@@ -12,7 +12,7 @@ extern "C" {
 
 #define MK_ALT	32
 
-typedef interface IParseDisplayname *LPPARSEDISPLAYNAME;
+typedef interface IParseDisplayName *LPPARSEDISPLAYNAME;
 typedef interface IOleContainer *LPOLECONTAINER;
 typedef interface IOleClientSite *LPOLECLIENTSITE;
 typedef interface IOleObject *LPOLEOBJECT;
@@ -31,6 +31,12 @@ typedef interface IOleCache *LPOLECACHE;
 typedef interface IOleCache2 *LPOLECACHE2;
 typedef interface IOleCacheControl *LPOLECACHECONTROL;
 
+typedef enum tagBINDSPEED
+{
+	BINDSPEED_INDEFINITE=1,
+	BINDSPEED_MODERATE,
+	BINDSPEED_IMMEDIATE
+} BINDSPEED;
 typedef enum tagOLEWHICHMK {
 	OLEWHICHMK_CONTAINER=1,
 	OLEWHICHMK_OBJREL,
@@ -98,6 +104,13 @@ DECLARE_INTERFACE_(IParseDisplayName,IUnknown)
 	STDMETHOD(ParseDisplayName)(THIS_ IBindCtx*,LPOLESTR,ULONG*,IMoniker**) PURE;
 };
 
+#ifdef COBJMACROS
+#define IParseDisplayName_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IParseDisplayName_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IParseDisplayName_Release(T) (T)->lpVtbl->Release(T)
+#define IParseDisplayName_ParseDisplayName(T,a,b,c,d) (T)->lpVtbl->ParseDisplayName(T,a,b,c,d)
+#endif
+
 EXTERN_C const IID IID_IOleContainer;
 #undef INTERFACE
 #define INTERFACE IOleContainer
@@ -126,6 +139,18 @@ DECLARE_INTERFACE_(IOleItemContainer,IOleContainer)
 	STDMETHOD(GetObjectStorage)(THIS_ LPOLESTR,IBindCtx*,REFIID,void**) PURE;
 	STDMETHOD(IsRunning)(THIS_ LPOLESTR) PURE;
 };
+
+#ifdef COBJMACROS
+#define IOleItemContainer_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IOleItemContainer_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IOleItemContainer_Release(T) (T)->lpVtbl->Release(T)
+#define IOleItemContainer_ParseDisplayName(T,a,b,c,d) (T)->lpVtbl->ParseDisplayName(T,a,b,c,d)
+#define IOleItemContainer_EnumObjects(T,a,b) (T)->lpVtbl->EnumObjects(T,a,b)
+#define IOleItemContainer_LockContainer(T,a) (T)->lpVtbl->LockContainer(T,a)
+#define IOleItemContainer_GetObject(T,a,b,c,d,e) (T)->lpVtbl->GetObject(T,a,b,c,d,e)
+#define IOleItemContainer_GetObjectStorage(T,a,b,c,d) (T)->lpVtbl->GetObjectStorage(T,a,b,c,d)
+#define IOleItemContainer_IsRunning(T,a) (T)->lpVtbl->IsRunning(T,a)
+#endif
 
 EXTERN_C const IID IID_IOleClientSite;
 #undef INTERFACE
@@ -185,6 +210,33 @@ DECLARE_INTERFACE_(IOleObject,IUnknown)
 	STDMETHOD(GetMiscStatus)(THIS_ DWORD,PDWORD) PURE;
 	STDMETHOD(SetColorScheme)(THIS_ LPLOGPALETTE) PURE;
 };
+
+#ifdef COBJMACROS
+#define IOleObject_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IOleObject_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IOleObject_Release(T) (T)->lpVtbl->Release(T)
+#define IOleObject_SetClientSite(T,a) (T)->lpVtbl->SetClientSite(T,a)
+#define IOleObject_GetClientSite(T,a) (T)->lpVtbl->GetClientSite(T,a)
+#define IOleObject_SetHostNames(T,a,b) (T)->lpVtbl->SetHostNames(T,a,b)
+#define IOleObject_Close(T,a) (T)->lpVtbl->Close(T,a)
+#define IOleObject_SetMoniker(T,a,b) (T)->lpVtbl->SetMoniker(T,a,b)
+#define IOleObject_GetMoniker(T,a,b,c) (T)->lpVtbl->GetMoniker(T,a,b,c)
+#define IOleObject_InitFromData(T,a,b,c) (T)->lpVtbl->InitFromData(T,a,b,c)
+#define IOleObject_GetClipboardData(T,a,b) (T)->lpVtbl->GetClipboardData(T,a,b)
+#define IOleObject_DoVerb(T,a,b,c,d,e,f) (T)->lpVtbl->DoVerb(T,a,b,c,d,e,f)
+#define IOleObject_EnumVerbs(T,a) (T)->lpVtbl->EnumVerbs(T,a)
+#define IOleObject_Update(T) (T)->lpVtbl->Update(T)
+#define IOleObject_IsUpToDate(T) (T)->lpVtbl->IsUpToDate(T)
+#define IOleObject_GetUserClassID(T,a) (T)->lpVtbl->GetUserClassID(T,a)
+#define IOleObject_GetUserType(T,a,b) (T)->lpVtbl->GetUserType(T,a,b)
+#define IOleObject_SetExtent(T,a,b) (T)->lpVtbl->SetExtent(T,a,b)
+#define IOleObject_GetExtent(T,a,b) (T)->lpVtbl->GetExtent(T,a,b)
+#define IOleObject_Advise(T,a,b) (T)->lpVtbl->Advise(T,a,b)
+#define IOleObject_Unadvise(T,a) (T)->lpVtbl->Unadvise(T,a)
+#define IOleObject_EnumAdvise(T,a) (T)->lpVtbl->EnumAdvise(T,a)
+#define IOleObject_GetMiscStatus(T,a,b) (T)->lpVtbl->GetMiscStatus(T,a,b)
+#define IOleObject_SetColorScheme(T,a) (T)->lpVtbl->SetColorScheme(T,a)
+#endif
 
 EXTERN_C const IID IID_IOleWindow;
 #undef INTERFACE
@@ -357,6 +409,14 @@ DECLARE_INTERFACE_(IDropSource,IUnknown)
 	STDMETHOD(GiveFeedback)(THIS_ DWORD) PURE;
 };
 
+#ifdef COBJMACROS
+#define IDropSource_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IDropSource_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IDropSource_Release(T) (T)->lpVtbl->Release(T)
+#define IDropSource_QueryContinueDrag(T,a,b) (T)->lpVtbl->QueryContinueDrag(T,a,b)
+#define IDropSource_GiveFeedback(T,a) (T)->lpVtbl->GiveFeedback(T,a)
+#endif
+
 EXTERN_C const IID IID_IDropTarget;
 #undef INTERFACE
 #define INTERFACE IDropTarget
@@ -370,6 +430,16 @@ DECLARE_INTERFACE_(IDropTarget,IUnknown)
 	STDMETHOD(DragLeave)(THIS) PURE;
 	STDMETHOD(Drop)(THIS_ LPDATAOBJECT,DWORD,POINTL,PDWORD) PURE;
 };
+
+#ifdef COBJMACROS
+#define IDropTarget_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IDropTarget_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IDropTarget_Release(T) (T)->lpVtbl->Release(T)
+#define IDropTarget_DragEnter(T,a,b,c,d) (T)->lpVtbl->DragEnter(T,a,b,c,d)
+#define IDropTarget_DragOver(T,a,b,c) (T)->lpVtbl->DragOver(T,a,b,c)
+#define IDropTarget_DragLeave(T) (T)->lpVtbl->DragLeave(T)
+#define IDropTarget_Drop(T,a,b,c,d) (T)->lpVtbl->Drop(T,a,b,c,d)
+#endif
 
 typedef BOOL(CALLBACK *__IView_pfncont)(DWORD);
 EXTERN_C const IID IID_IViewObject;

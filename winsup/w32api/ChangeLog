@@ -1,3 +1,37 @@
+2004-01-03  Filip Navara  <xnavara@volny.cz>
+
+	* include/cguid.h (CLSID_StdGlobalInterfaceTable): Declare IID.
+	* include/oaidl.h (ITypeLib2, ITypeInfo2): Define interfaces,
+	declare IID's.
+	(IErrorInfo): Add COBJMACROS.
+	* include/objbase.h (STGM_NOSNAPSHOT): Add define.
+	(CoGetPSClsid): Add protototype,
+	(CoRegisterPSClsid): Likewise.
+	* include/objidl.h (IMarshal): Correct methods.
+	(IMallocSpy): Likewise,
+	(LPPSFACTORYBUFFER): Add typedef.
+	(IGlobalInterfaceTable): Define interface and COBJMACROS. Declare
+	IID.
+	(IStorage_CreateStorage, IRpcStubBuffer_Invoke): Fix macros.
+	* include/ocidl.h (PROPBAG2_TYPE): Define enum.
+	(PROPBAG2, QACONTAINERFLAGS, QACONTAINER, QACONTROL): Define
+	structures.
+	(IPropertyBag2, IPersistPropertyBag2,IAdviseSinkEx, IPointerInactive,
+	IOleUndoUnit, IOleParentUndoUnit, IEnumOleUndoUnits, IOleUndoManager,
+	IQuickActivate): Define interfaces. Declare IID's.
+	(IPersistPropertyBag2): Add COBJMACROS.
+	(LPOLEUNDOMANAGER): Add typedef.
+	(LPPROPERTYBAG2): Likewise.
+	* include/oleidl.h (LPPARSEDISPLAYNAME): Fix definiton.
+	(BINDSPEED): Add definition.
+	(IParseDisplayName, IOleItemContainer, IOleObject, IDropSource,
+	IDropTarget): Add COBJMACROS.
+	* include/wtypes.h (MEMCTX, MSHCTX): Fix enum.
+	* include/winerror.h (CO_S_NOTALLINTERFACES): Add define.
+	* lib/uuid.c (IID_IGlobalInterfaceTable, IID_IOleUndoManager,
+	IID_IPersistPropertyBag2, IID_IPropertyBag2, IID_IRpcProxyBuffer):
+	Add IID definitions.
+
 2004-01-02  Filip Navara  <xnavara@volny.cz>
 
 	* include/ddk/winddk.h: Don't care about value of

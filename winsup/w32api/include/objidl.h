@@ -465,10 +465,10 @@ DECLARE_INTERFACE_(IMarshal,IUnknown)
 	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
 	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
 	STDMETHOD_(ULONG,Release)(THIS) PURE;
-	STDMETHOD(GetUnmarshalClass) (THIS_ REFIID,DWORD,PVOID,DWORD,CLSID*) PURE;
-	STDMETHOD(GetMarshalSizeMax) (THIS_ REFIID,DWORD,PVOID,DWORD,PDWORD) PURE;
-	STDMETHOD(MarshalInterface) (THIS_ REFIID,DWORD,DWORD) PURE;
-	STDMETHOD(UnmarshalInterface) (THIS_ IStream*,void**) PURE;
+	STDMETHOD(GetUnmarshalClass) (THIS_ REFIID,PVOID,DWORD,PVOID,DWORD,CLSID*) PURE;
+	STDMETHOD(GetMarshalSizeMax) (THIS_ REFIID,PVOID,DWORD,PVOID,PDWORD,ULONG*) PURE;
+	STDMETHOD(MarshalInterface) (THIS_ IStream*,REFIID,PVOID,DWORD,PVOID,DWORD) PURE;
+	STDMETHOD(UnmarshalInterface) (THIS_ IStream*,REFIID,void**) PURE;
 	STDMETHOD(ReleaseMarshalData) (THIS_ IStream*) PURE;
 	STDMETHOD(DisconnectObject) (THIS_ DWORD) PURE;
 };
@@ -512,7 +512,7 @@ DECLARE_INTERFACE_(IMallocSpy,IUnknown)
 	STDMETHOD_(void*,PostAlloc)(THIS_ void*) PURE;
 	STDMETHOD_(void*,PreFree)(THIS_ void*,BOOL) PURE;
 	STDMETHOD_(void,PostFree)(THIS_ BOOL) PURE;
-	STDMETHOD_(ULONG,PreRealloc)(THIS_ void*,ULONG,void*) PURE;
+	STDMETHOD_(ULONG,PreRealloc)(THIS_ void*,ULONG,void**,BOOL) PURE;
 	STDMETHOD_(void*,PostRealloc)(THIS_ void*,BOOL) PURE;
 	STDMETHOD_(void*,PreGetSize)(THIS_ void*,BOOL) PURE;
 	STDMETHOD_(ULONG,PostGetSize)(THIS_ ULONG,BOOL) PURE;
@@ -817,6 +817,7 @@ DECLARE_INTERFACE_(IPSFactoryBuffer,IUnknown)
 	STDMETHOD(CreateProxy)(THIS_ LPUNKNOWN,REFIID,LPRPCPROXYBUFFER*,PVOID*) PURE;
 	STDMETHOD(CreateStub)(THIS_ REFIID,LPUNKNOWN,LPRPCSTUBBUFFER*) PURE;
 };
+typedef interface IPSFactoryBuffer *LPPSFACTORYBUFFER;
 
 EXTERN_C const IID IID_ILockBytes;
 #undef INTERFACE
@@ -1001,6 +1002,28 @@ DECLARE_INTERFACE_(ILayoutStorage,IUnknown)
 	STDMETHOD(EndMonitor)(THIS) PURE;
 	STDMETHOD(ReLayoutDocfile)(THIS_ OLECHAR*) PURE;
 };
+
+EXTERN_C const IID IID_IGlobalInterfaceTable;
+#undef INTERFACE
+#define INTERFACE IGlobalInterfaceTable
+DECLARE_INTERFACE_(IGlobalInterfaceTable,IUnknown)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD(RegisterInterfaceInGlobal)(THIS_ IUnknown*,REFIID,DWORD*) PURE;
+	STDMETHOD(RevokeInterfaceFromGlobal)(THIS_ DWORD) PURE;
+	STDMETHOD(GetInterfaceFromGlobal)(THIS_ DWORD,REFIID,void**) PURE;
+};
+
+#ifdef COBJMACROS
+#define IGlobalInterfaceTable_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IGlobalInterfaceTable_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IGlobalInterfaceTable_Release(T) (T)->lpVtbl->Release(T)
+#define IGlobalInterfaceTable_RegisterInterfaceInGlobal(T,a,b,c) (T)->lpVtbl->RegisterInterfaceInGlobal(T,a,b,c)
+#define IGlobalInterfaceTable_RevokeInterfaceFromGlobal(T,a) (T)->lpVtbl->RevokeInterfaceFromGlobal(T,a)
+#define IGlobalInterfaceTable_GetInterfaceFromGlobal(T,a,b,c) (T)->lpVtbl->GetInterfaceFromGlobal(T,a,b,c)
+#endif
 
 HRESULT STDMETHODCALLTYPE IMarshal_GetUnmarshalClass_Proxy(IMarshal*,REFIID,void*,DWORD,void*,DWORD,CLSID*);
 void STDMETHODCALLTYPE IMarshal_GetUnmarshalClass_Stub(IRpcStubBuffer*,IRpcChannelBuffer*,PRPC_MESSAGE,PDWORD);
@@ -1572,7 +1595,7 @@ HRESULT STDMETHODCALLTYPE ILockBytes_WriteAt_Stub(ILockBytes*,ULARGE_INTEGER,BYT
 #define IStorage_Release(This)	 (This)->lpVtbl->Release(This)
 #define IStorage_CreateStream(T,p,g,r1,r2,pp) (T)->lpVtbl->CreateStream(T,p,g,r1,r2,pp)
 #define IStorage_OpenStream(T,p,r1,g,r2,pp) (T)->lpVtbl->OpenStream(T,p,r1,g,r2,pp)
-#define IStorage_CreateStorage(T,p,g,d,r2,pp) (This)->lpVtbl->CreateStorage(T,p,g,d,r2,pp)
+#define IStorage_CreateStorage(T,p,g,d,r2,pp) (T)->lpVtbl->CreateStorage(T,p,g,d,r2,pp)
 #define IStorage_OpenStorage(This,pwcsName,pstgPriority,grfMode,snbExclude,reserved,ppstg) (This)->lpVtbl->OpenStorage(This,pwcsName,pstgPriority,grfMode,snbExclude,reserved,ppstg)
 #define IStorage_CopyTo(This,ciidExclude,rgiidExclude,snbExclude,pstgDest) (This)->lpVtbl->CopyTo(This,ciidExclude,rgiidExclude,snbExclude,pstgDest)
 #define IStorage_MoveElementTo(This,pwcsName,pstgDest,pwcsNewName,grfFlags) (This)->lpVtbl->MoveElementTo(This,pwcsName,pstgDest,pwcsNewName,grfFlags)
@@ -1692,7 +1715,7 @@ HRESULT STDMETHODCALLTYPE ILockBytes_WriteAt_Stub(ILockBytes*,ULARGE_INTEGER,BYT
 #define IRpcStubBuffer_Release(This)	(This)->lpVtbl->Release(This)
 #define IRpcStubBuffer_Connect(This,p)	 (This)->lpVtbl->Connect(This,p)
 #define IRpcStubBuffer_Disconnect(This)	 (This)->lpVtbl->Disconnect(This)
-#define IRpcStubBuffer_Invoke(T,_prpcmsg,_p)	 (T)->lpVtbl->Invoke(This,_prpcmsg,_p)
+#define IRpcStubBuffer_Invoke(T,_prpcmsg,_p)	 (T)->lpVtbl->Invoke(T,_prpcmsg,_p)
 #define IRpcStubBuffer_IsIIDSupported(T,d) (T)->lpVtbl->IsIIDSupported(T,d)
 #define IRpcStubBuffer_CountRefs(This)	 (This)->lpVtbl->CountRefs(This)
 #define IRpcStubBuffer_DebugServerQueryInterface(T,p) (T)->lpVtbl->DebugServerQueryInterface(T,p)

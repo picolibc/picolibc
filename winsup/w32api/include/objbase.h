@@ -39,6 +39,7 @@
 #define STGM_NOSCRATCH 0x100000
 #define STGM_CREATE 0x1000
 #define STGM_CONVERT 0x20000
+#define STGM_NOSNAPSHOT 0x200000
 #define STGM_FAILIFTHERE 0
 #define CWCSTORAGENAME 32
 #define ASYNC_MODE_COMPATIBILITY	1
@@ -180,6 +181,8 @@ WINOLEAPI_(ULONG) CoAddRefServerProcess(void);
 WINOLEAPI_(ULONG) CoReleaseServerProcess(void);
 WINOLEAPI CoResumeClassObjects(void);
 WINOLEAPI CoSuspendClassObjects(void);
+WINOLEAPI CoGetPSClsid(REFIID,CLSID*);
+WINOLEAPI CoRegisterPSClsid(REFIID,REFCLSID);
 
 #pragma pack(pop)
 #endif

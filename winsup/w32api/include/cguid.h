@@ -75,6 +75,7 @@ extern const CLSID CLSID_InProcFreeMarshaler;
 extern const CLSID CLSID_Picture_Metafile;
 extern const CLSID CLSID_Picture_EnhMetafile;
 extern const CLSID CLSID_Picture_Dib;
+extern const CLSID CLSID_StdGlobalInterfaceTable;
 extern const GUID GUID_TRISTATE;
 #ifdef __cplusplus
 }

@@ -54,12 +54,14 @@ extern "C" {
 #define IMPLTYPEFLAG_FDEFAULTVTABLE 8
 
 typedef interface ITypeLib *LPTYPELIB;
+typedef interface ITypeLib2 *LPTYPELIB2;
 typedef interface ICreateTypeInfo *LPCREATETYPEINFO;
 typedef interface ICreateTypeInfo2 *LPCREATETYPEINFO2;
 typedef interface ICreateTypeLib *LPCREATETYPELIB;
 typedef interface ICreateTypeLib2 *LPCREATETYPELIB2;
 typedef interface ITypeComp *LPTYPECOMP;
 typedef interface ITypeInfo *LPTYPEINFO;
+typedef interface ITypeInfo2 *LPTYPEINFO2;
 typedef interface IErrorInfo *LPERRORINFO;
 typedef interface IDispatch *LPDISPATCH;
 typedef interface IEnumVARIANT *LPENUMVARIANT;
@@ -68,11 +70,13 @@ typedef interface ISupportErrorInfo *LPSUPPORTERRORINFO;
 typedef interface IRecordInfo *LPRECORDINFO;
 
 extern const IID IID_ITypeLib;
+extern const IID IID_ITypeLib2;
 extern const IID IID_ICreateTypeInfo;
 extern const IID IID_ICreateTypeInfo2;
 extern const IID IID_ICreateTypeLib;
 extern const IID IID_ICreateTypeLib2;
 extern const IID IID_ITypeInfo;
+extern const IID IID_ITypeInfo2;
 extern const IID IID_IErrorInfo;
 extern const IID IID_IDispatch;
 extern const IID IID_IEnumVARIANT;
@@ -519,6 +523,49 @@ DECLARE_INTERFACE_(ITypeInfo,IUnknown)
 };
 
 #undef INTERFACE
+#define INTERFACE ITypeInfo2
+DECLARE_INTERFACE_(ITypeInfo2,ITypeInfo)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD(GetTypeAttr)(THIS_ LPTYPEATTR*) PURE;
+	STDMETHOD(GetTypeComp)(THIS_ LPTYPECOMP*) PURE;
+	STDMETHOD(GetFuncDesc)(THIS_ UINT,LPFUNCDESC*) PURE;
+	STDMETHOD(GetVarDesc)(THIS_ UINT,LPVARDESC*) PURE;
+	STDMETHOD(GetNames)(THIS_ MEMBERID,BSTR*,UINT,UINT*) PURE;
+	STDMETHOD(GetRefTypeOfImplType)(THIS_ UINT,HREFTYPE*) PURE;
+	STDMETHOD(GetImplTypeFlags)(THIS_ UINT,INT*) PURE;
+	STDMETHOD(GetIDsOfNames)(THIS_ LPOLESTR*,UINT,MEMBERID*) PURE;
+	STDMETHOD(Invoke)(THIS_ PVOID,MEMBERID,WORD,DISPPARAMS*,VARIANT*,EXCEPINFO*,UINT*) PURE;
+	STDMETHOD(GetDocumentation)(THIS_ MEMBERID,BSTR*,BSTR*,DWORD*,BSTR*) PURE;
+	STDMETHOD(GetDllEntry)(THIS_ MEMBERID,INVOKEKIND,BSTR*,BSTR*,WORD*) PURE;
+	STDMETHOD(GetRefTypeInfo)(THIS_ HREFTYPE,LPTYPEINFO*) PURE;
+	STDMETHOD(AddressOfMember)(THIS_ MEMBERID,INVOKEKIND,PVOID*) PURE;
+	STDMETHOD(CreateInstance)(THIS_ LPUNKNOWN,REFIID,PVOID*) PURE;
+	STDMETHOD(GetMops)(THIS_ MEMBERID,BSTR*) PURE;
+	STDMETHOD(GetContainingTypeLib)(THIS_ LPTYPELIB*,UINT*) PURE;
+	STDMETHOD_(void,ReleaseTypeAttr)(THIS_ LPTYPEATTR) PURE;
+	STDMETHOD_(void,ReleaseFuncDesc)(THIS_ LPFUNCDESC) PURE;
+	STDMETHOD_(void,ReleaseVarDesc)(THIS_ LPVARDESC) PURE;
+	STDMETHOD(GetTypeKind)(THIS_ TYPEKIND*) PURE;
+	STDMETHOD(GetTypeFlags)(THIS_ ULONG*) PURE;
+	STDMETHOD(GetFuncIndexOfMemId)(THIS_ MEMBERID,INVOKEKIND,UINT*) PURE;
+	STDMETHOD(GetVarIndexOfMemId)(THIS_ MEMBERID,UINT*) PURE;
+	STDMETHOD(GetCustData)(THIS_ REFGUID,VARIANT*) PURE;
+	STDMETHOD(GetFuncCustData)(THIS_ UINT,REFGUID,VARIANT*) PURE;
+	STDMETHOD(GetParamCustData)(THIS_ UINT,UINT,REFGUID,VARIANT*) PURE;
+	STDMETHOD(GetVarCustData)(THIS_ UINT,REFGUID,VARIANT*) PURE;
+	STDMETHOD(GetImplTypeCustData)(THIS_ UINT,REFGUID,VARIANT*) PURE;
+	STDMETHOD(GetDocumentation2)(THIS_ MEMBERID,LCID,BSTR*,DWORD*,BSTR*) PURE;
+	STDMETHOD(GetAllCustData)(THIS_ CUSTDATA*) PURE;
+	STDMETHOD(GetAllFuncCustData)(THIS_ UINT,CUSTDATA*) PURE;
+	STDMETHOD(GetAllParamCustData)(THIS_ UINT,UINT,CUSTDATA*) PURE;
+	STDMETHOD(GetAllVarCustData)(THIS_ UINT,CUSTDATA*) PURE;
+	STDMETHOD(GetAllImplTypeCustData)(THIS_ UINT,CUSTDATA*) PURE;
+};
+
+#undef INTERFACE
 #define INTERFACE ITypeLib
 DECLARE_INTERFACE_(ITypeLib,IUnknown)
 {
@@ -537,6 +584,29 @@ DECLARE_INTERFACE_(ITypeLib,IUnknown)
 	STDMETHOD_(void,ReleaseTLibAttr)(THIS_ TLIBATTR*) PURE;
 };
 
+#undef INTERFACE
+#define INTERFACE ITypeLib2
+DECLARE_INTERFACE_(ITypeLib2,ITypeLib)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD_(UINT,GetTypeInfoCount)(THIS) PURE;
+	STDMETHOD(GetTypeInfo)(THIS_ UINT,ITypeInfo**) PURE;
+	STDMETHOD(GetTypeInfoType)(THIS_ UINT,TYPEKIND*) PURE;
+	STDMETHOD(GetTypeInfoOfGuid)(THIS_ REFGUID,ITypeInfo**) PURE;
+	STDMETHOD(GetLibAttr)(THIS_ TLIBATTR**) PURE;
+	STDMETHOD(GetTypeComp)(THIS_ ITypeComp*) PURE;
+	STDMETHOD(GetDocumentation)(THIS_ INT,BSTR*,BSTR*,DWORD*,BSTR*) PURE;
+	STDMETHOD(IsName)(THIS_ LPOLESTR,ULONG,BOOL*) PURE;
+	STDMETHOD(FindName)(THIS_ LPOLESTR,ULONG,ITypeInfo**,MEMBERID*,USHORT*) PURE;
+	STDMETHOD_(void,ReleaseTLibAttr)(THIS_ TLIBATTR*) PURE;
+	STDMETHOD(GetCustData)(THIS_ REFGUID,VARIANT*) PURE;
+	STDMETHOD(GetLibStatistics)(THIS_ ULONG*,ULONG*) PURE;
+	STDMETHOD(GetDocumentation2)(THIS_ INT,LCID,BSTR*,DWORD*,BSTR*) PURE;
+	STDMETHOD(GetAllCustData)(THIS_ CUSTDATA*) PURE;
+};
+
 EXTERN_C const IID IID_IErrorInfo;
 #undef INTERFACE
 #define INTERFACE IErrorInfo
@@ -551,6 +621,17 @@ DECLARE_INTERFACE_(IErrorInfo, IUnknown)
 	STDMETHOD(GetHelpFile)(THIS_ BSTR*) PURE;
 	STDMETHOD(GetHelpContext)(THIS_ DWORD*) PURE;
 };
+
+#ifdef COBJMACROS
+#define IErrorInfo_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IErrorInfo_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IErrorInfo_Release(T) (T)->lpVtbl->Release(T)
+#define IErrorInfo_GetGUID(T,a) (T)->lpVtbl->GetGUID(T,a)
+#define IErrorInfo_GetSource(T,a) (T)->lpVtbl->GetSource(T,a)
+#define IErrorInfo_GetDescription(T,a) (T)->lpVtbl->GetDescription(T,a)
+#define IErrorInfo_GetHelpFile(T,a) (T)->lpVtbl->GetHelpFile(T,a)
+#define IErrorInfo_GetHelpContext(T,a) (T)->lpVtbl->GetHelpContext(T,a)
+#endif
 
 EXTERN_C const IID IID_ICreateErrorInfo;
 #undef INTERFACE
