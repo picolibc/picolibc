@@ -1,3 +1,10 @@
+2004-09-07  Christopher Faylor  <cgf@timesys.com>
+
+	* cygtls.cc (_cygtls::init_thread): Set __sdidinit to negative value to
+	indicate that it is "special".
+	* thread.cc (pthread::exit): If __sdidinit is < 0, it was never really
+	initialized so reset it to 0 before calling _reclaim_reent.
+
 2004-09-05  Christopher Faylor  <cgf@timesys.com>
 
 	* include/cygwin/version.h: Bump DLL minor number to 12.

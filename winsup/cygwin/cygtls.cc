@@ -107,7 +107,7 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
 	  local_clib._stdin = _GLOBAL_REENT->_stdin;
 	  local_clib._stdout = _GLOBAL_REENT->_stdout;
 	  local_clib._stderr = _GLOBAL_REENT->_stderr;
-	  local_clib.__sdidinit = _GLOBAL_REENT->__sdidinit;
+	  local_clib.__sdidinit = _GLOBAL_REENT->__sdidinit ? -1 : 0;
 	  local_clib.__cleanup = _GLOBAL_REENT->__cleanup;
 	  local_clib.__sglue._niobs = 3;
 	  local_clib.__sglue._iobs = &_GLOBAL_REENT->__sf[0];
