@@ -565,10 +565,10 @@ fhandler_tty_slave::open (path_conv *, int flags, mode_t)
 int
 fhandler_tty_slave::close ()
 {
-  if (!output_done_event)
+  if (!output_done_event && !cygheap->fdtab.in_vfork_cleanup ())
     {
       fhandler_console::open_fhs--;
-      termios_printf ("decremeted open_fhs %d", fhandler_console::open_fhs);
+      termios_printf ("decremented open_fhs %d", fhandler_console::open_fhs);
     }
   return fhandler_tty_common::close ();
 }
