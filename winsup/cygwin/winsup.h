@@ -83,13 +83,16 @@ extern "C" DWORD WINAPI GetLastError (void);
 enum os_type {winNT = 1, win95, win98, winME, win32s, unknown};
 extern os_type os_being_run;
 
+enum codepage_type {ansi_cp, oem_cp};
+extern codepage_type current_codepage;
+
 /* Used to check if Cygwin DLL is dynamically loaded. */
 extern int dynamically_loaded;
 
 #define sys_wcstombs(tgt,src,len) \
-		    WideCharToMultiByte(CP_ACP,0,(src),-1,(tgt),(len),NULL,NULL)
+		    WideCharToMultiByte((current_codepage==ansi_cp?CP_ACP:CP_OEMCP),0,(src),-1,(tgt),(len),NULL,NULL)
 #define sys_mbstowcs(tgt,src,len) \
-		    MultiByteToWideChar(CP_ACP,0,(src),-1,(tgt),(len))
+		    MultiByteToWideChar((current_codepage==ansi_cp?CP_ACP:CP_OEMCP),0,(src),-1,(tgt),(len))
 
 #define TITLESIZE 1024
 #define MAX_USER_NAME 20
@@ -181,6 +184,8 @@ extern HANDLE netapi32_handle;
 /* debug_on_trap support. see exceptions.cc:try_to_debug() */
 extern "C" void error_start_init (const char*);
 extern "C" int try_to_debug ();
+
+extern "C" void codepage_init (const char*);
 
 extern int cygwin_finished_initializing;
 

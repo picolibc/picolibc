@@ -52,7 +52,7 @@ fhandler_dev_clipboard::read (void *ptr, size_t len)
   if (!clipboard_eof)
     {
       OpenClipboard(0);
-      hglb = GetClipboardData(CF_TEXT);
+      hglb = GetClipboardData((current_codepage==ansi_cp ? CF_TEXT : CF_OEMTEXT));
       lpstr = (LPSTR) GlobalLock(hglb);
       if (len < sizeof (lpstr))
         {

@@ -87,6 +87,31 @@ set_myself (pid_t pid, HANDLE h)
   return;
 }
 
+extern "C" void
+codepage_init (const char *buf)
+{
+  if (!buf || !*buf)
+    return;
+
+  if ( strcmp ( buf, "oem" ) == 0 )
+    {
+      current_codepage = oem_cp;
+      SetFileApisToOEM ();
+      debug_printf ( "File APIs set to OEM" );
+    }
+  else if ( strcmp ( buf, "ansi" ) == 0 )
+    {
+      current_codepage = ansi_cp;
+      SetFileApisToANSI ();
+      debug_printf ( "File APIs set to ANSI" );
+    }
+  else
+    {
+      debug_printf ( "Wrong codepage name: %s", buf );
+    }
+}
+
+
 /* Initialize the process table entry for the current task.
    This is not called for fork'd tasks, only exec'd ones.  */
 void __stdcall

@@ -247,6 +247,7 @@ LoadDLLfuncEx (RtlNtStatusToDosError, 4, ntdll, 1)
 LoadDLLfuncEx (ZwQuerySystemInformation, 16, ntdll, 1)
 
 LoadDLLinit (user32)
+LoadDLLfunc (CharToOemA, 8, user32)
 LoadDLLfunc (CharToOemBuffA, 12, user32)
 LoadDLLfunc (CloseClipboard, 0, user32)
 LoadDLLfunc (CreateWindowExA, 48, user32)

@@ -1,7 +1,7 @@
 /* environ.cc: Cygwin-adopted functions from newlib to manipulate
    process's environment.
 
-   Copyright 1997, 1998, 1999, 2000 Cygnus Solutions.
+   Copyright 1997, 1998, 1999, 2000 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -42,12 +42,11 @@ static char **lastenviron = NULL;
 
 
 /* List of names which are converted from dos to unix
- * on the way in and back again on the way out.
- *
- * PATH needs to be here because CreateProcess uses it and gdb uses
- * CreateProcess.  HOME is here because most shells use it and would be
- * confused by Windows style path names.
- */
+   on the way in and back again on the way out.
+  
+   PATH needs to be here because CreateProcess uses it and gdb uses
+   CreateProcess.  HOME is here because most shells use it and would be
+   confused by Windows style path names.  */
 static int return_MAX_PATH (const char *) {return MAX_PATH;}
 static win_env conv_envvars[] =
   {
@@ -282,10 +281,7 @@ _addenv (const char *name, const char *value, int overwrite)
   return 0;
 }
 
-/* putenv --
- *	Sets an environment variable
- */
-
+/* putenv Sets an environment variable */
 extern "C" int
 putenv (const char *str)
 {
@@ -306,12 +302,8 @@ putenv (const char *str)
   return 0;
 }
 
-/*
- * setenv --
- *	Set the value of the environment variable "name" to be
- *	"value".  If overwrite is set, replace any current value.
- */
-
+/* setenv -- Set the value of the environment variable "name" to be
+   "value".  If overwrite is set, replace any current value.  */
 extern "C" int
 setenv (const char *name, const char *value, int overwrite)
 {
@@ -333,11 +325,7 @@ setenv (const char *name, const char *value, int overwrite)
   return _addenv (name, value, !!overwrite);
 }
 
-/*
- * unsetenv(name) --
- *	Delete environment variable "name".
- */
-
+/* unsetenv(name) -- Delete environment variable "name".  */
 extern "C" void
 unsetenv (const char *name)
 {
@@ -352,7 +340,6 @@ unsetenv (const char *name)
 }
 
 /* Turn environment variable part of a=b string into uppercase. */
-
 static __inline__ void
 ucenv (char *p, char *eq)
 {
@@ -382,10 +369,9 @@ enum settings
   };
 
 /* When BUF is:
- * null or empty: disables globbing
- * "ignorecase": enables case-insensitive globbing
- * anything else: enables case-sensitive globbing
- */
+   null or empty: disables globbing
+   "ignorecase": enables case-insensitive globbing
+   anything else: enables case-sensitive globbing */
 static void
 glob_init (const char *buf)
 {
@@ -407,9 +393,8 @@ glob_init (const char *buf)
 }
 
 /* The structure below is used to set up an array which is used to
- * parse the CYGWIN environment variable or, if enabled, options from
- * the registry.
- */
+   parse the CYGWIN environment variable or, if enabled, options from
+   the registry.  */
 struct parse_thing
   {
     const char *name;
@@ -431,6 +416,7 @@ struct parse_thing
   } known[] =
 {
   {"binmode", {x: &binmode}, justset, NULL, {{O_TEXT}, {O_BINARY}}},
+  {"codepage", {func: &codepage_init}, isfunc, NULL, {{0}, {0}}},
   {"envcache", {&envcache}, justset, NULL, {{TRUE}, {FALSE}}},
   {"error_start", {func: &error_start_init}, isfunc, NULL, {{0}, {0}}},
   {"export", {&export_settings}, justset, NULL, {{FALSE}, {TRUE}}},
@@ -446,8 +432,7 @@ struct parse_thing
 };
 
 /* Parse a string of the form "something=stuff somethingelse=more-stuff",
- * silently ignoring unknown "somethings".
- */
+   silently ignoring unknown "somethings".  */
 static void __stdcall
 parse_options (char *buf)
 {
@@ -531,7 +516,6 @@ parse_options (char *buf)
 }
 
 /* Set options from the registry. */
-
 static void __stdcall
 regopt (const char *name)
 {
@@ -557,8 +541,7 @@ regopt (const char *name)
 }
 
 /* Initialize the environ array.  Look for the CYGWIN environment
- * environment variable and set appropriate options from it.
- */
+   environment variable and set appropriate options from it.  */
 void
 environ_init (char **envp, int envc)
 {
@@ -661,8 +644,7 @@ out:
   MALLOC_CHECK;
 }
 
-/* Function called by qsort to sort environment strings.
- */
+/* Function called by qsort to sort environment strings.  */
 static int
 env_sort (const void *a, const void *b)
 {
@@ -673,10 +655,9 @@ env_sort (const void *a, const void *b)
 }
 
 /* Create a Windows-style environment block, i.e. a typical character buffer
- * filled with null terminated strings, terminated by double null characters.
- * Converts environment variables noted in conv_envvars into win32 form
- * prior to placing them in the string.
- */
+   filled with null terminated strings, terminated by double null characters.
+   Converts environment variables noted in conv_envvars into win32 form
+   prior to placing them in the string.  */
 char * __stdcall
 winenv (const char * const *envp, int keep_posix)
 {

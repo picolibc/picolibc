@@ -15,6 +15,8 @@ details. */
 #include "exceptions.h"
 #include <ctype.h>
 #include <limits.h>
+#include <wingdi.h>
+#include <winuser.h>
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
@@ -55,6 +57,7 @@ per_thread NO_COPY *threadstuff[] = {&waitq_storage,
 BOOL display_title = FALSE;
 BOOL strip_title_path = FALSE;
 BOOL allow_glob = TRUE;
+codepage_type current_codepage = ansi_cp;
 
 int cygwin_finished_initializing = 0;
 
@@ -788,6 +791,9 @@ dll_crt0_1 ()
     {
       char *line = GetCommandLineA ();
       line = strcpy ((char *) alloca (strlen (line) + 1), line);
+
+      if (current_codepage == oem_cp)
+	CharToOemA ( line, line );
 
       /* Scan the command line and build argv.  Expand wildcards if not
 	 called from another cygwin process. */

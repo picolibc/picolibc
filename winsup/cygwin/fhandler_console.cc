@@ -217,7 +217,7 @@ fhandler_console::read (void *pv, size_t buflen)
 	      tmp[1] = ich;
 	      /* Need this check since US code page seems to have a bug when
 		 converting a CTRL-U. */
-	      if ((unsigned char)ich > 0x7f)
+	  if ((unsigned char)ich > 0x7f && current_codepage == ansi_cp)
 		OemToCharBuff (tmp + 1, tmp + 1, 1);
 	      if (!(input_rec.Event.KeyEvent.dwControlKeyState & LEFT_ALT_PRESSED))
 		toadd = tmp + 1;
@@ -1163,7 +1163,10 @@ fhandler_console::write_normal (const unsigned char *src,
       size_t len = found - src;
       do {
 	size_t l2 = min (sizeof (buf), len);
-	CharToOemBuff ((LPCSTR)src, buf, l2);
+	if (current_codepage == ansi_cp)
+	  CharToOemBuff ((LPCSTR)src, buf, l2);
+	else
+	  strncpy (buf, (LPCSTR)src, l2);
 	if (! WriteFile (get_output_handle (), buf, l2, &done, 0))
 	{
 	  debug_printf ("write failed, handle %p", get_output_handle ());

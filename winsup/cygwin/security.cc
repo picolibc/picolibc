@@ -22,6 +22,8 @@ details. */
 #include <sys/stat.h>
 #include <sys/acl.h>
 #include <ctype.h>
+#include <wingdi.h>
+#include <winuser.h>
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "path.h"
@@ -513,8 +515,18 @@ read_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size)
   debug_printf("file = %s", file);
 
   DWORD len = 0;
-  if (! GetFileSecurity (file,
-			 OWNER_SECURITY_INFORMATION
+  const char *pfile = file;
+  char fbuf [PATH_MAX];
+  if (current_codepage == oem_cp)
+    {
+      DWORD fname_len = min (sizeof (fbuf) - 1, strlen (file));
+      bzero (fbuf, sizeof (fbuf));
+      OemToCharBuff(file, fbuf, fname_len);
+      pfile = fbuf;
+    }
+
+  if (! GetFileSecurity (pfile,
+	 		OWNER_SECURITY_INFORMATION
 			 | GROUP_SECURITY_INFORMATION
 			 | DACL_SECURITY_INFORMATION,
 			 sd_buf, *sd_size, &len))

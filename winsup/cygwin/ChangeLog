@@ -1,3 +1,22 @@
+2000-12-09  Egor Duda <deo@logos-m.ru>
+
+	* autoload.cc: Autoload CharToOemA.
+	* dcrt0.cc (dll_crt0_1): Translate command line to OEM if current
+	codepage is OEM.
+	* environ.cc: Add new option 'codepage' to CYGWIN environment variable.
+	* fhandler_clipboard.cc (fhandler_clipboard::read): Read clipboard in
+	OEM mode if current codepage is OEM.
+	* fhandler_console.cc (fhandler_console::read): Only translate console
+	input if current codepage is ANSI.
+	* fhandler_console.cc (fhandler_console::write_normal): Translate
+	output data if current codepage is ANSI.
+	* pinfo.cc (codepage_init): New function.  Setup current codepage from
+	CYGWIN environment variable and set codepage for file APIs.
+	* security.cc (read_sd): Translate file name to it if current codepage
+	is OEM.
+	* winsup.h: (sys_wcstombs,sys_mbstowcs): Use current codepage for
+	translations between multibyte and widechar string and vice versa.
+
 Sat Dec  9 16:29:45 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (normalize_win32_path): Check for explicit use of two slashes
