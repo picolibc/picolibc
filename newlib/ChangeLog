@@ -1,3 +1,10 @@
+2004-01-16  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* libc/stdio/findfp.c (__sfp): Remove unnecessary memset.
+	* libc/stdio/vfprintf.c (__sbprintf): Ditto.
+	Add calls to __lock_init_recursive and __lock_close_recursive
+	instead.
+
 2004-01-15  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* libc/stdio/fclose.c: Include sys/lock.h.

@@ -114,9 +114,6 @@ found:
   fp->_ub._size = 0;
   fp->_lb._base = NULL;		/* no line buffer */
   fp->_lb._size = 0;
-#ifndef __SINGLE_THREAD__
-  memset (&fp->_lock, 0, sizeof(fp->_lock));
-#endif
 
   return fp;
 }

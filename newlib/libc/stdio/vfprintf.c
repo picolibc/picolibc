@@ -253,7 +253,7 @@ __sbprintf(fp, fmt, ap)
 	fake._bf._size = fake._w = sizeof(buf);
 	fake._lbfsize = 0;	/* not actually used, but Just In Case */
 #ifndef __SINGLE_THREAD__
-	memset (&fake._lock, 0, sizeof(fake._lock));
+	__lock_init_recursive (*(_LOCK_RECURSIVE_T *)&fake._lock);
 #endif
 
 	/* do the work, then copy any error status */
@@ -262,6 +262,10 @@ __sbprintf(fp, fmt, ap)
 		ret = EOF;
 	if (fake._flags & __SERR)
 		fp->_flags |= __SERR;
+
+#ifndef __SINGLE_THREAD__
+	__lock_close_recursive (*(_LOCK_RECURSIVE_T *)&fake._lock);
+#endif
 	return (ret);
 }
 
