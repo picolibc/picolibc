@@ -19,7 +19,7 @@
 
 2004-10-06  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
 
-	* cygcheck.cc (dump_sysinfo): Warn about empty path-components.
+	* cygcheck.cc (dump_sysinfo): Warn about empty path components.
 
 2004-10-04  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
 
