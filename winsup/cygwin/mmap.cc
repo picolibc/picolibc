@@ -313,7 +313,7 @@ map::get_list_by_fd (int fd)
 #else /* so we use the name hash value to identify the file unless
          it's not an anonymous mapping. */
     if ((fd == -1 && lists[i]->fd == -1)
-        || lists[i]->hash == fdtab[fd]->get_namehash ())
+        || (fd != -1 && lists[i]->hash == fdtab[fd]->get_namehash ()))
 #endif
       return lists[i];
   return 0;

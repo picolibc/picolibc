@@ -1,3 +1,8 @@
+Mon Mar 19 14:32:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* mmap.cc (map::get_list_by_fd): Avoid calling `get_namehash' when
+	file descriptor is -1.
+
 Sat Mar 17 18:30:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* syscalls.cc (check_posix_perm): New static function.
