@@ -141,5 +141,8 @@
  * sections.  */
 #undef  HAVE_INITFINI_ARRAY
 
+/* Define if the compiler supports aliasing an array to an address.  */
+#undef  _HAVE_ARRAY_ALIASING
+
 #endif /* !__NEWLIB_H__ */
 

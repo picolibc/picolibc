@@ -84,21 +84,40 @@ static _CONST char _ctype_b[128 + 256] = {
 	_CTYPE_DATA_128_256
 };
 
-#if defined(__CYGWIN__)
-extern _CONST char __declspec(dllexport) _ctype_[1 + 256] __attribute__ ((alias ("_ctype_b+127")));
+#  if defined(__CYGWIN__)
 _CONST char __declspec(dllexport) *__ctype_ptr = _ctype_b + 128;
-#else
-extern _CONST char _ctype_[1 + 256] __attribute__ ((alias ("_ctype_b+127")));
+#  else
 _CONST char *__ctype_ptr = _ctype_b + 128;
-#endif
+#  endif
+
+#  if defined(_HAVE_ARRAY_ALIASING)
+
+#    if defined(__CYGWIN__)
+extern _CONST char __declspec(dllexport) _ctype_[1 + 256] __attribute__ ((alias ("_ctype_b+127")));
+#    else
+extern _CONST char _ctype_[1 + 256] __attribute__ ((alias ("_ctype_b+127")));
+#    endif
+
+#  else /* !_HAVE_ARRAY_ALIASING */
+
+#    if defined(__CYGWIN__)
+_CONST char __declspec(dllexport) _ctype_[1 + 256] = {
+#    else
+_CONST char _ctype_[1 + 256] = {
+#    endif
+	0,
+	_CTYPE_DATA_0_127,
+	_CTYPE_DATA_128_256
+};
+#  endif /* !_HAVE_ARRAY_ALIASING */
 
 #else	/* !defined(ALLOW_NEGATIVE_CTYPE_INDEX) */
 
-#if defined(__CYGWIN__)
+# if defined(__CYGWIN__)
 _CONST char __declspec(dllexport) _ctype_[1 + 256] = {
-#else
+# else
 _CONST char _ctype_[1 + 256] = {
-#endif
+# endif
 	0,
 	_CTYPE_DATA_0_127,
 	_CTYPE_DATA_128_256

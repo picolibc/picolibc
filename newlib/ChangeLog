@@ -1,3 +1,15 @@
+2005-03-17  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.in: Add new check to see if compiler supports
+	aliasing of arrays and define _HAVE_ARRAY_ALIASING if true.
+	* configure: Regenerated.
+	* Makefile.in: Ditto.
+	* newlib.hin: Add _HAVE_ARRAY_ALIASING.
+	* libc/ctype/ctype_.c: Check for _HAVE_ARRAY_ALIASING before
+	aliasing the _ctype_ array to _ctype_b.
+	* libc/include/ctype.h: Change macros to use __ctype_ptr.  Mark
+	_ctype_ as deprecated.
+
 2005-03-17  Hans-Peter Nilsson  <hp@axis.com>
 
 	* configure.host (newlib_cflags) <cris-*-*, crisv32-*-*>: Add

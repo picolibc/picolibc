@@ -3459,6 +3459,34 @@ EOF
 
 fi
 
+echo $ac_n "checking for array aliasing support""... $ac_c" 1>&6
+echo "configure:3464: checking for array aliasing support" >&5
+if eval "test \"`echo '$''{'libc_cv_array_aliasing'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  cat > conftest.c <<EOF
+char x3 = { 'a', 'b', 'c' };
+extern char y2 __attribute__((alias ("x+1")));
+EOF
+if { ac_try='${CC} $CFLAGS $CPPFLAGS -c conftest.c
+		   1>&AS_MESSAGE_LOG_FD'; { (eval echo configure:3473: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; }
+then
+  libc_cv_array_aliasing=yes
+else
+  libc_cv_array_aliasing=no
+fi
+rm -f conftest*
+fi
+
+echo "$ac_t""$libc_cv_array_aliasing" 1>&6
+
+if test $libc_cv_array_aliasing = yes; then
+  cat >> confdefs.h <<EOF
+#define _HAVE_ARRAY_ALIASING 1
+EOF
+
+fi
+
 trap '' 1 2 15
 cat > confcache <<\EOF
 # This file is a shell script that caches the results of configure
@@ -3676,6 +3704,7 @@ s%@UNIX_OBJECTLIST@%$UNIX_OBJECTLIST%g
 s%@STDIO64_OBJECTLIST@%$STDIO64_OBJECTLIST%g
 s%@CC_FOR_BUILD@%$CC_FOR_BUILD%g
 s%@libc_cv_initfinit_array@%$libc_cv_initfinit_array%g
+s%@libc_cv_array_aliasing@%$libc_cv_array_aliasing%g
 
 CEOF
 EOF
