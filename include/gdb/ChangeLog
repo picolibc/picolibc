@@ -1,3 +1,8 @@
+2003-03-20  Nick Clifton  <nickc@redhat.com>
+
+	* sim-arm.h (sim_arm_regs): Add Maverick co-processor
+	registers.
+
 2003-02-27  Andrew Cagney  <cagney@redhat.com>
 
 	* remote-sim.h (sim_open, sim_load, sim_create_inferior): Rename
