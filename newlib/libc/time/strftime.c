@@ -84,7 +84,7 @@ A string representing the date, in the form `<<"%m/%d/%y">>'.
 
 o %e
 The day of the month, formatted with leading space if single digit
-(from `<< 1>>' to `<<31>>'). [tm_mday]
+(from `<<1>>' to `<<31>>'). [tm_mday]
 
 o %E<<x>>
 In some locales, the E modifier selects alternative representations of
@@ -127,11 +127,11 @@ The count of days in the year, formatted with three digits
 
 o %k
 The hour (on a 24-hour clock), formatted with leading space if single
-digit (from `<< 0>>' to `<<23>>'). Non-POSIX extension. [tm_hour]
+digit (from `<<0>>' to `<<23>>'). Non-POSIX extension. [tm_hour]
 
 o %l
 The hour (on a 12-hour clock), formatted with leading space if single
-digit (from `<< 1>>' to `<<12>>'). Non-POSIX extension. [tm_hour]
+digit (from `<<1>>' to `<<12>>'). Non-POSIX extension. [tm_hour]
 
 o %m
 The month number, formatted with two digits (from `<<01>>' to `<<12>>').
