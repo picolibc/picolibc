@@ -385,7 +385,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     chtype = PROC_EXEC;
 
   HANDLE subproc_ready;
-  if (chtype != PROC_EXEC)
+  if (1 || chtype != PROC_EXEC)
     subproc_ready = NULL;
   else
     {
@@ -808,7 +808,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	  goto out;
 	}
       child->dwProcessId = pi.dwProcessId;
-      child->hProcess = pi.hProcess;
+      child.hProcess = pi.hProcess;
       if (!child.remember ())
 	{
 	  syscall_printf ("process table full");
@@ -837,7 +837,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   res = 0;
   exited = false;
-  MALLOC_CHECK;
+#if 0
   if (mode == _P_OVERLAY)
     {
       int nwait = 3;
@@ -859,9 +859,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	      reset_signal_arrived ();
 	      continue;
 	    case WAIT_OBJECT_0 + 2:
-	      if (my_parent_is_alive ())
-		res |= EXIT_REPARENTING;
-	      else if (!myself->ppid_handle)
+	      if (!myself->cygstarted)
 		{
 		  nwait = 2;
 		  sigproc_terminate ();
@@ -885,41 +883,15 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	}
 
       ForceCloseHandle (subproc_ready);
-
-      sigproc_printf ("res %p", res);
-
-      if (res & EXIT_REPARENTING)
-	{
-	  /* Try to reparent child process.
-	   * Make handles to child available to parent process and exit with
-	   * EXIT_REPARENTING status. Wait() syscall in parent will then wait
-	   * for newly created child.
-	   */
-	  HANDLE oldh = myself->hProcess;
-	  HANDLE h = myself->ppid_handle;
-	  sigproc_printf ("parent handle %p", h);
-	  int rc = DuplicateHandle (hMainProc, pi.hProcess, h, &myself->hProcess,
-				    0, FALSE, DUPLICATE_SAME_ACCESS);
-	  sigproc_printf ("%d = DuplicateHandle, oldh %p, newh %p",
-			  rc, oldh, myself->hProcess);
-	  VerifyHandle (myself->hProcess);
-	  if (!rc && my_parent_is_alive ())
-	    {
-	      system_printf ("Reparent failed, parent handle %p, %E", h);
-	      system_printf ("my dwProcessId %d, myself->dwProcessId %d",
-			     GetCurrentProcessId (), myself->dwProcessId);
-	      system_printf ("old hProcess %p, hProcess %p", oldh, myself->hProcess);
-	    }
-	}
-
+      sigproc_printf ("P_OVERLAY res %p", res);
     }
+#endif
 
-  MALLOC_CHECK;
+  ForceCloseHandle1 (pi.hProcess, childhProc);
 
   switch (mode)
     {
     case _P_OVERLAY:
-      ForceCloseHandle1 (pi.hProcess, childhProc);
       myself->exit (res, 1);
       break;
     case _P_WAIT:
@@ -986,7 +958,6 @@ spawnve (int mode, const char *path, const char *const *argv,
     case _P_WAIT:
     case _P_DETACH:
     case _P_SYSTEM:
-      subproc_init ();
       ret = spawn_guts (path, argv, envp, mode);
 #ifdef NEWVFORK
       if (vf)

@@ -356,8 +356,6 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 
   pthread::atforkprepare ();
 
-  subproc_init ();
-
   int c_flags = GetPriorityClass (hMainProc) /*|
 		CREATE_NEW_PROCESS_GROUP*/;
   STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
@@ -384,7 +382,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   /* Create an inheritable handle to pass to the child process.  This will
      allow the child to duplicate handles from the parent to itself. */
   hParent = NULL;
-  if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &hParent, 0, 1,
+  if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &hParent, 0, TRUE,
 			DUPLICATE_SAME_ACCESS))
     {
       system_printf ("couldn't create handle to myself for child, %E");
@@ -501,8 +499,8 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   ProtectHandle1 (pi.hProcess, childhProc);
 
   /* Fill in fields in the child's process table entry.  */
-  forked->hProcess = pi.hProcess;
   forked->dwProcessId = pi.dwProcessId;
+  forked.hProcess = pi.hProcess;
 
   /* Hopefully, this will succeed.  The alternative to doing things this
      way is to reserve space prior to calling CreateProcess and then fill
@@ -590,6 +588,8 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
       (void) resume_child (pi, forker_finished);
     }
 
+  if (pi.hProcess)
+    ForceCloseHandle1 (pi.hProcess, childhProc);
   ForceCloseHandle (subproc_ready);
   ForceCloseHandle (pi.hThread);
   ForceCloseHandle (forker_finished);

@@ -656,7 +656,6 @@ dll_crt0_0 ()
     memory_init ();
   else
     {
-      bool close_ppid_handle = false;
       bool close_hexec_proc = false;
       switch (child_proc_info->type)
 	{
@@ -665,12 +664,10 @@ dll_crt0_0 ()
 	    cygheap_fixup_in_child (false);
 	    memory_init ();
 	    set_myself (NULL);
-	    close_ppid_handle = !!child_proc_info->pppid_handle;
 	    break;
 	  case _PROC_SPAWN:
 	    /* Have to delay closes until after cygheap is setup */
 	    close_hexec_proc = !!spawn_info->hexec_proc;
-	    close_ppid_handle = !!child_proc_info->pppid_handle;
 	    goto around;
 	  case _PROC_EXEC:
 	    hexec_proc = spawn_info->hexec_proc;
@@ -699,8 +696,6 @@ dll_crt0_0 ()
 	}
       if (close_hexec_proc)
 	CloseHandle (spawn_info->hexec_proc);
-      if (close_ppid_handle)
-	CloseHandle (child_proc_info->pppid_handle);
     }
 
   _cygtls::init ();
@@ -1014,13 +1009,10 @@ do_exit (int status)
   if (exit_state < ES_SIGNAL)
     {
       exit_state = ES_SIGNAL;
-      if (!(n & EXIT_REPARENTING))
-	{
-	  signal (SIGCHLD, SIG_IGN);
-	  signal (SIGHUP, SIG_IGN);
-	  signal (SIGINT, SIG_IGN);
-	  signal (SIGQUIT, SIG_IGN);
-	}
+      signal (SIGCHLD, SIG_IGN);
+      signal (SIGHUP, SIG_IGN);
+      signal (SIGINT, SIG_IGN);
+      signal (SIGQUIT, SIG_IGN);
     }
 
   if (exit_state < ES_CLOSEALL)
@@ -1112,7 +1104,7 @@ cygwin_exit (int n)
 extern "C" void
 _exit (int n)
 {
-  do_exit ((DWORD) n & 0xffff);
+  do_exit (((DWORD) n & 0xff) << 8);
 }
 
 extern "C" void

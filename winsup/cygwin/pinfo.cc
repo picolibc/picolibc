@@ -24,6 +24,7 @@ details. */
 #include "perprocess.h"
 #include "environ.h"
 #include <assert.h>
+#include <sys/wait.h>
 #include <ntdef.h>
 #include "ntdll.h"
 #include "cygthread.h"
@@ -70,7 +71,13 @@ set_myself (HANDLE h)
   if (!strace.active)
     strace.hello ();
   debug_printf ("myself->dwProcessId %u", myself->dwProcessId);
-  InitializeCriticalSection (&myself->lock);
+  InitializeCriticalSection (&myself.lock);
+  if (!h && myself->ppid)
+    {
+      pinfo parent (myself->ppid);
+      if (parent && parent->wr_proc_pipe)
+	CloseHandle (parent->wr_proc_pipe);
+    }
   return;
 }
 
@@ -108,6 +115,8 @@ _pinfo::exit (UINT n, bool norecord)
   cygthread::terminate ();
   if (norecord)
     sigproc_terminate ();
+  else
+    exitcode = n;
   if (this)
     {
       if (!norecord)
@@ -259,6 +268,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 	  procinfo->process_state |= PID_IN_USE | PID_EXECED;
 	  procinfo->pid = myself->pid;
 	}
+
       break;
     }
   destroy = 1;
@@ -505,7 +515,7 @@ _pinfo::commune_send (DWORD code, ...)
       __seterrno ();
       goto err;
     }
-  EnterCriticalSection (&myself->lock);
+  EnterCriticalSection (&myself.lock);
   myself->tothem = tome;
   myself->fromthem = fromme;
   myself->hello_pid = pid;
@@ -609,7 +619,7 @@ err:
 
 out:
   myself->hello_pid = 0;
-  LeaveCriticalSection (&myself->lock);
+  LeaveCriticalSection (&myself.lock);
   return res;
 }
 
@@ -640,6 +650,129 @@ _pinfo::cmdline (size_t& n)
       *p = '\0';
     }
   return s;
+}
+
+static DWORD WINAPI
+proc_waiter (void *arg)
+{
+  pinfo vchild = *(pinfo *) arg;
+  vchild.preserve ();
+
+  siginfo_t si;
+  si.si_signo = SIGCHLD;
+  si.si_code = SI_KERNEL;
+  si.si_pid = vchild->pid;
+  si.si_errno = 0;
+#if 0	// FIXME: This is tricky to get right
+  si.si_utime = pchildren[rc]->rusage_self.ru_utime;
+  si.si_stime = pchildren[rc].rusage_self.ru_stime;
+#else
+  si.si_utime = 0;
+  si.si_stime = 0;
+#endif
+  pid_t pid = vchild->pid;
+
+  for (;;)
+    {
+      DWORD nb;
+      char buf = '\0';
+      if (!ReadFile (vchild.rd_proc_pipe, &buf, 1, &nb, NULL)
+	  && GetLastError () != ERROR_BROKEN_PIPE)
+	{
+	  system_printf ("error on read of child wait pipe %p, %E", vchild.rd_proc_pipe);
+	  break;
+	}
+
+      si.si_uid = vchild->uid;
+
+      int proc_todo;
+      switch (buf)
+	{
+	case 0:
+	  if (WIFEXITED (vchild->exitcode))
+	    si.si_sigval.sival_int = CLD_STOPPED;
+	  else if (WCOREDUMP (vchild->exitcode))
+	    si.si_sigval.sival_int = CLD_DUMPED;
+	  else
+	    si.si_sigval.sival_int = CLD_KILLED;
+	  CloseHandle (vchild.rd_proc_pipe);
+	  vchild.rd_proc_pipe = NULL;
+	  si.si_status = vchild->exitcode;
+	  // proc_todo = PROC_CHILDTERMINATED;
+	  vchild->process_state = PID_ZOMBIE;
+	  break;
+	case SIGTTIN:
+	case SIGTTOU:
+	case SIGTSTP:
+	case SIGSTOP:
+	  si.si_sigval.sival_int = CLD_STOPPED;
+	  // proc_todo = PROC_CHILDSTOPPED;
+	  break;
+	case SIGCONT:
+	  // proc_todo = PROC_CHILDCONTINUED;
+	  continue;
+	default:
+	  system_printf ("unknown value %d on proc pipe", buf);
+	  continue;
+	}
+
+      /* Send a SIGCHLD to myself.   We do this here, rather than in proc_subproc
+	 to avoid the proc_subproc lock since the signal thread will eventually
+	 be calling proc_subproc and could unnecessarily block. */
+      sig_send (myself_nowait, si);
+
+      /* If we're just stopped or got a continue signal, keep looping.
+	 Otherwise, return this thread to the pool. */
+      if (buf != '\0')
+	sigproc_printf ("looping");
+      else
+	break;
+    }
+  sigproc_printf ("exiting wait thread for pid %d", pid);
+  return 0;
+}
+
+int
+pinfo::wait ()
+{
+  HANDLE out;
+  /* FIXME: execed processes should be able to wait for pids that were started
+     by the process which execed them. */
+  if (!CreatePipe (&rd_proc_pipe, &out, &sec_none_nih, 16))
+    {
+      system_printf ("Couldn't create pipe tracker for pid %d, %E",
+		     (*this)->pid);
+      return 0;
+    }
+  if (!DuplicateHandle (hMainProc, out, hProcess, &((*this)->wr_proc_pipe), 0,
+			TRUE, DUPLICATE_SAME_ACCESS))
+    {
+      system_printf ("Couldn't duplicate pipe topid %d(%p), %E", (*this)->pid,
+		     hProcess);
+      return 0;
+    }
+  CloseHandle (out);
+
+
+#if 1
+  DWORD tid;
+  HANDLE h = CreateThread (&sec_none_nih, 0, proc_waiter, this, 0, &tid);
+  if (!h)
+    sigproc_printf ("tracking thread creation failed for pid %d", (*this)->pid);
+  else
+    CloseHandle (h);
+#else
+  cygthread *h = new cygthread (proc_waiter, this, "sig");
+  if (!h)
+    sigproc_printf ("tracking thread creation failed for pid %d", (*this)->pid);
+  else
+    {
+      h->zap_h ();
+      sigproc_printf ("created tracking thread for pid %d, winpid %p, rd_pipe %p",
+		      (*this)->pid, (*this)->dwProcessId, rd_proc_pipe);
+    }
+#endif
+  return 1;
 }
 
 void

@@ -12,10 +12,6 @@ details. */
 #define _SIGPROC_H
 #include <signal.h>
 
-#define EXIT_SIGNAL	 0x010000
-#define EXIT_REPARENTING 0x020000
-#define EXIT_NOCLOSEALL  0x040000
-
 #ifdef NSIG
 enum
 {
@@ -38,7 +34,9 @@ enum procstuff
   PROC_CHILDTERMINATED	= 2,	// a child died
   PROC_CLEARWAIT	= 3,	// clear all waits - signal arrived
   PROC_WAIT		= 4,	// setup for wait() for subproc
-  PROC_NOTHING		= 5	// nothing, really
+  PROC_CHILDSTOPPED	= 5,	// register process as "stopped"
+  PROC_CHILDCONTINUED	= 6,	// remove process from "stopped" list
+  PROC_NOTHING		= 7	// nothing, really
 };
 
 struct sigpacket
@@ -77,7 +75,6 @@ int __stdcall proc_subproc (DWORD, DWORD) __attribute__ ((regparm (2)));
 class _pinfo;
 void __stdcall proc_terminate ();
 void __stdcall sigproc_init ();
-void __stdcall subproc_init ();
 void __stdcall sigproc_terminate ();
 bool __stdcall proc_exists (_pinfo *) __attribute__ ((regparm(1)));
 bool __stdcall pid_exists (pid_t) __attribute__ ((regparm(1)));

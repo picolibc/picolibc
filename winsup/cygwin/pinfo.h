@@ -36,19 +36,15 @@ public:
      constants below. */
   DWORD process_state;
 
-  /* If hProcess is set, it's because it came from a
-     CreateProcess call.  This means it's process relative
-     to the thing which created the process.  That's ok because
-     we only use this handle from the parent. */
-  HANDLE hProcess;
+  DWORD exitcode;	/* set when process exits */
 
-#define PINFO_REDIR_SIZE ((char *) &myself.procinfo->hProcess - (char *) myself.procinfo)
+#define PINFO_REDIR_SIZE ((char *) &myself.procinfo->exitcode - (char *) myself.procinfo)
 
   /* Handle associated with initial Windows pid which started it all. */
   HANDLE pid_handle;
 
-  /* Handle to the logical parent of this pid. */
-  HANDLE ppid_handle;
+  /* True if started by a cygwin process (DWORD for hysterical reasons) */
+  DWORD cygstarted;
 
   /* Parent process id.  */
   pid_t ppid;
@@ -120,7 +116,9 @@ public:
   HANDLE sendsig;
 private:
   sigset_t sig_mask;
-  CRITICAL_SECTION lock;
+public:
+  HANDLE wr_proc_pipe;
+  friend class pinfo;
 };
 
 class pinfo
@@ -129,12 +127,16 @@ class pinfo
   _pinfo *procinfo;
   bool destroy;
 public:
+  HANDLE rd_proc_pipe;
+  HANDLE hProcess;
+  CRITICAL_SECTION lock;
   void init (pid_t, DWORD, HANDLE = NULL) __attribute__ ((regparm(3)));
   pinfo () {}
   pinfo (_pinfo *x): procinfo (x) {}
   pinfo (pid_t n) {init (n, 0);}
   pinfo (pid_t n, DWORD flag) {init (n, flag);}
   void release ();
+  int wait ();
   ~pinfo ()
   {
     if (destroy && procinfo)
@@ -151,6 +153,7 @@ public:
   _pinfo *operator * () const {return procinfo;}
   operator _pinfo * () const {return procinfo;}
   // operator bool () const {return (int) h;}
+  void preserve() { destroy = false; }
 #ifndef _SIGPROC_H
   int remember () {system_printf ("remember is not here"); return 0;}
 #else
