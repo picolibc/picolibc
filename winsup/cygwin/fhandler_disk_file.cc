@@ -266,7 +266,7 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
       else
 	{
 	  buf->st_mode |= S_IFREG;
-	  if (!pc->exec_state () == dont_know_if_executable)
+	  if (pc->exec_state () == dont_know_if_executable)
 	    {
 	      DWORD cur, done;
 	      char magic[3];
@@ -283,7 +283,10 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
 		  magic[0] = magic[1] = magic[2] = '\0';
 		  if (ReadFile (get_handle (), magic, 3, &done, NULL) &&
 		      has_exec_chars (magic, done))
+		    {
 		      set_execable_p ();
+		      pc->set_exec ();
+		    }
 		  SetFilePointer (get_handle(), cur, NULL, FILE_BEGIN);
 		}
 	    }
