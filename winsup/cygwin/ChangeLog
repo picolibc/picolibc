@@ -1,3 +1,25 @@
+2003-01-02  Christopher Faylor  <cgf@redhat.com>
+
+	* devices.h (_devtype_t): Eliminate.
+	(_mode_t): New typedef.
+	(device::mode): Replace type.
+	* fhandler.h (fhandler_base::device_access_denied): Declare new
+	function.
+	* fhandler.cc (fhandler_base::device_access_denied): Define new
+	function.
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Just copy mode
+	directly from dev.mode to st_mode if it is a disk device.
+	* path.cc (path_conv::check): Set device mode from sym mode.
+	(symlink_worker): Let "exists" check happen when file is attempted to
+	be opened, or not, in the case of creating a device.
+	(symlink_info::parse_device): Change device type argument to device
+	mode argument.
+	(mknod_worker): New function.
+	(chmod_device): Ditto.
+	(chmod): Use chmod_device to set protection if it is an fs device.
+	(mknod): Use mknod_worker to actually create the device.  Don't take
+	any special action with the protection since it is now implicit.
+
 2003-01-01  Christopher Faylor  <cgf@redhat.com>
 
 	* passwd.cc (getpwuid_r32): Revert previous change.
