@@ -90,7 +90,14 @@ sysconf (int in)
 	      case _SC_NPROCESSORS_CONF:
 	       return sbi.NumberProcessors;
 	      case _SC_NPROCESSORS_ONLN:
-	       return sbi.ActiveProcessors;
+	       {
+		 int i = 0;
+		 do
+		   if (sbi.ActiveProcessors & 1)
+		     i++;
+		 while (sbi.ActiveProcessors >>= 1);
+		 return i;
+	       }
 	      case _SC_PHYS_PAGES:
 		return sbi.NumberOfPhysicalPages;
 	      case _SC_AVPHYS_PAGES:

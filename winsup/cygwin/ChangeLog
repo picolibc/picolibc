@@ -1,3 +1,8 @@
+2003-07-09  Christopher Faylor  <cgf@redhat.com>
+
+	* sysconf.cc (sysconf): Return processors online rather than bitmask
+	for _SC_NPROCESSORS_ONLN.
+
 2003-07-08  Christopher Faylor  <cgf@redhat.com>
 
 	* cygheap.cc (creturn): Set appropriate errno when out of memory.
