@@ -1876,6 +1876,11 @@ statfs (const char *fname, struct statfs *sfs)
 
   syscall_printf ("statfs %s", root);
 
+  /* GetDiskFreeSpaceEx must be called before GetDiskFreeSpace on
+     WinME, to avoid the MS KB 314417 bug */
+  ULARGE_INTEGER availb, freeb, totalb;
+  BOOL status = GetDiskFreeSpaceEx (root, &availb, &totalb, &freeb);
+
   DWORD spc, bps, availc, freec, totalc;
 
   if (!GetDiskFreeSpace (root, &spc, &bps, &freec, &totalc))
@@ -1884,9 +1889,7 @@ statfs (const char *fname, struct statfs *sfs)
       return -1;
     }
 
-  ULARGE_INTEGER availb, freeb, totalb;
-
-  if (GetDiskFreeSpaceEx (root, &availb, &totalb, &freeb))
+  if (status)
     {
       availc = availb.QuadPart / (spc*bps);
       totalc = totalb.QuadPart / (spc*bps);
