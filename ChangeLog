@@ -1,3 +1,8 @@
+2001-06-19  Alan Modra  <amodra@bigpond.net.au>
+
+	* Makefile.in: Revert 2001-06-17.
+	(VER): If AM_INIT_AUTOMAKE uses BFD_VERSION, get version from bfd/.
+
 2001-06-17  H.J. Lu <hjl@gnu.org>
 
 	* Makefile.in (gas.tar.bz2): Pass TOOL=bfd PACKAGE=gas to make.
