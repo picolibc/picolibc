@@ -46,35 +46,29 @@ details. */
 
 extern int threadsafe;
 
-#define MT_INTERFACE user_data->threadinterface
-
 struct _reent *
 _reent_clib ()
 {
-  int tmp = GetLastError ();
   struct __reent_t *_r =
-    (struct __reent_t *) TlsGetValue (MT_INTERFACE->reent_index);
+    (struct __reent_t *) MT_INTERFACE->reent_key.get ();
 
 #ifdef _CYG_THREAD_FAILSAFE
   if (_r == 0)
     system_printf ("local thread storage not inited");
 #endif
-
-  SetLastError (tmp);
   return _r->_clib;
 }
 
 struct _winsup_t *
 _reent_winsup ()
 {
-  int tmp = GetLastError ();
-  struct __reent_t *_r;
-  _r = (struct __reent_t *) TlsGetValue (MT_INTERFACE->reent_index);
+  struct __reent_t *_r =
+    (struct __reent_t *) MT_INTERFACE->reent_key.get ();
+
 #ifdef _CYG_THREAD_FAILSAFE
   if (_r == 0)
     system_printf ("local thread storage not inited");
 #endif
-  SetLastError (tmp);
   return _r->_winsup;
 }
 
@@ -166,39 +160,14 @@ ResourceLocks::Delete ()
 void
 MTinterface::Init (int forked)
 {
-
-  reent_index = TlsAlloc ();
   reents._clib = _impure_ptr;
   reents._winsup = &winsup_reent;
-
   winsup_reent._process_logmask = LOG_UPTO (LOG_DEBUG);
 
-  TlsSetValue (reent_index, &reents);
-  // the static reent_data will be used in the main thread
+  if (!forked)
+    reent_key.set (&reents);
 
-  if (!indexallocated)
-    {
-      thread_self_dwTlsIndex = TlsAlloc ();
-      if (thread_self_dwTlsIndex == TLS_OUT_OF_INDEXES)
-	system_printf
-	  ("local storage for thread couldn't be set\nThis means that we are not thread safe!");
-      else
-	indexallocated = (-1);
-    }
-
-  concurrency = 0;
-  threadcount = 1; /* 1 current thread when Init occurs.*/
-
-  pthread::initMainThread (&mainthread, myself->hProcess);
   pthread_mutex::initMutex ();
-
-  if (forked)
-    return;
-
-  mutexs = NULL;
-  conds  = NULL;
-  semaphores = NULL;
-
 }
 
 void
@@ -233,40 +202,51 @@ MTinterface::fixup_after_fork (void)
       sem->fixup_after_fork ();
       sem = sem->next;
     }
+
+  pthread::initMainThread (true);
+
+  threadcount = 1;
 }
 
 /* pthread calls */
 
 /* static methods */
 void
-pthread::initMainThread (pthread *mainThread, HANDLE win32_obj_id)
+pthread::initMainThread (bool do_init)
 {
-  mainThread->win32_obj_id = win32_obj_id;
-  mainThread->setThreadIdtoCurrent ();
-  setTlsSelfPointer (mainThread);
+  if (!do_init)
+    return;
+
+  pthread *thread = getTlsSelfPointer ();
+  if (!thread)
+    {
+      thread = new pthread ();
+      if (!thread)
+        api_fatal ("failed to create mainthread object");
+    }
+
+  thread->initCurrentThread ();
 }
 
 pthread *
 pthread::self ()
 {
-  pthread *temp = (pthread *) TlsGetValue (MT_INTERFACE->thread_self_dwTlsIndex);
-  if (temp)
-      return temp;
-  temp = new pthread ();
-  temp->precreate (NULL);
-  if (!temp->magic) {
-      delete temp;
-      return pthreadNull::getNullpthread ();
-  }
-  temp->postcreate ();
-  return temp;
+  pthread *thread = getTlsSelfPointer ();
+  if (thread)
+    return thread;
+  return pthreadNull::getNullpthread ();
 }
 
 void
 pthread::setTlsSelfPointer (pthread *thisThread)
 {
-  /* the OS doesn't check this for <= 64 Tls entries (pre win2k) */
-  TlsSetValue (MT_INTERFACE->thread_self_dwTlsIndex, thisThread);
+  MT_INTERFACE->thread_self_key.set (thisThread);
+}
+
+pthread *
+pthread::getTlsSelfPointer ()
+{
+  return (pthread *) MT_INTERFACE->thread_self_key.get ();
 }
 
 
@@ -383,9 +363,6 @@ pthread::exit (void *value_ptr)
       return_ptr = value_ptr;
       mutex.UnLock ();
     }
-
-  /* Prevent DLL_THREAD_DETACH Attempting to clean us up */
-  setTlsSelfPointer (0);
 
   if (InterlockedDecrement (&MT_INTERFACE->threadcount) == 0)
     ::exit (0);
@@ -713,6 +690,18 @@ DWORD
 pthread::getThreadId ()
 {
   return thread_id;
+}
+
+void
+pthread::initCurrentThread ()
+{
+  cancel_event = ::CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
+  if (!DuplicateHandle (GetCurrentProcess (), GetCurrentThread (),
+                        GetCurrentProcess (), &win32_obj_id,
+                        0, FALSE, DUPLICATE_SAME_ACCESS))
+    win32_obj_id = NULL;
+  setThreadIdtoCurrent ();
+  setTlsSelfPointer (this);
 }
 
 /* static members */
@@ -1411,16 +1400,15 @@ pthread::thread_init_wrapper (void *_arg)
 
   local_winsup._process_logmask = LOG_UPTO (LOG_DEBUG);
 
-  /* This is not checked by the OS !! */
-  if (!TlsSetValue (MT_INTERFACE->reent_index, &local_reent))
-    system_printf ("local storage for thread couldn't be set");
+  MT_INTERFACE->reent_key.set (&local_reent);
 
+  thread->setThreadIdtoCurrent ();
   setTlsSelfPointer (thread);
 
   thread->mutex.Lock ();
   // if thread is detached force cleanup on exit
   if (thread->attr.joinable == PTHREAD_CREATE_DETACHED && thread->joiner == NULL)
-    thread->joiner = pthread::self ();
+    thread->joiner = thread;
   thread->mutex.UnLock ();
 
 #ifdef _CYG_THREAD_FAILSAFE
@@ -1786,6 +1774,9 @@ int
 pthread::join (pthread_t *thread, void **return_val)
 {
    pthread_t joiner = self ();
+
+   if (!isGoodObject (&joiner))
+     return EINVAL;
 
    // Initialize return val with NULL
    if (return_val)
@@ -2594,6 +2585,7 @@ pthreadNull::getNullpthread ()
 
 pthreadNull::pthreadNull ()
 {
+  attr.joinable = PTHREAD_CREATE_DETACHED;
   /* Mark ourselves as invalid */
   magic = 0;
 }
@@ -2610,6 +2602,7 @@ pthreadNull::create (void *(*)(void *), pthread_attr *, void *)
 void
 pthreadNull::exit (void *value_ptr)
 {
+  ExitThread (0);
 }
 
 int

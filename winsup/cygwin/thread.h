@@ -344,7 +344,7 @@ public:
   pthread ();
   virtual ~pthread ();
 
-  static void initMainThread(pthread *, HANDLE);
+  static void initMainThread (bool);
   static bool isGoodObject(pthread_t const *);
   static void atforkprepare();
   static void atforkparent();
@@ -387,10 +387,12 @@ private:
   void pop_all_cleanup_handlers (void);
   void precreate (pthread_attr *);
   void postcreate ();
-  void setThreadIdtoCurrent();
-  static void setTlsSelfPointer(pthread *);
+  void setThreadIdtoCurrent ();
+  static void setTlsSelfPointer (pthread *);
+  static pthread *getTlsSelfPointer ();
   void cancel_self ();
   DWORD getThreadId ();
+  void initCurrentThread ();
 };
 
 class pthreadNull : public pthread
@@ -493,17 +495,12 @@ class MTinterface
 {
 public:
   // General
-  DWORD reent_index;
-  DWORD thread_self_dwTlsIndex;
-  /* we may get 0 for the Tls index.. grrr */
-  int indexallocated;
   int concurrency;
   long int threadcount;
 
   // Used for main thread data, and sigproc thread
   struct __reent_t reents;
   struct _winsup_t winsup_reent;
-  pthread mainthread;
 
   callback *pthread_prepare;
   callback *pthread_child;
@@ -514,17 +511,24 @@ public:
   class pthread_cond  * conds;
   class semaphore     * semaphores;
 
+  pthread_key reent_key;
+  pthread_key thread_self_key;
+
   void Init (int);
   void fixup_before_fork (void);
   void fixup_after_fork (void);
 
-  MTinterface ():reent_index (0), indexallocated (0), threadcount (1)
+  MTinterface () :
+    concurrency (0), threadcount (1),
+    pthread_prepare (NULL), pthread_child (NULL), pthread_parent (NULL),
+    mutexs (NULL), conds (NULL), semaphores (NULL),
+    reent_key (NULL), thread_self_key (NULL)
   {
-    pthread_prepare = NULL;
-    pthread_child   = NULL;
-    pthread_parent  = NULL;
   }
 };
+
+ 
+#define MT_INTERFACE user_data->threadinterface
 
 extern "C"
 {

@@ -628,6 +628,8 @@ dll_crt0_1 ()
   ProtectHandle (hMainThread);
   cygthread::init ();
 
+  pthread::initMainThread (!user_data->forkee);
+
   /* Initialize debug muto, if DLL is built with --enable-debugging.
      Need to do this before any helper threads start. */
   debug_init ();

@@ -27,12 +27,8 @@ WINAPI dll_entry (HANDLE h, DWORD reason, void *static_load)
     case DLL_PROCESS_DETACH:
       break;
     case DLL_THREAD_ATTACH:
-      if (user_data->threadinterface)
-	{
-	  if (!TlsSetValue (user_data->threadinterface->reent_index,
-			    &user_data->threadinterface->reents))
+      if (MT_INTERFACE->reent_key.set (&MT_INTERFACE->reents))
 	    api_fatal ("thread initialization failed");
-	}
       break;
     case DLL_THREAD_DETACH:
       /* not invoked */;

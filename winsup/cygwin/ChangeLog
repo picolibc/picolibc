@@ -1,3 +1,40 @@
+2002-11-05  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* dcrt0.cc (dll_crt0_1): Add call to pthread::initMainThread to
+	initialize mainthread when it is safe to call new.
+	* init.cc (dll_entry): Change call to store reents in tls key.
+	* thread.cc (_reent_clib) : Change call to get reents from tls
+	key.
+	(_reent_winsup): Ditto.
+	(MTinterface::Init): Key handling changed. Remove initialization
+	of member variables.
+	(MTinterface::fixup_after_fork): Reinitialize mainthread object
+	after fork. Reset threadount to 1.
+	(pthread::initMainThread): Create mainthread object dynamically.
+	and initialize with valid handles.
+	(pthread::self): Remove calls to create thread objects.
+	(pthread::setTlsSelfPointer): Change call to store thread self
+	handle in tls key.
+	(pthread::getTlsSelfPointer): New static method.
+	(pthread::exit): Remove setTlsSelfPointer call.
+	(pthread::initCurrentThread): New method.
+	(pthread::thread_init_wrapper): Change call to store thread self
+	handle in tls key.
+	(pthread::join): Check for a valid joiner.
+	(pthreadNull::pthreadNull): Mark Null object as detached.
+	(pthreadNull::exit): Terminate thread via ExitThread.
+	* thread.h (pthread::initMainThread): Change parameter in function
+	call.
+	(pthread::getTlsSelfPointer): New static method.
+	(pthread::initCurrentThread): New method.
+	(MTinterface::reent_key): Remove.
+	(MTinterface::thread_self_dwTlsIndex): Ditto..
+	(MTinterface::indexallocated): Ditto.
+	(MTinterface::mainthread): Ditto.
+	(MTinterface::reent_key): New member.
+	(MTinterface::thread_self_key): Ditto.
+	(MTinterface::MTinterface): Initialize all members.
+
 2002-11-23  Christopher Faylor  <cgf@redhat.com>
 
 	* wait.cc (wait4): Force pending signal delivery before waiting for
