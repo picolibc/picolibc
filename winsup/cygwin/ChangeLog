@@ -1,3 +1,8 @@
+2000-07-26  DJ Delorie  <dj@cygnus.com>
+
+	* fhandler_console.cc (fhandler_console::read): Explicitly set cursor
+	to make it visible while waiting in WaitForMultipleObjects.
+
 Wed Jul 26 10:59:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* passwd.cc: Change name of passwd_in_memory_p to passwd_state.

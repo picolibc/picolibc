@@ -145,6 +145,7 @@ fhandler_console::read (void *pv, size_t buflen)
       if ((bgres = bg_check (SIGTTIN)) <= 0)
 	return bgres;
 
+      cursor_rel (0,0); /* to make cursor appear on the screen immediately */
       switch (WaitForMultipleObjects (nwait, w4, FALSE, INFINITE))
 	{
 	case WAIT_OBJECT_0:
