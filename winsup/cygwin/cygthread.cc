@@ -128,7 +128,7 @@ cygthread::freerange ()
 {
   cygthread *self = (cygthread *) calloc (1, sizeof (*self));
   self->is_freerange = true;
-  self->ev = self->h;
+  self->inuse = 1;
   return self;
 }
 
@@ -153,6 +153,8 @@ new (size_t)
   char buf[1024];
   if (!GetEnvironmentVariable ("CYGWIN_FREERANGE_NOCHECK", buf, sizeof (buf)))
     api_fatal ("Overflowed cygwin thread pool");
+  else
+    thread_printf ("Overflowed cygwin thread pool");
 #endif
 
   info = freerange ();	/* exhausted thread pool */
@@ -180,6 +182,8 @@ cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
 			this, 0, &id);
       if (!h)
 	api_fatal ("thread handle not set - %p<%p>, %E", h, id);
+      if (is_freerange)
+	ev = h;
       thread_printf ("created thread %p", h);
     }
 }

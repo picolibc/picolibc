@@ -618,49 +618,55 @@ fhandler_disk_file::opendir ()
   else if ((dir->__d_dirname = (char *) malloc (len + 3)) == NULL)
     {
       set_errno (ENOMEM);
-      free (dir);
+      goto free_dir;
     }
   else if ((dir->__d_dirent =
 	    (struct dirent *) malloc (sizeof (struct dirent))) == NULL)
     {
       set_errno (ENOMEM);
-      free (dir);
-      free (dir->__d_dirname);
+      goto free_dirname;
     }
   else if (access_worker (pc, R_OK) != 0)
-    {
-      free (dir);
-      free (dir->__d_dirname);
-    }
+    goto free_dirent;
   else
     {
       strcpy (dir->__d_dirname, get_win32_name ());
       dir->__d_dirent->d_version = __DIRENT_VERSION;
       cygheap_fdnew fd;
-      if (fd >= 0)
-	{
-	  fd = this;
-	  fd->set_nohandle (true);
-	  dir->__d_dirent->d_fd = fd;
-	  dir->__fh = this;
-	  /* FindFirstFile doesn't seem to like duplicate /'s. */
-	  len = strlen (dir->__d_dirname);
-	  if (len == 0 || isdirsep (dir->__d_dirname[len - 1]))
-	    strcat (dir->__d_dirname, "*");
-	  else
-	    strcat (dir->__d_dirname, "\\*");  /**/
-	  dir->__d_cookie = __DIRENT_COOKIE;
-	  dir->__handle = INVALID_HANDLE_VALUE;
-	  dir->__d_position = 0;
-	  dir->__d_dirhash = get_namehash ();
 
-	  res = dir;
-	}
+      if (fd < 0)
+	goto free_dirent;
+
+      fd = this;
+      fd->set_nohandle (true);
+      dir->__d_dirent->d_fd = fd;
+      dir->__fh = this;
+      /* FindFirstFile doesn't seem to like duplicate /'s. */
+      len = strlen (dir->__d_dirname);
+      if (len == 0 || isdirsep (dir->__d_dirname[len - 1]))
+	strcat (dir->__d_dirname, "*");
+      else
+	strcat (dir->__d_dirname, "\\*");  /**/
+      dir->__d_cookie = __DIRENT_COOKIE;
+      dir->__handle = INVALID_HANDLE_VALUE;
+      dir->__d_position = 0;
+      dir->__d_dirhash = get_namehash ();
+
+      res = dir;
+
       if (pc.isencoded ())
 	set_encoded ();
     }
 
   syscall_printf ("%p = opendir (%s)", res, get_name ());
+  return res;
+
+free_dirent:
+  free (dir->__d_dirent);
+free_dirname:
+  free (dir->__d_dirname);
+free_dir:
+  free (dir);
   return res;
 }
 

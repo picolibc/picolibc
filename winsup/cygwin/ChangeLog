@@ -1,3 +1,11 @@
+2003-11-07  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::freerange): Set inuse count.  Avoid setting
+	ev from h as h would be NULL at this point.
+	(cygthread::operator new): Issue debugging info when overflowing the
+	thread pool.
+	(cygthread::cygthread): Set ev from h here after h has been initialized.
+
 2003-11-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* bsdlib.cc (_vwarnx): New function.
