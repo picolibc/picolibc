@@ -1,3 +1,7 @@
+Thu Feb  1 23:08:29 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* cygheap.cc (creturn): Correctly calculate cygheap_max.
+
 Wed Jan 31 10:04:58 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* shared.cc (shared_info::initialize): Reduce size of heap.

@@ -202,8 +202,9 @@ creturn (cygheap_types x, cygheap_entry * c, int len)
       return NULL;
     }
   c->type = x;
-  if (cygheap_max < ((char *) c + len))
-    cygheap_max = (char *) c + len;
+  char *cend = ((char *) c + sizeof (*c) + len);
+  if (cygheap_max < cend)
+    cygheap_max = cend;
   MALLOC_CHECK;
   return (void *) c->data;
 }
