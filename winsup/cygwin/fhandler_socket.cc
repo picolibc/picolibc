@@ -737,14 +737,15 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
 	    {
               do
                 {
-                  if (!(res = wsock_evt.wait (get_socket (), has_been_closed)))
-		    res = WSARecvFrom (get_socket (), &wsabuf, 1,
-				       (ret = 0, &ret), (DWORD *) &flags,
-				       from, fromlen, NULL, NULL);
+		  res = WSARecvFrom (get_socket (), &wsabuf, 1,
+				     (ret = 0, &ret), (DWORD *) &flags,
+				     from, fromlen, NULL, NULL);
                 }
               while (res == SOCKET_ERROR
                      && WSAGetLastError () == WSAEWOULDBLOCK
-                     && !has_been_closed);
+		     && !has_been_closed
+		     && !(res = wsock_evt.wait (get_socket (),
+		     				has_been_closed)));
 	      wsock_evt.release (get_socket ());
 	    }
 	}
@@ -863,14 +864,15 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
 	    {
               do
                 {
-                  if (!(res = wsock_evt.wait (get_socket (), has_been_closed)))
-		    res = WSARecvFrom (get_socket (), wsabuf, iovcnt,
-				       (ret = 0, &ret), (DWORD *) &flags,
-				       from, fromlen, NULL, NULL);
+		  res = WSARecvFrom (get_socket (), wsabuf, iovcnt,
+				     (ret = 0, &ret), (DWORD *) &flags,
+				     from, fromlen, NULL, NULL);
                 }
               while (res == SOCKET_ERROR
-                     && WSAGetLastError () == WSAEWOULDBLOCK
-                     && !has_been_closed);
+		     && WSAGetLastError () == WSAEWOULDBLOCK
+		     && !has_been_closed
+		     && !(res = wsock_evt.wait (get_socket (),
+		     				has_been_closed)));
 	      wsock_evt.release (get_socket ());
 	    }
 	}
