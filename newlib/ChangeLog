@@ -1,3 +1,9 @@
+2004-06-17  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/reent.h (_GLOBAL_REENT): Back
+	out change which set _GLOBAL_REENT to _global_impure_ptr until
+	we understand why Cygwin breaks because of it.
+
 2004-06-14  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/machine/i386/syscall.h: For now, set up
