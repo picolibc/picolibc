@@ -1,5 +1,9 @@
 2005-03-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (class cygthread): Remove forward declaration.
+
+2005-03-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (class cygthread): Forward declare.
 	(fhandler_socket::sec_pipe): Remove.
 	(fhandler_socket::eid_pipe_name): Remove.

@@ -37,7 +37,6 @@ typedef struct __DIR DIR;
 struct dirent;
 struct iovec;
 struct __acl32;
-class cygthread;
 
 enum dirent_states
 {
