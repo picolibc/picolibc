@@ -25,18 +25,48 @@
 /* Relocations.  */
 START_RELOC_NUMBERS (elf_m32r_reloc_type)
   RELOC_NUMBER (R_M32R_NONE, 0)
-  RELOC_NUMBER (R_M32R_16, 1)
-  RELOC_NUMBER (R_M32R_32, 2)
-  RELOC_NUMBER (R_M32R_24, 3)
-  RELOC_NUMBER (R_M32R_10_PCREL, 4)
-  RELOC_NUMBER (R_M32R_18_PCREL, 5)
-  RELOC_NUMBER (R_M32R_26_PCREL, 6)
-  RELOC_NUMBER (R_M32R_HI16_ULO, 7)
-  RELOC_NUMBER (R_M32R_HI16_SLO, 8)
-  RELOC_NUMBER (R_M32R_LO16, 9)
-  RELOC_NUMBER (R_M32R_SDA16, 10)
-  RELOC_NUMBER (R_M32R_GNU_VTINHERIT, 11)
-  RELOC_NUMBER (R_M32R_GNU_VTENTRY, 12)
+  /* REL relocations */
+  RELOC_NUMBER (R_M32R_16, 1)		 /* For backwards compatibility. */
+  RELOC_NUMBER (R_M32R_32, 2)		 /* For backwards compatibility. */
+  RELOC_NUMBER (R_M32R_24, 3)		 /* For backwards compatibility. */
+  RELOC_NUMBER (R_M32R_10_PCREL, 4)	 /* For backwards compatibility. */
+  RELOC_NUMBER (R_M32R_18_PCREL, 5)	 /* For backwards compatibility. */
+  RELOC_NUMBER (R_M32R_26_PCREL, 6)	 /* For backwards compatibility. */
+  RELOC_NUMBER (R_M32R_HI16_ULO, 7)	 /* For backwards compatibility. */
+  RELOC_NUMBER (R_M32R_HI16_SLO, 8)	 /* For backwards compatibility. */
+  RELOC_NUMBER (R_M32R_LO16, 9)		 /* For backwards compatibility. */
+  RELOC_NUMBER (R_M32R_SDA16, 10)	 /* For backwards compatibility. */
+  RELOC_NUMBER (R_M32R_GNU_VTINHERIT, 11)/* For backwards compatibility. */
+  RELOC_NUMBER (R_M32R_GNU_VTENTRY, 12)	 /* For backwards compatibility. */
+
+  /* RELA relocations */
+  RELOC_NUMBER (R_M32R_16_RELA, 33)
+  RELOC_NUMBER (R_M32R_32_RELA, 34)
+  RELOC_NUMBER (R_M32R_24_RELA, 35)
+  RELOC_NUMBER (R_M32R_10_PCREL_RELA, 36)
+  RELOC_NUMBER (R_M32R_18_PCREL_RELA, 37)
+  RELOC_NUMBER (R_M32R_26_PCREL_RELA, 38)
+  RELOC_NUMBER (R_M32R_HI16_ULO_RELA, 39)
+  RELOC_NUMBER (R_M32R_HI16_SLO_RELA, 40)
+  RELOC_NUMBER (R_M32R_LO16_RELA, 41)
+  RELOC_NUMBER (R_M32R_SDA16_RELA, 42)
+  RELOC_NUMBER (R_M32R_RELA_GNU_VTINHERIT, 43)
+  RELOC_NUMBER (R_M32R_RELA_GNU_VTENTRY, 44)
+                                                                                
+  RELOC_NUMBER (R_M32R_GOT24, 48)
+  RELOC_NUMBER (R_M32R_26_PLTREL, 49)
+  RELOC_NUMBER (R_M32R_COPY, 50)
+  RELOC_NUMBER (R_M32R_GLOB_DAT, 51)
+  RELOC_NUMBER (R_M32R_JMP_SLOT, 52)
+  RELOC_NUMBER (R_M32R_RELATIVE, 53)
+  RELOC_NUMBER (R_M32R_GOTOFF, 54)
+  RELOC_NUMBER (R_M32R_GOTPC24, 55)
+  RELOC_NUMBER (R_M32R_GOT16_HI_ULO, 56)
+  RELOC_NUMBER (R_M32R_GOT16_HI_SLO, 57)
+  RELOC_NUMBER (R_M32R_GOT16_LO, 58)
+  RELOC_NUMBER (R_M32R_GOTPC_HI_ULO, 59)
+  RELOC_NUMBER (R_M32R_GOTPC_HI_SLO, 60)
+  RELOC_NUMBER (R_M32R_GOTPC_LO, 61)
 END_RELOC_NUMBERS (R_M32R_max)
 
 /* Processor specific section indices.  These sections do not actually
