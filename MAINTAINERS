@@ -38,7 +38,7 @@ dejagnu/
 	Patches to bug-dejagnu@gnu.org
 	Avoid making changes to the local repository; please send
 	patches upstream.  Important and approved patches can be
-	checked into the src repository, otheriwse patches will be
+	checked into the src repository, otherwise patches will be
 	imported from the next release.
 
 gdb/; mmalloc/; readline/; sim/; GDB's part of include/ & dejagnu/
