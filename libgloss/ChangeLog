@@ -1,3 +1,7 @@
+Wed May 24 16:47:12 2000  Alexandre Oliva  <aoliva@cygnus.com>
+
+	* mn10300/time.c (time): Set *tloc, since the sim doesn't.
+
 Mon Jan 31 18:45:26 2000  Donald Lindsay  <dlindsay@cygnus.com>
 
 	* mips/crt0.S: If compiled into a mips2 multilib, sets processor

@@ -7,5 +7,9 @@
 time_t
 time (time_t *tloc)
 {
-  return TRAP0 (SYS_time, tloc, 0, 0);
+  time_t res;
+  res = TRAP0 (SYS_time, 0, 0, 0);
+  if (tloc)
+    *tloc = res;
+  return res;
 }
