@@ -1,3 +1,12 @@
+2005-03-06  Ralf Corsepious  <ralf.corsepius@rtems.org>
+
+	* libc/include/machine/_types.h: New file.
+	* libc/include/sys/types.h: Do not check for __rtems__
+	when including <machine/_types.h>.  Remove some redundant
+	declarations now that <machine/_types.h> is included.
+	* libc/sys/rtems/machine/_types.h: Removed.  Replaced with
+	shared header file.
+
 2005-02-25  Ralf Corsepious  <ralf.corsepius@rtems.org>
 
 	* libm/common/fdlibm.h (FLT_UWORD_MAX, FLT_UWORD_HALF_MAX): Add

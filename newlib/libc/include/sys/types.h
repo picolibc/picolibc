@@ -22,34 +22,14 @@
 #ifndef __INTTYPES_DEFINED__
 #define __INTTYPES_DEFINED__
 
-#if !defined (__rtems__)
-typedef short int __int16_t;
-typedef unsigned short int __uint16_t;
+#include <machine/_types.h>
 
-#if __INT_MAX__ == 32767
-typedef long int __int32_t;
-typedef unsigned long int __uint32_t;
-#else
-typedef int __int32_t;
-typedef unsigned int __uint32_t;
-#endif
-
-#if __LONG_MAX__ > 2147483647 || !defined(__GNUC__)
-typedef long int __int64_t;
-typedef unsigned long int __uint64_t;
-#else
-__extension__ typedef long long __int64_t;
-__extension__ typedef unsigned long long __uint64_t;
-#endif
-#else /* __rtems__ */
-
+#if defined(__rtems__)
 /*
  *  The following section is RTEMS specific and is needed to more
  *  closely match the types defined in the BSD sys/types.h.
  *  This is needed to let the RTEMS/BSD TCP/IP stack compile.
  */
-
-#include <machine/_types.h>
 
 /* deprecated */
 #if ___int8_t_defined
