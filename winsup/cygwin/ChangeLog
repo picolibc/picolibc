@@ -1,3 +1,11 @@
+Fri Oct 27 11:48:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler_socket.cc: New file.
+	* Makefile.in: Add fhandler_socket.o to dependencies.
+	* fhandler.h: Change comment.
+	* net.cc Move all fhandler_socket methods to fhandler_socket.cc.
+	* winsup.h: Add declaration for `ws2_32_handle'.
+
 Thu Oct 26 11:51:59 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* dtable.cc (dtable::release): Check for socket. Change

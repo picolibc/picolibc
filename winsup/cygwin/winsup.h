@@ -173,6 +173,7 @@ void __stdcall window_terminate (void);
 
 /* Globals that handle initialization of winsock in a child process. */
 extern HANDLE wsock32_handle;
+extern HANDLE ws2_32_handle;
 
 /* Globals that handle initialization of netapi in a child process. */
 extern HANDLE netapi32_handle;

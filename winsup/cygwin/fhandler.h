@@ -29,7 +29,7 @@ details. */
      fhandler_dev_tape    (fhandler_tape.cc)
 
      fhandler_pipe
-     fhandler_socket      (net.cc)
+     fhandler_socket      (fhandler_socket.cc)
 
      fhandler_tty_slave   (tty.cc)
      fhandler_pty_master  (tty.cc)
