@@ -1,3 +1,7 @@
+2003-06-25  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h: Correct spelling of "relocatable".
+
 2003-06-22  Zack Weinberg  <zack@codesourcery.com>
 
 	* safe-ctype.h (HC_UNKNOWN, HC_ASCII, HC_EBCDIC): Rename to
