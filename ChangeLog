@@ -1,5 +1,8 @@
 2002-10-01  Nathanael Nerode  <neroden@gcc.gnu.org>
 
+	* configure: Finish reverting change which Andrew Cagney started
+	reverting.  Should fix bustage.
+
 	* src-release (BINUTILS_SUPPORT_DIRS): Add cpu directory.
 	* src-release: New file.  Contains material for making net
 	releases for gdb, binutils, et al., formerly in Makefile.in.
