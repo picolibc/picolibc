@@ -1,5 +1,9 @@
 2002-06-05  Christopher Faylor  <cgf@redhat.com>
 
+	* child_info.h (CHILD_INFO_MAGIC): Update.
+
+2002-06-05  Christopher Faylor  <cgf@redhat.com>
+
 	* strace.cc (strace::hello): Set inited, when appropriate.
 
 2002-06-05  Christopher Faylor  <cgf@redhat.com>
