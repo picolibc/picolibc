@@ -12,13 +12,13 @@
 
 #define  __INSIDE_CYGWIN_NET__
 
-#define Win32_Winsock
 #include "winsup.h"
 #include <errno.h>
 #include <sys/socket.h>
 
 #include <unistd.h>
 #include <fcntl.h>
+#define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
 #include "cygheap.h"
 #include "cygerrno.h"

@@ -18,7 +18,6 @@ details. */
  */
 
 #define  __INSIDE_CYGWIN_NET__
-#define Win32_Winsock
 
 #include "winsup.h"
 #include <errno.h>
@@ -31,6 +30,7 @@ details. */
 #include <netdb.h>
 #include <unistd.h>
 #include <stdio.h>
+#define USE_SYS_TYPES_FD_SET
 #include <winsock.h>
 #include "select.h"
 #include "cygerrno.h"
@@ -66,7 +66,7 @@ typedef long fd_mask;
 
 #define unix_fd_set fd_set
 
-#define NULL_fd_set ((fd_set *)NULL)
+#define NULL_fd_set ((fd_set *) NULL)
 #define sizeof_fd_set(n) \
   ((unsigned) (NULL_fd_set->fds_bits + unix_howmany((n), UNIX_NFDBITS)))
 #define UNIX_FD_SET(n, p) \

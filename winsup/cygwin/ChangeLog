@@ -1,3 +1,12 @@
+Tue Mar 20 14:48:46 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* dtable.cc: Guard against new winsock.h/winsock2.h warnings when
+	mixing winsock*.h and sys/types.h.
+	* fhandler_socket.cc: Ditto.
+	* net.cc: Ditto.
+	* select.cc: Ditto.
+	* exceptions.cc: Remove unneeded define.
+
 Mon Mar 19 17:43:29 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (interruptible): Update debugging output.

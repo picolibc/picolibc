@@ -10,7 +10,6 @@ details. */
 
 #define  __INSIDE_CYGWIN_NET__
 
-#define Win32_Winsock
 #include "winsup.h"
 #include <errno.h>
 #include <sys/socket.h>
@@ -20,6 +19,7 @@ details. */
 #include <fcntl.h>
 #include <sys/cygwin.h>
 
+#define USE_SYS_TYPES_FD_SET
 #include <winsock.h>
 #include "sync.h"
 #include "sigproc.h"
