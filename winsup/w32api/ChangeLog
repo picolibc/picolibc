@@ -1,4 +1,24 @@
 
+Tue Jan 30 10:42:28  2001  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* Apply Phil Krylov patches.
+	2001-01-19  Phil Krylov  <phil@mail.ru>
+	* include/commctrl.h: (HDI_IMAGE) New definition.
+	(HDI_DI_SETITEM) Ditto.
+	(HDI_ORDER) Ditto.
+	(HDI_FILTER) Ditto.
+	(HDF_BITMAP_ON_RIGHT) Ditto.
+	(HDF_IMAGE) Ditto.
+	(HDM_SETORDERARRAY) Ditto.
+	(Header_SetOrderArray) Ditto.
+	(ICC_BAR_CLASSES) Ditto.
+	(struct _HD_ITEMA) Change definition.
+	(struct _HD_ITEMW) Ditto.
+	(struct tagINITCOMMONCONTROLSEX) Enclose in _WIN32_IE braces.
+	(InitCommonControlsEx()) Ditto.
+	2001-01-23  Phil Krylov  <phil@mail.ru>
+	* include/richedit.h: Many Richedit 2.0 definitions.
+
 Tue Jan 30 09:56:50  2001  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* include/winuser.h: (IDC_HAND)  New resource identifier.

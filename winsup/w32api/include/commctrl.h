@@ -148,6 +148,14 @@ extern "C" {
 #define HDI_FORMAT	4
 #define HDI_LPARAM	8
 #define HDI_BITMAP	16
+#if (_WIN32_IE >= 0x0300)
+#define HDI_IMAGE	32
+#define HDI_DI_SETITEM	64
+#define HDI_ORDER	128
+#endif
+#if (_WIN32_IE >= 0x0500)
+#define HDI_FILTER	256
+#endif
 #define HDF_LEFT	0
 #define HDF_RIGHT	1
 #define HDF_CENTER	2
@@ -156,6 +164,10 @@ extern "C" {
 #define HDF_OWNERDRAW	0x8000
 #define HDF_STRING	0x4000
 #define HDF_BITMAP	0x2000
+#if (_WIN32_IE >= 0x0300)
+#define HDF_BITMAP_ON_RIGHT	0x1000
+#define HDF_IMAGE	0x0800
+#endif
 #define HDM_GETITEMCOUNT	HDM_FIRST
 #define HDM_INSERTITEMA	(HDM_FIRST+1)
 #define HDM_INSERTITEMW	(HDM_FIRST+10)
@@ -165,6 +177,9 @@ extern "C" {
 #define HDM_SETITEMA	(HDM_FIRST+4)
 #define HDM_SETITEMW	(HDM_FIRST+12)
 #define HDM_LAYOUT	(HDM_FIRST+5)
+#if (_WIN32_IE >= 0x0300)
+#define HDM_SETORDERARRAY	(HDM_FIRST+18)
+#endif
 #define HHT_NOWHERE	1
 #define HHT_ONHEADER	2
 #define HHT_ONDIVIDER	4
@@ -810,6 +825,7 @@ extern "C" {
 #define CCM_GETUNICODEFORMAT 8198
 #define ICC_LISTVIEW_CLASSES 1
 #define ICC_TREEVIEW_CLASSES 2
+#define ICC_BAR_CLASSES	4
 #define ICC_TAB_CLASSES      8
 #define ICC_UPDOWN_CLASS 16
 #define ICC_PROGRESS_CLASS 32
@@ -1064,6 +1080,14 @@ typedef struct _HD_ITEMA {
 	int cchTextMax;
 	int fmt;
 	LPARAM lParam;
+#if (_WIN32_IE >= 0x0300)
+	int iImage;
+	int iOrder;
+#endif
+#if (_WIN32_IE >= 0x0500)
+	UINT type;
+	LPVOID pvFilter;
+#endif
 } HD_ITEMA;
 typedef struct _HD_ITEMW {
 	UINT mask;
@@ -1073,6 +1097,14 @@ typedef struct _HD_ITEMW {
 	int cchTextMax;
 	int fmt;
 	LPARAM lParam;
+#if (_WIN32_IE >= 0x0300)
+	int iImage;
+	int iOrder;
+#endif
+#if (_WIN32_IE >= 0x0500)
+	UINT type;
+	LPVOID pvFilter;
+#endif
 } HD_ITEMW;
 typedef struct _HD_LAYOUT {
 	RECT *prc;
@@ -1402,10 +1434,12 @@ typedef struct _TC_KEYDOWN {
 	WORD wVKey;
 	UINT flags;
 } TC_KEYDOWN;
+#if (_WIN32_IE >= 0x0300)
 typedef struct tagINITCOMMONCONTROLSEX {
 	DWORD dwSize;
 	DWORD dwICC;
 } INITCOMMONCONTROLSEX,*LPINITCOMMONCONTROLSEX;
+#endif
 typedef struct tagPBRANGE {
 	int iLow;
 	int iHigh;
@@ -1591,6 +1625,9 @@ void WINAPI GetEffectiveClientRect(HWND,LPRECT,LPINT);
 #define Header_GetItem(w,i,phdi) (BOOL)SendMessage((w),HDM_GETITEM,(WPARAM)(int)(i),(LPARAM)(HD_ITEM*)(phdi))
 #define Header_SetItem(w,i,phdi) (BOOL)SendMessage((w),HDM_SETITEM,(WPARAM)(int)(i),(LPARAM)(const HD_ITEM*)(phdi))
 #define Header_Layout(w,l) (BOOL)SendMessage((w),HDM_LAYOUT,0,(LPARAM)(HD_LAYOUT*)(l))
+#if (_WIN32_IE >= 0x0300)
+#define Header_SetOrderArray(w,l,a) (BOOL)SendMessage((w),HDM_SETORDERARRAY,(WPARAM)(l),(LPARAM)(a))
+#endif
 int WINAPI ImageList_Add(HIMAGELIST,HBITMAP,HBITMAP);
 #define ImageList_AddIcon(l,i) ImageList_ReplaceIcon(l,-1,i)
 int WINAPI ImageList_AddMasked(HIMAGELIST,HBITMAP,COLORREF);
@@ -1628,7 +1665,9 @@ HIMAGELIST WINAPI ImageList_Read(LPSTREAM);
 BOOL WINAPI ImageList_Write(HIMAGELIST,LPSTREAM);
 #endif
 void WINAPI InitCommonControls(void);
+#if (_WIN32_IE >= 0x0300)
 BOOL WINAPI InitCommonControlsEx(LPINITCOMMONCONTROLSEX);
+#endif
 WINBOOL WINAPI ImageList_DragShowNolock(BOOL);
 int WINAPI LBItemFromPt(HWND,POINT,BOOL);
 #define ListView_GetBkColor(w) (COLORREF)SendMessage((w),LVM_GETBKCOLOR,0,0)
