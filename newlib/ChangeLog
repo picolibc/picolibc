@@ -1,3 +1,25 @@
+2003-05-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure.host: Accomodate removing the libc/sys/cygwin dir.
+	* libc/locale/ldpart.c (__part_load_locale): Use 64 bit stat call
+	if __CYGWIN_USE_BIG_TYPES__ is set.
+	* libc/search/hash.c (__hash_open): Ditto.
+	(init_hash): Ditto.
+	* libc/stdio/fseek.c (fseek): Ditto.
+	* libc/stdio/makebuf.c (__smakebuf): Ditto.
+	* libc/stdio/mktemp.c (_gettemp): Ditto.
+	* libc/sys/cygwin/Makefile.am: Remove.
+	* libc/sys/cygwin/Makefile.in: Remove.
+	* libc/sys/cygwin/aclocal.m4: Remove.
+	* libc/sys/cygwin/configure: Remove.
+	* libc/sys/cygwin/configure.in: Remove.
+	* libc/sys/cygwin/crt0.c: Move to winsup/cygwin directory.
+	* libc/sys/cygwin/sys/dirent.h: Move to winsup/cygwin/include/sys
+	directory.
+	* libc/sys/cygwin/sys/param.h: Ditto.
+	* libc/sys/cygwin/sys/utime.h: Ditto.
+	* libc/sys/cygwin/sys/utmp.h: Ditto.
+
 2003-05-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/types.h: Don't define key_t for Cygwin.

@@ -132,7 +132,11 @@ _DEFUN (_gettemp, (ptr, path, doopen),
       if (*trv == '/')
 	{
 	  *trv = '\0';
+#ifdef __CYGWIN_USE_BIG_TYPES__
+	  if (_stat64_r (ptr, path, &sbuf))
+#else
 	  if (_stat_r (ptr, path, &sbuf))
+#endif
 	    return (0);
 	  if (!(sbuf.st_mode & S_IFDIR))
 	    {
@@ -158,7 +162,11 @@ _DEFUN (_gettemp, (ptr, path, doopen),
 #endif
 	    return 0;
 	}
+#ifdef __CYGWIN_USE_BIG_TYPES__
+      else if (_stat64_r (ptr, path, &sbuf))
+#else
       else if (_stat_r (ptr, path, &sbuf))
+#endif
 	return (ptr->_errno == ENOENT ? 1 : 0);
 
       /* tricky little algorithm for backward compatibility */

@@ -198,7 +198,11 @@ fseek (fp, offset, whence)
     {
       if (seekfn != __sseek
 	  || fp->_file < 0
+#ifdef __CYGWIN_USE_BIG_TYPES__
+	  || _fstat64_r (ptr, fp->_file, &st)
+#else
 	  || _fstat_r (ptr, fp->_file, &st)
+#endif
 	  || (st.st_mode & S_IFMT) != S_IFREG)
 	{
 	  fp->_flags |= __SNPT;
@@ -221,7 +225,11 @@ fseek (fp, offset, whence)
     target = offset;
   else
     {
+#ifdef __CYGWIN_USE_BIG_TYPES__
+      if (_fstat64_r (ptr, fp->_file, &st))
+#else
       if (_fstat_r (ptr, fp->_file, &st))
+#endif
 	goto dumb;
       target = st.st_size + offset;
     }
