@@ -1,3 +1,8 @@
+2003-04-09  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* libc/machine/sh/memset.S: Avoid clobbering volatile
+	objects following a tiny to-be-set array in the same quadword.
+
 2001-04-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/wchar.h: Add definitions for wcswidth and wcwidth.  

@@ -12,9 +12,7 @@
 ENTRY(memset)
 #if __SHMEDIA__
 	pta/l multiquad, tr0
-	mshflo.b r3,r3,r3
 	ptabs r18, tr2
-	mperm.w r3, r63, r3	// Fill pattern now in every byte of r3
 
 	andi r2, -8, r25
 	add r2, r4, r5
@@ -23,16 +21,40 @@ ENTRY(memset)
 	cmveq r4, r25, r20
 	bne/u r25, r20, tr0 // multiquad
 
-	ldlo.q r2, 0, r7
-	shlli r4, 2, r4
-	movi -1, r8
-	SHHI r8, r4, r8
-	SHHI r8, r4, r8
-	mcmv r7, r8, r3
-	stlo.q r2, 0, r3
+!	This sequence could clobber volatile objects that are in the same
+!	quadword as a very short char array.
+!	ldlo.q r2, 0, r7
+!	shlli r4, 2, r4
+!	movi -1, r8
+!	SHHI r8, r4, r8
+!	SHHI r8, r4, r8
+!	mcmv r7, r8, r3
+!	stlo.q r2, 0, r3
+
+	pta/l setlongs, tr0
+	movi 4, r8
+	bgeu/u r4, r8, tr0
+	pta/l endset, tr0
+	beqi/u r4, 0, tr0
+	st.b r2, 0, r3
+	beqi/u r4, 1, tr0
+	nop
+	st.b r2, 1, r3
+	beqi/l r4, 2, tr0
+	st.b r2,2,r3
+endset: blink tr2, r63
+setlongs:
+	mshflo.b r3, r3, r3
+	mperm.w r3, r63, r3	// Fill pattern now in every byte of r3
+	stlo.l r2, 0, r3
+	nop
+	nop
+	sthi.l r5, -1, r3
 	blink tr2, r63
 
 multiquad:
+	mshflo.b r3, r3, r3
+	mperm.w r3, r63, r3	// Fill pattern now in every byte of r3
 	pta/l lastquad, tr0
 	stlo.q r2, 0, r3
 	sub r20, r25, r24
