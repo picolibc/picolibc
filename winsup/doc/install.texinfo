@@ -102,8 +102,8 @@ If you want to build programs, of course you'll need @samp{gcc},
 
 @subsection How do I just get everything?
 
-In the past, the default was to install everything, much to the
-irritation of many users.  Now the default is to install only a basic
+Long ago, the default was to install everything, much to the
+irritation of most users.  Now the default is to install only a basic
 core of packages.  Cygwin Setup is designed to make it easy to browse
 categories and select what you want to install or omit from those
 categories.  It's also easy to install everything:
@@ -113,7 +113,7 @@ categories.  It's also easy to install everything:
 @item At the ``Select Packages'' screen, in ``Categories'' view, at the line 
 marked ``All'', click on the word ``default'' so that it changes to
 ``install''.  (Be patient, there is some computing to do at this step.
-It may take a few seconds to register the change.)  This tells Setup
+It may take a second or two to register the change.)  This tells Setup
 to install @emph{everything}, not just what it thinks you should have
 by default.
 
@@ -141,6 +141,10 @@ updates to what you have already installed.  Then...
 new packages that would not be installed by default.  You can check
 the list in the Partial View before proceeding, in case there's
 something you really @emph{don't} want.
+
+@item In the latest version of Cygwin Setup, if you click the ``View''
+button (twice) more, it shows packages not currently installed.  You
+ought to check whether you @emph{really} want to install everything!
 
 @end enumerate
 
@@ -268,3 +272,9 @@ to @code{C:\cygwin\bin\cygwin1.dll}.
 
 @end enumerate
 
+@subsection Can Cygwin Setup maintain a ``mirror''?
+
+NO.  Cygwin Setup cannot do this for you.  Use a tool designed for
+this purpose.  See @file{http://rsync.samba.org/},
+@file{http://sunsite.org.uk/packages/mirror/},
+@file{http://wget.sunsite.dk/} for utilities that can do this for you.
