@@ -1,3 +1,8 @@
+2002-07-01  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (struct bfd_sym_chain): Declare.
+	(struct bfd_link_info): Add gc_sym_list.  Formatting fixes.
+
 2002-06-25  Alan Modra  <amodra@bigpond.net.au>
 
 	* demangle.h: #include "ansidecl.h" rather than #include <ansidecl.h>.
