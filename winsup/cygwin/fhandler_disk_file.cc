@@ -303,9 +303,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf, path_conv *pc,
 	/* nothing */;
       else if (pc->issocket ())
 	buf->st_mode |= S_IFSOCK;
-      else if (pc->isfifo ())
-	buf->st_mode |= S_IFIFO;
-      else if (pc->isdevice ())
+      else if (is_fs_special ())
 	{
 	  buf->st_dev = dev;
 	  buf->st_mode = dev.mode;
@@ -686,7 +684,7 @@ fhandler_disk_file::readdir (DIR *dir)
 	  strcpy (fbuf, dir->__d_dirname);
 	  strcpy (fbuf + strlen (fbuf) - 1, dir->__d_dirent->d_name);
 	  path_conv fpath (fbuf, PC_SYM_NOFOLLOW);
-	  if (fpath.issymlink () || fpath.isdevice ())
+	  if (fpath.issymlink () || fpath.isspecial ())
 	    c[len - 4] = '\0';
 	}
     }
