@@ -247,6 +247,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 /* FRV magic number - no EABI available??.  */
 #define EM_CYGNUS_FRV		0x5441
+
+/* Ubicom IP2xxx; no ABI */
+#define EM_IP2K_OLD 	        0x8217	
+
 /* See the above comment before you add a new EM_* value here.  */
 
 /* Values for e_version.  */
