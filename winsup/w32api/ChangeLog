@@ -1,3 +1,8 @@
+2004-04-18  Hans Leidekker  <hans@it.vu.nl>
+
+	* lib/directx/dxguid.c (CLSID_DirectSoundPrivate,
+	DSPROPSETID_DirectSoundDevice): Add defines.
+
 2004-04-20  Adrian Sandor  <aditsu@users.sourceforge.net>
 
 	* include/msacm.h: New file.
