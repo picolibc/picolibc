@@ -5,7 +5,13 @@
  */
 
 #ifndef __STRICT_ANSI__
+
 #include <io.h>
 #include <process.h>
-#endif
+
+#define __UNISTD_GETOPT__
+#include <getopt.h>
+#undef __UNISTD_GETOPT__
+
+#endif 
 
