@@ -1,3 +1,8 @@
+2002-12-18  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl (do-info): Depend on maybe-all-texinfo, not all-texinfo.
+	* Makefile.in: Regenerate.
+
 2002-12-16  Jason Merrill  <jason@redhat.com>
 
 	* Makefile.tpl (all-gcc): Use 'make quickstrap' if there was a
