@@ -1,8 +1,3 @@
-2005-03-23  Vladimir Merzliakov  <wanderer@rsu.ru>
-
-	* getopt.h (getopt): Allow full prototype when builind under
-	FreeBSD.
-
 2005-03-22  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
 	* libiberty.h (make_relative_prefix): Add ATTRIBUTE_MALLOC.
