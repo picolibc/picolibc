@@ -1,5 +1,13 @@
 2003-03-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/olectl.h (OleLoadPictureEx) Add prototype.
+	(OleLoadPictureFile): Ditto.
+	(OleLoadPictureFileEx): Ditto.
+	(OleLoadPicturePath): Ditto.
+	(OleSavePictureFile): Ditto.
+
+2003-03-01  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/objbase.h (CoAddRefServerProcess): Add prototype.
 	(CoAddReleaseServerProcess): Ditto.
 	(CoResumeClassObjects): Ditto.
