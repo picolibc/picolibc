@@ -308,13 +308,25 @@ void sim_set_callbacks PARAMS ((struct host_callback_struct *));
 void sim_size PARAMS ((int i));
 
 
-/* Run a simulation with tracing enabled.
+/* Single-step simulator with tracing enabled.
    THIS PROCEDURE IS DEPRECIATED.
+   THIS PROCEDURE IS EVEN MORE DEPRECATED THAN SIM_SET_TRACE
    GDB and NRUN do not use this interface.
-   This procedure does not take a SIM_DESC argument as it is
-   used before sim_open. */
+   This procedure returns: ``0'' indicating that the simulator should
+   be continued using sim_trace() calls; ``1'' indicating that the
+   simulation has finished. */
 
 int sim_trace PARAMS ((SIM_DESC sd));
+
+
+/* Enable tracing.
+   THIS PROCEDURE IS DEPRECIATED.
+   GDB and NRUN do not use this interface.
+   This procedure returns: ``0'' indicating that the simulator should
+   be continued using sim_trace() calls; ``1'' indicating that the
+   simulation has finished. */
+
+void sim_set_trace PARAMS ((void));
 
 
 /* Configure the size of the profile buffer.
