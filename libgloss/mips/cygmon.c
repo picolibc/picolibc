@@ -60,13 +60,13 @@ struct s_mem
 int sysCall(unsigned long func, unsigned long p1, unsigned long p2, unsigned long p3)
 {
   int ret = 0;
-  asm volatile ( "
-          move $4, %1
-          move $5, %2
-          move $6, %3
-          move $7, %4
-          syscall 
-          nop
+  asm volatile ( "		\n\
+          move $4, %1		\n\
+          move $5, %2		\n\
+          move $6, %3		\n\
+          move $7, %4		\n\
+          syscall 		\n\
+          nop			\n\
           move %0, $2" : "=r"(ret) : "r"(func), "r"(p1), "r"(p2), "r"(p3));
   return ret;
 }

@@ -19,7 +19,7 @@
 	.set nomips16
 #endif
 
-#if __mips < 3
+#if !defined(__mips64)
   /* This machine does not support 64-bit operations.  */
   #define ADDU addu
   #define SUBU subu

@@ -66,7 +66,7 @@ _start:
 	nop
 	move	s0,$31
 #endif
-#if (__mips < 3) || (__mips_fpr==32)
+#if !defined(__mips64) || (__mips_fpr==32)
 #define STATUS_MASK (SR_CU1|SR_PE)
 #else
 # For mips3 or mips4, turn on 64-bit addressing and additional float regs
