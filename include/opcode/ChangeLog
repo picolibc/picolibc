@@ -1,3 +1,12 @@
+2000-03-26  Alan Modra  <alan@linuxcare.com>
+
+	* i386.h: (UNIXWARE_COMPAT): Rename to SYSV386_COMPAT as the
+	problem isn't really specific to Unixware.
+	(OLDGCC_COMPAT): Define.
+	(i386_optab): If !OLDGCC_COMPAT, don't handle fsubp etc. with
+	destination %st(0).
+	Fix lots of comments.
+
 2000-03-02  J"orn Rennecke <amylaar@cygnus.co.uk>
 
         * d30v.h:
