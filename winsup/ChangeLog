@@ -1,3 +1,8 @@
+2003-07-25  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Only use localhost when building mingw with distcc or
+	gcc won't be able to find .exp files on other hosts.
+
 2003-07-18  Vaclav Haisman  <V.Haisman@sh.cvut.cz>
   
 	* Makefile.common (CFLAGS_COMMON): Remove -march=i386.

@@ -18,12 +18,18 @@ override srcdir:=${shell cd $(srcdir); pwd}
 ifneq (,${filter-out /%,$(srcdir)})
     updir:=$(srcdir)/..
     updir1:=$(updir)/..
+    aux_dir:=$(updir)/../..
 else
     updir:=${patsubst %:::,%,${patsubst %/:::,%,$(dir $(srcdir)):::}}
 ifneq (,${findstring /,$(updir)})
     updir1:=${patsubst %:::,%,${patsubst %/:::,%,$(dir $(updir)):::}}
 else
     updir1:=$(updir)/..
+endif
+ifneq (,${findstring /,$(updir1)})
+    aux_dir:=${patsubst %:::,%,${patsubst %/:::,%,$(dir $(updir1)):::}}
+else
+    aux_dir:=$(updir1)/..
 endif
 endif
 
