@@ -22,8 +22,8 @@
 /**********************************************************************/
 /* fhandler_dev_mem */
 
-fhandler_dev_mem::fhandler_dev_mem (int nunit)
-  : fhandler_base (FH_MEM), unit (nunit)
+fhandler_dev_mem::fhandler_dev_mem ()
+  : fhandler_base (FH_MEM)
 {
   /* Reading physical memory only supported on NT/W2K. */
   if (!wincap.has_physical_mem_access ())
@@ -32,7 +32,7 @@ fhandler_dev_mem::fhandler_dev_mem (int nunit)
       return;
     }
 
-  if (unit == 1) /* /dev/mem */
+  if (dev == FH_MEM) /* /dev/mem */
     {
       NTSTATUS ret;
       SYSTEM_BASIC_INFORMATION sbi;
@@ -48,12 +48,12 @@ fhandler_dev_mem::fhandler_dev_mem (int nunit)
 	mem_size = sbi.PhysicalPageSize * sbi.NumberOfPhysicalPages;
       debug_printf ("MemSize: %d MB", mem_size >> 20);
     }
-  else if (unit == 2) /* /dev/kmem - Not yet supported */
+  else if (dev == FH_KMEM) /* /dev/kmem - Not yet supported */
     {
       mem_size = 0;
       debug_printf ("KMemSize: %d MB", mem_size >> 20);
     }
-  else if (unit == 4) /* /dev/port == First 64K of /dev/mem */
+  else if (dev == FH_ZERO) /* /dev/port == First 64K of /dev/mem */
     {
       mem_size = 65536;
       debug_printf ("PortSize: 64 KB");
@@ -75,10 +75,7 @@ fhandler_dev_mem::open (path_conv *, int flags, mode_t)
   if (!wincap.has_physical_mem_access ())
     {
       set_errno (ENOENT);
-      debug_printf ("%s is accessible under NT/W2K only",
-		    unit == 1 ? "/dev/mem" :
-		    unit == 2 ? "/dev/kmem" :
-				"/dev/port");
+      debug_printf ("%s is accessible under NT/W2K only", dev.name);
       return 0;
     }
 
