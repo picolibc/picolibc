@@ -1,5 +1,10 @@
 2004-05-28  Pierre Humblet  <Pierre.Humblet@ieee.org>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Only try to open
+	the file if it uses an acl.
+
+2004-05-28  Pierre Humblet  <Pierre.Humblet@ieee.org>
+
 	* path.cc (chdir): Always use the normalized_path as posix_cwd, except
 	if it starts with a drive.
 

@@ -381,7 +381,7 @@ fhandler_disk_file::fchmod (mode_t mode)
   if (wincap.has_security ())
     {
       enable_restore_privilege ();
-      if (!get_io_handle ())
+      if (!get_io_handle () && pc.has_acls ())
 	{
 	  query_open (query_write_control);
 	  if (!(oret = open_fs (O_BINARY, 0)))
