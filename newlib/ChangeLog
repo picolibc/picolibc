@@ -1,3 +1,8 @@
+2003-02-10  Christopher Faylor  <cgf@redhat.com>
+
+	* libc/include/sys/types.h: Don't define __MS_types__ for Cygwin.
+	Don't define some types under cygwin.
+
 2003-02-07  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* acinclude.m4 (--disable-newlib-supplied-syscalls): New configuration 

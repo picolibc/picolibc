@@ -46,10 +46,6 @@ __extension__ typedef unsigned long long __uint64_t;
 #define _SYS_TYPES_H
 #include <sys/_types.h>
 
-#if defined (_WIN32) || defined (__CYGWIN__)
-#define __MS_types__
-#endif
-
 #ifdef __i386__
 #if defined (GO32) || defined (__MSDOS__)
 #define __MS_types__
@@ -115,6 +111,7 @@ struct itimerspec {
 typedef	long	daddr_t;
 typedef	char *	caddr_t;
 
+#ifndef __CYGWIN__
 #if defined(__MS_types__) || defined(__rtems__)
 typedef	unsigned long	ino_t;
 #else
@@ -124,7 +121,7 @@ typedef	unsigned long	ino_t;
 typedef	unsigned short	ino_t;
 #endif
 #endif
-
+#endif /*__CYGWIN__*/
 
 #ifdef __MS_types__
 typedef unsigned long vm_offset_t;
@@ -170,6 +167,7 @@ typedef int pid_t;
 typedef	long key_t;
 typedef _ssize_t ssize_t;
 
+#ifndef __CYGWIN__
 #ifdef __MS_types__
 typedef	char *	addr_t;
 typedef int mode_t;
@@ -184,6 +182,7 @@ typedef unsigned short mode_t;
 typedef unsigned int mode_t _ST_INT32;
 #endif
 #endif /* ! __MS_types__ */
+#endif /*__CYGWIN__*/
 
 typedef unsigned short nlink_t;
 
