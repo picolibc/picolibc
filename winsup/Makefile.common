@@ -119,6 +119,9 @@ GCC_INCLUDE:=${subst //,/,-I$(gcc_libdir)/include}
 endif
 
 nostdinc:=${shell [ -d "$(updir)/w32api" ] && echo "-nostdinc -nostdinc++"}
+ifeq (,$(nostdinc))
+override w32api_lib:=${subst //,/,${shell $(CC) -print-search-dirs | awk -F: '/^librar/{for (i = 1; i <= NF; i++) if ($$i ~ /\/lib\/*$$/) print $$i}'}/w32api}
+endif
 
 COMPILE_CXX=$(CXX) $c $(nostdinc) $(ALL_CXXFLAGS) $(GCC_INCLUDE) \
 	     -fno-rtti -fno-exceptions

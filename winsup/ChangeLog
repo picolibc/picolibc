@@ -1,5 +1,10 @@
 2003-03-17  Christopher Faylor  <cgf@redhat.com>
 
+	* Makefile.common (w32api_lib): Default to system w32api directory if
+	w32api is missing from source.
+
+2003-03-17  Christopher Faylor  <cgf@redhat.com>
+
 	* Makefile.common: Fix typo from previous checkin.
 
 2003-03-17  Christopher Faylor  <cgf@redhat.com>
