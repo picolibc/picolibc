@@ -121,6 +121,7 @@ posify (int already_posix, char **here, const char *value)
 
       debug_printf ("env var converted to %s", outenv);
       *here = outenv;
+      free (src);
     }
 }
 
@@ -179,13 +180,6 @@ _addenv (const char *name, const char *value, int overwrite)
   int issetenv = overwrite >= 0;
   int offset;
   char *p;
-
-  int res;
-  if ((res = check_null_empty_path (name)))
-    {
-      set_errno (res);
-      return  -1;
-    }
 
   unsigned int valuelen = strlen (value);
   if ((p = my_findenv (name, &offset)))
@@ -259,6 +253,14 @@ _addenv (const char *name, const char *value, int overwrite)
 extern "C" int
 putenv (const char *str)
 {
+  int res;
+  if ((res = check_null_empty_path (str)))
+    {
+      if (res == ENOENT)
+        return 0;
+      set_errno (res);
+      return  -1;
+    }
   char *eq = strchr (str, '=');
   if (eq)
     return _addenv (str, eq + 1, -1);
@@ -278,8 +280,15 @@ extern "C" int
 setenv (const char *name, const char *value, int overwrite)
 {
   int res;
-  if ((res = check_null_empty_path (value)))
+  if ((res = check_null_empty_path (value)) == EFAULT)
     {
+      set_errno (res);
+      return  -1;
+    }
+  if ((res = check_null_empty_path (name)))
+    {
+      if (res == ENOENT)
+        return 0;
       set_errno (res);
       return  -1;
     }
@@ -493,7 +502,7 @@ environ_init (int already_posix)
   char *rawenv = GetEnvironmentStrings ();
   int envsize, i;
   char *p;
-  char **envp;
+  char *newp, **envp;
   int sawTERM = 0;
   static char cygterm[] = "TERM=cygwin";
 
@@ -516,21 +525,22 @@ environ_init (int already_posix)
      eventually want to use them).  */
   for (i = 0, p = rawenv; *p != '\0'; p = strchr (p, '\0') + 1, i++)
     {
+      newp = strdup (p);
       if (i >= envsize)
 	envp = (char **) realloc (envp, (4 + (envsize += 100)) *
 					    sizeof (char *));
-      envp[i] = p;
-      if (*p == '=')
-	*p = '!';
+      envp[i] = newp;
+      if (*newp == '=')
+	*newp = '!';
       char *eq;
-      if ((eq = strchr (p, '=')) == NULL)
-	eq = strchr (p, '\0');
+      if ((eq = strchr (newp, '=')) == NULL)
+	eq = strchr (newp, '\0');
       if (!parent_alive)
-	ucenv (p, eq);
-      if (strncmp (p, "TERM=", 5) == 0)
+	ucenv (newp, eq);
+      if (strncmp (newp, "TERM=", 5) == 0)
 	sawTERM = 1;
-      if (strncmp (p, "CYGWIN=", sizeof("CYGWIN=") - 1) == 0)
-	parse_options (p + sizeof("CYGWIN=") - 1);
+      if (strncmp (newp, "CYGWIN=", sizeof("CYGWIN=") - 1) == 0)
+	parse_options (newp + sizeof("CYGWIN=") - 1);
       if (*eq)
 	posify (already_posix, envp + i, *++eq ? eq : --eq);
       debug_printf ("%s", envp[i]);

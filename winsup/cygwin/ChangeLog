@@ -1,3 +1,12 @@
+Wed Jul 26 20:44:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* environ.cc (posify): Revert previous patch.
+	(_addenv): Remove check_null_empty_path from here.
+	(putenv): Call check_nullempty_path.
+	(setenv): Call check_nullempty_path for name as well here.
+	Don't report an error if value is empty string.
+	(environ_init): Revert usage of newp.
+
 Wed Jul 26 14:32:38 2000  Egor Duda <deo@logos-m.ru>
 
 	* syscalls.cc (stat_worker): Make stat return correct st_blocks for
