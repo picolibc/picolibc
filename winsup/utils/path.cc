@@ -283,6 +283,9 @@ cygpath (const char *s, ...)
 
   for (m = mount_table; m->posix ; m++)
     {
+      if (m->flags & MOUNT_AUTO)
+	continue;
+
       int n = strlen (m->posix);
       if (n < max_len || !path_prefix_p (m->posix, path, n))
 	continue;
