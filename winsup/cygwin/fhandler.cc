@@ -449,12 +449,25 @@ fhandler_base::open_9x (int flags, mode_t mode)
 
   syscall_printf ("(%s, %p)", get_win32_name (), flags);
 
-  if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
-    access = GENERIC_READ;
-  else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY)
-    access = GENERIC_WRITE;
-  else
-    access = GENERIC_READ | GENERIC_WRITE;
+  switch (query_open ())
+    {
+      case query_read_control:
+      case query_stat_control:
+	access = GENERIC_READ;
+	break;
+      case query_write_control:
+      case query_write_attributes:
+	access = GENERIC_READ | FILE_WRITE_ATTRIBUTES;
+	break;
+      default:
+	if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
+	  access = GENERIC_READ;
+	else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY)
+	  access = GENERIC_WRITE;
+	else
+	  access = GENERIC_READ | GENERIC_WRITE;
+	break;
+    }
 
   if ((flags & O_TRUNC) && ((flags & O_ACCMODE) != O_RDONLY))
     {

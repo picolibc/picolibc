@@ -1,3 +1,7 @@
+2005-03-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::open_9x): Satisfy query_open values.
+
 2005-03-04  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* fhandler_socket.cc (fhandler_socket::ioctl): Only cancel
