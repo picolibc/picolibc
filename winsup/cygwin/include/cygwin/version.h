@@ -95,10 +95,11 @@ details. */
        17: Export fast math stuff
        18: Stop exporting _strace_wm
        19: Export fchown, lchown, lacl
+       20: regsub, inet_network
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 19
+#define CYGWIN_VERSION_API_MINOR 20
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

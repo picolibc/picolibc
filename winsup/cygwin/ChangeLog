@@ -1,3 +1,9 @@
+Sun May 14 23:41:24 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* shared.h: Bump PROC_MAGIC.
+	* include/cygwin/version.h: Bump API minor to accomodate two recent
+	exports.
+
 2000-05-13  Mumit Khan  <khan@xraylith.wisc.edu>
 
 	* include/cygwin/socket.h (AF_INET6): Use same value as winsock2.
