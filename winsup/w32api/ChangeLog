@@ -1,5 +1,11 @@
 2002-05-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/winnt.h (EVENT_*, SEMAPHORE_*,MUTEX_*): Remove
+	more defines added in earlier change.
+	* lib/Makefile.in (TEST_OPTIONS): Add -Wsystem-headers flag.
+
+2002-05-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/winnt.h (THREAD_PRIORITY_*): Remove defines
 	added in last change.
 

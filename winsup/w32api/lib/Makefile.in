@@ -106,7 +106,7 @@ DISTFILES = Makefile.in $(DEF_FILES) $(SOURCES)
 # targets
 all: $(LIBS) $(EXTRA_OBJS)
 
-TEST_OPTIONS = $(ALL_CFLAGS) -Wall -pedantic -c $(srcdir)/test.c -o test.o
+TEST_OPTIONS = $(ALL_CFLAGS) -Wall -pedantic -Wsystem-headers -c $(srcdir)/test.c -o test.o
 .PHONY: test
 test:
 	@echo "Testing w32api..."
