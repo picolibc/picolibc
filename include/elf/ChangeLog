@@ -1,12 +1,315 @@
+2003-12-06  Alan Modra  <amodra@bigpond.net.au>
+
+	From Jan Beulich <JBeulich@novell.com>
+	* common.h (DT_HIOS): Correct value.
+
+2003-12-03   Kazuhiro Inaoka  <inaoka.kazuhiro@renesas.com>
+
+	* elf/m32r.h: Add new machine type m32r2 and instruction modes.
+
+2003-11-06  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h (R_PPC_RELAX32PC): Define.
+
+2003-10-22  Alexandre Oliva  <aoliva@redhat.com>,
+	    Michael Snyder  <msnyder@redhat.com>
+
+	* sh.h (EF_SH4A, EF_SH4AL_DSP, EF_SH4_NOFPU, EF_SH4A_NOFPU): New.
+	(EF_SH_MERGE_MACH): Combine them.
+
+2003-10-18  Hans-Peter Nilsson  <hp@bitrange.com>
+
+	* mmix.h (R_MMIX_PUSHJ_STUBBABLE): New reloc number.
+	(_bfd_mmix_before_linker_allocation): Rename from
+	_bfd_mmix_prepare_linker_allocated_gregs.
+	(_bfd_mmix_after_linker_allocation): Rename from
+	_bfd_mmix_finalize_linker_allocated_gregs.
+
+2003-10-06  Dave Brolley  <brolley@redhat.com>
+
+	* frv.h (EF_FRV_CPU_FR550): New macro.
+
+2003-09-30  Chris Demetriou  <cgd@broadcom.com>
+
+	* mips.h (E_MIPS_ARCH_64R2): New define.
+
+2003-09-23  DJ Delorie  <dj@redhat.com>
+
+	* sh.h (R_SH_SWITCH8, R_SH_GNU_VTINHERIT, R_SH_GNU_VTENTRY,
+	R_SH_LOOP_START,R_SH_LOOP_END): Move to "reserved" spaces.
+	(R_SH_DIR16, R_SH_DIR8, R_SH_DIR8UL, R_SH_DIR8UW, R_SH_DIR8U,
+	R_SH_DIR8SW, R_SH_DIR8S, R_SH_DIR4UL, R_SH_DIR4UW, R_SH_DIR4U,
+	R_SH_PSHA, R_SH_PSHL): New.
+
+2003-09-11  James Cownie <jcownie@etnus.com>
+
+	* dwarf2.h: Add HP dwarf extensions from their hacked gdb
+	header files (ftp://ftp.hp.com/pub/lang/tools/WDB/wdb-4.0.tar.gz).
+
+2003-09-04  Nick Clifton  <nickc@redhat.com>
+
+	* v850.h (E_V850E1_ARCH): Define.
+
+2003-08-21  James Cownie <jcownie@etnus.com>
+
+	* dwarf2.h: Add PGI dwarf extensions.
+
+2003-08-08 Dmitry Diky <diwil@mail.ru>
+
+	* msp430.h: Add xW42 and xE42 parts. Sort MPU list according to
+	gcc order.
+
+2003-08-07  Alan Modra  <amodra@bigpond.net.au>
+
+	* reloc-macros.h (START_RELOC_NUMBERS) : Remove PARAMS macro.  Use
+	C90 function definition.  Formatting.
+	(RELOC_NUMBER): Remove !__STDC__ code.
+
+2003-07-28  Eric Christopher  <echristo@redhat.com>
+
+	* ppc.h (R_PPC_RELAX32): New. Fake relocation.
+
+2003-07-25  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* v850.h (SHF_V850_GPREL): New.
+	(SHF_V850_EPREL): Likewise.
+	(SHF_V850_R0REL): Likewise.
+
+2003-07-09  Alexandre Oliva  <aoliva@redhat.com>
+
+	2001-05-16  Alexandre Oliva  <aoliva@redhat.com>
+	* mn10300.h: Introduce GOTPC16, GOTOFF24, GOTOFF16 and
+	PLT16, and rename GOTPC to GOTPC32 and GOTOFF to GOTOFF32.
+	Renumbered all relocs.
+	2001-04-12  Alexandre Oliva  <aoliva@redhat.com>
+	* mn10300.h (R_MN10300_GOTPC, R_MN10300_GOTOFF,
+	R_MN10300_PLT32, R_MN10300_GOT32, R_MN10300_GOT24,
+	R_MN10300_GOT16, R_MN10300_COPY, R_MN10300_GLOB_DAT,
+	R_MN10300_JMP_SLOT, R_MN10300_RELATIVE): New relocs.
+
+2003-07-09  Alexandre Oliva  <aoliva@redhat.com>
+
+	2000-04-01  Alexandre Oliva  <aoliva@cygnus.com>
+	* mn10300.h (E_MN10300_MACH_AM33_2): Renamed from
+	E_MN10300_MACH_AM332.
+	2000-03-31  Alexandre Oliva  <aoliva@cygnus.com>
+	* mn10300.h (E_MN10300_MACH_AM332): Defined.
+
+2003-07-01  Martin Schwidefsky  <schwidefsky@de.ibm.com>
+
+	* s390.h (elf_s390_reloc_type): Add long displacement relocations
+	R_390_20, R_390_GOT20, R_390_GOTPLT20 and R_390_TLS_GOTIE20.
+
+2003-06-29  Andreas Jaeger  <aj@suse.de>
+
+	* mmix.h: Convert to ISO C90 prototypes.
+	* mips.h: Likewise.
+
+2003-06-13  Robert Millan <zeratul2@wanadoo.es>
+
+	* common.h (GNU_ABI_TAG_NETBSD): New tag.
+	(GNU_ABI_TAG_FREEBSD): New tag.
+
+2003-06-10  Richard Sandiford  <rsandifo@redhat.com>
+
+	* h8.h (E_H8_MACH_H8300SXN): New flag.
+
+2003-06-03  Nick Clifton  <nickc@redhat.com>
+
+	* v850.h (R_V850_32): Rename to R_V850_ABS32.
+	Add R_V850_REL32.
+
+2003-05-15  Roland McGrath  <roland@redhat.com>
+
+	* common.h (NT_AUXV, AT_*): New macros.
+	* external.h (Elf32_External_Auxv, Elf64_External_Auxv): New types.
+	* internal.h (Elf_Internal_Auxv): New type.
+
+2003-05-14  Michael Snyder  <msnyder@redhat.com>
+	From  Bernd Schmidt  <bernds@redhat.com>
+	* h8.h (E_H8_MACH_H8300SX): New.
+
+2003-04-24 Dhananjay Deshpande <dhananjayd@kpitcummins.com>
+
+	* elf/h8.h (E_H8_MACH_H8300HN, E_H8_MACH_H8300SN): New
+
+2003-04-23  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* common.h (EM_SH): Amend comment to refer to SuperH.
+
+2003-04-22  Kazuhiro Inaoka  <inaoka.kazuhiro@renesas.com>
+
+	* common.h: Replace references to Mitsubishi M32R with
+	references to Renesas M32R.
+
+2003-04-15  Rohit Kumar Srivastava <rohits@kpitcummins.com>
+
+	* common.h: Replace occurrances of 'Hitachi' with 'Renesas'.
+
+2003-04-01  Bob Wilson  <bob.wilson@acm.org>
+
+	* elf/common.h (EM_XTENSA_OLD): Define.
+	* elf/xtensa.h: New file.
+
+2003-04-01  Nick Clifton  <nickc@redhat.com>
+
+	* arm.h (ARM_NOTE_SECTION): Include .gnu in the string.
+
+2003-03-25  Stan Cox   <scox@redhat.com>
+	    Nick Clifton  <nickc@redhat.com>
+
+	Contribute support for Intel's iWMMXt chip - an	ARM variant:
+
+	* arm.h (ARM_NOTE_SECTION): Define.
+
+2003-03-03  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* sh.h (EF_SH_MERGE_MACH): Make sure SH2E & SH3/SH3E merge to SH3E,
+	and SH2E & SH4 merge to SH4, not SH2E.
+
+2003-02-21  Ian Wienand  <ianw@gelato.unsw.edu.au>
+
+	* ia64.h (SHT_IA_64_LOPSREG, SHT_IA_64_HIPSREG,
+	SHT_IA_64_PRIORITY_INIT): Define.
+
+2003-02-18  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc64.h (IS_PPC64_TLS_RELOC): Rename from IS_TLS_RELOC.
+
+	* ppc.h: Replace DTPMOD64, TPREL64, DTPREL64 with DTPMOD32 etc.
+	(IS_PPC_TLS_RELOC): Define.
+
+2003-02-10  Nick Clifton  <nickc@redhat.com>
+
+	* arm.h (EF_ARM_MAVERICK_FLOAT): Define.
+
+2003-02-05  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h: Add TLS relocs.  Format.
+	* ppc64.h: Likewise.
+
+2003-01-27  Alexandre Oliva  <aoliva@redhat.com>
+
+	* mips.h (EF_MIPS_XGOT): Define.
+
+2003-01-24  Martin Schwidefsky  <schwidefsky@de.ibm.com>
+
+	* s390.h: Add s390 TLS relocations.
+
+2003-01-23  Nick Clifton  <nickc@redhat.com>
+
+	* Add sh2e support:
+
+	2002-04-02  Alexandre Oliva  <aoliva@redhat.com>
+
+		* sh.h (EF_SH_MERGE_MACH): Handle SH2E.
+
+	2002-04-02  Elena Zannoni  <ezannoni@redhat.com>
+
+		* sh.h (EF_SH2E): New.
+
+2003-01-23  Alan Modra  <amodra@bigpond.net.au>
+
+	* sh.h: Split out various bits to bfd/elf32-sh64.h.
+
+2003-01-20  Martin Schwidefsky  <schwidefsky@de.ibm.com>
+
+	* s390.h: Rename R_390_GOTOFF to R_390_GOTOFF32. Add new gotoff,
+	gotplt and pltoff relocations.
+
+2003-01-17  Alan Modra  <amodra@bigpond.net.au>
+
+	* common.h: Formatting, typo fixes.
+	(DT_ENCODING): Correct value.
+
+2003-01-17  Fabio Alemagna  <falemagn@aros.org>
+
+	* common.h (ELFOSABI_AROS): Define.
+	(ELFOSABI_OPENVMS): Likewise.
+	(ELFOSABI_NSK): Likewise.
+
+2003-01-16  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h: Split out ppc64 definitions to..
+	* pcc64.h: ..here.  New file.
+	(R_PPC64_REL30): Rename from R_PPC64_ADDR30.
+
+2003-01-13 Dmitry Diky <diwil@mail.ru>
+
+	* elf/common.h (EM_MSP430): Change e_machine value to officially
+	assigned.
+
+2003-01-02  Ben Elliston  <bje@redhat.com>
+
+	* common.h (EM_IQ2000): Define.
+	* iq2000.h: New file.
+
+2002-12-30  Chris Demetriou  <cgd@broadcom.com>
+
+	* mips.h (E_MIPS_ARCH_32R2): New define.
+
+2002-12-24    Dmitry Diky <diwil@mail.ru>
+
+	* common.h: Define msp430 machine numbers.
+	* msp430.h: New file.  Define msp430 relocs.
+
+2002-12-20  DJ Delorie  <dj@redhat.com>
+
+	* xstormy16.h: Add XSTORMY16_12.
+
+2002-12-16  Andrew MacLeod  <amacleod@redhat.com>
+
+	* xstormy16.h (START_RELOC_NUMBERS) Add relocation numbers
+	for R_XSTORMY16_LO16 and R_XSTORMY16_HI16.
+
+2002-12-10  James Cownie <jcownie@etnus.com>
+
+	* dwarf2.h (DW_TAG_upc_shared_type, DW_TAG_upc_strict_type,
+	DW_TAG_upc_relaxed_type, DW_AT_upc_threads_scaled, DW_LANG_Upc):
+	Define.
+
+2002-12-01  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* m68hc11.h (EF_M68HC12_MACH, EF_M68HCS12_MACH): Define.
+	(EF_M68HC11_MACH_MASK, EF_M68HC11_MACH): Define.
+	(EF_M68HC11_MERGE_MACH, EF_M68HC11_CAN_MERGE_MACH): Define.
+
+2002-11-30  Alan Modra  <amodra@bigpond.net.au>
+
+	* mmix.h: Replace boolean with bfd_boolean.
+	* sh.h: Likewise.
+
+2002-11-28  Alan Modra  <amodra@bigpond.net.au>
+
+	* internal.h (elf32_internal_ehdr, Elf32_Internal_Ehdr,
+	elf64_internal_ehdr, Elf64_Internal_Ehdr, elf32_internal_phdr,
+	Elf32_Internal_Phdr, elf64_internal_phdr, Elf64_Internal_Phdr,
+	elf32_internal_shdr, Elf32_Internal_Shdr, elf64_internal_shdr,
+	Elf64_Internal_Shdr, elf32_internal_sym, elf64_internal_sym,
+	Elf32_Internal_Sym, Elf64_Internal_Sym, Elf32_Internal_Note,
+	elf32_internal_note, elf32_internal_rel, Elf32_Internal_Rel,
+	elf64_internal_rel, Elf64_Internal_Rel, elf32_internal_rela,
+	elf64_internal_rela, Elf32_Internal_Rela, Elf64_Internal_Rela,
+	elf32_internal_dyn, elf64_internal_dyn, Elf32_Internal_Dyn,
+	Elf64_Internal_Dyn, elf32_internal_verdef, elf64_internal_verdef,
+	elf32_internal_verdaux, elf64_internal_verdaux, elf32_internal_verneed,
+	elf64_internal_verneed, elf32_internal_vernaux, elf64_internal_vernaux,
+	elf32_internal_versym, elf64_internal_versym, Elf32_Internal_Verdef,
+	Elf64_Internal_Verdef, Elf32_Internal_Verdaux, Elf64_Internal_Verdaux,
+	Elf32_Internal_Verneed, Elf64_Internal_Verneed, Elf32_Internal_Vernaux,
+	Elf64_Internal_Vernaux, Elf32_Internal_Versym, Elf64_Internal_Versym,
+	Elf32_Internal_Syminfo, Elf64_Internal_Syminfo): Delete.
+	(Elf_Internal_Rel): Delete.
+
 2002-10-11  Kaz Kojima  <kkojima@rr.iij4u.or.jp>
 
 	* sh.h: Add SH TLS relocs.
 
 2002-09-30  Gavin Romig-Koch  <gavin@redhat.com>
-            Ken Raeburn  <raeburn@cygnus.com>
-            Aldy Hernandez  <aldyh@redhat.com>
-            Eric Christopher  <echristo@redhat.com>
-            Richard Sandiford  <rsandifo@redhat.com>
+	    Ken Raeburn  <raeburn@cygnus.com>
+	    Aldy Hernandez  <aldyh@redhat.com>
+	    Eric Christopher  <echristo@redhat.com>
+	    Richard Sandiford  <rsandifo@redhat.com>
 
 	* mips.h (E_MIPS_MACH_4120, E_MIPS_MACH_5400, E_MIPS_MACH_5500): New.
 
@@ -44,9 +347,9 @@
 	    Graham Stott  <grahams@redhat.com>
 	    Jeff Johnston  <jjohnstn@redhat.com>
 
-        * common.h (EM_IP2K): New macro.
+	* common.h (EM_IP2K): New macro.
 	(EM_IP2K_OLD): New macro.
-        * ip2k.h: New file.
+	* ip2k.h: New file.
 
 2002-07-01  Matt Thomas  <matt@3am-software.com>
 

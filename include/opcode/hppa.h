@@ -1,6 +1,6 @@
 /* Table of opcodes for the PA-RISC.
    Copyright 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1998, 1999, 2000,
-   2001
+   2001, 2002
    Free Software Foundation, Inc.
 
    Contributed by the Center for Software Science at the
@@ -271,10 +271,12 @@ Float registers for fmpyadd and fmpysub:
 */
 
 
+#if 0
 /* List of characters not to put a space after.  Note that
    "," is included, as the "spopN" operations use literal
    commas in their completer sections.  */
 static const char *const completer_chars = ",CcY<>?!@+&U~FfGHINnOoZMadu|/=0123%e$m}";
+#endif
 
 /* The order of the opcodes in this table is significant:
 
@@ -405,6 +407,7 @@ static const struct pa_opcode pa_opcodes[] =
 { "ldbx",       0x0c000000, 0xfc001fc0, "cXx(b),t", pa10, 0},
 { "ldwa",       0x0c000180, 0xfc00d3c0, "cxccx(b),t", pa10, FLAG_STRICT},
 { "ldwa",	0x0c001180, 0xfc00d3c0, "cmcc5(b),t", pa10, FLAG_STRICT},
+{ "ldwa",	0x0c0011a0, 0xfc1ff3e0, "cocc@(b),t", pa20, FLAG_STRICT},
 { "ldcw",       0x0c0001c0, 0xfc0013c0, "cxcdx(s,b),t", pa10, FLAG_STRICT},
 { "ldcw",       0x0c0001c0, 0xfc0013c0, "cxcdx(b),t", pa10, FLAG_STRICT},
 { "ldcw",	0x0c0011c0, 0xfc0013c0, "cmcd5(s,b),t", pa10, FLAG_STRICT},
@@ -415,6 +418,7 @@ static const struct pa_opcode pa_opcodes[] =
 { "stby",	0x0c001300, 0xfc0013c0, "cscCx,V(b)", pa10, FLAG_STRICT},
 { "ldda",       0x0c000100, 0xfc00d3c0, "cxccx(b),t", pa20, FLAG_STRICT},
 { "ldda",	0x0c001100, 0xfc00d3c0, "cmcc5(b),t", pa20, FLAG_STRICT},
+{ "ldda",	0x0c001120, 0xfc1ff3e0, "cocc@(b),t", pa20, FLAG_STRICT},
 { "ldcd",       0x0c000140, 0xfc0013c0, "cxcdx(s,b),t", pa20, FLAG_STRICT},
 { "ldcd",       0x0c000140, 0xfc0013c0, "cxcdx(b),t", pa20, FLAG_STRICT},
 { "ldcd",	0x0c001140, 0xfc0013c0, "cmcd5(s,b),t", pa20, FLAG_STRICT},

@@ -23,14 +23,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #ifdef __cplusplus
 extern "C" { //}
 #endif
-  
-/* The simulator makes use of the following register information. */ 
-  
+
+/* The simulator makes use of the following register information. */
+
   enum sim_h8300_regs
   {
     /* Registers common to all the H8 variants. */
     /* Start here: */
-    SIM_H8300_R0_REGNUM,    
+    SIM_H8300_R0_REGNUM,
     SIM_H8300_R1_REGNUM,
     SIM_H8300_R2_REGNUM,
     SIM_H8300_R3_REGNUM,
@@ -42,8 +42,8 @@ extern "C" { //}
     SIM_H8300_CCR_REGNUM,  /* Contains processor status */
     SIM_H8300_PC_REGNUM,   /* Contains program counter */
     /* End here */
-    
-    SIM_H8300_EXR_REGNUM,  /* Contains extended processor status 
+
+    SIM_H8300_EXR_REGNUM,  /* Contains extended processor status
                               H8S and higher */
     SIM_H8300_MACL_REGNUM, /* Lower part of MAC register (26xx only)*/
     SIM_H8300_MACH_REGNUM, /* High part of MAC register (26xx only) */
@@ -55,11 +55,11 @@ extern "C" { //}
 
   enum
   {
-    SIM_H8300_ARG_FIRST_REGNUM = SIM_H8300_R0_REGNUM, /* first reg in which an arg 
-                                                         may be passed */    
-    SIM_H8300_ARG_LAST_REGNUM = SIM_H8300_R3_REGNUM,  /* last  reg in which an arg 
+    SIM_H8300_ARG_FIRST_REGNUM = SIM_H8300_R0_REGNUM, /* first reg in which an arg
                                                          may be passed */
-    SIM_H8300_FP_REGNUM = SIM_H8300_R6_REGNUM, /* Contain address of executing 
+    SIM_H8300_ARG_LAST_REGNUM = SIM_H8300_R3_REGNUM,  /* last  reg in which an arg
+                                                         may be passed */
+    SIM_H8300_FP_REGNUM = SIM_H8300_R6_REGNUM, /* Contain address of executing
                                                   stack frame */
     SIM_H8300_SP_REGNUM = SIM_H8300_R7_REGNUM  /* Contains address of top of stack */
   };
@@ -74,5 +74,5 @@ extern "C" { //}
 #ifdef __cplusplus
 }
 #endif
- 
+
 #endif				/* SIM_H8300_H */

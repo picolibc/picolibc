@@ -1,6 +1,6 @@
-/* coff information for Hitachi H8/300 and H8/300-H
+/* coff information for Renesas H8/300 and H8/300-H
 
-   Copyright 2001 Free Software Foundation, Inc.
+   Copyright 2001, 2003 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,12 +22,16 @@
 #define	H8300MAGIC	0x8300
 #define	H8300HMAGIC	0x8301
 #define	H8300SMAGIC	0x8302
+#define	H8300HNMAGIC	0x8303
+#define	H8300SNMAGIC	0x8304
 
-#define H8300BADMAG(x)  (((x).f_magic != H8300MAGIC))
-#define H8300HBADMAG(x) (((x).f_magic != H8300HMAGIC))
-#define H8300SBADMAG(x) (((x).f_magic != H8300SMAGIC))
+#define H8300BADMAG(x)   (((x).f_magic != H8300MAGIC))
+#define H8300HBADMAG(x)  (((x).f_magic != H8300HMAGIC))
+#define H8300SBADMAG(x)  (((x).f_magic != H8300SMAGIC))
+#define H8300HNBADMAG(x) (((x).f_magic != H8300HNMAGIC))
+#define H8300SNBADMAG(x) (((x).f_magic != H8300SNMAGIC))
 
-/********************** RELOCATION DIRECTIVES **********************/
+/* Relocation directives.  */
 
 /* The external reloc has an offset field, because some of the reloc
    types on the h8 don't have room in the instruction for the entire

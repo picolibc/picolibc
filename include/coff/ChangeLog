@@ -1,3 +1,73 @@
+2003-12-02  Graham Reed <grahamr@algorithmics.com>
+
+	* internal.h (C_WEAKEXT): Add alternative value for AIX 5.2
+	based targets.
+
+2003-08-23  Jason Eckhardt  <jle@rice.edu>
+
+	* coff/i860.h (COFF860_R_PAIR, COFF860_R_LOW0, COFF860_R_LOW1,
+	COFF860_R_LOW2, COFF860_R_LOW3, COFF860_R_LOW4, COFF860_R_SPLIT0,
+	COFF860_R_SPLIT1, COFF860_R_SPLIT2, COFF860_R_HIGHADJ,
+	COFF860_R_BRADDR): Define new relocation constants and document.
+	Minor formatting adjustments.
+
+2003-08-07  Alan Modra  <amodra@bigpond.net.au>
+
+	* ti.h (GET_SCNHDR_NRELOC): Rename PTR param to LOC.
+	(PUT_SCNHDR_NRELOC, GET_SCNHDR_NLNNO, PUT_SCNHDR_NLNNO): Likewise.
+	(GET_SCNHDR_FLAGS, PUT_SCNHDR_FLAGS): Likewise.
+	(GET_SCNHDR_PAGE, PUT_SCNHDR_PAGE): Likewise.
+
+2003-07-17  Jeff Muizelaar  <muizelaar@rogers.com>
+
+	* pe.h: (IMAGE_FILE_NET_RUN_FROM_SWAP): Define.
+	(IMAGE_FILE_MACHINE_WCEMIPSV2): Define.
+	(IMAGE_FILE_MACHINE_SH3DSP): Define.
+	(IMAGE_FILE_MACHINE_SH3E): Define.
+	(IMAGE_FILE_MACHINE_SH5): Define.
+	(IMAGE_FILE_MACHINE_AM33): Define.
+	(IMAGE_FILE_MACHINE_POWERPCFP): Define.
+	(IMAGE_FILE_MACHINE_AXP64): Define.
+	(IMAGE_FILE_MACHINE_TRICORE): Define.
+	(IMAGE_FILE_MACHINE_CEF): Define.
+	(IMAGE_FILE_MACHINE_EBC): Define.
+	(IMAGE_FILE_MACHINE_AMD64): Define.
+	(IMAGE_FILE_MACHINE_M32R): Define.
+	(IMAGE_FILE_MACHINE_CEE): Define.
+
+2003-07-14  Christian Groessler  <chris@groessler.org>
+
+        * i860.h (AOUTSZ): Define for i860 coff.
+
+2003-06-29  Andreas Jaeger  <aj@suse.de>
+
+	* xcoff.h (struct __rtinit ): Convert to ISO C90 prototypes.
+
+	* ecoff.h: Convert to ISO C90 prototypes.  Replace PTR by void *.
+
+2003-04-24 Dhananjay Deshpande <dhananjayd@kpitcummins.com>
+
+	* coff/h8300.h (H8300HNMAGIC, H8300SNMAGIC): New.
+	(H8300HNBADMAG, H8300SNBADMAG): New.
+
+2003-04-15  Rohit Kumar Srivastava <rohits@kpitcummins.com>
+
+	* sh.h: Replace occurrances of 'Hitachi' with 'Renesas'.
+	* h8300.h: Likewise.
+	* h8500.h: Likewise.
+
+2003-03-25  Stan Cox   <scox@redhat.com>
+	    Nick Clifton  <nickc@redhat.com>
+
+	Contribute support for Intel's iWMMXt chip - an	ARM variant:
+
+	* arm.h (ARM_NOTE_SECTION): Define.
+
+2002-11-30  Alan Modra  <amodra@bigpond.net.au>
+
+	* ecoff.h: Replace boolean with bfd_boolean.
+	* xcoff.h: Likewise.
+
 2002-03-18  Tom Rix  <trix@redhat.com>
 
 	* rs6k64.h: Add U64_TOCMAGIC, AIX 5 64 bit magic number.
@@ -5,26 +75,26 @@
 2002-02-01  Tom Rix  <trix@redhat.com>
 
 	* xcoff.h: Conditionally support <aiaff> for pre AIX 4.3.
- 
+
 2002-01-31  Ivan Guzvinec  <ivang@opencores.org>
 
 	* or32.h: New file.
 
 2001-12-24  Tom Rix  <trix@redhat.com>
 
-	* xcoff.h (xcoff_big_format_p): Make <bigaf> the default archive 
+	* xcoff.h (xcoff_big_format_p): Make <bigaf> the default archive
 	format.
-	(XCOFFARMAG_ELEMENT_SIZE, XCOFFARMAGBIG_ELEMENT_SIZE): Define for 
-	archive header ascii elements.  
+	(XCOFFARMAG_ELEMENT_SIZE, XCOFFARMAGBIG_ELEMENT_SIZE): Define for
+	archive header ascii elements.
 
 2001-12-17  Tom Rix  <trix@redhat.com>
 
 	* xcoff.h :  Add .except and .typchk section string and styp flags.
-	Fix xcoff_big_format_p macro.  
+	Fix xcoff_big_format_p macro.
 
 2001-12-16  Tom Rix  <trix@redhat.com>
 
-	* xcoff.h : Clean up formatting. 
+	* xcoff.h : Clean up formatting.
 
 2002-01-15  Richard Earnshaw  <rearnsha@arm.com>
 
@@ -34,9 +104,9 @@
 
 	* ti.h: Move arch-specific stuff from here...
 	(COFF_ADJUST_SYM_IN/OUT): Optionally put page flag into symbol
-	value. 
+	value.
 	* tic54x.h: ...to here.
-	
+
 2001-10-26  Christian Groessler  <cpg@aladdin.de>
 
 	* external.h (GET_LINENO_LNNO): Fix usage of H_GET_32/16.
@@ -60,7 +130,7 @@
 2001-09-05  Tom Rix <trix@redhat.com>
 
 	* xcoff.h : Add XCOFF_SYSCALL32 and XCOFF_SYSCALL64 hash table flags.
-	
+
 2001-08-27  Andreas Jaeger  <aj@suse.de>
 
 	* xcoff.h (struct __rtinit): Make proper prototype for rtl.
@@ -71,12 +141,12 @@ Fri Aug 24 01:18:51 2001  J"orn Rennecke <amylaar@redhat.com>
 
 2001-04-05  Tom Rix <trix@redhat.com>
 
-	* rs6000.h : move xcoff32 external structures from xcofflink. 
-	* rs6k64.h : move xcoff64 external structures from xcofflink. 
+	* rs6000.h : move xcoff32 external structures from xcofflink.
+	* rs6k64.h : move xcoff64 external structures from xcofflink.
 	* internal.h : promote 32 bit structure elements to 64 bit
 	for xcoff64 support
 	* xcoff.h : New file.
-	
+
 2001-03-23  Nick Clifton  <nickc@redhat.com>
 
 	* a29k.h: Fix compile time warning.
@@ -143,10 +213,10 @@ Fri Aug 24 01:18:51 2001  J"orn Rennecke <amylaar@redhat.com>
 	* rs6k64.h: New file.
 
 2000-04-17  Timothy Wall  <twall@cygnus.com>
-	
+
 	* ti.h: Load page cleanup.
 	* intental.h: Add load page field.
-	
+
 Mon Apr 17 16:44:01 2000  David Mosberger  <davidm@hpl.hp.com>
 
 	* pe.h (PEP64AOUTHDR): New header for PE+.
@@ -172,15 +242,15 @@ Mon Apr 17 16:44:01 2000  David Mosberger  <davidm@hpl.hp.com>
 2000-04-11  Timothy Wall  <twall@cygnus.com>
 
 	* ti.h: Remove load page references until load pages are
-	reimplemented. 
+	reimplemented.
 	* tic54x.h: Ditto.
-	
+
 2000-04-07  Timothy Wall  <twall@cygnus.com>
 
 	* internal.h: Fix some comments related to TI COFF (instead of tic80).
 	* ti.h: New.
 	* tic54x.h: New.
-	
+
 Wed Apr  5 22:08:41 2000  J"orn Rennecke <amylaar@cygnus.co.uk>
 
 	* sh.h (R_SH_LOOP_START, R_SH_LOOP_END): Define.
@@ -200,7 +270,7 @@ Wed Apr  5 22:08:41 2000  J"orn Rennecke <amylaar@cygnus.co.uk>
 	* arm.h: Add Windows CE definitions.
 	* mipspe.h: New file: Windows CE definitions for MIPS.
 	* pe.h: Add constants for ILF support.
-	
+
 2000-01-05  Nick Clifton  <nickc@cygnus.com>
 
 	* pe.h: Fix formatting of comments.
@@ -272,7 +342,7 @@ Mon May 17 13:35:35 1999  Stan Cox  <scox@cygnus.com>
 1999-04-08  Nick Clifton  <nickc@cygnus.com>
 
 	* mcore.h: New header file.  Defines for Motorola's MCore
-	processor. 
+	processor.
 
 Sun Dec  6 21:36:37 1998  Mark Elbrecht  <snowball3@usa.net>
 
@@ -283,11 +353,11 @@ Wed Jan 27 13:35:35 1999  Stan Cox  <scox@cygnus.com>
 	* arm.h (F_PIC_INT, F_ARM_2, F_ARM_3, F_ARM_4, F_APCS26):
 	Changed values to avoid clashing with IMAGE_FILE_* coff header
 	flag values.
-	
+
 Wed Apr  1 16:06:15 1998  Nick Clifton  <nickc@cygnus.com>
 
 	* internal.h: Document numbers associated with Thumb symbol
-	types. 
+	types.
 
 Fri Mar 27 17:16:57 1998  Ian Lance Taylor  <ian@cygnus.com>
 
@@ -394,7 +464,7 @@ Wed Jun 26 16:24:26 1996  Ian Lance Taylor  <ian@cygnus.com>
 Fri Jun 21 11:17:46 1996  Richard Henderson  <rth@tamu.edu>
 
 	* alpha.h: Add declarations for relocation types added for Alpha
- 	OSF/1 3.0.
+	OSF/1 3.0.
 
 Tue Jun 18 16:04:29 1996  Jeffrey A. Law  <law@rtl.cygnus.com>
 
@@ -420,7 +490,7 @@ Tue May  7 00:36:39 1996  Jeffrey A Law  (law@cygnus.com)
 	(R_MOV16B1, R_MOV16B2): Renamed from R_MOVB1 and R_MOVB2.
 	(R_MOV24B1, R_MOV24B2): Renamed from R_MOVLB1 and R_MOVLB2.
 	(R_MOVL1, R_MOVL2): New relocs.
-	
+
 Fri May  3 13:01:12 1996  Jeffrey A Law  (law@cygnus.com)
 
 	* internal.h (R_PCRWORD_B): Define for the h8300 relaxing
@@ -450,7 +520,7 @@ Thu Mar 21 16:25:57 1996  David Mosberger-Tang  <davidm@azstarnet.com>
 Thu Mar 14 15:22:44 1996  Jeffrey A Law  (law@cygnus.com)
 
 	* internal.h (R_MEM_INDIRECT): New reloc for the h8300.
- 
+
 Fri Feb  9 10:44:11 1996  Ian Lance Taylor  <ian@cygnus.com>
 
 	* aux-coff.h: Rename from aux.h, to avoid problems on hapless DOS
@@ -499,7 +569,7 @@ Wed Nov  1 15:25:18 1995  Manfred Hollstein KS/EF4A 60/1F/110 #40283  <manfred@l
 
 Wed Oct 18 18:36:19 1995  Geoffrey Noer  <noer@cygnus.com>
 
-	* sym.h: #if 0'd out runtime_pdr struct because it chokes 
+	* sym.h: #if 0'd out runtime_pdr struct because it chokes
 	Visual C++ and there aren't any references to it elsewhere in gdb.
 
 Mon Oct 16 11:12:24 1995  Ian Lance Taylor  <ian@cygnus.com>

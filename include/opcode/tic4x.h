@@ -1,6 +1,6 @@
 /* Table of opcodes for the Texas Instruments TMS320C[34]X family.
 
-   Copyright (c) 2002 Free Software Foundation.
+   Copyright (C) 2002, 2003 Free Software Foundation.
   
    Contributed by Michael P. Hayes (m.hayes@elec.canterbury.ac.nz)
    
@@ -16,17 +16,11 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+*/
 
-
-/* FIXME:  Only allow floating point registers for floating point
-   instructions.  Use another field in the instruction table?
-   This field could also flag which instructions are valid for
-   which architectures...
-   e.g., OP_FP | OP_C40  or OP_C40_FP  */
-
-#define IS_CPU_C3X(v) ((v) == 30 || (v) == 31 || (v) == 32)
-#define IS_CPU_C4X(v) ((v) ==  0 || (v) == 40 || (v) == 44)
+#define IS_CPU_TIC3X(v) ((v) == 30 || (v) == 31 || (v) == 32 || (v) == 33)
+#define IS_CPU_TIC4X(v) ((v) ==  0 || (v) == 40 || (v) == 44)
 
 /* Define some bitfield extraction/insertion macros.  */
 #define EXTR(inst, m, l)          ((inst) << (31 - (m)) >> (31 - ((m) - (l)))) 
@@ -56,22 +50,22 @@ c4x_reg_t;
 #define REG_IF REG_IIE		/* C3x only */
 #define REG_IOF REG_IIF		/* C3x only */
 
-#define C3X_REG_MAX REG_RC
-#define C4X_REG_MAX REG_TVTP
+#define TIC3X_REG_MAX REG_RC
+#define TIC4X_REG_MAX REG_TVTP
 
 /* Register table size including C4x expansion regs.  */
-#define REG_TABLE_SIZE (C4X_REG_MAX + 1)
+#define REG_TABLE_SIZE (TIC4X_REG_MAX + 1)
 
-struct c4x_register
+struct tic4x_register
 {
   char *        name;
   unsigned long regno;
 };
 
-typedef struct c4x_register c4x_register_t;
+typedef struct tic4x_register tic4x_register_t;
 
 /* We could store register synonyms here.  */
-static const c4x_register_t c3x_registers[] =
+static const tic4x_register_t tic3x_registers[] =
 {
   {"f0",  REG_R0},
   {"r0",  REG_R0},
@@ -112,10 +106,10 @@ static const c4x_register_t c3x_registers[] =
   {"", 0}
 };
 
-const unsigned int c3x_num_registers = (((sizeof c3x_registers) / (sizeof c3x_registers[0])) - 1);
+const unsigned int tic3x_num_registers = (((sizeof tic3x_registers) / (sizeof tic3x_registers[0])) - 1);
 
 /* Define C4x registers in addition to C3x registers.  */
-static const c4x_register_t c4x_registers[] =
+static const tic4x_register_t tic4x_registers[] =
 {
   {"die", REG_DIE},		/* Clobbers C3x REG_IE */
   {"iie", REG_IIE},		/* Clobbers C3x REG_IF */
@@ -133,1130 +127,19 @@ static const c4x_register_t c4x_registers[] =
   {"", 0}
 };
 
-const unsigned int c4x_num_registers = (((sizeof c4x_registers) / (sizeof c4x_registers[0])) - 1);
+const unsigned int tic4x_num_registers = (((sizeof tic4x_registers) / (sizeof tic4x_registers[0])) - 1);
 
-/* Instruction template.  */
-struct c4x_inst
-{
-  char *        name;
-  unsigned long opcode;
-  unsigned long opmask;
-  char *        args;
-};
-
-typedef struct c4x_inst c4x_inst_t;
-
-/* B  condition             16--20
-   C  condition             23--27
-   ,  required arg follows
-   ;  optional arg follows
-   General addressing modes
-   *  indirect               0--15 
-   #  direct (for ldp only)  0--15 
-   @  direct                 0--15 
-   F  short float immediate  0--15 
-   Q  register               0--15 
-   R  register              16--20 
-   S  short int immediate    0--15 
-   D  src and dst same reg
-   Three operand addressing modes
-   E  register               0--7 
-   G  register               8--15 
-   I  indirect(short)        0--7 
-   J  indirect(short)        8--15 
-   R  register              16--20
-   W  short int (C4x)        0--7
-   C  indirect(short) (C4x)  0--7
-   O  indirect(short) (C4x)  8--15
-   Parallel instruction addressing modes
-   E  register               0--7 
-   G  register               8--15
-   I  indirect(short)        0--7 
-   J  indirect(short)        8--15 
-   K  register              19--21
-   L  register              22--24
-   M  register (R2,R3)      22--22
-   N  register (R0,R1)      23--23
-   Misc. addressing modes
-   A  address register      22--24
-   B  unsigned integer       0--23  (absolute on C3x, relative on C4x)
-   P  displacement (PC Rel)  0--15 
-   U  unsigned integer       0--15
-   V  vector                 0--4   (C4x 0--8) 
-   T  integer (C4x stik)    16--20
-   Y  address reg (C4x)     16--20   
-   X  expansion reg (C4x)    0--4
-   Z  expansion reg (C4x)   16--20.  */
-
-#define C4X_OPERANDS_MAX 7	/* Max number of operands for an inst.  */
-#define C4X_NAME_MAX 16		/* Max number of chars in parallel name.  */
-
-/* General (two) operand group.  */
-#define G_F_r "F,R"
-#define G_I_r "S,R"
-#define G_L_r "U,R"
-#define G_Q_r "*,R"
-#define G_T_r "@,R"
-#define G_r_r "Q;R"
-
-/* Three operand group (Type 1 with missing third operand).  */
-#define T_rr_ "E,G"
-#define T_rS_ "E,J"
-#define T_Sr_ "I,G"
-#define T_SS_ "I,J"
-
-/* Three operand group (Type 2 with missing third operand).  */
-#define T_Jr_ "W,G"		/* C4x only */
-#define T_rJ_ "G,W"		/* C4x only (commutative insns only) */
-#define T_Rr_ "C,G"		/* C4x only */
-#define T_rR_ "G,C"		/* C4x only (commutative insns only) */
-#define T_JR_ "W,O"		/* C4x only */
-#define T_RJ_ "O,W"		/* C4x only (commutative insns only) */
-#define T_RR_ "C,O"		/* C4x only */
-
-/* Three operand group (Type 1).  */
-#define T_rrr "E,G;R"
-#define T_Srr "E,J,R"
-#define T_rSr "I,G;R"
-#define T_SSr "I,J,R"
-
-/* Three operand group (Type 2).  */
-#define T_Jrr "W,G;R"		/* C4x only */
-#define T_rJr "G,W,R"		/* C4x only (commutative insns only) */
-#define T_Rrr "C,G;R"		/* C4x only */
-#define T_rRr "G,C,R"		/* C4x only (commutative insns only) */
-#define T_JRr "W,O,R"		/* C4x only */
-#define T_RJr "O,W,R"		/* C4x only (commutative insns only) */
-#define T_RRr "C,O,R"		/* C4x only */
-
-/* Parallel group (store || op).  */
-#define Q_rS_rSr "H,J|K,I,L"
-#define Q_rS_Sr  "H,J|I,L"
-#define Q_rS_Srr "H,J|I,K;L"
-
-/* Parallel group (op || store).  */
-#define P_rSr_rS "K,I,L|H,J"
-#define P_Srr_rS "I,K;L|H,J"
-#define P_rS_rS  "L,I|H,J"
-
-/* Parallel group (load || load).  */
-#define P_Sr_Sr "I,L|J,K"
-#define Q_Sr_Sr "J,K|I,L"
-
-/* Parallel group (store || store).  */
-#define P_Sr_rS "I,L|H,J"
-#define Q_rS_rS "H,J|L,I"
-
-/* Parallel group (multiply || add/sub).  */
-#define P_SSr_rrr "I,J,N|H,K;M"	/* 00 (User manual transposes I,J) */
-#define P_Srr_rSr "J,K;N|H,I,M"	/* 01 */
-#define P_rSr_rSr "K,J,N|H,I,M"	/* 01 */
-#define P_rrr_SSr "H,K;N|I,J,M"	/* 10 (User manual transposes H,K) */
-#define P_Srr_Srr "J,K;N|I,H;M"	/* 11 */
-#define P_rSr_Srr "K,J,N|I,H;M"	/* 11 */
-
-#define Q_rrr_SSr "H,K;M|I,J,N"	/* 00 (User manual transposes I,J) */
-#define Q_rSr_Srr "H,I,M|J,K;N"	/* 01 */
-#define Q_rSr_rSr "H,I,M|K,J,N"	/* 01 */
-#define Q_SSr_rrr "I,J,M|H,K;N"	/* 10 (User manual transposes H,K) */
-#define Q_Srr_Srr "I,H;M|J,K;N"	/* 11 */
-#define Q_Srr_rSr "I,H;M|K,J,N"	/* 11 */
-
-/* Define c3x opcodes for assembler and disassembler.  */
-static const c4x_inst_t c3x_insts[] =
-{
-  /* Put synonyms after the desired forms in table so that they get
-     overwritten in the lookup table.  The disassembler will thus
-     print the `proper' mnemonics.  Note that the disassembler
-     only decodes the 11 MSBs, so instructions like ldp @0x500 will
-     be printed as ldiu 5, dp.  Note that with parallel instructions,
-     the second part is executed before the first part, unless
-     the sti1||sti2 form is used.  We also allow sti2||sti1
-     which is equivalent to the default sti||sti form.
-
-     Put most common forms first to speed up assembler.
-     
-     FIXME:  Add all the other parallel/load forms, like absf1_stf2
-     Perhaps I should have used a few macros...especially with
-     all the bloat after adding the C4x opcodes...too late now!  */
-
-    /* Parallel instructions.  */
-  { "absf_stf",     0xc8000000, 0xfe000000, P_Sr_rS },
-  { "absi_sti",     0xca000000, 0xfe000000, P_Sr_rS },
-  { "addf_mpyf",    0x80000000, 0xff000000, Q_rrr_SSr },
-  { "addf_mpyf",    0x81000000, 0xff000000, Q_rSr_Srr },
-  { "addf_mpyf",    0x81000000, 0xff000000, Q_rSr_rSr },
-  { "addf_mpyf",    0x82000000, 0xff000000, Q_SSr_rrr },
-  { "addf_mpyf",    0x83000000, 0xff000000, Q_Srr_Srr },
-  { "addf_mpyf",    0x83000000, 0xff000000, Q_Srr_rSr },
-  { "addf3_mpyf3",  0x80000000, 0xff000000, Q_rrr_SSr },
-  { "addf3_mpyf3",  0x81000000, 0xff000000, Q_rSr_Srr },
-  { "addf3_mpyf3",  0x81000000, 0xff000000, Q_rSr_rSr },
-  { "addf3_mpyf3",  0x82000000, 0xff000000, Q_SSr_rrr },
-  { "addf3_mpyf3",  0x83000000, 0xff000000, Q_Srr_Srr },
-  { "addf3_mpyf3",  0x83000000, 0xff000000, Q_Srr_rSr },
-  { "addf_stf",     0xcc000000, 0xfe000000, P_Srr_rS },
-  { "addf_stf",     0xcc000000, 0xfe000000, P_rSr_rS },
-  { "addf3_stf",    0xcc000000, 0xfe000000, P_Srr_rS },
-  { "addf3_stf",    0xcc000000, 0xfe000000, P_rSr_rS },
-  { "addi_mpyi",    0x88000000, 0xff000000, Q_rrr_SSr },
-  { "addi_mpyi",    0x89000000, 0xff000000, Q_rSr_Srr },
-  { "addi_mpyi",    0x89000000, 0xff000000, Q_rSr_rSr },
-  { "addi_mpyi",    0x8a000000, 0xff000000, Q_SSr_rrr },
-  { "addi_mpyi",    0x8b000000, 0xff000000, Q_Srr_Srr },
-  { "addi3_mpyi3",  0x88000000, 0xff000000, Q_rrr_SSr },
-  { "addi3_mpyi3",  0x89000000, 0xff000000, Q_rSr_Srr },
-  { "addi3_mpyi3",  0x8a000000, 0xff000000, Q_SSr_rrr },
-  { "addi3_mpyi3",  0x8b000000, 0xff000000, Q_Srr_Srr },
-  { "addi3_mpyi3",  0x8b000000, 0xff000000, Q_Srr_rSr },
-  { "addi_sti",     0xce000000, 0xfe000000, P_Srr_rS },
-  { "addi_sti",     0xce000000, 0xfe000000, P_rSr_rS },
-  { "addi3_sti",    0xce000000, 0xfe000000, P_Srr_rS },
-  { "addi3_sti",    0xce000000, 0xfe000000, P_rSr_rS },
-  { "and_sti",      0xd0000000, 0xfe000000, P_Srr_rS },
-  { "and_sti",      0xd0000000, 0xfe000000, P_rSr_rS },
-  { "and3_sti",     0xd0000000, 0xfe000000, P_Srr_rS },
-  { "and3_sti",     0xd0000000, 0xfe000000, P_rSr_rS },
-  { "ash_sti",      0xd2000000, 0xfe000000, P_rSr_rS },
-  { "ash3_sti",     0xd2000000, 0xfe000000, P_rSr_rS },
-  { "fix_sti",      0xd4000000, 0xfe000000, P_Sr_rS },
-  { "float_stf",    0xd6000000, 0xfe000000, P_Sr_rS },
-  { "ldf_ldf",      0xc4000000, 0xfe000000, P_Sr_Sr },
-  { "ldf1_ldf2",    0xc4000000, 0xfe000000, Q_Sr_Sr }, /* synonym */
-  { "ldf2_ldf1",    0xc4000000, 0xfe000000, P_Sr_Sr }, /* synonym */
-  { "ldf_stf",      0xd8000000, 0xfe000000, P_Sr_rS },
-  { "ldi_ldi",      0xc6000000, 0xfe000000, P_Sr_Sr },
-  { "ldi1_ldi2",    0xc6000000, 0xfe000000, Q_Sr_Sr }, /* synonym  */
-  { "ldi2_ldi1",    0xc6000000, 0xfe000000, P_Sr_Sr }, /* synonym  */
-  { "ldi_sti",      0xda000000, 0xfe000000, P_Sr_rS },
-  { "lsh_sti",      0xdc000000, 0xfe000000, P_rSr_rS },
-  { "lsh3_sti",     0xdc000000, 0xfe000000, P_rSr_rS },
-  { "mpyf_addf",    0x80000000, 0xff000000, P_SSr_rrr },
-  { "mpyf_addf",    0x81000000, 0xff000000, P_Srr_rSr },
-  { "mpyf_addf",    0x81000000, 0xff000000, P_rSr_rSr },
-  { "mpyf_addf",    0x82000000, 0xff000000, P_rrr_SSr },
-  { "mpyf_addf",    0x83000000, 0xff000000, P_Srr_Srr },
-  { "mpyf_addf",    0x83000000, 0xff000000, P_rSr_Srr },
-  { "mpyf3_addf3",  0x80000000, 0xff000000, P_SSr_rrr },
-  { "mpyf3_addf3",  0x81000000, 0xff000000, P_Srr_rSr },
-  { "mpyf3_addf3",  0x81000000, 0xff000000, P_rSr_rSr },
-  { "mpyf3_addf3",  0x82000000, 0xff000000, P_rrr_SSr },
-  { "mpyf3_addf3",  0x83000000, 0xff000000, P_Srr_Srr },
-  { "mpyf3_addf3",  0x83000000, 0xff000000, P_rSr_Srr },
-  { "mpyf_stf",     0xde000000, 0xfe000000, P_Srr_rS },
-  { "mpyf_stf",     0xde000000, 0xfe000000, P_rSr_rS },
-  { "mpyf3_stf",    0xde000000, 0xfe000000, P_Srr_rS },
-  { "mpyf3_stf",    0xde000000, 0xfe000000, P_rSr_rS },
-  { "mpyf_subf",    0x84000000, 0xff000000, P_SSr_rrr },
-  { "mpyf_subf",    0x85000000, 0xff000000, P_Srr_rSr },
-  { "mpyf_subf",    0x85000000, 0xff000000, P_rSr_rSr },
-  { "mpyf_subf",    0x86000000, 0xff000000, P_rrr_SSr },
-  { "mpyf_subf",    0x87000000, 0xff000000, P_Srr_Srr },
-  { "mpyf_subf",    0x87000000, 0xff000000, P_rSr_Srr },
-  { "mpyf3_subf3",  0x84000000, 0xff000000, P_SSr_rrr },
-  { "mpyf3_subf3",  0x85000000, 0xff000000, P_Srr_rSr },
-  { "mpyf3_subf3",  0x85000000, 0xff000000, P_rSr_rSr },
-  { "mpyf3_subf3",  0x86000000, 0xff000000, P_rrr_SSr },
-  { "mpyf3_subf3",  0x87000000, 0xff000000, P_Srr_Srr },
-  { "mpyf3_subf3",  0x87000000, 0xff000000, P_rSr_Srr },
-  { "mpyi_addi",    0x88000000, 0xff000000, P_SSr_rrr },
-  { "mpyi_addi",    0x89000000, 0xff000000, P_Srr_rSr },
-  { "mpyi_addi",    0x89000000, 0xff000000, P_rSr_rSr },
-  { "mpyi_addi",    0x8a000000, 0xff000000, P_rrr_SSr },
-  { "mpyi_addi",    0x8b000000, 0xff000000, P_Srr_Srr },
-  { "mpyi_addi",    0x8b000000, 0xff000000, P_rSr_Srr },
-  { "mpyi3_addi3",  0x88000000, 0xff000000, P_SSr_rrr },
-  { "mpyi3_addi3",  0x89000000, 0xff000000, P_Srr_rSr },
-  { "mpyi3_addi3",  0x89000000, 0xff000000, P_rSr_rSr },
-  { "mpyi3_addi3",  0x8a000000, 0xff000000, P_rrr_SSr },
-  { "mpyi3_addi3",  0x8b000000, 0xff000000, P_Srr_Srr },
-  { "mpyi3_addi3",  0x8b000000, 0xff000000, P_rSr_Srr },
-  { "mpyi_sti",     0xe0000000, 0xfe000000, P_Srr_rS },
-  { "mpyi_sti",     0xe0000000, 0xfe000000, P_rSr_rS },
-  { "mpyi3_sti",    0xe0000000, 0xfe000000, P_Srr_rS },
-  { "mpyi3_sti",    0xe0000000, 0xfe000000, P_rSr_rS },
-  { "mpyi_subi",    0x8c000000, 0xff000000, P_SSr_rrr },
-  { "mpyi_subi",    0x8d000000, 0xff000000, P_Srr_rSr },
-  { "mpyi_subi",    0x8d000000, 0xff000000, P_rSr_rSr },
-  { "mpyi_subi",    0x8e000000, 0xff000000, P_rrr_SSr },
-  { "mpyi_subi",    0x8f000000, 0xff000000, P_Srr_Srr },
-  { "mpyi_subi",    0x8f000000, 0xff000000, P_rSr_Srr },
-  { "mpyi3_subi3",  0x8c000000, 0xff000000, P_SSr_rrr },
-  { "mpyi3_subi3",  0x8d000000, 0xff000000, P_Srr_rSr },
-  { "mpyi3_subi3",  0x8d000000, 0xff000000, P_rSr_rSr },
-  { "mpyi3_subi3",  0x8e000000, 0xff000000, P_rrr_SSr },
-  { "mpyi3_subi3",  0x8f000000, 0xff000000, P_Srr_Srr },
-  { "mpyi3_subi3",  0x8f000000, 0xff000000, P_rSr_Srr },
-  { "negf_stf",     0xe2000000, 0xfe000000, P_Sr_rS },
-  { "negi_sti",     0xe4000000, 0xfe000000, P_Sr_rS },
-  { "not_sti",      0xe6000000, 0xfe000000, P_Sr_rS },
-  { "or3_sti",      0xe8000000, 0xfe000000, P_Srr_rS },
-  { "or3_sti",      0xe8000000, 0xfe000000, P_rSr_rS },
-  { "stf_absf",     0xc8000000, 0xfe000000, Q_rS_Sr },
-  { "stf_addf",     0xcc000000, 0xfe000000, Q_rS_Srr },
-  { "stf_addf",     0xcc000000, 0xfe000000, Q_rS_rSr },
-  { "stf_addf3",    0xcc000000, 0xfe000000, Q_rS_Srr },
-  { "stf_addf3",    0xcc000000, 0xfe000000, Q_rS_rSr },
-  { "stf_float",    0xd6000000, 0xfe000000, Q_rS_Sr },
-  { "stf_mpyf",     0xde000000, 0xfe000000, Q_rS_Srr },
-  { "stf_mpyf",     0xde000000, 0xfe000000, Q_rS_rSr },
-  { "stf_mpyf3",    0xde000000, 0xfe000000, Q_rS_Srr },
-  { "stf_mpyf3",    0xde000000, 0xfe000000, Q_rS_rSr },
-  { "stf_negf",     0xe2000000, 0xfe000000, Q_rS_Sr },
-  { "stf_stf",      0xc0000000, 0xfe000000, P_rS_rS },
-  { "stf1_stf2",    0xc0000000, 0xfe000000, Q_rS_rS }, /* synonym */
-  { "stf2_stf1",    0xc0000000, 0xfe000000, P_rS_rS }, /* synonym */
-  { "stf_subf",     0xea000000, 0xfe000000, Q_rS_rSr },
-  { "stf_subf3",    0xea000000, 0xfe000000, Q_rS_rSr },
-  { "sti_absi",     0xca000000, 0xfe000000, Q_rS_Sr },
-  { "sti_addi",     0xce000000, 0xfe000000, Q_rS_Srr },
-  { "sti_addi",     0xce000000, 0xfe000000, Q_rS_rSr },
-  { "sti_addi3",    0xce000000, 0xfe000000, Q_rS_Srr },
-  { "sti_addi3",    0xce000000, 0xfe000000, Q_rS_rSr },
-  { "sti_and",      0xd0000000, 0xfe000000, Q_rS_Srr },
-  { "sti_and",      0xd0000000, 0xfe000000, Q_rS_rSr },
-  { "sti_and3",     0xd0000000, 0xfe000000, Q_rS_Srr },
-  { "sti_and3",     0xd0000000, 0xfe000000, Q_rS_rSr },
-  { "sti_ash3",     0xd2000000, 0xfe000000, Q_rS_rSr },
-  { "sti_fix",      0xd4000000, 0xfe000000, Q_rS_Sr },
-  { "sti_ldi",      0xda000000, 0xfe000000, Q_rS_Sr },
-  { "sti_lsh",      0xdc000000, 0xfe000000, Q_rS_rSr },
-  { "sti_lsh3",     0xdc000000, 0xfe000000, Q_rS_rSr },
-  { "sti_mpyi",     0xe0000000, 0xfe000000, Q_rS_Srr },
-  { "sti_mpyi",     0xe0000000, 0xfe000000, Q_rS_rSr },
-  { "sti_mpyi3",    0xe0000000, 0xfe000000, Q_rS_Srr },
-  { "sti_mpyi3",    0xe0000000, 0xfe000000, Q_rS_rSr },
-  { "sti_negi",     0xe4000000, 0xfe000000, Q_rS_Sr },
-  { "sti_not",      0xe6000000, 0xfe000000, Q_rS_Sr },
-  { "sti_or",       0xe8000000, 0xfe000000, Q_rS_Srr },
-  { "sti_or",       0xe8000000, 0xfe000000, Q_rS_rSr },
-  { "sti_or3",      0xe8000000, 0xfe000000, Q_rS_Srr },
-  { "sti_or3",      0xe8000000, 0xfe000000, Q_rS_rSr },
-  { "sti_sti",      0xc2000000, 0xfe000000, P_rS_rS },
-  { "sti1_sti2",    0xc2000000, 0xfe000000, Q_rS_rS }, /* synonym */
-  { "sti2_sti1",    0xc2000000, 0xfe000000, P_rS_rS }, /* synonym */
-  { "sti_subi",     0xec000000, 0xfe000000, Q_rS_rSr },    
-  { "sti_subi3",    0xec000000, 0xfe000000, Q_rS_rSr },
-  { "sti_xor",      0xee000000, 0xfe000000, Q_rS_Srr },
-  { "sti_xor",      0xee000000, 0xfe000000, Q_rS_rSr },
-  { "sti_xor3",     0xee000000, 0xfe000000, Q_rS_Srr },
-  { "sti_xor3",     0xee000000, 0xfe000000, Q_rS_rSr },
-  { "subf_mpyf",    0x84000000, 0xff000000, Q_rrr_SSr },
-  { "subf_mpyf",    0x85000000, 0xff000000, Q_rSr_Srr },
-  { "subf_mpyf",    0x85000000, 0xff000000, Q_rSr_rSr },
-  { "subf_mpyf",    0x86000000, 0xff000000, Q_SSr_rrr },
-  { "subf_mpyf",    0x87000000, 0xff000000, Q_Srr_Srr },
-  { "subf_mpyf",    0x87000000, 0xff000000, Q_Srr_rSr },
-  { "subf3_mpyf3",  0x84000000, 0xff000000, Q_rrr_SSr },
-  { "subf3_mpyf3",  0x85000000, 0xff000000, Q_rSr_Srr },
-  { "subf3_mpyf3",  0x85000000, 0xff000000, Q_rSr_rSr },
-  { "subf3_mpyf3",  0x86000000, 0xff000000, Q_SSr_rrr },
-  { "subf3_mpyf3",  0x87000000, 0xff000000, Q_Srr_Srr },
-  { "subf3_mpyf3",  0x87000000, 0xff000000, Q_Srr_rSr },
-  { "subf_stf",     0xea000000, 0xfe000000, P_rSr_rS },
-  { "subf3_stf",    0xea000000, 0xfe000000, P_rSr_rS },
-  { "subi_mpyi",    0x8c000000, 0xff000000, Q_rrr_SSr },
-  { "subi_mpyi",    0x8d000000, 0xff000000, Q_rSr_Srr },
-  { "subi_mpyi",    0x8d000000, 0xff000000, Q_rSr_rSr },
-  { "subi_mpyi",    0x8e000000, 0xff000000, Q_SSr_rrr },
-  { "subi_mpyi",    0x8f000000, 0xff000000, Q_Srr_Srr },
-  { "subi_mpyi",    0x8f000000, 0xff000000, Q_Srr_rSr },
-  { "subi3_mpyi3",  0x8c000000, 0xff000000, Q_rrr_SSr },
-  { "subi3_mpyi3",  0x8d000000, 0xff000000, Q_rSr_Srr },
-  { "subi3_mpyi3",  0x8d000000, 0xff000000, Q_rSr_rSr },
-  { "subi3_mpyi3",  0x8e000000, 0xff000000, Q_SSr_rrr },
-  { "subi3_mpyi3",  0x8f000000, 0xff000000, Q_Srr_Srr },
-  { "subi3_mpyi3",  0x8f000000, 0xff000000, Q_Srr_rSr },
-  { "subi_sti",     0xec000000, 0xfe000000, P_rSr_rS },    
-  { "subi3_sti",    0xec000000, 0xfe000000, P_rSr_rS },
-  { "xor_sti",      0xee000000, 0xfe000000, P_Srr_rS },
-  { "xor_sti",      0xee000000, 0xfe000000, P_rSr_rS },
-  { "xor3_sti",     0xee000000, 0xfe000000, P_Srr_rS },
-  { "xor3_sti",     0xee000000, 0xfe000000, P_rSr_rS },
-
-  { "absf",   0x00000000, 0xffe00000, G_r_r },
-  { "absf",   0x00200000, 0xffe00000, G_T_r },
-  { "absf",   0x00400000, 0xffe00000, G_Q_r },
-  { "absf",   0x00600000, 0xffe00000, G_F_r },
-  { "absi",   0x00800000, 0xffe00000, G_r_r },
-  { "absi",   0x00a00000, 0xffe00000, G_T_r },
-  { "absi",   0x00c00000, 0xffe00000, G_Q_r },
-  { "absi",   0x00e00000, 0xffe00000, G_I_r },
-  { "addc",   0x01000000, 0xffe00000, G_r_r },
-  { "addc",   0x01200000, 0xffe00000, G_T_r },
-  { "addc",   0x01400000, 0xffe00000, G_Q_r },
-  { "addc",   0x01600000, 0xffe00000, G_I_r },
-  { "addc",   0x20000000, 0xffe00000, T_rrr },
-  { "addc",   0x20200000, 0xffe00000, T_Srr },
-  { "addc",   0x20400000, 0xffe00000, T_rSr },
-  { "addc",   0x20600000, 0xffe00000, T_SSr },
-  { "addc",   0x30000000, 0xffe00000, T_Jrr }, /* C4x */
-  { "addc",   0x30000000, 0xffe00000, T_rJr }, /* C4x */
-  { "addc",   0x30200000, 0xffe00000, T_rRr }, /* C4x */
-  { "addc",   0x30200000, 0xffe00000, T_Rrr }, /* C4x */
-  { "addc",   0x30400000, 0xffe00000, T_JRr }, /* C4x */
-  { "addc",   0x30400000, 0xffe00000, T_RJr }, /* C4x */
-  { "addc",   0x30600000, 0xffe00000, T_RRr }, /* C4x */
-  { "addc3",  0x20000000, 0xffe00000, T_rrr },
-  { "addc3",  0x20200000, 0xffe00000, T_Srr },
-  { "addc3",  0x20400000, 0xffe00000, T_rSr },
-  { "addc3",  0x20600000, 0xffe00000, T_SSr },
-  { "addc3",  0x30000000, 0xffe00000, T_Jrr }, /* C4x */
-  { "addc3",  0x30000000, 0xffe00000, T_rJr }, /* C4x */
-  { "addc3",  0x30200000, 0xffe00000, T_rRr }, /* C4x */
-  { "addc3",  0x30200000, 0xffe00000, T_Rrr }, /* C4x */
-  { "addc3",  0x30400000, 0xffe00000, T_JRr }, /* C4x */
-  { "addc3",  0x30400000, 0xffe00000, T_RJr }, /* C4x */
-  { "addc3",  0x30600000, 0xffe00000, T_RRr }, /* C4x */
-  { "addf",   0x01800000, 0xffe00000, G_r_r },
-  { "addf",   0x01a00000, 0xffe00000, G_T_r },
-  { "addf",   0x01c00000, 0xffe00000, G_Q_r },
-  { "addf",   0x01e00000, 0xffe00000, G_F_r },
-  { "addf",   0x20800000, 0xffe00000, T_rrr },
-  { "addf",   0x20a00000, 0xffe00000, T_Srr },
-  { "addf",   0x20c00000, 0xffe00000, T_rSr },
-  { "addf",   0x20e00000, 0xffe00000, T_SSr },
-  { "addf",   0x30800000, 0xffe00000, T_Jrr }, /* C4x */
-  { "addf",   0x30800000, 0xffe00000, T_rJr }, /* C4x */
-  { "addf",   0x30a00000, 0xffe00000, T_rRr }, /* C4x */
-  { "addf",   0x30a00000, 0xffe00000, T_Rrr }, /* C4x */
-  { "addf",   0x30c00000, 0xffe00000, T_JRr }, /* C4x */
-  { "addf",   0x30c00000, 0xffe00000, T_RJr }, /* C4x */
-  { "addf",   0x30e00000, 0xffe00000, T_RRr }, /* C4x */
-  { "addf3",  0x20800000, 0xffe00000, T_rrr },
-  { "addf3",  0x20a00000, 0xffe00000, T_Srr },
-  { "addf3",  0x20c00000, 0xffe00000, T_rSr },
-  { "addf3",  0x20e00000, 0xffe00000, T_SSr },
-  { "addf3",  0x30800000, 0xffe00000, T_Jrr }, /* C4x */
-  { "addf3",  0x30800000, 0xffe00000, T_rJr }, /* C4x */
-  { "addf3",  0x30a00000, 0xffe00000, T_rRr }, /* C4x */
-  { "addf3",  0x30a00000, 0xffe00000, T_Rrr }, /* C4x */
-  { "addf3",  0x30c00000, 0xffe00000, T_JRr }, /* C4x */
-  { "addf3",  0x30c00000, 0xffe00000, T_RJr }, /* C4x */
-  { "addf3",  0x30e00000, 0xffe00000, T_RRr }, /* C4x */
-  { "addi",   0x02000000, 0xffe00000, G_r_r },
-  { "addi",   0x02200000, 0xffe00000, G_T_r },
-  { "addi",   0x02400000, 0xffe00000, G_Q_r },
-  { "addi",   0x02600000, 0xffe00000, G_I_r },
-  { "addi",   0x21000000, 0xffe00000, T_rrr },
-  { "addi",   0x21200000, 0xffe00000, T_Srr },
-  { "addi",   0x21400000, 0xffe00000, T_rSr },
-  { "addi",   0x21600000, 0xffe00000, T_SSr },
-  { "addi",   0x31000000, 0xffe00000, T_Jrr }, /* C4x */
-  { "addi",   0x31000000, 0xffe00000, T_rJr }, /* C4x */
-  { "addi",   0x31200000, 0xffe00000, T_rRr }, /* C4x */
-  { "addi",   0x31200000, 0xffe00000, T_Rrr }, /* C4x */
-  { "addi",   0x31400000, 0xffe00000, T_JRr }, /* C4x */
-  { "addi",   0x31400000, 0xffe00000, T_RJr }, /* C4x */
-  { "addi",   0x31600000, 0xffe00000, T_RRr }, /* C4x */
-  { "addi3",  0x21000000, 0xffe00000, T_rrr },
-  { "addi3",  0x21200000, 0xffe00000, T_Srr },
-  { "addi3",  0x21400000, 0xffe00000, T_rSr },
-  { "addi3",  0x21600000, 0xffe00000, T_SSr },
-  { "addi3",  0x31000000, 0xffe00000, T_Jrr }, /* C4x */
-  { "addi3",  0x31000000, 0xffe00000, T_rJr }, /* C4x */
-  { "addi3",  0x31200000, 0xffe00000, T_rRr }, /* C4x */
-  { "addi3",  0x31200000, 0xffe00000, T_Rrr }, /* C4x */
-  { "addi3",  0x31400000, 0xffe00000, T_JRr }, /* C4x */
-  { "addi3",  0x31400000, 0xffe00000, T_RJr }, /* C4x */
-  { "addi3",  0x31600000, 0xffe00000, T_RRr }, /* C4x */
-  { "and",    0x02800000, 0xffe00000, G_r_r },
-  { "and",    0x02a00000, 0xffe00000, G_T_r },
-  { "and",    0x02c00000, 0xffe00000, G_Q_r },
-  { "and",    0x02e00000, 0xffe00000, G_L_r },
-  { "and",    0x21800000, 0xffe00000, T_rrr },
-  { "and",    0x21a00000, 0xffe00000, T_Srr },
-  { "and",    0x21c00000, 0xffe00000, T_rSr },
-  { "and",    0x21e00000, 0xffe00000, T_SSr },
-  { "and",    0x31800000, 0xffe00000, T_Jrr }, /* C4x */
-  { "and",    0x31800000, 0xffe00000, T_rJr }, /* C4x */
-  { "and",    0x31a00000, 0xffe00000, T_rRr }, /* C4x */
-  { "and",    0x31a00000, 0xffe00000, T_Rrr }, /* C4x */
-  { "and",    0x31c00000, 0xffe00000, T_JRr }, /* C4x */
-  { "and",    0x31c00000, 0xffe00000, T_RJr }, /* C4x */
-  { "and",    0x31e00000, 0xffe00000, T_RRr }, /* C4x */
-  { "and3",   0x21800000, 0xffe00000, T_rrr },
-  { "and3",   0x21a00000, 0xffe00000, T_Srr },
-  { "and3",   0x21c00000, 0xffe00000, T_rSr },
-  { "and3",   0x21e00000, 0xffe00000, T_SSr },
-  { "and3",   0x31800000, 0xffe00000, T_Jrr }, /* C4x */
-  { "and3",   0x31800000, 0xffe00000, T_rJr }, /* C4x */
-  { "and3",   0x31a00000, 0xffe00000, T_rRr }, /* C4x */
-  { "and3",   0x31a00000, 0xffe00000, T_Rrr }, /* C4x */
-  { "and3",   0x31c00000, 0xffe00000, T_JRr }, /* C4x */
-  { "and3",   0x31c00000, 0xffe00000, T_RJr }, /* C4x */
-  { "and3",   0x31e00000, 0xffe00000, T_RRr }, /* C4x */
-  { "andn",   0x03000000, 0xffe00000, G_r_r },
-  { "andn",   0x03200000, 0xffe00000, G_T_r },
-  { "andn",   0x03400000, 0xffe00000, G_Q_r },
-  { "andn",   0x03600000, 0xffe00000, G_L_r },
-  { "andn",   0x22000000, 0xffe00000, T_rrr },
-  { "andn",   0x22200000, 0xffe00000, T_Srr },
-  { "andn",   0x22400000, 0xffe00000, T_rSr },
-  { "andn",   0x22600000, 0xffe00000, T_SSr },
-  { "andn",   0x32000000, 0xffe00000, T_Jrr }, /* C4x */
-  { "andn",   0x32200000, 0xffe00000, T_Rrr }, /* C4x */
-  { "andn",   0x32400000, 0xffe00000, T_JRr }, /* C4x */
-  { "andn",   0x32600000, 0xffe00000, T_RRr }, /* C4x */
-  { "andn3",  0x22000000, 0xffe00000, T_rrr },
-  { "andn3",  0x22200000, 0xffe00000, T_Srr },
-  { "andn3",  0x22400000, 0xffe00000, T_rSr },
-  { "andn3",  0x22600000, 0xffe00000, T_SSr },
-  { "andn3",  0x32000000, 0xffe00000, T_Jrr }, /* C4x */
-  { "andn3",  0x32200000, 0xffe00000, T_Rrr }, /* C4x */
-  { "andn3",  0x32400000, 0xffe00000, T_JRr }, /* C4x */
-  { "andn3",  0x32600000, 0xffe00000, T_RRr }, /* C4x */
-  { "ash",    0x03800000, 0xffe00000, G_r_r },
-  { "ash",    0x03a00000, 0xffe00000, G_T_r },
-  { "ash",    0x03c00000, 0xffe00000, G_Q_r },
-  { "ash",    0x03e00000, 0xffe00000, G_I_r },
-  { "ash",    0x22800000, 0xffe00000, T_rrr },
-  { "ash",    0x22a00000, 0xffe00000, T_Srr },
-  { "ash",    0x22c00000, 0xffe00000, T_rSr },
-  { "ash",    0x22e00000, 0xffe00000, T_SSr },
-  { "ash",    0x32800000, 0xffe00000, T_Jrr }, /* C4x */
-  { "ash",    0x32a00000, 0xffe00000, T_Rrr }, /* C4x */
-  { "ash",    0x32c00000, 0xffe00000, T_JRr }, /* C4x */
-  { "ash",    0x32e00000, 0xffe00000, T_RRr }, /* C4x */
-  { "ash3",   0x22800000, 0xffe00000, T_rrr },
-  { "ash3",   0x22a00000, 0xffe00000, T_Srr },
-  { "ash3",   0x22c00000, 0xffe00000, T_rSr },
-  { "ash3",   0x22e00000, 0xffe00000, T_SSr },
-  { "ash3",   0x32800000, 0xffe00000, T_Jrr }, /* C4x */
-  { "ash3",   0x32a00000, 0xffe00000, T_Rrr }, /* C4x */
-  { "ash3",   0x32c00000, 0xffe00000, T_JRr }, /* C4x */
-  { "ash3",   0x32e00000, 0xffe00000, T_RRr }, /* C4x */
-  { "bB",     0x68000000, 0xffe00000, "Q" },
-  { "bB",     0x6a000000, 0xffe00000, "P" }, 
-  { "b",      0x68000000, 0xffe00000, "Q" }, /* synonym for bu */
-  { "b",      0x6a000000, 0xffe00000, "P" }, /* synonym for bu */
-  { "bBd",    0x68200000, 0xffe00000, "Q" },
-  { "bBd",    0x6a200000, 0xffe00000, "P" },
-  { "bd",     0x68200000, 0xffe00000, "Q" }, /* synonym for bud */
-  { "bd",     0x6a200000, 0xffe00000, "P" }, /* synonym for bud */
-  { "br",     0x60000000, 0xff000000, "B" },
-  { "brd",    0x61000000, 0xff000000, "B" },
-  { "call",   0x62000000, 0xff000000, "B" },
-  { "callB",  0x70000000, 0xffe00000, "Q" },
-  { "callB",  0x72000000, 0xffe00000, "P" },
-  { "cmpf",   0x04000000, 0xffe00000, G_r_r },
-  { "cmpf",   0x04200000, 0xffe00000, G_T_r },
-  { "cmpf",   0x04400000, 0xffe00000, G_Q_r },
-  { "cmpf",   0x04600000, 0xffe00000, G_F_r },
-  { "cmpf",   0x23000000, 0xffe00000, T_rr_ },
-  { "cmpf",   0x23200000, 0xffe00000, T_rS_ },
-  { "cmpf",   0x23400000, 0xffe00000, T_Sr_ },
-  { "cmpf",   0x23600000, 0xffe00000, T_SS_ },
-  { "cmpf",   0x33200000, 0xffe00000, T_Rr_ }, /* C4x */
-  { "cmpf",   0x33600000, 0xffe00000, T_RR_ }, /* C4x */
-  { "cmpf3",  0x23000000, 0xffe00000, T_rr_ },
-  { "cmpf3",  0x23200000, 0xffe00000, T_rS_ },
-  { "cmpf3",  0x23400000, 0xffe00000, T_Sr_ },
-  { "cmpf3",  0x23600000, 0xffe00000, T_SS_ },
-  { "cmpf3",  0x33200000, 0xffe00000, T_Rr_ }, /* C4x */
-  { "cmpf3",  0x33600000, 0xffe00000, T_RR_ }, /* C4x */
-  { "cmpi",   0x04800000, 0xffe00000, G_r_r },
-  { "cmpi",   0x04a00000, 0xffe00000, G_T_r },
-  { "cmpi",   0x04c00000, 0xffe00000, G_Q_r },
-  { "cmpi",   0x04e00000, 0xffe00000, G_I_r },
-  { "cmpi",   0x23800000, 0xffe00000, T_rr_ },
-  { "cmpi",   0x23a00000, 0xffe00000, T_rS_ },
-  { "cmpi",   0x23c00000, 0xffe00000, T_Sr_ },
-  { "cmpi",   0x23e00000, 0xffe00000, T_SS_ },
-  { "cmpi",   0x33800000, 0xffe00000, T_Jr_ }, /* C4x */
-  { "cmpi",   0x33a00000, 0xffe00000, T_Rr_ }, /* C4x */
-  { "cmpi",   0x33c00000, 0xffe00000, T_JR_ }, /* C4x */
-  { "cmpi",   0x33e00000, 0xffe00000, T_RR_ }, /* C4x */
-  { "cmpi3",  0x23800000, 0xffe00000, T_rr_ },
-  { "cmpi3",  0x23a00000, 0xffe00000, T_rS_ },
-  { "cmpi3",  0x23c00000, 0xffe00000, T_Sr_ },
-  { "cmpi3",  0x23e00000, 0xffe00000, T_SS_ },
-  { "cmpi3",  0x33800000, 0xffe00000, T_Jr_ }, /* C4x */
-  { "cmpi3",  0x33a00000, 0xffe00000, T_Rr_ }, /* C4x */
-  { "cmpi3",  0x33c00000, 0xffe00000, T_JR_ }, /* C4x */
-  { "cmpi3",  0x33e00000, 0xffe00000, T_RR_ }, /* C4x */
-  { "dbB",    0x6c000000, 0xfe200000, "A,Q" },
-  { "dbB",    0x6e000000, 0xfe200000, "A,P" },
-  { "db",     0x6c000000, 0xfe200000, "A,Q" }, /* synonym for dbu */
-  { "db",     0x6e000000, 0xfe200000, "A,P" }, /* synonym for dbu */
-  { "dbBd",   0x6c200000, 0xfe200000, "A,Q" },
-  { "dbBd",   0x6e200000, 0xfe200000, "A,P" },
-  { "dbd",    0x6c200000, 0xfe200000, "A,Q" }, /* synonym for dbud */
-  { "dbd",    0x6e200000, 0xfe200000, "A,P" }, /* synonym for dbud */
-  { "fix",    0x05000000, 0xffe00000, G_r_r },
-  { "fix",    0x05200000, 0xffe00000, G_T_r },
-  { "fix",    0x05400000, 0xffe00000, G_Q_r },
-  { "fix",    0x05600000, 0xffe00000, G_F_r },
-  { "float",  0x05800000, 0xffe00000, G_r_r },
-  { "float",  0x05a00000, 0xffe00000, G_T_r },
-  { "float",  0x05c00000, 0xffe00000, G_Q_r },
-  { "float",  0x05e00000, 0xffe00000, G_I_r },
-  { "iack",   0x1b200000, 0xffe00000, "@" },
-  { "iack",   0x1b400000, 0xffe00000, "*" },
-  { "idle",   0x06000000, 0xffffffff, "" },
-  { "lde",    0x06800000, 0xffe00000, G_r_r },
-  { "lde",    0x06a00000, 0xffe00000, G_T_r },
-  { "lde",    0x06c00000, 0xffe00000, G_Q_r },
-  { "lde",    0x06e00000, 0xffe00000, G_F_r },
-  { "ldf",    0x07000000, 0xffe00000, G_r_r },
-  { "ldf",    0x07200000, 0xffe00000, G_T_r },
-  { "ldf",    0x07400000, 0xffe00000, G_Q_r },
-  { "ldf",    0x07600000, 0xffe00000, G_F_r },
-  { "ldfC",   0x40000000, 0xf0600000, G_r_r },
-  { "ldfC",   0x40200000, 0xf0600000, G_T_r },
-  { "ldfC",   0x40400000, 0xf0600000, G_Q_r },
-  { "ldfC",   0x40600000, 0xf0600000, G_F_r },
-  { "ldfi",   0x07a00000, 0xffe00000, G_T_r },
-  { "ldfi",   0x07c00000, 0xffe00000, G_Q_r },
-  { "ldi",    0x08000000, 0xffe00000, G_r_r },
-  { "ldi",    0x08200000, 0xffe00000, G_T_r },
-  { "ldi",    0x08400000, 0xffe00000, G_Q_r },
-  { "ldi",    0x08600000, 0xffe00000, G_I_r },
-  { "ldiC",   0x50000000, 0xf0600000, G_r_r },
-  { "ldiC",   0x50200000, 0xf0600000, G_T_r },
-  { "ldiC",   0x50400000, 0xf0600000, G_Q_r },
-  { "ldiC",   0x50600000, 0xf0600000, G_I_r },
-  { "ldii",   0x08a00000, 0xffe00000, G_T_r },
-  { "ldii",   0x08c00000, 0xffe00000, G_Q_r },
-  { "ldp",    0x50700000, 0xffff0000, "#" }, /* synonym for ldiu #,dp */
-  { "ldm",    0x09000000, 0xffe00000, G_r_r },
-  { "ldm",    0x09200000, 0xffe00000, G_T_r },
-  { "ldm",    0x09400000, 0xffe00000, G_Q_r },
-  { "ldm",    0x09600000, 0xffe00000, G_F_r },
-  { "lsh",    0x09800000, 0xffe00000, G_r_r },
-  { "lsh",    0x09a00000, 0xffe00000, G_T_r },
-  { "lsh",    0x09c00000, 0xffe00000, G_Q_r },
-  { "lsh",    0x09e00000, 0xffe00000, G_I_r },
-  { "lsh",    0x24000000, 0xffe00000, T_rrr },
-  { "lsh",    0x24200000, 0xffe00000, T_Srr },
-  { "lsh",    0x24400000, 0xffe00000, T_rSr },
-  { "lsh",    0x24600000, 0xffe00000, T_SSr },
-  { "lsh",    0x34000000, 0xffe00000, T_Jrr }, /* C4x */
-  { "lsh",    0x34200000, 0xffe00000, T_Rrr }, /* C4x */
-  { "lsh",    0x34400000, 0xffe00000, T_JRr }, /* C4x */
-  { "lsh",    0x34600000, 0xffe00000, T_RRr }, /* C4x */
-  { "lsh3",   0x24000000, 0xffe00000, T_rrr },
-  { "lsh3",   0x24200000, 0xffe00000, T_Srr },
-  { "lsh3",   0x24400000, 0xffe00000, T_rSr },
-  { "lsh3",   0x24600000, 0xffe00000, T_SSr },
-  { "lsh3",   0x34000000, 0xffe00000, T_Jrr }, /* C4x */
-  { "lsh3",   0x34200000, 0xffe00000, T_Rrr }, /* C4x */
-  { "lsh3",   0x34400000, 0xffe00000, T_JRr }, /* C4x */
-  { "lsh3",   0x34600000, 0xffe00000, T_RRr }, /* C4x */
-  { "mpyf",   0x0a000000, 0xffe00000, G_r_r },
-  { "mpyf",   0x0a200000, 0xffe00000, G_T_r },
-  { "mpyf",   0x0a400000, 0xffe00000, G_Q_r },
-  { "mpyf",   0x0a600000, 0xffe00000, G_F_r },
-  { "mpyf",   0x24800000, 0xffe00000, T_rrr },
-  { "mpyf",   0x24a00000, 0xffe00000, T_Srr },
-  { "mpyf",   0x24c00000, 0xffe00000, T_rSr },
-  { "mpyf",   0x24e00000, 0xffe00000, T_SSr },
-  { "mpyf",   0x34800000, 0xffe00000, T_Jrr }, /* C4x */
-  { "mpyf",   0x34800000, 0xffe00000, T_rJr }, /* C4x */
-  { "mpyf",   0x34a00000, 0xffe00000, T_rRr }, /* C4x */
-  { "mpyf",   0x34a00000, 0xffe00000, T_Rrr }, /* C4x */
-  { "mpyf",   0x34c00000, 0xffe00000, T_JRr }, /* C4x */
-  { "mpyf",   0x34c00000, 0xffe00000, T_RJr }, /* C4x */
-  { "mpyf",   0x34e00000, 0xffe00000, T_RRr }, /* C4x */
-  { "mpyf3",  0x24800000, 0xffe00000, T_rrr },
-  { "mpyf3",  0x24a00000, 0xffe00000, T_Srr },
-  { "mpyf3",  0x24c00000, 0xffe00000, T_rSr },
-  { "mpyf3",  0x24e00000, 0xffe00000, T_SSr },
-  { "mpyf3",  0x34800000, 0xffe00000, T_Jrr }, /* C4x */
-  { "mpyf3",  0x34800000, 0xffe00000, T_rJr }, /* C4x */
-  { "mpyf3",  0x34a00000, 0xffe00000, T_rRr }, /* C4x */
-  { "mpyf3",  0x34a00000, 0xffe00000, T_Rrr }, /* C4x */
-  { "mpyf3",  0x34c00000, 0xffe00000, T_JRr }, /* C4x */
-  { "mpyf3",  0x34c00000, 0xffe00000, T_RJr }, /* C4x */
-  { "mpyf3",  0x34e00000, 0xffe00000, T_RRr }, /* C4x */
-  { "mpyi",   0x0a800000, 0xffe00000, G_r_r },
-  { "mpyi",   0x0aa00000, 0xffe00000, G_T_r },
-  { "mpyi",   0x0ac00000, 0xffe00000, G_Q_r },
-  { "mpyi",   0x0ae00000, 0xffe00000, G_I_r },
-  { "mpyi",   0x25000000, 0xffe00000, T_rrr },
-  { "mpyi",   0x25200000, 0xffe00000, T_Srr },
-  { "mpyi",   0x25400000, 0xffe00000, T_rSr },
-  { "mpyi",   0x25600000, 0xffe00000, T_SSr },
-  { "mpyi",   0x35000000, 0xffe00000, T_Jrr }, /* C4x */
-  { "mpyi",   0x35000000, 0xffe00000, T_rJr }, /* C4x */
-  { "mpyi",   0x35200000, 0xffe00000, T_rRr }, /* C4x */
-  { "mpyi",   0x35200000, 0xffe00000, T_Rrr }, /* C4x */
-  { "mpyi",   0x35400000, 0xffe00000, T_JRr }, /* C4x */
-  { "mpyi",   0x35400000, 0xffe00000, T_RJr }, /* C4x */
-  { "mpyi",   0x35600000, 0xffe00000, T_RRr }, /* C4x */
-  { "mpyi3",  0x25000000, 0xffe00000, T_rrr },
-  { "mpyi3",  0x25200000, 0xffe00000, T_Srr },
-  { "mpyi3",  0x25400000, 0xffe00000, T_rSr },
-  { "mpyi3",  0x25600000, 0xffe00000, T_SSr },
-  { "mpyi3",  0x35000000, 0xffe00000, T_Jrr }, /* C4x */
-  { "mpyi3",  0x35000000, 0xffe00000, T_rJr }, /* C4x */
-  { "mpyi3",  0x35200000, 0xffe00000, T_rRr }, /* C4x */
-  { "mpyi3",  0x35200000, 0xffe00000, T_Rrr }, /* C4x */
-  { "mpyi3",  0x35400000, 0xffe00000, T_JRr }, /* C4x */
-  { "mpyi3",  0x35400000, 0xffe00000, T_RJr }, /* C4x */
-  { "mpyi3",  0x35600000, 0xffe00000, T_RRr }, /* C4x */
-  { "negb",   0x0b000000, 0xffe00000, G_r_r },
-  { "negb",   0x0b200000, 0xffe00000, G_T_r },
-  { "negb",   0x0b400000, 0xffe00000, G_Q_r },
-  { "negb",   0x0b600000, 0xffe00000, G_I_r },
-  { "negf",   0x0b800000, 0xffe00000, G_r_r },
-  { "negf",   0x0ba00000, 0xffe00000, G_T_r },
-  { "negf",   0x0bc00000, 0xffe00000, G_Q_r },
-  { "negf",   0x0be00000, 0xffe00000, G_F_r },
-  { "negi",   0x0c000000, 0xffe00000, G_r_r },
-  { "negi",   0x0c200000, 0xffe00000, G_T_r },
-  { "negi",   0x0c400000, 0xffe00000, G_Q_r },
-  { "negi",   0x0c600000, 0xffe00000, G_I_r },
-  { "nop",    0x0c800000, 0xffe00000, "Q" },
-  { "nop",    0x0cc00000, 0xffe00000, "*" },
-  { "nop",    0x0c800000, 0xffe00000, "" },
-  { "norm",   0x0d000000, 0xffe00000, G_r_r },
-  { "norm",   0x0d200000, 0xffe00000, G_T_r },
-  { "norm",   0x0d400000, 0xffe00000, G_Q_r },
-  { "norm",   0x0d600000, 0xffe00000, G_F_r },
-  { "not",    0x0d800000, 0xffe00000, G_r_r },
-  { "not",    0x0da00000, 0xffe00000, G_T_r },
-  { "not",    0x0dc00000, 0xffe00000, G_Q_r },
-  { "not",    0x0de00000, 0xffe00000, G_L_r },
-  { "or",     0x10000000, 0xffe00000, G_r_r },
-  { "or",     0x10200000, 0xffe00000, G_T_r },
-  { "or",     0x10400000, 0xffe00000, G_Q_r },
-  { "or",     0x10600000, 0xffe00000, G_L_r },
-  { "or",     0x25800000, 0xffe00000, T_rrr },
-  { "or",     0x25a00000, 0xffe00000, T_Srr },
-  { "or",     0x25c00000, 0xffe00000, T_rSr },
-  { "or",     0x25e00000, 0xffe00000, T_SSr },
-  { "or",     0x35800000, 0xffe00000, T_Jrr }, /* C4x */
-  { "or",     0x35800000, 0xffe00000, T_rJr }, /* C4x */
-  { "or",     0x35a00000, 0xffe00000, T_rRr }, /* C4x */
-  { "or",     0x35a00000, 0xffe00000, T_Rrr }, /* C4x */
-  { "or",     0x35c00000, 0xffe00000, T_JRr }, /* C4x */
-  { "or",     0x35c00000, 0xffe00000, T_RJr }, /* C4x */
-  { "or",     0x35e00000, 0xffe00000, T_RRr }, /* C4x */
-  { "or3",    0x25800000, 0xffe00000, T_rrr },
-  { "or3",    0x25a00000, 0xffe00000, T_Srr },
-  { "or3",    0x25c00000, 0xffe00000, T_rSr },
-  { "or3",    0x25e00000, 0xffe00000, T_SSr },
-  { "or3",    0x35800000, 0xffe00000, T_Jrr }, /* C4x */
-  { "or3",    0x35800000, 0xffe00000, T_rJr }, /* C4x */
-  { "or3",    0x35a00000, 0xffe00000, T_rRr }, /* C4x */
-  { "or3",    0x35a00000, 0xffe00000, T_Rrr }, /* C4x */
-  { "or3",    0x35c00000, 0xffe00000, T_JRr }, /* C4x */
-  { "or3",    0x35c00000, 0xffe00000, T_RJr }, /* C4x */
-  { "or3",    0x35e00000, 0xffe00000, T_RRr }, /* C4x */
-  { "pop",    0x0e200000, 0xffe00000, "R" },
-  { "popf",   0x0ea00000, 0xffe00000, "R" },
-  { "push",   0x0f200000, 0xffe00000, "R" },
-  { "pushf",  0x0fa00000, 0xffe00000, "R" },
-  { "retiB",  0x78000000, 0xffe00000, "" },
-  { "reti",   0x78000000, 0xffe00000, "" }, /* synonym for reti */
-  { "retsB",  0x78800000, 0xffe00000, "" },
-  { "rets",   0x78800000, 0xffe00000, "" }, /* synonym for rets */
-  { "rnd",    0x11000000, 0xffe00000, G_r_r },
-  { "rnd",    0x11200000, 0xffe00000, G_T_r },
-  { "rnd",    0x11400000, 0xffe00000, G_Q_r },
-  { "rnd",    0x11600000, 0xffe00000, G_F_r },
-  { "rol",    0x11e00000, 0xffe00000, "R" },
-  { "rolc",   0x12600000, 0xffe00000, "R" },
-  { "ror",    0x12e00000, 0xffe00000, "R" },
-  { "rorc",   0x13600000, 0xffe00000, "R" },
-  { "rptb",   0x64000000, 0xff000000, "B" },
-  { "rptb",   0x79000000, 0xff000000, "Q" }, /* C4x */
-  { "rpts",   0x139b0000, 0xffff0000, "Q" },
-  { "rpts",   0x13bb0000, 0xffff0000, "@" },
-  { "rpts",   0x13db0000, 0xffff0000, "*" },
-  { "rpts",   0x13fb0000, 0xffff0000, "U" },
-  { "sigi",   0x16000000, 0xffe00000, "" },  /* C3x */
-  { "sigi",   0x16200000, 0xffe00000, G_T_r }, /* C4x */
-  { "sigi",   0x16400000, 0xffe00000, G_Q_r }, /* C4x */
-  { "stf",    0x14200000, 0xffe00000, "R,@" },
-  { "stf",    0x14400000, 0xffe00000, "R,*" },
-  { "stfi",   0x14a00000, 0xffe00000, "R,@" },
-  { "stfi",   0x14c00000, 0xffe00000, "R,*" },
-  { "sti",    0x15000000, 0xffe00000, "T,@" }, /* C4x only */
-  { "sti",    0x15200000, 0xffe00000, "R,@" },
-  { "sti",    0x15400000, 0xffe00000, "R,*" },
-  { "sti",    0x15600000, 0xffe00000, "T,*" }, /* C4x only */
-  { "stii",   0x15a00000, 0xffe00000, "R,@" },
-  { "stii",   0x15c00000, 0xffe00000, "R,*" },
-  { "subb",   0x16800000, 0xffe00000, G_r_r },
-  { "subb",   0x16a00000, 0xffe00000, G_T_r },
-  { "subb",   0x16c00000, 0xffe00000, G_Q_r },
-  { "subb",   0x16e00000, 0xffe00000, G_I_r },
-  { "subb",   0x26000000, 0xffe00000, T_rrr },
-  { "subb",   0x26200000, 0xffe00000, T_Srr },
-  { "subb",   0x26400000, 0xffe00000, T_rSr },
-  { "subb",   0x26600000, 0xffe00000, T_SSr },
-  { "subb",   0x36000000, 0xffe00000, T_Jrr }, /* C4x */
-  { "subb",   0x36200000, 0xffe00000, T_Rrr }, /* C4x */
-  { "subb",   0x36400000, 0xffe00000, T_JRr }, /* C4x */
-  { "subb",   0x36600000, 0xffe00000, T_RRr }, /* C4x */
-  { "subb3",  0x26000000, 0xffe00000, T_rrr },
-  { "subb3",  0x26200000, 0xffe00000, T_Srr },
-  { "subb3",  0x26400000, 0xffe00000, T_rSr },
-  { "subb3",  0x26600000, 0xffe00000, T_SSr },
-  { "subb3",  0x36000000, 0xffe00000, T_Jrr }, /* C4x */
-  { "subb3",  0x36200000, 0xffe00000, T_Rrr }, /* C4x */
-  { "subb3",  0x36400000, 0xffe00000, T_JRr }, /* C4x */
-  { "subb3",  0x36600000, 0xffe00000, T_RRr }, /* C4x */
-  { "subc",   0x17000000, 0xffe00000, G_r_r },
-  { "subc",   0x17200000, 0xffe00000, G_T_r },
-  { "subc",   0x17400000, 0xffe00000, G_Q_r },
-  { "subc",   0x17600000, 0xffe00000, G_I_r },
-  { "subf",   0x17800000, 0xffe00000, G_r_r },
-  { "subf",   0x17a00000, 0xffe00000, G_T_r },
-  { "subf",   0x17c00000, 0xffe00000, G_Q_r },
-  { "subf",   0x17e00000, 0xffe00000, G_F_r },
-  { "subf",   0x26800000, 0xffe00000, T_rrr },
-  { "subf",   0x26a00000, 0xffe00000, T_Srr },
-  { "subf",   0x26c00000, 0xffe00000, T_rSr },
-  { "subf",   0x26e00000, 0xffe00000, T_SSr },
-  { "subf",   0x36800000, 0xffe00000, T_Jrr }, /* C4x */
-  { "subf",   0x36a00000, 0xffe00000, T_Rrr }, /* C4x */
-  { "subf",   0x36c00000, 0xffe00000, T_JRr }, /* C4x */
-  { "subf",   0x36e00000, 0xffe00000, T_RRr }, /* C4x */
-  { "subf3",  0x26800000, 0xffe00000, T_rrr },
-  { "subf3",  0x26a00000, 0xffe00000, T_Srr },
-  { "subf3",  0x26c00000, 0xffe00000, T_rSr },
-  { "subf3",  0x26e00000, 0xffe00000, T_SSr },
-  { "subf3",  0x36800000, 0xffe00000, T_Jrr }, /* C4x */
-  { "subf3",  0x36a00000, 0xffe00000, T_Rrr }, /* C4x */
-  { "subf3",  0x36c00000, 0xffe00000, T_JRr }, /* C4x */
-  { "subf3",  0x36e00000, 0xffe00000, T_RRr }, /* C4x */
-  { "subi",   0x18000000, 0xffe00000, G_r_r },
-  { "subi",   0x18200000, 0xffe00000, G_T_r },
-  { "subi",   0x18400000, 0xffe00000, G_Q_r },
-  { "subi",   0x18600000, 0xffe00000, G_I_r },
-  { "subi",   0x27000000, 0xffe00000, T_rrr },
-  { "subi",   0x27200000, 0xffe00000, T_Srr },
-  { "subi",   0x27400000, 0xffe00000, T_rSr },
-  { "subi",   0x27600000, 0xffe00000, T_SSr },
-  { "subi",   0x37000000, 0xffe00000, T_Jrr }, /* C4x */
-  { "subi",   0x37200000, 0xffe00000, T_Rrr }, /* C4x */
-  { "subi",   0x37400000, 0xffe00000, T_JRr }, /* C4x */
-  { "subi",   0x37600000, 0xffe00000, T_RRr }, /* C4x */
-  { "subi3",  0x27000000, 0xffe00000, T_rrr },
-  { "subi3",  0x27200000, 0xffe00000, T_Srr },
-  { "subi3",  0x27400000, 0xffe00000, T_rSr },
-  { "subi3",  0x27600000, 0xffe00000, T_SSr },
-  { "subi3",  0x37000000, 0xffe00000, T_Jrr }, /* C4x */
-  { "subi3",  0x37200000, 0xffe00000, T_Rrr }, /* C4x */
-  { "subi3",  0x37400000, 0xffe00000, T_JRr }, /* C4x */
-  { "subi3",  0x37600000, 0xffe00000, T_RRr }, /* C4x */
-  { "subrb",  0x18800000, 0xffe00000, G_r_r },
-  { "subrb",  0x18a00000, 0xffe00000, G_T_r },
-  { "subrb",  0x18c00000, 0xffe00000, G_Q_r },
-  { "subrb",  0x18e00000, 0xffe00000, G_I_r },
-  { "subrf",  0x19000000, 0xffe00000, G_r_r },
-  { "subrf",  0x19200000, 0xffe00000, G_T_r },
-  { "subrf",  0x19400000, 0xffe00000, G_Q_r },
-  { "subrf",  0x19600000, 0xffe00000, G_F_r },
-  { "subri",  0x19800000, 0xffe00000, G_r_r },
-  { "subri",  0x19a00000, 0xffe00000, G_T_r },
-  { "subri",  0x19c00000, 0xffe00000, G_Q_r },
-  { "subri",  0x19e00000, 0xffe00000, G_I_r },
-  { "swi",    0x66000000, 0xffffffff, "" },
-  { "trapB",  0x74000000, 0xffe00000, "V" },
-  { "trap",   0x74000000, 0xffe00000, "V" }, /* synonym for trapu */
-  { "tstb",   0x1a000000, 0xffe00000, G_r_r },
-  { "tstb",   0x1a200000, 0xffe00000, G_T_r },
-  { "tstb",   0x1a400000, 0xffe00000, G_Q_r },
-  { "tstb",   0x1a600000, 0xffe00000, G_L_r },
-  { "tstb",   0x27800000, 0xffe00000, T_rr_ },
-  { "tstb",   0x27a00000, 0xffe00000, T_rS_ },
-  { "tstb",   0x27c00000, 0xffe00000, T_Sr_ },
-  { "tstb",   0x27e00000, 0xffe00000, T_SS_ },
-  { "tstb",   0x37800000, 0xffe00000, T_Jr_ }, /* C4x */
-  { "tstb",   0x37800000, 0xffe00000, T_rJ_ }, /* C4x */
-  { "tstb",   0x37a00000, 0xffe00000, T_rR_ }, /* C4x */
-  { "tstb",   0x37a00000, 0xffe00000, T_Rr_ }, /* C4x */
-  { "tstb",   0x37c00000, 0xffe00000, T_JR_ }, /* C4x */
-  { "tstb",   0x37c00000, 0xffe00000, T_RJ_ }, /* C4x */
-  { "tstb",   0x37e00000, 0xffe00000, T_RR_ }, /* C4x */
-  { "tstb3",  0x27800000, 0xffe00000, T_rr_ },
-  { "tstb3",  0x27a00000, 0xffe00000, T_rS_ },
-  { "tstb3",  0x27c00000, 0xffe00000, T_Sr_ },
-  { "tstb3",  0x27e00000, 0xffe00000, T_SS_ },
-  { "tstb3",  0x37800000, 0xffe00000, T_Jr_ }, /* C4x */
-  { "tstb3",  0x37800000, 0xffe00000, T_rJ_ }, /* C4x */
-  { "tstb3",  0x37a00000, 0xffe00000, T_rR_ }, /* C4x */
-  { "tstb3",  0x37a00000, 0xffe00000, T_Rr_ }, /* C4x */
-  { "tstb3",  0x37c00000, 0xffe00000, T_JR_ }, /* C4x */
-  { "tstb3",  0x37c00000, 0xffe00000, T_RJ_ }, /* C4x */
-  { "tstb3",  0x37e00000, 0xffe00000, T_RR_ }, /* C4x */
-  { "xor",    0x1a800000, 0xffe00000, G_r_r },
-  { "xor",    0x1aa00000, 0xffe00000, G_T_r },
-  { "xor",    0x1ac00000, 0xffe00000, G_Q_r },
-  { "xor",    0x1ae00000, 0xffe00000, G_L_r },
-  { "xor",    0x28000000, 0xffe00000, T_rrr },
-  { "xor",    0x28200000, 0xffe00000, T_Srr },
-  { "xor",    0x28400000, 0xffe00000, T_rSr },
-  { "xor",    0x28600000, 0xffe00000, T_SSr },
-  { "xor",    0x38000000, 0xffe00000, T_Jrr }, /* C4x */
-  { "xor",    0x38000000, 0xffe00000, T_rJr }, /* C4x */
-  { "xor",    0x38200000, 0xffe00000, T_rRr }, /* C4x */
-  { "xor",    0x38200000, 0xffe00000, T_Rrr }, /* C4x */
-  { "xor",    0x3c400000, 0xffe00000, T_JRr }, /* C4x */
-  { "xor",    0x3c400000, 0xffe00000, T_RJr }, /* C4x */
-  { "xor",    0x3c600000, 0xffe00000, T_RRr }, /* C4x */
-  { "xor3",   0x28000000, 0xffe00000, T_rrr },
-  { "xor3",   0x28200000, 0xffe00000, T_Srr },
-  { "xor3",   0x28400000, 0xffe00000, T_rSr },
-  { "xor3",   0x28600000, 0xffe00000, T_SSr },
-  { "xor3",   0x38000000, 0xffe00000, T_Jrr }, /* C4x */
-  { "xor3",   0x38000000, 0xffe00000, T_rJr }, /* C4x */
-  { "xor3",   0x38200000, 0xffe00000, T_rRr }, /* C4x */
-  { "xor3",   0x38200000, 0xffe00000, T_Rrr }, /* C4x */
-  { "xor3",   0x3c400000, 0xffe00000, T_JRr }, /* C4x */
-  { "xor3",   0x3c400000, 0xffe00000, T_RJr }, /* C4x */
-  { "xor3",   0x3c600000, 0xffe00000, T_RRr }, /* C4x */
-    
-  /* Dummy entry, not included in c3x_num_insts.  This
-     lets code examine entry i + 1 without checking
-     if we've run off the end of the table.  */
-  { "",      0x0, 0x00, "" }
-};
-
-const unsigned int c3x_num_insts = (((sizeof c3x_insts) / (sizeof c3x_insts[0])) - 1);
-
-/* Define c4x additional opcodes for assembler and disassembler.  */
-static const c4x_inst_t c4x_insts[] =
-{
-  /* Parallel instructions.  */
-  { "frieee_stf",    0xf2000000, 0xfe000000, P_Sr_rS },
-  { "toieee_stf",    0xf0000000, 0xfe000000, P_Sr_rS },
-
-  { "bBaf",    0x68a00000, 0xffe00000, "Q" },
-  { "bBaf",    0x6aa00000, 0xffe00000, "P" },
-  { "baf",     0x68a00000, 0xffe00000, "Q" }, /* synonym for buaf */
-  { "baf",     0x6aa00000, 0xffe00000, "P" }, /* synonym for buaf */
-  { "bBat",    0x68600000, 0xffe00000, "Q" },
-  { "bBat",    0x6a600000, 0xffe00000, "P" },
-  { "bat",     0x68600000, 0xffe00000, "Q" }, /* synonym for buat */
-  { "bat",     0x6a600000, 0xffe00000, "P" }, /* synonym for buat */
-  { "laj",     0x63000000, 0xff000000, "B" },
-  { "lajB",    0x70200000, 0xffe00000, "Q" },
-  { "lajB",    0x72200000, 0xffe00000, "P" },
-  { "latB",    0x74800000, 0xffe00000, "V" },
-
-  { "frieee",  0x1c000000, 0xffe00000, G_r_r },
-  { "frieee",  0x1c200000, 0xffe00000, G_T_r },
-  { "frieee",  0x1c400000, 0xffe00000, G_Q_r },
-  { "frieee",  0x1c600000, 0xffe00000, G_F_r },
-
-  { "lb0",     0xb0000000, 0xffe00000, G_r_r },
-  { "lb0",     0xb0200000, 0xffe00000, G_T_r },
-  { "lb0",     0xb0400000, 0xffe00000, G_Q_r },
-  { "lb0",     0xb0600000, 0xffe00000, G_I_r },
-  { "lbu0",    0xb2000000, 0xffe00000, G_r_r },
-  { "lbu0",    0xb2200000, 0xffe00000, G_T_r },
-  { "lbu0",    0xb2400000, 0xffe00000, G_Q_r },
-  { "lbu0",    0xb2600000, 0xffe00000, G_L_r },
-  { "lb1",     0xb0800000, 0xffe00000, G_r_r },
-  { "lb1",     0xb0a00000, 0xffe00000, G_T_r },
-  { "lb1",     0xb0c00000, 0xffe00000, G_Q_r },
-  { "lb1",     0xb0e00000, 0xffe00000, G_I_r },
-  { "lbu1",    0xb2800000, 0xffe00000, G_r_r },
-  { "lbu1",    0xb2a00000, 0xffe00000, G_T_r },
-  { "lbu1",    0xb2c00000, 0xffe00000, G_Q_r },
-  { "lbu1",    0xb2e00000, 0xffe00000, G_L_r },
-  { "lb2",     0xb1000000, 0xffe00000, G_r_r },
-  { "lb2",     0xb1200000, 0xffe00000, G_T_r },
-  { "lb2",     0xb1400000, 0xffe00000, G_Q_r },
-  { "lb2",     0xb1600000, 0xffe00000, G_I_r },
-  { "lbu2",    0xb3000000, 0xffe00000, G_r_r },
-  { "lbu2",    0xb3200000, 0xffe00000, G_T_r },
-  { "lbu2",    0xb3400000, 0xffe00000, G_Q_r },
-  { "lbu2",    0xb3600000, 0xffe00000, G_L_r },
-  { "lb3",     0xb1800000, 0xffe00000, G_r_r },
-  { "lb3",     0xb1a00000, 0xffe00000, G_T_r },
-  { "lb3",     0xb1c00000, 0xffe00000, G_Q_r },
-  { "lb3",     0xb1e00000, 0xffe00000, G_I_r },
-  { "lbu3",    0xb3800000, 0xffe00000, G_r_r },
-  { "lbu3",    0xb3a00000, 0xffe00000, G_T_r },
-  { "lbu3",    0xb3c00000, 0xffe00000, G_Q_r },
-  { "lbu3",    0xb3e00000, 0xffe00000, G_L_r },
-  { "lda",     0x1e800000, 0xffe00000, "Q,Y" }, 
-  { "lda",     0x1ea00000, 0xffe00000, "@,Y" }, 
-  { "lda",     0x1ec00000, 0xffe00000, "*,Y" }, 
-  { "lda",     0x1ee00000, 0xffe00000, "S,Y" }, 
-  { "ldep",    0x76000000, 0xffe00000, "X,R" }, 
-  { "ldhi",    0x1fe00000, 0xffe00000, G_L_r },
-  { "ldhi",    0x1fe00000, 0xffe00000, "#,R" },
-  { "ldpe",    0x76800000, 0xffe00000, "Q,Z" }, 
-  { "ldpk",    0x1F700000, 0xffff0000, "#" },
-  { "lh0",     0xba000000, 0xffe00000, G_r_r },
-  { "lh0",     0xba200000, 0xffe00000, G_T_r },
-  { "lh0",     0xba400000, 0xffe00000, G_Q_r },
-  { "lh0",     0xba600000, 0xffe00000, G_I_r },
-  { "lhu0",    0xbb000000, 0xffe00000, G_r_r },
-  { "lhu0",    0xbb200000, 0xffe00000, G_T_r },
-  { "lhu0",    0xbb400000, 0xffe00000, G_Q_r },
-  { "lhu0",    0xbb600000, 0xffe00000, G_L_r },
-  { "lh1",     0xba800000, 0xffe00000, G_r_r },
-  { "lh1",     0xbaa00000, 0xffe00000, G_T_r },
-  { "lh1",     0xbac00000, 0xffe00000, G_Q_r },
-  { "lh1",     0xbae00000, 0xffe00000, G_I_r },
-  { "lhu1",    0xbb800000, 0xffe00000, G_r_r },
-  { "lhu1",    0xbba00000, 0xffe00000, G_T_r },
-  { "lhu1",    0xbbc00000, 0xffe00000, G_Q_r },
-  { "lhu1",    0xbbe00000, 0xffe00000, G_L_r },
-  { "lwl0",    0xb4000000, 0xffe00000, G_r_r },
-  { "lwl0",    0xb4200000, 0xffe00000, G_T_r },
-  { "lwl0",    0xb4400000, 0xffe00000, G_Q_r },
-  { "lwl0",    0xb4600000, 0xffe00000, G_I_r },
-  { "lwl1",    0xb4800000, 0xffe00000, G_r_r },
-  { "lwl1",    0xb4a00000, 0xffe00000, G_T_r },
-  { "lwl1",    0xb4c00000, 0xffe00000, G_Q_r },
-  { "lwl1",    0xb4e00000, 0xffe00000, G_I_r },
-  { "lwl2",    0xb5000000, 0xffe00000, G_r_r },
-  { "lwl2",    0xb5200000, 0xffe00000, G_T_r },
-  { "lwl2",    0xb5400000, 0xffe00000, G_Q_r },
-  { "lwl2",    0xb5600000, 0xffe00000, G_I_r },
-  { "lwl3",    0xb5800000, 0xffe00000, G_r_r },
-  { "lwl3",    0xb5a00000, 0xffe00000, G_T_r },
-  { "lwl3",    0xb5c00000, 0xffe00000, G_Q_r },
-  { "lwl3",    0xb5e00000, 0xffe00000, G_I_r },
-  { "lwr0",    0xb6000000, 0xffe00000, G_r_r },
-  { "lwr0",    0xb6200000, 0xffe00000, G_T_r },
-  { "lwr0",    0xb6400000, 0xffe00000, G_Q_r },
-  { "lwr0",    0xb6600000, 0xffe00000, G_I_r },
-  { "lwr1",    0xb6800000, 0xffe00000, G_r_r },
-  { "lwr1",    0xb6a00000, 0xffe00000, G_T_r },
-  { "lwr1",    0xb6c00000, 0xffe00000, G_Q_r },
-  { "lwr1",    0xb6e00000, 0xffe00000, G_I_r },
-  { "lwr2",    0xb7000000, 0xffe00000, G_r_r },
-  { "lwr2",    0xb7200000, 0xffe00000, G_T_r },
-  { "lwr2",    0xb7400000, 0xffe00000, G_Q_r },
-  { "lwr2",    0xb7600000, 0xffe00000, G_I_r },
-  { "lwr3",    0xb7800000, 0xffe00000, G_r_r },
-  { "lwr3",    0xb7a00000, 0xffe00000, G_T_r },
-  { "lwr3",    0xb7c00000, 0xffe00000, G_Q_r },
-  { "lwr3",    0xb7e00000, 0xffe00000, G_I_r },
-  { "mb0",     0xb8000000, 0xffe00000, G_r_r },
-  { "mb0",     0xb8200000, 0xffe00000, G_T_r },
-  { "mb0",     0xb8400000, 0xffe00000, G_Q_r },
-  { "mb0",     0xb8600000, 0xffe00000, G_I_r },
-  { "mb1",     0xb8800000, 0xffe00000, G_r_r },
-  { "mb1",     0xb8a00000, 0xffe00000, G_T_r },
-  { "mb1",     0xb8c00000, 0xffe00000, G_Q_r },
-  { "mb1",     0xb8e00000, 0xffe00000, G_I_r },
-  { "mb2",     0xb9000000, 0xffe00000, G_r_r },
-  { "mb2",     0xb9200000, 0xffe00000, G_T_r },
-  { "mb2",     0xb9400000, 0xffe00000, G_Q_r },
-  { "mb2",     0xb9600000, 0xffe00000, G_I_r },
-  { "mb3",     0xb9800000, 0xffe00000, G_r_r },
-  { "mb3",     0xb9a00000, 0xffe00000, G_T_r },
-  { "mb3",     0xb9c00000, 0xffe00000, G_Q_r },
-  { "mb3",     0xb9e00000, 0xffe00000, G_I_r },
-  { "mh0",     0xbc000000, 0xffe00000, G_r_r },
-  { "mh0",     0xbc200000, 0xffe00000, G_T_r },
-  { "mh0",     0xbc400000, 0xffe00000, G_Q_r },
-  { "mh0",     0xbc600000, 0xffe00000, G_I_r },
-  { "mh1",     0xbc800000, 0xffe00000, G_r_r },
-  { "mh1",     0xbca00000, 0xffe00000, G_T_r },
-  { "mh1",     0xbcc00000, 0xffe00000, G_Q_r },
-  { "mh1",     0xbce00000, 0xffe00000, G_I_r },
-  { "mh2",     0xbd000000, 0xffe00000, G_r_r },
-  { "mh2",     0xbd200000, 0xffe00000, G_T_r },
-  { "mh2",     0xbd400000, 0xffe00000, G_Q_r },
-  { "mh2",     0xbd600000, 0xffe00000, G_I_r },
-  { "mh3",     0xbd800000, 0xffe00000, G_r_r },
-  { "mh3",     0xbda00000, 0xffe00000, G_T_r },
-  { "mh3",     0xbdc00000, 0xffe00000, G_Q_r },
-  { "mh3",     0xbde00000, 0xffe00000, G_I_r },
-  { "mpyshi",  0x1d800000, 0xffe00000, G_r_r },
-  { "mpyshi",  0x1da00000, 0xffe00000, G_T_r },
-  { "mpyshi",  0x1dc00000, 0xffe00000, G_Q_r },
-  { "mpyshi",  0x1de00000, 0xffe00000, G_I_r },
-  { "mpyshi",  0x28800000, 0xffe00000, T_rrr },
-  { "mpyshi",  0x28a00000, 0xffe00000, T_Srr },
-  { "mpyshi",  0x28c00000, 0xffe00000, T_rSr },
-  { "mpyshi",  0x28e00000, 0xffe00000, T_SSr },
-  { "mpyshi",  0x38800000, 0xffe00000, T_Jrr }, /* C4x */
-  { "mpyshi",  0x38800000, 0xffe00000, T_rJr }, /* C4x */
-  { "mpyshi",  0x38a00000, 0xffe00000, T_rRr }, /* C4x */
-  { "mpyshi",  0x38a00000, 0xffe00000, T_Rrr }, /* C4x */
-  { "mpyshi",  0x38c00000, 0xffe00000, T_JRr }, /* C4x */
-  { "mpyshi",  0x38c00000, 0xffe00000, T_RJr }, /* C4x */
-  { "mpyshi",  0x38e00000, 0xffe00000, T_RRr }, /* C4x */
-  { "mpyshi3", 0x28800000, 0xffe00000, T_rrr },
-  { "mpyshi3", 0x28a00000, 0xffe00000, T_Srr },
-  { "mpyshi3", 0x28c00000, 0xffe00000, T_rSr },
-  { "mpyshi3", 0x28e00000, 0xffe00000, T_SSr },
-  { "mpyshi3", 0x38800000, 0xffe00000, T_Jrr }, /* C4x */
-  { "mpyshi3", 0x38800000, 0xffe00000, T_rJr }, /* C4x */
-  { "mpyshi3", 0x38a00000, 0xffe00000, T_rRr }, /* C4x */
-  { "mpyshi3", 0x38a00000, 0xffe00000, T_Rrr }, /* C4x */
-  { "mpyshi3", 0x38c00000, 0xffe00000, T_JRr }, /* C4x */
-  { "mpyshi3", 0x38c00000, 0xffe00000, T_RJr }, /* C4x */
-  { "mpyshi3", 0x38e00000, 0xffe00000, T_RRr }, /* C4x */
-  { "mpyuhi",  0x1e000000, 0xffe00000, G_r_r },
-  { "mpyuhi",  0x1e200000, 0xffe00000, G_T_r },
-  { "mpyuhi",  0x1e400000, 0xffe00000, G_Q_r },
-  { "mpyuhi",  0x1e600000, 0xffe00000, G_I_r },
-  { "mpyuhi",  0x29000000, 0xffe00000, T_rrr },
-  { "mpyuhi",  0x29200000, 0xffe00000, T_Srr },
-  { "mpyuhi",  0x29400000, 0xffe00000, T_rSr },
-  { "mpyuhi",  0x29600000, 0xffe00000, T_SSr },
-  { "mpyuhi",  0x39000000, 0xffe00000, T_Jrr }, /* C4x */
-  { "mpyuhi",  0x39000000, 0xffe00000, T_rJr }, /* C4x */
-  { "mpyuhi",  0x39200000, 0xffe00000, T_rRr }, /* C4x */
-  { "mpyuhi",  0x39200000, 0xffe00000, T_Rrr }, /* C4x */
-  { "mpyuhi",  0x39400000, 0xffe00000, T_JRr }, /* C4x */
-  { "mpyuhi",  0x39400000, 0xffe00000, T_RJr }, /* C4x */
-  { "mpyuhi",  0x39600000, 0xffe00000, T_RRr }, /* C4x */
-  { "mpyuhi3", 0x29000000, 0xffe00000, T_rrr },
-  { "mpyuhi3", 0x29200000, 0xffe00000, T_Srr },
-  { "mpyuhi3", 0x29400000, 0xffe00000, T_rSr },
-  { "mpyuhi3", 0x29600000, 0xffe00000, T_SSr },
-  { "mpyuhi3", 0x39000000, 0xffe00000, T_Jrr }, /* C4x */
-  { "mpyuhi3", 0x39000000, 0xffe00000, T_rJr }, /* C4x */
-  { "mpyuhi3", 0x39200000, 0xffe00000, T_rRr }, /* C4x */
-  { "mpyuhi3", 0x39200000, 0xffe00000, T_Rrr }, /* C4x */
-  { "mpyuhi3", 0x39400000, 0xffe00000, T_JRr }, /* C4x */
-  { "mpyuhi3", 0x39400000, 0xffe00000, T_RJr }, /* C4x */
-  { "mpyuhi3", 0x39600000, 0xffe00000, T_RRr }, /* C4x */
-  { "rcpf",    0x1d000000, 0xffe00000, G_r_r },
-  { "rcpf",    0x1d200000, 0xffe00000, G_T_r },
-  { "rcpf",    0x1d400000, 0xffe00000, G_Q_r },
-  { "rcpf",    0x1d600000, 0xffe00000, G_F_r },
-  { "retiBd",  0x78200000, 0xffe00000, "" },
-  { "retid",   0x78200000, 0xffe00000, "" }, /* synonym for retiud */
-  { "rptbd",   0x79800000, 0xff000000, "Q" },  
-  { "rptbd",   0x65000000, 0xff000000, "B" },  
-  { "rsqrf",   0x1c800000, 0xffe00000, G_r_r },
-  { "rsqrf",   0x1ca00000, 0xffe00000, G_T_r },
-  { "rsqrf",   0x1cc00000, 0xffe00000, G_Q_r },
-  { "rsqrf",   0x1ce00000, 0xffe00000, G_F_r },
-  { "stik",    0x15000000, 0xffe00000, "T,@" },
-  { "stik",    0x15600000, 0xffe00000, "T,*" },
-  { "toieee",  0x1b800000, 0xffe00000, G_r_r },
-  { "toieee",  0x1ba00000, 0xffe00000, G_T_r },
-  { "toieee",  0x1bc00000, 0xffe00000, G_Q_r },
-  { "toieee",  0x1be00000, 0xffe00000, G_F_r },
-  { "idle2",   0x06000001, 0xffffffff, "" }, 
-    
-  /* Dummy entry, not included in num_insts.  This
-     lets code examine entry i+1 without checking
-     if we've run off the end of the table.  */
-  { "",      0x0, 0x00, "" }
-};
-
-const unsigned int c4x_num_insts = (((sizeof c4x_insts) / (sizeof c4x_insts[0])) - 1);
-    
-
-struct c4x_cond
+struct tic4x_cond
 {
   char *        name;
   unsigned long cond;
 };
 
-typedef struct c4x_cond c4x_cond_t;
+typedef struct tic4x_cond tic4x_cond_t;
 
 /* Define conditional branch/load suffixes.  Put desired form for
    disassembler last.  */
-static const c4x_cond_t c4x_conds[] =
+static const tic4x_cond_t tic4x_conds[] =
 {
   { "u",    0x00 },
   { "c",    0x01 }, { "lo",  0x01 },
@@ -1284,22 +167,22 @@ static const c4x_cond_t c4x_conds[] =
   { "",      0x0}
 };
 
-const unsigned int num_conds = (((sizeof c4x_conds) / (sizeof c4x_conds[0])) - 1);
+const unsigned int tic4x_num_conds = (((sizeof tic4x_conds) / (sizeof tic4x_conds[0])) - 1);
 
-struct c4x_indirect
+struct tic4x_indirect
 {
   char *        name;
   unsigned long modn;
 };
 
-typedef struct c4x_indirect c4x_indirect_t;
+typedef struct tic4x_indirect tic4x_indirect_t;
 
 /* Define indirect addressing modes where:
    d displacement (signed)
    y ir0
    z ir1  */
 
-static const c4x_indirect_t c4x_indirects[] =
+static const tic4x_indirect_t tic4x_indirects[] =
 {
   { "*+a(d)",   0x00 },
   { "*-a(d)",   0x01 },
@@ -1333,6 +216,864 @@ static const c4x_indirect_t c4x_indirects[] =
   { "",      0x0}
 };
 
-#define C3X_MODN_MAX 0x19
+#define TIC3X_MODN_MAX 0x19
 
-const unsigned int num_indirects = (((sizeof c4x_indirects) / (sizeof c4x_indirects[0])) - 1);
+const unsigned int tic4x_num_indirects = (((sizeof tic4x_indirects) / (sizeof tic4x_indirects[0])) - 1);
+
+/* Instruction template.  */
+struct tic4x_inst
+{
+  char *        name;
+  unsigned long opcode;
+  unsigned long opmask;
+  char *        args;
+  unsigned long oplevel;
+};
+
+typedef struct tic4x_inst tic4x_inst_t;
+
+/* Opcode infix
+   B  condition              16--20   U,C,Z,LO,HI, etc.
+   C  condition              23--27   U,C,Z,LO,HI, etc.
+
+   Arguments
+   ,  required arg follows
+   ;  optional arg follows
+
+   Argument types             bits    [classes] - example
+   -----------------------------------------------------------
+   *  indirect (all)          0--15   [A,AB,AU,AF,A2,A3,A6,A7,AY,B,BA,BB,BI,B6,B7] - *+AR0(5), *++AR0(IR0)
+   #  direct (for LDP)        0--15   [Z] - @start, start
+   @  direct                  0--15   [A,AB,AU,AF,A3,A6,A7,AY,B,BA,BB,BI,B6,B7] - @start, start
+   A  address register       22--24   [D] - AR0, AR7
+   B  unsigned integer        0--23   [I,I2] - @start, start  (absolute on C3x, relative on C4x)
+   C  indirect (disp - C4x)   0--7    [S,SC,S2,T,TC,T2,T2C] - *+AR0(5)
+   E  register (all)          0--7    [T,TC,T2,T2C] - R0, R7, R11, AR0, DP
+   e  register (0-11)         0--7    [S,SC,S2] - R0, R7, R11
+   F  short float immediate   0--15   [AF,B,BA,BB] - 3.5, 0e-3.5e-1
+   G  register (all)          8--15   [T,TC,T2,T2C] - R0, R7, R11, AR0, DP
+   g  register (0-11)         0--7    [S,SC,S2] - R0, R7, R11
+   H  register (0-7)         18--16   [LS,M,P,Q] - R0, R7
+   I  indirect (no disp)      0--7    [S,SC,S2,T,TC,T2,T2C] - *+AR0(1), *+AR0(IR0)
+   i  indirect (enhanced)     0--7    [LL,LS,M,P,Q,QC] - *+AR0(1), R5
+   J  indirect (no disp)      8--15   [LL,LS,P,Q,QC,S,SC,S2,T,TC,T2,T2C] - *+AR0(1), *+AR0(IR0)
+   j  indirect (enhanced)     8--15   [M] - *+AR0(1), R5
+   K  register               19--21   [LL,M,Q,QC] - R0, R7
+   L  register               22--24   [LL,LS,P,Q,QC] - R0, R7
+   M  register (R2,R3)       22--22   [M] R2, R3
+   N  register (R0,R1)       23--23   [M] R0, R1
+   O  indirect(disp - C4x)    8--15   [S,SC,S2,T,TC,T2] - *+AR0(5)
+   P  displacement (PC Rel)   0--15   [D,J,JS] - @start, start
+   Q  register (all)          0--15   [A,AB,AU,A2,A3,AY,BA,BI,D,I2,J,JS] - R0, AR0, DP, SP
+   q  register (0-11)         0--15   [AF,B,BB] - R0, R7, R11
+   R  register (all)         16--20   [A,AB,AU,AF,A6,A7,R,T,TC] - R0, AR0, DP, SP
+   r  register (0-11)        16--20   [B,BA,BB,BI,B6,B7,RF,S,SC] - R0, R1, R11
+   S  short int immediate     0--15   [A,AB,AY,BI] - -5, 5
+   T  integer (C4x)          16--20   [Z] - -5, 12
+   U  unsigned integer        0--15   [AU,A3] - 0, 65535
+   V  vector (C4x: 0--8)      0--4    [Z] - 25, 7
+   W  short int (C4x)         0--7    [T,TC,T2,T2C] - -3, 5
+   X  expansion reg (C4x)     0--4    [Z] - IVTP, TVTP
+   Y  address reg (C4x)      16--20   [Z] - AR0, DP, SP, IR0
+   Z  expansion reg (C4x)    16--20   [Z] - IVTP, TVTP
+*/
+
+#define TIC4X_OPERANDS_MAX 7	/* Max number of operands for an inst.  */
+#define TIC4X_NAME_MAX 16	/* Max number of chars in parallel name.  */
+
+/* Define the instruction level */
+#define OP_C3X   0x1   /* C30 support - supported by all */
+#define OP_C4X   0x2   /* C40 support - C40, C44 */
+#define OP_ENH   0x4   /* Class LL,LS,M,P,Q,QC enhancements. Argument type
+                          I and J is enhanced in these classes - C31>=6.0,
+                          C32>=2.0, C33 */
+#define OP_LPWR  0x8   /* Low power support (LOPOWER, MAXSPEED) - C30>=7.0,
+                          LC31, C31>=5.0, C32 */
+#define OP_IDLE2 0x10  /* Idle2 support (IDLE2) - C30>=7.0, LC31, C31>=5.0,
+                          C32, C33, C40>=5.0, C44 */
+
+/* The following class definition is a classification scheme for
+   putting instructions with similar type of arguments together. It
+   simplifies the op-code definitions significantly, as we then only
+   need to use the class macroes for 95% of the DSP's opcodes.
+*/
+
+/* A: General 2-operand integer operations
+   Syntax: <i> src, dst
+      src = Register (Q), Direct (@), Indirect (*), Signed immediate (S)
+      dst = Register (R)
+   Instr: 15/8 - ABSI, ADDC, ADDI, ASH, CMPI, LDI, LSH, MPYI, NEGB, NEGI,
+                SUBB, SUBC, SUBI, SUBRB, SUBRI, C4x: LBn, LHn, LWLn, LWRn,
+                MBn, MHn, MPYSHI, MPYUHI
+*/
+#define A_CLASS_INSN(name, opcode, level) \
+  { name, opcode|0x00000000, 0xffe00000, "Q;R", level }, \
+  { name, opcode|0x00200000, 0xffe00000, "@,R", level }, \
+  { name, opcode|0x00400000, 0xffe00000, "*,R", level }, \
+  { name, opcode|0x00600000, 0xffe00000, "S,R", level }
+
+/* AB: General 2-operand integer operation with condition
+   Syntax: <i>c src, dst
+       c   = Condition
+       src = Register (Q), Direct (@), Indirect (*), Signed immediate (S)
+       dst = Register (R)
+   Instr: 1/0 - LDIc
+*/
+#define AB_CLASS_INSN(name, opcode, level) \
+  { name, opcode|0x40000000, 0xf0600000, "Q;R", level }, \
+  { name, opcode|0x40200000, 0xf0600000, "@,R", level }, \
+  { name, opcode|0x40400000, 0xf0600000, "*,R", level }, \
+  { name, opcode|0x40600000, 0xf0600000, "S,R", level }
+
+/* AU: General 2-operand unsigned integer operation
+   Syntax: <i> src, dst
+        src = Register (Q), Direct (@), Indirect (*), Unsigned immediate (U)
+        dst = Register (R)
+   Instr: 6/2 - AND, ANDN, NOT, OR, TSTB, XOR, C4x: LBUn, LHUn
+*/
+#define AU_CLASS_INSN(name, opcode, level) \
+  { name, opcode|0x00000000, 0xffe00000, "Q;R", level }, \
+  { name, opcode|0x00200000, 0xffe00000, "@,R", level }, \
+  { name, opcode|0x00400000, 0xffe00000, "*,R", level }, \
+  { name, opcode|0x00600000, 0xffe00000, "U,R", level }
+
+/* AF: General 2-operand float to integer operation
+   Syntax: <i> src, dst
+        src = Register 0-11 (q), Direct (@), Indirect (*), Float immediate (F)
+        dst = Register (R)
+   Instr: 1/0 - FIX
+*/
+#define AF_CLASS_INSN(name, opcode, level) \
+  { name, opcode|0x00000000, 0xffe00000, "q;R", level }, \
+  { name, opcode|0x00200000, 0xffe00000, "@,R", level }, \
+  { name, opcode|0x00400000, 0xffe00000, "*,R", level }, \
+  { name, opcode|0x00600000, 0xffe00000, "F,R", level }
+
+/* A2: Limited 1-operand (integer) operation
+   Syntax: <i> src
+       src = Register (Q), Indirect (*), None
+   Instr: 1/0 - NOP
+*/
+#define A2_CLASS_INSN(name, opcode, level) \
+  { name, opcode|0x00000000, 0xffe00000, "Q", level }, \
+  { name, opcode|0x00400000, 0xffe00000, "*", level }, \
+  { name, opcode|0x00000000, 0xffe00000, "" , level }
+
+/* A3: General 1-operand unsigned integer operation
+   Syntax: <i> src
+        src = Register (Q), Direct (@), Indirect (*), Unsigned immediate (U)
+   Instr: 1/0 - RPTS
+*/
+#define A3_CLASS_INSN(name, opcode, level) \
+  { name, opcode|0x00000000, 0xffff0000, "Q", level }, \
+  { name, opcode|0x00200000, 0xffff0000, "@", level }, \
+  { name, opcode|0x00400000, 0xffff0000, "*", level }, \
+  { name, opcode|0x00600000, 0xffff0000, "U", level }
+
+/* A6: Limited 2-operand integer operation
+   Syntax: <i> src, dst
+       src = Direct (@), Indirect (*)
+       dst = Register (R)
+   Instr: 1/1 - LDII, C4x: SIGI
+*/
+#define A6_CLASS_INSN(name, opcode, level) \
+  { name, opcode|0x00200000, 0xffe00000, "@,R", level }, \
+  { name, opcode|0x00400000, 0xffe00000, "*,R", level }
+
+/* A7: Limited 2-operand integer store operation
+   Syntax: <i> src, dst
+       src = Register (R)
+       dst = Direct (@), Indirect (*)
+   Instr: 2/0 - STI, STII
+*/
+#define A7_CLASS_INSN(name, opcode, level) \
+  { name, opcode|0x00200000, 0xffe00000, "R,@", level }, \
+  { name, opcode|0x00400000, 0xffe00000, "R,*", level }
+
+/* AY: General 2-operand signed address load operation
+   Syntax: <i> src, dst
+        src = Register (Q), Direct (@), Indirect (*), Signed immediate (S)
+        dst = Address register - ARx, IRx, DP, BK, SP (Y)
+   Instr: 0/1 - C4x: LDA
+   Note: Q and Y should *never* be the same register
+*/
+#define AY_CLASS_INSN(name, opcode, level) \
+  { name, opcode|0x00000000, 0xffe00000, "Q,Y", level }, \
+  { name, opcode|0x00200000, 0xffe00000, "@,Y", level }, \
+  { name, opcode|0x00400000, 0xffe00000, "*,Y", level }, \
+  { name, opcode|0x00600000, 0xffe00000, "S,Y", level }
+
+/* B: General 2-operand float operation
+   Syntax: <i> src, dst
+       src = Register 0-11 (q), Direct (@), Indirect (*), Float immediate (F)
+       dst = Register 0-11 (r)
+   Instr: 12/2 - ABSF, ADDF, CMPF, LDE, LDF, LDM, MPYF, NEGF, NORM, RND,
+                 SUBF, SUBRF, C4x: RSQRF, TOIEEE
+*/
+#define B_CLASS_INSN(name, opcode, level) \
+  { name, opcode|0x00000000, 0xffe00000, "q;r", level }, \
+  { name, opcode|0x00200000, 0xffe00000, "@,r", level }, \
+  { name, opcode|0x00400000, 0xffe00000, "*,r", level }, \
+  { name, opcode|0x00600000, 0xffe00000, "F,r", level }
+
+/* BA: General 2-operand integer to float operation
+   Syntax: <i> src, dst
+       src = Register (Q), Direct (@), Indirect (*), Float immediate (F)
+       dst = Register 0-11 (r)
+   Instr: 0/1 - C4x: CRCPF
+*/
+#define BA_CLASS_INSN(name, opcode, level) \
+  { name, opcode|0x00000000, 0xffe00000, "Q;r", level }, \
+  { name, opcode|0x00200000, 0xffe00000, "@,r", level }, \
+  { name, opcode|0x00400000, 0xffe00000, "*,r", level }, \
+  { name, opcode|0x00600000, 0xffe00000, "F,r", level }
+
+/* BB: General 2-operand conditional float operation
+   Syntax: <i>c src, dst
+       c   = Condition
+       src = Register 0-11 (q), Direct (@), Indirect (*), Float immediate (F)
+       dst = Register 0-11 (r)
+   Instr: 1/0 - LDFc
+*/
+#define BB_CLASS_INSN(name, opcode, level) \
+  { name, opcode|0x40000000, 0xf0600000, "q;r", level }, \
+  { name, opcode|0x40200000, 0xf0600000, "@,r", level }, \
+  { name, opcode|0x40400000, 0xf0600000, "*,r", level }, \
+  { name, opcode|0x40600000, 0xf0600000, "F,r", level }
+
+/* BI: General 2-operand integer to float operation (yet different to BA)
+   Syntax: <i> src, dst
+       src = Register (Q), Direct (@), Indirect (*), Signed immediate (S)
+       dst = Register 0-11 (r)
+   Instr: 1/0 - FLOAT
+*/
+#define BI_CLASS_INSN(name, opcode, level) \
+  { name, opcode|0x00000000, 0xffe00000, "Q;r", level }, \
+  { name, opcode|0x00200000, 0xffe00000, "@,r", level }, \
+  { name, opcode|0x00400000, 0xffe00000, "*,r", level }, \
+  { name, opcode|0x00600000, 0xffe00000, "S,r", level }
+
+/* B6: Limited 2-operand float operation 
+   Syntax: <i> src, dst
+       src = Direct (@), Indirect (*)
+       dst = Register 0-11 (r)
+   Instr: 1/1 - LDFI, C4x: FRIEEE
+*/
+#define B6_CLASS_INSN(name, opcode, level) \
+  { name, opcode|0x00200000, 0xffe00000, "@,r", level }, \
+  { name, opcode|0x00400000, 0xffe00000, "*,r", level }
+
+/* B7: Limited 2-operand float store operation
+   Syntax: <i> src, dst
+       src = Register 0-11 (r)
+       dst = Direct (@), Indirect (*)
+   Instr: 2/0 - STF, STFI
+*/
+#define B7_CLASS_INSN(name, opcode, level) \
+  { name, opcode|0x00200000, 0xffe00000, "r,@", level }, \
+  { name, opcode|0x00400000, 0xffe00000, "r,*", level }
+
+/* D: Decrement and brach operations
+   Syntax: <i>c ARn, dst
+       c   = condition
+       ARn = AR register 0-7 (A)
+       dst = Register (Q), PC-relative (P)
+   Instr: 2/0 - DBc, DBcD
+   Alias: <name1> <name2>
+*/
+#define D_CLASS_INSN(name1, name2, opcode, level) \
+  { name1, opcode|0x00000000, 0xfe200000, "A,Q", level }, \
+  { name1, opcode|0x02000000, 0xfe200000, "A,P", level }, \
+  { name2, opcode|0x00000000, 0xfe200000, "A,Q", level }, \
+  { name2, opcode|0x02000000, 0xfe200000, "A,P", level }
+
+/* I: General branch operations
+   Syntax: <i> dst
+       dst = Address (B)
+   Instr: 3/1 - BR, BRD, CALL, C4x: LAJ
+*/
+
+/* I2: General branch operations (C4x addition)
+   Syntax: <i> dst
+       dst = Address (B), C4x: Register (Q)
+   Instr: 2/0 - RPTB, RPTBD
+*/
+
+/* J: General conditional branch operations
+   Syntax: <i>c dst
+       c   = Condition
+       dst = Register (Q), PC-relative (P)
+   Instr: 2/3 - Bc, BcD, C4x: BcAF, BcAT, LAJc
+   Alias: <name1> <name2>
+*/
+#define J_CLASS_INSN(name1, name2, opcode, level) \
+  { name1, opcode|0x00000000, 0xffe00000, "Q", level }, \
+  { name1, opcode|0x02000000, 0xffe00000, "P", level }, \
+  { name2, opcode|0x00000000, 0xffe00000, "Q", level }, \
+  { name2, opcode|0x02000000, 0xffe00000, "P", level }
+
+/* JS: General conditional branch operations
+   Syntax: <i>c dst
+       c   = Condition
+       dst = Register (Q), PC-relative (P)
+   Instr: 1/1 - CALLc, C4X: LAJc
+*/
+
+/* LL: Load-load parallell operation
+   Syntax: <i> src2, dst2 || <i> src1, dst1
+       src1 = Indirect 0,1,IR0,IR1 (J)
+       dst1 = Register 0-7 (K)
+       src2 = Indirect 0,1,IR0,IR1, ENH: Register (i)
+       dst2 = Register 0-7 (L)
+   Instr: 2/0 - LDF||LDF, LDI||LDI
+   Alias: i||i, i1||i2, i2||i1
+*/
+#define LL_CLASS_INSN(name, opcode, level) \
+  { name "_"  name    , opcode, 0xfe000000, "i;L|J,K", level }, \
+  { name "2_" name "1", opcode, 0xfe000000, "i;L|J,K", level }, \
+  { name "1_" name "2", opcode, 0xfe000000, "J,K|i;L", level }
+
+/* LS: Store-store parallell operation
+   Syntax: <i> src2, dst2 || <i> src1, dst1
+       src1 = Register 0-7 (H)
+       dst1 = Indirect 0,1,IR0,IR1 (J)
+       src2 = Register 0-7 (L)
+       dst2 = Indirect 0,1,IR0,IR1, ENH: register (i)
+   Instr: 2/0 - STF||STF, STI||STI
+   Alias: i||i, i1||i2, i2||i1.
+*/
+#define LS_CLASS_INSN(name, opcode, level) \
+  { name "_"  name    , opcode, 0xfe000000, "L;i|H,J", level }, \
+  { name "2_" name "1", opcode, 0xfe000000, "L;i|H,J", level }, \
+  { name "1_" name "2", opcode, 0xfe000000, "H,J|L;i", level }
+
+/* M: General multiply and add/sub operations
+   Syntax: <ia> src3,src4,dst1 || <ib> src2,src1,dst2 [00] - Manual
+           <ia> src3,src1,dst1 || <ib> src2,src4,dst2 [01] - Manual
+           <ia> src1,src3,dst1 || <ib> src2,src4,dst2 [01]
+           <ia> src1,src2,dst1 || <ib> src4,src3,dst2 [02] - Manual
+           <ia> src3,src1,dst1 || <ib> src4,src2,dst2 [03] - Manual
+           <ia> src1,src3,dst1 || <ib> src4,src2,dst2 [03]
+       src1 = Register 0-7 (K)
+       src2 = Register 0-7 (H)
+       src3 = Indirect 0,1,IR0,IR1, ENH: register (j)
+       src4 = Indirect 0,1,IR0,IR1, ENH: register (i)
+       dst1 = Register 0-1 (N)
+       dst2 = Register 2-3 (M)
+   Instr: 4/0 - MPYF3||ADDF3, MPYF3||SUBF3, MPYI3||ADDI3, MPYI3||SUBI3
+   Alias: a||b, a3||n, a||b3, a3||b3, b||a, b3||a, b||a3, b3||a3
+*/
+#define M_CLASS_INSN(namea, nameb, opcode, level) \
+  { namea "_" nameb, opcode|0x00000000, 0xff000000, "i;j;N|H;K;M", level }, \
+  { namea "_" nameb, opcode|0x01000000, 0xff000000, "j;K;N|H;i;M", level }, \
+  { namea "_" nameb, opcode|0x01000000, 0xff000000, "K;j;N|H;i;M", level }, \
+  { namea "_" nameb, opcode|0x02000000, 0xff000000, "H;K;N|i;j;M", level }, \
+  { namea "_" nameb, opcode|0x03000000, 0xff000000, "j;K;N|i;H;M", level }, \
+  { namea "_" nameb, opcode|0x03000000, 0xff000000, "K;j;N|i;H;M", level }, \
+  { namea "3_" nameb, opcode|0x00000000, 0xff000000, "i;j;N|H;K;M", level }, \
+  { namea "3_" nameb, opcode|0x01000000, 0xff000000, "j;K;N|H;i;M", level }, \
+  { namea "3_" nameb, opcode|0x01000000, 0xff000000, "K;j;N|H;i;M", level }, \
+  { namea "3_" nameb, opcode|0x02000000, 0xff000000, "H;K;N|i;j;M", level }, \
+  { namea "3_" nameb, opcode|0x03000000, 0xff000000, "j;K;N|i;H;M", level }, \
+  { namea "3_" nameb, opcode|0x03000000, 0xff000000, "K;j;N|i;H;M", level }, \
+  { namea "_" nameb "3", opcode|0x00000000, 0xff000000, "i;j;N|H;K;M", level }, \
+  { namea "_" nameb "3", opcode|0x01000000, 0xff000000, "j;K;N|H;i;M", level }, \
+  { namea "_" nameb "3", opcode|0x01000000, 0xff000000, "K;j;N|H;i;M", level }, \
+  { namea "_" nameb "3", opcode|0x02000000, 0xff000000, "H;K;N|i;j;M", level }, \
+  { namea "_" nameb "3", opcode|0x03000000, 0xff000000, "j;K;N|i;H;M", level }, \
+  { namea "_" nameb "3", opcode|0x03000000, 0xff000000, "K;j;N|i;H;M", level }, \
+  { namea "3_" nameb "3", opcode|0x00000000, 0xff000000, "i;j;N|H;K;M", level }, \
+  { namea "3_" nameb "3", opcode|0x01000000, 0xff000000, "j;K;N|H;i;M", level }, \
+  { namea "3_" nameb "3", opcode|0x01000000, 0xff000000, "K;j;N|H;i;M", level }, \
+  { namea "3_" nameb "3", opcode|0x02000000, 0xff000000, "H;K;N|i;j;M", level }, \
+  { namea "3_" nameb "3", opcode|0x03000000, 0xff000000, "j;K;N|i;H;M", level }, \
+  { namea "3_" nameb "3", opcode|0x03000000, 0xff000000, "K;j;N|i;H;M", level }, \
+  { nameb "_" namea, opcode|0x00000000, 0xff000000, "H;K;M|i;j;N", level }, \
+  { nameb "_" namea, opcode|0x01000000, 0xff000000, "H;i;M|j;K;N", level }, \
+  { nameb "_" namea, opcode|0x01000000, 0xff000000, "H;i;M|K;j;N", level }, \
+  { nameb "_" namea, opcode|0x02000000, 0xff000000, "i;j;M|H;K;N", level }, \
+  { nameb "_" namea, opcode|0x03000000, 0xff000000, "i;H;M|j;K;N", level }, \
+  { nameb "_" namea, opcode|0x03000000, 0xff000000, "i;H;M|K;j;N", level }, \
+  { nameb "3_" namea, opcode|0x00000000, 0xff000000, "H;K;M|i;j;N", level }, \
+  { nameb "3_" namea, opcode|0x01000000, 0xff000000, "H;i;M|j;K;N", level }, \
+  { nameb "3_" namea, opcode|0x01000000, 0xff000000, "H;i;M|K;j;N", level }, \
+  { nameb "3_" namea, opcode|0x02000000, 0xff000000, "i;j;M|H;K;N", level }, \
+  { nameb "3_" namea, opcode|0x03000000, 0xff000000, "i;H;M|j;K;N", level }, \
+  { nameb "3_" namea, opcode|0x03000000, 0xff000000, "i;H;M|K;j;N", level }, \
+  { nameb "_" namea "3", opcode|0x00000000, 0xff000000, "H;K;M|i;j;N", level }, \
+  { nameb "_" namea "3", opcode|0x01000000, 0xff000000, "H;i;M|j;K;N", level }, \
+  { nameb "_" namea "3", opcode|0x01000000, 0xff000000, "H;i;M|K;j;N", level }, \
+  { nameb "_" namea "3", opcode|0x02000000, 0xff000000, "i;j;M|H;K;N", level }, \
+  { nameb "_" namea "3", opcode|0x03000000, 0xff000000, "i;H;M|j;K;N", level }, \
+  { nameb "_" namea "3", opcode|0x03000000, 0xff000000, "i;H;M|K;j;N", level }, \
+  { nameb "3_" namea "3", opcode|0x00000000, 0xff000000, "H;K;M|i;j;N", level }, \
+  { nameb "3_" namea "3", opcode|0x01000000, 0xff000000, "H;i;M|j;K;N", level }, \
+  { nameb "3_" namea "3", opcode|0x01000000, 0xff000000, "H;i;M|K;j;N", level }, \
+  { nameb "3_" namea "3", opcode|0x02000000, 0xff000000, "i;j;M|H;K;N", level }, \
+  { nameb "3_" namea "3", opcode|0x03000000, 0xff000000, "i;H;M|j;K;N", level }, \
+  { nameb "3_" namea "3", opcode|0x03000000, 0xff000000, "i;H;M|K;j;N", level }
+
+/* P: General 2-operand operation with parallell store
+   Syntax: <ia> src2, dst1 || <ib> src3, dst2
+       src2 = Indirect 0,1,IR0,IR1, ENH: register (i)
+       dst1 = Register 0-7 (L)
+       src3 = Register 0-7 (H)
+       dst2 = Indirect 0,1,IR0,IR1 (J)
+   Instr: 9/2 - ABSF||STF, ABSI||STI, FIX||STI, FLOAT||STF, LDF||STF,
+                LDI||STI, NEGF||STF, NEGI||STI, NOT||STI, C4x: FRIEEE||STF,
+                TOIEEE||STF
+   Alias: a||b, b||a
+*/
+#define P_CLASS_INSN(namea, nameb, opcode, level) \
+  { namea "_" nameb, opcode, 0xfe000000, "i;L|H,J", level }, \
+  { nameb "_" namea, opcode, 0xfe000000, "H,J|i;L", level }
+
+/* Q: General 3-operand operation with parallell store
+   Syntax: <ia> src1, src2, dst1 || <ib> src3, dst2
+       src1 = Register 0-7 (K)
+       src2 = Indirect 0,1,IR0,IR1, ENH: register (i)
+       dst1 = Register 0-7 (L)
+       src3 = Register 0-7 (H)
+       dst2 = Indirect 0,1,IR0,IR1 (J)
+   Instr: 4/0 - ASH3||STI, LSH3||STI, SUBF3||STF, SUBI3||STI
+   Alias: a||b, b||a, a3||b, b||a3
+*/
+#define Q_CLASS_INSN(namea, nameb, opcode, level) \
+  { namea "_"  nameb    , opcode, 0xfe000000, "K,i;L|H,J", level }, \
+  { nameb "_"  namea    , opcode, 0xfe000000, "H,J|K,i;L", level }, \
+  { namea "3_" nameb    , opcode, 0xfe000000, "K,i;L|H,J", level }, \
+  { nameb "_"  namea "3", opcode, 0xfe000000, "H,J|K,i;L", level }
+
+/* QC: General commutative 3-operand operation with parallell store
+   Syntax: <ia> src2, src1, dst1 || <ib> src3, dst2
+           <ia> src1, src2, dst1 || <ib> src3, dst2 - Manual
+       src1 = Register 0-7 (K)
+       src2 = Indirect 0,1,IR0,IR1, ENH: register (i)
+       dst1 = Register 0-7 (L)
+       src3 = Register 0-7 (H)
+       dst2 = Indirect 0,1,IR0,IR1 (J)
+   Instr: 7/0 - ADDF3||STF, ADDI3||STI, AND3||STI, MPYF3||STF, MPYI3||STI,
+                OR3||STI, XOR3||STI
+   Alias: a||b, b||a, a3||b, b||a3
+*/
+#define QC_CLASS_INSN(namea, nameb, opcode, level) \
+  { namea "_"  nameb    , opcode, 0xfe000000, "i;K;L|H,J", level }, \
+  { namea "_"  nameb    , opcode, 0xfe000000, "K;i;L|H,J", level }, \
+  { nameb "_"  namea    , opcode, 0xfe000000, "H,J|i;K;L", level }, \
+  { nameb "_"  namea    , opcode, 0xfe000000, "H,J|K;i;L", level }, \
+  { namea "3_" nameb    , opcode, 0xfe000000, "i;K;L|H,J", level }, \
+  { namea "3_" nameb    , opcode, 0xfe000000, "K;i;L|H,J", level }, \
+  { nameb "_"  namea "3", opcode, 0xfe000000, "H,J|i;K;L", level }, \
+  { nameb "_"  namea "3", opcode, 0xfe000000, "H,J|K;i;L", level }
+
+/* R: General register integer operation
+   Syntax: <i> dst
+       dst = Register (R)
+   Instr: 6/0 - POP, PUSH, ROL, ROLC, ROR, RORC
+*/
+#define R_CLASS_INSN(name, opcode, level) \
+  { name, opcode, 0xffe0ffff, "R", level }
+
+/* RF: General register float operation
+   Syntax: <i> dst
+       dst = Register 0-11 (r)
+   Instr: 2/0 - POPF, PUSHF
+*/
+#define RF_CLASS_INSN(name, opcode, level) \
+  { name, opcode, 0xffe0ffff, "r", level }
+
+/* S: General 3-operand float operation
+   Syntax: <i> src2, src1, dst
+       src2 = Register 0-11 (e), Indirect 0,1,IR0,IR1 (I), C4x T2: Indirect (C)
+       src1 = Register 0-11 (g), Indirect 0,1,IR0,IR1 (J), C4x T2: Indirect (O)
+       dst  = Register 0-11 (r)
+   Instr: 1/0 - SUBF3
+   Alias: i, i3
+*/
+#define S_CLASS_INSN(name, opcode, level) \
+  { name, opcode|0x20000000, 0xffe00000, "e,g;r", level  }, \
+  { name, opcode|0x20200000, 0xffe00000, "e,J,r", level  }, \
+  { name, opcode|0x20400000, 0xffe00000, "I,g;r", level  }, \
+  { name, opcode|0x20600000, 0xffe00000, "I,J,r", level  }, \
+  { name, opcode|0x30200000, 0xffe00000, "C,g;r", OP_C4X }, \
+  { name, opcode|0x30600000, 0xffe00000, "C,O,r", OP_C4X }, \
+  { name "3", opcode|0x20000000, 0xffe00000, "e,g;r", level  }, \
+  { name "3", opcode|0x20200000, 0xffe00000, "e,J,r", level  }, \
+  { name "3", opcode|0x20400000, 0xffe00000, "I,g;r", level  }, \
+  { name "3", opcode|0x20600000, 0xffe00000, "I,J,r", level  }, \
+  { name "3", opcode|0x30200000, 0xffe00000, "C,g;r", OP_C4X }, \
+  { name "3", opcode|0x30600000, 0xffe00000, "C,O,r", OP_C4X }
+
+/* SC: General commutative 3-operand float operation
+   Syntax: <i> src2, src1, dst - Manual
+           <i> src1, src2, dst
+       src2 = Register 0-11 (e), Indirect 0,1,IR0,IR1 (I), C4x T2: Indirect (C)
+       src1 = Register 0-11 (g), Indirect 0,1,IR0,IR1 (J), C4x T2: Indirect (O)
+       dst  = Register 0-11 (r)
+   Instr: 2/0 - ADDF3, MPYF3
+   Alias: i, i3
+*/
+#define SC_CLASS_INSN(name, opcode, level) \
+  { name, opcode|0x20000000, 0xffe00000, "e,g;r", level  }, \
+  { name, opcode|0x20200000, 0xffe00000, "e,J,r", level  }, \
+  { name, opcode|0x20400000, 0xffe00000, "I,g;r", level  }, \
+  { name, opcode|0x20600000, 0xffe00000, "I,J,r", level  }, \
+  { name, opcode|0x30200000, 0xffe00000, "C,g;r", OP_C4X }, \
+  { name, opcode|0x30200000, 0xffe00000, "g,C,r", OP_C4X }, \
+  { name, opcode|0x30600000, 0xffe00000, "C,O,r", OP_C4X }, \
+  { name "3", opcode|0x20000000, 0xffe00000, "e,g;r", level  }, \
+  { name "3", opcode|0x20200000, 0xffe00000, "e,J,r", level  }, \
+  { name "3", opcode|0x20400000, 0xffe00000, "I,g;r", level  }, \
+  { name "3", opcode|0x20600000, 0xffe00000, "I,J,r", level  }, \
+  { name "3", opcode|0x30200000, 0xffe00000, "g,C,r", OP_C4X }, \
+  { name "3", opcode|0x30200000, 0xffe00000, "C,g;r", OP_C4X }, \
+  { name "3", opcode|0x30600000, 0xffe00000, "C,O,r", OP_C4X }
+
+/* S2: General 3-operand float operation with 2 args
+   Syntax: <i> src2, src1
+       src2 = Register 0-11 (e), Indirect 0,1,IR0,IR1 (I), C4x T2: Indirect (C)
+       src1 = Register 0-11 (g), Indirect 0,1,IR0,IR1 (J), C4x T2: Indirect (O)
+   Instr: 1/0 - CMPF3
+   Alias: i, i3
+*/
+#define S2_CLASS_INSN(name, opcode, level) \
+  { name, opcode|0x20000000, 0xffe00000, "e,g", level  }, \
+  { name, opcode|0x20200000, 0xffe00000, "e,J", level  }, \
+  { name, opcode|0x20400000, 0xffe00000, "I,g", level  }, \
+  { name, opcode|0x20600000, 0xffe00000, "I,J", level  }, \
+  { name, opcode|0x30200000, 0xffe00000, "C,g", OP_C4X }, \
+  { name, opcode|0x30600000, 0xffe00000, "C,O", OP_C4X }, \
+  { name "3", opcode|0x20000000, 0xffe00000, "e,g", level  }, \
+  { name "3", opcode|0x20200000, 0xffe00000, "e,J", level  }, \
+  { name "3", opcode|0x20400000, 0xffe00000, "I,g", level  }, \
+  { name "3", opcode|0x20600000, 0xffe00000, "I,J", level  }, \
+  { name "3", opcode|0x30200000, 0xffe00000, "C,g", OP_C4X }, \
+  { name "3", opcode|0x30600000, 0xffe00000, "C,O", OP_C4X }
+
+/* T: General 3-operand integer operand
+   Syntax: <i> src2, src1, dst
+       src2 = Register (E), Indirect 0,1,IR0,IR1 (I), C4x T2: Indirect (C), Immediate (W)
+       src1 = Register (G), Indirect 0,1,IR0,IR1 (J), C4x T2: Indirect (O)
+       dst  = Register (R)
+   Instr: 5/0 - ANDN3, ASH3, LSH3, SUBB3, SUBI3
+   Alias: i, i3
+*/
+#define T_CLASS_INSN(name, opcode, level) \
+  { name, opcode|0x20000000, 0xffe00000, "E,G;R", level  }, \
+  { name, opcode|0x20200000, 0xffe00000, "E,J,R", level  }, \
+  { name, opcode|0x20400000, 0xffe00000, "I,G;R", level  }, \
+  { name, opcode|0x20600000, 0xffe00000, "I,J,R", level  }, \
+  { name, opcode|0x30000000, 0xffe00000, "W,G;R", OP_C4X }, \
+  { name, opcode|0x30200000, 0xffe00000, "C,G;R", OP_C4X }, \
+  { name, opcode|0x30400000, 0xffe00000, "W,O,R", OP_C4X }, \
+  { name, opcode|0x30600000, 0xffe00000, "C,O,R", OP_C4X }, \
+  { name "3", opcode|0x20000000, 0xffe00000, "E,G;R", level  }, \
+  { name "3", opcode|0x20200000, 0xffe00000, "E,J,R", level  }, \
+  { name "3", opcode|0x20400000, 0xffe00000, "I,G;R", level  }, \
+  { name "3", opcode|0x20600000, 0xffe00000, "I,J,R", level  }, \
+  { name "3", opcode|0x30000000, 0xffe00000, "W,G;R", OP_C4X }, \
+  { name "3", opcode|0x30200000, 0xffe00000, "C,G;R", OP_C4X }, \
+  { name "3", opcode|0x30400000, 0xffe00000, "W,O,R", OP_C4X }, \
+  { name "3", opcode|0x30600000, 0xffe00000, "C,O,R", OP_C4X }
+
+/* TC: General commutative 3-operand integer operation
+   Syntax: <i> src2, src1, dst
+           <i> src1, src2, dst
+       src2 = Register (E), Indirect 0,1,IR0,IR1 (I), C4x T2: Indirect (C), Immediate (W)
+       src1 = Register (G), Indirect 0,1,IR0,IR1 (J), C4x T2: Indirect (O)
+       dst  = Register (R)
+   Instr: 6/2 - ADDC3, ADDI3, AND3, MPYI3, OR3, XOR3, C4x: MPYSHI, MPYUHI
+   Alias: i, i3
+*/
+#define TC_CLASS_INSN(name, opcode, level) \
+  { name, opcode|0x20000000, 0xffe00000, "E,G;R", level  }, \
+  { name, opcode|0x20200000, 0xffe00000, "E,J,R", level  }, \
+  { name, opcode|0x20400000, 0xffe00000, "I,G;R", level  }, \
+  { name, opcode|0x20600000, 0xffe00000, "I,J,R", level  }, \
+  { name, opcode|0x30000000, 0xffe00000, "W,G;R", OP_C4X }, \
+  { name, opcode|0x30000000, 0xffe00000, "G,W,R", OP_C4X }, \
+  { name, opcode|0x30200000, 0xffe00000, "C,G;R", OP_C4X }, \
+  { name, opcode|0x30200000, 0xffe00000, "G,C,R", OP_C4X }, \
+  { name, opcode|0x30400000, 0xffe00000, "W,O,R", OP_C4X }, \
+  { name, opcode|0x30400000, 0xffe00000, "O,W,R", OP_C4X }, \
+  { name, opcode|0x30600000, 0xffe00000, "C,O,R", OP_C4X }, \
+  { name "3", opcode|0x20000000, 0xffe00000, "E,G;R", level  }, \
+  { name "3", opcode|0x20200000, 0xffe00000, "E,J,R", level  }, \
+  { name "3", opcode|0x20400000, 0xffe00000, "I,G;R", level  }, \
+  { name "3", opcode|0x20600000, 0xffe00000, "I,J,R", level  }, \
+  { name "3", opcode|0x30000000, 0xffe00000, "W,G;R", OP_C4X }, \
+  { name "3", opcode|0x30000000, 0xffe00000, "G,W,R", OP_C4X }, \
+  { name "3", opcode|0x30200000, 0xffe00000, "C,G;R", OP_C4X }, \
+  { name "3", opcode|0x30200000, 0xffe00000, "G,C,R", OP_C4X }, \
+  { name "3", opcode|0x30400000, 0xffe00000, "W,O,R", OP_C4X }, \
+  { name "3", opcode|0x30400000, 0xffe00000, "O,W,R", OP_C4X }, \
+  { name "3", opcode|0x30600000, 0xffe00000, "C,O,R", OP_C4X }
+
+/* T2: General 3-operand integer operation with 2 args
+   Syntax: <i> src2, src1
+       src2 = Register (E), Indirect 0,1,IR0,IR1 (I), C4x T2: Indirect (C), Immediate (W)
+       src1 = Register (G), Indirect 0,1,IR0,IR1 (J), C4x T2: Indirect (O)
+   Instr: 1/0 - CMPI3
+   Alias: i, i3
+*/
+#define T2_CLASS_INSN(name, opcode, level) \
+  { name, opcode|0x20000000, 0xffe00000, "E,G", level  }, \
+  { name, opcode|0x20200000, 0xffe00000, "E,J", level  }, \
+  { name, opcode|0x20400000, 0xffe00000, "I,G", level  }, \
+  { name, opcode|0x20600000, 0xffe00000, "I,J", level  }, \
+  { name, opcode|0x30000000, 0xffe00000, "W,G", OP_C4X }, \
+  { name, opcode|0x30200000, 0xffe00000, "C,G", OP_C4X }, \
+  { name, opcode|0x30400000, 0xffe00000, "W,O", OP_C4X }, \
+  { name, opcode|0x30600000, 0xffe00000, "C,O", OP_C4X }, \
+  { name "3", opcode|0x20000000, 0xffe00000, "E,G", level  }, \
+  { name "3", opcode|0x20200000, 0xffe00000, "E,J", level  }, \
+  { name "3", opcode|0x20400000, 0xffe00000, "I,G", level  }, \
+  { name "3", opcode|0x20600000, 0xffe00000, "I,J", level  }, \
+  { name "3", opcode|0x30000000, 0xffe00000, "W,G", OP_C4X }, \
+  { name "3", opcode|0x30200000, 0xffe00000, "C,G", OP_C4X }, \
+  { name "3", opcode|0x30400000, 0xffe00000, "W,O", OP_C4X }, \
+  { name "3", opcode|0x30600000, 0xffe00000, "C,O", OP_C4X }
+
+/* T2C: General commutative 3-operand integer operation with 2 args 
+   Syntax: <i> src2, src1 - Manual
+           <i> src1, src2 
+       src2 = Register (E), Indirect 0,1,IR0,IR1 (I), C4x T2: Indirect (C), Immediate (W)
+       src1 = Register (G), Indirect 0,1,IR0,IR1 (J), C4x T2: Indirect (0)
+   Instr: 1/0 - TSTB3
+   Alias: i, i3
+*/
+#define T2C_CLASS_INSN(name, opcode, level) \
+  { name, opcode|0x20000000, 0xffe00000, "E,G", level  }, \
+  { name, opcode|0x20200000, 0xffe00000, "E,J", level  }, \
+  { name, opcode|0x20400000, 0xffe00000, "I,G", level  }, \
+  { name, opcode|0x20600000, 0xffe00000, "I,J", level  }, \
+  { name, opcode|0x30000000, 0xffe00000, "W,G", OP_C4X }, \
+  { name, opcode|0x30000000, 0xffe00000, "G,W", OP_C4X }, \
+  { name, opcode|0x30200000, 0xffe00000, "C,G", OP_C4X }, \
+  { name, opcode|0x30200000, 0xffe00000, "G,C", OP_C4X }, \
+  { name, opcode|0x30400000, 0xffe00000, "W,O", OP_C4X }, \
+  { name, opcode|0x30400000, 0xffe00000, "O,W", OP_C4X }, \
+  { name, opcode|0x30600000, 0xffe00000, "C,O", OP_C4X }, \
+  { name "3", opcode|0x20000000, 0xffe00000, "E,G", level  }, \
+  { name "3", opcode|0x20200000, 0xffe00000, "E,J", level  }, \
+  { name "3", opcode|0x20400000, 0xffe00000, "I,G", level  }, \
+  { name "3", opcode|0x20600000, 0xffe00000, "I,J", level  }, \
+  { name "3", opcode|0x30000000, 0xffe00000, "W,G", OP_C4X }, \
+  { name "3", opcode|0x30000000, 0xffe00000, "G,W", OP_C4X }, \
+  { name "3", opcode|0x30200000, 0xffe00000, "C,G", OP_C4X }, \
+  { name "3", opcode|0x30200000, 0xffe00000, "G,C", OP_C4X }, \
+  { name "3", opcode|0x30400000, 0xffe00000, "W,O", OP_C4X }, \
+  { name "3", opcode|0x30400000, 0xffe00000, "O,W", OP_C4X }, \
+  { name "3", opcode|0x30600000, 0xffe00000, "C,O", OP_C4X }
+
+/* Z: Misc operations with or without arguments
+   Syntax: <i> <arg1>,...
+   Instr: 16 - RETIc, RETSc, SIGI(c3X), SWI, IDLE, IDLE2, RETIcD, 
+               TRAPc, LATc, LDEP, LDEHI, LDEPE, LDPK, STIK, LDP, IACK
+*/
+
+
+/* Define tic4x opcodes for assembler and disassembler.  */
+static const tic4x_inst_t tic4x_insts[] =
+{
+  /* Put synonyms after the desired forms in table so that they get
+     overwritten in the lookup table.  The disassembler will thus
+     print the `proper' mnemonics.  Note that the disassembler
+     only decodes the 11 MSBs, so instructions like ldp @0x500 will
+     be printed as ldiu 5, dp.  Note that with parallel instructions,
+     the second part is executed before the first part, unless
+     the sti1||sti2 form is used.  We also allow sti2||sti1
+     which is equivalent to the default sti||sti form.
+  */
+  B_CLASS_INSN(  "absf",          0x00000000, OP_C3X   ),
+  P_CLASS_INSN(  "absf",  "stf",  0xc8000000, OP_C3X   ),
+  A_CLASS_INSN(  "absi",          0x00800000, OP_C3X   ),
+  P_CLASS_INSN(  "absi",  "sti",  0xca000000, OP_C3X   ),
+  A_CLASS_INSN(  "addc",          0x01000000, OP_C3X   ),
+  TC_CLASS_INSN( "addc",          0x00000000, OP_C3X   ),
+  B_CLASS_INSN(  "addf",          0x01800000, OP_C3X   ),
+  SC_CLASS_INSN( "addf",          0x00800000, OP_C3X   ),
+  QC_CLASS_INSN( "addf",  "stf",  0xcc000000, OP_C3X   ),
+  A_CLASS_INSN(  "addi",          0x02000000, OP_C3X   ),
+  TC_CLASS_INSN( "addi",          0x01000000, OP_C3X   ),
+  QC_CLASS_INSN( "addi",  "sti",  0xce000000, OP_C3X   ),
+  AU_CLASS_INSN( "and",           0x02800000, OP_C3X   ),
+  TC_CLASS_INSN( "and",           0x01800000, OP_C3X   ),
+  QC_CLASS_INSN( "and",   "sti",  0xd0000000, OP_C3X   ),
+  AU_CLASS_INSN( "andn",          0x03000000, OP_C3X   ),
+  T_CLASS_INSN(  "andn",          0x02000000, OP_C3X   ),
+  A_CLASS_INSN(  "ash",           0x03800000, OP_C3X   ),
+  T_CLASS_INSN(  "ash",           0x02800000, OP_C3X   ),
+  Q_CLASS_INSN(  "ash",   "sti",  0xd2000000, OP_C3X   ),
+  J_CLASS_INSN(  "bB",    "b",    0x68000000, OP_C3X   ),
+  J_CLASS_INSN(  "bBd",   "bd",   0x68200000, OP_C3X   ),
+  J_CLASS_INSN(  "bBaf",  "baf",  0x68a00000, OP_C4X   ),
+  J_CLASS_INSN(  "bBat",  "bat",  0x68600000, OP_C4X   ),
+  { "br",     0x60000000, 0xff000000, "B"   , OP_C3X   },  /* I_CLASS */
+  { "brd",    0x61000000, 0xff000000, "B"   , OP_C3X   },  /* I_CLASS */
+  { "call",   0x62000000, 0xff000000, "B"   , OP_C3X   },  /* I_CLASS */
+  { "callB",  0x70000000, 0xffe00000, "Q"   , OP_C3X   },  /* JS_CLASS */
+  { "callB",  0x72000000, 0xffe00000, "P"   , OP_C3X   },  /* JS_CLASS */
+  B_CLASS_INSN(  "cmpf",          0x04000000, OP_C3X   ),
+  S2_CLASS_INSN( "cmpf",          0x03000000, OP_C3X   ),
+  A_CLASS_INSN(  "cmpi",          0x04800000, OP_C3X   ),
+  T2_CLASS_INSN( "cmpi",          0x03800000, OP_C3X   ),
+  D_CLASS_INSN(  "dbB",   "db",   0x6c000000, OP_C3X   ),
+  D_CLASS_INSN(  "dbBd",  "dbd",  0x6c200000, OP_C3X   ),
+  AF_CLASS_INSN( "fix",           0x05000000, OP_C3X   ),
+  P_CLASS_INSN(  "fix",   "sti",  0xd4000000, OP_C3X   ),
+  BI_CLASS_INSN( "float",         0x05800000, OP_C3X   ),
+  P_CLASS_INSN(  "float", "stf",  0xd6000000, OP_C3X   ),
+  B6_CLASS_INSN( "frieee",        0x1c000000, OP_C4X   ),
+  P_CLASS_INSN(  "frieee","stf",  0xf2000000, OP_C4X   ),
+  { "iack",   0x1b200000, 0xffe00000, "@"   , OP_C3X   },  /* Z_CLASS */
+  { "iack",   0x1b400000, 0xffe00000, "*"   , OP_C3X   },  /* Z_CLASS */
+  { "idle",   0x06000000, 0xffffffff, ""    , OP_C3X   },  /* Z_CLASS */
+  { "idlez",  0x06000000, 0xffffffff, ""    , OP_C3X   },  /* Z_CLASS */
+  { "idle2",  0x06000001, 0xffffffff, ""    , OP_IDLE2 },  /* Z_CLASS */
+  { "laj",    0x63000000, 0xff000000, "B"   , OP_C4X   },  /* I_CLASS */
+  { "lajB",   0x70200000, 0xffe00000, "Q"   , OP_C4X   },  /* JS_CLASS */
+  { "lajB",   0x72200000, 0xffe00000, "P"   , OP_C4X   },  /* JS_CLASS */
+  { "latB",   0x74800000, 0xffe00000, "V"   , OP_C4X   },  /* Z_CLASS */
+  A_CLASS_INSN(  "lb0",           0xb0000000, OP_C4X   ),
+  A_CLASS_INSN(  "lb1",           0xb0800000, OP_C4X   ),
+  A_CLASS_INSN(  "lb2",           0xb1000000, OP_C4X   ),
+  A_CLASS_INSN(  "lb3",           0xb1800000, OP_C4X   ),
+  AU_CLASS_INSN( "lbu0",          0xb2000000, OP_C4X   ),
+  AU_CLASS_INSN( "lbu1",          0xb2800000, OP_C4X   ),
+  AU_CLASS_INSN( "lbu2",          0xb3000000, OP_C4X   ),
+  AU_CLASS_INSN( "lbu3",          0xb3800000, OP_C4X   ),
+  AY_CLASS_INSN( "lda",           0x1e800000, OP_C4X   ),
+  B_CLASS_INSN(  "lde",           0x06800000, OP_C3X   ),
+  { "ldep",   0x76000000, 0xffe00000, "X,R" , OP_C4X   },  /* Z_CLASS */
+  B_CLASS_INSN(  "ldf",           0x07000000, OP_C3X   ),
+  LL_CLASS_INSN( "ldf",           0xc4000000, OP_C3X   ),
+  P_CLASS_INSN(  "ldf",   "stf",  0xd8000000, OP_C3X   ),
+  BB_CLASS_INSN( "ldfC",          0x00000000, OP_C3X   ),
+  B6_CLASS_INSN( "ldfi",          0x07800000, OP_C3X   ),
+  { "ldhi",   0x1fe00000, 0xffe00000, "U,R" , OP_C4X   },  /* Z_CLASS */
+  { "ldhi",   0x1fe00000, 0xffe00000, "#,R" , OP_C4X   },  /* Z_CLASS */
+  A_CLASS_INSN(  "ldi",           0x08000000, OP_C3X   ),
+  LL_CLASS_INSN( "ldi",           0xc6000000, OP_C3X   ),
+  P_CLASS_INSN(  "ldi",   "sti",  0xda000000, OP_C3X   ),
+  AB_CLASS_INSN( "ldiC",          0x10000000, OP_C3X   ),
+  A6_CLASS_INSN( "ldii",          0x08800000, OP_C3X   ),
+  { "ldp",    0x50700000, 0xffff0000, "#"   , OP_C3X   },  /* Z_CLASS - synonym for ldiu #,dp */
+  B_CLASS_INSN(  "ldm",           0x09000000, OP_C3X   ),
+  { "ldpe",   0x76800000, 0xffe00000, "Q,Z" , OP_C4X   },  /* Z_CLASS */
+  { "ldpk",   0x1F700000, 0xffff0000, "#"   , OP_C4X   },  /* Z_CLASS */
+  A_CLASS_INSN(  "lh0",           0xba000000, OP_C4X   ),
+  A_CLASS_INSN(  "lh1",           0xba800000, OP_C4X   ),
+  AU_CLASS_INSN( "lhu0",          0xbb000000, OP_C4X   ),
+  AU_CLASS_INSN( "lhu1",          0xbb800000, OP_C4X   ),
+  { "lopower", 0x10800001,0xffffffff, ""    , OP_LPWR  },  /* Z_CLASS */
+  A_CLASS_INSN(  "lsh",           0x09800000, OP_C3X   ),
+  T_CLASS_INSN(  "lsh",           0x04000000, OP_C3X   ),
+  Q_CLASS_INSN(  "lsh",   "sti",  0xdc000000, OP_C3X   ),
+  A_CLASS_INSN(  "lwl0",          0xb4000000, OP_C4X   ),
+  A_CLASS_INSN(  "lwl1",          0xb4800000, OP_C4X   ),
+  A_CLASS_INSN(  "lwl2",          0xb5000000, OP_C4X   ),
+  A_CLASS_INSN(  "lwl3",          0xb5800000, OP_C4X   ),
+  A_CLASS_INSN(  "lwr0",          0xb6000000, OP_C4X   ),
+  A_CLASS_INSN(  "lwr1",          0xb6800000, OP_C4X   ),
+  A_CLASS_INSN(  "lwr2",          0xb7000000, OP_C4X   ),
+  A_CLASS_INSN(  "lwr3",          0xb7800000, OP_C4X   ),
+  { "maxspeed",0x10800000,0xffffffff, ""    , OP_LPWR  },  /* Z_CLASS */
+  A_CLASS_INSN(  "mb0",           0xb8000000, OP_C4X   ),
+  A_CLASS_INSN(  "mb1",           0xb8800000, OP_C4X   ),
+  A_CLASS_INSN(  "mb2",           0xb9000000, OP_C4X   ),
+  A_CLASS_INSN(  "mb3",           0xb9800000, OP_C4X   ),
+  A_CLASS_INSN(  "mh0",           0xbc000000, OP_C4X   ),
+  A_CLASS_INSN(  "mh1",           0xbc800000, OP_C4X   ),
+  A_CLASS_INSN(  "mh2",           0xbd000000, OP_C4X   ),
+  A_CLASS_INSN(  "mh3",           0xbd800000, OP_C4X   ),
+  B_CLASS_INSN(  "mpyf",          0x0a000000, OP_C3X   ),
+  SC_CLASS_INSN( "mpyf",          0x04800000, OP_C3X   ),
+  M_CLASS_INSN(  "mpyf",  "addf", 0x80000000, OP_C3X   ),
+  QC_CLASS_INSN( "mpyf",  "stf",  0xde000000, OP_C3X   ),
+  M_CLASS_INSN(  "mpyf",  "subf", 0x84000000, OP_C3X   ),
+  A_CLASS_INSN(  "mpyi",          0x0a800000, OP_C3X   ),
+  TC_CLASS_INSN( "mpyi",          0x05000000, OP_C3X   ),
+  M_CLASS_INSN(  "mpyi",  "addi", 0x88000000, OP_C3X   ),
+  QC_CLASS_INSN( "mpyi",  "sti",  0xe0000000, OP_C3X   ),
+  M_CLASS_INSN(  "mpyi",  "subi", 0x8c000000, OP_C3X   ),
+  A_CLASS_INSN(  "mpyshi",        0x1d800000, OP_C4X   ),
+  TC_CLASS_INSN( "mpyshi",        0x28800000, OP_C4X   ),
+  A_CLASS_INSN(  "mpyuhi",        0x1e000000, OP_C4X   ),
+  TC_CLASS_INSN( "mpyuhi",        0x29000000, OP_C4X   ),
+  A_CLASS_INSN(  "negb",          0x0b000000, OP_C3X   ),
+  B_CLASS_INSN(  "negf",          0x0b800000, OP_C3X   ),
+  P_CLASS_INSN(  "negf",  "stf",  0xe2000000, OP_C3X   ),
+  A_CLASS_INSN(  "negi",          0x0c000000, OP_C3X   ),
+  P_CLASS_INSN(  "negi",  "sti",  0xe4000000, OP_C3X   ),
+  A2_CLASS_INSN( "nop",           0x0c800000, OP_C3X   ),
+  B_CLASS_INSN(  "norm",          0x0d000000, OP_C3X   ),
+  AU_CLASS_INSN( "not",           0x0d800000, OP_C3X   ),
+  P_CLASS_INSN(  "not",   "sti",  0xe6000000, OP_C3X   ),
+  AU_CLASS_INSN( "or",            0x10000000, OP_C3X   ),
+  TC_CLASS_INSN( "or",            0x05800000, OP_C3X   ),
+  QC_CLASS_INSN( "or",    "sti",  0xe8000000, OP_C3X   ),
+  R_CLASS_INSN(  "pop",           0x0e200000, OP_C3X   ),
+  RF_CLASS_INSN( "popf",          0x0ea00000, OP_C3X   ),
+  R_CLASS_INSN(  "push",          0x0f200000, OP_C3X   ),
+  RF_CLASS_INSN( "pushf",         0x0fa00000, OP_C3X   ),
+  BA_CLASS_INSN( "rcpf",          0x1d000000, OP_C4X   ),
+  { "retiB",  0x78000000, 0xffe00000, ""    , OP_C3X   },  /* Z_CLASS */
+  { "reti",   0x78000000, 0xffe00000, ""    , OP_C3X   },  /* Z_CLASS  - Alias for retiu */
+  { "retiBd", 0x78200000, 0xffe00000, ""    , OP_C4X   },  /* Z_CLASS */
+  { "retid",  0x78200000, 0xffe00000, ""    , OP_C4X   },  /* Z_CLASS - Alias for retiud */
+  { "retsB",  0x78800000, 0xffe00000, ""    , OP_C3X   },  /* Z_CLASS */
+  { "rets",   0x78800000, 0xffe00000, ""    , OP_C3X   },  /* Z_CLASS  - Alias for retsu */
+  B_CLASS_INSN(  "rnd",           0x11000000, OP_C3X   ),
+  R_CLASS_INSN(  "rol",           0x11e00001, OP_C3X   ),
+  R_CLASS_INSN(  "rolc",          0x12600001, OP_C3X   ),
+  R_CLASS_INSN(  "ror",           0x12e0ffff, OP_C3X   ),
+  R_CLASS_INSN(  "rorc",          0x1360ffff, OP_C3X   ),
+  { "rptb",   0x64000000, 0xff000000, "B"   , OP_C3X   },  /* I2_CLASS */
+  { "rptb",   0x79000000, 0xff000000, "Q"   , OP_C4X   },  /* I2_CLASS */
+  { "rptbd",  0x65000000, 0xff000000, "B"   , OP_C4X   },  /* I2_CLASS */ 
+  { "rptbd",  0x79800000, 0xff000000, "Q"   , OP_C4X   },  /* I2_CLASS */
+  A3_CLASS_INSN( "rpts",          0x139b0000, OP_C3X   ),
+  B_CLASS_INSN(  "rsqrf",         0x1c800000, OP_C4X   ),
+  { "sigi",   0x16000000, 0xffe00000, ""    , OP_C3X   },  /* Z_CLASS */
+  A6_CLASS_INSN( "sigi",          0x16000000, OP_C4X   ),
+  B7_CLASS_INSN( "stf",           0x14000000, OP_C3X   ),
+  LS_CLASS_INSN( "stf",           0xc0000000, OP_C3X   ),
+  B7_CLASS_INSN( "stfi",          0x14800000, OP_C3X   ),
+  A7_CLASS_INSN( "sti",           0x15000000, OP_C3X   ),
+  { "sti",    0x15000000, 0xffe00000, "T,@" , OP_C4X   },  /* Class A7 - Alias for stik */
+  { "sti",    0x15600000, 0xffe00000, "T,*" , OP_C4X   },  /* Class A7 */
+  LS_CLASS_INSN( "sti",           0xc2000000, OP_C3X   ),
+  A7_CLASS_INSN( "stii",          0x15800000, OP_C3X   ),
+  { "stik",   0x15000000, 0xffe00000, "T,@" , OP_C4X   },  /* Z_CLASS */
+  { "stik",   0x15600000, 0xffe00000, "T,*" , OP_C4X   },  /* Z_CLASS */
+  A_CLASS_INSN(  "subb",          0x16800000, OP_C3X   ),
+  T_CLASS_INSN(  "subb",          0x06000000, OP_C3X   ),
+  A_CLASS_INSN(  "subc",          0x17000000, OP_C3X   ),
+  B_CLASS_INSN(  "subf",          0x17800000, OP_C3X   ),
+  S_CLASS_INSN(  "subf",          0x06800000, OP_C3X   ),
+  Q_CLASS_INSN(  "subf",  "stf",  0xea000000, OP_C3X   ),
+  A_CLASS_INSN(  "subi",          0x18000000, OP_C3X   ),
+  T_CLASS_INSN(  "subi",          0x07000000, OP_C3X   ),
+  Q_CLASS_INSN(  "subi",  "sti",  0xec000000, OP_C3X   ),
+  A_CLASS_INSN(  "subrb",         0x18800000, OP_C3X   ),
+  B_CLASS_INSN(  "subrf",         0x19000000, OP_C3X   ),
+  A_CLASS_INSN(  "subri",         0x19800000, OP_C3X   ),
+  { "swi",    0x66000000, 0xffffffff, ""    , OP_C3X   },  /* Z_CLASS */
+  B_CLASS_INSN(  "toieee",        0x1b800000, OP_C4X   ),
+  P_CLASS_INSN(  "toieee","stf",  0xf0000000, OP_C4X   ),
+  { "trapB",  0x74000000, 0xffe00000, "V"   , OP_C3X   },  /* Z_CLASS */
+  { "trap",   0x74000000, 0xffe00000, "V"   , OP_C3X   },  /* Z_CLASS - Alias for trapu */
+  AU_CLASS_INSN( "tstb",          0x1a000000, OP_C3X   ),
+  T2C_CLASS_INSN("tstb",          0x07800000, OP_C3X   ),
+  AU_CLASS_INSN( "xor",           0x1a800000, OP_C3X   ),
+  TC_CLASS_INSN( "xor",           0x08000000, OP_C3X   ),
+  QC_CLASS_INSN( "xor",   "sti",  0xee000000, OP_C3X   ),
+
+  /* Dummy entry, not included in tic4x_num_insts.  This
+     lets code examine entry i + 1 without checking
+     if we've run off the end of the table.  */
+  { "",      0x0, 0x00, "", 0 }
+};
+
+const unsigned int tic4x_num_insts = (((sizeof tic4x_insts) / (sizeof tic4x_insts[0])) - 1);

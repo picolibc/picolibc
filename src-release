@@ -1,5 +1,5 @@
 #   Copyright (C) 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
-#   1999, 2000, 2001, 2002 Free Software Foundation
+#   1999, 2000, 2001, 2002, 2003 Free Software Foundation
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -48,14 +48,15 @@ DEVO_SUPPORT= README Makefile.in configure configure.in \
 	mpw-README mpw-build.in mpw-config.in mpw-configure mpw-install \
 	COPYING COPYING.LIB install-sh config-ml.in symlink-tree \
 	mkinstalldirs ltconfig ltmain.sh missing ylwrap \
-	libtool.m4 gettext.m4 ltcf-c.sh ltcf-cxx.sh ltcf-gcj.sh
+	libtool.m4 gettext.m4 ltcf-c.sh ltcf-cxx.sh ltcf-gcj.sh \
+	Makefile.def Makefile.tpl src-release
 
 # Files in devo/etc used in any net release.
 # ChangeLog omitted because it may refer to files which are not in this
 # distribution (perhaps it would be better to include it anyway).
 ETC_SUPPORT= Makefile.in configure configure.in standards.texi \
 	make-stds.texi standards.info* configure.texi configure.info* \
-	configbuild.* configdev.*
+	configbuild.* configdev.* fdl.texi texi2pod.pl
 
 
 # When you use `make setup-dirs' or `make taz' you should always redefine
@@ -136,7 +137,7 @@ do-proto-toplev: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
 	mv -f tmp Makefile.in
 	#
 	./configure sun4
-	$(MAKE) configure-target \
+	$(MAKE) configure-host configure-target \
 	    ALL_GCC="" ALL_GCC_C="" ALL_GCC_CXX="" \
 	    CC_FOR_TARGET="$(CC)" CXX_FOR_TARGET="$(CXX)"
 	# Make links, and run "make diststuff" or "make info" when needed.
@@ -159,6 +160,26 @@ do-proto-toplev: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
 	done
 	cd etc && $(MAKE) info
 	$(MAKE) distclean
+	# Kludge for pr gdb/708.  'configure' configures in
+	# dejagnu/example/calc, but 'make distclean' does not clean in
+	# dejagnu/example.  Someday somebody might fix this in dejagnu,
+	# and then import a new dejagnu into sourceware.  Right now, a
+	# couple of 'rm' commands will get the gdb snapshots working
+	# again.  -- chastain 2003-08-15
+	rm -f dejagnu/example/calc/config.status
+	rm -f dejagnu/example/calc/config.log
+	# Kludge for pr gdb/857.  intl/Makefile.in lacks a couple
+	# of files in the distclean rule.  Zack W is planning to make
+	# the gcc version of intl/ the master version and then push
+	# that version to src soon.  See:
+	#   http://sources.redhat.com/ml/binutils/2003-07/msg00032.html
+	# After the src version of intl/ is upgraded, we can look at
+	# moving this logic into intl/Makefile.in distclean rule
+	# if it is still needed.  -- chastain 2003-09-12
+	rm -f intl/config.cache
+	rm -f intl/config.status
+	rm -f intl/config.h
+	rm -f intl/stamp-h
 	#
 	mkdir proto-toplev/etc
 	(cd proto-toplev/etc; \
@@ -210,9 +231,9 @@ do-md5sum:
 .PHONY: do-djunpack
 do-djunpack:
 	echo "==> Adding updated djunpack.bat to top-level directory"
-	echo - 's /gdb-[0-9\.]*/gdb-'"$(VER)"'/'
+	echo - 's /gdb-[0-9\.]*/$(PACKAGE)-'"$(VER)"'/'
 	sed < djunpack.bat > djunpack.new \
-		-e 's/gdb-[0-9][0-9\.]*/gdb-'"$(VER)"'/'
+		-e 's/gdb-[0-9][0-9\.]*/$(PACKAGE)-'"$(VER)"'/'
 	mv djunpack.new djunpack.bat
 	-rm -f proto-toplev/djunpack.bat
 	ln -s ../djunpack.bat proto-toplev/djunpack.bat
@@ -263,7 +284,12 @@ gdb.tar: $(DIST_SUPPORT) $(GDB_SUPPORT_DIRS) gdb
 DEJAGNU_SUPPORT_DIRS=  tcl expect libiberty
 .PHONY: dejagnu.tar.bz2
 dejagnu.tar.bz2: $(DIST_SUPPORT) $(DEJAGNU_SUPPORT_DIRS) dejagnu
-	$(MAKE) -f $(SELF) taz TOOL=dejagnu \
+	$(MAKE) -f $(SELF) gdb-taz TOOL=dejagnu \
+		MD5PROG="$(MD5PROG)" \
+		SUPPORT_FILES="$(DEJAGNU_SUPPORT_DIRS)"
+.PHONY: dejagnu.tar
+dejagnu.tar: $(DIST_SUPPORT) $(DEJAGNU_SUPPORT_DIRS) dejagnu
+	$(MAKE) -f $(SELF) gdb-tar TOOL=dejagnu \
 		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(DEJAGNU_SUPPORT_DIRS)"
 

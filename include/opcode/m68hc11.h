@@ -1,5 +1,5 @@
 /* m68hc11.h -- Header file for Motorola 68HC11 & 68HC12 opcode table
-   Copyright 1999, 2000, 2002 Free Software Foundation, Inc.
+   Copyright 1999, 2000, 2002, 2003 Free Software Foundation, Inc.
    Written by Stephane Carrez (stcarrez@nerim.fr)
 
 This file is part of GDB, GAS, and the GNU binutils.
@@ -378,7 +378,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  *
 #define M6811_OP_HIGH_ADDR    0x01000000 /* Used internally by gas.  */
 #define M6811_OP_LOW_ADDR     0x02000000
 
-#define M68HC12_BANK_VIRT 0x01000000
+#define M68HC12_BANK_VIRT 0x010000
 #define M68HC12_BANK_MASK 0x00003fff
 #define M68HC12_BANK_BASE 0x00008000
 #define M68HC12_BANK_SHIFT 14
@@ -388,6 +388,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  *
 /* CPU identification.  */
 #define cpu6811 0x01
 #define cpu6812 0x02
+#define cpu6812s 0x04
 
 /* The opcode table is an array of struct m68hc11_opcode.  */
 struct m68hc11_opcode {
@@ -424,4 +425,3 @@ extern const struct m68hc12_opcode_alias m68hc12_alias[];
 extern const int m68hc12_num_alias;
 
 #endif /* _OPCODE_M68HC11_H */
-

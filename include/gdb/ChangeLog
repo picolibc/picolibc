@@ -1,3 +1,49 @@
+2003-10-31  Kevin Buettner  <kevin@redhat.com>
+
+	* sim-frv.h: New file.
+
+2003-10-15  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* callback.h (struct host_callback_struct): New members ftruncate
+	and truncate.
+
+2003-06-10  Corinna Vinschen  <vinschen@redhat.com>
+
+	* gdb/fileio.h: New file.
+
+2003-05-07  Andrew Cagney  <cagney@redhat.com>
+
+	* sim-d10v.h (sim_d10v_translate_addr): Add regcache parameter.
+	(sim_d10v_translate_imap_addr): Add regcache parameter.
+	(sim_d10v_translate_dmap_addr): Ditto.
+
+2003-03-27  Nick Clifton  <nickc@redhat.com>
+
+	* sim-arm.h (sim_arm_regs): Add iWMMXt registers.
+
+2003-03-20  Nick Clifton  <nickc@redhat.com>
+
+	* sim-arm.h (sim_arm_regs): Add Maverick co-processor
+	registers.
+
+2003-02-27  Andrew Cagney  <cagney@redhat.com>
+
+	* remote-sim.h (sim_open, sim_load, sim_create_inferior): Rename
+	_bfd to bfd.
+
+2003-02-20  Andrew Cagney  <ac131313@redhat.com>
+
+	* remote-sim.h (SIM_RC): Delete unused SIM_RC_UNKNOWN_BREAKPOINT,
+	SIM_RC_INSUFFICIENT_RESOURCES and SIM_RC_DUPLICATE_BREAKPOINT.
+	(sim_set_breakpoint, sim_clear_breakpoint): Delete declarations.
+	(sim_clear_all_breakpoints, sim_enable_breakpoint): Ditto.
+	(sim_enable_all_breakpoints, sim_disable_breakpoint): Ditto.
+	(sim_disable_all_breakpoints): Ditto.
+
+2002-12-26  Kazu Hirata  <kazu@cs.umass.edu>
+
+	* sim-h8300.h: Remove ^M.
+
 2002-07-29  Andrey Volkov  <avolkov@transas.com>
 
 	* sim-h8300.h: Rename all enums from H8300_ to SIM_H8300_

@@ -1302,6 +1302,30 @@ static const template i386_optab[] = {
 {"punpckhqdq",2, 0x660f6d,  X, CpuSSE2, FP|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
 {"punpcklqdq",2, 0x660f6c,  X, CpuSSE2, FP|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
 
+/* Prescott New Instructions.  */
+
+{"addsubpd",  2, 0x660fd0,  X, CpuPNI, FP|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
+{"addsubps",  2, 0xf20fd0,  X, CpuPNI, FP|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
+{"fisttp",    1, 0xdf,      1, CpuPNI, sl_FP|FloatMF|Modrm, { ShortMem|LongMem, 0, 0} },
+/* Intel Syntax */
+{"fisttpd",   1, 0xdd,      1, CpuPNI, FP|Modrm,	{ LLongMem, 0, 0} },
+{"fisttpq",   1, 0xdd,      1, CpuPNI, FP|Modrm,	{ LLongMem, 0, 0} },
+{"fisttpll",  1, 0xdd,      1, CpuPNI, FP|Modrm,	{ LLongMem, 0, 0} },
+{"haddpd",    2, 0x660f7c,  X, CpuPNI, FP|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
+{"haddps",    2, 0xf20f7c,  X, CpuPNI, FP|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
+{"hsubpd",    2, 0x660f7d,  X, CpuPNI, FP|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
+{"hsubps",    2, 0xf20f7d,  X, CpuPNI, FP|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
+{"lddqu",     2, 0xf20ff0,  X, CpuPNI, FP|Modrm,	{ LLongMem, RegXMM, 0 } },
+{"monitor",   0, 0x0f01, 0xc8, CpuPNI, FP|ImmExt,	{ 0, 0, 0} },
+/* Need to ensure only "monitor %eax,%ecx,%edx" is accepted. */
+{"monitor",   3, 0x0f01, 0xc8, CpuPNI, FP|ImmExt,	{ Reg32, Reg32, Reg32} },
+{"movddup",   2, 0xf20f12,  X, CpuPNI, FP|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
+{"movshdup",  2, 0xf30f16,  X, CpuPNI, FP|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
+{"movsldup",  2, 0xf30f12,  X, CpuPNI, FP|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
+{"mwait",     0, 0x0f01, 0xc9, CpuPNI, FP|ImmExt,	{ 0, 0, 0} },
+/* Need to ensure only "mwait %eax,%ecx" is accepted.  */
+{"mwait",     2, 0x0f01, 0xc9, CpuPNI, FP|ImmExt,	{ Reg32, Reg32, 0} },
+
 /* AMD 3DNow! instructions.  */
 
 {"prefetch", 1, 0x0f0d,	   0, Cpu3dnow, FP|Modrm,		{ ByteMem, 0, 0 } },

@@ -1,5 +1,5 @@
 /* V850 ELF support for BFD.
-   Copyright 1997, 1998, 2000, 2002 Free Software Foundation, Inc.
+   Copyright 1997, 1998, 2000, 2002, 2003 Free Software Foundation, Inc.
    Created by Michael Meissner, Cygnus Support <meissner@cygnus.com>
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -35,6 +35,9 @@
 /* v850e code.  */
 #define E_V850E_ARCH		0x10000000
 
+/* v850e1 code.  */
+#define E_V850E1_ARCH		0x20000000
+
 
 /* Flags for the st_other field.  */
 #define V850_OTHER_SDA		0x01	/* Symbol had SDA relocations.  */
@@ -53,7 +56,7 @@ START_RELOC_NUMBERS (v850_reloc_type)
      RELOC_NUMBER (R_V850_HI16_S, 3)
      RELOC_NUMBER (R_V850_HI16, 4)
      RELOC_NUMBER (R_V850_LO16, 5)
-     RELOC_NUMBER (R_V850_32, 6)
+     RELOC_NUMBER (R_V850_ABS32, 6)
      RELOC_NUMBER (R_V850_16, 7)
      RELOC_NUMBER (R_V850_8, 8)
      RELOC_NUMBER( R_V850_SDA_16_16_OFFSET, 9)		/* For ld.b, st.b, set1, clr1, not1, tst1, movea, movhi */
@@ -75,6 +78,7 @@ START_RELOC_NUMBERS (v850_reloc_type)
      RELOC_NUMBER (R_V850_LONGCALL, 25)
      RELOC_NUMBER (R_V850_LONGJUMP, 26)
      RELOC_NUMBER (R_V850_ALIGN, 27)
+     RELOC_NUMBER (R_V850_REL32, 28)
 END_RELOC_NUMBERS (R_V850_max)
 
 
@@ -102,5 +106,16 @@ END_RELOC_NUMBERS (R_V850_max)
 
 /* Section contains the .scommon data.  */
 #define SHT_V850_ZCOMMON	0x70000002
+
+/* Processor specific section flags.  */
+
+/* This section must be in the small data area (pointed to by GP).  */
+#define SHF_V850_GPREL		0x10000000
+
+/* This section must be in the tiny data area (pointed to by EP).  */
+#define SHF_V850_EPREL		0x20000000
+
+/* This section must be in the zero data area (pointed to by R0).  */
+#define SHF_V850_R0REL		0x40000000
 
 #endif /* _ELF_V850_H */

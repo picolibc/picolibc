@@ -1,6 +1,6 @@
 /* Internal format of XCOFF object file data structures for BFD.
 
-   Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001
+   Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
    Free Software Foundation, Inc.
    Written by Ian Lance Taylor <ian@cygnus.com>, Cygnus Support.
 
@@ -366,10 +366,10 @@ struct xcoff_link_hash_table
   unsigned long file_align;
 
   /* Whether the .text section must be read-only.  */
-  boolean textro;
+  bfd_boolean textro;
 
   /* Whether garbage collection was done.  */
-  boolean gc;
+  bfd_boolean gc;
 
   /* A linked list of symbols for which we have size information.  */
   struct xcoff_link_size_list
@@ -391,7 +391,7 @@ struct xcoff_link_hash_table
 struct xcoff_loader_info
 {
   /* Set if a problem occurred.  */
-  boolean failed;
+  bfd_boolean failed;
 
   /* Output BFD.  */
   bfd *output_bfd;
@@ -400,7 +400,7 @@ struct xcoff_loader_info
   struct bfd_link_info *info;
 
   /* Whether all defined symbols should be exported.  */
-  boolean export_defineds;
+  bfd_boolean export_defineds;
 
   /* Number of ldsym structures.  */
   size_t ldsym_count;
@@ -424,7 +424,7 @@ struct __rtinit
 {
   /* Pointer to runtime linker.     
      XXX: Is the parameter really void?  */
-  int	(*rtl) PARAMS ((void));	
+  int	(*rtl) (void);	
 
   /* Offset to array of init functions, 0 if none. */
   int	init_offset;
@@ -604,7 +604,7 @@ struct xcoff_ar_hdr_big
 /* We often have to distinguish between the old and big file format.
    Make it a bit cleaner.  We can use `xcoff_ardata' here because the
    `hdr' member has the same size and position in both formats.  
-   <bigaf> is the default format, return true even when xcoff_ardata is 
+   <bigaf> is the default format, return TRUE even when xcoff_ardata is 
    NULL. */
 #ifndef SMALL_ARCHIVE
 /* Creates big archives by default */
