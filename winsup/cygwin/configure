@@ -1900,20 +1900,21 @@ esac
 fi
 
 
+LIBSERVER='$(bupdir)/cygserver/libcygserver.a'
 # Check whether --enable-server or --disable-server was given.
 if test "${enable_server+set}" = set; then
   enableval="$enable_server"
   case "${enableval}" in
-yes)
-	 cat >> confdefs.h <<\EOF
-#define USE_SERVER 1
-EOF
-
-	 LIBSERVER='$(bupdir)/cygserver/libcygserver.a' ;;
-no)	 LIBSERVER=;;
+yes)	;;
+no)	LIBSERVER=;;
 esac
 
 fi
+
+
+test -n "$LIBSERVER" && cat >> confdefs.h <<\EOF
+#define USE_SERVER 1
+EOF
 
 
 MALLOC_OFILES=malloc.o
@@ -1956,10 +1957,6 @@ case "$target_cpu" in
 		DEF_DLL_ENTRY="dll_entry@12"
 		ALLOCA="_alloca"
 		CONFIG_DIR="i386"  ;;
-   powerpc*)	DLL_ENTRY="dll_entry"
-		DEF_DLL_ENTRY="dll_entry"
-		ALLOCA=" __allocate_stack"
-		CONFIG_DIR="ppc"  ;;
    *)		{ echo "configure: error: Invalid target processor \"$target_cpu\"" 1>&2; exit 1; } ;;
 esac
 
