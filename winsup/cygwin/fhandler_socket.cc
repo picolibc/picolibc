@@ -637,6 +637,10 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 	}
       set_winsock_errno ();
     }
+
+  if (get_addr_family () == AF_LOCAL && (!res || in_progress))
+    set_sun_path (name->sa_data);
+
   if (get_addr_family () == AF_LOCAL && get_socket_type () == SOCK_STREAM)
     {
       if (!res || in_progress)
@@ -670,12 +674,12 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
       if (!res || in_progress)
         {
 	  /* eid credential transaction. */
-	  set_sun_path (name->sa_data);
 	  if (wincap.has_named_pipes ())
 	    {
 	      struct ucred in = { getpid (), geteuid32 (), getegid32 () };
 	      struct ucred out = { (pid_t) 0, (__uid32_t) -1, (__gid32_t) -1 };
 	      DWORD bytes = 0;
+	      debug_printf ("Calling CallNamedPipe");
 	      if (CallNamedPipe(eid_pipe_name ((char *) alloca (CYG_MAX_PATH + 1)),
 				&in, sizeof in, &out, sizeof out, &bytes, 1000))
 		{
@@ -745,7 +749,6 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 {
   int res = -1;
   bool secret_check_failed = false;
-  bool in_progress = false;
   struct ucred in = { sec_pid, sec_uid, sec_gid };
   struct ucred out = { (pid_t) 0, (__uid32_t) -1, (__gid32_t) -1 };
 
@@ -769,21 +772,13 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 
   res = ::accept (get_socket (), peer, len);
 
-  if ((SOCKET) res == INVALID_SOCKET && WSAGetLastError () == WSAEWOULDBLOCK)
-    in_progress = true;
-
-  if (get_addr_family () == AF_LOCAL && get_socket_type () == SOCK_STREAM)
+  if ((SOCKET) res != INVALID_SOCKET && get_addr_family () == AF_LOCAL
+      && get_socket_type () == SOCK_STREAM)
     {
-      if ((SOCKET) res != INVALID_SOCKET || in_progress)
-	{
-	  if (!create_secret_event ())
-	    secret_check_failed = true;
-	  else if (in_progress)
-	    signal_secret_event ();
-	}
+	if (!create_secret_event ())
+	  secret_check_failed = true;
 
-      if (!secret_check_failed &&
-	  (SOCKET) res != INVALID_SOCKET)
+      if (!secret_check_failed)
 	{
 	  if (!check_peer_secret_event ((struct sockaddr_in*) peer))
 	    {
@@ -795,40 +790,37 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
       if (secret_check_failed)
 	{
 	  close_secret_event ();
-	  if ((SOCKET) res != INVALID_SOCKET)
-	    closesocket (res);
+	  closesocket (res);
 	  set_errno (ECONNABORTED);
 	  return -1;
 	}
 
-      if ((SOCKET) res != INVALID_SOCKET || in_progress)
-        {
-	  /* eid credential transaction. */
-	  if (wincap.has_named_pipes ())
+      /* eid credential transaction. */
+      if (wincap.has_named_pipes ())
+	{
+	  DWORD bytes = 0;
+	  debug_printf ("Calling ConnectNamedPipe");
+	  bool ret = ConnectNamedPipe (sec_pipe, NULL);
+	  if (ret || GetLastError () == ERROR_PIPE_CONNECTED)
 	    {
-	      DWORD bytes = 0;
-	      bool ret = ConnectNamedPipe (sec_pipe, NULL);
-	      if (ret || GetLastError () == ERROR_PIPE_CONNECTED)
-		{
-		  if (!ReadFile (sec_pipe, &out, sizeof out, &bytes, NULL))
-		    debug_printf ("Receiving eid credentials failed: %E");
-		  else
-		    debug_printf ("Received eid credentials: pid: %d, uid: %d"
-		    		  ", gid: %d", out.pid, out.uid, out.gid);
-		  if (!WriteFile (sec_pipe, &in, sizeof in, &bytes, NULL))
-		    debug_printf ("Sending eid credentials failed: %E");
-		  DisconnectNamedPipe (sec_pipe);
-		}
+	      if (!ReadFile (sec_pipe, &out, sizeof out, &bytes, NULL))
+		debug_printf ("Receiving eid credentials failed: %E");
 	      else
-		debug_printf ("Connecting the eid credential pipe failed: %E");
+		debug_printf ("Received eid credentials: pid: %d, uid: %d"
+			      ", gid: %d", out.pid, out.uid, out.gid);
+	      if (!WriteFile (sec_pipe, &in, sizeof in, &bytes, NULL))
+		debug_printf ("Sending eid credentials failed: %E");
+	      DisconnectNamedPipe (sec_pipe);
 	    }
-	  else /* 9x */
-	    {
-	      /* Incorrect but wrong pid at least doesn't break getpeereid. */
-	      out.pid = sec_pid;
-	      out.uid = sec_uid;
-	      out.gid = sec_gid;
-	    }
+	  else
+	    debug_printf ("Connecting the eid credential pipe failed: %E");
+	}
+      else /* 9x */
+	{
+	  /* Incorrect but wrong pid at least doesn't break getpeereid. */
+	  out.pid = sec_pid;
+	  out.uid = sec_uid;
+	  out.gid = sec_gid;
 	}
     }
 

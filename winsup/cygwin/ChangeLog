@@ -1,3 +1,10 @@
+2005-03-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::connect): Always set sun_path
+	in case of a successful or pending connect.
+	(fhandler_socket::accept): Don't run secret event and eid credential
+	transactions if OS accept returned WSAEWOULDBLOCK.
+
 2005-03-16  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_tape.cc (get_ll): This is a generally useful function so
