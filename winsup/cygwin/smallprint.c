@@ -18,11 +18,17 @@ details. */
 int __small_sprintf (char *dst, const char *fmt, ...);
 int __small_vsprintf (char *dst, const char *fmt, va_list ap);
 
+#define LLMASK	(0xffffffffffffffffULL)
+#define LMASK	(0xffffffff)
+
+#define rnarg(dst, base, dosign, len, pad) __rn ((dst), (base), (dosign), va_arg (ap, unsigned), len, pad, LMASK)
+#define rnargLL(dst, base, dosign, len, pad) __rn ((dst), (base), (dosign), va_arg (ap, unsigned long long), len, pad, LLMASK)
+
 static char *
-rn (char *dst, int base, int dosign, long long val, int len, int pad)
+__rn (char *dst, int base, int dosign, long long val, int len, int pad, unsigned long long mask)
 {
   /* longest number is ULLONG_MAX, 18446744073709551615, 20 digits */
-  unsigned long long uval;
+  unsigned long long uval = 0;
   char res[20];
   static const char str[16] = "0123456789ABCDEF";
   int l = 0;
@@ -38,9 +44,9 @@ rn (char *dst, int base, int dosign, long long val, int len, int pad)
       uval = val;
     }
   else
-    {
-      uval = val;
-    }
+    uval = val;
+
+  uval &= mask;
 
   do
     {
@@ -115,38 +121,38 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		      {
 			*dst++ = '0';
 			*dst++ = 'x';
-			dst = rn (dst, 16, 0, c, len, pad);
+			dst = __rn (dst, 16, 0, c, len, pad, LMASK);
 		      }
 		  }
 		  break;
 		case 'E':
 		  strcpy (dst, "Win32 error ");
-		  dst = rn (dst + sizeof ("Win32 error"), 10, 0, GetLastError (), len, pad);
+		  dst = __rn (dst + sizeof ("Win32 error"), 10, 0, GetLastError (), len, pad, LMASK);
 		  break;
 		case 'd':
-		  dst = rn (dst, 10, addsign, va_arg (ap, int), len, pad);
+		  dst = rnarg (dst, 10, addsign, len, pad);
 		  break;
 		case 'D':
-		  dst = rn (dst, 10, addsign, va_arg (ap, long long), len, pad);
+		  dst = rnargLL (dst, 10, addsign, len, pad);
 		  break;
 		case 'u':
-		  dst = rn (dst, 10, 0, va_arg (ap, int), len, pad);
+		  dst = rnarg (dst, 10, 0, len, pad);
 		  break;
 		case 'U':
-		  dst = rn (dst, 10, 0, va_arg (ap, long long), len, pad);
+		  dst = rnargLL (dst, 10, 0, len, pad);
 		  break;
 		case 'o':
-		  dst = rn (dst, 8, 0, va_arg (ap, unsigned), len, pad);
+		  dst = rnarg (dst, 8, 0, len, pad);
 		  break;
 		case 'p':
 		  *dst++ = '0';
 		  *dst++ = 'x';
 		  /* fall through */
 		case 'x':
-		  dst = rn (dst, 16, 0, va_arg (ap, int), len, pad);
+		  dst = rnarg (dst, 16, 0, len, pad);
 		  break;
 		case 'X':
-		  dst = rn (dst, 16, 0, va_arg (ap, long long), len, pad);
+		  dst = rnargLL (dst, 16, 0, len, pad);
 		  break;
 		case 'P':
 		  if (!GetModuleFileName (NULL, tmp, CYG_MAX_PATH))

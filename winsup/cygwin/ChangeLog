@@ -1,5 +1,13 @@
 2005-01-31  Christopher Faylor  <cgf@timesys.com>
 
+	* smallprint.c (rnarg): New macro.
+	(rnargLL): Ditto.
+	(__rn): Rename from 'rn', add a mask argument, and use the mask
+	argument to control how many significant digits to care about.
+	(__small_vsprintf): Use __rn, rnarg, rnargLL, as appropriate.
+
+2005-01-31  Christopher Faylor  <cgf@timesys.com>
+
 	* pinfo.cc (pinfo::exit): Only return low-order 16 bits when exiting.
 
 2005-01-31  Corinna Vinschen  <corinna@vinschen.de>
