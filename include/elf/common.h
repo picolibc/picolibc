@@ -485,7 +485,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define DF_P1_LAZYLOAD	0x00000001
 #define DF_P1_GROUPPERM	0x00000002
 
-/* Flag value in in the DT_1_FLAGS .dynamic entry.  */
+/* Flag value in in the DT_FLAGS_1 .dynamic entry.  */
 #define DF_1_NOW	0x00000001
 #define DF_1_GLOBAL	0x00000002
 #define DF_1_GROUP	0x00000004

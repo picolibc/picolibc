@@ -1,3 +1,7 @@
+2000-07-18  H.J. Lu  <hjl@gnu.org>
+
+	* common.h (DT_FLAGS_1): Renamed from DT_1_FLAGS.
+
 2000-07-12  Alan Modra  <alan@linuxcare.com.au>
 
 	* internal.h (struct elf_internal_sym): Update comment for st_other.
