@@ -1,3 +1,11 @@
+2004-12-02  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* cygserver.sgml: Cleanup minor markup problem.
+	* how-resources.texinfo: Add man and info to documentation FAQ. 
+	* how-using.texinfo: Add more detail to Unicode FAQ.
+	* install.texinfo: Finally apply Pierre's patch from 2003-03-03.
+	* relnotes.texinfo: Add note about hyperthreading reports. 
+
 2004-09-30  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* how-using.texinfo: Fix typo. Add note about "Install For All Users"

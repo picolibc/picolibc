@@ -2,6 +2,14 @@
 
 @section Aware of the problem, no solution known.
 
+@subsection Hangs with Hyperthreaded Processor
+
+Some users using processors with Intel's Hyperthreading turned on have
+reported hangs that do not appear with Hyperthreading off. So far
+the Cygwin developers have not been able to reproduce this problem.
+See @file{http://www.cygwin.com/ml/cygwin/2004-07/msg01100.html} and
+related messages for details.
+
 @subsection Pipe key (@samp{|}) doesn't work on non-US keyboards in Win9x/ME
 
 This might get fixed someday, but meanwhile, just use rxvt, which does
@@ -16,9 +24,4 @@ class.  Details at
 @file{http://sources.redhat.com/ml/cygwin/2000-12/msg00331.html}.
 
 @subsection On Win9x, scp leaves ssh processes running.
-
-@section Fixed in the Next Release
-
-(Nothing to report.)
-
 

@@ -48,9 +48,10 @@
     The --help and --version options will print the default configuration
     pathname.
   </para>
-<para>
+  <para>
     This option has no counterpart in the configuration file, for obvious
    reasons.
+  </para>
 <listitem>
   <screen>-c, --cleanup-threads &lt;num&gt;</screen>
   <para>  

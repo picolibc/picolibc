@@ -199,14 +199,49 @@ character as a word delimiter.  Under certain circumstances, it is
 possible to get around this with various shell quoting mechanisms, but
 you are much better off if you can avoid the problem entirely.
 
-In particular, the environment variables @samp{USER} and @samp{HOME} are
-set for you in /etc/profile.  By default these derive from your Windows
-logon name.  You may edit this file and set them explicitly to something
-without spaces.
+On Windows NT/2000/XP you have two choices:
+@enumerate
 
-(If you use the @samp{login} package or anything else that reads
-/etc/passwd, you may need to make corresponding changes there.  See the
-README file for that package.)
+@item You can rename the user in the Windows User Manager GUI and then
+run mkpasswd.
+
+@item You can simply edit the /etc/passwd file and change the Cygwin user name 
+(first field). It's also a good idea to avoid spaces in the home directory.
+
+@end enumerate
+
+On Windows 95/98/ME you can create a new user and run mkpasswd, 
+or you can delete the offending entry from /etc/passwd. 
+Cygwin will then use the name in the default entry with uid 500.
+
+@subsection My @samp{HOME} environment variable is not what I want.
+
+When starting Cygwin from Windows, @samp{HOME} is determined as follows
+in order of decreasing priority:
+
+@enumerate
+
+@item @samp{HOME} from the Windows environment, translated to POSIX form.
+
+@item The entry in /etc/passwd
+
+@item @samp{HOMEDRIVE} and @samp{HOMEPATH} from the Windows environment
+
+@item /
+
+@end enumerate
+
+When using Cygwin from the network (telnet, ssh,...), @samp{HOME} is set 
+from /etc/passwd.
+
+If your @samp{HOME} is set to a value such as /cygdrive/c, it is likely 
+that it was set in Windows. Start a DOS Command Window and type 
+"set HOME" to verify if this is the case.
+
+Access to shared drives is often restricted when starting from the network,
+thus Domain users may wish to have a different @samp{HOME} in the 
+Windows environment (on shared drive) than in /etc/passwd (on local drive).
+Note that ssh only considers /etc/passwd, disregarding @samp{HOME}. 
 
 @subsection How do I uninstall individual packages?
 

@@ -337,26 +337,36 @@ Finally, you can simply @samp{cat} the file to the printer's share name:
 You may need to press the formfeed button on your printer or append the
 formfeed character to your file.
 
-@subsection Why don't international (8-bit) characters work?
+@subsection Why don't international (Unicode) characters work?
 
-Before you can type international characters (Једц) in bash, you must
-add the following lines to your @code{~/.inputrc} file:
+Internationalization is a complex issue. The short answer is that
+Cygwin is not Unicode-aware, so things that might work in Linux will
+not necessarily work on Cygwin. However, some things do work. To type
+international characters (Једц) in @code{bash}, add the following
+lines to your @code{~/.inputrc} file and restart @code{bash}:
 
 @example
 	set meta-flag on 
         set convert-meta off 
         set output-meta on 
+	set input-meta on
+	set kanji-code sjis
+	set meta-flag on
 @end example
 
 These are options to the @code{readline} library, which you can read
 about in the @code{bash(1)} and @code{readline(3)} man pages. Other
-tools that do not use @code{readline} for display, such as
-less and ls, require additional settings, which could be put in your
+tools that do not use @code{readline} for display, such as @code{less}
+and @code{ls}, require additional settings, which could be put in your
 @code{~/.bashrc}:
 @example
 alias less='/bin/less -r'
 alias ls='/bin/ls -F --color=tty --show-control-chars'
+export LANG="ja_JP.SJIS"
+export OUTPUT_CHARSET="sjis"
 @end example
+These examples use the Japanese Shift-JIS character set, obviously
+you will want to change them for your own locale. 
 
 
 @subsection Why don't cursor keys work under Win95/Win98?

@@ -4,16 +4,18 @@
 
 If you have installed Cygwin, you can find lots of documentation in
 @samp{/usr/share/doc/}.  Many packages ship with standard documentation,
-you can find this in a directory @samp{/usr/share/doc/@emph{package_name}}.  
+which you can find in @samp{/usr/share/doc/@emph{package_name}} or by
+using the @code{man} or @code{info} tools. (Hint: use @code{cygcheck
+-l @emph{package_name}} to list what man pages the package includes.)
 In addition, some packages have Cygwin specific instructions in a file
 @samp{/usr/share/doc/Cygwin/@emph{package_name}.README}.  Some older
 packages still keep their documentation in @samp{/usr/doc/} instead of
 @samp{/usr/share/doc/}.
 
-There are links to quite a lot of it on the main Cygwin project web
-page: @file{http://cygwin.com/}.  Be sure to at least
-read any 'Release Notes' or 'Readme' or 'read this' links on the main
-web page, if there are any.
+There are links to quite a lot of documentation on the main Cygwin
+project web page, @file{http://cygwin.com/}, including this FAQ.  Be
+sure to at least read any 'Release Notes' or 'Readme' or 'read this'
+links on the main web page, if there are any.
 
 There is a comprehensive Cygwin User's Guide at
 @file{http://cygwin.com/cygwin-ug-net/cygwin-ug-net.html}
