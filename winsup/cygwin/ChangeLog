@@ -1,3 +1,9 @@
+Sun May 20 13:26:25 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler_dsp.cc: Reformat to GNU standards.
+	(s_audio): Change to a pointer throughout.
+	(fhandler_dev_dsp::open): Initialize s_audio, if required.
+
 Sat May 19 23:40:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* autoload.cc: Add load statements for `LookupAccountNameW',
