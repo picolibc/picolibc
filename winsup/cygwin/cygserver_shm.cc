@@ -1,8 +1,9 @@
-/* cygserver_shm.cc: Single unix specification IPC interface for Cygwin
+/* cygserver_shm.cc: Single unix specification IPC interface for Cygwin.
 
-   Copyright 2001, 2002 Red Hat, Inc.
+   Copyright 2002 Red Hat, Inc.
 
-   Originally written by Robert Collins <robert.collins@hotmail.com>
+   Written by Conrad Scott <conrad.scott@dsl.pipex.com>.
+   Based on code by Robert Collins <robert.collins@hotmail.com>.
 
 This file is part of Cygwin.
 
@@ -12,13 +13,13 @@ details. */
 
 #include "woutsup.h"
 
-#include <assert.h>
 #include <errno.h>
+#include <pthread.h>
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
-#include <unistd.h>
 
-#include "cygerrno.h"
+#include "cygserver_ipc.h"
 #include "cygserver_shm.h"
 #include "security.h"
 
@@ -26,581 +27,550 @@ details. */
 #include "cygwin/cygserver_process.h"
 #include "cygwin/cygserver_transport.h"
 
-// FIXME IS THIS CORRECT
-/* Implementation notes: We use two shared memory regions per key:
- * One for the control structure, and one for the shared memory.
- * While this has a higher overhead tham a single shared area,
- * It allows more flexability. As the entire code is transparent to the user
- * We can merge these in the future should it be needed.
- * Also, IPC_PRIVATE keys create unique mappings each time. The shm_ids just
- * keep monotonically incrementing - system wide.
- */
-size_t
-getsystemallocgranularity ()
+/*---------------------------------------------------------------------------*
+ * with_strerr ()
+ *---------------------------------------------------------------------------*/
+
+#define with_strerr(MSG, ACTION)					\
+  do									\
+    {									\
+      const DWORD lasterr = GetLastError ();				\
+      char *MSG = NULL;							\
+      if (!FormatMessage ((FORMAT_MESSAGE_ALLOCATE_BUFFER		\
+			   | FORMAT_MESSAGE_FROM_SYSTEM			\
+			   | FORMAT_MESSAGE_IGNORE_INSERTS),		\
+			  NULL,						\
+			  lasterr,					\
+			  MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),	\
+			  reinterpret_cast<char *>(&MSG),		\
+			  0,						\
+			  NULL))					\
+	{								\
+	  MSG = static_cast<char *>					\
+	    (LocalAlloc (LMEM_FIXED, 24)); /* Big enough. */		\
+	  if (!MSG)							\
+	    {								\
+	      system_printf (("failure in LocalAlloc(LMEM_FIXED, 16): "	\
+			      "error = %lu"),				\
+			     GetLastError ());				\
+	    }								\
+	  else								\
+	    {								\
+	      snprintf (MSG, 24, "error = %lu", lasterr);		\
+	    }								\
+	}								\
+      SetLastError (lasterr);						\
+      { ACTION; }							\
+      if (MSG && !LocalFree (MSG))					\
+	{								\
+	  system_printf ("failed to free memory at %p, error = %lu",	\
+			 MSG, GetLastError ());				\
+	}								\
+      SetLastError (lasterr);						\
+    } while (false)
+
+/*---------------------------------------------------------------------------*
+ * class server_shmmgr
+ *
+ * A singleton class.
+ *---------------------------------------------------------------------------*/
+
+#define shmmgr (server_shmmgr::instance ())
+
+class server_shmmgr
 {
-  SYSTEM_INFO sysinfo;
-  static size_t buffer_offset = 0;
-  if (buffer_offset)
-    return buffer_offset;
-  GetSystemInfo (&sysinfo);
-  buffer_offset = sysinfo.dwAllocationGranularity;
-  return buffer_offset;
+private:
+  class segment_t
+  {
+  public:
+    // Bits for the _flg field.
+    enum { REMOVED = 0x01 };
+
+    const key_t key;
+    const int shmid;
+    struct shmid_ds ds;
+    int flg;
+    const HANDLE hFileMap;
+
+    segment_t *next;
+
+    segment_t (const key_t key, const int shmid, const HANDLE hFileMap)
+      : key (key), shmid (shmid), flg (0), hFileMap (hFileMap), next (NULL)
+    {
+      bzero (&ds, sizeof (ds));
+    }
+  };
+
+public:
+  static server_shmmgr & instance ();
+
+  int shmat (int shmid, int shmflg,
+	     pid_t, HANDLE & hFileMap,
+	     process_cache *, DWORD winpid);
+  int shmctl (int shmid, int cmd, struct shmid_ds &, pid_t);
+  int shmdt (int shmid, pid_t);
+  int shmget (key_t, size_t, int shmflg, pid_t, uid_t, gid_t);
+
+private:
+  CRITICAL_SECTION _segments_lock;
+  segment_t *_segments_head;	// A list sorted by shmid.
+
+  int _shmid_cnt;		// Number of shmid's allocated (for ipcs(8)).
+  int _shmid_max;		// Highest shmid yet allocated (for ipcs(8)).
+
+  server_shmmgr ();
+  ~server_shmmgr ();
+
+  // Undefined (as this class is a singleton):
+  server_shmmgr (const server_shmmgr &);
+  server_shmmgr & operator= (const server_shmmgr &);
+
+  segment_t *find_by_key (key_t);
+  segment_t *find (int shmid, segment_t **previous = NULL);
+
+  int new_segment (key_t, size_t, int shmflg, pid_t, uid_t, gid_t);
+
+  segment_t *new_segment (key_t, HANDLE);
+  void delete_segment (segment_t *);
+};
+
+/*---------------------------------------------------------------------------*
+ * server_shmmgr::instance ()
+ *---------------------------------------------------------------------------*/
+
+server_shmmgr &
+server_shmmgr::instance ()
+{
+  static server_shmmgr instance;
+
+  return instance;
 }
 
+/*---------------------------------------------------------------------------*
+ * server_shmmgr::shmat ()
+ *---------------------------------------------------------------------------*/
+
+int
+server_shmmgr::shmat (const int shmid, const int shmflg,
+		      const pid_t pid, HANDLE & hFileMap,
+		      process_cache *const cache, const DWORD winpid)
+{
+  process *const client = cache->process (winpid);
+
+  if (!client)
+    {
+      return -EAGAIN;
+    }
+
+  int result;
+  EnterCriticalSection (&_segments_lock);
+
+  segment_t *const segptr = find (shmid);
+
+  if (!segptr)
+    result = -EINVAL;
+  else if (!DuplicateHandle (GetCurrentProcess (),
+			     segptr->hFileMap,
+			     client->handle (),
+			     &hFileMap,
+			     0,
+			     FALSE, // bInheritHandle
+			     DUPLICATE_SAME_ACCESS))
+    {
+      with_strerr (msg,
+		   syscall_printf (("failed to duplicate handle for client "
+				    "[key = %lld, shmid = %d, handle = %p]:"
+				    "%s"),
+				   segptr->key, segptr->shmid,
+				   segptr->hFileMap, msg));
+
+      result = -EACCES;		// FIXME
+    }
+  else
+    {
+      segptr->ds.shm_lpid  = pid;
+      segptr->ds.shm_nattch += 1;
+      segptr->ds.shm_atime = time (NULL); // FIXME: sub-second times.
+
+      result = 0;
+    }
+
+  LeaveCriticalSection (&_segments_lock);
+
+  client->release ();
+  return result;
+}
+
+/*---------------------------------------------------------------------------*
+ * server_shmmgr::shmctl ()
+ *---------------------------------------------------------------------------*/
+
+int
+server_shmmgr::shmctl (const int shmid, const int cmd, struct shmid_ds & ds,
+		       const pid_t pid)
+{
+  int result;
+  EnterCriticalSection (&_segments_lock);
+
+  segment_t *const segptr = find (shmid);
+
+  if (!segptr)
+    result = -EINVAL;
+  else
+    {
+      switch (cmd)
+	{
+	case IPC_STAT:
+	  ds = segptr->ds;
+	  result = 0;
+	  break;
+
+	case IPC_SET:
+	  segptr->ds.shm_perm.uid = ds.shm_perm.uid;
+	  segptr->ds.shm_perm.gid = ds.shm_perm.gid;
+	  segptr->ds.shm_perm.mode = ds.shm_perm.mode & 0777;
+	  segptr->ds.shm_lpid = pid;
+	  segptr->ds.shm_ctime = time (NULL); // FIXME: sub-second times.
+	  result = 0;
+	  break;
+
+	case IPC_RMID:
+	  if (segptr->flg & segment_t::REMOVED)
+	    result = -EIDRM;
+	  else
+	    {
+	      segptr->flg |= segment_t::REMOVED;
+	      if (!segptr->ds.shm_nattch)
+		delete_segment (segptr);
+	      result = 0;
+	    }
+	  break;
+
+	case IPC_INFO:
+	  result = -EINVAL;
+	  break;
+
+	case SHM_STAT:
+	  result = -EINVAL;
+	  break;
+
+	default:
+	  result = -EINVAL;
+	  break;
+	}
+    }
+
+  LeaveCriticalSection (&_segments_lock);
+  return result;
+}
+
+/*---------------------------------------------------------------------------*
+ * server_shmmgr::shmdt ()
+ *---------------------------------------------------------------------------*/
+
+int
+server_shmmgr::shmdt (const int shmid, const pid_t pid)
+{
+  int result;
+  EnterCriticalSection (&_segments_lock);
+
+  segment_t *const segptr = find (shmid);
+
+  if (!segptr)
+    result = -EINVAL;
+  else
+    {
+      assert (segptr->ds.shm_nattch > 0);
+
+      segptr->ds.shm_lpid  = pid;
+      segptr->ds.shm_nattch -= 1;
+      segptr->ds.shm_dtime = time (NULL); // FIXME: sub-second times.
+
+      if (!segptr->ds.shm_nattch && (segptr->flg & segment_t::REMOVED))
+	delete_segment (segptr);
+
+      result = 0;
+    }
+
+  LeaveCriticalSection (&_segments_lock);
+  return result;
+}
+
+/*---------------------------------------------------------------------------*
+ * server_shmmgr::shmget ()
+ *---------------------------------------------------------------------------*/
+
+int
+server_shmmgr::shmget (const key_t key, const size_t size, const int shmflg,
+		       const pid_t pid, const uid_t uid, const gid_t gid)
+{
+  int result;
+  EnterCriticalSection (&_segments_lock);
+
+  /* Does a segment already exist with that key? */
+  if (key == IPC_PRIVATE)
+    result = new_segment (key, size, shmflg, pid, uid, gid);
+  else
+    {
+      segment_t *const segptr = find_by_key (key);
+
+      if (!segptr)
+	if (shmflg & IPC_CREAT)
+	  result = new_segment (key, size, shmflg, pid, uid, gid);
+	else
+	  result = -ENOENT;
+      else if (segptr->flg & segment_t::REMOVED)
+	result = -EIDRM;
+      else if ((shmflg & IPC_CREAT) && (shmflg & IPC_EXCL))
+	result = -EEXIST;
+      else if (size && segptr->ds.shm_segsz < size)
+	result = -EINVAL;
+      else
+	result = segptr->shmid;
+    }
+
+  LeaveCriticalSection (&_segments_lock);
+  return result;
+}
+
+/*---------------------------------------------------------------------------*
+ * server_shmmgr::server_shmmgr ()
+ *---------------------------------------------------------------------------*/
+
+server_shmmgr::server_shmmgr ()
+  : _segments_head (NULL)
+{
+  InitializeCriticalSection (&_segments_lock);
+}
+
+/*---------------------------------------------------------------------------*
+ * server_shmmgr::~server_shmmgr ()
+ *---------------------------------------------------------------------------*/
+
+server_shmmgr::~server_shmmgr ()
+{
+  DeleteCriticalSection (&_segments_lock);
+}
+
+/*---------------------------------------------------------------------------*
+ * server_shmmgr::find_by_key ()
+ *---------------------------------------------------------------------------*/
+
+server_shmmgr::segment_t *
+server_shmmgr::find_by_key (const key_t key)
+{
+  for (segment_t *segptr = _segments_head; segptr; segptr = segptr->next)
+    if (segptr->key == key)
+      return segptr;
+
+  return NULL;
+}
+
+/*---------------------------------------------------------------------------*
+ * server_shmmgr::find ()
+ *---------------------------------------------------------------------------*/
+
+server_shmmgr::segment_t *
+server_shmmgr::find (const int shmid, segment_t **previous)
+{
+  if (previous)
+    *previous = NULL;
+
+  for (segment_t *segptr = _segments_head; segptr; segptr = segptr->next)
+    if (segptr->shmid == shmid)
+      return segptr;
+    else if (segptr->shmid > shmid) // The list is sorted by shmid.
+      return NULL;
+    else if (previous)
+      *previous = segptr;
+
+  return NULL;
+}
+
+/*---------------------------------------------------------------------------*
+ * server_shmmgr::new_segment ()
+ *---------------------------------------------------------------------------*/
+
+int
+server_shmmgr::new_segment (const key_t key,
+			    const size_t size,
+			    const int shmflg,
+			    const pid_t pid,
+			    const uid_t uid,
+			    const gid_t gid)
+{
+  const HANDLE hFileMap = CreateFileMapping (INVALID_HANDLE_VALUE,
+					     NULL, PAGE_READWRITE,
+					     0, size,
+					     NULL);
+
+  if (!hFileMap)
+    {
+      with_strerr (msg,
+		   syscall_printf (("failed to create file mapping "
+				    "[size = %lu]: %s"),
+				   size, msg));
+
+      return -EINVAL;		// FIXME
+    }
+
+  segment_t *const segptr = new_segment (key, hFileMap);
+
+  segptr->ds.shm_perm.cuid = segptr->ds.shm_perm.uid = uid;
+  segptr->ds.shm_perm.cgid = segptr->ds.shm_perm.gid = gid;
+  segptr->ds.shm_perm.mode = shmflg & 0777;
+  segptr->ds.shm_segsz = size;
+  segptr->ds.shm_cpid = pid;
+  segptr->ds.shm_ctime = time (NULL); // FIXME: sub-second times.
+
+  return segptr->shmid;
+}
+
+/*---------------------------------------------------------------------------*
+ * server_shmmgr::new_segment ()
+ *
+ * Allocate a new segment for the given key and file map with the
+ * lowest available shmid and insert into the segment map.
+ *---------------------------------------------------------------------------*/
+
+server_shmmgr::segment_t *
+server_shmmgr::new_segment (const key_t key, const HANDLE hFileMap)
+{
+  int shmid = ipc_int2ext (0, IPC_SHMOP); // Next expected shmid value.
+  segment_t *previous = NULL;	// Insert pointer.
+
+  // Find first unallocated shmid.
+  for ( segment_t *segptr = _segments_head;
+	segptr && segptr->shmid == shmid;
+	segptr = segptr->next, shmid = ipc_inc_id (shmid, IPC_SHMOP))
+    {
+      previous = segptr;
+    }
+
+  segment_t *const segptr = new segment_t (key, shmid, hFileMap);
+
+  assert (segptr);
+
+  if (previous)
+    {
+      segptr->next = previous->next;
+      previous->next = segptr;
+    }
+  else
+    {
+      segptr->next = _segments_head;
+      _segments_head = segptr;
+    }
+
+  _shmid_cnt += 1;
+  if (shmid > _shmid_max)
+    _shmid_max = shmid;
+
+  return segptr;
+}
+
+/*---------------------------------------------------------------------------*
+ * server_shmmgr::delete_segment ()
+ *---------------------------------------------------------------------------*/
+
+void
+server_shmmgr::delete_segment (segment_t *const segptr)
+{
+  assert (segptr);
+  assert (!segptr->ds.shm_nattch);
+  assert (segptr->flg & segment_t::REMOVED);
+
+  segment_t *previous = NULL;
+
+  const segment_t *const tmp = find (segptr->shmid, &previous);
+
+  assert (tmp == segptr);
+  assert (previous ? previous->next == segptr : _segments_head == segptr);
+
+  if (previous)
+    previous->next = segptr->next;
+  else
+    _segments_head = segptr->next;
+
+  if (!CloseHandle (segptr->hFileMap))
+    with_strerr (msg,
+		 syscall_printf (("failed to close file map "
+				  "[handle = %p]: %s"),
+				 segptr->hFileMap, msg));
+
+  assert (_shmid_cnt > 0);
+  _shmid_cnt -= 1;
+
+  delete segptr;
+}
+
+/*---------------------------------------------------------------------------*
+ * client_request_shm::client_request_shm ()
+ *---------------------------------------------------------------------------*/
+
 client_request_shm::client_request_shm ()
-  : client_request (CYGSERVER_REQUEST_SHM, &parameters, sizeof (parameters))
+  : client_request (CYGSERVER_REQUEST_SHM,
+		    &_parameters, sizeof (_parameters))
 {
   syscall_printf ("created");
 }
 
-/* FIXME: evaluate getuid() and getgid() against the requested mode. Then
- * choose PAGE_READWRITE | PAGE_READONLY and FILE_MAP_WRITE  |  FILE_MAP_READ
- * appropriately
- */
-
-/* Test result from openbsd: shm ids are persistent cross process if a handle is left
- * open. This could lead to resource starvation: we're not copying that behaviour
- * unless we have to. (It will involve acygwin1.dll gloal shared list :[ ).
- */
-/* FIXME: shmid should be a verifyable object
- */
-
-/* FIXME: on NT we should check everything against the SD. On 95 we just emulate.
- */
-
-extern GENERIC_MAPPING
-  access_mapping;
-
-extern int
-check_and_dup_handle (HANDLE from_process, HANDLE to_process,
-		      HANDLE from_process_token,
-		      DWORD access,
-		      HANDLE from_handle,
-		      HANDLE * to_handle_ptr, BOOL bInheritHandle);
-
-//FIXME: where should this live
-static shmnode *
-  shm_head =
-  NULL;
-//FIXME: ditto.
-static shmnode *
-  deleted_head = NULL;
-/* must be long for InterlockedIncrement */
-static long
-  new_id =
-  0;
-static long
-  new_private_key =
-  0;
-
-static void
-delete_shmnode (shmnode **nodeptr)
-{
-  shmnode *node = *nodeptr;
-
-  // remove from the list
-  if (node == shm_head)
-    shm_head = shm_head->next;
-  else
-    {
-      shmnode *tempnode = shm_head;
-      while (tempnode && tempnode->next != node)
-	tempnode = tempnode->next;
-      if (tempnode)
-	tempnode->next = node->next;
-      // else log the unexpected !
-    }
-
-    // release the shared data view
-    UnmapViewOfFile (node->shmds->mapptr);
-    delete node->shmds;
-    CloseHandle (node->filemap);
-    CloseHandle (node->attachmap);
-
-    // free the memory
-    delete node;
-    nodeptr = NULL;
-}
+/*---------------------------------------------------------------------------*
+ * client_request_shm::serve ()
+ *---------------------------------------------------------------------------*/
 
 void
-client_request_shm::serve (transport_layer_base * const conn,
-			   process_cache * const cache)
+client_request_shm::serve (transport_layer_base *const conn,
+			   process_cache *const cache)
 {
   assert (conn);
-  assert (cache);
 
   assert (!error_code ());
 
-  // The minimum possible request length.  SHM_CREATE requests should
-  // be longer than this.
-  const size_t min_req_msglen =
-    (sizeof (parameters.in) - sizeof (parameters.in.sd_buf));
-
-  if (msglen () < min_req_msglen)
+  if (msglen () != sizeof (_parameters))
     {
-      syscall_printf (("bad request body length: " 
-		       "expecting at least %lu bytes, got %lu"),
-		      min_req_msglen, msglen ());
+      syscall_printf ("bad request body length: expecting %lu bytes, got %lu",
+		      sizeof (_parameters), msglen ());
       error_code (EINVAL);
       msglen (0);
       return;
     }
 
-  // FIXME: check length of sd_buf contents for SHM_CREATE?
+  // FIXME: Get a return code out of this and don't continue on error.
+  conn->impersonate_client ();
 
-  msglen (sizeof (parameters.out));
+  int result = -EINVAL;
 
-  HANDLE from_process_handle = NULL;
-  HANDLE token_handle = NULL;
-  DWORD rc;
-
-  class process *const process = cache->process (parameters.in.winpid);
-  assert (process);
-  from_process_handle = process->handle ();
-  process->release ();
-
-  /* possible TODO: reduce the access on the handle before we use it */
-  /* Note that unless we do this, we don't need to call CloseHandle - it's kept open
-   * by the process cache until the process terminates.
-   * We may need a refcount on the cache however...
-   */
-  if (!from_process_handle)
+  switch (_parameters.in.shmop)
     {
-      system_printf ("error opening process (%lu)", GetLastError ());
-      error_code (EACCES);
-      return;
+    case SHMOP_shmget:
+      result = shmmgr.shmget (_parameters.in.key, _parameters.in.size,
+			      _parameters.in.shmflg, _parameters.in.cygpid,
+			      _parameters.in.uid, _parameters.in.gid);
+      _parameters.shmid = result;
+      break;
+
+    case SHMOP_shmat:
+      result = shmmgr.shmat (_parameters.shmid, _parameters.in.shmflg,
+			     _parameters.in.cygpid, _parameters.out.hFileMap,
+			     cache, _parameters.in.winpid);
+      break;
+
+    case SHMOP_shmdt:
+      result = shmmgr.shmdt (_parameters.shmid, _parameters.in.cygpid);
+      break;
+
+    case SHMOP_shmctl:
+      result = shmmgr.shmctl (_parameters.shmid, _parameters.in.cmd,
+			      _parameters.ds, _parameters.in.cygpid);
+      break;
     }
 
-  if (wincap.has_security ())
+  conn->revert_to_self ();
+
+  if (result < 0)
     {
-      conn->impersonate_client ();
-
-      rc = OpenThreadToken (GetCurrentThread (),
-			    TOKEN_QUERY, TRUE, &token_handle);
-
-      conn->revert_to_self ();
-
-      if (!rc)
-	{
-	  system_printf ("error opening thread token (%lu)", GetLastError ());
-	  error_code (EACCES);
-	  CloseHandle (from_process_handle);
-	  return;
-	}
+      error_code (-result);
+      msglen (0);
     }
-
-  char *shmname = NULL, *shmaname = NULL;
-  char stringbuf[29], stringbuf1[29];
-
-  /* TODO: make this code block a function! */
-  if (parameters.in.type == SHM_REATTACH)
-    {
-      /* just find and fill out the existing shm_id */
-      shmnode *tempnode = shm_head;
-      while (tempnode)
-	{
-	  if (tempnode->shm_id == parameters.in.shm_id)
-	    {
-	      parameters.out.shm_id = tempnode->shm_id;
-	      parameters.out.key = tempnode->key;
-	      if (check_and_dup_handle
-		  (GetCurrentProcess (), from_process_handle, token_handle,
-		   DUPLICATE_SAME_ACCESS, tempnode->filemap,
-		   &parameters.out.filemap, TRUE) != 0)
-		{
-		  system_printf ("error duplicating filemap handle (%lu)",
-				 GetLastError ());
-		  error_code (EACCES);
-		}
-	      if (check_and_dup_handle
-		  (GetCurrentProcess (), from_process_handle, token_handle,
-		   DUPLICATE_SAME_ACCESS, tempnode->attachmap,
-		   &parameters.out.attachmap, TRUE) != 0)
-		{
-		  system_printf ("error duplicating attachmap handle (%lu)",
-				 GetLastError ());
-		  error_code (EACCES);
-		}
-	      CloseHandle (token_handle);
-	      return;
-	    }
-	  tempnode = tempnode->next;
-	}
-      error_code (EINVAL);
-      CloseHandle (token_handle);
-      return;
-    }
-
-  /* someone attached */
-  /* someone can send shm_id's they don't have and currently we will increment those
-   * attach counts. If someone wants to fix that, please go ahead.
-   * The problem is that shm_get has nothing to do with the ability to attach. Attach
-   * requires a permission check, which we get the OS to do in MapViewOfFile.
-   */
-  if (parameters.in.type == SHM_ATTACH)
-    {
-      shmnode *tempnode = shm_head;
-      while (tempnode)
-	{
-	  if (tempnode->shm_id == parameters.in.shm_id)
-	    {
-	      InterlockedIncrement (&tempnode->shmds->ds.shm_nattch);
-	      CloseHandle (token_handle);
-	      return;
-	    }
-	  tempnode = tempnode->next;
-	}
-      error_code (EINVAL);
-      CloseHandle (token_handle);
-      return;
-    }
-
-  /* Someone detached */
-  if (parameters.in.type == SHM_DETACH)
-    {
-      shmnode *tempnode = shm_head;
-      while (tempnode)
-	{
-	  if (tempnode->shm_id == parameters.in.shm_id)
-	    {
-	      InterlockedDecrement (&tempnode->shmds->ds.shm_nattch);
-	      CloseHandle (token_handle);
-	      return;
-	    }
-	  tempnode = tempnode->next;
-	}
-      error_code (EINVAL);
-      CloseHandle (token_handle);
-      return;
-    }
-
-  /* Someone wants the ID removed. */
-  if (parameters.in.type == SHM_DEL)
-    {
-      shmnode **tempnode = &shm_head;
-      while (*tempnode)
-	{
-	    if ((*tempnode)->shm_id == parameters.in.shm_id)
-	      {
-		// unlink from the accessible node list
-		shmnode *temp2 = *tempnode;
-		*tempnode = temp2->next;
-		// link into the deleted list
-		temp2->next = deleted_head;
-		deleted_head = temp2;
-
-		// FIXME: when/where do we delete the handles?
-		if (temp2->shmds->ds.shm_nattch)
-		  {
-		    // FIXME: add to a pending queue?
-		  }
-		else
-		  {
-		    delete_shmnode (&temp2);
-		  }
-
-		CloseHandle (token_handle);
-		return;
-	      }
-	    tempnode = &(*tempnode)->next;
-	  }
-      error_code (EINVAL);
-      CloseHandle (token_handle);
-      return;
-    }
-
-
-  if (parameters.in.type == SHM_CREATE)
-    {
-      /* FIXME: enter the checking for existing keys mutex. This mutex _must_ be system wide
-       * to prevent races on shmget.
-       */
-
-      if (parameters.in.key == IPC_PRIVATE)
-	{
-	  /* create the mapping name (CYGWINSHMKPRIVATE_0x01234567 */
-	  /* The K refers to Key, the actual mapped area has D */
-	  long private_key = (int) InterlockedIncrement (&new_private_key);
-	  snprintf (stringbuf, 29, "CYGWINSHMKPRIVATE_0x%0x", private_key);
-	  shmname = stringbuf;
-	  snprintf (stringbuf1, 29, "CYGWINSHMDPRIVATE_0x%0x", private_key);
-	  shmaname = stringbuf1;
-	}
-      else
-	{
-	  /* create the mapping name (CYGWINSHMK0x0123456789abcdef */
-	  /* The K refers to Key, the actual mapped area has D */
-
-	  snprintf (stringbuf, 29, "CYGWINSHMK0x%0qx", parameters.in.key);
-	  shmname = stringbuf;
-	  snprintf (stringbuf1, 29, "CYGWINSHMD0x%0qx", parameters.in.key);
-	  shmaname = stringbuf1;
-	  debug_printf ("system id strings: key = %s", shmname);
-	  debug_printf ("system id strings: data = %s", shmaname);
-	  debug_printf ("key input value is 0x%0qx", parameters.in.key);
-	}
-
-      /* attempt to open the key */
-
-      /* get an existing key */
-      /* On unix the same shmid identifier is returned on multiple calls to shm_get
-       * with the same key and size. Different modes is a ?.
-       */
-
-      /* walk the list of known keys and return the id if found. remember, we are
-       * authoritative...
-       */
-
-      shmnode *tempnode = shm_head;
-      while (tempnode)
-	{
-	  if (tempnode->key == parameters.in.key
-	      && parameters.in.key != IPC_PRIVATE)
-	    {
-	      // FIXME: free the mutex
-	      if (parameters.in.size
-		  && tempnode->shmds->ds.shm_segsz < parameters.in.size)
-		{
-		  error_code (EINVAL);
-		  CloseHandle (token_handle);
-		  return;
-		}
-	      /* FIXME: can the same process call this twice without error ? test
-	       * on unix
-	       */
-	      if ((parameters.in.shmflg & IPC_CREAT)
-		  && (parameters.in.shmflg & IPC_EXCL))
-		{
-		  error_code (EEXIST);
-		  debug_printf
-		    ("attempt to exclusively create already created shm_area with key 0x%0qx",
-		     parameters.in.key);
-		  // FIXME: free the mutex
-		  CloseHandle (token_handle);
-		  return;
-		}
-	      // FIXME: do we need to other tests of the requested mode with the
-	      // tempnode->shm_id mode ? testcase on unix needed.
-	      // FIXME how do we do the security test? or
-	      // do we wait for shmat to bother with that?
-	      /* One possibly solution: impersonate the client, and then test we can
-	       * reopen the area. In fact we'll probably have to do that to get
-	       * handles back to them, alternatively just tell them the id, and then
-	       * let them attempt the open.
-	       */
-	      parameters.out.shm_id = tempnode->shm_id;
-	      if (check_and_dup_handle
-		  (GetCurrentProcess (), from_process_handle, token_handle,
-		   DUPLICATE_SAME_ACCESS, tempnode->filemap,
-		   &parameters.out.filemap, TRUE) != 0)
-		{
-		  system_printf ("error duplicating filemap handle (%lu)",
-				 GetLastError ());
-		  error_code (EACCES);
-		  /*mutex*/
-		  CloseHandle (token_handle);
-		  return;
-		}
-	      if (check_and_dup_handle
-		  (GetCurrentProcess (), from_process_handle, token_handle,
-		   DUPLICATE_SAME_ACCESS, tempnode->attachmap,
-		   &parameters.out.attachmap, TRUE) != 0)
-		{
-		  system_printf ("error duplicating attachmap handle (%lu)",
-				 GetLastError ());
-		  error_code (EACCES);
-		  /*mutex*/
-		  CloseHandle (token_handle);
-		  return;
-		}
-
-	      CloseHandle (token_handle);
-	      return;
-	    }
-	  tempnode = tempnode->next;
-	}
-      /* couldn't find a currently open shm area. */
-
-      /* create one */
-
-      /* we trust the clients request - we will be doing it as them, and
-       * the worst they can do is open their own permissions
-       */
-
-      SECURITY_ATTRIBUTES sa;
-      sa.nLength = sizeof (sa);
-      sa.lpSecurityDescriptor = (PSECURITY_DESCRIPTOR) parameters.in.sd_buf;
-      sa.bInheritHandle = TRUE;	/* the memory structures inherit ok */
-
-      /* do this as the client */
-      conn->impersonate_client ();
-      /* This may need sh_none... it's only a control structure */
-      HANDLE filemap = CreateFileMapping (INVALID_HANDLE_VALUE,	// system pagefile.
-					  &sa,
-					  PAGE_READWRITE,	// protection
-					  0x00000000,
-					  getsystemallocgranularity (),
-					  shmname	// object name
-					  );
-      DWORD lasterr = GetLastError ();
-      conn->revert_to_self ();
-
-      if (filemap == NULL)
-	{
-	  /* We failed to open the filemapping ? */
-	  system_printf ("failed to open file mapping: %lu",
-			 GetLastError ());
-	  // free the mutex
-	  // we can assume that it exists, and that it was an access problem.
-	  error_code (EACCES);
-	  CloseHandle (token_handle);
-	  return;
-	}
-
-      /* successfully opened the control region mapping */
-      /* did we create it ? */
-      int oldmapping = lasterr == ERROR_ALREADY_EXISTS;
-      if (oldmapping)
-	{
-	  /* should never happen - we are the global daemon! */
-#if 0
-	  if ((parameters.in.shmflg & IPC_CREAT)
-	      && (parameters.in.shmflg & IPC_EXCL))
-#endif
-	    {
-	      /* FIXME free mutex */
-	      CloseHandle (filemap);
-	      error_code (EEXIST);
-	      CloseHandle (token_handle);
-	      return;
-	    }
-	}
-
-      /* we created a new mapping */
-      if (parameters.in.key != IPC_PRIVATE &&
-	  (parameters.in.shmflg & IPC_CREAT) == 0)
-	{
-	  CloseHandle (filemap);
-	  /* FIXME free mutex */
-	  error_code (ENOENT);
-	  CloseHandle (token_handle);
-	  return;
-	}
-
-      conn->impersonate_client ();
-      void *mapptr = MapViewOfFile (filemap, FILE_MAP_WRITE, 0, 0, 0);
-      conn->revert_to_self ();
-
-      if (!mapptr)
-	{
-	  CloseHandle (filemap);
-	  //FIXME: close filemap and free the mutex
-	  /* we couldn't access the mapped area with the requested permissions */
-	  error_code (EACCES);
-	  CloseHandle (token_handle);
-	  return;
-	}
-
-      conn->impersonate_client ();
-      /* Now get the user data */
-      HANDLE attachmap = CreateFileMapping (INVALID_HANDLE_VALUE,	// system pagefile
-					    &sa,
-					    PAGE_READWRITE,	// protection (FIXME)
-					    0x00000000,
-					    parameters.in.size +
-					    parameters.in.size %
-					    getsystemallocgranularity (),
-					    shmaname	// object name
-					    );
-      conn->revert_to_self ();
-
-      if (attachmap == NULL)
-	{
-	  system_printf ("failed to get shm attachmap");
-	  error_code (ENOMEM);
-	  UnmapViewOfFile (mapptr);
-	  CloseHandle (filemap);
-	  /* FIXME exit the mutex */
-	  CloseHandle (token_handle);
-	  return;
-	}
-
-      int_shmid_ds *shmtemp = new int_shmid_ds;
-      if (!shmtemp)
-	{
-	  system_printf ("failed to malloc shm node");
-	  error_code (ENOMEM);
-	  UnmapViewOfFile (mapptr);
-	  CloseHandle (filemap);
-	  CloseHandle (attachmap);
-	  /* FIXME exit mutex */
-	  CloseHandle (token_handle);
-	  return;
-	}
-
-      /* fill out the node data */
-      shmtemp->ds.shm_perm.cuid = getuid ();
-      shmtemp->ds.shm_perm.uid = shmtemp->ds.shm_perm.cuid;
-      shmtemp->ds.shm_perm.cgid = getgid ();
-      shmtemp->ds.shm_perm.gid = shmtemp->ds.shm_perm.cgid;
-      shmtemp->ds.shm_perm.mode = parameters.in.shmflg & 0x01ff;
-      shmtemp->ds.shm_lpid = 0;
-      shmtemp->ds.shm_nattch = 0;
-      shmtemp->ds.shm_atime = 0;
-      shmtemp->ds.shm_dtime = 0;
-      shmtemp->ds.shm_ctime = time (NULL);
-      shmtemp->ds.shm_segsz = parameters.in.size;
-      *(shmid_ds *) mapptr = shmtemp->ds;
-      shmtemp->mapptr = mapptr;
-
-      /* no need for InterlockedExchange here, we're serialised by the global mutex */
-      tempnode = new shmnode;
-      tempnode->shmds = shmtemp;
-      tempnode->shm_id = (int) InterlockedIncrement (&new_id);
-      tempnode->key = parameters.in.key;
-      tempnode->filemap = filemap;
-      tempnode->attachmap = attachmap;
-      tempnode->next = shm_head;
-      shm_head = tempnode;
-
-      /* we now have the area in the daemon list, opened.
-
-      FIXME: leave the system wide shm mutex */
-
-      parameters.out.shm_id = tempnode->shm_id;
-      if (check_and_dup_handle (GetCurrentProcess (), from_process_handle,
-				token_handle,
-				DUPLICATE_SAME_ACCESS,
-				tempnode->filemap, &parameters.out.filemap,
-				TRUE) != 0)
-	{
-	  system_printf ("error duplicating filemap handle (%lu)",
-			 GetLastError ());
-	  error_code (EACCES);
-	  CloseHandle (token_handle);
-	  /* mutex et al */
-	  return;
-	}
-      if (check_and_dup_handle (GetCurrentProcess (), from_process_handle,
-				token_handle,
-				DUPLICATE_SAME_ACCESS,
-				tempnode->attachmap,
-				&parameters.out.attachmap, TRUE) != 0)
-	{
-	  system_printf ("error duplicating attachmap handle (%lu)",
-			 GetLastError ());
-	  error_code (EACCES);
-	  CloseHandle (from_process_handle);
-	  CloseHandle (token_handle);
-	  /* more cleanup... yay! */
-	  return;
-	}
-      CloseHandle (token_handle);
-      return;
-    }
-
-  error_code (ENOSYS);
-  CloseHandle (token_handle);
-
-  return;
 }

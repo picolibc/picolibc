@@ -1,5 +1,12 @@
 2002-06-28  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* cygserver_ipc.h: New file.
+	* cygserver_shm.h: Re-written from scratch.
+	* cygserver_shm.cc: Ditto.
+	* shm.cc: Ditto.
+
+2002-06-28  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* threaded_queue.h (class queue_request): Re-write.
 	(threaded_queue_thread_function): Remove.
 	(class queue_process_param): Remove.
