@@ -98,7 +98,7 @@ struct arc_opcode {
 
 /* this is an "insert at front" linked list per Metaware spec
    that new definitions override older ones.  */
-struct arc_opcode *arc_ext_opcodes;
+extern struct arc_opcode *arc_ext_opcodes;
 
 struct arc_operand_value {
   char *name;          /* eg: "eq"  */
@@ -117,7 +117,9 @@ struct arc_operand_value {
 struct arc_ext_operand_value {
   struct arc_ext_operand_value *next;
   struct arc_operand_value operand;
-} *arc_ext_operands;
+};
+
+extern struct arc_ext_operand_value *arc_ext_operands;
 
 struct arc_operand {
 /* One of the insn format chars.  */
