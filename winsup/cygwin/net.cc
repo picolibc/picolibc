@@ -34,16 +34,17 @@ details. */
 #include "registry.h"
 #include "wsock_event.h"
 
-extern "C" {
-int h_errno;
+extern "C"
+{
+  int h_errno;
 
-int __stdcall rcmd (char **ahost, unsigned short inport, char *locuser,
-		    char *remuser, char *cmd, SOCKET *fd2p);
-int __stdcall rexec (char **ahost, unsigned short inport, char *locuser,
-		     char *password, char *cmd, SOCKET *fd2p);
-int __stdcall rresvport (int *);
-int sscanf (const char *, const char *, ...);
-} /* End of "C" section */
+  int __stdcall rcmd (char **ahost, unsigned short inport, char *locuser,
+		      char *remuser, char *cmd, SOCKET * fd2p);
+  int __stdcall rexec (char **ahost, unsigned short inport, char *locuser,
+		       char *password, char *cmd, SOCKET * fd2p);
+  int __stdcall rresvport (int *);
+  int sscanf (const char *, const char *, ...);
+}				/* End of "C" section */
 
 LPWSAOVERLAPPED
 wsock_event::prepare ()
@@ -72,25 +73,25 @@ wsock_event::wait (int socket, LPDWORD flags)
 
   switch (WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE, FALSE))
     {
-    case WSA_WAIT_EVENT_0:
-      DWORD len;
-      if (WSAGetOverlappedResult (socket, &ovr, &len, FALSE, flags))
-	ret = (int) len;
-      break;
-    case WSA_WAIT_EVENT_0 + 1:
-      if (!CancelIo ((HANDLE)socket))
-	{
-	  debug_printf ("CancelIo() %E, fallback to blocking io");
-	  WSAGetOverlappedResult (socket, &ovr, &len, TRUE, flags);
-	}
-      else
-	WSASetLastError (WSAEINTR);
-      break;
-    case WSA_WAIT_FAILED:
-      break;
-    default: /* Should be impossible. *LOL* */
-      WSASetLastError (WSAEFAULT);
-      break;
+      case WSA_WAIT_EVENT_0:
+	DWORD len;
+	if (WSAGetOverlappedResult (socket, &ovr, &len, FALSE, flags))
+	  ret = (int) len;
+	break;
+      case WSA_WAIT_EVENT_0 + 1:
+	if (!CancelIo ((HANDLE) socket))
+	  {
+	    debug_printf ("CancelIo() %E, fallback to blocking io");
+	    WSAGetOverlappedResult (socket, &ovr, &len, TRUE, flags);
+	  }
+	else
+	  WSASetLastError (WSAEINTR);
+	break;
+      case WSA_WAIT_FAILED:
+	break;
+      default:			/* Should be impossible. *LOL* */
+	WSASetLastError (WSAEFAULT);
+	break;
     }
   WSACloseEvent (event);
   event = NULL;
@@ -104,10 +105,12 @@ static fhandler_socket *
 get (const int fd)
 {
   cygheap_fdget cfd (fd);
+
   if (cfd < 0)
     return 0;
 
   fhandler_socket *const fh = cfd->is_socket ();
+
   if (!fh)
     set_errno (ENOTSOCK);
 
@@ -119,8 +122,9 @@ static SOCKET __stdcall
 set_socket_inheritance (SOCKET sock)
 {
   SOCKET osock = sock;
+
   if (!DuplicateHandle (hMainProc, (HANDLE) sock, hMainProc, (HANDLE *) &sock,
-			0, TRUE, DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
+                        0, TRUE, DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
     system_printf ("DuplicateHandle failed %E");
   else
     debug_printf ("DuplicateHandle succeeded osock %p, sock %p", osock, sock);
@@ -132,8 +136,8 @@ extern "C" unsigned long int
 htonl (unsigned long int x)
 {
   return ((((x & 0x000000ffU) << 24) |
-	   ((x & 0x0000ff00U) <<  8) |
-	   ((x & 0x00ff0000U) >>  8) |
+	   ((x & 0x0000ff00U) << 8) |
+	   ((x & 0x00ff0000U) >> 8) |
 	   ((x & 0xff000000U) >> 24)));
 }
 
@@ -149,7 +153,7 @@ extern "C" unsigned short
 htons (unsigned short x)
 {
   return ((((x & 0x000000ffU) << 8) |
-	   ((x & 0x0000ff00U) >> 8)));
+           ((x & 0x0000ff00U) >> 8)));
 }
 
 /* ntohs: standards? */
@@ -178,6 +182,7 @@ cygwin_inet_ntoa (struct in_addr in)
 #endif
 
   char *res = inet_ntoa (in);
+
   if (ntoa_buf)
     {
       free (ntoa_buf);
@@ -195,6 +200,7 @@ cygwin_inet_addr (const char *cp)
   if (check_null_str_errno (cp))
     return INADDR_NONE;
   unsigned long res = inet_addr (cp);
+
   return res;
 }
 
@@ -208,6 +214,7 @@ cygwin_inet_aton (const char *cp, struct in_addr *inp)
     return 0;
 
   unsigned long res = inet_addr (cp);
+
   if (res == INADDR_NONE && strcmp (cp, "255.255.255.255"))
     return 0;
   if (inp)
@@ -216,7 +223,7 @@ cygwin_inet_aton (const char *cp, struct in_addr *inp)
 }
 
 /* undocumented in wsock32.dll */
-extern "C" unsigned int	WINAPI inet_network (const char *);
+extern "C" unsigned int WINAPI inet_network (const char *);
 
 extern "C" unsigned int
 cygwin_inet_network (const char *cp)
@@ -224,6 +231,7 @@ cygwin_inet_network (const char *cp)
   if (check_null_str_errno (cp))
     return INADDR_NONE;
   unsigned int res = inet_network (cp);
+
   return res;
 }
 
@@ -280,50 +288,49 @@ struct tl
   int e;
 };
 
-static NO_COPY struct tl errmap[] =
-{
- {WSAEINTR, "WSAEINTR", EINTR},
- {WSAEWOULDBLOCK, "WSAEWOULDBLOCK", EWOULDBLOCK},
- {WSAEINPROGRESS, "WSAEINPROGRESS", EINPROGRESS},
- {WSAEALREADY, "WSAEALREADY", EALREADY},
- {WSAENOTSOCK, "WSAENOTSOCK", ENOTSOCK},
- {WSAEDESTADDRREQ, "WSAEDESTADDRREQ", EDESTADDRREQ},
- {WSAEMSGSIZE, "WSAEMSGSIZE", EMSGSIZE},
- {WSAEPROTOTYPE, "WSAEPROTOTYPE", EPROTOTYPE},
- {WSAENOPROTOOPT, "WSAENOPROTOOPT", ENOPROTOOPT},
- {WSAEPROTONOSUPPORT, "WSAEPROTONOSUPPORT", EPROTONOSUPPORT},
- {WSAESOCKTNOSUPPORT, "WSAESOCKTNOSUPPORT", ESOCKTNOSUPPORT},
- {WSAEOPNOTSUPP, "WSAEOPNOTSUPP", EOPNOTSUPP},
- {WSAEPFNOSUPPORT, "WSAEPFNOSUPPORT", EPFNOSUPPORT},
- {WSAEAFNOSUPPORT, "WSAEAFNOSUPPORT", EAFNOSUPPORT},
- {WSAEADDRINUSE, "WSAEADDRINUSE", EADDRINUSE},
- {WSAEADDRNOTAVAIL, "WSAEADDRNOTAVAIL", EADDRNOTAVAIL},
- {WSAENETDOWN, "WSAENETDOWN", ENETDOWN},
- {WSAENETUNREACH, "WSAENETUNREACH", ENETUNREACH},
- {WSAENETRESET, "WSAENETRESET", ENETRESET},
- {WSAECONNABORTED, "WSAECONNABORTED", ECONNABORTED},
- {WSAECONNRESET, "WSAECONNRESET", ECONNRESET},
- {WSAENOBUFS, "WSAENOBUFS", ENOBUFS},
- {WSAEISCONN, "WSAEISCONN", EISCONN},
- {WSAENOTCONN, "WSAENOTCONN", ENOTCONN},
- {WSAESHUTDOWN, "WSAESHUTDOWN", ESHUTDOWN},
- {WSAETOOMANYREFS, "WSAETOOMANYREFS", ETOOMANYREFS},
- {WSAETIMEDOUT, "WSAETIMEDOUT", ETIMEDOUT},
- {WSAECONNREFUSED, "WSAECONNREFUSED", ECONNREFUSED},
- {WSAELOOP, "WSAELOOP", ELOOP},
- {WSAENAMETOOLONG, "WSAENAMETOOLONG", ENAMETOOLONG},
- {WSAEHOSTDOWN, "WSAEHOSTDOWN", EHOSTDOWN},
- {WSAEHOSTUNREACH, "WSAEHOSTUNREACH", EHOSTUNREACH},
- {WSAENOTEMPTY, "WSAENOTEMPTY", ENOTEMPTY},
- {WSAEPROCLIM, "WSAEPROCLIM", EPROCLIM},
- {WSAEUSERS, "WSAEUSERS", EUSERS},
- {WSAEDQUOT, "WSAEDQUOT", EDQUOT},
- {WSAESTALE, "WSAESTALE", ESTALE},
- {WSAEREMOTE, "WSAEREMOTE", EREMOTE},
- {WSAEINVAL, "WSAEINVAL", EINVAL},
- {WSAEFAULT, "WSAEFAULT", EFAULT},
- {0, "NOERROR", 0},
- {0, NULL, 0}
+static NO_COPY struct tl errmap[] = {
+  {WSAEINTR, "WSAEINTR", EINTR},
+  {WSAEWOULDBLOCK, "WSAEWOULDBLOCK", EWOULDBLOCK},
+  {WSAEINPROGRESS, "WSAEINPROGRESS", EINPROGRESS},
+  {WSAEALREADY, "WSAEALREADY", EALREADY},
+  {WSAENOTSOCK, "WSAENOTSOCK", ENOTSOCK},
+  {WSAEDESTADDRREQ, "WSAEDESTADDRREQ", EDESTADDRREQ},
+  {WSAEMSGSIZE, "WSAEMSGSIZE", EMSGSIZE},
+  {WSAEPROTOTYPE, "WSAEPROTOTYPE", EPROTOTYPE},
+  {WSAENOPROTOOPT, "WSAENOPROTOOPT", ENOPROTOOPT},
+  {WSAEPROTONOSUPPORT, "WSAEPROTONOSUPPORT", EPROTONOSUPPORT},
+  {WSAESOCKTNOSUPPORT, "WSAESOCKTNOSUPPORT", ESOCKTNOSUPPORT},
+  {WSAEOPNOTSUPP, "WSAEOPNOTSUPP", EOPNOTSUPP},
+  {WSAEPFNOSUPPORT, "WSAEPFNOSUPPORT", EPFNOSUPPORT},
+  {WSAEAFNOSUPPORT, "WSAEAFNOSUPPORT", EAFNOSUPPORT},
+  {WSAEADDRINUSE, "WSAEADDRINUSE", EADDRINUSE},
+  {WSAEADDRNOTAVAIL, "WSAEADDRNOTAVAIL", EADDRNOTAVAIL},
+  {WSAENETDOWN, "WSAENETDOWN", ENETDOWN},
+  {WSAENETUNREACH, "WSAENETUNREACH", ENETUNREACH},
+  {WSAENETRESET, "WSAENETRESET", ENETRESET},
+  {WSAECONNABORTED, "WSAECONNABORTED", ECONNABORTED},
+  {WSAECONNRESET, "WSAECONNRESET", ECONNRESET},
+  {WSAENOBUFS, "WSAENOBUFS", ENOBUFS},
+  {WSAEISCONN, "WSAEISCONN", EISCONN},
+  {WSAENOTCONN, "WSAENOTCONN", ENOTCONN},
+  {WSAESHUTDOWN, "WSAESHUTDOWN", ESHUTDOWN},
+  {WSAETOOMANYREFS, "WSAETOOMANYREFS", ETOOMANYREFS},
+  {WSAETIMEDOUT, "WSAETIMEDOUT", ETIMEDOUT},
+  {WSAECONNREFUSED, "WSAECONNREFUSED", ECONNREFUSED},
+  {WSAELOOP, "WSAELOOP", ELOOP},
+  {WSAENAMETOOLONG, "WSAENAMETOOLONG", ENAMETOOLONG},
+  {WSAEHOSTDOWN, "WSAEHOSTDOWN", EHOSTDOWN},
+  {WSAEHOSTUNREACH, "WSAEHOSTUNREACH", EHOSTUNREACH},
+  {WSAENOTEMPTY, "WSAENOTEMPTY", ENOTEMPTY},
+  {WSAEPROCLIM, "WSAEPROCLIM", EPROCLIM},
+  {WSAEUSERS, "WSAEUSERS", EUSERS},
+  {WSAEDQUOT, "WSAEDQUOT", EDQUOT},
+  {WSAESTALE, "WSAESTALE", ESTALE},
+  {WSAEREMOTE, "WSAEREMOTE", EREMOTE},
+  {WSAEINVAL, "WSAEINVAL", EINVAL},
+  {WSAEFAULT, "WSAEFAULT", EFAULT},
+  {0, "NOERROR", 0},
+  {0, NULL, 0}
 };
 
 static int
@@ -342,6 +349,7 @@ __set_winsock_errno (const char *fn, int ln)
 {
   DWORD werr = WSAGetLastError ();
   int err = find_winsock_errno (werr);
+
   set_errno (err);
   syscall_printf ("%s:%d - winsock error %d -> errno %d", fn, ln, werr, err);
 }
@@ -350,8 +358,7 @@ __set_winsock_errno (const char *fn, int ln)
  * Since the member `s' isn't used for debug output we can use it
  * for the error text returned by herror and hstrerror.
  */
-static NO_COPY struct tl host_errmap[] =
-{
+static NO_COPY struct tl host_errmap[] = {
   {WSAHOST_NOT_FOUND, "Unknown host", HOST_NOT_FOUND},
   {WSATRY_AGAIN, "Host name lookup failure", TRY_AGAIN},
   {WSANO_RECOVERY, "Unknown server error", NO_RECOVERY},
@@ -366,6 +373,7 @@ set_host_errno ()
   int i;
 
   int why = WSAGetLastError ();
+
   for (i = 0; host_errmap[i].w != 0; ++i)
     if (why == host_errmap[i].w)
       break;
@@ -445,6 +453,7 @@ dup_protoent_ptr (struct protoent *src)
     return NULL;
 
   struct protoent *dst = (struct protoent *) calloc (1, sizeof *dst);
+
   if (!dst)
     return NULL;
 
@@ -468,7 +477,7 @@ out:
 #ifdef _MT_SAFE
 #define protoent_buf  _reent_winsup ()->_protoent_buf
 #else
-  static struct protoent *protoent_buf = NULL;
+static struct protoent *protoent_buf = NULL;
 #endif
 
 /* exported as getprotobyname: standards? */
@@ -500,19 +509,22 @@ cygwin_getprotobynumber (int number)
 }
 
 fhandler_socket *
-fdsock (int& fd, const char *name, SOCKET soc)
+fdsock (int &fd, const char *name, SOCKET soc)
 {
   if (!winsock2_active)
     soc = set_socket_inheritance (soc);
   else if (wincap.has_set_handle_information ())
     {
       /* NT systems apparently set sockets to inheritable by default */
-      SetHandleInformation ((HANDLE)soc, HANDLE_FLAG_INHERIT, 0);
-      debug_printf ("reset socket inheritance since winsock2_active %d", winsock2_active);
+      SetHandleInformation ((HANDLE) soc, HANDLE_FLAG_INHERIT, 0);
+      debug_printf ("reset socket inheritance since winsock2_active %d",
+		    winsock2_active);
     }
   else
-    debug_printf ("not setting socket inheritance since winsock2_active %d", winsock2_active);
-  fhandler_socket *fh = (fhandler_socket *) cygheap->fdtab.build_fhandler (fd, FH_SOCKET, name);
+    debug_printf ("not setting socket inheritance since winsock2_active %d",
+		  winsock2_active);
+  fhandler_socket *fh =
+    (fhandler_socket *) cygheap->fdtab.build_fhandler (fd, FH_SOCKET, name);
   fh->set_io_handle ((HANDLE) soc);
   fh->set_flags (O_RDWR | O_BINARY);
   fh->set_r_no_interrupt (winsock2_active);
@@ -526,7 +538,7 @@ cygwin_socket (int af, int type, int protocol)
 {
   int res = -1;
   SOCKET soc = 0;
-  fhandler_socket* fh = NULL;
+  fhandler_socket *fh = NULL;
 
   cygheap_fdnew fd;
 
@@ -543,6 +555,7 @@ cygwin_socket (int af, int type, int protocol)
 	}
 
       const char *name;
+
       if (af == AF_INET)
 	name = (type == SOCK_STREAM ? "/dev/tcp" : "/dev/udp");
       else
@@ -573,7 +586,7 @@ cygwin_sendto (int fd, const void *buf, int len, int flags,
   fhandler_socket *fh = get (fd);
 
   if ((len && __check_invalid_read_ptr_errno (buf, (unsigned) len))
-      || (to &&__check_invalid_read_ptr_errno (to, tolen))
+      || (to && __check_invalid_read_ptr_errno (to, tolen))
       || !fh)
     res = -1;
   else if ((res = len) != 0)
@@ -598,7 +611,7 @@ cygwin_recvfrom (int fd, void *buf, int len, int flags,
   if ((len && __check_null_invalid_struct_errno (buf, (unsigned) len))
       || (from
 	  && (check_null_invalid_struct_errno (fromlen)
-	      ||__check_null_invalid_struct_errno (from, (unsigned) *fromlen)))
+	      || __check_null_invalid_struct_errno (from, (unsigned) *fromlen)))
       || !fh)
     res = -1;
   else if ((res = len) != 0)
@@ -622,36 +635,36 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
   /* For the following debug_printf */
   switch (optname)
     {
-    case SO_DEBUG:
-      name="SO_DEBUG";
-      break;
-    case SO_ACCEPTCONN:
-      name="SO_ACCEPTCONN";
-      break;
-    case SO_REUSEADDR:
-      name="SO_REUSEADDR";
-      break;
-    case SO_KEEPALIVE:
-      name="SO_KEEPALIVE";
-      break;
-    case SO_DONTROUTE:
-      name="SO_DONTROUTE";
-      break;
-    case SO_BROADCAST:
-      name="SO_BROADCAST";
-      break;
-    case SO_USELOOPBACK:
-      name="SO_USELOOPBACK";
-      break;
-    case SO_LINGER:
-      name="SO_LINGER";
-      break;
-    case SO_OOBINLINE:
-      name="SO_OOBINLINE";
-      break;
-    case SO_ERROR:
-      name="SO_ERROR";
-      break;
+      case SO_DEBUG:
+	name = "SO_DEBUG";
+	break;
+      case SO_ACCEPTCONN:
+	name = "SO_ACCEPTCONN";
+	break;
+      case SO_REUSEADDR:
+	name = "SO_REUSEADDR";
+	break;
+      case SO_KEEPALIVE:
+	name = "SO_KEEPALIVE";
+	break;
+      case SO_DONTROUTE:
+	name = "SO_DONTROUTE";
+	break;
+      case SO_BROADCAST:
+	name = "SO_BROADCAST";
+	break;
+      case SO_USELOOPBACK:
+	name = "SO_USELOOPBACK";
+	break;
+      case SO_LINGER:
+	name = "SO_LINGER";
+	break;
+      case SO_OOBINLINE:
+	name = "SO_OOBINLINE";
+	break;
+      case SO_ERROR:
+	name = "SO_ERROR";
+	break;
     }
 
   if ((optval && __check_invalid_read_ptr_errno (optval, optlen)) || !fh)
@@ -684,36 +697,36 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval, int *optlen)
   /* For the following debug_printf */
   switch (optname)
     {
-    case SO_DEBUG:
-      name="SO_DEBUG";
-      break;
-    case SO_ACCEPTCONN:
-      name="SO_ACCEPTCONN";
-      break;
-    case SO_REUSEADDR:
-      name="SO_REUSEADDR";
-      break;
-    case SO_KEEPALIVE:
-      name="SO_KEEPALIVE";
-      break;
-    case SO_DONTROUTE:
-      name="SO_DONTROUTE";
-      break;
-    case SO_BROADCAST:
-      name="SO_BROADCAST";
-      break;
-    case SO_USELOOPBACK:
-      name="SO_USELOOPBACK";
-      break;
-    case SO_LINGER:
-      name="SO_LINGER";
-      break;
-    case SO_OOBINLINE:
-      name="SO_OOBINLINE";
-      break;
-    case SO_ERROR:
-      name="SO_ERROR";
-      break;
+      case SO_DEBUG:
+	name = "SO_DEBUG";
+	break;
+      case SO_ACCEPTCONN:
+	name = "SO_ACCEPTCONN";
+	break;
+      case SO_REUSEADDR:
+	name = "SO_REUSEADDR";
+	break;
+      case SO_KEEPALIVE:
+	name = "SO_KEEPALIVE";
+	break;
+      case SO_DONTROUTE:
+	name = "SO_DONTROUTE";
+	break;
+      case SO_BROADCAST:
+	name = "SO_BROADCAST";
+	break;
+      case SO_USELOOPBACK:
+	name = "SO_USELOOPBACK";
+	break;
+      case SO_LINGER:
+	name = "SO_LINGER";
+	break;
+      case SO_OOBINLINE:
+	name = "SO_OOBINLINE";
+	break;
+      case SO_ERROR:
+	name = "SO_ERROR";
+	break;
     }
 
   if ((optval
@@ -729,6 +742,7 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval, int *optlen)
       if (optname == SO_ERROR)
 	{
 	  int *e = (int *) optval;
+
 	  *e = find_winsock_errno (*e);
 	}
 
@@ -784,6 +798,7 @@ struct pservent
   short s_port;
   char *s_proto;
 };
+
 #pragma pack(pop)
 static struct servent *
 dup_servent_ptr (struct servent *src)
@@ -792,6 +807,7 @@ dup_servent_ptr (struct servent *src)
     return NULL;
 
   struct servent *dst = (struct servent *) calloc (1, sizeof *dst);
+
   if (!dst)
     return NULL;
 
@@ -803,9 +819,10 @@ dup_servent_ptr (struct servent *src)
   if (src->s_aliases && !(dst->s_aliases = dup_char_list (src->s_aliases)))
     goto out;
   char *s_proto;
+
   if (IsBadReadPtr (src->s_proto, sizeof (src->s_proto))
       && !IsBadReadPtr (((pservent *) src)->s_proto, sizeof (src->s_proto)))
-    s_proto = ((pservent *)src)->s_proto;
+    s_proto = ((pservent *) src)->s_proto;
   else
     s_proto = src->s_proto;
 
@@ -824,7 +841,7 @@ out:
 #ifdef _MT_SAFE
 #define servent_buf  _reent_winsup ()->_servent_buf
 #else
-  static struct servent *servent_buf = NULL;
+static struct servent *servent_buf = NULL;
 #endif
 
 /* exported as getservbyname: standards? */
@@ -863,13 +880,12 @@ cygwin_getservbyport (int port, const char *proto)
 extern "C" int
 cygwin_gethostname (char *name, size_t len)
 {
-  int PASCAL win32_gethostname (char*, int);
+  int PASCAL win32_gethostname (char *, int);
 
   if (__check_null_invalid_struct_errno (name, len))
     return -1;
 
-  if (wsock32_handle == NULL ||
-      win32_gethostname (name, len) == SOCKET_ERROR)
+  if (wsock32_handle == NULL || win32_gethostname (name, len) == SOCKET_ERROR)
     {
       DWORD local_len = len;
 
@@ -892,7 +908,7 @@ free_hostent_ptr (struct hostent *&p)
       debug_printf ("hostent: %s", p->h_name);
 
       if (p->h_name)
-	free ((void *)p->h_name);
+	free ((void *) p->h_name);
       free_char_list (p->h_aliases);
       free_addr_list (p->h_addr_list);
       p = NULL;
@@ -906,6 +922,7 @@ dup_hostent_ptr (struct hostent *src)
     return NULL;
 
   struct hostent *dst = (struct hostent *) calloc (1, sizeof *dst);
+
   if (!dst)
     return NULL;
 
@@ -933,7 +950,7 @@ out:
 #ifdef _MT_SAFE
 #define hostent_buf  _reent_winsup ()->_hostent_buf
 #else
-  static struct hostent *hostent_buf = NULL;
+static struct hostent *hostent_buf = NULL;
 #endif
 
 /* exported as gethostbyname: standards? */
@@ -1126,15 +1143,15 @@ cygwin_herror (const char *s)
   if (!h_errstr)
     switch (h_errno)
       {
-      case NETDB_INTERNAL:
-	h_errstr = "Resolver internal error";
-	break;
-      case NETDB_SUCCESS:
-	h_errstr = "Resolver error 0 (no error)";
-	break;
-      default:
-	h_errstr = "Unknown resolver error";
-	break;
+	case NETDB_INTERNAL:
+	  h_errstr = "Resolver internal error";
+	  break;
+	case NETDB_SUCCESS:
+	  h_errstr = "Resolver error 0 (no error)";
+	  break;
+	default:
+	  h_errstr = "Unknown resolver error";
+	  break;
       }
   write (2, h_errstr, strlen (h_errstr));
   write (2, "\n", 1);
@@ -1192,8 +1209,7 @@ getdomainname (char *domain, size_t len)
 	     (!wincap.is_winnt ()) ? "System" : "SYSTEM",
 	     "CurrentControlSet", "Services",
 	     (!wincap.is_winnt ()) ? "VxD" : "Tcpip",
-	     (!wincap.is_winnt ()) ? "MSTCP" : "Parameters",
-	     NULL);
+	     (!wincap.is_winnt ()) ? "MSTCP" : "Parameters", NULL);
 
   /* FIXME: Are registry keys case sensitive? */
   if (r.error () || r.get_string ("Domain", domain, len, "") != ERROR_SUCCESS)
@@ -1216,125 +1232,198 @@ static void
 get_2k_ifconf (struct ifconf *ifc, int what)
 {
   int cnt = 0;
-  char eth[2] = "/", ppp[2] = "/", slp[2] = "/", sub[2] = "0", tok[2] = "/";
+  int ethId = 0, pppId = 0, slpId = 0, tokId = 0;
 
   /* Union maps buffer to correct struct */
   struct ifreq *ifr = ifc->ifc_req;
 
-  DWORD if_cnt, ip_cnt, lip, lnp;
-  DWORD siz_if_table = 0;
+  DWORD ip_cnt, lip, lnp;
   DWORD siz_ip_table = 0;
-  PMIB_IFTABLE ift;
   PMIB_IPADDRTABLE ipt;
+  PMIB_IFROW ifrow;
   struct sockaddr_in *sa = NULL;
   struct sockaddr *so = NULL;
 
-  if (GetIfTable (NULL, &siz_if_table, TRUE) == ERROR_INSUFFICIENT_BUFFER &&
-      GetIpAddrTable (NULL, &siz_ip_table, TRUE) == ERROR_INSUFFICIENT_BUFFER &&
-      (ift = (PMIB_IFTABLE) alloca (siz_if_table)) &&
-      (ipt = (PMIB_IPADDRTABLE) alloca (siz_ip_table)) &&
-      !GetIfTable (ift, &siz_if_table, TRUE) &&
-      !GetIpAddrTable (ipt, &siz_ip_table, TRUE))
+  typedef struct ifcount_t
+  {
+    DWORD ifIndex;
+    size_t count;
+    unsigned int enumerated;	// for eth0:1
+    unsigned int classId;	// for eth0, tok0 ...
+
+  };
+  ifcount_t *iflist, *ifEntry;
+
+  if (GetIpAddrTable (NULL, &siz_ip_table, TRUE) == ERROR_INSUFFICIENT_BUFFER
+      && (ifrow = (PMIB_IFROW) alloca (sizeof (MIB_IFROW)))
+      && (ipt = (PMIB_IPADDRTABLE) alloca (siz_ip_table))
+      && !GetIpAddrTable (ipt, &siz_ip_table, TRUE))
     {
-      /* Iterate over all known interfaces */
-      for (if_cnt = 0; if_cnt < ift->dwNumEntries; ++if_cnt)
+      iflist =
+	(ifcount_t *) alloca (sizeof (ifcount_t) * (ipt->dwNumEntries + 1));
+      memset (iflist, 0, sizeof (ifcount_t) * (ipt->dwNumEntries + 1));
+      for (ip_cnt = 0; ip_cnt < ipt->dwNumEntries; ++ip_cnt)
 	{
-	  *sub = '0';
-	  /* Iterate over all configured IP-addresses */
-	  for (ip_cnt = 0; ip_cnt < ipt->dwNumEntries; ++ip_cnt)
+	  ifEntry = iflist;
+	  /* search for matching entry (and stop at first free entry) */
+	  while (ifEntry->count != 0)
 	    {
-	      /* Does the IP address belong to the interface? */
-	      if (ipt->table[ip_cnt].dwIndex == ift->table[if_cnt].dwIndex)
-		{
-		  /* Setup the interface name */
-		  switch (ift->table[if_cnt].dwType)
-		    {
-		      case MIB_IF_TYPE_TOKENRING:
-			++*tok;
-			strcpy (ifr->ifr_name, "tok");
-			strcat (ifr->ifr_name, tok);
-			break;
-		      case MIB_IF_TYPE_ETHERNET:
-			if (*sub == '0')
-			  ++*eth;
-			strcpy (ifr->ifr_name, "eth");
-			strcat (ifr->ifr_name, eth);
-			break;
-		      case MIB_IF_TYPE_PPP:
-			++*ppp;
-			strcpy (ifr->ifr_name, "ppp");
-			strcat (ifr->ifr_name, ppp);
-			break;
-		      case MIB_IF_TYPE_SLIP:
-			++*slp;
-			strcpy (ifr->ifr_name, "slp");
-			strcat (ifr->ifr_name, slp);
-			break;
-		      case MIB_IF_TYPE_LOOPBACK:
-			strcpy (ifr->ifr_name, "lo");
-			break;
-		      default:
-			continue;
-		    }
-		  if (*sub > '0')
-		    {
-		      strcat (ifr->ifr_name, ":");
-		      strcat (ifr->ifr_name, sub);
-		    }
-		  ++*sub;
-		  /* setup sockaddr struct */
-		  switch (what)
-		    {
-		      case SIOCGIFCONF:
-		      case SIOCGIFADDR:
-			sa = (struct sockaddr_in *) &ifr->ifr_addr;
-			sa->sin_addr.s_addr = ipt->table[ip_cnt].dwAddr;
-			sa->sin_family = AF_INET;
-			sa->sin_port = 0;
-			break;
-		      case SIOCGIFBRDADDR:
-			sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
-#if 0
-			/* Unfortunately, the field returns only crap. */
-			sa->sin_addr.s_addr = ipt->table[ip_cnt].dwBCastAddr;
-#else
-			lip = ipt->table[ip_cnt].dwAddr;
-			lnp = ipt->table[ip_cnt].dwMask;
-			sa->sin_addr.s_addr = lip & lnp | ~lnp;
-			sa->sin_family = AF_INET;
-			sa->sin_port = 0;
-#endif
-			break;
-		      case SIOCGIFNETMASK:
-			sa = (struct sockaddr_in *) &ifr->ifr_netmask;
-			sa->sin_addr.s_addr = ipt->table[ip_cnt].dwMask;
-			sa->sin_family = AF_INET;
-			sa->sin_port = 0;
-			break;
-		      case SIOCGIFHWADDR:
-			so = &ifr->ifr_hwaddr;
-			for (UINT i = 0; i < IFHWADDRLEN; ++i)
-			  if (i >= ift->table[if_cnt].dwPhysAddrLen)
-			    so->sa_data[i] = '\0';
-			  else
-			    so->sa_data[i] = ift->table[if_cnt].bPhysAddr[i];
-			so->sa_family = AF_INET;
-			break;
-		      case SIOCGIFMETRIC:
-			ifr->ifr_metric = 1;
-			break;
-		      case SIOCGIFMTU:
-			ifr->ifr_mtu = ift->table[if_cnt].dwMtu;
-			break;
-		    }
-		  ++cnt;
-		  if ((caddr_t) ++ifr >
-		      ifc->ifc_buf + ifc->ifc_len - sizeof (struct ifreq))
-		    goto done;
-		}
+	      if (ifEntry->ifIndex == ipt->table[ip_cnt].dwIndex)
+		break;
+	      ifEntry++;
+	    }
+	  if (ifEntry->count == 0)
+	    {
+	      ifEntry->count = 1;
+	      ifEntry->ifIndex = ipt->table[ip_cnt].dwIndex;
+	    }
+	  else
+	    {
+	      ifEntry->count++;
 	    }
 	}
+      // reset the last element. This is just the stopper for the loop.
+      iflist[ipt->dwNumEntries].count = 0;
+
+      /* Iterate over all configured IP-addresses */
+      for (ip_cnt = 0; ip_cnt < ipt->dwNumEntries; ++ip_cnt)
+	{
+	  memset (ifrow, 0, sizeof (MIB_IFROW));
+	  ifrow->dwIndex = ipt->table[ip_cnt].dwIndex;
+	  if (GetIfEntry (ifrow) != NO_ERROR)
+	    continue;
+
+	  ifcount_t *ifEntry = iflist;
+
+	  /* search for matching entry (and stop at first free entry) */
+	  while (ifEntry->count != 0)
+	    {
+	      if (ifEntry->ifIndex == ipt->table[ip_cnt].dwIndex)
+		break;
+	      ifEntry++;
+	    }
+
+	  /* Setup the interface name */
+	  switch (ifrow->dwType)
+	    {
+	      case MIB_IF_TYPE_TOKENRING:
+		if (ifEntry->enumerated == 0)
+		  {
+		    ifEntry->classId = tokId++;
+		    __small_sprintf (ifr->ifr_name, "tok%u",
+				     ifEntry->classId);
+		  }
+		else
+		  {
+		    __small_sprintf (ifr->ifr_name, "tok%u:%u",
+				     ifEntry->classId,
+				     ifEntry->enumerated - 1);
+		  }
+		ifEntry->enumerated++;
+		break;
+	      case MIB_IF_TYPE_ETHERNET:
+		if (ifEntry->enumerated == 0)
+		  {
+		    ifEntry->classId = ethId++;
+		    __small_sprintf (ifr->ifr_name, "eth%u",
+				     ifEntry->classId);
+		  }
+		else
+		  {
+		    __small_sprintf (ifr->ifr_name, "eth%u:%u",
+				     ifEntry->classId,
+				     ifEntry->enumerated - 1);
+		  }
+		ifEntry->enumerated++;
+		break;
+	      case MIB_IF_TYPE_PPP:
+		if (ifEntry->enumerated == 0)
+		  {
+		    ifEntry->classId = pppId++;
+		    __small_sprintf (ifr->ifr_name, "ppp%u",
+				     ifEntry->classId);
+		  }
+		else
+		  {
+		    __small_sprintf (ifr->ifr_name, "ppp%u:%u",
+				     ifEntry->classId,
+				     ifEntry->enumerated - 1);
+		  }
+		ifEntry->enumerated++;
+		break;
+	      case MIB_IF_TYPE_SLIP:
+		if (ifEntry->enumerated == 0)
+		  {
+		    ifEntry->classId = slpId++;
+		    __small_sprintf (ifr->ifr_name, "slp%u",
+				     ifEntry->classId);
+		  }
+		else
+		  {
+		    __small_sprintf (ifr->ifr_name, "slp%u:%u",
+				     ifEntry->classId,
+				     ifEntry->enumerated - 1);
+		  }
+		ifEntry->enumerated++;
+		break;
+	      case MIB_IF_TYPE_LOOPBACK:
+		strcpy (ifr->ifr_name, "lo");
+		break;
+	      default:
+		continue;
+	    }
+	  /* setup sockaddr struct */
+	  switch (what)
+	    {
+	      case SIOCGIFCONF:
+	      case SIOCGIFADDR:
+		sa = (struct sockaddr_in *) &ifr->ifr_addr;
+		sa->sin_addr.s_addr = ipt->table[ip_cnt].dwAddr;
+		sa->sin_family = AF_INET;
+		sa->sin_port = 0;
+		break;
+	      case SIOCGIFBRDADDR:
+		sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
+#if 0
+		/* Unfortunately, the field returns only crap. */
+		sa->sin_addr.s_addr = ipt->table[ip_cnt].dwBCastAddr;
+#else
+		lip = ipt->table[ip_cnt].dwAddr;
+		lnp = ipt->table[ip_cnt].dwMask;
+		sa->sin_addr.s_addr = lip & lnp | ~lnp;
+		sa->sin_family = AF_INET;
+		sa->sin_port = 0;
+#endif
+		break;
+	      case SIOCGIFNETMASK:
+		sa = (struct sockaddr_in *) &ifr->ifr_netmask;
+		sa->sin_addr.s_addr = ipt->table[ip_cnt].dwMask;
+		sa->sin_family = AF_INET;
+		sa->sin_port = 0;
+		break;
+	      case SIOCGIFHWADDR:
+		so = &ifr->ifr_hwaddr;
+		for (UINT i = 0; i < IFHWADDRLEN; ++i)
+		  if (i >= ifrow->dwPhysAddrLen)
+		    so->sa_data[i] = '\0';
+		  else
+		    so->sa_data[i] = ifrow->bPhysAddr[i];
+		so->sa_family = AF_INET;
+		break;
+	      case SIOCGIFMETRIC:
+		ifr->ifr_metric = 1;
+		break;
+	      case SIOCGIFMTU:
+		ifr->ifr_mtu = ifrow->dwMtu;
+		break;
+	    }
+	  ++cnt;
+	  if ((caddr_t)++ ifr >
+	      ifc->ifc_buf + ifc->ifc_len - sizeof (struct ifreq))
+	    goto done;
+	}
     }
+
 done:
   /* Set the correct length */
   ifc->ifc_len = cnt * sizeof (struct ifreq);
@@ -1370,8 +1459,7 @@ get_nt_ifconf (struct ifconf *ifc, int what)
 		    "SYSTEM\\"
 		    "CurrentControlSet\\"
 		    "Services\\"
-		    "Tcpip\\"
-		    "Linkage",
+		    "Tcpip\\" "Linkage",
 		    0, KEY_READ, &key) == ERROR_SUCCESS)
     {
       if (RegQueryValueEx (key, "Bind",
@@ -1422,12 +1510,11 @@ get_nt_ifconf (struct ifconf *ifc, int what)
 		   *ip && *np;
 		   ip += strlen (ip) + 1, np += strlen (np) + 1)
 		{
-		  if ((caddr_t) ++ifr > ifc->ifc_buf
-		      + ifc->ifc_len
-		      - sizeof (struct ifreq))
+		  if ((caddr_t)++ ifr > ifc->ifc_buf
+		      + ifc->ifc_len - sizeof (struct ifreq))
 		    break;
 
-		  if (! strncmp (bp, "NdisWan", 7))
+		  if (!strncmp (bp, "NdisWan", 7))
 		    {
 		      strcpy (ifr->ifr_name, "ppp");
 		      strcat (ifr->ifr_name, bp + 7);
@@ -1453,77 +1540,78 @@ get_nt_ifconf (struct ifconf *ifc, int what)
 		    {
 		      switch (what)
 			{
-			case SIOCGIFCONF:
-			case SIOCGIFADDR:
-			  sa = (struct sockaddr_in *) &ifr->ifr_addr;
-			  sa->sin_addr.s_addr = cygwin_inet_addr (dhcpaddress);
-			  sa->sin_family = AF_INET;
-			  sa->sin_port = 0;
-			  break;
-			case SIOCGIFBRDADDR:
-			  lip = cygwin_inet_addr (dhcpaddress);
-			  lnp = cygwin_inet_addr (dhcpnetmask);
-			  sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
-			  sa->sin_addr.s_addr = lip & lnp | ~lnp;
-			  sa->sin_family = AF_INET;
-			  sa->sin_port = 0;
-			  break;
-			case SIOCGIFNETMASK:
-			  sa = (struct sockaddr_in *) &ifr->ifr_netmask;
-			  sa->sin_addr.s_addr =
-			    cygwin_inet_addr (dhcpnetmask);
-			  sa->sin_family = AF_INET;
-			  sa->sin_port = 0;
-			  break;
-			case SIOCGIFHWADDR:
-			  so = &ifr->ifr_hwaddr;
-			  memset (so->sa_data, 0, IFHWADDRLEN);
-			  so->sa_family = AF_INET;
-			  break;
-			case SIOCGIFMETRIC:
-			  ifr->ifr_metric = 1;
-			  break;
-			case SIOCGIFMTU:
-			  ifr->ifr_mtu = 1500;
-			  break;
+			  case SIOCGIFCONF:
+			  case SIOCGIFADDR:
+			    sa = (struct sockaddr_in *) &ifr->ifr_addr;
+			    sa->sin_addr.s_addr =
+			      cygwin_inet_addr (dhcpaddress);
+			    sa->sin_family = AF_INET;
+			    sa->sin_port = 0;
+			    break;
+			  case SIOCGIFBRDADDR:
+			    lip = cygwin_inet_addr (dhcpaddress);
+			    lnp = cygwin_inet_addr (dhcpnetmask);
+			    sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
+			    sa->sin_addr.s_addr = lip & lnp | ~lnp;
+			    sa->sin_family = AF_INET;
+			    sa->sin_port = 0;
+			    break;
+			  case SIOCGIFNETMASK:
+			    sa = (struct sockaddr_in *) &ifr->ifr_netmask;
+			    sa->sin_addr.s_addr =
+			      cygwin_inet_addr (dhcpnetmask);
+			    sa->sin_family = AF_INET;
+			    sa->sin_port = 0;
+			    break;
+			  case SIOCGIFHWADDR:
+			    so = &ifr->ifr_hwaddr;
+			    memset (so->sa_data, 0, IFHWADDRLEN);
+			    so->sa_family = AF_INET;
+			    break;
+			  case SIOCGIFMETRIC:
+			    ifr->ifr_metric = 1;
+			    break;
+			  case SIOCGIFMTU:
+			    ifr->ifr_mtu = 1500;
+			    break;
 			}
 		    }
 		  else
 		    {
 		      switch (what)
 			{
-			case SIOCGIFCONF:
-			case SIOCGIFADDR:
-			  sa = (struct sockaddr_in *) &ifr->ifr_addr;
-			  sa->sin_addr.s_addr = cygwin_inet_addr (ip);
-			  sa->sin_family = AF_INET;
-			  sa->sin_port = 0;
-			  break;
-			case SIOCGIFBRDADDR:
-			  lip = cygwin_inet_addr (ip);
-			  lnp = cygwin_inet_addr (np);
-			  sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
-			  sa->sin_addr.s_addr = lip & lnp | ~lnp;
-			  sa->sin_family = AF_INET;
-			  sa->sin_port = 0;
-			  break;
-			case SIOCGIFNETMASK:
-			  sa = (struct sockaddr_in *) &ifr->ifr_netmask;
-			  sa->sin_addr.s_addr = cygwin_inet_addr (np);
-			  sa->sin_family = AF_INET;
-			  sa->sin_port = 0;
-			  break;
-			case SIOCGIFHWADDR:
-			  so = &ifr->ifr_hwaddr;
-			  memset (so->sa_data, 0, IFHWADDRLEN);
-			  so->sa_family = AF_INET;
-			  break;
-			case SIOCGIFMETRIC:
-			  ifr->ifr_metric = 1;
-			  break;
-			case SIOCGIFMTU:
-			  ifr->ifr_mtu = 1500;
-			  break;
+			  case SIOCGIFCONF:
+			  case SIOCGIFADDR:
+			    sa = (struct sockaddr_in *) &ifr->ifr_addr;
+			    sa->sin_addr.s_addr = cygwin_inet_addr (ip);
+			    sa->sin_family = AF_INET;
+			    sa->sin_port = 0;
+			    break;
+			  case SIOCGIFBRDADDR:
+			    lip = cygwin_inet_addr (ip);
+			    lnp = cygwin_inet_addr (np);
+			    sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
+			    sa->sin_addr.s_addr = lip & lnp | ~lnp;
+			    sa->sin_family = AF_INET;
+			    sa->sin_port = 0;
+			    break;
+			  case SIOCGIFNETMASK:
+			    sa = (struct sockaddr_in *) &ifr->ifr_netmask;
+			    sa->sin_addr.s_addr = cygwin_inet_addr (np);
+			    sa->sin_family = AF_INET;
+			    sa->sin_port = 0;
+			    break;
+			  case SIOCGIFHWADDR:
+			    so = &ifr->ifr_hwaddr;
+			    memset (so->sa_data, 0, IFHWADDRLEN);
+			    so->sa_family = AF_INET;
+			    break;
+			  case SIOCGIFMETRIC:
+			    ifr->ifr_metric = 1;
+			    break;
+			  case SIOCGIFMTU:
+			    ifr->ifr_mtu = 1500;
+			    break;
 			}
 		    }
 		  ++cnt;
@@ -1591,8 +1679,7 @@ get_95_ifconf (struct ifconf *ifc, int what)
       char adapter[256], ip[256], np[256];
 
       if (res != ERROR_SUCCESS
-	  || RegOpenKeyEx (key, ifname, 0,
-			   KEY_READ, &ifkey) != ERROR_SUCCESS)
+	  || RegOpenKeyEx (key, ifname, 0, KEY_READ, &ifkey) != ERROR_SUCCESS)
 	continue;
 
       if (RegQueryValueEx (ifkey, "Driver", 0,
@@ -1619,45 +1706,44 @@ get_95_ifconf (struct ifconf *ifc, int what)
 			      NULL, (unsigned char *) np,
 			      (size = sizeof np, &size)) == ERROR_SUCCESS)
 	{
-	  if ((caddr_t)++ifr > ifc->ifc_buf
-	      + ifc->ifc_len
-	      - sizeof (struct ifreq))
+	  if ((caddr_t)++ ifr > ifc->ifc_buf
+	      + ifc->ifc_len - sizeof (struct ifreq))
 	    goto out;
 
 	  switch (what)
 	    {
-	    case SIOCGIFCONF:
-	    case SIOCGIFADDR:
-	      sa = (struct sockaddr_in *) &ifr->ifr_addr;
-	      sa->sin_addr.s_addr = cygwin_inet_addr (ip);
-	      sa->sin_family = AF_INET;
-	      sa->sin_port = 0;
-	      break;
-	    case SIOCGIFBRDADDR:
-	      lip = cygwin_inet_addr (ip);
-	      lnp = cygwin_inet_addr (np);
-	      sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
-	      sa->sin_addr.s_addr = lip & lnp | ~lnp;
-	      sa->sin_family = AF_INET;
-	      sa->sin_port = 0;
-	      break;
-	    case SIOCGIFNETMASK:
-	      sa = (struct sockaddr_in *) &ifr->ifr_netmask;
-	      sa->sin_addr.s_addr = cygwin_inet_addr (np);
-	      sa->sin_family = AF_INET;
-	      sa->sin_port = 0;
-	      break;
-	    case SIOCGIFHWADDR:
-	      so = &ifr->ifr_hwaddr;
-	      memset (so->sa_data, 0, IFHWADDRLEN);
-	      so->sa_family = AF_INET;
-	      break;
-	    case SIOCGIFMETRIC:
-	      ifr->ifr_metric = 1;
-	      break;
-	    case SIOCGIFMTU:
-	      ifr->ifr_mtu = 1500;
-	      break;
+	      case SIOCGIFCONF:
+	      case SIOCGIFADDR:
+		sa = (struct sockaddr_in *) &ifr->ifr_addr;
+		sa->sin_addr.s_addr = cygwin_inet_addr (ip);
+		sa->sin_family = AF_INET;
+		sa->sin_port = 0;
+		break;
+	      case SIOCGIFBRDADDR:
+		lip = cygwin_inet_addr (ip);
+		lnp = cygwin_inet_addr (np);
+		sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
+		sa->sin_addr.s_addr = lip & lnp | ~lnp;
+		sa->sin_family = AF_INET;
+		sa->sin_port = 0;
+		break;
+	      case SIOCGIFNETMASK:
+		sa = (struct sockaddr_in *) &ifr->ifr_netmask;
+		sa->sin_addr.s_addr = cygwin_inet_addr (np);
+		sa->sin_family = AF_INET;
+		sa->sin_port = 0;
+		break;
+	      case SIOCGIFHWADDR:
+		so = &ifr->ifr_hwaddr;
+		memset (so->sa_data, 0, IFHWADDRLEN);
+		so->sa_family = AF_INET;
+		break;
+	      case SIOCGIFMETRIC:
+		ifr->ifr_metric = 1;
+		break;
+	      case SIOCGIFMTU:
+		ifr->ifr_mtu = 1500;
+		break;
 	    }
 	}
 
@@ -1667,28 +1753,28 @@ get_95_ifconf (struct ifconf *ifc, int what)
       strcat (netname, ifname);
 
       if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, netname,
-		  0, KEY_READ, &subkey) != ERROR_SUCCESS)
-      {
+			0, KEY_READ, &subkey) != ERROR_SUCCESS)
+	{
 	  RegCloseKey (ifkey);
 	  --ifr;
 	  continue;
-      }
+	}
 
       if (RegQueryValueEx (subkey, "AdapterName", 0,
-		  NULL, (unsigned char *) adapter,
-		  (size = sizeof adapter, &size)) == ERROR_SUCCESS
-	      && strcasematch (adapter, "MS$PPP"))
-      {
+			   NULL, (unsigned char *) adapter,
+			   (size = sizeof adapter, &size)) == ERROR_SUCCESS
+	  && strcasematch (adapter, "MS$PPP"))
+	{
 	  ++*ppp;
 	  strcpy (ifr->ifr_name, "ppp");
 	  strcat (ifr->ifr_name, ppp);
-      }
+	}
       else
-      {
+	{
 	  ++*eth;
 	  strcpy (ifr->ifr_name, "eth");
 	  strcat (ifr->ifr_name, eth);
-      }
+	}
 
       RegCloseKey (subkey);
       RegCloseKey (ifkey);
@@ -1728,44 +1814,45 @@ get_ifconf (struct ifconf *ifc, int what)
   memset (&ifr->ifr_addr, '\0', sizeof (ifr->ifr_addr));
   switch (what)
     {
-    case SIOCGIFCONF:
-    case SIOCGIFADDR:
-      sa = (struct sockaddr_in *) &ifr->ifr_addr;
-      sa->sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-      sa->sin_family = AF_INET;
-      sa->sin_port = 0;
-      break;
-    case SIOCGIFBRDADDR:
-      lip = htonl (INADDR_LOOPBACK);
-      lnp = cygwin_inet_addr ("255.0.0.0");
-      sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
-      sa->sin_addr.s_addr = lip & lnp | ~lnp;
-      sa->sin_family = AF_INET;
-      sa->sin_port = 0;
-      break;
-    case SIOCGIFNETMASK:
-      sa = (struct sockaddr_in *) &ifr->ifr_netmask;
-      sa->sin_addr.s_addr = cygwin_inet_addr ("255.0.0.0");
-      sa->sin_family = AF_INET;
-      sa->sin_port = 0;
-      break;
-    case SIOCGIFHWADDR:
-      ifr->ifr_hwaddr.sa_family = AF_INET;
-      memset (ifr->ifr_hwaddr.sa_data, 0, IFHWADDRLEN);
-      break;
-    case SIOCGIFMETRIC:
-      ifr->ifr_metric = 1;
-      break;
-    case SIOCGIFMTU:
-      /* This funny value is returned by `ifconfig lo' on Linux 2.2 kernel. */
-      ifr->ifr_mtu = 3924;
-      break;
-    default:
-      set_errno (EINVAL);
-      return -1;
+      case SIOCGIFCONF:
+      case SIOCGIFADDR:
+	sa = (struct sockaddr_in *) &ifr->ifr_addr;
+	sa->sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+	sa->sin_family = AF_INET;
+	sa->sin_port = 0;
+	break;
+      case SIOCGIFBRDADDR:
+	lip = htonl (INADDR_LOOPBACK);
+	lnp = cygwin_inet_addr ("255.0.0.0");
+	sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
+	sa->sin_addr.s_addr = lip & lnp | ~lnp;
+	sa->sin_family = AF_INET;
+	sa->sin_port = 0;
+	break;
+      case SIOCGIFNETMASK:
+	sa = (struct sockaddr_in *) &ifr->ifr_netmask;
+	sa->sin_addr.s_addr = cygwin_inet_addr ("255.0.0.0");
+	sa->sin_family = AF_INET;
+	sa->sin_port = 0;
+	break;
+      case SIOCGIFHWADDR:
+	ifr->ifr_hwaddr.sa_family = AF_INET;
+	memset (ifr->ifr_hwaddr.sa_data, 0, IFHWADDRLEN);
+	break;
+      case SIOCGIFMETRIC:
+	ifr->ifr_metric = 1;
+	break;
+      case SIOCGIFMTU:
+	/* This funny value is returned by `ifconfig lo' on Linux 2.2 kernel. */
+	ifr->ifr_mtu = 3924;
+	break;
+      default:
+	set_errno (EINVAL);
+	return -1;
     }
 
   OSVERSIONINFO os_version_info;
+
   memset (&os_version_info, 0, sizeof os_version_info);
   os_version_info.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
   GetVersionEx (&os_version_info);
@@ -1781,7 +1868,7 @@ get_ifconf (struct ifconf *ifc, int what)
 /* exported as rcmd: standards? */
 extern "C" int
 cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
-	       char *remuser, char *cmd, int *fd2p)
+	     char *remuser, char *cmd, int *fd2p)
 {
   int res = -1;
   SOCKET fd2s;
@@ -1794,12 +1881,14 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
     return (int) INVALID_SOCKET;
 
   cygheap_fdnew res_fd;
+
   if (res_fd < 0)
     goto done;
 
   if (fd2p)
     {
       cygheap_fdnew newfd (res_fd, false);
+
       if (*fd2p < 0)
 	goto done;
       *fd2p = newfd;
@@ -1833,6 +1922,7 @@ cygwin_rresvport (int *port)
     return -1;
 
   cygheap_fdnew res_fd;
+
   if (res_fd < 0)
     res = -1;
   else
@@ -1853,7 +1943,7 @@ cygwin_rresvport (int *port)
 /* exported as rexec: standards? */
 extern "C" int
 cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
-	       char *password, char *cmd, int *fd2p)
+	      char *password, char *cmd, int *fd2p)
 {
   int res = -1;
   SOCKET fd2s;
@@ -1866,11 +1956,13 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
     return (int) INVALID_SOCKET;
 
   cygheap_fdnew res_fd;
+
   if (res_fd < 0)
     goto done;
   if (fd2p)
     {
       cygheap_fdnew newfd (res_fd);
+
       if (newfd < 0)
 	goto done;
       *fd2p = newfd;
@@ -1929,6 +2021,7 @@ socketpair (int family, int type, int protocol, int *sb)
     {
       sb[0] = sb0;
       cygheap_fdnew sb1 (sb0, false);
+
       if (sb1 < 0)
 	goto done;
 
@@ -2009,8 +2102,7 @@ socketpair (int family, int type, int protocol, int *sb)
     sock_out.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
 
   /* Do a connect */
-  if (connect (outsock, (struct sockaddr *) &sock_in,
-					   sizeof (sock_in)) < 0)
+  if (connect (outsock, (struct sockaddr *) &sock_in, sizeof (sock_in)) < 0)
     {
       debug_printf ("connect error");
       set_winsock_errno ();
@@ -2038,7 +2130,7 @@ socketpair (int family, int type, int protocol, int *sb)
     {
       /* For datagram sockets, connect the 2nd socket */
       if (connect (newsock, (struct sockaddr *) &sock_out,
-					       sizeof (sock_out)) < 0)
+		   sizeof (sock_out)) < 0)
 	{
 	  debug_printf ("connect error");
 	  set_winsock_errno ();

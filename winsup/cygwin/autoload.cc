@@ -485,6 +485,7 @@ LoadDLLfuncEx (WSAEventSelect, 12, ws2_32, 1)
 LoadDLLfuncEx (WSAEnumNetworkEvents, 12, ws2_32, 1)
 
 LoadDLLfuncEx (GetIfTable, 12, iphlpapi, 1)
+LoadDLLfuncEx (GetIfEntry, 4, iphlpapi, 1)
 LoadDLLfuncEx (GetIpAddrTable, 12, iphlpapi, 1)
 
 LoadDLLfunc (CoInitialize, 4, ole32)

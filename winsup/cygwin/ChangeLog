@@ -1,3 +1,13 @@
+2002-11-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc: Run indent.
+
+2002-11-10  Alexander Gottwald <Alexander.Gottwald@s1999.tu-chemnitz.de>
+
+	* autoload.cc (GetIfEntry): Add symbol.
+	* net.cc (get_2k_ifconf): Get the interface entries with the GetIfEntry
+	call intead of the GetIfTable call. Clean-up multiple IP address naming.
+
 2002-11-09  Sergey Okhapkin  <sos@prospect.com.ru>
 
 	* fhandler.h (class fhandler_pipe): New ioctl() method.
