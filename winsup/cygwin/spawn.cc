@@ -211,7 +211,7 @@ class linebuf
   char *buf;
   size_t alloced;
   linebuf () : ix (0), buf (NULL), alloced (0) {}
-  ~linebuf () {/* if (buf) free (buf);*/}
+  ~linebuf () {if (buf) free (buf);}
   void add (const char *what, int len);
   void add (const char *what) {add (what, strlen (what));}
   void prepend (const char *what, int len);

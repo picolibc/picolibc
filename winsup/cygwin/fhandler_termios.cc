@@ -308,7 +308,7 @@ fhandler_termios::line_edit (const char *rptr, int nread, termios& ti)
       else if (CCEQ (ti.c_cc[VEOF], c))
 	{
 	  termios_printf ("EOF");
-	  (void) accept_input();
+	  (void) accept_input ();
 	  ret = line_edit_input_done;
 	  continue;
 	}

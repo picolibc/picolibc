@@ -62,8 +62,7 @@ static DWORD WINAPI
 read_pipe (void *arg)
 {
   pipeargs *pi = (pipeargs *) arg;
-  fhandler_base *fh = dynamic_cast<fhandler_base *> (pi->fh);
-  fh->fhandler_base::read (pi->ptr, *pi->len);
+  pi->fh->fhandler_base::read (pi->ptr, *pi->len);
   return 0;
 }
 
@@ -74,7 +73,7 @@ fhandler_pipe::read (void *in_ptr, size_t& in_len)
     in_len = 0;
   else
     {
-      pipeargs pi = {this, in_ptr, &in_len};
+      pipeargs pi = {dynamic_cast<fhandler_base *>(this), in_ptr, &in_len};
       ResetEvent (read_state);
       cygthread *th = new cygthread (read_pipe, &pi, "read_pipe");
       if (th->detach (read_state) && !in_len)
