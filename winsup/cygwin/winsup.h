@@ -195,7 +195,7 @@ int __stdcall __check_null_invalid_struct_errno (const void *s, unsigned sz) __a
 int __stdcall __check_invalid_read_ptr_errno (const void *s, unsigned sz) __attribute__ ((regparm(2)));
 
 #define check_null_invalid_struct(s) \
-  __check_null_invalid ((s), sizeof (*(s)))
+  __check_null_invalid_struct ((s), sizeof (*(s)))
 #define check_null_invalid_struct_errno(s) \
   __check_null_invalid_struct_errno ((s), sizeof (*(s)))
 

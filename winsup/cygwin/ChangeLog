@@ -1,3 +1,16 @@
+2001-11-15  Egor Duda  <deo@logos-m.ru>
+
+	* include/pthread.h (PTHREAD_COND_INITIALIZER): Define.
+	* thread.cc (__pthread_cond_destroy): Add support for
+	PTHREAD_COND_INITIALIZER.
+	(__pthread_cond_init): Ditto.
+	(__pthread_cond_broadcast): Ditto.
+	(__pthread_cond_signal): Ditto.
+	(__pthread_cond_dowait): Ditto.
+	(__pthread_mutex_init): Handle PTHREAD_MUTEX_INITIALIZER correctly,
+	don't return error when it's passed as parameter.
+	* winsup.h (check_null_invalid_struct): Call correct function.
+
 2001-11-14  Christopher Faylor  <cgf@redhat.com>
 
 	* exceptions.cc: Add stdlib.h include for alloca declaration.

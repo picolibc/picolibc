@@ -1676,6 +1676,8 @@ __pthread_getspecific (pthread_key_t key)
 int
 __pthread_cond_destroy (pthread_cond_t *cond)
 {
+  if (check_valid_pointer (cond) && (*cond == PTHREAD_COND_INITIALIZER))
+    return 0;
   if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC) != VALID_OBJECT)
     return EINVAL;
 
@@ -1695,7 +1697,7 @@ __pthread_cond_init (pthread_cond_t *cond, const pthread_condattr_t *attr)
   if (attr && verifyable_object_isvalid (attr, PTHREAD_CONDATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
 
-  if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC) != INVALID_OBJECT)
+  if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC, PTHREAD_COND_INITIALIZER) == VALID_OBJECT)
     return EBUSY;
 
   *cond = new pthread_cond (attr ? (*attr) : NULL);
@@ -1713,6 +1715,8 @@ __pthread_cond_init (pthread_cond_t *cond, const pthread_condattr_t *attr)
 int
 __pthread_cond_broadcast (pthread_cond_t *cond)
 {
+  if (*cond == PTHREAD_COND_INITIALIZER)
+    __pthread_cond_init (cond, NULL);
   if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC) != VALID_OBJECT)
     return EINVAL;
 
@@ -1724,6 +1728,8 @@ __pthread_cond_broadcast (pthread_cond_t *cond)
 int
 __pthread_cond_signal (pthread_cond_t *cond)
 {
+  if (*cond == PTHREAD_COND_INITIALIZER)
+    __pthread_cond_init (cond, NULL);
   if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC) != VALID_OBJECT)
     return EINVAL;
 
@@ -1743,6 +1749,8 @@ __pthread_cond_dowait (pthread_cond_t *cond, pthread_mutex_t *mutex,
   if (*mutex == PTHREAD_MUTEX_INITIALIZER)
     __pthread_mutex_init (mutex, NULL);
   themutex = mutex;
+  if (*cond == PTHREAD_COND_INITIALIZER)
+    __pthread_cond_init (cond, NULL);
 
   if (verifyable_object_isvalid (themutex, PTHREAD_MUTEX_MAGIC) != VALID_OBJECT)
     return EINVAL;
@@ -1920,7 +1928,7 @@ __pthread_mutex_init (pthread_mutex_t *mutex,
   if (attr && verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC) != VALID_OBJECT || check_valid_pointer (mutex))
     return EINVAL;
 
-  if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC, PTHREAD_MUTEX_INITIALIZER) != INVALID_OBJECT)
+  if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC, PTHREAD_MUTEX_INITIALIZER) == VALID_OBJECT)
     return EBUSY;
 
   *mutex = new pthread_mutex (attr ? (*attr) : NULL);

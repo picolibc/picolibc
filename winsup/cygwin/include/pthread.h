@@ -43,7 +43,8 @@ extern "C"
 #define PTHREAD_CANCEL_DEFERRED 0
 #define PTHREAD_CANCEL_DISABLE 1
 #define PTHREAD_CANCELED
-#define PTHREAD_COND_INITIALIZER
+/* this should be a value that can never be a valid address */
+#define PTHREAD_COND_INITIALIZER (void *)21
 #define PTHREAD_CREATE_DETACHED 1
 /* the default : joinable */
 #define PTHREAD_CREATE_JOINABLE 0
