@@ -742,6 +742,12 @@ case $basic_machine in
 	rtpc | rtpc-*)
 		basic_machine=romp-ibm
 		;;
+	s390 | s390-* )
+		basic_machine=s390-ibm
+		;;
+	s390x | s390x-* )
+		basic_machine=s390x-ibm
+		;;
 	sa29200)
 		basic_machine=a29k-amd
 		os=-udi
