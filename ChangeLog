@@ -3,6 +3,11 @@
 	* Makefile.tpl: Change configure dependencies to not have real
 	targets depend on phony targets.
 
+2002-12-06  DJ Delorie  <dj@redhat.com>
+
+	* Makefile.tpl: Change configure dependencies to not have real
+	targets depend on phony targets.
+
 2002-12-05  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* configure.in: Revert unintentional change.

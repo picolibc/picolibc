@@ -7707,7 +7707,7 @@ all-itcl: maybe-all-tcl maybe-all-tk
 install-itcl: maybe-install-tcl
 all-sid: maybe-all-tcl maybe-all-tk
 install-sid: maybe-install-tcl maybe-install-tk
-all-sim: maybe-all-libiberty maybe-all-bfd maybe-all-opcodes maybe-all-readline
+all-sim: maybe-all-libiberty maybe-all-bfd maybe-all-opcodes maybe-all-readline maybe-configure-gdb
 configure-tk: maybe-configure-tcl
 all-tk: maybe-all-tcl
 configure-tix: maybe-configure-tcl maybe-configure-tk
