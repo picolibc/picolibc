@@ -1,3 +1,8 @@
+2001-03-01  John David Anglin  <dave@hiauly1.hia.nrc.ca>
+
+	* safe-ctype.h (_sch_test): Cast enum bit to unsigned short int for pcc
+	compatibility.
+	
 2001-02-18  lars brinkhoff  <lars@nocrew.org>
 
 	* dis-asm.h: Add PDP-11 target.
