@@ -20,7 +20,7 @@
 	* include/winbase.h (InitializeSListHead): Avoid conflicting
 	definition with DDK headers.
 
-2004-04-13  Gé van Geldorp  <xnavara@volny.cz>
+2004-04-13  Gé van Geldorp  <gvg@reactos.com>
 
 	* include/winuser.h (GetLastError): Move from here...
 	* include/winbase.h: ... to here.
@@ -102,7 +102,7 @@
 
 2004-03-29  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* lib/Makefile,in; Add directx to .PHONY target.
+	* lib/Makefile.in: Add directx to .PHONY target.
 	* lib/directx/dxerr.c: Remove dependence on mingw runtime. 
 	Don't include stdio.h or tchar.h.
 	Replace _T() macro with TEXT() macro, throughout.
@@ -122,7 +122,7 @@
 	* lib/directx: Ditto.
 	* include/directx/(d3d9.h, d3d9caps.h, d3d9types.h, dxerr8.h,
 	dxerr9.h): New files.
-	* lib/ddk/(Makefile.in, d3d8.def, d3d9.def, d3dim.def, d3drm.def,
+	* lib/directx/(Makefile.in, d3d8.def, d3d9.def, d3dim.def, d3drm.def,
 	d3dx8d.def, d3dx9d.def, d3dxof.def, ddraw.def, dinput.def,
 	dinput_joy.c, dinput_joy2.c, dinput_kbd.c, dinput_mouse.c,
 	dinput_mouse2.c, dinput_private.h, dinput8.def, dmoguids.c, dplayx.def,
@@ -212,16 +212,16 @@
 
 2004-03-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/basetyps.h (GUID_SECT): Define to nothimg for GCC >= 2.95.
+	* include/basetyps.h (GUID_SECT): Define to nothing for GCC >= 2.95.
 
 2004-03-02  Martin Fuchs  <martin-fuchs@gmx.net>
 
 	* include/oleauto.h (VAR_VALIDDATE, VAR_FORMAT_NOSUBSTITUTE,
-	VAR_FOURDIGITYEARS) Define new constants. Group VAR_*  defines
+	VAR_FOURDIGITYEARS): Define new constants. Group VAR_*  defines
 	together.
-	(V_UI2, V_UI4, V_UI4REF, V_UI, V_UI8REF) Define macros.
+	(V_UI2, V_UI4, V_UI4REF, V_UI, V_UI8REF): Define macros.
 	(V_I8, V_I8REF): Correct macros.
-	(V_DECIMAL): Correct macro deginitions.
+	(V_DECIMAL): Correct macro definitions.
 	(V_INT_PTR, V_UINT_PTR, V_INT_PTRREF, V_UINT_PTRREF): Define
 	constants.
 	(VTBIT_*): Define constants.
@@ -237,7 +237,7 @@
 
 2004-03-01  Martin Fuchs  <martin-fuchs@gmx.net>
 
-	* include/oaidl.h (FADF_*) Define missing constants.
+	* include/oaidl.h (FADF_*): Define missing constants.
 	(IDispatch_*): Define COBJ macros.
 	(VARIANT): Add missing union members llVal and ullVal.
 	(wireVARIANT): Likewise.
@@ -253,7 +253,7 @@
 	(VarParseNumFromStr,VarNumFromParseNum): Add prototypes.
 	* include/winerror.h (DISP_E_DIVBYZERO): Define constant.
 	* include/winuser.h (COLOR_*): Define missing constants.
-	* include/wtypes.h (enum VARENUM) Add VT_INT_PTR, VT_UINT_PTR.
+	* include/wtypes.h (enum VARENUM): Add VT_INT_PTR, VT_UINT_PTR.
  	(VT_INT_PTR, VT_UINT_PTR): Remove macro definitions.
 
 2004-02-23  Filip Navara  <xnavara@volny.cz>
@@ -289,7 +289,7 @@
 2004-02-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/dnsapi.a: New file.
-	* lib/test.c: Include windns,h.
+	* lib/test.c: Include windns.h.
  
 2004-02-11  Pierre A. Humblet  <Pierre.Humblet@ieee.org>
 
@@ -442,7 +442,7 @@
 
 2004-01-01  Filip Navara  <xnavara@volny.cz>
 
-	* include/objbase.h:  Don't care about value of DBG define.
+	* include/objbase.h: Don't care about value of DBG define.
 	* include/objidl.h: Add some COBJMACROS.
 	* include/ocidl.h: Ditto.
 	* include/oleidl.h: Ditto.
@@ -482,7 +482,7 @@
 2003-12-08  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winuser.h (DISPLAY_DEVICE_*): Remove defines.
-	* include/wingdi.h  (DISPLAY_DEVICE_REMOVABLE,
+	* include/wingdi.h (DISPLAY_DEVICE_REMOVABLE,
 	DISPLAY_DEVICE_MODESPRUNED): Add defines.
 
 2003-12-08  Hartmut Honisch  <hhonisch@users.sourceforge.net>
@@ -491,7 +491,7 @@
 	Add macros.
 	* include/wingdi.h  (DISPLAY_DEVICE_*): Add multi-monitor
 	constants.
-	* include/shlobj.h (SHCOLUMNINIT); Add structure.
+	* include/shlobj.h (SHCOLUMNINIT): Add structure.
 	(SHCOLUMNDAT): Likwise.
 	(SHCOLUMNID): Likewise.
 	(SHCOLUMNINFO): Likewise.
@@ -517,9 +517,9 @@
 2003-12-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winnt.h (GetCurrentFiber): Remove duplicate prototype.
-	(GetFiberData); Likewise.
+	(GetFiberData): Likewise.
 	(GetCurrentFiber): Change volatile to __volatile__.
-	(GetFiberData); Likewise.
+	(GetFiberData): Likewise.
 
 2003-11-27  Christopher Faylor  <cgf@redhat.com>
 
@@ -579,14 +579,14 @@
 
 2003-10-13  Filip Navara  <xnavara@volny.cz>
 
-	* include/commctrl.h: (DSA_*):Add prototypes, typedefs and
+	* include/commctrl.h (DSA_*): Add prototypes, typedefs and
 	defines for Dynamic Storage Arrays.
 	(DPA_*): Likewise, for Dynamic Pointer Arrays.
 	(FlatSB_*, InitializeFlatSB, InitializeFlatSB): Add prototypes
 	and defines for Flat ScrollBars.
 	(SetWindowSubclass, GetWindowSubclass, RemoveWindowSubclass,
 	DefSubclassProc): Add prototypes for subclassing.
-	(DrawShadowText) Add prototype.
+	(DrawShadowText): Add prototype.
 	(COMCTL32_VERSION): Define.
 
 2003-10-13  Martin Fuchs  <Martin-Fuchs@gmx.net>
@@ -1402,7 +1402,7 @@
 
 	* include/commctrl.h (ILCF_*): Add defines.
 	(ILD_*): Ditto.
-	(HDS_*); Ditto.
+	(HDS_*): Ditto.
 	(IPN_FIRST, IPN_LAST): Cast to UINT.
 	(SBN_FIRST, SBN_LAST): Add defines.
 	(PGN_*): Ditto.
@@ -1600,7 +1600,7 @@
 
 2003-08-01  Gisle Vanem  <gvanem@broadpark.no>
 
-	* include/ddk/winddk.h; Remove trailing ';' from macros,
+	* include/ddk/winddk.h: Remove trailing ';' from macros,
 	throughout. Add () around defines with cast returns, throughout.
 
 2003-07-31  Martin Fuchs  <Martin-Fuchs@gmx.net>
@@ -3897,7 +3897,7 @@
 
 2002-02-28  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/windows.h; Remove test for __W32API_MAJOR_VERSION
+	* include/windows.h: Remove test for __W32API_MAJOR_VERSION
 	when selecting winsock interface.
 	* include/winsock2.h (SOCKET_ADDRESS_LIST): Add structure
 	and typedefs. Thanks to: 'Lorenzo' <conte0@infinito.it>.
@@ -4256,7 +4256,7 @@
 2001-11-09  Robert Collins  <rbtcollins@hotmail.com>
 
 	* include/winnt.h (GetCurrentFiber): Create a prototype before the 
-	implementation;
+	implementation.
 	(GetFiberData): Ditto.
 
 2001-11-09  Robert Collins  <rbtcollins@hotmail.com>
@@ -4266,7 +4266,7 @@
 2001-11-08  Robert Collins  <rbtcollins@hotmail.com>
 
 	* include/winnt.h: Define *_SID_AUTHORITY appropriately,
-	GetCurrentFiber: Create a prototype before the implementation;
+	GetCurrentFiber: Create a prototype before the implementation.
 	GetFiberData: Ditto.
 
 2001-11-06  Danny Smith  <dannysmith@users.sourceforge.net>
