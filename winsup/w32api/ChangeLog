@@ -1,3 +1,8 @@
+2003-09-13  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winuser.h (_WIN32_WINNT, _WIN32_WINDOWS, WINVER):
+	Change guards to use numeric constants, throughout.
+
 2003-09-08  Justin Forest <vhex@users.sourceforge.net>
 
 	* include/winuser.h (PM_QS_INPUT, PM_QS_POSTMESSAGE,

@@ -451,10 +451,10 @@ extern "C" {
 #define DFCS_INACTIVE	256
 #define DFCS_PUSHED	512
 #define DFCS_CHECKED	1024
-#if (WINVER >= _W2K)
+#if (WINVER >= 0x0500)
 #define DFCS_TRANSPARENT	0x800
 #define DFCS_HOT	0x1000
-#endif /* WINVER >= _W2K */
+#endif /* WINVER >= 0x0500 */
 #define DFCS_ADJUSTRECT	0x2000
 #define DFCS_FLAT	0x4000
 #define DFCS_MONO	0x8000
@@ -1783,7 +1783,7 @@ extern "C" {
 #define TPM_BOTTOMALIGN 32
 #define TPM_NONOTIFY 128
 #define TPM_RETURNCMD 256
-#if (_WIN32_WINNT >= _NT5 || _WIN32_WINDOWS >= _W98)
+#if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0410)
 #define TPM_RECURSE 1
 #endif
 #define HELP_COMMAND 0x102
@@ -2030,19 +2030,19 @@ extern "C" {
 #if(WINVER >= 0x0400)
 #define ENDSESSION_LOGOFF    0x80000000
 #endif /* WINVER >= 0x0400 */
-#if (_WIN32_WINNT >= _NT5 || _WIN32_WINDOWS >= _WME)
+#if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0490)
 #define ASFW_ANY ((DWORD)-1)
 #define LSFW_LOCK 1
 #define LSFW_UNLOCK 2
 #endif
-#if(_WIN32_WINNT >= _NT5)
+#if(_WIN32_WINNT >= 0x0500)
 #define LWA_COLORKEY 1
 #define LWA_ALPHA 2
 #endif
 #define GA_PARENT 1
 #define GA_ROOT 2
 #define GA_ROOTOWNER 3
-#if (_WIN32_WINNT >= _NT5 || _WIN32_WINDOWS >= _W98)
+#if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0410)
 #define MONITOR_DEFAULTTONULL 0 
 #define MONITOR_DEFAULTTOPRIMARY 1 
 #define MONITOR_DEFAULTTONEAREST 2 
@@ -3097,7 +3097,7 @@ DWORD WINAPI GetQueueStatus(UINT);
 BOOL WINAPI GetScrollInfo(HWND,int,LPSCROLLINFO);
 int WINAPI GetScrollPos(HWND,int);
 BOOL WINAPI GetScrollRange(HWND,int,LPINT,LPINT);
-#if (_WIN32_WINNT >= _NT5)
+#if (_WIN32_WINNT >= 0x0500)
 HWND WINAPI GetShellWindow(VOID);
 #endif
 HMENU WINAPI GetSubMenu(HMENU,int);
@@ -3402,15 +3402,15 @@ int WINAPIV wsprintfA(LPSTR,LPCSTR,...);
 int WINAPIV wsprintfW(LPWSTR,LPCWSTR,...);
 int WINAPI wvsprintfA(LPSTR,LPCSTR,va_list arglist);
 int WINAPI wvsprintfW(LPWSTR,LPCWSTR,va_list arglist);
-#if(_WIN32_WINNT >= _NT5  || _WIN32_WINDOWS >= _WME)
+#if(_WIN32_WINNT >= 0x0500  || _WIN32_WINDOWS >= 0x0490)
 BOOL WINAPI AllowSetForegroundWindow(DWORD);
 BOOL WINAPI LockSetForegroundWindow(UINT);
 #endif
-#if(_WIN32_WINNT >= _NT5)
+#if(_WIN32_WINNT >= 0x0500)
 BOOL WINAPI SetLayeredWindowAttributes(HWND,COLORREF,BYTE,DWORD);
 BOOL WINAPI UpdateLayeredWindow(HWND,HDC,POINT*,SIZE*,HDC,POINT*,COLORREF,BLENDFUNCTION*,DWORD);
 #endif
-#if(_WIN32_WINNT >= _WXP)
+#if(_WIN32_WINNT >= 0x0501)
 BOOL WINAPI GetLayeredWindowAttributes(HWND,COLORREF*,BYTE*,DWORD*);
 #endif
 #ifdef UNICODE
