@@ -2,6 +2,13 @@
 
    Copyright 2001 Free Software Foundation, Inc.
    
+   Note - certain prototypes declared in this header file are for
+   functions whoes implementation copyright does not belong to the
+   FSF.  Those prototypes are present in this file for reference
+   purposes only and their presence in this file should not construed
+   as an indication of ownership by the FSF of the implementation of
+   those functions in any way or form whatsoever.
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2, or (at your option)
