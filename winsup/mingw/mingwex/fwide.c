@@ -14,6 +14,7 @@
 */
 
 #include	<wchar.h>
+#include	<stdio.h>
 
 int
 fwide(stream, mode)
