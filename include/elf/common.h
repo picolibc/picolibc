@@ -189,6 +189,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* FR30 magic number - no EABI available.  */
 #define EM_CYGNUS_FR30		0x3330
 
+/* AVR magic number
+   Written in the absense of an ABI.  */
+#define EM_AVR			0x1057
+
 /* See the above comment before you add a new EM_* value here.  */
 
 /* Values for e_version */

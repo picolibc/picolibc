@@ -1,3 +1,7 @@
+2000-03-27  Denis Chertykov  <denisc@overta.ru>
+
+	* dis-asm.h (print_insn_avr): Declare.
+
 2000-03-14  Bernd Schmidt  <bernds@cygnus.co.uk>
 
 	* hashtab.h (htab_trav): Modify type so that first arg is of type
