@@ -1644,12 +1644,12 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
   int ace_off = 0;
 
   /* Construct allow attribute for owner. */
-  DWORD owner_allow = (STANDARD_RIGHTS_ALL & ~DELETE)
+  DWORD owner_allow = STANDARD_RIGHTS_ALL
 		      | FILE_WRITE_ATTRIBUTES | FILE_WRITE_EA;
   if (attribute & S_IRUSR)
     owner_allow |= FILE_GENERIC_READ;
   if (attribute & S_IWUSR)
-    owner_allow |= FILE_GENERIC_WRITE | DELETE;
+    owner_allow |= FILE_GENERIC_WRITE;
   if (attribute & S_IXUSR)
     owner_allow |= FILE_GENERIC_EXECUTE;
   if ((attribute & (S_IFDIR | S_IWUSR | S_IXUSR))
