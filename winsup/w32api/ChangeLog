@@ -1,3 +1,9 @@
+2003-01-11  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/commctrl.h (HDN_GETDISPINFO[AW]: Add defines.
+	(tagNMHDDISPINFO[AW}: Add structures and typedefs.
+	Reported by: Mat Nieuwenhoven  <matnieuw@users.sourceforge.net>
+
 2003-01-10  Christopher Faylor  <cgf@redhat.com>
 
 	* include/winsock2.h: Remove gethostname from INSIDE_CYGWIN protection.
