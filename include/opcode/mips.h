@@ -326,6 +326,8 @@ struct mips_opcode
 #define INSN_4100                 0x00040000
 /* Toshiba R3900 instruction.  */
 #define INSN_3900                 0x00080000
+/* MIPS R10000 instruction.  */
+#define INSN_10000                0x00100000
 
 /* MIPS ISA defines, use instead of hardcoding ISA level.  */
 
@@ -375,7 +377,9 @@ struct mips_opcode
      || (cpu == CPU_R4010 && ((insn)->membership & INSN_4010) != 0)	\
      || ((cpu == CPU_VR4100 || cpu == CPU_R4111)			\
 	 && ((insn)->membership & INSN_4100) != 0)			\
-     || (cpu == CPU_R3900  && ((insn)->membership & INSN_3900) != 0))
+     || (cpu == CPU_R3900 && ((insn)->membership & INSN_3900) != 0)	\
+     || ((cpu == CPU_R10000 || cpu == CPU_R12000)			\
+	 && ((insn)->membership & INSN_10000) != 0))
 
 /* This is a list of macro expanded instructions.
 

@@ -1,3 +1,8 @@
+2001-08-16  Thiemo Seufer <seufer@csv.ica.uni-stuttgart.de>
+
+	* mips.h (INSN_10000): Define.
+	(OPCODE_IS_MEMBER): Check for INSN_10000.
+
 2001-08-10  Alan Modra  <amodra@one.net.au>
 
 	* ppc.h: Revert 2001-08-08.
