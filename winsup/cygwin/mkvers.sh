@@ -86,6 +86,7 @@ fn=`basename $incfile`
 #
 cvs_tag="`sed 's%^.\(.*\)%\1%' $dir/CVS/Tag 2>/dev/null`"
 
+wv_cvs_tag="$cvs_tag"
 [ -n "$cvs_tag" ] && cvs_tag=" CVS tag"'
 '"$cvs_tag"
 
@@ -164,8 +165,10 @@ cygverhigh=`expr $major / 1000`
 cygverlow=`expr $major % 1000`
 cygwin_ver="$cygverhigh.$cygverlow.$minor"
 if [ -n "$cvs_tag" ]; then
-    cygwin_ver="$cygwin_ver ($cvs_tag)"
+    cvs_tag="`echo $wv_cvs_tag | sed -e 's/-branch.*//'`"
+    cygwin_ver="$cygwin_ver-$cvs_tag"
 fi
 
+echo "Version $cygwin_ver"
 set -$- $builddate
 $windres --include-dir $dir/../w32api/include --include-dir $dir/include --define CYGWIN_BUILD_DATE="$1" --define CYGWIN_BUILD_TIME="$2" --define CYGWIN_VERSION='"'"$cygwin_ver"'"' $rcfile winver.o
