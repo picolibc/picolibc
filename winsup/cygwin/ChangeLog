@@ -1,3 +1,11 @@
+2003-08-05  Pavel Tsekov  <ptsekov@gmx.net>
+
+	* fhandler_disk_file.cc (fhandler_cygdrive::readdir): Do not change
+	'errno' if end of directory condition is encountered as per SUSv2.
+	* fhandler_proc.cc (fhandler_proc::readdir): Ditto.
+	* fhandler_process (fhandler_process::readdir): Ditto.
+	* fhandler_registry (fhandler_registry::readdir): Ditto.
+
 2003-07-30  Christopher Faylor  <cgf@redhat.com>
 
 	* dcrt0.cc (_dll_crt0): Move strace.microseconds initialization to

@@ -769,10 +769,7 @@ fhandler_cygdrive::readdir (DIR *dir)
   if (!iscygdrive_root ())
     return fhandler_disk_file::readdir (dir);
   if (!pdrive || !*pdrive)
-    {
-      set_errno (ENMFILE);
-      return NULL;
-    }
+    return NULL;
   else if (dir->__d_position > 1
 	   && GetFileAttributes (pdrive) == INVALID_FILE_ATTRIBUTES)
     {
