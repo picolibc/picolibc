@@ -714,7 +714,7 @@ int
 fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
 			   struct sockaddr *from, int *fromlen)
 {
-  int res;
+  int res = SOCKET_ERROR;
   DWORD ret;
 
   flags &= MSG_WINMASK;
@@ -728,8 +728,7 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
 
       if (is_nonblocking () || has_been_closed)
 	res = WSARecvFrom (get_socket (), &wsabuf, 1, &ret, (DWORD *) &flags,
-			   from, fromlen,
-			   NULL, NULL);
+			   from, fromlen, NULL, NULL);
       else
 	{
 	  wsock_event wsock_evt;
@@ -758,7 +757,6 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
       if (WSAGetLastError () == WSAEMSGSIZE)
 	return len;
 
-      res = -1;
       set_winsock_errno ();
     }
   else
@@ -786,7 +784,7 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
   struct sockaddr *from = (struct sockaddr *) msg->msg_name;
   int *fromlen = from ? &msg->msg_namelen : NULL;
 
-  int res;
+  int res = SOCKET_ERROR;
 
   if (!winsock2_active)
     {
@@ -812,7 +810,7 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
 	  if (!buf)
 	    {
 	      set_errno (ENOMEM);
-	      res = -1;
+	      res = SOCKET_ERROR;
 	    }
 	  else
 	    {
@@ -885,7 +883,6 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
 	  if (WSAGetLastError () == WSAEMSGSIZE)
 	    return len;
 
-	  res = -1;
 	  set_winsock_errno ();
 	}
       else
@@ -921,7 +918,7 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
   if (to && !get_inet_addr (to, tolen, &sin, &tolen))
     return -1;
 
-  int res;
+  int res = SOCKET_ERROR;
   DWORD ret;
 
   if (!winsock2_active)
@@ -964,10 +961,7 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
     }
 
   if (res == SOCKET_ERROR)
-    {
-      res = -1;
-      set_winsock_errno ();
-    }
+    set_winsock_errno ();
   else
     res = ret;
 
@@ -976,7 +970,7 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
      EPIPE is generated if the local end has been shut down on a connection
      oriented socket.  In this case the process will also receive a SIGPIPE
      unless MSG_NOSIGNAL is set.  */
-  if (res == -1 && get_errno () == ESHUTDOWN
+  if (res == SOCKET_ERROR && get_errno () == ESHUTDOWN
       && get_socket_type () == SOCK_STREAM)
     {
       set_errno (EPIPE);
@@ -1002,7 +996,7 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags, ssize_t tot)
   struct iovec *const iov = msg->msg_iov;
   const int iovcnt = msg->msg_iovlen;
 
-  int res;
+  int res = SOCKET_ERROR;
 
   if (!winsock2_active)
     {
@@ -1029,7 +1023,7 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags, ssize_t tot)
 	  if (!buf)
 	    {
 	      set_errno (ENOMEM);
-	      res = -1;
+	      res = SOCKET_ERROR;
 	    }
 	  else
 	    {
@@ -1101,10 +1095,7 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags, ssize_t tot)
 	}
 
       if (res == SOCKET_ERROR)
-	{
-	  res = -1;
-	  set_winsock_errno ();
-	}
+	set_winsock_errno ();
       else
 	res = ret;
     }

@@ -53,7 +53,7 @@ extern "C"
 bool
 wsock_event::prepare (int sock, long event_mask)
 {
-  SetLastError (0);
+  WSASetLastError (0);
   if ((event = WSACreateEvent ()) != WSA_INVALID_EVENT
       && WSAEventSelect (sock, event, event_mask) == SOCKET_ERROR)
     {
@@ -67,7 +67,7 @@ wsock_event::prepare (int sock, long event_mask)
 int
 wsock_event::wait (int sock, int &closed)
 {
-  int ret = -1;
+  int ret = SOCKET_ERROR;
   DWORD wsa_err = 0;
   WSAEVENT ev[2] = { event, signal_arrived };
   switch (WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE, FALSE))

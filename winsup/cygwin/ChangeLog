@@ -1,3 +1,14 @@
+2004-03-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::recvfrom): Initialize res to
+	SOCKET_ERROR.  Use SOCKET_ERROR instead of -1 throughout.
+	(fhandler_socket::recvmsg): Ditto.
+	(fhandler_socket::sendto): Ditto.
+	(fhandler_socket::sendmsg): Ditto.
+	* net.cc (wsock_event::prepare): Call WSASetLastError instead of
+	SetLastError.
+	(wsock_event::wait): Use SOCKET_ERROR instead of -1.
+
 2004-03-30  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* thread.h (pthread::init_mainthread): Add parameter forked.  Set
