@@ -1,3 +1,8 @@
+2004-07-07  Nick Clifton  <nickc@redhat.com>
+
+	* configure.host (newlib_cflags): Define PREFER_SIZE_OVER_SPEED
+	for xStormy16.
+
 2004-07-06  Chris Demetriou  <cgd@broadcom.com>
 
 	* configure.host (mips*-*-elf*): Default long long printing
