@@ -56,11 +56,11 @@
 	NT systems, read primary group SID from process token.  Use that info
 	to create correct group entry.  On error or on 9x systems fallback
 	to emulating Administrators group as before.
-	(read_etc_passwd): When emulating nonexisting passwd file on NT systems,
-	read user and primary group SID from process token.  Use that info to
-	create correct passwd entry.  On error or on 9x systems fallback to
-	emulating user with Administrator user id and Administrators group
-	as before.
+	* passwd.cc (read_etc_passwd): When emulating nonexisting passwd file
+	on NT systems, read user and primary group SID from process token. 
+	Use that info to create correct passwd entry.  On error or on 9x
+	systems fallback to emulating user with Administrator user id and
+	Administrators group as before.
 
 2002-06-05  Corinna Vinschen  <corinna@vinschen.de>
 
