@@ -1,3 +1,13 @@
+2003-08-07  Michael Meissner  <gnu@the-meissners.org>
+
+	* cgen.h: Remove PARAM macro usage in all prototypes.
+	(CGEN_EXTRACT_INFO): Use void * instead of PTR.
+	(cgen_print_fn): Ditto.
+	(CGEN_HW_ENTRY): Ditto.
+	(CGEN_MAYBE_MULTI_IFLD): Ditto.
+	(struct cgen_insn): Ditto.
+	(CGEN_CPU_TABLE): Ditto.
+
 2003-08-07  Alan Modra  <amodra@bigpond.net.au>
 
 	* alpha.h: Remove PARAMS macro.
