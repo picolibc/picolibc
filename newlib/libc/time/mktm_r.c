@@ -95,7 +95,7 @@ _DEFUN (_mktm_r, (tim_p, res, is_gmtime),
 
   if (!is_gmtime)
     {
-      int offset;
+      long offset;
       int hours, mins, secs;
 
       TZ_LOCK;
@@ -117,11 +117,11 @@ _DEFUN (_mktm_r, (tim_p, res, is_gmtime),
 		  ? tz->__tzrule[1].offset 
 		  : tz->__tzrule[0].offset);
 
-      hours = offset / SECSPERHOUR;
+      hours = (int) (offset / SECSPERHOUR);
       offset = offset % SECSPERHOUR;
       
-      mins = offset / SECSPERMIN;
-      secs = offset % SECSPERMIN;
+      mins = (int) (offset / SECSPERMIN);
+      secs = (int) (offset % SECSPERMIN);
 
       res->tm_sec -= secs;
       res->tm_min -= mins;

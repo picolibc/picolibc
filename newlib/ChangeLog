@@ -1,3 +1,14 @@
+2005-02-25  Eric Blake  <ebb9@byu.net>
+
+	* libc/include/time.h (__tzrule_struct): Make offset long, since
+	a 16-bit int overflows on a 12-hour offset.
+	* libc/sys/linux/include/time.h: Ditto.
+	* libc/time/mktime.c (mktime): Use new type of __tzrule.offset.
+	* libc/time/mktm_r.c: Ditto.
+	* libc/time/gettzinfo.c: Ditto.
+	* libc/time/strftime.c (strftime): Fix '%x' to deal with negative
+	years.  Fix '%z' to use long, not int.
+
 2005-02-24  Ralf Corsepious  <ralf.corsepius@rtems.org>
 
 	* libm/common/s_fpclassify.c: Use __uint32_t instead of int to

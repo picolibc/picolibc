@@ -79,7 +79,7 @@ typedef struct __tzrule_struct
   int d;
   int s;
   time_t change;
-  int offset;
+  long offset; /* Match type of _timezone. */
 } __tzrule_type;
 
 typedef struct __tzinfo_struct

@@ -1,6 +1,7 @@
 /*
  * strftime.c
  * Original Author:	G. Haley
+ * Additions from:	Eric Blake
  *
  * Places characters into the array pointed to by s as controlled by the string
  * pointed to by format. If the total number of resulting characters including
@@ -102,9 +103,9 @@ The last two digits of the week-based year, see specifier %G (from
 o %G
 The week-based year. In the ISO 8601:2000 calendar, week 1 of the year
 includes January 4th, and begin on Mondays. Therefore, if January 1st,
-2nd, or 3rd falls on a Sunday, that day and earlier belong to week 53
-of the previous year; and if December 29th, 30th, or 31st falls on
-Monday, that day and later belong to week 1 of the next year.  For
+2nd, or 3rd falls on a Sunday, that day and earlier belong to the last
+week of the previous year; and if December 29th, 30th, or 31st falls
+on Monday, that day and later belong to week 1 of the next year.  For
 consistency with %Y, it always has at least four characters. 
 Example: "%G" for Saturday 2nd January 1999 gives "1998", and for
 Tuesday 30th December 1997 gives "1998". [tm_year, tm_wday, tm_yday]
@@ -447,7 +448,8 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	    {
 	      sprintf (&s[count], "%.2d/%.2d/%.2d",
 		       tim_p->tm_mon + 1, tim_p->tm_mday,
-		       (tim_p->tm_year % 100 + 100) % 100);
+		       tim_p->tm_year >= 0 ? tim_p->tm_year % 100
+		       : abs (tim_p->tm_year + YEAR_BASE) % 100);
 	      count += 8;
 	    }
 	  else
@@ -756,7 +758,7 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
             {
 	      if (count < maxsize - 5)
 		{
-		  int offset;
+		  long offset;
 		  __tzinfo_type *tz = __gettzinfo ();
 		  TZ_LOCK;
 		  /* The sign of this is exactly opposite the envvar TZ.  We
@@ -764,8 +766,8 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 		     but have to use __tzrule for daylight savings.  */
 		  offset = -tz->__tzrule[tim_p->tm_isdst > 0].offset;
 		  TZ_UNLOCK;
-		  sprintf (&s[count], "%+03ld%.2d", offset / SECSPERHOUR,
-			   abs (offset / SECSPERMIN) % 60);
+		  sprintf (&s[count], "%+03ld%.2ld", offset / SECSPERHOUR,
+			   labs (offset / SECSPERMIN) % 60L);
 		  count += 5;
 		}
 	      else
