@@ -1,5 +1,9 @@
 Wed Dec 14  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* configure.host: Turn on long double I/O for Cygwin.
+
+Wed Dec 14  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* MAINTAINERS: Removed Ranjith.
 	* NEWS: Updated for 1.9.0.
 	* README: Updated.
