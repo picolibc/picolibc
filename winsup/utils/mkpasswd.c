@@ -237,12 +237,12 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
       {
 	MultiByteToWideChar (CP_ACP, 0, disp_username, -1, uni_name, 512 );
 	rc = netusergetinfo(servername, (LPWSTR) & uni_name, 3,
-			    (LPBYTE *) &buffer );
+			    (void *) &buffer );
 	entriesread=1;
       }
     else 
       rc = netuserenum (servername, 3, FILTER_NORMAL_ACCOUNT,
-			(LPBYTE *) & buffer, 1024,
+			(void *) &buffer, 1024,
 			&entriesread, &totalentries, &resume_handle);
       switch (rc)
 	{
@@ -367,7 +367,7 @@ enum_local_groups (int print_sids)
     {
       DWORD i;
 
-      rc = netlocalgroupenum (NULL, 0, (LPBYTE *) & buffer, 1024,
+      rc = netlocalgroupenum (NULL, 0, (void *) &buffer, 1024,
 			      &entriesread, &totalentries, &resume_handle);
       switch (rc)
 	{
@@ -718,10 +718,10 @@ main (int argc, char **argv)
 	if (domain_name_specified)
 	  {
 	    mbstowcs (domain_name, argv[optind], (strlen (argv[optind]) + 1));
-	    rc = netgetdcname (NULL, domain_name, (LPBYTE *) & servername);
+	    rc = netgetdcname (NULL, domain_name, (void *) &servername);
 	  }
 	else
-	  rc = netgetdcname (NULL, NULL, (LPBYTE *) & servername);
+	  rc = netgetdcname (NULL, NULL, (void *) &servername);
 	
 	if (rc != ERROR_SUCCESS)
 	  {

@@ -136,7 +136,7 @@ enum_local_users (LPWSTR groupname)
   DWORD reshdl = 0;
 
   if (!netlocalgroupgetmembers (NULL, groupname,
-				1, (LPBYTE *) &buf1,
+				1, (void *) &buf1,
 				MAX_PREFERRED_LENGTH,
 				&entries, &total, &reshdl))
     {
@@ -170,7 +170,7 @@ enum_local_groups (int print_sids, int print_users)
     {
       DWORD i;
 
-      rc = netlocalgroupenum (NULL, 0, (LPBYTE *) &buffer, 1024,
+      rc = netlocalgroupenum (NULL, 0, (void *) &buffer, 1024,
 			      &entriesread, &totalentries, &resume_handle);
       switch (rc)
 	{
@@ -255,7 +255,7 @@ enum_users (LPWSTR servername, LPWSTR groupname)
   DWORD reshdl = 0;
 
   if (!netgroupgetusers (servername, groupname,
-			 0, (LPBYTE *) &buf1,
+			 0, (void *) &buf1,
 			 MAX_PREFERRED_LENGTH,
 			 &entries, &total, &reshdl))
     {
@@ -292,7 +292,7 @@ enum_groups (LPWSTR servername, int print_sids, int print_users, int id_offset)
     {
       DWORD i;
 
-      rc = netgroupenum (servername, 2, (LPBYTE *) & buffer, 1024,
+      rc = netgroupenum (servername, 2, (void *) & buffer, 1024,
 		         &entriesread, &totalentries, &resume_handle);
       switch (rc)
 	{
@@ -657,7 +657,7 @@ main (int argc, char **argv)
 	    {
 	      ret = lsaqueryinformationpolicy (lsa,
 					       PolicyPrimaryDomainInformation,
-					       (PVOID *) &pdi);
+					       (void *) &pdi);
 	      if (ret == STATUS_SUCCESS)
 	        {
 		  if (pdi->Sid)
@@ -694,10 +694,10 @@ main (int argc, char **argv)
 	if (domain_specified)
           {
 	    mbstowcs (domain_name, argv[optind], (strlen (argv[optind]) + 1));
-	    rc = netgetdcname (NULL, domain_name, (LPBYTE *) & servername);
+	    rc = netgetdcname (NULL, domain_name, (void *) &servername);
 	  }
 	else
-	  rc = netgetdcname (NULL, NULL, (LPBYTE *) & servername);
+	  rc = netgetdcname (NULL, NULL, (void *) &servername);
 	
 	if (rc != ERROR_SUCCESS)
 	  {

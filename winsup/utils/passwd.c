@@ -133,7 +133,7 @@ GetPW (char *user, int print_win_name)
 	}
     }
   MultiByteToWideChar (CP_ACP, 0, user, -1, name, 2 * (UNLEN + 1));
-  ret = NetUserGetInfo (NULL, name, 3, (LPBYTE *) &ui);
+  ret = NetUserGetInfo (NULL, name, 3, (void *) &ui);
   return EvalRet (ret, user) ? NULL : ui;
 }
 
@@ -184,7 +184,7 @@ PrintPW (PUSER_INFO_3 ui)
   printf ("Password expired           : %s",
 	(ui->usri3_password_expired) ? "yes\n" : "no\n");
   printf ("Latest password change     : %s", ctime(&t));
-  ret = NetUserModalsGet (NULL, 0, (LPBYTE *) &mi);
+  ret = NetUserModalsGet (NULL, 0, (void *) &mi);
   if (! ret)
     {
       if (mi->usrmod0_max_passwd_age == TIMEQ_FOREVER)
@@ -213,7 +213,7 @@ SetModals (int xarg, int narg, int iarg, int Larg)
   int ret;
   PUSER_MODALS_INFO_0 mi;
 
-  ret = NetUserModalsGet (NULL, 0, (LPBYTE *) &mi);
+  ret = NetUserModalsGet (NULL, 0, (void *) &mi);
   if (! ret)
     {
       if (xarg == 0)
