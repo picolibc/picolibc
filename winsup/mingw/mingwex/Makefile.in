@@ -86,6 +86,8 @@ DISTFILES = Makefile.in configure configure.in \
 	strtoumax.c \
 	testwmem.c \
 	trunc.c \
+	truncf.c \
+	truncl.c \
 	ulltoa.c \
 	ulltow.c \
 	vsnprintf.c \
