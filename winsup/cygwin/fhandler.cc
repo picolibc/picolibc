@@ -829,18 +829,23 @@ fhandler_base::fstat (struct __stat64 *buf, path_conv *)
 {
   switch (get_device ())
     {
+    case FH_PIPE:
+      buf->st_mode = S_IFIFO | STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
+      break;
     case FH_PIPEW:
-      buf->st_mode = STD_WBITS | S_IWGRP | S_IWOTH;
+      buf->st_mode = S_IFIFO | STD_WBITS | S_IWGRP | S_IWOTH;
       break;
     case FH_PIPER:
-      buf->st_mode = STD_RBITS;
+      buf->st_mode = S_IFIFO | STD_RBITS;
+      break;
+    case FH_FLOPPY:
+      buf->st_mode = S_IFBLK | STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
       break;
     default:
-      buf->st_mode = STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
+      buf->st_mode = S_IFCHR | STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
       break;
     }
 
-  buf->st_mode |= get_device () == FH_FLOPPY ? S_IFBLK : S_IFCHR;
   buf->st_nlink = 1;
   buf->st_blksize = S_BLKSIZE;
   time_as_timestruc_t (&buf->st_ctim);

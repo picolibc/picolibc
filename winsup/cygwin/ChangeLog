@@ -1,3 +1,8 @@
+2002-06-23  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* fhandler.cc (fhandler_base::fstat): Set S_IFIFO for pipes.
+	* fhandler_socket.cc (fhandler_socket.cc::fstat): Set S_IFSOCK.
+
 2002-06-23  Christopher Faylor  <cgf@redhat.com>
 
 	* lib/_cygwin_S_IEXEC.cc: Remove obsolete file.
