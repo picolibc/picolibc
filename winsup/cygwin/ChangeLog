@@ -1,3 +1,10 @@
+2005-03-23  Christopher Faylor  <cgf@timesys.com>
+
+	* include/ctype.h: New file.
+	* ctype.cc: Ditto.
+	* Makefile.in: Add ctype.o to DLL_OFILES.
+	* cygwin.din: Remove _ctype_ptr (for now?).
+
 2005-03-22  Christopher Faylor  <cgf@timesys.com>
 
 	* Makefile.in (DLL_OFILES): Add hookapi.o.  Eliminate some cruft.
