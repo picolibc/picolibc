@@ -10,6 +10,7 @@ Follow the instructions on each screen to install Cygwin.</para>
 </sect1>
 
 DOCTOOL-INSERT-setup-env
+DOCTOOL-INSERT-setup-maxmem
 DOCTOOL-INSERT-ntsec
 DOCTOOL-INSERT-setup-files
 </chapter>
