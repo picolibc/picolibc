@@ -67,7 +67,7 @@ fhandler_termios::tcsetpgrp (const pid_t pgid)
 {
   termios_printf ("tty %d pgid %d, sid %d, tsid %d", tc->ntty, pgid,
 		    myself->sid, tc->getsid ());
-  if (!pid_exists (pgid) || myself->sid != tc->getsid ())
+  if (myself->sid != tc->getsid ())
     {
       set_errno (EPERM);
       return -1;
