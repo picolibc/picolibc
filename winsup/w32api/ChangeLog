@@ -1,3 +1,8 @@
+2003-11-27  Christopher Faylor  <cgf@redhat.com>
+
+	* lib/Makefile.in: Use make function to locate .mri file to allow
+	building in directory other than source directory.
+
 2003-11-27  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/vfw32.def: Remove, replacing with ...

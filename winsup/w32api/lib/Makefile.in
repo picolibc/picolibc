@@ -172,9 +172,9 @@ libuuid.a : $(UUID_OBJS)
 # seems to be the simplest way to combine them into one archive.
 # NB: With older dlltool, the object file members will not have unique
 # names.
-libvfw32.a : libmsvfw32.a libavifil32.a libavicap32.a vfw32.mri
+libvfw32.a : vfw32.mri libmsvfw32.a libavifil32.a libavicap32.a
 	rm -f $@
-	$(AR) -M < vfw32.mri
+	$(AR) -M < ${word 1,$^}
 	$(RANLIB) $@
 
 lib%.a : %.def %.o
