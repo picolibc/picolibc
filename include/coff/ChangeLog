@@ -1,3 +1,8 @@
+2001-01-23  H.J. Lu  <hjl@gnu.org>
+
+	* include/coff/pe.h (struct external_PEI_DOS_hdr): New.
+	(struct external_PEI_IMAGE_hdr): New.
+
 2000-12-11  Alan Modra  <alan@linuxcare.com.au>
 
 	* ti.h (OCTETS_PER_BYTE_POWER): Change #warning to #error.
