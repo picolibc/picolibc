@@ -1,3 +1,8 @@
+2003-05-27  Bill C. Riemers  <cygwin@docbill.net>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): Filter
+	permissions throug umask on FAT or if ntsec is off.
+
 2003-05-26  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* syscalls.cc (statfs): Call GetDiskFreeSpaceEx before GetDiskFreeSpace.

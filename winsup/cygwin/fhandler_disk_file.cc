@@ -331,6 +331,9 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
 
       if (pc->exec_state () == is_executable)
 	buf->st_mode |= STD_XBITS;
+
+      /* This fakes the permissions of all files to match the current umask. */
+      buf->st_mode &= ~(cygheap->umask);
     }
 
   /* The number of links to a directory includes the
