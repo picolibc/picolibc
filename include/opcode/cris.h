@@ -160,6 +160,8 @@ extern const char *const cris_cc_strings[];
 #define JUMP_INDIR_Z_BITS (0xf2c0)
 #define JUMP_PC_INCR_OPCODE \
  (JUMP_INDIR_OPCODE + AUTOINCR_BIT * 0x0100 + REG_PC)
+#define ADD_PC_INCR_OPCODE \
+ (0xfa00 + (2 << 4) + AUTOINCR_BIT * 0x0100 + REG_PC)
 
 /* Nop.  */
 #define NOP_OPCODE (0x050F)

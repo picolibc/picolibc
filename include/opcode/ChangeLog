@@ -1,3 +1,7 @@
+2001-03-22  Hans-Peter Nilsson  <hp@axis.com>
+
+	* cris.h (ADD_PC_INCR_OPCODE): New macro.
+
 2001-03-21  Kazu Hirata  <kazu@hxi.com>
 
 	* h8300.h: Fix formatting.
