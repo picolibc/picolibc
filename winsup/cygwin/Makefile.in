@@ -202,9 +202,13 @@ new-$(DLL_NAME): $(LDSCRIPT) $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $(
 	-e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o winver.o \
 	$(DLL_IMPORTS) $(MALLOC_OBJ) $(LIBM) $(LIBC) \
 	-lstdc++ -lgcc -lshell32 -luuid
+	@rm -f stamp-cygwin-lib
 
-$(LIB_NAME): new-$(DLL_NAME) $(LIBCOS)
+$(LIB_NAME): new-$(DLL_NAME) $(LIBCOS) stamp-cygwin-lib
 	$(AR) rcv $(LIB_NAME) $(LIBCOS)
+
+stamp-cygwin-lib:
+	@touch stamp-cygwin-lib
 
 dll_ofiles: $(DLL_OFILES)
 

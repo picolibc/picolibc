@@ -167,6 +167,84 @@ Tue Sep 25 16:22:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	* include/sys/ipc.h: New file.
 	* include/sys/shm.h: New file.
 
+Mon Oct  1 16:52:23 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* dtable.h (dtable::build_fhandler): Make path_conv parameter
+	non-optional.
+	(dtable::init_std_file_from_handle): Eliminate name parameter.
+	* dtable.cc (stdio_init): Don't pass bogus name to
+	init_std_file_from_handle.  The function will figure out the name
+	itself.
+	(dtable::init_std_file_from_handle): Eliminate name parameter.  Assume
+	that we're always called with an appropriate fd.  Pass name as NULL if
+	we can't simply figure it out from context.
+	(cygwin_attach_handle_to_fd): Pass path_conv argument to
+	build_fhandler.
+	(dtable::build_fhandler): Make path_conv argument mandatory.  Eliminate
+	specific call to get_device_number.  With unknown device names, set
+	name from handle context for parsing by path_conv.
+	(dtable::build_fhandler): Pass path_conv argument to build_fhandler.
+	* path.h (path_conv::set_isdisk): Set disk device type.
+	(path_conv::is_device): Don't consider FH_DISK a "device".
+	* syscalls.cc (_open): Pass path_conv argument by reference.
+	(stat_worker): Ditto.
+	(_rename): Use path_conv operators.  Add bounds to DeleteFile/MoveFile
+	for loop.
+
+Mon Oct 1 14:25:00 2001  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* cygwin.din: export strtoll and strtoull
+
+Sun Sep 30 22:51:41 2001  Christopher Faylor <cgf@cygnus.com>
+
+	Add "path.h" include throughout, where needed.  Use new path_conv
+	methods and operators to simplify testing for directory and attributes,
+	throughout.
+	* path.h (path_conv::exists): New method.
+	(path_conv::has_attribute): Ditto.
+	(path_conv::isdir): Ditto.
+	(path_conv::DWORD &): New operator.
+	(path_conv::int &): Ditto.
+	* dir.cc (rmdir): Eliminate a goto.
+	* dtable.cc (dtable::build_fhandler): Accept opt and suffix info for
+	path_conv.check.  Return fh == NULL on path_conv error.  Pass unit to
+	set_name as appropriate.
+	(dtable::reset_unix_path_name): New method.
+	* dtable.h (dtable): Declare new method.  Reflect arg changes to
+	build_fhandler.
+	* fhandler.cc (fhandler_disk_dummy_name): Eliminate.
+	(fhandler_base::set_name): Expect paths to be NULL.  Build
+	unix_path_name from win32_path_name when it is a device.
+	(fhandler_base::reset_unix_path_name): New method.
+	(fhandler_base::raw_read): Report EISDIR when ERROR_INVALID_FUNCTION
+	or ERROR_INVALID_PARAMETER and reading a directory.
+	(fhandler_disk_file::fstat): Don't call stat_dev since we should now
+	never be calling fhandler_disk_file methods with devices.
+	(fhandler_base::fhandler_base): Clear {unix,win32}_path_name.
+	(fhandler_base::~fhandler_base): Always free {unix,win32}_path_name.
+	(fhandler_disk_file::fhandler_disk_file): Remove set_no_free_names
+	kludge.
+	(fhandler_disk_file::open): Ditto.
+	* fhandler.h (fhandler_base::no_free_names): Eliminate.
+	(fhandler_base::set_no_free_names): Ditto.
+	* fhandler_tty.cc (fhandler_tty_slave::fhandler_tty_slave): Don't set
+	unix_path_name here.
+	* path.cc (fchdir): Lock fd table throughout.  Use new
+	dtable::reset_unix_path_name method to reset path.
+	* syscalls.cc (stat_worker): Reorganize to always call fstat method.
+	Pass path_conv method to fhandler_*::open.
+	(chroot): Elminate a goto.
+
+Sun Sep 30 17:37:43 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* environ.cc (winenv): Allocate exact amount of space needed for forced
+	windows environment variable rather than just using MAX_PATH.
+
+Sun Sep 30 17:10:18 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Depend on stamp to ensure rebuilding.  Remove stamp file
+	when we've just built the DLL.
+
 Mon Oct  1 00:34:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* thread.cc (pthread_cond_dowait): Hopefully eliminate a race on multiple thread

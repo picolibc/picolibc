@@ -20,14 +20,13 @@ details. */
 #include "security.h"
 #include "cygwin/version.h"
 #include "fhandler.h"
+#include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "path.h"
 #include "shared_info.h"
+#include <assert.h>
 
 static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
-
-static NO_COPY char fhandler_disk_dummy_name[] = "some disk file";
 
 struct __cygwin_perfile *perfile_table;
 
@@ -146,30 +145,12 @@ fhandler_base::get_readahead_into_buffer (char *buf, size_t buflen)
 /* Record the file name.
    Filenames are used mostly for debugging messages, and it's hoped that
    in cases where the name is really required, the filename wouldn't ever
-   be too long (e.g. devices or some such).
-*/
-
+   be too long (e.g. devices or some such).  */
 void
 fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit)
 {
-  if (!no_free_names ())
-    {
-      if (unix_path_name != NULL && unix_path_name != fhandler_disk_dummy_name)
-	cfree (unix_path_name);
-      if (win32_path_name != NULL && unix_path_name != fhandler_disk_dummy_name)
-	cfree (win32_path_name);
-    }
-
-  unix_path_name = win32_path_name = NULL;
   if (unix_path == NULL || !*unix_path)
     return;
-
-  unix_path_name = cstrdup (unix_path);
-  if (unix_path_name == NULL)
-    {
-      system_printf ("fatal error. strdup failed");
-      exit (ENOMEM);
-    }
 
   if (win32_path)
     win32_path_name = cstrdup (win32_path);
@@ -185,6 +166,34 @@ fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit
       system_printf ("fatal error. strdup failed");
       exit (ENOMEM);
     }
+
+  assert (unix_path_name == NULL);
+  /* FIXME: This isn't really right.  It ignores the first argument if we're
+     building names for a device and just converts the device name from the
+     win32 name since it has theoretically been previously detected by
+     path_conv. Ideally, we should pass in a format string and build the
+     unix_path, too. */
+  if (!is_device () || *win32_path_name != '\\')
+    unix_path_name = cstrdup (unix_path);
+  else
+    {
+      unix_path_name = cstrdup (win32_path_name);
+      for (char *p = unix_path_name; (p = strchr (p, '\\')); p++)
+	*p = '/';
+    }
+
+  if (unix_path_name == NULL)
+    {
+      system_printf ("fatal error. strdup failed");
+      exit (ENOMEM);
+    }
+}
+
+void
+fhandler_base::reset_unix_path_name (const char *unix_path)
+{
+  cfree (unix_path_name);
+  unix_path_name = cstrdup (unix_path);
 }
 
 /* Detect if we are sitting at EOF for conditions where Windows
@@ -235,6 +244,13 @@ fhandler_base::raw_read (void *ptr, size_t ulen)
 	case ERROR_NOACCESS:
 	  if (is_at_eof (get_handle (), errcode))
 	    return 0;
+	case ERROR_INVALID_FUNCTION:
+	case ERROR_INVALID_PARAMETER:
+	  if (openflags & O_DIROPEN)
+	    {
+	      set_errno (EISDIR);
+	      return -1;
+	    }
 	default:
 	  syscall_printf ("ReadFile %s failed, %E", unix_path_name);
 	  __seterrno_from_win_error (errcode);
@@ -316,44 +332,28 @@ fhandler_base::open (int flags, mode_t mode)
     }
 
   if (get_query_open ())
-    {
-      access = 0;
-    }
+    access = 0;
   else if (get_device () == FH_TAPE)
-    {
-      access = GENERIC_READ | GENERIC_WRITE;
-    }
+    access = GENERIC_READ | GENERIC_WRITE;
   else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
-    {
-      access = GENERIC_READ;
-    }
+    access = GENERIC_READ;
   else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY)
-    {
-      access = GENERIC_WRITE;
-    }
+    access = GENERIC_WRITE;
   else
-    {
-      access = GENERIC_READ | GENERIC_WRITE;
-    }
+    access = GENERIC_READ | GENERIC_WRITE;
 
   /* Allow reliable lseek on disk devices. */
   if (get_device () == FH_FLOPPY)
-    {
-      access |= GENERIC_READ;
-    }
+    access |= GENERIC_READ;
 
   /* FIXME: O_EXCL handling?  */
 
   if ((flags & O_TRUNC) && ((flags & O_ACCMODE) != O_RDONLY))
     {
       if (flags & O_CREAT)
-	{
-	  creation_distribution = CREATE_ALWAYS;
-	}
+	creation_distribution = CREATE_ALWAYS;
       else
-	{
-	  creation_distribution = TRUNCATE_EXISTING;
-	}
+	creation_distribution = TRUNCATE_EXISTING;
     }
   else if (flags & O_CREAT)
     creation_distribution = OPEN_ALWAYS;
@@ -361,9 +361,7 @@ fhandler_base::open (int flags, mode_t mode)
     creation_distribution = OPEN_EXISTING;
 
   if ((flags & O_EXCL) && (flags & O_CREAT))
-    {
-      creation_distribution = CREATE_NEW;
-    }
+    creation_distribution = CREATE_NEW;
 
   if (flags & O_APPEND)
     set_append_p();
@@ -868,9 +866,6 @@ fhandler_disk_file::fstat (struct stat *buf)
 
   memset (buf, 0, sizeof (*buf));
 
-  if (is_device ())
-    return stat_dev (get_device (), get_unit (), get_namehash (), buf);
-
   /* NT 3.51 seems to have a bug when attempting to get vol serial
      numbers.  This loop gets around this. */
   for (int i = 0; i < 2; i++)
@@ -1199,6 +1194,8 @@ fhandler_base::fhandler_base (DWORD devtype, const char *name, int unit):
   raixget (0),
   raixput (0),
   rabuflen (0),
+  unix_path_name (NULL),
+  win32_path_name (NULL),
   open_status (0)
 {
   status = devtype;
@@ -1210,20 +1207,15 @@ fhandler_base::fhandler_base (DWORD devtype, const char *name, int unit):
       if (!get_w_binset ())
 	set_w_binary (bin);
     }
-  unix_path_name  = win32_path_name  = NULL;
-  set_name (name, NULL, unit);
 }
 
 /* Normal I/O destructor */
 fhandler_base::~fhandler_base (void)
 {
-  if (!no_free_names ())
-    {
-      if (unix_path_name != NULL && unix_path_name != fhandler_disk_dummy_name)
-	cfree (unix_path_name);
-      if (win32_path_name != NULL && win32_path_name != fhandler_disk_dummy_name)
-	cfree (win32_path_name);
-    }
+  if (unix_path_name != NULL)
+    cfree (unix_path_name);
+  if (win32_path_name != NULL)
+    cfree (win32_path_name);
   if (rabuf)
     free (rabuf);
   unix_path_name = win32_path_name = NULL;
@@ -1236,8 +1228,6 @@ fhandler_disk_file::fhandler_disk_file (const char *name) :
 	fhandler_base (FH_DISK, name)
 {
   set_cb (sizeof *this);
-  set_no_free_names ();
-  unix_path_name = win32_path_name = fhandler_disk_dummy_name;
 }
 
 int
@@ -1260,19 +1250,12 @@ fhandler_disk_file::open (const char *path, int flags, mode_t mode)
     }
 
   set_name (path, real_path.get_win32 ());
-  set_no_free_names (0);
   return open (real_path, flags, mode);
 }
 
 int
 fhandler_disk_file::open (path_conv& real_path, int flags, mode_t mode)
 {
-  if (get_win32_name () == fhandler_disk_dummy_name)
-    {
-      win32_path_name = real_path.get_win32 ();
-      set_no_free_names ();
-    }
-
   if (real_path.isbinary ())
     {
       set_r_binary (1);
@@ -1282,8 +1265,7 @@ fhandler_disk_file::open (path_conv& real_path, int flags, mode_t mode)
   set_has_acls (real_path.has_acls ());
   set_isremote (real_path.isremote ());
 
-  if (real_path.file_attributes () != (DWORD)-1
-      && (real_path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY))
+  if (real_path.isdir ())
     flags |= O_DIROPEN;
 
   int res = this->fhandler_base::open (flags, mode);

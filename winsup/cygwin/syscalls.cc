@@ -116,16 +116,13 @@ _unlink (const char *ourname)
 
   syscall_printf ("_unlink (%s)", win32_name.get_win32 ());
 
-  DWORD atts;
-  atts = win32_name.file_attributes ();
-  if (atts == 0xffffffff)
+  if (!win32_name.exists ())
     {
-      syscall_printf ("unlinking a nonexistant file");
+      syscall_printf ("unlinking a nonexistent file");
       set_errno (ENOENT);
       goto done;
     }
-
-  if (atts & FILE_ATTRIBUTE_DIRECTORY)
+  else if (win32_name.isdir ())
     {
       syscall_printf ("unlinking a directory");
       set_errno (EPERM);
@@ -140,11 +137,11 @@ _unlink (const char *ourname)
     }
 
   /* Check for shortcut as symlink condition. */
-  if (atts & FILE_ATTRIBUTE_READONLY)
+  if (win32_name.has_attribute (FILE_ATTRIBUTE_READONLY))
     {
       int len = strlen (win32_name);
-      if (len > 4 && strcasematch (win32_name + len - 4, ".lnk"))
-	SetFileAttributes (win32_name, atts & ~FILE_ATTRIBUTE_READONLY);
+      if (len > 4 && strcasematch ((char *) win32_name + len - 4, ".lnk"))
+	SetFileAttributes (win32_name, (DWORD) win32_name & ~FILE_ATTRIBUTE_READONLY);
     }
 
   DWORD lasterr;
@@ -249,11 +246,7 @@ remove (const char *ourname)
       return -1;
     }
 
-  DWORD atts = win32_name.file_attributes ();
-  if (atts != 0xffffffff && atts & FILE_ATTRIBUTE_DIRECTORY)
-    return rmdir (ourname);
-
-  return _unlink (ourname);
+  return win32_name.isdir () ? rmdir (ourname) : _unlink (ourname);
 }
 
 extern "C" pid_t
@@ -506,7 +499,7 @@ _open (const char *unix_path, int flags, ...)
       else
 	{
 	  path_conv pc;
-	  if (!(fh = cygheap->fdtab.build_fhandler (fd, unix_path, NULL, &pc)))
+	  if (!(fh = cygheap->fdtab.build_fhandler (fd, unix_path, NULL, pc)))
 	    res = -1;		// errno already set
 	  else if (!fh->open (pc, flags, (mode & 07777) & ~cygheap->umask))
 	    {
@@ -619,7 +612,7 @@ _link (const char *a, const char *b)
       goto done;
     }
 
-  if (real_b.file_attributes () != (DWORD)-1)
+  if (real_b.exists ())
     {
       syscall_printf ("file '%s' exists?", (char *)real_b);
       set_errno (EEXIST);
@@ -779,7 +772,7 @@ chown_worker (const char *name, unsigned fmode, uid_t uid, gid_t gid)
 	}
 
       DWORD attrib = 0;
-      if (win32_path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY)
+      if (win32_path.isdir ())
 	attrib |= S_IFDIR;
       res = get_file_attribute (win32_path.has_acls (),
 				win32_path.get_win32 (),
@@ -792,12 +785,10 @@ chown_worker (const char *name, unsigned fmode, uid_t uid, gid_t gid)
 	    uid = old_uid;
 	  if (gid == (gid_t) -1)
 	    gid = old_gid;
-	  if (win32_path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY)
+	  if (win32_path.isdir())
 	    attrib |= S_IFDIR;
-	  res = set_file_attribute (win32_path.has_acls (),
-				    win32_path.get_win32 (),
-				    uid, gid, attrib,
-				    cygheap->user.logsrv ());
+	  res = set_file_attribute (win32_path.has_acls (), win32_path, uid,
+	      			    gid, attrib, cygheap->user.logsrv ());
 	}
       if (res != 0 && (!win32_path.has_acls () || !allow_ntsec))
 	{
@@ -886,28 +877,25 @@ chmod (const char *path, mode_t mode)
       goto done;
     }
 
-  if (win32_path.file_attributes () == (DWORD)-1)
+  if (!win32_path.exists ())
     __seterrno ();
   else
     {
-      DWORD attr = win32_path.file_attributes ();
       /* temporary erase read only bit, to be able to set file security */
-      SetFileAttributesA (win32_path.get_win32 (),
-			  attr & ~FILE_ATTRIBUTE_READONLY);
+      SetFileAttributes (win32_path, (DWORD) win32_path & ~FILE_ATTRIBUTE_READONLY);
 
       uid_t uid;
       gid_t gid;
 
-      if (win32_path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY)
+      if (win32_path.isdir ())
 	mode |= S_IFDIR;
       get_file_attribute (win32_path.has_acls (),
 			  win32_path.get_win32 (),
 			  NULL, &uid, &gid);
-      if (win32_path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY)
+      /* FIXME: Do we really need this to be specified twice? */
+      if (win32_path.isdir ())
 	mode |= S_IFDIR;
-      if (!set_file_attribute (win32_path.has_acls (),
-				win32_path.get_win32 (),
-				uid, gid,
+      if (!set_file_attribute (win32_path.has_acls (), win32_path, uid, gid,
 				mode, cygheap->user.logsrv ())
 	  && allow_ntsec)
 	res = 0;
@@ -915,14 +903,14 @@ chmod (const char *path, mode_t mode)
       /* if the mode we want has any write bits set, we can't
 	 be read only. */
       if (mode & (S_IWUSR | S_IWGRP | S_IWOTH))
-	attr &= ~FILE_ATTRIBUTE_READONLY;
+	(DWORD) win32_path &= ~FILE_ATTRIBUTE_READONLY;
       else
-	attr |= FILE_ATTRIBUTE_READONLY;
+	(DWORD) win32_path |= FILE_ATTRIBUTE_READONLY;
 
       if (S_ISLNK (mode) || S_ISSOCK (mode))
-	attr |= FILE_ATTRIBUTE_SYSTEM;
+	(DWORD) win32_path |= FILE_ATTRIBUTE_SYSTEM;
 
-      if (!SetFileAttributesA (win32_path.get_win32 (), attr))
+      if (!SetFileAttributes (win32_path, win32_path))
 	__seterrno ();
       else
 	{
@@ -1084,22 +1072,24 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 	     int nofollow)
 {
   int res = -1;
-  int oret = 1;
-  int atts;
-
-  int attribute = 0;
+  int oret;
   uid_t uid;
   gid_t gid;
-
-  UINT dtype;
-  fhandler_disk_file fh (NULL);
+  path_conv real_path;
+  fhandler_base *fh = NULL;
 
   MALLOC_CHECK;
+  int open_flags = O_RDONLY | O_BINARY | O_DIROPEN
+    		   | (nofollow ? O_NOSYMLINK : 0);
 
   debug_printf ("%s (%s, %p)", caller, name, buf);
 
-  path_conv real_path (name, (nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW) |
-					 PC_FULL, stat_suffixes);
+  if (check_null_invalid_struct_errno (buf))
+    goto done;
+
+  fh = cygheap->fdtab.build_fhandler (-1, name, NULL, real_path,
+				      (nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW)
+				      | PC_FULL, stat_suffixes);
 
   if (real_path.error)
     {
@@ -1107,83 +1097,66 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
       goto done;
     }
 
-  if (check_null_invalid_struct_errno (buf))
-    goto done;
-
   memset (buf, 0, sizeof (struct stat));
 
   if (real_path.is_device ())
     return stat_dev (real_path.get_devn (), real_path.get_unitn (),
 		     hash_path_name (0, real_path.get_win32 ()), buf);
 
-  atts = real_path.file_attributes ();
+  debug_printf ("%d = file_attributes for '%s'", (DWORD) real_path,
+		(char *) real_path);
 
-  debug_printf ("%d = file_attributes for '%s'", atts, real_path.get_win32 ());
-
-  dtype = real_path.get_drive_type ();
-
-  if ((atts == -1 || ! (atts & FILE_ATTRIBUTE_DIRECTORY) ||
-       (wincap.can_open_directories ()
-	&& dtype != DRIVE_NO_ROOT_DIR
-	&& dtype != DRIVE_UNKNOWN)))
+  if ((oret = fh->open (real_path, open_flags, 0)))
+    /* ok */;
+  else
     {
-      oret = fh.open (real_path, O_RDONLY | O_BINARY | O_DIROPEN |
-				 (nofollow ? O_NOSYMLINK : 0), 0);
+      int ntsec_atts = 0;
       /* If we couldn't open the file, try a "query open" with no permissions.
 	 This will allow us to determine *some* things about the file, at least. */
-      if (!oret)
-	{
-	  fh.set_query_open (TRUE);
-	  oret = fh.open (real_path, O_RDONLY | O_BINARY | O_DIROPEN |
-				     (nofollow ? O_NOSYMLINK : 0), 0);
-	}
-      /* Check a special case here. If ntsec is ON it happens
-	 that a process creates a file using mode 000 to disallow
-	 other processes access. In contrast to UNIX, this results
-	 in a failing open call in the same process. Check that
-	 case. */
-      if (!oret && allow_ntsec && get_errno () == EACCES
-	  && !get_file_attribute (TRUE, real_path, &attribute, &uid, &gid)
-	  && !attribute && uid == myself->uid && gid == myself->gid)
-	{
+      fh->set_query_open (TRUE);
+      if ((oret = fh->open (real_path, open_flags, 0)))
+        /* ok */;
+      else if (allow_ntsec && real_path.has_acls () && get_errno () == EACCES
+		&& !get_file_attribute (TRUE, real_path, &ntsec_atts, &uid, &gid)
+		&& !ntsec_atts && uid == myself->uid && gid == myself->gid)
+        {
+	  /* Check a special case here. If ntsec is ON it happens
+	     that a process creates a file using mode 000 to disallow
+	     other processes access. In contrast to UNIX, this results
+	     in a failing open call in the same process. Check that
+	     case. */
 	  set_file_attribute (TRUE, real_path, 0400);
-	  oret = fh.open (real_path, O_RDONLY | O_BINARY | O_DIROPEN |
-				     (nofollow ? O_NOSYMLINK : 0), 0);
-	  set_file_attribute (TRUE, real_path.get_win32 (), 0);
-	}
-      if (oret)
-	{
-	  res = fh.fstat (buf);
-	  fh.close ();
-	  /* The number of links to a directory includes the
-	     number of subdirectories in the directory, since all
-	     those subdirectories point to it.
-	     This is too slow on remote drives, so we do without it and
-	     set the number of links to 2. */
-	  /* Unfortunately the count of 2 confuses `find (1)' command. So
-	     let's try it with `1' as link count. */
-	  if (atts != -1 && (atts & FILE_ATTRIBUTE_DIRECTORY))
-	    buf->st_nlink = (dtype == DRIVE_REMOTE
-			     ? 1
-			     : num_entries (real_path.get_win32 ()));
-	  goto done;
-	}
+	  oret = fh->open (real_path, open_flags, 0);
+	  set_file_attribute (TRUE, real_path, ntsec_atts);
+        }
     }
-  if (atts != -1 && (oret || (!oret && get_errno () != ENOENT
-				    && get_errno () != ENOSHARE)))
+  if (oret)
+    {
+      res = fh->fstat (buf);
+      /* The number of links to a directory includes the
+	 number of subdirectories in the directory, since all
+	 those subdirectories point to it.
+	 This is too slow on remote drives, so we do without it and
+	 set the number of links to 2. */
+      /* Unfortunately the count of 2 confuses `find (1)' command. So
+	 let's try it with `1' as link count. */
+      if (real_path.isdir ())
+	buf->st_nlink = (real_path.isremote ()
+			 ? 1 : num_entries (real_path.get_win32 ()));
+      fh->close ();
+    }
+  else if (real_path.exists ())
     {
       /* Unfortunately, the above open may fail if the file exists, though.
 	 So we have to care for this case here, too. */
       WIN32_FIND_DATA wfd;
       HANDLE handle;
       buf->st_nlink = 1;
-      if (atts != -1
-	  && (atts & FILE_ATTRIBUTE_DIRECTORY)
-	  && dtype != DRIVE_REMOTE)
+      if (real_path.isdir () && real_path.isremote ())
 	buf->st_nlink = num_entries (real_path.get_win32 ());
       buf->st_dev = FHDEVN (FH_DISK) << 8;
       buf->st_ino = hash_path_name (0, real_path.get_win32 ());
-      if (atts != -1 && (atts & FILE_ATTRIBUTE_DIRECTORY))
+      if (real_path.isdir ())
 	buf->st_mode = S_IFDIR;
       else if (real_path.issymlink ())
 	buf->st_mode = S_IFLNK;
@@ -1197,7 +1170,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 				 &buf->st_uid, &buf->st_gid))
 	{
 	  buf->st_mode |= STD_RBITS | STD_XBITS;
-	  if ((atts & FILE_ATTRIBUTE_READONLY) == 0)
+	  if (!(real_path.has_attribute (FILE_ATTRIBUTE_READONLY)))
 	    buf->st_mode |= STD_WBITS;
 	  if (real_path.issymlink ())
 	    buf->st_mode |= S_IRWXU | S_IRWXG | S_IRWXO;
@@ -1220,6 +1193,8 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
     }
 
  done:
+  if (fh)
+    delete fh;
   MALLOC_CHECK;
   syscall_printf ("%d = %s (%s, %p)", res, caller, name, buf);
   return res;
@@ -1352,15 +1327,14 @@ _rename (const char *oldpath, const char *newpath)
       return -1;
     }
 
-  if (!writable_directory (real_old.get_win32 ())
-      || !writable_directory (real_new.get_win32 ()))
+  if (!writable_directory (real_old) || !writable_directory (real_new))
     {
       syscall_printf ("-1 = rename (%s, %s)", oldpath, newpath);
       set_errno (EACCES);
       return -1;
     }
 
-  if (real_old.file_attributes () == (DWORD) -1) /* file to move doesn't exist */
+  if (!real_old.exists ()) /* file to move doesn't exist */
     {
        syscall_printf ("file to move doesn't exist");
        set_errno (ENOENT);
@@ -1369,10 +1343,8 @@ _rename (const char *oldpath, const char *newpath)
 
   /* Destination file exists and is read only, change that or else
      the rename won't work. */
-  if (real_new.file_attributes () != (DWORD) -1 &&
-      real_new.file_attributes () & FILE_ATTRIBUTE_READONLY)
-    SetFileAttributesA (real_new.get_win32 (),
-			real_new.file_attributes () & ~FILE_ATTRIBUTE_READONLY);
+  if (real_new.has_attribute (FILE_ATTRIBUTE_READONLY))
+    SetFileAttributes (real_new, (DWORD) real_new & ~FILE_ATTRIBUTE_READONLY);
 
   /* Shortcut hack No. 2, part 1 */
   if (!real_old.issymlink () && !real_new.error && real_new.issymlink () &&
@@ -1380,7 +1352,7 @@ _rename (const char *oldpath, const char *newpath)
       (lnk_suffix = strrchr (real_new.get_win32 (), '.')))
      *lnk_suffix = '\0';
 
-  if (!MoveFile (real_old.get_win32 (), real_new.get_win32 ()))
+  if (!MoveFile (real_old, real_new))
     res = -1;
 
   if (res == 0 || (GetLastError () != ERROR_ALREADY_EXISTS
@@ -1396,7 +1368,7 @@ _rename (const char *oldpath, const char *newpath)
   else
     {
       syscall_printf ("try win95 hack");
-      for (;;)
+      for (int i = 0; i < 2; i++)
 	{
 	  if (!DeleteFileA (real_new.get_win32 ()) &&
 	      GetLastError () != ERROR_FILE_NOT_FOUND)
@@ -1405,13 +1377,10 @@ _rename (const char *oldpath, const char *newpath)
 			      real_new.get_win32 ());
 	      break;
 	    }
-	  else
+	  else if (MoveFile (real_old.get_win32 (), real_new.get_win32 ()))
 	    {
-	      if (MoveFile (real_old.get_win32 (), real_new.get_win32 ()))
-		{
-		  res = 0;
-		  break;
-		}
+	      res = 0;
+	      break;
 	    }
 	}
     }
@@ -1421,14 +1390,13 @@ done:
     {
       __seterrno ();
       /* Reset R/O attributes if neccessary. */
-      if (real_new.file_attributes () != (DWORD) -1 &&
-	  real_new.file_attributes () & FILE_ATTRIBUTE_READONLY)
-	SetFileAttributesA (real_new.get_win32 (), real_new.file_attributes ());
+      if (real_new.has_attribute (FILE_ATTRIBUTE_READONLY))
+	SetFileAttributes (real_new, real_new);
     }
   else
     {
       /* make the new file have the permissions of the old one */
-      SetFileAttributesA (real_new.get_win32 (), real_old.file_attributes ());
+      SetFileAttributes (real_new, real_old);
 
       /* Shortcut hack, No. 2, part 2 */
       /* if the new filename was an existing shortcut, remove it now if the
@@ -1436,12 +1404,12 @@ done:
       if (lnk_suffix)
 	{
 	  *lnk_suffix = '.';
-	  DeleteFile (real_new.get_win32 ());
+	  DeleteFile (real_new);
 	}
     }
 
-  syscall_printf ("%d = rename (%s, %s)", res, real_old.get_win32 (),
-		  real_new.get_win32 ());
+  syscall_printf ("%d = rename (%s, %s)", res, (char *) real_old,
+		  (char *) real_new);
 
   return res;
 }
@@ -2317,27 +2285,29 @@ extern "C" int
 chroot (const char *newroot)
 {
   sigframe thisframe (mainthread);
-  int ret = -1;
   path_conv path (newroot, PC_SYM_FOLLOW | PC_FULL);
 
+  int ret;
   if (path.error)
-    goto done;
-  if (path.file_attributes () == (DWORD)-1)
+    ret = -1;
+  else if (!path.exists ())
     {
       set_errno (ENOENT);
-      goto done;
+      ret = -1;
     }
-  if (!(path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY))
+  else if (!path.isdir ())
     {
       set_errno (ENOTDIR);
-      goto done;
+      ret = -1;
     }
-  char buf[MAX_PATH];
-  normalize_posix_path (newroot, buf);
-  cygheap->root.set (buf, path);
-  ret = 0;
+  else
+    {
+      char buf[MAX_PATH];
+      normalize_posix_path (newroot, buf);
+      cygheap->root.set (buf, path);
+      ret = 0;
+    }
 
-done:
   syscall_printf ("%d = chroot (%s)", ret ? get_errno () : 0,
 				      newroot ? newroot : "NULL");
   return ret;

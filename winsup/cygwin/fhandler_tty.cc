@@ -19,6 +19,7 @@ details. */
 #include "cygerrno.h"
 #include "security.h"
 #include "fhandler.h"
+#include "path.h"
 #include "dtable.h"
 #include "sync.h"
 #include "sigproc.h"
@@ -443,11 +444,6 @@ fhandler_tty_slave::fhandler_tty_slave (int num, const char *name) :
 {
   set_cb (sizeof *this);
   ttynum = num;
-  /* FIXME: This is wasteful.  We should rewrite the set_name path to eliminate the
-     need for double allocates. */
-  unix_path_name = (char *) crealloc (unix_path_name, strlen (win32_path_name) + 1);
-  strcpy (unix_path_name, win32_path_name);
-  unix_path_name[0] = unix_path_name[4] = '/';
   debug_printf ("unix '%s', win32 '%s'", unix_path_name, win32_path_name);
   inuse = NULL;
 }

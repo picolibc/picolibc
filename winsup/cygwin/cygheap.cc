@@ -15,8 +15,8 @@
 #include <stdlib.h>
 #include "security.h"
 #include "fhandler.h"
-#include "dtable.h"
 #include "path.h"
+#include "dtable.h"
 #include "cygheap.h"
 #include "child_info.h"
 #include "heap.h"

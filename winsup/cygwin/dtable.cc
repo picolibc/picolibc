@@ -106,7 +106,7 @@ stdio_init (void)
       HANDLE out = GetStdHandle (STD_OUTPUT_HANDLE);
       HANDLE err = GetStdHandle (STD_ERROR_HANDLE);
 
-      cygheap->fdtab.init_std_file_from_handle (0, in, GENERIC_READ, "{stdin}");
+      cygheap->fdtab.init_std_file_from_handle (0, in, GENERIC_READ);
 
       /* STD_ERROR_HANDLE has been observed to be the same as
 	 STD_OUTPUT_HANDLE.  We need separate handles (e.g. using pipes
@@ -124,8 +124,8 @@ stdio_init (void)
 	    }
 	}
 
-      cygheap->fdtab.init_std_file_from_handle (1, out, GENERIC_WRITE, "{stdout}");
-      cygheap->fdtab.init_std_file_from_handle (2, err, GENERIC_WRITE, "{stderr}");
+      cygheap->fdtab.init_std_file_from_handle (1, out, GENERIC_WRITE);
+      cygheap->fdtab.init_std_file_from_handle (2, err, GENERIC_WRITE);
       /* Assign the console as the controlling tty for this process if we actually
 	 have a console and no other controlling tty has been assigned. */
       if (myself->ctty < 0 && GetConsoleCP () > 0)
@@ -170,47 +170,48 @@ dtable::release (int fd)
 
 void
 dtable::init_std_file_from_handle (int fd, HANDLE handle,
-				  DWORD myaccess, const char *name)
+				  DWORD myaccess)
 {
   int bin;
+  const char *name = NULL;
 
   if (__fmode)
     bin = __fmode;
   else
     bin = binmode ?: 0;
 
-  /* Check to see if we're being redirected - if not then
-     we open then as consoles */
-  if (fd == 0 || fd == 1 || fd == 2)
+  first_fd_for_open = 0;
+  /* See if we can consoleify it  - if it is a console,
+   don't open it in binary.  That will screw up our crlfs*/
+  CONSOLE_SCREEN_BUFFER_INFO buf;
+  if (GetConsoleScreenBufferInfo (handle, &buf))
     {
-      first_fd_for_open = 0;
-      /* See if we can consoleify it  - if it is a console,
-       don't open it in binary.  That will screw up our crlfs*/
-      CONSOLE_SCREEN_BUFFER_INFO buf;
-      if (GetConsoleScreenBufferInfo (handle, &buf))
-	{
-	  bin = 0;
-	  if (ISSTATE (myself, PID_USETTY))
-	    name = "/dev/tty";
-	  else
-	    name = "/dev/conout";
-	}
-      else if (FlushConsoleInputBuffer (handle))
-	{
-	  bin = 0;
-	  if (ISSTATE (myself, PID_USETTY))
-	    name = "/dev/tty";
-	  else
-	    name = "/dev/conin";
-	}
-      else if (GetFileType (handle) == FILE_TYPE_PIPE)
-	{
-	  if (bin == 0)
-	    bin = O_BINARY;
-	}
+      if (ISSTATE (myself, PID_USETTY))
+	name = "/dev/tty";
+      else
+	name = "/dev/conout";
+      bin = 0;
+    }
+  else if (FlushConsoleInputBuffer (handle))
+    {
+      if (ISSTATE (myself, PID_USETTY))
+	name = "/dev/tty";
+      else
+	name = "/dev/conin";
+      bin = 0;
+    }
+  else if (GetFileType (handle) == FILE_TYPE_PIPE)
+    {
+      if (fd == 0)
+	name = "/dev/piper";
+      else if (fd == 1 || fd == 2)
+	name = "/dev/pipew";
+      if (bin == 0)
+	bin = O_BINARY;
     }
 
-  build_fhandler (fd, name, handle)->init (handle, myaccess, bin);
+  path_conv pc;
+  build_fhandler (fd, name, handle, pc)->init (handle, myaccess, bin);
   set_std_handle (fd);
   paranoid_printf ("fd %d, handle %p", fd, handle);
 }
@@ -218,57 +219,50 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle,
 extern "C"
 int
 cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
-			      DWORD myaccess)
+			    DWORD myaccess)
 {
   if (fd == -1)
     fd = cygheap->fdtab.find_unused_handle ();
-  fhandler_base *res = cygheap->fdtab.build_fhandler (fd, name, handle);
+  path_conv pc;
+  fhandler_base *res = cygheap->fdtab.build_fhandler (fd, name, handle, pc);
   res->init (handle, myaccess, bin);
   return fd;
 }
 
 fhandler_base *
-dtable::build_fhandler (int fd, const char *name, HANDLE handle, path_conv *pc)
+dtable::build_fhandler (int fd, const char *name, HANDLE handle, path_conv& pc,
+    			unsigned opt, suffix_info *si)
 {
-  int unit;
-  DWORD devn;
-  fhandler_base *fh;
-
-  if (!pc)
-    devn = get_device_number (name, unit);
-  else
-    {
-      pc->check (name);
-      devn = pc->get_devn ();
-      unit = pc->get_unitn ();
-    }
-
-  if (devn == FH_BAD)
+  if (!name && handle)
     {
       struct sockaddr sa;
       int sal = sizeof (sa);
       CONSOLE_SCREEN_BUFFER_INFO cinfo;
       DCB dcb;
 
-      if (handle == NULL)
-	devn = FH_DISK;
-      else if (GetNumberOfConsoleInputEvents (handle, (DWORD *) &cinfo))
-	devn = FH_CONIN;
+      if (GetNumberOfConsoleInputEvents (handle, (DWORD *) &cinfo))
+	name = "/dev/conin";
       else if (GetConsoleScreenBufferInfo (handle, &cinfo))
-	devn= FH_CONOUT;
+	name = "/dev/conout";
       else if (wsock_started && getpeername ((SOCKET) handle, &sa, &sal) == 0)
-	devn = FH_SOCKET;
+	name = "/dev/socket";
       else if (GetFileType (handle) == FILE_TYPE_PIPE)
-	devn = FH_PIPE;
+	name = "/dev/pipe";
       else if (GetCommState (handle, &dcb))
-	devn = FH_SERIAL;
+	name = "/dev/ttyS0"; // FIXME - determine correct device
       else
-	devn = FH_DISK;
+	name = "some disk file";
     }
 
-  fh = build_fhandler (fd, devn, name, unit);
-  if (pc)
-    fh->set_name (name, *pc);
+  pc.check (name, opt | PC_NULLEMPTY, si);
+  if (pc.error)
+    {
+      set_errno (pc.error);
+      return NULL;
+    }
+
+  fhandler_base *fh = build_fhandler (fd, pc.get_devn (), name, pc.get_unitn ());
+  fh->set_name (name, pc, pc.get_unitn ());
   return fh;
 }
 
@@ -341,8 +335,11 @@ dtable::build_fhandler (int fd, DWORD dev, const char *name, int unit)
 	fh = new (buf) fhandler_dev_dsp (name);
 	break;
       default:
-	/* FIXME - this could recurse forever */
-	return build_fhandler (fd, name, NULL);
+	{
+	  /* FIXME - this could recurse forever */
+	  path_conv pc;
+	  return build_fhandler (fd, name, NULL, pc);
+	}
     }
 
   debug_printf ("%s - cb %d, fd %d, fh %p", fh->get_name () ?: "", fh->cb,
@@ -432,6 +429,14 @@ done:
   syscall_printf ("%d = dup2 (%d, %d)", res, oldfd, newfd);
 
   return res;
+}
+
+void
+dtable::reset_unix_path_name (int fd, const char *name)
+{
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "reset_unix_name");
+  fds[fd]->reset_unix_path_name (name);
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "reset_unix_name");
 }
 
 select_record *

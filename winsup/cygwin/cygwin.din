@@ -789,8 +789,12 @@ strtok_r
 _strtok_r = strtok_r
 strtol
 _strtol = strtol
+strtoll
+_strtoll = strtoll
 strtoul
 _strtoul = strtoul
+strtoull
+_strtoull = strtoull
 strupr
 _strupr = strupr
 strxfrm

@@ -806,14 +806,17 @@ winenv (const char * const *envp, int keep_posix)
 	  saw_forced_winenv[i] = strncasematch (forced_winenv_vars[i], *srcp, len);
     }
 
+  char dum[1];
   for (int i = 0; forced_winenv_vars[i]; i++)
     if (!saw_forced_winenv[i])
       {
-	len = strlen (forced_winenv_vars[i]);
-	p = (char *) alloca (len + MAX_PATH + 1);
+	int namelen = strlen (forced_winenv_vars[i]) + 1;
+	int vallen = GetEnvironmentVariable (forced_winenv_vars[i], dum, 0) + 1;
+	p = (char *) alloca (namelen + vallen);
 	strcpy (p, forced_winenv_vars[i]);
 	strcat (p, "=");
-	if (!GetEnvironmentVariable (forced_winenv_vars[i], p + len + 1, MAX_PATH))
+	if (!GetEnvironmentVariable (forced_winenv_vars[i], p + namelen,
+	      			     vallen + 1))
 	  debug_printf ("warning: %s not present in environment", *srcp);
 	else
 	  {
