@@ -1,3 +1,8 @@
+Sun Sep 23 11:15:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* dtable.cc (dtable::build_fhandler): Initialize unit when using
+	optional path_conv argument.
+
 Sat Sep 22 17:33:45 2001  Christopher Faylor <cgf@cygnus.com>
 			  Corinna Vinschen <corinna@vinschen.de>
 

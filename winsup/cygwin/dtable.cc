@@ -239,6 +239,7 @@ dtable::build_fhandler (int fd, const char *name, HANDLE handle, path_conv *pc)
     {
       pc->check (name);
       devn = pc->get_devn ();
+      unit = pc->get_unitn ();
     }
 
   if (devn == FH_BAD)
