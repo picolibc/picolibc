@@ -1,3 +1,11 @@
+Wed May  9 14:46:32 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler.h (fhandler_termios::echo_erase): Declare new method.
+	* fhandler_termios.cc (fhandler_termios::echo_erase): New method for
+	echoing erase characters.
+	(fhandler_termios::line_edit): Check the echo flag before echoing
+	control characters (from Kazuhiro Fujieda <fujieda@jaist.ac.jp>).
+
 Wed May  9 10:43:30 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* include/pthread.h: Remove C++ comment.

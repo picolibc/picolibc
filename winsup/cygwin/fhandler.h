@@ -600,6 +600,7 @@ public:
   virtual void __release_output_mutex (const char *fn, int ln) {}
   void fixup_after_fork (HANDLE);
   void fixup_after_exec (HANDLE parent) { fixup_after_fork (parent); }
+  void echo_erase (int force = 0);
 };
 
 enum ansi_intensity

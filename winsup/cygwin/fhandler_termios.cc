@@ -17,6 +17,7 @@ details. */
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "sync.h"
+#include "interlock.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "tty.h"
@@ -160,6 +161,13 @@ setEIO:
 
 #define set_input_done(x) input_done = input_done || (x)
 
+inline void
+fhandler_termios::echo_erase (int force)
+{
+  if (force || tc->ti.c_lflag & ECHO)
+    doecho ("\b \b", 3);
+}
+
 int
 fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
 {
@@ -247,7 +255,7 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
       else if (c == tc->ti.c_cc[VERASE])
 	{
 	  if (eat_readahead (1))
-	    doecho ("\b \b", 3);
+	    echo_erase ();
 	  continue;
 	}
       else if (c == tc->ti.c_cc[VWERASE])
@@ -257,21 +265,25 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
 	    if (!eat_readahead (1))
 	      break;
 	    else
-	      doecho ("\b \b", 3);
+	      echo_erase ();
 	  while ((ch = peek_readahead (1)) >= 0 && !isspace (ch));
 	  continue;
 	}
       else if (c == tc->ti.c_cc[VKILL])
 	{
 	  int nchars = eat_readahead (-1);
-	  while (nchars--)
-	    doecho ("\b \b", 3);
+	  if (tc->ti.c_lflag & ECHO)
+	    while (nchars--)
+	      echo_erase (1);
 	  continue;
 	}
       else if (c == tc->ti.c_cc[VREPRINT])
 	{
-	  doecho ("\n\r", 2);
-	  doecho (rabuf, ralen);
+	  if (tc->ti.c_lflag & ECHO)
+	    {
+	      doecho ("\n\r", 2);
+	      doecho (rabuf, ralen);
+	    }
 	  continue;
 	}
       else if (c == tc->ti.c_cc[VEOF])
