@@ -1,4 +1,9 @@
 
+Thu Jan 18 10:33:01  2001  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/wchar.h: Protect prototypes only declared in the C++ STL
+	from being declared unless __cplusplus is defined.
+
 Tue Jan 16 11:37:31  2001  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* include/stdlib.h: Apply Danny Smith patch 102730
