@@ -176,6 +176,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EM_OPENRISC    92	/* OpenRISC 32-bit embedded processor */
 #define EM_ARC_A5      93	/* ARC Cores Tangent-A5 */
 #define EM_XTENSA      94	/* Tensilica Xtensa Architecture */
+#define EM_IP2K	       101	/* Ubicom IP2022 micro controller */
 
 /* If it is necessary to assign new unofficial EM_* values, please pick large
    random numbers (0x8523, 0xa7f2, etc.) to minimize the chances of collision
@@ -246,6 +247,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 /* FRV magic number - no EABI available??.  */
 #define EM_CYGNUS_FRV		0x5441
+
+/* Ubicom IP2xxx; no ABI */
+#define EM_IP2K_OLD 	        0x8217	
+
 /* See the above comment before you add a new EM_* value here.  */
 
 /* Values for e_version.  */

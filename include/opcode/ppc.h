@@ -107,6 +107,30 @@ extern const int powerpc_num_opcodes;
 /* Opcode isn't supported by Power4 architecture.  */
 #define PPC_OPCODE_NOPOWER4 (040000)
 
+/* Opcode is only supported by POWERPC Classic architecture.  */
+#define PPC_OPCODE_CLASSIC (0100000)
+
+/* Opcode is only supported by e500x2 Core.  */
+#define PPC_OPCODE_SPE     (0200000)
+
+/* Opcode is supported by e500x2 Integer select APU.  */
+#define PPC_OPCODE_ISEL     (0400000)
+
+/* Opcode is an e500 SPE floating point instruction.  */
+#define PPC_OPCODE_EFS      (01000000)
+
+/* Opcode is supported by branch locking APU.  */
+#define PPC_OPCODE_BRLOCK   (02000000)
+
+/* Opcode is supported by performance monitor APU.  */
+#define PPC_OPCODE_PMR      (04000000)
+
+/* Opcode is supported by cache locking APU.  */
+#define PPC_OPCODE_CACHELCK (010000000)
+
+/* Opcode is supported by machine check APU.  */
+#define PPC_OPCODE_RFMCI    (020000000)
+
 /* A macro to extract the major opcode from an instruction.  */
 #define PPC_OP(i) (((i) >> 26) & 0x3f)
 

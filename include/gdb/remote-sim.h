@@ -1,6 +1,7 @@
 /* This file defines the interface between the simulator and gdb.
-   Copyright 1993, 1994, 1996, 1997, 1998, 2000
-   Free Software Foundation, Inc.
+
+   Copyright 1993, 1994, 1996, 1997, 1998, 2000, 2002 Free Software
+   Foundation, Inc.
 
 This file is part of GDB.
 
@@ -289,63 +290,6 @@ SIM_RC sim_enable_breakpoint PARAMS ((SIM_DESC sd, SIM_ADDR addr));
 SIM_RC sim_disable_breakpoint PARAMS ((SIM_DESC sd, SIM_ADDR addr));
 SIM_RC sim_enable_all_breakpoints PARAMS ((SIM_DESC sd));
 SIM_RC sim_disable_all_breakpoints PARAMS ((SIM_DESC sd));
-
-
-/* Provide simulator with a default (global) host_callback_struct.
-   THIS PROCEDURE IS DEPRECIATED.
-   GDB and NRUN do not use this interface.
-   This procedure does not take a SIM_DESC argument as it is
-   used before sim_open. */
-
-void sim_set_callbacks PARAMS ((struct host_callback_struct *));
-
-
-/* Set the size of the simulator memory array.
-   THIS PROCEDURE IS DEPRECIATED.
-   GDB and NRUN do not use this interface.
-   This procedure does not take a SIM_DESC argument as it is
-   used before sim_open. */
-
-void sim_size PARAMS ((int i));
-
-
-/* Single-step simulator with tracing enabled.
-   THIS PROCEDURE IS DEPRECIATED.
-   THIS PROCEDURE IS EVEN MORE DEPRECATED THAN SIM_SET_TRACE
-   GDB and NRUN do not use this interface.
-   This procedure returns: ``0'' indicating that the simulator should
-   be continued using sim_trace() calls; ``1'' indicating that the
-   simulation has finished. */
-
-int sim_trace PARAMS ((SIM_DESC sd));
-
-
-/* Enable tracing.
-   THIS PROCEDURE IS DEPRECIATED.
-   GDB and NRUN do not use this interface.
-   This procedure returns: ``0'' indicating that the simulator should
-   be continued using sim_trace() calls; ``1'' indicating that the
-   simulation has finished. */
-
-void sim_set_trace PARAMS ((void));
-
-
-/* Configure the size of the profile buffer.
-   THIS PROCEDURE IS DEPRECIATED.
-   GDB and NRUN do not use this interface.
-   This procedure does not take a SIM_DESC argument as it is
-   used before sim_open. */
-
-void sim_set_profile_size PARAMS ((int n));
-
-
-/* Kill the running program.
-   THIS PROCEDURE IS DEPRECIATED.
-   GDB and NRUN do not use this interface.
-   This procedure will be replaced as part of the introduction of
-   multi-cpu simulators. */
-
-void sim_kill PARAMS ((SIM_DESC sd));
 
 #ifdef __cplusplus
 }

@@ -415,6 +415,7 @@ case "${target}" in
   hppa*-*-*elf* | \
   parisc*-*-linux* | hppa*-*-linux* | \
   hppa*-*-lites* | \
+  hppa*-*-openbsd* | \
   hppa*64*-*-*)
     noconfigdirs="$noconfigdirs ${libgcj}"
     # Do configure ld/binutils/gas for this case.
@@ -453,9 +454,6 @@ case "${target}" in
     # Note however, that newlib will only be configured in this situation
     # if the --with-newlib option has been given, because otherwise
     # 'target-newlib' will appear in skipdirs.
-    ;;
-  *-*-linux*)
-    noconfigdirs="$noconfigdirs target-newlib target-libgloss"
     ;;
   i[3456]86-*-mingw32*)
     target_configdirs="$target_configdirs target-mingw"
@@ -544,6 +542,11 @@ case "${target}" in
   powerpc-*-eabi)
     noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
+  powerpc64*-*-linux*)
+    noconfigdirs="$noconfigdirs target-newlib target-libgloss"
+    # not yet ported.
+    noconfigdirs="$noconfigdirs target-libffi"
+    ;;
   rs6000-*-lynxos*)
     noconfigdirs="$noconfigdirs target-newlib gprof ${libgcj}"
     ;;
@@ -578,7 +581,7 @@ case "${target}" in
     noconfigdirs="$noconfigdirs gprof ${libgcj}"   # same as generic mips
    ;;
   mips*-*-linux*)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs target-newlib target-libgloss"
     ;;
   mips*-*-*)
     noconfigdirs="$noconfigdirs gprof ${libgcj}"
@@ -637,6 +640,9 @@ case "${target}" in
     ;;
   ip2k-*-*)
     noconfigdirs="$noconfigdirs target-libiberty ${libstdcxx_version} ${libgcj}"
+    ;;
+  *-*-linux*)
+    noconfigdirs="$noconfigdirs target-newlib target-libgloss"
     ;;
   *-*-lynxos*)
     noconfigdirs="$noconfigdirs target-newlib target-libgloss ${libgcj}"
@@ -1548,10 +1554,10 @@ cat >$sedtemp <<EOF
 s:^TARGET_CONFIGDIRS[ 	]*=.*$:TARGET_CONFIGDIRS = ${target_configdirs}:
 s%^TARGET_CONFIGARGS[ 	]*=.*$%TARGET_CONFIGARGS = ${targargs}%
 s%^FLAGS_FOR_TARGET[ 	]*=.*$%FLAGS_FOR_TARGET = ${FLAGS_FOR_TARGET}%
-s%^CC_FOR_TARGET[ 	]*=.*$%CC_FOR_TARGET = ${CC_FOR_TARGET}%
-s%^GCJ_FOR_TARGET[      ]*=.*$%GCJ_FOR_TARGET = ${GCJ_FOR_TARGET}%
-s%^CXX_FOR_TARGET[ 	]*=.*$%CXX_FOR_TARGET = ${qCXX_FOR_TARGET}%
-s%^CXX_FOR_TARGET_FOR_RECURSIVE_MAKE[ 	]*=.*$%CXX_FOR_TARGET_FOR_RECURSIVE_MAKE = ${qqCXX_FOR_TARGET}%
+s%^CC_FOR_TARGET[ 	]*=.*$%CC_FOR_TARGET = \$(STAGE_CC_WRAPPER) ${CC_FOR_TARGET}%
+s%^GCJ_FOR_TARGET[      ]*=.*$%GCJ_FOR_TARGET = \$(STAGE_CC_WRAPPER) ${GCJ_FOR_TARGET}%
+s%^CXX_FOR_TARGET[ 	]*=.*$%CXX_FOR_TARGET = \$(STAGE_CC_WRAPPER) ${qCXX_FOR_TARGET}%
+s%^CXX_FOR_TARGET_FOR_RECURSIVE_MAKE[ 	]*=.*$%CXX_FOR_TARGET_FOR_RECURSIVE_MAKE = \$(STAGE_CC_WRAPPER) ${qqCXX_FOR_TARGET}%
 s%^TARGET_SUBDIR[ 	]*=.*$%TARGET_SUBDIR = ${target_subdir}%
 s%^BUILD_SUBDIR[ 	]*=.*$%BUILD_SUBDIR = ${build_subdir}%
 s%^BUILD_CONFIGARGS[ 	]*=.*$%BUILD_CONFIGARGS = ${buildargs}%
