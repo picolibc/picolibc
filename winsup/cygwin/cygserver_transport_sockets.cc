@@ -89,9 +89,9 @@ class transport_layer_sockets *
 transport_layer_sockets::accept (bool * const recoverable)
 {
   /* FIXME: check we have listened */
-  const int fd = cygwin_accept(fd, &sockdetails, &sdlen);
+  const int accept_fd = cygwin_accept(fd, &sockdetails, &sdlen);
 
-  if (fd == -1)
+  if (accept_fd == -1)
     {
       system_printf ("Nup, couldn't accept. %d", errno);
       switch (errno)
@@ -112,7 +112,7 @@ transport_layer_sockets::accept (bool * const recoverable)
       return NULL;
     }
 
-  return new transport_layer_sockets (fd);
+  return new transport_layer_sockets (accept_fd);
 }
 
 #endif /* !__INSIDE_CYGWIN__ */
