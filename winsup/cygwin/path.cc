@@ -764,6 +764,11 @@ is_virtual_symlink:
 		  else
 		    break;
 		}
+	      else if (sym.error != ENOENT) /* E. g. EACCES */
+		{
+		  error = sym.error;
+		  goto out;
+		}
 	      /* No existing file found. */
 	    }
 

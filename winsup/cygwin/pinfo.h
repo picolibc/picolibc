@@ -27,11 +27,14 @@ enum picom
   PICOM_CWD = 3,
   PICOM_ROOT = 4,
   PICOM_FDS = 5,
-  PICOM_FD = 6
+  PICOM_FD = 6,
+  PICOM_PIPE_FHANDLER = 7
 };
 
 #define EXITCODE_SET 0x80000000
 #define EXITCODE_NOSET 0x40000000
+
+class fhandler_pipe;
 
 class _pinfo
 {
@@ -110,6 +113,7 @@ public:
   void commune_recv ();
   commune_result commune_send (DWORD, ...);
   bool alive ();
+  fhandler_pipe *pipe_fhandler (HANDLE hdl, size_t &);
   char *fd (int fd, size_t &);
   char *fds (size_t &);
   char *root (size_t &);

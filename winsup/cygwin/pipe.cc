@@ -36,43 +36,106 @@ fhandler_pipe::fhandler_pipe ()
 {
 }
 
+extern "C" int sscanf (const char *, const char *, ...);
+
 int
 fhandler_pipe::open (int flags, mode_t mode)
 {
-  const char *path = get_name ();
-  debug_printf ("path: %s", path);
-  if (!strncmp (get_name (), "/proc/", 6))
+  HANDLE proc, pipe_hdl, nio_hdl = NULL, nwrp_hdl = NULL;
+  fhandler_pipe *fh = NULL;
+  size_t size;
+  int pid, rwflags = (flags & O_ACCMODE);
+
+  if (flags & O_CREAT)
     {
-      char *c;
-      HANDLE hdl;
-      int pid = strtol (path += 6, &c, 10);
-      if (!pid || !c || *c != '/')
-        goto out;
-      path = c;
-      if (strncmp (path, "/fd/pipe:[", 10))
-        goto out;
-      path += 10;
-      hdl = (HANDLE) atoi (path);
-      if (pid == myself->pid)
-        {
-	  cygheap_fdenum cfd;
-	  while (cfd.next () >= 0)
-	    {
-	      if (cfd->get_handle () == hdl)
-	        {
-		  if (!cfd->dup (this))
-		    return 1;
-		  return 0;
-		}
-	    }
-	}
-      else
-        {
-	  /* TODO: Open pipes of different process.  Is that possible? */
-	}
+      set_errno (EACCES);
+      return 0;
     }
+  sscanf (get_name (), "/proc/%d/fd/pipe:[%d]", &pid, (int *) &pipe_hdl);
+  if (pid == myself->pid)
+    {
+      cygheap_fdenum cfd;
+      while (cfd.next () >= 0)
+	{
+	  if (cfd->get_handle () != pipe_hdl)
+	    continue;
+	  if ((rwflags == O_RDONLY && !(cfd->get_access () & GENERIC_READ))
+	      || (rwflags == O_WRONLY && !(cfd->get_access () & GENERIC_WRITE)))
+	    {
+	      set_errno (EACCES);
+	      return 0;
+	    }
+	  if (!cfd->dup (this))
+	    return 1;
+	  return 0;
+	}
+      set_errno (ENOENT);
+      return 0;
+    }
+
+  pinfo p (pid);
+  if (!p)
+    {
+      set_errno (ESRCH);
+      return 0;
+    }
+  if (!(proc = OpenProcess (PROCESS_DUP_HANDLE, false, p->dwProcessId)))
+    {
+      __seterrno ();
+      return 0;
+    }
+  if (!(fh = p->pipe_fhandler (pipe_hdl, size)) || !size)
+    {
+      set_errno (ENOENT);
+      goto out;
+    }
+  /* Too bad, but Windows only allows the same access mode when dup'ing
+     the pipe. */
+  if ((rwflags == O_RDONLY && !(fh->get_access () & GENERIC_READ))
+      || (rwflags == O_WRONLY && !(fh->get_access () & GENERIC_WRITE)))
+    {
+      set_errno (EACCES);
+      goto out;
+    }
+  if (!DuplicateHandle (proc, pipe_hdl, hMainProc, &nio_hdl,
+			0, false, DUPLICATE_SAME_ACCESS))
+    {
+      __seterrno ();
+      goto out;
+    }
+  if (fh->writepipe_exists
+      && !DuplicateHandle (proc, fh->writepipe_exists,
+			   hMainProc, &nwrp_hdl,
+			   0, false, DUPLICATE_SAME_ACCESS))
+    {
+      __seterrno ();
+      goto out;
+    }
+  if (fh->read_state)
+    {
+      create_read_state (2);
+      need_fork_fixup (true);
+      ProtectHandle1 (read_state, read_state);
+    }
+  if (fh->get_guard ())
+    create_guard ((flags & O_NOINHERIT) ?  &sec_none_nih : &sec_none);
+  init (nio_hdl, fh->get_access (), mode & O_TEXT ?: O_BINARY);
+  writepipe_exists = nwrp_hdl;
+  if (flags & O_NOINHERIT)
+    close_on_exec (true);
+  uninterruptible_io (fh->uninterruptible_io ());
+  free (fh);
+  CloseHandle (proc);
+  return 1;
 out:
-  set_errno (ENXIO);
+  if (nwrp_hdl)
+    CloseHandle (nwrp_hdl);
+  if (nio_hdl)
+    CloseHandle (nio_hdl);
+  if (fh)
+    free (fh);
+  if (proc)
+    CloseHandle (proc);
   return 0;
 }
 

@@ -321,6 +321,7 @@ class cygheap_fdmanip
   operator int &() {return fd;}
   operator fhandler_base* &() {return *fh;}
   operator fhandler_socket* () const {return reinterpret_cast<fhandler_socket *> (*fh);}
+  operator fhandler_pipe* () const {return reinterpret_cast<fhandler_pipe *> (*fh);}
   void operator = (fhandler_base *fh) {*this->fh = fh;}
   fhandler_base *operator -> () const {return *fh;}
   bool isopen () const

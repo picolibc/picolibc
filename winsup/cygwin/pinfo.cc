@@ -506,6 +506,34 @@ _pinfo::commune_recv ()
 	      }
         break;
       }
+    case PICOM_PIPE_FHANDLER:
+	{
+	  HANDLE hdl;
+	  if (!ReadFile (__fromthem, &hdl, sizeof hdl, &nr, NULL)
+	      || nr != sizeof hdl)
+	    {
+	      sigproc_printf ("ReadFile hdl failed, %E");
+	      CloseHandle (hp);
+	      goto out;
+	    }
+	  CloseHandle (__fromthem); __fromthem = NULL;
+	  CloseHandle (hp);
+	  unsigned int n = 0;
+	  cygheap_fdenum cfd;
+	  while (cfd.next () >= 0)
+	    if (cfd->get_handle () == hdl)
+	      {
+		fhandler_pipe *fh = cfd;
+		n = sizeof *fh;
+		if (!WriteFile (__tothem, &n, sizeof n, &nr, NULL))
+		  sigproc_printf ("WriteFile sizeof hdl failed, %E");
+		else if (!WriteFile (__tothem, fh, n, &nr, NULL))
+		  sigproc_printf ("WriteFile hdl failed, %E");
+	      }
+	  if (!n && !WriteFile (__tothem, &n, sizeof n, &nr, NULL))
+	    sigproc_printf ("WriteFile sizeof hdl failed, %E");
+	  break;
+	}
     case PICOM_FD:
       {
 	int fd;
@@ -518,7 +546,7 @@ _pinfo::commune_recv ()
 	  }
 	CloseHandle (__fromthem); __fromthem = NULL;
 	CloseHandle (hp);
-	unsigned int n;
+	unsigned int n = 0;
 	cygheap_fdget cfd (fd);
 	if (cfd < 0)
 	  n = strlen (strcpy (path, "")) + 1;
@@ -659,6 +687,17 @@ _pinfo::commune_send (DWORD code, ...)
   size_t n;
   switch (code)
     {
+    case PICOM_PIPE_FHANDLER:
+      {
+	HANDLE hdl = va_arg (args, HANDLE);
+	if (!WriteFile (tothem, &hdl, sizeof hdl, &nr, NULL)
+	    || nr != sizeof hdl)
+	  {
+	    __seterrno ();
+	    goto err;
+	  }
+      }
+      goto business_as_usual;
     case PICOM_FD:
       {
 	int fd = va_arg (args, int);
@@ -669,25 +708,31 @@ _pinfo::commune_send (DWORD code, ...)
 	    goto err;
 	  }
       }
-      /*FALLTHRU*/
+      goto business_as_usual;
     case PICOM_CMDLINE:
     case PICOM_CWD:
     case PICOM_ROOT:
     case PICOM_FDS:
+  business_as_usual:
       if (!ReadFile (fromthem, &n, sizeof n, &nr, NULL) || nr != sizeof n)
 	{
 	  __seterrno ();
 	  goto err;
 	}
-      res.s = (char *) malloc (n);
-      char *p;
-      for (p = res.s; ReadFile (fromthem, p, n, &nr, NULL); p += nr)
-	continue;
-      if ((unsigned) (p - res.s) != n)
-	{
-	  __seterrno ();
-	  goto err;
-	}
+      if (!n)
+        res.s = NULL;
+      else
+        {
+	  res.s = (char *) malloc (n);
+	  char *p;
+	  for (p = res.s; ReadFile (fromthem, p, n, &nr, NULL); p += nr)
+	    continue;
+	  if ((unsigned) (p - res.s) != n)
+	    {
+	      __seterrno ();
+	      goto err;
+	    }
+        }
       res.n = n;
       break;
     case PICOM_FIFO:
@@ -738,6 +783,18 @@ out:
   myself->hello_pid = 0;
   myself.unlock ();
   return res;
+}
+
+fhandler_pipe *
+_pinfo::pipe_fhandler (HANDLE hdl, size_t &n)
+{
+  if (!this || !pid)
+    return NULL;
+  if (pid == myself->pid)
+    return NULL;
+  commune_result cr = commune_send (PICOM_PIPE_FHANDLER, hdl);
+  n = cr.n;
+  return (fhandler_pipe *) cr.s;
 }
 
 char *

@@ -1,3 +1,17 @@
+2005-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (path_conv::check): Leave symlink expansion loop in case
+	a not-ENOENT error happens.
+
+	* cygheap.h (cygheap_fdmanip::fhandler_pipe *): New cast operator.
+	* pinfo.cc (_pinfo::commune_recv): Add PICOM_PIPE_FHANDLER handling.
+	(_pinfo::commune_send): Ditto.
+	(_pinfo::pipe_fhandler): New method.
+	* pinfo.h (enum picom): Add PICOM_PIPE_FHANDLER.
+	(_pinfo::pipe_fhandler): Declare.
+	* pipe.cc (fhandler_pipe::open): Rewrite.  Allow to open foreign
+	pipe handles.
+
 2005-02-03  Christopher Faylor  <cgf@timesys.com>
 
 	* cygthread.h (cygthread::terminate_thread): Reflect return value.
