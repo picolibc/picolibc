@@ -1,5 +1,11 @@
 2003-12-06  Christopher Faylor  <cgf@redhat.com>
 
+	* exceptions.cc (_threadinfo::remove): Avoid returning without
+	unlocking critical section in the (hopefully impossible) case of an
+	unrecognized thread.
+
+2003-12-06  Christopher Faylor  <cgf@redhat.com>
+
 	* cygtls.h: Add more "don't parse this" guards.
 	(_threadinfo::init_thread): Rename from 'init'.
 	(_threadinfo::init): Declare new function.

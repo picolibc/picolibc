@@ -192,13 +192,14 @@ _threadinfo::remove ()
   EnterCriticalSection (&protect_linked_list);
   for (t = _last_thread; t && t != this; t = t->prev)
     continue;
-  if (!t)
-    return;
-  t->prev->next = t->next;
-  if (t->next)
-    t->next->prev = t->prev;
-  if (t == _last_thread)
-    _last_thread = t->prev;
+  if (t)
+    {
+      t->prev->next = t->next;
+      if (t->next)
+	t->next->prev = t->prev;
+      if (t == _last_thread)
+	_last_thread = t->prev;
+    }
   LeaveCriticalSection (&protect_linked_list);
 }
 
