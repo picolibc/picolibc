@@ -1,3 +1,15 @@
+Mon Sep 18 17:15:37 2000  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+
+	* path.cc (mount_info::read_mounts): Don't delete mount entries of
+	which mount points have the cygdrive prefix.
+	* (mount_info::add_reg_mount): Properly catch errors on registry
+	operations.
+	* (mount_info::write_cygdrive_info_to_registry): Ditto.
+	* (mount_info::del_reg_mount): Cosmetic changes to be consistent
+	with other methods.
+	* (mount_info::add_item): Check arguments more precisely.
+	Increment nmounts only when registry operations succeed.
+
 Sun Sep 17 22:18:39 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (interruptible): Return 0 if given an address in
