@@ -564,7 +564,7 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
   if (!get_inet_addr (name, namelen, &sin, &namelen, secret))
     return -1;
 
-  if (!is_nonblocking () && !is_connect_pending ())
+  if (winsock2_active && !is_nonblocking () && !is_connect_pending ())
     if (!evt.load (get_socket (), FD_CONNECT_BIT))
       {
 	set_winsock_errno ();
@@ -573,7 +573,7 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 
   res = ::connect (get_socket (), (sockaddr *) &sin, namelen);
 
-  if (res && !is_nonblocking () && !is_connect_pending () &&
+  if (winsock2_active && res && !is_nonblocking () && !is_connect_pending () &&
       WSAGetLastError () == WSAEWOULDBLOCK)
     switch (evt.wait ())
       {
@@ -684,7 +684,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
   if (len && ((unsigned) *len < sizeof (struct sockaddr_in)))
     *len = sizeof (struct sockaddr_in);
 
-  if (!is_nonblocking ())
+  if (winsock2_active && !is_nonblocking ())
     {
       sock_event evt;
       if (!evt.load (get_socket (), FD_ACCEPT_BIT))

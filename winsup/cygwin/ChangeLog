@@ -1,5 +1,11 @@
 2003-05-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::connect): Guard calls to
+	sock_event methods by a check for WinSock2 availability.
+	(fhandler_socket::accept): Ditto.
+
+2003-05-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h: Rename FH_W95LSBUG flag to FH_LSEEKED.
 	(fhandler_base::set_did_lseek): Rename from set_check_win95_lseek_bug.
 	(fhandler_base::get_did_lseek): Rename from get_check_win95_lseek_bug.
