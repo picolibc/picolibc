@@ -123,7 +123,6 @@
 	* net.cc (cygwin_getsockopt): Dereference optlen pointer when passing
 	to __check_null_invalid_struct_errno.
 
->>>>>>> 1.1060
 2001-12-03  Christopher Faylor  <cgf@redhat.com>
 
 	* net.cc (cygwin_getsockopt): Allow NULL optval.
