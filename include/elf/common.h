@@ -142,6 +142,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EM_ME16	       59	/* Toyota ME16 processor */
 #define EM_ST100       60	/* STMicroelectronics ST100 processor */
 #define EM_TINYJ       61	/* Advanced Logic Corp. TinyJ embedded processor */
+#define EM_X86_64      62       /* Advanced Micro Devices X86-64 processor */
 
 #define EM_FX66	       66	/* Siemens FX66 microcontroller */
 #define EM_ST9PLUS     67	/* STMicroelectronics ST9+ 8/16 bit microcontroller */

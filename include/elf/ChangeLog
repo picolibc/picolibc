@@ -1,3 +1,8 @@
+2000-11-30  Jan Hubicka  <jh@suse.cz>
+	
+        * common.h (EM_X86_64): New macro.
+        * x86-64.h: New file.
+
 2000-11-27  Hans-Peter Nilsson  <hp@axis.com>
 
 	* common.h (e_machine numbers): Clarify comments to describe how
