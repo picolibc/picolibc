@@ -228,10 +228,10 @@ endif
 	$(MULTIDO) $(AM_MAKEFLAGS) DO=install multi-do
 	-if [ -z "$(MULTISUBDIR)" ]; then \
 	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include; \
-	  $(INSTALL_DATA) newlib.h $(DESTDIR)$(tooldir)/include/newlib.h; \
 	  for i in $(srcdir)/libc/include/*.h; do \
 	   $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/`basename $$i`; \
 	  done; \
+	  $(INSTALL_DATA) newlib.h $(DESTDIR)$(tooldir)/include/newlib.h; \
 	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include/machine; \
 	  for i in $(srcdir)/libc/include/machine/*.h; do \
 	   $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/machine/`basename $$i`; \

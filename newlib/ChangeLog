@@ -1,5 +1,12 @@
 2002-08-28  Jeff Johnston  <jjohnstn@redhat.com>
 
+        * Makefile.am (install-data-local): Move install of build
+        newlib.h after installing headers in libc/include so as to
+        overwrite default newlib.h.
+        * Makefile.in: Regenerated.
+
+2002-08-28  Jeff Johnston  <jjohnstn@redhat.com>
+
         * libc/include/newlib.h: New file for tools that use newlib
         headers but don't build newlib first (e.g. gcc).
 
