@@ -1,3 +1,7 @@
+2003-04-11  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.common (w32api_lib): Fix w32api detection.
+
 2003-03-28  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.common (ALL_CXXFLAGS): Make normal '=' type variable so that

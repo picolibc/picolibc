@@ -10,7 +10,7 @@
 
 # This makefile requires GNU make.
 
-CFLAGS_COMMON:=-Wall -Wwrite-strings -fno-common -pipe -Winline -fbuiltin -fmessage-length=0# -finline-functions
+CFLAGS_COMMON:=-march=i386 -Wall -Wwrite-strings -fno-common -pipe -Winline -fbuiltin -fmessage-length=0# -finline-functions
 MALLOC_DEBUG:=#-DMALLOC_DEBUG -I/cygnus/src/uberbaum/winsup/cygwin/dlmalloc
 MALLOC_OBJ:=#/cygnus/src/uberbaum/winsup/cygwin/dlmalloc/malloc.o
 
@@ -120,7 +120,7 @@ endif
 
 nostdinc:=${shell [ -d "$(updir)/w32api" ] && echo "-nostdinc -nostdinc++"}
 ifeq (,$(nostdinc))
-override w32api_lib:=${subst //,/,${shell $(CC) -print-search-dirs | awk -F: '/^librar/{for (i = 1; i <= NF; i++) if ($$i ~ /\/lib\/*$$/) print $$i}'}/w32api}
+override w32api_lib:=${subst //,/,${shell $(CC) -print-search-dirs | awk -F: '/^librar/{for (i = 1; i <= NF; i++) if ($$i ~ /\/lib\/*$$/) foo=$$i} END{print foo}'}/w32api}
 endif
 
 COMPILE_CXX=$(CXX) $c $(nostdinc) $(ALL_CXXFLAGS) $(GCC_INCLUDE) \
