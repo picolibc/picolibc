@@ -1303,12 +1303,11 @@ main (int argc, char **argv)
   argc -= optind;
   argv += optind;
 
-  if (argc == 0 && !sysinfo && !keycheck && !check_setup) {
+  if (argc == 0 && !sysinfo && !keycheck && !check_setup)
      if (givehelp)
 	usage (stdout, 0);
      else
 	usage (stderr, 1);
-     }
 
   if ((check_setup || sysinfo) && keycheck)
     usage (stderr, 1);
