@@ -1,6 +1,6 @@
 2004-08-19  Corinna Vinschen  <corinna@vinschen.de>
 
-	* fhandler_socket.cc (fhandler_socket::dup): Decrement dtable's
+	* fhandler_socket.cc (fhandler_socket::dup): Increment dtable's
 	need_fixup_before counter on successful dup.
 	* net.cc (cygwin_getpeername): Add file descriptor to debug output.
 
