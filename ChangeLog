@@ -1,3 +1,8 @@
+2004-02-19  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	PR bootstrap/11932
+	* mkinstalldirs, install-sh: Import from automake CVS HEAD.
+
 2004-02-19  Andrew Cagney  <cagney@redhat.com>
 
 	* config.guess: Update from version 2003-06-12 to 2004-02-16.
