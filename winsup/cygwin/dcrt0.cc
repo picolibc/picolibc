@@ -607,7 +607,7 @@ dll_crt0_1 ()
 				  DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
 	      h = NULL;
 	    set_myself (mypid, h);
-	    __argc = __argc_safe = spawn_info->moreinfo->argc;
+	    __argc = spawn_info->moreinfo->argc;
 	    __argv = spawn_info->moreinfo->argv;
 	    envp = spawn_info->moreinfo->envp;
 	    envc = spawn_info->moreinfo->envc;
@@ -724,6 +724,7 @@ dll_crt0_1 ()
 	}
     }
 
+  __argc_safe = __argc;
   if (user_data->premain[0])
     for (unsigned int i = 0; i < PREMAIN_LEN / 2; i++)
       user_data->premain[i] (__argc, __argv, user_data);

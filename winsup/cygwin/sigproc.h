@@ -75,10 +75,10 @@ public:
     if (!oframe)
       t.get_winapi_lock ();
   }
-  inline void init (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0))
+  inline void init (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0), bool is_exception = 0)
   {
-    if (!t.frame && t.id == GetCurrentThreadId ())
-      set (t, ebp);
+    if (is_exception || (!t.frame && t.id == GetCurrentThreadId ()))
+      set (t, ebp, is_exception);
     else
       st = NULL;
   }

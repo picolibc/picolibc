@@ -717,7 +717,7 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
 	{
 	  thiscatch = sigcatch_main;
 	  thiscomplete = sigcomplete_main;
-	  thisframe.set (mainthread, ebp, exception);
+	  thisframe.init (mainthread, ebp, exception);
 	  todo = getlocal_sigtodo (sig);
 	  issem = true;
 	}

@@ -510,7 +510,7 @@ err:
   buflen = (size_t) -1;
   return;
 
- sig_exit:
+sig_exit:
   set_sig_errno (EINTR);
   buflen = (size_t) -1;
   return;

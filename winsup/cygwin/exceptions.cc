@@ -618,7 +618,6 @@ sig_handle_tty_stop (int sig)
 		  myself->pid, sig, myself->ppid_handle);
   if (WaitForSingleObject (sigCONT, INFINITE) != WAIT_OBJECT_0)
     api_fatal ("WaitSingleObject failed, %E");
-  (void) ResetEvent (sigCONT);
   return;
 }
 }
@@ -1048,23 +1047,23 @@ sig_handle (int sig)
 
   goto dosig;
 
- stop:
+stop:
   /* Eat multiple attempts to STOP */
   if (ISSTATE (myself, PID_STOPPED))
     goto done;
   handler = (void *) sig_handle_tty_stop;
   thissig = myself->getsig (SIGSTOP);
 
- dosig:
+dosig:
   /* Dispatch to the appropriate function. */
   sigproc_printf ("signal %d, about to call %p", sig, handler);
   rc = setup_handler (sig, handler, thissig);
 
- done:
+done:
   sigproc_printf ("returning %d", rc);
   return rc;
 
- exit_sig:
+exit_sig:
   if (sig == SIGQUIT || sig == SIGABRT)
     {
       CONTEXT c;

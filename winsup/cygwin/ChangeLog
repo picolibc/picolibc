@@ -1,5 +1,17 @@
 2003-09-08  Christopher Faylor  <cgf@redhat.com>
 
+	* dcrt0.cc (dlL_crt0_1): Set __argc_safe after __argc is absolutely
+	know to be set.
+	* exceptions.cc (sig_handle_tty_stop): Don't reset sigCONT event since
+	it is reset automatically.
+	* fork.cc (fork): Remove obsolete usage of PID_SPLIT_HEAP.
+	* include/sys/cygwin.h: Ditto.
+	* sigproc.cc (sig_send): Use sigframe init method to set frame since it
+	checks for previous ownership of the frame.
+	* sigproc.h (sigframe::init): Accept an "is_exception" argument.
+
+2003-09-08  Christopher Faylor  <cgf@redhat.com>
+
 	* dir.cc (readdir): Reinstate setting of old ino field for legacy
 	applications.
 	* dirent.h (dirent): Rename unused field to __ino32.
