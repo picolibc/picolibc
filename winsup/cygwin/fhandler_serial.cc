@@ -476,6 +476,20 @@ fhandler_serial::ioctl (unsigned int cmd, void *buffer)
 	    res = -1;
 	  }
 	break;
+      case TIOCCBRK:
+	if (ClearCommBreak (get_handle ()) == 0)
+	  {
+	    __seterrno ();
+	    res = -1;
+	  }
+	break;
+      case TIOCSBRK:
+	if (SetCommBreak (get_handle ()) == 0)
+	  {
+	    __seterrno ();
+	    res = -1;
+	  }
+	break;
      case TIOCINQ:
        if (ev & CE_FRAME || ev & CE_IOE || ev & CE_OVERRUN || ev & CE_RXOVER
 	   || ev & CE_RXPARITY)

@@ -23,6 +23,8 @@ Other UNIX ioctl requests has been omited because
 effects of their work one can achive by standard
 POSIX commands */
 
+#define TIOCSBRK	0x5427
+#define TIOCCBRK	0x5428
 
 #define	TIOCM_DTR	0x002
 #define	TIOCM_RTS	0x004

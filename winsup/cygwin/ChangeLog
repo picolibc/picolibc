@@ -1,3 +1,9 @@
+2004-03-08  Jaakko Hyvatti  <jaakko.hyvatti@iki.fi>
+
+	* fhandler_serial.cc (fhandler_serial::ioctl): Implement TIOCSBRK and
+	TIOCCBRK.
+	* include/sys/termios.h: Define TIOCSBRK and TIOCCBRK.
+
 2004-03-08  Christopher Faylor  <cgf@redhat.com>
 
 	* exceptions.cc (setup_handler): Avoid suspending a thread if it in a
