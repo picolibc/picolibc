@@ -1,3 +1,7 @@
+2000-09-12  Philip Blundell  <philb@gnu.org>
+
+	* config.sub, config.guess: Update from subversions.
+
 2000-09-06  Alexandre Oliva  <aoliva@redhat.com>
 
 	* Makefile.in (all-zlib): Added dummy target.
