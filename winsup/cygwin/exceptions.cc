@@ -631,7 +631,7 @@ sig_handle_tty_stop (int sig)
   if (my_parent_is_alive ())
     {
       pinfo parent (myself->ppid);
-      if (ISSTATE (parent, PID_NOCLDSTOP))
+      if (NOTSTATE (parent, PID_NOCLDSTOP))
 	{
 	  siginfo_t si;
 	  si.si_signo = SIGCHLD;
