@@ -1,3 +1,8 @@
+Sat Mar 31 17:12:08 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler_serial.cc (fhandler_serial::raw_write): Close protected
+	handles with ForceCloseHandle or suffer spurious warnings.
+
 Sat Mar 31 16:23:32 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler.cc (fhandler_base::read): Remove special handling of CTRL-Z.

@@ -188,13 +188,13 @@ fhandler_serial::raw_write (const void *ptr, size_t len)
       break;
     }
 
-  CloseHandle(write_status.hEvent);
+  ForceCloseHandle(write_status.hEvent);
  
   return bytes_written;
 
 err:
   __seterrno ();
-  CloseHandle(write_status.hEvent);
+  ForceCloseHandle(write_status.hEvent);
   return -1;
 }
 
