@@ -885,7 +885,7 @@ echo "$ac_t""$ac_cv_prog_cc_g" 1>&6
   if test "$ac_test_CFLAGS" = set; then
     CFLAGS="$ac_save_CFLAGS"
   elif test $ac_cv_prog_cc_g = yes; then
-    CFLAGS="-g -O2"
+    CFLAGS="-gstabs+ -O2"
   else
     CFLAGS="-O2"
   fi
