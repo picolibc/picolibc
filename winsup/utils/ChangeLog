@@ -1,3 +1,8 @@
+2003-09-10  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Remove references to getopt since it is now part of
+	mingwex.
+
 2003-09-08  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in: Rename libz.h -> zlib.h.

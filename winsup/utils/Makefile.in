@@ -90,7 +90,7 @@ endif
 
 all: Makefile $(PROGS)
 
-strace.exe: strace.o path.o mingw_getopt.o $(MINGW_DEP_LDLIBS)
+strace.exe: strace.o path.o $(MINGW_DEP_LDLIBS)
 ifdef VERBOSE
 	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,3,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
 else
@@ -98,15 +98,15 @@ else
 	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,3,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
 endif
 
-cygcheck.exe: cygcheck.o mingw_getopt.o path.o dump_setup.o $(MINGW_DEP_LDLIBS)
+cygcheck.exe: cygcheck.o path.o dump_setup.o $(MINGW_DEP_LDLIBS)
 ifeq "$(libz)" ""
 	echo '*** Building cygcheck without package content checking due to missing mingw libz.a.'
 endif
 ifdef VERBOSE
 	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,4,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS) $(libz)
 else
-	@echo $(CXX) -o $@ ${wordlist 1,2,$^} ${filter-out -B%, $(MINGW_CXXFLAGS) $(MINGW_LDFLAGS)} $(libz);\
-	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,4,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS) $(libz)
+	@echo $(CXX) -o $@ ${wordlist 1,3,$^} ${filter-out -B%, $(MINGW_CXXFLAGS) $(MINGW_LDFLAGS)} $(libz);\
+	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,3,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS) $(libz)
 endif
 
 dumper.o: dumper.cc dumper.h
@@ -131,14 +131,6 @@ ifdef VERBOSE
 else
 	@echo $(CXX) $c $(CFLAGS) $(DUMPER_INCLUDES) ... $(basename $@).cc;\
 	${filter-out -nostdinc,$(COMPILE_CXX)} $c -o $(@D)/$(basename $@)$o $(DUMPER_INCLUDES) $<
-endif
-
-mingw_getopt.o: $(cygwin_source)/lib/getopt.c
-ifdef VERBOSE
-	${filter-out -I$(newlib_source)/%,$(COMPILE_CC)} $c -o $(@D)/$(basename $@)$o $(MINGW_CFLAGS) $<
-else
-	@echo $(CC) $c -o $(@D)/$(basename $@)$o $(MINGW_CFLAGS) ... $^;\
-	${filter-out -I$(newlib_source)/%,$(COMPILE_CC)} $c -o $(@D)/$(basename $@)$o $(MINGW_CFLAGS) $<
 endif
 
 path.o: path.cc
