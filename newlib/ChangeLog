@@ -1,3 +1,14 @@
+2002-04-30  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* Makefile.am (site.exp): Change host_alias, host_triplet,
+	target_alias, target_triplet to refer to gcc's host and target
+	variables (newlib's build and host variables).
+	* testsuite/lib/newlib.exp (newlib_init): Change build
+	references to host references, host references to target
+	references to reflect Makefile.am changes.
+	(newlib_target_compile): Likewise.
+	(newlib_finish): Likewise.
+
 2002-04-29  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/io64.c (fstat64, lstat64): New syscalls added.

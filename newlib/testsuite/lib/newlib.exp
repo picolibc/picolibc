@@ -19,10 +19,10 @@ proc newlib_init { args } {
     global newlib_initialized
     global target_info
     global CFLAGS_FOR_TARGET
-    # These values are initialized in the local site.exp file
+    # These values are initialized in the local site.exp file.
     global srcdir objdir
-    global build_triplet host_triplet
-    # newlib_cflags comes from acinclude.m4, through the site.exp file
+    global host_triplet target_triplet
+    # newlib_cflags comes from acinclude.m4, through the site.exp file.
     global newlib_cflags
     global old_ld_library_path
 
@@ -47,8 +47,8 @@ proc newlib_init { args } {
 	}
     }
 
-    if [string match $build_triplet $host_triplet] then {
-	if [string match "i686-pc-linux-gnu" $build_triplet] then {
+    if [string match $host_triplet $target_triplet] then {
+	if [string match "i686-pc-linux-gnu" $host_triplet] then {
 	    set old_ld_library_path [getenv LD_LIBRARY_PATH]
 	    setenv LD_LIBRARY_PATH "$objdir/.libs"
 	}
@@ -58,8 +58,7 @@ proc newlib_init { args } {
 proc newlib_target_compile { source dest type options } {
     global gluefile wrap_flags
     global srcdir objdir
-    global build_triplet
-    global host_triplet
+    global host_triplet target_triplet
 
     verbose "In newlib_target_compile...\n"
 	
@@ -75,8 +74,8 @@ proc newlib_target_compile { source dest type options } {
                                              -L$objdir"
     }
 
-    if [string match $build_triplet $host_triplet] then {
-	if [string match "i686-pc-linux-gnu" $build_triplet] then {
+    if [string match $host_triplet $target_triplet] then {
+	if [string match "i686-pc-linux-gnu" $host_triplet] then {
 	    lappend options "libs=$objdir/crt0.o -lc"
 	    lappend options "ldflags=-nostdlib -L$objdir/.libs -lgcc"
 	}
@@ -87,12 +86,12 @@ proc newlib_target_compile { source dest type options } {
 
 proc newlib_finish { } {
     global old_ld_library_path
-    global build_triplet host_triplet
+    global host_triplet target_triplet
 
     verbose "In newlib_finish...\n"
 
-    if [string match $build_triplet $host_triplet] then {
-	if [string match "i686-pc-linux-gnu" $build_triplet] then {
+    if [string match $host_triplet $target_triplet] then {
+	if [string match "i686-pc-linux-gnu" $host_triplet] then {
 	    setenv LD_LIBRARY_PATH "$old_ld_library_path"
 	}
     }
