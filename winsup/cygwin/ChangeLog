@@ -1,3 +1,8 @@
+2005-02-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* times.cc (utimes): Open files with GENERIC_WRITE on file systems
+	not supporting ACLs.
+
 2005-02-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::ftruncate): Fix checking

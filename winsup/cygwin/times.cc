@@ -462,8 +462,15 @@ utimes (const char *path, const struct timeval *tvp)
   /* MSDN suggests using FILE_FLAG_BACKUP_SEMANTICS for accessing
      the times of directories.  */
   /* Note: It's not documented in MSDN that FILE_WRITE_ATTRIBUTES is
-     sufficient to change the timestamps... */
-  HANDLE h = CreateFile (win32, FILE_WRITE_ATTRIBUTES,
+     sufficient to change the timestamps, but it is for NTFS and FAT,
+     local or remote, NT and 9x.  Unfortunately it's not sufficient
+     for a remote HPFS.  Looking for a way to decide whether we
+     should use FILE_WRITE_ATTRIBUTES or GENERIC_WRITE, we're now
+     using the has_acls () attribute.  The assumption is, that file
+     systems not supporting ACLs don't have a way to distinguish
+     between GENERIC_WRITE and FILE_WRITE_ATTRIBUTES anyway. */
+  HANDLE h = CreateFile (win32, win32.has_acls () ? FILE_WRITE_ATTRIBUTES
+  						  : GENERIC_WRITE,
 			 FILE_SHARE_READ | FILE_SHARE_WRITE,
 			 &sec_none_nih, OPEN_EXISTING,
 			 FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
