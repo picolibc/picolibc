@@ -401,6 +401,11 @@ proc_terminate (void)
 	  procs[i]->ppid = 1;
 	  if (!proc_exists (procs[i]))
 	    procs[i]->process_state = PID_EXITED;	/* CGF FIXME - still needed? */
+	  if (procs[i].wait_thread)
+	    {
+	      // CloseHandle (procs[i].rd_proc_pipe);
+	      procs[i].wait_thread->terminate_thread ();
+	    }
 	  procs[i].release ();
 	}
       nprocs = 0;

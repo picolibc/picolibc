@@ -137,6 +137,7 @@ public:
   CRITICAL_SECTION _lock;
   /* Handle associated with initial Windows pid which started it all. */
   HANDLE pid_handle;
+  class cygthread *wait_thread;
   void init (pid_t, DWORD, HANDLE = NULL) __attribute__ ((regparm(3)));
   pinfo () {}
   pinfo (_pinfo *x): procinfo (x), hProcess (NULL), pid_handle (NULL) {}

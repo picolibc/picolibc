@@ -833,7 +833,7 @@ pinfo::wait ()
     sigproc_printf ("tracking thread creation failed for pid %d", (*this)->pid);
   else
     {
-      h->zap_h ();
+      wait_thread = h;
       sigproc_printf ("created tracking thread for pid %d, winpid %p, rd_pipe %p",
 		      (*this)->pid, (*this)->dwProcessId, rd_proc_pipe);
     }
