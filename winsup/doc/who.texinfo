@@ -1,67 +1,76 @@
 @chapter Who's behind the project?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
+@strong{(Please note that if you have cygwin-specific questions, all of these
+people will appreciate it if you use the cygwin mailing lists rather than
+sending personal email.)}
 
-Chris Faylor (cgf@@cygnus.com) is behind many of the recent
-changes in Cygwin.  Prior to joining Cygnus, he contributed significant
-fixes to the process control and environ code, reworked the strace
-mechanism, and rewrote the signal-related code from scratch as a Net
-contributor.  In addition to continuing to make technical contributions,
-Chris is also currently the group's manager.
+Chris Faylor is behind many of the recent changes in Cygwin.  Prior to
+joining Cygnus, he contributed significant fixes to the process control
+and environ code, reworked the strace mechanism, and rewrote the
+signal-related code from scratch as a Net contributor.  In addition to
+continuing to make technical contributions, Chris is also currently the
+group's manager.
 
-Geoffrey Noer (noer@@cygnus.com) took over the Cygwin project from its'
-initial author Steve Chamberlain in mid-1996.  As maintainer, he
-produced Net releases beta 16 through 20; made the development
-snapshots; worked with Net contributors to fix bugs; made many various
-code improvements himself; wrote a paper on Cygwin for the
-1998 Usenix NT Symposium; authored the project WWW pages, FAQ, README;
-etc.
+Corinna Vinschen has contributed several useful fixes to the path
+handling code, console support, improved security handling, and raw
+device support.  Corinna is currently employed by Red Hat as a
+GDB/Cygwin engineer.
 
-DJ Delorie (dj@@cygnus.com) has done important work in profiling Cygwin,
+DJ Delorie has done important work in profiling Cygwin,
 worked on the Dejagnu automated testing framework, merged the dlltool
 functionality into ld, wrote a good deal of the Cygwin Users' Guide,
 authored the cygcheck utility, and made automated snapshots available
-from our project WWW page.
+from our project WWW page.  DJ is currently employed by Red Hat as
+a GCC engineer.
 
-Steve Chamberlain (sac@@transmeta.com) designed and implemented
+Egor Duda has contributed many useful fixes.  He is responsible for
+Cygwin's ability to start a debugger on detection of a fatal error
+as well as produce core dumps.
+
+Robert Collins has contributed many improvements to thread handling
+as well as generic fixes to cygwin itself.
+
+Kazuhiro Fujieda has contributed many bug fixes and bug reports.
+
+Geoffrey Noer took over the Cygwin project from its initial author Steve
+Chamberlain in mid-1996.  As maintainer, he produced Net releases beta
+16 through 20; made the development snapshots; worked with Net
+contributors to fix bugs; made many various code improvements himself;
+wrote a paper on Cygwin for the 1998 Usenix NT Symposium; authored the
+project WWW pages, FAQ, README; etc.  Geoffrey is not currently employed
+by Red Hat.
+
+Steve Chamberlain designed and implemented
 Cygwin in 1995-1996 while working for Cygnus.  He worked with the Net
 to improve the technology, ported/integrated many of the user tools
 for the first time to Cygwin, and produced all of the releases up to
-beta 14.
+beta 14.  Steve is not currently employed by Red Hat.
 
-Marco Fuykschot (marco@@ddi.nl) and Peter Boncz (boncz@@ddi.nl) of
-Data Distilleries contributed nearly all of the changes required to
-make Cygwin thread-safe.  They also provided the pthreads interface.
+Marco Fuykschot and Peter Boncz of Data Distilleries contributed nearly
+all of the changes required to make Cygwin thread-safe.  They also
+provided the pthreads interface.
 
-Sergey Okhapkin (sos@@prospect.com.ru) has been an invaluable Net
-contributor.  He implemented the tty/pty support, has played a
-significant role in revamping signal and exception handling, and has
-made countless contributions throughout the library.  He also provided
-binaries of the development snapshots to the Net after the beta 19
-release.
+Sergey Okhapkin has been an invaluable Net contributor.  He implemented
+the tty/pty support, has played a significant role in revamping signal
+and exception handling, and has made countless contributions throughout
+the library.  He also provided binaries of the development snapshots to
+the Net after the beta 19 release.
 
-Mumit Khan (khan@@xraylith.wisc.edu) has been most helpful on the EGCS
-end of things, providing quite a large number of stabilizing patches to
-the compiler tools for the B20 release.
+Mumit Khan (has been most helpful on the EGCS end of things, providing
+quite a large number of stabilizing patches to the compiler tools for
+the B20 release.
 
-Corinna Vinschen <corinna@@vinschen.de> has contributed several
-useful fixes to the path handling code, console support, improved security
-handling, and raw device support.
+Philippe Giacinti contributed the implementation of dlopen, dlclose,
+dlsym, dlfork, and dlerror in Cygwin.
 
-Philippe Giacinti (giac@@dalim.de) contributed the implementation of
-dlopen, dlclose, dlsym, dlfork, and dlerror in Cygwin.
-
-Many other people at Cygnus have made important contributions to Cygwin.
-Tobin Brockett wrote the InstallShield-based installer for the beta 19
-and 20 releases.  Ian Lance Taylor did a much-needed rework of the path
-handling code for beta 18, and has made many assorted fixes throughout
-the code.  Jeremy Allison made significant contributions in the area of
-file handling and process control, and rewrote select from scratch.
-Doug Evans rewrote the path-handling code in beta 16, among other
-things.  Kim Knuttila and Michael Meissner put in many long hours
-working on the now-defunct PowerPC port.  Jason Molenda and Mark Eichin
-have also made important contributions.
+Ian Lance Taylor did a much-needed rework of the path handling code for
+beta 18, and has made many assorted fixes throughout the code.  Jeremy
+Allison made significant contributions in the area of file handling and
+process control, and rewrote select from scratch.  Doug Evans rewrote
+the path-handling code in beta 16, among other things.  Kim Knuttila and
+Michael Meissner put in many long hours working on the now-defunct
+PowerPC port.  Jason Molenda and Mark Eichin have also made important
+contributions.
 
 Please note that those of us here at Cygnus that work on Cygwin try to
 be as responsive as possible and deal with patches and questions as we
