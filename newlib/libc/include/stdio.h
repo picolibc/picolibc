@@ -309,6 +309,7 @@ ssize_t _EXFUN(__getline, (char **, size_t *, FILE *));
 
 #ifdef __LARGE64_FILES
 #ifndef __CYGWIN__
+FILE *	_EXFUN(fdopen64, (int, const char *));
 FILE *  _EXFUN(fopen64, (const char *, const char *));
 _off64_t _EXFUN(ftello64, (FILE *));
 _off64_t _EXFUN(fseeko64, (FILE *, _off64_t, int));
@@ -316,6 +317,7 @@ int     _EXFUN(fgetpos64, (FILE *, _fpos64_t *));
 int     _EXFUN(fsetpos64, (FILE *, const _fpos64_t *));
 FILE *  _EXFUN(tmpfile64, (void));
 
+FILE *	_EXFUN(_fdopen64_r, (struct _reent *, int, const char *));
 FILE *  _EXFUN(_fopen64_r, (struct _reent *,const char *, const char *));
 _off64_t _EXFUN(_ftello64_r, (struct _reent *, FILE *));
 _off64_t _EXFUN(_fseeko64_r, (struct _reent *, FILE *, _off64_t, int));

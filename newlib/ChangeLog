@@ -1,3 +1,11 @@
+2003-07-24  Christopher Faylor  <cgf@redhat.com>
+
+	* libc/stdio64/fdopen64.c: New file.
+	* libc/stdio64/Makefile.am (LIB_OBJS): Add fdopen64.o
+	* libc/stdio64/Makefile.in: Regenerate.
+	* libc/include/stdio.h (fdopen64): Define.
+	* libc/include/stdio.h (_fdopen64_r): Ditto.
+
 2003-07-10  Alexandre Oliva  <aoliva@redhat.com>
 
 	2000-04-27  Alexandre Oliva  <aoliva@cygnus.com>

@@ -12,6 +12,7 @@ if ELIX_LEVEL_1
 LIB_OBJS =
 else
 LIB_OBJS = \
+	fdopen64.$(oext) 	\
 	fgetpos64.$(oext)	\
 	fopen64.$(oext) 	\
 	freopen64.$(oext) 	\

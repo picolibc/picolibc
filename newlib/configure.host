@@ -434,7 +434,9 @@ esac
 
 case "${host}" in
   *-*-cygwin*)
-	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DSIGNAL_PROVIDED -DWANT_IO_LONG_DBL -DWANT_PRINTF_LONG_LONG -D_COMPILING_NEWLIB -DHAVE_FCNTL -DMALLOC_PROVIDED"
+	test -z "$cygwin_srcdir" && cygwin_srcdir=`cd ${srcdir}/../winsup/cygwin; pwd`
+	export cygwin_srcdir
+	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DSIGNAL_PROVIDED -DWANT_IO_LONG_DBL -DWANT_PRINTF_LONG_LONG -D_COMPILING_NEWLIB -DHAVE_FCNTL -DMALLOC_PROVIDED -I${cygwin_srcdir}/include"
 	syscall_dir=syscalls
 	;;
 # RTEMS supplies its own versions of some routines:
