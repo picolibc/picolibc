@@ -71,7 +71,7 @@ extern "C"
   {/* initial_sp */ 0, /* magic_biscuit */ 0,
    /* dll_major */ CYGWIN_VERSION_DLL_MAJOR,
    /* dll_major */ CYGWIN_VERSION_DLL_MINOR,
-   /* impure_ptr_ptr */ NULL, /*envptr */ NULL,
+   /* impure_ptr_ptr */ NULL, /* envptr */ NULL,
    /* malloc */ export_malloc, /* free */ export_free,
    /* realloc */ export_realloc,
    /* fmode_ptr */ NULL, /* main */ NULL, /* ctors */ NULL,

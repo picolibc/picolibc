@@ -1,3 +1,8 @@
+Wed Jul 12 00:01:03 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* lib/_cygwin_crt0_common.cc (_cygwin_crt0_common): Don't reset
+	environ if already set.
+
 Mon Jul 10 19:07:03 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler_console.cc (fhandler_console::read): Unicode interface
