@@ -91,10 +91,6 @@ _cygtls::call2 (DWORD (*func) (void *, void *), void *arg, void *buf)
   _my_tls.init_thread (buf, func);
   DWORD res = func (arg, buf);
   _my_tls.remove (INFINITE);
-  // FIXME: Need some sort of atthreadexit function to allow things like
-  // select to control this themselves
-  if (_my_tls.locals.exitsock != INVALID_SOCKET)
-    closesocket (_my_tls.locals.exitsock);
   ExitThread (res);
 }
 
@@ -156,6 +152,10 @@ void
 _cygtls::remove (DWORD wait)
 {
   debug_printf ("wait %p\n", wait);
+  // FIXME: Need some sort of atthreadexit function to allow things like
+  // select to control this themselves
+  if (_my_tls.locals.exitsock != INVALID_SOCKET)
+    closesocket (locals.exitsock);
   do
     {
       sentry here (wait);
