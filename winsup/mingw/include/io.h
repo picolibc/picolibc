@@ -31,6 +31,11 @@
 
 /* All the headers include this file. */
 #include <_mingw.h>
+#define __need_wchar_t
+#ifndef RC_INVOKED
+#include <stddef.h>
+#endif /* Not RC_INVOKED */
+
 /*
  * Attributes of files as returned by _findfirst et al.
  */

@@ -92,6 +92,15 @@ struct tm {
 __END_CSTD_NAMESPACE
 
 #ifndef _WSTDIO_DEFINED
+
+#ifndef __VALIST
+#if defined __GNUC__ && __GNUC__ > = 3
+#define __VALIST __builtin_va_list
+#else
+#define __VALIST char*
+#endif
+#endif
+
 __BEGIN_CSTD_NAMESPACE
 /*  also in stdio.h - keep in sync */
 int	fwprintf (FILE*, const wchar_t*, ...);
