@@ -1,5 +1,10 @@
 2004-09-16  Antony King  <antony.king@st.com>
 
+	* libc/time/tzlock.c: Add default stubs that use generic
+	locking code.
+
+2004-09-16  Antony King  <antony.king@st.com>
+
 	* libc/ctype/ctype.tex: Added missing documentation.
 	* libc/stdio/stdio.tex Ditto.
 	* libc/stdlib/stdlib.tex Ditto.
