@@ -542,7 +542,6 @@ const char *windows_device_names[] =
   "\\dev\\pipew",
   "\\dev\\socket",
   "\\dev\\windows",
-  "\\dev\\dsp",
   
   NULL, NULL,
 
@@ -554,6 +553,7 @@ const char *windows_device_names[] =
   "\\dev\\%srandom",
   "\\dev\\mem",
   "\\dev\\clipboard",
+  "\\dev\\dsp"
 };
 
 static int

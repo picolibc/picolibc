@@ -1,3 +1,7 @@
+Tue Apr 17 12:14:54 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (windows_device_names): Move dsp to proper location.
+
 Tue Apr 17 13:44:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* path.cc (path_conv::check): Set case_clash even if pcheck_case
