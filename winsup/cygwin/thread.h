@@ -176,6 +176,7 @@ verifyable_object_state verifyable_object_isvalid (void const *, long, void *);
 class pthread_key:public verifyable_object
 {
 public:
+  static bool isGoodObject (pthread_key_t const *);
 
   DWORD dwTlsIndex;
   void *fork_buf;
@@ -228,6 +229,7 @@ private:
 class pthread_attr:public verifyable_object
 {
 public:
+  static bool isGoodObject(pthread_attr_t const *);
   int joinable;
   int contentionscope;
   int inheritsched;
@@ -241,6 +243,7 @@ public:
 class pthread_mutexattr:public verifyable_object
 {
 public:
+  static bool isGoodObject(pthread_mutexattr_t const *);
   int pshared;
   int mutextype;
     pthread_mutexattr ();
@@ -250,6 +253,8 @@ public:
 class pthread_mutex:public verifyable_object
 {
 public:
+  static bool isGoodObject(pthread_mutex_t const *);
+  static bool isGoodInitializerOrObject(pthread_mutex_t const *);
   CRITICAL_SECTION criticalsection;
   HANDLE win32_obj_id;
   LONG condwaits;
@@ -290,7 +295,7 @@ public:
    virtual ~pthread ();
 
    static void initMainThread(pthread *, HANDLE);
-   static bool isGoodObject(pthread_t *);
+   static bool isGoodObject(pthread_t const *);
    static void atforkprepare();
    static void atforkparent();
    static void atforkchild();
@@ -356,6 +361,7 @@ class pthreadNull : public pthread
 class pthread_condattr:public verifyable_object
 {
 public:
+  static bool isGoodObject(pthread_condattr_t *);
   int shared;
 
   pthread_condattr ();
@@ -365,6 +371,7 @@ public:
 class pthread_cond:public verifyable_object
 {
 public:
+  static bool isGoodObject(pthread_cond_t *);
   int shared;
   LONG waiting;
   LONG ExitingWait;
@@ -393,6 +400,7 @@ public:
 class semaphore:public verifyable_object
 {
 public:
+  static bool isGoodObject(semaphore **);
   HANDLE win32_obj_id;
   class semaphore * next;
   int shared;
