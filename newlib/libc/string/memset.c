@@ -103,7 +103,7 @@ _DEFUN (memset, (m, c, n),
 
   while (n--)
     {
-      *s++ = (char)c;
+      *s++ = (char)d;
     }
 
   return m;
