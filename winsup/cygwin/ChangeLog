@@ -54,7 +54,7 @@
 
 2005-03-28  Christopher Faylor  <cgf@timesys.com>
 
-	* cygthread.cc (cygthread::detach): Revert to just waiting for thred
+	* cygthread.cc (cygthread::detach): Revert to just waiting for thread
 	event since waiting for anything else is racy.
 	* timer.cc (timer_tracker::hcancel): Rename from cancel.
 	(timer_tracker::cancel): New method.
