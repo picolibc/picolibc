@@ -1,0 +1,65 @@
+Copyright 2001 Red Hat Inc., Robert Collins
+
+fhandlers are the core mechanism by which cygwin provides a file descripter (fd)
+interface to things such as a random number generated, winsock sockets, raw disk
+devices, the clipboard, the console and so on. Under unix access to all such
+devices is via a combination of IOCTL's and open/close/read/write calls. Some
+special functions do exist - such as bind () and listen () for sockets, but
+these consistently operate on fd's. Under Win32 there are disparate interfaces
+that have little in common with each other. See for example Direct Sound and
+the Clipboard.
+
+The fhandler class provides all open,read,write,close, ioctl and fork()/exec()
+functionality for the fd interface. The base class operates on win32 backed
+files. The various derived classes utilise win32 primitives to provide their
+specific functionality.
+
+When a file is opened - not necesarily via open() a fd is assigned to it. The fd
+includes a pointer to the actual fhandler that operates this specific file. All
+file-oriented system calls then operate off this basic structure.
+
+For example, lets examine lseek ().
+
+extern "C" off_t
+_lseek (int fd, off_t pos, int dir)
+{
+  off_t res;
+  sigframe thisframe (mainthread);
+
+  if (dir != SEEK_SET && dir != SEEK_CUR && dir != SEEK_END)
+    {
+      set_errno (EINVAL);
+      res = -1;
+    }
+  else if (cygheap->fdtab.not_open (fd))
+    {
+      set_errno (EBADF);
+      res = -1;
+    }
+  else
+    {
+      res = cygheap->fdtab[fd]->lseek (pos, dir);
+    }
+  syscall_printf ("%d = lseek (%d, %d, %d)", res, fd, pos, dir);
+
+  return res;
+}
+
+The sigframe thisframe (mainthread); is signal related - see
+"how_signals_work.txt".
+
+The if, else if, else tests (in order)
+* the validity of the dir parameter,
+* is the fd being passed actually open? (cannot seek on a closed fd)
+* call the lseek virtual function in the associated fhandler.
+
+So as you can see, there is no code that attempts to understand the nature of
+the fhandler.
+
+fhandlers that make cross-function-call use of win32 objects that are not
+inheritable cross-process need to implement fixup-after-fork and recreate those
+objects. HANDLES can be inherited, but memory mapped regions (for example)
+cannot.
+
+For an example step-by-step to create a new fhandler, see
+../doc/fhandler-tut.txt

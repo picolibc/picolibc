@@ -1,0 +1,12 @@
+#!/bin/sh
+case "$1" in
+    -v) v="-v"; shift
+esac
+lib=$1; shift
+nm=$1; shift
+dlltool=$1; shift
+def=$1; shift
+trap "rm /tmp/$$.def" 0 1 2 15
+(echo "LIBRARY cygwin1.dll
+EXPORTS"; $nm --extern-only --defined-only $* | sed -e '/^[ 	]*$/d' -e '/:$/d' -e 's/^.* _\(.*\)/\1/' |  grep $v -f - -w $def |egrep -vi '^library|exports|^$' | sort) > /tmp/$$.def
+exec $dlltool -d /tmp/$$.def -l "$lib" -D /dev/null

@@ -1,0 +1,11 @@
+#!/bin/sh
+lib=$1; shift
+nm=$1; shift
+ar=$1; shift
+ranlib=$1; shift
+grepit=`echo $* | sed 's/ /|__imp__/g'`
+[ -n "$grepit" ] && grepit="__imp__$grepit"
+objs=`$nm $lib | awk -F: '/^d[0-9]*.o:/ {obj=$1} '"/$grepit/"'{print obj}'`
+[ -n "$objs" ] || exit 1
+$ar d $lib $objs
+$ranlib $lib
