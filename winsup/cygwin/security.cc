@@ -181,9 +181,10 @@ static LSA_HANDLE
 open_local_policy ()
 {
   LSA_OBJECT_ATTRIBUTES oa = { 0, 0, 0, 0, 0, 0 };
-  LSA_HANDLE lsa = INVALID_HANDLE_VALUE;
+  LSA_HANDLE lsa = NULL;
 
-  NTSTATUS ret = LsaOpenPolicy(NULL, &oa, POLICY_ALL_ACCESS, &lsa);
+  NTSTATUS ret = LsaOpenPolicy(NULL, &oa, POLICY_VIEW_LOCAL_INFORMATION
+  					  | POLICY_LOOKUP_NAMES, &lsa);
   if (ret != STATUS_SUCCESS)
     set_errno (LsaNtStatusToWinError (ret));
   return lsa;
@@ -739,7 +740,7 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
     goto out;
 
   /* Open policy object. */
-  if ((lsa = open_local_policy ()) == INVALID_HANDLE_VALUE)
+  if (!(lsa = open_local_policy ()))
     goto out;
 
   /* Get logon server. */

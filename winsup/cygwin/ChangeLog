@@ -1,3 +1,9 @@
+2001-12-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (open_local_policy): Initialize lsa handle to NULL.
+	Request only needed access rights in call to LsaOpenPolicy().
+	(create_token): Check for NULL lsa pointer.
+
 2001-12-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din: Add symbols for endutent(), getutent(), getutid(),
