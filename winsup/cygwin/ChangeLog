@@ -1,5 +1,10 @@
 2003-12-08  Christopher Faylor  <cgf@redhat.com>
 
+	* thread.cc (pthread::precreate): Delete duplicate setting of
+	cancel_event.
+
+2003-12-08  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler.h (fhandler_tty_slave::ttyname): Use name from pc since it
 	is guaranteed to be accurate.
 	* fhandler_tty.cc (fhandler_tty_slave::open): Increment open_fhs

@@ -308,15 +308,6 @@ pthread::precreate (pthread_attr *newattr)
     }
   /* Change the mutex type to NORMAL to speed up mutex operations */
   mutex.type = PTHREAD_MUTEX_NORMAL;
-
-  cancel_event = ::CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
-  if (!cancel_event)
-    {
-      system_printf ("couldn't create cancel event, this %p LastError %E", this);
-      /* we need the event for correct behaviour */
-      magic = 0;
-      return;
-    }
 }
 
 void
