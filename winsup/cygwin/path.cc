@@ -2208,6 +2208,9 @@ symlink (const char *topath, const char *frompath)
   if (len <= 4 || strcasecmp (from + len - 4, ".lnk"))
     strcpy (from + len, ".lnk");
   path_conv win32_path (from, PC_SYM_NOFOLLOW);
+  path_conv win32_topath;
+  char cwd[MAX_PATH + 1], *cp, c = 0;
+  char w32topath[MAX_PATH + 1];
 #endif
 
   if (win32_path.error)
@@ -2236,6 +2239,7 @@ symlink (const char *topath, const char *frompath)
       goto done;
     }
 
+#if 0
   h = CreateFileA(win32_path, GENERIC_WRITE, 0, &sec_none_nih,
 		  CREATE_NEW, FILE_ATTRIBUTE_NORMAL, 0);
   if (h == INVALID_HANDLE_VALUE)
@@ -2243,7 +2247,6 @@ symlink (const char *topath, const char *frompath)
   else
     {
       DWORD written;
-#if 0
       /* This is the old technique creating a symlink.
          Preserved to have a fallback. */
       char buf[sizeof (SYMLINK_COOKIE) + MAX_PATH + 10];
@@ -2262,10 +2265,36 @@ symlink (const char *topath, const char *frompath)
 	  res = 0;
 	}
 #else
+  getcwd (cwd, MAX_PATH + 1);
+  if ((cp = strrchr (from, '/')) || (cp = strrchr (from, '\\')))
+    {
+      c = *cp;
+      *cp = '\0';
+      chdir (from);
+    }
+  backslashify (topath, w32topath, 0);
+  if (GetFileAttributes (w32topath) == (DWORD)-1)
+    {
+      win32_topath.check (topath, PC_SYM_NOFOLLOW);
+      if (win32_topath.error != ENOENT)
+        strcpy (w32topath, win32_topath);
+    }
+  if (cp)
+    {
+      *cp = c;
+      chdir (cwd);
+    }
+
+  h = CreateFileA(win32_path, GENERIC_WRITE, 0, &sec_none_nih,
+		  CREATE_NEW, FILE_ATTRIBUTE_NORMAL, 0);
+  if (h == INVALID_HANDLE_VALUE)
+      __seterrno ();
+  else
+    {
+      DWORD written;
       create_shortcut_header ();
-      path_conv win32_topath (topath, PC_SYM_NOFOLLOW);
       len = strlen (topath);
-      unsigned short win_len = strlen (win32_topath.get_win32 ());
+      unsigned short win_len = strlen (w32topath);
       if (WriteFile (h, shortcut_header, SHORTCUT_HDR_SIZE, &written, NULL)
           && written == SHORTCUT_HDR_SIZE
 	  && WriteFile (h, &len, sizeof len, &written, NULL)
@@ -2274,7 +2303,7 @@ symlink (const char *topath, const char *frompath)
 	  && written == len
 	  && WriteFile (h, &win_len, sizeof win_len, &written, NULL)
 	  && written == sizeof win_len
-	  && WriteFile (h, win32_topath.get_win32 (), win_len, &written, NULL)
+	  && WriteFile (h, w32topath, win_len, &written, NULL)
 	  && written == win_len)
         {
           CloseHandle (h);
