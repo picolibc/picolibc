@@ -116,6 +116,7 @@ lib_a_SOURCES = \
 	getopt.c	\
 	labs.c 		\
 	ldiv.c  	\
+	ldtoa.c		\
 	malign.c	\
 	malloc.c  	\
 	mblen.c		\
@@ -212,11 +213,12 @@ malloptr.o
 lib_a_OBJECTS =  __adjust.o __exp10.o __ten_mu.o abort.o abs.o assert.o \
 atexit.o atof.o atoff.o atoi.o atol.o bsearch.o calloc.o div.o dtoa.o \
 dtoastub.o ecvtbuf.o efgcvt.o environ.o envlock.o eprintf.o exit.o \
-getenv.o getenv_r.o getopt.o labs.o ldiv.o malign.o malloc.o mblen.o \
-mblen_r.o mbstowcs.o mbstowcs_r.o mbtowc.o mbtowc_r.o mlock.o mprec.o \
-msize.o mstats.o mtrim.o putenv.o putenv_r.o qsort.o rand.o rand_r.o \
-realloc.o setenv.o setenv_r.o strdup.o strdup_r.o strtod.o strtol.o \
-strtoul.o system.o valloc.o wcstombs.o wcstombs_r.o wctomb.o wctomb_r.o
+getenv.o getenv_r.o getopt.o labs.o ldiv.o ldtoa.o malign.o malloc.o \
+mblen.o mblen_r.o mbstowcs.o mbstowcs_r.o mbtowc.o mbtowc_r.o mlock.o \
+mprec.o msize.o mstats.o mtrim.o putenv.o putenv_r.o qsort.o rand.o \
+rand_r.o realloc.o setenv.o setenv_r.o strdup.o strdup_r.o strtod.o \
+strtol.o strtoul.o system.o valloc.o wcstombs.o wcstombs_r.o wctomb.o \
+wctomb_r.o
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
@@ -226,7 +228,7 @@ DIST_COMMON =  Makefile.am Makefile.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 SOURCES = $(lib_a_SOURCES)
 OBJECTS = $(lib_a_OBJECTS)
@@ -312,7 +314,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
@@ -436,6 +438,7 @@ doc: $(CHEWOUT_FILES)
 	cat $(srcdir)/stdlib.tex >> $(TARGETDOC)
 
 dtoa.o: dtoa.c mprec.h
+ldtoa.o: ldtoa.c mprec.h
 ecvtbuf.o: ecvtbuf.c mprec.h
 mbtowc_r.o: mbtowc_r.c mbctype.h
 	$(COMPILE) -c -fshort-enums $(srcdir)/mbtowc_r.c -o $@

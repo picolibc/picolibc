@@ -1,3 +1,17 @@
+2000-12-06  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdlib/Makefile.am: Added ldtoa.c to list of sources.
+	* libc/stdlib/Makefile.in: Regenerated.
+	* libc/stdio/floatio.h: Added suitable MAXEXP for long double.
+	* libc/stdio/vfieeefp.h: Added long double bit structures.
+	* libc/stdio/vfprintf.c[WANT_IO_LONG_DBL]: Added long double support.
+	[WANT_IO_LONG_DBL](isinfl, isnanl): New static long double routines.
+	(exponent): Changed expbuf to reasonable maximum instead of MAXEXP.
+	* libc/stdio/vfscanf.c[WANT_IO_LONG_DBL]: Added long double support.
+	* libc/stdlib/ldtoa.c: New file containing _ldtoa_r and
+	_strtold routines used for conversions between character
+	and long double.
+
 Wed Dec  6 12:01:00 2000  Corinna Vinschen <vinschen@cygnus.com>
 
 	* libc/include/stdlib.h: Add declarations for `mkstemp' and `mktemp'.

@@ -21,7 +21,12 @@
  * Floating point scanf/printf (input/output) definitions.
  */
 
+#ifdef _NO_LONGDBL
 /* 11-bit exponent (VAX G floating point) is 308 decimal digits */
 #define	MAXEXP		308
+#else  /* !_NO_LONGDBL */
+/* 15-bit exponent (Intel extended floating point) is 4932 decimal digits */
+#define MAXEXP          4932
+#endif /* !_NO_LONGDBL */
 /* 128 bit fraction takes up 39 decimal digits; max reasonable precision */
 #define	MAXFRACT	39

@@ -174,6 +174,14 @@ static char *rcsid = "$Id$";
 #include "fvwrite.h"
 #include "vfieeefp.h"
 
+/* Currently a test is made to see if long double processing is warranted.
+   This could be changed in the future should the _ldtoa_r code be
+   preferred over _dtoa_r.  */
+#define _NO_LONGDBL
+#if defined WANT_IO_LONG_DBL && (LDBL_MANT_DIG > DBL_MANT_DIG)
+#undef _NO_LONGDBL
+#endif
+
 /*
  * Flush out all the vectors defined by the given uio,
  * then reset it so that it can be reused.
@@ -240,7 +248,14 @@ __sbprintf(fp, fmt, ap)
 #define	BUF		(MAXEXP+MAXFRACT+1)	/* + decimal point */
 #define	DEFPREC		6
 
+#ifdef _NO_LONGDBL
 static char *cvt _PARAMS((struct _reent *, double, int, int, char *, int *, int, int *));
+#else
+static char *cvt _PARAMS((struct _reent *, _LONG_DOUBLE, int, int, char *, int *, int, int *));
+static int isinfl _PARAMS((_LONG_DOUBLE *));
+static int isnanl _PARAMS((_LONG_DOUBLE *));
+#endif
+
 static int exponent _PARAMS((char *, int, int));
 
 #else /* no FLOATING_POINT */
@@ -263,7 +278,7 @@ static int exponent _PARAMS((char *, int, int));
 #define	ALT		0x001		/* alternate form */
 #define	HEXPREFIX	0x002		/* add 0x or 0X prefix */
 #define	LADJUST		0x004		/* left adjustment */
-#define	LONGDBL		0x008		/* long double; unimplemented */
+#define	LONGDBL		0x008		/* long double */
 #define	LONGINT		0x010		/* long integer */
 #define	QUADINT		0x020		/* quad integer */
 #define	SHORTINT	0x040		/* short integer */
@@ -301,9 +316,13 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 #ifdef FLOATING_POINT
 	char *decimal_point = localeconv()->decimal_point;
 	char softsign;		/* temporary negative sign for floats */
-	double _double;		/* double precision arguments %[eEfgG] */
+#ifdef _NO_LONGDBL
+	double _fpvalue;	/* floating point arguments %[eEfgG] */
+#else
+	_LONG_DOUBLE _fpvalue;  /* floating point arguments %[eEfgG] */
+#endif
 	int expt;		/* integer value of exponent */
-	int expsize;		/* character count for expstr */
+	int expsize = 0;	/* character count for expstr */
 	int ndig;		/* actual number of digits returned by cvt */
 	char expstr[7];		/* buffer for exponent string */
 #endif
@@ -322,7 +341,7 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	int dprec;		/* a copy of prec if [diouxX], 0 otherwise */
 	int realsz;		/* field size expanded by dprec */
 	int size;		/* size of converted field or string */
-	char *xdigs;		/* digits for [xX] conversion */
+	char *xdigs = NULL;	/* digits for [xX] conversion */
 #define NIOV 8
 	struct __suio uio;	/* output information: summary */
 	struct __siov iov[NIOV];/* ... and individual io vectors */
@@ -553,29 +572,55 @@ reswitch:	switch (ch) {
 				prec = 1;
 			}
 
+#ifdef _NO_LONGDBL
 			if (flags & LONGDBL) {
-				_double = (double) va_arg(ap, long double);
+				_fpvalue = (double) va_arg(ap, _LONG_DOUBLE);
 			} else {
-				_double = va_arg(ap, double);
+				_fpvalue = va_arg(ap, double);
 			}
 
 			/* do this before tricky precision changes */
-			if (isinf(_double)) {
-				if (_double < 0)
+			if (isinf(_fpvalue)) {
+				if (_fpvalue < 0)
 					sign = '-';
 				cp = "Inf";
 				size = 3;
 				break;
 			}
-			if (isnan(_double)) {
+			if (isnan(_fpvalue)) {
 				cp = "NaN";
 				size = 3;
 				break;
 			}
 
+#else /* !_NO_LONGDBL */
+			
+			if (flags & LONGDBL) {
+				_fpvalue = va_arg(ap, _LONG_DOUBLE);
+			} else {
+				_fpvalue = (_LONG_DOUBLE)va_arg(ap, double);
+			}
+
+			/* do this before tricky precision changes */
+			if (isinfl(&_fpvalue)) {
+				if (_fpvalue < 0)
+					sign = '-';
+				cp = "Inf";
+				size = 3;
+				break;
+			}
+			if (isnanl(&_fpvalue)) {
+				cp = "NaN";
+				size = 3;
+				break;
+			}
+#endif /* !_NO_LONGDBL */
+
 			flags |= FPT;
-			cp = cvt(data, _double, prec, flags, &softsign,
+
+			cp = cvt(data, _fpvalue, prec, flags, &softsign,
 				&expt, ch, &ndig);
+
 			if (ch == 'g' || ch == 'G') {
 				if (expt <= -4 || expt > prec)
 					ch = (ch == 'g') ? 'e' : 'E';
@@ -796,7 +841,7 @@ number:			if ((dprec = prec) >= 0)
 			PRINT(cp, size);
 		} else {	/* glue together f_p fragments */
 			if (ch >= 'f') {	/* 'f' or 'g' */
-				if (_double == 0) {
+				if (_fpvalue == 0) {
 					/* kludge for __dtoa irregularity */
 					PRINT("0", 1);
 					if (expt < ndig || (flags & ALT) != 0) {
@@ -826,7 +871,7 @@ number:			if ((dprec = prec) >= 0)
 					ox[0] = *cp++;
 					ox[1] = '.';
 					PRINT(ox, 2);
-                                       if (_double) {
+                                       if (_fpvalue) {
 						PRINT(cp, ndig-1);
 					} else	/* 0.[0..] */
 						/* __dtoa irregularity */
@@ -857,19 +902,60 @@ error:
 
 #ifdef FLOATING_POINT
 
+#ifdef _NO_LONGDBL
 extern char *_dtoa_r _PARAMS((struct _reent *, double, int,
 			      int, int *, int *, char **));
+#else
+extern char *_ldtoa_r _PARAMS((struct _reent *, _LONG_DOUBLE, int,
+			      int, int *, int *, char **));
+#undef word0
+#define word0(x) ldword0(x)
+
+static int
+isinfl (value)
+     _LONG_DOUBLE *value;
+{
+  struct ldieee *ldptr;
+
+  ldptr = (struct ldieee *)value;
+
+  if (ldptr->exp == 0x7fff && !(ldptr->manh & 0x7fffffff) && !ldptr->manl)
+    return 1;
+  return 0;
+}
+
+static int
+isnanl (value)
+     _LONG_DOUBLE *value;
+{
+  struct ldieee *ldptr;
+
+  ldptr = (struct ldieee *)value;
+
+  if (ldptr->exp == 0x7fff && ((ldptr->manh & 0x7fffffff) || ldptr->manl))
+    return 1;
+  return 0;
+}
+#endif
 
 static char *
 cvt(data, value, ndigits, flags, sign, decpt, ch, length)
 	struct _reent *data;
+#ifdef _NO_LONGDBL
 	double value;
+#else
+	_LONG_DOUBLE value;
+#endif
 	int ndigits, flags, *decpt, ch, *length;
 	char *sign;
 {
 	int mode, dsgn;
 	char *digits, *bp, *rve;
+#ifdef _NO_LONGDBL
         union double_union tmp;
+#else
+        struct ldieee *ldptr;
+#endif
 
 	if (ch == 'f') {
 		mode = 3;		/* ndigits after the decimal point */
@@ -884,13 +970,27 @@ cvt(data, value, ndigits, flags, sign, decpt, ch, length)
 		mode = 2;		/* ndigits significant digits */
 	}
 
+#ifdef _NO_LONGDBL
         tmp.d = value;
+
 	if (word0(tmp) & Sign_bit) { /* this will check for < 0 and -0.0 */
 		value = -value;
 		*sign = '-';
         } else
 		*sign = '\000';
+
 	digits = _dtoa_r(data, value, mode, ndigits, decpt, &dsgn, &rve);
+#else /* !_NO_LONGDBL */
+	ldptr = (struct ldieee *)&value;
+	if (ldptr->sign) { /* this will check for < 0 and -0.0 */
+		value = -value;
+		*sign = '-';
+        } else
+		*sign = '\000';
+
+	digits = _ldtoa_r(data, value, mode, ndigits, decpt, &dsgn, &rve);
+#endif /* !_NO_LONGDBL */
+
 	if ((ch != 'g' && ch != 'G') || flags & ALT) {	/* Print trailing zeros */
 		bp = digits + ndigits;
 		if (ch == 'f') {
@@ -913,7 +1013,7 @@ exponent(p0, exp, fmtch)
 	int exp, fmtch;
 {
 	register char *p, *t;
-	char expbuf[MAXEXP];
+	char expbuf[40];
 
 	p = p0;
 	*p++ = fmtch;
@@ -923,13 +1023,13 @@ exponent(p0, exp, fmtch)
 	}
 	else
 		*p++ = '+';
-	t = expbuf + MAXEXP;
+	t = expbuf + 40;
 	if (exp > 9) {
 		do {
 			*--t = to_char(exp % 10);
 		} while ((exp /= 10) > 9);
 		*--t = to_char(exp);
-		for (; t < expbuf + MAXEXP; *p++ = *t++);
+		for (; t < expbuf + 40; *p++ = *t++);
 	}
 	else {
 		*p++ = '0';

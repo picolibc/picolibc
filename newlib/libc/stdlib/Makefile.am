@@ -34,6 +34,7 @@ lib_a_SOURCES = \
 	getopt.c	\
 	labs.c 		\
 	ldiv.c  	\
+	ldtoa.c		\
 	malign.c	\
 	malloc.c  	\
 	mblen.c		\
@@ -157,6 +158,7 @@ doc: $(CHEWOUT_FILES)
 CLEANFILES = $(CHEWOUT_FILES) *.ref
 
 dtoa.o: dtoa.c mprec.h
+ldtoa.o: ldtoa.c mprec.h
 ecvtbuf.o: ecvtbuf.c mprec.h
 mbtowc_r.o: mbtowc_r.c mbctype.h
 	$(COMPILE) -c -fshort-enums $(srcdir)/mbtowc_r.c -o $@

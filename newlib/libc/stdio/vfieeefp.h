@@ -57,6 +57,85 @@
 Exactly one of IEEE_8087, IEEE_MC68k, VAX, or IBM should be defined.
 #endif
 
+#ifdef WANT_IO_LONG_DBL
+/* If we are going to examine or modify specific bits in a long double using
+   the lword0 or lwordx macros, then we must wrap the long double inside
+   a union.  This is necessary to avoid undefined behavior according to
+   the ANSI C spec.  */
+
+#ifdef IEEE_8087
+#if LDBL_MANT_DIG == 24
+struct ldieee
+{
+  unsigned manh:23;
+  unsigned exp:8;
+  unsigned sign:1;
+}
+#elif LDBL_MANT_DIG == 53
+struct ldieee
+{
+  unsigned manl:20;
+  unsigned manh:32;
+  unsigned exp:11;
+  unsigned sign:1;
+}
+#elif LDBL_MANT_DIG == 64
+struct ldieee
+{
+  unsigned manl:32;
+  unsigned manh:32;
+  unsigned exp:15;
+  unsigned sign:1;
+};
+#elif LDBL_MANT_DIG > 64
+struct ldieee
+{
+  unsigned manl3:16;
+  unsigned manl2:32;
+  unsigned manl:32;
+  unsigned manh:32;
+  unsigned exp:15;
+  unsigned sign:1;
+};
+#endif /* LDBL_MANT_DIG */
+#else  /* !IEEE_8087 */
+#if LDBL_MANT_DIG == 24
+struct ldieee
+{
+  unsigned sign:1;
+  unsigned exp:8;
+  unsigned manh:23;
+}
+#elif LDBL_MANT_DIG == 53
+struct ldieee
+{
+  unsigned sign:1;
+  unsigned exp:11;
+  unsigned manh:32;
+  unsigned manl:20;
+}
+#elif LDBL_MANT_DIG == 64
+struct ldieee
+{
+  unsigned sign:1;
+  unsigned exp:15;
+  unsigned manh:32;
+  unsigned manl:32;
+}
+#elif LDBL_MANT_DIG > 64
+struct ldieee
+{
+  unsigned sign:1;
+  unsigned exp:15;
+  unsigned manh:32;
+  unsigned manl:32;
+  unsigned manl2:32;
+  unsigned manl3;16;
+};
+#endif /* LDBL_MANT_DIG */
+#endif /* !IEEE_8087 */
+#endif /* WANT_IO_LONG_DBL */
+
 /* If we are going to examine or modify specific bits in a double using
    the word0 and/or word1 macros, then we must wrap the double inside
    a union.  This is necessary to avoid undefined behavior according to
