@@ -168,26 +168,29 @@ mmap_record::alloc_page_map (_off64_t off, DWORD len)
 				       sizeof (DWORD))))
     return false;
 
+  off -= offset_;
+  len = PAGE_CNT (len);
+
   if (wincap.virtual_protect_works_on_shared_pages ())
     {
       DWORD old_prot;
+      DWORD vlen = len * getpagesize ();
 
-      off -= offset_;
-      len = PAGE_CNT (len) * getpagesize ();
       if (off > 0 &&
 	  !VirtualProtect (base_address_, off, PAGE_NOACCESS, &old_prot))
 	syscall_printf ("VirtualProtect(%x,%D) failed: %E", base_address_, off);
-      if (off + len < size_to_map_
-	  && !VirtualProtect (base_address_ + off + len,
-			      size_to_map_ - len - off,
+      if (off + vlen < size_to_map_
+	  && !VirtualProtect (base_address_ + off + vlen,
+			      size_to_map_ - vlen - off,
 			      PAGE_NOACCESS, &old_prot))
 	syscall_printf ("VirtualProtect(%x,%D) failed: %E",
-			base_address_ + off + len, size_to_map_ - len - off);
-      off /= getpagesize ();
-      len /= getpagesize ();
-      while (len-- > 0)
-	MAP_SET (off + len);
+			base_address_ + off + vlen, size_to_map_ - vlen - off);
     }
+
+  off /= getpagesize ();
+
+  while (len-- > 0)
+    MAP_SET (off + len);
   return true;
 }
 
