@@ -231,6 +231,8 @@ struct bfd_link_info
      select an appropriate memset function.  Apparently it is also
      normal for HPPA shared libraries to have undefined symbols.  */
   boolean allow_shlib_undefined;
+  /* True if ok to have multiple definition.  */
+  boolean allow_multiple_definition;
   /* Which symbols to strip.  */
   enum bfd_link_strip strip;
   /* Which local symbols to discard.  */

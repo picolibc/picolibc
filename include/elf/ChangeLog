@@ -1,3 +1,8 @@
+2002-05-28  Kuang Hwa Lin <kuang@sbcglobal.net>
+
+	* common.h (EM_DLX): Define.
+	* dlx.h: New file.
+
 2002-05-08  Jason Thorpe  <thorpej@wasabisystems.com>
 
 	* common.h (NT_GNU_ABI_TAG): Define.

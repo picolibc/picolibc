@@ -1,3 +1,25 @@
+2002-05-28  Kuang Hwa Lin <kuang@sbcglobal.net>
+
+	* dis-asm.h: Prototype print_insn_dlx.
+
+2002-05-23  Andrew Cagney  <ac131313@redhat.com>
+
+	* sim-d10v.h: Delete file.  Moved to include/gdb/.
+
+2002-05-23  Jakub Jelinek  <jakub@redhat.com>
+
+	* elf/common.h (PT_TLS, SHF_TLS, STT_TLS, DF_STATIC_TLS): Define.
+	* elf/ia64.h (R_IA64_LTOFF_TPREL22): Renamed from R_IA64_LTOFF_TP22.
+	* elf/i386.h: Add TLS relocs.
+
+2002-05-21  H.J. Lu  (hjl@gnu.org)
+
+	* bfdlink.h (bfd_link_info): Add allow_multiple_definition.
+
+2002-05-17  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* dis-asm.h (print_insn_shl, print_insn_sh64l): Remove prototype.
+
 2002-04-16  David S. Miller  <davem@redhat.com>
 
 	* xregex2.h (__restrict_arr): Define to __restrict on GCC
