@@ -58,7 +58,7 @@ details. */
 #define LoadDLLprime(dllname, init_also) __asm__ ("	\n\
   .section	." #dllname "_info,\"w\"		\n\
   .linkonce						\n\
-  .long		std_dll_init				\n\
+  .long		_std_dll_init				\n\
   .long		0					\n\
   .long		-1					\n\
   .long		" #init_also "				\n\
@@ -201,8 +201,7 @@ union retchain
 };
 
 /* The standard DLL initialization routine. */
-static long long std_dll_init () __asm__ ("std_dll_init") __attribute__ ((unused));
-static long long
+__attribute__ ((used, noinline)) static long long
 std_dll_init ()
 {
   HANDLE h;
@@ -241,9 +240,8 @@ std_dll_init ()
 }
 
 /* Initialization function for winsock stuff. */
-static long long wsock_init () __asm__ ("wsock_init") __attribute__ ((unused, regparm(1)));
 bool NO_COPY wsock_started = 0;
-static long long
+__attribute__ ((used, noinline, regparm(1))) static long long
 wsock_init ()
 {
   static LONG NO_COPY here = -1L;
@@ -304,8 +302,8 @@ wsock_init ()
   return ret.ll;
 }
 
-LoadDLLprime (wsock32, wsock_init)
-LoadDLLprime (ws2_32, wsock_init)
+LoadDLLprime (wsock32, _wsock_init)
+LoadDLLprime (ws2_32, _wsock_init)
 
 LoadDLLfunc (AccessCheck, 32, advapi32)
 LoadDLLfunc (AddAccessAllowedAce, 16, advapi32)

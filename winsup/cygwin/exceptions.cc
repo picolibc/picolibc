@@ -1203,12 +1203,10 @@ reset_signal_arrived ()
   sigproc_printf ("reset signal_arrived");
 }
 
-static void unused_sig_wrapper () __attribute__((const, unused));
-
 #undef errno
 #define errno ((DWORD volatile) _impure_ptr) + (((char *) &_impure_ptr->_errno) - ((char *) _impure_ptr))
 
-static void
+__attribute__((const, used, noinline)) static void
 unused_sig_wrapper ()
 {
 /* Signal cleanup stuff.  Cleans up stack (too bad that we didn't

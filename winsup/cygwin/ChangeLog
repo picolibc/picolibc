@@ -1,5 +1,22 @@
 2003-04-17  Thomas Pfaff  <tpfaff@gmx.net>
 
+	* Makefile.in: Add finline-functions optimization to CXXFLAGS.
+	* autoload.cc (LoadDLLprime): Rename std_dll_init to
+	_std_dll_init.
+	(std_dll_init): Remove name mangling prototype. Add attributes
+	used and noinline.
+	(wsock_init): Ditto.
+	Change wsock_init to _wsock_init in wsock32 and ws2_32
+	LoadDLLprime.
+	* exceptions.cc (unused_sig_wrapper): Remove prototype. Add
+	attributes used and noinline.
+	* pwdgrp.h ((pwdgrp (passwd *&)): Remove inline code.
+	(pwdgrp (__group32 *&)): Ditto.
+	* grp.cc (pwdgrp (passwd *&)): Outline constructor.
+	(pwdgrp (__group32 *&)): Ditto.
+
+2003-04-17  Thomas Pfaff  <tpfaff@gmx.net>
+
 	* thread.h (pthread::equal): New static method.
 	* thread.cc: Rename pthread_equal to pthread::equal throughout.
 	(pthread_equal): Use pthread::equal to compare threads ids.
