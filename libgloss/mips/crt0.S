@@ -157,16 +157,10 @@ zerobss:
 	lw	t0,0(a0)			# last address of memory available
 	la	t1,K0BASE			# cached kernel memory
 	addu	t0,t0,t1			# get the end of memory address
-	/* We must subtract 24 bytes for the 3 8 byte arguments to main, in
-	   case main wants to write them back to the stack.  The caller is
-	   supposed to allocate stack space for parameters in registers in
-	   the old MIPS ABIs.  We must do this even though we aren't passing
-	   arguments, because main might be declared to have them.
-
-	   Some ports need a larger alignment for the stack, so we subtract
-	   32, which satisifes the stack for the arguments and keeps the
-	   stack pointer better aligned.  */
-	subu	t0,t0,32			# and generate a starting stack-pointer
+	/* Allocate 32 bytes for the register parameters.  Allocate 16
+	   bytes for a null argv and envp.  Round the result up to 64
+	   bytes to preserve alignment.  */
+	subu	t0,t0,64
 4:
 	move	sp,t0				# set stack pointer
 	sw	sp,__stackbase			# keep this for future ref
@@ -213,9 +207,17 @@ init:
 	jal	_init				# run global constructors
 	nop
 
-	move	a0,zero				# set argc to 0
+	addiu	a1,sp,32			# argv = sp + 32
+	addiu	a2,sp,40			# envp = sp + 40
+#if __mips64
+	sd	zero,(a1)			# argv[argc] = 0
+	sd	zero,(a2)			# envp[0] = 0
+#else
+	sw	zero,(a1)
+	sw	zero,(a2)
+#endif
 	jal	main				# call the program start function
-	nop
+	move	a0,zero				# set argc to 0
 
 	# fall through to the "exit" routine
 	jal	exit				# call libc exit to run the G++

@@ -1,5 +1,10 @@
 2002-01-08  Richard Sandiford  <rsandifo@redhat.com
 
+	* mips/crt0.S (_start): Allocate 64 bytes of stack instead of 32.
+	Pass an empty argv and envp to main().
+
+2002-01-08  Richard Sandiford  <rsandifo@redhat.com
+
 	* mips/configure.in (mips64vr-elf, mips64vrel-elf): New config.
 	* mips/configure: Regenerate.
 
