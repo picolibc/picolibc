@@ -1,3 +1,8 @@
+Wed Feb 14 14:54:40 2001 Christophe Iasci <chrisiasci@aol.com>
+
+	* dlfcn.cc (dlopen): Do not call LoadLibrary with a NULL pointer, when
+	the library is not found
+
 2001-02-14  Egor Duda  <deo@logos-m.ru>
   
 	* fhandler_console.cc (fhandler_console::char_command): Ignore unknown

@@ -177,7 +177,8 @@ dlopen (const char *name, int)
     {
       /* handle for the named library */
       const char *fullpath = get_full_path_of_dll (name);
-      ret = (void *) LoadLibrary (fullpath);
+      if (fullpath)
+	ret = (void *) LoadLibrary (fullpath);
     }
 
   if (!ret)
