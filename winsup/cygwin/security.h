@@ -186,8 +186,8 @@ BOOL verify_token (HANDLE token, cygsid &usersid, cygsid &pgrpsid, BOOL * pinter
 
 /* Extract U-domain\user field from passwd entry. */
 void extract_nt_dom_user (const struct passwd *pw, char *domain, char *user);
-/* Get default logonserver and domain for this box. */
-BOOL get_logon_server_and_user_domain (char *logonserver, char *domain);
+/* Get default logonserver for a domain. */
+BOOL get_logon_server (const char * domain, char * server, WCHAR *wserver = NULL);
 
 /* sec_helper.cc: Security helper functions. */
 BOOL __stdcall is_grp_member (__uid32_t uid, __gid32_t gid);

@@ -162,6 +162,7 @@ str2buf2uni (UNICODE_STRING &tgt, WCHAR *buf, const char *srcstr)
   sys_mbstowcs (buf, srcstr, tgt.MaximumLength);
 }
 
+#if 0 //unused
 static void
 lsa2wchar (WCHAR *tgt, LSA_UNICODE_STRING &src, int size)
 {
@@ -172,6 +173,7 @@ lsa2wchar (WCHAR *tgt, LSA_UNICODE_STRING &src, int size)
   size >>= 1;
   tgt[size] = 0;
 }
+#endif
 
 static void
 lsa2str (char *tgt, LSA_UNICODE_STRING &src, int size)
@@ -202,6 +204,7 @@ close_local_policy (LSA_HANDLE &lsa)
   lsa = INVALID_HANDLE_VALUE;
 }
 
+#if 0 // unused
 static BOOL
 get_lsa_srv_inf (LSA_HANDLE lsa, char *logonserver, char *domain)
 {
@@ -252,40 +255,52 @@ get_lsa_srv_inf (LSA_HANDLE lsa, char *logonserver, char *domain)
     NetApiBufferFree (buf);
   return TRUE;
 }
-
-static BOOL
-get_logon_server (LSA_HANDLE lsa, char *logonserver)
-{
-  return get_lsa_srv_inf (lsa, logonserver, NULL);
-}
+#endif
 
 BOOL
-get_logon_server_and_user_domain (char *logonserver, char *userdomain)
+get_logon_server (const char * domain, char * server, WCHAR *wserver)
 {
-  BOOL ret = FALSE;
-  LSA_HANDLE lsa = open_local_policy ();
-  if (lsa != INVALID_HANDLE_VALUE)
+  WCHAR wdomain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+  NET_API_STATUS ret;
+  WCHAR * buf;
+  DWORD size = INTERNET_MAX_HOST_NAME_LENGTH + 1;
+
+  if ((GetComputerNameA(server + 2, &size)) &&
+      !strcasecmp(domain, server + 2))
     {
-      ret = get_lsa_srv_inf (lsa, logonserver, userdomain);
-      close_local_policy (lsa);
+      server[0] = server[1] = '\\';
+      if (wserver)
+        sys_mbstowcs (wserver, server, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+      return TRUE;
     }
-  return ret;
+
+  /* Try to get the primary domain controller for the domain */
+  sys_mbstowcs (wdomain, domain, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+  if ((ret = NetGetDCName(NULL, wdomain, (LPBYTE *) &buf)) == STATUS_SUCCESS)
+    {
+      sys_wcstombs (server, buf, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+      if (wserver)
+	for (WCHAR * ptr1 = buf; (*wserver++ = *ptr1++); ) {}
+      NetApiBufferFree (buf);
+      return TRUE;
+    }
+  __seterrno_from_win_error (ret);
+  return FALSE;
 }
 
 static BOOL
-get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user)
+get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user, char * domain)
 {
+  char dgroup[INTERNET_MAX_HOST_NAME_LENGTH + GNLEN + 2];
   WCHAR wuser[UNLEN + 1];
   sys_mbstowcs (wuser, user, UNLEN + 1);
   LPGROUP_USERS_INFO_0 buf;
-  DWORD cnt, tot;
+  DWORD cnt, tot, len;
   NET_API_STATUS ret;
 
+  /* Look only on logonserver */
   ret = NetUserGetGroups (wlogonserver, wuser, 0, (LPBYTE *) &buf,
 			  MAX_PREFERRED_LENGTH, &cnt, &tot);
-  if (ret == ERROR_BAD_NETPATH || ret == RPC_S_SERVER_UNAVAILABLE)
-    ret = NetUserGetGroups (NULL, wuser, 0, (LPBYTE *) &buf,
-			    MAX_PREFERRED_LENGTH, &cnt, &tot);
   if (ret)
     {
       __seterrno_from_win_error (ret);
@@ -293,30 +308,25 @@ get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user)
       return ret == NERR_UserNotFound;
     }
 
+  len = strlen(domain);
+  strcpy(dgroup, domain);
+  dgroup[len++] = '\\';
+
   for (DWORD i = 0; i < cnt; ++i)
     {
       cygsid gsid;
-      char group[UNLEN + 1];
+      DWORD glen = sizeof (gsid);
       char domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-      DWORD glen = UNLEN + 1;
-      DWORD dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
+      DWORD dlen = sizeof (domain);
       SID_NAME_USE use = SidTypeInvalid;
 
-      sys_wcstombs (group, buf[i].grui0_name, UNLEN + 1);
-      if (!LookupAccountName (NULL, group, gsid, &glen, domain, &dlen, &use))
-	debug_printf ("LookupAccountName(%s): %lu\n", group, GetLastError ());
-      if (!legal_sid_type (use))
-	{
-	  strcat (strcpy (group, domain), "\\");
-	  sys_wcstombs (group + strlen (group), buf[i].grui0_name,
-			UNLEN + 1 - strlen (group));
-	  glen = UNLEN + 1;
-	  dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
-	  if (!LookupAccountName(NULL, group, gsid, &glen, domain, &dlen, &use))
-	    debug_printf ("LookupAccountName(%s): %lu\n", group,GetLastError());
-	}
-      if (legal_sid_type (use))
-	grp_list += gsid;
+      sys_wcstombs (dgroup + len, buf[i].grui0_name, GNLEN + 1);
+      if (!LookupAccountName (NULL, dgroup, gsid, &glen, domain, &dlen, &use))
+	  debug_printf ("LookupAccountName(%s): %E", dgroup);
+      else if (legal_sid_type (use))
+	  grp_list += gsid;
+      else debug_printf("Global group %s invalid. Domain: %s Use: %d",
+			dgroup, domain, use);
     }
 
   NetApiBufferFree (buf);
@@ -324,21 +334,21 @@ get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user)
 }
 
 static BOOL
-is_group_member (WCHAR *wlogonserver, WCHAR *wgroup,
-		 cygsid &usersid, cygsidlist &grp_list)
+is_group_member (WCHAR *wgroup, PSID pusersid, cygsidlist &grp_list)
 {
   LPLOCALGROUP_MEMBERS_INFO_0 buf;
   DWORD cnt, tot;
   NET_API_STATUS ret;
   BOOL retval = FALSE;
 
+  /* Members can be users or global groups */
   ret = NetLocalGroupGetMembers (NULL, wgroup, 0, (LPBYTE *) &buf,
 				 MAX_PREFERRED_LENGTH, &cnt, &tot, NULL);
   if (ret)
     return FALSE;
 
   for (DWORD bidx = 0; !retval && bidx < cnt; ++bidx)
-    if (EqualSid (usersid, buf[bidx].lgrmi0_sid))
+    if (EqualSid (pusersid, buf[bidx].lgrmi0_sid))
       retval = TRUE;
     else
       for (int glidx = 0; !retval && glidx < grp_list.count; ++glidx)
@@ -350,8 +360,7 @@ is_group_member (WCHAR *wlogonserver, WCHAR *wgroup,
 }
 
 static BOOL
-get_user_local_groups (WCHAR *wlogonserver, const char *logonserver,
-		       cygsidlist &grp_list, cygsid &usersid)
+get_user_local_groups (cygsidlist &grp_list, PSID pusersid)
 {
   LPLOCALGROUP_INFO_0 buf;
   DWORD cnt, tot;
@@ -365,40 +374,39 @@ get_user_local_groups (WCHAR *wlogonserver, const char *logonserver,
       return FALSE;
     }
 
+  char bgroup[sizeof ("BUILTIN\\") + GNLEN] = "BUILTIN\\";
+  char lgroup[INTERNET_MAX_HOST_NAME_LENGTH + GNLEN + 2];
+  const DWORD blen = sizeof ("BUILTIN\\") - 1;
+  DWORD llen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
+  if (!GetComputerNameA(lgroup, & llen))
+    {
+       __seterrno();
+       return FALSE;
+    }
+  lgroup[llen++] = '\\';
+
   for (DWORD i = 0; i < cnt; ++i)
-    if (is_group_member (wlogonserver, buf[i].lgrpi0_name, usersid, grp_list))
+    if (is_group_member (buf[i].lgrpi0_name, pusersid, grp_list))
       {
 	cygsid gsid;
-	char group[UNLEN + 1];
+	DWORD glen = sizeof (gsid);
 	char domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-	DWORD glen = UNLEN + 1;
-	DWORD dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
+	DWORD dlen = sizeof (domain);
 	SID_NAME_USE use = SidTypeInvalid;
 
-	sys_wcstombs (group, buf[i].lgrpi0_name, UNLEN + 1);
-	if (!LookupAccountName (NULL, group, gsid, &glen, domain, &dlen, &use))
+	sys_wcstombs (bgroup + blen, buf[i].lgrpi0_name, GNLEN + 1);
+	if (!LookupAccountName (NULL, bgroup, gsid, &glen, domain, &dlen, &use))
 	  {
-	    glen = UNLEN + 1;
-	    dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
-	    if (!LookupAccountName (logonserver + 2, group,
-				    gsid, &glen, domain, &dlen, &use))
-	      debug_printf ("LookupAccountName(%s): %lu\n", group,
-							    GetLastError ());
-	  }
-	else if (!legal_sid_type (use))
-	  {
-	    strcat (strcpy (group, domain), "\\");
-	    sys_wcstombs (group + strlen (group), buf[i].lgrpi0_name,
-			  UNLEN + 1 - strlen (group));
-	    glen = UNLEN + 1;
-	    dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
-	    if (!LookupAccountName (NULL, group, gsid, &glen,
-				    domain, &dlen, &use))
-	      debug_printf ("LookupAccountName(%s): %lu\n", group,
-							    GetLastError ());
+	     if (GetLastError () != ERROR_NONE_MAPPED)
+		 debug_printf ("LookupAccountName(%s): %E", bgroup);
+	     strcpy(lgroup + llen, bgroup + blen);
+	     if (!LookupAccountName (NULL, lgroup, gsid, &glen,
+				     domain, &dlen, &use))
+		 debug_printf ("LookupAccountName(%s): %E", lgroup);
 	  }
 	if (legal_sid_type (use))
 	  grp_list += gsid;
+	else debug_printf("Rejecting local %s. use: %d", bgroup + blen, use);
       }
 
   NetApiBufferFree (buf);
@@ -418,7 +426,7 @@ sid_in_token_groups (PTOKEN_GROUPS grps, cygsid &sid)
 
 static BOOL
 get_user_primary_group (WCHAR *wlogonserver, const char *user,
-			cygsid &usersid, cygsid &pgrpsid)
+			PSID pusersid, cygsid &pgrpsid)
 {
   LPUSER_INFO_3 buf;
   WCHAR wuser[UNLEN + 1];
@@ -426,7 +434,7 @@ get_user_primary_group (WCHAR *wlogonserver, const char *user,
   BOOL retval = FALSE;
   UCHAR count = 0;
 
-  if (usersid == well_known_system_sid)
+  if (pusersid == well_known_system_sid)
     {
       pgrpsid = well_known_system_sid;
       return TRUE;
@@ -434,15 +442,13 @@ get_user_primary_group (WCHAR *wlogonserver, const char *user,
 
   sys_mbstowcs (wuser, user, UNLEN + 1);
   ret = NetUserGetInfo (wlogonserver, wuser, 3, (LPBYTE *) &buf);
-  if (ret == ERROR_BAD_NETPATH || ret == RPC_S_SERVER_UNAVAILABLE)
-    ret = NetUserGetInfo (NULL, wuser, 3, (LPBYTE *) &buf);
   if (ret)
     {
       __seterrno_from_win_error (ret);
       return FALSE;
     }
 
-  pgrpsid = usersid;
+  pgrpsid = pusersid;
   if (IsValidSid (pgrpsid) && (count = *GetSidSubAuthorityCount (pgrpsid)) > 1)
     {
       *GetSidSubAuthority (pgrpsid, count - 1) = buf->usri3_primary_group_id;
@@ -477,27 +483,28 @@ get_supplementary_group_sidlist (const char *username, cygsidlist &grp_list)
 }
 
 static BOOL
-get_group_sidlist (const char *logonserver, cygsidlist &grp_list,
+get_group_sidlist (cygsidlist &grp_list,
 		   cygsid &usersid, cygsid &pgrpsid,
 		   PTOKEN_GROUPS my_grps, LUID auth_luid, int &auth_pos,
 		   BOOL * special_pgrp)
 {
-  WCHAR wserver[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-  char user[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+  char user[UNLEN + 1];
   char domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-  DWORD ulen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
-  DWORD dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
+  WCHAR wserver[INTERNET_MAX_HOST_NAME_LENGTH + 3];
+  char server[INTERNET_MAX_HOST_NAME_LENGTH + 3];
+  DWORD ulen = sizeof (user);
+  DWORD dlen = sizeof (domain);
   SID_NAME_USE use;
   cygsidlist sup_list;
 
   auth_pos = -1;
-  sys_mbstowcs (wserver, logonserver, INTERNET_MAX_HOST_NAME_LENGTH + 1);
   if (!LookupAccountSid (NULL, usersid, user, &ulen, domain, &dlen, &use))
     {
       debug_printf ("LookupAccountSid () %E");
       __seterrno ();
       return FALSE;
     }
+
   grp_list += well_known_world_sid;
   if (usersid == well_known_system_sid)
     {
@@ -506,6 +513,8 @@ get_group_sidlist (const char *logonserver, cygsidlist &grp_list,
     }
   else
     {
+      if (!get_logon_server( domain, server, wserver))
+        return FALSE;
       if (my_grps)
 	{
 	  if (sid_in_token_groups (my_grps, well_known_local_sid))
@@ -536,6 +545,9 @@ get_group_sidlist (const char *logonserver, cygsidlist &grp_list,
 	  grp_list += buf;
 	  auth_pos = grp_list.count - 1;
 	}
+      if (!get_user_groups (wserver, grp_list, user, domain) ||
+          !get_user_local_groups (grp_list, usersid))
+        return FALSE;
     }
   /* special_pgrp true if pgrpsid is not null and not in normal groups */
   if (!pgrpsid)
@@ -544,9 +556,6 @@ get_group_sidlist (const char *logonserver, cygsidlist &grp_list,
       get_user_primary_group (wserver, user, usersid, pgrpsid);
     }
   else * special_pgrp = TRUE;
-  if (!get_user_groups (wserver, grp_list, user) ||
-      !get_user_local_groups (wserver, logonserver, grp_list, usersid))
-    return FALSE;
   if (get_supplementary_group_sidlist (user, sup_list))
     {
       for (int i = 0; i < sup_list.count; ++i)
@@ -729,7 +738,6 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
 {
   NTSTATUS ret;
   LSA_HANDLE lsa = INVALID_HANDLE_VALUE;
-  char logonserver[INTERNET_MAX_HOST_NAME_LENGTH + 1];
   int old_priv_state;
 
   cygsidlist grpsids;
@@ -772,10 +780,6 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
   if ((lsa = open_local_policy ()) == INVALID_HANDLE_VALUE)
     goto out;
 
-  /* Get logon server. */
-  if (!get_logon_server (lsa, logonserver))
-    goto out;
-
   /* User, owner, primary group. */
   user.User.Sid = usersid;
   user.User.Attributes = 0;
@@ -814,7 +818,7 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
 
   /* Create list of groups, the user is member in. */
   int auth_pos;
-  if (!get_group_sidlist (logonserver, grpsids, usersid, pgrpsid,
+  if (!get_group_sidlist (grpsids, usersid, pgrpsid,
 			  my_grps, auth_luid, auth_pos, &special_pgrp))
     goto out;
 

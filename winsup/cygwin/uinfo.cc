@@ -71,7 +71,8 @@ internal_getlogin (cygheap_user &user)
 	  user.set_domain (buf);
 	  NetApiBufferFree (wui);
 	}
-      if (!user.logsrv () && get_logon_server_and_user_domain (buf, NULL))
+      if (!user.logsrv () && user.domain() &&
+          get_logon_server(user.domain(), buf, NULL))
 	{
 	  user.set_logsrv (buf + 2);
 	  setenv ("LOGONSERVER", buf, 1);

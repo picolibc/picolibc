@@ -1,3 +1,24 @@
+2002-06-03  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* security.cc (lsa2wchar): Suppressed.
+	(get_lsa_srv_inf): Suppressed.
+	(get_logon_server_and_user_domain): Suppressed.
+	(get_logon_server): Essentially new.
+	(get_user_groups): Add "domain" argument. Only lookup the
+	designated server and use "domain" in LookupAccountName.
+	(is_group_member): Simplify the arguments.
+	(get_user_local_groups): Simplify the arguments. Do only a
+	local lookup. Use "BUILTIN" and local domain in LookupAccountName.
+	(get_user_primary_group). Only lookup the designated server.
+	(get_group_sidlist): Remove logonserver argument. Do not lookup
+	any server for the SYSTEM account.
+	(create_token): Delete logonserver and call to get_logon_server.
+	Adjust arguments of get_group_sidlist, see above.
+	* security.h: Delete declaration of get_logon_server_and_user_domain
+	and add declaration of get_logon_server. 
+	* uinfo.cc (internal_get_login): Call get_logon_server instead of
+	get_logon_server_and_user_domain.
+
 2002-06-02  Christopher Faylor  <cgf@redhat.com>
 
         * dtable.cc (handle_to_fn): Use largest match for device.  Correctly
