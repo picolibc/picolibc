@@ -4,6 +4,18 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
+if HAVE_STDIO64_DIR
+STDIO64_OBJECTS = \
+	fstat64r.$(oext) \
+	lseek64r.$(oext) \
+	open64r.$(oext)
+
+STDIO64_DEFS = \
+	fstat64r.def \
+	lseek64r.def \
+	open64r.def
+endif
+
 LIB_SOURCES = \
 	closer.c \
 	reent.c \
@@ -28,10 +40,14 @@ libreent_la_LDFLAGS = -Xcompiler -nostdlib
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libreent.la
 libreent_la_SOURCES = $(LIB_SOURCES)
+libreent_la_LIBADD = $(STDIO64_OBJECTS)
+libreent_la_DEPENDENCIES = $(STDIO64_OBJECTS)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
+lib_a_LIBADD = $(STDIO64_OBJECTS)
+lib_a_DEPENDENCIES = $(STDIO64_OBJECTS)
 noinst_DATA =
 endif # USE_LIBTOOL
 
@@ -51,6 +67,7 @@ CHEWOUT_FILES = \
 	statr.def \
 	timer.def \
 	unlinkr.def \
+	$(STDIO64_DEFS) \
 	writer.def
 
 SUFFIXES = .def .h

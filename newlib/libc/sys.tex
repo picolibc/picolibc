@@ -180,7 +180,14 @@ int lseek(int file, int ptr, int dir)@{
 @}
 @end example
 
-@c FIXME! Why no stub for open?
+@item open
+Open a file.  Minimal implementation:
+
+@example
+int open(const char *name, int flags, int mode)@{
+    return -1;
+@}
+@end example
 
 @item read
 Read from a file.  Minimal implementation:
@@ -341,6 +348,17 @@ int _open_r(void *@var{reent},
     const char *@var{file}, int @var{flags}, int @var{mode});
 @end example
 
+@ifset STDIO64
+@item _open64_r
+A reentrant version of @code{open64}.  It takes a pointer
+to the global data block, which holds @code{errno}.
+
+@example
+int _open64_r(void *@var{reent},
+    const char *@var{file}, int @var{flags}, int @var{mode});
+@end example
+@end ifset
+
 @item _close_r
 A reentrant version of @code{close}.  It takes a pointer to the global
 data block, which holds @code{errno}.
@@ -357,6 +375,17 @@ data block, which holds @code{errno}.
 off_t _lseek_r(void *@var{reent},
     int @var{fd}, off_t @var{pos}, int @var{whence});
 @end example
+
+@ifset STDIO64
+@item _lseek64_r
+A reentrant version of @code{lseek64}.  It takes a pointer to the global
+data block, which holds @code{errno}.
+
+@example
+off_t _lseek64_r(void *@var{reent},
+    int @var{fd}, off_t @var{pos}, int @var{whence});
+@end example
+@end ifset
 
 @item _read_r
 A reentrant version of @code{read}.  It takes a pointer to the global
@@ -409,6 +438,17 @@ data block, which holds @code{errno}.
 int _fstat_r(void *@var{reent},
     int @var{fd}, struct stat *@var{pstat});
 @end example
+
+@ifset STDIO64
+@item _fstat64_r
+A reentrant version of @code{fstat64}.  It takes a pointer to the global
+data block, which holds @code{errno}.
+
+@example
+int _fstat64_r(void *@var{reent},
+    int @var{fd}, struct stat *@var{pstat});
+@end example
+@end ifset
 
 @item _link_r
 A reentrant version of @code{link}.  It takes a pointer to the global

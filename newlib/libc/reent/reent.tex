@@ -107,6 +107,11 @@ _fstat_r        _sbrk_r
 _gettimeofday_r _stat_r
 _getpid_r       _times_r
 
+@ifset STDIO64
+@exdent @emph{Additional 64-bit I/O System functions:}
+_fstat64_r	_lseek64_r	_open64_r
+@end ifset
+
 @exdent @emph{Time function:}
 _asctime_r
 @end example

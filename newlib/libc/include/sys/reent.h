@@ -23,8 +23,11 @@ typedef unsigned __Long __ULong;
 #endif
 #endif
 
-#ifndef __Long
+#if !defined( __Long)
 #include <sys/types.h>
+#endif
+
+#ifndef __Long
 #define __Long __int32_t
 typedef __uint32_t __ULong;
 #endif
@@ -33,13 +36,6 @@ typedef __uint32_t __ULong;
  * If _REENT_SMALL is defined, we make struct _reent as small as possible,
  * by having nearly everything possible allocated at first use.
  */
-
-struct _glue 
-{
-  struct _glue *_next;
-  int _niobs;
-  struct __sFILE *_iobs;
-};
 
 struct _Bigint 
 {
@@ -88,7 +84,7 @@ struct _atexit {
 /*
  * Stdio buffers.
  *
- * This and __sFILE are defined here because we need them for struct _reent,
+ * This and __FILE are defined here because we need them for struct _reent,
  * but we don't want stdio.h included when stdlib.h is.
  */
 
@@ -104,6 +100,10 @@ struct __sbuf {
 
 typedef long _fpos_t;		/* XXX must match off_t in <sys/types.h> */
 				/* (and must be `long' for now) */
+
+#ifdef __LARGE64_FILES
+typedef _off64_t _fpos64_t;
+#endif
 
 /*
  * Stdio state variables.
@@ -196,6 +196,57 @@ struct __sFILE {
 #endif
 };
 
+#ifdef __LARGE64_FILES
+struct __sFILE64 {
+  unsigned char *_p;	/* current position in (some) buffer */
+  int	_r;		/* read space left for getc() */
+  int	_w;		/* write space left for putc() */
+  short	_flags;		/* flags, below; this FILE is free if 0 */
+  short	_file;		/* fileno, if Unix descriptor, else -1 */
+  struct __sbuf _bf;	/* the buffer (at least 1 byte, if !NULL) */
+  int	_lbfsize;	/* 0 or -_bf._size, for inline putc */
+
+  struct _reent *_data;
+
+  /* operations */
+  _PTR	_cookie;	/* cookie passed to io functions */
+
+  _READ_WRITE_RETURN_TYPE _EXFUN((*_read),(_PTR _cookie, char *_buf, int _n));
+  _READ_WRITE_RETURN_TYPE _EXFUN((*_write),(_PTR _cookie, const char *_buf,
+					    int _n));
+  _fpos_t _EXFUN((*_seek),(_PTR _cookie, _fpos_t _offset, int _whence));
+  int	_EXFUN((*_close),(_PTR _cookie));
+
+  /* separate buffer for long sequences of ungetc() */
+  struct __sbuf _ub;	/* ungetc buffer */
+  unsigned char *_up;	/* saved _p when _p is doing ungetc data */
+  int	_ur;		/* saved _r when _r is counting ungetc data */
+
+  /* tricks to meet minimum requirements even when malloc() fails */
+  unsigned char _ubuf[3];	/* guarantee an ungetc() buffer */
+  unsigned char _nbuf[1];	/* guarantee a getc() buffer */
+
+  /* separate buffer for fgetline() when line crosses buffer boundary */
+  struct __sbuf _lb;	/* buffer for fgetline() */
+
+  /* Unix stdio files get aligned to block boundaries on fseek() */
+  int	_blksize;	/* stat.st_blksize (may be != _bf._size) */
+  int   _flags2;        /* for future use */
+  _off64_t _offset;     /* current lseek offset */
+  _fpos64_t _EXFUN((*_seek64),(_PTR _cookie, _fpos64_t _offset, int _whence));
+};
+typedef struct __sFILE64 __FILE;
+#else
+typedef struct __sFILE   __FILE;
+#endif /* __LARGE64_FILES */
+
+struct _glue 
+{
+  struct _glue *_next;
+  int _niobs;
+  __FILE *_iobs;
+};
+
 /*
  * rand48 family support
  *
@@ -271,7 +322,7 @@ struct _reent
   /* FILE is a big struct and may change over time.  To try to achieve binary
      compatibility with future versions, put stdin,stdout,stderr here.
      These are pointers into member __sf defined below.  */
-  struct __sFILE *_stdin, *_stdout, *_stderr;	/* XXX */
+  __FILE *_stdin, *_stdout, *_stderr;	/* XXX */
 
   int _errno;			/* local copy of errno */
 
@@ -305,22 +356,22 @@ struct _reent
   struct _atexit _atexit;
 
   struct _glue __sglue;			/* root of glue chain */
-  struct __sFILE *__sf;			/* file descriptors */
+  __FILE *__sf;			        /* file descriptors */
   struct __sFILE_fake __sf_fake;	/* fake initial stdin/out/err */
   struct _misc_reent *_misc;            /* strtok, multibyte states */
   char *_signal_buf;                    /* strsignal */
 };
 
 #define _REENT_INIT(var) \
-  { (struct __sFILE *)&var.__sf_fake, (struct __sFILE *)&var.__sf_fake, \
-    (struct __sFILE *)&var.__sf_fake, 0, 0, _NULL, 0, 0, \
+  { (__FILE *)&var.__sf_fake, (__FILE *)&var.__sf_fake, \
+    (__FILE *)&var.__sf_fake, 0, 0, _NULL, 0, 0, \
     "C", _NULL, _NULL, 0, 0, _NULL, _NULL, _NULL, _NULL, _NULL, \
     { 0, _NULL, _NULL, 0 }, { _NULL, 0, _NULL }, _NULL, 0, _NULL, _NULL }
 
 #define _REENT_INIT_PTR(var) \
-  { var->_stdin = (struct __sFILE *)&var->__sf_fake; \
-    var->_stdout = (struct __sFILE *)&var->__sf_fake; \
-    var->_stderr = (struct __sFILE *)&var->__sf_fake; \
+  { var->_stdin = (__FILE *)&var->__sf_fake; \
+    var->_stdout = (__FILE *)&var->__sf_fake; \
+    var->_stderr = (__FILE *)&var->__sf_fake; \
     var->_errno = 0; \
     var->_inc = 0; \
     var->_emergency = _NULL; \
@@ -453,7 +504,7 @@ struct _reent
   /* FILE is a big struct and may change over time.  To try to achieve binary
      compatibility with future versions, put stdin,stdout,stderr here.
      These are pointers into member __sf defined below.  */
-  struct __sFILE *_stdin, *_stdout, *_stderr;
+  __FILE *_stdin, *_stdout, *_stderr;
 
   int  _inc;			/* used by tmpnam */
   char _emergency[_REENT_EMERGENCY_SIZE];
@@ -511,11 +562,11 @@ struct _reent
   /* signal info */
   void (**(_sig_func))(int);
 
-  /* These are here last so that __sFILE can grow without changing the offsets
+  /* These are here last so that __FILE can grow without changing the offsets
      of the above members (on the off chance that future binary compatibility
      would be broken otherwise).  */
-  struct _glue __sglue;			/* root of glue chain */
-  struct __sFILE __sf[3];		/* first three file descriptors */
+  struct _glue __sglue;		/* root of glue chain */
+  __FILE __sf[3];  		/* first three file descriptors */
 };
 
 #define _REENT_INIT(var) \

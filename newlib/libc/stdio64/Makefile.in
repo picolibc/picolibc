@@ -82,8 +82,6 @@ LIBC_MACHINE_LIB = @LIBC_MACHINE_LIB@
 LIBC_POSIX_LIB = @LIBC_POSIX_LIB@
 LIBC_SIGNAL_DEF = @LIBC_SIGNAL_DEF@
 LIBC_SIGNAL_LIB = @LIBC_SIGNAL_LIB@
-LIBC_STDIO64_DEF = @LIBC_STDIO64_DEF@
-LIBC_STDIO64_LIB = @LIBC_STDIO64_LIB@
 LIBC_SYSCALL_LIB = @LIBC_SYSCALL_LIB@
 LIBC_SYS_LIB = @LIBC_SYS_LIB@
 LIBC_UNIX_LIB = @LIBC_UNIX_LIB@
@@ -110,68 +108,41 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-@HAVE_STDIO64_DIR_TRUE@STDIO64_OBJECTS = @HAVE_STDIO64_DIR_TRUE@\
-@HAVE_STDIO64_DIR_TRUE@	fstat64r.$(oext) \
-@HAVE_STDIO64_DIR_TRUE@	lseek64r.$(oext) \
-@HAVE_STDIO64_DIR_TRUE@	open64r.$(oext)
-
-@HAVE_STDIO64_DIR_TRUE@STDIO64_DEFS = @HAVE_STDIO64_DIR_TRUE@\
-@HAVE_STDIO64_DIR_TRUE@	fstat64r.def \
-@HAVE_STDIO64_DIR_TRUE@	lseek64r.def \
-@HAVE_STDIO64_DIR_TRUE@	open64r.def
-
 LIB_SOURCES = \
-	closer.c \
-	reent.c \
-	impure.c \
-	execr.c \
-	fstatr.c \
-	getreent.c \
-	linkr.c \
-	lseekr.c \
-	openr.c \
-	readr.c \
-	signalr.c \
-	signgam.c \
-	sbrkr.c \
-	statr.c \
-	timer.c \
-	unlinkr.c \
-	writer.c
+	fgetpos64.c			\
+	fopen64.c 			\
+	freopen64.c 			\
+	fseeko64.c 			\
+	fsetpos64.c 			\
+	ftello64.c			\
+	stdio64.c			\
+	tmpfile64.c
 
 
-libreent_la_LDFLAGS = -Xcompiler -nostdlib
+libstdio64_la_LDFLAGS = -Xcompiler -nostdlib
 
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libreent.la
-@USE_LIBTOOL_TRUE@libreent_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
-@USE_LIBTOOL_TRUE@libreent_la_LIBADD = @USE_LIBTOOL_TRUE@$(STDIO64_OBJECTS)
-@USE_LIBTOOL_TRUE@libreent_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(STDIO64_OBJECTS)
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libstdio64.la
+@USE_LIBTOOL_TRUE@libstdio64_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
+@USE_LIBTOOL_TRUE@LIB_COMPILE = @USE_LIBTOOL_TRUE@$(LTCOMPILE)
+@USE_LIBTOOL_FALSE@LIB_COMPILE = @USE_LIBTOOL_FALSE@$(COMPILE)
 @USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
 @USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(STDIO64_OBJECTS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(STDIO64_OBJECTS)
+
+AM_CFLAGS = -I $(srcdir)/../stdio
 
 CHEWOUT_FILES = \
-	closer.def \
-	reent.def \
-	execr.def \
-	fstatr.def \
-	linkr.def \
-	lseekr.def \
-	openr.def \
-	readr.def \
-	signalr.def \
-	sbrkr.def \
-	statr.def \
-	timer.def \
-	unlinkr.def \
-	$(STDIO64_DEFS) \
-	writer.def
+	fgetpos64.def		\
+	fopen64.def		\
+	freopen64.def		\
+	fseeko64.def		\
+	fsetpos64.def		\
+	ftello64.def		\
+	tmpfile64.def
 
 
-SUFFIXES = .def .h
+SUFFIXES = .def
 
 CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
 
@@ -186,18 +157,18 @@ LIBRARIES =  $(noinst_LIBRARIES)
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  closer.$(OBJEXT) reent.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@impure.$(OBJEXT) execr.$(OBJEXT) fstatr.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@getreent.$(OBJEXT) linkr.$(OBJEXT) lseekr.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@openr.$(OBJEXT) readr.$(OBJEXT) signalr.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@signgam.$(OBJEXT) sbrkr.$(OBJEXT) statr.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@timer.$(OBJEXT) unlinkr.$(OBJEXT) writer.$(OBJEXT)
+lib_a_LIBADD = 
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  fgetpos64.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@fopen64.$(OBJEXT) freopen64.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@fseeko64.$(OBJEXT) fsetpos64.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@ftello64.$(OBJEXT) stdio64.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@tmpfile64.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
-@USE_LIBTOOL_TRUE@libreent_la_OBJECTS =  closer.lo reent.lo impure.lo \
-@USE_LIBTOOL_TRUE@execr.lo fstatr.lo getreent.lo linkr.lo lseekr.lo \
-@USE_LIBTOOL_TRUE@openr.lo readr.lo signalr.lo signgam.lo sbrkr.lo \
-@USE_LIBTOOL_TRUE@statr.lo timer.lo unlinkr.lo writer.lo
+libstdio64_la_LIBADD = 
+@USE_LIBTOOL_TRUE@libstdio64_la_OBJECTS =  fgetpos64.lo fopen64.lo \
+@USE_LIBTOOL_TRUE@freopen64.lo fseeko64.lo fsetpos64.lo ftello64.lo \
+@USE_LIBTOOL_TRUE@stdio64.lo tmpfile64.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -212,14 +183,14 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-SOURCES = $(lib_a_SOURCES) $(libreent_la_SOURCES)
-OBJECTS = $(lib_a_OBJECTS) $(libreent_la_OBJECTS)
+SOURCES = $(lib_a_SOURCES) $(libstdio64_la_SOURCES)
+OBJECTS = $(lib_a_OBJECTS) $(libstdio64_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .def .h .lo .o .obj .s
+.SUFFIXES: .S .c .def .lo .o .obj .s
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/../../Makefile.shared
-	cd $(top_srcdir) && $(AUTOMAKE) --cygnus reent/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --cygnus stdio64/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) \
@@ -293,8 +264,8 @@ distclean-noinstLTLIBRARIES:
 
 maintainer-clean-noinstLTLIBRARIES:
 
-libreent.la: $(libreent_la_OBJECTS) $(libreent_la_DEPENDENCIES)
-	$(LINK)  $(libreent_la_LDFLAGS) $(libreent_la_OBJECTS) $(libreent_la_LIBADD) $(LIBS)
+libstdio64.la: $(libstdio64_la_OBJECTS) $(libstdio64_la_DEPENDENCIES)
+	$(LINK)  $(libstdio64_la_LDFLAGS) $(libstdio64_la_OBJECTS) $(libstdio64_la_LIBADD) $(LIBS)
 
 tags: TAGS
 
@@ -327,7 +298,7 @@ maintainer-clean-tags:
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
-subdir = reent
+subdir = stdio64
 
 distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
@@ -434,9 +405,7 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 	touch stmp-def
 
 doc: $(CHEWOUT_FILES)
-	cat $(srcdir)/reent.tex >> $(TARGETDOC)
-
-impure.$(oext): $(srcdir)/impure.c $(srcdir)/../include/sys/reent.h
+	cat $(srcdir)/stdio64.tex >> $(TARGETDOC)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -81,6 +81,8 @@ LIBC_MACHINE_LIB = @LIBC_MACHINE_LIB@
 LIBC_POSIX_LIB = @LIBC_POSIX_LIB@
 LIBC_SIGNAL_DEF = @LIBC_SIGNAL_DEF@
 LIBC_SIGNAL_LIB = @LIBC_SIGNAL_LIB@
+LIBC_STDIO64_DEF = @LIBC_STDIO64_DEF@
+LIBC_STDIO64_LIB = @LIBC_STDIO64_LIB@
 LIBC_SYSCALL_LIB = @LIBC_SYSCALL_LIB@
 LIBC_SYS_LIB = @LIBC_SYS_LIB@
 LIBC_UNIX_LIB = @LIBC_UNIX_LIB@
@@ -113,9 +115,11 @@ AUTOMAKE_OPTIONS = cygnus
 
 @HAVE_UNIX_DIR_TRUE@UNIX_SUBDIR = @HAVE_UNIX_DIR_TRUE@unix
 
+@HAVE_STDIO64_DIR_TRUE@STDIO64_SUBDIR = @HAVE_STDIO64_DIR_TRUE@stdio64
+
 # The order of SUBDIRS is important for the integrated documentation.
 # Do not change the order without considering the doc impact.
-SUBDIRS = argz stdlib ctype search stdio string $(SIGNAL_SUBDIR) time locale sys reent \
+SUBDIRS = argz stdlib ctype search stdio $(STDIO64_SUBDIR) string $(SIGNAL_SUBDIR) time locale sys reent \
 	$(extra_dir) errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) .
 
 
@@ -128,6 +132,7 @@ noinst_DATA = $(CRT0)
 @USE_LIBTOOL_TRUE@	ctype/libctype.$(aext) \
 @USE_LIBTOOL_TRUE@	search/libsearch.$(aext) \
 @USE_LIBTOOL_TRUE@	stdio/libstdio.$(aext) \
+@USE_LIBTOOL_TRUE@	$(LIBC_STDIO64_LIB) \
 @USE_LIBTOOL_TRUE@	string/libstring.$(aext) \
 @USE_LIBTOOL_TRUE@	$(LIBC_SIGNAL_LIB) \
 @USE_LIBTOOL_TRUE@	time/libtime.$(aext) \
@@ -147,6 +152,7 @@ noinst_DATA = $(CRT0)
 @USE_LIBTOOL_FALSE@	ctype/lib.$(aext) \
 @USE_LIBTOOL_FALSE@	search/lib.$(aext) \
 @USE_LIBTOOL_FALSE@	stdio/lib.$(aext) \
+@USE_LIBTOOL_FALSE@	$(LIBC_STDIO64_LIB) \
 @USE_LIBTOOL_FALSE@	string/lib.$(aext) \
 @USE_LIBTOOL_FALSE@	$(LIBC_SIGNAL_LIB) \
 @USE_LIBTOOL_FALSE@	time/lib.$(aext) \
@@ -177,6 +183,7 @@ SUBDEFS = \
 	stdlib/stmp-def \
 	ctype/stmp-def \
 	stdio/stmp-def \
+	$(LIBC_STDIO64_DEF) \
 	string/stmp-def \
 	$(LIBC_SIGNAL_DEF) \
 	time/stmp-def \
@@ -187,7 +194,8 @@ SUBDEFS = \
 
 
 CLEANFILES = $(CRT0) \
-	sigset.texi stmp-sigset tmp.texi targetdep.tex stmp-targetdep
+	sigset.texi stmp-sigset extra.texi stmp-extra \
+	stdio64.texi stmp-stdio64 tmp.texi targetdep.tex stmp-targetdep
 
 
 ACLOCAL_AMFLAGS = -I ..
@@ -232,8 +240,9 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DIST_SUBDIRS =  argz stdlib ctype search stdio string signal time locale \
-sys reent @extra_dir@ errno misc machine unix posix syscalls .
+DIST_SUBDIRS =  argz stdlib ctype search stdio stdio64 string signal \
+time locale sys reent @extra_dir@ errno misc machine unix posix \
+syscalls .
 SOURCES = libc.a.c $(libc_la_SOURCES)
 OBJECTS = libc.a.$(OBJEXT) $(libc_la_OBJECTS)
 
@@ -693,7 +702,7 @@ crt0.o: sys/crt0.o
 
 sys/crt0.o: ; @true
 
-libc.info: sigset.texi extra.texi targetdep.tex $(SUBDEFS)
+libc.info: sigset.texi extra.texi stdio64.texi targetdep.tex $(SUBDEFS)
 
 stmp-sigset: config.status
 	if test -n "$(LIBC_SIGNAL_LIB)"; then \
@@ -716,6 +725,17 @@ stmp-extra: config.status
 	touch $@
 
 extra.texi: stmp-extra ; @true
+
+stmp-stdio64: config.status
+	if test -n "$(LIBC_STDIO64_LIB)"; then \
+	  echo "@set STDIO64" >tmp.texi; \
+	else \
+	  echo "@clear STDIO64" >tmp.texi; \
+	fi
+	$(SHELL) $(newlib_basedir)/../move-if-change tmp.texi stdio64.texi
+	touch $@
+
+stdio64.texi: stmp-stdio64 ; @true
 
 stmp-targetdep: force
 	rm -f tmp.texi

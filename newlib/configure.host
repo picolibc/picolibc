@@ -30,6 +30,7 @@
 #   have_sys_mach_dir	Is there a machine subdirectory in sys subdirectory
 #   posix_dir		"posix" to build libc/posix, "" otherwise
 #   signal_dir		"signal" to build libc/signal, "" otherwise
+#   stdio64_dir         "stdio64" to build libc/stdio64, "" otherwise
 #   syscall_dir		"syscalls" to build libc/syscalls, "" otherwise
 #   unix_dir		"unix" to build libc/unix, "" otherwise
 #   use_libtool         flag: use libtool to build newlib?
@@ -44,6 +45,7 @@ machine_dir=
 sys_dir=
 posix_dir=
 signal_dir=signal
+stdio64_dir=
 syscall_dir=
 unix_dir=
 mach_add_setjmp=
@@ -238,6 +240,7 @@ case "${host}" in
   i[3456]86-pc-linux-*)
     use_libtool=yes
     have_sys_mach_dir=yes
+    stdio64_dir=stdio64
     oext=lo
     aext=la ;;
   *) ;; #shared library not supported for ${host}

@@ -152,11 +152,17 @@ into another language, under the above conditions for modified versions.
 @c switch to set SIGNALS on or off, according to whether config picks up
 @c signal subdirectory:
 @include sigset.texi
+@include extra.texi
+@include stdio64.texi
 
 @menu
 * Stdlib::
 * Ctype::
 * Stdio::
+@ifset STDIO64
+* Stdio64::
+@end ifset
+
 * Strings::
 @ifset SIGNALS
 * Signals::

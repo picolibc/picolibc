@@ -18,9 +18,13 @@ if HAVE_UNIX_DIR
 UNIX_SUBDIR = unix
 endif
 
+if HAVE_STDIO64_DIR
+STDIO64_SUBDIR = stdio64
+endif
+
 # The order of SUBDIRS is important for the integrated documentation.
 # Do not change the order without considering the doc impact.
-SUBDIRS = argz stdlib ctype search stdio string $(SIGNAL_SUBDIR) time locale sys reent \
+SUBDIRS = argz stdlib ctype search stdio $(STDIO64_SUBDIR) string $(SIGNAL_SUBDIR) time locale sys reent \
 	$(extra_dir) errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) .
 
 noinst_DATA = $(CRT0)
@@ -33,6 +37,7 @@ SUBLIBS = \
 	ctype/libctype.$(aext) \
 	search/libsearch.$(aext) \
 	stdio/libstdio.$(aext) \
+	$(LIBC_STDIO64_LIB) \
 	string/libstring.$(aext) \
 	$(LIBC_SIGNAL_LIB) \
 	time/libtime.$(aext) \
@@ -54,6 +59,7 @@ SUBLIBS = \
 	ctype/lib.$(aext) \
 	search/lib.$(aext) \
 	stdio/lib.$(aext) \
+	$(LIBC_STDIO64_LIB) \
 	string/lib.$(aext) \
 	$(LIBC_SIGNAL_LIB) \
 	time/lib.$(aext) \
@@ -106,6 +112,7 @@ SUBDEFS = \
 	stdlib/stmp-def \
 	ctype/stmp-def \
 	stdio/stmp-def \
+	$(LIBC_STDIO64_DEF) \
 	string/stmp-def \
 	$(LIBC_SIGNAL_DEF) \
 	time/stmp-def \
@@ -114,7 +121,7 @@ SUBDEFS = \
 	$(LIBC_EXTRA_DEF) \
 	misc/stmp-def
 
-libc.info: sigset.texi extra.texi targetdep.tex $(SUBDEFS)
+libc.info: sigset.texi extra.texi stdio64.texi targetdep.tex $(SUBDEFS)
 
 stmp-sigset: config.status
 	if test -n "$(LIBC_SIGNAL_LIB)"; then \
@@ -138,6 +145,17 @@ stmp-extra: config.status
 
 extra.texi: stmp-extra ; @true
 
+stmp-stdio64: config.status
+	if test -n "$(LIBC_STDIO64_LIB)"; then \
+	  echo "@set STDIO64" >tmp.texi; \
+	else \
+	  echo "@clear STDIO64" >tmp.texi; \
+	fi
+	$(SHELL) $(newlib_basedir)/../move-if-change tmp.texi stdio64.texi
+	touch $@
+
+stdio64.texi: stmp-stdio64 ; @true
+
 stmp-targetdep: force
 	rm -f tmp.texi
 	targetdoc=`pwd`/tmp.texi; \
@@ -158,7 +176,8 @@ $(SUBDEFS): stmp-targetdep ; @true
 force:
 
 CLEANFILES = $(CRT0) \
-	sigset.texi stmp-sigset tmp.texi targetdep.tex stmp-targetdep
+	sigset.texi stmp-sigset extra.texi stmp-extra \
+	stdio64.texi stmp-stdio64 tmp.texi targetdep.tex stmp-targetdep
 
 ACLOCAL_AMFLAGS = -I ..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

@@ -2961,6 +2961,28 @@ else
   HAVE_SIGNAL_DIR_FALSE=
 fi
 
+LIBC_STDIO64_LIB=
+LIBC_STDIO64_DEF=
+if test -n "${stdio64_dir}"; then
+  if test "${use_libtool}" = "yes"; then
+    LIBC_STDIO64_LIB=${stdio64_dir}/lib${stdio64_dir}.${aext}
+  else
+    LIBC_STDIO64_LIB=${stdio64_dir}/lib.${aext}
+  fi
+  LIBC_STDIO64_DEF=${stdio64_dir}/stmp-def
+fi
+
+
+
+
+if test x${stdio64_dir} != x; then
+  HAVE_STDIO64_DIR_TRUE=
+  HAVE_STDIO64_DIR_FALSE='#'
+else
+  HAVE_STDIO64_DIR_TRUE='#'
+  HAVE_STDIO64_DIR_FALSE=
+fi
+
 LIBC_SYSCALL_LIB=
 if test -n "${syscall_dir}"; then
   if test "${use_libtool}" = "yes"; then
@@ -3143,7 +3165,7 @@ done
 ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
-trap 'rm -fr `echo "Makefile argz/Makefile ctype/Makefile errno/Makefile locale/Makefile misc/Makefile reent/Makefile search/Makefile stdio/Makefile stdlib/Makefile string/Makefile time/Makefile posix/Makefile signal/Makefile syscalls/Makefile unix/Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
+trap 'rm -fr `echo "Makefile argz/Makefile ctype/Makefile errno/Makefile locale/Makefile misc/Makefile reent/Makefile search/Makefile stdio/Makefile stdio64/Makefile stdlib/Makefile string/Makefile time/Makefile posix/Makefile signal/Makefile syscalls/Makefile unix/Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
@@ -3233,6 +3255,10 @@ s%@LIBC_SIGNAL_LIB@%$LIBC_SIGNAL_LIB%g
 s%@LIBC_SIGNAL_DEF@%$LIBC_SIGNAL_DEF%g
 s%@HAVE_SIGNAL_DIR_TRUE@%$HAVE_SIGNAL_DIR_TRUE%g
 s%@HAVE_SIGNAL_DIR_FALSE@%$HAVE_SIGNAL_DIR_FALSE%g
+s%@LIBC_STDIO64_LIB@%$LIBC_STDIO64_LIB%g
+s%@LIBC_STDIO64_DEF@%$LIBC_STDIO64_DEF%g
+s%@HAVE_STDIO64_DIR_TRUE@%$HAVE_STDIO64_DIR_TRUE%g
+s%@HAVE_STDIO64_DIR_FALSE@%$HAVE_STDIO64_DIR_FALSE%g
 s%@LIBC_SYSCALL_LIB@%$LIBC_SYSCALL_LIB%g
 s%@HAVE_SYSCALL_DIR_TRUE@%$HAVE_SYSCALL_DIR_TRUE%g
 s%@HAVE_SYSCALL_DIR_FALSE@%$HAVE_SYSCALL_DIR_FALSE%g
@@ -3285,7 +3311,7 @@ EOF
 
 cat >> $CONFIG_STATUS <<EOF
 
-CONFIG_FILES=\${CONFIG_FILES-"Makefile argz/Makefile ctype/Makefile errno/Makefile locale/Makefile misc/Makefile reent/Makefile search/Makefile stdio/Makefile stdlib/Makefile string/Makefile time/Makefile posix/Makefile signal/Makefile syscalls/Makefile unix/Makefile"}
+CONFIG_FILES=\${CONFIG_FILES-"Makefile argz/Makefile ctype/Makefile errno/Makefile locale/Makefile misc/Makefile reent/Makefile search/Makefile stdio/Makefile stdio64/Makefile stdlib/Makefile string/Makefile time/Makefile posix/Makefile signal/Makefile syscalls/Makefile unix/Makefile"}
 EOF
 cat >> $CONFIG_STATUS <<\EOF
 for ac_file in .. $CONFIG_FILES; do if test "x$ac_file" != x..; then

@@ -1,3 +1,53 @@
+2002-07-17  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.host(stdio64_dir): New setting that is used to
+	enable building of new stdio64 directory.
+	* libc/Makefile.am[HAVE_STDIO64_DIR]: Add support for
+	large files.
+	(stmp-stdio64,stdio64.texi): New targets to optionally add in
+	stdio64 info to info files.
+	* libc/Makefile.in: Regenerated.
+	* libc/configure: Ditto.
+	* libc/configure.in: Add configuration variables that are set
+	when stdio64 is selected as subdir in configure.host.
+	* libc/libc.texinfo: Add optional menu item for Stdio64, based
+	on whether STDIO64 flag is set or not.
+	* libc/sys.tex: Add optional stdio64 syscalls based on whether
+	STDIO64 flag is set or not.
+	* libc/include/reent.h[__LARGE64_FILES]: Add new stdio64
+	_r sycall routines.
+	* libc/include/stdio.h[__LARGE64_FILES]: Add new stdio64 prototypes.
+	(FILE): Typedef'd to __FILE instead of struct __sFILE directly.
+	(__SL64): New file flag indicating file is opened via fopen64.
+	* libc/include/sys/_types.h(_off64_t): Added.
+	* libc/include/sys/config.h: For x86-linux, define __LARGE64_FILES.
+	* libc/include/sys/reent.h(struct __sFILE64): New file structure
+	for 64-bit offset large file support.
+	(__FILE): New intermediate type either set to struct __sFILE64 or
+	struct __sFILE, depending on whether __LARGE64_FILES is set or not.
+	* libc/reent/Makefile.am[HAVE_STDIO64_DIR]: Add new files.
+	* libc/reent/Makefile.in: Regenerated.
+	* libc/reent/fstat64r.c: New file.
+	* libc/reent/lseek64r.c: Ditto.
+	* libc/reent/open64r.c: Ditto.
+	* libc/reent/reent.tex: Optionally add stdio64 reentrant syscalls
+	based on whether STDIO64 flag is set. 
+	* libc/stdio/stdio.tex: Add blank line.
+	* libc/stdio64/Makefile.am: New file.
+	* libc/stdio64/Makefile.in: Ditto.
+	* libc/stdio64/fgetpos64.c: Ditto.
+	* libc/stdio64/fopen64.: Ditto.
+	* libc/stdio64/freopen64.c: Ditto.
+	* libc/stdio64/fseeko64.c: Ditto.
+	* libc/stdio64/fsetpos64.c: Ditto.
+	* libc/stdio64/ftello64.c: Ditto.
+	* libc/stdio64/local64.h: Ditto.
+	* libc/stdio64/stdio64.c: Ditto.
+	* libc/stdio64/stdio64.tex: Ditto.
+	* libc/stdio64/tmpfile64.c: Ditto.
+	* libc/sys/linux/io64.c: Add weak aliases for lseek64, fstat64, and
+	open64.
+
 2002-07-16  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/Makefile.am (stmp-extra): New target to set makeinfo flag

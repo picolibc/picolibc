@@ -27,6 +27,7 @@ loff_t __libc_lseek64(int fd, loff_t offset, int whence)
   return pos;
 }
 weak_alias(__libc_lseek64,lseek64);
+weak_alias(__libc_lseek64,_lseek64);
 
 int __libc_open64(const char *path, int oflag, ...)
 {
@@ -41,6 +42,8 @@ int __libc_open64(const char *path, int oflag, ...)
    return __libc_open(path, oflag | O_LARGEFILE, mode);
 }
 weak_alias(__libc_open64,open64);
+weak_alias(__libc_open64,_open64);
 weak_alias(__libc_open64,__open64);
+weak_alias(__libc_fstat64,_fstat64);
 
 

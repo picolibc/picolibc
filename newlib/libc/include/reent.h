@@ -81,6 +81,14 @@ extern _ssize_t _write_r _PARAMS ((struct _reent *, int, const void *, size_t));
 /* This one is not guaranteed to be available on all targets.  */
 extern int _gettimeofday_r _PARAMS ((struct _reent *, struct timeval *tp, struct timezone *tzp));
 
+#ifdef __LARGE64_FILES
+struct stat64;
+
+extern _off64_t _lseek64_r _PARAMS ((struct _reent *, int, _off64_t, int));
+extern int _fstat64_r _PARAMS ((struct _reent *, int, struct stat64 *));
+extern int _open64_r _PARAMS ((struct _reent *, const char *, int, int));
+#endif
+
 #ifdef __cplusplus
 }
 #endif

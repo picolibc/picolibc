@@ -37,7 +37,7 @@
 #include <stdarg.h>
 
 /*
- * <sys/reent.h> defines __sFILE, _fpos_t.
+ * <sys/reent.h> defines __FILE, _fpos_t.
  * They must be defined there because struct _reent needs them (and we don't
  * want reent.h to include this file.
  */
@@ -48,7 +48,11 @@
 _BEGIN_STD_C
 
 typedef _fpos_t fpos_t;
-typedef struct __sFILE FILE;
+typedef __FILE FILE;
+
+#ifdef __LARGE64_FILES
+typedef _fpos64_t fpos64_t;
+#endif
 
 #include <sys/stdio.h>
 
@@ -68,8 +72,9 @@ typedef struct __sFILE FILE;
 #define	__SOFF	0x1000		/* set iff _offset is in fact correct */
 #define	__SMOD	0x2000		/* true => fgetline modified _p text */
 #if defined(__CYGWIN__) || defined(__CYGWIN__)
-#define __SCLE        0x4000          /* convert line endings CR/LF <-> NL */
+#  define __SCLE  0x4000        /* convert line endings CR/LF <-> NL */
 #endif
+#define	__SL64	0x8000		/* is 64-bit offset large file */
 
 /*
  * The following three definitions are for ANSI C, which took them
@@ -279,6 +284,22 @@ int	_EXFUN(_vsscanf_r, (struct _reent *, const char *, const char *, __VALIST));
 ssize_t _EXFUN(__getdelim, (char **, size_t *, int, FILE *));
 ssize_t _EXFUN(__getline, (char **, size_t *, FILE *));
 
+#ifdef __LARGE64_FILES
+FILE *  _EXFUN(fopen64, (const char *, const char *));
+_off64_t _EXFUN(ftello64, (FILE *));
+_off64_t _EXFUN(fseeko64, (FILE *, _off64_t, int));
+int     _EXFUN(fgetpos64, (FILE *, _fpos64_t *));
+int     _EXFUN(fsetpos64, (FILE *, const _fpos64_t *));
+FILE *  _EXFUN(tmpfile64, (void));
+
+FILE *  _EXFUN(_fopen64_r, (struct _reent *,const char *, const char *));
+_off64_t _EXFUN(_ftello64_r, (struct _reent *, FILE *));
+_off64_t _EXFUN(_fseeko64_r, (struct _reent *, FILE *, _off64_t, int));
+int     _EXFUN(_fgetpos64_r, (struct _reent *, FILE *, _fpos64_t *));
+int     _EXFUN(_fsetpos64_r, (struct _reent *, FILE *, const _fpos64_t *));
+FILE *  _EXFUN(_tmpfile64_r, (struct _reent *));
+#endif /* __LARGE64_FILES */
+ 
 /*
  * Routines internal to the implementation.
  */

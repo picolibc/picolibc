@@ -48,6 +48,7 @@
 #define HAVE_GETDATE
 #define _HAVE_SYSTYPES
 #define _READ_WRITE_RETURN_TYPE _ssize_t
+#define __LARGE64_FILES 1
 #endif
 #endif
 
