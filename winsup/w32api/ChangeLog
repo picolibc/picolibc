@@ -1,3 +1,20 @@
+2002-01-24  Phillip Susi  <psusi@cfl.rr.com> 
+
+	* include/commctrl.h: Add missing HDM_*,HDN_*,LVSICF_* defines.
+
+2002-01-24  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/commctrl.h (HDITEM[AW]): Rename _HD_ITEM[AW] to
+	_HDITEM[AW], with parallel changes to typedefs.	Use defines for
+	backward compatability with old names. Update UNICODE mappings.
+	(HDLAYOUT): Remove struct _HD_LAYOUT_XP.  Use new typedefs
+	for struct _HD_LAYOUT and add defines for backward
+	compatability with old names.
+	(NMLISTVIEW): Rename _NM_LISTVIEW to tagNMLISTVIEW, with
+	parallel chages to typedefs. Add defines for backward
+	compatability with old names.
+	(TCHITTESTINFO, IMAGELISTDRAWPARAMS): Fix _WIN32_IE guard.
+
 2002-01-21  Robert Collins  <rbtcollins@hotmail.com>
 
 	* include/winnt.h: Add missing MEM_ defines, and convert existing to 

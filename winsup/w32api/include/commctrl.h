@@ -179,6 +179,7 @@ extern "C" {
 #define HDM_LAYOUT	(HDM_FIRST+5)
 #if (_WIN32_IE >= 0x0300)
 #define HDM_GETITEMRECT (HDM_FIRST+7)
+#define HDM_GETORDERARRAY	(HDM_FIRST+17)
 #define HDM_SETORDERARRAY	(HDM_FIRST+18)
 #endif
 #define HHT_NOWHERE	1
@@ -206,6 +207,10 @@ extern "C" {
 #define HDN_ENDTRACKW	(HDN_FIRST-27)
 #define HDN_TRACKA	(HDN_FIRST-8)
 #define HDN_TRACKW	(HDN_FIRST-28)
+#if _WIN32_IE >= 0x0300
+#define HDN_ENDDRAG	(HDN_FIRST-11)
+#define HDN_BEGINDRAG	(HDN_FIRST-10)
+#endif
 #define CMB_MASKED 2
 #define TBSTATE_CHECKED	1
 #define TBSTATE_PRESSED	2
@@ -550,6 +555,8 @@ extern "C" {
 #define LVS_EX_SUBITEMIMAGES 2
 #define LVS_EX_TRACKSELECT 8
 #define LVS_EX_TWOCLICKACTIVATE 128
+#define LVSICF_NOINVALIDATEALL	0x00000001
+#define LVSICF_NOSCROLL	0x00000002
 #endif
 #define LVSIL_NORMAL	0
 #define LVSIL_SMALL	1
@@ -1206,7 +1213,7 @@ typedef struct _IMAGEINFO {
 	RECT rcImage;
 } IMAGEINFO;
 DECLARE_HANDLE(HIMAGELIST);
-typedef struct _HD_ITEMA {
+typedef struct _HDITEMA {
 	UINT mask;
 	int cxy;
 	LPSTR pszText;
@@ -1222,8 +1229,8 @@ typedef struct _HD_ITEMA {
 	UINT type;
 	LPVOID pvFilter;
 #endif
-} HD_ITEMA;
-typedef struct _HD_ITEMW {
+} HDITEMA, * LPHDITEMA;
+typedef struct _HDITEMW {
 	UINT mask;
 	int cxy;
 	LPWSTR pszText;
@@ -1239,32 +1246,16 @@ typedef struct _HD_ITEMW {
 	UINT type;
 	LPVOID pvFilter;
 #endif
-} HD_ITEMW;
-typedef struct _HDITEM {
-	UINT    mask; 
-        int     cxy; 
-	LPTSTR  pszText; 
-	HBITMAP hbm; 
-	int     cchTextMax; 
-	int     fmt; 
-	LPARAM  lParam; 
-#if (_WIN32_IE >= 0x0300)
-	int     iImage;
-	int     iOrder;
-#endif
-#if (_WIN32_IE >= 0x0500)
-	UINT    type;
-	LPVOID  pvFilter;
-#endif
-} HDITEM, FAR * LPHDITEM;
+} HDITEMW, * LPHDITEMW;
+/* for backward compatability */
+#define HD_ITEMA HDITEMA
+#define HD_ITEMW HDITEMW
+#define HD_ITEM HDITEM
 typedef struct _HD_LAYOUT {
 	RECT *prc;
 	WINDOWPOS *pwpos;
-} HD_LAYOUT;
-typedef struct _HD_LAYOUT_XP {
-      RECT FAR*      prc;  
-      WINDOWPOS FAR* pwpos; 
-} HDLAYOUT, FAR *LPHDLAYOUT; 
+} HDLAYOUT, *LPHDLAYOUT;
+#define HD_LAYOUT HDLAYOUT /*  backward compatability */
 typedef struct _HD_HITTESTINFO {
 	POINT pt;
 	UINT flags;
@@ -1503,7 +1494,7 @@ typedef struct _LVCOLUMNW {
 #define _LV_COLUMNW _LVCOLUMNW
 #define LV_COLUMNW LVCOLUMNW
 typedef int(CALLBACK *PFNLVCOMPARE)(LPARAM,LPARAM,LPARAM);
-typedef struct _NM_LISTVIEW {
+typedef struct tagNMLISTVIEW {
 	NMHDR hdr;
 	int iItem;
 	int iSubItem;
@@ -1512,7 +1503,11 @@ typedef struct _NM_LISTVIEW {
 	UINT uChanged;
 	POINT ptAction;
 	LPARAM lParam;
-} NM_LISTVIEW,*LPNM_LISTVIEW;
+} NMLISTVIEW, *LPNMLISTVIEW;
+/* for backward compatability */
+#define _NM_LISTVIEW  tagNMLISTVIEW
+#define NM_LISTVIEW NMLISTVIEW
+#define LPNM_LISTVIEW LPNMLISTVIEW
 typedef struct tagNMLVDISPINFOA {
 	NMHDR hdr;
 	LV_ITEMA item;
@@ -1796,7 +1791,8 @@ typedef struct tagIMAGELISTDRAWPARAMS {
 	UINT fStyle;
 	DWORD dwRop;
 } IMAGELISTDRAWPARAMS,*LPIMAGELISTDRAWPARAMS;
-#elif (_WIN32_IE >= 0x0400)
+#endif /* (_WIN32_IE >= 0x0300) */
+#if (_WIN32_IE >= 0x0400)
 typedef struct tagNMREBARCHILDSIZE {
 	NMHDR hdr;
 	UINT uBand;
@@ -2117,7 +2113,7 @@ WINBOOL WINAPI ImageList_DrawIndirect(IMAGELISTDRAWPARAMS*);
 #define WC_LISTVIEW WC_LISTVIEWW
 #define WC_TABCONTROL WC_TABCONTROLW
 #define WC_TREEVIEW WC_TREEVIEWW
-typedef HD_ITEMW HD_ITEM;
+typedef HDITEMW HDITEM;
 typedef TOOLINFOW TOOLINFO,*PTOOLINFO,*LPTOOLINFO;
 typedef TTHITTESTINFOW TTHITTESTINFO,*LPHITTESTINFO;
 typedef TOOLTIPTEXTW TOOLTIPTEXT,*LPTOOLTIPTEXT;
@@ -2255,7 +2251,7 @@ typedef REBARBANDINFOW REBARBANDINFO,*LPREBARBANDINFO;
 #define WC_LISTVIEW WC_LISTVIEWA
 #define WC_TABCONTROL WC_TABCONTROLA
 #define WC_TREEVIEW WC_TREEVIEWA
-typedef HD_ITEMA HD_ITEM;
+typedef HDITEMA HDITEM;
 typedef TOOLINFOA TOOLINFO,*PTOOLINFO,*LPTOOLINFO;
 typedef TTHITTESTINFOA TTHITTESTINFO,*LPHITTESTINFO;
 typedef TOOLTIPTEXTA TOOLTIPTEXT,*LPTOOLTIPTEXT;
