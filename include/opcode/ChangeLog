@@ -1,3 +1,11 @@
+2004-04-22  Peter Barada <peter@the-baradas.com>
+
+	* m68k.h: Add mcfmac/mcfemac definitions.  Update operand
+	descriptions for new EMAC cases.
+	Remove ColdFire macmw/macml/msacmw/msacmw hacks and properly
+	handle Motorola MAC syntax.
+	Allow disassembly of ColdFire V4e object files.
+
 2004-03-16  Alan Modra  <amodra@bigpond.net.au>
 
 	* ppc.h (PPC_OPERAND_GPR_0): Define.  Bump other operand defines.

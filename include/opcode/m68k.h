@@ -1,6 +1,6 @@
 /* Opcode table header for m680[01234]0/m6888[12]/m68851.
    Copyright 1989, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1999, 2001,
-   2003 Free Software Foundation, Inc.
+   2003, 2004 Free Software Foundation, Inc.
 
    This file is part of GDB, GAS, and the GNU binutils.
 
@@ -42,6 +42,8 @@
 #define mcf5407  0x1000
 #define mcfv4e   0x2000
 #define mcf528x  0x4000
+#define mcfmac   0x8000
+#define mcfemac  0x10000
 
  /* Handy aliases.  */
 #define	m68040up   (m68040 | m68060)
@@ -99,7 +101,7 @@ struct m68k_opcode_alias
    operand; the second, the place it is stored.  */
 
 /* Kinds of operands:
-   Characters used: AaBbCcDdEFfGHIJkLlMmnOopQqRrSsTtU VvWwXxYyZz0123|*~%;@!&$?/<>#^+-
+   Characters used: AaBbCcDdEeFfGgHIiJkLlMmnOopQqRrSsTtU VvWwXxYyZz01234|*~%;@!&$?/<>#^+-
 
    D  data register only.  Stored as 3 bits.
    A  address register only.  Stored as 3 bits.
@@ -133,9 +135,12 @@ struct m68k_opcode_alias
    C  the CCR.  No need to store it; this is just for filtering validity.
    S  the SR.  No need to store, just as with CCR.
    U  the USP.  No need to store, just as with CCR.
-   E  the ACC.  No need to store, just as with CCR.
-   G  the MACSR.  No need to store, just as with CCR.
+   E  the MAC ACC.  No need to store, just as with CCR.
+   e  the EMAC ACC[0123].
+   G  the MAC/EMAC MACSR.  No need to store, just as with CCR.
+   g  the EMAC ACCEXT{01,23}.
    H  the MASK.  No need to store, just as with CCR.
+   i  the MAC/EMAC scale factor.
 
    I  Coprocessor ID.   Not printed if 1.   The Coprocessor ID is always
       extracted from the 'd' field of word one, which means that an extended
@@ -230,7 +235,9 @@ struct m68k_opcode_alias
    w                                            (modes 2-5,7.2)
    y						(modes 2,5)
    z						(modes 2,5,7.2)
-   x  mov3q immediate operand.  */
+   x  mov3q immediate operand.
+   4						(modes 2,3,4,5)
+  */
 
 /* For the 68851:  */
 /* I didn't use much imagination in choosing the
@@ -283,7 +290,7 @@ struct m68k_opcode_alias
 */
 
 /* Places to put an operand, for non-general operands:
-   Characters used: BbCcDdghijkLlMmNnostWw123456789
+   Characters used: BbCcDdFfGgHhIijkLlMmNnostWw123456789/
 
    s  source, low bits of first word.
    d  dest, shifted 9 in first word
@@ -348,6 +355,13 @@ struct m68k_opcode_alias
    F  double precision float, low bit of 1st word, immediate uses 8 bytes
    x  extended precision float, low bit of 1st word, immediate uses 12 bytes
    p  packed float, low bit of 1st word, immediate uses 12 bytes
+   G  EMAC accumulator, load  (bit 4 2nd word, !bit8 first word)
+   H  EMAC accumulator, non load  (bit 4 2nd word, bit 8 first word)
+   F  EMAC ACCx
+   f  EMAC ACCy
+   I  MAC/EMAC scale factor
+   /  Like 's', but set 2nd word, bit 5 if trailing_ampersand set
+   ]  first word, bit 10
 */
 
 extern const struct m68k_opcode m68k_opcodes[];
