@@ -1,3 +1,7 @@
+2004-10-04  Christopher Faylor  <cgf@timesys.com>
+
+	* include/cygwin/signal.h: Add siginterrupt definition.
+
 2004-10-02  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* path.h (enum path_types): Delete PATH_ISDISK.

@@ -207,7 +207,8 @@ struct sigaction
 int sigwait (const sigset_t *, int *);
 int sigwaitinfo (const sigset_t *, siginfo_t *);
 int sighold (int);
-int sigqueue(pid_t, int, const union sigval);
+int sigqueue(pid_t, int, const union);
+int siginterrupt (int, int);
 #ifdef __cplusplus
 }
 #endif
