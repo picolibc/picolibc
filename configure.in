@@ -151,8 +151,7 @@ target_libraries="target-libiberty \
 		target-libstdc++-v3 \
 		target-libf2c \
 		${libgcj} \
-		target-libobjc \
-		target-libada"
+		target-libobjc"
 
 # these tools are built using the target libraries, and are intended to
 # run only in the target environment
@@ -278,26 +277,26 @@ case "${host}" in
     noconfigdirs="$noconfigdirs byacc"
     ;;
   i[[3456789]]86-*-vsta)
-    noconfigdirs="$noconfigdirs tcl expect dejagnu make texinfo bison patch flex byacc send-pr gprof uudecode dejagnu diff guile perl itcl tix gnuserv gettext"
+    noconfigdirs="tcl expect dejagnu make texinfo bison patch flex byacc send-pr gprof uudecode dejagnu diff guile perl itcl tix gnuserv gettext"
     ;;
   i[[3456789]]86-*-go32* | i[[3456789]]86-*-msdosdjgpp*)
-    noconfigdirs="$noconfigdirs tcl tk expect dejagnu send-pr uudecode guile itcl tix gnuserv libffi"
+    noconfigdirs="tcl tk expect dejagnu send-pr uudecode guile itcl tix gnuserv libffi"
     ;;
   i[[3456789]]86-*-mingw32*)
     # noconfigdirs="tcl tk expect dejagnu make texinfo bison patch flex byacc send-pr uudecode dejagnu diff guile perl itcl tix gnuserv"
-    noconfigdirs="$noconfigdirs expect dejagnu autoconf automake send-pr rcs guile perl texinfo libtool"
+    noconfigdirs="expect dejagnu autoconf automake send-pr rcs guile perl texinfo libtool"
     ;;
   i[[3456789]]86-*-beos*)
     noconfigdirs="$noconfigdirs tk itcl tix libgui gdb"
     ;;
   *-*-cygwin*)
-    noconfigdirs="$noconfigdirs autoconf automake send-pr rcs guile perl"
+    noconfigdirs="autoconf automake send-pr rcs guile perl"
     ;;
   *-*-netbsd*)
-    noconfigdirs="$noconfigdirs rcs"
+    noconfigdirs="rcs"
     ;;
   ppc*-*-pe)
-    noconfigdirs="$noconfigdirs patch diff make tk tcl expect dejagnu autoconf automake texinfo bison send-pr gprof rcs guile perl itcl tix gnuserv"
+    noconfigdirs="patch diff make tk tcl expect dejagnu autoconf automake texinfo bison send-pr gprof rcs guile perl itcl tix gnuserv"
     ;;
   powerpc-*-beos*)
     noconfigdirs="$noconfigdirs tk itcl tix libgui gdb dejagnu readline"
@@ -306,14 +305,6 @@ case "${host}" in
     noconfigdirs="$noconfigdirs tk itcl tix libgui"
     ;;
 esac
-
-AC_ARG_ENABLE(libada,
-[  --enable-libada        Builds libada directory],
-ENABLE_LIBADA=$enableval,
-ENABLE_LIBADA=yes)
-if test "${ENABLE_LIBADA}" != "yes" ; then
-  noconfigdirs="$noconfigdirs target-libada"
-fi
 
 # Save it here so that, even in case of --enable-libgcj, if the Java
 # front-end isn't enabled, we still get libgcj disabled.
@@ -612,7 +603,7 @@ case "${target}" in
     ;;
   powerpc-*-aix*)
     # copied from rs6000-*-* entry
-    noconfigdirs="$noconfigdirs gprof target-libada target-libgloss ${libgcj}"
+    noconfigdirs="$noconfigdirs gprof target-libgloss ${libgcj}"
     ;;
   powerpc*-*-winnt* | powerpc*-*-pe* | ppc*-*-pe)
     target_configdirs="$target_configdirs target-winsup"
@@ -634,7 +625,7 @@ case "${target}" in
     noconfigdirs="$noconfigdirs target-newlib gprof ${libgcj}"
     ;;
   rs6000-*-aix*)
-    noconfigdirs="$noconfigdirs gprof target-libada target-libgloss ${libgcj}"
+    noconfigdirs="$noconfigdirs gprof ${libgcj}"
     ;;
   rs6000-*-*)
     noconfigdirs="$noconfigdirs gprof ${libgcj}"
