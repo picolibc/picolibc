@@ -6,7 +6,7 @@ How do signals work?
 
 On process startup, cygwin starts a secondary thread which deals with
 signals.  This thread contains a loop which blocks waiting for
-information to show up on a pipe whose handle (sendsig) is currently
+information to arrive on a pipe whose handle (sendsig) is currently
 stored in _pinfo (this may change).
 
 Communication on the sendsig pipe is via the 'sigpacket' structure.
