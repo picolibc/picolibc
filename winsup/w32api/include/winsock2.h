@@ -265,7 +265,7 @@ typedef WSADATA *LPWSADATA;
 #define SO_RCVTIMEO	0x1006
 #define SO_ERROR	0x1007
 #define SO_TYPE	0x1008
-#endif ./* ! (__INSIDE_CYGWIN__ || __INSIDE_MSYS__) */
+#endif /* ! (__INSIDE_CYGWIN__ || __INSIDE_MSYS__) */
 
 #define INVALID_SOCKET (SOCKET)(~0)
 #define SOCKET_ERROR	(-1)

@@ -1,3 +1,7 @@
+Thu Aug 30 09:35:51 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* include/winsock2.h: Remove "extra token" after #endif.
+
 2001-08-31  Earnie Boyd  <earnie@SF.Net>
 
 	* config.guess: Remove the \r from the end of line.
