@@ -1,3 +1,11 @@
+2002-08-28  Michael Hayes <m.hayes@elec.canterbury.ac.nz>
+
+	* coff/internal.h: Add new relocation types.
+	* coff/ti.h: Add file-header flags for tic4x code.
+	* dis-asm.h: Add standard disassembler for tic4x.
+	* opcode/tic4x.h: New file.
+	* coff/tic4x.h: New file
+
 2002-08-07  H.J. Lu <hjl@gnu.org>
 
 	* bfdlink.h (bfd_link_info): Add allow_undefined_version.

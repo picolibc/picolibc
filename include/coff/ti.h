@@ -118,6 +118,7 @@ struct external_filehdr
 #define	F_RELFLG	(0x0001)
 #define	F_EXEC		(0x0002)
 #define	F_LNNO		(0x0004)
+#define F_VERS          (0x0010) /* TMS320C4x code */
 /* F_LSYMS needs to be redefined in your source file */
 #define	F_LSYMS_TICOFF	(0x0010) /* normal COFF is 0x8 */
 
