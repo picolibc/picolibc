@@ -1,3 +1,10 @@
+2003-08-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* errno.cc (errmap): Map ERROR_INVALID_BLOCK_LENGTH to EIO.
+	* fhandler_raw.cc (fhandler_dev_raw::raw_read): Set more accurate
+	errnos instead of EACCES.
+	(fhandler_dev_raw::raw_write): Ditto.
+
 2003-08-17  Christopher Faylor  <cgf@redhat.com>
 
 	* path.cc (special_name): Accommodate all special names with

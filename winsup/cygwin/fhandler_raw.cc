@@ -202,7 +202,10 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
   ret = writebuf ();
   if (ret)
     {
-      set_errno (is_eom (ret) ? ENOSPC : EACCES);
+      if (is_eom (ret))
+	set_errno (ENOSPC);
+      else
+        __seterrno ();
       goto err;
     }
 
@@ -267,8 +270,7 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
 		{
 		  if (!is_eof (ret) && !is_eom (ret))
 		    {
-		      debug_printf ("return -1, set errno to EACCES");
-		      set_errno (EACCES);
+		      __seterrno ();
 		      goto err;
 		    }
 
@@ -309,8 +311,7 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
     {
       if (!is_eof (ret) && !is_eom (ret))
 	{
-	  debug_printf ("return -1, set errno to EACCES");
-	  set_errno (EACCES);
+	  __seterrno ();
 	  goto err;
 	}
       if (bytes_read)
@@ -442,7 +443,7 @@ fhandler_dev_raw::raw_write (const void *ptr, size_t len)
 	    has_written = 1;
 	  if (!is_eom (ret))
 	    {
-	      set_errno (EACCES);
+	      __seterrno ();
 	      return -1;
 	    }
 	  eom_detected = 1;
