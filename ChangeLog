@@ -1,3 +1,115 @@
+2003-06-26  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in: Rename 'target_libs' to 'target_libraries'.
+	Remove useless reference to 'target_libs'.
+	* configure: Regenerate.
+
+2003-06-23  Keith Seitz  <kseitz@sources.redhat.com>
+
+	* Makefile.tpl: Add maybe-configure-itcl to configure-gdb.
+	* Makefile.in: Regenerate.
+
+2003-06-23  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.def: Introduce flags_to_pass.
+	* Makefile.tpl: Generate BASE_FLAGS_TO_PASS using it.
+	* Makefile.in: Regenerate.
+
+2003-06-23  Hans-Peter Nilsson  <hp@bitrange.com>
+
+	* configure.in (noconfigdirs) <cris-*-*>: Disable target-newlib
+	and target-libgloss.
+	<d30v-*-*, fr30-*-*, i960-*-*, m32r-*-*>: Disable gdb.
+	<h8300*-*-*>: Disable libf2c and ${libgcj}.
+	* configure: Regenerate.
+
+2003-06-17  Benjamin Kosnik  <bkoz@redhat.com>
+
+	* configure.in: Update testsuite_flags to new location.
+	* configure. Regenerate.
+	
+2003-06-18  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl: Remove BUILD_CC stuff.
+	* Makefile.in: Regenerate.
+
+2003-06-14  H.J. Lu <hongjiu.lu@intel.com>
+ 
+	* config.guess: Update to 2003-06-12 version.
+	* config.sub: Update to 2003-06-13 version.
+
+2003-06-12  Thiemo Seufer <seufer@csv.ica.uni-stuttgart.de>
+
+	* MAINTAINERS: Add myself as MIPS co-maintainer.
+
+2003-06-12  H.J. Lu <hongjiu.lu@intel.com>
+ 
+	* config.guess: Update to 2003-06-06 version.
+	* config.sub: Update to 2003-06-06 version.
+
+2003-06-11  Rainer Orth  <ro@TechFak.Uni-Bielefeld.DE>
+
+	* configure.in: Don't pass --with-stabs for mips*-sgi-irix6*o32.
+	* configure. Regenerate.
+
+2003-06-10  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in: Disable serial configure by default.
+	* configure: Regenerate.
+	* Makefile.tpl: Abolish .NOTPARALLEL.
+	* Makefile.in: Regenerate.
+
+	* Makefile.tpl: Replace {build,host,target}_canonical by
+	{build,host,target}.
+	* Makefile.in: Regenerate.
+
+	* Makefile.tpl: Fix stupid pasto.
+	* Makefile.in: Regenerate.
+
+2003-06-09  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl: Remove bogus conditional.
+	* Makefile.in: Regenerate.
+
+2003-06-03  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl: Make 'recursive targets' using autogen rather
+	than shell loop.  Remove duplicate 'clean' targets and false
+	comments.
+	* Makefile.def: Add systematic dependencies to 'recursive' targets.
+	Add systematic method of specifying missing targets in subdirs.
+	Add copyright boilerplate.
+	* Makefile.in: Regenerate.
+	* configure.in: Add 'recursive targets' to maybe list.
+	* configure: Regenerate.
+
+	* Makefile.tpl: Rename [+target+] to [+make_target+].
+	* Makefile.def: Rename 'target' to 'make_target'.
+
+2003-05-30  Nick Clifton  <nickc@redhat.com>
+
+	* README-maintainer-mode: Update URL for locating blessed config
+	tools.
+
+2003-05-29  Robert Millan  <rmh@debian.org>
+
+	* ltconfig: Import this patch and modify for use with current
+	version of ltconfig:
+
+	2003-05-21  Bruno Haible  <bruno@clisp.org>
+
+	* libtool.m4 (AC_LIBTOOL_SYS_DYNAMIC_LINKER): Add support for
+	GNU/FreeBSD.
+
+2003-05-28  DJ Delorie  <dj@redhat.com>
+
+	* Makefile.tpl: Make maybe-check-gcc .PHONY.
+	* Makefile.in: Regenerate.
+
+2003-05-28  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * COPYING.NEWLIB: Add license info for newlib/libc/sys/linux/stdlib.
+
 2003-05-21  DJ Delorie  <dj@redhat.com>
 	
 	* Makefile.tpl (configure-target-libiberty): Depend only on gcc, not

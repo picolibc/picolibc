@@ -1,5 +1,5 @@
 /* ppc.h -- Header file for PowerPC opcode table
-   Copyright 1994, 1995, 1999, 2000, 2001, 2002
+   Copyright 1994, 1995, 1999, 2000, 2001, 2002, 2003
    Free Software Foundation, Inc.
    Written by Ian Lance Taylor, Cygnus Support
 
@@ -273,6 +273,9 @@ extern const struct powerpc_operand powerpc_operands[];
 
 /* This operand is for the DS field in a DS form instruction.  */
 #define PPC_OPERAND_DS (020000)
+
+/* This operand is for the DQ field in a DQ form instruction.  */
+#define PPC_OPERAND_DQ (040000)
 
 /* The POWER and PowerPC assemblers use a few macros.  We keep them
    with the operands table for simplicity.  The macro table is an
