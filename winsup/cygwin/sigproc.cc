@@ -123,7 +123,7 @@ muto NO_COPY *sync_proc_subproc = NULL;	// Control access to subproc stuff
 
 DWORD NO_COPY sigtid = 0;		// ID of the signal thread
 
-int NO_COPY pending_signals = 0;	// TRUE if signals pending
+static bool NO_COPY pending_signals = false;	// true if signals pending
 
 /* Functions
  */
@@ -1042,6 +1042,9 @@ talktome ()
       pids[i]->commune_recv ();
 }
 
+#define RC_MAIN 0
+#define RC_NONMAIN 1
+#define RC_NOSYNC 2
 /* Process signals by waiting for a semaphore to become signaled.
  * Then scan an in-memory array representing queued signals.
  * Executes in a separate thread.
@@ -1141,25 +1144,24 @@ wait_sig (VOID *self)
       LONG **start_todo, **end_todo;
       switch (rc)
 	{
-	case 0:
+	case RC_MAIN:
+	case RC_NONMAIN:
 	  start_todo = todos;
 	  end_todo = todos;
 	  break;
-	case 1:
+	case RC_NOSYNC:
+	default:	// silence compiler warning
 	  start_todo = todos + 1;
 	  end_todo = todos + 1;
-	default:
-	  start_todo = todos;
-	  end_todo = todos + 1;
+	  break;
 	}
 
       /* A sigcatch semaphore has been signaled.  Scan the sigtodo
        * array looking for any unprocessed signals.
        */
-      pending_signals = -1;
-      bool saw_pending_signals = false;
-      bool saw_sigchld = false;
-      for (LONG **todo = start_todo; todo <= end_todo; todo++)
+      pending_signals = false;
+      bool saw_failed_interrupt = false;
+      for (LONG **todo = todos; todo <= end_todo; todo++)
 	for (int sig = -__SIGOFFSET; sig < NSIG; sig++)
 	  {
 	    LONG x = InterlockedDecrement (*todo + sig);
@@ -1168,10 +1170,7 @@ wait_sig (VOID *self)
 	    else if (x >= 0)
 	      {
 		if (x > 0)
-		  pending_signals = 1;
-
-		if (sig == SIGCHLD)
-		  saw_sigchld = true;
+		  pending_signals = true;	/* semaphore should already be armed */
 
 		if (sig > 0 && sig != SIGKILL && sig != SIGSTOP &&
 		    (sigismember (&myself->getsigmask (), sig) ||
@@ -1180,6 +1179,7 @@ wait_sig (VOID *self)
 		  {
 		    sigproc_printf ("signal %d blocked", sig);
 		    InterlockedIncrement (*todo + sig);
+		    pending_signals = true;	// FIXME: This will cause unnecessary sig_dispatch_pending spins
 		  }
 		else
 		  {
@@ -1206,41 +1206,37 @@ wait_sig (VOID *self)
 			if (!sig_handle (sig))
 			  {
 			    sigproc_printf ("couldn't send signal %d", sig);
-			    low_priority_sleep (SLEEP_0_STAY_LOW);	/* Hopefully, other process will be waking up soon. */
-			    saw_pending_signals = true;
+			    pending_signals = saw_failed_interrupt = true;
 			    ReleaseSemaphore (sigcatch_nosync, 1, NULL);
-			    InterlockedIncrement (*todo + sig);
+			    InterlockedIncrement (myself->getsigtodo (sig));
 			  }
-			break;
 		      }
 		  }
+
+		if (sig == SIGCHLD)
+		  proc_subproc (PROC_CLEARWAIT, 0);
+		goto out;
 	      }
 	  }
 
-      if (saw_pending_signals)
-	pending_signals = 1;
-      else if (pending_signals < 0)
-	pending_signals = 0;
-
-      if (saw_sigchld)
-	proc_subproc (PROC_CLEARWAIT, 0);
-
+    out:
       /* Signal completion of signal handling depending on which semaphore
-       * woke up the WaitForMultipleObjects above.
-       */
+	 woke up the WaitForMultipleObjects above.  */
       switch (rc)
 	{
-	case 0:
+	case RC_MAIN:
 	  SetEvent (sigcomplete_main);
 	  sigproc_printf ("set main thread completion event");
 	  break;
-	case 1:
+	case RC_NONMAIN:
 	  ReleaseSemaphore (sigcomplete_nonmain, 1, NULL);
 	  break;
 	default:
 	  /* Signal from another process.  No need to synchronize. */
 	  break;
 	}
+      if (saw_failed_interrupt)
+	low_priority_sleep (SLEEP_0_STAY_LOW);	/* Hopefully, other thread will be waking up soon. */
       sigproc_printf ("looping");
     }
 

@@ -591,7 +591,6 @@ handle_sigsuspend (sigset_t tempmask)
 }
 
 extern DWORD exec_exit;		// Possible exit value for exec
-extern int pending_signals;
 
 extern "C" {
 static void

@@ -1,5 +1,16 @@
 2003-08-19  Christopher Faylor  <cgf@redhat.com>
 
+	* exceptions.cc (pending_signals): Remove unneeded declaration.
+	* sigproc.cc (pending_signals): Make static.
+	(wait_sig): Use defined values rather than integers for rc.  Never scan
+	both todo arrays as this could cause hangs if signals arrive from two
+	different sources.  Rename saw_pending_signals to saw_failed_interrupt.
+	Exit loop when signal found.  Enter low-priority sleep, if necessary,
+	after finished signalling completion.  Set pending_signals when blocked
+	(from Pierre Humblet).
+
+2003-08-19  Christopher Faylor  <cgf@redhat.com>
+
 	* signal.cc (sigpending): Move.
 	* sigproc.cc (sigpending): To here.
 	(getlocal_sigtodo): Return process-local signal array.
