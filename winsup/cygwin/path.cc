@@ -96,9 +96,8 @@ struct symlink_info
 };
 
 /* These suffixes are the only ones allowed in inner path components. */
-suffix_info inner_suffixes[] =
+suffix_info lnk_suffixes[] =
 {
-  suffix_info ("", 1),
   suffix_info (".lnk", 1),
   suffix_info (NULL)
 };
@@ -273,7 +272,7 @@ path_conv::check (const char *src, unsigned opt,
 	     class if we're working on an inner component of the path */
 	  if (component)
 	    {
-	      suff = inner_suffixes;
+	      suff = NULL;
 	      sym.pflags = 0;
 	    }
 	  else
@@ -2264,7 +2263,7 @@ symlink (const char *topath, const char *frompath)
 	}
 #else
       create_shortcut_header ();
-      path_conv win32_topath (topath, PC_SYM_NOFOLLOW, inner_suffixes);
+      path_conv win32_topath (topath, PC_SYM_NOFOLLOW);
       len = strlen (topath);
       unsigned short win_len = strlen (win32_topath.get_win32 ());
       if (WriteFile (h, shortcut_header, SHORTCUT_HDR_SIZE, &written, NULL)
@@ -2404,6 +2403,7 @@ symlink_info::check (const char *in_path, const suffix_info *suffixes)
   int res = 0;
   char extbuf[MAX_PATH + 5];
   const char *path = in_path;
+  BOOL check_lnk = FALSE;
 
   if (!suffixes)
     ext_here = NULL;
@@ -2414,6 +2414,7 @@ symlink_info::check (const char *in_path, const suffix_info *suffixes)
     }
   else
     {
+restart:
       path = strcpy (extbuf, in_path);
       ext_here = strchr (path, '\0');
     }
@@ -2467,6 +2468,13 @@ symlink_info::check (const char *in_path, const suffix_info *suffixes)
 	       				  contents, &error, &pflags)))
 	{
 	  CloseHandle (h);
+	  /* If searching for `foo' and then finding a `foo.lnk' which is
+	     no shortcut, return the same as if file not found. */
+	  if (check_lnk)
+	    {
+	      fileattr = (DWORD)-1;
+	      goto out;
+	    }
 	  goto file_not_symlink;
 	}
       else if (sym_check == 2 &&
@@ -2478,9 +2486,15 @@ symlink_info::check (const char *in_path, const suffix_info *suffixes)
 	}
 
       CloseHandle (h);
-      break;
+      goto out;
     }
   while (suffixes);
+  if (!check_lnk)
+    {
+      suffixes = lnk_suffixes;
+      check_lnk = TRUE;
+      goto restart;
+    }
   goto out;
 
 file_not_symlink:
@@ -2628,9 +2642,8 @@ int
 chdir (const char *dir)
 {
   MALLOC_CHECK;
-  extern suffix_info dir_suffixes[];
   syscall_printf ("dir %s", dir);
-  path_conv path (dir, PC_FULL | PC_SYM_FOLLOW, dir_suffixes);
+  path_conv path (dir, PC_FULL | PC_SYM_FOLLOW);
 
   if (path.error)
     {

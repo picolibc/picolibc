@@ -1199,13 +1199,11 @@ fhandler_disk_file::fhandler_disk_file (const char *name) :
 int
 fhandler_disk_file::open (const char *path, int flags, mode_t mode)
 {
-  extern suffix_info inner_suffixes[];
-
   syscall_printf ("(%s, %p)", path, flags);
 
   /* O_NOSYMLINK is an internal flag for implementing lstat, nothing more. */
   path_conv real_path (path, (flags & O_NOSYMLINK) ?
-			     PC_SYM_NOFOLLOW : PC_SYM_FOLLOW, inner_suffixes);
+			     PC_SYM_NOFOLLOW : PC_SYM_FOLLOW);
 
   if (real_path.error &&
       (flags & O_NOSYMLINK || real_path.error != ENOENT || !(flags & O_CREAT)))

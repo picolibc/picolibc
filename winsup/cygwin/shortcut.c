@@ -16,13 +16,10 @@ details. */
 #include <sys/types.h>
 #include <sys/mount.h>
 #include <errno.h>
-#include "cygerrno.h"
 #include "shortcut.h"
 
 /* This is needed to avoid including path.h which is a pure C++ header. */
 #define PATH_SYMLINK MOUNT_SYMLINK
-
-#define debug_printf(x) strcpy (contents, x)
 
 char shortcut_header[SHORTCUT_HDR_SIZE];
 BOOL shortcut_initalized = FALSE;
@@ -71,25 +68,16 @@ check_shortcut (const char *path, DWORD fileattr, HANDLE h,
   hres = CoCreateInstance (&CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER,
 			   &IID_IShellLink, (void **)&psl);
   if (FAILED (hres))
-    {
-      debug_printf ("CoCreateInstance failed");
-      goto close_it;
-    }
+    goto close_it;
   /* Get a pointer to the IPersistFile interface. */
   hres = psl->lpVtbl->QueryInterface (psl, &IID_IPersistFile, (void **)&ppf);
   if (FAILED (hres))
-    {
-      debug_printf ("QueryInterface failed");
-      goto close_it;
-    }
+    goto close_it;
   /* Load the shortcut. */
   MultiByteToWideChar(CP_ACP, 0, path, -1, wc_path, MAX_PATH);
   hres = ppf->lpVtbl->Load (ppf, wc_path, STGM_READ);
   if (FAILED (hres))
-    {
-      debug_printf ("Load failed");
-      goto close_it;
-    }
+    goto close_it;
   /* Try the description (containing a POSIX path) first. */
   if (fileattr & FILE_ATTRIBUTE_READONLY)
     {
@@ -100,18 +88,14 @@ check_shortcut (const char *path, DWORD fileattr, HANDLE h,
 
       if (! ReadFile (h, file_header, SHORTCUT_HDR_SIZE, &got, 0))
 	{
-	  debug_printf ("ReadFile failed");
           *error = EIO;
-	  goto close_it_dont_set_error;
+	  goto close_it;
 	}
       if (got == SHORTCUT_HDR_SIZE && !cmp_shortcut_header (file_header))
         {
 	  hres = psl->lpVtbl->GetDescription (psl, contents, MAX_PATH);
 	  if (FAILED (hres))
-	    {
-	      debug_printf ("GetDescription failed");
-	      goto close_it;
-	    }
+	    goto close_it;
 	  len = strlen (contents);
 	}
     }
@@ -135,27 +119,17 @@ check_shortcut (const char *path, DWORD fileattr, HANDLE h,
       /* Set relative path inside of IShellLink interface. */
       hres = psl->lpVtbl->SetRelativePath (psl, full_path, 0);
       if (FAILED (hres))
-	{
-	  debug_printf ("SetRelativePath failed");
-	  goto close_it;
-	}
+	goto close_it;
       /* Get the path to the shortcut target. */
       hres = psl->lpVtbl->GetPath (psl, contents, MAX_PATH, &wfd, 0);
       if (FAILED(hres))
-	{
-	  debug_printf ("GetPath failed");
-	  goto close_it;
-	}
+	goto close_it;
     }
   /* It's a symlink.  */
   *pflags = PATH_SYMLINK;
   res = strlen (contents);
 
 close_it:
-  if (FAILED (hres))
-    *error = geterrno_from_win_error (HRESULT_CODE (hres), EACCES);
-
-close_it_dont_set_error:
   /* Release the pointer to IPersistFile. */
   if (ppf)
     ppf->lpVtbl->Release(ppf);

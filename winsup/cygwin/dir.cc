@@ -59,13 +59,6 @@ writable_directory (const char *file)
 #endif
 }
 
-suffix_info dir_suffixes[] =
-{
-  suffix_info ("", 1),
-  suffix_info (".lnk", 1),
-  suffix_info (NULL)
-};
-
 /* opendir: POSIX 5.1.2.1 */
 extern "C" DIR *
 opendir (const char *dirname)
@@ -75,7 +68,7 @@ opendir (const char *dirname)
   DIR *res = 0;
   struct stat statbuf;
 
-  path_conv real_dirname (dirname, PC_SYM_FOLLOW | PC_FULL, dir_suffixes);
+  path_conv real_dirname (dirname, PC_SYM_FOLLOW | PC_FULL);
 
   if (real_dirname.error)
     {
@@ -331,7 +324,7 @@ rmdir (const char *dir)
 {
   int res = -1;
 
-  path_conv real_dir (dir, PC_SYM_NOFOLLOW, dir_suffixes);
+  path_conv real_dir (dir, PC_SYM_NOFOLLOW);
 
   if (real_dir.error)
     {

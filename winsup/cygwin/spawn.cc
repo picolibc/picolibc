@@ -41,7 +41,6 @@ details. */
 static suffix_info std_suffixes[] =
 {
   suffix_info (".exe", 1), suffix_info ("", 1),
-  suffix_info (".lnk", 1),
   suffix_info (".com"), suffix_info (".cmd"),
   suffix_info (".bat"), suffix_info (".dll"),
   suffix_info (NULL)

@@ -65,11 +65,10 @@ close_all_files (void)
 extern "C" int
 _unlink (const char *ourname)
 {
-  extern suffix_info inner_suffixes[];
   int res = -1;
   sigframe thisframe (mainthread);
 
-  path_conv win32_name (ourname, PC_SYM_NOFOLLOW | PC_FULL, inner_suffixes);
+  path_conv win32_name (ourname, PC_SYM_NOFOLLOW | PC_FULL);
 
   if (win32_name.error)
     {
@@ -1031,7 +1030,6 @@ suffix_info stat_suffixes[] =
 {
   suffix_info ("", 1),
   suffix_info (".exe", 1),
-  suffix_info (".lnk", 1),
   suffix_info (NULL)
 };
 
@@ -1276,6 +1274,22 @@ _rename (const char *oldpath, const char *newpath)
     }
 
   path_conv real_new (newpath, PC_SYM_NOFOLLOW);
+
+  /* Shortcut hack. */
+  char new_lnk_buf[MAX_PATH + 5];
+  if (real_old.issymlink () && !real_new.error)
+    {
+      int len_old = strlen (real_old.get_win32 ());
+      int len_new = strlen (real_new.get_win32 ());
+      if (!strcasecmp (real_old.get_win32 () + len_old - 4, ".lnk") &&
+	  strcasecmp (real_new.get_win32 () + len_new - 4, ".lnk"))
+	{
+	  strcpy (new_lnk_buf, newpath);
+	  strcat (new_lnk_buf, ".lnk");
+	  newpath = new_lnk_buf;
+	  real_new.check (newpath, PC_SYM_NOFOLLOW);
+	}
+    }
 
   if (real_new.error)
     {

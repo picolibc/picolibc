@@ -1,3 +1,26 @@
+Thu Feb 22 15:33:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* cygerrno.h: Revert previous patch.
+	* errno.cc: Ditto.
+	* dir.cc: Eliminate `dir_suffixes'.
+	(opendir): Remove usage of `dir_suffixes'.
+	(rmdir): Ditto.
+	* fhandler.cc (fhandler_disk_file::open): Remove usage of
+	`inner_suffixes'.
+	* path.cc: Rename `inner_suffixes' to `lnk_suffixes'.
+	(path_conv::check): Remove usage of `inner_suffixes'.
+	(symlink): Ditto.
+	(symlink_info::check): Handle checking for `.lnk' in path_conv
+	exclusively here.
+	(chdir): Remove usage of `dir_suffixes'.
+	* shortcut.c: Eliminate debug_printf lines.
+	(check_shortcut): Don't set error except on failing ReadFile.
+	* spawn.cc: Remove ".lnk" from `std_suffixes'.
+	* syscalls.cc (_unlink): Remove usage of `inner_suffixes'.
+	Remove ".lnk" from `stat_suffixes'.
+	(_rename): Add check for renaming a symlink to keep the ".lnk"
+	suffix after renaming.
+
 Thu Feb 22 13:38:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* shortcut.c: New file. Provides a C interface to reading of
