@@ -543,13 +543,15 @@ win32_device_name (const char *src_path, char *win32_path,
    All duplicate /'s, except for 2 leading /'s, are deleted.
    The result is 0 for success, or an errno error value.  */
 
-static __inline int
+#define isslash(c) ((c) == '/')
+
+static int
 normalize_posix_path (const char *cwd, const char *src, char *dst)
 {
   const char *src_start = src;
   char *dst_start = dst;
 
-  if (!SLASH_P (src[0]))
+  if (!isslash (src[0]))
     {
       if (strlen (cwd) + 1 + strlen (src) >= MAX_PATH)
 	{
@@ -558,16 +560,18 @@ normalize_posix_path (const char *cwd, const char *src, char *dst)
 	}
       strcpy (dst, cwd);
       dst = strchr (dst, '\0');
-      if (dst > dst_start && !isdirsep(dst[-1]))
+      if (*src == '.')
+	goto sawdot;
+      if (dst > dst_start && !isslash (dst[-1]))
 	*dst++ = '/';
     }
   /* Two leading /'s?  If so, preserve them.  */
-  else if (SLASH_P (src[1]))
+  else if (isslash (src[1]))
     {
       *dst++ = '/';
       *dst++ = '/';
       src += 2;
-      if (SLASH_P(*src))
+      if (isslash (*src))
 	{ /* Starts with three or more slashes - reset. */
 	  dst = dst_start;
 	  *dst++ = '/';
@@ -578,50 +582,42 @@ normalize_posix_path (const char *cwd, const char *src, char *dst)
   while (*src)
     {
       /* Strip runs of /'s.  */
-      if (SLASH_P (*src))
-	{
-	  *dst++ = '/';
-	  src++;
-	  while (SLASH_P(*src))
-	    src++;
-	}
-      /* Ignore "./".  */
-      else if (src[0] == '.' && SLASH_P (src[1])
-	       && (src == src_start || SLASH_P (src[-1])))
-	{
-	  src += 2;
-	  while(SLASH_P(src[0]))
-	    src++;
-	}
-      /* Backup if "..".  */
-      else if (src[0] == '.' && src[1] == '.'
-	       /* dst must be greater than dst_start */
-	       && isdirsep (dst[-1])
-	       && (SLASH_P (src[2]) || src[2] == 0))
-	{
-	  /* Back up over /, but not if it's the first one.  */
-	  if (dst > dst_start + 1)
-	    dst--;
-	  /* Now back up to the next /.  */
-	  while (dst > dst_start + 1 && !isdirsep (dst[-1]))
-	    dst--;
-	  src += 2;
-	  while (SLASH_P (*src))
-	    src++;
-	}
-      /* Otherwise, add char to result.  */
+      if (!isslash (*src))
+	*dst++ = *src++;
       else
 	{
-	  if (*src == '\\')
-	    *dst++ = '/';
-	  else
-	    *dst++ = *src;
-	  ++src;
+	  while (*++src)
+	    {
+	      while (isslash (*src))
+		src++;
+
+	      if (*src != '.')
+		break;
+
+	    sawdot:
+	      if (src[1] != '.')
+		{
+		  if ((src[1] && !isslash (src[1])))
+		    break;
+		}
+	      else
+		{
+		  if (src[2] && !isslash (src[2]))
+		    break;
+		  while (dst > dst_start && !isslash (*--dst))
+		    continue;
+		  src++;
+		}
+	    }
+
+	  *dst++ = '/';
 	}
     }
-  if (dst > (dst_start + 1) && dst[-1] == '.' && SLASH_P (dst[-2]))
-    dst -= dst[2] ? 2 : 1;
-  *dst = 0;
+
+  *dst = '\0';
+  if (--dst > dst_start && isslash (*dst))
+    *dst = '\0';
+
   debug_printf ("%s = normalize_posix_path (%s)", dst_start, src_start);
   return 0;
 }
@@ -639,7 +635,7 @@ normalize_win32_path (const char *cwd, const char *src, char *dst)
   const char *src_start = src;
   char *dst_start = dst;
 
-  if (! SLASH_P (src[0])
+  if (!SLASH_P (src[0])
       && strchr (src, ':') == NULL)
     {
       if (strlen (cwd) + 1 + strlen (src) >= MAX_PATH)
@@ -979,20 +975,19 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
   char cwd[MAX_PATH];
 
   /* No need to fetch cwd if path is absolute.  */
-  if ((isrelpath = ! SLASH_P (*src_path)))
+  if ((isrelpath = !isslash (*src_path)))
     getcwd_inner (cwd, MAX_PATH, TRUE); /* FIXME: check rc */
   else
     strcpy (cwd, "/"); /* some innocuous value */
 
   rc = normalize_posix_path (cwd, src_path, pathbuf);
-  MALLOC_CHECK;
-  if (rc != 0)
+
+  if (rc)
     {
       debug_printf ("%d = conv_to_win32_path (%s)", rc, src_path);
       *flags = 0;
       return rc;
     }
-  nofinalslash (pathbuf, pathbuf);
 
   /* Determine where the destination should be placed. */
   if (full_win32_path != NULL)
@@ -1172,7 +1167,7 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
 
   /* FIXME: For now, if the path is relative and it's supposed to stay
      that way, skip mount table processing. */
-  MALLOC_CHECK;
+
   if (keep_rel_p && relative_path_p)
     {
       slashify (src_path, posix_path, 0);
@@ -1188,16 +1183,13 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
     getcwd_inner (cwd, MAX_PATH, 0); /* FIXME: check rc */
   else
     strcpy (cwd, "/"); /* some innocuous value */
-  MALLOC_CHECK;
+
   int rc = normalize_win32_path (cwd, src_path, pathbuf);
-  MALLOC_CHECK;
   if (rc != 0)
     {
       debug_printf ("%d = conv_to_posix_path (%s)", rc, src_path);
       return rc;
     }
-  nofinalslash (pathbuf, pathbuf);
-  MALLOC_CHECK;
 
   int pathbuflen = strlen (pathbuf);
   for (int i = 0; i < nmounts; ++i)
@@ -1507,8 +1499,8 @@ mount_info::write_cygdrive_info_to_registry (const char *cygdrive_prefix, unsign
   /* Verify cygdrive prefix starts with a forward slash and if there's
      another character, it's not a slash. */
   if ((cygdrive_prefix == NULL) || (*cygdrive_prefix == 0) ||
-      (cygdrive_prefix[0] != '/') ||
-      ((cygdrive_prefix[1] != '\0') && (SLASH_P (cygdrive_prefix[1]))))
+      (!isslash (cygdrive_prefix[0])) ||
+      ((cygdrive_prefix[1] != '\0') && (isslash (cygdrive_prefix[1]))))
       {
 	set_errno (EINVAL);
 	return -1;
