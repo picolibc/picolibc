@@ -1,3 +1,27 @@
+2002-08-30  Christopher Faylor  <cgf@redhat.com>
+
+	* miscfuncs.cc (check_iovec_for_read): Don't check buffer when zero
+	length iov_len.
+	(check_iovec_for_write): Ditto.
+
+2002-08-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* fhandler.h (fhandler_base::readv): New method.
+	(fhandler_base::writev): Ditto.
+	* fhandler.cc (fhandler_base::readv): New method.
+	(fhandler_base::writev): Ditto.
+	* syscalls.cc (_read): Delegate to readv(2).
+	(_write): Ditto, mutatis mutandi.
+	(readv): Rewrite, based on the old _read code, to use the new
+	fhandler_base::readv method.  Improve access mode handling and ensure
+	all calls reach the final strace statement.
+	(writev): Ditto, mutatis mutandi.
+	* include/sys/uio.h (struct iovec): Change field types to match SUSv3.
+	* winsup.h (check_iovec_for_read): New function.
+	(check_iovec_for_write): Ditto.
+	* miscfuncs.cc (check_iovec_for_read): Ditto.
+	(check_iovec_for_write): Ditto.
+
 2002-08-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din: Add more prototypes for new wchar functions in newlib.

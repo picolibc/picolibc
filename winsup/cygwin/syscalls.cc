@@ -321,15 +321,42 @@ getsid (pid_t pid)
 extern "C" ssize_t
 _read (int fd, void *ptr, size_t len)
 {
-  if (len == 0)
-    return 0;
+  const struct iovec iov =
+    {
+      iov_base: ptr,
+      iov_len: len
+    };
 
-  if (__check_null_invalid_struct_errno (ptr, len))
-    return -1;
+  return readv (fd, &iov, 1);
+}
 
-  int res;
+extern "C" ssize_t
+_write (int fd, const void *ptr, size_t len)
+{
+  const struct iovec iov =
+    {
+      iov_base: (void *) ptr,	// const_cast
+      iov_len: len
+    };
+
+  return writev (fd, &iov, 1);
+}
+
+extern "C" ssize_t
+readv (int fd, const struct iovec *const iov, const int iovcnt)
+{
   extern int sigcatchers;
-  int e = get_errno ();
+  const int e = get_errno ();
+
+  int res = -1;
+
+  const ssize_t tot = check_iovec_for_read (iov, iovcnt);
+
+  if (tot <= 0)
+    {
+      res = tot;
+      goto done;
+    }
 
   while (1)
     {
@@ -337,13 +364,19 @@ _read (int fd, void *ptr, size_t len)
 
       cygheap_fdget cfd (fd);
       if (cfd < 0)
-	return -1;
+	break;
+
+      if ((cfd->get_flags () & O_ACCMODE) == O_WRONLY)
+	{
+	  set_errno (EBADF);
+	  break;
+	}
 
       DWORD wait = cfd->is_nonblocking () ? 0 : INFINITE;
 
       /* Could block, so let user know we at least got here.  */
-      syscall_printf ("read (%d, %p, %d) %sblocking, sigcatchers %d",
-		      fd, ptr, len, wait ? "" : "non", sigcatchers);
+      syscall_printf ("readv (%d, %p, %d) %sblocking, sigcatchers %d",
+		      fd, iov, iovcnt, wait ? "" : "non", sigcatchers);
 
       if (wait && (!cfd->is_slow () || cfd->get_r_no_interrupt ()))
 	debug_printf ("no need to call ready_for_read\n");
@@ -357,177 +390,91 @@ _read (int fd, void *ptr, size_t len)
 	 ensure that an fd, closed in another thread, aborts I/O
 	 operations. */
       if (!cfd.isopen ())
-	return -1;
+	break;
 
       /* Check to see if this is a background read from a "tty",
 	 sending a SIGTTIN, if appropriate */
       res = cfd->bg_check (SIGTTIN);
 
       if (!cfd.isopen ())
-	return -1;
+	{
+	  res = -1;
+	  break;
+	}
 
       if (res > bg_eof)
 	{
 	  myself->process_state |= PID_TTYIN;
 	  if (!cfd.isopen ())
-	    return -1;
-	  res = cfd->read (ptr, len);
+	    {
+	      res = -1;
+	      break;
+	    }
+	  res = cfd->readv (iov, iovcnt, tot);
 	  myself->process_state &= ~PID_TTYIN;
 	}
 
     out:
-
-      if (res && get_errno () == EACCES &&
-	  !(cfd->get_flags () & (O_RDONLY | O_RDWR)))
-	{
-	  set_errno (EBADF);
-	  break;
-	}
-
       if (res >= 0 || get_errno () != EINTR || !thisframe.call_signal_handler ())
 	break;
       set_errno (e);
     }
 
-  syscall_printf ("%d = read (%d, %p, %d), errno %d", res, fd, ptr, len,
+done:
+  syscall_printf ("%d = readv (%d, %p, %d), errno %d", res, fd, iov, iovcnt,
 		  get_errno ());
   MALLOC_CHECK;
   return res;
 }
 
 extern "C" ssize_t
-_write (int fd, const void *ptr, size_t len)
+writev (const int fd, const struct iovec *const iov, const int iovcnt)
 {
   int res = -1;
+  const ssize_t tot = check_iovec_for_write (iov, iovcnt);
 
   sigframe thisframe (mainthread);
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     goto done;
 
-  /* No further action required for len == 0 */
-  if (len == 0)
+  if (tot <= 0)
     {
-      res = 0;
+      res = tot;
       goto done;
     }
 
-  if (len && __check_invalid_read_ptr_errno (ptr, len))
-    goto done;
+  if ((cfd->get_flags () & O_ACCMODE) == O_RDONLY)
+    {
+      set_errno (EBADF);
+      goto done;
+    }
 
   /* Could block, so let user know we at least got here.  */
   if (fd == 1 || fd == 2)
-    paranoid_printf ("write (%d, %p, %d)", fd, ptr, len);
+    paranoid_printf ("writev (%d, %p, %d)", fd, iov, iovcnt);
   else
-    syscall_printf  ("write (%d, %p, %d)", fd, ptr, len);
+    syscall_printf  ("writev (%d, %p, %d)", fd, iov, iovcnt);
 
   res = cfd->bg_check (SIGTTOU);
 
   if (res > bg_eof)
     {
       myself->process_state |= PID_TTYOU;
-      res = cfd->write (ptr, len);
+      res = cfd->writev (iov, iovcnt, tot);
       myself->process_state &= ~PID_TTYOU;
-      if (res && get_errno () == EACCES &&
-	  !(cfd->get_flags () & (O_WRONLY | O_RDWR)))
-	set_errno (EBADF);
     }
 
 done:
   if (fd == 1 || fd == 2)
-    paranoid_printf ("%d = write (%d, %p, %d)", res, fd, ptr, len);
+    paranoid_printf ("%d = write (%d, %p, %d), errno %d",
+		     res, fd, iov, iovcnt, get_errno ());
   else
-    syscall_printf ("%d = write (%d, %p, %d)", res, fd, ptr, len);
+    syscall_printf ("%d = write (%d, %p, %d), errno %d",
+		    res, fd, iov, iovcnt, get_errno ());
 
-  return (ssize_t) res;
-}
-
-/*
- * FIXME - should really move this interface into fhandler, and implement
- * write in terms of it. There are devices in Win32 that could do this with
- * overlapped I/O much more efficiently - we should eventually use
- * these.
- */
-
-extern "C" ssize_t
-writev (int fd, const struct iovec *iov, int iovcnt)
-{
-  int i;
-  ssize_t len, total;
-  char *base;
-
-  if (iovcnt < 1 || iovcnt > IOV_MAX)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-
-  /* Ensure that the sum of the iov_len values is less than
-     SSIZE_MAX (per spec), if so, we must fail with no output (per spec).
-  */
-  total = 0;
-  for (i = 0; i < iovcnt; ++i)
-    {
-    total += iov[i].iov_len;
-    if (total > SSIZE_MAX)
-      {
-      set_errno (EINVAL);
-      return -1;
-      }
-    }
-  /* Now write the data */
-  for (i = 0, total = 0; i < iovcnt; i++, iov++)
-    {
-      len = iov->iov_len;
-      base = iov->iov_base;
-      while (len > 0)
-	{
-	  register int nbytes;
-	  nbytes = write (fd, base, len);
-	  if (nbytes < 0 && total == 0)
-	    return -1;
-	  if (nbytes <= 0)
-	    return total;
-	  len -= nbytes;
-	  total += nbytes;
-	  base += nbytes;
-	}
-    }
-  return total;
-}
-
-/*
- * FIXME - should really move this interface into fhandler, and implement
- * read in terms of it. There are devices in Win32 that could do this with
- * overlapped I/O much more efficiently - we should eventually use
- * these.
- */
-
-extern "C" ssize_t
-readv (int fd, const struct iovec *iov, int iovcnt)
-{
-  int i;
-  ssize_t len, total;
-  char *base;
-
-  for (i = 0, total = 0; i < iovcnt; i++, iov++)
-    {
-      len = iov->iov_len;
-      base = iov->iov_base;
-      while (len > 0)
-	{
-	  register int nbytes;
-	  nbytes = read (fd, base, len);
-	  if (nbytes < 0 && total == 0)
-	    return -1;
-	  if (nbytes <= 0)
-	    return total;
-	  len -= nbytes;
-	  total += nbytes;
-	  base += nbytes;
-	}
-    }
-  return total;
+  MALLOC_CHECK;
+  return res;
 }
 
 /* _open */

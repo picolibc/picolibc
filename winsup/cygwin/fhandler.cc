@@ -13,6 +13,7 @@ details. */
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/cygwin.h>
+#include <sys/uio.h>
 #include <signal.h>
 #include "cygerrno.h"
 #include "perprocess.h"
@@ -695,6 +696,109 @@ fhandler_base::write (const void *ptr, size_t len)
 
   debug_printf ("%d = write (%p, %d)", res, ptr, len);
   return res;
+}
+
+ssize_t
+fhandler_base::readv (const struct iovec *const iov, const int iovcnt,
+		      ssize_t tot)
+{
+  assert (iov);
+  assert (iovcnt >= 1);
+
+  if (iovcnt == 1)
+    return read (iov->iov_base, iov->iov_len);
+
+  if (tot == -1)		// i.e. if not pre-calculated by the caller.
+    {
+      tot = 0;
+      const struct iovec *iovptr = iov + iovcnt;
+      do 
+	{
+	  iovptr -= 1;
+	  tot += iovptr->iov_len;
+	}
+      while (iovptr != iov);
+    }
+
+  assert (tot >= 0);
+
+  if (tot == 0)
+    return 0;
+
+  char *buf = (char *) alloca (tot);
+
+  if (!buf)
+    {
+      set_errno (ENOMEM);
+      return -1;
+    }
+
+  const ssize_t res = read (buf, tot);
+
+  const struct iovec *iovptr = iov;
+  int nbytes = res;
+
+  while (nbytes > 0)
+    {
+      const int frag = min (nbytes, (ssize_t) iovptr->iov_len);
+      memcpy (iovptr->iov_base, buf, frag);
+      buf += frag;
+      iovptr += 1;
+      nbytes -= frag;
+    }
+
+  return res;
+}
+
+ssize_t
+fhandler_base::writev (const struct iovec *const iov, const int iovcnt,
+		       ssize_t tot)
+{
+  assert (iov);
+  assert (iovcnt >= 1);
+
+  if (iovcnt == 1)
+    return write (iov->iov_base, iov->iov_len);
+
+  if (tot == -1)		// i.e. if not pre-calculated by the caller.
+    {
+      tot = 0;
+      const struct iovec *iovptr = iov + iovcnt;
+      do 
+	{
+	  iovptr -= 1;
+	  tot += iovptr->iov_len;
+	}
+      while (iovptr != iov);
+    }
+
+  assert (tot >= 0);
+
+  if (tot == 0)
+    return 0;
+
+  char *const buf = (char *) alloca (tot);
+
+  if (!buf)
+    {
+      set_errno (ENOMEM);
+      return -1;
+    }
+
+  char *bufptr = buf;
+  const struct iovec *iovptr = iov;
+  int nbytes = tot;
+
+  while (nbytes != 0)
+    {
+      const int frag = min (nbytes, (ssize_t) iovptr->iov_len);
+      memcpy (bufptr, iovptr->iov_base, frag);
+      bufptr += frag;
+      iovptr += 1;
+      nbytes -= frag;
+    }
+
+  return write (buf, tot);
 }
 
 __off64_t

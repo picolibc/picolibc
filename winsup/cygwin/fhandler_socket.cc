@@ -736,7 +736,9 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags)
   p = buf;
   while (nb > 0)
     {
-      ssize_t cnt = min(nb, iov->iov_len);
+      ssize_t cnt = iov->iov_len;
+      if (nb < cnt)
+	cnt = nb;
       memcpy (iov->iov_base, p, cnt);
       p += cnt;
       nb -= cnt;
