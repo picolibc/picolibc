@@ -1,3 +1,17 @@
+2004-06-29  Artem B. Bityuckiy  <dedekind@oktetlabs.ru>
+
+	* acinclude.m4: Move --enable-newlib-iconv option back here.
+	* configure.in: Remove --enable-newlib-iconv option.  Don't
+	tie iconv support to --enable-newlib-mb.
+	* aclocal.m4: Regenerated.
+	* configure: Ditto.
+	* doc/aclocal.m4, doc/configure: Ditto.
+	* iconvdata/aclocal.m4, iconvdata/configure: Ditto.
+	* libm/*/aclocal.m4: Ditto.
+	* libm/*/configure: Ditto.
+	* libc/*/aclocal.m4: Ditto.
+	* libc/*/configure: Ditto.
+
 2004-06-25  Artem B. Bityuckiy  <dedekind@oktetlabs.ru>
 
 	* acinclude.m4: Move iconv options into configure.in.

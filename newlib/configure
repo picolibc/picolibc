@@ -20,8 +20,6 @@ ac_help="$ac_help
 ac_help="$ac_help
   --enable-newlib-mb        enable multibyte support"
 ac_help="$ac_help
-  --enable-newlib-iconv     enable iconv library support"
-ac_help="$ac_help
   --enable-newlib-iconv-encodings   enable specific comma-separated list of bidirectional iconv encodings to be built-in"
 ac_help="$ac_help
   --enable-newlib-iconv-from-encodings   enable specific comma-separated list of \"from\" iconv encodings to be built-in"
@@ -37,6 +35,8 @@ ac_help="$ac_help
   --enable-malloc-debugging indicate malloc debugging requested"
 ac_help="$ac_help
   --enable-newlib-multithread        enable support for multiple threads"
+ac_help="$ac_help
+  --enable-newlib-iconv     enable iconv library support"
 ac_help="$ac_help
   --enable-newlib-elix-level         supply desired elix library level (1-4)"
 ac_help="$ac_help
@@ -634,26 +634,12 @@ fi
 if test "${enable_newlib_mb+set}" = set; then
   enableval="$enable_newlib_mb"
   case "${enableval}" in
-  yes) newlib_mb=yes; newlib_iconv=yes ;;
+  yes) newlib_mb=yes;;
   no)  newlib_mb=no ;;
   *)   { echo "configure: error: bad value ${enableval} for newlib-mb option" 1>&2; exit 1; } ;;
  esac
 else
   newlib_mb=
-fi
-
-# Check whether --enable-newlib-iconv or --disable-newlib-iconv was given.
-if test "${enable_newlib_iconv+set}" = set; then
-  enableval="$enable_newlib_iconv"
-  if test "${newlib_iconv+set}" != set; then
-   case "${enableval}" in
-     yes) newlib_iconv=yes ;;
-     no)  newlib_iconv=no ;;
-     *)   { echo "configure: error: bad value ${enableval} for newlib-iconv option" 1>&2; exit 1; } ;;
-   esac
- fi
-else
-  newlib_iconv=${newlib_iconv}
 fi
 
 # Check whether --enable-newlib-iconv-encodings or --disable-newlib-iconv-encodings was given.
@@ -719,7 +705,7 @@ am__api_version="1.4"
 # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
 # ./install, which can be erroneously created by make from ./install.sh.
 echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
-echo "configure:723: checking for a BSD compatible install" >&5
+echo "configure:709: checking for a BSD compatible install" >&5
 if test -z "$INSTALL"; then
 if eval "test \"`echo '$''{'ac_cv_path_install'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -772,7 +758,7 @@ test -z "$INSTALL_SCRIPT" && INSTALL_SCRIPT='${INSTALL_PROGRAM}'
 test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
 
 echo $ac_n "checking whether build environment is sane""... $ac_c" 1>&6
-echo "configure:776: checking whether build environment is sane" >&5
+echo "configure:762: checking whether build environment is sane" >&5
 # Just in case
 sleep 1
 echo timestamp > conftestfile
@@ -829,7 +815,7 @@ test "$program_suffix" != NONE &&
 test "$program_transform_name" = "" && program_transform_name="s,x,x,"
 
 echo $ac_n "checking whether ${MAKE-make} sets \${MAKE}""... $ac_c" 1>&6
-echo "configure:833: checking whether ${MAKE-make} sets \${MAKE}" >&5
+echo "configure:819: checking whether ${MAKE-make} sets \${MAKE}" >&5
 set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_prog_make_${ac_make}_set'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -862,12 +848,12 @@ else
 fi
 
 echo $ac_n "checking for Cygwin environment""... $ac_c" 1>&6
-echo "configure:866: checking for Cygwin environment" >&5
+echo "configure:852: checking for Cygwin environment" >&5
 if eval "test \"`echo '$''{'ac_cv_cygwin'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 871 "configure"
+#line 857 "configure"
 #include "confdefs.h"
 
 int main() {
@@ -878,7 +864,7 @@ int main() {
 return __CYGWIN__;
 ; return 0; }
 EOF
-if { (eval echo configure:882: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:868: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ac_cv_cygwin=yes
 else
@@ -895,19 +881,19 @@ echo "$ac_t""$ac_cv_cygwin" 1>&6
 CYGWIN=
 test "$ac_cv_cygwin" = yes && CYGWIN=yes
 echo $ac_n "checking for mingw32 environment""... $ac_c" 1>&6
-echo "configure:899: checking for mingw32 environment" >&5
+echo "configure:885: checking for mingw32 environment" >&5
 if eval "test \"`echo '$''{'ac_cv_mingw32'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 904 "configure"
+#line 890 "configure"
 #include "confdefs.h"
 
 int main() {
 return __MINGW32__;
 ; return 0; }
 EOF
-if { (eval echo configure:911: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:897: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ac_cv_mingw32=yes
 else
@@ -970,6 +956,20 @@ if test "${enable_newlib_multithread+set}" = set; then
  esac
 else
   newlib_multithread=yes
+fi
+
+# Check whether --enable-newlib-iconv or --disable-newlib-iconv was given.
+if test "${enable_newlib_iconv+set}" = set; then
+  enableval="$enable_newlib_iconv"
+  if test "${newlib_iconv+set}" != set; then
+   case "${enableval}" in
+     yes) newlib_iconv=yes ;;
+     no)  newlib_iconv=no ;;
+     *)   { echo "configure: error: bad value ${enableval} for newlib-iconv option" 1>&2; exit 1; } ;;
+   esac
+ fi
+else
+  newlib_iconv=${newlib_iconv}
 fi
 
 # Check whether --enable-newlib-elix-level or --disable-newlib-elix-level was given.

@@ -44,6 +44,17 @@ AC_ARG_ENABLE(newlib-multithread,
   *)   AC_MSG_ERROR(bad value ${enableval} for newlib-multithread option) ;;
  esac], [newlib_multithread=yes])dnl
 
+dnl Support --enable-newlib-iconv
+AC_ARG_ENABLE(newlib-iconv,
+[  --enable-newlib-iconv     enable iconv library support],
+[if test "${newlib_iconv+set}" != set; then
+   case "${enableval}" in
+     yes) newlib_iconv=yes ;;
+     no)  newlib_iconv=no ;;
+     *)   AC_MSG_ERROR(bad value ${enableval} for newlib-iconv option) ;;
+   esac
+ fi], [newlib_iconv=${newlib_iconv}])dnl
+
 dnl Support --enable-newlib-elix-level
 AC_ARG_ENABLE(newlib-elix-level,
 [  --enable-newlib-elix-level         supply desired elix library level (1-4)],
