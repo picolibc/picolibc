@@ -1,3 +1,8 @@
+2002-02-20  Nick Clifton  <nickc@cambridge.redhat.com>
+
+	* libc/machine/xscale/strchr.c (strchr): Add 'r1' to the list of
+	clobbered registers.
+
 2002-02-19  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* configure.host (newlib_cflags): When host is in m68* add

@@ -60,7 +60,7 @@ strchr (const char *s, int c)
 1:"
        : "=&r" (s)
        : "r" (c2), "0" (s)
-       : "r2", "r3", "r5", "r6", "cc");
+       : "r1", "r2", "r3", "r5", "r6", "cc");
 #endif
 
   while (*s && *s != c)
