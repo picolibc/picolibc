@@ -1,3 +1,10 @@
+2000-09-13  Will Cohen  <wcohen@redhat.com>
+
+	* libc/machine/v850/setjmp.S (_setjmp): Save r1 rather than r0.
+	Added return value 0.
+	(_longjmp): Allow longjmp to return value of second argument
+	passed to it.
+
 2000-09-06  Jeff Johnston <jjohnstn@redhat.com>
 
         * libc/include/sys/types.h (FD_ZERO): Remove call to bzero and
