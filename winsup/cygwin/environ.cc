@@ -746,7 +746,7 @@ environ_init (char **envp, int envc)
     }
 
   if (!sawTERM)
-    envp[i++] = cygterm;
+    envp[i++] = strdup (cygterm);
   envp[i] = NULL;
   FreeEnvironmentStrings (rawenv);
 

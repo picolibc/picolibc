@@ -1,3 +1,8 @@
+2004-12-03  Christopher Faylor  <cgf@timesys.com>
+
+	* environ.cc (environ_init): Alloc space for TERM if it is not set,
+	like all of the other environment variables.
+
 2004-12-02  Christopher Faylor  <cgf@timesys.com>
 
 	* child_info.h (child_info_fork::parent_wr_proc_pipe): New element.
