@@ -99,6 +99,9 @@ END_RELOC_NUMBERS (R_MIPS_maxext)
    position independent code.  */
 #define EF_MIPS_CPIC		0x00000004
 
+/* ???  Unknown flag, set in IRIX 6's BSDdup2.o in libbsd.a.  */
+#define EF_MIPS_XGOT		0x00000008
+
 /* Code in file uses UCODE (obsolete) */
 #define EF_MIPS_UCODE		0x00000010
 

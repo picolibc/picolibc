@@ -49,6 +49,9 @@ enable_version_specific_runtime_libs = @enable_version_specific_runtime_libs@
 gcc_version_trigger = @gcc_version_trigger@
 gcc_version = @gcc_version@
 
+# The gcc driver likes to know the arguments it was configured with.
+TOPLEVEL_CONFIGURE_ARGUMENTS=@TOPLEVEL_CONFIGURE_ARGUMENTS@
+
 srcdir = @srcdir@
 
 prefix = @prefix@
@@ -1105,6 +1108,7 @@ configure-gcc:
 	CFLAGS="$(CFLAGS)"; export CFLAGS; \
 	CXX="$(CXX)"; export CXX; \
 	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	TOPLEVEL_CONFIGURE_ARGUMENTS="$(TOPLEVEL_CONFIGURE_ARGUMENTS)"; export TOPLEVEL_CONFIGURE_ARGUMENTS; \
 	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
 	  AR="$(AR)"; export AR; \
 	  AS="$(AS)"; export AS; \
@@ -1314,7 +1318,7 @@ all-itcl: maybe-all-tcl maybe-all-tk
 # We put install-tcl before install-itcl because itcl wants to run a
 # program on installation which uses the Tcl libraries.
 install-itcl: maybe-install-tcl
-all-sid: maybe-all-tcl maybe-all-tk
+all-sid: maybe-all-libiberty maybe-all-bfd maybe-all-opcodes maybe-all-tcl maybe-all-tk
 install-sid: maybe-install-tcl maybe-install-tk
 all-sim: maybe-all-libiberty maybe-all-bfd maybe-all-opcodes maybe-all-readline maybe-configure-gdb
 configure-tk: maybe-configure-tcl

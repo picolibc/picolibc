@@ -1,3 +1,57 @@
+2003-01-31  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.tpl (all-sid): Add libiberty/bfd/opcodes dependencies.
+	* Makefile.in: Regenerated.
+
+2003-01-30  Alexandre Oliva  <aoliva@redhat.com>
+
+	* config.if: Copy from GCC.
+
+2003-01-27  Phil Edwards  <pme@gcc.gnu.org>
+
+	* configure.in:  Revert 24Jan change.
+	* configure:  Regenerate.
+
+2003-01-23  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in: Revert previous change.
+	* configure: Regenerate.
+
+2003-01-23  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in: Make rda native-only.
+	* configure: Regenerate.
+
+2003-01-19  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in: Add missing \.
+	* configure: Rebuilt.
+
+2003-01-17  Jakub Jelinek  <jakub@redhat.com>
+
+	* configure.in (baseargs): Avoid using \| in sed regular
+	expressions.
+	* configure: Rebuilt.
+
+2003-01-16  Jakub Jelinek  <jakub@redhat.com>
+
+	* configure.in (baseargs): Remove all supported forms of
+	--cache-file, --srcdir, --host, --build and --target options
+	from argument lists.
+	* configure: Rebuilt.
+
+2003-01-15  Alexandre Oliva  <aoliva@redhat.com>
+
+	* configure.in (noconfigdirs): Don't skip gas on IRIX 6.
+	* configure: Rebuilt.
+
+2003-01-09  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in: Substitute TOPLEVEL_CONFIGURE_ARGUMENTS.
+	* Makefile.tpl: Pass TOPLEVEL_CONFIGURE_ARGUMENTS to gcc.
+	* Makefile.in: Regenerate.
+	* configure: Regenerate.
+
 2003-01-09  Christian Cornelssen  <ccorn@cs.tu-berlin.de>
 
 	* Makefile.tpl (BASE_FLAGS_TO_PASS): Also pass DESTDIR.

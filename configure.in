@@ -83,7 +83,7 @@ if test -n "$PWD" ; then PWD=`${PWDCMD-pwd}`; fi
 
 # Export original configure arguments for use by sub-configures.
 TOPLEVEL_CONFIGURE_ARGUMENTS="$progname $@"
-export TOPLEVEL_CONFIGURE_ARGUMENTS
+AC_SUBST(TOPLEVEL_CONFIGURE_ARGUMENTS)
 
 moveifchange=${srcdir}/move-if-change
 
@@ -161,7 +161,7 @@ target_libs="target-libiberty \
 		target-newlib \
 		${libstdcxx_version} \
 		target-libf2c \
-		${libgcj}
+		${libgcj} \
 		target-libobjc"
 
 # these tools are built using the target libs, and are intended to run only
@@ -640,12 +640,11 @@ case "${target}" in
     noconfigdirs="$noconfigdirs ld gprof target-libgloss ${libgcj}"
     ;;
   mips*-*-irix6*)
-    # The GNU assembler does not support IRIX 6.
     # Linking libjava exceeds command-line length limits on at least
     # IRIX 6.2, but not on IRIX 6.5.
     # Also, boehm-gc won't build on IRIX 6.5, according to Jeffrey Oldham
     # <oldham@codesourcery.com>
-    noconfigdirs="$noconfigdirs gas gprof target-libgloss ${libgcj}"
+    noconfigdirs="$noconfigdirs gprof target-libgloss ${libgcj}"
     ;;
   mips*-dec-bsd*)
     noconfigdirs="$noconfigdirs gprof target-libgloss ${libgcj}"
@@ -1795,11 +1794,16 @@ AC_SUBST_FILE(serialization_dependencies)
 # down to subconfigures.
 baseargs=`echo " ${ac_configure_args} " | \
 	sed -e 's/ --no[[^ ]]* / /' \
-	    -e 's/ --cache[[a-z-]]*=[[^ ]]* / /' \
-	    -e 's/ --sr[[a-z-]]*=[[^ ]]* / /' \
-	    -e 's/ --ho[[a-z-]]*=[[^ ]]* / /' \
-	    -e 's/ --bu[[a-z-]]*=[[^ ]]* / /' \
-	    -e 's/ --ta[[a-z-]]*=[[^ ]]* / /' \
+	    -e 's/ --c[[a-z-]]*[[= ]][[^ ]]* / /' \
+	    -e 's/ --sr[[a-z-]]*[[= ]][[^ ]]* / /' \
+	    -e 's/ --ho[[a-z-]]*[[= ]][[^ ]]* / /' \
+	    -e 's/ --bu[[a-z-]]*[[= ]][[^ ]]* / /' \
+	    -e 's/ --t[[a-z-]]*[[= ]][[^ ]]* / /' \
+	    -e 's/ -cache-file[[= ]][[^ ]]* / /' \
+	    -e 's/ -srcdir[[= ]][[^ ]]* / /' \
+	    -e 's/ -host[[= ]][[^ ]]* / /' \
+	    -e 's/ -build[[= ]][[^ ]]* / /' \
+	    -e 's/ -target[[= ]][[^ ]]* / /' \
 	    -e 's/ [[^ -][^ ]*] / /' \
 	    -e 's/^ *//;s/ *$//'`
 
