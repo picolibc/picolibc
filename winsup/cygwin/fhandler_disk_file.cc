@@ -102,7 +102,12 @@ fhandler_disk_file::fstat_by_name (struct __stat64 *buf, path_conv *pc)
   HANDLE handle;
   WIN32_FIND_DATA local;
 
-  if ((handle = FindFirstFile (pc->get_win32 (), &local)) == INVALID_HANDLE_VALUE)
+  if (!pc->exists ())
+    {
+      set_errno (ENOENT);
+      res = -1;
+    }
+  else if ((handle = FindFirstFile (pc->get_win32 (), &local)) == INVALID_HANDLE_VALUE)
     {
       __seterrno ();
       res = -1;
@@ -140,7 +145,8 @@ fhandler_disk_file::fstat (struct __stat64 *buf, path_conv *pc)
   else
     query_open_already = false;
 
-  if (query_open_already && strncasematch (pc->volname (), "FAT", 3))
+  if (query_open_already && strncasematch (pc->volname (), "FAT", 3)
+      && !strpbrk (get_win32_name (), "?*|<>|"))
     oret = 0;
   else if (!(oret = open (pc, open_flags, 0)))
     {

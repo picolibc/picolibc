@@ -1,3 +1,10 @@
+2002-06-02  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_by_name): Check
+	specifically for non-existent file, first.
+	(fhandler_disk_file::fstat): Perform fd open on files with funny
+	characters.
+
 2002-06-02  Christopher January <chris@atomice.net>
 
 	* fhandler_process.cc (fhandler_process::open): Set fileid.
