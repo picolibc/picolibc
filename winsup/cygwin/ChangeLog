@@ -1,3 +1,9 @@
+Mon Jan 29 17:15:22 2001  Bill Hegardt <bill@troyxcd.com>
+
+	* fhandler_serial.cc (raw_write): Use local copy of OVERLAPPED
+	structure instead of shared structure to fix a race condition between
+	read/write.
+
 Mon Jan 29 14:30:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* mmap.cc (mmap): Remove obsolete check for MAP_SHARED|MAP_ANON as

@@ -161,15 +161,15 @@ int
 fhandler_serial::raw_write (const void *ptr, size_t len)
 {
   DWORD bytes_written;
+  OVERLAPPED write_status;
 
-  if (overlapped_armed)
-    PurgeComm (get_handle (), PURGE_TXABORT | PURGE_RXABORT);
-  ResetEvent (io_status.hEvent);
+  memset (&write_status, 0, sizeof (write_status));
+  write_status.hEvent = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
+  ProtectHandle (write_status.hEvent);
 
   for (;;)
     {
-      overlapped_armed = TRUE;
-      if (WriteFile (get_handle(), ptr, len, &bytes_written, &io_status))
+      if (WriteFile (get_handle(), ptr, len, &bytes_written, &write_status))
 	break;
 
       switch (GetLastError ())
@@ -182,17 +182,19 @@ fhandler_serial::raw_write (const void *ptr, size_t len)
 	    goto err;
 	}
 
-      if (!GetOverlappedResult (get_handle (), &io_status, &bytes_written, TRUE))
+      if (!GetOverlappedResult (get_handle (), &write_status, &bytes_written, TRUE))
 	goto err;
 
       break;
     }
 
-  overlapped_armed = FALSE;
+  CloseHandle(write_status.hEvent);
+ 
   return bytes_written;
 
 err:
   __seterrno ();
+  CloseHandle(write_status.hEvent);
   return -1;
 }
 
