@@ -1,3 +1,7 @@
+2003-01-12  Corinna Vinschen <corinna@vinschen.de>
+
+	* uname.cc (uname): Use cygwin_gethostname() to retrieve hostname.
+
 2003-01-12  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* sec_acl.cc (search_ace): Use id == -1, instead of < 0, as wildcard.

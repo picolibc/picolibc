@@ -19,7 +19,6 @@ details. */
 extern "C" int
 uname (struct utsname *name)
 {
-  DWORD len;
   SYSTEM_INFO sysinfo;
 
   if (check_null_invalid_struct_errno (name))
@@ -33,8 +32,7 @@ uname (struct utsname *name)
   GetSystemInfo (&sysinfo);
 
   /* Computer name */
-  len = sizeof (name->nodename) - 1;
-  GetComputerNameA (name->nodename, &len);
+  cygwin_gethostname (name->nodename, sizeof (name->nodename) - 1);
 
   /* Cygwin dll release */
   __small_sprintf (name->release, "%d.%d.%d%s(%d.%d/%d/%d)",
