@@ -1,6 +1,6 @@
 2003-07-08  Jeff Johnston  <jjohnstn@redhat.com>
 
-	* configure.in: Reapply Inaoko's multilib patch from
+	* configure.in: Reapply Kazuhiro Inaoko's multilib patch from
 	04-17-03.
 	* configure: Regenerated.
 
