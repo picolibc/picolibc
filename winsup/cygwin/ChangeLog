@@ -1,3 +1,8 @@
+Sat Jul 29 12:13:27 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* include/cygwin/version.h: Update minor version for cygdrive changes
+	below.
+
 Sat Jul 29 11:59:29 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* environ.cc (parse_thing): Make binmode a DWORD.
