@@ -1,3 +1,15 @@
+2005-01-02  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/w32api.h: Increment version.
+	* Makefile.in: Ditto.
+	* include/afxres.h: Remove the \r from the line ending.
+	* include/errorrep.h: Ditto.
+	* include/shldisp.h: Ditto.
+	* include/tschema.h: Ditto.
+	* lib/dhcpcsvc.def: Ditto.
+	* lib/uxtheme.def: Ditto.
+	* lib/wldap32.def: Ditto.
+
 2005-01-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winerror.h (ERROR_EXE_CANNOT_MODIFY_STRONG_SIGNED_BINARY):
