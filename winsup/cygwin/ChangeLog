@@ -1,5 +1,12 @@
 2003-09-12  Christopher Faylor  <cgf@redhat.com>
 
+	* thread.cc (MTinterface::fixup_after_fork): Remove code which
+	potentially overwrote _impure pointer with contents of thread which
+	invoked fork since this eliminates important information like the
+	pointer to the atexit queue.
+
+2003-09-12  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler_disk_file.cc (path_conv::ndisk_links): Fix problem where
 	search characters overwrote the path instead of being tacked on the
 	end.
