@@ -1,3 +1,12 @@
+2003-12-01  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* shared.cc (shared_name): Take into account the SE_CREATE_GLOBAL_NAME
+	privilege when building the name string.
+	(open_shared): Remove the call to OpenFileMapping.
+	(shared_info::initialize): Move cygheap initialization to ...   
+	(memory_init): ... here. Suppress now useless shared_h variable.
+	(user_shared_initialize): Make tu a cygpsid.
+
 2003-12-01  Dr. Volker Zell  <Dr.Volker.Zell@oracle.com>
 
 	* include/tzfile.h: Remove duplicate definition of TM_SUNDAY.

@@ -35,9 +35,12 @@ char * __stdcall
 shared_name (char *ret_buf, const char *str, int num)
 {
   extern bool _cygwin_testing;
+  static const char *prefix =
+    wincap.has_terminal_services ()
+    && (set_process_privilege (SE_CREATE_GLOBAL_NAME, true) >= 0
+	|| GetLastError () == ERROR_NO_SUCH_PRIVILEGE) ? "Global\\" : "";
 
-  __small_sprintf (ret_buf, "%s%s.%s.%d",
-  		   wincap.has_terminal_services () ?  "Global\\" : "",
+  __small_sprintf (ret_buf, "%s%s.%s.%d", prefix,
 		   cygwin_version.shared_id, str, num);
   if (_cygwin_testing)
     strcat (ret_buf, cygwin_version.dll_build_date);
@@ -91,15 +94,10 @@ open_shared (const char *name, int n, HANDLE &shared_h, DWORD size,
       if (!name)
 	mapname = NULL;
       else
-	{
-	  mapname = shared_name (map_buf, name, n);
-	  shared_h = OpenFileMappingA (FILE_MAP_READ | FILE_MAP_WRITE,
-				       TRUE, mapname);
-	}
-      if (!shared_h &&
-	  !(shared_h = CreateFileMapping (INVALID_HANDLE_VALUE, psa,
+        mapname = shared_name (map_buf, name, n);
+      if (!(shared_h = CreateFileMapping (INVALID_HANDLE_VALUE, psa,
 					  PAGE_READWRITE, 0, size, mapname)))
-	api_fatal ("CreateFileMapping, %E.  Terminating.");
+	api_fatal ("CreateFileMapping %s, %E.  Terminating.", mapname);
     }
 
   shared = (shared_info *)
@@ -163,7 +161,7 @@ user_shared_initialize (bool reinit)
     {
       if (wincap.has_security ())
         {
-	  cygsid tu (cygheap->user.sid ());
+	  cygpsid tu (cygheap->user.sid ());
 	  tu.string (name);
 	}
       else
@@ -216,13 +214,6 @@ shared_info::initialize ()
 	low_priority_sleep (0);	// Should be hit only very very rarely
     }
 
-  /* Initialize the Cygwin heap, if necessary */
-  if (!cygheap)
-    {
-      cygheap_init ();
-      cygheap->user.init ();
-    }
-
   heap_init ();
 
   if (!sversion)
@@ -238,16 +229,21 @@ memory_init ()
 {
   getpagesize ();
 
+  /* Initialize the Cygwin heap, if necessary */
+  if (!cygheap)
+    {
+      cygheap_init ();
+      cygheap->user.init ();
+    }
+
   /* Initialize general shared memory */
-  HANDLE shared_h = cygheap ? cygheap->shared_h : NULL;
   cygwin_shared = (shared_info *) open_shared ("shared",
 					       CYGWIN_VERSION_SHARED_DATA,
-					       shared_h,
+					       cygheap->shared_h,
 					       sizeof (*cygwin_shared),
 					       SH_CYGWIN_SHARED);
 
   cygwin_shared->initialize ();
-  cygheap->shared_h = shared_h;
   ProtectHandleINH (cygheap->shared_h);
 
   user_shared_initialize (false);
