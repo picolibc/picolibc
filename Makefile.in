@@ -111,6 +111,7 @@ NM = nm
 LD = ld
 
 BZIPPROG = bzip2
+MD5PROG = md5sum
 
 # These values are substituted by configure.
 DEFAULT_YACC = yacc
@@ -1690,9 +1691,36 @@ ETC_SUPPORT= Makefile.in configure configure.in standards.texi \
 # this macro.
 SUPPORT_FILES = list-of-support-files-for-tool-in-question
 
-.PHONY: taz
+# NOTE: No double quotes in the below.  It is used within shell script
+# as VER="$(VER)"
+VER = `	if grep AM_INIT_AUTOMAKE $(TOOL)/configure.in >/dev/null 2>&1; then \
+	  sed < $(TOOL)/configure.in -n 's/AM_INIT_AUTOMAKE[^,]*, *\([^)]*\))/\1/p'; \
+	else \
+	  sed < $(TOOL)/Makefile.in -n 's/^VERSION *= *//p'; \
+	fi`
+PACKAGE = $(TOOL)
 
+.PHONY: taz
 taz: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
+	$(MAKE) -f Makefile.in do-proto-toplev \
+		TOOL=$(TOOL) PACKAGE="$(PACKAGE)" VER="$(VER)" \
+		SUPPORT_FILES="$(SUPPORT_FILES)"
+	$(MAKE) -f Makefile.in do-md5sum \
+		TOOL=$(TOOL) PACKAGE="$(PACKAGE)" VER="$(VER)" \
+		SUPPORT_FILES="$(SUPPORT_FILES)"
+	$(MAKE) -f Makefile.in do-tar-bz2 \
+		TOOL=$(TOOL) PACKAGE="$(PACKAGE)" VER="$(VER)" \
+		SUPPORT_FILES="$(SUPPORT_FILES)"
+
+.PHONY: gdb-taz
+gdb-taz: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
+	$(MAKE) -f Makefile.in taz \
+		TOOL=$(TOOL) PACKAGE="$(PACKAGE)" VER="$(VER)" \
+		SUPPORT_FILES="$(SUPPORT_FILES)"
+
+.PHONY: do-proto-toplev
+do-proto-toplev: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
+	echo "==> Making $(PACKAGE)-$(VER)/"
 	# Take out texinfo from a few places.
 	sed -e '/^all\.normal: /s/\all-texinfo //' \
 	    -e '/^	install-texinfo /d' \
@@ -1742,24 +1770,21 @@ taz: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
 	  ln -s ../../../texinfo/util/tex3patch	proto-toplev/texinfo/util ; \
 	else true; fi
 	chmod -R og=u . || chmod og=u `find . -print`
-	if grep AM_INIT_AUTOMAKE $(TOOL)/configure.in >/dev/null 2>&1; then \
-	  ver=`sed < $(TOOL)/configure.in -n 's/AM_INIT_AUTOMAKE[^,]*, *\([^)]*\))/\1/p'`; \
-	else \
-	  ver=`sed <$(TOOL)/Makefile.in -n 's/^VERSION *= *//p'`; \
-	fi; \
-	if test x"$(PACKAGE)" = x; then \
-	  package="$(TOOL)"; \
-	else \
-	  package="$(PACKAGE)"; \
-	fi; \
-	$(MAKE) -f Makefile.in do-tar-bz2 TOOL=$(TOOL) VER=$$ver PACKAGE=$$package
-
-do-tar-bz2:
-	echo "==> Making $(PACKAGE)-$(VER).tar.bz2"
+	#
 	-rm -f $(PACKAGE)-$(VER)
 	ln -s proto-toplev $(PACKAGE)-$(VER)
+
+.PHONY: do-tar-bz2
+do-tar-bz2:
+	echo "==> Making $(PACKAGE)-$(VER).tar.bz2"
 	tar cfh $(PACKAGE)-$(VER).tar $(PACKAGE)-$(VER)
 	$(BZIPPROG) -v -9 $(PACKAGE)-$(VER).tar
+
+.PHONY: do-md5sum
+do-md5sum:
+	echo "==> Adding md5 checksum to top-level directory"
+	( cd proto-toplev && find * -follow -type f -print | xargs $(MD5PROG) ) > md5.sum
+	mv md5.sum proto-toplev
 
 TEXINFO_SUPPORT= texinfo/texinfo.tex
 DIST_SUPPORT= $(DEVO_SUPPORT) $(TEXINFO_SUPPORT)
@@ -1797,7 +1822,7 @@ gnats.tar.bz2: $(DIST_SUPPORT) $(GNATS_SUPPORT_DIRS) gnats
 .PHONY: gdb.tar.bz2
 GDB_SUPPORT_DIRS= bfd include libiberty mmalloc opcodes readline sim utils intl
 gdb.tar.bz2: $(DIST_SUPPORT) $(GDB_SUPPORT_DIRS) gdb
-	$(MAKE) -f Makefile.in taz TOOL=gdb \
+	$(MAKE) -f Makefile.in gdb-taz TOOL=gdb \
 		SUPPORT_FILES="$(GDB_SUPPORT_DIRS)"
 
 .PHONY: dejagnu.tar.bz2
@@ -1809,19 +1834,19 @@ dejagnu.tar.bz2: $(DIST_SUPPORT) $(DEJAGNU_SUPPORT_DIRS) dejagnu
 .PHONY: gdb+dejagnu.tar.bz2
 GDBD_SUPPORT_DIRS= $(GDB_SUPPORT_DIRS) tcl expect dejagnu
 gdb+dejagnu.tar.bz2: $(DIST_SUPPORT) $(GDBD_SUPPORT_DIRS) gdb
-	$(MAKE) -f Makefile.in taz TOOL=gdb PACKAGE=gdb+dejagnu \
+	$(MAKE) -f Makefile.in gdb-taz TOOL=gdb PACKAGE=gdb+dejagnu \
 		SUPPORT_FILES="$(GDBD_SUPPORT_DIRS)"
 
 .PHONY: insight.tar.bz2
 INSIGHT_SUPPORT_DIRS= $(GDB_SUPPORT_DIRS) tcl tk itcl tix libgui
 insight.tar.bz2: $(DIST_SUPPORT) $(GDB_SUPPORT_DIRS) gdb
-	$(MAKE) -f Makefile.in taz TOOL=gdb PACKAGE=insight \
+	$(MAKE) -f Makefile.in gdb-taz TOOL=gdb PACKAGE=insight \
 		SUPPORT_FILES="$(INSIGHT_SUPPORT_DIRS)"
 
 .PHONY: insight+dejagnu.tar.bz2
 INSIGHTD_SUPPORT_DIRS= $(INSIGHT_SUPPORT_DIRS) expect dejagnu
 insight+dejagnu.tar.bz2: $(DIST_SUPPORT) $(INSIGHTD_SUPPORT_DIRS) gdb
-	$(MAKE) -f Makefile.in taz TOOL=gdb PACKAGE="insight+dejagnu" \
+	$(MAKE) -f Makefile.in gdb-taz TOOL=gdb PACKAGE="insight+dejagnu" \
 		SUPPORT_FILES="$(INSIGHTD_SUPPORT_DIRS)"
 
 .PHONY: newlib.tar.bz2
