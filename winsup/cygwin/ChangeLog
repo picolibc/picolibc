@@ -3,7 +3,7 @@
 	* dtable.cc (dtable::build_fhandler): Don't increment console fd count
 	if new operation fails.  Increment fork_fixup field here.
 	(dtable::dup2): Don't increment fork_fixup field here.
-	(fdsock): Ditto.
+	* net.cc (fdsock): Ditto.
 
 2001-11-08  Corinna Vinschen  <corinna@vinschen.de>
 
