@@ -167,18 +167,40 @@ fhandler_pty_master::doecho (const void *str, DWORD len)
 int
 fhandler_pty_master::accept_input ()
 {
-  DWORD written;
+  DWORD bytes_left, written;
   DWORD n;
   DWORD rc;
+  char* p;
 
   rc = WaitForSingleObject (input_mutex, INFINITE);
 
-  n = get_ttyp ()->read_retval = eat_readahead (-1);
+  bytes_left = n = eat_readahead (-1);
+  get_ttyp ()->read_retval = 0;
+  p = rabuf;
 
   if (n != 0)
     {
-      termios_printf ("about to write %d chars to slave", n);
-      rc = WriteFile (get_output_handle (), rabuf, n, &written, NULL);
+      while (bytes_left > 0)
+	{
+	  termios_printf ("about to write %d chars to slave", bytes_left);
+	  rc = WriteFile (get_output_handle (), p, bytes_left, &written, NULL);
+	  if (!rc)
+	    {
+	      debug_printf ("error writing to pipe %E");
+	      break;
+	    }
+	  get_ttyp ()->read_retval += written;
+	  p += written;
+	  bytes_left -= written;
+	  if (bytes_left > 0)
+	    {
+	      debug_printf ("to_slave pipe is full");
+	      SetEvent (input_available_event);
+	      ReleaseMutex (input_mutex);
+	      Sleep (10);
+	      rc = WaitForSingleObject (input_mutex, INFINITE);
+	    }
+	}
     }
   else
     termios_printf ("sending EOF to slave");

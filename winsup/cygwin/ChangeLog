@@ -1,3 +1,9 @@
+2001-04-27  Egor Duda  <deo@logos-m.ru>
+
+	* tty.cc (tty::make_pipes): Set to_slave pipe mode to nonblocking.
+	* fhandler_tty.cc (fhandler_pty_master::accept_input): If pipe buffer
+	is full, give slave a chance to read data.
+
 2001-04-26  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
         * security.cc (alloc_sd): Add unrelated ACCESS_ALLOWED_ACE behind

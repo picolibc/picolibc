@@ -367,6 +367,10 @@ tty::make_pipes (fhandler_pty_master *ptym)
   ProtectHandle1 (from_slave, from_pty);
   termios_printf ("tty%d from_slave %p, to_slave %p", ntty, from_slave,
 		  to_slave);
+
+  DWORD pipe_mode = PIPE_NOWAIT;
+  if (!SetNamedPipeHandleState (to_slave, &pipe_mode, NULL, NULL))
+    termios_printf ("can't set to_slave to non-blocking mode");
   ptym->set_io_handle (from_slave);
   ptym->set_output_handle (to_slave);
   return TRUE;
