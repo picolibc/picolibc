@@ -1,3 +1,8 @@
+2001-04-17  Stephen L. Moshier  <moshier@moshier.ne.mediaone.net>
+
+        * newlib/libm/math/ef_asin.c (pio2_hi, pio2_lo, pio4_hi):
+         Correct the numerical values.
+
 2001-04-13  Robert Collins <rbtcollins@hotmail.com>
 
 	* libc/include/sys/unistd.h: Add pthread_atfork (Cygwin only).
