@@ -16,10 +16,12 @@
 	* path.cc (cwdstuff::init): Ditto.
 	* sigproc.cc (sigproc_init): Ditto.
 
-	* grp.cc (group_lock): Use different method for locking with static member.
+	* grp.cc (group_lock): Use different method for locking with static
+	member.
 	(read_etc_group): REALLY ensure that read lock mutex is released.
-	* passwd.cc (passwd_lock): Use different method for locking with static member.
-        (read_etc_passwd): REALLY ensure that read lock mutex is released.
+	* passwd.cc (passwd_lock): Use different method for locking with static
+	member.
+	(read_etc_passwd): REALLY ensure that read lock mutex is released.
 
 	* shared.cc (sec_user): Correct reversed inheritance test.
 
