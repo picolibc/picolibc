@@ -1,3 +1,8 @@
+Fri Mar 31 20:39:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * libc/include/sys/unistd.h: Add prototypes for
+        fchmod, fchown, lchown.
+
 Fri Mar 24 15:34:00 2000  Jeff Johnston  <jjohnstn@cygnus.com>
 
 	* acinclude.m4: Changed release to 1.8.2.

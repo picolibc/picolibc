@@ -186,6 +186,8 @@ _f_atan2f
 __f_atan2f = _f_atan2f
 fchmod
 _fchmod = fchmod
+fchown
+_fchown = fchown
 fclose
 _fclose = fclose
 fcntl
@@ -425,6 +427,8 @@ kill
 _kill = kill
 labs
 _labs = labs
+lchown
+_lchown = lchown
 ldexp
 _ldexp = ldexp
 ldexpf

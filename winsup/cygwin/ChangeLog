@@ -1,3 +1,23 @@
+Sun Apr 02 16:02:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * syscalls.cc (chown_worker): Use previous uid/gid if
+        new uid/gid is -1.
+
+Fry Mar 31 22:55:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * syscalls.cc (chown_worker): New static function with
+        chown functionality.
+        (chown): Call chown_worker with SYMLINK_FOLLOW.
+        (fchown): New function. Call chown_worker with SYMLINK_FOLLOW.
+        (lchown): New function. Call chown_worker with SYMLINK_IGNORE.
+        * cygwin.din: Add symbols for fchown, lchown.
+
+Fry Mar 31 11:18:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * path.cc (symlink): Call `set_file_attribute()' and
+        `SetFileAttributeA()' instead of `chmod()' to set
+        uid/gid correct.
+
 Wed Mar 29 22:49:56 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler.h (select_record): Explicitly zero elements of this class.

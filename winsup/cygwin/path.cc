@@ -2048,7 +2048,10 @@ symlink (const char *topath, const char *frompath)
       else
 	{
 	  CloseHandle (h);
-	  chmod (frompath, S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO);
+          set_file_attribute (win32_path.has_acls (),
+                              win32_path.get_win32 (),
+                              S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO);
+          SetFileAttributesA (win32_path.get_win32 (), FILE_ATTRIBUTE_SYSTEM);
 	  res = 0;
 	}
     }

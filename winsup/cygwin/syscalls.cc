@@ -641,22 +641,20 @@ rel2abssd (PSECURITY_DESCRIPTOR psd_rel, PSECURITY_DESCRIPTOR psd_abs,
 /*
  * chown() is only implemented for Windows NT.  Under other operating
  * systems, it is only a stub that always returns zero.
- *
- * Note: the SetFileSecurity API in NT can only set the current
- * user as file owner so we have to use the Backup API instead.
  */
-extern "C"
-int
-chown (const char * name, uid_t uid, gid_t gid)
+static int
+chown_worker (const char *name, symlink_follow fmode, uid_t uid, gid_t gid)
 {
   int res;
+  uid_t old_uid;
+  gid_t old_gid;
 
   if (os_being_run != winNT)    // real chown only works on NT
     res = 0;			// return zero (and do nothing) under Windows 9x
   else
     {
       /* we need Win32 path names because of usage of Win32 API functions */
-      path_conv win32_path (name);
+      path_conv win32_path (name, fmode);
 
       if (win32_path.error)
 	{
@@ -676,17 +674,22 @@ chown (const char * name, uid_t uid, gid_t gid)
       DWORD attrib = 0;
       if (win32_path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY)
         attrib |= S_IFDIR;
-      int has_acls;
-      has_acls = allow_ntsec && win32_path.has_acls ();
-      res = get_file_attribute (has_acls,
+      res = get_file_attribute (win32_path.has_acls (),
                                 win32_path.get_win32 (),
-                                (int *) &attrib);
+                                (int *) &attrib,
+                                &old_uid,
+                                &old_gid);
       if (!res)
-	res = set_file_attribute (win32_path.has_acls (),
-                                  win32_path.get_win32 (),
-				  uid, gid, attrib,
-                                  myself->logsrv);
-
+        {
+          if (uid == (uid_t) -1)
+            uid = old_uid;
+          if (gid == (gid_t) -1)
+            gid = old_gid;
+	  res = set_file_attribute (win32_path.has_acls (),
+                                    win32_path.get_win32 (),
+				    uid, gid, attrib,
+                                    myself->logsrv);
+        }
       if (res != 0 && get_errno () == ENOSYS)
       {
         /* fake - if not supported, pretend we're like win95
@@ -696,8 +699,48 @@ chown (const char * name, uid_t uid, gid_t gid)
     }
 
 done:
-  syscall_printf ("%d = chown (%s,...)", res, name);
+  syscall_printf ("%d = %schown (%s,...)",
+                  res, fmode == SYMLINK_IGNORE ? "l" : "", name);
   return res;
+}
+
+extern "C"
+int
+chown (const char * name, uid_t uid, gid_t gid)
+{
+  return chown_worker (name, SYMLINK_FOLLOW, uid, gid);
+}
+
+extern "C"
+int
+lchown (const char * name, uid_t uid, gid_t gid)
+{
+  return chown_worker (name, SYMLINK_IGNORE, uid, gid);
+}
+
+extern "C"
+int
+fchown (int fd, uid_t uid, gid_t gid)
+{
+  if (dtable.not_open (fd))
+    {
+      syscall_printf ("-1 = fchown (%d,...)", fd);
+      set_errno (EBADF);
+      return -1;
+    }
+
+  const char *path = dtable[fd]->get_name ();
+
+  if (path == NULL)
+    {
+      syscall_printf ("-1 = fchown (%d,...) (no name)", fd);
+      set_errno (ENOSYS);
+      return -1;
+    }
+
+  syscall_printf ("fchown (%d,...): calling chown_worker (%s,FOLLOW,...)",
+                  fd, path);
+  return chown_worker (path, SYMLINK_FOLLOW, uid, gid);
 }
 
 /* umask: POSIX 5.3.3.1 */
