@@ -874,6 +874,9 @@ fhandler_base::lseek (_off64_t offset, int whence)
     }
   else
     {
+      if (poff_high)
+        res += (_off64_t) *poff_high << 32;
+
       /* When next we write(), we will check to see if *this* seek went beyond
 	 the end of the file, and back-seek and fill with zeros if so - DJ */
       set_did_lseek ();
