@@ -361,10 +361,12 @@ extern "C" {
 #define MAXIMUM_SUSPEND_COUNT 0x7F
 #define WAIT_OBJECT_0 0
 #define WAIT_ABANDONED_0 128
-#define WAIT_TIMEOUT 0x102
+#ifndef WAIT_TIMEOUT /* also in winerror.h */
+#define WAIT_TIMEOUT 258
+#endif
 #define WAIT_IO_COMPLETION 0xC0
 #define WAIT_ABANDONED 128
-#define WAIT_FAILED 0xFFFFFFFF
+#define WAIT_FAILED ((DWORD)0xFFFFFFFF)
 #define PURGE_TXABORT 1
 #define PURGE_RXABORT 2
 #define PURGE_TXCLEAR 4

@@ -1,3 +1,28 @@
+2003-01-27  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/rpcnterr.h (RPC_X_INVALID_PIPE_OPERATION): Add
+	define.
+	* include/winbase.h (WAIT_TIMEOUT): Guard against prior
+	definition.
+	(WAIT_FAILED): Cast to DWORD.
+	* include/winerror.h (WAIT_TIMEOUT): Guard against prior
+	definition.
+
+2003-01-27  Bang Jun-Young  <junyoung@netbsd.org>
+
+	* include/winerror.h: Protect against multiple
+	definition of WSA* error codes.
+	* include/winsock.h: Likewise.
+	* include/winsock2.h: Likewise.
+
+2003-01-27  Bang Dong-Heui
+	    Bang Jun-Young  <junyoung@netbsd.org>
+
+	* include/winerror.h (ERROR_*, SEC_E_*,RPC_S_*, FRS_ERR_*,
+	DNS_*, WSA*, WAIT_TIMEOUT): Add missing error codes.
+	(RPC_X_INVALID_PIPE_OPERATION): Remove define.
+
+
 2003-01-24  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/ras.h (RASCONN[AW]): Add dwSessionId for

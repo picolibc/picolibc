@@ -366,6 +366,7 @@ struct sockproto {
 #define FD_ACCEPT	8
 #define FD_CONNECT	16
 #define FD_CLOSE	32
+#ifndef WSABASEERR
 #define WSABASEERR	10000
 #define WSAEINTR	(WSABASEERR+4)
 #define WSAEBADF	(WSABASEERR+9)
@@ -418,6 +419,8 @@ struct sockproto {
 #define WSATRY_AGAIN	(WSABASEERR+1002)
 #define WSANO_RECOVERY	(WSABASEERR+1003)
 #define WSANO_DATA	(WSABASEERR+1004)
+#endif /* !WSABASEERR */
+
 #define WSANO_ADDRESS	WSANO_DATA
 #if !(defined (__INSIDE_CYGWIN__) || defined (__INSIDE_MSYS__))
 #define h_errno WSAGetLastError()
