@@ -1,3 +1,8 @@
+2002-11-26  Christopher Faylor  <cgf@redhat.com>
+
+	* libc/string/memset.c (memset): Move initialization of 'd' earlier in
+	function.
+
 2002-11-25  Christopher Faylor  <cgf@redhat.com>
 
 	* libc/string/memset.c (memset): Minor optimization: Use new 'd'

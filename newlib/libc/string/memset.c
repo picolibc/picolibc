@@ -59,13 +59,13 @@ _DEFUN (memset, (m, c, n),
   int i;
   unsigned long buffer;
   unsigned long *aligned_addr;
+  unsigned int d = c & 0xff;
 
   if (!TOO_SMALL (n) && !UNALIGNED (m))
     {
       /* If we get this far, we know that n is large and m is word-aligned. */
 
       /* To avoid sign extention, copy C to an unsigned variable.  */
-      unsigned int d = c & 0xff;
 
       aligned_addr = (unsigned long*)m;
 
