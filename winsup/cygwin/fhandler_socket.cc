@@ -726,8 +726,8 @@ fhandler_socket::listen (int backlog)
 	    CreateNamedPipe (eid_pipe_name ((char *) alloca (CYG_MAX_PATH + 1)),
 			     PIPE_ACCESS_DUPLEX,
 			     PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,
-			     1, sizeof (struct ucred), sizeof (struct ucred),
-			     1000, &sec_all);
+			     PIPE_UNLIMITED_INSTANCES, sizeof (struct ucred),
+			     sizeof (struct ucred), 1000, &sec_all);
 	  debug_printf ("sec_pipe: %x", sec_pipe);
 	}
       connect_state (connected);
