@@ -71,8 +71,8 @@ struct pa_opcode
    In the args field, the following characters are unused:
 
 	'  "# %&    +-  /          :;< > @'
-	'  C        LM       U   YZ[\]  '
-	'   d       l              {|} '
+	' BC        LM       U   YZ[\]  '
+	'   de gh   lm   q         {|} '
 
    Here are all the characters:
 
@@ -104,7 +104,22 @@ Completer operands all have 'c' as the prefix:
    cx   indexed load completer.
    cm   short load and store completer.
    cs   store bytes short completer.
+
+   cw	read/write completer for PROBE
+   cW	wide completer for MFCTL
+   cL	local processor completer for cache control
    cZ   System Control Completer (to support LPA, LHA, etc.)
+
+   ci	correction completer for DCOR
+   ca	add completer
+   cy	32 bit add carry completer
+   cY	64 bit add carry completer
+   cv	signed overflow trap completer
+   ct	trap on condition completer for ADDI, SUB
+   cT	trap on condition completer for UADDCM
+   cb	32 bit borrow completer for SUB
+   cB	64 bit borrow completer for SUB
+
    ch	left/right half completer
    cH	signed/unsigned saturation completer
    cS	signed/unsigned completer at 21
@@ -181,6 +196,7 @@ Also these:
 	low_sign_ext)
    R	5 bit immediate value at 15 (for the ssm, rsm, probei instructions)
 	(same as r above, except the value is in a different location)
+   U	10 bit immediate value at 15 (for SSM, RSM on pa2.0)
    Q	5 bit immediate value at 10 (a bit position specified in
 	the bb instruction. It's the same as r above, except the
         value is in a different location)
@@ -335,21 +351,35 @@ static const struct pa_opcode pa_opcodes[] =
 { "andcm",      0x08000000, 0xfc000fe0, "?lx,b,t", pa10},
 { "uxor",       0x080003a0, 0xfc000fe0, "?Ux,b,t", pa20, FLAG_STRICT},
 { "uxor",       0x08000380, 0xfc000fe0, "?ux,b,t", pa10},
-{ "uaddcm",     0x08000920, 0xfc000f20, "*?ux,b,t",pa20, FLAG_STRICT},
+{ "uaddcm",     0x080009a0, 0xfc000fa0, "cT?Ux,b,t", pa20, FLAG_STRICT},
+{ "uaddcm",     0x08000980, 0xfc000fa0, "cT?ux,b,t", pa10, FLAG_STRICT},
 { "uaddcm",     0x08000980, 0xfc000fe0, "?ux,b,t", pa10},
 { "uaddcmt",    0x080009c0, 0xfc000fe0, "?ux,b,t", pa10},
-{ "dcor",       0x08000ba0, 0xfc1f0fa0, "%?ub,t",  pa20, FLAG_STRICT},
+{ "dcor",       0x08000ba0, 0xfc1f0fa0, "ci?Ub,t", pa20, FLAG_STRICT},
+{ "dcor",       0x08000b80, 0xfc1f0fa0, "ci?ub,t", pa10, FLAG_STRICT},
 { "dcor",       0x08000b80, 0xfc1f0fe0, "?ub,t",   pa10},
 { "idcor",      0x08000bc0, 0xfc1f0fe0, "?ub,t",   pa10},
+{ "addi",       0xb0000000, 0xfc000000, "ct?ai,b,x", pa10, FLAG_STRICT},
+{ "addi",       0xb4000000, 0xfc000000, "cv?ai,b,x", pa10, FLAG_STRICT},
 { "addi",       0xb4000000, 0xfc000800, "?ai,b,x", pa10},
 { "addio",      0xb4000800, 0xfc000800, "?ai,b,x", pa10},
 { "addit",      0xb0000000, 0xfc000800, "?ai,b,x", pa10},
 { "addito",     0xb0000800, 0xfc000800, "?ai,b,x", pa10},
+{ "add",        0x08000720, 0xfc0007e0, "cY?Ax,b,t", pa20, FLAG_STRICT},
+{ "add",        0x08000700, 0xfc0007e0, "cy?ax,b,t", pa10, FLAG_STRICT},
+{ "add",        0x08000220, 0xfc0003e0, "ca?Ax,b,t", pa20, FLAG_STRICT},
+{ "add",        0x08000200, 0xfc0003e0, "ca?ax,b,t", pa10, FLAG_STRICT},
 { "add",        0x08000600, 0xfc000fe0, "?ax,b,t", pa10},
 { "addl",       0x08000a00, 0xfc000fe0, "?ax,b,t", pa10},
 { "addo",       0x08000e00, 0xfc000fe0, "?ax,b,t", pa10},
 { "addc",       0x08000700, 0xfc000fe0, "?ax,b,t", pa10},
 { "addco",      0x08000f00, 0xfc000fe0, "?ax,b,t", pa10},
+{ "sub",        0x080004e0, 0xfc0007e0, "ct?Sx,b,t", pa20, FLAG_STRICT},
+{ "sub",        0x080004c0, 0xfc0007e0, "ct?sx,b,t", pa10, FLAG_STRICT},
+{ "sub",        0x08000520, 0xfc0007e0, "cB?Sx,b,t", pa20, FLAG_STRICT},
+{ "sub",        0x08000500, 0xfc0007e0, "cb?sx,b,t", pa10, FLAG_STRICT},
+{ "sub",        0x08000420, 0xfc0007e0, "cv?Sx,b,t", pa20, FLAG_STRICT},
+{ "sub",        0x08000400, 0xfc0007e0, "cv?sx,b,t", pa10, FLAG_STRICT},
 { "sub",        0x08000400, 0xfc000fe0, "?sx,b,t", pa10},
 { "subo",       0x08000c00, 0xfc000fe0, "?sx,b,t", pa10},
 { "subb",       0x08000500, 0xfc000fe0, "?sx,b,t", pa10},
@@ -357,11 +387,14 @@ static const struct pa_opcode pa_opcodes[] =
 { "subt",       0x080004c0, 0xfc000fe0, "?sx,b,t", pa10},
 { "subto",      0x08000cc0, 0xfc000fe0, "?sx,b,t", pa10},
 { "ds",         0x08000440, 0xfc000fe0, "?sx,b,t", pa10},
+{ "subi",       0x94000000, 0xfc000000, "cv?si,b,x", pa10, FLAG_STRICT},
 { "subi",       0x94000000, 0xfc000800, "?si,b,x", pa10},
 { "subio",      0x94000800, 0xfc000800, "?si,b,x", pa10},
 { "cmpiclr",    0x90000800, 0xfc000800, "?Si,b,x", pa20, FLAG_STRICT},
 { "cmpiclr",    0x90000000, 0xfc000800, "?si,b,x", pa10, FLAG_STRICT},
 { "comiclr",    0x90000000, 0xfc000800, "?si,b,x", pa10},
+{ "shladd",     0x08000220, 0xfc000320, "ca?Ax,.,b,t", pa20, FLAG_STRICT},
+{ "shladd",     0x08000200, 0xfc000320, "ca?ax,.,b,t", pa10, FLAG_STRICT},
 { "sh1add",     0x08000640, 0xfc000fe0, "?ax,b,t", pa10},
 { "sh1addl",    0x08000a40, 0xfc000fe0, "?ax,b,t", pa10},
 { "sh1addo",    0x08000e40, 0xfc000fe0, "?ax,b,t", pa10},
@@ -410,9 +443,12 @@ static const struct pa_opcode pa_opcodes[] =
 /* System Control Instructions */
 
 { "break",      0x00000000, 0xfc001fe0, "r,A", pa10},
+{ "rfi",        0x00000c00, 0xffffff1f, "cr", pa10, FLAG_STRICT},
 { "rfi",        0x00000c00, 0xffffffff, "", pa10},
 { "rfir",       0x00000ca0, 0xffffffff, "", pa11},
+{ "ssm",        0x00000d60, 0xfc00ffe0, "U,t", pa20, FLAG_STRICT},
 { "ssm",        0x00000d60, 0xffe0ffe0, "R,t", pa10},
+{ "rsm",        0x00000e60, 0xfc00ffe0, "U,t", pa20, FLAG_STRICT},
 { "rsm",        0x00000e60, 0xffe0ffe0, "R,t", pa10},
 { "mtsm",       0x00001860, 0xffe0ffff, "x", pa10},
 { "ldsid",      0x000010a0, 0xfc1f3fe0, "(s,b),t", pa10},
@@ -422,9 +458,14 @@ static const struct pa_opcode pa_opcodes[] =
 { "mtsarcm",    0x016018C0, 0xffe0ffff, "x", pa20, FLAG_STRICT},
 { "mfia",       0x000014A0, 0xffffffe0, "t", pa20, FLAG_STRICT},
 { "mfsp",       0x000004a0, 0xffff1fe0, "S,t", pa10},
+{ "mfctl",      0x016048a0, 0xffffffe0, "cW!,t", pa20, FLAG_STRICT},
 { "mfctl",      0x000008a0, 0xfc1fffe0, "^,t", pa10},
 { "sync",       0x00000400, 0xffffffff, "", pa10},
 { "syncdma",    0x00100400, 0xffffffff, "", pa10},
+{ "probe",      0x04001180, 0xfc003fe0, "cw(s,b),x,t", pa10, FLAG_STRICT},
+{ "probe",      0x04001180, 0xfc003fe0, "cw(b),x,t", pa10, FLAG_STRICT},
+{ "probei",     0x04003180, 0xfc003fe0, "cw(s,b),R,t", pa10, FLAG_STRICT},
+{ "probei",     0x04003180, 0xfc003fe0, "cw(b),R,t", pa10, FLAG_STRICT},
 { "prober",     0x04001180, 0xfc003fe0, "(s,b),x,t", pa10},
 { "prober",     0x04001180, 0xfc003fe0, "(b),x,t", pa10},
 { "proberi",    0x04003180, 0xfc003fe0, "(s,b),R,t", pa10},
@@ -439,8 +480,12 @@ static const struct pa_opcode pa_opcodes[] =
 { "lha",        0x04001300, 0xfc003fc0, "cZx(b),t", pa10},
 { "lci",        0x04001300, 0xfc003fe0, "x(s,b),t", pa10},
 { "lci",        0x04001300, 0xfc003fe0, "x(b),t", pa10},
+{ "pdtlb",      0x04001600, 0xfc003fdf, "cLcZx(s,b)", pa20, FLAG_STRICT},
+{ "pdtlb",      0x04001600, 0xfc003fdf, "cLcZx(b)", pa20, FLAG_STRICT},
 { "pdtlb",      0x04001200, 0xfc003fdf, "cZx(s,b)", pa10},
 { "pdtlb",      0x04001200, 0xfc003fdf, "cZx(b)", pa10},
+{ "pitlb",      0x04000600, 0xfc001fdf, "cLcZx(S,b)", pa20, FLAG_STRICT},
+{ "pitlb",      0x04000600, 0xfc001fdf, "cLcZx(b)", pa20, FLAG_STRICT},
 { "pitlb",      0x04000200, 0xfc001fdf, "cZx(S,b)", pa10},
 { "pitlb",      0x04000200, 0xfc001fdf, "cZx(b)", pa10},
 { "pdtlbe",     0x04001240, 0xfc003fdf, "cZx(s,b)", pa10},
@@ -546,6 +591,10 @@ static const struct pa_opcode pa_opcodes[] =
 { "ftest",      0x30002420, 0xffffffff, "", pa10},
 { "fid",        0x30000000, 0xffffffff, "", pa11},
 
+/* Performance Monitor Instructions */
+
+{ "pmdis",	0x30000280, 0xffffffdf, "N", pa20, FLAG_STRICT},
+{ "pmenb",	0x30000680, 0xffffffff, "", pa20, FLAG_STRICT},
 
 /* Assist Instructions */
 
