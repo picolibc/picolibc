@@ -1,3 +1,8 @@
+2003-10-13  Martin Fuchs  <Martin-Fuchs@gmx.net>
+
+	* include/shlobj.h (CFSTR_FILENAME, CFSTR_FILEDESCRIPTOR,
+	CFSTR_FILENAMEMAP, CFSTR_SHELLURL): Correct UNICODE definitions.
+
 2003-10-13  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* include/winnt.h (SM_REMOTESESSION): Add define.
