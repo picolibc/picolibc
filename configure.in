@@ -809,7 +809,7 @@ case "${target}" in
   i[3456]86-*-linux*)
     # This section makes it possible to build newlib natively on linux.
     # If we are using a cross compiler then don't configure newlib.
-    if [ x${is_cross_compiler} != xno ] ; then
+    if test x${is_cross_compiler} != xno ; then
          noconfigdirs="$noconfigdirs target-newlib"
     fi
     noconfigdirs="$noconfigdirs target-libgloss"
