@@ -12,7 +12,12 @@
 #include <envz.h>
 
 error_t
-envz_merge (char **envz, size_t *envz_len, const char *envz2, size_t envz2_len, int override)
+_DEFUN (envz_merge, (envz, envz_len, envz2, envz2_len, override),
+       char **envz _AND
+       size_t *envz_len _AND
+       const char *envz2 _AND
+       size_t envz2_len _AND
+       int override)
 {
   char *entry = NULL;
   char *name_str = NULL;

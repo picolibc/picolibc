@@ -10,7 +10,11 @@
 #include <stdlib.h>
 
 error_t
-argz_create_sep (const char *string, int sep, char **argz, size_t *argz_len)
+_DEFUN (argz_create_sep, (string, sep, argz, argz_len),
+       const char *string _AND
+       int sep _AND
+       char **argz _AND
+       size_t *argz_len)
 {
   int len = 0;
   int i = 0;

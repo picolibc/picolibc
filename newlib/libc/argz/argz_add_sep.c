@@ -11,7 +11,11 @@
 #include <argz.h>
 
 error_t
-argz_add_sep (char **argz, size_t *argz_len, const char *str, int sep)
+_DEFUN (argz_add_sep, (argz, argz_len, str, sep),
+       char **argz _AND
+       size_t *argz_len _AND
+       const char *str _AND
+       int sep)
 {
   char *str_argz = 0;
   size_t str_argz_len = 0;

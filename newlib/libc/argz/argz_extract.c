@@ -8,7 +8,10 @@
 #include <sys/types.h>
 
 void
-argz_extract (char *argz, size_t argz_len, char **argv)
+_DEFUN (argz_extract, (argz, argz_len, argv),
+       char *argz _AND
+       size_t argz_len _AND
+       char **argv)
 {
   size_t i = 0;
   int j = 0;

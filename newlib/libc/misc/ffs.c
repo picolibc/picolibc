@@ -24,9 +24,11 @@ PORTABILITY
 
 No supporting OS subroutines are required.  */
 
+#include <_ansi.h>
+
 int
-ffs (word)
-     int word;
+_DEFUN(ffs, (word),
+       int word)
 {
   int i;
 

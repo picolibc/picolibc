@@ -162,9 +162,9 @@ _DEFUN (_signal_r, (ptr, sig, func),
 }
 
 int 
-_raise_r (ptr, sig)
-     struct _reent *ptr;
-     int sig;
+_DEFUN (_raise_r, (ptr, sig),
+     struct _reent *ptr _AND
+     int sig)
 {
   _sig_func_ptr func;
 
@@ -196,9 +196,9 @@ _raise_r (ptr, sig)
 }
 
 int
-__sigtramp_r (ptr, sig)
-     struct _reent *ptr;
-     int sig;
+_DEFUN (__sigtramp_r, (ptr, sig),
+     struct _reent *ptr _AND
+     int sig)
 {
   _sig_func_ptr func;
 
@@ -228,8 +228,8 @@ __sigtramp_r (ptr, sig)
 #ifndef _REENT_ONLY
 
 int 
-raise (sig)
-     int sig;
+_DEFUN (raise, (sig),
+     int sig)
 {
   return _raise_r (_REENT, sig);
 }
@@ -243,13 +243,13 @@ _DEFUN (signal, (sig, func),
 }
 
 int 
-_init_signal ()
+_DEFUN_VOID (_init_signal)
 {
   return _init_signal_r (_REENT);
 }
 
 int
-__sigtramp (int sig)
+_DEFUN (__sigtramp, (sig), int sig)
 {
   return __sigtramp_r (_REENT, sig);
 }

@@ -16,17 +16,19 @@ static char ***p_environ = &environ;
 #include <stdarg.h>
 
 int
-execl (_CONST char *path, _CONST char *arg0, ...)
+_DEFUN(execl, (path, arg0, ...), 
+      _CONST char *path _AND
+      _CONST char *arg0 _DOTS)
 
 #else
 
 #include <varargs.h>
 
 int
-execl (path, arg0, va_alist)
-     _CONST char *path;
-     _CONST char *arg0;
-     va_dcl
+_DEFUN(execl, (path, arg0, va_alist),
+     _CONST char *path _AND
+     _CONST char *arg0 _AND
+     va_dcl)
 
 #endif
 

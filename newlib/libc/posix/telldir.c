@@ -78,8 +78,8 @@ __LOCK_INIT(static, dd_hash_lock);
 #ifndef _ELIX_LEVEL || _ELIX_LEVEL >= 2
 
 long
-telldir(dirp)
-       DIR *dirp;
+_DEFUN(telldir, (dirp),
+       DIR *dirp)
 {
 	register int index;
 	register struct ddloc *lp;
@@ -112,9 +112,9 @@ telldir(dirp)
  * Only values returned by "telldir" should be passed to seekdir.
  */
 void
-_seekdir(dirp, loc)
-	register DIR *dirp;
-	long loc;
+_DEFUN(_seekdir, (dirp, loc),
+	register DIR *dirp _AND
+	long loc)
 {
 	register struct ddloc *lp;
 	register struct ddloc **prevlp;
@@ -160,8 +160,8 @@ found:
 
 /* clean out any hash entries from a closed directory */
 void
-_cleanupdir (dirp)
-	register DIR *dirp;
+_DEFUN(_cleanupdir, (dirp),
+	register DIR *dirp)
 {
 	int i;
 

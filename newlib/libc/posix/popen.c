@@ -63,9 +63,9 @@ static struct pid {
 } *pidlist; 
 	
 FILE *
-popen(program, type)
-	const char *program;
-	const char *type;
+_DEFUN(popen, (program, type),
+	const char *program _AND
+	const char *type)
 {
 	struct pid *cur;
 	FILE *iop;
@@ -144,8 +144,8 @@ popen(program, type)
  *	if already `pclosed', or waitpid returns an error.
  */
 int
-pclose(iop)
-	FILE *iop;
+_DEFUN(pclose, (iop),
+	FILE *iop)
 {
 	register struct pid *cur, *last;
 	int pstat;

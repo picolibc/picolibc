@@ -42,7 +42,8 @@
 #define _REL(BASE) ((int)item-BASE)
 
 char *
-nl_langinfo(nl_item item) {
+_DEFUN(nl_langinfo, (item), 
+       nl_item item) {
 
    char *ret, *s, *cs;
    static char *csym = NULL;

@@ -10,7 +10,10 @@
 #include <stdlib.h>
 
 error_t
-argz_delete (char **argz, size_t *argz_len, char *entry)
+_DEFUN (argz_delete, (argz, argz_len, entry),
+       char **argz _AND
+       size_t *argz_len _AND
+       char *entry)
 {
   int len = 0;
   char *moveto = entry;

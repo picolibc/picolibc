@@ -4,10 +4,13 @@
  * is freely granted, provided that this notice is preserved.
  */
 
+#include <_ansi.h>
 #include <sys/types.h>
 
 size_t
-argz_count (const char *argz, size_t argz_len)
+_DEFUN (argz_count, (argz, argz_len), 
+       const char *argz _AND
+       size_t argz_len)
 {
   int i;
   size_t count = 0;

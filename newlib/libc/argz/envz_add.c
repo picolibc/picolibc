@@ -12,7 +12,11 @@
 #include <envz.h>
 
 error_t
-envz_add (char **envz, size_t *envz_len, const char *name, const char *value)
+_DEFUN (envz_add, (envz, envz_len, name, value),
+       char **envz _AND 
+       size_t *envz_len _AND 
+       const char *name _AND
+       const char *value)
 {
   char *concat = NULL;
   int name_len = 0;

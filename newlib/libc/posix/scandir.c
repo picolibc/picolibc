@@ -71,11 +71,11 @@ static char sccsid[] = "@(#)scandir.c	5.10 (Berkeley) 2/23/91";
 #endif
 
 int
-scandir(dirname, namelist, select, dcomp)
-	const char *dirname;
-	struct dirent ***namelist;
-	int (*select) __P((struct dirent *));
-	int (*dcomp) __P((const void *, const void *));
+_DEFUN(scandir, (dirname, namelist, select, dcomp),
+	const char *dirname _AND
+	struct dirent ***namelist _AND
+	int (*select) __P((struct dirent *)) _AND
+	int (*dcomp) __P((const void *, const void *)))
 {
 	register struct dirent *d, *p, **names;
 	register size_t nitems;
@@ -167,9 +167,9 @@ scandir(dirname, namelist, select, dcomp)
  * Alphabetic order comparison routine for those who want it.
  */
 int
-alphasort(d1, d2)
-       const struct dirent **d1;
-       const struct dirent **d2;
+_DEFUN(alphasort, (d1, d2),
+       const struct dirent **d1 _AND
+       const struct dirent **d2)
 {
        return(strcmp((*d1)->d_name, (*d2)->d_name));
 }

@@ -42,8 +42,8 @@ static char sccsid[] = "@(#)rewinddir.c	5.1 (Berkeley) 5/25/90";
 #include <sys/lock.h>
 
 void
-rewinddir(dirp)
-	DIR *dirp;
+_DEFUN(rewinddir, (dirp),
+	DIR *dirp)
 {
 #ifdef HAVE_DD_LOCK
 	__lock_acquire_recursive(dirp->dd_lock);

@@ -10,7 +10,11 @@
 #include <stdlib.h>
 
 error_t
-argz_append (char **argz, size_t *argz_len, const char *buf, size_t buf_len)
+_DEFUN (argz_append, (argz, argz_len, buf, buf_len),
+       char **argz _AND
+       size_t *argz_len _AND
+       const char *buf _AND
+       size_t buf_len)
 {
   size_t last = *argz_len;
 

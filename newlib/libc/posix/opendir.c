@@ -47,8 +47,8 @@ static char sccsid[] = "@(#)opendir.c	5.11 (Berkeley) 2/23/91";
  * open a directory.
  */
 DIR *
-opendir(name)
-	const char *name;
+_DEFUN(opendir, (name),
+	const char *name)
 {
 	register DIR *dirp;
 	register int fd;

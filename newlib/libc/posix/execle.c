@@ -11,17 +11,19 @@
 #include <stdarg.h>
 
 int
-execle (_CONST char *path, _CONST char *arg0, ...)
+_DEFUN(execle, (path, arg0, ...),
+      _CONST char *path _AND
+      _CONST char *arg0 _DOTS)
 
 #else
 
 #include <varargs.h>
 
 int
-execle (path, arg0, va_alist)
-     _CONST char *path;
-     _CONST char *arg0;
-     va_dcl
+_DEFUN(execle, (path, arg0, va_alist),
+     _CONST char *path _AND
+     _CONST char *arg0 _AND
+     va_dcl)
 
 #endif
 

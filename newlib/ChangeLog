@@ -1,3 +1,29 @@
+2003-06-06  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/argz/argz_add.c: Change to use _DEFUN macro for function
+        definition.
+        * libc/argz/argz_add_sep.c: Ditto.
+        * libc/argz/argz_append.c libc/argz/argz_count.c: Ditto.
+        * libc/argz/argz_create.c libc/argz/argz_create_sep.c: Ditto.
+        * libc/argz/argz_delete.c libc/argz/argz_extract.c: Ditto.
+        * libc/argz/argz_insert.c libc/argz/argz_next.c: Ditto.
+        * libc/argz/argz_replace.c libc/argz/argz_stringify.c: Ditto.
+        * libc/argz/envz_add.c libc/argz/envz_entry.c: Ditto.
+        * libc/argz/envz_get.c libc/argz/envz_merge.c: Ditto.
+        * libc/argz/envz_remove.c libc/argz/envz_strip.c: Ditto.
+        * libc/locale/nl_langinfo.c libc/misc/ffs.c: Ditto.
+        * libc/posix/closedir.c libc/posix/creat.c: Ditto.
+        * libc/posix/execl.c libc/posix/execle.c: Ditto.
+        * libc/posix/execlp.c libc/posix/execve.c: Ditto.
+        * libc/posix/isatty.c libc/posix/opendir.c: Ditto.
+        * libc/posix/popen.c libc/posix/readdir.c: Ditto.
+        * libc/posix/readdir_r.c libc/posix/rewinddir.c: Ditto.
+        * libc/posix/scandir.c libc/posix/seekdir.c: Ditto.
+        * libc/posix/telldir.c libc/search/hcreate.c: Ditto.
+        * libc/search/tdelete.c libc/search/tdestroy.c: Ditto.
+        * libc/search/tfind.c libc/search/tsearch.c: Ditto.
+        * libc/search/twalk.c libc/signal/signal.c: Ditto.
+
 2003-06-05  Nick Clifton  <nickc@redhat.com>
 	
 	* libc/include/sys/reent.h (struct _on_exit_args): New

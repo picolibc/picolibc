@@ -4,10 +4,14 @@
  * is freely granted, provided that this notice is preserved.
  */
 
+#include <_ansi.h>
 #include <sys/types.h>
 
 void
-argz_stringify (char *argz, size_t argz_len, int sep)
+_DEFUN (argz_stringify, (argz, argz_len, sep),
+       char *argz _AND
+       size_t argz_len _AND
+       int sep)
 {
   size_t i;
 

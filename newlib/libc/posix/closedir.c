@@ -49,8 +49,8 @@ extern void _cleanupdir (DIR *dirp);
  * close a directory.
  */
 int
-closedir(dirp)
-	register DIR *dirp;
+_DEFUN(closedir, (dirp),
+       register DIR *dirp)
 {
 	int fd, rc;
 
