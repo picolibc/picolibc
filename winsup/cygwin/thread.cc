@@ -424,7 +424,10 @@ pthread_cond::BroadCast ()
     {
       if (pthread_mutex_unlock (&cond_access))
         system_printf ("Failed to unlock condition variable access mutex, this %0p\n", this);
-      system_printf ("Broadcast called with invalid mutex\n");
+      /* This isn't and API error - users are allowed to call this when no threads 
+	 are waiting 
+	 system_printf ("Broadcast called with invalid mutex\n");
+      */
       return;
     }
   while (count--)
@@ -1639,6 +1642,8 @@ __pthread_cond_timedwait (pthread_cond_t * cond, pthread_mutex_t * mutex,
   if ((((pshared_mutex *)(mutex))->flags & SYS_BASE == SYS_BASE))
     // a pshared mutex
     themutex = __pthread_mutex_getpshared (mutex);
+  else
+    themutex = mutex;
 
   if (!verifyable_object_isvalid (*themutex, PTHREAD_MUTEX_MAGIC))
     return EINVAL;
@@ -1685,6 +1690,8 @@ __pthread_cond_wait (pthread_cond_t * cond, pthread_mutex_t * mutex)
   if ((((pshared_mutex *)(mutex))->flags & SYS_BASE == SYS_BASE))
     // a pshared mutex
     themutex = __pthread_mutex_getpshared (mutex);
+  else
+    themutex = mutex;
   if (!verifyable_object_isvalid (*themutex, PTHREAD_MUTEX_MAGIC))
     return EINVAL;
   if (!verifyable_object_isvalid (*cond, PTHREAD_COND_MAGIC))

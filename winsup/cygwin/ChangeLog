@@ -1,3 +1,11 @@
+Thu Jun  7 15:54:32 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* thread.cc (pthread_cond::Broadcast): Don't print error messages on
+	invalid mutexs - user programs are allowed to call
+	pthread_cond_broadcast like that.
+	(__pthread_cond_timedwait): Initialise themutex properly.
+	(__pthread_cond_wait): Initialise themutex properly.
+
 Tue Jun  5 19:56:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler_console.cc (fhandler_console::dup): Allocate space for
