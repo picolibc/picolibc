@@ -154,12 +154,13 @@ details. */
        54: Export __fpclassifyd, __fpclassifyf, __signbitd, __signbitf.
        55: Export fcloseall, fcloseall_r.
        56: Make ntsec on by default.
+       57: Export setgroups.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 56
+#define CYGWIN_VERSION_API_MINOR 57
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

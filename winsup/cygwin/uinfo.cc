@@ -48,9 +48,12 @@ internal_getlogin (cygheap_user &user)
 			     &ptok))
 	system_printf ("OpenProcessToken(): %E\n");
       else if (!GetTokenInformation (ptok, TokenUser, &tu, sizeof tu, &siz))
-	system_printf ("GetTokenInformation(): %E");
+	system_printf ("GetTokenInformation (TokenUser): %E");
       else if (!(ret = user.set_sid (tu)))
 	system_printf ("Couldn't retrieve SID from access token!");
+      else if (!GetTokenInformation (ptok, TokenPrimaryGroup,
+				     &user.groups.pgsid, sizeof tu, &siz))
+	system_printf ("GetTokenInformation (TokenPrimaryGroup): %E");
        /* We must set the user name, uid and gid.
 	 If we have a SID, try to get the corresponding Cygwin
 	 password entry. Set user name which can be different
@@ -75,11 +78,14 @@ internal_getlogin (cygheap_user &user)
 	     primary group to the group in /etc/passwd. */
 	  if (!SetTokenInformation (ptok, TokenOwner, &tu, sizeof tu))
 	    debug_printf ("SetTokenInformation(TokenOwner): %E");
-	  if (gsid && !SetTokenInformation (ptok, TokenPrimaryGroup,
-					    &gsid, sizeof gsid))
-	    debug_printf ("SetTokenInformation(TokenPrimaryGroup): %E");
+	  if (gsid)
+	    {
+	      user.groups.pgsid = gsid;
+	      if (!SetTokenInformation (ptok, TokenPrimaryGroup,
+					&gsid, sizeof gsid))
+		debug_printf ("SetTokenInformation(TokenPrimaryGroup): %E");
+	    }
 	 }
-
       if (ptok != INVALID_HANDLE_VALUE)
 	CloseHandle (ptok);
     }

@@ -47,6 +47,22 @@ BOOL allow_ntsec = true;
    The default is TRUE to reflect the old behaviour. */
 BOOL allow_smbntsec;
 
+cygsid *
+cygsidlist::alloc_sids (int n)
+{
+  if (n > 0)
+    return (cygsid *) cmalloc (HEAP_STR, n * sizeof (cygsid));
+  else
+    return NULL;
+}
+
+void
+cygsidlist::free_sids ()
+{
+  if (sids)
+    cfree (sids);
+}
+
 extern "C" void
 cygwin_set_impersonation_token (const HANDLE hToken)
 {
@@ -64,7 +80,7 @@ extract_nt_dom_user (const struct passwd *pw, char *domain, char *user)
   char *d, *u, *c;
 
   domain[0] = 0;
-  strlcpy (user, pw->pw_name, UNLEN+1);
+  strlcpy (user, pw->pw_name, UNLEN + 1);
   debug_printf ("pw_gecos = %x (%s)", pw->pw_gecos, pw->pw_gecos);
 
   if ((d = strstr (pw->pw_gecos, "U-")) != NULL &&
@@ -74,11 +90,11 @@ extract_nt_dom_user (const struct passwd *pw, char *domain, char *user)
       if ((u = strchr (d + 2, '\\')) == NULL || (c != NULL && u > c))
 	u = d + 1;
       else if (u - d <= INTERNET_MAX_HOST_NAME_LENGTH + 2)
-	strlcpy(domain, d + 2, u - d - 1);
+	strlcpy (domain, d + 2, u - d - 1);
       if (c == NULL)
 	c = u + UNLEN + 1;
       if (c - u <= UNLEN + 1)
-	strlcpy(user, u + 1, c - u);
+	strlcpy (user, u + 1, c - u);
     }
   if (domain[0])
     return;
@@ -112,9 +128,9 @@ cygwin_logon_user (const struct passwd *pw, const char *password)
   extract_nt_dom_user (pw, nt_domain, nt_user);
   debug_printf ("LogonUserA (%s, %s, %s, ...)", nt_user, nt_domain, password);
   if (!LogonUserA (nt_user, *nt_domain ? nt_domain : NULL, (char *) password,
-		    LOGON32_LOGON_INTERACTIVE,
-		    LOGON32_PROVIDER_DEFAULT,
-		    &hToken)
+		   LOGON32_LOGON_INTERACTIVE,
+		   LOGON32_PROVIDER_DEFAULT,
+		   &hToken)
       || !SetHandleInformation (hToken,
 				HANDLE_FLAG_INHERIT,
 				HANDLE_FLAG_INHERIT))
@@ -152,7 +168,7 @@ str2buf2uni (UNICODE_STRING &tgt, WCHAR *buf, const char *srcstr)
   sys_mbstowcs (buf, srcstr, tgt.MaximumLength);
 }
 
-#if 0 //unused
+#if 0				/* unused */
 static void
 lsa2wchar (WCHAR *tgt, LSA_UNICODE_STRING &src, int size)
 {
@@ -194,7 +210,7 @@ close_local_policy (LSA_HANDLE &lsa)
   lsa = INVALID_HANDLE_VALUE;
 }
 
-#if 0 // unused
+#if 0 /* unused */
 static BOOL
 get_lsa_srv_inf (LSA_HANDLE lsa, char *logonserver, char *domain)
 {
@@ -226,7 +242,8 @@ get_lsa_srv_inf (LSA_HANDLE lsa, char *logonserver, char *domain)
      not member of a domain.  The name in the primary domain info is the
      name of the workgroup then. */
   if (pdi->Sid &&
-      (ret = NetGetDCName (NULL, primary, (LPBYTE *) &buf)) == STATUS_SUCCESS)
+      (ret =
+       NetGetDCName (NULL, primary, (LPBYTE *) &buf)) == STATUS_SUCCESS)
     {
       sys_wcstombs (name, buf, INTERNET_MAX_HOST_NAME_LENGTH + 1);
       strcpy (logonserver, name);
@@ -271,7 +288,8 @@ get_logon_server (const char *domain, char *server, WCHAR *wserver)
     {
       sys_wcstombs (server, buf, INTERNET_MAX_HOST_NAME_LENGTH + 1);
       if (wserver)
-	for (WCHAR *ptr1 = buf; (*wserver++ = *ptr1++); ) {}
+	for (WCHAR *ptr1 = buf; (*wserver++ = *ptr1++);)
+	  ;
       NetApiBufferFree (buf);
       return TRUE;
     }
@@ -280,7 +298,8 @@ get_logon_server (const char *domain, char *server, WCHAR *wserver)
 }
 
 static BOOL
-get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user, char *domain)
+get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user,
+		 char *domain)
 {
   char dgroup[INTERNET_MAX_HOST_NAME_LENGTH + GNLEN + 2];
   WCHAR wuser[UNLEN + 1];
@@ -313,11 +332,12 @@ get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user, char *do
 
       sys_wcstombs (dgroup + len, buf[i].grui0_name, GNLEN + 1);
       if (!LookupAccountName (NULL, dgroup, gsid, &glen, domain, &dlen, &use))
-	  debug_printf ("LookupAccountName(%s): %E", dgroup);
+	debug_printf ("LookupAccountName(%s): %E", dgroup);
       else if (legal_sid_type (use))
-	  grp_list += gsid;
-      else debug_printf ("Global group %s invalid. Domain: %s Use: %d",
-			dgroup, domain, use);
+	grp_list += gsid;
+      else
+	debug_printf ("Global group %s invalid. Domain: %s Use: %d",
+		      dgroup, domain, use);
     }
 
   NetApiBufferFree (buf);
@@ -369,10 +389,10 @@ get_user_local_groups (cygsidlist &grp_list, PSID pusersid)
   char lgroup[INTERNET_MAX_HOST_NAME_LENGTH + GNLEN + 2];
   const DWORD blen = sizeof ("BUILTIN\\") - 1;
   DWORD llen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
-  if (!GetComputerNameA(lgroup, & llen))
+  if (!GetComputerNameA (lgroup, &llen))
     {
-       __seterrno ();
-       return FALSE;
+      __seterrno ();
+      return FALSE;
     }
   lgroup[llen++] = '\\';
 
@@ -389,11 +409,11 @@ get_user_local_groups (cygsidlist &grp_list, PSID pusersid)
 	if (!LookupAccountName (NULL, bgroup, gsid, &glen, domain, &dlen, &use))
 	  {
 	    if (GetLastError () != ERROR_NONE_MAPPED)
-              debug_printf ("LookupAccountName(%s): %E", bgroup);
+	      debug_printf ("LookupAccountName(%s): %E", bgroup);
 	    strcpy (lgroup + llen, bgroup + blen);
 	    if (!LookupAccountName (NULL, lgroup, gsid, &glen,
 				    domain, &dlen, &use))
-              debug_printf ("LookupAccountName(%s): %E", lgroup);
+	      debug_printf ("LookupAccountName(%s): %E", lgroup);
 	  }
 	if (!legal_sid_type (use))
 	  debug_printf ("Rejecting local %s. use: %d", bgroup + blen, use);
@@ -415,7 +435,7 @@ sid_in_token_groups (PTOKEN_GROUPS grps, cygsid &sid)
   return FALSE;
 }
 
-#if 0 /* Unused */
+#if 0				/* Unused */
 static BOOL
 get_user_primary_group (WCHAR *wlogonserver, const char *user,
 			PSID pusersid, cygsid &pgrpsid)
@@ -441,7 +461,8 @@ get_user_primary_group (WCHAR *wlogonserver, const char *user,
     }
 
   pgrpsid = pusersid;
-  if (IsValidSid (pgrpsid) && (count = *GetSidSubAuthorityCount (pgrpsid)) > 1)
+  if (IsValidSid (pgrpsid)
+      && (count = *GetSidSubAuthorityCount (pgrpsid)) > 1)
     {
       *GetSidSubAuthority (pgrpsid, count - 1) = buf->usri3_primary_group_id;
       retval = TRUE;
@@ -473,57 +494,63 @@ get_unix_group_sidlist (struct passwd *pw, cygsidlist &grp_list)
     }
 }
 
-static BOOL
-get_group_sidlist (cygsidlist &grp_list,
-		   cygsid &usersid, cygsid &pgrpsid, struct passwd *pw,
-		   PTOKEN_GROUPS my_grps, LUID auth_luid, int &auth_pos,
-		   BOOL *special_pgrp)
+static void
+get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps,
+			 LUID auth_luid, int &auth_pos)
 {
-  char user[UNLEN + 1];
-  char domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-  WCHAR wserver[INTERNET_MAX_HOST_NAME_LENGTH + 3];
-  char server[INTERNET_MAX_HOST_NAME_LENGTH + 3];
-  cygsidlist sup_list;
-
   auth_pos = -1;
+  if (my_grps)
+    {
+      if (sid_in_token_groups (my_grps, well_known_local_sid))
+	grp_list += well_known_local_sid;
+      if (sid_in_token_groups (my_grps, well_known_dialup_sid))
+	grp_list += well_known_dialup_sid;
+      if (sid_in_token_groups (my_grps, well_known_network_sid))
+	grp_list += well_known_network_sid;
+      if (sid_in_token_groups (my_grps, well_known_batch_sid))
+	grp_list += well_known_batch_sid;
+      if (sid_in_token_groups (my_grps, well_known_interactive_sid))
+	grp_list += well_known_interactive_sid;
+      if (sid_in_token_groups (my_grps, well_known_service_sid))
+	grp_list += well_known_service_sid;
+    }
+  else
+    {
+      grp_list += well_known_local_sid;
+      grp_list += well_known_interactive_sid;
+    }
+  if (auth_luid.QuadPart != 999) /* != SYSTEM_LUID */
+    {
+      char buf[64];
+      __small_sprintf (buf, "S-1-5-5-%u-%u", auth_luid.HighPart,
+		       auth_luid.LowPart);
+      grp_list += buf;
+      auth_pos = grp_list.count - 1;
+    }
+}
 
+static BOOL
+get_initgroups_sidlist (cygsidlist &grp_list,
+			PSID usersid, PSID pgrpsid, struct passwd *pw,
+			PTOKEN_GROUPS my_grps, LUID auth_luid, int &auth_pos,
+			BOOL &special_pgrp)
+{
   grp_list += well_known_world_sid;
   grp_list += well_known_authenticated_users_sid;
   if (usersid == well_known_system_sid)
     {
+      auth_pos = -1;
       grp_list += well_known_admins_sid;
       get_unix_group_sidlist (pw, grp_list);
     }
   else
     {
-      if (my_grps)
-	{
-	  if (sid_in_token_groups (my_grps, well_known_local_sid))
-	    grp_list += well_known_local_sid;
-	  if (sid_in_token_groups (my_grps, well_known_dialup_sid))
-	    grp_list += well_known_dialup_sid;
-	  if (sid_in_token_groups (my_grps, well_known_network_sid))
-	    grp_list += well_known_network_sid;
-	  if (sid_in_token_groups (my_grps, well_known_batch_sid))
-	    grp_list += well_known_batch_sid;
-	  if (sid_in_token_groups (my_grps, well_known_interactive_sid))
-	    grp_list += well_known_interactive_sid;
-	  if (sid_in_token_groups (my_grps, well_known_service_sid))
-	    grp_list += well_known_service_sid;
-	}
-      else
-	{
-	  grp_list += well_known_local_sid;
-	  grp_list += well_known_interactive_sid;
-	}
-      if (auth_luid.QuadPart != 999) /* != SYSTEM_LUID */
-	{
-	  char buf[64];
-	  __small_sprintf (buf, "S-1-5-5-%u-%u", auth_luid.HighPart,
-						 auth_luid.LowPart);
-	  grp_list += buf;
-	  auth_pos = grp_list.count - 1;
-	}
+      char user[UNLEN + 1];
+      char domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+      WCHAR wserver[INTERNET_MAX_HOST_NAME_LENGTH + 3];
+      char server[INTERNET_MAX_HOST_NAME_LENGTH + 3];
+
+      get_token_group_sidlist (grp_list, my_grps, auth_luid, auth_pos);
       extract_nt_dom_user (pw, domain, user);
       if (get_logon_server (domain, server, wserver))
 	get_user_groups (wserver, grp_list, user, domain);
@@ -531,14 +558,24 @@ get_group_sidlist (cygsidlist &grp_list,
       if (!get_user_local_groups (grp_list, usersid))
 	return FALSE;
     }
-  /* special_pgrp true if pgrpsid is not null and not in normal groups */
-  *special_pgrp = FALSE;
-  if (pgrpsid && !grp_list.contains (pgrpsid))
-    {
-       *special_pgrp = TRUE;
-       grp_list += pgrpsid;
-    }
+  /* special_pgrp true if pgrpsid is not in normal groups */
+  if ((special_pgrp = !grp_list.contains (pgrpsid)))
+    grp_list += pgrpsid;
   return TRUE;
+}
+
+static void
+get_setgroups_sidlist (cygsidlist &tmp_list, PTOKEN_GROUPS my_grps,
+		       user_groups &groups, LUID auth_luid, int &auth_pos)
+{
+  PSID pgpsid = groups.pgsid;
+  tmp_list += well_known_world_sid;
+  tmp_list += well_known_authenticated_users_sid;
+  get_token_group_sidlist (tmp_list, my_grps, auth_luid, auth_pos);
+  for (int gidx = 0; gidx < groups.sgsids.count; gidx++)
+    tmp_list += groups.sgsids.sids[gidx];
+  if (!groups.sgsids.contains (pgpsid))
+    tmp_list += pgpsid;
 }
 
 static const char *sys_privs[] = {
@@ -569,8 +606,8 @@ PTOKEN_PRIVILEGES
 get_system_priv_list (cygsidlist &grp_list)
 {
   LUID priv;
-  PTOKEN_PRIVILEGES privs = (PTOKEN_PRIVILEGES) malloc (sizeof (ULONG) +
-					    20 * sizeof (LUID_AND_ATTRIBUTES));
+  PTOKEN_PRIVILEGES privs = (PTOKEN_PRIVILEGES)
+    malloc (sizeof (ULONG) + 20 * sizeof (LUID_AND_ATTRIBUTES));
   if (!privs)
     {
       debug_printf ("malloc (system_privs) failed.");
@@ -583,7 +620,7 @@ get_system_priv_list (cygsidlist &grp_list)
       {
 	privs->Privileges[privs->PrivilegeCount].Luid = priv;
 	privs->Privileges[privs->PrivilegeCount].Attributes =
-		      SE_PRIVILEGE_ENABLED | SE_PRIVILEGE_ENABLED_BY_DEFAULT;
+	  SE_PRIVILEGE_ENABLED | SE_PRIVILEGE_ENABLED_BY_DEFAULT;
 	++privs->PrivilegeCount;
       }
   return privs;
@@ -605,8 +642,8 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list)
     {
       if (grp == -1)
 	{
-	  if ((ret = LsaEnumerateAccountRights (lsa, usersid, &privstrs, &cnt))
-	      != STATUS_SUCCESS)
+	  if ((ret = LsaEnumerateAccountRights (lsa, usersid, &privstrs,
+						&cnt)) != STATUS_SUCCESS)
 	    continue;
 	}
       else if ((ret = LsaEnumerateAccountRights (lsa, grp_list.sids[grp],
@@ -629,8 +666,8 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list)
 
 	  tmp_count = privs ? privs->PrivilegeCount : 0;
 	  tmp = (PTOKEN_PRIVILEGES)
-		realloc (privs, sizeof (ULONG) +
-				(tmp_count + 1) * sizeof (LUID_AND_ATTRIBUTES));
+	    realloc (privs, sizeof (ULONG) +
+		     (tmp_count + 1) * sizeof (LUID_AND_ATTRIBUTES));
 	  if (!tmp)
 	    {
 	      if (privs)
@@ -643,7 +680,7 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list)
 	  privs = tmp;
 	  privs->Privileges[privs->PrivilegeCount].Luid = priv;
 	  privs->Privileges[privs->PrivilegeCount].Attributes =
-		      SE_PRIVILEGE_ENABLED | SE_PRIVILEGE_ENABLED_BY_DEFAULT;
+	    SE_PRIVILEGE_ENABLED | SE_PRIVILEGE_ENABLED_BY_DEFAULT;
 	  ++privs->PrivilegeCount;
 
 	next_account_right:
@@ -654,8 +691,21 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list)
   return privs;
 }
 
+/* Accept a token if
+   - the requested usersid matches the TokenUser and
+   - if setgroups has been called:
+        the token groups that are listed in /etc/group match the union of
+	the requested primary and supplementary groups in gsids.
+   - else the (unknown) implicitly requested supplementary groups and those
+        in the token are the groups associated with the usersid. We assume
+	they match and verify only the primary groups.
+	The requested primary group must appear in the token.
+	The primary group in the token is a group associated with the usersid,
+	except if the token is internal and the group is in the token SD
+	(see create_token). In that latter case that group must match the
+	requested primary group.  */
 BOOL
-verify_token (HANDLE token, cygsid &usersid, cygsid &pgrpsid, BOOL *pintern)
+verify_token (HANDLE token, cygsid &usersid, user_groups &groups, BOOL *pintern)
 {
   DWORD size;
   BOOL intern = FALSE;
@@ -666,36 +716,39 @@ verify_token (HANDLE token, cygsid &usersid, cygsid &pgrpsid, BOOL *pintern)
       if (!GetTokenInformation (cygheap->user.token, TokenSource,
 				&ts, sizeof ts, &size))
 	debug_printf ("GetTokenInformation(): %E");
-      else *pintern = intern = !memcmp (ts.SourceName, "Cygwin.1", 8);
+      else
+	*pintern = intern = !memcmp (ts.SourceName, "Cygwin.1", 8);
     }
   /* Verify usersid */
   cygsid tok_usersid = NO_SID;
   if (!GetTokenInformation (token, TokenUser,
 			    &tok_usersid, sizeof tok_usersid, &size))
-      debug_printf ("GetTokenInformation(): %E");
-  if (usersid != tok_usersid) return FALSE;
+    debug_printf ("GetTokenInformation(): %E");
+  if (usersid != tok_usersid)
+    return FALSE;
 
-  /* In an internal token, if the sd group is not well_known_null_sid,
-     it must match pgrpsid */
-  if (intern)
+  /* For an internal token, if setgroups was not called and if the sd group
+     is not well_known_null_sid, it must match pgrpsid */
+  if (intern && !groups.issetgroups ())
     {
-       char sd_buf[MAX_SID_LEN + sizeof (SECURITY_DESCRIPTOR)];
-       PSID gsid = NO_SID;
-       if (!GetKernelObjectSecurity (token, GROUP_SECURITY_INFORMATION,
+      char sd_buf[MAX_SID_LEN + sizeof (SECURITY_DESCRIPTOR)];
+      PSID gsid = NO_SID;
+      if (!GetKernelObjectSecurity (token, GROUP_SECURITY_INFORMATION,
 				    (PSECURITY_DESCRIPTOR) sd_buf,
 				    sizeof sd_buf, &size))
-	   debug_printf ("GetKernelObjectSecurity(): %E");
-       else if (!GetSecurityDescriptorGroup ((PSECURITY_DESCRIPTOR) sd_buf,
+	debug_printf ("GetKernelObjectSecurity(): %E");
+      else if (!GetSecurityDescriptorGroup ((PSECURITY_DESCRIPTOR) sd_buf,
 					    &gsid, (BOOL *) &size))
-	   debug_printf ("GetSecurityDescriptorGroup(): %E");
-       if (well_known_null_sid != gsid) return pgrpsid == gsid;
+	debug_printf ("GetSecurityDescriptorGroup(): %E");
+      if (well_known_null_sid != gsid)
+	return gsid == groups.pgsid;
     }
-  /* See if the pgrpsid is the tok_usersid in the token groups */
+
   PTOKEN_GROUPS my_grps = NULL;
   BOOL ret = FALSE;
+  char saw_buf[NGROUPS_MAX] = {};
+  char *saw = saw_buf, sawpg = FALSE;
 
-  if ( pgrpsid == tok_usersid)
-    return TRUE;
   if (!GetTokenInformation (token, TokenGroups, NULL, 0, &size) &&
       GetLastError () != ERROR_INSUFFICIENT_BUFFER)
     debug_printf ("GetTokenInformation(token, TokenGroups): %E\n");
@@ -703,38 +756,70 @@ verify_token (HANDLE token, cygsid &usersid, cygsid &pgrpsid, BOOL *pintern)
     debug_printf ("malloc (my_grps) failed.");
   else if (!GetTokenInformation (token, TokenGroups, my_grps, size, &size))
     debug_printf ("GetTokenInformation(my_token, TokenGroups): %E\n");
-  else
-    ret = sid_in_token_groups (my_grps, pgrpsid);
+  else if (!groups.issetgroups ()) /* setgroups was never called */
+    {
+      ret = sid_in_token_groups (my_grps, groups.pgsid);
+      if (ret == FALSE)
+	ret = (groups.pgsid == tok_usersid);
+    }
+  else /* setgroups was called */
+    {
+      struct __group32 *gr;
+      cygsid gsid;
+      if (groups.sgsids.count > (int) sizeof (saw_buf) &&
+	  !(saw = (char *) calloc (groups.sgsids.count, sizeof (char))))
+	goto done;
+
+      /* token groups found in /etc/group match the user.gsids ? */
+      for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
+	if (gsid.getfromgr (gr) && sid_in_token_groups (my_grps, gsid))
+	  {
+	    int pos = groups.sgsids.position (gsid);
+	    if (pos >= 0)
+	      saw[pos] = TRUE;
+	    else if (groups.pgsid == gsid)
+	      sawpg = TRUE;
+	    else
+	      goto done;
+	  }
+      for (int gidx = 0; gidx < groups.sgsids.count; gidx++)
+	if (!saw[gidx])
+	  goto done;
+      if (sawpg || groups.sgsids.contains (groups.pgsid))
+	ret = TRUE;
+    }
+done:
   if (my_grps)
     free (my_grps);
+  if (saw != saw_buf)
+    free (saw);
   return ret;
 }
 
 HANDLE
-create_token (cygsid &usersid, cygsid &pgrpsid, struct passwd *pw)
+create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 {
   NTSTATUS ret;
   LSA_HANDLE lsa = INVALID_HANDLE_VALUE;
   int old_priv_state;
 
-  cygsidlist grpsids;
+  cygsidlist tmp_gsids (cygsidlist_auto, 12);
 
   SECURITY_QUALITY_OF_SERVICE sqos =
     { sizeof sqos, SecurityImpersonation, SECURITY_STATIC_TRACKING, FALSE };
-  OBJECT_ATTRIBUTES oa =
-    { sizeof oa, 0, 0, 0, 0, &sqos };
+  OBJECT_ATTRIBUTES oa = { sizeof oa, 0, 0, 0, 0, &sqos };
   PSECURITY_ATTRIBUTES psa;
-  BOOL special_pgrp;
+  BOOL special_pgrp = FALSE;
   char sa_buf[1024];
   LUID auth_luid = SYSTEM_LUID;
-  LARGE_INTEGER exp = { QuadPart:0x7fffffffffffffffLL  };
+  LARGE_INTEGER exp = { QuadPart:0x7fffffffffffffffLL };
 
   TOKEN_USER user;
-  PTOKEN_GROUPS grps = NULL;
+  PTOKEN_GROUPS new_tok_gsids = NULL;
   PTOKEN_PRIVILEGES privs = NULL;
   TOKEN_OWNER owner;
   TOKEN_PRIMARY_GROUP pgrp;
-  char acl_buf[MAX_DACL_LEN(5)];
+  char acl_buf[MAX_DACL_LEN (5)];
   TOKEN_DEFAULT_DACL dacl;
   TOKEN_SOURCE source;
   TOKEN_STATISTICS stats;
@@ -746,7 +831,7 @@ create_token (cygsid &usersid, cygsid &pgrpsid, struct passwd *pw)
   HANDLE primary_token = INVALID_HANDLE_VALUE;
 
   HANDLE my_token = INVALID_HANDLE_VALUE;
-  PTOKEN_GROUPS my_grps = NULL;
+  PTOKEN_GROUPS my_tok_gsids = NULL;
   DWORD size;
 
   /* SE_CREATE_TOKEN_NAME privilege needed to call NtCreateToken. */
@@ -768,68 +853,73 @@ create_token (cygsid &usersid, cygsid &pgrpsid, struct passwd *pw)
   else
     {
       /* Switching user context to SYSTEM doesn't inherit the authentication
-	 id of the user account running current process. */
+         id of the user account running current process. */
       if (usersid != well_known_system_sid)
 	if (!GetTokenInformation (my_token, TokenStatistics,
 				  &stats, sizeof stats, &size))
-	  debug_printf ("GetTokenInformation(my_token, TokenStatistics): %E\n");
+	  debug_printf
+	    ("GetTokenInformation(my_token, TokenStatistics): %E\n");
 	else
 	  auth_luid = stats.AuthenticationId;
 
       /* Retrieving current processes group list to be able to inherit
-	 some important well known group sids. */
+         some important well known group sids. */
       if (!GetTokenInformation (my_token, TokenGroups, NULL, 0, &size) &&
 	  GetLastError () != ERROR_INSUFFICIENT_BUFFER)
 	debug_printf ("GetTokenInformation(my_token, TokenGroups): %E\n");
-      else if (!(my_grps = (PTOKEN_GROUPS) malloc (size)))
-	debug_printf ("malloc (my_grps) failed.");
-      else if (!GetTokenInformation (my_token, TokenGroups, my_grps,
+      else if (!(my_tok_gsids = (PTOKEN_GROUPS) malloc (size)))
+	debug_printf ("malloc (my_tok_gsids) failed.");
+      else if (!GetTokenInformation (my_token, TokenGroups, my_tok_gsids,
 				     size, &size))
 	{
 	  debug_printf ("GetTokenInformation(my_token, TokenGroups): %E\n");
-	  free (my_grps);
-	  my_grps = NULL;
+	  free (my_tok_gsids);
+	  my_tok_gsids = NULL;
 	}
       CloseHandle (my_token);
     }
 
   /* Create list of groups, the user is member in. */
   int auth_pos;
-  if (!get_group_sidlist (grpsids, usersid, pgrpsid, pw,
-			  my_grps, auth_luid, auth_pos, &special_pgrp))
+  if (new_groups.issetgroups ())
+    get_setgroups_sidlist (tmp_gsids, my_tok_gsids, new_groups, auth_luid,
+			   auth_pos);
+  else if (!get_initgroups_sidlist (tmp_gsids, usersid, new_groups.pgsid, pw,
+				    my_tok_gsids, auth_luid, auth_pos,
+				    special_pgrp))
     goto out;
 
   /* Primary group. */
-  pgrp.PrimaryGroup = pgrpsid;
+  pgrp.PrimaryGroup = new_groups.pgsid;
 
   /* Create a TOKEN_GROUPS list from the above retrieved list of sids. */
-  char grps_buf[sizeof (ULONG) + grpsids.count * sizeof (SID_AND_ATTRIBUTES)];
-  grps = (PTOKEN_GROUPS) grps_buf;
-  grps->GroupCount = grpsids.count;
-  for (DWORD i = 0; i < grps->GroupCount; ++i)
+  char grps_buf[sizeof (ULONG) + tmp_gsids.count * sizeof (SID_AND_ATTRIBUTES)];
+  new_tok_gsids = (PTOKEN_GROUPS) grps_buf;
+  new_tok_gsids->GroupCount = tmp_gsids.count;
+  for (DWORD i = 0; i < new_tok_gsids->GroupCount; ++i)
     {
-      grps->Groups[i].Sid = grpsids.sids[i];
-      grps->Groups[i].Attributes = SE_GROUP_MANDATORY |
-				   SE_GROUP_ENABLED_BY_DEFAULT |
-				   SE_GROUP_ENABLED;
-      if (auth_pos >= 0 && i == (DWORD) auth_pos)
-	grps->Groups[i].Attributes |= SE_GROUP_LOGON_ID;
+      new_tok_gsids->Groups[i].Sid = tmp_gsids.sids[i];
+      new_tok_gsids->Groups[i].Attributes = SE_GROUP_MANDATORY |
+	SE_GROUP_ENABLED_BY_DEFAULT | SE_GROUP_ENABLED;
     }
+  if (auth_pos >= 0)
+    new_tok_gsids->Groups[auth_pos].Attributes |= SE_GROUP_LOGON_ID;
 
   /* Retrieve list of privileges of that user. */
-  if (!(privs = get_priv_list (lsa, usersid, grpsids)))
+  if (!(privs = get_priv_list (lsa, usersid, tmp_gsids)))
     goto out;
 
   /* Create default dacl. */
   if (!sec_acl ((PACL) acl_buf, FALSE,
-		grpsids.contains (well_known_admins_sid)?well_known_admins_sid:usersid))
+		tmp_gsids.contains (well_known_admins_sid) ?
+		well_known_admins_sid : usersid))
     goto out;
   dacl.DefaultDacl = (PACL) acl_buf;
 
   /* Let's be heroic... */
   ret = NtCreateToken (&token, TOKEN_ALL_ACCESS, &oa, TokenImpersonation,
-		       &auth_luid, &exp, &user, grps, privs, &owner, &pgrp,
-		       &dacl, &source);
+		       &auth_luid, &exp, &user, new_tok_gsids, privs, &owner,
+		       &pgrp, &dacl, &source);
   if (ret)
     __seterrno_from_win_error (RtlNtStatusToDosError (ret));
   else if (GetLastError () == ERROR_PROC_NOT_FOUND)
@@ -842,13 +932,15 @@ create_token (cygsid &usersid, cygsid &pgrpsid, struct passwd *pw)
       /* Set security descriptor and primary group */
       psa = __sec_user (sa_buf, usersid, TRUE);
       if (psa->lpSecurityDescriptor &&
-	  !SetSecurityDescriptorGroup (
-	      (PSECURITY_DESCRIPTOR) psa->lpSecurityDescriptor,
-	      special_pgrp ? pgrpsid : well_known_null_sid, FALSE))
-	  debug_printf ("SetSecurityDescriptorGroup %E");
+	  !SetSecurityDescriptorGroup ((PSECURITY_DESCRIPTOR)
+				       psa->lpSecurityDescriptor,
+				       special_pgrp ? new_groups.pgsid
+						    : well_known_null_sid,
+				       FALSE))
+	debug_printf ("SetSecurityDescriptorGroup %E");
       /* Convert to primary token. */
-      if (!DuplicateTokenEx (token, MAXIMUM_ALLOWED, psa,
-			     SecurityImpersonation, TokenPrimary, &primary_token))
+      if (!DuplicateTokenEx (token, MAXIMUM_ALLOWED, psa, SecurityImpersonation,
+			     TokenPrimary, &primary_token))
 	{
 	  __seterrno ();
 	  debug_printf ("DuplicateTokenEx %E");
@@ -862,8 +954,8 @@ out:
     CloseHandle (token);
   if (privs)
     free (privs);
-  if (my_grps)
-    free (my_grps);
+  if (my_tok_gsids)
+    free (my_tok_gsids);
   close_local_policy (lsa);
 
   debug_printf ("%d = create_token ()", primary_token);
@@ -946,13 +1038,13 @@ subauth (struct passwd *pw)
   str2buf2uni (subbuf.auth.Workstation, subbuf.wkstbuf, "");
   memcpy (subbuf.auth.ChallengeToClient, "12345678", MSV1_0_CHALLENGE_LENGTH);
   str2buf2lsa (subbuf.auth.CaseSensitiveChallengeResponse, subbuf.authinf1, "");
-  str2buf2lsa (subbuf.auth.CaseInsensitiveChallengeResponse, subbuf.authinf2,"");
+  str2buf2lsa (subbuf.auth.CaseInsensitiveChallengeResponse,subbuf.authinf2,"");
   subbuf.auth.ParameterControl = 0 | (subauth_id << 24);
   /* Try to logon... */
   ret = LsaLogonUser (lsa_hdl, (PLSA_STRING) &origin, Network,
-		     package_id, &subbuf, sizeof subbuf,
-		     NULL, &ts, (PVOID *)&profile, &size,
-		     &luid, &user_token, &quota, &ret2);
+		      package_id, &subbuf, sizeof subbuf,
+		      NULL, &ts, (PVOID *) &profile, &size,
+		      &luid, &user_token, &quota, &ret2);
   if (ret != STATUS_SUCCESS)
     {
       debug_printf ("LsaLogonUser: %d", ret);
@@ -963,8 +1055,7 @@ subauth (struct passwd *pw)
   LsaFreeReturnBuffer (profile);
   /* Convert to primary token. */
   if (!DuplicateTokenEx (user_token, TOKEN_ALL_ACCESS, &sa,
-			 SecurityImpersonation, TokenPrimary,
-			 &primary_token))
+			 SecurityImpersonation, TokenPrimary, &primary_token))
     __seterrno ();
 
 out:
@@ -1004,7 +1095,7 @@ read_sd (const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size)
 
   DWORD len = 0;
   const char *pfile = file;
-  char fbuf [PATH_MAX];
+  char fbuf[PATH_MAX];
   if (current_codepage == oem_cp)
     {
       DWORD fname_len = min (sizeof (fbuf) - 1, strlen (file));
@@ -1015,9 +1106,9 @@ read_sd (const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size)
 
   if (!GetFileSecurity (pfile,
 			OWNER_SECURITY_INFORMATION
-			 | GROUP_SECURITY_INFORMATION
-			 | DACL_SECURITY_INFORMATION,
-			 sd_buf, *sd_size, &len))
+			| GROUP_SECURITY_INFORMATION
+			| DACL_SECURITY_INFORMATION,
+			sd_buf, *sd_size, &len))
     {
       __seterrno ();
       return -1;
@@ -1090,8 +1181,8 @@ write_sd (const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size)
 		    &bytes_written, FALSE, TRUE, &context))
     {
       /* Samba returns ERROR_NOT_SUPPORTED.
-	 FAT returns ERROR_INVALID_SECURITY_DESCR.
-	 This shouldn't return as error, but better be ignored. */
+         FAT returns ERROR_INVALID_SECURITY_DESCR.
+         This shouldn't return as error, but better be ignored. */
       DWORD ret = GetLastError ();
       if (ret != ERROR_NOT_SUPPORTED && ret != ERROR_INVALID_SECURITY_DESCR)
 	{
@@ -1117,7 +1208,7 @@ get_nt_attribute (const char *file, int *attribute,
 
   syscall_printf ("file: %s", file);
 
-  /* Yeah, sounds too much, but I've seen SDs of 2100 bytes!*/
+  /* Yeah, sounds too much, but I've seen SDs of 2100 bytes! */
   DWORD sd_size = 4096;
   char sd_buf[4096];
   PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) sd_buf;
@@ -1282,13 +1373,13 @@ get_file_attribute (int use_ntsec, const char *file,
   if (allow_ntea)
     {
       int oatt = *attribute;
-      res = NTReadEA (file, ".UNIXATTR", (char *) attribute, sizeof (*attribute));
+      res = NTReadEA (file, ".UNIXATTR", (char *)attribute, sizeof(*attribute));
       *attribute |= oatt;
     }
   else
     res = 0;
 
-  /* symlinks are everything for everyone!*/
+  /* symlinks are everything for everyone! */
   if ((*attribute & S_IFLNK) == S_IFLNK)
     *attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
 
@@ -1296,8 +1387,8 @@ get_file_attribute (int use_ntsec, const char *file,
 }
 
 static int
-get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type, int *attribute,
-		  __uid32_t *uidret, __gid32_t *gidret)
+get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
+			 int *attribute, __uid32_t *uidret, __gid32_t *gidret)
 {
   if (!wincap.has_security ())
     return 0;
@@ -1308,18 +1399,15 @@ get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type, int *attribu
   PACL acl;
 
   if (ERROR_SUCCESS != GetSecurityInfo (handle, object_type,
-                                        DACL_SECURITY_INFORMATION |
-                                        GROUP_SECURITY_INFORMATION |
-                                        OWNER_SECURITY_INFORMATION,
-                                        &owner_sid,
-                                        &group_sid,
-                                        &acl,
-                                        NULL,
-                                        &psd))
-	{
-	  __seterrno ();
-	  debug_printf ("GetSecurityInfo %E");
-	  return -1;
+					DACL_SECURITY_INFORMATION |
+					GROUP_SECURITY_INFORMATION |
+					OWNER_SECURITY_INFORMATION,
+					&owner_sid, &group_sid,
+					&acl, NULL, &psd))
+    {
+      __seterrno ();
+      debug_printf ("GetSecurityInfo %E");
+      return -1;
     }
 
   __uid32_t uid = cygsid (owner_sid).get_uid ();
@@ -1341,8 +1429,7 @@ get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type, int *attribu
   if (!acl)
     {
       *attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
-      syscall_printf ("No ACL = %x, uid %d, gid %d",
-		      *attribute, uid, gid);
+      syscall_printf ("No ACL = %x, uid %d, gid %d", *attribute, uid, gid);
       LocalFree (psd);
       return 0;
     }
@@ -1354,7 +1441,7 @@ get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type, int *attribu
 
   for (DWORD i = 0; i < acl->AceCount; ++i)
     {
-      if (!GetAce (acl, i, (PVOID *) &ace))
+      if (!GetAce (acl, i, (PVOID *) & ace))
 	continue;
       if (ace->Header.AceFlags & INHERIT_ONLY)
 	continue;
@@ -1372,7 +1459,7 @@ get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type, int *attribu
 	  continue;
 	}
 
-      cygsid ace_sid ((PSID) &ace->SidStart);
+      cygsid ace_sid ((PSID) & ace->SidStart);
       if (owner_sid && ace_sid == owner_sid)
 	{
 	  if (ace->Mask & FILE_READ_DATA)
@@ -1438,11 +1525,12 @@ get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type, int *attribu
 
 int
 get_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
-		    int *attribute, __uid32_t *uidret, __gid32_t *gidret)
+		      int *attribute, __uid32_t *uidret, __gid32_t *gidret)
 {
   if (allow_ntsec)
     {
-      int res = get_nt_object_attribute (handle, object_type, attribute, uidret, gidret);
+      int res = get_nt_object_attribute (handle, object_type, attribute,
+      					 uidret, gidret);
       if (attribute && (*attribute & S_IFLNK) == S_IFLNK)
 	*attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
       return res;
@@ -1456,7 +1544,7 @@ get_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
   if (!attribute)
     return 0;
 
-  /* symlinks are everything for everyone!*/
+  /* symlinks are everything for everyone! */
   if ((*attribute & S_IFLNK) == S_IFLNK)
     *attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
 
@@ -1475,8 +1563,7 @@ add_access_allowed_ace (PACL acl, int offset, DWORD attributes,
   ACCESS_ALLOWED_ACE *ace;
   if (GetAce (acl, offset, (PVOID *) &ace))
     ace->Header.AceFlags |= inherit;
-  len_add += sizeof (ACCESS_DENIED_ACE) - sizeof (DWORD)
-	     + GetLengthSid (sid);
+  len_add += sizeof (ACCESS_DENIED_ACE) - sizeof (DWORD) + GetLengthSid (sid);
   return TRUE;
 }
 
@@ -1492,8 +1579,7 @@ add_access_denied_ace (PACL acl, int offset, DWORD attributes,
   ACCESS_DENIED_ACE *ace;
   if (GetAce (acl, offset, (PVOID *) &ace))
     ace->Header.AceFlags |= inherit;
-  len_add += sizeof (ACCESS_DENIED_ACE) - sizeof (DWORD)
-	     + GetLengthSid (sid);
+  len_add += sizeof (ACCESS_DENIED_ACE) - sizeof (DWORD) + GetLengthSid (sid);
   return TRUE;
 }
 
@@ -1614,8 +1700,7 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
   if (attribute & S_IXGRP)
     group_allow |= FILE_GENERIC_EXECUTE;
   if ((attribute & (S_IFDIR | S_IWGRP | S_IXGRP))
-      == (S_IFDIR | S_IWGRP | S_IXGRP)
-      && !(attribute & S_ISVTX))
+      == (S_IFDIR | S_IWGRP | S_IXGRP) && !(attribute & S_ISVTX))
     group_allow |= FILE_DELETE_CHILD;
 
   /* Construct allow attribute for everyone. */
@@ -1658,30 +1743,30 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
 
   /* Construct appropriate inherit attribute. */
   DWORD inherit = (attribute & S_IFDIR) ? SUB_CONTAINERS_AND_OBJECTS_INHERIT
-  					: NO_INHERITANCE;
+					: NO_INHERITANCE;
 
   /* Set deny ACE for owner. */
   if (owner_deny
       && !add_access_denied_ace (acl, ace_off++, owner_deny,
-				  owner_sid, acl_len, inherit))
+				 owner_sid, acl_len, inherit))
     return NULL;
   /* Set allow ACE for owner. */
   if (!add_access_allowed_ace (acl, ace_off++, owner_allow,
-				owner_sid, acl_len, inherit))
+			       owner_sid, acl_len, inherit))
     return NULL;
   /* Set deny ACE for group. */
   if (group_deny
       && !add_access_denied_ace (acl, ace_off++, group_deny,
-				  group_sid, acl_len, inherit))
+				 group_sid, acl_len, inherit))
     return NULL;
   /* Set allow ACE for group. */
   if (!add_access_allowed_ace (acl, ace_off++, group_allow,
-				group_sid, acl_len, inherit))
+			       group_sid, acl_len, inherit))
     return NULL;
 
   /* Set allow ACE for everyone. */
   if (!add_access_allowed_ace (acl, ace_off++, other_allow,
-				well_known_world_sid, acl_len, inherit))
+			       well_known_world_sid, acl_len, inherit))
     return NULL;
   /* Set null ACE for special bits. */
   if (null_allow
@@ -1764,15 +1849,15 @@ void
 set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
 			void *sd_buf, DWORD sd_buf_size)
 {
-  /* symlinks are anything for everyone!*/
+  /* symlinks are anything for everyone! */
   if ((attribute & S_IFLNK) == S_IFLNK)
     attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
 
   psa->lpSecurityDescriptor = sd_buf;
-  InitializeSecurityDescriptor ((PSECURITY_DESCRIPTOR)sd_buf,
+  InitializeSecurityDescriptor ((PSECURITY_DESCRIPTOR) sd_buf,
 				SECURITY_DESCRIPTOR_REVISION);
-  psa->lpSecurityDescriptor = alloc_sd (geteuid32 (), getegid32 (),
-					attribute, (PSECURITY_DESCRIPTOR)sd_buf,
+  psa->lpSecurityDescriptor = alloc_sd (geteuid32 (), getegid32 (), attribute,
+					(PSECURITY_DESCRIPTOR) sd_buf,
 					&sd_buf_size);
 }
 
@@ -1803,8 +1888,7 @@ set_nt_attribute (const char *file, __uid32_t uid, __gid32_t gid,
 
 int
 set_file_attribute (int use_ntsec, const char *file,
-		    __uid32_t uid, __gid32_t gid,
-		    int attribute)
+		    __uid32_t uid, __gid32_t gid, int attribute)
 {
   int ret = 0;
 
@@ -1825,6 +1909,5 @@ int
 set_file_attribute (int use_ntsec, const char *file, int attribute)
 {
   return set_file_attribute (use_ntsec, file,
-			     myself->uid, myself->gid,
-			     attribute);
+			     myself->uid, myself->gid, attribute);
 }

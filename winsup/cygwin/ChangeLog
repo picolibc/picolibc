@@ -1,3 +1,41 @@
+2002-07-29  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (dll_crt0_1): Move debug_fixup_after_fork_exec.
+	* cygheap.cc (cygheap_fixup_in_child): Call debug_fixup_after_fork_exec
+	immediately after cygheap has been set up.
+
+2002-07-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc: Change some formatting.
+	* include/cygwin/version.h: Bump API minor version.
+
+2002-07-28 Pierre Humblet <Pierre.Humblet@ieee.org>
+
+	* cygheap.h (class cygheap_user): Add member groups.
+	* security.h (class cygsidlist): Add members type and maxcount, methods
+	position, addfromgr, alloc_sids and free_sids and operator+= (const
+	PSID psid).  Modify contains () to call position () and optimize add ()
+	to use maxcount.
+	(class user_groups): Create.  Update declarations of verify_token and
+	create_token.
+	* security.cc (cygsidlist::alloc_sids): New.
+	(cygsidlist::free_sids): New.
+	(get_token_group_sidlist): Create from get_group_sidlist.
+	(get_initgroups_sidlist): Create from get_group_sidlist.
+	(get_group_sidlist): Suppress.
+	(get_setgroups_sidlist): Create.
+	(verify_token): Modify arguments.  Add setgroups case.
+	(create_token): Modify arguments.  Call get_initgroups_sidlist and
+	get_setgroups_sidlist as needed.  Set SE_GROUP_LOGON_ID from auth_pos
+	outside of the loop.  Rename the various group sid lists consistently.
+	* syscalls.cc (seteuid32): Modify to use cygheap->user.groups.
+	(setegid32): Call cygheap->user.groups.update_pgrp.
+	* grp.cc (setgroups): Create.
+	(setgroups32): Create.
+	* uinfo.cc (internal_getlogin): Initialize and update
+	user.groups.pgsid.
+	* cygwin.din: Add setgroups and setgroups32.
+
 2002-07-28  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_console.cc (fhandler_console::read): Use appropriate
@@ -181,7 +219,7 @@
 
 2002-07-25  Egor Duda  <deo@logos-m.ru>
 
-	* Makefile.in: Check if API version is updated when exports are 
+	* Makefile.in: Check if API version is updated when exports are
 	changed and stop if not so.
 
 2002-07-24  Egor Duda  <deo@logos-m.ru>
@@ -1337,14 +1375,13 @@
 
 2002-06-25  Thomas Pfaff  <tpfaff@gmx.net>
 
-        * include/pthread.h (PTHREAD_CANCELED): Defined a reasonable
-        value.
+	* include/pthread.h (PTHREAD_CANCELED): Defined a reasonable value.
 	* pthread.cc (pthread_exit): Call method instead of function.
 	(pthread_setcancelstate): Ditto.
 	(pthread_setcanceltype): Ditto.
 	(pthread_testcancel): Ditto.
 	* thread.h (pthread::cancel_event): New member.
-        (__pthread_cancel_self): New prototype.
+	(__pthread_cancel_self): New prototype.
 	(pthread::exit): New Method.
 	(pthread::cancel): Ditto.
 	(pthread::testcancel): Ditto.
@@ -1357,16 +1394,16 @@
 	(__pthread_setcancelstate): Ditto.
 	(__pthread_setcanceltype): Ditto.
 	(__pthread_testcancel): Ditto.
-	 * thread.cc (pthread::pthread): Inititialize cancel_event.
+	* thread.cc (pthread::pthread): Inititialize cancel_event.
 	(pthread::~pthread): Close cancel_event if needed.
 	(pthread::create): Create cancel_event.
-	(pthread::exit): New method. Replacement for __pthread_exit.
+	(pthread::exit): New method.  Replacement for __pthread_exit.
 	(pthread::cancel): New method.
 	(pthread::testcancel): Ditto.
 	(pthread::static_cancel_self); New static method.
-	(pthread::setcancelstate): New method. Replacement for
+	(pthread::setcancelstate): New method.  Replacement for
 	__pthread_setcancelstate.
-	(pthread::setcanceltype): New method. Replacement for
+	(pthread::setcanceltype): New method.  Replacement for
 	__pthread_setcanceltype.
 	(pthread::pop_cleanup_handler): Added lock for async cancel safe
 	cancellation.

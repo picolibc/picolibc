@@ -625,7 +625,6 @@ dll_crt0_1 ()
 	CloseHandle (spawn_info->hexec_proc);
       if (close_ppid_handle)
 	CloseHandle (child_proc_info->pppid_handle);
-      debug_fixup_after_fork_exec ();
     }
 
   /* Initialize the cygwin subsystem if this is the first process,

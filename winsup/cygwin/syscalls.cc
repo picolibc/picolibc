@@ -1958,9 +1958,8 @@ seteuid32 (__uid32_t uid)
   debug_printf ("uid: %d myself->gid: %d", uid, myself->gid);
 
   if (!wincap.has_security ()
-      || (!cygheap->user.issetuid ()
-	  && uid == myself->uid
-	  && myself->gid == cygheap->user.orig_gid)
+      || (uid == myself->uid
+	  && !cygheap->user.groups.ischanged)
       || uid == ILLEGAL_UID)
     {
       debug_printf ("Nothing happens");
@@ -1968,7 +1967,8 @@ seteuid32 (__uid32_t uid)
     }
 
   sigframe thisframe (mainthread);
-  cygsid usersid, pgrpsid;
+  cygsid usersid;
+  user_groups &groups = cygheap->user.groups;
   HANDLE ptok, sav_token;
   BOOL sav_impersonated, sav_token_is_internal_token;
   BOOL process_ok, explicitly_created_token = FALSE;
@@ -1976,8 +1976,7 @@ seteuid32 (__uid32_t uid)
   PSID origpsid, psid2 = NO_SID;
 
   pw_new = getpwuid32 (uid);
-  if (!usersid.getfrompw (pw_new) ||
-      (!pgrpsid.getfromgr (getgrgid32 (myself->gid))))
+  if (!usersid.getfrompw (pw_new))
     {
       set_errno (EINVAL);
       return -1;
@@ -1995,7 +1994,7 @@ seteuid32 (__uid32_t uid)
   /* Verify if the process token is suitable.
      Currently we do not try to differentiate between
 	 internal tokens and others */
-  process_ok = verify_token (ptok, usersid, pgrpsid);
+  process_ok = verify_token (ptok, usersid, groups);
   debug_printf("Process token %sverified", process_ok ? "" : "not ");
   if (process_ok)
     {
@@ -2011,8 +2010,8 @@ seteuid32 (__uid32_t uid)
   if (!process_ok && cygheap->user.token != INVALID_HANDLE_VALUE)
     {
       /* Verify if the current tokem is suitable */
-      BOOL token_ok = verify_token (cygheap->user.token, usersid, pgrpsid,
-				    & sav_token_is_internal_token);
+      BOOL token_ok = verify_token (cygheap->user.token, usersid, groups,
+				    &sav_token_is_internal_token);
       debug_printf("Thread token %d %sverified",
 		   cygheap->user.token, token_ok?"":"not ");
       if (!token_ok)
@@ -2048,7 +2047,7 @@ seteuid32 (__uid32_t uid)
     {
       /* If no impersonation token is available, try to
 	 authenticate using NtCreateToken() or subauthentication. */
-      cygheap->user.token = create_token (usersid, pgrpsid, pw_new);
+      cygheap->user.token = create_token (usersid, groups, pw_new);
       if (cygheap->user.token != INVALID_HANDLE_VALUE)
 	explicitly_created_token = TRUE;
       else
@@ -2076,7 +2075,7 @@ seteuid32 (__uid32_t uid)
 	  /* Try setting primary group in token to current group */
 	  if (!SetTokenInformation (cygheap->user.token,
 				    TokenPrimaryGroup,
-				    &pgrpsid, sizeof pgrpsid))
+				    &groups.pgsid, sizeof(cygsid)))
 	    debug_printf ("SetTokenInformation(user.token, "
 			  "TokenPrimaryGroup): %E");
 	}
@@ -2098,6 +2097,7 @@ seteuid32 (__uid32_t uid)
   cygheap->user.set_name (pw_new->pw_name);
   cygheap->user.set_sid (usersid);
   myself->uid = uid;
+  groups.ischanged = FALSE;
   return 0;
 
  failed:
@@ -2142,6 +2142,7 @@ setegid32 (__gid32_t gid)
     return 0;
 
   sigframe thisframe (mainthread);
+  user_groups * groups = &cygheap->user.groups;
   cygsid gsid;
   HANDLE ptok;
 
@@ -2153,6 +2154,7 @@ setegid32 (__gid32_t gid)
     }
   myself->gid = gid;
 
+  groups->update_pgrp (gsid);
   /* If impersonated, update primary group and revert */
   if (cygheap->user.issetuid ())
     {

@@ -86,40 +86,63 @@ public:
     }
 };
 
+typedef enum { cygsidlist_unknown, cygsidlist_alloc, cygsidlist_auto } cygsidlist_type;
 class cygsidlist {
+  int maxcount;
 public:
   int count;
   cygsid *sids;
+  cygsidlist_type type;
 
-  cygsidlist () : count (0), sids (NULL) {}
-  ~cygsidlist () { delete [] sids; }
-
-  BOOL add (cygsid &nsi)
+  cygsidlist (cygsidlist_type t, int m)
     {
-      cygsid *tmp = new cygsid [count + 1];
-      if (!tmp)
-	return FALSE;
-      for (int i = 0; i < count; ++i)
-	tmp[i] = sids[i];
-      delete [] sids;
-      sids = tmp;
+      type = t;
+      count = 0;
+      maxcount = m;
+      if (t == cygsidlist_alloc)
+	sids = alloc_sids (m);
+      else
+	sids = new cygsid [m];
+    }
+  ~cygsidlist () { if (type == cygsidlist_auto) delete [] sids; }
+
+  BOOL add (const PSID nsi) /* Only with auto for now */
+    {
+      if (count >= maxcount)
+        {
+	  cygsid *tmp = new cygsid [ 2 * maxcount];
+	  if (!tmp)
+	    return FALSE;
+	  maxcount *= 2;
+	  for (int i = 0; i < count; ++i)
+	    tmp[i] = sids[i];
+	  delete [] sids;
+	  sids = tmp;
+	}
       sids[count++] = nsi;
       return TRUE;
     }
-  BOOL add (const PSID nsid) { return add (nsid); }
+  BOOL add (cygsid &nsi) { return add ((PSID) nsi); }
   BOOL add (const char *sidstr)
     { cygsid nsi (sidstr); return add (nsi); }
+  BOOL addfromgr (struct __group32 *gr) /* Only with alloc */
+    { return sids[count++].getfromgr (gr); }
 
   BOOL operator+= (cygsid &si) { return add (si); }
   BOOL operator+= (const char *sidstr) { return add (sidstr); }
+  BOOL operator+= (const PSID psid) { return add (psid); }
 
-  BOOL contains (cygsid &sid) const
+  int position (const PSID sid) const
     {
       for (int i = 0; i < count; ++i)
 	if (sids[i] == sid)
-	  return TRUE;
-      return FALSE;
+	  return i;
+      return -1;
     }
+
+  BOOL contains (const PSID sid) const { return position (sid) >= 0; }
+  cygsid *alloc_sids (int n);
+  void free_sids ();
   void debug_print (const char *prefix = NULL) const
     {
       debug_printf ("-- begin sidlist ---");
@@ -128,6 +151,26 @@ public:
       for (int i = 0; i < count; ++i)
 	sids[i].debug_print (prefix);
       debug_printf ("-- ende sidlist ---");
+    }
+};
+
+class user_groups {
+public:
+  cygsid pgsid;
+  cygsidlist sgsids;
+  BOOL ischanged;
+
+  BOOL issetgroups () const { return (sgsids.type == cygsidlist_alloc); }
+  void update_supp (const cygsidlist &newsids)
+    {
+      sgsids.free_sids ();
+      sgsids = newsids;
+      ischanged = TRUE;
+    }
+  void update_pgrp (const PSID sid)
+    {
+      pgsid = sid;
+      ischanged = TRUE;
     }
 };
 
@@ -180,9 +223,9 @@ void set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
 /* Try a subauthentication. */
 HANDLE subauth (struct passwd *pw);
 /* Try creating a token directly. */
-HANDLE create_token (cygsid &usersid, cygsid &pgrpsid, struct passwd * pw);
+HANDLE create_token (cygsid &usersid, user_groups &groups, struct passwd * pw);
 /* Verify an existing token */
-BOOL verify_token (HANDLE token, cygsid &usersid, cygsid &pgrpsid, BOOL * pintern = NULL);
+BOOL verify_token (HANDLE token, cygsid &usersid, user_groups &groups, BOOL * pintern = NULL);
 
 /* Extract U-domain\user field from passwd entry. */
 void extract_nt_dom_user (const struct passwd *pw, char *domain, char *user);

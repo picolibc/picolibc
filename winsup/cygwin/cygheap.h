@@ -113,6 +113,7 @@ public:
   __gid32_t orig_gid;      /* Ditto */
   __uid32_t real_uid;      /* Remains intact on seteuid, replaced by setuid */
   __gid32_t real_gid;      /* Ditto */
+  user_groups groups;      /* Primary and supp SIDs */
 
   /* token is needed if set(e)uid should be called. It can be set by a call
      to `set_impersonation_token()'. */
