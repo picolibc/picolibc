@@ -1,3 +1,7 @@
+2002-08-16  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Change COMPILE_C* definitions.
+
 2002-08-10  Earnie Boyd  <earnie@users.sf.net>
 
 	* w32sdk: New winsup module.
