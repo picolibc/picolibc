@@ -47,7 +47,7 @@ strace::hello()
   if (active)
     {
       prntf (1, NULL, "**********************************************");
-      prntf (1, NULL, "Program name: %s (%d)", myself->progname, myself->pid);
+      prntf (1, NULL, "Program name: %s (%d)", myself->progname, myself->pid ?: GetCurrentProcessId ());
       prntf (1, NULL, "App version:  %d.%d, api: %d.%d",
 	     user_data->dll_major, user_data->dll_minor,
 	     user_data->api_major, user_data->api_minor);
@@ -138,7 +138,8 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
       if ((p = strrchr (progname, '.')) != NULL && strcasematch (p, ".exe"))
 	*p = '\000';
       p = progname;
-      count = __small_sprintf (buf, fmt, p && *p ? p : "?", myself->pid,
+      count = __small_sprintf (buf, fmt, p && *p ? p : "?",
+			       myself->pid ?: GetCurrentProcessId (),
 			       execing ? "!" : "");
       if (func)
 	count += getfunc (buf + count, func);

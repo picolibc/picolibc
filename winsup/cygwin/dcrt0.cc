@@ -581,18 +581,20 @@ dll_crt0_1 ()
 
   if (child_proc_info)
     {
+      bool close_ppid_handle = false;
+      bool close_hexec_proc = false;
       switch (child_proc_info->type)
 	{
 	  case _PROC_FORK:
 	    cygheap_fixup_in_child (0);
 	    alloc_stack (fork_info);
 	    set_myself (mypid);
+	    close_ppid_handle = !!child_proc_info->pppid_handle;
 	    break;
 	  case _PROC_SPAWN:
-	    if (spawn_info->hexec_proc)
-	      CloseHandle (spawn_info->hexec_proc);
-	    if (child_proc_info->pppid_handle)
-	      CloseHandle (child_proc_info->pppid_handle);
+	    /* Have to delay closes until after cygheap is setup */
+	    close_hexec_proc = !!spawn_info->hexec_proc;
+	    close_ppid_handle = !!child_proc_info->pppid_handle;
 	    goto around;
 	  case _PROC_EXEC:
 	    hexec_proc = spawn_info->hexec_proc;
@@ -619,6 +621,10 @@ dll_crt0_1 ()
 	      }
 	    break;
 	}
+      if (close_hexec_proc)
+	CloseHandle (spawn_info->hexec_proc);
+      if (close_ppid_handle)
+	CloseHandle (child_proc_info->pppid_handle);
       debug_fixup_after_fork_exec ();
     }
 
@@ -770,22 +776,48 @@ dll_crt0_1 ()
     exit (user_data->main (__argc, __argv, *user_data->envptr));
 }
 
+#ifdef DEBUGGING
+void
+break_here ()
+{
+  debug_printf ("break here");
+}
+#endif
+
 void
 initial_env ()
 {
+  DWORD len;
   char buf[MAX_PATH + 1];
 #ifdef DEBUGGING
   if (GetEnvironmentVariable ("CYGWIN_SLEEP", buf, sizeof (buf) - 1))
     {
-      console_printf ("Sleeping %d, pid %u\n", atoi (buf), GetCurrentProcessId ());
+      buf[0] = '\0';
+      len = GetModuleFileName (NULL, buf, MAX_PATH);
+      console_printf ("Sleeping %d, pid %u %s\n", atoi (buf), GetCurrentProcessId (), buf);
       Sleep (atoi (buf));
+    }
+  if (GetEnvironmentVariable ("CYGWIN_DEBUG", buf, sizeof (buf) - 1))
+    {
+      char buf1[MAX_PATH + 1];
+      len = GetModuleFileName (NULL, buf1, MAX_PATH);
+      char *p = strchr (buf, '=');
+      if (!p)
+	p = "gdb.exe -nw";
+      else
+	*p++ = '\0';
+      if (strstr (buf1, buf))
+	{
+	  error_start_init (p);
+	  try_to_debug ();
+	  break_here ();
+	}
     }
 #endif
 
   if (GetEnvironmentVariable ("CYGWIN_TESTING", buf, sizeof (buf) - 1))
     {
       _cygwin_testing = 1;
-      DWORD len;
       if ((len = GetModuleFileName (cygwin_hmodule, buf, MAX_PATH))
 	  && len > sizeof ("new-cygwin1.dll")
 	  && strcasematch (buf + len - sizeof ("new-cygwin1.dll"),
