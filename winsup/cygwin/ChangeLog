@@ -1,3 +1,8 @@
+Fri Sep 28 21:18:50 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* pipe.cc (fhandler_pipe::fixup_after_fork): New method.
+	* fhandler.h (fhandler_pipe::fixup_after_fork): Declare new method.
+
 Fri Sep 28 03:23:04 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* passwd.cc (read_etc_passwd): Bother with unlocking when not
