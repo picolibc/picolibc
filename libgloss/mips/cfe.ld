@@ -54,6 +54,10 @@ SECTIONS
   PROVIDE (etext = .);
   _etext  =  .;
   
+  .eh_frame_hdr : { *(.eh_frame_hdr) }
+  .eh_frame : { KEEP (*(.eh_frame)) }
+  .gcc_except_table : { *(.gcc_except_table) }
+  .jcr : { KEEP (*(.jcr)) }
   .ctors    :
   {
     /* gcc uses crtbegin.o to find the start of
