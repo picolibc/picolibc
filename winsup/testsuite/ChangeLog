@@ -1,5 +1,10 @@
 2003-03-18  Thomas Pfaff  <tpfaff@gmx.net>
 
+	* winsup.api/pthread/condvar7.c: New test.
+	* winsup.api/pthread/condvar9.c: Ditto.
+
+2003-03-18  Thomas Pfaff  <tpfaff@gmx.net>
+
 	* winsup.api/pthread/mutex1n.c: New test.
 	* winsup.api/pthread/mutex6n.c: Ditto.
 	* winsup.api/pthread/mutex7n.c: Ditto.
