@@ -12,7 +12,7 @@
 
 	Throughout, eliminate argument to sig_dispatch_pending.
 	* exceptions.cc (setup_handler): Move non-interruptible condition
-	handling (back) to wait_sig (as suggested by Pierre Humblet).
+	handling (back) to wait_sig.
 	(set_process_mask): Don't worry about calling sig_dispatch_pending from
 	sigthread since it is detected in the function anyway.
 	(sig_handle): Eliminate thisproc arg.  Don't call sig_dispatch_pending
