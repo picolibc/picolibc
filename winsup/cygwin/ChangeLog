@@ -1,3 +1,10 @@
+2003-05-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::dup): If running impersonated,
+	revert to original account before calling fixup_before_fork_exec
+	and impersonate again afterwards.  Change comment accordingly.
+	Clean up error handling and debug output.
+
 2003-05-27  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* fhandler_socket.cc (sock_event::~sock_event): New method.

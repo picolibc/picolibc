@@ -401,30 +401,37 @@ fhandler_socket::dup (fhandler_base *child)
     fhs->set_sun_path (get_sun_path ());
   fhs->set_socket_type (get_socket_type ());
 
-  /* Using WinSock2 methods for dup'ing sockets seem to collide
-     with user context switches under... some... conditions.  So we
-     drop this for NT systems at all and return to the good ol'
-     DuplicateHandle way of life.  This worked fine all the time on
-     NT anyway and it's even a bit faster. */
+  /* Since WSADuplicateSocket() fails on NT systems when the process
+     is currently impersonating a non-privileged account, we revert
+     to the original account before calling WSADuplicateSocket() and
+     switch back afterwards as it's also in fork().
+     If WSADuplicateSocket() still fails for some reason, we fall back
+     to DuplicateHandle(). */
+
   WSASetLastError (0);
+  if (cygheap->user.issetuid ())
+    RevertToSelf ();
   fhs->fixup_before_fork_exec (GetCurrentProcessId ());
-  if (WSAGetLastError () != WSAEINVAL && winsock2_active)
+  if (cygheap->user.issetuid ())
+    ImpersonateLoggedOnUser (cygheap->user.token);
+  if (winsock2_active && !WSAGetLastError ())
     {
       fhs->fixup_after_fork (hMainProc);
-      if (WSAGetLastError () != WSAEINVAL)
-	return get_io_handle () == (HANDLE) INVALID_SOCKET;
+      if (get_io_handle() != (HANDLE) INVALID_SOCKET)
+	return 0;
     }
 
   debug_printf ("WSADuplicateSocket failed, trying DuplicateHandle");
+
   /* We don't call fhandler_base::dup here since that requires to
      have winsock called from fhandler_base and it creates only
      inheritable sockets which is wrong for winsock2. */
+
   HANDLE nh;
   if (!DuplicateHandle (hMainProc, get_io_handle (), hMainProc, &nh, 0,
 			!winsock2_active, DUPLICATE_SAME_ACCESS))
     {
-      system_printf ("dup(%s) failed, handle %x, %E",
-		     get_name (), get_io_handle ());
+      system_printf ("!DuplicateHandle(%x) failed, %E", get_io_handle ());
       __seterrno ();
       return -1;
     }
