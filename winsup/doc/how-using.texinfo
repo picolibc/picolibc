@@ -160,17 +160,22 @@ or
 
 @subsection Why can't I cd into a shortcut to a directory?
 
-This is only valid up to but not including version 1.3.0:
+Cygwin versions < 1.3.0 do not follow MS Windows Explorer Shortcuts
+(*.lnk files).  It sees a shortcut as a regular file and this you
+cannot "cd" into it.
 
-Cygwin does not follow MS Windows Explorer Shortcuts (*.lnk files).  It
-sees a shortcut as a regular file and this you cannot "cd" into it.
+Since version 1.3.0, Cygwin uses shortcuts as symlinks by default.
 
-Some people have suggested replacing the current symbolic link scheme
-with shortcuts.  The major problem with this is that .LNK files would
-then be used to symlink Cygwin paths that may or may not be valid
-under native Win32 non-Cygwin applications such as Explorer.
+Cygwin shortcuts are different from shortcuts created by native Windows
+applications.  Windows applications can usually make use of Cygwin
+shortcuts but not vice versa.  This is by choice.  The reason is that
+Windows shortcuts may contain a bunch of extra information which would
+get lost, if, for example, Cygwin tar archives and extracts them as
+symlinks.
 
-Since version 1.3.0, Cygwin treats shortcuts as symlinks.
+Changing a Cygwin shortcut in Windows Explorer usually changes a Cygwin
+shortcut into a Windows native shortcut.  Afterwards, Cygwin will not
+recognize it as symlink anymore.
 
 @subsection I'm having basic problems with find.  Why?
 

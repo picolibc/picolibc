@@ -1,3 +1,7 @@
+2005-01-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* how-using.texinfo: Change text about using shortcuts.
+
 2005-01-22  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* how-api.texinfo: Make snapshot URL an HTML link.
