@@ -6,7 +6,6 @@
 The official maintainers of newlib:
 
 Jeff Johnston			jjohnstn@cygnus.com
-Ranjith Kumaran			ranjith@cygnus.com
 
 
 		     Various Domain Maintainers
@@ -22,11 +21,11 @@ If there are several maintainers for a given domain then
 responsibility falls to the first maintainer.  The first maintainer is
 free to devolve that responsibility among the other maintainers.
 
-Makefile.in, configure*:	jjohnstn@cygnus.com, ranjith@cygnus.com
+Makefile.in, configure*:	jjohnstn@cygnus.com
 
 Cygwin:				cgf@cygnus.com
 
-Web pages:			ranjith@cygnus.com, jjohnstn@cygnus.com
+Web pages:			jjohnstn@cygnus.com
 
 
 

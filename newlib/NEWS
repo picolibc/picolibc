@@ -1,3 +1,17 @@
+*** Major changes in newlib version 1.9.0:
+
+* i[3456]86-pc-linux support
+
+* Long Double I/O support via the WANT_IO_LONG_DBL flag
+
+* addition of reentrant environment functions
+
+* addition of xscale and AVR platforms
+
+* severe reduction in the number of warnings issued
+
+* consolidation of many RTEMS features into shared headers
+
 *** Major changes in newlib version 1.8.2:
 
 * RTEMS features and fixes from Joel Sherrill.
