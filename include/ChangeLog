@@ -1,3 +1,9 @@
+2001-05-28  Philip Blundell  <philb@gnu.org>
+
+	From 2001-05-11  Jakub Jelinek  <jakub@redhat.com>
+	* elf/ia64.h (ELF_STRING_ia64_unwind_once): Define.
+	(ELF_STRING_ia64_unwind_info_once): Define.
+
 2001-01-11  Peter Targett  <peter.targett@arccores.com>
 
 	* dis-asm.h (arc_get_disassembler): Correct declaration.
