@@ -1,3 +1,8 @@
+Mon Apr 10 22:58:25 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* include/winbase.h: Change first argument of ENUMRES* types to
+	coincide with Microsoft usage.
+
 Sat Apr  1 20:51:47 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* include/wininet.h: Add three more "INTERNET_OPTIONS".
