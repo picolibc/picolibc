@@ -31,6 +31,16 @@ typedef __pid_t pid_t;
 typedef __off_t off_t;
 typedef __loff_t loff_t;
 
+/* Time Value Specification Structures, P1003.1b-1993, p. 261 */
+
+#ifndef _STRUCT_TIMESPEC
+#define _STRUCT_TIMESPEC
+struct timespec {
+  time_t  tv_sec;   /* Seconds */
+  long    tv_nsec;  /* Nanoseconds */
+};
+#endif /* !_STRUCT_TIMESPEC */
+
 #include <linux/types.h>
 
 #endif
