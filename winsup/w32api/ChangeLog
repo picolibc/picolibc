@@ -1,3 +1,11 @@
+2003-05-21  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wincrypt.h (PLAINTEXTKEYBLOB, OPAQUEKEYBLOB,
+	PUBLICKEYBLOBEX, SYMMETRICWRAPKEYBLOB) Add defines.
+	(PP_*): Add defines.
+	(CryptContextAddRef): Add prototype.
+	Thanks to: Shura Zam  <debil_urod@users.sourceforge.net>
+
 2003-05-18  Manu B  <manubee@users.sourceforge.net>
 	
 	* include/commctrl.h (TVSORTCB): Rename old TV_SORTCB structure.
