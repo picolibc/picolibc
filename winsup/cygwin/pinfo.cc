@@ -768,11 +768,7 @@ _pinfo::dup_proc_pipe (HANDLE hProcess)
 			      0, FALSE,
 			      DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE);
   if (!res)
-    {
-      if (WaitForSingleObject (hProcess, 0) == WAIT_OBJECT_0)
-	CloseHandle (wr_proc_pipe);
-      sigproc_printf ("DuplicateHandle failed, pid %d, hProcess %p, %E", pid, hProcess);
-    }
+    sigproc_printf ("DuplicateHandle failed, pid %d, hProcess %p, %E", pid, hProcess);
   else
     {
       wr_proc_pipe_owner = dwProcessId;
