@@ -2033,8 +2033,8 @@ static int __stdcall
 mknod_worker (const char *path, mode_t type, mode_t mode, _major_t major,
 	      _minor_t minor)
 {
-  char buf[sizeof (":00000000:00000000:00000000") + MAX_PATH];
-  sprintf (buf, ":%x:%x:%x", major, minor,
+  char buf[sizeof (":\\00000000:00000000:00000000") + MAX_PATH];
+  sprintf (buf, ":\\%x:%x:%x", major, minor,
 	   type | (mode & (S_IRWXU | S_IRWXG | S_IRWXO)));
   return symlink_worker (buf, path, true, true);
 }

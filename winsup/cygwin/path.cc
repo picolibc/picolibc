@@ -2880,7 +2880,7 @@ symlink_info::parse_device (const char *contents)
   _major_t myminor;
   _mode_t mymode;
 
-  mymajor = strtol (++contents, &endptr, 16);
+  mymajor = strtol (contents += 2, &endptr, 16);
   if (endptr == contents)
     return false;
 
@@ -3016,7 +3016,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	  res = check_shortcut (suffix.path, fileattr, h, contents, &error, &pflags);
 	  if (!res)
 	    /* check more below */;
-	  else if (*contents == ':' && parse_device (contents))
+	  else if (contents[0] == ':' && contents[1] == '\\' && parse_device (contents))
 	    goto file_not_symlink;
 	  else
 	    break;

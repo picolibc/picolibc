@@ -1,5 +1,11 @@
 2003-09-27  Christopher Faylor  <cgf@redhat.com>
 
+	* path.cc (symlink_info::check): Use new introducer for mknod'ed files.
+	(parse_device): Ditto.
+	* syscalls.cc (mknod_worker): Ditto.
+
+2003-09-27  Christopher Faylor  <cgf@redhat.com>
+
 	* devices.shilka: Add /dev/sda disk devices.
 	* devices.cc: Regenerate.
 
