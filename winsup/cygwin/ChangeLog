@@ -1,3 +1,10 @@
+2002-05-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* external.cc (fillout_pinfo): Use new version define.
+	* include/sys/cygwin.h (external_pinfo): Define
+	EXTERNAL_PINFO_VERSION_16_BIT and EXTERNAL_PINFO_VERSION_32_BIT
+	instead of just EXTERNAL_PINFO_VERSION.
+
 2002-05-29  Christopher Faylor  <cgf@redhat.com>
 
 	* external.cc (fillout_pinfo): Set new version field in external_pinfo

@@ -83,7 +83,7 @@ fillout_pinfo (pid_t pid, int winpid)
 	  ep.rusage_children = p->rusage_children;
 	  strcpy (ep.progname, p->progname);
 	  ep.strace_mask = 0;
-	  ep.version = EXTERNAL_PINFO_VERSION;
+	  ep.version = EXTERNAL_PINFO_VERSION_32_BIT;
 
 	  ep.process_state = p->process_state;
 
