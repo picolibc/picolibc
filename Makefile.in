@@ -109,8 +109,7 @@ NM = nm
 
 LD = ld
 
-# Not plain GZIP, since gzip looks there for extra command-line options.
-GZIPPROG = gzip
+BZIPPROG = bzip2
 
 # These values are substituted by configure.
 DEFAULT_YACC = yacc
@@ -1749,55 +1748,55 @@ taz: $(DEVO_SUPPORT) $(SUPPORT_FILES) \
 	else \
 	  ver=`sed <$(TOOL)/Makefile.in -n 's/^VERSION *= *//p'`; \
 	fi; \
-	$(MAKE) -f Makefile.in do-tar-gz TOOL=$(TOOL) VER=$$ver
+	$(MAKE) -f Makefile.in do-tar-bz2 TOOL=$(TOOL) VER=$$ver
 
-do-tar-gz:
-	echo "==> Making $(TOOL)-$(VER).tar.gz"
+do-tar-bz2:
+	echo "==> Making $(TOOL)-$(VER).tar.bz2"
 	-rm -f $(TOOL)-$(VER)
 	ln -s proto-toplev $(TOOL)-$(VER)
 	tar cfh $(TOOL)-$(VER).tar $(TOOL)-$(VER)
-	$(GZIPPROG) -v -9 $(TOOL)-$(VER).tar
+	$(BZIPPROG) -v -9 $(TOOL)-$(VER).tar
 
-TEXINFO_SUPPORT= texinfo/texinfo.tex texinfo/gpl.texinfo texinfo/lgpl.texinfo
+TEXINFO_SUPPORT= texinfo/texinfo.tex
 DIST_SUPPORT= $(DEVO_SUPPORT) $(TEXINFO_SUPPORT)
 
-.PHONY: gas.tar.gz
+.PHONY: gas.tar.bz2
 GAS_SUPPORT_DIRS= bfd include libiberty opcodes intl setup.com makefile.vms
-gas.tar.gz: $(DIST_SUPPORT) $(GAS_SUPPORT_DIRS) gas
+gas.tar.bz2: $(DIST_SUPPORT) $(GAS_SUPPORT_DIRS) gas
 	$(MAKE) -f Makefile.in taz TOOL=gas \
 		SUPPORT_FILES="$(GAS_SUPPORT_DIRS)"
 
 # The FSF "binutils" release includes gprof and ld.
-.PHONY: binutils.tar.gz
+.PHONY: binutils.tar.bz2
 BINUTILS_SUPPORT_DIRS= bfd gas include libiberty opcodes ld gprof intl setup.com makefile.vms
-binutils.tar.gz: $(DIST_SUPPORT) $(BINUTILS_SUPPORT_DIRS) binutils
+binutils.tar.bz2: $(DIST_SUPPORT) $(BINUTILS_SUPPORT_DIRS) binutils
 	$(MAKE) -f Makefile.in taz TOOL=binutils \
 		SUPPORT_FILES="$(BINUTILS_SUPPORT_DIRS) makeall.bat configure.bat"
 
-.PHONY: gas+binutils.tar.gz
+.PHONY: gas+binutils.tar.bz2
 GASB_SUPPORT_DIRS= $(GAS_SUPPORT_DIRS) binutils ld gprof
-gas+binutils.tar.gz: $(DIST_SUPPORT) $(GASB_SUPPORT_DIRS) gas
+gas+binutils.tar.bz2: $(DIST_SUPPORT) $(GASB_SUPPORT_DIRS) gas
 	$(MAKE) -f Makefile.in taz TOOL=gas \
 		SUPPORT_FILES="$(GASB_SUPPORT_DIRS) makeall.bat configure.bat"
 
-.PHONY: libg++.tar.gz
+.PHONY: libg++.tar.bz2
 LIBGXX_SUPPORT_DIRS=include libstdc++ libio librx libiberty
-libg++.tar.gz: $(DIST_SUPPORT) libg++
+libg++.tar.bz2: $(DIST_SUPPORT) libg++
 	$(MAKE) -f Makefile.in taz TOOL=libg++ \
 		SUPPORT_FILES="$(LIBGXX_SUPPORT_DIRS)"
 
 GNATS_SUPPORT_DIRS=include libiberty send-pr
-gnats.tar.gz: $(DIST_SUPPORT) $(GNATS_SUPPORT_DIRS) gnats
+gnats.tar.bz2: $(DIST_SUPPORT) $(GNATS_SUPPORT_DIRS) gnats
 	$(MAKE) -f  Makefile.in taz TOOL=gnats \
 		SUPPORT_FILES="$(GNATS_SUPPORT_DIRS)"
 
-.PHONY: gdb.tar.gz
+.PHONY: gdb.tar.bz2
 GDB_SUPPORT_DIRS= bfd include libiberty mmalloc opcodes readline sim utils intl
-gdb.tar.gz: $(DIST_SUPPORT) $(GDB_SUPPORT_DIRS) gdb
+gdb.tar.bz2: $(DIST_SUPPORT) $(GDB_SUPPORT_DIRS) gdb
 	$(MAKE) -f Makefile.in taz TOOL=gdb \
 		SUPPORT_FILES="$(GDB_SUPPORT_DIRS)"
 
-.PHONY: newlib.tar.gz
+.PHONY: newlib.tar.bz2
 NEWLIB_SUPPORT_DIRS=libgloss
 # taz configures for the sun4 target which won't configure newlib.
 # We need newlib configured so that the .info files are made.
@@ -1810,7 +1809,7 @@ NEWLIB_SUPPORT_DIRS=libgloss
 # the make distclean.  For now punt on the issue of shipping newlib info files
 # with newlib net releases and wait for a day when some native target (sun4?)
 # supports newlib (if only minimally).
-newlib.tar.gz: $(DIST_SUPPORT) $(NEWLIB_SUPPORT_DIRS) newlib
+newlib.tar.bz2: $(DIST_SUPPORT) $(NEWLIB_SUPPORT_DIRS) newlib
 	$(MAKE) -f Makefile.in taz TOOL=newlib \
 		SUPPORT_FILES="$(NEWLIB_SUPPORT_DIRS)" \
 		DEVO_SUPPORT="$(DEVO_SUPPORT) COPYING.NEWLIB" newlib
