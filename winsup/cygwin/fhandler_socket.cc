@@ -1058,8 +1058,13 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
   else
     res = ret;
 
-  /* Special handling for SIGPIPE */
-  if (res == -1 && get_errno () == ESHUTDOWN)
+  /* Special handling for EPIPE and SIGPIPE.
+     
+     EPIPE is generated if the local end has been shut down on a connection
+     oriented socket.  In this case the process will also receive a SIGPIPE
+     unless MSG_NOSIGNAL is set.  */
+  if (res == -1 && get_errno () == ESHUTDOWN
+      && get_socket_type () == SOCK_STREAM)
     {
       set_errno (EPIPE);
       if (! (flags & MSG_NOSIGNAL))

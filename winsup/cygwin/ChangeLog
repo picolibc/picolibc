@@ -1,3 +1,8 @@
+2003-03-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::sendto): Restrict EPIPE and
+	SIGPIPE handling to connection oriented sockets.  Add comment.
+
 2003-03-19  Christopher Faylor  <cgf@redhat.com>
 
 	* sigproc.h (signal_fixup_after_exec): Eliminate argument in declaration.
