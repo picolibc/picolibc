@@ -31,12 +31,11 @@ scandir (const char *dir,
   struct dirent *ent, *etmp, **nl = NULL, **ntmp;
   int count = 0;
   int allocated = 0;
+  int err = 0;
 
   if (!(dirp = opendir (dir)))
     return -1;
 
-  int prior_errno = get_errno ();
-  set_errno (0);
   if (!compar)
     compar = alphasort;
 
@@ -44,10 +43,6 @@ scandir (const char *dir,
     {
       if (!select || select (ent))
 	{
-
-	  /* Ignore error from readdir/select. See POSIX specs. */
-	  set_errno (0);
-
 	  if (count == allocated)
 	    {
 
@@ -59,7 +54,7 @@ scandir (const char *dir,
 	      ntmp = (struct dirent **) realloc (nl, allocated * sizeof *nl);
 	      if (!ntmp)
 		{
-		  set_errno (ENOMEM);
+		  err = ENOMEM;
 		  break;
 		}
 	      nl = ntmp;
@@ -67,7 +62,7 @@ scandir (const char *dir,
 
 	  if (!(etmp = (struct dirent *) malloc (sizeof *ent)))
 	    {
-	      set_errno (ENOMEM);
+	      err = ENOMEM;
 	      break;
 	    }
 	  *etmp = *ent;
@@ -75,7 +70,7 @@ scandir (const char *dir,
 	}
     }
 
-  if ((prior_errno = get_errno ()) != 0)
+  if (err != 0)
     {
       closedir (dirp);
       if (nl)
@@ -85,12 +80,11 @@ scandir (const char *dir,
 	  free (nl);
 	}
       /* Ignore errors from closedir() and what not else. */
-      set_errno (prior_errno);
+      set_errno (err);
       return -1;
     }
 
   closedir (dirp);
-  set_errno (prior_errno);
 
   qsort (nl, count, sizeof *nl, (int (*)(const void *, const void *)) compar);
   if (namelist)

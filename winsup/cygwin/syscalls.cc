@@ -879,8 +879,7 @@ _fstat64_r (struct _reent *ptr, int fd, struct __stat64 *buf)
 {
   int ret;
 
-  set_errno (0);
-  if ((ret = fstat64 (fd, buf)) == -1 && get_errno () != 0)
+  if ((ret = fstat64 (fd, buf)) == -1)
     ptr->_errno = get_errno ();
   return ret;
 }
@@ -900,8 +899,7 @@ _fstat_r (struct _reent *ptr, int fd, struct __stat32 *buf)
 {
   int ret;
 
-  set_errno (0);
-  if ((ret = fstat (fd, buf)) == -1 && get_errno () != 0)
+  if ((ret = fstat (fd, buf)) == -1)
     ptr->_errno = get_errno ();
   return ret;
 }
@@ -1039,8 +1037,7 @@ _stat64_r (struct _reent *ptr, const char *name, struct __stat64 *buf)
 {
   int ret;
 
-  set_errno (0);
-  if ((ret = stat64 (name, buf)) == -1 && get_errno () != 0)
+  if ((ret = stat64 (name, buf)) == -1)
     ptr->_errno = get_errno ();
   return ret;
 }
@@ -1060,8 +1057,7 @@ _stat_r (struct _reent *ptr, const char *name, struct __stat32 *buf)
 {
   int ret;
 
-  set_errno (0);
-  if ((ret = stat (name, buf)) == -1 && get_errno () != 0)
+  if ((ret = stat (name, buf)) == -1)
     ptr->_errno = get_errno ();
   return ret;
 }

@@ -538,6 +538,33 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
   if (flags & MAP_ANONYMOUS)
     fd = -1;
 
+  fhandler_base *fh;
+
+  /* Get fhandler and convert /dev/zero mapping to MAP_ANONYMOUS mapping. */
+  if (fd != -1)
+    {
+      /* Ensure that fd is open */
+      cygheap_fdget cfd (fd);
+      if (cfd < 0)
+	{
+	  syscall_printf ("-1 = mmap(): EBADF");
+	  ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
+	  return MAP_FAILED;
+	}
+      fh = cfd;
+      if (fh->get_device () == FH_ZERO)
+        {
+	  /* mmap /dev/zero is like MAP_ANONYMOUS. */
+	  fd = -1;
+	  flags |= MAP_ANONYMOUS;
+	}
+    }
+  if (fd == -1)
+    {
+      fh_paging_file.set_io_handle (INVALID_HANDLE_VALUE);
+      fh = &fh_paging_file;
+    }
+
   /* 9x only: If MAP_FIXED is requested on a non-granularity boundary,
      change request so that this looks like a request with offset
      addr % granularity. */
@@ -554,49 +581,27 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
       gran_len = howmany (off + len, granularity) * granularity - gran_off;
     }
 
-  fhandler_base *fh;
-
-  if (fd != -1)
+  /* File mappings needs some extra care. */
+  if (fd != -1 && fh->get_device () == FH_FS)
     {
-      /* Ensure that fd is open */
-      cygheap_fdget cfd (fd);
-      if (cfd < 0)
+      DWORD high;
+      DWORD low = GetFileSize (fh->get_handle (), &high);
+      _off64_t fsiz = ((_off64_t)high << 32) + low;
+      /* Don't allow mappings beginning beyond EOF since Windows can't
+	 handle that POSIX like.  FIXME: Still looking for a good idea
+	 to allow that nevertheless. */
+      if (gran_off >= fsiz)
 	{
-	  syscall_printf ("-1 = mmap(): EBADF");
-	  ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
+	  set_errno (ENXIO);
+	  ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK,
+			       "mmap");
 	  return MAP_FAILED;
 	}
-      fh = cfd;
-      if (fh->get_device () == FH_FS)
-	{
-	  DWORD high;
-	  DWORD low = GetFileSize (fh->get_handle (), &high);
-	  _off64_t fsiz = ((_off64_t)high << 32) + low;
-	  /* Don't allow mappings beginning beyond EOF since Windows can't
-	     handle that POSIX like.  FIXME: Still looking for a good idea
-	     to allow that nevertheless. */
-	  if (gran_off >= fsiz)
-	    {
-	      set_errno (ENXIO);
-	      ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK,
-				   "mmap");
-	      return MAP_FAILED;
-	    }
-	  fsiz -= gran_off;
-	  if (gran_len > fsiz)
-	    gran_len = fsiz;
-	}
-      else if (fh->get_device () == FH_ZERO)
-	{
-	  /* mmap /dev/zero is like MAP_ANONYMOUS. */
-	  fd = -1;
-	  flags |= MAP_ANONYMOUS;
-	}
-    }
-  if (fd == -1)
-    {
-      fh_paging_file.set_io_handle (INVALID_HANDLE_VALUE);
-      fh = &fh_paging_file;
+      /* Don't map beyond EOF.  Windows would change the file to the
+         new length otherwise, in contrast to POSIX. */
+      fsiz -= gran_off;
+      if (gran_len > fsiz)
+	gran_len = fsiz;
     }
 
   DWORD access = (prot & PROT_WRITE) ? FILE_MAP_WRITE : FILE_MAP_READ;

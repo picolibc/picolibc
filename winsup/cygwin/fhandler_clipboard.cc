@@ -174,7 +174,6 @@ fhandler_dev_clipboard::write (const void *buf, size_t len)
 
       pos = msize;
 
-      set_errno (0);
       eof = false;
       return len;
     }
@@ -205,7 +204,6 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
 #if 0
 	  system_printf ("a non-accepted format! %d", format);
 #endif
-	  set_errno (0);
 	  len = 0;
 	}
       else
@@ -238,7 +236,6 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
 	      GlobalUnlock (hglb);
 	    }
 	  CloseClipboard ();
-	  set_errno (0);
 	  len = ret;
 	}
     }

@@ -95,8 +95,6 @@ fhandler_windows::read (void *buf, size_t& len)
 
   if ((ssize_t) len == -1)
     __seterrno ();
-  else
-    set_errno (0);
   return;
 }
 

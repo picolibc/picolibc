@@ -946,7 +946,6 @@ cygwin_gethostname (char *name, size_t len)
 	}
     }
   debug_printf ("name %s", name);
-  h_errno = 0;
   return 0;
 }
 
@@ -996,7 +995,6 @@ cygwin_gethostbyname (const char *name)
   else
     {
       debug_printf ("h_name %s", _my_tls.locals.hostent_buf->h_name);
-      h_errno = 0;
     }
   return _my_tls.locals.hostent_buf;
 }
@@ -1020,7 +1018,6 @@ cygwin_gethostbyaddr (const char *addr, int len, int type)
   else
     {
       debug_printf ("h_name %s", _my_tls.locals.hostent_buf->h_name);
-      h_errno = 0;
     }
   return _my_tls.locals.hostent_buf;
 }

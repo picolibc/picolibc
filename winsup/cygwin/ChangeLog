@@ -1,3 +1,17 @@
+2005-03-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_clipboard.cc (fhandler_dev_clipboard::write): Never set
+	errno to 0.
+	(fhandler_dev_clipboard::read): Ditto.
+	* fhandler_windows.cc (fhandler_windows::read): Ditto.
+	* scandir.cc (scandir): Ditto.
+	* syscalls.cc (_fstat64_r): Ditto.
+	(_fstat_r): Ditto.
+	(_stat64_r): Ditto.
+	(_stat_r): Ditto.
+
+	* mmap.cc (mmap64): Fix /dev/zero mapping.
+
 2005-02-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (class fhandler_socket): Declare new method
