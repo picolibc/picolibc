@@ -28,7 +28,7 @@
 extern "C" { // }
 #endif
 
-enum sim_arm_regnum
+enum sim_arm_regs
 {
   SIM_ARM_R0_REGNUM,
   SIM_ARM_R1_REGNUM,

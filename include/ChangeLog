@@ -1,3 +1,8 @@
+2002-06-18  Dave Brolley  <brolley@redhat.com>
+
+	From Catherine Moore:
+	* dis-asm.h (print_insn_frv): New prototype.
+
 2002-06-09  Andrew Cagney  <cagney@redhat.com>
 
 	* remote-sim.h: Move to directory gdb/.

@@ -1,3 +1,7 @@
+2002-06-15  Andrew Cagney  <ac131313@redhat.com>
+
+	* sim-arm.h (enum sim_arm_regs): Rename sim_arm_regnum.
+
 2002-06-12  Andrew Cagney  <ac131313@redhat.com>
 
 	* sim-arm.h: New file.

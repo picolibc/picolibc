@@ -244,6 +244,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 #define EM_XSTORMY16	        0xad45
 
+/* FRV magic number - no EABI available??.  */
+#define EM_CYGNUS_FRV		0x5441
 /* See the above comment before you add a new EM_* value here.  */
 
 /* Values for e_version.  */
