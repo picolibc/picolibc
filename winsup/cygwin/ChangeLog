@@ -1,5 +1,9 @@
 2002-06-10  Christopher Faylor  <cgf@redhat.com>
 
+	* include/sys/strace.h (strace): Avoid use of constructor.
+
+2002-06-10  Christopher Faylor  <cgf@redhat.com>
+
 	* dcrt0.cc (dll_crt0_1): Initialize wincap and check for sanity before
 	running global ctors.
 	* wincap.h (wincap): Eliminate constructor.  Default is to zero memory,

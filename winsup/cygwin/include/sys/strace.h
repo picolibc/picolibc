@@ -44,7 +44,6 @@ public:
   int lmicrosec;
   int execing;
   int inited;
-  strace() : version(1) {}
   void hello ();
   void prntf (unsigned, const char *func, const char *, ...) /*__attribute__ ((regparm(3)))*/;
   void vprntf (unsigned, const char *func, const char *, va_list ap) /*__attribute__ ((regparm(3)))*/;

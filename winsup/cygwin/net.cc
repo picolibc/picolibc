@@ -1123,7 +1123,7 @@ cygwin_gethostbyname (const char *name)
       tmp_addr[1] = b;
       tmp_addr[2] = c;
       tmp_addr[3] = d;
-      tmp_addr_list[0] = (char *)tmp_addr;
+      tmp_addr_list[0] = (char *) tmp_addr;
       tmp.h_name = name;
       tmp.h_aliases = tmp_aliases;
       tmp.h_addrtype = 2;
