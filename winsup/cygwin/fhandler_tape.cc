@@ -89,7 +89,7 @@ fhandler_dev_tape::open (const char *path, int flags, mode_t)
 	varblkop = get.mt_dsreg == 0;
 
       if (devbufsiz > 1L)
-	devbuf = (char *) cmalloc (HEAP_BUF, devbufsiz);
+	devbuf = new char [devbufsiz];
 
       /* The following rewind in position 0 solves a problem which appears
        * in case of multi volume archives: The last ReadFile on first medium
@@ -349,20 +349,22 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 		      size = get.mt_maxblksize;
 		      ret = NO_ERROR;
 		    }
-		  char *buf = (char *) cmalloc (HEAP_BUF, size);
-		  if (!buf)
+		  char *buf = NULL;
+		  if (size > 1L && !(buf = new char [size]))
 		    {
 		      ret = ERROR_OUTOFMEMORY;
 		      break;
 		    }
-		  if (devbuf)
+		  if (devbufsiz > 1L && size > 1L)
 		    {
-		      memcpy(buf,devbuf + devbufstart, devbufend - devbufstart);
+		      memcpy(buf, devbuf + devbufstart,
+			     devbufend - devbufstart);
 		      devbufend -= devbufstart;
-		      cfree (devbuf);
 		    }
 		  else
 		    devbufend = 0;
+		  if (devbufsiz > 1L)
+		    delete [] devbuf;
 		  devbufstart = 0;
 		  devbuf = buf;
 		  devbufsiz = size;

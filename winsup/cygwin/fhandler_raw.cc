@@ -117,12 +117,13 @@ fhandler_dev_raw::fhandler_dev_raw (DWORD devtype, const char *name, int unit) :
 {
   clear ();
   this->unit = unit;
+  set_need_fork_fixup ();
 }
 
 fhandler_dev_raw::~fhandler_dev_raw (void)
 {
-  if (devbufsiz >= 1L)
-    cfree (devbuf);
+  if (devbufsiz > 1L)
+    delete [] devbuf;
   clear ();
 }
 
@@ -139,7 +140,7 @@ fhandler_dev_raw::open (const char *path, int flags, mode_t)
   if (ret)
     {
       if (devbufsiz > 1L)
-	devbuf = (char *) cmalloc (HEAP_BUF, devbufsiz);
+	devbuf = new char [devbufsiz];
     }
   else
     devbufsiz = 0;
@@ -444,19 +445,26 @@ fhandler_dev_raw::dup (fhandler_base *child)
 
       fhc->devbufsiz = devbufsiz;
       if (devbufsiz > 1L)
-	{
-	  fhc->devbuf = (char *) cmalloc (HEAP_BUF, devbufsiz);
-	  memcpy (fhc->devbuf, devbuf, devbufend);
-	}
-      fhc->devbufstart = devbufstart;
-      fhc->devbufend = devbufend;
+	fhc->devbuf = new char [devbufsiz];
+      fhc->devbufstart = 0;
+      fhc->devbufend = 0;
       fhc->eom_detected = eom_detected;
       fhc->eof_detected = eof_detected;
-      fhc->lastblk_to_read = lastblk_to_read;
+      fhc->lastblk_to_read = 0;
       fhc->varblkop = varblkop;
       fhc->unit = unit;
     }
   return ret;
+}
+
+void
+fhandler_dev_raw::fixup_after_fork (HANDLE)
+{
+  if (devbufsiz > 1L)
+    devbuf = new char [devbufsiz];
+  devbufstart = 0;
+  devbufend = 0;
+  lastblk_to_read = 0;
 }
 
 int
@@ -488,12 +496,12 @@ fhandler_dev_raw::ioctl (unsigned int cmd, void *buf)
 	      ret = ERROR_INVALID_PARAMETER;
 	    else if (!devbuf || op->rd_parm != devbufsiz)
 	      {
-		char *buf = (char *) cmalloc (HEAP_BUF, op->rd_parm);
-		if (devbuf)
+		char *buf = new char [op->rd_parm];
+		if (devbufsiz > 1L)
 		  {
 		    memcpy (buf, devbuf + devbufstart, devbufend - devbufstart);
 		    devbufend -= devbufstart;
-		    cfree (devbuf);
+		    delete [] devbuf;
 		  }
 		else
 		  devbufend = 0;

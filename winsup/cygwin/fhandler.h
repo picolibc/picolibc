@@ -403,6 +403,8 @@ public:
   int dup (fhandler_base *child);
 
   int ioctl (unsigned int cmd, void *buf);
+
+  void fixup_after_fork (HANDLE);
 };
 
 class fhandler_dev_floppy: public fhandler_dev_raw

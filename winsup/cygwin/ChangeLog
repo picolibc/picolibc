@@ -1,3 +1,19 @@
+Tue Oct 31 22:39:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_dev_raw): Add definition for method
+	`fixup_after_fork'.
+	* fhandler_raw.cc (fhandler_dev_raw::fhandler_dev_raw): Add
+	`set_need_fixup_after_fork' call.
+	(fhandler_dev_raw::~fhandler_dev_raw): Revert to user space
+	allocation.
+	(fhandler_dev_raw::open): Ditto.
+	(fhandler_dev_raw::dup): Ditto. Reset buffer pointer.
+	(fhandler_dev_raw::fixup_after_fork): New function.
+	* fhandler_tape.cc (fhandler_dev_tape::open): Revert to user space
+	memory allocation.
+	(fhandler_dev_tape::ioctl): Ditto. Change behaviour on MTSETBLK when
+	new size is 1.
+
 Tue Oct 31 20:56:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler_tape.cc (fhandler_dev_tape::open): Fix memory allocation.
