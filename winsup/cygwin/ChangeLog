@@ -1,3 +1,29 @@
+2002-06-23  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* fhandler.cc (fhandler_base::fstat): Set S_IFIFO for pipes.
+	* fhandler_socket.cc (fhandler_socket.cc::fstat): Set S_IFSOCK.
+
+2002-06-23  Christopher Faylor  <cgf@redhat.com>
+
+	* lib/_cygwin_S_IEXEC.cc: Remove obsolete file.
+
+2002-06-23  Christopher Faylor  <cgf@redhat.com>
+
+	Use cygwin_{shm,ipc}.h instead of /sys/{shm,ipc}.h throughout.
+	* sys/ipc.h: Remove.
+	* sys/shm.h: Remove.
+	* cygwin_ipc.h: New file.
+	* cygwin_shm.h: New file.
+
+2002-06-23  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin.sc: Add recent changes from ld sources.
+
+2002-06-23  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* winsup.h: Move #ifdef EXPCGF code into "winbase.h".
+	* winbase.h: #ifdef EXPCGF code moved here from "winsup.h".
+
 2002-06-21  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver.cc: The tests for a duplicate server instance are now

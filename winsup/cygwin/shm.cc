@@ -23,7 +23,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "thread.h"
-#include <sys/shm.h>
+#include "cygwin_shm.h"
 #include "cygserver_shm.h"
 
 /*

@@ -1,5 +1,12 @@
 #include_next "winbase.h"
 
+#ifdef EXPCGF
+#define DECLARE_TLS_STORAGE char **tls[4096] __attribute__ ((unused))
+#else
+#define DECLARE_TLS_STORAGE do {} while (0)
+#define _WINBASE2_H
+#endif
+
 #ifndef _WINBASE2_H
 #define _WINBASE2_H
 

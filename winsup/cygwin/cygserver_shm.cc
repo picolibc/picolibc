@@ -12,9 +12,6 @@
 
 #include "woutsup.h"
 
-#include <sys/types.h>
-#include <sys/shm.h>
-
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
