@@ -1,3 +1,12 @@
+2002-06-18  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* testsuite/lib/passfail.exp (newlib_pass_fail_all): New
+	procedure.
+	(newlib_pass_fail): Change to compile and run only one file.
+	* testsuite/newlib.locale/locale.exp: Use new
+	newlib_pass_fail_all procedure.
+	* testsuite/newlib.string/string.exp: Likewise.
+
 2002-06-18  Dave Brolley  <brolley@redhat.com>
 
 	From Catherine Moore, Michael Meissner, Richard Sandiford:
