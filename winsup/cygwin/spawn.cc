@@ -623,7 +623,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   cygbench ("spawn-guts");
   if (!cygheap->user.impersonated || cygheap->user.token == INVALID_HANDLE_VALUE)
     {
-
+      PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf);
       ciresrv.moreinfo->uid = getuid32 ();
       /* FIXME: This leaks a handle in the CreateProcessAsUser case since the
 	 child process doesn't know about cygwin_mount_h. */
@@ -631,14 +631,12 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       newheap = cygheap_setup_for_child (&ciresrv, cygheap->fdtab.need_fixup_before ());
       rc = CreateProcess (runpath,	/* image name - with full path */
 			  one_line.buf,	/* what was passed to exec */
-					  /* process security attrs */
-			  sec_user_nih (sa_buf),
-					  /* thread security attrs */
-			  sec_user_nih (sa_buf),
-			  TRUE,	/* inherit handles from parent */
+			  sec_attribs,	/* process security attrs */
+			  sec_attribs,	/* thread security attrs */
+			  TRUE,		/* inherit handles from parent */
 			  flags,
-			  envblock,/* environment */
-			  0,	/* use current drive/directory */
+			  envblock,	/* environment */
+			  0,		/* use current drive/directory */
 			  &si,
 			  &pi);
     }
@@ -688,10 +686,10 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 		       one_line.buf,	/* what was passed to exec */
 		       sec_attribs,     /* process security attrs */
 		       sec_attribs,     /* thread security attrs */
-		       TRUE,	/* inherit handles from parent */
+		       TRUE,		/* inherit handles from parent */
 		       flags,
-		       envblock,/* environment */
-		       0,	/* use current drive/directory */
+		       envblock,	/* environment */
+		       0,		/* use current drive/directory */
 		       &si,
 		       &pi);
       /* Restore impersonation. In case of _P_OVERLAY this isn't
