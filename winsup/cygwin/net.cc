@@ -1442,7 +1442,7 @@ cygwin_hstrerror (int err)
 extern "C" void
 cygwin_herror (const char *s)
 {
-  if (check_null_str (s))
+  if (s && check_null_str (s))
     return;
   if (cygheap->fdtab.not_open (2))
     return;
@@ -2197,6 +2197,12 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
   SOCKET fd2s;
   sigframe thisframe (mainthread);
 
+  if (check_null_invalid_struct_errno (ahost) ||
+      check_null_empty_str_errno (*ahost) ||
+      (locuser && check_null_empty_str_errno (locuser)) ||
+      (remuser && check_null_str_errno (remuser)))
+    return (int) INVALID_SOCKET;
+
   cygheap_fdnew res_fd;
   if (res_fd < 0)
     goto done;
@@ -2262,6 +2268,12 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
   int res = -1;
   SOCKET fd2s;
   sigframe thisframe (mainthread);
+
+  if (check_null_invalid_struct_errno (ahost) ||
+      check_null_empty_str_errno (*ahost) ||
+      (locuser && check_null_empty_str_errno (locuser)) ||
+      (password && check_null_str_errno (password)))
+    return (int) INVALID_SOCKET;
 
   cygheap_fdnew res_fd;
   if (res_fd < 0)
