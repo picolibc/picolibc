@@ -205,7 +205,13 @@ normalize_posix_path (const char *src, char *dst)
   syscall_printf ("src %s", src);
 
   if (isdrive (src) || strpbrk (src, "\\:"))
-    return normalize_win32_path (src, dst);
+    {
+      int err = normalize_win32_path (src, dst);
+      if (!err && isdrive (dst))
+	for (char *p = dst; (p = strchr (p, '\\')); p++)
+	  *p = '/';
+      return err;
+    }
 
   if (!isslash (src[0]))
     {

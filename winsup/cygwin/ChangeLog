@@ -1,3 +1,8 @@
+2003-01-15  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (normalize_posix_path): Convert win32 path separators to
+	slashes when full path is specified.
+
 2003-01-15  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* cmalloc.cc (_cmalloc): Fix memory leak.
