@@ -43,6 +43,10 @@ static win_env conv_envvars[] =
      cygwin_conv_to_full_win32_path, return_MAX_PATH, return_MAX_PATH},
     {"TMPDIR=", 7, NULL, NULL, cygwin_conv_to_full_posix_path, cygwin_conv_to_full_win32_path,
      return_MAX_PATH, return_MAX_PATH},
+    {"TMP=", 4, NULL, NULL, cygwin_conv_to_full_posix_path, cygwin_conv_to_full_win32_path,
+     return_MAX_PATH, return_MAX_PATH},
+    {"TEMP=", 5, NULL, NULL, cygwin_conv_to_full_posix_path, cygwin_conv_to_full_win32_path,
+     return_MAX_PATH, return_MAX_PATH},
     {NULL, 0, NULL, NULL, NULL, NULL, 0, 0}
   };
 
