@@ -162,7 +162,7 @@ void uinfo_init (void);
 #define ILLEGAL_UID ((__uid32_t)-1)
 #define ILLEGAL_GID16 ((__gid16_t)-1)
 #define ILLEGAL_GID ((__gid32_t)-1)
-#define ILLEGAL_SEEK ((__off64_t)-1)
+#define ILLEGAL_SEEK ((_off64_t)-1)
 
 #define uid16touid32(u16)  ((u16)==ILLEGAL_UID16?ILLEGAL_UID:(__uid32_t)(u16))
 #define gid16togid32(g16)  ((g16)==ILLEGAL_GID16?ILLEGAL_GID:(__gid32_t)(g16))

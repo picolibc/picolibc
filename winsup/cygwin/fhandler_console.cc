@@ -31,7 +31,7 @@ details. */
 #include "shared_info.h"
 #include "cygthread.h"
 
-#define CONVERT_LIMIT 4096
+#define CONVERT_LIMIT 16384
 
 static BOOL
 cp_convert (UINT destcp, char *dest, UINT srccp, const char *src, DWORD size)

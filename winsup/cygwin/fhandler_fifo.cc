@@ -112,7 +112,10 @@ fhandler_fifo::open_not_mine (int flags)
 	    }
 
 	  if (i == 0)
-	    read_state = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+	    {
+	      read_state = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+	      set_need_fork_fixup ();
+	    }
 	}
       CloseHandle (hp);
 
@@ -182,4 +185,23 @@ errout:
 out:
   debug_printf ("returning %d, errno %d", res, get_errno ());
   return res;
+}
+
+int
+fhandler_fifo::dup (fhandler_base * child)
+{
+  int res = fhandler_pipe::dup (child);
+  if (!res)
+    {
+      fhandler_fifo *ff = (fhandler_fifo *) child;
+
+      if (!DuplicateHandle (hMainProc, get_output_handle (), hMainProc,
+			    &ff->get_output_handle (), false, true,
+			    DUPLICATE_SAME_ACCESS))
+	{
+	  child->close ();
+	  res = -1;
+	}
+    }
+  return 0;
 }

@@ -284,13 +284,13 @@ class fhandler_base
   virtual int write (const void *ptr, size_t len);
   virtual ssize_t readv (const struct iovec *, int iovcnt, ssize_t tot = -1);
   virtual ssize_t writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
-  virtual __off64_t lseek (__off64_t offset, int whence);
+  virtual _off64_t lseek (_off64_t offset, int whence);
   virtual int lock (int, struct flock *);
   virtual void dump ();
   virtual int dup (fhandler_base *child);
 
   virtual HANDLE mmap (caddr_t *addr, size_t len, DWORD access,
-		       int flags, __off64_t off);
+		       int flags, _off64_t off);
   virtual int munmap (HANDLE h, caddr_t addr, size_t len);
   virtual int msync (HANDLE h, caddr_t addr, size_t len, int flags);
   virtual BOOL fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
@@ -344,8 +344,8 @@ class fhandler_base
   virtual void set_eof () {}
   virtual DIR *opendir ();
   virtual dirent *readdir (DIR *);
-  virtual __off64_t telldir (DIR *);
-  virtual void seekdir (DIR *, __off64_t);
+  virtual _off64_t telldir (DIR *);
+  virtual void seekdir (DIR *, _off64_t);
   virtual void rewinddir (DIR *);
   virtual int closedir (DIR *);
   virtual bool is_slow () {return 0;}
@@ -401,7 +401,7 @@ class fhandler_socket: public fhandler_base
 
   int ioctl (unsigned int cmd, void *);
   int fcntl (int cmd, void *);
-  __off64_t lseek (__off64_t, int) { return 0; }
+  _off64_t lseek (_off64_t, int) { return 0; }
   int shutdown (int how);
   int close ();
   void hclose (HANDLE) {close ();}
@@ -442,7 +442,7 @@ protected:
   unsigned id;
 public:
   fhandler_pipe ();
-  __off64_t lseek (__off64_t offset, int whence);
+  _off64_t lseek (_off64_t offset, int whence);
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
@@ -480,6 +480,7 @@ public:
   HANDLE& get_output_handle () { return output_handle; }
   void set_output_handle (HANDLE h) { output_handle = h; }
   void set_use ();
+  int dup (fhandler_base *child);
   bool is_slow () {return 1;}
   ATOM& get_atom () {return upand;}
 };
@@ -537,7 +538,7 @@ class fhandler_dev_floppy: public fhandler_dev_raw
   virtual int open (int flags, mode_t mode = 0);
   virtual int close (void);
 
-  virtual __off64_t lseek (__off64_t offset, int whence);
+  virtual _off64_t lseek (_off64_t offset, int whence);
 
   virtual int ioctl (unsigned int cmd, void *buf);
 };
@@ -560,7 +561,7 @@ class fhandler_dev_tape: public fhandler_dev_raw
   virtual int open (int flags, mode_t mode = 0);
   virtual int close (void);
 
-  virtual __off64_t lseek (__off64_t offset, int whence);
+  virtual _off64_t lseek (_off64_t offset, int whence);
 
   virtual int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
 
@@ -594,15 +595,15 @@ class fhandler_disk_file: public fhandler_base
   bool isdevice () { return false; }
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
 
-  HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, __off64_t off);
+  HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, _off64_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);
   int msync (HANDLE h, caddr_t addr, size_t len, int flags);
   BOOL fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
 			      DWORD size, void *address);
   DIR *opendir ();
   struct dirent *readdir (DIR *);
-  __off64_t telldir (DIR *);
-  void seekdir (DIR *, __off64_t);
+  _off64_t telldir (DIR *);
+  void seekdir (DIR *, _off64_t);
   void rewinddir (DIR *);
   int closedir (DIR *);
 };
@@ -617,8 +618,8 @@ class fhandler_cygdrive: public fhandler_disk_file
   fhandler_cygdrive ();
   DIR *opendir ();
   struct dirent *readdir (DIR *);
-  __off64_t telldir (DIR *);
-  void seekdir (DIR *, __off64_t);
+  _off64_t telldir (DIR *);
+  void seekdir (DIR *, _off64_t);
   void rewinddir (DIR *);
   int closedir (DIR *);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
@@ -654,7 +655,7 @@ class fhandler_serial: public fhandler_base
   int ioctl (unsigned int cmd, void *);
   int tcsetattr (int a, const struct termios *t);
   int tcgetattr (struct termios *t);
-  __off64_t lseek (__off64_t, int) { return 0; }
+  _off64_t lseek (_off64_t, int) { return 0; }
   int tcflush (int);
   void dump ();
   int is_tty () { return 1; }
@@ -706,7 +707,7 @@ class fhandler_termios: public fhandler_base
   void fixup_after_fork (HANDLE);
   void fixup_after_exec (HANDLE parent) { fixup_after_fork (parent); }
   void echo_erase (int force = 0);
-  virtual __off64_t lseek (__off64_t, int);
+  virtual _off64_t lseek (_off64_t, int);
 };
 
 enum ansi_intensity
@@ -897,7 +898,7 @@ class fhandler_tty_slave: public fhandler_tty_common
   int dup (fhandler_base *child);
   void fixup_after_fork (HANDLE parent);
 
-  __off64_t lseek (__off64_t, int) { return 0; }
+  _off64_t lseek (_off64_t, int) { return 0; }
   select_record *select_read (select_record *s);
   int cygserver_attach_tty (HANDLE*, HANDLE*);
   int get_unit () __attribute__ ((regparm (1)));
@@ -927,7 +928,7 @@ public:
   int tcflush (int);
   int ioctl (unsigned int cmd, void *);
 
-  __off64_t lseek (__off64_t, int) { return 0; }
+  _off64_t lseek (_off64_t, int) { return 0; }
   char *ptsname ();
 
   void set_close_on_exec (int val);
@@ -968,7 +969,7 @@ class fhandler_dev_zero: public fhandler_base
   int open (int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
-  __off64_t lseek (__off64_t offset, int whence);
+  _off64_t lseek (_off64_t offset, int whence);
 
   void dump ();
 };
@@ -988,7 +989,7 @@ class fhandler_dev_random: public fhandler_base
   int open (int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
-  __off64_t lseek (__off64_t offset, int whence);
+  _off64_t lseek (_off64_t offset, int whence);
   int close (void);
   int dup (fhandler_base *child);
 
@@ -999,7 +1000,7 @@ class fhandler_dev_mem: public fhandler_base
 {
  protected:
   DWORD mem_size;
-  __off64_t pos;
+  _off64_t pos;
 
  public:
   fhandler_dev_mem ();
@@ -1008,12 +1009,12 @@ class fhandler_dev_mem: public fhandler_base
   int open (int flags, mode_t mode = 0);
   int write (const void *ptr, size_t ulen);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
-  __off64_t lseek (__off64_t offset, int whence);
+  _off64_t lseek (_off64_t offset, int whence);
   int close (void);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int dup (fhandler_base *child);
 
-  HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, __off64_t off);
+  HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, _off64_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);
   int msync (HANDLE h, caddr_t addr, size_t len, int flags);
   BOOL fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
@@ -1030,7 +1031,7 @@ class fhandler_dev_clipboard: public fhandler_base
   int open (int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
-  __off64_t lseek (__off64_t offset, int whence);
+  _off64_t lseek (_off64_t offset, int whence);
   int close (void);
 
   int dup (fhandler_base *child);
@@ -1038,7 +1039,7 @@ class fhandler_dev_clipboard: public fhandler_base
   void dump ();
 
  private:
-  __off64_t pos;
+  _off64_t pos;
   void *membuffer;
   size_t msize;
   bool eof;
@@ -1056,7 +1057,7 @@ class fhandler_windows: public fhandler_base
   int write (const void *ptr, size_t len);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   int ioctl (unsigned int cmd, void *);
-  __off64_t lseek (__off64_t, int) { return 0; }
+  _off64_t lseek (_off64_t, int) { return 0; }
   int close (void) { return 0; }
 
   void set_close_on_exec (int val);
@@ -1083,7 +1084,7 @@ class fhandler_dev_dsp : public fhandler_base
   int write (const void *ptr, size_t len);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   int ioctl (unsigned int cmd, void *);
-  __off64_t lseek (__off64_t, int);
+  _off64_t lseek (_off64_t, int);
   int close (void);
   int dup (fhandler_base *child);
   void dump (void);
@@ -1095,8 +1096,8 @@ class fhandler_virtual : public fhandler_base
  protected:
   char *filebuf;
   size_t bufalloc;
-  __off64_t filesize;
-  __off64_t position;
+  _off64_t filesize;
+  _off64_t position;
   int fileid; // unique within each class
  public:
 
@@ -1105,13 +1106,13 @@ class fhandler_virtual : public fhandler_base
 
   virtual int exists();
   DIR *opendir ();
-  __off64_t telldir (DIR *);
-  void seekdir (DIR *, __off64_t);
+  _off64_t telldir (DIR *);
+  void seekdir (DIR *, _off64_t);
   void rewinddir (DIR *);
   int closedir (DIR *);
   int write (const void *ptr, size_t len);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
-  __off64_t lseek (__off64_t, int);
+  _off64_t lseek (_off64_t, int);
   int dup (fhandler_base *child);
   int open (int flags, mode_t mode = 0);
   int close (void);
@@ -1141,8 +1142,8 @@ class fhandler_registry: public fhandler_proc
   fhandler_registry ();
   int exists();
   struct dirent *readdir (DIR *);
-  __off64_t telldir (DIR *);
-  void seekdir (DIR *, __off64_t);
+  _off64_t telldir (DIR *);
+  void seekdir (DIR *, _off64_t);
   void rewinddir (DIR *);
   int closedir (DIR *);
 

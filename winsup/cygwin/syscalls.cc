@@ -471,7 +471,7 @@ writev (const int fd, const struct iovec *const iov, const int iovcnt)
 
   res = cfd->bg_check (SIGTTOU);
 
-  if (res > bg_eof)
+  if (res > (int) bg_eof)
     {
       myself->process_state |= PID_TTYOU;
       res = cfd->writev (iov, iovcnt, tot);
@@ -546,10 +546,10 @@ extern "C" int _open (const char *, int flags, ...)
 extern "C" int _open64 (const char *, int flags, ...)
   __attribute__ ((alias ("open")));
 
-extern "C" __off64_t
-lseek64 (int fd, __off64_t pos, int dir)
+extern "C" _off64_t
+lseek64 (int fd, _off64_t pos, int dir)
 {
-  __off64_t res;
+  _off64_t res;
   sigframe thisframe (mainthread);
 
   if (dir != SEEK_SET && dir != SEEK_CUR && dir != SEEK_END)
@@ -570,16 +570,16 @@ lseek64 (int fd, __off64_t pos, int dir)
   return res;
 }
 
-extern "C" int _lseek64 (int fd, __off64_t pos, int dir)
+extern "C" int _lseek64 (int fd, _off64_t pos, int dir)
   __attribute__ ((alias ("lseek64")));
 
-extern "C" __off32_t
-lseek (int fd, __off32_t pos, int dir)
+extern "C" _off_t
+lseek (int fd, _off_t pos, int dir)
 {
-  return lseek64 (fd, (__off64_t) pos, dir);
+  return lseek64 (fd, (_off64_t) pos, dir);
 }
 
-extern "C" __off32_t _lseek (int, __off32_t, int)
+extern "C" _off_t _lseek (int, _off_t, int)
   __attribute__ ((alias ("lseek")));
 
 extern "C" int
@@ -1053,7 +1053,7 @@ fstat64 (int fd, struct __stat64 *buf)
   return res;
 }
 
-extern "C" int _fstat64 (int fd, __off64_t pos, int dir)
+extern "C" int _fstat64 (int fd, _off64_t pos, int dir)
   __attribute__ ((alias ("fstat64")));
 
 extern "C" int
@@ -1066,7 +1066,7 @@ fstat (int fd, struct __stat32 *buf)
   return ret;
 }
 
-extern "C" int _fstat (int fd, __off64_t pos, int dir)
+extern "C" int _fstat (int fd, _off64_t pos, int dir)
   __attribute__ ((alias ("fstat")));
 
 /* fsync: P96 6.6.1.1 */
@@ -1146,7 +1146,7 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow)
   return res;
 }
 
-extern "C" int _stat (int fd, __off64_t pos, int dir)
+extern "C" int _stat (int fd, _off64_t pos, int dir)
   __attribute__ ((alias ("stat")));
 
 extern "C" int
@@ -1758,7 +1758,7 @@ setmode (int fd, int mode)
 }
 
 extern "C" int
-ftruncate64 (int fd, __off64_t length)
+ftruncate64 (int fd, _off64_t length)
 {
   sigframe thisframe (mainthread);
   int res = -1;
@@ -1775,7 +1775,7 @@ ftruncate64 (int fd, __off64_t length)
 	  if (cfd->get_handle ())
 	    {
 	      /* remember curr file pointer location */
-	      __off64_t prev_loc = cfd->lseek (0, SEEK_CUR);
+	      _off64_t prev_loc = cfd->lseek (0, SEEK_CUR);
 
 	      cfd->lseek (length, SEEK_SET);
 	      if (!SetEndOfFile (h))
@@ -1795,14 +1795,14 @@ ftruncate64 (int fd, __off64_t length)
 
 /* ftruncate: P96 5.6.7.1 */
 extern "C" int
-ftruncate (int fd, __off32_t length)
+ftruncate (int fd, _off_t length)
 {
-  return ftruncate64 (fd, (__off64_t)length);
+  return ftruncate64 (fd, (_off64_t)length);
 }
 
 /* truncate: Provided by SVR4 and 4.3+BSD.  Not part of POSIX.1 or XPG3 */
 extern "C" int
-truncate64 (const char *pathname, __off64_t length)
+truncate64 (const char *pathname, _off64_t length)
 {
   sigframe thisframe (mainthread);
   int fd;
@@ -1824,9 +1824,9 @@ truncate64 (const char *pathname, __off64_t length)
 
 /* truncate: Provided by SVR4 and 4.3+BSD.  Not part of POSIX.1 or XPG3 */
 extern "C" int
-truncate (const char *pathname, __off32_t length)
+truncate (const char *pathname, _off_t length)
 {
-  return truncate64 (pathname, (__off64_t)length);
+  return truncate64 (pathname, (_off64_t)length);
 }
 
 extern "C" long
@@ -2567,98 +2567,111 @@ login (struct utmp *ut)
 
   pututline (ut);
   endutent ();
+  /* Writing to wtmp must be atomic to prevent mixed up data. */
+  HANDLE mutex = CreateMutex (NULL, FALSE, shared_name ("wtmp_mutex", 0));
+  if (mutex)
+    while (WaitForSingleObject (mutex, INFINITE) == WAIT_ABANDONED)
+      ;
   if ((fd = open (_PATH_WTMP, O_WRONLY | O_APPEND | O_BINARY, 0)) >= 0)
     {
-      (void) write (fd, (char *) ut, sizeof (struct utmp));
-      (void) close (fd);
+      write (fd, ut, sizeof *ut);
+      close (fd);
+    }
+  if (mutex)
+    {
+      ReleaseMutex (mutex);
+      CloseHandle (mutex);
     }
 }
 
-/* It isn't possible to use unix-style I/O function in logout code because
-cygwin's I/O subsystem may be inaccessible at logout () call time.
-FIXME (cgf): huh?
-*/
 extern "C" int
 logout (char *line)
 {
   sigframe thisframe (mainthread);
-  int res = 0;
-  HANDLE ut_fd;
-  static const char path_utmp[] = _PATH_UTMP;
+  struct utmp ut_buf, *ut;
 
-  path_conv win32_path (path_utmp);
-  if (win32_path.error)
-    return 0;
-
-  ut_fd = CreateFile (win32_path.get_win32 (),
-		      GENERIC_READ | GENERIC_WRITE,
-		      FILE_SHARE_READ | FILE_SHARE_WRITE,
-		      &sec_none_nih, OPEN_EXISTING,
-		      FILE_ATTRIBUTE_NORMAL, NULL);
-  if (ut_fd != INVALID_HANDLE_VALUE)
+  memset (&ut_buf, 0, sizeof ut_buf);
+  strncpy (ut_buf.ut_line, line, sizeof ut_buf.ut_line);
+  setutent ();
+  ut = getutline (&ut_buf);
+  if (ut)
     {
-      struct utmp *ut;
-      struct utmp ut_buf[100];
-      /* FIXME: utmp file access is not 64 bit clean for now. */
-      __off32_t pos = 0;		/* Position in file */
-      DWORD rd;
+      int fd;
 
-      while (!res && ReadFile (ut_fd, ut_buf, sizeof ut_buf, &rd, NULL)
-	     && rd != 0)
+      /* We can't use ut further since it's a pointer to the static utmp_data
+	 area (see below) and would get overwritten in pututline().  So we
+	 copy it back to the local ut_buf. */
+      memcpy (&ut_buf, ut, sizeof ut_buf);
+      ut_buf.ut_type = DEAD_PROCESS;
+      memset (ut_buf.ut_user, 0, sizeof ut_buf.ut_user);
+      time (&ut_buf.ut_time);
+      /* Writing to wtmp must be atomic to prevent mixed up data. */
+      HANDLE mutex = CreateMutex (NULL, FALSE, shared_name ("wtmp_mutex", 0));
+      if (mutex)
+	while (WaitForSingleObject (mutex, INFINITE) == WAIT_ABANDONED)
+	  ;
+      if ((fd = open (_PATH_WTMP, O_WRONLY | O_APPEND | O_BINARY, 0)) >= 0)
 	{
-	  struct utmp *ut_end = (struct utmp *) ((char *) ut_buf + rd);
-
-	  for (ut = ut_buf; ut < ut_end; ut++, pos += sizeof (*ut))
-	    if (ut->ut_name[0]
-		&& strncmp (ut->ut_line, line, sizeof (ut->ut_line)) == 0)
-	      /* Found the entry for LINE; mark it as logged out.  */
-	      {
-		/* Zero out entries describing who's logged in.  */
-		memset (ut->ut_name, 0, sizeof (ut->ut_name));
-		memset (ut->ut_host, 0, sizeof (ut->ut_host));
-		time (&ut->ut_time);
-
-		/* Now seek back to the position in utmp at which UT occured,
-		   and write the new version of UT there.  */
-		if ((SetFilePointer (ut_fd, pos, 0, FILE_BEGIN) != 0xFFFFFFFF)
-		    && (WriteFile (ut_fd, (char *) ut, sizeof (*ut),
-				   &rd, NULL)))
-		  {
-		    res = 1;
-		    break;
-		  }
-	      }
+	  write (fd, &ut_buf, sizeof ut_buf);
+	  close (fd);
 	}
-
-      CloseHandle (ut_fd);
+      if (mutex)
+	{
+	  ReleaseMutex (mutex);
+	  CloseHandle (mutex);
+	}
+      memset (ut_buf.ut_line, 0, sizeof ut_buf.ut_line);
+      ut_buf.ut_time = 0;
+      pututline (&ut_buf);
+      endutent ();
     }
-
-  return res;
+  return 1;
 }
 
-static int utmp_fd = -2;
+static int utmp_fd = -1;
+static bool utmp_readonly = false;
 static char *utmp_file = (char *) _PATH_UTMP;
 
 static struct utmp utmp_data;
 
+static void
+internal_setutent (bool force_readwrite)
+{
+  sigframe thisframe (mainthread);
+  if (force_readwrite && utmp_readonly)
+    endutent ();
+  if (utmp_fd < 0)
+    {
+      utmp_fd = open (utmp_file, O_RDWR | O_BINARY);
+      /* If open fails, we assume an unprivileged process (who?).  In this
+	 case we try again for reading only unless the process calls
+	 pututline() (==force_readwrite) in which case opening just fails. */
+      if (utmp_fd < 0 && !force_readwrite)
+        {
+	  utmp_fd = open (utmp_file, O_RDONLY | O_BINARY);
+	  if (utmp_fd >= 0)
+	    utmp_readonly = true;
+        }
+    }
+  else
+    lseek (utmp_fd, 0, SEEK_SET);
+}
+
 extern "C" void
 setutent ()
 {
-  sigframe thisframe (mainthread);
-  if (utmp_fd == -2)
-    utmp_fd = open (utmp_file, O_RDWR);
-  else
-    lseek (utmp_fd, 0, SEEK_SET);
+  internal_setutent (false);
 }
 
 extern "C" void
 endutent ()
 {
   sigframe thisframe (mainthread);
-  if (utmp_fd != -2)
+  if (utmp_fd >= 0)
     {
       close (utmp_fd);
-      utmp_fd = -2;
+      utmp_fd = -1;
+      utmp_readonly = false;
     }
 }
 
@@ -2680,9 +2693,13 @@ extern "C" struct utmp *
 getutent ()
 {
   sigframe thisframe (mainthread);
-  if (utmp_fd == -2)
-    setutent ();
-  if (read (utmp_fd, &utmp_data, sizeof (utmp_data)) != sizeof (utmp_data))
+  if (utmp_fd < 0)
+    {
+      internal_setutent (false);
+      if (utmp_fd < 0)
+        return NULL;
+    }
+  if (read (utmp_fd, &utmp_data, sizeof utmp_data) != sizeof utmp_data)
     return NULL;
   return &utmp_data;
 }
@@ -2693,7 +2710,13 @@ getutid (struct utmp *id)
   sigframe thisframe (mainthread);
   if (check_null_invalid_struct_errno (id))
     return NULL;
-  while (read (utmp_fd, &utmp_data, sizeof (utmp_data)) == sizeof (utmp_data))
+  if (utmp_fd < 0)
+    {
+      internal_setutent (false);
+      if (utmp_fd < 0)
+        return NULL;
+    }
+  while (read (utmp_fd, &utmp_data, sizeof utmp_data) == sizeof utmp_data)
     {
       switch (id->ut_type)
 	{
@@ -2724,12 +2747,18 @@ getutline (struct utmp *line)
   sigframe thisframe (mainthread);
   if (check_null_invalid_struct_errno (line))
     return NULL;
-  while (read (utmp_fd, &utmp_data, sizeof (utmp_data)) == sizeof (utmp_data))
+  if (utmp_fd < 0)
+    {
+      internal_setutent (false);
+      if (utmp_fd < 0)
+        return NULL;
+    }
+  while (read (utmp_fd, &utmp_data, sizeof utmp_data) == sizeof utmp_data)
     {
       if ((utmp_data.ut_type == LOGIN_PROCESS ||
 	   utmp_data.ut_type == USER_PROCESS) &&
 	  !strncmp (utmp_data.ut_line, line->ut_line,
-		    sizeof (utmp_data.ut_line)))
+		    sizeof utmp_data.ut_line))
 	return &utmp_data;
     }
   return NULL;
@@ -2741,11 +2770,24 @@ pututline (struct utmp *ut)
   sigframe thisframe (mainthread);
   if (check_null_invalid_struct (ut))
     return;
-  setutent ();
+  internal_setutent (true);
+  if (utmp_fd < 0)
+    return;
+  /* Read/write to utmp must be atomic to prevent overriding data
+     by concurrent processes. */
+  HANDLE mutex = CreateMutex (NULL, FALSE, shared_name ("utmp_mutex", 0));
+  if (mutex)
+    while (WaitForSingleObject (mutex, INFINITE) == WAIT_ABANDONED)
+      ;
   struct utmp *u;
   if ((u = getutid (ut)))
-    lseek (utmp_fd, -sizeof(struct utmp), SEEK_CUR);
+    lseek (utmp_fd, -sizeof *ut, SEEK_CUR);
   else
     lseek (utmp_fd, 0, SEEK_END);
-  (void) write (utmp_fd, (char *) ut, sizeof (struct utmp));
+  write (utmp_fd, ut, sizeof *ut);
+  if (mutex)
+    {
+      ReleaseMutex (mutex);
+      CloseHandle (mutex);
+    }
 }

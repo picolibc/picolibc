@@ -140,8 +140,8 @@ fhandler_dev_random::read (void *ptr, size_t& len)
   (ssize_t) len = -1;
 }
 
-__off64_t
-fhandler_dev_random::lseek (__off64_t, int)
+_off64_t
+fhandler_dev_random::lseek (_off64_t, int)
 {
   return 0;
 }

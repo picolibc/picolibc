@@ -430,9 +430,20 @@ fhandler_socket::fstat (struct __stat64 *buf)
   int res = fhandler_base::fstat (buf);
   if (!res)
     {
-      buf->st_mode &= ~_IFMT;
-      buf->st_mode |= _IFSOCK;
-      buf->st_ino = (ino_t) get_handle ();
+      if (get_socket_type ()) /* fstat */
+	{
+	  buf->st_dev = 0;
+	  buf->st_ino = (ino_t) get_handle ();
+	  buf->st_mode = S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO;
+	}
+      else
+	{
+	  path_conv spc ("/dev", PC_SYM_NOFOLLOW | PC_NULLEMPTY, NULL);
+	  buf->st_dev = spc.volser ();
+	  buf->st_ino = (ino_t) get_namehash ();
+	  buf->st_mode &= ~S_IRWXO;
+	  buf->st_rdev = (get_device () << 16) | get_unit ();
+	}
     }
   return res;
 }

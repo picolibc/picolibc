@@ -33,8 +33,8 @@ fhandler_pipe::fhandler_pipe ()
 {
 }
 
-__off64_t
-fhandler_pipe::lseek (__off64_t offset, int whence)
+_off64_t
+fhandler_pipe::lseek (_off64_t offset, int whence)
 {
   debug_printf ("(%d, %d)", offset, whence);
   set_errno (ESPIPE);
@@ -137,9 +137,12 @@ fhandler_pipe::fixup_after_fork (HANDLE parent)
 int
 fhandler_pipe::dup (fhandler_base *child)
 {
-  int res = fhandler_base::dup (child);
-  if (res)
-    return res;
+  if (get_handle ())
+    {
+      int res = fhandler_base::dup (child);
+      if (res)
+	return res;
+    }
 
   fhandler_pipe *ftp = (fhandler_pipe *) child;
 

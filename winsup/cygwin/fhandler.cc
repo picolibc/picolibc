@@ -795,10 +795,10 @@ fhandler_base::writev (const struct iovec *const iov, const int iovcnt,
   return write (buf, tot);
 }
 
-__off64_t
-fhandler_base::lseek (__off64_t offset, int whence)
+_off64_t
+fhandler_base::lseek (_off64_t offset, int whence)
 {
-  __off64_t res;
+  _off64_t res;
 
   /* 9x/Me doesn't support 64bit offsets.  We trap that here and return
      EINVAL.  It doesn't make sense to simulate bigger offsets by a
@@ -809,7 +809,7 @@ fhandler_base::lseek (__off64_t offset, int whence)
     {
       debug_printf ("Win9x, offset not 32 bit.");
       set_errno (EINVAL);
-      return (__off64_t)-1;
+      return (_off64_t)-1;
     }
 
   /* Seeks on text files is tough, we rewind and read till we get to the
@@ -956,6 +956,8 @@ fhandler_base::fstat (struct __stat64 *buf)
       break;
     }
 
+  buf->st_uid = geteuid32 ();
+  buf->st_gid = getegid32 ();
   buf->st_nlink = 1;
   buf->st_blksize = S_BLKSIZE;
   time_as_timestruc_t (&buf->st_ctim);
@@ -1244,7 +1246,7 @@ fhandler_base::readdir (DIR *)
   return NULL;
 }
 
-__off64_t
+_off64_t
 fhandler_base::telldir (DIR *)
 {
   set_errno (ENOTDIR);
@@ -1252,7 +1254,7 @@ fhandler_base::telldir (DIR *)
 }
 
 void
-fhandler_base::seekdir (DIR *, __off64_t)
+fhandler_base::seekdir (DIR *, _off64_t)
 {
   set_errno (ENOTDIR);
   return;

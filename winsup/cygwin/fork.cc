@@ -525,7 +525,6 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   /* Fill in fields in the child's process table entry.  */
   forked->hProcess = pi.hProcess;
   forked->dwProcessId = pi.dwProcessId;
-  forked->copysigs (myself);
 
   /* Hopefully, this will succeed.  The alternative to doing things this
      way is to reserve space prior to calling CreateProcess and then fill

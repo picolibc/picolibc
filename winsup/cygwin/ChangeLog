@@ -1,3 +1,213 @@
+2003-04-02  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (EXTRA_OFILES): Remove debugging object.
+
+2003-04-02  Jason Tishler <jason@tishler.net>
+	    Christopher Faylor  <cgf@redhat.com>
+
+	* external.cc (check_ntsec): New function.
+	(cygwin_internal): Add CW_CHECK_NTSEC handling to call check_ntsec()
+	from applications.
+	* include/cygwin/version.h: Bump API minor number.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Add CW_CHECK_NTSEC.
+
+2003-04-02  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::new): Add more defensive debugging.
+
+2003-04-01  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* fhandler.cc (fhandler_base::fstat): Set the uid and gid fields
+	from the current effective ids.
+	* fhandler_socket.cc (fhandler_socket::fstat): Keep the uid and gid set
+	by fhandler_base::fstat.
+	* security.cc (get_nt_attribute): Do not test wincap.has_security ().
+	(get_nt_object_attribute): Ditto.
+	(get_file_attribute): Add test for wincap.has_security ().
+	(get_object_attribute): Ditto.
+
+2003-04-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dir.cc: Change __off32_t to _off_t and __off64_t to _off64_t
+	throughout.
+	* fhandler.cc: Ditto.
+	* fhandler.h: Ditto.
+	* fhandler_clipboard.cc: Ditto.
+	* fhandler_disk_file.cc: Ditto.
+	* fhandler_dsp.cc: Ditto.
+	* fhandler_floppy.cc: Ditto.
+	* fhandler_mem.cc: Ditto.
+	* fhandler_proc.cc: Ditto.
+	* fhandler_process.cc: Ditto.
+	* fhandler_random.cc: Ditto.
+	* fhandler_registry.cc: Ditto.
+	* fhandler_tape.cc: Ditto.
+	* fhandler_termios.cc: Ditto.
+	* fhandler_virtual.cc: Ditto.
+	* fhandler_zero.cc: Ditto.
+	* mmap.cc: Ditto.
+	* pipe.cc: Ditto.
+	* syscalls.cc: Ditto.
+	* winsup.h: Ditto.
+	* include/cygwin/stat.h: Ditto.
+	* include/cygwin/types.h: Ditto.  Remove definition of __off32_t
+	and __off64_t.
+
+2003-03-31  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (setup_handler): Make sure winapi lock is released when
+	exiting loop.
+
+2003-03-30  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/fs.h: Remove unneeded include.
+	* include/cygwin/in.h: Include sys/types.h rather than cygwin/types.h.
+
+2003-03-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (login): Fix comment.
+	(logout): Ditto.
+
+2003-03-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc: Slightly cleanup all utmp functions.
+	(login): Use mutex to secure against concurrent access to wtmp file.
+	(logout): Rewrite using POSIX calls.
+	(utmp_fd): Initialized to -1 now.  Any value < 0 is treated as closed
+	in subsequent functions.
+	(utmp_readonly): New variable, indicating utmp file open for reading
+	only.
+	(internal_setutent): New function implementing setutent().
+	(setutent): Call internal_setutent now.
+	(endutent): Reset utmp_readonly.
+	(getutent): Return immediately if utmp file can't be opened.
+	(getutid): Ditto.
+	(getutline): Ditto.
+	(pututline): Ditto. Use mutex to secure against concurrent access to
+	utmp file.
+
+2003-03-28  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Remove EXE_LDFLAGS.  Fix fhandler_CFLAGS typo.  Recognize .s suffix.
+	* configure.in: Remove EXE_LDFLAGS.
+	* configure: Regenerate.
+
+2003-03-28  Christopher Faylor  <cgf@redhat.com>
+
+	* include/sys/cygwin.h: Declare cygwin_internal as unsigned long.
+	* external.cc (cygwin_internal): Define as unsigned long.
+
+2003-03-27  Christopher Faylor  <cgf@redhat.com>
+
+	* include/sys/cygwin.h: Move cygwin_internal outside of WINVER
+	conditional.
+
+2003-03-27  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.cc: Change 1==foo equations to foo==1 throughout.
+
+2003-03-27  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.h: Change class names, methods, members and local vars
+	according to the GNU coding style.
+	* thread.cc: Ditto.
+	* dcrt0.cc (dll_crt0_1): Rename pthread::initMainThread call to
+	pthread::init_mainthread.
+	* pthread.cc (pthead_getsequence_np): Rename pthread::isGoodObject
+	call to pthread::is_good_object.
+
+2003-03-27  Joe Buehler  <jhpb@draco.hekimian.com>
+
+	* autoload.cc: added RegGetKeySecurity()
+	* security.cc (get_nt_object_attribute): use RegGetKeySecurity() for
+	performance.
+
+2003-03-25  Christopher Faylor  <cgf@redhat.com>
+	    Joe Buehler  <jhpb@draco.hekimian.com>
+
+	* fork.cc (fork_parent): Don't copy signals from parent to child here.
+	* sigproc.cc (proc_subproc): Copy signals from parent to child pinfo
+	here.
+
+2003-03-23  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.h (class List): Move inline code inside class declaration.
+	(List::forEach): Change callback parameter to template class member
+	function pointer.
+	(pthread_keys::fixup_before_fork): Change to inline.  Use List::forEach
+	to fixup keys.
+	(pthread_keys::fixup_after_fork): Ditto.
+	(pthread_keys::runAllDestructors): Ditto.
+	(pthread_key::saveAKey): Remove.
+	(pthread_key::restoreAKey): Ditto.
+	(pthread_key::destroyAKey): Ditto.
+	(pthread_key::run_destructor): Rename to runDestructor.
+	(pthread_mutex::fixup_after_fork): Change to inline.  Use List::forEach
+	to fixup mutexes after a fork.
+	(pthread_mutex::FixupAfterFork): New method.
+	(pthread_mutex::mutexes): New member.
+	(pthread_cond::fixup_after_fork): Change to inline.  Use List::forEach
+	to fixup conds after a fork.
+	(pthread_cond::FixupAfterFork): New method.
+	(pthread_cond::conds): New member.
+	(pthread_rwlock::fixup_after_fork): Change to inline.  Use
+	List::forEach to fixup rwlocks after a fork.
+	(pthread_rwlock::FixupAfterFork): New method.
+	(pthread_rwlock::rwlocks): New member.
+	(semaphore::fixup_after_fork): Change to inline.  Use List::forEach to
+	fixup mutexes after a fork.
+	(semaphore::FixupAfterFork): New method.
+	(semaphore::semaphores): New member.
+	(MTinterface::mutexs): Remove.
+	(MTinterface::conds): Ditto.
+	(MTinterface::rwlocks): Ditto.
+	(MTinterface::semaphores): Ditto.
+	(pthread_equal): Add extern "C".
+	(pthread_mutex_lock): Ditto.
+
+	* thread.cc (MTinterface::fixup_after_fork): Change fixup_after_fork
+	calls for pthread objects.
+	(semaphore::conds): Instantiate.
+	(pthread_cond::pthread_cond): Use List::Insert rather than custom list
+	code.
+	(pthread_cond::~pthread_cond): Use List::Remove rather than custom list
+	code.
+	(pthread_cond::fixup_after_fork): Rename to FixupAfterFork.
+	(pthread_rwlock::rwlocks): Instantiate.
+	(pthread_rwlock::pthread_crwlock): Use List::Insert rather than custom
+	list code.
+	(pthread_rwlock::~pthread_rwlock): Use List::Remove rather than custom
+	list code.
+	(pthread_rwlock::fixup_after_fork): Rename to FixupAfterFork.
+	(pthread_key::saveAKey): Remove.
+	(pthread_key::fixup_before_fork): Ditto.
+	(pthread_key::restoreAKey): Ditto.
+	(pthread_key::fixup_after_fork): Ditto.
+	(pthread_key::destroyAKey): Ditto.
+	(pthread_key::runAllDestructors): Ditto.
+	(pthread_key::run_destructor): Rename to runDestructor.
+	(pthread_mutex::mutexes): Instantiate.
+	(pthread_mutex::pthread_mutex): Use List::Insert rather than custom
+	list code.
+	(pthread_mutex::~pthread_mutex): Use List::Remove rather than custom
+	list code.
+	(pthread_mutex::fixup_after_fork): Rename to FixupAfterFork.
+	(semaphore::conds): Instantiate.
+	(semaphore::semaphore): Use List::Insert rather than custom list code.
+	(semaphores::~semaphore): Use List::Remove rather than custom list
+	code.
+	(semaphore::fixup_after_fork): Rename to FixupAfterFork.
+
+2003-03-22  Christopher Faylor  <cgf@redhat.com>
+
+	* pipe.cc (fhandler_pipe::dup): Don't dup input_handle if it doesn't
+	exist.
+
+2003-03-22  Christopher Faylor  <cgf@redhat.com>
+
+	* pipe.cc (fhandler_pipe::dup): Don't dup input_handle if it doesn't
+	exist.
+
 2003-03-22  Christopher Faylor  <cgf@redhat.com>
 
 	* syscalls.cc (unlink): Be more defensive when SetFileAttributes is
@@ -374,7 +584,7 @@
 
 2003-03-17  Corinna Vinschen  <corinna@vinschen.de>
 
-	* glob.c (g_lstat): Change API minor test to match API minor number 
+	* glob.c (g_lstat): Change API minor test to match API minor number
 	change in previous patch.
 	(g_stat): Ditto.
 

@@ -31,12 +31,10 @@ typedef struct timespec timestruc_t;
 
 #ifndef __off_t_defined
 #define __off_t_defined
-typedef long __off32_t;
-typedef long long __off64_t;
 #ifdef __CYGWIN_USE_BIG_TYPES__
-typedef __off64_t off_t;
+typedef _off64_t off_t;
 #else
-typedef __off32_t off_t;
+typedef _off_t off_t;
 #endif
 #endif /*__off_t_defined*/
 
