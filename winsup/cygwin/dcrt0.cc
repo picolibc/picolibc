@@ -312,19 +312,18 @@ quoted (char *cmd, int winshell)
       return p;
     }
 
+  const char *s = quote == '\'' ? "'" : "\\\"";
   /* This must have been run from a Windows shell, so preserve
      quotes for globify to play with later. */
-  while (*++cmd)
-    if ((p = strpbrk (cmd, "\\\"")) == NULL)
+  while (*cmd && *++cmd)
+    if ((p = strpbrk (cmd, s)) == NULL)
       {
 	cmd = strchr (cmd, '\0');	// no closing quote
 	break;
       }
-    else if (quote == '\'')
-      continue;
     else if (*p == '\\')
       cmd = ++p;
-    else if (p[1] == quote)
+    else if (quote == '"' && p[1] == '"')
       {
 	*p = '\\';
 	cmd = ++p;			// a quoted quote

@@ -1,3 +1,13 @@
+Mon Sep 25 20:47:04 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (quoted): Fix problem where ' quoted strings were skipped.
+	* fhandler.h (fhandler_socket::~fhandler_socket): Delete declaration.
+	* net.cc: Remove unnecessary "number_of_sockets" usage.
+	(fhandler_socket::fhandler_socket): Ditto.
+	(fhandler_socket::~fhandler_socket): Delete definition.
+	* spawn.cc (spawn_guts): Force first argument passed to CreateProcess
+	as a command line to be windows style.
+
 2000-09-25  Christopher Faylor  <cgf@cygnus.com>
 
 	* spawn.cc (av::dup_maybe): Make function void rather than void *.

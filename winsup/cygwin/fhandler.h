@@ -314,7 +314,6 @@ private:
 public:
   fhandler_socket (const char *name = 0);
   fhandler_socket (unsigned int, const char *name = 0);
-  ~fhandler_socket ();
   int get_socket () const { return (int) get_handle(); }
   fhandler_socket * is_socket () { return this; }
   int write (const void *ptr, size_t len);

@@ -33,11 +33,6 @@ details. */
 #include "pinfo.h"
 #include "registry.h"
 
-/* We only want to initialize WinSock in a child process if socket
-   handles are inheritted. This global allows us to know whether this
-   should be done or not */
-int number_of_sockets = 0;
-
 extern "C"
 {
 int h_errno;
@@ -1584,7 +1579,6 @@ fhandler_socket::fhandler_socket (const char *name) :
 	fhandler_base (FH_SOCKET, name)
 {
   set_cb (sizeof *this);
-  number_of_sockets++;
 }
 
 /* sethostent: standards? */
@@ -1599,15 +1593,6 @@ extern "C"
 void
 endhostent (void)
 {
-}
-
-fhandler_socket::~fhandler_socket ()
-{
-  if (--number_of_sockets < 0)
-    {
-      number_of_sockets = 0;
-      system_printf("socket count < 0");
-    }
 }
 
 int

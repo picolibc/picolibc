@@ -496,7 +496,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 	  const char *a;
 
 	  newargv.dup_maybe (i);
-	  a = newargv[i];
+	  a = i ? newargv[i] : (char *) real_path;
 	  int len = strlen (a);
 	  if (len != 0 && !strpbrk (a, " \t\n\r\""))
 	    one_line.add (a, len);
