@@ -888,4 +888,3 @@
 
 	* shared.cc (open_shared): Don't attempt VirtualAlloc magic if first
 	attempt to map memory fails.
-
