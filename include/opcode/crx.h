@@ -93,9 +93,8 @@ reg_type;
    Argument types :
    r - register
    c - constant
-   d - displacement
-   ic - immediate
-   icr - index register
+   i - immediate
+   idxr - index register
    rbase - register base
    s - star ('*')
    copr - coprocessor register
@@ -103,8 +102,8 @@ reg_type;
 
 typedef enum
   {
-    arg_r, arg_c, arg_cr, arg_dc, arg_dcr, arg_sc,
-    arg_ic, arg_icr, arg_rbase, arg_copr, arg_copsr,
+    arg_r, arg_c, arg_cr, arg_ic, arg_icr, arg_sc,
+    arg_idxr, arg_rbase, arg_copr, arg_copsr,
     /* Not an argument.  */
     nullargs
   }
