@@ -1,3 +1,7 @@
+Fri Oct 27 20:20:29 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* strace.cc (main): Add a '-b' option.
+
 2000-10-18  DJ Delorie  <dj@redhat.com>
 
 	* ssp.c: new

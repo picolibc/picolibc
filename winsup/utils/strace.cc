@@ -23,6 +23,7 @@ static int numerror = 1;
 static int usecs = 1;
 static int delta = 1;
 static int hhmmss = 0;
+static int bufsize = 0;
 
 static BOOL close_handle (HANDLE h, DWORD ok);
 
@@ -492,7 +493,8 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
   child->last_usecs = usecs;
   if (numerror || !output_winerror (ofile, s))
     fputs (s, ofile);
-  fflush (ofile);
+  if (!bufsize)
+    fflush (ofile);
 }
 
 static void
@@ -575,11 +577,14 @@ main(int argc, char **argv)
   else
     pgm++;
 
-  while ((opt = getopt (argc, argv, "m:o:fndut")) != EOF)
+  while ((opt = getopt (argc, argv, "b:m:o:fndut")) != EOF)
     switch (opt)
       {
       case 'f':
 	forkdebug ^= 1;
+	break;
+      case 'b':
+	bufsize = atoi (optarg);
 	break;
       case 'm':
 	mask = strtoul (optarg, NULL, 16);
@@ -606,6 +611,9 @@ main(int argc, char **argv)
 
   if (!mask)
     mask = 1;
+
+  if (bufsize)
+    setvbuf (ofile, (char *) alloca (bufsize), _IOFBF, bufsize);
 
   if (!ofile)
     ofile = stdout;
