@@ -1,3 +1,39 @@
+Wed Feb 21 22:41:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* Makefile.in: Add `-lshell32 -luuid' to link pass for new-cygwin1.dll.
+	* autoload.cc: Add LoadDLLinitfunc for ole32.dll.
+	Add LoadDLLfuncEx statements for CoInitialize@4, CoUninitialize@0
+	and CoCreateInstance@20.
+	* dir.cc (dir_suffixes): New datastructure.
+	(readdir): Check for R/O *.lnk files to hide the suffix.
+	(opendir): Use `dir_suffixes' in path conversion.
+	(rmdir): Ditto.
+	* fhandler.cc (fhandler_disk_file::fstat): Add S_IFLNK flag
+	before calling `get_file_attribute'. Take FILE_ATTRIBUTE_READONLY
+	into account only if the file is no symlink.
+	* path.cc (inner_suffixes): New datastructure.
+	(SYMLINKATTR): Eliminated.
+	(path_conv::check): Use `inner_suffixes' on inner path components.
+	(shortcut_header): New global static variable.
+	(shortcut_initalized): Ditto.
+	(create_shortcut_header): New function.
+	(cmp_shortcut_header): Ditto.
+	(symlink): Create symlinks by creating windows shortcuts. Preserve
+	the old code.
+	(symlink_info::check_shortcut): New method.
+	(symlink_info::check_sysfile): Ditto.
+	(symlink_info::check): Check for shortcuts. Move code reading
+	old system attribute symlinks into symlink_info::check_sysfile().
+	(chdir): Use `dir_suffixes' in path conversion.
+	* security.cc (get_file_attribute): Check for S_IFLNK flag.
+	Force 0777 permissions then.
+	* spawn.cc (std_suffixes): Add ".lnk" suffix.
+	* syscalls.cc (_unlink): Use `inner_suffixes' in path conversion.
+	Check for shortcut symlinks to eliminate R/O attribute before
+	calling DeleteFile().
+	(stat_suffixes): Add ".lnk" suffix.
+	(stat_worker): Force 0777 permissions if file is a symlink.
+
 2001-02-21  Egor Duda  <deo@logos-m.ru>
 
 	* sigproc.cc (getsem): Make semaphore always non-inheritable.

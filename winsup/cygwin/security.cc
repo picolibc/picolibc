@@ -808,8 +808,15 @@ int
 get_file_attribute (int use_ntsec, const char *file,
 		    int *attribute, uid_t *uidret, gid_t *gidret)
 {
+  int res;
+
   if (use_ntsec && allow_ntsec)
-    return get_nt_attribute (file, attribute, uidret, gidret);
+    {
+      res = get_nt_attribute (file, attribute, uidret, gidret);
+      if (attribute && (*attribute & S_IFLNK) == S_IFLNK)
+	*attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
+      return res;
+    }
 
   if (uidret)
     *uidret = getuid ();
@@ -819,8 +826,7 @@ get_file_attribute (int use_ntsec, const char *file,
   if (!attribute)
     return 0;
 
-  int res = NTReadEA (file, ".UNIXATTR",
-		      (char *) attribute, sizeof (*attribute));
+  res = NTReadEA (file, ".UNIXATTR", (char *) attribute, sizeof (*attribute));
 
   /* symlinks are everything for everyone!*/
   if ((*attribute & S_IFLNK) == S_IFLNK)

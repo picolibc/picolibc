@@ -65,10 +65,11 @@ close_all_files (void)
 extern "C" int
 _unlink (const char *ourname)
 {
+  extern suffix_info inner_suffixes[];
   int res = -1;
   sigframe thisframe (mainthread);
 
-  path_conv win32_name (ourname, PC_SYM_NOFOLLOW | PC_FULL);
+  path_conv win32_name (ourname, PC_SYM_NOFOLLOW | PC_FULL, inner_suffixes);
 
   if (win32_name.error)
     {
@@ -92,6 +93,15 @@ _unlink (const char *ourname)
     {
       syscall_printf ("non-writable directory");
       goto done;
+    }
+
+  /* Check for shortcut as symlink condition. */
+  if (atts != 0xffffffff && atts & FILE_ATTRIBUTE_READONLY)
+    {
+      int len = strlen (win32_name.get_win32 ());
+      if (len > 4 && !strcasecmp (win32_name.get_win32 () + len - 4, ".lnk"))
+	SetFileAttributes (win32_name.get_win32 (),
+	              win32_name.file_attributes () & ~FILE_ATTRIBUTE_READONLY);
     }
 
   for (int i = 0; i < 2; i++)
@@ -1021,6 +1031,7 @@ suffix_info stat_suffixes[] =
 {
   suffix_info ("", 1),
   suffix_info (".exe", 1),
+  suffix_info (".lnk", 1),
   suffix_info (NULL)
 };
 
@@ -1135,6 +1146,8 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 	  buf->st_mode |= STD_RBITS | STD_XBITS;
 	  if ((atts & FILE_ATTRIBUTE_READONLY) == 0)
 	    buf->st_mode |= STD_WBITS;
+	  if (real_path.issymlink ())
+	    buf->st_mode |= S_IRWXU | S_IRWXG | S_IRWXO;
 	  get_file_attribute (FALSE, real_path.get_win32 (),
 			      NULL, &buf->st_uid, &buf->st_gid);
 	}

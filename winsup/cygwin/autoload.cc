@@ -90,6 +90,13 @@ LoadDLLinitfunc (advapi32)
 LoadDLLinitfunc (netapi32)
 {
   HANDLE h;
+  static NO_COPY LONG here = -1L;
+
+  while (InterlockedIncrement (&here))
+    {
+      InterlockedDecrement (&here);
+      Sleep (0);
+    }
 
   if ((h = LoadLibrary ("netapi32.dll")) != NULL)
     netapi32_handle = h;
@@ -192,6 +199,28 @@ LoadDLLinitfunc (iphlpapi)
     iphlpapi_handle = h;
   else if (!iphlpapi_handle)
     api_fatal ("could not load iphlpapi.dll, %E");
+
+  InterlockedDecrement (&here);
+  return 0;
+}
+
+LoadDLLinitfunc (ole32)
+{
+  HANDLE h;
+  static NO_COPY LONG here = -1L;
+
+  while (InterlockedIncrement (&here))
+    {
+      InterlockedDecrement (&here);
+      Sleep (0);
+    }
+
+  if (ole32_handle)
+    /* nothing to do */;
+  else if ((h = LoadLibrary ("ole32.dll")) != NULL)
+    ole32_handle = h;
+  else if (!ole32_handle)
+    api_fatal ("could not load ole32.dll, %E");
 
   InterlockedDecrement (&here);
   return 0;
@@ -339,5 +368,10 @@ LoadDLLfuncEx (WSASocketA, 24, ws2_32, 1)
 LoadDLLinit (iphlpapi)
 LoadDLLfuncEx (GetIfTable, 12, iphlpapi, 1)
 LoadDLLfuncEx (GetIpAddrTable, 12, iphlpapi, 1)
+
+LoadDLLinit (ole32)
+LoadDLLfunc (CoInitialize, 4, ole32)
+LoadDLLfunc (CoUninitialize, 0, ole32)
+LoadDLLfunc (CoCreateInstance, 20, ole32)
 }
 }

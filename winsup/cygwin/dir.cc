@@ -59,6 +59,13 @@ writable_directory (const char *file)
 #endif
 }
 
+suffix_info dir_suffixes[] =
+{
+  suffix_info ("", 1),
+  suffix_info (".lnk", 1),
+  suffix_info (NULL)
+};
+
 /* opendir: POSIX 5.1.2.1 */
 extern "C" DIR *
 opendir (const char *dirname)
@@ -68,7 +75,7 @@ opendir (const char *dirname)
   DIR *res = 0;
   struct stat statbuf;
 
-  path_conv real_dirname (dirname, PC_SYM_FOLLOW | PC_FULL);
+  path_conv real_dirname (dirname, PC_SYM_FOLLOW | PC_FULL, dir_suffixes);
 
   if (real_dirname.error)
     {
@@ -173,6 +180,14 @@ readdir (DIR * dir)
 
   /* We get here if `buf' contains valid data.  */
   strcpy (dir->__d_dirent->d_name, buf.cFileName);
+
+  if (buf.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
+    {
+      char *c = dir->__d_dirent->d_name;
+      int len = strlen (c);
+      if (!strcasecmp (c + len - 4, ".lnk"))
+        c[len - 4] = '\0';
+    }
 
   /* Compute d_ino by combining filename hash with the directory hash
      (which was stored in dir->__d_dirhash when opendir was called). */
@@ -316,7 +331,7 @@ rmdir (const char *dir)
 {
   int res = -1;
 
-  path_conv real_dir (dir, PC_SYM_NOFOLLOW);
+  path_conv real_dir (dir, PC_SYM_NOFOLLOW, dir_suffixes);
 
   if (real_dir.error)
     {

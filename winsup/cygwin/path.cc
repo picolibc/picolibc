@@ -57,6 +57,10 @@ details. */
 #include <errno.h>
 #include <ctype.h>
 #include <winioctl.h>
+#include <wingdi.h>
+#include <winuser.h>
+#include <winnls.h>
+#include <winnetwk.h>
 #include <sys/cygwin.h>
 #include <cygwin/version.h>
 #include "cygerrno.h"
@@ -70,6 +74,9 @@ details. */
 #include "registry.h"
 #include "security.h"
 #include <assert.h>
+#include <shlobj.h>
+#include <objidl.h>
+#include <objbase.h>
 
 static int normalize_win32_path (const char *src, char *dst);
 static void slashify (const char *src, char *dst, int trailing_slash_p);
@@ -87,7 +94,17 @@ struct symlink_info
   int is_symlink;
   int error;
   symlink_info (): known_suffix (NULL), contents (buf + MAX_PATH + 1) {}
+  int check_shortcut (const char *, DWORD, HANDLE);
+  int check_sysfile (const char *, DWORD, HANDLE);
   int check (const char *path, const suffix_info *suffixes);
+};
+
+/* These suffixes are the only ones allowed in inner path components. */
+suffix_info inner_suffixes[] =
+{
+  suffix_info ("", 1),
+  suffix_info (".lnk", 1),
+  suffix_info (NULL)
 };
 
 cwdstuff cygcwd;	/* The current working directory. */
@@ -95,10 +112,6 @@ cwdstuff cygcwd;	/* The current working directory. */
 #define path_prefix_p(p1, p2, l1) \
        ((cyg_tolower(*(p1))==cyg_tolower(*(p2))) && \
        path_prefix_p_(p1, p2, l1))
-
-#define SYMLINKATTR(x) \
-  (((x) & (FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_DIRECTORY)) == \
-   FILE_ATTRIBUTE_SYSTEM)
 
 /* Determine if path prefix matches current cygdrive */
 #define iscygdrive(path) \
@@ -264,7 +277,7 @@ path_conv::check (const char *src, unsigned opt,
 	     class if we're working on an inner component of the path */
 	  if (component)
 	    {
-	      suff = NULL;
+	      suff = inner_suffixes;
 	      sym.pflags = 0;
 	    }
 	  else
@@ -2182,6 +2195,35 @@ endmntent (FILE *)
 
 /********************** Symbolic Link Support **************************/
 
+/* The header written to a shortcut by Cygwin or U/WIN. */
+#define SHORTCUT_HDR_SIZE	76
+static char shortcut_header[SHORTCUT_HDR_SIZE];
+static BOOL shortcut_initalized = FALSE;
+
+static void
+create_shortcut_header (void)
+{
+  if (!shortcut_initalized)
+    {
+      shortcut_header[0] = 'L';
+      shortcut_header[4] = '\001';
+      shortcut_header[5] = '\024';
+      shortcut_header[6] = '\002';
+      shortcut_header[12] = '\300';
+      shortcut_header[19] = 'F';
+      shortcut_header[20] = '\f';
+      shortcut_header[60] = '\001';
+      shortcut_initalized = TRUE;
+    }
+}
+
+static BOOL
+cmp_shortcut_header (const char *file_header)
+{
+  create_shortcut_header ();
+  return memcmp (shortcut_header, file_header, SHORTCUT_HDR_SIZE);
+}
+
 /* Create a symlink from FROMPATH to TOPATH. */
 
 extern "C"
@@ -2191,7 +2233,17 @@ symlink (const char *topath, const char *frompath)
   HANDLE h;
   int res = -1;
 
+#if 0
   path_conv win32_path (frompath, PC_SYM_NOFOLLOW);
+#else
+  char from[MAX_PATH];
+  unsigned short len = strlen (frompath);
+  strcpy (from, frompath);
+  if (len <= 4 || strcasecmp (from + len - 4, ".lnk"))
+    strcpy (from + len, ".lnk");
+  path_conv win32_path (from, PC_SYM_NOFOLLOW);
+#endif
+
   if (win32_path.error)
     {
       set_errno (win32_path.error);
@@ -2224,20 +2276,17 @@ symlink (const char *topath, const char *frompath)
       __seterrno ();
   else
     {
+      DWORD written;
+#if 0
+      /* This is the old technique creating a symlink.
+         Preserved to have a fallback. */
       char buf[sizeof (SYMLINK_COOKIE) + MAX_PATH + 10];
 
       __small_sprintf (buf, "%s%s", SYMLINK_COOKIE, topath);
       DWORD len = strlen (buf) + 1;
 
       /* Note that the terminating nul is written.  */
-      DWORD written;
-      if (!WriteFile (h, buf, len, &written, NULL) || written != len)
-	{
-	  __seterrno ();
-	  CloseHandle (h);
-	  DeleteFileA (win32_path.get_win32 ());
-	}
-      else
+      if (WriteFile (h, buf, len, &written, NULL) || written != len)
 	{
 	  CloseHandle (h);
 	  set_file_attribute (win32_path.has_acls (),
@@ -2245,6 +2294,36 @@ symlink (const char *topath, const char *frompath)
 			      S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO);
 	  SetFileAttributesA (win32_path.get_win32 (), FILE_ATTRIBUTE_SYSTEM);
 	  res = 0;
+	}
+#else
+      create_shortcut_header ();
+      path_conv win32_topath (topath, PC_SYM_NOFOLLOW);
+      len = strlen (topath);
+      unsigned short win_len = strlen (win32_topath.get_win32 ());
+      if (WriteFile (h, shortcut_header, SHORTCUT_HDR_SIZE, &written, NULL)
+          && written == SHORTCUT_HDR_SIZE
+	  && WriteFile (h, &len, sizeof len, &written, NULL)
+	  && written == sizeof len
+	  && WriteFile (h, topath, len, &written, NULL)
+	  && written == len
+	  && WriteFile (h, &win_len, sizeof win_len, &written, NULL)
+	  && written == sizeof win_len
+	  && WriteFile (h, win32_topath.get_win32 (), win_len, &written, NULL)
+	  && written == win_len)
+        {
+          CloseHandle (h);
+          set_file_attribute (win32_path.has_acls (),
+                              win32_path.get_win32 (),
+                              S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO);
+          SetFileAttributesA (win32_path.get_win32 (), FILE_ATTRIBUTE_READONLY);
+          res = 0;
+	}
+#endif
+      else
+	{
+	  __seterrno ();
+	  CloseHandle (h);
+	  DeleteFileA (win32_path.get_win32 ());
 	}
     }
 
@@ -2281,6 +2360,177 @@ next_suffix (char *ext_here, const suffix_info *&suffixes)
 	return 1;
       }
   return 0;
+}
+
+int
+symlink_info::check_shortcut (const char *path, DWORD fileattr, HANDLE h)
+{
+  HRESULT hres;
+  IShellLink *psl = NULL;
+  IPersistFile *ppf = NULL;
+  WCHAR wc_path[MAX_PATH];
+  char full_path[MAX_PATH];
+  WIN32_FIND_DATA wfd;
+  DWORD len = 0;
+  int res = 0;
+
+  /* Initialize COM library. */
+  CoInitialize (NULL);
+
+  /* Get a pointer to the IShellLink interface. */
+  hres = CoCreateInstance (CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER,
+			   IID_IShellLink, (void **)&psl);
+  if (FAILED (hres))
+    {
+      debug_printf ("CoCreateInstance failed");
+      goto close_it;
+    }
+  /* Get a pointer to the IPersistFile interface. */
+  hres = psl->QueryInterface (IID_IPersistFile, (void **)&ppf);
+  if (FAILED (hres))
+    {
+      debug_printf ("QueryInterface failed");
+      goto close_it;
+    }
+  /* Load the shortcut. */
+  MultiByteToWideChar(CP_ACP, 0, path, -1, wc_path, MAX_PATH);
+  hres = ppf->Load (wc_path, STGM_READ);
+  if (FAILED (hres))
+    {
+      debug_printf ("Load failed");
+      goto close_it;
+    }
+  /* Try the description (containing a POSIX path) first. */
+  if (fileattr & FILE_ATTRIBUTE_READONLY)
+    {
+      /* An additional check is needed to prove if it's a shortcut
+         really created by Cygwin or U/WIN. */
+      char file_header[SHORTCUT_HDR_SIZE];
+      DWORD got;
+
+      if (! ReadFile (h, file_header, SHORTCUT_HDR_SIZE, &got, 0))
+	{
+	  debug_printf ("ReadFile failed");
+	  error = EIO;
+	  goto close_it_dont_set_error;
+	}
+      if (got == SHORTCUT_HDR_SIZE && !cmp_shortcut_header (file_header))
+        {
+	  hres = psl->GetDescription (contents, MAX_PATH);
+	  if (FAILED (hres))
+	    {
+	      debug_printf ("GetDescription failed");
+	      goto close_it;
+	    }
+	  len = strlen (contents);
+	}
+    }
+  /* No description or not R/O: Check the "official" path. */
+  if (len == 0)
+    {
+      /* Convert to full path (easy way) */
+      if ((path[0] == '\\' && path[1] == '\\')
+	  || (_toupper (path[0]) >= 'A' && _toupper (path[0]) <= 'Z'
+	      && path[1] == ':'))
+	len = 0;
+      else
+	{
+	  len = GetCurrentDirectory (MAX_PATH, full_path);
+	  if (path[0] == '\\')
+	    len = 2;
+	  else if (full_path[len - 1] != '\\')
+	    strcpy (full_path + len++, "\\");
+	}
+      strcpy (full_path + len, path);
+      debug_printf ("full_path = <%s>", full_path);
+      /* Set relative path inside of IShellLink interface. */
+      hres = psl->SetRelativePath (full_path, 0);
+      if (FAILED (hres))
+	{
+	  debug_printf ("SetRelativePath failed");
+	  goto close_it;
+	}
+      /* Get the path to the shortcut target. */
+      hres = psl->GetPath (contents, MAX_PATH, &wfd, 0);
+      if (FAILED(hres))
+	{
+	  debug_printf ("GetPath failed");
+	  goto close_it;
+	}
+    }
+  /* It's a symlink.  */
+  pflags = PATH_SYMLINK;
+  res = strlen (contents);
+
+close_it:
+  if (FAILED (hres))
+    error = geterrno_from_win_error (HRESULT_CODE (hres), EACCES);
+
+close_it_dont_set_error:
+  /* Release the pointer to IPersistFile. */
+  if (ppf)
+    ppf->Release();
+  /* Release the pointer to IShellLink. */
+  if (psl)
+    psl->Release();
+  /* Uninitialize COM library. */
+  CoUninitialize ();
+
+  syscall_printf ("%d = symlink.check_shortcut (%s, %s) (%p)",
+		  res, path, contents, pflags);
+  return res;
+}
+
+int
+symlink_info::check_sysfile (const char *path, DWORD fileattr, HANDLE h)
+{
+  char cookie_buf[sizeof (SYMLINK_COOKIE) - 1];
+  DWORD got;
+  int res = 0;
+
+  if (! ReadFile (h, cookie_buf, sizeof (cookie_buf), &got, 0))
+    {
+      debug_printf ("ReadFile1 failed");
+      error = EIO;
+    }
+  else if (got == sizeof (cookie_buf)
+	   && memcmp (cookie_buf, SYMLINK_COOKIE, sizeof (cookie_buf)) == 0)
+    {
+      /* It's a symlink.  */
+      pflags = PATH_SYMLINK;
+
+      res = ReadFile (h, contents, MAX_PATH + 1, &got, 0);
+      if (!res)
+	{
+	  debug_printf ("ReadFile2 failed");
+	  error = EIO;
+	}
+      else
+	{
+	  /* Versions prior to b16 stored several trailing
+	     NULs with the path (to fill the path out to 1024
+	     chars).  Current versions only store one trailing
+	     NUL.  The length returned is the path without
+	     *any* trailing NULs.  We also have to handle (or
+	     at least not die from) corrupted paths.  */
+	  if (memchr (contents, 0, got) != NULL)
+	    res = strlen (contents);
+	  else
+	    res = got;
+	}
+    }
+  else if (got == sizeof (cookie_buf)
+	   && memcmp (cookie_buf, SOCKET_COOKIE, sizeof (cookie_buf)) == 0)
+    pflags |= PATH_SOCKET;
+  else
+    {
+      /* Not a symlink, see if executable.  */
+      if (!(pflags & PATH_ALL_EXEC) && has_exec_chars (cookie_buf, got))
+	pflags |= PATH_EXEC;
+    }
+  syscall_printf ("%d = symlink.check_sysfile (%s, %s) (%p)",
+		  res, path, contents, pflags);
+  return res;
 }
 
 /* Check if PATH is a symlink.  PATH must be a valid Win32 path name.
@@ -2340,9 +2590,22 @@ symlink_info::check (const char *in_path, const suffix_info *suffixes)
 	  continue;
 	}
 
+      int sym_check = 0;
+
+      if (fileattr & FILE_ATTRIBUTE_DIRECTORY)
+        goto file_not_symlink;
+
+      /* Windows shortcuts are treated as symlinks. */
+      if (!strcasecmp (path + strlen (path) - 4, ".lnk"))
+	sym_check = 1;
+
+      /* The old Cygwin method creating symlinks: */
       /* A symlink will have the `system' file attribute. */
       /* Only files can be symlinks (which can be symlinks to directories). */
-      if (!(pflags & PATH_SYMLINK) && !SYMLINKATTR (fileattr))
+      if (fileattr & FILE_ATTRIBUTE_SYSTEM)
+	sym_check = 2;
+
+      if (!sym_check && !(pflags & PATH_SYMLINK))
 	goto file_not_symlink;
 
       /* Open the file.  */
@@ -2352,54 +2615,15 @@ symlink_info::check (const char *in_path, const suffix_info *suffixes)
       res = -1;
       if (h == INVALID_HANDLE_VALUE)
 	goto file_not_symlink;
-      else
+      else if (sym_check == 1 && !(res = check_shortcut (path, fileattr, h)))
 	{
-	  char cookie_buf[sizeof (SYMLINK_COOKIE) - 1];
-	  DWORD got;
-
-	  if (! ReadFile (h, cookie_buf, sizeof (cookie_buf), &got, 0))
-	    error = EIO;
-	  else if (got == sizeof (cookie_buf)
-		   && memcmp (cookie_buf, SYMLINK_COOKIE,
-			      sizeof (cookie_buf)) == 0)
-	    {
-	      /* It's a symlink.  */
-	      pflags = PATH_SYMLINK;
-
-	      res = ReadFile (h, contents, MAX_PATH + 1, &got, 0);
-	      if (!res)
-		error = EIO;
-	      else
-		{
-		  /* Versions prior to b16 stored several trailing
-		     NULs with the path (to fill the path out to 1024
-		     chars).  Current versions only store one trailing
-		     NUL.  The length returned is the path without
-		     *any* trailing NULs.  We also have to handle (or
-		     at least not die from) corrupted paths.  */
-		  if (memchr (contents, 0, got) != NULL)
-		    res = strlen (contents);
-		  else
-		    res = got;
-		}
-	    }
-	  else if (got == sizeof (cookie_buf)
-		   && memcmp (cookie_buf, SOCKET_COOKIE,
-			      sizeof (cookie_buf)) == 0)
-	    {
-	      pflags |= PATH_SOCKET;
-	      goto close_and_return;
-	    }
-	  else
-	    {
-	      /* Not a symlink, see if executable.  */
-	      if (!(pflags & PATH_ALL_EXEC) &&
-		  has_exec_chars (cookie_buf, got))
-		pflags |= PATH_EXEC;
-	    close_and_return:
-	      CloseHandle (h);
-	      goto file_not_symlink;
-	    }
+	  CloseHandle (h);
+	  goto file_not_symlink;
+	}
+      else if (sym_check == 2 && !(res = check_sysfile (path, fileattr, h)))
+	{
+	  CloseHandle (h);
+	  goto file_not_symlink;
 	}
 
       CloseHandle (h);
@@ -2553,8 +2777,9 @@ int
 chdir (const char *dir)
 {
   MALLOC_CHECK;
+  extern suffix_info dir_suffixes[];
   syscall_printf ("dir %s", dir);
-  path_conv path (dir, PC_FULL | PC_SYM_FOLLOW);
+  path_conv path (dir, PC_FULL | PC_SYM_FOLLOW, dir_suffixes);
 
   if (path.error)
     {

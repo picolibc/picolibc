@@ -921,6 +921,8 @@ fhandler_disk_file::fstat (struct stat *buf)
      directory. This is used, to set S_ISVTX, if needed.  */
   if (local.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
     buf->st_mode |= S_IFDIR;
+  if (get_symlink_p ())
+    buf->st_mode |= S_IFLNK;
   if (!get_file_attribute (has_acls (),
 			   get_win32_name (),
 			   &buf->st_mode,
@@ -928,7 +930,8 @@ fhandler_disk_file::fstat (struct stat *buf)
 			   &buf->st_gid))
     {
       /* If read-only attribute is set, modify ntsec return value */
-      if (local.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
+      if ((local.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
+          && !get_symlink_p ())
 	buf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
 
       buf->st_mode &= ~S_IFMT;
