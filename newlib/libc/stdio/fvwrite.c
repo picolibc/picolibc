@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "local.h"
 #include "fvwrite.h"
 
@@ -110,7 +111,9 @@ __sfvwrite (fp, uio)
        * as fit, but pretend we wrote everything.  This makes
        * snprintf() return the number of bytes needed, rather
        * than the number used, and avoids its write function
-       * (so that the write function can be invalid).
+       * (so that the write function can be invalid).  If
+       * we are dealing with the asprintf routines, we will
+       * dynamically increase the buffer size as needed.
        */
       do
 	{
@@ -118,6 +121,19 @@ __sfvwrite (fp, uio)
 	  w = fp->_w;
 	  if (fp->_flags & __SSTR)
 	    {
+	      if (len > w && fp->_flags & __SMBF)
+		{ /* must be asprintf family */
+		  unsigned char *ptr;
+		  int curpos = (fp->_p - fp->_bf._base);
+		  ptr = (unsigned char *)_realloc_r (fp->_data, fp->_bf._base, 
+                                                     curpos + len);
+		  if (!ptr)
+		    goto err;
+		  fp->_bf._base = ptr;
+		  fp->_p = ptr + curpos;
+		  fp->_bf._size = curpos + len;
+		  w = fp->_w = len;
+		}
 	      if (len < w)
 		w = len;
 	      COPY (w);		/* copy MIN(fp->_w,len), */

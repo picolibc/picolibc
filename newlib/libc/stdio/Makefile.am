@@ -5,6 +5,7 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 LIB_SOURCES = \
+	asprintf.c			\
 	clearerr.c 			\
 	fclose.c 			\
 	fdopen.c 			\
@@ -68,6 +69,7 @@ LIB_SOURCES = \
 	tmpfile.c 			\
 	tmpnam.c 			\
 	ungetc.c 			\
+	vasprintf.c			\
 	vfscanf.c 			\
 	vprintf.c 			\
 	vscanf.c			\

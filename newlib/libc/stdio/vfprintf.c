@@ -17,11 +17,14 @@ ANSI_SYNOPSIS
 	int vprintf(const char *<[fmt]>, va_list <[list]>);
 	int vfprintf(FILE *<[fp]>, const char *<[fmt]>, va_list <[list]>);
 	int vsprintf(char *<[str]>, const char *<[fmt]>, va_list <[list]>);
+	int vasprintf(char **<[strp]>, const char *<[fmt]>, va_list <[list]>);
 	int vsnprintf(char *<[str]>, size_t <[size]>, const char *<[fmt]>, va_list <[list]>);
 
 	int _vprintf_r(void *<[reent]>, const char *<[fmt]>,
                         va_list <[list]>);
 	int _vfprintf_r(void *<[reent]>, FILE *<[fp]>, const char *<[fmt]>,
+                        va_list <[list]>);
+	int _vasprintf_r(void *<[reent]>, char **<[str]>, const char *<[fmt]>,
                         va_list <[list]>);
 	int _vsprintf_r(void *<[reent]>, char *<[str]>, const char *<[fmt]>,
                         va_list <[list]>);
@@ -37,6 +40,11 @@ TRAD_SYNOPSIS
 
 	int vfprintf(<[fp]>, <[fmt]>, <[list]>)
 	FILE *<[fp]>;
+	char *<[fmt]>;
+	va_list <[list]>;
+
+	int vasprintf(<[strp]>, <[fmt]>, <[list]>)
+	char **<[strp]>;
 	char *<[fmt]>;
 	va_list <[list]>;
 
@@ -62,6 +70,12 @@ TRAD_SYNOPSIS
 	char *<[fmt]>;
 	va_list <[list]>;
 
+	int _vasprintf_r(<[reent]>, <[strp]>, <[fmt]>, <[list]>)
+	char *<[reent]>;
+	char **<[strp]>;
+	char *<[fmt]>;
+	va_list <[list]>;
+
 	int _vsprintf_r(<[reent]>, <[str]>, <[fmt]>, <[list]>)
 	char *<[reent]>;
 	char *<[str]>;
@@ -76,19 +90,19 @@ TRAD_SYNOPSIS
 	va_list <[list]>;
 
 DESCRIPTION
-<<vprintf>>, <<vfprintf>>, <<vsprintf>> and <<vsnprintf>> are (respectively)
-variants of <<printf>>, <<fprintf>>, <<sprintf>> and <<snprintf>>.  They differ
-only in allowing their caller to pass the variable argument list as a
-<<va_list>> object (initialized by <<va_start>>) rather than directly
-accepting a variable number of arguments.
+<<vprintf>>, <<vfprintf>>, <<vasprintf>>, <<vsprintf>> and <<vsnprintf>> are 
+(respectively) variants of <<printf>>, <<fprintf>>, <<saprintf>>, <<sprintf>>,
+and <<snprintf>>.  They differ only in allowing their caller to pass the 
+variable argument list as a <<va_list>> object (initialized by <<va_start>>) 
+rather than directly accepting a variable number of arguments.
 
 RETURNS
 The return values are consistent with the corresponding functions:
-<<vsprintf>> returns the number of bytes in the output string,
+<<vasprintf>>/<<vsprintf>> returns the number of bytes in the output string,
 save that the concluding <<NULL>> is not counted.
 <<vprintf>> and <<vfprintf>> return the number of characters transmitted.
-If an error occurs, <<vprintf>> and <<vfprintf>> return <<EOF>>. No
-error returns occur for <<vsprintf>>.
+If an error occurs, <<vprintf>> and <<vfprintf>> return <<EOF>> and
+<<vasprintf>> returns -1.  No error returns occur for <<vsprintf>>.
 
 PORTABILITY
 ANSI C requires all three functions.

@@ -198,11 +198,13 @@ int	_EXFUN(remove, (const char *));
 int	_EXFUN(rename, (const char *, const char *));
 #endif
 #ifndef __STRICT_ANSI__
+int	_EXFUN(asprintf, (char **, const char *, ...));
 int	_EXFUN(vfiprintf, (FILE *, const char *, __VALIST));
 int	_EXFUN(iprintf, (const char *, ...));
 int	_EXFUN(fiprintf, (FILE *, const char *, ...));
 int	_EXFUN(siprintf, (char *, const char *, ...));
 char *	_EXFUN(tempnam, (const char *, const char *));
+int	_EXFUN(vasprintf, (char **, const char *, __VALIST));
 int	_EXFUN(vsnprintf, (char *, size_t, const char *, __VALIST));
 int	_EXFUN(vfscanf, (FILE *, const char *, __VALIST));
 int	_EXFUN(vscanf, (const char *, __VALIST));
@@ -240,6 +242,7 @@ int	_EXFUN(putchar_unlocked, (int));
  * Recursive versions of the above.
  */
 
+int	_EXFUN(_asprintf_r, (struct _reent *, char **, const char *, ...));
 FILE *	_EXFUN(_fdopen_r, (struct _reent *, int, const char *));
 FILE *	_EXFUN(_fopen_r, (struct _reent *, const char *, const char *));
 int	_EXFUN(_fscanf_r, (struct _reent *, FILE *, const char *, ...));
@@ -262,6 +265,7 @@ int	_EXFUN(_sscanf_r, (struct _reent *, const char *, const char *, ...));
 char *	_EXFUN(_tempnam_r, (struct _reent *, const char *, const char *));
 FILE *	_EXFUN(_tmpfile_r, (struct _reent *));
 char *	_EXFUN(_tmpnam_r, (struct _reent *, char *));
+int	_EXFUN(_vasprintf_r, (struct _reent *, char **, const char *, __VALIST));
 int	_EXFUN(_vfprintf_r, (struct _reent *, FILE *, const char *, __VALIST));
 int	_EXFUN(_vprintf_r, (struct _reent *, const char *, __VALIST));
 int	_EXFUN(_vsprintf_r, (struct _reent *, char *, const char *, __VALIST));
