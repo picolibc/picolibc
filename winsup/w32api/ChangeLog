@@ -1,3 +1,10 @@
+
+Tue Jan 16 12:45:20  2001  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/odbcinst.h: Apply Danny Smith patch 102441
+	2000-11-20  Danny Smith  <danny_r_smith_2001@yahoo.co.nz>
+	New file.
+
 Mon Dec 25 12:22:19 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* lib/Makefile.in: Don't make "links" to include/w32api directory.
