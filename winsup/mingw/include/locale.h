@@ -51,6 +51,7 @@
 
 #ifndef RC_INVOKED
 
+__BEGIN_CSTD_NAMESPACE
 /*
  * The structure returned by 'localeconv'.
  */
@@ -76,23 +77,19 @@ struct lconv
 	char	n_sign_posn;
 };
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
 char*		setlocale (int, const char*);
 struct lconv*	localeconv (void);
+
+__END_CSTD_NAMESPACE
 
 #ifndef _WLOCALE_DEFINED  /* also declared in wchar.h */
 # define __need_wchar_t
 # include <stddef.h>
+__BEGIN_CGLOBAL_NAMESPACE
   wchar_t* 	_wsetlocale(int, const wchar_t*);
+__END_CGLOBAL_NAMESPACE
 # define _WLOCALE_DEFINED
 #endif /* ndef _WLOCALE_DEFINED */
-
-#ifdef	__cplusplus
-}
-#endif
 
 #endif	/* Not RC_INVOKED */
 
