@@ -1,3 +1,7 @@
+2001-11-17  Nick Duffek  <nick@duffek.com>
+
+	* path.cc (conv_path_list): Copy source paths before modifying them.
+
 2001-11-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_raw.cc (fhandler_dev_raw::clear): Don't reset unit.
