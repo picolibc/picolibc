@@ -1,3 +1,97 @@
+2004-08-17  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* fhandler.h (fhandler_dev_dsp:~fhandler_dev_dsp): Delete.
+	(fhandler_dev_dsp::open_count): Delete.
+	(fhandler_dev_dsp::close_audio_in): New method declaration.
+	(fhandler_dev_dsp::close_audio_in): Ditto.
+	* fhandler_dsp.cc: Add and edit debug_printf throughout.
+	(fhandler_dev_dsp::Audio::denyAccess): Delete.
+	(fhandler_dev_dsp::Audio::fork_fixup): Ditto.
+	(fhandler_dev_dsp::Audio::getOwner): Ditto.
+	(fhandler_dev_dsp::Audio::clearOwner): Ditto.
+	(fhandler_dev_dsp::Audio::owner_): Ditto.
+	(fhandler_dev_dsp::Audio::setformat): Ditto, rename to setconvert.
+	(fhandler_dev_dsp::Audio::lock): Ditto, move to queue.
+	(fhandler_dev_dsp::Audio::unlock): Ditto.
+	(fhandler_dev_dsp::Audio::lock_): Ditto.
+	(fhandler_dev_dsp::Audio::bufferIndex_): New member, from Audio_out
+	and Audio_in.
+	(fhandler_dev_dsp::Audio::pHdr_): Ditto.
+	(fhandler_dev_dsp::Audio::wavehdr_): Ditto.
+	(fhandler_dev_dsp::Audio::bigwavebuffer_): ditto.
+	(fhandler_dev_dsp::Audio::Qisr2app_): Ditto.
+	(fhandler_dev_dsp::Audio::setconvert): New method, from old setformat.
+	(fhandler_dev_dsp::Audio::queue::lock): New method.
+	(fhandler_dev_dsp::Audio::queue::unlock): Ditto.
+	(fhandler_dev_dsp::Audio::queue::dellock): Ditto.
+	(fhandler_dev_dsp::Audio::queue::isvalid): Ditto.
+	(fhandler_dev_dsp::Audio::queue::lock_): New member.
+	(fhandler_dev_dsp::Audio::queue::depth1_): Delete.
+	(fhandler_dev_dsp::Audio_out::fork_fixup): New method.
+	(fhandler_dev_dsp::Audio_out::isvalid): New method.
+	(fhandler_dev_dsp::Audio_out::start): Remove arguments.
+	(fhandler_dev_dsp::Audio_out::parsewav): Change arguments and set
+	internal state.
+	(fhandler_dev_dsp::Audio_out::emptyblocks): Delete.
+	(fhandler_dev_dsp::Audio_out::Qapp2app_): Ditto.
+	(fhandler_dev_dsp::Audio_out::Qisr2app_): Ditto, move to Audio.
+	(fhandler_dev_dsp::Audio_out::bufferIndex_): Ditto.
+	(fhandler_dev_dsp::Audio_out::pHdr_): Ditto.
+	(fhandler_dev_dsp::Audio_out::wavehdr_): Ditto.
+	(fhandler_dev_dsp::Audio_out::bigwavefuffer_): Ditto.
+	(fhandler_dev_dsp::Audio_out::freq_): New member.
+	(fhandler_dev_dsp::Audio_out::bits_): New member.
+	(fhandler_dev_dsp::Audio_out::channels_): New member.
+	(fhandler_dev_dsp::Audio_in::fork_fixup): New method.
+	(fhandler_dev_dsp::Audio_in::isvalid): New method.
+	(fhandler_dev_dsp::Audio_in::Qapp2app_): Delete.
+	(fhandler_dev_dsp::Audio_in::Qisr2app_): Ditto, move to Audio.
+	(fhandler_dev_dsp::Audio_in::bufferIndex_): Ditto.
+	(fhandler_dev_dsp::Audio_in::pHdr_): Ditto.
+	(fhandler_dev_dsp::Audio_in::wavehdr_): Ditto.
+	(fhandler_dev_dsp::Audio_in::bigwavefuffer_): Ditto.
+	(fhandler_dev_dsp::Audio::queue::queue): Simplify.
+	(fhandler_dev_dsp::Audio::queue::send): Use lock.
+	(fhandler_dev_dsp::Audio::queue::query): Do not use depth1_.
+	(fhandler_dev_dsp::Audio::queue::recv): Ditto.
+	(fhandler_dev_dsp::Audio::Audio): Adapt to new class members.
+	(fhandler_dev_dsp::Audio::~Audio): Ditto
+	(fhandler_dev_dsp::Audio_out::start): Reorganize.
+	(fhandler_dev_dsp::Audio_out::stop): Simplify.
+	(fhandler_dev_dsp::Audio_out::init): Reset the queue and clear flag.
+	(fhandler_dev_dsp::Audio_out::write): Reorganize to allocate audio_out.
+	(fhandler_dev_dsp::Audio_out::buf_info): Use appropriate block size.
+	(fhandler_dev_dsp::Audio_out::callback_sampledone): Do not use lock.
+	(fhandler_dev_dsp::Audio_out::waitforspace): Simplify.
+	(fhandler_dev_dsp::Audio_out::waitforallsent):Ditto.
+	(fhandler_dev_dsp::Audio_out::sendcurrent): Reorganize.
+	Clear flag before requeuing.
+	(fhandler_dev_dsp::Audio_out::parsewav):
+	(fhandler_dev_dsp::Audio_in::start): Reorganize.
+	(fhandler_dev_dsp::Audio_in::stop): Simplify.
+	(fhandler_dev_dsp::Audio_in::queueblock): Ditto.
+	Requeue header in case of error.
+	(fhandler_dev_dsp::Audio_in::init): Reset the queue and clear flag.
+	(fhandler_dev_dsp::Audio_in::waitfordata): Simplify.
+	Do not UnprepareHeader if the flag is zero.
+	(fhandler_dev_dsp::Audio_in::buf_info): Ditto.
+	(fhandler_dev_dsp::Audio_in::callback_blockfull): Do not use lock.
+	(fhandler_dev_dsp::open_count): Delete.
+	(fhandler_dev_dsp::open): Only check existence, do not allocate
+	anything. Set flags appropriately. Create archetype.
+	(fhandler_dev_dsp::write): Call archetype as needed. Create audio_out.
+	(fhandler_dev_dsp::read): Call archetype as needed. Create audio_in.
+	(fhandler_dev_dsp::close): Call archetype as needed.
+	Call close_audio_in and close_audio_out.
+	(fhandler_dev_dsp::close_audio_in): New function.
+	(fhandler_dev_dsp::close_audio_out): New function.
+	(fhandler_dev_dsp::dup): Use archetypes.
+	(fhandler_dev_dsp::ioctl): Call archetype as needed. Reorganize for
+	new structures.
+	(fhandler_dev_dsp::fixup_after_fork): Call archetype as needed.
+	(fhandler_dev_dsp::fixup_after_exec): Call archetype as needed.
+	Clear audio_in and audio_out.
+
 2004-08-14  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* fhandler.cc (fhandler_base::open_9x): Set file attributes

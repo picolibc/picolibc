@@ -1069,12 +1069,10 @@ class fhandler_dev_dsp: public fhandler_base
   int audiofreq_;
   int audiobits_;
   int audiochannels_;
-  static int open_count; // per process
   Audio_out *audio_out_;
   Audio_in  *audio_in_;
  public:
   fhandler_dev_dsp ();
-  ~fhandler_dev_dsp();
 
   int open (int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
@@ -1086,6 +1084,9 @@ class fhandler_dev_dsp: public fhandler_base
   void dump (void);
   void fixup_after_fork (HANDLE parent);
   void fixup_after_exec ();
+ private:
+  void close_audio_in ();
+  void close_audio_out (bool immediately = false);
 };
 
 class fhandler_virtual : public fhandler_base
