@@ -1,3 +1,8 @@
+Thu Feb  8 22:09:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* mmap.cc (mmap): Check for reusing a mapping only on MAP_SHARED
+	and on MAP_PRIVATE|MAP_ANON in the special case of offset 0.
+
 Thu Feb  8 21:57:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* mmap.cc (class list): Add member `hash'.
