@@ -1,3 +1,8 @@
+2003-10-10  Christopher Faylor  <cgf@redhat.com>
+
+	* shared.cc (shared_info::initialize): Remove myself check since
+	hMainProc initialization will allow user initialization to work.
+
 2003-10-09  Yitzchak Scott-Thoennes <sthoenna@efn.org>
 
 	* include/sys/mman.h (MAP_FAILED): Define as void *.
@@ -6,8 +11,8 @@
 
 	* dcrt0.cc (hMainProc): Initialize to useful value for use when dll is
 	dynamically loaded.
-	(shared_info::initialize): Don't initialize user stuff if myself
-	doesn't exist.
+	* shared.cc (shared_info::initialize): Don't initialize user stuff if
+	myself doesn't exist.
 
 2003-10-08  Corinna Vinschen  <corinna@vinschen.de>
 
