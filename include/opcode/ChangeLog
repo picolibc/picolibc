@@ -1,5 +1,8 @@
 Sat Aug 28 00:25:25 1999  Jerry Quinn <jquinn@nortelnetworks.com>
 
+	* hppa.h (pa_opcodes): Change completers in instructions to
+	use 'c' prefix.
+
 	* hppa.h (pa_opcodes):  Add popbts, new forms of bb, havg,
 	hshladd, hshradd, shrpd, and shrpw instructions.  Update arg comments.
 
