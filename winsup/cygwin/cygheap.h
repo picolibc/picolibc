@@ -253,6 +253,7 @@ struct init_cygheap
   mode_t umask;
   HANDLE shared_h;
   HANDLE console_h;
+  HANDLE mt_h;
   char *cygwin_regname;
   cwdstuff cwd;
   dtable fdtab;

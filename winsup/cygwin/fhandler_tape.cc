@@ -1169,13 +1169,13 @@ mtinfo::initialize (void)
     }
 }
 
-HANDLE mt_h;
 mtinfo *mt;
 
 void __stdcall
 mtinfo_init ()
 {
-  mt = (mtinfo *) open_shared ("mtinfo", MTINFO_VERSION, mt_h, sizeof (mtinfo), SH_MTINFO);
+  mt = (mtinfo *) open_shared ("mtinfo", MTINFO_VERSION, cygheap->mt_h, sizeof (mtinfo), SH_MTINFO);
+  ProtectHandleINH (cygheap->mt_h);
   mt->initialize ();
 }
 
