@@ -1178,7 +1178,13 @@ reset_signal_arrived ()
   sigproc_printf ("reset signal_arrived");
 }
 
-void unused_sig_wrapper ()
+static void unused_sig_wrapper () __attribute__((const, unused));
+
+#undef errno
+#define errno ((DWORD volatile) _impure_ptr) + (((char *) &_impure_ptr->_errno) - ((char *) _impure_ptr))
+
+static void
+unused_sig_wrapper ()
 {
 /* Signal cleanup stuff.  Cleans up stack (too bad that we didn't
    prototype signal handlers as __stdcall), calls _set_process_mask
@@ -1199,8 +1205,7 @@ _sigreturn:								\n\
 1:	popl	%%eax		# saved errno				\n\
 	testl	%%eax,%%eax	# Is it < 0				\n\
 	jl	2f		# yup.  ignore it			\n\
-	movl	%1,%%ebx						\n\
-	movl	%%eax,(%%ebx)						\n\
+	movl	%%eax,%1						\n\
 2:	popl	%%eax							\n\
 	popl	%%ebx							\n\
 	popl	%%ecx							\n\
@@ -1240,7 +1245,7 @@ _sigdelayed0:								\n\
 	popl	%%eax							\n\
 	jmp	*%%eax							\n\
 __no_sig_end:								\n\
-" : "=m" (sigsave.sig) : "m" (&_impure_ptr->_errno),
+" : "=m" (sigsave.sig):  "X" (errno),
   "g" (sigsave.retaddr), "g" (sigsave.oldmask), "g" (sigsave.sig),
     "g" (sigsave.func), "g" (sigsave.saved_errno), "g" (sigsave.newmask)
 );

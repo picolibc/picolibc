@@ -2225,7 +2225,7 @@ pthread_mutex::init (pthread_mutex_t *mutex,
   DWORD waitResult = WaitForSingleObject (mutexInitializationLock, INFINITE);
   if (waitResult != WAIT_OBJECT_0)
     {
-      system_printf ("Received a unexpected wait result on mutexInitializationLock %d\n", waitResult);
+      system_printf ("Received a unexpected wait result on mutexInitializationLock %d, %E\n", waitResult);
       return EINVAL;
     }
 
