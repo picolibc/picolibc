@@ -1,3 +1,14 @@
+2002-02-12  Hans-Peter Nilsson  <hp@bitrange.com>
+
+        * libc/sys/mmixware/link.c: New.
+        * libc/sys/mmixware/sys/syscall.h (TRAP1i, I3f): Make asm
+        volatile.
+        * libc/sys/mmixware/times.c (_times): Renamed from times.
+        * libc/sys/mmixware/open.c (_open): Attempt to handle O_APPEND
+        properly by reading previous contents, not through BinaryReadWrite.
+        * libc/sys/mmixware/Makefile.am (lib_a_SOURCES): Add link.c
+        * libc/sys/mmixware/Makefile.in: Regenerate.
+
 2002-02-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/grp.h: Don't declare group functions when compiling

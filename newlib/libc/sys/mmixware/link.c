@@ -1,6 +1,6 @@
-/* times stub for MMIXware.
+/* link stub for MMIXware.
 
-   Copyright (C) 2001, 2002 Hans-Peter Nilsson
+   Copyright (C) 2002 Hans-Peter Nilsson
 
    Permission to use, copy, modify, and distribute this software is
    freely granted, provided that the above copyright notice, this notice
@@ -15,11 +15,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "sys/syscall.h"
-#include "sys/times.h"
+#include <errno.h>
 
-clock_t
-_times (struct tms *buffer)
+int
+_link ()
 {
-  memset (buffer, 0, sizeof (*buffer));
-  return 0;
+  errno = EMLINK;
+  return -1;
 }

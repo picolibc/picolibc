@@ -86,7 +86,7 @@ noinst_LIBRARIES = lib.a
 
 lib_a_SOURCES = _exit.c access.c chmod.c chown.c close.c creat.c \
 	execv.c execve.c fork.c fstat.c getpid.c isatty.c \
-	kill.c lseek.c open.c pipe.c read.c \
+	kill.c link.c lseek.c open.c pipe.c read.c \
 	sbrk.c stat.c time.c unlink.c utime.c wait.c write.c \
 	times.c gettime.c setjmp.S
 
@@ -104,9 +104,9 @@ CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
 lib_a_OBJECTS =  _exit.o access.o chmod.o chown.o close.o creat.o \
-execv.o execve.o fork.o fstat.o getpid.o isatty.o kill.o lseek.o open.o \
-pipe.o read.o sbrk.o stat.o time.o unlink.o utime.o wait.o write.o \
-times.o gettime.o setjmp.o
+execv.o execve.o fork.o fstat.o getpid.o isatty.o kill.o link.o lseek.o \
+open.o pipe.o read.o sbrk.o stat.o time.o unlink.o utime.o wait.o \
+write.o times.o gettime.o setjmp.o
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)

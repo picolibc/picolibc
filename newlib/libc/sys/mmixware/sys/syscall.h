@@ -1,6 +1,6 @@
 /* syscall defines for MMIXware.
 
-   Copyright (C) 2001 Hans-Peter Nilsson
+   Copyright (C) 2001, 2002 Hans-Peter Nilsson
 
    Permission to use, copy, modify, and distribute this software is
    freely granted, provided that the above copyright notice, this notice
@@ -46,22 +46,30 @@ extern unsigned char _MMIX_allocated_filehandle[N_MMIX_FILEHANDLES];
 #define TMPFNO 127
 
 /* Simulator call with one argument.  Also used for zero-argument calls;
-   pass a zero as ARG1.  */
-#define TRAP1i(FUN, ARG1)				\
- ({ long ret_;						\
-    __asm__ ("TRAP 0,%1,%2\n\tSET %0,$255"		\
-	     : "=r" (ret_) : "i" (FUN), "i" (ARG1)	\
-	     : "memory");				\
-    ret_;						\
+   pass a zero as ARG1.  Make the asm volatile so we can safely ignore the
+   return-value and only get the benefit from the supposed side-effect
+   without the asm being optimized away.  */
+#define TRAP1i(FUN, ARG1)			\
+ ({ long ret_;					\
+    __asm__ __volatile__			\
+      ("TRAP 0,%1,%2\n\tSET %0,$255"		\
+       : "=r" (ret_) : "i" (FUN), "i" (ARG1)	\
+       : "memory");				\
+    ret_;					\
  })
 
 /* Helper macros to cope with the file-handle parameter to the simulator
-   being *constant*.  We support up to 32 simultaneously open files.  */
-#define I3f(FUN, ARG1, N, ARGS)					\
- if (ARG1 == N)							\
-   __asm__ ("SET $255,%3\n\tTRAP 0,%1,%2\n\tSET %0,$255"	\
-	    : "=r" (ret_) : "i" (FUN), "i" (N), "r" (ARGS)	\
-	    : "memory")
+   being *constant*.  We support up to 32 simultaneously open files.  Make
+   the asm volatile so we can safely ignore the return-value and get the
+   benefit from the supposed side-effect without the asm being optimized
+   away.  */
+
+#define I3f(FUN, ARG1, N, ARGS)				\
+ if (ARG1 == N)						\
+   __asm__ __volatile__					\
+     ("SET $255,%3\n\tTRAP 0,%1,%2\n\tSET %0,$255"	\
+      : "=r" (ret_) : "i" (FUN), "i" (N), "r" (ARGS)	\
+      : "memory")
 
 /* Using if:s rather than switches to help GCC optimize the rest away.  */
 #define DO32(FUN, ARG1, ARGS)			\
