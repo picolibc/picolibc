@@ -32,7 +32,7 @@ exhibit different limitations, on the various versions of Windows.
 
 @section Where can I get it?
 
-The main WWW page for the Cygwin project is
+The main location for the Cygwin project is
 @file{http://cygwin.com/}.  There you should find
 everything you need for Cygwin, including links for download and setup,
 a current list of ftp mirror sites, a User's Guide, an API Reference,
@@ -75,7 +75,7 @@ although the @emph{versions} available for download may have been
 different than those distributed with the commercial product.  We tested
 it all to make sure it worked together, and packaged it in a convenient
 form.  We considered such testing and packaging to be a valuable service
-and thus charged a fee for it.  Plus, it provided income for the cygwin
+and thus charged a fee for it.  Plus, it provided income for the Cygwin
 project so we could continue working on it.  However, Red Hat is no
 longer offering Cygwin 1.0 on CD.  There are tentative plans to offer a
 new Cygwin CD sometime in early 2001.  So far, however, there are no
@@ -125,7 +125,7 @@ updated, and since release 1.3.1, is more generically referred to as
 "1.3.x".
 
 Users obtain this package by first downloading a version of
-@code{setup.exe}.  This program started as a simple command line tool,
+Cygwin Setup.  This program started as a simple command line tool,
 has metamorphosed into a GUI, and is in the process of continual
 improvement.  However, its purpose is simple -- it is designed to
 install packages from the cygwin web site at @file{http://cygwin.com/}.
@@ -149,11 +149,12 @@ cygwin binary ports.  Each package has its own version numbers and its
 own release process.
 
 So, how do you get the most up-to-date version of cygwin?  Easy.  Just
-download the setup.exe program from your closest mirror.  This program
-will handle the task of updating the packages on your system to the
-latest version.  The Cygwin team frequently updates and adds new
-packages to the sourceware web site.  The setup.exe program is the
-easiest way to determine what you need on your system.
+download the Cygwin Setup program from
+@file{http://cygwin.com/setup.exe}.  This program will handle the task
+of updating the packages on your system to the latest version.  The
+Cygwin team frequently updates and adds new packages to the sourceware
+web site.  The Cygwin Setup program is the easiest way to determine what
+you need on your system.
 
 For some "ancient" history of the project (rather, just woefully out of
 date), visit the Project History page at
