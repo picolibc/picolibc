@@ -1,5 +1,10 @@
 2004-01-16  Christopher Faylor  <cgf@redhat.com>
 
+	* cygheap.cc (init_cygheap::close_ctty): Don't NULL ctty if it is still
+	active.
+
+2004-01-16  Christopher Faylor  <cgf@redhat.com>
+
 	* dtable.cc (dtable::vfork_parent_restore): Store ctty_on_hold prior to
 	calling close_all_files since it will be zeroed.
 
