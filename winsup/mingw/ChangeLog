@@ -1,3 +1,8 @@
+2002-12-12  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/malloc.h (_alloca): Add definition.
+	(alloca): Ditto.
+
 2002-12-08  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/math/s_erf.c: New file.
