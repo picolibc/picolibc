@@ -19,11 +19,12 @@ host_alias = @host_alias@
 build_alias = @build_alias@
 target_alias = @target_alias@
 prefix = @prefix@
+includedir:=@includedir@
+libdir:=@libdir@
 
 program_transform_name = @program_transform_name@
 exec_prefix = @exec_prefix@
 bindir = @bindir@
-libdir = @libdir@
 ifeq ($(target_alias),$(host_alias))
 ifeq ($(build_alias),$(host_alias))
 tooldir:=$(exec_prefix)
@@ -36,9 +37,11 @@ endif
 datadir = @datadir@
 infodir = @infodir@
 ifneq (,$(findstring cygwin,$(target_alias)))
-includedir = $(tooldir)/include/w32api
+inst_includedir:=$(tooldir)/include/w32api
+inst_libdir:=$(tooldir)/lib/w32api
 else
-includedir = @includedir@
+inst_includedir:=$(includedir)
+inst_libdir:=$(libdir)
 endif
 
 INSTALL = @INSTALL@
@@ -142,15 +145,15 @@ lib%.a: %.o
 install: install-libraries install-headers
 
 install-libraries: all
-	$(mkinstalldirs) $(tooldir)/lib
+	$(mkinstalldirs) $(inst_libdir)
 	for i in $(LIBS); do \
-		$(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
+		$(INSTALL_DATA) $$i $(inst_libdir)/$$i ; \
 	done
 
 install-headers:
-	$(mkinstalldirs) $(includedir)
+	$(mkinstalldirs) $(inst_includedir)
 	for i in $(HEADERS); do \
-		$(INSTALL_DATA) $(srcdir)/../include/$$i $(includedir)/$$i ; \
+		$(INSTALL_DATA) $(srcdir)/../include/$$i $(inst_includedir)/$$i ; \
 	done
 
 # uninstall headers and libraries from a target specified directory
@@ -158,14 +161,15 @@ uninstall: uninstall-libraries uninstall-headers
 
 uninstall-libraries:
 	@for i in $(LIBS); do \
-		rm -f $(tooldir)/lib/$$i ; \
+		rm -f $(inst_libdir)/$$i ; \
 	done
+	rmdir $(inst_libdir)
 
 uninstall-headers:
 	@for i in $(HEADERS); do \
-		rm -r $(tooldir)/include/w32api/$$i ; \
+		rm -r $(inst_includedir)/$$i ; \
 	done
-	rmdir $(tooldir)/include/w32api
+	rmdir $(inst_includedir)
 
 
 dist:

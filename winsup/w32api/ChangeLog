@@ -1,3 +1,8 @@
+Tue Apr 24 23:51:07 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* lib/Makefile.in: Install libraries in /usr/lib/w32api when building
+	for cygwin.
+
 Tue Apr 24 16:18:42 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* include/winsock2.h: Protect one *more* newlib defines when compiling
