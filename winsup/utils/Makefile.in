@@ -72,10 +72,10 @@ all: Makefile $(PROGS)
 
 strace.exe: strace.cc mingw_getopt.o $(MINGW_LDLIBS)
 ifdef VERBOSE
-	$(CC) $(MINGW_CFLAGS) -o $@ ${wordlist 1,2,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
+	$(CC) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,2,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
 else
-	@echo $(CC) -mno-cygwin -o $@ ${wordlist 1,2,$^} ${filter-out -B%, $(MINGW_LDFLAGS)};\
-	$(CC) $(MINGW_CFLAGS) -o $@ ${wordlist 1,2,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
+	@echo $(CC) -mno-cygwin -o $@ ${wordlist 1,2,$^} ${filter-out -B%, $(MINGW_CXXFLAGS) $(MINGW_LDFLAGS)};\
+	$(CC) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,2,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
 endif
 
 mingw_getopt.o: $(cygwin_source)/getopt.c

@@ -1,3 +1,7 @@
+Wed Mar 15 00:53:58 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Use MINGW_CXXFLAGS when compiling strace.
+
 Sun Mar 12 21:22:25 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* strace.cc: Throughout, track information like start_time, etc.  on a
