@@ -28,7 +28,7 @@ init_cygheap NO_COPY *cygheap;
 void NO_COPY *cygheap_max;
 
 static NO_COPY muto *cygheap_protect;
-static NO_COPY DWORD alloc_sz;
+static NO_COPY DWORD reserve_sz;
 
 struct cygheap_entry
   {
@@ -52,27 +52,27 @@ static void
 init_cheap ()
 {
 #ifndef DEBUGGING
-  alloc_sz = CYGHEAPSIZE;
+  reserve_sz = CYGHEAPSIZE;
 #else
   char buf[80];
   DWORD initial_sz = 0;
   if (!GetEnvironmentVariable ("CYGWIN_HEAPSIZE", buf, sizeof buf - 1))
-    initial_sz = alloc_sz = CYGHEAPSIZE;
+    initial_sz = reserve_sz = CYGHEAPSIZE;
   else
     {
-      initial_sz = alloc_sz = atoi (buf);
-      small_printf ("using cygheap size %d\n", alloc_sz);
+      initial_sz = reserve_sz = atoi (buf);
+      small_printf ("using cygheap size %d\n", reserve_sz);
     }
 #endif
   do
     if ((cygheap = (init_cygheap *) VirtualAlloc ((void *) &_cygheap_start,
-						  alloc_sz, MEM_RESERVE,
+						  reserve_sz, MEM_RESERVE,
 						  PAGE_NOACCESS)))
       break;
-  while ((alloc_sz -= 2 * (1024 * 1024)) >= CYGHEAPSIZE_MIN);
+  while ((reserve_sz -= 2 * (1024 * 1024)) >= CYGHEAPSIZE_MIN);
 #ifdef DEBUGGING
-  if (alloc_sz != initial_sz)
-    small_printf ("reset initial cygheap size to %u\n", alloc_sz);
+  if (reserve_sz != initial_sz)
+    small_printf ("reset initial cygheap size to %u\n", reserve_sz);
 #endif
   if (!cygheap)
     {
@@ -80,7 +80,7 @@ init_cheap ()
       if (!VirtualQuery ((LPCVOID) &_cygheap_start, &m, sizeof m))
 	system_printf ("couldn't get memory info, %E");
       system_printf ("Couldn't reserve %d bytes of space for cygwin's heap, %E",
-		     alloc_sz);
+		     reserve_sz);
       api_fatal ("AllocationBase %p, BaseAddress %p, RegionSize %p, State %p\n",
 		 m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
     }
@@ -103,7 +103,7 @@ cygheap_setup_for_child (child_info *ci, bool dup_later)
   void *newcygheap;
   cygheap_protect->acquire ();
   unsigned n = (char *) cygheap_max - (char *) cygheap;
-  unsigned size = alloc_sz;
+  unsigned size = reserve_sz;
   if (size < n)
     size = n + (128 * 1024);
   ci->cygheap_h = CreateFileMapping (INVALID_HANDLE_VALUE, &sec_none,
@@ -117,7 +117,7 @@ cygheap_setup_for_child (child_info *ci, bool dup_later)
   cygheap_protect->release ();
   ci->cygheap = cygheap;
   ci->cygheap_max = cygheap_max;
-  ci->cygheap_alloc_sz = size;
+  ci->cygheap_reserve_sz = size;
   return newcygheap;
 }
 
@@ -148,14 +148,14 @@ cygheap_fixup_in_child (bool execed)
   void *newaddr;
 
   newaddr = MapViewOfFileEx (child_proc_info->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, addr);
-  alloc_sz = child_proc_info->cygheap_alloc_sz;
+  reserve_sz = child_proc_info->cygheap_reserve_sz;
   if (newaddr != cygheap)
     {
       if (!newaddr)
 	newaddr = MapViewOfFileEx (child_proc_info->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, NULL);
       DWORD n = (DWORD) cygheap_max - (DWORD) cygheap;
       /* Reserve cygwin heap in same spot as parent */
-      if (!VirtualAlloc (cygheap, alloc_sz, MEM_RESERVE, PAGE_NOACCESS))
+      if (!VirtualAlloc (cygheap, reserve_sz, MEM_RESERVE, PAGE_NOACCESS))
 	{
 	  MEMORY_BASIC_INFORMATION m;
 	  memset (&m, 0, sizeof m);
@@ -163,7 +163,7 @@ cygheap_fixup_in_child (bool execed)
 	    system_printf ("couldn't get memory info, %E");
 
 	  system_printf ("Couldn't reserve %d bytes of space for cygwin's heap (%p <%p>) in child, %E",
-			 alloc_sz, cygheap, newaddr);
+			 reserve_sz, cygheap, newaddr);
 	  api_fatal ("m.AllocationBase %p, m.BaseAddress %p, m.RegionSize %p, m.State %p\n",
 		     m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
 	}
@@ -235,11 +235,11 @@ _csbrk (int sbs)
 #ifdef DEBUGGING
       system_printf ("couldn't commit memory for cygwin heap, prebrk %p, size %d, heapsize now %d, max heap size %u, %E",
 		     prebrk, sbs, (char *) cygheap_max - (char *) cygheap,
-		     alloc_sz);
+		     reserve_sz);
 #else
       malloc_printf ("couldn't commit memory for cygwin heap, prebrk %p, size %d, heapsize now %d, max heap size %u, %E",
 		     prebrk, sbs, (char *) cygheap_max - (char *) cygheap,
-		     alloc_sz);
+		     reserve_sz);
 #endif
       __seterrno ();
       cygheap_max = (char *) cygheap_max - sbs;

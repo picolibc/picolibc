@@ -49,7 +49,7 @@ public:
   HANDLE pppid_handle;
   init_cygheap *cygheap;
   void *cygheap_max;
-  DWORD cygheap_alloc_sz;
+  DWORD cygheap_reserve_sz;
   HANDLE cygheap_h;
   unsigned fhandler_union_cb;
 };
