@@ -1,3 +1,8 @@
+Thu Aug  3 09:01:14 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler_tty.cc (fhandler_pty_master::process_slave_output): Set
+	length field correctly when "need_nl".
+
 Wed Aug  2 22:58:07 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* fork.cc (vfork): Store complete stack frame in vfork_save structure

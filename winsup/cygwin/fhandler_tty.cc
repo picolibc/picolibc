@@ -233,6 +233,7 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 	 don't check again here.  */
       buf[0] = '\n';
       need_nl = 0;
+      rc = 1;
       goto out;
     }
 
