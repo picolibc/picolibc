@@ -27,7 +27,6 @@
  * Constants for the stat st_mode member.
  */
 #ifndef __STRICT_ANSI__
-#define _S_IFLNK	0xF000  /* Pretend */
 #endif
 #define	_S_IFIFO	0x1000	/* FIFO */
 #define	_S_IFCHR	0x2000	/* Character */
@@ -51,15 +50,9 @@
 #define	_S_ISCHR(m)	(((m) & _S_IFMT) == _S_IFCHR)
 #define	_S_ISBLK(m)	(((m) & _S_IFMT) == _S_IFBLK)
 #define	_S_ISREG(m)	(((m) & _S_IFMT) == _S_IFREG)
-#ifndef __STRICT_ANSI__
-# define _S_ISLNK(m)	(((m) & _S_IFMT) == _S_IFLNK) /* Should always be zero.*/
-#endif
 
 #ifndef _NO_OLDNAMES
 
-#ifndef __STRICT_ANSI__
-#define S_IFLNK		_S_IFLNK
-#endif
 #define	S_IFIFO		_S_IFIFO
 #define	S_IFCHR		_S_IFCHR
 #define	S_IFBLK		_S_IFBLK
@@ -79,9 +72,6 @@
 #define	S_ISCHR(m)	(((m) & S_IFMT) == S_IFCHR)
 #define	S_ISBLK(m)	(((m) & S_IFMT) == S_IFBLK)
 #define	S_ISREG(m)	(((m) & S_IFMT) == S_IFREG)
-#ifndef __STRICT_ANSI__
-#define S_ISLNK(m)	(((m) & S_IFMT) == S_IFLNK) /* Should always be zero.*/
-#endif
 
 #endif	/* Not _NO_OLDNAMES */
 
@@ -167,15 +157,6 @@ extern "C" {
 _CRTIMP int __cdecl	_fstat (int, struct _stat*);
 _CRTIMP int __cdecl	_chmod (const char*, int);
 _CRTIMP int __cdecl	_stat (const char*, struct _stat*);
-/*
- * FIXME: Should we use something MinGW specific such as __NO_POSIX_EMULATION__
- * instead of __STRICT_ANSI__?  I.E.: Do other things break because of -ansi
- * being specified to the compiler?  Of particular interest is the ACE/TAO
- * project which the lstat define broke the build of.
- */
-#ifndef __STRICT_ANSI__
-#define _lstat _stat
-#endif
 
 #ifndef	_NO_OLDNAMES
 
@@ -183,9 +164,6 @@ _CRTIMP int __cdecl	_stat (const char*, struct _stat*);
 _CRTIMP int __cdecl	fstat (int, struct stat*);
 _CRTIMP int __cdecl	chmod (const char*, int);
 _CRTIMP int __cdecl	stat (const char*, struct stat*);
-#ifndef __STRICT_ANSI__
-#define lstat stat
-#endif
 
 #endif	/* Not _NO_OLDNAMES */
 
