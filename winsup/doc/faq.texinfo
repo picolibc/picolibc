@@ -2,7 +2,7 @@
 
 @title The Cygwin FAQ
 
-@author You can always find the latest version of this FAQ at @file{http://cygwin.com/faq/}.
+@author You can always find the latest version of this FAQ at @file{http://cygwin.com/faq.html}.
 
 @setfilename faq.txt
 
