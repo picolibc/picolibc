@@ -404,6 +404,10 @@
 
 #define NT_NETBSD_IDENT		1
 
+/* Values for OpenBSD .note.openbsd.ident notes.  Note name is "OpenBSD".  */
+
+#define NT_OPENBSD_IDENT	1
+
 /* Values for FreeBSD .note.ABI-tag notes.  Note name is "FreeBSD".  */
 
 #define NT_FREEBSD_ABI_TAG	1
