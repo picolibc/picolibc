@@ -3,6 +3,7 @@
 	* dis-asm.h: Add prototype for disassembler_usage().
 	Add prototype for arm_disassembler_options().
 	Remvoe prototype for arm_toggle_regnames().
+	Add prototype for parse_arm_disassembler_option().
 
 1999-12-15  Doug Evans  <dje@transmeta.com>
 
