@@ -1,3 +1,12 @@
+2001-03-22  Alexandre Oliva  <aoliva@redhat.com>
+
+	Re-installed:
+	2001-01-02  Laurynas Biveinis  <lauras@softhome.net>
+	* ltcf-c.sh: Clear ac_cv_prog_cc_pic for DJGPP.  Do not add
+	'-DPIC' to ac_cv_prog_cc_pic for DJGPP.
+	* ltcf-cxx.sh: Likewise.
+	* ltcf-gcj.sh: Likewise.
+
 2001-03-22  Philip Blundell  <philb@gnu.org>
 
 	* config.sub, config.guess: Import latest from subversions.
