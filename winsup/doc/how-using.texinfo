@@ -457,11 +457,13 @@ After a new installation in the default location, your mount points will
 look something like this:
 
 @example
-Device              Directory           Type         Flags
-C:\cygwin\bin       /usr/bin            user         binmode
-C:\cygwin\lib       /usr/lib            user         binmode
-C:\cygwin           /                   user         binmode
+	bash$ mount
+	C:\cygwin\bin on /usr/bin type system (binmode)
+	C:\cygwin\lib on /usr/lib type system (binmode)
+	C:\cygwin on / type system (binmode)
 @end example
+
+(Exactly what you see depends on what options you gave to @code{setup.exe}.)
 
 Note that /bin and /usr/bin point to the same location, as do /lib and
 /usr/lib.  This is intentional, and you should not undo these mounts
@@ -512,7 +514,7 @@ contents are exempt from scanning.  In a default installation, this
 would be @samp{@code{C:\cygwin\bin}}.  Obviously, this could be
 exploited by a hostile non-Cygwin program, so do this at your own risk.
 
-@subsection Why can't I run bash as a shell under NT Emacs?
+@subsection How do I run bash as a shell under NT Emacs?
 
 The Windows port of GNU Emacs (aka "NT emacs") uses the Windows command
 shell by default.  Also, since Emacs is not a Cygwin application, it has
