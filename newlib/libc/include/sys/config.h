@@ -151,6 +151,7 @@
 #if defined(__CYGWIN32__) || defined(__CYGWIN__)
 #define __FILENAME_MAX__ (260 - 1 /* NUL */)
 #define _READ_WRITE_RETURN_TYPE _ssize_t
+#define __LARGE64_FILES 1
 #if defined(__INSIDE_CYGWIN__) || defined(_COMPILING_NEWLIB)
 #define __IMPORT
 #else

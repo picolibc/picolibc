@@ -48,17 +48,17 @@ DESCRIPTION
         with large file support.
 */
 
-off64_t
+_off64_t
 _lseek64_r (ptr, fd, pos, whence)
      struct _reent *ptr;
      int fd;
-     off64_t pos;
+     _off64_t pos;
      int whence;
 {
-  off64_t ret;
+  _off64_t ret;
 
   errno = 0;
-  if ((ret = _lseek64 (fd, pos, whence)) == (off64_t) -1 && errno != 0)
+  if ((ret = _lseek64 (fd, pos, whence)) == (_off64_t) -1 && errno != 0)
     ptr->_errno = errno;
   return ret;
 }

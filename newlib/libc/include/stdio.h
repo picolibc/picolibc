@@ -47,12 +47,20 @@
 
 _BEGIN_STD_C
 
-typedef _fpos_t fpos_t;
 typedef __FILE FILE;
 
+#ifdef __CYGWIN__
+#ifdef __CYGWIN_USE_BIG_TYPES__
+typedef _fpos64_t fpos_t;
+#else
+typedef _fpos_t fpos_t;
+#endif
+#else
+typedef _fpos_t fpos_t;
 #ifdef __LARGE64_FILES
 typedef _fpos64_t fpos64_t;
 #endif
+#endif /* !__CYGWIN__ */
 
 #include <sys/stdio.h>
 
@@ -287,6 +295,7 @@ ssize_t _EXFUN(__getdelim, (char **, size_t *, int, FILE *));
 ssize_t _EXFUN(__getline, (char **, size_t *, FILE *));
 
 #ifdef __LARGE64_FILES
+#ifndef __CYGWIN__
 FILE *  _EXFUN(fopen64, (const char *, const char *));
 _off64_t _EXFUN(ftello64, (FILE *));
 _off64_t _EXFUN(fseeko64, (FILE *, _off64_t, int));
@@ -300,6 +309,7 @@ _off64_t _EXFUN(_fseeko64_r, (struct _reent *, FILE *, _off64_t, int));
 int     _EXFUN(_fgetpos64_r, (struct _reent *, FILE *, _fpos64_t *));
 int     _EXFUN(_fsetpos64_r, (struct _reent *, FILE *, const _fpos64_t *));
 FILE *  _EXFUN(_tmpfile64_r, (struct _reent *));
+#endif /* !__CYGWIN__ */
 #endif /* __LARGE64_FILES */
  
 /*

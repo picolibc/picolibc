@@ -1,3 +1,13 @@
+2003-03-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure.host: Define stdio64_dir for Cygwin.
+	* libc/include/stdio.h: Change definition of fpos_t to fulfill
+	Cygwin 64bit file access requirements.
+	Drop definition of f*64() functions when compiled for Cygwin.
+	* libc/include/sys/config.h: Define __LARGE64_FILES for Cygwin.
+	* libc/reent/lseek64r.c: Use _off64_t instead of off64_t.
+	* libc/stdio64/local64.h: Use _fpos64_t instead of fpos64_t.
+
 2003-03-07   Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/reent.h: Remove extraneous _sig_func

@@ -288,6 +288,7 @@ case "${host}" in
   *-*-cygwin*)
 	sys_dir=cygwin
 	posix_dir=posix
+	stdio64_dir=stdio64
 	;;
   *-*-netware*)
 	signal_dir=
