@@ -7,9 +7,9 @@ void
 putTtyChar(int c)
 {
   /* 2 is fork under solaris; bad juju */
-  asm("	mov %i0,%o0
-	or %g0,2,%g1
-	ta 8
+  asm("	mov %i0,%o0		\n\
+	or %g0,2,%g1		\n\
+	ta 8			\n\
 	nop");
 }
 
@@ -20,8 +20,8 @@ write(int fd,char *ptr,int amt)
     {
       return -1;
     }
-  asm(" or %g0, 4, %g1
-	ta 8
+  asm(" or %g0, 4, %g1		\n\
+	ta 8			\n\
 	nop");
   return amt;
 }
@@ -33,8 +33,8 @@ read(int fd,char *ptr,int amt)
     {
       return -1;
     }
-  asm(" or %g0, 3, %g1
-	ta 8
+  asm(" or %g0, 3, %g1		\n\
+	ta 8			\n\
 	nop");
   return amt;
 }
@@ -43,19 +43,19 @@ void
 _exit(int code)
 {
   while(1) {
-    asm("	or %g0,1,%g1
-		ta 8
-		nop
-		ta 1
-		nop");
+    asm(" or %g0,1,%g1		\n\
+	  ta 8			\n\
+	  nop			\n\
+	  ta 1			\n\
+	  nop");
   }
 }
 
 int
 setitimer(int which, const struct itimerval *value, struct itimerval *ovalue)
 {
-  asm(" or %g0, 158, %g1
-	ta 8
+  asm(" or %g0, 158, %g1	\n\
+	ta 8			\n\
 	nop");
 }
 
@@ -138,8 +138,8 @@ isatty(int fd)
 int
 kill (int pid, int signal)
 {
-  asm ("or %g0, 37, %g1
-	ta 8
+  asm ("or %g0, 37, %g1		\n\
+	ta 8			\n\
 	nop");
 }
 
@@ -152,50 +152,50 @@ getpid ()
 int
 getitimer (int which, struct itimerval *value)
 {
-  asm ("or %g0, 157, %g1
-	ta 8
+  asm ("or %g0, 157, %g1	\n\
+	ta 8			\n\
 	nop");
 }
 
 void
 __install_signal_handler (void *func)
 {
-  asm ("mov %o0, %o1
-	mov %g0, %o0
-	or %g0, 48, %g1
-	ta 8
+  asm ("mov %o0, %o1		\n\
+	mov %g0, %o0		\n\
+	or %g0, 48, %g1		\n\
+	ta 8			\n\
 	nop");
 }
 
 int
 gettimeofday (struct timeval *tp, struct timezone *tzp)
 {
-  asm ("or %g0, 156, %g1
-	ta 8
+  asm ("or %g0, 156, %g1	\n\
+	ta 8			\n\
 	nop");
 }
 
 int
 stime (long *seconds)
 {
-  asm ("or %g0, 25, %g1
-	ta 8
+  asm ("or %g0, 25, %g1		\n\
+	ta 8			\n\
 	nop");
 }
 
 int
 add_mapping (long vma, long pma, long size)
 {
-  asm ("or %g0, 115, %g1
-	ta 8
+  asm ("or %g0, 115, %g1	\n\
+	ta 8			\n\
 	nop");
 }
 
 int
 remove_mapping (long vma, long vma_end)
 {
-  asm ("or %g0, 117, %g1
-	ta 8
+  asm ("or %g0, 117, %g1	\n\
+	ta 8			\n\
 	nop");
 }
 
@@ -211,10 +211,10 @@ __getProgramArgs (int *argv)
   int *res;
 
   /* 184 is tsolsys under solaris; bad juju */
-  asm ("mov %1, %%o0
-	or %%g0, 184, %%g1
-	ta 8
-	nop
+  asm ("mov %1, %%o0		\n\
+	or %%g0, 184, %%g1	\n\
+	ta 8			\n\
+	nop			\n\
 	mov %%o0, %0" : "=r" (res) : "r" (argv): "g1");
   return res;
 }

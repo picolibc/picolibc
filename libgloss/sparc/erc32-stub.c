@@ -136,22 +136,22 @@ handle_exception (registers)
   DEBUG (1, "Entering handle_exception()");
 
 /*  asm("mov %g0, %wim ; nop; nop; nop"); */
-  asm("	save %sp, -64, %sp
-	save %sp, -64, %sp
-	save %sp, -64, %sp
-	save %sp, -64, %sp
-	save %sp, -64, %sp
-	save %sp, -64, %sp
-	save %sp, -64, %sp
-	save %sp, -64, %sp
-	restore
-	restore
-	restore
-	restore
-	restore
-	restore
-	restore
-	restore
+  asm("	save %sp, -64, %sp	\n\
+	save %sp, -64, %sp	\n\
+	save %sp, -64, %sp	\n\
+	save %sp, -64, %sp	\n\
+	save %sp, -64, %sp	\n\
+	save %sp, -64, %sp	\n\
+	save %sp, -64, %sp	\n\
+	save %sp, -64, %sp	\n\
+	restore			\n\
+	restore			\n\
+	restore			\n\
+	restore			\n\
+	restore			\n\
+	restore			\n\
+	restore			\n\
+	restore			\n\
 ");
 
   if (registers[PC] == (unsigned long)breakinst) {
@@ -180,10 +180,10 @@ breakpoint()
   if (!initialized)
     return;
 
-  asm("	.globl " STRINGSYM(breakinst) "
-	" STRINGSYM(breakinst) ": ta 128+1
-	nop
-	nop
+  asm("	.globl " STRINGSYM(breakinst) "		\n\
+	" STRINGSYM(breakinst) ": ta 128+1	\n\
+	nop					\n\
+	nop					\n\
       ");
 }
 
@@ -197,9 +197,9 @@ int tt;
   print ("Got a bad trap #");
   outbyte (tt);
   outbyte ('\n');
-  asm("ta 0
-	nop
-	nop
+  asm("ta 0		\n\
+	nop		\n\
+	nop		\n\
       ");
 }
 
@@ -213,9 +213,9 @@ int tt;
   print ("Got a soft trap #");
   outbyte (tt);
   outbyte ('\n');
-  asm("ta 0
-	nop
-	nop
+  asm("ta 0		\n\
+	nop		\n\
+	nop		\n\
       ");
 }
 
@@ -239,7 +239,7 @@ flush_i_cache ()
 void
 target_reset()
 {
-  asm ("call 0
+  asm ("call 0		\n\
 	nop ");
 }
 

@@ -1,3 +1,8 @@
+2002-04-17	Joel Sherrill <joel@OARcorp.com>
+
+	* sparc/cygmon-salib.c, sparc/erc32-stub.c: Don't use multi-line
+	strings.
+
 2002-04-16  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* m68k/configure.in: Change to use LIB_AC_PROG_CC instead
