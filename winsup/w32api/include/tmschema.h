@@ -661,4 +661,4 @@ enum {
 	VTS_DISABLED = 4
 };
 
-#endif /* _TMSCHEMA_H */
+#endif

@@ -1,3 +1,10 @@
+2003-10-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/winuser.h [WINVER >= 0x0500] (EVENT_*): Add constants.
+
+	* include/uxtheme.h: Cleanup.
+	* include/tmschema.h: Cleanup.
+
 2003-10-02  Luke Dunstan  <infidel@users.sourceforge.net>
 
 	* include/winspool.h (GetDefaultPrinter[AW]): Add functions.
@@ -19,7 +26,7 @@
 
 2003-09-30  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
-	* include/dhcpcsvc.h: New file.
+	* include/dhcpcdsk.h: New file.
 	Note that MSDN is confused about whether it should start constant
 	and structure names with DHCPCAPI or DHCPAPI. It's using both but
 	experience suggests it's DHCPCAPI with `C'.
