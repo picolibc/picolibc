@@ -74,8 +74,14 @@ START_RELOC_NUMBERS (elf_mips_reloc_type)
   RELOC_NUMBER (R_MIPS_JALR, 37)
   FAKE_RELOC (R_MIPS_max, 38)
   /* These relocs are used for the mips16.  */
+  FAKE_RELOC (R_MIPS16_min, 100)
   RELOC_NUMBER (R_MIPS16_26, 100)
   RELOC_NUMBER (R_MIPS16_GPREL, 101)
+  RELOC_NUMBER (R_MIPS16_GOT16, 102)
+  RELOC_NUMBER (R_MIPS16_CALL16, 103)
+  RELOC_NUMBER (R_MIPS16_HI16, 104)
+  RELOC_NUMBER (R_MIPS16_LO16, 105)
+  FAKE_RELOC (R_MIPS16_max, 106)
   /* This was a GNU extension used by embedded-PIC.  It was co-opted by
      mips-linux for exception-handling data.  It is no longer used, but
      should continue to be supported by the linker for backward

@@ -1,3 +1,13 @@
+2005-02-15  Nigel Stephens  <nigel@mips.com>
+            Maciej W. Rozycki  <macro@mips.com>
+
+	* mips.h (R_MIPS16_GOT16): New reloc code.
+	(R_MIPS16_CALL16): Likewise.
+	(R_MIPS16_HI16): Likewise.
+	(R_MIPS16_LO16): Likewise.
+	(R_MIPS16_min): New fake reloc code.
+	(R_MIPS16_max): Likewise.
+
 2005-02-11  Maciej W. Rozycki  <macro@mips.com>
 
 	* mips.h (R_MIPS_max): Use FAKE_RELOC to define.
