@@ -19,5 +19,8 @@
 /* .pushsection/.popsection directives allowed */
 #undef HAVE_ASM_POPSECTION_DIRECTIVE
 
+/* support for section attributes */
+#undef HAVE_SECTION_ATTRIBUTES
+
 /* symbol prefix */
 #undef __SYMBOL_PREFIX

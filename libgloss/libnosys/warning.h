@@ -15,10 +15,14 @@
 #   define __make_section_unallocated(section_string)
 #  endif
 
-#  define link_warning(symbol, msg)                     \
+#  ifdef HAVE_SECTION_ATTRIBUTES
+#   define link_warning(symbol, msg)                     \
   __make_section_unallocated (".gnu.warning." #symbol)  \
   static const char __evoke_link_warning_##symbol[]     \
     __attribute__ ((section (".gnu.warning." #symbol))) = msg;
+#  else
+#   define link_warning(symbol, msg)
+#  endif
 
 #else /* !ELF */
 
