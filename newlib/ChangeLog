@@ -1,3 +1,8 @@
+2002-06-21  Richard Earnshaw  (rearnsha@arm.com)
+
+        * libc/sys/arm/sys/param.h (BIG_ENDIAN, LITTLE_ENDIAN): Define.
+        (BYTE_ORDER): Define as appropriate for the target.
+
 2002-06-21  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/config.h[__linux__]: Set _READ_WRITE_RETURN_TYPE
