@@ -132,6 +132,7 @@ UINT WINAPI GetConsoleOutputCP(void);
 BOOL WINAPI GetConsoleScreenBufferInfo(HANDLE,PCONSOLE_SCREEN_BUFFER_INFO);
 DWORD WINAPI GetConsoleTitleA(LPSTR,DWORD);
 DWORD WINAPI GetConsoleTitleW(LPWSTR,DWORD);
+HWND WINAPI GetConsoleWindow(void);
 COORD WINAPI GetLargestConsoleWindowSize(HANDLE);
 BOOL WINAPI GetNumberOfConsoleInputEvents(HANDLE,PDWORD);
 BOOL WINAPI GetNumberOfConsoleMouseButtons(PDWORD);
