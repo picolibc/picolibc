@@ -1,5 +1,20 @@
 2002-10-13  Christopher Faylor  <cgf@redhat.com>
 
+	* cygthread.cc (cygthread::stub): Reintroduce clearing of __name but do
+	it before SetEvent to eliminate a race.
+	(cygthread::terminate): Accumulate list of threads to check for
+	termination and call WaitForMultipleObjects on list rather than waiting
+	for each thread individually.
+	* sigproc.cc (subproc_init): Zap hwait_subproc thread handle since it
+	is no longer used.
+
+2002-10-13  Christopher Faylor  <cgf@redhat.com>
+
+	* spawn.cc (spawn_guts): Fix so that cygthread::terminate is *really*
+	called only for exec.
+
+2002-10-13  Christopher Faylor  <cgf@redhat.com>
+
 	* cygthread.cc (cygthread::stub): Don't zero __name here.  That
 	introduces a race.
 

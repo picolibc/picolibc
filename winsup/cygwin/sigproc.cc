@@ -805,8 +805,9 @@ subproc_init (void)
    */
   events[0] = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
   hwait_subproc = new cygthread (wait_subproc, NULL, "proc");
+  hwait_subproc->zap_h ();
   ProtectHandle (events[0]);
-  sigproc_printf ("started wait_subproc thread %p", (HANDLE) *hwait_subproc);
+  sigproc_printf ("started wait_subproc thread");
 }
 
 /* Initialize some of the memory block passed to child processes

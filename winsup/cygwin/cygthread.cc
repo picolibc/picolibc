@@ -58,6 +58,7 @@ cygthread::stub (VOID *arg)
 #ifdef DEBUGGING
 	  info->func = NULL;	// catch erroneous activation
 #endif
+	  info->__name = NULL;
 	  SetEvent (info->ev);
 	}
       switch (WaitForSingleObject (info->thread_sync, INFINITE))
@@ -313,15 +314,19 @@ cygthread::terminate ()
       (void) TerminateThread (runner_handle, 0);
       (void) WaitForSingleObject (runner_handle, INFINITE);
       (void) CloseHandle (runner_handle);
+      HANDLE hthreads[NTHREADS];
+      int n = 0;
       for (unsigned i = 0; i < NTHREADS; i++)
 	if (threads[i].h)
 	  {
+	    hthreads[n++] = threads[i].h;
 	    TerminateThread (threads[i].h, 0);
-	    (void) WaitForSingleObject (threads[i].h, INFINITE);
-	    (void) CloseHandle (threads[i].h);
-#ifdef DEBUGGING
-	    threads[i].h = NULL;
-#endif
 	  }
+      if (n)
+	{
+	  (void) WaitForMultipleObjects (n, hthreads, TRUE, INFINITE);
+	  while (--n >= 0)
+	    CloseHandle (hthreads[n]);
+	}
     }
 }
