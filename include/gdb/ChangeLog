@@ -1,5 +1,7 @@
-2002-03-10  Daniel Jacobowitz  <drow@mvista.com>
+2002-03-29  Daniel Jacobowitz  <drow@mvista.com>
 
+	Merge from trunk:
+	2002-03-10  Daniel Jacobowitz  <drow@mvista.com>
 	* signals.h: New file, from gdb/defs.h.
 
 
