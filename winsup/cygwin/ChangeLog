@@ -1,3 +1,7 @@
+2002-06-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pwdgrp.h (pwdgrp_read::~pwdgrp_read): Avoid compiler warning.
+
 2002-06-26  Christopher Faylor  <cgf@redhat.com>
 
 	* dcrt0.cc (_dcrt0): Be more defensive when reserved block is used and

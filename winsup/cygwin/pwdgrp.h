@@ -63,7 +63,8 @@ public:
   : fh (INVALID_HANDLE_VALUE), buf (NULL), lptr (NULL), eptr (NULL) {}
   virtual ~pwdgrp_read ()
   {
-    close ();
+    if (fh != INVALID_HANDLE_VALUE)
+      CloseHandle (fh);
     if (buf)
       free (buf);
   }
