@@ -1,3 +1,30 @@
+2002-09-27  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/settjmp.h: Use C++ c-header compatibility defines.
+	* include/time.h; Don't include non-ISO sys/types.h.
+	(struct tm): Define in __CSTD, if not already done.
+	(_wasctime): Qualify tm with __CSTD.
+	(_wctime): Qualify time_t with __CSTD.
+	* include/wchar.h (ctype.h): Don't #include.
+	(stdio.h): Don't #include.
+	(time.h): Don't #include.
+	(wctype.h): Include in C, but not in C++ in ANSI mode.
+	(time_t): Define in __CSTD, if not already done. Qualify
+	with __CSTD throughout.
+	(struct tm): Likewise.
+	(FILENAME_MAX): Replace with numeric constant throughout.
+	Whitespace.
+	* include/io.h (stdio.h): Don't #include.
+	(time_t): Define in __CSTD, if not already done. Qualify
+	with __CSTD throughout.
+	(FILENAME_MAX): Replace with numeric constant throughout.
+	Consolidate RC_INVOKED. __cplusplus blocks.
+	* include/sys/types.h (time_t): Define in __CSTD.
+	* include/sys/utime.h (_utimbuf, utimbuf): Qualify
+	time_t with __CSTD.
+ 	* include/dir.h: Add header guard.
+	* include/sys/time.h: Add header guard.
+
 2002-09-25  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/stdio.h (tempnam): Move out of __CSTD namespace.
@@ -11,30 +38,30 @@
 
 	* include/io.h: Move wide char prototypes together.
 	* include/string.h: Untangle wide char protototypes.
-	Use C++ c-header compatability defines.
+	Use C++ c-header compatibility defines.
 	*include/wchar.h: Copy wide char string prototypes from
 	string.h.
 	Resync with io.h.
-	* include/signal.h: Use C++ c-header compatability defines.
+	* include/signal.h: Use C++ c-header compatibility defines.
 	* include/stdio.h: Add  __HAVE_STD_CXX guard.
 
 2002-09-21  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/stdio.h: Reorder ANSI vs non-ANSI declarations
-	Use C++ c-header compatability defines.
+	Use C++ c-header compatibility defines.
 	* include/wchar.h: Likewise.
-	* include/time.h: Use C++ c-header compatability defines.
+	* include/time.h: Use C++ c-header compatibility defines.
 
 	* include/tchar.h: ANSI-fy comment.
 
 2002-09-21  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/stdlib.h: Move _Exit prototype into main C99 block.
-	Use C++ c-header compatability defines.
+	Use C++ c-header compatibility defines.
 
 2002-09-20  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/math.h: Use C++ c-header compatability defines.
+	* include/math.h: Use C++ c-header compatibility defines.
 
 	* mingwex/math/fpclassify.c: Add non-underscored alias.
 	* mingwex/math/fpclassifyf.c: Likewise.
@@ -42,15 +69,15 @@
 
 2002-09-20  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/locale.h: Use C++ c-header compatability defines.
+	* include/locale.h: Use C++ c-header compatibility defines.
 
 2002-09-20  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/_mingw.h (__BEGIN_CSTD_NAMESPACE,__END_CSTD_NAMESPACE
 	__BEGIN_CGLOBAL_NAMESPACE, __END_CGLOBAL_NAMESPACE, __CSTD,
-	__CGLOBAL): Add defines for for ISO C++ c-header compatability. 
+	__CGLOBAL): Add defines for for ISO C++ c-header compatibility. 
 
-	* include/ctype.h: Use C++ c-header compatability defines.
+	* include/ctype.h: Use C++ c-header compatibility defines.
 	* include/wctype.h: Likewise.
 
 2002-09-19  Danny Smith  <dannysmith@users.sourceforge.net>

@@ -46,8 +46,8 @@
  */
 struct _utimbuf
 {
-	time_t	actime;		/* Access time */
-	time_t	modtime;	/* Modification time */
+	__CSTD time_t	actime;		/* Access time */
+	__CSTD time_t	modtime;	/* Modification time */
 };
 
 
@@ -55,8 +55,8 @@ struct _utimbuf
 /* NOTE: Must be the same as _utimbuf above. */
 struct utimbuf
 {
-	time_t	actime;
-	time_t	modtime;
+	__CSTD time_t	actime;
+	__CSTD time_t	modtime;
 };
 #endif	/* Not _NO_OLDNAMES */
 

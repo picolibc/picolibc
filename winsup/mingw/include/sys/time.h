@@ -1,3 +1,5 @@
+#ifndef _SYS_TIME_H_
+#define _SYS_TIME_H_
 
 #include <time.h>
 
@@ -14,6 +16,9 @@ struct timeval {
 	((tvp)->tv_sec cmp (uvp)->tv_sec) : \
 	((tvp)->tv_usec cmp (uvp)->tv_usec))
 #define timerclear(tvp)	 (tvp)->tv_sec = (tvp)->tv_usec = 0
-#endif /* _TIMEVAL_DEFINED */
+#endif  /* _TIMEVAL_DEFINED */
 
-#endif /* __STRICT_ANSI__ */
+#endif  /* __STRICT_ANSI__ */
+
+#endif /* _SYS_TIME_H_ */
+

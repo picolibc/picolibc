@@ -31,16 +31,6 @@
 
 /* All the headers include this file. */
 #include <_mingw.h>
-
-/* We need the definition of FILE anyway... */
-#include <stdio.h>
-
-/* MSVC's io.h contains the stuff from dir.h, so I will too.
- * NOTE: This also defines off_t, the file offset type, through
- *       an inclusion of sys/types.h */
-
-#include <sys/types.h>	/* To get time_t. */
-
 /*
  * Attributes of files as returned by _findfirst et al.
  */
@@ -52,8 +42,29 @@
 #define	_A_SUBDIR	0x00000010
 #define	_A_ARCH		0x00000020
 
+/* TODO: Maximum number of open handles has not been tested, I just set
+ * it the same as FOPEN_MAX. */
+#define	HANDLE_MAX	20
+
+
+/* Some defines for _access nAccessMode (MS doesn't define them, but
+ * it doesn't seem to hurt to add them). */
+#define	F_OK	0	/* Check for file existence */
+#define	X_OK	1	/* Check for execute permission. */
+#define	W_OK	2	/* Check for write permission */
+#define	R_OK	4	/* Check for read permission */
+
 
 #ifndef RC_INVOKED
+
+#ifndef _TIME_T_DEFINED
+__BEGIN_CSTD_NAMESPACE
+typedef long time_t;
+__END_CSTD_NAMESPACE
+#define _TIME_T_DEFINED
+#endif
+
+__BEGIN_CGLOBAL_NAMESPACE
 
 #ifndef	_FSIZE_T_DEFINED
 typedef	unsigned long	_fsize_t;
@@ -67,46 +78,41 @@ typedef	unsigned long	_fsize_t;
 struct _finddata_t
 {
 	unsigned	attrib;		/* Attributes, see constants above. */
-	time_t		time_create;
-	time_t		time_access;	/* always midnight local time */
-	time_t		time_write;
+	__CSTD time_t	time_create;
+	__CSTD time_t	time_access;	/* always midnight local time */
+	__CSTD time_t	time_write;
 	_fsize_t	size;
-	char		name[FILENAME_MAX];	/* may include spaces. */
+	char		name[260];	/* may include spaces. */
 };
 
 struct _finddatai64_t {
-    unsigned    attrib;
-    time_t      time_create;
-    time_t      time_access;
-    time_t      time_write;
-    __int64     size;
-    char        name[FILENAME_MAX];
+    unsigned		attrib;
+    __CSTD time_t	time_create;
+    __CSTD time_t	time_access;
+    __CSTD time_t	time_write;
+    __int64		size;
+    char        name[260];
 };
-
 
 #ifndef _WFINDDATA_T_DEFINED
 struct _wfinddata_t {
     	unsigned	attrib;
-    	time_t		time_create;	/* -1 for FAT file systems */
-    	time_t		time_access;	/* -1 for FAT file systems */
-    	time_t		time_write;
+    	__CSTD time_t	time_create;	/* -1 for FAT file systems */
+    	__CSTD time_t	time_access;	/* -1 for FAT file systems */
+    	__CSTD time_t	time_write;
     	_fsize_t	size;
-    	wchar_t		name[FILENAME_MAX];	/* may include spaces. */
+    	wchar_t		name[260];	/* may include spaces. */
 };
 struct _wfinddatai64_t {
-    unsigned    attrib;
-    time_t      time_create;
-    time_t      time_access;
-    time_t      time_write;
-    __int64     size;
-    wchar_t     name[FILENAME_MAX];
+    unsigned		attrib;
+    __CSTD time_t	time_create;
+    __CSTD time_t	time_access;
+    __CSTD time_t	time_write;
+    __int64		size;
+    wchar_t		name[260];
 };
 
 #define _WFINDDATA_T_DEFINED
-#endif
-
-#ifdef	__cplusplus
-extern "C" {
 #endif
 
 /*
@@ -126,7 +132,6 @@ char*	_mktemp (char*);
 int	_rmdir (const char*);
 int _chmod (const char*, int);
 
-
 #ifdef __MSVCRT__
 __int64  _filelengthi64(int);
 long _findfirsti64(const char*, struct _finddatai64_t*);
@@ -134,7 +139,6 @@ int _findnexti64(long, struct _finddatai64_t*);
 __int64  _lseeki64(int, __int64, int);
 __int64  _telli64(int);
 #endif /* __MSVCRT__ */
-
 
 #ifndef _NO_OLDNAMES
 
@@ -148,31 +152,6 @@ int chmod (const char*, int);
 #endif /* _UWIN */
 
 #endif /* Not _NO_OLDNAMES */
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif	/* Not RC_INVOKED */
-
-
-/* TODO: Maximum number of open handles has not been tested, I just set
- * it the same as FOPEN_MAX. */
-#define	HANDLE_MAX	FOPEN_MAX
-
-
-/* Some defines for _access nAccessMode (MS doesn't define them, but
- * it doesn't seem to hurt to add them). */
-#define	F_OK	0	/* Check for file existence */
-#define	X_OK	1	/* Check for execute permission. */
-#define	W_OK	2	/* Check for write permission */
-#define	R_OK	4	/* Check for read permission */
-
-#ifndef RC_INVOKED
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
 
 int		_access (const char*, int);
 int		_chsize (int, long);
@@ -283,9 +262,7 @@ wchar_t * 	wmktemp(wchar_t *);
 #define _WIO_DEFINED
 #endif /* _WIO_DEFINED */
 
-#ifdef	__cplusplus
-}
-#endif
+__END_CGLOBAL_NAMESPACE
 
 #endif	/* Not RC_INVOKED */
 

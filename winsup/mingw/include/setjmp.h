@@ -33,10 +33,7 @@
 
 #ifndef RC_INVOKED
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
+__BEGIN_CSTD_NAMESPACE
 /*
  * The buffer used by setjmp to store the information used by longjmp
  * to perform it's evil goto-like work. The size of this buffer was
@@ -62,9 +59,8 @@ int	_setjmp (jmp_buf);
  */
 void	longjmp (jmp_buf, int);
 
-#ifdef __cplusplus
-}
-#endif
+__END_CSTD_NAMESPACE
+
 
 #endif	/* Not RC_INVOKED */
 

@@ -111,10 +111,10 @@ struct _stat
 	short	st_gid;		/* Group: Ditto */
 	_dev_t	st_rdev;	/* Seems useless (not even filled in) */
 	_off_t	st_size;	/* File size in bytes */
-	time_t	st_atime;	/* Accessed date (always 00:00 hrs local
-				 * on FAT) */
-	time_t	st_mtime;	/* Modified time */
-	time_t	st_ctime;	/* Creation time */
+	__CSTD time_t	st_atime;	/* Accessed date (always 00:00 hrs local
+					 * on FAT) */
+	__CSTD time_t	st_mtime;	/* Modified time */
+	__CSTD time_t	st_ctime;	/* Creation time */
 };
 
 struct stat
@@ -127,10 +127,10 @@ struct stat
 	short	st_gid;		/* Group: Ditto */
 	_dev_t	st_rdev;	/* Seems useless (not even filled in) */
 	_off_t	st_size;	/* File size in bytes */
-	time_t	st_atime;	/* Accessed date (always 00:00 hrs local
-				 * on FAT) */
-	time_t	st_mtime;	/* Modified time */
-	time_t	st_ctime;	/* Creation time */
+	__CSTD time_t	st_atime;	/* Accessed date (always 00:00 hrs local
+					 * on FAT) */
+	__CSTD time_t	st_mtime;	/* Modified time */
+	__CSTD time_t	st_ctime;	/* Creation time */
 };
 #if defined (__MSVCRT__)
 struct _stati64 {
@@ -142,9 +142,9 @@ struct _stati64 {
     short st_gid;
     _dev_t st_rdev;
     __int64 st_size;
-    time_t st_atime;
-    time_t st_mtime;
-    time_t st_ctime;
+    __CSTD time_t st_atime;
+    __CSTD time_t st_mtime;
+    __CSTD time_t st_ctime;
 };
 #endif /* __MSVCRT__ */
 #define _STAT_DEFINED

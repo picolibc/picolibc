@@ -30,10 +30,6 @@
 /* All the headers include this file. */
 #include <_mingw.h>
 
-#include <ctype.h>
-#include <stdio.h> /* for FILE, FILENAME_MAX */
-#include <time.h> /* for struct tm */
-
 #define __need_size_t
 #define __need_wint_t
 #define __need_wchar_t
@@ -42,10 +38,58 @@
 #include <stddef.h>
 #endif /* Not RC_INVOKED */
 
+/*
+ * FIXME: 
+ * MSDN says that isw* char classifications are in wchar.h.
+ * ISO C says they are wctype.h and ISO C++ expects them there as well.
+ * Including wctype.h here in C++ will cause the std symbols to be in
+ * global namespace as well as in std.  That is rude. 
+ */
+#if !(defined  __STRICT_ANSI__ && defined __cplusplus)
+#include <wctype.h>
+#endif
+
 #define WCHAR_MIN	0
 #define WCHAR_MAX	((wchar_t)-1)
 
 #ifndef RC_INVOKED
+
+__BEGIN_CSTD_NAMESPACE
+#ifndef _FILE_DEFINED
+#define	_FILE_DEFINED
+typedef struct _iobuf
+{
+	char*	_ptr;
+	int	_cnt;
+	char*	_base;
+	int	_flag;
+	int	_file;
+	int	_charbuf;
+	int	_bufsiz;
+	char*	_tmpfname;
+} FILE;
+#endif	/* Not _FILE_DEFINED */
+
+#ifndef _TIME_T_DEFINED
+typedef long time_t;
+#define _TIME_T_DEFINED
+#endif
+
+#ifndef _TM_DEFINED
+struct tm {
+        int tm_sec;     /* seconds after the minute - [0,59] */
+        int tm_min;     /* minutes after the hour - [0,59] */
+        int tm_hour;    /* hours since midnight - [0,23] */
+        int tm_mday;    /* day of the month - [1,31] */
+        int tm_mon;     /* months since January - [0,11] */
+        int tm_year;    /* years since 1900 */
+        int tm_wday;    /* days since Sunday - [0,6] */
+        int tm_yday;    /* days since January 1 - [0,365] */
+        int tm_isdst;   /* daylight savings time flag */
+        };
+#define _TM_DEFINED
+#endif
+__END_CSTD_NAMESPACE
 
 #ifndef _WSTDIO_DEFINED
 __BEGIN_CSTD_NAMESPACE
@@ -174,7 +218,6 @@ __END_CGLOBAL_NAMESPACE
 #define _WSTRING_DEFINED
 #endif  /* _WSTRING_DEFINED */
 
-
 #ifndef __STRICT_ANSI__
 __BEGIN_CGLOBAL_NAMESPACE
 /*
@@ -189,19 +232,19 @@ typedef	unsigned long	_fsize_t;
 #ifndef _WFINDDATA_T_DEFINED
 struct _wfinddata_t {
     	unsigned	attrib;
-    	time_t		time_create;	/* -1 for FAT file systems */
-    	time_t		time_access;	/* -1 for FAT file systems */
-    	time_t		time_write;
+    	__CSTD time_t	time_create;	/* -1 for FAT file systems */
+    	__CSTD time_t	time_access;	/* -1 for FAT file systems */
+    	__CSTD time_t	time_write;
     	_fsize_t	size;
-    	wchar_t		name[FILENAME_MAX];	/* may include spaces. */
+    	wchar_t		name[260];	/* may include spaces. */
 };
 struct _wfinddatai64_t {
-    unsigned    attrib;
-    time_t      time_create;
-    time_t      time_access;
-    time_t      time_write;
-    __int64     size;
-    wchar_t     name[FILENAME_MAX];
+    unsigned		attrib;
+    __CSTD time_t	time_create;
+    __CSTD time_t	time_access;
+    __CSTD time_t	time_write;
+    __int64		size;
+    wchar_t		name[260];
 };
 #define _WFINDDATA_T_DEFINED
 #endif
@@ -271,10 +314,10 @@ struct _stat
 	short	st_gid;		/* Group: Ditto */
 	_dev_t	st_rdev;	/* Seems useless (not even filled in) */
 	_off_t	st_size;	/* File size in bytes */
-	time_t	st_atime;	/* Accessed date (always 00:00 hrs local
-				 * on FAT) */
-	time_t	st_mtime;	/* Modified time */
-	time_t	st_ctime;	/* Creation time */
+	__CSTD time_t	st_atime;	/* Accessed date (always 00:00 hrs local
+					 * on FAT) */
+	__CSTD time_t	st_mtime;	/* Modified time */
+	__CSTD time_t	st_ctime;	/* Creation time */
 };
 
 struct stat
@@ -287,10 +330,10 @@ struct stat
 	short	st_gid;		/* Group: Ditto */
 	_dev_t	st_rdev;	/* Seems useless (not even filled in) */
 	_off_t	st_size;	/* File size in bytes */
-	time_t	st_atime;	/* Accessed date (always 00:00 hrs local
-				 * on FAT) */
-	time_t	st_mtime;	/* Modified time */
-	time_t	st_ctime;	/* Creation time */
+	__CSTD time_t	 st_atime;	/* Accessed date (always 00:00 hrs local
+					 * on FAT) */
+	__CSTD time_t	st_mtime;	/* Modified time */
+	__CSTD time_t	st_ctime;	/* Creation time */
 };
 #if defined (__MSVCRT__) 
 struct _stati64 {
@@ -302,9 +345,9 @@ struct _stati64 {
     short st_gid;
     _dev_t st_rdev;
     __int64 st_size;
-    time_t st_atime;
-    time_t st_mtime;
-    time_t st_ctime;
+    __CSTD time_t st_atime;
+    __CSTD time_t st_mtime;
+    __CSTD time_t st_ctime;
     };
 #endif  /* __MSVCRT__ */
 
@@ -327,14 +370,13 @@ wchar_t* _wsetlocale (int, const wchar_t*);
 __END_CGLOBAL_NAMESPACE
 #endif /* __STRICT_ANSI__ */
 
-
 #ifndef _WTIME_DEFINED
 __BEGIN_CGLOBAL_NAMESPACE
 #ifdef __MSVCRT__
 #ifndef __STRICT_ANSI__
 /* wide function prototypes, also declared in time.h */
-wchar_t*	_wasctime (const struct tm*);
-wchar_t*	_wctime (const time_t*);
+wchar_t*	_wasctime (const struct __CSTD tm*);
+wchar_t*	_wctime (const __CSTD time_t*);
 wchar_t*	_wstrdate (wchar_t*);
 wchar_t*	_wstrtime (wchar_t*);
 #endif /* __MSVCRT__ */

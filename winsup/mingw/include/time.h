@@ -36,12 +36,6 @@
 #ifndef RC_INVOKED
 #include <stddef.h>
 #endif	/* Not RC_INVOKED */
-
-/*
- * Need a definition of time_t.
- */
-#include <sys/types.h>
-
 /*
  * Number of clock ticks per second. A clock tick is the unit by which
  * processor time is measured and is returned by 'clock'.
@@ -57,7 +51,7 @@ __BEGIN_CSTD_NAMESPACE
 /*
  * A type for storing the current time and date. This is the number of
  * seconds since midnight Jan 1, 1970.
- * NOTE: Normally this is defined by the above include of sys/types.h
+ * NOTE: This is also defined in non-ISO sys/types.h
  */
 #ifndef _TIME_T_DEFINED
 typedef	long	time_t;
@@ -77,6 +71,7 @@ typedef	long	clock_t;
  * A structure for storing all kinds of useful information about the
  * current (or another) time.
  */
+#ifndef _TM_DEFINED
 struct tm
 {
 	int	tm_sec;		/* Seconds: 0-59 (K&R says 0-61?) */
@@ -90,7 +85,8 @@ struct tm
 	int	tm_isdst;	/* +1 Daylight Savings Time, 0 No DST,
 				 * -1 don't know */
 };
-
+#define _TM_DEFINED
+#endif
 
 clock_t	clock (void);
 time_t	time (time_t*);
@@ -188,8 +184,8 @@ __MINGW_IMPORT char 	*tzname[2];
 
 /* wide function prototypes, also declared in wchar.h */
 
-wchar_t *	_wasctime(const struct tm*);
-wchar_t *	_wctime(const time_t*);
+wchar_t *	_wasctime(const struct __CSTD tm*);
+wchar_t *	_wctime(const __CSTD time_t*);
 wchar_t*	_wstrdate(wchar_t*);
 wchar_t*	_wstrtime(wchar_t*);
 

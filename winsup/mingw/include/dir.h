@@ -21,6 +21,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  */
-
+#ifndef _DIR_H_
+#define _DIR_H_
 #include <io.h>
-
+#endif

@@ -40,8 +40,11 @@
 
 #ifndef RC_INVOKED
 
+
 #ifndef _TIME_T_DEFINED
+__BEGIN_CSTD_NAMESPACE
 typedef	long	time_t;
+__END_CSTD_NAMESPACE
 #define	_TIME_T_DEFINED
 #endif
 
