@@ -12,6 +12,7 @@ details. */
 
 #include <sys/ioctl.h>
 #include <fcntl.h>
+#include <ntdef.h>
 
 enum executable_states
 {
@@ -191,6 +192,7 @@ class path_conv
 
   ~path_conv ();
   inline char *get_win32 () { return path; }
+  PUNICODE_STRING get_nt_native_path (UNICODE_STRING &upath, WCHAR *wpath);
   operator char *() {return path;}
   operator const char *() {return path;}
   operator DWORD &() {return fileattr;}

@@ -286,6 +286,10 @@ normalize_posix_path (const char *src, char *dst, char **tail)
     }
 
 done:
+  /* Remove trailing dots and spaces which are ignored by Win32 functions but
+     not by native NT functions. */
+  while (dst[-1] == '.' || dst[-1] == ' ')
+    --dst;
   *dst = '\0';
   *tail = dst;
 
@@ -456,6 +460,30 @@ path_conv::set_normalized_path (const char *path_copy)
       normalized_path_size = 0;
     }
   memcpy (normalized_path, path_copy, n);
+}
+
+PUNICODE_STRING
+path_conv::get_nt_native_path (UNICODE_STRING &upath, WCHAR *wpath)
+{
+  if (path[0] != '\\')             /* X:\...  or NUL, etc. */
+    {
+      str2buf2uni (upath, wpath, "\\??\\");
+      str2buf2uni_cat (upath, path);
+    }
+  else if (path[1] != '\\')        /* \Device\... */
+    str2buf2uni (upath, wpath, path);
+  else if (path[2] != '.' 
+	   || path[3] != '\\')     /* \\server\share\... */
+    {
+      str2buf2uni (upath, wpath, "\\??\\UNC\\");
+      str2buf2uni_cat (upath, path + 2);
+    }        
+  else                                          /* \\.\device */
+    {
+      str2buf2uni (upath, wpath, "\\??\\");
+      str2buf2uni_cat (upath, path + 4);
+    }
+  return &upath;
 }
 
 /* Convert an arbitrary path SRC to a pure Win32 path, suitable for

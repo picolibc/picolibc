@@ -555,26 +555,8 @@ fhandler_base::open (int flags, mode_t mode)
       goto done;
     }
 
-  if (get_win32_name ()[0] != '\\')		/* X:\...  or NUL, etc. */
-    {
-      str2buf2uni (upath, wpath, "\\??\\");
-      str2buf2uni_cat (upath, get_win32_name ());
-    }
-  else if (get_win32_name ()[1] != '\\')	/* \Device\... */
-    str2buf2uni (upath, wpath, get_win32_name ());
-  else if (get_win32_name ()[2] != '.'
-  	   || get_win32_name ()[3] != '\\')	/* \\server\share\... */
-    {
-      str2buf2uni (upath, wpath, "\\??\\UNC\\");
-      str2buf2uni_cat (upath, get_win32_name () + 2);
-    }
-  else						/* \\.\device */
-    {
-      str2buf2uni (upath, wpath, "\\??\\");
-      str2buf2uni_cat (upath, get_win32_name () + 4);
-    }
-
-  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+  InitializeObjectAttributes (&attr, pc.get_nt_native_path (upath, wpath),
+			      OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
 			      sa.lpSecurityDescriptor, NULL);
 
   switch (query_open ())

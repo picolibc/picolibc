@@ -1,5 +1,13 @@
 2004-04-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::open): Call path_conv::get_nt_native_path
+	for evaluating NT path.
+	* path.cc (normalize_posix_path): Remove trailing dots and spaces.
+	(path_conv::get_nt_native_path): New function.
+	* path.h (class path_conv): Declare get_nt_native_path method.
+
+2004-04-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (fhandler_base::open): Fix NT native path evaluation
 	to allow opening serial ports.
 
