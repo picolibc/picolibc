@@ -171,12 +171,12 @@ main (int argc, char *argv[])
   external_pinfo *p;
   int aflag, lflag, fflag, sflag, uid;
   cygwin_getinfo_types query = CW_GETPINFO;
-  const char *dtitle = "  PID TTY     STIME COMMAND\n";
-  const char *dfmt   = "%5d%4d%10s %s\n";
-  const char *ftitle = "     UID   PID  PPID TTY     STIME COMMAND\n";
-  const char *ffmt   = "%8.8s%6d%6d%4d%10s %s\n";
-  const char *ltitle = "    PID  PPID  PGID   WINPID TTY  UID    STIME COMMAND\n";
-  const char *lfmt   = "%c %5d %5d %5d %8u %3d %4d %8s %s\n";
+  const char *dtitle = "    PID TTY     STIME COMMAND\n";
+  const char *dfmt   = "%7d%4d%10s %s\n";
+  const char *ftitle = "     UID     PID    PPID TTY     STIME COMMAND\n";
+  const char *ffmt   = "%8.8s%8d%8d%4d%10s %s\n";
+  const char *ltitle = "      PID    PPID    PGID   WINPID TTY  UID    STIME COMMAND\n";
+  const char *lfmt   = "%c %7d %7d %7d %8u %3d %4d %8s %s\n";
   char ch;
 
   aflag = lflag = fflag = sflag = 0;

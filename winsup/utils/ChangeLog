@@ -1,3 +1,7 @@
+Tue Oct 17 23:49:04 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* ps.cc (main): Add some extra space to pid output for Windows 95.
+
 Tue Oct 17  1:09:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	Patch suggested by Brad Town <btown@ceddec.com>:
