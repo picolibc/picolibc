@@ -1,3 +1,8 @@
+2000-05-17  DJ Delorie  <dj@cygnus.com>
+
+	* testsuite/winsup.api/crlf.c: New
+	* testsuite/winsup.api/iospeed.c: New
+
 Wed May 17 01:05:52 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (mount_info::cygdrive_posix_path): Don't add trailing slash
