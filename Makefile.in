@@ -500,7 +500,6 @@ EXTRA_GCC_FLAGS = \
 	"`echo 'LANGUAGES=$(LANGUAGES)' | sed -e s/.*=$$/XFOO=/`" \
 	"`echo 'STMP_FIXPROTO=$(STMP_FIXPROTO)' | sed -e s/.*=$$/XFOO=/`" \
 	"`echo 'LIMITS_H_TEST=$(LIMITS_H_TEST)' | sed -e s/.*=$$/XFOO=/`" \
-	"`echo 'LIBGCC1_TEST=$(LIBGCC1_TEST)' | sed -e s/.*=$$/XFOO=/`" \
 	"`echo 'LIBGCC2_CFLAGS=$(LIBGCC2_CFLAGS)' | sed -e s/.*=$$/XFOO=/`" \
 	"`echo 'LIBGCC2_DEBUG_CFLAGS=$(LIBGCC2_DEBUG_CFLAGS)' | sed -e s/.*=$$/XFOO=/`" \
 	"`echo 'LIBGCC2_INCLUDES=$(LIBGCC2_INCLUDES)' | sed -e s/.*=$$/XFOO=/`" \
@@ -525,7 +524,6 @@ CONFIGURE_BUILD_MODULES = \
 # This is a list of the targets for all of the modules which are compiled
 # using $(FLAGS_TO_PASS).
 ALL_MODULES = \
-	all-apache \
 	all-ash \
 	all-autoconf \
 	all-automake \
@@ -607,7 +605,6 @@ NATIVE_CHECK_MODULES = \
 	check-zip
 
 CROSS_CHECK_MODULES = \
-	check-apache \
 	check-ash \
 	check-autoconf \
 	check-automake \
@@ -676,7 +673,6 @@ CHECK_MODULES=$(NATIVE_CHECK_MODULES) $(CROSS_CHECK_MODULES)
 # We put install-tcl before install-itcl because itcl wants to run a
 # program on installation which uses the Tcl libraries.
 INSTALL_MODULES = \
-	install-apache \
 	install-ash \
 	install-autoconf \
 	install-automake \
@@ -744,8 +740,6 @@ INSTALL_MODULES = \
 # This is a list of the targets for all of the modules which are compiled
 # using $(X11_FLAGS_TO_PASS).
 ALL_X11_MODULES = \
-	all-emacs \
-	all-emacs19 \
 	all-gdb \
 	all-expect \
 	all-guile \
@@ -756,7 +750,6 @@ ALL_X11_MODULES = \
 # This is a list of the check targets for all of the modules which are
 # compiled using $(X11_FLAGS_TO_PASS).
 CHECK_X11_MODULES = \
-	check-emacs \
 	check-gdb \
 	check-guile \
 	check-expect \
@@ -767,8 +760,6 @@ CHECK_X11_MODULES = \
 # This is a list of the install targets for all the modules which are
 # compiled using $(X11_FLAGS_TO_PASS).
 INSTALL_X11_MODULES = \
-	install-emacs \
-	install-emacs19 \
 	install-gdb \
 	install-guile \
 	install-expect \
@@ -856,7 +847,6 @@ INSTALL_TARGET_MODULES = \
 
 # This is a list of the targets for which we can do a clean-{target}.
 CLEAN_MODULES = \
-	clean-apache \
 	clean-ash \
 	clean-autoconf \
 	clean-automake \
@@ -945,8 +935,6 @@ CLEAN_TARGET_MODULES = \
 
 # All of the x11 modules that can be cleaned
 CLEAN_X11_MODULES = \
-	clean-emacs \
-	clean-emacs19 \
 	clean-gdb \
 	clean-expect \
 	clean-guile \
@@ -1696,7 +1684,6 @@ ALL_GCC_C = $(ALL_GCC) all-target-newlib all-target-libgloss
 ALL_GCC_CXX = $(ALL_GCC_C) all-target-libstdc++-v3
 
 # This is a list of inter-dependencies among modules.
-all-apache:
 all-ash:
 all-autoconf: all-m4 all-texinfo
 all-automake: all-m4 all-texinfo
@@ -1716,8 +1703,6 @@ all-target-cygmon: configure-target-cygmon all-target-libiberty all-target-libst
 all-db:
 all-dejagnu: all-tcl all-expect all-tk
 all-diff: all-libiberty
-all-emacs:
-all-emacs19: all-bison all-byacc
 all-etc:
 configure-target-examples: $(ALL_GCC_C)
 all-target-examples: configure-target-examples
@@ -1746,7 +1731,6 @@ all-hello: all-libiberty
 all-indent:
 all-inet: all-tcl all-send-pr all-perl
 all-intl:
-all-ispell: all-emacs19
 all-itcl: all-tcl all-tk
 all-ld: all-libiberty all-bfd all-opcodes all-bison all-byacc all-flex all-intl
 configure-target-libgloss: $(ALL_GCC)

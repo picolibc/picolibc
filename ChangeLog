@@ -1,3 +1,20 @@
+2002-07-01  Nathanael Nerode <neroden@gcc.gnu.org>
+
+	* Makefile.in: Eliminate 'apache' targets.
+	* configure.in: Eliminate 'apache' targets.
+
+	* configure.in: Eliminate redundant tests.  Reorganize.
+
+	* Makefile.in: Eliminate last reference to LIBGCC1_TEST.
+
+	* config-ml.in: Eliminate references to Cygnus configure.
+
+	* Makefile.in: Eliminate references to building emacs.
+
+2002-07-01  Denis Chertykov  <denisc@overta.ru>
+
+	* configure.in: Add support for ip2k.
+
 2002-06-24  Ben Elliston  <bje@redhat.com>
 
 	* configure.in (host_tools): Remove cgen.
