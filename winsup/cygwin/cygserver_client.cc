@@ -350,7 +350,7 @@ client_request::make_request ()
 
   assert (transport);
 
-  if (!transport->connect ())
+  if (transport->connect () == -1)
     {
       if (errno)
 	error_code (errno);

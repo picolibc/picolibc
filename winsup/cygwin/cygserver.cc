@@ -445,6 +445,20 @@ private:
 void
 server_submission_loop::request_loop ()
 {
+  /* I'd like the accepting thread's priority to be above any "normal"
+   * thread in the system to avoid overflowing the listen queue (for
+   * sockets; similar issues exist for named pipes); but, for example,
+   * a normal priority thread in a foregrounded process is boosted to
+   * THREAD_PRIORITY_HIGHEST (AFAICT).  Thus try to set the current
+   * thread's priority to a level one above that.  This fails on
+   * win9x/ME so assume any failure in that call is due to that and
+   * simply call again at one priority level lower.
+   */
+  if (!SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_HIGHEST + 1))
+    if (!SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_HIGHEST))
+      debug_printf ("failed to raise accept thread priority, error = %lu",
+		    GetLastError ());
+
   while (_running)
     {
       bool recoverable = false;
@@ -453,6 +467,24 @@ server_submission_loop::request_loop ()
 	{
 	  system_printf ("fatal error on IPC transport: closing down");
 	  return;
+	}
+      // EINTR probably implies a shutdown request; so back off for a
+      // moment to let the main thread take control, otherwise the
+      // server spins here receiving EINTR repeatedly since the signal
+      // handler in the main thread doesn't get a chance to be called.
+      if (!conn && errno == EINTR)
+	{
+	  if (!SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_NORMAL))
+	    debug_printf ("failed to reset thread priority, error = %lu",
+			  GetLastError ());
+
+	  Sleep (0);
+	  if (!SetThreadPriority (GetCurrentThread (),
+				  THREAD_PRIORITY_HIGHEST + 1))
+	    if (!SetThreadPriority (GetCurrentThread (),
+				    THREAD_PRIORITY_HIGHEST))
+	      debug_printf ("failed to raise thread priority, error = %lu",
+			    GetLastError ());
 	}
       if (conn)
 	_queue->add (safe_new (server_request, conn, _cache));
@@ -650,7 +682,7 @@ main (const int argc, char *argv[])
       if (req.make_request () == -1 || req.error_code ())
 	{
 	  fprintf (stderr, "%s: shutdown request failed: %s\n",
-		   pgm, strerror (errno));
+		   pgm, strerror (req.error_code ()));
 	  exit (1);
 	}
 
@@ -659,12 +691,26 @@ main (const int argc, char *argv[])
       return 0;
     }
 
-  if (signal (SIGINT, handle_signal) == SIG_ERR)
-    {
-      system_printf ("could not install signal handler (%d)- aborting startup",
-		     errno);
-      exit (1);
-    }
+#define SIGHANDLE(SIG)							\
+  do									\
+    {									\
+      struct sigaction act;						\
+									\
+      act.sa_handler = &handle_signal;					\
+      act.sa_mask = 0;							\
+      act.sa_flags = 0;							\
+									\
+      if (sigaction (SIG, &act, NULL) == -1)				\
+	{								\
+	  system_printf ("failed to install handler for " #SIG ": %s",	\
+			 strerror (errno));				\
+	  exit (1);							\
+	}								\
+    } while (false)
+
+  SIGHANDLE (SIGHUP);
+  SIGHANDLE (SIGINT);
+  SIGHANDLE (SIGTERM);
 
   print_version (pgm);
   setbuf (stdout, NULL);
@@ -686,7 +732,10 @@ main (const int argc, char *argv[])
   request_queue.add_submission_loop (&submission_loop);
   printf (".");
 
-  transport->listen ();
+  if (transport->listen () == -1)
+    {
+      exit (1);
+    }
   printf (".");
 
   cache.start ();

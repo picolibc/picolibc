@@ -59,9 +59,11 @@ initialise_pipe_instance_lock ()
 transport_layer_pipes::transport_layer_pipes (const HANDLE hPipe)
   : _pipe_name (""),
     _hPipe (hPipe),
-    _is_accepted_endpoint (true)
+    _is_accepted_endpoint (true),
+    _is_listening_endpoint (false)
 {
-  assert (_hPipe && _hPipe != INVALID_HANDLE_VALUE);
+  assert (_hPipe);
+  assert (_hPipe != INVALID_HANDLE_VALUE);
 
   init_security ();
 }
@@ -71,7 +73,8 @@ transport_layer_pipes::transport_layer_pipes (const HANDLE hPipe)
 transport_layer_pipes::transport_layer_pipes ()
   : _pipe_name ("\\\\.\\pipe\\cygwin_lpc"),
     _hPipe (NULL),
-    _is_accepted_endpoint (false)
+    _is_accepted_endpoint (false),
+    _is_listening_endpoint (false)
 {
   init_security ();
 }
@@ -86,10 +89,9 @@ transport_layer_pipes::init_security ()
   InitializeSecurityDescriptor (&_sd, SECURITY_DESCRIPTOR_REVISION);
   SetSecurityDescriptorDacl (&_sd, TRUE, NULL, FALSE);
 
-  _sec_none_nih.nLength = _sec_all_nih.nLength = sizeof (SECURITY_ATTRIBUTES);
-  _sec_none_nih.bInheritHandle = _sec_all_nih.bInheritHandle = FALSE;
-  _sec_none_nih.lpSecurityDescriptor = NULL;
+  _sec_all_nih.nLength = sizeof (SECURITY_ATTRIBUTES);
   _sec_all_nih.lpSecurityDescriptor = &_sd;
+  _sec_all_nih.bInheritHandle = FALSE;
 }
 
 transport_layer_pipes::~transport_layer_pipes ()
@@ -99,19 +101,22 @@ transport_layer_pipes::~transport_layer_pipes ()
 
 #ifndef __INSIDE_CYGWIN__
 
-void
+int
 transport_layer_pipes::listen ()
 {
-  assert (!_is_accepted_endpoint);
   assert (!_hPipe);
+  assert (!_is_accepted_endpoint);
+  assert (!_is_listening_endpoint);
   /* no-op */
+  return 0;
 }
 
 class transport_layer_pipes *
 transport_layer_pipes::accept (bool *const recoverable)
 {
-  assert (!_is_accepted_endpoint);
   assert (!_hPipe);
+  assert (!_is_accepted_endpoint);
+  assert (_is_listening_endpoint);
 
   pthread_once (&pipe_instance_lock_once, &initialise_pipe_instance_lock);
 
@@ -145,8 +150,8 @@ transport_layer_pipes::accept (bool *const recoverable)
   if (duplicate)
     {
       *recoverable = false;
-      system_printf ("failure creating named pipe: "
-		     "is there another instance of the server running?");
+      system_printf ("failed to create named pipe: "
+		     "is the daemon already running?");
       return NULL;
     }
 
@@ -213,13 +218,9 @@ transport_layer_pipes::read (void *const buf, const size_t len)
 {
   // verbose: debug_printf ("reading from pipe %p", _hPipe);
 
-  if (!_hPipe)
-    {
-      set_errno (EBADF);
-      return -1;
-    }
-
+  assert (_hPipe);
   assert (_hPipe != INVALID_HANDLE_VALUE);
+  assert (!_is_listening_endpoint);
 
   DWORD count;
   if (!ReadFile (_hPipe, buf, len, &count, NULL))
@@ -237,13 +238,9 @@ transport_layer_pipes::write (void *const buf, const size_t len)
 {
   // verbose: debug_printf ("writing to pipe %p", _hPipe);
 
-  if (!_hPipe)
-    {
-      set_errno (EBADF);
-      return -1;
-    }
-
+  assert (_hPipe);
   assert (_hPipe != INVALID_HANDLE_VALUE);
+  assert (!_is_listening_endpoint);
 
   DWORD count;
   if (!WriteFile (_hPipe, buf, len, &count, NULL))
@@ -265,16 +262,12 @@ transport_layer_pipes::write (void *const buf, const size_t len)
  * congestion and overloading problems.
  */
 
-bool
+int
 transport_layer_pipes::connect ()
 {
-  if (_hPipe)
-    {
-      assert (_hPipe != INVALID_HANDLE_VALUE);
-
-      debug_printf ("Already have a pipe in this %p",this);
-      return false;
-    }
+  assert (!_hPipe);
+  assert (!_is_accepted_endpoint);
+  assert (!_is_listening_endpoint);
 
   static bool assume_cygserver = false;
 
@@ -298,17 +291,16 @@ transport_layer_pipes::connect ()
 	  ProtectHandle (_hPipe);
 #endif
 	  assume_cygserver = true;
-	  return true;
+	  return 0;
 	}
+
+      _hPipe = NULL;
 
       if (!assume_cygserver && GetLastError () != ERROR_PIPE_BUSY)
 	{
 	  debug_printf ("Error opening the pipe (%lu)", GetLastError ());
-	  _hPipe = NULL;
-	  return false;
+	  return -1;
 	}
-
-      _hPipe = NULL;
 
       /* Note: `If no instances of the specified named pipe exist, the
        * WaitNamedPipe function returns immediately, regardless of the
@@ -332,7 +324,7 @@ transport_layer_pipes::connect ()
 
   assume_cygserver = false;
 
-  return false;
+  return -1;
 }
 
 #ifndef __INSIDE_CYGWIN__
@@ -340,6 +332,8 @@ transport_layer_pipes::connect ()
 void
 transport_layer_pipes::impersonate_client ()
 {
+  assert (_hPipe);
+  assert (_hPipe != INVALID_HANDLE_VALUE);
   assert (_is_accepted_endpoint);
 
   // verbose: debug_printf ("impersonating pipe %p", _hPipe);

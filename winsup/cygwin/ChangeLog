@@ -1,5 +1,57 @@
 2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* include/cygwin/cygserver_transport.h
+	(transport_layer_base::listen): Change return type.
+	(transport_layer_base::connect): Ditto.
+	* include/cygwin/cygserver_transport_pipes.h
+	(transport_layer_pipes::listen): Change return type.
+	(transport_layer_pipes::connect): Ditto.
+	(transport_layer_pipes::_sec_none_nih): Remove unused field.
+	(transport_layer_pipes::_is_listening_endpoint): New field.
+	* cygserver_transport_pipes.cc: Synchronize with sockets code.
+	(transport_layer_pipes::transport_layer_pipes): Initialise new
+	field.  Separate out asserts.
+	(transport_layer_pipes::listen): Change return type.  Add asserts.
+	(transport_layer_pipes::accept): Add asserts.
+	(transport_layer_pipes::read): Change conditional to an assert.
+	Add assert.
+	(transport_layer_pipes::write): Ditto.
+	(transport_layer_pipes::connect): Change return type.  Change
+	conditional to an assert.  Add asserts.  Rationalize error code
+	slightly.
+	(transport_layer_pipes::impersonate_client): Add asserts.
+	* include/cygwin/cygserver_transport_sockets.h
+	(transport_layer_sockets::listen): Change return type.
+	(transport_layer_sockets::connect): Ditto.
+	(transport_layer_sockets::_addr): Change type of field.
+	(transport_layer_sockets::_addr_len): Ditto.
+	(transport_layer_sockets::_is_accepted_endpoint): New field.
+	(transport_layer_sockets::_is_listening_endpoint): Ditto.
+	* cygserver_transport_sockets.cc
+	(MAX_CONNECT_RETRY): New constant.
+	(transport_layer_sockets::transport_layer_sockets): Initialise new
+	fields.  Only initialise the socket address where necessary.
+	(transport_layer_sockets::listen): Change return type.  Rewrite.
+	(transport_layer_sockets::accept): Add asserts.  Add tracing
+	statements.  Use a local variable to hold the accepted address.
+	(transport_layer_sockets::close): Add tracing statements.  Unlink
+	the UNIX domain socket file as appropriate.  Close the socket
+	cleanly.
+	(transport_layer_sockets::read): Rewrite method.
+	(transport_layer_sockets::write): Ditto.
+	(transport_layer_sockets::connect): Change return type.  Rewrite.
+	* cygserver.cc (server_submission_loop::request_loop): Run the
+	listening thread at high priority with special handling for
+	shutdown.
+	(main): Print the request error code rather than errno in shutdown
+	request code.  Install signal handlers with sigaction(2) to avoid
+	setting SA_RESTART.  Check value of the listen method call, now it
+	has one.
+	* cygserver_client.cc (client_request::make_request): Check new
+	return value on connect method call.
+
+2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* include/cygwin/cygserver_transport_pipes.h
 	(cygserver_transport_pipes::_sd): Rename field.
 	(cygserver_transport_pipes::_sec_none_nih): Ditto.
@@ -412,7 +464,7 @@
 	the SHM_INFO command.
 	(server_shmmgr::shmget): Check `shmflg' against the mode of
 	existing segments as per Stevens 1990, p. 123.
-	(server_shmmgr::server_shmmgr): Initialize the new `_shm_tot'
+	(server_shmmgr::server_shmmgr): Initialise the new `_shm_tot'
 	field.
 	(server_shmmgr::new_segment): Set ENOMEM if CreateFileMapping
 	fails.  Pass `size' to new_segment.
