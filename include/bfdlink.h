@@ -246,6 +246,12 @@ struct bfd_link_info
   /* The function to call when the executable or shared object is
      unloaded.  */
   const char *fini_function;
+
+  /* May be used to set DT_FLAGS for ELF. */
+  bfd_vma flags;
+
+  /* May be used to set DT_FLAGS_1 for ELF. */
+  bfd_vma flags_1;
 };
 
 /* This structures holds a set of callback functions.  These are

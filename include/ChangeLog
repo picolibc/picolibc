@@ -1,3 +1,7 @@
+2000-07-19  H.J. Lu  (hjl@gnu.org)
+
+	* bfdlink.h (bfd_link_info): Add flags and flags_1.
+
 2000-06-05  DJ Delorie  <dj@redhat.com>
 
 	* MAINTAINERS: new
