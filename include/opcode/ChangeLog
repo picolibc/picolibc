@@ -1,3 +1,16 @@
+2002-08-19  Elena Zannoni <ezannoni@redhat.com>
+ 
+        From matthew green  <mrg@redhat.com>
+
+        * ppc.h (PPC_OPCODE_SPE): New opcode flag for Powerpc e500
+	instructions.
+        (PPC_OPCODE_ISEL, PPC_OPCODE_BRLOCK, PPC_OPCODE_PMR,
+	PPC_OPCODE_CACHELCK, PPC_OPCODE_RFMCI): New opcode flags for the
+	e500x2 Integer select, branch locking, performance monitor,
+	cache locking and machine check APUs, respectively.
+	(PPC_OPCODE_EFS): New opcode type for efs* instructions.
+	(PPC_OPCODE_CLASSIC): New opcode type for Classic PowerPC instructions.
+
 2002-08-13  Stephane Carrez  <stcarrez@nerim.fr>
 
 	* m68hc11.h (M6812_OP_PAGE): Define to identify call operand.
