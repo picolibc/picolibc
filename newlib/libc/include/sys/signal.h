@@ -237,25 +237,30 @@ int _EXFUN(sigqueue, (pid_t pid, int signo, const union sigval value));
 #define	SIGTERM	15	/* software termination signal from kill */
 
 #if defined(__rtems__)
-#define SIGUSR1 16  /* reserved as application defined signal 1 */
-#define SIGUSR2 17  /* reserved as application defined signal 2 */
-
-#define __SIGFIRSTNOTRT SIGHUP
-#define __SIGLASTNOTRT  SIGUSR2
-
-/* RTEMS does not support job control, hence no Job Control Signals are
-   defined per P1003.1b-1993, p. 60-61.
-
-   RTEMS does not support memory protection, hence no Memory Protection
-   Signals are defined per P1003.1b-1993, p. 60-61. */
+#define	SIGURG	16	/* urgent condition on IO channel */
+#define	SIGSTOP	17	/* sendable stop signal not from tty */
+#define	SIGTSTP	18	/* stop signal from tty */
+#define	SIGCONT	19	/* continue a stopped process */
+#define	SIGCHLD	20	/* to parent on child stop or exit */
+#define	SIGCLD	20	/* System V name for SIGCHLD */
+#define	SIGTTIN	21	/* to readers pgrp upon background tty read */
+#define	SIGTTOU	22	/* like TTIN for output if (tp->t_local&LTOSTOP) */
+#define	SIGIO	23	/* input/output possible signal */
+#define	SIGPOLL	SIGIO	/* System V name for SIGIO */
+#define	SIGWINCH 24	/* window changed */
+#define	SIGUSR1 25	/* user defined signal 1 */
+#define	SIGUSR2 26	/* user defined signal 2 */
 
 /* Real-Time Signals Range, P1003.1b-1993, p. 61
    NOTE: By P1003.1b-1993, this should be at least RTSIG_MAX
          (which is a minimum of 8) signals.
  */
+#define SIGRTMIN 27
+#define SIGRTMAX 31
+#define __SIGFIRSTNOTRT SIGHUP
+#define __SIGLASTNOTRT  SIGUSR2
 
-#define SIGRTMIN 18
-#define SIGRTMAX 32
+#define NSIG	32      /* signal 0 implied */
 
 #elif defined(__svr4__)
 /* svr4 specifics. different signals above 15, and sigaction. */

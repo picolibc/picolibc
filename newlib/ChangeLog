@@ -1,3 +1,13 @@
+2004-01-08  Joel Sherrill  <joel@oarcorp.com>
+
+        * libc/sys/rtems/sys/queue.h: New file.
+        * libc/include/sys/signal.h: Reflect renumbering of signals to
+        fit into 32-bit mask.
+        * libc/include/sys/unistd.h: Add fdatasync() prototype.
+        * libc/sys/rtems/crt0.c: Add more symbols which may be implicitly
+        required.  In particular, add the reentrant variants of libc calls.
+        * libc/sys/rtems/sys/dirent.h: Add scandir() prototype.
+
 2004-01-06  Mark Mitchell  <mark@codesourcery.com>
 
 	* libc/sys/arm/syscalls.c (unistd.h): Include it.

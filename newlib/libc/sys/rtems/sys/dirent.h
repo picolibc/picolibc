@@ -44,6 +44,12 @@ struct dirent {
 	char		d_name[NAME_MAX + 1];
 };
 
+int scandir ( const char *dirname,
+   struct dirent *** namelist,
+   int (*select)(struct dirent *),
+   int (*dcomp)(const struct dirent **, const struct dirent **)
+);
+
 #ifdef __cplusplus
 }
 #endif 
