@@ -3,6 +3,12 @@
 #ifndef _SYS_SIGNAL_H
 #define _SYS_SIGNAL_H
 
+#ifndef _SIGNAL_H_
+/* Some applications take advantage of the fact that <sys/signal.h>
+ * and <signal.h> are equivalent in glibc.  Allow for that here.  */
+#include <signal.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

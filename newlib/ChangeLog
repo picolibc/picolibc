@@ -1,3 +1,10 @@
+2004-10-08  Jeff Johnston  <jjohnstn@redhat.com>
+                                                                                
+        * libc/include/sys/signal.h: If <signal.h> didn't include
+        this header file, include <signal.h> to account for
+        applications that take advantage that the two header
+        files are the same in glibc.
+                                                                                
 2004-10-05  Tomer Levi  <Tomer.Levi@nsc.com>
 
         * configure.host: Add support for crx.
