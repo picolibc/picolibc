@@ -112,7 +112,7 @@ threaded_queue::cleanup ()
   LeaveCriticalSection (&queuelock);
   if (!running)
     return;
-  system_printf ("Waiting for current queue threads to terminate");
+  debug_printf ("Waiting for current queue threads to terminate");
   for (int n = running; n; n--)
     PulseEvent (event);
   while (running)
@@ -224,7 +224,7 @@ queue_process_param::stop ()
     }
   else
     {
-      system_printf ("killing request loop thread %ld", tid);
+      debug_printf ("killing request loop thread %ld", tid);
       int rc;
       if (!(rc = TerminateThread (hThread, 0)))
 	{

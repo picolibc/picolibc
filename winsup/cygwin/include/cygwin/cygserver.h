@@ -77,7 +77,10 @@ public:
   size_t msglen () const { return _header.msglen; };
   void msglen (size_t len) { _header.msglen = len; };
 
-  virtual int make_request ();
+  int make_request ();
+
+protected:
+  virtual void send (transport_layer_base *);
 
 private:
   header_t _header;
@@ -88,8 +91,6 @@ private:
   void handle (transport_layer_base *, class process_cache *);
   virtual void serve (transport_layer_base *, class process_cache *) = 0;
 #endif
-
-  void send (transport_layer_base *);
 };
 
 /*---------------------------------------------------------------------------*
@@ -160,6 +161,9 @@ public:
 
   HANDLE from_master () const { return req.from_master; };
   HANDLE to_master () const { return req.to_master; };
+
+protected:
+  virtual void send (transport_layer_base *);
 
 private:
   struct request_attach_tty req;

@@ -1,5 +1,21 @@
 2002-06-17  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* cygserver.cc (main): Adjust tracing output for a cleaner display
+	when compiled without --enable-debugging.
+	* threaded_queue.cc (threaded_queue::cleanup): Ditto.
+	(queue_process_param::stop): Ditto.
+	* include/cygwin/cygserver.h
+	(client_request::make_request): Make non-virtual.
+	(client_request::send): Make virtual and protected, not private.
+	(client_request_attach_tty::send): New virtual method.
+	* cygserver_client.cc: Use the `msglen()' accessor rather than
+	`_header.msglen' throughout.
+	(client_request_attach_tty::send): New method.
+	(client_request::make_request): Remove the explicit close of
+	`transport' as it is closed on deletion.
+
+2002-06-17  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* include/cygwin/cygserver.h: Change the client_request classes to
 	give greater encapsulation and to allow variable length requests
 	and replies.

@@ -90,6 +90,31 @@ client_request_attach_tty::client_request_attach_tty ()
 
 #endif /* __INSIDE_CYGWIN__ */
 
+/*
+ * client_request_attach_tty::send()
+ *
+ * Wraps the base method to provide error handling support.  If the
+ * reply contains a body but is flagged as an error, close any handles
+ * that have been returned by cygserver and then discard the message
+ * body, i.e. the client either sees a successful result with handles
+ * or an unsuccessful result with no handles.
+ */
+
+void
+client_request_attach_tty::send (transport_layer_base * const conn)
+{
+  client_request::send (conn);
+
+  if (msglen () && error_code ())
+    {
+      if (from_master ())
+	CloseHandle (from_master ());
+      if (to_master ())
+	CloseHandle (to_master ());
+      msglen (0);
+    }
+}
+
 client_request::header_t::header_t (const request_code_t request_code,
 				    const size_t msglen)
   : msglen (msglen),
@@ -104,15 +129,16 @@ void
 client_request::send (transport_layer_base * const conn)
 {
   assert (conn);
-  assert (!(_header.msglen && !_buf)); // i.e., _header.msglen implies _buf
-  assert (_header.msglen <= _buflen);
+  assert (!(msglen () && !_buf)); // i.e., msglen () implies _buf
+  assert (msglen () <= _buflen);
 
   {
     const ssize_t count = conn->write (&_header, sizeof (_header));
 
     if (count != sizeof (_header))
       {
-	error_code(errno);
+	assert (errno);
+	error_code (errno);
 	syscall_printf (("request header write failure: "
 			 "only %ld bytes sent of %ld, "
 			 "error = %d(%lu)"),
@@ -122,31 +148,33 @@ client_request::send (transport_layer_base * const conn)
       }
   }
 
-  if (_header.msglen)
+  if (msglen ())
     {
-      const ssize_t count = conn->write (_buf, _header.msglen);
+      const ssize_t count = conn->write (_buf, msglen ());
 
-      if (count == -1 || (size_t) count != _header.msglen)
+      if (count == -1 || (size_t) count != msglen ())
 	{
-	  error_code(errno);
+	  assert (errno);
+	  error_code (errno);
 	  syscall_printf (("request body write failure: "
 			   "only %ld bytes sent of %ld, "
 			   "error = %d(%lu)"),
-			  count, _header.msglen,
+			  count, msglen (),
 			  errno, GetLastError ());
 	  return;
 	}
     }
 
   syscall_printf ("request sent (%ld + %ld bytes)",
-		  sizeof (_header), _header.msglen);
+		  sizeof (_header), msglen ());
 
   {
     const ssize_t count = conn->read (&_header, sizeof (_header));
 
     if (count != sizeof (_header))
       {
-	error_code(errno);
+	assert (errno);
+	error_code (errno);
 	syscall_printf (("reply header read failure: "
 			 "only %ld bytes received of %ld, "
 			 "error = %d(%lu)"),
@@ -156,41 +184,42 @@ client_request::send (transport_layer_base * const conn)
       }
   }
 
-  if (_header.msglen && !_buf)
+  if (msglen () && !_buf)
     {
       system_printf ("no client buffer for reply body: %ld bytes needed",
-		     _header.msglen);
-      error_code(EINVAL);
+		     msglen ());
+      error_code (EINVAL);
       return;
     }
 
-  if (_header.msglen > _buflen)
+  if (msglen () > _buflen)
     {
       system_printf (("client buffer too small for reply body: "
 		      "have %ld bytes and need %ld"),
-		     _buflen, _header.msglen);
-      error_code(EINVAL);
+		     _buflen, msglen ());
+      error_code (EINVAL);
       return;
     }
 
-  if (_header.msglen)
+  if (msglen ())
     {
-      const ssize_t count = conn->read (_buf, _header.msglen);
+      const ssize_t count = conn->read (_buf, msglen ());
 
-      if (count == -1 || (size_t) count != _header.msglen)
+      if (count == -1 || (size_t) count != msglen ())
 	{
-	  error_code(errno);
+	  assert (errno);
+	  error_code (errno);
 	  syscall_printf (("reply body read failure: "
 			   "only %ld bytes received of %ld, "
 			   "error = %d(%lu)"),
-			  count, _header.msglen,
+			  count, msglen (),
 			  errno, GetLastError ());
 	  return;
 	}
     }
 
   syscall_printf ("reply received (%ld + %ld bytes)",
-		  sizeof (_header), _header.msglen);
+		  sizeof (_header), msglen ());
 }
 
 #ifndef __INSIDE_CYGWIN__
@@ -311,8 +340,6 @@ client_request::make_request ()
 
   send (transport);
 
-  transport->close ();
-
   delete transport;
 
   return 0;
@@ -341,41 +368,42 @@ void
 client_request::handle (transport_layer_base * const conn,
 			class process_cache * const cache)
 {
-  if (_header.msglen && !_buf)
+  if (msglen () && !_buf)
     {
       system_printf ("no buffer for request body: %ld bytes needed",
-		     _header.msglen);
-      error_code(EINVAL);
+		     msglen ());
+      error_code (EINVAL);
       return;
     }
 
-  if (_header.msglen > _buflen)
+  if (msglen () > _buflen)
     {
       system_printf (("buffer too small for request body: "
 		      "have %ld bytes and need %ld"),
-		     _buflen, _header.msglen);
-      error_code(EINVAL);
+		     _buflen, msglen ());
+      error_code (EINVAL);
       return;
     }
 
-  if (_header.msglen)
+  if (msglen ())
     {
-      const ssize_t count = conn->read (_buf, _header.msglen);
+      const ssize_t count = conn->read (_buf, msglen ());
 
-      if (count == -1 || (size_t) count != _header.msglen)
+      if (count == -1 || (size_t) count != msglen ())
 	{
-	  error_code(errno);
+	  assert (errno);
+	  error_code (errno);
 	  syscall_printf (("request body read failure: "
 			   "only %ld bytes received of %ld, "
 			   "error = %d(%lu)"),
-			  count, _header.msglen,
+			  count, msglen (),
 			  errno, GetLastError ());
 	  return;
 	}
     }
 
   syscall_printf ("request received (%ld + %ld bytes)",
-		  sizeof (_header), _header.msglen);
+		  sizeof (_header), msglen ());
 
   error_code (0);		// Overwrites the _header.request_code field.
 
@@ -390,7 +418,8 @@ client_request::handle (transport_layer_base * const conn,
 
     if (count != sizeof (_header))
       {
-	error_code(errno);
+	assert (errno);
+	error_code (errno);
 	syscall_printf (("reply header write failure: "
 			 "only %ld bytes sent of %ld, "
 			 "error = %d(%lu)"),
@@ -400,24 +429,25 @@ client_request::handle (transport_layer_base * const conn,
       }
   }
 
-  if (_header.msglen)
+  if (msglen ())
     {
-      const ssize_t count = conn->write (_buf, _header.msglen);
+      const ssize_t count = conn->write (_buf, msglen ());
 
-      if (count == -1 || (size_t) count != _header.msglen)
+      if (count == -1 || (size_t) count != msglen ())
 	{
-	  error_code(errno);
+	  assert (errno);
+	  error_code (errno);
 	  syscall_printf (("reply body write failure: "
 			   "only %ld bytes sent of %ld, "
 			   "error = %d(%lu)"),
-			  count, _header.msglen,
+			  count, msglen (),
 			  errno, GetLastError ());
 	  return;
 	}
     }
 
   syscall_printf ("reply sent (%ld + %ld bytes)",
-		  sizeof (_header), _header.msglen);
+		  sizeof (_header), msglen ());
 }
 
 #endif /* !__INSIDE_CYGWIN__ */

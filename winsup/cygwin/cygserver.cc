@@ -650,9 +650,9 @@ main (const int argc, char *argv[])
 
   assert (transport);
 
+  print_version (pgm);
   setbuf (stdout, NULL);
   printf ("daemon starting up");
-  print_version (pgm);
   if (signal (SIGQUIT, handle_signal) == SIG_ERR)
     {
       system_printf ("could not install signal handler (%d)- aborting startup",
