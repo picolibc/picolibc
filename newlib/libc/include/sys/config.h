@@ -126,12 +126,23 @@
 #define _REENT_SMALL
 #endif
 
+typedef short int __int16_t;
+typedef unsigned short int __uint16_t;
+
 #if INT_MAX == 32767
 typedef long int __int32_t;
 typedef unsigned long int __uint32_t;
 #else
 typedef int __int32_t;
 typedef unsigned int __uint32_t;
+#endif
+
+#if LONG_MAX > 2147483647 || !defined(__GNUC__)
+typedef long int __int64_t;
+typedef unsigned long int __uint64_t;
+#else
+typedef long long __int64_t;
+typedef unsigned long long __uint64_t;
 #endif
 
 #ifndef _POINTER_INT
