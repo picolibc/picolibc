@@ -1241,6 +1241,11 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	      *(int *) p ? "started" : "cancelled");
       set_async (*(int *) p);
       break;
+    case FIONREAD:
+      res = ioctlsocket (get_socket (), FIONREAD, (unsigned long *) p);
+      if (res == SOCKET_ERROR)
+        set_winsock_errno ();
+      break;
     default:
       /* We must cancel WSAAsyncSelect (if any) before setting socket to
        * blocking mode

@@ -1,3 +1,7 @@
+2004-02-09  Ralf Habacker  <ralf.habacker@freenet.de>
+
+	* fhandler_socket.cc (fhandler_socket::ioctl): Add FIONREAD handling.
+
 2004-02-08  Christopher Faylor  <cgf@redhat.com>
 
 	* debug.h (console_printf): Define for non-debugging condition.
