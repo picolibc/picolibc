@@ -129,6 +129,8 @@
 typedef short int __int16_t;
 typedef unsigned short int __uint16_t;
 
+#include <limits.h>
+
 #if INT_MAX == 32767
 typedef long int __int32_t;
 typedef unsigned long int __uint32_t;
