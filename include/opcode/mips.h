@@ -320,14 +320,18 @@ struct mips_opcode
 /* Toshiba R3900 instruction.  */
 #define INSN_3900                   0x00000080
 
+/* 32-bit code running on a ISA3+ CPU. */
+#define INSN_GP32                   0x00001000
+
 /* Test for membership in an ISA including chip specific ISAs.
    INSN is pointer to an element of the opcode table; ISA is the
    specified ISA to test against; and CPU is the CPU specific ISA
    to test, or zero if no CPU specific ISA test is desired. */ 
 
-#define OPCODE_IS_MEMBER(insn,isa,cpu) 				\
+#define OPCODE_IS_MEMBER(insn,isa,cpu,gp32) 	       		\
     ((((insn)->membership & INSN_ISA) != 0			\
-      && ((insn)->membership & INSN_ISA) <= isa)		\
+      && ((insn)->membership & INSN_ISA) <= isa			\
+      && ((insn)->membership & INSN_GP32 ? gp32 : 1))		\
      || (cpu == 4650						\
 	 && ((insn)->membership & INSN_4650) != 0)		\
      || (cpu == 4010						\

@@ -1,3 +1,7 @@
+1999-12-30  Andrew Haley  <aph@cygnus.com>
+
+	* mips.h (OPCODE_IS_MEMBER): Add gp32 arg.
+
 2000-01-15  Alan Modra  <alan@spri.levels.unisa.edu.au>
 
 	* i386.h: Qualify intel mode far call and jmp with x_Suf.
