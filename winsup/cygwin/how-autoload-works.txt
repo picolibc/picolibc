@@ -2,50 +2,61 @@ Copyright 2002 Red Hat Inc., Egor Duda
 
 How does function autoloading work?
 
-Cygwin has an ability to handle win32 functions which are present on some 
-platforms and not present on others via autoload mechanism. It's essentially a 
-lazy binding of symbols. It works as following. For (almost) every function 
-from OS API which cygwin uses, a stub is created in file autoload.cc. Each 
-reference to the such function from win32 API in cygwin dll source code is 
-actually pointing to this stub.
+Cygwin has the ability to handle win32 functions which are present on
+some platforms and not present on others via autoload mechanism.  It's
+essentially a lazy binding of symbols.  It works as following.  For
+(almost) every function from OS API which cygwin uses, a stub is created
+in file autoload.cc.  Each reference to the such function from win32 API
+in cygwin dll source code is actually pointing to this stub.
 
-When the function, say GetConsoleWindow(), is called first time, the
-control is passed to its stub. Stub tries to load appropriate system dll
-via LoadModule() and get actual function address via GetProcAddress().
-If this operation succeeds, the stub is "patched" to pass control to actual
-address of GetConsoleWindow() in appropriate system dll, so that next
-time we won't have to load dll and perform address lookup in it again.
+When the function, say GetConsoleWindow(), is called for the first time,
+the control is passed to its stub.  The stub tries to load the
+appropriate system dll via LoadModule() and get the actual function
+address via GetProcAddress().  If this operation succeeds, the stub is
+"patched" to pass control to actual address of GetConsoleWindow() in
+appropriate system dll, so that next time we won't have to load dll and
+perform address lookup in it again.  From this point on, the call to the
+function is performed as if the dll/function were linked statically.
 
 If LoadModule() or GetProcAddress() fail, (and on nt4 the latter indeed
 fails because GetConsoleWindow() is not available in kernel32.dll), then
-application, depending on what kind of stub is created in autoload.cc, is
-either:
-1) Exits with fatal error.
-2) Or returns a predefined value indicating an error; and sets error code to
-127 (ERROR_PROC_NOT_FOUND).
+the application, depending on what kind of stub is created in
+autoload.cc, will either:
 
-That is, almost all w32api functions are linked into cygwin dll
-dynamically, at runtime. 
+1) Exit with fatal error.
+
+2) Or return a predefined value indicating an error; and set the windows
+error code to 127 (ERROR_PROC_NOT_FOUND).
+
+Almost all w32api functions are linked into the cygwin dll in this
+manner, dynamically, at runtime.
+
 The costs:
-1) A tiny overhead in function call as each call is performed, 
-indirectly, via stub.
+1) A tiny overhead in the initial call to a function call as each call
+is performed, indirectly, via a stub.  For the first lookup of a symbol
+of an unloaded dll, there is also some overhead in loading the dll for
+the first time.  The dll is only loaded by the first call to a symbol
+in the dll.  After the first call to a function, subsequent calls are
+as fast as a normal, statically loaded function.
+
 The benefits:
-1) Speedup at startup time. Application only loads those dlls which are
-actually needed. For example, if application never uses socket functions,
-winsock dlls are never loaded.
+1) Speedup at startup time.  Applications only load those dlls which are
+actually needed.  For example, if application never uses socket
+functions, winsock dlls are never loaded.
+
 2) Greatly simplify wincap system -- we don't need to have a separate
 capability for every win32 function which may or may not be present on
 particular win32 platform.
-3) Allow single cygwin1.dll for all win32 platforms.
 
-If you're changing in cygwin1.dll source code and if you use some function that
-was not used there before, you should add a stub so it will be autoloaded. To 
-do so, add
+3) Allows a single cygwin1.dll for all win32 platforms.
+
+If you're changing in cygwin1.dll source code and if you use some
+function that was not used there before, you should add a stub so it
+will be autoloaded.  To do so, add one of the LoadDllfunc* macros to
+autoload.cc.  All macros eventually resolve to the following form:
 
 LoadDLLfuncEx2 (function name, parameter block length, dll name, 
                 non-fatality flag , value to return if function not available)
-
-to autoload.cc file.
 
 Parameter block length is a sum of sizes (in bytes) of parameters which are 
 being passed to the function. If non-fatality flag is set to 0, then failure 
