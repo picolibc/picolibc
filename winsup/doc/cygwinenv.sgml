@@ -52,9 +52,19 @@ This option only operates under Windows NT. Defaults to not set. </para>
 <listitem>
 <para><FirstTerm>(no)ntsec</FirstTerm> - if set, use the NT security
 model to set UNIX-like permissions on files and processes. The
-file permissions can only be set on NTFS partitions. FAT and SAMBA doesn't
+file permissions can only be set on NTFS partitions. FAT doesn't
 support the NT file security. For more information, read the documentation
 in <citation>ntsec.sgml</citation>.</para>
+</listitem>
+<listitem>
+<para><FirstTerm>(no)smbntsec</FirstTerm> - if set, use `ntsec' on remote
+drives as well (this is the default). If you encounter problems with NT shares
+or Samba drives, setting this to `nosmbntsec' could help. In that case the
+permission and owner/group information is faked as on FAT partitions.
+A reason for a non working ntsec on remote drives could be insufficient
+permissions of the users. Since the needed user rights are somewhat dangerous
+(SeRestorePrivilege) it's not always an option to grant that rights to users.
+However, this shouldn't be a problem in NT domain environments.</para>
 </listitem>
 <listitem>
 <para><FirstTerm>(no)reset_com</FirstTerm> - if set, serial ports are reset

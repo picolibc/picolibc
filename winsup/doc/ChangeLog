@@ -1,3 +1,7 @@
+Tue Dec 19 21:06:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* cygwinenv.sgml: Add text for `smbntsec' option.
+
 Sat Nov 18 23:50:12 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* cygwinenv.sgml: Remove CYGWIN=strace option.  Update CYGWIN options.
