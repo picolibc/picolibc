@@ -1,3 +1,8 @@
+2002-05-30  Christopher January  <chris@atomice.net>
+
+	* include/ntdef.h (ANSI_STRING, PANSI_STRING, OEM_STRING, POEM_STRING):
+	Add missing typedefs.
+
 2002-05-28  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/w32api.h: Increment version to 1.5

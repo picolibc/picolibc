@@ -37,6 +37,10 @@ typedef struct _STRING {
   PCHAR  Buffer;
 } STRING, *PSTRING;
 #endif
+typedef STRING ANSI_STRING;
+typedef PSTRING PANSI_STRING;
+typedef STRING OEM_STRING;
+typedef PSTRING POEM_STRING;
 typedef LARGE_INTEGER PHYSICAL_ADDRESS, *PPHYSICAL_ADDRESS;
 typedef enum _SECTION_INHERIT {
   ViewShare = 1,
