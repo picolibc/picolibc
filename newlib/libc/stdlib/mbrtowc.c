@@ -1,7 +1,7 @@
+#include <reent.h>
 #include <wchar.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <reent.h>
 #include <errno.h>
 #include <string.h>
 
