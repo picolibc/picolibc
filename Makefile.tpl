@@ -104,7 +104,6 @@ SET_LIB_PATH = @SET_LIB_PATH@
 # Some platforms don't like blank entries, so we remove duplicate,
 # leading and trailing colons.
 REALLY_SET_LIB_PATH = \
-  @SET_GCC_LIB_PATH@ \
   $(RPATH_ENVVAR)=`echo "$(HOST_LIB_PATH):$(TARGET_LIB_PATH):$$$(RPATH_ENVVAR)" | sed 's,::*,:,g;s,^:*,,;s,:*$$,,'`; export $(RPATH_ENVVAR);
 
 # This is the list of directories to be built for the build system.
@@ -174,9 +173,7 @@ HOST_EXPORTS = \
 	OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
 	TOPLEVEL_CONFIGURE_ARGUMENTS="$(TOPLEVEL_CONFIGURE_ARGUMENTS)"; export TOPLEVEL_CONFIGURE_ARGUMENTS; \
 	GMPLIBS="$(HOST_GMPLIBS)"; export GMPLIBS; \
-	GMPINC="$(HOST_GMPINC)"; export GMPINC; \
-	SET_GCC_LIB_PATH_CMD="@SET_GCC_LIB_PATH@"; export SET_GCC_LIB_PATH_CMD; \
-	@SET_GCC_LIB_PATH@
+	GMPINC="$(HOST_GMPINC)"; export GMPINC;
 
 # Similar, for later GCC stages.
 STAGE_HOST_EXPORTS = \
@@ -210,9 +207,7 @@ BASE_TARGET_EXPORTS = \
 	LDFLAGS="$(LDFLAGS_FOR_TARGET)"; export LDFLAGS; \
 	NM="$(NM_FOR_TARGET)"; export NM; \
 	RANLIB="$(RANLIB_FOR_TARGET)"; export RANLIB; \
-	WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
-	SET_GCC_LIB_PATH_CMD="@SET_GCC_LIB_PATH@"; export SET_GCC_LIB_PATH_CMD; \
-	@SET_GCC_LIB_PATH@
+	WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES;
 
 RAW_CXX_TARGET_EXPORTS = \
 	$(BASE_TARGET_EXPORTS) \
@@ -909,7 +904,6 @@ configure-[+module+]:
 .PHONY: all-[+module+] maybe-all-[+module+]
 maybe-all-[+module+]:
 @if [+module+]
-TARGET-[+module+]=[+ IF target +][+target+][+ ELSE +]all[+ ENDIF target +]
 maybe-all-[+module+]: all-[+module+]
 all-[+module+]: configure-[+module+]
 	@[+ IF bootstrap +]test -f stage_last && exit 0; \
@@ -917,8 +911,13 @@ all-[+module+]: configure-[+module+]
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd [+module+] && $(MAKE) $(FLAGS_TO_PASS) [+extra_make_flags+] \
-	  $(TARGET-[+module+]))
+	(cd [+module+] && $(MAKE) $(FLAGS_TO_PASS)[+ 
+	  IF with_x 
+	    +] $(X11_FLAGS_TO_PASS)[+ 
+	  ENDIF with_x +] [+extra_make_flags+] [+
+	  IF (== (get "module") "gcc") +] \
+	    `if [ -f gcc/stage_last ]; then echo quickstrap ; else echo all; fi` [+
+	  ELSE +]all[+ ENDIF +])
 @endif [+module+]
 
 .PHONY: check-[+module+] maybe-check-[+module+]

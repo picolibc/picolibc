@@ -101,7 +101,6 @@ SET_LIB_PATH = @SET_LIB_PATH@
 # Some platforms don't like blank entries, so we remove duplicate,
 # leading and trailing colons.
 REALLY_SET_LIB_PATH = \
-  @SET_GCC_LIB_PATH@ \
   $(RPATH_ENVVAR)=`echo "$(HOST_LIB_PATH):$(TARGET_LIB_PATH):$$$(RPATH_ENVVAR)" | sed 's,::*,:,g;s,^:*,,;s,:*$$,,'`; export $(RPATH_ENVVAR);
 
 # This is the list of directories to be built for the build system.
@@ -171,9 +170,7 @@ HOST_EXPORTS = \
 	OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
 	TOPLEVEL_CONFIGURE_ARGUMENTS="$(TOPLEVEL_CONFIGURE_ARGUMENTS)"; export TOPLEVEL_CONFIGURE_ARGUMENTS; \
 	GMPLIBS="$(HOST_GMPLIBS)"; export GMPLIBS; \
-	GMPINC="$(HOST_GMPINC)"; export GMPINC; \
-	SET_GCC_LIB_PATH_CMD="@SET_GCC_LIB_PATH@"; export SET_GCC_LIB_PATH_CMD; \
-	@SET_GCC_LIB_PATH@
+	GMPINC="$(HOST_GMPINC)"; export GMPINC;
 
 # Similar, for later GCC stages.
 STAGE_HOST_EXPORTS = \
@@ -207,9 +204,7 @@ BASE_TARGET_EXPORTS = \
 	LDFLAGS="$(LDFLAGS_FOR_TARGET)"; export LDFLAGS; \
 	NM="$(NM_FOR_TARGET)"; export NM; \
 	RANLIB="$(RANLIB_FOR_TARGET)"; export RANLIB; \
-	WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
-	SET_GCC_LIB_PATH_CMD="@SET_GCC_LIB_PATH@"; export SET_GCC_LIB_PATH_CMD; \
-	@SET_GCC_LIB_PATH@
+	WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES;
 
 RAW_CXX_TARGET_EXPORTS = \
 	$(BASE_TARGET_EXPORTS) \
@@ -2543,15 +2538,13 @@ configure-ash:
 .PHONY: all-ash maybe-all-ash
 maybe-all-ash:
 @if ash
-TARGET-ash=all
 maybe-all-ash: all-ash
 all-ash: configure-ash
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd ash && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-ash))
+	(cd ash && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif ash
 
 .PHONY: check-ash maybe-check-ash
@@ -2847,15 +2840,13 @@ configure-autoconf:
 .PHONY: all-autoconf maybe-all-autoconf
 maybe-all-autoconf:
 @if autoconf
-TARGET-autoconf=all
 maybe-all-autoconf: all-autoconf
 all-autoconf: configure-autoconf
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd autoconf && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-autoconf))
+	(cd autoconf && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif autoconf
 
 .PHONY: check-autoconf maybe-check-autoconf
@@ -3151,15 +3142,13 @@ configure-automake:
 .PHONY: all-automake maybe-all-automake
 maybe-all-automake:
 @if automake
-TARGET-automake=all
 maybe-all-automake: all-automake
 all-automake: configure-automake
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd automake && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-automake))
+	(cd automake && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif automake
 
 .PHONY: check-automake maybe-check-automake
@@ -3455,15 +3444,13 @@ configure-bash:
 .PHONY: all-bash maybe-all-bash
 maybe-all-bash:
 @if bash
-TARGET-bash=all
 maybe-all-bash: all-bash
 all-bash: configure-bash
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd bash && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-bash))
+	(cd bash && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif bash
 
 .PHONY: check-bash maybe-check-bash
@@ -3760,7 +3747,6 @@ configure-bfd:
 .PHONY: all-bfd maybe-all-bfd
 maybe-all-bfd:
 @if bfd
-TARGET-bfd=all
 maybe-all-bfd: all-bfd
 all-bfd: configure-bfd
 	@test -f stage_last && exit 0; \
@@ -3768,8 +3754,7 @@ all-bfd: configure-bfd
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd bfd && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-bfd))
+	(cd bfd && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif bfd
 
 .PHONY: check-bfd maybe-check-bfd
@@ -4066,7 +4051,6 @@ configure-opcodes:
 .PHONY: all-opcodes maybe-all-opcodes
 maybe-all-opcodes:
 @if opcodes
-TARGET-opcodes=all
 maybe-all-opcodes: all-opcodes
 all-opcodes: configure-opcodes
 	@test -f stage_last && exit 0; \
@@ -4074,8 +4058,7 @@ all-opcodes: configure-opcodes
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd opcodes && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-opcodes))
+	(cd opcodes && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif opcodes
 
 .PHONY: check-opcodes maybe-check-opcodes
@@ -4372,7 +4355,6 @@ configure-binutils:
 .PHONY: all-binutils maybe-all-binutils
 maybe-all-binutils:
 @if binutils
-TARGET-binutils=all
 maybe-all-binutils: all-binutils
 all-binutils: configure-binutils
 	@test -f stage_last && exit 0; \
@@ -4380,8 +4362,7 @@ all-binutils: configure-binutils
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd binutils && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-binutils))
+	(cd binutils && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif binutils
 
 .PHONY: check-binutils maybe-check-binutils
@@ -4677,15 +4658,13 @@ configure-bison:
 .PHONY: all-bison maybe-all-bison
 maybe-all-bison:
 @if bison
-TARGET-bison=all
 maybe-all-bison: all-bison
 all-bison: configure-bison
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd bison && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-bison))
+	(cd bison && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif bison
 
 .PHONY: check-bison maybe-check-bison
@@ -4984,15 +4963,13 @@ configure-byacc:
 .PHONY: all-byacc maybe-all-byacc
 maybe-all-byacc:
 @if byacc
-TARGET-byacc=all
 maybe-all-byacc: all-byacc
 all-byacc: configure-byacc
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd byacc && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-byacc))
+	(cd byacc && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif byacc
 
 .PHONY: check-byacc maybe-check-byacc
@@ -5291,15 +5268,13 @@ configure-bzip2:
 .PHONY: all-bzip2 maybe-all-bzip2
 maybe-all-bzip2:
 @if bzip2
-TARGET-bzip2=all
 maybe-all-bzip2: all-bzip2
 all-bzip2: configure-bzip2
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd bzip2 && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-bzip2))
+	(cd bzip2 && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif bzip2
 
 .PHONY: check-bzip2 maybe-check-bzip2
@@ -5595,15 +5570,13 @@ configure-dejagnu:
 .PHONY: all-dejagnu maybe-all-dejagnu
 maybe-all-dejagnu:
 @if dejagnu
-TARGET-dejagnu=all
 maybe-all-dejagnu: all-dejagnu
 all-dejagnu: configure-dejagnu
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd dejagnu && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-dejagnu))
+	(cd dejagnu && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif dejagnu
 
 .PHONY: check-dejagnu maybe-check-dejagnu
@@ -5899,15 +5872,13 @@ configure-diff:
 .PHONY: all-diff maybe-all-diff
 maybe-all-diff:
 @if diff
-TARGET-diff=all
 maybe-all-diff: all-diff
 all-diff: configure-diff
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd diff && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-diff))
+	(cd diff && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif diff
 
 .PHONY: check-diff maybe-check-diff
@@ -6203,15 +6174,13 @@ configure-dosutils:
 .PHONY: all-dosutils maybe-all-dosutils
 maybe-all-dosutils:
 @if dosutils
-TARGET-dosutils=all
 maybe-all-dosutils: all-dosutils
 all-dosutils: configure-dosutils
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd dosutils && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-dosutils))
+	(cd dosutils && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif dosutils
 
 .PHONY: check-dosutils maybe-check-dosutils
@@ -6502,15 +6471,13 @@ configure-etc:
 .PHONY: all-etc maybe-all-etc
 maybe-all-etc:
 @if etc
-TARGET-etc=all
 maybe-all-etc: all-etc
 all-etc: configure-etc
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd etc && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-etc))
+	(cd etc && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif etc
 
 .PHONY: check-etc maybe-check-etc
@@ -6806,15 +6773,13 @@ configure-fastjar:
 .PHONY: all-fastjar maybe-all-fastjar
 maybe-all-fastjar:
 @if fastjar
-TARGET-fastjar=all
 maybe-all-fastjar: all-fastjar
 all-fastjar: configure-fastjar
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd fastjar && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-fastjar))
+	(cd fastjar && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif fastjar
 
 .PHONY: check-fastjar maybe-check-fastjar
@@ -7113,15 +7078,13 @@ configure-fileutils:
 .PHONY: all-fileutils maybe-all-fileutils
 maybe-all-fileutils:
 @if fileutils
-TARGET-fileutils=all
 maybe-all-fileutils: all-fileutils
 all-fileutils: configure-fileutils
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd fileutils && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-fileutils))
+	(cd fileutils && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif fileutils
 
 .PHONY: check-fileutils maybe-check-fileutils
@@ -7417,15 +7380,13 @@ configure-findutils:
 .PHONY: all-findutils maybe-all-findutils
 maybe-all-findutils:
 @if findutils
-TARGET-findutils=all
 maybe-all-findutils: all-findutils
 all-findutils: configure-findutils
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd findutils && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-findutils))
+	(cd findutils && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif findutils
 
 .PHONY: check-findutils maybe-check-findutils
@@ -7721,15 +7682,13 @@ configure-find:
 .PHONY: all-find maybe-all-find
 maybe-all-find:
 @if find
-TARGET-find=all
 maybe-all-find: all-find
 all-find: configure-find
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd find && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-find))
+	(cd find && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif find
 
 .PHONY: check-find maybe-check-find
@@ -8025,15 +7984,13 @@ configure-flex:
 .PHONY: all-flex maybe-all-flex
 maybe-all-flex:
 @if flex
-TARGET-flex=all
 maybe-all-flex: all-flex
 all-flex: configure-flex
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd flex && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-flex))
+	(cd flex && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif flex
 
 .PHONY: check-flex maybe-check-flex
@@ -8333,7 +8290,6 @@ configure-gas:
 .PHONY: all-gas maybe-all-gas
 maybe-all-gas:
 @if gas
-TARGET-gas=all
 maybe-all-gas: all-gas
 all-gas: configure-gas
 	@test -f stage_last && exit 0; \
@@ -8341,8 +8297,7 @@ all-gas: configure-gas
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd gas && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-gas))
+	(cd gas && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif gas
 
 .PHONY: check-gas maybe-check-gas
@@ -8639,7 +8594,6 @@ configure-gcc:
 .PHONY: all-gcc maybe-all-gcc
 maybe-all-gcc:
 @if gcc
-TARGET-gcc=`if [ -f gcc/stage_last ]; then echo quickstrap ; else echo all; fi`
 maybe-all-gcc: all-gcc
 all-gcc: configure-gcc
 	@test -f stage_last && exit 0; \
@@ -8647,8 +8601,8 @@ all-gcc: configure-gcc
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd gcc && $(MAKE) $(FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS) \
-	  $(TARGET-gcc))
+	(cd gcc && $(MAKE) $(FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS)  \
+	    `if [ -f gcc/stage_last ]; then echo quickstrap ; else echo all; fi` )
 @endif gcc
 
 .PHONY: check-gcc maybe-check-gcc
@@ -8944,15 +8898,13 @@ configure-gawk:
 .PHONY: all-gawk maybe-all-gawk
 maybe-all-gawk:
 @if gawk
-TARGET-gawk=all
 maybe-all-gawk: all-gawk
 all-gawk: configure-gawk
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd gawk && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-gawk))
+	(cd gawk && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif gawk
 
 .PHONY: check-gawk maybe-check-gawk
@@ -9248,15 +9200,13 @@ configure-gettext:
 .PHONY: all-gettext maybe-all-gettext
 maybe-all-gettext:
 @if gettext
-TARGET-gettext=all
 maybe-all-gettext: all-gettext
 all-gettext: configure-gettext
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd gettext && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-gettext))
+	(cd gettext && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif gettext
 
 .PHONY: check-gettext maybe-check-gettext
@@ -9552,15 +9502,13 @@ configure-gnuserv:
 .PHONY: all-gnuserv maybe-all-gnuserv
 maybe-all-gnuserv:
 @if gnuserv
-TARGET-gnuserv=all
 maybe-all-gnuserv: all-gnuserv
 all-gnuserv: configure-gnuserv
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd gnuserv && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-gnuserv))
+	(cd gnuserv && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif gnuserv
 
 .PHONY: check-gnuserv maybe-check-gnuserv
@@ -9856,15 +9804,13 @@ configure-gprof:
 .PHONY: all-gprof maybe-all-gprof
 maybe-all-gprof:
 @if gprof
-TARGET-gprof=all
 maybe-all-gprof: all-gprof
 all-gprof: configure-gprof
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd gprof && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-gprof))
+	(cd gprof && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif gprof
 
 .PHONY: check-gprof maybe-check-gprof
@@ -10160,15 +10106,13 @@ configure-gzip:
 .PHONY: all-gzip maybe-all-gzip
 maybe-all-gzip:
 @if gzip
-TARGET-gzip=all
 maybe-all-gzip: all-gzip
 all-gzip: configure-gzip
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd gzip && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-gzip))
+	(cd gzip && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif gzip
 
 .PHONY: check-gzip maybe-check-gzip
@@ -10464,15 +10408,13 @@ configure-hello:
 .PHONY: all-hello maybe-all-hello
 maybe-all-hello:
 @if hello
-TARGET-hello=all
 maybe-all-hello: all-hello
 all-hello: configure-hello
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd hello && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-hello))
+	(cd hello && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif hello
 
 .PHONY: check-hello maybe-check-hello
@@ -10768,15 +10710,13 @@ configure-indent:
 .PHONY: all-indent maybe-all-indent
 maybe-all-indent:
 @if indent
-TARGET-indent=all
 maybe-all-indent: all-indent
 all-indent: configure-indent
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd indent && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-indent))
+	(cd indent && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif indent
 
 .PHONY: check-indent maybe-check-indent
@@ -11073,7 +11013,6 @@ configure-intl:
 .PHONY: all-intl maybe-all-intl
 maybe-all-intl:
 @if intl
-TARGET-intl=all
 maybe-all-intl: all-intl
 all-intl: configure-intl
 	@test -f stage_last && exit 0; \
@@ -11081,8 +11020,7 @@ all-intl: configure-intl
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd intl && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-intl))
+	(cd intl && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif intl
 
 .PHONY: check-intl maybe-check-intl
@@ -11378,15 +11316,13 @@ configure-tcl:
 .PHONY: all-tcl maybe-all-tcl
 maybe-all-tcl:
 @if tcl
-TARGET-tcl=all
 maybe-all-tcl: all-tcl
 all-tcl: configure-tcl
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd tcl && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-tcl))
+	(cd tcl && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif tcl
 
 .PHONY: check-tcl maybe-check-tcl
@@ -11667,15 +11603,13 @@ configure-itcl:
 .PHONY: all-itcl maybe-all-itcl
 maybe-all-itcl:
 @if itcl
-TARGET-itcl=all
 maybe-all-itcl: all-itcl
 all-itcl: configure-itcl
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd itcl && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-itcl))
+	(cd itcl && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif itcl
 
 .PHONY: check-itcl maybe-check-itcl
@@ -11972,7 +11906,6 @@ configure-ld:
 .PHONY: all-ld maybe-all-ld
 maybe-all-ld:
 @if ld
-TARGET-ld=all
 maybe-all-ld: all-ld
 all-ld: configure-ld
 	@test -f stage_last && exit 0; \
@@ -11980,8 +11913,7 @@ all-ld: configure-ld
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd ld && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-ld))
+	(cd ld && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif ld
 
 .PHONY: check-ld maybe-check-ld
@@ -12278,7 +12210,6 @@ configure-libcpp:
 .PHONY: all-libcpp maybe-all-libcpp
 maybe-all-libcpp:
 @if libcpp
-TARGET-libcpp=all
 maybe-all-libcpp: all-libcpp
 all-libcpp: configure-libcpp
 	@test -f stage_last && exit 0; \
@@ -12286,8 +12217,7 @@ all-libcpp: configure-libcpp
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd libcpp && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-libcpp))
+	(cd libcpp && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif libcpp
 
 .PHONY: check-libcpp maybe-check-libcpp
@@ -12583,15 +12513,13 @@ configure-libgui:
 .PHONY: all-libgui maybe-all-libgui
 maybe-all-libgui:
 @if libgui
-TARGET-libgui=all
 maybe-all-libgui: all-libgui
 all-libgui: configure-libgui
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd libgui && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-libgui))
+	(cd libgui && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif libgui
 
 .PHONY: check-libgui maybe-check-libgui
@@ -12888,7 +12816,6 @@ configure-libiberty:
 .PHONY: all-libiberty maybe-all-libiberty
 maybe-all-libiberty:
 @if libiberty
-TARGET-libiberty=all
 maybe-all-libiberty: all-libiberty
 all-libiberty: configure-libiberty
 	@test -f stage_last && exit 0; \
@@ -12896,8 +12823,7 @@ all-libiberty: configure-libiberty
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd libiberty && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-libiberty))
+	(cd libiberty && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif libiberty
 
 .PHONY: check-libiberty maybe-check-libiberty
@@ -13193,15 +13119,13 @@ configure-libtool:
 .PHONY: all-libtool maybe-all-libtool
 maybe-all-libtool:
 @if libtool
-TARGET-libtool=all
 maybe-all-libtool: all-libtool
 all-libtool: configure-libtool
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd libtool && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-libtool))
+	(cd libtool && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif libtool
 
 .PHONY: check-libtool maybe-check-libtool
@@ -13497,15 +13421,13 @@ configure-m4:
 .PHONY: all-m4 maybe-all-m4
 maybe-all-m4:
 @if m4
-TARGET-m4=all
 maybe-all-m4: all-m4
 all-m4: configure-m4
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd m4 && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-m4))
+	(cd m4 && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif m4
 
 .PHONY: check-m4 maybe-check-m4
@@ -13801,15 +13723,13 @@ configure-make:
 .PHONY: all-make maybe-all-make
 maybe-all-make:
 @if make
-TARGET-make=all
 maybe-all-make: all-make
 all-make: configure-make
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd make && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-make))
+	(cd make && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif make
 
 .PHONY: check-make maybe-check-make
@@ -14105,15 +14025,13 @@ configure-mmalloc:
 .PHONY: all-mmalloc maybe-all-mmalloc
 maybe-all-mmalloc:
 @if mmalloc
-TARGET-mmalloc=all
 maybe-all-mmalloc: all-mmalloc
 all-mmalloc: configure-mmalloc
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd mmalloc && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-mmalloc))
+	(cd mmalloc && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif mmalloc
 
 .PHONY: check-mmalloc maybe-check-mmalloc
@@ -14404,15 +14322,13 @@ configure-patch:
 .PHONY: all-patch maybe-all-patch
 maybe-all-patch:
 @if patch
-TARGET-patch=all
 maybe-all-patch: all-patch
 all-patch: configure-patch
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd patch && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-patch))
+	(cd patch && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif patch
 
 .PHONY: check-patch maybe-check-patch
@@ -14708,15 +14624,13 @@ configure-perl:
 .PHONY: all-perl maybe-all-perl
 maybe-all-perl:
 @if perl
-TARGET-perl=all
 maybe-all-perl: all-perl
 all-perl: configure-perl
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd perl && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-perl))
+	(cd perl && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif perl
 
 .PHONY: check-perl maybe-check-perl
@@ -15012,15 +14926,13 @@ configure-prms:
 .PHONY: all-prms maybe-all-prms
 maybe-all-prms:
 @if prms
-TARGET-prms=all
 maybe-all-prms: all-prms
 all-prms: configure-prms
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd prms && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-prms))
+	(cd prms && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif prms
 
 .PHONY: check-prms maybe-check-prms
@@ -15316,15 +15228,13 @@ configure-rcs:
 .PHONY: all-rcs maybe-all-rcs
 maybe-all-rcs:
 @if rcs
-TARGET-rcs=all
 maybe-all-rcs: all-rcs
 all-rcs: configure-rcs
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd rcs && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-rcs))
+	(cd rcs && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif rcs
 
 .PHONY: check-rcs maybe-check-rcs
@@ -15620,15 +15530,13 @@ configure-readline:
 .PHONY: all-readline maybe-all-readline
 maybe-all-readline:
 @if readline
-TARGET-readline=all
 maybe-all-readline: all-readline
 all-readline: configure-readline
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd readline && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-readline))
+	(cd readline && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif readline
 
 .PHONY: check-readline maybe-check-readline
@@ -15924,15 +15832,13 @@ configure-release:
 .PHONY: all-release maybe-all-release
 maybe-all-release:
 @if release
-TARGET-release=all
 maybe-all-release: all-release
 all-release: configure-release
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd release && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-release))
+	(cd release && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif release
 
 .PHONY: check-release maybe-check-release
@@ -16218,15 +16124,13 @@ configure-recode:
 .PHONY: all-recode maybe-all-recode
 maybe-all-recode:
 @if recode
-TARGET-recode=all
 maybe-all-recode: all-recode
 all-recode: configure-recode
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd recode && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-recode))
+	(cd recode && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif recode
 
 .PHONY: check-recode maybe-check-recode
@@ -16522,15 +16426,13 @@ configure-sed:
 .PHONY: all-sed maybe-all-sed
 maybe-all-sed:
 @if sed
-TARGET-sed=all
 maybe-all-sed: all-sed
 all-sed: configure-sed
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd sed && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-sed))
+	(cd sed && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif sed
 
 .PHONY: check-sed maybe-check-sed
@@ -16826,15 +16728,13 @@ configure-send-pr:
 .PHONY: all-send-pr maybe-all-send-pr
 maybe-all-send-pr:
 @if send-pr
-TARGET-send-pr=all
 maybe-all-send-pr: all-send-pr
 all-send-pr: configure-send-pr
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd send-pr && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-send-pr))
+	(cd send-pr && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif send-pr
 
 .PHONY: check-send-pr maybe-check-send-pr
@@ -17130,15 +17030,13 @@ configure-shellutils:
 .PHONY: all-shellutils maybe-all-shellutils
 maybe-all-shellutils:
 @if shellutils
-TARGET-shellutils=all
 maybe-all-shellutils: all-shellutils
 all-shellutils: configure-shellutils
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd shellutils && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-shellutils))
+	(cd shellutils && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif shellutils
 
 .PHONY: check-shellutils maybe-check-shellutils
@@ -17434,15 +17332,13 @@ configure-sid:
 .PHONY: all-sid maybe-all-sid
 maybe-all-sid:
 @if sid
-TARGET-sid=all
 maybe-all-sid: all-sid
 all-sid: configure-sid
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd sid && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-sid))
+	(cd sid && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif sid
 
 .PHONY: check-sid maybe-check-sid
@@ -17738,15 +17634,13 @@ configure-sim:
 .PHONY: all-sim maybe-all-sim
 maybe-all-sim:
 @if sim
-TARGET-sim=all
 maybe-all-sim: all-sim
 all-sim: configure-sim
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd sim && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-sim))
+	(cd sim && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif sim
 
 .PHONY: check-sim maybe-check-sim
@@ -18042,15 +17936,13 @@ configure-tar:
 .PHONY: all-tar maybe-all-tar
 maybe-all-tar:
 @if tar
-TARGET-tar=all
 maybe-all-tar: all-tar
 all-tar: configure-tar
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd tar && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-tar))
+	(cd tar && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif tar
 
 .PHONY: check-tar maybe-check-tar
@@ -18346,15 +18238,13 @@ configure-texinfo:
 .PHONY: all-texinfo maybe-all-texinfo
 maybe-all-texinfo:
 @if texinfo
-TARGET-texinfo=all
 maybe-all-texinfo: all-texinfo
 all-texinfo: configure-texinfo
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd texinfo && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-texinfo))
+	(cd texinfo && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif texinfo
 
 .PHONY: check-texinfo maybe-check-texinfo
@@ -18645,15 +18535,13 @@ configure-textutils:
 .PHONY: all-textutils maybe-all-textutils
 maybe-all-textutils:
 @if textutils
-TARGET-textutils=all
 maybe-all-textutils: all-textutils
 all-textutils: configure-textutils
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd textutils && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-textutils))
+	(cd textutils && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif textutils
 
 .PHONY: check-textutils maybe-check-textutils
@@ -18949,15 +18837,13 @@ configure-time:
 .PHONY: all-time maybe-all-time
 maybe-all-time:
 @if time
-TARGET-time=all
 maybe-all-time: all-time
 all-time: configure-time
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd time && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-time))
+	(cd time && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif time
 
 .PHONY: check-time maybe-check-time
@@ -19253,15 +19139,13 @@ configure-uudecode:
 .PHONY: all-uudecode maybe-all-uudecode
 maybe-all-uudecode:
 @if uudecode
-TARGET-uudecode=all
 maybe-all-uudecode: all-uudecode
 all-uudecode: configure-uudecode
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd uudecode && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-uudecode))
+	(cd uudecode && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif uudecode
 
 .PHONY: check-uudecode maybe-check-uudecode
@@ -19557,15 +19441,13 @@ configure-wdiff:
 .PHONY: all-wdiff maybe-all-wdiff
 maybe-all-wdiff:
 @if wdiff
-TARGET-wdiff=all
 maybe-all-wdiff: all-wdiff
 all-wdiff: configure-wdiff
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd wdiff && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-wdiff))
+	(cd wdiff && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif wdiff
 
 .PHONY: check-wdiff maybe-check-wdiff
@@ -19861,15 +19743,13 @@ configure-zip:
 .PHONY: all-zip maybe-all-zip
 maybe-all-zip:
 @if zip
-TARGET-zip=all
 maybe-all-zip: all-zip
 all-zip: configure-zip
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd zip && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-zip))
+	(cd zip && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif zip
 
 .PHONY: check-zip maybe-check-zip
@@ -20169,7 +20049,6 @@ configure-zlib:
 .PHONY: all-zlib maybe-all-zlib
 maybe-all-zlib:
 @if zlib
-TARGET-zlib=all
 maybe-all-zlib: all-zlib
 all-zlib: configure-zlib
 	@test -f stage_last && exit 0; \
@@ -20177,8 +20056,7 @@ all-zlib: configure-zlib
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd zlib && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-zlib))
+	(cd zlib && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif zlib
 
 .PHONY: check-zlib maybe-check-zlib
@@ -20464,15 +20342,13 @@ configure-gdb:
 .PHONY: all-gdb maybe-all-gdb
 maybe-all-gdb:
 @if gdb
-TARGET-gdb=all
 maybe-all-gdb: all-gdb
 all-gdb: configure-gdb
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd gdb && $(MAKE) $(FLAGS_TO_PASS) $(X11_FLAGS_TO_PASS) \
-	  $(TARGET-gdb))
+	(cd gdb && $(MAKE) $(FLAGS_TO_PASS) $(X11_FLAGS_TO_PASS) all)
 @endif gdb
 
 .PHONY: check-gdb maybe-check-gdb
@@ -20768,15 +20644,13 @@ configure-expect:
 .PHONY: all-expect maybe-all-expect
 maybe-all-expect:
 @if expect
-TARGET-expect=all
 maybe-all-expect: all-expect
 all-expect: configure-expect
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd expect && $(MAKE) $(FLAGS_TO_PASS) $(X11_FLAGS_TO_PASS) \
-	  $(TARGET-expect))
+	(cd expect && $(MAKE) $(FLAGS_TO_PASS) $(X11_FLAGS_TO_PASS) all)
 @endif expect
 
 .PHONY: check-expect maybe-check-expect
@@ -21072,15 +20946,13 @@ configure-guile:
 .PHONY: all-guile maybe-all-guile
 maybe-all-guile:
 @if guile
-TARGET-guile=all
 maybe-all-guile: all-guile
 all-guile: configure-guile
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd guile && $(MAKE) $(FLAGS_TO_PASS) $(X11_FLAGS_TO_PASS) \
-	  $(TARGET-guile))
+	(cd guile && $(MAKE) $(FLAGS_TO_PASS) $(X11_FLAGS_TO_PASS) all)
 @endif guile
 
 .PHONY: check-guile maybe-check-guile
@@ -21376,15 +21248,13 @@ configure-tk:
 .PHONY: all-tk maybe-all-tk
 maybe-all-tk:
 @if tk
-TARGET-tk=all
 maybe-all-tk: all-tk
 all-tk: configure-tk
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd tk && $(MAKE) $(FLAGS_TO_PASS) $(X11_FLAGS_TO_PASS) \
-	  $(TARGET-tk))
+	(cd tk && $(MAKE) $(FLAGS_TO_PASS) $(X11_FLAGS_TO_PASS) all)
 @endif tk
 
 .PHONY: check-tk maybe-check-tk
@@ -21680,15 +21550,13 @@ configure-libtermcap:
 .PHONY: all-libtermcap maybe-all-libtermcap
 maybe-all-libtermcap:
 @if libtermcap
-TARGET-libtermcap=all
 maybe-all-libtermcap: all-libtermcap
 all-libtermcap: configure-libtermcap
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd libtermcap && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-libtermcap))
+	(cd libtermcap && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif libtermcap
 
 .PHONY: check-libtermcap maybe-check-libtermcap
@@ -21919,15 +21787,13 @@ configure-utils:
 .PHONY: all-utils maybe-all-utils
 maybe-all-utils:
 @if utils
-TARGET-utils=all
 maybe-all-utils: all-utils
 all-utils: configure-utils
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd utils && $(MAKE) $(FLAGS_TO_PASS)  \
-	  $(TARGET-utils))
+	(cd utils && $(MAKE) $(FLAGS_TO_PASS)  all)
 @endif utils
 
 .PHONY: check-utils maybe-check-utils

@@ -51,7 +51,6 @@
 #define EF_ARM_EABI_VER1     0x01000000
 #define EF_ARM_EABI_VER2     0x02000000
 #define EF_ARM_EABI_VER3     0x03000000
-#define EF_ARM_EABI_VER4     0x04000000
 
 /* Local aliases for some flags to match names used by COFF port.  */
 #define F_INTERWORK	   EF_ARM_INTERWORK
@@ -64,9 +63,6 @@
 /* Additional symbol types for Thumb.  */
 #define STT_ARM_TFUNC      STT_LOPROC   /* A Thumb function.  */
 #define STT_ARM_16BIT      STT_HIPROC   /* A Thumb label.  */
-
-/* Additional section types.  */
-#define SHT_ARM_EXIDX	   0x70000001	/* Section holds ARM unwind info.  */
 
 /* ARM-specific values for sh_flags.  */
 #define SHF_ENTRYSECT      0x10000000   /* Section contains an entry point.  */
@@ -134,15 +130,10 @@ START_RELOC_NUMBERS (elf_arm_reloc_type)
   RELOC_NUMBER (R_ARM_TARGET1,         38)
   RELOC_NUMBER (R_ARM_ROSEGREL32,      39)
   RELOC_NUMBER (R_ARM_V4BX,            40)
-  RELOC_NUMBER (R_ARM_TARGET2,	       41)
-  RELOC_NUMBER (R_ARM_PREL31,	       42)
+  RELOC_NUMBER (R_ARM_STKCHK,          41)
+  RELOC_NUMBER (R_ARM_THM_STKCHK,      42)
   FAKE_RELOC   (FIRST_INVALID_RELOC2,  43)
-  FAKE_RELOC   (LAST_INVALID_RELOC2,   94)
-  RELOC_NUMBER (R_ARM_GOT_ABS,	       95)
-  RELOC_NUMBER (R_ARM_GOT_PREL,	       96)
-  RELOC_NUMBER (R_ARM_GOT_BREL12,      97)
-  RELOC_NUMBER (R_ARM_GOTOFF12,	       98)
-  RELOC_NUMBER (R_ARM_GOTRELAX,	       99)
+  FAKE_RELOC   (LAST_INVALID_RELOC2,   99)
   RELOC_NUMBER (R_ARM_GNU_VTENTRY,    100)
   RELOC_NUMBER (R_ARM_GNU_VTINHERIT,  101)
   RELOC_NUMBER (R_ARM_THM_PC11,       102)   /* Cygnus extension to abi: Thumb unconditional branch.  */
@@ -161,11 +152,5 @@ END_RELOC_NUMBERS (R_ARM_max)
 
 /* The name of the note section used to identify arm variants.  */
 #define ARM_NOTE_SECTION ".note.gnu.arm.ident"
-
-/* Special section names.  */
-#define ELF_STRING_ARM_unwind           ".ARM.exidx"
-#define ELF_STRING_ARM_unwind_info      ".ARM.extab"
-#define ELF_STRING_ARM_unwind_once      ".gnu.linkonce.armexidx."
-#define ELF_STRING_ARM_unwind_info_once ".gnu.linkonce.armextab."
-
+     
 #endif /* _ELF_ARM_H */
