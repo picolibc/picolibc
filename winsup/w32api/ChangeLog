@@ -1,3 +1,7 @@
+2002-06-25  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* include/winbase.h (FILE_FLAG_FIRST_PIPE_INSTANCE): Add constant.
+
 2002-06-26  Casper S. Hornstrup  <chorns@users.sourceforge.net>
 
 	* include/winbase.h (WINBASEAPI): Don't define if prior
