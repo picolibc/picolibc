@@ -2,6 +2,7 @@
 
 	* include/wincon.h (AttachConsole): Correct the _WIN32_WINNT filter.
 	Changed it twice due to inconsistent MSDN documentation.
+	* include/w32api.h (Windows95, etc. and IE3, etc.): Add definitions.
 
 2004-11-13  Danny Smith  <dannysmith@users.sourceforge.net>
 
