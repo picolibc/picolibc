@@ -1,5 +1,11 @@
 2004-06-01  Paolo Bonzini <bonzini@gnu.org>
 
+	* configure.in: Remove new- prefix from toplevel
+	bootstrap targets.
+	* configure: Regenerate.
+
+2004-06-01  Paolo Bonzini <bonzini@gnu.org>
+
 	Merge this patch from the gcc tree:
 
 	2004-05-30  Andreas Jaeger  <aj@suse.de>
