@@ -185,7 +185,7 @@ EOF
     whole_archive_flag_spec='-all_load $convenience'
     ;;
 
-  netbsd*)
+  netbsd* | knetbsd*-gnu)
     if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
       archive_cmds='$LD -Bshareable $libobjs $deplibs $linker_flags -o $lib'
       wlarc=
@@ -409,7 +409,7 @@ else
     ;;
 
   # FreeBSD 3 and greater uses gcc -shared to do shared libraries.
-  freebsd*)
+  freebsd* | kfreebsd*-gnu)
     archive_cmds='$CC -shared -o $lib $libobjs $deplibs $compiler_flags'
     hardcode_libdir_flag_spec='-R$libdir'
     hardcode_direct=yes
@@ -456,7 +456,7 @@ else
     link_all_deplibs=yes
     ;;
 
-  netbsd*)
+  netbsd* | knetbsd*-gnu)
     if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
       archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'  # a.out
     else
