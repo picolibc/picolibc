@@ -1,3 +1,9 @@
+2002-09-30  Nick Clifton  <nickc@redhat.com>
+
+	* cpu: New top level directory.  Intended to hold input files for
+	CGEN which have FSF copyright assignment.
+	* Makefile.in (BINUTILS_SUPPORT_DIRS): Add cpu directory.
+
 2002-09-29  Andrew Cagney  <ac131313@redhat.com>
 
 	Revert below (note that src does not contain Makefile.tpl):
