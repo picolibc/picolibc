@@ -163,6 +163,8 @@ private:
 #define PTHREAD_CONDATTR_MAGIC PTHREAD_MAGIC+6
 #define SEM_MAGIC PTHREAD_MAGIC+7
 #define PTHREAD_ONCE_MAGIC PTHREAD_MAGIC+8
+#define PTHREAD_RWLOCK_MAGIC PTHREAD_MAGIC+9
+#define PTHREAD_RWLOCKATTR_MAGIC PTHREAD_MAGIC+10
 
 #define MUTEX_OWNER_ANONYMOUS        ((pthread_t) -1)
 
@@ -517,6 +519,67 @@ private:
   static nativeMutex condInitializationLock;
 };
 
+class pthread_rwlockattr:public verifyable_object
+{
+public:
+  static bool isGoodObject(pthread_rwlockattr_t const *);
+  int shared;
+
+  pthread_rwlockattr ();
+  ~pthread_rwlockattr ();
+};
+
+class pthread_rwlock:public verifyable_object
+{
+public:
+  static bool isGoodObject (pthread_rwlock_t const *);
+  static bool isGoodInitializer (pthread_rwlock_t const *);
+  static bool isGoodInitializerOrObject (pthread_rwlock_t const *);
+  static bool isGoodInitializerOrBadObject (pthread_rwlock_t const *);
+  static void initMutex ();
+  static int init (pthread_rwlock_t *, const pthread_rwlockattr_t *);
+
+  int shared;
+
+  unsigned long waitingReaders;
+  unsigned long waitingWriters;
+  pthread_t writer;
+  struct RWLOCK_READER
+  {
+    struct RWLOCK_READER *next;
+    pthread_t thread;
+  } *readers;
+
+  int RdLock ();
+  int TryRdLock ();
+
+  int WrLock ();
+  int TryWrLock ();
+
+  int UnLock ();
+
+  pthread_mutex mtx;
+  pthread_cond condReaders;
+  pthread_cond condWriters;
+
+  class pthread_rwlock * next;
+
+  void fixup_after_fork ();
+
+  pthread_rwlock (pthread_rwlockattr *);
+  ~pthread_rwlock ();
+
+private:
+  void addReader (struct RWLOCK_READER *rd);
+  void removeReader (struct RWLOCK_READER *rd);
+  struct RWLOCK_READER *lookupReader (pthread_t thread);
+
+  static void RdLockCleanup (void *arg);
+  static void WrLockCleanup (void *arg);
+
+  static nativeMutex rwlockInitializationLock;
+};
+
 class pthread_once
 {
 public:
@@ -574,6 +637,7 @@ public:
   // lists of pthread objects. USE THREADSAFE INSERTS AND DELETES.
   class pthread_mutex * mutexs;
   class pthread_cond  * conds;
+  class pthread_rwlock * rwlocks;
   class semaphore     * semaphores;
 
   pthread_key reent_key;
@@ -586,7 +650,7 @@ public:
   MTinterface () :
     concurrency (0), threadcount (1),
     pthread_prepare (NULL), pthread_child (NULL), pthread_parent (NULL),
-    mutexs (NULL), conds (NULL), semaphores (NULL),
+    mutexs (NULL), conds (NULL), rwlocks (NULL), semaphores (NULL),
     reent_key (NULL), thread_self_key (NULL)
   {
   }
@@ -631,6 +695,19 @@ int __pthread_condattr_destroy (pthread_condattr_t * condattr);
 int __pthread_condattr_getpshared (const pthread_condattr_t * attr,
 				   int *pshared);
 int __pthread_condattr_setpshared (pthread_condattr_t * attr, int pshared);
+
+/* RW locks */
+int __pthread_rwlock_destroy (pthread_rwlock_t *rwlock);
+int __pthread_rwlock_rdlock (pthread_rwlock_t *rwlock);
+int __pthread_rwlock_tryrdlock (pthread_rwlock_t *rwlock);
+int __pthread_rwlock_wrlock (pthread_rwlock_t *rwlock);
+int __pthread_rwlock_trywrlock (pthread_rwlock_t *rwlock);
+int __pthread_rwlock_unlock (pthread_rwlock_t *rwlock);
+int __pthread_rwlockattr_init (pthread_rwlockattr_t *rwlockattr);
+int __pthread_rwlockattr_getpshared (const pthread_rwlockattr_t *attr,
+                                     int *pshared);
+int __pthread_rwlockattr_setpshared (pthread_rwlockattr_t *attr, int pshared);
+int __pthread_rwlockattr_destroy (pthread_rwlockattr_t *rwlockattr);
 
 /* Thread signal */
 int __pthread_kill (pthread_t thread, int sig);

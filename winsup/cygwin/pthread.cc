@@ -388,6 +388,74 @@ pthread_condattr_setpshared (pthread_condattr_t * attr, int pshared)
   return __pthread_condattr_setpshared (attr, pshared);
 }
 
+/* RW Locks */
+int
+pthread_rwlock_destroy (pthread_rwlock_t *rwlock)
+{
+  return __pthread_rwlock_destroy (rwlock);
+}
+
+int
+pthread_rwlock_init (pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr)
+{
+  return pthread_rwlock::init (rwlock, attr);
+}
+
+int
+pthread_rwlock_rdlock (pthread_rwlock_t *rwlock)
+{
+  return __pthread_rwlock_rdlock (rwlock);
+}
+
+int
+pthread_rwlock_tryrdlock (pthread_rwlock_t *rwlock)
+{
+  return __pthread_rwlock_tryrdlock (rwlock);
+}
+
+int
+pthread_rwlock_wrlock (pthread_rwlock_t *rwlock)
+{
+  return __pthread_rwlock_wrlock (rwlock);
+}
+
+int
+pthread_rwlock_trywrlock (pthread_rwlock_t *rwlock)
+{
+  return __pthread_rwlock_trywrlock (rwlock);
+}
+
+int
+pthread_rwlock_unlock (pthread_rwlock_t *rwlock)
+{
+  return __pthread_rwlock_unlock (rwlock);
+}
+
+int
+pthread_rwlockattr_init (pthread_rwlockattr_t *rwlockattr)
+{
+  return __pthread_rwlockattr_init (rwlockattr);
+}
+
+int
+pthread_rwlockattr_getpshared (const pthread_rwlockattr_t *attr,
+                               int *pshared)
+{
+  return __pthread_rwlockattr_getpshared (attr, pshared);
+}
+
+int
+pthread_rwlockattr_setpshared (pthread_rwlockattr_t *attr, int pshared)
+{
+  return __pthread_rwlockattr_setpshared (attr, pshared);
+}
+
+int
+pthread_rwlockattr_destroy (pthread_rwlockattr_t *rwlockattr)
+{
+  return __pthread_rwlockattr_destroy (rwlockattr);
+}
+
 /* Scheduling */
 
 int

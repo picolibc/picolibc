@@ -1,5 +1,64 @@
 2003-03-18  Thomas Pfaff  <tpfaff@gmx.net>
 
+	* cygwin.din: Add pthread_rwlock_destroy, pthread_rwlock_init,
+	pthread_rwlock_rdlock, pthread_rwlock_tryrdlock,
+	pthread_rwlock_wrlock, pthread_rwlock_trywrlock,
+	pthread_rwlock_unlock, pthread_rwlockattr_init,
+	pthread_rwlockattr_getpshared, pthread_rwlockattr_setpshared,
+	and pthread_rwlockattr_destroy.
+	* include/cygwin/version.h: Bump API minor number.
+	* include/pthread.h (PTHREAD_RWLOCK_INITIALIZER): Define a
+	reasonable value.
+	Add prototypes for pthread_rwlock_destroy, pthread_rwlock_init,
+	pthread_rwlock_rdlock, pthread_rwlock_tryrdlock,
+	pthread_rwlock_wrlock, pthread_rwlock_trywrlock,
+	pthread_rwlock_unlock, pthread_rwlockattr_init,
+	pthread_rwlockattr_getpshared, pthread_rwlockattr_setpshared,
+	and pthread_rwlockattr_destroy.
+	* thread.h (PTHREAD_ONCE_MAGIC): Remove superflous semicolon.
+	(PTHREAD_RWLOCK_MAGIC): New define.
+	(PTHREAD_RWLOCKATTR_MAGIC): Ditto.
+	(pthread_rwlockattr): New class.
+	(pthread_rwlock): Ditto.
+	(MTinterface::rwlocks): New member.
+	(MTinterface::MTinterface): Initialize rwlocks.
+	Add prototypes for __pthread_rwlock_destroy,
+	__pthread_rwlock_wrlock, __pthread_rwlock_trywrlock,
+	__pthread_rwlock_unlock, __pthread_rwlockattr_init,
+	__pthread_rwlockattr_getpshared, __pthread_rwlockattr_setpshared,
+	and __pthread_rwlockattr_destroy.
+	* thread.cc (MTinterface::Init): Initialize rwlock internal mutex.
+	(MTinterface::fixup_after_fork): Fixup rwlocks after fork.
+	(pthread_rwlockattr::isGoodObject): Implement.
+	(pthread_rwlockattr::pthread_rwlockattr): Ditto.
+	(pthread_rwlockattr::~pthread_rwlockattr): Ditto.
+	(pthread_rwlock::initMutex): Ditto.
+	(pthread_rwlock::pthread_rwlock): Ditto.
+	(pthread_rwlock::~pthread_rwlock): Ditto.
+	(pthread_rwlock::RdLock): Ditto.
+	(pthread_rwlock::TryRdLock): Ditto.
+	(pthread_rwlock::WrLock): Ditto.
+	(pthread_rwlock::TryWrLock): Ditto.
+	(pthread_rwlock::UnLock): Ditto.
+	(pthread_rwlock::addReader): Ditto.
+	(pthread_rwlock::removeReader): Ditto.
+	(pthread_rwlock::lookupReader): Ditto.
+	(pthread_rwlock::RdLockCleanup): Ditto.
+	(pthread_rwlock::WrLockCleanup): Ditto.
+	(pthread_rwlock::fixup_after_fork): Ditto.
+	(pthread_rwlock::isGoodObject): Ditto.
+	(pthread_rwlock::isGoodInitializer): Ditto.
+	(pthread_rwlock::isGoodInitializerOrObject): Ditto.
+	(pthread_rwlock::isGoodInitializerOrBadObject): Ditto.
+	(__pthread_rwlock_destroy): Ditto.
+	(pthread_rwlock::init): Ditto.
+	(__pthread_rwlock_rdlock): Ditto.
+	(__pthread_rwlock_tryrdlock): Ditto.
+	(__pthread_rwlock_wrlock): Ditto.
+	(__pthread_rwlock_trywrlock): Ditto.
+
+2003-03-18  Thomas Pfaff  <tpfaff@gmx.net>
+
 	* thread.h (pthread_cond::ExitingWait): Remove.
 	(pthread_cond::mutex): Ditto.
 	(pthread_cond::cond_access): Ditto.

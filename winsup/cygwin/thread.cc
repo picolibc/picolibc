@@ -199,6 +199,7 @@ MTinterface::Init (int forked)
 
   pthread_mutex::initMutex ();
   pthread_cond::initMutex ();
+  pthread_rwlock::initMutex ();
 }
 
 void
@@ -229,6 +230,13 @@ MTinterface::fixup_after_fork (void)
     {
       cond->fixup_after_fork ();
       cond = cond->next;
+    }
+  pthread_rwlock *rwlock = rwlocks;
+  debug_printf ("rwlocks is %x",rwlocks);
+  while (rwlock)
+    {
+      rwlock->fixup_after_fork ();
+      rwlock = rwlock->next;
     }
   semaphore *sem = semaphores;
   debug_printf ("semaphores is %x",semaphores);
@@ -996,6 +1004,341 @@ pthread_cond::fixup_after_fork ()
   semWait = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
   if (!semWait)
     api_fatal ("pthread_cond::fixup_after_fork () failed to recreate win32 semaphore");
+}
+
+bool
+pthread_rwlockattr::isGoodObject (pthread_rwlockattr_t const *attr)
+{
+  if (verifyable_object_isvalid (attr, PTHREAD_RWLOCKATTR_MAGIC) != VALID_OBJECT)
+    return false;
+  return true;
+}
+
+pthread_rwlockattr::pthread_rwlockattr ():verifyable_object
+  (PTHREAD_RWLOCKATTR_MAGIC), shared (PTHREAD_PROCESS_PRIVATE)
+{
+}
+
+pthread_rwlockattr::~pthread_rwlockattr ()
+{
+}
+
+/* This is used for rwlock creation protection within a single process only */
+nativeMutex NO_COPY pthread_rwlock::rwlockInitializationLock;
+
+/* We can only be called once.
+   TODO: (no rush) use a non copied memory section to
+   hold an initialization flag.  */
+void
+pthread_rwlock::initMutex ()
+{
+  if (!rwlockInitializationLock.init ())
+    api_fatal ("Could not create win32 Mutex for pthread rwlock static initializer support.");
+}
+
+pthread_rwlock::pthread_rwlock (pthread_rwlockattr *attr) :
+  verifyable_object (PTHREAD_RWLOCK_MAGIC),
+  shared (0), waitingReaders (0), waitingWriters (0), writer (NULL),
+  readers (NULL), mtx (NULL), condReaders (NULL), condWriters (NULL),
+  next (NULL)
+{
+  pthread_mutex *verifyable_mutex_obj = &mtx;
+  pthread_cond *verifyable_cond_obj;
+
+  if (attr)
+    if (attr->shared != PTHREAD_PROCESS_PRIVATE)
+      {
+        magic = 0;
+        return;
+      }
+
+  if (!pthread_mutex::isGoodObject (&verifyable_mutex_obj))
+    {
+      thread_printf ("Internal rwlock mutex is not valid. this %p", this);
+      magic = 0;
+      return;
+    }
+  /* Change the mutex type to NORMAL to speed up mutex operations */
+  mtx.type = PTHREAD_MUTEX_NORMAL;
+
+  verifyable_cond_obj = &condReaders;
+  if (!pthread_cond::isGoodObject (&verifyable_cond_obj))
+    {
+      thread_printf ("Internal rwlock readers cond is not valid. this %p", this);
+      magic = 0;
+      return;
+    }
+
+  verifyable_cond_obj = &condWriters;
+  if (!pthread_cond::isGoodObject (&verifyable_cond_obj))
+    {
+      thread_printf ("Internal rwlock writers cond is not valid. this %p", this);
+      magic = 0;
+      return;
+    }
+
+
+  /* threadsafe addition is easy */
+  next = (pthread_rwlock *) InterlockedExchangePointer (&MT_INTERFACE->rwlocks, this);
+}
+
+pthread_rwlock::~pthread_rwlock ()
+{
+  /* I'm not 100% sure the next bit is threadsafe. I think it is... */
+  if (MT_INTERFACE->rwlocks == this)
+    InterlockedExchangePointer (&MT_INTERFACE->rwlocks, this->next);
+  else
+    {
+      pthread_rwlock *temprwlock = MT_INTERFACE->rwlocks;
+      while (temprwlock->next && temprwlock->next != this)
+	temprwlock = temprwlock->next;
+      /* but there may be a race between the loop above and this statement */
+      InterlockedExchangePointer (&temprwlock->next, this->next);
+    }
+}
+
+int
+pthread_rwlock::RdLock ()
+{
+  int result = 0;
+  struct RWLOCK_READER *reader;
+  pthread_t self = pthread::self ();
+
+  mtx.Lock ();
+
+  if (lookupReader (self))
+    {
+      result = EDEADLK;
+      goto DONE;
+    }
+
+  reader = new struct RWLOCK_READER;
+  if (!reader)
+    {
+      result = EAGAIN;
+      goto DONE;
+    }
+
+  while (writer || waitingWriters)
+    {  
+      pthread_cleanup_push (pthread_rwlock::RdLockCleanup, this);
+
+      ++waitingReaders;
+      condReaders.Wait (&mtx);
+      --waitingReaders;
+
+      pthread_cleanup_pop (0);
+    }
+
+  reader->thread = self;
+  addReader (reader);
+
+ DONE:
+  mtx.UnLock ();
+
+  return result;
+}
+
+int
+pthread_rwlock::TryRdLock ()
+{
+  int result = 0;
+  pthread_t self = pthread::self ();
+
+  mtx.Lock ();
+
+  if (writer || waitingWriters || lookupReader (self))
+    result = EBUSY;
+  else
+    {
+      struct RWLOCK_READER *reader = new struct RWLOCK_READER;
+      if (reader)
+        {
+          reader->thread = self;
+          addReader (reader);
+        }
+      else
+        result = EAGAIN;
+    }
+    
+  mtx.UnLock ();
+
+  return result;
+}
+
+int
+pthread_rwlock::WrLock ()
+{
+  int result = 0;
+  pthread_t self = pthread::self ();
+
+  mtx.Lock ();
+
+  if (writer == self || lookupReader (self))
+    {
+      result = EDEADLK;
+      goto DONE;
+    }
+
+  while (writer || readers)
+    {  
+      pthread_cleanup_push (pthread_rwlock::WrLockCleanup, this);
+
+      ++waitingWriters;
+      condWriters.Wait (&mtx);
+      --waitingWriters;
+
+      pthread_cleanup_pop (0);
+    }
+
+  writer = self;
+
+ DONE:
+  mtx.UnLock ();
+
+  return result;
+}
+
+int
+pthread_rwlock::TryWrLock ()
+{
+  int result = 0;
+  pthread_t self = pthread::self ();
+
+  mtx.Lock ();
+
+  if (writer || readers)
+    result = EBUSY;
+  else
+    writer = self;
+    
+  mtx.UnLock ();
+
+  return result;
+}
+
+int
+pthread_rwlock::UnLock ()
+{
+  int result = 0;
+  pthread_t self = pthread::self ();
+
+  mtx.Lock ();
+
+  if (writer)
+    {
+      if (writer != self)
+        {
+          result = EPERM;
+          goto DONE;
+        }
+
+      writer = NULL;
+    }
+  else
+    {
+      struct RWLOCK_READER *reader = lookupReader (self);
+
+      if (!reader)
+        {
+          result = EPERM;
+          goto DONE;
+        }
+
+      removeReader (reader);
+      delete reader;
+    }
+
+  if (waitingWriters)
+    {
+      if (!readers)
+        condWriters.UnBlock (false);
+    }
+  else if (waitingReaders)
+    condReaders.UnBlock (true);
+
+ DONE:
+  mtx.UnLock ();
+
+  return result;
+}
+
+void
+pthread_rwlock::addReader (struct RWLOCK_READER *rd)
+{
+  rd->next = (struct RWLOCK_READER *)
+    InterlockedExchangePointer (&readers, rd);
+}
+
+void
+pthread_rwlock::removeReader (struct RWLOCK_READER *rd)
+{
+  if (readers == rd)
+    InterlockedExchangePointer (&readers, rd->next);
+  else
+    {
+      struct RWLOCK_READER *temp = readers;
+      while (temp->next && temp->next != rd)
+	temp = temp->next;
+      /* but there may be a race between the loop above and this statement */
+      InterlockedExchangePointer (&temp->next, rd->next);
+    }
+}
+
+struct pthread_rwlock::RWLOCK_READER *
+pthread_rwlock::lookupReader (pthread_t thread)
+{
+  struct RWLOCK_READER *temp = readers;
+
+  while (temp && temp->thread != thread)
+    temp = temp->next;
+
+  return temp;
+}
+
+void
+pthread_rwlock::RdLockCleanup (void *arg)
+{
+  pthread_rwlock *rwlock = (pthread_rwlock *) arg;
+
+  --(rwlock->waitingReaders);
+  rwlock->mtx.UnLock ();
+}
+
+void
+pthread_rwlock::WrLockCleanup (void *arg)
+{
+  pthread_rwlock *rwlock = (pthread_rwlock *) arg;
+
+  --(rwlock->waitingWriters);
+  rwlock->mtx.UnLock ();
+}
+
+void
+pthread_rwlock::fixup_after_fork ()
+{
+  pthread_t self = pthread::self ();
+  struct RWLOCK_READER **temp = &readers;
+
+  waitingReaders = 0;
+  waitingWriters = 0;
+
+  /* Unlock eventually locked mutex */
+  mtx.UnLock ();
+  /*
+   * Remove all readers except self
+   */
+  while (*temp)
+    {
+      if ((*temp)->thread == self)
+        temp = &((*temp)->next);
+      else
+        {
+          struct RWLOCK_READER *cur = *temp;
+          *temp = (*temp)->next;
+          delete cur;
+        }
+    }
 }
 
 /* pthread_key */
@@ -2289,6 +2632,191 @@ __pthread_condattr_destroy (pthread_condattr_t *condattr)
     return EINVAL;
   delete (*condattr);
   *condattr = NULL;
+  return 0;
+}
+
+/* RW locks */
+bool
+pthread_rwlock::isGoodObject (pthread_rwlock_t const *rwlock)
+{
+  if (verifyable_object_isvalid (rwlock, PTHREAD_RWLOCK_MAGIC) != VALID_OBJECT)
+    return false;
+  return true;
+}
+
+bool
+pthread_rwlock::isGoodInitializer (pthread_rwlock_t const *rwlock)
+{
+  if (verifyable_object_isvalid (rwlock, PTHREAD_RWLOCK_MAGIC, PTHREAD_RWLOCK_INITIALIZER) != VALID_STATIC_OBJECT)
+    return false;
+  return true;
+}
+
+bool
+pthread_rwlock::isGoodInitializerOrObject (pthread_rwlock_t const *rwlock)
+{
+  if (verifyable_object_isvalid (rwlock, PTHREAD_RWLOCK_MAGIC, PTHREAD_RWLOCK_INITIALIZER) == INVALID_OBJECT)
+    return false;
+  return true;
+}
+
+bool
+pthread_rwlock::isGoodInitializerOrBadObject (pthread_rwlock_t const *rwlock)
+{
+  verifyable_object_state objectState = verifyable_object_isvalid (rwlock, PTHREAD_RWLOCK_MAGIC, PTHREAD_RWLOCK_INITIALIZER);
+  if (objectState == VALID_OBJECT)
+	return false;
+  return true;
+}
+
+int
+__pthread_rwlock_destroy (pthread_rwlock_t *rwlock)
+{
+  if (pthread_rwlock::isGoodInitializer (rwlock))
+    return 0;
+  if (!pthread_rwlock::isGoodObject (rwlock))
+    return EINVAL;
+
+  if ((*rwlock)->writer || (*rwlock)->readers ||
+      (*rwlock)->waitingReaders || (*rwlock)->waitingWriters)
+    return EBUSY;
+
+  delete (*rwlock);
+  *rwlock = NULL;
+
+  return 0;
+}
+
+int
+pthread_rwlock::init (pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr)
+{
+  if (attr && !pthread_rwlockattr::isGoodObject (attr))
+    return EINVAL;
+  if (!rwlockInitializationLock.lock ())
+    return EINVAL;
+
+  if (!isGoodInitializerOrBadObject (rwlock))
+    {
+      rwlockInitializationLock.unlock ();
+      return EBUSY;
+    }
+
+  *rwlock = new pthread_rwlock (attr ? (*attr) : NULL);
+  if (!isGoodObject (rwlock))
+    {
+      delete (*rwlock);
+      *rwlock = NULL;
+      rwlockInitializationLock.unlock ();
+      return EAGAIN;
+    }
+  rwlockInitializationLock.unlock ();
+  return 0;
+}
+
+int
+__pthread_rwlock_rdlock (pthread_rwlock_t *rwlock)
+{
+  pthread_testcancel ();
+
+  if (pthread_rwlock::isGoodInitializer (rwlock))
+    pthread_rwlock::init (rwlock, NULL);
+  if (!pthread_rwlock::isGoodObject (rwlock))
+    return EINVAL;
+
+  return (*rwlock)->RdLock ();
+}
+
+int
+__pthread_rwlock_tryrdlock (pthread_rwlock_t *rwlock)
+{
+  if (pthread_rwlock::isGoodInitializer (rwlock))
+    pthread_rwlock::init (rwlock, NULL);
+  if (!pthread_rwlock::isGoodObject (rwlock))
+    return EINVAL;
+
+  return (*rwlock)->TryRdLock ();
+}
+
+int
+__pthread_rwlock_wrlock (pthread_rwlock_t *rwlock)
+{
+  pthread_testcancel ();
+
+  if (pthread_rwlock::isGoodInitializer (rwlock))
+    pthread_rwlock::init (rwlock, NULL);
+  if (!pthread_rwlock::isGoodObject (rwlock))
+    return EINVAL;
+
+  return (*rwlock)->WrLock ();
+}
+
+int
+__pthread_rwlock_trywrlock (pthread_rwlock_t *rwlock)
+{
+  if (pthread_rwlock::isGoodInitializer (rwlock))
+    pthread_rwlock::init (rwlock, NULL);
+  if (!pthread_rwlock::isGoodObject (rwlock))
+    return EINVAL;
+
+  return (*rwlock)->TryWrLock ();
+}
+
+int
+__pthread_rwlock_unlock (pthread_rwlock_t *rwlock)
+{
+  if (pthread_rwlock::isGoodInitializer (rwlock))
+    return 0;
+  if (!pthread_rwlock::isGoodObject (rwlock))
+    return EINVAL;
+
+  return (*rwlock)->UnLock ();
+}
+
+int
+__pthread_rwlockattr_init (pthread_rwlockattr_t *rwlockattr)
+{
+  if (check_valid_pointer (rwlockattr))
+    return EINVAL;
+  *rwlockattr = new pthread_rwlockattr;
+  if (!pthread_rwlockattr::isGoodObject (rwlockattr))
+    {
+      delete (*rwlockattr);
+      *rwlockattr = NULL;
+      return EAGAIN;
+    }
+  return 0;
+}
+
+int
+__pthread_rwlockattr_getpshared (const pthread_rwlockattr_t *attr, int *pshared)
+{
+  if (!pthread_rwlockattr::isGoodObject (attr))
+    return EINVAL;
+  *pshared = (*attr)->shared;
+  return 0;
+}
+
+int
+__pthread_rwlockattr_setpshared (pthread_rwlockattr_t *attr, int pshared)
+{
+  if (!pthread_rwlockattr::isGoodObject (attr))
+    return EINVAL;
+  if ((pshared < 0) || (pshared > 1))
+    return EINVAL;
+  /* shared rwlock vars not currently supported */
+  if (pshared != PTHREAD_PROCESS_PRIVATE)
+    return EINVAL;
+  (*attr)->shared = pshared;
+  return 0;
+}
+
+int
+__pthread_rwlockattr_destroy (pthread_rwlockattr_t *rwlockattr)
+{
+  if (!pthread_rwlockattr::isGoodObject (rwlockattr))
+    return EINVAL;
+  delete (*rwlockattr);
+  *rwlockattr = NULL;
   return 0;
 }
 
