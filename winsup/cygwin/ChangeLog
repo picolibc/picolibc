@@ -1,3 +1,8 @@
+2004-02-05  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin.din: Make many more functions SIGFE.
+	* include/cygwin/version.h (CYGWIN_VERSION_SHARED_DATA): Bump.
+
 2004-02-05  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* security.h (SID): New macro.

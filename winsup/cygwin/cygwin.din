@@ -84,8 +84,8 @@ fscanf_r = _fscanf_r SIGFE
 fstat SIGFE
 _fstat = fstat SIGFE
 _pipe SIGFE
-_pthread_cleanup_pop NOSIGFE
-_pthread_cleanup_push NOSIGFE
+_pthread_cleanup_pop SIGFE
+_pthread_cleanup_push SIGFE
 _scanf_r SIGFE
 scanf_r = _scanf_r SIGFE
 _sscanf_r SIGFE
@@ -96,8 +96,8 @@ _strtold SIGFE
 trunc NOSIGFE
 _vasprintf_r SIGFE
 vasprintf_r = _vasprintf_r SIGFE
-_vfscanf_r NOSIGFE
-vfscanf_r = _vfscanf_r NOSIGFE
+_vfscanf_r SIGFE
+vfscanf_r = _vfscanf_r SIGFE
 _vscanf_r SIGFE
 vscanf_r = _vscanf_r SIGFE
 _vsscanf_r SIGFE
@@ -529,8 +529,8 @@ forkpty SIGFE
 fpathconf SIGFE
 fprintf SIGFE
 _fprintf = fprintf SIGFE
-fputc NOSIGFE
-_fputc = fputc NOSIGFE
+fputc SIGFE
+_fputc = fputc SIGFE
 fputs SIGFE
 _fputs = fputs SIGFE
 fread SIGFE
@@ -591,10 +591,10 @@ getc SIGFE
 _getc = getc SIGFE
 getc_unlocked SIGFE
 _getc_unlocked = getc_unlocked SIGFE
-getchar NOSIGFE
-_getchar = getchar NOSIGFE
-getchar_unlocked NOSIGFE
-_getchar_unlocked = getchar_unlocked NOSIGFE
+getchar SIGFE
+_getchar = getchar SIGFE
+getchar_unlocked SIGFE
+_getchar_unlocked = getchar_unlocked SIGFE
 getcwd SIGFE
 _getcwd = getcwd SIGFE
 getdomainname SIGFE
@@ -661,8 +661,8 @@ getrlimit SIGFE
 _getrlimit = getrlimit SIGFE
 getrusage SIGFE
 _getrusage = getrusage SIGFE
-gets NOSIGFE
-_gets = gets NOSIGFE
+gets SIGFE
+_gets = gets SIGFE
 getsid SIGFE
 gettimeofday SIGFE
 _gettimeofday = gettimeofday SIGFE
@@ -818,8 +818,8 @@ localeconv NOSIGFE
 _localeconv = localeconv NOSIGFE
 localtime SIGFE
 _localtime = localtime SIGFE
-localtime_r NOSIGFE
-_localtime_r = localtime_r NOSIGFE
+localtime_r SIGFE
+_localtime_r = localtime_r SIGFE
 log NOSIGFE
 _log = log NOSIGFE
 log10 NOSIGFE
@@ -969,63 +969,63 @@ _powf = powf NOSIGFE
 printf SIGFE
 _printf = printf SIGFE
 pthread_atfork SIGFE
-pthread_attr_destroy NOSIGFE
-pthread_attr_getdetachstate NOSIGFE
-pthread_attr_getinheritsched NOSIGFE
-pthread_attr_getschedparam NOSIGFE
-pthread_attr_getschedpolicy NOSIGFE
-pthread_attr_getscope NOSIGFE
-pthread_attr_getstacksize NOSIGFE
+pthread_attr_destroy SIGFE
+pthread_attr_getdetachstate SIGFE
+pthread_attr_getinheritsched SIGFE
+pthread_attr_getschedparam SIGFE
+pthread_attr_getschedpolicy SIGFE
+pthread_attr_getscope SIGFE
+pthread_attr_getstacksize SIGFE
 pthread_attr_init SIGFE
-pthread_attr_setdetachstate NOSIGFE
-pthread_attr_setinheritsched NOSIGFE
-pthread_attr_setschedparam NOSIGFE
-pthread_attr_setschedpolicy NOSIGFE
-pthread_attr_setscope NOSIGFE
-pthread_attr_setstacksize NOSIGFE
-pthread_cancel NOSIGFE
+pthread_attr_setdetachstate SIGFE
+pthread_attr_setinheritsched SIGFE
+pthread_attr_setschedparam SIGFE
+pthread_attr_setschedpolicy SIGFE
+pthread_attr_setscope SIGFE
+pthread_attr_setstacksize SIGFE
+pthread_cancel SIGFE
 pthread_cond_broadcast SIGFE
-pthread_cond_destroy NOSIGFE
+pthread_cond_destroy SIGFE
 pthread_cond_init SIGFE
 pthread_cond_signal SIGFE
 pthread_cond_timedwait SIGFE
 pthread_cond_wait SIGFE
-pthread_condattr_destroy NOSIGFE
-pthread_condattr_getpshared NOSIGFE
+pthread_condattr_destroy SIGFE
+pthread_condattr_getpshared SIGFE
 pthread_condattr_init SIGFE
-pthread_condattr_setpshared NOSIGFE
+pthread_condattr_setpshared SIGFE
 pthread_continue SIGFE
 pthread_create SIGFE
 pthread_detach SIGFE
-pthread_equal NOSIGFE
-pthread_exit NOSIGFE
-pthread_getconcurrency NOSIGFE
-pthread_getschedparam NOSIGFE
-pthread_getsequence_np NOSIGFE
-pthread_getspecific NOSIGFE
+pthread_equal SIGFE
+pthread_exit SIGFE
+pthread_getconcurrency SIGFE
+pthread_getschedparam SIGFE
+pthread_getsequence_np SIGFE
+pthread_getspecific SIGFE
 pthread_join SIGFE
 pthread_key_create SIGFE
-pthread_key_delete NOSIGFE
+pthread_key_delete SIGFE
 pthread_kill SIGFE
-pthread_mutex_destroy NOSIGFE
+pthread_mutex_destroy SIGFE
 pthread_mutex_getprioceiling SIGFE
 pthread_mutex_init SIGFE
 pthread_mutex_lock SIGFE
 pthread_mutex_setprioceiling SIGFE
 pthread_mutex_trylock SIGFE
 pthread_mutex_unlock SIGFE
-pthread_mutexattr_destroy NOSIGFE
-pthread_mutexattr_getprioceiling NOSIGFE
-pthread_mutexattr_getprotocol NOSIGFE
-pthread_mutexattr_getpshared NOSIGFE
-pthread_mutexattr_gettype NOSIGFE
+pthread_mutexattr_destroy SIGFE
+pthread_mutexattr_getprioceiling SIGFE
+pthread_mutexattr_getprotocol SIGFE
+pthread_mutexattr_getpshared SIGFE
+pthread_mutexattr_gettype SIGFE
 pthread_mutexattr_init SIGFE
-pthread_mutexattr_setprioceiling NOSIGFE
-pthread_mutexattr_setprotocol NOSIGFE
-pthread_mutexattr_setpshared NOSIGFE
-pthread_mutexattr_settype NOSIGFE
+pthread_mutexattr_setprioceiling SIGFE
+pthread_mutexattr_setprotocol SIGFE
+pthread_mutexattr_setpshared SIGFE
+pthread_mutexattr_settype SIGFE
 pthread_once SIGFE
-pthread_rwlock_destroy NOSIGFE
+pthread_rwlock_destroy SIGFE
 pthread_rwlock_init SIGFE
 pthread_rwlock_rdlock SIGFE
 pthread_rwlock_tryrdlock SIGFE
@@ -1033,27 +1033,27 @@ pthread_rwlock_wrlock SIGFE
 pthread_rwlock_trywrlock SIGFE
 pthread_rwlock_unlock SIGFE
 pthread_rwlockattr_init SIGFE
-pthread_rwlockattr_getpshared NOSIGFE
-pthread_rwlockattr_setpshared NOSIGFE
-pthread_rwlockattr_destroy NOSIGFE
-pthread_self NOSIGFE
-pthread_setcancelstate NOSIGFE
-pthread_setcanceltype NOSIGFE
-pthread_setconcurrency NOSIGFE
+pthread_rwlockattr_getpshared SIGFE
+pthread_rwlockattr_setpshared SIGFE
+pthread_rwlockattr_destroy SIGFE
+pthread_self SIGFE
+pthread_setcancelstate SIGFE
+pthread_setcanceltype SIGFE
+pthread_setconcurrency SIGFE
 pthread_setschedparam SIGFE
-pthread_setspecific NOSIGFE
+pthread_setspecific SIGFE
 pthread_sigmask SIGFE
 pthread_suspend SIGFE
-pthread_testcancel NOSIGFE
+pthread_testcancel SIGFE
 ptsname SIGFE
 putc SIGFE
 _putc = putc SIGFE
 putc_unlocked SIGFE
 _putc_unlocked = putc_unlocked SIGFE
-putchar NOSIGFE
-_putchar = putchar NOSIGFE
-putchar_unlocked NOSIGFE
-_putchar_unlocked = putchar_unlocked NOSIGFE
+putchar SIGFE
+_putchar = putchar SIGFE
+putchar_unlocked SIGFE
+_putchar_unlocked = putchar_unlocked SIGFE
 putenv SIGFE
 _putenv = putenv SIGFE
 puts SIGFE
@@ -1135,7 +1135,7 @@ seekdir SIGFE
 _seekdir = seekdir SIGFE
 _seekdir64 = seekdir64 SIGFE
 sem_close SIGFE
-sem_destroy NOSIGFE
+sem_destroy SIGFE
 sem_getvalue SIGFE
 sem_init SIGFE
 sem_open SIGFE
@@ -1334,7 +1334,7 @@ strrchr NOSIGFE
 _strrchr = strrchr NOSIGFE
 strsep NOSIGFE
 _strsep = strsep NOSIGFE
-strsignal SIGFE
+strsignal NOSIGFE
 strspn NOSIGFE
 _strspn = strspn NOSIGFE
 strstr NOSIGFE
@@ -1352,7 +1352,7 @@ strtol NOSIGFE
 _strtol = strtol NOSIGFE
 strtoll NOSIGFE
 _strtoll = strtoll NOSIGFE
-strtosigno SIGFE
+strtosigno NOSIGFE
 strtoul NOSIGFE
 _strtoul = strtoul NOSIGFE
 strtoull NOSIGFE

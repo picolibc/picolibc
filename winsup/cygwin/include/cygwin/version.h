@@ -1,6 +1,6 @@
 /* version.h -- Cygwin version numbers and accompanying documentation.
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -247,9 +247,11 @@ details. */
 	shared memory regions.  It is incremented when incompatible
 	changes are made to the shared memory region *or* to any named
 	shared mutexes, semaphores, etc.   The arbitrary starting
-	version was 0 (cygwin release 98r2). */
+	version was 0 (cygwin release 98r2).
+	Bump to 4 since this hasn't been rigorously updated in a
+	while.  */
 
-#define CYGWIN_VERSION_SHARED_DATA 3
+#define CYGWIN_VERSION_SHARED_DATA 4
 
      /* An identifier used in the names used to create shared objects.
 	The full names include the CYGWIN_VERSION_SHARED_DATA version
