@@ -79,6 +79,8 @@ tcflush (int fd, int queue)
 
   if (!cfd->is_tty ())
     set_errno (ENOTTY);
+  else if (queue != TCIFLUSH && queue != TCOFLUSH && queue != TCIOFLUSH)
+      set_errno (EINVAL);
   else if ((res = cfd->bg_check (-SIGTTOU)) > bg_eof)
     res = cfd->tcflush (queue);
 
