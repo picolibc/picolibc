@@ -291,6 +291,7 @@ public:
   static bool isGoodObject(pthread_mutex_t const *);
   static bool isGoodInitializer(pthread_mutex_t const *);
   static bool isGoodInitializerOrObject(pthread_mutex_t const *);
+  static bool isGoodInitializerOrBadObject (pthread_mutex_t const *mutex);
   static void initMutex ();
   static int init (pthread_mutex_t *, const pthread_mutexattr_t *);
 

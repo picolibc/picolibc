@@ -1,3 +1,10 @@
+2002-10-17  Robert Collins  <rbtcollins@hotmail.com>
+
+	* thread.h (pthread_mutex::isGoodInitializerOrBadObject): Declare.
+	* thread.cc (pthread_mutex::isGoodInitializerOrBadObject): Implement.
+	(pthread_mutex::init): Use isGoodInitializerOrBadObject to avoid
+	unneeded SEGV's during debugging.
+
 2002-10-17  Thomas Pfaff  <tpfaff@gmx.net>
  
 	* thread.cc (verifyable_object_isvalid): Test for static object first.

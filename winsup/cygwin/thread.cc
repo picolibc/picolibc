@@ -1098,6 +1098,15 @@ pthread_mutex::isGoodInitializerOrObject (pthread_mutex_t const *mutex)
   return true;
 }
 
+bool 
+pthread_mutex::isGoodInitializerOrBadObject (pthread_mutex_t const *mutex)
+{
+    verifyable_object_state objectState = verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC, PTHREAD_MUTEX_INITIALIZER);
+    if (objectState == VALID_OBJECT)
+	return false;
+    return true;
+}
+
 /* This is used for mutex creation protection within a single process only */
 pthread_mutex::nativeMutex pthread_mutex::mutexInitializationLock NO_COPY;
 
@@ -2256,8 +2265,7 @@ pthread_mutex::init (pthread_mutex_t *mutex,
   if (!mutexInitializationLock.lock ())
     return EINVAL;
 
-  /* FIXME: bugfix: we should check *mutex being a valid address */
-  if (isGoodObject (mutex))
+  if (!isGoodInitializerOrBadObject (mutex))
     {
       mutexInitializationLock.unlock ();
       return EBUSY;
