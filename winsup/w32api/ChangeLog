@@ -1,3 +1,11 @@
+2003-05-13  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/oleidl.h  (LPENUMOLEDOCUMENTVIEWS): Remove typedef.
+	(IEnumOleDocumentViews): Remove commented out DECLARE_ENUMERATOR.
+	* include/docobj.h  (LPENUMOLEDOCUMENTVIEWS): Add typedef (previously
+	commented out).
+	(IEnumOleDocumentViews): Add definition using DECLARE_ENUMERATOR.
+
 2003-05-12  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/commctrl.h: (MCSC_BACKGROUND, MCSC_TEXT, MCSC_TITLEBK,

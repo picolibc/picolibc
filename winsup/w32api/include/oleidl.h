@@ -18,7 +18,6 @@ typedef interface IOleClientSite *LPOLECLIENTSITE;
 typedef interface IOleObject *LPOLEOBJECT;
 typedef interface IDropTarget *LPDROPTARGET;
 typedef interface IDropSource *LPDROPSOURCE;
-typedef interface IEnumOleDocumentViews *LPENUMOLEDOCUMENTVIEWS;
 typedef interface IEnumOleUndoUnits *LPENUMOLEUNDOUNITS;
 typedef interface IEnumOLEVERB *LPENUMOLEVERB;
 typedef interface IOleWindow *LPOLEWINDOW;
@@ -82,7 +81,6 @@ typedef struct tagOIFI {
 	UINT cAccelEntries;
 }OLEINPLACEFRAMEINFO,*LPOLEINPLACEFRAMEINFO;
 
-/*DECLARE_ENUMERATOR_(IEnumOleDocumentViews,IOleDocumentView);*/
 DECLARE_ENUMERATOR(OLEVERB);
 typedef IEnumOLEVERB IEnumOleVerb;
 
