@@ -1368,13 +1368,13 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
     }
 
   /* Get SID of owner. */
-  cygsid owner_sid;
+  cygsid owner_sid (NO_SID);
   /* Check for current user first */
   if (uid == myself->uid)
     owner_sid = cygheap->user.sid ();
   else if (uid == cygheap->user.orig_uid)
     owner_sid = cygheap->user.orig_sid ();
-  else
+  if (!owner_sid)
     {
       /* Otherwise retrieve user data from /etc/passwd */
       struct passwd *pw = getpwuid32 (uid);

@@ -1,5 +1,10 @@
 2002-06-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* security.cc (alloc_sd): Carefully check owner_sid again after trying
+	SIDs from cygheap.
+
+2002-06-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* security.cc (alloc_sd): Remove unnecessary retrieval of owner name.
 	Check uid for current user first and use SIDs from cygheap if so.
 	Set errno to EINVAL if user SID isn't retrievable.  Just print user SID
