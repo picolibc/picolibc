@@ -1,3 +1,7 @@
+2000-02-16  Nick Clifton  <nickc@cygnus.com>
+
+	* dis-asm.h: Add prototypes for ARM register name functions.
+
 Wed Feb  9 18:45:49 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* wait.h: Delete. No longer used by GDB.

@@ -196,6 +196,9 @@ extern int print_insn_pj		PARAMS ((bfd_vma, disassemble_info*));
 
 extern void print_arm_disassembler_options PARAMS ((FILE *));
 extern void parse_arm_disassembler_option  PARAMS ((char *));
+extern int  get_arm_regname_num_options    PARAMS ((void));
+extern int  set_arm_regname_option         PARAMS ((int));
+extern int  get_arm_regnames               PARAMS ((int, const char **, const char **, const char ***));
 
 /* Fetch the disassembler for a given BFD, if that support is available.  */
 extern disassembler_ftype disassembler	PARAMS ((bfd *));
