@@ -3017,9 +3017,9 @@ chdir (const char *in_dir)
       return -1;
     }
 
-  /* Convert path.  Third argument ensures that we don't check for NULL/empty/invalid
+  /* Convert path.  First argument ensures that we don't check for NULL/empty/invalid
      again. */
-  path_conv path (dir, PC_FULL | PC_SYM_FOLLOW, NULL);
+  path_conv path (PC_NONULLEMPTY, dir, PC_FULL | PC_SYM_FOLLOW);
   if (path.error)
     {
       set_errno (path.error);
