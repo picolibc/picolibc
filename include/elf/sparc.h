@@ -86,7 +86,7 @@ START_RELOC_NUMBERS (elf_sparc_reloc_type)
   RELOC_NUMBER (R_SPARC_UA32, 23)
 
   /* ??? These 6 relocs are new but not currently used.  For binary
-     compatility in the sparc64-elf toolchain, we leave them out.
+     compatibility in the sparc64-elf toolchain, we leave them out.
      A non-binary upward compatible change is expected for sparc64-elf.  */
 #ifndef SPARC64_OLD_RELOCS
   /* ??? New relocs on the UltraSPARC.  Not sure what they're for yet.  */

@@ -279,8 +279,8 @@ typedef struct
   char  NumberOfRvaAndSizes[4];
   /* IMAGE_DATA_DIRECTORY DataDirectory[IMAGE_NUMBEROF_DIRECTORY_ENTRIES];  */
   char  DataDirectory[16][2][4]; /* 16 entries, 2 elements/entry, 4 chars.  */
-} PEP64AOUTHDR;
-#define PEP64AOUTSZ	240
+} PEPAOUTHDR;
+#define PEPAOUTSZ	240
   
 #undef  E_FILNMLEN
 #define E_FILNMLEN	18	/* # characters in a file name.  */

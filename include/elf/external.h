@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* This file is part of ELF support for BFD, and contains the portions
    that describe how ELF is represented externally by the BFD library.
    I.E. it describes the in-file representation of ELF.  It requires
-   the elf-common.h file which contains the portions that are common to
+   the elf/common.h file which contains the portions that are common to
    both the internal and external representations. */
 
 /* The 64-bit stuff is kind of random.  Perhaps someone will publish a

@@ -1,3 +1,23 @@
+2001-06-11  Alan Modra  <amodra@bigpond.net.au>
+
+	Merge from mainline.
+	2001-05-23  Thiemo Seufer <seufer@csv.ica.uni-stuttgart.de>
+	* mips.h (CPU_R12000): Define.
+
+	2001-05-15  Thiemo Seufer <seufer@csv.ica.uni-stuttgart.de>
+	* mips.h (INSN_ISA_MASK): Define.
+
+	2001-03-21  Kazu Hirata  <kazu@hxi.com>
+	* h8300.h: Fix formatting.
+
+	2001-02-28  Igor Shevlyakov  <igor@windriver.com>
+	* m68k.h: new defines for Coldfire V4. Update mcf to know
+	about mcf5407.
+
+	2001-02-10  Nick Clifton  <nickc@redhat.com>
+	* mips.h: Remove extraneous whitespace.  Formating change to allow
+	for future contribution.
+
 2001-06-07  Alan Modra  <amodra@bigpond.net.au>
 
 	* Many files: Update copyright notices.
