@@ -564,6 +564,12 @@ we thought it would be a good idea for compatibility with VC++ code
 to follow their example.  We use _MFC_VER to indicate code that should
 be compiled with VC++.
 
+_WIN32 is only defined when you use either the -mno-cygwin or -mwin32
+gcc command line options.  This is because Cygwin is supposed to be a
+Unix emulation environment and defining _WIN32 confuses some programs
+which think that they have to make special concessions for a Windows
+environment which Cygwin handles automatically.
+
 @subsection How should I port my Unix GUI to Windows?
 
 There are two basic strategies for porting Unix GUIs to Windows.
