@@ -1,3 +1,11 @@
+2004-01-24  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.h (fhandler_base::fhaccess): Return int for compatibility
+	with access.
+	* fhandler.cc (fhandler_base::fhaccess): Return int.  Use consistent
+	variable name for exit value.  Exit at bottom, printing debugging
+	information, like other cygwin functions.
+
 2004-01-23  Christopher Faylor  <cgf@redhat.com>
 
 	* exceptions.cc (sig_handle): Remove extraneous vforkism.

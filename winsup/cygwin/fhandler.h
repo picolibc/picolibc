@@ -364,7 +364,7 @@ class fhandler_base
   bool is_auto_device () {return isdevice () && !dev ().isfs ();}
   bool is_fs_special () {return pc.is_fs_special ();}
   bool device_access_denied (int) __attribute__ ((regparm (2)));
-  bool fhaccess (int flags) __attribute__ ((regparm (2)));
+  int fhaccess (int flags) __attribute__ ((regparm (2)));
 };
 
 class fhandler_socket: public fhandler_base
