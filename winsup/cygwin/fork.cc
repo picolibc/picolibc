@@ -199,6 +199,17 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   if (fixup_mmaps_after_fork (hParent))
     api_fatal ("recreate_mmaps_after_fork_failed");
 
+#ifdef USE_SERVER
+  /* Incredible but true:  If we use sockets and SYSV IPC shared memory,
+     there's a good chance that a duplicated socket in the child occupies
+     memory which is needed to duplicate shared memory from the parent
+     process, if the shared memory hasn't been duplicated already.
+     The same goes very likely for "normal" mmap shared memory, too, but
+     with SYSV IPC it was the first time observed.  So, *never* fixup
+     fdtab before fixing up shared memory. */
+  if (fixup_shms_after_fork ())
+    api_fatal ("recreate_shm areas after fork failed");
+#endif
 
   MALLOC_CHECK;
 
@@ -225,11 +236,6 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
 
   _my_tls.fixup_after_fork ();
   sigproc_init ();
-
-#ifdef USE_SERVER
-  if (fixup_shms_after_fork ())
-    api_fatal ("recreate_shm areas after fork failed");
-#endif
 
   pthread::atforkchild ();
   fixup_timers_after_fork ();
