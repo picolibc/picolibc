@@ -37,6 +37,12 @@ _close (int file)
   return __trap34 (SYS_close, file, 0, 0);
 }
 
+int
+_link (char *old, char *new)
+{
+  return -1;
+}
+
 caddr_t
 _sbrk (int incr)
 {

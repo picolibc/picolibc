@@ -1,3 +1,7 @@
+2000-11-30  Jeff Johnston <jjohnstn@redhat.com>
+
+	* libc/sys/sh/syscalls.c (_link): New stub.
+
 2000-11-29  Nick Clifton  <nickc@redhat.com>
 
 	* configure.host: Add xscale target.
