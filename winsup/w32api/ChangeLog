@@ -1,3 +1,7 @@
+2004-04-20  Adrian Sandor  <aditsu@users.sourceforge.net>
+
+	* include/msacm.h: New file.
+
 2004-01-09  Stuart Cunningham  <stuart_hc@users.sourceforge.net>
 
 	* include/objbase.h (STGFMT): Declare enum.
