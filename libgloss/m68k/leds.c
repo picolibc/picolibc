@@ -15,9 +15,6 @@
  */
 #include "leds.h"
 
-void zylons();
-void led_putnum();
-
 /*
  * led_putnum -- print a hex number on the LED. the value of num must be a char with
  *              the ascii value. ie... number 0 is '0', a is 'a', ' ' (null) clears

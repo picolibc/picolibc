@@ -1,3 +1,9 @@
+2004-01-23  Gábor Lóki  <loki@inf.u-szeged.hu>
+
+	* m68k/leds.c: remove led_putnum(), zylons() forward
+	function declarations.
+	* m68k/leds.h: add zylons() forward function declaration.
+
 2004-01-06  Alexandre Oliva  <aoliva@redhat.com>
 
 	2003-12-02  Richard Sandiford  <rsandifo@redhat.com>
