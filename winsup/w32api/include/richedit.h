@@ -9,7 +9,11 @@ extern "C" {
 #endif
 #pragma pack(push,4)
 
+#ifdef UNICODE 
+#define RICHEDIT_CLASS L"RichEdit20W"
+#else
 #define RICHEDIT_CLASS "RichEdit20A"
+#endif
 #define CF_RTF TEXT("Rich Text Format")
 #define CF_RTFNOOBJS TEXT("Rich Text Format Without Objects")
 #define CF_RETEXTOBJ TEXT("RichEdit Text and Objects")

@@ -1,3 +1,10 @@
+2002-03-14  Gunnar Degnbol <gdegnbol@users.sourceforge.net>
+
+	* include/richedit.h (RICHEDIT_CLASS): UNICODE it.
+	* include/shlobj.h (IContextMenu2): Put methods in right order.
+	* include/basetyps.h (REFGUID, REFIID, REFCLSID): Check for
+	CINTERFACE before defining.
+
 2002-03-09  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/accctrl.h: Add #pragma GCC system_header
