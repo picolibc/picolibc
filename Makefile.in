@@ -1414,6 +1414,17 @@ $(INSTALL_X11_MODULES): installdirs
 # gcc is the only module which uses GCC_FLAGS_TO_PASS.
 .PHONY: all-gcc
 all-gcc:
+	# When configured with --enable-shared, libtool creates a
+	# script in the build directory which automatically relinks
+	# the program to search for shared libraries in the build
+	# directory.  However, when ld/ld-new is called the first time
+	# from the new gcc, all the compiler environment variables are
+	# set to use the new gcc. ld/ld-new will use the new gcc to
+	# relink the new linker. It is incorrect. We cannot run
+	# ld/ld-new the first time from the new gcc. It is a very
+	# special case. We deal with it here.
+	-if test -f gcc/Makefile -a -x ld/ld-new -a -x ld/.libs/ld-new; then \
+	  ld/ld-new -v >/dev/null 2>&1; fi
 	@if [ -f ./gcc/Makefile ] ; then \
 	  r=`pwd`; export r; \
 	  s=`cd $(srcdir); pwd`; export s; \
