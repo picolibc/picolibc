@@ -22,6 +22,7 @@ details. */
 #include <errno.h>
 #include <limits.h>
 #include <winnls.h>
+#include <wininet.h>
 #include <lmcons.h> /* for UNLEN */
 #include <cygwin/version.h>
 #include <sys/cygwin.h>
@@ -1971,6 +1972,14 @@ seteuid (uid_t uid)
   sigframe thisframe (mainthread);
   if (os_being_run == winNT)
     {
+      char orig_username[UNLEN + 1];
+      char orig_domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+      char username[UNLEN + 1];
+      DWORD ulen = UNLEN + 1;
+      char domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+      DWORD dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
+      SID_NAME_USE use;
+
       if (uid == (uid_t) -1 || uid == myself->uid)
 	{
 	  debug_printf ("new euid == current euid, nothing happens");
@@ -1983,18 +1992,44 @@ seteuid (uid_t uid)
 	  return -1;
 	}
 
+      cygsid tok_usersid;
+      DWORD siz;
+
+      char *env;
+      orig_username[0] = orig_domain[0] = '\0';
+      if ((env = getenv ("USERNAME")))
+        strncat (orig_username, env, UNLEN + 1);
+      if ((env = getenv ("USERDOMAIN")))
+        strncat (orig_domain, env, INTERNET_MAX_HOST_NAME_LENGTH + 1);
       if (uid == cygheap->user.orig_uid)
 	{
+
 	  debug_printf ("RevertToSelf () (uid == orig_uid, token=%d)",
 			cygheap->user.token);
 	  RevertToSelf ();
 	  if (cygheap->user.token != INVALID_HANDLE_VALUE)
 	    cygheap->user.impersonated = FALSE;
+
+	  HANDLE ptok = INVALID_HANDLE_VALUE;
+	  if (!OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok))
+	    debug_printf ("OpenProcessToken(): %E\n");
+	  else if (!GetTokenInformation (ptok, TokenUser, &tok_usersid,
+	  				 sizeof tok_usersid, &siz))
+	    debug_printf ("GetTokenInformation(): %E");
+	  else if (!LookupAccountSid (NULL, tok_usersid, username, &ulen,
+				      domain, &dlen, &use))
+	    debug_printf ("LookupAccountSid(): %E");
+	  else
+	    {
+	      setenv ("USERNAME", username, 1);
+	      setenv ("USERDOMAIN", domain, 1);
+	    }
+	  if (ptok != INVALID_HANDLE_VALUE)
+	    CloseHandle (ptok);
 	}
       else
 	{
-	  cygsid usersid, pgrpsid, tok_usersid, tok_pgrpsid;
-	  DWORD siz;
+	  cygsid usersid, pgrpsid, tok_pgrpsid;
 	  HANDLE sav_token = INVALID_HANDLE_VALUE;
 	  BOOL sav_impersonation;
 	  BOOL current_token_is_internal_token = FALSE;
@@ -2104,11 +2139,18 @@ seteuid (uid_t uid)
 	        }
 
 	      /* Now try to impersonate. */
-	      if (!ImpersonateLoggedOnUser (cygheap->user.token))
+	      if (!LookupAccountSid (NULL, usersid, username, &ulen,
+				     domain, &dlen, &use))
+		debug_printf ("LookupAccountSid (): %E");
+	      else if (!ImpersonateLoggedOnUser (cygheap->user.token))
 		system_printf ("Impersonating (%d) in set(e)uid failed: %E",
 			       cygheap->user.token);
 	      else
-		cygheap->user.impersonated = TRUE;
+	        {
+		  cygheap->user.impersonated = TRUE;
+		  setenv ("USERNAME", username, 1);
+		  setenv ("USERDOMAIN", domain, 1);
+	        }
 	    }
 	}
 
@@ -2124,6 +2166,8 @@ seteuid (uid_t uid)
 	  debug_printf ("Diffs!!! token: %d, cur: %d, new: %d, orig: %d",
 			cygheap->user.token, pw_cur->pw_uid,
 			pw_new->pw_uid, cygheap->user.orig_uid);
+	  setenv ("USERNAME", orig_username, 1);
+	  setenv ("USERDOMAIN", orig_domain, 1);
 	  set_errno (EPERM);
 	  return -1;
 	}

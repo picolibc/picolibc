@@ -1,3 +1,13 @@
+Sat Jun  9 23:20:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* syscalls.cc (seteuid): Set environment variables USERNAME and
+	USERDOMAIN before impersonation to workaround a LookupAccountSid()
+	misbehaviour.
+	* uinfo.cc (internal_getlogin): Revert most of the previous change.
+	Don't set environment variables USERNAME and USERDOMAIN. That's
+	the job of seteuid() now. Try to get logon server from Lsa
+	only if logon server isn't already known.
+
 Thu Jun  7 15:54:32 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* thread.cc (pthread_cond::Broadcast): Don't print error messages on
