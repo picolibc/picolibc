@@ -1856,6 +1856,11 @@ seteuid (uid_t uid)
 
           struct pinfo pi;
           pi.psid = (PSID) pi.sidbuf;
+          /* pi.token is used in internal_getlogin() to determine if
+             impersonation is active. If so, the token is used for
+             retrieving user's SID. */
+          pi.token = myself->impersonated ? myself->token
+                                          : INVALID_HANDLE_VALUE;
           struct passwd *pw_cur = getpwnam (internal_getlogin (&pi));
           if (pw_cur != pw_new)
             {

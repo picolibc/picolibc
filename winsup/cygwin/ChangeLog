@@ -1,3 +1,12 @@
+Wed Jun 28 19:36:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* syscalls.cc (seteuid): Initialize pi.token before calling
+	internal_getlogin().
+	* uinfo.cc (internal_getlogin): Use impersonation token instead
+	of process token in case of active impersonation. Add some comments.
+	(uinfo_init): Initializing myself->token and myself->impersonated
+	before calling internal_getlogin(). Add some comments.
+
 Mon Jun 26 18:32:41 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* windows.cc (setitimer): Round up when < 1000 usecs.

@@ -90,13 +90,18 @@ internal_getlogin (struct pinfo *pi)
         }
       if (allow_ntsec)
         {
-          HANDLE ptok = INVALID_HANDLE_VALUE; 
+          HANDLE ptok = pi->token; /* Which is INVALID_HANDLE_VALUE if no
+                                      impersonation took place. */
           DWORD siz;
           char tu[1024];
           int ret = 0;
             
-          /* Try to get the SID from current process first */
-          if (!OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok))
+          /* Try to get the SID either from already impersonated token
+             or from current process first. To differ that two cases is
+             important, because you can't rely on the user information
+             in a process token of a currently impersonated process. */
+          if (ptok == INVALID_HANDLE_VALUE
+              && !OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok))
             debug_printf ("OpenProcessToken(): %E\n");
           else if (!GetTokenInformation (ptok, TokenUser, (LPVOID) &tu,
                                          sizeof tu, &siz))
@@ -104,7 +109,8 @@ internal_getlogin (struct pinfo *pi)
           else if (!(ret = CopySid (40, (PSID) pi->sidbuf,
                                     ((TOKEN_USER *) &tu)->User.Sid)))
             debug_printf ("Couldn't retrieve SID from access token!");
-          if (ptok != INVALID_HANDLE_VALUE)
+          /* Close token only if it's a result from OpenProcessToken(). */
+          if (ptok != INVALID_HANDLE_VALUE && pi->token == INVALID_HANDLE_VALUE)
             CloseHandle (ptok);
 
           /* If that failes, try to get the SID from localhost. This can only
@@ -164,6 +170,13 @@ uinfo_init ()
   char *username;
   struct passwd *p;
 
+  /* Initialize to non impersonated values.
+     Setting `impersonated' to TRUE seems to be wrong but it
+     isn't. Impersonated is thought as "Current User and `token'
+     are coincident". See seteuid() for the mechanism behind that. */
+  myself->token = INVALID_HANDLE_VALUE;
+  myself->impersonated = TRUE;
+
   /* If psid is non null, the process is forked or spawned from
      another cygwin process without changing the user context.
      So all user infos in myself as well as the environment are
@@ -179,7 +192,6 @@ uinfo_init ()
     {
       /* calling getpwnam assures us that /etc/password has been
          read in, but we can't be sure about /etc/group */
-
       if (!group_in_memory_p)
         read_etc_group ();
 
@@ -191,9 +203,8 @@ uinfo_init ()
       myself->uid = DEFAULT_UID;
       myself->gid = DEFAULT_GID;
     }
-  /* Set to non impersonated value. */
-  myself->token = INVALID_HANDLE_VALUE;
-  myself->impersonated = TRUE;
+  /* Real and effective uid/gid are always identical on process start up.
+     This is at least true for NT/W2K. */
   myself->orig_uid = myself->real_uid = myself->uid;
   myself->orig_gid = myself->real_gid = myself->gid;
 }
