@@ -1,3 +1,7 @@
+Tue Feb 22 23:06:01 2000  Christopher Faylor <cgf@cygnus.com>
+
+	Respond to more g++ warnings relating to initializing structures.
+
 Mon Feb 21 18:36:37 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler.cc (set_inheritance): Revert previous patch which got rid of

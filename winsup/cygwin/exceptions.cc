@@ -365,9 +365,9 @@ try_to_debug ()
 
   BOOL dbg;
 
-  PROCESS_INFORMATION pi = {0};
+  PROCESS_INFORMATION pi = {NULL, 0, 0, 0};
 
-  STARTUPINFO si = {0};
+  STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
   si.lpReserved = NULL;
   si.lpDesktop = NULL;
   si.dwFlags = 0;

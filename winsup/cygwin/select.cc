@@ -1038,7 +1038,7 @@ static int
 peek_socket (select_record *me, int)
 {
   winsock_fd_set ws_readfds, ws_writefds, ws_exceptfds;
-  struct timeval tv = {0};
+  struct timeval tv = {0, 0};
   WINSOCK_FD_ZERO (&ws_readfds);
   WINSOCK_FD_ZERO (&ws_writefds);
   WINSOCK_FD_ZERO (&ws_exceptfds);

@@ -245,7 +245,7 @@ fork ()
   HANDLE subproc_ready, forker_finished;
   void *stack_here;
   int x;
-  PROCESS_INFORMATION pi = {0};
+  PROCESS_INFORMATION pi = {0, NULL, 0, 0};
 
   MALLOC_CHECK;
 
@@ -332,7 +332,7 @@ fork ()
 	 for the forkee.  */
       strcpy(child->progname, myself->progname);
 
-      STARTUPINFO si = {0};
+      STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
 
       si.cb = sizeof (STARTUPINFO);
       si.lpReserved2 = (LPBYTE)&ch;

@@ -23,7 +23,7 @@ typedef struct
     const char *name;
   } thread_info;
 
-static NO_COPY thread_info threads[32] = {{0}};	// increase as necessary
+static NO_COPY thread_info threads[32] = {{0, NULL}};	// increase as necessary
 #define NTHREADS (sizeof(threads) / sizeof(threads[0]))
 
 void
@@ -173,10 +173,10 @@ typedef struct _h
     struct _h *next;
   } handle_list;
 
-static NO_COPY handle_list starth = {0};
+static NO_COPY handle_list starth = {0, NULL, NULL, NULL, 0, NULL};
 static NO_COPY handle_list *endh = NULL;
 
-static handle_list NO_COPY freeh[1000] = {{0}};
+static handle_list NO_COPY freeh[1000] = {{0, NULL, NULL, NULL, 0, NULL}};
 #define NFREEH (sizeof (freeh) / sizeof (freeh[0]))
 
 static muto NO_COPY *debug_lock = NULL;

@@ -438,9 +438,8 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
   MALLOC_CHECK;
 
 skip_arg_parsing:
-  PROCESS_INFORMATION pi = {0};
-
-  STARTUPINFO si = {0};
+  PROCESS_INFORMATION pi = {NULL, 0, 0, 0};
+  STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
   si.lpReserved = NULL;
   si.lpDesktop = NULL;
   si.dwFlags = STARTF_USESTDHANDLES;

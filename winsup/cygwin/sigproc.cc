@@ -97,7 +97,7 @@ Static pinfo *zombies[PSIZE] = {NULL};	// All my deceased children info
 Static int nchildren = 0;		// Number of active children
 Static int nzombies = 0;		// Number of deceased children
 
-Static waitq waitq_head = {0};		// Start of queue for wait'ing threads
+Static waitq waitq_head = {0, 0, 0, 0, 0, 0, 0};// Start of queue for wait'ing threads
 Static waitq waitq_main;		// Storage for main thread
 
 DWORD NO_COPY maintid = 0;		// ID of the main thread

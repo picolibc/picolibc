@@ -225,7 +225,7 @@ static struct tl errmap[] =
  {WSAEREMOTE, "WSAEREMOTE", EREMOTE},
  {WSAEINVAL, "WSAEINVAL", EINVAL},
  {WSAEFAULT, "WSAEFAULT", EFAULT},
- {0}
+ {0, NULL, 0}
 };
 
 /* Cygwin internal */
@@ -256,7 +256,7 @@ static struct tl host_errmap[] =
   {WSATRY_AGAIN, "WSATRY_AGAIN", TRY_AGAIN},
   {WSANO_RECOVERY, "WSANO_RECOVERY", NO_RECOVERY},
   {WSANO_DATA, "WSANO_DATA", NO_DATA},
-  {0}
+  {0, NULL, 0}
 };
 
 /* Cygwin internal */

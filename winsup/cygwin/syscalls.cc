@@ -1627,7 +1627,7 @@ mknod ()
 /* FIXME: unimplemented! */
 extern "C"
 int
-setgid (gid_t a)
+setgid (gid_t)
 {
   set_errno (ENOSYS);
   return 0;
@@ -1637,7 +1637,7 @@ setgid (gid_t a)
 /* FIXME: unimplemented! */
 extern "C"
 int
-setuid (uid_t b)
+setuid (uid_t)
 {
   set_errno (ENOSYS);
   return 0;
@@ -1646,7 +1646,7 @@ setuid (uid_t b)
 /* seteuid: standards? */
 extern "C"
 int
-seteuid (uid_t c)
+seteuid (uid_t)
 {
   set_errno (ENOSYS);
   return 0;
@@ -1655,7 +1655,7 @@ seteuid (uid_t c)
 /* setegid: from System V.  */
 extern "C"
 int
-setegid (gid_t a)
+setegid (gid_t)
 {
   set_errno (ENOSYS);
   return 0;
@@ -1664,7 +1664,7 @@ setegid (gid_t a)
 /* chroot: privileged Unix system call.  */
 extern "C"
 int
-chroot (const char *path)
+chroot (const char *)
 {
   set_errno (ENOSYS);
   return -1;
