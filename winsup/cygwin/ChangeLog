@@ -1,3 +1,7 @@
+2000-05-31  DJ Delorie  <dj@cygnus.com>
+
+	* include/cygwin/version.h: use decimal, NOT octal
+
 Wed May 31 16:40:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_disk_file::open): Check for executable

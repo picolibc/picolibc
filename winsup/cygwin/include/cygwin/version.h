@@ -54,6 +54,8 @@ details. */
       /* CYGWIN_VERSION_DLL_COMBINED gives us a single number
 	 representing the combined DLL major and minor numbers. */
 
+      /* WATCH OUT FOR OCTAL!  Don't use, say, "00020" for 0.20 */
+
 #define CYGWIN_VERSION_DLL_MAKE_COMBINED(maj, min) (((maj) * 1000) + min)
 #define CYGWIN_VERSION_DLL_COMBINED \
   CYGWIN_VERSION_DLL_MAKE_COMBINED (CYGWIN_DLL_VERSION_MAJOR, CYGWIN_DLL_VERSION_MINOR)
@@ -65,7 +67,7 @@ details. */
 
     /* API versions <= this had a termios structure whose members were
        too small to accomodate modern settings. */
-#define CYGWIN_VERSION_DLL_OLD_TERMIOS		00005
+#define CYGWIN_VERSION_DLL_OLD_TERMIOS		5
 #define CYGWIN_VERSION_DLL_IS_OLD_TERMIOS \
   (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) <= \
   CYGWIN_VERSION_DLL_OLD_TERMIOS)
@@ -74,7 +76,7 @@ details. */
 	handling in the stdio buffers */
 #define CYGWIN_VERSION_OLD_STDIO_CRLF_HANDLING \
   (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) <= \
-  00020)
+  20)
 
 
      /* We used to use the DLL major/minor to track
