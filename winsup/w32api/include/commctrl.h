@@ -2982,7 +2982,7 @@ BOOL WINAPI _TrackMouseEvent(LPTRACKMOUSEEVENT);
 #define TreeView_GetSelection(w)	TreeView_GetNextItem(w,NULL,TVGN_CARET)
 #define TreeView_GetDropHilight(w)	TreeView_GetNextItem(w,NULL,TVGN_DROPHILITE)
 #define TreeView_GetRoot(w)	TreeView_GetNextItem(w,NULL,TVGN_ROOT)
-#define TreeView_Select(w,i,c) (HTREEITEM)SNDMSG((w),TVM_SELECTITEM,c,(LPARAM)(HTREEITEM)(i))
+#define TreeView_Select(w,i,c) (BOOL)SNDMSG((w),TVM_SELECTITEM,c,(LPARAM)(HTREEITEM)(i))
 #define TreeView_SelectItem(w,i)	TreeView_Select(w,i,TVGN_CARET)
 #define TreeView_SelectDropTarget(w,i)	TreeView_Select(w,i,TVGN_DROPHILITE)
 #define TreeView_SelectSetFirstVisible(w,i)	TreeView_Select(w,i,TVGN_FIRSTVISIBLE)
