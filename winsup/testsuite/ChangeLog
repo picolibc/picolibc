@@ -1,3 +1,23 @@
+2001-09-09  Egor Duda  <deo@logos-m.ru>
+
+	* winsup.api/ltp/dup03.c: New test.
+	* winsup.api/ltp/lseek03.c: Ditto.
+	* winsup.api/ltp/mmap001.c: Ditto.
+	* winsup.api/ltp/read01.c: Ditto.
+	* winsup.api/ltp/readdir01.c: Ditto.
+	* winsup.api/ltp/rmdir05.c: Ditto.
+	* winsup.api/ltp/sbrk01.c: Ditto.
+	* winsup.api/ltp/select02.c: Ditto.
+	* winsup.api/ltp/select03.c: Ditto.
+	* winsup.api/ltp/signal03.c: Ditto.
+	* winsup.api/ltp/stat06.c: Ditto.
+	* winsup.api/ltp/unlink08.c: Ditto.
+	* winsup.api/known_bugs.tcl: Update to reflect new test's known
+	failures.
+	* winsup.api/winsup.exp: Don't delete executable in case of
+	unexpected pass, as well as in case of unexpected failure.
+	* README: Update paragraph about expected failures.
+
 2001-05-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winsup.api/mmaptest01.c: Add log output.

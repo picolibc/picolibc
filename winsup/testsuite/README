@@ -28,15 +28,8 @@ print anything to the screen if you can avoid it (except for failure
 reasons, of course).  One .c file per test, no compile options are
 allowed (we're testing the api, not the compiler).
 
-Tests whose filename begin with "xf-" will be *expected* to fail, and
-will "fail" if they compile, run, and return zero.  Note that the
-*only* purpose for adding this feature is to test the testing
-framework itself.  All real tests should NOT be named xf-*, and should
-pass for real (compile, run, return 0) if the dll is working
-correctly.  Do not use xf-* to "silence" a failure that you know isn't
-going to get fixed for a while; let it just keep failing.  There are
-five "sample" tests that demonstrate how the framework works and what
-happens to each condition.
+Tests whose filename is mentioned in known-bugs.tcl will be *expected*
+to fail, and will "fail" if they compile, run, and return zero.
 
 "make check" will only work if you run it *on* an NT machine.
 Cross-checking is not supported.

@@ -61,10 +61,12 @@ foreach src [glob -nocomplain $srcdir/$subdir/*.c $srcdir/$subdir/*/*.c] {
             }
 	} else {
 	    pass "$testcase"
-	    catch { file delete "$base.exe" } err
-            if { $err != "" } {
-                note "error deleting $base.exe: $err"
-            }
+            if { ! $xfail_expected } {
+		catch { file delete "$base.exe" } err
+		if { $err != "" } {
+                    note "error deleting $base.exe: $err"
+		}
+	    }
 	}
     }
 }
