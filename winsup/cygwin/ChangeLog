@@ -1,3 +1,8 @@
+2003-06-03  Christopher Faylor  <cgf@redhat.com>
+
+	* configure.in: Allow any i?86 variant.
+	* configure: Regenerate.
+
 2003-06-03  Corinna Vinschen  <corinna@vinschen.de>
 	    Thomas Pfaff <tpfaff@gmx.net>
 
