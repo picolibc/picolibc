@@ -1,3 +1,8 @@
+Fri Aug 31 21:46:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* include/winnt.h: Change definition of `SYSTEM_LUID' to comply
+	with new `LARGE_INTEGER' definition.
+
 Thu Aug 30 09:35:51 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* include/winsock2.h: Remove "extra token" after #endif.
