@@ -1,6 +1,6 @@
 /* ELF support for BFD.
    Copyright 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
-   2001, 2002, 2003
+   2001, 2002, 2003, 2004
    Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, from information published
@@ -182,6 +182,7 @@
 #define EM_IP2K		101	/* Ubicom IP2022 micro controller */
 #define EM_CR		103	/* National Semiconductor CompactRISC */
 #define EM_MSP430	105	/* TI msp430 micro controller */
+#define EM_CRX		114	/* National Semiconductor CRX */
 
 /* If it is necessary to assign new unofficial EM_* values, please pick large
    random numbers (0x8523, 0xa7f2, etc.) to minimize the chances of collision
@@ -288,8 +289,9 @@
 #define PT_LOPROC	0x70000000	/* Processor-specific */
 #define PT_HIPROC	0x7FFFFFFF	/* Processor-specific */
 
-#define PT_GNU_EH_FRAME	(PT_LOOS + 0x474e550)
-#define PT_GNU_STACK	(PT_LOOS + 0x474e551)
+#define PT_GNU_EH_FRAME	(PT_LOOS + 0x474e550) /* Frame unwind information */
+#define PT_GNU_STACK	(PT_LOOS + 0x474e551) /* Stack flags */
+#define PT_GNU_RELRO	(PT_LOOS + 0x474e552) /* Read-only after relocation */
 
 /* Program segment permissions, in program header p_flags field.  */
 
@@ -494,7 +496,7 @@
 
 #define ELF64_R_SYM(i)		((i) >> 32)
 #define ELF64_R_TYPE(i)		((i) & 0xffffffff)
-#define ELF64_R_INFO(s,t)	(((bfd_vma) (s) << 32) + (bfd_vma) (t))
+#define ELF64_R_INFO(s,t)	(((bfd_vma) (s) << 31 << 1) + (bfd_vma) (t))
 
 /* Dynamic section tags.  */
 

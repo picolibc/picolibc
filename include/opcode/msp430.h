@@ -1,6 +1,6 @@
 /* Opcode table for the TI MSP430 microcontrollers
 
-   Copyright 2002 Free Software Foundation, Inc.
+   Copyright 2002, 2004 Free Software Foundation, Inc.
    Contributed by Dmitry Diky <diwil@mail.ru>
    
    This program is free software; you can redistribute it and/or modify
@@ -103,9 +103,114 @@ static struct msp430_opcode_s msp430_opcodes[] =
   MSP_INSN (rra,   2, 1, 0x1100, 0xff80),
   MSP_INSN (swpb,  2, 1, 0x1080, 0xffc0),
   MSP_INSN (rrc,   2, 1, 0x1000, 0xff80),
+  /* Simple polymorphs.  */
+  MSP_INSN (beq,   4, 0, 0, 0xffff),
+  MSP_INSN (bne,   4, 1, 0, 0xffff),
+  MSP_INSN (blt,   4, 2, 0, 0xffff),
+  MSP_INSN (bltu,  4, 3, 0, 0xffff),
+  MSP_INSN (bge,   4, 4, 0, 0xffff),
+  MSP_INSN (bgeu,  4, 5, 0, 0xffff),
+  MSP_INSN (bltn,  4, 6, 0, 0xffff),
+  MSP_INSN (jump,  4, 7, 0, 0xffff),
+  /* Long polymorphs.  */
+  MSP_INSN (bgt,   5, 0, 0, 0xffff),
+  MSP_INSN (bgtu,  5, 1, 0, 0xffff),
+  MSP_INSN (bleu,  5, 2, 0, 0xffff),
+  MSP_INSN (ble,   5, 3, 0, 0xffff),
 
   /* End of instruction set.  */
   { NULL, 0, 0, 0, 0 }
+};
+
+/* GCC uses the some condition codes which we'll
+   implement as new polymorph instructions.
+  
+   COND	EXPL	   SHORT JUMP	LONG JUMP
+   ===============================================
+   eq	==	   jeq 		jne +4; br lab
+   ne	!=	   jne 		jeq +4; br lab
+
+   ltn honours no-overflow flag
+   ltn	<	   jn 		jn +2;  jmp +4; br lab
+
+   lt	<	   jl 		jge +4;	br lab 
+   ltu	<	   jlo 		lhs +4; br lab
+   le	<= see below
+   leu	<= see below
+
+   gt	>  see below
+   gtu	>  see below
+   ge	>=	   jge 		jl +4; br lab
+   geu	>=	   jhs 		jlo +4; br lab
+   ===============================================
+
+   Therefore, new opcodes are (BranchEQ -> beq; and so on...)
+   beq,bne,blt,bltn,bltu,bge,bgeu
+   'u' means unsigned compares 
+  
+   Also, we add 'jump' instruction:
+   jump	UNCOND	-> jmp		br lab
+
+   They will have fmt == 4, and insn_opnumb == number of instruction.  */
+
+struct rcodes_s 
+{
+  char * name;
+  int    index;	/* Corresponding insn_opnumb.  */
+  int    sop;	/* Opcode if jump length is short.  */
+  long   lpos;	/* Label position.  */
+  long   lop0;	/* Opcode 1 _word_ (16 bits).  */
+  long   lop1;	/* Opcode second word.  */
+  long   lop2;	/* Opcode third word.  */
+};
+
+#define MSP430_RLC(n,i,sop,o1) \
+  {#n, i, sop, 2, (o1 + 2), 0x4010, 0}
+
+static struct rcodes_s msp430_rcodes[] = 
+{
+  MSP430_RLC (beq,  0, 0x2400, 0x2000),
+  MSP430_RLC (bne,  1, 0x2000, 0x2400),
+  MSP430_RLC (blt,  2, 0x3800, 0x3400),
+  MSP430_RLC (bltu, 3, 0x2800, 0x2c00),
+  MSP430_RLC (bge,  4, 0x3400, 0x3800),
+  MSP430_RLC (bgeu, 5, 0x2c00, 0x2800),
+  {"bltn",          6, 0x3000, 3, 0x3000 + 1, 0x3c00 + 2,0x4010},
+  {"jump",          7, 0x3c00, 1, 0x4010, 0, 0},
+  {0,0,0,0,0,0,0}
+};
+#undef MSP430_RLC
+
+
+/* More difficult than above and they have format 5.
+   
+   COND	EXPL	SHORT			LONG
+   =================================================================
+   gt	>	jeq +2; jge label	jeq +6; jl  +4; br label
+   gtu	>	jeq +2; jhs label	jeq +6; jlo +4; br label
+   leu	<=	jeq label; jlo label	jeq +2; jhs +4; br label
+   le	<=	jeq label; jl  label	jeq +2; jge +4; br label
+   =================================================================  */
+
+struct hcodes_s 
+{
+  char * name;	
+  int    index;		/* Corresponding insn_opnumb.  */
+  int    tlab;		/* Number of labels in short mode.  */
+  int    op0;		/* Opcode for first word of short jump.  */
+  int    op1;		/* Opcode for second word of short jump.  */
+  int    lop0;		/* Opcodes for long jump mode.  */
+  int    lop1;
+  int    lop2;
+};
+
+static struct hcodes_s msp430_hcodes[] = 
+{
+  {"bgt",  0, 1, 0x2401, 0x3400, 0x2403, 0x3802, 0x4010 },
+  {"bgtu", 1, 1, 0x2401, 0x2c00, 0x2403, 0x2802, 0x4010 },
+  {"bleu", 2, 2, 0x2400, 0x2800, 0x2401, 0x2c02, 0x4010 },
+  {"ble",  3, 2, 0x2400, 0x3800, 0x2401, 0x3402, 0x4010 },
+  {0,0,0,0,0,0,0,0}
 };
 
 #endif

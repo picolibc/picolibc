@@ -74,7 +74,7 @@ extern char **dupargv PARAMS ((char **)) ATTRIBUTE_MALLOC;
    to find the declaration so provide a fully prototyped one.  If it
    is 1, we found it so don't provide any declaration at all.  */
 #if !HAVE_DECL_BASENAME
-#if defined (__GNU_LIBRARY__ ) || defined (__linux__) || defined (__FreeBSD__) || defined (__OpenBSD__) || defined(__NetBSD__) || defined (__CYGWIN__) || defined (__CYGWIN32__) || defined (HAVE_DECL_BASENAME)
+#if defined (__GNU_LIBRARY__ ) || defined (__linux__) || defined (__FreeBSD__) || defined (__OpenBSD__) || defined(__NetBSD__) || defined (__CYGWIN__) || defined (__CYGWIN32__) || defined (__MINGW32__) || defined (HAVE_DECL_BASENAME)
 extern char *basename PARAMS ((const char *));
 #else
 extern char *basename ();
@@ -93,7 +93,7 @@ extern char *lrealpath PARAMS ((const char *));
    the last argument of this function, to terminate the list of
    strings.  Allocates memory using xmalloc.  */
 
-extern char *concat PARAMS ((const char *, ...)) ATTRIBUTE_MALLOC;
+extern char *concat PARAMS ((const char *, ...)) ATTRIBUTE_MALLOC ATTRIBUTE_SENTINEL;
 
 /* Concatenate an arbitrary number of strings.  You must pass NULL as
    the last argument of this function, to terminate the list of
@@ -102,27 +102,27 @@ extern char *concat PARAMS ((const char *, ...)) ATTRIBUTE_MALLOC;
    pointer to be freed after the new string is created, similar to the
    way xrealloc works.  */
 
-extern char *reconcat PARAMS ((char *, const char *, ...)) ATTRIBUTE_MALLOC;
+extern char *reconcat PARAMS ((char *, const char *, ...)) ATTRIBUTE_MALLOC ATTRIBUTE_SENTINEL;
 
 /* Determine the length of concatenating an arbitrary number of
    strings.  You must pass NULL as the last argument of this function,
    to terminate the list of strings.  */
 
-extern unsigned long concat_length PARAMS ((const char *, ...));
+extern unsigned long concat_length PARAMS ((const char *, ...)) ATTRIBUTE_SENTINEL;
 
 /* Concatenate an arbitrary number of strings into a SUPPLIED area of
    memory.  You must pass NULL as the last argument of this function,
    to terminate the list of strings.  The supplied memory is assumed
    to be large enough.  */
 
-extern char *concat_copy PARAMS ((char *, const char *, ...));
+extern char *concat_copy PARAMS ((char *, const char *, ...)) ATTRIBUTE_SENTINEL;
 
 /* Concatenate an arbitrary number of strings into a GLOBAL area of
    memory.  You must pass NULL as the last argument of this function,
    to terminate the list of strings.  The supplied memory is assumed
    to be large enough.  */
 
-extern char *concat_copy2 PARAMS ((const char *, ...));
+extern char *concat_copy2 PARAMS ((const char *, ...)) ATTRIBUTE_SENTINEL;
 
 /* This is the global area used by concat_copy2.  */
 
@@ -250,6 +250,37 @@ extern PTR xmemdup PARAMS ((const PTR, size_t, size_t)) ATTRIBUTE_MALLOC;
 extern double physmem_total PARAMS ((void));
 extern double physmem_available PARAMS ((void));
 
+
+/* These macros provide a K&R/C89/C++-friendly way of allocating structures
+   with nice encapsulation.  The XDELETE*() macros are technically
+   superfluous, but provided here for symmetry.  Using them consistently
+   makes it easier to update client code to use different allocators such
+   as new/delete and new[]/delete[].  */
+
+/* Scalar allocators.  */
+
+#define XNEW(T)			((T *) xmalloc (sizeof (T)))
+#define XCNEW(T)		((T *) xcalloc (1, sizeof (T)))
+#define XDELETE(P)		free ((void*) (P))
+
+/* Array allocators.  */
+
+#define XNEWVEC(T, N)		((T *) xmalloc (sizeof (T) * (N)))
+#define XCNEWVEC(T, N)		((T *) xcalloc ((N), sizeof (T)))
+#define XRESIZEVEC(T, P, N)	((T *) xrealloc ((void *) (P), sizeof (T) * (N)))
+#define XDELETEVEC(P)		free ((void*) (P))
+
+/* Allocators for variable-sized structures and raw buffers.  */
+
+#define XNEWVAR(T, S)		((T *) xmalloc ((S)))
+#define XCNEWVAR(T, S)		((T *) xcalloc (1, (S)))
+#define XRESIZEVAR(T, P, S)	((T *) xrealloc ((P), (S)))
+
+/* Type-safe obstack allocator.  */
+
+#define XOBNEW(O, T)		((T *) obstack_alloc ((O), sizeof (T)))
+
+
 /* hex character manipulation routines */
 
 #define _hex_array_size 256
@@ -309,7 +340,7 @@ extern PTR C_alloca PARAMS ((size_t)) ATTRIBUTE_MALLOC;
 # define ASTRDUP(X) \
   (__extension__ ({ const char *const libiberty_optr = (X); \
    const unsigned long libiberty_len = strlen (libiberty_optr) + 1; \
-   char *const libiberty_nptr = alloca (libiberty_len); \
+   char *const libiberty_nptr = (char *const) alloca (libiberty_len); \
    (char *) memcpy (libiberty_nptr, libiberty_optr, libiberty_len); }))
 #else
 # define alloca(x) C_alloca(x)
@@ -323,7 +354,7 @@ extern unsigned long libiberty_len;
 # define ASTRDUP(X) \
   (libiberty_optr = (X), \
    libiberty_len = strlen (libiberty_optr) + 1, \
-   libiberty_nptr = alloca (libiberty_len), \
+   libiberty_nptr = (char *) alloca (libiberty_len), \
    (char *) memcpy (libiberty_nptr, libiberty_optr, libiberty_len))
 #endif
 

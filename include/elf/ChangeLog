@@ -1,3 +1,62 @@
+2004-08-25  Dmitry Diky  <diwil@spec.ru>
+
+	* msp430.h: Add new relocs.
+
+2004-08-12  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* i386.h (R_386_USED_BY_INTEL_200): New.
+
+2004-07-29  Alexandre Oliva  <aoliva@redhat.com>
+
+	Introduce SH2a support.
+	2004-02-18  Corinna Vinschen  <vinschen@redhat.com>
+	* sh.h (EF_SH2A_NOFPU): New.
+	2003-12-01  Michael Snyder  <msnyder@redhat.com>
+	* sh.h (EF_SH2A): New.
+
+2004-07-27  Tomer Levi  <Tomer.Levi@nsc.com>
+
+	* crx.h: Add BFD_RELOC_CRX_SWITCH8, BFD_RELOC_CRX_SWITCH16,
+	BFD_RELOC_CRX_SWITCH32.
+
+2004-07-06  Tomer Levi  <Tomer.Levi@nsc.com>
+
+	* common.h (EM_CRX): Define.
+	* crx.h: New file.
+
+2004-06-25  Kazuhiro Inaoka  <inaoka.kazuhiro@renesas.com>
+
+	* m32r.h: Add defintions of R_M32R_GOTOFF_HI_ULO,
+	R_M32R_GOTOFF_HI_SLO and R_M32R_GOTOFF_LO.
+
+2004-06-19  Alan Modra  <amodra@bigpond.net.au>
+
+	* common.h (ELF64_R_INFO): Warning fix.
+
+2004-06-14  Chris Demetriou  <cgd@broadcom.com>
+
+	* mips.h (R_MIPS_PC32): Add back (undoing removal on 2004-04-24),
+	with an updated comment.
+
+2004-05-28  Andrew Stubbs <andrew.stubbs@superh.com>
+
+	* sh.h (EF_SH_HAS_DSP): Remove.
+	(EF_SH_HAS_FP): Remove.
+	(EF_SH_MERGE_MACH): Remove.
+	(EF_SH4_NOFPU): Convert to decimal.
+	(EF_SH4A_NOFPU): Likewise.
+	(EF_SH4_NOMMU_NOFPU): Likewise.
+	(EF_SH3_NOMMU): Add new macro.
+	(EF_SH_BFD_TABLE): Likewise.
+	(sh_find_elf_flags): Add prototype.
+	(sh_elf_get_flags_from_mach): Likewise.
+
+2004-04-24  Chris Demetriou  <cgd@broadcom.com>
+
+	* mips.h (R_MIPS_PC32, R_MIPS_PC64, R_MIPS_GNU_REL_LO16)
+	(R_MIPS_GNU_REL_HI16): Remove.
+	(R_MIPS_GNU_REL16_S2): Update comment.
+
 2004-30-30  Galit Heller  <Galit.Heller@nsc.com>
             Tomer Levi  <Tomer.Levi@nsc.com>
 

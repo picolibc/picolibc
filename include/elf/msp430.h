@@ -1,5 +1,5 @@
 /* MSP430 ELF support for BFD.
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
    Contributed by Dmitry Diky <diwil@mail.ru>
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -50,6 +50,8 @@ START_RELOC_NUMBERS (elf_msp430_reloc_type)
      RELOC_NUMBER (R_MSP430_16_PCREL, 		4)
      RELOC_NUMBER (R_MSP430_16_BYTE, 		5)
      RELOC_NUMBER (R_MSP430_16_PCREL_BYTE, 	6)
+     RELOC_NUMBER (R_MSP430_2X_PCREL,		7)
+     RELOC_NUMBER (R_MSP430_RL_PCREL,		8)
 
 END_RELOC_NUMBERS (R_MSP430_max)
 

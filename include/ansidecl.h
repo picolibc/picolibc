@@ -264,6 +264,14 @@ So instead we use the macro below and test it against specific values.  */
 #define ATTRIBUTE_UNUSED __attribute__ ((__unused__))
 #endif /* ATTRIBUTE_UNUSED */
 
+/* Before GCC 3.4, the C++ frontend couldn't parse attributes placed after the
+   identifier name.  */
+#if ! defined(__cplusplus) || (GCC_VERSION >= 3004)
+# define ARG_UNUSED(NAME) NAME ATTRIBUTE_UNUSED
+#else /* !__cplusplus || GNUC >= 3.4 */
+# define ARG_UNUSED(NAME) NAME
+#endif /* !__cplusplus || GNUC >= 3.4 */
+
 #ifndef ATTRIBUTE_NORETURN
 #define ATTRIBUTE_NORETURN __attribute__ ((__noreturn__))
 #endif /* ATTRIBUTE_NORETURN */
@@ -276,6 +284,15 @@ So instead we use the macro below and test it against specific values.  */
 #  define ATTRIBUTE_NONNULL(m)
 # endif /* GNUC >= 3.3 */
 #endif /* ATTRIBUTE_NONNULL */
+
+/* Attribute `pure' was valid as of gcc 3.0.  */
+#ifndef ATTRIBUTE_PURE
+# if (GCC_VERSION >= 3000)
+#  define ATTRIBUTE_PURE __attribute__ ((__pure__))
+# else
+#  define ATTRIBUTE_PURE
+# endif /* GNUC >= 3.0 */
+#endif /* ATTRIBUTE_PURE */
 
 /* Use ATTRIBUTE_PRINTF when the format specifier must not be NULL.
    This was the case for the `printf' format attribute by itself
@@ -304,6 +321,15 @@ So instead we use the macro below and test it against specific values.  */
 # define ATTRIBUTE_NULL_PRINTF_4 ATTRIBUTE_NULL_PRINTF(4, 5)
 # define ATTRIBUTE_NULL_PRINTF_5 ATTRIBUTE_NULL_PRINTF(5, 6)
 #endif /* ATTRIBUTE_NULL_PRINTF */
+
+/* Attribute `sentinel' was valid as of gcc 3.5.  */
+#ifndef ATTRIBUTE_SENTINEL
+# if (GCC_VERSION >= 3005)
+#  define ATTRIBUTE_SENTINEL __attribute__ ((__sentinel__))
+# else
+#  define ATTRIBUTE_SENTINEL
+# endif /* GNUC >= 3.5 */
+#endif /* ATTRIBUTE_SENTINEL */
 
 /* We use __extension__ in some places to suppress -pedantic warnings
    about GCC extensions.  This feature didn't work properly before

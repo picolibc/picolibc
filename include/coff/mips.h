@@ -105,34 +105,10 @@ struct external_reloc
 #define MIPS_R_GPREL	6
 #define MIPS_R_LITERAL	7
 
-/* These reloc types are a Cygnus extension used when generating
-   position independent code for embedded systems.  The numbers are
-   taken from Irix 4, but at least for internal relocs Irix 5 does not
-   give them the same meaning.  For an internal reloc the symbol index
-   of RELHI and RELLO is modified as described below for
-   MIPS_R_SWITCH.  */
+/* FIXME: This relocation is used (internally only) to represent branches
+   when assembling.  It should never appear in output files, and  
+   be removed.  (It used to be used for embedded-PIC support.)  */
 #define MIPS_R_PCREL16	12
-#define MIPS_R_RELHI	13
-#define MIPS_R_RELLO	14
-
-/* This reloc type is a Cygnus extension used when generating position
-   independent code for embedded systems.  It is used for an entry in
-   a switch table, which looks like this:
-     .word $L3-$LS12
-   The object file will contain the correct difference, and does not
-   require adjustment.  However, when the linker is relaxing PC
-   relative calls, it is possible for $L3 to move farther away.  This
-   reloc always appears in the .text section, and is always against
-   the .text section.  However, the symbol index is not
-   RELOC_SECTION_TEXT.  It is, instead, the distance between this
-   switch table entry and $LS12.  Thus, the original value of $L12 is
-     vaddr - symndx
-   and the original value of $L3 is
-     vaddr - symndx + addend
-   where addend is the value in the object file.  Knowing this, the
-   linker can know whether the addend in the object file must be
-   adjusted.  */
-#define MIPS_R_SWITCH	22
 
 /********************** STABS **********************/
 

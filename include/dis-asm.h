@@ -224,6 +224,7 @@ extern int print_insn_mn10200		(bfd_vma, disassemble_info *);
 extern int print_insn_mn10300		(bfd_vma, disassemble_info *);
 extern int print_insn_msp430		(bfd_vma, disassemble_info *);
 extern int print_insn_ns32k		(bfd_vma, disassemble_info *);
+extern int print_insn_crx               (bfd_vma, disassemble_info *);
 extern int print_insn_openrisc		(bfd_vma, disassemble_info *);
 extern int print_insn_big_or32		(bfd_vma, disassemble_info *);
 extern int print_insn_little_or32	(bfd_vma, disassemble_info *);

@@ -273,7 +273,7 @@ gnats.tar.bz2: $(DIST_SUPPORT) $(GNATS_SUPPORT_DIRS) gnats
 		SUPPORT_FILES="$(GNATS_SUPPORT_DIRS)"
 
 .PHONY: gdb.tar.bz2
-GDB_SUPPORT_DIRS= bfd include libiberty mmalloc opcodes readline sim utils intl
+GDB_SUPPORT_DIRS= bfd include libiberty opcodes readline sim utils intl
 gdb.tar.bz2: $(DIST_SUPPORT) $(GDB_SUPPORT_DIRS) gdb
 	$(MAKE) -f $(SELF) gdb-taz TOOL=gdb \
 		MD5PROG="$(MD5PROG)" \
@@ -309,7 +309,7 @@ gdb+dejagnu.tar: $(DIST_SUPPORT) $(GDBD_SUPPORT_DIRS) gdb
 		SUPPORT_FILES="$(GDBD_SUPPORT_DIRS)"
 
 .PHONY: insight.tar.bz2
-INSIGHT_SUPPORT_DIRS= $(GDB_SUPPORT_DIRS) tcl tk itcl tix libgui
+INSIGHT_SUPPORT_DIRS= $(GDB_SUPPORT_DIRS) tcl tk itcl libgui
 insight.tar.bz2: $(DIST_SUPPORT) $(GDB_SUPPORT_DIRS) gdb
 	$(MAKE) -f $(SELF) gdb-taz TOOL=gdb PACKAGE=insight \
 		MD5PROG="$(MD5PROG)" \
