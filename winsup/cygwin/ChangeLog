@@ -1,3 +1,18 @@
+2003-09-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_dev_raw): Add method fstat.
+	* fhandler_raw.cc (fhandler_dev_raw::fstat): New method.
+
+2003-09-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* devices.h (enum fh_devices): Remove DEV_RAWDRIVE_MAJOR and
+	FH_RAWDRIVE.
+	* devices.shilka (dev_rawdrive_storage): Remove.
+	(unit_devices): Remove pointer to dev_rawdrive_storage.
+	(uniq_devices): Remove rawdrive entry.
+	* dtable.cc (build_fh_pc): Remove DEV_RAWDRIVE_MAJOR case.
+	* path.cc (win32_device_name): ditto.
+
 2003-09-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syslog.cc (vsyslog): Print debug message if ReportEventA fails.

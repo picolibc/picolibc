@@ -129,6 +129,31 @@ fhandler_dev_raw::~fhandler_dev_raw (void)
   clear ();
 }
 
+int __stdcall
+fhandler_dev_raw::fstat (struct __stat64 *buf)
+{
+  debug_printf ("here");
+
+  switch (get_device ())
+    {
+    case FH_TAPE:
+    case FH_NTAPE:
+      buf->st_mode = S_IFCHR | STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
+      break;
+    default:
+      buf->st_mode = S_IFBLK | STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
+      break;
+    }
+
+  buf->st_uid = geteuid32 ();
+  buf->st_gid = getegid32 ();
+  buf->st_nlink = 1;
+  buf->st_blksize = S_BLKSIZE;
+  time_as_timestruc_t (&buf->st_ctim);
+  buf->st_atim = buf->st_mtim = buf->st_ctim;
+  return 0;
+}
+
 int
 fhandler_dev_raw::open (int flags, mode_t)
 {

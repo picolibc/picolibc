@@ -527,6 +527,8 @@ class fhandler_dev_raw: public fhandler_base
   void raw_read (void *ptr, size_t& ulen);
   int raw_write (const void *ptr, size_t ulen);
 
+  int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
+
   int dup (fhandler_base *child);
 
   int ioctl (unsigned int cmd, void *buf);
