@@ -1,5 +1,10 @@
 2002-02-14  Christopher Faylor  <cgf@redhat.com>
 
+	* include/sys/cygwin.h (cygwin_getinfo_types): New CW_STRACE_ACTIVE.
+	* external.cc (cygwin_internal): Handle CW_STRACE_ACTIVE.
+
+2002-02-14  Christopher Faylor  <cgf@redhat.com>
+
 	* exceptions.cc (unused_sig_wrapper): Eliminate unused parameter to
 	asm.
 	* external.cc (cygwin_internal): Change CW_STRACE_ON to
