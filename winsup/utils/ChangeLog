@@ -1,3 +1,7 @@
+Thu Oct 12 02:19:12 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* strace.cc (proc_child): Handle exceptions correctly.
+
 Sun Oct  8 23:11:17 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* ps.cc (main): Change order of reporting slightly so that windows pids

@@ -504,6 +504,7 @@ proc_child (unsigned mask, FILE *ofile)
   while (1)
     {
       BOOL debug_event = WaitForDebugEvent (&ev, 1000);
+      DWORD status = DBG_CONTINUE;
       if (!debug_event)
 	continue;
 
@@ -533,9 +534,12 @@ proc_child (unsigned mask, FILE *ofile)
 	case EXIT_PROCESS_DEBUG_EVENT:
 	  remove_child (ev.dwProcessId);
 	  break;
+	case EXCEPTION_DEBUG_EVENT:
+	  if (ev.u.Exception.ExceptionRecord.ExceptionCode != STATUS_BREAKPOINT)
+	    status = DBG_EXCEPTION_NOT_HANDLED;
+	  break;
 	}
-      if (!ContinueDebugEvent (ev.dwProcessId, ev.dwThreadId,
-				DBG_CONTINUE))
+      if (!ContinueDebugEvent (ev.dwProcessId, ev.dwThreadId, status))
 	error (0, "couldn't continue debug event, windows error %d",
 	       GetLastError ());
       if (ev.dwDebugEventCode == EXIT_PROCESS_DEBUG_EVENT && --processes == 0)
