@@ -92,7 +92,7 @@ do_mount (const char *dev, const char *where, int flags)
       if (c == '/' || c == '\\')
 	strcat (devtmp, ".");
       /* Use a curious property of Windows which allows the use of \.. even
-         on non-directory paths. */
+	 on non-directory paths. */
       for (const char *p = dev; (p = strpbrk (p, "/\\")); p++)
 	strcat (devtmp, "\\..");
       strcat (devtmp, "\\");

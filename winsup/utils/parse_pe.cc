@@ -30,7 +30,7 @@ exclusion::add (LPBYTE mem_base, DWORD mem_size)
   return 1;
 };
 
-int 
+int
 cmp_regions (const void *r1, const void *r2)
 {
   if (((process_mem_region *) r1)->base < ((process_mem_region *) r2)->base)

@@ -1,6 +1,6 @@
 /* ps.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -271,45 +271,45 @@ main (int argc, char *argv[])
       {
       case 'a':
       case 'e':
-        aflag = 1;
-        break;
+	aflag = 1;
+	break;
       case 'f':
-        fflag = 1;
-        break;
+	fflag = 1;
+	break;
       case 'h':
-        usage (stdout, 0);
+	usage (stdout, 0);
       case 'l':
-        lflag = 1;
-        break;
+	lflag = 1;
+	break;
       case 's':
 	sflag = 1;
 	break;
       case 'u':
-        uid = atoi (optarg);
-        if (uid == 0)
-          {
-            struct passwd *pw;
+	uid = atoi (optarg);
+	if (uid == 0)
+	  {
+	    struct passwd *pw;
 
-            if ((pw = getpwnam (optarg)))
-              uid = pw->pw_uid;
-            else
-              {
-                fprintf (stderr, "%s: user %s unknown\n", prog_name, optarg);
-                exit (1);
-              }
-          }
-        break;
+	    if ((pw = getpwnam (optarg)))
+	      uid = pw->pw_uid;
+	    else
+	      {
+		fprintf (stderr, "%s: user %s unknown\n", prog_name, optarg);
+		exit (1);
+	      }
+	  }
+	break;
       case 'v':
-        print_version ();
-        exit (0);
-        break;
+	print_version ();
+	exit (0);
+	break;
       case 'W':
 	query = CW_GETPINFO_FULL;
 	aflag = 1;
 	break;
 
       default:
-        usage (stderr, 1);
+	usage (stderr, 1);
       }
 
   if (sflag)
@@ -329,24 +329,24 @@ main (int argc, char *argv[])
        pid = p->pid)
     {
       if (!aflag)
-        if (p->version >= EXTERNAL_PINFO_VERSION_32_BIT)
+	if (p->version >= EXTERNAL_PINFO_VERSION_32_BIT)
 	  {
 	    if (p->uid32 != (__uid32_t) uid)
 	      continue;
-          }
+	  }
 	else if (p->uid != uid)
 	  continue;
       char status = ' ';
       if (p->process_state & PID_STOPPED)
-        status = 'S';
+	status = 'S';
       else if (p->process_state & PID_TTYIN)
-        status = 'I';
+	status = 'I';
       else if (p->process_state & PID_TTYOU)
-        status = 'O';
+	status = 'O';
 
       char pname[MAX_PATH];
       if (p->process_state & (PID_ZOMBIE | PID_EXITED))
-        strcpy (pname, "<defunct>");
+	strcpy (pname, "<defunct>");
       else if (p->ppid)
 	{
 	  char *s;
@@ -359,7 +359,7 @@ main (int argc, char *argv[])
       else if (query == CW_GETPINFO_FULL)
 	{
 	  HANDLE h = OpenProcess (PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
-	  			  FALSE, p->dwProcessId);
+				  FALSE, p->dwProcessId);
 	  if (!h)
 	    continue;
 	  HMODULE hm[1000];
@@ -377,26 +377,26 @@ main (int argc, char *argv[])
       char uname[128];
 
       if (fflag)
-        {
-          struct passwd *pw;
+	{
+	  struct passwd *pw;
 
-          if ((pw = getpwuid (p->version >= EXTERNAL_PINFO_VERSION_32_BIT ?
-	                      p->uid32 : p->uid)))
-            strcpy (uname, pw->pw_name);
-          else
-            sprintf (uname, "%u", (unsigned)
-	             (p->version >= EXTERNAL_PINFO_VERSION_32_BIT ?
+	  if ((pw = getpwuid (p->version >= EXTERNAL_PINFO_VERSION_32_BIT ?
+			      p->uid32 : p->uid)))
+	    strcpy (uname, pw->pw_name);
+	  else
+	    sprintf (uname, "%u", (unsigned)
+		     (p->version >= EXTERNAL_PINFO_VERSION_32_BIT ?
 		      p->uid32 : p->uid));
-        }
+	}
 
       if (sflag)
-        printf (dfmt, p->pid, ttynam (p->ctty), start_time (p), pname);
+	printf (dfmt, p->pid, ttynam (p->ctty), start_time (p), pname);
       else if (fflag)
-        printf (ffmt, uname, p->pid, p->ppid, ttynam (p->ctty), start_time (p),
-	        pname);
+	printf (ffmt, uname, p->pid, p->ppid, ttynam (p->ctty), start_time (p),
+		pname);
       else if (lflag)
-        printf (lfmt, status, p->pid, p->ppid, p->pgid,
-                p->dwProcessId, ttynam (p->ctty),
+	printf (lfmt, status, p->pid, p->ppid, p->pgid,
+		p->dwProcessId, ttynam (p->ctty),
 		p->version >= EXTERNAL_PINFO_VERSION_32_BIT ? p->uid32 : p->uid,
 		start_time (p), pname);
 

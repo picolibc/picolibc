@@ -1,6 +1,6 @@
 /* regtool.cc
 
-   Copyright 2000, 2001, 2002 Red Hat Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004 Red Hat Inc.
 
 This file is part of Cygwin.
 
@@ -278,21 +278,21 @@ find_key (int howmanyparts, REGSAM access)
     {
       /* expect host:/key/value format */
       host = (char*) malloc (strlen (n) + 1);
-      host[0] = host [1] = '\\'; 
+      host[0] = host [1] = '\\';
       for (e = n, h = host + 2; *e && *e != ':'; e++, h++)
-        *h = *e;
+	*h = *e;
       *h = 0;
       n = e + 1;
       if (*n == '/')
-        translate (n);
+	translate (n);
     }
   else if (n[0] == '\\' && n[1] == '\\')
     {
       /* expect //host/key/value format */
       host = (char*) malloc (strlen (n) + 1);
-      host[0] = host[1] = '\\'; 
+      host[0] = host[1] = '\\';
       for (e = n + 2, h = host + 2; *e && *e != '\\'; e++, h++)
-        *h = *e;
+	*h = *e;
       *h = 0;
       n = e;
     }
@@ -329,7 +329,7 @@ find_key (int howmanyparts, REGSAM access)
 	  return;
 	}
       else
-        {
+	{
 	  *e = 0;
 	  value = e + 1;
 	}

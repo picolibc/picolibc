@@ -1083,9 +1083,9 @@ dump_sysinfo ()
       DWORD serno = 0, maxnamelen = 0, flags = 0;
       name[0] = name[0] = fsname[0] = 0;
       sprintf (drive, "%c:\\", i + 'a');
-      /* Report all errors, except if the Volume is ERROR_NOT_READY. 
-         ERROR_NOT_READY is returned when removeable media drives are empty
-         (CD, floppy, etc.) */
+      /* Report all errors, except if the Volume is ERROR_NOT_READY.
+	 ERROR_NOT_READY is returned when removeable media drives are empty
+	 (CD, floppy, etc.) */
       if (!GetVolumeInformation
 	  (drive, name, sizeof (name), &serno, &maxnamelen, &flags, fsname,
 	   sizeof (fsname)) && GetLastError () != ERROR_NOT_READY)

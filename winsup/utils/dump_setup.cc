@@ -191,17 +191,17 @@ could_not_access (int verbose, char *filename, char *package, const char *type)
   switch (errno)
     {
       case ENOTDIR:
-        break;
+	break;
       case ENOENT:
-        if (verbose)
-          printf ("Missing %s: /%s from package %s\n",
-                  type, filename, package);
-        return true;
+	if (verbose)
+	  printf ("Missing %s: /%s from package %s\n",
+		  type, filename, package);
+	return true;
       case EACCES:
-        if (verbose)
-          printf ("Unable to access %s /%s from package %s\n",
-                  type, filename, package);
-        return true;
+	if (verbose)
+	  printf ("Unable to access %s /%s from package %s\n",
+		  type, filename, package);
+	return true;
     }
   return false;
 }
@@ -213,12 +213,12 @@ directory_exists (int verbose, char *filename, char *package)
   if (stat(cygpath("/", filename, ".", NULL), &status))
     {
       if (could_not_access (verbose, filename, package, "directory"))
-        return false;
+	return false;
     }
   else if (!S_ISDIR(status.st_mode))
     {
       if (verbose)
-        printf ("Directory/file mismatch: /%s from package %s\n", filename, package);
+	printf ("Directory/file mismatch: /%s from package %s\n", filename, package);
       return false;
     }
   return true;
@@ -232,12 +232,12 @@ file_exists (int verbose, char *filename, const char *alt, char *package)
       (!alt || stat(cygpath("/", filename, alt, NULL), &status)))
     {
       if (could_not_access (verbose, filename, package, "file"))
-        return false;
+	return false;
     }
   else if (!S_ISREG(status.st_mode))
     {
       if (verbose)
-        printf ("File type mismatch: /%s from package %s\n", filename, package);
+	printf ("File type mismatch: /%s from package %s\n", filename, package);
       return false;
     }
   return true;
@@ -286,20 +286,20 @@ check_package_files (int verbose, char *package)
 	filename += 2;
 
       if (filename[strlen (filename) - 1] == '/')
-        {
-          if (!directory_exists (verbose, filename, package))
-            result = false;
-        }
+	{
+	  if (!directory_exists (verbose, filename, package))
+	    result = false;
+	}
       else if (!strncmp (filename, "etc/postinstall/", 16))
-        {
-          if (!file_exists (verbose, filename, ".done", package))
-            result = false;
-        }
+	{
+	  if (!file_exists (verbose, filename, ".done", package))
+	    result = false;
+	}
       else
-        {
-          if (!file_exists (verbose, filename, ".lnk", package))
-            result = false;
-        }
+	{
+	  if (!file_exists (verbose, filename, ".lnk", package))
+	    result = false;
+	}
     }
 
   gzclose (fp);

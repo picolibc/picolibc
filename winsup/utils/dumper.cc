@@ -411,8 +411,8 @@ dumper::dump_thread (asection * to, process_thread * thread)
   if (tid == 0)
     {
       /* this is a special case. we don't know, which thread
-         was active when exception occured, so let's blame
-         the first one */
+	 was active when exception occured, so let's blame
+	 the first one */
       thread_pstatus.data.thread_info.is_active_thread = TRUE;
       tid = (DWORD) - 1;
     }
@@ -795,7 +795,7 @@ struct option longopts[] = {
   {0, no_argument, NULL, 0}
 };
 
-static void 
+static void
 print_version ()
 {
   const char *v = strchr (version, ':');
