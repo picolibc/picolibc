@@ -22,8 +22,10 @@ _start:
 	;; port1 interrupt
 	jmpf _int_port1
 
-	.text
 # Reset code, set up memory and call main.
+        .section        .rodata
+2:	.word	__rdata
+	.text
 _int_reset:
 	;; Set up the stack pointer.
 	mov r0,#__stack
@@ -36,6 +38,24 @@ _int_reset:
 	mov r2,#0
 0:	mov.w (r0++),r2
 	blt r0,r1,0b
+
+	;; Copy data from ROM into RAM.  ROM area may be above 64k,
+	;; but RAM may not.
+	mov r1,#__data
+	mov r3,#_edata
+	mov r4,#2b
+	mov.w r0,(r4++)
+	mov.w r2,(r4) 
+	mov r8,r2
+	;; If _data == _rdata there's no need to copy anything.
+	bnz r0,r1,0f
+	bz r2,#0,1f
+0:	movf.w r2,(r0++)
+	bnz r0,#0,2f
+	add r8,#1
+2:	mov.w (r1++),r2
+	blt r1,r3,0b
+1:	
 	;; Call hardware init routine
 	callf _hwinit
 	;; Call initialization routines

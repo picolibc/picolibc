@@ -45,7 +45,7 @@ SCRIPTS		=
 CRT		= crt0.o crti.o crtn.o
 
 # Here is all of the simulator stuff
-SIM_SCRIPTS	= sim_high.ld
+SIM_SCRIPTS	= sim_high.ld sim_rom.ld
 SIM_LDFLAGS	=
 SIM_BSP		= libsim.a
 SIM_OBJS	= syscalls.o sim_malloc_start.o

@@ -78,6 +78,8 @@ SECTIONS
   PROVIDE (etext = .);
   .data    :
   {
+    __data = .;
+    __rdata = .;
     *(.data)
     *(.data.*)
     *(.gnu.linkonce.d.*)

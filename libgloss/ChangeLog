@@ -1,3 +1,11 @@
+2003-04-23  Andrew Haley  <aph@cambridge.redhat.com>
+
+	* xstormy16/sim_rom.ld: New.
+	* xstormy16/Makefile.in (SIM_SCRIPTS): Add sim_rom.ld.	
+	* xstormy16/crt0.s (_int_reset): Copy ROM data to RAM.
+	* xstormy16/eva_app.ld (_rdata, _data): New.
+	* xstormy16/sim_high.ld (_rdata, _data): New.
+
 2003-04-17  Inaoka Kazuhiro  <inaoka.kazuhiro@renesas.com>
 
 	* m32r/Makefile.in: Add multilib support. 

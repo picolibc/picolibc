@@ -1,31 +1,24 @@
+/* Test xstormy16 programs that have initial data in ROM and copy it
+   to RAM.  */
+
 OUTPUT_FORMAT("elf32-xstormy16", "elf32-xstormy16",
 	      "elf32-xstormy16")
 OUTPUT_ARCH(xstormy16)
 ENTRY(_start)
-GROUP(-lc -leva_app -lgcc)
-
-MEMORY 
+ SEARCH_DIR(/cuddles/aph/sanyo-011113-branch/install/xstormy16-elf/lib);
+/* There are two memory regions we care about, one from 0 through 0x7F00
+   that is RAM and one from 0x8000 up which is ROM.  */
+MEMORY
 {
-  RAM   (w)  : ORIGIN = 0x9000,  LENGTH = 0x7000
-  ROM   (!w)  : ORIGIN = 0x10000, LENGTH = 0x70000
+  RAM (w) : ORIGIN = 0, LENGTH = 0x7F00
+  ROM (!w) : ORIGIN = 0x8000, LENGTH = 0xFF8000
 }
-
 SECTIONS
 {
-  __stack = 2 ;
-  __malloc_start = 0x800;
-  .data    :
-  {
-    __rdata = .;
-    __data = .;
-    *(.data)
-    *(.data.*)
-    *(.gnu.linkonce.d.*)
-    SORT(CONSTRUCTORS)
-  } > RAM
-  /* Read-only sections */
-  .rodata   : { *(.rodata) *(.rodata.*) *(.gnu.linkonce.r.*) } > RAM
-  .ctors   : 
+  /* Read-only sections in ROM.  */
+  .int_vec       : { *(.int_vec)	} > ROM
+  .rodata   : { *(.rodata) *(.rodata.*) *(.gnu.linkonce.r.*) } > ROM
+  .ctors   :
   {
     /* gcc uses crtbegin.o to find the start of
        the constructors, so we make sure it is
@@ -44,22 +37,55 @@ SECTIONS
     KEEP (*(EXCLUDE_FILE (*crtend.o ) .ctors))
     KEEP (*(SORT(.ctors.*)))
     KEEP (*(.ctors))
-  } > RAM
+  } > ROM
    .dtors         :
   {
     KEEP (*crtbegin.o(.dtors))
     KEEP (*(EXCLUDE_FILE (*crtend.o ) .dtors))
     KEEP (*(SORT(.dtors.*)))
     KEEP (*(.dtors))
+  } > ROM
+  .jcr : { KEEP (*(.jcr)) } > ROM
+  .eh_frame : { KEEP (*(.eh_frame)) } > ROM
+  .gcc_except_table : { *(.gcc_except_table) } > ROM
+  .plt : { *(.plt) } > ROM
+  .text      :
+  {
+    *(.text)
+    *(.text.*)
+    *(.stub)
+    /* .gnu.warning sections are handled specially by elf32.em.  */
+    *(.gnu.warning)
+    *(.gnu.linkonce.t.*)
+  } > ROM =0
+  .init          :
+  {
+    KEEP (*(.init))
+  } > ROM =0
+  .fini      :
+  {
+    KEEP (*(.fini))
+  } > ROM =0
+  PROVIDE (__etext = .);
+  PROVIDE (_etext = .);
+  PROVIDE (etext = .);
+  . = ALIGN(2);
+  __rdata = .;
+  .data    : AT (__rdata)
+  {
+    __data = .;
+    *(.data)
+    *(.data.*)
+    *(.gnu.linkonce.d.*)
+    SORT(CONSTRUCTORS)
   } > RAM
-  .eh_frame : { KEEP (*(.eh_frame)) } > RAM
-  .gcc_except_table : { *(.gcc_except_table) } > RAM
-  .jcr : { *(.jcr) } > RAM
-  .plt : { *(.plt) } > RAM
   _edata = .;
   PROVIDE (edata = .);
   __bss_start = .;
-  .bss       :
+  /* Why do we need to give bss an AT address at all?  Because if we
+     don't, ld will generate another program header for it rather than
+     using the one for .data.  */
+  .bss       : AT (LOADADDR(.data) + SIZEOF(.data))
   {
    *(.dynbss)
    *(.bss)
@@ -73,28 +99,8 @@ SECTIONS
   } > RAM
   . = ALIGN(2);
   _end = .;
+  __stack = .;
   PROVIDE (end = .);
-  .text      :
-  {
-    *(.int_vec)
-    *(.text)
-    *(.text.*)
-    *(.stub)
-    /* .gnu.warning sections are handled specially by elf32.em.  */
-    *(.gnu.warning)
-    *(.gnu.linkonce.t.*)
-  } > ROM =0
-  .init          : 
-  { 
-    KEEP (*(.init))
-  } > ROM =0
-  .fini      :
-  {
-    KEEP (*(.fini))
-  } > ROM =0
-  PROVIDE (__etext = .);
-  PROVIDE (_etext = .);
-  PROVIDE (etext = .);
   /* Stabs debugging sections.  */
   .stab 0 : { *(.stab) }
   .stabstr 0 : { *(.stabstr) }
