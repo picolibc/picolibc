@@ -1,9 +1,8 @@
 @chapter What is it?
 
 The Cygwin tools are ports of the popular GNU development tools for
-Windows NT, 95, 98 and 2000.  They run thanks to the Cygwin library
-which provides the UNIX system calls and environment these programs
-expect.
+Windows 9x/ME/NT/2000.  They run thanks to the Cygwin library which
+provides the UNIX system calls and environment these programs expect.
 
 With these tools installed, it is possible to write Win32 console or
 GUI applications that make use of the standard Microsoft Win32 API
