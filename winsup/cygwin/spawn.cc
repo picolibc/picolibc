@@ -587,6 +587,13 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       else
 	one_line.add ("", 1);
       MALLOC_CHECK;
+
+      if (one_line.ix > 32767)
+	{
+	  debug_printf ("Command line too long (>32K), return E2BIG");
+	  set_errno (E2BIG);
+	  return -1;
+	}
     }
 
   char *envblock;

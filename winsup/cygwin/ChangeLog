@@ -1,3 +1,8 @@
+2003-09-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* spawn.cc (spawn_guts): Set errno to E2BIG if command line is
+	longer than CreateProcess allows (32K).
+
 2003-09-25  Christopher Faylor  <cgf@redhat.com>
 
 	* dtable.cc (build_fh_name): Return pointer to a 'nodevice' rather than
