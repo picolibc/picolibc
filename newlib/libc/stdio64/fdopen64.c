@@ -30,6 +30,7 @@ File pointer or <<NULL>>, as for <<fopen>>.
 #include <errno.h>
 #include "local64.h"
 #include <_syslist.h>
+#include <sys/lock.h>
 
 extern int __sflags ();
 
