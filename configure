@@ -753,30 +753,6 @@ target_vendor=`echo $result | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\2/'`
 target_os=`echo $result | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 target=${target_cpu}-${target_vendor}-${target_os}
 
-# We have to make sure the gcc directory exists for the non-canadian
-# cross compiler if necessary. In that case, we will run the cross
-# compiler we just build to compile other stuff. Due to how the cross
-# compiler finds the C header files, the gcc directory may be needed
-# for successful cross-compilation. This sanity check can be disabled
-# by passing
-#
-#	--disable-target-dir-sanity-checking
-#
-# to configure.
-if test x${target} != x${build} && test x${build} = x${host} ; then
-    if test x${enable_target_dir_sanity_checking} != xno \
-       && test x${gcc_version} != x \
-       && test -d ${prefix}/${target_alias} \
-       && test ! -d ${prefix}/lib/gcc-lib/${target_alias}/${gcc_version} ; then
-    	echo "Please create the directory:" 1>&2
-    	echo 1>&2
-	echo "	${prefix}/lib/gcc-lib/${target_alias}/${gcc_version}" 1>&2
-    	echo 1>&2
-    	echo "first for successful cross-compilation." 1>&2
-	exit 1
-    fi
-fi
-
 . ${tmpfile}.tgt
 
 # Find the source files, if location was not specified.

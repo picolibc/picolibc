@@ -1,3 +1,14 @@
+20000-05-21  H.J. Lu  (hjl@gnu.org)
+
+	* configure: Revert changes made on May 18 and May 19.
+
+        * Makefile.in (CC_FOR_TARGET): Make sure as/ld in the gcc
+        directory are used if they exist. Make sure
+        $(build_tooldir)/include is searched for header files,
+        $(build_tooldir)/lib/ for library files.
+	(GCC_FOR_TARGET): Likewise.
+        (CXX_FOR_TARGET): Likewise.
+
 20000-05-19  H.J. Lu  (hjl@gnu.org)
 
 	* configure: Provide --disable-target-dir-sanity-checking to

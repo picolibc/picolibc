@@ -223,7 +223,7 @@ CC_FOR_TARGET = ` \
 	  ;; \
       esac \
     else \
-      echo $$r/gcc/xgcc -B$$r/gcc/; \
+      echo $$r/gcc/xgcc -B$(build_tooldir)/bin/ -B$(build_tooldir)/lib/ -B$$r/gcc/ -isystem $(build_tooldir)/include; \
     fi; \
   else \
     if [ "$(host_canonical)" = "$(target_canonical)" ] ; then \
@@ -237,7 +237,7 @@ CC_FOR_TARGET = ` \
 # variable is passed down to the gcc Makefile, where it is used to
 # build libgcc2.a.  We define it here so that it can itself be
 # overridden on the command line.
-GCC_FOR_TARGET = $$r/gcc/xgcc -B$$r/gcc/
+GCC_FOR_TARGET = $$r/gcc/xgcc -B$(build_tooldir)/bin/ -B$(build_tooldir)/lib/ -B$$r/gcc/ -I$(build_tooldir)/include
 
 CHILL_FOR_TARGET = ` \
   if [ -f $$r/gcc/xgcc ] ; then \
@@ -262,7 +262,7 @@ CXX_FOR_TARGET = ` \
 	  ;; \
       esac \
     else \
-      echo $$r/gcc/xgcc -B$$r/gcc/; \
+      echo $$r/gcc/g++ -B$(build_tooldir)/bin/ -B$(build_tooldir)/lib/ -B$$r/gcc/ -I$(build_tooldir)/include; \
     fi; \
   else \
     if [ "$(host_canonical)" = "$(target_canonical)" ] ; then \
