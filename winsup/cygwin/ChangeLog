@@ -1,3 +1,21 @@
+Fri Apr 20 14:50:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* Makefile.in: Add object files `sec_helper.cc' and `sec_acl.cc'.
+	* security.cc: Swap out several functions.
+	* sec_acl.cc: New file. Move Sun compatibel ACL functions from
+	`security.cc' to here.
+	* sec_helper.cc: New file. Move security helper functions from
+	`security.cc' to here.
+	* security.h: Changed to accomodate the above changes.
+
+Fri Apr 20 14:12:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* grp.cc: Replace `group_in_memory_p' by `group_state'.
+	Eliminate group_sem throughout.
+	(enum grp_state): New enumeration type.
+	(read_etc_group): Make race safe.
+	* security.cc: Eliminate group_sem throughout.
+
 Thu Apr 19  9:40:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* mmap.cc (mmap): Drop usage of the same memory area if the same

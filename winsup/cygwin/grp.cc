@@ -42,12 +42,17 @@ static int max_lines = 0;
 static int grp_pos = 0;
 #endif
 
-/* Set to 1 when /etc/group has been read in by read_etc_group (). */
-/* Functions in this file need to check the value of group_in_memory_p
-   and read in the group file if it isn't set. */
-/* FIXME: This should be static but this is called in uinfo_init outside
-   this file */
-int group_in_memory_p = 0;
+/* Set to loaded when /etc/passwd has been read in by read_etc_passwd ().
+   Set to emulated if passwd is emulated. */
+/* Functions in this file need to check the value of passwd_state
+   and read in the password file if it isn't set. */
+enum grp_state {
+  uninitialized = 0,
+  initializing,
+  emulated,
+  loaded
+};
+static grp_state group_state = uninitialized;
 
 static int
 parse_grp (struct group &grp, const char *line)
@@ -132,50 +137,64 @@ extern PSID get_admin_sid ();
 void
 read_etc_group ()
 {
-  extern int group_sem;
   char linebuf [200];
   char group_name [MAX_USER_NAME];
   DWORD group_name_len = MAX_USER_NAME;
 
   strncpy (group_name, "Administrators", sizeof (group_name));
 
-  ++group_sem;
-  FILE *f = fopen (etc_group, "rt");
-  --group_sem;
+  static pthread_mutex_t etc_group_mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
+  pthread_mutex_lock (&etc_group_mutex);
 
-  if (f)
+  /* if we got blocked by the mutex, then etc_group may have been processed */
+  if (group_state != uninitialized)
     {
-      while (fgets (linebuf, sizeof (linebuf), f) != NULL)
+      pthread_mutex_unlock(&etc_group_mutex);
+      return;
+    }
+
+  if (group_state != initializing)
+    {
+      group_state = initializing;
+
+      FILE *f = fopen (etc_group, "rt");
+
+      if (f)
 	{
-	  if (strlen (linebuf))
-	    add_grp_line (linebuf);
+	  while (fgets (linebuf, sizeof (linebuf), f) != NULL)
+	    {
+	      if (strlen (linebuf))
+		add_grp_line (linebuf);
+	    }
+
+	  fclose (f);
+	  group_state = loaded;
 	}
-
-      fclose (f);
-    }
-  else /* /etc/group doesn't exist -- create default one in memory */
-    {
-      char domain_name [MAX_DOMAIN_NAME];
-      DWORD domain_name_len = MAX_DOMAIN_NAME;
-      SID_NAME_USE acType;
-      debug_printf ("Emulating /etc/group");
-      if (! LookupAccountSidA (NULL ,
-				get_admin_sid () ,
-				group_name,
-				&group_name_len,
-				domain_name,
-				&domain_name_len,
-				&acType))
+      else /* /etc/group doesn't exist -- create default one in memory */
 	{
-	  strcpy (group_name, "unknown");
-	  debug_printf ("Failed to get local admins group name. %E");
-        }
+	  char domain_name [MAX_DOMAIN_NAME];
+	  DWORD domain_name_len = MAX_DOMAIN_NAME;
+	  SID_NAME_USE acType;
+	  debug_printf ("Emulating /etc/group");
+	  if (! LookupAccountSidA (NULL ,
+				    get_admin_sid () ,
+				    group_name,
+				    &group_name_len,
+				    domain_name,
+				    &domain_name_len,
+				    &acType))
+	    {
+	      strcpy (group_name, "unknown");
+	      debug_printf ("Failed to get local admins group name. %E");
+	    }
 
-      snprintf (linebuf, sizeof (linebuf), "%s::%u:\n", group_name, DEFAULT_GID);
-      add_grp_line (linebuf);
+	  snprintf (linebuf, sizeof (linebuf), "%s::%u:\n", group_name, DEFAULT_GID);
+	  add_grp_line (linebuf);
+	  group_state = emulated;
+	}
     }
 
-  group_in_memory_p = 1;
+  pthread_mutex_unlock(&etc_group_mutex);
 }
 
 extern "C"
@@ -183,7 +202,7 @@ struct group *
 getgrgid (gid_t gid)
 {
   struct group * default_grp = NULL;
-  if (!group_in_memory_p)
+  if (group_state  <= initializing)
     read_etc_group();
 
   for (int i = 0; i < curr_lines; i++)
@@ -201,7 +220,7 @@ extern "C"
 struct group *
 getgrnam (const char *name)
 {
-  if (!group_in_memory_p)
+  if (group_state  <= initializing)
     read_etc_group();
 
   for (int i = 0; i < curr_lines; i++)
@@ -223,7 +242,7 @@ extern "C"
 struct group *
 getgrent()
 {
-  if (!group_in_memory_p)
+  if (group_state  <= initializing)
     read_etc_group();
 
   if (grp_pos < curr_lines)
@@ -247,7 +266,7 @@ getgroups (int gidsetsize, gid_t *grouplist, gid_t gid, const char *username)
   DWORD size;
   int cnt = 0;
 
-  if (!group_in_memory_p)
+  if (group_state  <= initializing)
     read_etc_group();
 
   if (allow_ntsec &&
