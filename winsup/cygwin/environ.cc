@@ -411,12 +411,12 @@ check_case_init (const char *buf)
       pcheck_case = PCHECK_RELAXED;
       debug_printf ("File case checking set to RELAXED");
     }
-  else if (strcmp (buf, "adjust")== 0)
+  else if (strcasematch (buf, "adjust"))
     {
       pcheck_case = PCHECK_ADJUST;
       debug_printf ("File case checking set to ADJUST");
     }
-  else if (strcmp (buf, "strict")== 0)
+  else if (strcasematch (buf, "strict"))
     {
       pcheck_case = PCHECK_STRICT;
       debug_printf ("File case checking set to STRICT");

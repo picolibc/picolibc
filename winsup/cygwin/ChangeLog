@@ -1,3 +1,10 @@
+2002-06-26  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (cygheap_user::set_name): Avoid clearing things when just
+	setting name to itself or during first time initialization.
+
+	* environ.cc (check_case_init): Make case insensitive.
+
 2002-06-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_socket::bind): Add method definition.

@@ -440,9 +440,17 @@ cygheap_user::~cygheap_user ()
 void
 cygheap_user::set_name (const char *new_name)
 {
-  if (pname)
+  if (strcasematch (new_name, pname))
+    return;		/* nothing changed */
+
+  bool allocated = !!pname;
+  if (allocated)
     cfree (pname);
+
   pname = cstrdup (new_name ? new_name : "");
+  if (!allocated)
+    return;		/* Initializing.  Don't bother with other stuff. */
+
   homedrive = NULL;
   homepath = NULL;
   if (plogsrv)
