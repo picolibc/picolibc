@@ -1,3 +1,25 @@
+2002-08-26  Bart Oldeman  <bart.oldeman@btinternet.com>
+
+	* include/winsock2.h (SOCKET_ADDRESS): Define if
+	__CSADDR_T_DEFINED is not defined (copied from nspapi.h)
+	(CSADDR_INFO): Ditto.
+	(nspapi.h) : Don't include. Removed FIXME comment.
+	* include/nspapi.h (SOCKET_ADDRESS) Only define if
+	__CSADDR_T_DEFINED is not defined.
+	(CSADDR_INFO): Ditto.
+	(BLOB): Add structure and typedef if not already defined.
+	(NS_*): Add defines.
+	(SERVICE_*): Ditto.
+	(SERVICE_ADDRESS): Add structure and typedefs.
+ 	(SERVICE_ADDRESSES): Ditto.
+	(SERVICE_INFO[AW]): Ditto, and add UNICODE mappings.
+	(LPSERVICE_ASYNC_INFO): Add typedef.
+	(SetService[AW], GetAddressByName[AW]): Add prototypes and UNICODE
+	mappings.
+	* include/wsipx.h: New file.
+	* include/svcguid.h: New file.
+	* lib/test.c: Include wspix.h and svcguid.h.
+
 2002-08-26  Casper S. Hornstrup  <chorns@users.sourceforge.net>
 
 	* include/wsahelp.h: New file.

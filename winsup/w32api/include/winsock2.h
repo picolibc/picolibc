@@ -721,7 +721,6 @@ typedef struct _AFPROTOCOLS {
 	INT iProtocol;
 } AFPROTOCOLS, *PAFPROTOCOLS, *LPAFPROTOCOLS;
 
-
 typedef enum _WSAEcomparator
 {
 	COMP_EQUAL = 0,
@@ -734,23 +733,26 @@ typedef struct _WSAVersion
 	WSAECOMPARATOR	ecHow;
 } WSAVERSION, *PWSAVERSION, *LPWSAVERSION;
 
-/*
- * FIXME: nspapi.h has definition of SOCKET_ADDRESS needed by
- * SOCKET_ADDRESS_LIST and  LPCSADDR_INFO, needed in WSAQuery
- * but itself needs LPSOCKADDR which is defined earlier in this file
- * Incuding nspapi.h here works for now, but may need to change
- * as nspapi.h actually starts to define the Name Space Provider API.
- * MSDN docs say that SOCKET_ADDRESS is defined in winsock2.h. 
- */
-
-#include <nspapi.h>
+#ifndef __CSADDR_T_DEFINED /* also in nspapi.h */
+#define __CSADDR_T_DEFINED
+typedef struct _SOCKET_ADDRESS {
+	LPSOCKADDR lpSockaddr;
+	INT iSockaddrLength;
+} SOCKET_ADDRESS,*PSOCKET_ADDRESS,*LPSOCKET_ADDRESS;
+typedef struct _CSADDR_INFO {
+	SOCKET_ADDRESS LocalAddr;
+	SOCKET_ADDRESS RemoteAddr;
+	INT iSocketType;
+	INT iProtocol;
+} CSADDR_INFO,*PCSADDR_INFO,*LPCSADDR_INFO;
+#endif
 
 typedef struct _SOCKET_ADDRESS_LIST {
     INT             iAddressCount;
     SOCKET_ADDRESS  Address[1];
 } SOCKET_ADDRESS_LIST, * LPSOCKET_ADDRESS_LIST;
 
-#ifndef __BLOB_T_DEFINED /* also in wtypes.h */
+#ifndef __BLOB_T_DEFINED /* also in wtypes.h and nspapi.h */
 #define __BLOB_T_DEFINED
 typedef struct _BLOB {
 	ULONG	cbSize;
