@@ -41,39 +41,71 @@ cygheap_user::init()
 
   set_name (GetUserName (user_name, &user_name_len) ? user_name : "unknown");
 
-  if (wincap.has_security ())
-    {
-      HANDLE ptok = NULL;
-      DWORD siz, ret;
-      cygsid tu;
+  if (!wincap.has_security ())
+    return;
 
-      /* Get the SID from current process and store it in user.psid */
-      if (!OpenProcessToken (hMainProc, TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
-			     &ptok))
-	system_printf ("OpenProcessToken(): %E");
-      else
-	{
-	  if (!GetTokenInformation (ptok, TokenUser, &tu, sizeof tu, &siz))
-	    system_printf ("GetTokenInformation (TokenUser): %E");
-	  else if (!(ret = set_sid (tu)))
-	    system_printf ("Couldn't retrieve SID from access token!");
-	  /* Set token owner to the same value as token user */
-	  else if (!SetTokenInformation (ptok, TokenOwner, &tu, sizeof tu))
-	    debug_printf ("SetTokenInformation(TokenOwner): %E");
-	  if (!GetTokenInformation (ptok, TokenPrimaryGroup,
-				    &groups.pgsid, sizeof tu, &siz))
-	    system_printf ("GetTokenInformation (TokenPrimaryGroup): %E");
-	  CloseHandle (ptok);
-	}
+  HANDLE ptok;
+  DWORD siz;
+  char pdacl_buf [sizeof (PTOKEN_DEFAULT_DACL) + ACL_DEFAULT_SIZE];
+  PTOKEN_DEFAULT_DACL pdacl = (PTOKEN_DEFAULT_DACL) pdacl_buf;
+
+  if (!OpenProcessToken (hMainProc, TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
+			 &ptok))
+    {
+      system_printf ("OpenProcessToken(): %E");
+      return;
     }
+  if (!GetTokenInformation (ptok, TokenPrimaryGroup,
+			    &groups.pgsid, sizeof (cygsid), &siz))
+    system_printf ("GetTokenInformation (TokenPrimaryGroup): %E");
+
+  /* Get the SID from current process and store it in effec_cygsid */
+  if (!GetTokenInformation (ptok, TokenUser, &effec_cygsid, sizeof (cygsid), &siz))
+    {
+      system_printf ("GetTokenInformation (TokenUser): %E");
+      goto out;
+    }
+
+  /* Set token owner to the same value as token user */
+  if (!SetTokenInformation (ptok, TokenOwner, &effec_cygsid, sizeof (cygsid)))
+    debug_printf ("SetTokenInformation(TokenOwner): %E");
+
+  /* Add the user in the default DACL if needed */ 
+  if (!GetTokenInformation (ptok, TokenDefaultDacl, pdacl, sizeof (pdacl_buf), &siz))
+    system_printf ("GetTokenInformation (TokenDefaultDacl): %E");
+  else if (pdacl->DefaultDacl) /* Running with security */
+    {
+      PACL pAcl = pdacl->DefaultDacl;
+      PACCESS_ALLOWED_ACE pAce;
+
+      for (int i = 0; i < pAcl->AceCount; i++)
+        {
+	  if (!GetAce(pAcl, i, (LPVOID *) &pAce))
+	    system_printf ("GetAce: %E");
+	  else if (pAce->Header.AceType == ACCESS_ALLOWED_ACE_TYPE
+		   && effec_cygsid == &pAce->SidStart)
+	    goto out;
+	}
+      pAcl->AclSize = &pdacl_buf[sizeof (pdacl_buf)] - (char *) pAcl;
+      if (!AddAccessAllowedAce (pAcl, ACL_REVISION, GENERIC_ALL, effec_cygsid)) 
+	system_printf ("AddAccessAllowedAce: %E");
+      else if (FindFirstFreeAce (pAcl, (LPVOID *) &pAce), !(pAce))
+	debug_printf ("FindFirstFreeAce %E");
+      else
+        {
+          pAcl->AclSize = (char *) pAce - (char *) pAcl;
+	  if (!SetTokenInformation (ptok, TokenDefaultDacl, pdacl, sizeof (* pdacl)))
+	    system_printf ("SetTokenInformation (TokenDefaultDacl): %E");
+        }
+    }
+ out:	  
+  CloseHandle (ptok);
 }
 
 void
 internal_getlogin (cygheap_user &user)
 {
   struct passwd *pw = NULL;
-
-  myself->gid = UNKNOWN_GID;
 
   if (wincap.has_security ())
     {
@@ -96,8 +128,7 @@ internal_getlogin (cygheap_user &user)
 	    {
 	      HANDLE ptok;
 	      if (gsid != user.groups.pgsid
-		  && OpenProcessToken (hMainProc, TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
-				     &ptok))
+		  && OpenProcessToken (hMainProc, TOKEN_ADJUST_DEFAULT, &ptok))
 	        {
 		  /* Set primary group to the group in /etc/passwd. */
 		  if (!SetTokenInformation (ptok, TokenPrimaryGroup,

@@ -20,7 +20,7 @@ details. */
 #define MAX_SID_LEN 40
 #define MAX_DACL_LEN(n) (sizeof (ACL) \
 		   + (n) * (sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD) + MAX_SID_LEN))
-
+#define ACL_DEFAULT_SIZE 3072
 #define NO_SID ((PSID)NULL)
 
 class cygpsid {

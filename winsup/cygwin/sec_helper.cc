@@ -375,6 +375,7 @@ BOOL
 sec_acl (PACL acl, bool original, bool admins, PSID sid1, PSID sid2, DWORD access2)
 {
   size_t acl_len = MAX_DACL_LEN(5);
+  LPVOID pAce;
   cygpsid psid;
 
   if (!InitializeAcl (acl, acl_len, ACL_REVISION))
@@ -402,6 +403,12 @@ sec_acl (PACL acl, bool original, bool admins, PSID sid1, PSID sid2, DWORD acces
   if (!AddAccessAllowedAce (acl, ACL_REVISION,
 			    GENERIC_ALL, well_known_system_sid))
     debug_printf ("AddAccessAllowedAce(system) %E");
+  FindFirstFreeAce (acl, &pAce);
+  if (pAce)
+    acl->AclSize = (char *) pAce - (char *) acl;
+  else
+    debug_printf ("FindFirstFreeAce %E");
+
   return TRUE;
 }
 

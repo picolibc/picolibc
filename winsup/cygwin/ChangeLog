@@ -1,3 +1,22 @@
+2003-09-26  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* uinfo.cc (cygheap_user::init): Make sure the current user appears
+	in the default DACL. Rearrange to decrease the indentation levels. 
+	Initialize the effec_cygsid directly.
+	(internal_getlogin): Do not reinitialize myself->gid. Open the process
+	token with the required access.
+	* cygheap.h (class cygheap_user): Delete members pid and saved_psid.
+	Create members effec_cygsid and saved_cygsid.
+	(cygheap_user::set_sid): Define inline.
+	(cygheap_user::set_saved_sid): Ditto.
+	(cygheap_user::sid): Modify.
+	(cygheap_user::saved_sid): Modify.
+	* cygheap.cc (cygheap_user::set_sid): Delete.
+	(cygheap_user::set_saved_sid): Ditto.
+	* sec_helper.cc (sec_acl): Set the correct acl size.
+	* autoload.cc (FindFirstFreeAce): Add.
+	* security.h: Define ACL_DEFAULT_SIZE.
+
 2003-09-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (munmap): Use correct address and length parameters when

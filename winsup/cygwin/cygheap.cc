@@ -444,28 +444,3 @@ cygheap_user::set_name (const char *new_name)
   cfree_and_set (pwinname);
 }
 
-BOOL
-cygheap_user::set_sid (PSID new_sid)
-{
-  if (new_sid)
-    {
-      if (!psid)
-	psid = cmalloc (HEAP_STR, MAX_SID_LEN);
-      if (psid)
-	return CopySid (MAX_SID_LEN, psid, new_sid);
-    }
-  return FALSE;
-}
-
-BOOL
-cygheap_user::set_saved_sid ()
-{
-  if (psid)
-    {
-      if (!saved_psid)
-        saved_psid = cmalloc (HEAP_STR, MAX_SID_LEN);
-      if (saved_psid)
-	return CopySid (MAX_SID_LEN, saved_psid, psid);
-    }
-  return FALSE;
-}

@@ -106,8 +106,8 @@ class cygheap_user
   char  *homepath;	/* User's home path */
   char  *pwinname;	/* User's name as far as Windows knows it */
   char  *puserprof;	/* User profile */
-  PSID   psid;          /* buffer for user's SID */
-  PSID   saved_psid;    /* Remains intact even after impersonation */
+  cygsid effec_cygsid;  /* buffer for user's SID */
+  cygsid saved_cygsid;  /* Remains intact even after impersonation */
 public:
   __uid32_t saved_uid;     /* Remains intact even after impersonation */
   __gid32_t saved_gid;     /* Ditto */
@@ -160,10 +160,10 @@ public:
     const char *p = env_domain ("USERDOMAIN=", sizeof ("USERDOMAIN=") - 1);
     return (p == almost_null) ? NULL : p;
   }
-  BOOL set_sid (PSID new_sid);
-  BOOL set_saved_sid ();
-  PSID sid () const { return psid; }
-  PSID saved_sid () const { return saved_psid; }
+  BOOL set_sid (PSID new_sid) {return (BOOL) (effec_cygsid = new_sid);}
+  BOOL set_saved_sid () { return (BOOL) (saved_cygsid = effec_cygsid); }
+  PSID sid () { return effec_cygsid; }
+  PSID saved_sid () { return saved_cygsid; }
   const char *ontherange (homebodies what, struct passwd * = NULL);
   bool issetuid () const { return current_token != INVALID_HANDLE_VALUE; }
   HANDLE token () { return current_token; }
