@@ -1271,6 +1271,12 @@ extern "C" {
 #define SB_SETBKCOLOR	0x2001
 #if (_WIN32_IE >= 0x0300)
 #define SB_ISSIMPLE 1038
+#define MCSC_BACKGROUND 0
+#define MCSC_TEXT 1
+#define MCSC_TITLEBK 2
+#define MCSC_TITLETEXT 3
+#define MCSC_MONTHBK 4
+#define MCSC_TRAILINGTEXT 5
 #endif
 #define RBS_TOOLTIPS 256
 #define RBS_VARHEIGHT 512

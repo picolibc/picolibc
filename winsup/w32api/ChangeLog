@@ -1,3 +1,9 @@
+2003-05-12  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/commctrl.h: (MCSC_BACKGROUND, MCSC_TEXT, MCSC_TITLEBK,
+	MCSC_TITLETEXT, MCSC_MONTHBK, MCSCTRAILTEXT): Define.
+	Thanks to: Robert Wishlaw  <rwishlaw @ shaw . ca>
+
 2003-05-12  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/olectl.h (IOleControl,IOleControlSite,ISimpleFrameSite,
