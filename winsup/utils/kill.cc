@@ -32,10 +32,11 @@ static char opts[] = "hl::fs:";
 extern "C" const char *strsigno (int);
 
 static void
-usage (void)
+usage (FILE *where = stderr)
 {
-  fprintf (stderr, "Usage: kill [-sigN] pid1 [pid2 ...]\n");
-  exit (1);
+  fputs ("usage: kill [-signal] [-s signal] pid1 [pid2 ...]\n"
+	 "       kill -l [signal]\n", where);
+  exit (where == stderr ? 1 : 0);
 }
 
 static int
@@ -139,6 +140,9 @@ main (int argc, char **argv)
 	  break;
 	case 'f':
 	  force = 1;
+	  break;
+	case 'h':
+	  usage (stdout);
 	  break;
 	case '?':
 	  if (gotsig)

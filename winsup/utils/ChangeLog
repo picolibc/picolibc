@@ -1,5 +1,11 @@
 2002-05-13  Christopher Faylor  <cgf@redhat.com>
 
+	* kill.cc (usage): Show new options.  Allow specification of output
+	stream.
+	(main): Implement 'h' option.
+
+2002-05-13  Christopher Faylor  <cgf@redhat.com>
+
 	* Makefile.in (kill.exe): Add as a specific target.
 	* kill.cc (longopts): New.
 	(opts): Ditto.
