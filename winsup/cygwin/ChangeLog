@@ -1,5 +1,9 @@
 2002-06-24  Christopher Faylor  <cgf@redhat.com>
 
+	* dtable.cc (dtable::find_unused_handle): Avoid coercion.
+
+2002-06-24  Christopher Faylor  <cgf@redhat.com>
+
 	* dtable.cc (fhandler_base::dup2): Cleanup.  Ensure that lock is turned
 	off in error condition.
 

@@ -167,10 +167,9 @@ int
 dtable::find_unused_handle (int start)
 {
   AssertResourceOwner (LOCK_FD_LIST, READ_LOCK);
-
   do
     {
-      for (int i = start; i < (int) size; i++)
+      for (size_t i = start; i < size; i++)
 	/* See if open -- no need for overhead of not_open */
 	if (fds[i] == NULL)
 	  return i;
