@@ -1,3 +1,7 @@
+Tue Oct  2 23:00:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* shm.cc: Update to handle include changes from HEAD.
+
 Tue Oct  2 16:06:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* Makefile.in: Remove cygserver_shm.o from cygwin1.dll. 
