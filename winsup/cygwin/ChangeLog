@@ -1,3 +1,19 @@
+2002-05-13  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* syscalls.cc (seteuid): Set default dacl in process token.
+	Replace in-line code by call to verify_token().
+	(setegid): Reverse change from 2002-01-21. Add call to
+	RevertToSelf and set primary group in impersonation token.
+	* security.cc (create_token): Store pgrpsid in token security
+	descriptor, except if it already appears in my_grps.
+	Use sec_acl() in place of get_dacl().
+	(verify_token): Create from code in seteuid(), with tighter checks.
+	(get_dacl) Deleted.
+	(get_group_sidlist): Add argument to indicate if pgrpsid is already
+	in the groups.
+	* security.h: Define verify_token().
+	* autoload.cc: Load GetKernelObjectSecurity().
+
 2002-05-13  Mark Bradshaw  <bradshaw@staff.crosswalk.com>
 
 	* cygwin.din: Add strlcat and strlcpy.

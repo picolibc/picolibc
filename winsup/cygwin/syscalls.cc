@@ -2007,7 +2007,7 @@ seteuid (__uid16_t uid)
 	}
       else
 	{
-	  cygsid usersid, pgrpsid, tok_pgrpsid;
+	  cygsid usersid, pgrpsid, origsid;
 	  HANDLE sav_token = INVALID_HANDLE_VALUE;
 	  BOOL sav_impersonation;
 	  BOOL current_token_is_internal_token = FALSE;
@@ -2024,31 +2024,8 @@ seteuid (__uid16_t uid)
 	     - if reasonable - new pgrp == pgrp of impersonation token. */
 	  if (allow_ntsec && cygheap->user.token != INVALID_HANDLE_VALUE)
 	    {
-	      if (!GetTokenInformation (cygheap->user.token, TokenUser,
-					&tok_usersid, sizeof tok_usersid, &siz))
-		{
-		  debug_printf ("GetTokenInformation(): %E");
-		  tok_usersid = NO_SID;
-		}
-	      if (!GetTokenInformation (cygheap->user.token, TokenPrimaryGroup,
-					&tok_pgrpsid, sizeof tok_pgrpsid, &siz))
-		{
-		  debug_printf ("GetTokenInformation(): %E");
-		  tok_pgrpsid = NO_SID;
-		}
-	      /* Check if the current user token was internally created. */
-	      TOKEN_SOURCE ts;
-	      if (!GetTokenInformation (cygheap->user.token, TokenSource,
-					&ts, sizeof ts, &siz))
-		debug_printf ("GetTokenInformation(): %E");
-	      else if (!memcmp (ts.SourceName, "Cygwin.1", 8))
-		current_token_is_internal_token = TRUE;
-	      if ((usersid && tok_usersid && usersid != tok_usersid) ||
-		  /* Check for pgrp only if current token is an internal
-		     token. Otherwise the external provided token is
-		     very likely overwritten here. */
-		  (current_token_is_internal_token &&
-		   pgrpsid && tok_pgrpsid && pgrpsid != tok_pgrpsid))
+	      if (!verify_token(cygheap->user.token, usersid, pgrpsid,
+				& current_token_is_internal_token))
 		{
 		  /* If not, RevertToSelf and close old token. */
 		  debug_printf ("tsid != usersid");
@@ -2113,9 +2090,28 @@ seteuid (__uid16_t uid)
 					    &pgrpsid, sizeof pgrpsid))
 		    debug_printf ("SetTokenInformation(user.token, "
 				  "TokenPrimaryGroup): %E");
-
 		}
-
+	      /* Set process def dacl to allow access to impersonated token */
+	      char dacl_buf[MAX_DACL_LEN(5)];
+	      origsid = cygheap->user.orig_sid ();
+	      if (usersid && origsid &&
+		  sec_acl((PACL) dacl_buf, FALSE, origsid, usersid))
+	        {
+		  HANDLE ptok = INVALID_HANDLE_VALUE;
+		  TOKEN_DEFAULT_DACL tdacl;
+		  tdacl.DefaultDacl = (PACL) dacl_buf;
+		  if (!OpenProcessToken (GetCurrentProcess (), TOKEN_ADJUST_DEFAULT,
+					 &ptok))
+		    debug_printf ("OpenProcessToken(): %E");
+		  else
+		    {
+		      if (!SetTokenInformation (ptok, TokenDefaultDacl,
+						&tdacl, sizeof dacl_buf))
+			debug_printf ("SetTokenInformation"
+				      "(TokenDefaultDacl): %E");
+		    }
+		  if (ptok != INVALID_HANDLE_VALUE) CloseHandle (ptok);
+		}
 	      /* Now try to impersonate. */
 	      if (!LookupAccountSid (NULL, usersid, username, &ulen,
 				     domain, &dlen, &use))
@@ -2180,7 +2176,6 @@ setegid (__gid16_t gid)
 	      return -1;
 	    }
 	  myself->gid = gid;
-#if 0	  // Setting the primary group in token here isn't foolproof enough.
 	  if (allow_ntsec)
 	    {
 	      cygsid gsid;
@@ -2188,6 +2183,17 @@ setegid (__gid16_t gid)
 
 	      if (gsid.getfromgr (gr))
 		{
+		  /* Remove impersonation */
+		  if (cygheap->user.token != INVALID_HANDLE_VALUE
+		      && cygheap->user.impersonated)
+		    {
+		      if (!SetTokenInformation (cygheap->user.token,
+						TokenPrimaryGroup,
+						&gsid, sizeof gsid))
+			debug_printf ("SetTokenInformation(primary, "
+				      "TokenPrimaryGroup): %E");
+		      RevertToSelf ();
+		    }
 		  if (!OpenProcessToken (GetCurrentProcess (),
 					 TOKEN_ADJUST_DEFAULT,
 					 &ptok))
@@ -2196,13 +2202,15 @@ setegid (__gid16_t gid)
 		    {
 		      if (!SetTokenInformation (ptok, TokenPrimaryGroup,
 						&gsid, sizeof gsid))
-			debug_printf ("SetTokenInformation(myself, "
+			debug_printf ("SetTokenInformation(process, "
 				      "TokenPrimaryGroup): %E");
 		      CloseHandle (ptok);
 		    }
+		  if (cygheap->user.token != INVALID_HANDLE_VALUE
+		      && cygheap->user.impersonated)
+		    ImpersonateLoggedOnUser (cygheap->user.token);
 		}
 	    }
-#endif
 	}
     }
   else

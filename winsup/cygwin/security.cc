@@ -476,7 +476,8 @@ get_supplementary_group_sidlist (const char *username, cygsidlist &grp_list)
 static BOOL
 get_group_sidlist (const char *logonserver, cygsidlist &grp_list,
 		   cygsid &usersid, cygsid &pgrpsid,
-		   PTOKEN_GROUPS my_grps, LUID auth_luid, int &auth_pos)
+		   PTOKEN_GROUPS my_grps, LUID auth_luid, int &auth_pos,
+		   BOOL * special_pgrp)
 {
   WCHAR wserver[INTERNET_MAX_HOST_NAME_LENGTH + 1];
   char user[INTERNET_MAX_HOST_NAME_LENGTH + 1];
@@ -533,19 +534,25 @@ get_group_sidlist (const char *logonserver, cygsidlist &grp_list,
 	  auth_pos = grp_list.count - 1;
 	}
     }
+  /* special_pgrp true if pgrpsid is not null and not in normal groups */
   if (!pgrpsid)
-    get_user_primary_group (wserver, user, usersid, pgrpsid);
+    {
+      * special_pgrp = FALSE;
+      get_user_primary_group (wserver, user, usersid, pgrpsid);
+    }
+  else * special_pgrp = TRUE;
   if (!get_user_groups (wserver, grp_list, user) ||
       !get_user_local_groups (wserver, logonserver, grp_list, usersid))
     return FALSE;
-  if (!grp_list.contains (pgrpsid))
-    grp_list += pgrpsid;
   if (get_supplementary_group_sidlist (user, sup_list))
     {
       for (int i = 0; i < sup_list.count; ++i)
 	if (!grp_list.contains (sup_list.sids[i]))
 	  grp_list += sup_list.sids[i];
     }
+  if (!grp_list.contains (pgrpsid))
+    grp_list += pgrpsid;
+  else * special_pgrp = FALSE;
   return TRUE;
 }
 
@@ -663,38 +670,56 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list)
   return privs;
 }
 
-#define token_acl_size (sizeof (ACL) + \
-			2 * (sizeof (ACCESS_ALLOWED_ACE) + MAX_SID_LEN))
-
-static BOOL
-get_dacl (PACL acl, cygsid usersid, cygsidlist &grp_list)
+BOOL
+verify_token (HANDLE token, cygsid &usersid, cygsid &pgrpsid, BOOL * pintern)
 {
-  if (!InitializeAcl(acl, token_acl_size, ACL_REVISION))
+  DWORD size;
+  BOOL intern = FALSE;
+
+  if (pintern)
     {
-      __seterrno ();
-      return FALSE;
+      TOKEN_SOURCE ts;
+      if (!GetTokenInformation (cygheap->user.token, TokenSource,
+				&ts, sizeof ts, &size))
+	debug_printf ("GetTokenInformation(): %E");
+      else *pintern = intern = !memcmp (ts.SourceName, "Cygwin.1", 8);
     }
-  if (grp_list.contains (well_known_admins_sid))
+  /* Verify usersid */
+  cygsid tok_usersid = NO_SID;
+  if (!GetTokenInformation (token, TokenUser,
+			    &tok_usersid, sizeof tok_usersid, &size))
+      debug_printf ("GetTokenInformation(): %E");
+  if (usersid != tok_usersid) return FALSE;
+
+  /* In an internal token, if the sd group is not well_known_null_sid,
+     it must match pgrpsid */
+  if (intern)
     {
-      if (!AddAccessAllowedAce(acl, ACL_REVISION, GENERIC_ALL,
-			       well_known_admins_sid))
-	{
-	  __seterrno ();
-	  return FALSE;
-	}
+       char sd_buf[MAX_SID_LEN + sizeof (SECURITY_DESCRIPTOR)];
+       PSID gsid = NO_SID;
+       if (!GetKernelObjectSecurity(token, GROUP_SECURITY_INFORMATION,
+				    (PSECURITY_DESCRIPTOR) sd_buf,
+				    sizeof sd_buf, &size))
+	   debug_printf ("GetKernelObjectSecurity(): %E");
+       else if (!GetSecurityDescriptorGroup((PSECURITY_DESCRIPTOR) sd_buf,
+					    &gsid, (BOOL *) &size))
+	   debug_printf ("GetSecurityDescriptorGroup(): %E");
+       if (well_known_null_sid != gsid) return pgrpsid == gsid;
     }
-  else if (!AddAccessAllowedAce(acl, ACL_REVISION, GENERIC_ALL, usersid))
-    {
-      __seterrno ();
-      return FALSE;
-    }
-  if (!AddAccessAllowedAce(acl, ACL_REVISION, GENERIC_ALL,
-			   well_known_system_sid))
-    {
-      __seterrno ();
-      return FALSE;
-    }
-  return TRUE;
+  /* See if the pgrpsid is in the token groups */
+  PTOKEN_GROUPS my_grps = NULL;
+  BOOL ret = FALSE;
+
+  if (!GetTokenInformation (token, TokenGroups, NULL, 0, &size) &&
+	  GetLastError () != ERROR_INSUFFICIENT_BUFFER)
+	debug_printf ("GetTokenInformation(token, TokenGroups): %E\n");
+  else if (!(my_grps = (PTOKEN_GROUPS) malloc (size)))
+	debug_printf ("malloc (my_grps) failed.");
+  else if (!GetTokenInformation (token, TokenGroups, my_grps, size, &size))
+	debug_printf ("GetTokenInformation(my_token, TokenGroups): %E\n");
+  else 	ret = sid_in_token_groups (my_grps, pgrpsid);
+  if (my_grps) free (my_grps);
+  return ret;
 }
 
 HANDLE
@@ -711,6 +736,8 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
     { sizeof sqos, SecurityImpersonation, SECURITY_STATIC_TRACKING, FALSE };
   OBJECT_ATTRIBUTES oa =
     { sizeof oa, 0, 0, 0, 0, &sqos };
+  PSECURITY_ATTRIBUTES psa;
+  BOOL special_pgrp;
   char sa_buf[1024];
   LUID auth_luid = SYSTEM_LUID;
   LARGE_INTEGER exp = { QuadPart:0x7fffffffffffffffLL  };
@@ -720,7 +747,7 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
   PTOKEN_PRIVILEGES privs = NULL;
   TOKEN_OWNER owner;
   TOKEN_PRIMARY_GROUP pgrp;
-  char acl_buf[token_acl_size];
+  char acl_buf[MAX_DACL_LEN(5)];
   TOKEN_DEFAULT_DACL dacl;
   TOKEN_SOURCE source;
   TOKEN_STATISTICS stats;
@@ -786,7 +813,7 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
   /* Create list of groups, the user is member in. */
   int auth_pos;
   if (!get_group_sidlist (logonserver, grpsids, usersid, pgrpsid,
-			  my_grps, auth_luid, auth_pos))
+			  my_grps, auth_luid, auth_pos, &special_pgrp))
     goto out;
 
   /* Primary group. */
@@ -811,7 +838,8 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
     goto out;
 
   /* Create default dacl. */
-  if (!get_dacl ((PACL) acl_buf, usersid, grpsids))
+  if (!sec_acl((PACL) acl_buf, FALSE,
+		grpsids.contains (well_known_admins_sid)?well_known_admins_sid:usersid))
     goto out;
   dacl.DefaultDacl = (PACL) acl_buf;
 
@@ -826,11 +854,22 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
       __seterrno ();
       debug_printf ("Loading NtCreateToken failed.");
     }
-
-  /* Convert to primary token. */
-  if (!DuplicateTokenEx (token, MAXIMUM_ALLOWED, sec_user (sa_buf, usersid),
-			 SecurityImpersonation, TokenPrimary, &primary_token))
-    __seterrno ();
+  else
+    {
+      /* Set security descriptor and primary group */
+      psa = sec_user (sa_buf, usersid);
+      if (!SetSecurityDescriptorGroup (
+                   (PSECURITY_DESCRIPTOR) psa->lpSecurityDescriptor,
+                   special_pgrp?pgrpsid:well_known_null_sid, FALSE))
+          debug_printf ("SetSecurityDescriptorGroup %E");
+      /* Convert to primary token. */
+      if (!DuplicateTokenEx (token, MAXIMUM_ALLOWED, psa,
+                             SecurityImpersonation, TokenPrimary, &primary_token))
+        {
+          __seterrno ();
+          debug_printf ("DuplicateTokenEx %E");
+        }
+    }
 
 out:
   if (old_priv_state >= 0)

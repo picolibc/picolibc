@@ -181,6 +181,8 @@ void set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
 HANDLE subauth (struct passwd *pw);
 /* Try creating a token directly. */
 HANDLE create_token (cygsid &usersid, cygsid &pgrpsid);
+/* Verify an existing token */
+BOOL verify_token (HANDLE token, cygsid &usersid, cygsid &pgrpsid, BOOL * pintern = NULL);
 
 /* Extract U-domain\user field from passwd entry. */
 void extract_nt_dom_user (const struct passwd *pw, char *domain, char *user);
