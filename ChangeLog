@@ -1,3 +1,102 @@
+2002-07-19  Chris Demetriou  <cgd@broadcom.com>
+
+	* MAINTAINERS: Clarify on config.guess and config.sub, and add
+	one instance of them which was missed to the list to update.
+
+2002-07-16  Chris Demetriou  <cgd@broadcom.com>
+
+	* config.guess: Update to 2002-07-09 version.
+	* config.sub: Update to 2002-07-03 version.
+
+2002-07-11  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in: Remove two redundant tests.
+
+2002-07-11  Rainer Orth  <ro@TechFak.Uni-Bielefeld.DE>
+
+	* configure.in (mips*-*-irix6*o32): Enable stabs.
+
+2002-07-08  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in: Don't build grez.
+	* Makefile.in: Ditto.
+
+	* Makefile.in: Remove references to bsp, cygmon, libstub.
+	* configure.in: Ditto.
+
+	* configure.in: Remove leftover reference to gdbtest.
+
+2002-07-08  Phil Edwards  <pme@gcc.gnu.org>
+
+	* configure.in (gxx_include_dir):  Change to match versioned
+	C++ headers if --enable-version-specific-runtime-libs is used.
+
+2002-07-04  Steve Ellcey  <sje@cup.hp.com>
+
+	* ltcf-cxx.sh (hpux*): Modify to support ia64-*-hpux*.
+
+2002-07-03  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in: Make --without-x work.
+
+2002-07-03  Nick Clifton  <nickc@cambridge.redhat.com>
+
+	* contrib: New directory.  Created to contain a copy of the
+	texi2pod.pl script so that it is in the same place as the version in 
+	the FSF GCC sources.
+
+2002-07-02  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in: Rearrange target Makefile fragment collection.
+
+	* Makefile.in: Don't try to build gdbtest, tgas, ispell, inet, or
+	cvs[src].
+	* configure.in: Ditto.
+
+2002-07-01  Nathanael Nerode <neroden@gcc.gnu.org>
+
+	* Makefile.in: Eliminate 'apache' targets.
+	* configure.in: Eliminate 'apache' targets.
+
+	* configure.in: Eliminate redundant tests.  Reorganize.
+
+	* Makefile.in: Eliminate last reference to LIBGCC1_TEST.
+
+	* config-ml.in: Eliminate references to Cygnus configure.
+
+	* Makefile.in: Eliminate references to building emacs.
+
+2002-07-01  Denis Chertykov  <denisc@overta.ru>
+
+	* configure.in: Add support for ip2k.
+
+2002-06-24  Ben Elliston  <bje@redhat.com>
+
+	* configure.in (host_tools): Remove cgen.
+
+	* Makefile.in (all-cgen): Remove; runs from its source directory.
+	(check-cgen, install-cgen, clean-cgen): Likewise.
+	(all-opcodes): No not depend on all-cgen.
+	(all-sim): Likewise.
+
+2002-06-22  Nathanael Nerode  <neroden@twcny.rr.com>
+
+	* configure.in: Fix AIX configury bug.
+
+2002-06-19  Nathanael Nerode  <neroden@twcny.rr.com>
+
+	* configure.in: Replace ${topsrcdir} with ${srcdir}.
+
+	* configure.in: Move definition of libstdcxx_flags right above
+	usage, rather than way earlier.
+
+	* configure.in: Pull definition of is_cross_compiler earlier.
+
+	* configure.in: Rearrange a little.
+
+	* configure.in: Remove references to librx.
+	* Makefile.in: Remove references to librx.
+
 2002-06-19  Nathanael Nerode  <neroden@twcny.rr.com>
 
 	* configure.in: Eliminate ${gasdir} variable.
@@ -53,9 +152,6 @@
 	* config-ml.in: Likewise.
 	* configure: Likewise.
 	* configure.in: Likewise.
-
-	config:
-	* acinclude.m4: Allow for PWDCMD to override hardcoded pwd.
 
 2002-05-13  Nathanael Nerode  <neroden@twcny.rr.com>
 

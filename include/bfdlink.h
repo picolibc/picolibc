@@ -183,6 +183,12 @@ extern void bfd_link_hash_traverse
 /* Add an entry to the undefs list.  */
 extern void bfd_link_add_undef
   PARAMS ((struct bfd_link_hash_table *, struct bfd_link_hash_entry *));
+
+struct bfd_sym_chain
+{
+  struct bfd_sym_chain *next;
+  const char *name;
+};
 
 /* This structure holds all the information needed to communicate
    between BFD and the linker when doing a link.  */
@@ -191,33 +197,46 @@ struct bfd_link_info
 {
   /* Function callbacks.  */
   const struct bfd_link_callbacks *callbacks;
+
   /* true if BFD should generate a relocateable object file.  */
   boolean relocateable;
-  /* true if BFD should generate relocation information in the final executable.  */
+
+  /* true if BFD should generate relocation information in the final
+     executable.  */
   boolean emitrelocations;
+
   /* true if BFD should generate a "task linked" object file,
-     similar to relocatable but also with globals converted to statics. */
+     similar to relocatable but also with globals converted to
+     statics.  */
   boolean task_link;
+
   /* true if BFD should generate a shared object.  */
   boolean shared;
+
   /* true if BFD should pre-bind symbols in a shared object.  */
   boolean symbolic;
+
   /* true if BFD should export all symbols in the dynamic symbol table
      of an executable, rather than only those used.  */
   boolean export_dynamic;
+
   /* true if shared objects should be linked directly, not shared.  */
   boolean static_link;
+
   /* true if the output file should be in a traditional format.  This
      is equivalent to the setting of the BFD_TRADITIONAL_FORMAT flag
      on the output file, but may be checked when reading the input
      files.  */
   boolean traditional_format;
+
   /* true if we want to produced optimized output files.  This might
      need much more time and therefore must be explicitly selected.  */
   boolean optimize;
+
   /* true if BFD should generate errors for undefined symbols
      even if generating a shared object.  */
   boolean no_undefined;
+
   /* true if BFD should allow undefined symbols in shared objects even
      when no_undefined is set to disallow undefined symbols.  The net
      result will be that undefined symbols in regular objects will
@@ -231,39 +250,55 @@ struct bfd_link_info
      select an appropriate memset function.  Apparently it is also
      normal for HPPA shared libraries to have undefined symbols.  */
   boolean allow_shlib_undefined;
-  /* True if ok to have multiple definition.  */
+
+  /* true if ok to have multiple definition.  */
   boolean allow_multiple_definition;
+
   /* Which symbols to strip.  */
   enum bfd_link_strip strip;
+
   /* Which local symbols to discard.  */
   enum bfd_link_discard discard;
+
   /* true if symbols should be retained in memory, false if they
      should be freed and reread.  */
   boolean keep_memory;
+
   /* The list of input BFD's involved in the link.  These are chained
      together via the link_next field.  */
   bfd *input_bfds;
+
   /* If a symbol should be created for each input BFD, this is section
      where those symbols should be placed.  It must be a section in
      the output BFD.  It may be NULL, in which case no such symbols
      will be created.  This is to support CREATE_OBJECT_SYMBOLS in the
      linker command language.  */
   asection *create_object_symbols_section;
+
+  /* List of global symbol names that are starting points for marking
+     sections against garbage collection.  */
+  struct bfd_sym_chain *gc_sym_list;
+
   /* Hash table handled by BFD.  */
   struct bfd_link_hash_table *hash;
+
   /* Hash table of symbols to keep.  This is NULL unless strip is
      strip_some.  */
   struct bfd_hash_table *keep_hash;
+
   /* true if every symbol should be reported back via the notice
      callback.  */
   boolean notice_all;
+
   /* Hash table of symbols to report back via the notice callback.  If
      this is NULL, and notice_all is false, then no symbols are
      reported back.  */
   struct bfd_hash_table *notice_hash;
+
   /* Hash table of symbols which are being wrapped (the --wrap linker
      option).  If this is NULL, no symbols are being wrapped.  */
   struct bfd_hash_table *wrap_hash;
+
   /* If a base output file is wanted, then this points to it */
   PTR base_file;
 
@@ -275,6 +310,7 @@ struct bfd_link_info
   /* The function to call when the executable or shared object is
      loaded.  */
   const char *init_function;
+
   /* The function to call when the executable or shared object is
      unloaded.  */
   const char *fini_function;

@@ -339,7 +339,10 @@ struct mips_opcode
 #define INSN_ISA64                0x00000400
 
 /* Masks used for MIPS-defined ASEs.  */
+#define INSN_ASE_MASK		  0x0000f000
 
+/* MIPS 16 ASE */
+#define INSN_MIPS16               0x00002000
 /* MIPS-3D ASE */
 #define INSN_MIPS3D               0x00004000
 /* MDMX ASE */ 

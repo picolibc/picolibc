@@ -1,3 +1,32 @@
+2002-07-19  Denis Chertykov  <denisc@overta.ru>
+	    Matthew Green  <mrg@redhat.com>
+
+	* dis-asm.h (print_insn_ip2k): Declare.
+
+2002-07-10  Jakub Jelinek  <jakub@redhat.com>
+
+	* elf/common.h (SHT_GNU_LIBLIST, DT_GNU_PRELINKED,
+	DT_GNU_CONFLICT*, DT_GNU_LIBLIST*): Define.
+
+2002-07-01  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (struct bfd_sym_chain): Declare.
+	(struct bfd_link_info): Add gc_sym_list.  Formatting fixes.
+
+2002-06-25  Alan Modra  <amodra@bigpond.net.au>
+
+	* demangle.h: #include "ansidecl.h" rather than #include <ansidecl.h>.
+	* fibheap.h: Likewise.
+	* hashtab.h: Likewise.
+	* partition.h: Likewise.
+	* sort.h: Likewise.
+	* splay-tree.h: Likewise.
+
+2002-06-24  Alan Modra  <amodra@bigpond.net.au>
+
+	* libiberty.h (basename): Don't declare if HAVE_DECL_BASENAME.
+	* getopt.h (getopt): Don't declare if HAVE_DECL_GETOPT.
+
 2002-06-18  Dave Brolley  <brolley@redhat.com>
 
 	From Catherine Moore:
