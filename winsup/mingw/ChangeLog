@@ -1,3 +1,12 @@
+2002-12-08  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/math/s_erf.c: New file.
+	* mingwex/math/sf_erf.c: New file.
+	* mingwex/Makefile.in (MATH_DISTFILES): Add new files.
+	(MATH_OBJS): Add new objects.
+	* include/math.h (erf[f]): Add prototypes.
+	(erfc[f]): Add prototypes.
+
 2002-12-07  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/math.h: Add traditional/XOPEN math constants.

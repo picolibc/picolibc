@@ -56,10 +56,10 @@ MATH_DISTFILES = \
 	pow.c powf.c powi.c powif.c powil.c powl.c \
 	remainder.S remainderf.S remainderl.S remquo.S \
 	remquof.S remquol.S rint.c rintf.c rintl.c round.c roundf.c \
-	roundl.c scalbn.S scalbnf.S scalbnl.S signbit.c signbitf.c \
-	signbitl.c sinf.S sinhf.c sinhl.c sinl.S  sqrtf.c sqrtl.c \
-	tanf.S tanhf.c tanhl.c tanl.S tgamma.c tgammaf.c tgammal.c \
-	trunc.c truncf.c truncl.c
+	roundl.c scalbn.S scalbnf.S scalbnl.S s_erf.c sf_erf.c \
+	signbit.c signbitf.c signbitl.c sinf.S sinhf.c sinhl.c sinl.S \
+	sqrtf.c sqrtl.c tanf.S tanhf.c tanhl.c tanl.S tgamma.c \
+	tgammaf.c tgammal.c trunc.c truncf.c truncl.c
 
 CC = @CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
@@ -127,10 +127,10 @@ MATH_OBJS = \
 	pow.o powf.o powi.o powif.o powil.o powl.o \
 	remainder.o remainderf.o remainderl.o remquo.o \
 	remquof.o remquol.o rint.o rintf.o rintl.o round.o roundf.o \
-	roundl.o scalbn.o scalbnf.o scalbnl.o signbit.o signbitf.o \
-	signbitl.o sinf.o sinhf.o sinhl.o sinl.o sqrtf.o sqrtl.o \
-	tanf.o tanhf.o tanhl.o tanl.o tgamma.o tgammaf.o tgammal.o \
-	trunc.o truncf.o truncl.o
+	roundl.o scalbn.o scalbnf.o scalbnl.o s_erf.o sf_erf.o \
+	signbit.o signbitf.o signbitl.o sinf.o sinhf.o sinhl.o sinl.o \
+	sqrtf.o sqrtl.o tanf.o tanhf.o tanhl.o tanl.o tgamma.o \
+	tgammaf.o tgammal.o trunc.o truncf.o truncl.o
 FENV_OBJS = fesetround.o  fegetround.o \
 	fegetenv.o fesetenv.o feupdateenv.o \
 	feclearexcept.o feholdexcept.o fegetexceptflag.o \

@@ -518,9 +518,19 @@ extern long double powl (long double, long double);
 extern float sqrtf (float);
 extern long double sqrtl (long double);
 
-/* TODO */ 
 /* 7.12.8.1 The erf functions  */
+extern double erf (double);
+extern float erff (float);
+/* TODO
+extern long double erfl (long double);
+*/ 
+
 /* 7.12.8.2 The erfc functions  */
+extern double erfc (double);
+extern float erfcf (float);
+/* TODO
+extern long double erfcl (long double);
+*/ 
 
 /* 7.12.8.3 The lgamma functions */
 
