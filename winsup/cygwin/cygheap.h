@@ -46,6 +46,9 @@ struct cygheap_root_mount_info
   unsigned native_pathlen;
 };
 
+/* CGF: FIXME This doesn't belong here */
+
+int path_prefix_p (const char *path1, const char *path2, int len1) __attribute__ ((regparm (3)));
 class cygheap_root
 {
   /* Root directory information.
@@ -55,7 +58,6 @@ class cygheap_root
 public:
   bool posix_ok (const char *path)
   {
-    extern int path_prefix_p (const char *, const char *, int);
     if (!m)
       return 1;
     return path_prefix_p (m->posix_path, path, m->posix_pathlen);

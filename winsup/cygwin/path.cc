@@ -89,7 +89,6 @@ static DWORD available_drives;
 static int normalize_win32_path (const char *src, char *dst);
 static void slashify (const char *src, char *dst, int trailing_slash_p);
 static void backslashify (const char *src, char *dst, int trailing_slash_p);
-static int path_prefix_p (const char *path1, const char *path2, int len1);
 
 struct symlink_info
 {
@@ -243,6 +242,12 @@ normalize_posix_path (const char *src, char *dst)
 		}
 	      else if (src[2] && !isslash (src[2]))
 		break;
+              else
+		{
+		  while (dst > dst_start && !isslash (*--dst))
+		    continue;
+		  src++;
+		}
 	    }
 
 	  *dst++ = '/';
@@ -270,7 +275,7 @@ path_conv::add_ext_from_sym (symlink_info &sym)
     {
       known_suffix = path + sym.extn;
       if (sym.ext_tacked_on)
-        strcpy (known_suffix, sym.ext_here);
+	strcpy (known_suffix, sym.ext_here);
     }
 }
 
@@ -451,17 +456,17 @@ path_conv::check (const char *src, unsigned opt,
 	  if (sym.case_clash)
 	    {
 	      if (pcheck_case == PCHECK_STRICT)
-	        {
+		{
 		  case_clash = TRUE;
 		  error = ENOENT;
 		  goto out;
 		}
 	      /* If pcheck_case==PCHECK_ADJUST the case_clash is remembered
-	         if the last component is concerned. This allows functions
+		 if the last component is concerned. This allows functions
 		 which shall create files to avoid overriding already existing
 		 files with another case. */
 	      if (!component)
-	        case_clash = TRUE;
+		case_clash = TRUE;
 	    }
 
 	  if (!(opt & PC_SYM_IGNORE))
@@ -499,15 +504,15 @@ path_conv::check (const char *src, unsigned opt,
 		      set_symlink (); // last component of path is a symlink.
 		      fileattr = sym.fileattr;
 		      if (opt & PC_SYM_CONTENTS)
-		        {
+			{
 			  strcpy (path, sym.contents);
 			  goto out;
 			}
 		      add_ext_from_sym (sym);
 		      if (pcheck_case == PCHECK_RELAXED)
-		        goto out;
+			goto out;
 		      /* Avoid further symlink evaluation. Only case checks are
-		         done now. */
+			 done now. */
 		      opt |= PC_SYM_IGNORE;
 		    }
 		  else
@@ -617,7 +622,7 @@ out:
 
   if (!rootdir (tmp_buf) ||
       !GetVolumeInformation (tmp_buf, NULL, 0, &vol_serial, NULL,
-      			     &vol_flags, fs_name, 16))
+			     &vol_flags, fs_name, 16))
     {
       debug_printf ("GetVolumeInformation(%s) = ERR, this->path(%s), set_has_acls(FALSE)",
 		    tmp_buf, this->path, GetLastError ());
@@ -633,11 +638,11 @@ out:
       if (drive_type == DRIVE_REMOTE || (drive_type == DRIVE_UNKNOWN && (tmp_buf[0] == '\\' && tmp_buf[1] == '\\')))
 	is_remote_drive = 1;
       if (!allow_smbntsec && is_remote_drive)
-        set_has_acls (FALSE);
+	set_has_acls (FALSE);
       else
-        set_has_acls (vol_flags & FS_PERSISTENT_ACLS);
+	set_has_acls (vol_flags & FS_PERSISTENT_ACLS);
       /* Known file systems with buggy open calls. Further explanation
-         in fhandler.cc (fhandler_disk_file::open). */
+	 in fhandler.cc (fhandler_disk_file::open). */
       set_has_buggy_open (strcmp (fs_name, "SUNWNFS") == 0);
     }
 
@@ -2182,10 +2187,10 @@ cygdrive_getmntent ()
       __small_sprintf (native_path, "%c:\\", drive);
       if (GetDriveType (native_path) == DRIVE_REMOVABLE ||
 	  GetFileAttributes (native_path) == (DWORD) -1)
-        {
+	{
 	  available_drives &= ~mask;
 	  continue;
-        }
+	}
       native_path[2] = '\0';
       __small_sprintf (posix_path, "%s%c", mount_table->cygdrive, drive);
       ret = fillout_mntent (native_path, posix_path, mount_table->cygdrive_flags);
@@ -2405,7 +2410,7 @@ symlink (const char *topath, const char *frompath)
 	  unsigned short len = strlen (topath);
 	  unsigned short win_len = strlen (w32topath);
 	  success = WriteFile (h, shortcut_header, SHORTCUT_HDR_SIZE,
-	  		       &written, NULL)
+			       &written, NULL)
 		    && written == SHORTCUT_HDR_SIZE
 		    && WriteFile (h, &len, sizeof len, &written, NULL)
 		    && written == sizeof len
@@ -2426,7 +2431,7 @@ symlink (const char *topath, const char *frompath)
 
 	  /* Note that the terminating nul is written.  */
 	  success = WriteFile (h, buf, len, &written, NULL)
-	  	    || written != len;
+		    || written != len;
 
 	}
       if (success)
@@ -2436,8 +2441,8 @@ symlink (const char *topath, const char *frompath)
 			      win32_path.get_win32 (),
 			      S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO);
 	  SetFileAttributesA (win32_path.get_win32 (),
-	  		      allow_winsymlinks ? FILE_ATTRIBUTE_READONLY
-			      			: FILE_ATTRIBUTE_SYSTEM);
+			      allow_winsymlinks ? FILE_ATTRIBUTE_READONLY
+						: FILE_ATTRIBUTE_SYSTEM);
 	  res = 0;
 	}
       else
@@ -2678,15 +2683,15 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
       ext_tacked_on = !!*ext_here;
 
       if (pcheck_case != PCHECK_RELAXED && !case_check (path)
-          || (opt & PC_SYM_IGNORE))
-        goto file_not_symlink;
+	  || (opt & PC_SYM_IGNORE))
+	goto file_not_symlink;
 
       int sym_check;
 
       sym_check = 0;
 
       if (fileattr & FILE_ATTRIBUTE_DIRECTORY)
-        goto file_not_symlink;
+	goto file_not_symlink;
 
       /* Windows shortcuts are treated as symlinks. */
       if (suffix.lnk_match ())
@@ -2974,7 +2979,7 @@ chdir (const char *dir)
   if (res == -1)
     __seterrno ();
   else if (!path.has_symlinks () && strpbrk (dir, ":\\") == NULL
-           && pcheck_case == PCHECK_RELAXED)
+	   && pcheck_case == PCHECK_RELAXED)
     cygheap->cwd.set (path, dir);
   else
     cygheap->cwd.set (path, NULL);

@@ -167,5 +167,5 @@ has_exec_chars (const char *buf, int len)
 	  (buf[0] == 'M' && buf[1] == 'Z'));
 }
 
-extern int pathmatch (const char *path1, const char *path2);
-extern int pathnmatch (const char *path1, const char *path2, int len);
+int pathmatch (const char *path1, const char *path2) __attribute__ ((regparm (2)));
+int pathnmatch (const char *path1, const char *path2, int len) __attribute__ ((regparm (2)));
