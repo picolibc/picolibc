@@ -113,6 +113,7 @@ struct _cygtls
   int sig;
   unsigned stacklock;
   unsigned spinning;
+  unsigned incyg;
   __stack_t stack[TLS_STACK_SIZE];
   unsigned padding[0];
 
@@ -126,7 +127,8 @@ struct _cygtls
   void remove (DWORD);
   void push (__stack_t, bool) __attribute__ ((regparm (3)));
   __stack_t pop () __attribute__ ((regparm (1)));
-  bool isinitialized () {return initialized == CYGTLS_INITIALIZED || initialized == CYGTLS_EXCEPTION;}
+  bool isinitialized () const {return initialized == CYGTLS_INITIALIZED || initialized == CYGTLS_EXCEPTION;}
+  bool in_exception () const {return initialized == CYGTLS_EXCEPTION;}
   void set_state (bool);
   void reset_exception ();
   bool interrupt_now (CONTEXT *, int, void *, struct sigaction&)

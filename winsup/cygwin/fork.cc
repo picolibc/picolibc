@@ -512,6 +512,10 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
       goto cleanup;
     }
 
+  int forked_pid;
+
+  forked_pid = forked->pid;
+
   /* Initialize things that are done later in dll_crt0_1 that aren't done
      for the forkee.  */
   strcpy (forked->progname, myself->progname);
@@ -621,7 +625,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   pi.hThread = NULL;
   pthread::atforkparent ();
 
-  return forked->pid;
+  return forked_pid;
 
 /* Common cleanup code for failure cases */
  cleanup:

@@ -1,3 +1,23 @@
+2004-03-06  Christopher Faylor  <cgf@redhat.com>
+
+	* fork.cc (fork_parent): Save parent pid in a temporary variable since
+	child could conceivably exit before function returns, rendering the
+	child's shared memory area invalid.
+
+	* cygtls.h (_cygtls::incyg): Declare new field.
+	(_cygtls::in_exception): Define new function.
+	* exceptions.cc (setup_handler): Remove locked flag.  Use 'incyg' flag
+	and in_exception function to determine when we're in a cygwin function.
+	(_cygtls::call_signal_handler): Decrement incyg flag prior to calling a
+	handler.  Increment it on return.
+	* gendef (_sigfe): Increment incyg flag.  Use testl for zero testing
+	rather than orl, for consistency.
+	(_sigbe): Decrement incyg flag.  Use testl for zero testing rather than
+	orl, for consistency.
+	(_cygtls::pop): Use testl for zero testing rather than orl, for
+	consistency.
+	(stabilize_sig_stack): Ditto.
+
 2004-03-05  Christopher Faylor  <cgf@redhat.com>
 
 	* gendef (sigdelayed): Handle return here rather than going through

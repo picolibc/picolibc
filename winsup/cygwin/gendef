@@ -95,12 +95,13 @@ __sigfe:
 	movl	\$1,%eax				# potential lock value
 	lock	xchgl %eax,$tls::stacklock(%edx)	# see if we can grab it
 	movl	%eax,$tls::spinning(%edx)		# flag if we are waiting for lock
-	orl	%eax,%eax				# it will be zero
+	testl	%eax,%eax				# it will be zero
 	jz	2f					#  if so
 	xorl	%eax,%eax				# nope.  It was not zero
 	call	_low_priority_sleep			# should be a short-time thing, so
 	jmp	1b					# sleep and loop
-2:	movl	\$4,%eax				# have the lock, now increment the
+2:	incl	$tls::incyg(%edx)
+	movl	\$4,%eax				# have the lock, now increment the
 	xadd	%eax,$tls::stackptr(%edx)		#  stack pointer and get pointer
 	leal	__sigbe,%ebx				# new place to return to
 	xchgl	%ebx,12(%esp)				# exchange with real return value
@@ -120,7 +121,7 @@ __sigbe:
 	movl	\$1,%eax				# potential lock value
 	lock	xchgl %eax,$tls::stacklock(%edx)	# see if we can grab it
 	movl	%eax,$tls::spinning(%edx)		# flag if we are waiting for lock
-	orl	%eax,%eax				# it will be zero
+	testl	%eax,%eax				# it will be zero
 	jz	2f					#  if so
 	xorl	%eax,%eax				# nope.  not zero
 	call	_low_priority_sleep			# sleep
@@ -130,6 +131,7 @@ __sigbe:
 	xorl	%ebx,%ebx
 	xchgl	%ebx,-4(%eax)				# get return address from signal stack
 	xchgl	%ebx,8(%esp)				# restore ebx/real return address
+	decl	$tls::incyg(%edx)
 	decl	$tls::stacklock(%edx)			# release lock
 	popl	%eax
 	popl	%edx
@@ -145,7 +147,7 @@ _sigreturn:
 	movl	\$1,%eax				# potential lock value
 	lock	xchgl %eax,$tls::stacklock(%edx)	# see if we can grab it
 	movl	%eax,$tls::spinning(%edx)		# flag if we are waiting for lock
-	orl	%eax,%eax				# it will be zero
+	testl	%eax,%eax				# it will be zero
 	jz	2f					#  if so
 	xorl	%eax,%eax				# nope.  not zero
 	call	_low_priority_sleep			# sleep
@@ -220,7 +222,7 @@ __ZN7_cygtls4lockEv:
 	movl	%eax,%edi
 1:	movl	\$1,%eax
 	lock	xchgl %eax,$tls::pstacklock(%edi)
-	orl	%eax,%eax
+	testl	%eax,%eax
 	jz	2f
 	xorl	%eax,%eax
 	call	_low_priority_sleep
@@ -244,7 +246,7 @@ stabilize_sig_stack:
 	movl	\$1,%eax
 	lock	xchgl %eax,$tls::stacklock(%edx)
 	movl	%eax,$tls::spinning(%edx)		# flag if we are waiting for lock
-	orl	%eax,%eax
+	testl	%eax,%eax
 	jz	2f
 	xorl	%eax,%eax
 	call	_low_priority_sleep

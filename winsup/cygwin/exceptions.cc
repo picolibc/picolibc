@@ -742,7 +742,6 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
 {
   CONTEXT cx;
   bool interrupted = false;
-  bool locked = false;
 
   if (tls->sig)
     {
@@ -754,18 +753,17 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
   for (int i = 0; i < CALL_HANDLER_RETRY; i++)
     {
       tls->lock ();
-      locked = true;
-      if (tls->stackptr > tls->stack)
+      if (tls->incyg || tls->in_exception ())
 	{
 	  tls->reset_exception ();
 	  tls->interrupt_setup (sig, handler, siga);
 	  sigproc_printf ("interrupted known cygwin routine");
 	  interrupted = true;
+	  tls->unlock ();
 	  break;
 	}
 
       tls->unlock ();
-      locked = false;
       DWORD res;
       HANDLE hth = (HANDLE) *tls;
 
@@ -776,7 +774,7 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
 	 since we don't want to stall the signal handler.  FIXME: Will this result in
 	 noticeable delays?
 	 If the thread is already suspended (which can occur when a program has called
-	 SuspendThread on itself then just queue the signal. */
+	 SuspendThread on itself) then just queue the signal. */
 
 #ifndef DEBUGGING
       sigproc_printf ("suspending mainthread");
@@ -788,7 +786,7 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
 #endif
       res = SuspendThread (hth);
       /* Just set pending if thread is already suspended */
-      if (res || tls->stackptr > tls->stack)
+      if (res || tls->incyg)
 	{
 	  (void) ResumeThread (hth);
 	  break;
@@ -811,8 +809,6 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
     }
 
 out:
-  if (locked)
-    tls->unlock ();
   if (interrupted && tls->event)
     {
       HANDLE h = tls->event;
@@ -1185,8 +1181,10 @@ _cygtls::call_signal_handler ()
       sigset_t this_oldmask = oldmask;
       int this_errno = saved_errno;
       set_process_mask (newmask);
+      incyg--;
       sig = 0;
       sigfunc (thissig);
+      incyg++;
       set_process_mask (this_oldmask);
       if (this_errno >= 0)
 	set_errno (this_errno);
