@@ -1,3 +1,8 @@
+2000-09-02  Egor Duda  <deo@logos-m.ru>
+
+	* Makefile.in: Remove "make check" support. It is now in
+	winsup/Makefile.in.
+
 Fri Sep  1 21:17:03 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* sigproc.cc (mychild): New function.
