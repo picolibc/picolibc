@@ -1,3 +1,7 @@
+Mon Feb 21 00:19:40 2000  Christopher Faylor <cgf@cygnus.com>
+
+	Respond to a multitude of new g++ warnings.
+
 Sun Feb 20 22:10:21 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* environ.cc (getwinenv): Make __stdcall.

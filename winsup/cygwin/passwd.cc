@@ -164,8 +164,7 @@ search_for (uid_t uid, const char *name)
   return default_pw;
 }
 
-extern "C"
-struct passwd *
+extern "C" struct passwd *
 getpwuid (uid_t uid)
 {
   if (!passwd_in_memory_p)
@@ -174,8 +173,7 @@ getpwuid (uid_t uid)
   return search_for (uid, 0);
 }
 
-extern "C"
-struct passwd *
+extern "C" struct passwd *
 getpwnam (const char *name)
 {
   if (!passwd_in_memory_p)
@@ -184,8 +182,7 @@ getpwnam (const char *name)
   return search_for (0, name);
 }
 
-extern "C"
-struct passwd *
+extern "C" struct passwd *
 getpwent (void)
 {
   if (!passwd_in_memory_p)
@@ -197,9 +194,8 @@ getpwent (void)
   return NULL;
 }
 
-extern "C"
-struct passwd *
-getpwduid (uid_t uid)
+extern "C" struct passwd *
+getpwduid (uid_t)
 {
   if (!passwd_in_memory_p)
     read_etc_passwd();
@@ -207,8 +203,7 @@ getpwduid (uid_t uid)
   return NULL;
 }
 
-extern "C"
-void
+extern "C" void
 setpwent (void)
 {
   if (!passwd_in_memory_p)
@@ -217,8 +212,7 @@ setpwent (void)
   pw_pos = 0;
 }
 
-extern "C"
-void
+extern "C" void
 endpwent (void)
 {
   if (!passwd_in_memory_p)
@@ -227,8 +221,7 @@ endpwent (void)
   pw_pos = 0;
 }
 
-extern "C"
-int
+extern "C" int
 setpassent ()
 {
   if (!passwd_in_memory_p)
@@ -237,8 +230,7 @@ setpassent ()
   return 0;
 }
 
-extern "C"
-char *
+extern "C" char *
 getpass (const char * prompt)
 {
 #ifdef _MT_SAFE

@@ -182,7 +182,7 @@ fhandler_pty_master::accept_input ()
 }
 
 static DWORD WINAPI
-process_input (void *arg)
+process_input (void *)
 {
   char rawbuf[INP_BUFFER_SIZE];
 
@@ -346,7 +346,7 @@ again:
 }
 
 static DWORD WINAPI
-process_output (void *arg)
+process_output (void *)
 {
   char buf[OUT_BUFFER_SIZE*2];
   int n;
@@ -374,7 +374,7 @@ process_output (void *arg)
 /* Process tty ioctl requests */
 
 static DWORD WINAPI
-process_ioctl (void *arg)
+process_ioctl (void *)
 {
   while (1)
     {
@@ -500,7 +500,7 @@ fhandler_tty_slave::open (const char *, int flags, mode_t)
 }
 
 void
-fhandler_tty_slave::init (HANDLE f, DWORD a, mode_t)
+fhandler_tty_slave::init (HANDLE, DWORD a, mode_t)
 {
   int mode = 0;
 
@@ -733,7 +733,7 @@ fhandler_tty_slave::tcgetattr (struct termios *t)
 }
 
 int
-fhandler_tty_slave::tcsetattr (int a, const struct termios *t)
+fhandler_tty_slave::tcsetattr (int, const struct termios *t)
 {
   acquire_output_mutex (INFINITE);
   get_ttyp ()->ti = *t;
@@ -742,7 +742,7 @@ fhandler_tty_slave::tcsetattr (int a, const struct termios *t)
 }
 
 int
-fhandler_tty_slave::tcflush (int a)
+fhandler_tty_slave::tcflush (int)
 {
   return 0;
 }
@@ -895,7 +895,7 @@ fhandler_pty_master::read (void *ptr, size_t len)
   DWORD n;
   char *cptr = (char *) ptr;
 
-  if (! PeekNamedPipe (get_handle (), NULL, 0, NULL, &n, NULL))
+  if (!PeekNamedPipe (get_handle (), NULL, 0, NULL, &n, NULL))
     {
       if (GetLastError () == ERROR_BROKEN_PIPE)
 	{
@@ -916,14 +916,16 @@ fhandler_pty_master::read (void *ptr, size_t len)
       *cptr++ = TIOCPKT_DATA;
       len--;
     }
-  n = process_slave_output (cptr, len);
-  if (n < 0)
+
+  int x;
+  x = process_slave_output (cptr, len);
+  if (x < 0)
     return -1;
   if (output_done_event != NULL)
     SetEvent (output_done_event);
-  if (pktmode && n > 0)
-    n++;
-  return n;
+  if (pktmode && x > 0)
+    x++;
+  return x;
 }
 
 int
@@ -934,14 +936,14 @@ fhandler_pty_master::tcgetattr (struct termios *t)
 }
 
 int
-fhandler_pty_master::tcsetattr (int a, const struct termios *t)
+fhandler_pty_master::tcsetattr (int, const struct termios *t)
 {
   cygwin_shared->tty[ttynum]->ti = *t;
   return 0;
 }
 
 int
-fhandler_pty_master::tcflush (int a)
+fhandler_pty_master::tcflush (int)
 {
   return 0;
 }

@@ -295,7 +295,7 @@ public:
   {
     return windows_device_names[FHDEVN (status)];
   }
-  virtual int bg_check (int, int x = 0) {return 1;}
+  virtual int bg_check (int) {return 1;}
 };
 
 class fhandler_socket: public fhandler_base
@@ -311,7 +311,7 @@ public:
   int write (const void *ptr, size_t len);
   int read (void *ptr, size_t len);
   int ioctl (unsigned int cmd, void *);
-  off_t lseek (off_t offset, int whence) { return 0; }
+  off_t lseek (off_t, int) { return 0; }
   int close ();
 
   select_record *select_read (select_record *s);
@@ -479,7 +479,7 @@ public:
   int tcflow (int);
   int tcsetattr (int a, const struct termios *t);
   int tcgetattr (struct termios *t);
-  off_t lseek (off_t offset, int whence) { return 0; }
+  off_t lseek (off_t, int) { return 0; }
   int tcflush (int);
   void dump ();
   int is_tty () { return 1; }
@@ -501,7 +501,7 @@ class fhandler_termios: public fhandler_base
 {
 protected:
   HANDLE output_handle;
-  virtual void doecho (const void *str, DWORD len) {};
+  virtual void doecho (const void *, DWORD) {};
   virtual int accept_input () {return 1;};
 public:
   tty_min *tc;
@@ -519,7 +519,7 @@ public:
   int tcgetpgrp ();
   int tcsetpgrp (int pid);
   void set_ctty (int ttynum, int flags);
-  int bg_check (int sig, int blocksigs = 1);
+  int bg_check (int sig);
 };
 
 /* This is a input and output console handle */
@@ -656,7 +656,7 @@ public:
   int tcflush (int);
   int ioctl (unsigned int cmd, void *);
 
-  off_t lseek (off_t offset, int whence) { return 0; }
+  off_t lseek (off_t, int) { return 0; }
 };
 
 class fhandler_pty_master: public fhandler_tty_common
@@ -681,7 +681,7 @@ public:
   int tcflush (int);
   int ioctl (unsigned int cmd, void *);
 
-  off_t lseek (off_t offset, int whence) { return 0; }
+  off_t lseek (off_t, int) { return 0; }
   char *ptsname ();
 
   void set_close_on_exec (int val);
@@ -739,7 +739,7 @@ public:
   int write (const void *ptr, size_t len);
   int read (void *ptr, size_t len);
   int ioctl (unsigned int cmd, void *);
-  off_t lseek (off_t offset, int whence) { return 0; }
+  off_t lseek (off_t, int) { return 0; }
   int close (void) { return 0; }
 
   void set_close_on_exec (int val);

@@ -63,7 +63,7 @@ WndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 static HANDLE window_started;
 
 static DWORD WINAPI
-Winmain (VOID *arg)
+Winmain (VOID *)
 {
   MSG msg;
   WNDCLASS wc;

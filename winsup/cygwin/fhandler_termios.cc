@@ -102,7 +102,7 @@ fhandler_termios::set_ctty (int ttynum, int flags)
 }
 
 int
-fhandler_termios::bg_check (int sig, int blocksigs)
+fhandler_termios::bg_check (int sig)
 {
   if (!myself->pgid || tc->getpgid () == myself->pgid ||
 	myself->ctty != tc->ntty ||

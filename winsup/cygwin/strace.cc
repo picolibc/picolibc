@@ -183,7 +183,7 @@ strace_printf (unsigned category, const char *fmt,...)
 }
 
 void __stdcall
-mark (const char *fn, int i)
+mark (const char *, int)
 {
 }
 

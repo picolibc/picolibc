@@ -27,7 +27,7 @@ extern void do_global_ctors (void (**in_pfunc)(), int force);
 int NO_COPY dynamically_loaded;
 
 int
-WINAPI dll_entry (HANDLE hdll, DWORD reason, void *static_load)
+WINAPI dll_entry (HANDLE, DWORD reason, void *static_load)
 {
   switch (reason)
     {

@@ -84,7 +84,7 @@ fhandler_base::eat_readahead (int n)
     n = ralen;
   if (n > 0 && ralen)
     {
-      if ((ralen -= n) < 0)
+      if ((int) (ralen -= n) < 0)
 	ralen = 0;
 
       if (raixget >= ralen)
@@ -1059,14 +1059,14 @@ fhandler_base::dup (fhandler_base *child)
 /* Base terminal handlers.  These just return errors.  */
 
 int
-fhandler_base::tcflush (int queue)
+fhandler_base::tcflush (int)
 {
   set_errno (ENOTTY);
   return -1;
 }
 
 int
-fhandler_base::tcsendbreak (int duration)
+fhandler_base::tcsendbreak (int)
 {
   set_errno (ENOTTY);
   return -1;
@@ -1080,28 +1080,28 @@ fhandler_base::tcdrain (void)
 }
 
 int
-fhandler_base::tcflow (int action)
+fhandler_base::tcflow (int)
 {
   set_errno (ENOTTY);
   return -1;
 }
 
 int
-fhandler_base::tcsetattr (int a, const struct termios *t)
+fhandler_base::tcsetattr (int, const struct termios *)
 {
   set_errno (ENOTTY);
   return -1;
 }
 
 int
-fhandler_base::tcgetattr (struct termios *t)
+fhandler_base::tcgetattr (struct termios *)
 {
   set_errno (ENOTTY);
   return -1;
 }
 
 int
-fhandler_base::tcsetpgrp (const pid_t pid)
+fhandler_base::tcsetpgrp (const pid_t)
 {
   set_errno (ENOTTY);
   return -1;
@@ -1293,7 +1293,7 @@ fhandler_disk_file::lock (int cmd, struct flock *fl)
 	startpos = 0;
 	break;
       case SEEK_CUR:
-	if ((startpos = lseek (0, SEEK_CUR)) < 0)
+	if ((off_t) (startpos = lseek (0, SEEK_CUR)) == (off_t)-1)
 	  return -1;
 	break;
       case SEEK_END:
@@ -1453,7 +1453,7 @@ fhandler_pipe::lseek (off_t offset, int whence)
 }
 
 void __stdcall
-set_inheritance (HANDLE &h, int not_inheriting, const char *name)
+set_inheritance (HANDLE &h, int not_inheriting, const char *)
 {
   HANDLE newh;
 

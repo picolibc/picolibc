@@ -224,14 +224,14 @@ malloc_init ()
 
 extern "C"
 void
-__malloc_lock (struct _reent *ptr)
+__malloc_lock (struct _reent *)
 {
   SetResourceLock(LOCK_MEMORY_LIST,WRITE_LOCK|READ_LOCK," __malloc_lock");
 }
 
 extern "C"
 void
-__malloc_unlock (struct _reent *ptr)
+__malloc_unlock (struct _reent *)
 {
   ReleaseResourceLock(LOCK_MEMORY_LIST,WRITE_LOCK|READ_LOCK," __malloc_unlock");
 }

@@ -20,14 +20,14 @@ fhandler_dev_zero::fhandler_dev_zero (const char *name)
 }
 
 int
-fhandler_dev_zero::open (const char *path, int flags, mode_t mode = 0)
+fhandler_dev_zero::open (const char *, int flags, mode_t)
 {
   set_flags (flags);
   return 1;
 }
 
 int
-fhandler_dev_zero::write (const void *ptr, size_t len)
+fhandler_dev_zero::write (const void *, size_t len)
 {
   return len;
 }
@@ -40,7 +40,7 @@ fhandler_dev_zero::read (void *ptr, size_t len)
 }
 
 off_t
-fhandler_dev_zero::lseek (off_t offset, int whence)
+fhandler_dev_zero::lseek (off_t, int)
 {
   return 0;
 }

@@ -407,7 +407,7 @@ fhandler_console::ioctl (unsigned int cmd, void *buf)
 	  }
 	return 0;
       case TIOCSWINSZ:
-	(void) bg_check (SIGTTOU, 0);
+	(void) bg_check (SIGTTOU);
 	return 0;
     }
 
@@ -1323,7 +1323,7 @@ fhandler_console::set_close_on_exec (int val)
 }
 
 void
-fhandler_console::fixup_after_fork (HANDLE parent)
+fhandler_console::fixup_after_fork (HANDLE)
 {
   HANDLE h = get_handle ();
   HANDLE oh = get_output_handle ();

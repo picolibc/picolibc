@@ -2061,7 +2061,7 @@ has_suffix (const char *path, const suffix_info *suffixes)
   return NULL;
 }
 
-static int __inline
+static __inline__ int
 next_suffix (char *ext_here, const suffix_info *&suffixes)
 {
   if (!suffixes)

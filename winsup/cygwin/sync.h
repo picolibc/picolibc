@@ -21,8 +21,8 @@ class muto
   DWORD tid;	/* Thread Id of lock owner. */
 public:
   void *operator new (size_t, void *p) {return p;}
-  void *operator new (size_t n) {return ::new muto; }
-  void operator delete (void *p) {;} /* can't handle allocated mutos
+  void *operator new (size_t) {return ::new muto; }
+  void operator delete (void *) {;} /* can't handle allocated mutos
 					currently */
 
   /* This simple constructor is used for cases where no bruteforce

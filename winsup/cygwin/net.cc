@@ -904,7 +904,7 @@ cygwin_shutdown (int fd, int how)
 /* exported as herror: standards? */
 extern "C"
 void
-cygwin_herror (const char *p)
+cygwin_herror (const char *)
 {
   debug_printf ("********%d*************", __LINE__);
 }

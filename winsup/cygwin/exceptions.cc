@@ -439,7 +439,7 @@ stackdump (HANDLE hproc, HANDLE hthread, EXCEPTION_RECORD *e, CONTEXT *in)
 /* Main exception handler. */
 
 static int
-handle_exceptions (EXCEPTION_RECORD *e, void *arg, CONTEXT *in, void *x)
+handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
 {
   int sig;
 

@@ -42,7 +42,7 @@ static win_env conv_envvars[] =
      return_MAX_PATH, return_MAX_PATH},
     {"LD_LIBRARY_PATH=", 16, NULL, NULL, cygwin_conv_to_full_posix_path,
      cygwin_conv_to_full_win32_path, return_MAX_PATH, return_MAX_PATH},
-    {NULL}
+    {NULL, 0, NULL, NULL, NULL, NULL, 0, 0}
   };
 
 void
@@ -260,7 +260,7 @@ unsetenv (const char *name)
 
 /* Turn environment variable part of a=b string into uppercase. */
 
-static void __inline
+static __inline__ void
 ucenv (char *p, char *eq)
 {
   /* Amazingly, NT has a case sensitive environment name list,

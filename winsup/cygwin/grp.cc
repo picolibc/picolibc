@@ -277,7 +277,7 @@ getgroups (int gidsetsize, gid_t *grouplist)
 
 extern "C"
 int
-initgroups (const char *user, gid_t grp)
+initgroups (const char *, gid_t)
 {
   return 0;
 }

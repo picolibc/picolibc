@@ -169,8 +169,7 @@ sync_with_child (PROCESS_INFORMATION &pi, HANDLE subproc_ready,
 }
 
 static int
-resume_child (PROCESS_INFORMATION &pi, HANDLE subproc_ready,
-	      HANDLE forker_finished)
+resume_child (PROCESS_INFORMATION &pi, HANDLE forker_finished)
 {
   int rc;
 
@@ -454,7 +453,7 @@ fork ()
 		     DllList::the().numberOfOpenedDlls();
 
       /* Start thread, and wait for it to reload dlls.  */
-      if (!resume_child (pi, subproc_ready, forker_finished) ||
+      if (!resume_child (pi, forker_finished) ||
 	  !sync_with_child (pi, subproc_ready, load_dll, "child loading dlls"))
 	goto cleanup;
 
@@ -473,7 +472,7 @@ fork ()
 	}
 	DLL_DONE;
 	/* Start the child up again. */
-	(void) resume_child (pi, subproc_ready, forker_finished);
+	(void) resume_child (pi, forker_finished);
       }
 
       ForceCloseHandle (subproc_ready);

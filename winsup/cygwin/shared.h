@@ -530,11 +530,12 @@ extern int __stdcall set_console_state_for_spawn ();
 void __stdcall shared_init (void);
 void __stdcall shared_terminate (void);
 
-/* This is for programs that want to access the shared data. */
-extern "C" class shared_info *cygwin_getshared (void);
-
 char *__stdcall shared_name (const char *, int);
 void *__stdcall open_shared (const char *name, HANDLE &shared_h, DWORD size, void *addr);
+
+extern "C" {
+/* This is for programs that want to access the shared data. */
+class shared_info *cygwin_getshared (void);
 
 struct cygwin_version_info
 {
@@ -545,8 +546,9 @@ struct cygwin_version_info
   unsigned short shared_data;
   unsigned short mount_registry;
   const char *dll_build_date;
-  const char shared_id[sizeof (CYGWIN_VERSION_DLL_IDENTIFIER) + 64];
+  char shared_id[sizeof (CYGWIN_VERSION_DLL_IDENTIFIER) + 64];
 };
+}
 
 extern cygwin_version_info cygwin_version;
 extern const char *cygwin_version_strings;

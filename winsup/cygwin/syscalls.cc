@@ -149,7 +149,7 @@ setsid (void)
 }
 
 static int
-read_handler (int fd, void *ptr, size_t len, int blocksigs)
+read_handler (int fd, void *ptr, size_t len)
 {
   int res;
   fhandler_base *fh = dtable[fd];
@@ -169,7 +169,7 @@ read_handler (int fd, void *ptr, size_t len, int blocksigs)
 
   /* Check to see if this is a background read from a "tty",
      sending a SIGTTIN, if appropriate */
-  res = fh->bg_check (SIGTTIN, blocksigs);
+  res = fh->bg_check (SIGTTIN);
   if (res > 0)
     {
       myself->process_state |= PID_TTYIN;
@@ -198,11 +198,11 @@ _read (int fd, void *ptr, size_t len)
       fh->get_r_no_interrupt ())
     {
       debug_printf ("non-interruptible read\n");
-      return read_handler (fd, ptr, len, 0);
+      return read_handler (fd, ptr, len);
     }
 
   if (fh->ready_for_read (fd, INFINITE, 0))
-    return read_handler (fd, ptr, len, 1);
+    return read_handler (fd, ptr, len);
 
   set_sig_errno (EINTR);
   syscall_printf ("%d = read (%d<%s>, %p, %d), errno %d", -1, fd, fh->get_name (),
@@ -232,7 +232,7 @@ _write (int fd, const void *ptr, size_t len)
   fhandler_base *fh;
   fh = dtable[fd];
 
-  res = fh->bg_check (SIGTTOU, 0);
+  res = fh->bg_check (SIGTTOU);
   if (res > 0)
     {
       myself->process_state |= PID_TTYOU;

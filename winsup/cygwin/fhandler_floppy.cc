@@ -28,7 +28,7 @@ fhandler_dev_floppy::is_eom (int win_error)
 }
 
 int
-fhandler_dev_floppy::is_eof (int win_error)
+fhandler_dev_floppy::is_eof (int)
 {
   int ret = 0;
   if (ret)

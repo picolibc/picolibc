@@ -27,6 +27,7 @@ enum symlink_follow
 
 enum
 {
+  PATH_NOTHING = 0,
   PATH_SYMLINK = 1,
   PATH_BINARY = MOUNT_BINARY,
   PATH_EXEC = MOUNT_EXEC,
@@ -51,8 +52,8 @@ class path_conv
 
   void set_binary () {path_flags |= PATH_BINARY;}
   void set_symlink () {path_flags |= PATH_SYMLINK;}
-  void set_exec (int x = 1) {path_flags |= x ? PATH_EXEC : 0;}
-  void set_has_acls (int x = 1) {path_flags |= x ? PATH_HASACLS : 0;}
+  void set_exec (int x = 1) {path_flags |= x ? PATH_EXEC : PATH_NOTHING;}
+  void set_has_acls (int x = 1) {path_flags |= x ? PATH_HASACLS : PATH_NOTHING;}
 
   char *known_suffix;
 
@@ -66,7 +67,7 @@ class path_conv
 	     int use_full_path = 0, const suffix_info *suffixes = NULL);
   inline char *get_win32 () { return path; }
   BOOL is_device () {return devn != FH_BAD;}
-  DWORD get_devn () {return devn == FH_BAD ? FH_DISK : devn;}
+  DWORD get_devn () {return devn == FH_BAD ? (DWORD) FH_DISK : devn;}
   short get_unitn () {return devn == FH_BAD ? 0 : unit;}
   DWORD file_attributes () {return fileattr;}
 };

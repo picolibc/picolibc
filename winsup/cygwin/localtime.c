@@ -1560,10 +1560,8 @@ tzset P((void))
 
 /*ARGSUSED*/
 static void
-localsub(timep, offset, tmp)
-const time_t * const	timep;
-const long		offset;
-struct tm * const	tmp;
+localsub (const time_t * const	timep, const long offset,
+	  struct tm * const tmp)
 {
 	register struct state *		sp;
 	register const struct ttinfo *	ttisp;

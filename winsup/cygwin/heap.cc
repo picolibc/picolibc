@@ -20,7 +20,7 @@ details. */
 
 static unsigned page_const = 0;
 
-static int __inline
+static  __inline__ int
 getpagesize(void)
 {
     SYSTEM_INFO si;

@@ -371,8 +371,7 @@ set_bits (select_record *me, fd_set *readfds, fd_set *writefds,
 }
 
 static int
-verify_true (select_record *me, fd_set *readfds, fd_set *writefds,
-	   fd_set *exceptfds)
+verify_true (select_record *, fd_set *, fd_set *, fd_set *)
 {
   return 1;
 }
@@ -385,7 +384,7 @@ verify_ok (select_record *me, fd_set *readfds, fd_set *writefds,
 }
 
 static int
-no_startup (select_record *me, select_stuff *stuff)
+no_startup (select_record *, select_stuff *)
 {
   return 1;
 }
@@ -522,7 +521,7 @@ start_thread_pipe (select_record *me, select_stuff *stuff)
 }
 
 static void
-pipe_cleanup (select_record *me, select_stuff *stuff)
+pipe_cleanup (select_record *, select_stuff *stuff)
 {
   pipeinf *pi = (pipeinf *)stuff->device_specific[FHDEVN(FH_PIPE)];
   if (pi && pi->thread)
@@ -902,7 +901,7 @@ start_thread_serial (select_record *me, select_stuff *stuff)
 }
 
 static void
-serial_cleanup (select_record *me, select_stuff *stuff)
+serial_cleanup (select_record *, select_stuff *stuff)
 {
   serialinf *si = (serialinf *)stuff->device_specific[FHDEVN(FH_SERIAL)];
   if (si && si->thread)
@@ -1225,7 +1224,7 @@ err:
 }
 
 void
-socket_cleanup (select_record *me, select_stuff *stuff)
+socket_cleanup (select_record *, select_stuff *stuff)
 {
   socketinf *si = (socketinf *)stuff->device_specific[FHDEVN(FH_SOCKET)];
   select_printf ("si %p si->thread %p", si, si ? si->thread : NULL);

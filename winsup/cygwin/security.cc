@@ -1782,7 +1782,7 @@ int acecmp (const void *a1, const void *a2)
 
 extern "C"
 int
-aclsort (int nentries, int calclass, aclent_t *aclbufp)
+aclsort (int nentries, int, aclent_t *aclbufp)
 {
   if (aclcheck (aclbufp, nentries, NULL))
     return -1;
@@ -1975,7 +1975,7 @@ permfromstr (char *perm)
 
 extern "C"
 aclent_t *
-aclfromtext (char *acltextp, int *aclcnt)
+aclfromtext (char *acltextp, int *)
 {
   if (!acltextp)
     {

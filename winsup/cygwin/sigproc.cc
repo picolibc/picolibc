@@ -108,7 +108,7 @@ int NO_COPY pending_signals = 0;	// TRUE if signals pending
 /* Functions
  */
 static int __stdcall checkstate (waitq *);
-static BOOL __inline get_proc_lock (DWORD, DWORD);
+static __inline__ BOOL get_proc_lock (DWORD, DWORD);
 static HANDLE __stdcall getsem (pinfo *, const char *, int, int);
 static void __stdcall remove_child (int);
 static void __stdcall remove_zombie (int);
@@ -992,7 +992,7 @@ getsem (pinfo *p, const char *str, int init, int max)
  * Attempt to handle case where process is exiting as we try to grab
  * the mutex.
  */
-static BOOL __inline
+static __inline__ BOOL
 get_proc_lock (DWORD what, DWORD val)
 {
   Static int lastwhat = -1;
@@ -1123,7 +1123,7 @@ stopped_or_terminated (waitq *parent_w, pinfo *child)
  * has been handled, as per POSIX.
  */
 static DWORD WINAPI
-wait_sig (VOID *arg)
+wait_sig (VOID *)
 {
   /* Initialization */
   (void) SetThreadPriority (hwait_sig, WAIT_SIG_PRIORITY);
@@ -1292,7 +1292,7 @@ wait_sig (VOID *arg)
 
 /* Wait for subprocesses to terminate. Executes in a separate thread. */
 static DWORD WINAPI
-wait_subproc (VOID *arg)
+wait_subproc (VOID *)
 {
   sip_printf ("starting");
   int errloop = 0;

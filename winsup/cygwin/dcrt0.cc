@@ -22,8 +22,8 @@ details. */
 HANDLE NO_COPY hMainProc = NULL;
 HANDLE NO_COPY hMainThread = NULL;
 
-static per_process dummy_user_data = {0};
-per_process NO_COPY *user_data = &dummy_user_data;
+static NO_COPY char dummy_user_data[sizeof (per_process)] = {0};
+per_process NO_COPY *user_data = (per_process *) &dummy_user_data;
 
 per_thread_waitq NO_COPY waitq_storage;
 per_thread_vfork NO_COPY vfork_storage;
@@ -94,7 +94,7 @@ do_global_ctors (void (**in_pfunc)(), int force)
   while (--pfunc > in_pfunc)
     (*pfunc) ();
 
-  if (user_data != &dummy_user_data)
+  if (user_data != (per_process *) &dummy_user_data)
     atexit (do_global_dtors);
 }
 
@@ -260,7 +260,7 @@ isquote (char c)
 
 /* Step over a run of characters delimited by quotes */
 static __inline char *
-quoted (char *word, char *cmd, int winshell)
+quoted (char *cmd, int winshell)
 {
   char *p;
   char quote = *cmd;
@@ -418,7 +418,7 @@ build_argv (char *cmd, char **&argv, int &argc, int winshell)
 	    /* Skip over characters until the closing quote */
 	    {
 	      sawquote = cmd;
-	      cmd = quoted (word, cmd, winshell);
+	      cmd = quoted (cmd, winshell);
 	    }
 	  if (issep (*cmd))	// End of argument if space
 	    break;
@@ -502,7 +502,7 @@ static MEMORY_BASIC_INFORMATION sm;
 #define EBP	6
 #define ESP	7
 
-extern void __inline__
+extern __inline__ void
 alloc_stack_hard_way (child_info_fork *ci, volatile char *b)
 {
   void *new_stack_pointer;
@@ -535,7 +535,7 @@ alloc_stack_hard_way (child_info_fork *ci, volatile char *b)
 
 /* extend the stack prior to fork longjmp */
 
-extern void __inline__
+extern __inline__ void
 alloc_stack (child_info_fork *ci)
 {
   /* FIXME: adding 16384 seems to avoid a stack copy problem during
