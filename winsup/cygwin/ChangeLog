@@ -1,6 +1,12 @@
 2003-01-26  Christopher Faylor  <cgf@redhat.com>
 
-	* pwdgrp.cc (pwdgrp::parse_group): Fix off-by-one problem in allocating
+	* passwd.cc (pwdgrp::parse_passwd): Eliminate use of memset.  The
+	structure should always be completely filled out.
+	* grp.cc (pwdgrp::parse_group): Ditto.
+
+2003-01-26  Christopher Faylor  <cgf@redhat.com>
+
+	* grp.cc (pwdgrp::parse_group): Fix off-by-one problem in allocating
 	gr_mem.
 
 2003-01-26  Christopher Faylor  <cgf@redhat.com>

@@ -36,12 +36,7 @@ static char * NO_COPY null_ptr;
 bool
 pwdgrp::parse_group ()
 {
-  char *dp;
-
 # define grp (*group_buf)[curr_lines]
-
-  memset (&grp, 0, sizeof (grp));
-
   grp.gr_name = next_str ();
   if (!*grp.gr_name)
     return false;
@@ -52,7 +47,7 @@ pwdgrp::parse_group ()
     return false;
 
   int n;
-  dp = raw_ptr ();
+  char *dp = raw_ptr ();
   for (n = 0; *next_str (','); n++)
     continue;
 
