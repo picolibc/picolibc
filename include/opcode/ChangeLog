@@ -1,3 +1,7 @@
+2001-11-15  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h (struct powerpc_operand <insert, extract>): Add dialect param.
+
 2001-11-11  Timothy Wall  <twall@alum.mit.edu>
 
 	* tic54x.h: Revise opcode layout; don't really need a separate
