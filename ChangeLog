@@ -1,3 +1,8 @@
+1999-07-30  Alan Modra  <alan@spri.levels.unisa.edu.au>
+
+	* Makefile.in (check-target-libio): Remove all-target-libstdc++
+	dependency as this causes "make check" to globally "make all"
+
 1999-07-22  Ian Lance Taylor  <ian@zembu.com>
 
 	* Makefile.in (binutils.tar.bz2): Don't pass makeall.bat and
