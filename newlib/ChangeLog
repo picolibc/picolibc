@@ -1,3 +1,11 @@
+2004-04-28  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
+
+	* libc/stdio/local.h (_fwalk_reent): Specify prototype of
+	function pointer argument.
+	* libc/stdio/fwalk.c (_fwalk, _fwalk_reent): Change prototypes
+	to specify function pointer arguments.
+	(__fwalk, __fwalk_reent): Ditto.
+
 2004-04-26  Aldy Hernandez  <aldyh@redhat.com>
 
         * libc/machine/powerpc/vfscanf.c (__svfscanf_r): Fix typo in

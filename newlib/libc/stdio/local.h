@@ -41,7 +41,7 @@ extern _VOID   _EXFUN(__sinit,(struct _reent *));
 extern _VOID   _EXFUN(_cleanup_r,(struct _reent *));
 extern _VOID   _EXFUN(__smakebuf,(FILE *));
 extern int    _EXFUN(_fwalk,(struct _reent *, int (*)(FILE *)));
-extern int    _EXFUN(_fwalk_reent,(struct _reent *, int (*)(FILE *)));
+extern int    _EXFUN(_fwalk_reent,(struct _reent *, int (*)(struct _reent *, FILE *)));
 struct _glue * _EXFUN(__sfmoreglue,(struct _reent *,int n));
 extern int   _EXFUN(__srefill,(FILE *fp));
 

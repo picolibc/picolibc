@@ -30,7 +30,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 static int
 _DEFUN(__fwalk, (ptr, function),
        struct _reent *ptr _AND
-       register int (*function) ())
+       register int (*function) (FILE *))
 {
   register FILE *fp;
   register int n, ret = 0;
@@ -54,7 +54,7 @@ _DEFUN(__fwalk, (ptr, function),
 static int
 _DEFUN(__fwalk_reent, (ptr, reent_function),
        struct _reent *ptr _AND
-       register int (*reent_function) ())
+       register int (*reent_function) (struct _reent *, FILE *))
 {
   register FILE *fp;
   register int n, ret = 0;
@@ -76,7 +76,7 @@ _DEFUN(__fwalk_reent, (ptr, reent_function),
 int
 _DEFUN(_fwalk, (ptr, function),
        struct _reent *ptr _AND
-       register int (*function)())
+       register int (*function)(FILE *))
 {
   register int ret = 0;
 
@@ -99,7 +99,7 @@ _DEFUN(_fwalk, (ptr, function),
 int
 _DEFUN(_fwalk_reent, (ptr, reent_function),
        struct _reent *ptr _AND
-       register int (*reent_function) ())
+       register int (*reent_function) (struct _reent *, FILE *))
 {
   register int ret = 0;
 
