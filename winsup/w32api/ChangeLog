@@ -1,3 +1,9 @@
+2003-03-18  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/lmaccess.h (UF_LOCKOUT): Correct name from UF_LOCK.
+	Thanks to: Fabricio D. Rossi  <gurusoda@users.sourceforge.net>
+ 	(UF_SETTABLE_BITS): Correct UF_LOCKOUT here too. 
+
 2003-03-17  Bang Jun-Young  <junyoung@netbsd.org>
 
 	* include/winbase.h (EnumResourceLanguages[AW]): Correct prototypes.
