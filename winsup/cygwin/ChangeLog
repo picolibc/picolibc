@@ -1,3 +1,11 @@
+Tue Oct 24 20:38:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* ntdll.h: New file.
+	* fhandler_mem.cc: Move ntdll.dll specific definitions and
+	declarations to ntdll.h.
+	* sysconf.cc (sysconf): Add support for _SC_NPROCESSORS_CONF,
+	_SC_NPROCESSORS_ONLN, _SC_PHYS_PAGES and _SC_AVPHYS_PAGES.
+
 Tue Oct 24 20:00:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::fcntl): Behave properly when passed

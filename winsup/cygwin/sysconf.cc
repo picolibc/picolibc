@@ -13,9 +13,11 @@ details. */
 #include <errno.h>
 #include <time.h>
 #include <limits.h>
+#include <ntdef.h>
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygerrno.h"
+#include "ntdll.h"
 
 /* sysconf: POSIX 4.8.1.1 */
 /* Allows a portable app to determine quantities of resources or
@@ -57,6 +59,39 @@ sysconf (int in)
       case _SC_STREAM_MAX:
 	return _POSIX_STREAM_MAX;
 #endif
+      case _SC_NPROCESSORS_CONF:
+      case _SC_NPROCESSORS_ONLN:
+	if (os_being_run != winNT)
+	  return 1;
+	/*FALLTHRU*/
+      case _SC_PHYS_PAGES:
+      case _SC_AVPHYS_PAGES:
+        {
+	  NTSTATUS ret;
+	  SYSTEM_BASIC_INFORMATION sbi;
+          if ((ret = NtQuerySystemInformation (SystemBasicInformation,
+						 (PVOID) &sbi,
+                                           	 sizeof sbi, NULL))
+		!= STATUS_SUCCESS)
+            {
+              __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+              debug_printf("NtQuerySystemInformation: ret = %d, "
+		           "Dos(ret) = %d",
+                           ret, RtlNtStatusToDosError (ret));
+	      return -1;
+            }
+	  switch (in)
+	    {
+	    case _SC_NPROCESSORS_CONF:
+	     return sbi.NumberProcessors;
+	    case _SC_NPROCESSORS_ONLN:
+	     return sbi.ActiveProcessors;
+	    case _SC_PHYS_PAGES:
+	      return sbi.NumberOfPhysicalPages;
+	    case _SC_AVPHYS_PAGES:
+	      return sbi.HighestPhysicalPage - sbi.LowestPhysicalPage + 1;
+	    }
+	}
     }
 
   /* Invalid input or unimplemented sysconf name */
