@@ -29,8 +29,7 @@ typedef long long longlong;
 typedef __int64 longlong;
 #endif
 
-const char *known_env_vars[] =
-{
+const char *known_env_vars[] = {
   "c_include_path",
   "compiler_path",
   "cxx_include_path",
@@ -55,21 +54,45 @@ const char *known_env_vars[] =
   0
 };
 
-struct {
+struct
+{
   const char *name;
   int missing_is_good;
-} common_apps[] = {
-  { "bash", 0 },
-  { "cat", 0 },
-  { "cpp", 1 },
-  { "find", 0 },
-  { "gcc", 0 },
-  { "gdb", 0 },
-  { "ld", 0 },
-  { "ls", 0 },
-  { "make", 0 },
-  { "sh", 0 },
-  { 0, 0 }
+}
+common_apps[] =
+{
+  {
+  "bash", 0}
+  ,
+  {
+  "cat", 0}
+  ,
+  {
+  "cpp", 1}
+  ,
+  {
+  "find", 0}
+  ,
+  {
+  "gcc", 0}
+  ,
+  {
+  "gdb", 0}
+  ,
+  {
+  "ld", 0}
+  ,
+  {
+  "ls", 0}
+  ,
+  {
+  "make", 0}
+  ,
+  {
+  "sh", 0}
+  ,
+  {
+  0, 0}
 };
 
 int num_paths = 0, max_paths = 0;
@@ -102,8 +125,8 @@ void
 init_paths ()
 {
   char tmp[4000], *sl;
-  add_path ((char *) ".", 1);		/* to be replaced later */
-  add_path ((char *) ".", 1);		/* the current directory */
+  add_path ((char *) ".", 1);	/* to be replaced later */
+  add_path ((char *) ".", 1);	/* the current directory */
   GetSystemDirectory (tmp, 4000);
   add_path (tmp, strlen (tmp));
   sl = strrchr (tmp, '\\');
@@ -148,7 +171,7 @@ find_on_path (char *file, char *default_extension,
     return file;
 
   if (strchr (file, '.'))
-    default_extension = (char *)"";
+    default_extension = (char *) "";
 
   for (int i = 0; i < num_paths; i++)
     {
@@ -263,13 +286,13 @@ struct ExpDirectory
 };
 
 struct ImpDirectory
-  {
-    unsigned characteristics;
-    unsigned timestamp;
-    unsigned forwarder_chain;
-    unsigned name_rva;
-    unsigned iat_rva;
-  };
+{
+  unsigned characteristics;
+  unsigned timestamp;
+  unsigned forwarder_chain;
+  unsigned name_rva;
+  unsigned iat_rva;
+};
 
 
 void track_down (char *file, char *suffix, int lvl);
@@ -299,9 +322,9 @@ cygwin_info (HANDLE h)
   major = minor = NULL;
   while (buf < bufend)
     if ((buf = (char *) memchr (buf, '%', bufend - buf)) == NULL)
-	break;
+      break;
     else if (strncmp ("%%% Cygwin ", buf, CYGPREFIX) != 0)
-	buf++;
+      buf++;
     else
       {
 	char *p = strchr (buf += CYGPREFIX, '\n');
@@ -339,8 +362,10 @@ dll_info (const char *path, HANDLE fh, int lvl, int recurse)
 
   int nsections = get_word (fh, pe_header_offset + 4 + 2);
   char *sections = (char *) malloc (nsections * 40);
-  SetFilePointer (fh, pe_header_offset + 4 + 20 + get_word (fh, pe_header_offset + 4 + 16),
-		  0, FILE_BEGIN);
+  SetFilePointer (fh,
+		  pe_header_offset + 4 + 20 + get_word (fh,
+							pe_header_offset + 4 +
+							16), 0, FILE_BEGIN);
   ReadFile (fh, sections, nsections * 40, &junk, 0);
 
   if (verbose && num_entries >= 1 && export_size > 0)
@@ -436,8 +461,9 @@ track_down (char *file, char *suffix, int lvl)
 
   printf ("%s", path);
 
-  HANDLE fh = CreateFile (path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
-			  NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  HANDLE fh =
+    CreateFile (path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+		NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
   if (fh == INVALID_HANDLE_VALUE)
     {
       printf (" - Cannot open\n");
@@ -462,8 +488,7 @@ ls (char *f)
   FileTimeToSystemTime (&info.ftLastWriteTime, &systime);
   printf ("%5dk %04d/%02d/%02d %s",
 	  (((int) info.nFileSizeLow) + 512) / 1024,
-	  systime.wYear, systime.wMonth, systime.wDay,
-	  f);
+	  systime.wYear, systime.wMonth, systime.wDay, f);
   dll_info (f, h, 16, 0);
   CloseHandle (h);
 
@@ -498,11 +523,11 @@ cygcheck (char *app)
 extern char **environ;
 
 struct RegInfo
-  {
-    RegInfo *prev;
-    char *name;
-    HKEY key;
-  };
+{
+  RegInfo *prev;
+  char *name;
+  HKEY key;
+};
 
 void
 show_reg (RegInfo * ri, int nest)
@@ -538,8 +563,7 @@ scan_registry (RegInfo * prev, HKEY hKey, char *name, int cygnus)
 #if 0
       char tmp[400];
       FormatMessage (FORMAT_MESSAGE_FROM_SYSTEM, 0, GetLastError (),
-		     MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), tmp,
-		     400, 0);
+		     MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), tmp, 400, 0);
       printf ("RegQueryInfoKey: %s\n", tmp);
 #endif
       return;
@@ -574,16 +598,6 @@ scan_registry (RegInfo * prev, HKEY hKey, char *name, int cygnus)
 		break;
 	      }
 	  }
-#if 0
-        else
-          {
-	    char tmp[400];
-	    FormatMessage (FORMAT_MESSAGE_FROM_SYSTEM, 0, GetLastError (),
-			   MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), tmp,
-			   400, 0);
-	    printf ("RegEnumValue: %s\n", tmp);
-	  }
-#endif
 	}
       free (value_name);
       free (value_data);
@@ -592,7 +606,8 @@ scan_registry (RegInfo * prev, HKEY hKey, char *name, int cygnus)
   char *subkey_name = (char *) malloc (max_subkey_len + 1);
   for (i = 0; i < num_subkeys; i++)
     {
-      if (RegEnumKey (hKey, i, subkey_name, max_subkey_len + 1) == ERROR_SUCCESS)
+      if (RegEnumKey (hKey, i, subkey_name, max_subkey_len + 1) ==
+	  ERROR_SUCCESS)
 	{
 	  HKEY sKey;
 	  if (RegOpenKeyEx (hKey, subkey_name, 0, KEY_ALL_ACCESS, &sKey)
@@ -746,13 +761,14 @@ dump_sysinfo ()
       printf ("Listing available drives...\n");
       printf ("Drv Type        Size   Free Flags              Name\n");
     }
-  int prev_mode = SetErrorMode (SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
+  int prev_mode =
+    SetErrorMode (SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
   int drivemask = GetLogicalDrives ();
 
   HINSTANCE k32 = LoadLibrary ("kernel32.dll");
-  BOOL (WINAPI *gdfse) (LPCSTR, long long *, long long *, long long *) =
+  BOOL (WINAPI * gdfse) (LPCSTR, long long *, long long *, long long *) =
     (BOOL (WINAPI *) (LPCSTR, long long *, long long *, long long *))
-      GetProcAddress (k32, "GetDiskFreeSpaceExA");
+    GetProcAddress (k32, "GetDiskFreeSpaceExA");
 
   for (i = 0; i < 26; i++)
     {
@@ -790,8 +806,7 @@ dump_sysinfo ()
       int percent_full = -1;
 
       long long free_me = 0ULL, free_bytes = 0ULL, total_bytes = 1ULL;
-      if (gdfse != NULL
-	  && gdfse (drive, & free_me, & total_bytes, & free_bytes))
+      if (gdfse != NULL && gdfse (drive, &free_me, &total_bytes, &free_bytes))
 	{
 	  capacity_mb = total_bytes / (1024L * 1024L);
 	  percent_full = 100 - (int) ((100.0 * free_me) / total_bytes);
@@ -834,7 +849,8 @@ dump_sysinfo ()
     {
       printf ("fd=floppy, hd=hard drive, cd=CD-ROM, net=Network Share\n");
       printf ("CP=Case Preserving, CS=Case Sensitive, UN=Unicode\n");
-      printf ("PA=Persistent ACLS, FC=File Compression, VC=Volume Compression\n");
+      printf
+	("PA=Persistent ACLS, FC=File Compression, VC=Volume Compression\n");
     }
   printf ("\n");
 
@@ -842,10 +858,9 @@ dump_sysinfo ()
 
   if (givehelp)
     {
-      printf ("Mount entries: these map POSIX directories to your NT drives.\n");
-      printf ("%-*s  %-*s  %-*s  %s\n",
-	      ml_fsname, "-NT-",
-	      ml_dir, "-POSIX-",
+      printf
+	("Mount entries: these map POSIX directories to your NT drives.\n");
+      printf ("%-*s  %-*s  %-*s  %s\n", ml_fsname, "-NT-", ml_dir, "-POSIX-",
 	      ml_type, "-Type-", "-Flags-");
     }
 
@@ -856,24 +871,23 @@ dump_sysinfo ()
     {
       printf ("%-*s  %-*s  %-*s  %s\n",
 	      ml_fsname, mnt->mnt_fsname,
-	      ml_dir, mnt->mnt_dir,
-	      ml_type, mnt->mnt_type,
-	      mnt->mnt_opts);
+	      ml_dir, mnt->mnt_dir, ml_type, mnt->mnt_type, mnt->mnt_opts);
     }
   printf ("\n");
 
   add_path ((char *) "\\bin", 4);	/* just in case */
 
   if (givehelp)
-    printf ("Looking to see where common programs can be found, if at all...\n");
+    printf
+      ("Looking to see where common programs can be found, if at all...\n");
   for (i = 0; common_apps[i].name; i++)
     if (!find_on_path ((char *) common_apps[i].name, (char *) ".exe", 1, 0))
-    {
-      if (common_apps[i].missing_is_good)
-        printf ("Not Found: %s (good!)\n", common_apps[i].name);
-      else
-        printf ("Not Found: %s\n", common_apps[i].name);
-    }
+      {
+	if (common_apps[i].missing_is_good)
+	  printf ("Not Found: %s (good!)\n", common_apps[i].name);
+	else
+	  printf ("Not Found: %s\n", common_apps[i].name);
+      }
   printf ("\n");
 
   if (givehelp)
@@ -922,8 +936,8 @@ int
 check_keys ()
 {
   HANDLE h = CreateFileA ("CONIN$", GENERIC_READ | GENERIC_WRITE,
-                          FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-                          OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+			  FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+			  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
   if (h == INVALID_HANDLE_VALUE || h == NULL)
     return keyeprint ("Opening CONIN$");
@@ -936,7 +950,7 @@ check_keys ()
     {
       mode &= ~ENABLE_PROCESSED_INPUT;
       if (!SetConsoleMode (h, mode))
-        keyeprint ("GetConsoleMode");
+	keyeprint ("GetConsoleMode");
     }
 
   fputs ("\nThis key check works only in a console window,", stderr);
@@ -955,70 +969,74 @@ check_keys ()
     {
       prev_in = in;
       if (!ReadConsoleInput (h, &in, 1, &mode))
-        keyeprint ("ReadConsoleInput");
+	keyeprint ("ReadConsoleInput");
 
       if (!memcmp (&in, &prev_in, sizeof in))
-        continue;
+	continue;
 
       switch (in.EventType)
-        {
-        case KEY_EVENT:
-          printf ("%s %ux VK: 0x%02x VS: 0x%02x A: 0x%02x CTRL: ",
-                  in.Event.KeyEvent.bKeyDown ? "Pressed " : "Released",
-                  in.Event.KeyEvent.wRepeatCount,
-                  in.Event.KeyEvent.wVirtualKeyCode,
-                  in.Event.KeyEvent.wVirtualScanCode,
-                  (unsigned char) in.Event.KeyEvent.uChar.AsciiChar);
-          fputs (in.Event.KeyEvent.dwControlKeyState & CAPSLOCK_ON ?
-                 "CL " : "-- ", stdout);
-          fputs (in.Event.KeyEvent.dwControlKeyState & ENHANCED_KEY ?
-                 "EK " : "-- ", stdout);
-          fputs (in.Event.KeyEvent.dwControlKeyState & LEFT_ALT_PRESSED ?
-                 "LA " : "-- ", stdout);
-          fputs (in.Event.KeyEvent.dwControlKeyState & LEFT_CTRL_PRESSED ?
-                 "LC " : "-- ", stdout);
-          fputs (in.Event.KeyEvent.dwControlKeyState & NUMLOCK_ON ?
-                 "NL " : "-- ", stdout);
-          fputs (in.Event.KeyEvent.dwControlKeyState & RIGHT_ALT_PRESSED ?
-                 "RA " : "-- ", stdout);
-          fputs (in.Event.KeyEvent.dwControlKeyState & RIGHT_CTRL_PRESSED ?
-                 "RC " : "-- ", stdout);
-          fputs (in.Event.KeyEvent.dwControlKeyState & SCROLLLOCK_ON ?
-                 "SL " : "-- ", stdout);
-          fputs (in.Event.KeyEvent.dwControlKeyState & SHIFT_PRESSED ?
-                 "SH " : "-- ", stdout);
-          fputc ('\n', stdout);
-          break;
+	{
+	case KEY_EVENT:
+	  printf ("%s %ux VK: 0x%02x VS: 0x%02x A: 0x%02x CTRL: ",
+		  in.Event.KeyEvent.bKeyDown ? "Pressed " : "Released",
+		  in.Event.KeyEvent.wRepeatCount,
+		  in.Event.KeyEvent.wVirtualKeyCode,
+		  in.Event.KeyEvent.wVirtualScanCode,
+		  (unsigned char) in.Event.KeyEvent.uChar.AsciiChar);
+	  fputs (in.Event.KeyEvent.dwControlKeyState & CAPSLOCK_ON ?
+		 "CL " : "-- ", stdout);
+	  fputs (in.Event.KeyEvent.dwControlKeyState & ENHANCED_KEY ?
+		 "EK " : "-- ", stdout);
+	  fputs (in.Event.KeyEvent.dwControlKeyState & LEFT_ALT_PRESSED ?
+		 "LA " : "-- ", stdout);
+	  fputs (in.Event.KeyEvent.dwControlKeyState & LEFT_CTRL_PRESSED ?
+		 "LC " : "-- ", stdout);
+	  fputs (in.Event.KeyEvent.dwControlKeyState & NUMLOCK_ON ?
+		 "NL " : "-- ", stdout);
+	  fputs (in.Event.KeyEvent.dwControlKeyState & RIGHT_ALT_PRESSED ?
+		 "RA " : "-- ", stdout);
+	  fputs (in.Event.KeyEvent.dwControlKeyState & RIGHT_CTRL_PRESSED ?
+		 "RC " : "-- ", stdout);
+	  fputs (in.Event.KeyEvent.dwControlKeyState & SCROLLLOCK_ON ?
+		 "SL " : "-- ", stdout);
+	  fputs (in.Event.KeyEvent.dwControlKeyState & SHIFT_PRESSED ?
+		 "SH " : "-- ", stdout);
+	  fputc ('\n', stdout);
+	  break;
 
-        }
+	}
     }
   while (in.EventType != KEY_EVENT ||
-         in.Event.KeyEvent.bKeyDown != FALSE ||
-         in.Event.KeyEvent.uChar.AsciiChar != 'q');
+	 in.Event.KeyEvent.bKeyDown != FALSE ||
+	 in.Event.KeyEvent.uChar.AsciiChar != 'q');
 
   CloseHandle (h);
   return 0;
 }
+
 void
 usage ()
 {
   fprintf (stderr, "Usage: cygcheck [OPTIONS] [program ...]\n");
   fprintf (stderr, "  -s, --sysinfo  = system information (not with -k)\n");
-  fprintf (stderr, "  -v, --verbose  = verbose output (indented) (for -s or programs)\n");
+  fprintf (stderr,
+	   "  -v, --verbose  = verbose output (indented) (for -s or programs)\n");
   fprintf (stderr, "  -r, --registry = registry search (requires -s)\n");
-  fprintf (stderr, "  -k, --keycheck = perform a keyboard check session (not with -s)\n");
+  fprintf (stderr,
+	   "  -k, --keycheck = perform a keyboard check session (not with -s)\n");
   fprintf (stderr, "  -h, --help     = give help about the info\n");
-  fprintf (stderr, "You must at least give either -s or -k or a program name\n");
+  fprintf (stderr,
+	   "You must at least give either -s or -k or a program name\n");
   exit (1);
 }
 
 struct option longopts[] = {
-  { "sysinfo", no_argument, NULL, 's' },
-  { "registry", no_argument, NULL, 'r' },
-  { "verbose", no_argument, NULL, 'v' },
-  { "keycheck", no_argument, NULL, 'k' },
-  { "help", no_argument, NULL, 'h' },
-  { 0, no_argument, NULL, 0 }
+  {"sysinfo", no_argument, NULL, 's'},
+  {"registry", no_argument, NULL, 'r'},
+  {"verbose", no_argument, NULL, 'v'},
+  {"keycheck", no_argument, NULL, 'k'},
+  {"help", no_argument, NULL, 'h'},
+  {0, no_argument, NULL, 0}
 };
 char *opts = "srvkh";
 
@@ -1031,24 +1049,23 @@ main (int argc, char **argv)
     switch (i)
       {
       case 's':
-        sysinfo = 1;
-        break;
+	sysinfo = 1;
+	break;
       case 'r':
-        registry = 1;
-        break;
+	registry = 1;
+	break;
       case 'v':
-        verbose = 1;
-        break;
+	verbose = 1;
+	break;
       case 'k':
-        keycheck = 1;
-        break;
+	keycheck = 1;
+	break;
       case 'h':
-        givehelp = 1;
-        break;
+	givehelp = 1;
+	break;
       default:
-        usage ();
-        /*NOTREACHED*/
-      }
+	usage ();
+       /*NOTREACHED*/}
   argc -= optind;
   argv += optind;
 
@@ -1059,7 +1076,7 @@ main (int argc, char **argv)
     usage ();
 
   if (keycheck)
-    return check_keys();
+    return check_keys ();
 
   init_paths ();
 
@@ -1067,12 +1084,14 @@ main (int argc, char **argv)
     {
       if (argc == 1)
 	{
-	  printf ("Here is where the OS will find your program, and which dlls\n");
+	  printf
+	    ("Here is where the OS will find your program, and which dlls\n");
 	  printf ("will be used for it.  Use -v to see DLL version info\n");
 	}
       else
 	{
-	  printf ("Here is where the OS will find your programs, and which dlls\n");
+	  printf
+	    ("Here is where the OS will find your programs, and which dlls\n");
 	  printf ("will be used for them.  Use -v to see DLL version info\n");
 	}
 

@@ -19,7 +19,7 @@ section.  Let's say we're profiling cygwin1.dll.  Make sure you've
 built it with debug symbols (else gprof won't run) and run objdump
 like this:
 
-	objdump -h cygwin1.dll 
+	objdump -h cygwin1.dll
 
 It will print a report like this:
 
@@ -63,8 +63,8 @@ the first part of the report reports the amount of time spent in each
 function, like this:
 
 Each sample counts as 0.01 seconds.
-  %   cumulative   self              self     total           
- time   seconds   seconds    calls  ms/call  ms/call  name    
+  %   cumulative   self              self     total
+ time   seconds   seconds    calls  ms/call  ms/call  name
  10.02    231.22    72.43       46  1574.57  1574.57  strcspn
   7.95    288.70    57.48      130   442.15   442.15  strncasematch
 

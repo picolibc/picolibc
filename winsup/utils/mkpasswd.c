@@ -42,7 +42,7 @@ put_sid (PSID sid)
   return s;
 }
 
-void 
+void
 psx_dir (char *in, char *out)
 {
   if (isalpha (in[0]) && in[1] == ':')
@@ -65,7 +65,7 @@ psx_dir (char *in, char *out)
   *out = '\0';
 }
 
-void 
+void
 uni2ansi (LPWSTR wcs, char *mbs)
 {
   if (wcs)
@@ -75,7 +75,7 @@ uni2ansi (LPWSTR wcs, char *mbs)
     *mbs = '\0';
 }
 
-int 
+int
 enum_users (LPWSTR servername, int print_sids, int print_cygpath)
 {
   USER_INFO_3 *buffer;
@@ -191,7 +191,7 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath)
   return 0;
 }
 
-int 
+int
 enum_local_groups (int print_sids)
 {
   LOCALGROUP_INFO_0 *buffer;
@@ -277,7 +277,7 @@ enum_local_groups (int print_sids)
   return 0;
 }
 
-void 
+void
 usage ()
 {
   fprintf (stderr, "\n");
@@ -296,7 +296,7 @@ usage ()
   exit (1);
 }
 
-int 
+int
 main (int argc, char **argv)
 {
   LPWSTR servername = NULL;

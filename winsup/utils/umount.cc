@@ -27,13 +27,18 @@ static void
 usage (void)
 {
   fprintf (stderr, "Usage %s [-s] <posixpath>\n", progname);
-  fprintf (stderr, "-s = remove mount point from system-wide registry location\n");
+  fprintf (stderr,
+	   "-s = remove mount point from system-wide registry location\n");
   fprintf (stderr, "\n");
   fprintf (stderr, "--remove-all-mounts = remove all mounts\n");
-  fprintf (stderr, "--remove-auto-mounts = remove all automatically mounted mounts\n");
-  fprintf (stderr, "--remove-user-mounts = remove all mounts in the current user mount registry area, including auto mounts\n");
-  fprintf (stderr, "--remove-system-mounts = remove all mounts in the system-wide mount registry area\n");
-  fprintf (stderr, "[-s] --remove-cygdrive-prefix = remove cygdrive path prefix\n");
+  fprintf (stderr,
+	   "--remove-auto-mounts = remove all automatically mounted mounts\n");
+  fprintf (stderr,
+	   "--remove-user-mounts = remove all mounts in the current user mount registry area, including auto mounts\n");
+  fprintf (stderr,
+	   "--remove-system-mounts = remove all mounts in the system-wide mount registry area\n");
+  fprintf (stderr,
+	   "[-s] --remove-cygdrive-prefix = remove cygdrive path prefix\n");
   exit (1);
 }
 
@@ -57,7 +62,7 @@ main (int argc, char **argv)
   for (i = 1; i < argc; ++i)
     {
       if (argv[i][0] != '-')
-        break;
+	break;
 
       if (strcmp (argv[i], "-s") == 0)
 	{
@@ -194,7 +199,7 @@ remove_all_system_mounts ()
 static void
 remove_cygdrive_prefix (int flags)
 {
-  int res = cygwin_umount(NULL, flags | MOUNT_AUTO);
+  int res = cygwin_umount (NULL, flags | MOUNT_AUTO);
   if (res)
     error ("remove_cygdrive_prefix");
 }

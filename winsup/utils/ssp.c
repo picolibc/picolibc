@@ -498,7 +498,7 @@ run_program (char *cmdline)
 		  if (++qq % 100 == 0)
 		    fprintf (stderr, " %08x %d %d \r",
 			    pc, ncalls, opcode_count);
-		  
+
 		  if (sp == last_sp-4)
 		    {
 		      ncalls++;
@@ -598,7 +598,7 @@ run_program (char *cmdline)
 	  if (verbose)
 	    printf ("load dll %08x:",
 		   (int)event.u.LoadDll.lpBaseOfDll);
-	  
+
 	  dll_ptr = (char *)"( u n k n o w n ) \0\0";
 	  if (event.u.LoadDll.lpImageName)
 	    {

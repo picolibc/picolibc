@@ -65,7 +65,7 @@ MINGW_DEP_LDLIBS:=${ALL_DEP_LDLIBS} ${MINGW_LIB}
 ALL_LDFLAGS:=-B$(newlib_build)/libc/ -B$(newlib_build)/libm/ -B$(w32api_lib)/ \
 	     $(LDFLAGS) $(ALL_LDLIBS)
 MINGW_LDFLAGS:=$(ALL_LDFLAGS) $(MINGW_LIB)
-DUMPER_LDFLAGS:=$(ALL_LDFLAGS) $(DUMPER_LIB) 
+DUMPER_LDFLAGS:=$(ALL_LDFLAGS) $(DUMPER_LIB)
 
 PROGS:=mount$(EXEEXT) umount$(EXEEXT) ps$(EXEEXT) kill$(EXEEXT) \
        mkpasswd$(EXEEXT) mkgroup$(EXEEXT) cygpath$(EXEEXT) cygcheck$(EXEEXT) \

@@ -269,7 +269,7 @@ local machine or the default (or given) domain.</para>
 
 <screen>
 Usage passwd [name]
-      passwd [-x max] [-n min] [-i inact] [-L len] 
+      passwd [-x max] [-n min] [-i inact] [-L len]
       passwd {-l|-u|-S} name
   -x max   set max age of passwords
   -n min   set min age of passwords
@@ -303,12 +303,12 @@ at this time.  If not, <command>passwd</command> refuses to change the
 password and exits.</para>
 
 <para>Password expiry and length: The password aging information may be
-changed by the administrators with the <literal>-x</literal>, 
-<literal>-n</literal> and <literal>-i</literal> options.  The 
+changed by the administrators with the <literal>-x</literal>,
+<literal>-n</literal> and <literal>-i</literal> options.  The
 <literal>-x</literal> option is used to set the maximum number of days
 a password remains valid.  After <emphasis>max</emphasis> days, the
 password is required to be changed.  The <literal>-n</literal> option is
-used to set the minimum number of days before a password may be changed.  
+used to set the minimum number of days before a password may be changed.
 The user will not be permitted to change the password until
 <emphasis>min</emphasis> days have elapsed.  The <literal>-i</literal>
 option is used to disable an account after the password has been expired
@@ -321,8 +321,8 @@ for users, which doesn't belong to the administrators group, to
 password length are 0 to 14.  In any of the above cases, a value of 0
 means `no restrictions'.</para>
 
-<para>Account maintenance: User accounts may be locked and unlocked with the 
-<literal>-l</literal> and <literal>-u</literal> flags.  The 
+<para>Account maintenance: User accounts may be locked and unlocked with the
+<literal>-l</literal> and <literal>-u</literal> flags.  The
 <literal>-l</literal> option disables an account.  The <literal>-u</literal>
 option re-enables an account.</para>
 
@@ -383,9 +383,9 @@ to the current user.</para>
 
 <para>The <command>mount</command> utility is also the mechanism for
 adding new mounts to the mount table.  The following example
-demonstrates how to mount the directory 
+demonstrates how to mount the directory
 <filename>C:\cygnus\cygwin-b20\H-i586-cygwin32\bin</filename>
-to <filename>/bin</filename> and the network directory 
+to <filename>/bin</filename> and the network directory
 <filename>\\pollux\home\joe\data</filename> to <filename>/data</filename>.
 <filename>/bin</filename> is assumed to already exist.</para>
 
@@ -423,7 +423,7 @@ instead of the user-specific one.  System-wide mounts are displayed
 by <command>mount</command> as being of the "system" type, as is the
 case for the <filename>/</filename> partition in the last example.
 Under Windows NT, only those users with Administrator priviledges are
-permitted to modify the system-wide mount table.</para> 
+permitted to modify the system-wide mount table.</para>
 
 <para>Note that a given POSIX path may only exist once in the user
 table and once in the global, system-wide table.  Attempts to replace

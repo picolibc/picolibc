@@ -79,7 +79,7 @@ do_mount (const char *dev, const char *where, int flags)
     {
       if (force == FALSE)
 	fprintf (stderr, "%s: warning: %s is not a directory.\n", progname, where);
-    }    
+    }
 
   exit (0);
 }
@@ -167,7 +167,7 @@ main (int argc, const char **argv)
       else
 	usage ();
     }
-  
+
   if ((i + 2) != argc)
     usage ();
 
@@ -259,7 +259,7 @@ change_cygdrive_prefix (const char *new_prefix, int flags)
 
   if (mount (NULL, new_prefix, flags))
     error (new_prefix);
-  
+
   exit (0);
 }
 

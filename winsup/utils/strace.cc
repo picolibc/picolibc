@@ -30,17 +30,19 @@ static BOOL close_handle (HANDLE h, DWORD ok);
 #define CloseHandle(h) close_handle(h, 0)
 
 struct child_list
+{
+  DWORD id;
+  HANDLE hproc;
+  int saw_stars;
+  char nfields;
+  long long start_time;
+  DWORD last_usecs;
+  struct child_list *next;
+    child_list ():id (0), hproc (NULL), saw_stars (0), nfields (0),
+    start_time (0), last_usecs (0), next (NULL)
   {
-    DWORD id;
-    HANDLE hproc;
-    int saw_stars;
-    char nfields;
-    long long start_time;
-    DWORD last_usecs;
-    struct child_list *next;
-    child_list () : id (0), hproc (NULL), saw_stars (0), nfields (0),
-		    start_time (0), last_usecs (0), next (NULL) {}
-  };
+  }
+};
 
 child_list children;
 
@@ -85,7 +87,7 @@ DWORD lastid = 0;
 HANDLE lasth;
 
 #define PROCFLAGS \
- PROCESS_ALL_ACCESS /*(PROCESS_DUP_HANDLE | PROCESS_TERMINATE | PROCESS_VM_READ | PROCESS_VM_WRITE)*/
+ PROCESS_ALL_ACCESS		/*(PROCESS_DUP_HANDLE | PROCESS_TERMINATE | PROCESS_VM_READ | PROCESS_VM_WRITE) */
 static void
 add_child (DWORD id, HANDLE hproc)
 {
@@ -101,7 +103,7 @@ static child_list *
 get_child (DWORD id)
 {
   child_list *c;
-  for (c = &children; (c = c->next) != NULL; )
+  for (c = &children; (c = c->next) != NULL;)
     if (c->id == id)
       return c;
 
@@ -132,7 +134,7 @@ class linebuf
 {
   size_t alloc;
 public:
-  size_t ix;
+    size_t ix;
   char *buf;
   linebuf ()
   {
@@ -140,9 +142,16 @@ public:
     alloc = 0;
     buf = NULL;
   }
-  ~linebuf () {if (buf) free (buf);}
+ ~linebuf ()
+  {
+    if (buf)
+      free (buf);
+  }
   void add (const char *what, int len);
-  void add (const char *what) {add (what, strlen (what));}
+  void add (const char *what)
+  {
+    add (what, strlen (what));
+  }
   void prepend (const char *what, int len);
 };
 
@@ -172,15 +181,15 @@ linebuf::prepend (const char *what, int len)
       buf[ix] = '\0';
     }
   if ((buflen = strlen (buf)))
-      memmove (buf + len, buf, buflen + 1);
+    memmove (buf + len, buf, buflen + 1);
   else
-      buf[newix] = '\0';
+    buf[newix] = '\0';
   memcpy (buf, what, len);
   ix = newix;
 }
 
 static void
-make_command_line (linebuf& one_line, char **argv)
+make_command_line (linebuf & one_line, char **argv)
 {
   for (; *argv; argv++)
     {
@@ -240,26 +249,25 @@ create_child (char **argv)
   memset (&si, 0, sizeof (si));
   si.cb = sizeof (si);
 
-  /* cygwin32_conv_to_win32_path (exec_file, real_path);*/
+  /* cygwin32_conv_to_win32_path (exec_file, real_path); */
 
   flags = forkdebug ? 0 : DEBUG_ONLY_THIS_PROCESS;
-  flags |= /*CREATE_NEW_PROCESS_GROUP | */CREATE_DEFAULT_ERROR_MODE | DEBUG_PROCESS;
+  flags |=
+    /*CREATE_NEW_PROCESS_GROUP | */ CREATE_DEFAULT_ERROR_MODE | DEBUG_PROCESS;
 
   make_command_line (one_line, argv);
 
   SetConsoleCtrlHandler (NULL, 0);
-  ret = CreateProcess (0,
-		       one_line.buf,/* command line */
+  ret = CreateProcess (0, one_line.buf,	/* command line */
 		       NULL,	/* Security */
 		       NULL,	/* thread */
 		       TRUE,	/* inherit handles */
 		       flags,	/* start flags */
-		       NULL,
-		       NULL,	/* current directory */
-		       &si,
-		       &pi);
+		       NULL, NULL,	/* current directory */
+		       &si, &pi);
   if (!ret)
-    error (0, "error creating process %s, (error %d)", *argv, GetLastError());
+    error (0, "error creating process %s, (error %d)", *argv,
+	   GetLastError ());
 
   CloseHandle (pi.hThread);
   CloseHandle (pi.hProcess);
@@ -294,9 +302,7 @@ output_winerror (FILE *ofile, char *s)
 		      NULL,
 		      errnum,
 		      MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
-		      (LPTSTR) buf,
-		      sizeof (buf),
-		      NULL))
+		      (LPTSTR) buf, sizeof (buf), NULL))
     return 0;
 
   /* Get rid the trailing CR/NL pair. */
@@ -331,7 +337,7 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
   DWORD nbytes;
   child_list *child = get_child (id);
   HANDLE hchild = child->hproc;
-  #define INTROLEN (sizeof (alen) - 1)
+#define INTROLEN (sizeof (alen) - 1)
 
   if (id == lastid && hchild != lasth)
     warn (0, "%p != %p", hchild, lasth);
@@ -341,7 +347,8 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
 #ifndef DEBUGGING
     return;
 #else
-    error (0, "couldn't get message length from subprocess %d<%p>, windows error %d",
+    error (0,
+	   "couldn't get message length from subprocess %d<%p>, windows error %d",
 	   id, hchild, GetLastError ());
 #endif
 
@@ -378,8 +385,9 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
     {
       DWORD new_flag = 1;
       if (!WriteProcessMemory (hchild, (LPVOID) n, &new_flag,
-			      sizeof (new_flag), &nbytes))
-	error (0, "couldn't write strace flag to subprocess, windows error %d",
+			       sizeof (new_flag), &nbytes))
+	error (0,
+	       "couldn't write strace flag to subprocess, windows error %d",
 	       GetLastError ());
       return;
     }
@@ -387,9 +395,9 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
   char *origs = s;
 
   if (mask & n)
-    /* got it */;
+    /* got it */ ;
   else if (!(mask & _STRACE_ALL) || (n & _STRACE_NOTALL))
-    return;		/* This should not be included in "all" output */
+    return;			/* This should not be included in "all" output */
 
   DWORD dusecs, usecs;
   char *ptusec, *ptrest;
@@ -447,7 +455,7 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
 	{
 	  for (i = 0; i < child->nfields; i++)
 	    if ((news = strchr (news, ' ')) == NULL)
-	      break; 	// Should never happen
+	      break;		// Should never happen
 	    else
 	      news++;
 
@@ -459,8 +467,10 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
 	      if (*s == '*')
 		{
 		  SYSTEMTIME *st = syst (child->start_time);
-		  fprintf (ofile, "Date/Time:    %d-%02d-%02d %02d:%02d:%02d\n",
-			   st->wYear, st->wMonth, st->wDay, st->wHour, st->wMinute, st->wSecond);
+		  fprintf (ofile,
+			   "Date/Time:    %d-%02d-%02d %02d:%02d:%02d\n",
+			   st->wYear, st->wMonth, st->wDay, st->wHour,
+			   st->wMinute, st->wSecond);
 		  child->saw_stars++;
 		}
 	    }
@@ -471,7 +481,7 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
   char intbuf[40];
 
   if (child->saw_stars < 2 || s != origs)
-    /* Nothing */;
+    /* Nothing */ ;
   else if (hhmmss)
     {
       s = ptrest - 9;
@@ -537,7 +547,8 @@ proc_child (unsigned mask, FILE *ofile)
 	  remove_child (ev.dwProcessId);
 	  break;
 	case EXCEPTION_DEBUG_EVENT:
-	  if (ev.u.Exception.ExceptionRecord.ExceptionCode != STATUS_BREAKPOINT)
+	  if (ev.u.Exception.ExceptionRecord.ExceptionCode !=
+	      STATUS_BREAKPOINT)
 	    {
 	      status = DBG_EXCEPTION_NOT_HANDLED;
 #if 0
@@ -566,7 +577,7 @@ dostrace (unsigned mask, FILE *ofile, char **argv)
 }
 
 int
-main(int argc, char **argv)
+main (int argc, char **argv)
 {
   unsigned mask = 0;
   FILE *ofile = NULL;
@@ -627,7 +638,7 @@ static BOOL
 close_handle (HANDLE h, DWORD ok)
 {
   child_list *c;
-  for (c = &children; (c = c->next) != NULL; )
+  for (c = &children; (c = c->next) != NULL;)
     if (c->hproc == h && c->id != ok)
       error (0, "Closing child handle %p", h);
   return CloseHandle (h);

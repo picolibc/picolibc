@@ -8,7 +8,8 @@
 #include <sys/acl.h>
 #include <sys/stat.h>
 
-char *permstr (mode_t perm)
+char *
+permstr (mode_t perm)
 {
   static char pbuf[4];
 
@@ -20,7 +21,8 @@ char *permstr (mode_t perm)
 }
 
 #if 0
-char *username (uid_t uid)
+char *
+username (uid_t uid)
 {
   static char ubuf[256];
   struct passwd *pw;
@@ -31,7 +33,8 @@ char *username (uid_t uid)
     strcpy (ubuf, "<unknown>");
 }
 
-char *groupname (gid_t gid)
+char *
+groupname (gid_t gid)
 {
   static char gbuf[256];
   struct group *gr;
@@ -58,67 +61,66 @@ main (int argc, char **argv)
     switch (c)
       {
       case 'a':
-        aopt = 1;
-        break;
+	aopt = 1;
+	break;
       case 'd':
-        dopt = 1;
-        break;
+	dopt = 1;
+	break;
       default:
-        fprintf (stderr, "usage: %s [-ad] file...\n", argv[0]);
-        return 1;
+	fprintf (stderr, "usage: %s [-ad] file...\n", argv[0]);
+	return 1;
       }
   while ((c = optind++) < argc)
     {
       if (stat (argv[c], &st))
-        {
-          perror (argv[0]);
-          continue;
-        }
-      if (! first)
-        putchar ('\n');
+	{
+	  perror (argv[0]);
+	  continue;
+	}
+      if (!first)
+	putchar ('\n');
       first = 0;
       printf ("# file: %s\n", argv[c]);
       printf ("# owner: %d\n", st.st_uid);
       printf ("# group: %d\n", st.st_gid);
       if ((c = acl (argv[c], GETACL, MAX_ACL_ENTRIES, acls)) < 0)
-        {
-          perror (argv[0]);
-          continue;
-        }
+	{
+	  perror (argv[0]);
+	  continue;
+	}
       for (i = 0; i < c; ++i)
-        {
-          if (acls[i].a_type & ACL_DEFAULT)
-            {
-              if (aopt)
-                continue;
-              printf ("default:");
-            }
-          else if (dopt)
-            continue;
-          switch (acls[i].a_type & ~ACL_DEFAULT)
-            {
-            case USER_OBJ:
-              printf ("user::");
-              break;
-            case USER:
-              printf ("user:%d:", acls[i].a_id);
-              break;
-            case GROUP_OBJ:
-              printf ("group::");
-              break;
-            case GROUP:
-              printf ("group:%d:", acls[i].a_id);
-              break;
-            case CLASS_OBJ:
-              printf ("mask::");
-              break;
-            case OTHER_OBJ:
-              printf ("other::");
-              break;
-            }
-          printf ("%s\n", permstr (acls[i].a_perm));
-        }
+	{
+	  if (acls[i].a_type & ACL_DEFAULT)
+	    {
+	      if (aopt)
+		continue;
+	      printf ("default:");
+	    }
+	  else if (dopt)
+	    continue;
+	  switch (acls[i].a_type & ~ACL_DEFAULT)
+	    {
+	    case USER_OBJ:
+	      printf ("user::");
+	      break;
+	    case USER:
+	      printf ("user:%d:", acls[i].a_id);
+	      break;
+	    case GROUP_OBJ:
+	      printf ("group::");
+	      break;
+	    case GROUP:
+	      printf ("group:%d:", acls[i].a_id);
+	      break;
+	    case CLASS_OBJ:
+	      printf ("mask::");
+	      break;
+	    case OTHER_OBJ:
+	      printf ("other::");
+	      break;
+	    }
+	  printf ("%s\n", permstr (acls[i].a_perm));
+	}
     }
   return 0;
 }
-

@@ -52,13 +52,13 @@ Usage: %s [-p|--path] (-u|--unix)|(-w|--windows [-s|--short-name]) filename\n\
   -a|--absolute		output absolute path\n\
   -c|--close handle	close handle (for use in captured process)\n\
   -f|--file file	read file for path information\n\
-  -u|--unix     	print Unix form of filename\n\
-  -w|--windows  	print Windows form of filename\n\
+  -u|--unix		print Unix form of filename\n\
+  -w|--windows		print Windows form of filename\n\
   -s|--short-name	print Windows short form of filename\n\
-  -W|--windir 	 	print `Windows' directory\n\
-  -S|--sysdir 	 	print `system' directory\n\
-  -p|--path     	filename argument is a path\n\
-  -i|--ignore     	ignore missing argument\n",
+  -W|--windir		print `Windows' directory\n\
+  -S|--sysdir		print `system' directory\n\
+  -p|--path		filename argument is a path\n\
+  -i|--ignore		ignore missing argument\n",
 	   prog_name);
   exit (ignore_flag ? 0 : status);
 }

@@ -1,8 +1,8 @@
 dnl Autoconf configure script for Cygwin utilities.
-dnl Copyright 1996, 1997 Cygnus Solutions.
+dnl Copyright 1996, 1997, 1998, 1999, 2000 Cygnus Solutions.
 dnl
 dnl This file is part of Cygwin.
-dnl 
+dnl
 dnl This software is a copyrighted work licensed under the terms of the
 dnl Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 dnl details.
