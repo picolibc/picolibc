@@ -784,7 +784,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 		  rc ? cygpid : (unsigned int) -1, prog_arg, one_line.buf);
 
   /* Name the handle similarly to proc_subproc. */
-  ProtectHandle (pi.hProcess);
+  ProtectHandle1 (pi.hProcess, childhProc);
 
   bool wait_for_myself = false;
   if (mode == _P_OVERLAY)
@@ -802,7 +802,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	this). */
       if (!myself->wr_proc_pipe)
        {
-	 myself.hProcess = pi.hProcess;
 	 myself.remember ();
 	 wait_for_myself = true;
 	 myself->wr_proc_pipe = INVALID_HANDLE_VALUE;
@@ -854,8 +853,6 @@ if (wait_for_myself)
   waitpid (myself->pid, &res, 0);
 else
   ciresrv.sync (myself, INFINITE);
-
-ForceCloseHandle (pi.hProcess);
 
 switch (mode)
   {

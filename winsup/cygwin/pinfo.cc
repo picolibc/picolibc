@@ -742,7 +742,7 @@ proc_waiter (void *arg)
       /* Special case:  If the "child process" that died is us, then we're
 	 execing.  Just call proc_subproc directly and then exit this loop.
 	 We're done here.  */
-      if (hExeced && vchild->pid == myself->pid)
+      if (hExeced)
 	{
 	  /* execing.  no signals available now. */
 	  proc_subproc (PROC_CLEARWAIT, 0);

@@ -82,6 +82,8 @@ static bool __stdcall remove_proc (int);
 static bool __stdcall stopped_or_terminated (waitq *, _pinfo *);
 static DWORD WINAPI wait_sig (VOID *arg);
 
+extern HANDLE hExeced;
+
 /* wait_sig bookkeeping */
 
 class pending_signals
@@ -501,7 +503,6 @@ sigproc_init ()
 void __stdcall
 sigproc_terminate (void)
 {
-  extern HANDLE hExeced;
   hwait_sig = NULL;
 
   if (myself->sendsig == INVALID_HANDLE_VALUE)
@@ -509,7 +510,6 @@ sigproc_terminate (void)
   else
     {
       sigproc_printf ("entering");
-				//  finished with anything it is doing
       if (!hExeced)
 	{
 	  HANDLE sendsig = myself->sendsig;
@@ -545,6 +545,9 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
   sigpacket pack;
 
   pack.wakeup = NULL;
+  if (!myself->sendsig)	// FIXME: This catches the exec case but what if the exec is going to fail?
+    goto out;
+
   bool wait_for_completion;
   if (!(its_me = (p == NULL || p == myself || p == myself_nowait)))
     wait_for_completion = false;
@@ -657,7 +660,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	{
 	  if (no_signals_available ())
 	    sigproc_printf ("I'm going away now");
-	  else
+	  else if (!hExeced)
 	    system_printf ("error sending signal %d to pid %d, pipe handle %p, %E",
 			  si.si_signo, p->pid, sendsig);
 	}
@@ -857,8 +860,6 @@ remove_proc (int ci)
   if (procs[ci] != myself)
     {
       procs[ci].release ();
-      if (procs[ci].pid_handle)
-	ForceCloseHandle1 (procs[ci].pid_handle, childhProc);
       if (procs[ci].hProcess)
 	ForceCloseHandle1 (procs[ci].hProcess, childhProc);
     }

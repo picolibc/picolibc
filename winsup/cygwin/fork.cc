@@ -402,7 +402,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   ProtectHandle (pi.hThread);
   /* Protect the handle but name it similarly to the way it will
      be called in subproc handling. */
-  ProtectHandle (pi.hProcess);
+  ProtectHandle1 (pi.hProcess, childhProc);
 
   /* Fill in fields in the child's process table entry.  */
   child->dwProcessId = pi.dwProcessId;
@@ -501,7 +501,6 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
       (void) resume_child (forker_finished);
     }
 
-  ForceCloseHandle (pi.hProcess);
   ForceCloseHandle (pi.hThread);
   ForceCloseHandle (forker_finished);
   forker_finished = NULL;

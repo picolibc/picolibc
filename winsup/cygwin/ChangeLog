@@ -1,5 +1,18 @@
 2004-12-05  Christopher Faylor  <cgf@timesys.com>
 
+	* fork.cc (fork_parent): Reinstate "childhProc" protection.  Don't
+	close hProcess handle here since it is used to ensure that a new
+	process isn't created with the old pid after the old pid exits.
+	* spawn.cc (spawn_guts): Ditto.
+	* pinfo.cc (proc_waiter): Don't send any signals if we've execed since
+	this process doesn't officially exist.
+	* pinfo.h (pinfo::pid_handle): Eliminate.  Just use hProc.
+	* sigproc.cc (sig_send): Don't send any signals if our sendsig doesn't
+	exist.  That's a sign that we are execing.
+	(remove_proc): Eliminate pid_handle close.
+
+2004-12-05  Christopher Faylor  <cgf@timesys.com>
+
 	* cygthread.h (cygthread::terminate_thread): Make public.
 	* pinfo.h (pinfo::wait_thread): New element.
 	* pinfo.cc (pinfo::wait): Store "handle" to started thread in pinfo.
