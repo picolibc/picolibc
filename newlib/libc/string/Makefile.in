@@ -167,6 +167,8 @@ GENERAL_SOURCES = \
 	wcsrchr.c \
 	wcsspn.c \
 	wcsstr.c \
+	wcswidth.c \
+	wcwidth.c \
 	wmemchr.c \
 	wmemcmp.c \
 	wmemcpy.c \
@@ -207,7 +209,8 @@ wcscat.def	wcschr.def	wcscmp.def	wcscoll.def \
 wcscpy.def wcscspn.def \
 wcslcat.def	wcslcpy.def	wcslen.def	wcsncat.def wcsncmp.def \
 wcsncpy.def	wcspbrk.def	wcsrchr.def	wcsspn.def wcsstr.def \
-wmemchr.def	wmemcmp.def	wmemcpy.def	wmemmove.def wmemset.def
+wcswidth.def	wcwidth.def	wmemchr.def	wmemcmp.def wmemcpy.def \
+wmemmove.def	wmemset.def
 
 
 SUFFIXES = .def
@@ -246,9 +249,9 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@wcslcpy.$(OBJEXT) wcslen.$(OBJEXT) wcsncat.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@wcsncmp.$(OBJEXT) wcsncpy.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@wcspbrk.$(OBJEXT) wcsrchr.$(OBJEXT) wcsspn.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wcsstr.$(OBJEXT) wmemchr.$(OBJEXT) wmemcmp.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wmemcpy.$(OBJEXT) wmemmove.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wmemset.$(OBJEXT)
+@USE_LIBTOOL_FALSE@wcsstr.$(OBJEXT) wcswidth.$(OBJEXT) wcwidth.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wmemchr.$(OBJEXT) wmemcmp.$(OBJEXT) wmemcpy.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wmemmove.$(OBJEXT) wmemset.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 @USE_LIBTOOL_TRUE@libstring_la_OBJECTS =  bcopy.lo bzero.lo index.lo \
@@ -263,8 +266,8 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 @USE_LIBTOOL_TRUE@wcscat.lo wcschr.lo wcscmp.lo wcscoll.lo wcscpy.lo \
 @USE_LIBTOOL_TRUE@wcscspn.lo wcslcat.lo wcslcpy.lo wcslen.lo wcsncat.lo \
 @USE_LIBTOOL_TRUE@wcsncmp.lo wcsncpy.lo wcspbrk.lo wcsrchr.lo wcsspn.lo \
-@USE_LIBTOOL_TRUE@wcsstr.lo wmemchr.lo wmemcmp.lo wmemcpy.lo wmemmove.lo \
-@USE_LIBTOOL_TRUE@wmemset.lo
+@USE_LIBTOOL_TRUE@wcsstr.lo wcswidth.lo wcwidth.lo wmemchr.lo wmemcmp.lo \
+@USE_LIBTOOL_TRUE@wmemcpy.lo wmemmove.lo wmemset.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

@@ -1,3 +1,12 @@
+2001-04-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/wchar.h: Add definitions for wcswidth and wcwidth.  
+	* libc/string/Makefile.am: Add wcswidth.c and wcwidth.c
+	* libc/string/Makefile.in: Regenerated.
+	* libc/string/wcswidth.c: New file.
+	* libc/string/wcwidth.c: New file.
+	* libc/string/wcstrings.tex: Add wcswidth and wcwidth.
+
 Thu Apr  3 14:01:16 2003  J"orn Rennecke <joern.rennecke@superh.com>
 
 	* libc/machine/sh/memset.S: Fix problem with alloco region
