@@ -307,7 +307,7 @@ quoted (char *cmd, int winshell)
       strcpy (cmd, cmd + 1);
       if ((p = strchr (cmd, quote)) != NULL)
 	strcpy (p, p + 1);
-      return p + 1;
+      return p;
     }
 
   /* This must have been run from a Windows shell, so preserve

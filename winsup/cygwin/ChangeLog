@@ -1,3 +1,27 @@
+Wed Sep 13 14:56:47 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* spawn.cc (av): Hide 'calloced' field and limit cstrduping to class
+	methods only.
+	(spawn_guts): Use methods for manipulating most newargv stuff.
+
+2000-09-13  Egor Duda  <deo@logos-m.ru>
+
+	* child_info.h (child_info_spawn::~child_info_spawn): Avoid
+	memory leaks in cygheap.
+	* spawn.cc (spawn_guts): Ditto.
+
+Wed Sep 13 14:28:03 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (quoted): Return next character after a quoted string when
+	not doing special quote processing.  Also ensure that non-NULL is
+	returned in all circumstances.
+
+Wed Sep 13 10:26:16 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* spawn.cc (spawn_guts): Ensure that argv[0] is correctly set to the
+	full path when a script is detected.  Suggested by Kazuhiro Fujieda
+	<fujieda@jaist.ac.jp>.
+
 Tue Sep 12 22:33:30 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* external.cc (fillout_pinfo): Handle explicit pids correctly.

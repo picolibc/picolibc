@@ -87,6 +87,10 @@ public:
       {
 	if (moreinfo->old_title)
 	  cfree (moreinfo->old_title);
+	if (moreinfo->cwd_posix)
+	  cfree (moreinfo->cwd_posix);
+	if (moreinfo->cwd_win32)
+	  cfree (moreinfo->cwd_win32);
 	if (moreinfo->environ)
 	  {
 	    for (char **e = moreinfo->environ; *e; e++)

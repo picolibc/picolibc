@@ -244,14 +244,13 @@ exec_fixup_after_fork ()
   hexec_proc = NULL;
 }
 
-struct av
+class av
 {
-  int argc;
-  int calloced;
-private:
   char **argv;
+  int calloced;
 public:
-  av (int ac, const char * const *av) : argc (ac), calloced (0)
+  int argc;
+  av (int ac, const char * const *av) : calloced (0), argc (ac)
   {
     argv = (char **) cmalloc (HEAP_ARGV, (argc + 1) * sizeof (char *));
     memcpy (argv, av, (argc + 1) * sizeof (char *));
@@ -264,6 +263,26 @@ public:
   }
   int unshift (const char *what, int conv = 0);
   operator char **() {return argv;}
+  void all_calloced () {calloced = argc;}
+  void replace0_maybe (const char *arg0)
+  {
+    /* Note: Assumes that argv array has not yet been "unshifted" */
+    if (!calloced)
+      {
+	argv[0] = cstrdup (arg0);
+	calloced = 1;
+      }
+  }
+  void *dup_maybe (int i)
+  {
+    if (i >= calloced)
+      argv[i] = cstrdup (argv[i]);
+  }
+  void dup_all ()
+  {
+    for (int i = calloced; i < argc; i++)
+      argv[i] = cstrdup (argv[i]);
+  }
 };
 
 int
@@ -303,7 +322,6 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 
   MALLOC_CHECK;
 
-// if (strstr (prog_arg, "dopath")) try_to_debug ();
   if (prog_arg == NULL)
     {
       syscall_printf ("prog_arg is NULL");
@@ -417,18 +435,18 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
       if (buf[0] == 'M' && buf[1] == 'Z')
 	break;
 
-      debug_printf ("%s is a script", prog_arg);
+      debug_printf ("%s is a script", (char *) real_path);
 
-      char *ptr, *pgm, *arg1;
+      char *pgm, *arg1;
 
       if (buf[0] != '#' || buf[1] != '!')
 	{
 	  pgm = (char *) "/bin/sh";
-	  ptr = buf + 2;
 	  arg1 = NULL;
 	}
       else
 	{
+	  char *ptr;
 	  pgm = buf + 2;
 	  pgm += strspn (pgm, " \t");
 	  for (ptr = pgm, arg1 = NULL;
@@ -453,10 +471,13 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 	  *ptr = '\0';
 	}
 
+      /* Replace argv[0] with the full path to the script if this is the
+	 first time through the loop. */
+      newargv.replace0_maybe (real_path);
+	  
       /* pointers:
        * pgm	interpreter name
        * arg1	optional string
-       * ptr	end of string
        */
       if (arg1)
 	newargv.unshift (arg1);
@@ -466,8 +487,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
     }
 
   if (real_path.iscygexec ())
-    for (int i = newargv.calloced; i < newargv.argc; i++)
-      newargv[i] = cstrdup (newargv[i]);
+    newargv.dup_all ();
   else
     {
       for (int i = 0; i < newargv.argc; i++)
@@ -475,8 +495,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 	  char *p = NULL;
 	  const char *a;
 
-	  if (i >= newargv.calloced)
-	    newargv[i] = cstrdup (newargv[i]);
+	  newargv.dup_maybe (i);
 	  a = newargv[i];
 	  int len = strlen (a);
 	  if (len != 0 && !strpbrk (a, " \t\n\r\""))
@@ -507,6 +526,8 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 	one_line.add ("", 1);
       MALLOC_CHECK;
     }
+
+  newargv.all_calloced ();
   ciresrv.moreinfo->argc = newargv.argc;
   ciresrv.moreinfo->argv = newargv;
 
