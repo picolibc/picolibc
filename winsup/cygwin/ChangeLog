@@ -1,3 +1,8 @@
+Thu Nov  9 14:30:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* dir.cc (readdir): Avoid reading from the beginning when
+	readdir is called after a previous call has returned NULL.
+
 Wed Nov  8 21:00:31 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* select.cc (peek_pipe): Deal with pending newline in pty_master.

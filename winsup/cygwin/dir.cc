@@ -145,7 +145,8 @@ readdir (DIR * dir)
       return res;
     }
 
-  if (dir->__d_u.__d_data.__handle == INVALID_HANDLE_VALUE)
+  if (dir->__d_u.__d_data.__handle == INVALID_HANDLE_VALUE
+      && dir->__d_position == 0)
     {
       handle = FindFirstFileA (dir->__d_dirname, &buf);
       DWORD lasterr = GetLastError ();
