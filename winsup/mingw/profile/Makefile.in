@@ -89,6 +89,11 @@ gcrt1.o: gcrt0.c
 gcrt2.o: gcrt0.c
 	$(CC) -D__MSVCRT__ -c -o $@ $(CPPFLAGS) $(CFLAGS) $?
 
+#FIXME: Optimizing at higher than -O1 tweaks a bug in gcc 3.2.2
+# and earlier
+mcount.o: mcount.c
+	$(CC)  -c -o $@ $(CPPFLAGS) $(CFLAGS) -O1 $?
+
 Makefile: Makefile.in config.status configure
 	$(SHELL) config.status
 
