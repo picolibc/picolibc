@@ -82,6 +82,7 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath)
   DWORD entriesread = 0;
   DWORD totalentries = 0;
   DWORD resume_handle = 0;
+  DWORD rc;
   char ansi_srvname[256];
 
   if (servername)
@@ -90,10 +91,10 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath)
   do
     {
       DWORD i;
-      DWORD rc = NetUserEnum (servername, 3, FILTER_NORMAL_ACCOUNT,
-			      (LPBYTE *) & buffer, 1024,
-			      &entriesread, &totalentries, &resume_handle);
 
+      rc = NetUserEnum (servername, 3, FILTER_NORMAL_ACCOUNT,
+			(LPBYTE *) & buffer, 1024,
+			&entriesread, &totalentries, &resume_handle);
       switch (rc)
 	{
 	case ERROR_ACCESS_DENIED:
@@ -182,7 +183,7 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath)
       NetApiBufferFree (buffer);
 
     }
-  while (entriesread < totalentries);
+  while (rc == ERROR_MORE_DATA);
 
   if (servername)
     NetApiBufferFree (servername);
@@ -197,13 +198,14 @@ enum_local_groups (int print_sids)
   DWORD entriesread = 0;
   DWORD totalentries = 0;
   DWORD resume_handle = 0;
+  DWORD rc ;
 
   do
     {
       DWORD i;
-      DWORD rc = NetLocalGroupEnum (NULL, 0, (LPBYTE *) & buffer, 1024,
-			       &entriesread, &totalentries, &resume_handle);
 
+      rc = NetLocalGroupEnum (NULL, 0, (LPBYTE *) & buffer, 1024,
+			      &entriesread, &totalentries, &resume_handle);
       switch (rc)
 	{
 	case ERROR_ACCESS_DENIED:
@@ -270,7 +272,7 @@ enum_local_groups (int print_sids)
       NetApiBufferFree (buffer);
 
     }
-  while (entriesread < totalentries);
+  while (rc == ERROR_MORE_DATA);
 
   return 0;
 }
@@ -288,7 +290,7 @@ usage ()
   fprintf (stderr, "   -g,--local-groups       print local group information too\n");
   fprintf (stderr, "   -m,--no-mount           don't use mount points for home dir\n");
   fprintf (stderr, "   -s,--no-sids            don't print SIDs in GCOS field\n");
-  fprintf (stderr, "                           (this affects NT security)\n");
+  fprintf (stderr, "                           (this affects ntsec)\n");
   fprintf (stderr, "   -?,--help               displays this message\n\n");
   fprintf (stderr, "This program does only work on Windows NT\n\n");
   exit (1);
@@ -392,9 +394,11 @@ main (int argc, char **argv)
   /*
    * Get `administrators' group
   */
-  if (AllocateAndInitializeSid (&sid_nt_auth, 2, SECURITY_BUILTIN_DOMAIN_RID,
-                                DOMAIN_ALIAS_RID_ADMINS,
-                                0, 0, 0, 0, 0, 0, &sid))
+  if (!print_local
+      && AllocateAndInitializeSid (&sid_nt_auth, 2,
+                                   SECURITY_BUILTIN_DOMAIN_RID,
+                                   DOMAIN_ALIAS_RID_ADMINS,
+                                   0, 0, 0, 0, 0, 0, &sid))
     {
       if (LookupAccountSid (NULL, sid,
                             name, (len = 256, &len),
@@ -414,10 +418,10 @@ main (int argc, char **argv)
   if (print_domain)
     {
       if (domain_name_specified)
-	rc = NetGetAnyDCName (NULL, domain_name, (LPBYTE *) & servername);
+	rc = NetGetDCName (NULL, domain_name, (LPBYTE *) & servername);
 
       else
-	rc = NetGetAnyDCName (NULL, NULL, (LPBYTE *) & servername);
+	rc = NetGetDCName (NULL, NULL, (LPBYTE *) & servername);
 
       if (rc != ERROR_SUCCESS)
 	{

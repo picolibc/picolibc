@@ -82,13 +82,14 @@ enum_local_groups (int print_sids)
   DWORD entriesread = 0;
   DWORD totalentries = 0;
   DWORD resume_handle = 0;
+  DWORD rc;
 
   do
     {
       DWORD i;
-      DWORD rc = NetLocalGroupEnum (NULL, 0, (LPBYTE *) & buffer, 1024,
-			       &entriesread, &totalentries, &resume_handle);
 
+      rc = NetLocalGroupEnum (NULL, 0, (LPBYTE *) & buffer, 1024,
+			      &entriesread, &totalentries, &resume_handle);
       switch (rc)
 	{
 	case ERROR_ACCESS_DENIED:
@@ -155,7 +156,7 @@ enum_local_groups (int print_sids)
       NetApiBufferFree (buffer);
 
     }
-  while (entriesread < totalentries);
+  while (rc == ERROR_MORE_DATA);
 
   return 0;
 }
@@ -167,6 +168,7 @@ enum_groups (LPWSTR servername, int print_sids)
   DWORD entriesread = 0;
   DWORD totalentries = 0;
   DWORD resume_handle = 0;
+  DWORD rc;
   char ansi_srvname[256];
 
   if (servername)
@@ -175,9 +177,9 @@ enum_groups (LPWSTR servername, int print_sids)
   do
     {
       DWORD i;
-      DWORD rc = NetGroupEnum (servername, 2, (LPBYTE *) & buffer, 1024,
-			       &entriesread, &totalentries, &resume_handle);
 
+      rc = NetGroupEnum (servername, 2, (LPBYTE *) & buffer, 1024,
+		         &entriesread, &totalentries, &resume_handle);
       switch (rc)
 	{
 	case ERROR_ACCESS_DENIED:
@@ -252,7 +254,7 @@ enum_groups (LPWSTR servername, int print_sids)
       NetApiBufferFree (buffer);
 
     }
-  while (entriesread < totalentries);
+  while (rc == ERROR_MORE_DATA);
 
   if (servername)
     NetApiBufferFree (servername);
@@ -271,7 +273,7 @@ usage ()
   fprintf (stderr, "                         specified (or from the current domain if there is\n");
   fprintf (stderr, "                         no domain specified)\n");
   fprintf (stderr, "    -s,--no-sids         don't print SIDs in pwd field\n");
-  fprintf (stderr, "                         (this affects NT security)\n");
+  fprintf (stderr, "                         (this affects ntsec)\n");
   fprintf (stderr, "    -?,--help            print this message\n\n");
   exit (1);
 }
