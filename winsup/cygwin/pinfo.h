@@ -179,20 +179,6 @@ public:
   void set_acl();
 };
 
-class proc_pipe
-{
-  bool _closeem;
-public:
-  HANDLE in;
-  HANDLE out;
-  void set (bool);
-  proc_pipe (bool closeem) {set (closeem);}
-  proc_pipe () : _closeem (false), in (NULL), out (NULL) {};
-  void close () {_closeem = true;}
-  ~proc_pipe ();
-  int operator == (int x) {return (int) in == x;}
-};
-
 #define ISSTATE(p, f)	(!!((p)->process_state & f))
 #define NOTSTATE(p, f)	(!((p)->process_state & f))
 

@@ -767,40 +767,6 @@ proc_waiter (void *arg)
   return 0;
 }
 
-void
-proc_pipe::set (bool closeem)
-{
-  myself.lock ();
-  if (!CreatePipe (&in, &out, &sec_none_nih, 16))
-    {
-      system_printf ("couldn't create pipe, %E");
-      return;
-    }
-  /* Duplicate the write end of the pipe into the subprocess.  Make it inheritable
-     so that all of the execed children get it.  */
-  if (!DuplicateHandle (hMainProc, out, hMainProc, &out, 0, TRUE,
-			DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
-    {
-      CloseHandle (in);
-      in = out = NULL;
-      system_printf ("couldn't make handle %p noninheritable, %E", out);
-      return;
-    }
-  _closeem = closeem;
-}
-
-proc_pipe::~proc_pipe ()
-{
-  if (_closeem)
-    {
-      if (in)
-	CloseHandle (in);
-      if (out)
-	CloseHandle (out);
-    }
-  myself.unlock ();
-}
-
 /* function to set up the process pipe and kick off proc_waiter */
 int
 pinfo::wait ()
