@@ -71,7 +71,7 @@ struct pa_opcode
    In the args field, the following characters are unused:
 
 	'  "   &     -  /   34 6789:;< > @'
-	'  C      JK             Y [\]  '
+	'  C                     Y [\]  '
 	'    e                   y   } '
 
    Here are all the characters:
@@ -153,6 +153,8 @@ Also these:
    =    gfx tests for ftest
    d    14bit offset for single precision FP long load/store.
    #    14bit offset for double precision FP load long/store.
+   J    Yet another 14bit offset with an unusual encoding.
+   K    Yet another 14bit offset with an unusual encoding.
 
 Completer operands all have 'c' as the prefix:
 
@@ -161,6 +163,8 @@ Completer operands all have 'c' as the prefix:
    cq   short load and store completer (like cm, but inserted into a
 	different location in the target instruction).
    cs   store bytes short completer.
+   cc   Another load/store completer with a different encoding than the
+	others
 
    cw	read/write completer for PROBE
    cW	wide completer for MFCTL
@@ -293,6 +297,11 @@ static const struct pa_opcode pa_opcodes[] =
 { "ldw",        0x0c000080, 0xfc001fc0, "cxx(b),t", pa10, FLAG_STRICT},
 { "ldw",	0x0c001080, 0xfc001fc0, "cm5(s,b),t", pa10, FLAG_STRICT},
 { "ldw",	0x0c001080, 0xfc001fc0, "cm5(b),t", pa10, FLAG_STRICT},
+{ "ldw",        0x4c000000, 0xfc000000, "ccJ(s,b),x", pa10, FLAG_STRICT},
+{ "ldw",        0x4c000000, 0xfc000000, "ccJ(b),x", pa10, FLAG_STRICT},
+{ "ldw",        0x5c000004, 0xfc000006, "ccK(s,b),x", pa20, FLAG_STRICT},
+{ "ldw",        0x5c000004, 0xfc000006, "ccK(b),x", pa20, FLAG_STRICT},
+{ "ldw",        0x48000000, 0xfc000000, "j(s,b),x", pa10},
 { "ldw",        0x48000000, 0xfc000000, "j(s,b),x", pa10},
 { "ldw",        0x48000000, 0xfc000000, "j(b),x", pa10},
 { "ldh",        0x0c000040, 0xfc001fc0, "cxx(s,b),t", pa10, FLAG_STRICT},
@@ -313,6 +322,10 @@ static const struct pa_opcode pa_opcodes[] =
 { "std",        0x70000000, 0xfc000002, "cqx,#(b)", pa20, FLAG_STRICT},
 { "stw",	0x0c001280, 0xfc001fc0, "cmx,V(s,b)", pa10, FLAG_STRICT},
 { "stw",	0x0c001280, 0xfc001fc0, "cmx,V(b)", pa10, FLAG_STRICT},
+{ "stw",        0x6c000000, 0xfc000000, "ccx,J(s,b)", pa10, FLAG_STRICT},
+{ "stw",        0x6c000000, 0xfc000000, "ccx,J(b)", pa10, FLAG_STRICT},
+{ "stw",        0x7c000004, 0xfc000006, "ccx,K(s,b)", pa20, FLAG_STRICT},
+{ "stw",        0x7c000004, 0xfc000006, "ccx,K(b)", pa20, FLAG_STRICT},
 { "stw",        0x68000000, 0xfc000000, "x,j(s,b)", pa10},
 { "stw",        0x68000000, 0xfc000000, "x,j(b)", pa10},
 { "sth",	0x0c001240, 0xfc001fc0, "cmx,V(s,b)", pa10, FLAG_STRICT},

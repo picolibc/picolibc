@@ -1,5 +1,8 @@
 Sun Sep 19 10:40:59 1999  Jeffrey A Law  (law@cygnus.com)
 
+	* hppa.h (pa_opcodes): Add remaining PA2.0 integer load/store
+	instructions.
+
 	* hppa.h (pa_opcodes): Add remaining PA2.0 FP load/store instructions.
 
 	* hppa.h (pa_opcodes): Add long offset double word load/store
