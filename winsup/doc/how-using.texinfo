@@ -214,6 +214,8 @@ to determine whether they are executable.
 
 @subsection How do I print under Cygwin?
 
+There is no working lp or lpr system as you would find on UNIX.
+
 Jason Tishler has written a couple of messages that explain how to use
 a2ps (for nicely formatted text in PostScript) and ghostscript (to print
 PostScript files on non-PostScript Windows printers).  Start at
