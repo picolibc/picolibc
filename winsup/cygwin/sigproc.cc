@@ -46,7 +46,7 @@ details. */
 
 #define no_signals_available() (!hwait_sig || !sig_loop_wait)
 
-#define NZOMBIES	4096
+#define NZOMBIES	256
 
 /*
  * Global variables
