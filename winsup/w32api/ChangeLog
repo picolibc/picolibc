@@ -1,3 +1,7 @@
+2003-03-28  Bang Jun-Young  <junyoung@netbsd.org>
+
+	* include/winnt.h (WAITORTIMERCALLBACKFUNC): Add typedef.
+
 2003-03-27  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/secext.h (GetComputerObjectName[AW],GetUserNameEx[AW],
