@@ -47,6 +47,7 @@ _asprintf_r (ptr, strp, fmt, va_alist)
   f._bf._base = f._p = NULL;
   f._bf._size = f._w = 0;
   f._data = ptr;
+  f._file = -1;  /* No file. */
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else
@@ -80,6 +81,7 @@ asprintf (strp, fmt, va_alist)
   f._bf._base = f._p = NULL;
   f._bf._size = f._w = 0;
   f._data = _REENT;
+  f._file = -1;  /* No file. */
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else

@@ -325,6 +325,7 @@ _sprintf_r (ptr, str, fmt, va_alist)
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = INT_MAX;
   f._data = ptr;
+  f._file = -1;  /* No file. */
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else
@@ -356,6 +357,7 @@ sprintf (str, fmt, va_alist)
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = INT_MAX;
   f._data = _REENT;
+  f._file = -1;  /* No file. */
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else

@@ -46,6 +46,7 @@ _DEFUN (vasprintf, (strp, fmt, ap),
   f._bf._base = f._p = NULL;
   f._bf._size = f._w = 0;
   f._data = _REENT;
+  f._file = -1;  /* No file. */
   ret = vfprintf (&f, fmt, ap);
   *f._p = 0;
   *strp = f._bf._base;
@@ -66,6 +67,7 @@ _DEFUN (_vasprintf_r, (ptr, strp, fmt, ap),
   f._bf._base = f._p = NULL;
   f._bf._size = f._w = 0;
   f._data = ptr;
+  f._file = -1;  /* No file. */
   ret = _vfprintf_r (ptr, &f, fmt, ap);
   *f._p = 0;
   *strp = f._bf._base;

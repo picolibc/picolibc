@@ -1,3 +1,12 @@
+2003-02-05  Jonathan Larmour  <jifl@eCosCentric.com>
+
+	* libc/stdio/vsprintf.c (vsprintf, _vsprintf_r): Set _file fd to
+	-1 to be sure it cannot later match a valid file fd causing
+	isatty() to return 1.
+	* libc/stdio/asprintf.c (asprintf, _asprintf_r): Ditto.
+	* libc/stdio/sprintf.c (sprintf, _sprintf_r): Ditto.
+	* libc/stdio/vasprintf.c (vasprintf, _vasprintf_r): Ditto.
+
 2003-02-03  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdlib/ldtoa.c (_ldtoa_r): Fix code to allocate the format
