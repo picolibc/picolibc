@@ -1,3 +1,19 @@
+2002-02-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (dtable::dup2): Revert previous patch.
+	* fhandler.h: Ditto.
+	(fhandler_socket::recv): Define new method.
+	(fhandler_socket::send): Ditto.
+	* fhandler_socket.cc (fhandler_socket::recv): New method.
+	(fhandler_socket::send): Ditto.
+	(fhandler_socket::read): Call fhandler_socket::recv() now.
+	(fhandler_socket::write): Call fhandler_socket::send() now.
+	* net.cc (class wsock_event): Move definition to wsock_event.h.
+	(fdsock): Revert previous patch.
+	(cygwin_recv): Move implementation to fhandler_socket::recv().
+	(cygwin_send): Move implementation to fhandler_socket::send().
+	* wsock_event.h: New file.
+
 2002-02-06  Alexander Gottwald <Alexander.Gottwald@s1999.tuchemnitz.de>
 
 	* net.cc (get_2k_ifconf): Create interface entries for tokenring cards.

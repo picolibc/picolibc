@@ -351,9 +351,6 @@ class fhandler_base
   virtual void seekdir (DIR *, off_t);
   virtual void rewinddir (DIR *);
   virtual int closedir (DIR *);
-
-  virtual void set_fd (int nfd) {}
-  virtual int get_fd () { return -1; }
 };
 
 class fhandler_socket: public fhandler_base
@@ -364,7 +361,6 @@ class fhandler_socket: public fhandler_base
   HANDLE secret_event;
   struct _WSAPROTOCOL_INFOA *prot_info_ptr;
   char *sun_path;
-  int fd;
 
  public:
   fhandler_socket ();
@@ -378,8 +374,12 @@ class fhandler_socket: public fhandler_base
   void set_shutdown_read () {FHSETF (SHUTRD);}
   void set_shutdown_write () {FHSETF (SHUTWR);}
 
-  int write (const void *ptr, size_t len);
+  int recv (void *ptr, size_t len, unsigned int flags);
   int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
+
+  int send (const void *ptr, size_t len, unsigned int flags);
+  int write (const void *ptr, size_t len);
+
   int ioctl (unsigned int cmd, void *);
   int fcntl (int cmd, void *);
   off_t lseek (off_t, int) { return 0; }
@@ -395,8 +395,6 @@ class fhandler_socket: public fhandler_base
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
-  void set_fd (int nfd) { fd = nfd; }
-  int get_fd () { return fd; }
   void set_addr_family (int af) {addr_family = af;}
   int get_addr_family () {return addr_family;}
   void set_sun_path (const char *path);

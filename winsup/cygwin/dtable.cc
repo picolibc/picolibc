@@ -411,7 +411,6 @@ dtable::dup2 (int oldfd, int newfd)
   if (!not_open (newfd))
     _close (newfd);
   fds[newfd] = newfh;
-  newfh->set_fd (newfd);
 
   ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
   MALLOC_CHECK;

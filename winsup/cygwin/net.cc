@@ -34,6 +34,7 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include "registry.h"
+#include "wsock_event.h"
 #include <sys/uio.h>
 
 extern "C" {
@@ -46,23 +47,6 @@ int __stdcall rexec (char **ahost, unsigned short inport, char *locuser,
 int __stdcall rresvport (int *);
 int sscanf (const char *, const char *, ...);
 } /* End of "C" section */
-
-class wsock_event
-{
-  WSAEVENT		event;
-  WSAOVERLAPPED		ovr;
-public:
-  wsock_event () : event (NULL) {};
-  ~wsock_event ()
-    {
-      if (event)
-	WSACloseEvent (event);
-      event = NULL;
-    };
-
-  LPWSAOVERLAPPED prepare ();
-  int wait (int socket, LPDWORD flags);
-};
 
 LPWSAOVERLAPPED
 wsock_event::prepare ()
@@ -522,7 +506,6 @@ fdsock (int& fd, const char *name, SOCKET soc)
   else
     debug_printf ("not setting socket inheritance since winsock2_active %d", winsock2_active);
   fhandler_socket *fh = (fhandler_socket *) cygheap->fdtab.build_fhandler (fd, FH_SOCKET, name);
-  fh->set_fd (fd);
   fh->set_io_handle ((HANDLE) soc);
   fh->set_flags (O_RDWR);
   fh->set_name (name, name);
@@ -1528,42 +1511,12 @@ extern "C" int
 cygwin_recv (int fd, void *buf, int len, unsigned int flags)
 {
   int res;
-  wsock_event wsock_evt;
-  LPWSAOVERLAPPED ovr;
-  fhandler_socket *h = get (fd);
+  fhandler_socket *fh = get (fd);
 
-  if (__check_null_invalid_struct_errno (buf, len) || !h)
+  if (__check_null_invalid_struct_errno (buf, len) || !fh)
     res = -1;
   else
-    {
-      sigframe thisframe (mainthread);
-
-      if (h->is_nonblocking () || !(ovr = wsock_evt.prepare ()))
-	{
-	  debug_printf ("Fallback to winsock 1 recv call");
-	  if ((res = recv (h->get_socket (), (char *) buf, len, flags))
-	      == SOCKET_ERROR)
-	    {
-	      set_winsock_errno ();
-	      res = -1;
-	    }
-	}
-      else
-	{
-	  WSABUF wsabuf = { len, (char *) buf };
-	  DWORD ret = 0;
-	  if (WSARecv (h->get_socket (), &wsabuf, 1, &ret, (DWORD *)&flags,
-		       ovr, NULL) != SOCKET_ERROR)
-	    res = ret;
-	  else if ((res = WSAGetLastError ()) != WSA_IO_PENDING)
-	    {
-	      set_winsock_errno ();
-	      res = -1;
-	    }
-	  else if ((res = wsock_evt.wait (h->get_socket (), (DWORD *)&flags)) == -1)
-	    set_winsock_errno ();
-	}
-    }
+    res = fh->recv (buf, len, flags);
 
   syscall_printf ("%d = recv (%d, %x, %x, %x)", res, fd, buf, len, flags);
 
@@ -1575,42 +1528,12 @@ extern "C" int
 cygwin_send (int fd, const void *buf, int len, unsigned int flags)
 {
   int res;
-  wsock_event wsock_evt;
-  LPWSAOVERLAPPED ovr;
-  fhandler_socket *h = get (fd);
+  fhandler_socket *fh = get (fd);
 
-  if (__check_invalid_read_ptr_errno (buf, len) || !h)
+  if (__check_invalid_read_ptr_errno (buf, len) || !fh)
     res = -1;
   else
-    {
-      sigframe thisframe (mainthread);
-
-      if (h->is_nonblocking () || !(ovr = wsock_evt.prepare ()))
-	{
-	  debug_printf ("Fallback to winsock 1 send call");
-	  if ((res = send (h->get_socket (), (const char *) buf, len, flags))
-	      == SOCKET_ERROR)
-	    {
-	      set_winsock_errno ();
-	      res = -1;
-	    }
-	}
-      else
-	{
-	  WSABUF wsabuf = { len, (char *) buf };
-	  DWORD ret = 0;
-	  if (WSASend (h->get_socket (), &wsabuf, 1, &ret, (DWORD)flags,
-		       ovr, NULL) != SOCKET_ERROR)
-	    res = ret;
-	  else if ((res = WSAGetLastError ()) != WSA_IO_PENDING)
-	    {
-	      set_winsock_errno ();
-	      res = -1;
-	    }
-	  else if ((res = wsock_evt.wait (h->get_socket (), (DWORD *)&flags)) == -1)
-	    set_winsock_errno ();
-	}
-    }
+    res = fh->send (buf, len, flags);
 
   syscall_printf ("%d = send (%d, %x, %d, %x)", res, fd, buf, len, flags);
 
