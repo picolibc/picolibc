@@ -64,6 +64,12 @@ isatty (int i)
   return i<3;
 }
 
+int unlink (const char *p)
+{
+  return -1;
+}
+
+
 char *
 sbrk (int amt)
 {

@@ -1,3 +1,7 @@
+2003-08-12  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* i386/cygmon-salib.c (unlink): New stub.
+
 2003-08-08  Mark Salter <msalter@redhat.com>
 
         * i386/cygmon.ld: Add 4 byte alignment to __CTOR_LIST__
