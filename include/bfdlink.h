@@ -262,8 +262,13 @@ struct bfd_link_info
   /* TRUE if ok to have version with no definition.  */
   unsigned int allow_undefined_version: 1;
 
-  /* TRUE id a fedault symbol version should be created and used.  */
+  /* TRUE if a default symbol version should be created and used for
+     exported symbols.  */
   unsigned int create_default_symver: 1;
+
+  /* TRUE if a default symbol version should be created and used for
+     imported symbols.  */
+  unsigned int default_imported_symver: 1;
 
   /* TRUE if symbols should be retained in memory, FALSE if they
      should be freed and reread.  */

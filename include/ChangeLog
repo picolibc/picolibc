@@ -1,3 +1,7 @@
+2004-11-04  Paul Brook  <paul@codesourcery.com>
+
+	* bfdlink.h (bfd_link_info): Add default_imported_symver.
+
 2004-11-12  Bob Wilson  <bob.wilson@acm.org>
 
 	* xtensa-isa-internal.h (xtensa_interface_internal): Add class_id.
