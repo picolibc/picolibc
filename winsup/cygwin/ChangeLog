@@ -1,3 +1,9 @@
+2002-08-29  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* safe_memory.h: Replace #include <new> with an explicit
+	definition of the placement new operator.
+	(safe_delete): Remove unnecessary ## operator.
+
 2002-08-28  Christopher Faylor  <cgf@redhat.com>
 
 	* malloc.cc: Protect some definitions to avoid a compile time warning.

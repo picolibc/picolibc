@@ -22,27 +22,28 @@ details. */
  * destructor and then free(3).
  */
 
-#include <new>
 #include <stdlib.h>
+
+inline void *operator new (size_t, void *__p) throw () { return __p; }
 
 #define safe_new0(T) (new (malloc (sizeof (T))) T)
 
 #ifdef NEW_MACRO_VARARGS
 
-#define safe_new(T, ...)                       \
+#define safe_new(T, ...)			\
   (new (malloc (sizeof (T))) T (__VA_ARGS__))
 
 #else /* !NEW_MACRO_VARARGS */
 
-#define safe_new(T, args...)                   \
+#define safe_new(T, args...)			\
   (new (malloc (sizeof (T))) T (## args))
 
 #endif /* !NEW_MACRO_VARARGS */
 
-#define safe_delete(T, O)                      \
-{                                              \
-  (O)->~ ## T ();                              \
-  free (O);                                    \
+#define safe_delete(T, O)			\
+{						\
+  (O)->~T ();					\
+  free (O);					\
 }
 
 #endif /* __SAFE_MEMORY_H__ */
