@@ -1,6 +1,10 @@
 2001-10-30  Corinna Vinschen  <corinna@vinschen.de>
 
-	* (fhandler_socket::dup): Revert previous change.
+	* fhandler_socket.cc (fhandler_socket::close): Add error handling.
+
+2001-10-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::dup): Revert previous change.
 
 2001-10-30  Christopher Faylor  <cgf@redhat.com>
 
@@ -10,6 +14,8 @@
 	more debugging output.
 	(fhandler_socket::dup): Allocate new space for prot_info_ptr for
 	duplicated entry.
+	(fhandler_socket::close): Loop closesocket() as long as WSAEWOULDBLOCK
+	is returned.
 	* syscalls.cc (stat_worker): Always delete fh if it has been created.
 
 2001-10-29  Corinna Vinschen  <corinna@vinschen.de>

@@ -289,9 +289,14 @@ fhandler_socket::close ()
   setsockopt (get_socket (), SOL_SOCKET, SO_LINGER,
 	      (const char *)&linger, sizeof linger);
 
-  while (closesocket (get_socket ())
+  while ((res = closesocket (get_socket ()))
          && WSAGetLastError () == WSAEWOULDBLOCK)
     continue;
+  if (res)
+    {
+      set_winsock_errno ();
+      res = -1;
+    }
 
   close_secret_event ();
 
