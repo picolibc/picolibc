@@ -177,8 +177,8 @@ _csbrk (int sbs)
     {
       init_cheap ();
       cygheap_max = cygheap;
-      (void) _csbrk ((int) pagetrunc (4095 + sbs + sizeof (*cygheap)));
-      prebrk = (char *) (cygheap + 1) + sbs;
+      (void) _csbrk (sbs + sizeof (*cygheap) + (2 * system_info.dwPageSize));
+      prebrk = (char *) (cygheap + 1);
     }
   else
     {

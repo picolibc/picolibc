@@ -29,7 +29,7 @@ details. */
 
 shared_info NO_COPY *cygwin_shared = NULL;
 mount_info NO_COPY *mount_table = NULL;
-HANDLE cygwin_mount_h;
+HANDLE NO_COPY cygwin_mount_h;
 
 char * __stdcall
 shared_name (const char *str, int num)
