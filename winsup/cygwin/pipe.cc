@@ -128,7 +128,6 @@ fhandler_pipe::dup (fhandler_base *child)
   return 0;
 }
 
-
 int
 make_pipe (int fildes[2], unsigned int psize, int mode)
 {

@@ -146,6 +146,7 @@ cygheap_fixup_in_child (bool execed)
   ForceCloseHandle1 (child_proc_info->cygheap_h, passed_cygheap_h);
 
   cygheap_init ();
+  debug_fixup_after_fork_exec ();
 
   if (execed)
     {
