@@ -92,7 +92,7 @@ parse_grp (struct group &grp, const char *line)
 	      grp.gr_mem = namearray;
             }
           else
-            grp.gr_mem = NULL;
+            grp.gr_mem = (char **) calloc (1, sizeof (char *));
           return 1;
         }
     }

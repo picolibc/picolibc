@@ -1,3 +1,8 @@
+Mon Apr 03 13:58:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * grp.cc (parse_grp): Save empty array instead of
+        NULL in gr_mem if no supplementary group is given.
+
 Sun Apr 02 16:02:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
         * syscalls.cc (chown_worker): Use previous uid/gid if
