@@ -1,3 +1,8 @@
+Sat Jun 17 18:27:59 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in (subdirs): Previous change did not fix problem in
+	broken shells.
+
 Sat Jun 17 13:49:12 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Avoid installing dll if we're cross building and the

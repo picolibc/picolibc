@@ -219,10 +219,9 @@ install: all $(install_dlls_host)
 	@$(MAKE) subdirs DO=$@ $(FLAGS_TO_PASS)
 
 subdirs: force
-	@test -z "$(SUBDIRS)" && exit 0; \
-	for i in $(SUBDIRS); do \
-	   echo "Making $(DO) in $${i}..." ; \
+	@for i in should-never-exist $(SUBDIRS); do \
 	   if [ -d ./$$i ] ; then \
+	     echo "Making $(DO) in $${i}..." ; \
 	     if (rootme=`pwd`/ ; export rootme ; \
 	       rootsrc=`cd $(srcdir); pwd`/ ; export rootsrc ; \
 	       cd ./$$i; \
