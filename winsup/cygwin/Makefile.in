@@ -166,10 +166,10 @@ all_host: new-$(LIB_NAME) cygrun.exe
 
 force:
 
-install: install-bin install-libs install-headers $(install_host) $(install_target)
-
-install: install-libs install-headers install-man install_target \
+install: install-bin install-libs install-headers install-man install_target \
 	$(install_host) $(install_target)
+
+uninstall: uninstall-libs uninstall-headers uninstall-man 
 
 install-libs: $(TARGET_LIBS)
 	$(INSTALL_DATA) new-$(DLL_NAME) $(bindir)/$(DLL_NAME); \
@@ -205,6 +205,37 @@ install_target: cygserver.exe
 	$(INSTALL_PROGRAM) cygserver.exe $(bindir)/cygserver.exe
 	
 install_host:
+
+
+uninstall-libs: $(TARGET_LIBS)
+	rm -f $(bindir)/$(DLL_NAME); \
+	for i in $^; do \
+	    rm -f $(tooldir)/lib/$$i ; \
+	done
+
+uninstall-headers:
+	cd $(srcdir); \
+	for sub in `find include -name '[a-z]*' -type d -print | sort`; do \
+	    for i in $$sub/*.h ; do \
+	      rm -f $(tooldir)/$$sub/`basename $$i` ; \
+	    done ; \
+	done ; \
+	rm -f $(tooldir)/include/regex.h
+
+uninstall-man:
+	cd $(srcdir); \
+	for i in `find . -type f -name '*.2'`; do \
+	    rm -f $(tooldir)/man/man2/`basename $$i` ; \
+	done; \
+	for i in `find . -type f -name '*.3'`; do \
+	    rm -f $(tooldir)/man/man3/`basename $$i` ; \
+	done; \
+	for i in `find . -type f -name '*.5'`; do \
+	    rm -f $(tooldir)/man/man5/`basename $$i` ; \
+	done; \
+	for i in `find . -type f -name '*.7'`; do \
+	    rm -f $(tooldir)/man/man7/`basename $$i` ; \
+	done
 
 clean:
 	-rm -f *.o *.dll *.a *.exp junk *.base version.cc regexp/*.o winver_stamp *.exe *.d *stamp* *_magic.h

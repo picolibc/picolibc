@@ -1,6 +1,6 @@
 /* sigproc.cc: inter/intra signal and sub process handler
 
-   Copyright 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Christopher Faylor <cgf@cygnus.com>
 
@@ -926,6 +926,7 @@ getsem (_pinfo *p, const char *str, int init, int max)
 	  return NULL;
 	}
       int wait = 1000;
+      /* Wait for new process to generate its semaphores. */
       sigproc_printf ("pid %d, ppid %d, wait %d, initializing %x", p->pid, p->ppid, wait,
 		  ISSTATE (p, PID_INITIALIZING));
       for (int i = 0; ISSTATE (p, PID_INITIALIZING) && i < wait; i++)
@@ -941,27 +942,27 @@ getsem (_pinfo *p, const char *str, int init, int max)
       h = CreateSemaphore (allow_ntsec ? sec_user_nih (sa_buf) : &sec_none_nih,
 			   init, max, str = shared_name (str, winpid));
       p = myself;
+      if (!h)
+	{
+	  system_printf ("can't create semaphore %s, %E", str);
+	  __seterrno ();
+	}
     }
   else
     {
       h = OpenSemaphore (SEMAPHORE_ALL_ACCESS, FALSE,
-			 str = shared_name (str, p->dwProcessId));
+			 shared_name (str, p->dwProcessId));
 
-      if (h == NULL)
+      if (!h)
 	{
 	  if (GetLastError () == ERROR_FILE_NOT_FOUND && !proc_exists (p))
-	    set_errno (ESRCH);
+	    set_errno (ESRCH);	/* No such process */
 	  else
-	    set_errno (EPERM);
-	  return NULL;
+	    set_errno (EPERM);	/* Couldn't access the semaphore --
+				   different cygwin DLL maybe? */
 	}
     }
 
-  if (!h)
-    {
-      system_printf ("can't %s %s, %E", p ? "open" : "create", str);
-      set_errno (ESRCH);
-    }
   return h;
 }
 
@@ -1189,7 +1190,7 @@ wait_sig (VOID *)
 		/* A normal UNIX signal */
 		default:
 		  sigproc_printf ("Got signal %d", sig);
-		  int wasdispatched = sig_handle (sig);
+		  int wasdispatched = sig_handle (sig, rc != 2);
 		  if (sig == SIGCHLD && wasdispatched)
 		    dispatched_sigchld = 1;
 		  /* Need to decrement again to offset increment below since

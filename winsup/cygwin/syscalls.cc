@@ -1,6 +1,6 @@
 /* syscalls.cc: syscalls
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -205,7 +205,8 @@ _unlink (const char *ourname)
       syscall_printf ("CreateFile/CloseHandle succeeded");
       /* Everything is fine if the file has disappeared or if we know that the
 	 FILE_FLAG_DELETE_ON_CLOSE will eventually work. */
-      if (GetFileAttributes (win32_name) == (DWORD) -1 || delete_on_close_ok)
+      if (GetFileAttributes (win32_name) == INVALID_FILE_ATTRIBUTES
+          || delete_on_close_ok)
 	goto ok;	/* The file is either gone already or will eventually be
 			   deleted by the OS. */
     }
@@ -1424,6 +1425,8 @@ pathconf (const char *file, int v)
   switch (v)
     {
     case _PC_PATH_MAX:
+      if (check_null_empty_str_errno (file))
+          return -1;
       return PATH_MAX - strlen (file);
     case _PC_NAME_MAX:
       return PATH_MAX;

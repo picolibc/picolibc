@@ -1,6 +1,6 @@
 /* ioctl.cc: ioctl routines.
 
-   Copyright 1996, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Doug Evans of Cygnus Support
    dje@cygnus.com
@@ -23,25 +23,31 @@ details. */
 #include <sys/termios.h>
 
 extern "C" int
-ioctl (int fd, int cmd, void *buf)
+ioctl (int fd, int cmd, ...)
 {
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     return -1;
+
+  /* check for optional mode argument */
+  va_list ap;
+  va_start (ap, cmd);
+  char *argp = va_arg (ap, char *);
+  va_end (ap);
 
   debug_printf ("fd %d, cmd %x\n", fd, cmd);
   if (cfd->is_tty () && cfd->get_device () != FH_PTYM)
     switch (cmd)
       {
 	case TCGETA:
-	  return tcgetattr (fd, (struct termios *) buf);
+	  return tcgetattr (fd, (struct termios *) argp);
 	case TCSETA:
-	  return tcsetattr (fd, TCSANOW, (struct termios *) buf);
+	  return tcsetattr (fd, TCSANOW, (struct termios *) argp);
 	case TCSETAW:
-	  return tcsetattr (fd, TCSADRAIN, (struct termios *) buf);
+	  return tcsetattr (fd, TCSADRAIN, (struct termios *) argp);
 	case TCSETAF:
-	  return tcsetattr (fd, TCSAFLUSH, (struct termios *) buf);
+	  return tcsetattr (fd, TCSAFLUSH, (struct termios *) argp);
       }
 
-  return cfd->ioctl (cmd, buf);
+  return cfd->ioctl (cmd, argp);
 }

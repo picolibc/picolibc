@@ -249,6 +249,114 @@ Tue Sep 25 16:22:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	* include/sys/ipc.h: New file.
 	* include/sys/shm.h: New file.
 
+2002-01-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dir.cc: Use INVALID_FILE_ATTRIBUTES instead of "(DWORD) -1"
+	for file attributes throughout.
+	* fhandler.cc: Ditto.
+	* fhandler_disk_file.cc: Ditto.
+	* path.cc: Ditto.
+	* path.h: Ditto.
+	* syscalls.cc: Ditto.
+	* times.cc (utimes): Use path_conv::isdir() instead of explicit
+	GetFileAttributes() call.
+
+2002-01-13  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (multiple_cygwin_problem): Clarify logic and make
+	CYGWIN_MISMATCH_OK more powerful.
+
+2002-01-10  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (sig_handle): Accept a second argument indicating
+	whether the signal came from this process or not.
+	* sigproc.h: Reflect sig_handle arg change.
+	* signal.cc (kill_pgrp): Add sigframe info.
+	(abort): New function.  Eliminates newlib function of same name.
+	* sigproc.cc (wait_sig): Pass "signal from this process" value as arg
+	2.
+
+2002-01-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (pathconf): Guard _PC_PATH_MAX branch against invalid
+	file parameter.
+
+2002-01-09  Christopher Faylor  <cgf@redhat.com>
+            Robert Collins  <rbtcollins@hotmail.com>
+
+	* exceptions.cc (early_stuff_init): Rename from misnamed
+	set_console_handler.
+	(ctrl_c_handler): Attempt to work around potential signal duplication
+	during process startup.
+	(sig_handle): Ignore SIGINT when we're just an "exec stub".
+	* spawn.cc (spawn_guts): Store pid of spawned process in global for use
+	by ctrl_c_handler.
+	* dcrt0.cc (dll_crt0_1): Call renamed initialization function.
+	* winsup.h: Reflect function name change.
+
+2002-01-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_accept): Set sun_path for newly connected socket.
+
+2002-01-07  Ralf Habacker  <Ralf.Habacker@freenet.de>
+
+	* Makefile.in: Add uninstall target.
+
+2002-01-07  Christopher Faylor  <cgf@redhat.com>
+
+	* sigproc.cc (getsem): Clean up debugging output.
+
+2002-01-07  Christopher Faylor  <cgf@redhat.com>
+
+	* sigproc.cc (getsem): Set errno when unable to create own semaphore.
+	Reorganize to make clearer that error should only come from initial
+	creation of process semaphore.
+
+2002-01-06  Christopher Faylor  <cgf@redhat.com>
+
+	* dtable.cc (dtable::init_std_file_from_handle): Add some defensive
+	code to invalid handle case.
+
+2002-01-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ioctl.cc (ioctl): Make third argument optional.
+	* include/sys/ioctl.h: Ditto in declaration.
+	* dtable.cc (dtable::init_std_file_from_handle): Revert previous
+	bogus patch.
+	* window.cc (WndProc): Raise SIGURG instead of SIGIO in case of FD_OOB
+	message.
+
+2002-01-05  Christopher Faylor  <cgf@redhat.com>
+
+	* dir.cc (opendir): Guarantee release of alloced fhandler structure on
+	error.
+
+2002-01-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (sig_handle): Set default action for SIGURG to SIG_IGN.
+
+2002-01-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (dtable::init_std_file_from_handle): Don't treat NULL
+	handle as errorneous.
+
+2002-01-04  Christopher Faylor  <cgf@redhat.com>
+
+	* cygmagic: Change logic for equality test.
+
+2002-01-04  Christopher Faylor  <cgf@redhat.com>
+
+	* dir.cc (opendir): Don't attempt to call sub-opendir if ENOENT.
+
+2002-01-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc: Replace usage of AF_UNIX by Posix compliant AF_LOCAL
+	throughout.
+	(socketpair): Explicitly allow SOCK_STREAM and SOCK_DGRAM socket types
+	in families AF_UNIX and AF_LOCAL.  Explicitly allow PF_UNSPEC, PF_LOCAL
+	and PF_INET protocols.  Return error otherwise.  Implement datagram
+	socketpairs.
+
 2002-01-01  Christopher Faylor  <cgf@redhat.com>
 
         * speclib: Remove temp files automatically.

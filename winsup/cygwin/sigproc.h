@@ -1,6 +1,6 @@
 /* sigproc.h
 
-   Copyright 1997, 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -98,7 +98,7 @@ BOOL __stdcall my_parent_is_alive ();
 extern "C" int __stdcall sig_dispatch_pending (int force = FALSE);
 extern "C" void __stdcall set_process_mask (sigset_t newmask);
 extern "C" void __stdcall reset_signal_arrived ();
-int __stdcall sig_handle (int);
+int __stdcall sig_handle (int, bool);
 void __stdcall sig_clear (int);
 void __stdcall sig_set_pending (int);
 int __stdcall handle_sigsuspend (sigset_t);

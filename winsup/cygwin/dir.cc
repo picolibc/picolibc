@@ -1,6 +1,6 @@
 /* dir.cc: Posix directory-related routines
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -88,12 +88,16 @@ opendir (const char *name)
 						PC_SYM_FOLLOW | PC_FULL, NULL);
   if (!fh)
     res = NULL;
+  else if (pc.exists ())
+      res = fh->opendir (pc);
   else
     {
-      res = fh->opendir (pc);
-      if (!res)
-	delete fh;
+      set_errno (ENOENT);
+      res = NULL;
     }
+
+  if (!res && fh)
+    delete fh;
   return res;
 }
 
@@ -256,7 +260,7 @@ rmdir (const char *dir)
 	  /* RemoveDirectory on a samba drive doesn't return an error if the
 	     directory can't be removed because it's not empty. Checking for
 	     existence afterwards keeps us informed about success. */
-	  if (GetFileAttributes (real_dir) != (DWORD) -1)
+	  if (GetFileAttributes (real_dir) != INVALID_FILE_ATTRIBUTES)
 	    set_errno (ENOTEMPTY);
 	  else
 	    res = 0;

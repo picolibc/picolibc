@@ -1,6 +1,6 @@
 /* signal.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Steve Chamberlain of Cygnus Support, sac@cygnus.com
    Significant changes by Sergey Okhapkin <sos@prospect.com.ru>
@@ -13,6 +13,7 @@ details. */
 
 #include "winsup.h"
 #include <errno.h>
+#include <stdlib.h>
 #include "cygerrno.h"
 #include <sys/cygwin.h>
 #include "sync.h"
@@ -190,6 +191,7 @@ _raise (int sig)
 int
 _kill (pid_t pid, int sig)
 {
+  sigframe thisframe (mainthread);
   syscall_printf ("kill (%d, %d)", pid, sig);
   /* check that sig is in right range */
   if (sig < 0 || sig >= NSIG)
@@ -214,6 +216,7 @@ kill_pgrp (pid_t pid, int sig)
   int res = 0;
   int found = 0;
   int killself = 0;
+  sigframe thisframe (mainthread);
 
   sigproc_printf ("pid %d, signal %d", pid, sig);
 
@@ -255,6 +258,31 @@ extern "C" int
 killpg (pid_t pgrp, int sig)
 {
   return _kill (-pgrp, sig);
+}
+
+extern "C" void
+abort (void)
+{
+  sigframe thisframe (mainthread);
+  /* Flush all streams as per SUSv2.
+     From my reading of this document, this isn't strictly correct.
+     The streams are supposed to be flushed prior to exit.  However,
+     if there is I/O in any signal handler that will not necessarily
+     be flushed.
+     However this is the way FreeBSD does it, and it is much easier to
+     do things this way, so... */
+  if (_reent_clib ()->__cleanup)
+    _reent_clib ()->__cleanup (_reent_clib ());
+
+  /* Ensure that SIGABRT can be caught regardless of blockage. */
+  sigset_t sig_mask;
+  sigfillset (&sig_mask);
+  sigdelset (&sig_mask, SIGABRT);
+  set_process_mask (sig_mask);
+
+  _raise (SIGABRT);
+  (void) thisframe.call_signal_handler (); /* Call any signal handler */
+  do_exit (1);	/* signal handler didn't exit.  Goodbye. */
 }
 
 extern "C" int

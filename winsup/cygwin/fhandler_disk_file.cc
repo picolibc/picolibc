@@ -1,6 +1,6 @@
 /* fhandler_disk_file.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -382,7 +382,7 @@ fhandler_disk_file::open (path_conv *real_path, int flags, mode_t mode)
      which returns a valid handle when trying to open a file in a nonexistent
      directory. */
   if (real_path->has_buggy_open ()
-      && GetFileAttributes (win32_path_name) == (DWORD) -1)
+      && GetFileAttributes (win32_path_name) == INVALID_FILE_ATTRIBUTES)
     {
       debug_printf ("Buggy open detected.");
       close ();
@@ -804,7 +804,7 @@ fhandler_cygdrive::readdir (DIR *dir)
       set_errno (ENMFILE);
       return NULL;
     }
-  if (GetFileAttributes (pdrive) == (DWORD) -1)
+  if (GetFileAttributes (pdrive) == INVALID_FILE_ATTRIBUTES)
     {
       pdrive += DRVSZ;
       return readdir (dir);

@@ -1,6 +1,6 @@
 /* spawn.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -48,6 +48,7 @@ static suffix_info std_suffixes[] =
 };
 
 HANDLE hExeced;
+DWORD dwExeced;
 
 /* Add .exe to PROG if not already present and see if that exists.
    If not, return PROG (converted from posix to win32 rules if necessary).
@@ -56,7 +57,7 @@ HANDLE hExeced;
    Returns (possibly NULL) suffix */
 
 static const char *
-perhaps_suffix (const char *prog, path_conv &buf)
+perhaps_suffix (const char *prog, path_conv& buf)
 {
   char *ext;
 
@@ -760,6 +761,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 	 primarily for strace. */
       strace.execing = 1;
       hExeced = pi.hProcess;
+      dwExeced = pi.dwProcessId;
       strcpy (myself->progname, real_path);
       close_all_files ();
     }

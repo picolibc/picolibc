@@ -1,6 +1,6 @@
 /* winsup.h: main Cygwin header file.
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -195,7 +195,7 @@ void __stdcall totimeval (struct timeval *dst, FILETIME * src, int sub, int flag
 long __stdcall to_time_t (FILETIME * ptr);
 
 void __stdcall set_console_title (char *);
-void set_console_handler ();
+void early_stuff_init ();
 
 int __stdcall check_null_str (const char *name) __attribute__ ((regparm(1)));
 int __stdcall check_null_empty_str (const char *name) __attribute__ ((regparm(1)));

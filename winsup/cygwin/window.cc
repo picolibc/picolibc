@@ -18,6 +18,8 @@ details. */
 #include <limits.h>
 #include <wingdi.h>
 #include <winuser.h>
+#define USE_SYS_TYPES_FD_SET
+#include <winsock2.h>
 #include <unistd.h>
 #include "cygerrno.h"
 #include "perprocess.h"
@@ -61,7 +63,10 @@ WndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
       return 0;
     case WM_ASYNCIO:
-      raise (SIGIO);
+      if (WSAGETSELECTEVENT(lParam) == FD_OOB)
+        raise (SIGURG);
+      else
+	raise (SIGIO);
       return 0;
     default:
       return DefWindowProc (hwnd, uMsg, wParam, lParam);

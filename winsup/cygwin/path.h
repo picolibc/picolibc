@@ -1,6 +1,6 @@
 /* path.h: path data structures
 
-   Copyright 1996, 1997, 1998, 2000 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -86,7 +86,7 @@ class path_conv
   int issymlink () const {return path_flags & PATH_SYMLINK;}
   int issocket () const {return path_flags & PATH_SOCKET;}
   int iscygexec () const {return path_flags & PATH_CYGWIN_EXEC;}
-  bool exists () const {return fileattr != (DWORD) -1;}
+  bool exists () const {return fileattr != INVALID_FILE_ATTRIBUTES;}
   bool has_attribute (DWORD x) const {return exists () && (fileattr & x);}
   int isdir () const {return has_attribute (FILE_ATTRIBUTE_DIRECTORY);}
   executable_states exec_state ()
@@ -124,7 +124,7 @@ class path_conv
     check (src, opt | PC_NULLEMPTY, suffixes);
   }
 
-  path_conv (): path_flags (0), known_suffix (NULL), error (0), devn (0), unit (0), fileattr (0xffffffff) {path[0] = '\0';}
+  path_conv (): path_flags (0), known_suffix (NULL), error (0), devn (0), unit (0), fileattr (INVALID_FILE_ATTRIBUTES) {path[0] = '\0';}
 
   inline char *get_win32 () { return path; }
   operator char *() {return path; }

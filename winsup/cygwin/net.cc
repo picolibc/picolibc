@@ -541,7 +541,7 @@ cygwin_socket (int af, int type, int protocol)
     {
       debug_printf ("socket (%d, %d, %d)", af, type, protocol);
 
-      soc = socket (AF_INET, type, af == AF_UNIX ? 0 : protocol);
+      soc = socket (AF_INET, type, af == AF_LOCAL ? 0 : protocol);
 
       if (soc == INVALID_SOCKET)
 	{
@@ -578,7 +578,7 @@ static int get_inet_addr (const struct sockaddr *in, int inlen,
       *outlen = inlen;
       return 1;
     }
-  else if (in->sa_family == AF_UNIX)
+  else if (in->sa_family == AF_LOCAL)
     {
       int fd = _open (in->sa_data, O_RDONLY);
       if (fd == -1)
@@ -897,7 +897,7 @@ cygwin_connect (int fd,
 	    }
 	  set_winsock_errno ();
 	}
-      if (sock->get_addr_family () == AF_UNIX)
+      if (sock->get_addr_family () == AF_LOCAL)
 	{
 	  if (!res || in_progress)
 	    {
@@ -1215,7 +1215,7 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
 	  WSAGetLastError () == WSAEWOULDBLOCK)
 	in_progress = TRUE;
 
-      if (sock->get_addr_family () == AF_UNIX)
+      if (sock->get_addr_family () == AF_LOCAL)
 	{
 	  if ((SOCKET) res != (SOCKET) INVALID_SOCKET || in_progress)
 	    {
@@ -1255,6 +1255,8 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
       else
 	{
 	  fhandler_socket* res_fh = fdsock (res_fd, sock->get_name (), res);
+	  if (sock->get_addr_family () == AF_LOCAL)
+	    res_fh->set_sun_path (sock->get_sun_path ());
 	  res_fh->set_addr_family (sock->get_addr_family ());
 	  res = res_fd;
 	}
@@ -1276,7 +1278,7 @@ cygwin_bind (int fd, const struct sockaddr *my_addr, int addrlen)
   fhandler_socket *sock = get (fd);
   if (sock)
     {
-      if (my_addr->sa_family == AF_UNIX)
+      if (my_addr->sa_family == AF_LOCAL)
 	{
 #define un_addr ((struct sockaddr_un *) my_addr)
 	  struct sockaddr_in sin;
@@ -1293,19 +1295,19 @@ cygwin_bind (int fd, const struct sockaddr *my_addr, int addrlen)
 	  sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
 	  if (bind (sock->get_socket (), (sockaddr *) &sin, len))
 	    {
-	      syscall_printf ("AF_UNIX: bind failed %d", get_errno ());
+	      syscall_printf ("AF_LOCAL: bind failed %d", get_errno ());
 	      set_winsock_errno ();
 	      goto out;
 	    }
 	  if (getsockname (sock->get_socket (), (sockaddr *) &sin, &len))
 	    {
-	      syscall_printf ("AF_UNIX: getsockname failed %d", get_errno ());
+	      syscall_printf ("AF_LOCAL: getsockname failed %d", get_errno ());
 	      set_winsock_errno ();
 	      goto out;
 	    }
 
 	  sin.sin_port = ntohs (sin.sin_port);
-	  debug_printf ("AF_UNIX: socket bound to port %u", sin.sin_port);
+	  debug_printf ("AF_LOCAL: socket bound to port %u", sin.sin_port);
 
 	  /* bind must fail if file system socket object already exists
 	     so _open () is called with O_EXCL flag. */
@@ -1367,11 +1369,11 @@ cygwin_getsockname (int fd, struct sockaddr *addr, int *namelen)
   fhandler_socket *sock = get (fd);
   if (sock)
     {
-      if (sock->get_addr_family () == AF_UNIX)
+      if (sock->get_addr_family () == AF_LOCAL)
 	{
 	  struct sockaddr_un *sun = (struct sockaddr_un *) addr;
 	  memset (sun, 0, *namelen);
-	  sun->sun_family = AF_UNIX;
+	  sun->sun_family = AF_LOCAL;
 	  /* According to SUSv2 "If the actual length of the address is greater
 	     than the length of the supplied sockaddr structure, the stored
 	     address will be truncated."  We play it save here so that the
@@ -2322,17 +2324,34 @@ done:
 /* socketpair: standards? */
 /* Win32 supports AF_INET only, so ignore domain and protocol arguments */
 extern "C" int
-socketpair (int, int type, int, int *sb)
+socketpair (int family, int type, int protocol, int *sb)
 {
   int res = -1;
   SOCKET insock, outsock, newsock;
-  struct sockaddr_in sock_in;
-  int len = sizeof (sock_in);
+  struct sockaddr_in sock_in, sock_out;
+  int len;
+  cygheap_fdnew sb0;
 
   if (__check_null_invalid_struct_errno (sb, 2 * sizeof(int)))
     return -1;
 
-  cygheap_fdnew sb0;
+  if (family != AF_LOCAL && family != AF_INET)
+    {
+      set_errno (EAFNOSUPPORT);
+      goto done;
+    }
+  if (type != SOCK_STREAM && type != SOCK_DGRAM)
+    {
+      set_errno (EPROTOTYPE);
+      goto done;
+    }
+  if ((family == AF_LOCAL && protocol != PF_UNSPEC && protocol != PF_LOCAL)
+      || (family == AF_INET && protocol != PF_UNSPEC && protocol != PF_INET))
+    {
+      set_errno (EPROTONOSUPPORT);
+      goto done;
+    }
+
   if (sb0 < 0)
     goto done;
   else
@@ -2344,7 +2363,8 @@ socketpair (int, int type, int, int *sb)
 
       sb[1] = sb1;
     }
-  /* create a listening socket */
+
+  /* create the first socket */
   newsock = socket (AF_INET, type, 0);
   if (newsock == INVALID_SOCKET)
     {
@@ -2357,7 +2377,6 @@ socketpair (int, int type, int, int *sb)
   sock_in.sin_family = AF_INET;
   sock_in.sin_port = 0;
   sock_in.sin_addr.s_addr = INADDR_ANY;
-
   if (bind (newsock, (struct sockaddr *) &sock_in, sizeof (sock_in)) < 0)
     {
       debug_printf ("bind failed");
@@ -2365,7 +2384,7 @@ socketpair (int, int type, int, int *sb)
       closesocket (newsock);
       goto done;
     }
-
+  len = sizeof (sock_in);
   if (getsockname (newsock, (struct sockaddr *) &sock_in, &len) < 0)
     {
       debug_printf ("getsockname error");
@@ -2374,7 +2393,9 @@ socketpair (int, int type, int, int *sb)
       goto done;
     }
 
-  listen (newsock, 2);
+  /* For stream sockets, create a listener */
+  if (type == SOCK_STREAM)
+    listen (newsock, 2);
 
   /* create a connecting socket */
   outsock = socket (AF_INET, type, 0);
@@ -2386,9 +2407,37 @@ socketpair (int, int type, int, int *sb)
       goto done;
     }
 
-  sock_in.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+  /* For datagram sockets, bind the 2nd socket to an unused address, too */
+  if (type == SOCK_DGRAM)
+    {
+      sock_out.sin_family = AF_INET;
+      sock_out.sin_port = 0;
+      sock_out.sin_addr.s_addr = INADDR_ANY;
+      if (bind (outsock, (struct sockaddr *) &sock_out, sizeof (sock_out)) < 0)
+	{
+	  debug_printf ("bind failed");
+	  set_winsock_errno ();
+	  closesocket (newsock);
+	  closesocket (outsock);
+	  goto done;
+	}
+      len = sizeof (sock_out);
+      if (getsockname (outsock, (struct sockaddr *) &sock_out, &len) < 0)
+	{
+	  debug_printf ("getsockname error");
+	  set_winsock_errno ();
+	  closesocket (newsock);
+	  closesocket (outsock);
+	  goto done;
+	}
+    }
 
-  /* Do a connect and accept the connection */
+  /* Force IP address to loopback */
+  sock_in.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+  if (type == SOCK_DGRAM)
+    sock_out.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+
+  /* Do a connect */
   if (connect (outsock, (struct sockaddr *) &sock_in,
 					   sizeof (sock_in)) < 0)
     {
@@ -2399,22 +2448,60 @@ socketpair (int, int type, int, int *sb)
       goto done;
     }
 
-  insock = accept (newsock, (struct sockaddr *) &sock_in, &len);
-  if (insock == INVALID_SOCKET)
+  if (type == SOCK_STREAM)
     {
-      debug_printf ("accept error");
-      set_winsock_errno ();
+      /* For stream sockets, accept the connection and close the listener */
+      len = sizeof (sock_in);
+      insock = accept (newsock, (struct sockaddr *) &sock_in, &len);
+      if (insock == INVALID_SOCKET)
+	{
+	  debug_printf ("accept error");
+	  set_winsock_errno ();
+	  closesocket (newsock);
+	  closesocket (outsock);
+	  goto done;
+	}
       closesocket (newsock);
-      closesocket (outsock);
-      goto done;
+    }
+  else
+    {
+      /* For datagram sockets, connect the 2nd socket */
+      if (connect (newsock, (struct sockaddr *) &sock_out,
+					       sizeof (sock_out)) < 0)
+	{
+	  debug_printf ("connect error");
+	  set_winsock_errno ();
+	  closesocket (newsock);
+	  closesocket (outsock);
+	  goto done;
+	}
+      insock = newsock;
     }
 
-  closesocket (newsock);
   res = 0;
 
-  fdsock (sb[0], "/dev/tcp", insock);
+  if (family == AF_LOCAL)
+    {
+      fhandler_socket *fh;
 
-  fdsock (sb[1], "/dev/tcp", outsock);
+      fh = fdsock (sb[0],
+		   type == SOCK_STREAM ? "/dev/streamsocket" : "/dev/dgsocket",
+		   insock);
+      fh->set_sun_path ("");
+      fh->set_addr_family (AF_LOCAL);
+      fh = fdsock (sb[1],
+		   type == SOCK_STREAM ? "/dev/streamsocket" : "/dev/dgsocket",
+		   outsock);
+      fh->set_sun_path ("");
+      fh->set_addr_family (AF_LOCAL);
+    }
+  else
+    {
+      fdsock (sb[0], type == SOCK_STREAM ? "/dev/tcp" : "/dev/udp",
+	      insock)->set_addr_family (AF_INET);
+      fdsock (sb[1], type == SOCK_STREAM ? "/dev/tcp" : "/dev/udp",
+	      outsock)->set_addr_family (AF_INET);
+    }
 
 done:
   syscall_printf ("%d = socketpair (...)", res);

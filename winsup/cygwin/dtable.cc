@@ -1,6 +1,6 @@
 /* dtable.cc: file descriptor support.
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -91,8 +91,8 @@ dtable::extend (int howmuch)
 }
 
 /* Initialize the file descriptor/handle mapping table.
-   We only initialize the parent table here.  The child table is
-   initialized at each fork () call.  */
+   This function should only be called when a cygwin function is invoked
+   by a non-cygwin function, i.e., it should only happen very rarely. */
 
 void
 stdio_init (void)
@@ -197,7 +197,10 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
   first_fd_for_open = 0;
 
   if (!handle || handle == INVALID_HANDLE_VALUE)
-    return;
+    {
+      fds[fd] = NULL;
+      return;
+    }
 
   if (__fmode)
     bin = __fmode;
