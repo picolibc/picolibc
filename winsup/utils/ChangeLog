@@ -1,3 +1,9 @@
+Mon Apr 10 22:56:07 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* cygpath.cc (main): Add -f option for processing a group of paths from
+	a file.
+	(doit): New function.
+
 Sat Mar 18 22:52:37 2000  Christopher Faylor <cgf@cygnus.com>
 
 	Patch suggested by Mumit Khan  <khan@xraylith.wisc.edu>:
