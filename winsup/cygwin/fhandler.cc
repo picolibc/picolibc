@@ -370,6 +370,17 @@ fhandler_base::open (int flags, mode_t mode)
   if (get_device () == FH_SERIAL)
     file_attributes |= FILE_FLAG_OVERLAPPED;
 
+  /* CreateFile() with dwDesiredAccess == 0 when called on remote
+     share returns some handle, even if file doesn't exist. This code
+     works around this bug. */
+  if (get_query_open () &&
+      isremote () &&
+      creation_distribution == OPEN_EXISTING &&
+      GetFileAttributes (get_win32_name ()) == (DWORD) -1)
+    {
+      set_errno (ENOENT);
+      goto done;
+    }
   x = CreateFileA (get_win32_name (), access, shared,
 		   &sec_none, creation_distribution,
 		   file_attributes,
