@@ -1,3 +1,7 @@
+Sat Oct 14 23:42:58 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* ps.cc (main): Accomodate new PID_ constant.
+
 Thu Oct 12 02:19:12 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* strace.cc (proc_child): Handle exceptions correctly.

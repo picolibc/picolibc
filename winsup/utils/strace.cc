@@ -536,7 +536,14 @@ proc_child (unsigned mask, FILE *ofile)
 	  break;
 	case EXCEPTION_DEBUG_EVENT:
 	  if (ev.u.Exception.ExceptionRecord.ExceptionCode != STATUS_BREAKPOINT)
-	    status = DBG_EXCEPTION_NOT_HANDLED;
+	    {
+	      status = DBG_EXCEPTION_NOT_HANDLED;
+#if 0
+	      fprintf (stderr, "exception %p at %p\n",
+		       ev.u.Exception.ExceptionRecord.ExceptionCode,
+		       ev.u.Exception.ExceptionRecord.ExceptionAddress);
+#endif
+	    }
 	  break;
 	}
       if (!ContinueDebugEvent (ev.dwProcessId, ev.dwThreadId, status))

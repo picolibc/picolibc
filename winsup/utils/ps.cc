@@ -246,8 +246,6 @@ main (int argc, char *argv[])
        (p = (external_pinfo *) cygwin_internal (query, pid | CW_NEXTPID));
        pid = p->pid)
     {
-      if (p->process_state == PID_NOT_IN_USE)
-        continue;
       if (!aflag && p->uid != uid)
         continue;
       char status = ' ';
@@ -259,7 +257,7 @@ main (int argc, char *argv[])
         status = 'O';
 
       char pname[MAX_PATH];
-      if (p->process_state & PID_ZOMBIE)
+      if (p->process_state & (PID_ZOMBIE | PID_EXITED))
         strcpy (pname, "<defunct>");
       else if (p->ppid)
 	{
