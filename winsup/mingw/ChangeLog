@@ -1,3 +1,7 @@
+2002-09-16  Ranjit Matthew  <rmathew@hotmail.com>
+
+	* include/stdio.h: Correct comment about directory separator.
+
 2002-09-12  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/sys/time.h (timeval): Add struct definition and

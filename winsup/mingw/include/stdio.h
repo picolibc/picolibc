@@ -5,7 +5,7 @@
  * output.
  *
  * NOTE: The file manipulation functions provided by Microsoft seem to
- * work with either slash (/) or backslash (\) as the path separator.
+ * work with either slash (/) or backslash (\) as the directory separator.
  *
  * This file is part of the Mingw32 package.
  *
