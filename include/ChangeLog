@@ -1,3 +1,7 @@
+2004-03-30  Zack Weinberg  <zack@codesourcery.com>
+
+	* hashtab.h, splay-tree.h: Use new shorter form of GTY markers.
+
 2004-03-25  Stan Shebs  <shebs@apple.com>
 
 	* mpw/: Remove subdirectory and everything in it.
