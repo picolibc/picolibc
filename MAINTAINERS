@@ -21,8 +21,7 @@ cgen/; cgen parts of opcodes/, sim/ & include/
 	May need separate opcodes/ or sim/ approval for
 		commits of regenerated files there.
 
-config.guess; config.sub; dejagnu/config.guess; dejagnu/config.sub;
-readline/support/config.sub; readline/support/config.guess
+config.guess; config.sub; readline/support/config.{sub,guess}
 	config: http://savannah.gnu.org/projects/config
 	Patches to config-patches@gnu.org.
 	Changes need to be done in tandem with the official CONFIG
@@ -36,10 +35,6 @@ readline/support/config.sub; readline/support/config.guess
 dejagnu/
 	dejagnu: http://www.gnu.org/software/dejagnu/
 	Patches to bug-dejagnu@gnu.org
-	Avoid making changes to the local repository; please send
-	patches upstream.  Important and approved patches can be
-	checked into the src repository, otherwise patches will be
-	imported from the next release.
 
 gdb/; mmalloc/; readline/; sim/; GDB's part of include/ & dejagnu/
 	gdb: http://sources.redhat.com/gdb/
@@ -80,7 +75,7 @@ newlib/; libgloss/
 	http://sources.redhat.com/newlib/
 	Patches to newlib@sources.redhat.com.
 
-sid/; SID's part of cgen/ & dejagnu/
+sid/; SID's part of cgen/
 	sid: http://sources.redhat.com/sid/
 	Patches to sid@sources.redhat.com
 
@@ -100,9 +95,8 @@ winsup/
 	General discussion cygwin@sources.redhat.com.
 	See also winsup/MAINTAINERS.
 
-expect/; config-ml.in; setup.com; missing; makefile.vms; utils/;
-config/; config.if; makefile.vms; missing; ylwrap; mkdep; etc/;
-install-sh; intl/
+config-ml.in; setup.com; missing; makefile.vms; utils/; config/;
+config.if; makefile.vms; missing; ylwrap; mkdep; etc/; install-sh; intl/
 	Ask DJ Delorie <dj@redhat.com> after reading the libiberty entry.
 
 modules file
