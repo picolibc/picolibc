@@ -506,8 +506,19 @@ pthread_cond::TimedWait (DWORD dwMilliseconds)
       rv = WaitForSingleObject (win32_obj_id, dwMilliseconds);
     }
   else
+    {
+      LeaveCriticalSection (&mutex->criticalsection);
+      rv = WaitForSingleObject (win32_obj_id, dwMilliseconds);
+#if 0
+    /* we need to use native win32 mutex's here, because the cygwin ones now use
+     * critical sections, which are faster, but introduce a race _here_. Until then
+     * The NT variant of the code is redundant.
+     */
+	     
     rv = SignalObjectAndWait (mutex->win32_obj_id, win32_obj_id, dwMilliseconds,
 			 false);
+#endif
+    }
   switch (rv)
     {
     case WAIT_FAILED:
@@ -532,8 +543,13 @@ pthread_cond::fixup_after_fork ()
   this->win32_obj_id =::CreateEvent (&sec_none_nih, false, false, NULL);
   if (!win32_obj_id)
     api_fatal("failed to create new win32 mutex\n");
+#if DETECT_BAD_APPS
   if (waiting)
     api_fatal("Forked() while a condition variable has waiting threads.\nReport to cygwin@cygwin.com\n");
+#else
+  waiting = 0;
+  mutex = NULL;
+#endif
 }
 
 
@@ -604,11 +620,14 @@ pthread_mutex::pthread_mutex (pthread_mutexattr *attr):verifyable_object (PTHREA
       magic = 0;
       return;
     }
-
-  this->win32_obj_id =::CreateMutex (&sec_none_nih, false, NULL);
-
-  if (!win32_obj_id)
-    magic = 0;
+  if (iswinnt)
+    InitializeCriticalSection (&criticalsection);
+  else
+    {
+      this->win32_obj_id =::CreateMutex (&sec_none_nih, false, NULL);
+      if (!win32_obj_id)
+        magic = 0;
+    }
   condwaits = 0;
   pshared = PTHREAD_PROCESS_PRIVATE;
   /* threadsafe addition is easy */
@@ -617,18 +636,25 @@ pthread_mutex::pthread_mutex (pthread_mutexattr *attr):verifyable_object (PTHREA
 
 pthread_mutex::~pthread_mutex ()
 {
-  if (win32_obj_id)
-    CloseHandle (win32_obj_id);
-  win32_obj_id = NULL;
+  if (iswinnt)
+    DeleteCriticalSection (&criticalsection);
+  else
+    {
+      if (win32_obj_id)
+        CloseHandle (win32_obj_id);
+      win32_obj_id = NULL;
+    }
   /* I'm not 100% sure the next bit is threadsafe. I think it is... */
   if (MT_INTERFACE->mutexs == this)
-    InterlockedExchangePointer (&MT_INTERFACE->mutexs, this->next);
+    /* TODO: printf an error if the return value != this */
+    InterlockedExchangePointer (&MT_INTERFACE->mutexs, next);
   else
     {
       pthread_mutex *tempmutex = MT_INTERFACE->mutexs;
       while (tempmutex->next && tempmutex->next != this)
 	tempmutex = tempmutex->next;
       /* but there may be a race between the loop above and this statement */
+      /* TODO: printf an error if the return value != this */
       InterlockedExchangePointer (&tempmutex->next, this->next);
     }
 }
@@ -636,19 +662,33 @@ pthread_mutex::~pthread_mutex ()
 int
 pthread_mutex::Lock ()
 {
+  if (iswinnt)
+    {
+      EnterCriticalSection (&criticalsection);
+      return 0;
+    }
+  /* FIXME: Return 0 on success */
   return WaitForSingleObject (win32_obj_id, INFINITE);
 }
 
+/* returns non-zero on failure */
 int
 pthread_mutex::TryLock ()
 {
-  return WaitForSingleObject (win32_obj_id, 0);
+  if (iswinnt)
+    return (!TryEnterCriticalSection (&criticalsection));
+  return (WaitForSingleObject (win32_obj_id, 0) == WAIT_TIMEOUT);
 }
 
 int
 pthread_mutex::UnLock ()
 {
-  return ReleaseMutex (win32_obj_id);
+  if (iswinnt)
+    {
+      LeaveCriticalSection (&criticalsection);
+      return 0;
+    }
+  return (!ReleaseMutex (win32_obj_id));
 }
 
 void
@@ -658,12 +698,20 @@ pthread_mutex::fixup_after_fork ()
   if (pshared != PTHREAD_PROCESS_PRIVATE)
     api_fatal("pthread_mutex::fixup_after_fork () doesn'tunderstand PROCESS_SHARED mutex's\n");
   /* FIXME: duplicate code here and in the constructor. */
-  this->win32_obj_id =::CreateMutex (&sec_none_nih, false, NULL);
-
-  if (!win32_obj_id)
-    api_fatal("pthread_mutex::fixup_after_fork() failed to create new win32 mutex\n");
+  if (iswinnt)
+    InitializeCriticalSection(&criticalsection);
+  else
+    {
+      win32_obj_id =::CreateMutex (&sec_none_nih, false, NULL);
+      if (!win32_obj_id)
+        api_fatal("pthread_mutex::fixup_after_fork() failed to create new win32 mutex\n");
+    }
+#if DETECT_BAD_APPS
   if (condwaits)
     api_fatal("Forked() while a mutex has condition variables waiting on it.\nReport to cygwin@cygwin.com\n");
+#else
+  condwaits = 0;
+#endif
 }
 
 pthread_mutexattr::pthread_mutexattr ():verifyable_object (PTHREAD_MUTEXATTR_MAGIC),
@@ -1908,7 +1956,7 @@ __pthread_mutex_trylock (pthread_mutex_t *mutex)
     __pthread_mutex_init (mutex, NULL);
   if (!verifyable_object_isvalid (*themutex, PTHREAD_MUTEX_MAGIC))
     return EINVAL;
-  if ((*themutex)->TryLock () == WAIT_TIMEOUT)
+  if ((*themutex)->TryLock ())
     return EBUSY;
   return 0;
 }
@@ -1927,7 +1975,7 @@ __pthread_mutex_unlock (pthread_mutex_t *mutex)
 int
 __pthread_mutex_destroy (pthread_mutex_t *mutex)
 {
-  if (*mutex == PTHREAD_MUTEX_INITIALIZER)
+  if (check_valid_pointer (mutex) && (*mutex == PTHREAD_MUTEX_INITIALIZER))
     return 0;
   if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
     return EINVAL;

@@ -478,6 +478,7 @@ LoadDLLfuncEx (CancelIo, 4, kernel32, 1)
 LoadDLLfuncEx (Process32First, 8, kernel32, 1)
 LoadDLLfuncEx (Process32Next, 8, kernel32, 1)
 LoadDLLfuncEx (CreateToolhelp32Snapshot, 8, kernel32, 1)
+LoadDLLfunc (TryEnterCriticalSection, 4, kernel32)
 
 LoadDLLfuncEx (waveOutGetNumDevs, 0, winmm, 1)
 LoadDLLfuncEx (waveOutOpen, 24, winmm, 1)

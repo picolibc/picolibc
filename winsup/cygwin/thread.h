@@ -267,6 +267,7 @@ public:
 class pthread_mutex:public verifyable_object
 {
 public:
+  CRITICAL_SECTION criticalsection;
   HANDLE win32_obj_id;
   LONG condwaits;
   int pshared;

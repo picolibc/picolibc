@@ -1,3 +1,18 @@
+Wed Sep 12 13:03:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* autoload.cc (LoadDLLfuncEx): Auto load TryEnterCriticalSection - its an NT only call.
+	* thread.cc (pthread_cond::TimedWait): Use critical sections for NT.
+	(pthread_cond::fixup_after_fork): Don't detect bad apps.
+	(pthread_mutex::pthread_mutex): Use critical sections for NT.
+	(pthread_mutex::~pthread_mutex): Ditto.
+	(pthread_mutex::Lock): Ditto.
+	(pthread_mutex::TryLock): Ditto.
+	(pthread_mutex::UnLock): Ditto.
+	(pthread_mutex::fixup_after_fork): Ditto. Also do not detect bad apps.
+	(__pthread_mutex_trylock): Move WIN32 specific test into the class method.
+	(__pthread_mutex_destroy): Prevent dereferencing passed pointer without valid address.
+	* thread.h (pthread_mutex): Use critical sections for NT.
+
 Tue Sep 11 21:55:37 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* sigproc.h (sigframe::unregister): Return true/false whether this
