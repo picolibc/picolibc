@@ -10,8 +10,8 @@ The following packages are available with the latest net release:
 ash, bash, binutils, bison, byacc, bzip2, clear, common, cygwin,
 dejagnu, diff, expect, fileutils, findutils, flex, gawk, gcc, gdb,
 gperf, grep, groff, gzip, inetutils, less, libpng, login, m4, make, man,
-patch, sed, shellutils, tar, tcltk, termcap, texinfo, textutils, time,
-zlib
+opengl, patch, sed, shellutils, tar, tcltk, termcap, texinfo, textutils,
+time, zlib
 
 Full source code is available for all packages and tools.
 
