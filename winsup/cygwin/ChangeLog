@@ -1,3 +1,9 @@
+Tue May 16 23:39:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	Patch suggested by John Rowley <wjr@bgs.ac.uk>
+	* fhandler_tape.cc (fhandler_dev_tape::ioctl): Check
+        for filemark feature on MTWEOF operation.
+
 Tue May 16 11:49:13 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* include/cygwin/in.h (AF_INET6): Use correct in6_addr struct.

@@ -263,7 +263,12 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 	    ret = tape_set_pos (TAPE_SPACE_RELATIVE_BLOCKS, -op->mt_count);
 	    break;
 	  case MTWEOF:
-	    ret = tape_write_marks (TAPE_FILEMARKS, op->mt_count);
+	    if (tape_get_feature (TAPE_DRIVE_WRITE_FILEMARKS))
+	      ret = tape_write_marks (TAPE_FILEMARKS, op->mt_count);
+	    else if (tape_get_feature (TAPE_DRIVE_WRITE_LONG_FMKS))
+	      ret = tape_write_marks (TAPE_LONG_FILEMARKS, op->mt_count);
+	    else
+	      ret = tape_write_marks (TAPE_SHORT_FILEMARKS, op->mt_count);
 	    break;
 	  case MTREW:
 	    ret = tape_set_pos (TAPE_REWIND, 0);
