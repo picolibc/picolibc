@@ -30,5 +30,5 @@ cygwin_crt0 (MainFunc f)
       memset (u, 0, sizeof (u));
       (void) _cygwin_crt0_common (f, u);
     }
-  dll_crt0__FP11per_process (u); 	/* Jump into the dll, never to return */
+  dll_crt0__FP11per_process (u);	/* Jump into the dll, never to return */
 }

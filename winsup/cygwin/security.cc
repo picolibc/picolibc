@@ -970,7 +970,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
     other_allow |= FILE_GENERIC_EXECUTE;
   if (! (attribute & S_ISVTX))
     other_allow |= FILE_DELETE_CHILD;
-  
+
   /* Construct deny attributes for owner and group. */
   DWORD owner_deny = 0;
   if (is_grp_member (uid, gid))

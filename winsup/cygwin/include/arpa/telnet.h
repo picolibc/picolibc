@@ -87,8 +87,8 @@ extern char *telcmds[];
 #define	TELOPT_STATUS	5	/* give status */
 #define	TELOPT_TM	6	/* timing mark */
 #define	TELOPT_RCTE	7	/* remote controlled transmission and echo */
-#define TELOPT_NAOL 	8	/* negotiate about output line width */
-#define TELOPT_NAOP 	9	/* negotiate about output page size */
+#define TELOPT_NAOL	8	/* negotiate about output line width */
+#define TELOPT_NAOP	9	/* negotiate about output page size */
 #define TELOPT_NAOCRD	10	/* negotiate about CR disposition */
 #define TELOPT_NAOHTS	11	/* negotiate about horizontal tabstops */
 #define TELOPT_NAOHTD	12	/* negotiate about horizontal tab disposition */
@@ -120,7 +120,7 @@ extern char *telcmds[];
 #define	TELOPT_ENCRYPT	38	/* Encryption option */
 #define TELOPT_NEW_ENVIRON 39	/* New - Environment variables */
 #define	TELOPT_EXOPL	255	/* extended-options-list */
-#define TELOPT_ENVIRON TELOPT_OLD_ENVIRON 
+#define TELOPT_ENVIRON TELOPT_OLD_ENVIRON
 
 #define	NTELOPTS	(1+TELOPT_NEW_ENVIRON)
 #ifdef TELOPTS

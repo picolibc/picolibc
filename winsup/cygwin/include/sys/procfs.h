@@ -1,7 +1,4 @@
-/* 
- * sys/procfs.h header file for Cygwin.
- *
- */
+/* sys/procfs.h header file for Cygwin.  */
 
 #ifndef _SYS_PROCFS_H
 #define _SYS_PROCFS_H

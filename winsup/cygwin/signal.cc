@@ -57,7 +57,7 @@ signal (int sig, _sig_func_ptr func)
   myself->getsig (sig).sa_handler = func;
   myself->getsig (sig).sa_mask = 0;
   set_sigcatchers (prev, func);
-  
+
   syscall_printf ("%p = signal (%d, %p)", prev, sig, func);
   return prev;
 }

@@ -15,7 +15,7 @@ details. */
 
 #ifdef __cplusplus
 #define CDECL_BEGIN extern "C" {
-#define CDECL_END }			      
+#define CDECL_END }
 #else
 #define CDECL_BEGIN
 #define CDECL_END
@@ -27,7 +27,7 @@ CDECL_BEGIN								      \
   int WINAPI Entry (HINSTANCE h, DWORD reason, void *ptr);	              \
   typedef int (*mainfunc) (int, char **, char **);			      \
   extern int cygwin_attach_dll (HMODULE, mainfunc);			      \
-  extern void cygwin_detach_dll (DWORD);	               		      \
+  extern void cygwin_detach_dll (DWORD);				      \
 CDECL_END								      \
 									      \
 static HINSTANCE storedHandle;						      \
@@ -53,7 +53,7 @@ int WINAPI _cygwin_dll_entry (HINSTANCE h, DWORD reason, void *ptr)	      \
       storedHandle = h;							      \
       storedReason = reason;						      \
       storedPtr = ptr;							      \
-      dll_index = cygwin_attach_dll (h, &__dllMain);	      		      \
+      dll_index = cygwin_attach_dll (h, &__dllMain);			      \
       if (dll_index == (DWORD) -1)					      \
 	ret = 0;							      \
     }									      \
@@ -64,12 +64,12 @@ int WINAPI _cygwin_dll_entry (HINSTANCE h, DWORD reason, void *ptr)	      \
       ret = Entry (h, reason, ptr);					      \
       if (ret)								      \
       {									      \
-	cygwin_detach_dll (dll_index);				      	      \
+	cygwin_detach_dll (dll_index);					      \
 	dll_index = (DWORD) -1;						      \
       }									      \
     }									      \
     break;								      \
-    									      \
+									      \
     case DLL_THREAD_ATTACH:						      \
     {									      \
       ret = Entry (h, reason, ptr);					      \

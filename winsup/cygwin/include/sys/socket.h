@@ -18,7 +18,7 @@ extern "C"
   int getsockname (int, struct sockaddr *__addr, int *);
   int listen (int, int __n);
   int recv (int, void *__buff, int __len, unsigned int __flags);
-  int recvfrom (int, char *__buff, int __len, int __flags, 
+  int recvfrom (int, char *__buff, int __len, int __flags,
 			 struct sockaddr *__from, int *__fromlen);
   int send (int, const void *__buff, int __len, unsigned int __flags);
   int sendto (int, const void *, int, unsigned int, const struct sockaddr *, int);

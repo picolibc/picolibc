@@ -53,7 +53,7 @@ print_prof (struct profinfo *p)
 }
 #endif
 
-/* Everytime we wake up use the main thread pc to hash into the cell in the 
+/* Everytime we wake up use the main thread pc to hash into the cell in the
    profile buffer ARG. */
 
 static DWORD CALLBACK
@@ -125,7 +125,7 @@ profile_on (struct profinfo *p)
  *
  * profiling goes into the SAMPLES buffer of size SIZE (which is treated
  * as an array of u_shorts of size size/2)
- * 
+ *
  * each bin represents a range of pc addresses from OFFSET.  The number
  * of pc addresses in a bin depends on SCALE.  (A scale of 65536 maps
  * each bin to two addresses, A scale of 32768 maps each bin to 4 addresses,
@@ -160,9 +160,9 @@ profile_ctl (struct profinfo * p, char *samples, size_t size,
   return 0;
 }
 
-/* Equivalent to unix profil() 
-   Every SLEEPTIME interval, the user's program counter (PC) is examined: 
-   offset is subtracted and the result is multiplied by scale.  
+/* Equivalent to unix profil()
+   Every SLEEPTIME interval, the user's program counter (PC) is examined:
+   offset is subtracted and the result is multiplied by scale.
    The word pointed to by this address is incremented.  Buf is unused. */
 
 int

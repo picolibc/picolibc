@@ -806,7 +806,7 @@ public:
 
   void dump ();
 } ;
- 
+
 class fhandler_dev_clipboard: public fhandler_base
 {
 public:

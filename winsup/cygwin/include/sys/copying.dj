@@ -1,5 +1,5 @@
 This is the file "copying.dj".  It does not apply to any sources
-copyrighted by UCB Berkeley or the Free Software Foundation. 
+copyrighted by UCB Berkeley or the Free Software Foundation.
 
    Copyright Information for sources and executables that are marked
    Copyright (C) DJ Delorie
@@ -14,18 +14,18 @@ GNU General Public Licence, with the following exceptions:
 
 * Any existing copyright or authorship information in any given source
 file must remain intact.  If you modify a source file, a notice to that
-effect must be added to the authorship information in the source file. 
+effect must be added to the authorship information in the source file.
 
 * binaries provided in djgpp may be distributed without sources ONLY if
 the recipient is given sufficient information to obtain a copy of djgpp
 themselves.  This primarily applies to go32.exe, emu387, stub.exe, and
-the graphics drivers. 
+the graphics drivers.
 
 * modified versions of the binaries provided in djgpp must be
-distributed under the terms of the GPL. 
+distributed under the terms of the GPL.
 
 * objects and libraries linked into an application may be distributed
-without sources. 
+without sources.
 
 -----
 

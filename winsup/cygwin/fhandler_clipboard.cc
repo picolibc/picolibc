@@ -48,7 +48,7 @@ fhandler_dev_clipboard::read (void *ptr, size_t len)
   HGLOBAL hglb;
   LPSTR lpstr;
   int ret;
- 
+
   if (!clipboard_eof)
     {
       OpenClipboard(0);

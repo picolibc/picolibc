@@ -24,7 +24,7 @@ extern "C" {
  * remainder may be interface specific.
  */
 
-struct ifreq 
+struct ifreq
 {
 #define IFNAMSIZ        16
         union

@@ -16,17 +16,17 @@ struct sockaddr {
 #include <sys/types.h>
 
 struct linger {
-  unsigned short 			l_onoff;	/* Linger active		*/
+  unsigned short			l_onoff;	/* Linger active		*/
  unsigned short			l_linger;	/* How long to linger for	*/
 };
 
-struct msghdr 
+struct msghdr
 {
 	void	*	msg_name;	/* Socket name			*/
 	int		msg_namelen;	/* Length of name		*/
 	struct iovec *	msg_iov;	/* Data blocks			*/
-	int 		msg_iovlen;	/* Number of blocks		*/
-	void 	*	msg_accrights;	/* Per protocol magic (eg BSD file descriptor passing) */
+	int		msg_iovlen;	/* Number of blocks		*/
+	void	*	msg_accrights;	/* Per protocol magic (eg BSD file descriptor passing) */
 	int		msg_accrightslen;	/* Length of rights list */
 };
 
@@ -129,7 +129,7 @@ struct msghdr
 #define IP_TTL              7
 #define IP_TOS              8
 #define IP_DONTFRAGMENT     9
- 
+
 /* IPX options */
 #define IPX_TYPE	1
 

@@ -42,17 +42,17 @@
 #define SO_OOBINLINE    0x0100          /* leave received OOB data in line */
 #define SO_DONTLINGER   (u_int)(~SO_LINGER)
 
-/*                                                                        
- * Additional options.                                                    
- */                                                                       
-#define SO_SNDBUF       0x1001          /* send buffer size */            
-#define SO_RCVBUF       0x1002          /* receive buffer size */         
-#define SO_SNDLOWAT     0x1003          /* send low-water mark */         
-#define SO_RCVLOWAT     0x1004          /* receive low-water mark */      
-#define SO_SNDTIMEO     0x1005          /* send timeout */                
-#define SO_RCVTIMEO     0x1006          /* receive timeout */             
-#define SO_ERROR        0x1007          /* get error status and clear */  
-#define SO_TYPE         0x1008          /* get socket type */             
+/*
+ * Additional options.
+ */
+#define SO_SNDBUF       0x1001          /* send buffer size */
+#define SO_RCVBUF       0x1002          /* receive buffer size */
+#define SO_SNDLOWAT     0x1003          /* send low-water mark */
+#define SO_RCVLOWAT     0x1004          /* receive low-water mark */
+#define SO_SNDTIMEO     0x1005          /* send timeout */
+#define SO_RCVTIMEO     0x1006          /* receive timeout */
+#define SO_ERROR        0x1007          /* get error status and clear */
+#define SO_TYPE         0x1008          /* get socket type */
 
 #endif /* _ASM_SOCKET_H */
 

@@ -10,7 +10,7 @@ details. */
 
 #include <signal.h>
 
-#define EXIT_SIGNAL    	 0x010000
+#define EXIT_SIGNAL	 0x010000
 #define EXIT_REPARENTING 0x020000
 #define EXIT_NOCLOSEALL  0x040000
 

@@ -46,7 +46,7 @@ static int dllname ## _init ()
  *
  * So, immediately following the the call to one of the above routines
  * we have:
- *  foojmp (4 bytes) 	 Pointer to a word containing the routine used
+ *  foojmp (4 bytes)	 Pointer to a word containing the routine used
  *			 to eventually invoke the function.  Initially
  *			 points to an init function which loads the
  *			 DLL, gets the process's load address,

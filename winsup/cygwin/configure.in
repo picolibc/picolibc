@@ -88,7 +88,6 @@ AC_CHECK_TOOL(WINDRES, windres, windres)
 dnl C_SUBST(WINDRES)
 
 AC_ALLOCA
-AC_CONFIG_SUBDIRS(utils doc)		
 AC_PROG_MAKE_SET
 
 dnl check whether gcc supports __builtin_memset.
@@ -97,9 +96,9 @@ AC_LANG_SAVE
 AC_LANG_CPLUSPLUS
 AC_TRY_COMPILE([
 #include <string.h>
-void foo(char *s, int c, size_t n) 
-{ 
-  __builtin_memset(s, c, n); 
+void foo(char *s, int c, size_t n)
+{
+  __builtin_memset(s, c, n);
 }
 ], [ ],
 use_builtin_memset=yes, use_builtin_memset=no)
@@ -116,14 +115,14 @@ PTH_ALLOW=''
 AC_ARG_ENABLE(threadsafe,
 [ --enable-threadsafe=[runtime]	Build a cygwin DLL which is thread safe],
 [case "${enableval}" in
-yes)	 
+yes)
   dnl default.
   ;;
-runtime) 
+runtime)
   mt_safe_val=2
   MT_SAFE=yes
   ;;
-no)	 
+no)
   mt_safe_val=0
   MT_SAFE=no
   PTH_ALLOW=';'
@@ -134,12 +133,12 @@ esac
 AC_ARG_ENABLE(extra-threadsafe-checking,
 [ --enable-extra-threadsafe-checking	Build a cygwin DLL which is thread safe with extra consistency checking],
 [case "${enableval}" in
-yes)	 
+yes)
   mt_safe_val=1
   MT_SAFE=yes
   AC_DEFINE(_CYG_THREAD_FAILSAFE)
   ;;
-no)	 
+no)
   dnl Don't do anything here to avoid overriding --enable-threadsafe.
   ;;
 esac
@@ -188,8 +187,8 @@ dnl fi
 dnl
 dnl If newlib is part of build tree, always set EXE_LDFLAGS to point to
 dnl it; this is important in cases where the installed newlib is perhaps
-dnl not compatible. Check and warn for installed newlib only if it's not 
-dnl part of the build tree. 
+dnl not compatible. Check and warn for installed newlib only if it's not
+dnl part of the build tree.
 dnl
 
 AC_MSG_CHECKING([if newlib is part of the build tree])
@@ -220,10 +219,10 @@ AC_SUBST(EXE_LDFLAGS)
 case "$target_cpu" in
    i386|i486|i586|i686) DLL_ENTRY="_dll_entry@12"
 		DEF_DLL_ENTRY="dll_entry@12"
- 		ALLOCA="_alloca"
+		ALLOCA="_alloca"
 		CONFIG_DIR="i386"  ;;
-   powerpc*)	DLL_ENTRY="dll_entry" 
-		DEF_DLL_ENTRY="dll_entry" 
+   powerpc*)	DLL_ENTRY="dll_entry"
+		DEF_DLL_ENTRY="dll_entry"
 		ALLOCA=" __allocate_stack"
 		CONFIG_DIR="ppc"  ;;
    *)		AC_MSG_ERROR(Invalid target processor \"$target_cpu\") ;;

@@ -69,11 +69,11 @@ char *dest;
 			no = *src++ - '0';
 		else
 			no = -1;
- 		if (no < 0) {	/* Ordinary character. */
- 			if (c == '\\' && (*src == '\\' || *src == '&'))
- 				c = *src++;
- 			*dst++ = c;
- 		} else if (prog->startp[no] != NULL && prog->endp[no] != NULL) {
+		if (no < 0) {	/* Ordinary character. */
+			if (c == '\\' && (*src == '\\' || *src == '&'))
+				c = *src++;
+			*dst++ = c;
+		} else if (prog->startp[no] != NULL && prog->endp[no] != NULL) {
 			len = prog->endp[no] - prog->startp[no];
 			(void) strncpy(dst, prog->startp[no], len);
 			dst += len;

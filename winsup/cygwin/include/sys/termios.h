@@ -8,10 +8,10 @@
 #define TCIOFF		2
 #define TCION		3
 
-#define TCGETA   	5
-#define TCSETA   	6
-#define TCSETAW	 	7
-#define TCSETAF	 	8
+#define TCGETA	5
+#define TCSETA	6
+#define TCSETAW		7
+#define TCSETAF		8
 
 #define TCIFLUSH	0
 #define TCOFLUSH	1
@@ -167,23 +167,23 @@
 
 #define VDISCARD	1
 #define VEOL		2
-#define VEOL2   	3
+#define VEOL2		3
 #define VEOF		4
 #define VERASE		5
 #define VINTR		6
 #define VKILL		7
-#define VLNEXT 		8
+#define VLNEXT		8
 #define VMIN		9
 #define VQUIT		10
-#define VREPRINT 	11
+#define VREPRINT	11
 #define VSTART		12
 #define VSTOP		13
 #define VSUSP		14
-#define VSWTC 		15
+#define VSWTC		15
 #define VTIME		16
-#define VWERASE 	17
+#define VWERASE	17
 
-#define NCCS 		18
+#define NCCS		18
 
 typedef unsigned char cc_t;
 typedef unsigned int  tcflag_t;

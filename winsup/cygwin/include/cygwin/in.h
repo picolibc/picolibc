@@ -84,7 +84,7 @@ struct in_addr {
 
 /* Request struct for multicast socket ops */
 
-struct ip_mreq 
+struct ip_mreq
 {
 	struct in_addr imr_multiaddr;	/* IP multicast address of group */
 	struct in_addr imr_interface;	/* local IP address of interface */
@@ -151,13 +151,13 @@ struct sockaddr_in {
 #define	IN_LOOPBACK(a)		((((long int) (a)) & 0xff000000) == 0x7f000000)
 
 /* Defines for Multicast INADDR */
-#define INADDR_UNSPEC_GROUP   	0xe0000000      /* 224.0.0.0   */
-#define INADDR_ALLHOSTS_GROUP 	0xe0000001      /* 224.0.0.1   */
+#define INADDR_UNSPEC_GROUP	0xe0000000      /* 224.0.0.0   */
+#define INADDR_ALLHOSTS_GROUP	0xe0000001      /* 224.0.0.1   */
 #define INADDR_MAX_LOCAL_GROUP  0xe00000ff      /* 224.0.0.255 */
 
 /* <asm/byteorder.h> contains the htonl type stuff.. */
 
-#include <asm/byteorder.h> 
+#include <asm/byteorder.h>
 
 /* Some random defines to make it easier in the kernel.. */
 #ifdef __KERNEL__
@@ -171,7 +171,7 @@ struct sockaddr_in {
  *	IPv6 definitions as we start to include them. This is just
  *	a beginning dont get excited 8)
  */
- 
+
 struct in6_addr
 {
 	unsigned char s6_addr[16];

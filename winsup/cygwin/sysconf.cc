@@ -71,7 +71,7 @@ sysconf (int in)
 	  SYSTEM_BASIC_INFORMATION sbi;
           if ((ret = NtQuerySystemInformation (SystemBasicInformation,
 						 (PVOID) &sbi,
-                                           	 sizeof sbi, NULL))
+					       sizeof sbi, NULL))
 		!= STATUS_SUCCESS)
             {
               __seterrno_from_win_error (RtlNtStatusToDosError (ret));

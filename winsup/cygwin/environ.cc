@@ -188,7 +188,7 @@ envsize (const char * const *in_envp, int debug_print)
 {
   const char * const *envp;
   for (envp = in_envp; *envp; envp++)
-    if (debug_print) 
+    if (debug_print)
       debug_printf ("%s", *envp);
   return (1 + envp - in_envp) * sizeof (const char *);
 }

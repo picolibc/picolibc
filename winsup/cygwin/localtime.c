@@ -346,7 +346,7 @@ static char	tzfilehid[] = "@(#)tzfile.h	7.14";
 #define	TZ_MAGIC	"TZif"
 
 struct tzhead {
- 	char	tzh_magic[4];		/* TZ_MAGIC */
+	char	tzh_magic[4];		/* TZ_MAGIC */
 	char	tzh_reserved[16];	/* reserved for future use */
 	char	tzh_ttisgmtcnt[4];	/* coded number of trans. time flags */
 	char	tzh_ttisstdcnt[4];	/* coded number of trans. time flags */

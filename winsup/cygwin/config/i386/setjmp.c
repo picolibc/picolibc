@@ -11,7 +11,7 @@ details. */
 #ifdef __i386__
 
 #if 1
-asm("	.globl	_setjmp  		\n"
+asm("	.globl	_setjmp			\n"
 "_setjmp:				\n"
 "	pushl	%ebp			\n"
 "	movl	%esp,%ebp		\n"

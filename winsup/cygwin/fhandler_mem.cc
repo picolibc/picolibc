@@ -236,7 +236,7 @@ fhandler_dev_mem::lseek (off_t offset, int whence)
     case SEEK_SET:
       pos = offset;
       break;
-    
+
     case SEEK_CUR:
       pos += offset;
       break;
@@ -245,7 +245,7 @@ fhandler_dev_mem::lseek (off_t offset, int whence)
       pos = mem_size;
       pos += offset;
       break;
-    
+
     default:
       set_errno (EINVAL);
       return (off_t) -1;
@@ -314,7 +314,7 @@ fhandler_dev_mem::mmap (caddr_t *addr, size_t len, DWORD access,
   phys.QuadPart = (ULONGLONG) off;
 
   if ((ret = NtMapViewOfSection (h,
-  				 INVALID_HANDLE_VALUE,
+				 INVALID_HANDLE_VALUE,
 				 &base,
 				 0L,
 				 dlen,

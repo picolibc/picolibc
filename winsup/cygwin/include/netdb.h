@@ -61,7 +61,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
 /*
  * Structures returned by network data base library.  All addresses are
@@ -98,7 +98,7 @@ struct	servent {
 	char	*s_proto;	/* protocol to use */
 };
 
-struct	protoent 
+struct	protoent
 {
   char	*p_name;	/* official protocol name */
   char	**p_aliases;	/* alias list */
@@ -162,7 +162,7 @@ void		setrpcent (int);
 
 #ifdef __cplusplus
 };
-#endif 
+#endif
 
 #endif /* !_NETDB_H_ */
 

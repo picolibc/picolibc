@@ -1,3 +1,9 @@
+Sat Oct 28 01:39:53 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* configure.in: Eliminate subdir stuff.
+	* configure: Regenerate.
+	* include/getopt.h (option): Make name field 'const'.
+
 Fri Oct 27 20:51:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* autoload.cc: New file keeping all autoload stuff.
@@ -239,13 +245,13 @@ Wed Oct 18 20:50:27 2000  Christopher Faylor <cgf@cygnus.com>
 2000-10-18  DJ Delorie  <dj@redhat.com>
 
 	* dcrt0.cc (dll_crt0_1): init cygcwd before forkee branch
-	
+
 	* environ.cc (conv_start_chars): Cache a table of "first
 	characters" for environment variables needing conversion.
 	(getwinenv): Use it.
 	(environ_init): Create it, also check first chars for TERM and
 	CYGWIN.
-	
+
 	* path.cc: Use lookup table for case insensitive comparisons.
 
 Wed Oct 18 00:48:49 2000  Christopher Faylor <cgf@cygnus.com>

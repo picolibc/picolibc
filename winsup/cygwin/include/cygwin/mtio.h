@@ -1,9 +1,6 @@
-/* 
- * cygwin/mtio.h header file for Cygwin.
- *
- * Original written by H. Bergman for Linux.
- * Changed for Cygwin by C. Vinschen.
- */
+/* cygwin/mtio.h header file for Cygwin.
+
+   by C. Vinschen.  */
 
 #ifndef _CYGWIN_MTIO_H
 #define _CYGWIN_MTIO_H
@@ -24,7 +21,7 @@ struct	mtop {
 /* Magnetic Tape operations [Not all operations supported by all drivers]: */
 #define MTRESET 0	/* +reset drive in case of problems */
 #define MTFSF	1	/* forward space over FileMark,
-			 * position at first record of next file 
+			 * position at first record of next file
 			 */
 #define MTBSF	2	/* backward space FileMark (position before FM) */
 #define MTFSR	3	/* forward space record */
@@ -67,7 +64,7 @@ struct	mtop {
 /* structure for MTIOCGET - mag tape get status command */
 
 struct	mtget {
-	long	mt_type;	/* type of magtape device 
+	long	mt_type;	/* type of magtape device
 				 * Cygwin: MT_ISUNKNOWN */
 	long	mt_resid;	/* residual count: (not sure)
 				 *	number of bytes ignored, or
@@ -95,7 +92,7 @@ struct	mtget {
 /* structure for MTIOCPOS - mag tape get position command */
 
 struct	mtpos {
-	long 	mt_blkno;	/* current block number */
+	long	mt_blkno;	/* current block number */
 };
 
 
@@ -116,15 +113,15 @@ struct	mtpos {
 #define GMT_SM(x)               ((x) & 0x10000000)  /* DDS setmark */
 #define GMT_EOD(x)              ((x) & 0x08000000)  /* DDS EOD */
 #define GMT_WR_PROT(x)          ((x) & 0x04000000)
-/* #define GMT_ ? 		((x) & 0x02000000) */
+/* #define GMT_ ?		((x) & 0x02000000) */
 #define GMT_ONLINE(x)           ((x) & 0x01000000)
 #define GMT_D_6250(x)           ((x) & 0x00800000)
 #define GMT_D_1600(x)           ((x) & 0x00400000)
 #define GMT_D_800(x)            ((x) & 0x00200000)
-#define GMT_PADDING(x) 		((x) & 0x00100000)  /* data padding */
-#define GMT_HW_ECC(x) 		((x) & 0x00080000)  /* HW error correction */
+#define GMT_PADDING(x)		((x) & 0x00100000)  /* data padding */
+#define GMT_HW_ECC(x)		((x) & 0x00080000)  /* HW error correction */
 #define GMT_DR_OPEN(x)          ((x) & 0x00040000)  /* door open (no tape) */
-#define GMT_HW_COMP(x) 		((x) & 0x00020000)  /* HW compression */
+#define GMT_HW_COMP(x)		((x) & 0x00020000)  /* HW compression */
 #define GMT_IM_REP_EN(x)        ((x) & 0x00010000)  /* immediate report mode */
 /* 16 generic status bits unused */
 

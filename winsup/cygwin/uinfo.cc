@@ -105,7 +105,7 @@ internal_getlogin (_pinfo *pi)
 	  DWORD siz;
 	  char tu[1024];
 	  int ret = 0;
-	    
+
 	  /* Try to get the SID either from already impersonated token
 	     or from current process first. To differ that two cases is
 	     important, because you can't rely on the user information

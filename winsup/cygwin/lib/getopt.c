@@ -40,7 +40,7 @@ int	  opterr = 1;	/* if error message should be printed */
 int	  optind = 1;	/* index into parent argv vector */
 int	  optopt;	/* character checked for validity */
 int	  optreset;	/* reset getopt */
-char 	  *optarg;	/* argument associated with option */
+char	  *optarg;	/* argument associated with option */
 
 static char * __progname (char *);
 int getopt_internal (int, char * const *, const char *);
@@ -268,7 +268,7 @@ int test_getopt_long(args, expected_result)
 
 	actual_result[pass] = '\0';
 	return(strcmp(actual_result, expected_result));
-	
+
 }
 
 #if 0

@@ -62,7 +62,7 @@ times (struct tms * buf)
 
       syscall_printf ("ticks %d, CLOCKS_PER_SEC %d", ticks, CLOCKS_PER_SEC);
       syscall_printf ("user_time %d, kernel_time %d, creation_time %d, exit_time %d",
-	    	   user_time, kernel_time, creation_time, exit_time);
+		      user_time, kernel_time, creation_time, exit_time);
       buf->tms_stime = __to_clock_t (&kernel_time, 0);
       buf->tms_utime = __to_clock_t (&user_time, 0);
       timeval_to_filetime (&myself->rusage_children.ru_stime, &kernel_time);

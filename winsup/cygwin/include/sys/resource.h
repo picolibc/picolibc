@@ -11,7 +11,7 @@ extern "C" {
 #define	RUSAGE_CHILDREN	-1		/* terminated child processes */
 
 struct rusage {
-  	struct timeval ru_utime;	/* user time used */
+	struct timeval ru_utime;	/* user time used */
 	struct timeval ru_stime;	/* system time used */
 	long ru_maxrss;
 	long ru_ixrss;               /* XXX: 0 */

@@ -270,7 +270,7 @@ dll_list::load_after_fork (HANDLE parent, dll *first)
   int try2 = 0;
   dll d;
 
-  void *next = first; 
+  void *next = first;
   while (next)
     {
       DWORD nb;
@@ -363,7 +363,7 @@ dll_dllcrt0 (HMODULE h, per_process *p)
      all of cygwin's internal structures may have been set up. */
   if (!d || (cygwin_finished_initializing && !d->init ()))
     return -1;
-  
+
   return (DWORD) d;
 }
 

@@ -1,7 +1,4 @@
-/* 
- * sys/mtio.h header file for Cygwin.
- *
- */
+/* sys/mtio.h header file for Cygwin.  */
 
 #ifndef _SYS_MTIO_H
 #define _SYS_MTIO_H

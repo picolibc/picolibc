@@ -39,9 +39,9 @@ extern "C" {
 #endif
 
 struct option {
-	char *	name;
+	const char *name;
 	int  has_arg;
-	int * flag;
+	int *flag;
 	int val;
 };
 

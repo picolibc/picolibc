@@ -1631,10 +1631,8 @@ EOF
 
 fi
 
-subdirs="utils doc"
-		
 echo $ac_n "checking whether ${MAKE-make} sets \${MAKE}""... $ac_c" 1>&6
-echo "configure:1638: checking whether ${MAKE-make} sets \${MAKE}" >&5
+echo "configure:1636: checking whether ${MAKE-make} sets \${MAKE}" >&5
 set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_prog_make_${ac_make}_set'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1671,20 +1669,20 @@ ac_link='${CXX-g++} -o conftest${ac_exeext} $CXXFLAGS $CPPFLAGS $LDFLAGS conftes
 cross_compiling=$ac_cv_prog_cxx_cross
 
 cat > conftest.$ac_ext <<EOF
-#line 1675 "configure"
+#line 1673 "configure"
 #include "confdefs.h"
 
 #include <string.h>
-void foo(char *s, int c, size_t n) 
-{ 
-  __builtin_memset(s, c, n); 
+void foo(char *s, int c, size_t n)
+{
+  __builtin_memset(s, c, n);
 }
 
 int main() {
  
 ; return 0; }
 EOF
-if { (eval echo configure:1688: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1686: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   use_builtin_memset=yes
 else
@@ -1716,13 +1714,13 @@ PTH_ALLOW=''
 if test "${enable_threadsafe+set}" = set; then
   enableval="$enable_threadsafe"
   case "${enableval}" in
-yes)	 
+yes)
     ;;
-runtime) 
+runtime)
   mt_safe_val=2
   MT_SAFE=yes
   ;;
-no)	 
+no)
   mt_safe_val=0
   MT_SAFE=no
   PTH_ALLOW=';'
@@ -1736,7 +1734,7 @@ fi
 if test "${enable_extra_threadsafe_checking+set}" = set; then
   enableval="$enable_extra_threadsafe_checking"
   case "${enableval}" in
-yes)	 
+yes)
   mt_safe_val=1
   MT_SAFE=yes
   cat >> confdefs.h <<\EOF
@@ -1744,7 +1742,7 @@ yes)
 EOF
 
   ;;
-no)	 
+no)
     ;;
 esac
 
@@ -1794,7 +1792,7 @@ fi
 
 
 echo $ac_n "checking if newlib is part of the build tree""... $ac_c" 1>&6
-echo "configure:1798: checking if newlib is part of the build tree" >&5
+echo "configure:1796: checking if newlib is part of the build tree" >&5
 
 EXE_LDFLAGS=
 if test -d ../newlib
@@ -1809,9 +1807,9 @@ fi
 if test x"$EXE_LDFLAGS" = x
 then
   echo $ac_n "checking if installed newlib needed""... $ac_c" 1>&6
-echo "configure:1813: checking if installed newlib needed" >&5
+echo "configure:1811: checking if installed newlib needed" >&5
   cat > conftest.$ac_ext <<EOF
-#line 1815 "configure"
+#line 1813 "configure"
 #include "confdefs.h"
 
 int main() {
@@ -1819,7 +1817,7 @@ int main() {
     
 ; return 0; }
 EOF
-if { (eval echo configure:1823: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1821: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   echo "$ac_t""no" 1>&6
     
@@ -1839,8 +1837,8 @@ case "$target_cpu" in
 		DEF_DLL_ENTRY="dll_entry@12"
  		ALLOCA="_alloca"
 		CONFIG_DIR="i386"  ;;
-   powerpc*)	DLL_ENTRY="dll_entry" 
-		DEF_DLL_ENTRY="dll_entry" 
+   powerpc*)	DLL_ENTRY="dll_entry"
+		DEF_DLL_ENTRY="dll_entry"
 		ALLOCA=" __allocate_stack"
 		CONFIG_DIR="ppc"  ;;
    *)		{ echo "configure: error: Invalid target processor \"$target_cpu\"" 1>&2; exit 1; } ;;
@@ -2012,7 +2010,6 @@ s%@DLLTOOL@%$DLLTOOL%g
 s%@WINDRES@%$WINDRES%g
 s%@CPP@%$CPP%g
 s%@ALLOCA@%$ALLOCA%g
-s%@subdirs@%$subdirs%g
 s%@SET_MAKE@%$SET_MAKE%g
 s%@MT_SAFE@%$MT_SAFE%g
 s%@PTH_ALLOW@%$PTH_ALLOW%g
@@ -2238,102 +2235,5 @@ EOF
 chmod +x $CONFIG_STATUS
 rm -fr confdefs* $ac_clean_files
 test "$no_create" = yes || ${CONFIG_SHELL-/bin/sh} $CONFIG_STATUS || exit 1
-
-if test "$no_recursion" != yes; then
-
-  # Remove --cache-file and --srcdir arguments so they do not pile up.
-  ac_sub_configure_args=
-  ac_prev=
-  for ac_arg in $ac_configure_args; do
-    if test -n "$ac_prev"; then
-      ac_prev=
-      continue
-    fi
-    case "$ac_arg" in
-    -cache-file | --cache-file | --cache-fil | --cache-fi \
-    | --cache-f | --cache- | --cache | --cach | --cac | --ca | --c)
-      ac_prev=cache_file ;;
-    -cache-file=* | --cache-file=* | --cache-fil=* | --cache-fi=* \
-    | --cache-f=* | --cache-=* | --cache=* | --cach=* | --cac=* | --ca=* | --c=*)
-      ;;
-    -srcdir | --srcdir | --srcdi | --srcd | --src | --sr)
-      ac_prev=srcdir ;;
-    -srcdir=* | --srcdir=* | --srcdi=* | --srcd=* | --src=* | --sr=*)
-      ;;
-    *) ac_sub_configure_args="$ac_sub_configure_args $ac_arg" ;;
-    esac
-  done
-
-  for ac_config_dir in utils doc; do
-
-    # Do not complain, so a configure script can configure whichever
-    # parts of a large source tree are present.
-    if test ! -d $srcdir/$ac_config_dir; then
-      continue
-    fi
-
-    echo configuring in $ac_config_dir
-
-    case "$srcdir" in
-    .) ;;
-    *)
-      if test -d ./$ac_config_dir || mkdir ./$ac_config_dir; then :;
-      else
-        { echo "configure: error: can not create `pwd`/$ac_config_dir" 1>&2; exit 1; }
-      fi
-      ;;
-    esac
-
-    ac_popdir=`pwd`
-    cd $ac_config_dir
-
-      # A "../" for each directory in /$ac_config_dir.
-      ac_dots=`echo $ac_config_dir|sed -e 's%^\./%%' -e 's%[^/]$%&/%' -e 's%[^/]*/%../%g'`
-
-    case "$srcdir" in
-    .) # No --srcdir option.  We are building in place.
-      ac_sub_srcdir=$srcdir ;;
-    /*) # Absolute path.
-      ac_sub_srcdir=$srcdir/$ac_config_dir ;;
-    *) # Relative path.
-      ac_sub_srcdir=$ac_dots$srcdir/$ac_config_dir ;;
-    esac
-
-    # Check for guested configure; otherwise get Cygnus style configure.
-    if test -f $ac_sub_srcdir/configure; then
-      ac_sub_configure=$ac_sub_srcdir/configure
-    elif test -f $ac_sub_srcdir/configure.in; then
-      ac_sub_configure=$ac_configure
-    else
-      echo "configure: warning: no configuration information is in $ac_config_dir" 1>&2
-      ac_sub_configure=
-    fi
-
-    # The recursion is here.
-    if test -n "$ac_sub_configure"; then
-
-      # Make the cache file name correct relative to the subdirectory.
-      case "$cache_file" in
-      /*) ac_sub_cache_file=$cache_file ;;
-      *) # Relative path.
-        ac_sub_cache_file="$ac_dots$cache_file" ;;
-      esac
-  case "$ac_given_INSTALL" in
-        [/$]*) INSTALL="$ac_given_INSTALL" ;;
-        *) INSTALL="$ac_dots$ac_given_INSTALL" ;;
-        esac
-
-      echo "running ${CONFIG_SHELL-/bin/sh} $ac_sub_configure $ac_sub_configure_args --cache-file=$ac_sub_cache_file --srcdir=$ac_sub_srcdir"
-      # The eval makes quoting arguments work.
-      if eval ${CONFIG_SHELL-/bin/sh} $ac_sub_configure $ac_sub_configure_args --cache-file=$ac_sub_cache_file --srcdir=$ac_sub_srcdir
-      then :
-      else
-        { echo "configure: error: $ac_sub_configure failed for $ac_config_dir" 1>&2; exit 1; }
-      fi
-    fi
-
-    cd $ac_popdir
-  done
-fi
 
 
