@@ -1,3 +1,10 @@
+2002-11-26  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* cxx.cc: New file. Implement new, new[], delete and delete[]
+	operators and  __cxa_pure_virtual if compiled by gcc >=3.
+	* Makefile.in (DLL_OFILES): Add cxx.o.
+	Remove libstdc++.a from cygwin1.dll link step.
+
 2002-11-29  Steve Osborn  <bub@io.com>
 
 	* fhandler_tty.cc (fhandler_pty_master::accept_input): Move
