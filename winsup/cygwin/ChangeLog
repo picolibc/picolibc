@@ -1,3 +1,7 @@
+Thu Oct  5  1:13:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* include/sys/mman.h: Add missing MAP_FAILED macro.
+
 Wed Oct  4 18:48:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_dev_mem): Add method `init'. Add members
