@@ -1,3 +1,7 @@
+2004-04-23  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/stdio.h: (_ftell_r, _fseek_r): New prototypes.
+
 2004-04-23  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
 
 	* libc/stdio/asprintf.c libc/stdio/clearerr.c,
