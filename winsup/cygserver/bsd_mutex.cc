@@ -223,8 +223,15 @@ _msleep (void *ident, struct mtx *mtx, int priority,
 	panic ("wait in msleep (%s) failed, %E", wmesg);
 	break;
     }
+#if 0
   /* Dismiss event before entering mutex. */
+  /* CV 2004-09-06, Don't dismiss for now. 
+     TODO: Dismissing was meant to solve a problem with heavy load but
+     there's no proof that it helps.  On the contrary, it breaks msgtest
+     in the testsuite.  As long as I don't get a testcase to track that
+     down, I'll keep it that way. */
   ResetEvent (evt);
+#endif
   CloseHandle (evt);
   td->client->hold ();
   set_priority (old_priority);

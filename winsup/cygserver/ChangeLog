@@ -1,3 +1,7 @@
+2004-09-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_mutex.cc (_msleep): Disable resetting event object for now.
+
 2004-08-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sysv_shm.cc (kern_shmat): Add debug_printf's.
