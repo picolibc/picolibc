@@ -1,5 +1,10 @@
 2005-01-19  Shaun Jackman  <sjackman@gmail.com>
 
+	* libc/stdlib/setenv_r.c (_setenv_r): Call tzset() if the TZ
+	environment variable is set.
+
+2005-01-19  Shaun Jackman  <sjackman@gmail.com>
+
         * tzset_r.c (_tzname): Add a comma.
 
 2005-01-18  Aldy Hernandez  <aldyh@redhat.com>

@@ -122,7 +122,7 @@ _DEFUN (_setenv_r, (reent_ptr, name, value, rewrite),
   ENV_UNLOCK;
 
   /* if we are setting the TZ environment variable, update timezone info */
-  if (strcmp (name, "TZ") == 0)
+  if (strncmp ((*p_environ)[offset], "TZ=", 3) == 0)
     tzset ();
 
   return 0;
