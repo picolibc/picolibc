@@ -501,6 +501,12 @@ fdsock (int& fd, const char *name, SOCKET soc)
 {
   if (!winsock2_active)
     soc = set_socket_inheritance (soc);
+  else if (wincap.has_set_handle_information ())
+    {
+      /* NT systems apparently set sockets to inheritable by default */
+      SetHandleInformation ((HANDLE)soc, HANDLE_FLAG_INHERIT, 0);
+      debug_printf ("reset socket inheritance since winsock2_active %d", winsock2_active);
+    }
   else
     debug_printf ("not setting socket inheritance since winsock2_active %d", winsock2_active);
   fhandler_socket *fh = (fhandler_socket *) cygheap->fdtab.build_fhandler (fd, FH_SOCKET, name);

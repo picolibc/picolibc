@@ -1,3 +1,11 @@
+2002-06-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_socket::fixup_after_fork): Revert patch from
+	2002-06-04.
+	* fhandler_socket.cc (fhandler_socket::fixup_after_fork): Ditto.
+	(fhandler_socket::dup): Ditto.
+	* net.cc (fdsock): Make sockets explicitely noninheritable on NT.
+
 2002-06-09  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): Correctly
