@@ -405,7 +405,12 @@ out:
     {
       debug_printf ("GetVolumeInformation(%s) = OK, full_path(%s), set_has_acls(%d)",
 		    tmp_buf, full_path, volflags & FS_PERSISTENT_ACLS);
-      set_has_acls (volflags & FS_PERSISTENT_ACLS);
+      if (!allow_smbntsec
+          && ((tmp_buf[0] == '\\' && tmp_buf[1] == '\\')
+              || GetDriveType (tmp_buf) == DRIVE_REMOTE))
+        set_has_acls (FALSE);
+      else
+        set_has_acls (volflags & FS_PERSISTENT_ACLS);
       /* Known file systems with buggy open calls. Further explanation
          in fhandler.cc (fhandler_disk_file::open). */
       set_has_buggy_open (strcmp (fs_name, "SUNWNFS") == 0);

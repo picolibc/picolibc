@@ -29,6 +29,7 @@ details. */
 extern BOOL allow_glob;
 extern BOOL ignore_case_with_glob;
 extern BOOL allow_ntea;
+extern BOOL allow_smbntsec;
 extern BOOL strip_title_path;
 extern DWORD chunksize;
 BOOL reset_com = TRUE;
@@ -424,6 +425,7 @@ struct parse_thing
   {"glob", {func: &glob_init}, isfunc, NULL, {{0}, {s: "normal"}}},
   {"ntea", {&allow_ntea}, justset, NULL, {{FALSE}, {TRUE}}},
   {"ntsec", {&allow_ntsec}, justset, NULL, {{FALSE}, {TRUE}}},
+  {"smbntsec", {&allow_smbntsec}, justset, NULL, {{FALSE}, {TRUE}}},
   {"reset_com", {&reset_com}, justset, NULL, {{FALSE}, {TRUE}}},
   {"strip_title", {&strip_title_path}, justset, NULL, {{FALSE}, {TRUE}}},
   {"title", {&display_title}, justset, NULL, {{FALSE}, {TRUE}}},

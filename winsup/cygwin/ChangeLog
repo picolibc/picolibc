@@ -1,3 +1,15 @@
+Tue Dec 19 16:26:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* environ.cc (struct parse_thing): Add entry for new CYGWIN option
+	`smbntsec'.
+	* path.cc (path_conv::check): Check path for being a remote path.
+	If so and `allow_smbntsec' is set to FALSE, set has_acls to FALSE.
+	* security.cc: Add global definition for `allow_smbntsec'.
+	* security.h: Add extern declaration for `allow_smbntsec'.
+	* fhandler.cc (fhandler_disk_file::open): Eliminate extern declaration
+	of `allow_ntsec'.
+	* syscalls.cc: Ditto.
+
 Fri Dec 15 18:54:42 2000 Bradley A. Town <townba@pobox.com>
 
 	* fhandler_console.cc (read): Add support for xterm-style mouse event

@@ -36,6 +36,10 @@ details. */
 
 extern BOOL allow_ntea;
 BOOL allow_ntsec = FALSE;
+/* allow_smbntsec is handled exclusively in path.cc (path_conv::check).
+   It's defined here because of it's strong relationship to allow_ntsec.
+   The default is TRUE to reflect the old behaviour. */
+BOOL allow_smbntsec = TRUE;
 
 SID_IDENTIFIER_AUTHORITY sid_auth[] = {
 	{SECURITY_NULL_SID_AUTHORITY},

@@ -1254,7 +1254,6 @@ fhandler_disk_file::open (path_conv& real_path, int flags, mode_t mode)
     }
 
   extern BOOL allow_ntea;
-  extern BOOL allow_ntsec;
 
   if (!real_path.isexec () && !allow_ntea
       && (!allow_ntsec || !real_path.has_acls ())

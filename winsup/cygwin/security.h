@@ -15,6 +15,7 @@ int __stdcall get_file_attribute (int, const char *, int *,
 int __stdcall set_file_attribute (int, const char *, int);
 int __stdcall set_file_attribute (int, const char *, uid_t, gid_t, int, const char *);
 extern BOOL allow_ntsec;
+extern BOOL allow_smbntsec;
 
 /* `lookup_name' should be called instead of LookupAccountName.
  * logsrv may be NULL, in this case only the local system is used for lookup.

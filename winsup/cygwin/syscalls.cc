@@ -38,8 +38,6 @@ details. */
 #include "security.h"
 #include "cygheap.h"
 
-extern BOOL allow_ntsec;
-
 /* Close all files and process any queued deletions.
    Lots of unix style applications will open a tmp file, unlink it,
    but never call close.  This function is called by _exit to
