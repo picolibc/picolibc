@@ -1,4 +1,17 @@
-Mon Jun 24 21:17:02 2002  J"orn Rennecke <joern.rennecke@superh.com>
+2002-06-24  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* libc/search/db_local.h: New file.
+	* libc/include/db.h: Remove.
+	* libc/search/Makefile.am (LIB_SOURCES): Add db_local.h.
+	* libc/search/hash.c (MIN,MAX): Add macros.  Change <db.h> to
+	"db_local.h".
+	* libc/search/hash_bigkey.c: Likewise.
+	* libc/search/hash_buf.c: Likewise.
+	* libc/search/hash_func.c: Likewise.
+	* libc/search/hash_log2.c: Likewise.
+	* libc/search/hash_page.c: Likewise.
+
+2002-06-24  J"orn Rennecke <joern.rennecke@superh.com>
 
 	* libc/machine/sh/strcpy.S: New file.
 	* libc/machine/sh/Makefile.am (lib_a_SOURCES): Add rule for it.

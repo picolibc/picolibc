@@ -6,6 +6,7 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 LIB_SOURCES = \
 	bsearch.c \
+	db_local.h \
 	extern.h \
 	hash.c \
 	hash.h \

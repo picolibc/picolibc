@@ -40,6 +40,10 @@ static char sccsid[] = "@(#)hash_bigkey.c	8.3 (Berkeley) 5/31/94";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
 
+/* Macros for min/max.  */
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
+
 /*
  * PACKAGE: hash
  * DESCRIPTION:
@@ -69,7 +73,7 @@ static char sccsid[] = "@(#)hash_bigkey.c	8.3 (Berkeley) 5/31/94";
 #include <assert.h>
 #endif
 
-#include <db.h>
+#include "db_local.h"
 #include "hash.h"
 #include "page.h"
 #include "extern.h"

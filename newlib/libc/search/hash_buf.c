@@ -66,7 +66,7 @@ static char sccsid[] = "@(#)hash_buf.c	8.5 (Berkeley) 7/15/94";
 #include <assert.h>
 #endif
 
-#include <db.h>
+#include "db_local.h"
 #include "hash.h"
 #include "page.h"
 #include "extern.h"
@@ -92,6 +92,10 @@ static BUFHEAD *newbuf(HTAB *, __uint32_t, BUFHEAD *);
 
 #define MRU_INSERT(B)	BUF_INSERT((B), &hashp->bufhead)
 #define LRU_INSERT(B)	BUF_INSERT((B), LRU)
+
+/* Macros for min/max.  */
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
 
 /*
  * We are looking for a buffer with address "addr".  If prev_bp is NULL, then

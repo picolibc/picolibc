@@ -53,7 +53,7 @@ static char sccsid[] = "@(#)hash.c	8.9 (Berkeley) 6/16/94";
 #include <assert.h>
 #endif
 
-#include <db.h>
+#include "db_local.h"
 #include "hash.h"
 #include "page.h"
 #include "extern.h"
@@ -76,6 +76,10 @@ static int   init_htab(HTAB *, int);
 static void  swap_header(HTAB *);
 static void  swap_header_copy(HASHHDR *, HASHHDR *);
 #endif
+
+/* Macros for min/max.  */
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
 
 /* Fast arithmetic, relying on powers of 2, */
 #define MOD(x, y)		((x) & ((y) - 1))
