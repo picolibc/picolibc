@@ -170,11 +170,11 @@ cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
   thread_printf ("name %s, id %p", name, id);
   while (!h)
 #ifndef DEBUGGING
-    Sleep (0);
+    low_priority_sleep (0);
 #else
     {
       thread_printf ("waiting for %s<%p> to become active", __name, h);
-      Sleep (0);
+      low_priority_sleep (0);
     }
 #endif
   __name = name;
@@ -217,7 +217,7 @@ cygthread::operator
 HANDLE ()
 {
   while (!ev)
-    Sleep (0);
+    low_priority_sleep (0);
   return ev;
 }
 

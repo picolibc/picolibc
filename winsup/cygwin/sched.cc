@@ -438,7 +438,7 @@ sched_setscheduler (pid_t pid, int policy,
 int
 sched_yield (void)
 {
-  Sleep (0);
+  low_priority_sleep (0);
   return 0;
 }
 }

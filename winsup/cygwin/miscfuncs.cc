@@ -291,3 +291,12 @@ sys_mbstowcs (WCHAR *tgt, const char *src, int len)
 {
   return MultiByteToWideChar (get_cp (), 0, src, -1, tgt, len);
 }
+
+void __stdcall
+low_priority_sleep (DWORD secs)
+{
+  DWORD prio = GetThreadPriority (GetCurrentThread ());
+  SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
+  Sleep (secs);
+  SetThreadPriority (GetCurrentThread (), prio);
+}

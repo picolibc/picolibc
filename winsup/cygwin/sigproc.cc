@@ -886,7 +886,7 @@ getsem (_pinfo *p, const char *str, int init, int max)
       sigproc_printf ("pid %d, ppid %d, wait %d, initializing %x", p->pid, p->ppid, wait,
 		  ISSTATE (p, PID_INITIALIZING));
       for (int i = 0; ISSTATE (p, PID_INITIALIZING) && i < wait; i++)
-	Sleep (1);
+	low_priority_sleep (1);
     }
 
   SetLastError (0);

@@ -214,7 +214,7 @@ std_dll_init ()
     do
       {
 	InterlockedDecrement (&dll->here);
-	Sleep (0);
+	low_priority_sleep (0);
       }
     while (InterlockedIncrement (&dll->here));
   else if (!dll->handle)
@@ -263,7 +263,7 @@ wsock_init ()
   while (InterlockedIncrement (&here))
     {
       InterlockedDecrement (&here);
-      Sleep (0);
+      low_priority_sleep (0);
     }
 
   if (!wsock_started && (winsock_active || winsock2_active))

@@ -508,7 +508,7 @@ fhandler_serial::tcflush (int queue)
 	COMSTAT st;
 	if (!PurgeComm (get_handle (), PURGE_RXABORT | PURGE_RXCLEAR))
 	  break;
-	Sleep (100);
+	low_priority_sleep (100);
 	if (!ClearCommError (get_handle (), &ev, &st) || !st.cbInQue)
 	  break;
       }

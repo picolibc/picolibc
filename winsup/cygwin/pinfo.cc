@@ -212,7 +212,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 	   this way at some point.  */
       if (i < 9 && !created && createit && (procinfo->process_state & PID_EXITED))
 	{
-	  Sleep (5);
+	  low_priority_sleep (5);
 	  release ();
 	  continue;
 	}
@@ -368,12 +368,7 @@ _pinfo::commune_send (DWORD code)
     if (myself->hello_pid <= 0)
       break;
     else
-      {
-	DWORD prio = GetThreadPriority (GetCurrentThread ());
-	SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
-	Sleep (0);
-	SetThreadPriority (GetCurrentThread (), prio);
-      }
+      low_priority_sleep (0);
 
   CloseHandle (tome);
   tome = NULL;

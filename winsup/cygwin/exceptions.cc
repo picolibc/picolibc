@@ -666,7 +666,7 @@ sigthread::get_winapi_lock (int test)
   /* Need to do a busy loop because we can't block or a potential SuspendThread
      will hang. */
   while (InterlockedExchange (&winapi_lock, 1))
-    Sleep (1);
+    low_priority_sleep (1);
   return 1;
 }
 
@@ -855,7 +855,7 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
 
 	resume_thread:
 	  ResumeThread (hth);
-	  Sleep (0);
+	  low_priority_sleep (0);
 	  continue;
 	}
 
@@ -879,7 +879,7 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
       pending_signals = 1;	/* FIXME: Probably need to be more tricky here */
       sig_set_pending (sig);
       sig_dispatch_pending (1);
-      Sleep (0);		/* Hopefully, other process will be waking up soon. */
+      low_priority_sleep (0);	/* Hopefully, other process will be waking up soon. */
       sigproc_printf ("couldn't send signal %d", sig);
     }
 

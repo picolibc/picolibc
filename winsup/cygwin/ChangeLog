@@ -1,3 +1,11 @@
+2002-11-13  Christopher Faylor  <cgf@redhat.com>
+
+	* miscfuncs.cc (low_priority_sleep): New function.  Use throughout
+	where code is supposed to be giving up time slice.
+
+	* fhandler_console.cc (fhandler_console::read): Switch button 2/3
+	output escape sequences to be consistent with xterm.
+
 2002-11-12  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* syscalls.cc (chmod): Simplify conditional.

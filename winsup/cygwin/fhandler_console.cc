@@ -412,12 +412,12 @@ fhandler_console::read (void *pv, size_t buflen)
 		}
 	      else if ((mouse_event.dwButtonState & 2) != (dev_state->dwLastButtonState & 2))
 		{
-		  b = 1;
+		  b = 2;
 		  strcpy (sz, "btn2 down");
 		}
 	      else if ((mouse_event.dwButtonState & 4) != (dev_state->dwLastButtonState & 4))
 		{
-		  b = 2;
+		  b = 1;
 		  strcpy (sz, "btn3 down");
 		}
 

@@ -138,7 +138,7 @@ tty_list::terminate (void)
 	      i = 0;
 	    }
 
-	  Sleep (200);
+	  low_priority_sleep (200);
 	}
 
       termios_printf ("tty %d master about to finish", ttynum);
@@ -218,12 +218,12 @@ tty_list::allocate_tty (int with_console)
       SetConsoleTitle (buf);
       for (int times = 0; times < 25; times++)
 	{
-	  Sleep (10);
+	  low_priority_sleep (10);
 	  if ((console = FindWindow (NULL, buf)))
 	    break;
 	}
       SetConsoleTitle (oldtitle);
-      Sleep (40);
+      low_priority_sleep (40);
       ReleaseMutex (title_mutex);
       if (console == NULL)
 	{

@@ -862,7 +862,7 @@ pthread_cond::Signal ()
     {
       InterlockedIncrement (&ExitingWait);
       /* give up the cpu to force a context switch. */
-      Sleep (0);
+      low_priority_sleep (0);
       if (spins == 5)
 	/* we've had 5 timeslices, and the woken thread still hasn't done it's
 	 * thing - maybe we raced it with the event? */
