@@ -100,7 +100,6 @@ wsock_event::wait (int socket, LPDWORD flags)
 
 WSADATA wsadata;
 
-/* Cygwin internal */
 static fhandler_socket *
 get (const int fd)
 {
@@ -117,7 +116,6 @@ get (const int fd)
   return fh;
 }
 
-/* Cygwin internal */
 static SOCKET __stdcall
 set_socket_inheritance (SOCKET sock)
 {
@@ -163,7 +161,6 @@ ntohs (unsigned short x)
   return htons (x);
 }
 
-/* Cygwin internal */
 static void
 dump_protoent (struct protoent *p)
 {
@@ -343,7 +340,6 @@ find_winsock_errno (int why)
   return EPERM;
 }
 
-/* Cygwin internal */
 void
 __set_winsock_errno (const char *fn, int ln)
 {
@@ -366,7 +362,6 @@ static NO_COPY struct tl host_errmap[] = {
   {0, NULL, 0}
 };
 
-/* Cygwin internal */
 static void
 set_host_errno ()
 {
@@ -1221,7 +1216,6 @@ getdomainname (char *domain, size_t len)
   return 0;
 }
 
-/* Cygwin internal */
 /* Fill out an ifconf struct. */
 
 /*
