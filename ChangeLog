@@ -1,3 +1,8 @@
+2004-02-23  Andrew Cagney  <cagney@redhat.com>
+
+	* texinfo/texinfo.tex: Update from version 2003-02-03.16 to
+	2004-02-19.09.
+
 2004-02-19  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	PR bootstrap/11932
