@@ -1,3 +1,10 @@
+2001-05-25  Nick Clifton  <nickc@cambridge.redhat.com>
+
+	* libc/machine/xscale/memcmp.c: Fix bug when both pointers have
+	matching, non-word alignment, and the length is <= 4 but more than
+	enough to move them over a word boundary.
+	Add comments explaining what each instruction does.
+
 Mon May  7 20:39:25 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* libc/include/sys/stat.h: Revert March 3, Cygwin change.
