@@ -44,7 +44,7 @@ fhandler_pipe::lseek (__off64_t offset, int whence)
 void
 fhandler_pipe::set_close_on_exec (int val)
 {
-  this->fhandler_base::set_close_on_exec (val);
+  fhandler_base::set_close_on_exec (val);
   if (guard)
     set_inheritance (guard, val);
   if (writepipe_exists)
@@ -121,7 +121,7 @@ fhandler_pipe::fixup_after_exec (HANDLE parent)
 void
 fhandler_pipe::fixup_after_fork (HANDLE parent)
 {
-  this->fhandler_base::fixup_after_fork (parent);
+  fhandler_base::fixup_after_fork (parent);
   if (guard)
     fork_fixup (parent, guard, "guard");
   if (writepipe_exists)
@@ -132,7 +132,7 @@ fhandler_pipe::fixup_after_fork (HANDLE parent)
 int
 fhandler_pipe::dup (fhandler_base *child)
 {
-  int res = this->fhandler_base::dup (child);
+  int res = fhandler_base::dup (child);
   if (res)
     return res;
 

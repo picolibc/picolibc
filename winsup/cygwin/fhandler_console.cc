@@ -1677,7 +1677,7 @@ fhandler_console::init (HANDLE f, DWORD a, mode_t bin)
   if (f != INVALID_HANDLE_VALUE)
     CloseHandle (f);	/* Reopened by open */
 
-  this->tcsetattr (0, &tc->ti);
+  tcsetattr (0, &tc->ti);
 }
 
 int
@@ -1689,7 +1689,7 @@ fhandler_console::igncr_enabled (void)
 void
 fhandler_console::set_close_on_exec (int val)
 {
-  this->fhandler_base::set_close_on_exec (val);
+  fhandler_base::set_close_on_exec (val);
   set_inheritance (output_handle, val);
 }
 

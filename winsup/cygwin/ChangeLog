@@ -1,3 +1,7 @@
+2003-02-03  Christopher Faylor  <cgf@redhat.com>
+
+	Eliminate most unneeded this-> pointers throughout.
+
 2003-02-03  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* security.h: Add third argument to set_process_privilege.

@@ -214,7 +214,7 @@ fhandler_serial::open (path_conv *, int flags, mode_t mode)
   syscall_printf ("fhandler_serial::open (%s, %p, %p)",
 			get_name (), flags, mode);
 
-  if (!this->fhandler_base::open (NULL, flags, mode))
+  if (!fhandler_base::open (NULL, flags, mode))
     return 0;
 
   res = 1;
@@ -1012,7 +1012,7 @@ void
 fhandler_serial::fixup_after_fork (HANDLE parent)
 {
   if (get_close_on_exec ())
-    this->fhandler_base::fixup_after_fork (parent);
+    fhandler_base::fixup_after_fork (parent);
   overlapped_setup ();
   debug_printf ("io_status.hEvent %p", io_status.hEvent);
 }

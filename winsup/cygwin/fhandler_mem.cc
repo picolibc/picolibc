@@ -409,7 +409,7 @@ fhandler_dev_mem::fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
 int
 fhandler_dev_mem::fstat (struct __stat64 *buf, path_conv *pc)
 {
-  this->fhandler_base::fstat (buf, pc);
+  fhandler_base::fstat (buf, pc);
   buf->st_mode = S_IFCHR;
   if (wincap.has_physical_mem_access ())
     buf->st_mode |= S_IRUSR | S_IWUSR |

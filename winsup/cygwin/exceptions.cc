@@ -240,7 +240,7 @@ public:
   void init (DWORD, bool, bool); /* Called the first time that stack info is needed */
 
   /* Postfix ++ iterates over the stack, returning zero when nothing is left. */
-  int operator ++(int) { return this->walk (); }
+  int operator ++(int) { return walk (); }
 };
 
 /* The number of parameters used in STACKFRAME */

@@ -1066,7 +1066,7 @@ fhandler_pty_master::close ()
   while (accept_input () > 0)
     continue;
 #endif
-  this->fhandler_tty_common::close ();
+  fhandler_tty_common::close ();
 
   if (!get_ttyp ()->master_alive ())
     {
@@ -1176,7 +1176,7 @@ void
 fhandler_tty_common::set_close_on_exec (int val)
 {
 #ifndef DEBUGGING
-  this->fhandler_base::set_close_on_exec (val);
+  fhandler_base::set_close_on_exec (val);
 #else
   /* FIXME: This is a duplication from fhandler_base::set_close_on_exec.
      It is here because we need to specify the "from_pty" stuff here or
@@ -1201,7 +1201,7 @@ fhandler_tty_common::set_close_on_exec (int val)
 void
 fhandler_tty_common::fixup_after_fork (HANDLE parent)
 {
-  this->fhandler_termios::fixup_after_fork (parent);
+  fhandler_termios::fixup_after_fork (parent);
   if (output_done_event)
     fork_fixup (parent, output_done_event, "output_done_event");
   if (ioctl_request_event)
@@ -1220,7 +1220,7 @@ fhandler_tty_common::fixup_after_fork (HANDLE parent)
 void
 fhandler_pty_master::set_close_on_exec (int val)
 {
-  this->fhandler_tty_common::set_close_on_exec (val);
+  fhandler_tty_common::set_close_on_exec (val);
 
   /* FIXME: There is a console handle leak here. */
   if (get_ttyp ()->master_pid == GetCurrentProcessId ())
@@ -1235,7 +1235,7 @@ fhandler_pty_master::set_close_on_exec (int val)
 void
 fhandler_tty_master::fixup_after_fork (HANDLE child)
 {
-  this->fhandler_pty_master::fixup_after_fork (child);
+  fhandler_pty_master::fixup_after_fork (child);
   console->fixup_after_fork (child);
 }
 
