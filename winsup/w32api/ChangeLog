@@ -1,3 +1,10 @@
+Sun Oct  1 23:55:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * include/ipexport.h: Add missing `extern "C"' directives.
+        * include/iphlpapi.h: Ditto.
+        * include/iprtrmib.h: Ditto.
+        * include/iptypes.h: Ditto.
+
 Sun Oct  1 22:09:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
         * include/ipifcons.h: New header file.

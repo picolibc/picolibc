@@ -1,6 +1,10 @@
 #ifndef _IPTYPES_H_
 #define _IPTYPES_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define DEFAULT_MINIMUM_ENTITIES 32
 
 #define MAX_ADAPTER_ADDRESS_LENGTH 8
@@ -66,5 +70,9 @@ typedef struct {
   UINT EnableProxy;
   UINT EnableDns;
 } FIXED_INFO, *PFIXED_INFO;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _IPTYPES_H_ */

@@ -3,6 +3,10 @@
 
 #include <ipifcons.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef ANY_SIZE
 #define ANY_SIZE 1
 #endif
@@ -222,5 +226,9 @@ typedef struct {
   DWORD dwNumEntries;
   MIB_UDPROW table[ANY_SIZE];
 } MIB_UDPTABLE, *PMIB_UDPTABLE;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _IPRTRMIB_H_ */
