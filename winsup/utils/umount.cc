@@ -13,6 +13,7 @@ details. */
 #include <sys/mount.h>
 #include <mntent.h>
 #include <stdlib.h>
+#include <errno.h>
 
 static void remove_all_mounts ();
 static void remove_all_automounts ();
@@ -31,6 +32,13 @@ usage (void)
   fprintf (stderr, "--remove-auto-mounts = remove all automatically mounted mounts\n");
   fprintf (stderr, "--remove-user-mounts = remove all mounts in the current user mount registry area, including auto mounts\n");
   fprintf (stderr, "--remove-system-mounts = Remove all mounts in the system-wide mount registry area\n");
+  exit (1);
+}
+
+static void
+error (char *path)
+{
+  fprintf (stderr, "%s: %s: %s\n", progname, path, strerror (errno));
   exit (1);
 }
 
@@ -81,10 +89,7 @@ main (int argc, char **argv)
     usage ();
 
   if (cygwin_umount (argv[i], flags) != 0)
-    {
-      perror ("umount");
-      exit (1);
-    }
+    error (argv[i]);
 
   return 0;
 }
@@ -109,14 +114,18 @@ remove_all_automounts ()
       /* Remove the mount if it's an automount. */
       if (strcmp (p->mnt_type, "user,auto") == 0)
 	{
-	  cygwin_umount (p->mnt_dir, 0);
+	  if (cygwin_umount (p->mnt_dir, 0))
+	    error (p->mnt_dir);
+
 	  /* We've modified the table so we need to start over. */
 	  endmntent (m);
 	  m = setmntent ("/-not-used-", "r");
 	}
       else if (strcmp (p->mnt_type, "system,auto") == 0)
 	{
-	  cygwin_umount (p->mnt_dir, MOUNT_SYSTEM);
+	  if (cygwin_umount (p->mnt_dir, MOUNT_SYSTEM))
+	    error (p->mnt_dir);
+
 	  /* We've modified the table so we need to start over. */
 	  endmntent (m);
 	  m = setmntent ("/-not-used-", "r");
@@ -132,14 +141,14 @@ remove_all_user_mounts ()
 {
   FILE *m = setmntent ("/-not-used-", "r");
   struct mntent *p;
-  int err;
 
   while ((p = getmntent (m)) != NULL)
     {
       /* Remove the mount if it's a user mount. */
       if (strncmp (p->mnt_type, "user", 4) == 0)
 	{
-	  err = cygwin_umount (p->mnt_dir, 0);
+	  if (cygwin_umount (p->mnt_dir, 0))
+	    error (p->mnt_dir);
 
 	  /* We've modified the table so we need to start over. */
 	  endmntent (m);
@@ -162,7 +171,8 @@ remove_all_system_mounts ()
       /* Remove the mount if it's a system mount. */
       if (strncmp (p->mnt_type, "system", 6) == 0)
 	{
-	  cygwin_umount (p->mnt_dir, MOUNT_SYSTEM);
+	  if (cygwin_umount (p->mnt_dir, MOUNT_SYSTEM))
+	    error (p->mnt_dir);
 
 	  /* We've modified the table so we need to start over. */
 	  endmntent (m);

@@ -30,6 +30,14 @@ static short force = FALSE;
 
 static const char *progname;
 
+static void
+error (const char *path)
+{
+  fprintf (stderr, "%s: %s: %s\n", progname, path,
+	   (errno == EMFILE) ? "Too many mount entries" : strerror (errno));
+  exit (1);
+}
+
 /* FIXME: do_mount should also print a warning message if the dev arg
    is a non-existent Win32 path. */
 
@@ -59,10 +67,7 @@ do_mount (const char *dev, const char *where, int flags)
 #endif
 
   if (mount (dev, where, flags))
-    {
-      perror ("mount failed");
-      exit (1);
-    }
+    error (where);
 
   if (statres == -1)
     {
@@ -159,8 +164,7 @@ main (int argc, const char **argv)
   if ((force == FALSE) && (mount_already_exists (argv[i + 1], flags)))
     {
       errno = EBUSY;
-      perror ("mount failed");
-      exit (1);
+      error (argv[i + 1]);
     }
   else
     do_mount (argv[i], argv[i + 1], flags);
@@ -232,10 +236,7 @@ change_cygdrive_prefix (const char *new_prefix, int flags)
   flags |= MOUNT_AUTO;
 
   if (mount (NULL, new_prefix, flags))
-    {
-      perror ("mount failed");
-      exit (1);
-    }
+    error (new_prefix);
   
   exit (0);
 }

@@ -1,3 +1,11 @@
+2000-06-07  Kazuhiro Fujieda <fujieda@jaist.ac.jp>
+
+        mount.cc (error): New function to report an error and exit.
+        umount.cc (error): Ditto.
+        (remove_all_automounts): Check return status of cygwin_umount.
+        (remove_all_user_mounts): Ditto.
+        (remove_all_system_mounts): Ditto.
+
 2000-06-05  DJ Delorie  <dj@cygnus.com>
 
 	* mount.cc: add stdlib.h for exit
