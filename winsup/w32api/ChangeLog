@@ -1,3 +1,7 @@
+2003-02-01  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/commctrl.h (TCM_*): Add missing defines.
+
 2003-02-01  Jesus Alvarez  <jesus_alvarez@users.sourceforge.net>
 	    Danny Smith  <dannysmith@users.sourceforge.net>
 
