@@ -265,20 +265,23 @@ mount_commands (void)
 
   // write mount commands for user and system mount points
   while ((p = getmntent (m)) != NULL) {
-    strcpy(opts, " -f");
-    if      (p->mnt_type[0] == 'u')
-      strcat (opts, " -u");
-    else if (p->mnt_type[0] == 's')
-      strcat (opts, " -s");
-    if      (p->mnt_opts[0] == 'b')
-      strcat (opts, " -b");
-    else if (p->mnt_opts[0] == 't')
-      strcat (opts, " -t");
-    if (strstr (p->mnt_opts, ",exec"))
-      strcat (opts, " -x");
-    while ((c = strchr (p->mnt_fsname, '\\')) != NULL)
-      *c = '/';
-    printf (format_mnt, opts, p->mnt_fsname, p->mnt_dir);
+    // Only list non-cygdrives
+    if (!strstr (p->mnt_opts, ",noumount")) {
+      strcpy(opts, " -f");
+      if      (p->mnt_type[0] == 'u')
+        strcat (opts, " -u");
+      else if (p->mnt_type[0] == 's')
+        strcat (opts, " -s");
+      if      (p->mnt_opts[0] == 'b')
+        strcat (opts, " -b");
+      else if (p->mnt_opts[0] == 't')
+        strcat (opts, " -t");
+      if (strstr (p->mnt_opts, ",exec"))
+        strcat (opts, " -x");
+      while ((c = strchr (p->mnt_fsname, '\\')) != NULL)
+        *c = '/';
+      printf (format_mnt, opts, p->mnt_fsname, p->mnt_dir);
+    }
   }
   endmntent (m);
 

@@ -1,5 +1,9 @@
 2001-09-03  Michael A Chase <mchase@ix.netcom.com>
 
+	* mount.cc (mount_commands): Don't write /cygdrive/u mount points.
+
+2001-09-03  Michael A Chase <mchase@ix.netcom.com>
+
 	* mount.cc (longopts): Add mount-commands to options list.
 	(usage): Add mount-commands option.
 	(mount_commands): New function.  Write commands to recreate current
@@ -82,7 +86,7 @@ Mon Apr 16 15:08:00 2001  Corinna Vinschen <vinschen@redhat.com>
 	`print_users'.
 
 2001-04-15  Michael A Chase <mchase@ix.netcom.com>
-  
+
 	* mount.cc (longopts): Add help to options list.
 	(opts): Add 'h' to options string.
 	* umount.cc (longopts): Add help to options list.
