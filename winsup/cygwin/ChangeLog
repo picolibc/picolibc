@@ -1,3 +1,8 @@
+Mon Jul 17 19:39:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	Patch suggested by Eric Fifer <EFifer@sanwaint.com>
+	* poll.cc (poll): Fix erroneous negations.
+
 Mon Jul 17 17:56:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* environ.cc (setenv): Use __cygwin_environ instead of

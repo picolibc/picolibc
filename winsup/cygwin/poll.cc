@@ -51,11 +51,11 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
         else
 	  {
             fds[i].revents = 0;
-	    if (!FD_ISSET (fds[i].fd, &read_fds))
+	    if (FD_ISSET (fds[i].fd, &read_fds))
 	      fds[i].revents |= POLLIN;
-	    if (!FD_ISSET (fds[i].fd, &write_fds))
+	    if (FD_ISSET (fds[i].fd, &write_fds))
 	      fds[i].revents |= POLLOUT;
-	    if (!FD_ISSET (fds[i].fd, &except_fds))
+	    if (FD_ISSET (fds[i].fd, &except_fds))
 	      fds[i].revents |= POLLPRI;
 	  }
       }
