@@ -64,15 +64,17 @@ or if you know what everything is already, just leave this out.</para>
 <sect2 id="cygpath"><title>cygpath</title>
 
 <screen>
-Usage: cygpath [-p|--path] (-u|--unix)|(-w|--windows) filename
+Usage: cygpath [-p|--path] (-u|--unix)|(-w|--windows [-s|--short-name]) filename
        cygpath [-v|--version]
        cygpath [-W|--windir|-S|--sysdir]
-  -u|--unix     print UNIX form of filename
-  -w|--windows  print Windows form of filename
-  -p|--path     filename argument is a path
-  -v|--version  print program version
-  -W|--windir   print windows directory
-  -S|--sysdir   print system directory
+  -u|--unix       print UNIX form of filename
+  -w|--windows    print Windows form of filename
+  -s|--short-name print Windows short form of filename
+  -p|--path       filename argument is a path
+  -v|--version    print program version
+  -W|--windir     print Windows directory
+  -S|--sysdir     print Windows system directory
+  -i|--ignore     ignore missing filename argument
 </screen>
 
 <para>The <command>cygpath</command> program is a utility that
@@ -87,7 +89,9 @@ here.</para>
 indicate whether you want a conversion from Windows to UNIX (POSIX)
 format (<literal>-u</literal>) or a conversion from UNIX (POSIX) to
 Windows format (<literal>-w</literal>).  You must give exactly
-one of these.  To give neither or both is an error.</para>
+one of these.  To give neither or both is an error.  Use the
+<literal>-s</literal> option in combination with the <literal>-w
+</literal> option to convert to Windows short form.</para>
 
 <para>The <literal>-p</literal> option means that you want to convert
 a path-style string rather than a single filename.  For example, the
@@ -96,12 +100,17 @@ colon-delimited in UNIX.  By giving <literal>-p</literal> you are
 instructing <command>cygpath</command> to convert between these
 formats.</para>
 
+<para>The <literal>-i</literal> option supresses the print out of the
+usage message if no filename argument was given.  It can be used in
+make file rules converting variables to a proper format that may be
+omitted.</para>
+
 <example><title>Example cygpath usage</title>
 <screen>
 #!/bin/sh
 for i in `echo *.exe | sed 's/\.exe/cc/'`
 do
-  notepad `cygpath -w $i`
+  notepad "`cygpath -w $i`"
 done
 </screen>
 </example>

@@ -1,3 +1,8 @@
+2000-09-15  Joerg Schaible <joerg.schaible@gmx.de>
+
+	* cygpath.cc: Add new options: -s and -i.
+	* utils.sgml: Document the new options.
+
 Tue Sep 12 22:45:28 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* kill.cc (main): Change behavior of -f so that it will force the
@@ -27,7 +32,7 @@ Fri Aug 25 11:44:29 2000  Christopher Faylor <cgf@cygnus.com>
 
 Thu Aug 24 18:02:35 2000  Christopher Faylor <cgf@cygnus.com>
 
-        * ps.cc (main): Always print a cygwin process using cygwin paths.
+	* ps.cc (main): Always print a cygwin process using cygwin paths.
 
 2000-08-24  Egor Duda  <deo@logos-m.ru>
 
