@@ -1,4 +1,4 @@
-<sect1 id="func-cygwin-posix-to-win32-path-list">
+<sect1 id="cygwin-posix-to-win32-path-list">
 <title>cygwin_posix_to_win32_path_list</title>
 
 <funcsynopsis>
@@ -30,12 +30,12 @@ if (_epath != NULL && *_epath != 0
 </programlisting>
 </example>
 
-<para>See also <link linkend="func-cygwin-posix-to-win32-path-list-buf-size">
+<para>See also <link linkend="cygwin-posix-to-win32-path-list-buf-size">
 cygwin_posix_to_win32_path_list_buf_size</link></para>
 
 </sect1>
 
-<sect1 id="func-cygwin-win32-to-posix-path-list">
+<sect1 id="cygwin-win32-to-posix-path-list">
 <title>cygwin_win32_to_posix_path_list</title>
 
 <funcsynopsis>
@@ -49,12 +49,12 @@ cygwin_posix_to_win32_path_list_buf_size</link></para>
 the equivalent POSIX path-style string (i.e. /foo:/bar).
 <parameter>posix</parameter> must point to a sufficiently large
 buffer.  See also <link
-linkend="func-cygwin-win32-to-posix-path-list-buf-size">
+linkend="cygwin-win32-to-posix-path-list-buf-size">
 cygwin_win32_to_posix_path_list_buf_size</link></para>
 
 </sect1>
 
-<sect1 id="func-cygwin-posix-to-win32-path-list-buf-size">
+<sect1 id="cygwin-posix-to-win32-path-list-buf-size">
 <title>cygwin_posix_to_win32_path_list_buf_size</title>
 
 <funcsynopsis>
@@ -64,12 +64,12 @@ cygwin_win32_to_posix_path_list_buf_size</link></para>
 </funcsynopsis>
 
 <para>Returns the number of bytes needed to hold the result of calling
-<link linkend="func-cygwin-posix-to-win32-path-list">
+<link linkend="cygwin-posix-to-win32-path-list">
 cygwin_posix_to_win32_path_list</link>.</para>
 
 </sect1>
 
-<sect1 id="func-cygwin-win32-to-posix-path-list-buf-size">
+<sect1 id="cygwin-win32-to-posix-path-list-buf-size">
 <title>cygwin_win32_to_posix_path_list_buf_size</title>
 
 <funcsynopsis>
@@ -79,12 +79,12 @@ cygwin_posix_to_win32_path_list</link>.</para>
 </funcsynopsis>
 
 <para>Tells you how many bytes are needed for the results of <link
-linkend="func-cygwin-win32-to-posix-path-list">
+linkend="cygwin-win32-to-posix-path-list">
 cygwin_win32_to_posix_path_list</link>.</para>
 
 </sect1>
 
-<sect1 id="func-cygwin-conv-to-posix-path">
+<sect1 id="cygwin-conv-to-posix-path">
 <title>cygwin_conv_to_posix_path</title>
 
 <funcsynopsis>
@@ -103,7 +103,7 @@ size; use MAX_PATH if needed.</para>
 
 </sect1>
 
-<sect1 id="func-cygwin-conv-to-win32-path">
+<sect1 id="cygwin-conv-to-win32-path">
 <title>cygwin_conv_to_win32_path</title>
 
 <funcsynopsis>
@@ -121,7 +121,7 @@ If <parameter>path</parameter> is relative, then
 size; use MAX_PATH if needed.</para>
 
 </sect1>
-<sect1 id="func-cygwin-conv-to-full-posix-path">
+<sect1 id="cygwin-conv-to-full-posix-path">
 <title>cygwin_conv_to_full_posix_path</title>
 
 <funcsynopsis>
@@ -140,7 +140,7 @@ buffer of sufficient size; use MAX_PATH if needed.</para>
 
 </sect1>
 
-<sect1 id="func-cygwin-conv-to-full-win32-path">
+<sect1 id="cygwin-conv-to-full-win32-path">
 <title>cygwin_conv_to_full_win32_path</title>
 
 <funcsynopsis>
@@ -159,7 +159,7 @@ buffer of sufficient size; use MAX_PATH if needed.</para>
 
 </sect1>
 
-<sect1 id="func-cygwin-posix-path-list-p">
+<sect1 id="cygwin-posix-path-list-p">
 <title>cygwin_posix_path_list_p</title>
 
 <funcsynopsis>
@@ -178,7 +178,7 @@ parameter.</para>
 
 </sect1>
 
-<sect1 id="func-cygwin-split-path">
+<sect1 id="cygwin-split-path">
 <title>cygwin_split_path</title>
 
 <funcsynopsis>
