@@ -494,8 +494,8 @@ int
 _link (const char *a, const char *b)
 {
   int res = -1;
-  path_conv real_a (a, PC_SYM_NOFOLLOW);
-  path_conv real_b (b, PC_SYM_NOFOLLOW);
+  path_conv real_a (a, PC_SYM_NOFOLLOW | PC_FULL);
+  path_conv real_b (b, PC_SYM_NOFOLLOW | PC_FULL);
 
   if (real_a.error)
     {
@@ -525,7 +525,6 @@ _link (const char *a, const char *b)
       DWORD cbPathLen;
       DWORD StreamSize;
       WCHAR wbuf[MAX_PATH];
-      char buf[MAX_PATH];
 
       BOOL bSuccess;
 
@@ -546,8 +545,7 @@ _link (const char *a, const char *b)
 	}
 
       lpContext = NULL;
-      cygwin_conv_to_full_win32_path (real_b.get_win32 (), buf);
-      cbPathLen = sys_mbstowcs (wbuf, buf, MAX_PATH) * sizeof (WCHAR);
+      cbPathLen = sys_mbstowcs (wbuf, real_b.get_win32 (), MAX_PATH) * sizeof (WCHAR);
 
       StreamId.dwStreamId = BACKUP_LINK;
       StreamId.dwStreamAttributes = 0;

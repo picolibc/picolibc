@@ -1,3 +1,8 @@
+Tue Jul 25 21:40:51 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* syscalls.cc (_link): Avoid extraneous call to
+	cygwin_conv_to_win32_path.
+
 Mon Jul 24 21:10:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* syscalls.cc (_link): Corrected previous patch.

@@ -7,8 +7,9 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#include "winsup.h"
+#include <errno.h>
 #include <stdlib.h>
+#include "winsup.h"
 #include <stddef.h>
 #include <ctype.h>
 #include <fcntl.h>
@@ -120,7 +121,6 @@ posify (int already_posix, char **here, const char *value)
 
       debug_printf ("env var converted to %s", outenv);
       *here = outenv;
-      free (src);
     }
 }
 
@@ -170,6 +170,88 @@ getenv (const char *name)
   return my_findenv (name, &offset);
 }
 
+/* Takes similar arguments to setenv except that overwrite is
+   either -1, 0, or 1.  0 or 1 signify that the function should
+   perform similarly to setenv.  Otherwise putenv is assumed. */
+static int __stdcall
+_addenv (const char *name, const char *value, int overwrite)
+{
+  int issetenv = overwrite >= 0;
+  int offset;
+  char *p;
+
+  int res;
+  if ((res = check_null_empty_path (name)))
+    {
+      set_errno (res);
+      return  -1;
+    }
+
+  unsigned int valuelen = strlen (value);
+  if ((p = my_findenv (name, &offset)))
+    {				/* Already exists. */
+      if (!overwrite)		/* Ok to overwrite? */
+	return 0;		/* No.  Wanted to add new value.  FIXME: Right return value? */
+
+      /* We've found the offset into environ.  If this is a setenv call and
+	 there is room in the current environment entry then just overwrite it.
+	 Otherwise handle this case below. */
+      if (issetenv && strlen (p) >= valuelen)
+	{
+	  strcpy (p, value);
+	  return 0;
+	}
+    }
+  else
+    {				/* Create new slot. */
+      char **env;
+
+      /* Search for the end of the environment. */
+      for (env = environ; *env; env++)
+	continue;
+
+      offset = env - environ;	/* Number of elements currently in environ. */
+
+      /* Allocate space for additional element plus terminating NULL. */
+      __cygwin_environ = (char **) realloc (environ, (sizeof (char *) *
+						     (offset + 2)));
+      if (!__cygwin_environ)
+	return -1;		/* Oops.  No more memory. */
+
+      __cygwin_environ[offset + 1] = NULL;	/* NULL terminate. */
+      update_envptrs ();	/* Update any local copies of 'environ'. */
+    }
+
+  char *envhere;
+  if (!issetenv)
+    envhere = environ[offset] = (char *) name;	/* Not setenv. Just
+						   overwrite existing. */
+  else
+    {				/* setenv */
+      /* Look for an '=' in the name and ignore anything after that if found. */
+      for (p = (char *) name; *p && *p != '='; p++)
+	continue;
+
+      int namelen = p - name;	/* Length of name. */
+      /* Allocate enough space for name + '=' + value + '\0' */
+      envhere = environ[offset] = (char *) malloc (namelen + valuelen + 2);
+      if (!envhere)
+	return -1;		/* Oops.  No more memory. */
+
+      /* Put name '=' value into current slot. */
+      strncpy (envhere, name, namelen);
+      envhere[namelen] = '=';
+      strcpy (envhere + namelen + 1, value);
+    }
+
+  /* Update cygwin's cache, if appropriate */
+  win_env *spenv;
+  if ((spenv = getwinenv (envhere)))
+    spenv->add_cache (value);
+
+  return 0;
+}
+
 /* putenv --
  *	Sets an environment variable
  */
@@ -177,78 +259,33 @@ getenv (const char *name)
 extern "C" int
 putenv (const char *str)
 {
-  register char *p, *equal;
-  int rval;
+  char *eq = strchr (str, '=');
+  if (eq)
+    return _addenv (str, eq + 1, -1);
 
-  if (!(p = strdup (str)))
-    return 1;
-  if (!(equal = index (p, '=')))
-    {
-      (void) free (p);
-      return 1;
-    }
-  *equal = '\0';
-  rval = setenv (p, equal + 1, 1);
-  (void) free (p);
-  return rval;
+  /* Remove str from the environment. */
+  unsetenv (str);
+  return 0;
 }
 
 /*
  * setenv --
  *	Set the value of the environment variable "name" to be
- *	"value".  If rewrite is set, replace any current value.
+ *	"value".  If overwrite is set, replace any current value.
  */
 
 extern "C" int
-setenv (const char *name, const char *value, int rewrite)
+setenv (const char *name, const char *value, int overwrite)
 {
-  register char *C;
-  unsigned int l_value;
-  int offset;
-
-  if (*value == '=')		/* no `=' in value */
-    ++value;
-  l_value = strlen (value);
-  if ((C = my_findenv (name, &offset)))
-    {				/* find if already exists */
-      if (!rewrite)
-	return 0;
-      if (strlen (C) >= l_value)
-	{			/* old larger; copy over */
-	  while ((*C++ = *value++));
-	  return 0;
-	}
+  int res;
+  if ((res = check_null_empty_path (value)))
+    {
+      set_errno (res);
+      return  -1;
     }
-  else
-    {				/* create new slot */
-      register int cnt;
-      register char **P;
-
-      for (P = environ, cnt = 0; *P; ++P, ++cnt)
-	;
-      __cygwin_environ = (char **) realloc ((char *) environ,
-				   (size_t) (sizeof (char *) * (cnt + 2)));
-      if (!__cygwin_environ)
-	return -1;
-      __cygwin_environ[cnt + 1] = NULL;
-      update_envptrs ();
-      offset = cnt;
-    }
-
-  for (C = (char *) name; *C && *C != '='; ++C);	/* no `=' in name */
-
-  if (!(environ[offset] =	/* name + `=' + value */
-	(char *) malloc ((size_t) ((int) (C - name) + l_value + 2))))
-    return -1;
-  for (C = environ[offset]; (*C = *name++) && *C != '='; ++C);
-  *C++ = '=';
-  strcpy (C, value);
-
-  win_env *spenv;
-  if ((spenv = getwinenv (environ[offset])))
-    spenv->add_cache (value);
-
-  return 0;
+  if (*value == '=')
+    value++;
+  return _addenv (name, value, !!overwrite);
 }
 
 /*
@@ -453,11 +490,12 @@ regopt (const char *name)
 void
 environ_init (int already_posix)
 {
-  const char * const rawenv = GetEnvironmentStrings ();
+  char *rawenv = GetEnvironmentStrings ();
   int envsize, i;
-  char *newp, **envp;
-  const char *p;
+  char *p;
+  char **envp;
   int sawTERM = 0;
+  static char cygterm[] = "TERM=cygwin";
 
   /* Allocate space for environment + trailing NULL + CYGWIN env. */
   envp = (char **) malloc ((4 + (envsize = 100)) * sizeof (char *));
@@ -478,33 +516,31 @@ environ_init (int already_posix)
      eventually want to use them).  */
   for (i = 0, p = rawenv; *p != '\0'; p = strchr (p, '\0') + 1, i++)
     {
-      newp = strdup (p);
       if (i >= envsize)
 	envp = (char **) realloc (envp, (4 + (envsize += 100)) *
 					    sizeof (char *));
-      envp[i] = newp;
-      if (*newp == '=')
-	*newp = '!';
+      envp[i] = p;
+      if (*p == '=')
+	*p = '!';
       char *eq;
-      if ((eq = strchr (newp, '=')) == NULL)
-	eq = strchr (newp, '\0');
+      if ((eq = strchr (p, '=')) == NULL)
+	eq = strchr (p, '\0');
       if (!parent_alive)
-	ucenv (newp, eq);
-      if (strncmp (newp, "TERM=", 5) == 0)
+	ucenv (p, eq);
+      if (strncmp (p, "TERM=", 5) == 0)
 	sawTERM = 1;
-      if (strncmp (newp, "CYGWIN=", sizeof("CYGWIN=") - 1) == 0)
-	parse_options (newp + sizeof("CYGWIN=") - 1);
+      if (strncmp (p, "CYGWIN=", sizeof("CYGWIN=") - 1) == 0)
+	parse_options (p + sizeof("CYGWIN=") - 1);
       if (*eq)
 	posify (already_posix, envp + i, *++eq ? eq : --eq);
       debug_printf ("%s", envp[i]);
     }
 
   if (!sawTERM)
-    envp[i++] = strdup ("TERM=cygwin");
+    envp[i++] = cygterm;
   envp[i] = NULL;
   __cygwin_environ = envp;
   update_envptrs ();
-  FreeEnvironmentStringsA ((char *) rawenv);
   parse_options (NULL);
   MALLOC_CHECK;
 }
