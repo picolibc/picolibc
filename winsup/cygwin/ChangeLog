@@ -1,5 +1,10 @@
 2002-07-12  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* cygserver_shm.cc (server_shmmgr::shmdt): Only call
+	delete_segment if the segment exists [sic].
+
+2002-07-12  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* safe_memory.h: Include <new> rather than <new.h> for gcc 3.
 
 2002-07-11  Pavel Tsekov  <ptsekov@gmx.net>

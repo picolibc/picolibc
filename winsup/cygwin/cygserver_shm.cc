@@ -558,7 +558,7 @@ server_shmmgr::shmdt (const int shmid, const class process *const client)
   if (!result)
     _shm_atts -= 1;
 
-  if (segptr->is_pending_delete ())
+  if (!result && segptr->is_pending_delete ())
     delete_segment (segptr);
 
   LeaveCriticalSection (&_segments_lock);
