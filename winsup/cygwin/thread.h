@@ -254,6 +254,7 @@ class pthread_mutex:public verifyable_object
 {
 public:
   static bool isGoodObject(pthread_mutex_t const *);
+  static bool isGoodInitializer(pthread_mutex_t const *);
   static bool isGoodInitializerOrObject(pthread_mutex_t const *);
   CRITICAL_SECTION criticalsection;
   HANDLE win32_obj_id;
@@ -361,7 +362,7 @@ class pthreadNull : public pthread
 class pthread_condattr:public verifyable_object
 {
 public:
-  static bool isGoodObject(pthread_condattr_t *);
+  static bool isGoodObject(pthread_condattr_t const *);
   int shared;
 
   pthread_condattr ();
@@ -371,7 +372,9 @@ public:
 class pthread_cond:public verifyable_object
 {
 public:
-  static bool isGoodObject(pthread_cond_t *);
+  static bool isGoodObject(pthread_cond_t const *);
+  static bool isGoodInitializer(pthread_cond_t const *);
+  static bool isGoodInitializerOrObject(pthread_cond_t const *);
   int shared;
   LONG waiting;
   LONG ExitingWait;
@@ -400,7 +403,7 @@ public:
 class semaphore:public verifyable_object
 {
 public:
-  static bool isGoodObject(semaphore **);
+  static bool isGoodObject(sem_t const *);
   HANDLE win32_obj_id;
   class semaphore * next;
   int shared;

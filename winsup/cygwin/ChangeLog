@@ -1,5 +1,26 @@
 2002-09-21  Robert Collins <rbtcollins@hotmail.com>
 
+	* thread.cc: Change verifyable_object_isvalid calls with
+	PTHREAD_CONDATTR_MAGIC, PTHREAD_MUTEXATTR_MAGIC, PTHREAD_COND_MAGIC,
+	SEM_MAGIC to objecttype::isGoodObject() calls throughout.
+	(pthread_condattr::isGoodObject): Implement.
+	(pthread_mutex::isGoodInitializer): Implement.
+	(pthread_mutex::isGoodInitializerOrObject): Minor bugfix in the
+	check for verifyable_object_isvalid result.
+	(pthread_mutexattr::isGoodObject): Implement.
+	(pthread_cond::isGoodObject): Ditto.
+	(pthread_cond::isGoodInitializer): Ditto.
+	(pthread_cond::isGoodInitializerOrObject): Ditto.
+	(semaphore::isGoodObject): Ditto.
+	* thread.h (pthread_mutex::isGoodInitializer): Declare.
+	(pthread_condattr::isGoodObject): Ditto.
+	(pthread_cond::isGoodObject): Const correctness.
+	(pthread_cond::isGoodInitializer): Declare.
+	(pthread_cond::isGoodInitializerOrObject): Ditto.
+	(semaphore::isGoodObject): Const correctness.
+
+2002-09-21  Robert Collins <rbtcollins@hotmail.com>
+
 	* thread.cc: Change verifyable_object_isvalid calls with 
 	PTHREAD_MUTEX_MAGIC and PTHREAD_KEY_MAGIC and PTHREAD_ATTR_MAGIC to
 	::isGoodObject() calls throughout.
