@@ -635,8 +635,8 @@ skip_arg_parsing:
     {
       BOOL exited;
 
-      HANDLE waitbuf[2] = {pi.hProcess, spr};
-      int nwait = 2;
+      HANDLE waitbuf[3] = {pi.hProcess, signal_arrived, spr};
+      int nwait = 3;
 
       SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_HIGHEST);
       res = 0;
@@ -675,6 +675,10 @@ skip_arg_parsing:
 		  }
 	      break;
 	    case WAIT_OBJECT_0 + 1:
+	      sigproc_printf ("signal arrived");
+	      ResetEvent (signal_arrived);
+	      continue;
+	    case WAIT_OBJECT_0 + 2:
 	      res = EXIT_REPARENTING;
 	      MALLOC_CHECK;
 	      ForceCloseHandle (spr);

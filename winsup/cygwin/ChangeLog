@@ -1,3 +1,8 @@
+Wed Mar 15 14:25:38 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* spawn.cc (spawn_guts): Restore dependency on signal_arrived.  It's
+	needed to wake up the WaitForSingleObject.
+
 Tue Mar 14 23:41:16 2000  Christopher Faylor <cgf@cygnus.com>
 
 	Pipe changes throughout suggested by Eric Fifer <EFifer@sanwaint.com>
