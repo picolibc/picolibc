@@ -1,3 +1,8 @@
+Wed May 26 16:57:44 1999  Jeffrey A Law  (law@cygnus.com)
+
+	* hppa.h (pa_opcodes): Add second entry for "comb", "comib", 
+	"addb", and "addib" to be used by the disassembler.
+
 1999-05-12  Alan Modra  <alan@apri.levels.unisa.edu.au>
 
 	* i386.h (ReverseModrm): Remove all occurences.

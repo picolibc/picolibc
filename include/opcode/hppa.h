@@ -184,9 +184,21 @@ static const struct pa_opcode pa_opcodes[] =
 { "b",		0xe8000000, 0xffe0e000, "nW", pa10}, /* bl foo,r0 */
 { "ldi",	0x34000000, 0xffe0c000, "j,x", pa10},	/* ldo val(r0),r */
 { "comib", 	0x84000000, 0xfc000000, "?n5,b,w", pa10}, /* comib{tf}*/
+/* This entry is for the disassembler only.  It will never be used by
+   assembler.  */
+{ "comib", 	0x8c000000, 0xfc000000, "?n5,b,w", pa10}, /* comib{tf}*/
 { "comb",	0x80000000, 0xfc000000, "?nx,b,w", pa10}, /* comb{tf} */
+/* This entry is for the disassembler only.  It will never be used by
+   assembler.  */
+{ "comb",	0x88000000, 0xfc000000, "?nx,b,w", pa10}, /* comb{tf} */
 { "addb",	0xa0000000, 0xfc000000, "@nx,b,w", pa10}, /* addb{tf} */
+/* This entry is for the disassembler only.  It will never be used by
+   assembler.  */
+{ "addb",	0xa8000000, 0xfc000000, "@nx,b,w", pa10},
 { "addib",	0xa4000000, 0xfc000000, "@n5,b,w", pa10}, /* addib{tf}*/
+/* This entry is for the disassembler only.  It will never be used by
+   assembler.  */
+{ "addib",	0xac000000, 0xfc000000, "@n5,b,w", pa10}, /* addib{tf}*/
 { "nop",        0x08000240, 0xffffffff, "", pa10},      /* or 0,0,0 */
 { "copy",       0x08000240, 0xffe0ffe0, "x,t", pa10},   /* or r,0,t */
 { "mtsar",      0x01601840, 0xffe0ffff, "x", pa10}, /* mtctl r,cr11 */
