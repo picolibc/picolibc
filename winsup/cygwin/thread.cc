@@ -283,20 +283,18 @@ MTinterface::Init (int forked)
 
   if (!indexallocated)
     {
-      indexallocated = (-1);
       thread_self_dwTlsIndex = TlsAlloc ();
       if (thread_self_dwTlsIndex == TLS_OUT_OF_INDEXES)
 	system_printf
 	  ("local storage for thread couldn't be set\nThis means that we are not thread safe!");
+      else
+	indexallocated = (-1);
     }
 
   concurrency = 0;
   threadcount = 1; /*1 current thread when Init occurs.*/
 
-  mainthread.win32_obj_id = myself->hProcess;
-  mainthread.setThreadIdtoCurrent ();
-  /*store the main thread's self pointer */
-  TlsSetValue (thread_self_dwTlsIndex, &mainthread);
+  pthread::initMainThread(&mainthread, myself->hProcess);
 
   if (forked)
     return;
@@ -346,11 +344,35 @@ MTinterface::fixup_after_fork (void)
 /* pthread calls */
 
 /* static methods */
+void
+pthread::initMainThread(pthread *mainThread, HANDLE win32_obj_id)
+{
+  mainThread->win32_obj_id = win32_obj_id;
+  mainThread->setThreadIdtoCurrent ();
+  setTlsSelfPointer(mainThread);
+}
 
 pthread *
 pthread::self ()
 {
-  return (pthread *) TlsGetValue (MT_INTERFACE->thread_self_dwTlsIndex);
+  pthread *temp = (pthread *) TlsGetValue (MT_INTERFACE->thread_self_dwTlsIndex);
+  if (temp)
+      return temp;
+  temp = new pthread ();
+  temp->precreate (NULL);
+  if (!temp->magic) {
+      delete temp;
+      return pthreadNull::getNullpthread();
+  }
+  temp->postcreate ();
+  return temp;
+}
+
+void
+pthread::setTlsSelfPointer(pthread *thisThread)
+{
+  /*the OS doesn't check this for <= 64 Tls entries (pre win2k) */
+  TlsSetValue (MT_INTERFACE->thread_self_dwTlsIndex, thisThread);
 }
 
 /* member methods */
@@ -368,10 +390,14 @@ pthread::~pthread ()
     CloseHandle (cancel_event);
 }
 
+void
+pthread::setThreadIdtoCurrent ()
+{
+  thread_id = GetCurrentThreadId ();
+}
 
 void
-pthread::create (void *(*func) (void *), pthread_attr *newattr,
-		 void *threadarg)
+pthread::precreate (pthread_attr *newattr)
 {
   pthread_mutex *verifyable_mutex_obj = &mutex;
 
@@ -386,8 +412,6 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
       attr.inheritsched = newattr->inheritsched;
       attr.stacksize = newattr->stacksize;
     }
-  function = func;
-  arg = threadarg;
 
   if (verifyable_object_isvalid (&verifyable_mutex_obj, PTHREAD_MUTEX_MAGIC) != VALID_OBJECT)
     {
@@ -405,6 +429,17 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
       magic = 0;
       return;
     }
+}
+
+void
+pthread::create (void *(*func) (void *), pthread_attr *newattr,
+		 void *threadarg)
+{ 
+  precreate (newattr);
+  if (!magic)
+      return;
+   function = func;
+   arg = threadarg;
 
   win32_obj_id = ::CreateThread (&sec_none_nih, attr.stacksize,
 				(LPTHREAD_START_ROUTINE) thread_init_wrapper,
@@ -415,17 +450,22 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
       thread_printf ("CreateThread failed: this %p LastError %E", this);
       magic = 0;
     }
-  else
-    {
-      InterlockedIncrement (&MT_INTERFACE->threadcount);
-      /*FIXME: set the priority appropriately for system contention scope */
-      if (attr.inheritsched == PTHREAD_EXPLICIT_SCHED)
-	{
-	  /*FIXME: set the scheduling settings for the new thread */
-	  /*sched_thread_setparam (win32_obj_id, attr.schedparam); */
-	}
+  else {
+      postcreate ();
       ResumeThread (win32_obj_id);
-    }
+  }
+}
+
+void
+pthread::postcreate ()
+{
+    InterlockedIncrement (&MT_INTERFACE->threadcount);
+    /*FIXME: set the priority appropriately for system contention scope */
+    if (attr.inheritsched == PTHREAD_EXPLICIT_SCHED)
+      {
+	/*FIXME: set the scheduling settings for the new thread */
+	/*sched_thread_setparam (win32_obj_id, attr.schedparam); */
+      }
 }
 
 void
@@ -447,6 +487,9 @@ pthread::exit (void *value_ptr)
       return_ptr = value_ptr;
       mutex.UnLock ();
     }
+
+  /* Prevent DLL_THREAD_DETACH Attempting to clean us up */
+  setTlsSelfPointer(0);
 
   if (InterlockedDecrement (&MT_INTERFACE->threadcount) == 0)
     ::exit (0);
@@ -762,6 +805,18 @@ pthread::pop_all_cleanup_handlers ()
 {
   while (cleanup_stack != NULL)
     pop_cleanup_handler (1);
+}
+
+void
+pthread::cancel_self()
+{
+  exit (PTHREAD_CANCELED);
+}
+
+DWORD
+pthread::getThreadId()
+{
+  return thread_id;
 }
 
 pthread_attr::pthread_attr ():verifyable_object (PTHREAD_ATTR_MAGIC),
@@ -1278,8 +1333,7 @@ pthread::thread_init_wrapper (void *_arg)
   if (!TlsSetValue (MT_INTERFACE->reent_index, &local_reent))
     system_printf ("local storage for thread couldn't be set");
 
-  /*the OS doesn't check this for <= 64 Tls entries (pre win2k) */
-  TlsSetValue (MT_INTERFACE->thread_self_dwTlsIndex, thread);
+  setTlsSelfPointer(thread);
 
   thread->mutex.Lock ();
   // if thread is detached force cleanup on exit
@@ -1308,6 +1362,20 @@ pthread::thread_init_wrapper (void *_arg)
   return 0;
 }
 
+bool
+pthread::isGoodObject (pthread_t *thread)
+{
+  if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
+    return false;
+  return true;
+}
+
+unsigned long
+pthread::getsequence_np ()
+{
+  return getThreadId ();
+}
+
 int
 __pthread_create (pthread_t *thread, const pthread_attr_t *attr,
 		  void *(*start_routine) (void *), void *arg)
@@ -1318,7 +1386,7 @@ __pthread_create (pthread_t *thread, const pthread_attr_t *attr,
 
   *thread = new pthread ();
   (*thread)->create (start_routine, attr ? *attr : NULL, arg);
-  if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
+  if (!pthread::isGoodObject (thread))
     {
       delete (*thread);
       *thread = NULL;
@@ -1355,7 +1423,7 @@ __pthread_once (pthread_once_t *once_control, void (*init_routine) (void))
 int
 __pthread_cancel (pthread_t thread)
 {
-  if (verifyable_object_isvalid (&thread, PTHREAD_MAGIC) != VALID_OBJECT)
+  if (!pthread::isGoodObject (&thread))
     return ESRCH;
 
   return thread->cancel ();
@@ -1642,7 +1710,7 @@ __pthread_join (pthread_t *thread, void **return_val)
      *return_val = NULL;
 
   /*FIXME: wait on the thread cancellation event as well - we are a cancellation point*/
-  if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
+  if (!pthread::isGoodObject (thread))
     return ESRCH;
 
   if (__pthread_equal(thread,&joiner))
@@ -1675,7 +1743,7 @@ __pthread_join (pthread_t *thread, void **return_val)
 int
 __pthread_detach (pthread_t *thread)
 {
-  if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
+  if (!pthread::isGoodObject (thread))
     return ESRCH;
 
   (*thread)->mutex.Lock ();
@@ -1706,7 +1774,7 @@ __pthread_detach (pthread_t *thread)
 int
 __pthread_suspend (pthread_t *thread)
 {
-  if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
+  if (!pthread::isGoodObject (thread))
     return ESRCH;
 
   if ((*thread)->suspended == false)
@@ -1722,7 +1790,7 @@ __pthread_suspend (pthread_t *thread)
 int
 __pthread_continue (pthread_t *thread)
 {
-  if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
+  if (!pthread::isGoodObject (thread))
     return ESRCH;
 
   if ((*thread)->suspended == true)
@@ -1746,22 +1814,13 @@ int
 __pthread_getschedparam (pthread_t thread, int *policy,
 			 struct sched_param *param)
 {
-  if (verifyable_object_isvalid (&thread, PTHREAD_MAGIC) != VALID_OBJECT)
+  if (!pthread::isGoodObject (&thread))
     return ESRCH;
   *policy = SCHED_FIFO;
   /*we don't return the current effective priority, we return the current requested
    *priority */
   *param = thread->attr.schedparam;
   return 0;
-}
-
-
-unsigned long
-__pthread_getsequence_np (pthread_t *thread)
-{
-  if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
-    return EINVAL;
-  return (*thread)->GetThreadId ();
 }
 
 /*Thread SpecificData */
@@ -1812,7 +1871,7 @@ int
 __pthread_setschedparam (pthread_t thread, int policy,
 			 const struct sched_param *param)
 {
-  if (verifyable_object_isvalid (&thread, PTHREAD_MAGIC) != VALID_OBJECT)
+  if (!pthread::isGoodObject (&thread))
     return ESRCH;
   if (policy != SCHED_FIFO)
     return ENOTSUP;
@@ -2045,7 +2104,7 @@ __pthread_kill (pthread_t thread, int sig)
 // lock myself, for the use of thread2signal
   // two different kills might clash: FIXME
 
-  if (verifyable_object_isvalid (&thread, PTHREAD_MAGIC) != VALID_OBJECT)
+  if (!pthread::isGoodObject (&thread))
     return EINVAL;
 
   if (thread->sigs)
@@ -2400,5 +2459,74 @@ __sem_post (sem_t *sem)
   (*sem)->Post ();
   return 0;
 }
+
+/* pthreadNull */
+pthread *
+pthreadNull::getNullpthread()
+{
+  /* because of weird entry points */
+  _instance.magic = 0;
+  return &_instance;
+}
+
+pthreadNull::pthreadNull()
+{
+  /* Mark ourselves as invalid */
+  magic = 0;
+}
+
+pthreadNull::~pthreadNull()
+{
+}
+
+void
+pthreadNull::create (void *(*)(void *), pthread_attr *, void *)
+{
+}
+
+void
+pthreadNull::exit (void *value_ptr)
+{
+}
+
+int
+pthreadNull::cancel ()
+{
+  return 0;
+}
+
+void
+pthreadNull::testcancel ()
+{
+}
+
+int
+pthreadNull::setcancelstate (int state, int *oldstate)
+{
+  return EINVAL;
+}
+
+int
+pthreadNull::setcanceltype (int type, int *oldtype)
+{
+  return EINVAL;
+}
+
+void
+pthreadNull::push_cleanup_handler (__pthread_cleanup_handler *handler)
+{
+}
+
+void
+pthreadNull::pop_cleanup_handler (int const execute)
+{
+}
+unsigned long
+pthreadNull::getsequence_np()
+{
+  return 0;
+}
+
+pthreadNull pthreadNull::_instance = pthreadNull ();
 
 #endif // MT_SAFE

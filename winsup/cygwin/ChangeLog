@@ -1,3 +1,77 @@
+2002-09-11  Robert Collins  <rbtcollins@hotmail.com>
+
+	* init.cc (dll_entry): On thread detach, if the thread hasn't
+	exit()ed, do so.
+	* pthread.cc (pthread_getsequence_np): Remove the 
+	__pthread_getsequence_np wrapper. This requires errno.h.
+	* thread.cc (pthread::self): Instantiate a new pthread object 
+	when called and none exists. return a NULL object if instantiation 
+	fails.
+	(pthread::precreate): Factor out common code.
+	(pthread::postcreate): Ditto.
+	(pthread::create): Ditto.
+	(pthread::exit): Remove the TLS value when we exit to prevent
+	double exits.
+	(MTinterface::Init): Bugfix - don't mark the TLS index as created
+	if one was not allocated.
+	Apply Extract Method to move pthread specific initialisation into
+	pthread.
+	(pthread::initMainThread): Extracted method from MTinterface::Init.
+	(pthread::setTlsSelfPointer): Extracted method from various pthread
+	calls, to make reading those functions easier.
+	(pthread::setThreadIdtoCurrent): Ditto.
+	(pthread::cancel_self): Bring into the .cc file, it's only used
+	within the class.
+	(pthread::getThreadId): Ditto.
+	(pthread::thread_init_wrapper): Apply Extract Method to the TLS
+	setting logic.
+	(pthread::isGoodObject): Extracted method from various pthread
+	wrapper calls, for clarity of reading.
+	(pthread::getsequence_np): Converted from __pthread_getsquence_np.
+	(__pthread_create): Apply Extract Method to the object validation.
+	(__pthread_cancel): Ditto.
+	(__pthread_join): Ditto.
+	(__pthread_detach): Ditto.
+	(__pthread_suspend): Ditto.
+	(__pthread_continue): Ditto.
+	(__pthread_getschedparam): Ditto.
+	(__pthread_getsequence_np): Remove.
+	(__pthread_setschedparam): Apply Extract Method to the object
+	validation.
+	(pthreadNull::getNullpthread): New method, return the pthreadNull 
+	object.
+	(pthreadNull::pthreadNull): Private constructor to prevent accidental
+	use.
+	(pthreadNull::~pthreadNull): Prevent compile warnings.
+	(pthreadNull::create): Override pthread behaviour.
+	(pthreadNull::exit): Ditto.
+	(pthreadNull::cancel): Ditto.
+	(pthreadNull::testcancel): Ditto.
+	(pthreadNull::setcancelstate): Ditto.
+	(pthreadNull::setcanceltype): Ditto.
+	(pthreadNull::push_cleanup_handler): Ditto.
+	(pthreadNull::pop_cleanup_handler): Ditto.
+	(pthreadNull::getsequence_np): Ditto.
+	(pthreadNull::_instance): Ditto.
+	* thread.h (pthread): Declare pre- and post-create.
+	Move GetThreadId to private scope and rename to getThreadId.
+	Move setThreadIdtoCurrent to private scope.
+	Make create virtual.
+	Make ~pthread virtual.
+	Declare initMainThread.
+	Declare isGoodObject.
+	Make exit virtual.
+	Make cancel virtual.
+	Make testcancel virtual.
+	Make setcancelstate virtual.
+	Make setcanceltype virtual.
+	Make push_cleanup_handler virtual.
+	Make pop_cleanup_handler virtual.
+	Declare getsequence_np.
+	Declare setTlsSelfPointer.
+	(pthreadNull): New null object class for pthread.
+	(__pthread_getsequence_np): Remove.
+
 2002-09-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (seteuid32): Treat ILLEGAL_UID invalid.

@@ -12,6 +12,7 @@
 
 #include "winsup.h"
 #include "thread.h"
+#include "errno.h"
 
 extern "C"
 {
@@ -173,7 +174,9 @@ pthread_continue (pthread_t thread)
 unsigned long
 pthread_getsequence_np (pthread_t * thread)
 {
-  return __pthread_getsequence_np (thread);
+  if (!pthread::isGoodObject (thread))
+    return EINVAL;
+  return (*thread)->getsequence_np();
 }
 
 /* Thread SpecificData */

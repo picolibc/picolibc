@@ -270,42 +270,34 @@ public:
   pthread_t joiner;
   // int joinable;
 
-  DWORD GetThreadId ()
-  {
-    return thread_id;
-  }
-  void setThreadIdtoCurrent ()
-  {
-    thread_id = GetCurrentThreadId ();
-  }
-
   /* signal handling */
   struct sigaction *sigs;
   sigset_t *sigmask;
   LONG *sigtodo;
-  void create (void *(*)(void *), pthread_attr *, void *);
+  virtual void create (void *(*)(void *), pthread_attr *, void *);
 
-    pthread ();
-   ~pthread ();
+   pthread ();
+   virtual ~pthread ();
 
-   void exit (void *value_ptr);
+   static void initMainThread(pthread *, HANDLE);
+   static bool isGoodObject(pthread_t *);
 
-   int cancel ();
-   void testcancel ();
-   void cancel_self ()
-   {
-     exit (PTHREAD_CANCELED);
-   }
+   virtual void exit (void *value_ptr);
+
+   virtual int cancel ();
+   virtual void testcancel ();
    static void static_cancel_self ();
 
-   int setcancelstate (int state, int *oldstate);
-   int setcanceltype (int type, int *oldtype);
+   virtual int setcancelstate (int state, int *oldstate);
+   virtual int setcanceltype (int type, int *oldtype);
 
-   void push_cleanup_handler (__pthread_cleanup_handler *handler);
-   void pop_cleanup_handler (int const execute);
+   virtual void push_cleanup_handler (__pthread_cleanup_handler *handler);
+   virtual void pop_cleanup_handler (int const execute);
 
    static pthread* self ();
    static void *thread_init_wrapper (void *);
+
+   virtual unsigned long getsequence_np();
 
 private:
     DWORD thread_id;
@@ -316,6 +308,36 @@ private:
     friend int __pthread_detach (pthread_t * thread);
 
     void pop_all_cleanup_handlers (void);
+    void precreate (pthread_attr *);
+    void postcreate ();
+    void setThreadIdtoCurrent();
+    static void setTlsSelfPointer(pthread *);
+    void cancel_self ();
+    DWORD getThreadId ();
+};
+
+class pthreadNull : public pthread
+{
+  public: 
+    static pthread *getNullpthread();
+    ~pthreadNull();
+
+    /* From pthread These should never get called
+     * as the ojbect is not verifyable
+     */
+    void create (void *(*)(void *), pthread_attr *, void *);
+    void exit (void *value_ptr);
+    int cancel ();
+    void testcancel ();
+    int setcancelstate (int state, int *oldstate);
+    int setcanceltype (int type, int *oldtype);
+    void push_cleanup_handler (__pthread_cleanup_handler *handler);
+    void pop_cleanup_handler (int const execute);
+    unsigned long getsequence_np();
+
+  private:
+    pthreadNull ();
+    static pthreadNull _instance;
 };
 
 class pthread_condattr:public verifyable_object
@@ -457,8 +479,6 @@ int __pthread_attr_setstackaddr (pthread_attr_t *, void *);
 /* Thread suspend */
 int __pthread_suspend (pthread_t * thread);
 int __pthread_continue (pthread_t * thread);
-
-unsigned long __pthread_getsequence_np (pthread_t * thread);
 
 /* Thread SpecificData */
 int __pthread_key_create (pthread_key_t * key, void (*destructor) (void *));

@@ -35,6 +35,13 @@ WINAPI dll_entry (HANDLE h, DWORD reason, void *static_load)
     case DLL_PROCESS_DETACH:
       break;
     case DLL_THREAD_DETACH:
+      pthread *thisthread = (pthread *) TlsGetValue (
+			user_data->threadinterface->thread_self_dwTlsIndex);
+      if (thisthread) {
+	  /* Some non-pthread call created this thread, 
+	   * but we need to clean it up */
+	  thisthread->exit(0);
+      }
 #if 0 // FIXME: REINSTATE SOON
       waitq *w;
       if ((w = waitq_storage.get ()) != NULL)
