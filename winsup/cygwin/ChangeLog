@@ -1,6 +1,6 @@
 Sun Apr  1 00:38:06 2001  Christopher Faylor <cgf@cygnus.com>
 
-	* exceptions.cc (sigframe::call_signal_handler): Move out side of "C"
+	* exceptions.cc (sigframe::call_signal_handler): Move outside of "C"
 	block or some compilers will complain.
 
 Sun Apr  1 00:24:14 2001  Christopher Faylor <cgf@cygnus.com>
