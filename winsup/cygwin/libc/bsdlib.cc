@@ -236,3 +236,25 @@ errx (int eval, const char *fmt, ...)
   vwarnx (fmt, ap);
   exit (eval);
 }
+
+extern "C" const char *
+getprogname (void)
+{
+  return __progname;
+}
+
+extern "C" void
+setprogname (const char *newprogname)
+{
+  if (!check_null_str_errno (newprogname))
+    {
+      /* Per BSD man page, setprogname keeps a pointer to the last
+         path component of the argument.  It does *not* copy the
+	 argument before. */
+      __progname = strrchr (newprogname, '/');
+      if (__progname)
+        ++__progname;
+      else
+	__progname = (char *)newprogname;
+    }
+}

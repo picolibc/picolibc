@@ -1,3 +1,10 @@
+2003-11-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsdlib.cc (getprogname): New function.
+	(setprogname): New funtion.
+	* cygwin.din: Export getprogname and setprogname.
+	* include/cygwin/version.h: Bumb API version number.
+
 2003-11-15  Christopher Faylor  <cgf@redhat.com>
 
 	* include/limits.h: Revert unsanctioned changes below.

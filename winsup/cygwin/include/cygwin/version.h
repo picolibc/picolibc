@@ -227,13 +227,14 @@ details. */
       100: CW_GET_SHMLBA addition to external.cc.
       101: Export err, errx, verr, verrx, warn, warnx, vwarn, vwarnx.
       102: CW_GET_UID_FROM_SID and CW_GET_GID_FROM_SID addition to external.cc.
+      103: Export getprogname, setprogname.
 
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 102
+#define CYGWIN_VERSION_API_MINOR 103
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

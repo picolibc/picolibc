@@ -645,6 +645,7 @@ getpid
 _getpid = getpid
 getppid
 _getppid = getppid
+getprogname
 getpwduid
 _getpwduid = getpwduid
 getpwent
@@ -1178,6 +1179,7 @@ setpgid
 _setpgid = setpgid
 setpgrp
 _setpgrp = setpgrp
+setprogname
 setpwent
 _setpwent = setpwent
 setregid
