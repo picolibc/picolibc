@@ -265,7 +265,7 @@ class fhandler_base
   __ino64_t get_namehash () { return namehash; }
 
   virtual void hclose (HANDLE h) {CloseHandle (h);}
-  virtual void set_inheritance (HANDLE &h, int not_inheriting);
+  virtual void set_no_inheritance (HANDLE &h, int not_inheriting);
 
   /* fixup fd possibly non-inherited handles after fork */
   void fork_fixup (HANDLE parent, HANDLE &h, const char *name);

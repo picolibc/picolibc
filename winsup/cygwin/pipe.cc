@@ -45,9 +45,9 @@ fhandler_pipe::set_close_on_exec (int val)
 {
   fhandler_base::set_close_on_exec (val);
   if (guard)
-    set_inheritance (guard, val);
+    set_no_inheritance (guard, val);
   if (writepipe_exists)
-    set_inheritance (writepipe_exists, val);
+    set_no_inheritance (writepipe_exists, val);
 }
 
 struct pipeargs

@@ -200,7 +200,7 @@ fhandler_socket::create_secret_event (int* secret)
     debug_printf("create event %E");
   else if (get_close_on_exec ())
     /* Event allows inheritance, but handle will not be inherited */
-    set_inheritance (secret_event, 1);
+    set_no_inheritance (secret_event, 1);
 
   return secret_event;
 }
@@ -1300,9 +1300,9 @@ void
 fhandler_socket::set_close_on_exec (int val)
 {
   if (secret_event)
-    set_inheritance (secret_event, val);
+    set_no_inheritance (secret_event, val);
   if (!winsock2_active) /* < Winsock 2.0 */
-    set_inheritance (get_handle (), val);
+    set_no_inheritance (get_handle (), val);
   set_close_on_exec_flag (val);
   debug_printf ("set close_on_exec for %s to %d", get_name (), val);
 }

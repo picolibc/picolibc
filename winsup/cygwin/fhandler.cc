@@ -1299,7 +1299,7 @@ fhandler_dev_null::dump (void)
 }
 
 void
-fhandler_base::set_inheritance (HANDLE &h, int not_inheriting)
+fhandler_base::set_no_inheritance (HANDLE &h, int not_inheriting)
 {
   HANDLE oh = h;
   /* Note that we could use SetHandleInformation here but it is not available
@@ -1335,7 +1335,7 @@ void
 fhandler_base::set_close_on_exec (int val)
 {
   if (!get_nohandle ())
-    set_inheritance (io_handle, val);
+    set_no_inheritance (io_handle, val);
   set_close_on_exec_flag (val);
   debug_printf ("set close_on_exec for %s to %d", get_name (), val);
 }

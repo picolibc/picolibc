@@ -133,7 +133,7 @@ fhandler_windows::set_close_on_exec (int val)
     fhandler_base::set_close_on_exec_flag (val);
   void *h = hWnd_;
   if (h)
-    set_inheritance (h, val);
+    set_no_inheritance (h, val);
 }
 
 void

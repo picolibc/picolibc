@@ -1747,7 +1747,7 @@ void
 fhandler_console::set_close_on_exec (int val)
 {
   fhandler_base::set_close_on_exec (val);
-  set_inheritance (output_handle, val);
+  set_no_inheritance (output_handle, val);
 }
 
 void
