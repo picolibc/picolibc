@@ -1,3 +1,7 @@
+2000-01-10  Egor Duda  <deo@logos-m.ru>
+
+	* common.h (NT_WIN32PSTATUS): Define.  (cygwin elf core dumps). 
+
 1999-12-28  Nick Clifton  <nickc@cygnus.com>
 
 	* mips.h (STO_*): Redefine in terms of STV_* values now in

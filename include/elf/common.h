@@ -287,6 +287,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define NT_PSINFO	13		/* Has a struct psinfo */
 #define NT_LWPSTATUS	16		/* Has a struct lwpstatus_t */
 #define NT_LWPSINFO	17		/* Has a struct lwpsinfo_t */
+#define NT_WIN32PSTATUS	18		/* Has a struct win32_pstatus */
 
 /* Values of note segment descriptor types for object files.  */
 /* (Only for hppa right now.  Should this be moved elsewhere?)  */
