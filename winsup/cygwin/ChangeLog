@@ -1,3 +1,8 @@
+Tue Mar 13 13:52:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_disk_file::fstat): Add correct modes to
+	symlinks when stat'ing on FAT or FAT32 file systems.
+
 2001-03-12  Egor Duda  <deo@logos-m.ru>
 
 	* fhandler.h (fhandler_termios::fixup_after_exec): New function.

@@ -954,7 +954,7 @@ fhandler_disk_file::fstat (struct stat *buf)
       /* | S_IWGRP | S_IWOTH; we don't give write to group etc */
 
       if (get_symlink_p ())
-	buf->st_mode |= S_IFLNK;
+	buf->st_mode |= S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
       else if (get_socket_p ())
 	buf->st_mode |= S_IFSOCK;
       else
