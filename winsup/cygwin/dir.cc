@@ -401,8 +401,29 @@ rmdir (const char *dir)
     }
   else
     {
+      /* This kludge detects if we are attempting to remove the current working
+         directory.  If so, we will move elsewhere to potentially allow the
+	 rmdir to succeed.  This means that cygwin's concept of the current working
+	 directory != Windows concept but, hey, whaddaregonnado?
+	 Note that this will not cause something like the following to work:
+		 $ cd foo
+		 $ rmdir .
+         since the shell will have foo "open" in the above case and so Windows will
+	 not allow the deletion.
+	 FIXME: A potential workaround for this is for cygwin apps to *never* call
+	 SetCurrentDirectory. */
+      if (strcasematch (real_dir, cygheap->cwd.win32)
+	  && !strcasematch ("c:\\", cygheap->cwd.win32))
+	{
+	  DWORD err = GetLastError ();
+	  if (!SetCurrentDirectory ("c:\\"))
+	    SetLastError (err);
+	  else
+	    return rmdir (dir);
+	}
       if (GetLastError() == ERROR_ACCESS_DENIED)
 	{
+
 	  /* On 9X ERROR_ACCESS_DENIED is returned if you try to remove
 	     a non-empty directory. */
 	  if (wincap.access_denied_on_delete ())

@@ -1,3 +1,8 @@
+Mon Sep 17 14:04:27 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* syscalls.cc (rmdir): Set cwd to some other location if attempting to
+	rmdir current working directory.
+
 Sun Sep 16 23:04:31 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* dtable.h (not_open): Assure inline.

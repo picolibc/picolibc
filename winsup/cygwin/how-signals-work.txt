@@ -1,7 +1,5 @@
 Copyright 2001 Red Hat Inc., Christopher Faylor
 
-[This is not yet complete. -cgf]
-
 How do signals work?
 
 On process startup, cygwin starts a secondary thread that deals with signals.
@@ -111,3 +109,19 @@ arrival is more or less maintained.  It checks to see if a cygwin
 routine has set a special "restore this errno on returning from a
 signal" value and sets errno to this, if so.  Finally, it restores all
 of the register values that were in effect when sigdelayed was called.
+
+Ok, you thought I had forgotten about the 'pending' stuff didn't you?
+Well, if you can rewind up to the discussion of sig_handle we'll return
+to the situation where sigsave was currently active.  In this case,
+setup_handler will set a "pending" flag, will reincrement the appropriate
+element of the above signal array, and will return 0 to indicate that
+the interrupt did not occur.  Otherwise setup_handler returns 1.
+
+For pending signals, the theory is that the signal handler thread will
+be forced to be rerun by having some strategic cygwin function call
+sig_send with a __SIGFLUSH argument.  This causes the signal handler
+to rescan the signal array looking for pending signals.
+
+This leads us to the sig_send function.  This is the "client side" part
+of the signal manipulation process.  sig_send is the low-level function
+called by a high level process like kill().
