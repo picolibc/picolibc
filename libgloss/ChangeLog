@@ -1,3 +1,13 @@
+2004-06-17  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* arm/configure.in: Check the value of newlib-may-supply-syscalls
+	enablement variable to determine if crt0 should or should not be
+	built.
+	* arm/configure: Regenerated.
+	* arm/Makefile.in: Changed to look at @BUILD_CRT0_TRUE@ and
+	@BUILD_CRT0_FALSE@ variables set in configure to determine
+	if crt0.o should be built and installed.
+
 2004-06-09  Toralf Lund  <toralf@procaptura.com>
 
 	* arm/crt0.S: Copied from newlib and it now also sets up stacks for 

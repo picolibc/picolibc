@@ -2,6 +2,23 @@ dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.5)dnl
 AC_INIT(redboot-crt0.S)
 
+dnl Support --disable-newlib-supplied-syscalls
+AC_ARG_ENABLE(newlib-supplied-syscalls,
+[  --disable-newlib-supplied-syscalls disable newlib from supplying syscalls],
+[case "${enableval}" in
+  yes) newlib_may_supply_syscalls=yes ;;
+  no)  newlib_may_supply_syscalls=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-supplied-syscalls option) ;;
+ esac], [newlib_may_supply_syscalls=yes])dnl
+
+if test "x$newlib_may_supply_syscalls" = "xyes"; then
+  BUILD_CRT0_TRUE=
+  BUILD_CRT0_FALSE='#'
+else
+  BUILD_CRT0_TRUE='#'
+  BUILD_CRT0_FALSE=
+fi
+
 if test "$srcdir" = "." ; then
   if test "${with_target_subdir}" != "." ; then
     libgloss_topdir="${srcdir}/${with_multisrctop}../../.."
