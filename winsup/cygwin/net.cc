@@ -389,7 +389,7 @@ dup_ent (void *old, void *src0, struct_type type)
   if (old)
     {
       debug_printf ("freeing old %sent structure \"%s\" %p\n", entnames[type],
-		    ((unionent *) old)->name, old);
+		    old ? ((unionent *) old)->name : "<null!>", old);
       free (old);
     }
 
