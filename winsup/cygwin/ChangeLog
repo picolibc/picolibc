@@ -1,5 +1,9 @@
 2003-09-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::fstat): Drop FH_FLOPPY case.
+
+2003-09-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (class fhandler_dev_raw): Add method fstat.
 	* fhandler_raw.cc (fhandler_dev_raw::fstat): New method.
 

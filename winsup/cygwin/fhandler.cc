@@ -977,9 +977,6 @@ fhandler_base::fstat (struct __stat64 *buf)
     case FH_PIPER:
       buf->st_mode = S_IFIFO | STD_RBITS;
       break;
-    case FH_FLOPPY:
-      buf->st_mode = S_IFBLK | STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
-      break;
     default:
       buf->st_mode = S_IFCHR | STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
       break;
