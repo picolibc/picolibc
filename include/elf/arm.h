@@ -51,6 +51,7 @@
 #define EF_ARM_EABI_VER1     0x01000000
 #define EF_ARM_EABI_VER2     0x02000000
 #define EF_ARM_EABI_VER3     0x03000000
+#define EF_ARM_EABI_VER4     0x04000000
 
 /* Local aliases for some flags to match names used by COFF port.  */
 #define F_INTERWORK	   EF_ARM_INTERWORK

@@ -1,3 +1,7 @@
+2004-10-12  Paul Brook  <paul@codesourcery.com>
+
+	* elf/arm.h (EF_ARM_EABI_VER4): Define.
+
 2004-10-08  Daniel Jacobowitz  <dan@debian.org>
 
 	* elf/common.h (PT_SUNW_EH_FRAME): Define.
