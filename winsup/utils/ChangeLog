@@ -1,3 +1,12 @@
+2002-06-03  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+
+	* umount.cc (version): New global variable.
+	(longopts): Accommodate new --version option.
+	(opts): Ditto.
+	(usage): Standardize usage output.
+	(print_version): New function.
+	(main): Accommodate --help, --version options.
+
 2002-06-02  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* regtool.cc (prog_name): New global variable.
@@ -5,7 +14,7 @@
 	(opts): Ditto.
 	(usage): Standardize usage output.  Rearrange/add descriptions.
 	(print_version): New function.
-	(main): Accomodate longopts and new --help, --version options.  Add
+	(main): Accommodate longopts and new --help, --version options.  Add
 	check for (_argv[optind+1] == NULL).
 
 2002-06-02  Christopher Faylor  <cgf@redhat.com>
@@ -38,9 +47,9 @@
 	* passwd.c (prog_name): New global variable.
 	(longopts): Ditto.
 	(opts): Ditto.
-	(usage): Standardize output. Accomodate new options.
+	(usage): Standardize output. Accommodate new options.
 	(print_version): New function.
-	(main): Accomodate longopts and new --help, --version options.
+	(main): Accommodate longopts and new --help, --version options.
 
 2002-05-28  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
@@ -53,7 +62,7 @@
 	(opts): Ditto.
 	(usage): New function.
 	(print_version): New function.
-	(main): Accomodate longopts and new --help, --version options.
+	(main): Accommodate longopts and new --help, --version options.
 
 2002-05-26  Christopher Faylor  <cgf@redhat.com>
 
@@ -82,9 +91,9 @@
 2002-05-22  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
 	* mount.cc (version): New global variable.
-	(usage): Standardize usage output.  Accomodate new version option.
+	(usage): Standardize usage output.  Accommodate new version option.
 	(print_version): New function.
-	(longopts): Accomodate new version option.
+	(longopts): Accommodate new version option.
 	(opts): Ditto.
 	(main): Ditto.
 
@@ -135,7 +144,7 @@
 	* kill.cc (prog_name): New global variable.
 	(usage): Standardize usage output.  Add descriptions.
 	(print_version): New function.
-	(longopts): Accomodate new version option.
+	(longopts): Accommodate new version option.
 	(opts): Ditto.
 	(main): Ditto.
 

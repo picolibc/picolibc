@@ -1,6 +1,6 @@
 /* umount.cc
 
-   Copyright 1996, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -21,6 +21,7 @@ static void remove_all_user_mounts ();
 static void remove_all_system_mounts ();
 static void remove_cygdrive_prefix (int flags);
 
+static const char version[] = "$Revision$";
 static const char *progname;
 
 struct option longopts[] =
@@ -32,23 +33,27 @@ struct option longopts[] =
   {"remove-user-mounts", no_argument, NULL, 'U'},
   {"system", no_argument, NULL, 's'},
   {"user", no_argument, NULL, 'u'},
+  {"version", no_argument, NULL, 'v'},
   {NULL, 0, NULL, 0}
 };
 
-char opts[] = "hASUsuc";
+char opts[] = "AchsSuUv";
 
 static void
-usage (void)
+usage (FILE *where = stderr)
 {
-  fprintf (stderr, "Usage %s [OPTION] [<posixpath>]\n\
+  fprintf (where, "\
+Usage: %s [OPTION] [<posixpath>]\n\
   -A, --remove-all-mounts       remove all mounts\n\
   -c, --remove-cygdrive-prefix  remove cygdrive prefix\n\
+  -h, --help                    output usage information and exit\n\
   -s, --system                  remove system mount (default)\n\
   -S, --remove-system-mounts    remove all system mounts\n\
   -u, --user                    remove user mount\n\
   -U, --remove-user-mounts      remove all user mounts\n\
+  -v, --version                 output version information and exit\n\
 ", progname);
-  exit (1);
+  exit (where == stderr ? 1 : 0);
 }
 
 static void
@@ -58,13 +63,34 @@ error (const char *path)
   exit (1);
 }
 
+static void
+print_version ()
+{
+  const char *v = strchr (version, ':');
+  int len;
+  if (!v)
+    {
+      v = "?";
+      len = 1;
+    }
+  else
+    {
+      v += 2;
+      len = strchr (v, ' ') - v;
+    }
+  printf ("\
+%s (cygwin) %.*s\n\
+Filesystem Utility\n\
+Copyright 1996, 1998, 1999, 2000, 2001, 2002\n\
+Compiled on %s", progname, len, v, __DATE__);
+}
+
 int
 main (int argc, char **argv)
 {
   int i;
   int flags = 0;
   int default_flag = MOUNT_SYSTEM;
-  progname = argv[0];
   enum do_what
   {
     nada,
@@ -73,6 +99,14 @@ main (int argc, char **argv)
     saw_remove_all_system_mounts,
     saw_remove_all_user_mounts
   } do_what = nada;
+
+  progname = strrchr (argv[0], '/');
+  if (progname == NULL)
+    progname = strrchr (argv[0], '\\');
+  if (progname == NULL)
+    progname = argv[0];
+  else
+    progname++;
 
   if (argc == 1)
     usage ();
@@ -90,6 +124,8 @@ main (int argc, char **argv)
 	  usage ();
 	do_what = saw_remove_cygdrive_prefix;
 	break;
+      case 'h':
+	usage (stdout);
       case 's':
 	flags |= MOUNT_SYSTEM;
 	break;
@@ -107,6 +143,9 @@ main (int argc, char **argv)
 	  usage ();
 	do_what = saw_remove_all_user_mounts;
 	break;
+      case 'v':
+	print_version ();
+	exit (0);
       default:
 	usage ();
       }
