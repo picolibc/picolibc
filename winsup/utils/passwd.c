@@ -10,20 +10,22 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include <windows.h>
+#include <wininet.h>
+#include <lmaccess.h>
+#include <lmerr.h>
+#include <lmcons.h>
+#include <lmapibuf.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <getopt.h>
 #include <pwd.h>
+#include <sys/cygwin.h>
 #include <sys/types.h>
 #include <time.h>
-
-#include <windows.h>
-#include <lmaccess.h>
-#include <lmerr.h>
-#include <lmcons.h>
-#include <lmapibuf.h>
 
 #define USER_PRIV_ADMIN		 2
 
@@ -102,13 +104,31 @@ EvalRet (int ret, const char *user)
 }
 
 PUSER_INFO_3
-GetPW (const char *user)
+GetPW (char *user, int print_win_name)
 {
-  WCHAR name[512];
+  char usr_buf[UNLEN + 1];
+  WCHAR name[2 * (UNLEN + 1)];
   DWORD ret;
   PUSER_INFO_3 ui;
-
-  MultiByteToWideChar (CP_ACP, 0, user, -1, name, 512);
+  struct passwd *pw;
+  char *domain = (char *) alloca (INTERNET_MAX_HOST_NAME_LENGTH + 1);
+     
+  /* Try getting a Win32 username in case the user edited /etc/passwd */
+  if ((pw = getpwnam (user)))
+    {
+      cygwin_internal (CW_EXTRACT_DOMAIN_AND_USER, pw, domain, usr_buf);
+      if (strcasecmp (pw->pw_name, usr_buf))
+	{
+	  /* Hack to avoid problem with LookupAccountSid after impersonation */
+	  if (strcasecmp (usr_buf, "SYSTEM"))
+	    {
+	      user = usr_buf;
+	      if (print_win_name)
+		printf ("Windows username : %s\n", user);
+	    }
+	}
+    }
+  MultiByteToWideChar (CP_ACP, 0, user, -1, name, 2 * (UNLEN + 1));
   ret = NetUserGetInfo (NULL, name, 3, (LPBYTE *) &ui);
   return EvalRet (ret, user) ? NULL : ui;
 }
@@ -116,10 +136,10 @@ GetPW (const char *user)
 int
 ChangePW (const char *user, const char *oldpwd, const char *pwd, int justcheck)
 {
-  WCHAR name[512], oldpass[512], pass[512];
+  WCHAR name[2 * (UNLEN + 1)], oldpass[512], pass[512];
   DWORD ret;
 
-  MultiByteToWideChar (CP_ACP, 0, user, -1, name, 512);
+  MultiByteToWideChar (CP_ACP, 0, user, -1, name, 2 * (UNLEN + 1));
   MultiByteToWideChar (CP_ACP, 0, pwd, -1, pass, 512);
   if (! oldpwd)
     {
@@ -362,11 +382,11 @@ main (int argc, char **argv)
 
   strcpy (user, optind >= argc ? getlogin () : argv[optind]);
 
-  li = GetPW (getlogin ());
+  li = GetPW (getlogin (), 0);
   if (! li)
     return 1;
 
-  ui = GetPW (user);
+  ui = GetPW (user, 1);
   if (! ui)
     return 1;
 
@@ -377,7 +397,7 @@ main (int argc, char **argv)
       if (lopt)
         {
 	  if (ui->usri3_priv == USER_PRIV_ADMIN)
-	    return eprint (0, "You may not lock an administrators account.");
+	    return eprint (0, "Locking an admin account is disallowed.");
           ui->usri3_flags |= UF_ACCOUNTDISABLE;
         }
       if (uopt)

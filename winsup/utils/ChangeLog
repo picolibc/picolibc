@@ -1,3 +1,18 @@
+2002-06-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* passwd.c: Rearrange includes to avoid unnecessary warnings.
+	(GetPW): Add parameter to (dis)allow printing of Windows username.
+	Use defines instead of numerical constants where possible.
+	Try avoiding impersonation problem.  Rearrange to print Windows
+	username only if it's different from Cygwin username.
+	(ChangePW): Use defines instead of numerical constants where possible.
+	(main): Call GetPW with additional parameter.  Change error text.
+
+2002-06-14  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+
+	* passwd.c (GetPW): Handle case of user-edited /etc/passwd
+	with cygwin_internal (CW_EXTRACT_DOMAIN_AND_USER, ...).
+
 2002-06-09  Christopher Faylor  <cgf@redhat.com>
 
 	* path.cc (cygpath): Change MOUNT_AUTO to MOUNT_CYGDRIVE.
