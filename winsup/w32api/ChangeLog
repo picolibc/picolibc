@@ -1,7 +1,12 @@
 2002-05-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/winnt.h (THREAD_PRIORITY_*): Remove defines
+	added in last change.
+
+2002-05-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/winnt.h (THREAD_*, EVENT_*, MUTANT_*,
-	SEMAPHORE_*, MUTEX_*): Add new defines.
+	SEMAPHORE_*, MUTEX_*, TIMER_*): Add new defines.
 
 2002-05-01  Manu B  <contact.manu@wanadoo.fr>
 
