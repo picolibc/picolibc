@@ -1,3 +1,17 @@
+2004-03-13  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	*include/wininet.h (CACHEGROUP_SEARCH_ALL, CACHEGROUP_SEARCH_BYURL):
+	Add defines.
+	(INTERNET_CACHE_GROUP_ADD, INTERNET_CACHE_GROUP_REMOVE): Add defines.
+	(GROUPID) Add typedef.
+	(INTERNET_CACHE_GROUP_INFO[AW]): Define structures.
+	(CreateUrlCacheGroup): Add prototype.
+	(DeleteUrlCacheGroup): Add prototype.
+	(FindFirstUrlCacheGroup): Add prototype.
+	(FindNextUrlCacheGroup): Add prototype.
+	(GetUrlCacheGroupAttribute[AW]): Add prototypes.
+	(SetUrlCacheGroupAttribute[AW]): Add prototypes.
+
 2004-03-10  Al Slater  <al.slater@scluk.com>
 
 	* include/winsock2.h: Add missing LPFN_ typdefs for
