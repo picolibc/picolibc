@@ -13,6 +13,10 @@ details. */
 #include "perprocess.h"
 #include "dll_init.h"
 #include "environ.h"
+#include "security.h"
+#include "fhandler.h"
+#include "dtable.h"
+#include "cygheap.h"
 
 extern void __stdcall check_sanity_and_sync (per_process *);
 
@@ -253,7 +257,7 @@ release_upto (const char *name, DWORD here)
       {
 	size = mb.RegionSize;
 	if (!(mb.State == MEM_RESERVE && mb.AllocationProtect == PAGE_NOACCESS &&
-	    ((void *) start < user_data->heapbase || (void *) start > user_data->heaptop)))
+	    ((void *) start < cygheap->heapbase || (void *) start > cygheap->heaptop)))
 	  continue;
 	if (!VirtualFree ((void *) start, 0, MEM_RELEASE))
 	  api_fatal ("couldn't release memory %p(%d) for '%s' alignment, %E\n",

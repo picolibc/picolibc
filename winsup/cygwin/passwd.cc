@@ -72,7 +72,7 @@ public:
 	      last_modified = data.ftLastWriteTime;
 	    }
 	  FindClose (h);
-        }
+	}
       return state;
     }
   void operator = (pwd_state nstate)

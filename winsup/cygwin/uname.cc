@@ -61,7 +61,7 @@ uname (struct utsname *name)
 	else
 	  ptype = sysinfo.dwProcessorType;
 
-	__small_sprintf (name->machine, "i%d86", ptype);   
+	__small_sprintf (name->machine, "i%d86", ptype);
 	break;
       case PROCESSOR_ARCHITECTURE_ALPHA:
 	strcpy (name->machine, "alpha");

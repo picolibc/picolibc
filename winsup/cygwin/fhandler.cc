@@ -960,7 +960,7 @@ fhandler_disk_file::fstat (struct stat *buf)
     {
       /* If read-only attribute is set, modify ntsec return value */
       if ((local.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
-          && !get_symlink_p ())
+	  && !get_symlink_p ())
 	buf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
 
       if (!(buf->st_mode & S_IFMT))
@@ -1094,9 +1094,9 @@ int fhandler_base::fcntl (int cmd, void *arg)
 	 * Since O_ASYNC isn't defined in fcntl.h it's currently
 	 * ignored as well.
 	 */
-        const int allowed_flags = O_APPEND | O_NONBLOCK_MASK;
+	const int allowed_flags = O_APPEND | O_NONBLOCK_MASK;
 	int new_flags = (int) arg & allowed_flags;
-        /* Carefully test for the O_NONBLOCK or deprecated OLD_O_NDELAY flag.
+	/* Carefully test for the O_NONBLOCK or deprecated OLD_O_NDELAY flag.
 	   Set only the flag that has been passed in.  If both are set, just
 	   record O_NONBLOCK.   */
 	if ((new_flags & OLD_O_NDELAY) && (new_flags & O_NONBLOCK))
@@ -1249,7 +1249,7 @@ fhandler_disk_file::open (const char *path, int flags, mode_t mode)
        || !(flags & O_CREAT) || real_path.case_clash))
     {
       set_errno (flags & O_CREAT && real_path.case_clash ? ECASECLASH
-      							 : real_path.error);
+							 : real_path.error);
       syscall_printf ("0 = fhandler_disk_file::open (%s, %p)", path, flags);
       return 0;
     }

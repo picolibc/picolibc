@@ -104,7 +104,7 @@ monstartup(lowpc, highpc)
 	cp += p->kcountsize;
 	p->froms = (u_short *)cp;
 
-        /* XXX minbrk needed? */
+	/* XXX minbrk needed? */
 	//minbrk = fake_sbrk(0);
 	p->tos[0].link = 0;
 
@@ -151,7 +151,7 @@ _mcleanup()
 	if (p->state == GMON_PROF_ERROR)
 		ERR("_mcleanup: tos overflow\n");
 
-        hz = PROF_HZ;
+	hz = PROF_HZ;
 	moncontrol(0);
 
 #ifdef nope

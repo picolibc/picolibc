@@ -46,7 +46,7 @@ fhandler_socket::fhandler_socket (const char *name) :
   set_cb (sizeof *this);
   set_need_fork_fixup ();
   prot_info_ptr = (LPWSAPROTOCOL_INFOA) ccalloc (HEAP_BUF, 1,
-					         sizeof (WSAPROTOCOL_INFOA));
+						 sizeof (WSAPROTOCOL_INFOA));
 }
 
 fhandler_socket::~fhandler_socket ()
@@ -134,8 +134,8 @@ fhandler_socket::check_peer_secret_event (struct sockaddr_in* peer, int* secret)
   int* secret_ptr = (secret ? : connect_secret);
 
   __small_sprintf (buf, SECRET_EVENT_NAME, peer->sin_port,
-                  secret_ptr [0], secret_ptr [1],
-                  secret_ptr [2], secret_ptr [3]);
+		  secret_ptr [0], secret_ptr [1],
+		  secret_ptr [2], secret_ptr [3]);
   ev = CreateEvent (&sec_all_nih, FALSE, FALSE, buf);
   if (!ev && GetLastError () == ERROR_ALREADY_EXISTS)
     {
@@ -188,9 +188,9 @@ fhandler_socket::fixup_after_fork (HANDLE parent)
 		prot_info_ptr->dwServiceFlags1);
   if (prot_info_ptr &&
       (new_sock = WSASocketA (FROM_PROTOCOL_INFO,
-                              FROM_PROTOCOL_INFO,
-                              FROM_PROTOCOL_INFO,
-                              prot_info_ptr, 0, 0)) == INVALID_SOCKET)
+			      FROM_PROTOCOL_INFO,
+			      FROM_PROTOCOL_INFO,
+			      prot_info_ptr, 0, 0)) == INVALID_SOCKET)
     {
       debug_printf ("WSASocket error");
       set_winsock_errno ();
@@ -312,10 +312,10 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	}
       ifr->ifr_flags = IFF_NOTRAILERS | IFF_UP | IFF_RUNNING;
       if (ntohl (((struct sockaddr_in *) &ifr->ifr_addr)->sin_addr.s_addr)
-          == INADDR_LOOPBACK)
-        ifr->ifr_flags |= IFF_LOOPBACK;
+	  == INADDR_LOOPBACK)
+	ifr->ifr_flags |= IFF_LOOPBACK;
       else
-        ifr->ifr_flags |= IFF_BROADCAST;
+	ifr->ifr_flags |= IFF_BROADCAST;
       res = 0;
       break;
     case SIOCGIFBRDADDR:
@@ -424,18 +424,18 @@ fhandler_socket::fcntl (int cmd, void *arg)
     {
     case F_SETFL:
       {
-        /* Carefully test for the O_NONBLOCK or deprecated OLD_O_NDELAY flag.
+	/* Carefully test for the O_NONBLOCK or deprecated OLD_O_NDELAY flag.
 	   Set only the flag that has been passed in.  If both are set, just
 	   record O_NONBLOCK.   */
 	int new_flags = (int) arg & O_NONBLOCK_MASK;
 	if ((new_flags & OLD_O_NDELAY) && (new_flags & O_NONBLOCK))
 	  new_flags = O_NONBLOCK;
-        current = get_flags () & O_NONBLOCK_MASK;
+	current = get_flags () & O_NONBLOCK_MASK;
 	request = new_flags ? 1 : 0;
-        if (!!current != !!new_flags && (res = ioctl (FIONBIO, &request)))
-          break;
+	if (!!current != !!new_flags && (res = ioctl (FIONBIO, &request)))
+	  break;
 	set_flags ((get_flags () & ~O_NONBLOCK_MASK) | new_flags);
-        break;
+	break;
       }
     default:
       res = fhandler_base::fcntl (cmd, arg);

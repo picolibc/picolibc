@@ -85,7 +85,7 @@ class mount_info
   int write_cygdrive_info_to_registry (const char *cygdrive_prefix, unsigned flags);
   int remove_cygdrive_info_from_registry (const char *cygdrive_prefix, unsigned flags);
   int get_cygdrive_info (char *user, char *system, char* user_flags,
-		         char* system_flags);
+			 char* system_flags);
 
   void import_v1_mounts ();
 

@@ -83,7 +83,7 @@ extract_nt_dom_user (const struct passwd *pw, char *domain, char *user)
   if (pw->pw_gecos)
     {
       if ((c = strstr (pw->pw_gecos, "U-")) != NULL &&
-          (c == pw->pw_gecos || c[-1] == ','))
+	  (c == pw->pw_gecos || c[-1] == ','))
 	{
 	  buf[0] = '\0';
 	  strncat (buf, c + 2, INTERNET_MAX_HOST_NAME_LENGTH + UNLEN + 1);
@@ -210,7 +210,7 @@ get_lsa_srv_inf (LSA_HANDLE lsa, char *logonserver, char *domain)
   PPOLICY_PRIMARY_DOMAIN_INFO pdi;
 
   if ((ret = LsaQueryInformationPolicy (lsa, PolicyAccountDomainInformation,
-                                        (PVOID *) &adi)) != STATUS_SUCCESS)
+					(PVOID *) &adi)) != STATUS_SUCCESS)
     {
       set_errno (LsaNtStatusToWinError(ret));
       return FALSE;
@@ -218,7 +218,7 @@ get_lsa_srv_inf (LSA_HANDLE lsa, char *logonserver, char *domain)
   lsa2wchar (account, adi->DomainName, INTERNET_MAX_HOST_NAME_LENGTH + 1);
   LsaFreeMemory (adi);
   if ((ret = LsaQueryInformationPolicy (lsa, PolicyPrimaryDomainInformation,
-                                        (PVOID *) &pdi)) != STATUS_SUCCESS)
+					(PVOID *) &pdi)) != STATUS_SUCCESS)
     {
       set_errno (LsaNtStatusToWinError(ret));
       return FALSE;
@@ -226,18 +226,18 @@ get_lsa_srv_inf (LSA_HANDLE lsa, char *logonserver, char *domain)
   lsa2wchar (primary, pdi->Name, INTERNET_MAX_HOST_NAME_LENGTH + 1);
   LsaFreeMemory (pdi);
   if ((ret = NetServerEnum (NULL, 101, (LPBYTE *) &buf, MAX_PREFERRED_LENGTH,
-                            &cnt, &tot, SV_TYPE_DOMAIN_CTRL, primary, NULL))
+			    &cnt, &tot, SV_TYPE_DOMAIN_CTRL, primary, NULL))
       == STATUS_SUCCESS && cnt > 0)
     {
       sys_wcstombs (name, buf[0].sv101_name, INTERNET_MAX_HOST_NAME_LENGTH + 1);
       if (domain)
-        sys_wcstombs (domain, primary, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+	sys_wcstombs (domain, primary, INTERNET_MAX_HOST_NAME_LENGTH + 1);
     }
   else
     {
       sys_wcstombs (name, account, INTERNET_MAX_HOST_NAME_LENGTH + 1);
       if (domain)
-        sys_wcstombs (domain, account, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+	sys_wcstombs (domain, account, INTERNET_MAX_HOST_NAME_LENGTH + 1);
     }
   if (ret == STATUS_SUCCESS)
     NetApiBufferFree (buf);
@@ -298,19 +298,19 @@ get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user)
 
       sys_wcstombs (group, buf[i].grui0_name, UNLEN + 1);
       if (!LookupAccountName (NULL, group, gsid, &glen, domain, &dlen, &use))
-        debug_printf ("LookupAccountName(%s): %lu\n", group, GetLastError ());
+	debug_printf ("LookupAccountName(%s): %lu\n", group, GetLastError ());
       if (!legal_sid_type (use))
-        {
-          strcat (strcpy (group, domain), "\\");
-          sys_wcstombs (group + strlen (group), buf[i].grui0_name,
-                        UNLEN + 1 - strlen (group));
-          glen = UNLEN + 1;
-          dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
-          if (!LookupAccountName(NULL, group, gsid, &glen, domain, &dlen, &use))
-            debug_printf ("LookupAccountName(%s): %lu\n", group,GetLastError());
-        }
+	{
+	  strcat (strcpy (group, domain), "\\");
+	  sys_wcstombs (group + strlen (group), buf[i].grui0_name,
+			UNLEN + 1 - strlen (group));
+	  glen = UNLEN + 1;
+	  dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
+	  if (!LookupAccountName(NULL, group, gsid, &glen, domain, &dlen, &use))
+	    debug_printf ("LookupAccountName(%s): %lu\n", group,GetLastError());
+	}
       if (legal_sid_type (use))
-        grp_list += gsid;
+	grp_list += gsid;
     }
 
   NetApiBufferFree (buf);
@@ -319,7 +319,7 @@ get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user)
 
 static BOOL
 is_group_member (WCHAR *wlogonserver, WCHAR *wgroup,
-                 cygsid &usersid, cygsidlist &grp_list)
+		 cygsid &usersid, cygsidlist &grp_list)
 {
   LPLOCALGROUP_MEMBERS_INFO_0 buf;
   DWORD cnt, tot;
@@ -390,7 +390,7 @@ get_user_local_groups (WCHAR *wlogonserver, const char *logonserver,
 	  {
 	    strcat (strcpy (group, domain), "\\");
 	    sys_wcstombs (group + strlen (group), buf[i].lgrpi0_name,
-		          UNLEN + 1 - strlen (group));
+			  UNLEN + 1 - strlen (group));
 	    glen = UNLEN + 1;
 	    dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
 	    if (!LookupAccountName (NULL, group, gsid, &glen,
@@ -565,7 +565,7 @@ get_system_priv_list (cygsidlist &grp_list)
       {
 	privs->Privileges[privs->PrivilegeCount].Luid = priv;
 	privs->Privileges[privs->PrivilegeCount].Attributes =
-                      SE_PRIVILEGE_ENABLED | SE_PRIVILEGE_ENABLED_BY_DEFAULT;
+		      SE_PRIVILEGE_ENABLED | SE_PRIVILEGE_ENABLED_BY_DEFAULT;
 	++privs->PrivilegeCount;
       }
   return privs;
@@ -586,52 +586,52 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list)
   for (int grp = -1; grp < grp_list.count; ++grp)
     {
       if (grp == -1)
-        {
-          if ((ret = LsaEnumerateAccountRights (lsa, usersid, &privstrs, &cnt))
-              != STATUS_SUCCESS)
-            continue;
-        }
+	{
+	  if ((ret = LsaEnumerateAccountRights (lsa, usersid, &privstrs, &cnt))
+	      != STATUS_SUCCESS)
+	    continue;
+	}
       else if ((ret = LsaEnumerateAccountRights (lsa, grp_list.sids[grp],
-                                                 &privstrs, &cnt))
-               != STATUS_SUCCESS)
+						 &privstrs, &cnt))
+	       != STATUS_SUCCESS)
 	continue;
       for (ULONG i = 0; i < cnt; ++i)
-        {
-          LUID priv;
-          PTOKEN_PRIVILEGES tmp;
-          DWORD tmp_count;
+	{
+	  LUID priv;
+	  PTOKEN_PRIVILEGES tmp;
+	  DWORD tmp_count;
 
-          sys_wcstombs (buf, privstrs[i].Buffer,
-	  		INTERNET_MAX_HOST_NAME_LENGTH + 1);
-          if (!LookupPrivilegeValue (NULL, buf, &priv))
-            continue;
+	  sys_wcstombs (buf, privstrs[i].Buffer,
+			INTERNET_MAX_HOST_NAME_LENGTH + 1);
+	  if (!LookupPrivilegeValue (NULL, buf, &priv))
+	    continue;
 
-          for (DWORD p = 0; privs && p < privs->PrivilegeCount; ++p)
-            if (!memcmp (&priv, &privs->Privileges[p].Luid, sizeof (LUID)))
-              goto next_account_right;
+	  for (DWORD p = 0; privs && p < privs->PrivilegeCount; ++p)
+	    if (!memcmp (&priv, &privs->Privileges[p].Luid, sizeof (LUID)))
+	      goto next_account_right;
 
-          tmp_count = privs ? privs->PrivilegeCount : 0;
-          tmp = (PTOKEN_PRIVILEGES)
-                realloc (privs, sizeof (ULONG) +
-                                (tmp_count + 1) * sizeof (LUID_AND_ATTRIBUTES));
-          if (!tmp)
-            {
+	  tmp_count = privs ? privs->PrivilegeCount : 0;
+	  tmp = (PTOKEN_PRIVILEGES)
+		realloc (privs, sizeof (ULONG) +
+				(tmp_count + 1) * sizeof (LUID_AND_ATTRIBUTES));
+	  if (!tmp)
+	    {
 	      if (privs)
 		free (privs);
-              LsaFreeMemory (privstrs);
+	      LsaFreeMemory (privstrs);
 	      debug_printf ("realloc (privs) failed.");
-              return NULL;
-            }
-          tmp->PrivilegeCount = tmp_count;
-          privs = tmp;
-          privs->Privileges[privs->PrivilegeCount].Luid = priv;
-          privs->Privileges[privs->PrivilegeCount].Attributes =
-                      SE_PRIVILEGE_ENABLED | SE_PRIVILEGE_ENABLED_BY_DEFAULT;
-          ++privs->PrivilegeCount;
+	      return NULL;
+	    }
+	  tmp->PrivilegeCount = tmp_count;
+	  privs = tmp;
+	  privs->Privileges[privs->PrivilegeCount].Luid = priv;
+	  privs->Privileges[privs->PrivilegeCount].Attributes =
+		      SE_PRIVILEGE_ENABLED | SE_PRIVILEGE_ENABLED_BY_DEFAULT;
+	  ++privs->PrivilegeCount;
 
-        next_account_right:
-          ;
-        }
+	next_account_right:
+	  ;
+	}
       LsaFreeMemory (privstrs);
     }
   return privs;
@@ -652,10 +652,10 @@ get_dacl (PACL acl, cygsid usersid, cygsidlist &grp_list)
     {
       if (!AddAccessAllowedAce(acl, ACL_REVISION, GENERIC_ALL,
 			       well_known_admins_sid))
-        {
+	{
 	  __seterrno ();
-          return FALSE;
-        }
+	  return FALSE;
+	}
     }
   else if (!AddAccessAllowedAce(acl, ACL_REVISION, GENERIC_ALL, usersid))
     {
@@ -712,7 +712,7 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
   /* SE_CREATE_TOKEN_NAME privilege needed to call NtCreateToken. */
   if ((old_priv_state = set_process_privilege (SE_CREATE_TOKEN_NAME)) < 0)
     goto out;
- 
+
   /* Open policy object. */
   if ((lsa = open_local_policy ()) == INVALID_HANDLE_VALUE)
     goto out;
@@ -1191,7 +1191,7 @@ get_nt_attribute (const char *file, int *attribute,
 	    *flags |= S_ISVTX;
 	}
       else if (ace_sid == well_known_null_sid)
-        {
+	{
 	  /* Read SUID, SGID and VTX bits from NULL ACE. */
 	  if (ace->Mask & FILE_READ_DATA)
 	    *flags |= S_ISVTX;
@@ -1416,11 +1416,11 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   if (attribute & (S_ISUID | S_ISGID | S_ISVTX))
     {
       if (attribute & S_ISUID)
-        null_allow |= FILE_APPEND_DATA;
+	null_allow |= FILE_APPEND_DATA;
       if (attribute & S_ISGID)
-        null_allow |= FILE_WRITE_DATA;
+	null_allow |= FILE_WRITE_DATA;
       if (attribute & S_ISVTX)
-        null_allow |= FILE_READ_DATA;
+	null_allow |= FILE_READ_DATA;
     }
 
   /* Construct deny attributes for owner and group. */
@@ -1548,7 +1548,7 @@ set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
 
   psa->lpSecurityDescriptor = sd_buf;
   InitializeSecurityDescriptor ((PSECURITY_DESCRIPTOR)sd_buf,
-  				SECURITY_DESCRIPTOR_REVISION);
+				SECURITY_DESCRIPTOR_REVISION);
   psa->lpSecurityDescriptor = alloc_sd (geteuid (), getegid (),
 					cygheap->user.logsrv (),
 					attribute, (PSECURITY_DESCRIPTOR)sd_buf,

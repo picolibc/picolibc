@@ -16,6 +16,10 @@ details. */
 #include "pinfo.h"
 #include "heap.h"
 #include "shared_info.h"
+#include "security.h"
+#include "fhandler.h"
+#include "dtable.h"
+#include "cygheap.h"
 
 #define assert(x)
 

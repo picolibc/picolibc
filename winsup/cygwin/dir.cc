@@ -201,14 +201,14 @@ readdir (DIR * dir)
       char *c = dir->__d_dirent->d_name;
       int len = strlen (c);
       if (strcasematch (c + len - 4, ".lnk"))
-        {
+	{
 	  char fbuf[MAX_PATH + 1];
 	  strcpy (fbuf, dir->__d_dirname);
 	  strcpy (fbuf + strlen (fbuf) - 1, dir->__d_dirent->d_name);
 	  path_conv fpath (fbuf, PC_SYM_NOFOLLOW);
 	  if (fpath.issymlink ())
-            c[len - 4] = '\0';
-        }
+	    c[len - 4] = '\0';
+	}
     }
 
   /* Compute d_ino by combining filename hash with the directory hash
@@ -387,7 +387,7 @@ rmdir (const char *dir)
   /* Even own directories can't be removed if R/O attribute is set. */
   if (real_dir.file_attributes () & FILE_ATTRIBUTE_READONLY)
     SetFileAttributes (real_dir.get_win32 (), real_dir.file_attributes () &
-    					      ~FILE_ATTRIBUTE_READONLY);
+					      ~FILE_ATTRIBUTE_READONLY);
 
   if (RemoveDirectoryA (real_dir.get_win32 ()))
     {
@@ -402,7 +402,7 @@ rmdir (const char *dir)
   else
     {
       if (GetLastError() == ERROR_ACCESS_DENIED)
-        {
+	{
 	  /* On 9X ERROR_ACCESS_DENIED is returned if you try to remove
 	     a non-empty directory. */
 	  if (!iswinnt)

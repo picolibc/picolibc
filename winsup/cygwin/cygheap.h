@@ -67,7 +67,7 @@ public:
     if (!m)
       return 1;
     return strncasematch (m->native_path, path, m->native_pathlen)
-            && (path[m->native_pathlen] == '\\' || !path[m->native_pathlen]);
+	    && (path[m->native_pathlen] == '\\' || !path[m->native_pathlen]);
   }
   const char *unchroot (const char *path)
   {
@@ -153,6 +153,9 @@ struct init_cygheap
 {
   _cmalloc_entry *chain;
   char *buckets[32];
+  void *heapbase;
+  void *heapptr;
+  void *heaptop;
   cygheap_root root;
   cygheap_user user;
   mode_t umask;

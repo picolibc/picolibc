@@ -268,9 +268,9 @@ wsock_init ()
       int (*wsastartup) (int, WSADATA *);
 
       wsastartup = (int (*)(int, WSADATA *))
-      		   GetProcAddress ((HMODULE) (dll->handle), "WSAStartup");
+		   GetProcAddress ((HMODULE) (dll->handle), "WSAStartup");
       if (wsastartup)
-        {
+	{
 	  int res = wsastartup ((2<<8) | 2, &wsadata);
 
 	  debug_printf ("res %d", res);
@@ -283,7 +283,7 @@ wsock_init ()
 	  debug_printf ("lpVendorInfo %d", wsadata.lpVendorInfo);
 
 	  wsock_started = 1;
-        }
+	}
     }
 
   InterlockedDecrement (&here);

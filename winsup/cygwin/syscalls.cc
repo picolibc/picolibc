@@ -1138,7 +1138,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 	}
     }
   if (atts != -1 && (oret || (!oret && get_errno () != ENOENT
-			            && get_errno () != ENOSHARE)))
+				    && get_errno () != ENOSHARE)))
     {
       /* Unfortunately, the above open may fail if the file exists, though.
 	 So we have to care for this case here, too. */
@@ -1340,7 +1340,7 @@ _rename (const char *oldpath, const char *newpath)
   if (real_new.file_attributes () != (DWORD) -1 &&
       real_new.file_attributes () & FILE_ATTRIBUTE_READONLY)
     SetFileAttributesA (real_new.get_win32 (),
-    			real_new.file_attributes () & ~FILE_ATTRIBUTE_READONLY);
+			real_new.file_attributes () & ~FILE_ATTRIBUTE_READONLY);
 
   /* Shortcut hack No. 2, part 1 */
   if (!real_old.issymlink () && !real_new.error && real_new.issymlink () &&
@@ -1400,9 +1400,9 @@ done:
 
       /* Shortcut hack, No. 2, part 2 */
       /* if the new filename was an existing shortcut, remove it now if the
-         new filename is equal to the shortcut name without .lnk suffix. */
+	 new filename is equal to the shortcut name without .lnk suffix. */
       if (lnk_suffix)
-        {
+	{
 	  *lnk_suffix = '.';
 	  DeleteFile (real_new.get_win32 ());
 	}
@@ -1494,7 +1494,7 @@ check_posix_perm (const char *fname, int v)
 
   if (!allow_smbntsec
       && ((root[0] == '\\' && root[1] == '\\')
-          || GetDriveType (root) == DRIVE_REMOTE))
+	  || GetDriveType (root) == DRIVE_REMOTE))
     return 0;
 
   DWORD vsn, len, flags;
@@ -1584,7 +1584,7 @@ pathconf (const char *file, int v)
     case _PC_POSIX_PERMISSIONS:
     case _PC_POSIX_SECURITY:
       {
-        path_conv full_path (file, PC_SYM_FOLLOW | PC_FULL);
+	path_conv full_path (file, PC_SYM_FOLLOW | PC_FULL);
 	if (full_path.error)
 	  {
 	    set_errno (full_path.error);
@@ -1595,7 +1595,7 @@ pathconf (const char *file, int v)
 	    set_errno (EINVAL);
 	    return -1;
 	  }
-        return check_posix_perm (full_path, v);
+	return check_posix_perm (full_path, v);
       }
     default:
       set_errno (EINVAL);
@@ -2048,9 +2048,9 @@ seteuid (uid_t uid)
       char *env;
       orig_username[0] = orig_domain[0] = '\0';
       if ((env = getenv ("USERNAME")))
-        strncat (orig_username, env, UNLEN + 1);
+	strncat (orig_username, env, UNLEN + 1);
       if ((env = getenv ("USERDOMAIN")))
-        strncat (orig_domain, env, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+	strncat (orig_domain, env, INTERNET_MAX_HOST_NAME_LENGTH + 1);
       if (uid == cygheap->user.orig_uid)
 	{
 
@@ -2064,7 +2064,7 @@ seteuid (uid_t uid)
 	  if (!OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok))
 	    debug_printf ("OpenProcessToken(): %E\n");
 	  else if (!GetTokenInformation (ptok, TokenUser, &tok_usersid,
-	  				 sizeof tok_usersid, &siz))
+					 sizeof tok_usersid, &siz))
 	    debug_printf ("GetTokenInformation(): %E");
 	  else if (!LookupAccountSid (NULL, tok_usersid, username, &ulen,
 				      domain, &dlen, &use))
@@ -2100,7 +2100,7 @@ seteuid (uid_t uid)
 					&tok_usersid, sizeof tok_usersid, &siz))
 		{
 		  debug_printf ("GetTokenInformation(): %E");
-	          tok_usersid = NO_SID;
+		  tok_usersid = NO_SID;
 		}
 	      if (!GetTokenInformation (cygheap->user.token, TokenPrimaryGroup,
 					&tok_pgrpsid, sizeof tok_pgrpsid, &siz))
@@ -2119,7 +2119,7 @@ seteuid (uid_t uid)
 		  /* Check for pgrp only if current token is an internal
 		     token. Otherwise the external provided token is
 		     very likely overwritten here. */
-	          (current_token_is_internal_token &&
+		  (current_token_is_internal_token &&
 		   pgrpsid && tok_pgrpsid && pgrpsid != tok_pgrpsid))
 		{
 		  /* If not, RevertToSelf and close old token. */
@@ -2143,19 +2143,19 @@ seteuid (uid_t uid)
 	      if (ptok != INVALID_HANDLE_VALUE)
 		explicitely_created_token = TRUE;
 	      else
-	        {
+		{
 		  /* create_token failed. Try subauthentication. */
 		  debug_printf ("create token failed, try subauthentication.");
 		  ptok = subauth (pw_new);
 		}
 	      if (ptok != INVALID_HANDLE_VALUE)
-	        {
+		{
 		  cygwin_set_impersonation_token (ptok);
 		  /* If sav_token was internally created, destroy it. */
 		  if (sav_token != INVALID_HANDLE_VALUE &&
 		      current_token_is_internal_token)
 		    CloseHandle (sav_token);
-	        }
+		}
 	      else if (sav_token != INVALID_HANDLE_VALUE)
 		cygheap->user.token = sav_token;
 	    }
@@ -2168,9 +2168,9 @@ seteuid (uid_t uid)
 	      RevertToSelf ();
 
 	      /* If the token was explicitely created, all information has
-	         already been set correctly. */
+		 already been set correctly. */
 	      if (!explicitely_created_token)
-	        {
+		{
 		  /* Try setting owner to same value as user. */
 		  if (usersid &&
 		      !SetTokenInformation (cygheap->user.token, TokenOwner,
@@ -2186,7 +2186,7 @@ seteuid (uid_t uid)
 		    debug_printf ("SetTokenInformation(user.token, "
 				  "TokenPrimaryGroup): %E");
 
-	        }
+		}
 
 	      /* Now try to impersonate. */
 	      if (!LookupAccountSid (NULL, usersid, username, &ulen,
@@ -2196,11 +2196,11 @@ seteuid (uid_t uid)
 		system_printf ("Impersonating (%d) in set(e)uid failed: %E",
 			       cygheap->user.token);
 	      else
-	        {
+		{
 		  cygheap->user.impersonated = TRUE;
 		  setenv ("USERNAME", username, 1);
 		  setenv ("USERDOMAIN", domain, 1);
-	        }
+		}
 	    }
 	}
 
@@ -2253,7 +2253,7 @@ setegid (gid_t gid)
 	      HANDLE ptok;
 
 	      if (gsid.getfromgr (gr))
-	        {
+		{
 		  if (!OpenProcessToken (GetCurrentProcess (),
 					 TOKEN_ADJUST_DEFAULT,
 					 &ptok))
@@ -2261,12 +2261,12 @@ setegid (gid_t gid)
 		  else
 		    {
 		      if (!SetTokenInformation (ptok, TokenPrimaryGroup,
-		      				&gsid, sizeof gsid))
+						&gsid, sizeof gsid))
 			debug_printf ("SetTokenInformation(myself, "
 				      "TokenPrimaryGroup): %E");
 		      CloseHandle (ptok);
 		    }
-	        }
+		}
 	    }
 	}
     }

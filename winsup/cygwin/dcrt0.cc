@@ -101,9 +101,9 @@ extern "C"
    /* calloc */ export_calloc,
    /* premain */ {NULL, NULL, NULL, NULL},
    /* run_ctors_p */ 0,
-    /* unused */ { 0, 0, 0},
-   /* heapbase */ NULL, /* heapptr */ NULL, /* heaptop */ NULL,
-   /* unused1 */ 0, /* forkee */ 0, /* hmodule */ NULL,
+   /* unused */ {0, 0, 0, 0, 0, 0, 0},
+   /* forkee */ 0,
+   /* hmodule */ NULL,
    /* api_major */ CYGWIN_VERSION_API_MAJOR,
    /* api_minor */ CYGWIN_VERSION_API_MINOR,
    /* unused2 */ {0, 0, 0, 0, 0},
@@ -683,9 +683,6 @@ dll_crt0_1 ()
 	    cygheap_fixup_in_child (child_proc_info, 0);
 	    alloc_stack (fork_info);
 	    set_myself (mypid);
-	    user_data->heaptop = child_proc_info->heaptop;
-	    user_data->heapbase = child_proc_info->heapbase;
-	    user_data->heapptr = child_proc_info->heapptr;
 	    ProtectHandle (child_proc_info->forker_finished);
 	    break;
 	  case PROC_SPAWN:
@@ -896,7 +893,6 @@ _dll_crt0 ()
 
   main_environ = user_data->envptr;
   *main_environ = NULL;
-  user_data->heapbase = user_data->heapptr = user_data->heaptop = NULL;
 
   set_console_handler ();
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
@@ -954,7 +950,6 @@ cygwin_dll_init ()
 {
   static char **envp;
   static int _fmode;
-  user_data->heapbase = user_data->heapptr = user_data->heaptop = NULL;
 
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
 		       GetCurrentProcess (), &hMainProc, 0, FALSE,

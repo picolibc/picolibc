@@ -29,12 +29,12 @@ class cygsid {
   inline const PSID assign (const PSID nsid)
     {
       if (!nsid)
-        psid = NO_SID;
+	psid = NO_SID;
       else
-        {
-          psid = (PSID) sbuf;
-          CopySid (MAX_SID_LEN, psid, nsid);
-        }
+	{
+	  psid = (PSID) sbuf;
+	  CopySid (MAX_SID_LEN, psid, nsid);
+	}
       return psid;
     }
 
@@ -64,7 +64,7 @@ public:
   inline BOOL operator== (const PSID nsid) const
     {
       if (!psid || !nsid)
-        return nsid == psid;
+	return nsid == psid;
       return EqualSid (psid, nsid);
     }
   inline BOOL operator== (const char *nsidstr) const
@@ -98,9 +98,9 @@ public:
     {
       cygsid *tmp = new cygsid [count + 1];
       if (!tmp)
-        return FALSE;
+	return FALSE;
       for (int i = 0; i < count; ++i)
-        tmp[i] = sids[i];
+	tmp[i] = sids[i];
       delete [] sids;
       sids = tmp;
       sids[count++] = nsi;
@@ -116,7 +116,7 @@ public:
   BOOL contains (cygsid &sid) const
     {
       for (int i = 0; i < count; ++i)
-        if (sids[i] == sid)
+	if (sids[i] == sid)
 	  return TRUE;
       return FALSE;
     }
@@ -124,9 +124,9 @@ public:
     {
       debug_printf ("-- begin sidlist ---");
       if (!count)
-        debug_printf ("No elements");
+	debug_printf ("No elements");
       for (int i = 0; i < count; ++i)
-        sids[i].debug_print (prefix);
+	sids[i].debug_print (prefix);
       debug_printf ("-- ende sidlist ---");
     }
 };

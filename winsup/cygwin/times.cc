@@ -102,11 +102,11 @@ settimeofday (const struct timeval *tv, const struct timezone *tz)
   tz = tz;			/* silence warning about unused variable */
 
   ptm = gmtime(&tv->tv_sec);
-  st.wYear         = ptm->tm_year + 1900;
-  st.wMonth        = ptm->tm_mon + 1;
+  st.wYear	   = ptm->tm_year + 1900;
+  st.wMonth	   = ptm->tm_mon + 1;
   st.wDayOfWeek    = ptm->tm_wday;
-  st.wDay          = ptm->tm_mday;
-  st.wHour         = ptm->tm_hour;
+  st.wDay	   = ptm->tm_mday;
+  st.wHour	   = ptm->tm_hour;
   st.wMinute       = ptm->tm_min;
   st.wSecond       = ptm->tm_sec;
   st.wMilliseconds = tv->tv_usec / 1000;

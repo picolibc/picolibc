@@ -711,11 +711,11 @@ fhandler_tty_slave::read (void *ptr, size_t len)
 	      termios_printf ("read failed, %E");
 	      _raise (SIGHUP);
 	    }
-          /* MSDN states that 5th prameter can be used to determine total
-             number of bytes in pipe, but for some reason this number doesn't
-             change after successful read. So we have to peek into the pipe
-             again to see if input is still available */
-          if (!PeekNamedPipe (get_handle (), peek_buf, 1, &bytes_in_pipe, NULL, NULL))
+	  /* MSDN states that 5th prameter can be used to determine total
+	     number of bytes in pipe, but for some reason this number doesn't
+	     change after successful read. So we have to peek into the pipe
+	     again to see if input is still available */
+	  if (!PeekNamedPipe (get_handle (), peek_buf, 1, &bytes_in_pipe, NULL, NULL))
 	    {
 	      termios_printf ("PeekNamedPipe failed, %E");
 	      _raise (SIGHUP);

@@ -124,7 +124,7 @@ getrlimit (int resource, struct rlimit *rlp)
       if (!VirtualQuery ((LPCVOID) &m, &m, sizeof m))
 	debug_printf ("couldn't get stack info, returning def.values. %E");
       else
-        {
+	{
 	  rlp->rlim_cur = (DWORD) &m - (DWORD) m.AllocationBase;
 	  rlp->rlim_max = (DWORD) m.BaseAddress + m.RegionSize
 			  - (DWORD) m.AllocationBase;
@@ -174,7 +174,7 @@ setrlimit (int resource, const struct rlimit *rlp)
       break;
     case RLIMIT_NOFILE:
       if (rlp->rlim_cur != RLIM_INFINITY)
-        return setdtablesize (rlp->rlim_cur);
+	return setdtablesize (rlp->rlim_cur);
       break;
     default:
       set_errno (EINVAL);

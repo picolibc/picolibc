@@ -388,7 +388,7 @@ free_char_list (char **clist)
   if (clist)
     {
       for (char **cl = clist; *cl; ++cl)
-        free (*cl);
+	free (*cl);
       free (clist);
     }
 }
@@ -416,7 +416,7 @@ dup_addr_list (char **src, unsigned int size)
 {
   char **dst;
   int cnt = 0;
-  
+
   for (char **cl = src; *cl; ++cl)
     ++cnt;
   if (!(dst = (char **) calloc (cnt + 1, sizeof *dst)))
@@ -424,7 +424,7 @@ dup_addr_list (char **src, unsigned int size)
   while (cnt-- > 0)
     {
       if (!(dst[cnt] = (char *) malloc(size)))
-        return NULL;
+	return NULL;
       memcpy(dst[cnt], src[cnt], size);
     }
   return dst;
@@ -438,7 +438,7 @@ free_protoent_ptr (struct protoent *&p)
       debug_printf ("protoent: %s", p->p_name);
 
       if (p->p_name)
-        free (p->p_name);
+	free (p->p_name);
       free_char_list (p->p_aliases);
       p = NULL;
     }
@@ -878,7 +878,7 @@ cygwin_connect (int fd,
 		  in_progress = TRUE;
 		}
 	      else if (err == WSAEINVAL)
-	        WSASetLastError (WSAEISCONN);
+		WSASetLastError (WSAEISCONN);
 	    }
 	  set_winsock_errno ();
 	}
@@ -924,9 +924,9 @@ free_servent_ptr (struct servent *&p)
       debug_printf ("servent: %s", p->s_name);
 
       if (p->s_name)
-        free (p->s_name);
+	free (p->s_name);
       if (p->s_proto)
-        free (p->s_proto);
+	free (p->s_proto);
       free_char_list (p->s_aliases);
       p = NULL;
     }
@@ -1022,7 +1022,7 @@ free_hostent_ptr (struct hostent *&p)
       debug_printf ("hostent: %s", p->h_name);
 
       if (p->h_name)
-        free ((void *)p->h_name);
+	free ((void *)p->h_name);
       free_char_list (p->h_aliases);
       free_addr_list (p->h_addr_list);
       p = NULL;
@@ -1858,18 +1858,18 @@ get_nt_ifconf (struct ifconf *ifc, int what)
 /*
  * IFCONF Windows 95:
  * HKLM/Enum/Network/MSTCP/"*"
- *         -> Value "Driver" enthält Subkey relativ zu
- *            HKLM/System/CurrentControlSet/Class/
- *         -> In Subkey "Bindings" die Values aufzählen
- *            -> Enthält Subkeys der Form "VREDIR\*"
- *               Das * ist ein Subkey relativ zu
- *               HKLM/System/CurrentControlSet/Class/Net/
+ *	  -> Value "Driver" enthält Subkey relativ zu
+ *	    HKLM/System/CurrentControlSet/Class/
+ *	  -> In Subkey "Bindings" die Values aufzählen
+ *	    -> Enthält Subkeys der Form "VREDIR\*"
+ *	       Das * ist ein Subkey relativ zu
+ *	       HKLM/System/CurrentControlSet/Class/Net/
  * HKLM/System/CurrentControlSet/Class/"Driver"
- *         -> Value "IPAddress"
- *         -> Value "IPMask"
+ *	  -> Value "IPAddress"
+ *	  -> Value "IPMask"
  * HKLM/System/CurrentControlSet/Class/Net/"*"(aus "VREDIR\*")
- *         -> Wenn Value "AdapterName" == "MS$PPP" -> ppp interface
- *         -> Value "DriverDesc" enthält den Namen
+ *	  -> Wenn Value "AdapterName" == "MS$PPP" -> ppp interface
+ *	  -> Value "DriverDesc" enthält den Namen
  *
  */
 static void

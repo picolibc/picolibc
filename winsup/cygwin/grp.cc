@@ -83,7 +83,7 @@ public:
 	      last_modified = data.ftLastWriteTime;
 	    }
 	  FindClose (h);
-        }
+	}
       return state;
     }
   void operator = (grp_state nstate)
@@ -118,37 +118,37 @@ parse_grp (struct group &grp, const char *line)
     {
       *dp++ = '\0';
       if (!strlen (grp.gr_passwd))
-        grp.gr_passwd = NULL;
+	grp.gr_passwd = NULL;
 
       grp.gr_gid = strtol (dp, NULL, 10);
       dp = strchr (dp, ':');
       if (dp)
-        {
-          if (*++dp)
-            {
-              int i = 0;
-              char *cp;
+	{
+	  if (*++dp)
+	    {
+	      int i = 0;
+	      char *cp;
 
-              for (cp = dp; (cp = strchr (cp, ',')) != NULL; ++cp)
-                ++i;
-              char **namearray = (char **) calloc (i + 2, sizeof (char *));
-              if (namearray)
-                {
-                  i = 0;
-                  for (cp = dp; (cp = strchr (dp, ',')) != NULL; dp = cp + 1)
-                    {
-                      *cp = '\0';
-                      namearray[i++] = dp;
-                    }
-                  namearray[i++] = dp;
-                  namearray[i] = NULL;
-                }
+	      for (cp = dp; (cp = strchr (cp, ',')) != NULL; ++cp)
+		++i;
+	      char **namearray = (char **) calloc (i + 2, sizeof (char *));
+	      if (namearray)
+		{
+		  i = 0;
+		  for (cp = dp; (cp = strchr (dp, ',')) != NULL; dp = cp + 1)
+		    {
+		      *cp = '\0';
+		      namearray[i++] = dp;
+		    }
+		  namearray[i++] = dp;
+		  namearray[i] = NULL;
+		}
 	      grp.gr_mem = namearray;
-            }
-          else
-            grp.gr_mem = (char **) calloc (1, sizeof (char *));
-          return 1;
-        }
+	    }
+	  else
+	    grp.gr_mem = (char **) calloc (1, sizeof (char *));
+	  return 1;
+	}
     }
   return 0;
 }
@@ -195,7 +195,7 @@ read_etc_group ()
     {
       group_state = initializing;
       if (max_lines) /* When rereading, free allocated memory first. */
-        {
+	{
 	  for (int i = 0; i < curr_lines; ++i)
 	    {
 	      free (group_buf[i].gr_name);
@@ -256,9 +256,9 @@ getgrgid (gid_t gid)
   for (int i = 0; i < curr_lines; i++)
     {
       if (group_buf[i].gr_gid == DEFAULT_GID)
-        default_grp = group_buf + i;
+	default_grp = group_buf + i;
       if (group_buf[i].gr_gid == gid)
-        return group_buf + i;
+	return group_buf + i;
     }
 
   return default_grp;
@@ -333,8 +333,8 @@ getgroups (int gidsetsize, gid_t *grouplist, gid_t gid, const char *username)
       OpenProcessToken (hMainProc, TOKEN_QUERY, &hToken))
     {
       if (GetTokenInformation (hToken, TokenGroups, NULL, 0, &size)
-          || GetLastError () == ERROR_INSUFFICIENT_BUFFER)
-        {
+	  || GetLastError () == ERROR_INSUFFICIENT_BUFFER)
+	{
 	  char buf[size];
 	  TOKEN_GROUPS *groups = (TOKEN_GROUPS *) buf;
 
@@ -358,12 +358,12 @@ getgroups (int gidsetsize, gid_t *grouplist, gid_t gid, const char *username)
 			break;
 		      }
 	    }
-        }
+	}
       else
-        debug_printf ("%d = GetTokenInformation(NULL) %E", size);
+	debug_printf ("%d = GetTokenInformation(NULL) %E", size);
       CloseHandle (hToken);
       if (cnt)
-        return cnt;
+	return cnt;
     }
 
   for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)

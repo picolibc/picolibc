@@ -179,8 +179,8 @@ fhandler_dev_floppy::lseek (off_t offset, int whence)
       devbufstart = devbufend = 0;
 
       if (SetFilePointer (get_handle (), sector_aligned_offset, NULL, FILE_BEGIN)
-          == INVALID_SET_FILE_POINTER)
-        {
+	  == INVALID_SET_FILE_POINTER)
+	{
 	  __seterrno ();
 	  return -1;
 	}

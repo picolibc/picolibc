@@ -303,8 +303,6 @@ proc_subproc (DWORD what, DWORD val)
 
       int thiszombie;
       thiszombie = nzombies;
-      if (!zombies)
-	zombies = (pinfo *) malloc (sizeof (pinfo) * ZOMBIEMAX);
       zombies[nzombies] = pchildren[val];	// Add to zombie array
       zombies[nzombies++]->process_state = PID_ZOMBIE;// Walking dead
 
@@ -545,6 +543,11 @@ sig_dispatch_pending (int justwake)
 void __stdcall
 sigproc_init ()
 {
+  if (!zombies)
+    zombies = (pinfo *) malloc (sizeof (pinfo) * ZOMBIEMAX);
+  else
+    nzombies = 0;
+
   wait_sig_inited = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
   ProtectHandle (wait_sig_inited);
 
@@ -1302,17 +1305,6 @@ wait_subproc (VOID *)
   events[0] = NULL;
   sigproc_printf ("done");
   return 0;
-}
-
-void __stdcall
-sigproc_fixup_after_fork ()
-{
-  if (zombies)
-    {
-      free (zombies);
-      nzombies = 0;
-      zombies = NULL;
-    }
 }
 
 extern "C" {

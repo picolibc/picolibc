@@ -616,7 +616,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
       cygsid sid;
       DWORD ret_len;
       if (!GetTokenInformation (hToken, TokenUser, &sid, sizeof sid, &ret_len))
-        {
+	{
 	  sid = NO_SID;
 	  system_printf ("GetTokenInformation: %E");
 	}
@@ -628,15 +628,15 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 
       /* Remove impersonation */
       if (cygheap->user.impersonated
-          && cygheap->user.token != INVALID_HANDLE_VALUE)
+	  && cygheap->user.token != INVALID_HANDLE_VALUE)
 	RevertToSelf ();
 
       static BOOL first_time = TRUE;
       if (first_time)
-        {
-          set_process_privilege (SE_RESTORE_NAME);
-          first_time = FALSE;
-        }
+	{
+	  set_process_privilege (SE_RESTORE_NAME);
+	  first_time = FALSE;
+	}
 
       /* Load users registry hive. */
       load_registry_hive (sid);
@@ -703,7 +703,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
     {
       cygheap->fdtab.fixup_before_exec (pi.dwProcessId);
       if (mode == _P_OVERLAY)
-        ResumeThread (pi.hThread);
+	ResumeThread (pi.hThread);
     }
 
   if (mode == _P_OVERLAY)

@@ -125,7 +125,7 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
       if (aclbufp[i].a_perm & S_IXOTH)
 	allow |= FILE_GENERIC_EXECUTE;
       if ((aclbufp[i].a_perm & (S_IWOTH | S_IXOTH)) == (S_IWOTH | S_IXOTH))
-        allow |= FILE_DELETE_CHILD;
+	allow |= FILE_DELETE_CHILD;
       /* Set inherit property. */
       DWORD inheritance = (aclbufp[i].a_type & ACL_DEFAULT)
 			  ? INHERIT_ONLY : DONT_INHERIT;
@@ -433,7 +433,7 @@ acl_access (const char *path, int flags)
 			&& owner == group
 			&& is_grp_member (myself->uid, gr->gr_gid))
 		      break;
-	        }
+		}
 	      if (!gr)
 		continue;
 	    }

@@ -129,11 +129,11 @@ check_null_empty_str (const char *name)
 
 int __stdcall
 check_null_empty_str_errno (const char *name)
-{ 
-  int __err; 
-  if ((__err = check_null_empty_str (name))) 
-    set_errno (__err); 
-  return __err; 
+{
+  int __err;
+  if ((__err = check_null_empty_str (name)))
+    set_errno (__err);
+  return __err;
 }
 
 int __stdcall
@@ -147,9 +147,9 @@ __check_null_invalid_struct (const void *s, unsigned sz)
 
 int __stdcall
 __check_null_invalid_struct_errno (const void *s, unsigned sz)
-{ 
-  int __err; 
-  if ((__err = __check_null_invalid_struct (s, sz))) 
-    set_errno (__err); 
-  return __err; 
+{
+  int __err;
+  if ((__err = __check_null_invalid_struct (s, sz)))
+    set_errno (__err);
+  return __err;
 }

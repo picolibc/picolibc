@@ -1,3 +1,23 @@
+Fri Sep  7 17:11:11 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* cygheap.h (init_cygheap): Move heap pointers here.
+	* include/sys/cygwin.h (perprocess): Remove heap pointers.
+	* dcrt0.cc (__cygwin_user_data): Reflect obsolete perprocess stuff.
+	(_dll_crt0): Don't initialize heap pointers.
+	(cygwin_dll_init): Ditto.
+	(release_upto): Use heap pointers from cygheap.
+	* heap.h: Ditto.
+	* fork.cc (fork_parent): Ditto.  Don't set heap pointers in ch.
+	(fork_child): Remove obsolete sigproc_fixup_after_fork.
+	* shared.cc (memory_init): Reorganize so that cygheap initialization is
+	called prior to regular heap since regular heap uses cygheap now.
+	* sigproc.cc (proc_subproc): Eliminate zombies allocation.
+	(sigproc_init): Move zombies alloation here.  Don't free up array on
+	fork, just reuse it.
+	(sigproc_fixup_after_fork): Eliminate.
+	* sigproc.h: Ditto.
+	* include/cygwin/version.h: Reflect change to perprocess structure.
+
 Fri Sep  7 10:53:34 2001  Jason Tishler <jason@tishler.net>
 
 	* poll.cc (poll): Change implementation to only call select() when no
@@ -86,7 +106,7 @@ Tue Sep  4 22:14:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 2001-09-04  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
-        * fhandler_console.cc (fhandler_console::char_command): Save the cursor
+	* fhandler_console.cc (fhandler_console::char_command): Save the cursor
 	position relative to the top of the window.
 	* fhandler_cc (fhandler_console::write): Ditto.
 

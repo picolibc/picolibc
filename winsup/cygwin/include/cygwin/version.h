@@ -142,6 +142,7 @@ details. */
        42: sys_errlist, sys_nerr
        43: sigsetjmp, siglongjmp fixed
        44: Export dirfd
+       45: perprocess change
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0

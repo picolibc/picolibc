@@ -91,7 +91,7 @@ fillout_pinfo (pid_t pid, int winpid)
 
 static DWORD
 get_cygdrive_info (char *user, char *system, char *user_flags,
-	           char *system_flags)
+		   char *system_flags)
 {
   int res = mount_table->get_cygdrive_info (user, system, user_flags,
 					    system_flags);

@@ -163,14 +163,7 @@ struct per_process
   /* non-zero of ctors have been run.  Inherited from parent. */
   int run_ctors_p;
 
-  DWORD unused[3];
-
-  /* Heap management.  Inherited from parent. */
-  void *heapbase;		/* bottom of the heap */
-  void *heapptr;		/* current index into heap */
-  void *heaptop;		/* current top of heap */
-
-  DWORD unused1;
+  DWORD unused[7];
 
   /* Non-zero means the task was forked.  The value is the pid.
      Inherited from parent. */

@@ -39,15 +39,15 @@ fhandler_dev_mem::fhandler_dev_mem (const char *name, int nunit)
       NTSTATUS ret;
       SYSTEM_BASIC_INFORMATION sbi;
       if ((ret = NtQuerySystemInformation (SystemBasicInformation, (PVOID) &sbi,
-                                           sizeof sbi, NULL)) != STATUS_SUCCESS)
-        {
-          __seterrno_from_win_error (RtlNtStatusToDosError (ret));
-          debug_printf("NtQuerySystemInformation: ret = %d, Dos(ret) = %d",
-                       ret, RtlNtStatusToDosError (ret));
-          mem_size = 0;
-        }
+					   sizeof sbi, NULL)) != STATUS_SUCCESS)
+	{
+	  __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+	  debug_printf("NtQuerySystemInformation: ret = %d, Dos(ret) = %d",
+		       ret, RtlNtStatusToDosError (ret));
+	  mem_size = 0;
+	}
       else
-        mem_size = sbi.PhysicalPageSize * sbi.NumberOfPhysicalPages;
+	mem_size = sbi.PhysicalPageSize * sbi.NumberOfPhysicalPages;
       debug_printf ("MemSize: %d MB", mem_size >> 20);
     }
   else if (unit == 2) /* /dev/kmem - Not yet supported */
@@ -78,9 +78,9 @@ fhandler_dev_mem::open (const char *, int flags, mode_t)
     {
       set_errno (ENOENT);
       debug_printf ("%s is accessible under NT/W2K only",
-                    unit == 1 ? "/dev/mem" :
-                    unit == 2 ? "/dev/kmem" :
-                                "/dev/port");
+		    unit == 1 ? "/dev/mem" :
+		    unit == 2 ? "/dev/kmem" :
+				"/dev/port");
       return 0;
     }
 
@@ -96,7 +96,7 @@ fhandler_dev_mem::open (const char *, int flags, mode_t)
 
   OBJECT_ATTRIBUTES attr;
   InitializeObjectAttributes(&attr, &memstr,
-  			     OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+			     OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
 			     NULL, NULL);
 
   ACCESS_MASK section_access;
@@ -152,15 +152,15 @@ fhandler_dev_mem::write (const void *ptr, size_t ulen)
 
   phys.QuadPart = (ULONGLONG) pos;
   if ((ret = NtMapViewOfSection (get_handle (),
-                                 INVALID_HANDLE_VALUE,
-                                 &viewmem,
-                                 0L,
-                                 len,
-                                 &phys,
-                                 &len,
-                                 ViewShare,
-                                 0,
-                                 PAGE_READONLY)) != STATUS_SUCCESS)
+				 INVALID_HANDLE_VALUE,
+				 &viewmem,
+				 0L,
+				 len,
+				 &phys,
+				 &len,
+				 ViewShare,
+				 0,
+				 PAGE_READONLY)) != STATUS_SUCCESS)
     {
       __seterrno_from_win_error (RtlNtStatusToDosError (ret));
       return -1;
@@ -200,15 +200,15 @@ fhandler_dev_mem::read (void *ptr, size_t ulen)
 
   phys.QuadPart = (ULONGLONG) pos;
   if ((ret = NtMapViewOfSection (get_handle (),
-                                 INVALID_HANDLE_VALUE,
-                                 &viewmem,
-                                 0L,
-                                 len,
-                                 &phys,
-                                 &len,
-                                 ViewShare,
-                                 0,
-                                 PAGE_READONLY)) != STATUS_SUCCESS)
+				 INVALID_HANDLE_VALUE,
+				 &viewmem,
+				 0L,
+				 len,
+				 &phys,
+				 &len,
+				 ViewShare,
+				 0,
+				 PAGE_READONLY)) != STATUS_SUCCESS)
     {
       __seterrno_from_win_error (RtlNtStatusToDosError (ret));
       return -1;
@@ -283,7 +283,7 @@ fhandler_dev_mem::mmap (caddr_t *addr, size_t len, DWORD access,
   OBJECT_ATTRIBUTES attr;
   InitializeObjectAttributes(&attr, &memstr,
 			     OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
-  			     NULL, NULL);
+			     NULL, NULL);
 
   ACCESS_MASK section_access;
   ULONG protect;

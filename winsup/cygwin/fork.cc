@@ -246,7 +246,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   sync_with_parent ("after longjmp.", TRUE);
   ProtectHandle (hParent);
   sigproc_printf ("hParent %p, child 1 first_dll %p, load_dlls %d\n", hParent,
-      		  first_dll, load_dlls);
+		  first_dll, load_dlls);
 
 #ifdef DEBUGGING
   char c;
@@ -279,7 +279,6 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   debug_fixup_after_fork ();
   pinfo_fixup_after_fork ();
   cygheap->fdtab.fixup_after_fork (hParent);
-  sigproc_fixup_after_fork ();
   signal_fixup_after_fork ();
 
   MALLOC_CHECK;
@@ -430,9 +429,6 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   init_child_info (PROC_FORK1, &ch, 1, subproc_ready);
 
   ch.forker_finished = forker_finished;
-  ch.heaptop = user_data->heaptop;
-  ch.heapbase = user_data->heapbase;
-  ch.heapptr = user_data->heapptr;
 
   stack_base (ch);
 
@@ -489,7 +485,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
       ForceCloseHandle(forker_finished);
       /* Restore impersonation */
       if (cygheap->user.impersonated
-          && cygheap->user.token != INVALID_HANDLE_VALUE)
+	  && cygheap->user.token != INVALID_HANDLE_VALUE)
 	ImpersonateLoggedOnUser (cygheap->user.token);
       return -1;
     }
@@ -556,7 +552,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   rc = fork_copy (pi, "user/cygwin data",
 		  user_data->data_start, user_data->data_end,
 		  user_data->bss_start, user_data->bss_end,
-		  ch.heapbase, ch.heapptr,
+		  cygheap->heapbase, cygheap->heapptr,
 		  stack_here, ch.stackbottom,
 		  dll_data_start, dll_data_end,
 		  dll_bss_start, dll_bss_end, NULL);

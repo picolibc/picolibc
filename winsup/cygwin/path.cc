@@ -3115,7 +3115,7 @@ fchdir (int fd)
       char path[MAX_PATH];
       char posix_path[MAX_PATH];
       mount_table->conv_to_posix_path (cygheap->cwd.get (path, 0, 1),
-				       posix_path, 0); 
+				       posix_path, 0);
       cygheap->fdtab[fd]->set_name (path, posix_path);
     }
 

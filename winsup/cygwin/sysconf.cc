@@ -61,20 +61,20 @@ sysconf (int in)
 	/*FALLTHRU*/
       case _SC_PHYS_PAGES:
       case _SC_AVPHYS_PAGES:
-        {
+	{
 	  NTSTATUS ret;
 	  SYSTEM_BASIC_INFORMATION sbi;
-          if ((ret = NtQuerySystemInformation (SystemBasicInformation,
+	  if ((ret = NtQuerySystemInformation (SystemBasicInformation,
 						 (PVOID) &sbi,
 					       sizeof sbi, NULL))
 		!= STATUS_SUCCESS)
-            {
-              __seterrno_from_win_error (RtlNtStatusToDosError (ret));
-              debug_printf("NtQuerySystemInformation: ret = %d, "
-		           "Dos(ret) = %d",
-                           ret, RtlNtStatusToDosError (ret));
+	    {
+	      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+	      debug_printf("NtQuerySystemInformation: ret = %d, "
+			   "Dos(ret) = %d",
+			   ret, RtlNtStatusToDosError (ret));
 	      return -1;
-            }
+	    }
 	  switch (in)
 	    {
 	    case _SC_NPROCESSORS_CONF:

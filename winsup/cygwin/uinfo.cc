@@ -63,13 +63,13 @@ internal_getlogin (cygheap_user &user)
 	  sys_wcstombs (buf, wui->wkui1_username, UNLEN + 1);
 	  user.set_name (buf);
 	  sys_wcstombs (buf, wui->wkui1_logon_server,
-	  		INTERNET_MAX_HOST_NAME_LENGTH + 1);
+			INTERNET_MAX_HOST_NAME_LENGTH + 1);
 	  user.set_logsrv (buf);
 	  sys_wcstombs (buf, wui->wkui1_logon_domain,
 			INTERNET_MAX_HOST_NAME_LENGTH + 1);
 	  user.set_domain (buf);
 	  NetApiBufferFree (wui);
-      	}
+	}
       if (!user.logsrv () && get_logon_server_and_user_domain (buf, NULL))
 	{
 	  user.set_logsrv (buf + 2);
@@ -84,7 +84,7 @@ internal_getlogin (cygheap_user &user)
       sys_mbstowcs (wuser, user.name (), UNLEN + 1);
       wlogsrv[0] = '\0';
       if (user.logsrv ())
-        {
+	{
 	  strcat (strcpy (buf, "\\\\"), user.logsrv ());
 	  sys_mbstowcs (wlogsrv, buf, INTERNET_MAX_HOST_NAME_LENGTH + 3);
 	}
@@ -128,7 +128,7 @@ internal_getlogin (cygheap_user &user)
 	     in a process token of a currently impersonated process. */
 	  if (ptok == INVALID_HANDLE_VALUE
 	      && !OpenProcessToken (GetCurrentProcess (),
-	      			    TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
+				    TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
 				    &ptok))
 	    debug_printf ("OpenProcessToken(): %E\n");
 	  else if (!GetTokenInformation (ptok, TokenUser, &tu, sizeof tu, &siz))
@@ -188,7 +188,7 @@ internal_getlogin (cygheap_user &user)
 	      if (!SetTokenInformation (ptok, TokenOwner, &tu, sizeof tu))
 		debug_printf ("SetTokenInformation(TokenOwner): %E");
 	      if (gsid && !SetTokenInformation (ptok, TokenPrimaryGroup,
-		  			        &gsid, sizeof gsid))
+						&gsid, sizeof gsid))
 		debug_printf ("SetTokenInformation(TokenPrimaryGroup): %E");
 	    }
 

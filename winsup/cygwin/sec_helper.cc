@@ -36,12 +36,12 @@ details. */
 #include "cygheap.h"
 
 SID_IDENTIFIER_AUTHORITY sid_auth[] = {
-        {SECURITY_NULL_SID_AUTHORITY},
-        {SECURITY_WORLD_SID_AUTHORITY},
-        {SECURITY_LOCAL_SID_AUTHORITY},
-        {SECURITY_CREATOR_SID_AUTHORITY},
-        {SECURITY_NON_UNIQUE_AUTHORITY},
-        {SECURITY_NT_AUTHORITY}
+	{SECURITY_NULL_SID_AUTHORITY},
+	{SECURITY_WORLD_SID_AUTHORITY},
+	{SECURITY_LOCAL_SID_AUTHORITY},
+	{SECURITY_CREATOR_SID_AUTHORITY},
+	{SECURITY_NON_UNIQUE_AUTHORITY},
+	{SECURITY_NT_AUTHORITY}
 };
 
 cygsid well_known_null_sid ("S-1-0-0");
@@ -348,7 +348,7 @@ set_process_privilege (const char *privilege, BOOL enable)
   DWORD size;
 
   if (!OpenProcessToken (hMainProc, TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES,
-  			 &hToken))
+			 &hToken))
     {
       __seterrno ();
       goto out;
@@ -365,7 +365,7 @@ set_process_privilege (const char *privilege, BOOL enable)
   new_priv.Privileges[0].Attributes = enable ? SE_PRIVILEGE_ENABLED : 0;
 
   if (!AdjustTokenPrivileges (hToken, FALSE, &new_priv,
-  			      sizeof orig_priv, &orig_priv, &size))
+			      sizeof orig_priv, &orig_priv, &size))
     {
       __seterrno ();
       goto out;
