@@ -1,3 +1,8 @@
+Wed Dec 6 15:39:18 2000  Earnie Boyd  <earnie_boyd@yahoo.com>
+
+	* winsup/cygwin/include/sys/uio.h (readv): Correct prototype.
+	(writev): Ditto.
+
 Tue Dec  5 17:06:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* include/sys/uio.h: Include <sys/cdefs.h>. Use __BEGIN_DECL and

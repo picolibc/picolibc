@@ -19,8 +19,8 @@ struct iovec {
 	int iov_len;
 };
 
-extern int readv __P ((int filedes, const struct iovec *vector, size_t count));
-extern int writev __P ((int filedes, const struct iovec *vector, size_t count));
+extern ssize_t readv __P ((int filedes, const struct iovec *vector, int count));
+extern ssize_t writev __P ((int filedes, const struct iovec *vector, int count));
 
 __END_DECLS
 
