@@ -1,3 +1,7 @@
+Wed Jun 21 14:32:42 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Add *.def to clean operation.
+
 Wed Jun 21 13:18:23 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Add *.exe to clean operation.

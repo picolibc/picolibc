@@ -143,7 +143,7 @@ class per_process
 
   void *(*calloc)(size_t, size_t);
   /* For future expansion of values set by the app. */
-  void *public_reserved[4];
+  void (*premain[4]) (int, char **);
 
   /* The rest are *internal* to cygwin.dll.
      Those that are here because we want the child to inherit the value from
@@ -164,7 +164,7 @@ class per_process
   void *heapptr;		/* current index into heap */
   void *heaptop;		/* current top of heap */
 
-  HANDLE reserved1;		/* unused */
+  HANDLE unused1;		/* unused */
 
   /* Non-zero means the task was forked.  The value is the pid.
      Inherited from parent. */

@@ -11,6 +11,7 @@ details. */
 #undef MALLOC_DEBUG
 
 #include "winsup.h"
+#include "sys/cygwin.h"
 #include <reent.h>
 #include <stdlib.h>
 
@@ -54,6 +55,10 @@ cygwin_crt0_common (MainFunc f)
   this_proc.envptr = &environ;
   this_proc.impure_ptr_ptr = &_impure_ptr;
   this_proc.main = f;
+  this_proc.premain[0] = cygwin_premain0;
+  this_proc.premain[1] = cygwin_premain1;
+  this_proc.premain[2] = cygwin_premain2;
+  this_proc.premain[3] = cygwin_premain3;
   this_proc.fmode_ptr = &_fmode;
   this_proc.initial_sp = (char *) &onstack;
 

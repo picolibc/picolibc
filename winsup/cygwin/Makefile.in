@@ -106,7 +106,8 @@ GMON_START:=gcrt0.o
 # data which apps can get to, which is a pain in the dll, so we
 # include them directly into the library.
 
-LIBCOS:=libccrt0.o libcmain.o getopt.o dll_entry.o dll_main.o
+LIBCOS:=libccrt0.o libcmain.o getopt.o dll_entry.o dll_main.o \
+	premain0.o premain1.o premain2.o premain3.o
 
 # Build all source files in the config directory
 
@@ -143,9 +144,7 @@ install_host=@install_host@
 
 all: new-$(DLL_NAME) $(all_host) all_target
 
-install: $(install_host) install_target
-
-all_target: $(LIBGMON_A) $(LIB_NAME)
+all_target: $(LIBGMON_A) $(LIB_NAME) binmode.o
 
 all_host: cygrun.exe
 
@@ -167,7 +166,7 @@ install: all $(install_host) $(install_target)
 install_host:
 
 clean:
-	-rm -f *.o *.dll *.a *.exp junk *.base version.cc regexp/*.o winver_stamp *.exe
+	-rm -f *.o *.dll *.a *.exp junk *.base *.def version.cc regexp/*.o winver_stamp *.exe
 
 maintainer-clean realclean: clean
 	@echo "This command is intended for maintainers to use;"
