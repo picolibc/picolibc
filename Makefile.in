@@ -1186,28 +1186,13 @@ mail-report-with-warnings.log: warning.log
 
 # Installation targets.
 
-.PHONY: install uninstall source-vault binary-vault vault-install
+.PHONY: install uninstall
 install: installdirs @install_host_modules@ @install_target_modules@
 
 install-target: @install_target_modules@
 
 uninstall:
 	@echo "the uninstall target is not supported in this tree"
-
-source-vault:
-	$(MAKE) -f ./release/Build-A-Release \
-		host=$(host_alias) source-vault
-
-binary-vault:
-	$(MAKE) -f ./release/Build-A-Release \
-		host=$(host_alias) target=$(target_alias)
-
-vault-install:
-	@if [ -f ./release/vault-install ] ; then \
-	  ./release/vault-install $(host_alias) $(target_alias) ; \
-	else \
-	  true ; \
-	fi
 
 .PHONY: install.all
 install.all: install-no-fixedincludes
@@ -4968,90 +4953,112 @@ install-gcc:
 	  true; \
 	fi
 
-ALL_GCC = maybe-all-gcc
-ALL_GCC_C = $(ALL_GCC) maybe-all-target-newlib maybe-all-target-libgloss
-ALL_GCC_CXX = $(ALL_GCC_C) maybe-all-target-libstdc++-v3
+# --------------------------------------
+# Dependencies between different modules
+# --------------------------------------
 
-# This is a list of inter-dependencies among modules.
-all-autoconf: maybe-all-m4 maybe-all-texinfo
-all-automake: maybe-all-m4 maybe-all-texinfo
-all-bfd: maybe-all-libiberty maybe-all-intl
-all-binutils: maybe-all-libiberty maybe-all-opcodes maybe-all-bfd maybe-all-flex maybe-all-bison maybe-all-byacc maybe-all-intl
-all-bison: maybe-all-texinfo
-configure-target-boehm-gc: $(ALL_GCC_C) maybe-configure-target-qthreads
-all-dejagnu: maybe-all-tcl maybe-all-expect maybe-all-tk
-all-diff: maybe-all-libiberty
-configure-target-examples: $(ALL_GCC_C)
-all-expect: maybe-all-tcl maybe-all-tk
-all-fileutils: maybe-all-libiberty
-all-flex: maybe-all-libiberty maybe-all-bison maybe-all-byacc
-all-gas: maybe-all-libiberty maybe-all-opcodes maybe-all-bfd maybe-all-intl
+# There are two types of dependencies here: 'hard' dependencies, where one
+# module simply won't build without the other; and 'soft' dependencies, where
+# if the depended-on module is missing, the depending module will do without
+# or find a substitute somewhere (perhaps installed).  Soft dependencies
+# are specified by depending on a 'maybe-' target.  If you're not sure,
+# it's safer to use a soft dependency.
+
+# Host modules specific to gcc.
 all-gcc: maybe-all-libiberty maybe-all-bison maybe-all-byacc maybe-all-binutils maybe-all-gas maybe-all-ld maybe-all-zlib
+# This is a slightly kludgy method of getting dependencies on 
+# all-build-libiberty correct; it would be better to build it every time.
+all-gcc: maybe-all-build-libiberty
 all-bootstrap: maybe-all-libiberty maybe-all-texinfo maybe-all-bison maybe-all-byacc maybe-all-binutils maybe-all-gas maybe-all-ld maybe-all-zlib
+
+# Host modules specific to gdb.
 GDB_TK = @GDB_TK@
 all-gdb: maybe-all-libiberty maybe-all-opcodes maybe-all-bfd maybe-all-mmalloc maybe-all-readline maybe-all-bison maybe-all-byacc maybe-all-sim $(gdbnlmrequirements) $(GDB_TK)
-configure-target-gperf: $(ALL_GCC_CXX)
-all-target-gperf: maybe-all-target-libiberty maybe-all-target-libstdc++-v3
-all-gprof: maybe-all-libiberty maybe-all-bfd maybe-all-opcodes maybe-all-intl
-all-grep: maybe-all-libiberty
-all-gzip: maybe-all-libiberty
-all-hello: maybe-all-libiberty
-all-itcl: maybe-all-tcl maybe-all-tk
-all-ld: maybe-all-libiberty maybe-all-bfd maybe-all-opcodes maybe-all-bison maybe-all-byacc maybe-all-flex maybe-all-intl
-configure-target-libgloss: $(ALL_GCC)
-all-target-libgloss: maybe-configure-target-newlib
-all-libgui: maybe-all-tcl maybe-all-tk maybe-all-itcl
-configure-target-libffi: $(ALL_GCC_C) 
-configure-target-libjava: $(ALL_GCC_C) maybe-configure-target-zlib maybe-configure-target-boehm-gc maybe-configure-target-qthreads maybe-configure-target-libffi
-all-target-libjava: maybe-all-fastjar maybe-all-target-zlib maybe-all-target-boehm-gc maybe-all-target-qthreads maybe-all-target-libffi
-configure-target-libstdc++-v3: $(ALL_GCC_C)
-all-target-libstdc++-v3: maybe-all-target-libiberty
-configure-target-libf2c: $(ALL_GCC_C)
-all-target-libf2c: maybe-all-target-libiberty
-configure-target-libobjc: $(ALL_GCC_C)
-all-target-libobjc: maybe-all-target-libiberty
-all-m4: maybe-all-libiberty maybe-all-texinfo
-all-make: maybe-all-libiberty
-configure-target-newlib: $(ALL_GCC)
-configure-target-libtermcap: $(ALL_GCC_C)
-all-opcodes: maybe-all-bfd maybe-all-libiberty
-all-patch: maybe-all-libiberty
-all-prms: maybe-all-libiberty
-configure-target-qthreads: $(ALL_GCC_C)
-all-recode: maybe-all-libiberty
-all-sed: maybe-all-libiberty
-all-send-pr: maybe-all-prms
-all-sid: maybe-all-tcl maybe-all-tk
-all-sim: maybe-all-libiberty maybe-all-bfd maybe-all-opcodes maybe-all-readline
-all-snavigator: maybe-all-tcl maybe-all-tk maybe-all-itcl maybe-all-tix maybe-all-db maybe-all-grep maybe-all-libgui
-all-tar: maybe-all-libiberty
-all-tclX: maybe-all-tcl maybe-all-tk
-all-tk: maybe-all-tcl
-all-texinfo: maybe-all-libiberty
-all-tix: maybe-all-tcl maybe-all-tk
-configure-target-winsup: $(ALL_GCC_C)
-all-target-winsup: maybe-all-target-libiberty maybe-all-target-libtermcap
-all-uudecode: maybe-all-libiberty
-configure-target-zlib: $(ALL_GCC_C)
-all-fastjar: maybe-all-zlib maybe-all-libiberty
-configure-target-fastjar: maybe-configure-target-zlib
-all-target-fastjar: maybe-all-target-zlib maybe-all-target-libiberty
-configure-target-libiberty: $(ALL_GCC_C)
 install-gdb: maybe-install-tcl maybe-install-tk maybe-install-itcl maybe-install-tix maybe-install-libgui
-install-sid: maybe-install-tcl maybe-install-tk
+all-libgui: maybe-all-tcl maybe-all-tk maybe-all-itcl
 
+# Host modules specific to binutils.
+all-bfd: maybe-all-libiberty maybe-all-intl
+all-binutils: maybe-all-libiberty maybe-all-opcodes maybe-all-bfd maybe-all-flex maybe-all-bison maybe-all-byacc maybe-all-intl
 # We put install-opcodes before install-binutils because the installed
 # binutils might be on PATH, and they might need the shared opcodes
 # library.
 install-binutils: maybe-install-opcodes
+all-gas: maybe-all-libiberty maybe-all-opcodes maybe-all-bfd maybe-all-intl
+all-gprof: maybe-all-libiberty maybe-all-bfd maybe-all-opcodes maybe-all-intl
+all-ld: maybe-all-libiberty maybe-all-bfd maybe-all-opcodes maybe-all-bison maybe-all-byacc maybe-all-flex maybe-all-intl
+all-opcodes: maybe-all-bfd maybe-all-libiberty
 
+# Other host modules in the 'src' repository.
+all-dejagnu: maybe-all-tcl maybe-all-expect maybe-all-tk
+all-expect: maybe-all-tcl maybe-all-tk
+all-itcl: maybe-all-tcl maybe-all-tk
 # We put install-tcl before install-itcl because itcl wants to run a
 # program on installation which uses the Tcl libraries.
 install-itcl: maybe-install-tcl
+all-sid: maybe-all-tcl maybe-all-tk
+install-sid: maybe-install-tcl maybe-install-tk
+all-sim: maybe-all-libiberty maybe-all-bfd maybe-all-opcodes maybe-all-readline
+all-tk: maybe-all-tcl
+all-tix: maybe-all-tcl maybe-all-tk
+all-texinfo: maybe-all-libiberty
 
-# This is a slightly kludgy method of getting dependencies on 
-# all-build-libiberty correct; it would be better to build it every time.
-all-gcc: maybe-all-build-libiberty
+# Other host modules.  Warning, these are not well tested.
+all-autoconf: maybe-all-m4 maybe-all-texinfo
+all-automake: maybe-all-m4 maybe-all-texinfo
+all-bison: maybe-all-texinfo
+all-diff: maybe-all-libiberty
+all-fastjar: maybe-all-zlib maybe-all-libiberty
+all-fileutils: maybe-all-libiberty
+all-flex: maybe-all-libiberty maybe-all-bison maybe-all-byacc
+all-grep: maybe-all-libiberty
+all-gzip: maybe-all-libiberty
+all-hello: maybe-all-libiberty
+all-m4: maybe-all-libiberty maybe-all-texinfo
+all-make: maybe-all-libiberty
+all-patch: maybe-all-libiberty
+all-prms: maybe-all-libiberty
+all-recode: maybe-all-libiberty
+all-sed: maybe-all-libiberty
+all-send-pr: maybe-all-prms
+all-snavigator: maybe-all-tcl maybe-all-tk maybe-all-itcl maybe-all-tix maybe-all-db maybe-all-grep maybe-all-libgui
+all-tar: maybe-all-libiberty
+all-tclX: maybe-all-tcl maybe-all-tk
+all-uudecode: maybe-all-libiberty
+
+ALL_GCC = maybe-all-gcc
+ALL_GCC_C = $(ALL_GCC) maybe-all-target-newlib maybe-all-target-libgloss
+ALL_GCC_CXX = $(ALL_GCC_C) maybe-all-target-libstdc++-v3
+
+# Target modules specific to gcc.
+configure-target-boehm-gc: $(ALL_GCC_C) maybe-configure-target-qthreads
+configure-target-fastjar: maybe-configure-target-zlib
+all-target-fastjar: maybe-all-target-zlib maybe-all-target-libiberty
+configure-target-libf2c: $(ALL_GCC_C)
+all-target-libf2c: maybe-all-target-libiberty
+configure-target-libffi: $(ALL_GCC_C) 
+configure-target-libjava: $(ALL_GCC_C) maybe-configure-target-zlib maybe-configure-target-boehm-gc maybe-configure-target-qthreads maybe-configure-target-libffi
+all-target-libjava: maybe-all-fastjar maybe-all-target-zlib maybe-all-target-boehm-gc maybe-all-target-qthreads maybe-all-target-libffi
+configure-target-libobjc: $(ALL_GCC_C)
+all-target-libobjc: maybe-all-target-libiberty
+configure-target-libstdc++-v3: $(ALL_GCC_C)
+all-target-libstdc++-v3: maybe-all-target-libiberty
+configure-target-zlib: $(ALL_GCC_C)
+
+# Target modules in the 'src' repository.
+configure-target-examples: $(ALL_GCC_C)
+configure-target-libgloss: $(ALL_GCC)
+all-target-libgloss: maybe-configure-target-newlib
+configure-target-libiberty: $(ALL_GCC_C)
+configure-target-libtermcap: $(ALL_GCC_C)
+configure-target-newlib: $(ALL_GCC)
+configure-target-winsup: $(ALL_GCC_C)
+all-target-winsup: maybe-all-target-libiberty maybe-all-target-libtermcap
+
+# Other target modules.  Warning, these are not well tested.
+configure-target-gperf: $(ALL_GCC_CXX)
+all-target-gperf: maybe-all-target-libiberty maybe-all-target-libstdc++-v3
+configure-target-qthreads: $(ALL_GCC_C)
 
 # Dependencies of all-build-foo on configure-build-foo.
 all-build-libiberty: configure-build-libiberty

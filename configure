@@ -585,28 +585,6 @@ case "${exec_prefixoption}" in
 *) ;;
 esac
 
-# Define the trigger file to make sure configure will re-run whenever
-# the gcc version number changes.
-if [ "${with_gcc_version_trigger+set}" = set ]; then
-    gcc_version_trigger="$with_gcc_version_trigger"
-    gcc_version=`grep version_string ${with_gcc_version_trigger} | sed -e 's/.*\"\([^ \"]*\)[ \"].*/\1/'`
-else
-    # If gcc's sources are available, define the trigger file.
-    if [ -f ${topsrcdir}/gcc/version.c ] ; then
-	gcc_version_trigger=${topsrcdir}/gcc/version.c
-	gcc_version=`grep version_string ${gcc_version_trigger} | sed -e 's/.*\"\([^ \"]*\)[ \"].*/\1/'`
-	case "$arguments" in
-	  *--with-gcc-version-trigger=$gcc_version_trigger* )
-	    ;;
-	  * )
-	    # Make sure configure.in knows about this.
-	    arguments="--with-gcc-version-trigger=$gcc_version_trigger $arguments"
-	    ;;
-	esac
-	withoptions="--with-gcc-version-trigger=$gcc_version_trigger $withoptions"
-    fi
-fi
-
 ### break up ${srcdir}/configure.in.
 case "`grep '^# per\-host:' ${srcdir}/configure.in`" in
 "")

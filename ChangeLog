@@ -1,3 +1,16 @@
+2002-12-02  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure: Move gcc_version_trigger stuff from here...
+	* configure.in: ...to here.
+
+	* configure.in: Separate subconfigure options added by this file from
+	options given by the user.  Add machinery to put args for host
+	subconfigures into the Makefile.
+
+	* Makefile.tpl: Remove 'vault' targets.
+	* Makefile.tpl: Reorder and comment dependencies.
+	* Makefile.in: Regenerate.
+
 2002-11-28  Geoffrey Keating  <geoffk@apple.com>
 
 	* configure.in: Move host-specific darwin noconfigdirs into

@@ -33,6 +33,30 @@
 
 ##############################################################################
 
+extra_host_args=
+# Define the trigger file to make sure configure will re-run whenever
+# the gcc version number changes.
+if [ "${with_gcc_version_trigger+set}" = set ]; then
+    gcc_version_trigger="$with_gcc_version_trigger"
+    gcc_version=`grep version_string ${with_gcc_version_trigger} | sed -e 's/.*\"\([^ \"]*\)[ \"].*/\1/'`
+else
+    # If gcc's sources are available, define the trigger file.
+    if [ -f ${topsrcdir}/gcc/version.c ] ; then
+	gcc_version_trigger=${topsrcdir}/gcc/version.c
+	gcc_version=`grep version_string ${gcc_version_trigger} | sed -e 's/.*\"\([^ \"]*\)[ \"].*/\1/'`
+	case "$arguments" in
+	  *--with-gcc-version-trigger=$gcc_version_trigger* )
+	    ;;
+	  * )
+	    # Add to all subconfigure arguments: build, host, and target.
+	    arguments="--with-gcc-version-trigger=$gcc_version_trigger $arguments"
+	    ;;
+	esac
+	# This will be redundant when we start all subconfigures from the Makefile.
+	extra_host_args="--with-gcc-version-trigger=$gcc_version_trigger $extra_host_args"
+    fi
+fi
+
 ### To add a new directory to the tree, first choose whether it is a target
 ### or a host dependent tool.  Then put it into the appropriate list
 ### (library or tools, host or target), doing a dependency sort.  For
@@ -1189,21 +1213,21 @@ fi
 if test x${use_gnu_as} = x &&
    echo " ${configdirs} " | grep " gas " > /dev/null 2>&1 ; then
   with_gnu_as=yes
-  withoptions="$withoptions --with-gnu-as"
+  extra_host_args="$extra_host_args --with-gnu-as"
 fi
 
 if test x${use_gnu_ld} = x &&
    echo " ${configdirs} " | grep " ld " > /dev/null 2>&1 ; then
   with_gnu_ld=yes
-  withoptions="$withoptions --with-gnu-ld"
+  extra_host_args="$extra_host_args --with-gnu-ld"
 fi
 
-# If using newlib, add --with-newlib to the withoptions so that gcc/configure
+# If using newlib, add --with-newlib to the extra_host_args so that gcc/configure
 # can detect this case.
 
 if test x${with_newlib} != xno && echo " ${target_configdirs} " | grep " target-newlib " > /dev/null 2>&1 ; then
   with_newlib=yes
-  withoptions="$withoptions --with-newlib"
+  extra_host_args="$extra_host_args --with-newlib"
 fi
 
 # We default to --with-shared on platforms where -fpic is meaningless.
@@ -1230,13 +1254,13 @@ if test x${with_stabs} = x ; then
   case "${target}" in
   mips*-*-irix6*o32)
     with_stabs=yes;
-    withoptions="${withoptions} --with-stabs"
+    extra_host_args="${extra_host_args} --with-stabs"
     ;;
   mips*-*-irix6*)
     ;;
   mips*-*-* | alpha*-*-osf*)
     with_stabs=yes;
-    withoptions="${withoptions} --with-stabs"
+    extra_host_args="${extra_host_args} --with-stabs"
     ;;
   esac
 fi
@@ -1245,9 +1269,12 @@ fi
 # them automatically.
 case "${host}" in
   hppa*64*-*-hpux11*)	
-    withoptions="$withoptions -x-libraries=/usr/lib/pa20_64 -x-includes=/usr/X11R6/include"
+    extra_host_args="$extra_host_args -x-libraries=/usr/lib/pa20_64 -x-includes=/usr/X11R6/include"
     ;;
 esac
+
+# This will go away when we start subconfigures from the Makefile.
+withoptions="${withoptions} ${extra_host_args}"
 
 # If we aren't going to be using gcc, see if we can extract a definition
 # of CC from the fragment.
@@ -1421,6 +1448,18 @@ baseargs=`echo "${arguments}" | \
 # and not use the same cache file.  Multilibs are neither needed nor
 # desired.
 buildargs="--cache-file=../config.cache --build=${build_alias} --host=${build_alias} ${baseargs}"
+
+# For host modules, accept cache file option, or specification as blank.
+case "${cache_file}" in
+"") # empty
+  cache_file_option="" ;;
+/* | [A-Za-z]:[\\/]* ) # absolute path
+  cache_file_option="--cache-file=${cache_file}" ;;
+*) # relative path
+  cache_file_option="--cache-file=../${cache_file}" ;;
+esac
+
+hostargs="${cache_file_option} ${buildopt} --host=${host_alias} --target=${target_alias} ${extra_host_args} ${baseargs}"
 
 targargs=${baseargs}
 
@@ -1639,6 +1678,7 @@ s%@target_subdir@%${target_subdir}%
 s%@build_subdir@%${build_subdir}%
 s%@build_configargs@%${buildargs}%
 s%@gxx_include_dir@%${gxx_include_dir}%
+s%@host_configargs@%${hostargs}%
 EOF
 sed -f $sedtemp Makefile > Makefile.tem
 rm -f Makefile $sedtemp
