@@ -473,7 +473,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 
       /* Replace argv[0] with the full path to the script if this is the
 	 first time through the loop. */
-      newargv.replace0_maybe (real_path);
+      newargv.replace0_maybe (prog_arg);
 	  
       /* pointers:
        * pgm	interpreter name

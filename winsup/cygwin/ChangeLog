@@ -1,3 +1,9 @@
+Tue Sep 19 09:46:36 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* spawn.cc (spawn_guts): Use actual program argument passed in for
+	argv[0] as originally suggested by Kazuhiro Fujieda
+	<fujieda@jaist.ac.jp>.
+
 Mon Sep 18 23:17:19 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.h: Create new input path flag PATH_NEEDDIR.
