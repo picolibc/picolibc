@@ -1,8 +1,7 @@
-#!/bin/sh -x
+#!/bin/sh
 lib=$1; shift
 as=$1; shift
 ar=$1; shift
-ranlib=$1; shift
 rm -rf newsym.dir
 trap "rm -rf newsym.dir" 0 1 2 15
 mkdir newsym.dir
@@ -10,15 +9,25 @@ while [ -n "$1" ]; do
     newsym=$1; shift
     oldsym=$1; shift
     cat <<EOF > newsym.dir/$newsym.s
-	.section .idata$6
-	.extern	__imp__$oldsym
-	.extern __head_cygwin1_dll
 	.section .text
 	.global	_$newsym
+	.global	__imp__$newsym
 _$newsym:
 	jmp	*__imp__$oldsym
+
+	.section .idata\$7
+	.long	__head_cygwin1_dll
+
+        .section        .idata\$5
+__imp__$newsym:	.rva    1f
+
+	.section .idata\$4
+	.rva	1f
+
+	.section .idata\$6
+1:	.short	2
+	.asciz	"$oldsym"
 EOF
     $as -o newsym.dir/$newsym.o newsym.dir/$newsym.s
 done
-$ar cru $lib newsym.dir/*.o
-$ranlib $lib
+$ar crus $lib newsym.dir/*.o

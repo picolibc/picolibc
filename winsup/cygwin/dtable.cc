@@ -65,18 +65,25 @@ dtable::extend (int howmuch)
   if (howmuch <= 0)
     return 0;
 
+  if (new_size > (100 * NOFILE_INCR))
+    {
+      set_errno (EMFILE);
+      return 0;
+    }
+
   /* Try to allocate more space for fd table. We can't call realloc ()
      here to preserve old table if memory allocation fails */
 
   if (!(newfds = (fhandler_base **) ccalloc (HEAP_ARGV, new_size, sizeof newfds[0])))
     {
       debug_printf ("calloc failed");
+      set_errno (ENOMEM);
       return 0;
     }
   if (fds)
     {
-      memcpy (newfds, fds, size * sizeof (fds[0]));
       cfree (fds);
+      memcpy (newfds, fds, size * sizeof (fds[0]));
     }
 
   size = new_size;
@@ -434,6 +441,7 @@ build_fh_pc (path_conv& pc)
     fh = cnew (fhandler_nodevice) ();
 
   fh->set_name (pc);
+
   debug_printf ("fh %p", fh);
   return fh;
 }

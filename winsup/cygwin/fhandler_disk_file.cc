@@ -626,7 +626,7 @@ fhandler_disk_file::opendir ()
 
 	  res = dir;
 	}
-      if (real_name.isencoded ())
+      if (pc.isencoded ())
 	set_encoded ();
     }
 

@@ -2852,6 +2852,11 @@ long gethostid(void)
                        0x00290012};
 
   bool has_cpuid = false;
+  sigframe thisframe (mainthread);
+
+  DWORD opmask = SetThreadAffinityMask (GetCurrentThread (), 1);
+  if (!opmask)
+    debug_printf ("SetThreadAffinityMask to 1 failed, %E");
 
   if (!can_set_flag (0x00040000))
     debug_printf ("386 processor - no cpuid");
@@ -2933,7 +2938,10 @@ long gethostid(void)
   // a random hashing algorithm
   // dependancy on md5 is probably too costly
   for (int i=0;i<13;i++)
-        hostid ^= ((data[i] << (i << 2)) | (data[i] >> (32 - (i << 2))));
+    hostid ^= ((data[i] << (i << 2)) | (data[i] >> (32 - (i << 2))));
+
+  if (opmask && !SetThreadAffinityMask (GetCurrentThread (), opmask))
+    debug_printf ("SetThreadAffinityMask to %p failed, %E", opmask);
 
   debug_printf ("hostid: %08x", hostid);
 

@@ -35,7 +35,12 @@ sysconf (int in)
       case _SC_OPEN_MAX:
 	return getdtablesize ();
       case _SC_PAGESIZE:
-	return getpagesize ();
+	{
+	  long max = getdtablesize ();
+	  if (max < OPEN_MAX)
+	    max = OPEN_MAX;
+	  return max;
+	}
       case _SC_CLK_TCK:
 	return CLOCKS_PER_SEC;
       case _SC_JOB_CONTROL:
@@ -85,7 +90,14 @@ sysconf (int in)
 	      case _SC_NPROCESSORS_CONF:
 	       return sbi.NumberProcessors;
 	      case _SC_NPROCESSORS_ONLN:
-	       return sbi.ActiveProcessors;
+	       {
+		 int i = 0;
+		 do
+		   if (sbi.ActiveProcessors & 1)
+		     i++;
+		 while (sbi.ActiveProcessors >>= 1);
+		 return i;
+	       }
 	      case _SC_PHYS_PAGES:
 		return sbi.NumberOfPhysicalPages;
 	      case _SC_AVPHYS_PAGES:
