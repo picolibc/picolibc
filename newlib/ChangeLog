@@ -1,3 +1,14 @@
+Wed Mar  6 10:24:26 2002  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* Makefile.am (lib_a_SOURCES, SH64 case): Add memcpy.S, memset.S
+	and strcpy.S.
+	* Makefile.in: Regenerate.
+	* asm.h (_ENTRY): Set SH5 alignment to 8 bytes.
+	(SHHI, SHLO): Define.
+	* memcpy.S: Add code for SH5.
+	* memset.S: Likewise.
+	* strcpy.S: Likewise.
+
 2002-02-27  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configure.host: Add check for --disable-newlib-io-float

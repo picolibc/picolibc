@@ -13,7 +13,7 @@
 # endif
 
 # define _ENTRY(name)	\
-	TEXT; .align 4; .globl name; name:
+	TEXT; .balign 8; .globl name; name:
 #else
 #define _ENTRY(name)	\
 	.text; .align 2; .globl name; name:
@@ -30,4 +30,12 @@
 #else
 #define SL(branch, dest, in_slot, in_slot_arg2) \
 	in_slot, in_slot_arg2; branch dest
+#endif
+
+#ifdef __LITTLE_ENDIAN__
+#define SHHI shlld
+#define SHLO shlrd
+#else
+#define SHHI shlrd
+#define SHLO shlld
 #endif
