@@ -31,12 +31,6 @@ details. */
 #include "cygmalloc.h"
 #include "cygthread.h"
 
-#ifdef DEBUGGING
-static int npid;
-static int npid_max;
-static pid_t fork_pids[100];
-#endif
-
 /* Timeout to wait for child to start, parent to init child, etc.  */
 /* FIXME: Once things stabilize, bump up to a few minutes.  */
 #define FORK_WAIT_TIMEOUT (300 * 1000)     /* 300 seconds */
@@ -318,7 +312,6 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
 
   pthread::atforkchild ();
   fixup_timers_after_fork ();
-  wait_for_sigthread ();
   cygbench ("fork-child");
   cygwin_finished_initializing = true;
   return 0;
@@ -425,7 +418,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   ProtectHandleINH (subproc_ready);
   ProtectHandleINH (forker_finished);
 
-  init_child_info (PROC_FORK, &ch, 1, subproc_ready);
+  init_child_info (PROC_FORK, &ch, subproc_ready);
 
   ch.forker_finished = forker_finished;
 
@@ -439,23 +432,6 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   cygheap->user.deimpersonate ();
 
   ch.parent = hParent;
-#ifdef DEBUGGING
-  if (npid_max)
-    {
-      for (int pass = 0; pass < 2; pass++)
-	{
-	  pid_t pid;
-	  while ((pid = fork_pids[npid++]))
-	    if (!pinfo (pid))
-	      {
-		ch.cygpid = pid;
-		goto out;
-	      }
-	  npid = 0;
-	}
-    }
- out:
-#endif
 
   syscall_printf ("CreateProcess (%s, %s, 0, 0, 1, %x, 0, 0, %p, %p)",
 		  myself->progname, myself->progname, c_flags, &si, &pi);
@@ -499,11 +475,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
       ResumeThread (pi.hThread);
     }
 
-#ifdef DEBUGGING
-  int forked_pid = ch.cygpid != 1 ? ch.cygpid : cygwin_pid (pi.dwProcessId);
-#else
   int forked_pid = cygwin_pid (pi.dwProcessId);
-#endif
   pinfo forked (forked_pid, 1);
 
   if (!forked)
@@ -665,11 +637,13 @@ fork ()
 
   child_info_fork ch;
 
+  sig_send (NULL, __SIGHOLD);
   int res = setjmp (ch.jmp);
   if (res)
     res = fork_child (grouped.hParent, grouped.first_dll, grouped.load_dlls);
   else
     res = fork_parent (grouped.hParent, grouped.first_dll, grouped.load_dlls, esp, ch);
+  sig_send (NULL, __SIGNOHOLD);
 
   MALLOC_CHECK;
   syscall_printf ("%d = fork()", res);
@@ -679,13 +653,6 @@ fork ()
 void
 fork_init ()
 {
-  char buf[1024];
-  if (!GetEnvironmentVariable ("CYGWIN_FORK_PIDS", buf, 1024))
-    return;
-  pid_t pid;
-  char *p, *pe;
-  for (p = buf; (pid = strtol (p, &pe, 10)); p = pe)
-    fork_pids[npid_max++] = pid;
 }
 #endif /*DEBUGGING*/
 

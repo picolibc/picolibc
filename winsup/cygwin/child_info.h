@@ -42,7 +42,6 @@ public:
   DWORD intro;		// improbable string
   unsigned long magic;	// magic number unique to child_info
   unsigned short type;	// type of record, exec, spawn, fork
-  int cygpid;		// cygwin pid of child process
   HANDLE subproc_ready;	// used for synchronization with parent
   HANDLE user_h;
   HANDLE parent;
@@ -105,7 +104,7 @@ public:
   }
 };
 
-void __stdcall init_child_info (DWORD, child_info *, int, HANDLE);
+void __stdcall init_child_info (DWORD, child_info *, HANDLE);
 
 extern child_info *child_proc_info;
 extern child_info_spawn *spawn_info __attribute__ ((alias ("child_proc_info")));

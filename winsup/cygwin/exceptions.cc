@@ -805,6 +805,8 @@ ctrl_c_handler (DWORD type)
 
   if (!cygwin_finished_initializing)
     {
+      if (myself->ppid_handle)	/* Was this process created by a cygwin process? */
+	return TRUE;		/* Yes.  Let the parent eventually handle CTRL-C issues. */
       debug_printf ("exiting with status %p", STATUS_CONTROL_C_EXIT);
       ExitProcess (STATUS_CONTROL_C_EXIT);
     }

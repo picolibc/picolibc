@@ -605,7 +605,6 @@ dll_crt0_0 ()
   GetStartupInfo (&si);
   child_proc_info = (child_info *) si.lpReserved2;
 
-  int mypid = 0;
   if (si.cbReserved2 < EXEC_MAGIC_SIZE || !child_proc_info
       || memcmp (child_proc_info->zero, zeros,
 		 sizeof (child_proc_info->zero)) != 0)
@@ -625,7 +624,7 @@ dll_crt0_0 ()
       switch (child_proc_info->type)
 	{
 	  case _PROC_FORK:
-	    user_data->forkee = child_proc_info->cygpid;
+	    user_data->forkee = true;
 	    should_be_cb = sizeof (child_info_fork);
 	    /* fall through */;
 	  case _PROC_SPAWN:
@@ -639,7 +638,6 @@ dll_crt0_0 ()
 	    else
 	      {
 		cygwin_user_h = child_proc_info->user_h;
-		mypid = child_proc_info->cygpid;
 		break;
 	      }
 	  default:
@@ -667,7 +665,7 @@ dll_crt0_0 ()
 	    alloc_stack (fork_info);
 	    cygheap_fixup_in_child (false);
 	    memory_init ();
-	    set_myself (mypid);
+	    set_myself (NULL);
 	    close_ppid_handle = !!child_proc_info->pppid_handle;
 	    break;
 	  case _PROC_SPAWN:
@@ -686,7 +684,7 @@ dll_crt0_0 ()
 				  hMainProc, &h, 0, FALSE,
 				  DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
 	      h = NULL;
-	    set_myself (mypid, h);
+	    set_myself (h);
 	    __argc = spawn_info->moreinfo->argc;
 	    __argv = spawn_info->moreinfo->argv;
 	    envp = spawn_info->moreinfo->envp;
@@ -771,7 +769,7 @@ dll_crt0_1 (char *)
 	  _tlsbase = (char *) fork_info->stackbottom;
 	  _tlstop = (char *) fork_info->stacktop;
 	}
-      longjmp (fork_info->jmp, fork_info->cygpid);
+      longjmp (fork_info->jmp, true);
     }
 
 #ifdef DEBUGGING
@@ -934,7 +932,7 @@ _dll_crt0 ()
   _impure_ptr->_current_locale = "C";
 
   if (child_proc_info && child_proc_info->type == _PROC_FORK)
-    user_data->forkee = child_proc_info->cygpid;
+    user_data->forkee = true;
   else
     __sinit (_impure_ptr);
 

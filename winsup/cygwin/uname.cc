@@ -79,13 +79,13 @@ uname (struct utsname *name)
 	__small_sprintf (name->machine, "i%d86", ptype);
 	break;
       case PROCESSOR_ARCHITECTURE_IA64:
-        strcpy (name->machine, "ia64");
+	strcpy (name->machine, "ia64");
 	break;
       case PROCESSOR_ARCHITECTURE_AMD64:
-        strcpy (name->machine, "amd64");
+	strcpy (name->machine, "amd64");
 	break;
       case PROCESSOR_ARCHITECTURE_IA32_ON_WIN64:
-      	strcpy (name->machine, "ia32-win64");
+	strcpy (name->machine, "ia32-win64");
       case PROCESSOR_ARCHITECTURE_ALPHA:
 	strcpy (name->machine, "alpha");
 	break;

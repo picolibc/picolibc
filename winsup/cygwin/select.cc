@@ -507,63 +507,63 @@ out:
   if (s->write_selected)
     {
       if (s->write_ready)
-        {
-          select_printf ("%s, already ready for write", fh->get_name ());
-          gotone++;
-        }
+	{
+	  select_printf ("%s, already ready for write", fh->get_name ());
+	  gotone++;
+	}
       /* Do we need to do anything about SIGTTOU here? */
       else if (fh->get_device () == FH_PIPER)
 	select_printf ("%s, select for write on read end of pipe",
 		       fh->get_name ());
       else
-        {
-          /* We don't worry about the guard mutex, because that only applies
-             when from_select is false, and peek_pipe is never called that
-             way for writes.  */
+	{
+	  /* We don't worry about the guard mutex, because that only applies
+	     when from_select is false, and peek_pipe is never called that
+	     way for writes.  */
 
-          IO_STATUS_BLOCK iosb = {0};
-          FILE_PIPE_LOCAL_INFORMATION fpli = {0};
+	  IO_STATUS_BLOCK iosb = {0};
+	  FILE_PIPE_LOCAL_INFORMATION fpli = {0};
 
-          if (NtQueryInformationFile (h,
-                                      &iosb,
-                                      &fpli,
-                                      sizeof (fpli),
-                                      FilePipeLocalInformation))
-            {
-              /* If NtQueryInformationFile fails, optimistically assume the
-                 pipe is writable.  This could happen on Win9x, because
-                 NtQueryInformationFile is not available, or if we somehow
-                 inherit a pipe that doesn't permit FILE_READ_ATTRIBUTES
-                 access on the write end.  */
-              select_printf ("%s, NtQueryInformationFile failed",
-                             fh->get_name ());
-              gotone += s->write_ready = true;
-            }
-          /* Ensure that enough space is available for atomic writes,
-             as required by POSIX.  Subsequent writes with size > PIPE_BUF
-             can still block, but most (all?) UNIX variants seem to work
-             this way (e.g., BSD, Linux, Solaris).  */
-          else if (fpli.WriteQuotaAvailable >= PIPE_BUF)
-            {
-              select_printf ("%s, ready for write: size %lu, avail %lu",
-                             fh->get_name (),
-                             fpli.OutboundQuota,
-                             fpli.WriteQuotaAvailable);
-              gotone += s->write_ready = true;
-            }
-          /* If we somehow inherit a tiny pipe (size < PIPE_BUF), then consider
-             the pipe writable only if it is completely empty, to minimize the
-             probability that a subsequent write will block.  */
-          else if (fpli.OutboundQuota < PIPE_BUF &&
-                   fpli.WriteQuotaAvailable == fpli.OutboundQuota)
-            {
-              select_printf ("%s, tiny pipe: size %lu, avail %lu",
-                             fh->get_name (),
-                             fpli.OutboundQuota,
-                             fpli.WriteQuotaAvailable);
-              gotone += s->write_ready = true;
-            }
-        }
+	  if (NtQueryInformationFile (h,
+				      &iosb,
+				      &fpli,
+				      sizeof (fpli),
+				      FilePipeLocalInformation))
+	    {
+	      /* If NtQueryInformationFile fails, optimistically assume the
+		 pipe is writable.  This could happen on Win9x, because
+		 NtQueryInformationFile is not available, or if we somehow
+		 inherit a pipe that doesn't permit FILE_READ_ATTRIBUTES
+		 access on the write end.  */
+	      select_printf ("%s, NtQueryInformationFile failed",
+			     fh->get_name ());
+	      gotone += s->write_ready = true;
+	    }
+	  /* Ensure that enough space is available for atomic writes,
+	     as required by POSIX.  Subsequent writes with size > PIPE_BUF
+	     can still block, but most (all?) UNIX variants seem to work
+	     this way (e.g., BSD, Linux, Solaris).  */
+	  else if (fpli.WriteQuotaAvailable >= PIPE_BUF)
+	    {
+	      select_printf ("%s, ready for write: size %lu, avail %lu",
+			     fh->get_name (),
+			     fpli.OutboundQuota,
+			     fpli.WriteQuotaAvailable);
+	      gotone += s->write_ready = true;
+	    }
+	  /* If we somehow inherit a tiny pipe (size < PIPE_BUF), then consider
+	     the pipe writable only if it is completely empty, to minimize the
+	     probability that a subsequent write will block.  */
+	  else if (fpli.OutboundQuota < PIPE_BUF &&
+		   fpli.WriteQuotaAvailable == fpli.OutboundQuota)
+	    {
+	      select_printf ("%s, tiny pipe: size %lu, avail %lu",
+			     fh->get_name (),
+			     fpli.OutboundQuota,
+			     fpli.WriteQuotaAvailable);
+	      gotone += s->write_ready = true;
+	    }
+	}
     }
 
   return gotone;

@@ -882,7 +882,7 @@ fhandler_dev_dsp::Audio_in::waitfordata ()
   if (pHdr->dwFlags) /* Zero if queued following error in queueblock */
     {
       /* Errors are ignored here. They will probbaly cause a failure
-         in the subsequent PrepareHeader */
+	 in the subsequent PrepareHeader */
       rc = waveInUnprepareHeader (dev_, pHdr, sizeof (WAVEHDR));
       debug_printf ("%d = waveInUnprepareHeader (0x%08x)", rc, pHdr);
     }
@@ -1149,7 +1149,7 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
       CASE (SNDCTL_DSP_RESET)
 	close_audio_in ();
 	close_audio_out (true);
-        return 0;
+	return 0;
 	break;
 
       CASE (SNDCTL_DSP_GETBLKSIZE)
@@ -1328,8 +1328,8 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
       CASE (SNDCTL_DSP_SYNC)
 	// Stop audio out device
 	close_audio_out ();
-        // Stop audio in device
-        close_audio_in ();
+	// Stop audio in device
+	close_audio_in ();
 	return 0;
 
     default:

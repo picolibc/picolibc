@@ -163,8 +163,8 @@ str2buf2uni (UNICODE_STRING &tgt, WCHAR *buf, const char *srcstr)
 {
   tgt.Buffer = (PWCHAR) buf;
   tgt.MaximumLength = (strlen (srcstr) + 1) * sizeof (WCHAR);
-  tgt.Length = sys_mbstowcs (buf, srcstr, tgt.MaximumLength / sizeof (WCHAR)) 
-               * sizeof (WCHAR);
+  tgt.Length = sys_mbstowcs (buf, srcstr, tgt.MaximumLength / sizeof (WCHAR))
+	       * sizeof (WCHAR);
   if (tgt.Length)
     tgt.Length -= sizeof (WCHAR);
 }
@@ -173,7 +173,7 @@ void
 str2uni_cat (UNICODE_STRING &tgt, const char *srcstr)
 {
   int len = sys_mbstowcs (tgt.Buffer + tgt.Length / sizeof (WCHAR), srcstr,
-		          (tgt.MaximumLength - tgt.Length) / sizeof (WCHAR));
+			  (tgt.MaximumLength - tgt.Length) / sizeof (WCHAR));
   if (len)
     tgt.Length += (len - 1) * sizeof (WCHAR);
   else

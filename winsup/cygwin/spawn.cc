@@ -393,8 +393,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       ProtectHandleINH (subproc_ready);
     }
 
-  init_child_info (chtype, &ciresrv, (mode == _P_OVERLAY) ? myself->pid : 1,
-		   subproc_ready);
+  init_child_info (chtype, &ciresrv, subproc_ready);
 
   ciresrv.moreinfo = (cygheap_exec_info *) ccalloc (HEAP_1_EXEC, 1, sizeof (cygheap_exec_info));
   ciresrv.moreinfo->old_title = NULL;
@@ -630,6 +629,10 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     flags |= DETACHED_PROCESS;
   if (mode != _P_OVERLAY)
     flags |= CREATE_SUSPENDED;
+#if 0 //someday
+  else
+    myself->dwProcessId = 0;
+#endif
 
   /* Some file types (currently only sockets) need extra effort in the
      parent after CreateProcess and before copying the datastructures
@@ -637,7 +640,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
      unfortunately, to avoid a race condition. */
   if (cygheap->fdtab.need_fixup_before ())
     flags |= CREATE_SUSPENDED;
-
 
   const char *runpath = null_app_name ? NULL : (const char *) real_path;
 
@@ -649,6 +651,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   cygheap->fdtab.set_file_pointers_for_exec ();
   cygheap->user.deimpersonate ();
+
   /* When ruid != euid we create the new process under the current original
      account and impersonate in child, this way maintaining the different
      effective vs. real ids.
@@ -729,6 +732,10 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     {
       __seterrno ();
       syscall_printf ("CreateProcess failed, %E");
+#if 0 // someday
+      if (mode == _P_OVERLAY)
+	myself->dwProcessId = GetCurrentProcessId ();
+#endif
       if (subproc_ready)
 	ForceCloseHandle (subproc_ready);
       cygheap_setup_for_child_cleanup (newheap, &ciresrv, 0);

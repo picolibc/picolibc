@@ -981,14 +981,14 @@ normalize_win32_path (const char *src, char *dst, char **tail)
   else if (strchr (src, ':') == NULL && *src != '/')
     {
       if (beg_src_slash)
-        dst += cygheap->cwd.get_drive (dst);
+	dst += cygheap->cwd.get_drive (dst);
       else if (!cygheap->cwd.get (dst, 0))
 	return get_errno ();
       else
-        {
-          dst += strlen (dst);
-          *dst++ = '\\';
-        }
+	{
+	  dst += strlen (dst);
+	  *dst++ = '\\';
+	}
     }
 
   while (*src)
@@ -1508,11 +1508,11 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
 	return err;
       chroot_ok = true;
     }
-  else 
+  else
     {
       int offset = 0;
       if (src_path[1] != '/' && src_path[1] != ':')
-        offset = cygheap->cwd.get_drive (dst);
+	offset = cygheap->cwd.get_drive (dst);
       backslashify (src_path, dst + offset, 0);
     }
  out:
@@ -2189,7 +2189,7 @@ mount_info::add_item (const char *native, const char *posix, unsigned mountflags
     posixerr = normalize_posix_path (posix, posixtmp, &posixtail);
 
   debug_printf ("%s[%s], %s[%s], %p",
-                native, nativeerr ? error : nativetmp,
+		native, nativeerr ? error : nativetmp,
 		posix, posixerr ? error : posixtmp, mountflags);
 
   if (nativeerr || posixerr)

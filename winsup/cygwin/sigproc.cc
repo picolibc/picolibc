@@ -707,6 +707,8 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
     sendsig = myself->sendsig;
   else
     {
+      for (int i = 0; !p->dwProcessId && i < 10000; i++)
+	low_priority_sleep (0);
       HANDLE hp = OpenProcess (PROCESS_DUP_HANDLE, false, p->dwProcessId);
       if (!hp)
 	{
@@ -854,14 +856,13 @@ subproc_init (void)
    by fork/spawn/exec. */
 
 void __stdcall
-init_child_info (DWORD chtype, child_info *ch, pid_t pid, HANDLE subproc_ready)
+init_child_info (DWORD chtype, child_info *ch, HANDLE subproc_ready)
 {
   memset (ch, 0, sizeof *ch);
   ch->cb = chtype == PROC_FORK ? sizeof (child_info_fork) : sizeof (child_info);
   ch->intro = PROC_MAGIC_GENERIC;
   ch->magic = CHILD_INFO_MAGIC;
   ch->type = chtype;
-  ch->cygpid = pid;
   ch->subproc_ready = subproc_ready;
   ch->pppid_handle = myself->ppid_handle;
   ch->fhandler_union_cb = sizeof (fhandler_union);
@@ -1064,6 +1065,7 @@ wait_sig (VOID *self)
 {
   HANDLE readsig;
   char sa_buf[1024];
+  Static bool holding_signals;
 
   /* Initialization */
   (void) SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
@@ -1080,6 +1082,7 @@ wait_sig (VOID *self)
   myself->process_state |= PID_ACTIVE;
   myself->process_state &= ~PID_INITIALIZING;
 
+  sigproc_printf ("myself->dwProcessId %u", myself->dwProcessId);
   /* If we've been execed, then there is still a stub left in the previous
      windows process waiting to see if it's started a cygwin process or not.
      Signalling subproc_ready indicates that we are a cygwin process.  */
@@ -1159,9 +1162,17 @@ wait_sig (VOID *self)
 	    if (q->si.si_signo == __SIGDELETE || q->process () > 0)
 	      sigq.del ();
 	  break;
+	case __SIGHOLD:
+	  holding_signals = 1;
+	  break;
+	case __SIGNOHOLD:
+	  holding_signals = 0;
+	  break;
 	default:
 	  if (pack.si.si_signo < 0)
 	    sig_clear (-pack.si.si_signo);
+	  else if (holding_signals)
+	    sigq.add (pack);
 	  else
 	    {
 	      int sig = pack.si.si_signo;

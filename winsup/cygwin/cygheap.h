@@ -277,6 +277,7 @@ struct init_cygheap
   struct _cygtls **threadlist;
   size_t sthreads;
   int open_fhs;
+  pid_t pid;			/* my pid */
   void close_ctty ();
 };
 

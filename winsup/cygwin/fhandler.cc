@@ -484,10 +484,10 @@ fhandler_base::open_9x (int flags, mode_t mode)
     {
       /* If mode has no write bits set, we set the R/O attribute. */
       if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
-        file_attributes |= FILE_ATTRIBUTE_READONLY;
+	file_attributes |= FILE_ATTRIBUTE_READONLY;
       /* The file attributes are needed for later use in, e.g. fchmod. */
       pc.file_attributes (file_attributes & FILE_ATTRIBUTE_VALID_SET_FLAGS);
-    } 
+    }
 
   x = CreateFile (get_win32_name (), access, shared, &sa, creation_distribution,
 		  file_attributes, 0);
@@ -818,7 +818,7 @@ fhandler_base::write (const void *ptr, size_t len)
 		 on any OS. */
 	      /* Check there is enough space */
 	      if (!SetEndOfFile (get_output_handle ()))
-	        {
+		{
 		  __seterrno ();
 		  return -1;
 		}
@@ -837,7 +837,7 @@ fhandler_base::write (const void *ptr, size_t len)
 		  if (!ret || written < zeros_this_time)
 		    {
 		      if (!ret)
-		        {
+			{
 			  __seterrno ();
 			  if (get_errno () == EPIPE)
 			    raise (SIGPIPE);

@@ -797,7 +797,7 @@ mprotect (void *addr, size_t len, int prot)
     {
       MEMORY_BASIC_INFORMATION mbi;
       if (VirtualQuery (addr, &mbi, sizeof mbi))
-        {
+	{
 	  if (mbi.AllocationProtect == PAGE_WRITECOPY
 	      || mbi.AllocationProtect == PAGE_EXECUTE_WRITECOPY)
 	    writecopy = true;

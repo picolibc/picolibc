@@ -1,3 +1,36 @@
+2004-09-11  Pierre Humblet  <pierre.humblet@ieee.org>
+	    Christopher Faylor  <cgf@timesys.com>
+
+	* exceptions.cc: (ctrl_c_handler): Do nothing while a Cygwin subprocess
+	is starting.
+
+2004-09-10  Christopher Faylor  <cgf@timesys.com>
+
+	* child_info.h (init_child_info): Remove pid argument from declaration.
+	* cygheap.h (init_cygheap::pid): New element.
+	* dcrt0.cc (dll_crt0_0): Eliminate handling of now-noexistent cygpid
+	parameter in child_info struct.  Set forkee to 'true' rather than cygpid
+	since the pid value was never used.
+	(dll_crt0_1): Ditto.
+	(_dll_crt0): Ditto.
+	* fork.cc (fork_child): Don't wait for sigthread.  This is handled in
+	the fork call now.
+	(fork_parent): Remove obsolete pid argument from init_child_info call.  Don't
+	do anything special with cygpid when DEBUGGING.
+	(fork): Delay all signals during fork.
+	(fork_init): Don't do anything special when DEBUGGING.
+	* pinfo.cc (set_myself): Remove pid parameter.  Use new pid field in
+	cygheap.
+	(pinfo_init): Don't pass pid argument to set_myself.
+	* sigproc.cc (sig_send): Wait for dwProcessId to be non-zero as well as
+	sendsig.
+	(init_child_info): Eliminate handling of pid.
+	(wait_sig): Implement method to temporarily hold off sending signals.
+	* sigproc.h (__SIGHOLD): New enum.
+	(__SIGNOHOLD): Ditto.
+	* spawn.cc (spawn_guts): Remove obsolete pid argument from
+	init_child_info call.
+
 2004-09-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::dup): Use debug_printf.

@@ -849,36 +849,36 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	      if (features1 & (1 << 25))
 		print (" sse");
 	      if (is_intel)
-	        {
-	          if (features1 & (1 << 26))
+		{
+		  if (features1 & (1 << 26))
 		    print (" sse2");
-	          if (features1 & (1 << 27))
+		  if (features1 & (1 << 27))
 		    print (" ss");
-	          if (features1 & (1 << 28))
+		  if (features1 & (1 << 28))
 		    print (" htt");
-	          if (features1 & (1 << 29))
+		  if (features1 & (1 << 29))
 		    print (" tmi");
-	          if (features1 & (1 << 30))
+		  if (features1 & (1 << 30))
 		    print (" ia-64");
-	          if (features1 & (1 << 31))
+		  if (features1 & (1 << 31))
 		    print (" pbe");
 
-	          if (features2 & (1 << 0))
+		  if (features2 & (1 << 0))
 		    print (" pni");
-	          if (features2 & (1 << 3))
+		  if (features2 & (1 << 3))
 		    print (" monitor");
-	          if (features2 & (1 << 4))
+		  if (features2 & (1 << 4))
 		    print (" ds_cpl");
 		  if (features2 & (1 << 7))
 		    print (" tm2");
-	          if (features2 & (1 << 8))
+		  if (features2 & (1 << 8))
 		    print (" est");
-	         if (features2 & (1 << 10))
+		 if (features2 & (1 << 10))
 		    print (" cid");
-	        }
+		}
 
 	      if (is_amd && maxe >= 0x80000001)
-	        {
+		{
 		  // uses AMD extended calls to check
 		  // for 3dnow and 3dnow extended support
 		  // (source: AMD Athlon Processor Recognition Application Note)
@@ -887,14 +887,14 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 		    {
 		      cpuid (&unused, &unused, &unused, &features2, 0x80000001);
 
-                      if (features2 & (1 << 11))
-		        print (" syscall");
-                      if (features2 & (1 << 19))
-		        print (" mp");
-                      if (features2 & (1 << 22))
-                        print (" mmxext");
-                      if (features2 & (1 << 29))
-                        print (" lm");
+		      if (features2 & (1 << 11))
+			print (" syscall");
+		      if (features2 & (1 << 19))
+			print (" mp");
+		      if (features2 & (1 << 22))
+			print (" mmxext");
+		      if (features2 & (1 << 29))
+			print (" lm");
 		      if (features2 & (1 << 30)) // 31th bit is on
 			print (" 3dnowext");
 		      if (features2 & (1 << 31)) // 32th bit (highest) is on

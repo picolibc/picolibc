@@ -44,7 +44,7 @@ pinfo_fixup_after_fork ()
 {
   if (hexec_proc)
     CloseHandle (hexec_proc);
-  /* Keeps the cygpid from being reused. No rights required */
+  /* Keeps the cygpid from being reused.  No rights required */
   if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &hexec_proc, 0,
 			TRUE, 0))
     {
@@ -58,19 +58,18 @@ pinfo_fixup_after_fork ()
    This is done once when the dll is first loaded.  */
 
 void __stdcall
-set_myself (pid_t pid, HANDLE h)
+set_myself (HANDLE h)
 {
-  DWORD winpid = GetCurrentProcessId ();
-  if (pid == 1)
-    pid = cygwin_pid (winpid);
-  myself.init (pid, PID_IN_USE | PID_MYSELF, h);
-  myself->dwProcessId = winpid;
+  if (!h)
+    cygheap->pid = cygwin_pid (GetCurrentProcessId ());
+  myself.init (cygheap->pid, PID_IN_USE | PID_MYSELF, h);
   myself->process_state |= PID_IN_USE;
   myself->start_time = time (NULL); /* Register our starting time. */
 
   (void) GetModuleFileName (NULL, myself->progname, sizeof (myself->progname));
   if (!strace.active)
     strace.hello ();
+  debug_printf ("myself->dwProcessId %u", myself->dwProcessId);
   InitializeCriticalSection (&myself->lock);
   return;
 }
@@ -90,7 +89,7 @@ pinfo_init (char **envp, int envc)
     {
       /* Invent our own pid.  */
 
-      set_myself (1);
+      set_myself (NULL);
       myself->ppid = 1;
       myself->pgid = myself->sid = myself->pid;
       myself->ctty = -1;

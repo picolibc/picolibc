@@ -712,7 +712,7 @@ link (const char *a, const char *b)
 	  goto docopy;
 	}
       if (GetLastError () != ERROR_PROC_NOT_FOUND)
-        {
+	{
 	  syscall_printf ("CreateHardLinkA failed");
 	  __seterrno ();
 	  goto done;
@@ -804,7 +804,7 @@ link (const char *a, const char *b)
       CloseHandle (hFileSource);
 
       if (!bSuccess)
-        {
+	{
 	  /* Only copy file if FS doesn't support hard links */
 	  if (write_err == ERROR_INVALID_FUNCTION)
 	    {
