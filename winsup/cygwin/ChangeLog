@@ -1,3 +1,14 @@
+Fri Aug 24  8:54:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* net.cc (free_addr_list): Add define for symmetry.
+	(free_hostent_ptr): Use free_addr_list to free h_addr_list element.
+
+Thu Aug 23 16:00:09 2001  Jason Tishler <jason@tishler.net>
+
+	* net.cc (dup_addr_list): New static function.
+	(dup_hostent_ptr): Use dup_addr_list instead of dup_char_list in order
+	to handle embedded null characters.
+
 Wed Aug 22 22:23:14 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* dtable.cc (dtable::dup2): Allow extension of fd table by dup2.

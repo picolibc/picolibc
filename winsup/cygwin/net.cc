@@ -409,6 +409,27 @@ dup_char_list (char **src)
   return dst;
 }
 
+#define free_addr_list(addr_list)	free_char_list (addr_list)
+
+static char **
+dup_addr_list (char **src, unsigned int size)
+{
+  char **dst;
+  int cnt = 0;
+  
+  for (char **cl = src; *cl; ++cl)
+    ++cnt;
+  if (!(dst = (char **) calloc (cnt + 1, sizeof *dst)))
+    return NULL;
+  while (cnt-- > 0)
+    {
+      if (!(dst[cnt] = (char *) malloc(size)))
+        return NULL;
+      memcpy(dst[cnt], src[cnt], size);
+    }
+  return dst;
+}
+
 static void
 free_protoent_ptr (struct protoent *&p)
 {
@@ -998,7 +1019,7 @@ free_hostent_ptr (struct hostent *&p)
       if (p->h_name)
         free ((void *)p->h_name);
       free_char_list (p->h_aliases);
-      free_char_list (p->h_addr_list);
+      free_addr_list (p->h_addr_list);
       p = NULL;
     }
 }
@@ -1021,7 +1042,8 @@ dup_hostent_ptr (struct hostent *src)
     goto out;
   if (src->h_aliases && !(dst->h_aliases = dup_char_list (src->h_aliases)))
     goto out;
-  if (src->h_addr_list && !(dst->h_addr_list = dup_char_list(src->h_addr_list)))
+  if (src->h_addr_list
+      && !(dst->h_addr_list = dup_addr_list(src->h_addr_list, src->h_length)))
     goto out;
 
   debug_printf ("hostent: copied %s", dst->h_name);
