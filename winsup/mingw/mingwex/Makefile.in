@@ -70,9 +70,12 @@ STDIO_DISTFILES = \
 	vfscanf.c vfwscanf.c vscanf.c vsscanf.c vswscanf.c vwscanf.c
 
 COMPLEX_DISTFILES = \
-	cabs.c cacos.c cacosh.c carg.c casin.c casinh.c catan.c catanh.c \
-	ccos.c ccosh.c cexp.c cimag.c clog.c cpow.c cproj.c creal.c \
-	csin.c csinh.c csqrt.c ctan.c ctanh.c
+	cabs.c cabsf.c cacos.c cacosf.c cacosh.c cacoshf.c carg.c \
+	cargf.c casin.c casinf.c casinh.c casinhf.c catan.c catanf.c \
+	catanh.c catanhf.c ccos.c ccosf.c ccosh.c ccoshf.c cexp.c \
+	cexpf.c cimag.c cimagf.c clog.c clogf.c cpow.c cpowf.c cproj.c \
+	cprojf.c creal.c crealf.c csin.c csinf.c csinh.c csinhf.c \
+	csqrt.c csqrtf.c ctan.c ctanf.c ctanh.c ctanhf.c
 
 CC = @CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
@@ -156,9 +159,12 @@ POSIX_OBJS = \
 REPLACE_OBJS = \
 	mingw-aligned-malloc.o mingw-fseek.o
 COMPLEX_OBJS = \
-	cabs.o cacos.o cacosh.o carg.o casin.o casinh.o catan.o catanh.o \
-	ccos.o ccosh.o cexp.o cimag.o clog.o cpow.o cproj.o creal.o \
-	csin.o csinh.o csqrt.o ctan.o ctanh.o 
+	cabs.o cabsf.o cacos.o cacosf.o cacosh.o cacoshf.o carg.o \
+	cargf.o casin.o casinf.o casinh.o casinhf.o catan.o catanf.o \
+	catanh.o catanhf.o ccos.o ccosf.o ccosh.o ccoshf.o cexp.o \
+	cexpf.o cimag.o cimagf.o clog.o clogf.o cpow.o cpowf.o cproj.o \
+	cprojf.o creal.o crealf.o csin.o csinf.o csinh.o csinhf.o \
+	csqrt.o csqrtf.o ctan.o ctanf.o ctanh.o ctanhf.o
 
 LIB_OBJS = $(Q8_OBJS) $(STDLIB_OBJS) $(STDLIB_STUB_OBJS) \
 	$(STDIO_OBJS) $(MATH_OBJS)  $(FENV_OBJS) \

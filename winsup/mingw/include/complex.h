@@ -46,7 +46,7 @@ extern "C" {
 
 #ifndef RC_INVOKED
 
-/* TODO: float and long double versions */ 
+/* TODO: long double versions */ 
 double __MINGW_ATTRIB_CONST creal (double _Complex);
 double __MINGW_ATTRIB_CONST cimag (double _Complex);
 double __MINGW_ATTRIB_CONST carg (double _Complex);
@@ -70,6 +70,29 @@ double _Complex  cpow (double _Complex, double _Complex);
 double _Complex  csqrt (double _Complex);
 double _Complex __MINGW_ATTRIB_CONST cproj (double _Complex);
 
+float __MINGW_ATTRIB_CONST crealf (float _Complex);
+float __MINGW_ATTRIB_CONST cimagf (float _Complex);
+float __MINGW_ATTRIB_CONST cargf (float _Complex);
+float __MINGW_ATTRIB_CONST cabsf (float _Complex);
+float _Complex __MINGW_ATTRIB_CONST conjf (float _Complex);
+float _Complex  cacosf (float _Complex);
+float _Complex  casinf (float _Complex);
+float _Complex  catanf (float _Complex);
+float _Complex  ccosf (float _Complex);
+float _Complex  csinf (float _Complex);
+float _Complex  ctanf (float _Complex);
+float _Complex  cacoshf (float _Complex);
+float _Complex  casinhf (float _Complex);
+float _Complex  catanhf (float _Complex);
+float _Complex  ccoshf (float _Complex);
+float _Complex  csinhf (float _Complex);
+float _Complex  ctanhf (float _Complex);
+float _Complex  cexpf (float _Complex);
+float _Complex  clogf (float _Complex);
+float _Complex  cpowf (float _Complex, float _Complex);
+float _Complex  csqrtf (float _Complex);
+float _Complex __MINGW_ATTRIB_CONST cprojf (float _Complex);
+
 #ifdef __GNUC__
 
 __CRT_INLINE double __MINGW_ATTRIB_CONST creal (double _Complex _Z)
@@ -90,6 +113,30 @@ __CRT_INLINE double _Complex __MINGW_ATTRIB_CONST conj (double _Complex _Z)
 __CRT_INLINE  double __MINGW_ATTRIB_CONST carg (double _Complex _Z)
 {
   double res;
+  __asm__  ("fpatan;"
+	   : "=t" (res) : "0" (__real__ _Z), "u" (__imag__ _Z) : "st(1)");
+  return res;
+}
+
+
+__CRT_INLINE float __MINGW_ATTRIB_CONST crealf (float _Complex _Z)
+{
+  return __real__ _Z;
+}
+
+__CRT_INLINE float __MINGW_ATTRIB_CONST cimagf (float _Complex _Z)
+{
+  return __imag__ _Z;
+}
+
+__CRT_INLINE float _Complex __MINGW_ATTRIB_CONST conjf (float _Complex _Z)
+{
+  return __extension__ ~_Z;
+}
+
+__CRT_INLINE  float __MINGW_ATTRIB_CONST cargf (float _Complex _Z)
+{
+  float res;
   __asm__  ("fpatan;"
 	   : "=t" (res) : "0" (__real__ _Z), "u" (__imag__ _Z) : "st(1)");
   return res;

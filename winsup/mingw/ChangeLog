@@ -1,3 +1,16 @@
+2004-12-26  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/complex/(cabsf.c cacosf.c cacoshf.c cargf.c casinf.c
+	casinhf.c catanf.c catanhf.c ccosf.c ccoshf.c cexpf.c cimagf.c
+	clogf.c cpowf.c cprojf.c crealf.c csinf.c csinhf.c csqrtf.c
+	ctanf.c ctanhf.c): New files.
+	* mingwex/Makefile.in (COMPLEX_DISTFILES): Adjust.
+	(COMPLEX_OBJS(: Adjust.
+	* include/complex.h (cabsf, cacosf, cacoshf, cargf, casinf. 
+	casinhf, catanf, catanhf, ccosf, ccoshf, cexpf, cimagf, clogf,
+	cpowf, cprojf, crealf, csinf, csinhf, csqrtf, ctanf, ctanhf):
+	Declare.
+
 2004-12-20  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wchar.h (wcsdup): Correct prototype.
