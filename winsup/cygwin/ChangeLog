@@ -1,5 +1,14 @@
 2005-01-22  Christopher Faylor  <cgf@timesys.com>
 
+	* pinfo.cc (pinfo::init): Move everything but the MapViewOfFileEx out
+	of the loop since trying multiple times to call CreateFileMapping
+	doesn't make much sense.  Try to structure the loop a little better so
+	that exiting with a break does the right thing.
+	(pinfo::release): Release shared memory area if it exists and close
+	handle if it exists.
+
+2005-01-22  Christopher Faylor  <cgf@timesys.com>
+
 	* pinfo.cc (pinfo::maybe_set_exit_code_from_windows): Make sure that
 	process has exited before getting an error code.
 	(pinfo::exit): "cd" to innocuous location before exiting to make sure

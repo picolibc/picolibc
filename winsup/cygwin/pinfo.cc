@@ -117,8 +117,8 @@ pinfo::maybe_set_exit_code_from_windows ()
       GetExitCodeProcess (hProcess, &x);
       self->exitcode = EXITCODE_SET | (x & 0xff) << 8;
     }
-  sigproc_printf ("exit value - old %p, windows %p, cygwin %p", oexitcode, x,
-		  self->exitcode);
+  sigproc_printf ("pid %d, exit value - old %p, windows %p, cygwin %p",
+		  self->pid, oexitcode, x, self->exitcode);
 }
 
 void
@@ -138,10 +138,17 @@ pinfo::exit (DWORD n)
   fill_rusage (&r, hMainProc);
   add_rusage (&self->rusage_self, &r);
 
+  /* The below call could be moved down two lines, but I like to see consistent
+     output from strace and the overhead should be extremely negligible.  */
   maybe_set_exit_code_from_windows ();
   if (n != EXITCODE_NOSET)
     {
+      /* Move to an innocuous location to avoid races with other processes
+	 that may want to manipulate the current directory before this process
+	 has completely exited.  */
       SetCurrentDirectory ("c:\\");
+      /* Shave a little time off by telling our parent that we have now
+	 exited.  */
       self->alert_parent (0);
     }
   int exitcode = self->exitcode;
@@ -156,7 +163,7 @@ pinfo::exit (DWORD n)
 # undef self
 
 void
-pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
+pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 {
   if (myself && n == myself->pid)
     {
@@ -165,6 +172,9 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
       h = NULL;
       return;
     }
+
+  h = NULL;
+  procinfo = NULL;
 
   void *mapaddr;
   if (!(flag & PID_MYSELF))
@@ -179,10 +189,13 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
   int createit = flag & (PID_IN_USE | PID_EXECED);
   DWORD access = FILE_MAP_READ
 		 | (flag & (PID_IN_USE | PID_EXECED | PID_MAP_RW) ? FILE_MAP_WRITE : 0);
-  for (int i = 0; i < 10; i++)
+
+  bool created;
+  if (h0)
+    created = 0;
+  else
     {
-      int created;
-      char mapname[CYG_MAX_PATH]; /* XXX Not a path */
+      char mapname[CYG_MAX_PATH];
       shared_name (mapname, "cygpid", n);
 
       int mapsize;
@@ -191,14 +204,9 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
       else
 	mapsize = sizeof (_pinfo);
 
-      if (in_h)
+      if (!createit)
 	{
-	  h = in_h;
-	  created = 0;
-	}
-      else if (!createit)
-	{
-	  h = OpenFileMapping (access, FALSE, mapname);
+	  h0 = OpenFileMapping (access, FALSE, mapname);
 	  created = 0;
 	}
       else
@@ -207,48 +215,41 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 	  PSECURITY_ATTRIBUTES sec_attribs =
 	    sec_user_nih (sa_buf, cygheap->user.sid(), well_known_world_sid,
 			  FILE_MAP_READ);
-	  h = CreateFileMapping (INVALID_HANDLE_VALUE, sec_attribs,
-				 PAGE_READWRITE, 0, mapsize, mapname);
-	  created = h && GetLastError () != ERROR_ALREADY_EXISTS;
+	  h0 = CreateFileMapping (INVALID_HANDLE_VALUE, sec_attribs,
+				  PAGE_READWRITE, 0, mapsize, mapname);
+	  created = GetLastError () != ERROR_ALREADY_EXISTS;
 	}
 
-      if (!h)
+      if (!h0)
 	{
 	  if (createit)
 	    __seterrno ();
-	  procinfo = NULL;
 	  return;
 	}
+    }
 
-      procinfo = (_pinfo *) MapViewOfFileEx (h, access, 0, 0, 0, mapaddr);
-      if (procinfo)
-	/* it worked */;
-      else if (exit_state)
-	return;		/* exiting */
-      else
+  ProtectHandle1 (h0, pinfo_shared_handle);
+
+  for (int i = 0; i < 20; i++)
+    {
+      procinfo = (_pinfo *) MapViewOfFileEx (h0, access, 0, 0, 0, mapaddr);
+      if (!procinfo)
 	{
-	  if (GetLastError () == ERROR_INVALID_HANDLE)
-	    api_fatal ("MapViewOfFileEx(%p, in_h %p) failed, %E", h, in_h);
-	  else
-	    {
-	      debug_printf ("MapViewOfFileEx(%p, in_h %p) failed, %E", h, in_h);
-	      if (h != in_h)
-		CloseHandle (h);
-	    }
-	  if (i < 9)
-	    continue;
-	  else
+	  if (exit_state)
 	    return;
-	}
 
-      ProtectHandle1 (h, pinfo_shared_handle);
+	  if (GetLastError () == ERROR_INVALID_HANDLE)
+	    api_fatal ("MapViewOfFileEx h0 %p, i %d failed, %E", h0, i);
+
+	  debug_printf ("MapViewOfFileEx h0 %p, i %d failed, %E", h0, i);
+	  continue;
+	}
 
       if ((procinfo->process_state & PID_INITIALIZING) && (flag & PID_NOREDIR)
 	  && cygwin_pid (procinfo->dwProcessId) != procinfo->pid)
 	{
-	  release ();
-	  set_errno (ENOENT);
-	  return;
+	  set_errno (ESRCH);
+	  break;
 	}
 
       if (procinfo->process_state & PID_EXECED)
@@ -259,26 +260,21 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 	  if (realpid == n)
 	    api_fatal ("retrieval of execed process info for pid %d failed due to recursion.", n);
 	  n = realpid;
-	  release ();
-	  if (flag & PID_ALLPIDS)
+
+	  if ((flag & PID_ALLPIDS))
 	    {
-	      set_errno (ENOENT);
+	      set_errno (ESRCH);
 	      break;
 	    }
-	  continue;
+	  goto loop;
 	}
 
-	/* In certain rare, pathological cases, it is possible for the shared
-	   memory region to exist for a while after a process has exited.  This
-	   should only be a brief occurrence, so rather than introduce some kind
-	   of locking mechanism, just loop.  FIXME: I'm sure I'll regret doing it
-	   this way at some point.  */
-      if (i < 9 && !created && createit && (procinfo->process_state & PID_EXITED))
-	{
-	  low_priority_sleep (5);
-	  release ();
-	  continue;
-	}
+	/* In certain rare cases, it is possible for the shared memory region to
+	   exist for a while after a process has exited.  This should only be a
+	   brief occurrence, so rather than introduce some kind of locking
+	   mechanism, just loop.  */
+      if (!created && createit && (procinfo->process_state & PID_EXITED))
+	goto loop;
 
       if (!created)
 	/* nothing */;
@@ -290,9 +286,21 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 	  procinfo->pid = myself->pid;
 	}
 
+      h = h0;	/* Success! */
       break;
+
+    loop:
+      release ();
+      low_priority_sleep (0);
     }
-  destroy = 1;
+
+  if (h)
+    destroy = 1;
+  else
+    {
+      h = h0;
+      release ();
+    }
 }
 
 void
@@ -875,7 +883,7 @@ _pinfo::alert_parent (char sig)
 void
 pinfo::release ()
 {
-  if (h)
+  if (procinfo)
     {
 #ifdef DEBUGGING
       if (((DWORD) procinfo & 0x77000000) == 0x61000000)
@@ -883,6 +891,9 @@ pinfo::release ()
 #endif
       UnmapViewOfFile (procinfo);
       procinfo = NULL;
+    }
+  if (h)
+    {
       ForceCloseHandle1 (h, pinfo_shared_handle);
       h = NULL;
     }
