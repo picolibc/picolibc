@@ -11,7 +11,7 @@ ilockincr (long *m)
 	movl	$1,%0\n\
 	lock	xadd %0,%1\n\
 	inc	%0\n\
-	": "=a" (__res), "+m" (m): : "memory", "cc");
+	": "=a" (__res), "+m" (*m): : "cc");
   return __res;
 }
 
@@ -23,7 +23,7 @@ ilockdecr (long *m)
 	movl	$0xffffffff,%0\n\
 	lock	xadd %0,%1\n\
 	dec	%0\n\
-	": "=a" (__res), "+m" (m): : "memory", "cc");
+	": "=a" (__res), "+m" (*m):  : "cc");
   return __res;
 }
 
@@ -34,7 +34,7 @@ ilockexch (long *t, long v)
   __asm__ __volatile__ ("\n\
 1:	lock	cmpxchgl %3,(%1)\n\
 	jne 1b\n\
- 	": "=a" (__res), "=q" (t): "1" (t), "q" (v), "0" (*t): "memory", "cc");
+ 	": "=a" (__res), "=q" (t): "1" (t), "q" (v), "0" (*t): "cc");
   return __res;
 }
 
@@ -44,7 +44,7 @@ ilockcmpexch (long *t, long v, long c)
   register int __res;
   __asm__ __volatile__ ("\n\
 	lock cmpxchgl %3,(%1)\n\
-	": "=a" (__res), "=q" (t) : "1" (t), "q" (v), "0" (c): "memory", "cc");
+	": "=a" (__res), "=q" (t) : "1" (t), "q" (v), "0" (c): "cc");
   return __res;
 }
 
