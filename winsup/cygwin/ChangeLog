@@ -1,3 +1,9 @@
+Mon Jul 10 19:07:03 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler_console.cc (fhandler_console::read): Unicode interface
+	to ReadConsoleInput only exists on W2K, so use workaround from
+	Kazuhiro Fujieda  <fujieda@jaist.ac.jp>.
+
 Mon Jul 10 11:30:00 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in (install): Install textmode.o as well as binmode.o.

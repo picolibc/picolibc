@@ -161,7 +161,7 @@ fhandler_console::read (void *pv, size_t buflen)
       INPUT_RECORD input_rec;
       const char *toadd;
 
-      if (!ReadConsoleInputW (h, &input_rec, 1, &nread))
+      if (!ReadConsoleInput (h, &input_rec, 1, &nread))
 	{
 	  syscall_printf ("ReadConsoleInput failed, %E");
 	  __seterrno ();
@@ -193,7 +193,11 @@ fhandler_console::read (void *pv, size_t buflen)
 	}
       else
 	{
-	  nread = WideCharToMultiByte (CP_ACP, 0, &wch, 1, tmp + 1, sizeof (tmp) - 1, NULL, NULL);
+	  tmp[1] = ich;
+	  /* Need this check since US code page seems to have a bug when
+	     converting a CTRL-U. */
+	  if ((unsigned char)ich > 0x7f)
+	    OemToCharBuff (tmp + 1, tmp + 1, 1);
 	  if (!(input_rec.Event.KeyEvent.dwControlKeyState & LEFT_ALT_PRESSED))
 	    toadd = tmp + 1;
 	  else
