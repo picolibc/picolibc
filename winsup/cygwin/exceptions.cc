@@ -158,7 +158,9 @@ open_stackdumpfile ()
     {
       const char *p;
       /* write to progname.stackdump if possible */
-      if ((p = strrchr (myself->progname, '\\')))
+      if (!myself->progname[0])
+	p = "unknown";
+      else if ((p = strrchr (myself->progname, '\\')))
 	p++;
       else
 	p = myself->progname;

@@ -1,3 +1,12 @@
+Thu Sep  6 14:03:49 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* cygheap.cc (cygheap_fixup_in_child): Don't consider a NULL bucket as
+	a candidate for deletion.  It is actually the end of a linked list
+	chain.
+
+	* exceptions.cc (open_stackdumpfile): Default to "unknown" program name
+	if myself->progname hasn't been filled out yet.
+
 Thu Sep  6 01:16:44 2001  Christopher Faylor <cgf@cygnus.com>
 
 	Move appropriate variables to NO_COPY segment, throughout.

@@ -136,7 +136,7 @@ cygheap_fixup_in_child (child_info *ci, bool execed)
       for (_cmalloc_entry *rvc = cygheap->chain; rvc; rvc = rvc->prev)
 	{
 	  cygheap_entry *ce = (cygheap_entry *) rvc->data;
-	  if (rvc->b >= NBUCKETS || ce->type <= HEAP_1_START)
+	  if (!rvc->ptr || rvc->b >= NBUCKETS || ce->type <= HEAP_1_START)
 	    continue;
 	  else if (ce->type < HEAP_1_MAX)
 	    ce->type += HEAP_1_MAX;	/* Mark for freeing after next exec */
