@@ -65,222 +65,51 @@ gotit:\n\
   jmp *%eax\n\
 ");
 
+int
+std_dll_init (HANDLE &dll_handle, const char *dll_name, LONG &here)
+{
+  HANDLE h;
+
+  while (InterlockedIncrement (&here))
+    {
+      InterlockedDecrement (&here);
+      Sleep (0);
+    }
+
+  if (dll_handle)
+    /* nothing to do */;
+  else if ((h = LoadLibrary (dll_name)) != NULL)
+    dll_handle = h;
+  else
+    api_fatal ("could not load %s, %E", dll_name);
+
+  InterlockedDecrement (&here);
+  return 0;
+}
+
 LoadDLLinitfunc (advapi32)
-{
-  HANDLE h;
-  static NO_COPY LONG here = -1L;
-
-  while (InterlockedIncrement (&here))
-    {
-      InterlockedDecrement (&here);
-      Sleep (0);
-    }
-
-  if (advapi32_handle)
-    /* nothing to do */;
-  else if ((h = LoadLibrary ("advapi32.dll")) != NULL)
-    advapi32_handle = h;
-  else if (!advapi32_handle)
-    api_fatal ("could not load advapi32.dll, %E");
-
-  InterlockedDecrement (&here);
-  return 0;
-}
-
 LoadDLLinitfunc (netapi32)
-{
-  HANDLE h;
-  static NO_COPY LONG here = -1L;
-
-  while (InterlockedIncrement (&here))
-    {
-      InterlockedDecrement (&here);
-      Sleep (0);
-    }
-
-  if ((h = LoadLibrary ("netapi32.dll")) != NULL)
-    netapi32_handle = h;
-  else if (! netapi32_handle)
-    api_fatal ("could not load netapi32.dll. %d", GetLastError ());
-
-  InterlockedDecrement (&here);
-  return 0;
-}
-
 LoadDLLinitfunc (ntdll)
-{
-  HANDLE h;
-  static NO_COPY LONG here = -1L;
-
-  while (InterlockedIncrement (&here))
-    {
-      InterlockedDecrement (&here);
-      Sleep (0);
-    }
-
-  if (ntdll_handle)
-    /* nothing to do */;
-  else if ((h = LoadLibrary ("ntdll.dll")) != NULL)
-    ntdll_handle = h;
-  else if (!ntdll_handle)
-    api_fatal ("could not load ntdll.dll, %E");
-
-  InterlockedDecrement (&here);
-  return 0;
-}
-
 LoadDLLinitfunc (secur32)
-{
-  HANDLE h;
-  static NO_COPY LONG here = -1L;
-
-  while (InterlockedIncrement (&here))
-    {
-      InterlockedDecrement (&here);
-      Sleep (0);
-    }
-
-  if (secur32_handle)
-    /* nothing to do */;
-  else if ((h = LoadLibrary ("secur32.dll")) != NULL)
-    secur32_handle = h;
-  else if (!secur32_handle)
-    api_fatal ("could not load secur32.dll, %E");
-
-  InterlockedDecrement (&here);
-  return 0;		/* Already done by another thread? */
-}
-
 LoadDLLinitfunc (user32)
-{
-  HANDLE h;
-  static NO_COPY LONG here = -1L;
-
-  while (InterlockedIncrement (&here))
-    {
-      InterlockedDecrement (&here);
-      Sleep (0);
-    }
-
-  if (user32_handle)
-    /* nothing to do */;
-  else if ((h = LoadLibrary ("user32.dll")) != NULL)
-    user32_handle = h;
-  else if (!user32_handle)
-    api_fatal ("could not load user32.dll, %E");
-
-  InterlockedDecrement (&here);
-  return 0;		/* Already done by another thread? */
-}
-
-LoadDLLinitfunc (wsock32)
-{
-  extern void wsock_init ();
-  HANDLE h;
-
-  if ((h = LoadLibrary ("wsock32.dll")) != NULL)
-    wsock32_handle = h;
-  else if (!wsock32_handle)
-    api_fatal ("could not load wsock32.dll.  Is TCP/IP installed?");
-  else
-    return 0;		/* Already done by another thread? */
-
-  if (!ws2_32_handle)
-    wsock_init ();
-
-  return 0;
-}
-
-LoadDLLinitfunc (ws2_32)
-{
-  extern void wsock_init ();
-  HANDLE h;
-
-  if ((h = LoadLibrary ("ws2_32.dll")) == NULL)
-    return 0;          /* Already done or not available. */
-  ws2_32_handle = h;
-
-  if (!wsock32_handle)
-    wsock_init ();
-
-  return 0;
-}
-
 LoadDLLinitfunc (iphlpapi)
-{
-  HANDLE h;
-  static NO_COPY LONG here = -1L;
-
-  while (InterlockedIncrement (&here))
-    {
-      InterlockedDecrement (&here);
-      Sleep (0);
-    }
-
-  if (iphlpapi_handle)
-    /* nothing to do */;
-  else if ((h = LoadLibrary ("iphlpapi.dll")) != NULL)
-    iphlpapi_handle = h;
-  else if (!iphlpapi_handle)
-    api_fatal ("could not load iphlpapi.dll, %E");
-
-  InterlockedDecrement (&here);
-  return 0;
-}
-
 LoadDLLinitfunc (ole32)
-{
-  HANDLE h;
-  static NO_COPY LONG here = -1L;
-
-  while (InterlockedIncrement (&here))
-    {
-      InterlockedDecrement (&here);
-      Sleep (0);
-    }
-
-  if (ole32_handle)
-    /* nothing to do */;
-  else if ((h = LoadLibrary ("ole32.dll")) != NULL)
-    ole32_handle = h;
-  else if (!ole32_handle)
-    api_fatal ("could not load ole32.dll, %E");
-
-  InterlockedDecrement (&here);
-  return 0;
-}
-
 LoadDLLinitfunc (kernel32)
+LoadDLLinitfunc (winmm)
+
+extern void wsock_init ();
+
+LoadDLLinitfuncdef (wsock32)
 {
-  HANDLE h;
-
-  if ((h = LoadLibrary ("kernel32.dll")) != NULL)
-    kernel32_handle = h;
-  else if (!kernel32_handle)
-    api_fatal ("could not load kernel32.dll, %E");
-  else
-    return 0;		/* Already done by another thread? */
-
+  LoadDLLstdfunc (wsock32);
+  wsock_init ();
   return 0;
 }
 
-LoadDLLinitfunc (winmm)
+LoadDLLinitfuncdef (ws2_32)
 {
-  HANDLE h;
-  static NO_COPY LONG here = -1L;
-
-  while (InterlockedIncrement (&here))
-    {
-      InterlockedDecrement (&here);
-      Sleep (0);
-    }
-
-  if ((h = LoadLibrary ("winmm.dll")) != NULL)
-    winmm_handle = h;
-  else if (! winmm_handle)
-    api_fatal ("could not load winmm.dll. %d", GetLastError ());
-
-  InterlockedDecrement (&here);
+  LoadDLLstdfunc (ws2_32);
+  wsock_init ();
   return 0;
 }
 

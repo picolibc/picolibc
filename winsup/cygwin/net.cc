@@ -1928,21 +1928,38 @@ endhostent (void)
 extern "C" void
 wsock_init ()
 {
-  int res = WSAStartup ((2<<8) | 2, &wsadata);
+  static LONG NO_COPY here = -1L;
+  static int NO_COPY was_in_progress = 0;
 
-  debug_printf ("res %d", res);
-  debug_printf ("wVersion %d", wsadata.wVersion);
-  debug_printf ("wHighVersion %d", wsadata.wHighVersion);
-  debug_printf ("szDescription %s", wsadata.szDescription);
-  debug_printf ("szSystemStatus %s", wsadata.szSystemStatus);
-  debug_printf ("iMaxSockets %d", wsadata.iMaxSockets);
-  debug_printf ("iMaxUdpDg %d", wsadata.iMaxUdpDg);
-  debug_printf ("lpVendorInfo %d", wsadata.lpVendorInfo);
+  while (InterlockedIncrement (&here))
+    {
+      InterlockedDecrement (&here);
+      Sleep (0);
+    }
+  if (!was_in_progress && (wsock32_handle || ws2_32_handle))
+    {
+      /* Don't use autoload to load WSAStartup to eliminate recursion. */
+      int (*wsastartup) (int, WSADATA *);
 
-  if (FIONBIO  != REAL_FIONBIO)
-    debug_printf ("****************  FIONBIO  != REAL_FIONBIO");
+      wsastartup = (int (*)(int, WSADATA *))
+      		   GetProcAddress ((HMODULE) (wsock32_handle ?: ws2_32_handle),
+				   "WSAStartup");
+      if (wsastartup)
+        {
+	  int res = wsastartup ((2<<8) | 2, &wsadata);
 
-  /* FIXME: will resulting random sequence be unpredictable enough? */
-  srandom (GetTickCount ());
+	  debug_printf ("res %d", res);
+	  debug_printf ("wVersion %d", wsadata.wVersion);
+	  debug_printf ("wHighVersion %d", wsadata.wHighVersion);
+	  debug_printf ("szDescription %s", wsadata.szDescription);
+	  debug_printf ("szSystemStatus %s", wsadata.szSystemStatus);
+	  debug_printf ("iMaxSockets %d", wsadata.iMaxSockets);
+	  debug_printf ("iMaxUdpDg %d", wsadata.iMaxUdpDg);
+	  debug_printf ("lpVendorInfo %d", wsadata.lpVendorInfo);
+
+	  was_in_progress = 1;
+        }
+    }
+  InterlockedDecrement (&here);
 }
 

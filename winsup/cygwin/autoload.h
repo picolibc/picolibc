@@ -11,9 +11,19 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #define LoadDLLinitfunc(dllname) \
+LoadDLLinitfuncdef(dllname) \
+{ \
+  return LoadDLLstdfunc(dllname); \
+}
+
+#define LoadDLLinitfuncdef(dllname) \
 HANDLE NO_COPY dllname ## _handle = NULL; \
+LONG NO_COPY dllname ## _here = -1L; \
 /*static*/ int dllname ## _init () __asm__ (#dllname "_init"); \
 /*static*/ int dllname ## _init ()
+
+#define LoadDLLstdfunc(dllname) \
+	std_dll_init (dllname ## _handle, #dllname ".dll", dllname ## _here)
 
 #define LoadDLLinitnow(dllname) \
   ({__asm__ ("movl $cygwin_dll_func_load, " #dllname "_init_holder"); dllname##_init ();})

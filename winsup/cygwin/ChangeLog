@@ -1,3 +1,15 @@
+Wed May  2 20:18:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* autoload.cc: Use new definition of LoadDLLinitfunc throughout.
+	Redefine wrapper for wsock32.dll and ws2_32.dll.
+	(std_dll_init): New function.
+	* autoload.h: Rename LoadDLLinitfunc to LoadDLLinitfuncdef.
+	Add new defines LoadDLLinitfunc and LoadDLLstdfunc.
+	* net.cc (wsock_init): Add guard variable handling. Take care
+	to call WSAStartup only once. Load WSAStartup without using
+	autoload wrapper to eliminate recursion.  Eliminate FIONBIO
+	and srandom stuff.
+
 Tue May  1 01:26:15 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (mount_info::conv_to_win32_path): More path tweaking.
