@@ -1,3 +1,11 @@
+2002-09-17  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/shlobj.h (SHGetSpecialFolderPath[AW]):
+	Add _WIN32_IE guard. Correct prototype for wide version.
+	(SHGetFolderPath): Add comment on shfolder.dll.
+	(SHGetFolderLocation): Add prototyope for WinME and W2K.
+	(SHGetFolderPathAndSubDir[AW]): Add prototypes for XP.
+
 2002-09-16  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/shell32.def (SHGetFolderPath[AW]): Add comment.
