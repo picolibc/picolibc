@@ -180,7 +180,7 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
 /* Utility for spawn_guts.  */
 
 static HANDLE
-handle (int n, int direction)
+handle (int n)
 {
   fhandler_base *fh = cygheap->fdtab[n];
 
@@ -188,9 +188,7 @@ handle (int n, int direction)
     return INVALID_HANDLE_VALUE;
   if (fh->get_close_on_exec ())
     return INVALID_HANDLE_VALUE;
-  if (direction == 0)
-    return fh->get_handle ();
-  return fh->get_output_handle ();
+  return n ? fh->get_output_handle () : fh->get_handle ();
 }
 
 int
@@ -591,15 +589,18 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   si.lpReserved = NULL;
   si.lpDesktop = NULL;
   si.dwFlags = STARTF_USESTDHANDLES;
-  si.hStdInput = handle (0, 0); /* Get input handle */
-  si.hStdOutput = handle (1, 1); /* Get output handle */
-  si.hStdError = handle (2, 1); /* Get output handle */
+  si.hStdInput = handle (0);	/* Get input handle */
+  si.hStdOutput = handle (1);	/* Get output handle */
+  si.hStdError = handle (2);	/* Get output handle */
   si.cb = sizeof (si);
 
   int flags = CREATE_DEFAULT_ERROR_MODE | GetPriorityClass (hMainProc);
 
   if (mode == _P_DETACH || !set_console_state_for_spawn ())
-    flags |= DETACHED_PROCESS;
+    {
+      debug_printf ("mode %c= _P_DETACH", mode == _P_DETACH ? '=' : '!');
+      flags |= DETACHED_PROCESS;
+    }
   if (mode != _P_OVERLAY)
     flags |= CREATE_SUSPENDED;
 
