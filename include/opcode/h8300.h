@@ -594,7 +594,7 @@ struct h8_opcode h8_opcodes[] =
   NEW_SOP(O(O_STMAC,SL),1,2,"stmac"),{{MACREG,RD32,E}},{{0x0,0x2,MACREG,RD32,E}} EOP,
   NEW_SOP(O(O_LDM,SL),0,6,"ldm.l"),{{RSINC, RS32, E}},{{ 0x0,0x1,IGNORE,0x0,0x6,0xD,0x7,IGNORE,E}}EOP,
   NEW_SOP(O(O_STM,SL),0,6,"stm.l"),{{RS32, RDDEC, E}},{{0x0,0x1,IGNORE,0x0,0x6,0xD,0xF,IGNORE,E}}EOP,
-  { 0 }
+  {0, 0, 0, NULL, {{0,0,0}}, {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}}, 0, 0, 0, 0}
 };
 #else
 extern struct h8_opcode h8_opcodes[];

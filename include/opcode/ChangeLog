@@ -1,3 +1,7 @@
+2001-09-21  Nick Clifton  <nickc@cambridge.redhat.com>
+
+	* h8300.h: Fix compile time warning messages
+
 2001-09-04  Richard Henderson  <rth@redhat.com>
 
 	* alpha.h (struct alpha_operand): Pack elements into bitfields.
