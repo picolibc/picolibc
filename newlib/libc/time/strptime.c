@@ -33,6 +33,9 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <time.h>
+#include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
 
 static const char *abb_weekdays[] = {
     "Sun",

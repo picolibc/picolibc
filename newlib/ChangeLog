@@ -1,3 +1,8 @@
+2004-04-01  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
+
+	* libc/time/strptime.c: Add standard includes to avoid
+	warning messages at compilation time.
+
 2004-04-01  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/vfscanf.c (__svfscanf_r): Add locking/unlocking
