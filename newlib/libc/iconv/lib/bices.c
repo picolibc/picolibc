@@ -23,80 +23,75 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifdef ENABLE_ICONV
- 
 #include "deps.h"
-#include <_ansi.h>
 #include "local.h"
 
 /*
  * Each known CES should be registered here
  */
-#ifdef ICONV_CONVERTER_EUC_JP
-extern _CONST struct iconv_ces_desc iconv_ces_euc_jp;
+#ifdef _ICONV_CONVERTER_EUC_JP
+extern _CONST struct iconv_ces_desc _iconv_ces_module_euc_jp;
 #endif 
-#ifdef ICONV_CONVERTER_EUC_KR
-extern _CONST struct iconv_ces_desc iconv_ces_euc_kr;
+#ifdef _ICONV_CONVERTER_EUC_KR
+extern _CONST struct iconv_ces_desc _iconv_ces_module_euc_kr;
 #endif 
-#ifdef ICONV_CONVERTER_EUC_TW
-extern _CONST struct iconv_ces_desc iconv_ces_euc_tw;
+#ifdef _ICONV_CONVERTER_EUC_TW
+extern _CONST struct iconv_ces_desc _iconv_ces_module_euc_tw;
 #endif 
-#ifdef ICONV_CONVERTER_GB2312
-extern _CONST struct iconv_ces_desc iconv_ces_gb2312;
+#ifdef _ICONV_CONVERTER_GB2312
+extern _CONST struct iconv_ces_desc _iconv_ces_module_gb2312;
 #endif 
-#ifdef ICONV_CONVERTER_ISO_10646_UCS_2
-extern _CONST struct iconv_ces_desc iconv_ces_iso_10646_ucs_2;
+#ifdef _ICONV_CONVERTER_ISO_10646_UCS_2
+extern _CONST struct iconv_ces_desc _iconv_ces_module_iso_10646_ucs_2;
 #endif 
-#ifdef ICONV_CONVERTER_ISO_10646_UCS_4
-extern _CONST struct iconv_ces_desc iconv_ces_iso_10646_ucs_4;
+#ifdef _ICONV_CONVERTER_ISO_10646_UCS_4
+extern _CONST struct iconv_ces_desc _iconv_ces_module_iso_10646_ucs_4;
 #endif 
-#ifdef ICONV_CONVERTER_UCS_2_INTERNAL
-extern _CONST struct iconv_ces_desc iconv_ces_ucs_2_internal;
+#ifdef _ICONV_CONVERTER_UCS_2_INTERNAL
+extern _CONST struct iconv_ces_desc _iconv_ces_module_ucs_2_internal;
 #endif 
-#ifdef ICONV_CONVERTER_UCS_4_INTERNAL
-extern _CONST struct iconv_ces_desc iconv_ces_ucs_4_internal;
+#ifdef _ICONV_CONVERTER_UCS_4_INTERNAL
+extern _CONST struct iconv_ces_desc _iconv_ces_module_ucs_4_internal;
 #endif 
-#ifdef ICONV_CONVERTER_UTF_16
-extern _CONST struct iconv_ces_desc iconv_ces_utf_16;
+#ifdef _ICONV_CONVERTER_UTF_16
+extern _CONST struct iconv_ces_desc _iconv_ces_module_utf_16;
 #endif 
-#ifdef ICONV_CONVERTER_UTF_8
-extern _CONST struct iconv_ces_desc iconv_ces_utf_8;
+#ifdef _ICONV_CONVERTER_UTF_8
+extern _CONST struct iconv_ces_desc _iconv_ces_module_utf_8;
 #endif 
 
-_CONST iconv_builtin_table iconv_builtin_ces[] =
+_CONST iconv_builtin_table_t _iconv_builtin_ces[] =
 {
-#ifdef ICONV_CONVERTER_EUC_JP
-    {(_VOID_PTR)"euc_jp", (_VOID_PTR)&iconv_ces_euc_jp},
+#ifdef _ICONV_CONVERTER_EUC_JP
+    {"euc_jp", (_CONST _VOID_PTR)&_iconv_ces_module_euc_jp},
 #endif 
-#ifdef ICONV_CONVERTER_EUC_KR
-    {(_VOID_PTR)"euc_kr", (_VOID_PTR)&iconv_ces_euc_kr},
+#ifdef _ICONV_CONVERTER_EUC_KR
+    {"euc_kr", (_CONST _VOID_PTR)&_iconv_ces_module_euc_kr},
 #endif 
-#ifdef ICONV_CONVERTER_EUC_TW
-    {(_VOID_PTR)"euc_tw", (_VOID_PTR)&iconv_ces_euc_tw},
+#ifdef _ICONV_CONVERTER_EUC_TW
+    {"euc_tw", (_CONST _VOID_PTR)&_iconv_ces_module_euc_tw},
 #endif 
-#ifdef ICONV_CONVERTER_GB2312
-    {(_VOID_PTR)"gb_2312_80", (_VOID_PTR)&iconv_ces_gb2312},
+#ifdef _ICONV_CONVERTER_GB2312
+    {"gb_2312_80", (_CONST _VOID_PTR)&_iconv_ces_module_gb2312},
 #endif 
-#ifdef ICONV_CONVERTER_ISO_10646_UCS_2
-    {(_VOID_PTR)"iso_10646_ucs_2", (_VOID_PTR)&iconv_ces_iso_10646_ucs_2},
+#ifdef _ICONV_CONVERTER_ISO_10646_UCS_2
+    {"iso_10646_ucs_2", (_CONST _VOID_PTR)&_iconv_ces_module_iso_10646_ucs_2},
 #endif 
-#ifdef ICONV_CONVERTER_ISO_10646_UCS_4
-    {(_VOID_PTR)"iso_10646_ucs_4", (_VOID_PTR)&iconv_ces_iso_10646_ucs_4},
+#ifdef _ICONV_CONVERTER_ISO_10646_UCS_4
+    {"iso_10646_ucs_4", (_CONST _VOID_PTR)&_iconv_ces_module_iso_10646_ucs_4},
 #endif 
-#ifdef ICONV_CONVERTER_UCS_2_INTERNAL
-    {(_VOID_PTR)"ucs_2_internal", (_VOID_PTR)&iconv_ces_ucs_2_internal},
+#ifdef _ICONV_CONVERTER_UCS_2_INTERNAL
+    {"ucs_2_internal", (_CONST _VOID_PTR)&_iconv_ces_module_ucs_2_internal},
 #endif 
-#ifdef ICONV_CONVERTER_UCS_4_INTERNAL
-    {(_VOID_PTR)"ucs_4_internal", (_VOID_PTR)&iconv_ces_ucs_4_internal},
+#ifdef _ICONV_CONVERTER_UCS_4_INTERNAL
+    {"ucs_4_internal", (_CONST _VOID_PTR)&_iconv_ces_module_ucs_4_internal},
 #endif 
-#ifdef ICONV_CONVERTER_UTF_16
-    {(_VOID_PTR)"utf_16", (_VOID_PTR)&iconv_ces_utf_16},
+#ifdef _ICONV_CONVERTER_UTF_16
+    {"utf_16", (_CONST _VOID_PTR)&_iconv_ces_module_utf_16},
 #endif 
-#ifdef ICONV_CONVERTER_UTF_8
-    {(_VOID_PTR)"utf_8", (_VOID_PTR)&iconv_ces_utf_8},
+#ifdef _ICONV_CONVERTER_UTF_8
+    {"utf_8", (_CONST _VOID_PTR)&_iconv_ces_module_utf_8},
 #endif 
-    {NULL, NULL}
+    {NULL, (_CONST _VOID_PTR)NULL}
 };
-
-#endif /* #ifdef ENABLE_ICONV */
 

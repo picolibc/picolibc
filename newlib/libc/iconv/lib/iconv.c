@@ -142,9 +142,6 @@ by the Single Unix specification.
 No supporting OS subroutine calls are required.
 */
 
-#ifdef ENABLE_ICONV
-
-#include <_ansi.h>
 #include <reent.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -184,7 +181,7 @@ _DEFUN(_iconv_open_r, (rptr, to, from),
                       _CONST char *to     _AND
                       _CONST char *from)
 {
-     iconv_converter *ic;
+     iconv_converter_t *ic;
     _CONST char *nlspath;
 
     if(!to || !from)
@@ -204,8 +201,8 @@ _DEFUN(_iconv_open_r, (rptr, to, from),
         return (iconv_t)(-1);
     }
 
-    ic = strcmp(from, to) ? iconv_unicode_conv_init(rptr, to, from)
-                          : iconv_null_conv_init(rptr, to, from);
+    ic = strcmp(from, to) ? _iconv_unicode_conv_init(rptr, to, from)
+                          : _iconv_null_conv_init(rptr, to, from);
     _free_r(rptr, (_VOID_PTR)to);
     _free_r(rptr, (_VOID_PTR)from);
     return ic ? (iconv_t)(ic) : (iconv_t)(-1);
@@ -229,7 +226,7 @@ _DEFUN(_iconv_r, (rptr, cd, inbuf, inbytesleft, outbuf, outbytesleft),
         __errno_r(rptr) = E2BIG;
         return (size_t)(-1);
     }
-    return ((iconv_converter *)cd)->convert(rptr, (iconv_converter *)cd + 1,
+    return ((iconv_converter_t *)cd)->convert(rptr, (iconv_converter_t *)cd + 1,
                                             (_CONST unsigned char**)inbuf,
                                             inbytesleft,
                                             (unsigned char**)outbuf,
@@ -247,11 +244,9 @@ _DEFUN(_iconv_close_r, (rptr, cd),
         __errno_r(rptr) = EBADF;
         return -1;
     }
-    res = ((iconv_converter *)cd)->close(rptr, (iconv_converter *)cd + 1);
+    res = ((iconv_converter_t *)cd)->close(rptr, (iconv_converter_t *)cd + 1);
     _free_r(rptr, (_VOID_PTR)cd);
     return res ? -1 : 0;
 }
 #endif /* #ifndef _REENT_ONLY */
-
-#endif /* #ifdef ENABLE_ICONV */
 

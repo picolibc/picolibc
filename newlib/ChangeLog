@@ -1,3 +1,120 @@
+2004-01-27  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
+
+	* configure.in: Add support to generate iconv converter flags
+	for newlib.h
+	* newlib.hin: Add iconv converter flags.
+	* configure: Regenerated.
+	* libc/Makefile.in: Ditto.
+	* libc/configure.in: Moved iconv converter parsing logic to
+	top level newlib configure.in.
+	* libc/configure: Regenerated.
+	* libc/iconv/Makefile.in: Ditto.
+	* libc/iconv/README.TODO
+	* libc/iconv/charset.aliases: Remove wrong BE aliases for
+	UCS2/UCS4/UTF8.
+	* libc/iconv/ccs/Makefile.am: Remove C flag setting now that
+	newlib.h can be used.
+	* libc/iconv/ces/Makefile.am: Ditto.
+	* libc/iconv/lib/Makefile.am: Ditto.
+	* libc/iconv/ccs/Makefile.in: Regenerated.
+	* libc/iconv/ces/Makefile.in: Ditto.
+	* libc/iconv/lib/Makefile.in: Ditto.
+	* libc/iconv/ccs/README.CCS.SOURCES: Updated.
+	* libc/iconv/ccs/iconv_mktbl: Don't write junk strings to binaries.
+	* libc/iconv/ccs/big5.c: Switch to use new underscored flags
+	defined in newlib.h.
+	* libc/iconv/ccs/cns11643_plane1.c: Ditto.
+	* libc/iconv/ccs/cns11643_plane14.c: Ditto.
+	* libc/iconv/ccs/cns11643_plane2.c: Ditto.
+	* libc/iconv/ccs/cp775.c: Ditto.
+	* libc/iconv/ccs/cp850.c: Ditto.
+	* libc/iconv/ccs/cp852.c: Ditto.
+	* libc/iconv/ccs/cp855.c: Ditto.
+	* libc/iconv/ccs/cp866.c: Ditto.
+	* libc/iconv/ccs/gb_2312_80.c: Ditto.
+	* libc/iconv/ccs/iso_8859_1.c: Ditto.
+	* libc/iconv/ccs/iso_8859_15.c: Ditto.
+	* libc/iconv/ccs/iso_8859_2.c: Ditto.
+	* libc/iconv/ccs/iso_8859_4.c: Ditto.
+	* libc/iconv/ccs/iso_8859_5.c: Ditto.
+	* libc/iconv/ccs/jis_x0201.c: Ditto.
+	* libc/iconv/ccs/jis_x0208_1983.c: Ditto.
+	* libc/iconv/ccs/jis_x0212_1990.c: Ditto.
+	* libc/iconv/ccs/koi8_r.c: Ditto.
+	* libc/iconv/ccs/koi8_u.c: Ditto.
+	* libc/iconv/ccs/ksx1001.c: Ditto.
+	* libc/iconv/ccs/shift_jis.c: Ditto.
+	* libc/iconv/ccs/us_ascii.c: Ditto.
+	* libc/iconv/ccs/binary/big5.cct: Newly generated.
+	* libc/iconv/ccs/binary/cns11643_plane1.cct: Ditto.
+	* libc/iconv/ccs/binary/cns11643_plane14.cct: Ditto.
+	* libc/iconv/ccs/binary/cns11643_plane2.cct: Ditto.
+	* libc/iconv/ccs/binary/cp775.cct: Ditto.
+	* libc/iconv/ccs/binary/cp850.cct: Ditto.
+	* libc/iconv/ccs/binary/cp852.cct: Ditto.
+	* libc/iconv/ccs/binary/cp855.cct: Ditto.
+	* libc/iconv/ccs/binary/cp866.cct: Ditto.
+	* libc/iconv/ccs/binary/gb_2312_80.cct: Ditto.
+	* libc/iconv/ccs/binary/iso_8859_1.cct: Ditto.
+	* libc/iconv/ccs/binary/iso_8859_15.cct: Ditto.
+	* libc/iconv/ccs/binary/iso_8859_2.cct: Ditto.
+	* libc/iconv/ccs/binary/iso_8859_4.cct: Ditto.
+	* libc/iconv/ccs/binary/iso_8859_5.cct: Ditto.
+	* libc/iconv/ccs/binary/jis_x0201.cct: Ditto.
+	* libc/iconv/ccs/binary/jis_x0208_1983.cct: Ditto.
+	* libc/iconv/ccs/binary/jis_x0212_1990.cct: Ditto.
+	* libc/iconv/ccs/binary/koi8_r.cct: Ditto.
+	* libc/iconv/ccs/binary/koi8_u.cct: Ditto.
+	* libc/iconv/ccs/binary/ksx1001.cct: Ditto.
+	* libc/iconv/ccs/binary/shift_jis.cct: Ditto.
+	* libc/iconv/ccs/binary/us_ascii.cct: Ditto.
+	* libc/iconv/lib/bialiasesi.c: Sync with charset.aliases.
+	* libc/iconv/ces/euc-jp.c: Use newlib.h macros.
+	* libc/iconv/ces/euc-kr.c: Ditto.
+	* libc/iconv/ces/euc-tw.c: Ditto.
+	* libc/iconv/ces/gb2312.c: Ditto.
+	* libc/iconv/ces/iso-10646-ucs-2.c: Ditto.
+	* libc/iconv/ces/iso-10646-ucs-4.c: Ditto.
+	* libc/iconv/ces/ucs-2-internal.c: Ditto.
+	* libc/iconv/ces/ucs-4-internal.c: Ditto.
+	* libc/iconv/ces/utf-16.c: Ditto.
+	* libc/iconv/ces/utf-8.c: Ditto.
+	* libc/iconv/lib/aliases.c: Ditto.
+	* libc/iconv/lib/biccs.c: Ditto.
+	* libc/iconv/lib/bices.c: Ditto.
+	* libc/iconv/lib/ccs.c: Ditto.
+	* libc/iconv/lib/ces.c: Ditto.
+	* libc/iconv/lib/ces_euc.c: Ditto.
+	* libc/iconv/lib/ces_iso2022.c: Ditto.
+	* libc/iconv/lib/ces_table.c: Ditto.
+	* libc/iconv/lib/converter.c: Ditto.
+	* libc/iconv/lib/deps.h: Ditto.
+	* libc/iconv/lib/endian.h: Ditto.
+	* libc/iconv/lib/iconv.c: Ditto.
+	* libc/iconv/lib/loaddata.c: Ditto.
+	* libc/iconv/lib/local.h: Include newlib.h.
+	* libc/argz/Makefile.in: Regenerated.
+	* libc/ctype/Makefile.in: Ditto.
+	* libc/errno/Makefile.in: Ditto.
+	* libc/iconv/ccs/binary/Makefile.in: Ditto.
+	* libc/locale/Makefile.in: Ditto.
+	* libc/misc/Makefile.in: Ditto.
+	* libc/posix/Makefile.in: Ditto.
+	* libc/reent/Makefile.in: Ditto.
+	* libc/search/Makefile.in: Ditto.
+	* libc/signal/Makefile.in: Ditto.
+	* libc/stdio/Makefile.in: Ditto.
+	* libc/stdio64/Makefile.in: Ditto.
+	* libc/stdlib/Makefile.in: Ditto.
+	* libc/string/Makefile.in: Ditto.
+	* libc/syscalls/Makefile.in: Ditto.
+	* libc/time/Makefile.in: Ditto.
+	* libc/unix/Makefile.in: Ditto.
+	* testsuite/newlib.iconv/iconv.exp: New file.
+	* testsuite/newlib.iconv/iconvjp.c: Ditto.
+	* testsuite/newlib.iconv/iconvnm.c: Ditto.
+	* testsuite/newlib.iconv/iconvru.c: Ditto.
+
 2004-01-23  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
 
 	* acinclude.m4 (--enable-newlib-iconv): New configuration option.

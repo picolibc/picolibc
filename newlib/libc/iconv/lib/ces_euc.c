@@ -1,4 +1,4 @@
-/*-
+/*
  * Copyright (c) 1999,2000
  *    Konstantin Chuguev.  All rights reserved.
  *
@@ -25,10 +25,7 @@
  *
  *    iconv (Charset Conversion Library) v2.0
  */
-#ifdef ENABLE_ICONV
- 
 #include "deps.h"
-#include <_ansi.h>
 #include <sys/types.h>
 #include <stddef.h>
 #include <errno.h>
@@ -42,25 +39,25 @@
 typedef struct {
     int nccs;
     struct iconv_ccs ccs[1];
-} iconv_ces_euc_state;
+} iconv_ces_euc_state_t;
 
 int
-_DEFUN(iconv_euc_init, (rptr, data, desc_data, num),
-                       struct _reent *rptr        _AND
-                       _VOID_PTR *data            _AND
-                       _CONST _VOID_PTR desc_data _AND
-                       size_t num)
+_DEFUN(_iconv_euc_init, (rptr, data, desc_data, num),
+                        struct _reent *rptr        _AND
+                        _VOID_PTR *data            _AND
+                        _CONST _VOID_PTR desc_data _AND
+                        size_t num)
 {
-    size_t stsz = sizeof(iconv_ces_euc_state) +
+    size_t stsz = sizeof(iconv_ces_euc_state_t) +
                   sizeof(struct iconv_ccs) * (num - 1);
     int i;
-    iconv_ces_euc_state *state = (iconv_ces_euc_state *)_malloc_r(rptr, stsz);
+    iconv_ces_euc_state_t *state = (iconv_ces_euc_state_t *)_malloc_r(rptr, stsz);
 
     if (state == NULL)
         return __errno_r(rptr);
     for (i = 0; i < num; i++) {
-        int res = iconv_ccs_init(rptr, &(state->ccs[i]),
-                           ((_CONST iconv_ces_euc_ccs *) desc_data)[i].name);
+        int res = _iconv_ccs_init(rptr, &(state->ccs[i]),
+                           ((_CONST iconv_ces_euc_ccs_t *) desc_data)[i].name);
         if (res) {
             while (--i >= 0)
                 state->ccs[i].close(rptr, &(state->ccs[i]));
@@ -69,16 +66,16 @@ _DEFUN(iconv_euc_init, (rptr, data, desc_data, num),
         }
     }
     state->nccs = num;
-    (iconv_ces_euc_state *)*data = state;
+    (iconv_ces_euc_state_t *)*data = state;
     return 0;
 }
 
 int
-_DEFUN(iconv_euc_close, (rptr, data),
+_DEFUN(_iconv_euc_close, (rptr, data),
                         struct _reent *rptr _AND
                         _VOID_PTR data)
 {
-#define state ((iconv_ces_euc_state *)data)
+#define state ((iconv_ces_euc_state_t *)data)
     int i, res = 0;
 
     for (i = 0; i < state->nccs; i++)
@@ -92,13 +89,13 @@ _DEFUN(iconv_euc_close, (rptr, data),
 #define is_7bit(data) ((data)->nbits & 1)
 
 ssize_t
-_DEFUN(iconv_euc_convert_from_ucs, (ces, in, outbuf, outbytesleft),
-                                   struct iconv_ces *ces  _AND
-                                   ucs_t in               _AND
-                                   unsigned char **outbuf _AND
-                                   size_t *outbytesleft)
+_DEFUN(_iconv_euc_convert_from_ucs, (ces, in, outbuf, outbytesleft),
+                                    struct iconv_ces *ces  _AND
+                                    ucs_t in               _AND
+                                    unsigned char **outbuf _AND
+                                    size_t *outbytesleft)
 {
-    iconv_ces_euc_state *euc_state;
+    iconv_ces_euc_state_t *euc_state;
     size_t bytes;
     int i;
 
@@ -106,15 +103,15 @@ _DEFUN(iconv_euc_convert_from_ucs, (ces, in, outbuf, outbytesleft),
         return 1;    /* No state reinitialization for table charsets */
     if (iconv_char32bit(in))
         return -1;
-    euc_state = (iconv_ces_euc_state *)(ces->data);
+    euc_state = (iconv_ces_euc_state_t *)(ces->data);
     for (i = 0; i < euc_state->nccs; i++) {
-        _CONST iconv_ces_euc_ccs *ccsattr;
+        _CONST iconv_ces_euc_ccs_t *ccsattr;
         _CONST struct iconv_ccs *ccs = &(euc_state->ccs[i]);
         ucs_t res = ICONV_CCS_CONVERT_FROM_UCS(ccs, in);
 
         if (res == UCS_CHAR_INVALID)
             continue;
-        ccsattr = &(((_CONST iconv_ces_euc_ccs *)(ces->desc->data))[i]);
+        ccsattr = &(((_CONST iconv_ces_euc_ccs_t *)(ces->desc->data))[i]);
         if (i) {
             if (is_7_14bit(ccs))
                 res |= is_7bit(ccs) ? 0x80 : 0x8080;
@@ -165,21 +162,21 @@ _DEFUN(cvt2ucs, (ccs, inbuf, inbytesleft, hi_plane, bufptr),
 }
 
 ucs_t
-_DEFUN(iconv_euc_convert_to_ucs, (ces, inbuf, inbytesleft),
-                                 struct iconv_ces *ces        _AND
-                                 _CONST unsigned char **inbuf _AND
-                                 size_t *inbytesleft)
+_DEFUN(_iconv_euc_convert_to_ucs, (ces, inbuf, inbytesleft),
+                                  struct iconv_ces *ces        _AND
+                                  _CONST unsigned char **inbuf _AND
+                                  size_t *inbytesleft)
 {
-    iconv_ces_euc_state *euc_state =
-        (iconv_ces_euc_state *)(ces->data);
+    iconv_ces_euc_state_t *euc_state =
+        (iconv_ces_euc_state_t *)(ces->data);
     ucs_t res = UCS_CHAR_INVALID;
     _CONST unsigned char *ptr;
     int i;
 
     if (**inbuf & 0x80) {
         for (i = 1; i < euc_state->nccs; i++) {
-            _CONST iconv_ces_euc_ccs *ccsattr =
-                 &(((_CONST iconv_ces_euc_ccs *)
+            _CONST iconv_ces_euc_ccs_t *ccsattr =
+                 &(((_CONST iconv_ces_euc_ccs_t *)
                        (ces->desc->data))[i]);
             if (ccsattr->prefixlen + 1 > *inbytesleft)
                 return UCS_CHAR_NONE;
@@ -203,6 +200,4 @@ _DEFUN(iconv_euc_convert_to_ucs, (ces, inbuf, inbytesleft),
     *inbuf = ptr;
     return res;
 }
-
-#endif /* #ifdef ENABLE_ICONV */
 

@@ -1,10 +1,9 @@
-#ifdef ENABLE_ICONV
 #include "../lib/deps.h"
 
-#ifdef ICONV_CONVERTER_KSX1001
+#ifdef _ICONV_CONVERTER_KSX1001
 #include "../lib/endian.h"
 
-_CONST unsigned char iconv_ccs_table_ksx1001[] = {
+_CONST unsigned char _iconv_ccs_table_ksx1001[] = {
 	3, 'C', 'S', 'C', 'T', ICONV_ORDER, 14, 2,
 	_1l(0x00, 0x00, 0x00, 0x08), _1l(0x00, 0x00, 0x5B, 0x08),
 	_1l(0x00, 0x00, 0x00, 0x00), _1l(0x00, 0x00, 0x00, 0x00),
@@ -12329,6 +12328,5 @@ _CONST unsigned char iconv_ccs_table_ksx1001[] = {
 	_2s(0xFF, 0xFE, 0xFF, 0xFE), _2s(0xFF, 0xFE, 0xFF, 0xFE),
 };
 
-#endif /* #ifdef ICONV_CONVERTER_KSX1001 */
+#endif /* #ifdef _ICONV_CONVERTER_KSX1001 */
 
-#endif /* #ifdef ENABLE_ICONV */

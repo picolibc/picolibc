@@ -1,10 +1,9 @@
-#ifdef ENABLE_ICONV
 #include "../lib/deps.h"
 
-#ifdef ICONV_CONVERTER_BIG5
+#ifdef _ICONV_CONVERTER_BIG5
 #include "../lib/endian.h"
 
-_CONST unsigned char iconv_ccs_table_big5[] = {
+_CONST unsigned char _iconv_ccs_table_big5[] = {
 	3, 'C', 'S', 'C', 'T', ICONV_ORDER, 16, 3,
 	_1l(0x00, 0x00, 0x00, 0x08), _1l(0x00, 0x00, 0xB6, 0x08),
 	_1l(0x00, 0x00, 0x04, 0x00), _1l(0x00, 0x00, 0x00, 0x00),
@@ -12297,6 +12296,5 @@ _CONST unsigned char iconv_ccs_table_big5[] = {
 	_2s(0xFF, 0xFE, 0xA2, 0xCE), _2s(0xFF, 0xFE, 0xFF, 0xFE),
 };
 
-#endif /* #ifdef ICONV_CONVERTER_BIG5 */
+#endif /* #ifdef _ICONV_CONVERTER_BIG5 */
 
-#endif /* #ifdef ENABLE_ICONV */

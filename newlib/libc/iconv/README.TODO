@@ -25,17 +25,8 @@
    be loaded twice. To save memory, we should load each .cct only once 
    (if possible).
 
-5. UTF-16 converter supports only Big Endian UTF-16. BOM (Byte Order Mark)
-   isn't supported too. UTF-16BE and UTF-16LE CES support should be added.
-   BOM Support should be added. The same is for UCS4 and UCS2 encodings.
-   
-6. iconv tests should be written and added to Newlib tests suite.
-
-
                                              Artem B. Bityuckiy,
                                              SoftMine Corporation,
                                              <abitytsky@softminecorp.com>,
                                              <dedekind@mail.ru>,
                                              Jan, 2004.
-
-

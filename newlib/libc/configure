@@ -3158,49 +3158,15 @@ fi
 
 
 
-if test x${newlib_iconv} != x; then
-    
 
-if test 1 = 1; then
+
+if test x${newlib_iconv} != x; then
   ENABLE_NEWLIB_ICONV_TRUE=
   ENABLE_NEWLIB_ICONV_FALSE='#'
 else
   ENABLE_NEWLIB_ICONV_TRUE='#'
   ENABLE_NEWLIB_ICONV_FALSE=
 fi
-    NEWLIB_CFLAGS="${NEWLIB_CFLAGS} -DENABLE_ICONV"
-fi;
-
-if test "x${builtin_converters}" != "x"; then
-  
-    if test x${newlib_iconv} = x; then
-      { echo "configure: error: --enable-newlib-builtin-converters option can't be used if iconv library is disabled - use --enable-newlib-iconv to enable it" 1>&2; exit 1; }
-  fi
-  
-    builtin_converters=`echo "${builtin_converters}" | sed -e 's/,/ /g' -e 's/-/_/g' -e 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/'`
-  
-      available_converters=`cat "${srcdir}/iconv/charset.aliases" | sed -e '/#/d' | sed -e 'N; s/\n //;'`
-    
-      builtin_converters1="${builtin_converters}"
-  builtin_converters=""
-  for converter in ${builtin_converters1}; do
-      result=`echo "${available_converters}" | grep -e "\(^\| \)${converter}\( \|\$\)"`
-      if test $? != "0"; then
-          { echo "configure: error: ${converter} is not supported - see ${srcdir}/iconv/charset.aliases file for the list of available converters" 1>&2; exit 1; }
-      fi
-      converter1=`echo "${result}" | sed -e 's/\(^[^ ]*\).*$/\1/'`
-      builtin_converters="${builtin_converters} ${converter1}"
-  done
-
-    for converter in ${builtin_converters}; do
-      opt=ICONV_CONVERTER_`echo "${converter}" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
-      NEWLIB_ICONV_CFLAGS="${NEWLIB_ICONV_CFLAGS} -D${opt}"
-  done
-
-else
-    NEWLIB_ICONV_CFLAGS=
-fi;
-
 
 if test -n "${machine_dir}"; then
   if test "${use_libtool}" = "yes"; then
@@ -3443,7 +3409,6 @@ s%@extra_dir@%$extra_dir%g
 s%@LIBC_SYS_LIB@%$LIBC_SYS_LIB%g
 s%@ENABLE_NEWLIB_ICONV_TRUE@%$ENABLE_NEWLIB_ICONV_TRUE%g
 s%@ENABLE_NEWLIB_ICONV_FALSE@%$ENABLE_NEWLIB_ICONV_FALSE%g
-s%@NEWLIB_ICONV_CFLAGS@%$NEWLIB_ICONV_CFLAGS%g
 s%@LIBC_MACHINE_LIB@%$LIBC_MACHINE_LIB%g
 
 CEOF

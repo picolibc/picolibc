@@ -25,22 +25,17 @@
  *
  *    iconv (Charset Conversion Library) v2.0
  */
-#ifdef ENABLE_ICONV
- 
 #include "../lib/deps.h"
 
-#ifdef ICONV_CONVERTER_GB2312
-
+#ifdef _ICONV_CONVERTER_GB2312
 #include "../lib/local.h"
 
-static _CONST iconv_ces_euc_ccs ccsattr[] = {
+static _CONST iconv_ces_euc_ccs_t ccsattr[] = {
     {"us_ascii", "", 0},
     {"gb_2312_80", "", 0}
 };
 
 ICONV_CES_MODULE_DECL(euc, gb2312);
 
-#endif /* #ifdef ICONV_CONVERTER_GB2312 */
-
-#endif /* #ifdef ENABLE_ICONV */
+#endif /* #ifdef _ICONV_CONVERTER_GB2312 */
 

@@ -25,13 +25,9 @@
  *
  *    iconv (Charset Conversion Library) v2.0
  */
-#ifdef ENABLE_ICONV
- 
 #include "../lib/deps.h"
 
-#ifdef ICONV_CONVERTER_ISO_10646_UCS_2
-
-#include <_ansi.h>
+#ifdef _ICONV_CONVERTER_ISO_10646_UCS_2
 #include "../lib/local.h"
 
 #define out_char(ptr, ch) \
@@ -114,7 +110,5 @@ _DEFUN(convert_to_ucs, (ces, inbuf, inbytesleft),
 
 ICONV_CES_STATEFUL_MODULE_DECL(iso_10646_ucs_2);
 
-#endif /* #ifdef ICONV_CONVERTER_ISO_10646_UCS_2 */
-
-#endif /* #ifdef ENABLE_ICONV */
+#endif /* #ifdef _ICONV_CONVERTER_ISO_10646_UCS_2 */
 

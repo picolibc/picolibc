@@ -23,117 +23,113 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifdef ENABLE_ICONV
- 
 #include <_ansi.h>
 #include "deps.h"
 
 /* 
- * Built-in charset aliases table. The main name starts at the first position 
- * of a line, followed by zero or more aliases, separated by any whitespace
- * character(s). Alias list may continue on the next line if the latter
- * begins with a whitespace.
+ * Built-in charset aliases table. The "official" name starts at the first 
+ * position of a line, followed by zero or more aliases, separated by any 
+ * whitespace character(s). Aliases list may continue on the next line if this 
+ * line begins with a whitespace.
  */
-_CONST char iconv_builtin_aliases[] = 
+_CONST char _iconv_builtin_aliases[] = 
 {
-#ifdef ICONV_CONVERTER_US_ASCII
+#ifdef _ICONV_CONVERTER_US_ASCII
 "us_ascii ansi_x3.4_1968 ansi_x3.4_1986 iso_646.irv:1991 ascii iso646_us us ibm367 cp367 csascii\n"
 #endif
-#ifdef ICONV_CONVERTER_BIG5
+#ifdef _ICONV_CONVERTER_BIG5
 "big5 csbig5 big_five bigfive cn_big5 cp950\n"
 #endif
-#ifdef ICONV_CONVERTER_CNS11643_PLANE1
+#ifdef _ICONV_CONVERTER_CNS11643_PLANE1
 "cns11643_plane1\n"
 #endif
-#ifdef ICONV_CONVERTER_CNS11643_PLANE2
+#ifdef _ICONV_CONVERTER_CNS11643_PLANE2
 "cns11643_plane2\n"
 #endif
-#ifdef ICONV_CONVERTER_CNS11643_PLANE14
+#ifdef _ICONV_CONVERTER_CNS11643_PLANE14
 "cns11643_plane14\n"
 #endif
-#ifdef ICONV_CONVERTER_SHIFT_JIS
+#ifdef _ICONV_CONVERTER_SHIFT_JIS
 "shift_jis sjis cp932 ms_kanji csshiftjis\n"
 #endif
-#ifdef ICONV_CONVERTER_KSX_1001
+#ifdef _ICONV_CONVERTER_KSX_1001
 "ksx1001 ks_x_1001\n"
 #endif
-#ifdef ICONV_CONVERTER_JIS_X0212_1990
+#ifdef _ICONV_CONVERTER_JIS_X0212_1990
 "jis_x0212_1990\n"
 #endif
-#ifdef ICONV_CONVERTER_JIS_X0208_1983
+#ifdef _ICONV_CONVERTER_JIS_X0208_1983
 "jis_x0208_1983 jis_c6226-1983 iso_ir_87 x0208\n"
 #endif
-#ifdef ICONV_CONVERTER_JIS_X0201
+#ifdef _ICONV_CONVERTER_JIS_X0201
 "jis_x0201 x0201 cshalfwidthkatakana\n"
 #endif
-#ifdef ICONV_CONVERTER_GB_2312_80
+#ifdef _ICONV_CONVERTER_GB_2312_80
 "gb_2312_80 gb2312 gb2312_80 euc_cn eucch cn_gb csgb2312 iso_ir_58 chinese\n"
 #endif
-#ifdef ICONV_CONVERTER_CP866
+#ifdef _ICONV_CONVERTER_CP866
 "cp866 866 IBM866 CSIBM866\n"
 #endif
-#ifdef ICONV_CONVERTER_CP855
+#ifdef _ICONV_CONVERTER_CP855
 "cp855 ibm855 855 csibm855\n"
 #endif
-#ifdef ICONV_CONVERTER_CP852
+#ifdef _ICONV_CONVERTER_CP852
 "cp852 ibm852 852 cspcp852\n"
 #endif
-#ifdef ICONV_CONVERTER_CP850
+#ifdef _ICONV_CONVERTER_CP850
 "cp850 ibm850 850 cspc850multilingual\n"
 #endif
-#ifdef ICONV_CONVERTER_CP775
+#ifdef _ICONV_CONVERTER_CP775
 "cp775 ibm775 cspc775baltic\n"
 #endif
-#ifdef ICONV_CONVERTER_KOI8_U
+#ifdef _ICONV_CONVERTER_KOI8_U
 "koi8_u koi8u\n"
 #endif
-#ifdef ICONV_CONVERTER_KOI8_R
+#ifdef _ICONV_CONVERTER_KOI8_R
 "koi8_r cskoi8r koi8r koi8\n"
 #endif
-#ifdef ICONV_CONVERTER_ISO_8859_1
-"iso_8859_1 iso_88591 iso_8859_1:1987 iso_ir_100 latin1 l1 ibm819 cp819 csisolatin1\n"
+#ifdef _ICONV_CONVERTER_ISO_8859_1
+"iso_8859_1 iso_8859_1 iso_88591:1987 iso_ir_100 latin1 l1 ibm819 cp819 csisolatin1\n"
 #endif
-#ifdef ICONV_CONVERTER_ISO_8859_2
-"iso_8859_2 iso_88592 iso_8859_2:1987 iso_ir_101 latin2 l2 csisolatin2\n"
+#ifdef _ICONV_CONVERTER_ISO_8859_2
+"iso_8859_2 iso8859_2 iso_88592 iso_8859_2:1987 iso_ir_101 latin2 l2 csisolatin2\n"
 #endif
-#ifdef ICONV_CONVERTER_ISO_8859_4
-"iso_8859_4 iso_88594 iso_8859_4:1988 iso_ir_110 latin4 l4 csisolatin4\n"
+#ifdef _ICONV_CONVERTER_ISO_8859_4
+"iso_8859_4 iso8859_4 iso_88594 iso_8859_4:1988 iso_ir_110 latin4 l4 csisolatin4\n"
 #endif
-#ifdef ICONV_CONVERTER_ISO_8859_5
-"iso_8859_5 iso_88595 iso_8859_5:1988 iso_ir_144 cyrillic csisolatincyrillic\n"
+#ifdef _ICONV_CONVERTER_ISO_8859_5
+"iso_8859_5 iso8859_5 iso_88595 iso_8859_5:1988 iso_ir_144 cyrillic csisolatincyrillic\n"
 #endif
-#ifdef ICONV_CONVERTER_ISO_8859_15
-"iso_8859_15 iso_885915 iso_8859_15:1998 iso8859_15 iso885915\n"
+#ifdef _ICONV_CONVERTER_ISO_8859_15
+"iso_8859_15 iso8859_15 iso_885915 iso_8859_15:1998 iso8859_15 iso885915\n"
 #endif
-#ifdef ICONV_CONVERTER_EUC_JP
+#ifdef _ICONV_CONVERTER_EUC_JP
 "euc_jp eucjp\n"
 #endif 
-#ifdef ICONV_CONVERTER_EUC_KR
+#ifdef _ICONV_CONVERTER_EUC_KR
 "euc_kr euckr\n"
 #endif 
-#ifdef ICONV_CONVERTER_EUC_TW
+#ifdef _ICONV_CONVERTER_EUC_TW
 "euc_tw euctw\n"
 #endif 
-#ifdef ICONV_CONVERTER_ISO_10646_UCS_2
-"iso_10646_ucs_2 iso10646_ucs_2 iso_10646_ucs2 iso10646_ucs2 iso1064ucs2\n"
+#ifdef _ICONV_CONVERTER_ISO_10646_UCS_2
+"iso_10646_ucs_2 iso10646_ucs_2 iso_10646_ucs2 iso10646_ucs2 iso1064ucs2 ucs2 ucs_2\n"
 #endif 
-#ifdef ICONV_CONVERTER_ISO_10646_UCS_4
-"iso_10646_ucs_4 iso10646_ucs_4 iso_10646_ucs4 iso10646_ucs4 iso1064ucs4\n"
+#ifdef _ICONV_CONVERTER_ISO_10646_UCS_4
+"iso_10646_ucs_4 iso10646_ucs_4 iso_10646_ucs4 iso10646_ucs4 iso1064ucs4 ucs4 ucs_4\n"
 #endif 
-#ifdef ICONV_CONVERTER_UCS_2_INTERNAL
+#ifdef _ICONV_CONVERTER_UCS_2_INTERNAL
 "ucs_2_internal ucs2_internal ucs2internal\n"
 #endif 
-#ifdef ICONV_CONVERTER_UCS_4_INTERNAL
+#ifdef _ICONV_CONVERTER_UCS_4_INTERNAL
 "ucs_4_internal ucs4_internal ucs4internal\n"
 #endif 
-#ifdef ICONV_CONVERTER_UTF_16
-"utf_16 utf16 utf_16be utf16be\n"
+#ifdef _ICONV_CONVERTER_UTF_16
+"utf_16 utf16\n"
 #endif 
-#ifdef ICONV_CONVERTER_UTF_8
+#ifdef _ICONV_CONVERTER_UTF_8
 "utf_8 utf8\n"
 #endif 
 ""
 };
-
-#endif /* #ifdef ENABLE_ICONV */
 

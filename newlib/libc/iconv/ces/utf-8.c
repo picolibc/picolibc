@@ -25,13 +25,9 @@
  *
  *    iconv (Charset Conversion Library) v2.0
  */
-#ifdef ENABLE_ICONV
- 
 #include "../lib/deps.h"
 
-#ifdef ICONV_CONVERTER_UTF_8
-
-#include <_ansi.h>
+#ifdef _ICONV_CONVERTER_UTF_8
 #include "../lib/local.h"
 
 #define cont_byte(b) (((b) & 0x3F) | 0x80)
@@ -187,7 +183,5 @@ _DEFUN(convert_to_ucs, (ces, inbuf, inbytesleft),
 
 ICONV_CES_STATELESS_MODULE_DECL(utf_8);
 
-#endif /* #ifdef ICONV_CONVERTER_UTF_8 */
-
-#endif /* #ifdef ENABLE_ICONV */
+#endif /* #ifdef _ICONV_CONVERTER_UTF_8 */
 

@@ -25,15 +25,12 @@
  *
  *    iconv (Charset Conversion Library) v2.0
  */
-#ifdef ENABLE_ICONV
- 
 #include "../lib/deps.h"
 
-#ifdef ICONV_CONVERTER_EUC_TW
-
+#ifdef _ICONV_CONVERTER_EUC_TW
 #include "../lib/local.h"
 
-static _CONST iconv_ces_euc_ccs ccsattr[] = {
+static _CONST iconv_ces_euc_ccs_t ccsattr[] = {
     {"us_ascii", "", 0},
     {"cns11643_plane1", "", 0},
     {"cns11643_plane2", "\x8e\xa2", 2},
@@ -42,7 +39,5 @@ static _CONST iconv_ces_euc_ccs ccsattr[] = {
 
 ICONV_CES_MODULE_DECL(euc, euc_tw);
 
-#endif /* #ifdef ICONV_CONVERTER_EUC_KR */
-
-#endif /* #ifdef ENABLE_ICONV */
+#endif /* #ifdef _ICONV_CONVERTER_EUC_KR */
 

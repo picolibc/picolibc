@@ -21,7 +21,7 @@ cp852 ibm852 852 cspcp852
 cp850 ibm850 850 cspc850multilingual
 cp775 ibm775 cspc775baltic
 koi8_u koi8u
-koi8_r cskoi8r koi8r
+koi8_r cskoi8r koi8r koi8
 iso_8859_1 iso8859_1 iso88591 iso_8859_1:1987 iso_ir_100 latin1 l1 ibm819 cp819 csisolatin1
 iso_8859_2 iso8859_2 iso88592 iso_8859_2:1987 iso_ir_101 latin2 l2 csisolatin2
 iso_8859_4 iso8859_4 iso88594 iso_8859_4:1988 iso_ir_110 latin4 l4 csisolatin4
@@ -30,9 +30,9 @@ iso_8859_15 iso8859_15 iso885915 iso_8859_15:1998 iso8859_15 iso885915
 euc_jp eucjp
 euc_kr euckr
 euc_tw euctw
-iso_10646_ucs_2 iso10646_ucs_2 iso_10646_ucs2 iso10646_ucs2 iso1064ucs2 ucs2 ucs_2 ucs2be ucs2_be ucs_2be ucs_2_be
-iso_10646_ucs_4 iso10646_ucs_4 iso_10646_ucs4 iso10646_ucs4 iso1064ucs4 ucs4 ucs_4 ucs4be ucs4_be ucs_4be ucs_4_be
+iso_10646_ucs_2 iso10646_ucs_2 iso_10646_ucs2 iso10646_ucs2 iso1064ucs2 ucs2 ucs_2
+iso_10646_ucs_4 iso10646_ucs_4 iso_10646_ucs4 iso10646_ucs4 iso1064ucs4 ucs4 ucs_4
 ucs_2_internal ucs2_internal ucs2internal
 ucs_4_internal ucs4_internal ucs4internal
-utf_16 utf16 utf_16be utf16be utf_16_be
+utf_16 utf16
 utf_8 utf8

@@ -25,13 +25,9 @@
  *
  *    iconv (Charset Conversion Library) v2.0
  */
-#ifdef ENABLE_ICONV
- 
 #include "../lib/deps.h"
 
-#ifdef ICONV_CONVERTER_UTF_16
-
-#include <_ansi.h>
+#ifdef _ICONV_CONVERTER_UTF_16
 #include <string.h>
 #include "../lib/local.h"
 
@@ -138,7 +134,5 @@ _DEFUN(convert_to_ucs, (ces, inbuf, inbytesleft),
 
 ICONV_CES_STATEFUL_MODULE_DECL(utf_16);
 
-#endif /* #ifdef ICONV_CONVERTER_UTF_16 */
-
-#endif /* #ifdef ENABLE_ICONV */
+#endif /* #ifdef _ICONV_CONVERTER_UTF_16 */
 

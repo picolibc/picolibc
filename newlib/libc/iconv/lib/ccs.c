@@ -25,15 +25,12 @@
  *
  *    iconv (Charset Conversion Library) v2.0
  */
-#ifdef ENABLE_ICONV
- 
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <reent.h>
 #include <endian.h>
-#include <_ansi.h>
 #include <sys/param.h>
 #include <sys/types.h>
 #include "local.h"
@@ -96,7 +93,7 @@ _DEFUN(letohl, (s), __uint32_t l)
 typedef struct {
     unsigned char label[8];  /* CSconvT<N>; N=[0-3] */
     __uint32_t tables[2];     /* offsets to 2 unidirectional tables */
-} iconv_ccs_convtable;
+} iconv_ccs_convtable_t;
 
 #define ICONV_TBL_LABEL             "\003CSCT"
 #define ICONV_TBL_LABEL_SIZE        5
@@ -105,7 +102,7 @@ typedef struct {
 #define ICONV_TBL_VERSION(table)    ((table)->label[7])
 
 /* Indices for unidirectional conversion tables */
-enum { iconv_ccs_to_ucs = 0, iconv_ccs_from_ucs = 1 };
+enum { _iconv_ccs_to_ucs = 0, _iconv_ccs_from_ucs = 1 };
 
 
 /* Unidirectional conversion table types */
@@ -113,29 +110,29 @@ enum { iconv_ccs_to_ucs = 0, iconv_ccs_from_ucs = 1 };
 /* one-level tables */
 typedef struct {
     ucs2_t data[128];
-} iconv_ccs_table_7bit; /* 7-bit charset to Unicode */
+} iconv_ccs_table_7bit_t; /* 7-bit charset to Unicode */
 
 typedef struct {
     ucs2_t data[256];
-} iconv_ccs_table_8bit; /* 8-bit charset to Unicode */
+} iconv_ccs_table_8bit_t; /* 8-bit charset to Unicode */
 
 /* two-level tables */
 typedef struct {
     __uint32_t data[128];
-} iconv_ccs_table_14bit; /* 14-bit charset to Unicode */
+} iconv_ccs_table_14bit_t; /* 14-bit charset to Unicode */
 
 typedef struct {
     __uint32_t data[256];
-} iconv_ccs_table_16bit; /* 16-bit charset to Unicode;
-                          * Unicode to any charset */
+} iconv_ccs_table_16bit_t; /* 16-bit charset to Unicode;
+                            * Unicode to any charset */
 
 /* abstract table */
 typedef union {
-    iconv_ccs_table_7bit  _7bit;
-    iconv_ccs_table_8bit  _8bit;
-    iconv_ccs_table_14bit _14bit;
-    iconv_ccs_table_16bit _16bit;
-} iconv_ccs_table_abstract;
+    iconv_ccs_table_7bit_t  _7bit;
+    iconv_ccs_table_8bit_t  _8bit;
+    iconv_ccs_table_14bit_t _14bit;
+    iconv_ccs_table_16bit_t _16bit;
+} iconv_ccs_table_abstract_t;
 
 /* host and network byte order array element macros */
 #define iconv_table_elt_le(base, i, type)    \
@@ -144,7 +141,7 @@ typedef union {
 #define iconv_table_elt_be(base, i, type)    \
     ((type *)(((char *)(base)) + betohl(((__int32_t *)(base))[(i)])))
 
-#define abstable ((_CONST iconv_ccs_table_abstract *)table)
+#define abstable ((_CONST iconv_ccs_table_abstract_t *)table)
 
 /* Functions for little endian byte order tables */
 static ucs2_t
@@ -168,11 +165,11 @@ _DEFUN(cvt_14bit_le, (table, ch),
                      _CONST _VOID_PTR table _AND
                      ucs2_t ch)
 {
-    _CONST iconv_ccs_table_7bit *sub_table;
+    _CONST iconv_ccs_table_7bit_t *sub_table;
 
     if (ch & 0x8080)
         return UCS_CHAR_INVALID;
-    sub_table =  iconv_table_elt_le(table, ch >> 8, iconv_ccs_table_7bit);
+    sub_table =  iconv_table_elt_le(table, ch >> 8, iconv_ccs_table_7bit_t);
     return sub_table == &(abstable->_7bit) ? UCS_CHAR_INVALID
                                            : letohs(sub_table->data[ch & 0x7F]);
 }
@@ -182,8 +179,8 @@ _DEFUN(cvt_16bit_le, (table, ch),
                      _CONST _VOID_PTR table _AND
                      ucs2_t ch)
 {
-    _CONST iconv_ccs_table_8bit *sub_table =
-        iconv_table_elt_le(table, ch >> 8, iconv_ccs_table_8bit);
+    _CONST iconv_ccs_table_8bit_t *sub_table =
+        iconv_table_elt_le(table, ch >> 8, iconv_ccs_table_8bit_t);
     return sub_table == &(abstable->_8bit) ? UCS_CHAR_INVALID
                                            : letohs(sub_table->data[ch & 0xFF]);
 }
@@ -215,11 +212,11 @@ _DEFUN(cvt_14bit_be, (table, ch),
                      _CONST _VOID_PTR table _AND
                      ucs2_t ch)
 {
-    _CONST iconv_ccs_table_7bit *sub_table;
+    _CONST iconv_ccs_table_7bit_t *sub_table;
 
     if (ch & 0x8080)
         return UCS_CHAR_INVALID;
-    sub_table =  iconv_table_elt_be(table, ch >> 8, iconv_ccs_table_7bit);
+    sub_table =  iconv_table_elt_be(table, ch >> 8, iconv_ccs_table_7bit_t);
     return sub_table == &(abstable->_7bit) ? UCS_CHAR_INVALID
                                            : betohs(sub_table->data[ch & 0x7F]);
 }
@@ -229,8 +226,8 @@ _DEFUN(cvt_16bit_be, (table, ch),
                      _CONST _VOID_PTR table _AND
                      ucs2_t ch)
 {
-    _CONST iconv_ccs_table_8bit *sub_table =
-        iconv_table_elt_be(table, ch >> 8, iconv_ccs_table_8bit);
+    _CONST iconv_ccs_table_8bit_t *sub_table =
+        iconv_table_elt_be(table, ch >> 8, iconv_ccs_table_8bit_t);
     return sub_table == &(abstable->_8bit) ? UCS_CHAR_INVALID
                                            : betohs(sub_table->data[ch & 0xFF]);
 }
@@ -245,7 +242,7 @@ static iconv_ccs_convert_t * _CONST converters_be[] = {
 static int
 _DEFUN(ccs_init, (ccs, table),
                  struct iconv_ccs *ccs _AND
-                 _CONST iconv_ccs_convtable *table)
+                 _CONST iconv_ccs_convtable_t *table)
 {
     if (strncmp(table->label, ICONV_TBL_LABEL, ICONV_TBL_LABEL_SIZE))
         return EINVAL;
@@ -256,21 +253,21 @@ _DEFUN(ccs_init, (ccs, table),
     if (ICONV_TBL_BYTE_ORDER(table) == ICONV_CCT_LE) {
         /* Little Endian */
         ccs->from_ucs = iconv_table_elt_le(table->tables,
-                                           iconv_ccs_from_ucs,
-                                           _CONST iconv_ccs_convtable);
+                                           _iconv_ccs_from_ucs,
+                                           _CONST iconv_ccs_convtable_t);
         ccs->to_ucs = iconv_table_elt_le(table->tables,
-                                         iconv_ccs_to_ucs,
-                                         _CONST iconv_ccs_convtable);
+                                         _iconv_ccs_to_ucs,
+                                         _CONST iconv_ccs_convtable_t);
         ccs->convert_from_ucs = cvt_16bit_le;
         ccs->convert_to_ucs = converters_le[ICONV_TBL_VERSION(table)];
     } else {
         /* Big Endian (Network Byte Order) */
         ccs->from_ucs = iconv_table_elt_be(table->tables,
-                                             iconv_ccs_from_ucs,
-                                             _CONST iconv_ccs_convtable);
+                                             _iconv_ccs_from_ucs,
+                                             _CONST iconv_ccs_convtable_t);
         ccs->to_ucs = iconv_table_elt_be(table->tables,
-                                           iconv_ccs_to_ucs,
-                                           _CONST iconv_ccs_convtable);
+                                           _iconv_ccs_to_ucs,
+                                           _CONST iconv_ccs_convtable_t);
         ccs->convert_from_ucs = cvt_16bit_be;
         ccs->convert_to_ucs = converters_be[ICONV_TBL_VERSION(table)];
     }
@@ -291,10 +288,10 @@ _DEFUN(iconv_ccs_init_builtin, (ccs, name),
                                struct iconv_ccs *ccs _AND
                                _CONST char *name)
 {
-    _CONST iconv_builtin_table *ccs_ptr;
-    for (ccs_ptr = iconv_builtin_ccs; ccs_ptr->key != NULL; ccs_ptr ++) {
+    _CONST iconv_builtin_table_t *ccs_ptr;
+    for (ccs_ptr = _iconv_builtin_ccs; ccs_ptr->key != NULL; ccs_ptr ++) {
         if (strcmp(ccs_ptr->key, name) == 0) {
-            int res = ccs_init(ccs, (_CONST iconv_ccs_convtable *)
+            int res = ccs_init(ccs, (_CONST iconv_ccs_convtable_t *)
                                     (ccs_ptr->value));
             if (res == 0)
                 ccs->close = close_builtin;
@@ -306,7 +303,7 @@ _DEFUN(iconv_ccs_init_builtin, (ccs, name),
 
 /* External CCS initialisation */
 struct external_extra {
-    _CONST iconv_ccs_convtable *ptr;
+    _CONST iconv_ccs_convtable_t *ptr;
     off_t size;
 };
 
@@ -327,7 +324,7 @@ _DEFUN(iconv_ccs_init_external, (rptr, ccs, name),
                                 _CONST char *name)
 {
     char *file;
-    _CONST iconv_ccs_convtable *ccs_ptr;
+    _CONST iconv_ccs_convtable_t *ccs_ptr;
     _CONST char *datapath;
     _iconv_fd_t *extra;
 
@@ -358,7 +355,7 @@ _DEFUN(iconv_ccs_init_external, (rptr, ccs, name),
     }
     _free_r(rptr, (_VOID_PTR)name);
     
-    ccs_ptr = (_CONST iconv_ccs_convtable *)extra->mem;
+    ccs_ptr = (_CONST iconv_ccs_convtable_t *)extra->mem;
     if (ccs_init(ccs, ccs_ptr) != 0) {
         _iconv_unload_file(rptr, extra);
         _free_r(rptr, (_VOID_PTR)extra);
@@ -371,10 +368,10 @@ _DEFUN(iconv_ccs_init_external, (rptr, ccs, name),
 }
 
 int
-_DEFUN(iconv_ccs_init, (rptr, ccs, name),
-                       struct _reent *rptr   _AND
-                       struct iconv_ccs *ccs _AND
-                       _CONST char *name)
+_DEFUN(_iconv_ccs_init, (rptr, ccs, name),
+                        struct _reent *rptr   _AND
+                        struct iconv_ccs *ccs _AND
+                        _CONST char *name)
 {
     int res = iconv_ccs_init_builtin(ccs, name);
     if (res)
@@ -383,6 +380,4 @@ _DEFUN(iconv_ccs_init, (rptr, ccs, name),
         __errno_r(rptr) = res;
     return res;
 }
-
-#endif /* #ifdef ENABLE_ICONV */
 

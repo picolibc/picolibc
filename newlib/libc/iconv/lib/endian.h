@@ -25,10 +25,8 @@
  *
  *	iconv (Charset Conversion Library) v2.0
  */
-#ifdef ENABLE_ICONV
- 
-#ifndef _LOCAL_ENDIAN_H_
-#define _LOCAL_ENDIAN_H_
+#ifndef __LOCAL_ENDIAN_H__
+#define __LOCAL_ENDIAN_H__
 
 #include <sys/param.h>
 #include <sys/types.h>
@@ -54,7 +52,5 @@
 
 #endif
 
-#endif /* #ifndef _LOCAL_ENDIAN_H_ */
-
-#endif /* #ifdef ENABLE_ICONV */
+#endif /* #ifndef __LOCAL_ENDIAN_H__ */
 

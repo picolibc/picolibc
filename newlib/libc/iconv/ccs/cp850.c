@@ -1,10 +1,9 @@
-#ifdef ENABLE_ICONV
 #include "../lib/deps.h"
 
-#ifdef ICONV_CONVERTER_CP850
+#ifdef _ICONV_CONVERTER_CP850
 #include "../lib/endian.h"
 
-_CONST unsigned char iconv_ccs_table_cp850[] = {
+_CONST unsigned char _iconv_ccs_table_cp850[] = {
 	3, 'C', 'S', 'C', 'T', ICONV_ORDER, 8, 1,
 	_1l(0x00, 0x00, 0x00, 0x08), _1l(0x00, 0x00, 0x02, 0x08),
 	_2s(0x00, 0x00, 0x00, 0x01), _2s(0x00, 0x02, 0x00, 0x03),
@@ -457,6 +456,5 @@ _CONST unsigned char iconv_ccs_table_cp850[] = {
 	_2s(0xFF, 0xFE, 0xFF, 0xFE), _2s(0xFF, 0xFE, 0xFF, 0xFE),
 };
 
-#endif /* #ifdef ICONV_CONVERTER_CP850 */
+#endif /* #ifdef _ICONV_CONVERTER_CP850 */
 
-#endif /* #ifdef ENABLE_ICONV */

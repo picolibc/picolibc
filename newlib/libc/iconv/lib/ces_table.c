@@ -25,9 +25,6 @@
  *
  *    iconv (Charset Conversion Library) v2.0
  */
-#ifdef ENABLE_ICONV
- 
-#include <_ansi.h>
 #include <sys/types.h>
 #include <assert.h>
 #include <errno.h>
@@ -46,7 +43,7 @@ _DEFUN(table_init, (rptr, data, name, desc_data),
     struct iconv_ccs *ccs = _malloc_r(rptr, sizeof(struct iconv_ccs));
     if (ccs == NULL)
         return __errno_r(rptr);
-    res = iconv_ccs_init(rptr, ccs, name);
+    res = _iconv_ccs_init(rptr, ccs, name);
     if (res)
         _free_r(rptr, ccs);
     else
@@ -114,14 +111,12 @@ _DEFUN(convert_to_ucs, (ces, inbuf, inbytesleft),
     return res;
 }
 
-_CONST struct iconv_ces_desc iconv_ces_table_driven = {
+_CONST struct iconv_ces_desc _iconv_ces_table_driven = {
         table_init,
         table_close,
-        iconv_ces_reset_null,
+        _iconv_ces_reset_null,
         convert_from_ucs,
         convert_to_ucs,
         NULL
 };
-
-#endif /* #ifdef ENABLE_ICONV */
 

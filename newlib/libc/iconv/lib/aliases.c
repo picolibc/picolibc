@@ -23,9 +23,6 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#if defined(ENABLE_ICONV)
- 
-#include <_ansi.h>
 #include <string.h>
 #include <stdlib.h>
 #include <reent.h>
@@ -37,7 +34,7 @@
  * PARAMETERS:
  *    _CONST char *haystack - the string in which to search.
  *    _CONST char *needle   - the string which to search.
- *    int length            - the maximum 'searchee' string length.
+ *    int length            - the maximum 'haystack' string length.
  *
  * DESCRIPTION:
  *    The  strstr() function finds the first occurrence of the substring 
@@ -45,7 +42,7 @@
  *
  * RETURN:
  *    Returns a pointer to the beginning of the substring, or NULL if the 
- *    substring is not found.
+ *    substring was not found.
  */
 static char *
 _DEFUN(strnstr, (haystack, needle, length),
@@ -82,7 +79,7 @@ _DEFUN(strnstr, (haystack, needle, length),
  *    _CONST char *str - string to canonize. 
  *
  * DESCRIPTION:
- *     Convert all letters to small and substitute all '-' by '_'.
+ *     Converts all letters to small and substitute all '-' by '_'.
  *
  * RETURN:
  *     Returns canonical form of 'str' if success, NULL if failure.
@@ -113,12 +110,12 @@ _DEFUN(canonical_form, (rptr, str),
  *
  * PARAMETERS:
  *    struct _reent *rptr - reent structure of curent thread/process.
- *     _CONST char *alias - alias by which "official" name should be found.
- *     char *table        - alias table.
- *     int len            - alias table length.
+ *    _CONST char *alias  - alias by which "official" name should be found.
+ *    _CONST char *table  - aliases table.
+ *    int len             - aliases table length.
  *
  * DESCRIPTION:
- *     'table' contains the list of that names and their aliases. "Official" 
+ *     'table' contains the list of names and their aliases. "Official" 
  *      names go first, e.g.:
  *
  *     Official_name1 alias11 alias12 alias1N
@@ -129,7 +126,7 @@ _DEFUN(canonical_form, (rptr, str),
  *     previous line.
  *
  * RETURN:
- *     Returns pointer to name "official" if success, NULL if failure.
+ *     Returns pointer to "official" name if success, NULL if failure.
  */
 static _CONST char *
 _DEFUN(find_alias, (rptr, alias, table, len),
@@ -175,7 +172,7 @@ search_again:
 }
 
 /*
- * _iconv_construct_filename -- constructs file name string from it's 
+ * _iconv_construct_filename -- constructs full file name from it's 
  * path and name
  *
  * PARAMETERS:
@@ -188,7 +185,7 @@ search_again:
  *     'path' and 'name' shouldn't be NULL.
  *
  * RETURN:
- *     The pointer to file path if success, NULL else.
+ *     The pointer to full file name if success, NULL if faulture.
  */
 char *
 _DEFUN(_iconv_construct_filename, (rptr, path, file),
@@ -218,19 +215,19 @@ _DEFUN(_iconv_construct_filename, (rptr, path, file),
 }
 
 /*
- * _iconv_resolve_alias - resolves charset's name by given alias. 
+ * _iconv_resolve_alias - resolves "official" name by given alias. 
  *
  * PARAMETERS:
- *    struct _reent *rptr - reent structure of curent thread/process.
+ *    struct _reent *rptr    - reent structure of curent thread/process.
  *    _CONST char *alias     - alias to resolve.
- *    _CONST char *bialiases - built-in aliases table.
+ *    _CONST char *bialiases - aliases table.
  *    int cf                 - canonize flag.
- *    _CONST char *fname     - external file with aliases list.
+ *    _CONST char *fname     - name of external file with list uf aliases.
  *
  * DESCRIPTION:
- *     Tries to find 'alias' in built-in aliases list ('bialiases'). If not 
+ *     Tries to find 'alias' in aliases list ('bialiases'). If not 
  *     found, searches at 'fname' file. 'cf' flag shows if 'alias' should be 
- *     canonized before searching. Both 'bialiases' and 'fname' can be NULL
+ *     canonized before searching. Both 'bialiases' and 'fname' can't be NULL
  *     pointers.
  * 
  * RETURN:
@@ -275,12 +272,12 @@ free_and_return:
 }
 
 /*
- * _iconv_resolve_cs_name - resolves charset by given alias. 
+ * _iconv_resolve_cs_name - resolves convrter's "official" name by given alias. 
  *
  * PARAMETERS:
- *    struct _reent *rptr - reent structure of curent thread/process.
- *     _CONST char *cs   - charset alias to resolve.
- *     _CONST char *path - external file with aliases list.
+ *     struct _reent *rptr - reent structure of curent thread/process.
+ *     _CONST char *cs     - charset alias to resolve.
+ *     _CONST char *path   - external file with aliases list.
  *
  * DESCRIPTION: 
  * First, tries to find 'cs' among built-in aliases. If not fount, tries to 
@@ -304,12 +301,10 @@ _DEFUN(_iconv_resolve_cs_name, (rptr, cs, path),
   if (fname == NULL)
       return NULL;
   
-  p = (char *)_iconv_resolve_alias(rptr, cs, iconv_builtin_aliases, 
+  p = (char *)_iconv_resolve_alias(rptr, cs, _iconv_builtin_aliases, 
                                 1, (_CONST char *)fname);
   if (fname != NULL)
       _free_r(rptr, (_VOID_PTR)fname);
   return p;
 }
-
-#endif /* #if defined(ENABLE_ICONV) */
 

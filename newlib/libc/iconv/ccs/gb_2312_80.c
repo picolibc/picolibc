@@ -1,10 +1,9 @@
-#ifdef ENABLE_ICONV
 #include "../lib/deps.h"
 
-#ifdef ICONV_CONVERTER_GB_2312_80
+#ifdef _ICONV_CONVERTER_GB_2312_80
 #include "../lib/endian.h"
 
-_CONST unsigned char iconv_ccs_table_gb_2312_80[] = {
+_CONST unsigned char _iconv_ccs_table_gb_2312_80[] = {
 	3, 'C', 'S', 'C', 'T', ICONV_ORDER, 14, 2,
 	_1l(0x00, 0x00, 0x00, 0x08), _1l(0x00, 0x00, 0x53, 0x08),
 	_1l(0x00, 0x00, 0x00, 0x00), _1l(0x00, 0x00, 0x00, 0x00),
@@ -9001,6 +9000,5 @@ _CONST unsigned char iconv_ccs_table_gb_2312_80[] = {
 	_2s(0xFF, 0xFE, 0xFF, 0xFE), _2s(0xFF, 0xFE, 0xFF, 0xFE),
 };
 
-#endif /* #ifdef ICONV_CONVERTER_GB_2312_80 */
+#endif /* #ifdef _ICONV_CONVERTER_GB_2312_80 */
 
-#endif /* #ifdef ENABLE_ICONV */

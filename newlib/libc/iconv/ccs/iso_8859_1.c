@@ -1,10 +1,9 @@
-#ifdef ENABLE_ICONV
 #include "../lib/deps.h"
 
-#ifdef ICONV_CONVERTER_ISO_8859_1
+#ifdef _ICONV_CONVERTER_ISO_8859_1
 #include "../lib/endian.h"
 
-_CONST unsigned char iconv_ccs_table_iso_8859_1[] = {
+_CONST unsigned char _iconv_ccs_table_iso_8859_1[] = {
 	3, 'C', 'S', 'C', 'T', ICONV_ORDER, 8, 1,
 	_1l(0x00, 0x00, 0x00, 0x08), _1l(0x00, 0x00, 0x02, 0x08),
 	_2s(0x00, 0x00, 0x00, 0x01), _2s(0x00, 0x02, 0x00, 0x03),
@@ -265,6 +264,5 @@ _CONST unsigned char iconv_ccs_table_iso_8859_1[] = {
 	_2s(0x00, 0xFC, 0x00, 0xFD), _2s(0x00, 0xFE, 0x00, 0xFF),
 };
 
-#endif /* #ifdef ICONV_CONVERTER_ISO_8859_1 */
+#endif /* #ifdef _ICONV_CONVERTER_ISO_8859_1 */
 
-#endif /* #ifdef ENABLE_ICONV */

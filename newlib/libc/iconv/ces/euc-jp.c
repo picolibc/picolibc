@@ -25,15 +25,12 @@
  *
  *    iconv (Charset Conversion Library) v2.0
  */
-#ifdef ENABLE_ICONV
-
 #include "../lib/deps.h"
 
-#ifdef ICONV_CONVERTER_EUC_JP
-
+#ifdef _ICONV_CONVERTER_EUC_JP
 #include "../lib/local.h"
 
-static _CONST iconv_ces_euc_ccs ccsattr[] = {
+static _CONST iconv_ces_euc_ccs_t ccsattr[] = {
     {"us_ascii", "", 0},
     {"jis_x0208_1983", "", 0},
     {"jis_x0201", "\x8e", 1},
@@ -42,7 +39,5 @@ static _CONST iconv_ces_euc_ccs ccsattr[] = {
 
 ICONV_CES_MODULE_DECL(euc, euc_jp);
 
-#endif /* #ifdef ICONV_CONVERTER_EUC_JP */
-
-#endif /* #ifdef ENABLE_ICONV */
+#endif /* #ifdef _ICONV_CONVERTER_EUC_JP */
 

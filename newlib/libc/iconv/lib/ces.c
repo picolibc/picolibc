@@ -25,9 +25,6 @@
  *
  *    iconv (Charset Conversion Library) v2.0
  */
-#ifdef ENABLE_ICONV
- 
-#include <_ansi.h>
 #include <errno.h>
 #include <limits.h>
 #include <stdio.h>
@@ -67,8 +64,8 @@ _DEFUN(ces_init_builtin, (rptr, ces, name),
                          struct iconv_ces *ces _AND
                          _CONST char *name)
 {
-    _CONST iconv_builtin_table *ces_ptr;
-    for (ces_ptr = iconv_builtin_ces; ces_ptr->key != NULL; ces_ptr ++)
+    _CONST iconv_builtin_table_t *ces_ptr;
+    for (ces_ptr = _iconv_builtin_ces; ces_ptr->key != NULL; ces_ptr ++)
         if (strcmp(ces_ptr->key, name) == 0)
             return ces_instance_init(rptr, ces, name,
                    (_CONST struct iconv_ces_desc *)(ces_ptr->value));
@@ -76,21 +73,21 @@ _DEFUN(ces_init_builtin, (rptr, ces, name),
 }
 
 int
-_DEFUN(iconv_ces_init, (rptr, ces, name),
-                       struct _reent *rptr   _AND
-                       struct iconv_ces *ces _AND
-                       _CONST char *name)
+_DEFUN(_iconv_ces_init, (rptr, ces, name),
+                        struct _reent *rptr   _AND
+                        struct iconv_ces *ces _AND
+                        _CONST char *name)
 {
     return ces_init_builtin(rptr, ces, name)
-           && ces_instance_init(rptr, ces, name, &iconv_ces_table_driven);
+           && ces_instance_init(rptr, ces, name, &_iconv_ces_table_driven);
 }
 
 int
-_DEFUN(iconv_ces_init_state, (rptr, res, name, data),
-                             struct _reent *rptr _AND
-                             _VOID_PTR *res      _AND
-                             _CONST char *name   _AND
-                             _CONST _VOID_PTR data)
+_DEFUN(_iconv_ces_init_state, (rptr, res, name, data),
+                              struct _reent *rptr _AND
+                              _VOID_PTR *res      _AND
+                              _CONST char *name   _AND
+                              _CONST _VOID_PTR data)
 {
         if ((*res = _malloc_r(rptr, sizeof(int))) == NULL)
             return __errno_r(rptr);
@@ -99,7 +96,7 @@ _DEFUN(iconv_ces_init_state, (rptr, res, name, data),
 }
 
 int
-_DEFUN(iconv_ces_close_state, (rptr, data),
+_DEFUN(_iconv_ces_close_state, (rptr, data),
                               struct _reent *rptr _AND
                               _VOID_PTR data)
 {
@@ -109,23 +106,23 @@ _DEFUN(iconv_ces_close_state, (rptr, data),
 }
 
 _VOID
-_DEFUN(iconv_ces_reset_state, (data), _VOID_PTR data)
+_DEFUN(_iconv_ces_reset_state, (data), _VOID_PTR data)
 {
     *(int *)data = 0;
 }
 
 int
-_DEFUN(iconv_ces_init_null, (rptr, res, name, data),
-                            struct _reent *rptr _AND
-                            _VOID_PTR *res      _AND
-                            _CONST char *name   _AND
-                            _CONST _VOID_PTR data)
+_DEFUN(_iconv_ces_init_null, (rptr, res, name, data),
+                             struct _reent *rptr _AND
+                             _VOID_PTR *res      _AND
+                             _CONST char *name   _AND
+                             _CONST _VOID_PTR data)
 {
     return 0;
 }
 
 int
-_DEFUN(iconv_ces_close_null, (rptr, data),
+_DEFUN(_iconv_ces_close_null, (rptr, data),
                              struct _reent *rptr _AND
                              _VOID_PTR data)
 {
@@ -133,9 +130,8 @@ _DEFUN(iconv_ces_close_null, (rptr, data),
 }
 
 _VOID
-_DEFUN(iconv_ces_reset_null, (data), _VOID_PTR data)
+_DEFUN(_iconv_ces_reset_null, (data), _VOID_PTR data)
 {
+    return;
 }
-
-#endif /* #ifdef ENABLE_ICONV */
 

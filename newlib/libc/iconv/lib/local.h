@@ -58,11 +58,11 @@ _EXFUN(_iconv_unload_file, (struct _reent *, _iconv_fd_t *));
 typedef struct {
     _CONST char *key;
     _CONST _VOID_PTR value;
-} iconv_builtin_table;
+} iconv_builtin_table_t;
 
-extern _CONST iconv_builtin_table iconv_builtin_ccs[];
-extern _CONST iconv_builtin_table iconv_builtin_ces[];
-extern _CONST char iconv_builtin_aliases[];
+extern _CONST iconv_builtin_table_t _iconv_builtin_ccs[];
+extern _CONST iconv_builtin_table_t _iconv_builtin_ces[];
+extern _CONST char _iconv_builtin_aliases[];
 
 /* Table-driven coded character set (CCS) definitions. */
 struct iconv_ccs;
@@ -87,8 +87,8 @@ struct iconv_ccs {
 
 /* CCS initialisation function */
 int 
-_EXFUN(iconv_ccs_init, (struct _reent *rptr, struct iconv_ccs *ccs, 
-                        _CONST char *name));
+_EXFUN(_iconv_ccs_init, (struct _reent *rptr, struct iconv_ccs *ccs, 
+                         _CONST char *name));
 
 /* CCS conversion macros */
 #define ICONV_CCS_CONVERT_FROM_UCS(ccs, ch) \
@@ -119,7 +119,7 @@ _EXFUN(iconv_ces_convert_from_ucs_t, (struct iconv_ces *data, ucs_t in,
 typedef ucs_t
 _EXFUN(iconv_ces_convert_to_ucs_t, (struct iconv_ces *data, 
                                     _CONST unsigned char **inbuf,
-                                     size_t *inbytesleft));
+                                    size_t *inbytesleft));
 
 /* CES descriptor structure - CES class data */
 struct iconv_ces_desc {
@@ -132,7 +132,7 @@ struct iconv_ces_desc {
 };
 
 /* explicit CES class for table (CCS) driven charsets */
-extern _CONST struct iconv_ces_desc iconv_ces_table_driven;
+extern _CONST struct iconv_ces_desc _iconv_ces_table_driven;
 
 /* CES structure - CES instance data */
 struct iconv_ces {
@@ -144,7 +144,7 @@ struct iconv_ces {
 
 /* Basic CES functions and macros */
 extern int 
-_EXFUN(iconv_ces_init, (struct _reent *rptr, struct iconv_ces *ces,
+_EXFUN(_iconv_ces_init, (struct _reent *rptr, struct iconv_ces *ces,
                         _CONST char *name));
 
 #define ICONV_CES_CLOSE(rptr, ces) ((ces)->close(rptr, ces))
@@ -161,37 +161,37 @@ _EXFUN(iconv_ces_init_int_t, (struct _reent *rptr, _VOID_PTR* /* void ** */,
 
 /* CES subclass macros (for EUC and ISO-2022) */
 #define ICONV_CES_DRIVER_DECL(name) \
-    iconv_ces_init_int_t iconv_##name##_init; \
-    iconv_ces_close_t iconv_##name##_close; \
-    iconv_ces_reset_t iconv_##name##_reset; \
-    iconv_ces_convert_from_ucs_t iconv_##name##_convert_from_ucs; \
-    iconv_ces_convert_to_ucs_t iconv_##name##_convert_to_ucs; \
+    iconv_ces_init_int_t         _iconv_##name##_init; \
+    iconv_ces_close_t            _iconv_##name##_close; \
+    iconv_ces_reset_t            _iconv_##name##_reset; \
+    iconv_ces_convert_from_ucs_t _iconv_##name##_convert_from_ucs; \
+    iconv_ces_convert_to_ucs_t   _iconv_##name##_convert_to_ucs; \
 
 /* CES functions and macros for stateless encodings */
-iconv_ces_init_t  iconv_ces_init_null;
-iconv_ces_close_t iconv_ces_close_null;
-iconv_ces_reset_t iconv_ces_reset_null;
+iconv_ces_init_t  _iconv_ces_init_null;
+iconv_ces_close_t _iconv_ces_close_null;
+iconv_ces_reset_t _iconv_ces_reset_null;
 
 #define ICONV_CES_STATELESS_MODULE_DECL(name) \
-    _CONST struct iconv_ces_desc iconv_ces_##name = { \
-        iconv_ces_init_null, \
-        iconv_ces_close_null, \
-        iconv_ces_reset_null, \
+    _CONST struct iconv_ces_desc _iconv_ces_module_##name = { \
+        _iconv_ces_init_null, \
+        _iconv_ces_close_null, \
+        _iconv_ces_reset_null, \
         convert_from_ucs, \
         convert_to_ucs, \
         NULL \
     }
 
 /* CES functions and macros for stateful (integer state) encodings */
-iconv_ces_init_t  iconv_ces_init_state;
-iconv_ces_close_t iconv_ces_close_state;
-iconv_ces_reset_t iconv_ces_reset_state;
+iconv_ces_init_t  _iconv_ces_init_state;
+iconv_ces_close_t _iconv_ces_close_state;
+iconv_ces_reset_t _iconv_ces_reset_state;
 
 #define ICONV_CES_STATEFUL_MODULE_DECL(name) \
-    _CONST struct iconv_ces_desc iconv_ces_##name = { \
-        iconv_ces_init_state, \
-        iconv_ces_close_state, \
-        iconv_ces_reset_state, \
+    _CONST struct iconv_ces_desc _iconv_ces_module_##name = { \
+        _iconv_ces_init_state, \
+        _iconv_ces_close_state, \
+        _iconv_ces_reset_state, \
         convert_from_ucs, \
         convert_to_ucs, \
         NULL \
@@ -203,17 +203,17 @@ iconv_ces_reset_t iconv_ces_reset_state;
     module_init(struct _reent *rptr, _VOID_PTR *data, /* void ** */ \
                 _CONST char *cs_name, _CONST _VOID_PTR desc_data) \
     { \
-        return iconv_##type##_init(rptr, data, desc_data, \
-                                   sizeof(ccsattr) / \
-                                   sizeof(iconv_ces_##type##_ccs)); \
+        return _iconv_##type##_init(rptr, data, desc_data, \
+                                    sizeof(ccsattr) / \
+                                    sizeof(iconv_ces_##type##_ccs_t)); \
     } \
     \
-    _CONST struct iconv_ces_desc iconv_ces_##name = { \
+    _CONST struct iconv_ces_desc _iconv_ces_module_##name = { \
         module_init, \
-        iconv_##type##_close, \
-        iconv_##type##_reset, \
-        iconv_##type##_convert_from_ucs, \
-        iconv_##type##_convert_to_ucs, \
+        _iconv_##type##_close, \
+        _iconv_##type##_reset, \
+        _iconv_##type##_convert_from_ucs, \
+        _iconv_##type##_convert_to_ucs, \
         &ccsattr \
     }
 
@@ -222,10 +222,10 @@ typedef struct {
     _CONST char *name;
     _CONST char *prefix;
     size_t      prefixlen;
-} iconv_ces_euc_ccs;
+} iconv_ces_euc_ccs_t;
 
 ICONV_CES_DRIVER_DECL(euc);
-#define iconv_euc_reset iconv_ces_reset_null
+#define _iconv_euc_reset _iconv_ces_reset_null
 
 /* ISO-2022 character encoding schemes and functions. */
 enum {ICONV_SHIFT_SI = 0, ICONV_SHIFT_SO, ICONV_SHIFT_SS2, ICONV_SHIFT_SS3};
@@ -235,7 +235,7 @@ typedef struct {
     _CONST char *designator;
     size_t designatorlen;
     int shift;
-} iconv_ces_iso2022_ccs;
+} iconv_ces_iso2022_ccs_t;
 
 ICONV_CES_DRIVER_DECL(iso2022);
 
@@ -252,24 +252,22 @@ _EXFUN(iconv_close_t, (struct _reent *rptr, _VOID_PTR));
 typedef struct {
     iconv_conv_t *convert;
     iconv_close_t *close;
-}iconv_converter;
-
+}iconv_converter_t;
 
 typedef struct {
     struct iconv_ces from;
     struct iconv_ces to;
     ucs_t  missing;
-} unicode_converter;
-
+} unicode_converter_t;
 
 /* Converter initialisers */
-iconv_converter *
-_EXFUN(iconv_unicode_conv_init, (struct _reent *rptr, _CONST char *to, 
-                                 _CONST char *from));
+iconv_converter_t *
+_EXFUN(_iconv_unicode_conv_init, (struct _reent *rptr, _CONST char *to, 
+                                  _CONST char *from));
 
-iconv_converter *
-_EXFUN(iconv_null_conv_init, (struct _reent *rptr, _CONST char *to,
-                              _CONST char *from));
+iconv_converter_t *
+_EXFUN(_iconv_null_conv_init, (struct _reent *rptr, _CONST char *to,
+                               _CONST char *from));
 
 #endif /* __LOCAL_H__ */
 

@@ -25,9 +25,6 @@
  *
  *    iconv (Charset Conversion Library) v2.0
  */
-#ifdef ENABLE_ICONV
- 
-#include <_ansi.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,15 +33,15 @@
 #include <limits.h>
 #include "local.h"
 
-static iconv_converter *
+static iconv_converter_t *
 _DEFUN(converter_init, (rptr, conv_func, close_func, extra),
                         struct _reent *rptr      _AND
                         iconv_conv_t conv_func   _AND
                         iconv_close_t close_func _AND
                         size_t extra)
 {
-    iconv_converter *res = _malloc_r(rptr, sizeof(iconv_converter) + extra);
-        memset(res, 0, sizeof(iconv_converter) + extra);
+    iconv_converter_t *res = _malloc_r(rptr, sizeof(iconv_converter_t) + extra);
+        memset(res, 0, sizeof(iconv_converter_t) + extra);
     if (res) {
         res->convert = conv_func;
         res->close = close_func;
@@ -58,7 +55,7 @@ _DEFUN(unicode_close, (rptr, data),
                       _VOID_PTR data)
 {
     int res;
-    unicode_converter *uc = (unicode_converter *)data;
+    unicode_converter_t *uc = (unicode_converter_t *)data;
 
     res = ICONV_CES_CLOSE(rptr, &(uc->from));
     res = ICONV_CES_CLOSE(rptr, &(uc->to)) || res;
@@ -75,7 +72,7 @@ _DEFUN(unicode_conv, (rptr, data, inbuf, inbytesleft, outbuf, outbytesleft),
                      size_t *outbytesleft)
 {
         size_t res = 0;
-        unicode_converter *uc = (unicode_converter *)data;
+        unicode_converter_t *uc = (unicode_converter_t *)data;
 
         if (inbuf == NULL || *inbuf == NULL) {
             if (ICONV_CES_CONVERT_FROM_UCS(&(uc->to), UCS_CHAR_NONE,
@@ -130,21 +127,21 @@ _DEFUN(unicode_conv, (rptr, data, inbuf, inbytesleft, outbuf, outbytesleft),
     return res;
 }
 
-iconv_converter *
-_DEFUN(iconv_unicode_conv_init, (rptr, to, from),
-                                struct _reent *rptr _AND
-                                _CONST char *to     _AND
-                                _CONST char *from)
+iconv_converter_t *
+_DEFUN(_iconv_unicode_conv_init, (rptr, to, from),
+                                 struct _reent *rptr _AND
+                                 _CONST char *to     _AND
+                                 _CONST char *from)
 {
-    unicode_converter *uc;
-    iconv_converter *ic = converter_init(rptr, unicode_conv, unicode_close,
-                                         sizeof(unicode_converter));
+    unicode_converter_t *uc;
+    iconv_converter_t *ic = converter_init(rptr, unicode_conv, unicode_close,
+                                         sizeof(unicode_converter_t));
 
     if (ic == NULL)
         return NULL;
-    uc = (unicode_converter *)(ic + 1);
-    if (!iconv_ces_init(rptr, &(uc->from), from)) {
-        if(!iconv_ces_init(rptr, &(uc->to), to))
+    uc = (unicode_converter_t *)(ic + 1);
+    if (!_iconv_ces_init(rptr, &(uc->from), from)) {
+        if(!_iconv_ces_init(rptr, &(uc->to), to))
         {
             uc->missing = '_';
             return ic;
@@ -195,14 +192,12 @@ _DEFUN(null_conv, (rptr, data, inbuf, inbytesleft, outbuf, outbytesleft),
     return 0;
 }
 
-iconv_converter *
-_DEFUN(iconv_null_conv_init, (rptr, to, from),
-                             struct _reent *rptr _AND
-                             _CONST char *to     _AND
-                             _CONST char *from)
+iconv_converter_t *
+_DEFUN(_iconv_null_conv_init, (rptr, to, from),
+                              struct _reent *rptr _AND
+                              _CONST char *to     _AND
+                              _CONST char *from)
 {
     return converter_init(rptr, null_conv, null_close, 0);
 }
-
-#endif /* #ifdef ENABLE_ICONV */
 

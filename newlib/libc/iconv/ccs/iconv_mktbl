@@ -251,19 +251,19 @@ if ($opt_C) {
     $opt_o =~ tr/-/_/;
     $name = $opt_o;
         $name =~ tr/[a-z]/[A-Z]/;
-    print qq/#ifdef ENABLE_ICONV\n/;
-    print qq/#include "..\/lib\/deps.h"\n\n/;
-    print "#ifdef ICONV_CONVERTER_$name\n";
-    print qq/#include "..\/lib\/endian.h"\n\n/;
-    print "_CONST unsigned char iconv_ccs_table_$opt_o" . "[] = {\n";
+    print "#include \"..\/lib\/deps.h\"\n\n";
+    print "#ifdef _ICONV_CONVERTER_$name\n";
+    print "#include \"..\/lib\/endian.h\"\n\n";
+    print "_CONST unsigned char _iconv_ccs_table_$opt_o" . "[] = {\n";
     print "\t3, 'C', 'S', 'C', 'T', ICONV_ORDER, $nbits, $type,\n";
     print &pack_array(2, 'N', [8, 8 + $to_size]);
+    print $to;
+    print $from;
+    print "};\n\n";
+    print "#endif /* #ifdef _ICONV_CONVERTER_$name */\n\n";
 } else {
     print pack("A5CCCNN", "\003CSCT", 0, $nbits, $type, 8, 8 + $to_size);
+    print $to;
+    print $from;
 }
-print $to;
-print $from;
-print "};\n\n";
-print "#endif /* #ifdef ICONV_CONVERTER_$name */\n\n";
-print "#endif /* #ifdef ENABLE_ICONV */\n" if $opt_C;
 

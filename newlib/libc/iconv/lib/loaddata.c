@@ -23,9 +23,6 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#if defined(ENABLE_ICONV)
- 
-#include <_ansi.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -34,7 +31,7 @@
 #include <assert.h>
 #include "local.h"
 
-#ifdef _POSIX_MAPPED_FILES /* Should be defined in unistd.h if mmap()/munmap */
+#ifdef _POSIX_MAPPED_FILES /* Should be defined in unistd.h if mmap/munmap */
 #include <sys/mman.h>      /* are supported */
 #endif
 
@@ -120,6 +117,4 @@ _DEFUN(_iconv_unload_file, (rptr, desc),
     return 0;
 #endif /* #ifdef _POSIX_MAPPED_FILES */
 }
-
-#endif /* #if defined(ENABLE_ICONV) */
 

@@ -123,49 +123,7 @@ AC_SUBST(LIBC_SYS_LIB)
 AC_SUBST(sys_dir)
 
 dnl iconv library will be compiled if --enable-newlib-iconv option is enabled
-if test x${newlib_iconv} != x; then
-    AM_CONDITIONAL(ENABLE_NEWLIB_ICONV, test 1 = 1)
-    NEWLIB_CFLAGS="${NEWLIB_CFLAGS} -DENABLE_ICONV"
-fi;
-
-dnl Parse --enable-newlib-builtin-converters option argument
-if test "x${builtin_converters}" != "x"; then
-  
-  dnl Check that --enable-newlib-iconv was enabled
-  if test x${newlib_iconv} = x; then
-      AC_MSG_ERROR(--enable-newlib-builtin-converters option can't be used if iconv library is disabled - use --enable-newlib-iconv to enable it)
-  fi
-  
-  dnl Normalize converter names and delete commas
-  builtin_converters=`echo "${builtin_converters}" | sed -e 's/,/ /g' -e 's/-/_/g' -e 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/'`
-  
-  dnl Get the list of available converters excluding comments
-  dnl Join line with previous if the first character is whitespace
-  available_converters=`cat "${srcdir}/iconv/charset.aliases" | sed -e '/#/d' | sed -e 'N; s/\n //;'`
-    
-  dnl Check if required converters are supported
-  dnl Convert aliases to "official" names
-  builtin_converters1="${builtin_converters}"
-  builtin_converters=""
-  for converter in ${builtin_converters1}; do
-      result=`echo "${available_converters}" | grep -e "\(^\| \)${converter}\( \|\$\)"`
-      if test $? != "0"; then
-          AC_MSG_ERROR(${converter} is not supported - see ${srcdir}/iconv/charset.aliases file for the list of available converters)
-      fi
-      converter1=`echo "${result}" | sed -e 's/\(^[[^ ]]*\).*$/\1/'`
-      builtin_converters="${builtin_converters} ${converter1}"
-  done
-
-  dnl Define appropriate -D options
-  for converter in ${builtin_converters}; do
-      opt=ICONV_CONVERTER_`echo "${converter}" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
-      NEWLIB_ICONV_CFLAGS="${NEWLIB_ICONV_CFLAGS} -D${opt}"
-  done
-
-else
-    NEWLIB_ICONV_CFLAGS=
-fi;
-AC_SUBST(NEWLIB_ICONV_CFLAGS)
+AM_CONDITIONAL(ENABLE_NEWLIB_ICONV, test x${newlib_iconv} != x)
 
 if test -n "${machine_dir}"; then
   if test "${use_libtool}" = "yes"; then

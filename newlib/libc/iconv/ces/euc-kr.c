@@ -25,22 +25,17 @@
  *
  *    iconv (Charset Conversion Library) v2.0
  */
-#ifdef ENABLE_ICONV
- 
 #include "../lib/deps.h"
 
-#ifdef ICONV_CONVERTER_EUC_KR
-
+#ifdef _ICONV_CONVERTER_EUC_KR
 #include "../lib/local.h"
 
-static _CONST iconv_ces_euc_ccs ccsattr[] = {
+static _CONST iconv_ces_euc_ccs_t ccsattr[] = {
     {"us_ascii", "", 0},
     {"ksx1001", "", 0}
 };
 
 ICONV_CES_MODULE_DECL(euc, euc_kr);
 
-#endif /* #ifdef ICONV_CONVERTER_EUC_KR */
-
-#endif /* #ifdef ENABLE_ICONV */
+#endif /* #ifdef _ICONV_CONVERTER_EUC_KR */
 

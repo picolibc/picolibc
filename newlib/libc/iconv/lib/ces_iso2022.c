@@ -25,9 +25,6 @@
  *
  *    iconv (Charset Conversion Library) v2.0
  */
-#ifdef ENABLE_ICONV
- 
-#include <_ansi.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -37,18 +34,18 @@ typedef struct {
     _CONST char *sequence;
     size_t      length;
     int         prefix_type;
-} iconv_ces_iso2022_shift;
+} iconv_ces_iso2022_shift_t;
 
 enum { ICONV_PREFIX_STATE = 0, ICONV_PREFIX_LINE, ICONV_PREFIX_CHAR };
 
-static _CONST iconv_ces_iso2022_shift iso_shift[] = {
+static _CONST iconv_ces_iso2022_shift_t iso_shift[] = {
     { "\x0f",  1, ICONV_PREFIX_STATE },
     { "\x0e",  1, ICONV_PREFIX_LINE },
     { "\x1bN", 2, ICONV_PREFIX_CHAR },
     { "\x1bO", 2, ICONV_PREFIX_CHAR }
 };
 
-#define shift_num (sizeof(iso_shift) / sizeof(iconv_ces_iso2022_shift))
+#define shift_num (sizeof(iso_shift) / sizeof(iconv_ces_iso2022_shift_t))
 
 typedef struct {
     int     nccs;
@@ -57,28 +54,28 @@ typedef struct {
     int     shift_tab[shift_num];
     char    prefix_cache[128];
     struct  iconv_ccs ccs[1];
-} iconv_ces_iso2022_state;
+} iconv_ces_iso2022_state_t;
 
 int
-_DEFUN(iconv_iso2022_init, (rptr, data, desc_data, num),
-                           struct _reent *rptr        _AND
-                           _VOID_PTR *data            _AND
-                           _CONST _VOID_PTR desc_data _AND
-                           size_t num)
+_DEFUN(_iconv_iso2022_init, (rptr, data, desc_data, num),
+                            struct _reent *rptr        _AND
+                            _VOID_PTR *data            _AND
+                            _CONST _VOID_PTR desc_data _AND
+                            size_t num)
 {
-    size_t stsz = sizeof(iconv_ces_iso2022_state) +
+    size_t stsz = sizeof(iconv_ces_iso2022_state_t) +
                   sizeof(struct iconv_ccs) * (num - 1);
     int i;
-    iconv_ces_iso2022_state *state
-        = (iconv_ces_iso2022_state *)_malloc_r(rptr, stsz);
+    iconv_ces_iso2022_state_t *state
+        = (iconv_ces_iso2022_state_t *)_malloc_r(rptr, stsz);
 
     if (state == NULL)
         return __errno_r(rptr);
     bzero(state->prefix_cache, sizeof(state->prefix_cache));
     for (i = 0; i < num; i++) {
-        _CONST iconv_ces_iso2022_ccs *ccsattr = 
-                         &(((_CONST iconv_ces_iso2022_ccs *)desc_data)[i]);
-        int res = iconv_ccs_init(rptr, &(state->ccs[i]), ccsattr->name);
+        _CONST iconv_ces_iso2022_ccs_t *ccsattr = 
+                         &(((_CONST iconv_ces_iso2022_ccs_t *)desc_data)[i]);
+        int res = _iconv_ccs_init(rptr, &(state->ccs[i]), ccsattr->name);
         if (res) {
             while (--i >= 0)
                 state->ccs[i].close(rptr, &(state->ccs[i]));
@@ -92,14 +89,14 @@ _DEFUN(iconv_iso2022_init, (rptr, data, desc_data, num),
     }
     state->nccs = num;
     iconv_iso2022_reset(state);
-    (iconv_ces_iso2022_state *)*data = state;
+    (iconv_ces_iso2022_state_t *)*data = state;
     return 0;
 }
 
-#define state ((iconv_ces_iso2022_state *)data)
+#define state ((iconv_ces_iso2022_state_t *)data)
 
 int
-_DEFUN(iconv_iso2022_close, (rptr, data),
+_DEFUN(_iconv_iso2022_close, (rptr, data),
                              struct _reent *rptr _AND
                              _VOID_PTR data)
 {
@@ -112,7 +109,7 @@ _DEFUN(iconv_iso2022_close, (rptr, data),
 }
 
 _VOID
-_DEFUN(iconv_iso2022_reset, (data), _VOID_PTR data)
+_DEFUN(_iconv_iso2022_reset, (data), _VOID_PTR data)
 {
     size_t i;
 
@@ -125,8 +122,8 @@ _DEFUN(iconv_iso2022_reset, (data), _VOID_PTR data)
 
 #undef state
 
-#define CES_STATE(ces)     ((iconv_ces_iso2022_state *)((ces)->data))
-#define CES_CCSATTR(ces)   ((_CONST iconv_ces_iso2022_ccs *) \
+#define CES_STATE(ces)     ((iconv_ces_iso2022_state_t *)((ces)->data))
+#define CES_CCSATTR(ces)   ((_CONST iconv_ces_iso2022_ccs_t *) \
                            (((struct iconv_ces_desc *)((ces)->desc))->data))
 
 static _VOID 
@@ -134,7 +131,7 @@ _DEFUN(update_shift_state, (ces, ch),
                            _CONST struct iconv_ces *ces _AND
                            ucs_t ch)
 {
-    iconv_ces_iso2022_state *iso_state = CES_STATE(ces);
+    iconv_ces_iso2022_state_t *iso_state = CES_STATE(ces);
     size_t i;
 
     if (ch == '\n' && iso_state->previous_char == '\r') {
@@ -156,8 +153,8 @@ _DEFUN(cvt_ucs2iso, (ces, in, outbuf, outbytesleft, cs),
                     size_t *outbytesleft         _AND
                     int cs)
 {
-    iconv_ces_iso2022_state *iso_state = CES_STATE(ces);
-    _CONST iconv_ces_iso2022_ccs *ccsattr;
+    iconv_ces_iso2022_state_t *iso_state = CES_STATE(ces);
+    _CONST iconv_ces_iso2022_ccs_t *ccsattr;
     _CONST struct iconv_ccs *ccs;
     ucs_t res;
     size_t len = 0;
@@ -210,13 +207,13 @@ _DEFUN(cvt_ucs2iso, (ces, in, outbuf, outbytesleft, cs),
 }
 
 ssize_t
-_DEFUN(iconv_iso2022_convert_from_ucs, (ces, in, outbuf, outbytesleft),
-                                       struct iconv_ces *ces  _AND
-                                       ucs_t in               _AND
-                                       unsigned char **outbuf _AND
-                                       size_t *outbytesleft)
+_DEFUN(_iconv_iso2022_convert_from_ucs, (ces, in, outbuf, outbytesleft),
+                                        struct iconv_ces *ces  _AND
+                                        ucs_t in               _AND
+                                        unsigned char **outbuf _AND
+                                        size_t *outbytesleft)
 {
-    iconv_ces_iso2022_state *iso_state = CES_STATE(ces);
+    iconv_ces_iso2022_state_t *iso_state = CES_STATE(ces);
     ssize_t res;
     int cs, i;
 
@@ -262,13 +259,13 @@ _DEFUN(cvt_iso2ucs, (ccs, inbuf, inbytesleft, prefix_type),
 }
 
 ucs_t
-_DEFUN(iconv_iso2022_convert_to_ucs, (ces, inbuf, inbytesleft),
-                                     struct iconv_ces *ces        _AND
-                                     _CONST unsigned char **inbuf _AND
-                                     size_t *inbytesleft)
+_DEFUN(_iconv_iso2022_convert_to_ucs, (ces, inbuf, inbytesleft),
+                                      struct iconv_ces *ces        _AND
+                                      _CONST unsigned char **inbuf _AND
+                                      size_t *inbytesleft)
 {
-    iconv_ces_iso2022_state *iso_state = CES_STATE(ces);
-    _CONST iconv_ces_iso2022_ccs *ccsattr;
+    iconv_ces_iso2022_state_t *iso_state = CES_STATE(ces);
+    _CONST iconv_ces_iso2022_ccs_t *ccsattr;
     ucs_t res;
     _CONST unsigned char *ptr = *inbuf;
     unsigned char byte;
@@ -327,6 +324,4 @@ _DEFUN(iconv_iso2022_convert_to_ucs, (ces, inbuf, inbytesleft),
     }
     return res;
 }
-
-#endif /* #ifdef ENABLE_ICONV */
 

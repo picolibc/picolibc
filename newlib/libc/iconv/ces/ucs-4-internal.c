@@ -25,13 +25,9 @@
  *
  *    iconv (Charset Conversion Library) v2.0
  */
-#ifdef ENABLE_ICONV
- 
 #include "../lib/deps.h"
 
-#ifdef ICONV_CONVERTER_UCS_4_INTERNAL
-
-#include <_ansi.h>
+#ifdef _ICONV_CONVERTER_UCS_4_INTERNAL
 #include "../lib/local.h"
 
 static ssize_t
@@ -64,7 +60,5 @@ _DEFUN(convert_to_ucs, (ces, inbuf, inbytesleft),
 
 ICONV_CES_STATELESS_MODULE_DECL(ucs_4_internal);
 
-#endif /* #ifdef ICONV_CONVERTER_UCS_4_INTERNAL */
-
-#endif /* #ifdef ENABLE_ICONV */
+#endif /* #ifdef _ICONV_CONVERTER_UCS_4_INTERNAL */
 
