@@ -27,7 +27,7 @@ extern DWORD __sigfirst, __siglast;
 };
 
 static BOOL WINAPI ctrl_c_handler (DWORD);
-static void really_exit (int);
+static void signal_exit (int);
 static char windows_system_directory[1024];
 static size_t windows_system_directory_length;
 
@@ -518,7 +518,7 @@ handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
 	  stackdump (e, &c);
 	}
       try_to_debug ();
-      really_exit (EXIT_SIGNAL | sig);
+      signal_exit (0x80 | sig);		// Flag signal + core dump
     }
 
   sig_send (NULL, sig, (DWORD) ebp);		// Signal myself
@@ -869,17 +869,6 @@ extern "C" {
 static void
 sig_handle_tty_stop (int sig)
 {
-#if 0
-  HANDLE waitbuf[2];
-
-  /* Be sure that process's main thread isn't an owner of vital
-     mutex to prevent cygwin subsystem lockups */
-  waitbuf[0] = pinfo_mutex;
-  waitbuf[1] = title_mutex;
-  WaitForMultipleObjects (2, waitbuf, TRUE, INFINITE);
-  ReleaseMutex (pinfo_mutex);
-  ReleaseMutex (title_mutex);
-#endif
   myself->stopsig = sig;
   myself->process_state |= PID_STOPPED;
   /* See if we have a living parent.  If so, send it a special signal.
@@ -993,7 +982,7 @@ exit_sig:
       GetThreadContext (hMainThread, &c);
       stackdump (NULL, &c);
       try_to_debug ();
-      really_exit (EXIT_SIGNAL | sig);
+      sig |= 0x80;
     }
   sigproc_printf ("signal %d, about to call do_exit", sig);
   TerminateThread (hMainThread, 0);
@@ -1001,20 +990,20 @@ exit_sig:
      use a resource lock when exiting.  */
   user_data->resourcelocks->Delete ();
   user_data->resourcelocks->Init ();
-  do_exit (EXIT_SIGNAL | (sig << 8));
+  signal_exit (sig);
   /* Never returns */
 }
 
 /* Cover function to `do_exit' to handle exiting even in presence of more
-   exceptions.  We use to call exit, but a SIGSEGV shouldn't cause atexit
+   exceptions.  We used to call exit, but a SIGSEGV shouldn't cause atexit
    routines to run.  */
-
 static void
-really_exit (int rc)
+signal_exit (int rc)
 {
   /* If the exception handler gets a trap, we could recurse awhile.
      If this is non-zero, skip the cleaning up and exit NOW.  */
 
+  rc = EXIT_SIGNAL | (rc << 8);
   if (exit_already++)
     {
       /* We are going down - reset our process_state without locking. */

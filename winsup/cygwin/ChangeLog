@@ -1,3 +1,11 @@
+Wed Jul 26 16:05:04 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (signal_exit): Renamed from "really+exit".  Always sets
+	EXIT_SIGNAL bit and reorganizes exit value for backwards cygwin
+	handling.
+	(handle_exceptions): Call signal_exit.  Set "core dumped" bit.
+	(sig_handle): Call signal_exit.  Set "core dumped" bit appropriately.
+
 Wed Jul 26 20:44:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* environ.cc (posify): Revert previous patch.
