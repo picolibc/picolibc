@@ -22,6 +22,7 @@ class cygthread
   static bool exiting;
   static DWORD WINAPI stub (VOID *);
   static DWORD WINAPI simplestub (VOID *);
+  void terminate_thread ();
  public:
   static const char * name (DWORD = 0);
   cygthread (LPTHREAD_START_ROUTINE, LPVOID, const char *);
@@ -33,7 +34,6 @@ class cygthread
   void * operator new (size_t);
   static cygthread *freerange ();
   void exit_thread ();
-  void terminate_thread ();
   static void terminate ();
   bool SetThreadPriority (int nPriority) {return ::SetThreadPriority (h, nPriority);}
   void zap_h ()

@@ -1,6 +1,6 @@
 /* sys/param.h
 
-   Copyright 2001 Red Hat, Inc.
+   Copyright 2001, 2003 Red Hat, Inc.
 
    This software is a copyrighted work licensed under the terms of the
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -32,6 +32,11 @@
 /* This is defined to be the same as MAX_PATH which is used internally.
    The Posix version is PATH_MAX.  */
 #define MAXPATHLEN      (260 - 1 /*NUL*/)
+
+/* This is the number of bytes per block given in the st_blocks stat member.
+   It should be in sync with S_BLKSIZE in sys/stat.h.  S_BLKSIZE is the
+   BSD variant of this constant. */
+#define DEV_BSIZE	1024
 
 /* Some autoconf'd packages check for endianness.  When cross-building we
    can't run programs on the target.  Fortunately, autoconf supports the

@@ -28,7 +28,8 @@ enum
 				   not yet implemented */
   MOUNT_NOTEXEC =	0x100,	/* don't check files for executable magic */
   MOUNT_DEVFS =		0x200,	/* /device "filesystem" */
-  MOUNT_PROC =		0x400	/* /proc "filesystem" */
+  MOUNT_PROC =		0x400,	/* /proc "filesystem" */
+  MOUNT_ENC =		0x800	/* encode special characters */
 };
 
 int mount (const char *, const char *, unsigned __flags);

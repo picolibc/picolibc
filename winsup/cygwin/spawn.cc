@@ -800,9 +800,9 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	      reset_signal_arrived ();
 	      continue;
 	    case WAIT_OBJECT_0 + 2:
-	      if (myself->ppid_handle)
+	      if (my_parent_is_alive ())
 		res |= EXIT_REPARENTING;
-	      if (!my_parent_is_alive ())
+	      else if (!myself->ppid_handle)
 		{
 		  nwait = 2;
 		  sigproc_terminate ();

@@ -32,6 +32,8 @@
 #include "cygheap.h"
 #include "sigproc.h"
 #include "wsock_event.h"
+#include "cygthread.h"
+#include "select.h"
 #include <unistd.h>
 
 extern bool fdsock (cygheap_fdmanip& fd, const device *, SOCKET soc);
@@ -116,73 +118,6 @@ get_inet_addr (const struct sockaddr *in, int inlen,
       return 0;
     }
 }
-
-class sock_event
-{
-  WSAEVENT ev[2];
-  SOCKET evt_sock;
-  int evt_type_bit;
-
-public:
-  sock_event ()
-    {
-      ev[0] = WSA_INVALID_EVENT;
-      ev[1] = signal_arrived;
-    }
-  bool load (SOCKET sock, int type_bit)
-    {
-      if ((ev[0] = WSACreateEvent ()) == WSA_INVALID_EVENT)
-	return false;
-      evt_sock = sock;
-      evt_type_bit = type_bit;
-      if (WSAEventSelect (evt_sock, ev[0], 1 << evt_type_bit))
-	{
-	  WSACloseEvent (ev[0]);
-	  ev[0] = WSA_INVALID_EVENT;
-	  return false;
-	}
-      return true;
-    }
-  int wait ()
-    {
-      WSANETWORKEVENTS sock_event;
-      int wait_result = WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE,
-						  FALSE);
-      if (wait_result == WSA_WAIT_EVENT_0)
-	WSAEnumNetworkEvents (evt_sock, ev[0], &sock_event);
-
-      /* Cleanup,  Revert to blocking. */
-      WSAEventSelect (evt_sock, ev[0], 0);
-      WSACloseEvent (ev[0]);
-      unsigned long nonblocking = 0;
-      ioctlsocket (evt_sock, FIONBIO, &nonblocking);
-
-      switch (wait_result)
-	{
-	  case WSA_WAIT_EVENT_0:
-	    if ((sock_event.lNetworkEvents & (1 << evt_type_bit))
-		&& sock_event.iErrorCode[evt_type_bit])
-	      {
-		WSASetLastError (sock_event.iErrorCode[evt_type_bit]);
-		set_winsock_errno ();
-		return -1;
-	      }
-	    break;
-
-	  case WSA_WAIT_EVENT_0 + 1:
-	    debug_printf ("signal received");
-	    set_errno (EINTR);
-	    return 1;
-
-	  case WSA_WAIT_FAILED:
-	  default:
-	    WSASetLastError (WSAEFAULT);
-	    set_winsock_errno ();
-	    return -1;
-	}
-      return 0;
-    }
-};
 
 /**********************************************************************/
 /* fhandler_socket */
@@ -390,38 +325,47 @@ fhandler_socket::dup (fhandler_base *child)
   debug_printf ("here");
   fhandler_socket *fhs = (fhandler_socket *) child;
   fhs->addr_family = addr_family;
-  fhs->set_io_handle (get_io_handle ());
   if (get_addr_family () == AF_LOCAL)
     fhs->set_sun_path (get_sun_path ());
   fhs->set_socket_type (get_socket_type ());
 
-  /* Using WinSock2 methods for dup'ing sockets seem to collide
-     with user context switches under... some... conditions.  So we
-     drop this for NT systems at all and return to the good ol'
-     DuplicateHandle way of life.  This worked fine all the time on
-     NT anyway and it's even a bit faster. */
-  if (!wincap.has_security ())
+  if (winsock2_active)
     {
+      /* Since WSADuplicateSocket() fails on NT systems when the process
+	 is currently impersonating a non-privileged account, we revert
+	 to the original account before calling WSADuplicateSocket() and
+	 switch back afterwards as it's also in fork().
+	 If WSADuplicateSocket() still fails for some reason, we fall back
+	 to DuplicateHandle(). */
+      WSASetLastError (0);
+      if (cygheap->user.issetuid ())
+	RevertToSelf ();
+      fhs->set_io_handle (get_io_handle ());
       fhs->fixup_before_fork_exec (GetCurrentProcessId ());
-      if (winsock2_active)
+      if (cygheap->user.issetuid ())
+	ImpersonateLoggedOnUser (cygheap->user.token);
+      if (!WSAGetLastError ())
 	{
 	  fhs->fixup_after_fork (hMainProc);
-	  return get_io_handle () == (HANDLE) INVALID_SOCKET;
+	  if (fhs->get_io_handle() != (HANDLE) INVALID_SOCKET)
+	    return 0;
 	}
+      debug_printf ("WSADuplicateSocket failed, trying DuplicateHandle");
     }
+
   /* We don't call fhandler_base::dup here since that requires to
      have winsock called from fhandler_base and it creates only
      inheritable sockets which is wrong for winsock2. */
+
   HANDLE nh;
   if (!DuplicateHandle (hMainProc, get_io_handle (), hMainProc, &nh, 0,
 			!winsock2_active, DUPLICATE_SAME_ACCESS))
     {
-      system_printf ("dup(%s) failed, handle %x, %E",
-		     get_name (), get_io_handle ());
+      system_printf ("!DuplicateHandle(%x) failed, %E", get_io_handle ());
       __seterrno ();
       return -1;
     }
-  child->set_io_handle (nh);
+  fhs->set_io_handle (nh);
   return 0;
 }
 
@@ -543,8 +487,6 @@ out:
 int
 fhandler_socket::connect (const struct sockaddr *name, int namelen)
 {
-  sock_event evt;
-  BOOL interrupted = FALSE;
   int res = -1;
   BOOL secret_check_failed = FALSE;
   BOOL in_progress = FALSE;
@@ -554,30 +496,7 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
   if (!get_inet_addr (name, namelen, &sin, &namelen, secret))
     return -1;
 
-  if (winsock2_active && !is_nonblocking () && !is_connect_pending ())
-    if (!evt.load (get_socket (), FD_CONNECT_BIT))
-      {
-	set_winsock_errno ();
-	return -1;
-      }
-
   res = ::connect (get_socket (), (sockaddr *) &sin, namelen);
-
-  if (winsock2_active && res && !is_nonblocking () && !is_connect_pending () &&
-      WSAGetLastError () == WSAEWOULDBLOCK)
-    switch (evt.wait ())
-      {
-	case 1: /* Signal */
-	  WSASetLastError (WSAEINPROGRESS);
-	  interrupted = TRUE;
-	  break;
-	case 0:
-	  res = 0;
-	  break;
-	default:
-	  res = -1;
-	  break;
-      }
 
   if (res)
     {
@@ -632,9 +551,6 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
   else
     set_connect_state (CONNECTED);
 
-  if (interrupted)
-    set_errno (EINTR);
-
   return res;
 }
 
@@ -673,25 +589,6 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
    */
   if (len && ((unsigned) *len < sizeof (struct sockaddr_in)))
     *len = sizeof (struct sockaddr_in);
-
-  if (winsock2_active && !is_nonblocking ())
-    {
-      sock_event evt;
-      if (!evt.load (get_socket (), FD_ACCEPT_BIT))
-	{
-	  set_winsock_errno ();
-	  return -1;
-	}
-      switch (evt.wait ())
-	{
-	  case 1: /* Signal */
-	    return -1;
-	  case 0:
-	    break;
-	  case -1:
-	    return -1;
-	}
-    }
 
   res = ::accept (get_socket (), peer, len);
 

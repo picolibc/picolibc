@@ -800,22 +800,34 @@ out:
       if (!fs.update (path))
 	{
 	  fs.root_dir ()[0] = '\0';
-	  set_has_acls (false);
-	  set_has_buggy_open (false);
+	  set_has_acls (false);		// already implied but...
+	  set_has_buggy_open (false);	// ditto
 	}
       else
 	{
 	  set_isdisk ();
 	  debug_printf ("root_dir(%s), this->path(%s), set_has_acls(%d)",
 			fs.root_dir (), this->path, fs.flags () & FS_PERSISTENT_ACLS);
-	  if (!allow_smbntsec && fs.is_remote_drive ())
+	  if (!(fs.flags () & FS_PERSISTENT_ACLS) || (!allow_smbntsec && fs.is_remote_drive ()))
 	    set_has_acls (false);
 	  else
-	    set_has_acls (fs.flags () & FS_PERSISTENT_ACLS);
+	    {
+	      set_has_acls (true);
+	      if (allow_ntsec && wincap.has_security ())
+		set_exec (0);  /* We really don't know if this is executable or not here
+				  but set it to not executable since it will be figured out
+				  later by anything which cares about this. */
+	    }
 	  /* Known file systems with buggy open calls. Further explanation
 	     in fhandler.cc (fhandler_disk_file::open). */
 	  set_has_buggy_open (strcmp (fs.name (), "SUNWNFS") == 0);
 	}
+      if (exec_state () != dont_know_if_executable)
+	/* ok */;
+      else if (isdir ())
+	set_exec (1);
+      else if (issymlink () || issocket ())
+	set_exec (0);
     }
 
 #if 0
@@ -1139,6 +1151,41 @@ set_flags (unsigned *flags, unsigned val)
     }
 }
 
+void
+mount_item::fnmunge (char *dst, const char *src)
+{
+  strcpy (dst, src);
+  backslashify (dst, dst, 0);
+}
+
+void
+mount_item::build_win32 (char *dst, const char *src, unsigned *outflags, unsigned chroot_pathlen)
+{
+  int n;
+  const char *real_native_path;
+  int real_posix_pathlen;
+  set_flags (outflags, (unsigned) flags);
+  if (!cygheap->root.exists () || posix_pathlen != 1 || posix_path[0] != '/')
+    {
+      n = native_pathlen;
+      real_native_path = native_path;
+      real_posix_pathlen = chroot_pathlen ?: posix_pathlen;
+    }
+  else
+    {
+      n = cygheap->root.native_length ();
+      real_native_path = cygheap->root.native_path ();
+      real_posix_pathlen = posix_pathlen;
+    }
+  memcpy (dst, real_native_path, n + 1);
+  const char *p = src + real_posix_pathlen;
+  if (*p == '/')
+    /* nothing */;
+  else if ((isdrive (dst) && !dst[2]) || *p)
+    dst[n++] = '\\';
+  fnmunge (dst + n, p);
+}
+
 /* conv_to_win32_path: Ensure src_path is a pure Win32 path and store
    the result in win32_path.
 
@@ -1156,6 +1203,7 @@ int
 mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
 				unsigned *flags, bool no_normalize)
 {
+  bool chroot_ok = !cygheap->root.exists ();
   while (sys_mount_table_counter < cygwin_shared->sys_mount_table_counter)
     {
       init ();
@@ -1164,7 +1212,6 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
   int src_path_len = strlen (src_path);
   MALLOC_CHECK;
   unsigned dummy_flags;
-  int chroot_ok = !cygheap->root.exists ();
 
   dev.devn = FH_FS;
 
@@ -1272,8 +1319,8 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
 	return ENOENT;
     }
 
-  int chrooted_path_len;
-  chrooted_path_len = 0;
+  int chroot_pathlen;
+  chroot_pathlen = 0;
   /* Check the mount table for prefix matches. */
   for (i = 0; i < nmounts; i++)
     {
@@ -1290,11 +1337,11 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
       else if (cygheap->root.posix_ok (mi->posix_path))
 	{
 	  path = cygheap->root.unchroot (mi->posix_path);
-	  chrooted_path_len = len = strlen (path);
+	  chroot_pathlen = len = strlen (path);
 	}
       else
 	{
-	  chrooted_path_len = 0;
+	  chroot_pathlen = 0;
 	  continue;
 	}
 
@@ -1306,36 +1353,12 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
     {
       backslashify (pathbuf, dst, 0);	/* just convert */
       set_flags (flags, PATH_BINARY);
+      chroot_ok = !cygheap->root.exists ();
     }
   else
     {
-      int n;
-      const char *native_path;
-      int posix_pathlen;
-      if (chroot_ok || chrooted_path_len || mi->posix_pathlen != 1
-	  || mi->posix_path[0] != '/')
-	{
-	  n = mi->native_pathlen;
-	  native_path = mi->native_path;
-	  posix_pathlen = chrooted_path_len ?: mi->posix_pathlen;
-	  chroot_ok = 1;
-	}
-      else
-	{
-	  n = cygheap->root.native_length ();
-	  native_path = cygheap->root.native_path ();
-	  posix_pathlen = mi->posix_pathlen;
-	  chroot_ok = 1;
-	}
-      memcpy (dst, native_path, n + 1);
-      const char *p = pathbuf + posix_pathlen;
-      if (*p == '/')
-	/* nothing */;
-      else if ((isdrive (dst) && !dst[2]) || *p)
-	dst[n++] = '\\';
-      strcpy (dst + n, p);
-      backslashify (dst, dst, 0);
-      set_flags (flags, (unsigned) mi->flags);
+      mi->build_win32 (dst, pathbuf, flags, chroot_pathlen);
+      chroot_ok = true;
     }
 
   if (!isvirtual_dev (dev.devn))
@@ -3354,7 +3377,7 @@ conv_path_list_buf_size (const char *path_list, bool to_posix)
   /* 100: slop */
   size = strlen (path_list)
     + (num_elms * max_mount_path_len)
-    + (nrel * strlen (to_posix ? pc.get_win32 () : pc.normalized_path))
+    + (nrel * strlen (to_posix ? pc.normalized_path : pc.get_win32 ()))
     + 100;
   return size;
 }

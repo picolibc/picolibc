@@ -84,7 +84,7 @@ fn=`basename $incfile`
 # if it exists, will contain the name of the sticky tag associated with
 # the current build.  Save that for output later.
 #
-cvs_tag="`sed 's%^.\(.*\)%\1%' $dir/CVS/Tag 2>/dev/null`"
+cvs_tag="`sed -e '/dontuse/d' -e 's%^.\(.*\)%\1%' $dir/CVS/Tag 2>/dev/null`"
 
 wv_cvs_tag="$cvs_tag"
 [ -n "$cvs_tag" ] && cvs_tag=" CVS tag"'

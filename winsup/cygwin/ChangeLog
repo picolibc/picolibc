@@ -1,3 +1,144 @@
+2003-06-05  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::terminate_thread): Change system_printf to
+	debug_printf.
+
+2003-06-04  Christopher Faylor  <cgf@redhat.com>
+
+	* shared.cc (shared_info::heap_chunk_size): Be really defensive about
+	making sure that heap_chunk is set.
+
+2003-06-04  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (conv_path_list): Use correct value when calculating length
+	to avoid a potential SEGV.
+
+2003-06-03  Pierre Humblet  <pierre.humblet@ieee.org>
+
+        * fhandler_disk_file.cc (fhandler_disk_file::fstat): Mark the pc
+        as non-executable if the file cannot be opened for read. Retry query
+        open only if errno is EACCES. Never change the mode, even if it is 000
+        when query open() fails.
+
+2003-06-03  Christopher Faylor  <cgf@redhat.com>
+
+	* configure.in: Allow any i?86 variant.
+	* configure: Regenerate.
+
+2003-06-03  Corinna Vinschen  <corinna@vinschen.de>
+	    Thomas Pfaff <tpfaff@gmx.net>
+
+	* fhandler_socket.cc (connect_thread): Remove.
+	(accept_thread): Remove.
+	(fhandler_socket::connect): Remove all special blocking handling.
+	(fhandler_socket::accept): Ditto.
+	* net.cc (cygwin_connect): Make blocking sockets temporarily
+	non-blocking and call cygwin_select on them to be interruptible.
+	(cygwin_accept):  Ditto.
+
+2003-06-02  Christopher Faylor  <cgf@redhat.com>
+
+	* spawn.cc (spawn_guts): Don't hang around if the parent doesn't exist.
+
+2003-06-02  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.h (cygthread::terminate_thread): Mark private.
+	* cygthread.cc (cygthread::terminate_thread): Deallocate free_range
+	thread stuff.
+
+2003-06-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::accept): Rename `signalled'
+	to `interrupted' as used in fhandler_socket::connect.
+
+2003-06-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::connect): Simplify previous
+	patch.
+	(fhandler_socket::accept): Ditto.
+
+2003-06-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc: Include cygthread.h.
+	(class sock_event): Remove.
+	(thread_connect): New function.
+	(thread_accept): Ditto.
+	(fhandler_socket::connect): Use cygthread instead of socket event
+	handling for blocking sockets.
+	(fhandler_socket::accept): Ditto.
+
+2003-06-02  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.cc (fhandler_base::write): Correct minor printf formatting
+	style glitch.
+
+2003-06-01  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_by_name): Assume
+	an existing directory is a root if FindFirstFile fails.
+
+2003-05-30  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (mount_info::conv_to_win32_path): gcc warning about chroot_ok
+	was actually valid.  Fix it.
+
+2003-05-30  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (init_cheap): Temporarily remove inline that newer gcc's
+	have problems with.
+
+	* path.cc (path_conv::check): Rework has_acls logic slightly.  Uncouple
+	exec tests away from filesystem tests.
+
+2003-05-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/sys/param.h: Add DEV_BSIZE.
+
+2003-05-29  Pierre Humblet  <pierre.humblet@ieee.org>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::dup): Rearrange.  Fix
+	conditional.
+
+2003-05-28  Christopher Faylor  <cgf@redhat.com>
+
+	* mkvers.sh: Avoid "-dontuse" tags.
+
+	* path.cc (path_conv::check): Set exec state based on known situations.
+
+	* path.cc (mount_item::fnmunge): New function.
+	(mount_item::build_win32): New function.
+	(mount_info::conv_to_win32_path): Use build_win32 to build windows
+	path.
+	* path.h (mount_item::fnmunge): Declare new function.
+	(mount_item::build_win32): Ditto.
+	* sys/mount.h (MOUNT_ENC): Define.
+
+2003-05-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::dup): If running impersonated,
+	revert to original account before calling fixup_before_fork_exec
+	and impersonate again afterwards.  Change comment accordingly.
+	Clean up error handling and debug output.
+
+2003-05-27  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* fhandler_socket.cc (sock_event::~sock_event): New method.
+	(sock_event::load): Change to void. Check if winsock2 is available.
+	(socke_event::wait): Return 0 if interruptible mode is not available.
+	(fhandler_socket::connect): Remove checks for winsock2 availability.
+	(fhandler_socket::accept): Ditto.
+
+2003-05-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::dup): First try duplicating
+	using WSADuplicateSocket/WSASocket, if that fails, try DuplicateHandle.
+
+2003-05-27  Bill C. Riemers  <cygwin@docbill.net>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): Filter
+	permissions throug umask on FAT or if ntsec is off.
+
 2003-05-26  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* syscalls.cc (statfs): Call GetDiskFreeSpaceEx before GetDiskFreeSpace.
