@@ -1,3 +1,9 @@
+2002-05-22  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* security.cc (create_token): Call __sec_user() instead of
+	sec_user() to remove dependence on allow_ntsec. Verify that
+	the returned sd is non-null.
+
 2002-05-25  Robert Collins   <rbtcollins@hotmail.com>
 
 	* gmon.c (fake_sbrk): Correctly return -1 on failed malloc's.
