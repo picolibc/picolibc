@@ -1958,6 +1958,9 @@ extern "C" {
 #define WA_CLICKACTIVE 2
 #define ICON_SMALL 0
 #define ICON_BIG 1
+#if _WIN32_WINNT >= 0x0501
+#define ICON_SMALL2 2
+#endif
 #define HBMMENU_CALLBACK ((HBITMAP) -1)
 #define HBMMENU_SYSTEM ((HBITMAP)1)
 #define HBMMENU_MBAR_RESTORE ((HBITMAP)2)

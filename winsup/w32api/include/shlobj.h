@@ -492,8 +492,8 @@ DECLARE_INTERFACE_(IShellPropSheetExt, IUnknown)
 typedef IShellPropSheetExt *LPSHELLPROPSHEETEXT;
 
 #undef INTERFACE
-#define INTERFACE IExtractIcon
-DECLARE_INTERFACE_(IExtractIcon, IUnknown)  /* exic */
+#define INTERFACE IExtractIconA
+DECLARE_INTERFACE_(IExtractIconA, IUnknown)
 {
 	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
 	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
@@ -501,7 +501,27 @@ DECLARE_INTERFACE_(IExtractIcon, IUnknown)  /* exic */
 	STDMETHOD(GetIconLocation)(THIS_ UINT,LPSTR,UINT,int*,PUINT) PURE;
 	STDMETHOD(Extract)(THIS_ LPCSTR,UINT,HICON*,HICON*,UINT) PURE;
 };
-typedef IExtractIcon *LPEXTRACTICON;
+typedef IExtractIconA *LPEXTRACTICONA;
+
+#undef INTERFACE
+#define INTERFACE IExtractIconW
+DECLARE_INTERFACE_(IExtractIconW, IUnknown)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD(GetIconLocation)(THIS_ UINT,LPWSTR,UINT,int*,PUINT) PURE;
+	STDMETHOD(Extract)(THIS_ LPCWSTR,UINT,HICON*,HICON*,UINT) PURE;
+};
+typedef IExtractIconW *LPEXTRACTICONW;
+
+#ifdef UNICODE
+#define IExtractIcon IExtractIconW
+#define LPEXTRACTICON LPEXTRACTICONW
+#else
+#define IExtractIcon IExtractIconA
+#define LPEXTRACTICON LPEXTRACTICONA
+#endif
 
 #undef INTERFACE
 #define INTERFACE IShellLinkA
@@ -613,19 +633,6 @@ DECLARE_INTERFACE(IFileViewer)
 typedef IFileViewer *LPFILEVIEWER;
 
 #undef INTERFACE
-#define INTERFACE ICommDlgBrowser
-DECLARE_INTERFACE_(ICommDlgBrowser,IUnknown)
-{
-	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
-	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
-	STDMETHOD_(ULONG,Release)(THIS) PURE;
-	STDMETHOD(OnDefaultCommand)(THIS) PURE;
-	STDMETHOD(OnStateChange)(THIS_ ULONG) PURE;
-	STDMETHOD(IncludeObject)(THIS_ LPCITEMIDLIST) PURE;
-};
-typedef ICommDlgBrowser *LPCOMMDLGBROWSER;
-
-#undef INTERFACE
 #define INTERFACE IPersistFolder
 DECLARE_INTERFACE_(IPersistFolder,IPersist)
 {
@@ -690,6 +697,20 @@ DECLARE_INTERFACE_(IShellView,IOleWindow)
 	STDMETHOD(SelectItem)(THIS_ LPCITEMIDLIST,UINT) PURE;
 	STDMETHOD(GetItemObject)(THIS_ UINT,REFIID,PVOID*) PURE;
 };
+
+#undef INTERFACE
+#define INTERFACE ICommDlgBrowser
+DECLARE_INTERFACE_(ICommDlgBrowser,IUnknown)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD(OnDefaultCommand)(THIS_ IShellView*) PURE;
+	STDMETHOD(OnStateChange)(THIS_ IShellView*,ULONG) PURE;
+	STDMETHOD(IncludeObject)(THIS_ IShellView*,LPCITEMIDLIST) PURE;
+};
+typedef ICommDlgBrowser *LPCOMMDLGBROWSER;
+
 typedef GUID SHELLVIEWID;
 typedef struct _SV2CVW2_PARAMS {
 	DWORD cbSize;
@@ -806,7 +827,44 @@ typedef struct {
 	BOOL fShowStartPage : 1;
 	UINT fSpareFlags : 13;
 } SHELLSTATE, *LPSHELLSTATE;
-#endif
+#endif /* _WIN32_WINNT >= 0x0500 */
+
+#if (_WIN32_IE >= 0x0500)
+#pragma pack(push,8)
+typedef struct
+{
+	SIZE sizeDragImage;
+	POINT ptOffset;
+	HBITMAP hbmpDragImage;
+	COLORREF crColorKey;
+} SHDRAGIMAGE, *LPSHDRAGIMAGE;
+#pragma pack(pop)
+
+#undef INTERFACE
+#define INTERFACE IDragSourceHelper
+DECLARE_INTERFACE_(IDragSourceHelper, IUnknown)
+{
+	STDMETHOD (QueryInterface)(THIS_ REFIID riid, void **ppv) PURE;
+	STDMETHOD_(ULONG, AddRef) (THIS) PURE;
+	STDMETHOD_(ULONG, Release) (THIS) PURE;
+	STDMETHOD (InitializeFromBitmap)(THIS_ LPSHDRAGIMAGE pshdi, IDataObject* pDataObject) PURE;
+	STDMETHOD (InitializeFromWindow)(THIS_ HWND hwnd, POINT* ppt, IDataObject* pDataObject) PURE;
+};
+
+#undef INTERFACE
+#define INTERFACE IDropTargetHelper
+DECLARE_INTERFACE_(IDropTargetHelper, IUnknown)
+{
+	STDMETHOD (QueryInterface)(THIS_ REFIID riid, void** ppv) PURE;
+	STDMETHOD_(ULONG, AddRef) (THIS) PURE;
+	STDMETHOD_(ULONG, Release) (THIS) PURE;
+	STDMETHOD (DragEnter)(THIS_ HWND hwndTarget, IDataObject* pDataObject, POINT* ppt, DWORD dwEffect) PURE;
+	STDMETHOD (DragLeave)(THIS) PURE;
+	STDMETHOD (DragOver)(THIS_ POINT* ppt, DWORD dwEffect) PURE;
+	STDMETHOD (Drop)(THIS_ IDataObject* pDataObject, POINT* ppt, DWORD dwEffect) PURE;
+	STDMETHOD (Show)(THIS_ BOOL fShow) PURE;
+};
+#endif /* _WIN32_IE >= 0x0500 */
 
 void WINAPI SHAddToRecentDocs(UINT,PCVOID);
 LPITEMIDLIST WINAPI SHBrowseForFolderA(PBROWSEINFOA);
@@ -870,6 +928,7 @@ typedef BROWSEINFOA BROWSEINFO,*PBROWSEINFO,*LPBROWSEINFO;
 #define SHGetFolderPathAndSubDir SHGetFolderPathAndSubDirA
 #endif
 #endif /* UNICODE */
+
 
 #pragma pack(pop)
 #ifdef __cplusplus

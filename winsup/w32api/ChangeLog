@@ -1,3 +1,19 @@
+2003-08-18  Danny Smith <dannysmith@users.sourceforge.net>
+
+	* include/commctrl.h (TB_*) Group defines together. 
+
+2003-08-18  Martin Fuchs  <Martin-Fuchs@gmx.net>
+
+	* include/winuser.h (ICON_SMALL2): Define.
+	* include/commctrl.h (TB_SETBUTTONWIDTH, TB_SETDRAWTEXTFLAGS):
+	Define.
+	* include/shlobj.h (SHDRAGIMAGE): Define structure.
+	(IDragSourceHelper) Define interface.
+  	(IDropTargetHelper): Likewise.
+	(IExtractIcon): Unicode it.
+	(ICommDlgBrowser): Use IShellView type as param in OnDefaultCommand,
+	OnStateChange and IncludeObject methods.
+
 2003-08-17  Martin Fuchs  <Martin-Fuchs@gmx.net>
 
 	* include/commctrl.h (TreeView_GetScrollTime,
