@@ -1,3 +1,8 @@
+2003-02-25  Earnie Boyd  <earnie@users.sf.net>
+
+	* Makefile.in (libmsvcrt20.a): Remove target and dependencies.
+	(libmsvcrt40.a): Ditto.
+
 2003-02-21  Earnie Boyd  <earnie@users.sf.net>
 
 	Thanks to David Frasier <davidf@sjsoft.com> who inspired portions of

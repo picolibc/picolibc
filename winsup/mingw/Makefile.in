@@ -154,8 +154,7 @@ MINGW_OBJS = CRTglob.o CRTfmode.o CRTinit.o  dllmain.o gccmain.o \
 	     pseudo-reloc.o pseudo-reloc-list.o
 MOLD_OBJS = ctype_old.o string_old.o
 
-LIBS = libcrtdll.a libmsvcrt.a libmsvcrtd.a libmsvcrt20.a libmsvcrt40.a \
-       libmingw32.a \
+LIBS = libcrtdll.a libmsvcrt.a libmsvcrtd.a libmingw32.a \
        libcoldname.a libmoldname.a libmoldnamed.a $(LIBM_A) libmingwthrd.a
 
 DLLS = $(THREAD_DLL_NAME)
@@ -230,7 +229,7 @@ libmingw32.a: $(MINGW_OBJS)
 	$(AR) rc $@ $(MINGW_OBJS)
 	$(RANLIB) $@
 
-msvcrt.def msvcrtd.def msvcrt20.def msvcrt40.def: msvcrt.def.in
+msvcrt.def msvcrtd.def: msvcrt.def.in
 	$(CC) -DRUNTIME=$(basename $(notdir $@)) \
 		-D__FILENAME__=$@ \
 		-D__MSVCRT__ -C -E -P \
@@ -415,8 +414,6 @@ force:
 libcrtdll.a: crtdll.def
 libmsvcrt.a: msvcrt.def
 libmsvcrtd.a: msvcrtd.def
-libmsvcrt20.a: msvcrt20.def
-libmsvcrt40.a: msvcrt40.def
 CRT_noglob.o: CRT_noglob.c
 CRTfmode.o: CRTfmode.c
 CRTglob.o: CRTglob.c
