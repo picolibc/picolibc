@@ -29,6 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EF_SPARC_32PLUS		0x000100	/* generic V8+ features */
 #define EF_SPARC_SUN_US1	0x000200	/* Sun UltraSPARC1 extensions */
 #define EF_SPARC_HAL_R1		0x000400	/* HAL R1 extensions */
+#define EF_SPARC_SUN_US3	0x000800	/* Sun UltraSPARCIII extensions */
 
 #define EF_SPARC_LEDATA         0x800000	/* little endian data */
 

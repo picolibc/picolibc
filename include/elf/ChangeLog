@@ -1,4 +1,9 @@
-1999-07-14  Jakub Jelinek  <jj@ultra.linux.cz>
+1999-07-16  Jakub Jelinek  <jj@ultra.linux.cz>
+
+	* sparc.h (EF_SPARC_SUN_US3): Define in Cheetah extensions
+	flag (as per SCD2.4.1).
+
+1999-07-16  Jakub Jelinek  <jj@ultra.linux.cz>
 
 	* sparc.h (ELF64_R_TYPE_DATA): Only use ELF64_R_TYPE bits, not
 	ELF64_R_SYM bits.
