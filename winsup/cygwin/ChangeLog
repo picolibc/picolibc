@@ -1,3 +1,19 @@
+Wed Aug 22 23:41:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* net.cc (cygwin_inet_ntoa): Rearrange previous patch to use
+	thread local buffer space when compiled thread safe.
+	(cygwin_getprotobyname): Ditto.
+	(cygwin_getprotobynumber): Ditto.
+	(cygwin_getservbyname): Ditto.
+	(cygwin_getservbyport): Ditto.
+	(cygwin_gethostbyname): Ditto.
+	(cygwin_gethostbyaddr): Ditto. Move near to cygwin_gethostbyname.
+	* thread.h (struct _winsup_t): Add pointers for above used buffer space.
+	* passwd.cc (getpwduid): Remove initializing passwd.
+	(setpwent): Ditto.
+	(endpwent): Ditto.
+	(setpassent): Ditto.
+
 Wed Aug 22 13:41:09 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* smallprint.c (console_printf): New function.

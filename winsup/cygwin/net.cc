@@ -182,17 +182,21 @@ dump_protoent (struct protoent *p)
 extern "C" char *
 cygwin_inet_ntoa (struct in_addr in)
 {
-  static char *buf = NULL;
+#ifdef _MT_SAFE
+#define ntoa_buf  _reent_winsup ()->_ntoa_buf
+#else
+  static char *ntoa_buf = NULL;
+#endif
 
   char *res = inet_ntoa (in);
-  if (buf)
+  if (ntoa_buf)
     {
-      free (buf);
-      buf = NULL;
+      free (ntoa_buf);
+      ntoa_buf = NULL;
     }
   if (res)
-    buf = strdup (res);
-  return buf;
+    ntoa_buf = strdup (res);
+  return ntoa_buf;
 }
 
 /* exported as inet_addr: BSD 4.3 */
@@ -446,32 +450,36 @@ out:
   return NULL;
 }
 
+#ifdef _MT_SAFE
+#define protoent_buf  _reent_winsup ()->_protoent_buf
+#else
+  static struct protoent *protoent_buf = NULL;
+#endif
+
 /* exported as getprotobyname: standards? */
 extern "C" struct protoent *
 cygwin_getprotobyname (const char *p)
 {
-  static struct protoent *res = NULL;
-  free_protoent_ptr (res);
-  res = dup_protoent_ptr (getprotobyname (p));
-  if (!res)
+  free_protoent_ptr (protoent_buf);
+  protoent_buf = dup_protoent_ptr (getprotobyname (p));
+  if (!protoent_buf)
     set_winsock_errno ();
 
-  dump_protoent (res);
-  return res;
+  dump_protoent (protoent_buf);
+  return protoent_buf;
 }
 
 /* exported as getprotobynumber: standards? */
 extern "C" struct protoent *
 cygwin_getprotobynumber (int number)
 {
-  static struct protoent *res = NULL;
-  free_protoent_ptr (res);
-  res = dup_protoent_ptr (getprotobynumber (number));
-  if (!res)
+  free_protoent_ptr (protoent_buf);
+  protoent_buf = dup_protoent_ptr (getprotobynumber (number));
+  if (!protoent_buf)
     set_winsock_errno ();
 
-  dump_protoent (res);
-  return res;
+  dump_protoent (protoent_buf);
+  return protoent_buf;
 }
 
 fhandler_socket *
@@ -927,32 +935,36 @@ out:
   return NULL;
 }
 
+#ifdef _MT_SAFE
+#define servent_buf  _reent_winsup ()->_servent_buf
+#else
+  static struct servent *servent_buf = NULL;
+#endif
+
 /* exported as getservbyname: standards? */
 extern "C" struct servent *
 cygwin_getservbyname (const char *name, const char *proto)
 {
-  static struct servent *p = NULL;
-  free_servent_ptr (p);
-  p = dup_servent_ptr (getservbyname (name, proto));
-  if (!p)
+  free_servent_ptr (servent_buf);
+  servent_buf = dup_servent_ptr (getservbyname (name, proto));
+  if (!servent_buf)
     set_winsock_errno ();
 
-  syscall_printf ("%x = getservbyname (%s, %s)", p, name, proto);
-  return p;
+  syscall_printf ("%x = getservbyname (%s, %s)", servent_buf, name, proto);
+  return servent_buf;
 }
 
 /* exported as getservbyport: standards? */
 extern "C" struct servent *
 cygwin_getservbyport (int port, const char *proto)
 {
-  static struct servent *p = NULL;
-  free_servent_ptr (p);
-  p = dup_servent_ptr (getservbyport (port, proto));
-  if (!p)
+  free_servent_ptr (servent_buf);
+  servent_buf = dup_servent_ptr (getservbyport (port, proto));
+  if (!servent_buf)
     set_winsock_errno ();
 
-  syscall_printf ("%x = getservbyport (%d, %s)", p, port, proto);
-  return p;
+  syscall_printf ("%x = getservbyport (%d, %s)", servent_buf, port, proto);
+  return servent_buf;
 }
 
 extern "C" int
@@ -1021,6 +1033,12 @@ out:
   return NULL;
 }
 
+#ifdef _MT_SAFE
+#define hostent_buf  _reent_winsup ()->_hostent_buf
+#else
+  static struct hostent *hostent_buf = NULL;
+#endif
+
 /* exported as gethostbyname: standards? */
 extern "C" struct hostent *
 cygwin_gethostbyname (const char *name)
@@ -1048,20 +1066,38 @@ cygwin_gethostbyname (const char *name)
       return &tmp;
     }
 
-  static struct hostent *ptr = NULL;
-  free_hostent_ptr (ptr);
-  ptr = dup_hostent_ptr (gethostbyname (name));
-  if (!ptr)
+  free_hostent_ptr (hostent_buf);
+  hostent_buf = dup_hostent_ptr (gethostbyname (name));
+  if (!hostent_buf)
     {
       set_winsock_errno ();
       set_host_errno ();
     }
   else
     {
-      debug_printf ("h_name %s", ptr->h_name);
+      debug_printf ("h_name %s", hostent_buf->h_name);
       h_errno = 0;
     }
-  return ptr;
+  return hostent_buf;
+}
+
+/* exported as gethostbyaddr: standards? */
+extern "C" struct hostent *
+cygwin_gethostbyaddr (const char *addr, int len, int type)
+{
+  free_hostent_ptr (hostent_buf);
+  hostent_buf = dup_hostent_ptr (gethostbyaddr (addr, len, type));
+  if (!hostent_buf)
+    {
+      set_winsock_errno ();
+      set_host_errno ();
+    }
+  else
+    {
+      debug_printf ("h_name %s", hostent_buf->h_name);
+      h_errno = 0;
+    }
+  return hostent_buf;
 }
 
 /* exported as accept: standards? */
@@ -1258,26 +1294,6 @@ cygwin_getsockname (int fd, struct sockaddr *addr, int *namelen)
     }
   syscall_printf ("%d = getsockname (%d, %x, %d)", res, fd, addr, namelen);
   return res;
-}
-
-/* exported as gethostbyaddr: standards? */
-extern "C" struct hostent *
-cygwin_gethostbyaddr (const char *addr, int len, int type)
-{
-  static struct hostent *ptr = NULL;
-  free_hostent_ptr (ptr);
-  ptr = dup_hostent_ptr (gethostbyaddr (addr, len, type));
-  if (!ptr)
-    {
-      set_winsock_errno ();
-      set_host_errno ();
-    }
-  else
-    {
-      debug_printf ("h_name %s", ptr->h_name);
-      h_errno = 0;
-    }
-  return ptr;
 }
 
 /* exported as listen: standards? */

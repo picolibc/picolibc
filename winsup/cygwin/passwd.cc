@@ -376,36 +376,24 @@ getpwent (void)
 extern "C" struct passwd *
 getpwduid (uid_t)
 {
-  if (passwd_state  <= initializing)
-    read_etc_passwd ();
-
   return NULL;
 }
 
 extern "C" void
 setpwent (void)
 {
-  if (passwd_state  <= initializing)
-    read_etc_passwd ();
-
   pw_pos = 0;
 }
 
 extern "C" void
 endpwent (void)
 {
-  if (passwd_state  <= initializing)
-    read_etc_passwd ();
-
   pw_pos = 0;
 }
 
 extern "C" int
 setpassent ()
 {
-  if (passwd_state  <= initializing)
-    read_etc_passwd ();
-
   return 0;
 }
 

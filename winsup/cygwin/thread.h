@@ -94,6 +94,12 @@ struct _winsup_t
 
   /* uinfo.cc */
   char _username[UNLEN + 1];
+
+  /* net.cc */
+  char *_ntoa_buf;
+  struct protoent *_protoent_buf;
+  struct servent *_servent_buf;
+  struct hostent *_hostent_buf;
 };
 
 
