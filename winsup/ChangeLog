@@ -1,3 +1,7 @@
+Thu Jun 22 18:28:06 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Add dummy info targets.
+
 Tue Jun 20 13:36:23 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* configure.in: Bow to necessity and build w32api before anything else.

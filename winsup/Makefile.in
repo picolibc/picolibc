@@ -40,8 +40,8 @@ SUBDIRS=@SUBDIRS@
 INSTALL_SUBDIRS=${patsubst %,install_%,$(SUBDIRS)}
 CLEAN_SUBDIRS=${patsubst %,clean_%,$(SUBDIRS)}
 
-.PHONY: all install clean $(SUBDIRS) $(INSTALL_SUBDIRS) \
-	$(CLEAN_SUBDIRS)
+.PHONY: all install clean all-info info install-info \
+	$(SUBDIRS) $(INSTALL_SUBDIRS) $(CLEAN_SUBDIRS)
 
 .SUFFIXES:
 
@@ -58,6 +58,12 @@ all: Makefile $(SUBDIRS)
 install: Makefile $(INSTALL_SUBDIRS)
 
 clean: $(CLEAN_SUBDIRS)
+
+all-info:
+
+install-info:
+
+info:
 
 $(SUBDIRS):
 	@$(MAKE) -C $@ all
