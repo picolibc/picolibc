@@ -1,3 +1,7 @@
+2003-01-23  Alan Modra  <amodra@bigpond.net.au>
+
+	* sh.h: Split out various bits to bfd/elf32-sh64.h.
+
 2003-01-20  Martin Schwidefsky  <schwidefsky@de.ibm.com>
 
 	* s390.h: Rename R_390_GOTOFF to R_390_GOTOFF32. Add new gotoff,
