@@ -557,7 +557,7 @@ sigpending (sigset_t *set)
 extern "C" int __stdcall
 sig_dispatch_pending ()
 {
-  if (!hwait_sig || GetCurrentThreadId () == sigtid)
+  if (exit_state || !hwait_sig || GetCurrentThreadId () == sigtid)
     return 0;
 
   sigframe thisframe (mainthread);
