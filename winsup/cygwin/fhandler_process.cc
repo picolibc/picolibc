@@ -23,6 +23,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "ntdll.h"
+#include <sys/param.h>
 #include <assert.h>
 
 #define _COMPILING_NEWLIB
@@ -454,22 +455,18 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
 	  return 0;
 	}
        fault_count = vmc.PageFaultCount;
-       utime = put.UserTime.QuadPart / 100000ULL;
-       stime = put.KernelTime.QuadPart / 100000ULL;
+       utime = put.UserTime.QuadPart * HZ / 10000000ULL;
+       stime = put.KernelTime.QuadPart * HZ / 10000000ULL;
        if (stodi.CurrentTime.QuadPart > put.CreateTime.QuadPart)
-	 start_time = (spt.InterruptTime.QuadPart + spt.KernelTime.QuadPart +
-		       spt.IdleTime.QuadPart + spt.UserTime.QuadPart +
-		       spt.DpcTime.QuadPart - stodi.CurrentTime.QuadPart +
-		       put.CreateTime.QuadPart) / 100000ULL;
+         start_time = (spt.KernelTime.QuadPart + spt.UserTime.QuadPart -
+                       stodi.CurrentTime.QuadPart + put.CreateTime.QuadPart) * HZ / 10000000ULL;
        else
 	 /*
 	  * sometimes stodi.CurrentTime is a bit behind
 	  * Note: some older versions of procps are broken and can't cope
 	  * with process start times > time(NULL).
 	  */
-	 start_time = (spt.InterruptTime.QuadPart + spt.KernelTime.QuadPart +
-		       spt.IdleTime.QuadPart + spt.UserTime.QuadPart +
-		       spt.DpcTime.QuadPart) / 100000ULL;
+	 start_time = (spt.KernelTime.QuadPart + spt.UserTime.QuadPart) * HZ / 10000000ULL;
        priority = pbi.BasePriority;
        unsigned page_size = getpagesize();
        vmsize = vmc.VirtualSize;
@@ -478,7 +475,7 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
     }
   else
     {
-      start_time = (GetTickCount() / 1000 - time(NULL) + p->start_time) * 100;
+      start_time = (GetTickCount() / 1000 - time(NULL) + p->start_time) * HZ;
     }
   return __small_sprintf (destbuf, "%d (%s) %c "
 				   "%d %d %d %d %d "

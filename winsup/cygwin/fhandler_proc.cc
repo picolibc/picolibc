@@ -23,6 +23,7 @@ details. */
 #include "cygheap.h"
 #include <assert.h>
 #include <sys/utsname.h>
+#include <sys/param.h>
 #include "ntdll.h"
 
 #define _COMPILING_NEWLIB
@@ -423,9 +424,8 @@ format_proc_uptime (char *destbuf, size_t maxsize)
   else
     {
       idle_time = spt.IdleTime.QuadPart / 100000ULL;
-      uptime = (spt.InterruptTime.QuadPart + spt.KernelTime.QuadPart +
-		spt.IdleTime.QuadPart + spt.UserTime.QuadPart +
-		spt.DpcTime.QuadPart) / 100000ULL;
+      uptime = (spt.KernelTime.QuadPart +
+		        spt.UserTime.QuadPart) / 100000ULL;
     }
 
   return __small_sprintf (destbuf, "%U.%02u %U.%02u\n",
@@ -467,9 +467,9 @@ format_proc_stat (char *destbuf, size_t maxsize)
 		       ret, RtlNtStatusToDosError (ret));
 	  return 0;
 	}
-      kernel_time = (spt.KernelTime.QuadPart + spt.InterruptTime.QuadPart + spt.DpcTime.QuadPart) / 100000ULL;
-      user_time = spt.UserTime.QuadPart / 100000ULL;
-      idle_time = spt.IdleTime.QuadPart / 100000ULL;
+      kernel_time = (spt.KernelTime.QuadPart - spt.IdleTime.QuadPart) * HZ / 10000000ULL;
+      user_time = spt.UserTime.QuadPart * HZ / 10000000ULL;
+      idle_time = spt.IdleTime.QuadPart * HZ / 10000000ULL;
       interrupt_count = spt.InterruptCount;
       pages_in = spi.PagesRead;
       pages_out = spi.PagefilePagesWritten + spi.MappedFilePagesWritten;

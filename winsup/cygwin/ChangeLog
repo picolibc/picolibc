@@ -1,3 +1,14 @@
+2002-08-31  Christopher January  <chris@atomice.net>
+
+	* fhandler_proc.cc: Add <sys/param.h> include.
+	(format_proc_uptime): Use KernelTime and UserTime only as they include
+	the other counters.
+	(format_proc_stat): KernelTime includes IdleTime, so subtract IdleTime
+	from KernelTime. Make number of 'jiffies' per second same as HZ define.
+	* fhandler_process.cc: Add <sys/param.h> include.
+	(format_process_stat): Make number of 'jiffies' per second same as
+	HZ define. Use KernelTime and UserTime only to calculate start_time.
+	
 2002-08-30  Christopher Faylor  <cgf@redhat.com>
 
 	(inspired by a patch from Egor Duda)
