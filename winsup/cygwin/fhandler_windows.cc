@@ -90,7 +90,7 @@ fhandler_windows::read (void *buf, size_t& len)
       return;
     }
 
-  (ssize_t) len = GetMessage (ptr, hWnd_, 0, 0);
+  len = (size_t) GetMessage (ptr, hWnd_, 0, 0);
 
   if ((ssize_t) len == -1)
     __seterrno ();

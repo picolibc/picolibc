@@ -1,3 +1,11 @@
+2003-09-07  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (_csbrk): More left coercion cleanup.
+	* fhandler_tty.cc (fhandler_tty_slave::read): Ditto.
+	(fhandler_tty_slave::write): Ditto.
+	* fhandler_windows.cc (fhandler_windows::read): Ditto.
+	* heap.cc (sbrk): Ditto.
+
 2003-09-07  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* signal.cc (nanosleep): Improve test for valid values.  Round delay up

@@ -762,7 +762,7 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
       if (!vmin && !time_to_wait)
 	{
 	  ReleaseMutex (input_mutex);
-	  (ssize_t) len = bytes_in_pipe;
+	  len = (size_t) bytes_in_pipe;
 	  return;
 	}
 
@@ -842,7 +842,7 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
 	waiter = time_to_wait;
     }
   termios_printf ("%d=read(%x, %d)", totalread, ptr, len);
-  (ssize_t) len = totalread;
+  len = (size_t) totalread;
   return;
 }
 
@@ -1153,7 +1153,7 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 void __stdcall
 fhandler_pty_master::read (void *ptr, size_t& len)
 {
-  (ssize_t) len = process_slave_output ((char *) ptr, len, pktmode);
+  len = (size_t) process_slave_output ((char *) ptr, len, pktmode);
   return;
 }
 

@@ -146,7 +146,7 @@ sbrk (int n)
         || VirtualAlloc (cygheap->user_heap.top, newbrksize = commitbytes, MEM_RESERVE, PAGE_NOACCESS))
        && VirtualAlloc (cygheap->user_heap.top, commitbytes, MEM_COMMIT, PAGE_READWRITE) != NULL)
      {
-	(char *) cygheap->user_heap.max += pround (newbrksize);
+	cygheap->user_heap.max = (char *) cygheap->user_heap.max + pround (newbrksize);
 	goto good;
      }
 
