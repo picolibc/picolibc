@@ -1,3 +1,8 @@
+2004-11-11  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
+
+	* cygcheck.cc (keyeprint): New optional parameters: show_error and
+	print_failed.
+
 2004-10-31  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
 
 	* cygcheck.cc (get_dword): Fix errormessage.
