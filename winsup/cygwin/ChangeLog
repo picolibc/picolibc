@@ -1,5 +1,10 @@
 2003-02-12  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_tty.cc (process_input): Add sanity check to ensure that
+	console typeahead is cleared on signal.
+
+2003-02-12  Christopher Faylor  <cgf@redhat.com>
+
 	* spawn.cc (linebuf::~linebuf): Resurrect commented out (for
 	debugging?) code.
 
