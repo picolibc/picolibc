@@ -16,6 +16,16 @@ Tue Jul 25 21:40:51 2000  Christopher Faylor <cgf@cygnus.com>
 	* syscalls.cc (_link): Avoid extraneous call to
 	cygwin_conv_to_win32_path.
 
+Tue Jul 25 21:11:15 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* environ.cc (_addenv): New function.  Subsumes functionality of
+	putenv/setenv.  Does not allocate space for putenv case.
+	(putenv): Use _addenv to add a value to the environment.
+	(setenv): Ditto.
+	(environ_init): Don't malloc space for each entry in the environment
+	table.  Just use the space from GetEnvironmentStrings.
+	(posify): Don't free the src argument since it is no longer malloced.
+
 Mon Jul 24 21:10:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* syscalls.cc (_link): Corrected previous patch.
