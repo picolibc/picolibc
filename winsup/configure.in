@@ -57,7 +57,7 @@ AC_CANONICAL_SYSTEM
 
 LIB_AC_PROG_CC
 
-SUBDIRS='cygwin w32api mingw'
+SUBDIRS='w32api cygwin mingw'
 case "$with_cross_host" in
   ""|*cygwin*)
     SUBDIRS="$SUBDIRS utils"

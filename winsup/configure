@@ -826,7 +826,7 @@ else
 fi
 
 
-SUBDIRS='cygwin w32api mingw'
+SUBDIRS='w32api cygwin mingw'
 case "$with_cross_host" in
   ""|*cygwin*)
     SUBDIRS="$SUBDIRS utils"

@@ -1,3 +1,8 @@
+Tue Jun 20 13:36:23 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* configure.in: Bow to necessity and build w32api before anything else.
+	* configure: Regenerate.
+
 Sat Jun 17 13:50:04 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* configure.in: Detect "cross-hosting" situation and add a subset of
