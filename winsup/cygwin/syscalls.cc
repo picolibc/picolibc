@@ -2054,7 +2054,8 @@ seteuid32 (__uid32_t uid)
 	  /* create_token failed. Try subauthentication. */
 	  debug_printf ("create token failed, try subauthentication.");
 	  cygheap->user.token = subauth (pw_new);
-	  if (cygheap->user.token == INVALID_HANDLE_VALUE) goto failed;
+	  if (cygheap->user.token == INVALID_HANDLE_VALUE)
+	    goto failed;
 	}
     }
 
@@ -2098,6 +2099,11 @@ seteuid32 (__uid32_t uid)
   return 0;
 
  failed:
+  if (uid == myself->uid)
+    {
+      system_printf ("special case, returning 0");
+      return 0;
+    }
   cygheap->user.token = sav_token;
   cygheap->user.impersonated = sav_impersonated;
   if (cygheap->user.issetuid ()

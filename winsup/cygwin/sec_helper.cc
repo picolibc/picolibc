@@ -390,7 +390,7 @@ out:
   if (hToken)
     CloseHandle (hToken);
 
-  syscall_printf ("%d = set_process_privilege (%s, %d)",ret, privilege, enable);
+  syscall_printf ("%d = set_process_privilege (%s, %d)", ret, privilege, enable);
   return ret;
 }
 

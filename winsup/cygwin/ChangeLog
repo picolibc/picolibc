@@ -1,3 +1,8 @@
+2002-07-01  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* syscalls.c (seteuid32): Do not return an error when the token cannot
+	be created only because of a problem with the gid.
+
 2002-07-01  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_clipboard.c (fhandler_dev_clipboard::open): Force text mode.
