@@ -1,5 +1,10 @@
 2002-06-09  Christopher Faylor  <cgf@redhat.com>
 
+	* path.cc (cygpath): Change MOUNT_AUTO to MOUNT_CYGDRIVE.
+	(getmntent): Ditto.
+
+2002-06-09  Christopher Faylor  <cgf@redhat.com>
+
 	* mount.cc (main): Use default system/user flag for cygdrive stuff,
 	too.
 	(change_cygdrive_prefix): Change MOUNT_AUTO to MOUNT_CYGDRIVE.

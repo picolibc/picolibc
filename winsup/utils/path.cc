@@ -283,7 +283,7 @@ cygpath (const char *s, ...)
 
   for (m = mount_table; m->posix ; m++)
     {
-      if (m->flags & MOUNT_AUTO)
+      if (m->flags & MOUNT_CYGDRIVE)
 	continue;
 
       int n = strlen (m->posix);
@@ -341,8 +341,8 @@ getmntent (FILE *)
     strcat (mnt.mnt_opts, (char *) ",cygexec");
   else if (m->flags & MOUNT_EXEC)
     strcat (mnt.mnt_opts, (char *) ",exec");
-  if ((m->flags & MOUNT_AUTO))             /* cygdrive */
-    strcat (mnt.mnt_opts, (char *) ",noumount");
+  if ((m->flags & MOUNT_CYGDRIVE))             /* cygdrive */
+    strcat (mnt.mnt_opts, (char *) ",cygdrive");
   mnt.mnt_freq = 1;
   mnt.mnt_passno = 1;
   m++;
