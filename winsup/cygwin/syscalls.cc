@@ -55,6 +55,9 @@ details. */
 
 SYSTEM_INFO system_info;
 
+static int __stdcall mknod_worker (const char *, mode_t, mode_t, _major_t,
+				   _minor_t);
+
 /* Close all files and process any queued deletions.
    Lots of unix style applications will open a tmp file, unlink it,
    but never call close.  This function is called by _exit to
@@ -533,6 +536,11 @@ open (const char *unix_path, int flags, ...)
 	  if (!(fh = cygheap->fdtab.build_fhandler_from_name (fd, unix_path,
 							      NULL, pc)))
 	    res = -1;		// errno already set
+	  else if (fh->is_fs_device () && fh->device_access_denied (flags))
+	    {
+	      fd.release ();
+	      res = -1;
+	    }
 	  else if (!fh->open (&pc, flags, (mode & 07777) & ~cygheap->umask))
 	    {
 	      fd.release ();
@@ -898,6 +906,12 @@ umask (mode_t mask)
   return oldmask;
 }
 
+int
+chmod_device (path_conv& pc, mode_t mode)
+{
+  return mknod_worker (pc, pc.dev.mode & S_IFMT, mode, pc.dev.major, pc.dev.minor);
+}
+
 /* chmod: POSIX 5.6.4.1 */
 extern "C" int
 chmod (const char *path, mode_t mode)
@@ -918,6 +932,11 @@ chmod (const char *path, mode_t mode)
   if (win32_path.is_auto_device ())
     {
       res = 0;
+      goto done;
+    }
+  if (win32_path.is_fs_device ())
+    {
+      res = chmod_device (win32_path, mode);
       goto done;
     }
 
@@ -1920,6 +1939,16 @@ regfree ()
   return 0;
 }
 
+static int __stdcall
+mknod_worker (const char *path, mode_t type, mode_t mode, _major_t major,
+	      _minor_t minor)
+{
+  char buf[sizeof (":00000000:00000000:00000000") + MAX_PATH];
+  sprintf (buf, ":%x:%x:%x", major, minor,
+	   type | (mode & (S_IRWXU | S_IRWXG | S_IRWXO)));
+  return symlink_worker (buf, path, true, true);
+}
+
 /* mknod was the call to create directories before the introduction
    of mkdir in 4.2BSD and SVR3.  Use of mknod required superuser privs
    so the mkdir command had to be setuid root.
@@ -1942,53 +1971,32 @@ mknod (const char *path, mode_t mode, dev_t dev)
       return -1;
     }
 
-  mode_t prot = mode & (S_IRWXU | S_IRWXG | S_IRWXO);
-  mode &= S_IFMT;
-  if (!mode || mode == S_IFREG)
+  mode_t type = mode & S_IFMT;
+  switch (type)
     {
-      int fd = open (path, O_CREAT, prot);
-      if (fd < 0)
-	return -1;
-      close (fd);
-      return 0;
-    }
+    case S_IFCHR:
+    case S_IFBLK:
+    case S_IFIFO:
+      break;
 
-  char buf[sizeof (":00000000:00000000:X") + MAX_PATH];
+    case 0:
+    case S_IFREG:
+      {
+	int fd = open (path, O_CREAT, mode);
+	if (fd < 0)
+	  return -1;
+	close (fd);
+	return 0;
+      }
 
-  _devtype_t ch;
-  if (mode == S_IFCHR)
-    ch = 'c';
-  else if (mode == S_IFBLK)
-    ch = 'b';
-  else if (mode == S_IFIFO)
-    {
-      dev = FH_FIFO;
-      ch = 's';
-    }
-  else
-    {
+    default:
       set_errno (EINVAL);
       return -1;
     }
 
   _major_t major = dev >> 8 /* SIGH.  _major (dev) */;
   _minor_t minor = dev & 0xff /* SIGH _minor (dev) */;
-
-  sprintf (buf, ":%x:%x:%c", major, minor, ch);
-  if (symlink_worker (buf, w32path, true, true))
-    return -1;
-
-  strcat (w32path, ".lnk");
-  if (chmod (w32path, prot))
-    return -1;
-
-  if (!SetFileAttributes (w32path, FILE_ATTRIBUTE_READONLY))
-    {
-      __seterrno ();
-      return -1;
-    }
-
-  return 0;
+  return mknod_worker (w32path, type, mode, major, minor);
 }
 
 extern "C" int
