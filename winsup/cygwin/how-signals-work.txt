@@ -1,0 +1,95 @@
+[This is not yet complete. -cgf]
+
+How do signals work?
+
+On process startup, cygwin starts a secondary thread that deals with signals.
+This thread contains a loop which blocks waiting for one of three events:
+
+1) sigcatch_main - a semaphore which, when incremented, indicates that a
+   signal may be available for the main thread.  The caller waits for the
+   signal to be delivered before returning.
+
+2) sigcatch_nonmain - a semaphore which , when incremented, indicates that
+   a signal is available for a non-main thread (currently this is not truly
+   implemented).  The caller waits for the signal to be delivered before
+   returning.
+
+3) sigcatch_nosync - a semaphore which, when incremented, indicates that
+   a signal may be available for the main thread.  The caller does not wait
+   for the delivery of the signal before returning.
+
+So, the signal handler blocks waiting for one of these three semaphores.
+
+If one of these is activated, then the the signal handler inspects an
+array of integers looking for a non-zero value.  The array corresponds
+to the normal UNIX signals + two extra locations for internal usage.
+This array is located in the 'sigtodo' array in the procinfo class.
+
+The signal thread uses the InterlockedDecrement function to atomically
+inspect elements of the array.  If one one of the elements of the array
+is non-zero, then cygwin checks to see if the user has blocked the signal
+by inspecting the process signal mask.  If the signal is blocked, then
+the array is reincremented and the next element is checked.
+
+If the signal is not blocked, then the function "sig_handle" is called
+with the signal number as an argument.  This is a fairly straightforward
+function.  It first checks to see if the signal is special in any way.
+
+A special signal is something like SIGKILL or SIGSTOP.  The user has no
+control over how those signals affect a UNIX process.  If a SIGKILL is
+received then sig_handle calls exit_sig to exit the process.  If SIGSTOP
+is called then sig_handle calls the regular signal dispatch function
+with a special function argument "sig_handle_tty_stop".  The signal
+dispatch function is described below.
+
+An uncaught signal like SIGTERM or SIGHUP will cause the process to exit
+with the standard UNIX exit values.  Uncaught signals like SIGUSR1 are
+ignored, as on UNIX.
+
+If the signal has an associated signal handler, then the setup_handler
+function is eventually called.  It is passed the signal, the address of
+the handler, and a standard UNIX sigaction structure.  The meat of
+signal processing is in setup_handler.
+
+setup_handler has a "simple" task.  It tries to stop the appropriate
+thread and redirect its execution to the signal handler function.
+Currently, the "appropriate thread" is only the main thread.
+
+To accomplish this, setup_handler first inspects the static sigsave
+structure.  This structure contains information on any not-yet-handled
+signals that may have been set up by a previous call to setup_handler
+but not yet dispatched in the main thread.  If the sigsave structure
+seems to be "active", then a "pending" flag is set (see below).
+
+After determining that sigsave is available, setup_handler will take
+one of two routes, depending on whether the main thread is executing
+in the cygwin DLL or is currently in "user" code.  We'll discuss the
+cygwin DLL case first.
+
+If sigsave seems to be available, then the frame information for the
+main thread is inspected.  This information is set by any cygwin
+function that is known to block (such as _read()), usually by calling
+'sigframe thisframe (mainthread)' in the cygwin function.  This call
+sets up information about the current stack frame of an executing cygwin
+process.  Any function which uses 'sigframe thisframe' should be signal
+aware.  It should detect when a signal has arrived and return
+immediately.
+
+So, if mainframe is active, that means that we have good information about
+the state of the main thread.  Cygwin uses the stack frame info from this
+structure to insert a call to the assembly language function 'sigdelayed'
+in place of the main thread's normal return address.  So, when a call to
+(e.g.) _read returns after detecting a signal, it does not return to its
+caller.  Rather, it returns to sigdelayed.
+
+The sigdelayed function saves a lot of state on the stack and sets the
+signal mask as appropriate for POSIX.  It uses information from the
+sigsave structure which has been filled in by interrupt_on_return, as
+called by setup_handler.  sigdelayed pushes another "sigreturn" address
+on the stack.  This will be the return address seen by the signal
+handler.  After setting up the return value, modifying the signal mask,
+and saving other information on the stack, sigreturn clears the sigsave
+structure (so that setup_handler can use it) and jumps to the signal
+handler function.
+
+
