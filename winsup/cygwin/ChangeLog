@@ -1,5 +1,9 @@
 2002-08-18  Christopher Faylor  <cgf@redhat.com>
 
+	* cygmalloc.h (MORECORE_CANNOT_TRIM): Define.
+
+2002-08-18  Christopher Faylor  <cgf@redhat.com>
+
 	* sigproc.cc (sigCONT): Define.
 	* sigproc.h (sigCONT): Declare.
 	(wait_sig): Create sigCONT event here.
