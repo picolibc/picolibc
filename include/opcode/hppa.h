@@ -71,7 +71,7 @@ struct pa_opcode
    In the args field, the following characters are unused:
 
 	'  "#  &     -  /   34 6789:;< > @'
-	' BC      JKLM          XY [\]  '
+	' BC      JK            XY [\]  '
 	'   de  h    m           y { } '
 
    Here are all the characters:
@@ -143,6 +143,8 @@ Also these:
    Z    %r1 -- implicit target of addil instruction.
    g    ,gate completer for new syntax branch
    l	,l completer for new syntax branch
+   M    ,push completer for new syntax branch
+   L    ,%r2 completer for new syntax branch
 
 Completer operands all have 'c' as the prefix:
 
