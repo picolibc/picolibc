@@ -1,3 +1,7 @@
+1999-06-30  Mark Mitchell  <mark@codesourcery.com>
+
+	* configure.in: Build ld on IRIX6.
+
 1999-06-12  Ian Lance Taylor  <ian@zembu.com>
 
 	* Makefile.in: Change distribution targets to use bzip2 instead of
