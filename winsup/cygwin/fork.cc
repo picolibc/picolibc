@@ -104,8 +104,8 @@ fork_copy (PROCESS_INFORMATION &pi, const char *what, ...)
 		__seterrno ();
 	      /* If this happens then there is a bug in our fork
 		 implementation somewhere. */
-	      system_printf ("%s pass %d failed, %p..%p, done %d, %E",
-			    what, pass, low, high, done);
+	      system_printf ("%s pass %d failed, %p..%p, done %d, windows pid %u, %E",
+			    what, pass, low, high, done, pi.dwProcessId);
 	      goto err;
 	    }
 	}
@@ -340,8 +340,8 @@ slow_pid_reuse (HANDLE h)
 }
 
 static int __stdcall
-fork_parent (void *stack_here, HANDLE& hParent, dll *&first_dll,
-	     bool& load_dlls, child_info_fork &ch)
+fork_parent (HANDLE& hParent, dll *&first_dll,
+	     bool& load_dlls, void *stack_here, child_info_fork &ch)
 {
   HANDLE subproc_ready, forker_finished;
   DWORD rc;
@@ -646,7 +646,7 @@ fork ()
     }
 
   void *esp;
-  __asm ("movl %%esp,%0": "=r" (esp));
+  __asm__ volatile ("movl %%esp,%0": "=r" (esp));
 
   myself->set_has_pgid_children ();
 
@@ -657,7 +657,7 @@ fork ()
   if (res)
     res = fork_child (grouped.hParent, grouped.first_dll, grouped.load_dlls);
   else
-    res = fork_parent (esp, grouped.hParent, grouped.first_dll, grouped.load_dlls, ch);
+    res = fork_parent (grouped.hParent, grouped.first_dll, grouped.load_dlls, esp, ch);
 
   MALLOC_CHECK;
   syscall_printf ("%d = fork()", res);

@@ -100,78 +100,99 @@ _unlink (const char *ourname)
   /* Check for shortcut as symlink condition. */
   if (atts != 0xffffffff && atts & FILE_ATTRIBUTE_READONLY)
     {
-      int len = strlen (win32_name.get_win32 ());
-      if (len > 4 && strcasematch (win32_name.get_win32 () + len - 4, ".lnk"))
-	SetFileAttributes (win32_name.get_win32 (),
-		      win32_name.file_attributes () & ~FILE_ATTRIBUTE_READONLY);
+      int len = strlen (win32_name);
+      if (len > 4 && strcasematch (win32_name + len - 4, ".lnk"))
+	SetFileAttributes (win32_name, atts & ~FILE_ATTRIBUTE_READONLY);
     }
 
+  DWORD lasterr;
+  lasterr = 0;
   for (int i = 0; i < 2; i++)
     {
       if (DeleteFile (win32_name))
 	{
 	  syscall_printf ("DeleteFile succeeded");
-	  res = 0;
-	  break;
+	  goto ok;
 	}
 
-      DWORD lasterr;
       lasterr = GetLastError ();
+      if (i || lasterr != ERROR_ACCESS_DENIED || win32_name.issymlink ())
+	break;		/* Couldn't delete it. */
 
-      /* FIXME: There's a race here. */
-      HANDLE h = CreateFile (win32_name, GENERIC_READ,
-			    FILE_SHARE_READ,
-			    &sec_none_nih, OPEN_EXISTING,
-			    FILE_FLAG_DELETE_ON_CLOSE, 0);
-      if (h != INVALID_HANDLE_VALUE)
-	{
-	  CloseHandle (h);
-	  syscall_printf ("CreateFile/CloseHandle succeeded");
-	  if (os_being_run == winNT || GetFileAttributes (win32_name) == (DWORD) -1)
-	    {
-	      res = 0;
-	      break;
-	    }
-	}
-
-      if (i > 0)
-	{
-	  if (os_being_run == winNT || lasterr != ERROR_ACCESS_DENIED)
-	    goto err;
-
-	  if (win32_name.isremote ())
-	    {
-	      syscall_printf ("access denied on remote drive");
-	      goto err;  /* Can't detect this, unfortunately */
-	    }
-	  lasterr = ERROR_SHARING_VIOLATION;
-	}
-
-      syscall_printf ("i %d, couldn't delete file, %E", i);
-
-      /* If we get ERROR_SHARING_VIOLATION, the file may still be open -
-	 Windows NT doesn't support deleting a file while it's open.  */
-      if (lasterr == ERROR_SHARING_VIOLATION)
-	{
-	  cygwin_shared->delqueue.queue_file (win32_name);
-	  res = 0;
-	  break;
-	}
-
-      /* if access denied, chmod to be writable in case it is not
+      /* if access denied, chmod to be writable, in case it is not,
 	 and try again */
-      /* FIXME: Should check whether ourname is directory or file
-	 and only try again if permissions are not sufficient */
-      if (lasterr == ERROR_ACCESS_DENIED && chmod (win32_name, 0777) == 0)
-	continue;
-
-    err:
-      __seterrno ();
-      res = -1;
-      break;
+      (void) chmod (win32_name, 0777);
     }
 
-done:
+  /* Tried to delete file by normal DeleteFile and by resetting protection
+     and then deleting.  That didn't work.
+
+     There are two possible reasons for this:  1) The file may be opened and
+     Windows is not allowing it to be deleted, or 2) We may not have permissions
+     to delete the file.
+
+     So, first assume that it may be 1) and try to remove the file using the
+     Windows FILE_FLAG_DELETE_ON_CLOSE semantics.  This seems to work only
+     spottily on Windows 9x/Me but it does seem to work reliably on NT as
+     long as the file doesn't exist on a remote drive. */
+
+  bool delete_on_close_ok;
+
+  delete_on_close_ok  = !win32_name.isremote () && os_being_run == winNT;
+
+  /* Attempt to use "delete on close" semantics to handle removing
+     a file which may be open. */
+  HANDLE h;
+  h = CreateFile (win32_name, GENERIC_READ, FILE_SHARE_READ, &sec_none_nih,
+		  OPEN_EXISTING, FILE_FLAG_DELETE_ON_CLOSE, 0);
+  if (h == INVALID_HANDLE_VALUE)
+    {
+      if (GetLastError () == ERROR_FILE_NOT_FOUND)
+	goto ok;
+    }
+  else
+    {
+      CloseHandle (h);
+      syscall_printf ("CreateFile/CloseHandle succeeded");
+      /* Everything is fine if the file has disappeared or if we know that the
+	 FILE_FLAG_DELETE_ON_CLOSE will eventually work. */
+      if (GetFileAttributes (win32_name) == (DWORD) -1 || delete_on_close_ok)
+	goto ok;	/* The file is either gone already or will eventually be
+			   deleted by the OS. */
+    }
+
+  /* FILE_FLAGS_DELETE_ON_CLOSE was a bust.  If delete_on_close_ok is
+     true then it should have worked.  If it didn't work, that was an
+     error.  Windows 9x seems to return ERROR_ACCESS_DENIED in "sharing
+     violation" type of situations. */
+  if (delete_on_close_ok
+      || (lasterr != ERROR_ACCESS_DENIED && lasterr != ERROR_SHARING_VIOLATION))
+    goto err;
+
+  /* Can't reliably detect sharing violations on remote shares, so if we
+     didn't specifically get that error, then punt. */
+  if (lasterr != ERROR_SHARING_VIOLATION && win32_name.isremote ())
+    {
+      syscall_printf ("access denied on remote drive");
+      goto err;  /* Can't detect this, unfortunately */
+    }
+
+  syscall_printf ("couldn't delete file, err %d", lasterr);
+
+  /* Add file to the "to be deleted" queue. */
+  cygwin_shared->delqueue.queue_file (win32_name);
+
+ /* Success condition. */
+ ok:
+  res = 0;
+  goto done;
+
+ /* Error condition. */
+ err:
+  __seterrno ();
+  res = -1;
+
+ done:
   syscall_printf ("%d = unlink (%s)", res, ourname);
   return res;
 }
@@ -2084,7 +2105,7 @@ seteuid (uid_t uid)
 	    }
 
 	  /* Only when ntsec is ON! */
-	  /* If no impersonation token is available, try to 
+	  /* If no impersonation token is available, try to
 	     authenticate using NtCreateToken() or subauthentication. */
 	  if (allow_ntsec && cygheap->user.token == INVALID_HANDLE_VALUE)
 	    {

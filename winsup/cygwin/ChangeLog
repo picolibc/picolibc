@@ -1,3 +1,17 @@
+Mon Jun 18 17:09:25 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler_tty.cc (fhandler_tty_slave::init): Revert 2001-06-16 change.
+
+	* fork.cc (fork_copy): Print more debugging info.
+	(fork_parent): Change order of arguments to accomdate buggy gcc.
+	(fork): Ditto.
+
+Sun Jun 17 18:54:46 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* syscalls.cc (_unlink): Reorganize to try harder to delete file with
+	DeleteFile and to recover more gracefully if FILE_FLAG_DELETE_ON_CLOSE
+	doesn't work properly.
+
 Sat Jun 16 13:06:49 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (sig_handle_tty_stop): Reset PID_STOPPED if not
@@ -25,14 +39,14 @@ Thu Jun 14 20:19:46 2001  Christopher Faylor <cgf@cygnus.com>
 	call to get_attributes.
 
 Fri June 15 09:25:00  Robert Collins <rbtcollins@hotmail.com>
-  
+
 	* thread.cc (pthread_cond::Signal): Release the condition access
 	variable correctly.
 
 2001-06-14  Egor Duda  <deo@logos-m.ru>
 
-	* fhandler.cc (fhandler_base::open): Set win32 access flags
-	to 0, when requested.
+	* fhandler.cc (fhandler_base::open): Set win32 access flags to 0, when
+	requested.
 	* fhandler.h: New status flag FH_QUERYOPEN.
 	(fhandler::get_query_open): New function.
 	(fhandler::set_query_open): Ditto.
