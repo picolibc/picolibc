@@ -71,7 +71,7 @@ _DEFUN(_iconv_nls_construct_filename, (rptr, file, ext),
   int dirlen = strlen (dir);
     
   if ((path = _getenv_r (rptr, NLS_ENVVAR_NAME)) == NULL || *path == '\0')
-    path = NLS_DEFAULT_NLSPATH;
+    path = ICONV_DEFAULT_NLSPATH;
 
   len1 = strlen (path);
   len2 = strlen (file);

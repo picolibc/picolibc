@@ -1,5 +1,5 @@
-#ifndef __INCOV_ICONVNLS_H__
-#define __INCOV_ICONVNLS_H__
+#ifndef __ICONV_ICONVNLS_H__
+#define __ICONV_ICONVNLS_H__
 
 #include <newlib.h>
 
@@ -33,5 +33,5 @@
 # endif
 #endif /* _MB_CAPABLE */
 
-#endif /* !__INCOV_ICONVNLS_H__ */
+#endif /* !__ICONV_ICONVNLS_H__ */
 

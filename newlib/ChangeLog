@@ -1,3 +1,11 @@
+2004-09-13 Artem B. Bityuckiy  <dedekind@oktetlabs.ru>
+
+	* libc/iconv/iconv.tex: Updated with new content.
+	* libc/iconv/lib/iconvnls.c: Reference ICONV_DEFAULT_NLSPATH
+	instead of NLS_DEFAULT_NLSPATH.
+	* libc/iconv/lib/iconvnls.h: Fix typo.
+	* libc/include/sys/iconvnls.h: New file.
+
 2004-09-09  Paul Brook  <paul@codesourcery.com>
 
 	* libc/include/sys/reent.h (struct _on_exit_args): Add _dso_handle
