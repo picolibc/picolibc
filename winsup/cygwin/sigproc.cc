@@ -535,7 +535,6 @@ sig_dispatch_pending (int justwake)
 #endif
   else
     {
-      assert (!wait_sig_inited);
       if (!justwake)
 	(void) sig_send (myself, __SIGFLUSH);
       else if (ReleaseSemaphore (sigcatch_nosync, 1, NULL))
