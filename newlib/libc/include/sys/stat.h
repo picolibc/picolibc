@@ -68,7 +68,6 @@ struct	stat
 #define	S_IREAD		0000400	/* read permission, owner */
 #define	S_IWRITE 	0000200	/* write permission, owner */
 #define	S_IEXEC		0000100	/* execute/search permission, owner */
-
 #define	S_ENFMT 	0002000	/* enforcement-mode locking */
 
 #define	S_IFMT		_IFMT
@@ -94,18 +93,30 @@ struct	stat
 #define _S_IEXEC	0000100
 #endif
 
-#define	S_IRWXU 	0000700	/* rwx, owner */
+#define	S_IRWXU 	(S_IRUSR | S_IWUSR | S_IXUSR)
 #define		S_IRUSR	0000400	/* read permission, owner */
 #define		S_IWUSR	0000200	/* write permission, owner */
-#define		S_IXUSR	0000100	/* execute/search permission, owner */
-#define	S_IRWXG		0000070	/* rwx, group */
+#define		S_IXUSR 0000100/* execute/search permission, owner */
+#define	S_IRWXG		(S_IRGRP | S_IWGRP | S_IXGRP)
 #define		S_IRGRP	0000040	/* read permission, group */
 #define		S_IWGRP	0000020	/* write permission, grougroup */
-#define		S_IXGRP	0000010	/* execute/search permission, group */
-#define	S_IRWXO		0000007	/* rwx, other */
+#define		S_IXGRP 0000010/* execute/search permission, group */
+#define	S_IRWXO		(S_IROTH | S_IWOTH | S_IXOTH)
 #define		S_IROTH	0000004	/* read permission, other */
 #define		S_IWOTH	0000002	/* write permission, other */
-#define		S_IXOTH	0000001	/* execute/search permission, other */
+#define		S_IXOTH 0000001/* execute/search permission, other */
+
+#if defined (__CYGWIN__) && !defined (__INSIDE_CYGWIN__)
+extern unsigned const _cygwin_S_IEXEC, _cygwin_S_IXUSR, _cygwin_S_IXGRP, _cygwin_S_IXOTH;
+#undef S_IEXEC
+#undef S_IXUSR
+#undef S_IXGRP
+#undef S_IXOTH
+#define S_IEXEC		_cygwin_S_IEXEC
+#define S_IXUSR		_cygwin_S_IXUSR
+#define S_IXGRP		_cygwin_S_IXGRP
+#define S_IXOTH		_cygwin_S_IXOTH
+#endif
 
 #define	S_ISBLK(m)	(((m)&_IFMT) == _IFBLK)
 #define	S_ISCHR(m)	(((m)&_IFMT) == _IFCHR)

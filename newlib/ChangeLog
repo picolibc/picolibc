@@ -1,3 +1,10 @@
+Sat Mar  3 00:34:14 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* libc/include/sys/stat.h: Use special defines for executable stat bits
+	when compiling for Cygwin.
+	* libc/include/sys/unistd.h: Use special define for X_OK when compiling
+	for Cygwin.
+
 2001-03-02  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/string/strtok.c: Add #undef of __STRICT_ANSI__ so prototype

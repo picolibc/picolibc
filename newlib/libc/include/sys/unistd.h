@@ -137,6 +137,12 @@ int     _EXFUN(symlink, (const char *__name1, const char *__name2));
 # define	W_OK	2
 # define	X_OK	1
 
+#if defined (__CYGWIN__) && !defined (__INSIDE_CYGWIN__)
+# undef		X_OK
+# define X_OK	_cygwin_X_OK
+extern const unsigned _cygwin_X_OK;
+#endif
+
 # define	SEEK_SET	0
 # define	SEEK_CUR	1
 # define	SEEK_END	2
