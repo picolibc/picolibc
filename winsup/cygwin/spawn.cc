@@ -254,17 +254,22 @@ class av
   char **argv;
   int calloced;
  public:
+  int error;
   int argc;
-  av (int ac, const char * const *av) : calloced (0), argc (ac)
+  av (int ac, const char * const *av) : calloced (0), error (false), argc (ac)
   {
     argv = (char **) cmalloc (HEAP_1_ARGV, (argc + 5) * sizeof (char *));
     memcpy (argv, av, (argc + 1) * sizeof (char *));
   }
   ~av ()
   {
-    for (int i = 0; i < calloced; i++)
-      cfree (argv[i]);
-    cfree (argv);
+    if (argv)
+      {
+	for (int i = 0; i < calloced; i++)
+	  if (argv[i])
+	    cfree (argv[i]);
+	cfree (argv);
+      }
   }
   int unshift (const char *what, int conv = 0);
   operator char **() {return argv;}
@@ -272,21 +277,23 @@ class av
   void replace0_maybe (const char *arg0)
   {
     /* Note: Assumes that argv array has not yet been "unshifted" */
-    if (!calloced)
-      {
-	argv[0] = cstrdup1 (arg0);
-	calloced = 1;
-      }
+    if (!calloced
+	&& (argv[0] = cstrdup1 (arg0)))
+      calloced = true;
+    else
+      error = errno;
   }
   void dup_maybe (int i)
   {
-    if (i >= calloced)
-      argv[i] = cstrdup1 (argv[i]);
+    if (i >= calloced
+	&& !(argv[i] = cstrdup1 (argv[i])))
+      error = errno;
   }
   void dup_all ()
   {
     for (int i = calloced; i < argc; i++)
-      argv[i] = cstrdup1 (argv[i]);
+      if (!(argv[i] = cstrdup1 (argv[i])))
+	error = errno;
   }
 };
 
@@ -309,7 +316,8 @@ av::unshift (const char *what, int conv)
 	*p = '\0';
       what = buf;
     }
-  *argv = cstrdup1 (what);
+  if (!(*argv = cstrdup1 (what)))
+    error = errno;
   argc++;
   calloced++;
   return 1;
@@ -338,7 +346,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     {
       syscall_printf ("argv is NULL");
       set_errno (EINVAL);
-      return (-1);
+      return -1;
     }
 
   path_conv real_path;
@@ -561,6 +569,12 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   char *envblock;
   newargv.all_calloced ();
+  if (newargv.error)
+    {
+      set_errno (newargv.error);
+      return -1;
+    }
+
   ciresrv.moreinfo->argc = newargv.argc;
   ciresrv.moreinfo->argv = newargv;
   ciresrv.hexec_proc = hexec_proc;

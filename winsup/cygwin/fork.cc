@@ -457,7 +457,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 		  myself->progname, myself->progname, c_flags, &si, &pi);
   __malloc_lock ();
   void *newheap;
-  newheap = cygheap_setup_for_child (&ch,cygheap->fdtab.need_fixup_before ());
+  newheap = cygheap_setup_for_child (&ch, cygheap->fdtab.need_fixup_before ());
   rc = CreateProcess (myself->progname, /* image to run */
 		      myself->progname, /* what we send in arg0 */
 		      sec_attribs,

@@ -725,7 +725,6 @@ enum ansi_intensity
 #define eattitle 7
 #define MAXARGS 10
 
-class fhandler_console;
 class dev_console
 {
   WORD default_color, underline_color, dim_color;
@@ -1160,30 +1159,32 @@ class fhandler_process: public fhandler_proc
 
 typedef union
 {
-  char base[sizeof(fhandler_base)];
-  char console[sizeof(fhandler_console)];
-  char dev_clipboard[sizeof(fhandler_dev_clipboard)];
-  char dev_dsp[sizeof(fhandler_dev_dsp)];
-  char dev_floppy[sizeof(fhandler_dev_floppy)];
-  char dev_mem[sizeof(fhandler_dev_mem)];
-  char dev_null[sizeof(fhandler_dev_null)];
-  char dev_random[sizeof(fhandler_dev_random)];
-  char dev_raw[sizeof(fhandler_dev_raw)];
-  char dev_tape[sizeof(fhandler_dev_tape)];
-  char dev_zero[sizeof(fhandler_dev_zero)];
-  char disk_file[sizeof(fhandler_disk_file)];
-  char pipe[sizeof(fhandler_pipe)];
-  char proc[sizeof(fhandler_proc)];
-  char process[sizeof(fhandler_process)];
-  char pty_master[sizeof(fhandler_pty_master)];
-  char registry[sizeof(fhandler_registry)];
-  char serial[sizeof(fhandler_serial)];
-  char socket[sizeof(fhandler_socket)];
-  char termios[sizeof(fhandler_termios)];
-  char tty_common[sizeof(fhandler_tty_common)];
-  char tty_master[sizeof(fhandler_tty_master)];
-  char tty_slave[sizeof(fhandler_tty_slave)];
-  char windows[sizeof(fhandler_windows)];
+  char __base[sizeof (fhandler_base)];
+  char __console[sizeof (fhandler_console)];
+  char __cygdrive[sizeof (fhandler_cygdrive)];
+  char __dev_clipboard[sizeof (fhandler_dev_clipboard)];
+  char __dev_dsp[sizeof (fhandler_dev_dsp)];
+  char __dev_floppy[sizeof (fhandler_dev_floppy)];
+  char __dev_mem[sizeof (fhandler_dev_mem)];
+  char __dev_null[sizeof (fhandler_dev_null)];
+  char __dev_random[sizeof (fhandler_dev_random)];
+  char __dev_raw[sizeof (fhandler_dev_raw)];
+  char __dev_tape[sizeof (fhandler_dev_tape)];
+  char __dev_zero[sizeof (fhandler_dev_zero)];
+  char __disk_file[sizeof (fhandler_disk_file)];
+  char __pipe[sizeof (fhandler_pipe)];
+  char __proc[sizeof (fhandler_proc)];
+  char __process[sizeof (fhandler_process)];
+  char __pty_master[sizeof (fhandler_pty_master)];
+  char __registry[sizeof (fhandler_registry)];
+  char __serial[sizeof (fhandler_serial)];
+  char __socket[sizeof (fhandler_socket)];
+  char __termios[sizeof (fhandler_termios)];
+  char __tty_common[sizeof (fhandler_tty_common)];
+  char __tty_master[sizeof (fhandler_tty_master)];
+  char __tty_slave[sizeof (fhandler_tty_slave)];
+  char __virtual[sizeof (fhandler_virtual)];
+  char __windows[sizeof (fhandler_windows)];
 } fhandler_union;
 
 struct select_record

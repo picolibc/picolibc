@@ -224,7 +224,7 @@ struct init_cygheap
   bool etc_changed ();
 };
 
-#define CYGHEAPSIZE (sizeof (init_cygheap) + (4000 * sizeof (fhandler_union)) + (2 * 65536))
+#define CYGHEAPSIZE (sizeof (init_cygheap) + (16000 * sizeof (fhandler_union)) + (4 * 65536))
 
 extern init_cygheap *cygheap;
 extern void *cygheap_max;

@@ -63,12 +63,13 @@ init_cheap ()
   cygheap_max = cygheap;
 }
 
-static void dup_now (void *, child_info *, unsigned) __attribute__ ((regparm(3)));
+// static void dup_now (void *, child_info *, unsigned) __attribute__ ((regparm(3)));
 static void
 dup_now (void *newcygheap, child_info *ci, unsigned n)
 {
   if (!VirtualAlloc (newcygheap, n, MEM_COMMIT, PAGE_READWRITE))
-    api_fatal ("couldn't allocate new cygwin heap for child, %E");
+    api_fatal ("couldn't allocate new cygwin heap %p, %d for child, %E",
+	       newcygheap, n);
   memcpy (newcygheap, cygheap, n);
 }
 
@@ -77,9 +78,15 @@ cygheap_setup_for_child (child_info *ci, bool dup_later)
 {
   void *newcygheap;
   cygheap_protect->acquire ();
+if (!ci) try_to_debug ();
   unsigned n = (char *) cygheap_max - (char *) cygheap;
+  unsigned size = CYGHEAPSIZE;
+  if (size < n)
+    size = n + (128 * 1024);
   ci->cygheap_h = CreateFileMapping (INVALID_HANDLE_VALUE, &sec_none,
-				     CFMAP_OPTIONS, 0, CYGHEAPSIZE, NULL);
+				     CFMAP_OPTIONS, 0, size, NULL);
+  if (!ci->cygheap_h)
+    api_fatal ("Couldn't create heap for child, size %d, %E", CYGHEAPSIZE);
   newcygheap = MapViewOfFileEx (ci->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, NULL);
   ProtectHandle1INH (ci->cygheap_h, passed_cygheap_h);
   if (!dup_later)
@@ -177,7 +184,12 @@ _csbrk (int sbs)
   if (!sbs || (prebrk != prebrka && prebrka == pagetrunc (cygheap_max)))
     /* nothing to do */;
   else if (!VirtualAlloc (prebrk, (DWORD) sbs, MEM_COMMIT, PAGE_READWRITE))
-    api_fatal ("couldn't commit memory for cygwin heap, %E");
+    {
+      malloc_printf ("couldn't commit memory for cygwin heap, %E");
+      __seterrno ();
+      (char *) cygheap_max -= sbs;
+      return NULL;
+    }
 
   return prebrk;
 }
@@ -222,6 +234,11 @@ _cmalloc (int size)
     {
       size = sz + sizeof (_cmalloc_entry);
       rvc = (_cmalloc_entry *) _csbrk (size);
+      if (!rvc)
+	{
+	  cygheap_protect->release ();
+	  return NULL;
+	}
 
       rvc->b = b;
       rvc->prev = cygheap->chain;

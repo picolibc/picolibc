@@ -1,5 +1,31 @@
 2002-10-08  Christopher Faylor  <cgf@redhat.com>
 
+	* cygheap.cc (dup_now): Make fatal error a little more informative.
+	(cygheap_setup_for_child): Detect when default size of shared region is
+	less than the current size and allocate that much.
+	(_cbrk): Just return NULL on inability to allocate.
+	(_cmalloc): Ditto.
+	* cygheap.h (CYGHEAPSIZE): Change size to reflect newer, tinier
+	fhandler sizes.
+	* spawn.cc (av::error): New element, reflects potential errno from cmalloc.
+	(av::~av): Don't free NULL pointers.
+	(av::replace0_maybe): Detect out-of-memory conditions.
+	(av::dup_maybe): Ditto.
+	(av::dup_all): Ditto.
+	(av::unshift): Ditto.
+	(spawn_guts): Set errno and return if argv creation ran into problems.
+
+	* fhandler.h (fhandler_union): Change member names to something safer.
+
+	* fhandler_console.cc (fhandler_console::get_tty_stuff): Always set
+	fhandler_console::dev_state regardless of whether shared region is
+	initialized.
+
+	* cygthread.cc (cygthread::runner): Use ExitThread rather than return
+	(planning for future).
+
+2002-10-08  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler.h (dev_console): New class.
 	(fhandler_console::dev_state): New class element.
 	(fhandler_console::mouse_aware): Use dev_state element.

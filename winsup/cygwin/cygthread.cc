@@ -86,10 +86,10 @@ cygthread::runner (VOID *arg)
 				   &threads[i], CREATE_SUSPENDED,
 				   &threads[i].avail);
     else
-      return 0;
+      ExitThread (0);
 
   initialized ^= 1;
-  return 0;
+  ExitThread (0);
 }
 
 /* Start things going.  Called from dll_crt0_1. */

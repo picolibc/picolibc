@@ -100,12 +100,14 @@ dev_console NO_COPY *fhandler_console::dev_state;
 tty_min *
 fhandler_console::get_tty_stuff (int flags = 0)
 {
-  if (shared_console_info)
+  if (dev_state)
     return &shared_console_info->tty_min_state;
 
   shared_console_info =
     (console_state *) open_shared (NULL, 0, cygheap->console_h,
 				   sizeof (*shared_console_info), NULL);
+  dev_state = &shared_console_info->dev_state;
+
   ProtectHandleINH (cygheap->console_h);
   if (!shared_console_info->tty_min_state.ntty)
     {
@@ -113,7 +115,6 @@ fhandler_console::get_tty_stuff (int flags = 0)
       shared_console_info->tty_min_state.setsid (myself->sid);
       shared_console_info->tty_min_state.set_ctty (TTY_CONSOLE, flags);
 
-      fhandler_console::dev_state = &shared_console_info->dev_state;
       dev_state->scroll_region.Bottom = -1;
       dev_state->dwLastCursorPosition.X = -1;
       dev_state->dwLastCursorPosition.Y = -1;
