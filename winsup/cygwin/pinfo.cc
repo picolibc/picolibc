@@ -501,7 +501,7 @@ _pinfo::commune_send (DWORD code, ...)
     }
   if (!CreatePipe (&fromme, &tothem, &sec_all_nih, PIPEBUFSIZE))
     {
-      sigproc_printf ("first CreatePipe failed, %E");
+      sigproc_printf ("second CreatePipe failed, %E");
       __seterrno ();
       goto err;
     }

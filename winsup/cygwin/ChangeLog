@@ -1,3 +1,7 @@
+2004-10-05  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
+
+	* pinfo.cc (_pinfo::commune_send): Correct debugging output.
+
 2004-10-04  Christopher Faylor  <cgf@timesys.com>
 
 	* include/cygwin/signal.h: Add siginterrupt definition.
