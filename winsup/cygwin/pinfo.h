@@ -114,7 +114,7 @@ public:
   char *cmdline (size_t &);
   void set_ctty (class tty_min *, int, class fhandler_tty_slave *);
 
-  friend void __stdcall set_myself (pid_t, HANDLE);
+  friend void __stdcall set_myself (HANDLE);
 
   /* signals */
   HANDLE sendsig;
@@ -204,7 +204,7 @@ cygwin_pid (pid_t pid)
 }
 
 void __stdcall pinfo_init (char **, int);
-void __stdcall set_myself (pid_t pid, HANDLE h = NULL);
+void __stdcall set_myself (HANDLE h);
 extern pinfo myself;
 
 #define _P_VFORK 0
