@@ -1,3 +1,7 @@
+Tue May 28 21:34:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* shortcut.c (check_shortcut): Treat only Cygwin shortcuts as symlinks.
+
 Fri May 25 11:07:07 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (symlink_info::check): Correctly set 'ext_tacked_on'.  Use
