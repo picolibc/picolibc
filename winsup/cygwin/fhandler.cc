@@ -631,6 +631,8 @@ fhandler_base::open (int flags, mode_t mode)
 	  set_security_attribute (mode, &sa, sd);
 	  attr.SecurityDescriptor = sa.lpSecurityDescriptor;
 	}
+      /* The file attributes are needed for later use in, e.g. fchmod. */
+      pc.file_attributes (file_attributes);
     }
 
   status = NtCreateFile (&x, access, &attr, &io, NULL, file_attributes, shared,

@@ -201,6 +201,7 @@ class path_conv
   DWORD get_devn () {return dev.devn;}
   short get_unitn () {return dev.minor;}
   DWORD file_attributes () {return fileattr;}
+  void file_attributes (DWORD new_attr) {fileattr = new_attr;}
   DWORD drive_type () {return fs.drive_type ();}
   DWORD fs_flags () {return fs.flags ();}
   bool fs_has_ea () {return fs.has_ea ();}

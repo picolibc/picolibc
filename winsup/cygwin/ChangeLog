@@ -1,5 +1,11 @@
 2004-05-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::open): Set file attributes to correct
+	value when creating files.
+	* path.h (class path_conv): Add write accessor for file_attributes.
+
+2004-05-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (class fhandler_socket): Add "owner" status flag.
 	* fhandler_socket.cc (wait): Take flag parameter to take FD_OOB into
 	account.  Don't wait infinitely.
