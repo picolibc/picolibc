@@ -34,7 +34,6 @@ structure.
 * fgetpos::     Record position in a stream or file
 * fgets::       Get character string from a file or stream
 * fileno::      Get file descriptor associated with stream
-* fiprintf::    Write formatted output to file (integer only)
 * fopen::       Open a file
 * fdopen::	Turn an open file into a stream
 * fputc::       Write a character on a stream or file
@@ -53,7 +52,6 @@ structure.
 * getline::     Get character string from a file or stream
 * gets::        Get character string from standard input (obsolete)
 * getw::        Get a word (int) from a file or stream
-* iprintf::     Write formatted output (integer only)
 * mktemp::      Generate unused file name
 * perror::      Print an error message on standard error
 * putc::        Write a character on a stream or file (macro)
@@ -69,12 +67,14 @@ structure.
 * setbuffer::   Specify full buffering for a file or stream with size
 * setlinebuf::  Specify line buffering for a file or stream
 * setvbuf::     Specify buffering for a file or stream
-* siprintf::    Write formatted output to string (integer only)
-* sniprintf::   Write formatted output to string up to max size (integer only)
 * printf::      Write formatted output
 * scanf::       Scan and format input
+* iprintf::     Write formatted output (integer only)
+* iscanf::      Scan and format input (integer only)
 * tmpfile::     Create a temporary file
 * tmpnam::      Generate name for a temporary file
+* viprintf::    Format variable argument list for non-floating-point output
+* viscanf::     Scan variable format list for non-floating-point input
 * vprintf::     Format variable argument list
 * vscanf::      Format variable argument list
 @end menu 
@@ -108,9 +108,6 @@ structure.
 
 @page
 @include stdio/fileno.def
-
-@page
-@include stdio/fiprintf.def
 
 @page
 @include stdio/fopen.def
@@ -167,9 +164,6 @@ structure.
 @include stdio/getw.def 
 
 @page
-@include stdio/iprintf.def 
-
-@page
 @include stdio/mktemp.def
 
 @page
@@ -215,16 +209,16 @@ structure.
 @include stdio/setvbuf.def
 
 @page 
-@include stdio/siprintf.def 
-
-@page 
-@include stdio/sniprintf.def 
-
-@page 
 @include stdio/sprintf.def 
 
 @page
 @include stdio/sscanf.def 
+
+@page 
+@include stdio/siprintf.def 
+
+@page 
+@include stdio/siscanf.def 
 
 @page
 @include stdio/tmpfile.def
@@ -237,3 +231,10 @@ structure.
 
 @page
 @include stdio/vfscanf.def
+
+@page 
+@include stdio/viprintf.def 
+
+@page 
+@include stdio/viscanf.def 
+

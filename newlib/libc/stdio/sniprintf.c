@@ -17,45 +17,6 @@
 
 /* This code created by modifying snprintf.c so copyright inherited. */
 
-/*
-FUNCTION
-<<sniprintf>>---write formatted output (integer only)
-
-INDEX
-	sniprintf
-
-ANSI_SYNOPSIS
-        #include <stdio.h>
-
-        int sniprintf(char *<[str]>, size_t <[size]>, const char *<[format]> [, <[arg]>, ...]);
-
-TRAD_SYNOPSIS
-        #include <stdio.h>
-
-	int sniprintf(<[str]>, size_t <[size]>, <[format]> [, <[arg]>, ...]);
-	char *<[str]>;
-        size_t <[size]>;
-	char *<[format]>;
-
-DESCRIPTION
-<<sniprintf>> is a restricted version of <<snprintf>>: it has the same
-arguments and behavior, save that it cannot perform any floating-point
-formatting: the <<f>>, <<g>>, <<G>>, <<e>>, and <<F>> type specifiers
-are not recognized.
-
-RETURNS
-        <<sniprintf>> returns the number of bytes in the output string,
-        save that the concluding <<NULL>> is not counted.
-        <<sniprintf>> returns when the end of the format string is
-        encountered.
-
-PORTABILITY
-<<sniprintf>> is not required by ANSI C.
-
-Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
-<<lseek>>, <<read>>, <<sbrk>>, <<write>>.
-*/
-
 #include <_ansi.h>
 #include <reent.h>
 #include <stdio.h>

@@ -14,6 +14,7 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
+/* This code was copied from asprintf.c */
 
 #include <_ansi.h>
 #include <reent.h>
@@ -23,58 +24,77 @@
 #else
 #include <varargs.h>
 #endif
+#include <limits.h>
 #include "local.h"
 
-#ifndef _REENT_ONLY
-
+int
 #ifdef _HAVE_STDC
-int
-iprintf(_CONST char *fmt,...)
+_DEFUN(_asiprintf_r, (ptr, strp, fmt),
+       struct _reent *ptr _AND
+       char **strp        _AND
+       _CONST char *fmt _DOTS)
 #else
-int
-iprintf(fmt, va_alist)
-        char *fmt;
-        va_dcl
-#endif
-{
-  int ret;
-  va_list ap;
-
-  _REENT_SMALL_CHECK_INIT (_stdout_r (_REENT));
-#ifdef _HAVE_STDC
-  va_start (ap, fmt);
-#else
-  va_start (ap);
-#endif
-  ret = vfiprintf (stdout, fmt, ap);
-  va_end (ap);
-  return ret;
-}
-
-#endif /* ! _REENT_ONLY */
-
-#ifdef _HAVE_STDC
-int
-_iprintf_r(struct _reent *ptr, _CONST char *fmt, ...)
-#else
-int
-_iprintf_r(ptr, fmt, va_alist)
+_asiprintf_r(ptr, strp, fmt, va_alist)
            struct _reent *ptr;
-           char *fmt;
+           char **strp;
+           _CONST char *fmt;
            va_dcl
 #endif
 {
   int ret;
   va_list ap;
+  FILE f;
 
-  _REENT_SMALL_CHECK_INIT (_stdout_r (ptr));
+  /* mark a zero-length reallocatable buffer */
+  f._flags = __SWR | __SSTR | __SMBF;
+  f._bf._base = f._p = NULL;
+  f._bf._size = f._w = 0;
+  f._file = -1;  /* No file. */
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else
   va_start (ap);
 #endif
-  ret = _vfiprintf_r (ptr, _stdout_r (ptr), fmt, ap);
+  ret = vfiprintf (&f, fmt, ap);
   va_end (ap);
-  return ret;
+  *f._p = 0;
+  *strp = f._bf._base;
+  return (ret);
 }
 
+#ifndef _REENT_ONLY
+
+int
+#ifdef _HAVE_STDC
+_DEFUN(asiprintf, (strp, fmt),
+       char **strp _AND
+       _CONST char *fmt _DOTS)
+#else
+asiprintf(strp, fmt, va_alist)
+        char **strp;
+        _CONST char *fmt;
+        va_dcl
+#endif
+{
+  int ret;
+  va_list ap;
+  FILE f;
+  
+  /* mark a zero-length reallocatable buffer */
+  f._flags = __SWR | __SSTR | __SMBF;
+  f._bf._base = f._p = NULL;
+  f._bf._size = f._w = 0;
+  f._file = -1;  /* No file. */
+#ifdef _HAVE_STDC
+  va_start (ap, fmt);
+#else
+  va_start (ap);
+#endif
+  ret = vfiprintf (&f, fmt, ap);
+  va_end (ap);
+  *f._p = 0;
+  *strp = f._bf._base;
+  return (ret);
+}
+
+#endif

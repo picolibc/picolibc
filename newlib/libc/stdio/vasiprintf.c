@@ -14,67 +14,62 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
+/* This code was based on vsiprintf.c */
+/* doc in vfprintf.c */
+
+#if defined(LIBC_SCCS) && !defined(lint)
+static char sccsid[] = "%W% (Berkeley) %G%";
+#endif /* LIBC_SCCS and not lint */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
+#include <limits.h>
 #ifdef _HAVE_STDC
 #include <stdarg.h>
 #else
 #include <varargs.h>
 #endif
-#include "local.h"
 
 #ifndef _REENT_ONLY
 
-#ifdef _HAVE_STDC
 int
-iprintf(_CONST char *fmt,...)
-#else
-int
-iprintf(fmt, va_alist)
-        char *fmt;
-        va_dcl
-#endif
+_DEFUN(vasiprintf, (strp, fmt, ap),
+       char **strp      _AND
+       _CONST char *fmt _AND
+       va_list ap)
 {
   int ret;
-  va_list ap;
+  FILE f;
 
-  _REENT_SMALL_CHECK_INIT (_stdout_r (_REENT));
-#ifdef _HAVE_STDC
-  va_start (ap, fmt);
-#else
-  va_start (ap);
-#endif
-  ret = vfiprintf (stdout, fmt, ap);
-  va_end (ap);
+  f._flags = __SWR | __SSTR | __SMBF;
+  f._bf._base = f._p = NULL;
+  f._bf._size = f._w = 0;
+  f._file = -1;  /* No file. */
+  ret = _vfiprintf_r (_REENT, &f, fmt, ap);
+  *f._p = 0;
+  *strp = f._bf._base;
   return ret;
 }
 
-#endif /* ! _REENT_ONLY */
+#endif /* !_REENT_ONLY */
 
-#ifdef _HAVE_STDC
 int
-_iprintf_r(struct _reent *ptr, _CONST char *fmt, ...)
-#else
-int
-_iprintf_r(ptr, fmt, va_alist)
-           struct _reent *ptr;
-           char *fmt;
-           va_dcl
-#endif
+_DEFUN(_vasiprintf_r, (ptr, strp, fmt, ap),
+       struct _reent *ptr _AND
+       char **strp        _AND
+       _CONST char *fmt   _AND
+       va_list ap)
 {
   int ret;
-  va_list ap;
+  FILE f;
 
-  _REENT_SMALL_CHECK_INIT (_stdout_r (ptr));
-#ifdef _HAVE_STDC
-  va_start (ap, fmt);
-#else
-  va_start (ap);
-#endif
-  ret = _vfiprintf_r (ptr, _stdout_r (ptr), fmt, ap);
-  va_end (ap);
+  f._flags = __SWR | __SSTR | __SMBF ;
+  f._bf._base = f._p = NULL;
+  f._bf._size = f._w = 0;
+  f._file = -1;  /* No file. */
+  ret = _vfiprintf_r (ptr, &f, fmt, ap);
+  *f._p = 0;
+  *strp = f._bf._base;
   return ret;
 }
 

@@ -16,22 +16,25 @@
  */
 
 #include <_ansi.h>
+#include <reent.h>
 #include <stdio.h>
 #ifdef _HAVE_STDC
 #include <stdarg.h>
 #else
 #include <varargs.h>
 #endif
+#include "local.h"
 
+#ifndef _REENT_ONLY
+
+int
 #ifdef _HAVE_STDC
-int
-fiprintf(FILE * fp, _CONST char *fmt,...)
+fiscanf(FILE *fp, _CONST char *fmt, ...)
 #else
-int
-fiprintf(fp, fmt, va_alist)
-         FILE *fp;
-         char *fmt;
-         va_dcl
+fiscanf(FILE *fp, fmt, va_alist)
+       FILE *fp;
+       char *fmt;
+       va_dcl
 #endif
 {
   int ret;
@@ -42,7 +45,34 @@ fiprintf(fp, fmt, va_alist)
 #else
   va_start (ap);
 #endif
-  ret = vfiprintf (fp, fmt, ap);
+  ret = __svfiscanf_r (_REENT, fp, fmt, ap);
   va_end (ap);
   return ret;
 }
+
+#endif /* !_REENT_ONLY */
+
+int
+#ifdef _HAVE_STDC
+_fiscanf_r(struct _reent *ptr, FILE *fp, _CONST char *fmt, ...)
+#else
+_fiscanf_r(ptr, FILE *fp, fmt, va_alist)
+          struct _reent *ptr;
+          FILE *fp;
+          char *fmt;
+          va_dcl
+#endif
+{
+  int ret;
+  va_list ap;
+
+#ifdef _HAVE_STDC
+  va_start (ap, fmt);
+#else
+  va_start (ap);
+#endif
+  ret = __svfiscanf_r (ptr, fp, fmt, ap);
+  va_end (ap);
+  return (ret);
+}
+

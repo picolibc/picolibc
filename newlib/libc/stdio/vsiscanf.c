@@ -1,4 +1,6 @@
 /*
+ * Code created by modifying iscanf.c which has following copyright.
+ *
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
@@ -16,33 +18,57 @@
  */
 
 #include <_ansi.h>
+#include <reent.h>
 #include <stdio.h>
+#include <string.h>
 #ifdef _HAVE_STDC
 #include <stdarg.h>
 #else
 #include <varargs.h>
 #endif
+#include "local.h"
 
-#ifdef _HAVE_STDC
-int
-fiprintf(FILE * fp, _CONST char *fmt,...)
-#else
-int
-fiprintf(fp, fmt, va_alist)
-         FILE *fp;
-         char *fmt;
-         va_dcl
-#endif
+static _READ_WRITE_RETURN_TYPE
+_DEFUN(eofread1, (cookie, buf, len),
+       _PTR cookie _AND
+       char *buf   _AND
+       int len)
 {
-  int ret;
-  va_list ap;
+  return 0;
+}
 
-#ifdef _HAVE_STDC
-  va_start (ap, fmt);
-#else
-  va_start (ap);
-#endif
-  ret = vfiprintf (fp, fmt, ap);
-  va_end (ap);
-  return ret;
+/*
+ * vsiscanf
+ */
+
+#ifndef _REENT_ONLY
+
+int
+_DEFUN(vsiscanf, (str, fmt, ap), 
+       _CONST char *str _AND 
+       _CONST char *fmt _AND 
+       va_list ap)
+{
+  return _vsiscanf_r (_REENT, str, fmt, ap);
+}
+
+#endif /* !_REENT_ONLY */
+
+int
+_DEFUN(_vsiscanf_r, (ptr, str, fmt, ap),
+       struct _reent *ptr _AND 
+       _CONST char *str   _AND 
+       _CONST char *fmt   _AND 
+       va_list ap)
+{
+  FILE f;
+
+  f._flags = __SRD | __SSTR;
+  f._bf._base = f._p = (unsigned char *) str;
+  f._bf._size = f._r = strlen (str);
+  f._read = eofread1;
+  f._ub._base = NULL;
+  f._lb._base = NULL;
+  f._file = -1;  /* No file. */
+  return __svfiscanf_r (ptr, &f, fmt, ap);
 }

@@ -16,20 +16,48 @@
  */
 
 #include <_ansi.h>
+#include <reent.h>
 #include <stdio.h>
 #ifdef _HAVE_STDC
 #include <stdarg.h>
 #else
 #include <varargs.h>
 #endif
+#include "local.h"
 
+#ifndef _REENT_ONLY
+
+int
 #ifdef _HAVE_STDC
-int
-fiprintf(FILE * fp, _CONST char *fmt,...)
+iscanf(_CONST char *fmt, ...)
 #else
+iscanf(fmt, va_alist)
+      char *fmt;
+      va_dcl
+#endif
+{
+  int ret;
+  va_list ap;
+
+  _REENT_SMALL_CHECK_INIT (_stdin_r (_REENT));
+#ifdef _HAVE_STDC
+  va_start (ap, fmt);
+#else
+  va_start (ap);
+#endif
+  ret = __svfiscanf_r (_REENT, _stdin_r (_REENT), fmt, ap);
+  va_end (ap);
+  return ret;
+}
+
+#endif /* !_REENT_ONLY */
+
 int
-fiprintf(fp, fmt, va_alist)
-         FILE *fp;
+#ifdef _HAVE_STDC
+_iscanf_r(struct _reent *ptr, _CONST char *fmt, ...)
+#else
+_iscanf_r(ptr, fmt, va_alist)
+         struct _reent *ptr;
          char *fmt;
          va_dcl
 #endif
@@ -37,12 +65,14 @@ fiprintf(fp, fmt, va_alist)
   int ret;
   va_list ap;
 
+  _REENT_SMALL_CHECK_INIT (_stdin_r (ptr));
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else
   va_start (ap);
 #endif
-  ret = vfiprintf (fp, fmt, ap);
+  ret = __svfiscanf_r (ptr, _stdin_r (ptr), fmt, ap);
   va_end (ap);
-  return ret;
+  return (ret);
 }
+

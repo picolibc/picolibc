@@ -219,7 +219,6 @@ int	_EXFUN(remove, (const char *));
 int	_EXFUN(rename, (const char *, const char *));
 #endif
 #ifndef __STRICT_ANSI__
-int	_EXFUN(asprintf, (char **, const char *, ...));
 #ifdef _COMPILING_NEWLIB
 int	_EXFUN(fseeko, (FILE *, _off_t, int));
 _off_t	_EXFUN(ftello, ( FILE *));
@@ -227,20 +226,27 @@ _off_t	_EXFUN(ftello, ( FILE *));
 int	_EXFUN(fseeko, (FILE *, off_t, int));
 off_t	_EXFUN(ftello, ( FILE *));
 #endif
-int	_EXFUN(vfiprintf, (FILE *, const char *, __VALIST));
-int	_EXFUN(iprintf, (const char *, ...));
-int	_EXFUN(fiprintf, (FILE *, const char *, ...));
-int	_EXFUN(siprintf, (char *, const char *, ...));
-char *	_EXFUN(tempnam, (const char *, const char *));
-int	_EXFUN(vasprintf, (char **, const char *, __VALIST));
-int	_EXFUN(vsnprintf, (char *, size_t, const char *, __VALIST));
-int	_EXFUN(vfscanf, (FILE *, const char *, __VALIST));
-int	_EXFUN(vscanf, (const char *, __VALIST));
-int	_EXFUN(vsscanf, (const char *, const char *, __VALIST));
 #ifndef _REENT_ONLY
+int	_EXFUN(asiprintf, (char **, const char *, ...));
+int	_EXFUN(asprintf, (char **, const char *, ...));
 int	_EXFUN(fcloseall, (_VOID));
+int	_EXFUN(fiprintf, (FILE *, const char *, ...));
+int	_EXFUN(iprintf, (const char *, ...));
+int	_EXFUN(siprintf, (char *, const char *, ...));
 int	_EXFUN(snprintf, (char *, size_t, const char *, ...));
 int	_EXFUN(sniprintf, (char *, size_t, const char *, ...));
+char *	_EXFUN(tempnam, (const char *, const char *));
+int	_EXFUN(vasiprintf, (char **, const char *, __VALIST));
+int	_EXFUN(vasprintf, (char **, const char *, __VALIST));
+int	_EXFUN(vsniprintf, (char *, size_t, const char *, __VALIST));
+int	_EXFUN(vsnprintf, (char *, size_t, const char *, __VALIST));
+int	_EXFUN(vfiprintf, (FILE *, const char *, __VALIST));
+int	_EXFUN(vfiscanf, (FILE *, const char *, __VALIST));
+int	_EXFUN(vfscanf, (FILE *, const char *, __VALIST));
+int	_EXFUN(viscanf, (const char *, __VALIST));
+int	_EXFUN(vscanf, (const char *, __VALIST));
+int	_EXFUN(vsiscanf, (const char *, const char *, __VALIST));
+int	_EXFUN(vsscanf, (const char *, const char *, __VALIST));
 #endif
 #endif
 
@@ -272,18 +278,20 @@ int	_EXFUN(putchar_unlocked, (int));
  * Recursive versions of the above.
  */
 
+int	_EXFUN(_asiprintf_r, (struct _reent *, char **, const char *, ...));
 int	_EXFUN(_asprintf_r, (struct _reent *, char **, const char *, ...));
 int	_EXFUN(_fcloseall_r, (struct _reent *));
 FILE *	_EXFUN(_fdopen_r, (struct _reent *, int, const char *));
 FILE *	_EXFUN(_fopen_r, (struct _reent *, const char *, const char *));
 int	_EXFUN(_fclose_r, (struct _reent *, FILE *));
+int	_EXFUN(_fiscanf_r, (struct _reent *, FILE *, const char *, ...));
 int	_EXFUN(_fscanf_r, (struct _reent *, FILE *, const char *, ...));
 int	_EXFUN(_fseek_r, (struct _reent *, FILE *, long, int));
 long	_EXFUN(_ftell_r, (struct _reent *, FILE *));
 int	_EXFUN(_getchar_r, (struct _reent *));
 char *	_EXFUN(_gets_r, (struct _reent *, char *));
 int	_EXFUN(_iprintf_r, (struct _reent *, const char *, ...));
-int	_EXFUN(_siprintf_r, (struct _reent *, char *, const char *, ...));
+int	_EXFUN(_iscanf_r, (struct _reent *, const char *, ...));
 int	_EXFUN(_mkstemp_r, (struct _reent *, char *));
 char *	_EXFUN(_mktemp_r, (struct _reent *, char *));
 void	_EXFUN(_perror_r, (struct _reent *, const char *));
@@ -294,22 +302,32 @@ int	_EXFUN(_remove_r, (struct _reent *, const char *));
 int	_EXFUN(_rename_r, (struct _reent *,
 			   const char *_old, const char *_new));
 int	_EXFUN(_scanf_r, (struct _reent *, const char *, ...));
-int	_EXFUN(_sprintf_r, (struct _reent *, char *, const char *, ...));
+int	_EXFUN(_siprintf_r, (struct _reent *, char *, const char *, ...));
+int	_EXFUN(_siscanf_r, (struct _reent *, const char *, const char *, ...));
+int	_EXFUN(_sniprintf_r, (struct _reent *, char *, size_t, const char *, ...));
 int	_EXFUN(_snprintf_r, (struct _reent *, char *, size_t, const char *, ...));
+int	_EXFUN(_sprintf_r, (struct _reent *, char *, const char *, ...));
 int	_EXFUN(_sscanf_r, (struct _reent *, const char *, const char *, ...));
 char *	_EXFUN(_tempnam_r, (struct _reent *, const char *, const char *));
 FILE *	_EXFUN(_tmpfile_r, (struct _reent *));
 char *	_EXFUN(_tmpnam_r, (struct _reent *, char *));
 int	_EXFUN(_ungetc_r, (struct _reent *, int, FILE *));
+int	_EXFUN(_vasiprintf_r, (struct _reent *, char **, const char *, __VALIST));
 int	_EXFUN(_vasprintf_r, (struct _reent *, char **, const char *, __VALIST));
 int	_EXFUN(_vfiprintf_r, (struct _reent *, FILE *, const char *, __VALIST));
 int	_EXFUN(_vfprintf_r, (struct _reent *, FILE *, const char *, __VALIST));
+int	_EXFUN(_viprintf_r, (struct _reent *, const char *, __VALIST));
 int	_EXFUN(_vprintf_r, (struct _reent *, const char *, __VALIST));
+int	_EXFUN(_vsiprintf_r, (struct _reent *, char *, const char *, __VALIST));
 int	_EXFUN(_vsprintf_r, (struct _reent *, char *, const char *, __VALIST));
+int	_EXFUN(_vsniprintf_r, (struct _reent *, char *, size_t, const char *, __VALIST));
 int	_EXFUN(_vsnprintf_r, (struct _reent *, char *, size_t, const char *, __VALIST));
+int	_EXFUN(_vfiscanf_r, (struct _reent *, FILE *, const char *, __VALIST));
 int	_EXFUN(_vfscanf_r, (struct _reent *, FILE *, const char *, __VALIST));
+int	_EXFUN(_viscanf_r, (struct _reent *, const char *, __VALIST));
 int	_EXFUN(_vscanf_r, (struct _reent *, const char *, __VALIST));
 int	_EXFUN(_vsscanf_r, (struct _reent *, const char *, const char *, __VALIST));
+int	_EXFUN(_vsiscanf_r, (struct _reent *, const char *, const char *, __VALIST));
 
 ssize_t _EXFUN(__getdelim, (char **, size_t *, int, FILE *));
 ssize_t _EXFUN(__getline, (char **, size_t *, FILE *));

@@ -119,8 +119,19 @@ Supporting OS subroutines required:
 #endif
 #include "local.h"
 
-#ifndef	NO_FLOATING_POINT
+#ifdef INTEGER_ONLY
+#define VFSCANF vfiscanf
+#define _VFSCANF_R _vfiscanf_r
+#define __SVFSCANF __svfiscanf
+#define __SVFSCANF_R __svfiscanf_r
+#else
+#define VFSCANF vfscanf
+#define _VFSCANF_R _vfscanf_r
+#define __SVFSCANF __svfscanf
+#define __SVFSCANF_R __svfscanf_r
+#ifndef NO_FLOATING_POINT
 #define FLOATING_POINT
+#endif
 #endif
 
 #ifdef FLOATING_POINT
@@ -214,39 +225,39 @@ typedef unsigned long long u_long_long;
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(vfscanf, (fp, fmt, ap), 
+_DEFUN(VFSCANF, (fp, fmt, ap), 
        register FILE *fp _AND 
        _CONST char *fmt _AND 
        va_list ap)
 {
   CHECK_INIT(fp);
-  return __svfscanf_r (_REENT, fp, fmt, ap);
+  return __SVFSCANF_R (_REENT, fp, fmt, ap);
 }
 
 int
-_DEFUN(__svfscanf, (fp, fmt0, ap),
+_DEFUN(__SVFSCANF, (fp, fmt0, ap),
        register FILE *fp _AND
        char _CONST *fmt0 _AND
        va_list ap)
 {
-  return __svfscanf_r (_REENT, fp, fmt0, ap);
+  return __SVFSCANF_R (_REENT, fp, fmt0, ap);
 }
 
 #endif /* !_REENT_ONLY */
 
 int
-_DEFUN(_vfscanf_r, (data, fp, fmt, ap),
+_DEFUN(_VFSCANF_R, (data, fp, fmt, ap),
        struct _reent *data _AND 
        register FILE *fp   _AND 
        _CONST char *fmt    _AND 
        va_list ap)
 {
-  return __svfscanf_r (data, fp, fmt, ap);
+  return __SVFSCANF_R (data, fp, fmt, ap);
 }
 
 
 int
-_DEFUN(__svfscanf_r, (rptr, fp, fmt0, ap),
+_DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
        struct _reent *rptr _AND
        register FILE *fp   _AND
        char _CONST *fmt0   _AND
@@ -1168,108 +1179,4 @@ match_failure:
 all_done:
   _funlockfile (fp);
   return nassigned;
-}
-
-/*
- * Fill in the given table from the scanset at the given format
- * (just after `[').  Return a pointer to the character past the
- * closing `]'.  The table has a 1 wherever characters should be
- * considered part of the scanset.
- */
-
-/*static*/
-u_char *
-_DEFUN(__sccl, (tab, fmt),
-       register char *tab _AND
-       register u_char *fmt)
-{
-  register int c, n, v;
-
-  /* first `clear' the whole table */
-  c = *fmt++;			/* first char hat => negated scanset */
-  if (c == '^')
-    {
-      v = 1;			/* default => accept */
-      c = *fmt++;		/* get new first char */
-    }
-  else
-    v = 0;			/* default => reject */
-  /* should probably use memset here */
-  for (n = 0; n < 256; n++)
-    tab[n] = v;
-  if (c == 0)
-    return fmt - 1;		/* format ended before closing ] */
-
-  /*
-   * Now set the entries corresponding to the actual scanset to the
-   * opposite of the above.
-   *
-   * The first character may be ']' (or '-') without being special; the
-   * last character may be '-'.
-   */
-
-  v = 1 - v;
-  for (;;)
-    {
-      tab[c] = v;		/* take character c */
-    doswitch:
-      n = *fmt++;		/* and examine the next */
-      switch (n)
-	{
-
-	case 0:		/* format ended too soon */
-	  return fmt - 1;
-
-	case '-':
-	  /*
-	   * A scanset of the form [01+-] is defined as `the digit 0, the
-	   * digit 1, the character +, the character -', but the effect of a
-	   * scanset such as [a-zA-Z0-9] is implementation defined.  The V7
-	   * Unix scanf treats `a-z' as `the letters a through z', but treats
-	   * `a-a' as `the letter a, the character -, and the letter a'.
-	   *
-	   * For compatibility, the `-' is not considerd to define a range if
-	   * the character following it is either a close bracket (required by
-	   * ANSI) or is not numerically greater than the character we just
-	   * stored in the table (c).
-	   */
-	  n = *fmt;
-	  if (n == ']' || n < c)
-	    {
-	      c = '-';
-	      break;		/* resume the for(;;) */
-	    }
-	  fmt++;
-	  do
-	    {			/* fill in the range */
-	      tab[++c] = v;
-	    }
-	  while (c < n);
-#if 1			/* XXX another disgusting compatibility hack */
-	  /*
-	   * Alas, the V7 Unix scanf also treats formats such
-	   * as [a-c-e] as `the letters a through e'. This too
-	   * is permitted by the standard....
-	   */
-	  goto doswitch;
-#else
-	  c = *fmt++;
-	  if (c == 0)
-	    return fmt - 1;
-	  if (c == ']')
-	    return fmt;
-#endif
-
-	  break;
-
-
-	case ']':		/* end of scanset */
-	  return fmt;
-
-	default:		/* just another character */
-	  c = n;
-	  break;
-	}
-    }
-  /* NOTREACHED */
 }

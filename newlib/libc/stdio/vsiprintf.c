@@ -14,35 +14,60 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
+/* doc in vfiprintf.c */
+
+#if defined(LIBC_SCCS) && !defined(lint)
+static char sccsid[] = "%W% (Berkeley) %G%";
+#endif /* LIBC_SCCS and not lint */
 
 #include <_ansi.h>
+#include <reent.h>
 #include <stdio.h>
+#include <limits.h>
 #ifdef _HAVE_STDC
 #include <stdarg.h>
 #else
 #include <varargs.h>
 #endif
 
-#ifdef _HAVE_STDC
+#ifndef _REENT_ONLY 
+
 int
-fiprintf(FILE * fp, _CONST char *fmt,...)
-#else
-int
-fiprintf(fp, fmt, va_alist)
-         FILE *fp;
-         char *fmt;
-         va_dcl
-#endif
+_DEFUN(vsiprintf, (str, fmt, ap),
+       char *str        _AND
+       _CONST char *fmt _AND
+       va_list ap)
 {
   int ret;
-  va_list ap;
+  FILE f;
 
-#ifdef _HAVE_STDC
-  va_start (ap, fmt);
-#else
-  va_start (ap);
-#endif
-  ret = vfiprintf (fp, fmt, ap);
-  va_end (ap);
+  f._flags = __SWR | __SSTR;
+  f._bf._base = f._p = (unsigned char *) str;
+  f._bf._size = f._w = INT_MAX;
+  f._file = -1;  /* No file. */
+  ret = _vfiprintf_r (_REENT, &f, fmt, ap);
+  *f._p = 0;
   return ret;
 }
+
+#endif /* !_REENT_ONLY */
+
+int
+_DEFUN(_vsiprintf_r, (ptr, str, fmt, ap),
+       struct _reent *ptr _AND
+       char *str          _AND
+       _CONST char *fmt   _AND
+       va_list ap)
+{
+  int ret;
+  FILE f;
+
+  f._flags = __SWR | __SSTR;
+  f._bf._base = f._p = (unsigned char *) str;
+  f._bf._size = f._w = INT_MAX;
+  f._file = -1;  /* No file. */
+  ret = _vfiprintf_r (ptr, &f, fmt, ap);
+  *f._p = 0;
+  return ret;
+}
+

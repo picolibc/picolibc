@@ -1,3 +1,32 @@
+2004-11-23  Jeff Johnston  <jjohnstn@redhat.com>
+                                                                                
+	* libc/include/stdio.h: Add new iprintf and iscanf variants.  Also
+	do some reordering.
+	* libc/machine/powerpc/vfscanf.c: Remove __sccl function.
+	* libc/stdio/Makefile.am: Add support for new iprintf and iscanf
+	family functions.
+	* libc/stdio/Makefile.in: Regenerated.
+	* libc/stdio/fiprintf.c: Remove doc to siprintf.c.
+	* libc/stdio/iprintf.c: Ditto.
+	* libc/stdio/local.h (__svfiscanf_r): New prototype.
+	* libc/stdio/siprintf.c: Add docs for various iprintf family functions.
+	* libc/stdio/sniprintf.c: Move docs to siprintf.c.
+	* libc/stdio/stdio.tex: Add new functions.
+	* libc/stdio/vfscanf.c: Split out __sccl function to separate
+	file and add special name defines so this file can be used
+	to build vfiscanf.o.
+	* libc/stdio/asiprintf.c: New file.
+	* libc/stdio/fiscanf.c: Ditto.
+	* libc/stdio/iscanf.c: Ditto.
+	* libc/stdio/sccl.c: Ditto.
+	* libc/stdio/siscanf.c: Ditto.
+	* libc/stdio/vasiprintf.c: Ditto.
+	* libc/stdio/viprintf.c: Ditto.
+	* libc/stdio/viscanf.c: Ditto.
+	* libc/stdio/vsiprintf.c: Ditto.
+	* libc/stdio/vsiscanf.c: Ditto.
+	* libc/stdio/vsniprintf.c: Ditto.
+
 2004-11-19  Shaun Jackman  <sjackman@gmail.com>
                                                                                 
         * libc/include/stdio.h: Add sniprintf.

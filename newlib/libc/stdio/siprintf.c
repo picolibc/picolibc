@@ -17,37 +17,68 @@
 
 /*
 FUNCTION
-<<siprintf>>---write formatted output (integer only)
+        <<iprintf>>, <<fiprintf>>, <<asiprintf>>, <<siprintf>>, <<sniprintf>>---format output
 
 INDEX
+	fiprintf
+INDEX
+	iprintf
+INDEX
+	asiprintf
+INDEX
 	siprintf
+INDEX
+	sniprintf
 
 ANSI_SYNOPSIS
         #include <stdio.h>
 
+        int iprintf(const char *<[format]> [, <[arg]>, ...]);
+        int fiprintf(FILE *<[fd]>, const char *<[format]> [, <[arg]>, ...]);
         int siprintf(char *<[str]>, const char *<[format]> [, <[arg]>, ...]);
+        int asiprintf(char **<[strp]>, const char *<[format]> [, <[arg]>, ...]);
+        int sniprintf(char *<[str]>, size_t <[size]>, const char *<[format]> [, <[arg]>, ...]);
 
 TRAD_SYNOPSIS
-        #include <stdio.h>
+	#include <stdio.h>
 
-        int siprintf(<[str]>, <[format]>, [, <[arg]>, ...])
-        char *<[str]>;
-        const char *<[format]>;
+	int iprintf(<[format]> [, <[arg]>, ...])
+	char *<[format]>;
+
+	int fiprintf(<[fd]>, <[format]> [, <[arg]>, ...]);
+	FILE *<[fd]>;
+	char *<[format]>;
+
+	int asiprintf(<[strp]>, <[format]> [, <[arg]>, ...]);
+	char **<[strp]>;
+	char *<[format]>;
+
+	int siprintf(<[str]>, <[format]> [, <[arg]>, ...]);
+	char *<[str]>;
+	char *<[format]>;
+
+	int sniprintf(<[str]>, size_t <[size]>, <[format]> [, <[arg]>, ...]);
+	char *<[str]>;
+        size_t <[size]>;
+	char *<[format]>;
 
 DESCRIPTION
-<<siprintf>> is a restricted version of <<sprintf>>: it has the same
-arguments and behavior, save that it cannot perform any floating-point
-formatting: the <<f>>, <<g>>, <<G>>, <<e>>, and <<F>> type specifiers
-are not recognized.
+        <<iprintf>>, <<fiprintf>>, <<siprintf>>, <<sniprintf>>,
+        <<asiprintf>>, are the same as <<printf>>, <<fprintf>>,
+	<<sprintf>>, <<snprintf>>, and <<asprintf>>, respectively,
+	only that they restrict usage to non-floating-point format
+	specifiers.
 
 RETURNS
-        <<siprintf>> returns the number of bytes in the output string,
-        save that the concluding <<NULL>> is not counted.
-        <<siprintf>> returns when the end of the format string is
-        encountered.
+<<siprintf>> and <<asiprintf>> return the number of bytes in the output string,
+save that the concluding <<NULL>> is not counted.
+<<iprintf>> and <<fiprintf>> return the number of characters transmitted.
+If an error occurs, <<iprintf>> and <<fiprintf>> return <<EOF>> and
+<<asiprintf>> returns -1.  No error returns occur for <<siprintf>>.
 
 PORTABILITY
-<<siprintf>> is not required by ANSI C.
+<<iprintf>>, <<fiprintf>>, <<siprintf>>, <<sniprintf>>, and <<asprintf>>
+are newlib extensions.
 
 Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
@@ -64,6 +95,39 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <limits.h>
 #include "local.h"
 
+int
+#ifdef _HAVE_STDC
+_DEFUN(_siprintf_r, (ptr, str, fmt),
+       struct _reent *ptr _AND
+       char *str          _AND
+       _CONST char *fmt _DOTS)
+#else
+_siprintf_r(ptr, str, fmt, va_alist)
+           struct _reent *ptr;
+           char *str;
+           _CONST char *fmt;
+           va_dcl
+#endif
+{
+  int ret;
+  va_list ap;
+  FILE f;
+
+  f._flags = __SWR | __SSTR;
+  f._bf._base = f._p = (unsigned char *) str;
+  f._bf._size = f._w = INT_MAX;
+  f._file = -1;  /* No file. */
+#ifdef _HAVE_STDC
+  va_start (ap, fmt);
+#else
+  va_start (ap);
+#endif
+  ret = _vfiprintf_r (ptr, &f, fmt, ap);
+  va_end (ap);
+  *f._p = 0;
+  return (ret);
+}
+
 #ifndef _REENT_ONLY
 
 int
@@ -73,9 +137,9 @@ _DEFUN(siprintf, (str, fmt),
        _CONST char *fmt _DOTS)
 #else
 siprintf(str, fmt, va_alist)
-         char *str;
-         _CONST char *fmt;
-         va_dcl
+        char *str;
+        _CONST char *fmt;
+        va_dcl
 #endif
 {
   int ret;
@@ -91,44 +155,10 @@ siprintf(str, fmt, va_alist)
 #else
   va_start (ap);
 #endif
-  ret = vfiprintf (&f, fmt, ap);
+  ret = _vfiprintf_r (_REENT, &f, fmt, ap);
   va_end (ap);
   *f._p = 0;
   return (ret);
 }
 
-#endif /* ! _REENT_ONLY */
-
-int
-#ifdef _HAVE_STDC
-_DEFUN(_siprintf_r, (rptr, str, fmt),
-       struct _reent *rptr _AND
-       char *str           _AND
-       _CONST char *fmt _DOTS)
-#else
-_siprintf_r(rptr, str, fmt, va_alist)
-            struct _reent *rptr;
-            char *str;
-            _CONST char *fmt;
-            va_dcl
 #endif
-{
-  int ret;
-  va_list ap;
-  FILE f;
-
-  f._flags = __SWR | __SSTR;
-  f._bf._base = f._p = (unsigned char *) str;
-  f._bf._size = f._w = INT_MAX;
-  f._file = -1;  /* No file. */
-#ifdef _HAVE_STDC
-  va_start (ap, fmt);
-#else
-  va_start (ap);
-#endif
-  ret = _vfiprintf_r (rptr, &f, fmt, ap);
-  va_end (ap);
-  *f._p = 0;
-  return (ret);
-}
-
