@@ -93,6 +93,7 @@ struct host_callback_struct
   void (*flush_stderr) PARAMS ((host_callback *));
   int (*stat) PARAMS ((host_callback *, const char *, struct stat *));
   int (*fstat) PARAMS ((host_callback *, int, struct stat *));
+  int (*lstat) PARAMS ((host_callback *, const char *, struct stat *));
   int (*ftruncate) PARAMS ((host_callback *, int, long));
   int (*truncate) PARAMS ((host_callback *, const char *, long));
 
@@ -188,6 +189,9 @@ extern host_callback default_callback;
 #define CB_SYS_chmod 	16
 #define CB_SYS_utime 	17
 #define CB_SYS_time 	18
+
+/* More standard syscalls.  */
+#define CB_SYS_lstat    19
 
 /* Struct use to pass and return information necessary to perform a
    system call.  */

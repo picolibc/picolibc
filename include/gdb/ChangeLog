@@ -1,3 +1,8 @@
+2004-12-13  Hans-Peter Nilsson  <hp@axis.com>
+
+	* callback.h (struct host_callback_struct): New member lstat.
+	(CB_SYS_lstat): New macro.
+
 2004-09-08  Michael Snyder  <msnyder@redhat.com>
 
 	Commited by Corinna Vinschen <vinschen@redhat.com>
