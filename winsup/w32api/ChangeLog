@@ -1,4 +1,10 @@
 
+Sun Jan 28 12:47:31  2001  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* Apply Danny Smith patch 102382
+	2000-11-15  Danny Smith  <danny_r_smith_2001@yahoo.co.nz>
+	* lib/mswsock.def: remove leading underscores from symbol names
+
 Sun Jan 28 11:16:39  2001  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* Apply Danny Smith patch 102446
