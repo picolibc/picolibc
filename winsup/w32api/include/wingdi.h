@@ -154,6 +154,10 @@ extern "C" {
 #define EMR_PIXELFORMAT 104
 #define ENHMETA_SIGNATURE 1179469088
 #define EPS_SIGNATURE 0x46535045
+#if (_WIN32_WINNT >= 0x0500)
+#define FR_PRIVATE 0x10
+#define FR_NOT_ENUM 0x20
+#endif
 #define META_SETBKCOLOR	0x201
 #define META_SETBKMODE	0x102
 #define META_SETMAPMODE	0x103
@@ -2401,6 +2405,10 @@ int WINAPI AbortDoc(HDC);
 BOOL WINAPI AbortPath(HDC);
 int WINAPI AddFontResourceA(LPCSTR);
 int WINAPI AddFontResourceW(LPCWSTR);
+#if (_WIN32_WINNT >= 0x0500)
+int WINAPI AddFontResourceExA(LPCSTR,DWORD,PVOID);
+int WINAPI AddFontResourceExW(LPCWSTR,DWORD,PVOID);
+#endif
 BOOL WINAPI AngleArc(HDC,int,int,DWORD,FLOAT,FLOAT);
 BOOL WINAPI AnimatePalette(HPALETTE,UINT,UINT,const PALETTEENTRY*);
 BOOL WINAPI Arc(HDC,int,int,int,int,int,int,int,int);
@@ -2653,6 +2661,10 @@ BOOL WINAPI RectInRegion(HRGN,LPCRECT);
 BOOL WINAPI RectVisible(HDC,LPCRECT);
 BOOL WINAPI RemoveFontResourceA(LPCSTR);
 BOOL WINAPI RemoveFontResourceW(LPCWSTR);
+#if (_WIN32_WINNT >= 0x0500)
+BOOL WINAPI RemoveFontResourceExA(LPCSTR,DWORD,PVOID);
+BOOL WINAPI RemoveFontResourceExW(LPCWSTR,DWORD,PVOID);
+#endif
 HDC WINAPI ResetDCA(HDC,const DEVMODEA*);
 HDC WINAPI ResetDCW(HDC,const DEVMODEW*);
 BOOL WINAPI ResizePalette(HPALETTE,UINT);
@@ -2767,6 +2779,9 @@ typedef NEWTEXTMETRICEXW NEWTEXTMETRICEX;
 typedef ENUMLOGFONTW ENUMLOGFONT,*LPENUMLOGFONT;
 typedef ENUMLOGFONTEXW ENUMLOGFONTEX,*LPENUMLOGFONTEX;
 #define AddFontResource AddFontResourceW
+#if (_WIN32_WINNT >= 0x0500)
+#define AddFontResourceEx AddFontResourceExW
+#endif
 #define CopyEnhMetaFile CopyEnhMetaFileW
 #define CopyMetaFile CopyMetaFileW
 #define CreateDC CreateDCW
@@ -2804,6 +2819,9 @@ typedef ENUMLOGFONTEXW ENUMLOGFONTEX,*LPENUMLOGFONTEX;
 #define GetTextMetrics GetTextMetricsW
 #define PolyTextOut PolyTextOutW
 #define RemoveFontResource RemoveFontResourceW
+#if (_WIN32_WINNT >= 0x0500)
+#define RemoveFontResourceEx RemoveFontResourceExW
+#endif
 #define ResetDC ResetDCW
 #define SetICMProfile SetICMProfileW
 #define StartDoc StartDocW
@@ -2829,6 +2847,9 @@ typedef NEWTEXTMETRICEXA NEWTEXTMETRICEX;
 typedef ENUMLOGFONTA ENUMLOGFONT,*LPENUMLOGFONT;
 typedef ENUMLOGFONTEXA ENUMLOGFONTEX,*LPENUMLOGFONTEX;
 #define AddFontResource AddFontResourceA
+#if (_WIN32_WINNT >= 0x0500)
+#define AddFontResourceEx AddFontResourceExA
+#endif
 #define CopyEnhMetaFile CopyEnhMetaFileA
 #define CopyMetaFile CopyMetaFileA
 #define CreateDC CreateDCA
@@ -2866,6 +2887,9 @@ typedef ENUMLOGFONTEXA ENUMLOGFONTEX,*LPENUMLOGFONTEX;
 #define GetTextMetrics GetTextMetricsA
 #define PolyTextOut PolyTextOutA
 #define RemoveFontResource RemoveFontResourceA
+#if (_WIN32_WINNT >= 0x0500)
+#define RemoveFontResourceEx RemoveFontResourceExA
+#endif
 #define ResetDC ResetDCA
 #define SetICMProfile SetICMProfileA
 #define StartDoc StartDocA
