@@ -1,3 +1,10 @@
+2001-12-10  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.h (fhandler_serial::ev): New class member.
+	* fhandler_serial.cc (fhandler_serial::raw_read): Use class member for
+	event status.
+	* select.cc (peek_serial): Ditto.
+
 2001-12-07  Christopher Faylor  <cgf@redhat.com>
 
 	* path.cc (path_conv::check): Use full path name for determining

@@ -582,6 +582,7 @@ class fhandler_serial: public fhandler_base
  public:
   int overlapped_armed;
   OVERLAPPED io_status;
+  DWORD ev;
 
   /* Constructor */
   fhandler_serial (int unit);

@@ -865,7 +865,6 @@ struct serialinf
 static int
 peek_serial (select_record *s, bool)
 {
-  DWORD ev;
   COMSTAT st;
 
   fhandler_serial *fh = (fhandler_serial *)s->fh;
@@ -890,19 +889,18 @@ peek_serial (select_record *s, bool)
 
   if (!fh->overlapped_armed)
     {
-      DWORD ev;
       COMSTAT st;
 
       ResetEvent (fh->io_status.hEvent);
 
-      if (!ClearCommError (h, &ev, &st))
+      if (!ClearCommError (h, &fh->ev, &st))
 	{
 	  debug_printf ("ClearCommError");
 	  goto err;
 	}
       else if (st.cbInQue)
 	return s->read_ready = true;
-      else if (WaitCommEvent (h, &ev, &fh->io_status))
+      else if (WaitCommEvent (h, &fh->ev, &fh->io_status))
 	return s->read_ready = true;
       else if (GetLastError () == ERROR_IO_PENDING)
 	fh->overlapped_armed = 1;
@@ -923,7 +921,7 @@ peek_serial (select_record *s, bool)
   switch (WaitForMultipleObjects (2, w4, FALSE, to))
     {
     case WAIT_OBJECT_0:
-      if (!ClearCommError (h, &ev, &st))
+      if (!ClearCommError (h, &fh->ev, &st))
 	{
 	  debug_printf ("ClearCommError");
 	  goto err;

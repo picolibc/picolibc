@@ -60,7 +60,6 @@ fhandler_serial::raw_read (void *ptr, size_t ulen)
 
   for (n = 0, tot = 0; ulen; ulen -= n, ptr = (char *)ptr + n)
     {
-      DWORD ev;
       COMSTAT st;
       DWORD inq = 1;
 
@@ -374,7 +373,6 @@ fhandler_serial::tcflush (int queue)
        (we stop after 1000 chars anyway) */
     for (int max = 1000; max > 0; max--)
       {
-	DWORD ev;
 	COMSTAT st;
 	if (!PurgeComm (get_handle (), PURGE_RXABORT | PURGE_RXCLEAR))
 	  break;
