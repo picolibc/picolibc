@@ -12,20 +12,13 @@ class muto;
 class wininfo
 {
   HWND hwnd;
-  static muto *lock;
+  static muto *_lock;
 public:
-  UINT timer_active;
-  struct itimerval itv;
-  DWORD start_time;
-  HANDLE window_started;
   operator HWND ();
   int __stdcall wininfo::process (HWND, UINT, WPARAM, LPARAM)
     __attribute__ ((regparm (3)));
-  int __stdcall setitimer (const struct itimerval *value, struct itimerval *oldvalue)
-    __attribute__ ((regparm (3)));
-  int __stdcall getitimer (struct itimerval *value)
-    __attribute__ ((regparm (2)));
-  wininfo ();
+  void lock ();
+  void release ();
   DWORD WINAPI winthread () __attribute__ ((regparm (1)));
 };
 

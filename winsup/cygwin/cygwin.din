@@ -821,6 +821,7 @@ ldexpf NOSIGFE
 _ldexpf = ldexpf NOSIGFE
 ldiv NOSIGFE
 _ldiv = ldiv NOSIGFE
+lfind NOSIGFE
 lgamma NOSIGFE
 _lgamma = lgamma NOSIGFE
 lgamma_r NOSIGFE
@@ -866,6 +867,7 @@ lrint NOSIGFE
 lrintf NOSIGFE
 lround NOSIGFE
 lroundf NOSIGFE
+lsearch NOSIGFE
 lseek SIGFE
 _lseek = lseek SIGFE
 _lseek64 = lseek64 SIGFE
@@ -1436,6 +1438,7 @@ time SIGFE
 _time = time SIGFE
 timer_create SIGFE
 timer_delete SIGFE
+timer_gettime SIGFE
 timer_settime SIGFE
 times SIGFE
 _times = times SIGFE

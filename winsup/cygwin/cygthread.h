@@ -26,6 +26,7 @@ class cygthread
   VOID *arg;
   bool is_freerange;
   static bool exiting;
+  HANDLE notify_detached;
  public:
   bool terminate_thread ();
   static DWORD WINAPI stub (VOID *);
@@ -34,7 +35,7 @@ class cygthread
   static const char * name (DWORD = 0);
   void auto_release () {func = NULL;}
   void release (bool);
-  cygthread (LPTHREAD_START_ROUTINE, LPVOID, const char *);
+  cygthread (LPTHREAD_START_ROUTINE, LPVOID, const char *, HANDLE = NULL);
   cygthread () {};
   static void init ();
   bool detach (HANDLE = NULL);

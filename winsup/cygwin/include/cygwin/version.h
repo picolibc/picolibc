@@ -252,12 +252,13 @@ details. */
       123: Export utmpxname.
       124: Add MAP_AUTOGROW flag to mmap.
       125: LD_PRELOAD/CW_HOOK available.
+      126: Add lsearch, lfind, timer_gettime.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 125
+#define CYGWIN_VERSION_API_MINOR 126
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

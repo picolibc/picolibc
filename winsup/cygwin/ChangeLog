@@ -1,3 +1,70 @@
+2005-03-26  Pierre Humblet <pierre.humblet@ieee.org>
+	    Christopher Faylor <cgf@timesys.com>
+
+	* wininfo.h (wininfo::timer_active): Delete.
+	(wininfo::itv): Ditto.
+	(wininfo::start_time): Ditto.
+	(wininfo::window_started): Ditto.
+	(wininfo::getitimer): Ditto.
+	(wininfo::setitimer): Ditto.
+	(wininfo::wininfo): Ditto.
+	(wininfo::lock): New method.
+	(wininfo::release): Ditto.
+	* window.cc:  Use new lock/acquire wininfo methods throughout.
+	 (wininfo::wininfo): Delete
+	(wininfo::getitimer): Ditto.
+	(wininfo::setitimer): Ditto.
+	(getitimer): Ditto.
+	(setitimer): Ditto.
+	(ualarm): Ditto.
+	(alarm): Ditto.
+	(wininfo::lock): Define new function.
+	(wininfo::release): Ditto.
+	(wininfo::process): Delete WM_TIMER handling.
+	* timer.cc (struct timetracker): Delete it, flags.  Add it_interval,
+	interval_us, sleepto_us, running, init_muto(), syncthread, and
+	gettime().
+	(ttstart): Make NO_COPY.
+	(lock_timer_tracker): New class.
+	(timer_tracker::timer_tracker): Distinguish ttstart case.
+	(timer_tracker::~timer_tracker): New destructor.  Clean out events, and
+	reset magic.
+	(timer_tracker::init_muto): New method.
+	(to_us): Round up as per POSIX.
+	(timer_thread): Reorganize to match timer_tracker::settime and
+	timer_tracker::gettime.  Call sig_send without wait.  Call
+	auto_release.
+	(timer_tracker::settime): Reorganize logic to avoid race.  Call gettime
+	to recover old value.
+	(timer_tracker::gettime): New method.
+	(timer_create): Properly set errno on invalid timerid.  Use new
+	lock_timer_tracker method.
+	(timer_delete): Ditto.  Simplify code slightly.
+	(timer_gettime): New function.
+	(fixup_timers_after_fork): Reinit ttstart.
+	(getitimer): New implementation.
+	(setitimer): Ditto.
+	(ualarm): Ditto.
+	(alarm): Ditto.
+	* cygwin.din: Export timer_gettime.
+	* winsup.h: Remove has has_visible_window_station declaration.
+
+2005-03-26  Christopher Faylor  <cgf@timesys.com>
+
+	* Makefile.in (DLL_OFILES): Add lsearch.o.
+	* cygthread.h (cygthread::notify_detached): New element.
+	(cygthread::cygthread): Take optional fourth argument signifying event
+	to signal on thread completion.
+	* cygthread.cc (cygthread::stub): Signal notify_detached event, if it
+	exists.
+	(cygthread::cygthread): Initialize notify_detached from fourth argument.
+	(cygthread::detach): Wait for notify_detached field is present.
+
+	* lsearch.cc: New file.
+	* search.h: Ditto.
+	* include/cygwin/version.h: Bump API minor number to 126.
+	* cygwin.din: Export lsearch, lfind.
+
 2005-03-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_socket::secret_event): Remove.

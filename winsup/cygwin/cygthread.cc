@@ -26,7 +26,7 @@ DWORD NO_COPY cygthread::main_thread_id;
 bool NO_COPY cygthread::exiting;
 
 /* Initial stub called by cygthread constructor. Performs initial
-   per-thread initialization and loops waiting for new thread functions
+   per-thread initialization and loops waiting for another thread function
    to execute.  */
 DWORD WINAPI
 cygthread::stub (VOID *arg)
@@ -73,10 +73,11 @@ cygthread::stub (VOID *arg)
 	  info->func (info->arg == cygself ? info : info->arg);
 	  /* ...so the above should always return */
 
+	  HANDLE notify = info->notify_detached;
 	  /* If func is NULL, the above function has set that to indicate
 	     that it doesn't want to alert anyone with a SetEvent and should
 	     just be marked as no longer inuse.  Hopefully the function knows
-	     that it is doing.  */
+	     what it is doing.  */
 	  if (!info->func)
 	    info->release (false);
 	  else
@@ -88,6 +89,8 @@ cygthread::stub (VOID *arg)
 	      info->__name = NULL;
 	      SetEvent (info->ev);
 	    }
+	  if (notify)
+	    SetEvent (notify);
 	}
       switch (WaitForSingleObject (info->thread_sync, INFINITE))
 	{
@@ -161,8 +164,8 @@ out:
 }
 
 cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
-		      const char *name): __name (name),
-					 func (start), arg (param)
+		      const char *name, HANDLE notify)
+ : __name (name), func (start), arg (param), notify_detached (notify)
 {
   thread_printf ("name %s, id %p", name, id);
   if (h)
@@ -310,7 +313,9 @@ cygthread::detach (HANDLE sigwait)
       DWORD res;
 
       if (!sigwait)
-	res = WaitForSingleObject (*this, INFINITE);
+	/* If the caller specified a special handle for notification, wait for that.
+	   This assumes that the thread in question is auto releasing. */
+	res = WaitForSingleObject (notify_detached ?: *this, INFINITE);
       else
 	{
 	  /* Lower our priority and give priority to the read thread */
