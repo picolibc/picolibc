@@ -35,7 +35,8 @@
 
 2002-11-05  Sergey Okhapkin  <sos@prospect.com.ru>
 
-	* fhandler_serial.cc (fhandler_serial::raw_read): Use correct type for minchars.
+	* fhandler_serial.cc (fhandler_serial::raw_read): Use correct type for
+	minchars.
 	(fhandler_serial::ioctl): Set errno if the ClearCommError fails.
 	(fhandler_serial::tcsetattr): Use correct value for vmin_.
 	(fhandler_serial::tcgetattr): Ditto.
