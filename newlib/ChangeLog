@@ -1,3 +1,7 @@
+2002-01-07 Jeff Johnston  <jjohnstn@redhat.com>
+
+	* MAINTAINERS: Change e-mail addresses to refer to redhat domain.
+
 2002-01-07 Alan Matsuoka <alanm@redhat.com>
 
         * libc/include/machine/ieeefp.h: Configure d10v doubles to

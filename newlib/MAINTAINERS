@@ -5,7 +5,7 @@
 
 The official maintainers of newlib:
 
-Jeff Johnston			jjohnstn@cygnus.com
+Jeff Johnston			jjohnstn@redhat.com
 
 
 		     Various Domain Maintainers
@@ -21,11 +21,11 @@ If there are several maintainers for a given domain then
 responsibility falls to the first maintainer.  The first maintainer is
 free to devolve that responsibility among the other maintainers.
 
-Makefile.in, configure*:	jjohnstn@cygnus.com
+Makefile.in, configure*:	jjohnstn@redhat.com
 
-Cygwin:				cgf@cygnus.com
+Cygwin:				cgf@redhat.com
 
-Web pages:			jjohnstn@cygnus.com
+Web pages:			jjohnstn@redhat.com
 
 
 
@@ -33,5 +33,5 @@ Web pages:			jjohnstn@cygnus.com
 
 These are users with general write privileges after getting approval:
 
-DJ Delorie			dj@cygnus.com
-Christopher G. Faylor		cgf@cygnus.com
+DJ Delorie			dj@redhat.com
+Christopher G. Faylor		cgf@redhat.com
