@@ -4,7 +4,6 @@
 #pragma GCC system_header
 #endif
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -119,7 +118,7 @@ typedef struct _INPUT_RECORD {
 } INPUT_RECORD,*PINPUT_RECORD;
 
 BOOL WINAPI AllocConsole(void);
-HANDLE WINAPI CreateConsoleScreenBuffer(DWORD,DWORD,LPSECURITY_ATTRIBUTES,DWORD,PVOID);
+HANDLE WINAPI CreateConsoleScreenBuffer(DWORD,DWORD,CONST SECURITY_ATTRIBUTES*,DWORD,LPVOID);
 BOOL WINAPI FillConsoleOutputAttribute(HANDLE,WORD,DWORD,COORD,PDWORD);
 BOOL WINAPI FillConsoleOutputCharacterA(HANDLE,CHAR,DWORD,COORD,PDWORD);
 BOOL WINAPI FillConsoleOutputCharacterW(HANDLE,WCHAR,DWORD,COORD,PDWORD);

@@ -1,3 +1,31 @@
+2002-06-19  Casper S. Hornstrup  <chorns@users.sourceforge.net>
+
+	* include/ddeml.h (DdeCreateStringHandle{AW]:Correct
+	prototypes.
+	* include/winsvc.h (StartServiceW): Correct prototype.
+	* include/winbase.h (BackupRead,BackupSeek,BackupWrite,
+	FileTimeToLocalFileTime, GetAce,GetPrivateProfileStruct[AW],
+	GetTickCount,InterlockedExchangeAdd,
+	WritePrivateProfileStruct[AW]: Correct prototypes.
+	(GetEnvironmentStrings): Correct mapping to
+	GetEnvironmentStringsA.
+	* include/winver.h (VerQueryValueA,VerQueryValueW):
+	Correct prototypes.
+	* include/wincon.h (CreateConsoleScreenBuffer): Correct
+	prototype.
+	* include/winreg.h (RegQueryMultipleValues[AW],
+	RegQueryValueEx[AW]):Correct prototypes.
+	* include/wingdi.h (PXFORM, PLOGBRUSH, PLOGPEN, PPOLYTEXTA,
+	PPOLYTEXTW): Add typedefs.
+	(_DESIGNVECTOR,COLOR16, _TRIVERTEX, _DISPLAY_DEVICE): Add
+	structures and typedefs.
+	(MM_MAX_NUMAXES): Add define.
+	(EnumFontsW,GetEnhMetaFilePixelFormat,
+	wglGetLayerPaletteEntries): Correct prototypes.
+	* include/winerror.h (RPC_X_INVALID_PIPE_OBJECT,
+	RPC_X_WRONG_PIPE_ORDER,RPC_X_WRONG_PIPE_VERSION,
+	RPC_S_SEND_INCOMPLETE): Add defines.
+
 2002-06-17  Casper S. Hornstrup  <chorns@users.sourceforge.net>
 
 	* include/windef.h (_fastcall, __fastcall, FASTCALL):
