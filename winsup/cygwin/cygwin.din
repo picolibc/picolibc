@@ -1067,6 +1067,20 @@ wmemmove
 _wmemmove = wmemmove
 wmemset
 _wmemset = wmemset
+btowc
+_btowc = btowc
+wctob
+_wctob = wctob
+mbsinit
+_mbsinit = mbsinit
+mbrlen
+_mbrlen = mbrlen
+mbrtowc
+_mbrtowc = mbrtowc
+wcrtomb
+_wcrtomb = wcrtomb
+wcsrtombs
+_wcsrtombs = wcsrtombs
 wprintf
 _wprintf = wprintf
 memccpy
