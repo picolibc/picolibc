@@ -1,3 +1,7 @@
+2002-09-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntsec.html: Add chapter for switching user context w/o password.
+
 2002-08-29  Christopher Faylor  <cgf@redhat.com>
 
 	* how-api.texinfo: Remove a line from the CRLF discussion about lseek

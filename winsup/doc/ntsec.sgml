@@ -411,7 +411,6 @@ for fun.</para>
 <title>/etc/passwd</title>
 <screen>
 root:*:0:0:Administrators group,S-1-5-32-544::
-Everyone:*:1:1:,S-1-1-0::
 SYSTEM:*:18:18:,S-1-5-18:/home/system:/bin/bash
 admin:*:500:513:,S-1-5-21-1844237615-436374069-1060284298-500:/home/Administrator:/bin/bash
 corinna:*:100:0:Corinna Vinschen,S-1-5-21-1844237615-436374069-1060284298-1003:/home/corinna:/bin/tcsh
@@ -423,7 +422,6 @@ Guest:*:501:546:,S-1-5-21-1844237615-436374069-1060284298-501:/home/Guest:/bin/b
 <title>/etc/group</title>
 <screen>
 root:S-1-5-32-544:0:
-everyone:S-1-1-0:1:
 local:S-1-2-0:2:
 network:S-1-5-2:3:
 interactive:S-1-5-4:4:
@@ -707,6 +705,28 @@ contexts by observing the following order:</para>
 etc.
 
 </screen>
+
+</sect2>
+
+<sect2 id="ntsec-release1.3.3"><title>New since Cygwin release 1.3.3</title>
+
+<para>
+Since Cygwin release 1.3.3, applications having the
+<command>Create a process level token</command> user right can switch user
+context without giving a password by just calling the usual
+<command>setuid</command>, <command>seteuid</command>,
+<command>setgid</command> and <command>setegid</command> functions.  This is
+typically only given to the SYSTEM user. However, this now allows to switch
+the user context using e. g. rhosts authentication or (when running sshd
+under SYSTEM account as service) public key authentication.
+</para>
+<para>
+An important restriction of this method is, that a process started under
+SYSTEM account can't access network shares which require authentication.
+This also applies to the subprocesses which switched the user context 
+without a password.  People using network home drives are typically not
+able to access it when trying to login using ssh or rsh without password.
+</para>
 
 </sect2>
 
