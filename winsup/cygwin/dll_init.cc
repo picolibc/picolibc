@@ -182,25 +182,34 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
 
 /* Detach a DLL from the chain. */
 void
-dll_list::detach (dll *d)
+dll_list::detach (void *retaddr)
 {
   if (!myself || myself->process_state == PID_EXITED)
     return;
+  MEMORY_BASIC_INFORMATION m;
+  if (!VirtualQuery (retaddr, &m, sizeof m))
+    return;
+  HMODULE h = (HMODULE) m.AllocationBase;
 
-  if (d->count <= 0)
-    system_printf ("WARNING: try to detach an already detached dll ...");
-  else if (--d->count == 0)
-    {
-      d->p.run_dtors ();
-      d->prev->next = d->next;
-      if (d->next)
-	d->next->prev = d->prev;
-      if (d->type == DLL_LOAD)
-	loaded_dlls--;
-      if (end == d)
-	end = d->prev;
-      VirtualFree (d, 0, MEM_RELEASE);
-    }
+  dll *d = &start;
+  while ((d = d->next))
+    if (d->handle != h)
+      continue;
+    else if (d->count <= 0)
+      system_printf ("WARNING: try to detach an already detached dll ...");
+    else if (--d->count == 0)
+      {
+	d->p.run_dtors ();
+	d->prev->next = d->next;
+	if (d->next)
+	  d->next->prev = d->prev;
+	if (d->type == DLL_LOAD)
+	  loaded_dlls--;
+	if (end == d)
+	  end = d->prev;
+	VirtualFree (d, 0, MEM_RELEASE);
+	break;
+      }
 }
 
 /* Initialization for all linked DLLs, called by dll_crt0_1. */
@@ -390,9 +399,9 @@ dll_noncygwin_dllcrt0 (HMODULE h, per_process *p)
 }
 
 extern "C" void
-cygwin_detach_dll (dll *d)
+cygwin_detach_dll (dll *)
 {
-  dlls.detach (d);
+  dlls.detach (__builtin_return_address (0));
 }
 
 extern "C" void

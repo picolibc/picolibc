@@ -70,7 +70,7 @@ public:
   int reload_on_fork;
   dll *operator [] (const char *name);
   dll *alloc (HINSTANCE, per_process *, dll_type);
-  void detach (dll *);
+  void detach (void *);
   void init ();
   void load_after_fork (HANDLE, dll *);
   dll *inext ()

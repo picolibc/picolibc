@@ -1,5 +1,12 @@
 2002-11-13  Christopher Faylor  <cgf@redhat.com>
 
+	* dll_init.cc (dll_list::detach): Eliminate reliance on passed in dll
+	address.  Infer from module of caller instead.
+	(cygwin_detach_dll): Ignore dll_index argument.
+	* dll_init.h (dll_list::detach): Reflect argument change above.
+
+2002-11-13  Christopher Faylor  <cgf@redhat.com>
+
 	* ioctl.cc (ioctl): Always print ioctl results, even when it's a tty.
 
 2002-11-13  Christopher Faylor  <cgf@redhat.com>
