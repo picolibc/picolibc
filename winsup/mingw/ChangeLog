@@ -2,6 +2,7 @@
 
 	* include/_mingw.h: Revert to primary release 3 and increment minor
 	release to 3.
+	* Makefile.in (VERSION): Ditto.
 
 2004-04-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
