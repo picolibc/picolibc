@@ -1,3 +1,7 @@
+2001-09-13  Egor Duda  <deo@logos-m.ru>
+
+	* dumper.cc (main): Properly recognize negative pids (used by w9x).
+
 2001-09-09  Egor Duda  <deo@logos-m.ru>
 
 	* dumper.cc (main): Change command-line arguments format to be

@@ -806,7 +806,7 @@ main (int argc, char **argv)
 	p++;
       else
 	p = win32_name;
-      pid = atoi (*(argv + optind + 1));
+      pid = strtoul (*(argv + optind + 1), NULL, 10);
     }
   else
     {
