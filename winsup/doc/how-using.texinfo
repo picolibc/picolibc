@@ -1,0 +1,426 @@
+@section Using Cygwin
+
+@subsection How should I set my PATH?
+
+If you look at the "Cygwin 1.1.0" (or similar) shortcut created in the
+"Cygnus Solutions" programs folder, you'll see that it runs
+@code{C:\cygwin\bin\cygwin.bat} (assuming your root is
+@code{C:\cygwin}).  The contents should look something like this:
+
+@example
+	@@echo off
+	SET MAKE_MODE=unix
+	SET PATH=C:\cygwin\bin;C:\cygwin\usr\local\bin;%PATH%
+	bash
+@end example
+
+Effectively, this @strong{prepends} /usr/bin and /usr/local/bin to your
+Windows system path.  If you choose to reset your PATH, say in
+$HOME/.bashrc, then you should follow this rule.  You @strong{must} have
+@code{/usr/bin} in your PATH @strong{before} any Windows system
+directories.  (And you must not omit the Windows system directories!)
+Otherwise you will likely encounter all sorts of problems
+running Cygwin applications.
+
+If you haven't messed up the default mounts, then @code{/bin} and
+@code{/usr/bin} are the same location, so you only need one of them in
+your PATH.  You should use @code{/usr/local/bin} for installing
+additional Cygwin applications that are not part of the core net
+release.  (That is, anything not found in an ftp mirror of @code{latest}
+and installed by @code{setup.exe}.)
+
+@subsection How do I convert between Windows and UNIX paths?
+
+Use the 'cygpath' utility.  Type '@code{cygpath}' with no arguments to
+get usage information.  For example (on my installation):
+@example
+	bash$ cygpath --windows ~/.bashrc
+        D:\starksb\.bashrc
+        bash$ cygpath --unix C:/cygwin/bin/cygwin.bat
+        /usr/bin/cygwin.bat
+        bash$ cygpath --unix C:\\cygwin\\bin\\cygwin.bat
+        /usr/bin/cygwin.bat
+@end example
+Note that bash interprets the backslash '\' as an escape character, so
+you must type it twice in the bash shell if you want it to be recognised
+as such.
+
+@subsection How do I set /etc up?
+
+@strong{(Please note: This section has not yet been updated for the latest
+net release.)}
+
+If you want a valid /etc set up (so "ls -l" will display correct
+user information for example) and if you are running NT (preferably
+with an NTFS file system), you should just need to create the /etc
+directory on the filesystem mounted as / and then use mkpasswd and
+mkgroup to create /etc/passwd and /etc/group respectively.  Since
+Windows 95/98's Win32 API is less complete, you're out of luck if
+you're running Windows 95/98.
+
+@subsection Why doesn't bash read my .bashrc file on startup?
+
+Your .bashrc is read from your home directory specified by the HOME
+environment variable.  It uses /.bashrc if HOME is not set.  So you need
+to set HOME correctly, or move your .bashrc to the top of the drive
+mounted as / in Cygwin.
+
+@subsection How can I get bash filename completion to be case insensitive?
+
+"shopt -s nocaseglob" should do the trick.
+
+@subsection Can I use paths/filenames containing spaces in them?
+
+Cygwin does support spaces in filenames and paths.  That said, some
+utilities that use the library may not, since files don't typically
+contain spaces in Unix.  If you stumble into problems with this, you
+will need to either fix the utilities or stop using spaces in filenames
+used by Cygwin tools.
+
+In particular, bash interprets space as a word separator.  You would have
+to quote a filename containing spaces, or escape the space character.
+For example:
+@example
+	bash-2.03$ cd '/cygdrive/c/Program Files'
+@end example
+or
+@example
+	bash-2.03$ cd /cygdrive/c/Program\ Files
+@end example
+
+@subsection Why can't I cd into a shortcut to a directory?
+
+Cygwin does not follow MS Windows Explorer Shortcuts (*.lnk files).  It
+sees a shortcut as a regular file and this you cannot "cd" into it.
+
+Some people have suggested replacing the current symbolic link scheme
+with shortcuts.  The major problem with this is that .LNK files would
+then be used to symlink Cygwin paths that may or may not be valid
+under native Win32 non-Cygwin applications such as Explorer.
+
+@subsection I'm having basic problems with find.  Why?
+
+Make sure you are using the find that came with Cygwin and that you
+aren't picking up the Win32 find command instead.  You can verify that
+you are getting the right one by doing a "type find" in bash.
+
+@subsection Why don't cursor keys work under Win95/Win98?
+
+@strong{(Please note: This section has not yet been updated for the latest
+net release.)}
+
+Careful examination shows that they not just non-functional, but
+rather behave strangely, for example, with NumLock off, keys on numeric
+keyboard work, until you press usual cursor keys, when even numeric
+stop working, but they start working again after hitting alphanumeric
+key, etc. This reported to happen on localized versions of Win98 and
+Win95, and not specific to Cygwin (there're known cases of Alt+Enter
+(fullscreen/windowed toggle) not working and shifts sticking with
+other programs). The cause of this problem is Microsoft keyboard
+localizer which by default installed in 'autoexec.bat'. Corresponding
+line looks like:
+
+@example
+keyb ru,,C:\WINDOWS\COMMAND\keybrd3.sys
+@end example
+
+(That's for russian locale.) You should comment that line if you want
+your keys working properly. Of course, this will deprive you of your
+local alphabet keyboard support, so you should think about
+another localizer. exUSSR users are of course knowledgable of Keyrus
+localizer, and it might work for other locales too, since it has keyboard
+layout editor. But it has russian messages and documentation ;-(
+Reference URL is http://www.hnet.ru/software/contrib/Utils/KeyRus/
+(note the you may need to turn off Windows logo for Keyrus to operate
+properly).
+
+@subsection Is it OK to have multiple copies of the DLL?
+
+You should only have one copy of the Cygwin DLL on your system.  If you
+have multiple versions, they will conflict and cause problems.
+
+If you get the error "shared region is corrupted" it means you have
+multiple versions of cygwin1.dll running at the same time.  This could
+happen, for example, if you update cygwin1.dll without exiting @emph{all}
+Cygwin apps (including inetd) beforehand.
+
+@subsection Where can I find "more"?
+
+If you are looking for the "more" pager, you should use the "less" pager
+instead.
+
+@subsection Where can I find "which"?
+
+There is no "which" command with Cygwin.  However, you can use the bash
+shell builtin "type" which does something similar.
+
+@subsection How can I access other drives?
+
+You have some flexibility here.
+
+Cygwin has a builtin "cygdrive prefix" for drives that are not mounted.
+You can access any drive, say Z:, as '/cygdrive/z/'.
+
+In some applications (notably bash), you can use the familiar windows
+<drive>:/path/, using posix forward-slashes ('/') instead of Windows
+backward-slashes ('\').  (But see the warning below!)  This maps in the
+obvious way to the Windows path, but will be converted internally to use
+the Cygwin path, following mounts (default or explicit).  For example:
+@example
+	bash-2.03$ cd C:/Windows
+	bash-2.03$ pwd
+        /cygdrive/c/Windows
+@end example
+and
+@example
+	bash-2.03$ cd C:/cygwin
+	bash-2.03$ pwd
+        /
+@end example
+for a default setup.  (You could also use backward-slashes in the
+Windows path, but these would have to be escaped from the shell.)
+
+@strong{Warning:} There is some ambiguity in going from a Windows path
+to the posix path, because different posix paths, through different
+mount points, could map to the same Windows directory.  This matters
+because different mount points may be binmode or textmode, so the
+behaviour of Cygwin apps will vary depending on the posix path used to
+get there.
+
+You can avoid the ambiguity of Windows paths, and avoid typing
+"/cygdrive", by explicitly mounting drives to posix paths.  For example:
+@example
+	bash$ mkdir /c
+	bash$ mount c:/ /c
+	bash$ ls /c
+@end example
+Note that you only need to mount drives once.  The mapping is kept
+in the registry so mounts stay valid pretty much indefinitely.
+You can only get rid of them with umount (or the registry editor).
+
+The '-b' option to mount mounts the mountpoint in binary mode
+("binmode") where text and binary files are treated equivalently.  This
+should only be necessary for badly ported Unix programs where binary
+flags are missing from open calls.  It is also the setting for /,
+/usr/bin and /usr/lib in a default Cygwin installation.  The default for
+new mounts is text mode ("textmode"), which is also the mode for all
+"cygdrive" mounts.
+
+@subsection How can I copy and paste into Cygwin console windows?
+
+Under Windows NT, open the properties dialog of the console window.
+The options contain a toggle button, named "Quick edit mode".  It must
+be ON.  Save the properties.
+
+Under Windows 9x, open the properties dialog of the console window.
+Select the Misc tab.  Uncheck Fast Pasting.  Check QuickEdit.
+
+@subsection What does "mount failed: Device or resource busy" mean?
+
+@strong{(Please note: This section has not yet been updated for the latest
+net release.)}
+
+This usually means that you are trying to mount to a location
+already in use by mount.  For example, if c: is mounted as '/'
+and you try to mount d: there as well, you will get this error
+message.  First "umount" the old location, then "mount" the new one and
+you should have better luck.
+
+If you are trying to umount '/' and are getting this message, you may
+need to run @code{regedit.exe} and change the "native" key for the '/'
+mount in one of the mount points kept under
+HKEY_CURRENT_USER/Software/Cygnus Solutions/CYGWIN.DLL setup/<version>
+where <version> is the latest registry version associated with the
+Cygwin library.
+
+@subsection How can I share files between Unix and Windows?
+
+During development, we have both Unix boxes running Samba and
+NT/Windows 95/98 machines.  We often build with cross-compilers
+under Unix and copy binaries and source to the Windows system
+or just toy with them directly off the Samba-mounted partition.
+On dual-boot NT/Windows 9x machines, we usually use the FAT
+filesystem so we can also access the files under Windows 9x.
+
+@subsection Are mixed-case filenames possible with Cygwin?
+
+Several Unix programs expect to be able to use to filenames
+spelled the same way, but with different case.  A prime example
+of this is perl's configuration script, which wants @code{Makefile} and
+@code{makefile}.  WIN32 can't tell the difference between files with
+just different case, so the configuration fails.
+
+In releases prior to beta 16, mount had a special mixed case option
+which renamed files in such a way as to allow mixed case filenames.  We
+chose to remove the support when we rewrote the path handling code for
+beta 16.  The standard Windows apps -- explorer.exe,
+cmd.exe/command.com, etc. -- do not distinguish filenames that differed
+only in case, resulting in some (very) undesirable behavior.
+
+Sergey Okhapkin had maintained a mixed-case patch ('coolview') until
+about B20.1, but this has not been updated to recent versions of Cygwin.
+
+@subsection What about DOS special filenames?
+
+Files cannot be named com1, lpt1, or aux (to name a few); either as
+the root filename or as the extension part.  If you do, you'll have
+trouble.  Unix programs don't avoid these names which can make things
+interesting.  E.g., the perl distribution has a file called
+@code{aux.sh}.  The perl configuration tries to make sure that
+@code{aux.sh} is there, but an operation on a file with the magic
+letters 'aux' in it will hang.
+
+@subsection When it hangs, how do I get it back?
+
+If something goes wrong and the tools hang on you for some reason (easy
+to do if you try and read a file called aux.sh), first try hitting ^C to
+return to bash or the cmd prompt.
+
+If you start up another shell, and applications don't run, it's a good
+bet that the hung process is still running somewhere.  Use the Task
+Manager, pview, or a similar utility to kill the process.
+
+And, if all else fails, there's always the reset button/power switch.
+This should never be necessary under Windows NT.
+
+@subsection Why the weird directory structure?
+
+Why do /lib and /usr/lib (and /bin, /usr/bin) point to the same thing?
+
+Why use mounts instead of symbolic links?
+
+Can I use a disk root (e.g., C:\) as Cygwin root?  Why is this discouraged?
+
+After a new installation in the default location, your mount points will
+look something like this:
+
+@example
+Device              Directory           Type         Flags
+C:\cygwin\bin       /usr/bin            user         binmode
+C:\cygwin\lib       /usr/lib            user         binmode
+C:\cygwin           /                   user         binmode
+@end example
+
+Note that /bin and /usr/bin point to the same location, as do /lib and
+/usr/lib.  This is intentional, and you should not undo these mounts
+unless you @emph{really} know what you are doing.
+
+Various applications and packages may expect to be installed in /lib or
+/usr/lib (similarly /bin or /usr/bin).  Rather than distinguish between
+them and try to keep track of them (possibly requiring the occasional
+duplication or symbolic link), it was decided to maintain only one
+actual directory, with equivalent ways to access it.
+
+Symbolic links had been considered for this purpose, but were dismissed
+because they do not always work on Samba drives.  Also, mounts are
+faster to process because no disk access is required to resolve them.
+
+Note that non-cygwin applications will not observe Cygwin mounts (or
+symlinks for that matter).  For example, if you use WinZip to unpack the
+tar distribution of a Cygwin package, it may not get installed to the
+correct Cygwin path.  @emph{So don't do this!}
+
+It is strongly recommended not to make the Cygwin root directory the
+same as your drive's root directory, unless you know what you are doing
+and are prepared to deal with the consequences.  It is generally easier
+to maintain the Cygwin hierarchy if it is isolated from, say, C:\.  For
+one thing, you avoid possible collisions with other (non-cygwin)
+applications that may create (for example) \bin and \lib directories.
+(Maybe you have nothing like that installed now, but who knows about
+things you might add in the future?)
+
+@subsection How do anti-virus programs like Cygwin?
+
+Users have reported that McAfee (now NAI) VirusScan for NT (and others?) is
+incompatible with Cygwin.  This is because it tries to scan the
+newly loaded shared memory in the cygwin.dll, which can cause fork()s
+to fail, wreaking havoc on many of the tools.
+
+There are also reports of NAI VirusScan causing the system to hang when
+unpacking tar.gz archives.  This is surely a bug in VirusScan, and
+should be reported to NAI.  The only workaround is to disable VirusScan
+when accessing these files.  This can be an issue during setup, and is
+discussed in that FAQ entry.
+
+@subsection Why can't I run bash as a shell under NT Emacs?
+
+@strong{(Please note: This section has not yet been updated for the latest
+net release.)}
+
+Place the following code in your startup file and try again:
+
+@smallexample
+(load "comint")
+(fset 'original-comint-exec-1 (symbol-function 'comint-exec-1))
+(defun comint-exec-1 (name buffer command switches)
+  (let ((binary-process-input t)
+        (binary-process-output nil))
+    (original-comint-exec-1 name buffer command switches)))
+@end smallexample
+
+@subsection info error "dir: No such file or directory"
+
+Cygwin packages install their info documentation in the /usr/info
+directory.  But you need to create a @code{dir} file there before the
+standalone info program (probably @code{/usr/bin/info}) can be used to
+read those info files.  This is how you do it:
+@example
+	bash$ cd /usr/info
+	bash$ for f in *.info ; do install-info $f dir ; done
+@end example
+This may generate warnings:
+@example
+	install-info: warning: no info dir entry in `gzip.info'
+	install-info: warning: no info dir entry in `time.info'
+@end example
+The @code{install-info} command cannot parse these files, so you will
+have to add their entries to @code{/usr/info/dir} by hand.
+
+@subsection Why do I get a message saying Out of Queue slots?
+
+@strong{(Please note: This section has not yet been updated for the latest
+net release.)}
+
+"Out of queue slots!" generally occurs when you're trying to remove
+many files that you do not have permission to remove (either because
+you don't have permission, they are opened exclusively, etc).  What
+happens is Cygwin queues up these files with the supposition that it
+will be possible to delete these files in the future.  Assuming that
+the permission of an affected file does change later on, the file will
+be deleted as requested.  However, if too many requests come in to
+delete inaccessible files, the queue overflows and you get the message
+you're asking about.  Usually you can remedy this with a quick chmod,
+close of a file, or other such thing.  (Thanks to Larry Hall for
+this explanation).
+
+@subsection Why don't symlinks work on samba-mounted filesystems?
+
+Symlinks are marked with "system" file attribute.  Samba does not
+enable this attribute by default.  To enable it, consult your Samba
+documentation and then add these lines to your samba configuration
+file:
+
+@smallexample
+	map system = yes
+	create mask = 0775
+@end smallexample
+
+Note that the 0775 can be anything as long as the 0010 bit is set.
+
+@subsection Why does df report sizes incorrectly.
+
+@strong{(Please note: This section has not yet been updated for the latest
+net release.)}
+
+There is a bug in the Win32 API function GetFreeDiskSpace that
+makes it return incorrect values for disks larger than 2 GB in size.
+Perhaps that may be your problem?
+
+@subsection Has the screen program been ported yet?
+
+@strong{(Please note: This section has not yet been updated for the latest
+net release.)}
+
+Screen requires either unix domain sockets or fifoes.  Neither of
+them have been implemented in Cygwin yet.
+

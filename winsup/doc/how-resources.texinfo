@@ -1,0 +1,115 @@
+@section Where can I get more information?
+
+@subsection Where's the documentation?
+
+There are links to quite a lot of it on the main Cygwin project web
+page: @file{http://sources.redhat.com/cygwin/}.  Be sure to at least
+read any 'Release Notes' or 'Readme' or 'read this' links on the main
+web page, if there are any.
+
+There is a comprehensive Cygwin User's Guide at
+@file{http://sources.redhat.com/cygwin/cygwin-ug-net/cygwin-ug-net.html}
+and an API Reference at
+@file{http://sources.redhat.com/cygwin/cygwin-api/cygwin-api.html}.
+
+There is an interesting paper about Cygwin from the 1998 USENIX Windows
+NT Workshop Proceedings at
+@file{http://sources.redhat.com/cygwin/usenix-98/cygwin.html}.
+
+You can find documentation for the individual GNU tools at
+@file{http://www.fsf.org/manual/}.  (You should read GNU manuals from a
+local mirror, check @file{http://www.fsf.org/server/list-mirrors.html}
+for a list of them.)
+
+@subsection What Cygwin mailing lists can I join?
+
+Comprehensive information about the Cygwin mailing lists can be found at
+@file{http://sources.redhat.com/cygwin/lists.html}.
+
+To subscribe to the main list, send a message to
+cygwin-subscribe@@sources.redhat.com.  To unsubscribe from the 
+main list, send a message to cygwin-unsubscribe@@sources.redhat.com.
+In both cases, the subject and body of the message are ignored.
+
+Similarly, to subscribe to the Cygwin annoucements list, send a message
+to cygwin-announce-subscribe@@sources.redhat.com.  To unsubscribe,
+send a message to cygwin-announce-unsubscribe@@sources.redhat.com.
+
+If you are going to help develop the Cygwin library by volunteering for
+the project, you will want to subscribe to the Cygwin developers list,
+called cygwin-developers.  If you are contributing to Cygwin tools &
+applications, rather than the library itself, then you should subscribe
+to cygwin-apps.  The same mechanism as described for the first two lists
+works for these as well.  Both cygwin-developers and cygwin-apps are
+by-approval lists.
+
+There is a searchable archive of the main mailing list at
+@file{http://sources.redhat.com/ml/cygwin/}.  There is an alternate
+archive, also searchable, at @file{http://www.delorie.com/archives/}.
+
+Cygwin mailing lists are not gatewayed to USENET, so anti-spam measures
+in your email address are neither required nor appreciated.  Also, avoid
+sending HTML content to Cygwin mailing lists.
+
+@subsection Posting Guidelines (Or: Why won't you/the mailing list answer my questions?)
+
+If you follow these guidelines, you are much more likely to get a
+helpful response from the Cygwin developers and/or the Cygwin community at
+large:
+
+@itemize @bullet
+@item Read the User's Guide and the FAQ first.
+@item Check the mailing list archives.  Your topic may have come up
+before.  (It may even have been answered!)  Use the search facilities
+at the links above.  Try the alternate site if the main archive is not
+producing search results.
+@item Explain your problem carefully and completely.  "I installed Blah
+and it doesn't work!" wastes everybody's time.  It provides no
+information for anyone to help you with your problem.  You should
+provide:
+
+@itemize @bullet
+@item A problem statement:  How does it behave, how do you think it
+should behave, and what makes you think it's broken?  (Oh yeah, and what
+is @emph{"it"}?)
+@item Information about your Windows OS ("Win95 OSR2" or "NT4/SP3" or
+"Win2K" or "Win98 SE" or ...).
+@item Details about your installation process, or attempts at same.  (Internet or
+Directory install?  If the former, exactly when and from what mirror?
+If the latter, which packages did you download?  Which version of
+setup.exe?  Any subsequent updates?)
+@item Details about your Cygwin setup, accomplished by @emph{pasting}
+the output of 'cygcheck -s -v -r' into your message.  (Do not send the
+output as a file attachment.)
+@item A valid return address, so that a reply doesn't require manual editing of
+the 'To:' header.
+@end itemize
+
+@item Your message must be relevant to the list.  Messages that are
+@emph{not} directly related to Cygwin are considered off-topic and are
+unwelcome.  For example, the following are off-topic:
+
+@itemize @bullet
+@item General programming language questions
+@item General Windows programming questions
+@item General UNIX shell programming questions
+@item General application usage questions
+@item How to make millions by working at home
+@item Announcements from LaserJet toner cartridge suppliers
+@end itemize
+
+@end itemize
+
+If you do not follow the above guidelines, you may still elicit a
+response, but you may not appreciate it!
+
+Inquiries about support contracts and commercial licensing should go to
+info@@cygnus.com.  If you want to purchase the Cygwin 1.0 CD-ROM, visit
+@file{http://www.cygnus.com/cygwin/} or write to
+cygwin-info@@cygnus.com.  While not strictly @emph{unappreciated} in the
+main cygwin list, you'll get the information you need more quickly if
+you write to the correct address in the first place.
+
+Beyond that, perhaps nobody has time to answer your question.  Perhaps
+nobody knows the answer.
+
