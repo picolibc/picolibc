@@ -1,3 +1,8 @@
+Mon May 15 14:26:00 2000  Joel Sherrill  <joel@oarcorp.com>
+
+	* libc/sys/rtems/sys/time.h: Add macros for manipulating timeval
+	structures.
+
 Wed May 10 19:24:53 2000  Jim Wilson  <wilson@cygnus.com>
 
 	* libc/include/machine/ieeefp.h: Add ia64 support.
