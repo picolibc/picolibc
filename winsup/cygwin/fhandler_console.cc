@@ -579,6 +579,7 @@ fhandler_console::dup (fhandler_base *child)
   fhc->dwLastButtonState = dwLastButtonState;
   fhc->nModifiers = nModifiers;
 
+  fhc->insert_mode = insert_mode;
   fhc->use_mouse = use_mouse;
   fhc->raw_win32_keyboard_mode = raw_win32_keyboard_mode;
 
@@ -801,7 +802,7 @@ fhandler_console::fhandler_console (const char *name) :
   dwLastCursorPosition.Y = -1;
   dwLastButtonState = 0;
   nModifiers = 0;
-  use_mouse = raw_win32_keyboard_mode = FALSE;
+  insert_mode = use_mouse = raw_win32_keyboard_mode = FALSE;
   /* Set the mask that determines if an input keystroke is modified by
      META.  We set this based on the keyboard layout language loaded
      for the current thread.  The left <ALT> key always generates
@@ -1096,7 +1097,16 @@ fhandler_console::char_command (char c)
     case 'h':
     case 'l':
       if (!saw_question_mark)
-	break;
+        {
+	  switch (args_[0])
+	    {
+	    case 4:    /* Insert mode */
+	      insert_mode = (c == 'h') ? TRUE : FALSE;
+	      syscall_printf("insert mode %sabled", insert_mode ? "en" : "dis");
+	      break;
+	    }
+	  break;
+	}
       switch (args_[0])
 	{
 	case 47:   /* Save/Restore screen */
@@ -1267,6 +1277,11 @@ fhandler_console::char_command (char c)
       cursor_set (FALSE, ((8 * (x / 8 + 1)) - 8), y);
       break;
     case 'b':				/* Repeat char #1 #2 times */
+      if (insert_mode)
+	{
+          cursor_get (&x, &y);
+	  scroll_screen (x, y, -1, y, x + args_[1], y);
+	}
       while (args_[1]--)
 	WriteFile (get_output_handle (), &args_[0], 1, (DWORD *) &x, 0);
       break;
@@ -1326,6 +1341,12 @@ fhandler_console::write_normal (const unsigned char *src,
 	  CharToOemBuff ((LPCSTR)src, buf, l2);
 	else
 	  strncpy (buf, (LPCSTR)src, l2);
+        if (insert_mode)
+	  {
+	    int x, y;
+            cursor_get (&x, &y);
+	    scroll_screen (x, y, -1, y, x + l2, y);
+	  }
 	if (!WriteFile (get_output_handle (), buf, l2, &done, 0))
 	{
 	  debug_printf ("write failed, handle %p", get_output_handle ());
@@ -1539,16 +1560,16 @@ static struct {
   const char *val[4];
 } keytable[] = {
 	       /* NORMAL */  /* SHIFT */    /* CTRL */       /* ALT */
-  {VK_LEFT,	{"\033[D",	NULL,		NULL,		NULL}},
-  {VK_RIGHT,	{"\033[C",	NULL,		NULL,		NULL}},
-  {VK_UP,	{"\033[A",	NULL,		NULL,		NULL}},
-  {VK_DOWN,	{"\033[B",	NULL,		NULL,		NULL}},
-  {VK_PRIOR,	{"\033[5~",	NULL,		NULL,		NULL}},
-  {VK_NEXT,	{"\033[6~",	NULL,		NULL,		NULL}},
-  {VK_HOME,	{"\033[1~",	NULL,		NULL,		NULL}},
-  {VK_END,	{"\033[4~",	NULL,		NULL,		NULL}},
-  {VK_INSERT,	{"\033[2~",	NULL,		NULL,		NULL}},
-  {VK_DELETE,	{"\033[3~",	NULL,		NULL,		NULL}},
+  {VK_LEFT,	{"\033[D",	"\033[D",	"\033[D",	"\033\033[D"}},
+  {VK_RIGHT,	{"\033[C",	"\033[C",	"\033[C",	"\033\033[C"}},
+  {VK_UP,	{"\033[A",	"\033[A",	"\033[A",	"\033\033[A"}},
+  {VK_DOWN,	{"\033[B",	"\033[B",	"\033[B",	"\033\033[B"}},
+  {VK_PRIOR,	{"\033[5~",	"\033[5~",	"\033[5~",	"\033\033[5~"}},
+  {VK_NEXT,	{"\033[6~",	"\033[6~",	"\033[6~",	"\033\033[6~"}},
+  {VK_HOME,	{"\033[1~",	"\033[1~",	"\033[1~",	"\033\033[1~"}},
+  {VK_END,	{"\033[4~",	"\033[4~",	"\033[4~",	"\033\033[4~"}},
+  {VK_INSERT,	{"\033[2~",	"\033[2~",	"\033[2~",	"\033\033[2~"}},
+  {VK_DELETE,	{"\033[3~",	"\033[3~",	"\033[3~",	"\033\033[3~"}},
   {VK_F1,	{"\033[[A",	"\033[23~",	NULL,		NULL}},
   {VK_F2,	{"\033[[B",	"\033[24~",	NULL,		NULL}},
   {VK_F3,	{"\033[[C",	"\033[25~",	NULL,		NULL}},

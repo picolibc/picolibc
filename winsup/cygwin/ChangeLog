@@ -1,8 +1,22 @@
+Sat Mar 31 11:09:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_console): Add members `insert_mode'.
+	* fhandler_console.cc (fhandler_console::dup): Duplicate `insert_mode'.
+	(fhandler_console::fhandler_console): Initialize `insert_mode'.
+	fhandler_console::char_command): Add terminal capabilities
+	"enter insert mode" = \E[4h and "exit insert mode" = \E[4l.
+	Care for insert mode on terminal capability "repeat char" = \E[x;yb.
+	(fhandler_console::write_normal): Care for insert mode before writing
+	to the console.
+	(array keytable): Add keymapping for modified cursor and control
+	block keys (xterm like).
+
 Fri Mar 30 13:02:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler.h (class fhandler_console): Add members `savebufsiz' and
 	`savebuf' to allow save/restore of screen.
-	* fhandler_console.cc (fhandler_console::dup): Duplicate savebuf.
+	* fhandler_console.cc (fhandler_console::dup): Duplicate `savebufsiz'
+	and `savebuf'.
 	(fhandler_console::fhandler_console): Initialize `savebufsiz' and
 	`savebuf'.
 	(fhandler_console::char_command): Add terminal capabilities

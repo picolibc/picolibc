@@ -652,6 +652,7 @@ private:
   DWORD dwLastButtonState;
   int nModifiers;
 
+  BOOL insert_mode;
   BOOL use_mouse;
   BOOL raw_win32_keyboard_mode;
 
