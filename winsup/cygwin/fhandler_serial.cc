@@ -18,6 +18,7 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include <sys/termios.h>
+#include <ddk/ntddser.h>
 
 /**********************************************************************/
 /* fhandler_serial */
@@ -43,7 +44,7 @@ fhandler_serial::raw_read (void *ptr, size_t ulen)
   int tot;
   DWORD n;
   HANDLE w4[2];
-  DWORD minchars = vmin_ ?: ulen;
+  size_t minchars = vmin_ ?: ulen;
 
   w4[0] = io_status.hEvent;
   w4[1] = signal_arrived;
@@ -56,7 +57,7 @@ fhandler_serial::raw_read (void *ptr, size_t ulen)
       ResetEvent (io_status.hEvent);
     }
 
-  for (n = 0, tot = 0; ulen; ulen -= n, ptr = (char *)ptr + n)
+  for (n = 0, tot = 0; ulen; ulen -= n, ptr = (char *) ptr + n)
     {
       COMSTAT st;
       DWORD inq = 1;
@@ -81,7 +82,7 @@ fhandler_serial::raw_read (void *ptr, size_t ulen)
 	inq = st.cbInQue;
       else if (!overlapped_armed)
 	{
-	  if ((size_t)tot >= minchars)
+	  if ((size_t) tot >= minchars)
 	    break;
 	  else if (WaitCommEvent (get_handle (), &ev, &io_status))
 	    {
@@ -388,7 +389,10 @@ fhandler_serial::ioctl (unsigned int cmd, void *buffer)
   DWORD ev;
   COMSTAT st;
   if (ClearCommError (get_handle (), &ev, &st))
-    res = -1;
+    {
+      __seterrno ();
+      res = -1;
+    }
   else
     switch (cmd)
       {
@@ -397,48 +401,35 @@ fhandler_serial::ioctl (unsigned int cmd, void *buffer)
 	break;
       case TIOCMGET:
 	DWORD modem_lines;
-	if (GetCommModemStatus (get_handle (), &modem_lines) == 0)
+	if (!GetCommModemStatus (get_handle (), &modem_lines))
 	  {
 	    __seterrno ();
 	    res = -1;
 	  }
 	else
 	  {
-	    unsigned modem_status = 0;
+	    ipbuffer = 0;
 	    if (modem_lines & MS_CTS_ON)
-	      modem_status |= TIOCM_CTS;
+	      ipbuffer |= TIOCM_CTS;
 	    if (modem_lines & MS_DSR_ON)
-	      modem_status |= TIOCM_DSR;
+	      ipbuffer |= TIOCM_DSR;
 	    if (modem_lines & MS_RING_ON)
-	      modem_status |= TIOCM_RI;
+	      ipbuffer |= TIOCM_RI;
 	    if (modem_lines & MS_RLSD_ON)
-	      modem_status |= TIOCM_CD;
-	    if (!wincap.supports_reading_modem_output_lines ())
-	      modem_status |= rts | dtr;
+	      ipbuffer |= TIOCM_CD;
+
+	    DWORD cb;
+	    DWORD mcr;
+	    if (!DeviceIoControl (get_handle (), IOCTL_SERIAL_GET_DTRRTS,
+				  NULL, 0, &mcr, 4, &cb, 0) || cb != 4)
+	      ipbuffer |= rts | dtr;
 	    else
 	      {
-		DWORD cb;
-		DWORD mcr;
-		BOOL result = DeviceIoControl (get_handle (), 0x001B0078, NULL,
-					       0, &mcr, 4, &cb, 0);
-		if (!result)
-		  {
-		    __seterrno ();
-		    res = -1;
-		    goto out;
-		  }
-		if (cb != 4)
-		  {
-		    set_errno (EINVAL);	/* FIXME: right errno? */
-		    res = -1;
-		    goto out;
-		  }
 		if (mcr & 2)
-		  modem_status |= TIOCM_RTS;
+		  ipbuffer |= TIOCM_RTS;
 		if (mcr & 1)
-		  modem_status |= TIOCM_DTR;
+		  ipbuffer |= TIOCM_DTR;
 	      }
-	    ipbuffer = modem_status;
 	  }
 	break;
       case TIOCMSET:
@@ -472,15 +463,12 @@ fhandler_serial::ioctl (unsigned int cmd, void *buffer)
 		res = -1;
 	      }
 	  }
+	else if (EscapeCommFunction (get_handle (), CLRDTR))
+	  dtr = 0;
 	else
 	  {
-	    if (EscapeCommFunction (get_handle (), CLRDTR))
-	      dtr = 0;
-	    else
-	      {
-		__seterrno ();
-		res = -1;
-	      }
+	    __seterrno ();
+	    res = -1;
 	  }
 	break;
      case TIOCINQ:
@@ -499,7 +487,6 @@ fhandler_serial::ioctl (unsigned int cmd, void *buffer)
        break;
      }
 
-out:
   termios_printf ("%d = ioctl (%p, %p)", res, cmd, buffer);
 # undef ibuffer
 # undef ipbuffer
@@ -794,7 +781,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
 
   if (t->c_lflag & ICANON)
     {
-      vmin_ = MAXDWORD;
+      vmin_ = 0;
       vtime_ = 0;
     }
   else
@@ -999,7 +986,7 @@ fhandler_serial::tcgetattr (struct termios *t)
     t->c_oflag |= ONLCR;
 
   debug_printf ("vmin_ %d, vtime_ %d", vmin_, vtime_);
-  if (vmin_ == MAXDWORD)
+  if (vmin_ == 0)
     {
       t->c_lflag |= ICANON;
       t->c_cc[VTIME] = t->c_cc[VMIN] = 0;
