@@ -43,7 +43,7 @@ Thu Jun 21 22:01:39 2001  Marius Gedminas <mgedmin@delfi.lt>
 	* thread.cc (__pthread_cond_timedwait): Lock the waiting mutex before
 	the condition protect mutex to avoid deadlocking. (Found by Greg Smith).
 	(__pthread_cond_wait): Ditto.
-	
+
 2001-06-30  Egor Duda  <deo@logos-m.ru>
 
 	* fhandler.cc (fhandler_base::open): Work around windows bug when

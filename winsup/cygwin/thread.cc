@@ -401,7 +401,7 @@ pthread_cond::pthread_cond (pthread_condattr * attr):verifyable_object (PTHREAD_
     {
       system_printf ("couldn't init mutex, this %0p errno=%d\n", this, temperr);
       /* we need the mutex for correct behaviour */
-      magic = 0;	
+      magic = 0;
     }
 
   if (!this->win32_obj_id)
