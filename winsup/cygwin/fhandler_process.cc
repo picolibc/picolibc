@@ -305,7 +305,7 @@ fhandler_process::fill_filebuf ()
       }
     case PROCESS_EXENAME:
       {
-	filebuf = (char *) realloc (filebuf, bufalloc = MAX_PATH);
+	filebuf = (char *) realloc (filebuf, bufalloc = CYG_MAX_PATH);
 	if (p->process_state & (PID_ZOMBIE | PID_EXITED))
 	  strcpy (filebuf, "<defunct>");
 	else
@@ -364,7 +364,7 @@ fhandler_process::fill_filebuf ()
 static _off64_t
 format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
 {
-  char cmd[MAX_PATH];
+  char cmd[CYG_MAX_PATH];
   int state = 'R';
   unsigned long fault_count = 0UL,
 		utime = 0UL, stime = 0UL,
@@ -501,7 +501,7 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
 static _off64_t
 format_process_status (_pinfo *p, char *destbuf, size_t maxsize)
 {
-  char cmd[MAX_PATH];
+  char cmd[CYG_MAX_PATH];
   int state = 'R';
   const char *state_str = "unknown";
   unsigned long vmsize = 0UL, vmrss = 0UL, vmdata = 0UL, vmlib = 0UL, vmtext = 0UL,

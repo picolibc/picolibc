@@ -73,8 +73,8 @@ enum path_types
 class symlink_info;
 struct fs_info
 {
-  char name_storage[MAX_PATH];
-  char root_dir_storage[MAX_PATH];
+  char name_storage[CYG_MAX_PATH];
+  char root_dir_storage[CYG_MAX_PATH];
   DWORD flags_storage;
   DWORD serial_storage;
   DWORD sym_opt_storage; /* additional options to pass to symlink_info resolver */
@@ -199,7 +199,7 @@ class path_conv
   size_t normalized_path_size;
   void set_normalized_path (const char *) __attribute__ ((regparm (2)));
  private:
-  char path[MAX_PATH];
+  char path[CYG_MAX_PATH];
 };
 
 /* Symlink marker */

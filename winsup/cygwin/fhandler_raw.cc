@@ -183,7 +183,7 @@ fhandler_dev_raw::open (int flags, mode_t)
 
   extern void str2buf2uni (UNICODE_STRING &, WCHAR *, const char *);
   UNICODE_STRING dev;
-  WCHAR devname[MAX_PATH + 1];
+  WCHAR devname[CYG_MAX_PATH + 1];
   str2buf2uni (dev, devname, get_win32_name ());
   OBJECT_ATTRIBUTES attr;
   InitializeObjectAttributes (&attr, &dev, OBJ_CASE_INSENSITIVE, NULL, NULL);

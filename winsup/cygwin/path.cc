@@ -88,7 +88,7 @@ static void backslashify (const char *src, char *dst, int trailing_slash_p);
 
 struct symlink_info
 {
-  char contents[MAX_PATH + 4];
+  char contents[CYG_MAX_PATH + 4];
   char *ext_here;
   int extn;
   unsigned pflags;
@@ -302,7 +302,7 @@ normalize_posix_path (const char *src, char *dst)
 
 	  *dst++ = '/';
 	}
-	if ((dst - dst_start) >= MAX_PATH)
+	if ((dst - dst_start) >= CYG_MAX_PATH)
 	  {
 	    debug_printf ("ENAMETOOLONG = normalize_posix_path (%s)", src);
 	    return ENAMETOOLONG;
@@ -333,7 +333,7 @@ static void __stdcall mkrelpath (char *dst) __attribute__ ((regparm (2)));
 static void __stdcall
 mkrelpath (char *path)
 {
-  char cwd_win32[MAX_PATH];
+  char cwd_win32[CYG_MAX_PATH];
   if (!cygheap->cwd.get (cwd_win32, 0))
     return;
 
@@ -359,8 +359,8 @@ mkrelpath (char *path)
 bool
 fs_info::update (const char *win32_path)
 {
-  char tmp_buf [MAX_PATH];
-  strncpy (tmp_buf, win32_path, MAX_PATH);
+  char tmp_buf [CYG_MAX_PATH];
+  strncpy (tmp_buf, win32_path, CYG_MAX_PATH);
 
   if (!rootdir (tmp_buf))
     {
@@ -373,7 +373,7 @@ fs_info::update (const char *win32_path)
   if (strcmp (tmp_buf, root_dir_storage) == 0)
     return 1;
 
-  strncpy (root_dir_storage, tmp_buf, MAX_PATH);
+  strncpy (root_dir_storage, tmp_buf, CYG_MAX_PATH);
   drive_type_storage = GetDriveType (root_dir_storage);
   if (drive_type_storage == DRIVE_REMOTE || (drive_type_storage == DRIVE_UNKNOWN && (root_dir_storage[0] == '\\' && root_dir_storage[1] == '\\')))
     is_remote_drive_storage = 1;
@@ -449,11 +449,11 @@ void
 path_conv::check (const char *src, unsigned opt,
 		  const suffix_info *suffixes)
 {
-  /* This array is used when expanding symlinks.  It is MAX_PATH * 2
+  /* This array is used when expanding symlinks.  It is CYG_MAX_PATH * 2
      in length so that we can hold the expanded symlink plus a
      trailer.  */
-  char path_copy[MAX_PATH + 3];
-  char tmp_buf[2 * MAX_PATH + 3];
+  char path_copy[CYG_MAX_PATH + 3];
+  char tmp_buf[2 * CYG_MAX_PATH + 3];
   symlink_info sym;
   bool need_directory = 0;
   bool saw_symlinks = 0;
@@ -463,7 +463,7 @@ path_conv::check (const char *src, unsigned opt,
 
 #if 0
   static path_conv last_path_conv;
-  static char last_src[MAX_PATH + 1];
+  static char last_src[CYG_MAX_PATH + 1];
 
   if (*last_src && strcmp (last_src, src) == 0)
     {
@@ -529,7 +529,7 @@ path_conv::check (const char *src, unsigned opt,
       for (;;)
 	{
 	  const suffix_info *suff;
-	  char pathbuf[MAX_PATH];
+	  char pathbuf[CYG_MAX_PATH];
 	  char *full_path;
 
 	  /* Don't allow symlink.check to set anything in the path_conv
@@ -737,7 +737,7 @@ path_conv::check (const char *src, unsigned opt,
 	 \0 added to path_copy above. */
       int taillen = strlen (++tail);
       int buflen = strlen (sym.contents);
-      if (buflen + taillen > MAX_PATH)
+      if (buflen + taillen > CYG_MAX_PATH)
 	  {
 	    error = ENAMETOOLONG;
 	    strcpy (path, "::ENAMETOOLONG::");
@@ -953,7 +953,7 @@ normalize_win32_path (const char *src, char *dst)
 		  *p = '\0';
 	    }
 	}
-      if (strlen (dst) + 1 + strlen (src) >= MAX_PATH)
+      if (strlen (dst) + 1 + strlen (src) >= CYG_MAX_PATH)
 	{
 	  debug_printf ("ENAMETOOLONG = normalize_win32_path (%s)", src);
 	  return ENAMETOOLONG;
@@ -998,7 +998,7 @@ normalize_win32_path (const char *src, char *dst)
 	    *dst++ = *src;
 	  ++src;
 	}
-      if ((dst - dst_start) >= MAX_PATH)
+      if ((dst - dst_start) >= CYG_MAX_PATH)
 	return ENAMETOOLONG;
     }
   *dst = 0;
@@ -1103,8 +1103,8 @@ conv_path_list (const char *src, char *dst, int to_posix)
     {
       s = strccpy (srcbuf, &src, src_delim);
       int len = s - srcbuf;
-      if (len >= MAX_PATH)
-	srcbuf[MAX_PATH - 1] = '\0';
+      if (len >= CYG_MAX_PATH)
+	srcbuf[CYG_MAX_PATH - 1] = '\0';
       (*conv_fn) (len ? srcbuf : ".", d);
       if (!*src++)
 	break;
@@ -1301,7 +1301,7 @@ mount_item::build_win32 (char *dst, const char *src, unsigned *outflags, unsigne
 
    The result is zero for success, or an errno value.
 
-   {,full_}win32_path must have sufficient space (i.e. MAX_PATH bytes).  */
+   {,full_}win32_path must have sufficient space (i.e. CYG_MAX_PATH bytes).  */
 
 int
 mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
@@ -1325,7 +1325,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
   *flags = 0;
   debug_printf ("conv_to_win32_path (%s)", src_path);
 
-  if (src_path_len >= MAX_PATH)
+  if (src_path_len >= CYG_MAX_PATH)
     {
       debug_printf ("ENAMETOOLONG = conv_to_win32_path (%s)", src_path);
       return ENAMETOOLONG;
@@ -1333,7 +1333,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
 
   int i, rc;
   mount_item *mi = NULL;	/* initialized to avoid compiler warning */
-  char pathbuf[MAX_PATH];
+  char pathbuf[CYG_MAX_PATH];
 
   if (dst == NULL)
     goto out;		/* Sanity check. */
@@ -1530,7 +1530,7 @@ mount_info::cygdrive_win32_path (const char *src, char *dst, int& unit)
 /* conv_to_posix_path: Ensure src_path is a POSIX path.
 
    The result is zero for success, or an errno value.
-   posix_path must have sufficient space (i.e. MAX_PATH bytes).
+   posix_path must have sufficient space (i.e. CYG_MAX_PATH bytes).
    If keep_rel_p is non-zero, relative paths stay that way.  */
 
 int
@@ -1554,7 +1554,7 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
 		trailing_slash_p ? "add-slash" : "no-add-slash");
   MALLOC_CHECK;
 
-  if (src_path_len >= MAX_PATH)
+  if (src_path_len >= CYG_MAX_PATH)
     {
       debug_printf ("ENAMETOOLONG");
       return ENAMETOOLONG;
@@ -1570,7 +1570,7 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
       return 0;
     }
 
-  char pathbuf[MAX_PATH];
+  char pathbuf[CYG_MAX_PATH];
   int rc = normalize_win32_path (src_path, pathbuf);
   if (rc != 0)
     {
@@ -1600,7 +1600,7 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
 	nextchar = 1;
 
       int addslash = nextchar > 0 ? 1 : 0;
-      if ((mi.posix_pathlen + (pathbuflen - mi.native_pathlen) + addslash) >= MAX_PATH)
+      if ((mi.posix_pathlen + (pathbuflen - mi.native_pathlen) + addslash) >= CYG_MAX_PATH)
 	return ENAMETOOLONG;
       strcpy (posix_path, mi.posix_path);
       if (addslash)
@@ -1617,7 +1617,7 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
 	}
       if (mi.flags & MOUNT_ENC)
 	{
-	  char tmpbuf[MAX_PATH + 1];
+	  char tmpbuf[CYG_MAX_PATH + 1];
 	  if (fnunmunge (tmpbuf, posix_path))
 	    strcpy (posix_path, tmpbuf);
 	}
@@ -1680,7 +1680,7 @@ mount_info::set_flags_from_win32_path (const char *p)
 void
 mount_info::read_mounts (reg_key& r)
 {
-  char posix_path[MAX_PATH];
+  char posix_path[CYG_MAX_PATH];
   HKEY key = r.get_key ();
   DWORD i, posix_path_size;
   int res;
@@ -1691,13 +1691,13 @@ mount_info::read_mounts (reg_key& r)
      arbitrarily large number of mounts. */
   for (i = 0; ; i++)
     {
-      char native_path[MAX_PATH];
+      char native_path[CYG_MAX_PATH];
       int mount_flags;
 
-      posix_path_size = MAX_PATH;
+      posix_path_size = CYG_MAX_PATH;
       /* FIXME: if maximum posix_path_size is 256, we're going to
 	 run into problems if we ever try to store a mount point that's
-	 over 256 but is under MAX_PATH. */
+	 over 256 but is under CYG_MAX_PATH. */
       res = RegEnumKeyEx (key, i, posix_path, &posix_path_size, NULL,
 			  NULL, NULL, NULL);
 
@@ -1987,7 +1987,7 @@ mount_info::get_cygdrive_info (char *user, char *system, char* user_flags,
 {
   /* Get the user path prefix from HKEY_CURRENT_USER. */
   reg_key r;
-  int res = r.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, user, MAX_PATH, "");
+  int res = r.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, user, CYG_MAX_PATH, "");
 
   /* Get the user flags, if appropriate */
   if (res == ERROR_SUCCESS)
@@ -2001,7 +2001,7 @@ mount_info::get_cygdrive_info (char *user, char *system, char* user_flags,
 	      CYGWIN_INFO_CYGNUS_REGISTRY_NAME, CYGWIN_REGNAME,
 	      CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME,
 	      NULL);
-  int res2 = r2.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, system, MAX_PATH, "");
+  int res2 = r2.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, system, CYG_MAX_PATH, "");
 
   /* Get the system flags, if appropriate */
   if (res2 == ERROR_SUCCESS)
@@ -2121,8 +2121,8 @@ mount_info::add_item (const char *native, const char *posix, unsigned mountflags
     }
 
   /* Make sure both paths do not end in /. */
-  char nativetmp[MAX_PATH];
-  char posixtmp[MAX_PATH];
+  char nativetmp[CYG_MAX_PATH];
+  char posixtmp[CYG_MAX_PATH];
 
   backslashify (native, nativetmp, 0);
   nofinalslash (nativetmp, nativetmp);
@@ -2181,7 +2181,7 @@ mount_info::add_item (const char *native, const char *posix, unsigned mountflags
 int
 mount_info::del_item (const char *path, unsigned flags, int reg_p)
 {
-  char pathtmp[MAX_PATH];
+  char pathtmp[CYG_MAX_PATH];
   int posix_path_p = false;
 
   /* Something's wrong if path is NULL or empty. */
@@ -2304,7 +2304,7 @@ static struct mntent *
 cygdrive_getmntent ()
 {
   char native_path[4];
-  char posix_path[MAX_PATH];
+  char posix_path[CYG_MAX_PATH];
   DWORD mask = 1, drive = 'a';
   struct mntent *ret = NULL;
 
@@ -2486,9 +2486,9 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
   HANDLE h;
   int res = -1;
   path_conv win32_path, win32_topath;
-  char from[MAX_PATH + 5];
-  char cwd[MAX_PATH + 1], *cp = NULL, c = 0;
-  char w32topath[MAX_PATH + 1];
+  char from[CYG_MAX_PATH + 5];
+  char cwd[CYG_MAX_PATH + 1], *cp = NULL, c = 0;
+  char w32topath[CYG_MAX_PATH + 1];
   DWORD written;
   SECURITY_ATTRIBUTES sa = sec_none_nih;
 
@@ -2499,7 +2499,7 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
       check_null_empty_str_errno (frompath))
     goto done;
 
-  if (strlen (topath) >= MAX_PATH)
+  if (strlen (topath) >= CYG_MAX_PATH)
     {
       set_errno (ENAMETOOLONG);
       goto done;
@@ -2540,7 +2540,7 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
     {
       if (!isabspath (topath))
 	{
-	  getcwd (cwd, MAX_PATH + 1);
+	  getcwd (cwd, CYG_MAX_PATH + 1);
 	  if ((cp = strrchr (from, '/')) || (cp = strrchr (from, '\\')))
 	    {
 	      c = *cp;
@@ -2597,7 +2597,7 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
       else
 	{
 	  /* This is the old technique creating a symlink. */
-	  char buf[sizeof (SYMLINK_COOKIE) + MAX_PATH + 10];
+	  char buf[sizeof (SYMLINK_COOKIE) + CYG_MAX_PATH + 10];
 
 	  __small_sprintf (buf, "%s%s", SYMLINK_COOKIE, topath);
 	  DWORD len = strlen (buf) + 1;
@@ -2677,7 +2677,7 @@ check_shortcut (const char *path, DWORD fileattr, HANDLE h,
       *error = EIO;
       goto close_it;
     }
-  if (got != sizeof len || len == 0 || len > MAX_PATH)
+  if (got != sizeof len || len == 0 || len > CYG_MAX_PATH)
     goto file_not_symlink;
   /* Now read description entry. */
   if (!ReadFile (h, contents, len, &got, 0))
@@ -2723,7 +2723,7 @@ check_sysfile (const char *path, DWORD fileattr, HANDLE h,
       /* It's a symlink.  */
       *pflags = PATH_SYMLINK;
 
-      res = ReadFile (h, contents, MAX_PATH + 1, &got, 0);
+      res = ReadFile (h, contents, CYG_MAX_PATH + 1, &got, 0);
       if (!res)
 	{
 	  debug_printf ("ReadFile2 failed");
@@ -3219,7 +3219,7 @@ getcwd (char *buf, size_t ulen)
 extern "C" char *
 getwd (char *buf)
 {
-  return getcwd (buf, MAX_PATH);
+  return getcwd (buf, CYG_MAX_PATH);
 }
 
 /* chdir: POSIX 5.2.1.1 */
@@ -3640,7 +3640,7 @@ cwdstuff::get_initial ()
 
   int i;
   DWORD len, dlen;
-  for (i = 0, dlen = MAX_PATH, len = 0; i < 3; dlen *= 2, i++)
+  for (i = 0, dlen = CYG_MAX_PATH, len = 0; i < 3; dlen *= 2, i++)
     {
       win32 = (char *) crealloc (win32, dlen + 2);
       if ((len = GetCurrentDirectoryA (dlen, win32)) < dlen)
@@ -3665,7 +3665,7 @@ cwdstuff::get_initial ()
 void
 cwdstuff::set (const char *win32_cwd, const char *posix_cwd)
 {
-  char pathbuf[MAX_PATH];
+  char pathbuf[CYG_MAX_PATH];
 
   if (win32_cwd)
     {

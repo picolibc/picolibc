@@ -30,17 +30,17 @@ details. */
 static FILE *
 open_system_file (const char *relative_path)
 {
-  char win32_name[MAX_PATH];
-  char posix_name[MAX_PATH];
+  char win32_name[CYG_MAX_PATH];
+  char posix_name[CYG_MAX_PATH];
   if (wincap.is_winnt ())
     {
-      if (!GetSystemDirectory (win32_name, MAX_PATH))
+      if (!GetSystemDirectory (win32_name, CYG_MAX_PATH))
 	return NULL;
       strcat (win32_name, "\\drivers\\etc\\");
     }
   else
     {
-      if (!GetWindowsDirectory (win32_name, MAX_PATH))
+      if (!GetWindowsDirectory (win32_name, CYG_MAX_PATH))
 	return NULL;
       strcat (win32_name, "\\");
     }

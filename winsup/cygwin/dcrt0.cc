@@ -722,7 +722,7 @@ dll_crt0_1 ()
 	 win32 style. */
       if ((strchr (__argv[0], ':')) || (strchr (__argv[0], '\\')))
 	{
-	  char *new_argv0 = (char *) alloca (MAX_PATH);
+	  char *new_argv0 = (char *) alloca (CYG_MAX_PATH);
 	  cygwin_conv_to_posix_path (__argv[0], new_argv0);
 	  __argv[0] = new_argv0;
 	}
@@ -805,20 +805,20 @@ void
 initial_env ()
 {
   DWORD len;
-  char buf[MAX_PATH + 1];
+  char buf[CYG_MAX_PATH + 1];
 #ifdef DEBUGGING
   if (GetEnvironmentVariable ("CYGWIN_SLEEP", buf, sizeof (buf) - 1))
     {
       DWORD ms = atoi (buf);
       buf[0] = '\0';
-      len = GetModuleFileName (NULL, buf, MAX_PATH);
+      len = GetModuleFileName (NULL, buf, CYG_MAX_PATH);
       console_printf ("Sleeping %d, pid %u %s\n", ms, GetCurrentProcessId (), buf);
       Sleep (ms);
     }
   if (GetEnvironmentVariable ("CYGWIN_DEBUG", buf, sizeof (buf) - 1))
     {
-      char buf1[MAX_PATH + 1];
-      len = GetModuleFileName (NULL, buf1, MAX_PATH);
+      char buf1[CYG_MAX_PATH + 1];
+      len = GetModuleFileName (NULL, buf1, CYG_MAX_PATH);
       strlwr (buf1);
       strlwr (buf);
       char *p = strchr (buf, ':');
@@ -838,7 +838,7 @@ initial_env ()
   if (GetEnvironmentVariable ("CYGWIN_TESTING", buf, sizeof (buf) - 1))
     {
       _cygwin_testing = 1;
-      if ((len = GetModuleFileName (cygwin_hmodule, buf, MAX_PATH))
+      if ((len = GetModuleFileName (cygwin_hmodule, buf, CYG_MAX_PATH))
 	  && len > sizeof ("new-cygwin1.dll")
 	  && strcasematch (buf + len - sizeof ("new-cygwin1.dll"),
 			   "\\new-cygwin1.dll"))

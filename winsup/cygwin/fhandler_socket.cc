@@ -189,7 +189,7 @@ fhandler_socket::create_secret_event (int* secret)
       return NULL;
     }
 
-  char event_name[MAX_PATH];
+  char event_name[CYG_MAX_PATH];
   secret_event_name (event_name, sin.sin_port, secret ?: connect_secret);
   LPSECURITY_ATTRIBUTES sec = get_inheritance (true);
   secret_event = CreateEvent (sec, FALSE, FALSE, event_name);
@@ -230,7 +230,7 @@ int
 fhandler_socket::check_peer_secret_event (struct sockaddr_in* peer, int* secret)
 {
 
-  char event_name[MAX_PATH];
+  char event_name[CYG_MAX_PATH];
 
   secret_event_name (event_name, peer->sin_port, secret ?: connect_secret);
   HANDLE ev = CreateEvent (&sec_all_nih, FALSE, FALSE, event_name);

@@ -862,7 +862,7 @@ format_proc_partitions (char *destbuf, size_t maxsize)
     {
       for (int drive_number=0;;drive_number++)
 	{
-	  CHAR szDriveName[MAX_PATH];
+	  CHAR szDriveName[CYG_MAX_PATH];
 	  __small_sprintf (szDriveName, "\\\\.\\PHYSICALDRIVE%d", drive_number);
 	  HANDLE hDevice;
 	  hDevice = CreateFile (szDriveName,

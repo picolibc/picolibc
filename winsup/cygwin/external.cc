@@ -114,8 +114,8 @@ get_cygdrive_info (char *user, char *system, char *user_flags,
 static DWORD
 get_cygdrive_prefixes (char *user, char *system)
 {
-  char user_flags[MAX_PATH];
-  char system_flags[MAX_PATH];
+  char user_flags[CYG_MAX_PATH];
+  char system_flags[CYG_MAX_PATH];
   DWORD res = get_cygdrive_info (user, system, user_flags, system_flags);
   return res;
 }

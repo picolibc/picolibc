@@ -35,7 +35,7 @@ details. */
 #include "environ.h"
 #include "cygthread.h"
 
-#define LINE_BUF_CHUNK (MAX_PATH * 2)
+#define LINE_BUF_CHUNK (CYG_MAX_PATH * 2)
 
 static suffix_info std_suffixes[] =
 {
@@ -88,7 +88,7 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
   const char *suffix = "";
   debug_printf ("find_exec (%s)", name);
   const char *retval = buf;
-  char tmp[MAX_PATH];
+  char tmp[CYG_MAX_PATH];
   const char *posix = (opt & FE_NATIVE) ? NULL : name;
   bool has_slash = strchr (name, '/');
 
@@ -307,7 +307,7 @@ av::unshift (const char *what, int conv)
 
   argv = av;
   memmove (argv + 1, argv, (argc + 1) * sizeof (char *));
-  char buf[MAX_PATH + 1];
+  char buf[CYG_MAX_PATH + 1];
   if (conv)
     {
       cygwin_conv_to_posix_path (what, buf);
@@ -462,7 +462,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
       DWORD done;
 
-      char buf[2 * MAX_PATH + 1];
+      char buf[2 * CYG_MAX_PATH + 1];
       buf[0] = buf[1] = buf[2] = buf[sizeof (buf) - 1] = '\0';
       if (!ReadFile (hnd, buf, sizeof (buf) - 1, &done, 0))
 	{

@@ -51,7 +51,7 @@ struct dll
   int count;
   dll_type type;
   int namelen;
-  char name[MAX_PATH + 1];
+  char name[CYG_MAX_PATH + 1];
   void detach ();
   int init ();
 };

@@ -53,7 +53,7 @@ static char **lastenviron;
    PATH needs to be here because CreateProcess uses it and gdb uses
    CreateProcess.  HOME is here because most shells use it and would be
    confused by Windows style path names.  */
-static int return_MAX_PATH (const char *) {return MAX_PATH;}
+static int return_MAX_PATH (const char *) {return CYG_MAX_PATH;}
 static NO_COPY win_env conv_envvars[] =
   {
     {NL ("PATH="), NULL, NULL, cygwin_win32_to_posix_path_list,
@@ -539,7 +539,7 @@ parse_options (char *buf)
 
   if (buf == NULL)
     {
-      char newbuf[MAX_PATH + 7];
+      char newbuf[CYG_MAX_PATH + 7];
       newbuf[0] = '\0';
       for (k = known; k->name != NULL; k++)
 	if (k->remember)
@@ -624,7 +624,7 @@ regopt (const char *name)
   bool parsed_something = false;
   /* FIXME: should not be under mount */
   reg_key r (KEY_READ, CYGWIN_INFO_PROGRAM_OPTIONS_NAME, NULL);
-  char buf[MAX_PATH];
+  char buf[CYG_MAX_PATH];
   char lname[strlen (name) + 1];
   strlwr (strcpy (lname, name));
 

@@ -133,7 +133,7 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
     count = 0;
   else
     {
-      char *p, progname[MAX_PATH + 1];
+      char *p, progname[CYG_MAX_PATH + 1];
       if (!pn)
 	p = (char *) "*** unknown ***";
       else if ((p = strrchr (pn, '\\')) != NULL)

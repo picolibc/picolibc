@@ -689,7 +689,7 @@ link (const char *a, const char *b)
     }
 
   /* Shortcut hack. */
-  char new_lnk_buf[MAX_PATH + 5];
+  char new_lnk_buf[CYG_MAX_PATH + 5];
   if (allow_winsymlinks && real_a.is_lnk_symlink () && !real_b.case_clash)
     {
       strcpy (new_lnk_buf, b);
@@ -710,7 +710,7 @@ link (const char *a, const char *b)
       LPVOID lpContext;
       DWORD cbPathLen;
       DWORD StreamSize;
-      WCHAR wbuf[MAX_PATH];
+      WCHAR wbuf[CYG_MAX_PATH];
 
       BOOL bSuccess;
 
@@ -725,7 +725,7 @@ link (const char *a, const char *b)
 	  goto docopy;
 	}
 
-      cbPathLen = sys_mbstowcs (wbuf, real_b, MAX_PATH) * sizeof (WCHAR);
+      cbPathLen = sys_mbstowcs (wbuf, real_b, CYG_MAX_PATH) * sizeof (WCHAR);
 
       StreamId.dwStreamId = BACKUP_LINK;
       StreamId.dwStreamAttributes = 0;
@@ -1365,7 +1365,7 @@ rename (const char *oldpath, const char *newpath)
   path_conv real_new (newpath, PC_SYM_NOFOLLOW);
 
   /* Shortcut hack. */
-  char new_lnk_buf[MAX_PATH + 5];
+  char new_lnk_buf[CYG_MAX_PATH + 5];
   if (real_old.is_lnk_symlink () && !real_new.error && !real_new.case_clash)
     {
       strcpy (new_lnk_buf, newpath);
@@ -2044,7 +2044,7 @@ static int __stdcall
 mknod_worker (const char *path, mode_t type, mode_t mode, _major_t major,
 	      _minor_t minor)
 {
-  char buf[sizeof (":\\00000000:00000000:00000000") + MAX_PATH];
+  char buf[sizeof (":\\00000000:00000000:00000000") + CYG_MAX_PATH];
   sprintf (buf, ":\\%x:%x:%x", major, minor,
 	   type | (mode & (S_IRWXU | S_IRWXG | S_IRWXO)));
   return symlink_worker (buf, path, true, true);
@@ -2056,7 +2056,7 @@ mknod32 (const char *path, mode_t mode, __dev32_t dev)
   if (check_null_empty_str_errno (path))
     return -1;
 
-  if (strlen (path) >= MAX_PATH)
+  if (strlen (path) >= CYG_MAX_PATH)
     return -1;
 
   path_conv w32path (path, PC_SYM_NOFOLLOW | PC_FULL);
@@ -2595,7 +2595,7 @@ extern "C" void
 updwtmp (const char *wtmp_file, const struct utmp *ut)
 {
   /* Writing to wtmp must be atomic to prevent mixed up data. */
-  char mutex_name[MAX_PATH];
+  char mutex_name[CYG_MAX_PATH];
   HANDLE mutex;
   int fd;
 
@@ -2833,7 +2833,7 @@ pututline (struct utmp *ut)
 		ut->ut_user, ut->ut_host);
   /* Read/write to utmp must be atomic to prevent overriding data
      by concurrent processes. */
-  char mutex_name[MAX_PATH];
+  char mutex_name[CYG_MAX_PATH];
   HANDLE mutex = CreateMutex (NULL, FALSE,
 			      shared_name (mutex_name, "utmp_mutex", 0));
   if (mutex)
@@ -2987,7 +2987,7 @@ getusershell ()
     "/usr/bin/csh",
     NULL
   };
-  static char buf[MAX_PATH];
+  static char buf[CYG_MAX_PATH];
   int ch, buf_idx;
 
   if (!shell_fp && !(shell_fp = fopen64 (ETC_SHELLS, "rt")))
@@ -3002,11 +3002,11 @@ getusershell ()
   /* Get each non-whitespace character as part of the shell path as long as
      it fits in buf. */
   for (buf_idx = 0;
-       ch != EOF && !isspace (ch) && buf_idx < MAX_PATH;
+       ch != EOF && !isspace (ch) && buf_idx < CYG_MAX_PATH;
        buf_idx++, ch = getc (shell_fp))
     buf[buf_idx] = ch;
   /* Skip any trailing non-whitespace character not fitting in buf.  If the
-     path is longer than MAX_PATH, it's invalid anyway. */
+     path is longer than CYG_MAX_PATH, it's invalid anyway. */
   while (ch != EOF && !isspace (ch))
     ch = getc (shell_fp);
   if (buf_idx)

@@ -87,7 +87,7 @@ open_shared (const char *name, int n, HANDLE &shared_h, DWORD size,
   if (!shared_h)
     {
       char *mapname;
-      char map_buf[MAX_PATH];
+      char map_buf[CYG_MAX_PATH];
       if (!name)
 	mapname = NULL;
       else

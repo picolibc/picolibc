@@ -55,6 +55,23 @@ extern unsigned long cygwin_inet_addr (const char *cp);
 }
 #endif
 
+/* Note that MAX_PATH is defined in the windows headers */
+/* There is also PATH_MAX and MAXPATHLEN.
+   PATH_MAX is from Posix and does *not* include the trailing NUL.
+   MAXPATHLEN is from Unix.
+
+   Thou shalt use CYG_MAX_PATH throughout.  It avoids the NUL vs no-NUL
+   issue and is neither of the Unixy ones [so we can punt on which
+   one is the right one to use]. 
+   
+   Windows ANSI calls are limited to MAX_PATH in length. Cygwin calls that
+   thunk through to Windows Wide calls are limited to 32K. We define
+   CYG_MAX_PATH as a convenient, not to short, not too long 'happy medium'.
+   
+   */
+
+#define CYG_MAX_PATH (MAX_PATH)
+
 #ifdef __cplusplus
 
 extern const char case_folded_lower[];
@@ -306,14 +323,6 @@ extern SYSTEM_INFO system_info;
 
 #define WM_ASYNCIO	0x8000		// WM_APP
 
-/* Note that MAX_PATH is defined in the windows headers */
-/* There is also PATH_MAX and MAXPATHLEN.
-   PATH_MAX is from Posix and does *not* include the trailing NUL.
-   MAXPATHLEN is from Unix.
-
-   Thou shalt use MAX_PATH throughout.  It avoids the NUL vs no-NUL
-   issue and is neither of the Unixy ones [so we can punt on which
-   one is the right one to use].  */
 
 #define STD_RBITS (S_IRUSR | S_IRGRP | S_IROTH)
 #define STD_WBITS (S_IWUSR)

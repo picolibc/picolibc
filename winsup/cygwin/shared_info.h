@@ -20,11 +20,11 @@ class mount_item
      area [with the user being able to configure at runtime the max size].  */
   /* Win32-style mounted partition source ("C:\foo\bar").
      native_path[0] == 0 for unused entries.  */
-  char native_path[MAX_PATH];
+  char native_path[CYG_MAX_PATH];
   int native_pathlen;
 
   /* POSIX-style mount point ("/foo/bar") */
-  char posix_path[MAX_PATH];
+  char posix_path[CYG_MAX_PATH];
   int posix_pathlen;
 
   unsigned flags;
@@ -62,7 +62,7 @@ class mount_info
   /* cygdrive_prefix is used as the root of the path automatically
      prepended to a path when the path has no associated mount.
      cygdrive_flags are the default flags for the cygdrives. */
-  char cygdrive[MAX_PATH];
+  char cygdrive[CYG_MAX_PATH];
   size_t cygdrive_len;
   unsigned cygdrive_flags;
  private:
@@ -120,7 +120,7 @@ class mount_info
 
 class delqueue_list
 {
-  char name[MAX_DELQUEUES_PENDING][MAX_PATH];
+  char name[MAX_DELQUEUES_PENDING][CYG_MAX_PATH];
   char inuse[MAX_DELQUEUES_PENDING];
   int empty;
 

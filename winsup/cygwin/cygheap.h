@@ -42,9 +42,9 @@ struct _cmalloc_entry
 
 struct cygheap_root_mount_info
 {
-  char posix_path[MAX_PATH];
+  char posix_path[CYG_MAX_PATH];
   unsigned posix_pathlen;
-  char native_path[MAX_PATH];
+  char native_path[CYG_MAX_PATH];
   unsigned native_pathlen;
 };
 
@@ -215,7 +215,7 @@ struct cwdstuff
   char *win32;
   DWORD hash;
   muto *cwd_lock;
-  char *get (char *buf, int need_posix = 1, int with_chroot = 0, unsigned ulen = MAX_PATH);
+  char *get (char *buf, int need_posix = 1, int with_chroot = 0, unsigned ulen = CYG_MAX_PATH);
   DWORD get_hash ();
   void init ();
   void fixup_after_exec (char *win32, char *posix, DWORD hash);

@@ -30,7 +30,7 @@ delqueue_list::init ()
 void
 delqueue_list::queue_file (const char *dosname)
 {
-  char temp[MAX_PATH], *end;
+  char temp[CYG_MAX_PATH], *end;
   GetFullPathName (dosname, sizeof (temp), temp, &end);
 
   /* Note about race conditions: The only time we get to this point is

@@ -1,3 +1,47 @@
+2003-11-11  Robert Collins <rbtcollins@hotmail.com>
+	    Ron Parker <rdparker@butlermfg.com>
+
+	* bsdlib.cc: Update throughout to use CYG_MAX_PATH rather than MAX_PATH.
+	* cygheap.h: Ditto.
+	* dcrt0.cc: Ditto.
+	* delqueue.cc: Ditto.
+	* dlfcn.cc: Ditto.
+	* dll_init.cc: Ditto.
+	* dll_init.h: Ditto.
+	* dtable.cc: Ditto.
+	* environ.cc: Ditto.
+	* environ.h: Ditto.
+	* exceptions.cc: Ditto.
+	* external.cc: Ditto.
+	* fhandler_disk_file.cc: Ditto.
+	* fhandler_proc.cc: Ditto.
+	* fhandler_process.cc: Ditto.
+	* fhandler_raw.cc: Ditto.
+	* fhandler_registry.cc: Ditto.
+	* fhandler_socket.cc: Ditto.
+	* fhandler_virtual.cc: Ditto.
+	* miscfuncs.cc: Ditto.
+	* mmap.cc: Ditto.
+	* netdb.cc: Ditto.
+	* path.cc: Ditto.
+	* path.h: Ditto.
+	* pinfo.cc: Ditto.
+	* pinfo.h: Ditto.
+	* pthread.cc: Ditto.
+	* registry.cc: Ditto.
+	* shared.cc: Ditto.
+	* shared_info.h: Ditto.
+	* smallprint.c: Ditto.
+	* spawn.cc: Ditto.
+	* strace.cc: Ditto.
+	* syscalls.cc: Ditto.
+	* thread.h: Ditto.
+	* uinfo.cc: Ditto.
+	* winsup.h: Ditto.
+	* include/limits.h: Ditto.
+	* include/cygwin/config.h: Ditto.
+	* include/sys/param.h: Ditto.
+
 2003-11-12  Brian Ford  <ford@vss.fsi.com>
 
 	* dtable.cc (build_fh_pc): Use DEV_SERIAL_MAJOR to catch all serial

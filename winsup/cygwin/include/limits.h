@@ -125,7 +125,7 @@ details. */
 #define SSIZE_MAX (__LONG_MAX__)
 
 /* Maximum length of a path */
-#define PATH_MAX (260 - 1 /*NUL*/)
+#define PATH_MAX (4096 - 1 /*NUL*/)
 
 /* Max num groups for a user, value taken from NT documentation */
 /* Must match <sys/param.h> NGROUPS */

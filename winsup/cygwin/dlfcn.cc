@@ -49,7 +49,7 @@ get_full_path_of_dll (const char* str, char *name)
   int len = strlen (str);
 
   /* empty string or too long to be legal win32 pathname? */
-  if (len == 0 || len >= MAX_PATH - 1)
+  if (len == 0 || len >= CYG_MAX_PATH - 1)
     return str;		/* Yes.  Let caller deal with it. */
 
   const char *ret;
@@ -93,7 +93,7 @@ dlopen (const char *name, int)
     ret = (void *) GetModuleHandle (NULL); /* handle for the current module */
   else
     {
-      char buf[MAX_PATH];
+      char buf[CYG_MAX_PATH];
       /* handle for the named library */
       const char *fullpath = get_full_path_of_dll (name, buf);
       if (!fullpath)

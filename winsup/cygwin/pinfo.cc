@@ -146,7 +146,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
   for (int i = 0; i < 10; i++)
     {
       int created;
-      char mapname[MAX_PATH];
+      char mapname[CYG_MAX_PATH]; /* XXX Not a path */
       __small_sprintf (mapname, "cygpid.%x", n);
 
       int mapsize;

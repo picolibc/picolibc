@@ -168,8 +168,8 @@ mangle_sem_name (char *mangled, const char *name)
   if (check_null_empty_str_errno (name))
     return false;
   int len = strlen (name);
-  if (len > MAX_PATH
-      || (wincap.has_terminal_services () && len > MAX_PATH - 7))
+  if (len > CYG_MAX_PATH
+      || (wincap.has_terminal_services () && len > CYG_MAX_PATH - 7))
     {
       set_errno (EINVAL);
       return false;
@@ -196,7 +196,7 @@ sem_open (const char *name, int oflag, ...)
       value = va_arg (ap, unsigned int);
       va_end (ap);
     }
-  char mangled_name[MAX_PATH + 1];
+  char mangled_name[CYG_MAX_PATH + 1];
   if (!mangle_sem_name (mangled_name, name))
     return NULL;
   return semaphore::open (mangled_name, oflag, mode, value);

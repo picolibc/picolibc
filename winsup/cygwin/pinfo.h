@@ -66,7 +66,7 @@ public:
   DWORD dwProcessId;
 
   /* Used to spawn a child for fork(), among other things. */
-  char progname[MAX_PATH];
+  char progname[CYG_MAX_PATH];
 
   /* User information.
      The information is derived from the GetUserName system call,

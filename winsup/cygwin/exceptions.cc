@@ -28,7 +28,7 @@ details. */
 
 #define CALL_HANDLER_RETRY 20
 
-char debugger_command[2 * MAX_PATH + 20];
+char debugger_command[2 * CYG_MAX_PATH + 20];
 
 extern "C" {
 static int handle_exceptions (EXCEPTION_RECORD *, void *, CONTEXT *, void *);
@@ -141,8 +141,8 @@ error_start_init (const char *buf)
       return;
     }
 
-  char pgm[MAX_PATH + 1];
-  if (!GetModuleFileName (NULL, pgm, MAX_PATH))
+  char pgm[CYG_MAX_PATH + 1];
+  if (!GetModuleFileName (NULL, pgm, CYG_MAX_PATH))
     strcpy (pgm, "cygwin1.dll");
   for (char *p = strchr (pgm, '\\'); p; p = strchr (p, '\\'))
     *p = '/';
@@ -1125,7 +1125,7 @@ void
 events_init (void)
 {
   char *name;
-  char mutex_name[MAX_PATH];
+  char mutex_name[CYG_MAX_PATH];
   /* title_mutex protects modification of console title. It's necessary
      while finding console window handle */
 

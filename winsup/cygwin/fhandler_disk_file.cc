@@ -611,7 +611,7 @@ fhandler_disk_file::opendir ()
 
   if (!pc.isdir ())
     set_errno (ENOTDIR);
-  else if ((len = strlen (pc))> MAX_PATH - 3)
+  else if ((len = strlen (pc))> CYG_MAX_PATH - 3)
     set_errno (ENAMETOOLONG);
   else if ((dir = (DIR *) malloc (sizeof (DIR))) == NULL)
     set_errno (ENOMEM);
@@ -718,7 +718,7 @@ fhandler_disk_file::readdir (DIR *dir)
       int len = strlen (c);
       if (strcasematch (c + len - 4, ".lnk"))
 	{
-	  char fbuf[MAX_PATH + 1];
+	  char fbuf[CYG_MAX_PATH + 1];
 	  strcpy (fbuf, dir->__d_dirname);
 	  strcpy (fbuf + strlen (fbuf) - 1, dir->__d_dirent->d_name);
 	  path_conv fpath (fbuf, PC_SYM_NOFOLLOW);

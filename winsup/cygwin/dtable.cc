@@ -251,7 +251,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	dev.parse ("/dev/ttyS0");
       else
 	{
-	  name = handle_to_fn (handle, (char *) alloca (MAX_PATH + 100));
+	  name = handle_to_fn (handle, (char *) alloca (CYG_MAX_PATH + 100));
 	  bin = 0;
 	}
     }
@@ -768,7 +768,7 @@ handle_to_fn (HANDLE h, char *posix_fn)
 
   ntfn->Name.Buffer[ntfn->Name.Length / sizeof (WCHAR)] = 0;
 
-  char win32_fn[MAX_PATH + 100];
+  char win32_fn[CYG_MAX_PATH + 100];
   sys_wcstombs (win32_fn, ntfn->Name.Buffer, ntfn->Name.Length);
   debug_printf ("nt name '%s'", win32_fn);
   if (!strncasematch (win32_fn, DEVICE_PREFIX, DEVICE_PREFIX_LEN)
@@ -782,8 +782,8 @@ handle_to_fn (HANDLE h, char *posix_fn)
   char *maxmatchdos = NULL;
   for (char *s = fnbuf; *s; s = strchr (s, '\0') + 1)
     {
-      char device[MAX_PATH + 10];
-      device[MAX_PATH + 9] = '\0';
+      char device[CYG_MAX_PATH + 10];
+      device[CYG_MAX_PATH + 9] = '\0';
       if (strchr (s, ':') == NULL)
 	continue;
       if (!QueryDosDevice (s, device, sizeof (device) - 1))

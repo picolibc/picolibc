@@ -226,7 +226,7 @@ void
 load_registry_hive (PSID psid)
 {
   char sid[256];
-  char path[MAX_PATH + 1];
+  char path[CYG_MAX_PATH + 1];
   HKEY hkey;
   LONG ret;
 

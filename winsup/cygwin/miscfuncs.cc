@@ -147,7 +147,7 @@ strcasestr (const char *searchee, const char *lookfor)
 int __stdcall
 check_null_str (const char *name)
 {
-  if (name && !IsBadStringPtr (name, MAX_PATH))
+  if (name && !IsBadStringPtr (name, CYG_MAX_PATH))
     return 0;
 
   return EFAULT;
@@ -156,7 +156,7 @@ check_null_str (const char *name)
 int __stdcall
 check_null_empty_str (const char *name)
 {
-  if (name && !IsBadStringPtr (name, MAX_PATH))
+  if (name && !IsBadStringPtr (name, CYG_MAX_PATH))
     return !*name ? ENOENT : 0;
 
   return EFAULT;

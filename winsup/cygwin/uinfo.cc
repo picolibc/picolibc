@@ -254,7 +254,7 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
   LPUSER_INFO_3 ui = NULL;
   WCHAR wuser[UNLEN + 1];
   NET_API_STATUS ret;
-  char homepath_env_buf[MAX_PATH + 1];
+  char homepath_env_buf[CYG_MAX_PATH + 1];
   char homedrive_env_buf[3];
   char *newhomedrive = NULL;
   char *newhomepath = NULL;
@@ -287,8 +287,8 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	    setenv ("HOME", "/", 1);
 	  else
 	    {
-	      char home[MAX_PATH];
-	      char buf[MAX_PATH + 1];
+	      char home[CYG_MAX_PATH];
+	      char buf[CYG_MAX_PATH + 1];
 	      strcpy (buf, newhomedrive);
 	      strcat (buf, newhomepath);
 	      cygwin_conv_to_full_posix_path (buf, home);
@@ -315,11 +315,11 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	     sys_mbstowcs (wuser, winname (), sizeof (wuser) / sizeof (*wuser));
 	      if (!(ret = NetUserGetInfo (wlogsrv, wuser, 3,(LPBYTE *)&ui)))
 		{
-		  sys_wcstombs (homepath_env_buf, ui->usri3_home_dir, MAX_PATH);
+		  sys_wcstombs (homepath_env_buf, ui->usri3_home_dir, CYG_MAX_PATH);
 		  if (!homepath_env_buf[0])
 		    {
 		      sys_wcstombs (homepath_env_buf, ui->usri3_home_dir_drive,
-				    MAX_PATH);
+				    CYG_MAX_PATH);
 		      if (homepath_env_buf[0])
 			strcat (homepath_env_buf, "\\");
 		      else
@@ -421,7 +421,7 @@ cygheap_user::env_userprofile (const char *name, size_t namelen)
   if (test_uid (puserprof, name, namelen))
     return puserprof;
 
-  char userprofile_env_buf[MAX_PATH + 1];
+  char userprofile_env_buf[CYG_MAX_PATH + 1];
   cfree_and_set (puserprof, almost_null);
   /* FIXME: Should this just be setting a puserprofile like everything else? */
   const char *myname = winname ();

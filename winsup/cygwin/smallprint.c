@@ -63,7 +63,7 @@ rn (char *dst, int base, int dosign, long long val, int len, int pad)
 int
 __small_vsprintf (char *dst, const char *fmt, va_list ap)
 {
-  char tmp[MAX_PATH + 1];
+  char tmp[CYG_MAX_PATH + 1];
   char *orig = dst;
   const char *s;
 
@@ -149,7 +149,7 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  dst = rn (dst, 16, 0, va_arg (ap, long long), len, pad);
 		  break;
 		case 'P':
-		  if (!GetModuleFileName (NULL, tmp, MAX_PATH))
+		  if (!GetModuleFileName (NULL, tmp, CYG_MAX_PATH))
 		    s = "cygwin program";
 		  else
 		    s = tmp;
