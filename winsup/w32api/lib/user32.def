@@ -205,6 +205,7 @@ GetAltTabInfo@20
 GetAltTabInfoA@20	
 GetAltTabInfoW@20	
 GetActiveWindow@0
+GetAncestor@8
 GetAsyncKeyState@4
 GetCapture@0
 GetCaretBlinkTime@0

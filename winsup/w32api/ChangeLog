@@ -1,3 +1,16 @@
+2002-12-18  James E. Lucas  <xelloss@users.sourceforge.net>
+
+	* include/winnetwk.h (WNetResourceInformation[AW]): Correct
+	prototypes.
+	* include/winuser.h (GetAncestor) Add prototype.
+	(GA_PARENT, GA_ROOT, GA_ROOTOWNER): Add defines.
+	(EWX_FORCEIFHUNG): Add define for _WIN32_WINNT >= 0x0500.
+	(SPI_GETACTIVEWINDOWTRACKING, SPI_GETACTIVEWNDTRKZORDER,
+	SPI_GETACTIVEWNDTRKTIMEOUT, SPI_SETACTIVEWINDOWTRACKING
+	SPI_SETACTIVEWNDTRKZORDER, SPI_SETACTIVEWNDTRKTIMEOUT): Add
+	defines.
+	* lib/user32.def (GetAncestor@8): Add stub.
+
 2002-12-15  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/windows.h: Guard inclusion of wingdi.h,
