@@ -41,7 +41,7 @@ into seconds, divide by the macro <<CLOCKS_PER_SEC>>.
 RETURNS
 The amount of processor time used so far by your program, in units
 defined by the machine-dependent macro <<CLOCKS_PER_SEC>>.  If no
-measurement is available, the result is <<-1>>.
+measurement is available, the result is (clock_t)<<-1>>.
 
 PORTABILITY
 ANSI C requires <<clock>> and <<CLOCKS_PER_SEC>>.
