@@ -33,14 +33,14 @@ sysconf (int in)
 	/* FIXME: what's the right value?  _POSIX_ARG_MAX is only 4K */
 	return 1048576;
       case _SC_OPEN_MAX:
-	return getdtablesize ();
-      case _SC_PAGESIZE:
 	{
 	  long max = getdtablesize ();
 	  if (max < OPEN_MAX)
 	    max = OPEN_MAX;
 	  return max;
 	}
+      case _SC_PAGESIZE:
+	return getpagesize ();
       case _SC_CLK_TCK:
 	return CLOCKS_PER_SEC;
       case _SC_JOB_CONTROL:

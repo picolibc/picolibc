@@ -1,3 +1,8 @@
+2003-07-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysconf.cc (sysconf): Fix OPEN_MAX patch.  Return page size on
+	_SC_PAGESIZE again.
+
 2003-07-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.h (class cygheap_user): Use INVALID_HANDLE_VALUE as invalid
