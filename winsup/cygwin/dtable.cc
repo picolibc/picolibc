@@ -244,7 +244,7 @@ fhandler_base *
 dtable::build_fhandler_from_name (int fd, const char *name, HANDLE handle,
     				  path_conv& pc, unsigned opt, suffix_info *si)
 {
-  pc.check (name, opt | PC_NULLEMPTY, si);
+  pc.check (name, opt | PC_NULLEMPTY | PC_FULL, si);
   if (pc.error)
     {
       set_errno (pc.error);

@@ -422,7 +422,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
     {
       CloseHandle (hParent);
       CloseHandle (subproc_ready);
-      system_printf ("unable to allocate subproc_ready event, %E");
+      system_printf ("unable to allocate forker_finished event, %E");
       return -1;
     }
 

@@ -1,3 +1,13 @@
+2001-10-14  Christopher Faylor  <cgf@redhat.com>
+
+	* dtable.cc (dtable::build_fhandler_from_name): Use PC_FULL to
+	determine path name.
+
+Sun Oct 14 08:10:12 2001  Gary R. Van Sickle
+
+	* fork.cc (fork_parent): Correct the "unable to allocate
+	forker_finished event" error message.  It named the wrong event before.
+
 2001-10-13  Christopher Faylor  <cgf@redhat.com>
 
 	* autoload.cc (load_wsock32): Declare dummy function to force loading

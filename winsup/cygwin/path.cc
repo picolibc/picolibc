@@ -3146,22 +3146,6 @@ fchdir (int fd)
     }
   SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fchdir");
   int ret = chdir (cygheap->fdtab[fd]->get_name ());
-  if (ret == 0)
-    {
-      /* The name in the fhandler is explicitely overwritten with the full path.
-	 Otherwise fchmod() to a path originally given as a relative path could
-	 end up in a completely different directory. Imagine:
-
-	   fd = open ("..");
-	   fchmod(fd);
-	   fchmod(fd);
-
-	 The 2nd fchmod should chdir to the same dir as the first call, not
-	 to it's parent dir. */
-      char posix_path[MAX_PATH];
-      cygheap->fdtab.reset_unix_path_name (fd, cygheap->cwd.get (posix_path, 1, 1));
-    }
-
   ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fchdir");
   syscall_printf ("%d = fchdir (%d)", ret, fd);
   return ret;
