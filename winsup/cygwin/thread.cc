@@ -1371,7 +1371,10 @@ pthread_mutex::is_good_object (pthread_mutex_t const *mutex)
 bool
 pthread_mutex::is_good_initializer (pthread_mutex_t const *mutex)
 {
-  if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC, PTHREAD_MUTEX_INITIALIZER) != VALID_STATIC_OBJECT)
+  if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC,
+                                 PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP,
+                                 PTHREAD_NORMAL_MUTEX_INITIALIZER_NP,
+                                 PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP) != VALID_STATIC_OBJECT)
     return false;
   return true;
 }
@@ -1379,7 +1382,10 @@ pthread_mutex::is_good_initializer (pthread_mutex_t const *mutex)
 bool
 pthread_mutex::is_good_initializer_or_object (pthread_mutex_t const *mutex)
 {
-  if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC, PTHREAD_MUTEX_INITIALIZER) == INVALID_OBJECT)
+  if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC,
+                                 PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP,
+                                 PTHREAD_NORMAL_MUTEX_INITIALIZER_NP,
+                                 PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP) == INVALID_OBJECT)
     return false;
   return true;
 }
@@ -1387,9 +1393,11 @@ pthread_mutex::is_good_initializer_or_object (pthread_mutex_t const *mutex)
 bool
 pthread_mutex::is_good_initializer_or_bad_object (pthread_mutex_t const *mutex)
 {
-  verifyable_object_state objectState = verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC, PTHREAD_MUTEX_INITIALIZER);
-  if (objectState == VALID_OBJECT)
-	return false;
+  if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC,
+                                 PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP,
+                                 PTHREAD_NORMAL_MUTEX_INITIALIZER_NP,
+                                 PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP) == VALID_OBJECT)
+    return false;
   return true;
 }
 
@@ -1780,12 +1788,15 @@ check_valid_pointer (void const *pointer)
 }
 
 verifyable_object_state
-verifyable_object_isvalid (void const * objectptr, long magic, void *static_ptr)
+verifyable_object_isvalid (void const * objectptr, long magic, void *static_ptr1,
+                           void *static_ptr2, void *static_ptr3)
 {
   verifyable_object **object = (verifyable_object **)objectptr;
   if (check_valid_pointer (object))
     return INVALID_OBJECT;
-  if (static_ptr && *object == static_ptr)
+  if ((static_ptr1 && *object == static_ptr1) ||
+      (static_ptr2 && *object == static_ptr2) ||
+      (static_ptr3 && *object == static_ptr3))
     return VALID_STATIC_OBJECT;
   if (!*object)
     return INVALID_OBJECT;
@@ -1794,12 +1805,6 @@ verifyable_object_isvalid (void const * objectptr, long magic, void *static_ptr)
   if ((*object)->magic != magic)
     return INVALID_OBJECT;
   return VALID_OBJECT;
-}
-
-verifyable_object_state
-verifyable_object_isvalid (void const * objectptr, long magic)
-{
-  return verifyable_object_isvalid (objectptr, magic, NULL);
 }
 
 DWORD WINAPI
@@ -2402,9 +2407,8 @@ pthread_cond::is_good_initializer_or_object (pthread_cond_t const *cond)
 bool
 pthread_cond::is_good_initializer_or_bad_object (pthread_cond_t const *cond)
 {
-  verifyable_object_state objectState = verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC, PTHREAD_COND_INITIALIZER);
-  if (objectState == VALID_OBJECT)
-	return false;
+  if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC, PTHREAD_COND_INITIALIZER) == VALID_OBJECT)
+    return false;
   return true;
 }
 
@@ -2429,6 +2433,9 @@ pthread_cond_destroy (pthread_cond_t *cond)
 int
 pthread_cond::init (pthread_cond_t *cond, const pthread_condattr_t *attr)
 {
+
+  pthread_cond_t new_cond;
+
   if (attr && !pthread_condattr::is_good_object (attr))
     return EINVAL;
 
@@ -2440,15 +2447,17 @@ pthread_cond::init (pthread_cond_t *cond, const pthread_condattr_t *attr)
       return EBUSY;
     }
 
-  *cond = new pthread_cond (attr ? (*attr) : NULL);
-  if (!is_good_object (cond))
+  new_cond = new pthread_cond (attr ? (*attr) : NULL);
+  if (!is_good_object (&new_cond))
     {
-      delete (*cond);
-      *cond = NULL;
+      delete new_cond;
       cond_initialization_lock.unlock ();
       return EAGAIN;
     }
+
+  *cond = new_cond;
   cond_initialization_lock.unlock ();
+
   return 0;
 }
 
@@ -2600,9 +2609,8 @@ pthread_rwlock::is_good_initializer_or_object (pthread_rwlock_t const *rwlock)
 bool
 pthread_rwlock::is_good_initializer_or_bad_object (pthread_rwlock_t const *rwlock)
 {
-  verifyable_object_state objectState = verifyable_object_isvalid (rwlock, PTHREAD_RWLOCK_MAGIC, PTHREAD_RWLOCK_INITIALIZER);
-  if (objectState == VALID_OBJECT)
-	return false;
+  if (verifyable_object_isvalid (rwlock, PTHREAD_RWLOCK_MAGIC, PTHREAD_RWLOCK_INITIALIZER) == VALID_OBJECT)
+    return false;
   return true;
 }
 
@@ -2627,6 +2635,8 @@ pthread_rwlock_destroy (pthread_rwlock_t *rwlock)
 int
 pthread_rwlock::init (pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr)
 {
+  pthread_rwlock_t new_rwlock;
+
   if (attr && !pthread_rwlockattr::is_good_object (attr))
     return EINVAL;
 
@@ -2638,15 +2648,17 @@ pthread_rwlock::init (pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr
       return EBUSY;
     }
 
-  *rwlock = new pthread_rwlock (attr ? (*attr) : NULL);
-  if (!is_good_object (rwlock))
+  new_rwlock = new pthread_rwlock (attr ? (*attr) : NULL);
+  if (!is_good_object (&new_rwlock))
     {
-      delete (*rwlock);
-      *rwlock = NULL;
+      delete new_rwlock;
       rwlock_initialization_lock.unlock ();
       return EAGAIN;
     }
+
+  *rwlock = new_rwlock;
   rwlock_initialization_lock.unlock ();
+
   return 0;
 }
 
@@ -2795,18 +2807,13 @@ pthread_equal (pthread_t t1, pthread_t t2)
 
 /* Mutexes  */
 
-/* FIXME: there's a potential race with PTHREAD_MUTEX_INITALIZER:
-   the mutex is not actually inited until the first use.
-   So two threads trying to lock/trylock may collide.
-   Solution: we need a global mutex on mutex creation, or possibly simply
-   on all constructors that allow INITIALIZER macros.
-   the lock should be very small: only around the init routine, not
-   every test, or all mutex access will be synchronised.  */
-
 int
 pthread_mutex::init (pthread_mutex_t *mutex,
-		      const pthread_mutexattr_t *attr)
+                     const pthread_mutexattr_t *attr,
+                     const pthread_mutex_t initializer)
 {
+  pthread_mutex_t new_mutex;
+
   if (attr && !pthread_mutexattr::is_good_object (attr) || check_valid_pointer (mutex))
     return EINVAL;
 
@@ -2818,15 +2825,27 @@ pthread_mutex::init (pthread_mutex_t *mutex,
       return EBUSY;
     }
 
-  *mutex = new pthread_mutex (attr ? (*attr) : NULL);
-  if (!is_good_object (mutex))
+  new_mutex = new pthread_mutex (attr ? (*attr) : NULL);
+  if (!is_good_object (&new_mutex))
     {
-      delete (*mutex);
-      *mutex = NULL;
+      delete new_mutex;
       mutex_initialization_lock.unlock ();
       return EAGAIN;
     }
+
+  if (!attr && initializer)
+    {
+      if (initializer == PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP)
+        new_mutex->type = PTHREAD_MUTEX_RECURSIVE;
+      else if (initializer == PTHREAD_NORMAL_MUTEX_INITIALIZER_NP)
+        new_mutex->type = PTHREAD_MUTEX_NORMAL;
+      else if (initializer == PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP)
+        new_mutex->type = PTHREAD_MUTEX_ERRORCHECK;
+    }
+
+  *mutex = new_mutex;
   mutex_initialization_lock.unlock ();
+
   return 0;
 }
 
@@ -2834,11 +2853,6 @@ extern "C" int
 pthread_mutex_getprioceiling (const pthread_mutex_t *mutex,
 				int *prioceiling)
 {
-  pthread_mutex_t *themutex = (pthread_mutex_t *) mutex;
-  if (pthread_mutex::is_good_initializer (mutex))
-    pthread_mutex::init ((pthread_mutex_t *) mutex, NULL);
-  if (!pthread_mutex::is_good_object (themutex))
-    return EINVAL;
   /* We don't define _POSIX_THREAD_PRIO_PROTECT because we do't currently support
      mutex priorities.
 
@@ -2852,47 +2866,28 @@ pthread_mutex_getprioceiling (const pthread_mutex_t *mutex,
 extern "C" int
 pthread_mutex_lock (pthread_mutex_t *mutex)
 {
-  pthread_mutex_t *themutex = mutex;
-  /* This could be simplified via is_good_initializer_or_object
-     and is_good_initializer, but in a performance critical call like this....
-     no.  */
-  switch (verifyable_object_isvalid (themutex, PTHREAD_MUTEX_MAGIC, PTHREAD_MUTEX_INITIALIZER))
-    {
-    case INVALID_OBJECT:
-      return EINVAL;
-      break;
-    case VALID_STATIC_OBJECT:
-      if (pthread_mutex::is_good_initializer (mutex))
-	{
-	  int rv = pthread_mutex::init (mutex, NULL);
-	  if (rv && rv != EBUSY)
-	    return rv;
-	}
-      /* No else needed. If it's been initialized while we waited,
-	 we can just attempt to lock it */
-      break;
-    case VALID_OBJECT:
-      break;
-    }
-  return (*themutex)->lock ();
+  if (pthread_mutex::is_good_initializer (mutex))
+    pthread_mutex::init (mutex, NULL, *mutex);
+  if (!pthread_mutex::is_good_object (mutex))
+    return EINVAL;
+  return (*mutex)->lock ();
 }
 
 extern "C" int
 pthread_mutex_trylock (pthread_mutex_t *mutex)
 {
-  pthread_mutex_t *themutex = mutex;
   if (pthread_mutex::is_good_initializer (mutex))
-    pthread_mutex::init (mutex, NULL);
-  if (!pthread_mutex::is_good_object (themutex))
+    pthread_mutex::init (mutex, NULL, *mutex);
+  if (!pthread_mutex::is_good_object (mutex))
     return EINVAL;
-  return (*themutex)->trylock ();
+  return (*mutex)->trylock ();
 }
 
 extern "C" int
 pthread_mutex_unlock (pthread_mutex_t *mutex)
 {
   if (pthread_mutex::is_good_initializer (mutex))
-    pthread_mutex::init (mutex, NULL);
+    return EPERM;
   if (!pthread_mutex::is_good_object (mutex))
     return EINVAL;
   return (*mutex)->unlock ();
@@ -2920,11 +2915,6 @@ extern "C" int
 pthread_mutex_setprioceiling (pthread_mutex_t *mutex, int prioceiling,
 				int *old_ceiling)
 {
-  pthread_mutex_t *themutex = mutex;
-  if (pthread_mutex::is_good_initializer (mutex))
-    pthread_mutex::init (mutex, NULL);
-  if (!pthread_mutex::is_good_object (themutex))
-    return EINVAL;
   return ENOSYS;
 }
 

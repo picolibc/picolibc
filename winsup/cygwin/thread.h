@@ -120,8 +120,10 @@ typedef enum
   VALID_STATIC_OBJECT
 } verifyable_object_state;
 
-verifyable_object_state verifyable_object_isvalid (void const *, long);
-verifyable_object_state verifyable_object_isvalid (void const *, long, void *);
+verifyable_object_state verifyable_object_isvalid (void const * objectptr, long magic,
+                                                   void *static_ptr1 = NULL,
+                                                   void *static_ptr2 = NULL,
+                                                   void *static_ptr3 = NULL);
 
 template <class list_node> inline void
 List_insert (list_node *&head, list_node *node)
@@ -276,7 +278,8 @@ public:
   static bool is_good_initializer_or_bad_object (pthread_mutex_t const *mutex);
   static bool can_be_unlocked (pthread_mutex_t const *mutex);
   static void init_mutex ();
-  static int init (pthread_mutex_t *, const pthread_mutexattr_t *);
+  static int init (pthread_mutex_t *mutex, const pthread_mutexattr_t *attr,
+                   const pthread_mutex_t initializer = NULL);
 
   unsigned long lock_counter;
   HANDLE win32_obj_id;
