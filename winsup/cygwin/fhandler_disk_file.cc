@@ -374,10 +374,14 @@ fhandler_disk_file::open (path_conv *real_path, int flags, mode_t mode)
   set_has_acls (real_path->has_acls ());
   set_isremote (real_path->isremote ());
 
-  if (real_path->isdir ())
-    flags |= O_DIROPEN;
-
-  int res = this->fhandler_base::open (real_path, flags, mode);
+  int res;
+  if (!real_path->isdir () || wincap.can_open_directories ())
+    res = this->fhandler_base::open (real_path, flags | O_DIROPEN, mode);
+  else
+    {
+      set_errno (EISDIR);
+      res = 0;
+    }
 
   if (!res)
     goto out;

@@ -1,5 +1,11 @@
 2002-05-12  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::open): Avoid using
+	O_DIROPEN when OS doesn't support it.  Return proper errno in that
+	case.
+
+2002-05-12  Christopher Faylor  <cgf@redhat.com>
+
 	* syscalls.cc (_read): Change error to EBADF if attempt to read from a
 	non-readable fd.
 
