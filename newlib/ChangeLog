@@ -1,3 +1,10 @@
+2004-09-21  Ian Lance Taylor  <ian@wasabisystems.com>
+
+	* libc/machine/xscale/setjmp.S: New file, copied from
+	libc/machine/arm/setjmp.S.
+	* libc/machine/xscale/Makefile.am (lib_a_SOURCES): Add setjmp.S.
+	* libc/machine/xscale/Makefile.in: Regenerate.
+
 2004-09-16  Antony King  <antony.king@st.com>
 
 	* libc/include/sys/lock.h: Replaced empty {} with (0) to conform

@@ -8,7 +8,7 @@ noinst_LIBRARIES = lib.a
 
 lib_a_SOURCES = \
 	memchr.c memcmp.c memcpy.c memmove.c memset.c \
-	strchr.c strcmp.c strcpy.c strlen.c
+	strchr.c strcmp.c strcpy.c strlen.c setjmp.S
 
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
