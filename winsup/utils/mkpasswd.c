@@ -1,6 +1,6 @@
 /* mkpasswd.c:
 
-   Copyright 1997, 1998, 1999, 2000 Red Hat, Inc.
+   Copyright 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -19,6 +19,7 @@
 #include <lmaccess.h>
 #include <lmapibuf.h>
 #include <sys/fcntl.h>
+#include <lmerr.h>
 
 SID_IDENTIFIER_AUTHORITY sid_world_auth = {SECURITY_WORLD_SID_AUTHORITY};
 SID_IDENTIFIER_AUTHORITY sid_nt_auth = {SECURITY_NT_AUTHORITY};
@@ -27,6 +28,7 @@ NET_API_STATUS WINAPI (*netapibufferfree)(PVOID);
 NET_API_STATUS WINAPI (*netuserenum)(LPWSTR,DWORD,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
 NET_API_STATUS WINAPI (*netlocalgroupenum)(LPWSTR,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
 NET_API_STATUS WINAPI (*netgetdcname)(LPWSTR,LPWSTR,PBYTE*);
+NET_API_STATUS WINAPI (*netusergetinfo)(LPWSTR,LPWSTR,DWORD,PBYTE*);
 
 #ifndef min
 #define min(a,b) (((a)<(b))?(a):(b))
@@ -47,6 +49,8 @@ load_netapi ()
   if (!(netlocalgroupenum = (void *) GetProcAddress (h, "NetLocalGroupEnum")))
     return FALSE;
   if (!(netgetdcname = (void *) GetProcAddress (h, "NetGetDCName")))
+    return FALSE;
+  if (!(netusergetinfo = (void *) GetProcAddress (h, "NetUserGetInfo")))
     return FALSE;
 
   return TRUE;
@@ -104,7 +108,7 @@ uni2ansi (LPWSTR wcs, char *mbs, int size)
 
 int
 enum_users (LPWSTR servername, int print_sids, int print_cygpath,
-	    const char * passed_home_path, int id_offset)
+	    const char * passed_home_path, int id_offset, char *disp_username)
 {
   USER_INFO_3 *buffer;
   DWORD entriesread = 0;
@@ -112,6 +116,7 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
   DWORD resume_handle = 0;
   DWORD rc;
   char ansi_srvname[256];
+  WCHAR uni_name[512];
 
   if (servername)
     uni2ansi (servername, ansi_srvname, sizeof (ansi_srvname));
@@ -120,6 +125,14 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
     {
       DWORD i;
 
+    if (disp_username != NULL)
+      {
+	MultiByteToWideChar (CP_ACP, 0, disp_username, -1, uni_name, 512 );
+	rc = netusergetinfo(servername, (LPWSTR) & uni_name, 3,
+			    (LPBYTE *) &buffer );
+	entriesread=1;
+      }
+    else 
       rc = netuserenum (servername, 3, FILTER_NORMAL_ACCOUNT,
 			(LPBYTE *) & buffer, 1024,
 			&entriesread, &totalentries, &resume_handle);
@@ -134,7 +147,9 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
 	  break;
 
 	default:
-	  fprintf (stderr, "NetUserEnum() failed with %ld\n", rc);
+	  fprintf (stderr, "NetUserEnum() failed with error %ld.\n", rc);
+	  if (rc == NERR_UserNotFound) 
+	    fprintf (stderr, "That user doesn't exist.\n");
 	  exit (1);
 	}
 
@@ -381,6 +396,7 @@ usage ()
   fprintf (stderr, "                           (this affects ntsec)\n");
   fprintf (stderr, "   -p,--path-to-home path  if user account has no home dir, use\n");
   fprintf (stderr, "                           path instead of /home/\n");
+  fprintf (stderr, "   -u,--username username  only return information for the specified user\n");
   fprintf (stderr, "   -?,--help               displays this message\n\n");
   fprintf (stderr, "One of `-l', `-d' or `-g' must be given on NT/W2K.\n");
   return 1;
@@ -393,12 +409,13 @@ struct option longopts[] = {
   {"local-groups", no_argument, NULL, 'g'},
   {"no-mount", no_argument, NULL, 'm'},
   {"no-sids", no_argument, NULL, 's'},
-  {"path-to-home",required_argument, NULL, 'p'},
+  {"path-to-home", required_argument, NULL, 'p'},
+  {"username", required_argument, NULL, 'u'},
   {"help", no_argument, NULL, 'h'},
   {0, no_argument, NULL, 0}
 };
 
-char opts[] = "ldo:gsmhp:";
+char opts[] = "ldo:gsmhpu:";
 
 int
 main (int argc, char **argv)
@@ -414,6 +431,7 @@ main (int argc, char **argv)
   int print_cygpath = 1;
   int id_offset = 10000;
   int i;
+  char *disp_username = NULL;
 
   char name[256], passed_home_path[MAX_PATH];
   DWORD len;
@@ -458,6 +476,9 @@ main (int argc, char **argv)
 		strcpy (passed_home_path, optarg);
 		if (optarg[strlen (optarg)-1] != '/')
 		  strcat (passed_home_path, "/");
+		break;
+	      case 'u':
+		disp_username = optarg;
 		break;
 	      case 'h':
 		return usage ();
@@ -513,19 +534,25 @@ main (int argc, char **argv)
   /*
    * Get `Everyone' group
   */
-  print_special (print_sids, &sid_world_auth, 1, SECURITY_WORLD_RID, 0, 0, 0, 0, 0, 0, 0);
-  /*
-   * Get `system' group
-  */
-  print_special (print_sids, &sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID, 0, 0, 0, 0, 0, 0, 0);
-  /*
-   * Get `administrators' group
-  */
-  if (!print_local_groups)
-    print_special (print_sids, &sid_nt_auth, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0);
+  if (disp_username == NULL)
+    {
+      print_special (print_sids, &sid_world_auth, 1, SECURITY_WORLD_RID,
+		     0, 0, 0, 0, 0, 0, 0);
+      /*
+       * Get `system' group
+      */
+      print_special (print_sids, &sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
+		     0, 0, 0, 0, 0, 0, 0);
+      /*
+       * Get `administrators' group
+      */
+      if (!print_local_groups)
+	print_special (print_sids, &sid_nt_auth, 2, SECURITY_BUILTIN_DOMAIN_RID,
+		       DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0);
 
-  if (print_local_groups)
-    enum_local_groups (print_sids);
+      if (print_local_groups)
+	enum_local_groups (print_sids);
+    }
 
   if (print_domain)
     {
@@ -541,11 +568,13 @@ main (int argc, char **argv)
 	  exit (1);
 	}
 
-      enum_users (servername, print_sids, print_cygpath, passed_home_path, id_offset);
+      enum_users (servername, print_sids, print_cygpath, passed_home_path,
+		  id_offset, disp_username);
     }
 
   if (print_local)
-    enum_users (NULL, print_sids, print_cygpath, passed_home_path, 0);
+    enum_users (NULL, print_sids, print_cygpath, passed_home_path, 0,
+    		disp_username);
 
   if (servername)
     netapibufferfree (servername);

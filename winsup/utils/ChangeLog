@@ -1,3 +1,14 @@
+2001-11-20  Mark Bradshaw  <bradshaw@staff.crosswalk.com>
+
+	* mkpasswd.c: include lmerr.h
+	(main): New -u option to allow specifying a
+	specific user.  If specified, groups aren't displayed and
+	output is limited to only the specified user.
+	(enum_users): If specific user is specified, via -u option,
+	display only that user's record.  With -u use NetUserGetInfo
+	instead of NetUserEnum.
+	(load_netapi): Added netusergetinfo.
+
 2001-11-15  Gary R. Van Sickle  <g.r.vansickle@worldnet.att.net>
 
 	* strace.cc (main): Change getopt() to getopt_long().
