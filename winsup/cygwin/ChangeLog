@@ -1,3 +1,10 @@
+Fri Jun 16 19:27:27 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Just use library files from this tree when building
+	cygrun.exe.
+	* path.cc (chdir): Don't set cache to offending chdir.  Change comment
+	to reflect current reality.
+
 Thu Jun 16 20:55:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* cygwin.din: Define symbols for `cygwin_logon_user' and
@@ -27,12 +34,7 @@ Thu Jun 16 20:55:00 2000  Corinna Vinschen <corinna@vinschen.de>
 	(getegid): Return effective gid.
 	include/sys/cygwin.h: Add prototypes for `cygwin_logon_user' and
 	`cygwin_set_impersonation_token'.
-	include/cygwin/version.h: Bumb API minor version to 22.
-
-Thu Jun 15 18:12:36 2000  Christopher Faylor <cgf@cygnus.com>
-
-	* path.cc (chdir): Don't set cache to offending chdir.  Change comment
-	to reflect current reality.
+	include/cygwin/version.h: Bump API minor version to 22.
 
 Thu Jun 15 15:43:50 2000  Christopher Faylor <cgf@cygnus.com>
 

@@ -197,9 +197,9 @@ winver_stamp: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
 	touch $@; \
 	$(COMPILE_CXX) -o version.o version.cc
 
-cygrun.exe : cygrun.o $(DLL_IMPORTS) $(w32api_lib)/libuser32.a \
-	     $(w32api_lib)/libshell32.a
-	$(CC) -o $@ -L$(w32api_lib) ${word 1,$^}
+cygrun.exe : cygrun.o $(LIB_NAME) $(w32api_lib)/libuser32.a \
+	     $(w32api_lib)/libshell32.a $(w32api_lib)/libkernel32.a
+	$(CC) -nodefaultlibs -o $@ $^ $(LIBGCC)
 
 #
 

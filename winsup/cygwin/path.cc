@@ -2471,7 +2471,7 @@ chdir (const char *dir)
     {
       /* Store new cache information */
       free (cwd_win32);
-      cwd_win32 = strdup (path);;
+      cwd_win32 = strdup (path);
 
       char pathbuf[MAX_PATH];
       (void) normalize_posix_path (cwd_posix, dir, pathbuf);
@@ -2479,7 +2479,7 @@ chdir (const char *dir)
       cwd_posix = strdup (pathbuf);
     }
 
-  syscall_printf ("%d = chdir (%s <dos %s>)", res, cwd_posix, cwd_win32);
+  syscall_printf ("%d = chdir() cwd_posix '%s' native '%s'", res, cwd_posix, native_dir);
   return res;
 }
 
