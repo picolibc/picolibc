@@ -1398,7 +1398,7 @@ pthread::getsequence_np ()
 }
 
 int
-__pthread_create (pthread_t *thread, const pthread_attr_t *attr,
+pthread::create (pthread_t *thread, const pthread_attr_t *attr,
 		  void *(*start_routine) (void *), void *arg)
 {
   DECLARE_TLS_STORAGE;
@@ -1407,7 +1407,7 @@ __pthread_create (pthread_t *thread, const pthread_attr_t *attr,
 
   *thread = new pthread ();
   (*thread)->create (start_routine, attr ? *attr : NULL, arg);
-  if (!pthread::isGoodObject (thread))
+  if (!isGoodObject (thread))
     {
       delete (*thread);
       *thread = NULL;
@@ -1418,7 +1418,7 @@ __pthread_create (pthread_t *thread, const pthread_attr_t *attr,
 }
 
 int
-__pthread_once (pthread_once_t *once_control, void (*init_routine) (void))
+pthread::once (pthread_once_t *once_control, void (*init_routine) (void))
 {
   // already done ?
   if (once_control->state)
@@ -1442,9 +1442,9 @@ __pthread_once (pthread_once_t *once_control, void (*init_routine) (void))
 }
 
 int
-__pthread_cancel (pthread_t thread)
+pthread::cancel (pthread_t thread)
 {
-  if (!pthread::isGoodObject (&thread))
+  if (!isGoodObject (&thread))
     return ESRCH;
 
   return thread->cancel ();
@@ -1510,7 +1510,7 @@ pthread::atforkchild (void)
  *parent and child calls are called in FI-FC order.
  */
 int
-__pthread_atfork (void (*prepare)(void), void (*parent)(void), void (*child)(void))
+pthread::atfork (void (*prepare)(void), void (*parent)(void), void (*child)(void))
 {
   callback *prepcb = NULL, *parentcb = NULL, *childcb = NULL;
   if (prepare)
@@ -1726,16 +1726,16 @@ __pthread_attr_destroy (pthread_attr_t *attr)
 }
 
 int
-__pthread_join (pthread_t *thread, void **return_val)
+pthread::join (pthread_t *thread, void **return_val)
 {
-   pthread_t joiner = pthread::self ();
+   pthread_t joiner = self ();
 
    // Initialize return val with NULL
    if (return_val)
      *return_val = NULL;
 
   /*FIXME: wait on the thread cancellation event as well - we are a cancellation point*/
-  if (!pthread::isGoodObject (thread))
+  if (!isGoodObject (thread))
     return ESRCH;
 
   if (__pthread_equal (thread,&joiner))
@@ -1766,9 +1766,9 @@ __pthread_join (pthread_t *thread, void **return_val)
 }
 
 int
-__pthread_detach (pthread_t *thread)
+pthread::detach (pthread_t *thread)
 {
-  if (!pthread::isGoodObject (thread))
+  if (!isGoodObject (thread))
     return ESRCH;
 
   (*thread)->mutex.Lock ();
@@ -1797,9 +1797,9 @@ __pthread_detach (pthread_t *thread)
 }
 
 int
-__pthread_suspend (pthread_t *thread)
+pthread::suspend (pthread_t *thread)
 {
-  if (!pthread::isGoodObject (thread))
+  if (!isGoodObject (thread))
     return ESRCH;
 
   if ((*thread)->suspended == false)
@@ -1813,9 +1813,9 @@ __pthread_suspend (pthread_t *thread)
 
 
 int
-__pthread_continue (pthread_t *thread)
+pthread::resume (pthread_t *thread)
 {
-  if (!pthread::isGoodObject (thread))
+  if (!isGoodObject (thread))
     return ESRCH;
 
   if ((*thread)->suspended == true)
@@ -2456,10 +2456,10 @@ semaphore::isGoodObject (sem_t const * sem)
 }
 
 int
-__sem_init (sem_t *sem, int pshared, unsigned int value)
+semaphore::init (sem_t *sem, int pshared, unsigned int value)
 {
   /*opengroup calls this undefined */
-  if (semaphore::isGoodObject (sem))
+  if (isGoodObject (sem))
     return EBUSY;
 
   if (value > SEM_VALUE_MAX)
@@ -2467,7 +2467,7 @@ __sem_init (sem_t *sem, int pshared, unsigned int value)
 
   *sem = new semaphore (pshared, value);
 
-  if (!semaphore::isGoodObject (sem))
+  if (!isGoodObject (sem))
     {
       delete (*sem);
       *sem = NULL;
@@ -2477,9 +2477,9 @@ __sem_init (sem_t *sem, int pshared, unsigned int value)
 }
 
 int
-__sem_destroy (sem_t *sem)
+semaphore::destroy (sem_t *sem)
 {
-  if (!semaphore::isGoodObject (sem))
+  if (!isGoodObject (sem))
     return EINVAL;
 
   /*FIXME - new feature - test for busy against threads... */
@@ -2490,9 +2490,9 @@ __sem_destroy (sem_t *sem)
 }
 
 int
-__sem_wait (sem_t *sem)
+semaphore::wait (sem_t *sem)
 {
-  if (!semaphore::isGoodObject (sem))
+  if (!isGoodObject (sem))
     {
       set_errno (EINVAL);
       return -1;
@@ -2503,9 +2503,9 @@ __sem_wait (sem_t *sem)
 }
 
 int
-__sem_trywait (sem_t *sem)
+semaphore::trywait (sem_t *sem)
 {
-  if (!semaphore::isGoodObject (sem))
+  if (!isGoodObject (sem))
     {
       set_errno (EINVAL);
       return -1;
@@ -2515,9 +2515,9 @@ __sem_trywait (sem_t *sem)
 }
 
 int
-__sem_post (sem_t *sem)
+semaphore::post (sem_t *sem)
 {
-  if (!semaphore::isGoodObject (sem))
+  if (!isGoodObject (sem))
     return EINVAL;
 
   (*sem)->Post ();

@@ -1,5 +1,25 @@
 2002-09-21  Robert Collins <rbtcollins@hotmail.com>
 
+	* pthread.cc: Use class::call for converted pthread and semaphore
+	calls.
+	* thread.cc: Convert various __pthread_call and __sem_call to 
+	pthread::call and sem::call throughout.
+	* pthread.h (__pthread_cancel): Convert to pthread::cancel.
+	(__pthread_join): Convert to pthread::join.
+	(__pthread_detach): Convert to pthread::detach.
+	(__pthread_create): Convert to pthread::create.
+	(__pthread_once): Convert to pthread::once.
+	(__pthread_atfork): Convert to pthread::atfork.
+	(__pthread_suspend): Convert to pthread::suspend.
+	(__pthread_continue): Convert to pthread::resume.
+	(__sem_init): Convert to semaphore::init.
+	(__sem_destroy): Convert to semaphore::destroy.
+	(__sem_wait): Convert to semaphore::wait.
+	(__sem_trywait): Convert to semaphore::trywait.
+	(__sem_post): Convert to semaphore::post.
+
+2002-09-21  Robert Collins <rbtcollins@hotmail.com>
+
 	* thread.cc: Finish the removal of the separate pthread_key
 	destructor list.
 	Remove all pthread_key_destructor and pthread_key_destructor_list

@@ -336,9 +336,21 @@ public:
    static void atforkparent();
    static void atforkchild();
 
+   /* API calls */
+   static int cancel (pthread_t);
+   static int join (pthread_t * thread, void **return_val);
+   static int detach (pthread_t * thread);
+   static int create (pthread_t * thread, const pthread_attr_t * attr,
+			      void *(*start_routine) (void *), void *arg);
+   static int once (pthread_once_t *, void (*)(void));
+   static int atfork(void (*)(void), void (*)(void), void (*)(void));
+   static int suspend (pthread_t * thread);
+   static int resume (pthread_t * thread);
+
    virtual void exit (void *value_ptr);
 
    virtual int cancel ();
+   
    virtual void testcancel ();
    static void static_cancel_self ();
 
@@ -357,9 +369,6 @@ private:
     DWORD thread_id;
     __pthread_cleanup_handler *cleanup_stack;
     pthread_mutex mutex;
-
-    friend int __pthread_join (pthread_t * thread, void **return_val);
-    friend int __pthread_detach (pthread_t * thread);
 
     void pop_all_cleanup_handlers (void);
     void precreate (pthread_attr *);
@@ -439,6 +448,13 @@ class semaphore:public verifyable_object
 {
 public:
   static bool isGoodObject(sem_t const *);
+  /* API calls */
+  static int init (sem_t * sem, int pshared, unsigned int value);
+  static int destroy (sem_t * sem);
+  static int wait (sem_t * sem);
+  static int trywait (sem_t * sem);
+  static int post (sem_t * sem);
+  
   HANDLE win32_obj_id;
   class semaphore * next;
   int shared;
@@ -496,21 +512,8 @@ public:
     }
 };
 
-/* Cancellation */
-int __pthread_cancel (pthread_t thread);
-
-/* Thread Exit */
-int __pthread_join (pthread_t * thread, void **return_val);
-int __pthread_detach (pthread_t * thread);
-
 extern "C"
 {
-/*  ThreadCreation */
-int __pthread_create (pthread_t * thread, const pthread_attr_t * attr,
-		      void *(*start_routine) (void *), void *arg);
-int __pthread_once (pthread_once_t *, void (*)(void));
-int __pthread_atfork(void (*)(void), void (*)(void), void (*)(void));
-
 int __pthread_attr_init (pthread_attr_t * attr);
 int __pthread_attr_destroy (pthread_attr_t * attr);
 int __pthread_attr_setdetachstate (pthread_attr_t *, int);
@@ -530,10 +533,6 @@ int __pthread_attr_setschedparam (pthread_attr_t *,
 int __pthread_attr_setschedpolicy (pthread_attr_t *, int);
 int __pthread_attr_setscope (pthread_attr_t *, int);
 int __pthread_attr_setstackaddr (pthread_attr_t *, void *);
-
-/* Thread suspend */
-int __pthread_suspend (pthread_t * thread);
-int __pthread_continue (pthread_t * thread);
 
 /* Thread SpecificData */
 int __pthread_key_create (pthread_key_t * key, void (*destructor) (void *));
@@ -593,16 +592,7 @@ int __pthread_getschedparam (pthread_t thread, int *policy,
 int __pthread_setschedparam (pthread_t thread, int policy,
 			     const struct sched_param *param);
 
-/* cancelability states */
-
-/* Semaphores */
-int __sem_init (sem_t * sem, int pshared, unsigned int value);
-int __sem_destroy (sem_t * sem);
-int __sem_wait (sem_t * sem);
-int __sem_trywait (sem_t * sem);
-int __sem_post (sem_t * sem);
 };
-
 #endif // MT_SAFE
 
 #endif // _CYGNUS_THREADS_

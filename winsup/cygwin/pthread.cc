@@ -21,19 +21,19 @@ int
 pthread_create (pthread_t * thread, const pthread_attr_t * attr,
 		void *(*start_routine) (void *), void *arg)
 {
-  return __pthread_create (thread, attr, start_routine, arg);
+  return pthread::create (thread, attr, start_routine, arg);
 }
 
 int
 pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 {
-  return __pthread_once (once_control, init_routine);
+  return pthread::once (once_control, init_routine);
 }
 
 int
 pthread_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void))
 {
-  return __pthread_atfork(prepare, parent, child);
+  return pthread::atfork(prepare, parent, child);
 }
 
 int
@@ -147,13 +147,13 @@ pthread_exit (void *value_ptr)
 int
 pthread_join (pthread_t thread, void **return_val)
 {
-  return __pthread_join (&thread, (void **) return_val);
+  return pthread::join (&thread, (void **) return_val);
 }
 
 int
 pthread_detach (pthread_t thread)
 {
-  return __pthread_detach (&thread);
+  return pthread::detach (&thread);
 }
 
 
@@ -161,14 +161,14 @@ pthread_detach (pthread_t thread)
 int
 pthread_suspend (pthread_t thread)
 {
-  return __pthread_suspend (&thread);
+  return pthread::suspend (&thread);
 }
 
 /* same */
 int
 pthread_continue (pthread_t thread)
 {
-  return __pthread_continue (&thread);
+  return pthread::resume (&thread);
 }
 
 unsigned long
@@ -425,7 +425,7 @@ pthread_setschedparam (pthread_t thread, int policy,
 int
 pthread_cancel (pthread_t thread)
 {
-  return __pthread_cancel (thread);
+  return pthread::cancel (thread);
 }
 
 int
@@ -462,31 +462,31 @@ _pthread_cleanup_pop (int execute)
 int
 sem_init (sem_t * sem, int pshared, unsigned int value)
 {
-  return __sem_init (sem, pshared, value);
+  return semaphore::init (sem, pshared, value);
 }
 
 int
 sem_destroy (sem_t * sem)
 {
-  return __sem_destroy (sem);
+  return semaphore::destroy (sem);
 }
 
 int
 sem_wait (sem_t * sem)
 {
-  return __sem_wait (sem);
+  return semaphore::wait (sem);
 }
 
 int
 sem_trywait (sem_t * sem)
 {
-  return __sem_trywait (sem);
+  return semaphore::trywait (sem);
 }
 
 int
 sem_post (sem_t * sem)
 {
-  return __sem_post (sem);
+  return semaphore::post (sem);
 }
 
 }
