@@ -1,3 +1,8 @@
+Mon Oct  8 14:15:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* winsup.api/mmaptest01.c: Add several tests on mmaps.  Use libltp.
+	* winsup.api/winsup.exp: Link all tests agains libltp.
+
 Fri Oct  5 11:15:55 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* winsup.api/nullgetcwd.c: New file.  Check that NULL first argument to

@@ -1,6 +1,9 @@
 /*
   Copyright 2001 Free Software Foundation, Inc.
   Written by Michael Chastain, <chastain@redhat.com>
+  Changes by Corinna Vinschen, <corinna@vinschen.de>:
+  - Using mkstemp to generate filenames.
+  - Adding tests
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -50,6 +53,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "test.h"
+#include "usctest.h"
+
+char *TCID = "mmaptest01";	/* Test program identifier. */
+int TST_TOTAL = 7;		/* Total number of test cases. */
+extern int Tst_count;		/* Test Case counter for tst_* routines */
+
 /* some systems have O_BINARY and some do not */
 #ifndef O_BINARY
 #define O_BINARY 0
@@ -67,43 +77,100 @@ char const line2 [] = "y2 y2 y2 y2 y2 y2 y2 y2 y2 y2 y2 y2 y2 y2 y2 y2 y2\n";
 
 int main ()
 {
+  int ret = 0;
+
+  char fnam1[32];
+  char fnam2[32];
+
   int fd1;
   char * buf1;
 
   int fd2;
   char * buf2;
 
+  char buf3[20];
+
   int i;
 
+  strcpy (fnam1, "mmaptest01.1.XXXXXX");
+  strcpy (fnam2, "mmaptest01.2.XXXXXX");
+
   /* create file 1 */
-  fd1  = open ("y1.txt", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
+  //fd1  = open (fnam1, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
+  fd1 = mkstemp (fnam1);
   for (i = 0; i < count1; i++)
     write (fd1, line1, size1);
   close (fd1);
 
   /* create file 2 */
-  fd2  = open ("y2.txt", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
+  //fd2  = open (fnam2, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
+  fd2 = mkstemp (fnam2);
   for (i = 0; i < count2; i++)
     write (fd2, line2, size2);
   close (fd2);
 
   /* mmap file 1 */
-  fd1  = open ("y1.txt", O_RDONLY | O_BINARY, 0644);
-  buf1 = mmap (0, 4096, PROT_READ, MAP_PRIVATE, fd1, 0);
+  fd1  = open (fnam1, O_RDONLY | O_BINARY, 0644);
+  buf1 = mmap (0, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE, fd1, 0);
   close (fd1);
 
   /* mmap file 2 */
-  fd2  = open ("y2.txt", O_RDONLY | O_BINARY, 0644);
-  buf2 = mmap (0, 4096, PROT_READ, MAP_PRIVATE, fd2, 0);
+  fd2  = open (fnam2, O_RDONLY | O_BINARY, 0644);
+  buf2 = mmap (0, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE, fd2, 0);
   close (fd2);
 
   /* the buffers have to be different */
-  if (buf1 == buf2 || !memcmp (buf1, buf2, 20))
-    {
-      printf ("buffers are not different!\n");
-      return 1;
-    }
+  Tst_count = 0;
+  tst_resm (buf1 == buf2 || !memcmp (buf1, buf2, 20) ? TFAIL : TPASS,
+	"mmap uses unique buffers when mapping different already closed files");
+  munmap (buf2, 4096);
 
-  return 0;
+  /* mmap file 1 twice with MAP_PRIVATE */
+  fd2  = open (fnam1, O_RDONLY | O_BINARY, 0644);
+  buf2 = mmap (0, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE, fd2, 0);
+  close (fd2);
+
+  tst_resm (buf1 == buf2 ? TFAIL : TPASS,
+	    "mmap uses different buffers on MAP_PRIVATE mapping");
+
+  tst_resm (memcmp (buf1, buf2, 20) ? TFAIL : TPASS,
+	    "two private buffers of the same file are identical");
+
+  buf1[0] = 0x7f;
+  tst_resm (!memcmp (buf1, buf2, 20) ? TFAIL : TPASS,
+	    "changes are private in MAP_PRIVATE mappings");
+
+  munmap (buf1, 4096);
+  munmap (buf2, 4096);
+
+  /* mmap file 1 twice with MAP_SHARED */
+  fd1  = open (fnam1, O_RDWR | O_BINARY, 0644);
+  buf1 = mmap (0, 4096, PROT_READ|PROT_WRITE, MAP_SHARED, fd1, 0);
+  close (fd1);
+
+  fd2  = open (fnam1, O_RDWR | O_BINARY, 0644);
+  buf2 = mmap (0, 4096, PROT_READ|PROT_WRITE, MAP_SHARED, fd2, 0);
+  close (fd2);
+
+  tst_resm (memcmp (buf1, buf2, 20) ? TFAIL : TPASS,
+	    "two shared buffers of the same file are identical");
+
+  buf1[0] = 0x7f;
+  tst_resm (memcmp (buf1, buf2, 20) ? TFAIL : TPASS,
+	    "changes are shared between MAP_SHARED mappings of the same file");
+  munmap (buf2, 4096);
+
+  fd2  = open (fnam1, O_RDWR | O_BINARY, 0644);
+  memset (buf3, 0, 20);
+  read (fd2, buf3, 20);
+  close (fd2);
+
+  tst_resm (memcmp (buf1, buf3, 20) ? TFAIL : TPASS,
+	    "changes are propagated to the mapped file on MAP_SHARED mapping");
+
+  munmap (buf1, 4096);
+  unlink (fnam1);
+  unlink (fnam2);
+  tst_exit ();
 }
 

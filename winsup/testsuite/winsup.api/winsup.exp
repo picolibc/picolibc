@@ -7,11 +7,12 @@ if { ! [isnative] } {
 }
 
 set rv ""
-set add_includes ""
-set add_libs ""
 
 set ltp_includes "-I$ltp_includes"
 set ltp_libs "$rootme/libltp.a"
+
+set add_includes $ltp_includes
+set add_libs $ltp_libs
 
 set test_filter ""
 
@@ -45,11 +46,6 @@ foreach src [glob -nocomplain $srcdir/$subdir/*.c $srcdir/$subdir/*/*.c] {
     } else {
         set xfail_expected 0
 	clear_xfail
-    }
-
-    if { [regexp "^ltp/" $testcase ] } {
-        set add_includes $ltp_includes
-        set add_libs $ltp_libs
     }
 
     ws_spawn "$CC -g3 $CFLAGS $src $add_includes $add_libs $runtime_root/binmode.o $runtime_root/new-libcygwin.a -o $base.exe"
