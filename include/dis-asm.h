@@ -73,6 +73,11 @@ typedef struct disassemble_info {
   unsigned long mach;
   /* Endianness (for bi-endian cpus).  Mono-endian cpus can ignore this.  */
   enum bfd_endian endian;
+  /* An arch/mach-specific bitmask of selected instruction subsets, mainly
+     for processors with run-time-switchable instruction sets.  The default,
+     zero, means that there is no constraint.  CGEN-based opcodes ports
+     may use ISA_foo masks.  */
+  unsigned long insn_sets;
 
   /* Some targets need information about the current section to accurately
      display insns.  If this is NULL, the target disassembler function
@@ -275,6 +280,7 @@ extern int generic_symbol_at_address
   (INFO).flavour = bfd_target_unknown_flavour, \
   (INFO).arch = bfd_arch_unknown, \
   (INFO).mach = 0, \
+  (INFO).insn_sets = 0, \
   (INFO).endian = BFD_ENDIAN_UNKNOWN, \
   (INFO).octets_per_byte = 1, \
   INIT_DISASSEMBLE_INFO_NO_ARCH(INFO, STREAM, FPRINTF_FUNC)

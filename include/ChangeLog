@@ -1,3 +1,8 @@
+2002-02-05  Frank Ch. Eigler  <fche@redhat.com>
+
+	* dis-asm.h (disassemble_info): New field `insn_sets'.
+	(INIT_DISASSEMBLE_INFO): Clear it.
+
 2002-02-05  Jason Merrill  <jason@redhat.com>
 
 	* demangle.h (cplus_demangle_v3): Add "options" parm.
