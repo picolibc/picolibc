@@ -575,14 +575,14 @@ public:
   virtual void __release_output_mutex (const char *fn, int ln) {}
 };
 
-/* This is a input and output console handle */
-class fhandler_console: public fhandler_termios
+enum ansi_intensity
 {
-private:
+  INTENSITY_INVISIBLE,
+  INTENSITY_DIM,
+  INTENSITY_NORMAL,
+  INTENSITY_BOLD
+};
 
-/* Output state */
-
-  // enum {normal, gotesc, gotsquare, gotarg1, gotcommand} state;
 #define normal 1
 #define gotesc 2
 #define gotsquare 3
@@ -592,13 +592,55 @@ private:
 #define gettitle 7
 #define eattitle 8
 #define MAXARGS 10
+
+/* This is a input and output console handle */
+class fhandler_console: public fhandler_termios
+{
+private:
+
+  WORD default_color, underline_color, dim_color;
+
+/* Output state */
   int state_;
   int args_[MAXARGS];
   int nargs_;
+  unsigned rarg;
+  BOOL saw_question_mark;
 
-  DWORD default_color;
+  char my_title_buf [TITLESIZE + 1];
+
+  WORD current_win32_attr;
+  ansi_intensity intensity;
+  BOOL underline, blink, reverse;
+  WORD fg, bg;
+
+  /* saved cursor coordinates */
+  int savex, savey;
+
+  struct
+    {
+      short Top, Bottom;
+    } scroll_region;
+  struct
+    {
+      SHORT winTop;
+      SHORT winBottom;
+      COORD dwWinSize;
+      COORD dwBufferSize;
+      COORD dwCursorPosition;
+      WORD wAttributes;
+    } info;
+
+  COORD dwLastCursorPosition;
+  DWORD dwLastButtonState;
+  int nModifiers;
+
+  BOOL use_mouse;
+  BOOL raw_win32_keyboard_mode;
 
 /* Output calls */
+  void set_default_attr ();
+  WORD get_win32_attr ();
 
   BOOL fillin_info ();
   void clear_screen (int, int, int, int);
@@ -607,7 +649,8 @@ private:
   void cursor_get (int *, int *);
   void cursor_rel (int, int);
   const unsigned char * write_normal (unsigned const char*, unsigned const char *);
-  void char_command (char, bool);
+  void char_command (char);
+  BOOL set_raw_win32_keyboard_mode (BOOL);
   int output_tcsetattr (int a, const struct termios *t);
 
 /* Input calls */

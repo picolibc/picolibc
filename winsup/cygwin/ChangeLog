@@ -1,3 +1,38 @@
+2001-02-27  Egor Duda  <deo@logos-m.ru>
+
+	* fhandler.h (class fhandler_console): Make all variables that
+	describe "state" of console to be members of fhandler_console.
+	default_color is now the color which is set when console recieves
+	reset command.
+	* fhandler_console.cc (fhandler_console::fhandler_console): Turn
+	mouse handling and raw keyboard mode off by default. Initialize
+	state information.
+	* fhandler.cc (fhandler_console::set_raw_win32_keyboard_mode): New
+	function.
+	* fhandler_console.cc (fhandler_console::set_default_attr): New
+	function. Reset console attributes to default values.
+	* fhandler_console.cc (fhandler_console::open): Reset attributes.
+	* fhandler_console.cc (fhandler_console::get_win32_attr): New function.
+	Calculate win32-style console attribute based on terminal attributes.
+	* fhandler_console.cc (fhandler_console::set_cursor_maybe): Use
+	member variable.
+	* fhandler_console.cc (fhandler_console::read): If in raw-win32
+	keyboard mode, encode win32 keyboard events in \033{x;y;z;t;u;wK
+	sequences.
+	* fhandler_console.cc (fhandler_console::dup): Copy all state
+	information to the dup()ed handle.
+	* fhandler_console.cc (fhandler_console::scroll_screen): Use current
+	fill-in	attribute.
+	* fhandler_console.cc (fhandler_console::clear_screen): Ditto.
+	* fhandler_console.cc (fhandler_console::char_command): Check if we
+	saw '?' symbol by member variable. Set terminal	attributes on \033[Xm
+	commands. \033[24m - turn off underline mode, \033[27m - turn off
+	reverse mode, \033[39m - restore default foreground color.
+	\033[49m - restore default background color. \033[2000h - turn on raw
+	keyboard mode, \033[2000l - turn off raw keyboard mode.
+	* fhandler_console.cc (fhandler_console::write): Set attribues to
+	default values on reset command.
+
 2001-02-26  Mike Simons  <msimons@moria.simons-clan.com>
   
 	* times.cc (settimeofday): Replace function stub with working code.
