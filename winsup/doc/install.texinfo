@@ -122,6 +122,12 @@ everything!)
 
 @subsection What if setup fails?
 
+First, make sure that you are using the latest version of
+@code{setup.exe}.  It's a work in progress, with improvements and
+bugfixes being made often.  The latest version is always available from
+the 'Install Cygwin now' link on the Cygwin Home Page at
+@file{http://sources.redhat.com/cygwin/}.
+
 If you are downloading from the internet, setup will fail if it cannot
 download the list of mirrors at
 @file{http://sources.redhat.com/cygwin/mirrors.html}.  It could be that
@@ -133,6 +139,18 @@ upgraded, try deleting that package's entry from /etc/setup.  If you are
 reacting quickly to an announcement on the mailing list, it could be
 that the mirror you are using doesn't have the latest copy yet.  Try
 another mirror, or try again tomorrow.
+
+If setup has otherwise behaved strangely, check the files
+@samp{setup.log} and @samp{setup.log.full} in the Cygwin root directory
+(@code{C:\cygwin} by default).  It may provide some clues as to what
+went wrong and why.
+
+If you're still baffled, search the Cygwin mailing list for clues.
+Others may have the same problem, and a solution may be posted there.
+If that search proves fruitless, send a query to the Cygwin mailing
+list.  You must provide complete details in your query: version of
+setup, options you selected, contents of setup.log and setup.log.full,
+what happened that wasn't supposed to happen, etc.
 
 @subsection What's the difference between packages in @samp{latest} and @samp{contrib}?
 
