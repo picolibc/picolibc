@@ -100,7 +100,7 @@ TESTSUP_OFILES:=${sort ${addsuffix .o,${basename ${notdir ${wildcard $(libltp_sr
 all_host=@all_host@
 install_host=@install_host@
 
-all check: $(TESTSUP_LIB_NAME)
+all: $(TESTSUP_LIB_NAME)
 
 force:
 
@@ -183,5 +183,7 @@ check: $(TESTSUP_LIB_NAME) $(RUNTIME) testsuite/site.exp
 	PATH=$${rootme}/../cygwin:$${PATH} ;\
 	$(RUNTEST) --tool winsup $(RUNTESTFLAGS)
 
+Makefile: Makefile.in $(srcdir)/configure.in config.status
+	$(SHELL) config.status
 #
 
