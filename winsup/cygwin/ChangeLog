@@ -1,3 +1,27 @@
+2002-08-25  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* fhandler.h (fhandler_socket::recvfrom): Fix prototype.
+	(fhandler_socket::sendto): Ditto.
+	* fhandler_socket.cc (fhandler_socket::recvfrom): Ditto.
+	(fhandler_socket::sendto): Ditto.
+	* include/sys/socket.h (recv): Fix prototype.
+	(recvfrom): Ditto.
+	(send): Ditto.
+	(sendto): Ditto.
+	* net.cc (cygwin_sendto): Ditto. Improve strace message
+	(cygwin_recvfrom): Ditto.  Ditto.
+	(cygwin_setsockopt): Improve strace message.
+	(cygwin_getsockopt): Ditto.
+	(cygwin_connect): Ditto.
+	(cygwin_accept): Ditto.
+	(cygwin_bind): Ditto.
+	(cygwin_getsockname): Ditto.
+	(cygwin_getpeername): Ditto.
+	(cygwin_recv): Fix prototype.
+	(cygwin_send): Ditto.
+	(cygwin_recvmsg): Improve strace message.
+	(cygwin_sendmsg): Ditto.
+
 2002-08-25 Pierre Humblet <Pierre.Humblet@ieee.org>
 
 	* sec_acl.cc (getacl): Check ace_sid == well_known_world_sid
