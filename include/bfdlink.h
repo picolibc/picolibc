@@ -1,5 +1,5 @@
 /* bfdlink.h -- header file for BFD link routines
-   Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2002
+   Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2002, 2003
    Free Software Foundation, Inc.
    Written by Steve Chamberlain and Ian Lance Taylor, Cygnus Support.
 
@@ -204,7 +204,7 @@ struct bfd_sym_chain
 struct bfd_link_info
 {
   /* TRUE if BFD should generate a relocatable object file.  */
-  unsigned int relocateable: 1;
+  unsigned int relocatable: 1;
 
   /* TRUE if BFD should generate relocation information in the final
      executable.  */
@@ -428,7 +428,7 @@ struct bfd_link_callbacks
   /* A function which is called to add a symbol to a set.  ENTRY is
      the link hash table entry for the set itself (e.g.,
      __CTOR_LIST__).  RELOC is the relocation to use for an entry in
-     the set when generating a relocateable file, and is also used to
+     the set when generating a relocatable file, and is also used to
      get the size of the entry when generating an executable file.
      ABFD, SEC and VALUE identify the value to add to the set.  */
   bfd_boolean (*add_to_set)
@@ -439,7 +439,7 @@ struct bfd_link_callbacks
      destructor is found.  This is only called by some object file
      formats.  CONSTRUCTOR is TRUE for a constructor, FALSE for a
      destructor.  This will use BFD_RELOC_CTOR when generating a
-     relocateable file.  NAME is the name of the symbol found.  ABFD,
+     relocatable file.  NAME is the name of the symbol found.  ABFD,
      SECTION and VALUE are the value of the symbol.  */
   bfd_boolean (*constructor)
     PARAMS ((struct bfd_link_info *, bfd_boolean constructor,

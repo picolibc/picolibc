@@ -1,3 +1,28 @@
+2003-06-26  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in: Rename 'target_libs' to 'target_libraries'.
+	Remove useless reference to 'target_libs'.
+	* configure: Regenerate.
+
+2003-06-23  Keith Seitz  <kseitz@sources.redhat.com>
+
+	* Makefile.tpl: Add maybe-configure-itcl to configure-gdb.
+	* Makefile.in: Regenerate.
+
+2003-06-23  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.def: Introduce flags_to_pass.
+	* Makefile.tpl: Generate BASE_FLAGS_TO_PASS using it.
+	* Makefile.in: Regenerate.
+
+2003-06-23  Hans-Peter Nilsson  <hp@bitrange.com>
+
+	* configure.in (noconfigdirs) <cris-*-*>: Disable target-newlib
+	and target-libgloss.
+	<d30v-*-*, fr30-*-*, i960-*-*, m32r-*-*>: Disable gdb.
+	<h8300*-*-*>: Disable libf2c and ${libgcj}.
+	* configure: Regenerate.
+
 2003-06-17  Benjamin Kosnik  <bkoz@redhat.com>
 
 	* configure.in: Update testsuite_flags to new location.
