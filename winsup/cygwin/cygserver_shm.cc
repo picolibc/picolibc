@@ -23,9 +23,7 @@
 //#include "dtable.h"
 //#include "cygheap.h"
 //#include "thread.h"
-#define __INSIDE_CYGWIN__
 #include <sys/shm.h>
-#undef __INSIDE_CYGWIN__
 //#include "perprocess.h"
 #include <threaded_queue.h>
 #include <cygwin/cygserver_process.h>
