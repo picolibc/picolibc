@@ -161,6 +161,8 @@ uinfo_init ()
      Setting `impersonated' to TRUE seems to be wrong but it
      isn't. Impersonated is thought as "Current User and `token'
      are coincident". See seteuid() for the mechanism behind that. */
+  if (cygheap->user.token != INVALID_HANDLE_VALUE)
+    CloseHandle (cygheap->user.token);
   cygheap->user.token = INVALID_HANDLE_VALUE;
   cygheap->user.impersonated = TRUE;
 

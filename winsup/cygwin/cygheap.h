@@ -107,7 +107,8 @@ public:
   HANDLE token;
   BOOL   impersonated;
 
-  cygheap_user () : pname (NULL), plogsrv (NULL), pdomain (NULL), psid (NULL) {}
+  cygheap_user () : pname (NULL), plogsrv (NULL), pdomain (NULL),
+		    psid (NULL), token (INVALID_HANDLE_VALUE) {}
   ~cygheap_user ();
 
   void set_name (const char *new_name);
