@@ -1,3 +1,14 @@
+Sat Nov  4 00:51:38 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* pinfo.cc (EnumProcessesNT): Avoid 0 pids.
+	(EnumProcesses9x): Ditto.
+	* sigproc.cc (remove_childe): Eliminate.
+	(proc_subproc): Move remove_child stuff here.
+	(wait_subproc): Synchronize with proc_subproc when error occurs.  Add
+	more debugging info.
+	* sigproc.h (procstuff): Add an entry.
+	* spawn.cc (spawn_guts): Add sigframe here.
+
 Fri Nov  3 20:07:14 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* sigproc.cc (wait_subproc): Refine debug output.

@@ -116,7 +116,6 @@ int NO_COPY pending_signals = 0;	// TRUE if signals pending
 static int __stdcall checkstate (waitq *);
 static __inline__ BOOL get_proc_lock (DWORD, DWORD);
 static HANDLE __stdcall getsem (_pinfo *, const char *, int, int);
-static void __stdcall remove_child (int);
 static void __stdcall remove_zombie (int);
 static DWORD WINAPI wait_sig (VOID *arg);
 static int __stdcall stopped_or_terminated (waitq *, _pinfo *);
@@ -285,7 +284,13 @@ proc_subproc (DWORD what, DWORD val)
 		  pchildren[val]->pid, val, hchildren[val], nchildren, nzombies);
       zombies[nzombies] = pchildren[val];	// Add to zombie array
       zombies[nzombies++]->process_state = PID_ZOMBIE;// Walking dead
-      remove_child (val);		// Remove from children array
+      sigproc_printf ("removing [%d], pid %d, handle %p, nchildren %d",
+		      val, pchildren[val]->pid, hchildren[val], nchildren);
+      if ((int) val < --nchildren)
+	{
+	  hchildren[val] = hchildren[nchildren];
+	  pchildren[val] = pchildren[nchildren];
+	}
       break;
 
     /* A child is in the stopped state.  Scan wait() queue to see if anyone
@@ -934,23 +939,6 @@ get_proc_lock (DWORD what, DWORD val)
   return TRUE;
 }
 
-/* Remove a child from pchildren/hchildren by swapping it with the
- * last child in the list.
- */
-static void __stdcall
-remove_child (int ci)
-{
-  sigproc_printf ("removing [%d], pid %d, handle %p, nchildren %d",
-	      ci, pchildren[ci]->pid, hchildren[ci], nchildren);
-  if (ci < --nchildren)
-    {
-      pchildren[ci] = pchildren[nchildren];
-      hchildren[ci] = hchildren[nchildren];
-    }
-
-  return;
-}
-
 /* Remove a zombie from zombies by swapping it with the last child in the list.
  */
 static void __stdcall
@@ -1250,7 +1238,9 @@ wait_subproc (VOID *)
 	     closed a handle in the children[] array.  So, we try looping a couple
 	     of times to stabilize. FIXME - this is not foolproof.  Probably, this
 	     thread should be responsible for closing the children. */
-	  if (++errloop < 10)
+	  if (!errloop++)
+	    proc_subproc (PROC_NOTHING, 0);	// Just synchronize and continue
+	  if (errloop < 10)
 	    continue;
 
 	  system_printf ("wait failed. nchildren %d, wait %d, %E",
@@ -1262,9 +1252,10 @@ wait_subproc (VOID *)
 	      continue;
 	    else
 	      {
-		system_printf ("event[%d] %p, pchildren[%d] %p, %E", i, i, pchildren[i]);
-		system_printf ("pid %d, dwProcessId %u, progname '%s'", i,
-			       events[0], pchildren[i]->pid, pchildren[i]->dwProcessId,
+		system_printf ("nchildren %d, event[%d] %p, pchildren[%d] %p, %E",
+			       nchildren, i, events[0], i, (_pinfo *) pchildren[i]);
+		system_printf ("pid %d, dwProcessId %u, progname '%s'",
+			       pchildren[i]->pid, pchildren[i]->dwProcessId,
 			       pchildren[i]->progname);
 	      }
 	  break;

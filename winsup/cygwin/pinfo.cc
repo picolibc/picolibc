@@ -327,14 +327,17 @@ EnumProcessesNT (DWORD* &pidlist, DWORD &npidlist)
   SYSTEM_PROCESSES *px = procs;
   for (;;)
     {
-      if (nelem >= npidlist)
+      if (px->ProcessId)
 	{
-	  npidlist += slop_pidlist;
-	  pidlist = (DWORD *) realloc (pidlist, size_pidlist (npidlist));
+	  if (nelem >= npidlist)
+	    {
+	      npidlist += slop_pidlist;
+	      pidlist = (DWORD *) realloc (pidlist, size_pidlist (npidlist));
+	    }
+	  pidlist[nelem++] = cygwin_pid (px->ProcessId);
+	  if (!px->NextEntryDelta)
+	    break;
 	}
-      pidlist[nelem++] = cygwin_pid (px->ProcessId);
-      if (!px->NextEntryDelta)
-	break;
       px = (SYSTEM_PROCESSES *) ((char *) px + px->NextEntryDelta);
     }
 
@@ -359,6 +362,8 @@ EnumProcesses9x (DWORD* &pidlist, DWORD &npidlist)
   if (myProcess32First(h, &proc))
     do
       {
+	if (!proc.th32ProcessID)
+	  continue;
 	if (nelem >= npidlist)
 	  {
 	    npidlist += slop_pidlist;

@@ -289,6 +289,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 {
   BOOL rc;
   pid_t cygpid;
+  sigframe thisframe (mainthread);
 
   MALLOC_CHECK;
 
