@@ -1259,7 +1259,7 @@ pthread_rwlock::unlock ()
 void
 pthread_rwlock::add_reader (struct RWLOCK_READER *rd)
 {
-  List_insert (readers_mx, readers, rd);
+  List_insert (readers, rd);
 }
 
 void
@@ -1998,22 +1998,6 @@ pthread::cancel (pthread_t thread)
   return thread->cancel ();
 }
 
-/* Races in pthread_atfork:
-   We are race safe in that any additions to the lists are made via
-   InterlockedExchangePointer.
-   However, if the user application doesn't perform syncronisation of some sort
-   It's not guaranteed that a near simultaneous call to pthread_atfork and fork
-   will result in the new atfork handlers being calls.
-   More rigorous internal syncronisation isn't needed as the user program isn't
-   guaranteeing their own state.
-
-   as far as multiple calls to pthread_atfork, the worst case is simultaneous calls
-   will result in an indeterminate order for parent and child calls (what gets inserted
-   first isn't guaranteed.)
-
-   There is one potential race... Does the result of InterlockedExchangePointer
-   get committed to the return location _before_ any context switches can occur?
-   If yes, we're safe, if no, we're not.  */
 void
 pthread::atforkprepare (void)
 {
@@ -2090,7 +2074,7 @@ pthread::atfork (void (*prepare)(void), void (*parent)(void), void (*child)(void
   if (prepcb)
   {
     prepcb->cb = prepare;
-    prepcb->next = (callback *) InterlockedExchangePointer ((LONG *) &MT_INTERFACE->pthread_prepare, (long int) prepcb);
+    List_insert (MT_INTERFACE->pthread_prepare, prepcb);
   }
   if (parentcb)
   {
@@ -2099,7 +2083,7 @@ pthread::atfork (void (*prepare)(void), void (*parent)(void), void (*child)(void
     while (*t)
       t = &(*t)->next;
     /* t = pointer to last next in the list */
-    parentcb->next = (callback *) InterlockedExchangePointer ((LONG *) t, (long int) parentcb);
+    List_insert (*t, parentcb);
   }
   if (childcb)
   {
@@ -2108,7 +2092,7 @@ pthread::atfork (void (*prepare)(void), void (*parent)(void), void (*child)(void
     while (*t)
       t = &(*t)->next;
     /* t = pointer to last next in the list */
-    childcb->next = (callback *) InterlockedExchangePointer ((LONG *) t, (long int) childcb);
+    List_insert (*t, childcb);
   }
   return 0;
 }

@@ -224,14 +224,13 @@ verifyable_object_state verifyable_object_isvalid (void const *, long);
 verifyable_object_state verifyable_object_isvalid (void const *, long, void *);
 
 template <class list_node> inline void
-List_insert (fast_mutex &mx, list_node *&head, list_node *node)
+List_insert (list_node *&head, list_node *node)
 {
   if (!node)
     return;
-  mx.lock ();
-  node->next = head;
-  head = node;
-  mx.unlock ();
+  do
+    node->next = head;
+  while (InterlockedCompareExchangePointer (&head, node, node->next) != node->next);
 }
 
 template <class list_node> inline void
@@ -240,16 +239,17 @@ List_remove (fast_mutex &mx, list_node *&head, list_node *node)
   if (!node)
     return;
   mx.lock ();
-  if (node == head)
-    head = head->next;
-  else if (head)
+  if (head)
     {
-      list_node *cur = head;
+      if (InterlockedCompareExchangePointer (&head, node->next, node) != node)
+        {
+          list_node *cur = head;
 
-      while (cur->next && node != cur->next)
-        cur = cur->next;
-      if (node == cur->next)
-        cur->next = cur->next->next;
+          while (cur->next && node != cur->next)
+            cur = cur->next;
+          if (node == cur->next)
+            cur->next = cur->next->next;
+        }
     }
   mx.unlock ();
 }
@@ -274,7 +274,7 @@ template <class list_node> class List
 
   void insert (list_node *node)
   {
-    List_insert (mx, head, node);
+    List_insert (head, node);
   }
 
   void remove (list_node *node)
