@@ -1,3 +1,14 @@
+Mon Apr 30 21:51:14 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (mkrelpath): New function.
+	(mount_info::conv_to_win32_path): Eliminate now-unneeded relative path
+	name arg and processing.
+	(path_conv::check): Accomodate relative path names again.  Accomodate
+	one extra argument in mount_info::conv_to_win32_path.  Tack trailing
+	slash on end of relative path as a side effect, like before.
+	* shared_info.h (mount_info::conv_to_win32_path): Reflect new argument
+	ordering.
+
 Mon Apr 30 22:09:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* autoload.cc: Add LoadDLLinitfunc for secur32.dll.

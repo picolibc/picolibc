@@ -303,6 +303,33 @@ path_conv::add_ext_from_sym (symlink_info &sym)
     }
 }
 
+static void __stdcall mkrelpath (char *dst) __attribute__ ((regparm (2)));
+static void __stdcall
+mkrelpath (char *path)
+{
+  char cwd_win32[MAX_PATH];
+  if (!cygheap->cwd.get (cwd_win32, 0))
+    return;
+
+  unsigned cwdlen = strlen (cwd_win32);
+  if (!path_prefix_p (cwd_win32, path, cwdlen))
+    return;
+
+  size_t n = strlen (path);
+  if (n < cwdlen)
+    return;
+
+  char *tail = path;
+  if (n == cwdlen)
+    tail += cwdlen;
+  else
+    tail += isdirsep (cwd_win32[cwdlen - 1]) ? cwdlen : cwdlen + 1;
+
+  memmove (path, tail, strlen (tail) + 1);
+  if (!*path)
+    strcpy (path, ".");
+}
+
 /* Convert an arbitrary path SRC to a pure Win32 path, suitable for
    passing to Win32 API routines.
 
@@ -328,6 +355,7 @@ path_conv::check (const char *src, unsigned opt,
   symlink_info sym;
   bool need_directory = 0;
   bool saw_symlinks = 0;
+  int is_relpath;
 
 #if 0
   static path_conv last_path_conv;
@@ -367,6 +395,7 @@ path_conv::check (const char *src, unsigned opt,
 	       (p[1] == '\0' || strcmp (p, "\\.") == 0))
 	need_directory = 1;
 
+      is_relpath = !isabspath (src);
       error = normalize_posix_path (src, path_copy);
       if (error)
 	return;
@@ -388,7 +417,7 @@ path_conv::check (const char *src, unsigned opt,
 	{
 	  const suffix_info *suff;
 	  char pathbuf[MAX_PATH];
-	  char *full_path, *rel_path, *realpath;
+	  char *full_path;
 
 	  /* Don't allow symlink.check to set anything in the path_conv
 	     class if we're working on an inner component of the path */
@@ -396,20 +425,16 @@ path_conv::check (const char *src, unsigned opt,
 	    {
 	      suff = NULL;
 	      sym.pflags = 0;
-	      rel_path = NULL;
-	      realpath = full_path = pathbuf;
+	      full_path = pathbuf;
 	    }
 	  else
 	    {
 	      suff = suffixes;
 	      sym.pflags = path_flags;
-	      if (opt & PC_FULL)
-		rel_path = NULL, realpath = full_path = this->path;
-	      else
-		realpath = rel_path = this->path, full_path = pathbuf;
+	      full_path = this->path;
 	    }
 
-	  error = mount_table->conv_to_win32_path (path_copy, rel_path, full_path, devn,
+	  error = mount_table->conv_to_win32_path (path_copy, full_path, devn,
 						   unit, &sym.pflags);
 
 	  if (devn != FH_BAD)
@@ -419,24 +444,24 @@ path_conv::check (const char *src, unsigned opt,
 	    }
 
 	  /* Eat trailing slashes */
-	  char *dostail = strchr (realpath, '\0');
+	  char *dostail = strchr (full_path, '\0');
 
 	  /* If path is only a drivename, Windows interprets it as the current working
 	     directory on this drive instead of the root dir which is what we want. So
 	     we need the trailing backslash in this case. */
-	  while (dostail > realpath + 3 && (*--dostail == '\\'))
+	  while (dostail > full_path + 3 && (*--dostail == '\\'))
 	    *tail = '\0';
 
-	  if (realpath[0] && realpath[1] == ':' && realpath[2] == '\0')
-	    strcat (realpath, "\\");
+	  if (full_path[0] && full_path[1] == ':' && full_path[2] == '\0')
+	    strcat (full_path, "\\");
 
 	  if ((opt & PC_SYM_IGNORE) && pcheck_case == PCHECK_RELAXED)
 	    {
-	      fileattr = GetFileAttributesA (realpath);
+	      fileattr = GetFileAttributesA (full_path);
 	      goto out;
 	    }
 
-	  int len = sym.check (realpath, suff, opt);
+	  int len = sym.check (full_path, suff, opt);
 
 	  if (sym.case_clash)
 	    {
@@ -589,10 +614,8 @@ out:
   DWORD serial, volflags;
   char fs_name[16];
 
-  if (isabspath (this->path))
-    strcpy (tmp_buf, this->path);
-  else
-    cygheap->cwd.get (tmp_buf, 1, 1, MAX_PATH);
+  strcpy (tmp_buf, this->path);
+
   if (allow_ntsec && (!rootdir (tmp_buf) ||
       !GetVolumeInformation (tmp_buf, NULL, 0, &serial, NULL,
       			     &volflags, fs_name, 16)))
@@ -616,6 +639,24 @@ out:
       /* Known file systems with buggy open calls. Further explanation
          in fhandler.cc (fhandler_disk_file::open). */
       set_has_buggy_open (strcmp (fs_name, "SUNWNFS") == 0);
+    }
+
+  if (!(opt & PC_FULL))
+    {
+      if (is_relpath)
+	mkrelpath (this->path);
+      if (need_directory)
+	{
+	  char n = strlen (this->path);
+	  /* Do not add trailing \ to UNC device names like \\.\a: */
+	  if (this->path[n - 1] != '\\' &&
+	      (strncmp (this->path, "\\\\.\\", 4) != 0 ||
+	       !strncasematch (this->path + 4, "unc\\", 4)))
+	    {
+	      this->path[n] = '\\';
+	      this->path[n + 1] = '\0';
+	    }
+	}
     }
 
   if (saw_symlinks)
@@ -1071,9 +1112,8 @@ mount_info::init ()
    {,full_}win32_path must have sufficient space (i.e. MAX_PATH bytes).  */
 
 int
-mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
-				char *full_win32_path, DWORD &devn, int &unit,
-				unsigned *flags)
+mount_info::conv_to_win32_path (const char *src_path, char *dst,
+				DWORD &devn, int &unit, unsigned *flags)
 {
   while (sys_mount_table_counter < cygwin_shared->sys_mount_table_counter)
     {
@@ -1081,10 +1121,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
       sys_mount_table_counter++;
     }
   int src_path_len = strlen (src_path);
-  int trailing_slash_p = (src_path_len > 1
-			  && SLASH_P (src_path[src_path_len - 1]));
   MALLOC_CHECK;
-  int isrelpath;
   unsigned dummy_flags;
 
   devn = FH_BAD;
@@ -1103,15 +1140,8 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
     }
 
   int i, rc;
-  char *dst = NULL;
   mount_item *mi = NULL;	/* initialized to avoid compiler warning */
   char pathbuf[MAX_PATH];
-
-  /* Determine where the destination should be placed. */
-  if (full_win32_path != NULL)
-    dst = full_win32_path;
-  else if (win32_path != NULL)
-    dst = win32_path;
 
   if (dst == NULL)
     goto out;		/* Sanity check. */
@@ -1127,7 +1157,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
 	  debug_printf ("normalize_win32_path failed, rc %d", rc);
 	  return rc;
 	}
-      isrelpath = !isabspath (src_path);
+
       *flags = set_flags_from_win32_path (dst);
       if (cygheap->root.length () && dst[0] && dst[1] == ':')
 	{
@@ -1145,7 +1175,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
 	      return ENOENT;
 	    }
 	}
-      goto fillin;
+      goto out;
     }
 
   /* Normalize the path, taking out ../../ stuff, we need to do this
@@ -1173,13 +1203,11 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
       return rc;
     }
 
-  isrelpath = !isslash (*src_path);
-
   /* See if this is a cygwin "device" */
   if (win32_device_name (pathbuf, dst, devn, unit))
     {
       *flags = MOUNT_BINARY;	/* FIXME: Is this a sensible default for devices? */
-      goto fillin;
+      goto out;
     }
 
   /* Check if the cygdrive prefix was specified.  If so, just strip
@@ -1187,10 +1215,10 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
   MALLOC_CHECK;
   if (iscygdrive_device (pathbuf))
     {
-      if (!cygdrive_win32_path (pathbuf, dst, trailing_slash_p))
+      if (!cygdrive_win32_path (pathbuf, dst, 0))
 	return ENOENT;
       *flags = cygdrive_flags;
-      goto fillin;
+      goto out;
     }
 
   /* Check the mount table for prefix matches. */
@@ -1204,9 +1232,9 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
   if (i >= nmounts)
     {
       if (slash_drive_prefix_p (pathbuf))
-	slash_drive_to_win32_path (pathbuf, dst, trailing_slash_p);
+	slash_drive_to_win32_path (pathbuf, dst, 0);
       else
-	backslashify (pathbuf, dst, trailing_slash_p);	/* just convert */
+	backslashify (pathbuf, dst, 0);	/* just convert */
       *flags = 0;
     }
   else
@@ -1214,67 +1242,16 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
       int n = mi->native_pathlen;
       memcpy (dst, mi->native_path, n + 1);
       char *p = pathbuf + mi->posix_pathlen;
-      if (!trailing_slash_p && !*p)
-	{
-	  if (isdrive (dst) && !dst[2])
-	    dst[n++] = '\\';
-	  dst[n] = '\0';
-	}
-      else
-	{
-	  /* Do not add trailing \ to UNC device names like \\.\a: */
-	  if (*p != '/' &&  /* FIXME: this test seems wrong. */
-	     (strncmp (mi->native_path, "\\\\.\\", 4) != 0 ||
-	       strncmp (mi->native_path + 4, "UNC\\", 4) == 0))
-	    dst[n++] = '\\';
-	  strcpy (dst + n, p);
-	}
-      backslashify (dst, dst, trailing_slash_p);
+      if ((isdrive (dst) && !dst[2]) || (p && dst[n - 1] != '\\'))
+	dst[n++] = '\\';
+      strcpy (dst + n, p);
+      backslashify (dst, dst, 0);
       *flags = mi->flags;
     }
 
-fillin:
-  /* Compute relative path if asked to and able to.  */
-  if (win32_path == NULL)
-    /* nothing to do */;
-  else if (isrelpath)
-    {
-      char cwd_win32[MAX_PATH];
-      if (!cygheap->cwd.get (cwd_win32, 0))
-	return get_errno ();
-      unsigned cwdlen = strlen (cwd_win32);
-      if (!path_prefix_p (cwd_win32, dst, cwdlen))
-	strcpy (win32_path, dst);
-      else
-	{
-	  size_t n = strlen (dst);
-	  if (n < cwdlen)
-	    strcpy (win32_path, dst);
-	  else
-	    {
-	      if (n == cwdlen)
-		dst += cwdlen;
-	      else
-		dst += isdirsep (cwd_win32[cwdlen - 1]) ? cwdlen : cwdlen + 1;
-
-	      memmove (win32_path, dst, strlen (dst) + 1);
-	      if (!*win32_path)
-		{
-		  strcpy (win32_path, ".");
-		  if (trailing_slash_p)
-		    strcat (win32_path, "\\");
-		}
-	    }
-	}
-    }
-  else if (win32_path != dst)
-    strcpy (win32_path, dst);
-
 out:
   MALLOC_CHECK;
-  debug_printf ("%s(rel), %s(abs) %p(flags) = conv_to_win32_path (%s)",
-		win32_path, full_win32_path, *flags,
-		src_path);
+  debug_printf ("src_path %s, win32 %s, flags %p", dst, *flags, src_path);
   return 0;
 }
 
