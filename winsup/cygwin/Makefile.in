@@ -149,7 +149,8 @@ install: all
 	    for i in $$sub/*.h ; do \
 	      $(INSTALL_DATA) $$i $(tooldir)/$$sub/`basename $$i` ; \
 	    done ; \
-	done
+	done ; \
+	$(INSTALL_DATA) regexp/regexp.h $(tooldir)/include/regexp.h
 
 clean:
 	-rm -f *.o *.dll *.a *.exp junk *.base version.cc regexp/*.o winver_stamp

@@ -1,3 +1,7 @@
+2000-04-26  DJ Delorie  <dj@cygnus.com>
+
+	* Makefile.in (install): install regexp.h
+	
 Wed Apr 26 16:20:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
         * syscalls.cc (stat_worker): Previous patch could succeed
