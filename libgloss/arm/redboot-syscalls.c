@@ -1,7 +1,7 @@
 /*
  * redboot-syscalls.c -- provide system call support for RedBoot
  *
- * Copyright (c) 1997, 2001 Cygnus Support
+ * Copyright (c) 1997, 2001, 2002 Red Hat, Inc.
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -175,14 +175,10 @@ clock_t
 _times(struct tms * tp)
 {
     clock_t utime;
-#ifdef HAVE_BSP_CLOCK
     int err;
-    err = __syscall(SYS_utime, &utime);
+    err = __syscall(SYS_times, &utime);
     if (err)
 	utime = 0;
-#else
-    utime = 0;
-#endif
 
     if (tp) {
 	tp->tms_utime = utime;
@@ -201,3 +197,15 @@ _unlink (const char *pathname)
   return -1;
 }
 
+
+#define SYS_meminfo     1001
+
+void *
+__get_memtop(void)
+{
+  unsigned long totmem = 0, topmem = 0;
+  int numbanks;
+
+  __syscall(SYS_meminfo, (unsigned long)&totmem, (unsigned long)&topmem, 0);
+  return (void*)topmem;
+}
