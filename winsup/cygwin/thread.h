@@ -373,7 +373,7 @@ public:
   pthread ();
   virtual ~pthread ();
 
-  static void init_mainthread ();
+  static void init_mainthread (const bool forked = false);
   static bool is_good_object(pthread_t const *);
   static void atforkprepare();
   static void atforkparent();

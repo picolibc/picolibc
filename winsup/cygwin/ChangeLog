@@ -1,3 +1,12 @@
+2004-03-30  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.h (pthread::init_mainthread): Add parameter forked.  Set
+	forked default to false..
+	* thread.cc (MTinterface::fixup_after_fork): Call
+	pthread::init_mainthread with forked = true.
+	(pthread::init_mainthread): Add parameter forked.  Do not change thread
+	self pointer when forked.
+
 2004-03-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* shm.cc (shmat): If shmid is unknown, call a special variation
