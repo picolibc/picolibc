@@ -13,6 +13,7 @@ details. */
 
 #include "winsup.h"
 #include <grp.h>
+#include <wininet.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -27,8 +28,6 @@ details. */
 
 /* Read /etc/group only once for better performance.  This is done
    on the first call that needs information from it. */
-
-#define MAX_DOMAIN_NAME	100
 
 static NO_COPY const char *etc_group = "/etc/group";
 static struct group *group_buf = NULL;		/* group contents in memory */
@@ -138,8 +137,8 @@ void
 read_etc_group ()
 {
   char linebuf [200];
-  char group_name [MAX_USER_NAME];
-  DWORD group_name_len = MAX_USER_NAME;
+  char group_name [UNLEN + 1];
+  DWORD group_name_len = UNLEN + 1;
 
   strncpy (group_name, "Administrators", sizeof (group_name));
 
@@ -172,8 +171,8 @@ read_etc_group ()
 	}
       else /* /etc/group doesn't exist -- create default one in memory */
 	{
-	  char domain_name [MAX_DOMAIN_NAME];
-	  DWORD domain_name_len = MAX_DOMAIN_NAME;
+	  char domain_name [INTERNET_MAX_HOST_NAME_LENGTH + 1];
+	  DWORD domain_name_len = INTERNET_MAX_HOST_NAME_LENGTH + 1;
 	  SID_NAME_USE acType;
 	  debug_printf ("Emulating /etc/group");
 	  if (! LookupAccountSidA (NULL ,

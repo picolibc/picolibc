@@ -1,3 +1,23 @@
+Mon Apr 30 19:58:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* grp.cc: Eliminate MAX_DOMAIN_NAME define.
+	(read_etc_group): Substitute MAX_DOMAIN_NAME by
+	INTERNET_MAX_HOST_NAME_LENGTH.
+	* passwd.cc (parse_pwd): Don't force pw_name to be lower case.
+	* sec_helper.cc: Substitute MAX_USER_NAME by UNLEN,
+	MAX_COMPUTERNAME_LENGTH by INTERNET_MAX_HOST_NAME_LENGTH throughout.
+	(lookup_name): Slight cleanup.
+	* security.cc (alloc_sd): Substitute MAX_USER_NAME by UNLEN.
+	* security.h: Define DEFAULT_UID as DOMAIN_USER_RID_ADMIN and
+	DEFAULT_GID as DOMAIN_ALIAS_RID_ADMINS.
+	* shared.cc (memory_init): Substitute MAX_USER_NAME by UNLEN.
+	* thread.h: Ditto.
+	* uinfo.cc (internal_getlogin): Substitute MAX_USER_NAME by UNLEN.
+	Substitute MAX_COMPUTERNAME_LENGTH and MAX_HOST_NAME by
+	INTERNET_MAX_HOST_NAME_LENGTH.
+	* winsup.h: Include lmcons.h. Eliminate MAX_USER_NAME and
+	MAX_HOST_NAME. Move DEFAULT_UID and DEFAULT_GID to security.h.
+
 Mon Apr 30 12:35:40 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (path_conv::check): Don't use path_flags when converting to

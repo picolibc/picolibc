@@ -14,6 +14,9 @@ details. */
 
 #define MAX_SID_LEN 40
 
+#define DEFAULT_UID DOMAIN_USER_RID_ADMIN
+#define DEFAULT_GID DOMAIN_ALIAS_RID_ADMINS
+
 class cygsid {
   PSID psid;
   char sbuf[MAX_SID_LEN];

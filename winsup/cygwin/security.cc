@@ -468,7 +468,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
     }
 
   /* Get SID and name of new owner. */
-  char owner[MAX_USER_NAME];
+  char owner[UNLEN + 1];
   cygsid owner_sid;
   struct passwd *pw = getpwuid (uid);
   strcpy (owner, pw ? pw->pw_name : getlogin ());

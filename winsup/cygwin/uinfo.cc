@@ -12,6 +12,7 @@ details. */
 #include <pwd.h>
 #include <unistd.h>
 #include <winnls.h>
+#include <wininet.h>
 #include <utmp.h>
 #include <limits.h>
 #include <stdlib.h>
@@ -29,8 +30,8 @@ details. */
 struct passwd *
 internal_getlogin (cygheap_user &user)
 {
-  char username[MAX_USER_NAME];
-  DWORD username_len = MAX_USER_NAME;
+  char username[UNLEN + 1];
+  DWORD username_len = UNLEN + 1;
   struct passwd *pw = NULL;
 
   if (!user.name ())
@@ -62,19 +63,19 @@ internal_getlogin (cygheap_user &user)
 	{
 	  char buf[512];
 
-	  sys_wcstombs (buf, wui->wkui1_username, MAX_USER_NAME);
+	  sys_wcstombs (buf, wui->wkui1_username, UNLEN + 1);
 	  user.set_name (buf);
-	  sys_wcstombs (buf, wui->wkui1_logon_server, MAX_HOST_NAME);
+	  sys_wcstombs (buf, wui->wkui1_logon_server, INTERNET_MAX_HOST_NAME_LENGTH + 1);
 	  user.set_logsrv (buf);
 	  sys_wcstombs (buf, wui->wkui1_logon_domain,
-			MAX_COMPUTERNAME_LENGTH + 1);
+			INTERNET_MAX_HOST_NAME_LENGTH + 1);
 	  user.set_domain (buf);
 	  /* Save values in environment */
 	  if (!strcasematch (user.name (), "SYSTEM")
 	      && user.domain () && user.logsrv ())
 	    {
 	      LPUSER_INFO_3 ui = NULL;
-	      WCHAR wbuf[MAX_HOST_NAME + 2];
+	      WCHAR wbuf[INTERNET_MAX_HOST_NAME_LENGTH + 2];
 
 	      strcat (strcpy (buf, "\\\\"), user.logsrv ());
 	      setenv ("USERNAME", user.name (), 1);
@@ -82,7 +83,7 @@ internal_getlogin (cygheap_user &user)
 	      setenv ("USERDOMAIN", user.domain (), 1);
 	      /* HOMEDRIVE and HOMEPATH are wrong most of the time, too,
 		 after changing user context! */
-	      sys_mbstowcs (wbuf, buf, MAX_HOST_NAME + 2);
+	      sys_mbstowcs (wbuf, buf, INTERNET_MAX_HOST_NAME_LENGTH + 2);
 	      if (!NetUserGetInfo (NULL, wui->wkui1_username, 3, (LPBYTE *)&ui)
 		  || !NetUserGetInfo (wbuf,wui->wkui1_username,3,(LPBYTE *)&ui))
 		{
@@ -237,7 +238,7 @@ getlogin (void)
 #ifdef _MT_SAFE
   char *this_username=_reent_winsup ()->_username;
 #else
-  static NO_COPY char this_username[MAX_USER_NAME];
+  static NO_COPY char this_username[UNLEN + 1];
 #endif
 
   return strcpy (this_username, cygheap->user.name ());

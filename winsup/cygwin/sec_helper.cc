@@ -23,6 +23,7 @@ details. */
 #include <ctype.h>
 #include <wingdi.h>
 #include <winuser.h>
+#include <wininet.h>
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "fhandler.h"
@@ -221,10 +222,10 @@ get_id_from_sid (PSID psid, BOOL search_grp, int *type)
    */
   if (id == -1 || type)
     {
-      char account[MAX_USER_NAME];
-      char domain[MAX_COMPUTERNAME_LENGTH+1];
-      DWORD acc_len = MAX_USER_NAME;
-      DWORD dom_len = MAX_COMPUTERNAME_LENGTH+1;
+      char account[UNLEN + 1];
+      char domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+      DWORD acc_len = UNLEN + 1;
+      DWORD dom_len = INTERNET_MAX_HOST_NAME_LENGTH + 1;
       SID_NAME_USE acc_type;
 
       if (!LookupAccountSid (NULL, psid, account, &acc_len,
@@ -299,13 +300,16 @@ is_grp_member (uid_t uid, gid_t gid)
   return grp_member;
 }
 
+#define SIDLEN	(sidlen = MAX_SID_LEN, &sidlen)
+#define DOMLEN	(domlen = INTERNET_MAX_HOST_NAME_LENGTH, &domlen)
+
 BOOL
 lookup_name (const char *name, const char *logsrv, PSID ret_sid)
 {
   cygsid sid;
   DWORD sidlen;
-  char domuser[MAX_COMPUTERNAME_LENGTH+MAX_USER_NAME+1];
-  char dom[MAX_COMPUTERNAME_LENGTH+1];
+  char domuser[INTERNET_MAX_HOST_NAME_LENGTH + UNLEN + 2];
+  char dom[INTERNET_MAX_HOST_NAME_LENGTH + 1];
   DWORD domlen;
   SID_NAME_USE acc_type;
 
@@ -317,51 +321,35 @@ lookup_name (const char *name, const char *logsrv, PSID ret_sid)
   if (cygheap->user.domain ())
     {
       strcat (strcat (strcpy (domuser, cygheap->user.domain ()), "\\"), name);
-      if (LookupAccountName (NULL, domuser,
-			     sid, (sidlen = MAX_SID_LEN, &sidlen),
-			     dom, (domlen = MAX_COMPUTERNAME_LENGTH, &domlen),
-			     &acc_type)
+      if (LookupAccountName (NULL, domuser, sid, SIDLEN, dom, DOMLEN, &acc_type)
 	  && legal_sid_type (acc_type))
 	goto got_it;
       if (logsrv && *logsrv
-	  && LookupAccountName (logsrv, domuser,
-				sid, (sidlen = MAX_SID_LEN, &sidlen),
-				dom, (domlen = MAX_COMPUTERNAME_LENGTH,&domlen),
-				&acc_type)
+	  && LookupAccountName (logsrv, domuser, sid, SIDLEN,
+				dom, DOMLEN, &acc_type)
 	  && legal_sid_type (acc_type))
 	goto got_it;
     }
   if (logsrv && *logsrv)
     {
-      if (LookupAccountName (logsrv, name,
-			     sid, (sidlen = MAX_SID_LEN, &sidlen),
-			     dom, (domlen = MAX_COMPUTERNAME_LENGTH, &domlen),
-			     &acc_type)
+      if (LookupAccountName (logsrv, name, sid, SIDLEN, dom, DOMLEN, &acc_type)
 	  && legal_sid_type (acc_type))
 	goto got_it;
       if (acc_type == SidTypeDomain)
 	{
 	  strcat (strcat (strcpy (domuser, dom), "\\"), name);
-	  if (LookupAccountName (logsrv, domuser,
-				 sid,(sidlen = MAX_SID_LEN, &sidlen),
-				 dom,(domlen = MAX_COMPUTERNAME_LENGTH,&domlen),
-				 &acc_type))
+	  if (LookupAccountName (logsrv, domuser, sid, SIDLEN,
+				 dom, DOMLEN, &acc_type))
 	    goto got_it;
 	}
     }
-  if (LookupAccountName (NULL, name,
-			 sid, (sidlen = MAX_SID_LEN, &sidlen),
-			 dom, (domlen = 100, &domlen),
-			 &acc_type)
+  if (LookupAccountName (NULL, name, sid, SIDLEN, dom, DOMLEN, &acc_type)
       && legal_sid_type (acc_type))
     goto got_it;
   if (acc_type == SidTypeDomain)
     {
       strcat (strcat (strcpy (domuser, dom), "\\"), name);
-      if (LookupAccountName (NULL, domuser,
-			     sid, (sidlen = MAX_SID_LEN, &sidlen),
-			     dom, (domlen = MAX_COMPUTERNAME_LENGTH, &domlen),
-			     &acc_type))
+      if (LookupAccountName (NULL, domuser, sid, SIDLEN, dom, DOMLEN,&acc_type))
 	goto got_it;
     }
   debug_printf ("LookupAccountName(%s) %E", name);
@@ -377,6 +365,9 @@ got_it:
 
   return TRUE;
 }
+
+#undef SIDLEN
+#undef DOMLEN
 
 int
 set_process_privilege (const char *privilege, BOOL enable)

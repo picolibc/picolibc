@@ -20,6 +20,7 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygheap.h"
+#include "security.h"
 #include <sys/termios.h>
 
 /* Read /etc/passwd only once for better performance.  This is done
@@ -93,7 +94,7 @@ parse_pwd (struct passwd &res, char *buf)
   if (mybuf[--len] == '\n')
     mybuf[len] = '\0';
 
-  res.pw_name = strlwr (grab_string (&mybuf));
+  res.pw_name = grab_string (&mybuf);
   res.pw_passwd = grab_string (&mybuf);
   res.pw_uid = grab_int (&mybuf);
   res.pw_gid = grab_int (&mybuf);

@@ -71,6 +71,7 @@ extern char case_folded_upper[];
 #define _WINSVC_H
 #include <windows.h>
 #include <wincrypt.h>
+#include <lmcons.h>
 #undef _WINGDI_H
 #undef _WINUSER_H
 #undef _WINNLS_H
@@ -97,11 +98,6 @@ extern int dynamically_loaded;
 		    MultiByteToWideChar((current_codepage==ansi_cp?CP_ACP:CP_OEMCP),0,(src),-1,(tgt),(len))
 
 #define TITLESIZE 1024
-#define MAX_USER_NAME 20
-#define DEFAULT_UID 500
-#define DEFAULT_GID 544
-
-#define MAX_HOST_NAME 256
 
 /* status bit manipulation */
 #define __ISSETF(what, x, prefix) \

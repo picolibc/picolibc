@@ -93,7 +93,7 @@ struct _winsup_t
   struct tm _localtime_buf;
 
   /* uinfo.cc */
-  char _username[MAX_USER_NAME];
+  char _username[UNLEN + 1];
 };
 
 

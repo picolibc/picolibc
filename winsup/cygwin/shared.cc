@@ -154,8 +154,8 @@ memory_init ()
   heap_init ();
 
   /* Allocate memory for the per-user mount table */
-  char user_name[MAX_USER_NAME];
-  DWORD user_name_len = MAX_USER_NAME;
+  char user_name[UNLEN + 1];
+  DWORD user_name_len = UNLEN + 1;
 
   if (!GetUserName (user_name, &user_name_len))
     strcpy (user_name, "unknown");
