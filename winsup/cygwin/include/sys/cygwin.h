@@ -87,24 +87,24 @@ unsigned long cygwin_internal (cygwin_getinfo_types, ...);
 /* Flags associated with process_state */
 enum
 {
-  PID_IN_USE	       = 0x0001, /* Entry in use. */
-  PID_ZOMBIE	       = 0x0002, /* Child exited: no parent wait. */
-  PID_STOPPED	       = 0x0004, /* Waiting for SIGCONT. */
-  PID_TTYIN	       = 0x0008, /* Waiting for terminal input. */
-  PID_TTYOU	       = 0x0010, /* Waiting for terminal output. */
-  PID_ORPHANED	       = 0x0020, /* Member of an orphaned process group. */
-  PID_ACTIVE	       = 0x0040, /* Pid accepts signals. */
-  PID_CYGPARENT	       = 0x0080, /* Set if parent was a cygwin app. */
-  PID_MAP_RW	       = 0x0100, /* Flag to open map rw. */
-  PID_MYSELF	       = 0x0200, /* Flag that pid is me. */
-  PID_NOCLDSTOP	       = 0x0400, /* Set if no SIGCHLD signal on stop. */
-  PID_INITIALIZING     = 0x0800, /* Set until ready to receive signals. */
-  PID_USETTY	       = 0x1000, /* Setting this enables or disables cygwin's */
-				 /*  tty support.  This is inherited by */
-				 /*  all execed or forked processes. */
-  PID_ALLPIDS	       = 0x2000, /* child has execed */
-  PID_EXECED	       = 0x4000, /* redirect to original pid info block */
-  PID_NOREDIR	       = 0x8000, /* don't redirect if execed */
+  PID_IN_USE	       = 0x00001, /* Entry in use. */
+  PID_ZOMBIE	       = 0x00002, /* Child exited: no parent wait. */
+  PID_STOPPED	       = 0x00004, /* Waiting for SIGCONT. */
+  PID_TTYIN	       = 0x00008, /* Waiting for terminal input. */
+  PID_TTYOU	       = 0x00010, /* Waiting for terminal output. */
+  PID_ORPHANED	       = 0x00020, /* Member of an orphaned process group. */
+  PID_ACTIVE	       = 0x00040, /* Pid accepts signals. */
+  PID_CYGPARENT	       = 0x00080, /* Set if parent was a cygwin app. */
+  PID_MAP_RW	       = 0x00100, /* Flag to open map rw. */
+  PID_MYSELF	       = 0x00200, /* Flag that pid is me. */
+  PID_NOCLDSTOP	       = 0x00400, /* Set if no SIGCHLD signal on stop. */
+  PID_INITIALIZING     = 0x00800, /* Set until ready to receive signals. */
+  PID_USETTY	       = 0x01000, /* Setting this enables or disables cygwin's
+				     tty support.  This is inherited by
+				     all execed or forked processes. */
+  PID_ALLPIDS	       = 0x02000, /* used by pinfo scanner */
+  PID_EXECED	       = 0x04000, /* redirect to original pid info block */
+  PID_NOREDIR	       = 0x08000, /* don't redirect if execed */
   PID_EXITED	       = 0x80000000 /* Free entry. */
 };
 

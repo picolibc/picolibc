@@ -1,3 +1,65 @@
+2004-12-05  Christopher Faylor  <cgf@timesys.com>
+
+	* sigproc.cc (mychild): Reimplement as list scan.
+	(proc_subproc): Don't mess with pinfo if it's myself.
+
+2004-12-05  Christopher Faylor  <cgf@timesys.com>
+
+	* child_info.h (child_info_types): Label enum for _PROC constants.
+	(child_info::child_info): New constructor.
+	(child_info::~child_info): New destructor.
+	(child_info::sync): Declare new function.
+	(child_info_fork::child_info_fork): New constructor.
+	(child_info_spawn::child_info_spawn): Remove old constructor.
+	(child_info_spawn::child_info_spawn): New constructor.
+	* dcrt0.cc (dll_crt0_0): Use correct sizeof when doing sanity check on
+	passed in child_info.  Signal readiness to parent when not forking (and
+	not spawning).
+	* fork.cc (sync_with_child): Delete.
+	(resume_child): Remove extra argument.
+	(sync_with_parent): Use child_info method to sync with parent.
+	(fork_child): Don't close fork_info->subproc_ready since that is now
+	handled by the destructor.
+	(fork_parent): Remove subproc_ready stuff.  Use child_info sync method
+	for waiting..  Set start time here for child.  Rename "forked" to
+	"child".
+	(fork): Check ch.subproc_ready for validity here.
+	* pinfo.h (_pinfo::exec_sendsig): Temp storage for exec stub which may
+	be staying around to handle non-cygwin captive process.
+	(_pinfo::exec_dwProcessId): Ditto.
+	(_pinfo::_lock): Renamed from lock.
+	(_pinfo::lock): New method.
+	(_pinfo::unlock): Ditto.
+	(_pinfo::initialize_lock): Ditto.
+	* pinfo.cc (set_myself): Use initialize_lock method to initialize
+	myself lock.  Set "exec" fields in _pinfo to zero to indicate that
+	we've started successfully.  Set start time here when appropriate.
+	(_pinfo::commune_send): Use pinfo lock/unlock methods.
+	(proc_waiter): Remove special case for non-cywin processes.
+	Reinstitute handling for PID_NOCLDSTOP.
+	* sigproc.cc (proc_subproc): Set proper EAGAIN errno when process table
+	is filled.
+	(sig_send): Use exec_* fields from _pinfo for sending signals if the
+	the _pinfo sendsig never materializes.
+	(child_info::child_info): New constructor, renamed from init_child_info.
+	Zeroes child_info structure and sets appropriate fields in structure
+	based on chtype.
+	(child_info::~child_info): New destructor.  Closes subproc_ready if it
+	exists.
+	(child_info_fork::child_info_fork): New constructor.
+	(child_info_spawn::child_info_spawn): New constructor.
+	(child_info::ready): New function.  Signals parent when child is ready.
+	(child_info::sync): New function.  Wait for child to signal us or
+	process to die.
+	(remove_proc): Remove closing of hProcess since this should now be
+	handled shortly after process creation.
+	* spawn.cc (spawn_guts): Use child_info_spawn constructor rather than
+	init_child_info.  Save exec_sendsig and exec_dwProcessId in execing
+	_pinfo.  Rely on child_info constructor to properly set
+	parent_wr_proc_pipe in ciresrv.  Revert to previous determination on
+	whether to start a process in suspended mode.  Remove reparenting
+	stuff.  Just keep a stub around if starting a non-cygwin process.
+
 2004-12-05  Bas van Gompel  <cygwin-patch@bavag.tmfweb.nl>
 
 	* fhandler.cc (fhandler_base::read): Remove superfluous check in

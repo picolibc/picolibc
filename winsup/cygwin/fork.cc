@@ -107,68 +107,8 @@ fork_copy (PROCESS_INFORMATION &pi, const char *what, ...)
   return 0;
 }
 
-/* Wait for child to finish what it's doing and signal us.
-   We don't want to wait forever here.If there's a problem somewhere
-   it'll hang the entire system (since all forks are mutex'd). If we
-   time out, set errno = EAGAIN and hope the app tries again.  */
 static int
-sync_with_child (PROCESS_INFORMATION &pi, HANDLE subproc_ready,
-		 bool hang_child, const char *s)
-{
-  /* We also add the child process handle to the wait. If the child fails
-     to initialize (eg. because of a missing dll). Then this
-     handle will become signalled. This stops a *looong* timeout wait.
-  */
-  HANDLE w4[2];
-
-  debug_printf ("waiting for child.  reason: %s, hang_child %d", s,
-		hang_child);
-  w4[1] = pi.hProcess;
-  w4[0] = subproc_ready;
-  DWORD rc = WaitForMultipleObjects (2, w4, FALSE, FORK_WAIT_TIMEOUT);
-
-  if (rc == WAIT_OBJECT_0 ||
-      WaitForSingleObject (subproc_ready, 0) == WAIT_OBJECT_0)
-    /* That's ok */;
-  else if (rc == WAIT_FAILED || rc == WAIT_TIMEOUT)
-    {
-      if (rc != WAIT_FAILED)
-	system_printf ("WaitForMultipleObjects timed out");
-      else
-	system_printf ("WaitForMultipleObjects failed, %E");
-      set_errno (EAGAIN);
-      syscall_printf ("-1 = fork(), WaitForMultipleObjects failed");
-      TerminateProcess (pi.hProcess, 1);
-      return 0;
-    }
-  else
-    {
-      /* Child died. Clean up and exit. */
-      DWORD errcode;
-      GetExitCodeProcess (pi.hProcess, &errcode);
-      /* Fix me.  This is not enough.  The fork should not be considered
-       * to have failed if the process was essentially killed by a signal.
-       */
-      if (errcode != STATUS_CONTROL_C_EXIT)
-	{
-	  system_printf ("child %u(%p) died before initialization with status code %p",
-			 cygwin_pid (pi.dwProcessId), pi.hProcess, errcode);
-	  system_printf ("*** child state %s", s);
-#ifdef DEBUGGING
-	  try_to_debug ();
-#endif
-	}
-      set_errno (EAGAIN);
-      syscall_printf ("Child died before subproc_ready signalled");
-      return 0;
-    }
-
-  debug_printf ("child signalled me");
-  return 1;
-}
-
-static int
-resume_child (PROCESS_INFORMATION &pi, HANDLE forker_finished)
+resume_child (HANDLE forker_finished)
 {
   SetEvent (forker_finished);
   debug_printf ("signalled child");
@@ -182,9 +122,7 @@ static void __stdcall
 sync_with_parent (const char *s, bool hang_self)
 {
   debug_printf ("signalling parent: %s", s);
-  /* Tell our parent we're waiting. */
-  if (!SetEvent (fork_info->subproc_ready))
-    api_fatal ("fork child - SetEvent for %s failed, %E", s);
+  fork_info->ready (false);
   if (hang_self)
     {
       HANDLE h = fork_info->forker_finished;
@@ -281,7 +219,6 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
     }
 
   ForceCloseHandle (hParent);
-  (void) ForceCloseHandle1 (fork_info->subproc_ready, subproc_ready);
   (void) ForceCloseHandle1 (fork_info->forker_finished, forker_finished);
 
   _my_tls.fixup_after_fork ();
@@ -308,7 +245,7 @@ slow_pid_reuse (HANDLE h)
 
   if (nfork_procs >= (sizeof (last_fork_procs) / sizeof (last_fork_procs [0])))
     nfork_procs = 0;
-  /* Keep a list of handles to forked processes sitting around to prevent
+  /* Keep a list of handles to child processes sitting around to prevent
      Windows from reusing the same pid n times in a row.  Having the same pids
      close in succesion confuses bash.  Keeping a handle open will stop
      windows from reusing the same pid.  */
@@ -330,7 +267,7 @@ static int __stdcall
 fork_parent (HANDLE& hParent, dll *&first_dll,
 	     bool& load_dlls, void *stack_here, child_info_fork &ch)
 {
-  HANDLE subproc_ready, forker_finished;
+  HANDLE forker_finished;
   DWORD rc;
   PROCESS_INFORMATION pi = {0, NULL, 0, 0};
 
@@ -379,35 +316,22 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   /* This will help some of the confusion.  */
   fflush (stdout);
 
-  subproc_ready = CreateEvent (&sec_all, FALSE, FALSE, NULL);
-  if (subproc_ready == NULL)
-    {
-      CloseHandle (hParent);
-      system_printf ("unable to allocate subproc_ready event, %E");
-      return -1;
-    }
   forker_finished = CreateEvent (&sec_all, FALSE, FALSE, NULL);
   if (forker_finished == NULL)
     {
       CloseHandle (hParent);
-      CloseHandle (subproc_ready);
       system_printf ("unable to allocate forker_finished event, %E");
       return -1;
     }
 
-  ProtectHandleINH (subproc_ready);
   ProtectHandleINH (forker_finished);
 
-  init_child_info (PROC_FORK, &ch, subproc_ready);
-
   ch.forker_finished = forker_finished;
-  ch.parent_wr_proc_pipe = myself->wr_proc_pipe == INVALID_HANDLE_VALUE
-    			   ? NULL : myself->wr_proc_pipe;
 
   stack_base (ch);
 
   si.cb = sizeof (STARTUPINFO);
-  si.lpReserved2 = (LPBYTE)&ch;
+  si.lpReserved2 = (LPBYTE) &ch;
   si.cbReserved2 = sizeof (ch);
 
   /* Remove impersonation */
@@ -437,7 +361,6 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
     {
       __seterrno ();
       syscall_printf ("CreateProcessA failed, %E");
-      ForceCloseHandle (subproc_ready);
       ForceCloseHandle (forker_finished);
       /* Restore impersonation */
       cygheap->user.reimpersonate ();
@@ -457,10 +380,11 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
       ResumeThread (pi.hThread);
     }
 
-  int forked_pid = cygwin_pid (pi.dwProcessId);
-  pinfo forked (forked_pid, 1);
+  int child_pid = cygwin_pid (pi.dwProcessId);
+  pinfo child (child_pid, 1);
+  child->start_time = time (NULL); /* Register child's starting time. */
 
-  if (!forked)
+  if (!child)
     {
       syscall_printf ("pinfo failed");
       if (get_errno () != ENOMEM)
@@ -470,7 +394,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 
   /* Initialize things that are done later in dll_crt0_1 that aren't done
      for the forkee.  */
-  strcpy (forked->progname, myself->progname);
+  strcpy (child->progname, myself->progname);
 
   /* Restore impersonation */
   cygheap->user.reimpersonate ();
@@ -478,18 +402,18 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   ProtectHandle (pi.hThread);
   /* Protect the handle but name it similarly to the way it will
      be called in subproc handling. */
-  ProtectHandle1 (pi.hProcess, childhProc);
+  ProtectHandle (pi.hProcess);
 
   /* Fill in fields in the child's process table entry.  */
-  forked->dwProcessId = pi.dwProcessId;
-  forked.hProcess = pi.hProcess;
+  child->dwProcessId = pi.dwProcessId;
+  child.hProcess = pi.hProcess;
 
   /* Hopefully, this will succeed.  The alternative to doing things this
      way is to reserve space prior to calling CreateProcess and then fill
      it in afterwards.  This requires more bookkeeping than I like, though,
      so we'll just do it the easy way.  So, terminate any child process if
      we can't actually record the pid in the internal table. */
-  if (!forked.remember ())
+  if (!child.remember ())
     {
       TerminateProcess (pi.hProcess, 1);
       set_errno (EAGAIN);
@@ -501,8 +425,11 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 #endif
 
   /* Wait for subproc to initialize itself. */
-  if (!sync_with_child (pi, subproc_ready, true, "waiting for longjmp"))
-    goto cleanup;
+  if (!ch.sync (child, FORK_WAIT_TIMEOUT))
+    {
+      system_printf ("child %d died waiting for longjmp before initialization", child_pid);
+      goto cleanup;
+    }
 
   /* CHILD IS STOPPED */
   debug_printf ("child is alive (but stopped)");
@@ -547,9 +474,13 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
     }
 
   /* Start thread, and wait for it to reload dlls.  */
-  if (!resume_child (pi, forker_finished) ||
-      !sync_with_child (pi, subproc_ready, load_dlls, "child loading dlls"))
+  if (!resume_child (forker_finished))
     goto cleanup;
+  else if (!ch.sync (child, FORK_WAIT_TIMEOUT))
+    {
+      system_printf ("child %d died waiting for dll loading", child_pid);
+      goto cleanup;
+    }
 
   /* If DLLs were loaded in the parent, then the child has reloaded all
      of them and is now waiting to have all of the individual data and
@@ -567,17 +498,17 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 	    goto cleanup;
 	}
       /* Start the child up again. */
-      (void) resume_child (pi, forker_finished);
+      (void) resume_child (forker_finished);
     }
 
-  ForceCloseHandle (subproc_ready);
+  ForceCloseHandle (pi.hProcess);
   ForceCloseHandle (pi.hThread);
   ForceCloseHandle (forker_finished);
   forker_finished = NULL;
   pi.hThread = NULL;
   pthread::atforkparent ();
 
-  return forked_pid;
+  return child_pid;
 
 /* Common cleanup code for failure cases */
  cleanup:
@@ -589,8 +520,6 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
     ForceCloseHandle1 (pi.hProcess, childhProc);
   if (pi.hThread)
     ForceCloseHandle (pi.hThread);
-  if (subproc_ready)
-    ForceCloseHandle (subproc_ready);
   if (forker_finished)
     ForceCloseHandle (forker_finished);
   return -1;
@@ -618,6 +547,11 @@ fork ()
   myself->set_has_pgid_children ();
 
   child_info_fork ch;
+  if (ch.subproc_ready == NULL)
+    {
+      system_printf ("unable to allocate subproc_ready event, %E");
+      return -1;
+    }
 
   sig_send (NULL, __SIGHOLD);
   int res = setjmp (ch.jmp);

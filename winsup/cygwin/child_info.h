@@ -10,7 +10,7 @@ details. */
 
 #include <setjmp.h>
 
-enum
+enum child_info_types
 {
   _PROC_EXEC,
   _PROC_SPAWN,
@@ -51,6 +51,10 @@ public:
   HANDLE cygheap_h;
   HANDLE parent_wr_proc_pipe;
   unsigned fhandler_union_cb;
+  child_info (unsigned, child_info_types);
+  ~child_info ();
+  void ready (bool);
+  bool sync (pinfo&, DWORD);
 };
 
 class mount_info;
@@ -64,6 +68,7 @@ public:
   jmp_buf jmp;		// where child will jump to
   void *stacktop;	// location of top of parent stack
   void *stackbottom;	// location of bottom of parent stack
+  child_info_fork ();
 };
 
 class fhandler_base;
@@ -84,7 +89,6 @@ class child_info_spawn: public child_info
 public:
   cygheap_exec_info *moreinfo;
 
-  child_info_spawn (): moreinfo (NULL) {}
   ~child_info_spawn ()
   {
     if (moreinfo)
@@ -101,6 +105,7 @@ public:
 	cfree (moreinfo);
       }
   }
+  child_info_spawn (child_info_types);
 };
 
 void __stdcall init_child_info (DWORD, child_info *, HANDLE);

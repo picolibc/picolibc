@@ -50,21 +50,25 @@ set_myself (HANDLE h)
     cygheap->pid = cygwin_pid (GetCurrentProcessId ());
   myself.init (cygheap->pid, PID_IN_USE | PID_MYSELF, h);
   myself->process_state |= PID_IN_USE;
-  myself->start_time = time (NULL); /* Register our starting time. */
+  myself->dwProcessId = GetCurrentProcessId ();
 
   (void) GetModuleFileName (NULL, myself->progname, sizeof (myself->progname));
   if (!strace.active)
     strace.hello ();
   debug_printf ("myself->dwProcessId %u", myself->dwProcessId);
-  InitializeCriticalSection (&myself.lock);
-  myself->dwProcessId = GetCurrentProcessId ();
+  myself.initialize_lock ();
   if (h)
     {
       /* here if execed */
       static pinfo NO_COPY myself_identity;
       myself_identity.init (cygwin_pid (myself->dwProcessId), PID_EXECED);
+      myself->start_time = time (NULL); /* Register our starting time. */
+      myself->exec_sendsig = NULL;
+      myself->exec_dwProcessId = 0;
     }
-  else if (myself->wr_proc_pipe)
+  else if (!myself->wr_proc_pipe)
+    myself->start_time = time (NULL); /* Register our starting time. */
+  else
     {
       /* We've inherited the parent's wr_proc_pipe.  We don't need it,
 	 so close it. */
@@ -522,7 +526,7 @@ _pinfo::commune_send (DWORD code, ...)
       __seterrno ();
       goto err;
     }
-  EnterCriticalSection (&myself.lock);
+  myself.lock ();
   myself->tothem = tome;
   myself->fromthem = fromme;
   myself->hello_pid = pid;
@@ -626,7 +630,7 @@ err:
 
 out:
   myself->hello_pid = 0;
-  LeaveCriticalSection (&myself.lock);
+  myself.unlock ();
   return res;
 }
 
@@ -710,13 +714,6 @@ proc_waiter (void *arg)
 	  /* Child exited.  Do some cleanup and signal myself.  */
 	  CloseHandle (vchild.rd_proc_pipe);
 	  vchild.rd_proc_pipe = NULL;
-
-	  if (vchild->process_state != PID_EXITED && vchild.hProcess)
-	    {
-	      DWORD exit_code;
-	      if (GetExitCodeProcess (vchild.hProcess, &exit_code))
-		vchild->exitcode = (exit_code & 0xff) << 8;
-	    }
 	  if (WIFEXITED (vchild->exitcode))
 	    si.si_sigval.sival_int = CLD_EXITED;
 	  else if (WCOREDUMP (vchild->exitcode))
@@ -730,32 +727,12 @@ proc_waiter (void *arg)
 	case SIGTTOU:
 	case SIGTSTP:
 	case SIGSTOP:
+	  if (ISSTATE (myself, PID_NOCLDSTOP))	// FIXME: No need for this flag to be in _pinfo any longer
+	    continue;
 	  /* Child stopped.  Signal myself.  */
 	  si.si_sigval.sival_int = CLD_STOPPED;
 	  break;
 	case SIGCONT:
-	  continue;
-	case __ALERT_REPARENT: /* sigh */
-	  /* spawn_guts has signalled us that it has just started a new
-	     subprocess which will take over this cygwin pid.  */
-
-	  /* We need to keep a handle to the original windows process which
-	     represents the cygwin process around to make sure that the
-	     windows pid is not reused before we are through with it.
-	     So, detect the first time that a subprocess calls exec
-	     and save the current hprocess in the pid_handle field.
-	     On subsequent execs just close the handle. */
-	  if (!vchild.hProcess)
-	    /* something went wrong.  oh well. */;
-	  else if (vchild.pid_handle)
-	    ForceCloseHandle1 (vchild.hProcess, childhProc);
-	  else
-	    vchild.pid_handle = vchild.hProcess;
-	  vchild.hProcess = OpenProcess (PROCESS_QUERY_INFORMATION, FALSE,
-					 vchild->dwProcessId);
-	  vchild->cygstarted++;
-	  if (vchild.hProcess)
-	    ProtectHandle1 (vchild.hProcess, childhProc);
 	  continue;
 	default:
 	  system_printf ("unknown value %d on proc pipe", buf);
@@ -788,6 +765,40 @@ proc_waiter (void *arg)
   sigproc_printf ("exiting wait thread for pid %d", pid);
   _my_tls._ctinfo->release ();	/* return the cygthread to the cygthread pool */
   return 0;
+}
+
+void
+proc_pipe::set (bool closeem)
+{
+  myself.lock ();
+  if (!CreatePipe (&in, &out, &sec_none_nih, 16))
+    {
+      system_printf ("couldn't create pipe, %E");
+      return;
+    }
+  /* Duplicate the write end of the pipe into the subprocess.  Make it inheritable
+     so that all of the execed children get it.  */
+  if (!DuplicateHandle (hMainProc, out, hMainProc, &out, 0, TRUE,
+			DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
+    {
+      CloseHandle (in);
+      in = out = NULL;
+      system_printf ("couldn't make handle %p noninheritable, %E", out);
+      return;
+    }
+  _closeem = closeem;
+}
+
+proc_pipe::~proc_pipe ()
+{
+  if (_closeem)
+    {
+      if (in)
+	CloseHandle (in);
+      if (out)
+	CloseHandle (out);
+    }
+  myself.unlock ();
 }
 
 /* function to set up the process pipe and kick off proc_waiter */

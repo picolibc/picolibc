@@ -618,13 +618,15 @@ dll_crt0_0 ()
 	  case _PROC_SPAWN:
 	  case _PROC_EXEC:
 	    if (!should_be_cb)
-	      should_be_cb = sizeof (child_info);
+	      should_be_cb = sizeof (child_info_spawn);
 	    if (should_be_cb != child_proc_info->cb)
 	      multiple_cygwin_problem ("proc size", child_proc_info->cb, should_be_cb);
 	    else if (sizeof (fhandler_union) != child_proc_info->fhandler_union_cb)
 	      multiple_cygwin_problem ("fhandler size", child_proc_info->fhandler_union_cb, sizeof (fhandler_union));
 	    else
 	      {
+		if (child_proc_info->type != _PROC_FORK)
+		  child_proc_info->ready (true);
 		cygwin_user_h = child_proc_info->user_h;
 		break;
 	      }

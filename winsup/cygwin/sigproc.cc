@@ -200,19 +200,18 @@ proc_exists (_pinfo *p)
   return p && !(p->process_state & (PID_EXITED | PID_ZOMBIE));
 }
 
-/* Return 1 if this is one of our children, zero otherwise.
-   FIXME: This really should be integrated with the rest of the proc_subproc
-   testing.  Scanning these lists twice is inefficient. */
-bool __stdcall
+/* Return true if this is one of our children, false otherwise.  */
+static inline bool __stdcall
 mychild (int pid)
 {
-  pinfo p (pid);
-  return p && p->ppid == myself->pid;
+  for (int i = 0; i < nprocs; i++)
+    if (procs[i]->pid == pid)
+      return true;
+  return false;
 }
 
 /* Handle all subprocess requests
  */
-#define vchild (*((pinfo *) val))
 int __stdcall
 proc_subproc (DWORD what, DWORD val)
 {
@@ -223,6 +222,7 @@ proc_subproc (DWORD what, DWORD val)
   waitq *w;
 
 #define wval	 ((waitq *) val)
+#define vchild (*((pinfo *) val))
 
   sigproc_printf ("args: %x, %d", what, val);
 
@@ -244,18 +244,21 @@ proc_subproc (DWORD what, DWORD val)
 	  sigproc_printf ("proc table overflow: hit %d processes, pid %d\n",
 			  nprocs, vchild->pid);
 	  rc = 0;
-	  set_errno (EMFILE);	// FIXMENOW - what's the right errno?
+	  set_errno (EAGAIN);
 	  break;
 	}
 
-      vchild->ppid = myself->pid;
-      vchild->uid = myself->uid;
-      vchild->gid = myself->gid;
-      vchild->pgid = myself->pgid;
-      vchild->sid = myself->sid;
-      vchild->ctty = myself->ctty;
-      vchild->cygstarted = true;
-      vchild->process_state |= PID_INITIALIZING | (myself->process_state & PID_USETTY);
+      if (vchild != myself)
+	{
+	  vchild->ppid = myself->pid;
+	  vchild->uid = myself->uid;
+	  vchild->gid = myself->gid;
+	  vchild->pgid = myself->pgid;
+	  vchild->sid = myself->sid;
+	  vchild->ctty = myself->ctty;
+	  vchild->cygstarted = true;
+	  vchild->process_state |= PID_INITIALIZING | (myself->process_state & PID_USETTY);
+	}
       procs[nprocs] = vchild;
       rc = procs[nprocs].wait ();
       if (rc)
@@ -353,6 +356,8 @@ out:
 out1:
   sigproc_printf ("returning %d", rc);
   return rc;
+#undef wval
+#undef vchild
 }
 
 // FIXME: This is inelegant
@@ -566,9 +571,27 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
     sendsig = myself->sendsig;
   else
     {
-      for (int i = 0; !p->dwProcessId && i < 10000; i++)
+      HANDLE dupsig;
+      DWORD dwProcessId;
+      for (int i = 0; !p->sendsig && i < 10000; i++)
 	low_priority_sleep (0);
-      HANDLE hp = OpenProcess (PROCESS_DUP_HANDLE, false, p->dwProcessId);
+      if (p->sendsig)
+	{
+	  dupsig = p->sendsig;
+	  dwProcessId = p->dwProcessId;
+	}
+      else
+	{
+	  dupsig = p->exec_sendsig;
+	  dwProcessId = p->exec_dwProcessId;
+	}
+      if (!dupsig)
+	{
+	  set_errno (EAGAIN);
+	  sigproc_printf ("sendsig handle never materialized");
+	  goto out;
+	}
+      HANDLE hp = OpenProcess (PROCESS_DUP_HANDLE, false, dwProcessId);
       if (!hp)
 	{
 	  sigproc_printf ("OpenProcess failed, %E");
@@ -576,14 +599,12 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	  goto out;
 	}
       VerifyHandle (hp);
-      for (int i = 0; !p->sendsig && i < 10000; i++)
-	low_priority_sleep (0);
-      if (!DuplicateHandle (hp, p->sendsig, hMainProc, &sendsig, false, 0,
+      if (!DuplicateHandle (hp, dupsig, hMainProc, &sendsig, false, 0,
 			    DUPLICATE_SAME_ACCESS) || !sendsig)
 	{
-	  CloseHandle (hp);
-	  sigproc_printf ("DuplicateHandle failed, %E");
 	  __seterrno ();
+	  sigproc_printf ("DuplicateHandle failed, %E");
+	  CloseHandle (hp);
 	  goto out;
 	}
       CloseHandle (hp);
@@ -695,17 +716,98 @@ out:
 /* Initialize some of the memory block passed to child processes
    by fork/spawn/exec. */
 
-void __stdcall
-init_child_info (DWORD chtype, child_info *ch, HANDLE subproc_ready)
+child_info::child_info (unsigned in_cb, child_info_types chtype)
 {
-  memset (ch, 0, sizeof *ch);
-  ch->cb = chtype == PROC_FORK ? sizeof (child_info_fork) : sizeof (child_info);
-  ch->intro = PROC_MAGIC_GENERIC;
-  ch->magic = CHILD_INFO_MAGIC;
-  ch->type = chtype;
-  ch->subproc_ready = subproc_ready;
-  ch->fhandler_union_cb = sizeof (fhandler_union);
-  ch->user_h = cygwin_user_h;
+  memset (this, 0, in_cb);
+  cb = in_cb;
+  intro = PROC_MAGIC_GENERIC;
+  magic = CHILD_INFO_MAGIC;
+  type = chtype;
+  fhandler_union_cb = sizeof (fhandler_union);
+  user_h = cygwin_user_h;
+  if (chtype != PROC_SPAWN)
+    subproc_ready = CreateEvent (&sec_all, FALSE, FALSE, NULL);
+  sigproc_printf ("subproc_ready %p", subproc_ready);
+  if (chtype != PROC_EXEC && myself->wr_proc_pipe != INVALID_HANDLE_VALUE)
+    parent_wr_proc_pipe = myself->wr_proc_pipe;
+}
+
+child_info::~child_info ()
+{
+  if (subproc_ready)
+    CloseHandle (subproc_ready);
+}
+
+child_info_fork::child_info_fork () :
+  child_info (sizeof *this, _PROC_FORK)
+{
+}
+
+child_info_spawn::child_info_spawn (child_info_types chtype) :
+  child_info (sizeof *this, chtype)
+{
+}
+
+void
+child_info::ready (bool execed)
+{
+  if (!subproc_ready)
+    {
+      sigproc_printf ("subproc_ready not set");
+      return;
+    }
+
+  if (!SetEvent (subproc_ready))
+    api_fatal ("SetEvent failed");
+  else
+    sigproc_printf ("signalled %p that I was ready", subproc_ready);
+
+  if (execed)
+    {
+      CloseHandle (subproc_ready);
+      subproc_ready = NULL;
+    }
+}
+
+bool
+child_info::sync (pinfo& vchild, DWORD howlong)
+{
+  if (!subproc_ready)
+    {
+      sigproc_printf ("not waiting.  subproc_ready is NULL");
+      return false;
+    }
+
+  HANDLE w4[2];
+  w4[0] = subproc_ready;
+  w4[1] = vchild.hProcess;
+
+  bool res;
+  sigproc_printf ("waiting for subproc_ready(%p) and child process(%p)", w4[0], w4[1]);
+  switch (WaitForMultipleObjects (2, w4, FALSE, howlong))
+    {
+    case WAIT_OBJECT_0:
+      sigproc_printf ("got subproc_ready for pid %d", vchild->pid);
+      res = true;
+      break;
+    case WAIT_OBJECT_0 + 1:
+      if (WaitForSingleObject (subproc_ready, 0) == WAIT_OBJECT_0)
+	sigproc_printf ("should never happen.  noticed subproc_ready after process exit");
+      else
+	{
+	  DWORD exitcode = 0;
+	  (void) GetExitCodeProcess (vchild.hProcess, &exitcode);
+	  vchild->exitcode = (exitcode & 0xff) << 8;
+	  sigproc_printf ("non-cygwin exit value is %p", exitcode);
+	}
+      res = false;
+      break;
+    default:
+      system_printf ("wait failed, pid %d, %E", vchild->pid);
+      res = false;
+      break;
+    }
+  return res;
 }
 
 /* Check the state of all of our children to see if any are stopped or

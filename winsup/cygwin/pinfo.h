@@ -111,6 +111,8 @@ public:
 
   /* signals */
   HANDLE sendsig;
+  HANDLE exec_sendsig;
+  DWORD exec_dwProcessId;
 private:
   sigset_t sig_mask;
 public:
@@ -132,14 +134,14 @@ class pinfo
 public:
   HANDLE rd_proc_pipe;
   HANDLE hProcess;
-  CRITICAL_SECTION lock;
+  CRITICAL_SECTION _lock;
   /* Handle associated with initial Windows pid which started it all. */
   HANDLE pid_handle;
   void init (pid_t, DWORD, HANDLE = NULL) __attribute__ ((regparm(3)));
   pinfo () {}
   pinfo (_pinfo *x): procinfo (x), hProcess (NULL), pid_handle (NULL) {}
   pinfo (pid_t n) : rd_proc_pipe (NULL), hProcess (NULL), pid_handle (NULL) {init (n, 0);}
-  pinfo (pid_t n, DWORD flag) : rd_proc_pipe (NULL), hProcess (NULL), pid_handle (NULL)  {init (n, flag);}
+  pinfo (pid_t n, DWORD flag) : rd_proc_pipe (NULL), hProcess (NULL), pid_handle (NULL) {init (n, flag);}
   void release ();
   int wait () __attribute__ ((regparm (1)));
   ~pinfo ()
@@ -147,7 +149,9 @@ public:
     if (destroy && procinfo)
       release ();
   }
-
+  void initialize_lock () {InitializeCriticalSection (&_lock);}
+  void lock () {EnterCriticalSection (&_lock);}
+  void unlock () {LeaveCriticalSection (&_lock);}
   _pinfo *operator -> () const {return procinfo;}
   int operator == (pinfo *x) const {return x->procinfo == procinfo;}
   int operator == (pinfo &x) const {return x.procinfo == procinfo;}
@@ -173,6 +177,20 @@ public:
 #endif
   HANDLE shared_handle () {return h;}
   void set_acl();
+};
+
+class proc_pipe
+{
+  bool _closeem;
+public:
+  HANDLE in;
+  HANDLE out;
+  void set (bool);
+  proc_pipe (bool closeem) {set (closeem);}
+  proc_pipe () : _closeem (false), in (NULL), out (NULL) {};
+  void close () {_closeem = true;}
+  ~proc_pipe ();
+  int operator == (int x) {return (int) in == x;}
 };
 
 #define ISSTATE(p, f)	(!!((p)->process_state & f))

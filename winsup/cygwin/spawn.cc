@@ -372,17 +372,15 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
 
-  child_info_spawn ciresrv;
-  si.lpReserved2 = (LPBYTE) &ciresrv;
-  si.cbReserved2 = sizeof (ciresrv);
-
-  DWORD chtype;
+  child_info_types chtype;
   if (mode != _P_OVERLAY)
     chtype = PROC_SPAWN;
   else
     chtype = PROC_EXEC;
 
-  init_child_info (chtype, &ciresrv, NULL);
+  child_info_spawn ciresrv (chtype);
+  si.lpReserved2 = (LPBYTE) &ciresrv;
+  si.cbReserved2 = sizeof (ciresrv);
 
   ciresrv.moreinfo = (cygheap_exec_info *) ccalloc (HEAP_1_EXEC, 1, sizeof (cygheap_exec_info));
   ciresrv.moreinfo->old_title = NULL;
@@ -616,16 +614,21 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   if (mode == _P_DETACH || !set_console_state_for_spawn ())
     flags |= DETACHED_PROCESS;
 
-  HANDLE saved_sendsig;
+  bool reset_sendsig = false;
   if (mode != _P_OVERLAY)
-    saved_sendsig = NULL;
+    myself->exec_sendsig = NULL;
   else
     {
       /* Reset sendsig so that any process which wants to send a signal
 	 to this pid will wait for the new process to become active.
 	 Save the old value in case the exec fails.  */
-      saved_sendsig = myself->sendsig;
-      myself->sendsig = INVALID_HANDLE_VALUE;
+      if (!myself->exec_sendsig)
+	{
+	  myself->exec_sendsig = myself->sendsig;
+	  myself->exec_dwProcessId = myself->dwProcessId;
+	  myself->sendsig = NULL;
+	  reset_sendsig = true;
+	}
       /* Save a copy of a handle to the current process around the first time we
 	 exec so that the pid will not be reused.  Why did I stop cygwin from
 	 generating its own pids again? */
@@ -636,15 +639,13 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	ProtectHandle (cygheap->pid_handle);
       else
 	system_printf ("duplicate to pid_handle failed, %E");
-      ciresrv.parent_wr_proc_pipe = myself->wr_proc_pipe;
     }
 
-  /* Start the process in a suspended state.  Needed so that any potential parent will
-     be able to take notice of the new "execed" process.  This is only really needed
-     to handle exec'ed windows processes since cygwin processes are smart enough that
-     the parent doesn't have to bother but what are you gonna do?  Cygwin lives in
-     a windows world. */
-  if (mode != _P_OVERLAY || !real_path.iscygexec ())
+  /* Some file types (currently only sockets) need extra effort in the parent
+     after CreateProcess and before copying the datastructures to the child.
+     So we have to start the child in suspend state, unfortunately, to avoid
+     a race condition. */
+  if (mode != _P_OVERLAY || cygheap->fdtab.need_fixup_before ())
     flags |= CREATE_SUSPENDED;
 
   const char *runpath = null_app_name ? NULL : (const char *) real_path;
@@ -739,8 +740,11 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       __seterrno ();
       syscall_printf ("CreateProcess failed, %E");
       /* If this was a failed exec, restore the saved sendsig. */
-      if (saved_sendsig)
-	myself->sendsig = saved_sendsig;
+      if (reset_sendsig)
+	{
+	  myself->sendsig = myself->exec_sendsig;
+	  myself->exec_sendsig = NULL;
+	}
       cygheap_setup_for_child_cleanup (newheap, &ciresrv, 0);
       return -1;
     }
@@ -780,41 +784,32 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 		  rc ? cygpid : (unsigned int) -1, prog_arg, one_line.buf);
 
   /* Name the handle similarly to proc_subproc. */
-  ProtectHandle1 (pi.hProcess, childhProc);
+  ProtectHandle (pi.hProcess);
 
-  int wait_for_myself = false;
-  DWORD exec_cygstarted;
+  bool wait_for_myself = false;
   if (mode == _P_OVERLAY)
     {
-      if (!real_path.iscygexec ())
-	{
-	  /* Store the old exec_cygstarted since this is used as a crude semaphore for
-	     detecting when the parent has noticed the change in windows pid for this
-	     cygwin pid. */
-	  exec_cygstarted = myself->cygstarted;
-	  myself->dwProcessId = dwExeced = pi.dwProcessId;  /* Reparenting needs this */
-	  myself.alert_parent (__ALERT_REPARENT);
-	}
-      CloseHandle (saved_sendsig);
+      myself->dwProcessId = dwExeced = pi.dwProcessId;
       strace.execing = 1;
-      hExeced = pi.hProcess;
+      myself.hProcess = hExeced = pi.hProcess;
       strcpy (myself->progname, real_path); // FIXME: race?
+      sigproc_printf ("new process name %s", myself->progname);
       close_all_files ();
-      /* If wr_proc_pipe is NULL then this process was not started by a cygwin
-	 process.  So, we need to wait around until the process we've just "execed"
-	 dies.  Use our own wait facility to wait for our own pid to exit (there
-	 is some minor special case code in proc_waiter and friends to accommodate
-	 this). */
+      /* If wr_proc_pipe doesn't exist then this process was not started by a cygwin
+	process.  So, we need to wait around until the process we've just "execed"
+	dies.  Use our own wait facility to wait for our own pid to exit (there
+	is some minor special case code in proc_waiter and friends to accommodeate
+	this). */
       if (!myself->wr_proc_pipe)
-	{
-	  myself.hProcess = pi.hProcess;
-	  myself.remember ();
-	  wait_for_myself = true;
-	}
+       {
+	 myself.hProcess = pi.hProcess;
+	 myself.remember ();
+	 wait_for_myself = true;
+	 myself->wr_proc_pipe = INVALID_HANDLE_VALUE;
+       }
     }
   else
     {
-      exec_cygstarted = 0;
       myself->set_has_pgid_children ();
       ProtectHandle (pi.hThread);
       pinfo child (cygpid, PID_IN_USE);
@@ -830,8 +825,9 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       child.hProcess = pi.hProcess;
       if (!child.remember ())
 	{
-	  syscall_printf ("process table full");
-	  set_errno (EAGAIN);
+	  /* FIXME: Child in strange state now. */
+	  CloseHandle (pi.hProcess);
+	  CloseHandle (pi.hThread);
 	  res = -1;
 	  goto out;
 	}
@@ -844,222 +840,217 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	 However, we should try to find another way to do this eventually. */
       (void) DuplicateHandle (hMainProc, child.shared_handle (), pi.hProcess,
 			      NULL, 0, 0, DUPLICATE_SAME_ACCESS);
+      child->start_time = time (NULL); /* Register child's starting time. */
     }
 
-  /* Start the child running */
-  if (flags & CREATE_SUSPENDED)
-    ResumeThread (pi.hThread);
-  ForceCloseHandle (pi.hThread);
-  // ForceCloseHandle (pi.hProcess);  // handled by proc_subproc and friends
+/* Start the child running */
+if (flags & CREATE_SUSPENDED)
+  ResumeThread (pi.hThread);
+ForceCloseHandle (pi.hThread);
 
-  sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
+sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
 
-  if (wait_for_myself)
-    waitpid (myself->pid, &res, 0);
-  else
-    {
-      /* Loop, waiting for parent to notice pid change, if exec_cygstarted.
-         In theory this wait should usually be a no-op.  */
-      if (exec_cygstarted)
-	while (myself->cygstarted == exec_cygstarted && myself.parent_alive ())
-	  low_priority_sleep (0);
-      res = 42;
-    }
+if (wait_for_myself)
+  waitpid (myself->pid, &res, 0);
+else
+  ciresrv.sync (myself, INFINITE);
 
-  switch (mode)
-    {
-    case _P_OVERLAY:
-      myself->exit (res, 1);
-      break;
-    case _P_WAIT:
-    case _P_SYSTEM:
-      if (waitpid (cygpid, (int *) &res, 0) != cygpid)
-	res = -1;
-      break;
-    case _P_DETACH:
-      res = 0;	/* Lose all memory of this child. */
-      break;
-    case _P_NOWAIT:
-    case _P_NOWAITO:
-    case _P_VFORK:
-      res = cygpid;
-      break;
-    default:
-      break;
-    }
+ForceCloseHandle (pi.hProcess);
+
+switch (mode)
+  {
+  case _P_OVERLAY:
+    myself->exit (res, 1);
+    break;
+  case _P_WAIT:
+  case _P_SYSTEM:
+    if (waitpid (cygpid, (int *) &res, 0) != cygpid)
+      res = -1;
+    break;
+  case _P_DETACH:
+    res = 0;	/* Lose all memory of this child. */
+    break;
+  case _P_NOWAIT:
+  case _P_NOWAITO:
+  case _P_VFORK:
+    res = cygpid;
+    break;
+  default:
+    break;
+  }
 
 out:
-  pthread_cleanup_pop (1);
-  return (int) res;
+pthread_cleanup_pop (1);
+return (int) res;
 }
 
 extern "C" int
 cwait (int *result, int pid, int)
 {
-  return waitpid (pid, result, 0);
+return waitpid (pid, result, 0);
 }
 
 /*
- * Helper function for spawn runtime calls.
- * Doesn't search the path.
- */
+* Helper function for spawn runtime calls.
+* Doesn't search the path.
+*/
 
 extern "C" int
 spawnve (int mode, const char *path, const char *const *argv,
-	 const char *const *envp)
+       const char *const *envp)
 {
-  int ret;
+int ret;
 #ifdef NEWVFORK
-  vfork_save *vf = vfork_storage.val ();
+vfork_save *vf = vfork_storage.val ();
 
-  if (vf != NULL && (vf->pid < 0) && mode == _P_OVERLAY)
-    mode = _P_NOWAIT;
-  else
-    vf = NULL;
+if (vf != NULL && (vf->pid < 0) && mode == _P_OVERLAY)
+  mode = _P_NOWAIT;
+else
+  vf = NULL;
 #endif
 
-  syscall_printf ("spawnve (%s, %s, %x)", path, argv[0], envp);
+syscall_printf ("spawnve (%s, %s, %x)", path, argv[0], envp);
 
-  switch (mode)
-    {
-    case _P_OVERLAY:
-      /* We do not pass _P_SEARCH_PATH here. execve doesn't search PATH.*/
-      /* Just act as an exec if _P_OVERLAY set. */
-      spawn_guts (path, argv, envp, mode);
-      /* Errno should be set by spawn_guts.  */
-      ret = -1;
-      break;
-    case _P_VFORK:
-    case _P_NOWAIT:
-    case _P_NOWAITO:
-    case _P_WAIT:
-    case _P_DETACH:
-    case _P_SYSTEM:
-      ret = spawn_guts (path, argv, envp, mode);
+switch (mode)
+  {
+  case _P_OVERLAY:
+    /* We do not pass _P_SEARCH_PATH here. execve doesn't search PATH.*/
+    /* Just act as an exec if _P_OVERLAY set. */
+    spawn_guts (path, argv, envp, mode);
+    /* Errno should be set by spawn_guts.  */
+    ret = -1;
+    break;
+  case _P_VFORK:
+  case _P_NOWAIT:
+  case _P_NOWAITO:
+  case _P_WAIT:
+  case _P_DETACH:
+  case _P_SYSTEM:
+    ret = spawn_guts (path, argv, envp, mode);
 #ifdef NEWVFORK
-      if (vf)
-	{
-	  if (ret > 0)
-	    {
-	      debug_printf ("longjmping due to vfork");
-	      vf->restore_pid (ret);
-	    }
-	}
+    if (vf)
+      {
+	if (ret > 0)
+	  {
+	    debug_printf ("longjmping due to vfork");
+	    vf->restore_pid (ret);
+	  }
+      }
 #endif
-      break;
-    default:
-      set_errno (EINVAL);
-      ret = -1;
-      break;
-    }
-  return ret;
+    break;
+  default:
+    set_errno (EINVAL);
+    ret = -1;
+    break;
+  }
+return ret;
 }
 
 /*
- * spawn functions as implemented in the MS runtime library.
- * Most of these based on (and copied from) newlib/libc/posix/execXX.c
- */
+* spawn functions as implemented in the MS runtime library.
+* Most of these based on (and copied from) newlib/libc/posix/execXX.c
+*/
 
 extern "C" int
 spawnl (int mode, const char *path, const char *arg0, ...)
 {
-  int i;
-  va_list args;
-  const char *argv[256];
+int i;
+va_list args;
+const char *argv[256];
 
-  va_start (args, arg0);
-  argv[0] = arg0;
-  i = 1;
+va_start (args, arg0);
+argv[0] = arg0;
+i = 1;
 
-  do
-      argv[i] = va_arg (args, const char *);
-  while (argv[i++] != NULL);
+do
+    argv[i] = va_arg (args, const char *);
+while (argv[i++] != NULL);
 
-  va_end (args);
+va_end (args);
 
-  return spawnve (mode, path, (char * const  *) argv, cur_environ ());
+return spawnve (mode, path, (char * const  *) argv, cur_environ ());
 }
 
 extern "C" int
 spawnle (int mode, const char *path, const char *arg0, ...)
 {
-  int i;
-  va_list args;
-  const char * const *envp;
-  const char *argv[256];
+int i;
+va_list args;
+const char * const *envp;
+const char *argv[256];
 
-  va_start (args, arg0);
-  argv[0] = arg0;
-  i = 1;
+va_start (args, arg0);
+argv[0] = arg0;
+i = 1;
 
-  do
-    argv[i] = va_arg (args, const char *);
-  while (argv[i++] != NULL);
+do
+  argv[i] = va_arg (args, const char *);
+while (argv[i++] != NULL);
 
-  envp = va_arg (args, const char * const *);
-  va_end (args);
+envp = va_arg (args, const char * const *);
+va_end (args);
 
-  return spawnve (mode, path, (char * const *) argv, (char * const *) envp);
+return spawnve (mode, path, (char * const *) argv, (char * const *) envp);
 }
 
 extern "C" int
 spawnlp (int mode, const char *path, const char *arg0, ...)
 {
-  int i;
-  va_list args;
-  const char *argv[256];
+int i;
+va_list args;
+const char *argv[256];
 
-  va_start (args, arg0);
-  argv[0] = arg0;
-  i = 1;
+va_start (args, arg0);
+argv[0] = arg0;
+i = 1;
 
-  do
-      argv[i] = va_arg (args, const char *);
-  while (argv[i++] != NULL);
+do
+    argv[i] = va_arg (args, const char *);
+while (argv[i++] != NULL);
 
-  va_end (args);
+va_end (args);
 
-  return spawnvpe (mode, path, (char * const *) argv, cur_environ ());
+return spawnvpe (mode, path, (char * const *) argv, cur_environ ());
 }
 
 extern "C" int
 spawnlpe (int mode, const char *path, const char *arg0, ...)
 {
-  int i;
-  va_list args;
-  const char * const *envp;
-  const char *argv[256];
+int i;
+va_list args;
+const char * const *envp;
+const char *argv[256];
 
-  va_start (args, arg0);
-  argv[0] = arg0;
-  i = 1;
+va_start (args, arg0);
+argv[0] = arg0;
+i = 1;
 
-  do
-    argv[i] = va_arg (args, const char *);
-  while (argv[i++] != NULL);
+do
+  argv[i] = va_arg (args, const char *);
+while (argv[i++] != NULL);
 
-  envp = va_arg (args, const char * const *);
-  va_end (args);
+envp = va_arg (args, const char * const *);
+va_end (args);
 
-  return spawnvpe (mode, path, (char * const *) argv, envp);
+return spawnvpe (mode, path, (char * const *) argv, envp);
 }
 
 extern "C" int
 spawnv (int mode, const char *path, const char * const *argv)
 {
-  return spawnve (mode, path, argv, cur_environ ());
+return spawnve (mode, path, argv, cur_environ ());
 }
 
 extern "C" int
 spawnvp (int mode, const char *path, const char * const *argv)
 {
-  return spawnvpe (mode, path, argv, cur_environ ());
+return spawnvpe (mode, path, argv, cur_environ ());
 }
 
 extern "C" int
 spawnvpe (int mode, const char *file, const char * const *argv,
-					     const char * const *envp)
+					   const char * const *envp)
 {
-  path_conv buf;
-  return spawnve (mode, find_exec (file, buf), argv, envp);
+path_conv buf;
+return spawnve (mode, find_exec (file, buf), argv, envp);
 }
