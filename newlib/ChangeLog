@@ -1,5 +1,14 @@
 2002-05-06  Jeff Johnston  <jjohnstn@redhat.com>
 
+	*  libc/include/sys/reent.h (_l64a_buf): New reentrant area.
+	(_REENT_L64A_BUF): New macro for accessing area.
+	*  libc/stdlib/Makefile.am: Add a64l.c and l64a.c.
+	*  libc/stdlib/Makefile.in: Regenerated.
+	*  libc/stdlib/a64l.c: New file.
+	*  libc/stdlib/l64a.c: New file.
+
+2002-05-06  Jeff Johnston  <jjohnstn@redhat.com>
+
         * libc/unix/pread.c: Fix typo for _pread_r.
         * libc/unix/pwrite.c: Fix type for _pwrite_r.
         * libc/sys/linux/pread64.c: Fix typo for read syscall.

@@ -106,6 +106,7 @@ LIB_SOURCES = \
 	__adjust.c 	\
 	__exp10.c 	\
 	__ten_mu.c 	\
+	a64l.c		\
 	abort.c  	\
 	abs.c 		\
 	assert.c  	\
@@ -131,6 +132,7 @@ LIB_SOURCES = \
 	getenv_r.c	\
 	getopt.c	\
 	jrand48.c	\
+	l64a.c		\
 	labs.c 		\
 	lcong48.c	\
 	ldiv.c  	\
@@ -200,6 +202,7 @@ libstdlib_la_LDFLAGS = -Xcompiler -nostdlib
 MALLOC_COMPILE = $(LIB_COMPILE) -DINTERNAL_NEWLIB
 
 CHEWOUT_FILES = \
+	a64l.def	\
 	abort.def	\
 	abs.def		\
 	assert.def	\
@@ -257,13 +260,13 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@mallstatsr.$(oext) msizer.$(oext) malloptr.$(oext) \
 @USE_LIBTOOL_FALSE@mallocr.$(oext)
 @USE_LIBTOOL_FALSE@lib_a_OBJECTS =  __adjust.o __exp10.o __ten_mu.o \
-@USE_LIBTOOL_FALSE@abort.o abs.o assert.o atexit.o atof.o atoff.o \
-@USE_LIBTOOL_FALSE@atoi.o atol.o bsearch.o calloc.o div.o drand48.o \
-@USE_LIBTOOL_FALSE@dtoa.o dtoastub.o ecvtbuf.o efgcvt.o environ.o \
-@USE_LIBTOOL_FALSE@envlock.o eprintf.o erand48.o exit.o getenv.o \
-@USE_LIBTOOL_FALSE@getenv_r.o getopt.o jrand48.o labs.o lcong48.o \
-@USE_LIBTOOL_FALSE@ldiv.o ldtoa.o lrand48.o malign.o malloc.o mblen.o \
-@USE_LIBTOOL_FALSE@mblen_r.o mbstowcs.o mbstowcs_r.o mbtowc.o \
+@USE_LIBTOOL_FALSE@a64l.o abort.o abs.o assert.o atexit.o atof.o \
+@USE_LIBTOOL_FALSE@atoff.o atoi.o atol.o bsearch.o calloc.o div.o \
+@USE_LIBTOOL_FALSE@drand48.o dtoa.o dtoastub.o ecvtbuf.o efgcvt.o \
+@USE_LIBTOOL_FALSE@environ.o envlock.o eprintf.o erand48.o exit.o \
+@USE_LIBTOOL_FALSE@getenv.o getenv_r.o getopt.o jrand48.o l64a.o labs.o \
+@USE_LIBTOOL_FALSE@lcong48.o ldiv.o ldtoa.o lrand48.o malign.o malloc.o \
+@USE_LIBTOOL_FALSE@mblen.o mblen_r.o mbstowcs.o mbstowcs_r.o mbtowc.o \
 @USE_LIBTOOL_FALSE@mbtowc_r.o mlock.o mprec.o mrand48.o msize.o \
 @USE_LIBTOOL_FALSE@mstats.o mtrim.o nrand48.o putenv.o putenv_r.o \
 @USE_LIBTOOL_FALSE@qsort.o rand.o rand48.o rand_r.o realloc.o seed48.o \
@@ -279,21 +282,22 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 @USE_LIBTOOL_TRUE@mallinfor.$(oext) mallstatsr.$(oext) msizer.$(oext) \
 @USE_LIBTOOL_TRUE@malloptr.$(oext) mallocr.$(oext)
 @USE_LIBTOOL_TRUE@libstdlib_la_OBJECTS =  __adjust.lo __exp10.lo \
-@USE_LIBTOOL_TRUE@__ten_mu.lo abort.lo abs.lo assert.lo atexit.lo \
-@USE_LIBTOOL_TRUE@atof.lo atoff.lo atoi.lo atol.lo bsearch.lo calloc.lo \
-@USE_LIBTOOL_TRUE@div.lo drand48.lo dtoa.lo dtoastub.lo ecvtbuf.lo \
-@USE_LIBTOOL_TRUE@efgcvt.lo environ.lo envlock.lo eprintf.lo erand48.lo \
-@USE_LIBTOOL_TRUE@exit.lo getenv.lo getenv_r.lo getopt.lo jrand48.lo \
-@USE_LIBTOOL_TRUE@labs.lo lcong48.lo ldiv.lo ldtoa.lo lrand48.lo \
-@USE_LIBTOOL_TRUE@malign.lo malloc.lo mblen.lo mblen_r.lo mbstowcs.lo \
-@USE_LIBTOOL_TRUE@mbstowcs_r.lo mbtowc.lo mbtowc_r.lo mlock.lo mprec.lo \
-@USE_LIBTOOL_TRUE@mrand48.lo msize.lo mstats.lo mtrim.lo nrand48.lo \
-@USE_LIBTOOL_TRUE@putenv.lo putenv_r.lo qsort.lo rand.lo rand48.lo \
-@USE_LIBTOOL_TRUE@rand_r.lo realloc.lo seed48.lo setenv.lo setenv_r.lo \
-@USE_LIBTOOL_TRUE@srand48.lo strdup.lo strdup_r.lo strtod.lo strtol.lo \
-@USE_LIBTOOL_TRUE@strtoll.lo strtoll_r.lo strtoul.lo strtoull.lo \
-@USE_LIBTOOL_TRUE@strtoull_r.lo system.lo valloc.lo wcstombs.lo \
-@USE_LIBTOOL_TRUE@wcstombs_r.lo wctomb.lo wctomb_r.lo
+@USE_LIBTOOL_TRUE@__ten_mu.lo a64l.lo abort.lo abs.lo assert.lo \
+@USE_LIBTOOL_TRUE@atexit.lo atof.lo atoff.lo atoi.lo atol.lo bsearch.lo \
+@USE_LIBTOOL_TRUE@calloc.lo div.lo drand48.lo dtoa.lo dtoastub.lo \
+@USE_LIBTOOL_TRUE@ecvtbuf.lo efgcvt.lo environ.lo envlock.lo eprintf.lo \
+@USE_LIBTOOL_TRUE@erand48.lo exit.lo getenv.lo getenv_r.lo getopt.lo \
+@USE_LIBTOOL_TRUE@jrand48.lo l64a.lo labs.lo lcong48.lo ldiv.lo \
+@USE_LIBTOOL_TRUE@ldtoa.lo lrand48.lo malign.lo malloc.lo mblen.lo \
+@USE_LIBTOOL_TRUE@mblen_r.lo mbstowcs.lo mbstowcs_r.lo mbtowc.lo \
+@USE_LIBTOOL_TRUE@mbtowc_r.lo mlock.lo mprec.lo mrand48.lo msize.lo \
+@USE_LIBTOOL_TRUE@mstats.lo mtrim.lo nrand48.lo putenv.lo putenv_r.lo \
+@USE_LIBTOOL_TRUE@qsort.lo rand.lo rand48.lo rand_r.lo realloc.lo \
+@USE_LIBTOOL_TRUE@seed48.lo setenv.lo setenv_r.lo srand48.lo strdup.lo \
+@USE_LIBTOOL_TRUE@strdup_r.lo strtod.lo strtol.lo strtoll.lo \
+@USE_LIBTOOL_TRUE@strtoll_r.lo strtoul.lo strtoull.lo strtoull_r.lo \
+@USE_LIBTOOL_TRUE@system.lo valloc.lo wcstombs.lo wcstombs_r.lo \
+@USE_LIBTOOL_TRUE@wctomb.lo wctomb_r.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

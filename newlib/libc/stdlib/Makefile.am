@@ -8,6 +8,7 @@ LIB_SOURCES = \
 	__adjust.c 	\
 	__exp10.c 	\
 	__ten_mu.c 	\
+	a64l.c		\
 	abort.c  	\
 	abs.c 		\
 	assert.c  	\
@@ -33,6 +34,7 @@ LIB_SOURCES = \
 	getenv_r.c	\
 	getopt.c	\
 	jrand48.c	\
+	l64a.c		\
 	labs.c 		\
 	lcong48.c	\
 	ldiv.c  	\
@@ -141,6 +143,7 @@ malloptr.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_MALLOPT -c $(srcdir)/mallocr.c -o $@
 
 CHEWOUT_FILES= \
+	a64l.def	\
 	abort.def	\
 	abs.def		\
 	assert.def	\

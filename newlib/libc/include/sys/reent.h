@@ -253,6 +253,7 @@ struct _misc_reent
   int _mblen_state;
   int _wctomb_state;
   int _mbtowc_state;
+  char _l64a_buf[8];
 };
 
 /* This version of _reent is layed our with "int"s in pairs, to help
@@ -394,6 +395,7 @@ struct _reent
   _r->_misc->_mblen_state = 0; \
   _r->_misc->_wctomb_state = 0; \
   _r->_misc->_mbtowc_state = 0; \
+  _r->_misc->_l64a_buf[0] = '\0'; \
 } while (0)
 #define _REENT_CHECK_MISC(var) \
   _REENT_CHECK(var, _misc, struct _misc_reent *, sizeof *((var)->_misc), _REENT_INIT_MISC(var))
@@ -414,6 +416,7 @@ struct _reent
 #define _REENT_MBLEN_STATE(ptr)	((ptr)->_misc->_mblen_state)
 #define _REENT_MBTOWC_STATE(ptr)((ptr)->_misc->_mbtowc_state)
 #define _REENT_WCTOMB_STATE(ptr)((ptr)->_misc->_wctomb_state)
+#define _REENT_L64A_BUF(ptr)    ((ptr)->_misc->_l64a_buf)
 
 #else /* !_REENT_SMALL */
 
@@ -460,6 +463,7 @@ struct _reent
           int _mblen_state;
           int _mbtowc_state;
           int _wctomb_state;
+          char _l64a_buf[8];
         } _reent;
   /* Two next two fields were once used by malloc.  They are no longer
      used. They are used to preserve the space used before so as to
@@ -492,7 +496,7 @@ struct _reent
     { 0,0,0,0,0,0,0,0}, 0, 1, \
     {{_RAND48_SEED_0, _RAND48_SEED_1, _RAND48_SEED_2}, \
      {_RAND48_MULT_0, _RAND48_MULT_1, _RAND48_MULT_2}, _RAND48_ADD}, \
-    0, 0, 0} } }
+    0, 0, 0, ""} } }
 
 #define _REENT_INIT_PTR(var) \
   { int i; \
@@ -532,6 +536,7 @@ struct _reent
     var->_new._reent._mblen_state = 0; \
     var->_new._reent._mbtowc_state = 0; \
     var->_new._reent._wctomb_state = 0; \
+    var->_new._reent._l64a_buf[0] = '\0'; \
   }
 
 #define _REENT_CHECK_RAND48(ptr)	/* nothing */
@@ -557,6 +562,7 @@ struct _reent
 #define _REENT_MBLEN_STATE(ptr)	((ptr)->_new._reent._mblen_state)
 #define _REENT_MBTOWC_STATE(ptr)((ptr)->_new._reent._mbtowc_state)
 #define _REENT_WCTOMB_STATE(ptr)((ptr)->_new._reent._wctomb_state)
+#define _REENT_L64A_BUF(ptr)    ((ptr)->_new._reent._l64a_buf)
 
 #endif /* !_REENT_SMALL */
 
