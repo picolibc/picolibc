@@ -89,7 +89,7 @@ static DWORD available_drives;
 static int normalize_win32_path (const char *src, char *dst);
 static void slashify (const char *src, char *dst, int trailing_slash_p);
 static void backslashify (const char *src, char *dst, int trailing_slash_p);
-static int path_prefix_p_ (const char *path1, const char *path2, int len1);
+static int path_prefix_p (const char *path1, const char *path2, int len1);
 
 struct symlink_info
 {
@@ -108,10 +108,6 @@ struct symlink_info
 
 int pcheck_case = PCHECK_RELAXED; /* Determines the case check behaviour. */
 
-#define path_prefix_p(p1, p2, l1) \
-       ((cyg_tolower(*(p1))==cyg_tolower(*(p2))) && \
-       path_prefix_p_(p1, p2, l1))
-
 /* Determine if path prefix matches current cygdrive */
 #define iscygdrive(path) \
   (path_prefix_p (mount_table->cygdrive, (path), mount_table->cygdrive_len))
@@ -120,12 +116,6 @@ int pcheck_case = PCHECK_RELAXED; /* Determines the case check behaviour. */
   (iscygdrive(path) && isalpha(path[mount_table->cygdrive_len]) && \
    (isdirsep(path[mount_table->cygdrive_len + 1]) || \
     !path[mount_table->cygdrive_len + 1]))
-
-#define ischrootpath(p) \
-	(cygheap->root.length () && \
-	 strncasematch (cygheap->root.path (), p, cygheap->root.length ()) && \
-	 (p[cygheap->root.length ()] == '/' \
-	  || p[cygheap->root.length ()] == '\0'))
 
 /* Return non-zero if PATH1 is a prefix of PATH2.
    Both are assumed to be of the same path style and / vs \ usage.
@@ -141,8 +131,8 @@ int pcheck_case = PCHECK_RELAXED; /* Determines the case check behaviour. */
    /foo is not a prefix of /foobar
 */
 
-static int
-path_prefix_p_ (const char *path1, const char *path2, int len1)
+int
+path_prefix_p (const char *path1, const char *path2, int len1)
 {
   /* Handle case where PATH1 has trailing '/' and when it doesn't.  */
   if (len1 > 0 && SLASH_P (path1[len1 - 1]))
@@ -182,7 +172,7 @@ pathmatch (const char *path1, const char *path2)
 
 #define isslash(c) ((c) == '/')
 
-static int
+int
 normalize_posix_path (const char *src, char *dst)
 {
   const char *src_start = src;
@@ -211,11 +201,6 @@ normalize_posix_path (const char *src, char *dst)
   /* Two leading /'s?  If so, preserve them.  */
   else if (isslash (src[1]))
     {
-      if (cygheap->root.length ())
-	{
-	  debug_printf ("ENOENT = normalize_posix_path (%s)", src);
-	  return ENOENT;
-	}
       *dst++ = '/';
       *dst++ = '/';
       src += 2;
@@ -225,12 +210,6 @@ normalize_posix_path (const char *src, char *dst)
 	  *dst++ = '/';
 	  src = src_start + 1;
 	}
-    }
-  /* Exactly one leading slash. Absolute path. Check for chroot. */
-  else if (cygheap->root.length ())
-    {
-      strcpy (dst, cygheap->root.path ());
-      dst += cygheap->root.length ();
     }
   else
     *dst = '\0';
@@ -264,14 +243,6 @@ normalize_posix_path (const char *src, char *dst)
 		}
 	      else if (src[2] && !isslash (src[2]))
 		break;
-	      else
-		{
-		  if (!ischrootpath (dst_start) ||
-		      dst - dst_start != (int) cygheap->root.length ())
-		    while (dst > dst_start && !isslash (*--dst))
-		      continue;
-		  src++;
-		}
 	    }
 
 	  *dst++ = '/';
@@ -442,7 +413,10 @@ path_conv::check (const char *src, unsigned opt,
 
 	  /* Convert to native path spec sans symbolic link info. */
 	  error = mount_table->conv_to_win32_path (path_copy, full_path, devn,
-						   unit, &sym.pflags);
+						   unit, &sym.pflags, 1);
+
+	  if (error)
+	    return;
 
 	  /* devn should not be a device.  If it is, then stop parsing now. */
 	  if (devn != FH_BAD)
@@ -891,24 +865,8 @@ normalize_win32_path (const char *src, char *dst)
 
   if (beg_src_slash && isdirsep (src[1]))
     {
-      if (cygheap->root.length ())
-	{
-	  debug_printf ("ENOENT = normalize_win32_path (%s)", src);
-	  return ENOENT;
-	}
       *dst++ = '\\';
       ++src;
-    }
-  /* If absolute path, care for chroot. */
-  else if (beg_src_slash  && cygheap->root.length ())
-    {
-      strcpy (dst, cygheap->root.path ());
-      char *c;
-      while ((c = strchr (dst, '/')) != NULL)
-	*c = '\\';
-      dst += cygheap->root.length ();
-      dst_root_start = dst;
-      *dst++ = '\\';
     }
   else if (strchr (src, ':') == NULL && *src != '/')
     {
@@ -1127,7 +1085,8 @@ mount_info::init ()
 
 int
 mount_info::conv_to_win32_path (const char *src_path, char *dst,
-				DWORD &devn, int &unit, unsigned *flags)
+				DWORD &devn, int &unit, unsigned *flags,
+				bool no_normalize)
 {
   while (sys_mount_table_counter < cygwin_shared->sys_mount_table_counter)
     {
@@ -1137,6 +1096,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
   int src_path_len = strlen (src_path);
   MALLOC_CHECK;
   unsigned dummy_flags;
+  int chroot_ok = !cygheap->root.exists ();
 
   devn = FH_BAD;
   unit = 0;
@@ -1173,22 +1133,6 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
 	}
 
       *flags = set_flags_from_win32_path (dst);
-      if (cygheap->root.length () && dst[0] && dst[1] == ':')
-	{
-	  char posix_path[MAX_PATH + 1];
-
-	  rc = mount_table->conv_to_posix_path (dst, posix_path, 0);
-	  if (rc)
-	    {
-	      debug_printf ("conv_to_posix_path failed, rc %d", rc);
-	      return rc;
-	    }
-	  if (!ischrootpath (posix_path))
-	    {
-	      debug_printf ("ischrootpath failed");
-	      return ENOENT;
-	    }
-	}
       goto out;
     }
 
@@ -1208,20 +1152,26 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
      converting it to a DOS-style path, looking up the appropriate drive
      in the mount table.  */
 
-  rc = normalize_posix_path (src_path, pathbuf);
-
-  if (rc)
+  if (no_normalize)
+    strcpy (pathbuf, src_path);
+  else
     {
-      debug_printf ("%d = conv_to_win32_path (%s)", rc, src_path);
-      *flags = 0;
-      return rc;
+      rc = normalize_posix_path (src_path, pathbuf);
+
+      if (rc)
+	{
+	  debug_printf ("%d = conv_to_win32_path (%s)", rc, src_path);
+	  *flags = 0;
+	  return rc;
+	}
     }
 
   /* See if this is a cygwin "device" */
   if (win32_device_name (pathbuf, dst, devn, unit))
     {
       *flags = MOUNT_BINARY;	/* FIXME: Is this a sensible default for devices? */
-      goto out;
+      rc = 0;
+      goto out_no_chroot_check;
     }
 
   /* Check if the cygdrive prefix was specified.  If so, just strip
@@ -1235,11 +1185,33 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
       goto out;
     }
 
+  int chrooted_path_len;
+  chrooted_path_len = 0;
   /* Check the mount table for prefix matches. */
   for (i = 0; i < nmounts; i++)
     {
+      const char *path;
+      int len;
+
       mi = mount + posix_sorted[i];
-      if (path_prefix_p (mi->posix_path, pathbuf, mi->posix_pathlen))
+      if (!cygheap->root.exists ()
+	  || (mi->posix_pathlen == 1 && mi->posix_path[0] == '/'))
+	{
+	  path = mi->posix_path;
+	  len = mi->posix_pathlen;
+	}
+      else if (cygheap->root.posix_ok (mi->posix_path))
+	{
+	  path = cygheap->root.unchroot (mi->posix_path);
+	  chrooted_path_len = len = strlen (path);
+	}
+      else
+	{
+	  chrooted_path_len = 0;
+	  continue;
+	}
+
+      if (path_prefix_p (path, pathbuf, len))
 	break;
     }
 
@@ -1250,9 +1222,26 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
     }
   else
     {
-      int n = mi->native_pathlen;
-      memcpy (dst, mi->native_path, n + 1);
-      char *p = pathbuf + mi->posix_pathlen;
+      int n;
+      const char *native_path;
+      int posix_pathlen;
+      if (chroot_ok || chrooted_path_len || mi->posix_pathlen != 1
+	  || mi->posix_path[0] != '/')
+	{
+	  n = mi->native_pathlen;
+	  native_path = mi->native_path;
+	  posix_pathlen = chrooted_path_len ?: mi->posix_pathlen;
+	  chroot_ok = 1;
+	}
+      else
+	{
+	  n = cygheap->root.native_length ();
+	  native_path = cygheap->root.native_path ();
+	  posix_pathlen = mi->posix_pathlen;
+	  chroot_ok = 1;
+	}
+      memcpy (dst, native_path, n + 1);
+      const char *p = pathbuf + posix_pathlen;
       if (*p == '/')
 	/* nothing */;
       else if ((isdrive (dst) && !dst[2]) || *p)
@@ -1262,10 +1251,20 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
       *flags = mi->flags;
     }
 
-out:
+ out:
   MALLOC_CHECK;
-  debug_printf ("src_path %s, dst %s, flags %p", src_path, dst, *flags);
-  return 0;
+  if (chroot_ok || cygheap->root.ischroot_native (dst))
+    rc = 0;
+  else
+    {
+      debug_printf ("attempt to access outside of chroot '%s = %s'",
+		    cygheap->root.posix_path (), cygheap->root.native_path ());
+      rc = ENOENT;
+    }
+
+ out_no_chroot_check:
+  debug_printf ("src_path %s, dst %s, flags %p, rc %d", src_path, dst, *flags, rc);
+  return rc;
 }
 
 /* cygdrive_posix_path: Build POSIX path used as the
@@ -1370,6 +1369,9 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
       if (!path_prefix_p (mi.native_path, pathbuf, mi.native_pathlen))
 	continue;
 
+      if (cygheap->root.exists () && !cygheap->root.posix_ok (mi.posix_path))
+	continue;
+
       /* SRC_PATH is in the mount table. */
       int nextchar;
       const char *p = pathbuf + mi.native_pathlen;
@@ -1391,8 +1393,30 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
 	slashify (p,
 		  posix_path + addslash + (mi.posix_pathlen == 1 ? 0 : mi.posix_pathlen),
 		  trailing_slash_p);
+
+      if (cygheap->root.exists ())
+	{
+	  const char *p = cygheap->root.unchroot (posix_path);
+	  memmove (posix_path, p, strlen (p) + 1);
+	}
       goto out;
     }
+
+  if (!cygheap->root.exists ())
+    /* nothing */;
+  else if (cygheap->root.ischroot_native (pathbuf))
+    {
+      const char *p = pathbuf + cygheap->root.native_length ();
+      if (*p)
+	slashify (p, posix_path, trailing_slash_p);
+      else
+	{
+	  posix_path[0] = '/';
+	  posix_path[1] = '\0';
+	}
+    }
+  else
+    return ENOENT;
 
   /* Not in the database.  This should [theoretically] only happen if either
      the path begins with //, or / isn't mounted, or the path has a drive
@@ -3336,11 +3360,9 @@ cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
   if (!need_posix)
     tocopy = win32;
   else
-    tocopy = with_chroot && ischrootpath(posix) ?
-	     posix + cygheap->root.length () : posix;
+    tocopy = posix;
 
-  debug_printf("cygheap->root: %s, posix: %s",
-	       (const char *) cygheap->root.path (), posix);
+  debug_printf("posix %s", posix);
   if (strlen (tocopy) >= ulen)
     {
       set_errno (ERANGE);

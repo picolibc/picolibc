@@ -1,3 +1,34 @@
+Sat Jun  2 14:07:28 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* cygheap.cc (cygheap_root::cygheap_rot): Remove constructor.
+	(cygheap_root::~cygheap_root): Remove destructor.
+	(cygheap_root::operator =): Remove.
+	(cygheap_root::set): New method.
+	* cygheap.h (cygheap_root): Reflect above changes.  Store root info in
+	mount-like structure.
+	(cygheap_root:posix_ok): New method.
+	(cygheap_root::ischroot_native): Ditto.
+	(cygheap_root::unchroot): Ditto.
+	(cygheap_root::exists): Ditto.
+	(cygheap_root::posix_length): Ditto.
+	(cygheap_root::posix_path): Ditto.
+	(cygheap_root::native_length): Ditto.
+	(cygheap_root::native_path): Ditto.
+	* dir.cc (opendir): Remove special chroot test.
+	* path.cc (path_prefix_p): Remove front end.
+	(normalize_posix_path): Reorganize chroot tests to accomodate new
+	convention of allowing paths using posix chroot prefix.
+	(path_conv::check): Pass a "already ran normalize" option to
+	conv_to_win32_path.  Return if there is an error from this function.
+	(mount_info::conv_to_win32_path): Add extra argument.  Don't call
+	normalize_posix_path if caller has already done so.  Substitute chroot
+	setting, if any, for root translation.  Add chroot checking to final
+	output step.
+	* shared_info (mount_info): Accomodate additional argument to
+	conv_to_win32_path.
+	* syscalls.cc (chroot): Store both normalized posix path and native
+	path in chroot.
+
 Fri Jun  1 10:57:19 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (chdir): Really make sure that isspace gets only an unsigned

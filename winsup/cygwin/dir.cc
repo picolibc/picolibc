@@ -78,8 +78,7 @@ opendir (const char *dirname)
       goto failed;
     }
 
-  if (stat (cygheap->root.length () ? dirname : real_dirname.get_win32 (),
-	    &statbuf) == -1)
+  if (stat (real_dirname, &statbuf) == -1)
     goto failed;
 
   if (!(statbuf.st_mode & S_IFDIR))
@@ -88,7 +87,7 @@ opendir (const char *dirname)
       goto failed;
     }
 
-  len = strlen (real_dirname.get_win32 ());
+  len = strlen (real_dirname);
   if (len > MAX_PATH - 3)
     {
       set_errno (ENAMETOOLONG);

@@ -290,40 +290,20 @@ cstrdup1 (const char *s)
   return p;
 }
 
-cygheap_root::cygheap_root (cygheap_root &nroot)
+void
+cygheap_root::set (const char *posix, const char *native)
 {
-  rootlen = nroot.rootlen;
-  root = nroot.root ? cstrdup (nroot.root) : NULL;
-}
+  if (!m)
+    m = (struct cygheap_root_mount_info *) ccalloc (HEAP_MOUNT, 1, sizeof (*m));
+  strcpy (m->posix_path, posix);
+  m->posix_pathlen = strlen (posix);
+  if (m->posix_pathlen >= 1 && m->posix_path[m->posix_pathlen - 1] == '/')
+    m->posix_path[--m->posix_pathlen] = '\0';
 
-cygheap_root::~cygheap_root ()
-{
-  if (root)
-    cfree (root);
-}
-
-char *
-cygheap_root::operator =(const char *new_root)
-{
-  if (root)
-    {
-      cfree (root);
-      root = NULL;
-    }
-  rootlen = 0;
-  if (new_root && *new_root)
-    {
-      root = cstrdup (new_root);
-      rootlen = strlen (root);
-      if (rootlen >= 1 && root[rootlen - 1] == '/')
-	root[--rootlen] = '\0';
-      if (!rootlen)
-	{
-	  cfree (root);
-	  root = NULL;
-	}
-    }
-  return root;
+  strcpy (m->native_path, native);
+  m->native_pathlen = strlen (native);
+  if (m->native_pathlen >= 1 && m->native_path[m->native_pathlen - 1] == '\\')
+    m->native_path[--m->native_pathlen] = '\0';
 }
 
 cygheap_user::~cygheap_user ()

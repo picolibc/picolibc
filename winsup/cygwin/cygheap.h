@@ -16,6 +16,7 @@ enum cygheap_types
   HEAP_STR,
   HEAP_ARGV,
   HEAP_BUF,
+  HEAP_MOUNT,
   HEAP_1_START,
   HEAP_1_STR,
   HEAP_1_ARGV,
@@ -37,18 +38,51 @@ struct _cmalloc_entry
   char data[0];
 };
 
+struct cygheap_root_mount_info
+{
+  char posix_path[MAX_PATH];
+  unsigned posix_pathlen;
+  char native_path[MAX_PATH];
+  unsigned native_pathlen;
+};
+
 class cygheap_root
 {
   /* Root directory information.
      This is used after a chroot is called. */
-  size_t rootlen;
-  char *root;
+  struct cygheap_root_mount_info *m;
+
 public:
-  cygheap_root (cygheap_root &nroot);
-  ~cygheap_root ();
-  char *operator =(const char *new_root);
-  size_t length () const { return rootlen; }
-  const char *path () const { return root; }
+  bool posix_ok (const char *path)
+  {
+    extern int path_prefix_p (const char *, const char *, int);
+    if (!m)
+      return 1;
+    return path_prefix_p (m->posix_path, path, m->posix_pathlen);
+  }
+  bool ischroot_native (const char *path)
+  {
+    if (!m)
+      return 1;
+    return strncasematch (m->native_path, path, m->native_pathlen)
+            && (path[m->native_pathlen] == '\\' || !path[m->native_pathlen]);
+ 
+  }
+  const char *unchroot (const char *path)
+  {
+    if (!m)
+      return path;
+    const char *p = path + m->posix_pathlen;
+    if (!*p)
+      p = "/";
+    return p;
+  }
+  bool exists () {return !!m;}
+  void set (const char *posix, const char *native);
+  size_t posix_length () const { return m->posix_pathlen; }
+  const char *posix_path () const { return m->posix_path; }
+  size_t native_length () const { return m->native_pathlen; }
+  const char *native_path () const { return m->native_path; }
 };
 
 class cygheap_user

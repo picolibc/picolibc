@@ -38,6 +38,8 @@ details. */
 #include "security.h"
 #include "cygheap.h"
 
+extern int normalize_posix_path (const char *, char *);
+
 SYSTEM_INFO system_info;
 
 /* Close all files and process any queued deletions.
@@ -2195,19 +2197,14 @@ chroot (const char *newroot)
       set_errno (ENOENT);
       goto done;
     }
-  if (! (path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY))
+  if (!(path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY))
     {
       set_errno (ENOTDIR);
       goto done;
     }
-  char buf[MAX_PATH + 1];
-  ret = mount_table->conv_to_posix_path (path.get_win32 (), buf, 0);
-  if (ret)
-    {
-      set_errno (ret);
-      goto done;
-    }
-  cygheap->root = buf;
+  char buf[MAX_PATH];
+  normalize_posix_path (newroot, buf);
+  cygheap->root.set (buf, path);
   ret = 0;
 
 done:
