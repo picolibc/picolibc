@@ -1,3 +1,8 @@
+2003-03-16  Vadim Yegorov  <zg@bmg.lv>
+
+	* winioctl.h (FSCTL_SET_REPARSE_POINT: Correct macro.
+	(FSCTL_DELETE_REPARSE_POINT): Likewise.
+
 2003-03-15  Bang Jun-Young  <junyoung@netbsd.org>
 
 	* winnt.h (JOBOBJECTINFOCLASS): Define enum.
