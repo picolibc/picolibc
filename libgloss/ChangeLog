@@ -1,3 +1,20 @@
+2003-06-06  Stan Cox  <scox@redhat.com>
+            Jeff Johnston  <jjohnstn@redhat.com>
+            Anthony Green  <green@redhat.com>
+
+	* configure.in: Add iq2000 support.  
+	* configure: Rebuilt.  
+	* iq2000/Makefile.in, iq2000/access.c, iq2000/_exit.c,
+	iq2000/configure, iq2000/chmod.c, iq2000/chown.c, iq2000/close.c,
+	iq2000/configure.in, iq2000/creat.c, iq2000/crt0.S, iq2000/crt1.c,
+	iq2000/execv.c, iq2000/execve.c, iq2000/fork.c, iq2000/fstat.c,
+	iq2000/getpid.c, iq2000/gettime.c, iq2000/isatty.c, iq2000/kill.c,
+	iq2000/lseek.c, iq2000/open.c, iq2000/pipe.c, iq2000/read.c,
+	iq2000/sbrk.c, iq2000/sim.ld, iq2000/stat.c, iq2000/test.c,
+	iq2000/time.c, iq2000/times.c, iq2000/trap.c, iq2000/trap.h,
+	iq2000/unlink.c, iq2000/utime.c, iq2000/wait.c, iq2000/write.c:
+	New files.
+
 2003-05-27  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libnosys/Makefile.in: Add errno.o.

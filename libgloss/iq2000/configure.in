@@ -1,0 +1,115 @@
+# Copyright (c) 2000, Cygnus Solutions, A Red Hat Company
+#
+# The authors hereby grant permission to use, copy, modify, distribute,
+# and license this software and its documentation for any purpose, provided
+# that existing copyright notices are retained in all copies and that this
+# notice is included verbatim in any distributions. No written agreement,
+# license, or royalty fee is required for any of the authorized uses.
+# Modifications to this software may be copyrighted by their authors
+# and need not follow the licensing terms described here, provided that
+# the new terms are clearly indicated on the first page of each file where
+# they apply.
+#
+# Process this file with autoconf to produce a configure script.
+#
+AC_PREREQ(2.5)dnl
+AC_INIT(crt0.S)
+
+if test "${enable_shared}" = "yes" ; then
+    echo "Shared libraries not supported for cross compiling, ignored"
+fi
+
+if test "$srcdir" = "." ; then
+  if test "${with_target_subdir}" != "." ; then
+    libgloss_topdir="${srcdir}/${with_multisrctop}../../.."
+  else
+    libgloss_topdir="${srcdir}/${with_multisrctop}../.."
+  fi
+else
+  libgloss_topdir="${srcdir}/../.."
+fi
+AC_CONFIG_AUX_DIR($libgloss_topdir)
+
+AC_CANONICAL_SYSTEM
+AC_ARG_PROGRAM
+
+AC_PROG_INSTALL
+
+# FIXME: We temporarily define our own version of AC_PROG_CC.  This is
+# copied from autoconf 2.12, but does not call AC_PROG_CC_WORKS.  We
+# are building a library that must be included in all links, so we 
+# can't link an executable until this lib is built.
+# autoconf should provide a way to do this.
+
+AC_DEFUN(LIB_AC_PROG_CC,
+[AC_BEFORE([$0], [AC_PROG_CPP])dnl
+AC_CHECK_PROG(CC, gcc, gcc)
+if test -z "$CC"; then
+  AC_CHECK_PROG(CC, cc, cc, , , /usr/ucb/cc)
+  test -z "$CC" && AC_MSG_ERROR([no acceptable cc found in \$PATH])
+fi
+
+AC_PROG_CC_GNU
+
+if test $ac_cv_prog_gcc = yes; then
+  GCC=yes
+dnl Check whether -g works, even if CFLAGS is set, in case the package
+dnl plays around with CFLAGS (such as to build both debugging and
+dnl normal versions of a library), tasteless as that idea is.
+  ac_test_CFLAGS="${CFLAGS+set}"
+  ac_save_CFLAGS="$CFLAGS"
+  CFLAGS=
+  AC_PROG_CC_G
+  if test "$ac_test_CFLAGS" = set; then
+    CFLAGS="$ac_save_CFLAGS"
+  elif test $ac_cv_prog_cc_g = yes; then
+    CFLAGS="-g -O2"
+  else
+    CFLAGS="-O2"
+  fi
+else
+  GCC=
+  test "${CFLAGS+set}" = set || CFLAGS="-g"
+fi
+])
+
+LIB_AC_PROG_CC
+AS=${AS-as}
+AC_SUBST(AS)
+AR=${AR-ar}
+AC_SUBST(AR)
+LD=${LD-ld}
+AC_SUBST(LD)
+AC_PROG_RANLIB
+
+host_makefile_frag=${srcdir}/../config/default.mh
+
+if test "${with_multisubdir}" = "m32"; then
+  LD_TYPE="m32"
+else
+  LD_TYPE="m16"
+fi
+AC_SUBST(LD_TYPE)
+ 
+dnl We have to assign the same value to other variables because autoconf
+dnl doesn't provide a mechanism to substitute a replacement keyword with
+dnl arbitrary data or pathnames.
+dnl
+host_makefile_frag_path=$host_makefile_frag
+AC_SUBST(host_makefile_frag_path)
+AC_SUBST_FILE(host_makefile_frag)
+target_makefile_frag_path=$target_makefile_frag
+AC_SUBST(target_makefile_frag_path)
+AC_SUBST_FILE(target_makefile_frag)
+AC_SUBST(part_specific_obj)
+
+AC_OUTPUT(Makefile,
+. ${libgloss_topdir}/config-ml.in,
+srcdir=${srcdir}
+target=${target}
+ac_configure_args="${ac_configure_args} --enable-multilib"
+CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
+libgloss_topdir=${libgloss_topdir}
+)
+
+
