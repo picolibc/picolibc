@@ -262,12 +262,11 @@ proc_subproc (DWORD what, DWORD val)
       break;
 
     /* A child process had terminated.
-     * Possibly this is just due to an exec().  Cygwin implements an exec()
-     * as a "handoff" from one windows process to another.  If child->hProcess
-     * is different from what is recorded in hchildren, then this is an exec().
-     * Otherwise this is a normal child termination event.
-     * (called from wait_subproc thread)
-     */
+       Possibly this is just due to an exec().  Cygwin implements an exec()
+       as a "handoff" from one windows process to another.  If child->hProcess
+       is different from what is recorded in hchildren, then this is an exec().
+       Otherwise this is a normal child termination event.
+       (called from wait_subproc thread) */
     case PROC_CHILDTERMINATED:
       if (hchildren[val] != pchildren[val]->hProcess)
 	{

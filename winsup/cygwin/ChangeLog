@@ -1,3 +1,8 @@
+Sat Nov  4 22:07:03 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (handle_sigsuspend): Record frame here for signalling.
+	(set_process_mask): Ditto.
+
 Sat Nov  4 14:24:10 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* sigproc.cc (wait_subproc): Still more debugging cleanup.

@@ -554,6 +554,7 @@ stack (void)
 int __stdcall
 handle_sigsuspend (sigset_t tempmask)
 {
+  sigframe thisframe (mainthread); 
   sigset_t oldmask = myself->getsigmask ();	// Remember for restoration
 
   set_process_mask (tempmask & ~SIG_NONMASKABLE);// Let signals we're
@@ -872,6 +873,7 @@ ctrl_c_handler (DWORD type)
 extern "C" void __stdcall
 set_process_mask (sigset_t newmask)
 {
+  sigframe thisframe (mainthread); 
   mask_sync->acquire (INFINITE);
   sigset_t oldmask = myself->getsigmask ();
   newmask &= ~SIG_NONMASKABLE;
