@@ -519,7 +519,7 @@ path_conv::check (const char *src, unsigned opt,
 	    }
           else if (isvirtual_dev (devn))
             {
-	      /* FIXME: Fix this.  Calling build_fhandler here is not the right way to handle this. */
+	      /* FIXME: Calling build_fhandler here is not the right way to handle this. */
               fhandler_virtual *fh =
                 (fhandler_virtual *) cygheap->fdtab.build_fhandler (-1, devn, path_copy, NULL, unit);
               int file_type = fh->exists (path_copy);
