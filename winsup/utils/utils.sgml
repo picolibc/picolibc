@@ -641,21 +641,23 @@ table.</para>
 <sect2 id="strace"><title>strace</title>
 
 <screen>
-Usage strace [options] program [args...]
-
+Usage: strace [OPTIONS] <command-line>
+Usage: strace [OPTIONS] -p <pid>
   -b, --buffer-size=SIZE       set size of output file buffer
   -d, --no-delta               don't display the delta-t microsecond timestamp
-  -f, --trace-children         trace child processes (toggle -- default is "true")
-  -h, --help                   display help info
+  -f, --trace-children         trace child processes (toggle - default true)
+  -h, --help                   output usage information and exit
   -m, --mask=MASK              set message filter mask
   -n, --crack-error-numbers    output descriptive text instead of error
                                numbers for Windows errors
   -o, --output=FILENAME        set output file to FILENAME
-  -p, --pid=pid                attach to a running process
+  -p, --pid=n                  attach to executing program with cygwin pid n
   -S, --flush-period=PERIOD    flush buffered strace output every PERIOD secs
-  -t, --timestamp              use an absolute hh:mm:ss timestamp insted of the
-                               default microsecond timestamp.  Implies -d
-  -v, --version                display version info
+  -t, --timestamp              use an absolute hh:mm:ss timestamp insted of 
+                               the default microsecond timestamp.  Implies -d
+  -T, --toggle                 toggle tracing in a process already being
+                               traced. Requires -p <pid>
+  -v, --version                output version information and exit
   -w, --new-window             spawn program under test in a new window
 
     MASK can be any combination of the following mnemonics and/or hex values

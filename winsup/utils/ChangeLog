@@ -1,3 +1,18 @@
+2002-06-07  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* strace.cc (toggle): New global variable.
+	(error): Use exit instead of ExitProcess so that stdio buffers get
+	flushed.
+	(create_child): Remove command line error checking.
+	(dostrace): Ditto.
+	(dotoggle): New function.
+	(usage): Add entry for new option -T|--toggle.  Alphabetize.
+	(longopts): Add new option -T|--toggle.
+	(opts): Ditto.
+	(main): Handle new -T|--toggle option.  Move all command line checking
+	here from other functions.
+	* utils.sgml: Update section for strace.
+
 2002-06-05  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
 	* strace.cc (version): New global variable.

@@ -43,6 +43,7 @@ static int numerror = 1;
 static int usecs = 1;
 static int delta = 1;
 static int hhmmss = 0;
+static int toggle = 0;
 static int bufsize = 0;
 static int new_window = 0;
 static long flush_period = 0;
@@ -102,7 +103,7 @@ error (int geterrno, const char *fmt, ...)
       fputs (buf, stderr);
       fputs ("\n", stderr);
     }
-  ExitProcess (1);
+  exit (1);
 }
 
 DWORD lastid = 0;
@@ -309,14 +310,11 @@ create_child (char **argv)
   BOOL ret;
   DWORD flags;
 
-  if (!*argv)
-    error (0, "no program argument specified");
-
   memset (&si, 0, sizeof (si));
   si.cb = sizeof (si);
 
   flags = CREATE_DEFAULT_ERROR_MODE
-          | (forkdebug ? DEBUG_PROCESS : DEBUG_ONLY_THIS_PROCESS);
+	  | (forkdebug ? DEBUG_PROCESS : DEBUG_ONLY_THIS_PROCESS);
   if (new_window)
     flags |= CREATE_NEW_CONSOLE | CREATE_NEW_PROCESS_GROUP;
 
@@ -650,10 +648,24 @@ proc_child (unsigned mask, FILE *ofile, pid_t pid)
 }
 
 static void
+dotoggle (pid_t pid)
+{
+  load_cygwin ();
+  child_pid = (DWORD) cygwin_internal (CW_CYGWIN_PID_TO_WINPID, pid);
+  if (!child_pid)
+    {
+      warn (0, "no such cygwin pid - %d", pid);
+      child_pid = pid;
+    }
+  if (cygwin_internal (CW_STRACE_TOGGLE, child_pid))
+    error (0, "failed to toggle tracing for process %d<%d>", pid, child_pid);
+
+  return;
+}
+
+static void
 dostrace (unsigned mask, FILE *ofile, pid_t pid, char **argv)
 {
-  if (*argv && pid)
-    error (0, "can't use -p with program argument");
   if (!pid)
     create_child (argv);
   else
@@ -786,21 +798,24 @@ usage (FILE *where = stderr)
 {
   fprintf (where, "\
 Usage: %s [OPTIONS] <command-line>\n\
+Usage: %s [OPTIONS] -p <pid>\n\
   -b, --buffer-size=SIZE       set size of output file buffer\n\
   -d, --no-delta               don't display the delta-t microsecond timestamp\n\
   -f, --trace-children         trace child processes (toggle - default true)\n\
   -h, --help                   output usage information and exit\n\
   -m, --mask=MASK              set message filter mask\n\
-  -o, --output=FILENAME        set output file to FILENAME\n\
-  -p, --pid=n                  attach to executing program with cygwin pid n\n\
   -n, --crack-error-numbers    output descriptive text instead of error\n\
                                numbers for Windows errors\n\
+  -o, --output=FILENAME        set output file to FILENAME\n\
+  -p, --pid=n                  attach to executing program with cygwin pid n\n\
   -S, --flush-period=PERIOD    flush buffered strace output every PERIOD secs\n\
   -t, --timestamp              use an absolute hh:mm:ss timestamp insted of \n\
                                the default microsecond timestamp.  Implies -d\n\
+  -T, --toggle                 toggle tracing in a process already being\n\
+                               traced. Requires -p <pid>\n\
   -v, --version                output version information and exit\n\
   -w, --new-window             spawn program under test in a new window\n\
-\n", pgm);
+\n", pgm, pgm);
   if ( where == stdout)
     fprintf (stdout, "\
     MASK can be any combination of the following mnemonics and/or hex values\n\
@@ -844,6 +859,7 @@ struct option longopts[] = {
   {"no-delta", no_argument, NULL, 'd'},
   {"pid", required_argument, NULL, 'p'},
   {"timestamp", no_argument, NULL, 't'},
+  {"toggle", no_argument, NULL, 'T'},
   {"trace-children", no_argument, NULL, 'f'},
   {"translate-error-numbers", no_argument, NULL, 'n'},
   {"usecs", no_argument, NULL, 'u'},
@@ -851,7 +867,7 @@ struct option longopts[] = {
   {NULL, 0, NULL, 0}
 };
 
-static const char *const opts = "b:dhfm:no:p:S:tuvw";
+static const char *const opts = "b:dhfm:no:p:S:tTuvw";
 
 static void
 print_version ()
@@ -880,7 +896,7 @@ main (int argc, char **argv)
 {
   unsigned mask = 0;
   FILE *ofile = NULL;
-  pid_t attach_pid = 0;
+  pid_t pid = 0;
   int opt;
 
   if (!(pgm = strrchr (*argv, '\\')) && !(pgm = strrchr (*argv, '/')))
@@ -914,7 +930,7 @@ main (int argc, char **argv)
 	      error (0, "syntax error in mask expression \"%s\" near \
 character #%d.\n", optarg, (int) (endptr - optarg), endptr);
 	    }
-	break;
+	  break;
 	}
       case 'n':
 	numerror ^= 1;
@@ -927,13 +943,16 @@ character #%d.\n", optarg, (int) (endptr - optarg), endptr);
 #endif
 	break;
       case 'p':
-	attach_pid = strtol (optarg, NULL, 10);
+	pid = strtol (optarg, NULL, 10);
 	break;
       case 'S':
 	flush_period = strtol (optarg, NULL, 10);
 	break;
       case 't':
 	hhmmss ^= 1;
+	break;
+      case 'T':
+	toggle ^= 1;
 	break;
       case 'u':
 	// FIXME: currently unimplemented
@@ -943,14 +962,22 @@ character #%d.\n", optarg, (int) (endptr - optarg), endptr);
 	// Print version info and exit
 	print_version ();
 	return 0;
-	break;
       case 'w':
 	new_window ^= 1;
 	break;
+      case '?':
+	fprintf (stderr, "Try '%s --help' for more information.\n", pgm);
+	exit (1);
       }
 
-  if ( argv[optind] == NULL)
-    usage ();
+  if (pid && argv[optind])
+    error (0, "cannot provide both a command line and a process id");
+
+  if (!pid && !argv[optind])
+    error (0, "must provide either a command line or a process id");
+
+  if (toggle && !pid)
+    error (0, "must provide a process id to toggle tracing");
 
   if (!mask)
     mask = 1;
@@ -961,7 +988,10 @@ character #%d.\n", optarg, (int) (endptr - optarg), endptr);
   if (!ofile)
     ofile = stdout;
 
-  dostrace (mask, ofile, attach_pid, argv + optind);
+  if (toggle)
+    dotoggle (pid);
+  else
+    dostrace (mask, ofile, pid, argv + optind);
 }
 
 #undef CloseHandle
