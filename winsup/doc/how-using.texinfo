@@ -266,6 +266,12 @@ instead.
 There is no "which" command with Cygwin.  However, you can use the bash
 shell builtin "type" which does something similar.
 
+@subsection Why isn't package XXXX available in Cygwin?  (Or, why is your package so out of date?)
+
+Probably because there is nobody willing or able to maintain it.  It
+takes time, and the priority for the Cygwin Team is the Cygwin package.
+The rest is a volunteer effort.  Want to contribute?  See below.
+
 @subsection How can I access other drives?
 
 You have some flexibility here.
