@@ -14,20 +14,20 @@
 
    1) Define the reentrant versions of the syscalls directly.
       (eg: _open_r, _close_r, etc.).  Please keep the namespace clean.
-      When you do this, set "syscall_dir" to "syscalls" in configure.in,
-      and add -DREENTRANT_SYSCALLS_PROVIDED to target_cflags in configure.in.
+      When you do this, set "syscall_dir" to "syscalls" and add
+      -DREENTRANT_SYSCALLS_PROVIDED to newlib_cflags in configure.host.
 
    2) Define namespace clean versions of the system calls by prefixing
       them with '_' (eg: _open, _close, etc.).  Technically, there won't be
       true reentrancy at the syscall level, but the library will be namespace
       clean.
-      When you do this, set "syscall_dir" to "syscalls" in configure.in.
+      When you do this, set "syscall_dir" to "syscalls" in configure.host.
 
    3) Define or otherwise provide the regular versions of the syscalls
       (eg: open, close, etc.).  The library won't be reentrant nor namespace
       clean, but at least it will work.
-      When you do this, add -DMISSING_SYSCALL_NAMES to target_cflags in
-      configure.in.
+      When you do this, add -DMISSING_SYSCALL_NAMES to newlib_cflags in
+      configure.host.
 
    Stubs of the reentrant versions of the syscalls exist in the libc/reent
    source directory and are used if REENTRANT_SYSCALLS_PROVIDED isn't defined.
