@@ -1,3 +1,13 @@
+2002-09-30  Robert Collins <rbtcollins@hotmail.com>
+
+	* thread.cc (pthread_mutex::initMutex): Use the wrapper init call.
+	(pthread_mutex::nativeMutex::init): Implement.
+	(pthread_mutex::nativeMutex::lock): Ditto.
+	(pthread_mutex::nativeMutex::unlock): Ditto.
+       	(pthread_mutex::init): Use the wrapper lock and unlockcalls.
+	* thread.h (pthread_mutex): Move mutexInitializationLock into a 
+	nativeMutex wrapper class.
+
 2002-09-30  Christopher Faylor  <cgf@redhat.com>
 
 	Remove \n from calls to strace class printfs throughout.

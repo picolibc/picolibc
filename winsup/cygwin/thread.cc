@@ -1097,7 +1097,7 @@ pthread_mutex::isGoodInitializerOrObject (pthread_mutex_t const *mutex)
   return true;
 }
 
-HANDLE pthread_mutex::mutexInitializationLock;
+pthread_mutex::nativeMutex pthread_mutex::mutexInitializationLock;
 
 /* We can only be called once.
    TODO: (no rush) use a non copied memory section to
@@ -1105,10 +1105,8 @@ HANDLE pthread_mutex::mutexInitializationLock;
 void
 pthread_mutex::initMutex ()
 {
-  mutexInitializationLock = CreateMutex (NULL, FALSE, NULL);
-  if (!mutexInitializationLock)
-    api_fatal ("Could not create win32 Mutex for pthread mutex static initializer support. The error code was %E");
-
+  if (!mutexInitializationLock.init())
+    api_fatal ("Could not create win32 Mutex for pthread mutex static initializer support.\n");
 }
 
 pthread_mutex::pthread_mutex (pthread_mutexattr *attr):verifyable_object (PTHREAD_MUTEX_MAGIC)
@@ -1212,6 +1210,37 @@ pthread_mutex::fixup_after_fork ()
 #else
   condwaits = 0;
 #endif
+}
+
+bool
+pthread_mutex::nativeMutex::init()
+{
+  theHandle = CreateMutex (NULL, FALSE, NULL);
+  if (!theHandle)
+    {
+      debug_printf ("CreateMutex failed. %E");
+      return false;
+    }
+  return true;
+}
+
+bool
+pthread_mutex::nativeMutex::lock()
+{
+  DWORD waitResult = WaitForSingleObject (theHandle, INFINITE);
+  if (waitResult != WAIT_OBJECT_0)
+    {
+      system_printf ("Received unexpected wait result %d on handle %p, %E", waitResult, theHandle);
+      return false;
+    }
+  return true;
+}
+
+void
+pthread_mutex::nativeMutex::unlock()
+{
+  if (!ReleaseMutex (theHandle))
+    system_printf ("Received a unexpected result releasing mutex. %E");
 }
 
 bool
@@ -2222,18 +2251,13 @@ pthread_mutex::init (pthread_mutex_t *mutex,
 {
   if (attr && !pthread_mutexattr::isGoodObject (attr) || check_valid_pointer (mutex))
     return EINVAL;
-  DWORD waitResult = WaitForSingleObject (mutexInitializationLock, INFINITE);
-  if (waitResult != WAIT_OBJECT_0)
-    {
-      system_printf ("Received a unexpected wait result on mutexInitializationLock %d, %E", waitResult);
-      return EINVAL;
-    }
+  if (!mutexInitializationLock.lock())
+    return EINVAL;
 
   /* FIXME: bugfix: we should check *mutex being a valid address */
   if (isGoodObject (mutex))
     {
-      if (!ReleaseMutex (mutexInitializationLock))
-	  system_printf ("Received a unexpected result releasing mutexInitializationLock %E");
+      mutexInitializationLock.unlock();
       return EBUSY;
     }
 
@@ -2242,12 +2266,10 @@ pthread_mutex::init (pthread_mutex_t *mutex,
     {
       delete (*mutex);
       *mutex = NULL;
-      if (!ReleaseMutex (mutexInitializationLock))
-	  system_printf ("Received a unexpected result releasing mutexInitializationLock %E");
+      mutexInitializationLock.unlock();
       return EAGAIN;
     }
-  if (!ReleaseMutex (mutexInitializationLock))
-      system_printf ("Received a unexpected result releasing mutexInitializationLock %E");
+  mutexInitializationLock.unlock();
   return 0;
 }
 

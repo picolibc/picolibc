@@ -309,7 +309,15 @@ public:
   pthread_mutex (pthread_mutex_t *, pthread_mutexattr *);
   ~pthread_mutex ();
 private:
-  static HANDLE mutexInitializationLock;
+  class nativeMutex {
+    public:
+      bool init();
+      bool lock();
+      void unlock();
+    private:
+      HANDLE theHandle;
+  };
+  static nativeMutex mutexInitializationLock;
 };
 
 class pthread:public verifyable_object
