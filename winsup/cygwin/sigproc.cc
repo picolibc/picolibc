@@ -668,7 +668,7 @@ sig_send (_pinfo *p, int sig)
    If sending to this process, wait for notification that a signal has
    completed before returning.  */
 int __stdcall
-sig_send (_pinfo *p, siginfo_t& si, _threadinfo *tls)
+sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 {
   int rc = 1;
   bool its_me;
@@ -747,7 +747,7 @@ sig_send (_pinfo *p, siginfo_t& si, _threadinfo *tls)
   if (!pack.si.si_uid)
     pack.si.si_uid = myself->uid;
   pack.pid = myself->pid;
-  pack.tls = (_threadinfo *) tls;
+  pack.tls = (_cygtls *) tls;
   if (wait_for_completion)
     {
       pack.wakeup = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
@@ -816,7 +816,7 @@ sig_send (_pinfo *p, siginfo_t& si, _threadinfo *tls)
     }
 
   if (wait_for_completion && si.si_signo != __SIGFLUSHFAST)
-    call_signal_handler_now ();
+    _my_tls.call_signal_handler ();
 
 out:
   if (pack.wakeup)

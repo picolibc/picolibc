@@ -72,9 +72,9 @@ char NO_COPY **envp;
 
 extern "C" void __sinit (_reent *);
 
-_threadinfo NO_COPY *_main_tls;
+_cygtls NO_COPY *_main_tls;
 
-int cygwin_finished_initializing;
+bool NO_COPY cygwin_finished_initializing;
 
 /* Used in SIGTOMASK for generating a bit for insertion into a sigset_t.
    This is subtracted from the signal number prior to shifting the bit.
@@ -513,18 +513,16 @@ alloc_stack_hard_way (child_info_fork *ci, volatile char *b)
 static void
 alloc_stack (child_info_fork *ci)
 {
-  /* FIXME: adding 16384 seems to avoid a stack copy problem during
-     fork on Win95, but I don't know exactly why yet. DJ */
-  volatile char b[ci->stacksize + 16384];
-
-  if (!VirtualQuery ((LPCVOID) &b, &sm, sizeof sm))
+  if (!VirtualQuery ((LPCVOID) _tlstop, &sm, sizeof sm))
     api_fatal ("fork: couldn't get stack info, %E");
 
   if (sm.AllocationBase == ci->stacktop)
-    ci->stacksize = 0;
-  else
-    alloc_stack_hard_way (ci, b + sizeof (b) - 1);
+    {
+      ci->stacksize = 0;
+      return;
+    }
 
+  alloc_stack_hard_way (ci, b + sizeof (b) - 1);
   return;
 }
 
@@ -662,7 +660,6 @@ dll_crt0_0 ()
     }
 
   device::init ();
-  winpids::init ();
   do_global_ctors (&__CTOR_LIST__, 1);
   cygthread::init ();
 
@@ -718,7 +715,7 @@ dll_crt0_0 ()
 	CloseHandle (child_proc_info->pppid_handle);
     }
 
-  _threadinfo::init ();
+  _cygtls::init ();
 
   /* Initialize events */
   events_init ();
@@ -873,7 +870,7 @@ dll_crt0_1 (char *)
       set_console_title (cp);
     }
 
-  cygwin_finished_initializing = 1;
+  cygwin_finished_initializing = true;
   /* Call init of loaded dlls. */
   dlls.init ();
 

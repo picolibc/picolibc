@@ -69,8 +69,10 @@ int
 muto::acquire (DWORD ms)
 {
   DWORD this_tid = GetCurrentThreadId ();
+#if 0
   if (exiting_thread)
     return this_tid == exiting_thread;
+#endif
 
   if (tid != this_tid)
     {
@@ -113,8 +115,6 @@ int
 muto::release ()
 {
   DWORD this_tid = GetCurrentThreadId ();
-  if (exiting_thread)
-    return this_tid == exiting_thread;
 
   if (tid != this_tid || !visits)
     {

@@ -318,7 +318,7 @@ low_priority_sleep (DWORD secs)
 
   if (!secs && wincap.has_switch_to_thread ())
     {
-      for (int i = 0; i < 10; i++)
+      for (int i = 0; i < 3; i++)
 	SwitchToThread ();
     }
   else

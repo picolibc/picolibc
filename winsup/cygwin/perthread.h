@@ -58,7 +58,7 @@ class vfork_save
  public:
   int pid;
   DWORD frame[100];
-  _threadinfo tls;
+  _cygtls tls;
   char **vfork_ebp;
   char **vfork_esp;
   int ctty;

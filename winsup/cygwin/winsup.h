@@ -239,7 +239,7 @@ extern "C" int try_to_debug (bool waitloop = 1);
 
 void set_file_api_mode (codepage_type);
 
-extern int cygwin_finished_initializing;
+extern bool cygwin_finished_initializing;
 
 /**************************** Miscellaneous ******************************/
 

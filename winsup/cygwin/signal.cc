@@ -93,7 +93,7 @@ nanosleep (const struct timespec *rqtp, struct timespec *rmtp)
     rem = 0;
   if (rc == WAIT_OBJECT_0)
     {
-      (void) call_signal_handler_now ();
+      (void) _my_tls.call_signal_handler ();
       set_errno (EINTR);
       res = -1;
     }
@@ -302,7 +302,7 @@ kill_pgrp (pid_t pid, siginfo_t& si)
       found++;
     }
 
-  if (killself && kill_worker (myself->pid, si))
+  if (killself && !exit_state && kill_worker (myself->pid, si))
     res = -1;
 
   if (!found)
@@ -341,7 +341,7 @@ abort (void)
   set_signal_mask (sig_mask);
 
   raise (SIGABRT);
-  (void) call_signal_handler_now (); /* Call any signal handler */
+  (void) _my_tls.call_signal_handler (); /* Call any signal handler */
   do_exit (1);	/* signal handler didn't exit.  Goodbye. */
 }
 

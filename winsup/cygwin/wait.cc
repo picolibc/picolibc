@@ -15,6 +15,7 @@ details. */
 #include "sigproc.h"
 #include "perthread.h"
 #include "thread.h"
+#include "cygtls.h"
 
 /* This is called _wait and not wait because the real wait is defined
    in libc/syscalls/syswait.c.  It calls us.  */
@@ -99,7 +100,7 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
       if (w->status == -1)
 	{
 	  set_sig_errno (EINTR);
-	  call_signal_handler_now ();
+	  _my_tls.call_signal_handler ();
 	  sawsig = true;
 	  res = -1;
 	}
@@ -114,7 +115,7 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
 	*status = w->status;
 
     done:
-      if (!sawsig || !call_signal_handler_now ())
+      if (!sawsig || !_my_tls.call_signal_handler ())
 	break;
     }
 

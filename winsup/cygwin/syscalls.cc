@@ -461,7 +461,7 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
 	}
 
     out:
-      if (res >= 0 || get_errno () != EINTR || !call_signal_handler_now ())
+      if (res >= 0 || get_errno () != EINTR || !_my_tls.call_signal_handler ())
 	break;
       set_errno (e);
     }

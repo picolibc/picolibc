@@ -30,6 +30,7 @@ details. */
 #include "shared_info.h"
 #include "cygheap.h"
 #include "fhandler.h"
+#include "cygmalloc.h"
 
 static char NO_COPY pinfo_dummy[sizeof (_pinfo)] = {0};
 
@@ -755,22 +756,14 @@ winpids::enum9x (bool winpid)
   return nelem;
 }
 
-NO_COPY CRITICAL_SECTION winpids::cs;
-
 void
 winpids::set (bool winpid)
 {
-  EnterCriticalSection (&cs);
+  __malloc_lock ();
   npids = (this->*enum_processes) (winpid);
   if (pidlist)
     pidlist[npids] = 0;
-  LeaveCriticalSection (&cs);
-}
-
-void
-winpids::init ()
-{
-  InitializeCriticalSection (&cs);
+  __malloc_unlock ();
 }
 
 DWORD

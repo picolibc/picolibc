@@ -1,3 +1,60 @@
+2004-02-11  Christopher Faylor  <cgf@redhat.com>
+
+	Rename _threadinfo to _cygtls, throughout.
+	* cygtls.h (_cygtls::call_signal_handler): Rename from
+	call_signal_handler_now.
+	(_cygtls::push): Make second argument mandatory.
+	(_cygtls::fixup_after_fork): Declare new function.
+	(_cygtls::lock): Ditto.
+	* cygtls.cc (_cygtls::fixup_after_fork): Define new function.
+	* dcrt0.cc (cygwin_finished_initializing): Define as bool.
+	(alloc_stack): Use _tlstop rather than arbitrary variable in probably
+	vain attempt to avoid strange fork problem on CTRL-C.
+	(dll_crt0_0): Remove obsolete winpids::init call.
+	* dll_init.cc (dll_dllcrt0): Detect forkee condition as equivalent to
+	initializing.
+	* winsup.h (cygwin_finished_initializing): Declare as bool.
+	* exceptions.cc (handle_exceptions): Rely on
+	cygwin_finished_initializing to determine how to handle exception
+	during process startup.
+	(_cygtls::call_signal_handler): Rename from call_signal_handler_now.
+	(_cygtls::interrupt_now): Fill in second argument to push.
+	(signal_fixup_after_fork): Eliminate.
+	(setup_handler): Initialize locked to avoid potential inappropriate
+	unlock.  Resume thread if it has acquired the stack lock.
+	(ctrl_c_handler): Just exit if ctrl-c is hit before cygiwn has finished
+	initializing.
+	* fork.cc (sync_with_child): Don't call abort since it can cause exit
+	deadlocks.
+	(sync_with_child): Change debugging output slightly.
+	(fork_child): Set cygwin_finished_initializing here.  Call _cygtls fork
+	fixup and explicitly call sigproc_init.
+	(fork_parent): Release malloc lock on fork failure.
+	(vfork): Call signal handler via _my_tls.
+	* sigproc.cc (sig_send): Ditto.
+	* syscalls.cc (readv): Ditto.
+	* termios.cc (tcsetattr): Ditto.
+	* wait.cc (wait4): Ditto.
+	* signal.cc (nanosleep): Ditto.
+	(abort): Ditto.
+	(kill_pgrp): Avoid killing self if exiting.
+	* sync.cc (muto::acquire): Remove (temporarily?) ill-advised
+	exiting_thread check.
+	* gendef (_sigfe): Be more agressive in protecting stack pointer from
+	other access by signal thread.
+	(_cygtls::locked): Define new function.
+	(_sigbe): Ditto.
+	(_cygtls::pop): Protect edx.
+	(_cygtls::lock): Use guaranteed method to set eax to 1.
+	(longjmp): Aggressively protect signal stack.
+	* miscfuncs.cc (low_priority_sleep): Reduce "sleep time" for secs == 0.
+	* pinfo.cc (winpids::set): Counterintuitively use malloc's lock to
+	protect simultaneous access to the pids list since there are
+	pathological conditions which can cause malloc to call winpid.
+	(winpids::init): Eliminate.
+	* pinfo.h (winpids::cs): Eliminate declaration.
+	* pinfo.h (winpids::init): Eliminate definition.
+
 2004-02-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.cc (get_nt_object_attribute): Fix error handling.

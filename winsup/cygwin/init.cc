@@ -27,7 +27,7 @@ HANDLE sync_startup;
 static void WINAPI
 threadfunc_fe (VOID *arg)
 {
-  _threadinfo::call ((DWORD (*)  (void *, void *)) (((char **) _tlsbase)[OLDFUNC_OFFSET]), arg);
+  _cygtls::call ((DWORD (*)  (void *, void *)) (((char **) _tlsbase)[OLDFUNC_OFFSET]), arg);
 }
 
 static DWORD WINAPI

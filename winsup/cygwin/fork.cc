@@ -167,11 +167,11 @@ sync_with_child (PROCESS_INFORMATION &pi, HANDLE subproc_ready,
        */
       if (errcode != STATUS_CONTROL_C_EXIT)
 	{
-	    system_printf ("child %u(%p) died before initialization with status code %p",
-			  cygwin_pid (pi.dwProcessId), pi.hProcess, errcode);
-	    system_printf ("*** child state %s", s);
+	  system_printf ("child %u(%p) died before initialization with status code %p",
+			 cygwin_pid (pi.dwProcessId), pi.hProcess, errcode);
+	  system_printf ("*** child state %s", s);
 #ifdef DEBUGGING
-	    abort ();
+	  try_to_debug ();
 #endif
 	}
       set_errno (EAGAIN);
@@ -212,13 +212,13 @@ sync_with_parent (const char *s, bool hang_self)
       switch (psync_rc)
 	{
 	case WAIT_TIMEOUT:
-	  api_fatal ("WFSO timed out for %s", s);
+	  api_fatal ("WFSO timed out %s", s);
 	  break;
 	case WAIT_FAILED:
 	  if (GetLastError () == ERROR_INVALID_HANDLE &&
 	      WaitForSingleObject (fork_info->forker_finished, 1) != WAIT_FAILED)
 	    break;
-	  api_fatal ("WFSO failed for %s, fork_finished %p, %E", s,
+	  api_fatal ("WFSO failed %s, fork_finished %p, %E", s,
 		     fork_info->forker_finished);
 	  break;
 	default:
@@ -243,6 +243,17 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   sigproc_printf ("hParent %p, child 1 first_dll %p, load_dlls %d", hParent,
 		  first_dll, load_dlls);
 
+  /* If we've played with the stack, stacksize != 0.  That means that
+     fork() was invoked from other than the main thread.  Make sure that
+     the threadinfo information is properly set up.  */
+  if (!fork_info->stacksize)
+    {
+      _main_tls = &_my_tls;
+      _main_tls->init_thread (NULL, NULL);
+      _main_tls->local_clib = *_impure_ptr;
+      _impure_ptr = &_main_tls->local_clib;
+    }
+
 #ifdef DEBUGGING
   char c;
   if (GetEnvironmentVariable ("FORKDEBUG", &c, 1))
@@ -256,18 +267,6 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
       Sleep (atoi (buf));
     }
 #endif
-
-  /* If we've played with the stack, stacksize != 0.  That means that
-     fork() was invoked from other than the main thread.  Make sure that
-     when the "main" thread exits it calls do_exit, like a normal process.
-     Exit with a status code of 0. */
-  if (fork_info->stacksize)
-    {
-      _main_tls = &_my_tls;
-      _main_tls->init_thread (NULL, NULL);
-      _main_tls->local_clib = *_impure_ptr;
-      _impure_ptr = &_main_tls->local_clib;
-    }
 
   set_file_api_mode (current_codepage);
 
@@ -307,7 +306,8 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
 #endif
 
   pinfo_fixup_after_fork ();
-  signal_fixup_after_fork ();
+  _my_tls.fixup_after_fork ();
+  sigproc_init ();
 
   /* Set thread local stuff to zero.  Under Windows 95/98 this is sometimes
      non-zero, for some reason.
@@ -320,6 +320,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   fixup_timers_after_fork ();
   wait_for_sigthread ();
   cygbench ("fork-child");
+  cygwin_finished_initializing = true;
   return 0;
 }
 
@@ -458,7 +459,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 
   syscall_printf ("CreateProcess (%s, %s, 0, 0, 1, %x, 0, 0, %p, %p)",
 		  myself->progname, myself->progname, c_flags, &si, &pi);
-  __malloc_lock ();
+  bool locked = __malloc_lock ();
   void *newheap;
   newheap = cygheap_setup_for_child (&ch, cygheap->fdtab.need_fixup_before ());
   rc = CreateProcess (myself->progname, /* image to run */
@@ -483,6 +484,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
       /* Restore impersonation */
       cygheap->user.reimpersonate ();
       cygheap_setup_for_child_cleanup (newheap, &ch, 0);
+      __malloc_unlock ();
       return -1;
     }
 
@@ -573,6 +575,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 		  dll_bss_start, dll_bss_end, impure_beg, impure_end, NULL);
 
   __malloc_unlock ();
+  locked = false;
   MALLOC_CHECK;
   if (!rc)
     goto cleanup;
@@ -622,6 +625,9 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 
 /* Common cleanup code for failure cases */
  cleanup:
+  if (locked)
+    __malloc_unlock ();
+
   /* Remember to de-allocate the fd table. */
   if (pi.hProcess)
     ForceCloseHandle1 (pi.hProcess, childhProc);
@@ -725,7 +731,7 @@ vfork ()
       debug_printf ("cygheap->ctty_on_hold %p, cygheap->open_fhs %d", cygheap->ctty_on_hold, cygheap->open_fhs);
       int res = cygheap->fdtab.vfork_child_dup () ? 0 : -1;
       debug_printf ("%d = vfork()", res);
-      call_signal_handler_now ();	// FIXME: racy
+      _my_tls.call_signal_handler ();	// FIXME: racy
       vf->tls = _my_tls;
       return res;
     }
@@ -757,7 +763,7 @@ vfork ()
   debug_printf ("exiting vfork, pid %d", pid);
   sig_dispatch_pending ();
 
-  call_signal_handler_now (); // FIXME: racy
+  _my_tls.call_signal_handler ();	// FIXME: racy
   _my_tls = vf->tls;
   return pid;
 #endif

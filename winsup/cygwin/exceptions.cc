@@ -519,7 +519,7 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
 	break;
       }
 
-  if (!myself->progname[0]
+  if (!cygwin_finished_initializing
       || GetCurrentThreadId () == sigtid
       || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_DFL
       || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_IGN
@@ -692,10 +692,10 @@ interruptible (DWORD pc)
   return res;
 }
 void __stdcall
-_threadinfo::interrupt_setup (int sig, void *handler,
+_cygtls::interrupt_setup (int sig, void *handler,
 			      struct sigaction& siga)
 {
-  push ((__stack_t) sigdelayed);
+  push ((__stack_t) sigdelayed, false);
   oldmask = myself->getsigmask ();
   newmask = oldmask | siga.sa_mask | SIGTOMASK (sig);
   sa_flags = siga.sa_flags;
@@ -717,26 +717,14 @@ _threadinfo::interrupt_setup (int sig, void *handler,
 }
 
 bool
-_threadinfo::interrupt_now (CONTEXT *ctx, int sig, void *handler,
+_cygtls::interrupt_now (CONTEXT *ctx, int sig, void *handler,
 			    struct sigaction& siga)
 {
-  push ((__stack_t) ctx->Eip);
+  push ((__stack_t) ctx->Eip, false);
   interrupt_setup (sig, handler, siga);
   ctx->Eip = pop ();
   SetThreadContext (*this, ctx); /* Restart the thread in a new location */
   return 1;
-}
-
-void __stdcall
-signal_fixup_after_fork ()
-{
-  if (_my_tls.sig)
-    {
-      _my_tls.sig = 0;
-      _my_tls.stackptr = _my_tls.stack + 1;	// FIXME?
-      set_signal_mask (_my_tls.oldmask);
-    }
-  sigproc_init ();
 }
 
 extern "C" void __stdcall
@@ -747,13 +735,14 @@ set_sig_errno (int e)
   // sigproc_printf ("errno %d", e);
 }
 
-static int setup_handler (int, void *, struct sigaction&, _threadinfo *tls)
+static int setup_handler (int, void *, struct sigaction&, _cygtls *tls)
   __attribute__((regparm(3)));
 static int
-setup_handler (int sig, void *handler, struct sigaction& siga, _threadinfo *tls)
+setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
 {
   CONTEXT cx;
   bool interrupted = false;
+  bool locked = false;
 
   if (tls->sig)
     {
@@ -762,12 +751,11 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _threadinfo *tls)
       goto out;
     }
 
-  int locked;
   for (int i = 0; i < CALL_HANDLER_RETRY; i++)
     {
-      locked = tls->lock ();
-      __stack_t *retaddr_on_stack = tls->stackptr - 1;
-      if (retaddr_on_stack >= tls->stack)
+      tls->lock ();
+      locked = true;
+      if (tls->stackptr > tls->stack)
 	{
 	  tls->reset_exception ();
 	  tls->interrupt_setup (sig, handler, siga);
@@ -776,14 +764,14 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _threadinfo *tls)
 	  break;
 	}
 
+      tls->unlock ();
+      locked = false;
       DWORD res;
       HANDLE hth = (HANDLE) *tls;
 
-      /* Suspend the thread which will receive the signal.  But first ensure that
-	 this thread doesn't have any mutos.  (FIXME: Someday we should just grab
-	 all of the mutos rather than checking for them)
-	 For Windows 95, we also have to ensure that the addresses returned by GetThreadContext
-	 are valid.
+      /* Suspend the thread which will receive the signal.
+	 For Windows 95, we also have to ensure that the addresses returned by
+	 GetThreadContext are valid.
 	 If one of these conditions is not true we loop for a fixed number of times
 	 since we don't want to stall the signal handler.  FIXME: Will this result in
 	 noticeable delays?
@@ -799,31 +787,25 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _threadinfo *tls)
       sigproc_printf ("suspending mainthread PC %p", cx.Eip);
 #endif
       res = SuspendThread (hth);
-      /* Just release the lock now since we hav suspended the main thread and it
-	 definitely can't be grabbing it now.  This will have to change, of course,
-	 if/when we can send signals to other than the main thread. */
-
       /* Just set pending if thread is already suspended */
       if (res)
 	{
 	  (void) ResumeThread (hth);
 	  break;
 	}
-
-      // FIXME - add check for reentering of DLL here
-
-      cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
-      if (!GetThreadContext (hth, &cx))
-	system_printf ("couldn't get context of main thread, %E");
-      else if (interruptible (cx.Eip))
-	interrupted = tls->interrupt_now (&cx, sig, handler, siga);
+      if (!tls->locked ())
+	{
+	  cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
+	  if (!GetThreadContext (hth, &cx))
+	    system_printf ("couldn't get context of main thread, %E");
+	  else if (interruptible (cx.Eip))
+	    interrupted = tls->interrupt_now (&cx, sig, handler, siga);
+	}
 
       res = ResumeThread (hth);
       if (interrupted)
 	break;
 
-      tls->unlock ();
-      locked = false;
       sigproc_printf ("couldn't interrupt.  trying again.");
       low_priority_sleep (0);
     }
@@ -845,6 +827,10 @@ static BOOL WINAPI
 ctrl_c_handler (DWORD type)
 {
   static bool saw_close;
+
+  if (!cygwin_finished_initializing)
+    ExitProcess (STATUS_CONTROL_C_EXIT);
+
   _my_tls.remove (INFINITE);
 
   /* Return FALSE to prevent an "End task" dialog box from appearing
@@ -977,7 +963,7 @@ sigpacket::process ()
     /* nothing to do */;
   else if (tls && sigismember (&tls->sigwait_mask, si.si_signo))
     insigwait_mask = true;
-  else if (!tls && (tls = _threadinfo::find_tls (si.si_signo)))
+  else if (!tls && (tls = _cygtls::find_tls (si.si_signo)))
     insigwait_mask = true;
   else if (!(masked = sigismember (mask, si.si_signo)) && tls)
     masked  = sigismember (&tls->sigmask, si.si_signo);
@@ -1153,36 +1139,36 @@ events_terminate (void)
   exit_already = 1;
 }
 
-extern "C" {
-int __stdcall
-call_signal_handler_now ()
+int
+_cygtls::call_signal_handler ()
 {
-  int sa_flags = 0;
-  while (_my_tls.sig && _my_tls.stackptr > _my_tls.stack)
+  int this_sa_flags = 0;
+  /* Call signal handler.  No need to set stacklock since sig effectively
+     implies that.  */
+  while (sig)
     {
-      sa_flags = _my_tls.sa_flags;
-      int sig = _my_tls.sig;
-      void (*sigfunc) (int) = _my_tls.func;
+      this_sa_flags = sa_flags;
+      int thissig = sig;
+      void (*sigfunc) (int) = func;
 
-      (void) _my_tls.pop ();
+      (void) pop ();
       reset_signal_arrived ();
-      sigset_t oldmask = _my_tls.oldmask;
-      int this_errno = _my_tls.saved_errno;
-      set_process_mask (_my_tls.newmask);
-      _my_tls.sig = 0;
-      sigfunc (sig);
+      sigset_t oldmask = oldmask;
+      int this_errno = saved_errno;
+      set_process_mask (newmask);
+      sig = 0;
+      sigfunc (thissig);
       set_process_mask (oldmask);
       if (this_errno >= 0)
 	set_errno (this_errno);
     }
 
-  return sa_flags & SA_RESTART;
+  return this_sa_flags & SA_RESTART;
 }
 
-void __stdcall
+extern "C" void __stdcall
 reset_signal_arrived ()
 {
   (void) ResetEvent (signal_arrived);
   sigproc_printf ("reset signal_arrived");
-}
 }

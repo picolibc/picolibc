@@ -23,6 +23,7 @@ details. */
 #include "cygwin/version.h"
 #include "perprocess.h"
 #include "sigproc.h"
+#include "cygtls.h"
 #include <sys/termios.h>
 
 /* tcsendbreak: POSIX 7.2.2.1 */
@@ -146,7 +147,7 @@ tcsetattr (int fd, int a, const struct termios *t)
 	  e = get_errno ();
 	  break;
 	case bg_signalled:
-	  if (call_signal_handler_now ())
+	  if (_my_tls.call_signal_handler ())
 	    continue;
 	  res = -1;
 	  /* fall through intentionally */

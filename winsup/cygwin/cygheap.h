@@ -266,7 +266,7 @@ struct init_cygheap
 #ifdef NEWVFORK
   fhandler_tty_slave *ctty_on_hold;
 #endif
-  struct _threadinfo **threadlist;
+  struct _cygtls **threadlist;
   size_t sthreads;
   int open_fhs;
   void close_ctty ();

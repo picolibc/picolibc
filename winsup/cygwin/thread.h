@@ -348,7 +348,7 @@ private:
 
 #define WAIT_CANCELED   (WAIT_OBJECT_0 + 1)
 
-class _threadinfo;
+class _cygtls;
 class pthread: public verifyable_object
 {
 public:
@@ -360,7 +360,7 @@ public:
   bool valid;
   bool suspended;
   int cancelstate, canceltype;
-  _threadinfo *cygtls;
+  _cygtls *cygtls;
   HANDLE cancel_event;
   pthread_t joiner;
 

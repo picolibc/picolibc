@@ -371,7 +371,7 @@ dll_dllcrt0 (HMODULE h, per_process *p)
      initializing, then the DLL must be a cygwin-aware DLL
      that was explicitly linked into the program rather than
      a dlopened DLL. */
-  if (!cygwin_finished_initializing)
+  if (!in_forkee && !cygwin_finished_initializing)
     type = DLL_LINK;
   else
     {
@@ -387,7 +387,7 @@ dll_dllcrt0 (HMODULE h, per_process *p)
      initialize the DLL.  If we haven't finished initializing,
      it may not be safe to call the dll's "main" since not
      all of cygwin's internal structures may have been set up. */
-  if (!d || (cygwin_finished_initializing && !d->init ()))
+  if (!d || ((in_forkee || cygwin_finished_initializing) && !d->init ()))
     return -1;
 
   return (DWORD) d;

@@ -91,86 +91,99 @@ EOF
 
 	.stabs	"_sigfe:F(0,1)",36,0,0,__sigbe
 __sigfe:
+	pushl	%ebx
 	pushl	%edx
-	movl	%fs:4,%edx
-1:	movl	\$1,%eax
-	lock	xchgl %eax,$tls::stacklock(%edx)
-	cmpl	%eax,%eax
-	jz	2f
-	xorl	%eax,%eax
-	call	_low_priority_sleep
-	jmp	1b
-2:	movl	\$4,%eax
-	xadd	%eax,$tls::stackptr(%edx)
-	decl	$tls::stacklock(%edx)
-	leal	__sigbe,%edx
-	xchgl	%edx,8(%esp)
-	movl	%edx,(%eax)
-	popl	%edx
+1:	movl	%fs:4,%edx				# location of bottom of stack
+	movl	\$1,%eax				# potential lock value
+	lock	xchgl %eax,$tls::stacklock(%edx)	# see if we can grab it
+	orl	%eax,%eax				# it will be zero
+	jz	2f					#  if so
+	xorl	%eax,%eax				# nope.  It was not zero
+	call	_low_priority_sleep			# should be a short-time thing, so
+	jmp	1b					# sleep and loop
+2:	movl	\$4,%eax				# have the lock, now increment the
+	xadd	%eax,$tls::stackptr(%edx)		#  stack pointer and get pointer
+	leal	__sigbe,%ebx				# new place to return to
+	xchgl	%ebx,12(%esp)				# exchange with real return value
+	movl	%ebx,(%eax)				# store real return value on alt stack
+	decl	$tls::stacklock(%edx)			# remove lock
+	popl	%edx					# restore saved value
+	popl	%ebx
 	ret
 
 	.global	__sigbe
 	.stabs	"_sigbe:F(0,1)",36,0,0,__sigbe
 __sigbe:
-	pushl	%edx
-	pushl	%eax
-	movl	%fs:4,%edx
-1:	movl	\$1,%eax
-	lock	xchgl %eax,$tls::stacklock(%edx)
-	cmpl	%eax,%eax
-	jz	2f
-	xorl	%eax,%eax
-	call	_low_priority_sleep
-	jmp	1b
-2:	movl	\$-4,%eax
-	xadd	%eax,$tls::stackptr(%edx)
-	decl	$tls::stacklock(%edx)
-	xchgl	%edx,-4(%eax)
-	xchgl	%edx,4(%esp)
+	pushl	%ebx
+	pushl	%edx					# return here after cygwin syscall
+	pushl	%eax					# don't clobber
+1:	movl	%fs:4,%edx				# address of bottom of tls
+	movl	\$1,%eax				# potential lock value
+	lock	xchgl %eax,$tls::stacklock(%edx)	# see if we can grab it
+	orl	%eax,%eax				# it will be zero
+	jz	2f					#  if so
+	xorl	%eax,%eax				# nope.  not zero
+	call	_low_priority_sleep			# sleep
+	jmp	1b					#  and loop
+2:	movl	\$-4,%eax				# now decrement aux stack
+	xadd	%eax,$tls::stackptr(%edx)		#  and get pointer
+#	xorl	%ebx,%ebx
+	movl	\$0x41774177,%ebx
+	xchgl	%ebx,-4(%eax)				# 
+	xchgl	%ebx,8(%esp)
+	decl	$tls::stacklock(%edx)			# release lock
 	popl	%eax
+	popl	%edx
 	ret
 
-	.global	__ZN11_threadinfo3popEv
-__ZN11_threadinfo3popEv:
+	.global	__ZN7_cygtls3popEv
+__ZN7_cygtls3popEv:
 1:	pushl	%ebx
+	pushl	%edx				# FIXME: needed?
 	movl	%eax,%edx
 	movl	\$-4,%ebx
 	xadd	%ebx,$tls::pstackptr(%edx)
-	xorl	%eax,%eax
+#	xorl	%eax,%eax
+	movl	8(%esp),%eax
 	xchgl	%eax,-4(%ebx)
+	popl	%edx				# FIXME: needed?
 	popl	%ebx
 	ret
 
-	.global	__ZN11_threadinfo4lockEv
-__ZN11_threadinfo4lockEv:
-	pushl	%ebx
-	movl	%eax,%ebx
+	.global	__ZN7_cygtls4lockEv
+__ZN7_cygtls4lockEv:
+	pushl	%edi
+	movl	%eax,%edi
 1:	movl	\$1,%eax
-	lock	xchgl %eax,$tls::pstacklock(%ebx)
-	cmpl	%eax,%eax
+	lock	xchgl %eax,$tls::pstacklock(%edi)
+	orl	%eax,%eax
 	jz	2f
 	xorl	%eax,%eax
 	call	_low_priority_sleep
 	jmp	1b
-2:	xorl	\$1,%eax
-	popl	%ebx
+2:	popl	%edi
 	ret
 
-	.global	__ZN11_threadinfo6unlockEv
-__ZN11_threadinfo6unlockEv:
+	.global	__ZN7_cygtls6unlockEv
+__ZN7_cygtls6unlockEv:
 	decl	$tls::pstacklock(%eax)
+	ret
+
+	.global	__ZN7_cygtls6lockedEv
+__ZN7_cygtls6lockedEv:
+	movl	$tls::pstacklock(%eax),%eax
 	ret
 
 	.global	_sigreturn
 	.stabs	"sigreturn:F(0,1)",36,0,0,_sigreturn
 _sigreturn:
-	addl	\$4,%esp			# Remove argument
+	addl	\$4,%esp		# Remove argument
 	call	_set_process_mask\@4
 
 	movl	%fs:4,%ebx
 
-	cmpl	\$0,$tls::sig(%ebx)	# Did a signal come in?
-	jnz	3f			# Yes, if non-zero
+#	cmpl	\$0,$tls::sig(%ebx)	# Did a signal come in?
+#	jnz	3f			# Yes, if non-zero
 
 1:	popl	%edx			# saved errno
 	testl	%edx,%edx		# Is it < 0
@@ -215,8 +228,7 @@ _sigdelayed:
 	movl	\$0,$tls::sig(%ebx)	# zero the signal number as a
 					# flag to the signal handler thread
 					# that it is ok to set up sigsave
-4:	popl	%ebx
-	jmp	*%ebx
+4:	ret
 
 EOF
     }
@@ -229,15 +241,26 @@ sub longjmp {
 	.globl	_longjmp
 
 _longjmp:
+1:	movl	%fs:4,%edx
+	movl	\$1,%eax
+	lock	xchgl %eax,$tls::stacklock(%edx)
+	orl	%eax,%eax
+	jz	2f
+	xorl	%eax,%eax
+	call	_low_priority_sleep
+	jmp	1b
+2:	leal	($tls::stack)(%edx),%eax
+	movl	%eax,($tls::stackptr)(%edx)
+
 	pushl	%ebp
 	movl	%esp,%ebp
 	movl	8(%ebp),%edi
 	movl	12(%ebp),%eax
 	testl	%eax,%eax
-	jne	0f
+	jne	3f
 	incl	%eax
-0:
-	movl	%eax,0(%edi)
+
+3:	movl	%eax,0(%edi)
 	movl	24(%edi),%ebp
 	pushfl
 	popl	%ebx
@@ -250,14 +273,12 @@ _longjmp:
 	movw	%ax,%es
 	movw	40(%edi),%ax
 	movw	%ax,%gs
-	movl	%fs:4,%eax
-	leal	($tls::stack)(%eax),%edx
-	movl	%edx,($tls::stackptr)(%eax)
 	movl	0(%edi),%eax
 	movl	4(%edi),%ebx
 	movl	8(%edi),%ecx
-	movl	12(%edi),%edx
 	movl	16(%edi),%esi
+	decl	$tls::stacklock(%edx)
+	movl	12(%edi),%edx
 	movl	20(%edi),%edi
 	popfl
 	ret

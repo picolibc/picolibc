@@ -90,7 +90,7 @@ struct _local_storage
    'gentls_offsets' (<<-- start parsing here).  */
 
 typedef __uint32_t __stack_t;
-struct _threadinfo
+struct _cygtls
 {
   void (*func) /*gentls_offsets*/(int)/*gentls_offsets*/;
   int saved_errno;
@@ -108,7 +108,7 @@ struct _threadinfo
   struct pthread *tid;
   struct _reent local_clib;
   struct _local_storage locals;
-  struct _threadinfo *prev, *next;
+  struct _cygtls *prev, *next;
   __stack_t *stackptr;
   int sig;
   unsigned stacklock;
@@ -121,9 +121,9 @@ struct _threadinfo
   void init_thread (void *, DWORD (*) (void *, void *));
   static void call (DWORD (*) (void *, void *), void *);
   static void call2 (DWORD (*) (void *, void *), void *, void *) __attribute__ ((regparm (3)));
-  static struct _threadinfo *find_tls (int sig);
+  static struct _cygtls *find_tls (int sig);
   void remove (DWORD);
-  void push (__stack_t, bool = false) __attribute__ ((regparm (3)));
+  void push (__stack_t, bool) __attribute__ ((regparm (3)));
   __stack_t pop () __attribute__ ((regparm (1)));
   bool isinitialized () {return initialized == CYGTLS_INITIALIZED || initialized == CYGTLS_EXCEPTION;}
   void set_state (bool);
@@ -138,16 +138,19 @@ struct _threadinfo
   void set_siginfo (struct sigpacket *) __attribute__ ((regparm (3)));
   void set_threadkill () {threadkill = true;}
   void reset_threadkill () {threadkill = false;}
-  int lock () __attribute__ ((regparm (1)));
+  int call_signal_handler () __attribute__ ((regparm (1)));
+  void fixup_after_fork () __attribute__ ((regparm (1)));
+  void lock () __attribute__ ((regparm (1)));
   void unlock () __attribute__ ((regparm (1)));
+  bool locked () __attribute__ ((regparm (1)));
   /*gentls_offsets*/
 };
 #pragma pack(pop)
 
 extern char *_tlsbase __asm__ ("%fs:4");
 extern char *_tlstop __asm__ ("%fs:8");
-#define _my_tls (((_threadinfo *) _tlsbase)[-1])
-extern _threadinfo *_main_tls;
+#define _my_tls (((_cygtls *) _tlsbase)[-1])
+extern _cygtls *_main_tls;
 
 #define __getreent() (&_my_tls.local_clib)
 

@@ -54,7 +54,7 @@ struct sigpacket
 {
   siginfo_t si;
   pid_t pid;
-  class _threadinfo *tls;
+  class _cygtls *tls;
   sigset_t *mask;
   union
   {
@@ -91,9 +91,8 @@ void __stdcall subproc_init ();
 void __stdcall sigproc_terminate ();
 bool __stdcall proc_exists (_pinfo *) __attribute__ ((regparm(1)));
 bool __stdcall pid_exists (pid_t) __attribute__ ((regparm(1)));
-int __stdcall sig_send (_pinfo *, siginfo_t&, class _threadinfo *tls = NULL) __attribute__ ((regparm (3)));
+int __stdcall sig_send (_pinfo *, siginfo_t&, class _cygtls *tls = NULL) __attribute__ ((regparm (3)));
 int __stdcall sig_send (_pinfo *, int) __attribute__ ((regparm (2)));
-void __stdcall signal_fixup_after_fork ();
 void __stdcall signal_fixup_after_exec ();
 void __stdcall wait_for_sigthread ();
 void __stdcall sigalloc ();

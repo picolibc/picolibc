@@ -179,7 +179,6 @@ class winpids
   DWORD enumNT (bool winpid);
   DWORD enum9x (bool winpid);
   void add (DWORD& nelem, bool, DWORD pid);
-  static CRITICAL_SECTION cs;
 public:
   DWORD npids;
   inline void reset () { npids = 0; release (); }
@@ -196,7 +195,6 @@ public:
   inline _pinfo *operator [] (int i) const {return (_pinfo *) pinfolist[i];}
   ~winpids ();
   void release ();
-  static void init ();
 };
 
 extern __inline pid_t

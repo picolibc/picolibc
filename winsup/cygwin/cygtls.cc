@@ -20,6 +20,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "cygthread.h"
+#include "pinfo.h"
 #include "sigproc.h"
 
 class sentry
@@ -32,7 +33,7 @@ public:
   sentry () {destroy = 0;}
   sentry (DWORD wait) {destroy = lock->acquire (wait);}
   ~sentry () {if (destroy) lock->release ();}
-  friend void _threadinfo::init ();
+  friend void _cygtls::init ();
 };
 
 muto NO_COPY *sentry::lock;
@@ -42,27 +43,27 @@ static size_t NO_COPY nthreads;
 #define THREADLIST_CHUNK 256
 
 void
-_threadinfo::init ()
+_cygtls::init ()
 {
   if (cygheap->threadlist)
     memset (cygheap->threadlist, 0, cygheap->sthreads * sizeof (cygheap->threadlist[0]));
   else
     {
       cygheap->sthreads = THREADLIST_CHUNK;
-      cygheap->threadlist = (_threadinfo **) ccalloc (HEAP_TLS, cygheap->sthreads,
+      cygheap->threadlist = (_cygtls **) ccalloc (HEAP_TLS, cygheap->sthreads,
 						     sizeof (cygheap->threadlist[0]));
     }
   new_muto1 (sentry::lock, sentry_lock);
 }
 
 void
-_threadinfo::set_state (bool is_exception)
+_cygtls::set_state (bool is_exception)
 {
   initialized = CYGTLS_INITIALIZED + is_exception;
 }
 
 void
-_threadinfo::reset_exception ()
+_cygtls::reset_exception ()
 {
   if (initialized == CYGTLS_EXCEPTION)
     {
@@ -75,14 +76,14 @@ _threadinfo::reset_exception ()
 
 /* Two calls to get the stack right... */
 void
-_threadinfo::call (DWORD (*func) (void *, void *), void *arg)
+_cygtls::call (DWORD (*func) (void *, void *), void *arg)
 {
   char buf[CYGTLS_PADSIZE];
   call2 (func, arg, buf);
 }
 
 void
-_threadinfo::call2 (DWORD (*func) (void *, void *), void *arg, void *buf)
+_cygtls::call2 (DWORD (*func) (void *, void *), void *arg, void *buf)
 {
   exception_list except_entry;
   /* Initialize this thread's ability to respond to things like
@@ -95,7 +96,7 @@ _threadinfo::call2 (DWORD (*func) (void *, void *), void *arg, void *buf)
 }
 
 void
-_threadinfo::init_thread (void *x, DWORD (*func) (void *, void *))
+_cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
 {
   if (x)
     {
@@ -125,7 +126,7 @@ _threadinfo::init_thread (void *x, DWORD (*func) (void *, void *))
   sentry here (INFINITE);
   if (nthreads >= cygheap->sthreads)
     {
-      cygheap->threadlist = (_threadinfo **)
+      cygheap->threadlist = (_cygtls **)
 	crealloc (cygheap->threadlist, (cygheap->sthreads += THREADLIST_CHUNK)
 		 * sizeof (cygheap->threadlist[0]));
       memset (cygheap->threadlist + nthreads, 0, THREADLIST_CHUNK * sizeof (cygheap->threadlist[0]));
@@ -135,7 +136,22 @@ _threadinfo::init_thread (void *x, DWORD (*func) (void *, void *))
 }
 
 void
-_threadinfo::remove (DWORD wait)
+_cygtls::fixup_after_fork ()
+{
+  if (sig)
+    {
+      set_signal_mask (oldmask);
+      sig = 0;
+    }
+  stacklock = 0;
+  stackptr = stack + 1;	// FIXME?
+#ifdef DEBUGGING
+  memset (stackptr, 0, sizeof (stack) - sizeof (stack[0]));
+#endif
+}
+
+void
+_cygtls::remove (DWORD wait)
 {
   debug_printf ("wait %p\n", wait);
   sentry here (wait);
@@ -153,7 +169,7 @@ _threadinfo::remove (DWORD wait)
 }
 
 void
-_threadinfo::push (__stack_t addr, bool exception)
+_cygtls::push (__stack_t addr, bool exception)
 {
   if (exception)
     lock ();
@@ -166,13 +182,13 @@ _threadinfo::push (__stack_t addr, bool exception)
 #define BAD_IX ((size_t) -1)
 static size_t NO_COPY threadlist_ix = BAD_IX;
 
-_threadinfo *
-_threadinfo::find_tls (int sig)
+_cygtls *
+_cygtls::find_tls (int sig)
 {
   debug_printf ("sig %d\n", sig);
   sentry here (INFINITE);
   __asm__ volatile (".equ _threadlist_exception_return,.");
-  _threadinfo *res = NULL;
+  _cygtls *res = NULL;
   for (threadlist_ix = 0; threadlist_ix < nthreads; threadlist_ix++)
     if (sigismember (&(cygheap->threadlist[threadlist_ix]->sigwait_mask), sig))
       {
@@ -184,7 +200,7 @@ _threadinfo::find_tls (int sig)
 }
 
 void
-_threadinfo::set_siginfo (sigpacket *pack)
+_cygtls::set_siginfo (sigpacket *pack)
 {
   infodata = pack->si;
 }
@@ -222,7 +238,7 @@ handle_threadlist_exception (EXCEPTION_RECORD *e, void *frame, CONTEXT *, void *
 }
 
 void
-_threadinfo::init_threadlist_exceptions (exception_list *el)
+_cygtls::init_threadlist_exceptions (exception_list *el)
 {
   extern void init_exception_handler (exception_list *, exception_handler *);
   init_exception_handler (el, handle_threadlist_exception);
