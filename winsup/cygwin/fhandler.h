@@ -360,6 +360,7 @@ class fhandler_base
   virtual bool is_slow () {return 0;}
   bool is_auto_device () {return isdevice () && !dev.isfs ();}
   bool is_fs_device () {return dev.isfs ();}
+  bool device_access_denied (int) __attribute__ ((regparm (1)));
 };
 
 class fhandler_socket: public fhandler_base
