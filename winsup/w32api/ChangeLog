@@ -1,3 +1,12 @@
+2001-03-20  Danny Smith <dannysmith@users.sourceforge.net>
+
+	* include/winsock.h (_SYS_TYPES_H macro guard for int types): Remove;
+	use only _BSDTYPES_DEFINED macro now defined in newlib sys/types.h.
+	(SYS_TYPES_H macro guard for fd_set): Replace with_SYS_TYPES_FD_SET
+	macro now defined in newlib sys/types.h.  Emit warning if defined.
+	* include/winsock2.h: Ditto.
+	* include/windows.h (Win32_Winsock): Replace with new macros
+	__USE_W32_SOCKETS and warn of deprecation.
 
 2001-03-13  Earnie Boyd  <earnie@users.sourceforge.net
 

@@ -133,7 +133,14 @@
 #include <shellapi.h>
 #include <winperf.h>
 #include <winspool.h>
-#if defined(Win32_Winsock) || !(defined(__INSIDE_CYGWIN__) || defined(__CYGWIN__) || defined(__CYGWIN32__) || defined(_UWIN))
+#if defined(Win32_Winsock)
+#warning "The  Win32_Winsock macro name is deprecated.\
+    Please use __USE_W32_SOCKETS instead"
+#ifndef __USE_W32_SOCKETS
+#define __USE_W32_SOCKETS
+#endif
+#endif
+#if defined(__USE_W32_SOCKETS) || !(defined(__INSIDE_CYGWIN__) || defined(__CYGWIN__) || defined(__CYGWIN32__) || defined(_UWIN))
 #include <winsock.h>
 #endif
 #endif /* WIN32_LEAN_AND_MEAN */

@@ -25,14 +25,14 @@
 extern "C" {
 #endif
 /*   Names common to Winsock1.1 and Winsock2  */
-#if !defined ( _BSDTYPES_DEFINED ) && !defined ( _SYS_TYPES_H  )
+#if !defined ( _BSDTYPES_DEFINED )
 /* also defined in gmon.h and in cygwin's sys/types */
 typedef unsigned char	u_char;
 typedef unsigned short	u_short;
 typedef unsigned int	u_int;
 typedef unsigned long	u_long;
 #define _BSDTYPES_DEFINED
-#endif /* ndef _BSDTYPES_  _SYS_TYPES_H */
+#endif /* ! def _BSDTYPES_DEFINED  */
 typedef u_int	SOCKET;
 #ifndef FD_SETSIZE
 #define FD_SETSIZE	64
@@ -43,8 +43,10 @@ typedef u_int	SOCKET;
 #define SD_SEND         0x01
 #define SD_BOTH         0x02
 
-#ifndef _SYS_TYPES_H
-/* fd_set may have been defined by the newlib <sys/types.h>.  */
+#ifndef _SYS_TYPES_FD_SET
+/* fd_set may be defined by the newlib <sys/types.h>
+ * if __USE_W32_SOCKETS not defined.   
+ */
 #ifdef fd_set
 #undef fd_set
 #endif
@@ -68,7 +70,7 @@ for (__i = 0; __i < ((fd_set *)(set))->fd_count ; __i++) {\
 } while (0)
 #endif
 #ifndef FD_SET
-/* this differs from the define in winsock.h */
+/* this differs from the define in winsock.h and in cygwin sys/types.h */
 #define FD_SET(fd, set) do { u_int __i;\
 for (__i = 0; __i < ((fd_set *)(set))->fd_count ; __i++) {\
 	if (((fd_set *)(set))->fd_array[__i] == (fd)) {\
@@ -89,7 +91,10 @@ if (__i == ((fd_set *)(set))->fd_count) {\
 #ifndef FD_ISSET
 #define FD_ISSET(fd, set) __WSAFDIsSet((SOCKET)(fd), (fd_set *)(set))
 #endif
-#endif /* ndef _SYS_TYPES_H */
+#elif !defined (USE_SYS_TYPES_FD_SET)
+#warning "fd_set and associated macros have been defined in sys/types.  \
+    This may cause runtime problems with W32 sockets" 
+#endif /* ndef _SYS_TYPES_FD_SET */
 #ifndef __INSIDE_CYGWIN__
 struct timeval {
 	long    tv_sec;
