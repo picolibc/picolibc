@@ -52,25 +52,29 @@ DllMain (HANDLE hDllHandle /* Library instance handle. */,
 {
 
   extern CRITICAL_SECTION __mingwthr_cs;
-  extern void __mingwthr_run_key_dtors (DWORD);
+  extern void __mingwthr_run_key_dtors( void );
+
+#ifdef DEBUG
+  printf ("%s: reason %d\n", __FUNCTION__, reason );
+#endif
 
   switch (reason)
     {
     case DLL_PROCESS_ATTACH:
-      InitializeCriticalSection (&__mingwthr_cs);
-      break;
+       InitializeCriticalSection (&__mingwthr_cs);
+       break;
 
     case DLL_PROCESS_DETACH:
-      DeleteCriticalSection (&__mingwthr_cs);
+      __mingwthr_run_key_dtors();
+       DeleteCriticalSection (&__mingwthr_cs);
       break;
 
     case DLL_THREAD_ATTACH:
       break;
 
     case DLL_THREAD_DETACH:
-      __mingwthr_run_key_dtors (GetCurrentThreadId ());
+      __mingwthr_run_key_dtors();
       break;
     }
   return TRUE;
 }
-

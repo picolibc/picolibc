@@ -12,7 +12,7 @@
  *
  *  This code is distributed in the hope that is will be useful but
  *  WITHOUT ANY WARRANTY. ALL WARRANTIES, EXPRESS OR IMPLIED ARE HEREBY
- *  DISCLAMED. This includeds but is not limited to warranties of
+ *  DISCLAIMED. This includeds but is not limited to warranties of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  * $Revision$

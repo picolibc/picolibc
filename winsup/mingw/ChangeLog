@@ -2,13 +2,72 @@
 
 	* include/strings.h: New File.
 
+2001-12-02  Danny Smith  <dannysmith@users.sourceforge.net> 
+
+	Apply patches from:
+	2001-06-21  Mumit Khan  <khan@nanotech.wisc.edu>
+
+	* include/math.h (_FPCLASS* ): Add defines from float.h.
+	(IEEE recommended functions): Add declarations from float.h.
+	* include/float.h (_FPCLASS* ): Protect against redefinition.
+
+2001-11-29   Wu Yongwei  <adah@netstd.com>
+ 
+	* include/_mingw.h,assert.h,conio.h,ctype.h,dir.h,direct.h
+	dirent.h,dos.h,errno.h,excpt.h,fcntl.h,float.h,io.h,
+	limits.h,locale.h,malloc.h,math.h,process.h,setjmp.h,
+	share.h,signal.h,stdarg.h,stddef.h,stdint.h,stdio.h,
+	stdlib.h,string.h,tchar.h,time.h,varargs.h,wchar.h,
+	wctype.h,sys/stat.h,sys/timeb.h,sys/types.h,sys/utime.h:
+	Correct spelling of "disclaimed" in comments.
+	* include/excpt.h: Another spelling correction. 
+
 2001-11-08  Robert Collins  <rbtcollins@hotmail.com>
 
 	* include/errno.h: Fix "errno is not a prototype" warning.
 
+2001-11-07  Danny Smith  <dannysmith@users.sourceforge.net> 
+
+	* include/ctype.h (tolower, toupper,_tolower,_toupper): Comment 
+	differences between ANSI and non-ANSI versions. 
+	(_ctype[],_pctype): Declare vars. 
+	(__ISCTYPE): New helper macro using _pctype. 
+	(is* ctype functions): Use __ISCTYPE to define inline versions. 
+	(_toupper, _tolower, __isascii, __toascii, __iscsym, __iscsymf):
+	Inline definitions. 
+	(isw* ctype functions): Inline definitions. 
+	* include/wctype.h (_ctype[],_pctype): Declare vars. 
+	(isw* ctype functions): Inline definitions. 
+
+
+2001-11-06  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/float.h (_clearfp, _statusfp, _fpreset, fpreset,
+	__fpecode): Use __STDC__ prototypes.
+ 
+
+2001-11-06 Thomas Pfaff <tpfaff@gmx.net>
+
+ 	* mthr_stub.c (__mingwthr_remove_key_dtor) New.
+ 	* mthr_init.c (DllMain) Run dtors if a process terminates.
+ 	* mthr.c  (__mingwthr_add_key_dtor)  Removed.
+ 	(___mingwthr_add_key_dtor)  New.
+ 	(___mingwthr_remove_key_dtor) New.
+ 	(__mingwthr_run_key_dtors) Complete rewrite.
+  	(__mingwthr_remove_key_dtor) New.
+
 2001-11-05  Egor Duda  <deo@logos-m.ru>
 
 	* Makefile.in: Delete unused executable after creating base-files.
+
+2001-11-06  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/errno.h (_errno): Use __STDC__ prototype.
+	Thanks to: Jim Barton.
+
+2001-11-04  "stefan" <stefan@lkcc.org>
+
+	* include/sys/locking.h (_LK_UNLCK, LK_UNLCK): Correct names.
 
 2001-10-30  Danny Smith  <dannysmith@users.sourceforge.net>
 
