@@ -449,6 +449,9 @@ dup_ent (void *old, void *src0, struct_type type)
       free (old);
     }
 
+  if (!src0)
+    return NULL;
+
   unionent *src = (unionent *) src0;
   debug_printf ("duping %sent \"%s\", %p", entnames[type],
 		src ? src->name : "<null!>", src);
