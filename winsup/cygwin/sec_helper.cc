@@ -329,10 +329,16 @@ int
 set_process_privilege (const char *privilege, bool enable, bool use_thread)
 {
   HANDLE hToken = NULL;
-  LUID restore_priv;
+  LUID priv_luid;
   TOKEN_PRIVILEGES new_priv, orig_priv;
   int ret = -1;
   DWORD size;
+
+  if (!LookupPrivilegeValue (NULL, privilege, &priv_luid))
+    {
+      __seterrno ();
+      goto out;
+    }
 
   if ((use_thread
        && !OpenThreadToken (GetCurrentThread (), TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES,
@@ -345,14 +351,8 @@ set_process_privilege (const char *privilege, bool enable, bool use_thread)
       goto out;
     }
 
-  if (!LookupPrivilegeValue (NULL, privilege, &restore_priv))
-    {
-      __seterrno ();
-      goto out;
-    }
-
   new_priv.PrivilegeCount = 1;
-  new_priv.Privileges[0].Luid = restore_priv;
+  new_priv.Privileges[0].Luid = priv_luid;
   new_priv.Privileges[0].Attributes = enable ? SE_PRIVILEGE_ENABLED : 0;
 
   if (!AdjustTokenPrivileges (hToken, FALSE, &new_priv,

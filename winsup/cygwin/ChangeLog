@@ -1,5 +1,15 @@
 2003-11-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sec_helper.cc (set_process_privilege): Rename restore_priv to
+	priv_luid.
+
+2003-11-26  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* sec_helper.cc (set_process_privilege): Call LookupPrivilegeValue
+	before opening the token.
+
+2003-11-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dir.cc (mkdir): Use local security_descriptor. Call
 	set_security_attribute appropriately.
 	* external.cc (cygwin_internal): Ditto.
