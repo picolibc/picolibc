@@ -2074,12 +2074,6 @@ typedef enum tagTOKEN_TYPE {
 	TokenPrimary = 1,
 	TokenImpersonation
 } TOKEN_TYPE,*PTOKEN_TYPE;
-#if (_WIN32_WINNT >= 0x0501)
-typedef LONG (WINAPI *PVECTORED_EXCEPTION_HANDLER)(PEXCEPTION_POINTERS);
-typedef enum _HEAP_INFORMATION_CLASS {
-	HeapCompatibilityInformation
-} HEAP_INFORMATION_CLASS;
-#endif
 typedef struct _TOKEN_STATISTICS {
 	LUID TokenId;
 	LUID AuthenticationId;
@@ -3167,6 +3161,9 @@ typedef enum _POWER_INFORMATION_LEVEL {
 	ProcessorPowerPolicyCurrent
 } POWER_INFORMATION_LEVEL;
 
+#if (_WIN32_WINNT >= 0x0500)
+typedef LONG (WINAPI *PVECTORED_EXCEPTION_HANDLER)(PEXCEPTION_POINTERS);
+#endif
 #if 1 /* (WIN32_WINNT >= 0x0500) */
 typedef struct _SYSTEM_POWER_INFORMATION {
 	ULONG  MaxIdlenessAllowed;
@@ -3176,7 +3173,10 @@ typedef struct _SYSTEM_POWER_INFORMATION {
 } SYSTEM_POWER_INFORMATION,*PSYSTEM_POWER_INFORMATION;
 #endif
 
-#if (WIN32_WINNT >= 0x0501)
+#if (_WIN32_WINNT >= 0x0501)
+typedef enum _HEAP_INFORMATION_CLASS {
+	HeapCompatibilityInformation
+} HEAP_INFORMATION_CLASS;
 typedef enum _ACTIVATION_CONTEXT_INFO_CLASS {
 	ActivationContextBasicInformation = 1,
 	ActivationContextDetailedInformation,

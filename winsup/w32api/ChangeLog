@@ -1,3 +1,11 @@
+2003-10-09  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/winbase.h (AddVectoredExceptionHandler): Define if
+	_WIN32_WINNT >= 0x0500.
+
+	* include/winnt.h (PVECTORED_EXCEPTION_HANDLER): Define if
+	_WIN32_WINNT >= 0x0500.
+
 2003-10-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/winbase.h (AddVectoredExceptionHandler): Only define if
