@@ -1,3 +1,11 @@
+Mon Jul 24 13:26:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_dev_random): Add members for managing
+	pseudo randomness.
+	* fhandler_random.cc: Rearrange. Use pseudo random number generator
+	as entropy source if system entropy isn't available and if device is
+	used as /dev/urandom. Allow initializing device by calling write().
+
 Sun Jul 23 23:11:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler.h: Add comment.

@@ -743,6 +743,11 @@ class fhandler_dev_random: public fhandler_base
 protected:
   int unit;
   HCRYPTPROV crypt_prov;
+  long pseudo;
+
+  BOOL crypt_gen_random (void *ptr, size_t len);
+  int pseudo_write (const void *ptr, size_t len);
+  int pseudo_read (void *ptr, size_t len);
 
 public:
   fhandler_dev_random (const char *name, int unit);
