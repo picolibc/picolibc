@@ -2786,8 +2786,9 @@ check_sysfile (const char *path, DWORD fileattr, HANDLE h,
 	     NUL.  The length returned is the path without
 	     *any* trailing NULs.  We also have to handle (or
 	     at least not die from) corrupted paths.  */
-	  if (memchr (contents, 0, got) != NULL)
-	    res = strlen (contents);
+	  char *end;
+	  if ((end = (char *) memchr (contents, 0, got)) != NULL)
+	    res = end - contents;
 	  else
 	    res = got;
 	}
