@@ -826,6 +826,7 @@ class fhandler_console: public fhandler_termios
   void set_close_on_exec (int val);
   void fixup_after_fork (HANDLE parent);
   void set_input_state ();
+  void send_winch_maybe ();
 };
 
 class fhandler_tty_common: public fhandler_termios

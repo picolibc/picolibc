@@ -147,13 +147,6 @@ set_console_state_for_spawn ()
 #     define tc shared_console_info	/* ACK.  Temporarily define for use in TTYSETF macro */
       SetConsoleMode (h, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_INPUT);
       TTYSETF (RSTCONS);
-#if 0
-      char ch;
-      DWORD n;
-      /* NOTE -- This ReadFile is apparently necessary for correct functioning on
-	 Windows NT 4.0.  Without this, the next ReadFile returns garbage.  */
-      (void) ReadFile (h, &ch, 0, &n, NULL);
-#endif
 #     undef tc
     }
 
@@ -184,6 +177,17 @@ fhandler_console::set_cursor_maybe ()
       SetConsoleCursorPosition (get_output_handle (), now.dwCursorPosition);
       dwLastCursorPosition = now.dwCursorPosition;
     }
+}
+
+void
+fhandler_console::send_winch_maybe ()
+{
+  SHORT y = info.dwWinSize.Y;
+  SHORT x = info.dwWinSize.X;
+  fillin_info ();
+	       
+  if (y != info.dwWinSize.Y || x != info.dwWinSize.X)
+    tc->kill_pgrp (SIGWINCH);
 }
 
 int __stdcall
@@ -332,9 +336,10 @@ fhandler_console::read (void *pv, size_t buflen)
 	  break;
 
 	case MOUSE_EVENT:
+	  send_winch_maybe ();
 	  if (use_mouse)
 	    {
-	      MOUSE_EVENT_RECORD & mouse_event = input_rec.Event.MouseEvent;
+	      MOUSE_EVENT_RECORD& mouse_event = input_rec.Event.MouseEvent;
 
 	      /* Treat the double-click event like a regular button press */
 	      if (mouse_event.dwEventFlags == DOUBLE_CLICK)
@@ -416,10 +421,10 @@ fhandler_console::read (void *pv, size_t buflen)
 	    }
 	  break;
 
+	case FOCUS_EVENT:
 	case WINDOW_BUFFER_SIZE_EVENT:
-	  tc->kill_pgrp (SIGWINCH);
-	  continue;
-
+	  send_winch_maybe ();
+	  /* fall through */
 	default:
 	  continue;
 	}
@@ -493,7 +498,7 @@ fhandler_console::scroll_screen (int x1, int y1, int x2, int y2, int xn, int yn)
   CHAR_INFO fill;
   COORD dest;
 
-  (void)fillin_info ();
+  (void) fillin_info ();
   sr1.Left = x1 >= 0 ? x1 : info.dwWinSize.X - 1;
   if (y1 == 0)
     sr1.Top = info.winTop;
@@ -761,8 +766,6 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
     {
       flags |= ENABLE_PROCESSED_INPUT;
     }
-  /* What about ENABLE_WINDOW_INPUT
-     and ENABLE_MOUSE_INPUT   ? */
 
   if (use_tty)
     {
@@ -956,7 +959,7 @@ fhandler_console::cursor_set (BOOL rel_to_top, int x, int y)
 {
   COORD pos;
 
-  (void)fillin_info ();
+  (void) fillin_info ();
   if (y > info.winBottom)
     y = info.winBottom;
   else if (y < 0)
@@ -1692,7 +1695,7 @@ fhandler_console::init (HANDLE f, DWORD a, mode_t bin)
   if (f != INVALID_HANDLE_VALUE)
     CloseHandle (f);	/* Reopened by open */
 
-  output_tcsetattr (0, &tc->ti);
+  this->tcsetattr (0, &tc->ti);
 }
 
 int

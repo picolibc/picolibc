@@ -661,18 +661,22 @@ peek_console (select_record *me, bool)
       break;
     else
       {
-	if (irec.EventType == WINDOW_BUFFER_SIZE_EVENT)
-	  fh->tc->kill_pgrp (SIGWINCH);
-	else if (irec.EventType == MOUSE_EVENT &&
-		 (irec.Event.MouseEvent.dwEventFlags == 0 ||
-		  irec.Event.MouseEvent.dwEventFlags == DOUBLE_CLICK))
+	if (irec.EventType == KEY_EVENT)
 	  {
-	    if (fh->mouse_aware ())
+	    if (irec.Event.KeyEvent.bKeyDown
+		&& (irec.Event.KeyEvent.uChar.AsciiChar
+		    || get_nonascii_key (irec, tmpbuf)))
 	      return me->read_ready = true;
 	  }
-	else if (irec.EventType == KEY_EVENT && irec.Event.KeyEvent.bKeyDown == true &&
-		 (irec.Event.KeyEvent.uChar.AsciiChar || get_nonascii_key (irec, tmpbuf)))
-	  return me->read_ready = true;
+	else
+	  {
+	    fh->send_winch_maybe ();
+	    if (irec.EventType == MOUSE_EVENT
+		&& fh->mouse_aware ()
+		&& (irec.Event.MouseEvent.dwEventFlags == 0
+		    || irec.Event.MouseEvent.dwEventFlags == DOUBLE_CLICK))
+		return me->read_ready = true;
+	  }
 
 	/* Read and discard the event */
 	ReadConsoleInput (h, &irec, 1, &events_read);

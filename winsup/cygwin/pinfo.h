@@ -131,7 +131,7 @@ class pinfo
 {
   HANDLE h;
   _pinfo *procinfo;
-  int destroy;
+  bool destroy;
 public:
   void init (pid_t n, DWORD create = 0, HANDLE h = NULL) __attribute__ ((regparm(3)));
   pinfo () {}
@@ -154,10 +154,15 @@ public:
   _pinfo *operator * () const {return procinfo;}
   operator _pinfo * () const {return procinfo;}
   // operator bool () const {return (int) h;}
-#ifdef _SIGPROC_H
-  int remember () {destroy = 0; return proc_subproc (PROC_ADDCHILD, (DWORD) this);}
-#else
+#ifndef _SIGPROC_H
   int remember () {system_printf ("remember is not here"); return 0;}
+#else
+  int remember ()
+  {
+    int res = proc_subproc (PROC_ADDCHILD, (DWORD) this);
+    destroy = res ? false : true;
+    return res;
+  }
 #endif
   HANDLE shared_handle () {return h;}
 };
