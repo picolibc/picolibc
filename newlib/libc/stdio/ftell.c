@@ -46,7 +46,7 @@ The result of <<ftell>>/<<ftello>> is the current position for a file
 identified by <[fp]>.  If you record this result, you can later
 use it with <<fseek>>/<<fseeko>> to return the file to this
 position.  The difference between <<ftell>> and <<ftello>> is that
-<<ftell>> returns <<long>> and <<ftello> returns <<off_t>>.
+<<ftell>> returns <<long>> and <<ftello>> returns <<off_t>>.
 
 In the current implementation, <<ftell>>/<<ftello>> simply uses a character
 count to represent the file position; this is the same number that

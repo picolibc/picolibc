@@ -1,3 +1,16 @@
+2002-07-16  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/Makefile.am (stmp-extra): New target to set makeinfo flag
+        if LIBC_EXTRA_LIB is present.
+        * libc/Makefile.in: Regenerated.
+	* libc/libc.texinfo: Add blank line.
+        * libc/argz/Makefile.am: Add doc support.
+        * libc/search/Makefile.am: Ditto.
+        * libc/argz/Makefile.in: Regenerated.
+        * libc/search/Makefile.in: Ditto.
+        * libc/misc/misc.tex: Add ffs function.
+        * libc/stdio/ftell.c: Fix missing doc delimeter in description.
+
 2002-07-15  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/config.h[__H8300__]: Replace __SMALL_BITFIELDS

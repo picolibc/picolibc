@@ -138,6 +138,16 @@ libargz_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
 @USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
+
+SUFFIXES = .def
+
+CHEWOUT_FILES = 
+
+CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
+
+TARGETDOC = ../tmp.texi
+
+CLEANFILES = $(CHEWOUT_FILES) *.ref
 mkinstalldirs = $(SHELL) $(top_srcdir)/../../mkinstalldirs
 CONFIG_CLEAN_FILES = 
 LIBRARIES =  $(noinst_LIBRARIES)
@@ -186,7 +196,7 @@ OBJECTS = $(lib_a_OBJECTS) $(libargz_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .lo .o .obj .s
+.SUFFIXES: .S .c .def .lo .o .obj .s
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/../../Makefile.shared
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus argz/Makefile
 
@@ -340,6 +350,7 @@ installdirs:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-rm -f Makefile $(CONFIG_CLEAN_FILES)
@@ -389,6 +400,12 @@ install uninstall-am uninstall all-redirect all-am all installdirs \
 mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
+
+.c.def:
+	$(CHEW) < $< > $*.def 2> $*.ref
+	touch stmp-def
+
+doc: $(CHEWOUT_FILES)
 
 objectlist.awk.in: $(noinst_LTLIBRARIES)
 	-rm -f objectlist.awk.in

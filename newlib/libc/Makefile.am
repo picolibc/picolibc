@@ -114,7 +114,7 @@ SUBDEFS = \
 	$(LIBC_EXTRA_DEF) \
 	misc/stmp-def
 
-libc.info: sigset.texi targetdep.tex $(SUBDEFS)
+libc.info: sigset.texi extra.texi targetdep.tex $(SUBDEFS)
 
 stmp-sigset: config.status
 	if test -n "$(LIBC_SIGNAL_LIB)"; then \
@@ -126,6 +126,17 @@ stmp-sigset: config.status
 	touch $@
 
 sigset.texi: stmp-sigset ; @true
+
+stmp-extra: config.status
+	if test -n "$(LIBC_EXTRA_LIB)"; then \
+	  echo "@set EXTRA" >tmp.texi; \
+	else \
+	  echo "@clear EXTRA" >tmp.texi; \
+	fi
+	$(SHELL) $(newlib_basedir)/../move-if-change tmp.texi extra.texi
+	touch $@
+
+extra.texi: stmp-extra ; @true
 
 stmp-targetdep: force
 	rm -f tmp.texi
