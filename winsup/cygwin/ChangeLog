@@ -1,3 +1,8 @@
+2002-04-28  Norbert Schulze  <norbert.schulze@web.de>
+
+	* localtime.cc (tzsetwall): Use wildabbr if generated timezone name
+	length < 3.
+
 2002-05-05  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* spawn.cc (spawn_guts): Move call to set_process_privilege()
