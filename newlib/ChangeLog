@@ -1,3 +1,12 @@
+Sun Jul  7 01:23:45 2002  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* libc/machine/sh/Makefile.am (lib_a_SOURCES):
+	Make strcmp.S unconditional.
+	* libc/machine/sh/Makefile.in: Regenerate.
+	* libc/machine/sh/asm.h (DELAYED_BRANCHES, SL): Also for __SH5__ .
+	* strcmp.S (strcmp): Add SHmedia variant.  Use different registers
+	for SHcompact.
+
 2002-07-04  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/inode.c: Fix utime prototype and add _LIBC
