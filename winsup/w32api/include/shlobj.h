@@ -140,14 +140,19 @@ extern "C" {
 #define CSIDL_INTERNET_CACHE   32
 #define CSIDL_COOKIES	33
 #define CSIDL_HISTORY	34
-#define CFSTR_SHELLIDLIST	"Shell IDList Array"
-#define CFSTR_SHELLIDLISTOFFSET	"Shell Object Offsets"
-#define CFSTR_NETRESOURCES	"Net Resource"
-#define CFSTR_FILEDESCRIPTOR	"FileGroupDescriptor"
-#define CFSTR_FILECONTENTS	"FileContents"
-#define CFSTR_FILENAME	"FileName"
-#define CFSTR_PRINTERGROUP	"PrinterFriendlyName"
-#define CFSTR_FILENAMEMAP	"FileNameMap"
+#define CFSTR_SHELLIDLIST	TEXT("Shell IDList Array")
+#define CFSTR_SHELLIDLISTOFFSET	TEXT("Shell Object Offsets")
+#define CFSTR_NETRESOURCES	TEXT("Net Resource")
+#define CFSTR_FILEDESCRIPTOR	TEXT("FileGroupDescriptor")
+#define CFSTR_FILECONTENTS	TEXT("FileContents")
+#define CFSTR_FILENAME	TEXT("FileName")
+#define CFSTR_PRINTERGROUP	TEXT("PrinterFriendlyName")
+#define CFSTR_FILENAMEMAP	TEXT("FileNameMap")
+#define CFSTR_INDRAGLOOP	TEXT("InShellDragLoop")
+#define CFSTR_PASTESUCCEEDED	TEXT("Paste Succeeded")
+#define CFSTR_PERFORMEDDROPEFFECT	TEXT("Performed DropEffect")
+#define CFSTR_PREFERREDDROPEFFECT	TEXT("Preferred DropEffect")
+#define CFSTR_SHELLURL	TEXT("UniformResourceLocator")
 #define CMF_NORMAL	0
 #define CMF_DEFAULTONLY	1
 #define CMF_VERBSONLY	2
