@@ -1,3 +1,46 @@
+2001-11-01  Christopher Faylor  <cgf@redhat.com>
+
+	* dtable.cc (dtable::build_fhandler): Issue internal error on unknown
+	device.
+	* fhandler.cc (fhandler_base::close): Show both name and handle in
+	debugging output.
+
+	* fhandler.h (fhandler_base::get_guard): New virtual method.
+	(fhandler_pipe::get_guard): New method.
+	(fhandler_socket::ready_for_read): Delete declaration.
+	(fhandler_pipe::ready_for_read): Ditto.
+	(fhandler_serial::ready_for_read): Ditto.
+	(fhandler_console::ready_for_read): Ditto.
+	(fhandler_tty_common::ready_for_read): Ditto.
+	(fhandler_windows::ready_for_read): Ditto.
+	(struct select_record::peek): Declare new method.
+	* select.cc (MAKEready): Delete.
+	(peek_pipe): Use get_guard method to retrieve potential guard mutex
+	handle.
+	(fhandler_base::ready_for_read): Rewrite as generic ready-for-read
+	handler.  Should only be called for "slow" devices.
+	(fhandler_socket::ready_for_read): Delete definition.
+	(fhandler_pipe::ready_for_read): Ditto.
+	(fhandler_serial::ready_for_read): Ditto.
+	(fhandler_console::ready_for_read): Ditto.
+	(fhandler_tty_common::ready_for_read): Ditto.
+	(fhandler_windows::ready_for_read): Ditto.
+	(fhandler_pipe::select_read): Fill in new peek record in select_record
+	structure.
+	(fhandler_console::select_read): Ditto.
+	(fhandler_tty_common::select_read): Ditto.
+	(fhandler_serial::select_read): Ditto.
+	(fhandler_socket::select_read): Ditto.
+	(fhandler_socket::select_read): Ditto.
+	(fhandler_tty_slave::ready_for_read): Check for tty not open.  Set
+	errnos appropriately.
+	* syscalls.cc (_read): Allow ready_for_read to set errno.
+
+	* pinfo.cc (pinfo::init): Return spawn/NO_WAIT process as valid if it
+	is initializing.
+	* sigproc.cc (getsem): Adjust wait for process to initialize downward
+	to avoid huge waits.
+
 2001-10-31  Christopher Faylor  <cgf@redhat.com>
 
 	* environ.cc: Set reset_com to false to mimic linux behavior more

@@ -314,10 +314,6 @@ _read (int fd, void *ptr, size_t len)
 	debug_printf ("non-interruptible read\n");
       else if (!cfd->ready_for_read (fd, wait, 0))
 	{
-	  if (!wait)
-	    set_sig_errno (EAGAIN);	/* Don't really need 'set_sig_errno' here, but... */
-	  else
-	    set_sig_errno (EINTR);
 	  res = -1;
 	  goto out;
 	}

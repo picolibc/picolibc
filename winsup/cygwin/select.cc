@@ -84,24 +84,6 @@ typedef long fd_mask;
 #define allocfd_set(n) ((fd_set *) memset (alloca (sizeof_fd_set (n)), 0, sizeof_fd_set (n)))
 #define copyfd_set(to, from, n) memcpy (to, from, sizeof_fd_set (n));
 
-/* Make a fhandler_foo::ready_for_ready method.
-   Assumption: The "ready_for_read" methods are called with one level of
-   signal blocking. */
-#define MAKEready(what) \
-int \
-fhandler_##what::ready_for_read (int fd, DWORD howlong, int ignra) \
-{ \
-  select_record me (this); \
-  me.fd = fd; \
-  while (select_read (&me) && !me.read_ready && \
-         !peek_##what (&me, ignra) && howlong == INFINITE) \
-    if (fd >= 0 && cygheap->fdtab.not_open (fd)) \
-      break; \
-    else if (WaitForSingleObject (signal_arrived, 10) == WAIT_OBJECT_0) \
-      break; \
-  return me.read_ready; \
-}
-
 #define set_handle_or_return_if_not_open(h, s) \
   h = (s)->fh->get_handle (); \
   if (cygheap->fdtab.not_open ((s)->fd)) \
@@ -400,13 +382,14 @@ no_verify (select_record *, fd_set *, fd_set *, fd_set *)
 }
 
 static int
-peek_pipe (select_record *s, int ignra, HANDLE guard_mutex = NULL)
+peek_pipe (select_record *s, int ignra)
 {
   int n = 0;
   int gotone = 0;
   fhandler_base *fh = s->fh;
 
   HANDLE h;
+  HANDLE guard_mutex = s->fh->get_guard ();
   set_handle_or_return_if_not_open (h, s);
 
   /* Don't perform complicated tests if we don't need to. */
@@ -499,21 +482,6 @@ poll_pipe (select_record *me, fd_set *readfds, fd_set *writefds,
 	 0;
 }
 
-int
-fhandler_pipe::ready_for_read (int fd, DWORD howlong, int ignra)
-{
-  select_record me (this);
-  me.fd = fd;
-  (void) select_read (&me);
-  while (!peek_pipe (&me, ignra, guard) && howlong == INFINITE)
-    if (fd >= 0 && cygheap->fdtab.not_open (fd))
-      break;
-    else if (WaitForSingleObject (signal_arrived, 10) == WAIT_OBJECT_0)
-      break;
-  select_printf ("returning %d", me.read_ready);
-  return me.read_ready;
-}
-
 static int start_thread_pipe (select_record *me, select_stuff *stuff);
 
 struct pipeinf
@@ -596,6 +564,7 @@ fhandler_pipe::select_read (select_record *s)
     s = new select_record;
   s->startup = start_thread_pipe;
   s->poll = poll_pipe;
+  s->peek = peek_pipe;
   s->verify = verify_ok;
   s->read_selected = TRUE;
   s->cleanup = pipe_cleanup;
@@ -693,8 +662,6 @@ poll_console (select_record *me, fd_set *readfds, fd_set *writefds,
 	 0;
 }
 
-MAKEready (console)
-
 select_record *
 fhandler_console::select_read (select_record *s)
 {
@@ -707,6 +674,7 @@ fhandler_console::select_read (select_record *s)
       set_cursor_maybe ();
     }
 
+  s->peek = peek_console;
   s->h = get_handle ();
   s->read_selected = TRUE;
   return s;
@@ -745,21 +713,6 @@ fhandler_console::select_except (select_record *s)
   return s;
 }
 
-int
-fhandler_tty_common::ready_for_read (int fd, DWORD howlong, int ignra)
-{
-  select_record me (this);
-  me.fd = fd;
-  (void) select_read (&me);
-  while (!peek_pipe (&me, ignra) && howlong == INFINITE)
-    if (fd >= 0 && cygheap->fdtab.not_open (fd))
-      break;
-    else if (WaitForSingleObject (signal_arrived, 10) == WAIT_OBJECT_0)
-      break;
-  select_printf ("returning %d", me.read_ready);
-  return me.read_ready;
-}
-
 select_record *
 fhandler_tty_common::select_read (select_record *s)
 {
@@ -795,6 +748,7 @@ fhandler_tty_slave::select_read (select_record *s)
   s->h = input_available_event;
   s->startup = no_startup;
   s->poll = poll_pipe;
+  s->peek = peek_pipe;
   s->verify = verify_tty_slave;
   s->read_selected = TRUE;
   s->cleanup = NULL;
@@ -805,6 +759,11 @@ int
 fhandler_tty_slave::ready_for_read (int fd, DWORD howlong, int ignra)
 {
   HANDLE w4[2];
+  if (!cygheap->fdtab.not_open (fd))
+    {
+      set_errno (EBADF);
+      return 1;
+    }
   if (!ignra && get_readahead_valid ())
     {
       select_printf ("readahead");
@@ -814,13 +773,18 @@ fhandler_tty_slave::ready_for_read (int fd, DWORD howlong, int ignra)
   w4[1] = input_available_event;
   switch (WaitForMultipleObjects (2, w4, FALSE, howlong))
     {
+    case WAIT_OBJECT_0:
+      set_errno (EINTR);
+      return 0;
     case WAIT_OBJECT_0 + 1:
       return 1;
     case WAIT_FAILED:
       select_printf ("wait failed %E");
-    case WAIT_OBJECT_0:
-    case WAIT_TIMEOUT:
+      set_errno (EINVAL); /* FIXME: correct errno? */
+      return 0;
     default:
+      if (!howlong)
+	set_errno (EAGAIN);
       return 0;
     }
 }
@@ -1058,8 +1022,6 @@ poll_serial (select_record *me, fd_set *readfds, fd_set *writefds,
 	 0;
 }
 
-MAKEready (serial)
-
 select_record *
 fhandler_serial::select_read (select_record *s)
 {
@@ -1071,6 +1033,7 @@ fhandler_serial::select_read (select_record *s)
       s->verify = verify_ok;
       s->cleanup = serial_cleanup;
     }
+  s->peek = peek_serial;
   s->read_selected = TRUE;
   return s;
 }
@@ -1107,9 +1070,40 @@ fhandler_serial::select_except (select_record *s)
 }
 
 int
-fhandler_base::ready_for_read (int, DWORD, int)
+fhandler_base::ready_for_read (int fd, DWORD howlong, int ignra)
 {
-  return 1;
+  int avail = 0;
+  select_record me (this);
+  me.fd = fd;
+  while (!avail)
+    {
+      (void) select_read (&me);
+      avail = me.read_ready ?: me.peek (&me, ignra);
+
+      if (fd >= 0 && cygheap->fdtab.not_open (fd))
+	{
+	  set_errno (EBADF);
+	  avail = 0;
+	  break;
+	}
+
+      if (howlong != INFINITE)
+	{
+	  if (!avail)
+	    set_errno (EAGAIN);
+	  break;
+	}
+
+      if (WaitForSingleObject (signal_arrived, avail ? 0 : 10) == WAIT_OBJECT_0)
+	{
+	  set_errno (EINTR);
+	  avail = 0;
+	  break;
+	}
+    }
+
+  select_printf ("read_ready %d, avail %d", me.read_ready, avail);
+  return avail;
 }
 
 select_record *
@@ -1225,8 +1219,6 @@ poll_socket (select_record *me, fd_set *readfds, fd_set *writefds,
 	 set_bits (me, readfds, writefds, exceptfds) :
 	 0;
 }
-
-MAKEready (socket)
 
 static int start_thread_socket (select_record *, select_stuff *);
 
@@ -1406,6 +1398,7 @@ fhandler_socket::select_read (select_record *s)
       s->verify = verify_true;
       s->cleanup = socket_cleanup;
     }
+  s->peek = peek_socket;
   s->read_ready = saw_shutdown_read ();
   s->read_selected = TRUE;
   return s;
@@ -1475,8 +1468,6 @@ poll_windows (select_record *me, fd_set *readfds, fd_set *writefds,
 	 0;
 }
 
-MAKEready (windows)
-
 select_record *
 fhandler_windows::select_read (select_record *s)
 {
@@ -1487,6 +1478,7 @@ fhandler_windows::select_read (select_record *s)
       s->poll = poll_windows;
       s->verify = poll_windows;
     }
+  s->peek = peek_windows;
   s->h = get_handle ();
   s->read_selected = TRUE;
   s->h = get_handle ();

@@ -182,7 +182,8 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
       procinfo = (_pinfo *) MapViewOfFile (h, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
       ProtectHandle1 (h, pinfo_shared_handle);
 
-      if ((procinfo->process_state & PID_INITIALIZING) && (flag & PID_NOREDIR))
+      if ((procinfo->process_state & PID_INITIALIZING) && (flag & PID_NOREDIR)
+	  && cygwin_pid (procinfo->dwProcessId) != procinfo->pid)
 	{
 	  release ();
 	  set_errno (ENOENT);

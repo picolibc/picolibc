@@ -157,15 +157,15 @@ enum executable_states
 
 class fhandler_base
 {
-protected:
+ protected:
   DWORD status;
-private:
+ private:
   int access;
   HANDLE io_handle;
 
   unsigned long namehash;	/* hashed filename, used as inode num */
 
-protected:
+ protected:
   /* Full unix path name of this file */
   /* File open flags from open () and fcntl () calls */
   int openflags;
@@ -180,7 +180,7 @@ protected:
   char *win32_path_name;
   DWORD open_status;
 
-public:
+ public:
   void set_name (const char * unix_path, const char * win32_path = NULL,
 		 int unit = 0);
 
@@ -371,17 +371,18 @@ public:
     rabuf = NULL;
   }
   void operator delete (void *);
+  HANDLE get_guard () const {return NULL;}
 };
 
 class fhandler_socket: public fhandler_base
 {
-private:
+ private:
   int addr_family;
   int connect_secret [4];
   HANDLE secret_event;
   struct _WSAPROTOCOL_INFOA *prot_info_ptr;
 
-public:
+ public:
   fhandler_socket ();
   ~fhandler_socket ();
   int get_socket () { return (int) get_handle(); }
@@ -410,7 +411,6 @@ public:
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
-  int ready_for_read (int fd, DWORD howlong, int ignra);
   int get_addr_family () {return addr_family;}
   void set_addr_family (int af) {addr_family = af;}
   void set_connect_secret ();
@@ -428,13 +428,12 @@ class fhandler_pipe: public fhandler_base
   HANDLE writepipe_exists;
   DWORD orig_pid;
   unsigned id;
-public:
+ public:
   fhandler_pipe (DWORD devtype = FH_PIPE);
   off_t lseek (off_t offset, int whence);
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
-  int ready_for_read (int fd, DWORD howlong, int ignra);
   void set_close_on_exec (int val);
   int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   int close ();
@@ -443,11 +442,12 @@ public:
   void fixup_after_fork (HANDLE);
   bool hit_eof ();
   friend int make_pipe (int fildes[2], unsigned int psize, int mode);
+  HANDLE get_guard () const {return guard;}
 };
 
 class fhandler_dev_raw: public fhandler_base
 {
-protected:
+ protected:
   char *devbuf;
   size_t devbufsiz;
   size_t devbufstart;
@@ -470,7 +470,7 @@ protected:
 
   fhandler_dev_raw (DWORD dev, int unit);
 
-public:
+ public:
   ~fhandler_dev_raw (void);
 
   int get_unit () { return unit; }
@@ -491,11 +491,11 @@ public:
 
 class fhandler_dev_floppy: public fhandler_dev_raw
 {
-protected:
+ protected:
   virtual int is_eom (int win_error);
   virtual int is_eof (int win_error);
 
-public:
+ public:
   fhandler_dev_floppy (int unit);
 
   virtual int open (path_conv *, int flags, mode_t mode = 0);
@@ -512,13 +512,13 @@ class fhandler_dev_tape: public fhandler_dev_raw
 
   bool is_rewind_device () { return get_unit () < 128; }
 
-protected:
+ protected:
   virtual void clear (void);
 
   virtual int is_eom (int win_error);
   virtual int is_eof (int win_error);
 
-public:
+ public:
   fhandler_dev_tape (int unit);
 
   int open (path_conv *, int flags, mode_t mode = 0);
@@ -532,7 +532,7 @@ public:
 
   int ioctl (unsigned int cmd, void *buf);
 
-private:
+ private:
   int tape_write_marks (int marktype, DWORD len);
   int tape_get_pos (unsigned long *ret);
   int tape_set_pos (int mode, long count, BOOLEAN sfm_func = FALSE);
@@ -549,7 +549,7 @@ private:
 
 class fhandler_disk_file: public fhandler_base
 {
-public:
+ public:
   fhandler_disk_file ();
 
   int open (path_conv * real_path, int flags, mode_t mode);
@@ -568,12 +568,12 @@ public:
 
 class fhandler_serial: public fhandler_base
 {
-private:
+ private:
   unsigned int vmin_;			/* from termios */
   unsigned int vtime_;			/* from termios */
   pid_t pgrp_;
 
-public:
+ public:
   int overlapped_armed;
   OVERLAPPED io_status;
 
@@ -607,7 +607,6 @@ public:
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
-  int ready_for_read (int fd, DWORD howlong, int ignra);
 };
 
 #define acquire_output_mutex(ms) \
@@ -620,11 +619,11 @@ class tty;
 class tty_min;
 class fhandler_termios: public fhandler_base
 {
-protected:
+ protected:
   HANDLE output_handle;
   virtual void doecho (const void *, DWORD) {};
   virtual int accept_input () {return 1;};
-public:
+ public:
   tty_min *tc;
   fhandler_termios (DWORD dev, int unit = 0) :
   fhandler_base (dev, unit)
@@ -667,7 +666,7 @@ enum ansi_intensity
 /* This is a input and output console handle */
 class fhandler_console: public fhandler_termios
 {
-private:
+ private:
 
   WORD default_color, underline_color, dim_color;
 
@@ -737,7 +736,7 @@ private:
   int input_tcsetattr (int a, const struct termios *t);
   void set_cursor_maybe ();
 
-public:
+ public:
 
   fhandler_console ();
 
@@ -764,7 +763,6 @@ public:
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
-  int ready_for_read (int fd, DWORD howlong, int ignra);
   void fixup_after_exec (HANDLE);
   void set_close_on_exec (int val);
   void fixup_after_fork (HANDLE parent);
@@ -773,7 +771,7 @@ public:
 
 class fhandler_tty_common: public fhandler_termios
 {
-public:
+ public:
   fhandler_tty_common (DWORD dev, int unit = 0)
     : fhandler_termios (dev, unit), output_done_event (NULL),
     ioctl_request_event (NULL), ioctl_done_event (NULL), output_mutex (NULL),
@@ -806,12 +804,11 @@ public:
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
-  int ready_for_read (int fd, DWORD howlong, int ignra);
 };
 
 class fhandler_tty_slave: public fhandler_tty_common
 {
-public:
+ public:
   /* Constructor */
   fhandler_tty_slave ();
   fhandler_tty_slave (int);
@@ -834,7 +831,7 @@ public:
 class fhandler_pty_master: public fhandler_tty_common
 {
   int pktmode;			// non-zero if pty in a packet mode.
-public:
+ public:
   int need_nl;			// Next read should start with \n
 
   /* Constructor */
@@ -862,7 +859,7 @@ public:
 
 class fhandler_tty_master: public fhandler_pty_master
 {
-public:
+ public:
   /* Constructor */
   fhandler_console *console;	// device handler to perform real i/o.
   HANDLE hThread;		// process_output thread handle.
@@ -876,7 +873,7 @@ public:
 
 class fhandler_dev_null: public fhandler_base
 {
-public:
+ public:
   fhandler_dev_null ();
 
   void dump ();
@@ -887,7 +884,7 @@ public:
 
 class fhandler_dev_zero: public fhandler_base
 {
-public:
+ public:
   fhandler_dev_zero ();
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
@@ -900,7 +897,7 @@ public:
 
 class fhandler_dev_random: public fhandler_base
 {
-protected:
+ protected:
   int unit;
   HCRYPTPROV crypt_prov;
   long pseudo;
@@ -909,7 +906,7 @@ protected:
   int pseudo_write (const void *ptr, size_t len);
   int pseudo_read (void *ptr, size_t len);
 
-public:
+ public:
   fhandler_dev_random (int unit);
   int get_unit () { return unit; }
   int open (path_conv *, int flags, mode_t mode = 0);
@@ -924,12 +921,12 @@ public:
 
 class fhandler_dev_mem: public fhandler_base
 {
-protected:
+ protected:
   int unit;
   DWORD mem_size;
   DWORD pos;
 
-public:
+ public:
   fhandler_dev_mem (int unit);
   ~fhandler_dev_mem (void);
 
@@ -952,7 +949,7 @@ public:
 
 class fhandler_dev_clipboard: public fhandler_base
 {
-public:
+ public:
   fhandler_dev_clipboard ();
   int is_windows (void) { return 1; }
   int open (path_conv *, int flags, mode_t mode = 0);
@@ -965,7 +962,7 @@ public:
 
   void dump ();
 
-private:
+ private:
   off_t pos;
   void *membuffer;
   size_t msize;
@@ -974,10 +971,10 @@ private:
 
 class fhandler_windows: public fhandler_base
 {
-private:
+ private:
   HWND hWnd_;	// the window whose messages are to be retrieved by read() call
   int method_;  // write method (Post or Send)
-public:
+ public:
   fhandler_windows ();
   int is_windows (void) { return 1; }
   int open (path_conv *, int flags, mode_t mode = 0);
@@ -992,18 +989,17 @@ public:
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
-  int ready_for_read (int fd, DWORD howlong, int ignra);
 };
 
 class fhandler_dev_dsp : public fhandler_base
 {
-private:
+ private:
   int audioformat_;
   int audiofreq_;
   int audiobits_;
   int audiochannels_;
   bool setupwav(const char *pData, int nBytes);
-public:
+ public:
   fhandler_dev_dsp ();
   ~fhandler_dev_dsp();
 
@@ -1055,6 +1051,7 @@ struct select_record
   int (*startup) (select_record *me, class select_stuff *stuff);
   int (*poll) (select_record *me, fd_set *readfds, fd_set *writefds,
 	       fd_set *exceptfds);
+  int (*peek) (select_record *, int);
   int (*verify) (select_record *me, fd_set *readfds, fd_set *writefds,
 		 fd_set *exceptfds);
   void (*cleanup) (select_record *me, class select_stuff *stuff);
@@ -1070,7 +1067,7 @@ struct select_record
 
 class select_stuff
 {
-public:
+ public:
   ~select_stuff ();
   select_stuff (): always_ready (0), windows_used (0), start (0)
   {

@@ -325,14 +325,11 @@ dtable::build_fhandler (int fd, DWORD dev, const char *name, int unit)
 	fh = cnew (fhandler_dev_dsp) ();
 	break;
       default:
-	{
-	  /* FIXME - this could recurse forever */
-	  path_conv pc;
-	  return build_fhandler_from_name (fd, name, NULL, pc);
-	}
+	system_printf ("internal error -- unknown device - %p", dev);
+	fh = NULL;
     }
 
-  debug_printf ("%s - fd %d, fh %p", fh->get_name () ?: "", fd, fh);
+  debug_printf ("%s - fd %d, fh %p", fd, fh);
   return fd >= 0 ? (fds[fd] = fh) : fh;
 }
 

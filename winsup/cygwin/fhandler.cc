@@ -784,7 +784,7 @@ fhandler_base::close ()
 {
   int res = -1;
 
-  syscall_printf ("handle %p", get_handle());
+  syscall_printf ("closing '%s' handle %p", get_name (), get_handle());
   if (CloseHandle (get_handle()))
     res = 0;
   else
