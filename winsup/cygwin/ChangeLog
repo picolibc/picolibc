@@ -1,6 +1,11 @@
 2005-03-10  Christopher Faylor  <cgf@timesys.com>
 
-	* autoload.cc (LoadDllprime): Scrap use of .linkonce and just use an
+	* autoload.cc (LoadDLLprime): Use nocopy segment or forked processes
+	will not initialize properly.
+
+2005-03-10  Christopher Faylor  <cgf@timesys.com>
+
+	* autoload.cc (LoadDLLprime): Scrap use of .linkonce and just use an
 	ifdef guard to load .foo_init into data segment.
 
 	* dcrt0.cc (initial_env): Allow colon or space as CYGWIN_DEBUG

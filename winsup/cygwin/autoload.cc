@@ -57,7 +57,7 @@ details. */
    function.  */
 #define LoadDLLprime(dllname, init_also) __asm__ ("	\n\
 .ifndef " #dllname "_primed				\n\
-  .data							\n\
+  .section	.data_cygwin_nocopy,\"w\"		\n\
   .align	4					\n\
 ."#dllname "_info:					\n\
   .long		_std_dll_init				\n\
