@@ -1,3 +1,13 @@
+2003-10-01  Phil Edwards  <pme@gcc.gnu.org>
+
+	* config-ml.in:  Use ac_configure_args directly instead of
+	ml_arguments.  Only set ml_norecursion if --no[-]recursion is
+	actually seen.
+
+2003-10-01  Eric Botcazou  <ebotcazou@libertysurf.fr>
+
+	* config-ml.in: Propagate INSTALL variables.
+
 2003-09-21  Daniel Jacobowitz  <drow@mvista.com>
 
 	* configure.in: Pass a computed --program-transform-name
