@@ -1,3 +1,8 @@
+2002-10-14  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/windows.h: Don't include basetyps.h.
+	* include/objfwd.h: Do include basetyps.h.
+
 2002-10-13  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/objbase.h: Include rpc.h and rpcndr.h
