@@ -182,7 +182,7 @@ struct _reent
           char _asctime_buf[26];
           struct tm _localtime_buf;
           int _gamma_signgam;
-          unsigned long long _rand_next;
+          __extension__ unsigned long long _rand_next;
 
         } _reent;
   /* Two next two fields were once used by malloc.  They are no longer

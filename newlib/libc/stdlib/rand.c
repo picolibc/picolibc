@@ -82,7 +82,7 @@ _DEFUN_VOID (rand)
      Computer Programming," Vol 2, Seminumerical Algorithms, Third
      Edition, Addison-Wesley, 1998, p. 106 (line 26) & p. 108 */
   _REENT->_new._reent._rand_next = 
-    _REENT->_new._reent._rand_next * 6364136223846793005LL + 1;
+     _REENT->_new._reent._rand_next * __extension__ 6364136223846793005LL + 1;
   return (int)((_REENT->_new._reent._rand_next >> 32) & RAND_MAX);
 }
 
