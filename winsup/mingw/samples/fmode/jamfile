@@ -1,7 +1,0 @@
-
-Main test.exe : test.c ;
-
-Main test2.exe : test2.c ;
-
-Main all.exe : all.c ;
-
