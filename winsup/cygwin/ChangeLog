@@ -1,4 +1,8 @@
 2001-12-30  Christopher Faylor  <cgf@redhat.com>
+
+	* include/getopt.h: Fix define.
+
+2001-12-30  Christopher Faylor  <cgf@redhat.com>
 	    Ralf Habacker  <Ralf.Habacker@freenet.de>
 
 	* speclib: New file.

@@ -69,7 +69,7 @@ struct option {
 
 int getopt_long (int, char *const *, const char *, const struct option *, int *);
 #ifndef HAVE_DECL_GETOPT
-#define HAVE_DECL_GETOPT 0
+#define HAVE_DECL_GETOPT 1
 #endif
 
 #define no_argument             0
