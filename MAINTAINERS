@@ -23,7 +23,7 @@ cgen/; cgen parts of opcodes/, sim/ & include/
 
 config.guess; config.sub; dejagnu/config.guess;
 readline/support/config.sub; readline/support/config.guess
-	config: http://gnu.org
+	config: http://savannah.gnu.org/projects/config
 	Patches to config-patches@gnu.org.
 	Changes need to be done in tandem with the official CONFIG
 	sources or submitted to the master file maintainer and brought

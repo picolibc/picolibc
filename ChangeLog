@@ -1,3 +1,7 @@
+2002-01-03  Ben Elliston  <bje@redhat.com>
+
+	* MAINTAINERS: Update URL for config.* scripts.
+
 2001-12-18  Alan Modra  <amodra@bigpond.net.au>
 
 	* config.sub: Import latest version.
