@@ -1165,18 +1165,24 @@ dump_sysinfo ()
   printf ("\n");
 
   unsigned ml_fsname = 4, ml_dir = 7, ml_type = 6;
+  bool ml_trailing = false;
 
   struct mntent *mnt;
   setmntent (0, 0);
   while ((mnt = getmntent (0)))
     {
       unsigned n = (int) strlen (mnt->mnt_fsname);
+      ml_trailing |= (n > 1 && strchr ("\\/", mnt->mnt_fsname[n - 1]));
       if (ml_fsname < n)
 	ml_fsname = n;
       n = (int) strlen (mnt->mnt_dir);
+      ml_trailing |= (n > 1 && strchr ("\\/", mnt->mnt_dir[n - 1]));
       if (ml_dir < n)
 	ml_dir = n;
     }
+
+  if (ml_trailing)
+    puts ("Warning: Mount entries should not have a trailing (back)slash\n");
 
   if (givehelp)
     {

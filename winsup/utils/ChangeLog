@@ -1,5 +1,10 @@
 2004-10-10  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
 
+	* cygcheck.cc (dump_sysinfo): Warn about trailing (back)slash on mount
+	entries.
+
+2004-10-10  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
+
 	* cygcheck.cc (dump_sysinfo): Don't warn about empty path components,
 	just display ``.''.
 
