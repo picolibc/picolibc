@@ -947,7 +947,7 @@ sig_handle (int sig)
       while (ResumeThread (hMainThread) > 1)
 	;
       /* process pending signals */
-      sig_dispatch_pending ();
+      sig_dispatch_pending (1);
     }
 
 #if 0
