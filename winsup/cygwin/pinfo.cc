@@ -362,12 +362,17 @@ _pinfo::commune_send (DWORD code)
   if (sig_send (this, __SIGCOMMUNE))
     goto err;
 
+  /* FIXME: Need something better than an busy loop here */
   bool isalive;
   while ((isalive = alive ()))
     if (myself->hello_pid <= 0)
       break;
     else
-      Sleep (0);
+      {
+	DWORD prio = SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
+	Sleep (0);
+	SetThreadPriority (GetCurrentThread (), prio);
+      }
 
   CloseHandle (tome);
   tome = NULL;
