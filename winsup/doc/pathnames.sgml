@@ -209,7 +209,7 @@ device names is not sufficent.
 </para>
 
 <para>NT/W2K supports raw block special device support for partitions
-and drives. The device names for partitions is the drive letter
+and drives. The Win32 device name for a partition is the drive letter
 with leading <filename>\\.\</filename>, so the floppy would be
 <filename>\\.\A:</filename>, the first partition typically
 <filename>\\.\C:</filename>. Complete drives (except floppies
@@ -219,13 +219,14 @@ is the drive number which you can check in the disk manager.
 Each drive line has prepended the text "Disk x".
 </para>
 
-<para>To access tape drives, NT/W2K uses the file name
+<para>To access tape drives, NT/W2K uses the Win32 file name
 <filename>\\.\TAPEx</filename>. For example the first installed tape device
 is named <filename>\\.\tape0</filename>.
 </para>
 
-<para>To access those devices you have to mount them and you have to
-use the posix name of the device to be recognized by Cygwin.
+<para>Up to Cygwin 1.3.3 this is the only way to use those devices.
+To access them you have to mount them and you have to use the posix
+name of the device to be recognized by Cygwin.
 The naming convention is simple: The name has to begin with
 <filename>/dev/</filename> and the rest is as you like. The only
 exception are tape devices. To identify if the tape device is
@@ -247,6 +248,77 @@ mount -b //./tape0 /dev/nst0          # ...and as the no-rewind device
 include the -b option when mounting these devices to ensure that all
 file I/O is in "binary mode".
 </para>
+
+<para>
+NT knows another way of accessing these devices. In the internal NT
+namespace the devices are using different names.  The Win32 names are
+only a sort of symbolic link to the NT internal device name.
+E.g. the first harddisk is the NT internal device \device\harddisk0\partition0
+or the first partition on the third harddisk is \device\harddisk2\partition1.
+The first floppy in the system is \device\floppy0, the first CD-ROM is
+\device\cdrom0 and the first tape drive is \device\tape0.
+</para>
+
+<para>
+Since Cygwin 1.3.4 these devices are accessible from inside of Cygwin processes
+using fixed device names.  That means, you don't have to mount the devices
+anymore which results in a more cleaner mount table.
+</para>
+
+<para>The new fixed POSIX names are mapped to NT internal devices as
+follows:</para>
+
+<screen>
+/dev/st0	\device\tape0, rewind
+/dev/nst0	\device\tape0, no-rewind
+/dev/st1	\device\tape1
+...
+
+/dev/fd0	\device\floppy0
+/dev/fd1	\device\floppy1
+...
+
+/dev/scd0	\device\cdrom0
+/dev/scd1	\device\cdrom1
+...
+
+/dev/sda	\device\harddisk0\partition0	(whole disk)
+/dev/sda1	\device\harddisk0\partition1	(first partition)
+...
+/dev/sda15	\device\harddisk0\partition15	(fifteenth partition)
+
+/dev/sdb	\device\harddisk1\partition0
+/dev/sdb1	\device\harddisk1\partition1
+
+[up to]
+
+/dev/sdl	\device\harddisk11\partition0
+/dev/sdl1	\device\harddisk11\partition1
+...
+/dev/sdl15	\device\harddisk11\partition15
+</screen>
+
+<para>
+if you don't like these device names, feel free to create symbolic
+links as they are created on Linux systems for convenience:
+</para>
+
+<screen>
+ln -s /dev/scd0 /dev/cdrom
+ln -s /dev/st0  /dev/tape
+...
+</screen>
+
+<para>
+Note that you can't use the mount table to map from fixed device name
+to your own device name or to map from internal NT device name to
+your own device name.  The following two examples will not work:
+</para>
+
+<screen>
+mount -s -f -b /dev/st0 /dev/tape
+mount -s -f -b /device/tape0 /dev/tape
+</screen>
 
 </sect2>
 

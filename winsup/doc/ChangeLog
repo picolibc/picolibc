@@ -1,3 +1,7 @@
+Tue Oct 16 17:14:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* pathnames.sgml: Add description for new fixed device paths.
+
 Fri Sep  7 12:47:47 2001  Michael Schaap <cygwin@mscha.com>
 
 	* how-resources.texinfo: Add some additional words about where to find
