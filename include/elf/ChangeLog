@@ -1,3 +1,7 @@
+Wed Dec  1 03:02:15 1999  Jeffrey A Law  (law@cygnus.com)
+
+	* mn10300.h (E_MN10300_MACH_AM33): Define.
+
 Mon Oct 11 22:42:37 1999  Jeffrey A Law  (law@cygnus.com)
 
 	* hppa.h (PF_HP_PAGE_SIZE): Define.

@@ -50,4 +50,5 @@ END_RELOC_NUMBERS
    the rest are open. */
 
 #define E_MN10300_MACH_MN10300	0x00810000
+#define E_MN10300_MACH_AM33	0x00820000
 #endif /* _ELF_MN10300_H */
