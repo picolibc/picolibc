@@ -288,8 +288,9 @@
 #define PT_LOPROC	0x70000000	/* Processor-specific */
 #define PT_HIPROC	0x7FFFFFFF	/* Processor-specific */
 
-#define PT_GNU_EH_FRAME	(PT_LOOS + 0x474e550)
-#define PT_GNU_STACK	(PT_LOOS + 0x474e551)
+#define PT_GNU_EH_FRAME	(PT_LOOS + 0x474e550) /* Frame unwind information */
+#define PT_GNU_STACK	(PT_LOOS + 0x474e551) /* Stack flags */
+#define PT_GNU_RELRO	(PT_LOOS + 0x474e552) /* Read-only after relocation */
 
 /* Program segment permissions, in program header p_flags field.  */
 

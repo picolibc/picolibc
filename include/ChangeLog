@@ -1,3 +1,10 @@
+2004-05-11  Jakub Jelinek  <jakub@redhat.com>
+
+	* bfdlink.h (struct bfd_link_info): Add relro, relro_start and
+	relro_end fields.
+	* elf/common.h (PT_GNU_EH_FRAME, PT_GNU_STACK): Add comments.
+	(PT_GNU_RELRO): Define.
+
 2004-05-04  Andreas Jaeger  <aj@suse.de>
 
 	* demangle.h: Do not use C++ reserved keyword typename as
