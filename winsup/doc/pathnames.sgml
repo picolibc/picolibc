@@ -156,15 +156,27 @@ default printer with the command <command>cat filename > PRN</command>
 
 <sect2> <title>POSIX devices</title>
 <para>There is no need to create a POSIX <filename>/dev</filename> 
-directory as it is simulated within Cygwin automatically.
-It supports the following devices: <filename>/dev/null</filename>,
-<filename>/dev/zero</filename>, <filename>/dev/tty</filename>,
-<filename>/dev/ttyX</filename>, <filename>/dev/ptmx</filename>,
-<filename>/dev/comX</filename> (the serial ports),
-<filename>/dev/windows</filename> (the windows message queue),
-<filename>/dev/random</filename> and <filename>/dev/urandom</filename>.
-These devices cannot be seen with the command <command>ls /dev</command>
+directory as Cygwin automatically simulates it internally. 
+These devices cannot be seen with the command <command>ls /dev/</command>
 although commands such as <command>ls /dev/tty</command> work fine.
+</para>
+<para>
+Cygwin supports the following devices commonly found on POSIX systems:
+<filename>/dev/dsp</filename>, <filename>/dev/null</filename>, 
+<filename>/dev/zero</filename>, <filename>/dev/console</filename>,
+<filename>/dev/tty</filename>, <filename>/dev/ttym</filename>, 
+<filename>/dev/ttyX</filename>, <filename>/dev/ttySX</filename>, 
+<filename>/dev/pipe</filename>, <filename>/dev/port</filename>, 
+<filename>/dev/ptmx</filename>, <filename>/dev/mem</filename>,
+<filename>/dev/random</filename>, and <filename>/dev/urandom</filename>.
+Cygwin also has several Windows-specific devices:
+<filename>/dev/comX</filename> (the serial ports, starting with 
+<filename>COM1</filename> which is the same as <filename>ttyS0</filename>),
+<filename>/dev/conin</filename> (Windows <filename>CONIN$</filename>),
+<filename>/dev/conout</filename> (Windows <filename>CONOUT$</filename>),
+<filename>/dev/clipboard</filename> (the Windows clipboard, currently
+text only), and
+<filename>/dev/windows</filename> (the Windows message queue).
 </para>
 
 <para>Windows NT/W2K/XP additionally support raw devices like floppies,
@@ -232,6 +244,7 @@ ln -s /dev/nst0  /dev/tape
 ...
 </screen>
 
+<warning>
 <para>
 Note that you can't use the mount table to map from fixed device name
 to your own device name or to map from internal NT device name to
@@ -241,10 +254,11 @@ The following three examples will not work as expected:
 </para>
 
 <screen>
-mount -f -b /dev/nst0 /dev/tape
+mount -f -b /dev/nst0 /dev/tape 
 mount -f -b /device/tape0 /dev/tape
 ln -s /device/tape0 /dev/tape
 </screen>
+</warning>
 
 </sect2>
 

@@ -20,8 +20,6 @@ for redirection from the Windows command shell.  It will also affect
 the default translation mode of a pipe, although most shells set the
 pipe to binary by default.
 </para>
-<warning><title>Warning!</title><para>If set in 12/98 b20.1, all files 
-always open in binary mode.</para></warning>
 </listitem>
 <listitem>
 <para><envar>check_case:level</envar> - Controls the behaviour of
@@ -81,11 +79,15 @@ settings are re-exported to the environment as <envar>CYGWIN</envar> again.
 Defaults to off.</para>
 </listitem>
 <listitem>
-<para><envar>error_start:filepath</envar> - if set, runs 
-<filename>filepath</filename> when cygwin encounters a fatal error.  This is
-useful for debugging.  <filename>filepath</filename> is usually set to the path
-to the <command>gdb</command> or <command>dumper</command> program.
-There is no default set.</para>
+<para>
+<envar>error_start:Win32filepath</envar> - if set, runs 
+<filename>Win32filepath</filename> when cygwin encounters a fatal error,
+which is useful for debugging.  <filename>Win32filepath</filename> is
+usually set to the path to <command>gdb</command> or
+<command>dumper</command>, for example
+<filename>C:\cygwin\bin\gdb.exe</filename>. 
+There is no default set.
+</para>
 </listitem>
 <listitem>
 <para><envar>forkchunk:32768</envar> - causes <function>fork()</function>
