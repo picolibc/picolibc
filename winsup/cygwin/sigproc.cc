@@ -1096,6 +1096,7 @@ wait_sig (VOID *self)
   for (;;)
     {
       DWORD rc = WaitForMultipleObjects (3, catchem, FALSE, sig_loop_wait);
+      (void) SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
 
       /* sigproc_terminate sets sig_loop_wait to zero to indicate that
        * this thread should terminate.

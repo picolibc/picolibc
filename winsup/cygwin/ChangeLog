@@ -1,5 +1,15 @@
 2002-11-14  Christopher Faylor  <cgf@redhat.com>
 
+	* exceptions.cc (setup_handler): Add debugging output.  Set thread
+	priority to idle if pending signals to allow other threads to get into
+	interruptible state.
+	* miscfuncs.cc (sys_mbstowcs): Save current thread in variable to avoid
+	an OS call.
+	* wait.cc (wait_sig): Reset thread priority each time through loop
+	since the priority may have been set down to deal with pending signals.
+
+2002-11-14  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler_serial.cc (fhandler_serial::tcgetattr): Don't take any
 	special action when vmin_ == 0.
 

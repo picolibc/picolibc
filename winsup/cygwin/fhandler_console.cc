@@ -1556,9 +1556,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	      src++;
 	    }
 	  else if (isalpha (*src))
-	    {
-	      dev_state->state_ = gotcommand;
-	    }
+	    dev_state->state_ = gotcommand;
 	  else if (*src != '@' && !isalpha (*src) && !isdigit (*src))
 	    {
 	      if (*src == '?')

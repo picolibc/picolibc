@@ -1,6 +1,6 @@
 /* miscfuncs.cc: misc funcs that don't belong anywhere else
 
-   Copyright 1996, 1997, 1998, 1999, 2000 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -295,8 +295,9 @@ sys_mbstowcs (WCHAR *tgt, const char *src, int len)
 void __stdcall
 low_priority_sleep (DWORD secs)
 {
-  DWORD prio = GetThreadPriority (GetCurrentThread ());
-  SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
+  HANDLE thisthread = GetCurrentThread ();
+  int curr_prio = GetThreadPriority (thisthread);
+  SetThreadPriority (thisthread, THREAD_PRIORITY_IDLE);
   Sleep (secs);
-  SetThreadPriority (GetCurrentThread (), prio);
+  SetThreadPriority (thisthread, curr_prio);
 }

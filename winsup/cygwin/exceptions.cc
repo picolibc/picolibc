@@ -637,7 +637,7 @@ interruptible (DWORD pc, int testvalid = 0)
 
 # define h ((HMODULE) m.AllocationBase)
   /* Apparently Windows 95 can sometimes return bogus addresses from
-     GetThreadContext.  These resolve to an allocation base == 0.
+     GetThreadContext.  These resolve to a strange allocation base.
      These should *never* be treated as interruptible. */
   if (!h || m.State != MEM_COMMIT)
     res = 0;
@@ -866,7 +866,13 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
 	  LeaveCriticalSection (&th->lock);
 	}
       else if (interruptible (cx.Eip))
-	interrupted = interrupt_now (&cx, sig, handler, siga);
+	{
+	  interrupted = interrupt_now (&cx, sig, handler, siga);
+#ifdef DEBUGGING
+	  if (!interrupted)
+	    sigproc_printf ("couldn't deliver signal %d via %p", sig, cx.Eip);
+#endif
+	}
       else
 	break;
     }
@@ -892,6 +898,8 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
     }
 
   sigproc_printf ("returning %d", interrupted);
+  if (pending_signals)
+    SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
   return interrupted;
 }
 #endif /* i386 */
