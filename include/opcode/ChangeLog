@@ -1,3 +1,8 @@
+Wed Jan  3 16:27:15 MET 2001  Jan hubicka  <jh@suse.cz>
+
+	* i386.h (i386_optab): Fix 64bit pushf template; Add instructions
+	introduced by Pentium4
+
 Sat Dec 30 19:03:15 MET 2000  Jan hubicka  <jh@suse.cz>
 
 	* i386.h (i386_optab): Add "rex*" instructions;
