@@ -1,5 +1,20 @@
 2002-07-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* cygserver_process (process::process): Add the client's cygpid
+	and winpid to all tracing statements as appropriate.
+	(process::exit_code): Ditto.
+	(process_cache::check_and_remove_process): Ditto.
+	* cygserver_shm.cc (server_shmmgr::shmat): Ditto.
+	(server_shmmgr::shmdt): Ditto.
+	(server_shmmgr::shmctl): Add a process object argument and remove
+	the explicit cygpid argument.  Add the client's cygpid and winpid
+	to all tracing statements as appropriate.
+	(server_shmmgr::shmget): Ditto.
+	(client_request_shm::serve): Update for the new signature of the
+	shmctl and shmget methods.
+
+2002-07-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* cygserver.cc (client_request_shutdown::serve): Don't set the
 	shutdown flag directly, but send a SIGINT, as the signal handler
 	sets the flag and the signal breaks the pause(2) in the main loop.

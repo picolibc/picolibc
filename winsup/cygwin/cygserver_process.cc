@@ -60,14 +60,14 @@ process::process (const pid_t cygpid, const DWORD winpid)
   _hProcess = OpenProcess (PROCESS_ALL_ACCESS, FALSE, winpid);
   if (!_hProcess)
     {
-      system_printf ("unable to obtain handle for new cache process %lu",
-		     winpid);
+      system_printf ("unable to obtain handle for new cache process %d(%lu)",
+		     _cygpid, _winpid);
       _hProcess = INVALID_HANDLE_VALUE;
       _exit_status = 0;
     }
   else
-    debug_printf ("got handle %p for new cache process %lu",
-		  _hProcess, _winpid);
+    debug_printf ("got handle %p for new cache process %d(%lu)",
+		  _hProcess, _cygpid, _winpid);
   InitializeCriticalSection (&_access);
 }
 
@@ -91,7 +91,8 @@ process::exit_code ()
       && _exit_status == STILL_ACTIVE
       && !GetExitCodeProcess (_hProcess, &_exit_status))
     {
-      system_printf ("failed to retrieve exit code (%lu)", GetLastError ());
+      system_printf ("failed to retrieve exit code for %d(%lu), error = %lu",
+		     _cygpid, _winpid, GetLastError ());
       _hProcess = INVALID_HANDLE_VALUE;
     }
   return _exit_status;
@@ -176,7 +177,7 @@ process_cache::process_cache (const unsigned int initial_workers)
 
   if (!_cache_add_trigger)
     {
-      system_printf ("failed to create cache add trigger (%lu), terminating",
+      system_printf ("failed to create cache add trigger, error = %lu",
 		     GetLastError ());
       abort ();
     }
@@ -213,8 +214,9 @@ process_cache::process (const pid_t cygpid, const DWORD winpid)
 	{
 	  LeaveCriticalSection (&_cache_write_access);
 	  system_printf (("process limit (%d processes) reached; "
-			  "new connection refused"),
-			 MAXIMUM_WAIT_OBJECTS - SPECIALS_COUNT);
+			  "new connection refused for %d(%lu)"),
+			 MAXIMUM_WAIT_OBJECTS - SPECIALS_COUNT,
+			 cygpid, winpid);
 	  set_errno (EAGAIN);
 	  return NULL;
 	}
@@ -256,7 +258,7 @@ process_cache::wait_for_processes (const HANDLE interrupt_event)
   // Update `_wait_array' with handles of all current processes.
   const size_t count = sync_wait_array (interrupt_event);
 
-  debug_printf ("waiting on %u objects (out of %u processes)",
+  debug_printf ("waiting on %u objects in total (%u processes)",
 		count, _processes_count);
 
   const DWORD rc = WaitForMultipleObjects (count, _wait_array,
@@ -354,8 +356,8 @@ process_cache::check_and_remove_process (const size_t index)
   if (process->exit_code () == STILL_ACTIVE)
     return;
 
-  debug_printf ("process %lu has left the building ($? = %lu)",
-		process->_winpid, process->_exit_status);
+  debug_printf ("process %d(%lu) has left the building ($? = %lu)",
+		process->_cygpid, process->_winpid, process->_exit_status);
 
   /* Unlink the process object from the process list. */
 
@@ -374,7 +376,6 @@ process_cache::check_and_remove_process (const size_t index)
     _processes_head = process->_next;
 
   _processes_count -= 1;
-  SetEvent (_cache_add_trigger);
   LeaveCriticalSection (&_cache_write_access);
 
   /* Schedule any cleanup tasks for this process. */

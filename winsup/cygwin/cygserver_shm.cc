@@ -168,9 +168,11 @@ public:
 	     int shmid, int shmflg, class process *);
   int shmctl (int & out_shmid, struct shmid_ds & out_ds,
 	      struct shminfo & out_shminfo, struct shm_info & out_shm_info,
-	      const int shmid, int cmd, const struct shmid_ds &, pid_t);
+	      const int shmid, int cmd, const struct shmid_ds &,
+	      class process *);
   int shmdt (int shmid, const class process *);
-  int shmget (int & out_shmid, key_t, size_t, int shmflg, pid_t, uid_t, gid_t);
+  int shmget (int & out_shmid, key_t, size_t, int shmflg, uid_t, gid_t,
+	      class process *);
 
 private:
   static server_shmmgr *_instance;
@@ -392,8 +394,8 @@ server_shmmgr::shmat (HANDLE & hFileMap,
 		      const int shmid, const int shmflg,
 		      class process *const client)
 {
-  syscall_printf ("shmat (shmid = %d, shmflg = 0%o) for %d",
-		  shmid, shmflg, client->cygpid ());
+  syscall_printf ("shmat (shmid = %d, shmflg = 0%o) for %d(%lu)",
+		  shmid, shmflg, client->cygpid (), client->winpid ());
 
   int result = 0;
   EnterCriticalSection (&_segments_lock);
@@ -411,11 +413,15 @@ server_shmmgr::shmat (HANDLE & hFileMap,
   LeaveCriticalSection (&_segments_lock);
 
   if (result < 0)
-    syscall_printf ("-1 [%d] = shmat (shmid = %d, shmflg = 0%o) for %d",
-		    -result, shmid, shmflg, client->cygpid ());
+    syscall_printf (("-1 [%d] = shmat (shmid = %d, shmflg = 0%o) "
+		     "for %d(%lu)"),
+		    -result, shmid, shmflg,
+		    client->cygpid (), client->winpid ());
   else
-    syscall_printf ("0x%x = shmat (shmid = %d, shmflg = 0%o) for %d",
-		    hFileMap, shmid, shmflg, client->cygpid ());
+    syscall_printf (("0x%x = shmat (shmid = %d, shmflg = 0%o) "
+		     "for %d(%lu)"),
+		    hFileMap, shmid, shmflg,
+		    client->cygpid (), client->winpid ());
 
   return result;
 }
@@ -431,10 +437,10 @@ server_shmmgr::shmctl (int & out_shmid,
 		       struct shm_info & out_shm_info,
 		       const int shmid, const int cmd,
 		       const struct shmid_ds & ds,
-		       const pid_t cygpid)
+		       class process *const client)
 {
-  syscall_printf ("shmctl (shmid = %d, cmd = 0x%x) for %d",
-		  shmid, cmd, cygpid);
+  syscall_printf ("shmctl (shmid = %d, cmd = 0x%x) for %d(%lu)",
+		  shmid, cmd, client->cygpid (), client->winpid ());
 
   int result = 0;
   EnterCriticalSection (&_segments_lock);
@@ -468,7 +474,7 @@ server_shmmgr::shmctl (int & out_shmid,
 	      segptr->_ds.shm_perm.uid = ds.shm_perm.uid;
 	      segptr->_ds.shm_perm.gid = ds.shm_perm.gid;
 	      segptr->_ds.shm_perm.mode = ds.shm_perm.mode & 0777;
-	      segptr->_ds.shm_lpid = cygpid;
+	      segptr->_ds.shm_lpid = client->cygpid ();
 	      segptr->_ds.shm_ctime = time (NULL); // FIXME: sub-second times.
 	      break;
 
@@ -515,16 +521,16 @@ server_shmmgr::shmctl (int & out_shmid,
 
   if (result < 0)
     syscall_printf (("-1 [%d] = "
-		     "shmctl (shmid = %d, cmd = 0x%x) for %d"),
+		     "shmctl (shmid = %d, cmd = 0x%x) for %d(%lu)"),
 		    -result,
-		    shmid, cmd, cygpid);
+		    shmid, cmd, client->cygpid (), client->winpid ());
   else
     syscall_printf (("%d = "
-		     "shmctl (shmid = %d, cmd = 0x%x) for %d"),
+		     "shmctl (shmid = %d, cmd = 0x%x) for %d(%lu)"),
 		    ((cmd == SHM_STAT || cmd == SHM_INFO)
 		     ? out_shmid
 		     : result),
-		    shmid, cmd, cygpid);
+		    shmid, cmd, client->cygpid (), client->winpid ());
 
   return result;
 }
@@ -536,8 +542,8 @@ server_shmmgr::shmctl (int & out_shmid,
 int
 server_shmmgr::shmdt (const int shmid, const class process *const client)
 {
-  syscall_printf ("shmdt (shmid = %d) for %d",
-		  shmid, client->cygpid ());
+  syscall_printf ("shmdt (shmid = %d) for %d(%lu)",
+		  shmid, client->cygpid (), client->winpid ());
 
   int result = 0;
   EnterCriticalSection (&_segments_lock);
@@ -558,11 +564,11 @@ server_shmmgr::shmdt (const int shmid, const class process *const client)
   LeaveCriticalSection (&_segments_lock);
 
   if (result < 0)
-    syscall_printf ("-1 [%d] = shmdt (shmid = %d) for %d",
-		    -result, shmid, client->cygpid ());
+    syscall_printf ("-1 [%d] = shmdt (shmid = %d) for %d(%lu)",
+		    -result, shmid, client->cygpid (), client->winpid ());
   else
-    syscall_printf ("%d = shmdt (shmid = %d) for %d",
-		    result, shmid, client->cygpid ());
+    syscall_printf ("%d = shmdt (shmid = %d) for %d(%lu)",
+		    result, shmid, client->cygpid (), client->winpid ());
 
   return result;
 }
@@ -574,24 +580,28 @@ server_shmmgr::shmdt (const int shmid, const class process *const client)
 int
 server_shmmgr::shmget (int & out_shmid,
 		       const key_t key, const size_t size, const int shmflg,
-		       const pid_t cygpid, const uid_t uid, const gid_t gid)
+		       const uid_t uid, const gid_t gid,
+		       class process *const client)
 {
-  syscall_printf ("shmget (key = 0x%016llx, size = %u, shmflg = 0%o) for %d",
+  syscall_printf (("shmget (key = 0x%016llx, size = %u, shmflg = 0%o) "
+		   "for %d(%lu)"),
 		  key, size, shmflg,
-		  cygpid);
+		  client->cygpid (), client->winpid ());
 
   int result = 0;
   EnterCriticalSection (&_segments_lock);
 
   if (key == IPC_PRIVATE)
-    result = new_segment (key, size, shmflg, cygpid, uid, gid);
+    result = new_segment (key, size, shmflg,
+			  client->cygpid (), uid, gid);
   else
     {
       segment_t *const segptr = find_by_key (key);
 
       if (!segptr)
 	if (shmflg & IPC_CREAT)
-	  result = new_segment (key, size, shmflg, cygpid, uid, gid);
+	  result = new_segment (key, size, shmflg,
+				client->cygpid (), uid, gid);
 	else
 	  result = -ENOENT;
       else if (segptr->is_deleted ())
@@ -617,17 +627,17 @@ server_shmmgr::shmget (int & out_shmid,
   if (result < 0)
     syscall_printf (("-1 [%d] = "
 		     "shmget (key = 0x%016llx, size = %u, shmflg = 0%o) "
-		     "for %d"),
+		     "for %d(%lu)"),
 		    -result,
 		    key, size, shmflg,
-		    cygpid);
+		    client->cygpid (), client->winpid ());
   else
     syscall_printf (("%d = "
 		     "shmget (key = 0x%016llx, size = %u, shmflg = 0%o) "
-		     "for %d"),
+		     "for %d(%lu)"),
 		    out_shmid,
 		    key, size, shmflg,
-		    cygpid);
+		    client->cygpid (), client->winpid ());
 
   return result;
 }
@@ -889,8 +899,9 @@ client_request_shm::serve (transport_layer_base *const conn,
     case SHMOP_shmget:
       result = shmmgr.shmget (_parameters.out.shmid,
 			      _parameters.in.key, _parameters.in.size,
-			      _parameters.in.shmflg, _parameters.in.cygpid,
-			      _parameters.in.uid, _parameters.in.gid);
+			      _parameters.in.shmflg,
+			      _parameters.in.uid, _parameters.in.gid,
+			      client);
       break;
 
     case SHMOP_shmat:
@@ -908,7 +919,8 @@ client_request_shm::serve (transport_layer_base *const conn,
 			      _parameters.out.ds, _parameters.out.shminfo,
 			      _parameters.out.shm_info,
 			      _parameters.in.shmid, _parameters.in.cmd,
-			      _parameters.in.ds, _parameters.in.cygpid);
+			      _parameters.in.ds,
+			      client);
       break;
     }
 
