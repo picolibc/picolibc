@@ -366,7 +366,6 @@ DECLSPEC_NORETURN void  RPC_ENTRY RpcRaiseException(RPC_STATUS);
 RPC_STATUS RPC_ENTRY RpcTestCancel(void);
 RPC_STATUS RPC_ENTRY RpcCancelThread(void*);
 RPC_STATUS RPC_ENTRY UuidCreate(UUID*);
-RPC_STATUS RPC_ENTRY UuidCreateSequential(UUID*);
 signed int RPC_ENTRY UuidCompare(UUID*,UUID*, RPC_STATUS*);
 RPC_STATUS RPC_ENTRY UuidCreateNil(UUID*);
 int RPC_ENTRY UuidEqual(UUID*,UUID*, RPC_STATUS*);
@@ -381,6 +380,11 @@ RPC_STATUS RPC_ENTRY RpcMgmtInqParameter(unsigned int,unsigned long*);
 RPC_STATUS RPC_ENTRY RpcMgmtSetParameter(unsigned int,unsigned long);
 RPC_STATUS RPC_ENTRY RpcMgmtBindingInqParameter(RPC_BINDING_HANDLE,unsigned int,unsigned long*);
 RPC_STATUS RPC_ENTRY RpcMgmtBindingSetParameter(RPC_BINDING_HANDLE,unsigned int,unsigned long);
+
+#if _WIN32_WINNT >= 0x0500
+RPC_STATUS RPC_ENTRY UuidCreateSequential(UUID*);
+#endif
+
 #include <rpcdcep.h>
 #ifdef __cplusplus
 }
