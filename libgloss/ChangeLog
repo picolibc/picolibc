@@ -1,5 +1,22 @@
 2002-07-12  Chris Demetriou  <cgd@broadcom.com>
 
+        * mips/Makefile.in (GENOBJS2): New variable to name other
+        commonly used objects.
+        (DVEOBJS, JMR3904OBJS): Reference GENOBJS2.
+
+        * mips/Makefile.in: Add support for Broadcom CFE firmware.
+        * mips/configure.in: (mipsisa32*-*-*, *): Likewise.
+        * mips/configure: Regenerate.
+        * mips/cfe.c: New file.
+        * mips/cfe.ld: New file.
+        * mips/cfe_api.c: New file.
+        * mips/cfe_api.h: New file.
+        * mips/cfe_api_int.h: New file.
+        * mips/cfe_error.h: New file.  
+        * mips/cfe_prestart.S: New file.
+
+2002-07-12  Chris Demetriou  <cgd@broadcom.com>
+
         * mips/array.ld (hardware_exit_hook, hardware_hazard_hook): New
         symbols for optionally-provided functions.
         * mips/ddb-kseg0.ld: Likewise.

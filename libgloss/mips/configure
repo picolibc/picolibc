@@ -943,14 +943,14 @@ case "${target}" in
   mipsisa32*-*-*)
         part_specific_obj=
         part_specific_defines=
-        script_list="idt32 idt64"
-        bsp_list="libidt.a"
+        script_list="idt32 idt64 cfe"
+        bsp_list="libidt.a libcfe.a"
         ;;
   *)
         part_specific_obj="vr4300.o cma101.o"
 	part_specific_defines=
-        script_list="idt pmon ddb ddb-kseg0 lsi idtecoff nullmon"
-        bsp_list="libidt.a libpmon.a liblsi.a libnullmon.a"
+        script_list="idt pmon ddb ddb-kseg0 lsi cfe idtecoff nullmon"
+        bsp_list="libidt.a libpmon.a liblsi.a libcfe.a libnullmon.a"
         ;;
 esac
 
@@ -1158,7 +1158,7 @@ cat >> $CONFIG_STATUS <<\EOF
 
 # Split the substitutions into bite-sized pieces for seds with
 # small command number limits, like on Digital OSF/1 and HP-UX.
-ac_max_sed_cmds=90 # Maximum number of lines to put in a sed script.
+ac_max_sed_cmds=60 # Maximum number of lines to put in a sed script.
 ac_file=1 # Number of current file.
 ac_beg=1 # First line for current file.
 ac_end=$ac_max_sed_cmds # Line after last line for current file.

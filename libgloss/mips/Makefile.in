@@ -67,12 +67,14 @@ CRT0 = @crt0@
 PCRT0 = @pcrt0@
 GENOBJS = syscalls.o fstat.o getpid.o isatty.o kill.o \
 	lseek.o print.o putnum.o stat.o unlink.o
+GENOBJS2 = open.o close.o read.o write.o
 IDTOBJS = idtmon.o @part_specific_obj@ ${GENOBJS}
 PMONOBJS = pmon.o @part_specific_obj@ ${GENOBJS}
 LSIOBJS = lsipmon.o @part_specific_obj@ ${GENOBJS}
-DVEOBJS = open.o close.o dvemon.o read.o write.o @part_specific_obj@ ${GENOBJS}
-JMR3904OBJS = open.o close.o jmr3904-io.o read.o write.o \
-  @part_specific_obj@ ${GENOBJS}
+DVEOBJS = dvemon.o @part_specific_obj@ ${GENOBJS} ${GENOBJS2}
+JMR3904OBJS = jmr3904-io.o @part_specific_obj@ ${GENOBJS} ${GENOBJS2}
+CFEOBJS = cfe.o cfe_api.o cfe_prestart.o \
+	@part_specific_obj@ ${GENOBJS} ${GENOBJS2}
 
 # Nullmon cannot support read and write, but the test cases pull them in via libs
 NULLMONOBJS = nullmon.o @part_specific_obj@ ${GENOBJS}
@@ -129,6 +131,10 @@ libjmr3904.a: $(JMR3904OBJS)
 	${AR} ${ARFLAGS} $@ $(JMR3904OBJS)
 	${RANLIB} $@
 
+libcfe.a: $(CFEOBJS)
+	${AR} ${ARFLAGS} $@ $(CFEOBJS)
+	${RANLIB} $@
+
 # nullmon.a , This is what you want if you want crt0 but NO mon services
 # Supports GDB sim testing, board bringups, ICE operation.
 libnullmon.a: $(NULLMONOBJS)
@@ -141,7 +147,7 @@ libnullmon.a: $(NULLMONOBJS)
 # in the comand line for ld, and all the symbols will get fully
 # resolved.
 
-test: $(OBJS) ${BSP} pmon-test idt-test
+test: $(OBJS) ${BSP} pmon-test idt-test cfe-test
 	@echo Done...
 
 dtor.o:  $(srcdir)/dtor.C
@@ -169,6 +175,16 @@ idt-test.dis: idt-test.x
 	@rm -fr idt-test.dis
 	$(OBJDUMP) -d idt-test.x > $@
 idt-test: idt-test.srec idt-test.dis
+
+cfe-test.x: test.o ${CRT0} Makefile libcfe.a
+	${CC} $(CFLAGS_FOR_TARGET) -L${srcdir} -L${objdir} \
+	test.o -o $@ $(NEWLIB_LDFLAGS) -Wl,-Tcfe.ld
+cfe-test.srec: cfe-test.x
+	$(OBJCOPY) -O srec cfe-test.x $@
+cfe-test.dis: cfe-test.x
+	@rm -fr cfe-test.dis
+	$(OBJDUMP) -d cfe-test.x > $@
+cfe-test: cfe-test.srec cfe-test.dis
 
 doc:	
 
