@@ -393,15 +393,16 @@ fhandler_socket::dup (fhandler_base *child)
      drop this for NT systems at all and return to the good ol'
      DuplicateHandle way of life.  This worked fine all the time on
      NT anyway and it's even a bit faster. */
-  if (!wincap.has_security ())
+  WSASetLastError (0);
+  fhs->fixup_before_fork_exec (GetCurrentProcessId ());
+  if (WSAGetLastError () != WSAEINVAL && winsock2_active)
     {
-      fhs->fixup_before_fork_exec (GetCurrentProcessId ());
-      if (winsock2_active)
-	{
-	  fhs->fixup_after_fork (hMainProc);
-	  return get_io_handle () == (HANDLE) INVALID_SOCKET;
-	}
+      fhs->fixup_after_fork (hMainProc);
+      if (WSAGetLastError () != WSAEINVAL)
+	return get_io_handle () == (HANDLE) INVALID_SOCKET;
     }
+
+  debug_printf ("WSADuplicateSocket failed, trying DuplicateHandle");
   /* We don't call fhandler_base::dup here since that requires to
      have winsock called from fhandler_base and it creates only
      inheritable sockets which is wrong for winsock2. */

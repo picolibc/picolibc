@@ -1,3 +1,8 @@
+2003-05-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::dup): First try duplicating
+	using WSADuplicateSocket/WSASocket, if that fails, try DuplicateHandle.
+
 2003-05-27  Bill C. Riemers  <cygwin@docbill.net>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): Filter
