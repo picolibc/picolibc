@@ -310,6 +310,8 @@ _fscanf_r
 fscanf_r = _fscanf_r
 fseek
 _fseek = fseek
+fseeko
+_fseeko = fseeko
 fsetpos
 _fsetpos = fsetpos
 _fstat
@@ -325,6 +327,8 @@ _f_tanf
 __f_tanf = _f_tanf
 ftell
 _ftell = ftell
+ftello
+_ftello = ftello
 ftime
 _ftime = ftime
 ftruncate
