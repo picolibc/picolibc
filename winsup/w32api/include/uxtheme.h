@@ -34,14 +34,14 @@ extern "C" {
 #define HTTB_SIZINGTEMPLATE 0x0100
 #define HTTB_SYSTEMSIZINGMARGINS 0x0200
 
-typedef enum {
+typedef enum PROPERTYORIGIN {
 	PO_STATE = 0,
 	PO_PART = 1,
 	PO_CLASS = 2,
 	PO_GLOBAL = 3,
 	PO_NOTFOUND = 4
 } PROPERTYORIGIN;
-typedef enum {
+typedef enum THEMESIZE {
 	TS_MIN,
 	TS_TRUE,
 	TS_DRAW

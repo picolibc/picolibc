@@ -1,5 +1,16 @@
 2003-09-24  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/uxtheme.h (PROPERTYORIGIN): the documentation of
+	PROPERTYORIGIN suggests it's `PROPERTYORIGIN' but experimentation
+	suggests it's actually `enum PROPERTYORIGIN'. Keep both.
+
+	* include/uxtheme.h (THEME_SIZE, THEMESIZE): MSDN suggests
+	it's either `THEME_SIZE' or `THEMESIZE' but experimentation
+	suggests it's actually `enum THEMESIZE'. Keep `THEME_SIZE'
+	and `enum THEMESIZE'.
+
+2003-09-24  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/uxtheme.h: New file.
 	* include/tmschema.h: New file.
 	* include/uxtheme.def: New file.
