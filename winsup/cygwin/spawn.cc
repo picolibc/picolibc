@@ -679,6 +679,9 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   else
     {
       PSID sid = cygheap->user.sid ();
+      /* Give access to myself */
+      if (mode == _P_OVERLAY)
+	myself.set_acl();
 
       /* Set security attributes with sid */
       PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf, sid);

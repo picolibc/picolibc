@@ -42,9 +42,9 @@ pinfo_fixup_after_fork ()
 {
   if (hexec_proc)
     CloseHandle (hexec_proc);
-
+  /* Keeps the cygpid from being reused. No rights required */
   if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &hexec_proc, 0,
-			TRUE, DUPLICATE_SAME_ACCESS))
+			TRUE, 0))
     {
       system_printf ("couldn't save current process handle %p, %E", hMainProc);
       hexec_proc = NULL;
@@ -236,6 +236,22 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
       break;
     }
   destroy = 1;
+}
+
+void
+pinfo::set_acl()
+{
+  char sa_buf[1024];
+  SECURITY_DESCRIPTOR sd;
+  
+  sec_acl ((PACL) sa_buf, true, true, cygheap->user.sid (), 
+	   well_known_world_sid, FILE_MAP_READ);
+  if (!InitializeSecurityDescriptor( &sd, SECURITY_DESCRIPTOR_REVISION))
+    debug_printf("InitializeSecurityDescriptor %E");
+  else if (!SetSecurityDescriptorDacl(&sd, TRUE, (PACL) sa_buf, FALSE)) 
+    debug_printf("SetSecurityDescriptorDacl %E");
+  else if (!SetKernelObjectSecurity(h, DACL_SECURITY_INFORMATION, &sd))
+    debug_printf ("SetKernelObjectSecurity %E");
 }
 
 bool

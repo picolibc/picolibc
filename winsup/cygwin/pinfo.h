@@ -176,6 +176,7 @@ public:
   }
 #endif
   HANDLE shared_handle () {return h;}
+  void set_acl();
 };
 
 #define ISSTATE(p, f)	(!!((p)->process_state & f))

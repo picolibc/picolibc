@@ -1,5 +1,12 @@
 2003-09-26  Pierre Humblet <pierre.humblet@ieee.org>
 
+	* pinfo.h (pinfo::set_acl): Declare.
+	* pinfo.cc (pinfo_fixup_after_fork): Duplicate with no rights.
+	(pinfo::set_acl): New.
+	* spawn.cc (spawn_guts): Call myself.set_acl.
+
+2003-09-26  Pierre Humblet <pierre.humblet@ieee.org>
+
 	* uinfo.cc (cygheap_user::init): Make sure the current user appears
 	in the default DACL. Rearrange to decrease the indentation levels. 
 	Initialize the effec_cygsid directly.
