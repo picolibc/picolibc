@@ -979,7 +979,6 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 {
   int res = -1;
   int atts;
-  char *win32_name;
   char root[MAX_PATH];
   UINT dtype;
   fhandler_disk_file fh (NULL);
@@ -999,16 +998,15 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 
   memset (buf, 0, sizeof (struct stat));
 
-  win32_name = real_path.get_win32 ();
   if (real_path.is_device ())
     return stat_dev (real_path.get_devn (), real_path.get_unitn (),
-		     hash_path_name (0, win32_name), buf);
+		     hash_path_name (0, real_path.get_win32 ()), buf);
 
   atts = real_path.file_attributes ();
 
-  debug_printf ("%d = GetFileAttributesA (%s)", atts, win32_name);
+  debug_printf ("%d = GetFileAttributesA (%s)", atts, real_path.get_win32 ());
 
-  strcpy (root, win32_name);
+  strcpy (root, real_path.get_win32 ());
   dtype = GetDriveType (rootdir (root));
 
   if ((atts == -1 || !(atts & FILE_ATTRIBUTE_DIRECTORY) ||
@@ -1029,7 +1027,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
          let's try it with `1' as link count. */
       if (atts != -1 && (atts & FILE_ATTRIBUTE_DIRECTORY))
         buf->st_nlink =
-            (dtype == DRIVE_REMOTE ? 1 : num_entries (win32_name));
+            (dtype == DRIVE_REMOTE ? 1 : num_entries (real_path.get_win32 ()));
     }
   else if (atts != -1 || GetLastError () != ERROR_FILE_NOT_FOUND)
     {
@@ -1041,7 +1039,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
       if (atts != -1
           && (atts & FILE_ATTRIBUTE_DIRECTORY)
           && dtype != DRIVE_REMOTE)
-        buf->st_nlink = num_entries (win32_name);
+        buf->st_nlink = num_entries (real_path.get_win32 ());
       buf->st_dev = FHDEVN(FH_DISK) << 8;
       buf->st_ino = hash_path_name (0, real_path.get_win32 ());
       if (atts != -1 && (atts & FILE_ATTRIBUTE_DIRECTORY))
@@ -1063,18 +1061,16 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
                               NULL, &buf->st_uid, &buf->st_gid);
         }
       if ((handle = FindFirstFile (real_path.get_win32(), &wfd))
-          == INVALID_HANDLE_VALUE)
+          != INVALID_HANDLE_VALUE)
         {
-          __seterrno ();
-          goto done;
+          buf->st_atime   = to_time_t (&wfd.ftLastAccessTime);
+          buf->st_mtime   = to_time_t (&wfd.ftLastWriteTime);
+          buf->st_ctime   = to_time_t (&wfd.ftCreationTime);
+          buf->st_size    = wfd.nFileSizeLow;
+          buf->st_blksize = S_BLKSIZE;
+          buf->st_blocks  = (buf->st_size + S_BLKSIZE-1) / S_BLKSIZE;
+          FindClose (handle);
         }
-      buf->st_atime   = to_time_t (&wfd.ftLastAccessTime);
-      buf->st_mtime   = to_time_t (&wfd.ftLastWriteTime);
-      buf->st_ctime   = to_time_t (&wfd.ftCreationTime);
-      buf->st_size    = wfd.nFileSizeLow;
-      buf->st_blksize = S_BLKSIZE;
-      buf->st_blocks  = (buf->st_size + S_BLKSIZE-1) / S_BLKSIZE;
-      FindClose (handle);
       res = 0;
     }
 

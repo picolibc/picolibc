@@ -1,3 +1,8 @@
+Thu Apr 25 21:35:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * syscalls.cc (stat_worker): Previous patch failed to stat
+        each drives root dir on 9X.
+
 Thu Apr 25 16:37:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
         * fhandler.cc (fhandler_disk_file::open): Check for allow_ntsec
