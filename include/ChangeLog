@@ -1,3 +1,8 @@
+2002-11-11  Svein E. Seldal  <Svein.Seldal@solidas.com>
+
+	* opcode/tic4x.h: Added new opcodes and corrected some bugs.  Add
+	support for new DSP types.
+
 2002-10-26  Roger Sayle  <roger@eyesopen.com>
 
 	* partition.h:  Close the extern "C" scope when compiling with C++.
