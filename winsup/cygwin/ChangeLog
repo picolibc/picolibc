@@ -1,3 +1,20 @@
+2002-09-06  Christopher Faylor  <cgf@redhat.com>
+
+	* winsup.h (_WIN32_WINNT): Protect.
+
+2002-09-06  Christopher Faylor  <cgf@redhat.com>
+
+	* winsup.h (_WIN32_WINNT): Define.
+
+2002-09-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Drop shortcut.o.
+	* path.cc: Move all shortcut functions from shortcut.c to here.
+	(check_shortcut): Implement without using COM interface.
+	* path.h: Move definition of SHORTCUT_HDR_SIZE to here.
+	* shortcut.c: Remove.
+	* shortcut.h: Ditto.
+
 2002-09-03  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* fhandler.h (fhandler_socket::read): Remove method.
@@ -47,7 +64,7 @@
 	(fhandler_tty_slave::read): Don't do anything special with vtime when
 	vmin == 0.
 
-2002-07-25  Egor Duda  <deo@logos-m.ru>
+2002-08-30  Egor Duda  <deo@logos-m.ru>
 
 	* autoload.cc (GetConsoleWindow): Correct parameter count.
 
