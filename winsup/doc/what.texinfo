@@ -57,7 +57,7 @@ such, it included such non-software things as printed manuals, support,
 and aggregation of useful utilities.  There was nothing (software-wise)
 in there that you couldn't get off the net already, if you took the time
 to find and download everything (and usually, build it yourself),
-although the @emph{versions} available for download may have beeen
+although the @emph{versions} available for download may have been
 different than those distributed with the commercial product.  We tested
 it all to make sure it worked together, and packaged it in a convenient
 form.  We considered such testing and packaging to be a valuable service
