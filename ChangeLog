@@ -1,3 +1,16 @@
+2003-08-01  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	Merge from gcc:
+
+	2003-08-01  Matt Kraai  <kraai@alumni.cmu.edu>
+	* Makefile.tpl (check, check-c++): Express dependencies using
+	dependencies rather than commands.
+	* Makefile.in: Regenerate.
+
+	2003-07-31  Geoffrey Keating  <geoffk@apple.com>
+	* Makefile.tpl (libsubdir): Use gcc instead of gcc-lib.
+	* Makefile.in: Update.
+
 2003-08-01  Andrew Cagney  <cagney@redhat.com>
 
 	* configure.in (noconfigdirs): Do not add GDB when m32r-*-*.

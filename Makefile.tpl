@@ -88,7 +88,7 @@ tooldir = @tooldir@
 build_tooldir = @build_tooldir@
 
 # Directory in which the compiler finds executables, libraries, etc.
-libsubdir = $(libdir)/gcc-lib/$(target_alias)/$(gcc_version)
+libsubdir = $(libdir)/gcc/$(target_alias)/$(gcc_version)
 GDB_NLM_DEPS = 
 
 # This is the name of the environment variable used for the path to
@@ -665,8 +665,7 @@ clean-target-libgcc:
 # Check target.
 
 .PHONY: check do-check
-check:
-	$(MAKE) do-check
+check: do-check
 
 # Only include modules actually being configured and built.
 do-check: maybe-check-gcc [+
@@ -1229,8 +1228,7 @@ check-gcc-c++:
 	fi
 
 .PHONY: check-c++
-check-c++:
-	$(MAKE) check-target-libstdc++-v3 check-gcc-c++
+check-c++: check-target-libstdc++-v3 check-gcc-c++
 
 .PHONY: install-gcc maybe-install-gcc
 maybe-install-gcc:
