@@ -2,6 +2,7 @@
 
 	* moldname-crtdll.def: Remove CR from end of line.
 	* moldname-msvcrt.def: Ditto.
+	* Makefile.in: Use bzip2 compression for Cygwin target.
 
 2002-04-04  Danny Smith  <dannysmith@sourceforge.users.net>
 
