@@ -1418,10 +1418,15 @@ special_name (const char *s, int inc = 1)
   if (strpbrk (s, special_chars))
     return !strncasematch (s, "%2f", 3);
 
+  // FIXME: add com0 and {com,lpt}N.*
   if (strcasematch (s, "nul")
+      || strncasematch (s, "nul.", 4)
       || strcasematch (s, "aux")
+      || strncasematch (s, "aux.", 4)
       || strcasematch (s, "prn")
+      || strncasematch (s, "prn.", 4)
       || strcasematch (s, "con")
+      || strncasematch (s, "con.", 4)
       || strcasematch (s, "conin$")
       || strcasematch (s, "conout$"))
     return -1;
