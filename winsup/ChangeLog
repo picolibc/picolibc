@@ -1,5 +1,11 @@
 2001-11-03  Christopher Faylor  <cgf@redhat.com>
 
+	* configure.in: Disable subauth directory test.
+	* configure: Regenerate.
+	* Makefile.in: Use MAKE variable in directory builds.
+
+2001-11-03  Christopher Faylor  <cgf@redhat.com>
+
 	* Makefile.in: Add directory dependencies to ensure ordering when using
 	'make -jN'.
 

@@ -72,12 +72,12 @@ $(SUBDIRS):
 
 $(INSTALL_SUBDIRS):
 	@if cd ${patsubst install_%,%,$@} 2>/dev/null; then \
-	    make install; \
+	    $(MAKE) install; \
 	fi || exit 0
 
 $(CLEAN_SUBDIRS):
 	@if cd ${patsubst clean_%,%,$@} 2>/dev/null; then \
-	    make clean; \
+	    $(MAKE) clean; \
 	fi || exit 0
 
 .PRECIOUS: Makefile
