@@ -38,6 +38,9 @@ extern DWORD __no_sig_start, __no_sig_end;
 
 extern DWORD sigtid;
 
+extern HANDLE hExeced;
+extern DWORD dwExeced;
+
 static BOOL WINAPI ctrl_c_handler (DWORD);
 static void signal_exit (int) __attribute__ ((noreturn));
 static char windows_system_directory[1024];
@@ -113,8 +116,12 @@ init_exception_handler (exception_list *el)
 #endif
 
 void
-set_console_handler ()
+early_stuff_init ()
 {
+  (void) SetConsoleCtrlHandler (ctrl_c_handler, FALSE);
+  if (!SetConsoleCtrlHandler (ctrl_c_handler, TRUE))
+    system_printf ("SetConsoleCtrlHandler failed, %E");
+
   /* Initialize global security attribute stuff */
 
   sec_none.nLength = sec_none_nih.nLength =
@@ -124,10 +131,6 @@ set_console_handler ()
   sec_none.lpSecurityDescriptor = sec_none_nih.lpSecurityDescriptor = NULL;
   sec_all.lpSecurityDescriptor = sec_all_nih.lpSecurityDescriptor =
     get_null_sd ();
-
-  (void) SetConsoleCtrlHandler (ctrl_c_handler, FALSE);
-  if (!SetConsoleCtrlHandler (ctrl_c_handler, TRUE))
-    system_printf ("SetConsoleCtrlHandler failed, %E");
 }
 
 extern "C" void
@@ -911,8 +914,18 @@ ctrl_c_handler (DWORD type)
       return FALSE;
     }
 
+  /* If we are a stub and the new process has a pinfo structure, let it
+     handle this signal. */
+  if (dwExeced && pinfo (dwExeced))
+    return TRUE;
+
+  /* We're only the process group leader when we have a valid pinfo structure.
+     If we don't have one, then the parent "stub" will handle the signal. */
+  if (!pinfo (GetCurrentProcessId ()))
+    return TRUE;
+
   tty_min *t = cygwin_shared->tty.get_tty (myself->ctty);
-  /* Ignore this if we're not the process group lead since it should be handled
+  /* Ignore this if we're not the process group leader since it should be handled
      *by* the process group leader. */
   if (myself->ctty != -1 && t->getpgid () == myself->pid &&
        (GetTickCount () - t->last_ctrl_c) >= MIN_CTRL_C_SLOP)
@@ -925,6 +938,7 @@ ctrl_c_handler (DWORD type)
       t->last_ctrl_c = GetTickCount ();
       return TRUE;
     }
+
   return TRUE;
 }
 
@@ -997,7 +1011,7 @@ sig_handle (int sig)
   if (handler == (void *) SIG_DFL)
     {
       if (sig == SIGCHLD || sig == SIGIO || sig == SIGCONT || sig == SIGWINCH
-          || sig == SIGURG)
+          || sig == SIGURG || (hExeced && sig == SIGINT))
 	{
 	  sigproc_printf ("default signal %d ignored", sig);
 	  goto done;
@@ -1060,8 +1074,6 @@ sig_handle (int sig)
 static void
 signal_exit (int rc)
 {
-  extern HANDLE hExeced;
-
   rc = EXIT_SIGNAL | (rc << 8);
   if (exit_already++)
     myself->exit (rc);

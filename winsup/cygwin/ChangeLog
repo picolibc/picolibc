@@ -1,3 +1,16 @@
+2002-01-09  Christopher Faylor  <cgf@redhat.com>
+            Robert Collins  <rbtcollins@hotmail.com>
+
+	* exceptions.cc (early_stuff_init): Rename from misnamed
+	set_console_handler.
+	(ctrl_c_handler): Attempt to work around potential signal duplication
+	during process startup.
+	(sig_handle): Ignore SIGINT when we're just an "exec stub".
+	* spawn.cc (spawn_guts): Store pid of spawned process in global for use
+	by ctrl_c_handler.
+	* dcrt0.cc (dll_crt0_1): Call renamed initialization function.
+	* winsup.h: Reflect function name change.
+
 2002-01-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (cygwin_accept): Set sun_path for newly connected socket.

@@ -813,7 +813,7 @@ _dll_crt0 ()
   main_environ = user_data->envptr;
   *main_environ = NULL;
 
-  set_console_handler ();
+  early_stuff_init ();
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
 		       GetCurrentProcess (), &hMainProc, 0, FALSE,
 			DUPLICATE_SAME_ACCESS))
