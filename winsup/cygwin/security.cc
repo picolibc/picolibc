@@ -779,6 +779,7 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
 	  free (my_grps);
 	  my_grps = NULL;
 	}
+      CloseHandle (my_token);
     }
 
   /* Create list of groups, the user is member in. */
