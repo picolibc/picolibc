@@ -631,6 +631,13 @@ skip_arg_parsing:
           && cygheap->user.token != INVALID_HANDLE_VALUE)
 	RevertToSelf ();
 
+      static BOOL first_time = TRUE;
+      if (first_time)
+        {
+          set_process_privilege (SE_RESTORE_NAME);
+          first_time = FALSE;
+        }
+
       /* Load users registry hive. */
       load_registry_hive (sid);
 

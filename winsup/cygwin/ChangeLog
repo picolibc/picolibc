@@ -1,3 +1,8 @@
+2001-08-14  Egor Duda  <deo@logos-m.ru>
+
+	* spawn.cc (spawn_guts): Enable appropriate privilege before
+	loading user's registry hive.
+
 Mon Aug 13 22:34:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::fcntl): Use new O_NONBLOCK_MASK define.
