@@ -159,6 +159,12 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 
   select_printf ("sel.always_ready %d", sel.always_ready);
 
+  int timeout = 0;
+  /* Allocate some fd_set structures using the number of fds as a guide. */
+  fd_set *r = allocfd_set (maxfds);
+  fd_set *w = allocfd_set (maxfds);
+  fd_set *e = allocfd_set (maxfds);
+
   /* Degenerate case.  No fds to wait for.  Just wait. */
   if (sel.start.next == NULL)
     {
@@ -168,23 +174,17 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	  set_sig_errno (EINTR);
 	  return -1;
 	}
-      return 0;
+      timeout = 1;
     }
-
-  /* Allocate some fd_set structures using the number of fds as a guide. */
-  fd_set *r = allocfd_set (maxfds);
-  fd_set *w = allocfd_set (maxfds);
-  fd_set *e = allocfd_set (maxfds);
-
-  if (sel.always_ready || ms == 0)
+  else if (sel.always_ready || ms == 0)
     /* Don't bother waiting. */;
-  else if (sel.wait (r, w, e, ms))
+  else if ((timeout = sel.wait (r, w, e, ms) < 0))
     return -1;	/* some kind of error */
 
   copyfd_set (readfds, r, maxfds);
   copyfd_set (writefds, w, maxfds);
   copyfd_set (exceptfds, e, maxfds);
-  return sel.poll (readfds, writefds, exceptfds);
+  return timeout ? 0 : sel.poll (readfds, writefds, exceptfds);
 }
 
 /* Cleanup */
@@ -254,6 +254,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   HANDLE w4[MAXIMUM_WAIT_OBJECTS];
   select_record *s = &start;
   int m = 0;
+  int res = 0;
 
   w4[m++] = signal_arrived;  /* Always wait for the arrival of a signal. */
   /* Loop through the select chain, starting up anything appropriate and
@@ -302,6 +303,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	  return -1;
 	case WAIT_TIMEOUT:
 	  select_printf ("timed out");
+	  res = 1;
 	  goto out;
       }
 
@@ -338,8 +340,8 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
     }
 
 out:
-  select_printf ("returning 0");
-  return 0;
+  select_printf ("returning %d", res);
+  return res;
 }
 
 static int
