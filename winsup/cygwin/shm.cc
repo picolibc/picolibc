@@ -111,7 +111,8 @@ fixup_shms_after_fork ()
       if (!newshmds)
 	{
 	  /* don't worry about handle cleanup, we're dying! */
-	  system_printf("failed to reattach to shm control file view %x\n",tempnode);
+	  system_printf ("failed to reattach to shm control file view %x\n",
+			 tempnode);
 	  return 1;
 	}
       tempnode->shmds = (class shmid_ds *) newshmds;
@@ -126,7 +127,8 @@ fixup_shms_after_fork ()
 	  if (newdata != attachnode->data)
 	    {
 	      /* don't worry about handle cleanup, we're dying! */
-		system_printf("failed to reattach to mapped file view %x\n",attachnode->data);
+	      system_printf ("failed to reattach to mapped file view %x\n",
+			     attachnode->data);
 	      return 1;
 	    }
 	  attachnode = attachnode->next;
@@ -142,14 +144,12 @@ fixup_shms_after_fork ()
  */
 
 /* FIXME: after fork, every memory area needs to have the attach count
- * incremented and the mappings potentially reestablished, perhaps allowing
- * inherit will work?!?
+ * incremented. This should be done in the server?
  */
 
-/* FIXME: are inherited mapped IPC_PRIVATE id's shared between process's
- * YES from linux.
+/* FIXME: tell the daemon when we attach, so at process close it can clean up
+ * the attach count
  */
-
 extern "C" void *
 shmat (int shmid, const void *shmaddr, int shmflg)
 {
@@ -221,10 +221,22 @@ shmat (int shmid, const void *shmaddr, int shmflg)
   attachnode->data = rv;
   attachnode->shmflg = shmflg;
   attachnode->next =
-    (_shmattach *) InterlockedExchangePointer (&tempnode->attachhead, attachnode);
+    (_shmattach *) InterlockedExchangePointer (&tempnode->attachhead,
+					       attachnode);
 
 
   return rv;
+}
+
+/* FIXME: tell the daemon when we detach so it doesn't cleanup incorrectly.
+ */
+extern "C" int
+shmdt (const void *shmaddr)
+{
+  /* this should be "rare" so a hefty search is ok. If this is common, then we
+   * should alter the data structs to allow more optimisation
+   */
+  
 }
 
 //FIXME: who is allowed to perform STAT? 
@@ -235,46 +247,46 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
   while (tempnode && tempnode->shm_id != shmid)
     tempnode = tempnode->next;
   if (!tempnode)
-  {
-    /* couldn't find a currently open shm control area for the key - probably because
-     * shmget hasn't been called.
-     * Allocate a new control block - this has to be handled by the daemon */
-    client_request_shm_get *req =
-      new client_request_shm_get (shmid, GetCurrentProcessId ());
+    {
+      /* couldn't find a currently open shm control area for the key - probably because
+       * shmget hasn't been called.
+       * Allocate a new control block - this has to be handled by the daemon */
+      client_request_shm_get *req =
+	new client_request_shm_get (shmid, GetCurrentProcessId ());
 
-    int rc;
-    if ((rc = cygserver_request (req)))
-      {
-        delete req;
-        set_errno (ENOSYS);   /* daemon communication failed */
-        return -1;
-      }
+      int rc;
+      if ((rc = cygserver_request (req)))
+	{
+	  delete req;
+	  set_errno (ENOSYS);	/* daemon communication failed */
+	  return -1;
+	}
 
-    if (req->header.error_code)       /* shm_get failed in the daemon */
-      {
-        set_errno (req->header.error_code);
-        delete req;
-        return -1;
-      }
+      if (req->header.error_code)	/* shm_get failed in the daemon */
+	{
+	  set_errno (req->header.error_code);
+	  delete req;
+	  return -1;
+	}
 
-    /* we've got the id, now we open the memory area ourselves.
-     * This tests security automagically
-     * FIXME: make this a method of shmnode ?
-     */
-    tempnode =
-      build_inprocess_shmds (req->parameters.out.filemap,
-                             req->parameters.out.attachmap,
-                             req->parameters.out.key,
-                             req->parameters.out.shm_id);
-    delete req;
-    if (!tempnode)
-      return -1;
-  }
-  
+      /* we've got the id, now we open the memory area ourselves.
+       * This tests security automagically
+       * FIXME: make this a method of shmnode ?
+       */
+      tempnode =
+	build_inprocess_shmds (req->parameters.out.filemap,
+			       req->parameters.out.attachmap,
+			       req->parameters.out.key,
+			       req->parameters.out.shm_id);
+      delete req;
+      if (!tempnode)
+	return -1;
+    }
+
   switch (cmd)
     {
     case IPC_STAT:
-      buf->shm_perm = tempnode->shmds->shm_perm; 
+      buf->shm_perm = tempnode->shmds->shm_perm;
       buf->shm_segsz = tempnode->shmds->shm_segsz;
       buf->shm_lpid = tempnode->shmds->shm_lpid;
       buf->shm_cpid = tempnode->shmds->shm_cpid;
@@ -285,40 +297,44 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
       break;
     case IPC_RMID:
       {
-      /* TODO: check permissions. Or possibly, the daemon gets to be the only 
-       * one with write access to the memory area?
-       */
-      if (tempnode->shmds->shm_nattch)
-	system_printf ("call to shmctl with cmd= IPC_RMID when memory area still has"
-			" attachees\n");
-      /* how does this work? 
-	* we mark the ds area as "deleted", and the at and get calls all fail from now on
-	* on, when nattch becomes 0, the mapped data area is destroyed.
-        * and each process, as they touch this area detaches. eventually only the 
- 	* daemon has an attach. The daemon gets asked to detach immediately.
-	*/
+	/* TODO: check permissions. Or possibly, the daemon gets to be the only 
+	 * one with write access to the memory area?
+	 */
+	if (tempnode->shmds->shm_nattch)
+	  system_printf
+	    ("call to shmctl with cmd= IPC_RMID when memory area still has"
+	     " attachees\n");
+	/* how does this work? 
+	   * we mark the ds area as "deleted", and the at and get calls all fail from now on
+	   * on, when nattch becomes 0, the mapped data area is destroyed.
+	   * and each process, as they touch this area detaches. eventually only the 
+	   * daemon has an attach. The daemon gets asked to detach immediately.
+	 */
 #if 0
-      client_request_shm_get *req =
+//waiting for the daemon to handle terminating process's
+	client_request_shm_get *req =
 	  new client_request_shm_get (SHM_DEL, shmid, GetCurrentProcessId ());
-    int rc;
-    if ((rc = cygserver_request (req)))
-      {
-        delete req;
-        set_errno (ENOSYS);   /* daemon communication failed */
-        return -1;
-      }
+	int rc;
+	if ((rc = cygserver_request (req)))
+	  {
+	    delete req;
+	    set_errno (ENOSYS);	/* daemon communication failed */
+	    return -1;
+	  }
 
-    if (req->header.error_code)       /* shm_del failed in the daemon */
-      {
-        set_errno (req->header.error_code);
-        delete req;
-        return -1;
-      }
+	if (req->header.error_code)	/* shm_del failed in the daemon */
+	  {
+	    set_errno (req->header.error_code);
+	    delete req;
+	    return -1;
+	  }
 
-     /* the daemon has deleted it's references */
-     /* now for us */
-#endif
-}
+	/* the daemon has deleted it's references */
+	/* now for us */
+	
+#endif	
+
+      }
       break;
     case IPC_SET:
     default:
@@ -333,10 +349,6 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
  * appropriately
  */
 
-/* Test result from openbsd: shm ids are persistent cross process if a handle is left
- * open. This could lead to resource starvation: we're not copying that behaviour 
- * unless we have to. (It will involve acygwin1.dll gloal shared list :[ ).
- */
 /* FIXME: shmid should be a verifyable object
  */
 

@@ -1,3 +1,43 @@
+Sun Sep 30 23:41:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* Makefile.in: Add cygserver_process.o to cygserver.exe.
+	* cygserver.cc: Include signal.h and cygwin_version.h.
+	Define debug_printf as a macro.
+	Define DEBUG to a value.
+	(client_request_attach_tty::serve): Add beginning of process cache support.
+	Change from #ifdef DEBUG to work with new DEBUG style.
+	(client_request_get_version::serve): Add beginning of process cache support.
+	(class server_request): New prototype for support of process cache.
+	(class queue_process_param): New class to allow request loop threading.
+	(class server_request_queue): Add beginning of process cache support.
+	Allow request loop threading.
+	(request_loop): Thread function for request loops.
+	(server_request_queue::process_requests): Initiator for threaded request loops.
+	(client_request_shutdown::serve): Add beginning of process cache support.
+	(server_request::server_request): Ditto.
+	(server_request::process): Use debug_printf. Add beginning of process cache support.
+	(server_request_queue::cleanup): Kill off any request loop threads.
+	(server_request_queue::add): Add beginning of process cache support.
+	(handle_signal): Trigger a shutdown.
+	(main): Print out some useful info at startup - version, date time.
+	Add process cache support.
+	Spawn a separate thread for the transport request loop, thus allowing concurrent
+	support for multiple transports.
+	* cygserver_client.cc (client_request_get_version::serve): Add process cache support.
+	(client_request_attach_tty::serve): Add process cache support.
+	(client_request_shutdown::serve): Add process cache support.
+	* cygsserver_process.cc: New file with the process cache support.
+	* cygserver_shm.cc: Redefine debug_printf to allow conditional output.
+	* cygwin.din: Export shmdt().
+	* shm.cc: Run indent.
+	Update FIXME's.
+	(shmdt): New function.
+	* include/cygwin/cygserver.h (class client_request): Add process cache support.
+	(class client_request_get_version): Ditto.
+	(class client_request_shutdown): Ditto.
+	(class client_request_attach_tty): Ditto.
+	* include/cygwin/cygserver_process.h: New header for process cache support.
+
 Sun Sep 30  8:52:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* include/cygwin/cygserver_transport.h: Add copyright header.

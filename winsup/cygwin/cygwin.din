@@ -1223,4 +1223,5 @@ _aclfromtext = aclfromtext
 ftok
 shmat
 shmctl
+shmdt
 shmget

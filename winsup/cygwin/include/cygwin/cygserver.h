@@ -87,7 +87,7 @@ class client_request
   public:
   client_request (cygserver_request_code id);
   virtual void send (transport_layer_base *conn);
-  virtual void serve (transport_layer_base *conn) {};
+  virtual void serve (transport_layer_base *conn, class process_cache *cache) {};
   virtual operator struct request_header ();
   cygserver_request_code req_id () {return header.req_id;};
   virtual ~client_request();
@@ -98,7 +98,7 @@ class client_request
 class client_request_get_version : public client_request
 {
   public:
-  virtual void serve (transport_layer_base *conn);
+  virtual void serve (transport_layer_base *conn, class process_cache *cache);
   client_request_get_version::client_request_get_version();
   struct request_get_version version;
 };
@@ -106,14 +106,14 @@ class client_request_get_version : public client_request
 class client_request_shutdown : public client_request
 {
   public:
-  virtual void serve (transport_layer_base *conn);
+  virtual void serve (transport_layer_base *conn, class process_cache *cache);
   client_request_shutdown ();
 };
 
 class client_request_attach_tty : public client_request
 {
   public:
-  virtual void serve (transport_layer_base *conn);
+  virtual void serve (transport_layer_base *conn, class process_cache *cache);
   client_request_attach_tty ();
   client_request_attach_tty (DWORD npid, DWORD nmaster_pid, HANDLE nfrom_master, HANDLE nto_master);
   HANDLE from_master () {return req.from_master;};

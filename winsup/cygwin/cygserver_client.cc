@@ -42,7 +42,7 @@ client_request_get_version::client_request_get_version () : client_request (CYGS
 
 #ifdef __INSIDE_CYGWIN__
 void
-client_request_get_version::serve (transport_layer_base *conn)
+client_request_get_version::serve (transport_layer_base *conn, class process_cache *cache)
 {
 }
 #endif
@@ -69,7 +69,7 @@ client_request_attach_tty::client_request_attach_tty (DWORD npid, DWORD nmaster_
 
 #ifdef __INSIDE_CYGWIN__
 void
-client_request_attach_tty::serve (transport_layer_base *conn)
+client_request_attach_tty::serve (transport_layer_base *conn, class process_cache *cache)
 {
 }
 #endif
@@ -82,7 +82,7 @@ client_request_shutdown::client_request_shutdown () : client_request (CYGSERVER_
 
 #ifdef __INSIDE_CYGWIN__
 void
-client_request_shutdown::serve (transport_layer_base *conn)
+client_request_shutdown::serve (transport_layer_base *conn, class process_cache *cache)
 {
 }
 #endif

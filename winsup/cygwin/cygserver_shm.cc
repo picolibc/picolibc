@@ -1,4 +1,4 @@
-/* shm.cc: Single unix specification IPC interface for Cygwin
+/* cygserver_shm.cc: Single unix specification IPC interface for Cygwin
 
    Copyright 2001 Red Hat, Inc.
 
@@ -18,8 +18,9 @@
 #endif
 
 #ifndef __INSIDE_CYGWIN__
+#define DEBUG 0
 #define system_printf printf
-#define debug_printf printf
+#define debug_printf if (DEBUG) printf
 #define api_fatal printf
 #include <stdio.h>
 #include <windows.h>
@@ -293,8 +294,8 @@ client_request_shm_get::serve (transport_layer_base * conn)
   shmname = stringbuf;
   snprintf (stringbuf1, 29, "CYGWINSHMD0x%0qx", parameters.in.key);
   shmaname = stringbuf1;
-debug_printf ("system id strings are \n%s\n%s\n",shmname,shmaname);
-debug_printf ("key input value is 0x%0qx\n", parameters.in.key);
+  debug_printf ("system id strings are \n%s\n%s\n",shmname,shmaname);
+  debug_printf ("key input value is 0x%0qx\n", parameters.in.key);
     }
 
   /* attempt to open the key */
