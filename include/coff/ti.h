@@ -1,4 +1,8 @@
-/*** COFF information for generic Texas Instruments COFF flavour */
+/* COFF information for TI COFF support.  Definitions in this file should be
+   customized in a target-specific file, and then this file included (see
+   tic54x.h for an example). */
+#ifndef COFF_TI_H
+#define COFF_TI_H
 
 /********************** FILE HEADER **********************/
 
@@ -155,8 +159,6 @@ struct external_scnhdr {
 
 /*
  * Special section flags
- * TI COFF puts the section alignment power of two in the section flags
- * e.g. 2**N is alignment, flags |= (N & 0xF) << 8
  */
 /* recognized load pages */
 #define PG_PROG         0x0         /* PROG page */
@@ -167,6 +169,8 @@ struct external_scnhdr {
    linker output if there are no references found to any symbol in the section
    STYP_BLOCK: the section should be blocked, i.e. if the section would cross
    a page boundary, it is started at a page boundary instead.
+   TI COFF puts the section alignment power of two in the section flags
+   e.g. 2**N is alignment, flags |= (N & 0xF) << 8
 */ 
 #define STYP_CLINK      (0x4000)
 #define STYP_BLOCK      (0x1000)
@@ -238,7 +242,8 @@ PUT_SCNHDR_PAGE(ABFD,((struct internal_scnhdr *)(INT))->s_page, \
 
    c2x, c5x and most c54x devices have 16-bit addresses, but the c548 has
    23-bit program addresses.  make sure the page flags don't interfere 
-
+   These flags are used by GDB to identify the destination page for
+   addresses. 
 */
 
 #define LONG_ADDRESSES  1
@@ -393,8 +398,8 @@ if(src->n_sclass == C_MOU || src->n_sclass == C_MOS) \
 bfd_h_put_32(abfd,src->n_value * 8,(bfd_byte *)dst->e_value); \
 } while (0)
 
-/* detect section-relative absolute symbols so they get flagged with a sym
-   index of -1 
+/* Detect section-relative absolute symbols so they get flagged with a sym
+   index of -1.
 */
 #define SECTION_RELATIVE_ABSOLUTE_SYMBOL_P(RELOC,SECT) \
 ((*(RELOC)->sym_ptr_ptr)->section->output_section == (SECT) \
@@ -428,4 +433,5 @@ struct external_reloc {
 #define R_EXTWORD 0x002B            /* 23-bit direct reference */
 #define R_EXTWORD16 0x002C          /* 16-bit direct reference to 23-bit addr*/
 #define R_EXTWORDMS7 0x002D         /* upper 7 bits of 23-bit address */
-/*EOF*/
+
+#endif /* COFF_TI_H */
