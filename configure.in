@@ -27,8 +27,6 @@ sinclude(config/acx.m4)
 
 # clear some things potentially inherited from environment.
 
-enable_threads=no
-enable_shared=no
 enable_libstdcxx_v3=yes
 floating_point=default
 gas=default
@@ -67,15 +65,6 @@ case "${OSTYPE}" in
 esac
 
 config_shell=${CONFIG_SHELL-/bin/sh}
-
-## this is a little touchy and won't always work, but...
-##
-## if the argv[[0]] starts with a slash then it is an absolute name that can (and
-## must) be used as is.
-##
-## otherwise, if argv[[0]] has no slash in it, we can assume that it is on the
-## path.  Since PATH might include "." we also add `pwd` to the end of PATH.
-##
 
 progname=$0
 # if PWD already has a value, it is probably wrong.
@@ -137,8 +126,6 @@ fi
 #
 host_libs="intl mmalloc libiberty opcodes bfd readline tcl tk itcl tix libgui zlib"
 
-libstdcxx_version="target-libstdc++-v3"
-
 # these tools are built for the host environment
 # Note, the powerpc-eabi build depends on sim occurring before gdb in order to
 # know that we are building the simulator.
@@ -159,7 +146,7 @@ libgcj="target-libffi \
 target_libs="target-libiberty \
 		target-libgloss \
 		target-newlib \
-		${libstdcxx_version} \
+		target-libstdc++-v3 \
 		target-libf2c \
 		${libgcj} \
 		target-libobjc"
@@ -357,7 +344,7 @@ case "${target}" in
     ;;
   *-*-kaos*)
     # Remove unsupported stuff on all kaOS configurations.
-    skipdirs="target-libiberty ${libgcj} ${libstdcxx_version} target-libf2c target-librx"
+    skipdirs="target-libiberty ${libgcj} target-libstdc++-v3 target-libf2c target-librx"
     skipdirs="$skipdirs target-libobjc target-examples target-groff target-gperf"
     skipdirs="$skipdirs zlib fastjar target-libjava target-boehm-gc target-zlib"
     noconfigdirs="$noconfigdirs target-libgloss"
@@ -375,7 +362,7 @@ case "${target}" in
     esac
     ;;
   *-*-netware)
-    noconfigdirs="$noconfigdirs ${libstdcxx_version} target-newlib target-libiberty target-libgloss ${libgcj}"
+    noconfigdirs="$noconfigdirs target-libstdc++-v3 target-newlib target-libiberty target-libgloss ${libgcj}"
     ;;
   *-*-rtems*)
     noconfigdirs="$noconfigdirs target-libgloss ${libgcj}"
@@ -419,11 +406,11 @@ case "${target}" in
     noconfigdirs="$noconfigdirs tcl tix tk itcl libgui sim"
     noconfigdirs="$noconfigdirs expect dejagnu"
     # the C++ libraries don't build on top of CE's C libraries
-    noconfigdirs="$noconfigdirs ${libstdcxx_version}"
+    noconfigdirs="$noconfigdirs target-libstdc++-v3"
     noconfigdirs="$noconfigdirs target-newlib"
     case "${host}" in
       *-*-cygwin*) ;; # keep gdb and readline
-      *) noconfigdirs="$noconfigdirs gdb readline ${libstdcxx_version}"
+      *) noconfigdirs="$noconfigdirs gdb readline"
 	 ;;
     esac
     ;;
@@ -458,19 +445,19 @@ case "${target}" in
     noconfigdirs="$noconfigdirs ld target-libgloss ${libgcj}"
     ;;
   avr-*-*)
-    noconfigdirs="$noconfigdirs target-libiberty ${libstdcxx_version} ${libgcj}"
+    noconfigdirs="$noconfigdirs target-libiberty target-libstdc++-v3 ${libgcj}"
     ;;
   c4x-*-* | tic4x-*-*)
-    noconfigdirs="$noconfigdirs ${libstdcxx_version} target-libgloss ${libgcj}"
+    noconfigdirs="$noconfigdirs target-libstdc++-v3 target-libgloss ${libgcj}"
     ;;
   c54x*-*-* | tic54x-*-*)
-    noconfigdirs="$noconfigdirs ${libstdcxx_version} target-libgloss ${libgcj} gcc gdb newlib"
+    noconfigdirs="$noconfigdirs target-libstdc++-v3 target-libgloss ${libgcj} gcc gdb newlib"
     ;;
   cris-*-*)
     noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   d10v-*-*)
-    noconfigdirs="$noconfigdirs ${libstdcxx_version} target-libgloss ${libgcj}"
+    noconfigdirs="$noconfigdirs target-libstdc++-v3 target-libgloss ${libgcj}"
     ;;
   d30v-*-*)
     noconfigdirs="$noconfigdirs ${libgcj}"
@@ -485,7 +472,7 @@ case "${target}" in
     noconfigdirs="$noconfigdirs target-libgloss"
     ;;
   h8500-*-*)
-    noconfigdirs="$noconfigdirs ${libstdcxx_version} target-libgloss ${libgcj} target-libf2c"
+    noconfigdirs="$noconfigdirs target-libstdc++-v3 target-libgloss ${libgcj} target-libf2c"
     ;;
   hppa*64*-*-linux* | parisc*64*-*-linux*)
     # In this case, it's because the hppa64-linux target is for
@@ -564,7 +551,7 @@ case "${target}" in
     esac
     ;;    
   i[[3456]]86-*-pe)
-    noconfigdirs="$noconfigdirs ${libstdcxx_version} target-libgloss ${libgcj}"
+    noconfigdirs="$noconfigdirs target-libstdc++-v3 target-libgloss ${libgcj}"
     ;;
   i[[3456]]86-*-sco3.2v5*)
     # The linker does not yet know about weak symbols in COFF,
@@ -584,7 +571,7 @@ case "${target}" in
      noconfigdirs="$noconfigdirs gdb target-newlib target-libgloss ${libgcj}"
      ;;
   m68hc11-*-*|m6811-*-*|m68hc12-*-*|m6812-*-*)
-    noconfigdirs="$noconfigdirs target-libiberty ${libstdcxx_version} ${libgcj}"
+    noconfigdirs="$noconfigdirs target-libiberty target-libstdc++-v3 ${libgcj}"
     ;;
   m68k-*-elf*)
     noconfigdirs="$noconfigdirs ${libgcj}"
@@ -704,7 +691,7 @@ case "${target}" in
   sparc-*-solaris* | sparc64-*-solaris* | sparcv9-*-solaris*)
     ;;
   v810-*-*)
-    noconfigdirs="$noconfigdirs bfd binutils gas gcc gdb ld ${libstdcxx_version} opcodes target-libgloss ${libgcj}"
+    noconfigdirs="$noconfigdirs bfd binutils gas gcc gdb ld target-libstdc++-v3 opcodes target-libgloss ${libgcj}"
     ;;
   v850-*-*)
     noconfigdirs="$noconfigdirs target-libgloss ${libgcj}"
@@ -722,7 +709,7 @@ case "${target}" in
     noconfigdirs="$noconfigdirs target-newlib target-libgloss ${libgcj}"
     ;;
   ip2k-*-*)
-    noconfigdirs="$noconfigdirs target-libiberty ${libstdcxx_version} ${libgcj}"
+    noconfigdirs="$noconfigdirs target-libiberty target-libstdc++-v3 ${libgcj}"
     ;;
   *-*-linux*)
     noconfigdirs="$noconfigdirs target-newlib target-libgloss"
@@ -1031,7 +1018,6 @@ case "${host}" in
     ;;
   m88k-dg-dgux*)
     tentative_cc="gcc -Wall -ansi -D__using_DGUX"
-    host_makefile_frag="config/mh-dgux"
     ;;
   m88k-harris-cxux*)
     # Under CX/UX, we want to tell the compiler to use ANSI mode.
@@ -1248,24 +1234,6 @@ if test x${with_newlib} != xno && echo " ${target_configdirs} " | grep " target-
   with_newlib=yes
   extra_host_args="$extra_host_args --with-newlib"
 fi
-
-# We default to --with-shared on platforms where -fpic is meaningless.
-# Well, we don't yet, but we will.
-if false && test "${host}" = "${target}" && test x${enable_shared} = x ; then
-  case "${target}" in
-    alpha*-dec-osf*)	enable_shared=yes ;;
-    alpha*-*-linux*)	enable_shared=yes ;;
-    mips-sgi-irix5*)	enable_shared=yes ;;
-    *)			enable_shared=no ;;
-  esac
-fi
-
-case "${enable_shared}" in
-  yes) shared=yes ;;
-  no) shared=no ;;
-  "") shared=no ;;
-  *) shared=yes ;;
-esac
 
 
 # Default to using --with-stabs for certain targets.
@@ -1642,12 +1610,10 @@ esac
 
 # If --enable-shared was set, we must set LD_LIBRARY_PATH so that the
 # binutils tools will find libbfd.so.
-if test "${shared}" = "yes" ; then
-  SET_LIB_PATH="\$(REALLY_SET_LIB_PATH)"
-else
-  SET_LIB_PATH=
-fi
-
+case "${enable_shared}" in
+  no | "") SET_LIB_PATH= ;;
+  *) SET_LIB_PATH="\$(REALLY_SET_LIB_PATH)" ;;
+esac
 
 case "${host}" in
   *-*-hpux*) RPATH_ENVVAR=SHLIB_PATH ;;
@@ -2034,8 +2000,6 @@ AC_SUBST(RPATH_ENVVAR)
 AC_SUBST(BUILD_PREFIX)
 AC_SUBST(BUILD_PREFIX_1)
 AC_SUBST(configlinks)
-AC_SUBST(enable_shared)
-AC_SUBST(enable_threads)
 AC_SUBST(enable_version_specific_runtime_libs)
 AC_SUBST(gcc_version_trigger)
 AC_SUBST(gcc_version)
