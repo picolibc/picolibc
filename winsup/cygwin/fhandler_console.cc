@@ -1406,7 +1406,7 @@ fhandler_console::write_normal (const unsigned char *src,
       switch (base_chars[*src])
 	{
 	case BEL:
-	  Beep (412, 100);
+	  MessageBeep (0xFFFFFFFF);
 	  break;
 	case ESC:
 	  dev_state->state_ = gotesc;
