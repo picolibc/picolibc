@@ -816,6 +816,40 @@ typedef struct
   bfd_vma ri_gp_value;
 } Elf64_Internal_RegInfo;
 
+typedef struct
+{
+  /* The hash value computed from the name of the corresponding
+     dynamic symbol.  */
+  unsigned char ms_hash_value[4];
+  /* Contains both the dynamic relocation index and the symbol flags
+     field.  The macros ELF32_MS_REL_INDEX and ELF32_MS_FLAGS are used
+     to access the individual values.  The dynamic relocation index
+     identifies the first entry in the .rel.dyn section that
+     references the dynamic symbol corresponding to this msym entry.
+     If the index is 0, no dynamic relocations are associated with the
+     symbol.  The symbol flags field is reserved for future use.  */
+  unsigned char ms_info[4];
+} Elf32_External_Msym;
+
+typedef struct
+{
+  /* The hash value computed from the name of the corresponding
+     dynamic symbol.  */
+  unsigned long ms_hash_value;
+  /* Contains both the dynamic relocation index and the symbol flags
+     field.  The macros ELF32_MS_REL_INDEX and ELF32_MS_FLAGS are used
+     to access the individual values.  The dynamic relocation index
+     identifies the first entry in the .rel.dyn section that
+     references the dynamic symbol corresponding to this msym entry.
+     If the index is 0, no dynamic relocations are associated with the
+     symbol.  The symbol flags field is reserved for future use.  */
+  unsigned long ms_info;
+} Elf32_Internal_Msym;
+
+#define ELF32_MS_REL_INDEX(i) ((i) >> 8)
+#define ELF32_MS_FLAGS(i)     (i) & 0xff)
+#define ELF32_MS_INFO(r, f)   (((r) << 8) + ((f) & 0xff))
+
 /* MIPS ELF reginfo swapping routines.  */
 extern void bfd_mips_elf64_swap_reginfo_in
   PARAMS ((bfd *, const Elf64_External_RegInfo *, Elf64_Internal_RegInfo *));

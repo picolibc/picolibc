@@ -1,3 +1,11 @@
+1999-06-20  Mark Mitchell  <mark@codesourcery.com>
+
+	* mips.h (Elf32_Internal_Msym): New structure.
+	(Elf32_External_Msym): Likewise.
+	(ELF32_MS_REL_INDEX): New macro.
+	(ELF32_MS_FLAGS): Likewise.
+	(ELF32_MS_INFO): Likewise.
+	
 1999-06-14  Nick Clifton  <nickc@cygnus.com>
 
 	* dis-asm.h (arm_toggle_regnames): New prototype.
