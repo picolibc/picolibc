@@ -1,6 +1,6 @@
 /* Table of opcodes for the Texas Instruments TMS320C[34]X family.
 
-   Copyright (c) 2002 Free Software Foundation.
+   Copyright (C) 2002, 2003 Free Software Foundation.
   
    Contributed by Michael P. Hayes (m.hayes@elec.canterbury.ac.nz)
    
@@ -19,8 +19,8 @@
    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#define IS_CPU_C3X(v) ((v) == 30 || (v) == 31 || (v) == 32 || (v) == 33)
-#define IS_CPU_C4X(v) ((v) ==  0 || (v) == 40 || (v) == 44)
+#define IS_CPU_TIC3X(v) ((v) == 30 || (v) == 31 || (v) == 32 || (v) == 33)
+#define IS_CPU_TIC4X(v) ((v) ==  0 || (v) == 40 || (v) == 44)
 
 /* Define some bitfield extraction/insertion macros.  */
 #define EXTR(inst, m, l)          ((inst) << (31 - (m)) >> (31 - ((m) - (l)))) 
@@ -50,22 +50,22 @@ c4x_reg_t;
 #define REG_IF REG_IIE		/* C3x only */
 #define REG_IOF REG_IIF		/* C3x only */
 
-#define C3X_REG_MAX REG_RC
-#define C4X_REG_MAX REG_TVTP
+#define TIC3X_REG_MAX REG_RC
+#define TIC4X_REG_MAX REG_TVTP
 
 /* Register table size including C4x expansion regs.  */
-#define REG_TABLE_SIZE (C4X_REG_MAX + 1)
+#define REG_TABLE_SIZE (TIC4X_REG_MAX + 1)
 
-struct c4x_register
+struct tic4x_register
 {
   char *        name;
   unsigned long regno;
 };
 
-typedef struct c4x_register c4x_register_t;
+typedef struct tic4x_register tic4x_register_t;
 
 /* We could store register synonyms here.  */
-static const c4x_register_t c3x_registers[] =
+static const tic4x_register_t tic3x_registers[] =
 {
   {"f0",  REG_R0},
   {"r0",  REG_R0},
@@ -106,10 +106,10 @@ static const c4x_register_t c3x_registers[] =
   {"", 0}
 };
 
-const unsigned int c3x_num_registers = (((sizeof c3x_registers) / (sizeof c3x_registers[0])) - 1);
+const unsigned int tic3x_num_registers = (((sizeof tic3x_registers) / (sizeof tic3x_registers[0])) - 1);
 
 /* Define C4x registers in addition to C3x registers.  */
-static const c4x_register_t c4x_registers[] =
+static const tic4x_register_t tic4x_registers[] =
 {
   {"die", REG_DIE},		/* Clobbers C3x REG_IE */
   {"iie", REG_IIE},		/* Clobbers C3x REG_IF */
@@ -127,19 +127,19 @@ static const c4x_register_t c4x_registers[] =
   {"", 0}
 };
 
-const unsigned int c4x_num_registers = (((sizeof c4x_registers) / (sizeof c4x_registers[0])) - 1);
+const unsigned int tic4x_num_registers = (((sizeof tic4x_registers) / (sizeof tic4x_registers[0])) - 1);
 
-struct c4x_cond
+struct tic4x_cond
 {
   char *        name;
   unsigned long cond;
 };
 
-typedef struct c4x_cond c4x_cond_t;
+typedef struct tic4x_cond tic4x_cond_t;
 
 /* Define conditional branch/load suffixes.  Put desired form for
    disassembler last.  */
-static const c4x_cond_t c4x_conds[] =
+static const tic4x_cond_t tic4x_conds[] =
 {
   { "u",    0x00 },
   { "c",    0x01 }, { "lo",  0x01 },
@@ -167,22 +167,22 @@ static const c4x_cond_t c4x_conds[] =
   { "",      0x0}
 };
 
-const unsigned int num_conds = (((sizeof c4x_conds) / (sizeof c4x_conds[0])) - 1);
+const unsigned int tic4x_num_conds = (((sizeof tic4x_conds) / (sizeof tic4x_conds[0])) - 1);
 
-struct c4x_indirect
+struct tic4x_indirect
 {
   char *        name;
   unsigned long modn;
 };
 
-typedef struct c4x_indirect c4x_indirect_t;
+typedef struct tic4x_indirect tic4x_indirect_t;
 
 /* Define indirect addressing modes where:
    d displacement (signed)
    y ir0
    z ir1  */
 
-static const c4x_indirect_t c4x_indirects[] =
+static const tic4x_indirect_t tic4x_indirects[] =
 {
   { "*+a(d)",   0x00 },
   { "*-a(d)",   0x01 },
@@ -216,12 +216,12 @@ static const c4x_indirect_t c4x_indirects[] =
   { "",      0x0}
 };
 
-#define C3X_MODN_MAX 0x19
+#define TIC3X_MODN_MAX 0x19
 
-const unsigned int c4x_num_indirects = (((sizeof c4x_indirects) / (sizeof c4x_indirects[0])) - 1);
+const unsigned int tic4x_num_indirects = (((sizeof tic4x_indirects) / (sizeof tic4x_indirects[0])) - 1);
 
 /* Instruction template.  */
-struct c4x_inst
+struct tic4x_inst
 {
   char *        name;
   unsigned long opcode;
@@ -230,7 +230,7 @@ struct c4x_inst
   unsigned long oplevel;
 };
 
-typedef struct c4x_inst c4x_inst_t;
+typedef struct tic4x_inst tic4x_inst_t;
 
 /* Opcode infix
    B  condition              16--20   U,C,Z,LO,HI, etc.
@@ -278,8 +278,8 @@ typedef struct c4x_inst c4x_inst_t;
    Z  expansion reg (C4x)    16--20   [Z] - IVTP, TVTP
 */
 
-#define C4X_OPERANDS_MAX 7	/* Max number of operands for an inst.  */
-#define C4X_NAME_MAX 16		/* Max number of chars in parallel name.  */
+#define TIC4X_OPERANDS_MAX 7	/* Max number of operands for an inst.  */
+#define TIC4X_NAME_MAX 16	/* Max number of chars in parallel name.  */
 
 /* Define the instruction level */
 #define OP_C3X   0x1   /* C30 support - supported by all */
@@ -873,8 +873,8 @@ typedef struct c4x_inst c4x_inst_t;
 */
 
 
-/* Define c3x opcodes for assembler and disassembler.  */
-static const c4x_inst_t c4x_insts[] =
+/* Define tic4x opcodes for assembler and disassembler.  */
+static const tic4x_inst_t tic4x_insts[] =
 {
   /* Put synonyms after the desired forms in table so that they get
      overwritten in the lookup table.  The disassembler will thus
@@ -1070,10 +1070,10 @@ static const c4x_inst_t c4x_insts[] =
   TC_CLASS_INSN( "xor",           0x08000000, OP_C3X   ),
   QC_CLASS_INSN( "xor",   "sti",  0xee000000, OP_C3X   ),
 
-  /* Dummy entry, not included in c3x_num_insts.  This
+  /* Dummy entry, not included in tic4x_num_insts.  This
      lets code examine entry i + 1 without checking
      if we've run off the end of the table.  */
   { "",      0x0, 0x00, "", 0 }
 };
 
-const unsigned int c4x_num_insts = (((sizeof c4x_insts) / (sizeof c4x_insts[0])) - 1);
+const unsigned int tic4x_num_insts = (((sizeof tic4x_insts) / (sizeof tic4x_insts[0])) - 1);

@@ -1,3 +1,10 @@
+2003-04-04  Svein E. Seldal  <Svein.Seldal@solidas.com>
+
+	* coff/tic4x.h: Namespace cleanup. Replace s/c4x/tic4x
+	and s/c3x/tic3x/
+	* coff/tc-tic4x.h: Ditto
+	* opcode/tic4x.h: Ditto
+
 2003-04-02  Bob Wilson  <bob.wilson@acm.org>
 
 	* xtensa-config.h: Remove comment indicating that this is a
