@@ -1157,8 +1157,8 @@ fhandler_base::operator delete (void *p)
 }
 
 /* Normal I/O constructor */
-fhandler_base::fhandler_base (DWORD devtype):
-  status (devtype),
+fhandler_base::fhandler_base ():
+  status (0),
   access (0),
   io_handle (NULL),
   namehash (0),
@@ -1191,7 +1191,7 @@ fhandler_base::~fhandler_base (void)
 /* /dev/null */
 
 fhandler_dev_null::fhandler_dev_null () :
-	fhandler_base (FH_NULL)
+	fhandler_base ()
 {
 }
 
