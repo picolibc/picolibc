@@ -155,55 +155,55 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath)
 	  uni2ansi (buffer[i].usri3_full_name, fullname);
 	  homedir_w32[0] = homedir_psx[0] = '\0';
 	  uni2ansi (buffer[i].usri3_home_dir, homedir_w32);
-          if (print_cygpath)
-            cygwin_conv_to_posix_path (homedir_w32, homedir_psx);
-          else
+	  if (print_cygpath)
+	    cygwin_conv_to_posix_path (homedir_w32, homedir_psx);
+	  else
 	    psx_dir (homedir_w32, homedir_psx);
 
-          if (print_sids)
-            {
-              if (!LookupAccountName (servername ? ansi_srvname : NULL,
-                                      username,
-                                      psid, &sid_length,
-                                      domain_name, &domname_len,
-			              &acc_type))
-                {
-                  fprintf (stderr,
-                           "LookupAccountName(%s,%s) failed with error %ld\n",
-                           servername ? ansi_srvname : "NULL",
-                           username,
-                           GetLastError ());
-                  continue;
-                }
-              else if (acc_type == SidTypeDomain)
-                {
-                  char domname[356];
+	  if (print_sids)
+	    {
+	      if (!LookupAccountName (servername ? ansi_srvname : NULL,
+				      username,
+				      psid, &sid_length,
+				      domain_name, &domname_len,
+				      &acc_type))
+		{
+		  fprintf (stderr,
+			   "LookupAccountName(%s,%s) failed with error %ld\n",
+			   servername ? ansi_srvname : "NULL",
+			   username,
+			   GetLastError ());
+		  continue;
+		}
+	      else if (acc_type == SidTypeDomain)
+		{
+		  char domname[356];
 
-                  strcpy (domname, domain_name);
-                  strcat (domname, "\\");
-                  strcat (domname, username);
-                  sid_length = 1024;
-                  domname_len = 100;
-                  if (!LookupAccountName (servername ? ansi_srvname : NULL,
-                                          domname,
-                                          psid, &sid_length,
-                                          domain_name, &domname_len,
-			                  &acc_type))
-                    {
-                      fprintf (stderr,
-                               "LookupAccountName(%s,%s) failed with error %ld\n",
-                               servername ? ansi_srvname : "NULL",
-                               domname,
-                               GetLastError ());
-                      continue;
-                    }
-                }
-            }
+		  strcpy (domname, domain_name);
+		  strcat (domname, "\\");
+		  strcat (domname, username);
+		  sid_length = 1024;
+		  domname_len = 100;
+		  if (!LookupAccountName (servername ? ansi_srvname : NULL,
+					  domname,
+					  psid, &sid_length,
+					  domain_name, &domname_len,
+					  &acc_type))
+		    {
+		      fprintf (stderr,
+			       "LookupAccountName(%s,%s) failed with error %ld\n",
+			       servername ? ansi_srvname : "NULL",
+			       domname,
+			       GetLastError ());
+		      continue;
+		    }
+		}
+	    }
 	  printf ("%s::%d:%d:%s%s%s:%s:/bin/sh\n", username, uid, gid,
 		  fullname,
-                  print_sids ? "," : "",
-                  print_sids ? put_sid (psid) : "",
-                  homedir_psx);
+		  print_sids ? "," : "",
+		  print_sids ? put_sid (psid) : "",
+		  homedir_psx);
 	}
 
       netapibufferfree (buffer);
@@ -267,32 +267,32 @@ enum_local_groups (int print_sids)
 		       localgroup_name, GetLastError ());
 	      continue;
 	    }
-          else if (acc_type == SidTypeDomain)
-            {
-              char domname[356];
+	  else if (acc_type == SidTypeDomain)
+	    {
+	      char domname[356];
 
-              strcpy (domname, domain_name);
-              strcat (domname, "\\");
-              strcat (domname, localgroup_name);
-              sid_length = 1024;
-              domname_len = 100;
-              if (!LookupAccountName (NULL, domname,
-                                      psid, &sid_length,
-                                      domain_name, &domname_len,
-                                      &acc_type))
-                {
-                  fprintf (stderr,
-                           "LookupAccountName(%s) failed with error %ld\n",
-                           localgroup_name, GetLastError ());
-                  continue;
-                }
-            }
+	      strcpy (domname, domain_name);
+	      strcat (domname, "\\");
+	      strcat (domname, localgroup_name);
+	      sid_length = 1024;
+	      domname_len = 100;
+	      if (!LookupAccountName (NULL, domname,
+				      psid, &sid_length,
+				      domain_name, &domname_len,
+				      &acc_type))
+		{
+		  fprintf (stderr,
+			   "LookupAccountName(%s) failed with error %ld\n",
+			   localgroup_name, GetLastError ());
+		  continue;
+		}
+	    }
 
 	  gid = *GetSidSubAuthority (psid, *GetSidSubAuthorityCount(psid) - 1);
 
 	  printf ("%s:*:%ld:%ld:%s%s::\n", localgroup_name, gid, gid,
-                  print_sids ? "," : "",
-                  print_sids ? put_sid (psid) : "");
+		  print_sids ? "," : "",
+		  print_sids ? put_sid (psid) : "");
 	}
 
       netapibufferfree (buffer);
@@ -358,8 +358,8 @@ main (int argc, char **argv)
       return usage ();
     else
       {
-        while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
-          switch (i)
+	while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
+	  switch (i)
 	    {
 	    case 'l':
 	      print_local = 1;
@@ -382,18 +382,18 @@ main (int argc, char **argv)
 	      fprintf (stderr, "Try `%s --help' for more information.\n", argv[0]);
 	      return 1;
 	    }
-        if (!print_local && !print_domain && !print_local_groups)
-          {
+	if (!print_local && !print_domain && !print_local_groups)
+	  {
 	    fprintf (stderr, "%s: Specify one of `-l', `-d' or `-g'\n", argv[0]);
 	    return 1;
 	  }
-        if (optind < argc)
-          {
+	if (optind < argc)
+	  {
 	    if (!print_domain)
 	      {
-	        fprintf (stderr, "%s: A domain name is only accepted "
-	      		         "when `-d' is given.\n", argv[0]);
-	        return 1;
+		fprintf (stderr, "%s: A domain name is only accepted "
+				 "when `-d' is given.\n", argv[0]);
+		return 1;
 	      }
 	    mbstowcs (domain_name, argv[optind], (strlen (argv[optind]) + 1));
 	    domain_name_specified = 1;
@@ -405,11 +405,11 @@ main (int argc, char **argv)
     {
       /* Same behaviour as in cygwin/uinfo.cc (internal_getlogin). */
       if (!GetUserName (name, (len = 256, &len)))
-        strcpy (name, "unknown");
+	strcpy (name, "unknown");
 
       printf ("%s::%ld:%ld::/home/%s:/bin/sh\n", name,
-                                                 DOMAIN_USER_RID_ADMIN,
-                                                 DOMAIN_ALIAS_RID_ADMINS,
+						 DOMAIN_USER_RID_ADMIN,
+						 DOMAIN_ALIAS_RID_ADMINS,
 						 name);
 
       return 0;
@@ -418,7 +418,7 @@ main (int argc, char **argv)
   if (!load_netapi ())
     {
       fprintf (stderr, "Failed loading symbols from netapi32.dll "
-      		       "with error %lu\n", GetLastError ());
+		       "with error %lu\n", GetLastError ());
       return 1;
     }
 
@@ -426,17 +426,17 @@ main (int argc, char **argv)
    * Get `Everyone' group
   */
   if (AllocateAndInitializeSid (&sid_world_auth, 1, SECURITY_WORLD_RID,
-                                0, 0, 0, 0, 0, 0, 0, &sid))
+				0, 0, 0, 0, 0, 0, 0, &sid))
     {
       if (LookupAccountSid (NULL, sid,
-                            name, (len = 256, &len),
-                            dom, (len2 = 256, &len),
-                            &use))
-        printf ("%s:*:%d:%d:%s%s::\n", name,
-                                         SECURITY_WORLD_RID,
-                                         SECURITY_WORLD_RID,
-                                         print_sids ? "," : "",
-                                         print_sids ? put_sid (sid) : "");
+			    name, (len = 256, &len),
+			    dom, (len2 = 256, &len),
+			    &use))
+	printf ("%s:*:%d:%d:%s%s::\n", name,
+					 SECURITY_WORLD_RID,
+					 SECURITY_WORLD_RID,
+					 print_sids ? "," : "",
+					 print_sids ? put_sid (sid) : "");
       FreeSid (sid);
     }
 
@@ -444,17 +444,17 @@ main (int argc, char **argv)
    * Get `system' group
   */
   if (AllocateAndInitializeSid (&sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
-                                0, 0, 0, 0, 0, 0, 0, &sid))
+				0, 0, 0, 0, 0, 0, 0, &sid))
     {
       if (LookupAccountSid (NULL, sid,
-                            name, (len = 256, &len),
-                            dom, (len2 = 256, &len),
-                            &use))
-        printf ("%s:*:%d:%d:%s%s::\n", name,
-                                         SECURITY_LOCAL_SYSTEM_RID,
-                                         SECURITY_LOCAL_SYSTEM_RID,
-                                         print_sids ? "," : "",
-                                         print_sids ? put_sid (sid) : "");
+			    name, (len = 256, &len),
+			    dom, (len2 = 256, &len),
+			    &use))
+	printf ("%s:*:%d:%d:%s%s::\n", name,
+					 SECURITY_LOCAL_SYSTEM_RID,
+					 SECURITY_LOCAL_SYSTEM_RID,
+					 print_sids ? "," : "",
+					 print_sids ? put_sid (sid) : "");
       FreeSid (sid);
     }
 
@@ -463,19 +463,19 @@ main (int argc, char **argv)
   */
   if (!print_local_groups
       && AllocateAndInitializeSid (&sid_nt_auth, 2,
-                                   SECURITY_BUILTIN_DOMAIN_RID,
-                                   DOMAIN_ALIAS_RID_ADMINS,
-                                   0, 0, 0, 0, 0, 0, &sid))
+				   SECURITY_BUILTIN_DOMAIN_RID,
+				   DOMAIN_ALIAS_RID_ADMINS,
+				   0, 0, 0, 0, 0, 0, &sid))
     {
       if (LookupAccountSid (NULL, sid,
-                            name, (len = 256, &len),
-                            dom, (len2 = 256, &len),
-                            &use))
-        printf ("%s:*:%ld:%ld:%s%s::\n", name,
-                                         DOMAIN_ALIAS_RID_ADMINS,
-                                         DOMAIN_ALIAS_RID_ADMINS,
-                                         print_sids ? "," : "",
-                                         print_sids ? put_sid (sid) : "");
+			    name, (len = 256, &len),
+			    dom, (len2 = 256, &len),
+			    &use))
+	printf ("%s:*:%ld:%ld:%s%s::\n", name,
+					 DOMAIN_ALIAS_RID_ADMINS,
+					 DOMAIN_ALIAS_RID_ADMINS,
+					 print_sids ? "," : "",
+					 print_sids ? put_sid (sid) : "");
       FreeSid (sid);
     }
 
