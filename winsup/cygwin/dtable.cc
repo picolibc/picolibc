@@ -287,6 +287,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
     }
 }
 
+#define cnew(name) new ((void *) ccalloc (HEAP_FHANDLER, 1, sizeof (name))) name
 fhandler_base *
 build_fh_name (const char *name, HANDLE h, unsigned opt, suffix_info *si)
 {
@@ -294,7 +295,7 @@ build_fh_name (const char *name, HANDLE h, unsigned opt, suffix_info *si)
   if (pc.error)
     {
       set_errno (pc.error);
-      return NULL;
+      return cnew (fhandler_nodevice) ();
     }
 
   if (!pc.exists () && h)
@@ -325,7 +326,6 @@ build_fh_dev (const device& dev, const char *unix_name)
   return build_fh_pc (pc);
 }
 
-#define cnew(name) new ((void *) ccalloc (HEAP_FHANDLER, 1, sizeof (name))) name
 fhandler_base *
 build_fh_pc (path_conv& pc)
 {

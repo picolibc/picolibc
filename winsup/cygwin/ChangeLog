@@ -1,5 +1,10 @@
 2003-09-25  Christopher Faylor  <cgf@redhat.com>
 
+	* dtable.cc (build_fh_name): Return pointer to a 'nodevice' rather than
+	a NULL pointer or suffer SEGVs with invalid paths.
+
+2003-09-25  Christopher Faylor  <cgf@redhat.com>
+
 	* fork.cc (fork_parent): Detect failed pinfo constructor.
 	* spawn.cc (spawn_guts): Don't overwrite ENOMEM errno on failed pinfo
 	constructor.
