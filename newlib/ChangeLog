@@ -1,3 +1,10 @@
+2003-11-19  Nicholas Wourms  <nwourms@netscape.net>
+
+	* configure.host: Enable positional arguments for printf
+	family for Cygwin.
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Remove extraneous
+	pointer reference for quad_ptr_t.
+
 2003-11-19  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/scanf.c: Don't include local.h more than once.

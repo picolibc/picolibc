@@ -869,7 +869,7 @@ reswitch:	switch (ch) {
 		case 'n':
 #ifndef _NO_LONGLONG
 			if (flags & QUADINT)
-				*GET_ARG(N, ap, quad_ptr_t *) = ret;
+				*GET_ARG(N, ap, quad_ptr_t) = ret;
 			else 
 #endif
 			if (flags & LONGINT)
