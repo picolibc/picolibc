@@ -1,3 +1,8 @@
+2001-05-15  Ralf Baechle  <ralf@gnu.org>
+
+	* common.h: Remove definition of EM_MIPS_RS4_BE.  The constant was
+	never in active use and is used otherwise by the ABI.
+
 2001-05-07  Thiemo Seufer <seufer@csv.ica.uni-stuttgart.de>
 
 	* external.h: Fix typo.
