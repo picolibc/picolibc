@@ -908,9 +908,6 @@ win32_device_name (const char *src_path, char *win32_path, device& dev)
       case DEV_TAPE_MAJOR:
 	__small_sprintf (win32_path, dev.fmt, dev.minor % 128);
 	break;
-      case DEV_RAWDRIVE_MAJOR:
-	__small_sprintf (win32_path, dev.fmt, dev.minor + 'A');
-	break;
       case DEV_SD_MAJOR:
 	__small_sprintf (win32_path, dev.fmt, dev.minor / 16, dev.minor % 16);
 	break;

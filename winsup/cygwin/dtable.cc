@@ -346,7 +346,6 @@ build_fh_pc (path_conv& pc)
       case DEV_FLOPPY_MAJOR:
       case DEV_CDROM_MAJOR:
       case DEV_SD_MAJOR:
-      case DEV_RAWDRIVE_MAJOR:
 	fh = cnew (fhandler_dev_floppy) ();
 	break;
       case DEV_TAPE_MAJOR:

@@ -210,9 +210,6 @@ const device dev_sdy_storage =
 const device dev_sdz_storage =
 {"/dev/sdz", FH_SDZ, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 400};
 
-const device dev_rawdrive_storage =
-{"/dev/rawdrive", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0};
-
 const device dev_bad_storage =
 {":bad:", FH_BAD, ":bad:", 0, 0, 0, 0};
 #define bad_dev (&dev_bad_storage)
@@ -225,7 +222,6 @@ const device *unit_devices[] =
   &dev_ttys_storage,
   &dev_floppy_storage,
   &dev_tcp_storage,
-  &dev_rawdrive_storage,
   &dev_tape_storage
 };
 
@@ -1137,21 +1133,6 @@ return	NULL;
 
 }
         }
-    case 13:
-          if (strncmp (KR_keyword, "/dev/rawdrive", 13) == 0)
-            {
-{
-return &dev_rawdrive_storage;
-
-}
-            }
-          else
-            {
-{
-return	NULL;
-
-}
-            }
     case 14:
           if (strncmp (KR_keyword, "/dev/clipboard", 14) == 0)
             {
