@@ -23,7 +23,7 @@ details. */
 
 __BEGIN_DECLS
 
-int ioctl (int __fd, int __cmd, void *);
+int ioctl (int __fd, int __cmd, ...);
 
 __END_DECLS
 
