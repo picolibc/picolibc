@@ -23,7 +23,7 @@
 /* fhandler_dev_mem */
 
 fhandler_dev_mem::fhandler_dev_mem ()
-  : fhandler_base (FH_MEM)
+  : fhandler_base ()
 {
   /* Reading physical memory only supported on NT/W2K. */
   if (!wincap.has_physical_mem_access ())
