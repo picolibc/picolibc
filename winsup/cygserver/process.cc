@@ -68,9 +68,11 @@ process::process (const pid_t cygpid, const DWORD winpid, HANDLE signal_arrived)
       if (!DuplicateHandle (_hProcess, signal_arrived,
 			    GetCurrentProcess (), &_signal_arrived,
 			    0, FALSE, DUPLICATE_SAME_ACCESS))
-	system_printf ("error getting signal_arrived to server (%lu)",
-		       GetLastError ());
-	_signal_arrived = INVALID_HANDLE_VALUE;
+	{
+	  system_printf ("error getting signal_arrived to server (%lu)",
+			 GetLastError ());
+	  _signal_arrived = INVALID_HANDLE_VALUE;
+	}
     }
   InitializeCriticalSection (&_access);
   debug ("initialized (%lu)", _cygpid);
@@ -80,7 +82,8 @@ process::~process ()
 {
   debug ("deleting (%lu)", _cygpid);
   DeleteCriticalSection (&_access);
-  CloseHandle (_signal_arrived);
+  if (_signal_arrived && _signal_arrived != INVALID_HANDLE_VALUE)
+    CloseHandle (_signal_arrived);
   CloseHandle (_hProcess);
 }
 

@@ -35,6 +35,7 @@ __FBSDID("$FreeBSD: /repoman/r/ncvs/src/sys/kern/sysv_sem.c,v 1.70 2004/05/30 20
 #include "cygserver.h"
 #include "process.h"
 #include "cygserver_ipc.h"
+#include <sys/smallprint.h>
 
 #ifdef __CYGWIN__
 #define __semctl semctl
@@ -53,7 +54,7 @@ static int semvalid(int semid, struct semid_ds *semaptr);
 static struct sem_undo *semu_alloc(struct thread *td);
 static int semundo_adjust(struct thread *td, struct sem_undo **supptr,
 		int semid, int semnum, int adjval);
-static void semundo_clear(int semid, int semnum);
+static void semundo_clear(int semid, int semnum, struct thread *td);
 
 #ifndef _SYS_SYSPROTO_H_
 struct __semctl_args;
@@ -88,7 +89,7 @@ static eventhandler_tag semexit_tag;
 #define SEMUNDO_LOCK()		mtx_lock(&SEMUNDO_MTX);
 #define SEMUNDO_HOOKLOCK()	_mtx_lock(&SEMUNDO_MTX, p->winpid, __FILE__, __LINE__);
 #define SEMUNDO_UNLOCK()	mtx_unlock(&SEMUNDO_MTX);
-#define SEMUNDO_LOCKASSERT(how)	mtx_assert(&SEMUNDO_MTX, (how));
+#define SEMUNDO_LOCKASSERT(how,pid)	mtx_assert(&SEMUNDO_MTX, (how), (pid));
 
 struct sem {
 	u_short	semval;		/* semaphore value */
@@ -108,7 +109,11 @@ struct undo {
 
 struct sem_undo {
 	SLIST_ENTRY(sem_undo) un_next;	/* ptr to next active undo structure */
+#ifdef __CYGWIN__
+	DWORD	un_proc;		/* owner of this structure */
+#else
 	struct	proc *un_proc;		/* owner of this structure */
+#endif
 	short	un_cnt;			/* # of active entries */
 	struct undo un_ent[1];		/* undo entries */
 };
@@ -240,10 +245,18 @@ seminit(void)
 		sema[i].sem_perm.seq = 0;
 	}
 	for (i = 0; i < seminfo.semmni; i++)
-		mtx_init(&sema_mtx[i], "semid", NULL, MTX_DEF);
+	{
+	   char *buf = (char *)malloc (16);
+	   __small_sprintf (buf, "semid[%d]", i);
+		mtx_init(&sema_mtx[i], buf, NULL, MTX_DEF);
+	}
 	for (i = 0; i < seminfo.semmnu; i++) {
 		struct sem_undo *suptr = SEMU(i);
+#ifdef __CYGWIN__
+		suptr->un_proc = 0;
+#else
 		suptr->un_proc = NULL;
+#endif
 	}
 	SLIST_INIT(&semu_list);
 	mtx_init(&sem_mtx, "sem", NULL, MTX_DEF);
@@ -351,7 +364,7 @@ semu_alloc(struct thread *td)
 	struct sem_undo **supptr;
 	int attempt;
 
-	SEMUNDO_LOCKASSERT(MA_OWNED);
+	SEMUNDO_LOCKASSERT(MA_OWNED, td->td_proc->winpid);
 	/*
 	 * Try twice to allocate something.
 	 * (we'll purge an empty structure after the first pass so
@@ -366,10 +379,14 @@ semu_alloc(struct thread *td)
 
 		for (i = 0; i < seminfo.semmnu; i++) {
 			suptr = SEMU(i);
+#ifdef __CYGWIN__
+			if (suptr->un_proc == 0) {
+#else
 			if (suptr->un_proc == NULL) {
+#endif
 				SLIST_INSERT_HEAD(&semu_list, suptr, un_next);
 				suptr->un_cnt = 0;
-				suptr->un_proc = td->td_proc;
+				suptr->un_proc = td->td_proc->winpid;
 				return(suptr);
 			}
 		}
@@ -386,7 +403,11 @@ semu_alloc(struct thread *td)
 			SLIST_FOREACH_PREVPTR(suptr, supptr, &semu_list,
 			    un_next) {
 				if (suptr->un_cnt == 0) {
+#ifdef __CYGWIN__
+					suptr->un_proc = 0;
+#else
 					suptr->un_proc = NULL;
+#endif
 					did_something = 1;
 					*supptr = SLIST_NEXT(suptr, un_next);
 					break;
@@ -421,7 +442,7 @@ semundo_adjust(struct thread *td, struct sem_undo **supptr, int semid,
 	struct undo *sunptr;
 	int i;
 
-	SEMUNDO_LOCKASSERT(MA_OWNED);
+	SEMUNDO_LOCKASSERT(MA_OWNED, td->td_proc->winpid);
 	/* Look for and remember the sem_undo if the caller doesn't provide
 	   it */
 
@@ -429,7 +450,7 @@ semundo_adjust(struct thread *td, struct sem_undo **supptr, int semid,
 	if (suptr == NULL) {
 		SLIST_FOREACH(suptr, &semu_list, un_next) {
 #ifdef __CYGWIN__
-			if (suptr->un_proc->cygpid == p->cygpid) {
+			if (suptr->un_proc == p->winpid) {
 #else
 			if (suptr->un_proc == p) {
 #endif
@@ -486,11 +507,11 @@ semundo_adjust(struct thread *td, struct sem_undo **supptr, int semid,
 }
 
 static void
-semundo_clear(int semid, int semnum)
+semundo_clear(int semid, int semnum, struct thread *td)
 {
 	struct sem_undo *suptr;
 
-	SEMUNDO_LOCKASSERT(MA_OWNED);
+	SEMUNDO_LOCKASSERT(MA_OWNED, td->td_proc->winpid);
 	SLIST_FOREACH(suptr, &semu_list, un_next) {
 		struct undo *sunptr = &suptr->un_ent[0];
 		int i = 0;
@@ -647,7 +668,7 @@ __semctl(struct thread *td, struct __semctl_args *uap)
 		}
 		semaptr->sem_perm.mode = 0;
 		SEMUNDO_LOCK();
-		semundo_clear(semid, -1);
+		semundo_clear(semid, -1, td);
 		SEMUNDO_UNLOCK();
 		wakeup(semaptr);
 		break;
@@ -770,7 +791,7 @@ __semctl(struct thread *td, struct __semctl_args *uap)
 		}
 		semaptr->sem_base[semnum].semval = real_arg.val;
 		SEMUNDO_LOCK();
-		semundo_clear(semid, semnum);
+		semundo_clear(semid, semnum, td);
 		SEMUNDO_UNLOCK();
 		wakeup(semaptr);
 		break;
@@ -808,7 +829,7 @@ raced:
 			semaptr->sem_base[i].semval = usval;
 		}
 		SEMUNDO_LOCK();
-		semundo_clear(semid, -1);
+		semundo_clear(semid, -1, td);
 		SEMUNDO_UNLOCK();
 		wakeup(semaptr);
 		break;
@@ -821,7 +842,7 @@ raced:
 	if (error == 0)
 		td->td_retval[0] = rval;
 done2:
-	if (mtx_owned(sema_mtxp))
+	if (mtx_owned(sema_mtxp, td->td_proc->winpid))
 		mtx_unlock(sema_mtxp);
 	if (array != NULL)
 		sys_free(array, M_TEMP);
@@ -850,7 +871,7 @@ semget(struct thread *td, struct semget_args *uap)
 	struct ucred *cred = td->td_ucred;
 #endif
 
-	DPRINTF(("semget(0x%x, %d, 0%o)\n", key, nsems, semflg));
+	DPRINTF(("semget(0x%X, %d, 0%o)\n", key, nsems, semflg));
 	if (!jail_sysvipc_allowed && jailed(td->td_ucred))
 		return (ENOSYS);
 
@@ -1056,7 +1077,7 @@ semop(struct thread *td, struct semop_args *uap)
 			semptr = &semaptr->sem_base[sopptr->sem_num];
 
 			DPRINTF((
-			    "semop:  semaptr=%x, sem_base=%x, "
+			    "semop: semaptr=%x, sem_base=%x, "
 			    "semptr=%x, sem[%d]=%d : op=%d, flag=%s\n",
 			    semaptr, semaptr->sem_base, semptr,
 			    sopptr->sem_num, semptr->semval, sopptr->sem_op,
@@ -1252,18 +1273,6 @@ semexit_myhook(void *arg, struct proc *p)
 	struct sem_undo *suptr;
 	struct sem_undo **supptr;
 
-#ifdef __CYGWIN__
-	/*
-	 * Search all mutexes, if some of them are still owned by the
-	 * leaving process.  If so, unlock them.
-	 */
-	if (sem_mtx.owner == p->winpid)
-		mtx_unlock(&sem_mtx);
-	for (int i = 0; i < seminfo.semmni; i++)
-		if (sema_mtx[i].owner == p->winpid)
-			mtx_unlock(&sema_mtx[i]);
-#endif /* __CYGWIN__ */
-
 	/*
 	 * Go through the chain of undo vectors looking for one
 	 * associated with this process.
@@ -1271,16 +1280,20 @@ semexit_myhook(void *arg, struct proc *p)
 	SEMUNDO_HOOKLOCK();
 	SLIST_FOREACH_PREVPTR(suptr, supptr, &semu_list, un_next) {
 #ifdef __CYGWIN__
-		if (suptr->un_proc->cygpid == p->cygpid)
+		if (suptr->un_proc == p->winpid)
 #else
 		if (suptr->un_proc == p)
 #endif
 			break;
 	}
+#ifndef __CYGWIN__
 	SEMUNDO_UNLOCK();
+#endif
 
-	if (suptr == NULL)
+	if (suptr == NULL) {
+		SEMUNDO_UNLOCK();
 		return;
+	}
 
 #ifdef __CYGWIN__
 	DPRINTF(("proc @%u(%u) has undo structure with %d entries\n",
@@ -1309,8 +1322,8 @@ semexit_myhook(void *arg, struct proc *p)
 			_mtx_lock(sema_mtxp, p->winpid, __FILE__, __LINE__);
 #else
 			mtx_lock(sema_mtxp);
-#endif
 			SEMUNDO_HOOKLOCK();
+#endif
 			if ((semaptr->sem_perm.mode & SEM_ALLOC) == 0)
 				panic("semexit - semid not allocated");
 			if (semnum >= semaptr->sem_nsems)
@@ -1318,13 +1331,11 @@ semexit_myhook(void *arg, struct proc *p)
 
 			DPRINTF((
 #ifdef __CYGWIN__
-			    "semexit:  %u(%u) id=%d num=%d(adj=%d) ; sem=%d\n",
-			    suptr->un_proc->cygpid, suptr->un_proc->winpid,
-			    suptr->un_ent[ix].un_id,
+			    "semexit:  %u id=%d num=%d(adj=%d) ; sem=%d\n",
 #else
 			    "semexit:  %08x id=%d num=%d(adj=%d) ; sem=%d\n",
-			    suptr->un_proc, suptr->un_ent[ix].un_id,
 #endif
+			    suptr->un_proc, suptr->un_ent[ix].un_id,
 			    suptr->un_ent[ix].un_num,
 			    suptr->un_ent[ix].un_adjval,
 			    semaptr->sem_base[semnum].semval));
@@ -1340,17 +1351,26 @@ semexit_myhook(void *arg, struct proc *p)
 
 			wakeup(semaptr);
 			DPRINTF(("semexit:  back from wakeup\n"));
-			mtx_unlock(sema_mtxp);
+			_mtx_unlock(sema_mtxp, __FILE__, __LINE__);
+#ifndef __CYGWIN__
 			SEMUNDO_UNLOCK();
+#endif
 		}
 	}
 
 	/*
 	 * Deallocate the undo vector.
 	 */
-	DPRINTF(("removing vector\n"));
+	DPRINTF(("removing vector (%u)\n", suptr->un_proc));
+#ifdef __CYGWIN__
+	suptr->un_proc = 0;
+#else
 	suptr->un_proc = NULL;
+#endif
 	*supptr = SLIST_NEXT(suptr, un_next);
+#ifdef __CYGWIN__
+	SEMUNDO_UNLOCK();
+#endif
 }
 
 #ifndef __CYGWIN__

@@ -1,6 +1,6 @@
 /* bsd_helper.cc
 
-   Copyright 2003, 2004 Red Hat Inc.
+   Copyright 2003, 2004, 2005 Red Hat Inc.
 
 This file is part of Cygwin.
 
@@ -129,7 +129,7 @@ ipcexit_hookthread (const LPVOID param)
 	   exiting process and shmexit_myhook to keep track of shared
 	   memory. */
 	if (Giant.owner == shs->ipcblk.winpid)
-		mtx_unlock (&Giant);
+	  mtx_unlock (&Giant);
 	if (support_semaphores == TUN_TRUE)
 	  semexit_myhook (NULL, &shs->ipcblk);
 	if (support_sharedmem == TUN_TRUE)
@@ -152,6 +152,7 @@ ipcexit_hookthread (const LPVOID param)
       if (ipcht_entry->winpid == shs->ipcblk.winpid)
         {
 	  SLIST_REMOVE (&ipcht_list, ipcht_entry, ipc_hookthread, sht_next);
+	  CloseHandle (ipcht_entry->thread);
 	  delete ipcht_entry;
 	}
     }

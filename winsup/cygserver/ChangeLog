@@ -1,3 +1,52 @@
+2005-04-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_helper.cc (ipcexit_hookthread): Fix whitespace and handle leak.
+	* bsd_mutex.cc: Include stdlib.h, sys/msg.h and sys/sem.h.
+	(mtx_init): Initialize lock counter to 0.
+	(_mtx_lock): Increment and log mutex lock counter.
+	(mtx_owned): Add winpid argument. Return true only if mutex is
+	actually owned by process winpid.
+	(_mtx_assert): Add winpid argument accordingly.
+	(_mtx_unlock): Log owner and lock count.
+	(MSLEEP_MUTEX): Remove.
+	(MSLEEP_SEM): Ditto.
+	(MSLEEP_EVENT): Ditto.
+	(msleep_event_name): Ditto.
+	(msleep_cs): New global critical section.
+	(msleep_cnt): New global variable indicating msleep record usage.
+	(msleep_max_cnt): New global variable indicating msleep record size.
+	(msleep_arr): New global pointer to msleep records.
+	(msleep_init): Initialize msleep_cs. Allocate msleep_arr array.
+	(_msleep): Rewrite using new msleep_cs/msleep_arr based thread
+	synchronization. Don't be shy with debug output.
+	(wakeup): Rewrite using new msleep_cs/msleep_arr based thread
+	synchronization.
+	* bsd_mutex.h (struct mtx): Add lock counter for better debugging.
+	(mtx_owned): Declare with winpid argument.
+	(_mtx_assert): Ditto.
+	(mtx_assert): Define with winpid argument.
+	* cygserver.cc (version): Remove.
+	(SERVER_VERSION): New define, decoupling server version information
+	from source code control system.
+	(print_version): Simplify printing server version.
+	* process.cc (process::process): Fix wrong bracketing (and handle leak).
+	(process::~process): Only try to close _signal_arrived if valid.
+	* sysv_sem.cc: Include sys/smallprint.h.
+	(semundo_clear): Define with additional struct thread pointer argument.
+	Accomodate throughout.
+	(SEMUNDO_LOCKASSERT): Define with winpid argument. Accomodate
+	throughout.
+	(struct sem_undo): Define un_proc as pid_t on Cygwin. Accomodate
+	throughout.
+	(seminit): Improve debugging by adding the semid to the mutex name.
+	(semget): Correctly print key value as 64 bit hex value in debug
+	output.
+	(semexit_myhook): Remove Cygwin specific unlocking of mutexes owned
+	by exiting process.  Keep semaphore global lock throughout whole
+	function to avoid races.
+	* sysv_shm.cc (GIANT_REQUIRED): Define empty on Cygwin. We know that
+	Giant is locked.
+
 2005-04-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* bsd_mutex.cc (_msleep): Whitespace fix.

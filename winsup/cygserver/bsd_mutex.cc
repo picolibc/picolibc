@@ -14,6 +14,9 @@ details. */
 #define __BSD_VISIBLE 1
 #include <sys/smallprint.h>
 #include <limits.h>
+#include <stdlib.h>
+#include <sys/msg.h>
+#include <sys/sem.h>
 
 #include "process.h"
 #include "cygserver_ipc.h"
@@ -26,6 +29,7 @@ mtx_init (mtx *m, const char *name, const void *, int)
 {
   m->name = name;
   m->owner = 0;
+  m->cnt = 0;
   /* Can't use Windows Mutexes here since Windows Mutexes are only
      unlockable by the lock owner. */
   m->h = CreateSemaphore (NULL, 1, 1, NULL);
@@ -36,30 +40,32 @@ mtx_init (mtx *m, const char *name, const void *, int)
 void
 _mtx_lock (mtx *m, DWORD winpid, const char *file, int line)
 {
-  _log (file, line, LOG_DEBUG, "Try locking mutex %s", m->name);
+  _log (file, line, LOG_DEBUG, "Try locking mutex %s (%u) (hold: %u)",
+	m->name, winpid, m->owner);
   if (WaitForSingleObject (m->h, INFINITE) != WAIT_OBJECT_0)
     _panic (file, line, "wait for %s in %d failed, %E", m->name, winpid);
   m->owner = winpid;
-  _log (file, line, LOG_DEBUG, "Locked      mutex %s", m->name);
+  _log (file, line, LOG_DEBUG, "Locked      mutex %s/%u (%u)",
+	m->name, ++m->cnt, winpid);
 }
 
 int
-mtx_owned (mtx *m)
+mtx_owned (mtx *m, DWORD winpid)
 {
-  return m->owner > 0;
+  return m->owner == winpid;
 }
 
 void
-_mtx_assert (mtx *m, int what, const char *file, int line)
+_mtx_assert (mtx *m, int what, DWORD winpid, const char *file, int line)
 {
   switch (what)
     {
       case MA_OWNED:
-        if (!mtx_owned (m))
+        if (!mtx_owned (m, winpid))
 	  _panic (file, line, "Mutex %s not owned", m->name);
 	break;
       case MA_NOTOWNED:
-        if (mtx_owned (m))
+        if (mtx_owned (m, winpid))
 	  _panic (file, line, "Mutex %s is owned", m->name);
         break;
       default:
@@ -70,6 +76,8 @@ _mtx_assert (mtx *m, int what, const char *file, int line)
 void
 _mtx_unlock (mtx *m, const char *file, int line)
 {
+  DWORD owner = m->owner;
+  unsigned long cnt = m->cnt;
   m->owner = 0;
   /* Cautiously check if mtx_destroy has been called (shutdown).
      In that case, m->h is NULL. */
@@ -82,7 +90,8 @@ _mtx_unlock (mtx *m, const char *file, int line)
           || (wincap.is_winnt () && GetLastError () != ERROR_TOO_MANY_POSTS))
 	_panic (file, line, "release of mutex %s failed, %E", m->name);
     }
-  _log (file, line, LOG_DEBUG, "Unlocked    mutex %s", m->name);
+  _log (file, line, LOG_DEBUG, "Unlocked    mutex %s/%u (owner: %u)",
+  	m->name, cnt, owner);
 }
 
 void
@@ -97,22 +106,6 @@ mtx_destroy (mtx *m)
 /*
  * Helper functions for msleep/wakeup.
  */
-
-/* Values for which */
-#define MSLEEP_MUTEX	0
-#define MSLEEP_SEM	1
-#define MSLEEP_EVENT	2
-
-static char *
-msleep_event_name (void *ident, char *name, int which)
-{
-  if (wincap.has_terminal_services ())
-    __small_sprintf (name, "Global\\cygserver.msleep.evt.%1d.%08x",
-		     which, ident);
-  else
-    __small_sprintf (name, "cygserver.msleep.evt.%1d.%08x", which, ident);
-  return name;
-}
 
 static int
 win_priority (int priority)
@@ -172,13 +165,36 @@ set_priority (int priority)
  * flag the mutex is not entered before returning.
  */
 static HANDLE msleep_glob_evt;
+CRITICAL_SECTION msleep_cs;
+static long msleep_cnt;
+static long msleep_max_cnt;
+static struct msleep_record {
+  void *ident;
+  HANDLE wakeup_evt;
+  LONG threads;
+} *msleep_arr;
 
 void
 msleep_init (void)
 {
+  extern struct msginfo msginfo;
+  extern struct seminfo seminfo;
+
   msleep_glob_evt = CreateEvent (NULL, TRUE, FALSE, NULL);
   if (!msleep_glob_evt)
     panic ("CreateEvent in msleep_init failed: %E");
+  InitializeCriticalSection (&msleep_cs);
+  long msgmni = support_msgqueues ? msginfo.msgmni : 0;
+  long semmni = support_semaphores ? seminfo.semmni : 0;
+  TUNABLE_INT_FETCH ("kern.ipc.msgmni", &msgmni);
+  TUNABLE_INT_FETCH ("kern.ipc.semmni", &semmni);
+  debug ("Try allocating msgmni (%d) + semmni (%d) msleep records",
+  	 msgmni, semmni);
+  msleep_max_cnt = msgmni + semmni;
+  msleep_arr = (struct msleep_record *) calloc (msleep_max_cnt,
+  						sizeof (struct msleep_record));
+  if (!msleep_arr)
+    panic ("Allocating msleep records in msleep_init failed: %d", errno);
 }
 
 int
@@ -186,46 +202,47 @@ _msleep (void *ident, struct mtx *mtx, int priority,
 	const char *wmesg, int timo, struct thread *td)
 {
   int ret = -1;
-  char name[64];
+  int i;
 
-  /* The mutex is used to indicate an ident specific critical section.
-     The critical section is needed to synchronize access to the
-     semaphore and eventually the event object.  The whole idea is
-     that a wakeup is *guaranteed* to wakeup *all* threads.  If that's
-     not synchronized, sleeping threads could return into the msleep
-     function before all other threads have called CloseHandle(evt).
-     That's bad, since the event still exists and is signalled! */
-  HANDLE mutex = CreateMutex (NULL, FALSE,
-			      msleep_event_name (ident, name, MSLEEP_MUTEX));
-  if (!mutex)
-    panic ("CreateMutex in msleep (%s) failed: %E", wmesg);
-  WaitForSingleObject (mutex, INFINITE);
+  while (1)
+    {
+      EnterCriticalSection (&msleep_cs);
+      for (i = 0; i < msleep_cnt; ++i)
+	if (msleep_arr[i].ident == ident)
+	  break;
+      if (!msleep_arr[i].ident)
+	{
+	  debug ("New ident %x, index %d", ident, i);
+	  if (i >= msleep_max_cnt)
+	    panic ("Too many idents to wait for.\n");
+	  msleep_arr[i].ident = ident;
+	  msleep_arr[i].wakeup_evt = CreateEvent (NULL, TRUE, FALSE, NULL);
+	  if (!msleep_arr[i].wakeup_evt)
+	    panic ("CreateEvent in msleep (%s) failed: %E", wmesg);
+	  msleep_arr[i].threads = 1;
+	  ++msleep_cnt;
+	  LeaveCriticalSection (&msleep_cs);
+	  break;
+	}
+      else if (WaitForSingleObject (msleep_arr[i].wakeup_evt, 0)
+	       != WAIT_OBJECT_0)
+	{
+	  ++msleep_arr[i].threads;
+	  LeaveCriticalSection (&msleep_cs);
+	  break;
+	}
+      /* Otherwise wakeup has been called, so sleep to wait until all
+         formerly waiting threads have left and retry. */
+      LeaveCriticalSection (&msleep_cs);
+      Sleep (1L);
+    }
 
-  /* Ok, we're in the critical section now.  We create an ident specific
-     semaphore, which is used to synchronize the waiting threads. */
-  HANDLE sem = CreateSemaphore (NULL, 0, LONG_MAX,
-				msleep_event_name (ident, name, MSLEEP_SEM));
-  if (!sem)
-    panic ("CreateSemaphore in msleep (%s) failed: %E", wmesg);
-
-  /* This thread is one more thread sleeping.  The semaphore value is
-     so used as a counter of sleeping threads.  That info is needed by
-     the wakeup function. */
-  ReleaseSemaphore (sem, 1, NULL);
-
-  /* Leave critical section. */
-  ReleaseMutex (mutex);
-
-  HANDLE evt = CreateEvent (NULL, TRUE, FALSE,
-			    msleep_event_name (ident, name, MSLEEP_EVENT));
-  if (!evt)
-    panic ("CreateEvent in msleep (%s) failed: %E", wmesg);
   if (mtx)
     mtx_unlock (mtx);
   int old_priority = set_priority (priority);
   HANDLE obj[4] =
     {
-      evt,
+      msleep_arr[i].wakeup_evt,
       msleep_glob_evt,
       td->client->handle (),
       td->client->signal_arrived ()
@@ -241,37 +258,45 @@ _msleep (void *ident, struct mtx *mtx, int priority,
     {
       case WAIT_OBJECT_0:	/* wakeup() has been called. */
 	ret = 0;
+	debug ("msleep wakeup called");
         break;
       case WAIT_OBJECT_0 + 1:	/* Shutdown event (triggered by wakeup_all). */
         priority |= PDROP;
 	/*FALLTHRU*/
       case WAIT_OBJECT_0 + 2:	/* The dependent process has exited. */
+	debug ("msleep process exit or shutdown");
 	ret = EIDRM;
         break;
       case WAIT_OBJECT_0 + 3:	/* Signal for calling process arrived. */
+	debug ("msleep process got signal");
         ret = EINTR;
 	break;
       case WAIT_TIMEOUT:
         ret = EWOULDBLOCK;
         break;
       default:
-	panic ("wait in msleep (%s) failed, %E", wmesg);
+	/* There's a chance that a process has been terminated before
+	   WaitForMultipleObjects has been called.  In this case the handles
+	   might be invalid.  The error code returned is ERROR_INVALID_HANDLE.
+	   Since we can trust the values of these handles otherwise, we
+	   treat an ERROR_INVALID_HANDLE as a normal process termination and
+	   hope for the best. */
+	if (GetLastError () != ERROR_INVALID_HANDLE)
+	  panic ("wait in msleep (%s) failed, %E", wmesg);
+	ret = EIDRM;
 	break;
     }
 
-  CloseHandle (evt);
-  /* wakeup has reset the semaphore to 0.  Now indicate that this thread
-     has called CloseHandle (evt) and enter the critical section.  The
-     critical section is still hold by wakeup, until all formerly sleeping
-     threads have indicated that the event has been dismissed.  That's
-     the signal for wakeup that it's the only thread still holding a
-     handle to the event object.  wakeup will then close the last handle
-     and leave the critical section. */
-  ReleaseSemaphore (sem, 1, NULL);
-  WaitForSingleObject (mutex, INFINITE);
-  CloseHandle (sem);
-  ReleaseMutex (mutex);
-  CloseHandle (mutex);
+  EnterCriticalSection (&msleep_cs);
+  if (--msleep_arr[i].threads == 0)
+    {
+      CloseHandle (msleep_arr[i].wakeup_evt);
+      msleep_arr[i].ident = NULL;
+      --msleep_cnt;
+      if (i < msleep_cnt)
+        msleep_arr[i] = msleep_arr[msleep_cnt];
+    }
+  LeaveCriticalSection (&msleep_cs);
 
   set_priority (old_priority);
 
@@ -286,70 +311,15 @@ _msleep (void *ident, struct mtx *mtx, int priority,
 int
 wakeup (void *ident)
 {
-  char name[64];
-  LONG threads;
+  int i;
 
-  HANDLE evt = OpenEvent (EVENT_MODIFY_STATE, FALSE,
-  			  msleep_event_name (ident, name, MSLEEP_EVENT));
-  if (!evt) /* No thread is waiting. */
-    {
-      /* Another round of different error codes returned by 9x and NT
-         systems. Oh boy... */
-      if (  (!wincap.is_winnt () && GetLastError () != ERROR_INVALID_NAME)
-	  || (wincap.is_winnt () && GetLastError () != ERROR_FILE_NOT_FOUND))
-	panic ("OpenEvent (%s) in wakeup failed: %E", name);
-      return 0;
-    }
-
-  /* The mutex is used to indicate an ident specific critical section.
-     The critical section is needed to synchronize access to the
-     semaphore and eventually the event object.  The whole idea is
-     that a wakeup is *guaranteed* to wakeup *all* threads.  If that's
-     not synchronized, sleeping threads could return into the msleep
-     function before all other threads have called CloseHandle(evt).
-     That's bad, since the event still exists and is signalled! */
-  HANDLE mutex = OpenMutex (MUTEX_ALL_ACCESS, FALSE,
-			    msleep_event_name (ident, name, MSLEEP_MUTEX));
-  if (!mutex)
-    panic ("OpenMutex (%s) in wakeup failed: %E", name);
-  WaitForSingleObject (mutex, INFINITE);
-  /* Ok, we're in the critical section now.  We create an ident specific
-     semaphore, which is used to synchronize the waiting threads. */
-  HANDLE sem = OpenSemaphore (SEMAPHORE_ALL_ACCESS, FALSE,
-			      msleep_event_name (ident, name, MSLEEP_SEM));
-  if (!sem)
-    panic ("OpenSemaphore (%s) in wakeup failed: %E", name);
-  ReleaseSemaphore (sem, 1, &threads);
-  /* `threads' is the number of waiting threads.  Now reset the semaphore
-     to 0 and wait for this number of threads to indicate that they have
-     called CloseHandle (evt).  Then it's save to do the same here in
-     wakeup, which then means that the event object is destroyed and
-     can get safely recycled. */
-  for (int i = threads + 1; i > 0; --i)
-    WaitForSingleObject (sem, INFINITE);
-
-  if (!SetEvent (evt))
-    panic ("SetEvent (%s) in wakeup failed, %E", name);
-
-  /* Now wait for all threads which were waiting for this wakeup. */
-  while (threads-- > 0)
-    WaitForSingleObject (sem, INFINITE);
-
-  /* Now our handle is the last handle to this event object. */
-  CloseHandle (evt);
-  /* But paranoia rulez, so we check here again. */
-  evt = OpenEvent (EVENT_MODIFY_STATE, FALSE,
-		   msleep_event_name (ident, name, MSLEEP_EVENT));
-  if (evt)
-    panic ("Event %s has not been destroyed.  Obviously I can't count :-(",
-	   name);
-
-  CloseHandle (sem);
-
-  /* Leave critical section (all of wakeup is critical). */
-  ReleaseMutex (mutex);
-  CloseHandle (mutex);
-
+  EnterCriticalSection (&msleep_cs);
+  for (i = 0; i < msleep_cnt; ++i)
+    if (msleep_arr[i].ident == ident)
+      break;
+  if (msleep_arr[i].ident)
+    SetEvent (msleep_arr[i].wakeup_evt);
+  LeaveCriticalSection (&msleep_cs);
   return 0;
 }
 

@@ -1,6 +1,6 @@
 /* cygserver.cc
 
-   Copyright 2001, 2002, 2003, 2004 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004, 2005 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -37,8 +37,7 @@ details. */
 
 #define DEF_CONFIG_FILE	"" SYSCONFDIR "/cygserver.conf"
 
-// Version string.
-static const char version[] = "$Revision$";
+#define SERVER_VERSION	"1.12"
 
 GENERIC_MAPPING access_mapping;
 
@@ -496,24 +495,6 @@ print_usage (const char *const pgm)
 static void
 print_version ()
 {
-  char *vn = NULL;
-
-  const char *const colon = strchr (version, ':');
-
-  if (!colon)
-    {
-      vn = strdup ("?");
-    }
-  else
-    {
-      vn = strdup (colon + 2);	// Skip ": "
-
-      char *const spc = strchr (vn, ' ');
-
-      if (spc)
-	*spc = '\0';
-    }
-
   char buf[200];
   snprintf (buf, sizeof (buf), "%d.%d.%d(%d.%d/%d/%d)-(%d.%d.%d.%d) %s",
 	    cygwin_version.dll_major / 1000,
@@ -531,12 +512,10 @@ print_version ()
 
   log (LOG_INFO, "(cygwin) %s\n"
 		  "API version %s\n"
-		  "Copyright 2001, 2002, 2003 Red Hat, Inc.\n"
+		  "Copyright 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.\n"
 		  "Compiled on %s\n"
 		  "Default configuration file is %s",
-		  vn, buf, __DATE__, DEF_CONFIG_FILE);
-
-  free (vn);
+		  SERVER_VERSION, buf, __DATE__, DEF_CONFIG_FILE);
 }
 
 /*

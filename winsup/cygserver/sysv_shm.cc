@@ -68,7 +68,11 @@ __FBSDID("$FreeBSD: /repoman/r/ncvs/src/sys/kern/sysv_shm.c,v 1.89 2003/11/07 04
 #define btoc(b)	(((b) + PAGE_MASK) / PAGE_SIZE)
 #define round_page(p) ((((unsigned long)(p)) + PAGE_MASK) & ~(PAGE_MASK))
 #define ACCESSPERMS (0777)
+#ifdef __CYGWIN__
+#define GIANT_REQUIRED
+#else
 #define GIANT_REQUIRED mtx_assert(&Giant, MA_OWNED)
+#endif
 #define KERN_SUCCESS 0
 #define VM_PROT_READ	PROT_READ
 #define VM_PROT_WRITE	PROT_WRITE
