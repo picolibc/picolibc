@@ -1,3 +1,8 @@
+2001-02-27  Philip Blundell  <pb@futuretv.com>
+
+	* arm.h: Add new definitions from ARM document SWS ESPC 0003 B-01.
+	(EF_PIC, et al.): Rename to EF_ARM_xx.
+
 2001-02-09  Martin Schwidefsky  <schwidefsky@de.ibm.com>
 
 	* common.h: Add linux target for S/390.
