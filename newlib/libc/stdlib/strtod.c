@@ -111,7 +111,7 @@ _DEFUN (_strtod_r, (ptr, s00, se),
   int bb2, bb5, bbe, bd2, bd5, bbbits, bs2, c, dsign, e1, esign, i, j,
     k, nd, nd0, nf, nz, nz0, sign;
   long e;
-  _CONST char *s, *s0, *s1;
+  _CONST char *s, *s0, *s1, *s2;
   double aadj, aadj1, adj;
   long L;
   unsigned long z;
@@ -222,7 +222,7 @@ dig_done:
 	  s = s00;
 	  goto ret;
 	}
-      s00 = s;
+      s2 = s;
       esign = 0;
       switch (c = *++s)
 	{
@@ -253,7 +253,7 @@ dig_done:
 	    e = 0;
 	}
       else
-	s = s00;
+	s = s2;
     }
   if (!nd)
     {
