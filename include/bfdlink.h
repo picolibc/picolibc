@@ -201,6 +201,19 @@ struct bfd_link_info
   /* true if BFD should generate errors for undefined symbols
      even if generating a shared object.  */
   boolean no_undefined;
+  /* true if BFD should allow undefined symbols in shared objects even
+     when no_undefined is set to disallow undefined symbols.  The net
+     result will be that undefined symbols in regular objects will
+     still trigger an error, but undefined symbols in shared objects
+     will be ignored.  The implementation of no_undefined makes the
+     assumption that the runtime linker will choke on undefined
+     symbols.  However there is at least one system (BeOS) where
+     undefined symbols in shared libraries is normal since the kernel
+     patches them at load time to select which function is most
+     appropriate for the current architecture.  I.E. dynamically
+     select an appropriate memset function.  Apparently it is also
+     normal for HPPA shared libraries to have undefined symbols.  */
+  boolean allow_shlib_undefined;
   /* Which symbols to strip.  */
   enum bfd_link_strip strip;
   /* Which local symbols to discard.  */

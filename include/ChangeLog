@@ -1,3 +1,10 @@
+2000-12-10  Fred Fish  <fnf@be.com>
+
+      * bfdlink.h (struct bfd_link_info): Add new allow_shlib_undefined
+      member to struct for systems where it is normal to have undefined
+      symbols in shared libraries at runtime and the runtime linker takes
+      care of redirecting them.
+
 2000-12-07  Zack Weinberg  <zack@wolery.stanford.edu>
 
 	* safe-ctype.h: New file.
