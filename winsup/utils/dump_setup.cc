@@ -411,21 +411,22 @@ package_list (int verbose, char **argv)
     {
       FILE *fp = open_package_list (packages[i].name);
       if (!fp)
-      {
-	if (verbose)
-	  printf ("Can't open file list /etc/setup/%s.lst.gz for package %s\n",
-	      packages[i].name, packages[i].name);
-	return;
-      }
+	{
+	  if (verbose)
+	    printf ("Can't open file list /etc/setup/%s.lst.gz for package %s\n",
+		packages[i].name, packages[i].name);
+	  continue;
+	}
 
-      printf ("Package: %s-%s\n", packages[i].name, packages[i].ver);
+      if (verbose)
+	printf ("Package: %s-%s\n", packages[i].name, packages[i].ver);
 
       char buf[MAX_PATH + 1];
       while (fgets (buf, MAX_PATH, fp))
 	{
 	  char *lastchar = strchr(buf, '\n');
 	  if (lastchar[-1] != '/')
-	    printf ("    /%s", buf);
+	    printf ("%s/%s", (verbose?"    ":""), buf);
 	}
 
       fclose (fp);
@@ -450,12 +451,7 @@ package_find (int verbose, char **argv)
     {
       FILE *fp = open_package_list (packages[i].name);
       if (!fp)
-      {
-	if (verbose)
-	  printf ("Can't open file list /etc/setup/%s.lst.gz for package %s\n",
-	      packages[i].name, packages[i].name);
-	return;
-      }
+	continue;
 
       char buf[MAX_PATH + 2];
       buf[0] = '/';
@@ -479,7 +475,11 @@ package_find (int verbose, char **argv)
 	      if (!a && is_alias)
 		a = match_argv (argv, filename + 4);
 	      if (a > 0)
-		printf ("%s-%s\n", packages[i].name, packages[i].ver);
+		{
+		  if (verbose)
+		    printf ("%s: found in package ", filename);
+		  printf ("%s-%s\n", packages[i].name, packages[i].ver);
+		}
 	    }
 	}
 

@@ -1,3 +1,15 @@
+2003-08-16  David Rothenberger  <daveroth@acm.org>
+
+	* dump_setup.cc (package_find): Don't stop searching on missing
+	file list.
+	(package_list): Ditto.
+
+2003-08-16  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
+
+	* dump_setup.cc: (package_list): Make output terse unless
+	verbose requested.  Fix formatting.
+	(package_find): Ditto.
+
 2003-08-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (main): Fix some formatting and help text printing.
