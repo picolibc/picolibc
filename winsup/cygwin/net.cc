@@ -1019,6 +1019,11 @@ getdomainname (char *domain, int len)
 /* Cygwin internal */
 /* Fill out an ifconf struct.
  *
+ * Windows 2000:
+ * Look at HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\
+                                                        Parameters\Interfaces
+ * Each subkey is an interface.
+ *
  * Windows NT:
  * Look at the Bind value in
  * HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Linkage\
@@ -1039,316 +1044,435 @@ getdomainname (char *domain, int len)
  * entries from the Registry and use all entries that have legal
  * "IPAddress" and "IPMask" values.
  */
+static void
+get_2k_ifconf (struct ifconf *ifc, struct sockaddr_in *sa, int what)
+{
+  HKEY key;
+  int cnt = 1;
+
+  /* Union maps buffer to correct struct */
+  struct ifreq *ifr = ifc->ifc_req;
+
+  if (RegOpenKeyEx (HKEY_LOCAL_MACHINE,
+                    "SYSTEM\\"
+                    "CurrentControlSet\\"
+                    "Services\\"
+                    "Tcpip\\"
+                    "Parameters\\"
+                    "Interfaces",
+                    0, KEY_READ, &key) == ERROR_SUCCESS)
+    {
+      HKEY ikey;
+      unsigned long lip, lnp;
+      char name[256];
+      DWORD type, size;
+      char eth[2] = "/", ppp[2] = "/";
+
+      for (int idx = 0;
+           RegEnumKeyEx (key, idx, name, (size = 256, &size),
+                         NULL, NULL, 0, NULL) == ERROR_SUCCESS;
+           ++idx)
+        {
+          if (RegOpenKeyEx (key, name, 0, KEY_READ, &ikey) != ERROR_SUCCESS)
+            continue;
+
+          /* If the "NTEContextList" value not exists, the subkey
+             is irrelevant. */
+          if (RegQueryValueEx (ikey, "NTEContextList",
+                               NULL, &type, NULL, &size) != ERROR_SUCCESS)
+            {
+              RegCloseKey (ikey);
+              continue;
+            }
+
+          if ((caddr_t) ++ifr > ifc->ifc_buf
+              + ifc->ifc_len
+              - sizeof (struct ifreq))
+            {
+              RegCloseKey (ikey);
+              break;
+            }
+
+          char ipaddress[256], netmask[256];
+          char dhcpaddress[256], dhcpnetmask[256];
+
+          if (RegQueryValueEx (ikey, "IPAddress",
+                               NULL, &type,
+                               (unsigned char *) ipaddress,
+                               (size = 256, &size)) == ERROR_SUCCESS
+              && RegQueryValueEx (ikey, "SubnetMask",
+                                  NULL, &type,
+                                  (unsigned char *) netmask,
+                                  (size = 256, &size)) == ERROR_SUCCESS)
+            {
+              /* ppp interfaces don't have the "AddressType" value. */
+              if (RegQueryValueEx (ikey, "AddressType",
+                                   NULL, &type, NULL, &size) == ERROR_SUCCESS)
+                {
+                  ++*eth;
+                  strcpy (ifr->ifr_name, "eth");
+                  strcat (ifr->ifr_name, eth);
+                }
+              else
+                {
+                  ++*ppp;
+                  strcpy (ifr->ifr_name, "ppp");
+                  strcat (ifr->ifr_name, ppp);
+                }
+
+              memset (&ifr->ifr_addr, '\0', sizeof ifr->ifr_addr);
+              if (cygwin_inet_addr (ipaddress) == 0L
+                  && RegQueryValueEx (ikey, "DhcpIPAddress",
+                                      NULL, &type,
+                                      (unsigned char *) dhcpaddress,
+                                      (size = 256, &size))
+                  == ERROR_SUCCESS
+                  && RegQueryValueEx (ikey, "DhcpSubnetMask",
+                                      NULL, &type,
+                                      (unsigned char *) dhcpnetmask,
+                                      (size = 256, &size))
+                  == ERROR_SUCCESS)
+                {
+                  switch (what)
+                    {
+                    case SIOCGIFCONF:
+                    case SIOCGIFADDR:
+                      sa = (struct sockaddr_in *) &ifr->ifr_addr;
+                      sa->sin_addr.s_addr = cygwin_inet_addr (dhcpaddress);
+                      break;
+                    case SIOCGIFBRDADDR:
+                      lip = cygwin_inet_addr (dhcpaddress);
+                      lnp = cygwin_inet_addr (dhcpnetmask);
+                      sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
+                      sa->sin_addr.s_addr = lip & lnp | ~lnp;
+                      break;
+                    case SIOCGIFNETMASK:
+                      sa = (struct sockaddr_in *) &ifr->ifr_netmask;
+                      sa->sin_addr.s_addr =
+                        cygwin_inet_addr (dhcpnetmask);
+                      break;
+                    }
+                }
+              else
+                {
+                  switch (what)
+                    {
+                    case SIOCGIFCONF:
+                    case SIOCGIFADDR:
+                      sa = (struct sockaddr_in *) &ifr->ifr_addr;
+                      sa->sin_addr.s_addr = cygwin_inet_addr (ipaddress);
+                      break;
+                    case SIOCGIFBRDADDR:
+                      lip = cygwin_inet_addr (ipaddress);
+                      lnp = cygwin_inet_addr (netmask);
+                      sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
+                      sa->sin_addr.s_addr = lip & lnp | ~lnp;
+                      break;
+                    case SIOCGIFNETMASK:
+                      sa = (struct sockaddr_in *) &ifr->ifr_netmask;
+                      sa->sin_addr.s_addr = cygwin_inet_addr (netmask);
+                      break;
+                    }
+                }
+              sa->sin_family = AF_INET;
+              sa->sin_port = 0;
+              ++cnt;
+            }
+
+          RegCloseKey (ikey);
+        }
+
+      RegCloseKey (key);
+    }
+
+  /* Set the correct length */
+  ifc->ifc_len = cnt * sizeof (struct ifreq);
+}
+
+static void
+get_nt_ifconf (struct ifconf *ifc, struct sockaddr_in *sa, int what)
+{
+  HKEY key;
+  unsigned long lip, lnp;
+  DWORD type, size;
+  int cnt = 1;
+  char *binding = (char *) 0;
+
+  /* Union maps buffer to correct struct */
+  struct ifreq *ifr = ifc->ifc_req;
+
+  if (RegOpenKeyEx (HKEY_LOCAL_MACHINE,
+                    "SYSTEM\\"
+                    "CurrentControlSet\\"
+                    "Services\\"
+                    "Tcpip\\"
+                    "Linkage",
+                    0, KEY_READ, &key) == ERROR_SUCCESS)
+    {
+      if (RegQueryValueEx (key, "Bind",
+                           NULL, &type,
+                           NULL, &size) == ERROR_SUCCESS)
+        {
+          binding = (char *) alloca (size);
+          if (RegQueryValueEx (key, "Bind",
+                               NULL, &type,
+                               (unsigned char *) binding,
+                               &size) != ERROR_SUCCESS)
+            {
+              binding = NULL;
+            }
+        }
+      RegCloseKey (key);
+    }
+
+  if (binding)
+    {
+      char *bp, eth[2] = "/";
+      char cardkey[256], ipaddress[256], netmask[256];
+
+      for (bp = binding; *bp; bp += strlen(bp) + 1)
+        {
+          bp += strlen ("\\Device\\");
+          strcpy (cardkey, "SYSTEM\\CurrentControlSet\\Services\\");
+          strcat (cardkey, bp);
+          strcat (cardkey, "\\Parameters\\Tcpip");
+
+          if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, cardkey,
+                            0, KEY_READ, &key) != ERROR_SUCCESS)
+            continue;
+
+          if (RegQueryValueEx (key, "IPAddress",
+                               NULL, &type,
+                               (unsigned char *) ipaddress,
+                               (size = 256, &size)) == ERROR_SUCCESS
+              && RegQueryValueEx (key, "SubnetMask",
+                                  NULL, &type,
+                                  (unsigned char *) netmask,
+                                  (size = 256, &size)) == ERROR_SUCCESS)
+            {
+              char *ip, *np;
+              char dhcpaddress[256], dhcpnetmask[256];
+
+              for (ip = ipaddress, np = netmask;
+                   *ip && *np;
+                   ip += strlen (ip) + 1, np += strlen (np) + 1)
+                {
+                  if ((caddr_t) ++ifr > ifc->ifc_buf
+                      + ifc->ifc_len
+                      - sizeof (struct ifreq))
+                    break;
+
+                  if (! strncmp (bp, "NdisWan", 7))
+                    {
+                      strcpy (ifr->ifr_name, "ppp");
+                      strcat (ifr->ifr_name, bp + 7);
+                    }
+                  else
+                    {
+                      ++*eth;
+                      strcpy (ifr->ifr_name, "eth");
+                      strcat (ifr->ifr_name, eth);
+                    }
+                  memset (&ifr->ifr_addr, '\0', sizeof ifr->ifr_addr);
+                  if (cygwin_inet_addr (ip) == 0L
+                      && RegQueryValueEx (key, "DhcpIPAddress",
+                                          NULL, &type,
+                                          (unsigned char *) dhcpaddress,
+                                          (size = 256, &size))
+                      == ERROR_SUCCESS
+                      && RegQueryValueEx (key, "DhcpSubnetMask",
+                                          NULL, &type,
+                                          (unsigned char *) dhcpnetmask,
+                                          (size = 256, &size))
+                      == ERROR_SUCCESS)
+                    {
+                      switch (what)
+                        {
+                        case SIOCGIFCONF:
+                        case SIOCGIFADDR:
+                          sa = (struct sockaddr_in *) &ifr->ifr_addr;
+                          sa->sin_addr.s_addr = cygwin_inet_addr (dhcpaddress);
+                          break;
+                        case SIOCGIFBRDADDR:
+                          lip = cygwin_inet_addr (dhcpaddress);
+                          lnp = cygwin_inet_addr (dhcpnetmask);
+                          sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
+                          sa->sin_addr.s_addr = lip & lnp | ~lnp;
+                          break;
+                        case SIOCGIFNETMASK:
+                          sa = (struct sockaddr_in *) &ifr->ifr_netmask;
+                          sa->sin_addr.s_addr =
+                            cygwin_inet_addr (dhcpnetmask);
+                          break;
+                        }
+                    }
+                  else
+                    {
+                      switch (what)
+                        {
+                        case SIOCGIFCONF:
+                        case SIOCGIFADDR:
+                          sa = (struct sockaddr_in *) &ifr->ifr_addr;
+                          sa->sin_addr.s_addr = cygwin_inet_addr (ip);
+                          break;
+                        case SIOCGIFBRDADDR:
+                          lip = cygwin_inet_addr (ip);
+                          lnp = cygwin_inet_addr (np);
+                          sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
+                          sa->sin_addr.s_addr = lip & lnp | ~lnp;
+                          break;
+                        case SIOCGIFNETMASK:
+                          sa = (struct sockaddr_in *) &ifr->ifr_netmask;
+                          sa->sin_addr.s_addr = cygwin_inet_addr (np);
+                          break;
+                        }
+                    }
+                  sa->sin_family = AF_INET;
+                  sa->sin_port = 0;
+                  ++cnt;
+                }
+            }
+          RegCloseKey (key);
+        }
+    }
+
+  /* Set the correct length */
+  ifc->ifc_len = cnt * sizeof (struct ifreq);
+}
+
+static void
+get_9x_ifconf (struct ifconf *ifc, struct sockaddr_in *sa, int what)
+{
+  HKEY key, subkey;
+  unsigned long lip, lnp;
+  FILETIME update;
+  LONG res;
+  DWORD type, size;
+  char ifname[256], ip[256], np[256];
+  int cnt = 1;
+
+  char eth[2];
+  eth[0] = '/';
+  eth[1] = '\0';
+
+  /* Union maps buffer to correct struct */
+  struct ifreq *ifr = ifc->ifc_req;
+
+  if (RegOpenKeyEx (HKEY_LOCAL_MACHINE,
+                    "SYSTEM\\"
+                    "CurrentControlSet\\"
+                    "Services\\"
+                    "Class\\"
+                    "NetTrans",
+                    0, KEY_READ, &key) == ERROR_SUCCESS)
+    {
+      for (int i = 0;
+           (res = RegEnumKeyEx (key, i, ifname,
+                                (size = sizeof ifname, &size),
+                                0, 0, 0, &update)) != ERROR_NO_MORE_ITEMS;
+           ++i)
+        {
+          if (res != ERROR_SUCCESS
+              || RegOpenKeyEx (key, ifname, 0,
+                               KEY_READ, &subkey) != ERROR_SUCCESS)
+            continue;
+          if (RegQueryValueEx (subkey, "IPAddress", 0,
+                               &type, (unsigned char *) ip,
+                               (size = sizeof ip, &size)) == ERROR_SUCCESS
+              || RegQueryValueEx (subkey, "IPMask", 0,
+                                  &type, (unsigned char *) np,
+                                  (size = sizeof np, &size)) == ERROR_SUCCESS)
+            {
+              if ((caddr_t)++ifr > ifc->ifc_buf
+                  + ifc->ifc_len
+                  - sizeof(struct ifreq))
+                break;
+              ++*eth;
+              strcpy (ifr->ifr_name, "eth");
+              strcat (ifr->ifr_name, eth);
+              switch (what)
+                {
+                case SIOCGIFCONF:
+                case SIOCGIFADDR:
+                  sa = (struct sockaddr_in *) &ifr->ifr_addr;
+                  sa->sin_addr.s_addr = cygwin_inet_addr (ip);
+                  break;
+                case SIOCGIFBRDADDR:
+                  lip = cygwin_inet_addr (ip);
+                  lnp = cygwin_inet_addr (np);
+                  sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
+                  sa->sin_addr.s_addr = lip & lnp | ~lnp;
+                  break;
+                case SIOCGIFNETMASK:
+                  sa = (struct sockaddr_in *) &ifr->ifr_netmask;
+                  sa->sin_addr.s_addr = cygwin_inet_addr (np);
+                  break;
+                }
+              sa->sin_family = AF_INET;
+              sa->sin_port = 0;
+              ++cnt;
+            }
+          RegCloseKey (subkey);
+        }
+    }
+
+  /* Set the correct length */
+  ifc->ifc_len = cnt * sizeof (struct ifreq);
+}
+
 static int
 get_ifconf (struct ifconf *ifc, int what)
 {
-  if (os_being_run == winNT)
+  unsigned long lip, lnp;
+  struct sockaddr_in *sa;
+
+  /* Union maps buffer to correct struct */
+  struct ifreq *ifr = ifc->ifc_req;
+
+  /* Ensure we have space for two struct ifreqs, fail if not. */
+  if (ifc->ifc_len < (int) (2 * sizeof (struct ifreq)))
     {
-      HKEY key;
-      DWORD type, size;
-      unsigned long lip, lnp;
-      int cnt = 1;
-      char *binding = (char *) 0;
-      struct sockaddr_in *sa;
-
-      /* Union maps buffer to correct struct */
-      struct ifreq *ifr = ifc->ifc_req;
-
-      /* Ensure we have space for two struct ifreqs, fail if not. */
-      if (ifc->ifc_len < (int) (2 * sizeof (struct ifreq)))
-	{
-	  set_errno (EFAULT);
-	  return -1;
-	}
-
-      /* Set up interface lo0 first */
-      strcpy (ifr->ifr_name, "lo0");
-      memset (&ifr->ifr_addr, '\0', sizeof (ifr->ifr_addr));
-      switch (what)
-	{
-	case SIOCGIFCONF:
-	case SIOCGIFADDR:
-	  sa = (struct sockaddr_in *) &ifr->ifr_addr;
-	  sa->sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-	  break;
-	case SIOCGIFBRDADDR:
-	  lip = htonl (INADDR_LOOPBACK);
-	  lnp = cygwin_inet_addr ("255.0.0.0");
-	  sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
-	  sa->sin_addr.s_addr = lip & lnp | ~lnp;
-	  break;
-	case SIOCGIFNETMASK:
-	  sa = (struct sockaddr_in *) &ifr->ifr_netmask;
-	  sa->sin_addr.s_addr = cygwin_inet_addr ("255.0.0.0");
-	  break;
-	default:
-	  set_errno (EINVAL);
-	  return -1;
-	}
-      sa->sin_family = AF_INET;
-      sa->sin_port = 0;
-
-      if (RegOpenKeyEx (HKEY_LOCAL_MACHINE,
-			"SYSTEM\\"
-			"CurrentControlSet\\"
-			"Services\\"
-			"Tcpip\\"
-			"Linkage",
-			0, KEY_READ, &key) == ERROR_SUCCESS)
-	{
-	  if (RegQueryValueEx (key, "Bind",
-			       NULL, &type,
-			       NULL, &size) == ERROR_SUCCESS)
-	    {
-	      binding = (char *) alloca (size);
-	      if (RegQueryValueEx (key, "Bind",
-				   NULL, &type,
-				   (unsigned char *) binding,
-				   &size) != ERROR_SUCCESS)
-		{
-		  binding = NULL;
-		}
-	    }
-	  RegCloseKey (key);
-	}
-
-      if (binding)
-	{
-	  char *bp, eth[2];
-	  char cardkey[256], ipaddress[256], netmask[256];
-
-	  eth[0] = '/';
-	  eth[1] = '\0';
-	  for (bp = binding; *bp; bp += strlen(bp) + 1)
-	    {
-	      bp += strlen ("\\Device\\");
-	      strcpy (cardkey, "SYSTEM\\CurrentControlSet\\Services\\");
-	      strcat (cardkey, bp);
-	      strcat (cardkey, "\\Parameters\\Tcpip");
-
-	      if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, cardkey,
-				0, KEY_READ, &key) != ERROR_SUCCESS)
-		continue;
-
-	      if (RegQueryValueEx (key, "IPAddress",
-				   NULL, &type,
-				   (unsigned char *) &ipaddress,
-				   (size = 256, &size)) == ERROR_SUCCESS
-		  && RegQueryValueEx (key, "SubnetMask",
-				      NULL, &type,
-				      (unsigned char *) &netmask,
-				      (size = 256, &size)) == ERROR_SUCCESS)
-		{
-		  char *ip, *np;
-		  char sub[2];
-		  char dhcpaddress[256], dhcpnetmask[256];
-
-		  sub[0] = '/';
-		  sub[1] = '\0';
-		  if (strncmp (bp, "NdisWan", 7))
-		    ++*eth;
-		  for (ip = ipaddress, np = netmask;
-		       *ip && *np;
-		       ip += strlen (ip) + 1, np += strlen (np) + 1)
-		    {
-		      if ((caddr_t) ++ifr > ifc->ifc_buf
-			  + ifc->ifc_len
-			  - sizeof (struct ifreq))
-			break;
-
-		      if (! strncmp (bp, "NdisWan", 7))
-			{
-			  strcpy (ifr->ifr_name, "ppp");
-			  strcat (ifr->ifr_name, bp + 7);
-			}
-		      else
-			{
-			  strcpy (ifr->ifr_name, "eth");
-			  strcat (ifr->ifr_name, eth);
-			}
-		      ++*sub;
-		      if (*sub >= '1')
-			strcat (ifr->ifr_name, sub);
-		      memset (&ifr->ifr_addr, '\0', sizeof ifr->ifr_addr);
-		      if (cygwin_inet_addr (ip) == 0L
-			  && RegQueryValueEx (key, "DhcpIPAddress",
-					      NULL, &type,
-					      (unsigned char *) &dhcpaddress,
-					      (size = 256, &size))
-			  == ERROR_SUCCESS
-			  && RegQueryValueEx (key, "DhcpSubnetMask",
-					      NULL, &type,
-					      (unsigned char *) &dhcpnetmask,
-					      (size = 256, &size))
-			  == ERROR_SUCCESS)
-			{
-			  switch (what)
-			    {
-			    case SIOCGIFCONF:
-			    case SIOCGIFADDR:
-			      sa = (struct sockaddr_in *) &ifr->ifr_addr;
-			      sa->sin_addr.s_addr =
-				cygwin_inet_addr (dhcpaddress);
-			      break;
-			    case SIOCGIFBRDADDR:
-			      lip = cygwin_inet_addr (dhcpaddress);
-			      lnp = cygwin_inet_addr (dhcpnetmask);
-			      sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
-			      sa->sin_addr.s_addr = lip & lnp | ~lnp;
-			      break;
-			    case SIOCGIFNETMASK:
-			      sa = (struct sockaddr_in *) &ifr->ifr_netmask;
-			      sa->sin_addr.s_addr =
-				cygwin_inet_addr (dhcpnetmask);
-			      break;
-			    }
-			}
-		      else
-			{
-			  switch (what)
-			    {
-			    case SIOCGIFCONF:
-			    case SIOCGIFADDR:
-			      sa = (struct sockaddr_in *) &ifr->ifr_addr;
-			      sa->sin_addr.s_addr = cygwin_inet_addr (ip);
-			      break;
-			    case SIOCGIFBRDADDR:
-			      lip = cygwin_inet_addr (ip);
-			      lnp = cygwin_inet_addr (np);
-			      sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
-			      sa->sin_addr.s_addr = lip & lnp | ~lnp;
-			      break;
-			    case SIOCGIFNETMASK:
-			      sa = (struct sockaddr_in *) &ifr->ifr_netmask;
-			      sa->sin_addr.s_addr = cygwin_inet_addr (np);
-			      break;
-			    }
-			}
-		      sa->sin_family = AF_INET;
-		      sa->sin_port = 0;
-		      ++cnt;
-		    }
-		}
-	      RegCloseKey (key);
-	    }
-	}
-
-      /* Set the correct length */
-      ifc->ifc_len = cnt * sizeof (struct ifreq);
+      set_errno (EFAULT);
+      return -1;
     }
-  else /* Windows 9x */
+
+  /* Set up interface lo0 first */
+  strcpy (ifr->ifr_name, "lo0");
+  memset (&ifr->ifr_addr, '\0', sizeof (ifr->ifr_addr));
+  switch (what)
     {
-      HKEY key, subkey;
-      FILETIME update;
-      LONG res;
-      DWORD type, size;
-      unsigned long lip, lnp;
-      char ifname[256], ip[256], np[256];
-      int cnt = 1;
-      struct sockaddr_in *sa;
-
-      /* Union maps buffer to correct struct */
-      struct ifreq *ifr = ifc->ifc_req;
-      char eth[2];
-
-      eth[0] = '/';
-      eth[1] = '\0';
-
-      /* Ensure we have space for two struct ifreqs, fail if not. */
-      if (ifc->ifc_len < (int) (2 * sizeof (struct ifreq)))
-	{
-	  set_errno (EFAULT);
-	  return -1;
-	}
-
-      /* Set up interface lo0 first */
-      strcpy (ifr->ifr_name, "lo0");
-      memset (&ifr->ifr_addr, '\0', sizeof ifr->ifr_addr);
-      switch (what)
-	{
-	case SIOCGIFCONF:
-	case SIOCGIFADDR:
-	  sa = (struct sockaddr_in *) &ifr->ifr_addr;
-	  sa->sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-	  break;
-	case SIOCGIFBRDADDR:
-	  lip = htonl(INADDR_LOOPBACK);
-	  lnp = cygwin_inet_addr ("255.0.0.0");
-	  sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
-	  sa->sin_addr.s_addr = lip & lnp | ~lnp;
-	  break;
-	case SIOCGIFNETMASK:
-	  sa = (struct sockaddr_in *) &ifr->ifr_netmask;
-	  sa->sin_addr.s_addr = cygwin_inet_addr ("255.0.0.0");
-	  break;
-	default:
-	  set_errno (EINVAL);
-	  return -1;
-	}
-      sa->sin_family = AF_INET;
-      sa->sin_port = 0;
-
-      if (RegOpenKeyEx (HKEY_LOCAL_MACHINE,
-			"SYSTEM\\"
-			"CurrentControlSet\\"
-			"Services\\"
-			"Class\\"
-			"NetTrans",
-			0, KEY_READ, &key) == ERROR_SUCCESS)
-	{
-	  for (int i = 0;
-	       (res = RegEnumKeyEx (key, i, ifname,
-				    (size = sizeof ifname, &size),
-				    0, 0, 0, &update)) != ERROR_NO_MORE_ITEMS;
-	       ++i)
-	    {
-	      if (res != ERROR_SUCCESS
-		  || RegOpenKeyEx (key, ifname, 0,
-				   KEY_READ, &subkey) != ERROR_SUCCESS)
-		continue;
-	      if (RegQueryValueEx (subkey, "IPAddress", 0,
-				   &type, (unsigned char *) ip,
-				   (size = sizeof ip, &size)) == ERROR_SUCCESS
-		  || RegQueryValueEx (subkey, "IPMask", 0,
-				      &type, (unsigned char *) np,
-				      (size = sizeof np, &size)) == ERROR_SUCCESS)
-		{
-		  if ((caddr_t)++ifr > ifc->ifc_buf
-		      + ifc->ifc_len
-		      - sizeof(struct ifreq))
-		    break;
-		  ++*eth;
-		  strcpy (ifr->ifr_name, "eth");
-		  strcat (ifr->ifr_name, eth);
-		  switch (what)
-		    {
-		    case SIOCGIFCONF:
-		    case SIOCGIFADDR:
-		      sa = (struct sockaddr_in *) &ifr->ifr_addr;
-		      sa->sin_addr.s_addr = cygwin_inet_addr (ip);
-		      break;
-		    case SIOCGIFBRDADDR:
-		      lip = cygwin_inet_addr (ip);
-		      lnp = cygwin_inet_addr (np);
-		      sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
-		      sa->sin_addr.s_addr = lip & lnp | ~lnp;
-		      break;
-		    case SIOCGIFNETMASK:
-		      sa = (struct sockaddr_in *) &ifr->ifr_netmask;
-		      sa->sin_addr.s_addr = cygwin_inet_addr (np);
-		      break;
-		    }
-		  sa->sin_family = AF_INET;
-		  sa->sin_port = 0;
-		  ++cnt;
-		}
-	      RegCloseKey (subkey);
-	    }
-	}
-
-      /* Set the correct length */
-      ifc->ifc_len = cnt * sizeof (struct ifreq);
+    case SIOCGIFCONF:
+    case SIOCGIFADDR:
+      sa = (struct sockaddr_in *) &ifr->ifr_addr;
+      sa->sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+      break;
+    case SIOCGIFBRDADDR:
+      lip = htonl (INADDR_LOOPBACK);
+      lnp = cygwin_inet_addr ("255.0.0.0");
+      sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
+      sa->sin_addr.s_addr = lip & lnp | ~lnp;
+      break;
+    case SIOCGIFNETMASK:
+      sa = (struct sockaddr_in *) &ifr->ifr_netmask;
+      sa->sin_addr.s_addr = cygwin_inet_addr ("255.0.0.0");
+      break;
+    default:
+      set_errno (EINVAL);
+      return -1;
     }
+  sa->sin_family = AF_INET;
+  sa->sin_port = 0;
+
+  OSVERSIONINFO os_version_info;
+  memset (&os_version_info, 0, sizeof os_version_info);
+  os_version_info.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
+  GetVersionEx (&os_version_info);
+  if (os_version_info.dwPlatformId != VER_PLATFORM_WIN32_NT)
+    get_9x_ifconf (ifc, sa, what);
+  else if (os_version_info.dwMajorVersion <= 4)
+    get_nt_ifconf (ifc, sa, what);
+  else
+    get_2k_ifconf (ifc, sa, what);
 
   return 0;
 }

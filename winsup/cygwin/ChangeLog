@@ -1,3 +1,11 @@
+Thu Sep 28 01:46:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* net.cc (get_ifconf): Code cleanup. Split. Call os dependent
+	subfunctions instead.
+	(get_9x_ifconf): New function for 9X systems, called by get_ifconf.
+	(get_nt_ifconf): New function for NT systems, called by get_ifconf.
+	(get_2k_ifconf): New function for W2K systems, called by get_ifconf.
+
 Wed Sep 27 01:10:07 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* spawn.cc (spawn_guts): Attempt to accomodate archaic windows quoting
