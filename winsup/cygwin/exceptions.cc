@@ -350,12 +350,15 @@ try_to_debug (bool waitloop)
   char* rawenv = GetEnvironmentStrings () ;
   for (char* p = rawenv; *p != '\0'; p = strchr (p, '\0') + 1)
     {
-      if (strncmp (p, "CYGWIN=", sizeof ("CYGWIN=") - 1) == 0)
+      if (strncmp (p, "CYGWIN=", strlen ("CYGWIN=")) == 0)
 	{
 	  char* q = strstr (p, "error_start") ;
 	  /* replace 'error_start=...' with '_rror_start=...' */
-	  if (q) *q = '_' ;
-	  SetEnvironmentVariable ("CYGWIN", p + sizeof ("CYGWIN=")) ;
+	  if (q)
+	    {
+	      *q = '_' ;
+	      SetEnvironmentVariable ("CYGWIN", p + strlen ("CYGWIN=")) ;
+	    }
 	  break ;
 	}
     }

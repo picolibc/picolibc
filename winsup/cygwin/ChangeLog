@@ -1,5 +1,15 @@
 2003-12-26  Christopher Faylor  <cgf@redhat.com>
 
+	* exceptions.cc (try_to_debug): Fix off-by-one problem when resetting
+	environment variable after error_start detected.
+
+	* fhandler_tty_slave.cc (fhandler_tty_slave::close): Clarify debug
+	message.
+	* syscalls.cc (setsid): Don't increment usecount here, since it will be
+	automatically decremented on close.
+
+2003-12-26  Christopher Faylor  <cgf@redhat.com>
+
 	* exceptions.cc (setup_handler): Protect against a race.
 
 2003-12-26  Christopher Faylor  <cgf@redhat.com>

@@ -620,7 +620,7 @@ fhandler_tty_slave::close ()
       if (archetype->usecount < 0)
 	system_printf ("usecount %d", archetype->usecount);
 #endif
-      termios_printf ("just exiting because archetype usecount is > 0");
+      termios_printf ("just returning because archetype usecount is > 0");
       return 0;
     }
 
