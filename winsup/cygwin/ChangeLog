@@ -1,3 +1,23 @@
+2003-05-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (CYGWIN_START): Define as crt0.o.  Add to TARGET_LIBS.
+	* fhandler.h (fhandler_virtual::fstat): Remove useless declaration.
+	* fhandler_virtual.cc: Remove _COMPILING_NEWLIB define.
+	* ipc.cc (ftok): Use stat64.
+	* syscalls.cc (_fstat64): Remove alias.
+	(_fstat): Ditto.
+	(_stat): Ditto.
+	(_fstat64_r): New function.
+	(_fstat_r): Ditto.
+	(_stat64_r): Ditto.
+	(stat_r): Ditto.
+	* crt0.o: New file, moved from newlib.
+	* include/sys/param.h: Ditto.
+	* include/sys/utime.h: Ditto.
+	* include/sys/utmp.h: Ditto.
+	* include/sys/dirent.h: Ditto.  Expose different struct dirent,
+	dependening of the environment.
+
 2003-05-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	Replace ino_t by __ino64_t throughout.

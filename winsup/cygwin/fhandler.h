@@ -1126,7 +1126,6 @@ class fhandler_virtual : public fhandler_base
   int dup (fhandler_base * child);
   int open (path_conv *, int flags, mode_t mode = 0);
   int close (void);
-  int __stdcall fstat (struct stat *buf, path_conv *pc) __attribute__ ((regparm (3)));
   virtual bool fill_filebuf ();
   void fixup_after_exec (HANDLE);
 };

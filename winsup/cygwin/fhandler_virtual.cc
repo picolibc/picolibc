@@ -22,7 +22,6 @@ details. */
 #include "cygheap.h"
 #include <assert.h>
 
-#define _COMPILING_NEWLIB
 #include <dirent.h>
 
 fhandler_virtual::fhandler_virtual (DWORD devtype):

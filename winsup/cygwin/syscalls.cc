@@ -1033,8 +1033,16 @@ fstat64 (int fd, struct __stat64 *buf)
   return res;
 }
 
-extern "C" int _fstat64 (int fd, _off64_t pos, int dir)
-  __attribute__ ((alias ("fstat64")));
+extern "C" int
+_fstat64_r (struct _reent *ptr, int fd, struct __stat64 *buf)
+{
+  int ret;
+
+  set_errno (0);
+  if ((ret = fstat64 (fd, buf)) == -1 && get_errno () != 0)
+    ptr->_errno = get_errno ();
+  return ret;
+}
 
 extern "C" int
 fstat (int fd, struct __stat32 *buf)
@@ -1046,8 +1054,16 @@ fstat (int fd, struct __stat32 *buf)
   return ret;
 }
 
-extern "C" int _fstat (int fd, _off64_t pos, int dir)
-  __attribute__ ((alias ("fstat")));
+extern "C" int
+_fstat_r (struct _reent *ptr, int fd, struct __stat32 *buf)
+{
+  int ret;
+
+  set_errno (0);
+  if ((ret = fstat (fd, buf)) == -1 && get_errno () != 0)
+    ptr->_errno = get_errno ();
+  return ret;
+}
 
 /* fsync: P96 6.6.1.1 */
 extern "C" int
@@ -1133,9 +1149,6 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow,
   return res;
 }
 
-extern "C" int _stat (int fd, _off64_t pos, int dir)
-  __attribute__ ((alias ("stat")));
-
 extern "C" int
 stat64 (const char *name, struct __stat64 *buf)
 {
@@ -1145,12 +1158,34 @@ stat64 (const char *name, struct __stat64 *buf)
 }
 
 extern "C" int
+_stat64_r (struct _reent *ptr, const char *name, struct __stat64 *buf)
+{
+  int ret;
+
+  set_errno (0);
+  if ((ret = stat64 (name, buf)) == -1 && get_errno () != 0)
+    ptr->_errno = get_errno ();
+  return ret;
+}
+
+extern "C" int
 stat (const char *name, struct __stat32 *buf)
 {
   struct __stat64 buf64;
   int ret = stat64 (name, &buf64);
   if (!ret)
     stat64_to_stat32 (&buf64, buf);
+  return ret;
+}
+
+extern "C" int
+_stat_r (struct _reent *ptr, const char *name, struct __stat32 *buf)
+{
+  int ret;
+
+  set_errno (0);
+  if ((ret = stat (name, buf)) == -1 && get_errno () != 0)
+    ptr->_errno = get_errno ();
   return ret;
 }
 

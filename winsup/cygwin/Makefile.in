@@ -123,6 +123,7 @@ DEF_FILE:=cygwin.def
 DLL_ENTRY:=@DLL_ENTRY@
 
 LIBGMON_A:=libgmon.a
+CYGWIN_START:=crt0.o
 GMON_START:=gcrt0.o
 
 # Some things want these from libc, but they have their own static
@@ -237,7 +238,7 @@ PWD:=${shell pwd}
 SUBLIBS:=libpthread.a $(PWD)/libm.a libc.a
 EXTRALIBS:=libautomode.a libbinmode.a libtextmode.a
 INSTOBJS:=automode.o binmode.o textmode.o
-TARGET_LIBS:=$(LIB_NAME) $(SUBLIBS) $(GMON_START) $(LIBGMON_A) $(SUBLIBS) $(INSTOBJS) $(EXTRALIBS)
+TARGET_LIBS:=$(LIB_NAME) $(SUBLIBS) $(CYGWIN_START) $(GMON_START) $(LIBGMON_A) $(SUBLIBS) $(INSTOBJS) $(EXTRALIBS)
 .PHONY: all force dll_ofiles install all_target install_target all_host install_host \
 	install install-libs install-headers -lgcc
 

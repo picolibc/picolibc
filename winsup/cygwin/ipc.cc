@@ -21,8 +21,8 @@ extern "C"
 key_t
 ftok (const char *path, int id)
 {
-  struct stat statbuf;
-  if (stat (path, &statbuf))
+  struct __stat64 statbuf;
+  if (stat64 (path, &statbuf))
     {
       /* stat set the appropriate errno for us */
       return (key_t) -1;
