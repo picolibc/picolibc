@@ -1,3 +1,10 @@
+2005-03-28  Mark Mitchell <mark@codesourcery.com>
+
+	* gdb/ser-tcp.c (net_read_prim): Use recv unconditionally.
+	(net_write_prim): Use send unconditionally.
+	* gdb/configure.ac: Do not check for send and recv.
+	* gdb/configure: Regenerated.
+	
 2005-03-28  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* gdb/remote-rdi.c (arm_rdi_insert_breakpoint): Don't call
