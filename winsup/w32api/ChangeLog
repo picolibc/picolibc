@@ -1,3 +1,8 @@
+2002-12-11  Danny Smith  <dannysmith@users.sourveforge.net>
+
+	* include/shlobj.h (IShellLinkW::GetPath): Correct prototype.
+	Thanks to: Dimitri Papadopoulos <dimitri_at@sourceforge.users.net>
+
 2002-12-09  Danny Smith  <dannysmith@users.sourveforge.net>
 	
 	* include/shellapi.h (ExtractIconEx[AW]): Correct return type
@@ -7,7 +12,7 @@
 2002-12-07  Danny Smith  <dannysmith@users.sourveforge.net>
 	
 	* include/winuser.h (AllowSetForegroundWindow,
-	LockSetForegroundWindow) Add prototypes.
+	LockSetForegroundWindow): Add prototypes.
 	(ASFW_ANY, LSFW_LOCK, LSFW_UNLOCK) Add defines.
 	Thanks to:  Pat Thoyts  <patthoyts@users.sourceforge.net>
 	* lib/winuser.def (AllowSetForegroundWindow,
