@@ -4,7 +4,7 @@
 # This makefile requires GNU make.
 
 srcdir = @srcdir@
-VPATH = $(srcdir):$(srcdir)/math:$(srcdir)/stdio
+VPATH = $(srcdir):$(srcdir)/math:$(srcdir)/stdio:$(srcdir)/complex
 objdir = .
 
 target_alias = @target_alias@
@@ -64,6 +64,11 @@ MATH_DISTFILES = \
 STDIO_DISTFILES = \
 	snprintf.c snwprintf.c vsnprintf.c vsnwprintf.c \
 	vfscanf.c vfwscanf.c vscanf.c vsscanf.c vswscanf.c vwscanf.c
+
+COMPLEX_DISTFILES = \
+	cabs.c cacos.c cacosh.c casin.c casinh.c catan.c catanh.c \
+	ccos.c ccosh.c cexp.c cimag.c clog.c cpow.c cproj.c creal.c \
+	csin.c csinh.c csqrt.c ctan.c ctanh.c
 
 CC = @CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
@@ -143,10 +148,14 @@ POSIX_OBJS = \
 	dirent.o wdirent.o getopt.o
 REPLACE_OBJS = \
 	mingw-fseek.o
+COMPLEX_OBJS = \
+	cabs.o cacos.o cacosh.o casin.o casinh.o catan.o catanh.o \
+	ccos.o ccosh.o cexp.o cimag.o clog.o cpow.o cproj.o creal.o \
+	csin.o csinh.o csqrt.o ctan.o ctanh.o
 
 LIB_OBJS = $(Q8_OBJS) $(STDLIB_OBJS) $(STDLIB_STUB_OBJS) \
 	$(STDIO_OBJS) $(MATH_OBJS)  $(FENV_OBJS) \
-	$(POSIX_OBJS) $(REPLACE_OBJS)
+	$(POSIX_OBJS) $(REPLACE_OBJS) $(COMPLEX_OBJS)
 
 LIBS = $(LIBMINGWEX_A)
 DLLS = 
@@ -216,3 +225,9 @@ dist:
 	@for i in $(STDIO_DISTFILES); do\
 		cp -p $(srcdir)/stdio/$$i $(distdir)/mingwex/stdio/$$i ; \
 	done
+	mkdir $(distdir)/mingwex/complex
+	chmod 755 $(distdir)/mingwex/complex
+	@for i in $(COMPLEX_DISTFILES); do\
+		cp -p $(srcdir)/complex/$$i $(distdir)/mingwex/complex/$$i ; \
+	done
+

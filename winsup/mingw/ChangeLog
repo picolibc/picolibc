@@ -1,5 +1,35 @@
 2003-10-21  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/complex.h: New file.
+	* mingwex/complex: New directory.
+	* mingwex/complex/cabs.c: New file.
+	* mingwex/complex/cacos.c: New file.
+	* mingwex/complex/cacosh.c: New file.
+	* mingwex/complex/casin.c: New file.
+	* mingwex/complex/casinh.c: New file.
+	* mingwex/complex/catan.c: New file.
+	* mingwex/complex/catanh.c: New file.
+	* mingwex/complex/ccos.c: New file.
+	* mingwex/complex/ccosh.c: New file.
+	* mingwex/complex/cexp.c: New file.
+	* mingwex/complex/cimag.c: New file.
+	* mingwex/complex/clog.c: New file.
+	* mingwex/complex/cpow.c: New file.
+	* mingwex/complex/cproj.c: New file.
+	* mingwex/complex/creal.c: New file.
+	* mingwex/complex/csin.c: New file.
+	* mingwex/complex/csinh.c: New file.
+	* mingwex/complex/csqrt.c: New file.
+	* mingwex/complex/ctan.c: New file.
+	* mingwex/complex/ctanh.c: New file.
+	* mingwex/Makefile.in (COMPLEX_DISTFILES): New list of
+	files.
+	(dist): Use it.
+	(COMPLEX_OBJS): New list of objects.
+	(LIB_OBJS): Include it in the library.
+
+2003-10-21  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/math.h (cabs): Remove non-ISO prototype.
 
 2003-10-21  Danny Smith  <dannysmith@users.sourceforge.net>
