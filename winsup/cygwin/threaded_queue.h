@@ -23,18 +23,26 @@ class queue_request
     queue_request();
 };
 
+
+typedef DWORD WINAPI threaded_queue_thread_function (LPVOID);
 /* parameters for a request finding and submitting loop */
 
 class queue_process_param
 {
   public:
+    bool start (threaded_queue_thread_function *, class threaded_queue *);
+    void stop ();
+    bool running;
+    long int shutdown;
     class queue_process_param * next;
     class threaded_queue *queue;
+    queue_process_param (bool ninterruptible);
+    ~queue_process_param ();
+    bool interruptible;
+    HANDLE interrupt;
     HANDLE hThread;
     DWORD tid;
 };
-
-typedef DWORD WINAPI threaded_queue_thread_function (LPVOID);
 
 /* a queue to allocate requests from n submission loops to x worker threads */
 

@@ -1,5 +1,22 @@
 Tue Oct  2 23:24:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
+	* cygserver.cc (class server_process_param): Use new constructor syntax.
+	* cygserver_process.cc (process_cache::~process_cache): New function.
+	* threaded_queue.cc: Define condition debug_printf.
+	Run indent.
+	(threaded_queue::cleanup): Move queue_process_param guts to a method.
+	(threaded_queue::process_requests): Ditto.
+	(queue_process_param::queue_process_param): New method.
+	(queue_process_param::~queue_process_param): Ditto.
+	(queue_process_param::start): Ditto.
+	(queue_process_param::stop): Ditto.
+	* threaded_queue.h (class queue_process_param): Add support for 
+	interruptible request loops.
+	* cygwin/include/cygwin/cygserver_process.h (class process_cache): Add
+	destructor.
+
+Tue Oct  2 23:24:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
 	* cygserver_client.cc: New flag allow_daemon to disable the daemon completely.
 	(cygserver_request): Check it.
 	(cygserver_init): Ditto.

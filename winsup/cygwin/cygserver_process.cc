@@ -35,6 +35,10 @@ process_cache::process_cache () : head (NULL)
   InitializeCriticalSection (&cache_write_access);
 }
 
+process_cache::~process_cache ()
+{
+}
+
 class process *
 process_cache::process (long pid)
 {

@@ -289,6 +289,7 @@ class server_process_param : public queue_process_param
 {
   public:
     transport_layer_base *transport;
+    server_process_param () : queue_process_param (false) {};
 };
 
 class server_request_queue : public threaded_queue

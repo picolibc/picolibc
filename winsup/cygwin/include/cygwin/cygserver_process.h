@@ -35,6 +35,7 @@ class process_cache
 {
   public:
     process_cache ();
+    ~process_cache ();
     class process *process (long);
   private:
     class process_entry *head;
