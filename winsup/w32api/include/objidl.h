@@ -301,6 +301,7 @@ typedef struct tagPROPVARIANT {
 	WORD wReserved2;
 	WORD wReserved3;
 	_ANONYMOUS_UNION union {
+		CHAR cVal;
 		UCHAR bVal;
 		short iVal;
 		USHORT uiVal;
@@ -408,6 +409,11 @@ typedef struct tagSOLE_AUTHENTICATION_LIST {
     DWORD cAuthInfo;
     SOLE_AUTHENTICATION_INFO* aAuthInfo;
 } SOLE_AUTHENTICATION_LIST;
+
+EXTERN_C const FMTID FMTID_SummaryInformation;
+EXTERN_C const FMTID FMTID_DocSummaryInformation;
+EXTERN_C const FMTID FMTID_UserDefinedProperties;
+
 DECLARE_ENUMERATOR(FORMATETC);
 DECLARE_ENUMERATOR(HLITEM);
 DECLARE_ENUMERATOR(STATDATA);

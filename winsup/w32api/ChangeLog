@@ -1,5 +1,12 @@
 2003-07-22  Danny Smith <dannysmith@users.sourceforge.net>
 
+	* include/objidl.h (PropVariant): Add CHAR cVal field
+	to union.
+	(FMTID_SummaryInformation, FMTID_DocSummaryInformation,
+	FMTID_UserDefinedProperties): Declare.
+
+2003-07-22  Danny Smith <dannysmith@users.sourceforge.net>
+
 	* include/winbase.h (GetModuleHandleEx[AW]): Add prototypes.
 
 2003-07-22  Danny Smith <dannysmith@users.sourceforge.net>
