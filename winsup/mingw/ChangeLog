@@ -1,5 +1,24 @@
 2002-04-26  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	Add atexit support for dlls.
+	* crt1.c (atexit): Force thunk to _imp__atexit.
+	(_onexit): Force thunk to _imp___onexit.
+	* dllcrt1.c (DllMainCRTStartup): Initialise private atexit
+	table on DLL_PROCESS_ATTACH, clean it up on DLL_PROCESS_DETACH.
+	(__dll_exit): New function to run atexit-registered functions
+	 and flush output buffers on DLL_PROCESS_DETACH or failed
+	DLL_PROCESS_ATTACH. 
+	(atexit): Force use of private atexit table via _dllonexit,
+	(_onexit): New function. Force use of private atexit table via
+	_dllonexit,
+	* mscvrt.def (atexit, _onexit): Add DATA keyword so that only 
+	_imp_<_symbol> is visible in import lib.
+	* mscvrt20.def: Likewise.
+	* mscvrt40.def: Likewise.
+	* crtdll.def: Likewise.
+
+2002-04-26  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/fenv.h: Change header guard macro to _FENV_H_.
 	(fenv_t, fexcept_t): Move into block protected by
 	#ifndef RC_INVOKED.

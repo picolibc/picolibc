@@ -414,7 +414,7 @@ _mkdir
 _mktemp
 _msize
 _nextafter
-_onexit
+_onexit DATA
 _open
 _open_osfhandle
 _osmajor_dll DATA
@@ -520,7 +520,7 @@ asctime
 asin
 atan
 atan2
-atexit
+atexit DATA
 atof
 atoi
 atol
