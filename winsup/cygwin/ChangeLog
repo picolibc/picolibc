@@ -1,3 +1,7 @@
+Sat Mar 17 09:51:32 2001  Mathew Brozowski <brozow@tavve.com>
+
+	* net.cc (cygwin_socket): Pass protocol parameter to socket call.
+
 Sat Mar 17 02:05:38 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* dir.cc (readdir): Use strcasematch for consistency.

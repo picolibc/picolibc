@@ -352,7 +352,7 @@ cygwin_socket (int af, int type, int protocol)
     {
       debug_printf ("socket (%d, %d, %d)", af, type, protocol);
 
-      soc = socket (AF_INET, type, 0);
+      soc = socket (AF_INET, type, protocol);
 
       if (soc == INVALID_SOCKET)
 	{
