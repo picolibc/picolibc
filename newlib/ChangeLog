@@ -1,3 +1,8 @@
+Sat Nov 25 11:24:00 2000  Corinna Vinschen <vinschen@cygnus.com>
+
+	* libc/include/sys/types.h: Change i to `__i' in FD_ZERO macro to
+	avoid compiler warnings.
+
 2000-11-22  Michael Meissner  <meissner@redhat.com>
 
 	* libc/posix/execl.c (execl): Don't reference environ directly,
