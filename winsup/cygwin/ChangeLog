@@ -1,3 +1,10 @@
+2002-07-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_serial.cc: Change 'must_init_serial_line capability'
+	to 'supports_reading_modem_output_lines' throughout (negated meaning).
+	* wincap.cc: Ditto.
+	* wincap.h: Ditto.
+
 2002-07-23  Nicholas Wourms  <nwourms@netscape.net>
 
 	* cygwin.din (fcloseall): Add symbol for export.

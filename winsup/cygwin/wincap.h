@@ -47,7 +47,7 @@ struct wincaps
   unsigned has_valid_processorlevel			: 1;
   unsigned has_64bit_file_access			: 1;
   unsigned has_process_io_counters                      : 1;
-  unsigned must_init_serial_line                        : 1;
+  unsigned supports_reading_modem_output_lines          : 1;
 };
 
 class wincapc
@@ -99,7 +99,7 @@ public:
   bool  IMPLEMENT (has_valid_processorlevel)
   bool  IMPLEMENT (has_64bit_file_access)
   bool  IMPLEMENT (has_process_io_counters)
-  bool  IMPLEMENT (must_init_serial_line)
+  bool  IMPLEMENT (supports_reading_modem_output_lines)
 
 #undef IMPLEMENT
 };
