@@ -37,6 +37,7 @@ strace::hello()
       return;
     }
 
+  inited = 1;
   if (!being_debugged ())
     return;
 
