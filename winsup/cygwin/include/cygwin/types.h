@@ -99,6 +99,38 @@ typedef __ino32_t ino_t;
 #endif
 #endif /*__ino_t_defined*/
 
+#if defined (__INSIDE_CYGWIN__)
+struct __flock32 {
+	short	 l_type;	/* F_RDLCK, F_WRLCK, or F_UNLCK */
+	short	 l_whence;	/* flag to choose starting offset */
+	_off_t	 l_start;	/* relative offset, in bytes */
+	_off_t	 l_len;		/* length, in bytes; 0 means lock to EOF */
+	short	 l_pid;		/* returned with F_GETLK */
+	short	 l_xxx;		/* reserved for future use */
+};
+
+struct __flock64 {
+	short	 l_type;	/* F_RDLCK, F_WRLCK, or F_UNLCK */
+	short	 l_whence;	/* flag to choose starting offset */
+	_off_t	 l_start;	/* relative offset, in bytes */
+	_off64_t l_len;		/* length, in bytes; 0 means lock to EOF */
+	pid_t	 l_pid;		/* returned with F_GETLK */
+};
+#endif
+
+struct flock {
+	short	 l_type;	/* F_RDLCK, F_WRLCK, or F_UNLCK */
+	short	 l_whence;	/* flag to choose starting offset */
+	off_t	 l_start;	/* relative offset, in bytes */
+	off_t	 l_len;		/* length, in bytes; 0 means lock to EOF */
+#ifdef __CYGWIN_USE_BIG_TYPES__
+	pid_t	 l_pid;		/* returned with F_GETLK */
+#else
+	short	 l_pid;		/* returned with F_GETLK */
+	short	 l_xxx;		/* reserved for future use */
+#endif
+};
+
 #ifndef __key_t_defined
 #define __key_t_defined
 typedef long long key_t;

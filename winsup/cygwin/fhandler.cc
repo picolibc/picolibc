@@ -931,7 +931,7 @@ fhandler_base::ioctl (unsigned int cmd, void *buf)
 }
 
 int
-fhandler_base::lock (int, struct flock *)
+fhandler_base::lock (int, struct __flock64 *)
 {
   set_errno (EINVAL);
   return -1;
@@ -1088,7 +1088,7 @@ int fhandler_base::fcntl (int cmd, void *arg)
     case F_GETLK:
     case F_SETLK:
     case F_SETLKW:
-      res = lock (cmd, (struct flock *) arg);
+      res = lock (cmd, (struct __flock64 *) arg);
       break;
     default:
       set_errno (EINVAL);

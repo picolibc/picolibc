@@ -1,5 +1,23 @@
 2003-12-01  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (OBSOLETE_FUNCTIONS): Add fcntl.
+	(NEW_FUNCTIONS): Add fcntl64.
+	* cygwin.din: Export fcntl64.  Make fcntl being SIGFE.
+	* fcntl.cc (fcntl_worker): New function.
+	(fcntl64): New function.
+	(_fcntl): Call fcntl_worker.  Convert 32 bit flock structure into
+	64 bit flock structure and vice versa.
+	* fhandler.cc (fhandler_base::lock): Change 2nd parameter to
+	struct __flock64 *.
+	* fhandler_disk_file.cc (fhandler_disk_file::lock): Ditto.  Rework
+	to be 64 bit aware.
+	* fhandler.h: Accomodate above method argument changes.
+	* include/cygwin/types.h: Add struct __flock32 and __flock64.
+	Define struct flock according to setting of __CYGWIN_USE_BIG_TYPES__.
+	* include/cygwin/version.h: Bump API minor number.
+
+2003-12-01  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.cc (cygheap_init): Set cygheap->shared_prefix.
 	* cygheap.h (struct init_cygheap): Add shared_prefix.
 	* shared.cc (shared_name): Use cygheap->shared_prefix.

@@ -143,7 +143,7 @@ GMON_OFILES:=gmon.o mcount.o profil.o
 OBSOLETE_FUNCTIONS:=regcomp regerror regexec regfree regsub \
 		    open acl aclcheck aclfrommode aclfrompbits \
 		    aclfromtext aclsort acltomode acltopbits \
-		    acltotext chown facl fchown fdopen fgetpos fopen \
+		    acltotext chown facl fchown fcntl fdopen fgetpos fopen \
 		    freopen fseeko fsetpos fstat ftello ftruncate \
 		    getegid geteuid getgid getgrent getgrgid getgrnam \
 		    getgroups getpwuid getpwuid_r getuid initgroups \
@@ -168,6 +168,7 @@ NEW_FUNCTIONS:=regcomp posix_regcomp \
 	       chown _chown32 \
 	       facl _facl32 \
 	       fchown _fchown32 \
+	       fcntl _fcntl64 \
 	       fdopen _fdopen64 \
 	       fgetpos _fgetpos64 \
 	       fopen _fopen64 \

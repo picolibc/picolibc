@@ -19,11 +19,9 @@ details. */
 #include "cygheap.h"
 #include "thread.h"
 
-extern "C" int
-_fcntl (int fd, int cmd,...)
+static int
+fcntl_worker (int fd, int cmd, void *arg)
 {
-  void *arg = NULL;
-  va_list args;
   int res;
 
   cygheap_fdget cfd (fd, true);
@@ -32,16 +30,56 @@ _fcntl (int fd, int cmd,...)
       res = -1;
       goto done;
     }
-
-  va_start (args, cmd);
-  arg = va_arg (args, void *);
   if (cmd != F_DUPFD)
     res = cfd->fcntl(cmd, arg);
   else
     res = dup2 (fd, cygheap_fdnew (((int) arg) - 1));
-  va_end (args);
-
 done:
   syscall_printf ("%d = fcntl (%d, %d, %p)", res, fd, cmd, arg);
+  return res;
+}
+
+extern "C" int
+fcntl64 (int fd, int cmd,...)
+{
+  void *arg = NULL;
+  va_list args;
+
+  va_start (args, cmd);
+  arg = va_arg (args, void *);
+  va_end (args);
+  return fcntl_worker (fd, cmd, arg);
+}
+
+extern "C" int
+_fcntl (int fd, int cmd,...)
+{
+  void *arg = NULL;
+  va_list args;
+  struct __flock32 *src;
+  struct __flock64 dst;
+
+  va_start (args, cmd);
+  arg = va_arg (args, void *);
+  va_end (args);
+  if (cmd == F_GETLK || cmd == F_SETLK || cmd == F_SETLKW)
+    {
+      src = (struct __flock32 *)arg;
+      dst.l_type = src->l_type;
+      dst.l_whence = src->l_whence;
+      dst.l_start = src->l_start;
+      dst.l_len = src->l_len;
+      dst.l_pid = src->l_pid;
+      arg = &dst;
+    }
+  int res = fcntl_worker (fd, cmd, arg);
+  if (cmd == F_GETLK)
+    {
+      src->l_type = dst.l_type;
+      src->l_whence = dst.l_whence;
+      src->l_start = dst.l_start;
+      src->l_len = dst.l_len;
+      src->l_pid = (short)dst.l_pid;
+    }
   return res;
 }

@@ -460,11 +460,10 @@ fhandler_base::close_fs ()
    the best.  */
 
 int
-fhandler_disk_file::lock (int cmd, struct flock *fl)
+fhandler_disk_file::lock (int cmd, struct __flock64 *fl)
 {
   _off64_t win32_start;
-  int win32_len;
-  DWORD win32_upper;
+  _off64_t win32_len;
   _off64_t startpos;
 
   /*
@@ -535,17 +534,22 @@ fhandler_disk_file::lock (int cmd, struct flock *fl)
       win32_start = 0;
     }
 
-  /*
-   * Special case if len == 0 for POSIX means lock
-   * to the end of the entire file (and all future extensions).
-   */
+  DWORD off_high, off_low, len_high, len_low;
+
+  off_high = (DWORD)(win32_start & 0xffffffff);
+  off_low = (DWORD)(win32_start >> 32);
   if (win32_len == 0)
     {
-      win32_len = 0xffffffff;
-      win32_upper = wincap.lock_file_highword ();
+      /* Special case if len == 0 for POSIX means lock to the end of
+         the entire file (and all future extensions).  */
+      len_low = 0xffffffff;
+      len_high = wincap.lock_file_highword ();
     }
   else
-    win32_upper = 0;
+    {
+      len_low = (DWORD)(win32_len & 0xffffffff);
+      len_high = (DWORD)(win32_len >> 32);
+    }
 
   BOOL res;
 
@@ -558,18 +562,18 @@ fhandler_disk_file::lock (int cmd, struct flock *fl)
 
       ov.Internal = 0;
       ov.InternalHigh = 0;
-      ov.Offset = (DWORD)win32_start;
-      ov.OffsetHigh = 0;
+      ov.Offset = off_low;
+      ov.OffsetHigh = off_high;
       ov.hEvent = (HANDLE) 0;
 
       if (fl->l_type == F_UNLCK)
 	{
-	  res = UnlockFileEx (get_handle (), 0, (DWORD)win32_len, win32_upper, &ov);
+	  res = UnlockFileEx (get_handle (), 0, len_low, len_high, &ov);
 	}
       else
 	{
-	  res = LockFileEx (get_handle (), lock_flags, 0, (DWORD)win32_len,
-							win32_upper, &ov);
+	  res = LockFileEx (get_handle (), lock_flags, 0,
+			    len_low, len_high, &ov);
 	  /* Deal with the fail immediately case. */
 	  /*
 	   * FIXME !! I think this is the right error to check for
@@ -587,10 +591,9 @@ fhandler_disk_file::lock (int cmd, struct flock *fl)
     {
       /* Windows 95 -- use primitive lock call */
       if (fl->l_type == F_UNLCK)
-	res = UnlockFile (get_handle (), (DWORD)win32_start, 0, (DWORD)win32_len,
-							win32_upper);
+	res = UnlockFile (get_handle (), off_low, off_high, len_low, len_high);
       else
-	res = LockFile (get_handle (), (DWORD)win32_start, 0, (DWORD)win32_len, win32_upper);
+	res = LockFile (get_handle (), off_low, off_high, len_low, len_high);
     }
 
   if (res == 0)

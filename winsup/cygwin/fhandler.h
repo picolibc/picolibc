@@ -294,7 +294,7 @@ class fhandler_base
   virtual ssize_t readv (const struct iovec *, int iovcnt, ssize_t tot = -1);
   virtual ssize_t writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
   virtual _off64_t lseek (_off64_t offset, int whence);
-  virtual int lock (int, struct flock *);
+  virtual int lock (int, struct __flock64 *);
   virtual void dump ();
   virtual int dup (fhandler_base *child);
 
@@ -603,7 +603,7 @@ class fhandler_disk_file: public fhandler_base
 
   int open (int flags, mode_t mode);
   int close ();
-  int lock (int, struct flock *);
+  int lock (int, struct __flock64 *);
   bool isdevice () { return false; }
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
 

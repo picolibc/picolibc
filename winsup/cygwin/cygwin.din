@@ -464,8 +464,9 @@ fclose SIGFE
 _fclose = fclose SIGFE
 fcloseall SIGFE
 _fcloseall = fcloseall SIGFE
-fcntl NOSIGFE
-_fcntl = fcntl NOSIGFE
+fcntl SIGFE
+_fcntl = fcntl SIGFE
+_fcntl64 = fcntl64 SIGFE
 fcvt SIGFE
 _fcvt = fcvt SIGFE
 fcvtbuf SIGFE
@@ -500,6 +501,7 @@ finitef NOSIGFE
 _finitef = finitef NOSIGFE
 fiprintf SIGFE
 _fiprintf = fiprintf SIGFE
+flock SIGFE
 flock SIGFE
 floor NOSIGFE
 _floor = floor NOSIGFE
