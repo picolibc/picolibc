@@ -1,3 +1,8 @@
+2001-05-04  Egor Duda  <deo@logos-m.ru>
+
+	* fhandler_socket.cc (set_connect_secret): Use /dev/urandom to
+	generate secret cookie.
+
 Thu May  3 16:37:55 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* include/pthread.h (pthread_cleanup_push): Eliminate space preceding

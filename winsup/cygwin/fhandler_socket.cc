@@ -28,6 +28,10 @@
 #include "sigproc.h"
 
 #define SECRET_EVENT_NAME "cygwin.local_socket.secret.%d.%08x-%08x-%08x-%08x"
+#define ENTROPY_SOURCE_NAME "/dev/urandom"
+#define ENTROPY_SOURCE_DEV_UNIT 9
+
+fhandler_dev_random* entropy_source = NULL;
 
 /**********************************************************************/
 /* fhandler_socket */
@@ -50,8 +54,22 @@ fhandler_socket::~fhandler_socket ()
 void
 fhandler_socket::set_connect_secret ()
 {
-  for (int i = 0; i < 4; i++)
-    connect_secret [i] = random ();
+  if (!entropy_source)
+    {
+      void *buf = malloc (sizeof (fhandler_dev_random));
+      entropy_source = new (buf) fhandler_dev_random (ENTROPY_SOURCE_NAME,
+						      ENTROPY_SOURCE_DEV_UNIT);
+    }
+  if (entropy_source &&
+      !entropy_source->open (ENTROPY_SOURCE_NAME, O_RDONLY))
+    {
+      delete entropy_source;
+      entropy_source = NULL;
+    }
+  if (!entropy_source ||
+      (entropy_source->read (connect_secret, sizeof (connect_secret)) !=
+					     sizeof (connect_secret)))
+    bzero ((char*) connect_secret, sizeof (connect_secret));
 }
 
 void
