@@ -1,5 +1,9 @@
 2004-08-12  Nathanael Nerode  <neroden@gcc.gnu.org>
 
+	* Makefile.def, configure.in, src-release: Remove useless, bogus
+	references to tix.
+	* Makefile.in, configure: Regenerate.
+
 	* src-release: Stop distributing mmalloc with gdb (which doesn't
 	use it).
 	* Makefile.def: GDB doesn't depend on mmalloc anymore.
