@@ -1,3 +1,8 @@
+2002-01-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (pathconf): Guard _PC_PATH_MAX branch against invalid
+	file parameter.
+
 2002-01-09  Christopher Faylor  <cgf@redhat.com>
             Robert Collins  <rbtcollins@hotmail.com>
 

@@ -1424,6 +1424,8 @@ pathconf (const char *file, int v)
   switch (v)
     {
     case _PC_PATH_MAX:
+      if (check_null_empty_str_errno (file))
+          return -1;
       return PATH_MAX - strlen (file);
     case _PC_NAME_MAX:
       return PATH_MAX;
