@@ -1,3 +1,8 @@
+2002-11-16  Svein E. Seldal  <Svein.Seldal@solidas.com>
+
+	* opcode/tic4x.h: Major rewrite of entire file. Define
+	  instruction classes, and put each instruction into a class.
+
 2002-11-14  Egor Duda  <deo@logos-m.ru>
 
 	* bfdlink.h (struct bfd_link_info): Add new boolean
