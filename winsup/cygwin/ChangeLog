@@ -1,3 +1,9 @@
+2002-05-17  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.cc (fhandler_base::lseek): Avoid calling SetFilePointer with
+	high order part of 64 bit address on OS's which do not support that
+	kind of operation.  Otherwise Windows 95 will become confused.
+
 2002-05-16  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* fhandler_raw.cc (fhandler_dev_raw::open): Replace set_errno()

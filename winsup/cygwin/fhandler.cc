@@ -732,9 +732,17 @@ fhandler_base::lseek (__off64_t offset, int whence)
 		       : (whence == SEEK_CUR ? FILE_CURRENT : FILE_END);
 
   LONG off_low = offset & 0xffffffff;
-  LONG off_high = wincap.has_64bit_file_access () ? offset >> 32 : 0;
+  LONG *poff_high, off_high;
+  if (!wincap.has_64bit_file_access ())
+    poff_high = NULL;
+  else
+    {
+      off_high =  offset >> 32;
+      poff_high = &off_high;
+    }
 
-  res = SetFilePointer (get_handle(), off_low, &off_high, win32_whence);
+  debug_printf ("setting file pointer to %u (high), %u (low)", off_high, off_low);
+  res = SetFilePointer (get_handle(), off_low, poff_high, win32_whence);
   if (res == INVALID_SET_FILE_POINTER && GetLastError ())
     {
       __seterrno ();
