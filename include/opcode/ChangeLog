@@ -1,3 +1,8 @@
+Wed Dec 20 14:22:03 MET 2000  Jan Hubicka  <jh@suse.cz>
+
+	* i386.h (i386_optab): Replace "Imm" with "EncImm".
+	(i386_regtab): Add flags field.
+	
 2000-12-12  Nick Clifton  <nickc@redhat.com>
 
 	* mips.h: Fix formatting.
