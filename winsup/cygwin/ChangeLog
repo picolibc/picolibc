@@ -1,3 +1,7 @@
+2002-06-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* environ.cc (build_env): If realloc moves envblock, move s with it.
+
 2002-06-13  Nicholas S. Wourms  <nwourms@netscape.net>
 
 	* winver.rc: Add more words to copyright.

@@ -910,7 +910,16 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 
 	  /* See if we need to increase the size of the block. */
 	  if (new_tl > tl)
-	    envblock = (char *) realloc (envblock, 2 + (tl += len + 100));
+	    {
+	      char *new_envblock =
+	      		(char *) realloc (envblock, 2 + (tl += len + 100));
+	      /* If realloc moves the block, move `s' with it. */
+	      if (new_envblock != envblock)
+	        {
+		  s += new_envblock - envblock;
+		  envblock = new_envblock;
+		}
+	    }
 
 	  memcpy (s, p, len + 1);
 
