@@ -353,7 +353,7 @@ fhandler_base::open (int flags, mode_t mode)
 
   if (get_query_open ())
     access = 0;
-  else if (get_device () == FH_TAPE)
+  else if (get_major () == DEV_TAPE_MAJOR)
     access = GENERIC_READ | GENERIC_WRITE;
   else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
     access = GENERIC_READ;
@@ -363,7 +363,7 @@ fhandler_base::open (int flags, mode_t mode)
     access = GENERIC_READ | GENERIC_WRITE;
 
   /* Allow reliable lseek on disk devices. */
-  if (get_device () == FH_FLOPPY)
+  if (get_major () == DEV_FLOPPY_MAJOR)
     access |= GENERIC_READ;
 
   /* FIXME: O_EXCL handling?  */
@@ -392,11 +392,11 @@ fhandler_base::open (int flags, mode_t mode)
   file_attributes = FILE_ATTRIBUTE_NORMAL;
   if (flags & O_DIROPEN)
     file_attributes |= FILE_FLAG_BACKUP_SEMANTICS;
-  if (get_device () == FH_SERIAL)
+  if (get_major () == DEV_SERIAL_MAJOR)
     file_attributes |= FILE_FLAG_OVERLAPPED;
 
 #ifdef HIDDEN_DOT_FILES
-  if (flags & O_CREAT && get_device () == FH_FS)
+  if (flags & O_CREAT && dev ().isfs ())
     {
       char *c = strrchr (get_win32_name (), '\\');
       if ((c && c[1] == '.') || *get_win32_name () == '.')
@@ -420,7 +420,7 @@ fhandler_base::open (int flags, mode_t mode)
 
   /* If the file should actually be created and ntsec is on,
      set files attributes. */
-  if (flags & O_CREAT && get_device () == FH_FS && allow_ntsec && has_acls ())
+  if (flags & O_CREAT && dev ().isfs () && allow_ntsec && has_acls ())
     set_security_attribute (mode, &sa, sd);
 
   x = CreateFile (get_win32_name (), access, shared, &sa, creation_distribution,
