@@ -103,6 +103,10 @@ cygwin_internal (cygwin_getinfo_types t, ...)
       case CW_USER_DATA:
 	return (DWORD) &__cygwin_user_data;
 
+      case CW_PERFILE:
+	perfile_table = va_arg (arg, struct __cygwin_perfile *);
+	return 0;
+
       default:
 	return (DWORD) -1;
     }

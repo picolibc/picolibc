@@ -1,3 +1,19 @@
+Sun Jul  9 01:19:06 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* cygwin.din: Export _getmode and getmode to allow querying of binary
+	state of an fd.
+	* external.cc (cygwin_internal): Add handling of perfile_table setting.
+	* fhandler.cc (perfile_table): New global.
+	(fhandler_base::get_default_fmode): New method to return a file's
+	default mode based on its name.
+	(fhandler_base::open): Use get_default_mode method to determine a
+	file's mode.  Record file mode in file flags.
+	* fhandler.h (fhandler_base): Declare get_default_fmode
+	* syscalls.cc (getmode): New function.
+	* sys/cygwin.h (__cygwin_perfile): New structure.
+	(cygwin_getinfo_types): Move outside of WINVER conditional.
+	(per_process): Move inside of WINVER conditional.
+
 Sat Jul  8 00:15:01 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* external.cc (cygwin_internal): Export __cygwin_user_data.

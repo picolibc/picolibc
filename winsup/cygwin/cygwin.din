@@ -335,6 +335,8 @@ getlogin
 _getlogin = getlogin
 getmntent
 _getmntent = getmntent
+getmode
+_getmode = getmode
 get_osfhandle
 _get_osfhandle = get_osfhandle
 getpagesize

@@ -18,6 +18,8 @@ static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
 
 static char fhandler_disk_dummy_name[] = "some disk file";
 
+struct __cygwin_perfile *perfile_table = NULL;
+
 DWORD binmode;
 
 int
@@ -249,6 +251,27 @@ fhandler_base::raw_write (const void *ptr, size_t len)
   return bytes_written;
 }
 
+#define ACCFLAGS(x) (x & (O_RDONLY | O_WRONLY | O_RDWR))
+int
+fhandler_base::get_default_fmode (int flags)
+{
+  if (perfile_table)
+    {
+      size_t nlen = strlen (get_name ());
+      unsigned accflags = ACCFLAGS (flags);
+      for (__cygwin_perfile *pf = perfile_table; pf->name; pf++)
+	{
+	  size_t pflen = strlen (pf->name);
+	  const char *stem = get_name () + nlen - pflen;
+	  if (pflen > nlen || (stem != get_name () && !isdirsep (stem[-1])))
+	    continue;
+	  else if (strcasematch (stem, pf->name) && ACCFLAGS (pf->flags) == accflags)
+	    return pf->flags & ~(O_RDONLY | O_WRONLY | O_RDWR);
+	}
+    }
+  return __fmode;
+}
+
 /* Open system call handler function.
    Path is now already checked for symlinks */
 int
@@ -261,8 +284,6 @@ fhandler_base::open (int flags, mode_t mode)
   int creation_distribution;
 
   syscall_printf ("(%s, %p)", get_win32_name (), flags);
-
-  set_flags (flags);
 
   if (get_win32_name () == NULL)
     {
@@ -352,16 +373,22 @@ fhandler_base::open (int flags, mode_t mode)
   rpos_ = 0;
   rsize_ = -1;
   int bin;
-  if (flags & (O_BINARY | O_TEXT))
-    bin = flags & O_TEXT ? 0 : O_BINARY;
-  else if (__fmode & O_BINARY)
+  int fmode;
+  if ((bin = flags & (O_BINARY | O_TEXT)))
+    /* nothing to do */;
+  else if ((fmode = get_default_fmode (flags)) & O_BINARY)
     bin = O_BINARY;
-  else if (__fmode & O_TEXT)
+  else if (fmode & O_TEXT)
     bin = O_TEXT;
   else if (get_device () == FH_DISK)
     bin = get_w_binary () || get_r_binary ();
   else
     bin = binmode || get_w_binary () || get_r_binary ();
+
+  if (bin & O_TEXT)
+    bin = 0;
+
+  set_flags (flags | (bin ? O_BINARY : O_TEXT));
 
   set_r_binary (bin);
   set_w_binary (bin);

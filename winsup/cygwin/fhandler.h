@@ -107,6 +107,7 @@ enum
 #define FHSTATOFF	0
 
 extern const char *windows_device_names[];
+extern struct __cygwin_perfile *perfile_table;
 #define __fmode (*(user_data->fmode_ptr))
 
 class select_record;
@@ -181,6 +182,8 @@ public:
 
   void set_w_binary (int b) { FHCONDSETF (b, WBINARY); FHSETF (WBINSET); }
   void set_r_binary (int b) { FHCONDSETF (b, RBINARY); FHSETF (RBINSET); }
+
+  int get_default_fmode (int flags);
 
   int get_r_no_interrupt () { return FHISSETF (NOEINTR); }
   void set_r_no_interrupt (int b) { FHCONDSETF (b, NOEINTR); }

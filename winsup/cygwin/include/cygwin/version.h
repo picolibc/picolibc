@@ -114,6 +114,7 @@ details. */
        23: Export new dll_crt0 interface and cygwin_user_data for use
 	   with crt0 startup code.
        24: Export poll and _poll.
+       25: Export getmode and _getmode.
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0

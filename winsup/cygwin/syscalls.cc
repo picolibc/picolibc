@@ -1494,11 +1494,22 @@ setmode_helper (FILE *f)
   return 0;
 }
 
+extern "C" int
+getmode (int fd)
+{
+  if (dtable.not_open (fd))
+    {
+      set_errno (EBADF);
+      return -1;
+    }
+
+  return dtable[fd]->get_flags () & (O_BINARY | O_TEXT);
+}
+
 /* Set a file descriptor into text or binary mode, returning the
    previous mode.  */
 
-extern "C"
-int
+extern "C" int
 setmode (int fd, int mode)
 {
   if (dtable.not_open (fd))
