@@ -1,4 +1,10 @@
+Mon Mar 26 18:48:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* mmap.cc (mmap): Outflank copy-on-write problem on 9x by
+	setting access mode to FILE_MAP_READ when read access is requested.
+
 Sun Mar 25 20:12:21 2001  Christopher Faylor <cgf@cygnus.com>
+
 
 	* dlfcn.cc (check_access): Eliminate.
 	(check_path_access): Use passed in path_conv buf.
