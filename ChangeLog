@@ -1,3 +1,8 @@
+2002-02-04  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * COPYING.NEWLIB: Remove advertising clause from
+        Berkeley and Red Hat licenses.
+
 2002-02-01  Mo DeJong  <supermo@bayarea.net>
 
 	* Makefile.in: Add all-tix to deps for all-snavigator
