@@ -234,6 +234,8 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 bool
 _pinfo::alive ()
 {
+  if (!dwProcessId)
+    return 0;
   HANDLE h = OpenProcess (PROCESS_QUERY_INFORMATION, false, dwProcessId);
   if (h)
     CloseHandle (h);

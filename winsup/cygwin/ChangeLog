@@ -1,5 +1,9 @@
 2002-11-04  Christopher Faylor  <cgf@redhat.com>
 
+	* sigproc.cc (WAIT_SIG_PRIORITY): Bump to THREAD_PRIORITY_TIME_CRITICAL.
+
+2002-11-04  Christopher Faylor  <cgf@redhat.com>
+
 	* pinfo.cc (_pinfo::commune_send): Initialize buffer or suffer random
 	crashes.
 
