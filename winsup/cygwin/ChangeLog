@@ -1,3 +1,9 @@
+Fri Feb  9 23:19:01 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* fork.cc (fork_parent): Return EAGAIN when can't record pid.
+	* pinfo.h (pinfo::remember): Return value of call to proc_subproc.
+	* sigproc.cc (proc_subproc): Return error if can't record pid.
+
 Fri Feb  9 12:17:27 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* syscalls.cc (mknod): Add valid parameters.

@@ -514,13 +514,24 @@ out:
      be called in subproc handling. */
   ProtectHandle1 (pi.hProcess, childhProc);
 
-  slow_pid_reuse (pi.hProcess);
-
   /* Fill in fields in the child's process table entry.  */
   forked->hProcess = pi.hProcess;
   forked->dwProcessId = pi.dwProcessId;
   forked->copysigs(myself);
-  forked.remember ();
+
+  /* Hopefully, this will succeed.  The alternative to doing things this
+     way is to reserve space prior to calling CreateProcess and then fill
+     it in afterwards.  This requires more bookkeeping than I like, though,
+     so we'll just do it the easy way.  So, terminate any child process if
+     we can't actually record the pid in the internal table. */
+  if (!forked.remember ())
+    {
+      TerminateProcess (pi.hProcess, 1);
+      set_errno (EAGAIN);
+      goto cleanup;
+    }
+
+  slow_pid_reuse (pi.hProcess);
 
   /* Wait for subproc to initialize itself. */
   if (!sync_with_child(pi, subproc_ready, TRUE, "waiting for longjmp"))

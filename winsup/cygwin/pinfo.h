@@ -18,7 +18,7 @@ enum
   __SIGOFFSET	    =  3
 };
 
-#define PSIZE 1024
+#define PSIZE 63
 
 #include <sys/resource.h>
 #include "thread.h"
@@ -152,7 +152,7 @@ public:
   _pinfo *operator * () const {return procinfo;}
   operator _pinfo * () const {return procinfo;}
   // operator bool () const {return (int) h;}
-  void remember () {destroy = 0; proc_subproc (PROC_ADDCHILD, (DWORD) this);}
+  int remember () {destroy = 0; return proc_subproc (PROC_ADDCHILD, (DWORD) this);}
   HANDLE shared_handle () {return h;}
 };
 

@@ -246,7 +246,10 @@ proc_subproc (DWORD what, DWORD val)
      */
     case PROC_ADDCHILD:
       if (nchildren >= PSIZE - 1)
-	system_printf ("nchildren too large %d", nchildren);
+	{
+	  rc = 0;
+	  break;
+	}
       pchildren[nchildren] = vchild;
       hchildren[nchildren] = vchild->hProcess;
       if (!DuplicateHandle (hMainProc, vchild->hProcess, hMainProc, &vchild->pid_handle,
