@@ -1,3 +1,7 @@
+2001-11-12  Anthony Green  <green@redhat.com>
+
+	* libc/sys/arm/crt0.S (__stack_base__): New symbol.
+
 2001-11-13  Hans-Peter Nilsson  <hp@bitrange.com>
 
 	* libc/sys/mmixware/*: Correct spacing in all source files.

@@ -243,9 +243,10 @@ change_back:
 /*  Workspace for Angel calls.  */
 	.data
 /*  Data returned by monitor SWI.  */
+.global	__stack_base__
 HeapBase:	.word	0
 HeapLimit:	.word	0
-StackBase:	.word	0
+__stack_base__:	.word	0
 StackLimit:	.word	0
 CommandLine:	.space	256,0	/*  Maximum length of 255 chars handled.  */
 #endif
