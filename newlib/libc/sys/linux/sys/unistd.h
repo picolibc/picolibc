@@ -29,9 +29,6 @@ char    _EXFUN(*ctermid, (char *__s ));
 char    _EXFUN(*cuserid, (char *__s ));
 int     _EXFUN(dup, (int __fildes ));
 int     _EXFUN(dup2, (int __fildes, int __fildes2 ));
-#if defined(__CYGWIN__)
-void	_EXFUN(endusershell, (void));
-#endif
 int     _EXFUN(execl, (const char *__path, const char *, ... ));
 int     _EXFUN(execle, (const char *__path, const char *, ... ));
 int     _EXFUN(execlp, (const char *__file, const char *, ... ));
@@ -44,6 +41,7 @@ int     _EXFUN(fchown, (int __fildes, uid_t __owner, gid_t __group ));
 pid_t   _EXFUN(fork, (void ));
 long    _EXFUN(fpathconf, (int __fd, int __name ));
 int     _EXFUN(fsync, (int __fd));
+int     _EXFUN(ftruncate, (int __fd, off_t __length));
 char    _EXFUN(*getcwd, (char *__buf, size_t __size ));
 int	_EXFUN(getdomainname ,(char *__name, size_t __len));
 gid_t   _EXFUN(getegid, (void ));
@@ -70,9 +68,6 @@ int	_EXFUN(nice, (int __nice_value ));
 off_t   _EXFUN(lseek, (int __fildes, off_t __offset, int __whence ));
 long    _EXFUN(pathconf, (const char *__path, int __name ));
 int     _EXFUN(pause, (void ));
-#ifdef __CYGWIN__
-int	_EXFUN(pthread_atfork, (void (*)(void), void (*)(void), void (*)(void)));
-#endif
 int     _EXFUN(pipe, (int __fildes[2] ));
 ssize_t _EXFUN(pread, (int __fd, void *__buf, size_t __nbytes, off_t __offset));
 ssize_t _EXFUN(pwrite, (int __fd, const void *__buf, size_t __nbytes, off_t __offset));
@@ -91,9 +86,11 @@ void    _EXFUN(swab, (const void *, void *, ssize_t));
 long    _EXFUN(sysconf, (int __name ));
 pid_t   _EXFUN(tcgetpgrp, (int __fildes ));
 int     _EXFUN(tcsetpgrp, (int __fildes, pid_t __pgrp_id ));
+int     _EXFUN(truncate, (const char *, off_t __length));
 char *  _EXFUN(ttyname, (int __fildes ));
 int     _EXFUN(ttyname_r, (int __fildes, char *__buf, size_t __len));
 int     _EXFUN(unlink, (const char *__path ));
+int     _EXFUN(usleep, (__useconds_t __useconds));
 int     _EXFUN(vhangup, (void ));
 _READ_WRITE_RETURN_TYPE _EXFUN(write, (int __fd, const void *__buf, size_t __nbyte ));
 
