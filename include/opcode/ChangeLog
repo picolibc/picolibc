@@ -1,3 +1,7 @@
+2000-05-23  Maciej W. Rozycki  <macro@ds2.pg.gda.pl>
+
+	* i386.h: Allow d suffix on iret, and add DefaultSize modifier.
+
 2000-05-17  Maciej W. Rozycki  <macro@ds2.pg.gda.pl>
 
 	* i386.h: Use sl_FP, not sl_Suf for fild.

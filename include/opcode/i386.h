@@ -1,5 +1,6 @@
 /* opcode/i386.h -- Intel 80386 opcode table
-   Copyright 1989, 91, 92, 93, 94, 95, 96, 97, 98, 1999 Free Software Foundation.
+   Copyright 1989, 91, 92, 93, 94, 95, 96, 97, 98, 99, 2000
+   Free Software Foundation.
 
 This file is part of GAS, the GNU Assembler, and GDB, the GNU Debugger.
 
@@ -481,7 +482,7 @@ static const template i386_optab[] = {
 {"int",	   1,	0xcd, X, 0,	 NoSuf,			{ Imm8, 0, 0} },
 {"int3",   0,	0xcc, X, 0,	 NoSuf,			{ 0, 0, 0} },
 {"into",   0,	0xce, X, 0,	 NoSuf,			{ 0, 0, 0} },
-{"iret",   0,	0xcf, X, 0,	 wl_Suf,		{ 0, 0, 0} },
+{"iret",   0,	0xcf, X, 0,	 wld_Suf|DefaultSize,	{ 0, 0, 0} },
 /* i386sl, i486sl, later 486, and Pentium.  */
 {"rsm",	   0, 0x0faa, X, Cpu386, NoSuf,			{ 0, 0, 0} },
 
