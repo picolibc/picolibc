@@ -854,9 +854,9 @@ static const template i386_optab[] =
 {"lock",   0,	0xf0, X, 0,	 NoSuf|IsPrefix,	{ 0, 0, 0} },
 {"wait",   0,   0x9b, X, 0,	 NoSuf|IsPrefix,	{ 0, 0, 0} },
 #define CS_PREFIX_OPCODE 0x2e
-{"cs",	   0,	0x2e, X, CpuNo64,	NoSuf|IsPrefix,	{ 0, 0, 0} },
+{"cs",	   0,	0x2e, X, 0,	NoSuf|IsPrefix,	{ 0, 0, 0} },
 #define DS_PREFIX_OPCODE 0x3e
-{"ds",	   0,	0x3e, X, CpuNo64,	NoSuf|IsPrefix,	{ 0, 0, 0} },
+{"ds",	   0,	0x3e, X, 0,	NoSuf|IsPrefix,	{ 0, 0, 0} },
 #define ES_PREFIX_OPCODE 0x26
 {"es",	   0,	0x26, X, CpuNo64,	NoSuf|IsPrefix,	{ 0, 0, 0} },
 #define FS_PREFIX_OPCODE 0x64

@@ -1,3 +1,7 @@
+2004-07-22  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* i386.h (i386_optab): Allow cs/ds in 64bit for branch hints.
+
 2004-07-21  Jan Beulich  <jbeulich@novell.com>
 
 	* i386.h: Adjust instruction descriptions to better match the
