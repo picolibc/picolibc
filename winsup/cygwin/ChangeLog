@@ -1,5 +1,9 @@
 2002-08-01  Christopher Faylor  <cgf@redhat.com>
 
+	* cygthread.cc: Remove cruft.
+
+2002-08-01  Christopher Faylor  <cgf@redhat.com>
+
 	* Makefile.in (DLL_OFILES): Add cygthread.o.
 	* dcrt0.cc (dll_crt0_1): Eliminate various thread initialization
 	functions in favor of new cygthread class.
