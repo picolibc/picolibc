@@ -1,3 +1,13 @@
+Thu Dec 14 23:37:51 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler.h (fhandler_console): Add additional argument to
+	char_command method.
+	* fhandler_console.cc (fhandler_console::read): Revert previously
+	misapplied patch.
+	(fhandler_console::char_command): Add a second argument.
+	(fhandler_console::write): Recognize when a '?' is found after a
+	<esc>[.
+
 Tue Dec  5 17:06:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* net.cc (cygwin_rexec): Eliminate superfluous call to

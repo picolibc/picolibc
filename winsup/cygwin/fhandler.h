@@ -595,7 +595,7 @@ private:
   void cursor_get (int *, int *);
   void cursor_rel (int, int);
   const unsigned char * write_normal (unsigned const char*, unsigned const char *);
-  void char_command (char);
+  void char_command (char, bool);
   int output_tcsetattr (int a, const struct termios *t);
 
 /* Input calls */
