@@ -1,3 +1,29 @@
+2004-10-15  Robert Wruck  <wruck@tweerlei.de>
+            Danny Smith  <dannysmith@users.sourceforge.net>
+
+	= include/winbase.h (InitializeSListHead, Interlocked*):
+	Guard with !__USE_NTOSKRNL__.
+
+	* include/ddk/ntddk.h (__USE_NTOSKRNL__): Define.
+	* include/ddk/winddk.h (InitializeSListHead, Interlocked*):
+	Guard with  __USE_NTOSKRNL__. 
+	(ExInterlockedPopEntrySList, ExInterlockedPushEntrySList):
+	Add prototypes.  Guard macro definition with __USE_NTOSKRNL__ 
+	&& _WIN32_WINNT >= 0x0501
+	(ExAllocateFromNPagedLookasideList, ExAllocateFromPagedLookasideList,
+	ExFreeToNPagedLookasideList, ExFreeToPagedLookasideList):
+	Replace calts to InterlockedPopEntrySList, InterlockedPushEntrySList
+	with ExInterlockedPopEntrySList, ExInterlockedPushEntrySList.
+
+	* lib/ddk/ntosknl.def (ExInterlockedPopEntrySList,
+	ExInterlockedPushEntrySList)  Add stubs with fastcall decoration.
+	(ExDesktopObjectType, ExEventObjectType, ExSemaphoreObjectType,
+	ExWindowStationObjectType, IoAdapterObjectType,
+	IoDeviceHandlerObjectSize, IoDeviceHandlerObjectType,
+	IoDeviceObjectType, IoDriverObjectType, IoFileObjectType,
+	LpcPortObjectType, MmSectionObjectType, SeTokenObjectType):
+	Uncomment stubs.
+
 2004-10-11  Robert Wruck  <wruck@tweerlei.de>
 
         * include/ddk/winddk.h (IoReleaseRemoveLockAndWait): Fix

@@ -1574,7 +1574,11 @@ WINBASEAPI BOOL WINAPI InitializeCriticalSectionAndSpinCount(LPCRITICAL_SECTION,
 WINBASEAPI DWORD WINAPI SetCriticalSectionSpinCount(LPCRITICAL_SECTION,DWORD);
 WINBASEAPI BOOL WINAPI InitializeSecurityDescriptor(PSECURITY_DESCRIPTOR,DWORD);
 WINBASEAPI BOOL WINAPI InitializeSid (PSID,PSID_IDENTIFIER_AUTHORITY,BYTE);
-#if !defined(__WINDDK_H) && _WIN32_WINNT >= 0x0501
+
+#if !(__USE_NTOSKRNL__)
+/* CAREFUL: These are exported from ntoskrnl.exe and declared in winddk.h
+   as __fastcall functions, but are  exported from kernel32.dll as __stdcall */
+#if (_WIN32_WINNT >= 0x0501)
 WINBASEAPI VOID WINAPI InitializeSListHead(PSLIST_HEADER);
 #endif
 #ifndef __INTERLOCKED_DECLARED
@@ -1598,6 +1602,8 @@ PSLIST_ENTRY WINAPI InterlockedPopEntrySList(PSLIST_HEADER);
 PSLIST_ENTRY WINAPI InterlockedPushEntrySList(PSLIST_HEADER,PSLIST_ENTRY);
 #endif
 #endif /* __INTERLOCKED_DECLARED */
+#endif /*  __USE_NTOSKRNL__ */
+
 WINBASEAPI BOOL WINAPI IsBadCodePtr(FARPROC);
 WINBASEAPI BOOL WINAPI IsBadHugeReadPtr(PCVOID,UINT);
 WINBASEAPI BOOL WINAPI IsBadHugeWritePtr(PVOID,UINT);

@@ -3809,6 +3809,11 @@ KeGetCurrentIrql(
 #define KeGetCurrentProcessorNumber() \
   ((ULONG)KeGetCurrentKPCR()->ProcessorNumber)
 
+
+#if  __USE_NTOSKRNL__
+/* CAREFUL: These are exported from ntoskrnl.exe as __fastcall functions,
+   but are also exported from kernel32.dll and declared in winbase.h as
+   __stdcall */
 #if !defined(__INTERLOCKED_DECLARED)
 #define __INTERLOCKED_DECLARED
 
@@ -3865,7 +3870,22 @@ InterlockedExchangeAdd(
 #define InterlockedCompareExchangePointer(Destination, Exchange, Comparand) \
   ((PVOID) InterlockedCompareExchange((PLONG) Destination, (LONG) Exchange, (LONG) Comparand))
 
+#if  (_WIN32_WINNT >= 0x0501)
+PSLIST_ENTRY
+DDKFASTAPI
+InterlockedPopEntrySList(
+  IN PSLIST_HEADER  ListHead);
+
+NTOSAPI
+PSLIST_ENTRY
+DDKFASTAPI
+InterlockedPushEntrySList(
+  IN PSLIST_HEADER  ListHead,
+  IN PSLIST_ENTRY  ListEntry);
+#endif /* _WIN32_WINNT >= 0x0501 */
+
 #endif /* !__INTERLOCKED_DECLARED */
+#endif /*  __USE_NTOSKRNL__ */
 
 NTOSAPI
 VOID
@@ -4149,23 +4169,6 @@ RemoveTailList(
    
   return Entry;
 }
-
-#if !defined(_WINBASE_H) || _WIN32_WINNT < 0x0501
-
-NTOSAPI
-PSLIST_ENTRY
-DDKFASTAPI
-InterlockedPopEntrySList(
-  IN PSLIST_HEADER  ListHead);
-
-NTOSAPI
-PSLIST_ENTRY
-DDKFASTAPI
-InterlockedPushEntrySList(
-  IN PSLIST_HEADER  ListHead,
-  IN PSLIST_ENTRY  ListEntry);
-
-#endif
 
 /*
  * USHORT
@@ -5063,18 +5066,52 @@ ExAcquireSharedWaitForExclusive(
   IN PERESOURCE  Resource,
   IN BOOLEAN  Wait);
 
+
+NTOSAPI
+PSINGLE_LIST_ENTRY
+DDKFASTAPI
+ExInterlockedPopEntrySList(
+  IN PSLIST_HEADER  ListHead,
+  IN PKSPIN_LOCK  Lock);
+
+
+NTOSAPI
+PSINGLE_LIST_ENTRY
+DDKFASTAPI
+ExInterlockedPushEntrySList(
+  IN PSLIST_HEADER  ListHead,
+  IN PSINGLE_LIST_ENTRY  ListEntry,
+  IN PKSPIN_LOCK  Lock);
+
+
+#if (__USE_NTOSKRNL__) && (_WIN32_WINNT >= 0x0501)
+#define ExInterlockedPopEntrySList(_ListHead, \
+                                   _Lock) \
+  InterlockedPopEntrySList(_ListHead)
+
+#define ExInterlockedPushEntrySList(_ListHead, \
+                                    _ListEntry, \
+                                    _Lock) \
+  InterlockedPushEntrySList(_ListHead, _ListEntry)
+#endif /*  __USE_NTOSKRNL__ */
+
+#define ExQueryDepthSList(ListHead) QueryDepthSList(ListHead)
+
 static __inline PVOID
 ExAllocateFromNPagedLookasideList(
   IN PNPAGED_LOOKASIDE_LIST  Lookaside)
 {
-	PVOID Entry;
+  PVOID Entry;
 
-	Lookaside->TotalAllocates++;
-  Entry = InterlockedPopEntrySList(&Lookaside->ListHead);
-	if (Entry == NULL) {
-		Lookaside->_DDK_DUMMYUNION_MEMBER(AllocateMisses)++;
-		Entry = (Lookaside->Allocate)(Lookaside->Type, Lookaside->Size, Lookaside->Tag);
-	}
+  Lookaside->TotalAllocates++;
+  Entry = ExInterlockedPopEntrySList(&Lookaside->ListHead,
+				     &Lookaside->Obsoleted);
+  if (Entry == NULL) {
+    Lookaside->_DDK_DUMMYUNION_MEMBER(AllocateMisses)++;
+    Entry = (Lookaside->Allocate)(Lookaside->Type,
+				  Lookaside->Size,
+				  Lookaside->Tag);
+  }
   return Entry;
 }
 
@@ -5085,13 +5122,47 @@ ExAllocateFromPagedLookasideList(
   PVOID Entry;
 
   Lookaside->TotalAllocates++;
-  Entry = InterlockedPopEntrySList(&Lookaside->ListHead);
+  Entry = ExInterlockedPopEntrySList(&Lookaside->ListHead,
+				     &Lookaside->Obsoleted);
   if (Entry == NULL) {
     Lookaside->_DDK_DUMMYUNION_MEMBER(AllocateMisses)++;
     Entry = (Lookaside->Allocate)(Lookaside->Type,
-      Lookaside->Size, Lookaside->Tag);
+				  Lookaside->Size,
+				  Lookaside->Tag);
   }
   return Entry;
+}
+
+static __inline VOID
+ExFreeToNPagedLookasideList(
+  IN PNPAGED_LOOKASIDE_LIST  Lookaside,
+  IN PVOID  Entry)
+{
+  Lookaside->TotalFrees++;
+  if (ExQueryDepthSList(&Lookaside->ListHead) >= Lookaside->Depth) {
+    Lookaside->_DDK_DUMMYUNION_N_MEMBER(2,FreeMisses)++;
+    (Lookaside->Free)(Entry);
+  } else {
+    ExInterlockedPushEntrySList(&Lookaside->ListHead,
+				(PSLIST_ENTRY)Entry,
+				&Lookaside->Obsoleted);
+  }
+}
+
+static __inline VOID
+ExFreeToPagedLookasideList(
+  IN PPAGED_LOOKASIDE_LIST  Lookaside,
+  IN PVOID  Entry)
+{
+  Lookaside->TotalFrees++;
+  if (ExQueryDepthSList(&Lookaside->ListHead) >= Lookaside->Depth) {
+    Lookaside->_DDK_DUMMYUNION_N_MEMBER(2,FreeMisses)++;
+    (Lookaside->Free)(Entry);
+  } else {
+    ExInterlockedPushEntrySList(&Lookaside->ListHead,
+				(PSLIST_ENTRY)Entry,
+				&Lookaside->Obsoleted);
+  }
 }
 
 NTOSAPI
@@ -5193,37 +5264,6 @@ DDKAPI
 ExFreePoolWithTag(
   IN PVOID  P,
   IN ULONG  Tag);
-
-#define ExQueryDepthSList(ListHead) QueryDepthSList(ListHead)
-
-static __inline VOID
-ExFreeToNPagedLookasideList(
-  IN PNPAGED_LOOKASIDE_LIST  Lookaside,
-  IN PVOID  Entry)
-{
-  Lookaside->TotalFrees++;
-	if (ExQueryDepthSList(&Lookaside->ListHead) >= Lookaside->Depth) {
-		Lookaside->_DDK_DUMMYUNION_N_MEMBER(2,FreeMisses)++;
-		(Lookaside->Free)(Entry);
-  } else {
-		InterlockedPushEntrySList(&Lookaside->ListHead,
-      (PSLIST_ENTRY)Entry);
-	}
-}
-
-static __inline VOID
-ExFreeToPagedLookasideList(
-  IN PPAGED_LOOKASIDE_LIST  Lookaside,
-  IN PVOID  Entry)
-{
-  Lookaside->TotalFrees++;
-  if (ExQueryDepthSList(&Lookaside->ListHead) >= Lookaside->Depth) {
-    Lookaside->_DDK_DUMMYUNION_N_MEMBER(2,FreeMisses)++;
-    (Lookaside->Free)(Entry);
-  } else {
-    InterlockedPushEntrySList(&Lookaside->ListHead, (PSLIST_ENTRY)Entry);
-  }
-}
 
 /*
  * ERESOURCE_THREAD
@@ -5404,15 +5444,6 @@ ExfInterlockedPopEntryList(
   IN PSINGLE_LIST_ENTRY  ListHead,
   IN PKSPIN_LOCK  Lock);
 
-/*
- * PSINGLE_LIST_ENTRY
- * ExInterlockedPopEntrySList(
- *   IN PSLIST_HEADER  ListHead,
- *   IN PKSPIN_LOCK  Lock)
- */
-#define ExInterlockedPopEntrySList(_ListHead, \
-                                   _Lock) \
-  InterlockedPopEntrySList(_ListHead)
 
 NTOSAPI
 PSINGLE_LIST_ENTRY
@@ -5430,17 +5461,6 @@ ExfInterlockedPushEntryList(
   IN PSINGLE_LIST_ENTRY  ListEntry,
   IN PKSPIN_LOCK  Lock);
 
-/*
- * PSINGLE_LIST_ENTRY FASTCALL
- * ExInterlockedPushEntrySList(
- *   IN PSLIST_HEADER  ListHead,
- *   IN PSINGLE_LIST_ENTRY  ListEntry,
- *   IN PKSPIN_LOCK  Lock)
- */
-#define ExInterlockedPushEntrySList(_ListHead, \
-                                    _ListEntry, \
-                                    _Lock) \
-  InterlockedPushEntrySList(_ListHead, _ListEntry)
 
 NTOSAPI
 PLIST_ENTRY

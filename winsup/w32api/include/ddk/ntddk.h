@@ -19,9 +19,10 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  * DEFINES:
- *    DBG          - Debugging enabled/disabled (0/1)
- *    POOL_TAGGING - Enable pool tagging
- *    _X86_        - X86 environment
+ *    DBG             - Debugging enabled/disabled (0/1)
+ *    POOL_TAGGING    - Enable pool tagging
+ *    _X86_           - X86 environment
+ *   __USE_NTOSKRNL__ - Use ntoskrnl.exe exports instead of kernel32.dll
  */
 
 #ifndef __NTDDK_H
@@ -29,6 +30,10 @@
 
 #if __GNUC__ >= 3
 #pragma GCC system_header
+#endif
+
+#ifndef __USE_NTOSKRNL__
+#define __USE_NTOSKRNL__ 1
 #endif
 
 #ifdef __cplusplus

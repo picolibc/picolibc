@@ -71,10 +71,10 @@ ExCreateCallback@16
 ExDeleteNPagedLookasideList@4
 ExDeletePagedLookasideList@4
 ExDeleteResourceLite@4
-;ExDesktopObjectType DATA
+ExDesktopObjectType DATA
 ;ExDisableResourceBoostLite
 ;ExEnumHandleTable
-;ExEventObjectType DATA
+ExEventObjectType DATA
 ExExtendZone@12
 @Exfi386InterlockedDecrementLong@4
 @Exfi386InterlockedExchangeUlong@8
@@ -113,9 +113,9 @@ ExInterlockedExtendZone@16
 ExInterlockedInsertHeadList@12
 ExInterlockedInsertTailList@12
 ExInterlockedPopEntryList@8
-;ExInterlockedPopEntrySList
+@ExInterlockedPopEntrySList@8
 ExInterlockedPushEntryList@12
-;ExInterlockedPushEntrySList
+@ExInterlockedPushEntrySList@12
 ExInterlockedRemoveHeadList@8
 ExIsProcessorFeaturePresent@4
 ExIsResourceAcquiredExclusiveLite@4
@@ -137,7 +137,7 @@ ExReleaseResourceForThreadLite@8
 @ExReleaseResourceLite@4
 ;ExReleaseRundownProtection
 ;ExRundownCompleted
-;ExSemaphoreObjectType DATA
+ExSemaphoreObjectType DATA
 ExSetResourceOwnerPointer@8
 ExSetTimerResolution@8
 ;ExSystemExceptionFilter
@@ -146,7 +146,7 @@ ExUnregisterCallback@4
 ExUuidCreate@4
 ExVerifySuite@4
 ;ExWaitForRundownProtectionRelease
-;ExWindowStationObjectType DATA
+ExWindowStationObjectType DATA
 ;FsRtlAcquireFileExclusive
 ;FsRtlAddLargeMcbEntry
 ;FsRtlAddMcbEntry
@@ -280,7 +280,7 @@ FsRtlIsTotalDeviceFailure@4
 IoAcquireCancelSpinLock@4
 IoAcquireRemoveLockEx@20
 ;IoAcquireVpbSpinLock
-;IoAdapterObjectType DATA
+IoAdapterObjectType DATA
 IoAllocateAdapterChannel@20
 IoAllocateController@16
 IoAllocateDriverObjectExtension@16
@@ -332,15 +332,15 @@ IoDeleteDevice@4
 ;IoDeleteDriver
 IoDeleteSymbolicLink@4
 IoDetachDevice@4
-;IoDeviceHandlerObjectSize DATA
-;IoDeviceHandlerObjectType DATA
-;IoDeviceObjectType DATA
+IoDeviceHandlerObjectSize DATA
+IoDeviceHandlerObjectType DATA
+IoDeviceObjectType DATA
 IoDisconnectInterrupt@4
-;IoDriverObjectType DATA
+IoDriverObjectType DATA
 ;IoEnqueueIrp
 ;IoEnumerateDeviceObjectList
 ;IoFastQueryNetworkAttributes
-;IoFileObjectType DATA
+IoFileObjectType DATA
 ;IoForwardAndCatchIrp
 IoForwardIrpSynchronously@8
 IoFreeController@4
@@ -625,7 +625,7 @@ KeWaitForSingleObject@20
 ;LdrEnumResources
 ;LdrFindResourceDirectory_U
 ;LdrFindResource_U
-;LpcPortObjectType DATA
+LpcPortObjectType DATA
 ;LpcRequestPort
 ;LpcRequestWaitReplyPort
 ;LsaCallAuthenticationPackage
@@ -692,7 +692,7 @@ MmProtectMdlSystemAddress@8
 MmQuerySystemSize@0
 MmRemovePhysicalMemory@8
 MmResetDriverPaging@4
-;MmSectionObjectType DATA
+MmSectionObjectType DATA
 MmSecureVirtualMemory@12
 ;MmSetAddressRangeModified
 ;MmSetBankedSection
@@ -1226,7 +1226,7 @@ SeSinglePrivilegeCheck@8
 ;SeTokenImpersonationLevel
 ;SeTokenIsAdmin
 ;SeTokenIsRestricted
-;SeTokenObjectType DATA
+SeTokenObjectType DATA
 ;SeTokenType
 ;SeUnlockSubjectContext
 ;SeUnregisterLogonSessionTerminatedRoutine
