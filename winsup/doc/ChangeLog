@@ -1,4 +1,8 @@
-2004-06-13  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+2003-06-14  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* how-programming.texinfo: Add section about Visual Studio linking.
+	
+2003-06-13  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* faq.texinfo: Move outdated calls.texinfo to readme.texinfo.
 	* how-api.texinfo: Fix typos.

@@ -202,6 +202,64 @@ give them to you, but you can't give them to anyone else, which is
 something that Red Hat can't agree to.  Fortunately, we
 have our own Win32 headers which are pretty complete.
 
+@subsection How do I link against @samp{cygwin1.dll} with Visual Studio?
+
+To my knowledge, none of the Cygwin developers have done this, but we
+have this report from the mailing list that it can be done this way:
+
+@enumerate
+@item Use the impdef program to generate a .def file for the cygwin1.dll
+(if you build the cygwin dll from source, you will already have a def
+file)
+
+@example
+impdef cygwin1.dll > cygwin1.def
+@end example
+
+@item Use the MS VS linker (lib) to generate an import library
+
+@example
+lib /def=cygwin1.def /out=cygwin1.lib
+@end example
+
+@item Create a file "my_crt0.c" with the following contents
+
+@example
+#include <sys/cygwin.h>
+#include <stdlib.h>
+
+typedef int (*MainFunc) (int argc, char *argv[], char **env);
+
+void
+  my_crt0 (MainFunc f)
+  @{
+    cygwin_crt0(f);
+  @}
+@end example
+
+@item Use gcc in a Cygwin prompt to build my_crt0.c into a DLL
+       (e.g. my_crt0.dll). Follow steps 1 and 2 to generate .def and
+       .lib files for the DLL.
+
+@item  Download crt0.c from the cygwin website and include it in
+       your sources. Modify it to call my_crt0() instead of
+       cygwin_crt0().  Since you are using Cygwin source code, your
+       resulting program will be licensed under the GNU GPL. For more
+       information, see @file{http://gnu.org/licenses/gpl-faq.html}.  
+
+@item  Build your object files using the MS VC compiler cl.
+
+@item  Link your object files, cygwin1.lib, and my_crt0.lib (or
+       whatever you called it) into the executable.
+@end enumerate
+
+Note that if you are using any other Cygwin based libraries
+that you will probably need to build them as DLLs using gcc and
+then generate import libraries for the MS VC linker.
+
+Thanks to Alastair Growcott (alastair dot growcott at bakbone dot co
+dot uk) for this tip.
+
 @subsection How do I link against a @samp{.lib} file?
 
 If your @samp{.lib} file is a normal static or import library with
@@ -236,7 +294,7 @@ with Cygwin development tools.
 Note that this is a lot of work (half a day or so), but much less than
 rewriting the runtime library in question from specs...
 
-(thanks to Jacob Navia (root@@jacob.remcomp.fr) for this explanation)
+Thanks to Jacob Navia (root at jacob dot remcomp dot fr) for this explanation.
 
 @subsection How do I rebuild the tools on my NT box?
 
