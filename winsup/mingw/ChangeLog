@@ -1,9 +1,13 @@
+2003-03-03  Christopher Faylor  <cgf@redhat.com>
+
+	* mingwex/getopt.c: Refresh from NetBSD sources.
+
 2003-03-03  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/getopt.c: New file, copied from cygwin srcs.
 	* include/getopt.h: New file, copied from cygwin srcs.
 	* include/unistd.h: Include getopt.h.
-	* mingwex/Makefile.in ((DISTFILES): Add getopt.c.
+	* mingwex/Makefile.in (DISTFILES): Add getopt.c.
 	(POSIX_OBJS): Add getopt.o.
 
 2003-03-02  Danny Smith  <dannysmith@users.sourceforge.net>
