@@ -1,3 +1,9 @@
+2003-05-27  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libnosys/Makefile.in: Add errno.o.
+	* libnosys/errno.c: New file to supply errno definition if
+	one not provided yet.
+
 2003-05-26  Eric Christopher  <echristo@redhat.com>
 
 	* mips/crt0.S: Remove stackbase variable set.
