@@ -1,5 +1,10 @@
 2003-05-06  Earnie Boyd  <earnie@users.sf.net>
 
+	* include/_mingw.h: Change version to 3.0
+	* Makefile.in: Ditto.
+
+2003-05-06  Earnie Boyd  <earnie@users.sf.net>
+
 	* configure.in (W32API_INCLUDE): Need the -I switch in the value.
 	* mingwex/configure.in (W32API_INCLUDE): Ditto.
 	* profile/configure.in (W32API_INCLUDE): Ditto.
