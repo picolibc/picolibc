@@ -683,7 +683,7 @@ globextend(path, pglob)
 	if (pglob->gl_pathv == NULL && pglob->gl_offs > 0) {
 		/* first time around -- clear initial gl_offs items */
 		pathv += pglob->gl_offs;
-		for (i = pglob->gl_offs; --i >= 0; )
+		for (i = pglob->gl_offs; --i >= 0;)
 			*--pathv = NULL;
 	}
 	pglob->gl_pathv = pathv;

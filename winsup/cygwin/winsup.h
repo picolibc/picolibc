@@ -1,6 +1,6 @@
 /* winsup.h: main Cygwin header file.
 
-   Copyright 1996, 1997, 1998, 1999, 2000 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -184,8 +184,6 @@ extern HANDLE netapi32_handle;
 /* debug_on_trap support. see exceptions.cc:try_to_debug() */
 extern "C" void error_start_init (const char*);
 extern "C" int try_to_debug ();
-
-extern "C" void codepage_init (const char*);
 
 extern int cygwin_finished_initializing;
 

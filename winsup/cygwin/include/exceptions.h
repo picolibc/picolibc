@@ -1,6 +1,6 @@
 /* exceptions.h
 
-   Copyright 1996, 1997, 1998 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 2001 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -46,7 +46,7 @@ ehandler (
 	   PEXCEPTION_RECORD erecord,
 	   PEXCEPTION_FRAME myframe,
 	   PCONTEXT context,		/-* context before and after *-/
-	   PVOID dispatch )		/-* something *-/
+	   PVOID dispatch)		/-* something *-/
 
 When a handler wants to handle the exception, it has some alternatives:
 

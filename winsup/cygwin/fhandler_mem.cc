@@ -1,6 +1,6 @@
 /* fhandler_mem.cc.  See fhandler.h for a description of the fhandler classes.
 
-   Copyright 1999, 2000 Cygnus Solutions.
+   Copyright 2000, 2001 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -79,7 +79,7 @@ fhandler_dev_mem::open (const char *, int flags, mode_t)
       debug_printf ("%s is accessible under NT/W2K only",
                     unit == 1 ? "/dev/mem" :
                     unit == 2 ? "/dev/kmem" :
-                                "/dev/port" );
+                                "/dev/port");
       return 0;
     }
 

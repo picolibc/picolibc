@@ -1,7 +1,7 @@
 /* environ.cc: Cygwin-adopted functions from newlib to manipulate
    process's environment.
 
-   Copyright 1997, 1998, 1999, 2000 Red Hat, Inc.
+   Copyright 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -390,6 +390,30 @@ glob_init (const char *buf)
     {
       allow_glob = TRUE;
       ignore_case_with_glob = FALSE;
+    }
+}
+
+static void
+codepage_init (const char *buf)
+{
+  if (!buf || !*buf)
+    return;
+
+  if (strcmp (buf, "oem")== 0 )
+    {
+      current_codepage = oem_cp;
+      SetFileApisToOEM ();
+      debug_printf ("File APIs set to OEM" );
+    }
+  else if (strcmp (buf, "ansi")== 0 )
+    {
+      current_codepage = ansi_cp;
+      SetFileApisToANSI ();
+      debug_printf ("File APIs set to ANSI" );
+    }
+  else
+    {
+      debug_printf ("Wrong codepage name: %s", buf );
     }
 }
 

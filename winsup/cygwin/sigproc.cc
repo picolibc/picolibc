@@ -1,6 +1,6 @@
 /* sigproc.cc: inter/intra signal and sub process handler
 
-   Copyright 1997, 1998, 1999, 2000 Cygnus Solutions.
+   Copyright 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
 
    Written by Christopher Faylor <cgf@cygnus.com>
 
@@ -1148,7 +1148,7 @@ wait_sig (VOID *)
 	      if (sig == SIGCHLD)
 		saw_sigchld = 1;
 
-	      if (sig > 0 && sig != SIGCONT && sig != SIGKILL && sig != SIGSTOP &&
+	      if (sig > 0 && sig != SIGKILL && sig != SIGSTOP &&
 		  (sigismember (& myself->getsigmask (), sig) ||
 		   myself->process_state & PID_STOPPED))
 		{

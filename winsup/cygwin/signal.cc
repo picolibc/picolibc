@@ -1,6 +1,6 @@
 /* signal.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
 
    Written by Steve Chamberlain of Cygnus Support, sac@cygnus.com
    Significant changes by Sergey Okhapkin <sos@prospect.com.ru>
@@ -262,7 +262,8 @@ sigaction (int sig, const struct sigaction *newact, struct sigaction *oldact)
 
   if (newact)
     {
-      if ((sig == SIGKILL || sig == SIGSTOP) && newact->sa_handler != SIG_DFL)
+      if ((sig == SIGKILL || sig == SIGSTOP || sig == SIGCONT) &&
+	  newact->sa_handler != SIG_DFL)
 	{
 	  set_errno (EINVAL);
 	  return -1;

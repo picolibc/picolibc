@@ -1,6 +1,6 @@
 /* dcrt0.cc -- essentially the main() for the Cygwin dll
 
-   Copyright 1996, 1997, 1998, 1999, 2000 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -793,7 +793,7 @@ dll_crt0_1 ()
       line = strcpy ((char *) alloca (strlen (line) + 1), line);
 
       if (current_codepage == oem_cp)
-	CharToOemA ( line, line );
+	CharToOemA (line, line);
 
       /* Scan the command line and build argv.  Expand wildcards if not
 	 called from another cygwin process. */

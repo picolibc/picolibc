@@ -1,3 +1,13 @@
+Sun Jan  7 22:59:37 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* pinfo.cc (codepage_init): Move function.
+	* environ.cc (codepage_init): To here.
+	* exceptoins.cc (SIG_NONMASKABLE): Remove SIGCONT from consideration
+	since it is supposed to be maskable.
+	* signal.cc (sigaction): Ditto.
+	* sigproc.cc (wait_sig): Ditto.
+	* winsup.h: Eliminate global declaration of codepage_init.
+
 Thu Jan  5  9:33:00  2001  Corinna Vinschen <corina@vinschen.de>
 
 	* resource.cc (getrlimit): Set errno on EFAULT instead of returning

@@ -1,6 +1,6 @@
 /* exceptions.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -547,7 +547,7 @@ stack (void)
 
 /* Utilities to call a user supplied exception handler.  */
 
-#define SIG_NONMASKABLE	(SIGTOMASK (SIGCONT) | SIGTOMASK (SIGKILL) | SIGTOMASK (SIGSTOP))
+#define SIG_NONMASKABLE	(SIGTOMASK (SIGKILL) | SIGTOMASK (SIGSTOP))
 
 #ifdef __i386__
 #define HAVE_CALL_HANDLER

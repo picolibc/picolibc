@@ -1,6 +1,6 @@
 /* pinfo.cc: process table support
 
-   Copyright 1996, 1997, 1998, 2000 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 2000, 2001 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -86,31 +86,6 @@ set_myself (pid_t pid, HANDLE h)
 
   return;
 }
-
-extern "C" void
-codepage_init (const char *buf)
-{
-  if (!buf || !*buf)
-    return;
-
-  if ( strcmp ( buf, "oem" ) == 0 )
-    {
-      current_codepage = oem_cp;
-      SetFileApisToOEM ();
-      debug_printf ( "File APIs set to OEM" );
-    }
-  else if ( strcmp ( buf, "ansi" ) == 0 )
-    {
-      current_codepage = ansi_cp;
-      SetFileApisToANSI ();
-      debug_printf ( "File APIs set to ANSI" );
-    }
-  else
-    {
-      debug_printf ( "Wrong codepage name: %s", buf );
-    }
-}
-
 
 /* Initialize the process table entry for the current task.
    This is not called for fork'd tasks, only exec'd ones.  */
@@ -339,7 +314,7 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
     /* Scan list of previously recorded pids to make sure that this pid hasn't
        shown up before.  This can happen when a process execs. */
     for (unsigned i = 0; i < nelem; i++)
-      if (pinfolist[i]->pid == pinfolist[nelem]->pid )
+      if (pinfolist[i]->pid == pinfolist[nelem]->pid)
 	{
 	  if ((_pinfo *) pinfolist[nelem] != (_pinfo *) myself)
 	    pinfolist[nelem].release ();
