@@ -1,3 +1,8 @@
+2003-09-11  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Tweak mingw libz.a detection to make it more reliably
+	detect when libz.a is not available.
+
 2003-09-11  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
 
 	* cygcheck.cc (dump_only): New global variable.

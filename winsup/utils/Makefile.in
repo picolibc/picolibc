@@ -40,10 +40,10 @@ libbfd:=${shell $(CC) -B$(bupdir2)/bfd/ --print-file-name=libbfd.a}
 libintl:=${shell $(CC) -B$(bupdir2)/intl/ --print-file-name=libintl.a}
 build_dumper:=${shell test -r $(libbfd) && test -r ${libintl} &&  echo 1}
 
-libz:=${shell $(CC) -mno-cygwin --print-file-name=libz.a}
-zlib_h:=-include ${patsubst %/lib/libz.a,%/include/zlib.h,$(libz)}
-zconf_h:=-include ${patsubst %/lib/libz.a,%/include/zconf.h,$(libz)}
-ifeq "${dir $(libz)}" "./"
+libz:=${shell x=$$($(CC) -mno-cygwin --print-file-name=libz.a); cd $$(dirname $$x); dir=$$(pwd); case "$$dir" in *mingw*) echo $$dir/libz.a ;; esac}
+zlib_h:=-include ${patsubst %/lib/mingw/libz.a,%/include/zlib.h,${patsubst %/lib/libz.a,%/include/zlib.h,$(libz)}}
+zconf_h:=${patsubst %/zlib.h,%/zconf.h,$(zlib_h)}
+ifeq "${libz}" ""
 zlib_h:=
 zconf_h:=
 libz:=
@@ -101,7 +101,7 @@ endif
 
 cygcheck.exe: cygcheck.o path.o dump_setup.o $(MINGW_DEP_LDLIBS)
 ifeq "$(libz)" ""
-	echo '*** Building cygcheck without package content checking due to missing mingw libz.a.'
+	@echo '*** Building cygcheck without package content checking due to missing mingw libz.a.'
 endif
 ifdef VERBOSE
 	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,3,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS) $(libz)
