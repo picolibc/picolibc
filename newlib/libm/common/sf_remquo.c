@@ -44,7 +44,7 @@
         int *quo;
 #endif
 {
-	return (double) remquof((float) x);
+	return (double) remquof((float) x, (float) y, quo);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

@@ -50,13 +50,13 @@
 #ifdef _DOUBLE_IS_32BITS
 
 #ifdef __STDC__
-	long int round(double x)
+	long int lround(double x)
 #else
-	long int round(x)
+	long int lround(x)
 	double x;
 #endif
 {
-	return (double) roundf((float) x);
+	return (double) lroundf((float) x);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

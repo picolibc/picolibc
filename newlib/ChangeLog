@@ -1,3 +1,9 @@
+2002-06-19  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* libm/common/sf_lround.c (round): Change name to: (lround).
+	* libm/common/sf_remquo.c (remquo): Pass all arguemnts to
+	remquof.
+
 2002-06-18  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* testsuite/lib/passfail.exp (newlib_pass_fail_all): New
