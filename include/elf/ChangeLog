@@ -1,3 +1,7 @@
+2002-10-11  Kaz Kojima  <kkojima@rr.iij4u.or.jp>
+
+	* sh.h: Add SH TLS relocs.
+
 2002-09-30  Gavin Romig-Koch  <gavin@redhat.com>
             Ken Raeburn  <raeburn@cygnus.com>
             Aldy Hernandez  <aldyh@redhat.com>
