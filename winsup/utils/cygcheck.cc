@@ -852,7 +852,7 @@ dump_sysinfo ()
   time_t now;
   char *found_cygwin_dll;
 
-  printf ("\nCygwin Win95/NT Configuration Diagnostics\n");
+  printf ("\nCygwin Configuration Diagnostics\n");
   time (&now);
   printf ("Current System Time: %s\n", ctime (&now));
 
