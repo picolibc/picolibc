@@ -26,9 +26,6 @@ details. */
 
 class NO_COPY strace strace;
 
-/* 'twould be nice to declare this in winsup.h but winsup.h doesn't require
-   stdarg.h, so we declare it here instead. */
-
 #ifndef NOSTRACE
 
 void
