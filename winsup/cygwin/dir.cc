@@ -343,6 +343,19 @@ rmdir (const char *dir)
       goto done;
     }
 
+  /* Is `dir' a directory? */
+  if (real_dir.file_attributes () == (DWORD) -1 ||
+      !(real_dir.file_attributes () & FILE_ATTRIBUTE_DIRECTORY))
+    {
+      set_errno (ENOTDIR);
+      goto done;
+    }
+
+  /* Even own directories can't be removed if R/O attribute is set. */
+  if (real_dir.file_attributes () & FILE_ATTRIBUTE_READONLY)
+    SetFileAttributes (real_dir.get_win32 (), real_dir.file_attributes () &
+    					      ~FILE_ATTRIBUTE_READONLY);
+
   if (RemoveDirectoryA (real_dir.get_win32 ()))
     {
       /* RemoveDirectory on a samba drive doesn't return an error if the
@@ -353,21 +366,24 @@ rmdir (const char *dir)
       else
 	res = 0;
     }
-  else if (GetLastError() == ERROR_ACCESS_DENIED)
-    {
-      /* Under Windows 9X or on a samba share, ERROR_ACCESS_DENIED is
-	 returned if you try to remove a file. On 9X the same error is
-	 returned if you try to remove a non-empty directory. */
-     if (real_dir.file_attributes () != (DWORD) -1 &&
-	 !(real_dir.file_attributes () & FILE_ATTRIBUTE_DIRECTORY))
-       set_errno (ENOTDIR);
-     else if (os_being_run != winNT)
-       set_errno (ENOTEMPTY);
-     else
-       __seterrno ();
-    }
   else
-    __seterrno ();
+    {
+      if (GetLastError() == ERROR_ACCESS_DENIED)
+        {
+	  /* On 9X ERROR_ACCESS_DENIED is returned if you try to remove
+	     a non-empty directory. */
+	  if (os_being_run != winNT)
+	    set_errno (ENOTEMPTY);
+	  else
+	    __seterrno ();
+	}
+      else
+	__seterrno ();
+
+      /* If directory still exists, restore R/O attribute. */
+      if (real_dir.file_attributes () & FILE_ATTRIBUTE_READONLY)
+	SetFileAttributes (real_dir.get_win32 (), real_dir.file_attributes ());
+    }
 
 done:
   syscall_printf ("%d = rmdir (%s)", res, dir);

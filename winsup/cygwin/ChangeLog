@@ -1,3 +1,8 @@
+Sat May 12 18:19:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* dir.cc (rmdir): Rearrange slightly to allow removing directories
+	even when R/O attribute is set.
+
 Fri May 11 16:53:38 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* external.cc (fillout_pinfo): Use correct pids.
