@@ -41,7 +41,7 @@ extern "C" {
 /*
  * If not debugging, assert does nothing.
  */
-#define assert(x)	((void)0);
+#define assert(x)	((void)0)
 
 #else /* debugging enabled */
 

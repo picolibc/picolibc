@@ -1,4 +1,9 @@
 
+Tue Jan 30 13:01:01  2001  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/assert.h: (assert): Remove ; from end of definition
+	Thanks to: AJ Reins <tbisp@qwest.net>
+
 Tue Jan 30 07:31:22  2001  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* include/time.h: (CLOCKS_PER_SEC): Type cast the constant.
