@@ -110,19 +110,19 @@ extern unsigned short** _imp___ctype;
 
 #if !(defined(__NO_CTYPE_INLINES) || defined(__WCTYPE_INLINES_DEFINED))
 #define __WCTYPE_INLINES_DEFINED
-extern inline int iswalnum(wint_t wc) {return (iswctype(wc,_ALPHA|_DIGIT));}
-extern inline int iswalpha(wint_t wc) {return (iswctype(wc,_ALPHA));}
-extern inline int iswascii(wint_t wc) {return (((unsigned)wc & 0x7F) ==0);}
-extern inline int iswcntrl(wint_t wc) {return (iswctype(wc,_CONTROL));}
-extern inline int iswdigit(wint_t wc) {return (iswctype(wc,_DIGIT));}
-extern inline int iswgraph(wint_t wc) {return (iswctype(wc,_PUNCT|_ALPHA|_DIGIT));}
-extern inline int iswlower(wint_t wc) {return (iswctype(wc,_LOWER));}
-extern inline int iswprint(wint_t wc) {return (iswctype(wc,_BLANK|_PUNCT|_ALPHA|_DIGIT));}
-extern inline int iswpunct(wint_t wc) {return (iswctype(wc,_PUNCT));}
-extern inline int iswspace(wint_t wc) {return (iswctype(wc,_SPACE));}
-extern inline int iswupper(wint_t wc) {return (iswctype(wc,_UPPER));}
-extern inline int iswxdigit(wint_t wc) {return (iswctype(wc,_HEX));}
-extern inline int isleadbyte(int c) {return (_pctype[(unsigned char)(c)] & _LEADBYTE);}
+extern __inline__ int iswalnum(wint_t wc) {return (iswctype(wc,_ALPHA|_DIGIT));}
+extern __inline__ int iswalpha(wint_t wc) {return (iswctype(wc,_ALPHA));}
+extern __inline__ int iswascii(wint_t wc) {return (((unsigned)wc & 0x7F) ==0);}
+extern __inline__ int iswcntrl(wint_t wc) {return (iswctype(wc,_CONTROL));}
+extern __inline__ int iswdigit(wint_t wc) {return (iswctype(wc,_DIGIT));}
+extern __inline__ int iswgraph(wint_t wc) {return (iswctype(wc,_PUNCT|_ALPHA|_DIGIT));}
+extern __inline__ int iswlower(wint_t wc) {return (iswctype(wc,_LOWER));}
+extern __inline__ int iswprint(wint_t wc) {return (iswctype(wc,_BLANK|_PUNCT|_ALPHA|_DIGIT));}
+extern __inline__ int iswpunct(wint_t wc) {return (iswctype(wc,_PUNCT));}
+extern __inline__ int iswspace(wint_t wc) {return (iswctype(wc,_SPACE));}
+extern __inline__ int iswupper(wint_t wc) {return (iswctype(wc,_UPPER));}
+extern __inline__ int iswxdigit(wint_t wc) {return (iswctype(wc,_HEX));}
+extern __inline__ int isleadbyte(int c) {return (_pctype[(unsigned char)(c)] & _LEADBYTE);}
 #endif /* !(defined(__NO_CTYPE_INLINES) || defined(__WCTYPE_INLINES_DEFINED)) */
 
 

@@ -254,7 +254,7 @@ typedef struct {
 
 #endif	/* !defined(__cplusplus) || defined(__STDC_FORMAT_MACROS) */
 
-extern inline intmax_t	imaxabs (intmax_t j)
+extern __inline__ intmax_t	imaxabs (intmax_t j)
 	{return	(j >= 0 ? j : -j);}
 imaxdiv_t imaxdiv (intmax_t numer, intmax_t denom);
 

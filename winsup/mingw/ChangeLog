@@ -1,3 +1,8 @@
+2002-05-21  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wctype.h: Replace 'inline' with '__inline__'.
+	* include/inttypes.h: Likewise.
+
 2002-05-16  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/_mingw.h (__MINGW_IMPORT): Put extern at start 
