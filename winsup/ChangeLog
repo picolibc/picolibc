@@ -1,3 +1,7 @@
+Wed Apr 18 18:45:07 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* configure.in: Add bz2lib.
+
 2001-03-19  DJ Delorie  <dj@redhat.com>
 
 	* configure: fix regeneration bug.
