@@ -849,8 +849,7 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
       if (th)
 	{
 	  interrupted = interrupt_on_return (th, sig, handler, siga);
-	  if (!interrupted)
-	    LeaveCriticalSection (&th->lock);
+	  LeaveCriticalSection (&th->lock);
 	}
       else if (interruptible (cx.Eip))
 	interrupted = interrupt_now (&cx, sig, handler, siga);
@@ -869,9 +868,6 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
       Sleep (0);		/* Hopefully, other process will be waking up soon. */
       sigproc_printf ("couldn't send signal %d", sig);
     }
-
-  if (th)
-    LeaveCriticalSection (&th->lock);
 
   if (!hth)
     sigproc_printf ("good.  Didn't suspend main thread, th %p", th);

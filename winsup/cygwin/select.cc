@@ -123,14 +123,6 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   fd_set *dummy_exceptfds = allocfd_set (maxfds);
   sigframe thisframe (mainthread);
 
-#if 0
-  if (n > FD_SETSIZE)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-#endif
-
   select_printf ("%d, %p, %p, %p, %p", maxfds, readfds, writefds, exceptfds, to);
 
   if (!readfds)
@@ -407,7 +399,7 @@ no_verify (select_record *, fd_set *, fd_set *, fd_set *)
 }
 
 static int
-peek_pipe (select_record *s, int ignra)
+peek_pipe (select_record *s, int ignra, HANDLE guard_mutex = NULL)
 {
   int n = 0;
   int gotone = 0;
@@ -454,8 +446,15 @@ peek_pipe (select_record *s, int ignra)
 	}
     }
 
-  if (fh->get_device() != FH_PIPEW &&
-      !PeekNamedPipe (h, NULL, 0, NULL, (DWORD *) &n, NULL))
+  if (fh->get_device () == FH_PIPEW)
+    /* nothing */;
+  else if (guard_mutex && WaitForSingleObject (guard_mutex, 0) != WAIT_OBJECT_0)
+    {
+      select_printf ("%s, couldn't get mutex %p, %E", fh->get_name (),
+	  	     guard_mutex);
+      n = 0;
+    }
+  else if (!PeekNamedPipe (h, NULL, 0, NULL, (DWORD *) &n, NULL))
     {
       select_printf ("%s, PeekNamedPipe failed, %E", fh->get_name ());
       n = -1;
@@ -496,8 +495,20 @@ poll_pipe (select_record *me, fd_set *readfds, fd_set *writefds,
 	 set_bits (me, readfds, writefds, exceptfds) :
 	 0;
 }
-
-MAKEready(pipe)
+int
+fhandler_pipe::ready_for_read (int fd, DWORD howlong, int ignra)
+{
+  select_record me (this);
+  me.fd = fd;
+  (void) select_read (&me);
+  while (!peek_pipe (&me, ignra, guard) && howlong == INFINITE)
+    if (fd >= 0 && cygheap->fdtab.not_open (fd))
+      break;
+    else if (WaitForSingleObject (signal_arrived, 10) == WAIT_OBJECT_0)
+      break;
+  select_printf ("returning %d", me.read_ready);
+  return me.read_ready;
+}
 
 static int start_thread_pipe (select_record *me, select_stuff *stuff);
 

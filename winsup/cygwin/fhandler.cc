@@ -1289,8 +1289,8 @@ fhandler_disk_file::open (path_conv& real_path, int flags, mode_t mode)
      which might return a valid HANDLE without having actually opened
      the file.
      The only known file system to date is the SUN NFS Solstice Client 3.1
-     which returns a valid handle when trying to open a file in a non
-     existant directory. */
+     which returns a valid handle when trying to open a file in a nonexistent
+     directory. */
   if (real_path.has_buggy_open ()
       && GetFileAttributes (win32_path_name) == (DWORD) -1)
     {
@@ -1491,23 +1491,6 @@ void
 fhandler_dev_null::dump (void)
 {
   paranoid_printf ("here");
-}
-
-/**********************************************************************/
-/* fhandler_pipe */
-
-fhandler_pipe::fhandler_pipe (const char *name, DWORD devtype) :
-	fhandler_base (devtype, name)
-{
-  set_cb (sizeof *this);
-}
-
-off_t
-fhandler_pipe::lseek (off_t offset, int whence)
-{
-  debug_printf ("(%d, %d)", offset, whence);
-  set_errno (ESPIPE);
-  return -1;
 }
 
 void

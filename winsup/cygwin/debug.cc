@@ -105,7 +105,6 @@ makethread (LPTHREAD_START_ROUTINE start, LPVOID param, DWORD flags,
 {
   DWORD tid;
   HANDLE h;
-  SECURITY_ATTRIBUTES *sa;
   thread_start *info;	/* Various information needed by the newly created thread */
 
   for (;;)
@@ -123,16 +122,9 @@ out:
   info->func = start;	/* Real function to start */
   info->arg = param;	/* The single parameter to the thread */
 
-  if (*name != '+')
-    sa = &sec_none_nih;	/* The handle should not be inherited by subprocesses. */
-  else
-    {
-      name++;
-      sa = &sec_none;	/* The handle should be inherited by subprocesses. */
-    }
-
-  if ((h = CreateThread (sa, 0, thread_stub, (VOID *) info, flags, &tid)))
-    regthread (name, tid);	/* Register this name/thread id for debugging output. */
+  if ((h = CreateThread (&sec_none_nih, 0, thread_stub, (VOID *) info, flags,
+	  		 &tid)))
+    regthread (name, tid);	/* Register for debugging output. */
 
   return h;
 }

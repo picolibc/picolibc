@@ -19,6 +19,60 @@ details. */
 #include "cygheap.h"
 #include "thread.h"
 
+fhandler_pipe::fhandler_pipe (const char *name, DWORD devtype) :
+	fhandler_base (devtype, name), guard (0)
+{
+  set_cb (sizeof *this);
+}
+
+off_t
+fhandler_pipe::lseek (off_t offset, int whence)
+{
+  debug_printf ("(%d, %d)", offset, whence);
+  set_errno (ESPIPE);
+  return -1;
+}
+
+void
+fhandler_pipe::set_close_on_exec (int val)
+{
+  this->fhandler_base::set_close_on_exec (val);
+  set_inheritance (guard, val);
+}
+
+int
+fhandler_pipe::read (void *in_ptr, size_t in_len)
+{
+  int res = this->fhandler_base::read (in_ptr, in_len);
+  ReleaseMutex (guard);
+  return res;
+}
+
+int fhandler_pipe::close ()
+{
+  int res = this->fhandler_base::close ();
+  if (guard)
+    CloseHandle (guard);
+  return res;
+}
+
+int
+fhandler_pipe::dup (fhandler_base *child)
+{
+  int res = this->fhandler_base::dup (child);
+  if (res)
+    return res;
+
+  fhandler_pipe *ftp = (fhandler_pipe *) child;
+
+  if (guard == NULL)
+    ftp->guard = NULL;
+  else if (!DuplicateHandle (hMainProc, guard, hMainProc, &ftp->guard, 0, 1,
+			     DUPLICATE_SAME_ACCESS))
+    return -1;
+  return 0;
+}
+
 static int
 make_pipe (int fildes[2], unsigned int psize, int mode)
 {
@@ -53,6 +107,7 @@ make_pipe (int fildes[2], unsigned int psize, int mode)
       fildes[1] = fdw;
 
       res = 0;
+      fhr->create_guard (sa);
     }
 
   syscall_printf ("%d = make_pipe ([%d, %d], %d, %p)", res, fdr, fdw, psize, mode);

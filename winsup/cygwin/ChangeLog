@@ -1,3 +1,26 @@
+Sat Sep 22 12:44:57 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (setup_handler): Always relinquish lock after we've
+	interrupted.
+	* fhandler.cc: Move pipe methods to pipe.cc.
+	* fhandler.h (fhandler_pipe): Add new methods.
+	* fork.cc (sync_with_parent): Make error messages more informative.
+	* pipe.cc (fhandler_pipe::fhandler_pipe): Move here from fhandler.cc.
+	(fhandler_pipe::lseek): Ditto.
+	(fhandler_pipe::set_close_on_exec): New method.
+	(fhandler_pipe::read): Ditto.
+	(fhandler_pipe::close): Ditto.
+	(fhandler_pipe::dup): Ditto.
+	(make_pipe): Create the guard mutex on the read side of the pipe.
+	* select.cc (peek_pipe): Use guard_mutex to discover if we have the
+	right to read on this pipe.
+	(fhandler_pipe::readh_for_read): Pass the read pipe guard mutex to
+	peek_pipe.
+	* syscalls.cc (_read): Always detect signal catchers, for now.
+
+	* debug.cc (makethread): Eliminate hack to make thread inheritable.
+	* sigproc.cc (subproc_init): Don't use hack to make thread inheritable.
+
 Thu Sep 20 16:48:44 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler.cc (fhandler_base::set_inheritance): Just use

@@ -295,7 +295,7 @@ _read (int fd, void *ptr, size_t len)
       /* Could block, so let user know we at least got here.  */
       syscall_printf ("read (%d, %p, %d) %sblocking, sigcatchers %d", fd, ptr, len, wait ? "" : "non", sigcatchers);
 
-      if (wait && (!sigcatchers || !fh->is_slow () || fh->get_r_no_interrupt ()))
+      if (wait && (/*!sigcatchers || */!fh->is_slow () || fh->get_r_no_interrupt ()))
 	debug_printf ("non-interruptible read\n");
       else if (!fh->ready_for_read (fd, wait, 0))
 	{

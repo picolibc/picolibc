@@ -435,17 +435,20 @@ public:
 
 class fhandler_pipe: public fhandler_base
 {
+  HANDLE guard;
 public:
   fhandler_pipe (const char *name = 0, DWORD devtype = FH_PIPE);
   off_t lseek (off_t offset, int whence);
-  /* This strange test is due to the fact that we can't rely on
-     Windows shells to "do the right thing" with pipes.  Apparently
-     the can keep one end of the pipe open when it shouldn't be. */
   BOOL is_slow () {return !wincap.has_unreliable_pipes ();}
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
   int ready_for_read (int fd, DWORD howlong, int ignra);
+  void set_close_on_exec (int val);
+  int read (void *ptr, size_t len);
+  int close ();
+  void create_guard (SECURITY_ATTRIBUTES *sa) {guard = CreateMutex (sa, FALSE, NULL);}
+  int dup (fhandler_base *child);
 };
 
 class fhandler_dev_raw: public fhandler_base

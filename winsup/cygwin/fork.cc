@@ -198,7 +198,7 @@ sync_with_parent(const char *s, bool hang_self)
   debug_printf ("signalling parent: %s", s);
   /* Tell our parent we're waiting. */
   if (!SetEvent (child_proc_info->subproc_ready))
-    api_fatal ("fork child - SetEvent failed, %E");
+    api_fatal ("fork child - SetEvent for %s failed, %E", s);
   if (hang_self)
     {
       HANDLE h = child_proc_info->forker_finished;
@@ -210,13 +210,14 @@ sync_with_parent(const char *s, bool hang_self)
       switch (psync_rc)
 	{
 	case WAIT_TIMEOUT:
-	  api_fatal ("WFSO timed out");
+	  api_fatal ("WFSO timed out for %s", s);
 	  break;
 	case WAIT_FAILED:
 	  if (GetLastError () == ERROR_INVALID_HANDLE &&
 	      WaitForSingleObject (child_proc_info->forker_finished, 1) != WAIT_FAILED)
 	    break;
-	  api_fatal ("WFSO failed, fork_finished %p, %E", child_proc_info->forker_finished);
+	  api_fatal ("WFSO failed for %s, fork_finished %p, %E", s,
+	      	     child_proc_info->forker_finished);
 	  break;
 	default:
 	  debug_printf ("no problems");

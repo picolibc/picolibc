@@ -819,7 +819,7 @@ subproc_init (void)
    * the hchildren array.
    */
   events[0] = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
-  if (!(hwait_subproc = makethread (wait_subproc, NULL, 0, "+proc")))
+  if (!(hwait_subproc = makethread (wait_subproc, NULL, 0, "proc")))
     system_printf ("cannot create wait_subproc thread, %E");
   ProtectHandle (events[0]);
   ProtectHandle (hwait_subproc);
