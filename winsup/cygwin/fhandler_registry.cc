@@ -266,8 +266,7 @@ retry:
     {
       RegCloseKey ((HKEY) dir->__d_u.__d_data.__handle);
       dir->__d_u.__d_data.__handle = INVALID_HANDLE_VALUE;
-      if (error != ERROR_NO_MORE_ITEMS)
-	seterrno_from_win_error (__FILE__, __LINE__, error);
+      seterrno_from_win_error (__FILE__, __LINE__, error);
       goto out;
     }
 

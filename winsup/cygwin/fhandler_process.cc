@@ -149,7 +149,10 @@ struct dirent *
 fhandler_process::readdir (DIR * dir)
 {
   if (dir->__d_position >= PROCESS_LINK_COUNT)
-    return NULL;
+    {
+      set_errno (ENMFILE);
+      return NULL;
+    }
   strcpy (dir->__d_dirent->d_name, process_listing[dir->__d_position++]);
   syscall_printf ("%p = readdir (%p) (%s)", &dir->__d_dirent, dir,
 		  dir->__d_dirent->d_name);

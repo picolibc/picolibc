@@ -216,6 +216,7 @@ fhandler_proc::readdir (DIR * dir)
 	    }
 	  found++;
 	}
+      set_errno (ENMFILE);
       return NULL;
     }
 
