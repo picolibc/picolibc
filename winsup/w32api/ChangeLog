@@ -1,3 +1,8 @@
+Tue Sep  4 14:15:59 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* winbase.h: Add missing closing parentheses to
+	InterlockedExchangePointer declaration.
+
 2001-09-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/shlobj.h (CFSTR_* ): Add new defines.

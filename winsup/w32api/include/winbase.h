@@ -1319,7 +1319,7 @@ LONG WINAPI InterlockedDecrement(LPLONG);
 LONG WINAPI InterlockedExchange(LPLONG,LONG);
 /* PVOID WINAPI InterlockedExchangePointer(PVOID*,PVOID); */
 #define InterlockedExchangePointer(t,v) \
-    (PVOID)InterlockedExchange((LPLONG)(t),(LONG)(v)
+    (PVOID)InterlockedExchange((LPLONG)(t),(LONG)(v))
 LONG WINAPI InterlockedExchangeAdd(PLONG,LONG);
 LONG WINAPI InterlockedIncrement(LPLONG);
 BOOL WINAPI IsBadCodePtr(FARPROC);
