@@ -1,3 +1,12 @@
+2003-09-25  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/winuser.h [WINVER >= 0x0500] (GetGUIThreadInfo,
+	LPGUITHREADINFO): Add function and associated typedef...
+
+	* include/winable.h [WINVER < 0x0500] (GetGUIThreadInfo,
+	LPGUITHREADINFO): ...and duplicate them in <winable.h> as
+	seems to be required on older versions of Windows.
+
 2003-09-24  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/GL/glu.h (gluErrorUnicodeStringWIN): Add macro
