@@ -1,3 +1,10 @@
+2003-05-03  Chris Demetriou  <cgd@broadcom.com>
+
+	2003-04-29  Gerald Pfeifer  <pfeifer@dbai.tuwien.ac.at>
+	* Makefile.tpl (MAKEINFOFLAGS): Use --no-split instead of
+	--split-size.
+	* Makefile.in: Regenerate.
+
 2003-04-27  Daniel Jacobowitz  <drow@mvista.com>
 
 	* src-release (DEVO_SUPPORT): Add src-release, Makefile.tpl,

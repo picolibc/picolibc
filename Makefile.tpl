@@ -206,8 +206,8 @@ USUAL_MAKEINFO = `if [ -f $$r/texinfo/makeinfo/makeinfo ] ; \
 # This just becomes part of the MAKEINFO definition passed down to
 # sub-makes.  It lets flags be given on the command line while still
 # using the makeinfo from the object tree.
-# (Default to avoid splitting info files by setting the threshold high.)
-MAKEINFOFLAGS = --split-size=5000000
+# (Default to avoid splitting info files.)
+MAKEINFOFLAGS = --no-split
 
 EXPECT = `if [ -f $$r/expect/expect ] ; \
 	then echo $$r/expect/expect ; \
