@@ -60,6 +60,8 @@ QUICKREF
 	strtok ansi impure
 */
 
+/* undef STRICT_ANSI so that strtok_r prototype will be defined */
+#undef  __STRICT_ANSI__
 #include <string.h>
 #include <_ansi.h>
 #include <reent.h>

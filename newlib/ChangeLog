@@ -1,5 +1,10 @@
 2001-03-02  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/string/strtok.c: Add #undef of __STRICT_ANSI__ so prototype
+	of strtok_r is always defined.
+
+2001-03-02  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/machine/ansi.h: New dummy header file.
 
 2001-02-22  Jeff Johnston  <jjohnstn@redhat.com>
