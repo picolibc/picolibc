@@ -1936,8 +1936,8 @@ static void do_check_malloced_chunk(p, s) mchunkptr p; INTERNAL_SIZE_T s;
 {                                                                             \
   BK = P->bk;                                                                 \
   FD = P->fd;                                                                 \
-  if (FD) FD->bk = BK;                                                        \
-  if (BK) BK->fd = FD;                                                        \
+  FD->bk = BK;                                                        \
+  BK->fd = FD;                                                        \
 }                                                                             \
 
 /* Place p as the last remainder */

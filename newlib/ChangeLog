@@ -1,3 +1,7 @@
+2003-02-19  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/stdlib/mallocr.c (unlink): Revert 02/18 fix.
+
 2003-02-18  Christian Groessler  <chris@groessler.org>
 
 	* libc/machine/z8k/setjmp.S (_setjmp / _longjmp): Fix to
