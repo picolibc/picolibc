@@ -1,3 +1,9 @@
+2001-09-11  Danny Smith  <dannysmith@users.sourceforge.net>
+
+ 	* include/winnt.h (_[U]LARGE_INTEGER): Protect nameless struct with
+	!defined(NONAMELESSUNION), rather than defined(_ANONYMOUS_STRUCT).
+	(_REPARSE_DATA_BUFFER): Name union field DUMMYUNIONNAME.
+
 2001-09-05  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wininet.h (InternetAutodial): Add prototype. 

@@ -1705,12 +1705,12 @@ typedef union _LARGE_INTEGER {
     DWORD LowPart;
     LONG  HighPart;
   } u;
-#if defined(_ANONYMOUS_STRUCT) || defined(__cplusplus)
+#if ! defined(NONAMELESSUNION) || defined(__cplusplus)
   struct {
     DWORD LowPart;
     LONG  HighPart;
   };
-#endif /* _ANONYMOUS_STRUCT */
+#endif /* NONAMELESSUNION */
   LONGLONG QuadPart;
 } LARGE_INTEGER, *PLARGE_INTEGER;
 typedef union _ULARGE_INTEGER {
@@ -1718,12 +1718,12 @@ typedef union _ULARGE_INTEGER {
     DWORD LowPart;
     DWORD HighPart;
   } u;
-#if defined(_ANONYMOUS_STRUCT) || defined(__cplusplus)
+#if ! defined(NONAMELESSUNION) || defined(__cplusplus)
   struct {
     DWORD LowPart;
     DWORD HighPart;
   };
-#endif /* _ANONYMOUS_STRUCT */
+#endif /* NONAMELESSUNION */
   ULONGLONG QuadPart;
 } ULARGE_INTEGER, *PULARGE_INTEGER;
 typedef LARGE_INTEGER LUID,*PLUID;
@@ -2502,7 +2502,7 @@ typedef struct _REPARSE_DATA_BUFFER {
 		struct {
 			BYTE   DataBuffer[1];
 		} GenericReparseBuffer;
-	};
+	} DUMMYUNIONNAME;
 } REPARSE_DATA_BUFFER, *PREPARSE_DATA_BUFFER;
 typedef struct _REPARSE_GUID_DATA_BUFFER {
 	DWORD  ReparseTag;
