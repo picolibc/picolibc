@@ -358,7 +358,7 @@ proc_subproc (DWORD what, DWORD val)
 	      w->next->pid = 0;
 	      if (clearing)
 		w->next->status = -1;		/* flag that a signal was received */
-	      else
+	      else if (!(w->next->options & WNOHANG))
 		w->next->ev = NULL;
 	      if (!SetEvent (oldw))
 		system_printf ("couldn't wake up wait event %p, %E", oldw);
@@ -1004,7 +1004,7 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
   BOOL terminated;
 
   if ((terminated = child->process_state == PID_ZOMBIE) ||
-      (w->options & WUNTRACED) && child->stopsig)
+      ((w->options & WUNTRACED) && child->stopsig))
     {
       parent_w->next = w->next;	/* successful wait.  remove from wait queue */
       w->pid = child->pid;

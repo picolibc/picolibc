@@ -1,3 +1,7 @@
+Mon Oct 23 12:44:35 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.cc (proc_subproc): Correctly handle flags for WNOHANG case.
+
 Mon Oct 23 10:00:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* security.cc: Eliminate C++ comments throughout.
