@@ -1,3 +1,9 @@
+2004-06-05  Luke Dunstan  <infidel@users.sourceforge.net>
+
+	* include/winbase.h (GetWriteWatch): Correct prototype.
+	(WRITE_WATCH_FLAG_RESET): Define.
+	Thanks to Sergey Philippov <phis@users.sourceforge.net>.
+
 2004-06-02  Rocher Laurent  <lrocher@users.sourceforge.net>
 
 	* include/commctrl.h (Animate_OpenEx): Define.
