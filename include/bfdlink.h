@@ -303,9 +303,9 @@ struct bfd_link_info
   unsigned int noexecstack: 1;
 
   /* What to do with unresolved symbols in an object file.
-     When producing static binaries the default is GENERATE_ERROR.
-     When producing dynamic binaries the default is IGNORE.  The
-     assumption with dynamic binaries is that the reference will be
+     When producing executables the default is GENERATE_ERROR.
+     When producing shared libraries the default is IGNORE.  The
+     assumption with shared libraries is that the reference will be
      resolved at load/execution time.  */
   enum report_method unresolved_syms_in_objects;
 
