@@ -96,8 +96,7 @@ START_RELOC_NUMBERS (elf_ppc_reloc_type)
    that may still be in object files.  */
   RELOC_NUMBER (R_PPC_TOC16, 255)
 
-  EMPTY_RELOC (R_PPC_max)
-END_RELOC_NUMBERS
+END_RELOC_NUMBERS (R_PPC_max)
 
 
 /* Processor specific flags for the ELF header e_flags field.  */

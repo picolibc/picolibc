@@ -36,8 +36,7 @@ START_RELOC_NUMBERS (elf_mn10300_reloc_type)
   RELOC_NUMBER (R_MN10300_GNU_VTINHERIT, 7)
   RELOC_NUMBER (R_MN10300_GNU_VTENTRY, 8)
   RELOC_NUMBER (R_MN10300_24, 9)
-  EMPTY_RELOC  (R_MN10300_MAX)
-END_RELOC_NUMBERS
+END_RELOC_NUMBERS (R_MN10300_MAX)
 
 /* Machine variant if we know it.  This field was invented at Cygnus,
    but it is hoped that other vendors will adopt it.  If some standard

@@ -1,3 +1,38 @@
+2000-06-06  Alan Modra  <alan@linuxcare.com.au>
+
+	* reloc-macros.h (START_RELOC_NUMBERS): Don't define initial dummy
+	-1 valued enum.
+	(RELOC_NUMBER, FAKE_RELOC, EMPTY_RELOC): Append rather than
+	prepend comma.
+	(END_RELOC_NUMBERS): Give macro an arg to define as last enum.
+
+	* alpha.h (R_ALPHA_max): Define via END_RELOC_NUMBERS rather than
+	with EMPTY_RELOC.
+	* arc.h (R_ARC_max): Likewise.
+	* avr.h (R_AVR_max): Likewise.
+	* fr30.h (R_FR30_max): Likewise.
+	* hppa.h (R_PARISC_UNIMPLEMENTED): Likewise.
+	* i960.h (R_960_max): Likewise.
+	* m32r.h (R_M32R_max): Likewise.
+	* m68k.h (R_68K_max): Likewise.
+	* mcore.h (R_MCORE_max): Likewise.
+	* mn10300.h (R_MN10300_MAX): Likewise.
+	* pj.h (R_PJ_max): Likewise.
+	* ppc.h (R_PPC_max): Likewise.
+	* sh.h (R_SH_max): Likewise.
+	* sparc.h (R_SPARC_max): Likewise.
+	* v850.h (R_V850_max): Likewise.
+
+	* arm.h (R_ARM_max): Define via END_RELOC_NUMBERS.
+	* d10v.h (R_D10V_max): Likewise.
+	* d30v.h (R_D30V_max): Likewise.
+	* ia64.h (R_IA64_max): Likewise.
+	* mips.h (R_MIPS_maxext): Likewise.
+	* mn10200.h (R_MN10200_max): Likewise.
+
+	* i386.h (R_386_max): Remove old RELOC_NUMBER definition, and
+	define via END_RELOC_NUMBERS.
+
 2000-06-03  Alan Modra  <alan@linuxcare.com.au>
 
 	* reloc-macros.h (START_RELOC_NUMBERS): Fix name clash for

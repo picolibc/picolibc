@@ -77,9 +77,7 @@ START_RELOC_NUMBERS (v850_reloc_type)
 /* END CYGNUS LOCAL */
      RELOC_NUMBER (R_V850_GNU_VTINHERIT, 23)
      RELOC_NUMBER (R_V850_GNU_VTENTRY, 24)
-
-     EMPTY_RELOC (R_V850_max)
-END_RELOC_NUMBERS
+END_RELOC_NUMBERS (R_V850_max)
 
 
 /* Processor specific section indices.  These sections do not actually

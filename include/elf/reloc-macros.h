@@ -27,20 +27,20 @@
    	START_RELOC_NUMBERS (foo)
    	    RELOC_NUMBER (R_foo_NONE,    0)
    	    RELOC_NUMBER (R_foo_32,      1)
-   	    FAKE_RELOC   (R_foo_illegal, 2)
-   	    EMPTY_RELOC  (R_foo_max)
-   	END_RELOC_NUMBERS
+   	    EMPTY_RELOC  (R_foo_good)
+   	    FAKE_RELOC   (R_foo_illegal, 9)
+   	END_RELOC_NUMBERS (R_foo_count)
 
    Then the following will be produced by default (ie if
    RELOC_MACROS_GEN_FUNC is *not* defined).
 
    	enum foo
 	{
-	  foo = -1,
    	  R_foo_NONE = 0,
    	  R_foo_32 = 1,
-   	  R_foo_illegal = 2,
-   	  R_foo_max
+	  R_foo_good,
+   	  R_foo_illegal = 9,
+   	  R_foo_count
    	};
 
    If RELOC_MACROS_GEN_FUNC *is* defined, then instead the
@@ -87,7 +87,7 @@ name (rtype)							\
 #define FAKE_RELOC(name, number)
 #define EMPTY_RELOC(name)
 
-#define END_RELOC_NUMBERS	\
+#define END_RELOC_NUMBERS(name)	\
     default: return NULL;	\
   }				\
 }
@@ -95,21 +95,11 @@ name (rtype)							\
 
 #else /* Default to generating enum.  */
 
-/* Some compilers cannot cope with an enum that ends with a trailing
-   comma, so START_RELOC_NUMBERS creates a fake reloc entry, (initialised
-   to -1 so that the first real entry will still default to 0).  Further
-   entries then prepend a comma to their definitions, creating a list
-   of enumerator entries that will satisfy these compilers.  */
-#if defined (__STDC__) || defined (ALMOST_STDC)
-#define START_RELOC_NUMBERS(name)   enum name { _##name = -1
-#else
-#define START_RELOC_NUMBERS(name)   enum name { _/**/name = -1
-#endif
-
-#define RELOC_NUMBER(name, number)  , name = number
-#define FAKE_RELOC(name, number)    , name = number
-#define EMPTY_RELOC(name)           , name
-#define END_RELOC_NUMBERS           };
+#define START_RELOC_NUMBERS(name)   enum name {
+#define RELOC_NUMBER(name, number)  name = number,
+#define FAKE_RELOC(name, number)    name = number,
+#define EMPTY_RELOC(name)           name,
+#define END_RELOC_NUMBERS(name)     name };
 
 #endif
 

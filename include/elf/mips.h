@@ -84,7 +84,7 @@ START_RELOC_NUMBERS (elf_mips_reloc_type)
   /* These are GNU extensions to enable C++ vtable garbage collection.  */
   RELOC_NUMBER (R_MIPS_GNU_VTINHERIT, 253)
   RELOC_NUMBER (R_MIPS_GNU_VTENTRY, 254)
-END_RELOC_NUMBERS
+END_RELOC_NUMBERS (R_MIPS_maxext)
 
 /* Processor specific flags for the ELF header e_flags field.  */
 

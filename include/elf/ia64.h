@@ -167,6 +167,6 @@ START_RELOC_NUMBERS (elf_ia64_reloc_type)
   RELOC_NUMBER (R_IA64_LTOFF_TP22, 0x9a) /* @ltoff(sym-TP+add), add imm22 ## */
 
   FAKE_RELOC (R_IA64_MAX_RELOC_CODE, 0x9a)
-END_RELOC_NUMBERS
+END_RELOC_NUMBERS (R_IA64_max)
 
 #endif /* _ELF_IA64_H */
