@@ -193,6 +193,9 @@ case "${host_cpu}" in
   thumb)
 	machine_dir=arm
 	;;
+  tic4x|c4x)
+	machine_dir=tic4x
+	;;
   tic80*)
 	machine_dir=tic80
 	;;

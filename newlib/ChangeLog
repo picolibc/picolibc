@@ -1,3 +1,15 @@
+2004-02-02  Joel Sherrill  <joel@oarcorp.com>
+
+	* configure.host: Add support for tic4x.
+	* libc/include/machine/ieeefp.h: Ditto.
+	* libc/include/machine/setjmp.h: Ditto.
+	* libc/machine/tic4x/Makefile.am: New file.
+	* libc/machine/tic4x/configure.in: Ditto.
+	* libc/machine/tic4x/setjmp.S: Ditto.
+	* libc/machine/tic4x/aclocal.m4: Generated.
+	* libc/machine/tic4x/configure: Ditto.
+	* libc/machine/tic4x/Makefile.in: Ditto.
+
 2004-01-30  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/fwalk.c (_fwalk.c): Don't traverse the

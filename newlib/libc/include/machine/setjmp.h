@@ -149,6 +149,13 @@ typedef int jmp_buf[_JBLEN];
 #define _JBLEN 16
 #endif
 
+#if defined(_C4x)
+#define _JBLEN 10
+#endif
+#if defined(_C3x)
+#define _JBLEN 9
+#endif
+
 #ifdef __TIC80__
 #define _JBLEN 13
 #endif
