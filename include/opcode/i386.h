@@ -98,11 +98,13 @@ static const template i386_optab[] =
    are set to an implementation defined value (on the Pentium Pro,
    the implementation defined value is zero).  */
 { "mov",   2,	0x8c, X, 0,	 wl_Suf|Modrm,			{ SReg2, WordReg|InvMem, 0 } },
-{ "mov",   2,	0x8c, X, 0,	 wl_Suf|Modrm|IgnoreSize,	{ SReg2, WordMem, 0 } },
+{ "mov",   2,	0x8c, X, 0,	 w_Suf|Modrm|IgnoreSize,	{ SReg2, WordMem, 0 } },
 { "mov",   2,	0x8c, X, Cpu386, wl_Suf|Modrm,			{ SReg3, WordReg|InvMem, 0 } },
-{ "mov",   2,	0x8c, X, Cpu386, wl_Suf|Modrm|IgnoreSize,	{ SReg3, WordMem, 0 } },
-{ "mov",   2,	0x8e, X, 0,	 wl_Suf|Modrm|IgnoreSize,	{ WordReg|WordMem, SReg2, 0 } },
-{ "mov",   2,	0x8e, X, Cpu386, wl_Suf|Modrm|IgnoreSize,	{ WordReg|WordMem, SReg3, 0 } },
+{ "mov",   2,	0x8c, X, Cpu386, w_Suf|Modrm|IgnoreSize,	{ SReg3, WordMem, 0 } },
+{ "mov",   2,	0x8e, X, 0,	 wl_Suf|Modrm|IgnoreSize,	{ WordReg, SReg2, 0 } },
+{ "mov",   2,	0x8e, X, 0,	 w_Suf|Modrm|IgnoreSize,	{ WordMem, SReg2, 0 } },
+{ "mov",   2,	0x8e, X, Cpu386, wl_Suf|Modrm|IgnoreSize,	{ WordReg, SReg3, 0 } },
+{ "mov",   2,	0x8e, X, Cpu386, w_Suf|Modrm|IgnoreSize,	{ WordMem, SReg3, 0 } },
 /* Move to/from control debug registers.  In the 16 or 32bit modes they are 32bit.  In the 64bit
    mode they are 64bit.*/
 { "mov",   2, 0x0f20, X, Cpu386|CpuNo64, l_Suf|D|Modrm|IgnoreSize,{ Control, Reg32|InvMem, 0} },
@@ -1003,6 +1005,10 @@ static const template i386_optab[] =
 {"movq",   2,	0x88, X, Cpu64,	 NoSuf|D|W|Modrm|Size64,{ Reg64, Reg64|AnyMem, 0 } },
 {"movq",   2,	0xc6, 0, Cpu64,	 NoSuf|W|Modrm|Size64,	{ Imm32S, Reg64|WordMem, 0 } },
 {"movq",   2,	0xb0, X, Cpu64,	 NoSuf|W|ShortForm|Size64,{ Imm64, Reg64, 0 } },
+/* The segment register moves accept Reg64 so that a segment register
+   can be copied to a 64 bit register, and vice versa.  */
+{"movq",   2,	0x8c, X, Cpu64,  NoSuf|Modrm|Size64,	{ SReg2|SReg3, Reg64|InvMem, 0 } },
+{"movq",   2,	0x8e, X, Cpu64,	 NoSuf|Modrm|Size64,	{ Reg64, SReg2|SReg3, 0 } },
 /* Move to/from control debug registers.  In the 16 or 32bit modes they are 32bit.  In the 64bit
    mode they are 64bit.*/
 {"movq",   2, 0x0f20, X, Cpu64,	 NoSuf|D|Modrm|IgnoreSize|NoRex64|Size64,{ Control, Reg64|InvMem, 0} },

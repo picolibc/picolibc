@@ -1,3 +1,9 @@
+2005-03-29  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* i386.h (i386_optab): Don't allow the `l' suffix for moving
+	moving between memory and segment register. Allow movq for
+	moving between general-purpose register and segment register.
+
 2005-02-09  Jan Beulich  <jbeulich@novell.com>
 
 	PR gas/707
