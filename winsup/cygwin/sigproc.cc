@@ -103,10 +103,13 @@ Static HANDLE wait_sig_inited = NULL;	// Control synchronization of
  */
 Static HANDLE events[PSIZE + 1] = {0};  // All my children's handles++
 #define hchildren (events + 1)		// Where the children handles begin
-Static pinfo pchildren[PSIZE];		// All my children info
+Static char cpchildren[PSIZE * sizeof (pinfo)];		// All my children info
 Static int nchildren = 0;		// Number of active children
-Static pinfo zombies[NZOMBIES];		// All my deceased children info
+Static char czombies[NZOMBIES * sizeof (pinfo)];		// All my deceased children info
 Static int nzombies = 0;		// Number of deceased children
+
+#define pchildren ((pinfo *) cpchildren)
+#define zombies ((pinfo *) czombies)
 
 Static waitq waitq_head = {0, 0, 0, 0, 0, 0, 0};// Start of queue for wait'ing threads
 Static waitq waitq_main;		// Storage for main thread
@@ -939,8 +942,8 @@ getsem (_pinfo *p, const char *str, int init, int max)
       char sa_buf[1024];
 
       DWORD winpid = GetCurrentProcessId ();
-      h = CreateSemaphore (allow_ntsec ? sec_user_nih (sa_buf) : &sec_none_nih,
-			   init, max, str = shared_name (str, winpid));
+      h = CreateSemaphore (sec_user_nih (sa_buf), init, max,
+			   str = shared_name (str, winpid));
       p = myself;
       if (!h)
 	{

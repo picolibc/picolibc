@@ -237,11 +237,8 @@ get_null_sd ()
 }
 
 PSECURITY_ATTRIBUTES __stdcall
-sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
+__sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
 {
-  if (!sa_buf)
-    return inherit ? &sec_none : &sec_none_nih;
-
   PSECURITY_ATTRIBUTES psa = (PSECURITY_ATTRIBUTES) sa_buf;
   PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR)
 			     ((char *) sa_buf + sizeof (*psa));
@@ -313,10 +310,4 @@ sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
   psa->lpSecurityDescriptor = psd;
   psa->bInheritHandle = inherit;
   return psa;
-}
-
-SECURITY_ATTRIBUTES *__stdcall
-sec_user_nih (PVOID sa_buf, PSID sid2)
-{
-  return sec_user (sa_buf, sid2, FALSE);
 }

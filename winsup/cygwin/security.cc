@@ -726,7 +726,7 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
   source.SourceIdentifier.HighPart = 0;
   source.SourceIdentifier.LowPart = 0x0101;
 
-  HANDLE token;
+  HANDLE token = INVALID_HANDLE_VALUE;
   HANDLE primary_token = INVALID_HANDLE_VALUE;
 
   HANDLE my_token = INVALID_HANDLE_VALUE;

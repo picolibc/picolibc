@@ -199,8 +199,20 @@ SECURITY_DESCRIPTOR *__stdcall get_null_sd (void);
 
 /* Various types of security attributes for use in Create* functions. */
 extern SECURITY_ATTRIBUTES sec_none, sec_none_nih, sec_all, sec_all_nih;
-extern SECURITY_ATTRIBUTES *__stdcall sec_user (PVOID sa_buf, PSID sid2 = NULL, BOOL inherit = TRUE);
-extern SECURITY_ATTRIBUTES *__stdcall sec_user_nih (PVOID sa_buf, PSID sid2 = NULL);
+extern SECURITY_ATTRIBUTES *__stdcall __sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
+  __attribute__ ((regparm (3)));
 
 int __stdcall NTReadEA (const char *file, const char *attrname, char *buf, int len);
 BOOL __stdcall NTWriteEA (const char *file, const char *attrname, const char *buf, int len);
+
+extern inline SECURITY_ATTRIBUTES *
+sec_user_nih (char sa_buf[], PSID sid = NULL)
+{
+  return allow_ntsec ? __sec_user (sa_buf, sid, FALSE) : &sec_none_nih;
+}
+
+extern inline SECURITY_ATTRIBUTES *
+sec_user (char sa_buf[], PSID sid = NULL)
+{
+  return allow_ntsec ? __sec_user (sa_buf, sid, TRUE) : &sec_none_nih;
+}

@@ -1,3 +1,22 @@
+2002-02-19  Christopher Faylor  <cgf@redhat.com>
+
+	* fork.cc (fork_parent): Use sec_user_nih to control process/thread
+	inheritance/permission.
+	* spawn.cc (spawn_guts): Ditto.
+	* security.cc (create_token): Initialize token so that it is not tested
+	for bogus value later.  Use sec_user to control process/thread
+	creation.
+	* security.h (__sec_user): Rename declaration from sec_user.
+	(sec_user_nih): Declare here as inline function wrapper for __sec_user.
+	(sec_user): Ditto.
+	* sigproc.cc (czombies): Allocate a character array for zombies to
+	avoid constructor overhead
+	(extremely hackish, I know).
+	(cpchildren): Ditto.
+	(pchildren): New define.
+	(zombies): Ditto.
+	(getsem): Use sec_user_nih to control semaphore inheritance/permission.
+
 2002-02-16  Christopher Faylor  <cgf@redhat.com>
 
 	* times.cc (hires::prime): Restore thread priority on failure
