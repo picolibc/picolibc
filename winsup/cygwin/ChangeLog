@@ -1,3 +1,8 @@
+2001-04-02  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+
+	* fhandler.cc (fhandler_disk_file::open): Avoid checking a magic
+	number of a directory.
+
 Mon Apr  2 00:24:08 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* shared_info.h (mount_info): Remove mnt_ elements.

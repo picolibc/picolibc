@@ -1264,6 +1264,7 @@ fhandler_disk_file::open (path_conv& real_path, int flags, mode_t mode)
   extern BOOL allow_ntea;
 
   if (real_path.isdisk ()
+      && !(real_path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY)
       && (real_path.exec_state () == dont_know_if_executable)
       && !allow_ntea && (!allow_ntsec || !real_path.has_acls ()))
     {
