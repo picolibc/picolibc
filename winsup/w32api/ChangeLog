@@ -1,3 +1,7 @@
+Mon Oct  9 11:49:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* include/winnt.h: Add missing FILE_NAMED_STREAMS define.
+
 2000-11-06  Earnie Boyd  <earnie_boyd@yahoo.com>
 
 	* Makefile.in: increment VERSION.  
