@@ -71,7 +71,7 @@ extern "C" {
 
   /* Different from the linux versions - note the shorts.. */
 struct	hostent {
-	char	*h_name;	/* official name of host */
+	const char	*h_name;	/* official name of host */
 	char	**h_aliases;	/* alias list */
 	short	h_addrtype;	/* host address type */
 	short	h_length;	/* length of address */
