@@ -333,7 +333,7 @@ cygthread::detach (HANDLE sigwait)
 	    signalled = false;
 	  else if (res != WAIT_OBJECT_0 + 1)
 	    api_fatal ("WFMO failed waiting for cygthread '%s'", __name);
-	  else if ((res = WaitForSingleObject (*this, INFINITE)) == WAIT_OBJECT_0)
+	  else if ((res = WaitForSingleObject (*this, 0)) == WAIT_OBJECT_0)
 	    signalled = false;
 	  else
 	    {
