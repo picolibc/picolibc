@@ -2524,6 +2524,7 @@ typedef struct _REPARSE_POINT_INFORMATION {
 	WORD   ReparseDataLength;
 	WORD   UnparsedNameLength;
 } REPARSE_POINT_INFORMATION, *PREPARSE_POINT_INFORMATION;
+PVOID GetCurrentFiber(void);
 extern __inline__ PVOID GetCurrentFiber(void)
 {
     void* ret;
@@ -2534,7 +2535,7 @@ extern __inline__ PVOID GetCurrentFiber(void)
 		);
     return ret;
 }
-
+PVOID GetFiberData(void);
 extern __inline__ PVOID GetFiberData(void)
 {
     void* ret;
