@@ -2099,16 +2099,16 @@ seteuid32 (__uid32_t uid)
   return 0;
 
  failed:
-  if (uid == myself->uid)
-    {
-      syscall_printf ("special case, returning 0");
-      return 0;
-    }
   cygheap->user.token = sav_token;
   cygheap->user.impersonated = sav_impersonated;
   if (cygheap->user.issetuid ()
        && !ImpersonateLoggedOnUser (cygheap->user.token))
     system_printf ("Impersonating in seteuid failed: %E");
+  if (uid == myself->uid)
+    {
+      syscall_printf ("special case, returning 0");
+      return 0;
+    }
   return -1;
 }
 

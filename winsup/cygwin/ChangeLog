@@ -1,5 +1,10 @@
 2002-07-01  Christopher Faylor  <cgf@redhat.com>
 
+	* syscalls.cc (seteuid32): Fix incorrect placement of Pierre's patch
+	below.
+
+2002-07-01  Christopher Faylor  <cgf@redhat.com>
+
 	* syscalls.cc (seteuid32): Fix incorrect use of system_printf.
 
 2002-07-02  Christopher January  <chris@atomice.net>
