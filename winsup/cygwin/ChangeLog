@@ -1,3 +1,22 @@
+Mon Sep 10 08:28:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* thread.h (MT_Interface): Remove pshared mutex array. 
+	Add a threadsafe list for mutex tracking (for fixupafter fork). 
+	* thread.cc (MTInterface::Init): Remove pshared mutex array.
+	(pthread_mutex::pthread_mutex): Remove pshared mutex functionality. 
+	Fail with EINVAL on attempts to	use pshared functionality.
+	(__pthread_mutex_getpshared): Remove.
+	(__pthread_cond_timedwait): Remove pshared mutex functionality.
+	(__pthread_cond_wait): Ditto.
+	(__pthread_mutex_init): Ditto.
+	(__pthread_mutex_getprioceiling): Ditto.
+	(__pthread_mutex_lock): Ditto.
+	(__pthread_mutex_trylock): Ditto.
+	(__pthread_mutex_unlock): Ditto.
+	(__pthread_mutex_destroy): Ditto.
+	(__pthread_mutex_setprioceiling): Ditto.
+	(__pthread_mutexattr_setpshared): Ditto.
+	
 Sun Sep  9 23:09:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* pwdgrp.h (pwdgrp_check::set_last_modified): Call GetFileTime()

@@ -356,10 +356,8 @@ public:
   callback *pthread_child;
   callback *pthread_parent;
 
-  /* this is an associative array for the _exclusive_ use of pshared mutex's
-   * normal mutex's don't go here to reduce overhead and prevent serialisation.
-   */
-  class pthread_mutex * pshared_mutexs[256];
+  // list of mutex's. USE THREADSAFE INSERTS AND DELETES.
+  class pthread_mutex * mutexs;
 
   void Init (int);
 
