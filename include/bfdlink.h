@@ -191,6 +191,9 @@ struct bfd_link_info
   boolean shared;
   /* true if BFD should pre-bind symbols in a shared object.  */
   boolean symbolic;
+  /* true if BFD should export all symbols in the dynamic symbol table
+     of an executable, rather than only those used.  */
+  boolean export_dynamic;
   /* true if shared objects should be linked directly, not shared.  */
   boolean static_link;
   /* true if the output file should be in a traditional format.  This

@@ -1,3 +1,7 @@
+2001-06-15  Hans-Peter Nilsson  <hp@axis.com>
+
+	* bfdlink.h (struct bfd_link_info): New member export_dynamic.
+
 2001-05-16  Matt Kraai  <kraai@alumni.carnegiemellon.edu>
 
 	* partition.h: Fix misspelling of `implementation'.
