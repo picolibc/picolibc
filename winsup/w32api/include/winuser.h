@@ -116,6 +116,14 @@ extern "C" {
 #define MF_USECHECKBITMAPS 512
 #define MF_UNHILITE 0
 #define MF_HILITE 128
+
+/* Also defined in dbt.h */
+#define BSM_ALLCOMPONENTS	0
+#define BSM_APPLICATIONS	8
+#define BSM_ALLDESKTOPS		16
+#define BSM_INSTALLABLEDRIVERS	4
+#define BSM_NETDRIVER	2
+#define BSM_VXDS	1
 #define BSF_FLUSHDISK 0x00000004
 #define BSF_FORCEIFHUNG 0x00000020
 #define BSF_IGNORECURRENTTASK 0x00000002
@@ -131,12 +139,7 @@ extern "C" {
 #define BSF_LUID 0x00000400
 #define BSF_RETURNHDESK 0x00000200
 #endif /* (_WIN32_WINNT >= 0x0501) */
-#define BSM_ALLCOMPONENTS	0
-#define BSM_APPLICATIONS	8
-#define BSM_ALLDESKTOPS		16
-#define BSM_INSTALLABLEDRIVERS	4
-#define BSM_NETDRIVER	2
-#define BSM_VXDS	1
+
 #define BROADCAST_QUERY_DENY	1112363332
 #define ENUM_CURRENT_SETTINGS	((DWORD)-1)
 #define ENUM_REGISTRY_SETTINGS	((DWORD)-2)
@@ -2967,7 +2970,7 @@ typedef struct tagRAWMOUSE {
 	USHORT usFlags;
 	_ANONYMOUS_UNION union {
 		ULONG ulButtons;
-		struct {
+		_ANONYMOUS_STRUCT struct {
 			USHORT usButtonFlags;
 			USHORT usButtonData;
 		};
@@ -2992,7 +2995,7 @@ typedef struct tagRAWHID {
 } RAWHID,*PRAWHID,*LPRAWHID;
 typedef struct tagRAWINPUT {
 	RAWINPUTHEADER header;
-	_ANONYMOUS_UNION union {
+	union {
 		RAWMOUSE    mouse;
 		RAWKEYBOARD keyboard;
 		RAWHID      hid;

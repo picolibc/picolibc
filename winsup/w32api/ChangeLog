@@ -1,3 +1,13 @@
+2003-09-30  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winuser.h (BSF_*, BSM_*):  Sync constants defined in
+	both winuser.h and dbt.h.
+	* include/dbt.h (BSF_*, BSM_*): Likewise.
+
+	* include/winuser.h (struct tagRAWINPUT): Remove
+	_ANONYMOUS_UNION tag from named union.
+	(struct tagRAWMOUSE): Add _ANONYMOUS_STRUCT to nameless struct.
+
 2003-09-30  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/dhcpcsvc.h: New file.
@@ -24,6 +34,7 @@
 	* lib/user32.def (GetRawInputDeviceInfo[AW]): Ooops... there
 	are ANSI/Unicode versions of this function.
 
+>>>>>>> 1.469
 2003-09-29  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/winuser.h [_WIN32_WINNT >= 0x0501] (RIM_TYPEMOUSE,
