@@ -1,3 +1,8 @@
+2004-07-16  Richard Earnshaw  <rearnsha@arm.com>
+
+	* arm.h: Remove all old content.  Replace with architecture defines
+	from gas/config/tc-arm.c.
+
 2004-07-09  Andreas Schwab  <schwab@suse.de>
 
 	* m68k.h: Fix comment.
