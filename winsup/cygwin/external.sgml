@@ -10,7 +10,9 @@
 </funcsynopsis>
 
 <para>This function gives you access to various internal data and functions.
-Stay away unless you know what you're doing.</para>
+It takes two arguments.  The first argument is a type from the 'cygwin_getinfo_types'
+enum.  The second is an optional pointer.</para>
+<para>Stay away unless you know what you're doing.</para>
 
 </sect1>
 
