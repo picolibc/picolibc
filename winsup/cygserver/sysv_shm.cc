@@ -382,6 +382,7 @@ kern_shmat(struct thread *td, int shmid, const void *shmaddr, int shmflg)
 	if ((shmflg & SHM_RDONLY) == 0)
 		prot |= VM_PROT_WRITE;
 	flags = MAP_ANON | MAP_SHARED;
+	debug_printf ("shmaddr: %x, shmflg: %x", shmaddr, shmflg);
 	if (shmaddr) {
 		flags |= MAP_FIXED;
 		if (shmflg & SHM_RND) {
@@ -389,6 +390,7 @@ kern_shmat(struct thread *td, int shmid, const void *shmaddr, int shmflg)
 		} else if (((vm_offset_t)shmaddr & (SHMLBA-1)) == 0) {
 			attach_va = (vm_offset_t)shmaddr;
 		} else {
+			debug_printf ("Odd shmaddr: EINVAL");
 			error = EINVAL;
 			goto done2;
 		}
