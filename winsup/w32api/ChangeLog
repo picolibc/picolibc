@@ -1,5 +1,10 @@
 2003-01-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/winnt.h (IMAGE_FILE_AGGRESIVE_WS_TRIM
+	IMAGE_FILE_LARGE_ADDRESS_AWARE): Add defines.
+
+2003-01-11  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/accctrl.h (enum _SE_OBJECT_TYPE): Add
 	SE_REGISTRY_WOW64_32KEY.
 	Reported by: Dimitri Papadopoulos  <dimitri_at@sourceforge.users.net>
