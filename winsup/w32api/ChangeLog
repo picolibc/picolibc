@@ -1,4 +1,11 @@
-003-08-29  Steve Cleary  <scleary@jerviswebb.com>
+2003-09-02  Bart Oldeman  <bartoldeman@users.sourceforge.net>
+
+	* lib/snmpapi.def (LIBRARY) Add library name.
+	Remove '\r', throughout.
+	* lib/wsnmp32.def: Remove '\r', throughout.
+	* lib/igmpagnt.def: Likewise.
+
+2003-08-29  Steve Cleary  <scleary@jerviswebb.com>
 
 	* include/winuser.h (QS_ALLPOSTMESSAGE, QS_RAWINPUT): Add defines.
 	(QS_INPUT, QS_ALLINPUT, QS_ALLEVENTS): Adjust by OR'ing	with
