@@ -1,3 +1,10 @@
+2003-06-17  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* msvcrt.def.in (__badioinfo, __lc_codepage, __lc_handle,
+	__pioinfo, __setlc_active, _unguarded_readlc_active, _dstbias):
+	Mark as DATA.
+	Thanks to: Aaron W  LaFramboise   <AWLaFramboise@aol.com>
+
 2003-05-30  Sascha Sommer  <saschasommer@freenet.de>
 
 	* include/sys/types.h (_ssize_t, ssize_t):  Add typedefs.

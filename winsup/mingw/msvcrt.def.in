@@ -62,7 +62,7 @@ __RTtypeid
 __STRINGTOLD
 __argc DATA
 __argv DATA
-__badioinfo
+__badioinfo DATA
 __crtCompareStringA
 __crtGetLocaleInfoW
 __crtLCMapStringA
@@ -74,8 +74,8 @@ __initenv DATA
 __isascii
 __iscsym
 __iscsymf
-__lc_codepage
-__lc_handle
+__lc_codepage DATA
+__lc_handle DATA
 __lconv_init
 __mb_cur_max DATA
 __p___argc
@@ -106,16 +106,16 @@ __p__winmajor
 __p__winminor
 __p__winver
 __p__wpgmptr
-__pioinfo
+__pioinfo DATA
 __pxcptinfoptrs
 __set_app_type
-__setlc_active
+__setlc_active DATA
 __setusermatherr
 __threadhandle
 __threadid
 __toascii
 __unDName
-__unguarded_readlc_active
+__unguarded_readlc_active DATA
 __wargv DATA
 __wgetmainargs
 __winitenv DATA
@@ -169,7 +169,7 @@ _cscanf
 _ctype DATA
 _cwait
 _daylight DATA
-_dstbias
+_dstbias DATA
 _dup
 _dup2
 _ecvt
