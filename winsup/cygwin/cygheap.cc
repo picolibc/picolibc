@@ -212,6 +212,13 @@ cygheap_init ()
 	    && (set_process_privilege (SE_CREATE_GLOBAL_NAME, true) >= 0
 		|| GetLastError () == ERROR_NO_SUCH_PRIVILEGE)
 	    ? "Global\\" : "");
+  if (cygheap->ctty)
+    {
+      fhandler_console::open_fhs++;
+      debug_printf ("tty%d, open_fhs %d, arch usecount %d",
+		    cygheap->ctty->get_ttyp ()->ntty,
+		    fhandler_console::open_fhs, cygheap->ctty->usecount);
+    }
 }
 
 /* Copyright (C) 1997, 2000 DJ Delorie */

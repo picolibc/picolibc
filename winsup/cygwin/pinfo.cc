@@ -293,7 +293,9 @@ _pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *arch)
 	  if (arch)
 	    {
 	      arch->usecount++;
-	      debug_printf ("arch usecount for tty%d is %d", tc->ntty, arch->usecount);
+	      fhandler_console::open_fhs++;
+	      debug_printf ("tty%d, open_fhs %d, arch usecount %d", tc->ntty,
+			    fhandler_console::open_fhs, arch->usecount);
 	    }
 	}
     }

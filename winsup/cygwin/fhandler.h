@@ -890,7 +890,7 @@ class fhandler_tty_common: public fhandler_termios
 
   virtual int dup (fhandler_base *child);
 
-  tty *get_ttyp () { return (tty *)tc; }
+  tty *get_ttyp () { return (tty *) tc; }
 
   int close ();
   void set_close_on_exec (int val);
@@ -969,8 +969,6 @@ class fhandler_tty_master: public fhandler_pty_master
   int init ();
   int init_console ();
   void set_winsize (bool);
-  void fixup_after_fork (HANDLE parent);
-  void fixup_after_exec (HANDLE);
   bool is_slow () {return 1;}
 };
 

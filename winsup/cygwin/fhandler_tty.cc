@@ -78,6 +78,7 @@ fhandler_tty_master::init ()
   set_winsize (false);
 
   inuse = get_ttyp ()->create_inuse (TTY_MASTER_ALIVE);
+  set_close_on_exec (true);
 
   cygthread *h;
   h = new cygthread (process_input, cygself, "ttyin");
@@ -1400,20 +1401,6 @@ fhandler_pty_master::set_close_on_exec (int val)
       termios_printf ("from_slave %p, to_slave %p", get_handle (),
 		      get_output_handle ());
     }
-}
-
-void
-fhandler_tty_master::fixup_after_fork (HANDLE child)
-{
-  fhandler_pty_master::fixup_after_fork (child);
-  console->fixup_after_fork (child);
-}
-
-void
-fhandler_tty_master::fixup_after_exec (HANDLE)
-{
-  console->close ();
-  init_console ();
 }
 
 int

@@ -457,8 +457,8 @@ tty::common_init (fhandler_pty_master *ptym)
       return false;
     }
 
-  ProtectHandle1INH (ptym->output_mutex, output_mutex);
-  ProtectHandle1INH (ptym->input_mutex, input_mutex);
+  // /* screws up tty master */ ProtectHandle1INH (ptym->output_mutex, output_mutex);
+  // /* screws up tty master */ ProtectHandle1INH (ptym->input_mutex, input_mutex);
   winsize.ws_col = 80;
   winsize.ws_row = 25;
 

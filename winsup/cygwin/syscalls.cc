@@ -335,8 +335,7 @@ setsid (void)
 		      myself->pgid, myself->ctty, fhandler_console::open_fhs);
       if (cygheap->ctty)
 	{
-	  if (cygheap->ctty->usecount == 1)
-	    cygheap->ctty->close ();
+	  cygheap->ctty->close ();
 	  cygheap->ctty = NULL;
 	}
       return myself->sid;

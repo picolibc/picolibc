@@ -1,5 +1,23 @@
 2003-12-26  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler.h (fhandler_tty_master::fixup_after_fork): Remove
+	declaration.
+	(fhandler_tty_master::fixup_after_exec): Ditto.
+	* fhandler_tty.cc (fhandler_tty_master::init): Fix so that children do
+	not inherit master tty handles.
+	(fhandler_tty_master::fixup_after_fork): Remove, since it was never
+	used.
+	(fhandler_tty_master::fixup_after_exec): Ditto.
+	* pinfo.cc (_pinfo::set_ctty): Increment open_fhs when ctty is set.
+	* cygheap.cc (cygheap_init): Ditto.
+	* syscalls.cc (setsid): *Always* call close on opened ctty since the
+	archetype is associated with the ctty and it counts as an opened
+	handle.
+	* tty.cc (tty::common_init): Don't protect input/output mutex since it
+	confuses subsequent fork/execs when CYGWIN=tty.
+
+2003-12-26  Christopher Faylor  <cgf@redhat.com>
+
 	* exceptions.cc (try_to_debug): Fix off-by-one problem when resetting
 	environment variable after error_start detected.
 

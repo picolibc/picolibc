@@ -87,7 +87,7 @@ class fhandler_pty_master;
 class tty: public tty_min
 {
   HANDLE get_event (const char *fmt, BOOL manual_reset = FALSE)
-    __attribute__ ((regparm (2)));
+    __attribute__ ((regparm (3)));
 public:
   HWND  hwnd;	/* Console window handle tty belongs to */
 
