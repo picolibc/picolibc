@@ -100,6 +100,9 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	cygwin_shared->mount.import_v1_mounts ();
 	return 0;
 
+      case CW_USER_DATA:
+	return (DWORD) &__cygwin_user_data;
+
       default:
 	return (DWORD) -1;
     }

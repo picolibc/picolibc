@@ -1,3 +1,20 @@
+Sat Jul  8 00:15:01 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* external.cc (cygwin_internal): Export __cygwin_user_data.
+	* include/sys/cygwin.h: Allow definition of per_process even when not
+	compiling with C++.
+	(cygwin_getinfo_types): Add CW_USER_DATA.
+	* lib/_cygwin_crt0_common.cc (_cygwin_crt0_common): Get
+	__cygwin_user_data pointer from cygwin_internal.  If it doesn't exist,
+	return failure.  Use either this pointer or passed in pointer
+	throughout.  Clear forkee.
+	* lib/crt0.h: Accomodate argument changes to _cygwin_crt0_common.
+	* lib/cygwin_attach_dll.c (cygwin_attach_dll): Reorganize to allow use
+	of newer binaries with older DLLs.  Detect older DLLs when
+	_cygwin_crt0_common returns 0 and allocate space for a per_process
+	structure on the stack.
+	* lib/cygwin_crt0.c (cygwin_crt0): Ditto.
+
 Fri Jul  7 10:31:00 2000  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/sys/cygwin.h: Hide internal data types in per_process

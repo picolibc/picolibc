@@ -36,7 +36,6 @@ extern void cygwin_premain1 (int argc, char **argv);
 extern void cygwin_premain2 (int argc, char **argv);
 extern void cygwin_premain3 (int argc, char **argv);
 
-#ifdef __cplusplus
 /* This lives in the app and is initialized before jumping into the DLL.
    It should only contain stuff which the user's process needs to see, or
    which is needed before the user pointer is initialized, or is needed to
@@ -126,7 +125,6 @@ struct per_process
   struct _reent *impure_ptr;
 };
 #define per_process_overwrite ((unsigned) &(((struct per_process *) NULL)->resourcelocks))
-#endif /* __cplusplus */
 
 #ifdef _PATH_PASSWD
 extern HANDLE cygwin_logon_user (const struct passwd *, const char *);
@@ -152,7 +150,8 @@ typedef enum
     CW_SETPINFO,
     CW_SETTHREADNAME,
     CW_GETVERSIONINFO,
-    CW_READ_V1_MOUNT_TABLES
+    CW_READ_V1_MOUNT_TABLES,
+    CW_USER_DATA
   } cygwin_getinfo_types;
 
 struct external_pinfo
