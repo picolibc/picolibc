@@ -48,24 +48,22 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
 {
   int res;
   HANDLE waitfor;
-  waitq *w;
+  waitq *w = &_my_tls.wq;
 
   pthread_testcancel ();
 
   while (1)
     {
       sig_dispatch_pending ();
-      bool sawsig = false;
       if (options & ~(WNOHANG | WUNTRACED))
 	{
 	  set_errno (EINVAL);
-	  return -1;
+	  res = -1;
+	  break;
 	}
 
       if (r)
 	memset (r, 0, sizeof (*r));
-
-      w = &_my_tls.wq;
 
       w->pid = intpid;
       w->options = options;
@@ -77,7 +75,7 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
 	  set_errno (ENOSYS);
 	  paranoid_printf ("proc_subproc returned 0");
 	  res = -1;
-	  goto done;
+	  break;
 	}
 
       if ((waitfor = w->ev) == NULL)
@@ -93,14 +91,14 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
 	  /* found no children */
 	  set_errno (ECHILD);
 	  res = -1;
-	  goto done;
+	  break;
 	}
 
       if (w->status == -1)
 	{
+	  if (_my_tls.call_signal_handler ())
+	    continue;
 	  set_sig_errno (EINTR);
-	  _my_tls.call_signal_handler ();
-	  sawsig = true;
 	  res = -1;
 	}
       else if (res != WAIT_OBJECT_0)
@@ -112,10 +110,7 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
 	}
       else if ((res = w->pid) != 0 && status)
 	*status = w->status;
-
-    done:
-      if (!sawsig || !_my_tls.call_signal_handler ())
-	break;
+      break;
     }
 
   sigproc_printf ("intpid %d, status %p, w->status %d, options %d, res %d",
