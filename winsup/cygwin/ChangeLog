@@ -1,3 +1,11 @@
+2002-03-05  Robert Collins  <rbtcollins@hotmail.com>
+
+	* cygserver_transport_pipes.cc (transport_layer_pipes::transport_layer_pipes): 
+	Always init - until static members work correctly.
+	* shm.cc (shmget): Initialize the security descriptor - thanks Corinna!
+	* include/sys/ipc.h: Make the ipc control constants partitioned off from the sem 
+	control constants.
+
 2002-03-04  Christian Lestrade  <christian.lestrade@free.fr>
 
 	* include/sys/termios.h: Define _POSIX_VDISABLE.  Define CCEQ macro.

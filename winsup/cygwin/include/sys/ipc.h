@@ -39,9 +39,10 @@ struct ipc_perm {
 /* this is a value that will _never_ be a valid key from ftok */
 #define IPC_PRIVATE -2
 
-#define IPC_RMID 0x0003
-#define IPC_SET  0x0002
-#define IPC_STAT 0x0001
+/* ctl commands 1000-1fff is ipc reserved */
+#define IPC_RMID 0x1003
+#define IPC_SET  0x1002
+#define IPC_STAT 0x1001
 
 key_t ftok(const char *, int);
 

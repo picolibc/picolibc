@@ -29,8 +29,13 @@
 #define debug_printf if (DEBUG) printf
 #endif
 
+//SECURITY_DESCRIPTOR transport_layer_pipes::sd;
+//SECURITY_ATTRIBUTES transport_layer_pipes::sec_none_nih, transport_layer_pipes::sec_all_nih;
+//bool transport_layer_pipes::inited = false;
+
 transport_layer_pipes::transport_layer_pipes (HANDLE new_pipe)
 {
+  inited = false; //FIXME: allow inited, sd, all_nih_.. to be static members
   pipe = new_pipe;
   if (inited != true)
     init_security();
@@ -38,12 +43,12 @@ transport_layer_pipes::transport_layer_pipes (HANDLE new_pipe)
 
 transport_layer_pipes::transport_layer_pipes () 
 {
+  inited = false;
   pipe = NULL;
   strcpy(pipe_name, "\\\\.\\pipe\\cygwin_lpc");
   if (inited != true)
     init_security();
 }
-
 
 void
 transport_layer_pipes::init_security()

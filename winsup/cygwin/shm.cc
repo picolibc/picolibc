@@ -460,6 +460,8 @@ shmget (key_t key, size_t size, int shmflg)
   char sd_buf[4096];
   PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) sd_buf;
   /* create a sd for our open requests based on shmflag & 0x01ff */
+  InitializeSecurityDescriptor (psd,
+                                    SECURITY_DESCRIPTOR_REVISION);
   psd = alloc_sd (getuid (), getgid (), cygheap->user.logsrv (),
 		  shmflg & 0x01ff, psd, &sd_size);
 
