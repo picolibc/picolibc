@@ -32,8 +32,8 @@ typedef	struct _heapinfo
 } _HEAPINFO;
 
 /* Values for _heapinfo.useflag */
-#define _USEDENTRY 0
-#define _FREEENTRY 1
+#define _FREEENTRY 0
+#define _USEDENTRY 1
 
 /* Return codes for _heapwalk()  */
 #define _HEAPEMPTY	(-1)

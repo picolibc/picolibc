@@ -1,3 +1,7 @@
+2005-03-15  Hans Leidekker  <hans@it.vu.nl>
+
+	* include/malloc.h (_FREEENTRY, _USEDENTRY): Correct defines.
+
 2005-02-25  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wctype.h (wctrans): Remove _CRTIMP.
