@@ -161,7 +161,7 @@ const NO_COPY char __declspec(dllexport) * const _sys_errlist[]=
 /*	ENXIO 6		*/ "No such device or address",
 /*	E2BIG 7		*/ "Arg list too long",
 /*	ENOEXEC 8	*/ "Exec format error",
-/*	EBADF 9		*/ "Bad file number",
+/*	EBADF 9		*/ "Bad file descriptor",
 /*	ECHILD 10	*/ "No children",
 /*	EAGAIN 11	*/ "Resource temporarily unavailable",
 /*	ENOMEM 12	*/ "Not enough core",
@@ -338,7 +338,7 @@ strerror (int errnum)
       error = "Exec format error";
       break;
     case EBADF:
-      error = "Bad file number";
+      error = "Bad file descriptor";
       break;
     case ECHILD:
       error = "No children";
