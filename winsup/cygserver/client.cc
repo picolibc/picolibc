@@ -30,10 +30,7 @@ details. */
 
 int cygserver_running = CYGSERVER_UNKNOWN; // Nb: inherited by children.
 
-/* On by default during development. For release, we probably want off
- * by default.
- */
-bool allow_daemon = true;	// Nb: inherited by children.
+bool allow_server = false;	// Nb: inherited by children.
 
 client_request_get_version::client_request_get_version ()
   : client_request (CYGSERVER_REQUEST_GET_VERSION, &version, sizeof (version))
@@ -509,7 +506,7 @@ check_cygserver_available ()
 void
 cygserver_init ()
 {
-  if (!allow_daemon)
+  if (!allow_server)
     {
       syscall_printf ("cygserver use disabled in client");
       cygserver_running = CYGSERVER_UNAVAIL;

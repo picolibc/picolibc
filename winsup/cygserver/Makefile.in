@@ -29,6 +29,7 @@ CC:=@CC@
 CC_FOR_TARGET:=$(CC)
 CXX:=@CXX@
 CXX_FOR_TARGET:=$(CXX)
+AR:=@AR@
 
 CFLAGS:=@CFLAGS@ -I$(cygwin_source)
 CXXFLAGS:=@CXXFLAGS@ -I$(cygwin_source)
@@ -38,11 +39,12 @@ include $(srcdir)/../Makefile.common
 
 OBJS:=	cygserver.o client.o process.o shm.o threaded_queue.o transport.o \
 	transport_pipes.o transport_sockets.o
+LIBOBJS:=${patsubst %.o,lib%.o,$(OBJS)}
 
 CYGWIN_OBJS:=$(cygwin_build)/smallprint.o $(cygwin_build)/version.o \
 	$(cygwin_build)/wincap.o
 
-all: cygserver.exe
+all: cygserver.exe libcygserver.a
 
 install: all
 
@@ -59,3 +61,9 @@ $(cygwin_build)/%.o: $(cygwin_source)/%.c
 	@$(MAKE) -C $(@D) $(@F)
 
 Makefile: Makefile.in configure
+
+lib%.o: %.cc
+	${filter-out -D__OUTSIDE_CYGWIN__, $(COMPILE_CXX)} -I$(updir)/cygwin -o $(@D)/${basename $(@F)}$o $<
+
+libcygserver.a: $(LIBOBJS)
+	$(AR) crus $@ $?
