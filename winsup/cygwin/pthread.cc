@@ -349,7 +349,7 @@ pthread_cond_destroy (pthread_cond_t * cond)
 int
 pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
 {
-  return __pthread_cond_init (cond, attr);
+  return pthread_cond::init (cond, attr);
 }
 
 int

@@ -1,3 +1,20 @@
+2003-01-09  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* pthread.cc (pthread_cond_init): Use new pthread_cond::init.
+	* thread.cc: Some white spaces cleanups.
+	Change __pthread_cond_init to pthread_cond::init throughout.
+	(nativeMutex): Move class methods outside pthread_mutex.
+	(MTinterface::Init): Initialize pthread_cond init lock.
+	(pthread_cond::condInitializationLock): Instantiate.
+	(pthread_cond::initMutex): New Method.
+	(pthread_cond::isGoodInitializerOrBadObject): Ditto.
+	* thread.h: Some white spaces cleanups.
+	(nativeMutex): Move class declaration outside pthread_mutex.
+	(pthread_cond::condInitializationLock): New static member.
+	(pthread_cond::initMutex): New Method.
+	(pthread_cond::isGoodInitializerOrBadObject): Ditto.
+	(__pthread_cond_init): Remove prototype.
+
 2003-01-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (num_entries): Return 2 as link count if

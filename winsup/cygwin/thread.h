@@ -121,6 +121,16 @@ void AssertResourceOwner (int, int);
 #endif
 }
 
+class nativeMutex
+{
+public:
+  bool init ();
+  bool lock ();
+  void unlock ();
+private:
+  HANDLE theHandle;
+};
+
 class per_process;
 class pinfo;
 
@@ -288,9 +298,9 @@ public:
 class pthread_mutex:public verifyable_object
 {
 public:
-  static bool isGoodObject(pthread_mutex_t const *);
-  static bool isGoodInitializer(pthread_mutex_t const *);
-  static bool isGoodInitializerOrObject(pthread_mutex_t const *);
+  static bool isGoodObject (pthread_mutex_t const *);
+  static bool isGoodInitializer (pthread_mutex_t const *);
+  static bool isGoodInitializerOrObject (pthread_mutex_t const *);
   static bool isGoodInitializerOrBadObject (pthread_mutex_t const *mutex);
   static void initMutex ();
   static int init (pthread_mutex_t *, const pthread_mutexattr_t *);
@@ -309,15 +319,8 @@ public:
   pthread_mutex (pthread_mutexattr * = NULL);
   pthread_mutex (pthread_mutex_t *, pthread_mutexattr *);
   ~pthread_mutex ();
+
 private:
-  class nativeMutex {
-    public:
-      bool init();
-      bool lock();
-      void unlock();
-    private:
-      HANDLE theHandle;
-  };
   static nativeMutex mutexInitializationLock;
 };
 
@@ -432,9 +435,13 @@ public:
 class pthread_cond:public verifyable_object
 {
 public:
-  static bool isGoodObject(pthread_cond_t const *);
-  static bool isGoodInitializer(pthread_cond_t const *);
-  static bool isGoodInitializerOrObject(pthread_cond_t const *);
+  static bool isGoodObject (pthread_cond_t const *);
+  static bool isGoodInitializer (pthread_cond_t const *);
+  static bool isGoodInitializerOrObject (pthread_cond_t const *);
+  static bool isGoodInitializerOrBadObject (pthread_cond_t const *);
+  static void initMutex ();
+  static int init (pthread_cond_t *, const pthread_condattr_t *);
+
   int shared;
   LONG waiting;
   LONG ExitingWait;
@@ -450,6 +457,9 @@ public:
 
   pthread_cond (pthread_condattr *);
   ~pthread_cond ();
+
+private:
+  static nativeMutex condInitializationLock;
 };
 
 class pthread_once
@@ -559,8 +569,6 @@ void *__pthread_getspecific (pthread_key_t key);
 
 /* Thead synchroniation */
 int __pthread_cond_destroy (pthread_cond_t * cond);
-int __pthread_cond_init (pthread_cond_t * cond,
-			 const pthread_condattr_t * attr);
 int __pthread_cond_signal (pthread_cond_t * cond);
 int __pthread_cond_broadcast (pthread_cond_t * cond);
 int __pthread_condattr_init (pthread_condattr_t * condattr);

@@ -72,6 +72,37 @@ _reent_winsup ()
   return _r->_winsup;
 }
 
+bool
+nativeMutex::init ()
+{
+  theHandle = CreateMutex (&sec_none_nih, FALSE, NULL);
+  if (!theHandle)
+    {
+      debug_printf ("CreateMutex failed. %E");
+      return false;
+    }
+  return true;
+}
+
+bool
+nativeMutex::lock ()
+{
+  DWORD waitResult = WaitForSingleObject (theHandle, INFINITE);
+  if (waitResult != WAIT_OBJECT_0)
+    {
+      system_printf ("Received unexpected wait result %d on handle %p, %E", waitResult, theHandle);
+      return false;
+    }
+  return true;
+}
+
+void
+nativeMutex::unlock ()
+{
+  if (!ReleaseMutex (theHandle))
+    system_printf ("Received a unexpected result releasing mutex. %E");
+}
+
 inline LPCRITICAL_SECTION
 ResourceLocks::Lock (int _resid)
 {
@@ -168,6 +199,7 @@ MTinterface::Init (int forked)
     reent_key.set (&reents);
 
   pthread_mutex::initMutex ();
+  pthread_cond::initMutex ();
 }
 
 void
@@ -743,6 +775,19 @@ pthread_condattr::~pthread_condattr ()
 {
 }
 
+/* This is used for cond creation protection within a single process only */
+nativeMutex NO_COPY pthread_cond::condInitializationLock;
+
+/* We can only be called once.
+   TODO: (no rush) use a non copied memory section to
+   hold an initialization flag.  */
+void
+pthread_cond::initMutex ()
+{
+  if (!condInitializationLock.init ())
+    api_fatal ("Could not create win32 Mutex for pthread cond static initializer support.");
+}
+
 pthread_cond::pthread_cond (pthread_condattr *attr):verifyable_object (PTHREAD_COND_MAGIC)
 {
   int temperr;
@@ -1090,14 +1135,14 @@ pthread_mutex::isGoodInitializerOrObject (pthread_mutex_t const *mutex)
 bool
 pthread_mutex::isGoodInitializerOrBadObject (pthread_mutex_t const *mutex)
 {
-    verifyable_object_state objectState = verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC, PTHREAD_MUTEX_INITIALIZER);
-    if (objectState == VALID_OBJECT)
+  verifyable_object_state objectState = verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC, PTHREAD_MUTEX_INITIALIZER);
+  if (objectState == VALID_OBJECT)
 	return false;
-    return true;
+  return true;
 }
 
 /* This is used for mutex creation protection within a single process only */
-pthread_mutex::nativeMutex pthread_mutex::mutexInitializationLock NO_COPY;
+nativeMutex NO_COPY pthread_mutex::mutexInitializationLock;
 
 /* We can only be called once.
    TODO: (no rush) use a non copied memory section to
@@ -1210,37 +1255,6 @@ pthread_mutex::fixup_after_fork ()
 #else
   condwaits = 0;
 #endif
-}
-
-bool
-pthread_mutex::nativeMutex::init ()
-{
-  theHandle = CreateMutex (&sec_none_nih, FALSE, NULL);
-  if (!theHandle)
-    {
-      debug_printf ("CreateMutex failed. %E");
-      return false;
-    }
-  return true;
-}
-
-bool
-pthread_mutex::nativeMutex::lock ()
-{
-  DWORD waitResult = WaitForSingleObject (theHandle, INFINITE);
-  if (waitResult != WAIT_OBJECT_0)
-    {
-      system_printf ("Received unexpected wait result %d on handle %p, %E", waitResult, theHandle);
-      return false;
-    }
-  return true;
-}
-
-void
-pthread_mutex::nativeMutex::unlock ()
-{
-  if (!ReleaseMutex (theHandle))
-    system_printf ("Received a unexpected result releasing mutex. %E");
 }
 
 bool
@@ -2001,6 +2015,15 @@ pthread_cond::isGoodInitializerOrObject (pthread_cond_t const *cond)
   return true;
 }
 
+bool
+pthread_cond::isGoodInitializerOrBadObject (pthread_cond_t const *cond)
+{
+  verifyable_object_state objectState = verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC, PTHREAD_COND_INITIALIZER);
+  if (objectState == VALID_OBJECT)
+	return false;
+  return true;
+}
+
 int
 __pthread_cond_destroy (pthread_cond_t *cond)
 {
@@ -2020,23 +2043,28 @@ __pthread_cond_destroy (pthread_cond_t *cond)
 }
 
 int
-__pthread_cond_init (pthread_cond_t *cond, const pthread_condattr_t *attr)
+pthread_cond::init (pthread_cond_t *cond, const pthread_condattr_t *attr)
 {
   if (attr && !pthread_condattr::isGoodObject (attr))
     return EINVAL;
+  if (!condInitializationLock.lock ())
+    return EINVAL;
 
-  if (pthread_cond::isGoodObject (cond))
-    return EBUSY;
+  if (!isGoodInitializerOrBadObject (cond))
+    {
+      condInitializationLock.unlock ();
+      return EBUSY;
+    }
 
   *cond = new pthread_cond (attr ? (*attr) : NULL);
-
-  if (!pthread_cond::isGoodObject (cond))
+  if (!isGoodObject (cond))
     {
       delete (*cond);
       *cond = NULL;
+      condInitializationLock.unlock ();
       return EAGAIN;
     }
-
+  condInitializationLock.unlock ();
   return 0;
 }
 
@@ -2044,7 +2072,7 @@ int
 __pthread_cond_broadcast (pthread_cond_t *cond)
 {
   if (pthread_cond::isGoodInitializer (cond))
-    __pthread_cond_init (cond, NULL);
+    pthread_cond::init (cond, NULL);
   if (!pthread_cond::isGoodObject (cond))
     return EINVAL;
 
@@ -2057,7 +2085,7 @@ int
 __pthread_cond_signal (pthread_cond_t *cond)
 {
   if (pthread_cond::isGoodInitializer (cond))
-    __pthread_cond_init (cond, NULL);
+    pthread_cond::init (cond, NULL);
   if (!pthread_cond::isGoodObject (cond))
     return EINVAL;
 
@@ -2078,7 +2106,7 @@ __pthread_cond_dowait (pthread_cond_t *cond, pthread_mutex_t *mutex,
     pthread_mutex::init (mutex, NULL);
   themutex = mutex;
   if (pthread_cond::isGoodInitializer (cond))
-    __pthread_cond_init (cond, NULL);
+    pthread_cond::init (cond, NULL);
 
   if (!pthread_mutex::isGoodObject (themutex))
     return EINVAL;
