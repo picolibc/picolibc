@@ -1,3 +1,7 @@
+2001-10-13  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Allow stdinc searching for dumper.
+
 Tue Oct  9 21:59:00 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in (MINGW_INCLUDES): Accomodate changes in Makefile.common.

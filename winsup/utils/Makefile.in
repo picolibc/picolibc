@@ -97,27 +97,27 @@ endif
 
 dumper.o: dumper.cc dumper.h
 ifdef VERBOSE
-	$(COMPILE_CXX) $c -o $@ $(DUMPER_INCLUDES) ${firstword $^}
+	${filter-out -nostdinc,$(COMPILE_CXX)} $c -o $@ $(DUMPER_INCLUDES) ${firstword $^}
 else
 	@echo $(CXX) $c $(CFLAGS) $(DUMPER_INCLUDES) ... $(basename $@).cc;\
-	$(COMPILE_CXX) $c -o $(@D)/$(basename $@)$o $(DUMPER_INCLUDES) $<
+	${filter-out -nostdinc,$(COMPILE_CXX)} $c -o $(@D)/$(basename $@)$o $(DUMPER_INCLUDES) $<
 endif
 
 
 module_info.o: module_info.cc
 ifdef VERBOSE
-	$(COMPILE_CXX) $c -o $@ $(DUMPER_INCLUDES) ${firstword $^}
+	${filter-out -nostdinc,$(COMPILE_CXX)} $c -o $@ $(DUMPER_INCLUDES) ${firstword $^}
 else
 	@echo $(CXX) $c $(CFLAGS) $(DUMPER_INCLUDES) ... $(basename $@).cc;\
-	$(COMPILE_CXX) $c -o $(@D)/$(basename $@)$o $(DUMPER_INCLUDES) $<
+	${filter-out -nostdinc,$(COMPILE_CXX)} $c -o $(@D)/$(basename $@)$o $(DUMPER_INCLUDES) $<
 endif
 
 parse_pe.o: parse_pe.cc dumper.h
 ifdef VERBOSE
-	$(COMPILE_CXX) $c -o $@ $(DUMPER_INCLUDES) ${firstword $^}
+	${filter-out -nostdinc,$(COMPILE_CXX)} $c -o $@ $(DUMPER_INCLUDES) ${firstword $^}
 else
 	@echo $(CXX) $c $(CFLAGS) $(DUMPER_INCLUDES) ... $(basename $@).cc;\
-	$(COMPILE_CXX) $c -o $(@D)/$(basename $@)$o $(DUMPER_INCLUDES) $<
+	${filter-out -nostdinc,$(COMPILE_CXX)} $c -o $(@D)/$(basename $@)$o $(DUMPER_INCLUDES) $<
 endif
 
 mingw_getopt.o: $(cygwin_source)/lib/getopt.c
