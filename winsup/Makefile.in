@@ -39,6 +39,7 @@ includedir:=@includedir@
 SUBDIRS=@SUBDIRS@
 INSTALL_SUBDIRS=${patsubst %,install_%,$(SUBDIRS)}
 CLEAN_SUBDIRS=${patsubst %,clean_%,$(SUBDIRS)}
+ZLIB=${findstring zlib,$(SUBDIRS)}
 
 .PHONY: all install clean all-info info install-info check \
 	$(SUBDIRS) $(INSTALL_SUBDIRS) $(CLEAN_SUBDIRS)
@@ -107,7 +108,7 @@ mingw: w32api
 
 cygwin: w32api
 
-cinstall: mingw bz2lib zlib
+cinstall: mingw bz2lib $(ZLIB)
 
 install_utils: cygwin mingw
 
@@ -115,4 +116,4 @@ install_mingw: w32api
 
 install_cygwin: w32api
 
-install_cinstall: mingw bz2lib zlib
+install_cinstall: mingw bz2lib $(ZLIB)

@@ -1,3 +1,8 @@
+2001-12-18  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Don't attempt to use zlib directory as a dependency if
+	it doesn't exist.
+
 2001-12-14  Christopher Faylor  <cgf@redhat.com>
 
 	* configure.in: Detect zlib subdirectory.
