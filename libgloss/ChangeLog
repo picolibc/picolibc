@@ -1,3 +1,11 @@
+2001-10-31  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* m32r/Makefile.in: Use gdb stub set by configure.
+	* m32r/configure.in: Add a special macro for testing
+	c compiler without building executable.  Add setting of
+	GDBSTUB.
+	* m32r/configure: Regenerated.
+
 2001-10-31  David Howells  <dhowells@redhat.com>
 
 	* syscall.h: Added SYS_times, SYS_gettimeofday, SYS_link values.
