@@ -1,3 +1,9 @@
+2000-09-05  Manfred Hollstein  <manfredh@redhat.com>
+
+        * Makefile.am (install-data-local): Use optional $(DESTDIR) where
+        required, as documented in the gnu coding standards.
+        * Makefile.in: Regenerate.
+
 2000-09-05  Jeff Johnston <jjohnstn@redhat.com>
 
 	* libc/include/fcntl.h (_FNDELAY): Changed to be _FNONBLOCK to

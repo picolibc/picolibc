@@ -129,32 +129,32 @@ stmp-targ-include: config.status
 CLEANFILES = targ-include stmp-targ-include
 
 install-data-local: install-toollibLIBRARIES
-	rm -f $(toollibdir)/libg.a
-	ln $(toollibdir)/libc.a $(toollibdir)/libg.a
+       rm -f $(DESTDIR)$(toollibdir)/libg.a
+       ln $(DESTDIR)$(toollibdir)/libc.a $(DESTDIR)$(toollibdir)/libg.a
 	$(MULTIDO) $(AM_MAKEFLAGS) DO=install multi-do
 	-if [ -z "$(MULTISUBDIR)" ]; then \
 	  for i in $(srcdir)/libc/include/*.h; do \
-	    $(INSTALL_DATA) $$i $(tooldir)/include/`basename $$i`; \
+           $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/`basename $$i`; \
 	  done; \
 	  for i in $(srcdir)/libc/include/machine/*.h; do \
-	    $(INSTALL_DATA) $$i $(tooldir)/include/machine/`basename $$i`; \
+           $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/machine/`basename $$i`; \
 	  done; \
 	  for i in $(srcdir)/libc/machine/$(machine_dir)/machine/*.h; do \
 	    if [ -f $$i ]; then \
-	      $(INSTALL_DATA) $$i $(tooldir)/include/machine/`basename $$i`; \
+             $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/machine/`basename $$i`; \
 	    else true; fi ; \
 	  done; \
 	  for i in $(srcdir)/libc/include/sys/*.h; do \
-	    $(INSTALL_DATA) $$i $(tooldir)/include/sys/`basename $$i`; \
+           $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/sys/`basename $$i`; \
 	  done; \
 	  for i in $(srcdir)/libc/sys/$(sys_dir)/sys/*.h; do \
 	    if [ -f $$i ]; then \
-	      $(INSTALL_DATA) $$i $(tooldir)/include/sys/`basename $$i`; \
+             $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/sys/`basename $$i`; \
 	    else true; fi ; \
 	  done ; \
 	  for i in $(srcdir)/libc/sys/$(sys_dir)/include/*.h; do \
 	    if [ -f $$i ]; then \
-	      $(INSTALL_DATA) $$i $(tooldir)/include/`basename $$i`; \
+             $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/`basename $$i`; \
 	    else true; fi ; \
 	  done ; \
 	else true; fi
