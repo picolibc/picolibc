@@ -15,6 +15,8 @@ SHELL = @SHELL@
 srcdir = @srcdir@
 VPATH = @srcdir@
 
+host_alias = @host_alias@
+build_alias = @build_alias@
 target_alias = @target_alias@
 prefix = @prefix@
 
@@ -133,35 +135,6 @@ lib%.a: %.o
 	$(RANLIB) $@
 
 # install headers and libraries in a target specified directory.
-xinstall: xinstall-libraries xinstall-headers
-
-xinstall-libraries: all
-	$(mkinstalldirs) $(tooldir)/lib
-	for i in $(LIBS); do \
-		$(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
-	done
-
-xinstall-headers:
-	$(mkinstalldirs) $(tooldir)/include/w32api
-	for i in $(HEADERS); do \
-		$(INSTALL_DATA) $(srcdir)/../include/$$i $(tooldir)/include/w32api/$$i ; \
-	done
-
-# uninstall headers and libraries from a target specified directory
-xuninstall: xuninstall-libraries xuninstall-headers
-
-xuninstall-libraries:
-	@for i in $(LIBS); do \
-		rm -f $(tooldir)/lib/$$i ; \
-	done
-
-xuninstall-headers:
-	@for i in $(HEADERS); do \
-		rm -r $(tooldir)/include/w32api/$$i ; \
-	done
-	rmdir $(tooldir)/include/w32api
-
-# install headers and libraries 
 install: install-libraries install-headers
 
 install-libraries: all
@@ -176,7 +149,7 @@ install-headers:
 		$(INSTALL_DATA) $(srcdir)/../include/$$i $(tooldir)/include/w32api/$$i ; \
 	done
 
-# uninstall headers and libraries 
+# uninstall headers and libraries from a target specified directory
 uninstall: uninstall-libraries uninstall-headers
 
 uninstall-libraries:
@@ -186,9 +159,10 @@ uninstall-libraries:
 
 uninstall-headers:
 	@for i in $(HEADERS); do \
-		rm -f $(tooldir)/include/w32api/$$i ; \
+		rm -r $(tooldir)/include/w32api/$$i ; \
 	done
 	rmdir $(tooldir)/include/w32api
+
 
 dist:
 	mkdir $(distdir)/include

@@ -1,4 +1,17 @@
 
+2001-02-12:  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* lib/Makefile.in: (host_alias): Add variable.
+	(host_build): Ditto:
+	(xinstall): Removed
+	(xinstall-libraries): Ditto.
+	(xinstall-headers): Ditto.
+	(xuninstall): Ditto.
+	(xuninstall-libraries): Ditto.
+	(xuninstall-headers): Ditto.
+	* Makefile.in: (host_alias): Add variable.
+	(build_alias): Ditto.
+
 Fri Feb  2 13:08:09  2001  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* include/winnt.h: (__TEXT): Add private macro.
