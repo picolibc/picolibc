@@ -1,3 +1,9 @@
+2000-01-27  Thomas de Lellis  <tdel@windriver.com>
+
+        * arm.h (STT_ARM_TFUNC): Define in terms of STT_LOPROC.
+	(STT_ARM_16BIT): New flag.  Denotes a label that was defined in
+	Thumb block but was does not identify a function.
+
 2000-01-20  Nick Clifton  <nickc@cygnus.com>
 
 	* common.h (EM_MCORE): Fix spelling of Motorola.

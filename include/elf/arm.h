@@ -1,5 +1,5 @@
 /* ARM ELF support for BFD.
-   Copyright (C) 1998, 1999 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -29,7 +29,7 @@
 #define EF_APCS_26         0x08
 #define EF_APCS_FLOAT      0x10
 #define EF_PIC             0x20
-#define EF_ALIGN8	   0x40		/* 8-bit structure alignment is in use */
+#define EF_ALIGN8	   0x40		/* 8-bit structure alignment is in use.  */
 #define EF_NEW_ABI         0x80
 #define EF_OLD_ABI         0x100
 #define EF_SOFT_FLOAT      0x200
@@ -41,15 +41,16 @@
 #define F_PIC              EF_PIC
 #define F_SOFT_FLOAT	   EF_SOFT_FLOAT
 
-/* Additional symbol types for Thumb */
-#define STT_ARM_TFUNC     0xd
+/* Additional symbol types for Thumb.  */
+#define STT_ARM_TFUNC      STT_LOPROC   /* A Thumb function.  */
+#define STT_ARM_16BIT      STT_HIPROC   /* A Thumb label.  */
 
-/* ARM-specific values for sh_flags */
-#define SHF_ENTRYSECT      0x10000000   /* Section contains an entry point */
-#define SHF_COMDEF         0x80000000   /* Section may be multiply defined in the input to a link step */
+/* ARM-specific values for sh_flags.  */
+#define SHF_ENTRYSECT      0x10000000   /* Section contains an entry point.  */
+#define SHF_COMDEF         0x80000000   /* Section may be multiply defined in the input to a link step.  */
 
-/* ARM-specific program header flags */
-#define PF_ARM_SB          0x10000000   /* Segment contains the location addressed by the static base */
+/* ARM-specific program header flags.  */
+#define PF_ARM_SB          0x10000000   /* Segment contains the location addressed by the static base.  */
 
 /* Relocation types.  */
 START_RELOC_NUMBERS (elf_arm_reloc_type)
@@ -82,8 +83,8 @@ START_RELOC_NUMBERS (elf_arm_reloc_type)
   FAKE_RELOC   (LAST_INVALID_RELOC1,  99)
   RELOC_NUMBER (R_ARM_GNU_VTENTRY, 100)
   RELOC_NUMBER (R_ARM_GNU_VTINHERIT, 101)
-  RELOC_NUMBER (R_ARM_THM_PC11,    102)       /* cygnus extension to abi: thumb unconditional branch */
-  RELOC_NUMBER (R_ARM_THM_PC9,     103)       /* cygnus extension to abi: thumb conditional branch */
+  RELOC_NUMBER (R_ARM_THM_PC11,    102)       /* Cygnus extension to abi: Thumb unconditional branch */
+  RELOC_NUMBER (R_ARM_THM_PC9,     103)       /* Cygnus extension to abi: Thumb conditional branch */
   FAKE_RELOC   (FIRST_INVALID_RELOC2, 104)
   FAKE_RELOC   (LAST_INVALID_RELOC2,  248)
   RELOC_NUMBER (R_ARM_RXPC25,     249)
