@@ -229,51 +229,54 @@ setsid (void)
 extern "C" ssize_t
 _read (int fd, void *ptr, size_t len)
 {
-  sigframe thisframe (mainthread);
-  extern int sigcatchers;
-  bool sawsig;
-
-beg:
-  sawsig = 0;
-  if (fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-      return -1;
-    }
-
-  // set_sig_errno (0);
-  fhandler_base *fh = fdtab[fd];
-  DWORD wait = (fh->get_flags () & (O_NONBLOCK | OLD_O_NDELAY)) ? 0 : INFINITE;
-
-  /* Could block, so let user know we at least got here.  */
-  syscall_printf ("read (%d, %p, %d) %sblocking, sigcatchers %d", fd, ptr, len, wait ? "" : "non", sigcatchers);
-
   int res;
-  if (wait && (!sigcatchers || !fh->is_slow () || fh->get_r_no_interrupt ()))
-    debug_printf ("non-interruptible read\n");
-  else if (!fh->ready_for_read (fd, wait, 0))
+  fhandler_base *fh;
+  extern int sigcatchers;
+
+  while (1)
     {
-      if (!wait)
-	set_sig_errno (EAGAIN);	/* Don't really need 'set_sig_errno' here, but... */
-      else
-	set_sig_errno (EINTR);
-      res = -1;
-      goto out;
+      sigframe thisframe (mainthread);
+
+      if (fdtab.not_open (fd))
+	{
+	  set_errno (EBADF);
+	  return -1;
+	}
+
+      // set_sig_errno (0);
+      fh = fdtab[fd];
+      DWORD wait = (fh->get_flags () & (O_NONBLOCK | OLD_O_NDELAY)) ? 0 : INFINITE;
+
+      /* Could block, so let user know we at least got here.  */
+      syscall_printf ("read (%d, %p, %d) %sblocking, sigcatchers %d", fd, ptr, len, wait ? "" : "non", sigcatchers);
+
+      if (wait && (!sigcatchers || !fh->is_slow () || fh->get_r_no_interrupt ()))
+	debug_printf ("non-interruptible read\n");
+      else if (!fh->ready_for_read (fd, wait, 0))
+	{
+	  if (!wait)
+	    set_sig_errno (EAGAIN);	/* Don't really need 'set_sig_errno' here, but... */
+	  else
+	    set_sig_errno (EINTR);
+	  res = -1;
+	  goto out;
+	}
+
+      /* Check to see if this is a background read from a "tty",
+	 sending a SIGTTIN, if appropriate */
+      res = fh->bg_check (SIGTTIN);
+      if (res > bg_eof)
+	{
+	  myself->process_state |= PID_TTYIN;
+	  res = fh->read (ptr, len);
+	  myself->process_state &= ~PID_TTYIN;
+	}
+
+    out:
+      if (res >= 0 || get_errno () == EINTR || !thisframe.call_signal_handler ())
+	break;
     }
 
-  /* Check to see if this is a background read from a "tty",
-     sending a SIGTTIN, if appropriate */
-  res = fh->bg_check (SIGTTIN);
-  if (res > bg_eof)
-    {
-      myself->process_state |= PID_TTYIN;
-      res = fh->read (ptr, len);
-      myself->process_state &= ~PID_TTYIN;
-    }
-
-out:
-  if (res < 0 && get_errno () == EINTR && call_signal_handler ())
-    goto beg;
   syscall_printf ("%d = read (%d<%s>, %p, %d), bin %d, errno %d", res, fd, fh->get_name (),
 		  ptr, len, fh->get_r_binary (), get_errno ());
   MALLOC_CHECK;

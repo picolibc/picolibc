@@ -99,7 +99,7 @@ sigprocmask (int sig, const sigset_t *set, sigset_t *oldset)
   if (sig < 0 || sig >= NSIG)
     {
       set_errno (EINVAL);
-      syscall_printf ("SIG_ERR = sigprocmask sig %d out of range", sig);
+      syscall_printf ("SIG_ERR = sigprocmask signal %d out of range", sig);
       return -1;
     }
 
@@ -182,7 +182,7 @@ _kill (pid_t pid, int sig)
   if (sig < 0 || sig >= NSIG)
     {
       set_errno (EINVAL);
-      syscall_printf ("sig %d out of range", sig);
+      syscall_printf ("signal %d out of range", sig);
       return -1;
     }
 
@@ -202,7 +202,7 @@ kill_pgrp (pid_t pid, int sig)
   int found = 0;
   int killself = 0;
 
-  sigproc_printf ("pid %d, sig %d", pid, sig);
+  sigproc_printf ("pid %d, signal %d", pid, sig);
 
   winpids pids;
   for (unsigned i = 0; i < pids.npids; i++)
@@ -247,12 +247,12 @@ killpg (pid_t pgrp, int sig)
 extern "C" int
 sigaction (int sig, const struct sigaction *newact, struct sigaction *oldact)
 {
-  sigproc_printf ("sig %d, newact %p, oldact %p", sig, newact, oldact);
+  sigproc_printf ("signal %d, newact %p, oldact %p", sig, newact, oldact);
   /* check that sig is in right range */
   if (sig < 0 || sig >= NSIG)
     {
       set_errno (EINVAL);
-      syscall_printf ("SIG_ERR = sigaction sig %d out of range", sig);
+      syscall_printf ("SIG_ERR = sigaction signal %d out of range", sig);
       return -1;
     }
 
@@ -286,7 +286,7 @@ sigaddset (sigset_t *set, const int sig)
   if (sig <= 0 || sig >= NSIG)
     {
       set_errno (EINVAL);
-      syscall_printf ("SIG_ERR = sigaddset sig %d out of range", sig);
+      syscall_printf ("SIG_ERR = sigaddset signal %d out of range", sig);
       return -1;
     }
 
@@ -301,7 +301,7 @@ sigdelset (sigset_t *set, const int sig)
   if (sig <= 0 || sig >= NSIG)
     {
       set_errno (EINVAL);
-      syscall_printf ("SIG_ERR = sigdelset sig %d out of range", sig);
+      syscall_printf ("SIG_ERR = sigdelset signal %d out of range", sig);
       return -1;
     }
 
@@ -316,7 +316,7 @@ sigismember (const sigset_t *set, int sig)
   if (sig <= 0 || sig >= NSIG)
     {
       set_errno (EINVAL);
-      syscall_printf ("SIG_ERR = sigdelset sig %d out of range", sig);
+      syscall_printf ("SIG_ERR = sigdelset signal %d out of range", sig);
       return -1;
     }
 

@@ -1,3 +1,18 @@
+Sat Mar 31 18:59:52 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.h (class sigframe): Implement 'unregister()' method.
+	(sigframe::~sigframe): Use unregister method.
+	(sigframe::call_signal_handler): Declare new method.
+	* exceptions.cc (sigframe::call_signal_handler): New method.
+	Unregisters current sigframe before calling signal handler.
+	(setup_handler): Clear waiting threads prior to arming signal_arrived.
+	* syscalls.cc (_read): Change goto to loop.  Recalculate sigframe
+	inside of loop so that constructor is called when appropriate.
+	* wait.cc (wait4): Ditto.
+
+	* signal.cc: Change "sig" to "signal" in debugging messages throughout.
+	* sigproc.cc: Ditto.
+
 Sat Mar 31 17:12:08 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler_serial.cc (fhandler_serial::raw_write): Close protected

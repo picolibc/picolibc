@@ -736,7 +736,7 @@ sig_send (_pinfo *p, int sig, DWORD ebp)
   if (!wait_for_completion)
     {
       rc = WAIT_OBJECT_0;
-      sigproc_printf ("Not waiting for sigcomplete.  its_me %d sig %d", its_me, sig);
+      sigproc_printf ("Not waiting for sigcomplete.  its_me %d signal %d", its_me, sig);
       if (!its_me)
 	ForceCloseHandle (thiscatch);
     }
@@ -765,7 +765,7 @@ sig_send (_pinfo *p, int sig, DWORD ebp)
     {
       /* It's an error unless sig_loop_wait == 0 (the process is exiting). */
       if (!no_signals_available ())
-	system_printf ("wait for sig_complete event failed, sig %d, rc %d, %E",
+	system_printf ("wait for sig_complete event failed, signal %d, rc %d, %E",
 		      sig, rc);
       set_errno (ENOSYS);
       rc = -1;
@@ -1144,7 +1144,7 @@ wait_sig (VOID *)
 		  (sigismember (&myself->getsigmask (), sig) ||
 		  (sig != SIGCONT && ISSTATE (myself, PID_STOPPED))))
 		{
-		  sigproc_printf ("sig %d blocked", sig);
+		  sigproc_printf ("signal %d blocked", sig);
 		  break;
 		}
 

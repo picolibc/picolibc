@@ -49,6 +49,17 @@ class sigframe
 {
 private:
   sigthread *st;
+  void unregister ()
+  {
+    if (st)
+      {
+	EnterCriticalSection (&st->lock);
+	st->frame = 0;
+	st->release_winapi_lock ();
+	LeaveCriticalSection (&st->lock);
+	st = NULL;
+      }
+  }
 
 public:
   void set (sigthread &t, DWORD ebp)
@@ -70,15 +81,10 @@ public:
   }
   ~sigframe ()
   {
-    if (st)
-      {
-	EnterCriticalSection (&st->lock);
-	st->frame = 0;
-	st->release_winapi_lock ();
-	LeaveCriticalSection (&st->lock);
-	st = NULL;
-      }
+    unregister ();
   }
+
+  int call_signal_handler ();
 };
 
 extern sigthread mainthread;

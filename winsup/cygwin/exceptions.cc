@@ -864,10 +864,10 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
     }
   else
     {
-      res = SetEvent (signal_arrived);	// For an EINTR case
-      sigproc_printf ("armed signal_arrived %p, res %d", signal_arrived, res);
       /* Clear any waiting threads prior to dispatching to handler function */
       proc_subproc (PROC_CLEARWAIT, 1);
+      res = SetEvent (signal_arrived);	// For an EINTR case
+      sigproc_printf ("armed signal_arrived %p, res %d", signal_arrived, res);
     }
 
   if (th)
@@ -1125,6 +1125,13 @@ reset_signal_arrived ()
 {
   (void) ResetEvent (signal_arrived);
   sigproc_printf ("reset signal_arrived");
+}
+
+int
+sigframe::call_signal_handler ()
+{
+  unregister ();
+  ::call_signal_handler ();
 }
 
 int __stdcall

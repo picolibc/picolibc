@@ -50,71 +50,74 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
   int res;
   waitq *w;
   HANDLE waitfor;
-  sigframe thisframe (mainthread);
   bool sawsig;
 
-beg:
-  sawsig = 0;
-  if (options & ~(WNOHANG | WUNTRACED))
+  while (1)
     {
-      set_errno (EINVAL);
-      return -1;
+      sigframe thisframe (mainthread);
+      sawsig = 0;
+      if (options & ~(WNOHANG | WUNTRACED))
+	{
+	  set_errno (EINVAL);
+	  return -1;
+	}
+
+      if (r)
+	memset (r, 0, sizeof (*r));
+
+      if ((w = (waitq *) waitq_storage.get ()) == NULL)
+	w = (waitq *) waitq_storage.create ();
+
+      w->pid = intpid;
+      w->options = options;
+      w->rusage = r;
+      sigproc_printf ("calling proc_subproc, pid %d, options %d",
+		     w->pid, w->options);
+      if (!proc_subproc (PROC_WAIT, (DWORD)w))
+	{
+	  set_errno (ENOSYS);
+	  paranoid_printf ("proc_subproc returned 0");
+	  res = -1;
+	  goto done;
+	}
+
+      if ((waitfor = w->ev) == NULL)
+	goto nochildren;
+
+      res = WaitForSingleObject (waitfor, INFINITE);
+
+      sigproc_printf ("%d = WaitForSingleObject (...)", res);
+
+      if (w->ev == NULL)
+	{
+	nochildren:
+	  /* found no children */
+	  set_errno (ECHILD);
+	  res = -1;
+	  goto done;
+	}
+
+      if (w->status == -1)
+	{
+	  set_sig_errno (EINTR);
+	  sawsig = 1;
+	  res = -1;
+	}
+      else if (res != WAIT_OBJECT_0)
+	{
+	  /* We shouldn't set errno to any random value if we can help it.
+	     See the Posix manual for a list of valid values for `errno'.  */
+	  set_errno (EINVAL);
+	  res = -1;
+	}
+      else if ((res = w->pid) != 0 && status)
+	*status = w->status;
+
+    done:
+      if (!sawsig || !thisframe.call_signal_handler ())
+	break;
     }
 
-  if (r)
-    memset (r, 0, sizeof (*r));
-
-  if ((w = (waitq *) waitq_storage.get ()) == NULL)
-    w = (waitq *) waitq_storage.create ();
-
-  w->pid = intpid;
-  w->options = options;
-  w->rusage = r;
-  sigproc_printf ("calling proc_subproc, pid %d, options %d",
-		 w->pid, w->options);
-  if (!proc_subproc (PROC_WAIT, (DWORD)w))
-    {
-      set_errno (ENOSYS);
-      paranoid_printf ("proc_subproc returned 0");
-      res = -1;
-      goto done;
-    }
-
-  if ((waitfor = w->ev) == NULL)
-    goto nochildren;
-
-  res = WaitForSingleObject (waitfor, INFINITE);
-
-  sigproc_printf ("%d = WaitForSingleObject (...)", res);
-
-  if (w->ev == NULL)
-    {
-    nochildren:
-      /* found no children */
-      set_errno (ECHILD);
-      res = -1;
-      goto done;
-    }
-
-  if (w->status == -1)
-    {
-      set_sig_errno (EINTR);
-      sawsig = 1;
-      res = -1;
-    }
-  else if (res != WAIT_OBJECT_0)
-    {
-      /* We shouldn't set errno to any random value if we can help it.
-	 See the Posix manual for a list of valid values for `errno'.  */
-      set_errno (EINVAL);
-      res = -1;
-    }
-  else if ((res = w->pid) != 0 && status)
-    *status = w->status;
-
-done:
-  if (sawsig && call_signal_handler ())
-    goto beg;
   sigproc_printf ("intpid %d, status %p, w->status %d, options %d, res %d",
 		  intpid, status, w->status, options, res);
   w->status = -1;
