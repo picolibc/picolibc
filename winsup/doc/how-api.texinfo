@@ -174,17 +174,12 @@ ones which have a "#!" as their first characters.
 
 @subsection How secure is Cygwin in a multi-user environment?
 
-Cygwin is not secure in a multi-user environment.  For
-example if you have a long running daemon such as "inetd"
-running as admin while ordinary users are logged in, or if
-you have a user logged in remotely while another user is logged
-into the console, one cygwin client can trick another into
-running code for it.  In this way one user may gain the
-privilege of another cygwin program running on the machine.
-This is because cygwin has shared state that is accessible by 
-all processes.
-
-(Thanks to Tim Newsham (newsham@@lava.net) for this explanation).
+As of version 1.5.13, the Cygwin developers are not aware of any feature
+in the cygwin dll that would allow users to gain privileges or to access
+objects to which they have no rights under Windows. However there is no
+guarantee that Cygwin is as secure as the Windows it runs on.  Cygwin
+processes share some variables and are thus easier targets of denial of
+service type of attacks.
 
 @subsection How do the net-related functions work?
 
