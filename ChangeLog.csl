@@ -1,0 +1,58 @@
+2005-03-23  Jim Blandy  <jimb@redhat.com>
+
+	* config/tc-arm.c (arm_adjust_symtab): Fetch elf_sym's binding
+	attributes properly.
+
+2005-03-21  Nick Clifton  <nickc@redhat.com>
+
+	* gas/testsuite/gas/arm/iwmmxt.s: Update instructions that use the "never" value
+	in the conditional field to use "le" instead.  This is so that the
+	disassembler will disassemble them.
+	* gas/testsuite/gas/arm/iwmmxt.d: Update expected disassemblies.
+
+2005-03-18  Julian Brown  <julian@codesourcery.com>
+
+	* ld/scripttempl/armbpapi.sc (.rel.dyn): Add .rel.init_array,
+	.rel.fini_array.
+	(.rela.dyn): Add .rela.init_array, .rela.fini_array.
+	(SECTIONS): Add .rel.other, .rela.other, .reli.other after PLT relocs.
+
+2005-03-16  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* gas/configure.tgt: Set emulation for arm-*-eabi*.
+	* gas/config/tc-arm.c (meabi_flags): Check EABI_DEFAULT.
+	* gas/config/te-armeabi.h: New file.
+	* gas/config/te-armlinuxeabi.h (EABI_DEFAULT): Define.
+	* gas/config/te-symbian.h: Include "te-armeabi.h".
+
+2005-03-15  Zack Weinberg  <zack@codesourcery.com>
+
+	* gas/config/tc-arm.c (do_mla): Rename to do_mlas, take second
+	is_mls parameter; do not diagnose Rm==Rd when is_mls.
+	(do_mla, do_mls, five_bit_unsigned_immediate, bfci_lsb_and_width)
+	(do_bfc, do_bfi, do_bfx, do_rbit, do_mov16, do_ldsttv4): New functions.
+	(insns): Add ARMv6T2 instructions:
+	bfc bfi mls movw movt rbit sbfx ubfx ldrht ldrsht ldrsbt strht.
+	(arm_archs): Add V6T2 variants.
+
+2005-03-12  Zack Weinberg  <zack@codesourcery.com>
+
+	* gas/config/tc-arm.c (tinsns): Add ARMv6K instructions sev, wfe,
+	wfi, yield.
+
+	* opcodes/arm-dis.c (thumb_opcodes): Add ARMv6K instructions nop, sev,
+	wfe, wfi, yield.
+
+	* gas/testsuite/gas/arm/thumbv6k.d, gas/arm/thumbv6k.s: New dump test.
+	* gas/testsuite/gas/arm/arm.exp: Run it.
+
+2005-03-12  Zack Weinberg  <zack@codesourcery.com>
+
+	* opcodes/arm-dis.c (arm_opcodes): Document %E and %V.
+	Add entries for v6T2 ARM instructions:
+	bfc bfi mls strht ldrht ldrsht ldrsbt movw movt rbit ubfx sbfx.
+	(print_insn_arm): Add support for %E and %V.
+
+	* include/opcode/arm.h: Adjust comments for ARM_EXT_V4T and ARM_EXT_V5T.
+	Add ARM_EXT_V6T2, ARM_ARCH_V6T2, ARM_ARCH_V6KT2, ARM_ARCH_V6ZT2,
+	and ARM_ARCH_V6ZKT2.
