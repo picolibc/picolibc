@@ -1,3 +1,11 @@
+2002-12-30  Chris Demetriou  <cgd@broadcom.com>
+
+	* mips.h: Document "+" as the start of two-character operand
+	type names, and add new "K", "+A", "+B", and "+C" operand types.
+	(OP_MASK_INSMSB, OP_SH_INSMSB, OP_MASK_EXTMSB)
+	(OP_SH_EXTMSB, INSN_ISA32R2, ISA_MIPS32R2, CPU_MIPS32R2): New
+	defines.
+
 2002-12-24    Dmitry Diky <diwil@mail.ru>
 
 	* msp430.h: New file.  Defines msp430 opcodes.

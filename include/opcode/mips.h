@@ -142,6 +142,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  *
 #define OP_SH_VECBYTE		22
 #define OP_MASK_VECALIGN	0x7	/* Vector byte-align (alni.ob) op.  */
 #define OP_SH_VECALIGN		21
+#define OP_MASK_INSMSB		0x1f	/* "ins" MSB.  */
+#define OP_SH_INSMSB		11
+#define OP_MASK_EXTMSBD		0x1f	/* "ext" MSBD.  */
+#define OP_SH_EXTMSBD		11
 
 #define	OP_OP_COP0		0x10
 #define	OP_OP_COP1		0x11
@@ -228,6 +232,12 @@ struct mips_opcode
    "J" 19 bit wait function code (OP_*_CODE19)
    "x" accept and ignore register name
    "z" must be zero register
+   "K" 5 bit Hardware Register (rdhwr instruction) (OP_*_RD)
+   "+A" 5 bit ins/ext position/lsb (OP_*_SHAMT)
+   "+B" 5 bit "ins" size spec (OP_*_INSMSB).  Requires that "+A"
+	occur first!
+   "+C" 5 bit "ext" msbd spec (OP_*_EXTMSBD).  Requires that "+A"
+	occur first!
 
    Floating point instructions:
    "D" 5 bit destination register (OP_*_FD)
@@ -268,11 +278,16 @@ struct mips_opcode
    "()" parens surrounding optional value
    ","  separates operands
    "[]" brackets around index for vector-op scalar operand specifier (vr5400)
+   "+"  Start of extension sequence.
 
    Characters used so far, for quick reference when adding more:
-   "%[]<>(),"
-   "ABCDEFGHIJLMNOPQRSTUVWXYZ"
+   "%[]<>(),+"
+   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
    "abcdefhijklopqrstuvwxz"
+
+   Extension character sequences used so far ("+" followed by the
+   following), for quick reference when adding more:
+   "ABC"
 */
 
 /* These are the bits which may be set in the pinfo field of an
@@ -364,6 +379,7 @@ struct mips_opcode
 #define INSN_ISA5                 0x00000100
 #define INSN_ISA32                0x00000200
 #define INSN_ISA64                0x00000400
+#define INSN_ISA32R2              0x00000800
 
 /* Masks used for MIPS-defined ASEs.  */
 #define INSN_ASE_MASK		  0x0000f000
@@ -406,8 +422,11 @@ struct mips_opcode
 #define       ISA_MIPS3       (ISA_MIPS2 | INSN_ISA3)
 #define       ISA_MIPS4       (ISA_MIPS3 | INSN_ISA4)
 #define       ISA_MIPS5       (ISA_MIPS4 | INSN_ISA5)
+
 #define       ISA_MIPS32      (ISA_MIPS2 | INSN_ISA32)
 #define       ISA_MIPS64      (ISA_MIPS5 | INSN_ISA32 | INSN_ISA64)
+
+#define       ISA_MIPS32R2    (ISA_MIPS32 | INSN_ISA32R2)
 
 /* CPU defines, use instead of hardcoding processor number. Keep this
    in sync with bfd/archures.c in order for machine selection to work.  */
@@ -432,6 +451,7 @@ struct mips_opcode
 #define CPU_R12000	12000
 #define CPU_MIPS16	16
 #define CPU_MIPS32	32
+#define CPU_MIPS32R2	33
 #define CPU_MIPS5       5
 #define CPU_MIPS64      64
 #define CPU_SB1         12310201        /* octal 'SB', 01.  */
