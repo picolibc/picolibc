@@ -170,6 +170,7 @@ path_conv::check (const char *src, unsigned opt,
   char tmp_buf[MAX_PATH];
   symlink_info sym;
   bool need_directory = 0;
+  bool saw_symlinks = 0;
 
 #if 0
   static path_conv last_path_conv;
@@ -298,6 +299,7 @@ path_conv::check (const char *src, unsigned opt,
 	     these operations again on the newly derived path. */
 	  else if (len > 0)
 	    {
+	      saw_symlinks = 1;
 	      if (component == 0 && !need_directory && !(opt & PC_SYM_FOLLOW))
 		{
 		  set_symlink (); // last component of path is a symlink.
@@ -315,7 +317,7 @@ path_conv::check (const char *src, unsigned opt,
 	      (tail > path_copy && tail[-1] == ':'))
 	    goto out;	// all done
 
-	  /* Haven't found a valid pathname component yet.
+	  /* Haven't found an existing pathname component yet.
 	     Pinch off the tail and try again. */
 	  *tail = '\0';
 	  component++;
@@ -415,6 +417,9 @@ out:
          in fhandler.cc (fhandler_disk_file::open). */
       set_has_buggy_open (strcmp (fs_name, "SUNWNFS") == 0);
     }
+
+  if (saw_symlinks)
+    set_has_symlinks ();
 
 #if 0
   if (!error)
@@ -2372,10 +2377,7 @@ symlink_info::check (const char *in_path, const suffix_info *suffixes)
 	      /* Not a symlink, see if executable.  */
 	      if (!(pflags & PATH_ALL_EXEC) &&
 		  has_exec_chars (cookie_buf, got))
-{
-debug_printf ("setting exec flag");
 		pflags |= PATH_EXEC;
-}
 	    close_and_return:
 	      CloseHandle (h);
 	      goto file_not_symlink;
@@ -2572,10 +2574,23 @@ chdir (const char *dir)
       native_dir[3] = '\0';
     }
   int res = SetCurrentDirectoryA (native_dir) ? 0 : -1;
+
+  /* If res < 0, we didn't change to a new directory.
+     Otherwise, set the current windows and posix directory cache from input.
+     If the specified directory is a MS-DOS style directory or if the directory
+     was symlinked, convert the MS-DOS path back to posix style.  Otherwise just
+     store the given directory.  This allows things like "find", which traverse
+     directory trees, to work correctly with Cygwin mounted directories.
+     FIXME: Is just storing the posixized windows directory the correct thing to
+     do when we detect a symlink?  Should we instead rebuild the posix path from
+     the input by traversing links?  This would be an expensive operation but
+     we'll see if Cygwin mailing list users whine about the current behavior. */
   if (res == -1)
     __seterrno ();
+  else if (!path.has_symlinks () && strpbrk (dir, ":\\") == NULL)
+    cygcwd.set (path, dir);
   else
-    cygcwd.set (path, strpbrk (dir, ":\\") != NULL ? NULL : dir);
+    cygcwd.set (path, NULL);
 
   /* Note that we're accessing cwd.posix without a lock here.  I didn't think
      it was worth locking just for strace. */
