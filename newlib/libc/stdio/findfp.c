@@ -25,6 +25,10 @@
 #include <sys/lock.h>
 #include "local.h"
 
+#ifndef __SINGLE_THREAD__
+__LOCK_INIT(static, __sfp_lock);
+#endif
+
 static void
 std (ptr, flags, file, data)
      FILE *ptr;
@@ -87,9 +91,7 @@ __sfp (d)
   struct _glue *g;
 
 #ifndef __SINGLE_THREAD__
-  __LOCK_INIT(static, lock);
-
-  __lock_acquire(lock); 
+  __lock_acquire(__sfp_lock); 
 #endif
 
   if (!_GLOBAL_REENT->__sdidinit)
@@ -104,7 +106,7 @@ __sfp (d)
 	break;
     }
 #ifndef __SINGLE_THREAD__
-  __lock_release(lock); 
+  __lock_release(__sfp_lock); 
 #endif
   d->_errno = ENOMEM;
   return NULL;
@@ -112,7 +114,7 @@ __sfp (d)
 found:
   fp->_flags = 1;		/* reserve this slot; caller sets real flags */
 #ifndef __SINGLE_THREAD__
-  __lock_release(lock); 
+  __lock_release(__sfp_lock); 
 #endif
   fp->_p = NULL;		/* no current pointer */
   fp->_w = 0;			/* nothing to read or write */
@@ -192,3 +194,42 @@ __sinit (s)
   std (s->_stderr, __SWR | __SNBF, 2, s);
 
 }
+
+#ifndef __SINGLE_THREAD__
+
+/* Walkable file locking routine.  */
+static int
+__fp_lock (ptr)
+     FILE * ptr;
+{
+  _flockfile(ptr);
+
+  return 0;
+}
+
+/* Walkable file unlocking routine.  */
+static int
+__fp_unlock (ptr)
+     FILE * ptr;
+{
+  _funlockfile(ptr);
+
+  return 0;
+}
+
+void
+__fp_lock_all ()
+{
+  __lock_acquire(__sfp_lock); 
+
+  (void) _fwalk (_REENT, __fp_lock);
+}
+
+void
+__fp_unlock_all ()
+{
+  (void) _fwalk (_REENT, __fp_unlock);
+
+  __lock_release(__sfp_lock); 
+}
+#endif
