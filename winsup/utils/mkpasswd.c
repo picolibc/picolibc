@@ -484,7 +484,7 @@ print_special (int print_sids,
 int
 usage (FILE * stream, int isNT)
 {
-  fprintf (stream, "Usage: mkpasswd [OPTION]... [domain]...\n\n"
+  fprintf (stream, "Usage: mkpasswd [OPTION]... [domain]...\n"
 	           "Print /etc/passwd file to stdout\n\n"
 	           "Options:\n");
   if (isNT)

@@ -1,5 +1,9 @@
 2003-04-26  Joshua Daniel Franklin <joshuadfranklin at yahoo dot com>
 
+	* mkpasswd.c (usage) Remove extra newline from description output.
+
+2003-04-26  Joshua Daniel Franklin <joshuadfranklin at yahoo dot com>
+
 	* cygcheck.cc (usage) Add description output.
 	* cygpath.cc (usage) Add description output.
 	* dumper.cc (usage) Add newline to description output.
