@@ -14,6 +14,8 @@
 #include <sys/ioctl.h>
 #include <machine/syscall.h>
 
+_syscall2(int,fstat64,int,fd,struct stat64 *,st)
+_syscall2(int,lstat64,const char *,name,struct stat64 *,st)
 _syscall2(int,stat64,const char *,name,struct stat64 *,st)
 
 static _syscall5(void,_llseek,int,fd,off_t,hi,off_t,lo,loff_t *,pos,int,whence)

@@ -1,3 +1,7 @@
+2002-04-29  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/io64.c (fstat64, lstat64): New syscalls added.
+
 2002-04-29  Jonathan Larmour  <jlarmour@redhat.com>
 
 	* libc/sys/arm/syscalls.c (_rename): New function. Just a stub.
