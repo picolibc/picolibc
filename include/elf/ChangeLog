@@ -1,3 +1,8 @@
+2003-09-11  James Cownie <jcownie@etnus.com>
+
+	* dwarf2.h: Add HP dwarf extensions from their hacked gdb
+	header files (ftp://ftp.hp.com/pub/lang/tools/WDB/wdb-4.0.tar.gz).
+
 2003-09-04  Nick Clifton  <nickc@redhat.com>
 
 	* v850.h (E_V850E1_ARCH): Define.
