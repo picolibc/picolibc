@@ -145,6 +145,15 @@ extern int fdmatch PARAMS ((int fd1, int fd2));
 
 extern char * getpwd PARAMS ((void));
 
+/* Get the current time.  */
+/* Prototypes vary from system to system, so we only provide a
+   prototype on systems where we know that we need it.  */
+#ifdef __MINGW32__
+/* Forward declaration to avoid #include <sys/time.h>.   */
+struct timeval;
+extern int gettimeofday PARAMS ((struct timeval *, void *)); 
+#endif
+
 /* Get the amount of time the process has run, in microseconds.  */
 
 extern long get_run_time PARAMS ((void));
@@ -153,7 +162,7 @@ extern long get_run_time PARAMS ((void));
    return value using malloc.  */
 
 extern char *make_relative_prefix PARAMS ((const char *, const char *,
-					   const char *));
+					   const char *)) ATTRIBUTE_MALLOC;
 
 /* Choose a temporary directory to use for scratch files.  */
 
@@ -245,6 +254,10 @@ extern PTR xcalloc PARAMS ((size_t, size_t)) ATTRIBUTE_MALLOC;
 /* Copy a string into a memory buffer without fail.  */
 
 extern char *xstrdup PARAMS ((const char *)) ATTRIBUTE_MALLOC;
+
+/* Copy at most N characters from string into a buffer without fail.  */
+
+extern char *xstrndup PARAMS ((const char *, size_t)) ATTRIBUTE_MALLOC;
 
 /* Copy an existing memory buffer to a new memory buffer without fail.  */
 

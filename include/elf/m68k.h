@@ -1,5 +1,5 @@
 /* MC68k ELF support for BFD.
-   Copyright 1998, 1999, 2000, 2002 Free Software Foundation, Inc.
+   Copyright 1998, 1999, 2000, 2002, 2005 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -54,5 +54,6 @@ END_RELOC_NUMBERS (R_68K_max)
 
 #define EF_CPU32    0x00810000
 #define EF_M68000   0x01000000
+#define EF_CFV4E    0x00008000
 
 #endif

@@ -65,7 +65,7 @@ extern "C" {
 typedef struct xtensa_isa_opaque { int unused; } *xtensa_isa;
 
 
-/* Opcodes, formats, regfiles, states, sysregs, ctypes, and protos are
+/* Most of the Xtensa ISA entities (e.g., opcodes, regfiles, etc.) are
    represented here using sequential integers beginning with 0.  The
    specific values are only fixed for a particular instantiation of an
    xtensa_isa structure, so these values should only be used
@@ -168,6 +168,7 @@ xtensa_isa_errno (xtensa_isa isa);
 extern char *
 xtensa_isa_error_msg (xtensa_isa isa);
 
+
 
 /* Instruction buffers.  */
 
@@ -214,6 +215,7 @@ xtensa_insnbuf_to_chars (xtensa_isa isa, const xtensa_insnbuf insn,
 extern void
 xtensa_insnbuf_from_chars (xtensa_isa isa, xtensa_insnbuf insn,
 			   const unsigned char *cp, int num_chars);
+
 
 
 /* ISA information.  */
@@ -279,6 +281,7 @@ xtensa_isa_num_interfaces (xtensa_isa isa);
 extern int
 xtensa_isa_num_funcUnits (xtensa_isa isa);
 
+
 
 /* Instruction formats.  */
 
@@ -341,6 +344,7 @@ xtensa_format_get_slot (xtensa_isa isa, xtensa_format fmt, int slot,
 extern int
 xtensa_format_set_slot (xtensa_isa isa, xtensa_format fmt, int slot,
 			xtensa_insnbuf insn, const xtensa_insnbuf slotbuf);
+
 
 
 /* Opcode information.  */
@@ -412,7 +416,6 @@ xtensa_opcode_is_call (xtensa_isa isa, xtensa_opcode opc);
 extern int
 xtensa_opcode_num_operands (xtensa_isa isa, xtensa_opcode opc);
 
-
 extern int
 xtensa_opcode_num_stateOperands (xtensa_isa isa, xtensa_opcode opc);
 
@@ -437,6 +440,7 @@ xtensa_opcode_num_funcUnit_uses (xtensa_isa isa, xtensa_opcode opc);
 
 extern xtensa_funcUnit_use *
 xtensa_opcode_funcUnit_use (xtensa_isa isa, xtensa_opcode opc, int u);
+
 
 
 /* Operand information.  */
@@ -572,6 +576,7 @@ extern int
 xtensa_operand_undo_reloc (xtensa_isa isa, xtensa_opcode opc, int opnd,
 			   uint32 *valp, uint32 pc);
 
+
 
 /* State Operands.  */
 
@@ -588,6 +593,7 @@ xtensa_stateOperand_state (xtensa_isa isa, xtensa_opcode opc, int stOp);
 extern char
 xtensa_stateOperand_inout (xtensa_isa isa, xtensa_opcode opc, int stOp);
 
+
 
 /* Interface Operands.  */
 
@@ -597,6 +603,7 @@ xtensa_stateOperand_inout (xtensa_isa isa, xtensa_opcode opc, int stOp);
 extern xtensa_interface
 xtensa_interfaceOperand_interface (xtensa_isa isa, xtensa_opcode opc,
 				   int ifOp);
+
 
 
 /* Register Files.  */
@@ -651,6 +658,7 @@ xtensa_regfile_num_bits (xtensa_isa isa, xtensa_regfile rf);
 extern int
 xtensa_regfile_num_entries (xtensa_isa isa, xtensa_regfile rf);
 
+
 
 /* Processor States.  */
 
@@ -679,6 +687,7 @@ xtensa_state_num_bits (xtensa_isa isa, xtensa_state st);
 
 extern int
 xtensa_state_is_exported (xtensa_isa isa, xtensa_state st);
+
 
 
 /* Sysregs ("special registers" and "user registers").  */
@@ -716,6 +725,7 @@ xtensa_sysreg_number (xtensa_isa isa, xtensa_sysreg sysreg);
 
 extern int
 xtensa_sysreg_is_user (xtensa_isa isa, xtensa_sysreg sysreg);
+
 
 
 /* Interfaces.  */
@@ -767,6 +777,7 @@ xtensa_interface_has_side_effect (xtensa_isa isa, xtensa_interface intf);
 
 extern int
 xtensa_interface_class_id (xtensa_isa isa, xtensa_interface intf);
+
 
 
 /* Functional Units.  */
