@@ -951,8 +951,8 @@ static const c4x_inst_t c4x_insts[] =
   P_CLASS_INSN(  "ldf",   "stf",  0xd8000000, OP_C3X   ),
   BB_CLASS_INSN( "ldfC",          0x00000000, OP_C3X   ),
   B6_CLASS_INSN( "ldfi",          0x07800000, OP_C3X   ),
-  { "ldhi",   0x1fe00000, 0xffe00000, "U,r" , OP_C4X   },  /* Z_CLASS */
-  { "ldhi",   0x1fe00000, 0xffe00000, "#,r" , OP_C4X   },  /* Z_CLASS */
+  { "ldhi",   0x1fe00000, 0xffe00000, "U,R" , OP_C4X   },  /* Z_CLASS */
+  { "ldhi",   0x1fe00000, 0xffe00000, "#,R" , OP_C4X   },  /* Z_CLASS */
   A_CLASS_INSN(  "ldi",           0x08000000, OP_C3X   ),
   LL_CLASS_INSN( "ldi",           0xc6000000, OP_C3X   ),
   P_CLASS_INSN(  "ldi",   "sti",  0xda000000, OP_C3X   ),

@@ -1,3 +1,7 @@
+2002-11-19  Svein E. Seldal  <Svein.Seldal@solidas.com>
+
+	* tic4x.h (c4x_insts): Fixed LDHI constraint
+
 2002-11-18  Klee Dienes  <kdienes@apple.com>
 
 	* h8300.h (h8_opcode): Remove 'length' field.
