@@ -36,6 +36,9 @@ dejagnu/
 	dejagnu: http://www.gnu.org/software/dejagnu/
 	Patches to bug-dejagnu@gnu.org
 
+depcomp
+        Send bug reports and patches to bug-automake@gnu.org.
+
 gdb/; mmalloc/; readline/; sim/; GDB's part of include/ & dejagnu/
 	gdb: http://sources.redhat.com/gdb/
 	Patches to gdb-patches@sources.redhat.com.
