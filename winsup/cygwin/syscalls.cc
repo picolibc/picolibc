@@ -2445,33 +2445,139 @@ memccpy (_PTR out, const _PTR in, int c, size_t len)
 extern "C" int
 setpriority (int which, id_t who, int value)
 {
-  /* TODO: Support PRIO_PGRP and PRIO_USER. */
-  if (which != PRIO_PROCESS || (who != 0 && (pid_t) who != myself->pid))
+  DWORD prio = nice_to_winprio (value);
+  int error = 0;
+
+  switch (which)
     {
+    case PRIO_PROCESS:
+      if (!who)
+	who = myself->pid;
+      if ((pid_t) who == myself->pid)
+	{
+	  if (!SetPriorityClass (hMainProc, prio))
+	    {
+	      set_errno (EACCES);
+	      return -1;
+	    }
+	  myself->nice = value;
+	  debug_printf ("Set nice to %d", myself->nice);
+	  return 0;
+	}
+      break;
+    case PRIO_PGRP:
+      if (!who)
+	who = myself->pgid;
+      break;
+    case PRIO_USER:
+      if (!who)
+	who = myself->uid;
+      break;
+    default:
       set_errno (EINVAL);
       return -1;
     }
-  DWORD prio = nice_to_winprio (value);
-  if (SetPriorityClass (hMainProc, prio) == FALSE)
+  winpids pids ((DWORD) PID_MAP_RW);
+  for (DWORD i = 0; i < pids.npids; ++i)
     {
-      __seterrno ();
+      _pinfo *p = pids[i];
+      if (p)
+	{
+	  switch (which)
+	    {
+	    case PRIO_PROCESS:
+	      if ((pid_t) who != p->pid)
+		continue;
+	      break;
+	    case PRIO_PGRP:
+	      if ((pid_t) who != p->pgid)
+		continue;
+	      break;
+	    case PRIO_USER:
+		if ((__uid32_t) who != p->uid)
+		continue;
+	      break;
+	    }
+	  HANDLE proc_h = OpenProcess (PROCESS_SET_INFORMATION, FALSE,
+				       p->dwProcessId);
+	  if (!proc_h)
+	    error = EPERM;
+	  else
+	    {
+	      if (!SetPriorityClass (proc_h, prio))
+		error = EACCES;
+	      else
+		p->nice = value;
+	      CloseHandle (proc_h);
+	    }
+	}
+    }
+  pids.reset ();
+  if (error)
+    {
+      set_errno (error);
       return -1;
     }
-  myself->nice = value;
-  debug_printf ("Set nice to %d", myself->nice);
   return 0;
 }
 
 extern "C" int
 getpriority (int which, id_t who)
 {
-  /* TODO: Support PRIO_PGRP and PRIO_USER. */
-  if (which != PRIO_PROCESS || (who != 0 && (pid_t) who != myself->pid))
+  int nice = NZERO * 2; /* Illegal value */
+
+  switch (which)
     {
+    case PRIO_PROCESS:
+      if (!who)
+	who = myself->pid;
+      if ((pid_t) who == myself->pid)
+	return myself->nice;
+      break;
+    case PRIO_PGRP:
+      if (!who)
+	who = myself->pgid;
+      break;
+    case PRIO_USER:
+      if (!who)
+	who = myself->uid;
+      break;
+    default:
       set_errno (EINVAL);
       return -1;
     }
-  return myself->nice;
+  winpids pids ((DWORD) 0);
+  for (DWORD i = 0; i < pids.npids; ++i)
+    {
+      _pinfo *p = pids[i];
+      if (p)
+        switch (which)
+	  {
+	  case PRIO_PROCESS:
+	    if ((pid_t) who == p->pid)
+	      {
+		nice = p->nice;
+		goto out;
+	      }
+	    break;
+	  case PRIO_PGRP:
+	    if ((pid_t) who == p->pgid && p->nice < nice)
+	      nice = p->nice;
+	    break;
+	  case PRIO_USER:
+	    if ((__uid32_t) who == p->uid && p->nice < nice)
+	      nice = p->nice;
+	      break;
+	  }
+    }
+out:
+  pids.reset ();
+  if (nice == NZERO * 2)
+    {
+      set_errno (ESRCH);
+      return -1;
+    }
+  return nice;
 }
 
 extern "C" int
