@@ -1,5 +1,7 @@
 \input texinfo 
-@title README 20.2 for Cygwin B20.1 Release.
+@title The Cygwin README
+
+@subtitle (Only partially updated for the latest net release.)
 
 @setfilename readme.txt
 
@@ -7,6 +9,10 @@
 @include install.texinfo
 
 @chapter Release Information
+
+@strong{(Please note: This section has not yet been updated for the latest
+net release.)}
+
 @include changes.texinfo
 
 @include relnotes.texinfo
