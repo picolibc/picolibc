@@ -69,5 +69,39 @@
 #define __MINGW32_MAJOR_VERSION 2
 #define __MINGW32_MINOR_VERSION 3
 
+/*  ISO C++.  */
+#ifndef __HAVE_STD_CXX
+#define __HAVE_STD_CXX 1
+#endif
+
+#ifdef __cplusplus
+# if !(defined(__BEGIN_CSTD_NAMESPACE) \
+       && defined(__END_CSTD_NAMESPACE))
+#  if  __HAVE_STD_CXX
+#   define __BEGIN_CSTD_NAMESPACE namespace std { extern "C" {
+#   define __END_CSTD_NAMESPACE  } }
+#   define __CSTD std::
+#  else
+#   define __BEGIN_CSTD_NAMESPACE extern "C" {
+#   define __END_CSTD_NAMESPACE  }
+#   define __CSTD
+#  endif
+# endif /* !defined(__BEGIN_CSTD_NAMESPACE) */ 
+# if !(defined(__BEGIN_CGLOBAL_NAMESPACE) \
+       && defined(__END_GLOBAL_NAMESPACE))
+#  define __BEGIN_CGLOBAL_NAMESPACE extern "C" {
+#  define __END_CGLOBAL_NAMESPACE  }
+#  define __CGLOBAL ::
+# endif /* !defined(__BEGIN_CGLOBAL_NAMESPACE) */ 
+#else /* !__cplusplus */
+# define __BEGIN_CSTD_NAMESPACE
+# define __END_CSTD_NAMESPACE
+# define __CSTD 
+# define __BEGIN_CGLOBAL_NAMESPACE
+# define __END_CGLOBAL_NAMESPACE
+# define __CGLOBAL
+#endif
+
+
 #endif /* __MINGW_H */
 

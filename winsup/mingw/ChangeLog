@@ -1,3 +1,12 @@
+2002-09-20  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/_mingw.h (__BEGIN_CSTD_NAMESPACE,__END_CSTD_NAMESPACE
+	__BEGIN_CGLOBAL_NAMESPACE, __END_CGLOBAL_NAMESPACE, __CSTD,
+	__CGLOBAL): Add defines for for ISO C++ c-header compatability. 
+
+	* include/ctype.h: Use C++ c-header compatability defines.
+	* include/wctype.h: Likewise.
+
 2002-09-19  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wchar.h: Don't #include sys/types.h, stdlib.h,

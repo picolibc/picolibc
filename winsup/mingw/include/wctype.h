@@ -50,9 +50,7 @@
 
 #ifndef RC_INVOKED
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+__BEGIN_CSTD_NAMESPACE
 
 #ifndef WEOF
 #define	WEOF	(wchar_t)(0xFFFF)
@@ -131,9 +129,7 @@ wint_t 		towctrans(wint_t, wctrans_t);
 wctrans_t	wctrans(const char*);
 wctype_t	wctype(const char*);
 
-#ifdef __cplusplus
-}
-#endif
+__END_CSTD_NAMESPACE
 
 #endif	/* Not RC_INVOKED */
 

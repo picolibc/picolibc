@@ -55,9 +55,7 @@
 
 #ifndef RC_INVOKED
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+__BEGIN_CSTD_NAMESPACE
 
 int	isalnum(int);
 int	isalpha(int);
@@ -71,9 +69,6 @@ int	isspace(int);
 int	isupper(int);
 int	isxdigit(int);
 
-#ifndef __STRICT_ANSI__
-int	_isctype (int, int);
-#endif
 
 /* These are the ANSI versions, with correct checking of argument */
 int	tolower(int);
@@ -84,6 +79,10 @@ int	toupper(int);
  * explicitly by MSVCRT/CRTDLL. However, underscored versions are also
  * exported.
  */
+
+__END_CSTD_NAMESPACE
+__BEGIN_CGLOBAL_NAMESPACE
+
 #ifndef	__STRICT_ANSI__
 /*
  *  These are the cheap non-std versions: The return values are undefined
@@ -91,7 +90,12 @@ int	toupper(int);
  */ 
 int	_tolower(int);
 int	_toupper(int);
+
+int	_isctype (int, int);
 #endif
+
+__END_CGLOBAL_NAMESPACE
+__BEGIN_CSTD_NAMESPACE
 
 /* Also defined in stdlib.h */
 #ifndef MB_CUR_MAX
@@ -154,7 +158,7 @@ extern unsigned short** _imp___ctype;
 
 #if ! (defined (__NO_CTYPE_INLINES) || defined (__STRICT_ANSI__ ))
 /* use  simple lookup if SB locale, else  _isctype()  */
-#define __ISCTYPE(c, mask)  (MB_CUR_MAX == 1 ? (_pctype[c] & mask) : _isctype(c, mask))
+#define __ISCTYPE(c, mask)  (MB_CUR_MAX == 1 ? (_pctype[c] & mask) : __CGLOBAL _isctype(c, mask))
 extern __inline__ int isalnum(int c) {return __ISCTYPE(c, (_ALPHA|_DIGIT));}
 extern __inline__ int isalpha(int c) {return __ISCTYPE(c, _ALPHA);}
 extern __inline__ int iscntrl(int c) {return __ISCTYPE(c, _CONTROL);}
@@ -225,6 +229,9 @@ extern __inline__ int iswxdigit(wint_t wc) {return (iswctype(wc,_HEX));}
 extern __inline__ int isleadbyte(int c) {return (_pctype[(unsigned char)(c)] & _LEADBYTE);}
 #endif /* !(defined(__NO_CTYPE_INLINES) || defined(__WCTYPE_INLINES_DEFINED)) */
 
+__END_CSTD_NAMESPACE
+__BEGIN_CGLOBAL_NAMESPACE
+
 #ifndef	__STRICT_ANSI__
 int	__isascii (int);
 int	__toascii (int);
@@ -234,8 +241,8 @@ int	__iscsym (int);		/* Valid character in C symbol (after first) */
 #ifndef __NO_CTYPE_INLINES
 extern __inline__ int __isascii(int c) {return (((unsigned)c & ~0x7F) == 0);} 
 extern __inline__ int __toascii(int c) {return (c & 0x7F);}
-extern __inline__ int __iscsymf(int c) {return (isalpha(c) || (c == '_'));}
-extern __inline__ int __iscsym(int c)  {return  (isalnum(c) || (c == '_'));}
+extern __inline__ int __iscsymf(int c) {return (__CSTD isalpha(c) || (c == '_'));}
+extern __inline__ int __iscsym(int c)  {return  (__CSTD isalnum(c) || (c == '_'));}
 #endif /* __NO_CTYPE_INLINES */
 
 #ifndef	_NO_OLDNAMES
@@ -247,9 +254,7 @@ int	iscsym (int);
 
 #endif	/* Not __STRICT_ANSI__ */
 
-#ifdef __cplusplus
-}
-#endif
+__END_CGLOBAL_NAMESPACE
 
 #endif	/* Not RC_INVOKED */
 
