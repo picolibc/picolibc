@@ -28,6 +28,7 @@ details. */
 #include <wininet.h>
 #include <ntsecapi.h>
 #include <subauth.h>
+#include <aclapi.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "fhandler.h"
@@ -1299,6 +1300,174 @@ get_file_attribute (int use_ntsec, const char *file,
     *attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
 
   return res > 0 ? 0 : -1;
+}
+
+static int
+get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type, int *attribute,
+		  __uid32_t *uidret, __gid32_t *gidret)
+{
+  if (!wincap.has_security ())
+    return 0;
+
+  PSECURITY_DESCRIPTOR psd = NULL;
+  PSID owner_sid;
+  PSID group_sid;
+  PACL acl;
+
+  if (ERROR_SUCCESS != GetSecurityInfo (handle, object_type,
+                                        DACL_SECURITY_INFORMATION |
+                                        GROUP_SECURITY_INFORMATION |
+                                        OWNER_SECURITY_INFORMATION,
+                                        &owner_sid,
+                                        &group_sid,
+                                        &acl,
+                                        NULL,
+                                        &psd))
+	{
+	  __seterrno ();
+	  debug_printf ("GetSecurityInfo %E");
+	  return -1;
+    }
+
+  __uid32_t uid = cygsid (owner_sid).get_uid ();
+  __gid32_t gid = cygsid (group_sid).get_gid ();
+  if (uidret)
+    *uidret = uid;
+  if (gidret)
+    *gidret = gid;
+
+  if (!attribute)
+    {
+      syscall_printf ("uid %d, gid %d", uid, gid);
+      LocalFree (psd);
+      return 0;
+    }
+
+  BOOL grp_member = is_grp_member (uid, gid);
+
+  if (!acl)
+    {
+      *attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
+      syscall_printf ("No ACL = %x, uid %d, gid %d",
+		      *attribute, uid, gid);
+      LocalFree (psd);
+      return 0;
+    }
+
+  ACCESS_ALLOWED_ACE *ace;
+  int allow = 0;
+  int deny = 0;
+  int *flags, *anti;
+
+  for (DWORD i = 0; i < acl->AceCount; ++i)
+    {
+      if (!GetAce (acl, i, (PVOID *) &ace))
+	continue;
+      if (ace->Header.AceFlags & INHERIT_ONLY_ACE)
+	continue;
+      switch (ace->Header.AceType)
+	{
+	case ACCESS_ALLOWED_ACE_TYPE:
+	  flags = &allow;
+	  anti = &deny;
+	  break;
+	case ACCESS_DENIED_ACE_TYPE:
+	  flags = &deny;
+	  anti = &allow;
+	  break;
+	default:
+	  continue;
+	}
+
+      cygsid ace_sid ((PSID) &ace->SidStart);
+      if (owner_sid && ace_sid == owner_sid)
+	{
+	  if (ace->Mask & FILE_READ_DATA)
+	    *flags |= S_IRUSR;
+	  if (ace->Mask & FILE_WRITE_DATA)
+	    *flags |= S_IWUSR;
+	  if (ace->Mask & FILE_EXECUTE)
+	    *flags |= S_IXUSR;
+	}
+      else if (group_sid && ace_sid == group_sid)
+	{
+	  if (ace->Mask & FILE_READ_DATA)
+	    *flags |= S_IRGRP
+		      | ((grp_member && !(*anti & S_IRUSR)) ? S_IRUSR : 0);
+	  if (ace->Mask & FILE_WRITE_DATA)
+	    *flags |= S_IWGRP
+		      | ((grp_member && !(*anti & S_IWUSR)) ? S_IWUSR : 0);
+	  if (ace->Mask & FILE_EXECUTE)
+	    *flags |= S_IXGRP
+		      | ((grp_member && !(*anti & S_IXUSR)) ? S_IXUSR : 0);
+	}
+      else if (ace_sid == well_known_world_sid)
+	{
+	  if (ace->Mask & FILE_READ_DATA)
+	    *flags |= S_IROTH
+		      | ((!(*anti & S_IRGRP)) ? S_IRGRP : 0)
+		      | ((!(*anti & S_IRUSR)) ? S_IRUSR : 0);
+	  if (ace->Mask & FILE_WRITE_DATA)
+	    *flags |= S_IWOTH
+		      | ((!(*anti & S_IWGRP)) ? S_IWGRP : 0)
+		      | ((!(*anti & S_IWUSR)) ? S_IWUSR : 0);
+	  if (ace->Mask & FILE_EXECUTE)
+	    {
+	      *flags |= S_IXOTH
+			| ((!(*anti & S_IXGRP)) ? S_IXGRP : 0)
+			| ((!(*anti & S_IXUSR)) ? S_IXUSR : 0);
+	    }
+	  if ((*attribute & S_IFDIR) &&
+	      (ace->Mask & (FILE_WRITE_DATA | FILE_EXECUTE | FILE_DELETE_CHILD))
+	      == (FILE_WRITE_DATA | FILE_EXECUTE))
+	    *flags |= S_ISVTX;
+	}
+      else if (ace_sid == well_known_null_sid)
+	{
+	  /* Read SUID, SGID and VTX bits from NULL ACE. */
+	  if (ace->Mask & FILE_READ_DATA)
+	    *flags |= S_ISVTX;
+	  if (ace->Mask & FILE_WRITE_DATA)
+	    *flags |= S_ISGID;
+	  if (ace->Mask & FILE_APPEND_DATA)
+	    *flags |= S_ISUID;
+	}
+    }
+  *attribute &= ~(S_IRWXU | S_IRWXG | S_IRWXO | S_ISVTX | S_ISGID | S_ISUID);
+  *attribute |= allow;
+  *attribute &= ~deny;
+
+  LocalFree (psd);
+
+  syscall_printf ("%x, uid %d, gid %d", *attribute, uid, gid);
+  return 0;
+}
+
+int
+get_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
+		    int *attribute, __uid32_t *uidret, __gid32_t *gidret)
+{
+  if (allow_ntsec)
+    {
+      int res = get_nt_object_attribute (handle, object_type, attribute, uidret, gidret);
+      if (attribute && (*attribute & S_IFLNK) == S_IFLNK)
+	*attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
+      return res;
+    }
+
+  if (uidret)
+    *uidret = getuid32 ();
+  if (gidret)
+    *gidret = getgid32 ();
+
+  if (!attribute)
+    return 0;
+
+  /* symlinks are everything for everyone!*/
+  if ((*attribute & S_IFLNK) == S_IFLNK)
+    *attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
+
+  return 0;
 }
 
 BOOL

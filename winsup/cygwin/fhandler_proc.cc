@@ -216,6 +216,8 @@ fhandler_proc::open (path_conv *pc, int flags, mode_t mode)
   if (!res)
     goto out;
 
+  set_nohandle (true);
+
   const char *path;
 
   path = get_name () + proc_len;
@@ -291,7 +293,11 @@ fhandler_proc::open (path_conv *pc, int flags, mode_t mode)
     }
 
   fileid = proc_file_no;
-  fill_filebuf ();
+  if (!fill_filebuf ())
+    {
+      res = 0;
+      goto out;
+	}
 
   if (flags & O_APPEND)
     position = filesize;
@@ -307,7 +313,7 @@ out:
   return res;
 }
 
-void
+bool
 fhandler_proc::fill_filebuf ()
 {
   switch (fileid)
@@ -361,6 +367,7 @@ fhandler_proc::fill_filebuf ()
 	break;
       }
     }
+    return true;
 }
 
 static

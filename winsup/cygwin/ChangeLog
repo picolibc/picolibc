@@ -1,4 +1,53 @@
-2002-07-01  Pierre Humblet <pierre.humblet@ieee.org>
+2002-07-02  Christopher January  <chris@atomice.net>
+
+	* autoload.cc (GetSecurityInfo): Define new autoload function.
+	(RegQueryInfoKeyA): Ditto.
+	* fhandler.h (fhandler_virtual::fill_filebuf): Change return type to
+	bool.
+	(fhandler_proc::fill_filebuf): Ditto.
+	(fhandler_registry::fill_filebuf): Ditto.
+	(fhandler_process::fill_filebuf): Ditto.
+	(fhandler_registry::value_name): Add new member.
+	(fhandler_registry::close): Add new method.
+	(fhandler_process::p): Remove member.
+	* fhandler_proc.cc (fhandler_proc::open): Add set_nohandle after
+	calling superclass method.  Check return value of fill_filebuf.
+	(fhandler_proc::fill_filebuf): Change return type to bool.  Add return
+	statement.
+	* fhandler_process.cc (fhandler_process::open): Add set_nohandle after
+	calling superclass method.  Remove references to p.  Check return value
+	of fill_filebuf.
+	(fhandler_process::fill_filebuf): Change return type to bool.  Don't
+	use dereference operator on p.  Add return statement.
+	(fhandler_process::format_process_stat): Fix typo.
+	* fhandler_registry.cc: Add static open_key declaration.
+	(fhandler_registry::exists): Assume path is already normalised.  Try
+	opening the path as a key in its own right first, before reverting to
+	enumerating subkeys and values of the parent key.
+	(fhandler_registry::fstat): Add additional code to return more relevant
+	information about the registry key/value.
+	(fhandler_registry::readdir): Explicitly set desired access when
+	opening registry key.  Remove output of buf from debug_printf format
+	string.
+	(fhandler_registry::open): Use set_io_handle to store registry key
+	handle.  Set value_name member.  Move code to read a value from the
+	registry to fill_filebuf.  Add call to fill_filebuf.
+	(fhandler_registry::close): New method.
+	(fhandler_registry::fill_filebuf): Change return type to bool.  Add
+	code to read a value from registry.
+	(fhandler_registry::open_key): Make function static.  Use KEY_READ as
+	desired access unless this is the last path component.  Check the
+	return value of RegOpenKeyEx for an error instead of hKey.
+	* fhandler_virtual.cc (fhandler_virtual::lseek): Check the return value
+	of fill_filebuf.
+	(fhandler_virtual::open): Remove call to set_nohandle.
+	(fhandler_virtual::fill_filebuf): Change return type to bool.  Add
+	return statement.
+	* security.cc (get_nt_object_attribute): New function.
+	(get_object_attribute): New function.
+	* security.h (get_object_attribute): New function declaration.
+
+2002-07-01  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* syscalls.c (seteuid32): Do not return an error when the token cannot
 	be created only because of a problem with the gid.

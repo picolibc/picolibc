@@ -115,7 +115,8 @@ fhandler_virtual::lseek (__off64_t offset, int whence)
    * On Linux, when you lseek within a /proc file,
    * the contents of the file are updated.
    */
-  fill_filebuf ();
+  if (!fill_filebuf ())
+  	return (__off64_t) -1;
   switch (whence)
     {
     case SEEK_SET:
@@ -209,8 +210,6 @@ fhandler_virtual::open (path_conv *, int flags, mode_t mode)
 
   set_flags ((flags & ~O_TEXT) | O_BINARY);
 
-  set_nohandle (true);
-
   return 1;
 }
 
@@ -220,7 +219,8 @@ fhandler_virtual::exists ()
   return 0;
 }
 
-void
+bool
 fhandler_virtual::fill_filebuf ()
 {
+  return true;
 }
