@@ -499,9 +499,7 @@ _open (const char *unix_path, int flags, ...)
       fhandler_base *fh;
       cygheap_fdnew fd;
 
-      if (fd < 0)
-	set_errno (ENMFILE);
-      else
+      if (fd >= 0)
 	{
 	  path_conv pc;
 	  if (!(fh = cygheap->fdtab.build_fhandler_from_name (fd, unix_path,

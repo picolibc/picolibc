@@ -73,9 +73,6 @@ public:
     if (!oframe)
       t.get_winapi_lock ();
   }
-
-  sigframe (): st (NULL) {}
-  sigframe (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0)) {init (t, ebp);}
   inline void init (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0))
   {
     if (!t.frame && t.id == GetCurrentThreadId ())
@@ -83,6 +80,9 @@ public:
     else
       st = NULL;
   }
+
+  sigframe (): st (NULL) {}
+  sigframe (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0)) {init (t, ebp);}
   ~sigframe ()
   {
     unregister ();

@@ -179,6 +179,29 @@ wait_for_me ()
     }
 }
 
+/* Get the sync_proc_subproc muto to control access to
+ * children, zombie arrays.
+ * Attempt to handle case where process is exiting as we try to grab
+ * the mutex.
+ */
+static BOOL
+get_proc_lock (DWORD what, DWORD val)
+{
+  Static int lastwhat = -1;
+  if (!sync_proc_subproc)
+    return FALSE;
+  if (sync_proc_subproc->acquire (WPSP))
+    {
+      lastwhat = what;
+      return TRUE;
+    }
+  if (!sync_proc_subproc)
+    return FALSE;
+  system_printf ("Couldn't aquire sync_proc_subproc for(%d,%d), %E, last %d",
+		  what, val, lastwhat);
+  return TRUE;
+}
+
 static BOOL __stdcall
 proc_can_be_signalled (_pinfo *p)
 {
@@ -937,29 +960,6 @@ getsem (_pinfo *p, const char *str, int init, int max)
       set_errno (ESRCH);
     }
   return h;
-}
-
-/* Get the sync_proc_subproc muto to control access to
- * children, zombie arrays.
- * Attempt to handle case where process is exiting as we try to grab
- * the mutex.
- */
-static BOOL
-get_proc_lock (DWORD what, DWORD val)
-{
-  Static int lastwhat = -1;
-  if (!sync_proc_subproc)
-    return FALSE;
-  if (sync_proc_subproc->acquire (WPSP))
-    {
-      lastwhat = what;
-      return TRUE;
-    }
-  if (!sync_proc_subproc)
-    return FALSE;
-  system_printf ("Couldn't aquire sync_proc_subproc for(%d,%d), %E, last %d",
-		  what, val, lastwhat);
-  return TRUE;
 }
 
 /* Remove a zombie from zombies by swapping it with the last child in the list.

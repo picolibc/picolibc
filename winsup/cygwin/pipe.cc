@@ -133,13 +133,11 @@ make_pipe (int fildes[2], unsigned int psize, int mode)
   int res = -1;
 
   cygheap_fdnew fdr;
-  if (fdr < 0)
-    /* saw an error */;
-  else
+  if (fdr >= 0)
     {
       cygheap_fdnew fdw (fdr, false);
       if (fdw < 0)
-	set_errno (ENMFILE);
+	/* out of fds? */;
       else if (!CreatePipe (&r, &w, sa, psize))
 	__seterrno ();
       else

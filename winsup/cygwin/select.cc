@@ -389,7 +389,7 @@ peek_pipe (select_record *s, int ignra)
   fhandler_base *fh = s->fh;
 
   HANDLE h;
-  HANDLE guard_mutex = s->fh->get_guard ();
+  HANDLE guard_mutex = fh->get_guard ();
   set_handle_or_return_if_not_open (h, s);
 
   /* Don't perform complicated tests if we don't need to. */
@@ -438,12 +438,23 @@ peek_pipe (select_record *s, int ignra)
       select_printf ("%s, PeekNamedPipe failed, %E", fh->get_name ());
       n = -1;
     }
-  else if (n && guard_mutex
-	   && WaitForSingleObject (guard_mutex, 0) != WAIT_OBJECT_0)
+  else if (n && guard_mutex)
     {
-      select_printf ("%s, couldn't get mutex %p, %E", fh->get_name (),
-	  	     guard_mutex);
-      n = 0;
+      if (WaitForSingleObject (guard_mutex, 0) != WAIT_OBJECT_0)
+	{
+	  select_printf ("%s, couldn't get mutex %p, %E", fh->get_name (),
+			 guard_mutex);
+	  n = 0;
+	}
+      /* Now that we have the mutex, make sure that no one else has snuck
+         in and grabbed the data that we originally saw. */
+      if (!PeekNamedPipe (h, NULL, 0, NULL, (DWORD *) &n, NULL))
+	{
+	  select_printf ("%s, PeekNamedPipe failed, %E", fh->get_name ());
+	  n = -1;
+	}
+      if (n <= 0)
+	ReleaseMutex (guard_mutex);	/* Oops.  We lost the race.  */
     }
 
   if (n < 0)

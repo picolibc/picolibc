@@ -39,6 +39,15 @@ class cygsid {
     }
 
 public:
+  inline operator const PSID () { return psid; }
+
+  inline const PSID operator= (cygsid &nsid)
+    { return assign (nsid); }
+  inline const PSID operator= (const PSID nsid)
+    { return assign (nsid); }
+  inline const PSID operator= (const char *nsidstr)
+    { return getfromstr (nsidstr); }
+
   inline cygsid () : psid ((PSID) sbuf) {}
   inline cygsid (const PSID nsid) { *this = nsid; }
   inline cygsid (const char *nstrsid) { *this = nstrsid; }
@@ -53,13 +62,6 @@ public:
   inline int get_gid () { return get_id (TRUE); }
 
   char *string (char *nsidstr) const;
-
-  inline const PSID operator= (cygsid &nsid)
-    { return assign (nsid); }
-  inline const PSID operator= (const PSID nsid)
-    { return assign (nsid); }
-  inline const PSID operator= (const char *nsidstr)
-    { return getfromstr (nsidstr); }
 
   inline BOOL operator== (const PSID nsid) const
     {
@@ -76,8 +78,6 @@ public:
     { return !(*this == nsid); }
   inline BOOL operator!= (const char *nsidstr) const
     { return !(*this == nsidstr); }
-
-  inline operator const PSID () { return psid; }
 
   void debug_print (const char *prefix = NULL) const
     {

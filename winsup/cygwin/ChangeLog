@@ -1,3 +1,23 @@
+2001-11-02  Egor Duda  <deo@logos-m.ru>
+
+	* dll_init.h (class dll_list): Reorder functions to avoid compiler
+	"can't inline" warnings.
+	* security.h (class cygsid): Ditto.
+	* sigproc.cc (get_proc_lock): Ditto.
+	* sigproc.h (class sigframe): Ditto.
+	* sync.h (class muto): Ditto.
+
+2001-11-02  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.h (fhandler_base::get_guard): Actually MAKE virtual as
+	previously indicated.
+	* pipe.cc (make_pipe): Remove extraneous set_errno.
+	* syscalls.cc (_open): Ditto.
+	* select.cc (peek_pipe): Need to check that there is still something to
+	read from the pipe after acquiring the mutex since another
+	process/thread could have eaten the input before we got to acquiring
+	the lock.  (Thanks to Nick Duffek for this inspiration.)
+
 2001-11-01  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.h: Change Windows 'BOOL's to c++ 'bool's for all variables.

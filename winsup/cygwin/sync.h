@@ -22,14 +22,16 @@ class muto
 public:
   class muto *next;
   const char *name;
+
+  muto() {}
+  /* The real constructor. */
+  muto(int inh, const char *name);
+
   void *operator new (size_t, void *p) {return p;}
   void *operator new (size_t) {return ::new muto; }
   void operator delete (void *) {;} /* can't handle allocated mutos
 					currently */
 
-  muto() {}
-  /* The real constructor. */
-  muto(int inh, const char *name);
   ~muto ();
   int acquire (DWORD ms = INFINITE) __attribute__ ((regparm(1))); /* Acquire the lock. */
   int release ();		     /* Release the lock. */

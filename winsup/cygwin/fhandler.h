@@ -371,7 +371,7 @@ class fhandler_base
     rabuf = NULL;
   }
   void operator delete (void *);
-  HANDLE get_guard () const {return NULL;}
+  virtual HANDLE get_guard () const {return NULL;}
 };
 
 class fhandler_socket: public fhandler_base
