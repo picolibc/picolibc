@@ -1,3 +1,9 @@
+2002-07-24  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/oleauto.h (V_UNION): Correct definition for case of
+	NONAMELESSUNION:
+	(V_VT): Likewise.
+
 2002-07-23  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/oleauto.h (V_BOOL): Define in terms of boolVal,
@@ -17,7 +23,7 @@
 	character.
 	* include/winsock2.h (struct sockaddr): Use __int64 instead of
 	long long.
-	* include/kernel32.c (GetCurrentFiber, GetFiberData): Watcom
+	* lib/kernel32.c (GetCurrentFiber, GetFiberData): Watcom
 	does not need external *Fiber library functions.
 
 2002-07-20  Casper S. Hornstrup  <chorns@users.sourceforge.net>

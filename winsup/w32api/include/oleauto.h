@@ -28,12 +28,13 @@
 #define ACTIVEOBJECT_STRONG 0
 #define ACTIVEOBJECT_WEAK 1
 #ifdef NONAMELESSUNION
-#define V_UNION(X,Y) ((X)->u.Y)
+#define V_UNION(X,Y) ((X)->n1.n2.n3.Y)
+#define V_VT(X) ((X)->n1.n2.vt)
 #else
 #define V_UNION(X,Y) ((X)->Y)
+#define V_VT(X) ((X)->vt)
 #endif
 #define V_BOOL(X) V_UNION(X,boolVal)
-#define V_VT(X) ((X)->vt)
 #define V_ISBYREF(X) (V_VT(X)&VT_BYREF)
 #define V_ISARRAY(X) (V_VT(X)&VT_ARRAY)
 #define V_ISVECTOR(X) (V_VT(X)&VT_VECTOR)
