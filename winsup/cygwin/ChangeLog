@@ -1,3 +1,11 @@
+2005-04-06  Christopher Faylor  <cgf@timesys.com>
+
+	* net.cc (cygwin_getservbyname): Return (possibly NULL) return value of
+	dup_ent rather than assuming that tls buffer is valid.
+	(cygwin_getservbyport): Ditto.
+	(cygwin_gethostbyname): Ditto.
+	(cygwin_gethostbyaddr): Ditto.
+
 2005-04-05  Christopher Faylor  <cgf@timesys.com>
 
 	* cygtls.cc (_cygtls::remove): Don't free or close stuff if we're being

@@ -890,9 +890,9 @@ cygwin_getservbyname (const char *name, const char *proto)
       || (proto != NULL && check_null_str_errno (proto)))
     return NULL;
 
-  dup_ent (servent_buf, getservbyname (name, proto), t_servent);
-  syscall_printf ("%p = getservbyname (%s, %s)", _my_tls.locals.servent_buf, name, proto);
-  return _my_tls.locals.servent_buf;
+  servent *res = (servent *) dup_ent (servent_buf, getservbyname (name, proto), t_servent);
+  syscall_printf ("%p = getservbyname (%s, %s)", res, name, proto);
+  return res;
 }
 
 /* exported as getservbyport: standards? */
@@ -903,9 +903,9 @@ cygwin_getservbyport (int port, const char *proto)
   if (proto != NULL && check_null_str_errno (proto))
     return NULL;
 
-  dup_ent (servent_buf, getservbyport (port, proto), t_servent);
+  servent *res = (servent *) dup_ent (servent_buf, getservbyport (port, proto), t_servent);
   syscall_printf ("%p = getservbyport (%d, %s)", _my_tls.locals.servent_buf, port, proto);
-  return _my_tls.locals.servent_buf;
+  return res;
 }
 
 extern "C" int
@@ -964,14 +964,15 @@ cygwin_gethostbyname (const char *name)
       h = &tmp;
     }
 
-  if (dup_ent (hostent_buf, h, t_hostent))
-    debug_printf ("h_name %s", _my_tls.locals.hostent_buf->h_name);
+  hostent *res = (hostent *) dup_ent (hostent_buf, h, t_hostent);
+  if (res)
+    debug_printf ("h_name %s", res);
   else
     {
-      debug_printf ("dup_ent failed for name %s", name);
+      debug_printf ("dup_ent returned NULL for name %s, h %p", name, h);
       set_host_errno ();
     }
-  return _my_tls.locals.hostent_buf;
+  return res;
 }
 
 /* exported as gethostbyaddr: standards? */
@@ -982,11 +983,12 @@ cygwin_gethostbyaddr (const char *addr, int len, int type)
   if (__check_invalid_read_ptr_errno (addr, len))
     return NULL;
 
-  if (dup_ent (hostent_buf, gethostbyaddr (addr, len, type), t_hostent))
+  hostent *res = (hostent *) dup_ent (hostent_buf, gethostbyaddr (addr, len, type), t_hostent);
+  if (res)
     debug_printf ("h_name %s", _my_tls.locals.hostent_buf->h_name);
   else
     set_host_errno ();
-  return _my_tls.locals.hostent_buf;
+  return res;
 }
 
 /* exported as accept: standards? */
