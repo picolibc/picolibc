@@ -1,3 +1,7 @@
+2003-08-21  James Cownie <jcownie@etnus.com>
+
+	* dwarf2.h: Add PGI dwarf extensions.
+	
 2003-08-08 Dmitry Diky <diwil@mail.ru>
 	
 	* msp430.h: Add xW42 and xE42 parts. Sort MPU list according to
