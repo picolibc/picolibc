@@ -100,7 +100,7 @@ struct symlink_info
   bool case_clash;
   _major_t major;
   _minor_t minor;
-  _devtype_t devtype;
+  _mode_t mode;
   int check (char *path, const suffix_info *suffixes, unsigned opt);
   bool parse_device (const char *);
   BOOL case_check (char *path);
@@ -615,6 +615,7 @@ path_conv::check (const char *src, unsigned opt,
 	      else
 		{
 		  dev.setfs (1);
+		  dev.mode = sym.mode;
 		  fileattr = sym.fileattr;
 		}
 	      goto out;
@@ -2379,47 +2380,54 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
 
   syscall_printf ("symlink (%s, %s)", topath, win32_path.get_win32 ());
 
-  if (win32_path.isdevice () || win32_path.exists ())
+  if (win32_path.is_auto_device ())
     {
       set_errno (EEXIST);
       goto done;
     }
 
-  if (use_winsym)
-    if (isdevice)
+  DWORD create_how;
+  if (!use_winsym)
+    create_how = CREATE_NEW;
+  else if (isdevice)
+    {
       strcpy (w32topath, topath);
-    else
-      {
-	if (!isabspath (topath))
-	  {
-	    getcwd (cwd, MAX_PATH + 1);
-	    if ((cp = strrchr (from, '/')) || (cp = strrchr (from, '\\')))
-	      {
-		c = *cp;
-		*cp = '\0';
-		chdir (from);
-	      }
-	    backslashify (topath, w32topath, 0);
-	  }
-	if (!cp || GetFileAttributes (w32topath) == INVALID_FILE_ATTRIBUTES)
-	  {
-	    win32_topath.check (topath, PC_SYM_NOFOLLOW);
-	    if (!cp || win32_topath.error != ENOENT)
-	      strcpy (w32topath, win32_topath);
-	  }
-	if (cp)
-	  {
-	    *cp = c;
-	    chdir (cwd);
-	  }
-      }
+      create_how = CREATE_ALWAYS;
+      (void) SetFileAttributes (win32_path, FILE_ATTRIBUTE_NORMAL);
+    }
+  else
+    {
+      if (!isabspath (topath))
+	{
+	  getcwd (cwd, MAX_PATH + 1);
+	  if ((cp = strrchr (from, '/')) || (cp = strrchr (from, '\\')))
+	    {
+	      c = *cp;
+	      *cp = '\0';
+	      chdir (from);
+	    }
+	  backslashify (topath, w32topath, 0);
+	}
+      if (!cp || GetFileAttributes (w32topath) == INVALID_FILE_ATTRIBUTES)
+	{
+	  win32_topath.check (topath, PC_SYM_NOFOLLOW);
+	  if (!cp || win32_topath.error != ENOENT)
+	    strcpy (w32topath, win32_topath);
+	}
+      if (cp)
+	{
+	  *cp = c;
+	  chdir (cwd);
+	}
+      create_how = CREATE_NEW;
+    }
 
   if (allow_ntsec && win32_path.has_acls ())
     set_security_attribute (S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO,
 			    &sa, alloca (4096), 4096);
 
-  h = CreateFile (win32_path, GENERIC_WRITE, 0, &sa,
-		  CREATE_NEW, FILE_ATTRIBUTE_NORMAL, 0);
+  h = CreateFile (win32_path, GENERIC_WRITE, 0, &sa, create_how,
+		  FILE_ATTRIBUTE_NORMAL, 0);
   if (h == INVALID_HANDLE_VALUE)
     __seterrno ();
   else
@@ -2473,7 +2481,7 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
 	  if ((cp && cp[1] == '.') || *win32_path == '.')
 	    attr |= FILE_ATTRIBUTE_HIDDEN;
 #endif
-	  SetFileAttributes (win32_path.get_win32 (), attr);
+	  SetFileAttributes (win32_path, attr);
 
 	  if (!isdevice && win32_path.fs_fast_ea ())
 	    set_symlink_ea (win32_path, topath);
@@ -2735,22 +2743,29 @@ bool
 symlink_info::parse_device (const char *contents)
 {
   char *endptr;
-  int mymajor, myminor;
+  _major_t mymajor;
+  _major_t myminor;
+  _mode_t mymode;
 
   mymajor = strtol (++contents, &endptr, 16);
   if (endptr == contents)
     return false;
 
   contents = endptr;
-  myminor = strtol (++endptr, &endptr, 16);
+  myminor = strtol (++contents, &endptr, 16);
   if (endptr == contents)
     return false;
 
-  switch (*++endptr)
+  contents = endptr;
+  mymode = strtol (++contents, &endptr, 16);
+  if (endptr == contents)
+    return false;
+
+  switch (mymode & S_IFMT)
     {
-    case 'b':
-    case 'c':
-    case 's':
+    case S_IFBLK:
+    case S_IFCHR:
+    case S_IFIFO:
       if (mymajor || myminor)
 	break;
     default:
@@ -2759,7 +2774,7 @@ symlink_info::parse_device (const char *contents)
 
   major = mymajor;
   minor = myminor;
-  devtype = *endptr;
+  mode = mymode;
   return true;
 }
 
