@@ -101,11 +101,16 @@ struct symlink_info
   int is_symlink;
   bool ext_tacked_on;
   int error;
+  BOOL case_clash;
   symlink_info (): contents (buf + MAX_PATH + 1) {}
-  int check (const char *path, const suffix_info *suffixes);
+  int check (const char *path, const suffix_info *suffixes,
+  	     char *orig_path, BOOL sym_ignore);
+  BOOL case_check (const char *path, char *orig_path);
 };
 
 cwdstuff cygcwd;	/* The current working directory. */
+
+int pcheck_case = PCHECK_RELAXED; /* Determines the case check behaviour. */
 
 #define path_prefix_p(p1, p2, l1) \
        ((cyg_tolower(*(p1))==cyg_tolower(*(p2))) && \
@@ -150,10 +155,28 @@ path_prefix_p_ (const char *path1, const char *path2, int len1)
   if (len1 == 0)
     return SLASH_P (path2[0]) && !SLASH_P (path2[1]);
 
-  if (!strncasematch (path1, path2, len1))
+  if (!pathnmatch (path1, path2, len1))
     return 0;
 
   return SLASH_P (path2[len1]) || path2[len1] == 0 || path1[len1 - 1] == ':';
+}
+
+/* Return non-zero if paths match in first len chars.
+   Check is dependent of the case sensitivity setting. */
+int
+pathnmatch (const char *path1, const char *path2, int len)
+{
+  return pcheck_case == PCHECK_STRICT ? !strncmp (path1, path2, len)
+  				      : strncasematch (path1, path2, len);
+}
+
+/* Return non-zero if paths match. Check is dependent of the case
+   sensitivity setting. */
+int
+pathmatch (const char *path1, const char *path2)
+{
+  return pcheck_case == PCHECK_STRICT ? !strcmp (path1, path2)
+  				      : strcasematch (path1, path2);
 }
 
 /* Convert an arbitrary path SRC to a pure Win32 path, suitable for
@@ -211,6 +234,7 @@ path_conv::check (const char *src, unsigned opt,
   path_flags = 0;
   known_suffix = NULL;
   fileattr = (DWORD) -1;
+  case_clash = FALSE;
   for (;;)
     {
       MALLOC_CHECK;
@@ -247,7 +271,7 @@ path_conv::check (const char *src, unsigned opt,
       if (full_path[0] && full_path[1] == ':' && full_path[2] == '\0')
 	strcat (full_path, "\\");
 
-      if (opt & PC_SYM_IGNORE)
+      if ((opt & PC_SYM_IGNORE) && pcheck_case == PCHECK_RELAXED)
 	{
 	  fileattr = GetFileAttributesA (path);
 	  goto out;
@@ -284,44 +308,77 @@ path_conv::check (const char *src, unsigned opt,
 	      sym.pflags = path_flags;
 	    }
 
-	  int len = sym.check (path_copy, suff);
+	  int len = sym.check (path_copy, suff, full_path, opt & PC_SYM_IGNORE);
 
-	  if (!component)
-	    path_flags = sym.pflags;
-
-	  /* If symlink.check found an existing non-symlink file, then
-	     it sets the appropriate flag.  It also sets any suffix found
-	     into `ext_here'. */
-	  if (!sym.is_symlink && sym.fileattr != (DWORD) -1)
+	  if (sym.case_clash)
 	    {
-	      error = sym.error;
-	      if (component == 0)
-		{
-		  fileattr = sym.fileattr;
-		  goto fillin;
-		}
-	      goto out;	// file found
-	    }
-	  /* Found a symlink if len > 0.  If component == 0, then the
-	     src path itself was a symlink.  If !follow_mode then
-	     we're done.  Otherwise we have to insert the path found
-	     into the full path that we are building and perform all of
-	     these operations again on the newly derived path. */
-	  else if (len > 0)
-	    {
-	      saw_symlinks = 1;
-	      if (component == 0 && !need_directory && !(opt & PC_SYM_FOLLOW))
-		{
-		  set_symlink (); // last component of path is a symlink.
-		  fileattr = sym.fileattr;
-		  if (opt & PC_SYM_CONTENTS)
-		      strcpy (path, sym.contents);
-		  goto fillin;
-		}
-	      break;
+	      case_clash = TRUE;
+	      error = ENOENT;
+	      goto out;
 	    }
 
-	  /* No existing file found. */
+	  if (!(opt & PC_SYM_IGNORE))
+	    {
+	      if (!component)
+		path_flags = sym.pflags;
+
+	      /* If symlink.check found an existing non-symlink file, then
+		 it sets the appropriate flag.  It also sets any suffix found
+		 into `ext_here'. */
+	      if (!sym.is_symlink && sym.fileattr != (DWORD) -1)
+		{
+		  error = sym.error;
+		  if (component == 0)
+		    {
+		      fileattr = sym.fileattr;
+		      if (sym.ext_here && *sym.ext_here)
+			{
+			  known_suffix = this->path + sym.extn;
+			  if (sym.ext_tacked_on)
+			    strcpy (known_suffix, sym.ext_here);
+			}
+		    }
+		  if (pcheck_case == PCHECK_RELAXED)
+		    goto out;	// file found
+		  /* Avoid further symlink evaluation. Only case checks are
+		     done now. */
+		  opt |= PC_SYM_IGNORE;
+		}
+	      /* Found a symlink if len > 0.  If component == 0, then the
+		 src path itself was a symlink.  If !follow_mode then
+		 we're done.  Otherwise we have to insert the path found
+		 into the full path that we are building and perform all of
+		 these operations again on the newly derived path. */
+	      else if (len > 0)
+		{
+		  saw_symlinks = 1;
+		  if (component == 0 && !need_directory && !(opt & PC_SYM_FOLLOW))
+		    {
+		      set_symlink (); // last component of path is a symlink.
+		      fileattr = sym.fileattr;
+		      if (opt & PC_SYM_CONTENTS)
+		        {
+			  strcpy (path, sym.contents);
+			  goto out;
+			}
+		      if (sym.ext_here && *sym.ext_here)
+			{
+			  known_suffix = this->path + sym.extn;
+			  if (sym.ext_tacked_on)
+			    strcpy (known_suffix, sym.ext_here);
+			}
+		      if (pcheck_case == PCHECK_RELAXED)
+		        goto out;
+		      /* Avoid further symlink evaluation. Only case checks are
+		         done now. */
+		      opt |= PC_SYM_IGNORE;
+		    }
+		  else
+		    break;
+		}
+	      /* No existing file found. */
+
+	    }
 
 	  if (!(tail = strrchr (path_copy, '\\')) ||
 	      (tail > path_copy && tail[-1] == ':'))
@@ -378,7 +435,7 @@ path_conv::check (const char *src, unsigned opt,
 	}
     }
 
-fillin:
+/*fillin:*/
   if (sym.ext_here && *sym.ext_here && !(opt & PC_SYM_CONTENTS))
     {
       known_suffix = this->path + sym.extn;
@@ -399,6 +456,7 @@ out:
       error = ENOTDIR;
       return;
     }
+
   DWORD serial, volflags;
   char fs_name[16];
 
@@ -2258,18 +2316,17 @@ symlink (const char *topath, const char *frompath)
   char w32topath[MAX_PATH + 1];
   DWORD written;
 
-  if (allow_winsymlinks)
+  win32_path.check (frompath, PC_SYM_NOFOLLOW);
+  if (allow_winsymlinks && !win32_path.error)
     {
       strcpy (from, frompath);
       strcat (from, ".lnk");
       win32_path.check (from, PC_SYM_NOFOLLOW);
     }
-  else
-    win32_path.check (frompath, PC_SYM_NOFOLLOW);
 
   if (win32_path.error)
     {
-      set_errno (win32_path.error);
+      set_errno (win32_path.case_clash ? ECASECLASH : win32_path.error);
       goto done;
     }
 
@@ -2573,7 +2630,8 @@ suffix_scan::next ()
    stored into BUF if PATH is a symlink.  */
 
 int
-symlink_info::check (const char *path, const suffix_info *suffixes)
+symlink_info::check (const char *path, const suffix_info *suffixes,
+		     char *orig_path, BOOL sym_ignore)
 {
   HANDLE h;
   int res = 0;
@@ -2584,6 +2642,8 @@ symlink_info::check (const char *path, const suffix_info *suffixes)
   extn = ext_here - path;
 
   ext_tacked_on = !*ext_here;
+
+  case_clash = FALSE;
 
   while (suffix.next ())
     {
@@ -2598,6 +2658,10 @@ symlink_info::check (const char *path, const suffix_info *suffixes)
 	  error = geterrno_from_win_error (GetLastError (), EACCES);
 	  continue;
 	}
+
+      if (pcheck_case != PCHECK_RELAXED && !case_check (path, orig_path)
+          || sym_ignore)
+        goto file_not_symlink;
 
       int sym_check = 0;
 
@@ -2660,6 +2724,50 @@ out:
   syscall_printf ("%d = symlink.check (%s, %p) (%p)",
 		  res, suffix.path, contents, pflags);
   return res;
+}
+
+/* Check the correct case of the last path component (given in DOS style).
+   Adjust the case in this->path if pcheck_case == PCHECK_ADJUST or return
+   FALSE if pcheck_case == PCHECK_STRICT.
+   Dont't call if pcheck_case == PCHECK_RELAXED.
+*/
+
+BOOL
+symlink_info::case_check (const char *path, char *orig_path)
+{
+  WIN32_FIND_DATA data;
+  HANDLE h;
+  const char *c;
+
+  /* Set a pointer to the beginning of the last component. */
+  if (!(c = strrchr (path, '\\')))
+    c = path;
+  else
+    ++c;
+
+  if ((h = FindFirstFile (path, &data))
+      != INVALID_HANDLE_VALUE)
+    {
+      FindClose (h);
+
+      /* If that part of the component exists, check the case. */
+      if (strcmp (c, data.cFileName))
+	{
+	  /* If check is set to STRICT, a wrong case results
+	     in returning a ENOENT. */
+	  if (pcheck_case == PCHECK_STRICT)
+	    {
+	      case_clash = TRUE;
+	      return FALSE;
+	    }
+
+	  /* PCHECK_ADJUST adjusts the case in the incoming
+	     path which points to the path in *this. */
+	  strncpy (orig_path + (c - path), data.cFileName,
+		   strlen (data.cFileName));
+	}
+    }
+  return TRUE;
 }
 
 /* readlink system call */
@@ -2855,7 +2963,8 @@ chdir (const char *dir)
      we'll see if Cygwin mailing list users whine about the current behavior. */
   if (res == -1)
     __seterrno ();
-  else if (!path.has_symlinks () && strpbrk (dir, ":\\") == NULL)
+  else if (!path.has_symlinks () && strpbrk (dir, ":\\") == NULL
+           && pcheck_case == PCHECK_RELAXED)
     cygcwd.set (path, dir);
   else
     cygcwd.set (path, NULL);

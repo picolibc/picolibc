@@ -545,7 +545,7 @@ _link (const char *a, const char *b)
     }
   if (real_b.error)
     {
-      set_errno (real_b.error);
+      set_errno (real_b.case_clash ? ECASECLASH : real_b.error);
       goto done;
     }
 

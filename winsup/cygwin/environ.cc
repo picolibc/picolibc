@@ -32,6 +32,7 @@ extern BOOL allow_ntea;
 extern BOOL allow_smbntsec;
 extern BOOL allow_winsymlinks;
 extern BOOL strip_title_path;
+extern int pcheck_case;
 extern DWORD chunksize;
 BOOL reset_com = TRUE;
 static BOOL envcache = TRUE;
@@ -394,6 +395,33 @@ glob_init (const char *buf)
 }
 
 static void
+check_case_init (const char *buf)
+{
+  if (!buf || !*buf)
+    return;
+
+  if (strncmp (buf, "relax", 5)== 0)
+    {
+      pcheck_case = PCHECK_RELAXED;
+      debug_printf ("File case checking set to RELAXED");
+    }
+  else if (strcmp (buf, "adjust")== 0)
+    {
+      pcheck_case = PCHECK_ADJUST;
+      debug_printf ("File case checking set to ADJUST");
+    }
+  else if (strcmp (buf, "strict")== 0)
+    {
+      pcheck_case = PCHECK_STRICT;
+      debug_printf ("File case checking set to STRICT");
+    }
+  else
+    {
+      debug_printf ("Wrong case checking name: %s", buf);
+    }
+}
+
+static void
 codepage_init (const char *buf)
 {
   if (!buf || !*buf)
@@ -441,6 +469,7 @@ struct parse_thing
   } known[] =
 {
   {"binmode", {x: &binmode}, justset, NULL, {{O_TEXT}, {O_BINARY}}},
+  {"check_case", {func: &check_case_init}, isfunc, NULL, {{0}, {0}}},
   {"codepage", {func: &codepage_init}, isfunc, NULL, {{0}, {0}}},
   {"envcache", {&envcache}, justset, NULL, {{TRUE}, {FALSE}}},
   {"error_start", {func: &error_start_init}, isfunc, NULL, {{0}, {0}}},

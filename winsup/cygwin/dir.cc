@@ -306,7 +306,7 @@ mkdir (const char *dir, mode_t mode)
 
   if (real_dir.error)
     {
-      set_errno (real_dir.error);
+      set_errno (real_dir.case_clash ? ECASECLASH : real_dir.error);
       goto done;
     }
 

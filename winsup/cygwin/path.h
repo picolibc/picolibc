@@ -25,6 +25,13 @@ enum pathconv_arg
   PC_NULLEMPTY		= 0x0020
 };
 
+enum case_checking
+{
+  PCHECK_RELAXED	= 0,
+  PCHECK_ADJUST		= 1,
+  PCHECK_STRICT		= 2
+};
+
 #define PC_NONULLEMPTY -1
 
 #include <sys/mount.h>
@@ -88,6 +95,8 @@ class path_conv
   int unit;
 
   DWORD fileattr;
+
+  BOOL case_clash;
 
   void check (const char *src, unsigned opt = PC_SYM_FOLLOW,
 	      const suffix_info *suffixes = NULL)  __attribute__ ((regparm(3)));
@@ -171,3 +180,6 @@ struct cwdstuff
 };
 
 extern cwdstuff cygcwd;
+
+extern int pathmatch (const char *path1, const char *path2);
+extern int pathnmatch (const char *path1, const char *path2, int len);

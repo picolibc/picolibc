@@ -283,7 +283,8 @@ extern const char __declspec(dllexport) * const _sys_errlist[]=
 /* ESTALE 133 */ "Stale NFS file handle",
 /* ENOTSUP 134 */   "134",
 /* ENOMEDIUM 135 */ "no medium",
-/* ENOSHARE 136 */   "No such host or network path"
+/* ENOSHARE 136 */   "No such host or network path",
+/* ECASECLASH 137 */ "Filename exists with different case"
 };
 
 int __declspec(dllexport) _sys_nerr =
@@ -658,6 +659,9 @@ strerror (int errnum)
       break;
     case ENOSHARE:
       error = "No such host or network path";
+      break;
+    case ECASECLASH:
+      error = "Filename exists with different case";
       break;
     default:
 #ifdef _MT_SAFE

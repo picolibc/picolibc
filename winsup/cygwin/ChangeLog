@@ -1,3 +1,30 @@
+Thu Apr 17 23:19:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* dir.cc (mkdir): Check for case clash.
+	* environ.cc: Add extern declaration for `pcheck_case'.
+	(check_case_init): New function.
+	(struct parse_thing): Add "check_case" option.
+	* errno.cc (_sys_nerrlist): Add text for ECASECLASH.
+	(strerror): Add case branch for ECASECLASH.
+	* fhandler.cc (fhandler_disk_file::open): Check for case clash.
+	* path.cc: Add global variable `pcheck_case'.
+	(struct symlink_info): Add member `case_clash' and method `case_check'.
+	(path_prefix_p_): Call `pathnmatch' instead of `strncasematch'.
+	(pathnmatch): New funtion.
+	(pathmatch): Ditto.
+	(path_conv::check): Add handling for case checking.
+	(symlink): Check for case clash.
+	(symlink_info::check): Add parameter for case checking.
+	Handle case checking.
+	(symlink_info::case_check): New method.
+	(chdir): Don't use unconverted path if pcheck_case==PCHECK_STRICT.
+	* path.h: Add extern declarations for `pathmatch' and
+	`pathnmatch'.
+	(enum case_checking): New enumeration type describing
+	the case checking behaviour of path conversion routines.
+	(class path_conv): Add member `case_clash'.
+	* syscalls.cc (_link): Check for case clash.
+
 Thu Apr 12 12:49:53 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* syscalls.cc (mkfifo): New function stub.

@@ -1208,9 +1208,11 @@ fhandler_disk_file::open (const char *path, int flags, mode_t mode)
 			     PC_SYM_NOFOLLOW : PC_SYM_FOLLOW);
 
   if (real_path.error &&
-      (flags & O_NOSYMLINK || real_path.error != ENOENT || !(flags & O_CREAT)))
+      (flags & O_NOSYMLINK || real_path.error != ENOENT
+       || !(flags & O_CREAT) || real_path.case_clash))
     {
-      set_errno (real_path.error);
+      set_errno (flags & O_CREAT && real_path.case_clash ? ECASECLASH
+      							 : real_path.error);
       syscall_printf ("0 = fhandler_disk_file::open (%s, %p)", path, flags);
       return 0;
     }
