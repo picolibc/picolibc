@@ -252,12 +252,16 @@ __set_winsock_errno (const char *fn, int ln)
     }
 }
 
+/*
+ * Since the member `s' isn't used for debug output we can use it
+ * for the error text returned by herror and hstrerror.
+ */
 static struct tl host_errmap[] =
 {
-  {WSAHOST_NOT_FOUND, "WSAHOST_NOT_FOUND", HOST_NOT_FOUND},
-  {WSATRY_AGAIN, "WSATRY_AGAIN", TRY_AGAIN},
-  {WSANO_RECOVERY, "WSANO_RECOVERY", NO_RECOVERY},
-  {WSANO_DATA, "WSANO_DATA", NO_DATA},
+  {WSAHOST_NOT_FOUND, "Unknown host", HOST_NOT_FOUND},
+  {WSATRY_AGAIN, "Host name lookup failure", TRY_AGAIN},
+  {WSANO_RECOVERY, "Unknown server error", NO_RECOVERY},
+  {WSANO_DATA, "No address associated with name", NO_DATA},
   {0, NULL, 0}
 };
 
@@ -268,7 +272,7 @@ set_host_errno ()
   int i;
 
   int why = WSAGetLastError ();
-  for (i = 0; i < host_errmap[i].w != 0; ++i)
+  for (i = 0; host_errmap[i].w != 0; ++i)
     if (why == host_errmap[i].w)
       break;
 
@@ -884,11 +888,49 @@ cygwin_shutdown (int fd, int how)
   return res;
 }
 
-/* exported as herror: standards? */
-extern "C" void
-cygwin_herror (const char *)
+/* exported as hstrerror: BSD 4.3  */
+extern "C" const char *
+cygwin_hstrerror (int err)
 {
-  debug_printf ("********%d*************", __LINE__);
+  int i;
+
+  for (i = 0; host_errmap[i].e != 0; ++i)
+    if (err == host_errmap[i].e)
+      break;
+
+  return host_errmap[i].s;
+}
+
+/* exported as herror: BSD 4.3  */
+extern "C" void
+cygwin_herror (const char *s)
+{
+  if (fdtab.not_open (2))
+    return;
+
+  if (s)
+    {
+      write (2, s, strlen (s));
+      write (2, ": ", 2);
+    }
+
+  const char *h_errstr = cygwin_hstrerror (h_errno);
+
+  if (!h_errstr)
+    switch (h_errno)
+      {
+      case NETDB_INTERNAL:
+        h_errstr = "Resolver internal error";
+        break;
+      case NETDB_SUCCESS:
+        h_errstr = "Resolver error 0 (no error)";
+        break;
+      default:
+        h_errstr = "Unknown resolver error";
+        break;
+      }
+  write (2, h_errstr, strlen (h_errstr));
+  write (2, "\n", 1);
 }
 
 /* exported as getpeername: standards? */

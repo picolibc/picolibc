@@ -118,10 +118,11 @@ details. */
        26: CW_GET_CYGDRIVE_PREFIXES addition to external.cc
        27: CW_GETPINFO_FULL addition to external.cc
        28: Accidentally bumped by cgf
+       29: Export hstrerror
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 28
+#define CYGWIN_VERSION_API_MINOR 29
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

@@ -151,6 +151,7 @@ struct servent	*getservent (void);
 struct rpcent	*getrpcent (void);
 struct rpcent	*getrpcbyname (const char *);
 struct rpcent	*getrpcbynumber (int);
+const char      *hstrerror (int);
 void		herror (const char *);
 void		sethostent (int);
 void		setnetent (int);

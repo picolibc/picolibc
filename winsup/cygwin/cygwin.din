@@ -925,6 +925,7 @@ _ntohs = ntohs
 accept = cygwin_accept
 bind = cygwin_bind
 connect = cygwin_connect
+hstrerror = cygwin_hstrerror
 herror = cygwin_herror
 inet_addr = cygwin_inet_addr
 inet_network = cygwin_inet_network
