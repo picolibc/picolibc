@@ -326,7 +326,7 @@ proc_subproc (DWORD what, DWORD val)
       ProtectHandle1 (vchild->pid_handle, pid_handle);
 
       if (!DuplicateHandle (hMainProc, hMainProc, vchild->hProcess, &vchild->ppid_handle,
-			    0, TRUE, DUPLICATE_SAME_ACCESS))
+			    SYNCHRONIZE | PROCESS_DUP_HANDLE, TRUE, 0))
 	system_printf ("Couldn't duplicate my handle<%p> for pid %d, %E", hMainProc, vchild->pid);
       vchild->ppid = myself->pid;
       vchild->uid = myself->uid;

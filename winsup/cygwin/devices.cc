@@ -1195,7 +1195,7 @@ device::parse (const char *s)
       if (++len < prior_len)
 	{
 	  dev = KR_find_keyword (s, len);
-	  if (!dev || (!dev->upper && !dev->devn == FH_TTY))
+	  if (!dev || (!dev->upper && dev->devn != FH_TTY))
 	    dev = NULL;
 	  else
 	    {

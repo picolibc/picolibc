@@ -1,3 +1,15 @@
+2003-09-28  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* sigproc.cc (proc_subproc): Restrict permissions on ppid_handle.
+
+2003-09-28  Christopher Faylor  <cgf@redhat.com>
+
+	* devices.shilka (device::parse): Restore check for tty in unit
+	handling, but without the previous typo.
+	* devices.cc: Regenerate.
+	* devices.h (DEV_CYGDRIVE_MAJOR): Change major number to one used by
+	linux for "user-mode virtual block device".
+
 2003-09-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* devices.h: Move a few device major numbers.  Fix typo of FH_UDP.
