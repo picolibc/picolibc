@@ -227,12 +227,14 @@ fhandler_process::open (path_conv *pc, int flags, mode_t mode)
     }
 
   fileid = process_file_no;
-  fill_filebuf (p);
+  this->p = &p;
+  fill_filebuf ();
 
   if (flags & O_APPEND)
     position = filesize;
   else
     position = 0;
+  this->p = NULL;
   }
 
 success:
@@ -245,7 +247,7 @@ out:
 }
 
 void
-fhandler_process::fill_filebuf (pinfo& p)
+fhandler_process::fill_filebuf ()
 {
   switch (fileid)
     {
@@ -262,22 +264,22 @@ fhandler_process::fill_filebuf (pinfo& p)
 	switch (fileid)
 	  {
 	  case PROCESS_PPID:
-	    num = p->ppid;
+	    num = (*p)->ppid;
 	    break;
 	  case PROCESS_UID:
-	    num = p->uid;
+	    num = (*p)->uid;
 	    break;
 	  case PROCESS_PGID:
-	    num = p->pgid;
+	    num = (*p)->pgid;
 	    break;
 	  case PROCESS_SID:
-	    num = p->sid;
+	    num = (*p)->sid;
 	    break;
 	  case PROCESS_GID:
-	    num = p->gid;
+	    num = (*p)->gid;
 	    break;
 	  case PROCESS_CTTY:
-	    num = p->ctty;
+	    num = (*p)->ctty;
 	    break;
 	  default: // what's this here for?
 	    num = 0;
@@ -291,11 +293,11 @@ fhandler_process::fill_filebuf (pinfo& p)
       {
 	if (!filebuf)
 	filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = MAX_PATH);
-	if (p->process_state & (PID_ZOMBIE | PID_EXITED))
+	if ((*p)->process_state & (PID_ZOMBIE | PID_EXITED))
 	  strcpy (filebuf, "<defunct>");
 	else
 	  {
-	    mount_table->conv_to_posix_path (p->progname, filebuf, 1);
+	    mount_table->conv_to_posix_path ((*p)->progname, filebuf, 1);
 	    int len = strlen (filebuf);
 	    if (len > 4)
 	      {
@@ -311,16 +313,16 @@ fhandler_process::fill_filebuf (pinfo& p)
       {
 	if (!filebuf)
 	filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 40);
-	__small_sprintf (filebuf, "%d\n", p->dwProcessId);
+	__small_sprintf (filebuf, "%d\n", (*p)->dwProcessId);
 	filesize = strlen (filebuf);
 	break;
       }
     case PROCESS_WINEXENAME:
       {
-	int len = strlen (p->progname);
+	int len = strlen ((*p)->progname);
 	if (!filebuf)
 	filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = (len + 2));
-	strcpy (filebuf, p->progname);
+	strcpy (filebuf, (*p)->progname);
 	filebuf[len] = '\n';
 	filesize = len + 1;
 	break;
@@ -329,21 +331,21 @@ fhandler_process::fill_filebuf (pinfo& p)
       {
 	if (!filebuf)
 	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 2048);
-	filesize = format_process_status (p, filebuf, bufalloc);
+	filesize = format_process_status ((*p), filebuf, bufalloc);
 	break;
       }
     case PROCESS_STAT:
       {
 	if (!filebuf)
 	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 2048);
-	filesize = format_process_stat (p, filebuf, bufalloc);
+	filesize = format_process_stat ((*p), filebuf, bufalloc);
 	break;
       }
     case PROCESS_STATM:
       {
 	if (!filebuf)
 	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 2048);
-	filesize = format_process_statm (p, filebuf, bufalloc);
+	filesize = format_process_statm ((*p), filebuf, bufalloc);
 	break;
       }
     }
