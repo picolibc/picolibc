@@ -66,7 +66,13 @@ extern "C" {
 #define RESTRICTED_POINTER
 #define POINTER_ALIGNMENT
 
-
+#ifdef NONAMELESSUNION
+# define _DDK_DUMMYUNION_MEMBER(name) DUMMYUNIONNAME.name
+# define _DDK_DUMMYUNION_N_MEMBER(n, name) DUMMYUNIONNAME##n.name
+#else
+# define _DDK_DUMMYUNION_MEMBER(name) name
+# define _DDK_DUMMYUNION_N_MEMBER(n, name) name
+#endif
 
 /*
 ** Forward declarations
@@ -167,6 +173,14 @@ typedef struct _DRIVE_LAYOUT_INFORMATION_EX *PDRIVE_LAYOUT_INFORMATION_EX;
 #define HIGH_PRIORITY                     31
 #define MAXIMUM_PRIORITY                  32
 
+#define FILE_SUPERSEDED                   0x00000000
+#define FILE_OPENED                       0x00000001
+#define FILE_CREATED                      0x00000002
+#define FILE_OVERWRITTEN                  0x00000003
+#define FILE_EXISTS                       0x00000004
+#define FILE_DOES_NOT_EXIST               0x00000005
+
+/* also in winnt.h */
 #define FILE_LIST_DIRECTORY               0x00000001
 #define FILE_READ_DATA                    0x00000001
 #define FILE_ADD_FILE                     0x00000002
@@ -181,13 +195,6 @@ typedef struct _DRIVE_LAYOUT_INFORMATION_EX *PDRIVE_LAYOUT_INFORMATION_EX;
 #define FILE_DELETE_CHILD                 0x00000040
 #define FILE_READ_ATTRIBUTES              0x00000080
 #define FILE_WRITE_ATTRIBUTES             0x00000100
-
-#define FILE_SUPERSEDED                   0x00000000
-#define FILE_OPENED                       0x00000001
-#define FILE_CREATED                      0x00000002
-#define FILE_OVERWRITTEN                  0x00000003
-#define FILE_EXISTS                       0x00000004
-#define FILE_DOES_NOT_EXIST               0x00000005
 
 #define FILE_SHARE_READ                   0x00000001
 #define FILE_SHARE_WRITE                  0x00000002
@@ -279,6 +286,7 @@ typedef struct _DRIVE_LAYOUT_INFORMATION_EX *PDRIVE_LAYOUT_INFORMATION_EX;
    FILE_WRITE_EA | \
    FILE_APPEND_DATA | \
    SYNCHRONIZE)
+/* end winnt.h */
 
 /* Exported object types */
 extern NTOSAPI POBJECT_TYPE ExDesktopObjectType;
@@ -3161,7 +3169,7 @@ typedef struct _IO_REMOVE_LOCK_DBG_BLOCK {
 
 typedef struct _IO_REMOVE_LOCK {
   IO_REMOVE_LOCK_COMMON_BLOCK  Common;
-#if DBG
+#ifdef DBG
   IO_REMOVE_LOCK_DBG_BLOCK  Dbg;
 #endif
 } IO_REMOVE_LOCK, *PIO_REMOVE_LOCK;
@@ -3938,7 +3946,7 @@ RtlAssert(
   IN ULONG  LineNumber,
   IN PCHAR  Message);
 
-#if DBG
+#ifdef DBG
 
 #define ASSERT(exp) \
   ((!(exp)) ? \
@@ -5048,7 +5056,7 @@ ExAllocateFromNPagedLookasideList(
 	Lookaside->TotalAllocates++;
   Entry = InterlockedPopEntrySList(&Lookaside->ListHead);
 	if (Entry == NULL) {
-		Lookaside->AllocateMisses++;
+		Lookaside->_DDK_DUMMYUNION_MEMBER(AllocateMisses)++;
 		Entry = (Lookaside->Allocate)(Lookaside->Type, Lookaside->Size, Lookaside->Tag);
 	}
   return Entry;
@@ -5063,7 +5071,7 @@ ExAllocateFromPagedLookasideList(
   Lookaside->TotalAllocates++;
   Entry = InterlockedPopEntrySList(&Lookaside->ListHead);
   if (Entry == NULL) {
-    Lookaside->AllocateMisses++;
+    Lookaside->_DDK_DUMMYUNION_MEMBER(AllocateMisses)++;
     Entry = (Lookaside->Allocate)(Lookaside->Type,
       Lookaside->Size, Lookaside->Tag);
   }
@@ -5179,7 +5187,7 @@ ExFreeToNPagedLookasideList(
 {
   Lookaside->TotalFrees++;
 	if (ExQueryDepthSList(&Lookaside->ListHead) >= Lookaside->Depth) {
-		Lookaside->FreeMisses++;
+		Lookaside->_DDK_DUMMYUNION_N_MEMBER(2,FreeMisses)++;
 		(Lookaside->Free)(Entry);
   } else {
 		InterlockedPushEntrySList(&Lookaside->ListHead,
@@ -5194,7 +5202,7 @@ ExFreeToPagedLookasideList(
 {
   Lookaside->TotalFrees++;
   if (ExQueryDepthSList(&Lookaside->ListHead) >= Lookaside->Depth) {
-    Lookaside->FreeMisses++;
+    Lookaside->_DDK_DUMMYUNION_N_MEMBER(2,FreeMisses)++;
     (Lookaside->Free)(Entry);
   } else {
     InterlockedPushEntrySList(&Lookaside->ListHead, (PSLIST_ENTRY)Entry);
@@ -5532,7 +5540,7 @@ DDKAPI
 ExVerifySuite(
   IN SUITE_TYPE  SuiteType);
 
-#if DBG
+#ifdef DBG
 
 #define PAGED_CODE() { \
   if (KeGetCurrentIrql() > APC_LEVEL) { \
@@ -9059,7 +9067,7 @@ DbgSetDebugFilterState(
   IN ULONG  Level,
   IN BOOLEAN  State);
 
-#if DBG
+#ifdef DBG
 
 #define KdPrint(_x_) DbgPrint _x_
 #define KdPrintEx(_x_) DbgPrintEx _x_

@@ -1,3 +1,17 @@
+2004-01-02  Filip Navara  <xnavara@volny.cz>
+
+	* include/ddk/winddk.h: Don't care about value of
+	DBG define.
+
+2004-01-02  Danny Smith  <dannysmith@users.sourceforge.net>
+	    Filip Navara  <xnavara@volny.cz>
+	    
+	* include/ddk/winddk.h (_DDK_DUMMYUNION_MEMBER,
+	_DDK_DUMMYUNION_N_MEMBER): New macros.
+	(ExAllocateFromPagedLookasideList,ExFreeToPagedLookasideList,
+	ExAllocateFromNPagedLookasideList, ExFreeToNPagedLookasideList):
+	Use them.
+
 2004-01-01  Filip Navara  <xnavara@volny.cz>
 
 	* include/objbase.h:  Don't care about value of DBG define.
