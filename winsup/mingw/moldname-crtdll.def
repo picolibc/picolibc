@@ -26,7 +26,6 @@
 EXPORTS
 access
 beep
-cabs
 chdir
 chmod
 chsize
@@ -67,12 +66,8 @@ getcwd
 getpid
 getw
 heapwalk
-hypot
 isatty
 itoa
-j0
-j1
-jn
 kbhit
 lseek
 ltoa
@@ -138,6 +133,19 @@ wcsupr
 
 
 write
+; non-ANSI functions declared in math.h
+j0
+j1
+jn
 y0
 y1
 yn
+chgsign
+scalb
+finite
+fpclass
+; C99 functions
+cabs
+hypot
+logb
+nextafter

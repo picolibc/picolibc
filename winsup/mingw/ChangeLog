@@ -1,3 +1,154 @@
+2002-07-29  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* moldname.def.in (chgsign,scalb,finite,fpclass,logb,
+	nextafter): Add non-underscored stubs.
+	* moldname-msvcrt.def: Regenerate.
+	* moldname-crtdll.def: Regenerate.
+	* mingwex/math: New directory.
+	* mingwex/rint.c: Move to mingwex/math.
+	* mingwex/rintf.c: Ditto.
+	* mingwex/rintl.c: Ditto.
+	* mingwex/round.c: Ditto.
+	* mingwex/roundf.c: Ditto.
+	* mingwex/roundl.c: Ditto.
+	* mingwex/rint.c: Ditto.
+	* mingwex/rintf.c: Ditto.
+	* mingwex/rintl.c: Ditto.
+	* mingwex/trunc.c: Ditto.
+	* mingwex/truncf.c: Ditto.
+	* mingwex/truncl.c: Ditto.
+	* mingwex/signbit.c: Ditto.
+	* mingwex/signbitf.c: Ditto.
+	* mingwex/signbitl.c: Ditto.
+	* mingwex/copysignl.S: Ditto.
+	* mingwex/fdim.c: Ditto.
+	* mingwex/fdimf.c: Ditto.
+	* mingwex/fdiml.c: Ditto.
+	* mingwex/fmin.c: Ditto.
+	* mingwex/fminf.c: Ditto.
+	* mingwex/fminl.c: Ditto.
+	* mingwex/fmax.c: Ditto.
+	* mingwex/fmaxf.c: Ditto.
+	* mingwex/fmaxl.c: Ditto.
+	* mingwex/fma.c: Ditto.
+	* mingwex/fmaf.c: Ditto.
+	* mingwex/fmal.c: Ditto.
+	* mingwex/fpclassify.c: Ditto.
+	* mingwex/fpclassifyl.c: Ditto.
+	* mingwex/fpclassifyl.c: Ditto.
+	* mingwex/isnan.c: Ditto.
+	* mingwex/isnanf.c: Ditto.
+	* mingwex/isnanl.c: Ditto.
+	* mingwex/fucom.c: Ditto.
+	* mingwex/fp_consts.c: Ditto. Split out float and long double
+	definitions.
+	* mingwex/math_stubs.c: Remove.
+	* mingwex/log2.c: Remove. Replaced by math/log2.S
+	* mingwex/log2f.c: Remove.  Replaced by math/log2f.S
+	* mingwex/log2l.c: Remove.  Replaced by math/log2l.S
+	* mingwex/math/acosf.c : New file.
+	* mingwex/math/acosl.c: New file.
+	* mingwex/math/asinf.c: New file.
+	* mingwex/math/asinl.c: New file.
+	* mingwex/math/atan2f.c: New file.
+	* mingwex/math/atan2l.c: New file.
+	* mingwex/math/atanf.c: New file.
+	* mingwex/math/atanl.c: New file.
+	* mingwex/math/cbrt.c: New file.
+	* mingwex/math/cbrtf.c: New file.
+	* mingwex/math/cbrtl.c: New file.
+	* mingwex/math/ceilf.S: New file.
+	* mingwex/math/ceill.S: New file.
+	* mingwex/math/cephes_ld.h: New file.
+	* mingwex/math/copysign.S: New file.
+	* mingwex/math/copysignf.S: New file.
+	* mingwex/math/cosf.S: New file.
+	* mingwex/math/coshf.c: New file.
+	* mingwex/math/coshl.c: New file.
+	* mingwex/math/cosl.S: New file.
+	* mingwex/math/exp2.S: New file.
+	* mingwex/math/exp2f.S: New file.
+	* mingwex/math/exp2l.S: New file.
+	* mingwex/math/expf.c: New file.
+	* mingwex/math/expl.c: New file.
+	* mingwex/math/fabs.c: New file.
+	* mingwex/math/fabsf.c: New file.
+	* mingwex/math/fabsl.c: New file.
+	* mingwex/math/floorf.S: New file.
+	* mingwex/math/floorl.S: New file.
+	* mingwex/math/fmodf.c: New file.
+	* mingwex/math/fmodl.c: New file.
+	* mingwex/math/fp_consts.h: Ditto.
+	* mingwex/math/fp_constsf.c: Ditto.
+	* mingwex/math/fp_constsl.c: Ditto.
+	* mingwex/math/frexpf.c: New file.
+	* mingwex/math/frexpl.S: New file.
+	* mingwex/math/hypotf.c: New file.
+	* mingwex/math/hypotl.c: New file.
+	* mingwex/math/ilogb.S: New file.
+	* mingwex/math/ilogbf.S: New file.
+	* mingwex/math/ilogbl.S: New file.
+	* mingwex/math/ldexpf.c: New file.
+	* mingwex/math/ldexpl.c: New file.
+	* mingwex/math/llrint.c: New file.
+	* mingwex/math/llrintf.c: New file.
+	* mingwex/math/llrintl.c: New file.
+	* mingwex/math/llround.c: New file.
+	* mingwex/math/llroundf.c: New file.
+	* mingwex/math/llroundl.c: New file.
+	* mingwex/math/log10f.S: New file.
+	* mingwex/math/log10l.S: New file.
+	* mingwex/math/log1p.S: New file.
+	* mingwex/math/log1pf.S: New file.
+	* mingwex/math/log1pl.S: New file.
+	* mingwex/math/log2.S: New file.
+	* mingwex/math/log2f.S: New file.
+	* mingwex/math/log2l.S: New file.
+	* mingwex/math/logb.c: New file.
+	* mingwex/math/logbf.c: New file.
+	* mingwex/math/logbl.c: New file.
+	* mingwex/math/logf.S: New file.
+	* mingwex/math/logl.S: New file.
+	* mingwex/math/lrint.c: New file.
+	* mingwex/math/lrintf.c: New file.
+	* mingwex/math/lrintl.c: New file.
+	* mingwex/math/lround.c: New file.
+	* mingwex/math/lroundf.c: New file.
+	* mingwex/math/lroundl.c: New file.
+	* mingwex/math/modff.c: New file.
+	* mingwex/math/modfl.c: New file.
+	* mingwex/math/nearbyint.S: New file.
+	* mingwex/math/nearbyintf.S: New file.
+	* mingwex/math/nearbyintl.S: New file.
+	* mingwex/math/nextafterf.c: New file.
+	* mingwex/math/powf.c: New file.
+	* mingwex/math/powl.c: New file.
+	* mingwex/math/powil.c: New file.
+	* mingwex/math/remainder.S: New file.
+	* mingwex/math/remainderf.S: New file.
+	* mingwex/math/remainderl.S: New file.
+	* mingwex/math/remquo.S: New file.
+	* mingwex/math/remquof.S: New file.
+	* mingwex/math/remquol.S: New file.
+	* mingwex/math/scalbn.S: New file.
+	* mingwex/math/scalbnf.S: New file.
+	* mingwex/math/scalbnl.S: New file.
+	* mingwex/math/sinf.S: New file.
+	* mingwex/math/sinhf.c: New file.
+	* mingwex/math/sinhl.c: New file.
+	* mingwex/math/sinl.S: New file.
+	* mingwex/math/sqrt.c: New file.
+	* mingwex/math/sqrtf.c: New file.
+	* mingwex/math/sqrtl.c: New file.
+	* mingwex/math/tanf.S: New file.
+	* mingwex/math/tanhf.c: New file.
+	* mingwex/math/tanhl.c: New file.
+	* mingwex/math/tanl.S: New file.
+	* mingwex/Makefile.in: Adjust VPATH for source files in
+	mingwex/math.
+	* include/ math.h: Add protypes for new functions and
+	reorganise to reflect ANSI,C99 status.
+
 2002-06-19  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/tchar.h (_getts): Define as _getws for _UNICODE.

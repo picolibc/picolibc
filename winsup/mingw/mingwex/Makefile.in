@@ -3,8 +3,8 @@
 #
 # This makefile requires GNU make.
 
-VPATH = @srcdir@
 srcdir = @srcdir@
+VPATH = $(srcdir):$(srcdir)/math
 objdir = .
 
 target_alias = @target_alias@
@@ -26,92 +26,43 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 mkinstalldirs = $(SHELL) $(srcdir)/../mkinstalldirs
 DISTFILES = Makefile.in configure configure.in \
-	mingw-fseek.c \
-	_Exit.c \
-	atoll.c \
-	copysignl.S \
-	dirent.c \
-	fdim.c \
-	fdimf.c \
-	fdiml.c \
-	feclearexcept.c \
-	fegetenv.c \
-	fegetexceptflag.c \
-	fegetround.c \
-	feholdexcept.c \
-	feraiseexcept.c \
-	fesetenv.c \
-	fesetround.c \
-	fetestexcept.c \
-	fesetexceptflag.c \
-	feupdateenv.c \
-	fma.S \
-	fmaf.S \
-	fmal.c \
-	fmax.c \
-	fmaxf.c \
-	fmaxl.c \
-	fmin.c \
-	fminf.c \
-	fminl.c \
-	fp_consts.c \
-	fpclassify.c \
-	fpclassifyf.c \
-	fpclassifyl.c \
-	fucom.c \
-	fwide.c \
-	imaxabs.c \
-	imaxdiv.c \
-	isnan.c \
-	isnanf.c \
-	isnanl.c \
-	lltoa.c \
-	lltow.c \
-	log2.c \
-	log2f.c \
-	log2l.c \
-	math_stubs.c \
-	mbsinit.c \
-	rint.c \
-	rintf.c \
-	rintl.c \
-	round.c \
-	roundf.c \
-	roundl.c \
-	signbit.c \
-	signbitf.c \
-	signbitl.c \
-	sitest.c \
-	snprintf.c \
-	snwprintf.c \
-	strtof.c \
-	strtoimax.c \
-	strtoumax.c \
-	testwmem.c \
-	trunc.c \
-	truncf.c \
-	truncl.c \
-	ulltoa.c \
-	ulltow.c \
-	vsnprintf.c \
-	vsnwprintf.c \
-	wcstof.c \
-	wcstoimax.c \
-	wcstoumax.c \
-	wdirent.c \
-	wmemchr.c \
-	wmemcmp.c \
-	wmemcpy.c \
-	wmemmove.c \
-	wmemset.c \
+	_Exit.c atoll.c dirent.c feclearexcept.c fegetenv.c \
+	fegetexceptflag.c fegetround.c feholdexcept.c feraiseexcept.c \
+	fesetenv.c fesetexceptflag.c fesetround.c fetestexcept.c \
+	feupdateenv.c fwide.c imaxabs.c imaxdiv.c lltoa.c lltow.c \
+	mbsinit.c mingw-fseek.c sitest.c snprintf.c snwprintf.c \
+	strtof.c strtoimax.c strtoumax.c testwmem.c ulltoa.c ulltow.c \
+	vsnprintf.c vsnwprintf.c wcstof.c wcstoimax.c wcstoumax.c \
+	wdirent.c wmemchr.c wmemcmp.c wmemcpy.c wmemmove.c wmemset.c \
 	wtoll.c
+MATH_DISTFILES = \
+	acosf.c acosl.c asinf.c asinl.c atan2f.c atan2l.c \
+	atanf.c atanl.c cbrt.c cbrtf.c cbrtl.c ceilf.S ceill.S cephes_mconf.h \
+	copysign.S copysignf.S copysignl.S cosf.S coshf.c coshl.c cosl.S \
+	exp2.S exp2f.S exp2l.S expf.c expl.c fabs.c fabsf.c fabsl.c \
+	fdim.c fdimf.c fdiml.c floorf.S floorl.S fma.S fmaf.S fmal.c \
+	fmax.c fmaxf.c fmaxl.c fmin.c fminf.c fminl.c fmodf.c \
+	fmodl.c fp_consts.c fp_consts.h fp_constsf.c  fp_constsl.c \
+	fpclassify.c fpclassifyf.c fpclassifyl.c \
+	frexpf.c frexpl.S fucom.c hypotf.c hypotl.c ilogb.S ilogbf.S \
+	ilogbl.S isnan.c isnanf.c isnanl.c ldexpf.c ldexpl.c llrint.c \
+	llrintf.c llrintl.c llround.c llroundf.c llroundl.c \
+	log10f.S log10l.S log1p.S log1pf.S log1pl.S log2.S log2f.S \
+	log2l.S logb.c logbf.c logbl.c logf.S logl.S lrint.c lrintf.c \
+	lrintl.c lround.c lroundf.c lroundl.c modff.c modfl.c \
+	nearbyint.S nearbyintf.S nearbyintl.S nextafterf.c powf.c powil.c \
+	powl.c remainder.S remainderf.S remainderl.S remquo.S \
+	remquof.S remquol.S rint.c rintf.c rintl.c round.c roundf.c \
+	roundl.c scalbn.S scalbnf.S scalbnl.S signbit.c signbitf.c \
+	signbitl.c sinf.S sinhf.c sinhl.c sinl.S  sqrtf.c sqrtl.c \
+	tanf.S tanhf.c tanhl.c tanl.S trunc.c truncf.c truncl.c
 
 CC = @CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
 CC_FOR_TARGET = $(CC)
 AS_FOR_TARGET = $(AS)
 CFLAGS = @CFLAGS@ -Wall
-CXXFLAGS = @CXXFLAGS@ 
+CXXFLAGS = @CXXFLAGS@
 OPTFLAGS= -fomit-frame-pointer
 
 # compiling with Cygwin?
@@ -150,22 +101,26 @@ STDLIB_STUB_OBJS = \
 STDIO_STUB_OBJS = \
 	snprintf.o  vsnprintf.o snwprintf.o vsnwprintf.o
 MATH_OBJS = \
+	acosf.o acosl.o asinf.o asinl.o atan2f.o atan2l.o \
+	atanf.o atanl.o cbrt.o cbrtf.o cbrtl.o ceilf.o ceill.o \
+	copysign.o copysignf.o copysignl.o cosf.o coshf.o coshl.o cosl.o \
+	exp2.o exp2f.o exp2l.o expf.o expl.o fabs.o fabsf.o fabsl.o \
+	fdim.o fdimf.o fdiml.o floorf.o floorl.o fma.o fmaf.o fmal.o \
+	fmax.o fmaxf.o fmaxl.o fmin.o fminf.o fminl.o fmodf.o \
+	fmodl.o fp_consts.o fp_constsf.o fp_constsl.o \
 	fpclassify.o fpclassifyf.o fpclassifyl.o \
-	fucom.o \
-	round.o roundf.o roundl.o \
-	rint.o rintf.o rintl.o \
-	signbit.o signbitf.o signbitl.o \
-	trunc.o truncf.o truncl.o \
-	isnan.o  isnanf.o isnanl.o \
-	fp_consts.o \
-	fdim.o fdimf.o fdiml.o \
-	fmax.o  fmaxf.o fmaxl.o \
-	fmin.o fminf.o fminl.o \
-	fma.o  fmaf.o fmal.o \
-	log2.o log2f.o log2l.o  \
-	copysignl.o
-MATH_STUB_OBJS = \
-	math_stubs.o
+	frexpf.o frexpl.o fucom.o hypotf.o hypotl.o ilogb.o ilogbf.o \
+	ilogbl.o isnan.o isnanf.o isnanl.o ldexpf.o ldexpl.o llrint.o \
+	llrintf.o llrintl.o llround.o llroundf.o llroundl.o \
+	log10f.o log10l.o log1p.o log1pf.o log1pl.o log2.o log2f.o \
+	log2l.o logb.o logbf.o logbl.o logf.o logl.o lrint.o lrintf.o \
+	lrintl.o lround.o lroundf.o lroundl.o modff.o modfl.o \
+	nearbyint.o nearbyintf.o nearbyintl.o nextafterf.o powf.o powil.o \
+	powl.o remainder.o remainderf.o remainderl.o remquo.o \
+	remquof.o remquol.o rint.o rintf.o rintl.o round.o roundf.o \
+	roundl.o scalbn.o scalbnf.o scalbnl.o signbit.o signbitf.o \
+	signbitl.o sinf.o sinhf.o sinhl.o sinl.o sqrtf.o sqrtl.o \
+	tanf.o tanhf.o tanhl.o tanl.o trunc.o truncf.o truncl.o
 FENV_OBJS = fesetround.o  fegetround.o \
 	fegetenv.o fesetenv.o feupdateenv.o \
 	feclearexcept.o feholdexcept.o fegetexceptflag.o \
@@ -176,7 +131,7 @@ REPLACE_OBJS = \
 	mingw-fseek.o
 
 LIB_OBJS = $(Q8_OBJS) $(STDLIB_STUB_OBJS) $(STDIO_STUB_OBJS) \
-	$(MATH_OBJS) $(MATH_STUB_OBJS) $(FENV_OBJS) $(POSIX_OBJS) \
+	$(MATH_OBJS)  $(FENV_OBJS) $(POSIX_OBJS) \
 	$(REPLACE_OBJS)
 
 LIBS = $(LIBMINGWEX_A)
@@ -185,6 +140,7 @@ DLLS =
 all: $(LIBMINGWEX_A)
 
 $(LIBMINGWEX_A): $(LIB_OBJS)
+	rm -f $(LIBMINGWEX_A)
 	$(AR) $(ARFLAGS) $@ $(LIB_OBJS)
 	$(RANLIB) $@
 
@@ -234,3 +190,9 @@ dist:
 	@for i in $(DISTFILES); do\
 		cp -p $(srcdir)/$$i $(distdir)/mingwex/$$i ; \
 	done
+	mkdir $(distdir)/mingwex/math
+	chmod 755 $(distdir)//mingwex/math
+	@for i in $(MATH_DISTFILES); do\
+		cp -p $(srcdir)/math/$$i $(distdir)/mingwex/math/$$i ; \
+	done
+

@@ -6,8 +6,7 @@
 
 	.file	"copysignl.S"
 	.text
-	.align 2
-	.p2align 4,,15
+	.align 4
 .globl _copysignl
 	.def	_copysignl;	.scl	2;	.type	32;	.endef
 _copysignl:
