@@ -1,3 +1,8 @@
+Sun May  6 11:55:40 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* string.h (cygwin_strchr): Make 'static inline' so that things will
+	still work when optimized.
+
 Sat May  5 01:04:11 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (handle_exceptions): Vastly increase test for exception

@@ -19,7 +19,7 @@ extern "C" {
 
 #undef strchr
 #define strchr cygwin_strchr
-extern inline __stdcall char *
+static inline __stdcall char *
 strchr (const char *s, int c)
 {
   register char * res;
