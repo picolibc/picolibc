@@ -8,7 +8,7 @@
  * Updated by Jeremy Bettis <jeremy@hksys.com>
  * Significantly revised and rewinddir, seekdir and telldir added by Colin
  * Peters <colin@fu.is.saga-u.ac.jp>
- *
+ *	
  * $Revision$
  * $Author$
  * $Date$
@@ -20,9 +20,11 @@
 #include <string.h>
 #include <io.h>
 #include <direct.h>
-#include <sys/stat.h>
 
 #include <dirent.h>
+
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h> /* for GetFileAttributes */
 
 #define SUFFIX	"*"
 #define	SLASH	"\\"
@@ -33,12 +35,12 @@
  * Returns a pointer to a DIR structure appropriately filled in to begin
  * searching a directory.
  */
-DIR *
+DIR * 
 opendir (const char *szPath)
 {
   DIR *nd;
-  struct _stat statDir;
-
+  unsigned int rc;
+	
   errno = 0;
 
   if (!szPath)
@@ -54,15 +56,16 @@ opendir (const char *szPath)
     }
 
   /* Attempt to determine if the given path really is a directory. */
-  if (_stat (szPath, &statDir))
+  rc = GetFileAttributes(szPath);
+  if (rc == -1)
     {
-      /* Error, stat should have set an error value. */
+      /* call GetLastError for more error info */
+      errno = ENOENT;
       return (DIR *) 0;
     }
-
-  if (!S_ISDIR (statDir.st_mode))
+  if (!(rc & FILE_ATTRIBUTE_DIRECTORY))
     {
-      /* Error, stat reports not a directory. */
+      /* Error, entry exists but not a directory. */
       errno = ENOTDIR;
       return (DIR *) 0;
     }
@@ -149,7 +152,7 @@ readdir (DIR * dirp)
       /* Start the search */
       dirp->dd_handle = _findfirst (dirp->dd_name, &(dirp->dd_dta));
 
-      if (dirp->dd_handle == -1)
+  	  if (dirp->dd_handle == -1)
 	{
 	  /* Whoops! Seems there are no files in that
 	   * directory. */

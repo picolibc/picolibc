@@ -1,5 +1,5 @@
 /* shortcut.c: Read shortcuts. This part of the code must be in C because
-               the C++ interface to COM doesn't work without -fvtable-thunk
+	       the C++ interface to COM doesn't work without -fvtable-thunk
 	       which is too dangerous to use.
 
    Copyright 2001 Red Hat, Inc.
@@ -39,7 +39,7 @@ has_exec_chars (const char *buf, int len)
 }
 
 char shortcut_header[SHORTCUT_HDR_SIZE];
-BOOL shortcut_initalized = FALSE;
+BOOL shortcut_initalized;
 
 void
 create_shortcut_header (void)
@@ -73,9 +73,7 @@ check_shortcut (const char *path, DWORD fileattr, HANDLE h,
   IShellLink *psl = NULL;
   IPersistFile *ppf = NULL;
   WCHAR wc_path[MAX_PATH];
-  char full_path[MAX_PATH];
   char file_header[SHORTCUT_HDR_SIZE];
-  WIN32_FIND_DATA wfd;
   DWORD len = 0;
   int res = 0;
   DWORD got = 0;
@@ -109,16 +107,20 @@ check_shortcut (const char *path, DWORD fileattr, HANDLE h,
     {
       /* Check header if the shortcut is really created by Cygwin or U/WIN. */
       if (got == SHORTCUT_HDR_SIZE && !cmp_shortcut_header (file_header))
-        {
+	{
 	  hres = psl->lpVtbl->GetDescription (psl, contents, MAX_PATH);
 	  if (FAILED (hres))
 	    goto file_not_symlink;
 	  len = strlen (contents);
 	}
     }
+#if TREAT_NATIVE_SHORTCUTS_AS_SYMLINKS
   /* No description or not R/O: Check the "official" path. */
   if (len == 0)
     {
+      char full_path[MAX_PATH];
+      WIN32_FIND_DATA wfd;
+
       /* Convert to full path (easy way) */
       if ((path[0] == '\\' && path[1] == '\\')
 	  || (_toupper (path[0]) >= 'A' && _toupper (path[0]) <= 'Z'
@@ -142,6 +144,7 @@ check_shortcut (const char *path, DWORD fileattr, HANDLE h,
       if (FAILED(hres))
 	goto file_not_symlink;
     }
+#endif
   res = strlen (contents);
   if (res) /* It's a symlink.  */
     *pflags = PATH_SYMLINK;

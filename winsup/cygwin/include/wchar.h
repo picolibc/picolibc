@@ -1,6 +1,6 @@
 /* wchar.h
 
-   Copyright 1998 Cygnus Solutions
+   Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -13,8 +13,9 @@ details. */
 
 #include <sys/cdefs.h>
 
-/* Get wchar_t from <stddef.h>.  */
+/* Get wchar_t and wint_t from <stddef.h>.  */
 #define __need_wchar_t
+#define __need_wint_t
 #include <stddef.h>
 
 __BEGIN_DECLS
