@@ -1,3 +1,9 @@
+2005-04-07  Shaun Jackman  <sjackman@gmail.com>
+
+	* libc/unix/Makefile.am (LIB_OBJS): Include all the ELIX objects if no
+	ELIX level is defined.
+	* libc/unix/Makefile.in: Regenerated.
+
 2005-04-05  Dave Korn  <dave.korn@artimi.com>
 
 	* libc/stdio/vfscanf.c (__svfscanf_r): If an error occurs processing
