@@ -1,5 +1,9 @@
 2005-04-07  Shaun Jackman  <sjackman@gmail.com>
 
+	* libc/sys/linux/inode.c (lchown): New function.
+
+2005-04-07  Shaun Jackman  <sjackman@gmail.com>
+
 	* libc/unix/Makefile.am (LIB_OBJS): Include all the ELIX objects if no
 	ELIX level is defined.
 	* libc/unix/Makefile.in: Regenerated.
