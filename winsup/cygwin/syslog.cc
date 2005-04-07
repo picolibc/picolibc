@@ -234,11 +234,7 @@ out:
       if (ret >= 0 || !(_my_tls.locals.process_logopt & LOG_CONS))
         ret = syslogd_sock;
     }
-#ifdef EXC_GUARD
-  InterlockedExchange (&try_connect_guard, 2);
-#else
   try_connect_guard.release ();
-#endif
   return ret;
 }
 

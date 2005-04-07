@@ -1,5 +1,9 @@
 2005-04-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syslog.cc (try_connect_guard): Remove useless conditionalized code.
+
+2005-04-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syslog.cc: Include sys/socket.h.
 	(try_connect_guard): New static variable.
 	(syslogd_inited): Ditto.
