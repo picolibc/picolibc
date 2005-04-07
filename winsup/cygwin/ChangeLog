@@ -1,3 +1,21 @@
+2005-04-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syslog.cc: Include sys/socket.h.
+	(try_connect_guard): New static variable.
+	(syslogd_inited): Ditto.
+	(syslogd_sock): Ditto.
+	(try_connect_syslogd): New function to connect and write syslog to
+	local syslogd.
+	(vsyslog): Log to stderr if LOG_PERROR flag has been given to openlog.
+	Try logging to syslogd.  Use Event Log resp. log file as fallback.
+	(closelog): Close socket to syslogd.
+	* include/sys/syslog.h (_PATH_LOG): Define.
+	(INTERNAL_NOPRI): Define if SYSLOG_NAMES is defined.
+	(INTERNAL_MARK): Ditto.
+	(struct _code): Ditto.
+	(prioritynames): Ditto.
+	(facilitynames): Ditto.
+
 2005-04-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (get_inet_addr): Add type parameter to return

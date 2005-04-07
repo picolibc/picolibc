@@ -8,12 +8,15 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#define  __INSIDE_CYGWIN_NET__
+
 #include "winsup.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <syslog.h>
 #include <stdarg.h>
 #include <unistd.h>
+#include <sys/socket.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -179,6 +182,66 @@ pass_handler::print_va (const char *fmt, va_list list)
     return -1;
 }
 
+static NO_COPY muto try_connect_guard;
+static bool syslogd_inited;
+static int syslogd_sock = -1;
+extern "C" int cygwin_socket (int, int, int);
+extern "C" int cygwin_connect (int, const struct sockaddr *, int);
+
+static int
+try_connect_syslogd (const char *msg, int len)
+{
+  try_connect_guard.init ("try_connect_guard")->acquire ();
+  if (!syslogd_inited)
+    {
+      struct __stat64 st;
+      int fd;
+      struct sockaddr sa;
+
+      if (stat64 (_PATH_LOG, &st) || !S_ISSOCK (st.st_mode))
+	goto out;
+      if ((fd = cygwin_socket (AF_LOCAL, SOCK_DGRAM, 0)) < 0)
+        goto out;
+      sa.sa_family = AF_LOCAL;
+      strncpy (sa.sa_data, _PATH_LOG, sizeof sa.sa_data);
+      if (cygwin_connect (fd, &sa, sizeof sa))
+        {
+	  if (get_errno () != EPROTOTYPE)
+	    {
+	      close (fd);
+	      goto out;
+	    }
+	  /* Retry with SOCK_STREAM. */
+	  if ((fd = cygwin_socket (AF_LOCAL, SOCK_STREAM, 0)) < 0)
+	    goto out;
+	  if (cygwin_connect (fd, &sa, sizeof sa))
+	    {
+	      close (fd);
+	      goto out;
+	    }
+	}
+      syslogd_sock = fd;
+      fcntl (syslogd_sock, F_SETFD, FD_CLOEXEC);
+      syslogd_inited = true;
+    }
+out:
+  int ret = -1;
+  if (syslogd_sock >= 0)
+    {
+      ret = write (syslogd_sock, msg, len);
+      /* If write fails and LOG_CONS is set, return failure to vsyslog so
+         it falls back to the usual logging method for this OS. */
+      if (ret >= 0 || !(_my_tls.locals.process_logopt & LOG_CONS))
+        ret = syslogd_sock;
+    }
+#ifdef EXC_GUARD
+  InterlockedExchange (&try_connect_guard, 2);
+#else
+  try_connect_guard.release ();
+#endif
+  return ret;
+}
+
 /*
  * syslog: creates the log message and writes to system
  * log (NT) or log file (95). FIXME. WinNT log error messages
@@ -333,7 +396,13 @@ vsyslog (int priority, const char *message, va_list ap)
 
     msg_strings[0] = total_msg;
 
-    if (wincap.has_eventlog ())
+    if (_my_tls.locals.process_logopt & LOG_PERROR)
+      write (STDERR_FILENO, total_msg, len + 1);
+
+    int fd;
+    if ((fd = try_connect_syslogd (total_msg, len + 1)) >= 0)
+      ;
+    else if (wincap.has_eventlog ())
       {
 	/* For NT, open the event log and send the message */
 	HANDLE hEventSrc = RegisterEventSourceA (NULL, (_my_tls.locals.process_ident != NULL) ?
@@ -399,5 +468,12 @@ syslog (int priority, const char *message, ...)
 extern "C" void
 closelog (void)
 {
-  ;
+  try_connect_guard.init ("try_connect_guard")->acquire ();
+  if (syslogd_inited && syslogd_sock >= 0)
+    {
+      close (syslogd_sock);
+      syslogd_sock = -1;
+      syslogd_inited = false;
+    }
+  try_connect_guard.release ();
 }
