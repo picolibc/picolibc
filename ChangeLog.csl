@@ -1,3 +1,13 @@
+2005-04-08  Paul Brook  <paul@codesourcery.com>
+
+	* elf32-arm.c (ARM2THUMB_GLUE_SIZE): Rename...
+	(ARM2THUMB_STATIC_GLUE_SIZE): ... to this.
+	(ARM2THUMB_PIC_GLUE_SIZE): Define.
+	(a2t1p_ldr_insn, a2t2p_add_pc_insn, a2t3p_bx_r12_insn): Add.
+	(elf32_arm_to_thumb_stub): Create PIC stubs.
+	(record_arm_to_thumb_glue): Use different stub size for relocatable
+	images.
+
 2005-03-29  Julian Brown  <julian@codesourcery.com>
 
 	* elf32-arm.c (elf32_arm_final_link_relocate): Use blx to get to
