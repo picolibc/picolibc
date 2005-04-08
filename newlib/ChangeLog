@@ -1,3 +1,14 @@
+2005-04-08  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/libgen.h: New file.
+
+2005-04-08  Shaun Jackman  <sjackman@gmail.com>
+
+	* libc/unix/Makefile.am: Add support for basename and dirname.
+	* libc/unix/Makefile.in: Regenerated.
+	* libc/unix/basename.c: New file.
+	* libc/unix/dirname.c: New file.
+
 2005-04-07  Shaun Jackman  <sjackman@gmail.com>
 
 	* libc/sys/linux/inode.c (lchown): New function.

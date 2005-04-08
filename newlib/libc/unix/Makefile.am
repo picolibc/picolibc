@@ -15,6 +15,8 @@ ELIX_2_OBJS = \
 	ttyname.$(oext)
 
 ELIX_4_OBJS = \
+	basename.$(oext)	\
+	dirname.$(oext)		\
 	getlogin.$(oext)	\
 	getpass.$(oext) 	\
 	getpwent.$(oext) 	\

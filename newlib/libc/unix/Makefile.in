@@ -116,7 +116,7 @@ GENERAL_SOURCES =  	getcwd.c 		pread.c 		pwrite.c 		sigset.c
 ELIX_2_OBJS =  	ttyname.$(oext)
 
 
-ELIX_4_OBJS =  	getlogin.$(oext)		getpass.$(oext) 		getpwent.$(oext) 		getut.$(oext)
+ELIX_4_OBJS =  	basename.$(oext)		dirname.$(oext)			getlogin.$(oext)		getpass.$(oext) 		getpwent.$(oext) 		getut.$(oext)
 
 @ELIX_LEVEL_1_TRUE@LIB_OBJS = 
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@LIB_OBJS = $(ELIX_2_OBJS)
