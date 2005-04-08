@@ -1,3 +1,7 @@
+2005-04-08  Christopher Faylor  <cgf@timesys.com>
+
+	* pipe.cc (fhandler_pipe::open): Remove O_CREAT limitation.
+
 2005-04-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syslog.cc (try_connect_guard): Remove useless conditionalized code.
@@ -237,7 +241,7 @@
 	cygheap->user.deimpersonate instead of RevertToSelf.  Create
 	impersonation token from primary internal or external token.  Set
 	cygheap->user.curr_primary_token and cygheap->user.current_token
-	privileges once here.  Drop "failed" and "failed_ptok" labels. 
+	privileges once here.  Drop "failed" and "failed_ptok" labels.
 	Drop setting DefaultDacl of process token.
 	(setegid32): Use hProcToken and hProcImpToken instead of opening
 	process token. Always reimpersonate afterwards.

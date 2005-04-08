@@ -46,11 +46,6 @@ fhandler_pipe::open (int flags, mode_t mode)
   size_t size;
   int pid, rwflags = (flags & O_ACCMODE);
 
-  if (flags & O_CREAT)
-    {
-      set_errno (EACCES);
-      return 0;
-    }
   sscanf (get_name (), "/proc/%d/fd/pipe:[%d]", &pid, (int *) &pipe_hdl);
   if (pid == myself->pid)
     {
