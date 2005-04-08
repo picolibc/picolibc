@@ -1,3 +1,8 @@
+2005-04-08  Mark Mitchell <mark@codesourcery.com>
+
+	* ld/configure.tgt (arm-wrs-linux-gnueabi*): Support both big- and
+	little-endian.
+	
 2005-04-08  Paul Brook  <paul@codesourcery.com>
 
 	* elf32-arm.c (ARM2THUMB_GLUE_SIZE): Rename...
