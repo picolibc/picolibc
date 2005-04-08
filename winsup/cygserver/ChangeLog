@@ -1,3 +1,17 @@
+2005-04-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_mutex.cc (msleep_cnt): Remove.
+	(msleep_max_cnt): Remove.
+	(msleep_arr): Remove.
+	(class msleep_sync_array): New class to encapsulate msleep/wakeup
+	thread synchronization.
+	(msleep_sync): New object pointer.
+	(msleep_init): Initialize new msleep_sync object.
+	(_mutex): Just call msleep_sync->enter() and msleep_sync->leave() for
+	thread synchronization. Improve debug output a bit more.
+	(wakeup): Just call msleep_sync->wakeup().
+	(wakeup_all): Whitespace fix.
+
 2005-04-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* bsd_helper.cc (ipcexit_hookthread): Fix whitespace and handle leak.

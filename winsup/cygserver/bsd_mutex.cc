@@ -165,14 +165,117 @@ set_priority (int priority)
  * flag the mutex is not entered before returning.
  */
 static HANDLE msleep_glob_evt;
-CRITICAL_SECTION msleep_cs;
-static long msleep_cnt;
-static long msleep_max_cnt;
-static struct msleep_record {
-  void *ident;
-  HANDLE wakeup_evt;
-  LONG threads;
-} *msleep_arr;
+
+class msleep_sync_array
+{
+  enum msleep_action {
+    MSLEEP_ENTER = 0,
+    MSLEEP_LEAVE,
+    MSLEEP_WAKEUP
+  };
+
+  CRITICAL_SECTION cs;
+  long cnt;
+  long max_cnt;
+  struct msleep_record {
+    void *ident;
+    HANDLE wakeup_evt;
+    LONG threads;
+  } *a;
+
+  int find_ident (void *ident, msleep_action action)
+  {
+    int i;
+    for (i = 0; i < cnt; ++i)
+      if (a[i].ident == ident)
+	return i;
+    if (i >= max_cnt)
+      panic ("ident %x not found and run out of slots.", ident);
+    if (i >= cnt && action == MSLEEP_LEAVE)
+      panic ("ident %x not found (%d).", ident, action);
+    return i;
+  }
+
+  HANDLE first_entry (int i, void *ident)
+  {
+    debug ("New ident %x, index %d", ident, i);
+    a[i].ident = ident;
+    a[i].wakeup_evt = CreateEvent (NULL, TRUE, FALSE, NULL);
+    if (!a[i].wakeup_evt)
+      panic ("CreateEvent failed: %E");
+    debug ("i = %d, CreateEvent: %x", i, a[i].wakeup_evt);
+    a[i].threads = 1;
+    ++cnt;
+    return a[i].wakeup_evt;
+  }
+
+  HANDLE next_entry (int i)
+  {
+    if (a[i].ident && WaitForSingleObject (a[i].wakeup_evt, 0) != WAIT_OBJECT_0)
+      {
+        ++a[i].threads;
+	return a[i].wakeup_evt;
+      }
+    return NULL;
+  }
+
+public:
+
+  msleep_sync_array (int count) : cnt (0), max_cnt (count)
+  {
+    InitializeCriticalSection (&cs);
+    if (!(a = new msleep_record[count]))
+      panic ("Allocating msleep records failed: %d", errno);
+  }
+
+  HANDLE enter (void *ident)
+  {
+    HANDLE evt = NULL;
+    while (!evt)
+      {
+        EnterCriticalSection (&cs);
+	int i = find_ident (ident, MSLEEP_ENTER);
+	if (i >= cnt)
+	  evt = first_entry (i, ident);
+	else if (!(evt = next_entry (i)))
+	  {
+	    /* wakeup has been called, so sleep to wait until all
+	       formerly waiting threads have left and retry. */
+	    LeaveCriticalSection (&cs);
+	    Sleep (1L);
+	  }
+      }
+    LeaveCriticalSection (&cs);
+    return evt;
+  }
+
+  void leave (void *ident)
+  {
+    EnterCriticalSection (&cs);
+    int i = find_ident (ident, MSLEEP_LEAVE);
+    if (--a[i].threads == 0)
+      {
+	debug ("i = %d, CloseEvent: %x", i, a[i].wakeup_evt);
+	CloseHandle (a[i].wakeup_evt);
+	a[i].ident = NULL;
+	--cnt;
+	if (i < cnt)
+	  a[i] = a[cnt];
+      }
+    LeaveCriticalSection (&cs);
+  }
+
+  void wakeup (void *ident)
+  {
+    EnterCriticalSection (&cs);
+    int i = find_ident (ident, MSLEEP_WAKEUP);
+    if (i < cnt && a[i].ident)
+      SetEvent (a[i].wakeup_evt);
+    LeaveCriticalSection (&cs);
+  }
+};
+
+static msleep_sync_array *msleep_sync;
 
 void
 msleep_init (void)
@@ -183,17 +286,14 @@ msleep_init (void)
   msleep_glob_evt = CreateEvent (NULL, TRUE, FALSE, NULL);
   if (!msleep_glob_evt)
     panic ("CreateEvent in msleep_init failed: %E");
-  InitializeCriticalSection (&msleep_cs);
   long msgmni = support_msgqueues ? msginfo.msgmni : 0;
   long semmni = support_semaphores ? seminfo.semmni : 0;
   TUNABLE_INT_FETCH ("kern.ipc.msgmni", &msgmni);
   TUNABLE_INT_FETCH ("kern.ipc.semmni", &semmni);
   debug ("Try allocating msgmni (%d) + semmni (%d) msleep records",
   	 msgmni, semmni);
-  msleep_max_cnt = msgmni + semmni;
-  msleep_arr = (struct msleep_record *) calloc (msleep_max_cnt,
-  						sizeof (struct msleep_record));
-  if (!msleep_arr)
+  msleep_sync = new msleep_sync_array (msgmni + semmni);
+  if (!msleep_sync)
     panic ("Allocating msleep records in msleep_init failed: %d", errno);
 }
 
@@ -202,47 +302,15 @@ _msleep (void *ident, struct mtx *mtx, int priority,
 	const char *wmesg, int timo, struct thread *td)
 {
   int ret = -1;
-  int i;
 
-  while (1)
-    {
-      EnterCriticalSection (&msleep_cs);
-      for (i = 0; i < msleep_cnt; ++i)
-	if (msleep_arr[i].ident == ident)
-	  break;
-      if (!msleep_arr[i].ident)
-	{
-	  debug ("New ident %x, index %d", ident, i);
-	  if (i >= msleep_max_cnt)
-	    panic ("Too many idents to wait for.\n");
-	  msleep_arr[i].ident = ident;
-	  msleep_arr[i].wakeup_evt = CreateEvent (NULL, TRUE, FALSE, NULL);
-	  if (!msleep_arr[i].wakeup_evt)
-	    panic ("CreateEvent in msleep (%s) failed: %E", wmesg);
-	  msleep_arr[i].threads = 1;
-	  ++msleep_cnt;
-	  LeaveCriticalSection (&msleep_cs);
-	  break;
-	}
-      else if (WaitForSingleObject (msleep_arr[i].wakeup_evt, 0)
-	       != WAIT_OBJECT_0)
-	{
-	  ++msleep_arr[i].threads;
-	  LeaveCriticalSection (&msleep_cs);
-	  break;
-	}
-      /* Otherwise wakeup has been called, so sleep to wait until all
-         formerly waiting threads have left and retry. */
-      LeaveCriticalSection (&msleep_cs);
-      Sleep (1L);
-    }
+  HANDLE evt = msleep_sync->enter (ident);
 
   if (mtx)
     mtx_unlock (mtx);
   int old_priority = set_priority (priority);
   HANDLE obj[4] =
     {
-      msleep_arr[i].wakeup_evt,
+      evt,
       msleep_glob_evt,
       td->client->handle (),
       td->client->signal_arrived ()
@@ -253,22 +321,21 @@ _msleep (void *ident, struct mtx *mtx, int priority,
   if ((priority & PCATCH)
       && td->client->signal_arrived () != INVALID_HANDLE_VALUE)
     obj_cnt = 4;
-
   switch (WaitForMultipleObjects (obj_cnt, obj, FALSE, timo ?: INFINITE))
     {
       case WAIT_OBJECT_0:	/* wakeup() has been called. */
 	ret = 0;
-	debug ("msleep wakeup called");
+	debug ("msleep wakeup called for %d", td->td_proc->winpid);
         break;
       case WAIT_OBJECT_0 + 1:	/* Shutdown event (triggered by wakeup_all). */
         priority |= PDROP;
 	/*FALLTHRU*/
       case WAIT_OBJECT_0 + 2:	/* The dependent process has exited. */
-	debug ("msleep process exit or shutdown");
+	debug ("msleep process exit or shutdown for %d", td->td_proc->winpid);
 	ret = EIDRM;
         break;
       case WAIT_OBJECT_0 + 3:	/* Signal for calling process arrived. */
-	debug ("msleep process got signal");
+	debug ("msleep process got signal for %d", td->td_proc->winpid);
         ret = EINTR;
 	break;
       case WAIT_TIMEOUT:
@@ -283,20 +350,13 @@ _msleep (void *ident, struct mtx *mtx, int priority,
 	   hope for the best. */
 	if (GetLastError () != ERROR_INVALID_HANDLE)
 	  panic ("wait in msleep (%s) failed, %E", wmesg);
+	debug ("wait in msleep (%s) failed for %d, %E", wmesg,
+							td->td_proc->winpid);
 	ret = EIDRM;
 	break;
     }
 
-  EnterCriticalSection (&msleep_cs);
-  if (--msleep_arr[i].threads == 0)
-    {
-      CloseHandle (msleep_arr[i].wakeup_evt);
-      msleep_arr[i].ident = NULL;
-      --msleep_cnt;
-      if (i < msleep_cnt)
-        msleep_arr[i] = msleep_arr[msleep_cnt];
-    }
-  LeaveCriticalSection (&msleep_cs);
+  msleep_sync->leave (ident);
 
   set_priority (old_priority);
 
@@ -311,15 +371,7 @@ _msleep (void *ident, struct mtx *mtx, int priority,
 int
 wakeup (void *ident)
 {
-  int i;
-
-  EnterCriticalSection (&msleep_cs);
-  for (i = 0; i < msleep_cnt; ++i)
-    if (msleep_arr[i].ident == ident)
-      break;
-  if (msleep_arr[i].ident)
-    SetEvent (msleep_arr[i].wakeup_evt);
-  LeaveCriticalSection (&msleep_cs);
+  msleep_sync->wakeup (ident);
   return 0;
 }
 
@@ -330,6 +382,6 @@ wakeup (void *ident)
 void
 wakeup_all (void)
 {
-    SetEvent (msleep_glob_evt);
+  SetEvent (msleep_glob_evt);
 }
 #endif /* __OUTSIDE_CYGWIN__ */
