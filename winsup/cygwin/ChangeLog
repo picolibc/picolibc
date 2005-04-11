@@ -2,7 +2,7 @@
 
 	Revert previous patch.
 	* autoload.cc (GetVolumePathNamesForVolumeNameA): Remove.
-	* autoload.cc (GetVolumeNameForVolumeMountPointA): Add.
+	(GetVolumeNameForVolumeMountPointA): Add.
 	* syscalls.cc (sync): Rewrite guid case to skip floppies also on
 	Windows 2000.
 
