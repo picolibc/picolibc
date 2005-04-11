@@ -939,28 +939,28 @@ sync ()
 {
   char vol[CYG_MAX_PATH];
   
-  if (wincap.has_get_volume_pathnames ()) /* Win2k and newer */
+  if (wincap.has_guid_volumes ()) /* Win2k and newer */
     {
+      char a_drive[CYG_MAX_PATH] = {0};
+      char b_drive[CYG_MAX_PATH] = {0};
+
+      if (is_floppy ("A:"))
+        GetVolumeNameForVolumeMountPointA ("A:\\", a_drive, CYG_MAX_PATH);
+      if (is_floppy ("B:"))
+        GetVolumeNameForVolumeMountPointA ("B:\\", a_drive, CYG_MAX_PATH);
+
       HANDLE sh = FindFirstVolumeA (vol, CYG_MAX_PATH);
       if (sh != INVALID_HANDLE_VALUE)
 	{
 	  do
 	    {
-	      char pvol[CYG_MAX_PATH];
-	      DWORD len;
-	      if (GetVolumePathNamesForVolumeNameA (vol, pvol, CYG_MAX_PATH,
-						    &len))
-		debug_printf ("Try volume %s (GUID: %s)", pvol, vol);
-	      else
-		debug_printf ("Try volume %s", vol);
+	      debug_printf ("Try volume %s", vol);
 
-	      /* Check pvol for being a floppy on A: or B:.  Skip them. */
-	      if (strncasematch (pvol, "A:", 2)
-	          || strncasematch (pvol, "B:", 2))
+	      /* Check vol for being a floppy on A: or B:.  Skip them. */
+	      if (strcasematch (vol, a_drive) || strcasematch (vol, b_drive))
 	        {
-		  pvol[2] = '\0';
-		  if (is_floppy (pvol))
-		    continue;
+		  debug_printf ("Is floppy, don't sync");
+		  continue;
 		}
 
 	      /* Eliminate trailing backslash. */

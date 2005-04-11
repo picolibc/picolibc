@@ -1,5 +1,13 @@
 2005-04-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	Revert previous patch.
+	* autoload.cc (GetVolumePathNamesForVolumeNameA): Remove.
+	* autoload.cc (GetVolumeNameForVolumeMountPointA): Add.
+	* syscalls.cc (sync): Rewrite guid case to skip floppies also on
+	Windows 2000.
+
+2005-04-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (sync): Use renamed has_get_volume_pathnames wincap.
 	* wincap.h (wincaps::has_get_volume_pathnames): Rename from
 	has_guid_volumes
