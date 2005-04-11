@@ -1,3 +1,11 @@
+2005-04-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (sync): Use renamed has_get_volume_pathnames wincap.
+	* wincap.h (wincaps::has_get_volume_pathnames): Rename from
+	has_guid_volumes
+	* wincap.cc: Accomodate above rename throughout.  Set to false on
+	Windows 2000.
+
 2005-04-08  Christopher Faylor  <cgf@timesys.com>
 
 	* pipe.cc (fhandler_pipe::open): Remove O_CREAT limitation.

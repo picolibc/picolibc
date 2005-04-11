@@ -58,7 +58,7 @@ struct wincaps
   unsigned has_ioctl_storage_get_media_types_ex		: 1;
   unsigned start_proc_suspended				: 1;
   unsigned has_extended_priority_class			: 1;
-  unsigned has_guid_volumes				: 1;
+  unsigned has_get_volume_pathnames			: 1;
 };
 
 class wincapc
@@ -121,7 +121,7 @@ public:
   bool	IMPLEMENT (has_ioctl_storage_get_media_types_ex)
   bool	IMPLEMENT (start_proc_suspended)
   bool	IMPLEMENT (has_extended_priority_class)
-  bool	IMPLEMENT (has_guid_volumes)
+  bool	IMPLEMENT (has_get_volume_pathnames)
 
 #undef IMPLEMENT
 };

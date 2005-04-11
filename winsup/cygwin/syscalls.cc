@@ -939,7 +939,7 @@ sync ()
 {
   char vol[CYG_MAX_PATH];
   
-  if (wincap.has_guid_volumes ()) /* Win2k and newer */
+  if (wincap.has_get_volume_pathnames ()) /* Win2k and newer */
     {
       HANDLE sh = FindFirstVolumeA (vol, CYG_MAX_PATH);
       if (sh != INVALID_HANDLE_VALUE)
