@@ -100,6 +100,51 @@ int __stdcall
 fhandler_base::fstat_by_handle (struct __stat64 *buf)
 {
   BY_HANDLE_FILE_INFORMATION local;
+
+  if (wincap.is_winnt ())
+    {
+      NTSTATUS status;
+      IO_STATUS_BLOCK io;
+      /* The entries potentially contain a name of MAX_PATH wide characters. */
+      DWORD fvi_size = 2 * CYG_MAX_PATH + sizeof (FILE_FS_VOLUME_INFORMATION);
+      DWORD fai_size = 2 * CYG_MAX_PATH + sizeof (FILE_ALL_INFORMATION);
+
+      PFILE_FS_VOLUME_INFORMATION pfvi = (PFILE_FS_VOLUME_INFORMATION)
+      					 alloca (fvi_size);
+      PFILE_ALL_INFORMATION pfai = (PFILE_ALL_INFORMATION) alloca (fai_size);
+
+      status = NtQueryVolumeInformationFile (get_handle (), &io, pfvi, fvi_size,
+					     FileFsVolumeInformation);
+      if (!NT_SUCCESS (status))
+	{
+	  debug_printf ("%u = NtQueryVolumeInformationFile)",
+			RtlNtStatusToDosError (status));
+	  pfvi->VolumeSerialNumber = 0; /* Set to pc.volser () in helper. */
+        }
+      status = NtQueryInformationFile (get_handle (), &io, pfai, fai_size,
+				       FileAllInformation);
+      if (NT_SUCCESS (status))
+	/* If the change time is 0, it's a file system which doesn't
+	   support a change timestamp.  In that case use the LastWriteTime
+	   entry, as in other calls to fstat_helper. */
+	return fstat_helper (buf,
+			 pfai->BasicInformation.ChangeTime.QuadPart ?
+			 *(FILETIME *) &pfai->BasicInformation.ChangeTime :
+			 *(FILETIME *) &pfai->BasicInformation.LastWriteTime,
+			 *(FILETIME *) &pfai->BasicInformation.LastAccessTime,
+			 *(FILETIME *) &pfai->BasicInformation.LastWriteTime,
+			 pfvi->VolumeSerialNumber,
+			 pfai->StandardInformation.EndOfFile.HighPart,
+			 pfai->StandardInformation.EndOfFile.LowPart,
+			 pfai->StandardInformation.AllocationSize.QuadPart,
+			 pfai->InternalInformation.IndexNumber.HighPart,
+			 pfai->InternalInformation.IndexNumber.LowPart,
+			 pfai->StandardInformation.NumberOfLinks);
+
+      debug_printf ("%u = NtQuerynformationFile)",
+		    RtlNtStatusToDosError (status));
+    }
+
   BOOL res = GetFileInformationByHandle (get_handle (), &local);
   debug_printf ("%d = GetFileInformationByHandle (%s, %d)",
 		res, get_win32_name (), get_handle ());
@@ -111,12 +156,13 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
     }
 
   return fstat_helper (buf,
-		       local.ftCreationTime,
+		       local.ftLastWriteTime, /* see fstat_helper comment */
 		       local.ftLastAccessTime,
 		       local.ftLastWriteTime,
 		       local.dwVolumeSerialNumber,
 		       local.nFileSizeHigh,
 		       local.nFileSizeLow,
+		       -1LL,
 		       local.nFileIndexHigh,
 		       local.nFileIndexLow,
 		       local.nNumberOfLinks);
@@ -139,12 +185,13 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
     {
       FindClose (handle);
       res = fstat_helper (buf,
-			  local.ftCreationTime,
+			  local.ftLastWriteTime, /* see fstat_helper comment */
 			  local.ftLastAccessTime,
 			  local.ftLastWriteTime,
 			  pc.volser (),
 			  local.nFileSizeHigh,
 			  local.nFileSizeLow,
+			  -1LL,
 			  0,
 			  0,
 			  1);
@@ -152,7 +199,7 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
   else if (pc.isdir ())
     {
       FILETIME ft = {};
-      res = fstat_helper (buf, ft, ft, ft, pc.volser (), 0, 0, 0, 0, 1);
+      res = fstat_helper (buf, ft, ft, ft, pc.volser (), 0, 0, -1LL, 0, 0, 1);
     }
   else
     {
@@ -213,14 +260,21 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
   return res;
 }
 
+/* The ftChangeTime is taken from the NTFS ChangeTime entry, if reading
+   the file information using NtQueryInformationFile succeeded.  If not,
+   it's faked using the LastWriteTime entry from GetFileInformationByHandle
+   or FindFirstFile.  We're deliberatly not using the creation time anymore
+   to simplify interaction with native Windows applications which choke on
+   creation times >= access or write times. */
 int __stdcall
 fhandler_base::fstat_helper (struct __stat64 *buf,
-			     FILETIME ftCreationTime,
+			     FILETIME ftChangeTime,
 			     FILETIME ftLastAccessTime,
 			     FILETIME ftLastWriteTime,
 			     DWORD dwVolumeSerialNumber,
 			     DWORD nFileSizeHigh,
 			     DWORD nFileSizeLow,
+			     LONGLONG nAllocSize,
 			     DWORD nFileIndexHigh,
 			     DWORD nFileIndexLow,
 			     DWORD nNumberOfLinks)
@@ -228,17 +282,9 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
   IO_STATUS_BLOCK st;
   FILE_COMPRESSION_INFORMATION fci;
 
-  /* This is for FAT filesystems, which don't support atime/ctime */
-  if (ftLastAccessTime.dwLowDateTime == 0
-      && ftLastAccessTime.dwHighDateTime == 0)
-    ftLastAccessTime = ftLastWriteTime;
-  if (ftCreationTime.dwLowDateTime == 0
-      && ftCreationTime.dwHighDateTime == 0)
-    ftCreationTime = ftLastWriteTime;
-
   to_timestruc_t (&ftLastAccessTime, &buf->st_atim);
   to_timestruc_t (&ftLastWriteTime, &buf->st_mtim);
-  to_timestruc_t (&ftCreationTime, &buf->st_ctim);
+  to_timestruc_t (&ftChangeTime, &buf->st_ctim);
   buf->st_dev = dwVolumeSerialNumber ?: pc.volser ();
   buf->st_size = ((_off64_t) nFileSizeHigh << 32) + nFileSizeLow;
   /* The number of links to a directory includes the
@@ -273,15 +319,20 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 
   buf->st_blksize = S_BLKSIZE;
 
-  /* On compressed and sparsed files, we request the actual amount of bytes
-     allocated on disk.  */
-  if (pc.has_attribute (FILE_ATTRIBUTE_COMPRESSED | FILE_ATTRIBUTE_SPARSE_FILE)
+  if (nAllocSize >= 0LL)
+    /* A successful NtQueryInformationFile returns the allocation size
+       correctly for compressed and sparse files as well. */
+    buf->st_blocks = (nAllocSize + S_BLKSIZE - 1) / S_BLKSIZE;
+  else if (pc.has_attribute (FILE_ATTRIBUTE_COMPRESSED
+			     | FILE_ATTRIBUTE_SPARSE_FILE)
       && get_io_handle ()
       && !NtQueryInformationFile (get_io_handle (), &st, (PVOID) &fci,
 				  sizeof fci, FileCompressionInformation))
+    /* Otherwise we request the actual amount of bytes allocated for
+       compressed and sparsed files. */
     buf->st_blocks = (fci.CompressedSize.QuadPart + S_BLKSIZE - 1) / S_BLKSIZE;
   else
-    /* Just compute no. of blocks from file size. */
+    /* Otherwise compute no. of blocks from file size. */
     buf->st_blocks  = (buf->st_size + S_BLKSIZE - 1) / S_BLKSIZE;
 
   buf->st_mode = 0;
@@ -380,6 +431,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 int __stdcall
 fhandler_disk_file::fstat (struct __stat64 *buf)
 {
+  /* Changing inode data requires setting ctime (only 9x). */
   if (has_changed ())
     touch_ctime ();
   return fstat_fs (buf);
@@ -393,11 +445,10 @@ fhandler_disk_file::touch_ctime (void)
   GetSystemTimeAsFileTime (&ft);
   /* Modification time is touched if the file data has changed as well.
      This happens for instance on write() or ftruncate(). */
-  if (!SetFileTime (get_io_handle (), &ft, NULL,
-		    has_changed () == data_changed ? &ft : NULL))
+  if (!SetFileTime (get_io_handle (), NULL, NULL, &ft))
     debug_printf ("SetFileTime (%s) failed, %E", get_win32_name ());
   else
-    has_changed (no_change);
+    has_changed (false);
 }
 
 int __stdcall
@@ -443,8 +494,8 @@ fhandler_disk_file::fchmod (mode_t mode)
     res = 0;
 
   /* Set ctime on success. */
-  if (!res)
-    has_changed (inode_changed);
+  if (!res && !wincap.is_winnt ())
+    has_changed (true);
 
   if (oret)
     close ();
@@ -476,13 +527,8 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
     attrib |= S_IFDIR;
   int res = get_file_attribute (pc.has_acls (), get_io_handle (), pc, &attrib);
   if (!res)
-    {
-      res = set_file_attribute (pc.has_acls (), get_io_handle (), pc,
-				uid, gid, attrib);
-      /* Set ctime on success. */
-      if (!res)
-	has_changed (inode_changed);
-    }
+    res = set_file_attribute (pc.has_acls (), get_io_handle (), pc,
+			      uid, gid, attrib);
 
   if (oret)
     close ();
@@ -576,10 +622,6 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 	}
     }
 
-  /* Set ctime on success. */
-  if (!res && cmd == SETACL)
-    has_changed (inode_changed);
-
   if (oret)
     close ();
 
@@ -626,9 +668,6 @@ fhandler_disk_file::ftruncate (_off64_t length)
 	    res = res_bug;
 	  /* restore original file pointer location */
 	  lseek (prev_loc, SEEK_SET);
-	  /* Set ctime on success. */
-	  if (!res)
-	    has_changed (data_changed);
 	}
     }
   return res;
@@ -760,8 +799,6 @@ fhandler_disk_file::link (const char *newpath)
 	}
 
     success:
-      /* Set ctime on success. */
-      has_changed (inode_changed);
       close ();
       if (!allow_winsymlinks && pc.is_lnk_symlink ())
 	SetFileAttributes (newpc, (DWORD) pc
@@ -776,16 +813,14 @@ docopy:
       __seterrno ();
       return -1;
     }
-  /* Set ctime on success, also on the copy. */
-  has_changed (inode_changed);
+  /* Set ctime on success (copy gets it automatically). */
+  if (!wincap.is_winnt ())
+    has_changed (true);
   close ();
   fhandler_disk_file fh (newpc);
   fh.query_open (query_write_attributes);
   if (fh.open (O_BINARY, 0))
-    {
-      fh.has_changed (inode_changed);
-      fh.close ();
-    }
+    fh.close ();
   return 0;
 }
 
@@ -897,10 +932,6 @@ fhandler_base::open_fs (int flags, mode_t mode)
       && !allow_ntsec && allow_ntea)
     set_file_attribute (false, NULL, get_win32_name (), mode);
 
-  /* O_TRUNC on existing file requires setting ctime. */
-  if ((flags & (O_CREAT | O_TRUNC)) == O_TRUNC)
-    has_changed (data_changed);
-
   set_fs_flags (pc.fs_flags ());
 
 out:
@@ -912,7 +943,7 @@ out:
 int
 fhandler_disk_file::close ()
 {
-  /* Changing file data requires setting ctime. */
+  /* Changing inode data requires setting ctime (only 9x). */
   if (has_changed ())
     touch_ctime ();
   return close_fs ();

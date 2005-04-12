@@ -295,7 +295,6 @@ fhandler_base::raw_write (const void *ptr, size_t len)
       return -1;
     }
 written:
-  has_changed (data_changed);
   return bytes_written;
 }
 
