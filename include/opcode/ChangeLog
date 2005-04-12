@@ -1,3 +1,8 @@
+2005-04-12  Mark Kettenis  <kettenis@gnu.org>
+
+	* i386.h (i386_optab): Mark VIA PadLock instructions as ImmExt and
+	adjust them accordingly.
+
 2005-04-01  Jan Beulich  <jbeulich@novell.com>
 
 	* i386.h (i386_optab): Add rdtscp.
