@@ -1,3 +1,11 @@
+2005-04-12  Richard Sandiford  <rsandifo@redhat.com>
+
+	* mips/array.ld, mips/cfe.ld, mips/dve.ld, mips/idt32.ld,
+	* mips/idt64.ld, mips/idtecoff.ld, mips/idt.ld,
+	* mips/jmr3904app-java.ld, mips/jmr3904app.ld,
+	* mips/jmr3904dram-java.ld, mips/jmr3904dram.ld, mips/lsi.ld,
+	* mips/nullmon.ld, mips/pmon.ld: Keep .init and .fini.
+
 2005-02-08  Antony King  <antony.king@st.com>
 
 	* arm/syscalls.c: Change CHECK_INIT to pass reentrant struct

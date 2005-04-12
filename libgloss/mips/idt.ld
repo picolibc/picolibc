@@ -42,10 +42,10 @@ SECTIONS
     *(.mips16.call.*)
   }
   .init : {
-    *(.init)
+    KEEP (*(.init))
   }
   .fini : {
-    *(.fini)
+    KEEP (*(.fini))
   }
   .rel.sdata : {
     PROVIDE (__runtime_reloc_start = .);

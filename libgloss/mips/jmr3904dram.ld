@@ -34,7 +34,7 @@ SECTIONS
       /* It fits the Cygmon ROMS */
   .text : {
      _ftext = . ;
-    *(.init)
+    KEEP (*(.init))
      eprol  =  .;
     *(.text)
     *(.text.*)
@@ -44,7 +44,7 @@ SECTIONS
     PROVIDE (__runtime_reloc_start = .);
     *(.rel.sdata)
     PROVIDE (__runtime_reloc_stop = .);
-    *(.fini)
+    KEEP (*(.fini))
      etext  =  .;
      _etext  =  .;
   }
