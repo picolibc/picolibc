@@ -1,3 +1,7 @@
+2005-04-12  Paul Brook  <paul@codesourcery.com>
+
+	* opcode/m88k.h: Rename psr macros to avoid conflicts.
+
 2005-04-11  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
 	* libiberty.h (fopen_unlocked, fdopen_unlocked, freopen_unlocked):

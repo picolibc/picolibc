@@ -231,22 +231,22 @@ struct PROCESSOR
 
 /* Definitions for fields in psr.  */
 
-#define mode  31
-#define rbo   30
-#define ser   29
-#define carry 28
-#define sf7m  11
-#define sf6m  10
-#define sf5m   9
-#define sf4m   8
-#define sf3m   7
-#define sf2m   6
-#define sf1m   5
-#define mam    4
-#define inm    3
-#define exm    2
-#define trm    1
-#define ovfm   0
+#define psr_mode  31
+#define psr_rbo   30
+#define psr_ser   29
+#define psr_carry 28
+#define psr_sf7m  11
+#define psr_sf6m  10
+#define psr_sf5m   9
+#define psr_sf4m   8
+#define psr_sf3m   7
+#define psr_sf2m   6
+#define psr_sf1m   5
+#define psr_mam    4
+#define psr_inm    3
+#define psr_exm    2
+#define psr_trm    1
+#define psr_ovfm   0
 
 /* The 1 clock operations.  */
 
