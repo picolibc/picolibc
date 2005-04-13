@@ -1,3 +1,35 @@
+2005-04-13  H.J. Lu  <hongjiu.lu@intel.com>
+
+	2004-10-27  Richard Earnshaw  <rearnsha@arm.com>
+	* arm.h: Add R_ARM_CALL and R_ARM_JUMP32.
+
+	2004-10-12  Paul Brook  <paul@codesourcery.com>
+	* arm.h (EF_ARM_EABI_VER4): Define.
+
+	2004-10-08  Daniel Jacobowitz  <dan@debian.org>
+
+	* common.h (PT_SUNW_EH_FRAME): Define.
+	* x86-64.h (SHT_X86_64_UNWIND): Define.
+
+	2004-10-07  Bob Wilson  <bob.wilson@acm.org>
+	* xtensa.h (R_XTENSA_DIFF8, R_XTENSA_DIFF16, R_XTENSA_DIFF32,
+	R_XTENSA_SLOT*_OP, R_XTENSA_SLOT*_ALT): New relocations.
+	(XTENSA_PROP_SEC_NAME): Define.
+	(property_table_entry): Add flags field.
+	(XTENSA_PROP_*, GET_XTENSA_PROP_*, SET_XTENSA_PROP_*): Define.
+
+	2004-09-17  Paul Brook  <paul@codesourcery.com>
+	* arm.h: Remove R_ARM_STKCHK and R_ARM_THM_STKCHK.
+	Add R_ARM_TARGET2, R_ARM_PREL31, R_ARM_GOT_ABS, R_ARM_GOT_PREL,
+	R_ARM_GOT_BREL12, R_ARM_GOTOFF12 and R_ARM_GOTRELAX.
+
+	2004-09-13  Paul Brook  <paul@codesourcery.com>
+	* arm.h: Rename RELABS to TARGET1.
+
+	2004-05-11  Jakub Jelinek  <jakub@redhat.com>
+	* common.h (PT_GNU_EH_FRAME, PT_GNU_STACK): Add comments.
+	(PT_GNU_RELRO): Define.
+
 2005-03-29  Daniel Jacobowitz  <dan@codesourcery.com>
 	    Phil Blundell  <philb@gnu.org>
 
@@ -23,7 +55,7 @@
 	* mips.h: Define MIPS TLS relocations.
 
 2005-02-15  Nigel Stephens  <nigel@mips.com>
-            Maciej W. Rozycki  <macro@mips.com>
+	    Maciej W. Rozycki  <macro@mips.com>
 
 	* mips.h (R_MIPS16_GOT16): New reloc code.
 	(R_MIPS16_CALL16): Likewise.
@@ -56,8 +88,7 @@
 
 2004-12-22  Klaus Rudolph  <lts-rudolph@gmx.de>
 	
-	* include/elf/avr.h (R_AVR_LDI, R_AVR_6, R_AVR_6_ADIW): New
-	relocs.
+	* avr.h (R_AVR_LDI, R_AVR_6, R_AVR_6_ADIW): New relocs.
 
 2004-12-16  Richard Sandiford  <rsandifo@redhat.com>
 
@@ -144,7 +175,7 @@
 	(R_MIPS_GNU_REL16_S2): Update comment.
 
 2004-30-30  Galit Heller  <Galit.Heller@nsc.com>
-            Tomer Levi  <Tomer.Levi@nsc.com>
+	    Tomer Levi  <Tomer.Levi@nsc.com>
 
 	* common.h (EM_CR): Define.
 	* cr16c.h: New file.

@@ -1,3 +1,41 @@
+2005-04-13  H.J. Lu  <hongjiu.lu@intel.com>
+
+	2005-04-12  Paul Brook  <paul@codesourcery.com>
+	* m88k.h: Rename psr macros to avoid conflicts.
+
+	2005-03-12  Zack Weinberg  <zack@codesourcery.com>
+	* arm.h: Adjust comments for ARM_EXT_V4T and ARM_EXT_V5T.
+	Add ARM_EXT_V6T2, ARM_ARCH_V6T2, ARM_ARCH_V6KT2, ARM_ARCH_V6ZT2,
+	and ARM_ARCH_V6ZKT2.
+
+	2004-11-29  Tomer Levi  <Tomer.Levi@nsc.com>
+	* crx.h (enum operand_type): Rename rbase_cst4 to rbase_dispu4.
+	Remove redundant instruction types.
+	(struct argument): X_op - new field.
+	(struct cst4_entry): Remove.
+	(no_op_insn): Declare.
+
+	2004-11-05  Tomer Levi  <Tomer.Levi@nsc.com>
+	* crx.h (enum argtype): Rename types, remove unused types.
+
+	2004-10-27  Tomer Levi  <Tomer.Levi@nsc.com>
+	* crx.h (enum reg): Rearrange registers, remove 'ccfg' and `'pc'.
+	(enum reg_type): Remove CRX_PC_REGTYPE, CRX_MTPR_REGTYPE.
+	(enum operand_type): Rearrange operands, edit comments.
+	replace us<N> with ui<N> for unsigned immediate.
+	replace d<N> with disps<N>/dispu<N>/dispe<N> for signed/unsigned/escaped
+	displacements (respectively).
+	replace rbase_ridx_scl2_dispu<N> with rindex_disps<N> for register index.
+	(instruction type): Add NO_TYPE_INS.
+	(instruction flags): Add USER_REG, CST4MAP, NO_SP, NO_RPTR.
+	(operand_entry): New field - 'flags'.
+	(operand flags): New.
+
+	2004-10-21  Tomer Levi  <Tomer.Levi@nsc.com>
+	* crx.h (operand_type): Remove redundant types i3, i4,
+	i5, i8, i12.
+	Add new unsigned immediate types us3, us4, us5, us16.
+
 2005-04-12  Mark Kettenis  <kettenis@gnu.org>
 
 	* i386.h (i386_optab): Mark VIA PadLock instructions as ImmExt and

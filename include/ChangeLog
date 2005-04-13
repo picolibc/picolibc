@@ -1,7 +1,3 @@
-2005-04-12  Paul Brook  <paul@codesourcery.com>
-
-	* opcode/m88k.h: Rename psr macros to avoid conflicts.
-
 2005-04-11  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
 	* libiberty.h (fopen_unlocked, fdopen_unlocked, freopen_unlocked):
@@ -61,12 +57,6 @@
 
 	* bfdlink.h (bfd_link_info): Add gc_sections.
 
-2005-03-12  Zack Weinberg  <zack@codesourcery.com>
-
-	* opcode/arm.h: Adjust comments for ARM_EXT_V4T and ARM_EXT_V5T.
-	Add ARM_EXT_V6T2, ARM_ARCH_V6T2, ARM_ARCH_V6KT2, ARM_ARCH_V6ZT2,
-	and ARM_ARCH_V6ZKT2.
-
 2005-03-09  Mark Mitchell  <mark@codesourcery.com>
 
 	* libiberty.h (gettimeofday): Declare.
@@ -104,14 +94,6 @@
 	* fibheap.h (struct fibnode): Only use unsigned long bitfields
 	when __GNUC__ is defined and ints are less than 32-bits wide.
 
-2004-11-29  Tomer Levi  <Tomer.Levi@nsc.com>
-
-	* opcode/crx.h (enum operand_type): Rename rbase_cst4 to rbase_dispu4.
-	Remove redundant instruction types.
-	(struct argument): X_op - new field.
-	(struct cst4_entry): Remove.
-	(no_op_insn): Declare.
-
 2004-11-04  Paul Brook  <paul@codesourcery.com>
 
 	* bfdlink.h (bfd_link_info): Add default_imported_symver.
@@ -126,52 +108,15 @@
 
 	* dis-asm.h: Add prototype for print_insn_maxq_little.
 
-2004-11-05  Tomer Levi  <Tomer.Levi@nsc.com>
-
-	* opcode/crx.h (enum argtype): Rename types, remove unused types.
-
-2004-10-27  Richard Earnshaw  <rearnsha@arm.com>
-
-	* elf/arm.h: Add R_ARM_CALL and R_ARM_JUMP32.
-
-2004-10-27  Tomer Levi  <Tomer.Levi@nsc.com>
-
-	* opcode/crx.h (enum reg): Rearrange registers, remove 'ccfg' and `'pc'.
-	(enum reg_type): Remove CRX_PC_REGTYPE, CRX_MTPR_REGTYPE.
-	(enum operand_type): Rearrange operands, edit comments.
-	replace us<N> with ui<N> for unsigned immediate.
-	replace d<N> with disps<N>/dispu<N>/dispe<N> for signed/unsigned/escaped
-	displacements (respectively).
-	replace rbase_ridx_scl2_dispu<N> with rindex_disps<N> for register index.
-	(instruction type): Add NO_TYPE_INS.
-	(instruction flags): Add USER_REG, CST4MAP, NO_SP, NO_RPTR.
-	(operand_entry): New field - 'flags'.
-	(operand flags): New.
-
 2004-10-26  Paul Brook  <paul@codesourcery.com>
 
 	* bfdlink.h (struct bfd_link_info): Add create_default_symver.
-
-2004-10-21  Tomer Levi  <Tomer.Levi@nsc.com>
-
-	* opcode/crx.h (operand_type): Remove redundant types i3, i4,
-	i5, i8, i12.
-	Add new unsigned immediate types us3, us4, us5, us16.
 
 2004-10-21  H.J. Lu  <hongjiu.lu@intel.com>
 
 	PR 463
 	* bfdlink.h (bfd_link_callbacks): Add a pointer to struct
 	bfd_link_hash_entry to reloc_overflow.
-
-2004-10-12  Paul Brook  <paul@codesourcery.com>
-
-	* elf/arm.h (EF_ARM_EABI_VER4): Define.
-
-2004-10-08  Daniel Jacobowitz  <dan@debian.org>
-
-	* elf/common.h (PT_SUNW_EH_FRAME): Define.
-	* elf/x86-64.h (SHT_X86_64_UNWIND): Define.
 
 2004-10-07  Bob Wilson  <bob.wilson@acm.org>
 
@@ -269,21 +214,9 @@
 	xtensa_interface_num_bits, xtensa_interface_inout,
 	xtensa_interface_has_side_effect, xtensa_funcUnit_lookup,
 	xtensa_funcUnit_name, xtensa_funcUnit_num_copies): New prototypes.
-	* elf/xtensa.h (R_XTENSA_DIFF8, R_XTENSA_DIFF16, R_XTENSA_DIFF32,
-	R_XTENSA_SLOT*_OP, R_XTENSA_SLOT*_ALT): New relocations.
-	(XTENSA_PROP_SEC_NAME): Define.
-	(property_table_entry): Add flags field.
-	(XTENSA_PROP_*, GET_XTENSA_PROP_*, SET_XTENSA_PROP_*): Define.
-
 2004-10-07  Jeff Baker  <jbaker@qnx.com>
 
 	* bfdlink.h (bfd_link_info): Add bitfield: warn_shared_textrel.
-
-2004-09-17  Paul Brook  <paul@codesourcery.com>
-
-	* elf/arm.h: Remove R_ARM_STKCHK and R_ARM_THM_STKCHK.
-	Add R_ARM_TARGET2, R_ARM_PREL31, R_ARM_GOT_ABS, R_ARM_GOT_PREL,
-	R_ARM_GOT_BREL12, R_ARM_GOTOFF12 and R_ARM_GOTRELAX.
 
 2004-09-17  Alan Modra  <amodra@bigpond.net.au>
 
@@ -293,10 +226,6 @@
 2004-09-13  Aaron W. LaFramboise  <aaronavay62@aaronwl.com>
 
 	* libiberty.h (basename): Prototype for __MINGW32__.
-
-2004-09-13  Paul Brook  <paul@codesourcery.com>
-
-	* elf/arm.h: Rename RELABS to TARGET1.
 
 2004-09-04  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
@@ -352,8 +281,6 @@
 
 	* bfdlink.h (struct bfd_link_info): Add relro, relro_start and
 	relro_end fields.
-	* elf/common.h (PT_GNU_EH_FRAME, PT_GNU_STACK): Add comments.
-	(PT_GNU_RELRO): Define.
 
 2004-05-04  Andreas Jaeger  <aj@suse.de>
 
