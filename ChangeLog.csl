@@ -1,3 +1,11 @@
+2005-04-13  Paul Brook  <paul@codesourcery.com>
+
+	Backport from mainline.
+	2005-04-11  Alan Modra  <amodra@bigpond.net.au>
+	* emultempl/elf32.em (gld${EMULATION_NAME}_stat_needed): Ignore
+	as_needed libs that were not needed.
+	(gld${EMULATION_NAME}_check_needed): Likewise.
+
 2005-04-08  Mark Mitchell <mark@codesourcery.com>
 
 	* ld/configure.tgt (arm-wrs-linux-gnueabi*): Support both big- and
