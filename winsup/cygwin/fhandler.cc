@@ -1635,6 +1635,9 @@ fhandler_base::link (const char *newpath)
 int
 fhandler_base::utimes (const struct timeval *tvp)
 {
+  if (is_fs_special ())
+    return utimes_fs (tvp);
+
   set_errno (EINVAL);
   return -1;
 }

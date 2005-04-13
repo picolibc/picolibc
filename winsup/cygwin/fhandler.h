@@ -271,6 +271,7 @@ class fhandler_base
     __attribute__ ((regparm (3)));
   int __stdcall fstat_by_handle (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_by_name (struct __stat64 *buf) __attribute__ ((regparm (2)));
+  int fhandler_base::utimes_fs (const struct timeval *) __attribute__ ((regparm (2)));
   virtual int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   virtual int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
   virtual int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));

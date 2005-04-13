@@ -827,18 +827,24 @@ docopy:
 int
 fhandler_disk_file::utimes (const struct timeval *tvp)
 {
+  return utimes_fs (tvp);
+}
+
+int
+fhandler_base::utimes_fs (const struct timeval *tvp)
+{
   FILETIME lastaccess, lastwrite, lastchange;
   struct timeval tmp[2];
 
   query_open (query_write_attributes);
-  if (!open (O_BINARY, 0))
+  if (!open_fs (O_BINARY, 0))
     {
       /* It's documented in MSDN that FILE_WRITE_ATTRIBUTES is sufficient
 	 to change the timestamps.  Unfortunately it's not sufficient for a
 	 remote HPFS which requires GENERIC_WRITE, so we just retry to open
 	 for writing, though this fails for R/O files of course. */
       query_open (no_query);
-      if (!open (O_WRONLY | O_BINARY, 0))
+      if (!open_fs (O_WRONLY | O_BINARY, 0))
 	{
 	  syscall_printf ("Opening file failed");
 	  return -1;
@@ -859,13 +865,20 @@ fhandler_disk_file::utimes (const struct timeval *tvp)
   /* Update ctime */
   timeval_to_filetime (&tmp[0], &lastchange);
   debug_printf ("incoming lastaccess %08x %08x", tvp[0].tv_sec, tvp[0].tv_usec);
-  if (!SetFileTime (get_handle (), &lastchange, &lastaccess, &lastwrite))
+
+  if (is_fs_special ())
+    SetFileAttributes (pc, (DWORD) pc & ~FILE_ATTRIBUTE_READONLY);
+  BOOL res = SetFileTime (get_handle (), &lastchange, &lastaccess, &lastwrite);
+  DWORD errcode = GetLastError ();
+  if (is_fs_special ())
+    SetFileAttributes (pc, pc);
+  if (!res)
     {
-      DWORD errcode = GetLastError ();
       close ();
       __seterrno_from_win_error (errcode);
       return -1;
     }
+
   close ();
   return 0;
 }

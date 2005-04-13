@@ -1,3 +1,11 @@
+2005-04-13  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler.h (fhandler_base::utimes_fs): New method.
+	* fhandler.cc (fhandler_base::utimes): Call utimes_fs if on-disk
+	special file.
+	* fhandler_disk_file.cc (fhandler_disk_file::utimes): Use utimes_fs.
+	(fhandler_base::utimes_fs): Handle on-disk device files.
+
 2005-04-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::utimes): Don't set errno
