@@ -141,7 +141,7 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 			 pfai->InternalInformation.IndexNumber.LowPart,
 			 pfai->StandardInformation.NumberOfLinks);
 
-      debug_printf ("%u = NtQuerynformationFile)",
+      debug_printf ("%u = NtQueryInformationFile)",
 		    RtlNtStatusToDosError (status));
     }
 

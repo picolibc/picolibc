@@ -931,7 +931,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 		       &auth_luid, &exp, &user, new_tok_gsids, privs, &owner,
 		       &pgrp, &dacl, &source);
   if (ret)
-    __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+    __seterrno_from_nt_status (ret);
   else if (GetLastError () == ERROR_PROC_NOT_FOUND)
     {
       __seterrno ();
@@ -1153,7 +1153,7 @@ write_sd (HANDLE fh, const char *file, security_descriptor &sd)
   if (fh == INVALID_HANDLE_VALUE)	/* CreateFile failed */
     __seterrno ();
   else if (ret != STATUS_SUCCESS)	/* NtSetSecurityObject failed */
-    __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+    __seterrno_from_nt_status (ret);
   else					/* Everything's fine. */
     res = 0;
   return res;
@@ -1348,7 +1348,7 @@ get_nt_object_security (HANDLE handle, SE_OBJECT_TYPE object_type,
     }
   if (ret != STATUS_SUCCESS)
     {
-      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+      __seterrno_from_nt_status (ret);
       return -1;
     }
   return 0;

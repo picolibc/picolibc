@@ -665,7 +665,7 @@ fhandler_base::open (int flags, mode_t mode)
 			 create_disposition, create_options, NULL, 0);
   if (!NT_SUCCESS (status))
     {
-      __seterrno_from_win_error (RtlNtStatusToDosError (status));
+      __seterrno_from_nt_status (status);
       if (!nohandle ())
 	goto done;
    }

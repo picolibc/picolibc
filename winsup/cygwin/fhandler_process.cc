@@ -683,9 +683,8 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
 					sizeof spt, NULL);
       if (ret != STATUS_SUCCESS)
 	{
-	  __seterrno_from_win_error (RtlNtStatusToDosError (ret));
-	  debug_printf ("NtQueryInformationProcess: ret %d, Dos(ret) %d",
-		       ret, RtlNtStatusToDosError (ret));
+	  __seterrno_from_nt_status (ret);
+	  debug_printf ("NtQueryInformationProcess: ret %d, Dos(ret) %E", ret);
 	  return 0;
 	}
       fault_count = vmc.PageFaultCount;

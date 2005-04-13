@@ -1115,7 +1115,7 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
 					 base ? AT_ROUND_TO_PAGE : 0, protect);
       if (ret != STATUS_SUCCESS)
         {
-	  __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+	  __seterrno_from_nt_status (ret);
 	  base = NULL;
 	}
       else
@@ -1196,7 +1196,7 @@ fhandler_disk_file::fixup_mmap_after_fork (HANDLE h, DWORD access, int flags,
 					 ulen, &phys, &ulen, ViewShare,
 					 AT_ROUND_TO_PAGE, protect);
       if (ret != STATUS_SUCCESS)
-        __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+        __seterrno_from_nt_status (ret);
     }
   else
     base = MapViewOfFileEx (h, access, 0, offset, size, address);

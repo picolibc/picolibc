@@ -79,9 +79,9 @@ sysconf (int in)
 						 sizeof sbi, NULL))
 		  != STATUS_SUCCESS)
 	      {
-		__seterrno_from_win_error (RtlNtStatusToDosError (ret));
-		debug_printf ("NtQuerySystemInformation: ret %d, Dos(ret) %d",
-			      ret, RtlNtStatusToDosError (ret));
+		__seterrno_from_nt_status (ret);
+		debug_printf ("NtQuerySystemInformation: ret %d, Dos(ret) %E",
+			      ret);
 		return -1;
 	      }
 	    switch (in)
@@ -112,9 +112,9 @@ sysconf (int in)
 						 sizeof spi, NULL))
 		  != STATUS_SUCCESS)
 	      {
-		__seterrno_from_win_error (RtlNtStatusToDosError (ret));
-		debug_printf ("NtQuerySystemInformation: ret %d, Dos(ret) %d",
-			      ret, RtlNtStatusToDosError (ret));
+		__seterrno_from_nt_status (ret);
+		debug_printf ("NtQuerySystemInformation: ret %d, Dos(ret) %E",
+			      ret);
 		return -1;
 	      }
 	    return spi.AvailablePages;

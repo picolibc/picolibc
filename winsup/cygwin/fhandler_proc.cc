@@ -477,9 +477,8 @@ format_proc_uptime (char *destbuf, size_t maxsize)
 	}
       else if (ret != STATUS_SUCCESS)
 	{
-	  __seterrno_from_win_error (RtlNtStatusToDosError (ret));
-	  debug_printf("NtQuerySystemInformation: ret %d, Dos(ret) %d",
-		       ret, RtlNtStatusToDosError (ret));
+	  __seterrno_from_nt_status (ret);
+	  debug_printf("NtQuerySystemInformation: ret %d, Dos(ret) %E", ret);
 	  return 0;
 	}
     }
@@ -514,9 +513,8 @@ format_proc_stat (char *destbuf, size_t maxsize)
 					   (PVOID) &sbi, sizeof sbi, NULL))
 	  != STATUS_SUCCESS)
 	{
-	  __seterrno_from_win_error (RtlNtStatusToDosError (ret));
-	  debug_printf ("NtQuerySystemInformation: ret %d, Dos(ret) %d",
-			ret, RtlNtStatusToDosError (ret));
+	  __seterrno_from_nt_status (ret);
+	  debug_printf ("NtQuerySystemInformation: ret %d, Dos(ret) %E", ret);
 	  sbi.NumberProcessors = 1;
 	}
 
@@ -556,9 +554,8 @@ format_proc_stat (char *destbuf, size_t maxsize)
 					sizeof stodi, NULL);
       if (ret != STATUS_SUCCESS)
 	{
-	  __seterrno_from_win_error (RtlNtStatusToDosError (ret));
-	  debug_printf("NtQuerySystemInformation: ret %d, Dos(ret) %d",
-		       ret, RtlNtStatusToDosError (ret));
+	  __seterrno_from_nt_status (ret);
+	  debug_printf("NtQuerySystemInformation: ret %d, Dos(ret) %E", ret);
 	  return 0;
 	}
       pages_in = spi.PagesRead;

@@ -48,9 +48,8 @@ fhandler_dev_mem::open (int flags, mode_t)
       if ((ret = NtQuerySystemInformation (SystemBasicInformation, (PVOID) &sbi,
 					   sizeof sbi, NULL)) != STATUS_SUCCESS)
 	{
-	  __seterrno_from_win_error (RtlNtStatusToDosError (ret));
-	  debug_printf("NtQuerySystemInformation: ret %d, Dos(ret) %d",
-		       ret, RtlNtStatusToDosError (ret));
+	  __seterrno_from_nt_status (ret);
+	  debug_printf("NtQuerySystemInformation: ret %d, Dos(ret) %E", ret);
 	  mem_size = 0;
 	}
       else
@@ -109,7 +108,7 @@ fhandler_dev_mem::open (int flags, mode_t)
   NTSTATUS ret = NtOpenSection (&mem, section_access, &attr);
   if (!NT_SUCCESS (ret))
     {
-      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+      __seterrno_from_nt_status (ret);
       set_io_handle (NULL);
       return 0;
     }
@@ -151,7 +150,7 @@ fhandler_dev_mem::write (const void *ptr, size_t ulen)
 				 0,
 				 PAGE_READONLY)) != STATUS_SUCCESS)
     {
-      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+      __seterrno_from_nt_status (ret);
       return -1;
     }
 
@@ -159,7 +158,7 @@ fhandler_dev_mem::write (const void *ptr, size_t ulen)
 
   if (!NT_SUCCESS (ret = NtUnmapViewOfSection (INVALID_HANDLE_VALUE, viewmem)))
     {
-      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+      __seterrno_from_nt_status (ret);
       return -1;
     }
 
@@ -203,7 +202,7 @@ fhandler_dev_mem::read (void *ptr, size_t& ulen)
 				 0,
 				 PAGE_READONLY)) != STATUS_SUCCESS)
     {
-      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+      __seterrno_from_nt_status (ret);
       ulen = (size_t) -1;
       return;
     }
@@ -212,7 +211,7 @@ fhandler_dev_mem::read (void *ptr, size_t& ulen)
 
   if (!NT_SUCCESS (ret = NtUnmapViewOfSection (INVALID_HANDLE_VALUE, viewmem)))
     {
-      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+      __seterrno_from_nt_status (ret);
       ulen = (size_t) -1;
       return;
     }
@@ -303,7 +302,7 @@ fhandler_dev_mem::mmap (caddr_t *addr, size_t len, DWORD access,
   NTSTATUS ret = NtOpenSection (&h, section_access, &attr);
   if (!NT_SUCCESS (ret))
     {
-      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+      __seterrno_from_nt_status (ret);
       syscall_printf ("-1 = mmap(): NtOpenSection failed with %E");
       return INVALID_HANDLE_VALUE;
     }
@@ -325,7 +324,7 @@ fhandler_dev_mem::mmap (caddr_t *addr, size_t len, DWORD access,
 				 0,
 				 protect)) != STATUS_SUCCESS)
     {
-      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+      __seterrno_from_nt_status (ret);
       syscall_printf ("-1 = mmap(): NtMapViewOfSection failed with %E");
       return INVALID_HANDLE_VALUE;
     }
@@ -347,7 +346,7 @@ fhandler_dev_mem::munmap (HANDLE h, caddr_t addr, size_t len)
   NTSTATUS ret;
   if (!NT_SUCCESS (ret = NtUnmapViewOfSection (INVALID_HANDLE_VALUE, addr)))
     {
-      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+      __seterrno_from_nt_status (ret);
       return -1;
     }
   CloseHandle (h);
@@ -391,7 +390,7 @@ fhandler_dev_mem::fixup_mmap_after_fork (HANDLE h, DWORD access, int flags,
 				 0,
 				 protect)) != STATUS_SUCCESS)
     {
-      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+      __seterrno_from_nt_status (ret);
       syscall_printf ("-1 = fixup_mmap_after_fork(): NtMapViewOfSection failed with %E");
       return false;
     }
