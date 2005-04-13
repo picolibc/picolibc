@@ -1,3 +1,8 @@
+2005-04-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::utimes): Don't set errno
+	if open fails, it has already been set by open.
+
 2005-04-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (NtQueryVolumeInformationFile): Add.
@@ -6,8 +11,7 @@
 	(fhandler_base::status): Revert has_changed to a simple bit.
 	(fhandler_base::fstat_helper): Add nAllocSize parameter.  Rename
 	ftCreationTime to ftChangeTime.
-	* fhandler_disk_file.cc:
-	Call fstat_helper with additional
+	* fhandler_disk_file.cc: Call fstat_helper with additional
 	allocation size throughout.
 	(fhandler_base::fstat_by_handle): Use NT native functions to get
 	full file information on NT.  Call fstat_helper with LastWriteTime
@@ -200,7 +204,7 @@
 	(fhandler_base::has_changed): Implement with type change_state.
 	* fhandler.cc (fhandler_base::raw_write): Accommodate type change
 	of has_changed.
-	* fhandler_disk_file.cc )fhandler_disk_file::touch_ctime): Also
+	* fhandler_disk_file.cc (fhandler_disk_file::touch_ctime): Also
 	touch modification time if has_changed == data_changed.
 	(fhandler_disk_file::fchmod): Also open on 9x, otherwise we can't
 	touch ctime.  Accommodate type change of has_changed.

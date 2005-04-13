@@ -841,7 +841,6 @@ fhandler_disk_file::utimes (const struct timeval *tvp)
       if (!open (O_WRONLY | O_BINARY, 0))
 	{
 	  syscall_printf ("Opening file failed");
-	  __seterrno ();
 	  return -1;
 	}
     }
