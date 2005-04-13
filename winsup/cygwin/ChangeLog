@@ -1,5 +1,10 @@
 2005-04-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (class fhandler_socket): Remove utimes.
+	* fhandler_socket.cc (fhandler_socket::utimes): Remove.
+
+2005-04-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygerrno.h (__seterrno_from_nt_status): Define. Always set Win32
 	error code as well as errno. Use throughout where errno is set from
 	NT status.

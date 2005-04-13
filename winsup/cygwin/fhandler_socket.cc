@@ -589,17 +589,6 @@ fhandler_socket::link (const char *newpath)
 }
 
 int
-fhandler_socket::utimes (const struct timeval *tvp)
-{
-  if (get_device () == FH_UNIX)
-    {
-      fhandler_disk_file fh (pc);
-      return fh.utimes (tvp);
-    }
-  return fhandler_base::utimes (tvp);
-}
-
-int
 fhandler_socket::bind (const struct sockaddr *name, int namelen)
 {
   int res = -1;
