@@ -116,11 +116,11 @@ rdimon-libcfunc.o: libcfunc.c
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 $(RDPMON_BSP): $(RDPMON_OBJS)
-	${AR} ${ARFLAGS} $@ $(IDTOBJS)
+	${AR} ${ARFLAGS} $@ $^
 	${RANLIB} $@
 
 $(RDIMON_BSP): $(RDIMON_OBJS)
-	${AR} ${ARFLAGS} $@ $(IDTOBJS)
+	${AR} ${ARFLAGS} $@ $^
 	${RANLIB} $@
 
 clean mostlyclean:

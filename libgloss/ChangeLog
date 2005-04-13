@@ -1,3 +1,9 @@
+2005-04-12  Shaun Jackman  <sjackman@gmail.com>
+
+	* libgloss/arm/Makefile.in (RDPMON_BSP): librdpmon.a was empty due 
+	to a typo. Fixed.
+	(RDIMON_BSP): Ditto.
+
 2005-04-12  Richard Sandiford  <rsandifo@redhat.com>
 
 	* mips/array.ld, mips/cfe.ld, mips/dve.ld, mips/idt32.ld,
