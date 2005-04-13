@@ -1,5 +1,7 @@
 2005-04-13  H.J. Lu  <hongjiu.lu@intel.com>
 
+	Moved from ../ChangeLog
+
 	2005-04-12  Paul Brook  <paul@codesourcery.com>
 	* m88k.h: Rename psr macros to avoid conflicts.
 

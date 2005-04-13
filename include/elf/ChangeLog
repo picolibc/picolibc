@@ -1,5 +1,7 @@
 2005-04-13  H.J. Lu  <hongjiu.lu@intel.com>
 
+	Moved from ../ChangeLog
+
 	2004-10-27  Richard Earnshaw  <rearnsha@arm.com>
 	* arm.h: Add R_ARM_CALL and R_ARM_JUMP32.
 
