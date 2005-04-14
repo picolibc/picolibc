@@ -116,9 +116,7 @@ resume_child (HANDLE forker_finished)
   return 1;
 }
 
-/* Notify parent that it is time for the next step.
-   Note that this has to be a macro since the parent may be messing with
-   our stack. */
+/* Notify parent that it is time for the next step. */
 static void __stdcall
 sync_with_parent (const char *s, bool hang_self)
 {
