@@ -1,3 +1,23 @@
+2005-04-14  Christopher Faylor  <cgf@timesys.com>
+
+	* dcrt0.cc (do_global_dtors): Run DLL dtors.
+	(__main): Don't rely on atexit to run dtors.
+	(do_exit): Specifically call do_global_dtors here.
+	(cygwin_exit): Ditto.
+	* dll_init.cc (dll_global_dtors): Make global.  Only run dtors once.
+	(dll_list::init): Just set flag that dtors should be run.  Don't rely on atexit.
+	* dll_init.h (dll_global_dtors): Declare.
+
+	* exceptions.cc (sigrelse): Define.
+
+	* path.h (is_fs_device): New method.
+	(is_lnk_special): Ditto.
+	* fhandler_disk_file.cc (fhandler_disk_file::link): Use
+	"is_lnk_special" rather than "is_lnk_symlink".
+	* syscalls.cc (rename): Ditto.
+
+	* hookapi.cc (ld_preload): Use colon as a separator rather than space.
+
 2005-04-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (class fhandler_socket): Remove utimes.

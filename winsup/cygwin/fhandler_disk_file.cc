@@ -701,7 +701,7 @@ fhandler_disk_file::link (const char *newpath)
 
   /* Shortcut hack. */
   char new_lnk_buf[CYG_MAX_PATH + 5];
-  if (allow_winsymlinks && pc.is_lnk_symlink () && !newpc.case_clash)
+  if (allow_winsymlinks && pc.is_lnk_special () && !newpc.case_clash)
     {
       strcpy (new_lnk_buf, newpath);
       strcat (new_lnk_buf, ".lnk");
@@ -800,7 +800,7 @@ fhandler_disk_file::link (const char *newpath)
 
     success:
       close ();
-      if (!allow_winsymlinks && pc.is_lnk_symlink ())
+      if (!allow_winsymlinks && pc.is_lnk_special ())
 	SetFileAttributes (newpc, (DWORD) pc
 				   | FILE_ATTRIBUTE_SYSTEM
 				   | FILE_ATTRIBUTE_READONLY);

@@ -24,14 +24,17 @@ extern void __stdcall check_sanity_and_sync (per_process *);
 dll_list NO_COPY dlls;
 
 static int NO_COPY in_forkee;
-static int dll_global_dtors_recorded;
+static bool dll_global_dtors_recorded;
 
 /* Run destructors for all DLLs on exit. */
-static void
+void
 dll_global_dtors ()
 {
-  for (dll *d = dlls.istart (DLL_ANY); d; d = dlls.inext ())
-    d->p.run_dtors ();
+  int recorded = dll_global_dtors_recorded;
+  dll_global_dtors_recorded = false;
+  if (recorded)
+    for (dll *d = dlls.istart (DLL_ANY); d; d = dlls.inext ())
+      d->p.run_dtors ();
 }
 
 /* Run all constructors associated with a dll */
@@ -215,12 +218,7 @@ dll_list::detach (void *retaddr)
 void
 dll_list::init ()
 {
-  /* Make sure that destructors are called on exit. */
-  if (!dll_global_dtors_recorded)
-    {
-      atexit (dll_global_dtors);
-      dll_global_dtors_recorded = 1;
-    }
+  dll_global_dtors_recorded = true;
 
   /* Walk the dll chain, initializing each dll */
   dll *d = &start;

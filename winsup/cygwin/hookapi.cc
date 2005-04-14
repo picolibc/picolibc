@@ -197,7 +197,7 @@ ld_preload ()
   char *s = (char *) alloca (strlen (p) + 1);
   strcpy (s, p);
   char *here = NULL;
-  for (p = strtok_r (s, " \t\n", &here); p; p = strtok_r (NULL, " \t\n", &here))
+  for (p = strtok_r (s, ":\t\n", &here); p; p = strtok_r (NULL, ":\t\n", &here))
     {
       path_conv lib (p);
       if (!LoadLibrary (lib))

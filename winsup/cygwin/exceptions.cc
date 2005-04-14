@@ -909,6 +909,24 @@ sighold (int sig)
   return 0;
 }
 
+extern "C" int
+sigrelse (int sig)
+{
+  /* check that sig is in right range */
+  if (sig < 0 || sig >= NSIG)
+    {
+      set_errno (EINVAL);
+      syscall_printf ("signal %d out of range", sig);
+      return -1;
+    }
+  mask_sync.acquire (INFINITE);
+  sigset_t mask = myself->getsigmask ();
+  sigdelset (&mask, sig);
+  set_signal_mask (mask);
+  mask_sync.release ();
+  return 0;
+}
+
 /* Update the signal mask for this process
    and return the old mask.
    Called from sigdelayed */

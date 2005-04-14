@@ -1260,6 +1260,7 @@ significandf NOSIGFE
 sigpause SIGFE
 sigpending SIGFE
 sigprocmask SIGFE
+sigrelse SIGFE
 sigsuspend SIGFE
 sigwait SIGFE
 sigwaitinfo SIGFE

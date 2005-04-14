@@ -89,3 +89,4 @@ public:
 };
 
 extern dll_list dlls;
+void dll_global_dtors ();

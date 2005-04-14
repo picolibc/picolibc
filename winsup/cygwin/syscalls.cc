@@ -1135,7 +1135,7 @@ rename (const char *oldpath, const char *newpath)
 
   /* Shortcut hack. */
   char new_lnk_buf[CYG_MAX_PATH + 5];
-  if (real_old.is_lnk_symlink () && !real_new.error && !real_new.case_clash)
+  if (real_old.is_lnk_special () && !real_new.error && !real_new.case_clash)
     {
       strcpy (new_lnk_buf, newpath);
       strcat (new_lnk_buf, ".lnk");
@@ -1170,7 +1170,7 @@ rename (const char *oldpath, const char *newpath)
     SetFileAttributes (real_new, (DWORD) real_new & ~FILE_ATTRIBUTE_READONLY);
 
   /* Shortcut hack No. 2, part 1 */
-  if (!real_old.issymlink () && !real_new.error && real_new.is_lnk_symlink ()
+  if (!real_old.issymlink () && !real_new.error && real_new.is_lnk_special ()
       && (lnk_suffix = strrchr (real_new.get_win32 (), '.')))
      *lnk_suffix = '\0';
 
