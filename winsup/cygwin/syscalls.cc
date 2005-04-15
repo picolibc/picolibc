@@ -1959,7 +1959,8 @@ mkfifo (const char *path, mode_t mode)
 extern "C" int
 seteuid32 (__uid32_t uid)
 {
-  debug_printf ("uid: %u myself->gid: %u", uid, myself->gid);
+  debug_printf ("uid: %u myself->uid: %u myself->gid: %u",
+  		uid, myself->uid, myself->gid);
 
   if (uid == myself->uid && !cygheap->user.groups.ischanged)
     {
