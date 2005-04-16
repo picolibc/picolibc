@@ -1,3 +1,8 @@
+2005-04-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_base::utimes_fs): Drop touching
+	ChangeTime.
+
 2005-04-16  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler.cc (fhandler::dup): Duplicate flags, too.

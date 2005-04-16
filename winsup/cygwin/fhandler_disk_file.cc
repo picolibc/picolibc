@@ -833,7 +833,7 @@ fhandler_disk_file::utimes (const struct timeval *tvp)
 int
 fhandler_base::utimes_fs (const struct timeval *tvp)
 {
-  FILETIME lastaccess, lastwrite, lastchange;
+  FILETIME lastaccess, lastwrite;
   struct timeval tmp[2];
 
   query_open (query_write_attributes);
@@ -862,13 +862,11 @@ fhandler_base::utimes_fs (const struct timeval *tvp)
     }
   timeval_to_filetime (&tvp[0], &lastaccess);
   timeval_to_filetime (&tvp[1], &lastwrite);
-  /* Update ctime */
-  timeval_to_filetime (&tmp[0], &lastchange);
   debug_printf ("incoming lastaccess %08x %08x", tvp[0].tv_sec, tvp[0].tv_usec);
 
   if (is_fs_special ())
     SetFileAttributes (pc, (DWORD) pc & ~FILE_ATTRIBUTE_READONLY);
-  BOOL res = SetFileTime (get_handle (), &lastchange, &lastaccess, &lastwrite);
+  BOOL res = SetFileTime (get_handle (), NULL, &lastaccess, &lastwrite);
   DWORD errcode = GetLastError ();
   if (is_fs_special ())
     SetFileAttributes (pc, pc);
