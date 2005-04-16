@@ -1,3 +1,22 @@
+2005-04-16  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler.cc (fhandler::dup): Duplicate flags, too.
+	* fhandler.h (fhandler_fifo::owner): Eliminate.
+	* fhandler_disk_file.cc (fhandler_base::fstat_fs): Handle on-disk
+	devices better.
+	(fhandler_base::fstat_helper): Ditto.
+	* fhandler_fifo.cc (fhandler_fifo::fhandler_fifo): Don't initialize
+	obsolete "owner".
+	(fhandler_fifo::open_not_mine): Add some debugging.  Duplicate correct
+	handle when we own it.
+	(fhandler_fifo::open): Set flags from input, not from first pipe.  Flag
+	that fork fixup is needed.
+	(fhandler_fifo::dup): Set errno correctly when DuplicateHandle fails.
+	* pinfo.cc (commune_send): Add debugging for fifo.
+
+	* cygwin/version.h: Bump API minor version to 127 to reflect exporting
+	of sigrelese.
+
 2005-04-14  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
 	* syscalls.cc (setuid32): Correct debugging output.

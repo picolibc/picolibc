@@ -1284,6 +1284,7 @@ fhandler_base::dup (fhandler_base *child)
       VerifyHandle (nh);
       child->set_io_handle (nh);
     }
+  set_flags (child->get_flags ());
   return 0;
 }
 

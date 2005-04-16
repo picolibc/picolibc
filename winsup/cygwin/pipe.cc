@@ -237,6 +237,7 @@ fhandler_pipe::fixup_after_exec ()
 void
 fhandler_pipe::fixup_after_fork (HANDLE parent)
 {
+debug_printf ("here");
   fhandler_base::fixup_after_fork (parent);
   if (guard)
     fork_fixup (parent, guard, "guard");
@@ -259,7 +260,6 @@ fhandler_pipe::dup (fhandler_base *child)
 	goto err;
     }
 
-  /* FIXME: This leaks handles in the failing condition */
   if (guard == NULL)
     ftp->guard = NULL;
   else if (!DuplicateHandle (hMainProc, guard, hMainProc, &ftp->guard, 0, 1,

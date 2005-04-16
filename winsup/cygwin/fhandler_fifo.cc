@@ -1,6 +1,6 @@
-/* fhandler_fifo.cc.  See fhandler.h for a description of the fhandler classes.
+/* fhandler_fifo.cc - See fhandler.h for a description of the fhandler classes.
 
-   Copyright 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -23,7 +23,7 @@
 #include "pinfo.h"
 
 fhandler_fifo::fhandler_fifo ()
-  : fhandler_pipe (), output_handle (NULL), owner (NULL),
+  : fhandler_pipe (), output_handle (NULL),
     read_use (0), write_use (0)
 {
 }
@@ -85,6 +85,8 @@ fhandler_fifo::open_not_mine (int flags)
 	  r = p->commune_send (PICOM_FIFO, get_win32_name ());
 	  if (r.handles[0] == NULL)
 	    continue;		// process doesn't own fifo
+	  debug_printf ("pid %d, handles[0] %p, handles[1] %p", p->pid,
+			r.handles[0], r.handles[1]);
 	}
       else
 	{
@@ -162,6 +164,7 @@ fhandler_fifo::open (int flags, mode_t)
       delete (fhs[0]);
       delete (fhs[1]);
       set_use (1);
+      need_fork_fixup (true);
     }
 
 out:
@@ -170,17 +173,17 @@ out:
 }
 
 int
-fhandler_fifo::dup (fhandler_base * child)
+fhandler_fifo::dup (fhandler_base *child)
 {
   int res = fhandler_pipe::dup (child);
   if (!res)
     {
       fhandler_fifo *ff = (fhandler_fifo *) child;
-
       if (!DuplicateHandle (hMainProc, get_output_handle (), hMainProc,
 			    &ff->get_output_handle (), false, true,
 			    DUPLICATE_SAME_ACCESS))
 	{
+	  __seterrno ();
 	  child->close ();
 	  res = -1;
 	}
