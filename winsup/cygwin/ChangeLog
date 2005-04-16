@@ -1,4 +1,18 @@
 2005-04-16  Corinna Vinschen  <corinna@vinschen.de>
+	    Pierre Humblet <pierre.humblet@ieee.org>
+
+	* security.h (cygsidlist::addfromgr): Allow duplicate entries.
+	(get_server_groups): Declare new function.
+	* security.cc (is_group_member): Simplify.
+	(get_server_groups): New function.
+	(get_initgroups_sidlist): Call get_server_groups.
+	(verify_token): Allow token when supplementary sids are not in
+	/etc/group but are in the token.
+	Streamline the code.
+	* grp.cc (initgroups32): New implementation.
+	(getgroups32): Handle case where the supplementary groups are set.
+
+2005-04-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* environ.cc (environ_init): Don't set traverse checking as default.
 

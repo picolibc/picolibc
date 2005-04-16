@@ -148,8 +148,7 @@ public:
   BOOL add (const char *sidstr)
     { cygsid nsi (sidstr); return add (nsi); }
   BOOL addfromgr (struct __group32 *gr) /* Only with alloc */
-    { return sids[count].getfromgr (gr)
-	     && (contains (sids[count]) || ++count); }
+    { return sids[count].getfromgr (gr) && ++count; }
 
   BOOL operator+= (cygsid &si) { return add (si); }
   BOOL operator+= (const char *sidstr) { return add (sidstr); }
@@ -326,6 +325,8 @@ HANDLE subauth (struct passwd *pw);
 HANDLE create_token (cygsid &usersid, user_groups &groups, struct passwd * pw);
 /* Verify an existing token */
 bool verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern = NULL);
+/* Get groups of a user */
+bool get_server_groups (cygsidlist &grp_list, PSID usersid, struct passwd *pw);
 
 /* Extract U-domain\user field from passwd entry. */
 void extract_nt_dom_user (const struct passwd *pw, char *domain, char *user);

@@ -344,14 +344,32 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
   __gid32_t gid;
   const char *username;
 
-  if (allow_ntsec)
+  if (!srchsid && cygheap->user.groups.issetgroups ())
     {
-      /* If impersonated, use impersonation token. */
-      if (cygheap->user.issetuid ())
-	hToken = cygheap->user.token ();
-      else
-        hToken = hProcImpToken;
+      cygsid sid;
+      for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
+	if (sid.getfromgr (gr))
+	  for (int pg = 0; pg < cygheap->user.groups.sgsids.count; ++pg)
+	    if (sid == cygheap->user.groups.sgsids.sids[pg] &&
+		sid != well_known_world_sid)
+	      {
+		if (cnt < gidsetsize)
+		  grouplist[cnt] = gr->gr_gid;
+		++cnt;
+		if (gidsetsize && cnt > gidsetsize)
+		  goto error;
+		break;
+	      }
+      return cnt;
     }
+
+
+  /* If impersonated, use impersonation token. */
+  if (cygheap->user.issetuid ())
+    hToken = cygheap->user.token ();
+  else
+    hToken = hProcImpToken;
+
   if (hToken)
     {
       if (GetTokenInformation (hToken, TokenGroups, NULL, 0, &size)
@@ -450,9 +468,32 @@ getgroups (int gidsetsize, __gid16_t *grouplist)
 extern "C" int
 initgroups32 (const char *name, __gid32_t gid)
 {
+  int ret;
   if (wincap.has_security ())
-    cygheap->user.groups.clear_supp ();
-  syscall_printf ( "0 = initgroups (%s, %u)", name, gid);
+    {
+      ret = -1;
+      struct passwd *pw = internal_getpwnam (name);
+      struct __group32 *gr = internal_getgrgid (gid);
+      cygsid usersid, grpsid;
+      if (!usersid.getfrompw (pw) || !grpsid.getfromgr (gr))
+	{
+	  set_errno (EINVAL);
+	  goto out;
+	}
+      cygsidlist tmp_gsids (cygsidlist_auto, 12);
+      if (!get_server_groups (tmp_gsids, usersid, pw))
+	goto out;
+      tmp_gsids += grpsid;
+      cygsidlist new_gsids (cygsidlist_alloc, tmp_gsids.count);
+      for (int i = 0; i < tmp_gsids.count; i++)
+	new_gsids.sids[i] = tmp_gsids.sids[i];
+      new_gsids.count = tmp_gsids.count;
+      cygheap->user.groups.update_supp (new_gsids);
+    }
+  ret = 0;
+
+ out:
+  syscall_printf ( "%d = initgroups (%s, %u)", ret, name, gid);
   return 0;
 }
 

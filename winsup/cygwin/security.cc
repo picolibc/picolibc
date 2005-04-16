@@ -42,8 +42,7 @@ details. */
 
 bool allow_ntsec;
 /* allow_smbntsec is handled exclusively in path.cc (path_conv::check).
-   It's defined here because of it's strong relationship to allow_ntsec.
-   The default is TRUE to reflect the old behaviour. */
+   It's defined here because of it's strong relationship to allow_ntsec. */
 bool allow_smbntsec;
 bool allow_traverse;
 
@@ -363,7 +362,6 @@ is_group_member (WCHAR *wgroup, PSID pusersid, cygsidlist &grp_list)
   LPLOCALGROUP_MEMBERS_INFO_0 buf;
   DWORD cnt, tot;
   NET_API_STATUS ret;
-  bool retval = false;
 
   /* Members can be users or global groups */
   ret = NetLocalGroupGetMembers (NULL, wgroup, 0, (LPBYTE *) &buf,
@@ -371,14 +369,17 @@ is_group_member (WCHAR *wgroup, PSID pusersid, cygsidlist &grp_list)
   if (ret)
     return false;
 
-  for (DWORD bidx = 0; !retval && bidx < cnt; ++bidx)
+  bool retval = true;
+  for (DWORD bidx = 0; bidx < cnt; ++bidx)
     if (EqualSid (pusersid, buf[bidx].lgrmi0_sid))
-      retval = true;
+      goto done;
     else
-      for (int glidx = 0; !retval && glidx < grp_list.count; ++glidx)
+      for (int glidx = 0; glidx < grp_list.count; ++glidx)
 	if (EqualSid (grp_list.sids[glidx], buf[bidx].lgrmi0_sid))
-	  retval = true;
+	  goto done;
 
+  retval = false;
+ done:
   NetApiBufferFree (buf);
   return retval;
 }
@@ -545,6 +546,30 @@ get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps,
     }
 }
 
+bool
+get_server_groups (cygsidlist &grp_list, PSID usersid, struct passwd *pw)
+{
+  char user[UNLEN + 1];
+  char domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+  WCHAR wserver[INTERNET_MAX_HOST_NAME_LENGTH + 3];
+  char server[INTERNET_MAX_HOST_NAME_LENGTH + 3];
+
+  if (well_known_system_sid == usersid)
+    {
+      grp_list += well_known_admins_sid;
+      get_unix_group_sidlist (pw, grp_list);
+      return true;
+    }
+
+  grp_list += well_known_world_sid;
+  grp_list += well_known_authenticated_users_sid;
+  extract_nt_dom_user (pw, domain, user);
+  if (get_logon_server (domain, server, wserver))
+    get_user_groups (wserver, grp_list, user, domain);
+  get_unix_group_sidlist (pw, grp_list);
+  return get_user_local_groups (grp_list, usersid);
+}
+
 static bool
 get_initgroups_sidlist (cygsidlist &grp_list,
 			PSID usersid, PSID pgrpsid, struct passwd *pw,
@@ -554,26 +579,12 @@ get_initgroups_sidlist (cygsidlist &grp_list,
   grp_list += well_known_world_sid;
   grp_list += well_known_authenticated_users_sid;
   if (well_known_system_sid == usersid)
-    {
-      auth_pos = -1;
-      grp_list += well_known_admins_sid;
-      get_unix_group_sidlist (pw, grp_list);
-    }
-  else
-    {
-      char user[UNLEN + 1];
-      char domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-      WCHAR wserver[INTERNET_MAX_HOST_NAME_LENGTH + 3];
-      char server[INTERNET_MAX_HOST_NAME_LENGTH + 3];
+    auth_pos = -1;
+   else
+     get_token_group_sidlist (grp_list, my_grps, auth_luid, auth_pos);
+  if (!get_server_groups (grp_list, usersid, pw))
+    return false;
 
-      get_token_group_sidlist (grp_list, my_grps, auth_luid, auth_pos);
-      extract_nt_dom_user (pw, domain, user);
-      if (get_logon_server (domain, server, wserver))
-	get_user_groups (wserver, grp_list, user, domain);
-      get_unix_group_sidlist (pw, grp_list);
-      if (!get_user_local_groups (grp_list, usersid))
-	return false;
-    }
   /* special_pgrp true if pgrpsid is not in normal groups */
   if ((special_pgrp = !grp_list.contains (pgrpsid)))
     grp_list += pgrpsid;
@@ -775,8 +786,7 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
     }
 
   PTOKEN_GROUPS my_grps;
-  bool saw_buf[NGROUPS_MAX] = {};
-  bool *saw = saw_buf, sawpg = false, ret = false;
+  bool sawpg = false, ret = false;
 
   if (!GetTokenInformation (token, TokenGroups, NULL, 0, &size) &&
       GetLastError () != ERROR_INSUFFICIENT_BUFFER)
@@ -785,40 +795,39 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
     debug_printf ("alloca (my_grps) failed.");
   else if (!GetTokenInformation (token, TokenGroups, my_grps, size, &size))
     debug_printf ("GetTokenInformation(my_token, TokenGroups), %E");
-  else if (!groups.issetgroups ()) /* setgroups was never called */
-    ret = sid_in_token_groups (my_grps, groups.pgsid)
-	  || groups.pgsid == usersid;
-  else /* setgroups was called */
+  else
     {
-      struct __group32 *gr;
-      cygsid gsid;
-      if (groups.sgsids.count > (int) (sizeof (saw_buf) / sizeof (*saw_buf))
-	  && !(saw = (bool *) calloc (groups.sgsids.count, sizeof (bool))))
-	goto done;
+      if (groups.issetgroups ()) /* setgroups was called */
+	{
+	  cygsid gsid;
+	  struct __group32 *gr;
+	  bool saw[groups.sgsids.count];
+	  memset (saw, 0, sizeof(saw));
 
-      /* token groups found in /etc/group match the user.gsids ? */
-      for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
-	if (gsid.getfromgr (gr) && sid_in_token_groups (my_grps, gsid))
-	  {
-	    int pos = groups.sgsids.position (gsid);
-	    if (pos >= 0)
-	      saw[pos] = true;
-	    else if (groups.pgsid == gsid)
-	      sawpg = true;
-	    else if (gsid != well_known_world_sid
-		     && gsid != usersid)
+	  /* token groups found in /etc/group match the user.gsids ? */
+	  for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
+	    if (gsid.getfromgr (gr) && sid_in_token_groups (my_grps, gsid))
+	      {
+		int pos = groups.sgsids.position (gsid);
+		if (pos >= 0)
+		  saw[pos] = true;
+		else if (groups.pgsid == gsid)
+		  sawpg = true;
+		else if (gsid != well_known_world_sid
+			 && gsid != usersid)
+		  goto done;
+	      }
+	  /* user.sgsids groups must be in the token */
+	  for (int gidx = 0; gidx < groups.sgsids.count; gidx++)
+	    if (!saw[gidx] && !sid_in_token_groups (my_grps, groups.sgsids.sids[gidx]))
 	      goto done;
-	  }
-      for (int gidx = 0; gidx < groups.sgsids.count; gidx++)
-	if (!saw[gidx])
-	  goto done;
+	}
+      /* The primary group must be in the token */
       ret = sawpg
-	    || groups.sgsids.contains (groups.pgsid)
-	    || groups.pgsid == usersid;
+	|| sid_in_token_groups (my_grps, groups.pgsid)
+	|| groups.pgsid == usersid;
     }
 done:
-  if (saw != saw_buf)
-    free (saw);
   return ret;
 }
 
