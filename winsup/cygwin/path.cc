@@ -3112,7 +3112,14 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	     matter, so we just return 0.  For example, getting the
 	     attributes of \\HOST will typically fail.  */
 	  debug_printf ("GetFileAttributes (%s) failed", suffix.path);
-	  set_error (geterrno_from_win_error (GetLastError (), EACCES));
+
+	  /* The above comment is not *quite* right.  When calling
+	     GetFileAttributes for a non-existant file an a Win9x share,
+	     GetLastError returns ERROR_INVALID_FUNCTION.  Go figure! */
+	  DWORD win_error = GetLastError ();
+	  if (win_error == ERROR_INVALID_FUNCTION)
+	    win_error = ERROR_FILE_NOT_FOUND;
+	  set_error (geterrno_from_win_error (win_error, EACCES));
 	  continue;
 	}
 

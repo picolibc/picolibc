@@ -870,7 +870,9 @@ fhandler_base::utimes_fs (const struct timeval *tvp)
   DWORD errcode = GetLastError ();
   if (is_fs_special ())
     SetFileAttributes (pc, pc);
-  if (!res)
+  /* Opening a directory on a 9x share from a NT machine works(!), but
+     then the SetFileTimes fails with ERROR_NOT_SUPPORTED.  Oh well... */
+  if (!res && errcode != ERROR_NOT_SUPPORTED)
     {
       close ();
       __seterrno_from_win_error (errcode);

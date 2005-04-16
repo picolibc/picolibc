@@ -1,4 +1,11 @@
 2005-04-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_base::utimes_fs): Ignore
+	ERROR_NOT_SUPPORTED to workaround Win9x weirdness.
+	* path.cc (symlink_info::check): Remap ERROR_INVALID_FUNTION to
+	ERROR_FILE_NOT_FOUND for the same reason.
+
+2005-04-16  Corinna Vinschen  <corinna@vinschen.de>
 	    Pierre Humblet <pierre.humblet@ieee.org>
 
 	* security.h (cygsidlist::addfromgr): Allow duplicate entries.
