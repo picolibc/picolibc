@@ -1,5 +1,9 @@
 2005-04-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* environ.cc (environ_init): Don't set traverse checking as default.
+
+2005-04-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_base::utimes_fs): Drop touching
 	ChangeTime.
 

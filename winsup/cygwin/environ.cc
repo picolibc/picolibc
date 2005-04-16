@@ -731,12 +731,9 @@ environ_init (char **envp, int envc)
   if (myself->progname[0])
     got_something_from_registry = regopt (myself->progname) || got_something_from_registry;
 
-  /* Set ntsec and traverse checking explicit as default, if NT is running */
+  /* Set ntsec explicit as default, if NT is running */
   if (wincap.has_security ())
-    {
-      allow_ntsec = true;
-      allow_traverse = true;
-    }
+    allow_ntsec = true;
 
   if (!envp)
     envp_passed_in = 0;
