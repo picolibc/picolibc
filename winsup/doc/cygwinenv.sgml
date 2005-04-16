@@ -163,10 +163,12 @@ nostrip_title</literal>.</para>
 If set, Cygwin handles file permissions so that the parent directories'
 permissions are checked, as it's default on POSIX systems.  If not set,
 only the file's own permissions are taken into account.  This is the
-default on Windows and called "bypass traverse checking".  Beginning with
-version 1.5.13, traverse checking (as on POSIX) is enabled by default.
-If you want to switch off traverse checking for Cygwin processes and child
-processes started from Cygwin processes, you have to set "notraverse".</para>
+default on Windows and called "bypass traverse checking".  Default was
+"traverse" in version 1.5.13 and 1.5.14.  Beginning with 1.5.15, traverse
+checking is disabled again since it's not correctly implemented by Microsoft
+and it's behaviour is getting worse with each new OS version.  Unprivileged
+terminal server sessions are practically impossible with traverse checking
+switched on.  So, use at your own risk.</para>
 </listitem>
 <listitem>
 <para><envar>(no)tty</envar> - if set, Cygwin enables extra support

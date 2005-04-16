@@ -1,3 +1,7 @@
+2005-04-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwinenv.sgml: Add new words for (no)traverse option.
+
 2005-03-30  Christopher Faylor  <cgf@timesys.com>
 
 	* how-using.texinfo: Add more words to the "multiple DLL" section.
