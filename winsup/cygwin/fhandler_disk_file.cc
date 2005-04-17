@@ -219,7 +219,7 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
 
   if (get_io_handle ())
     {
-      if (nohandle ())
+      if (nohandle () || is_fs_special ())
 	return fstat_by_name (buf);
       else
 	return fstat_by_handle (buf);
@@ -325,7 +325,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
     buf->st_blocks = (nAllocSize + S_BLKSIZE - 1) / S_BLKSIZE;
   else if (pc.has_attribute (FILE_ATTRIBUTE_COMPRESSED
 			     | FILE_ATTRIBUTE_SPARSE_FILE)
-      && get_io_handle ()
+      && get_io_handle () && !is_fs_special ()
       && !NtQueryInformationFile (get_io_handle (), &st, (PVOID) &fci,
 				  sizeof fci, FileCompressionInformation))
     /* Otherwise we request the actual amount of bytes allocated for
@@ -352,8 +352,8 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
   else if (pc.issocket ())
     buf->st_mode = S_IFSOCK;
 
-  if (!get_file_attribute (pc.has_acls (), get_io_handle (), get_win32_name (),
-			   &buf->st_mode, &buf->st_uid, &buf->st_gid))
+  if (!get_file_attribute (pc.has_acls (), is_fs_special () ? NULL: get_io_handle (),
+			   get_win32_name (), &buf->st_mode, &buf->st_uid, &buf->st_gid))
     {
       /* If read-only attribute is set, modify ntsec return value */
       if (pc.has_attribute (FILE_ATTRIBUTE_READONLY) && !pc.issymlink ())
@@ -373,7 +373,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
     {
       buf->st_mode |= STD_RBITS;
 
-      if (!pc.has_attribute (FILE_ATTRIBUTE_READONLY))
+      if (!pc.has_attribute (FILE_ATTRIBUTE_READONLY) && !pc.issymlink ())
 	buf->st_mode |= STD_WBITS;
       /* | S_IWGRP | S_IWOTH; we don't give write to group etc */
 

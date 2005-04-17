@@ -100,7 +100,7 @@ fhandler_fifo::open_not_mine (int flags)
 	      __seterrno ();
 	      goto out;
 	    }
-	  if (!DuplicateHandle (hMainProc, fh->get_handle (), hMainProc,
+	  if (!DuplicateHandle (hMainProc, fh->get_output_handle (), hMainProc,
 				&r.handles[1], 0, false, DUPLICATE_SAME_ACCESS))
 	    {
 	      CloseHandle (r.handles[0]);
@@ -146,14 +146,14 @@ fhandler_fifo::open (int flags, mode_t)
     goto out;
 
   fhandler_pipe *fhs[2];
-  if (create (fhs, 0, flags, true))
+  if (create (fhs, 1, flags, true))
     {
       __seterrno ();
       res = 0;
     }
   else
     {
-      set_flags (fhs[0]->get_flags ());
+      set_flags (flags);
       set_io_handle (fhs[0]->get_handle ());
       set_output_handle (fhs[1]->get_handle ());
       guard = fhs[0]->guard;

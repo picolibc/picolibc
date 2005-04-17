@@ -610,6 +610,7 @@ _pinfo::commune_recv ()
 		  it[0] = it[1] = NULL;	/* FIXME: possibly left a handle open in child? */
 		  break;
 		}
+	    debug_printf ("fifo found %p, %p", it[0], it[1]);
 	  }
 
 	CloseHandle (hp);

@@ -495,7 +495,7 @@ public:
   void create_guard (SECURITY_ATTRIBUTES *sa) {guard = CreateMutex (sa, FALSE, NULL);}
   int dup (fhandler_base *child);
   int ioctl (unsigned int cmd, void *);
-  void fixup_after_fork (HANDLE);
+  virtual void fixup_after_fork (HANDLE);
   void fixup_after_exec ();
   bool hit_eof ();
   void set_eof () {broken_pipe = true;}
@@ -509,7 +509,6 @@ public:
 class fhandler_fifo: public fhandler_pipe
 {
   HANDLE output_handle;
-  HANDLE owner;		// You can't have too many mutexes, now, can you?
   long read_use;
   long write_use;
   virtual HANDLE& get_io_handle () { return io_handle ?: output_handle; }
