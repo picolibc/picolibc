@@ -1,3 +1,7 @@
+2005-04-18  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* grp.cc (initgroups32): Return the correct value.
+
 2005-04-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_base::utimes_fs): Ignore

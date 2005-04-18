@@ -494,7 +494,7 @@ initgroups32 (const char *name, __gid32_t gid)
 
  out:
   syscall_printf ( "%d = initgroups (%s, %u)", ret, name, gid);
-  return 0;
+  return ret;
 }
 
 extern "C" int
