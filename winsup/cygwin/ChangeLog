@@ -1,3 +1,7 @@
+2005-04-18  Christopher Faylor  <cgf@timesys.com>
+
+	* include/cygwin/version.h: Bump DLL minor number to 16.
+
 2005-04-18  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* grp.cc (initgroups32): Return the correct value.
