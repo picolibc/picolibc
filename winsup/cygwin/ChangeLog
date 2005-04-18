@@ -1,3 +1,21 @@
+2005-04-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (enum conn_state): Add connect_failed state.
+	* fhandler_socket.cc (fhandler_socket::connect): Set connect_state to
+	connect_failed when connect failed.
+	* poll.cc (poll): Change errno to EINVAL if allocating memory fails,
+	according to SUSv3. Add socket descriptors always to except_fds. Test
+	for failed connect and set revents flags appropriately.
+	* select.cc (set_bits): Set connect_state to connect_failed when
+	select indicates failed nonblocking connect.
+	(fhandler_dev_null::select_except): Set except_ready to false so that
+	/dev/null is not always in except state.
+	(peek_socket): Fix bogus conditional.
+	(fhandler_socket::select_write): Treat all connect_states except
+	unconnected equivalent to return consistent results.
+	(fhandler_windows::select_except): Set except_ready to false so that
+	/dev/windows is not always in except state.
+
 2005-04-18  Christopher Faylor  <cgf@timesys.com>
 
 	* include/cygwin/version.h: Bump DLL minor number to 16.

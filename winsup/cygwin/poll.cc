@@ -45,7 +45,7 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
 
   if (!read_fds || !write_fds || !except_fds)
     {
-      set_errno (ENOMEM);
+      set_errno (EINVAL);	/* According to SUSv3. */
       return -1;
     }
 
@@ -63,7 +63,9 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
 	    FD_SET(fds[i].fd, read_fds);
 	  if (fds[i].events & POLLOUT)
 	    FD_SET(fds[i].fd, write_fds);
-	  if (fds[i].events & POLLPRI)
+	  /* On sockets, except_fds is needed to catch failed connects. */
+	  if ((fds[i].events & POLLPRI)
+	      || cygheap->fdtab[fds[i].fd]->is_socket ())
 	    FD_SET(fds[i].fd, except_fds);
 	}
       else if (fds[i].fd >= 0)
@@ -87,11 +89,12 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
 	      fds[i].revents = POLLHUP;
 	    else
 	      {
+		fhandler_socket *sock;
+
 		if (FD_ISSET(fds[i].fd, read_fds))
 		  {
 		    char peek[1];
-		    fhandler_socket *sock =
-				      cygheap->fdtab[fds[i].fd]->is_socket ();
+		    sock = cygheap->fdtab[fds[i].fd]->is_socket ();
 		    if (!sock)
 		      fds[i].revents |= POLLIN;
 		    else
@@ -125,10 +128,19 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
 			set_errno (old_errno);
 		      }
 		  }
-		if (FD_ISSET(fds[i].fd, write_fds))
-		  fds[i].revents |= POLLOUT;
-		if (FD_ISSET(fds[i].fd, except_fds))
-		  fds[i].revents |= POLLPRI;
+		/* Handle failed connect. */
+		if (FD_ISSET(fds[i].fd, write_fds)
+		    && FD_ISSET(fds[i].fd, except_fds)
+		    && (sock = cygheap->fdtab[fds[i].fd]->is_socket ())
+		    && sock->connect_state () == connect_failed)
+		  fds[i].revents |= (POLLIN | POLLERR);
+		else 
+		  {
+		    if (FD_ISSET(fds[i].fd, write_fds))
+		      fds[i].revents |= POLLOUT;
+		    if (FD_ISSET(fds[i].fd, except_fds))
+		      fds[i].revents |= POLLPRI;
+		  }
 	      }
 	  }
       }

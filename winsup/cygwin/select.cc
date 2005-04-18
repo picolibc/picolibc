@@ -352,7 +352,7 @@ set_bits (select_record *me, fd_set *readfds, fd_set *writefds,
 	{
 	  UNIX_FD_SET (me->fd, writefds);
 	  if ((sock = me->fh->is_socket ()))
-	    sock->connect_state (connected);
+	    sock->connect_state (connect_failed);
 	}
       if (me->except_selected)
 	UNIX_FD_SET (me->fd, exceptfds);
@@ -915,7 +915,7 @@ fhandler_dev_null::select_except (select_record *s)
     }
   s->h = get_handle ();
   s->except_selected = true;
-  s->except_ready = true;
+  s->except_ready = false;
   return s;
 }
 
@@ -1271,11 +1271,11 @@ peek_socket (select_record *me, bool)
 	  set_winsock_errno ();
 	  return 0;
 	}
-      if (WINSOCK_FD_ISSET (h, &ws_readfds) || (me->read_selected && me->read_ready))
+      if (WINSOCK_FD_ISSET (h, &ws_readfds))
 	me->read_ready = true;
-      if (WINSOCK_FD_ISSET (h, &ws_writefds) || (me->write_selected && me->write_ready))
+      if (WINSOCK_FD_ISSET (h, &ws_writefds))
 	me->write_ready = true;
-      if (WINSOCK_FD_ISSET (h, &ws_exceptfds) || ((me->except_selected || me->except_on_write) && me->except_ready))
+      if (WINSOCK_FD_ISSET (h, &ws_exceptfds))
 	me->except_ready = true;
     }
   return me->read_ready || me->write_ready || me->except_ready;
@@ -1460,7 +1460,7 @@ fhandler_socket::select_write (select_record *s)
   s->peek = peek_socket;
   s->write_ready = saw_shutdown_write () || connect_state () == unconnected;
   s->write_selected = true;
-  if (connect_state () == connect_pending)
+  if (connect_state () != unconnected)
     {
       s->except_ready = saw_shutdown_write () || saw_shutdown_read ();
       s->except_on_write = true;
@@ -1559,7 +1559,7 @@ fhandler_windows::select_except (select_record *s)
   s->peek = peek_windows;
   s->h = get_handle ();
   s->except_selected = true;
-  s->except_ready = true;
+  s->except_ready = false;
   s->windows_handle = true;
   return s;
 }

@@ -50,7 +50,8 @@ enum conn_state
 {
   unconnected = 0,
   connect_pending = 1,
-  connected = 2
+  connected = 2,
+  connect_failed = 3
 };
 
 enum line_edit_status

@@ -706,7 +706,7 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
       err = WSAGetLastError ();
       /* Special handling for connect to return the correct error code
 	 when called on a non-blocking socket. */
-      if (is_nonblocking () || connect_state () == connect_pending)
+      if (is_nonblocking ())
 	{
 	  if (err == WSAEWOULDBLOCK || err == WSAEALREADY)
 	    in_progress = true;
@@ -736,6 +736,8 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 
   if (err == WSAEINPROGRESS || err == WSAEALREADY)
     connect_state (connect_pending);
+  else if (err)
+    connect_state (connect_failed);
   else
     connect_state (connected);
 
