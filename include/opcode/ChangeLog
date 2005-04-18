@@ -1,3 +1,8 @@
+2005-04-18  Mark Kettenis  <kettenis@gnu.org>
+
+	* i386.h: Insert hyphens into selected VIA PadLock extensions.
+	Add xcrypt-ctr.  Provide aliases without hyphens.
+
 2005-04-13  H.J. Lu  <hongjiu.lu@intel.com>
 
 	Moved from ../ChangeLog

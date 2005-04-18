@@ -1378,15 +1378,23 @@ static const template i386_optab[] =
 {"rdtscp",   0, 0x0f01, 0xf9, CpuSledgehammer,NoSuf|ImmExt,	{ 0, 0, 0} },
 
 /* VIA PadLock extensions.  */
-{"xstorerng", 0, 0x000fa7, 0xc0, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
-{"xcryptecb", 0, 0xf30fa7, 0xc8, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
-{"xcryptcbc", 0, 0xf30fa7, 0xd0, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
-{"xcryptcfb", 0, 0xf30fa7, 0xe0, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
-{"xcryptofb", 0, 0xf30fa7, 0xe8, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
+{"xstore-rng",0, 0x000fa7, 0xc0, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
+{"xcrypt-ecb",0, 0xf30fa7, 0xc8, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
+{"xcrypt-cbc",0, 0xf30fa7, 0xd0, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
+{"xcrypt-ctr",0, 0xf30fa7, 0xd8, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
+{"xcrypt-cfb",0, 0xf30fa7, 0xe0, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
+{"xcrypt-ofb",0, 0xf30fa7, 0xe8, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
 {"montmul",   0, 0xf30fa6, 0xc0, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
 {"xsha1",     0, 0xf30fa6, 0xc8, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
 {"xsha256",   0, 0xf30fa6, 0xd0, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
-/* Alias for xstorerng.  */
+/* Aliases without hyphens.  */
+{"xstorerng", 0, 0x000fa7, 0xc0, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
+{"xcryptecb", 0, 0xf30fa7, 0xc8, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
+{"xcryptcbc", 0, 0xf30fa7, 0xd0, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
+{"xcryptctr", 0, 0xf30fa7, 0xd8, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
+{"xcryptcfb", 0, 0xf30fa7, 0xe0, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
+{"xcryptofb", 0, 0xf30fa7, 0xe8, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
+/* Alias for xstore-rng.  */
 {"xstore",    0, 0x000fa7, 0xc0, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
 
 /* sentinel */
