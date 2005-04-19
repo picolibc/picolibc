@@ -1,3 +1,7 @@
+2005-04-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwinenv.sgml: Mention that check_case is deprecated.
+
 2005-04-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwinenv.sgml: Add new words for (no)traverse option.
