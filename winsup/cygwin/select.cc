@@ -36,6 +36,7 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "pinfo.h"
 #include "sigproc.h"
 #include "tty.h"
 #include "ntdll.h"
@@ -156,6 +157,33 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   copyfd_set (writefds, w, maxfds);
   copyfd_set (exceptfds, e, maxfds);
   return timeout ? 0 : sel.poll (readfds, writefds, exceptfds);
+}
+
+extern "C" int
+pselect(int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
+	const struct timespec *ts, const sigset_t *set)
+{
+  struct timeval tv;
+  sigset_t oldset = myself->getsigmask ();
+
+  if (ts)
+    {
+      if (check_invalid_read_struct_errno (ts))
+	return -1;
+      tv.tv_sec = ts->tv_sec;
+      tv.tv_usec = ts->tv_nsec / 1000;
+    }
+  if (set)
+    {
+      if (check_invalid_read_struct_errno (set))
+	return -1;
+      set_signal_mask (*set);
+    }
+  int ret = cygwin_select (maxfds, readfds, writefds, exceptfds,
+  			   ts ? &tv : NULL);
+  if (set)
+    set_signal_mask (oldset);
+  return ret;
 }
 
 /* Call cleanup functions for all inspected fds.  Gets rid of any

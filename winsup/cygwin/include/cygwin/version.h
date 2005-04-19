@@ -254,12 +254,13 @@ details. */
       125: LD_PRELOAD/CW_HOOK available.
       126: Export lsearch, lfind, timer_gettime.
       127: Export sigrelese.
+      128: Export pselect.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 127
+#define CYGWIN_VERSION_API_MINOR 128
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

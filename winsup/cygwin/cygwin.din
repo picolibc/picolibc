@@ -346,6 +346,7 @@ rexec = cygwin_rexec SIGFE
 rresvport = cygwin_rresvport SIGFE
 _select = cygwin_select SIGFE
 select = cygwin_select SIGFE
+pselect SIGFE
 send = cygwin_send SIGFE
 sendmsg = cygwin_sendmsg SIGFE
 sendto = cygwin_sendto SIGFE

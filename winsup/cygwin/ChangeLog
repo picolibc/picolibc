@@ -1,3 +1,10 @@
+2005-04-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din (pselect): Export.
+	* select.cc (pselect): New function.
+	* include/cygwin/version.h: Bump API minor number.
+	* include/sys/select.h: Include signal.h.  Declare pselect.
+
 2005-04-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (enum conn_state): Add connect_failed state.
