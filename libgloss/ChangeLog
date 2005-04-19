@@ -1,3 +1,8 @@
+2005-04-19  Eric Christopher  <echristo@redhat.com>
+
+	* mips/regs.S: Sign extend constants for mips64 and unify
+        address handling.
+
 2005-04-12  Shaun Jackman  <sjackman@gmail.com>
 
 	* libgloss/arm/Makefile.in (RDPMON_BSP): librdpmon.a was empty due 

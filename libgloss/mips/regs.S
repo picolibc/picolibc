@@ -53,15 +53,16 @@
 #define fp1	$f1
 
 /* Useful memory constants: */
-#define K0BASE		0x80000000
 #ifndef __mips64
+#define K0BASE          0x80000000
 #define K1BASE		0xA0000000
 #define K0BASE_ADDR	((char *)K0BASE)
 #define K1BASE_ADDR	((char *)K1BASE)
 #else
-#define K1BASE		0xFFFFFFFFA0000000LL
+#define K0BASE          0xFFFFFFFF80000000
+#define K1BASE		0xFFFFFFFFA0000000
 #define K0BASE_ADDR	((char *)0xFFFFFFFF80000000LL)
-#define K1BASE_ADDR	((char *)K1BASE)
+#define K1BASE_ADDR	((char *)0xFFFFFFFFA0000000LL)
 #endif
 
 #define PHYS_TO_K1(a)   ((unsigned)(a) | K1BASE)
