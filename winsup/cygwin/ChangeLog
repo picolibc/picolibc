@@ -1,5 +1,10 @@
 2005-04-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* security.cc (alloc_sd): Remove DELETE bit from user's ACE if
+	allow_traverse is set.
+
+2005-04-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin.din (pselect): Export.
 	* select.cc (pselect): New function.
 	* include/cygwin/version.h: Bump API minor number.

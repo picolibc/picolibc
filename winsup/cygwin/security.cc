@@ -1553,6 +1553,14 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
   /* Construct allow attribute for owner. */
   DWORD owner_allow = STANDARD_RIGHTS_ALL
 		      | FILE_WRITE_ATTRIBUTES | FILE_WRITE_EA;
+  /* This has nothing to do with traverse checking in the first place, but
+     since traverse checking is the setting which switches to POSIX-like
+     permission rules, the below is all too similar.  Removing the delete
+     bit for a file or directory results in checking the parent directories'
+     ACL, if the current user has the FILE_DELETE_CHILD bit set.  This is
+     how it is on POSIX systems. */
+  if (allow_traverse)
+    owner_allow &= ~DELETE;
   if (attribute & S_IRUSR)
     owner_allow |= FILE_GENERIC_READ;
   if (attribute & S_IWUSR)
