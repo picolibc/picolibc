@@ -663,7 +663,8 @@ path_conv::check (const char *src, unsigned opt,
 		    break;
 		  default:
 		    fileattr = INVALID_FILE_ATTRIBUTES;
-		    goto virtual_component_retry;
+		    error = ENOENT;
+		    break;
 		}
 	      goto out;
 	    }
