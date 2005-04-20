@@ -1,3 +1,7 @@
+2005-04-20  Gerd Spalink  <Gerd.Spalink@t-online.de>
+
+	* fhandler-tut.txt: Update description to cygwin 1.5.13
+
 2005-04-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwinenv.sgml: Mention that check_case is deprecated.
