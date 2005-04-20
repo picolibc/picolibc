@@ -1,3 +1,8 @@
+2005-04-20  Brian Dessent  <brian@dessent.net>
+
+	* utils.sgml (mount): Clarify setting cygdrive prefix for user
+	and system-wide.
+
 2005-03-24  Brian Dessent  <brian@dessent.net>
 
 	* cygcheck.cc (init_paths): Use full path instead of "." for the

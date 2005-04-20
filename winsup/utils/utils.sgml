@@ -729,9 +729,11 @@ set the automount prefix to <filename>/</filename>:</para>
 </screen>
 </example>
 
-<para>Note that if you set a new prefix in this manner, you can
-specify the <literal>-s</literal> flag to make this the system-wide default 
-prefix.  By default, the cygdrive-prefix applies only to the system-wide setting.  
+<para>Note that the cygdrive prefix can be set both per-user and system-wide, 
+and that as with all mounts, a user-specific mount takes precedence over the 
+system-wide setting.  The <command>mount</command> utility creates system-wide 
+mounts by default if you do not specify a type.  Use the <literal>-s</literal> 
+or <literal>-u</literal> flag to indicate a system or user mount, respectively.
 You can always see the user and system cygdrive prefixes with the 
 <literal>-p</literal> option.  Using the <literal>-b</literal>
 flag with <literal>--change-cygdrive-prefix</literal> makes all new 
