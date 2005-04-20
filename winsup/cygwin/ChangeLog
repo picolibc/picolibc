@@ -1,5 +1,11 @@
 2005-04-20  Christopher Faylor  <cgf@timesys.com>
 
+	* path.cc (path_conv::check): Fix problem reading symlinks introduced
+	in below change by reverting the change and adding an additional test
+	for nonexistent files in /proc.
+
+2005-04-20  Christopher Faylor  <cgf@timesys.com>
+
 	* path.cc (path_conv::check): Punt when attempting to access a
 	nonexistent directory or file in /proc.
 

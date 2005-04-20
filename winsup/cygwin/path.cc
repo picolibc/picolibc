@@ -531,7 +531,7 @@ path_conv::check (const char *src, unsigned opt,
   symlink_info sym;
   bool need_directory = 0;
   bool saw_symlinks = 0;
-  int is_relpath;
+  bool is_relpath;
   char *tail, *path_end;
 
 #if 0
@@ -646,25 +646,33 @@ path_conv::check (const char *src, unsigned opt,
 		{
 		  case 1:
 		  case 2:
-		    fileattr = FILE_ATTRIBUTE_DIRECTORY;
+		    if (component == 0)
+		      fileattr = FILE_ATTRIBUTE_DIRECTORY;
 		    break;
 		  case -1:
-		    fileattr = 0;
+		    if (component == 0)
+		      fileattr = 0;
 		    break;
 		  case -2:	/* /proc/self or /proc/<pid>/symlinks */
 		    goto is_virtual_symlink;
 		  case -3:	/* /proc/<pid>/fd/pipe:[] */
-		    fileattr = 0;
-		    dev.parse (FH_PIPE);
+		    if (component == 0)
+		      {
+			fileattr = 0;
+			dev.parse (FH_PIPE);
+		      }
 		    break;
 		  case -4:	/* /proc/<pid>/fd/socket:[] */
-		    fileattr = 0;
-		    dev.parse (FH_TCP);
+		    if (component == 0)
+		      {
+			fileattr = 0;
+			dev.parse (FH_TCP);
+		      }
 		    break;
 		  default:
-		    fileattr = INVALID_FILE_ATTRIBUTES;
-		    error = ENOENT;
-		    break;
+		    if (component == 0)
+		      fileattr = INVALID_FILE_ATTRIBUTES;
+		    goto virtual_component_retry;
 		}
 	      goto out;
 	    }
@@ -794,7 +802,6 @@ is_virtual_symlink:
 	    }
 
 virtual_component_retry:
-
 	  /* Find the new "tail" of the path, e.g. in '/for/bar/baz',
 	     /baz is the tail. */
 	  if (tail != path_end)
@@ -877,6 +884,11 @@ out:
     /* nothing to do */;
   else if (fileattr & FILE_ATTRIBUTE_DIRECTORY)
     path_flags &= ~PATH_SYMLINK;
+  else if (isvirtual_dev (dev.devn) && fileattr == INVALID_FILE_ATTRIBUTES)
+    {
+      error = ENOENT;
+      return;
+    }
   else
     {
       debug_printf ("%s is a non-directory", path);
