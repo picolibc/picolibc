@@ -47,7 +47,9 @@ v&lt;version&gt;"
 where &lt;version&gt; is the latest registry version associated with
 the Cygwin library (this version is not the same as the release
 number).  The system-wide table is located under the same subkeys
-under HKEY_LOCAL_SYSTEM.</para>
+under HKEY_LOCAL_SYSTEM.  The user mount table takes precedence over 
+the system-wide table if a path is mounted in both.  This includes the
+setting of the cygdrive prefix.</para>
 
 <para>Since Windows uses drive letters instead of a single filesystem
 root, the POSIX root <filename>/</filename> must be set to a directory
