@@ -1,5 +1,12 @@
 2005-04-20  Christopher Faylor  <cgf@timesys.com>
 
+	* sigproc.cc (proc_subproc): Fix handling of waiting for pids with zero
+	value.
+
+	* strace.cc (strace::hello): Report parent pid of executing process.
+
+2005-04-20  Christopher Faylor  <cgf@timesys.com>
+
 	* path.cc (path_conv::check): Fix problem reading symlinks introduced
 	in below change by reverting the change and adding an additional test
 	for nonexistent files in /proc.

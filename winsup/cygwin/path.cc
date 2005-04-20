@@ -4073,3 +4073,16 @@ dirname (char *path)
     strcpy (bs, ".");
   return buf;
 }
+
+muto path_uglification::locker;
+
+path_uglification::~path_uglification ()
+{
+  if (locker.ismine ())
+    locker.release ();
+}
+
+win_path::win_path (const char *_path)
+{
+  path = _path;
+}
