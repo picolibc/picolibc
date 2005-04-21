@@ -1,3 +1,9 @@
+2005-04-21  Christopher Faylor  <cgf@timesys.com>
+
+	* shared.cc (shared_info::initialize): Test previous version of shared
+	memory magic rather than current version when determining if there has
+	been a shared memory mismatch.
+
 2005-04-20  Christopher Faylor  <cgf@timesys.com>
 
 	* sigproc.cc (proc_subproc): Fix handling of waiting for pids with zero

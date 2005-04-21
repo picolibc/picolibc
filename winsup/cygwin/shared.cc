@@ -195,17 +195,12 @@ void
 shared_info::initialize ()
 {
   DWORD sversion = (DWORD) InterlockedExchange ((LONG *) &version, SHARED_VERSION_MAGIC);
-  if (!sversion)
+  if (sversion)
     {
-      /* Initialize tty table.  */
-      tty.init ();
-    }
-  else
-    {
-      if (version != SHARED_VERSION_MAGIC)
+      if (sversion != SHARED_VERSION_MAGIC)
 	{
-	  multiple_cygwin_problem ("system shared memory version", version, SHARED_VERSION_MAGIC);
 	  InterlockedExchange ((LONG *) &version, sversion);
+	  multiple_cygwin_problem ("system shared memory version", sversion, SHARED_VERSION_MAGIC);
 	}
       while (!cb)
 	low_priority_sleep (0);	// Should be hit only very very rarely
@@ -214,7 +209,10 @@ shared_info::initialize ()
   heap_init ();
 
   if (!sversion)
-    cb = sizeof (*this);	// Do last, after all shared memory initializion
+    {
+      tty.init ();		/* Initialize tty table.  */
+      cb = sizeof (*this);	/* Do last, after all shared memory initialization */
+    }
 
   if (cb != SHARED_INFO_CB)
     system_printf ("size of shared memory region changed from %u to %u",
