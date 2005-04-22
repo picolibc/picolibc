@@ -54,7 +54,9 @@ strace::hello ()
   if (active)
     {
       prntf (1, NULL, "**********************************************");
-      prntf (1, NULL, "Program name: %s (%d)", myself->progname, myself->pid ?: GetCurrentProcessId ());
+      prntf (1, NULL, "Program name: %s (pid %d, ppid %d)", myself->progname,
+	     myself->pid ?: GetCurrentProcessId (),
+	     myself->ppid ?: 1);
       prntf (1, NULL, "App version:  %d.%d, api: %d.%d",
 	     user_data->dll_major, user_data->dll_minor,
 	     user_data->api_major, user_data->api_minor);

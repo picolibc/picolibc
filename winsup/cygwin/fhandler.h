@@ -503,7 +503,8 @@ public:
   HANDLE get_guard () const {return guard;}
   int ready_for_read (int fd, DWORD howlong);
   static int create (fhandler_pipe *[2], unsigned, int, bool = false);
-  bool is_slow () {return 1;}
+  bool is_slow () {return true;}
+  static int create_selectable (LPSECURITY_ATTRIBUTES, HANDLE&, HANDLE&, DWORD, bool);
   friend class fhandler_fifo;
 };
 
@@ -525,6 +526,7 @@ public:
   void set_use ();
   int dup (fhandler_base *child);
   bool is_slow () {return 1;}
+  void close_one_end ();
 };
 
 class fhandler_dev_raw: public fhandler_base

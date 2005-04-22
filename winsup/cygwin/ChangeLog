@@ -1,3 +1,16 @@
+2005-04-22  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler.cc (fhandler_base::read): Remove unused signal state tweaks.
+	* fhandler.h (fhandler_pipe::create_selectable): Declare.
+	(fhandler_fifo::close_one_end): Declare.
+	* fhandler_fifo.cc (fhandler_fifo::close_one_end): Define.
+	(fhandler_fifo::open_not_mine): Use close_one_end to close appropriate
+	end of pipe.
+	* pinfo.cc (_pinfo::commune_recv): Ditto.
+	* pipe.cc (fhandler_pipe::create_selectable): Rename from
+	create_selectable_pipe.  Reorganize.
+	(fhandler_pipe::create): Use create_selectable.
+
 2005-04-21  Christopher Faylor  <cgf@timesys.com>
 
 	* shared.cc (shared_info::initialize): Test previous version of shared

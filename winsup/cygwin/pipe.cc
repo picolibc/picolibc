@@ -318,21 +318,17 @@ leave:
    FILE_READ_ATTRIBUTES access, on later versions of win32 where
    this is supported.  This access is needed by NtQueryInformationFile,
    which is used to implement select and nonblocking writes.
-   Note that the return value is either NO_ERROR or GetLastError,
+   Note that the return value is either 0 or GetLastError,
    unlike CreatePipe, which returns a bool for success or failure.  */
-static int
-create_selectable_pipe (PHANDLE read_pipe_ptr,
-			PHANDLE write_pipe_ptr,
-			LPSECURITY_ATTRIBUTES sa_ptr,
-			DWORD psize)
+int
+fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
+				  HANDLE& w, DWORD psize, bool fifo)
 {
   /* Default to error. */
-  *read_pipe_ptr = *write_pipe_ptr = INVALID_HANDLE_VALUE;
-
-  HANDLE read_pipe = INVALID_HANDLE_VALUE, write_pipe = INVALID_HANDLE_VALUE;
+  r = w = INVALID_HANDLE_VALUE;
 
   /* Ensure that there is enough pipe buffer space for atomic writes.  */
-  if (psize < PIPE_BUF)
+  if (!fifo && psize < PIPE_BUF)
     psize = PIPE_BUF;
 
   char pipename[CYG_MAX_PATH];
@@ -342,9 +338,9 @@ create_selectable_pipe (PHANDLE read_pipe_ptr,
      to be as robust as possible.  */
   while (1)
     {
-      static volatile LONG pipe_unique_id;
+      static volatile ULONG pipe_unique_id;
 
-      __small_sprintf (pipename, "\\\\.\\pipe\\cygwin-%d-%ld", myself->pid,
+      __small_sprintf (pipename, "\\\\.\\pipe\\cygwin-%p-%p", myself->pid,
 		       InterlockedIncrement ((LONG *) &pipe_unique_id));
 
       debug_printf ("CreateNamedPipe: name %s, size %lu", pipename, psize);
@@ -358,84 +354,67 @@ create_selectable_pipe (PHANDLE read_pipe_ptr,
 	 the pipe was not created earlier by some other process, even if
 	 the pid has been reused.  We avoid FILE_FLAG_FIRST_PIPE_INSTANCE
 	 because that is only available for Win2k SP2 and WinXP.  */
-      SetLastError (0);
-      read_pipe = CreateNamedPipe (pipename,
-				   PIPE_ACCESS_INBOUND,
-				   PIPE_TYPE_BYTE | PIPE_READMODE_BYTE,
-				   1,       /* max instances */
-				   psize,   /* output buffer size */
-				   psize,   /* input buffer size */
-				   NMPWAIT_USE_DEFAULT_WAIT,
-				   sa_ptr);
+      r = CreateNamedPipe (pipename, PIPE_ACCESS_INBOUND,
+			   PIPE_TYPE_BYTE | PIPE_READMODE_BYTE, 1, psize,
+			   psize, NMPWAIT_USE_DEFAULT_WAIT, sa_ptr);
 
-      DWORD err = GetLastError ();
       /* Win 95 seems to return NULL instead of INVALID_HANDLE_VALUE */
-      if ((read_pipe || !err) && read_pipe != INVALID_HANDLE_VALUE)
+      if (r && r != INVALID_HANDLE_VALUE)
 	{
-	  debug_printf ("pipe read handle %p", read_pipe);
+	  debug_printf ("pipe read handle %p", r);
 	  break;
 	}
 
+      DWORD err = GetLastError ();
       switch (err)
 	{
 	case ERROR_PIPE_BUSY:
 	  /* The pipe is already open with compatible parameters.
 	     Pick a new name and retry.  */
 	  debug_printf ("pipe busy, retrying");
-	  continue;
+	  break;
 	case ERROR_ACCESS_DENIED:
 	  /* The pipe is already open with incompatible parameters.
 	     Pick a new name and retry.  */
 	  debug_printf ("pipe access denied, retrying");
-	  continue;
-	case ERROR_CALL_NOT_IMPLEMENTED:
-	  /* We are on an older Win9x platform without named pipes.
-	     Return an anonymous pipe as the best approximation.  */
-	  debug_printf ("CreateNamedPipe not implemented, resorting to "
-			"CreatePipe size %lu", psize);
-	  if (CreatePipe (read_pipe_ptr, write_pipe_ptr, sa_ptr, psize))
+	  break;
+	default:
+	  /* CreateNamePipe failed.  Maybe we are on an older Win9x platform without
+	     named pipes.  Return an anonymous pipe as the best approximation.  */
+	  debug_printf ("CreateNamedPipe failed, resorting to CreatePipe size %lu",
+			psize);
+	  if (CreatePipe (&r, &w, sa_ptr, psize))
 	    {
-	      debug_printf ("pipe read handle %p", *read_pipe_ptr);
-	      debug_printf ("pipe write handle %p", *write_pipe_ptr);
-	      return NO_ERROR;
+	      debug_printf ("pipe read handle %p", r);
+	      debug_printf ("pipe write handle %p", w);
+	      return 0;
 	    }
 	  err = GetLastError ();
 	  debug_printf ("CreatePipe failed, %E");
 	  return err;
-	default:
-	  debug_printf ("CreateNamedPipe failed, %E");
-	  return err;
 	}
-      /* NOTREACHED */
     }
 
   debug_printf ("CreateFile: name %s", pipename);
 
   /* Open the named pipe for writing.
      Be sure to permit FILE_READ_ATTRIBUTES access.  */
-  write_pipe = CreateFile (pipename,
-			   GENERIC_WRITE | FILE_READ_ATTRIBUTES,
-			   0,       /* share mode */
-			   sa_ptr,
-			   OPEN_EXISTING,
-			   0,       /* flags and attributes */
-			   0);      /* handle to template file */
+  w = CreateFile (pipename, GENERIC_WRITE | FILE_READ_ATTRIBUTES, 0, sa_ptr,
+		  OPEN_EXISTING, 0, 0);
 
-  if (write_pipe == INVALID_HANDLE_VALUE)
+  if (!w || w == INVALID_HANDLE_VALUE)
     {
       /* Failure. */
       DWORD err = GetLastError ();
       debug_printf ("CreateFile failed, %E");
-      CloseHandle (read_pipe);
+      CloseHandle (r);
       return err;
     }
 
-  debug_printf ("pipe write handle %p", write_pipe);
+  debug_printf ("pipe write handle %p", w);
 
   /* Success. */
-  *read_pipe_ptr = read_pipe;
-  *write_pipe_ptr = write_pipe;
-  return NO_ERROR;
+  return 0;
 }
 
 int
@@ -444,9 +423,9 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode, bool fif
   HANDLE r, w;
   SECURITY_ATTRIBUTES *sa = (mode & O_NOINHERIT) ?  &sec_none_nih : &sec_none;
   int res = -1;
-  int ret;
 
-  if ((ret = create_selectable_pipe (&r, &w, sa, psize)) != NO_ERROR)
+  int ret = create_selectable (sa, r, w, psize, fifo);
+  if (ret)
     __seterrno_from_win_error (ret);
   else
     {

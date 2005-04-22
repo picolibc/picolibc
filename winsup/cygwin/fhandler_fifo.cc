@@ -67,14 +67,30 @@ fhandler_fifo::close ()
 }
 
 #define DUMMY_O_RDONLY 4
+
+void
+fhandler_fifo::close_one_end ()
+{
+  int testflags = (get_flags () & (O_RDWR | O_WRONLY | O_APPEND)) ?: DUMMY_O_RDONLY;
+  static int flagtypes[] = {DUMMY_O_RDONLY | O_RDWR, O_WRONLY | O_APPEND | O_RDWR};
+  HANDLE *handles[2] = {&(get_handle ()), &(get_output_handle ())};
+  for (int i = 0; i < 2; i++)
+    if (!(testflags & flagtypes[i]))
+      {
+	CloseHandle (*handles[i]);
+	*handles[i] = NULL;
+      }
+    else if (i == 0 && !read_state)
+      {
+	create_read_state (2);
+	need_fork_fixup (true);
+      }
+}
 int
 fhandler_fifo::open_not_mine (int flags)
 {
   winpids pids;
-  static int flagtypes[] = {DUMMY_O_RDONLY | O_RDWR, O_WRONLY | O_APPEND | O_RDWR};
-  HANDLE *usehandles[2] = {&(get_handle ()), &(get_output_handle ())};
   int res = 0;
-  int testflags = (flags & (O_RDWR | O_WRONLY | O_APPEND)) ?: DUMMY_O_RDONLY;
 
   for (unsigned i = 0; i < pids.npids; i++)
     {
@@ -109,22 +125,11 @@ fhandler_fifo::open_not_mine (int flags)
 	    }
 	}
 
-      for (int i = 0; i < 2; i++)
-	if (!(testflags & flagtypes[i]))
-	    CloseHandle (r.handles[i]);
-	else
-	  {
-	    *usehandles[i] = r.handles[i];
-
-	    if (i == 0)
-	      {
-		read_state = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
-		need_fork_fixup (true);
-	      }
-	  }
-
-      res = 1;
+      set_io_handle (r.handles[0]);
+      set_output_handle (r.handles[1]);
       set_flags (flags);
+      close_one_end ();
+      res = 1;
       goto out;
     }
 

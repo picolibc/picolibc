@@ -611,6 +611,7 @@ _pinfo::commune_recv ()
 		  break;
 		}
 	    debug_printf ("fifo found %p, %p", it[0], it[1]);
+	    fh->close_one_end ();  /* FIXME: not quite right - need more handshaking */
 	  }
 
 	CloseHandle (hp);
