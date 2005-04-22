@@ -834,6 +834,9 @@ class dev_console
 
   bool con_to_str (char *d, const char *s, DWORD sz);
   bool str_to_con (char *d, const char *s, DWORD sz);
+  void set_color (HANDLE);
+  bool fillin_info (HANDLE);
+  void set_default_attr ();
 
   friend class fhandler_console;
 };
@@ -846,9 +849,7 @@ class fhandler_console: public fhandler_termios
 
 /* Output calls */
   void set_default_attr ();
-  WORD get_win32_attr ();
 
-  bool fillin_info ();
   void clear_screen (int, int, int, int);
   void scroll_screen (int, int, int, int, int, int);
   void cursor_set (bool, int, int);

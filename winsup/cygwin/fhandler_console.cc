@@ -1,6 +1,6 @@
 /* fhandler_console.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -97,7 +97,6 @@ fhandler_console::get_tty_stuff (int flags = 0)
       dev_state->scroll_region.Bottom = -1;
       dev_state->dwLastCursorPosition.X = -1;
       dev_state->dwLastCursorPosition.Y = -1;
-      dev_state->default_color = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
       dev_state->underline_color = FOREGROUND_GREEN | FOREGROUND_BLUE;
       dev_state->dim_color = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
       dev_state->meta_mask = LEFT_ALT_PRESSED;
@@ -112,6 +111,7 @@ fhandler_console::get_tty_stuff (int flags = 0)
 	 shell symbols and should not be interpreted as META. */
       if (PRIMARYLANGID (LOWORD (GetKeyboardLayout (0))) == LANG_ENGLISH)
 	dev_state->meta_mask |= RIGHT_ALT_PRESSED;
+      dev_state->set_default_attr ();
     }
 
   return &shared_console_info->tty_min_state;
@@ -213,7 +213,7 @@ fhandler_console::send_winch_maybe ()
 {
   SHORT y = dev_state->info.dwWinSize.Y;
   SHORT x = dev_state->info.dwWinSize.X;
-  fillin_info ();
+  dev_state->fillin_info (get_output_handle ());
 
   if (y != dev_state->info.dwWinSize.Y || x != dev_state->info.dwWinSize.X)
     {
@@ -556,27 +556,27 @@ fhandler_console::set_input_state ()
 }
 
 bool
-fhandler_console::fillin_info (void)
+dev_console::fillin_info (HANDLE h)
 {
   bool ret;
   CONSOLE_SCREEN_BUFFER_INFO linfo;
 
-  if ((ret = GetConsoleScreenBufferInfo (get_output_handle (), &linfo)))
+  if ((ret = GetConsoleScreenBufferInfo (h, &linfo)))
     {
-      dev_state->info.winTop = linfo.srWindow.Top;
-      dev_state->info.winBottom = linfo.srWindow.Bottom;
-      dev_state->info.dwWinSize.Y = 1 + linfo.srWindow.Bottom - linfo.srWindow.Top;
-      dev_state->info.dwWinSize.X = 1 + linfo.srWindow.Right - linfo.srWindow.Left;
-      dev_state->info.dwBufferSize = linfo.dwSize;
-      dev_state->info.dwCursorPosition = linfo.dwCursorPosition;
-      dev_state->info.wAttributes = linfo.wAttributes;
+      info.winTop = linfo.srWindow.Top;
+      info.winBottom = linfo.srWindow.Bottom;
+      info.dwWinSize.Y = 1 + linfo.srWindow.Bottom - linfo.srWindow.Top;
+      info.dwWinSize.X = 1 + linfo.srWindow.Right - linfo.srWindow.Left;
+      info.dwBufferSize = linfo.dwSize;
+      info.dwCursorPosition = linfo.dwCursorPosition;
+      info.wAttributes = linfo.wAttributes;
     }
   else
     {
-      memset (&dev_state->info, 0, sizeof dev_state->info);
-      dev_state->info.dwWinSize.Y = 25;
-      dev_state->info.dwWinSize.X = 80;
-      dev_state->info.winBottom = 24;
+      memset (&info, 0, sizeof info);
+      info.dwWinSize.Y = 25;
+      info.dwWinSize.X = 80;
+      info.winBottom = 24;
     }
 
   return ret;
@@ -589,7 +589,7 @@ fhandler_console::scroll_screen (int x1, int y1, int x2, int y2, int xn, int yn)
   CHAR_INFO fill;
   COORD dest;
 
-  (void) fillin_info ();
+  (void) dev_state->fillin_info (get_output_handle ());
   sr1.Left = x1 >= 0 ? x1 : dev_state->info.dwWinSize.X - 1;
   if (y1 == 0)
     sr1.Top = dev_state->info.winTop;
@@ -661,10 +661,13 @@ fhandler_console::open (int flags, mode_t)
     }
   set_output_handle (h);
 
-  if (fillin_info ())
-    dev_state->default_color = dev_state->info.wAttributes;
-
-  set_default_attr ();
+  if (dev_state->fillin_info (get_output_handle ()))
+    {
+      dev_state->current_win32_attr = dev_state->info.wAttributes;
+      if (!dev_state->default_color)
+	dev_state->default_color = dev_state->info.wAttributes;
+      dev_state->set_default_attr ();
+    }
 
   DWORD cflags;
   if (GetConsoleMode (get_io_handle (), &cflags))
@@ -723,7 +726,7 @@ fhandler_console::ioctl (unsigned int cmd, void *buf)
       case TIOCGWINSZ:
 	int st;
 
-	st = fillin_info ();
+	st = dev_state->fillin_info (get_output_handle ());
 	if (st)
 	  {
 	    /* *not* the buffer size, the actual screen size... */
@@ -911,28 +914,12 @@ fhandler_console::fhandler_console () :
   fhandler_termios ()
 {
 }
-
-#define FOREGROUND_ATTR_MASK (FOREGROUND_RED | FOREGROUND_GREEN | \
-			      FOREGROUND_BLUE | FOREGROUND_INTENSITY)
-#define BACKGROUND_ATTR_MASK (BACKGROUND_RED | BACKGROUND_GREEN | \
-			      BACKGROUND_BLUE | BACKGROUND_INTENSITY)
 void
-fhandler_console::set_default_attr ()
+dev_console::set_color (HANDLE h)
 {
-  dev_state->blink = dev_state->underline = dev_state->reverse = false;
-  dev_state->intensity = INTENSITY_NORMAL;
-  dev_state->fg = dev_state->default_color & FOREGROUND_ATTR_MASK;
-  dev_state->bg = dev_state->default_color & BACKGROUND_ATTR_MASK;
-  dev_state->current_win32_attr = get_win32_attr ();
-  SetConsoleTextAttribute (get_output_handle (), dev_state->current_win32_attr);
-}
-
-WORD
-fhandler_console::get_win32_attr ()
-{
-  WORD win_fg = dev_state->fg;
-  WORD win_bg = dev_state->bg;
-  if (dev_state->reverse)
+  WORD win_fg = fg;
+  WORD win_bg = bg;
+  if (reverse)
     {
       WORD save_fg = win_fg;
       win_fg = (win_bg & BACKGROUND_RED   ? FOREGROUND_RED   : 0) |
@@ -944,16 +931,32 @@ fhandler_console::get_win32_attr ()
 	       (save_fg & FOREGROUND_BLUE  ? BACKGROUND_BLUE  : 0) |
 	       (save_fg & FOREGROUND_INTENSITY ? BACKGROUND_INTENSITY : 0);
     }
-  if (dev_state->underline)
-    win_fg = dev_state->underline_color;
+  if (underline)
+    win_fg = underline_color;
   /* emulate blink with bright background */
-  if (dev_state->blink)
+  if (blink)
     win_bg |= BACKGROUND_INTENSITY;
-  if (dev_state->intensity == INTENSITY_INVISIBLE)
+  if (intensity == INTENSITY_INVISIBLE)
     win_fg = win_bg;
-  else if (dev_state->intensity == INTENSITY_BOLD)
+  else if (intensity == INTENSITY_BOLD)
     win_fg |= FOREGROUND_INTENSITY;
-  return (win_fg | win_bg);
+  current_win32_attr = win_fg | win_bg;
+  if (h)
+    SetConsoleTextAttribute (h, current_win32_attr);
+}
+
+#define FOREGROUND_ATTR_MASK (FOREGROUND_RED | FOREGROUND_GREEN | \
+			      FOREGROUND_BLUE | FOREGROUND_INTENSITY)
+#define BACKGROUND_ATTR_MASK (BACKGROUND_RED | BACKGROUND_GREEN | \
+			      BACKGROUND_BLUE | BACKGROUND_INTENSITY)
+void
+dev_console::set_default_attr ()
+{
+  blink = underline = reverse = false;
+  intensity = INTENSITY_NORMAL;
+  fg = default_color & FOREGROUND_ATTR_MASK;
+  bg = default_color & BACKGROUND_ATTR_MASK;
+  set_color (NULL);
 }
 
 /*
@@ -967,7 +970,7 @@ fhandler_console::clear_screen (int x1, int y1, int x2, int y2)
   DWORD done;
   int num;
 
-  (void)fillin_info ();
+  (void) dev_state->fillin_info (get_output_handle ());
 
   if (x1 < 0)
     x1 = dev_state->info.dwWinSize.X - 1;
@@ -1006,7 +1009,7 @@ fhandler_console::cursor_set (bool rel_to_top, int x, int y)
 {
   COORD pos;
 
-  (void) fillin_info ();
+  (void) dev_state->fillin_info (get_output_handle ());
   if (y > dev_state->info.winBottom)
     y = dev_state->info.winBottom;
   else if (y < 0)
@@ -1027,7 +1030,7 @@ fhandler_console::cursor_set (bool rel_to_top, int x, int y)
 void
 fhandler_console::cursor_rel (int x, int y)
 {
-  fillin_info ();
+  (void) dev_state->fillin_info (get_output_handle ());
   x += dev_state->info.dwCursorPosition.X;
   y += dev_state->info.dwCursorPosition.Y;
   cursor_set (false, x, y);
@@ -1036,7 +1039,7 @@ fhandler_console::cursor_rel (int x, int y)
 void
 fhandler_console::cursor_get (int *x, int *y)
 {
-  fillin_info ();
+  dev_state->fillin_info (get_output_handle ());
   *y = dev_state->info.dwCursorPosition.Y;
   *x = dev_state->info.dwCursorPosition.X;
 }
@@ -1100,13 +1103,11 @@ fhandler_console::char_command (char c)
   switch (c)
     {
     case 'm':   /* Set Graphics Rendition */
-       int i;
-
-       for (i = 0; i <= dev_state->nargs_; i++)
+       for (int i = 0; i <= dev_state->nargs_; i++)
 	 switch (dev_state->args_[i])
 	   {
 	     case 0:    /* normal color */
-	       set_default_attr ();
+	       dev_state->set_default_attr ();
 	       break;
 	     case 1:    /* bold */
 	       dev_state->intensity = INTENSITY_BOLD;
@@ -1193,8 +1194,7 @@ fhandler_console::char_command (char c)
 	       dev_state->bg = dev_state->default_color & BACKGROUND_ATTR_MASK;
 	       break;
 	   }
-	 dev_state->current_win32_attr = get_win32_attr ();
-	 SetConsoleTextAttribute (get_output_handle (), dev_state->current_win32_attr);
+       dev_state->set_color (get_output_handle ());
       break;
     case 'h':
     case 'l':
@@ -1365,7 +1365,7 @@ fhandler_console::char_command (char c)
       scroll_screen (0, dev_state->args_[0], -1, -1, 0, 0);
       break;
     case 'T':				/* SR - Scroll down */
-      fillin_info ();
+      dev_state->fillin_info (get_output_handle ());
       dev_state->args_[0] = dev_state->args_[0] ? dev_state->args_[0] : 1;
       scroll_screen (0, 0, -1, -1, 0, dev_state->info.winTop + dev_state->args_[0]);
       break;
@@ -1555,13 +1555,13 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    }
 	  else if (*src == 'M')		/* Reverse Index */
 	    {
-	      fillin_info ();
+	      dev_state->fillin_info (get_output_handle ());
 	      scroll_screen (0, 0, -1, -1, 0, dev_state->info.winTop + 1);
 	      dev_state->state_ = normal;
 	    }
 	  else if (*src == 'c')		/* Reset Linux terminal */
 	    {
-	      set_default_attr ();
+	      dev_state->set_default_attr ();
 	      clear_screen (0, 0, -1, -1);
 	      cursor_set (true, 0, 0);
 	      dev_state->state_ = normal;

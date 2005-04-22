@@ -1,5 +1,25 @@
 2005-04-22  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler.h (dev_console::set_color): Define new function.
+	(dev_console::set_default_attr): Ditto, moved from fhandler_console.
+	(dev_console::fillin_info): Ditto.  Accommodate this change throughout
+	this file.
+	(fhandler_console::get_win32_attr): Eliminate.
+	* fhandler_console.cc (fhandler_console::get_tty_stuff): Properly set
+	default attributes on initialization.
+	(fhandler_console::open): Set current attributes rather than default
+	color on open.
+	(fhandler_console::get_win32_attr): Eliminate.
+	(dev_console::set_color): New function.  Move get_win32_attr stuff
+	here.
+	(dev_console::set_default_attr): New function, moved from
+	fhandler_console.
+	(dev_console::fillin_info): Ditto.
+	(fhandler_console::char_command): Call set_color to set screen
+	characteristics.
+
+2005-04-22  Christopher Faylor  <cgf@timesys.com>
+
 	* fhandler.cc (fhandler_base::read): Remove unused signal state tweaks.
 	* fhandler.h (fhandler_pipe::create_selectable): Declare.
 	(fhandler_fifo::close_one_end): Declare.
