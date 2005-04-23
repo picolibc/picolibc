@@ -172,8 +172,9 @@ user_shared_initialize (bool reinit)
   ProtectHandleINH (cygwin_user_h);
   debug_printf ("user shared version %x", user_shared->version);
 
+  DWORD sversion = (DWORD) InterlockedExchange ((LONG *) &user_shared->version, USER_VERSION_MAGIC);
   /* Initialize the Cygwin per-user shared, if necessary */
-  if (!user_shared->version)
+  if (!sversion)
     {
       user_shared->version = USER_VERSION_MAGIC;
       debug_printf ("initializing user shared");
@@ -189,6 +190,9 @@ user_shared_initialize (bool reinit)
     multiple_cygwin_problem ("user shared memory version", user_shared->version, USER_VERSION_MAGIC);
   else if (user_shared->cb != sizeof (*user_shared))
     multiple_cygwin_problem ("user shared memory size", user_shared->cb, sizeof (*user_shared));
+  else
+      while (!user_shared->cb)
+	low_priority_sleep (0);	// Should be hit only very very rarely
 }
 
 void

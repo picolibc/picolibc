@@ -1,5 +1,10 @@
 2005-04-22  Christopher Faylor  <cgf@timesys.com>
 
+	* shared.cc (user_shared_initialize): Implement locking similar to
+	shared_info when initializing shared region.
+
+2005-04-22  Christopher Faylor  <cgf@timesys.com>
+
 	* fhandler.h (dev_console::set_color): Define new function.
 	(dev_console::set_default_attr): Ditto, moved from fhandler_console.
 	(dev_console::fillin_info): Ditto.  Accommodate this change throughout
