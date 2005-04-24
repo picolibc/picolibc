@@ -1,3 +1,10 @@
+2005-04-23  Wu Yongwei  <adah@sh163.net>
+
+	mingwex/dirent.c: Formatting changes.
+
+	mingwex/dirent.c (_topendir): Make the end-of-path slash check
+	MBCS-safe.
+
 2005-03-31  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/_mingw.h (__MINGW_ATTRIB_NONNULL): Define.

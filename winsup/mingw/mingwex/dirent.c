@@ -75,8 +75,10 @@ _topendir (const _TCHAR *szPath)
 
   /* Allocate enough space to store DIR structure and the complete
    * directory path given. */
-  nd = (_TDIR *) malloc (sizeof (_TDIR) + (_tcslen(szFullPath) + _tcslen (SLASH) +
-			 _tcslen(SUFFIX) + 1) * sizeof(_TCHAR));
+  nd = (_TDIR *) malloc (sizeof (_TDIR) + (_tcslen (szFullPath)
+					   + _tcslen (SLASH)
+					   + _tcslen (SUFFIX) + 1)
+					  * sizeof (_TCHAR));
 
   if (!nd)
     {
@@ -89,9 +91,11 @@ _topendir (const _TCHAR *szPath)
   _tcscpy (nd->dd_name, szFullPath);
 
   /* Add on a slash if the path does not end with one. */
-  if (nd->dd_name[0] != _T('\0') &&
-      nd->dd_name[_tcslen (nd->dd_name) - 1] != _T('/') &&
-      nd->dd_name[_tcslen (nd->dd_name) - 1] != _T('\\'))
+  if (nd->dd_name[0] != _T('\0')
+      && _tcsrchr (nd->dd_name, _T('/')) != nd->dd_name
+					    + _tcslen (nd->dd_name) - 1
+      && _tcsrchr (nd->dd_name, _T('\\')) != nd->dd_name
+      					     + _tcslen (nd->dd_name) - 1)
     {
       _tcscat (nd->dd_name, SLASH);
     }
@@ -148,7 +152,7 @@ _treaddir (_TDIR * dirp)
       /* Start the search */
       dirp->dd_handle = _tfindfirst (dirp->dd_name, &(dirp->dd_dta));
 
-  	  if (dirp->dd_handle == -1)
+      if (dirp->dd_handle == -1)
 	{
 	  /* Whoops! Seems there are no files in that
 	   * directory. */
@@ -167,7 +171,7 @@ _treaddir (_TDIR * dirp)
 	  /* We are off the end or otherwise error.	
 	     _findnext sets errno to ENOENT if no more file
 	     Undo this. */ 
-	  DWORD winerr = GetLastError();
+	  DWORD winerr = GetLastError ();
 	  if (winerr == ERROR_NO_MORE_FILES)
 	    errno = 0;	
 	  _findclose (dirp->dd_handle);
