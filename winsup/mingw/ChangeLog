@@ -1,8 +1,21 @@
+2005-04-23  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/mbrtowc.c: New file.
+	* mingwex/wcrtomb.c: New file.
+	* mingwex/btowc.c: New file.
+	* mingwex/wctob.c: New file.
+	* mingwex/mb_wc_common.h: New file.
+	* mingwex/Makefile.in (DISTFILES): Add new files.
+	(Q8_OBJS): Add new objects.
+	* include/wchar.h: Adjust comment about mbrtowc() and related
+	funcions. Add __restrict__ to pointer params in prototypes.
+	(wmemset. wmemchr, wmemcpy, wmemmove, wcstoll, wcstoull): Remove
+	arg names from protototypes.
+	
 2005-04-23  Wu Yongwei  <adah@sh163.net>
 
-	mingwex/dirent.c: Formatting changes.
-
-	mingwex/dirent.c (_topendir): Make the end-of-path slash check
+	* mingwex/dirent.c: Formatting changes.
+	* mingwex/dirent.c (_topendir): Make the end-of-path slash check
 	MBCS-safe.
 
 2005-03-31  Danny Smith  <dannysmith@users.sourceforge.net>

@@ -254,9 +254,11 @@ _CRTIMP wchar_t* __cdecl wcsupr (wchar_t*);
 #define _WSTRING_DEFINED
 #endif  /* _WSTRING_DEFINED */
 
-/* These are resolved by -lmsvcp60 */
-/* If you don't have msvcp60.dll in your windows system directory, you can
-   easily obtain it with a search from your favorite search engine. */
+/* These are resolved by -lmingwex. Alternatively, they can be resolved by
+   adding -lmsvcp60 to your command line, which will give you the VC++
+   versions of these functions. If you want the latter and don't have
+   msvcp60.dll in your windows system directory, you can easily obtain
+   it with a search from your favorite search engine.  */
 #ifndef __STRICT_ANSI__
 typedef wchar_t _Wint_t;
 #endif
@@ -264,29 +266,35 @@ typedef wchar_t _Wint_t;
 typedef int mbstate_t;
 
 wint_t __cdecl btowc(int);
-size_t __cdecl mbrlen(const char *, size_t, mbstate_t *);
-size_t __cdecl mbrtowc(wchar_t *, const char *, size_t, mbstate_t *);
-size_t __cdecl mbsrtowcs(wchar_t *, const char **, size_t, mbstate_t *);
-
-size_t __cdecl wcrtomb(char *, wchar_t, mbstate_t *);
-size_t __cdecl wcsrtombs(char *, const wchar_t **, size_t, mbstate_t *);
+size_t __cdecl mbrlen(const char * __restrict__, size_t,
+		      mbstate_t * __restrict__);
+size_t __cdecl mbrtowc(wchar_t * __restrict__, const char * __restrict__,
+		       size_t, mbstate_t * __restrict__);
+size_t __cdecl mbsrtowcs(wchar_t * __restrict__, const char ** __restrict__,
+			 size_t, mbstate_t * __restrict__);
+size_t __cdecl wcrtomb(char * __restrict__, wchar_t,
+		       mbstate_t * __restrict__);
+size_t __cdecl wcsrtombs(char * __restrict__, const wchar_t ** __restrict__,
+			 size_t, mbstate_t * __restrict__);
 int __cdecl wctob(wint_t);
 
 #ifndef __NO_ISOCEXT /* these need static lib libmingwex.a */
-__CRT_INLINE int __cdecl fwide(FILE* __UNUSED_PARAM(stream), int __UNUSED_PARAM(mode))
+__CRT_INLINE int __cdecl fwide(FILE* __UNUSED_PARAM(stream),
+			       int __UNUSED_PARAM(mode))
   {return -1;} /* limited to byte orientation */ 
 __CRT_INLINE int __cdecl mbsinit(const mbstate_t* __UNUSED_PARAM(ps))
   {return 1;}
-wchar_t* __cdecl wmemset(wchar_t* s, wchar_t c, size_t n);
-wchar_t* __cdecl wmemchr(const wchar_t* s, wchar_t c, size_t n);
-int wmemcmp(const wchar_t* s1, const wchar_t * s2, size_t n);
-wchar_t* __cdecl wmemcpy(wchar_t* __restrict__ s1, const wchar_t* __restrict__ s2,
-		 size_t n);
-wchar_t* __cdecl wmemmove(wchar_t* s1, const wchar_t* s2, size_t n);
-long long __cdecl wcstoll(const wchar_t* __restrict__ nptr,
-		  wchar_t** __restrict__ endptr, int base);
-unsigned long long __cdecl wcstoull(const wchar_t* __restrict__ nptr,
-			    wchar_t ** __restrict__ endptr, int base);
+wchar_t* __cdecl wmemset(wchar_t *, wchar_t, size_t);
+wchar_t* __cdecl wmemchr(const wchar_t*, wchar_t, size_t);
+int wmemcmp(const wchar_t*, const wchar_t *, size_t);
+wchar_t* __cdecl wmemcpy(wchar_t* __restrict__,
+		         const wchar_t* __restrict__,
+			 size_t);
+wchar_t* __cdecl wmemmove(wchar_t* s1, const wchar_t *, size_t);
+long long __cdecl wcstoll(const wchar_t * __restrict__,
+			  wchar_t** __restrict__, int);
+unsigned long long __cdecl wcstoull(const wchar_t * __restrict__,
+			    wchar_t ** __restrict__, int);
 #endif /* __NO_ISOCEXT */
 
 #ifndef	__STRICT_ANSI__
