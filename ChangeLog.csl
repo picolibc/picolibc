@@ -1,3 +1,8 @@
+2005-04-25  Paul Brook  <paul@codesourcery.com>
+
+	* gdb/configure.tgt: Don't build rdi-share library.
+	* gdb/config/arm/embed.mt: Ditto.
+
 2005-03-31  Mark Mitchell  <mark@codesourcery.com>
 
 	* gdb/ser-tcp.c (net_write_prim): Correct prototype.
