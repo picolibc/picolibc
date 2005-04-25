@@ -1,3 +1,7 @@
+2005-04-25  Christopher Faylor  <cgf@timesys.com>
+
+	* mount.cc (mount_commands): Display "-X" option when appropriate.
+
 2005-04-20  Brian Dessent  <brian@dessent.net>
 
 	* utils.sgml (mount): Clarify setting cygdrive prefix for user
