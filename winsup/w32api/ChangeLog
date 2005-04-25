@@ -1,3 +1,8 @@
+2005-04-25  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/vfw.h (capCreateCaptureWindow[AW]): Add prototypes.
+	(capGetDriverDescription[AW]): Likewise.
+
 2005-04-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/winnt.h (SE_UNDOCK_NAME TEXT): Define.
@@ -21,7 +26,7 @@
 
 	* include/ws2tcpip.h (getaddrinfo, freeaddrinfo, getnameinfo):
 	Guard with _WIN32_WINNT >= 0x0501. Add FIXME comment.
-	* gai_strerror[AW]: Put into #if 0 block.
+	(gai_strerror[AW]): Put into #if 0 block.
 
 2005-03-07  Danny Smith  <dannysmith@users.sourceforge.net>
 
@@ -59,7 +64,7 @@
 
 2005-01-18  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* lib/user32.def (MonitorFromPoint}: Correct suffix.
+	* lib/user32.def (MonitorFromPoint): Correct suffix.
 
 2005-01-13  Benoit Blanchon  <bblanchon@users.sourceforge.net>
 

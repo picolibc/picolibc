@@ -1057,6 +1057,12 @@ ICDecompressExQuery(HIC hic,DWORD dwFlags,LPBITMAPINFOHEADER lpbiSrc,LPVOID lpSr
 	return ICSendMessage(hic,ICM_DECOMPRESSEX_QUERY,(DWORD)&ic,sizeof(ic));
 }
 
+/* AVICAP32 exports */
+HWND VFWAPI capCreateCaptureWindowA (LPCSTR,DWORD,int,int,int,int,HWND,int);
+HWND VFWAPI capCreateCaptureWindowW (LPCWSTR,DWORD,int,int,int,int,HWND,int);
+BOOL VFWAPI capGetDriverDescriptionA (UINT,LPSTR,int,LPSTR,int);
+BOOL VFWAPI capGetDriverDescriptionW (UINT,LPWSTR,int,LPWSTR,int);
+
 #ifdef UNICODE
 #define AVISTREAMINFO AVISTREAMINFOW
 #define LPAVISTREAMINFO LPAVISTREAMINFOW
@@ -1088,6 +1094,10 @@ ICDecompressExQuery(HIC hic,DWORD dwFlags,LPBITMAPINFOHEADER lpbiSrc,LPVOID lpSr
 #define MCIWNDM_NEW MCIWNDM_NEWW
 #define MCIWNDM_RETURNSTRING MCIWNDM_RETURNSTRINGW
 #define MCIWNDM_OPEN MCIWNDM_OPENW
+
+#define capCreateCaptureWindow  capCreateCaptureWindowW
+#define capGetDriverDescription capGetDriverDescriptionW
+
 #else
 #define AVISTREAMINFO AVISTREAMINFOA
 #define LPAVISTREAMINFO LPAVISTREAMINFOA
@@ -1119,6 +1129,10 @@ ICDecompressExQuery(HIC hic,DWORD dwFlags,LPBITMAPINFOHEADER lpbiSrc,LPVOID lpSr
 #define MCIWNDM_NEW MCIWNDM_NEWA
 #define MCIWNDM_RETURNSTRING MCIWNDM_RETURNSTRINGA
 #define MCIWNDM_OPEN MCIWNDM_OPENA
+
+#define capCreateCaptureWindow  capCreateCaptureWindowA
+#define capGetDriverDescription capGetDriverDescriptionA
+
 #endif
 
 #endif /* RC_INVOKED */
