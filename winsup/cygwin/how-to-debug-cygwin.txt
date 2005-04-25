@@ -82,10 +82,10 @@ c:\some\path\bad_program.exe some parameters
    You can also set a CYGWIN_DEBUG variable to force the debugger to pop up
    only when a certain program is run:
 
-set CYGWIN_DEBUG=cat.exe=gdb.exe
+set CYGWIN_DEBUG=cat.exe:gdb.exe
 
    This will force gdb.exe to start when the program name contains the string
-   "cat.exe".  The '=gdb.exe' isn't really needed, since it is the default.
+   "cat.exe".  The ':gdb.exe' isn't really needed, since it is the default.
    It is just there to show how you can specify a program to run when the
    program starts.  You can optionally set a breakpoint on "break_here"
    once the debugger pops up and then you can single step through the

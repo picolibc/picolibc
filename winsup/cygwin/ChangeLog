@@ -1,3 +1,7 @@
+2005-04-24  Pavel Tsekov <ptsekov@gmx.net>
+
+	* how-to-debug-cygwin.txt: Fix typo.
+
 2005-04-22  Christopher Faylor  <cgf@timesys.com>
 
 	* shared.cc (user_shared_initialize): Implement locking similar to
