@@ -1,3 +1,9 @@
+2005-04-26  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wininet.h (FtpGetFileSize): Add prototype.
+	(FtpCommand[AW]): Correct prototypes.
+	Reported by: <siger at users dot sf dot net>
+
 2005-04-25  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/vfw.h (capCreateCaptureWindow[AW]): Add prototypes.
