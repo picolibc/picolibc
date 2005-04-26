@@ -1,3 +1,36 @@
+2005-04-25  Zack Weinberg  <zack@codesourcery.com>
+
+	Thumb32 assembler.
+
+	* include/elf/arm.h: Import full set of relocation names from
+	latest AAELF.  Make the primary name of all relocations be the one
+	AAELF specifies.  Provide aliases under the traditional names.
+	Kill FIRST_INVALID_RELOC_* and LAST_INVALID_RELOC_*.
+	* bfd/reloc.c: Reorganize ARM relocations.  Remove ARM relocations
+	that are never generated.  Document more of the relocations.  Add
+	relocations for Thumb32.
+	* bfd/libbfd.h, bfd/bfd-in2.h: Regenerate.
+	* bfd/elf32-arm.c: Reorganize howto tables.  Implement Thumb32
+	relocations.
+	* ld/testsuite/ld-arm/mixed-app.d: Adjust expectations for
+	renamed relocations.
+
+	* gas/hash.c (hash_find_n): New interface.
+	* gas/hash.h: Prototype it.
+
+	* gas/config/tc-arm.c: Rewrite and reorganize.  Implement 32-bit
+	Thumb instructions.
+	* gas/testsuite/gas/arm: Convert all "gas_test" style tests to
+	"run_dump_test" style tests, for more thorough testing.  Make
+	adjustments to expectations where necessary.
+	* gas/testsuite/gas/arm/t16-bad.s, gas/testsuite/gas/arm/tcompat.s
+	* gas/testsuite/gas/arm/tcompat2.s, gas/testsuite/gas/arm/thumb32.s:
+	New test cases.
+
+	* opcodes/arm-dis.c: Add support for Thumb32 instructions and
+	16-bit V6T2 instructions.
+
+
 2005-04-13  Paul Brook  <paul@codesourcery.com>
 
 	Backport from mainline.
@@ -10,7 +43,7 @@
 
 	* ld/configure.tgt (arm-wrs-linux-gnueabi*): Support both big- and
 	little-endian.
-	
+
 2005-04-08  Paul Brook  <paul@codesourcery.com>
 
 	* elf32-arm.c (ARM2THUMB_GLUE_SIZE): Rename...
