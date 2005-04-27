@@ -1,5 +1,10 @@
 2005-04-26  Christopher Faylor  <cgf@timesys.com>
 
+	* environ.cc (build_env): Ensure that win32 array is properly filled in
+	when a missing value has to be generated.
+
+2005-04-26  Christopher Faylor  <cgf@timesys.com>
+
 	* include/cygwin/version.h: Bump DLL minor number to 17.
 
 2005-04-24  Pavel Tsekov <ptsekov@gmx.net>

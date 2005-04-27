@@ -980,7 +980,7 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 	  *dstp = spenvs[i].retrieve (no_envblock);
 	  if (*dstp && (!no_envblock || spenvs[i].force) && *dstp != env_dontadd)
 	    {
-	      *pass_dstp = *dstp;
+	      *pass_dstp++ = *dstp;
 	      tl += strlen (*dstp) + 1;
 	      dstp++;
 	    }
