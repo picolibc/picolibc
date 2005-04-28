@@ -1,3 +1,9 @@
+2005-04-27  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler.cc (fhandler_base::open_9x): Remove (broken) check for
+	O_CREAT|O_EXCL.
+	* syscalls.cc (open): Do O_CREAT|O_EXCL check here first.
+
 2005-04-26  Christopher Faylor  <cgf@timesys.com>
 
 	* environ.cc (build_env): Ensure that win32 array is properly filled in
