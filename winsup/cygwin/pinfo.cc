@@ -174,6 +174,7 @@ pinfo::exit (DWORD n)
 void
 pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 {
+  shared_locations shloc;
   h = NULL;
   if (myself && !(flag & PID_EXECED)
       && (n == myself->pid || (DWORD) n == myself->dwProcessId))
@@ -185,71 +186,59 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 
   void *mapaddr;
   int createit = flag & (PID_IN_USE | PID_EXECED);
-  bool created = false;
   DWORD access = FILE_MAP_READ
 		 | (flag & (PID_IN_USE | PID_EXECED | PID_MAP_RW)
 		    ? FILE_MAP_WRITE : 0);
   if (!h0)
-    mapaddr = NULL;
+    shloc = (flag & (PID_IN_USE | PID_EXECED)) ? SH_JUSTCREATE : SH_JUSTOPEN;
   else
     {
-      /* Try to enforce that myself is always created in the same place */
-      mapaddr = open_shared (NULL, 0, h0, 0, SH_MYSELF);
+      shloc = SH_MYSELF;
       if (h0 == INVALID_HANDLE_VALUE)
 	h0 = NULL;
     }
 
   procinfo = NULL;
+  char sa_buf[1024];
+  PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf, cygheap->user.sid(),
+						   well_known_world_sid,
+						   FILE_MAP_READ);
+
   for (int i = 0; i < 20; i++)
     {
+      DWORD mapsize;
+      if (flag & PID_EXECED)
+	mapsize = PINFO_REDIR_SIZE;
+      else
+	mapsize = sizeof (_pinfo);
+
+      procinfo = (_pinfo *) open_shared ("cygpid", n, h0, mapsize, shloc,
+					 sec_attribs, access);
       if (!h0)
 	{
-	  char mapname[CYG_MAX_PATH];
-	  shared_name (mapname, "cygpid", n);
-
-	  int mapsize;
-	  if (flag & PID_EXECED)
-	    mapsize = PINFO_REDIR_SIZE;
-	  else
-	    mapsize = sizeof (_pinfo);
-
-	  if (!createit)
-	    {
-	      h0 = OpenFileMapping (access, FALSE, mapname);
-	      created = false;
-	    }
-	  else
-	    {
-	      char sa_buf[1024];
-	      PSECURITY_ATTRIBUTES sec_attribs =
-		sec_user_nih (sa_buf, cygheap->user.sid(), well_known_world_sid,
-			      FILE_MAP_READ);
-	      h0 = CreateFileMapping (INVALID_HANDLE_VALUE, sec_attribs,
-				      PAGE_READWRITE, 0, mapsize, mapname);
-	      created = GetLastError () != ERROR_ALREADY_EXISTS;
-	    }
-
-	  if (!h0)
-	    {
-	      if (createit)
-		__seterrno ();
-	      return;
-	    }
+	  if (createit)
+	    __seterrno ();
+	  return;
 	}
-
-      procinfo = (_pinfo *) MapViewOfFileEx (h0, access, 0, 0, 0, mapaddr);
 
       if (!procinfo)
 	{
 	  if (exit_state)
 	    return;
 
-	  if (GetLastError () == ERROR_INVALID_HANDLE)
-	    api_fatal ("MapViewOfFileEx h0 %p, i %d failed, %E", h0, i);
+	  switch (GetLastError ())
+	    {
+	    case ERROR_INVALID_HANDLE:
+	      api_fatal ("MapViewOfFileEx h0 %p, i %d failed, %E", h0, i);
+	    case ERROR_INVALID_ADDRESS:
+	      mapaddr = NULL;
+	    }
 
 	  debug_printf ("MapViewOfFileEx h0 %p, i %d failed, %E", h0, i);
 	  continue;
 	}
+
+      bool created = shloc != SH_JUSTOPEN;
 
       if ((procinfo->process_state & PID_INITIALIZING) && (flag & PID_NOREDIR)
 	  && cygwin_pid (procinfo->dwProcessId) != procinfo->pid)

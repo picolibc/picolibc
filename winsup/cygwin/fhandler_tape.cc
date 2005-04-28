@@ -1171,7 +1171,8 @@ mtinfo *mt;
 void __stdcall
 mtinfo_init ()
 {
-  mt = (mtinfo *) open_shared ("mtinfo", MTINFO_VERSION, cygheap->mt_h, sizeof (mtinfo), SH_MTINFO);
+  shared_locations sh_mtinfo = SH_MTINFO;
+  mt = (mtinfo *) open_shared ("mtinfo", MTINFO_VERSION, cygheap->mt_h, sizeof (mtinfo), sh_mtinfo);
   ProtectHandleINH (cygheap->mt_h);
   mt->initialize ();
 }

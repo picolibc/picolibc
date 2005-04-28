@@ -173,7 +173,10 @@ enum shared_locations
   SH_SHARED_CONSOLE,
   SH_MYSELF,
   SH_MTINFO,
-  SH_TOTAL_SIZE
+  SH_TOTAL_SIZE,
+  SH_JUSTCREATE,
+  SH_JUSTOPEN
+
 };
 void __stdcall memory_init ();
 
@@ -182,7 +185,7 @@ void __stdcall memory_init ();
 	     (((DWORD) ((p) + 1) + system_info.dwAllocationGranularity - 1) / \
 	      system_info.dwAllocationGranularity)))
 
-#define cygwin_shared_address	((void *) 0xa000000)
+#define cygwin_shared_address	((void *) 0x60000000)
 
 #ifdef _FHANDLER_H_
 struct console_state
@@ -194,6 +197,7 @@ struct console_state
 
 char *__stdcall shared_name (char *, const char *, int);
 void *__stdcall open_shared (const char *name, int n, HANDLE &shared_h, DWORD size,
-			     shared_locations, PSECURITY_ATTRIBUTES psa = &sec_all);
+			     shared_locations&, PSECURITY_ATTRIBUTES psa = &sec_all,
+			     DWORD access = FILE_MAP_READ | FILE_MAP_WRITE);
 extern void user_shared_initialize (bool reinit);
 

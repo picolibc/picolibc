@@ -81,10 +81,11 @@ fhandler_console::get_tty_stuff (int flags = 0)
   if (dev_state)
     return &shared_console_info->tty_min_state;
 
+  shared_locations sh_shared_console = SH_SHARED_CONSOLE;
   shared_console_info =
     (console_state *) open_shared (NULL, 0, cygheap->console_h,
 				   sizeof (*shared_console_info),
-				   SH_SHARED_CONSOLE);
+				   sh_shared_console);
   dev_state = &shared_console_info->dev_state;
 
   ProtectHandleINH (cygheap->console_h);

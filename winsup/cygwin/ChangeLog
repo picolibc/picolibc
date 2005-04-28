@@ -1,3 +1,23 @@
+2005-04-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shared_info.h (cygwin_shared_address): Bump to a higher value to avoid
+	collision with large data areas.
+
+2005-04-28  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler_console.cc (fhandler_console::get_tty_stuff): Accommodate
+	changes to open_shared arguments.
+	* fhandler_tape.cc (mtinfo_init): Ditto.
+	* pinfo.cc (pinfo::init): Use open_shared rather than win32 mmap calls.
+	* shared.cc (user_shared_initialize): Ditto.
+	(memory_init): Ditto.
+	(open_shared): Change to allow use a smore general mmap handler.
+	* shared_info.h (shared_locations): Add SH_JUSTCREATE, SH_JUSTOPEN.
+	(open_shared): Change declaration to match new usage.
+
+	* autoload.cc (LoadDLLfuncEx2): Define in terms of LoadDLLfuncEx3.
+	(LoadDLLfuncEx3): New macro.
+
 2005-04-27  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler.cc (fhandler_base::open_9x): Remove (broken) check for

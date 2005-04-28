@@ -75,23 +75,20 @@ static char *offsets[] =
 
 void * __stdcall
 open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
-	     shared_locations m, PSECURITY_ATTRIBUTES psa)
+	     shared_locations& m, PSECURITY_ATTRIBUTES psa, DWORD access)
 {
   void *shared;
 
   void *addr;
-  if (!wincap.needs_memory_protection () && offsets[0])
+  if ((m == SH_JUSTCREATE || m == SH_JUSTOPEN)
+      || !wincap.needs_memory_protection () && offsets[0])
     addr = NULL;
   else
-    {
-      addr = offsets[m];
-      (void) VirtualFree (addr, 0, MEM_RELEASE);
-    }
+    addr = offsets[m];
 
-  if (!size)
-    return addr;
-
-  if (!shared_h)
+  if (shared_h)
+    m = SH_JUSTOPEN;
+  else
     {
       char *mapname;
       char map_buf[CYG_MAX_PATH];
@@ -99,20 +96,32 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
 	mapname = NULL;
       else
 	mapname = shared_name (map_buf, name, n);
-      if (!(shared_h = CreateFileMapping (INVALID_HANDLE_VALUE, psa,
-					  PAGE_READWRITE, 0, size, mapname)))
+      if (m == SH_JUSTOPEN)
+	shared_h = OpenFileMapping (access, FALSE, mapname);
+      else
+	{
+	  shared_h = CreateFileMapping (INVALID_HANDLE_VALUE, psa, PAGE_READWRITE,
+					0, size, mapname);
+	  if (GetLastError () == ERROR_ALREADY_EXISTS)
+	    m = SH_JUSTOPEN;
+	}
+      if (shared_h)
+	/* ok! */;
+      else if (m != SH_JUSTOPEN)
 	api_fatal ("CreateFileMapping %s, %E.  Terminating.", mapname);
+      else
+	return NULL;
     }
 
   shared = (shared_info *)
-    MapViewOfFileEx (shared_h, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0, addr);
+    MapViewOfFileEx (shared_h, access, 0, 0, 0, addr);
 
-  if (!shared)
+  if (!shared && addr)
     {
       /* Probably win95, so try without specifying the address.  */
       shared = (shared_info *) MapViewOfFileEx (shared_h,
 				       FILE_MAP_READ|FILE_MAP_WRITE,
-				       0, 0, 0, 0);
+				       0, 0, 0, NULL);
 #ifdef DEBUGGING
       if (wincap.is_winnt ())
 	system_printf ("relocating shared object %s(%d) from %p to %p on Windows NT", name, n, addr, shared);
@@ -165,9 +174,10 @@ user_shared_initialize (bool reinit)
   if (!cygwin_user_h)
     cygheap->user.get_windows_id (name);
 
+  shared_locations sh_user_shared = SH_USER_SHARED;
   user_shared = (user_info *) open_shared (name, USER_VERSION,
 					    cygwin_user_h, sizeof (user_info),
-					    SH_USER_SHARED, &sec_none);
+					    sh_user_shared, &sec_none);
   debug_printf ("opening user shared for '%s' at %p", name, user_shared);
   ProtectHandleINH (cygwin_user_h);
   debug_printf ("user shared version %x", user_shared->version);
@@ -236,11 +246,12 @@ memory_init ()
     }
 
   /* Initialize general shared memory */
+  shared_locations sh_cygwin_shared = SH_CYGWIN_SHARED;
   cygwin_shared = (shared_info *) open_shared ("shared",
 					       CYGWIN_VERSION_SHARED_DATA,
 					       cygheap->shared_h,
 					       sizeof (*cygwin_shared),
-					       SH_CYGWIN_SHARED);
+					       sh_cygwin_shared);
 
   cygwin_shared->initialize ();
   ProtectHandleINH (cygheap->shared_h);

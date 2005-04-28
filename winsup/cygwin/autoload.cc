@@ -75,11 +75,15 @@ details. */
 
 /* Standard DLL load macro.  May invoke a fatal error if the function isn't
    found. */
-#define LoadDLLfunc(name, n, dllname) LoadDLLfuncEx (name, n, dllname, 0)
-#define LoadDLLfuncEx(name, n, dllname, notimp) LoadDLLfuncEx2(name, n, dllname, notimp, 0)
+#define LoadDLLfunc(name, n, dllname) \
+  LoadDLLfuncEx (name, n, dllname, 0)
+#define LoadDLLfuncEx(name, n, dllname, notimp) \
+  LoadDLLfuncEx2(name, n, dllname, notimp, 0)
+#define LoadDLLfuncEx2(name, n, dllname, notimp, err) \
+  LoadDLLfuncEx3(name, n, dllname, notimp, err, 0)
 
 /* Main DLL setup stuff. */
-#define LoadDLLfuncEx2(name, n, dllname, notimp, err) \
+#define LoadDLLfuncEx3(name, n, dllname, notimp, err, fn) \
   LoadDLLprime (dllname, dll_func_load)			\
   __asm__ ("						\n\
   .section	." #dllname "_text,\"wx\"		\n\
@@ -91,11 +95,11 @@ _win32_" mangle (name, n) ":				\n\
   .byte		0xe9					\n\
   .long		-4 + 1f - .				\n\
 1:movl		(2f),%eax				\n\
-  call		*(%eax)					\n\
+   call		*(%eax)					\n\
 2:.long		." #dllname "_info			\n\
-  .long		(" #n "+" #notimp ") | (((" #err ") & 0xffff) <<16)	\n\
-  .asciz	\"" #name "\"				\n\
-  .text							\n\
+   .long		(" #n "+" #notimp ") | (((" #err ") & 0xff) <<16) | (((" #fn ") & 0xff) << 24)	\n\
+   .asciz	\"" #name "\"				\n\
+   .text							\n\
 ");
 
 /* DLL loader helper functions used during initialization. */
