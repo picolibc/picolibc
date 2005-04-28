@@ -520,9 +520,7 @@ fhandler_base::open_9x (int flags, mode_t mode)
     {
       if (pc.isdir ())
 	{
-	  if (flags & (O_CREAT | O_EXCL) == (O_CREAT | O_EXCL))
-	    set_errno (EEXIST);
-	  else if (flags & (O_WRONLY | O_RDWR))
+	  if (flags & (O_WRONLY | O_RDWR))
 	    set_errno (EISDIR);
 	  else
 	    nohandle (true);

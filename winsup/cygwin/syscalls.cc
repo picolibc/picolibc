@@ -564,6 +564,12 @@ open (const char *unix_path, int flags, ...)
 	{
 	  if (!(fh = build_fh_name (unix_path, NULL, PC_SYM_FOLLOW)))
 	    res = -1;		// errno already set
+	  else if (((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL)) && fh->exists ())
+	    {
+	      delete fh;
+	      res = -1;
+	      set_errno (EEXIST);
+	    }
 	  else if (fh->is_fs_special () && fh->device_access_denied (flags))
 	    {
 	      delete fh;
