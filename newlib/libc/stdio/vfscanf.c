@@ -1050,7 +1050,8 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		case 'n':
 		case 'N':
 	          if (nancount == 0
-		      && (flags & (SIGNOK | NDIGITS | DPTOK | EXPOK)))
+		      && (flags & (SIGNOK | NDIGITS | DPTOK | EXPOK)) ==
+		      	          (SIGNOK | NDIGITS | DPTOK | EXPOK))
 		    {
 		      flags &= ~(SIGNOK | DPTOK | EXPOK | NDIGITS);
 		      nancount = 1;
