@@ -1,3 +1,7 @@
+2005-04-27  Paul Brook  <paul@codesourcery.com>
+
+	* sim/common/Make-common.in: Add $(EXEEXT) to "run".
+
 2005-04-25  Paul Brook  <paul@codesourcery.com>
 
 	* gdb/configure.tgt: Don't build rdi-share library.
