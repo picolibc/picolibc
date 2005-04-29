@@ -1,3 +1,23 @@
+2005-04-29  Zack Weinberg  <zack@codesourcery.com>
+
+	* gas/sb.c: Include as.h.
+	(sb_to_scrub, scrub_position, scrub_from_sb): New statics.
+	(sb_scrub_and_add_sb): New interface.
+	* gas/sb.h: Declare sb_scrub_and_add_sb.
+	* gas/input-scrub.c (input_scrub_include_sb): Use it.
+
+	* gas/config/tc-arm.c (do_t_arit3c): Correct typo in expression.
+	(do_t_mul): Allow dest to equal either source1 or source2 in
+	16-bit form; do not complain about dest == source1 in any
+	case.
+
+	* gas/testsuite/gas/arm/tcompat2.s: Test both dest==source1 and
+	dest==source2 for commutative arithmetic instructions.
+	* gas/testsuite/gas/arm/tcompat2.d: Update to match.
+	* gas/testsuite/gas/arm/t16-bad.l: Adjust expected diagnostic.
+	* gas/testsuite/gas/arm/macro1.s, gas/arm/macro1.d: New test pair.
+	* gas/testsuite/gas/arm/arm.exp: Run it.
+
 2005-04-25  Zack Weinberg  <zack@codesourcery.com>
 
 	Thumb32 assembler.
