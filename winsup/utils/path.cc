@@ -1,6 +1,6 @@
 /* path.cc
 
-   Copyright 2001 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2005 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -343,6 +343,10 @@ getmntent (FILE *)
     strcat (mnt.mnt_opts, (char *) ",cygexec");
   else if (m->flags & MOUNT_EXEC)
     strcat (mnt.mnt_opts, (char *) ",exec");
+  else if (m->flags & MOUNT_NOTEXEC)
+    strcat (mnt.mnt_opts, (char *) ",noexec");
+  if (m->flags & MOUNT_ENC)
+    strcat (mnt.mnt_opts, ",managed");
   if ((m->flags & MOUNT_CYGDRIVE))             /* cygdrive */
     strcat (mnt.mnt_opts, (char *) ",cygdrive");
   mnt.mnt_freq = 1;
