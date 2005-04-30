@@ -1,3 +1,34 @@
+2005-05-01  Zack Weinberg  <zack@codesourcery.com>
+
+	* gas/config/tc-arm.c (encode_thumb32_addr_mode): Set inst.reloc.pc_rel
+	if is_pc.
+	(T16_32_TAB): Delete unused entry for BLX.
+	(do_t_ldst): Don't offset inst.reloc.exp.X_add_number for PC-relative
+	addressing.
+	(md_pcrel_from): Report the adjusted PC for
+	BFD_RELOC_ARM_THUMB_OFFSET and BFD_RELOC_ARM_T32_OFFSET_IMM.
+	(md_apply_fix3): Correct bitmasks for BFD_RELOC_ARM_T32_OFFSET_IMM.
+	Do not round up value for PC-relative BFD_RELOC_ARM_THUMB_OFFSET.
+
+	* gas/testsuite/gas/arm/thumb.s: Test PC-relative ldr more thoroughly.
+	* gas/testsuite/gas/arm/thumb.d: Update to match.
+
+	* gas/testsuite/gas/arm/thumb32.s: Properly align labels that
+	will be targeted by blx instructions.
+	* gas/testsuite/gas/arm/thumb32.d: Update to match.  Correct
+	expected dissassembly of PC-relative ldr.
+
+	* gas/testsuite/gas/arm/macro1.s: Add leading label and
+	trailing padding for a.out compatibility.
+	* gas/testsuite/gas/arm/macro1.d: Update to match.
+	* gas/testsuite/gas/arm/tcompat2.s: Add trailing padding for a.out
+	compatibility.
+	* gas/testsuite/gas/arm/tcompat2.d: Update to match.
+
+	* opcodes/arm-dis.c (print_insn_thumb32): Reorganize %a and %A
+	handling.  Call info->print_address_func when %a/%A are applied 
+	to a PC-relative instruction.
+
 2005-04-29  Zack Weinberg  <zack@codesourcery.com>
 
 	* gas/sb.c: Include as.h.
