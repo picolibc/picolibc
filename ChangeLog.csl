@@ -1,5 +1,50 @@
 2005-05-01  Zack Weinberg  <zack@codesourcery.com>
 
+	* gas/config/tc-arm.c (thumb32_mode): Rename unified_syntax.
+	All uses changed to match.
+	(COND_ALWAYS): Don't offset.
+	(COND_MASK): Delete.
+	(struct arm_it): Add cond field.
+	(struct asm_opcode): Add tag field.  Change some fields to
+	unsigned int and/or to bitfields.
+	(my_get_expression): If unified_syntax, always treat the
+	prefix as optional.
+	(s_thumb32, s_thumb32_func): Delete.
+	(opcode_select, s_force_thumb): Don't set thumb32_mode.
+	(s_syntax): New function.
+	(md_pseudo_table): Update to match.
+	(do_blx, do_iwmmxt_wldstw): Look at inst.cond, not
+	inst.instruction, for the condition.  
+	(do_it): New function.
+	(do_t_branch): Get the condition from inst.cond and patch it
+	into the appropriate place.
+	(output_inst): If inst.size == 0, output nothing, but do issue
+	a diagnostic if any.
+	(enum opcode_tag): New set of constants.
+	(opcode_lookup): New function.
+	(md_assemble): Use opcode_lookup.  Restructure a little.
+	(conds, OPS0): Adjust comment.
+	(TxCE, TxCM, TUE, TUF): Rewrite.
+	(TCC): Delete.
+	(TxC3, TC3, tC3, TxCM_, C3, C3E): New notational macros.
+
+	(insns): Use TC3, tC3, or C3, as appropriate, for all
+	instructions where the conditional infix appears after the
+	third letter of the mnemonic.  Use TCE for 'b'.  Use C3E for
+	'cmfe' and 'cnfe'.  Change 'czbne' to 'cbnz', 'czbeq' to 'cbz'.
+	Use TUE, with a dummy ARM opcode, for all variants of 'it'.
+
+	* opcodes/arm-dis.c: Change 'czbne' to 'cbnz', 'czbeq' to 'cbz'.
+
+	* gas/testsuite/gas/arm/thumb.d: bal.n is no longer
+	distinguishable from b.n.
+	* gas/testsuite/gas/arm/thumb32.d: Likewise.  Change 'czbne'
+	to 'cbnz', 'czbeq' to 'cbz'.
+	* gas/testsuite/gas/arm/thumb32.s: Use .syntax unified.
+	Change 'czbne' to 'cbnz', 'czbeq' to 'cbz'.
+
+2005-05-01  Zack Weinberg  <zack@codesourcery.com>
+
 	* gas/config/tc-arm.c (encode_thumb32_addr_mode): Set inst.reloc.pc_rel
 	if is_pc.
 	(T16_32_TAB): Delete unused entry for BLX.
