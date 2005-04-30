@@ -84,7 +84,10 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
       || !wincap.needs_memory_protection () && offsets[0])
     addr = NULL;
   else
-    addr = offsets[m];
+    {
+      addr = offsets[m];
+      (void) VirtualFree (addr, 0, MEM_RELEASE);
+    }
 
   if (shared_h)
     m = SH_JUSTOPEN;

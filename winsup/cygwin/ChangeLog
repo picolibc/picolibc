@@ -1,5 +1,16 @@
 2005-04-30  Christopher Faylor  <cgf@timesys.com>
 
+	* environ.cc (spenv::force_into_environment): Rename from add_always.
+	(spenv::add_if_exists): Rename from force.
+	(build_env): Accommodate name changes.  Make sure that stuff that is
+	always supposed to be in the environment is actually added to the
+	environment.
+
+	* shared.cc (open_shared): Restore VirtualFree eliminated by 2005-04-28
+	change.
+
+2005-04-30  Christopher Faylor  <cgf@timesys.com>
+
 	* errno.cc (errmap): Sort table.
 
 2005-04-29  Christopher Faylor  <cgf@timesys.com>

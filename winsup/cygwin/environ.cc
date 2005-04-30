@@ -1,7 +1,7 @@
 /* environ.cc: Cygwin-adopted functions from newlib to manipulate
    process's environment.
 
-   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005 Red Hat, Inc.
+   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -854,8 +854,8 @@ struct spenv
 {
   const char *name;
   size_t namelen;
-  bool add_always;	/* If true, always add to env if missing */
-  bool force;	/* if true, retrieve value from cache */
+  bool force_into_environmentironment;	/* If true, always add to env if missing */
+  bool add_if_exists;		/* if true, retrieve value from cache */
   const char * (cygheap_user::*from_cygheap) (const char *, size_t);
 
   char *retrieve (bool, const char * const = NULL)
@@ -953,7 +953,7 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 	    saw_spenv[i] = 1;
 	    if (*dstp == env_dontadd)
 	      goto next1;
-	    if (spenvs[i].force)
+	    if (spenvs[i].add_if_exists)
 	      calc_tl = true;
 	    goto  next0;
 	  }
@@ -975,10 +975,10 @@ build_env (const char * const *envp, char *&envblock, int &envc,
   assert ((srcp - envp) == n);
   /* Fill in any required-but-missing environment variables. */
   for (unsigned i = 0; i < SPENVS_SIZE; i++)
-    if (!saw_spenv[i] && (spenvs[i].add_always || cygheap->user.issetuid ()))
+    if (!saw_spenv[i] && (spenvs[i].force_into_environmentironment || cygheap->user.issetuid ()))
       {
-	  *dstp = spenvs[i].retrieve (no_envblock);
-	  if (*dstp && (!no_envblock || spenvs[i].force) && *dstp != env_dontadd)
+	  *dstp = spenvs[i].retrieve (false);
+	  if (*dstp && *dstp != env_dontadd)
 	    {
 	      *pass_dstp++ = *dstp;
 	      tl += strlen (*dstp) + 1;
