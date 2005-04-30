@@ -1,3 +1,7 @@
+2005-04-29  Christopher Faylor  <cgf@timesys.com>
+
+	* errno.cc (errmap): Map ERROR_NETNAME_DELETED to ENOSHARE.
+
 2005-04-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* shared_info.h (cygwin_shared_address): Bump to a higher value to avoid
