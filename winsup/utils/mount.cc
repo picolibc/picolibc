@@ -163,7 +163,7 @@ Display information about mounted filesystems, or mount a filesystem\n\
   -f, --force                   force mount, don't warn about missing mount\n\
 				point directories\n\
   -h, --help                    output usage information and exit\n\
-  -m, --mount-commands          write mount commands to replace user and\n\
+  -m, --mount-commands          write mount commands to replicate user and\n\
 				system mount points and cygdrive prefixes\n\
   -o, --options X[,X...]	specify mount options\n\
   -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix\n\

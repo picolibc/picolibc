@@ -574,7 +574,7 @@ Display information about mounted filesystems, or mount a filesystem
   -f, --force                   force mount, don't warn about missing mount
                                 point directories
   -h, --help                    output usage information and exit
-  -m, --mount-commands          write mount commands to replace user and
+  -m, --mount-commands          write mount commands to replicate user and
                                 system mount points and cygdrive prefixes
   -o, --options X[,X...]        specify mount options
   -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix
