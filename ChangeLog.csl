@@ -1,3 +1,9 @@
+2005-05-01  Paul Brook  <paul@codesourcery.com>
+
+	* bfd/elf32-arm.c (bfd_elf32_arm_process_before_allocation): Treat
+	R_ARM_PLT32 the same as R_ARM_PC24.
+	(arm_add_to_rel): Ditto.
+
 2005-05-01  Zack Weinberg  <zack@codesourcery.com>
 
 	* gas/config/tc-arm.c (thumb32_mode): Rename unified_syntax.
