@@ -134,7 +134,7 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
 		    && (sock = cygheap->fdtab[fds[i].fd]->is_socket ())
 		    && sock->connect_state () == connect_failed)
 		  fds[i].revents |= (POLLIN | POLLERR);
-		else 
+		else
 		  {
 		    if (FD_ISSET(fds[i].fd, write_fds))
 		      fds[i].revents |= POLLOUT;

@@ -118,11 +118,11 @@ fhandler_process::exists ()
     {
       fileid = PROCESS_FD;
       if (fill_filebuf ())
-        return -2;
+	return -2;
       /* Check for nameless device entries. */
       path = strrchr (path, '/');
       if (path && *++path)
-        {
+	{
 	  if (!strncmp (path, "pipe:[", 6))
 	    return -3;
 	  else if (!strncmp (path, "socket:[", 8))
@@ -211,7 +211,7 @@ fhandler_process::readdir (DIR * dir)
   if (fileid == PROCESS_FD)
     {
       if (dir->__d_position >= 2 + filesize / sizeof (int))
-        return NULL;
+	return NULL;
     }
   else if (dir->__d_position >= PROCESS_LINK_COUNT)
     return NULL;
@@ -414,7 +414,7 @@ fhandler_process::fill_filebuf ()
     case PROCESS_CWD:
     case PROCESS_CMDLINE:
       {
-        if (filebuf)
+	if (filebuf)
 	  free (filebuf);
 	size_t fs;
 	switch (fileid)

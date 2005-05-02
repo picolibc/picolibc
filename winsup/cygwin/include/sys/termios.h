@@ -15,7 +15,7 @@ details. */
 
 #define	TIOCMGET	0x5415
 #define	TIOCMSET	0x5418
-#define	TIOCINQ		0x541B	
+#define	TIOCINQ		0x541B
 
 /* TIOCINQ is utilized instead of FIONREAD which has been
 accupied for other purposes under CYGWIN.

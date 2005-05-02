@@ -22,7 +22,7 @@ Mon Dec 23 13:35:27 1996  Jeremy Allison <jra@cygnus.com>
 	* winsup.h: Decremented internal_reserved array by one to add
 	hmodule in u area. Added prototype for recreate_mmaps_after_fork().
 	* include/sys/mman.h: Fixed include file for mmap calls.
-	
+
 Tue Dec 17 16:20:52 1996  Geoffrey Noer  <noer@cygnus.com>
 
 	* syscalls.cc (_rename): fix code so we really do
@@ -54,14 +54,14 @@ Fri Dec 13 16:18:22 1996  Jeremy Allison <jra@cygnus.com>
 
 Fri Dec 13 10:56:21 1996  Jeremy Allison <jra@cygnus.com>
 
-        * cygwin.din: Added h_errno, seteuid, _seteuid.
-        * exceptions.cc: Made init_exceptions extern "C".
-        * exceptions.h: Added cplusplus wrappers to enable this to
-        be used from C.
-        * net.cc: Added error numbers, fixed gethostbyaddr, added h_errno
-        fixes.
-        * stubs.cc: Added seteuid.
-        * include/mywinsock.h: Added HOST error entries for DNS lookups.
+	* cygwin.din: Added h_errno, seteuid, _seteuid.
+	* exceptions.cc: Made init_exceptions extern "C".
+	* exceptions.h: Added cplusplus wrappers to enable this to
+	be used from C.
+	* net.cc: Added error numbers, fixed gethostbyaddr, added h_errno
+	fixes.
+	* stubs.cc: Added seteuid.
+	* include/mywinsock.h: Added HOST error entries for DNS lookups.
 
 Tue Dec 10 15:38:46 1996  Geoffrey Noer  <noer@cygnus.com>
 
@@ -75,7 +75,7 @@ Tue Dec 10 15:38:46 1996  Geoffrey Noer  <noer@cygnus.com>
 
 Thu Dec  5 14:03:08 1996  Geoffrey Noer  <noer@cygnus.com>
 
-        * select.cc: add missing end comment at about line 933.
+	* select.cc: add missing end comment at about line 933.
 	gnu-win32 beta 17 release made
 
 Wed Dec  4 15:53:11 1996  Geoffrey Noer  <noer@cygnus.com>
@@ -293,19 +293,19 @@ Wed Oct 30 16:35:41 1996 Jeremy Allison <jra@cygnus.com>
 
 Wed Oct 30 13:05:33 1996  Geoffrey Noer  <noer@cygnus.com>
 
-        * include/custcntl.h
-        * include/features.h
-        * include/icmp.h
-        * include/wchar.h
-        * include/cygwin32/icmp.h
-        * include/cygwin32/ip.h
-        * include/cygwin32/sockios.h
-        * include/cygwin32/types.h
-        * include/cygwin32/uio.h
-        * include/sys/ttychars.h
-        Added comment with name of header to each so that these are no
-        longer empty files (some unzip programs won't create
-        zero-length files which is a problem for headers)
+	* include/custcntl.h
+	* include/features.h
+	* include/icmp.h
+	* include/wchar.h
+	* include/cygwin32/icmp.h
+	* include/cygwin32/ip.h
+	* include/cygwin32/sockios.h
+	* include/cygwin32/types.h
+	* include/cygwin32/uio.h
+	* include/sys/ttychars.h
+	Added comment with name of header to each so that these are no
+	longer empty files (some unzip programs won't create
+	zero-length files which is a problem for headers)
 
 Sun Oct 27 17:30:03 1996  Geoffrey Noer  <noer@cygnus.com>
 
@@ -407,11 +407,11 @@ Mon Oct 21 09:48:00 1996  Jeremy Allison <jra@cygnus.com>
 
 	* select.cc: Re-written from scratch. Take account of
 	the following cases. (1). All sockets [written&works]
-        (2). Handles, sockets and always readies [written,not tested]
-        (3). All handles [written,not tested]. (4). Handles & sockets
-        with timeout [not yet written,returns -1]. Correctly blocks
+	(2). Handles, sockets and always readies [written,not tested]
+	(3). All handles [written,not tested]. (4). Handles & sockets
+	with timeout [not yet written,returns -1]. Correctly blocks
 	and doesn't spin cpu.
-        * pinfo.cc: Changed to add global lock around pinfo array.
+	* pinfo.cc: Changed to add global lock around pinfo array.
 	* fork.cc: Changed to use global pinfo lock.
 	* shared.cc: Fixed bug with fork()->exec()->exec() code.
 	* net.cc: Removed select_init() call (no longer used).
@@ -478,19 +478,19 @@ Wed Oct 16 17:16:33 1996  Geoffrey Noer  <noer@cygnus.com>
 Tue Oct 15 09:51:48 1996  Jeremy Allison <jra@cygnus.com>
 
 	* fhandler.h: Many changes to support moving fhandler array out of
-        shared area into locally allocated memory. Removed fhandler class,
-        fhandler_base is now root of class tree. Re-arranged class definitions
-        to make it clear what functions are virtual and can be overridden.
+	shared area into locally allocated memory. Removed fhandler class,
+	fhandler_base is now root of class tree. Re-arranged class definitions
+	to make it clear what functions are virtual and can be overridden.
 	Inlined may accessor functions.
-        * fhandler.cc: Many changes to support moving fhandler array out of
-        shared area into locally allocated memory. unix_path_name_ is now
+	* fhandler.cc: Many changes to support moving fhandler array out of
+	shared area into locally allocated memory. unix_path_name_ is now
 	always set (all fhandler_base classes have a name).
 	* hinfo.cc: Many changes to support moving fhandler array out of
-        shared area into locally allocated memory. Added linearization and
+	shared area into locally allocated memory. Added linearization and
 	de-linearization functions.
 	* net.cc(socket): Added code to keep name for fhandler_socket.
 	* pinfo.cc : Changed allocation of fhandler_base array to be in local
-        memory rather than in shared area. (modified functions are pinfo_init,
+	memory rather than in shared area. (modified functions are pinfo_init,
 	pinfo_list::get_empty_pinfo, pinfo_list::allocate_pid,
 	pinfo::record_death).
 	* shared.cc: Added functions to copy fd area for spawned process.
@@ -511,13 +511,13 @@ Tue Oct 15 09:51:48 1996  Jeremy Allison <jra@cygnus.com>
 
 Mon Oct 14 14:59:16 1996  Geoffrey Noer  <noer@cygnus.com>
 
-        * sysdef/i386: replace all files with ones from Scott
+	* sysdef/i386: replace all files with ones from Scott
 	Christley's windows32api-0.1.2 package.  Still need to
 	integrate new headers.
 
 Mon Oct 14 13:41:14 1996  Geoffrey Noer  <noer@cygnus.com>
 
-        * syscalls.cc (_unlink): need to fchmod file to writable
+	* syscalls.cc (_unlink): need to fchmod file to writable
 	before attempting to delete.  This change still needs more
 	work (fchmod isn't written yet).
 	* (fchmod): change comment
@@ -567,7 +567,7 @@ Thu Oct  3 16:19:23 1996  Jeremy Allison <jra@cygnus.com>
 	and understanding which variables are class variables much simpler.
 	Changed name member to unix_path_name_ and made dynamic rather
 	than a fixed 31 byte buffer per entry.
-        * fhandler.cc: Updated varable access for above.
+	* fhandler.cc: Updated varable access for above.
 	* fcntl.cc: Updated varable access for above.
 	* hinfo.cc: Updated varable access for above.
 	* spawn.cc: Updated varable access for above.
@@ -780,7 +780,7 @@ Thu Aug 22 17:04:09 1996  Geoffrey Noer  <noer@cygnus.com>
 	* libcfork.cc: deleted
 	* fork.cc (vfork): used to be in libcfork.cc
 	* (__fork): used to be in libcfork.cc
-	* (fork): used to be in libcfork.cc	
+	* (fork): used to be in libcfork.cc
 	* Makefile.in: don't build libcfork.cc any more
 	* libccrt0.cc: set data_start, etc. from dll structure
 	* winsup.h: add data_start, etc. to public vars in dll
@@ -793,10 +793,10 @@ Thu Aug 22 01:36:53 1996  Geoffrey Noer  <noer@cygnus.com>
 
 Wed Aug 21 16:15:47 1996  Geoffrey Noer  <noer@cygnus.com>
 
-        * cygwin.din: list vfork
-        * dirsearch.cc: fix errno setting in readdir that caused
-        diff to not function on directories
-        * pipe.cc: reformatted
+	* cygwin.din: list vfork
+	* dirsearch.cc: fix errno setting in readdir that caused
+	diff to not function on directories
+	* pipe.cc: reformatted
 
 Wed Aug 21 15:12:47 1996  Jeremy Allison <jra@cygnus.com>
 
@@ -825,7 +825,7 @@ Mon Aug 19 09:22:35 1996  Doug Evans  <dje@canuck.cygnus.com>
 	(dll_crt0_1): Probe forked child's stack out.
 
 	* fork.cc (FORK_WAIT_TIMEOUT): Bump up to two minutes.
-	
+
 	* fork.cc (dump_jmp_buf): New function.
 	(cygwin_fork_helper1): Call it.
 	* dcrt0.cc (dll_crt0:1): Call it.
@@ -870,8 +870,8 @@ Sat Aug 10 16:30:14 1996  Geoffrey Noer  <noer@cygnus.com>
 
 Fri Aug  9 18:19:12 1996  Geoffrey Noer  <noer@cygnus.com>
 
-        * syscalls.cc (_rename): return -1 if file to be renamed
-        doesn't exist.  Reformatted whole file.
+	* syscalls.cc (_rename): return -1 if file to be renamed
+	doesn't exist.  Reformatted whole file.
 	* fork.cc: increase timeout value to 60 sec from 30 sec
 
 Thu Aug  8 17:44:39 1996  Jim Wilson  <wilson@cygnus.com>
@@ -1141,7 +1141,7 @@ Wed Jul  3 12:30:24 1996  Doug Evans  <dje@canuck.cygnus.com>
 	(system_printf): New function.
 	* pproc.cc (per_process::init): Delete call to strace_init.
 	* dcrt0 (dll_crt0_1): Call strace_init as soon as possible.
-	
+
 	* dcrt0 (dll_crt0_1): Delete local can_glob, use
 	u->self->invoked_by_cygwin_p instead.
 	Move PID environment variable handling into pinfo_init_per_process.
@@ -1621,7 +1621,7 @@ Tue May 14 14:59:32 1996  Doug Evans  <dje@canuck.cygnus.com>
 	* smallprintf.c (__small_vsprintf): Support %p.
 	* syscalls.cc (getppid): Update.
 	* wait.cc (wait_for_any): Likewise.
-	
+
 Mon May 13 13:45:36 1996  Mark Eichin  <eichin@cygnus.com>
 
 	* fhandler.cc (ioctl): fix TIOCGWINSZ handling: (1) check the
@@ -1639,16 +1639,16 @@ Mon May 13 13:45:36 1996  Mark Eichin  <eichin@cygnus.com>
 Fri May 10 17:59:09 1996  Mark Eichin  <eichin@cygnus.com>
 
 	* select.cc: change most debugging statements to select_printf.
- 	(dbg_input_event): new function, prints an INPUT_RECORD via select
- 	printf.
+	(dbg_input_event): new function, prints an INPUT_RECORD via select
+	printf.
 	(polled): Don't sleep around WaitForMultipleObjects; let it have a
- 	10ms timeout until we have time to test it with 0.  If
- 	WaitForMultipleObjects says that STD_INPUT_HANDLE has data, use
- 	PeekConsoleInput to scan the available events. If the first one is
- 	not a *bKeyDown* with a non-zero *AsciiChar* then use
- 	ReadConsoleInput to rip it off the queue, and pretend it wasn't
- 	there, so that later calls to read (and thus ReadFile) don't block
- 	because they can't find any *real* input. (This could be optimized
+	10ms timeout until we have time to test it with 0.  If
+	WaitForMultipleObjects says that STD_INPUT_HANDLE has data, use
+	PeekConsoleInput to scan the available events. If the first one is
+	not a *bKeyDown* with a non-zero *AsciiChar* then use
+	ReadConsoleInput to rip it off the queue, and pretend it wasn't
+	there, so that later calls to read (and thus ReadFile) don't block
+	because they can't find any *real* input. (This could be optimized
 	later to check the whole queue, and if there are *no* real input
 	events, nuke them all.)
 
@@ -1656,11 +1656,11 @@ Fri May 10 17:59:09 1996  Mark Eichin  <eichin@cygnus.com>
 	category, because select needs a *lot* of work. STRACE=256 to use it.
 
 	* fhandler.cc (fhandler_console_in::init): IGNCR can't work
- 	without major changes to deal with the interaction with select
- 	(which shouldn't wake up if IGNCR causes the whole input to be
- 	deleted...) so don't make it the default.
+	without major changes to deal with the interaction with select
+	(which shouldn't wake up if IGNCR causes the whole input to be
+	deleted...) so don't make it the default.
 	(fhandler_console_out::tcgetattr, fhandler_tty::tcgetattr): don't
- 	set IGNCR based on get_r_binary either.
+	set IGNCR based on get_r_binary either.
 
 Wed May  8 20:20:05 1996  Mark Eichin  <eichin@cygnus.com>
 
@@ -1710,7 +1710,7 @@ Sun May  5 00:45:59 1996  Mark Eichin  <eichin@cygnus.com>
 
 Wed Apr 24 23:42:49 1996  Steve Chamberlain  <sac@dilithium.transmeta.com>
 
-	* winsup.h (pinfo, pinfo_list): Remove dummy item.	
+	* winsup.h (pinfo, pinfo_list): Remove dummy item.
 	* fork.cc (*): Revert changes of Apr 2.
 
 Sun Apr 21 17:00:14 1996  Steve Chamberlain  <sac@slash.cygnus.com>
@@ -1736,7 +1736,7 @@ Wed Apr 10 16:13:30 1996  steve chamberlain  <sac@slash.cygnus.com>
 	* Makefile.in (glob/libglob.a): Call glob makefile correctly.
 	* winsup.h (pinfo, pinfo_list): Reorder elements to avoid
 	alignment bug in PPC gcc.
-	
+
 Tue Apr  9 17:23:57 1996  steve chamberlain  <sac@slash.cygnus.com>
 
 	* dcrt0.cc (globify): Expand command line wildcards if
@@ -1779,7 +1779,7 @@ Fri Mar 29 16:35:02 1996  steve chamberlain  <sac@slash.cygnus.com>
 	* pinfo.cc (pinfo::clearout): Zero split_heap_p.
 	* syscalls.cc (_sbrk): Cope with not being able to
 	allocate contiguous chunks.
-	
+
 
 Tue Mar 26 09:14:32 1996  steve chamberlain  <sac@slash.cygnus.com>
 
@@ -1854,7 +1854,7 @@ Tue Feb 20 16:53:24 1996  Steve Chamberlain  <sac@slash.cygnus.com>
 	path.cc (path_conv::path_conv): Initialize mixed, binary and silent.
 	* smallprint.c (__small_vsprintf): Add 'c' option.
 	* wait.cc (wait_found): Close child handles.
-	
+
 Mon Feb 19 09:11:57 1996  Michael Meissner  <meissner@tiktok.cygnus.com>
 
 	* Makefile.in (real-headers): Eliminate real-headers dependency on
@@ -1912,7 +1912,7 @@ Wed Feb  7 16:41:18 1996  Steve Chamberlain  <sac@slash.cygnus.com>
 	(chown): Returns 0.
 	(sbrk): Clean up.
 	(_unlink): Only try and DeleteFile once.
-	
+
 Mon Feb  5 19:15:44 1996  Steve Chamberlain  <sac@slash.cygnus.com>
 
 	* dcrt0.cc  (dll_crt0_1): Build env string into static buffer.
@@ -1947,7 +1947,7 @@ Fri Jan 26 15:47:31 1996  Steve Chamberlain  <sac@slash.cygnus.com>
 	* Makefile.in, configure.in: Cope with config directory.
 	* setjmp.c, longjmp.c: Moved into config/i386.
 	* config/ppc/setjmp.S, config/ppc/longjmp.S: New.
-	
+
 Fri Jan 26 14:57:33 1996  Jason Molenda  (crash@phydeaux.cygnus.com)
 
 	* Makefile.in (DLL_OFILES): removed ppc-stub.o
@@ -1985,7 +1985,7 @@ Mon Jan 22 10:33:53 1996  Steve Chamberlain  <sac@slash.cygnus.com>
 	* shared.cc (shared_info::initialize): Initialize heap chunk.
 	* syscalls.cc (_sbrk): If current chunk is used, allocate another.
 	* wait.cc (wait_found): Fix exit code.
-	
+
 Thu Jan 18 10:09:45 1996  Steve Chamberlain  <sac@slash.cygnus.com>
 
 	* fhandler.cc (fhandler_normal::open) Don't test a
@@ -2026,6 +2026,6 @@ Tue Jan  2 08:58:58 1996  steve chamberlain  <sac@slash.cygnus.com>
 	* spawn.cc: Lint.  Removed vfork stuff.
 	* stubs.c (getmntent, endgrent): Deleted.
 	* syscalls.c (__seterrno): Now takes arguments.
-	* termios.c: Much moved info fhandler.c	
+	* termios.c: Much moved info fhandler.c
 	* times.cc (utime, utimes): New.
 	* uinfo.c (cuserid): New.

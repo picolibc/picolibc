@@ -15,10 +15,10 @@ extern "C" {
 #include <_ansi.h>
 #include <sys/types.h>
 
-struct utimbuf 
+struct utimbuf
 {
   time_t actime;
-  time_t modtime; 
+  time_t modtime;
 };
 
 int _EXFUN(utime, (const char *__path, const struct utimbuf *__buf));

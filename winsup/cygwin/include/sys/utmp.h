@@ -22,16 +22,16 @@ extern "C" {
 #endif
 
 
-struct utmp 
+struct utmp
 {
- short	ut_type;	
- pid_t	ut_pid;		
+ short	ut_type;
+ pid_t	ut_pid;
  char	ut_line[UT_LINESIZE];
  char  ut_id[UT_IDLEN];
- time_t ut_time;	
- char	ut_user[UT_NAMESIZE];	
- char	ut_host[UT_HOSTSIZE];	
- long	ut_addr;	
+ time_t ut_time;
+ char	ut_user[UT_NAMESIZE];
+ char	ut_host[UT_HOSTSIZE];
+ long	ut_addr;
 };
 
 extern struct utmp *_getutline (struct utmp *);

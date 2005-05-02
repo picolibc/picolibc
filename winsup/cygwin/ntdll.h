@@ -382,9 +382,9 @@ typedef struct _FILE_ACCESS_INFORMATION {
   ACCESS_MASK AccessFlags;
 } FILE_ACCESS_INFORMATION, *PFILE_ACCESS_INFORMATION;
 
-typedef struct _FILE_POSITION_INFORMATION {                 
-  LARGE_INTEGER CurrentByteOffset;                        
-} FILE_POSITION_INFORMATION, *PFILE_POSITION_INFORMATION;   
+typedef struct _FILE_POSITION_INFORMATION {
+  LARGE_INTEGER CurrentByteOffset;
+} FILE_POSITION_INFORMATION, *PFILE_POSITION_INFORMATION;
 
 typedef struct _FILE_MODE_INFORMATION {
   ULONG Mode;
@@ -394,10 +394,10 @@ typedef struct _FILE_ALIGNMENT_INFORMATION {
   ULONG AlignmentRequirement;
 } FILE_ALIGNMENT_INFORMATION;
 
-typedef struct _FILE_NAME_INFORMATION {                     
-  ULONG FileNameLength;                                   
-  WCHAR FileName[1];                                      
-} FILE_NAME_INFORMATION, *PFILE_NAME_INFORMATION;           
+typedef struct _FILE_NAME_INFORMATION {
+  ULONG FileNameLength;
+  WCHAR FileName[1];
+} FILE_NAME_INFORMATION, *PFILE_NAME_INFORMATION;
 
 typedef struct _FILE_ALL_INFORMATION {
   FILE_BASIC_INFORMATION     BasicInformation;

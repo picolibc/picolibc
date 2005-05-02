@@ -768,7 +768,7 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval, int *optlen)
 	name = "SO_ERROR";
 	break;
       case SO_PEERCRED:
-        name = "SO_PEERCRED";
+	name = "SO_PEERCRED";
     }
 
   if ((optval

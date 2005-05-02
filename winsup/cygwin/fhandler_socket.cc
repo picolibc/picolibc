@@ -104,8 +104,8 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 	  *outlen = sizeof sin;
 	  if (type)
 	    *type = (ctype == 's' ? SOCK_STREAM :
-	             ctype == 'd' ? SOCK_DGRAM
-		                  : 0);
+		     ctype == 'd' ? SOCK_DGRAM
+				  : 0);
 	  ret = 1;
 	}
       CloseHandle (fh);
@@ -217,7 +217,7 @@ fhandler_socket::af_local_recv_secret (void)
       debug_printf ("Received af_local secret: %08x-%08x-%08x-%08x",
 		    out[0], out[1], out[2], out[3]);
       if (out[0] != connect_secret[0] || out[1] != connect_secret[1]
-          || out[2] != connect_secret[2] || out[3] != connect_secret[3])
+	  || out[2] != connect_secret[2] || out[3] != connect_secret[3])
 	{
 	  debug_printf ("Receiving af_local secret mismatch");
 	  return false;
@@ -463,7 +463,7 @@ fhandler_socket::dup (fhandler_base *child)
     {
       fhs->set_sun_path (get_sun_path ());
       if (get_socket_type () == SOCK_STREAM)
-        {
+	{
 	  fhs->sec_pid = sec_pid;
 	  fhs->sec_uid = sec_uid;
 	  fhs->sec_gid = sec_gid;
@@ -524,7 +524,7 @@ fhandler_socket::fstat (struct __stat64 *buf)
     {
       res = fhandler_base::fstat_fs (buf);
       if (!res)
-        {
+	{
 	  buf->st_mode = (buf->st_mode & ~S_IFMT) | S_IFSOCK;
 	}
     }
@@ -800,7 +800,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 	    {
 	      sock->set_sun_path (get_sun_path ());
 	      if (get_socket_type () == SOCK_STREAM)
-	        {
+		{
 		  /* Don't forget to copy credentials from accepting
 		     socket to accepted socket and start transaction
 		     on accepted socket! */
@@ -812,7 +812,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 		      set_winsock_errno ();
 		      goto out;
 		    }
-	        }
+		}
 	    }
 	  sock->connect_state (connected);
 	  res = res_fd;
@@ -1652,7 +1652,7 @@ fhandler_socket::getpeereid (pid_t *pid, __uid32_t *euid, __gid32_t *egid)
   if (sec_peer_pid == (pid_t) 0)
     {
       set_errno (ENOTCONN);	/* Usually when calling getpeereid on
-      				   accepting (instead of accepted) socket. */
+				   accepting (instead of accepted) socket. */
       return -1;
     }
 

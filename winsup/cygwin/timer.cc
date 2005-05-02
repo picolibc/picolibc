@@ -66,7 +66,7 @@ timer_tracker::cancel ()
 {
   if (!hcancel)
     return false;
-    
+
   SetEvent (hcancel);
   if (WaitForSingleObject (syncthread, INFINITE) != WAIT_OBJECT_0)
     api_fatal ("WFSO failed waiting for timer thread, %E");
@@ -128,7 +128,7 @@ timer_thread (VOID *x)
       long long sleep_us;
       long sleep_ms;
       /* Account for delays in starting thread
-        and sending the signal */
+	and sending the signal */
       now = gtod.usecs (false);
       sleep_us = sleepto_us - now;
       if (sleep_us > 0)

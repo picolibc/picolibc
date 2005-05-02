@@ -54,7 +54,7 @@ struct semctl_args {
 };
 
 struct semget_args {
-  key_t   key; 
+  key_t   key;
   int     nsems;
   int     semflg;
 };
@@ -63,7 +63,7 @@ struct semop_args {
   int     semid;
   struct  sembuf *sops;
   size_t  nsops;
-};              
+};
 
 struct shmat_args {
   int     shmid;

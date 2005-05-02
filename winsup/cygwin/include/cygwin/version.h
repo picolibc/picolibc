@@ -235,14 +235,14 @@ details. */
       108: Remove unused (hopefully) reent_data export.
       109: Oh well.  Someone uses reent_data.
       110: Export clock_gettime, sigwaitinfo, timer_create, timer_delete,
-           timer_settime
+	   timer_settime
       111: Export sigqueue, sighold.
       112: Redefine some mtget fields.
       113: Again redefine some mtget fields.  Use mt_fileno and mt_blkno as
-           on Linux.
+	   on Linux.
       114: Export rand_r, ttyname_r.
       115: Export flockfile, ftrylockfile, funlockfile, getgrgid_r, getgrnam_r,
-           getlogin_r.
+	   getlogin_r.
       116: Export atoll.
       117: Export utmpx functions, Return utmp * from pututent.
       118: Export getpriority, setpriority.

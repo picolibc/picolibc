@@ -1,7 +1,7 @@
 /* Initial implementation:
    Copyright (c) 2002 Robert Drehmel
    All rights reserved.
-  
+
    As long as the above copyright statement and this notice remain
    unchanged, you can do what ever you want with this file.  */
 

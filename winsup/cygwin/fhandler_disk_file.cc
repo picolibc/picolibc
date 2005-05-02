@@ -120,7 +120,7 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 	  debug_printf ("%u = NtQueryVolumeInformationFile)",
 			RtlNtStatusToDosError (status));
 	  pfvi->VolumeSerialNumber = 0; /* Set to pc.volser () in helper. */
-        }
+	}
       status = NtQueryInformationFile (get_handle (), &io, pfai, fai_size,
 				       FileAllInformation);
       if (NT_SUCCESS (status))
@@ -760,7 +760,7 @@ fhandler_disk_file::link (const char *newpath)
       context = NULL;
       write_err = 0;
       /* Write WIN32_STREAM_ID */
-      ret = BackupWrite (get_handle (), (LPBYTE) &stream_id, size,	
+      ret = BackupWrite (get_handle (), (LPBYTE) &stream_id, size,
 			 &written, FALSE, FALSE, &context);
       if (ret)
 	{

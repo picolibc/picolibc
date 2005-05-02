@@ -120,17 +120,17 @@ dlsym (void *handle, const char *name)
       HMODULE *modules;
       DWORD needed, i;
       if (!EnumProcessModules (cur_proc, NULL, 0, &needed))
-        {
-        dlsym_fail:
-          set_dl_error ("dlsym");
-          return NULL;
-        }
+	{
+	dlsym_fail:
+	  set_dl_error ("dlsym");
+	  return NULL;
+	}
       modules = (HMODULE*) alloca (needed);
       if (!EnumProcessModules (cur_proc, modules, needed, &needed))
-        goto dlsym_fail;
+	goto dlsym_fail;
       for (i = 0; i < needed / sizeof (HMODULE); i++)
-        if ((ret = (void *) GetProcAddress (modules[i], name)))
-          break;
+	if ((ret = (void *) GetProcAddress (modules[i], name)))
+	  break;
     }
   else
     ret = (void *) GetProcAddress ((HMODULE)handle, name);

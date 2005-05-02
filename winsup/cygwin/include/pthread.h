@@ -117,8 +117,8 @@ void _pthread_cleanup_push (__pthread_cleanup_handler *handler);
 void _pthread_cleanup_pop (int execute);
 
 #define pthread_cleanup_push(_fn, _arg) { __pthread_cleanup_handler __cleanup_handler = \
-                                         { _fn, _arg, NULL }; \
-                                         _pthread_cleanup_push( &__cleanup_handler );
+					 { _fn, _arg, NULL }; \
+					 _pthread_cleanup_push( &__cleanup_handler );
 #define pthread_cleanup_pop(_execute) _pthread_cleanup_pop( _execute ); }
 
 /* Condition variables */
@@ -174,7 +174,7 @@ int pthread_rwlock_trywrlock (pthread_rwlock_t *rwlock);
 int pthread_rwlock_unlock (pthread_rwlock_t *rwlock);
 int pthread_rwlockattr_init (pthread_rwlockattr_t *rwlockattr);
 int pthread_rwlockattr_getpshared (const pthread_rwlockattr_t *attr,
-                                   int *pshared);
+				   int *pshared);
 int pthread_rwlockattr_setpshared (pthread_rwlockattr_t *attr, int pshared);
 int pthread_rwlockattr_destroy (pthread_rwlockattr_t *rwlockattr);
 

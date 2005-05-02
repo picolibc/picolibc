@@ -360,7 +360,7 @@ void set_cygwin_privileges (HANDLE token);
 #define pop_thread_privilege() \
     if (_dup_token) \
       { \
-        ImpersonateLoggedOnUser (_token); \
+	ImpersonateLoggedOnUser (_token); \
 	CloseHandle (_dup_token); \
       } \
   }

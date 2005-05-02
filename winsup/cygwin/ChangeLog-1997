@@ -418,7 +418,7 @@ Sun Nov 16 15:54:27 1997  Geoffrey Noer  <noer@rtl.cygnus.com>
 	appear to be active.  This will clear out pids that have died
 	abnormally.  'ps -f' bypasses this.
 	* winsup.h (class pinfo): Add dwSpawnedProcessId field.
-	
+
 Sun Nov 16 15:54:27 1997  Geoffrey Noer  <noer@rtl.cygnus.com>
 
 	patch from sos@prospect.com.ru (Sergey Okhapkin):
@@ -1298,7 +1298,7 @@ Mon Sep  8 20:19:09 1997  Geoffrey Noer  <noer@cygnus.com>
 
 Mon Sep  8 17:40:46 1997  Geoffrey Noer  <noer@cygnus.com>
 
-	patch from sos@prospect.com.ru (Sergey Okhapkin):	
+	patch from sos@prospect.com.ru (Sergey Okhapkin):
 	* dcrt0.cc (_exit): Kill the foreground process group on session
 	leader exit only if job control is in progress.
 	* exceptions.cc (ctrl_c_handler): protect the code with critical
@@ -1572,7 +1572,7 @@ Thu Jul 24 02:14:24 1997  Geoffrey Noer  <noer@cygnus.com>
 	a child is stopped.
 	(wait4): wait calls should wait childs only; fixed a bug with
 	nprocinfo count; fixed signal handling.
-	
+
 Thu Jul 24 02:10:25 1997  Geoffrey Noer  <noer@cygnus.com>
 
 	* uname.cc: uname now outputs Cygwin32_NT or Cygwin32_95
@@ -1848,7 +1848,7 @@ Thu Jul 24 02:10:25 1997  Geoffrey Noer  <noer@cygnus.com>
 	window to avoid race conditions on multiprocessor systems.
 	* winsup.h: misc changes to support all of the above.
 
-Thu Jul 24 02:10:25 1997  Geoffrey Noer  <noer@cygnus.com>	
+Thu Jul 24 02:10:25 1997  Geoffrey Noer  <noer@cygnus.com>
 
 	* net.cc (cygwin32_shutdown): New implementation to replace
 	stub previously present
@@ -1895,7 +1895,7 @@ Tue Jun 24 18:31:27 1997  Geoffrey Noer  <noer@cygnus.com>
 	* net.cc: ditto
 	* syscalls.cc: ditto 
 	* syslog.cc: ditto
-	
+
 	* uname.cc (uname): call get_os_type to fill new our_os local
 	variable, check that when filling out utsname struct, default
 	to i386 when we can't find out the specific Intel processor
@@ -1940,7 +1940,7 @@ Thu Jun 19 12:58:45 1997  Geoffrey Noer  <noer@cygnus.com>
 	* exceptions.cc (return_handler): renamed to set_process_mask
  	(set_process_mask): new; use to set process mask instead of direct
 	u->self->sig_mask manipulations.
-	* winsup.h: rename return_handler proto to set_process_mask	
+	* winsup.h: rename return_handler proto to set_process_mask
 	* signal.cc: throughout file, call set_process_mask() instead of
 	direct manipulations of u->self->sig_mask.
 	(pause): new
@@ -1957,7 +1957,7 @@ Wed Jun 18 22:01:56 1997  Geoffrey Noer  <noer@cygnus.com>
 Wed Jun 18 13:56:47 1997  Geoffrey Noer  <noer@cygnus.com>
 
 	patch from sos@prospect.com.ru (Sergey Okhapkin):
-	* signal.cc (sigsuspend): deal with pending unblocked signals	
+	* signal.cc (sigsuspend): deal with pending unblocked signals
 	* winsup.h: add proto for return_handler (sigset_t)
 
 Wed Jun 18 02:02:13 1997  Geoffrey Noer  <noer@cygnus.com>
@@ -1967,7 +1967,7 @@ Wed Jun 18 02:02:13 1997  Geoffrey Noer  <noer@cygnus.com>
 
 Tue Jun 17 14:57:09 1997  Geoffrey Noer  <noer@cygnus.com>
 
-        patch from sos@prospect.com.ru (Sergey Okhapkin):	
+        patch from sos@prospect.com.ru (Sergey Okhapkin):
 	* cygwin.din: add getpgid, killpg exports, delete duplicate
 	random export
 	* fork.cc (cygwin_fork_helper1): inherit pgid and sid on fork
@@ -2144,7 +2144,7 @@ Mon Jun  3 12:21:20 1997  Geoffrey Noer  <noer@cygnus.com>
 	* passwd.cc: include termios.h
 	(getpass): new
 	* stubs.cc (getpass): delete old stub
-	
+
 Tue Jun  3 14:51:47 1997  Ian Lance Taylor  <ian@cygnus.com>
 
 	* times.cc (ftime): New function.
@@ -2400,7 +2400,7 @@ Thu Apr 17 23:50:50 1997  Geoffrey Noer  <noer@cygnus.com>
 	in size instad of 30.  This will increase cygwin.dll memory
 	usage by 20K.  We need to remove static allocations from
 	path code.
-	
+
 Thu Apr 17 10:11:50 1997  Geoffrey Noer  <noer@cygnus.com>
 
 	patch from sos@prospect.com.ru (Sergey Okhapkin):
@@ -2408,14 +2408,14 @@ Thu Apr 17 10:11:50 1997  Geoffrey Noer  <noer@cygnus.com>
 	generate SIGHUP instead of SIGQUIT
 	* signal.cc (_raise): rewrite
 
-Wed Apr 16 10:42:46 1997  Geoffrey Noer  <noer@cygnus.com>	
+Wed Apr 16 10:42:46 1997  Geoffrey Noer  <noer@cygnus.com>
 
 	* version.h: increment CYGWIN_DLL_VERSION_MINOR
 	* syscalls.cc (system): use spawnvp instead of fork/exec
 	* ntea.cc: make all functions return false for now; they
 	were causing an obscene performance hit
 
-	patch from sos@prospect.com.ru (Sergey Okhapkin):	
+	patch from sos@prospect.com.ru (Sergey Okhapkin):
 	* console.cc (FakeReadFile): patch to support EINTR, EIO
 	* exceptions.cc: add support for return_handler, remove
 	control-C counter
@@ -2435,7 +2435,7 @@ Wed Apr 16 10:42:46 1997  Geoffrey Noer  <noer@cygnus.com>
 	(wait_for_any): init nprocinfo to 1, not 0, other small fixes
 	* winsup.h: add signal_arrived to per_process class, reduce
 	amount of reserved space, add sig_pending to pinfo class
-	
+
 Tue Apr 15 17:01:34 1997  Geoffrey Noer  <noer@cygnus.com>
 
 	* utils/mkpasswd.c: change default shell to /bin/sh
@@ -2483,7 +2483,7 @@ Fri Apr 11 00:03:49 1997  Geoffrey Noer  <noer@cygnus.com>
 	fhandler.cc, add includes necessary for this code
 	* grp.cc, Makefile.in: fix copyright dates
 	* ntea.cc: include string.h
-	
+
 Thu Apr 10 22:00:43 1997  Geoffrey Noer  <noer@cygnus.com>
 
 	patch from sos@prospect.com.ru (Sergey Okhapkin):
@@ -2659,10 +2659,10 @@ Fri Feb 14 18:55:01 1997  Jeremy Allison <jra@cygnus.com>
 
 Thu Feb 13 14:06:04 1997  Geoffrey Noer  <noer@cygnus.com>
 
-        * path.cc: remove SLASH_P define and
-        * winsup.h: define it here instead
-        patch from scottk@utig.ig.utexas.edu (Scott Kempf):
-        dirsearch.cc (opendir): fix problem with accessing "/"
+	* path.cc: remove SLASH_P define and
+	* winsup.h: define it here instead
+	patch from scottk@utig.ig.utexas.edu (Scott Kempf):
+	dirsearch.cc (opendir): fix problem with accessing "/"
 
 Mon Feb 10 13:57:11 1997  Geoffrey Noer  <noer@cygnus.com>
 
@@ -2688,7 +2688,7 @@ Mon Feb  3 16:16:39 1997  Jeremy Allison <jra@cygnus.com>
 	* fhandler.cc: Removed open_helper, turned it into
 	fhandler_base::open and added fhandler_disk_file::open. More
 	correct C++.
-        fhandler_disk_file: Moved check_execable_p into fhandler_disk_file.
+	fhandler_disk_file: Moved check_execable_p into fhandler_disk_file.
 	tty ports are now closed correctly.
 	* fhandler.h: Changes to support the above.
 
@@ -2753,7 +2753,7 @@ Thu Jan  9 14:20:01 1997  Jeremy Allison <jra@cygnus.com>
 	* cygwin.din: Added cygwin32_getprotobynumber and
 	cygwin32_getservbyport.
 	* net.cc: Added cygwin32_getprotobynumber and
-        cygwin32_getservbyport.
+	cygwin32_getservbyport.
 
 Wed Jan  8 14:15:35 1997  Jeremy Allison <jra@cygnus.com>
 

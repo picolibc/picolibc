@@ -23,7 +23,7 @@ Sat Dec 16 18:36:44 1995  steve chamberlain  <sac@slash.cygnus.com>
 	Changed the way that children are waited for.  Now
 	you can exec a non-gnuwin32 program and wait for its
 	result.
-	
+
 	* Makefile.in: Turn off frame-pointer.
 	* dcrt0.cc (environ_init): Lint.
 	* dirsearch.cc (opendir): Use new path_conv mechanism.
@@ -40,7 +40,7 @@ Sat Dec 16 18:36:44 1995  steve chamberlain  <sac@slash.cygnus.com>
 	* sysconf.cc (sysconf): Understand SC_PAGESIZE.
 	* times.cc (utime): New function.
 	* uname.cc (uname): Dig out more info.
-	
+
 Wed Dec 13 05:54:55 1995  Michael Meissner  <meissner@tiktok.cygnus.com>
 
 	* dcrt0.cc (environ_init): Cast alloca return to appropriate type.
@@ -83,7 +83,7 @@ Tue Dec  5 16:00:05 1995  Jason Molenda  (crash@phydeaux.cygnus.com)
 Tue Dec  5 08:08:08 1995  steve chamberlain  <sac@slash.cygnus.com>
 
 	Release-B10
-	
+
 	* cygwin.dll (__assert, wait, spawnv, spawnvp): Deleted.
 	* dcrt0.c: Quoting rewritten.
 	* exec.cc (file_exists): Use new path_conv mechanism.
@@ -129,7 +129,7 @@ Wed Nov 15 23:47:43 1995  Jason Molenda  (crash@phydeaux.cygnus.com)
 	Tue Oct 3 10:23:14 1995 Anders Blomdell (anders.blomdell@control.lth.se)
 
 	* spawn.cc (spawn_guts): quote doublequotes correctly 
-	
+
 Tue Nov 14 15:05:33 1995  Jason Molenda  (crash@phydeaux.cygnus.com)
 
 	* configure.in: comment out call to cfg-ml-com.in.

@@ -114,7 +114,7 @@ pinfo::maybe_set_exit_code_from_windows ()
   if (hProcess && !(self->exitcode & EXITCODE_SET))
     {
       WaitForSingleObject (hProcess, INFINITE);	// just to be safe, in case
-      						// process hasn't quite exited
+						// process hasn't quite exited
 						// after closing pipe
       GetExitCodeProcess (hProcess, &x);
       self->exitcode = EXITCODE_SET | (x & 0xff) << 8;
@@ -467,7 +467,7 @@ _pinfo::commune_recv ()
       }
     case PICOM_CWD:
       {
-        CloseHandle (__fromthem); __fromthem = NULL;
+	CloseHandle (__fromthem); __fromthem = NULL;
 	CloseHandle (hp);
 	unsigned int n = strlen (cygheap->cwd.get (path, 1, 1,
 						   CYG_MAX_PATH)) + 1;
@@ -479,7 +479,7 @@ _pinfo::commune_recv ()
       }
     case PICOM_ROOT:
       {
-        CloseHandle (__fromthem); __fromthem = NULL;
+	CloseHandle (__fromthem); __fromthem = NULL;
 	CloseHandle (hp);
 	unsigned int n;
 	if (cygheap->root.exists ())
@@ -494,7 +494,7 @@ _pinfo::commune_recv ()
       }
     case PICOM_FDS:
       {
-        CloseHandle (__fromthem); __fromthem = NULL;
+	CloseHandle (__fromthem); __fromthem = NULL;
 	CloseHandle (hp);
 	unsigned int n = 0;
 	int fd;
@@ -511,7 +511,7 @@ _pinfo::commune_recv ()
 		sigproc_printf ("WriteFile fd %d failed, %E", fd);
 		break;
 	      }
-        break;
+	break;
       }
     case PICOM_PIPE_FHANDLER:
 	{
@@ -563,7 +563,7 @@ _pinfo::commune_recv ()
 	  sigproc_printf ("WriteFile sizeof fd failed, %E");
 	else if (!WriteFile (__tothem, path, n, &nr, NULL))
 	  sigproc_printf ("WriteFile fd failed, %E");
-        break;
+	break;
       }
     case PICOM_FIFO:
       {
@@ -729,9 +729,9 @@ _pinfo::commune_send (DWORD code, ...)
 	  goto err;
 	}
       if (!n)
-        res.s = NULL;
+	res.s = NULL;
       else
-        {
+	{
 	  res.s = (char *) malloc (n);
 	  char *p;
 	  for (p = res.s; ReadFile (fromthem, p, n, &nr, NULL); p += nr)
@@ -741,7 +741,7 @@ _pinfo::commune_send (DWORD code, ...)
 	      __seterrno ();
 	      goto err;
 	    }
-        }
+	}
       res.n = n;
       break;
     case PICOM_FIFO:

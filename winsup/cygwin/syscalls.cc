@@ -925,7 +925,7 @@ fsync (int fd)
 
 EXPORT_ALIAS (fsync, fdatasync)
 
-static void 
+static void
 sync_worker (const char *vol)
 {
   HANDLE fh = CreateFileA (vol, GENERIC_WRITE, wincap.shared (),
@@ -944,16 +944,16 @@ extern "C" void
 sync ()
 {
   char vol[CYG_MAX_PATH];
-  
+
   if (wincap.has_guid_volumes ()) /* Win2k and newer */
     {
       char a_drive[CYG_MAX_PATH] = {0};
       char b_drive[CYG_MAX_PATH] = {0};
 
       if (is_floppy ("A:"))
-        GetVolumeNameForVolumeMountPointA ("A:\\", a_drive, CYG_MAX_PATH);
+	GetVolumeNameForVolumeMountPointA ("A:\\", a_drive, CYG_MAX_PATH);
       if (is_floppy ("B:"))
-        GetVolumeNameForVolumeMountPointA ("B:\\", a_drive, CYG_MAX_PATH);
+	GetVolumeNameForVolumeMountPointA ("B:\\", a_drive, CYG_MAX_PATH);
 
       HANDLE sh = FindFirstVolumeA (vol, CYG_MAX_PATH);
       if (sh != INVALID_HANDLE_VALUE)
@@ -964,7 +964,7 @@ sync ()
 
 	      /* Check vol for being a floppy on A: or B:.  Skip them. */
 	      if (strcasematch (vol, a_drive) || strcasematch (vol, b_drive))
-	        {
+		{
 		  debug_printf ("Is floppy, don't sync");
 		  continue;
 		}
@@ -988,7 +988,7 @@ sync ()
 	drives &= ~2;
       strcpy (vol, "\\\\.\\A:");
       do
-        {
+	{
 	  /* Geeh.  Try to sync only non-floppy drives. */
 	  if (drives & mask)
 	    {
@@ -1208,9 +1208,9 @@ rename (const char *oldpath, const char *newpath)
   if (real_old.isdir ()
       && ((lasterr == ERROR_SHARING_VIOLATION && wincap.has_move_file_ex ())
        || (lasterr == ERROR_ACCESS_DENIED && !real_new.exists ()
-           && !wincap.has_move_file_ex ())
+	   && !wincap.has_move_file_ex ())
        || (lasterr == ERROR_ALREADY_EXISTS && real_new.exists ()
-           && !wincap.has_move_file_ex ()))
+	   && !wincap.has_move_file_ex ()))
       && (len = strlen (real_old), strncasematch (real_old, real_new, len))
       && real_new[len] == '\\')
     SetLastError (ERROR_INVALID_PARAMETER);
@@ -1743,7 +1743,7 @@ statvfs (const char *fname, struct statvfs *sfs)
       else
 	availc = freec;
       if (GetVolumeInformation (root, NULL, 0, &vsn, &maxlen, &flags, NULL, 0))
-        {
+	{
 	  sfs->f_bsize = spc*bps;
 	  sfs->f_frsize = spc*bps;
 	  sfs->f_blocks = totalc;
@@ -1966,7 +1966,7 @@ extern "C" int
 seteuid32 (__uid32_t uid)
 {
   debug_printf ("uid: %u myself->uid: %u myself->gid: %u",
-  		uid, myself->uid, myself->gid);
+		uid, myself->uid, myself->gid);
 
   if (uid == myself->uid && !cygheap->user.groups.ischanged)
     {
@@ -2055,7 +2055,7 @@ seteuid32 (__uid32_t uid)
       /* Try setting default DACL */
       char dacl_buf[MAX_DACL_LEN (5)];
       if (sec_acl ((PACL) dacl_buf, true, true, usersid))
-        {
+	{
 	  TOKEN_DEFAULT_DACL tdacl = { (PACL) dacl_buf };
 	  if (!SetTokenInformation (new_token, TokenDefaultDacl,
 				    &tdacl, sizeof (tdacl)))
@@ -2175,7 +2175,7 @@ setegid32 (__gid32_t gid)
     {
       /* If impersonated, update impersonation token... */
       if (!SetTokenInformation (cygheap->user.primary_token (),
-      				TokenPrimaryGroup, &gsid, sizeof gsid))
+				TokenPrimaryGroup, &gsid, sizeof gsid))
 	debug_printf ("SetTokenInformation(primary_token, "
 		      "TokenPrimaryGroup), %E");
       if (!SetTokenInformation (cygheap->user.token (), TokenPrimaryGroup,
@@ -2467,7 +2467,7 @@ getpriority (int which, id_t who)
     {
       _pinfo *p = pids[i];
       if (p)
-        switch (which)
+	switch (which)
 	  {
 	  case PRIO_PROCESS:
 	    if ((pid_t) who == p->pid)

@@ -18,7 +18,7 @@ _$newsym:
 	.section .idata\$7
 	.long	__head_cygwin1_dll
 
-        .section        .idata\$5
+	.section        .idata\$5
 __imp__$newsym:	.rva    1f
 
 	.section .idata\$4

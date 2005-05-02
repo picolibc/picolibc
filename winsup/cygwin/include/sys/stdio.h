@@ -24,5 +24,5 @@ details. */
 #    define _funlockfile(fp) __cygwin_lock_unlock ((_LOCK_T *)&(fp)->_lock)
 #  endif
 #endif
- 
+
 #endif

@@ -7,7 +7,7 @@
    details. */
 
 /* Including this file should not require any Windows headers.  */
-   
+
 #ifndef _SYS_DIRENT_H
 #define _SYS_DIRENT_H
 

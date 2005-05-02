@@ -255,7 +255,7 @@ mmap_record::map_pages (caddr_t addr, DWORD len)
   for (DWORD l = 0; l < len; ++l)
     if (MAP_ISSET (off + l))
       {
-        set_errno (EINVAL);
+	set_errno (EINVAL);
 	return false;
       }
   switch (access_mode_)
@@ -553,7 +553,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 	}
       fh = cfd;
       if (fh->get_device () == FH_ZERO)
-        {
+	{
 	  /* mmap /dev/zero is like MAP_ANONYMOUS. */
 	  fd = -1;
 	  flags |= MAP_ANONYMOUS;
@@ -600,11 +600,11 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 	  return MAP_FAILED;
 	}
       /* Don't map beyond EOF.  Windows would change the file to the
-         new length otherwise, in contrast to POSIX.  Allow mapping
+	 new length otherwise, in contrast to POSIX.  Allow mapping
 	 beyon EOF if MAP_AUTOGROW flag is set. */
       fsiz -= gran_off;
       if (gran_len > fsiz)
-        {
+	{
 	  if ((flags & MAP_AUTOGROW) && (off - gran_off) + len > fsiz)
 	    {
 	      /* Check if file has been opened for writing. */
@@ -621,9 +621,9 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 	    gran_len = fsiz;
 	}
       /* If the requested len is <= file size, drop the MAP_AUTOGROW flag.
-         This simplifes fhandler::mmap's job. */
+	 This simplifes fhandler::mmap's job. */
       if ((flags & MAP_AUTOGROW) && gran_len <= fsiz)
-        flags &= ~MAP_AUTOGROW;
+	flags &= ~MAP_AUTOGROW;
     }
 
   DWORD access = (prot & PROT_WRITE) ? FILE_MAP_WRITE : FILE_MAP_READ;
@@ -675,7 +675,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 	  DWORD u_len;
 	  long record_idx = -1;
 	  if ((record_idx = map_list->search_record ((caddr_t)addr, len,
-	  					     u_addr, u_len,
+						     u_addr, u_len,
 						     record_idx)) >= 0)
 	    {
 	      mmap_record *rec = map_list->get_record (record_idx);
@@ -1073,14 +1073,14 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
       high = (off + len) >> 32;
       low = (off + len) & UINT32_MAX;
       /* Auto-grow in CreateFileMapping only works if the protection is
-         PAGE_READWRITE.  So, first we call CreateFileMapping with
+	 PAGE_READWRITE.  So, first we call CreateFileMapping with
 	 PAGE_READWRITE, then, if the requested protection is different, we
 	 close the mapping and reopen it again with the correct protection,
 	 *iff* auto-grow worked. */
       h = CreateFileMapping (get_handle (), &sec_none, PAGE_READWRITE,
 			     high, low, NULL);
       if (h && protect != PAGE_READWRITE)
-        {
+	{
 	  CloseHandle (h);
 	  h = CreateFileMapping (get_handle (), &sec_none, protect,
 				 high, low, NULL);
@@ -1110,11 +1110,11 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
       phys.QuadPart = (ULONGLONG) off;
       ULONG ulen = len;
       base = *addr ?: (void *) mmapped_areas->get_next_anon_addr ();
-      NTSTATUS ret = NtMapViewOfSection (h, INVALID_HANDLE_VALUE, &base, 0L, 
+      NTSTATUS ret = NtMapViewOfSection (h, INVALID_HANDLE_VALUE, &base, 0L,
 					 ulen, &phys, &ulen, ViewShare,
 					 base ? AT_ROUND_TO_PAGE : 0, protect);
       if (ret != STATUS_SUCCESS)
-        {
+	{
 	  __seterrno_from_nt_status (ret);
 	  base = NULL;
 	}
@@ -1192,11 +1192,11 @@ fhandler_disk_file::fixup_mmap_after_fork (HANDLE h, DWORD access, int flags,
 	    protect = PAGE_WRITECOPY;
 	    break;
 	}
-      NTSTATUS ret = NtMapViewOfSection (h, INVALID_HANDLE_VALUE, &base, 0L, 
+      NTSTATUS ret = NtMapViewOfSection (h, INVALID_HANDLE_VALUE, &base, 0L,
 					 ulen, &phys, &ulen, ViewShare,
 					 AT_ROUND_TO_PAGE, protect);
       if (ret != STATUS_SUCCESS)
-        __seterrno_from_nt_status (ret);
+	__seterrno_from_nt_status (ret);
     }
   else
     base = MapViewOfFileEx (h, access, 0, offset, size, address);

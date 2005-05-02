@@ -1,6 +1,6 @@
 /* syslog.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -201,11 +201,11 @@ try_connect_syslogd (const char *msg, int len)
       if (stat64 (_PATH_LOG, &st) || !S_ISSOCK (st.st_mode))
 	goto out;
       if ((fd = cygwin_socket (AF_LOCAL, SOCK_DGRAM, 0)) < 0)
-        goto out;
+	goto out;
       sa.sa_family = AF_LOCAL;
       strncpy (sa.sa_data, _PATH_LOG, sizeof sa.sa_data);
       if (cygwin_connect (fd, &sa, sizeof sa))
-        {
+	{
 	  if (get_errno () != EPROTOTYPE)
 	    {
 	      close (fd);
@@ -230,9 +230,9 @@ out:
     {
       ret = write (syslogd_sock, msg, len);
       /* If write fails and LOG_CONS is set, return failure to vsyslog so
-         it falls back to the usual logging method for this OS. */
+	 it falls back to the usual logging method for this OS. */
       if (ret >= 0 || !(_my_tls.locals.process_logopt & LOG_CONS))
-        ret = syslogd_sock;
+	ret = syslogd_sock;
     }
   try_connect_guard.release ();
   return ret;

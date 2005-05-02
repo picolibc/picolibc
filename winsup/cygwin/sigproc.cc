@@ -473,8 +473,8 @@ create_signal_arrived ()
   ProtectHandle (signal_arrived);
 }
 
-/* Message initialization.  Called from dll_crt0_1
-  
+/* Signal thread initialization.  Called from dll_crt0_1.
+
    This routine starts the signal handling thread.  The wait_sig_inited
    event is used to signal that the thread is ready to handle signals.
    We don't wait for this during initialization but instead detect it

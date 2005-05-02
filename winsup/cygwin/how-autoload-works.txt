@@ -56,7 +56,7 @@ will be autoloaded.  To do so, add one of the LoadDllfunc* macros to
 autoload.cc.  All macros eventually resolve to the following form:
 
 LoadDLLfuncEx2 (function name, parameter block length, dll name,
-                non-fatality flag , value to return if function not available)
+		non-fatality flag , value to return if function not available)
 
 Parameter block length is a sum of sizes (in bytes) of parameters which are
 being passed to the function. If non-fatality flag is set to 0, then failure

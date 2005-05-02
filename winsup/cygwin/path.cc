@@ -589,7 +589,7 @@ path_conv::check (const char *src, unsigned opt,
       sym.contents[0] = '\0';
 
       int symlen = 0;
-      
+
       for (unsigned pflags_or = opt & PC_NO_ACCESS_CHECK; ; pflags_or = 0)
 	{
 	  const suffix_info *suff;
@@ -637,7 +637,7 @@ path_conv::check (const char *src, unsigned opt,
 	      fhandler_virtual *fh = (fhandler_virtual *) build_fh_dev (dev, path_copy);
 	      int file_type = fh->exists ();
 	      if (file_type == -2)
-	        {
+		{
 		  fh->fill_filebuf ();
 		  symlen = sym.set (fh->get_filebuf ());
 		}
@@ -756,11 +756,11 @@ is_virtual_symlink:
 		  error = sym.error;
 		  if (component == 0)
 		    add_ext_from_sym (sym);
-                  else if (!(sym.fileattr & FILE_ATTRIBUTE_DIRECTORY))
-                    {
-                      error = ENOTDIR;
+		  else if (!(sym.fileattr & FILE_ATTRIBUTE_DIRECTORY))
+		    {
+		      error = ENOTDIR;
 		      goto out;
-                    }
+		    }
 		  if (pcheck_case == PCHECK_RELAXED)
 		    goto out;	// file found
 		  /* Avoid further symlink evaluation. Only case checks are
@@ -2509,7 +2509,7 @@ is_floppy (const char *dos)
   if (!QueryDosDevice (dos, dev, 256))
     return false;
   return strncasematch (dev, "\\Device\\Floppy", 14)
-  	 || strcasematch (dev, "A:");
+	 || strcasematch (dev, "A:");
 }
 
 extern "C" FILE *
@@ -2652,7 +2652,7 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
 	    {
 	      win32_topath.check (topath, PC_SYM_NOFOLLOW);
 	      if (win32_topath.error != ENOENT)
-	        strcpy (use_winsym ? reltopath : w32topath, win32_topath);
+		strcpy (use_winsym ? reltopath : w32topath, win32_topath);
 	    }
 	  else if (!use_winsym)
 	    strcpy (w32topath, reltopath);
@@ -2668,7 +2668,7 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
 	    }
 	}
       else
-        {
+	{
 	  win32_topath.check (topath, PC_FULL | PC_SYM_NOFOLLOW);
 	  strcpy (w32topath, win32_topath);
 	}
@@ -2802,7 +2802,7 @@ cmp_shortcut_header (win_shortcut_hdr *file_header)
   return file_header->size == sizeof (win_shortcut_hdr)
       && !memcmp (&file_header->magic, &GUID_shortcut, sizeof GUID_shortcut)
       && (file_header->flags & ~WSH_FLAG_IDLIST)
-         == (WSH_FLAG_DESC | WSH_FLAG_RELPATH)
+	 == (WSH_FLAG_DESC | WSH_FLAG_RELPATH)
       && file_header->run == SW_NORMAL;
 }
 
@@ -4014,7 +4014,7 @@ basename (char *path)
     {
       /* Trailing (back)slashes are eliminated. */
       while (c && c > bs && c[1] == '\0')
-        {
+	{
 	  *c = '\0';
 	  c = strrchr (bs, '/');
 	  if ((d = strrchr (c ?: bs, '\\')) > c)
@@ -4052,22 +4052,22 @@ dirname (char *path)
     {
       /* Trailing (back)slashes are eliminated. */
       while (c && c > bs && c[1] == '\0')
-        {
+	{
 	  *c = '\0';
 	  c = strrchr (bs, '/');
 	  if ((d = strrchr (c ?: bs, '\\')) > c)
 	    c = d;
 	}
       if (!c)
-        strcpy (bs, ".");
+	strcpy (bs, ".");
       else if (c > bs)
 	{
 	  /* More trailing (back)slashes are eliminated. */
 	  while (c > bs && (*c == '/' || *c == '\\'))
 	    *c-- = '\0';
-        }
+	}
       else
-        c[1] = '\0';
+	c[1] = '\0';
     }
   else
     strcpy (bs, ".");

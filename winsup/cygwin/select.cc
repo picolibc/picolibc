@@ -180,7 +180,7 @@ pselect(int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       set_signal_mask (*set);
     }
   int ret = cygwin_select (maxfds, readfds, writefds, exceptfds,
-  			   ts ? &tv : NULL);
+			   ts ? &tv : NULL);
   if (set)
     set_signal_mask (oldset);
   return ret;
@@ -603,7 +603,7 @@ out:
 	      gotone += s->write_ready = true;
 	    }
 #else
-          gotone += s->write_ready = true;
+	  gotone += s->write_ready = true;
 #endif
 	}
     }

@@ -406,7 +406,7 @@ class cygheap_fdenum : public cygheap_fdmanip
   {
     while (++fd < (int) cygheap->fdtab.size)
       if (*(fh = cygheap->fdtab + fd) != NULL)
-        return fd;
+	return fd;
     return -1;
   }
   void rewind ()
