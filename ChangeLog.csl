@@ -1,5 +1,10 @@
 2005-05-01  Paul Brook  <paul@codesourcery.com>
 
+	* bfd/elflink.c (_bfd_elf_merge_symbol): Skip weak definitions if a
+	strong definition has already been seen.
+
+2005-05-01  Paul Brook  <paul@codesourcery.com>
+
 	* bfd/elf32-arm.c (bfd_elf32_arm_process_before_allocation): Treat
 	R_ARM_PLT32 the same as R_ARM_PC24.
 	(arm_add_to_rel): Ditto.
