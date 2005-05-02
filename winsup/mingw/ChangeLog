@@ -1,3 +1,10 @@
+2005-05-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/_mingw.h (__MINGW_ATTRIB_NONNULL): Don't define as
+	variadic macro.
+	* mingwex/mbrtowc.c (__mbrtowc_cp): Use __MINGW_ATTRIB_NONNULL.
+	Remove unused MBTOWC_FLAGS define.
+
 2005-04-23  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/mbrtowc.c: New file.
@@ -11,7 +18,7 @@
 	funcions. Add __restrict__ to pointer params in prototypes.
 	(wmemset. wmemchr, wmemcpy, wmemmove, wcstoll, wcstoull): Remove
 	arg names from protototypes.
-	
+
 2005-04-23  Wu Yongwei  <adah@sh163.net>
 
 	* mingwex/dirent.c: Formatting changes.

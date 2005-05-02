@@ -5,17 +5,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-#define MBTOWC_FLAGS (MB_PRECOMPOSED | MB_ERR_INVALID_CHARS)
-/* Attribute `nonnull' was valid as of gcc 3.3.  */
-#ifndef ATTRIBUTE_NONNULL
-# if (__GNUC__ > 3 ||( __GNUC__ == 3 &&  __GNUC_MINOR__ >= 3))
-#  define ATTRIBUTE_NONNULL(m...) __attribute__ ((__nonnull__ (m)))
-# else
-#  define ATTRIBUTE_NONNULL(m...)
-# endif /* GNUC >= 3.3 */
-#endif /* ATTRIBUTE_NONNULL */
-
-static int ATTRIBUTE_NONNULL(1, 4)
+static int __MINGW_ATTRIB_NONNULL(1) __MINGW_ATTRIB_NONNULL(4)
 __mbrtowc_cp (wchar_t * __restrict__ pwc, const char * __restrict__ s,
 	      size_t n, mbstate_t* __restrict__ ps,
 	      const unsigned int cp, const unsigned int mb_max) 
