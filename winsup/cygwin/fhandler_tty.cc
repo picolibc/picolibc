@@ -815,7 +815,7 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
       if (!ptr && len == UINT_MAX)
 	len = (size_t) bytes_in_pipe;
 
-      if (ptr && !vmin && !time_to_wait)
+      if (ptr && !bytes_in_pipe && !vmin && !time_to_wait)
 	{
 	  ReleaseMutex (input_mutex);
 	  len = (size_t) bytes_in_pipe;

@@ -1,3 +1,8 @@
+2005-05-01  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler_tty.cc (fhandler_tty_slave::read): Actually read input when
+	vmin == vtime == 0.
+
 2005-04-30  Christopher Faylor  <cgf@timesys.com>
 
 	* environ.cc (spenv::force_into_environment): Rename from add_always.
