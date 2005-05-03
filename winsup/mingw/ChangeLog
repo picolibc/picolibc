@@ -1,3 +1,12 @@
+2005-05-03  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/math/signbit.c (__signbit):  Make return value
+	consistent with GCC's __builtin_signbit.
+	* mingwex/math/signbitf.c (__signbitf):  Likewise.
+	* mingwex/math/signbitf.c (__signbitl):  Likewise.
+	* include/math.h (__signbit, __signbitf, __signbitl): Likewise
+	for inlines.
+
 2005-05-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/_mingw.h (__MINGW_ATTRIB_NONNULL): Don't define as

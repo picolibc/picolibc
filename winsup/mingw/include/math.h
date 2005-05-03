@@ -373,19 +373,19 @@ __CRT_INLINE int __cdecl __isnanl (long double _x)
 __CRT_INLINE int __cdecl __signbit (double x) {
   unsigned short stw;
   __asm__ ( "fxam; fstsw %%ax;": "=a" (stw) : "t" (x));
-  return stw & 0x0200;
+  return (stw & 0x0200) != 0;
 }
 
 __CRT_INLINE int __cdecl __signbitf (float x) {
   unsigned short stw;
   __asm__ ("fxam; fstsw %%ax;": "=a" (stw) : "t" (x));
-  return stw & 0x0200;
+  return (stw & 0x0200) != 0;
 }
 
 __CRT_INLINE int __cdecl __signbitl (long double x) {
   unsigned short stw;
   __asm__ ("fxam; fstsw %%ax;": "=a" (stw) : "t" (x));
-  return stw & 0x0200;
+  return (stw & 0x0200) != 0;
 }
 
 #define signbit(x) (sizeof (x) == sizeof (float) ? __signbitf (x)	\
