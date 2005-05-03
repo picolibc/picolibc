@@ -108,6 +108,8 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 				  : 0);
 	  ret = 1;
 	}
+      else
+        __seterrno ();
       CloseHandle (fh);
       return ret;
     }
