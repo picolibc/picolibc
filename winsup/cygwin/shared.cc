@@ -189,23 +189,20 @@ user_shared_initialize (bool reinit)
   /* Initialize the Cygwin per-user shared, if necessary */
   if (!sversion)
     {
-      user_shared->version = USER_VERSION_MAGIC;
       debug_printf ("initializing user shared");
-      user_shared->cb =  sizeof (*user_shared);
-      if (user_shared->cb != sizeof (*user_shared))
-	system_printf ("size of user shared region changed from %u to %u",
-		       sizeof (*user_shared), user_shared->cb);
       user_shared->mountinfo.init ();	/* Initialize the mount table.  */
-      /* Initialize the queue of deleted files.  */
-      user_shared->delqueue.init ();
+      user_shared->delqueue.init (); /* Initialize the queue of deleted files.  */
+      user_shared->cb =  sizeof (*user_shared);
     }
-  else if (user_shared->version != USER_VERSION_MAGIC)
-    multiple_cygwin_problem ("user shared memory version", user_shared->version, USER_VERSION_MAGIC);
-  else if (user_shared->cb != sizeof (*user_shared))
-    multiple_cygwin_problem ("user shared memory size", user_shared->cb, sizeof (*user_shared));
   else
+    {
       while (!user_shared->cb)
 	low_priority_sleep (0);	// Should be hit only very very rarely
+      if (user_shared->version != sversion)
+	multiple_cygwin_problem ("user shared memory version", user_shared->version, sversion);
+      else if (user_shared->cb != sizeof (*user_shared))
+	multiple_cygwin_problem ("user shared memory size", user_shared->cb, sizeof (*user_shared));
+    }
 }
 
 void
