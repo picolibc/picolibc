@@ -1,3 +1,10 @@
+2005-05-04  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wchar.h (WCHAR_MAX): Define as 0xffff, so preprocessor
+	#if (WCHAR_MAX <= WCHAR_MIN) is false.
+	* include/stdint.h (WCHAR_MAX): Likwise.
+	(WINT_MAX): Likewise.
+
 2005-05-03  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/math/signbit.c (__signbit):  Make return value

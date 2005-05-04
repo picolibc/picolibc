@@ -51,7 +51,7 @@
 #endif /* __STRICT_ANSI__ */
 
 #define WCHAR_MIN	0
-#define WCHAR_MAX	((wchar_t)-1)
+#define WCHAR_MAX	0xffff
 
 #ifndef WEOF
 #define	WEOF	(wchar_t)(0xFFFF)

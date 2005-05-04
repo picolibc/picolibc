@@ -137,14 +137,14 @@ typedef unsigned long long   uintmax_t;
 
 #ifndef WCHAR_MIN  /* also in wchar.h */ 
 #define WCHAR_MIN 0
-#define WCHAR_MAX ((wchar_t)-1) /* UINT16_MAX */
+#define WCHAR_MAX 0xffff /* UINT16_MAX */
 #endif
 
 /*
  * wint_t is unsigned short for compatibility with MS runtime
  */
 #define WINT_MIN 0
-#define WINT_MAX ((wint_t)-1) /* UINT16_MAX */
+#define WINT_MAX 0xffff /* UINT16_MAX */
 
 #endif /* !defined ( __cplusplus) || defined __STDC_LIMIT_MACROS */
 
