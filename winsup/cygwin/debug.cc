@@ -230,12 +230,4 @@ close_handle (const char *func, int ln, HANDLE h, const char *name, bool force)
 #endif
   return ret;
 }
-
-int __stdcall
-__set_errno (const char *func, int ln, int val)
-{
-  debug_printf ("%s:%d val %d", func, ln, val);
-  _impure_ptr->_errno = val;
-  return errno = val;
-}
 #endif /*DEBUGGING*/

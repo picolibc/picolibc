@@ -23,12 +23,14 @@ int __stdcall geterrno_from_win_error (DWORD code, int deferrno) __attribute__ (
 	  __seterrno_from_win_error (winerr); \
 	})
 
-#ifndef DEBUGGING
-#define set_errno(val) (errno = _impure_ptr->_errno = (val))
-#else
-int __stdcall __set_errno (const char *ln, int ln, int val) __attribute ((regparm(3)));
+inline int
+__set_errno (const char *fn, int ln, int val)
+{
+  debug_printf ("%s:%d val %d", fn, ln, val);
+  return errno = _impure_ptr->_errno = (val);
+}
 #define set_errno(val) __set_errno (__PRETTY_FUNCTION__, __LINE__, (val))
-#endif
+
 #define get_errno()  (errno)
 extern "C" void __stdcall set_sig_errno (int e);
 

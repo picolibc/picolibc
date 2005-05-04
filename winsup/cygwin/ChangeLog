@@ -1,3 +1,9 @@
+2005-05-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygerrno.h (__set_errno): Define as inline function here.
+	(set_errno): Always define as call to __set_errno.
+	* debug.cc (__set_errno): Move to cygerrno.h.
+
 2005-05-03  Christopher Faylor  <cgf@timesys.com>
 
 	* shared.cc (user_shared_initialize): Rework locking so that nothing is
