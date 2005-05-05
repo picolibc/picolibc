@@ -1,3 +1,10 @@
+2005-05-05  J"orn Rennecke <joern.rennecke@st.com>
+
+        * rs6000/sim-getrusage.S: New file, broken out of:
+        (simulator.S).
+        * rs6000/Makefile.in (SIM_OBJS): Add sim-getrusage.o.
+        (sim-getrusage.o): New rule.
+
 2005-04-28  Shaun Jackman  <sjackman@gmail.com>
 
 	* libgloss/syscalls.c (get_errno): Add an output register constraint.

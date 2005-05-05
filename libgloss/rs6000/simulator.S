@@ -87,14 +87,6 @@ FUNC_START(gettimeofday)
 0:	blr
 FUNC_END(gettimeofday)
 
-FUNC_START(getrusage)
-	li	r0,117
-	sc
-	bns+	0f
-	b	FUNC_NAME(_cerror)
-0:	blr
-FUNC_END(getrusage)
-
 FUNC_START(lseek)
 	li	r0,199
 	sc
