@@ -180,7 +180,7 @@ get_errno (void)
   return do_AngelSWI (AngelSWI_Reason_Errno, NULL);
 #else
   register r0 asm("r0");
-  asm ("swi %a1" : "=3Dr"(r0) : "i" (SWI_GetErrno));
+  asm ("swi %a1" : "=r"(r0) : "i" (SWI_GetErrno));
   return r0;
 #endif
 }

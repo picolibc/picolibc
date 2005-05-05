@@ -1,3 +1,7 @@
+2005-05-05  Tobias Anderberg  <tobias.anderberg@axis.com>
+
+        * arm/syscalls.c (get_errno): Fix output register constraint.
+
 2005-05-05  J"orn Rennecke <joern.rennecke@st.com>
 
         * rs6000/sim-getrusage.S: New file, broken out of:
