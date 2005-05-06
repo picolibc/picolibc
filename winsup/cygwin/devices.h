@@ -49,6 +49,8 @@ enum fh_devices
 
   FH_FS      = FHDEV (0, 247),	/* filesystem based device */
 
+  FH_NETDRIVE= FHDEV (0, 246),
+
   DEV_FLOPPY_MAJOR = 2,
   FH_FLOPPY  = FHDEV (DEV_FLOPPY_MAJOR, 0),
 
@@ -169,6 +171,8 @@ extern const device dev_pipew_storage;
 #define pipew_dev (&dev_pipew_storage)
 extern const device dev_proc_storage;
 #define proc_dev (&dev_proc_storage)
+extern const device dev_netdrive_storage;
+#define netdrive_dev (&dev_netdrive_storage)
 extern const device dev_cygdrive_storage;
 #define cygdrive_dev (&dev_cygdrive_storage)
 extern const device dev_fh_storage;

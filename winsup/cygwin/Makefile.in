@@ -124,7 +124,7 @@ DLL_OFILES:=assert.o autoload.o bsdlib.o ctype.o cxx.o cygheap.o cygthread.o \
 	dtable.o environ.o errno.o exceptions.o exec.o external.o fcntl.o \
 	fhandler.o fhandler_clipboard.o fhandler_console.o fhandler_disk_file.o \
 	fhandler_dsp.o fhandler_fifo.o fhandler_floppy.o fhandler_mem.o \
-	fhandler_nodevice.o fhandler_proc.o fhandler_process.o \
+	fhandler_netdrive.o fhandler_nodevice.o fhandler_proc.o fhandler_process.o \
 	fhandler_random.o fhandler_raw.o fhandler_registry.o fhandler_serial.o \
 	fhandler_socket.o fhandler_tape.o fhandler_termios.o \
 	fhandler_tty.o fhandler_virtual.o fhandler_windows.o fhandler_zero.o \
@@ -235,6 +235,7 @@ fhandler_disk_file_CFLAGS:=-fomit-frame-pointer
 fhandler_dsp_CFLAGS:=-fomit-frame-pointer
 fhandler_floppy_CFLAGS:=-fomit-frame-pointer
 fhandler_mem_CFLAGS:=-fomit-frame-pointer
+fhandler_netdrive_CFLAGS:=-fomit-frame-pointer
 fhandler_proc_CFLAGS:=-fomit-frame-pointer
 fhandler_process_CFLAGS:=-fomit-frame-pointer
 fhandler_random_CFLAGS:=-fomit-frame-pointer

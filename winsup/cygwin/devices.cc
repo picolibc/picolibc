@@ -25,6 +25,9 @@ const device dev_fs_storage =
 const device dev_proc_storage =
   {"", {FH_PROC}, ""};
 
+const device dev_netdev_storage =
+  {"", {FH_NETDRIVE}, ""};
+
 const device dev_registry_storage =
   {"", {FH_REGISTRY}, ""};
 
