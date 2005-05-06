@@ -1516,8 +1516,6 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
       goto out_no_chroot_check;
     }
 
-  /* Check if the cygdrive prefix was specified.  If so, just strip
-     off the prefix and transform it into an MS-DOS path. */
   MALLOC_CHECK;
   if (isproc (src_path))
     {
@@ -1529,6 +1527,8 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
       strcpy (dst, src_path);
       goto out;
     }
+  /* Check if the cygdrive prefix was specified.  If so, just strip
+     off the prefix and transform it into an MS-DOS path. */
   else if (iscygdrive (src_path))
     {
       int n = mount_table->cygdrive_len - 1;
