@@ -21,6 +21,7 @@ details. */
 
 #define CYGTLS_INITIALIZED 0x43227
 #define CYGTLS_EXCEPTION (0x43227 + true)
+#define CYGTLSMAGIC "D0Ub313v31nm&G1c?";
 
 #ifndef CYG_MAX_PATH
 # define CYG_MAX_PATH 260

@@ -1,5 +1,10 @@
 2005-05-07  Christopher Faylor  <cgf@timesys.com>
 
+	* path.cc (normalize_posix_path): Don't treat '//' specially since
+	newer versions of bash now get this right.
+
+2005-05-07  Christopher Faylor  <cgf@timesys.com>
+
 	* devices.cc: Regenerate with correct name for dev_netdrive_storage.
 
 2005-05-06  Christopher Faylor  <cgf@timesys.com>
