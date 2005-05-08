@@ -1,3 +1,10 @@
+2005-05-08  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/math/erfl.c: New file.
+	* mingwex/Makefile.i (MATH_DISTFILES): Add erfl.c.
+	(MATH_OBJS): Add erfl.o.
+	* include/math.h (erfl, erfcl): Uncomment prototypes.
+
 2005-05-04  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wchar.h (WCHAR_MAX): Define as 0xffff, so preprocessor

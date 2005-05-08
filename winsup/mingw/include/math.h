@@ -565,16 +565,12 @@ extern long double __cdecl sqrtl (long double);
 /* 7.12.8.1 The erf functions  */
 extern double __cdecl erf (double);
 extern float __cdecl erff (float);
-/* TODO
 extern long double __cdecl erfl (long double);
-*/ 
 
 /* 7.12.8.2 The erfc functions  */
 extern double __cdecl erfc (double);
 extern float __cdecl erfcf (float);
-/* TODO
 extern long double __cdecl erfcl (long double);
-*/ 
 
 /* 7.12.8.3 The lgamma functions */
 extern double __cdecl lgamma (double);
