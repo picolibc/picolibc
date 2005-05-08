@@ -55,7 +55,7 @@ in binary mode if any of the following conditions hold:</para>
 <orderedlist numeration="arabic" spacing="compact">
 <listitem><para>binary mode is specified in the open call</para>
 </listitem>
-<listitem><para>the filename is a MS-DOS filename
+<listitem><para>the filename is a MS-DOS filename</para>
 </listitem>
 <listitem><para>the file resides on a binary mounted partition</para>
 </listitem>

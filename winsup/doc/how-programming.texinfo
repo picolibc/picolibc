@@ -50,35 +50,37 @@ building it, and once built there were problems using it.  It appears
 that there is only minimal support for the Objective C front-end in the
 main GCC distribution, anyway.
 
-@subsection Why is make behaving badly?
+@subsection Why does my make fail on Cygwin with an execvp error? 
 
 First of all, if you are using @samp{make -j[N]}, then stop.  It doesn't
-work well.
+work well. Also beware of using non-portable shell features in your
+Makefiles (see tips at @file{http://cygwin.com/faq/faq_3.html#SEC46}).
 
-Otherwise, read on...
+Errors of @samp{make: execvp: /bin/sh: Illegal Argument} or 
+@samp{make: execvp: /bin/sh: Argument list too long} are often
+caused by the command-line being to long for the Windows execution model.
+To circumvent this, mount the path of the executable using the -X switch
+to enable cygexec for all executables in that folder; you will also need
+to exclude non-cygwin executables with the -x switch. Enabling cygexec
+causes cygwin executables to talk directly to one another, which increases
+the command-line limit. To enable cygexec for @samp{/bin} and 
+@samp{/usr/bin}, you can use these commands in a batch file:
 
-Make has two operating modes, UNIX and WIN32.  You need to make sure
-that you are operating in the right mode.
+@example
+mount -X -b -f c:\cygwin\bin /bin
+mount -X -b -f c:\cygwin\bin /usr/bin
+mount -x -b -f c:\cygwin\bin\strace.exe /usr/bin/strace.exe
+mount -x -b -f c:\cygwin\bin\strace.exe /bin/strace.exe
+mount -x -b -f c:\cygwin\bin\cygcheck.exe /usr/bin/cygcheck.exe
+mount -x -b -f c:\cygwin\bin\cygcheck.exe /bin/cygcheck.exe
+@end example
 
-In UNIX mode, make uses sh.exe as a subshell.  The path list separator
-is ':', '\' is the escape character, POSIX paths are expected, and
-Cygwin mounts will be understood.  Use this for Makefiles written for
-UNIX.
+Note that you must specifically exclude @code{strace} and @code{cygcheck},
+which are not linked to the Cygwin DLL.
 
-In WIN32 mode, make uses the "native" command shell (cmd.exe or
-command.com), with all the restrictions that implies.  The path list
-separator is ';', the path separator is '\', "copy" and "del" work, but
-the Cygwin mount table is not understood.  Use this for nmake-style
-Makefiles.
+(See @file{http://www.cygwin.com/cygwin-ug-net/using-utils.html#mount} 
+for more information.)
 
-The default mode for the Net Release of make (the one installed by
-@code{setup.exe}) is UNIX.  The default mode for commercial releases to
-Redhat (formerly Cygnus) customers is WIN32.
-
-You can override the default by setting the environment variable
-MAKE_MODE to "UNIX" (actually case is not significant) or "WIN32"
-(actually anything other than "UNIX").  You can also specify the options
---unix or --win32 on the make command line.
 
 @subsection Why the undefined reference to @samp{WinMain@@16}?
 

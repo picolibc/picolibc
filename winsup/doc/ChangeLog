@@ -1,3 +1,8 @@
+2005-05-08  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* how-programming.texinfo: Replace MAKE_MODE entry with FAQ about
+	execvp errors and cygexec.
+
 2005-04-20  Brian Dessent  <brian@dessent.net>
 
 	* pathnames.sgml (mount-table): Indicate that user-specific
