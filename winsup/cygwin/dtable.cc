@@ -454,6 +454,9 @@ build_fh_pc (path_conv& pc)
 	  case FH_PROCESS:
 	    fh = cnew (fhandler_process) ();
 	    break;
+	  case FH_NETDRIVE:
+	    fh = cnew (fhandler_netdrive) ();
+	    break;
 	  case FH_TTY:
 	    {
 	      if (myself->ctty == TTY_CONSOLE)

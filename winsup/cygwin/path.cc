@@ -154,7 +154,8 @@ struct win_shortcut_hdr
   (path_prefix_p (proc, (path), proc_len))
 
 #define isvirtual_dev(devn) \
-  (devn == FH_CYGDRIVE || devn == FH_PROC || devn == FH_REGISTRY || devn == FH_PROCESS)
+  (devn == FH_CYGDRIVE || devn == FH_PROC || devn == FH_REGISTRY \
+   || devn == FH_PROCESS || devn == FH_NETDRIVE )
 
 /* Return non-zero if PATH1 is a prefix of PATH2.
    Both are assumed to be of the same path style and / vs \ usage.
@@ -1517,6 +1518,19 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
     }
 
   MALLOC_CHECK;
+  /* If the path is on a network drive, bypass the mount table.
+     If it's // or //MACHINE, use the netdrive device. */
+  if (src_path[1] == '/') 
+    {
+      if (!strchr (src_path + 2, '/'))
+	{
+	  dev = *netdrive_dev;
+	  set_flags (flags, PATH_BINARY);
+	}
+      backslashify (src_path, dst, 0);
+      /* Go through chroot check */
+      goto out;
+    }
   if (isproc (src_path))
     {
       dev = *proc_dev;

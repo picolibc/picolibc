@@ -1203,6 +1203,16 @@ class fhandler_proc: public fhandler_virtual
   bool fill_filebuf ();
 };
 
+class fhandler_netdrive: public fhandler_virtual
+{
+ public:
+  fhandler_netdrive ();
+  int exists();
+  struct dirent *readdir (DIR *);
+  int open (int flags, mode_t mode = 0);
+  int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
+};
+
 class fhandler_registry: public fhandler_proc
 {
  private:

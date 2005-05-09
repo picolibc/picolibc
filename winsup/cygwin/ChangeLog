@@ -1,3 +1,16 @@
+2005-05-09  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* fhandler.h (class fhandler_netdrive): New class.
+	* fhandler_netdrive.cc (fhandler_netdrive::fhandler_netdrive): New constructor.
+	(fhandler_netdrive::exists): New method.
+	(fhandler_netdrive::fstat): Ditto.
+	(fhandler_netdrive::readdir): Ditto.
+	(fhandler_netdrive::open): Ditto.
+	* dtable.cc (build_fh_pc): Handle case FH_NETDRIVE.
+	* path.cc (isvirtual_dev): Add FH_NETDRIVE.
+	(mount_info::conv_to_win32_path): Detect netdrive device and bypass mount
+	search for network paths.
+
 2005-05-08  Christopher Faylor  <cgf@timesys.com>
 
 	* dcrt0.cc (get_cygwin_startup_info): New function pulled from
@@ -50,6 +63,7 @@
 
 	* fhandler_socket.cc (get_inet_addr): Add missing __seterrno call.
 
+	
 2005-05-01  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_tty.cc (fhandler_tty_slave::read): Actually read input when
