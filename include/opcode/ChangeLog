@@ -1,3 +1,7 @@
+2005-05-09  Jan Beulich  <jbeulich@novell.com>
+
+	* i386.h (i386_optab): Add ht and hnt.
+
 2005-04-18  Mark Kettenis  <kettenis@gnu.org>
 
 	* i386.h: Insert hyphens into selected VIA PadLock extensions.

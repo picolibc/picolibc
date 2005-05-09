@@ -876,6 +876,8 @@ static const template i386_optab[] =
 {"repz",   0,	0xf3, X, 0,	 NoSuf|IsPrefix,	{ 0, 0, 0} },
 {"repne",  0,	0xf2, X, 0,	 NoSuf|IsPrefix,	{ 0, 0, 0} },
 {"repnz",  0,	0xf2, X, 0,	 NoSuf|IsPrefix,	{ 0, 0, 0} },
+{"ht",	   0,	0x3e, X, 0,	 NoSuf|IsPrefix,	{ 0, 0, 0} },
+{"hnt",	   0,	0x2e, X, 0,	 NoSuf|IsPrefix,	{ 0, 0, 0} },
 {"rex",    0,	0x40, X, Cpu64,	 NoSuf|IsPrefix,	{ 0, 0, 0} },
 {"rexz",   0,	0x41, X, Cpu64,	 NoSuf|IsPrefix,	{ 0, 0, 0} },
 {"rexy",   0,	0x42, X, Cpu64,	 NoSuf|IsPrefix,	{ 0, 0, 0} },
