@@ -578,13 +578,62 @@ initial_env ()
 
 }
 
+child_info *
+get_cygwin_startup_info ()
+{
+  STARTUPINFO si;
+  char zeros[sizeof (child_proc_info->zero)] = {0};
+
+  GetStartupInfo (&si);
+  child_info *res = (child_info *) si.lpReserved2;
+  if (si.cbReserved2 < EXEC_MAGIC_SIZE || !res
+      || memcmp (res->zero, zeros, sizeof (res->zero)) != 0)
+    res = NULL;
+  else
+    {
+      if ((res->intro & OPROC_MAGIC_MASK) == OPROC_MAGIC_GENERIC)
+	multiple_cygwin_problem ("proc intro", res->intro, 0);
+      else if (res->intro == PROC_MAGIC_GENERIC
+	       && res->magic != CHILD_INFO_MAGIC)
+	multiple_cygwin_problem ("proc magic", res->magic,
+				 CHILD_INFO_MAGIC);
+      else if (res->cygheap != (void *) &_cygheap_start)
+	multiple_cygwin_problem ("cygheap base", (DWORD) res->cygheap,
+				 (DWORD) &_cygheap_start);
+
+      unsigned should_be_cb = 0;
+      switch (res->type)
+	{
+	  case _PROC_FORK:
+	    user_data->forkee = true;
+	    should_be_cb = sizeof (child_info_fork);
+	    /* fall through */;
+	  case _PROC_SPAWN:
+	  case _PROC_EXEC:
+	    if (!should_be_cb)
+	      should_be_cb = sizeof (child_info_spawn);
+	    if (should_be_cb != res->cb)
+	      multiple_cygwin_problem ("proc size", res->cb, should_be_cb);
+	    else if (sizeof (fhandler_union) != res->fhandler_union_cb)
+	      multiple_cygwin_problem ("fhandler size", res->fhandler_union_cb, sizeof (fhandler_union));
+	    break;
+	  default:
+	    system_printf ("unknown exec type %d", res->type);
+	    /* intentionally fall through */
+	  case _PROC_WHOOPS:
+	    res = NULL;
+	    break;
+	}
+    }
+
+  return res;
+}
+
 void __stdcall
 dll_crt0_0 ()
 {
   wincap.init ();
   initial_env ();
-
-  char zeros[sizeof (child_proc_info->zero)] = {0};
 
   init_console_handler ();
   init_global_security ();
@@ -600,60 +649,17 @@ dll_crt0_0 ()
 
   (void) SetErrorMode (SEM_FAILCRITICALERRORS);
 
-  STARTUPINFO si;
-  GetStartupInfo (&si);
-  child_proc_info = (child_info *) si.lpReserved2;
-
-  if (si.cbReserved2 < EXEC_MAGIC_SIZE || !child_proc_info
-      || memcmp (child_proc_info->zero, zeros,
-		 sizeof (child_proc_info->zero)) != 0)
-    child_proc_info = NULL;
-  else
-    {
-      if ((child_proc_info->intro & OPROC_MAGIC_MASK) == OPROC_MAGIC_GENERIC)
-	multiple_cygwin_problem ("proc intro", child_proc_info->intro, 0);
-      else if (child_proc_info->intro == PROC_MAGIC_GENERIC
-	       && child_proc_info->magic != CHILD_INFO_MAGIC)
-	multiple_cygwin_problem ("proc magic", child_proc_info->magic,
-				 CHILD_INFO_MAGIC);
-      else if (child_proc_info->cygheap != (void *) &_cygheap_start)
-	multiple_cygwin_problem ("cygheap base", (DWORD) child_proc_info->cygheap,
-				 (DWORD) &_cygheap_start);
-      unsigned should_be_cb = 0;
-      switch (child_proc_info->type)
-	{
-	  case _PROC_FORK:
-	    user_data->forkee = true;
-	    should_be_cb = sizeof (child_info_fork);
-	    /* fall through */;
-	  case _PROC_SPAWN:
-	  case _PROC_EXEC:
-	    if (!should_be_cb)
-	      should_be_cb = sizeof (child_info_spawn);
-	    if (should_be_cb != child_proc_info->cb)
-	      multiple_cygwin_problem ("proc size", child_proc_info->cb, should_be_cb);
-	    else if (sizeof (fhandler_union) != child_proc_info->fhandler_union_cb)
-	      multiple_cygwin_problem ("fhandler size", child_proc_info->fhandler_union_cb, sizeof (fhandler_union));
-	    else
-	      cygwin_user_h = child_proc_info->user_h;
-	    break;
-	  default:
-	    system_printf ("unknown exec type %d", child_proc_info->type);
-	    /* intentionally fall through */
-	  case _PROC_WHOOPS:
-	    child_proc_info = NULL;
-	    break;
-	}
-    }
 
   device::init ();
   do_global_ctors (&__CTOR_LIST__, 1);
   cygthread::init ();
 
+  child_proc_info = get_cygwin_startup_info ();
   if (!child_proc_info)
     memory_init ();
   else
     {
+      cygwin_user_h = child_proc_info->user_h;
       switch (child_proc_info->type)
 	{
 	  case _PROC_FORK:

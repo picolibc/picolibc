@@ -27,8 +27,10 @@ details. */
 #include "heap.h"
 #include "pwdgrp.h"
 #include "cygtls.h"
+#include "child_info.h"
 
 void *hook_cygwin (const char *, const void *);
+child_info *get_cygwin_startup_info ();
 
 static external_pinfo *
 fillout_pinfo (pid_t pid, int winpid)
@@ -305,6 +307,16 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  const char *name = va_arg (arg, const char *);
 	  const void *hookfn = va_arg (arg, const void *);
 	  return (unsigned long) hook_cygwin (name, hookfn);
+	}
+      case CW_ARGV:
+	{
+	  child_info_spawn *ci = (child_info_spawn *) get_cygwin_startup_info ();
+	  return (DWORD) (ci ? ci->moreinfo->argv : NULL);
+	}
+      case CW_ENVP:
+	{
+	  child_info_spawn *ci = (child_info_spawn *) get_cygwin_startup_info ();
+	  return (DWORD) (ci ? ci->moreinfo->envp : NULL);
 	}
       default:
 	return (DWORD) -1;

@@ -1,3 +1,12 @@
+2005-05-08  Christopher Faylor  <cgf@timesys.com>
+
+	* dcrt0.cc (get_cygwin_startup_info): New function pulled from
+	dll_crt0_0.
+	(dll_crt0_0): Use get_cygwin_startup_info to retrieve cygwin-specific
+	startup pointer.
+	* external.cc (cygwin_internal): Implement CW_ARGV and CW_ENVP.
+	* include/sys/cygwin.h: Implement CW_ARGV and CW_ENVP.
+
 2005-05-07  Christopher Faylor  <cgf@timesys.com>
 
 	* path.cc (normalize_posix_path): Don't treat '//' specially since
