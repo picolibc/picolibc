@@ -8,6 +8,7 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
+#define cygwin_internal cygwin_internal_dontuse
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,6 +20,7 @@
 #include <getopt.h>
 #include "cygwin/include/sys/cygwin.h"
 #include "cygwin/include/mntent.h"
+#undef cygwin_internal
 
 #define alloca __builtin_alloca
 
@@ -1427,10 +1429,48 @@ Compiled on %s\n\
 ", len, v, __DATE__);
 }
 
+void
+nuke (char *ev)
+{
+  int n = 1 + strchr (*_environ, '=') - ev;
+  char *s = (char *) alloca (n);
+  memcpy (s, ev, n);
+  s[n] = '\0';
+  putenv (s);
+}
+
+DWORD (*cygwin_internal) (int, ...);
+
+static void
+load_cygwin (int& argc, char **&argv)
+{
+  HMODULE h;
+
+  if (!(h = LoadLibrary ("cygwin1.dll")))
+    return;
+  if (!(cygwin_internal = (DWORD (*) (int, ...)) GetProcAddress (h, "cygwin_internal")))
+    return;
+
+  char **av = (char **) cygwin_internal (CW_ARGV);
+  if (av)
+    for (argc = 0, argv = av; *av; av++)
+      argc++;
+	      
+  char **envp = (char **) cygwin_internal (CW_ENVP);
+  if (envp)
+    {
+      while (*_environ)
+	nuke (*_environ);
+      for (char **ev = envp; *ev; ev++)
+	putenv (*ev);
+    }
+}
+
 int
 main (int argc, char **argv)
 {
   int i;
+  load_cygwin (argc, argv);
 
   (void) putenv("POSIXLY_CORRECT=1");
   while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)

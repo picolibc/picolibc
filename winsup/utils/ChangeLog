@@ -1,5 +1,12 @@
 2005-05-08  Christopher Faylor  <cgf@timesys.com>
 
+	* cygcheck.cc (nuke): New function.
+	(load_cygwin): New function.
+	(main): Use load_cygwin to load argv/envp from cygwin environment, if
+	appropriate.
+
+2005-05-08  Christopher Faylor  <cgf@timesys.com>
+
 	* strace.cc (attach_process): Don't call load_cygwin().  Assume that
 	it's already happened.
 	(dotoggle): Ditto.
