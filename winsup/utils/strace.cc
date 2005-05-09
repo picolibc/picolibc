@@ -1,6 +1,6 @@
 /* strace.cc
 
-   Copyright 2000, 2001, 2002, 2003, 2004 Red Hat Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005 Red Hat Inc.
 
    Written by Chris Faylor <cgf@redhat.com>
 
@@ -279,7 +279,6 @@ load_cygwin ()
 static void
 attach_process (pid_t pid)
 {
-  load_cygwin ();
   child_pid = (DWORD) cygwin_internal (CW_CYGWIN_PID_TO_WINPID, pid);
   if (!child_pid)
     {
@@ -652,7 +651,6 @@ proc_child (unsigned mask, FILE *ofile, pid_t pid)
 static void
 dotoggle (pid_t pid)
 {
-  load_cygwin ();
   child_pid = (DWORD) cygwin_internal (CW_CYGWIN_PID_TO_WINPID, pid);
   if (!child_pid)
     {
@@ -905,6 +903,14 @@ main (int argc, char **argv)
   pid_t pid = 0;
   int opt;
   int toggle = 0;
+
+  if (load_cygwin ())
+    {
+      char **av = (char **) cygwin_internal (CW_ARGV);
+      if (av)
+	for (argc = 0, argv = av; *av; av++)
+	  argc++;
+    }
 
   if (!(pgm = strrchr (*argv, '\\')) && !(pgm = strrchr (*argv, '/')))
     pgm = *argv;

@@ -1,3 +1,10 @@
+2005-05-08  Christopher Faylor  <cgf@timesys.com>
+
+	* strace.cc (attach_process): Don't call load_cygwin().  Assume that
+	it's already happened.
+	(dotoggle): Ditto.
+	(main): Set argv from cygwin environment, if it exists.
+
 2005-05-01  Christopher Faylor  <cgf@timesys.com>
 
 	* mount.cc (usage): Clarify action of -m option.
