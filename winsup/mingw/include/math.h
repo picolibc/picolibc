@@ -721,8 +721,7 @@ extern long double __cdecl nanl(const char *tagp);
 /* 7.12.11.3 */
 extern double __cdecl nextafter (double, double); /* in libmoldname.a */
 extern float __cdecl nextafterf (float, float);
-/* TODO: Not yet implemented */
-/* extern long double __cdecl nextafterl (long double, long double); */
+extern long double __cdecl nextafterl (long double, long double);
 
 /* 7.12.11.4 The nexttoward functions: TODO */
 

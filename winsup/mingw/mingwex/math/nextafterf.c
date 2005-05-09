@@ -11,17 +11,15 @@ nextafterf (float x, float y)
   if (isnan (y) || isnan (x))
     return x + y;
   if (x == y )
-     return x;
+     /* nextafter (0.0, -O.0) should return -0.0.  */
+     return y;
   u.f = x; 
-  if (u.i == 0u)
+  if (x == 0.0F)
     {
-      if (y > 0.0F)
-	u.i = 1;
-      else
-	u.i = 0x80000001;
-      return u.f;
+      u.i = 1;
+      return y > 0.0F ? u.f : -u.f;
     }
-   if (((x > 0.0F) ^ (y > x)) == 0)
+  if (((x > 0.0F) ^ (y > x)) == 0)
     u.i++;
   else
     u.i--;

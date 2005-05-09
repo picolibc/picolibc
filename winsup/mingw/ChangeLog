@@ -1,7 +1,16 @@
+2005-05-09  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/math/nextafterf.c (nextafterf): Correct
+	handling of -0.0.
+	* mingwex/math/nextafterl.c: New file.
+	* mingwex/Makefile.in (MATH_DISTFILES): Add nextafterl.c.
+	(MATH_OBJS): Add nextafterl.o.
+	* include/math.h (nextafterl): Uncomment prototype.
+
 2005-05-08  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/math/erfl.c: New file.
-	* mingwex/Makefile.i (MATH_DISTFILES): Add erfl.c.
+	* mingwex/Makefile.in (MATH_DISTFILES): Add erfl.c.
 	(MATH_OBJS): Add erfl.o.
 	* include/math.h (erfl, erfcl): Uncomment prototypes.
 
