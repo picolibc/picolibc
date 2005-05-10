@@ -59,3 +59,7 @@ nextafterl (long double x, long double y)
 
   return u.ld;
 }
+
+/* nexttowardl is the same function with a different name.  */
+long double
+nexttowardl (long double, long double) __attribute__ ((alias("nextafterl")));

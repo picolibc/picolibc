@@ -723,7 +723,10 @@ extern double __cdecl nextafter (double, double); /* in libmoldname.a */
 extern float __cdecl nextafterf (float, float);
 extern long double __cdecl nextafterl (long double, long double);
 
-/* 7.12.11.4 The nexttoward functions: TODO */
+/* 7.12.11.4 The nexttoward functions */
+extern double __cdecl nexttoward (double,  long double);
+extern float __cdecl nexttowardf (float,  long double);
+extern long double __cdecl nexttowardl (long double, long double);
 
 /* 7.12.12.1 */
 /*  x > y ? (x - y) : 0.0  */

@@ -1,3 +1,14 @@
+2005-05-10  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/math/nexttoward.c: New file.
+	* mingwex/math/nexttowardf.c: New file.
+	* mingwex/math/nextafterl.c: Add nexttowardl aliaa.
+	* mingwex/Makefile.in (MATH_DISTFILES): Add nexttoward.c,
+	mexttowardf.c,
+	(MATH_OBJS):  Add nexttoward.o,	mexttowardf.o,
+	* include/math.h (nexttoward, nextowardf, nexttowardl): Add
+	prototypes.
+
 2005-05-09  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/math/nextafterf.c (nextafterf): Correct
