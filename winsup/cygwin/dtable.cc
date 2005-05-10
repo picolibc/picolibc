@@ -465,6 +465,9 @@ build_fh_pc (path_conv& pc)
 		fh = cnew (fhandler_tty_slave) ();
 	      break;
 	    }
+	  case FH_KMSG:
+	    fh = cnew (fhandler_mailslot) ();
+	    break;
 	}
       }
 

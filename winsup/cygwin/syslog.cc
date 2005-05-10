@@ -461,6 +461,38 @@ syslog (int priority, const char *message, ...)
   va_end (ap);
 }
 
+static NO_COPY muto klog_guard;
+fhandler_mailslot *dev_kmsg;
+
+extern "C" void
+vklog (int priority, const char *message, va_list ap)
+{
+  /* TODO: kernel messages are under our control entirely and they should
+     be quick.  No playing with /dev/null, but a fixed upper size for now. */
+  char buf[2060];	/* 2048 + a prority */
+  __small_sprintf (buf, "<%d>", priority);
+  __small_vsprintf (buf + strlen (buf), message, ap);
+  klog_guard.init ("klog_guard")->acquire ();
+  if (!dev_kmsg)
+    dev_kmsg = (fhandler_mailslot *) build_fh_name ("/dev/kmsg");
+  if (dev_kmsg && !dev_kmsg->get_handle ())
+    dev_kmsg->open (O_WRONLY, 0);
+  if (dev_kmsg && dev_kmsg->get_handle ())
+    dev_kmsg->write (buf, strlen (buf) + 1);
+  else
+    vsyslog (priority, message, ap);
+  klog_guard.release ();
+}
+
+extern "C" void
+klog (int priority, const char *message, ...)
+{
+  va_list ap;
+  va_start (ap, message);
+  vklog (priority, message, ap);
+  va_end (ap);
+}
+
 extern "C" void
 closelog (void)
 {

@@ -360,6 +360,17 @@ class fhandler_base
   friend class fhandler_fifo;
 };
 
+class fhandler_mailslot : public fhandler_base
+{
+ public:
+  fhandler_mailslot ();
+  int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
+  int open (int flags, mode_t mode = 0);
+  int write (const void *ptr, size_t len);
+  int ioctl (unsigned int cmd, void *);
+  select_record *select_read (select_record *s);
+};
+
 class fhandler_socket: public fhandler_base
 {
  private:
@@ -1274,6 +1285,7 @@ typedef union
   char __dev_tape[sizeof (fhandler_dev_tape)];
   char __dev_zero[sizeof (fhandler_dev_zero)];
   char __disk_file[sizeof (fhandler_disk_file)];
+  char __mailslot[sizeof (fhandler_mailslot)];
   char __pipe[sizeof (fhandler_pipe)];
   char __proc[sizeof (fhandler_proc)];
   char __process[sizeof (fhandler_process)];
@@ -1327,6 +1339,7 @@ class select_stuff
   void *device_specific_pipe;
   void *device_specific_socket;
   void *device_specific_serial;
+  void *device_specific_mailslot;
 
   int test_and_set (int i, fd_set *readfds, fd_set *writefds,
 		     fd_set *exceptfds);
@@ -1336,7 +1349,8 @@ class select_stuff
   select_stuff (): always_ready (0), windows_used (0), start (0),
 		   device_specific_pipe (0),
 		   device_specific_socket (0),
-		   device_specific_serial (0) {}
+		   device_specific_serial (0),
+		   device_specific_mailslot (0) {}
 };
 
 int __stdcall set_console_state_for_spawn ();

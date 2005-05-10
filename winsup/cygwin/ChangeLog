@@ -1,3 +1,28 @@
+2005-05-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Add fhandler_mailslot.o.
+	* devices.h (FH_KMSG): Define new device.
+	* devices.in: Add "/dev/kmsg" entry.
+	* devices.cc: Regenerate.
+	* dtable.cc (build_fh_pc): Handle case FH_KMSG.
+	* fhandler.h (class fhandler_mailslot): New class.
+	(class select_stuff): Add device_specific_mailslot pointer.
+	* fhandler_mailslot.cc: New file.
+	* select.cc (peek_mailslot): New function.
+	(verify_mailslot): Ditto.
+	(struct mailslotinf): New stuct to handle select on mailslots.
+	(thread_mailslot): New function.
+	(start_thread_mailslot): Ditto.
+	(mailslot_cleanup): Ditto.
+	(fhandler_mailslot::select_read): New method.
+	* syslog.cc (klog_guard): New muto.
+	(dev_kmsg): Local mailslot for kernel message device.
+	(vklog): New function.
+	(klog): Ditto.
+	* winsup.h (vklog): Declare.
+	(klog): Ditto.
+	* include/sys/syslog.h: Define _PATH_KLOG.
+
 2005-05-10  Christopher Faylor  <cgf@timesys.com>
 
 	* dcrt0.cc (dll_crt0_1): Call cygwin_exit to ensure that destructors

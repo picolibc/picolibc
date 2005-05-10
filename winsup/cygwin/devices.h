@@ -101,6 +101,7 @@ enum fh_devices
   FH_FULL    = FHDEV (1, 7),
   FH_RANDOM  = FHDEV (1, 8),
   FH_URANDOM = FHDEV (1, 9),
+  FH_KMSG    = FHDEV (1, 11),
   FH_OSS_DSP = FHDEV (14, 3),
 
   DEV_CYGDRIVE_MAJOR = 98,

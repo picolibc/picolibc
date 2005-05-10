@@ -15,6 +15,7 @@ details. */
 #include <stdarg.h>
 
 #define _PATH_LOG	"/dev/log"
+#define _PATH_KLOG	"/dev/kmsg"
 
 #define	LOG_EMERG	0
 #define	LOG_ALERT	1

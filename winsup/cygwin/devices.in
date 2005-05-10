@@ -81,6 +81,7 @@ const device dev_bad_storage =
 "/dev/sr%(0-15)d", BRACK(FHDEV(DEV_CDROM_MAJOR, {$1})), "\\Device\\CdRom{$1}"
 "/dev/sd%{a-z}s", BRACK(FH_SD{uc $1}), "\\Device\\Harddisk{ord($1) - ord('a')}\\Partition0"
 "/dev/sd%{a-z}s%(1-15)d", BRACK(FH_SD{uc $1} | {$2}), "\\Device\\Harddisk{ord($1) - ord('a')}\\Partition{$2 % 16}"
+"/dev/kmsg", BRACK(FH_KMSG), "\\\\.\\mailslot\\cygwin\\dev\\kmsg"
 %other	{return	NULL;}
 %%
 #undef BRACK

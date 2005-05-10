@@ -296,6 +296,9 @@ extern "C" int __small_sprintf (char *dst, const char *fmt, ...) /*__attribute__
 extern "C" int __small_vsprintf (char *dst, const char *fmt, va_list ap) /*__attribute__ ((regparm (3)))*/;
 extern void multiple_cygwin_problem (const char *, unsigned, unsigned);
 
+extern "C" void vklog (int priority, const char *message, va_list ap);
+extern "C" void klog (int priority, const char *message, ...);
+
 int symlink_worker (const char *, const char *, bool, bool)
   __attribute__ ((regparm (3)));
 

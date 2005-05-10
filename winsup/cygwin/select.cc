@@ -1591,3 +1591,123 @@ fhandler_windows::select_except (select_record *s)
   s->windows_handle = true;
   return s;
 }
+
+static int
+peek_mailslot (select_record *me, bool)
+{
+  HANDLE h;
+  set_handle_or_return_if_not_open (h, me);
+
+  if (me->read_selected && me->read_ready)
+    return 1;
+  DWORD msgcnt = 0;
+  if (!GetMailslotInfo (h, NULL, NULL, &msgcnt, NULL))
+    {
+      select_printf ("mailslot %d(%p) error %E", me->fd, h);
+      return 1;
+    }
+  if (msgcnt > 0)
+    {
+      me->read_ready = true;
+      select_printf ("mailslot %d(%p) ready", me->fd, h);
+      return 1;
+    }
+  select_printf ("mailslot %d(%p) not ready", me->fd, h);
+  return 0;
+}
+
+static int
+verify_mailslot (select_record *me, fd_set *rfds, fd_set *wfds,
+		 fd_set *efds)
+{
+  return peek_mailslot (me, true);
+}
+
+static int start_thread_mailslot (select_record *me, select_stuff *stuff);
+
+struct mailslotinf
+  {
+    cygthread *thread;
+    bool stop_thread_mailslot;
+    select_record *start;
+  };
+
+static DWORD WINAPI
+thread_mailslot (void *arg)
+{
+  mailslotinf *mi = (mailslotinf *) arg;
+  bool gotone = false;
+
+  for (;;)
+    {
+      select_record *s = mi->start;
+      while ((s = s->next))
+	if (s->startup == start_thread_mailslot)
+	  {
+	    if (peek_mailslot (s, true))
+	      gotone = true;
+	    if (mi->stop_thread_mailslot)
+	      {
+		select_printf ("stopping");
+		goto out;
+	      }
+	  }
+      /* Paranoid check */
+      if (mi->stop_thread_mailslot)
+	{
+	  select_printf ("stopping from outer loop");
+	  break;
+	}
+      if (gotone)
+	break;
+      Sleep (10);
+    }
+out:
+  return 0;
+}
+
+static int
+start_thread_mailslot (select_record *me, select_stuff *stuff)
+{
+  if (stuff->device_specific_mailslot)
+    {
+      me->h = *((mailslotinf *) stuff->device_specific_mailslot)->thread;
+      return 1;
+    }
+  mailslotinf *mi = new mailslotinf;
+  mi->start = &stuff->start;
+  mi->stop_thread_mailslot = false;
+  mi->thread = new cygthread (thread_mailslot, (LPVOID) mi, "select_mailslot");
+  me->h = *mi->thread;
+  if (!me->h)
+    return 0;
+  stuff->device_specific_mailslot = (void *) mi;
+  return 1;
+}
+
+static void
+mailslot_cleanup (select_record *, select_stuff *stuff)
+{
+  mailslotinf *mi = (mailslotinf *) stuff->device_specific_mailslot;
+  if (mi && mi->thread)
+    {
+      mi->stop_thread_mailslot = true;
+      mi->thread->detach ();
+      delete mi;
+      stuff->device_specific_mailslot = NULL;
+    }
+}
+
+select_record *
+fhandler_mailslot::select_read (select_record *s)
+{
+  if (!s)
+    s = new select_record;
+  s->startup = start_thread_mailslot;
+  s->peek = peek_mailslot;
+  s->verify = verify_mailslot;
+  s->cleanup = mailslot_cleanup;
+  s->read_selected = true;
+  s->read_ready = false;
+  return s;
+}
