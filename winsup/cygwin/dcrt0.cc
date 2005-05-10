@@ -41,6 +41,8 @@ details. */
 
 #define PREMAIN_LEN (sizeof (user_data->premain) / sizeof (user_data->premain[0]))
 
+extern "C" void cygwin_exit (int);
+
 void ld_preload ();
 
 HANDLE NO_COPY hMainProc = (HANDLE) -1;
@@ -885,7 +887,7 @@ dll_crt0_1 (char *)
   wait_for_sigthread ();
   ld_preload ();
   if (user_data->main)
-    exit (user_data->main (__argc, __argv, *user_data->envptr));
+    cygwin_exit (user_data->main (__argc, __argv, *user_data->envptr));
 }
 
 struct _reent *
