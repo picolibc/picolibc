@@ -1,3 +1,14 @@
+2005-05-10  Nick Clifton  <nickc@redhat.com>
+
+	* Update the address and phone number of the FSF organization in
+	the GPL notices in the following files:
+	a29k.h,	alpha.h, arc.h, arm.h, avr.h, cgen.h, convex.h, cris.h,
+	crx.h, d10v.h, d30v.h, dlx.h, h8300.h, hppa.h, i370.h, i386.h,
+	i860.h, i960.h, m68hc11.h, m68k.h, m88k.h, maxq.h, mips.h, mmix.h,
+	mn10200.h, mn10300.h, msp430.h, np1.h, ns32k.h, or32.h, pdp11.h,
+	pj.h, pn.h, ppc.h, pyr.h, s390.h, sparc.h, tic30.h, tic4x.h,
+	tic54x.h, tic80.h, v850.h, vax.h
+
 2005-05-09  Jan Beulich  <jbeulich@novell.com>
 
 	* i386.h (i386_optab): Add ht and hnt.

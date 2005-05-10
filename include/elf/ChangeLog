@@ -1,3 +1,15 @@
+2005-05-10  Nick Clifton  <nickc@redhat.com>
+
+	* Update the address and phone number of the FSF organization in
+	the GPL notices in the following files:
+        alpha.h, arc.h, arm.h, avr.h, common.h, cr16c.h, cris.h, crx.h,
+	d10v.h, d30v.h, dlx.h, dwarf.h, dwarf2.h, external.h, fr30.h,
+	frv.h, h8.h, hppa.h, i370.h, i386.h, i860.h, i960.h, ia64.h,
+	internal.h, ip2k.h, iq2000.h, m32r.h, m68hc11.h, m68k.h, mcore.h,
+	mips.h, mmix.h, mn10200.h, mn10300.h, msp430.h, openrisc.h,
+	or32.h, pj.h, ppc.h, ppc64.h, reloc-macros.h, s390.h, sh.h,
+	sparc.h, v850.h,  vax.h, x86-64.h, xstormy16.h,	xtensa.h
+	
 2005-04-13  H.J. Lu  <hongjiu.lu@intel.com>
 
 	Moved from ../ChangeLog
