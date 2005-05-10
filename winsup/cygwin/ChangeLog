@@ -1,3 +1,8 @@
+2005-05-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (path_conv::check): Set correct file attributes for socket
+	files.
+
 2005-05-09  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* fhandler.h (class fhandler_netdrive): New class.

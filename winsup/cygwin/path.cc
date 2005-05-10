@@ -720,7 +720,7 @@ is_virtual_symlink:
 		  error = ENOTDIR;
 		  return;
 		}
-	      fileattr = 0;
+	      fileattr = sym.fileattr;
 	      dev.parse (FH_UNIX);
 	      dev.setfs (1);
 	      goto out;
