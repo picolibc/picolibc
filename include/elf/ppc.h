@@ -120,12 +120,17 @@ START_RELOC_NUMBERS (elf_ppc_reloc_type)
   RELOC_NUMBER (R_PPC_EMB_BIT_FLD,	115)
   RELOC_NUMBER (R_PPC_EMB_RELSDA,	116)
 
-/* Fake relocations for branch stubs. This will keep them
-   together.  */
-#define R_PPC_RELAX32 249
-#define R_PPC_RELAX32PC 250
-#define R_PPC_RELAX32_PLT 251
-#define R_PPC_RELAX32PC_PLT 252
+/* Fake relocations for branch stubs, only used internally by ld.  */
+#define R_PPC_RELAX32 245
+#define R_PPC_RELAX32PC 246
+#define R_PPC_RELAX32_PLT 247
+#define R_PPC_RELAX32PC_PLT 248
+
+/* These are GNU extensions used in PIC code sequences.  */
+  RELOC_NUMBER (R_PPC_REL16,		249)
+  RELOC_NUMBER (R_PPC_REL16_LO,		250)
+  RELOC_NUMBER (R_PPC_REL16_HI,		251)
+  RELOC_NUMBER (R_PPC_REL16_HA,		252)
 
 /* These are GNU extensions to enable C++ vtable garbage collection.  */
   RELOC_NUMBER (R_PPC_GNU_VTINHERIT,	253)
@@ -139,6 +144,9 @@ END_RELOC_NUMBERS (R_PPC_max)
 
 #define IS_PPC_TLS_RELOC(R) \
   ((R) >= R_PPC_TLS && (R) <= R_PPC_GOT_DTPREL16_HA)
+
+/* Specify the start of the .glink section.  */
+#define DT_PPC_GLINK		DT_LOPROC
 
 /* Processor specific flags for the ELF header e_flags field.  */
 
