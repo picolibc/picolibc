@@ -1430,7 +1430,8 @@ fhandler_console::write_normal (const unsigned char *src,
 
   while (found < end)
     {
-      if (base_chars[*found] != NOR)
+      char ch = base_chars[*found];
+      if (ch != NOR)
 	break;
       found++;
     }

@@ -1,3 +1,9 @@
+2005-05-10  Christopher Faylor  <cgf@timesys.com>
+
+	* cygtls.cc (_cygtls::remove): Clear exitsock after close.
+	* fhandler_console.cc (fhandler_console::write_normal): Store character
+	in a local variable for potential future inspection.
+
 2005-05-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (DLL_OFILES): Add fhandler_mailslot.o.
