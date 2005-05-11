@@ -1,3 +1,11 @@
+2005-05-11  Christopher Faylor  <cgf@timesys.com>
+
+	* dcrt0.cc (do_global_dtors): Don't call dll_global_dtors here.
+	(__main): Reinstate atexit of do_global_dtors.
+	(cygwin_exit): Call dll_global_dtors here.
+	(do_exit): And here.
+
+
 2005-05-10  Christopher Faylor  <cgf@timesys.com>
 
 	* cygtls.cc (_cygtls::remove): Clear exitsock after close.

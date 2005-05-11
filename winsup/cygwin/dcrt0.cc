@@ -129,9 +129,8 @@ char *old_title;
 char title_buf[TITLESIZE + 1];
 
 static void
-do_global_dtors (void)
+do_global_dtors ()
 {
-  dll_global_dtors ();
   void (**pfunc) () = user_data->dtors;
   if (pfunc)
     {
@@ -982,6 +981,7 @@ extern "C" void
 __main (void)
 {
   do_global_ctors (user_data->ctors, false);
+  atexit (do_global_dtors);
 }
 
 exit_states NO_COPY exit_state;
@@ -1003,7 +1003,7 @@ do_exit (int status)
 
   EnterCriticalSection (&exit_lock);
   muto::set_exiting_thread ();
-  do_global_dtors ();
+  dll_global_dtors ();
 
   if (exit_state < ES_EVENTS_TERMINATE)
     {
@@ -1107,7 +1107,7 @@ cygwin_atexit (void (*function)(void))
 extern "C" void
 cygwin_exit (int n)
 {
-  do_global_dtors ();
+  dll_global_dtors ();
   if (atexit_lock)
     atexit_lock.acquire ();
   exit (n);
