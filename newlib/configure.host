@@ -178,6 +178,7 @@ case "${host_cpu}" in
 	machine_dir=mn10200
 	;;
   mn10300)
+	default_newlib_io_long_long="yes"
 	machine_dir=mn10300
 	;;
   or16)

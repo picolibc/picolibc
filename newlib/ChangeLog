@@ -1,5 +1,9 @@
 2005-05-12  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* configure.host (mn10300-*): Add long long I/O support by default.
+
+2005-05-12  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/sys/linux/getpwuid.c: Removed.
 	* libc/sys/linux/getpwnam.c: Removed.
 	* libc/sys/linux/getpwent.c: New file containing logic
