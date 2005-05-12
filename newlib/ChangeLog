@@ -1,3 +1,13 @@
+2005-05-12  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/getpwuid.c: Removed.
+	* libc/sys/linux/getpwnam.c: Removed.
+	* libc/sys/linux/getpwent.c: New file containing logic
+	from files removed above.  This allows overriding of file
+	in libc/unix.
+	* libc/sys/linux/Makefile.am: Support changes above.
+	* libc/sys/linux/Makefile.in: Regenerated.
+
 2005-04-28  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/vfscanf.c (__svfscanf_r): Fix code thinko

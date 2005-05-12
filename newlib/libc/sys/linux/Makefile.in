@@ -118,7 +118,7 @@ ELIX_2_OBJS =  	aio64.$(oext) 	confstr.$(oext) 	ctermid.$(oext) 	fclean.$(oext) 
 ELIX_3_OBJS =  	system.$(oext) 	wait.$(oext)
 
 
-ELIX_4_OBJS =  	getlogin.$(oext) 	getpwnam.$(oext) 	getpwuid.$(oext) 	stack.$(oext)
+ELIX_4_OBJS =  	getlogin.$(oext) 	getpwent.$(oext) 	stack.$(oext)
 
 @ELIX_LEVEL_1_TRUE@LIB_OBJS = 
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@LIB_OBJS = $(ELIX_2_OBJS)
