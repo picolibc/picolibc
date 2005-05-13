@@ -1,3 +1,9 @@
+2005-05-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winnetwk.h (WNetGetResourceParentA): Add missing declaration.
+	(WNetGetResourceParentW): Ditto.
+	* include/ddk/ntifs.h (FILE_ID_FULL_DIRECTORY_INFORMATION): Define.
+
 2005-04-26  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wininet.h (FtpGetFileSize): Add prototype.

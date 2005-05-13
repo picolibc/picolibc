@@ -938,6 +938,44 @@ typedef struct _FILE_BOTH_DIRECTORY_INFORMATION {
 		WCHAR         FileName[0];
 } FILE_BOTH_DIRECTORY_INFORMATION, *PFILE_BOTH_DIRECTORY_INFORMATION;
 
+#if (VER_PRODUCTBUILD >= 2600)
+
+typedef struct _FILE_ID_FULL_DIRECTORY_INFORMATION {
+		ULONG	          NextEntryOffset;
+		ULONG	          FileIndex;
+		LARGE_INTEGER   CreationTime;
+		LARGE_INTEGER   LastAccessTime;
+		LARGE_INTEGER   LastWriteTime;
+		LARGE_INTEGER   ChangeTime;
+		LARGE_INTEGER   EndOfFile;
+		LARGE_INTEGER   AllocationSize;
+		ULONG           FileAttributes;
+		ULONG           FileNameLength;
+		ULONG           EaSize;
+		LARGE_INTEGER   FileId;
+		WCHAR           FileName[0];
+} FILE_ID_FULL_DIRECTORY_INFORMATION, *PFILE_ID_FULL_DIRECTORY_INFORMATION;
+
+typedef struct _FILE_ID_BOTH_DIRECTORY_INFORMATION {
+		ULONG         NextEntryOffset;
+		ULONG	        FileIndex;
+		LARGE_INTEGER CreationTime;
+		LARGE_INTEGER LastAccessTime;
+		LARGE_INTEGER LastWriteTime;
+		LARGE_INTEGER ChangeTime;
+		LARGE_INTEGER EndOfFile;
+		LARGE_INTEGER AllocationSize;
+		ULONG         FileAttributes;
+		ULONG         FileNameLength;
+		ULONG         EaSize;
+		CHAR          ShortNameLength;
+		WCHAR         ShortName[12];
+		LARGE_INTEGER FileId;
+		WCHAR         FileName[0];
+} FILE_ID_BOTH_DIRECTORY_INFORMATION, *PFILE_ID_BOTH_DIRECTORY_INFORMATION;
+
+#endif
+
 typedef struct _FILE_EA_INFORMATION {
     ULONG EaSize;
 } FILE_EA_INFORMATION, *PFILE_EA_INFORMATION;

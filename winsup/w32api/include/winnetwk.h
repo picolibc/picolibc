@@ -278,6 +278,8 @@ DWORD APIENTRY WNetGetNetworkInformationA(LPCSTR,LPNETINFOSTRUCT);
 DWORD APIENTRY WNetGetNetworkInformationW(LPCWSTR,LPNETINFOSTRUCT);
 DWORD APIENTRY WNetGetResourceInformationA(LPNETRESOURCEA,LPVOID,LPDWORD,LPSTR*);
 DWORD APIENTRY WNetGetResourceInformationW(LPNETRESOURCEA,LPVOID,LPDWORD,LPWSTR*);
+DWORD APIENTRY WNetGetResourceParentA(LPNETRESOURCEA,LPVOID,LPDWORD);
+DWORD APIENTRY WNetGetResourceParentW(LPNETRESOURCEW,LPVOID,LPDWORD);
 DWORD APIENTRY WNetGetLastErrorA(PDWORD,LPSTR,DWORD,LPSTR,DWORD);
 DWORD APIENTRY WNetGetLastErrorW(PDWORD,LPWSTR,DWORD,LPWSTR,DWORD);
 DWORD APIENTRY MultinetGetConnectionPerformanceA(LPNETRESOURCEA,LPNETCONNECTINFOSTRUCT);
@@ -294,6 +296,7 @@ typedef UNIVERSAL_NAME_INFOW UNIVERSAL_NAME_INFO,*LPUNIVERSAL_NAME_INFO;
 #define WNetEnumResource WNetEnumResourceW
 #define WNetOpenEnum WNetOpenEnumW
 #define WNetGetResourceInformation WNetGetResourceInformationW
+#define WNetGetResourceParent WNetGetResourceParentW
 #define WNetGetUniversalName WNetGetUniversalNameW
 #define WNetSetConnection WNetSetConnectionW
 #define WNetUseConnection WNetUseConnectionW
@@ -322,6 +325,7 @@ typedef REMOTE_NAME_INFOA REMOTE_NAME_INFO,*LPREMOTE_NAME_INFO;
 #define WNetOpenEnum WNetOpenEnumA
 #define WNetEnumResource WNetEnumResourceA
 #define WNetGetResourceInformation WNetGetResourceInformationA
+#define WNetGetResourceParent WNetGetResourceParentA
 #define WNetGetUniversalName WNetGetUniversalNameA
 #define WNetConnectionDialog1 WNetConnectionDialog1A
 #define WNetDisconnectDialog1 WNetDisconnectDialog1A
