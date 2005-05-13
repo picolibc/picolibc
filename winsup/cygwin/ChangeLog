@@ -1,3 +1,20 @@
+2005-05-12  Christopher Faylor  <cgf@timesys.com>
+
+	* cygtls.cc (_cygtls::remove): Eliminate compiler warning.
+
+	* dir.cc (mkdir): Check path for writability.
+	(rmdir): Ditto.  Remove check for special directories.
+	* path.cc (path_conv::check): Set PATH_RO for virtual devices.  Set
+	error if read-only and asked for writability.
+	* path.h (pathconv_arg): Add PC_WRITABLE.
+	(path_types): Add PATH_RO.
+	(path_conv::isro): Add (currently unused) check for read-only
+	filesystem.  Return "ENOSHARE" when we know a share doesn't exist.
+	* include/sys/mount.h: Add MOUNT_RO flag.
+	* autoload.cc (WNetGetResourceInformationA): Import.
+	* fhandler_netdrive.cc (fhandler_netdrive::exists): Detect actual
+	existence of remote system rather than always assuming that it exists.
+
 2005-05-11  Christopher Faylor  <cgf@timesys.com>
 
 	* dcrt0.cc (do_global_dtors): Don't call dll_global_dtors here.

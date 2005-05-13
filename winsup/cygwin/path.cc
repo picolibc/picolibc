@@ -675,6 +675,7 @@ path_conv::check (const char *src, unsigned opt,
 		      fileattr = INVALID_FILE_ATTRIBUTES;
 		    goto virtual_component_retry;
 		}
+	      path_flags |= PATH_RO;
 	      goto out;
 	    }
 	  /* devn should not be a device.  If it is, then stop parsing now. */
@@ -881,15 +882,21 @@ virtual_component_retry:
 out:
   bool strip_tail = false;
   /* If the user wants a directory, do not return a symlink */
-  if (!need_directory || error)
+  if ((opt & PC_WRITABLE) && (path_flags & PATH_RO))
+    {
+      debug_printf ("%s is on a read-only filesystem", path);
+      error = EROFS;
+      return;
+    }
+  else if (isvirtual_dev (dev.devn) && fileattr == INVALID_FILE_ATTRIBUTES)
+    {
+      error = dev.devn == FH_NETDRIVE ? ENOSHARE : ENOENT;
+      return;
+    }
+  else if (!need_directory || error)
     /* nothing to do */;
   else if (fileattr & FILE_ATTRIBUTE_DIRECTORY)
     path_flags &= ~PATH_SYMLINK;
-  else if (isvirtual_dev (dev.devn) && fileattr == INVALID_FILE_ATTRIBUTES)
-    {
-      error = ENOENT;
-      return;
-    }
   else
     {
       debug_printf ("%s is a non-directory", path);

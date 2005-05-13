@@ -224,7 +224,7 @@ mkdir (const char *dir, mode_t mode)
   SECURITY_ATTRIBUTES sa = sec_none_nih;
   security_descriptor sd;
 
-  path_conv real_dir (dir, PC_SYM_NOFOLLOW);
+  path_conv real_dir (dir, PC_SYM_NOFOLLOW | PC_WRITABLE);
 
   if (real_dir.error)
     {
@@ -263,15 +263,11 @@ extern "C" int
 rmdir (const char *dir)
 {
   int res = -1;
-  DWORD devn;
 
-  path_conv real_dir (dir, PC_SYM_NOFOLLOW | PC_FULL);
+  path_conv real_dir (dir, PC_SYM_NOFOLLOW | PC_FULL | PC_WRITABLE);
 
   if (real_dir.error)
     set_errno (real_dir.error);
-  else if ((devn = real_dir.get_devn ()) == FH_PROC || devn == FH_REGISTRY
-	   || devn == FH_PROCESS)
-    set_errno (EROFS);
   else if (!real_dir.exists ())
     set_errno (ENOENT);
   else if  (!real_dir.isdir ())

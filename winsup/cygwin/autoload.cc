@@ -557,6 +557,8 @@ LoadDLLfuncEx (waveInStart, 4, winmm, 1)
 LoadDLLfuncEx (waveInReset, 4, winmm, 1)
 LoadDLLfuncEx (waveInClose, 4, winmm, 1)
 
+LoadDLLfunc (WNetGetResourceInformationA, 16, mpr)
+
 LoadDLLfuncEx (UuidCreate, 4, rpcrt4, 1)
 LoadDLLfuncEx (UuidCreateSequential, 4, rpcrt4, 1)
 }

@@ -172,7 +172,7 @@ _cygtls::remove (DWORD wait)
       if (locals.exitsock != INVALID_SOCKET)
 	{
 	  closesocket (locals.exitsock);
-	  locals.exitsock = NULL;
+	  locals.exitsock = (SOCKET) NULL;
 	}
       free_local (process_ident);
       free_local (ntoa_buf);

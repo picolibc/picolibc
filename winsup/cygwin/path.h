@@ -39,7 +39,8 @@ enum pathconv_arg
   PC_NULLEMPTY		= 0x0020,
   PC_CHECK_EA		= 0x0040,
   PC_POSIX		= 0x0080,
-  PC_NO_ACCESS_CHECK	= 0x00800000
+  PC_NO_ACCESS_CHECK	= 0x00800000,
+  PC_WRITABLE		= 0x00400000
 };
 
 enum case_checking
@@ -51,7 +52,7 @@ enum case_checking
 
 #define PC_NONULLEMPTY -1
 
-#include <sys/mount.h>
+#include "sys/mount.h"
 
 enum path_types
 {
@@ -62,6 +63,7 @@ enum path_types
   PATH_NOTEXEC		= MOUNT_NOTEXEC,
   PATH_CYGWIN_EXEC	= MOUNT_CYGWIN_EXEC,
   PATH_ENC		= MOUNT_ENC,
+  PATH_RO		= MOUNT_RO,
   PATH_ALL_EXEC		= (PATH_CYGWIN_EXEC | PATH_EXEC),
   PATH_NO_ACCESS_CHECK	= PC_NO_ACCESS_CHECK,
   PATH_LNK		= 0x01000000,
@@ -149,6 +151,7 @@ class path_conv
   int is_lnk_special () const {return is_fs_device () || isfifo () || is_lnk_symlink ();}
   int issocket () const {return dev.devn == FH_UNIX;}
   int iscygexec () const {return path_flags & PATH_CYGWIN_EXEC;}
+  bool isro () const {return !!(path_flags & PATH_RO);}
   bool exists () const {return fileattr != INVALID_FILE_ATTRIBUTES;}
   bool has_attribute (DWORD x) const {return exists () && (fileattr & x);}
   int isdir () const {return has_attribute (FILE_ATTRIBUTE_DIRECTORY);}

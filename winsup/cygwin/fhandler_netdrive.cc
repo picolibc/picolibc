@@ -8,6 +8,7 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include <windows.h>
 #include "winsup.h"
 #include <unistd.h>
 #include <stdlib.h>
@@ -19,12 +20,31 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include <assert.h>
+#include <shlwapi.h>
 
 /* Returns 0 if path doesn't exist, >0 if path is a directory,
    -1 if path is a file, -2 if it's a symlink.  */
 int
 fhandler_netdrive::exists ()
 {
+  char *to;
+  const char *from;
+  char namebuf[strlen (get_name ()) + 1];
+  for (to = namebuf, from = get_name (); *from; to++, from++)
+    *to = (*from == '/') ? '\\' : *from;
+  *to = '\0';
+
+  NETRESOURCE nr = {0};
+  nr.dwScope = RESOURCE_GLOBALNET;
+  nr.dwType = RESOURCETYPE_DISK;
+  nr.lpLocalName = NULL;
+  nr.lpRemoteName = namebuf;
+  LPTSTR sys = NULL;
+  char buf[8192];
+  DWORD n = sizeof (buf);
+  DWORD rc = WNetGetResourceInformation (&nr, &buf, &n, &sys);
+  if (rc != ERROR_MORE_DATA && rc != NO_ERROR)
+    return 0;
   return 1;
 }
 
