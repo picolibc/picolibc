@@ -423,6 +423,8 @@ mount_commands (void)
 	  strcat (opts, " -x");
 	if (strstr (p->mnt_opts, ",noexec"))
 	  strcat (opts, " -E");
+	if (strstr (p->mnt_opts, ",cygexec"))
+	  strcat (opts, " -X");
 	if (strstr (p->mnt_opts, ",managed"))
 	  strcat (opts, " -o managed");
 	while ((c = strchr (p->mnt_fsname, '\\')) != NULL)

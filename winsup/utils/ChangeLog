@@ -1,3 +1,7 @@
+2005-05-13  Christopher Faylor  <cgf@timesys.com>
+
+	* mount.cc (mount_commands): Display "-X" option when appropriate.
+
 2005-05-08  Christopher Faylor  <cgf@timesys.com>
 
 	* cygcheck.cc (nuke): New function.
@@ -20,10 +24,6 @@
 
 	* path.cc (getmntent): Add previously-omitted 'noexec' and 'managed'
 	flags to mnt_opts string if present in mount flags.
-
-2005-04-25  Christopher Faylor  <cgf@timesys.com>
-
-	* mount.cc (mount_commands): Display "-X" option when appropriate.
 
 2005-04-20  Brian Dessent  <brian@dessent.net>
 
