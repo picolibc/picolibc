@@ -237,11 +237,7 @@ normalize_posix_path (const char *src, char *dst, char *&tail)
     }
   /* Two leading /'s?  If so, preserve them.  */
   else if (isslash (src[1]) && !isslash (src[2]))
-    {
-      *tail++ = '/';
-      *tail++ = '/';
-      src += 2;
-    }
+    *tail++ = *src++;
 
   while (*src)
     {
