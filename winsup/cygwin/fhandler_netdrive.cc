@@ -136,7 +136,6 @@ fhandler_netdrive::readdir (DIR *dir)
 	  return NULL;
 	}
     }
-  /* FIXME: dot and dot_dot handling */
   DWORD cnt = 1;
   size = 16384;	/* As documented in MSDN. */
   nro = (NETRESOURCE *) alloca (size);

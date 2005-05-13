@@ -1,5 +1,9 @@
 2005-05-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (fhandler_netdrive::readdir): Remove useless comment.
+
+2005-05-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (WNetGetResourceParentA): Import.
 	(WNetOpenEnumA): Import.
 	(WNetEnumResourceA): Import.
