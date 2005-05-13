@@ -1,5 +1,12 @@
 2005-05-13  Christopher Faylor  <cgf@timesys.com>
 
+	Remove PC_FULL from path_conv usage throughout.
+	* path.h (enum pathconv_arg): Change PC_FULL to PC_NOUILL.
+	* path.cc (path_conv::check): Test for PC_NOFULL rather than !PC_FULL.
+	(cygwin_conv_to_win32_path): Use PC_NOFULL to force non-absolute path.
+
+2005-05-13  Christopher Faylor  <cgf@timesys.com>
+
 	* fhandler_netdrive.cc (fhandler_netdrive::exists): Assert that "//"
 	exists.
 

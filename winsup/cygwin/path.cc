@@ -956,7 +956,7 @@ out:
     devn = FH_SOCKET;
 #endif
 
-  if (!(opt & PC_FULL))
+  if (opt & PC_NOFULL)
     {
       if (is_relpath)
 	mkrelpath (this->path);
@@ -2679,7 +2679,7 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
 	    strcpy (w32topath, reltopath);
 	  if (use_winsym)
 	    {
-	      win32_topath.check (topath, PC_FULL | PC_SYM_NOFOLLOW);
+	      win32_topath.check (topath, PC_SYM_NOFOLLOW);
 	      strcpy (w32topath, win32_topath);
 	    }
 	  if (cp)
@@ -2690,7 +2690,7 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
 	}
       else
 	{
-	  win32_topath.check (topath, PC_FULL | PC_SYM_NOFOLLOW);
+	  win32_topath.check (topath, PC_SYM_NOFOLLOW);
 	  strcpy (w32topath, win32_topath);
 	}
       create_how = CREATE_NEW;
@@ -3433,7 +3433,7 @@ chdir (const char *in_dir)
 
   /* Convert path.  First argument ensures that we don't check for NULL/empty/invalid
      again. */
-  path_conv path (PC_NONULLEMPTY, in_dir, PC_FULL | PC_SYM_FOLLOW | PC_POSIX);
+  path_conv path (PC_NONULLEMPTY, in_dir, PC_SYM_FOLLOW | PC_POSIX);
   if (path.error)
     {
       set_errno (path.error);
@@ -3518,7 +3518,7 @@ fchdir (int fd)
 extern "C" int
 cygwin_conv_to_win32_path (const char *path, char *win32_path)
 {
-  path_conv p (path, PC_SYM_FOLLOW | PC_NO_ACCESS_CHECK);
+  path_conv p (path, PC_SYM_FOLLOW | PC_NO_ACCESS_CHECK | PC_NOFULL);
   if (p.error)
     {
       win32_path[0] = '\0';
@@ -3533,7 +3533,7 @@ cygwin_conv_to_win32_path (const char *path, char *win32_path)
 extern "C" int
 cygwin_conv_to_full_win32_path (const char *path, char *win32_path)
 {
-  path_conv p (path, PC_SYM_FOLLOW | PC_FULL | PC_NO_ACCESS_CHECK);
+  path_conv p (path, PC_SYM_FOLLOW | PC_NO_ACCESS_CHECK);
   if (p.error)
     {
       win32_path[0] = '\0';
@@ -3571,7 +3571,7 @@ realpath (const char *path, char *resolved)
   extern suffix_info stat_suffixes[];
   int err;
 
-  path_conv real_path (path, PC_SYM_FOLLOW | PC_FULL, stat_suffixes);
+  path_conv real_path (path, PC_SYM_FOLLOW, stat_suffixes);
 
   if (real_path.error)
     err = real_path.error;
@@ -3624,7 +3624,7 @@ conv_path_list_buf_size (const char *path_list, bool to_posix)
   int i, num_elms, max_mount_path_len, size;
   const char *p;
 
-  path_conv pc(".", PC_FULL | PC_POSIX);
+  path_conv pc(".", PC_POSIX);
   /* The theory is that an upper bound is
      current_size + (num_elms * max_mount_path_len)  */
 

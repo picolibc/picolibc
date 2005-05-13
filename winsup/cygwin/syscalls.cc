@@ -134,7 +134,7 @@ unlink (const char *ourname)
   int res = -1;
   DWORD devn;
 
-  path_conv win32_name (ourname, PC_SYM_NOFOLLOW | PC_FULL);
+  path_conv win32_name (ourname, PC_SYM_NOFOLLOW);
 
   if (win32_name.error)
     {
@@ -267,7 +267,7 @@ unlink (const char *ourname)
 extern "C" int
 _remove_r (struct _reent *, const char *ourname)
 {
-  path_conv win32_name (ourname, PC_SYM_NOFOLLOW | PC_FULL);
+  path_conv win32_name (ourname, PC_SYM_NOFOLLOW);
 
   if (win32_name.error)
     {
@@ -282,7 +282,7 @@ _remove_r (struct _reent *, const char *ourname)
 extern "C" int
 remove (const char *ourname)
 {
-  path_conv win32_name (ourname, PC_SYM_NOFOLLOW | PC_FULL);
+  path_conv win32_name (ourname, PC_SYM_NOFOLLOW);
 
   if (win32_name.error)
     {
@@ -1128,7 +1128,7 @@ rename (const char *oldpath, const char *newpath)
   int res = 0;
   char *lnk_suffix = NULL;
 
-  path_conv real_old (oldpath, PC_FULL | PC_SYM_NOFOLLOW);
+  path_conv real_old (oldpath, PC_SYM_NOFOLLOW);
 
   if (real_old.error)
     {
@@ -1137,7 +1137,7 @@ rename (const char *oldpath, const char *newpath)
       return -1;
     }
 
-  path_conv real_new (newpath, PC_FULL | PC_SYM_NOFOLLOW);
+  path_conv real_new (newpath, PC_SYM_NOFOLLOW);
 
   /* Shortcut hack. */
   char new_lnk_buf[CYG_MAX_PATH + 5];
@@ -1146,7 +1146,7 @@ rename (const char *oldpath, const char *newpath)
       strcpy (new_lnk_buf, newpath);
       strcat (new_lnk_buf, ".lnk");
       newpath = new_lnk_buf;
-      real_new.check (newpath, PC_FULL | PC_SYM_NOFOLLOW);
+      real_new.check (newpath, PC_SYM_NOFOLLOW);
     }
 
   if (real_new.error || real_new.case_clash)
@@ -1460,7 +1460,7 @@ pathconf (const char *file, int v)
     case _PC_POSIX_PERMISSIONS:
     case _PC_POSIX_SECURITY:
       {
-	path_conv full_path (file, PC_SYM_FOLLOW | PC_FULL);
+	path_conv full_path (file, PC_SYM_FOLLOW);
 	if (full_path.error)
 	  {
 	    set_errno (full_path.error);
@@ -1719,7 +1719,7 @@ statvfs (const char *fname, struct statvfs *sfs)
       return -1;
     }
 
-  path_conv full_path (fname, PC_SYM_FOLLOW | PC_FULL);
+  path_conv full_path (fname, PC_SYM_FOLLOW);
   if (!rootdir (full_path, root))
     return -1;
 
@@ -1910,7 +1910,7 @@ mknod32 (const char *path, mode_t mode, __dev32_t dev)
   if (strlen (path) >= CYG_MAX_PATH)
     return -1;
 
-  path_conv w32path (path, PC_SYM_NOFOLLOW | PC_FULL);
+  path_conv w32path (path, PC_SYM_NOFOLLOW);
   if (w32path.exists ())
     {
       set_errno (EEXIST);
@@ -2247,7 +2247,7 @@ setregid (__gid16_t rgid, __gid16_t egid)
 extern "C" int
 chroot (const char *newroot)
 {
-  path_conv path (newroot, PC_SYM_FOLLOW | PC_FULL | PC_POSIX);
+  path_conv path (newroot, PC_SYM_FOLLOW | PC_POSIX);
 
   int ret = -1;
   if (path.error)

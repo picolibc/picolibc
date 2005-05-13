@@ -294,7 +294,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
       case CW_GET_BINMODE:
 	{
 	  const char *path = va_arg (arg, const char *);
-	  path_conv p (path, PC_SYM_FOLLOW | PC_FULL | PC_NULLEMPTY);
+	  path_conv p (path, PC_SYM_FOLLOW | PC_NULLEMPTY);
 	  if (p.error)
 	    {
 	      set_errno (p.error);

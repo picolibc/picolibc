@@ -412,8 +412,7 @@ acl_worker (const char *path, int cmd, int nentries, __aclent32_t *aclbufp,
 {
   extern suffix_info stat_suffixes[];
   int res = -1;
-  fhandler_base *fh = build_fh_name (path, NULL, fmode | PC_FULL,
-				     stat_suffixes);
+  fhandler_base *fh = build_fh_name (path, NULL, fmode, stat_suffixes);
   if (fh->error ())
     {
       debug_printf ("got %d error from build_fh_name", fh->error ());

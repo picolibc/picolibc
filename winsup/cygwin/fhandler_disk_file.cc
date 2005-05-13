@@ -681,7 +681,7 @@ fhandler_disk_file::ftruncate (_off64_t length)
 int
 fhandler_disk_file::link (const char *newpath)
 {
-  path_conv newpc (newpath, PC_SYM_NOFOLLOW | PC_FULL | PC_POSIX);
+  path_conv newpc (newpath, PC_SYM_NOFOLLOW | PC_POSIX);
   extern bool allow_winsymlinks;
 
   if (newpc.error)
@@ -711,7 +711,7 @@ fhandler_disk_file::link (const char *newpath)
       strcpy (new_lnk_buf, newpath);
       strcat (new_lnk_buf, ".lnk");
       newpath = new_lnk_buf;
-      newpc.check (newpath, PC_SYM_NOFOLLOW | PC_FULL);
+      newpc.check (newpath, PC_SYM_NOFOLLOW);
     }
 
   query_open (query_write_attributes);

@@ -338,7 +338,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 fhandler_base *
 build_fh_name (const char *name, HANDLE h, unsigned opt, suffix_info *si)
 {
-  path_conv pc (name, opt | PC_NULLEMPTY | PC_FULL | PC_POSIX, si);
+  path_conv pc (name, opt | PC_NULLEMPTY | PC_POSIX, si);
   if (pc.error)
     {
       fhandler_base *fh = cnew (fhandler_nodevice) ();

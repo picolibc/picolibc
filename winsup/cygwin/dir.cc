@@ -45,7 +45,7 @@ opendir (const char *name)
   fhandler_base *fh;
   DIR *res;
 
-  fh = build_fh_name (name, NULL, PC_SYM_FOLLOW | PC_FULL);
+  fh = build_fh_name (name, NULL, PC_SYM_FOLLOW);
   if (!fh)
     res = NULL;
   else if (fh->exists ())
@@ -264,7 +264,7 @@ rmdir (const char *dir)
 {
   int res = -1;
 
-  path_conv real_dir (dir, PC_SYM_NOFOLLOW | PC_FULL | PC_WRITABLE);
+  path_conv real_dir (dir, PC_SYM_NOFOLLOW | PC_WRITABLE);
 
   if (real_dir.error)
     set_errno (real_dir.error);
