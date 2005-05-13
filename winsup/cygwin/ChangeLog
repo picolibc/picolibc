@@ -1,3 +1,19 @@
+2005-05-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (WNetGetResourceParentA): Import.
+	(WNetOpenEnumA): Import.
+	(WNetEnumResourceA): Import.
+	(WNetCloseEnum): Import.
+	* fhandler.h (fhandler_netdrive::telldir): Add declaration.
+	(fhandler_netdrive::seekdir): Ditto.
+	(fhandler_netdrive::closedir): Ditto.
+	* fhandler_netdrive.cc: Drop explicit including windows.h.  Include
+	winnetwk.h instead of shlwapi.h.  Include dirent.h.
+	(fhandler_netdrive::readdir): Implement.
+	(fhandler_netdrive::telldir): New method.
+	(fhandler_netdrive::seekdir): New method.
+	(fhandler_netdrive::closedir): Ditto.
+
 2005-05-13  Christopher Faylor  <cgf@timesys.com>
 
 	Remove PC_FULL from path_conv usage throughout.
