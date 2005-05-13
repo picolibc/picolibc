@@ -29,7 +29,10 @@ fhandler_netdrive::exists ()
 {
   char *to;
   const char *from;
-  char namebuf[strlen (get_name ()) + 1];
+  size_t len = strlen (get_name ());
+  if (len == 2)
+    return 1;
+  char namebuf[len + 1];
   for (to = namebuf, from = get_name (); *from; to++, from++)
     *to = (*from == '/') ? '\\' : *from;
   *to = '\0';
