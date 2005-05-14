@@ -1,3 +1,7 @@
+2005-05-14  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h (DT_PPC_GOT): Rename from DT_PPC_GLINK.
+
 2005-05-11  Alan Modra  <amodra@bigpond.net.au>
 
 	* ppc.h (R_PPC_RELAX32, R_PPC_RELAX32PC, R_PPC_RELAX32_PLT,

@@ -145,8 +145,8 @@ END_RELOC_NUMBERS (R_PPC_max)
 #define IS_PPC_TLS_RELOC(R) \
   ((R) >= R_PPC_TLS && (R) <= R_PPC_GOT_DTPREL16_HA)
 
-/* Specify the start of the .glink section.  */
-#define DT_PPC_GLINK		DT_LOPROC
+/* Specify the value of _GLOBAL_OFFSET_TABLE_.  */
+#define DT_PPC_GOT		DT_LOPROC
 
 /* Processor specific flags for the ELF header e_flags field.  */
 
