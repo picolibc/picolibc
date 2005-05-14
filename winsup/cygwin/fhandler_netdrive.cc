@@ -65,7 +65,7 @@ fhandler_netdrive::fstat (struct __stat64 *buf)
 
   (void) fhandler_base::fstat (buf);
 
-  buf->st_mode = S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
+  buf->st_mode = S_IFDIR | STD_RBITS | STD_XBITS;
 
   return 0;
 }

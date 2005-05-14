@@ -148,11 +148,16 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
   BOOL res = GetFileInformationByHandle (get_handle (), &local);
   debug_printf ("%d = GetFileInformationByHandle (%s, %d)",
 		res, get_win32_name (), get_handle ());
-  /* GetFileInformationByHandle will fail if it's given stdio handle or pipe*/
+  /* GetFileInformationByHandle will fail if it's given stdio handle or pipe.
+     It also fails on 9x when trying to access directories on shares. */
   if (!res)
     {
       memset (&local, 0, sizeof (local));
       local.nFileSizeLow = GetFileSize (get_handle (), &local.nFileSizeHigh);
+      /* Even GetFileSize fails on 9x when trying to access directories
+	 on shares. In this case reset filesize to 0. */
+      if (local.nFileSizeLow == 0xffffffff && GetLastError ())
+	local.nFileSizeLow = 0;
     }
 
   return fstat_helper (buf,
