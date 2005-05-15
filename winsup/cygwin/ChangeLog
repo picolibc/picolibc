@@ -1,3 +1,7 @@
+2005-05-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* environ.cc (conv_envvars): Treat LD_LIBRARY_PATH as path list.
+
 2005-05-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Check
