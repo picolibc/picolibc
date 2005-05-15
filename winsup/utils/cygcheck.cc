@@ -1,6 +1,6 @@
 /* cygcheck.cc
 
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -1424,7 +1424,7 @@ print_version ()
   printf ("\
 cygcheck version %.*s\n\
 System Checker for Cygwin\n\
-Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.\n\
+Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.\n\
 Compiled on %s\n\
 ", len, v, __DATE__);
 }
@@ -1459,10 +1459,19 @@ load_cygwin (int& argc, char **&argv)
   char **envp = (char **) cygwin_internal (CW_ENVP);
   if (envp)
     {
+      /* Store path and revert to this value, otherwise path gets overwritten
+         by the POSIXy Cygwin variation, which breaks cygcheck.
+	 Another approach would be to use the Cygwin PATH and convert it to
+	 Win32 again. */
+      char *path = NULL;
       while (*_environ)
-	nuke (*_environ);
+	{
+	  if (!strncmp (*_environ, "PATH=", 5))
+	    path = strdup (*_environ);
+	  nuke (*_environ);
+        }
       for (char **ev = envp; *ev; ev++)
-	putenv (*ev);
+	putenv (!strncmp (*ev, "PATH=", 5) ? path : *ev);
     }
 }
 

@@ -1,3 +1,9 @@
+2005-05-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (load_cygwin): Don't touch $PATH for now.
+	(print_version): Fix copyright.
+	* strace.cc (print_version): Ditto.
+
 2005-05-13  Christopher Faylor  <cgf@timesys.com>
 
 	* mount.cc (mount_commands): Display "-X" option when appropriate.
