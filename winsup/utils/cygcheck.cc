@@ -1466,12 +1466,15 @@ load_cygwin (int& argc, char **&argv)
       char *path = NULL;
       while (*_environ)
 	{
-	  if (!strncmp (*_environ, "PATH=", 5))
+	  if (strncmp (*_environ, "PATH=", 5) == 0)
 	    path = strdup (*_environ);
 	  nuke (*_environ);
         }
       for (char **ev = envp; *ev; ev++)
-	putenv (!strncmp (*ev, "PATH=", 5) ? path : *ev);
+	if (strncmp (*ev, "PATH=", 5) != 0)
+	 putenv (*ev);
+	else if (path)
+	  putenv (path);
     }
 }
 

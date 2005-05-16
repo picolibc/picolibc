@@ -1,3 +1,7 @@
+2005-05-15  Christopher Faylor  <cgf@timesys.com>
+
+	* cygcheck.cc (load_cygwin): Avoid calling putenv with a NULL path.
+
 2005-05-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (load_cygwin): Don't touch $PATH for now.
