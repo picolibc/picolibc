@@ -650,7 +650,6 @@ dll_crt0_0 ()
 
   (void) SetErrorMode (SEM_FAILCRITICALERRORS);
 
-
   device::init ();
   do_global_ctors (&__CTOR_LIST__, 1);
   cygthread::init ();
@@ -686,7 +685,8 @@ dll_crt0_0 ()
 	    __argv = spawn_info->moreinfo->argv;
 	    envp = spawn_info->moreinfo->envp;
 	    envc = spawn_info->moreinfo->envc;
-	    cygheap->fdtab.fixup_after_exec ();
+	    if (!dynamically_loaded)
+	      cygheap->fdtab.fixup_after_exec ();
 	    signal_fixup_after_exec ();
 	    if (spawn_info->moreinfo->old_title)
 	      {

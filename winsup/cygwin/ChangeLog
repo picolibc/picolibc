@@ -1,5 +1,10 @@
 2005-05-16  Christopher Faylor  <cgf@timesys.com>
 
+	* dcrt0.cc (dll_crt0_0): Don't do fixup_after_exec if dynamically
+	loaded since the state of fds is unknown at this point.
+
+2005-05-16  Christopher Faylor  <cgf@timesys.com>
+
 	* include/sys/cygwin.h (enum cygwin_getinfo_types): Add CW_DEBUG_SELF.
 	* external.cc (cygwin_internal): Implement CW_DEBUG_SELF.
 
