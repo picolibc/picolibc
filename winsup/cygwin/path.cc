@@ -911,8 +911,8 @@ out:
 	      tail = NULL;
 	    else if (p[1] == '\\')
 	      {
-		error = ENOENT;
-		return;
+		memmove (p, p + 1, strlen (p));
+		tail = NULL;
 	      }
 	    else if (!tail)
 	      tail = p;

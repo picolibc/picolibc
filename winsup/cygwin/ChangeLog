@@ -1,3 +1,7 @@
+2005-05-16  Christopher Faylor  <cgf@timesys.com>
+
+	* path.cc (path_conv::check): Remove embedded dots before slashes.
+
 2005-05-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* environ.cc (conv_envvars): Remove LD_LIBRARY_PATH entirely.
