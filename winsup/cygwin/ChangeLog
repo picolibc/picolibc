@@ -1,5 +1,18 @@
 2005-05-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (class fhandler_netdrive): Add method rewinddir.
+	* fhandler_netdrive.cc (struct netdriveinf): New structure to
+	store thread arguments.
+	(thread_netdrive): Thread handling all potentially blocking
+	WNet... calls.
+	(create_thread_and_wait): Start and wait for above thread.
+	(fhandler_netdrive::exists): Change to call create_thread_and_wait
+	instead of calling WNet... function.
+	(fhandler_netdrive::readdir): Ditto.  Fix error handling.
+	(fhandler_netdrive::rewinddir): New method.
+
+2005-05-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* external.cc (cygwin_internal): Avoid compiler warning.
 
 2005-05-16  Christopher Faylor  <cgf@timesys.com>

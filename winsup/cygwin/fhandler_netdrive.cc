@@ -18,10 +18,89 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "sigproc.h"
+#include "cygthread.h"
 #include <assert.h>
 #include <winnetwk.h>
 
 #include <dirent.h>
+
+enum
+  {
+    GET_RESOURCE_INFO = 0,
+    GET_RESOURCE_OPENENUM = 1,
+    GET_RESOURCE_OPENENUMTOP = 2,
+    GET_RESOURCE_ENUM = 3
+  };
+
+struct netdriveinf
+  {
+    int what;
+    int ret;
+    PVOID in;
+    PVOID out;
+    DWORD outsize;
+    HANDLE sem;
+  };
+
+static DWORD WINAPI
+thread_netdrive (void *arg)
+{
+  netdriveinf *ndi = (netdriveinf *) arg;
+  LPTSTR dummy = NULL;
+  LPNETRESOURCE nro, nro2;
+  DWORD size;
+  HANDLE enumhdl;
+
+  ReleaseSemaphore (ndi->sem, 1, NULL);
+  switch (ndi->what)
+    {
+    case GET_RESOURCE_INFO:
+      nro = (LPNETRESOURCE) alloca (size = 4096);
+      ndi->ret = WNetGetResourceInformation ((LPNETRESOURCE) ndi->in,
+					     nro, &size, &dummy);
+      break;
+    case GET_RESOURCE_OPENENUM:
+    case GET_RESOURCE_OPENENUMTOP:
+      nro = (LPNETRESOURCE) alloca (size = 4096);
+      ndi->ret = WNetGetResourceInformation ((LPNETRESOURCE) ndi->in,
+					     nro, &size, &dummy);
+      if (ndi->ret != NO_ERROR)
+        break;
+      if (ndi->what == GET_RESOURCE_OPENENUMTOP)
+        {
+	  nro2 = nro;
+	  nro = (LPNETRESOURCE) alloca (size = 4096);
+	  ndi->ret = WNetGetResourceParent (nro2, nro, &size);
+	  if (ndi->ret != NO_ERROR)
+	    break;
+	}
+      ndi->ret = WNetOpenEnum (RESOURCE_GLOBALNET, RESOURCETYPE_DISK, 0, nro,
+			       &enumhdl);
+      if (ndi->ret == NO_ERROR)
+        *(HANDLE *) ndi->out = enumhdl;
+      break;
+    case GET_RESOURCE_ENUM:
+      ndi->ret = WNetEnumResource ((HANDLE) ndi->in, (size = 1, &size),
+				   (LPNETRESOURCE) ndi->out, &ndi->outsize);
+      break;
+    }
+  ReleaseSemaphore (ndi->sem, 1, NULL);
+  return 0;
+}
+
+static DWORD
+create_thread_and_wait (int what, PVOID in, PVOID out, DWORD outsize,
+			const char *name)
+{
+  netdriveinf ndi = { what, 0, in, out, outsize,
+		      CreateSemaphore (&sec_none_nih, 0, 2, NULL) };
+  cygthread *thr = new cygthread (thread_netdrive, (LPVOID) &ndi, name);
+  if (thr->detach (ndi.sem))
+    ndi.ret = ERROR_OPERATION_ABORTED;
+  CloseHandle (ndi.sem);
+  return ndi.ret;
+}
 
 /* Returns 0 if path doesn't exist, >0 if path is a directory,
    -1 if path is a file, -2 if it's a symlink.  */
@@ -43,11 +122,9 @@ fhandler_netdrive::exists ()
   nr.dwType = RESOURCETYPE_DISK;
   nr.lpLocalName = NULL;
   nr.lpRemoteName = namebuf;
-  LPTSTR sys = NULL;
-  char buf[8192];
-  DWORD n = sizeof (buf);
-  DWORD rc = WNetGetResourceInformation (&nr, &buf, &n, &sys);
-  if (rc != ERROR_MORE_DATA && rc != NO_ERROR)
+  DWORD ret = create_thread_and_wait (GET_RESOURCE_INFO, &nr, NULL, 0,
+				      "WnetGetResourceInformation");
+  if (ret != ERROR_MORE_DATA && ret != NO_ERROR)
     return 0;
   return 1;
 }
@@ -80,8 +157,8 @@ fhandler_netdrive::readdir (DIR *dir)
   if (!dir->__d_position)
     {
       size_t len = strlen (get_name ());
-      char *namebuf, *dummy;
-      NETRESOURCE nr = { 0 }, *nro2;
+      char *namebuf;
+      NETRESOURCE nr = { 0 };
 
       if (len == 2)	/* // */
         {
@@ -106,44 +183,24 @@ fhandler_netdrive::readdir (DIR *dir)
 
       nr.lpRemoteName = namebuf;
       nr.dwType = RESOURCETYPE_DISK;
-      size = 4096;
-      nro = (NETRESOURCE *) alloca (size);
-      ret = WNetGetResourceInformation (&nr, nro, &size, &dummy);
+      nro = (NETRESOURCE *) alloca (4096);
+      ret = create_thread_and_wait (len == 2 ? GET_RESOURCE_OPENENUMTOP
+					     : GET_RESOURCE_OPENENUM,
+				    &nr, &dir->__handle, 0, "WNetOpenEnum");
       if (ret != NO_ERROR)
 	{
-	  __seterrno ();
-	  return NULL;
-	}
-
-      if (len == 2)
-        {
-	  nro2 = nro;
-	  size = 4096;
-	  nro = (NETRESOURCE *) alloca (size);
-	  ret = WNetGetResourceParent (nro2, nro, &size);
-	  if (ret != NO_ERROR)
-	    {
-	      __seterrno ();
-	      return NULL;
-	    }
-	}
-      ret = WNetOpenEnum(RESOURCE_GLOBALNET, RESOURCETYPE_DISK, 0,
-      			 nro, &dir->__handle);
-      if (ret != NO_ERROR)
-	{
-	  __seterrno ();
+	  __seterrno_from_win_error (ret);
 	  dir->__handle = INVALID_HANDLE_VALUE;
 	  return NULL;
 	}
     }
-  DWORD cnt = 1;
-  size = 16384;	/* As documented in MSDN. */
-  nro = (NETRESOURCE *) alloca (size);
-  ret = WNetEnumResource (dir->__handle, &cnt, nro, &size);
+  ret = create_thread_and_wait (GET_RESOURCE_ENUM, dir->__handle,
+  				nro = (LPNETRESOURCE) alloca (16384),
+				16384, "WnetEnumResource");
   if (ret != NO_ERROR)
     {
       if (ret != ERROR_NO_MORE_ITEMS)
-	__seterrno ();
+	__seterrno_from_win_error (ret);
       return NULL;
     }
   dir->__d_position++;
@@ -161,6 +218,15 @@ fhandler_netdrive::telldir (DIR *dir)
 void
 fhandler_netdrive::seekdir (DIR *, _off64_t)
 {
+}
+
+void
+fhandler_netdrive::rewinddir (DIR *dir)
+{
+  if (dir->__handle != INVALID_HANDLE_VALUE)
+    WNetCloseEnum (dir->__handle);
+  dir->__handle = INVALID_HANDLE_VALUE;
+  return fhandler_virtual::rewinddir (dir);
 }
 
 int
