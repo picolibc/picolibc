@@ -1439,7 +1439,9 @@ nuke (char *ev)
   putenv (s);
 }
 
-DWORD (*cygwin_internal) (int, ...);
+extern "C" {
+unsigned long (*cygwin_internal) (int, ...);
+};
 
 static void
 load_cygwin (int& argc, char **&argv)

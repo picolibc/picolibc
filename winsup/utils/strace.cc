@@ -250,7 +250,9 @@ ctrl_c (DWORD)
   return TRUE;
 }
 
-DWORD (*cygwin_internal) (int, ...);
+extern "C" {
+unsigned long (*cygwin_internal) (int, ...);
+};
 
 static int
 load_cygwin ()
