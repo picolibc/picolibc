@@ -1523,7 +1523,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
   MALLOC_CHECK;
   /* If the path is on a network drive, bypass the mount table.
      If it's // or //MACHINE, use the netdrive device. */
-  if (src_path[1] == '/') 
+  if (src_path[1] == '/')
     {
       if (!strchr (src_path + 2, '/'))
 	{
