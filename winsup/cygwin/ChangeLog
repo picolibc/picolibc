@@ -1,3 +1,7 @@
+2005-05-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* external.cc (cygwin_internal): Avoid compiler warning.
+
 2005-05-16  Christopher Faylor  <cgf@timesys.com>
 
 	* dcrt0.cc (dll_crt0_0): Don't do fixup_after_exec if dynamically

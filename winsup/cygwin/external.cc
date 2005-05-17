@@ -323,6 +323,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	try_to_debug ();
 	break;
       default:
-	return (DWORD) -1;
+        break;
     }
+  return (unsigned long) -1;
 }
