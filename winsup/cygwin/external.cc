@@ -311,13 +311,17 @@ cygwin_internal (cygwin_getinfo_types t, ...)
       case CW_ARGV:
 	{
 	  child_info_spawn *ci = (child_info_spawn *) get_cygwin_startup_info ();
-	  return (DWORD) (ci ? ci->moreinfo->argv : NULL);
+	  return (unsigned long) (ci ? ci->moreinfo->argv : NULL);
 	}
       case CW_ENVP:
 	{
 	  child_info_spawn *ci = (child_info_spawn *) get_cygwin_startup_info ();
-	  return (DWORD) (ci ? ci->moreinfo->envp : NULL);
+	  return (unsigned long) (ci ? ci->moreinfo->envp : NULL);
 	}
+      case CW_DEBUG_SELF:
+	error_start_init (va_arg (arg, const char *));
+	try_to_debug ();
+	break;
       default:
 	return (DWORD) -1;
     }

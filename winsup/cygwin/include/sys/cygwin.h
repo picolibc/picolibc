@@ -82,7 +82,8 @@ typedef enum
     CW_GET_BINMODE,
     CW_HOOK,
     CW_ARGV,
-    CW_ENVP
+    CW_ENVP,
+    CW_DEBUG_SELF
   } cygwin_getinfo_types;
 
 #define CW_NEXTPID	0x80000000	/* or with pid to get next one */

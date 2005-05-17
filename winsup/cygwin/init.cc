@@ -119,6 +119,7 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
     {
     case DLL_PROCESS_ATTACH:
       cygwin_hmodule = (HMODULE) h;
+      dynamically_loaded = (static_load == NULL);
       /* Is the stack at an unusual high address?  Check if we're running on
 	 a 64 bit machine.  If so, respawn. */
       if (&is_64bit_machine >= (PBOOL) 0x400000
@@ -127,7 +128,6 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
 	respawn_wow64_process ();
 
       prime_threads ();
-      dynamically_loaded = (static_load == NULL);
       dll_crt0_0 ();
       break;
     case DLL_PROCESS_DETACH:

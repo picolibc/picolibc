@@ -1,5 +1,12 @@
 2005-05-16  Christopher Faylor  <cgf@timesys.com>
 
+	* include/sys/cygwin.h (enum cygwin_getinfo_types): Add CW_DEBUG_SELF.
+	* external.cc (cygwin_internal): Implement CW_DEBUG_SELF.
+
+	* init.cc (dll_entry): Minor rearrangement of code.
+
+2005-05-16  Christopher Faylor  <cgf@timesys.com>
+
 	* path.cc (path_conv::check): Remove embedded dots before slashes.
 
 2005-05-16  Corinna Vinschen  <corinna@vinschen.de>
