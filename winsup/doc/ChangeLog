@@ -1,3 +1,9 @@
+2005-05-18  Brian Dessent  <brian@dessent.net>
+
+	* install.texinfo ("How do I uninstall..."): Rewrite to cover
+	removing services, dealing with permissions, and other common
+	tasks for removing Cygwin completely.
+
 2005-05-08  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* how-programming.texinfo: Replace MAKE_MODE entry with FAQ about
