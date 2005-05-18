@@ -171,7 +171,7 @@ main(int ac, char **av)
 	 */
 	switch(pid=fork()) {
 	case 0: 	/* CHILD - Call execlp(2) */
-	    execlp("/usr/bin/test", "/usr/bin/test", 0);
+	    execlp("/usr/bin/test", "/usr/bin/test", NULL);
 	    /* should not get here!! if we do, the parent will fail the Test Case */
 	    exit(errno);	
 	case -1:	/* ERROR!!! exit now!!*/

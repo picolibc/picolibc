@@ -172,7 +172,7 @@ main(int ac, char **av)
 	 */
 	switch(pid=fork()) {
 	case 0: 	/* CHILD - Call execle(2) */
-	    execle("test", "test", 0, environ);
+	    execle("test", "test", NULL, environ);
 	    /* should not get here!! if we do, the parent will fail the Test Case */
 	    exit(errno);	
 	case -1:	/* ERROR!!! exit now!!*/

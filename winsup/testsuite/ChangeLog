@@ -1,3 +1,12 @@
+2005-05-17  Brian Dessent  <brian@dessent.net>
+
+	* winsup.api/signal-into-win32-api.c (main): Use 'NULL' instead of '0'
+	in argument list to avoid compiler warning with gcc4.
+	* winsup.api/ltp/execle01.c (main): Ditto.
+	* winsup.api/ltp/execlp01.c (main): Ditto.
+	* winsup.api/ltp/fcntl07.c (do_exec): Ditto.
+	* winsup.api/ltp/fcntl07B.c (do_exec): Ditto.
+
 2005-02-10  Christopher Faylor  <cgf@timesys.com>
 
 	* winsup.api/known_bugs.tcl: Remove dup05, fcntl07B, lseek04, select03,

@@ -37,7 +37,7 @@ main (int argc, char** argv)
       return 2;
     }
   else if (pid == 0)
-    execl ( argv[0], argv[0], "child", 0 );
+    execl ( argv[0], argv[0], "child", NULL );
   else
     {
       sleep_stage = 0;
