@@ -1,3 +1,8 @@
+2005-05-18  Zack Weinberg  <zack@codesourcery.com>
+
+	* arm.h: Make all #ifndef OLD_ARM_ABI blocks
+	unconditional, delete all #ifdef OLD_ARM_ABI blocks.
+
 2005-05-17  Zack Weinberg  <zack@codesourcery.com>
 
 	* arm.h: Import complete list of official relocation names

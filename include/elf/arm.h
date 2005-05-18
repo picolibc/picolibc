@@ -89,7 +89,6 @@ START_RELOC_NUMBERS (elf_arm_reloc_type)
   RELOC_NUMBER (R_ARM_PC24,            	  1)   /* deprecated */
   RELOC_NUMBER (R_ARM_ABS32,           	  2)
   RELOC_NUMBER (R_ARM_REL32,           	  3)
-#ifndef OLD_ARM_ABI
   RELOC_NUMBER (R_ARM_LDR_PC_G0,       	  4)
   RELOC_NUMBER (R_ARM_ABS16,           	  5)
   RELOC_NUMBER (R_ARM_ABS12,           	  6)
@@ -101,19 +100,6 @@ START_RELOC_NUMBERS (elf_arm_reloc_type)
   RELOC_NUMBER (R_ARM_BREL_ADJ,	       	 12)
   RELOC_NUMBER (R_ARM_SWI24,           	 13)   /* obsolete */
   RELOC_NUMBER (R_ARM_THM_SWI8,        	 14)   /* obsolete */
-#else
-  RELOC_NUMBER (R_ARM_ABS8,            	  4)
-  RELOC_NUMBER (R_ARM_ABS16,           	  5)
-  RELOC_NUMBER (R_ARM_ABS12,           	  6)
-  RELOC_NUMBER (R_ARM_THM_ABS5,        	  7)
-  RELOC_NUMBER (R_ARM_THM_CALL,        	  8)
-  RELOC_NUMBER (R_ARM_SBREL32,         	  9)
-  RELOC_NUMBER (R_ARM_BREL_ADJ,        	 10)
-  RELOC_NUMBER (R_ARM_THM_JUMP11,      	 11)
-  RELOC_NUMBER (R_ARM_THM_JUMP8,       	 12)
-  RELOC_NUMBER (R_ARM_GNU_VTINHERIT,   	 13)
-  RELOC_NUMBER (R_ARM_GNU_VTENTRY,     	 14)
-#endif
   RELOC_NUMBER (R_ARM_XPC25,           	 15)   /* obsolete */
   RELOC_NUMBER (R_ARM_THM_XPC22,       	 16)   /* obsolete */
   RELOC_NUMBER (R_ARM_TLS_DTPMOD32,    	 17)
@@ -196,12 +182,10 @@ START_RELOC_NUMBERS (elf_arm_reloc_type)
   RELOC_NUMBER (R_ARM_GOT_BREL12,      	 97)
   RELOC_NUMBER (R_ARM_GOTOFF12,	       	 98)
   RELOC_NUMBER (R_ARM_GOTRELAX,	       	 99)
-#ifndef OLD_ARM_ABI
   RELOC_NUMBER (R_ARM_GNU_VTENTRY,    	100)   /* deprecated - old C++ abi */
   RELOC_NUMBER (R_ARM_GNU_VTINHERIT,  	101)   /* deprecated - old C++ abi */
   RELOC_NUMBER (R_ARM_THM_JUMP11,     	102)
   RELOC_NUMBER (R_ARM_THM_JUMP8,      	103)
-#endif
   RELOC_NUMBER (R_ARM_TLS_GD32,	      	104)
   RELOC_NUMBER (R_ARM_TLS_LDM32,      	105)
   RELOC_NUMBER (R_ARM_TLS_LDO32,      	106)
@@ -234,9 +218,7 @@ START_RELOC_NUMBERS (elf_arm_reloc_type)
   FAKE_RELOC (R_ARM_GOT32,              R_ARM_GOT_BREL)   /* 32 bit GOT entry.  */
   FAKE_RELOC (R_ARM_ROSEGREL32,         R_ARM_SBREL31)    /* ??? */
   FAKE_RELOC (R_ARM_AMP_VCALL9,         R_ARM_BREL_ADJ)   /* Thumb-something.  Not used.  */
-#ifndef OLD_ARM_ABI
   FAKE_RELOC (R_ARM_PC13,               R_ARM_LDR_PC_G0)  /* Unclear whether meaning is different.  */
-#endif
 END_RELOC_NUMBERS (R_ARM_max)
 
 /* The name of the note section used to identify arm variants.  */
