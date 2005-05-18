@@ -1,3 +1,9 @@
+2005-05-17  Zack Weinberg  <zack@codesourcery.com>
+
+	* arm.h: Import complete list of official relocation names
+	and numbers from AAELF.  Define FAKE_RELOCs for old names.
+	Remove a few old names no longer used anywhere.
+
 2005-05-14  Alan Modra  <amodra@bigpond.net.au>
 
 	* ppc.h (DT_PPC_GOT): Rename from DT_PPC_GLINK.
