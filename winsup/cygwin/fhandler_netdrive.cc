@@ -212,12 +212,18 @@ fhandler_netdrive::readdir (DIR *dir)
 _off64_t
 fhandler_netdrive::telldir (DIR *dir)
 {
-  return -1;
+  return dir->__d_position;
 }
 
 void
-fhandler_netdrive::seekdir (DIR *, _off64_t)
+fhandler_netdrive::seekdir (DIR *dir, _off64_t pos)
 {
+  rewinddir (dir);
+  if (pos < 0)
+    return;
+  while (dir->__d_position < pos)
+    if (!readdir (dir))
+      break;
 }
 
 void
@@ -232,9 +238,7 @@ fhandler_netdrive::rewinddir (DIR *dir)
 int
 fhandler_netdrive::closedir (DIR *dir)
 {
-  if (dir->__handle != INVALID_HANDLE_VALUE)
-    WNetCloseEnum (dir->__handle);
-  dir->__handle = INVALID_HANDLE_VALUE;
+  rewinddir (dir);
   return fhandler_virtual::closedir (dir);
 }
 
