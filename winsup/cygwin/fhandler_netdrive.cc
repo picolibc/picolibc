@@ -209,12 +209,6 @@ fhandler_netdrive::readdir (DIR *dir)
   return dir->__d_dirent;
 }
 
-_off64_t
-fhandler_netdrive::telldir (DIR *dir)
-{
-  return dir->__d_position;
-}
-
 void
 fhandler_netdrive::seekdir (DIR *dir, _off64_t pos)
 {

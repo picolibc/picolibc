@@ -1,5 +1,11 @@
 2005-05-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_netdrive.cc (fhandler_netdrive::telldir): Remove since it's
+	equivalent to fhandler_virtual::telldir now anyway.
+	* fhandler.h (class fhandler_netdrive): Remove telldir.
+
+2005-05-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_netdrive.cc (fhandler_netdrive::telldir): Implement.
 	(fhandler_netdrive::seekdir): Implement.
 	(fhandler_netdrive::closedir): Call rewinddir to have only one point
