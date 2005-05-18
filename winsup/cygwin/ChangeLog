@@ -1,3 +1,12 @@
+2005-05-18  Christopher Faylor  <cgf@timesys.com>
+
+	* cygtls.h (_local_storage::unknown_thread_name): New buffer.
+	* tlsoffsets.h: Regenerate.
+	* cygthread.cc (cygthread::name): Use new thread-local buffer.
+	* exceptions.cc (handle_exceptions): Avoid unnecessary initialization
+	of static variables to zero.
+	* fork.cc (slow_pid_reuse) Ditto.
+
 2005-05-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (mmap64): Avoid compiler warning.
@@ -234,7 +243,6 @@
 
 	* fhandler_socket.cc (get_inet_addr): Add missing __seterrno call.
 
-	
 2005-05-01  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_tty.cc (fhandler_tty_slave::read): Actually read input when

@@ -388,8 +388,8 @@ extern "C" DWORD __stdcall RtlUnwind (void *, void *, void *, DWORD);
 static int
 handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
 {
-  static bool NO_COPY debugging = false;
-  static int NO_COPY recursed = 0;
+  static bool NO_COPY debugging;
+  static int NO_COPY recursed;
 
   if (debugging && ++debugging < 500000)
     {

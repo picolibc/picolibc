@@ -252,8 +252,8 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
 static void
 slow_pid_reuse (HANDLE h)
 {
-  static NO_COPY HANDLE last_fork_procs[NPIDS_HELD] = {0};
-  static NO_COPY unsigned nfork_procs = 0;
+  static NO_COPY HANDLE last_fork_procs[NPIDS_HELD];
+  static NO_COPY unsigned nfork_procs;
 
   if (nfork_procs >= (sizeof (last_fork_procs) / sizeof (last_fork_procs [0])))
     nfork_procs = 0;

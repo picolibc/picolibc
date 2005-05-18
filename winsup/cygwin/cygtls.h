@@ -92,6 +92,9 @@ struct _local_storage
   struct servent *servent_buf;		// note: malloced
   struct hostent *hostent_buf;		// note: malloced
   char signamebuf[sizeof ("Unknown signal 4294967295   ")];
+
+  /* cygthread.cc */
+  char unknown_thread_name[30];
 };
 
 typedef struct struct_waitq

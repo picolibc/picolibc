@@ -210,9 +210,8 @@ cygthread::name (DWORD tid)
 
   if (!res)
     {
-      static char buf[30] NO_COPY = {0};
-      __small_sprintf (buf, "unknown (%p)", tid);
-      res = buf;
+      __small_sprintf (_my_tls.locals.unknown_thread_name, "unknown (%p)", tid);
+      res = _my_tls.locals.unknown_thread_name;
     }
 
   return res;
