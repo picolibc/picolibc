@@ -1,3 +1,8 @@
+2005-05-19  Ben Elliston  <bje@au.ibm.com>
+
+	* dwarf2.h (enum dwarf_type): Assign DW_ATE_GNU_decimal_float from
+	the user-defined encoding space pending inclusion in the standard.
+
 2005-05-18  Zack Weinberg  <zack@codesourcery.com>
 
 	* arm.h: Make all #ifndef OLD_ARM_ABI blocks
