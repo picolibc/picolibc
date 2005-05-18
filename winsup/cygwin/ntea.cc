@@ -88,7 +88,7 @@ NTReadEA (const char *file, const char *attrname, char *attrbuf, int len)
     HANDLE hFileSource;
     int eafound = 0;
     PFILE_FULL_EA_INFORMATION ea, sea;
-    int easize;
+    int easize = 0;
 
     hFileSource = CreateFile (file, FILE_READ_EA,
 			      FILE_SHARE_READ | FILE_SHARE_WRITE,

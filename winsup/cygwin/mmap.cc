@@ -538,7 +538,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
   if (flags & MAP_ANONYMOUS)
     fd = -1;
 
-  fhandler_base *fh;
+  fhandler_base *fh = NULL;
 
   /* Get fhandler and convert /dev/zero mapping to MAP_ANONYMOUS mapping. */
   if (fd != -1)

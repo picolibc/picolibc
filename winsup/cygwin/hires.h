@@ -25,8 +25,6 @@ class hires_base
 {
  protected:
   int inited;
- public:
-  virtual LONGLONG usecs (bool justdelta) {return 0LL;}
 };
 
 class hires_us : hires_base
