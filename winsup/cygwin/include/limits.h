@@ -1,6 +1,6 @@
 /* limits.h
 
-   Copyright 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,6 +9,9 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #ifndef _LIMITS_H___
+
+#include <features.h>
+
 #ifndef _MACH_MACHLIMITS_H_
 
 /* _MACH_MACHLIMITS_H_ is used on OSF/1.  */
