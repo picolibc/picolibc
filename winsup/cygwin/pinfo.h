@@ -221,9 +221,10 @@ public:
   DWORD npids;
   inline void reset () { npids = 0; release (); }
   void set (bool winpid);
+  winpids (): enum_processes (&winpids::enum_init) {}
   winpids (int): pinfo_access (0), enum_processes (&winpids::enum_init)
     { reset (); }
-  winpids (DWORD acc = 0): pidlist (NULL), npidlist (0), pinfolist (NULL),
+  winpids (DWORD acc): pidlist (NULL), npidlist (0), pinfolist (NULL),
   			   enum_processes (&winpids::enum_init), npids (0)
   {
     pinfo_access = acc;

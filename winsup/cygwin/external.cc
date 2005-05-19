@@ -32,6 +32,8 @@ details. */
 void *hook_cygwin (const char *, const void *);
 child_info *get_cygwin_startup_info ();
 
+static winpids pids;
+
 static external_pinfo *
 fillout_pinfo (pid_t pid, int winpid)
 {
@@ -41,7 +43,6 @@ fillout_pinfo (pid_t pid, int winpid)
   if ((nextpid = !!(pid & CW_NEXTPID)))
     pid ^= CW_NEXTPID;
 
-  static winpids pids (0);
 
   static unsigned int i;
   if (!pids.npids || !nextpid)

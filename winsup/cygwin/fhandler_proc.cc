@@ -200,7 +200,7 @@ fhandler_proc::readdir (DIR * dir)
 {
   if (dir->__d_position >= PROC_LINK_COUNT)
     {
-      winpids pids;
+      winpids pids ((DWORD) 0);
       int found = 0;
       for (unsigned i = 0; i < pids.npids; i++)
 	if (found++ == dir->__d_position - PROC_LINK_COUNT)

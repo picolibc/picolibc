@@ -89,7 +89,7 @@ fhandler_fifo::close_one_end ()
 int
 fhandler_fifo::open_not_mine (int flags)
 {
-  winpids pids;
+  winpids pids ((DWORD) 0);
   int res = 0;
 
   for (unsigned i = 0; i < pids.npids; i++)

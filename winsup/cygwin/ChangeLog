@@ -1,5 +1,14 @@
 2005-05-18  Christopher Faylor  <cgf@timesys.com>
 
+	* external.cc: Move pids declaration to file scope and use less
+	enthusiastic constructor.
+	* pinfo.h (winpids::winpids): Remove default setting.
+	* fhandler_fifo.cc (fhandler_fifo::open_not_mine): Accommodate removal
+	of default setting.
+	* fhandler_proc.cc (fhandler_proc::readdir): Ditto.
+
+2005-05-18  Christopher Faylor  <cgf@timesys.com>
+
 	* cygtls.h (_local_storage::unknown_thread_name): New buffer.
 	* tlsoffsets.h: Regenerate.
 	* cygthread.cc (cygthread::name): Use new thread-local buffer.
