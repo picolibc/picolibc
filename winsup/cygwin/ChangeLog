@@ -1,3 +1,7 @@
+2005-05-19  Christopher Faylor  <cgf@timesys.com>
+
+	* include/endian.h: New file.
+
 2005-05-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.sc: Add Dwarf-2 debug sections.
