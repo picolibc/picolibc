@@ -1,4 +1,4 @@
-/* io.h
+/* endian.h
 
    Copyright 2005 Red Hat, Inc.
 
