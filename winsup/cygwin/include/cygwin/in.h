@@ -20,7 +20,8 @@
 
 #include <stdint.h>
 
-/* Standard well-defined IP protocols.  */
+/* Standard well-defined IP protocols.  If you ever add one here, don't
+   forget to define it below. */
 enum
 {
   IPPROTO_IP = 0,		/* Dummy protocol for TCP		*/
@@ -36,6 +37,7 @@ enum
   IPPROTO_MAX
 };
 
+/* Define IPPROTO_xxx values to accomodate SUSv3 */
 #define IPPROTO_IP IPPROTO_IP
 #define IPPROTO_ICMP IPPROTO_ICMP
 #define IPPROTO_IGMP IPPROTO_IGMP

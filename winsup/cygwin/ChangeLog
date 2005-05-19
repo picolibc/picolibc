@@ -1,5 +1,9 @@
 2005-05-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/in.h: Add comment.
+
+2005-05-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/in.h: Define IPPROTO_xxx values as macros to
 	accomodate SUSv3.
 
