@@ -13,5 +13,5 @@ details. */
 
 #include <machine/endian.h>
 
-#endif /* _IO_H_ */
+#endif
 
