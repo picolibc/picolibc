@@ -1,3 +1,7 @@
+2005-05-19  Anton Blanchard  <anton@samba.org>
+
+	* ppc.h (PPC_OPCODE_POWER5): Define.
+
 2005-05-10  Nick Clifton  <nickc@redhat.com>
 
 	* Update the address and phone number of the FSF organization in

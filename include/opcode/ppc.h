@@ -134,6 +134,9 @@ extern const int powerpc_num_opcodes;
 /* Opcode is supported by machine check APU.  */
 #define PPC_OPCODE_RFMCI	  0x800000
 
+/* Opcode is only supported by Power5 architecture.  */
+#define PPC_OPCODE_POWER5	    0x1000000
+
 /* A macro to extract the major opcode from an instruction.  */
 #define PPC_OP(i) (((i) >> 26) & 0x3f)
 
