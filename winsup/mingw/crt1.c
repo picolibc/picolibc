@@ -124,6 +124,25 @@ _gnu_exception_handler (EXCEPTION_POINTERS * exception_data)
 	}
       break;
 
+    case EXCEPTION_ILLEGAL_INSTRUCTION:
+    case EXCEPTION_PRIV_INSTRUCTION:
+      /* test if the user has set SIGILL */
+      old_handler = signal (SIGILL, SIG_DFL);
+      if (old_handler == SIG_IGN)
+	{
+	  /* this is undefined if the signal was raised by anything other
+	     than raise ().  */
+	  signal (SIGILL, SIG_IGN);
+	  action = EXCEPTION_CONTINUE_EXECUTION;
+	}
+      else if (old_handler != SIG_DFL)
+	{
+	  /* This means 'old' is a user defined function. Call it */
+	  (*old_handler) (SIGILL);
+	  action = EXCEPTION_CONTINUE_EXECUTION;
+	}
+      break;
+
     case EXCEPTION_FLT_INVALID_OPERATION:
     case EXCEPTION_FLT_DIVIDE_BY_ZERO:
     case EXCEPTION_FLT_DENORMAL_OPERAND:

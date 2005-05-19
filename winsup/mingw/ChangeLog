@@ -1,3 +1,8 @@
+2005-05-20  Danny Smith  <dannysmith@users.sourceforge
+
+	* crt1.c (_gnu_exception_handler): Handle illegal instruction
+	OS exception as a signal if user has defined a SIGILL handler.
+
 2005-05-10  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/math/nexttoward.c: New file.
