@@ -51,9 +51,7 @@ TEXIDIR = $(srcdir)/../texinfo
 INFOFILES = standards.info configure.info
 DVIFILES = standards.dvi configure.dvi
 
-all:
-
-# We want install to imply install-info as per GNU standards.
+all: info
 install: install-info
 
 uninstall:
