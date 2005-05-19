@@ -103,6 +103,19 @@ SECTIONS
   {
     [ .stabstr ]
   }
+  /* DWARF 1.1 and DWARF 2 */
+  .debug_aranges  BLOCK(__section_alignment__) (NOLOAD) : { *(.debug_aranges) }
+  .debug_pubnames BLOCK(__section_alignment__) (NOLOAD) : { *(.debug_pubnames) }
+  /* DWARF 2 */
+  .debug_info     BLOCK(__section_alignment__) (NOLOAD) : { *(.debug_info) }
+  .debug_abbrev   BLOCK(__section_alignment__) (NOLOAD) : { *(.debug_abbrev) }
+  .debug_line     BLOCK(__section_alignment__) (NOLOAD) : { *(.debug_line) }
+  .debug_frame    BLOCK(__section_alignment__) (NOLOAD) : { *(.debug_frame) }
+  .debug_str      BLOCK(__section_alignment__) (NOLOAD) : { *(.debug_str) }
+  .debug_loc      BLOCK(__section_alignment__) (NOLOAD) : { *(.debug_loc) }
+  .debug_macinfo  BLOCK(__section_alignment__) (NOLOAD) : { *(.debug_macinfo) }
+  .debug_macinfo  BLOCK(__section_alignment__) (NOLOAD) : { *(.debug_macinfo) }
+  .debug_ranges   BLOCK(__section_alignment__) (NOLOAD) : { *(.debug_ranges) }
   .cygheap BLOCK(64 * 1024) :
   {
     __system_dlls__ = ABSOLUTE(.) ;

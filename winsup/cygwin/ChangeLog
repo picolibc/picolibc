@@ -1,5 +1,9 @@
 2005-05-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin.sc: Add Dwarf-2 debug sections.
+
+2005-05-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mmap.cc (mmap64): Make granularity an automatic variable.
 
 2005-05-19  Christopher Faylor  <cgf@timesys.com>
