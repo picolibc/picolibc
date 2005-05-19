@@ -678,12 +678,9 @@ class fhandler_cygdrive: public fhandler_disk_file
   const char *pdrive;
   void set_drives ();
  public:
-  bool iscygdrive_root () { return !dev ().minor; }
   fhandler_cygdrive ();
   DIR *opendir ();
   struct dirent *readdir (DIR *);
-  _off64_t telldir (DIR *);
-  void seekdir (DIR *, _off64_t);
   void rewinddir (DIR *);
   int closedir (DIR *);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));

@@ -1326,8 +1326,6 @@ fhandler_cygdrive::set_drives ()
 int
 fhandler_cygdrive::fstat (struct __stat64 *buf)
 {
-  if (!iscygdrive_root ())
-    return fhandler_disk_file::fstat (buf);
   buf->st_mode = S_IFDIR | 0555;
   if (!ndrives)
     set_drives ();
@@ -1341,7 +1339,7 @@ fhandler_cygdrive::opendir ()
   DIR *dir;
 
   dir = fhandler_disk_file::opendir ();
-  if (dir && iscygdrive_root () && !ndrives)
+  if (dir && !ndrives)
     set_drives ();
 
   return dir;
@@ -1350,8 +1348,6 @@ fhandler_cygdrive::opendir ()
 struct dirent *
 fhandler_cygdrive::readdir (DIR *dir)
 {
-  if (!iscygdrive_root ())
-    return fhandler_disk_file::readdir (dir);
   if (!pdrive || !*pdrive)
     return NULL;
   if (GetFileAttributes (pdrive) == INVALID_FILE_ATTRIBUTES)
@@ -1369,23 +1365,9 @@ fhandler_cygdrive::readdir (DIR *dir)
   return dir->__d_dirent;
 }
 
-_off64_t
-fhandler_cygdrive::telldir (DIR *dir)
-{
-  return fhandler_disk_file::telldir (dir);
-}
-
-void
-fhandler_cygdrive::seekdir (DIR *dir, _off64_t loc)
-{
-  return fhandler_disk_file::seekdir (dir, loc);
-}
-
 void
 fhandler_cygdrive::rewinddir (DIR *dir)
 {
-  if (!iscygdrive_root ())
-    return fhandler_disk_file::rewinddir (dir);
   pdrive = get_win32_name ();
   dir->__d_position = 0;
   return;
@@ -1394,8 +1376,6 @@ fhandler_cygdrive::rewinddir (DIR *dir)
 int
 fhandler_cygdrive::closedir (DIR *dir)
 {
-  if (!iscygdrive_root ())
-    return fhandler_disk_file::closedir (dir);
   pdrive = get_win32_name ();
   return 0;
 }

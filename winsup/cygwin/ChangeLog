@@ -1,3 +1,18 @@
+2005-05-19  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler.h (fhandler_cygdrive::seekdir): Delete declaration.
+	(fhandler_cygdrive::seekdir): Delete.
+
+2005-05-19  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* fhandler.h (fhandler_cygdrive::iscygdrive_root): Delete method.
+	(fhandler_cygdrive::telldir): Delete declaration.
+	* fhandler_disk_file.cc: Remove all uses of
+	fhandler_cygdrive::iscygdrive_root.
+	(fhandler_disk_file::mkdir): New method.
+	(fhandler_disk_file::rmdir): Ditto.
+	(fhandler_cygdrive::telldir): Delete.
+
 2005-05-18  Christopher Faylor  <cgf@timesys.com>
 
 	* external.cc: Move pids declaration to file scope and use less
