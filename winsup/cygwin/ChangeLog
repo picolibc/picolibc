@@ -1,3 +1,8 @@
+2005-05-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/in.h: Define IPPROTO_xxx values as macros to
+	accomodate SUSv3.
+
 2005-05-19  Christopher Faylor  <cgf@timesys.com>
 
 	* include/limits.h: Include features.h, as on linux.

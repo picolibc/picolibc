@@ -32,10 +32,20 @@ enum
   IPPROTO_PUP = 12,		/* PUP protocol				*/
   IPPROTO_UDP = 17,		/* User Datagram Protocol		*/
   IPPROTO_IDP = 22,		/* XNS IDP protocol			*/
-
   IPPROTO_RAW = 255,		/* Raw IP packets			*/
   IPPROTO_MAX
 };
+
+#define IPPROTO_IP IPPROTO_IP
+#define IPPROTO_ICMP IPPROTO_ICMP
+#define IPPROTO_IGMP IPPROTO_IGMP
+#define IPPROTO_IPIP IPPROTO_IPIP
+#define IPPROTO_TCP IPPROTO_TCP
+#define IPPROTO_EGP IPPROTO_EGP
+#define IPPROTO_PUP IPPROTO_PUP
+#define IPPROTO_UDP IPPROTO_UDP
+#define IPPROTO_IDP IPPROTO_IDP
+#define IPPROTO_RAW IPPROTO_RAW
 
 typedef uint16_t in_port_t;
 /* Standard well-known ports.  *//* from winsup/include/netinet/in.h */
