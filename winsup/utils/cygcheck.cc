@@ -1466,7 +1466,6 @@ load_cygwin (int& argc, char **&argv)
   char **envp = (char **) cygwin_internal (CW_ENVP);
   if (envp)
     {
-      cygwin_internal (CW_DEBUG_SELF, "d:\\cygwin\\bin\\gdb.exe");
       /* Store path and revert to this value, otherwise path gets overwritten
          by the POSIXy Cygwin variation, which breaks cygcheck.
 	 Another approach would be to use the Cygwin PATH and convert it to

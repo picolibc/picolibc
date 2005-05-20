@@ -1,5 +1,9 @@
 2005-05-20  Christopher Faylor  <cgf@timesys.com>
 
+	* cygcheck.cc (load_cygwin): Remove debugging statement.
+
+2005-05-20  Christopher Faylor  <cgf@timesys.com>
+
 	* cygcheck.cc (dump_sysinfo): Don't attempt to use path if it is not
 	set.
 	(nuke): Fix off by one error in allocation of environment variable.
