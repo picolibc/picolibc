@@ -977,19 +977,24 @@ dump_sysinfo ()
 
   printf ("Path:");
   char *s = getenv ("PATH"), *e;
-  char sep = strchr (s, ';') ? ';' : ':';
-  int count_path_items = 0;
-  while (1)
+  if (!s)
+    puts ("");
+  else
     {
-      for (e = s; *e && *e != sep; e++);
-      if (e-s)
-	printf ("\t%.*s\n", e - s, s);
-      else
-	puts ("\t.");
-      count_path_items++;
-      if (!*e)
-	break;
-      s = e + 1;
+      char sep = strchr (s, ';') ? ';' : ':';
+      int count_path_items = 0;
+      while (1)
+	{
+	  for (e = s; *e && *e != sep; e++);
+	  if (e-s)
+	    printf ("\t%.*s\n", e - s, s);
+	  else
+	    puts ("\t.");
+	  count_path_items++;
+	  if (!*e)
+	    break;
+	  s = e + 1;
+	}
     }
 
   fflush (stdout);
@@ -1432,8 +1437,8 @@ Compiled on %s\n\
 void
 nuke (char *ev)
 {
-  int n = 1 + strchr (*_environ, '=') - ev;
-  char *s = (char *) alloca (n);
+  int n = 1 + strchr (ev, '=') - ev;
+  char *s = (char *) alloca (n + 1);
   memcpy (s, ev, n);
   s[n] = '\0';
   putenv (s);
@@ -1461,22 +1466,24 @@ load_cygwin (int& argc, char **&argv)
   char **envp = (char **) cygwin_internal (CW_ENVP);
   if (envp)
     {
+      cygwin_internal (CW_DEBUG_SELF, "d:\\cygwin\\bin\\gdb.exe");
       /* Store path and revert to this value, otherwise path gets overwritten
          by the POSIXy Cygwin variation, which breaks cygcheck.
 	 Another approach would be to use the Cygwin PATH and convert it to
 	 Win32 again. */
       char *path = NULL;
-      while (*_environ)
+      char **env;
+      while (*(env = _environ))
 	{
-	  if (strncmp (*_environ, "PATH=", 5) == 0)
-	    path = strdup (*_environ);
-	  nuke (*_environ);
+	  if (strncmp (*env, "PATH=", 5) == 0)
+	    path = strdup (*env);
+	  nuke (*env);
         }
       for (char **ev = envp; *ev; ev++)
 	if (strncmp (*ev, "PATH=", 5) != 0)
 	 putenv (*ev);
-	else if (path)
-	  putenv (path);
+      if (path)
+	putenv (path);
     }
 }
 

@@ -1,3 +1,10 @@
+2005-05-20  Christopher Faylor  <cgf@timesys.com>
+
+	* cygcheck.cc (dump_sysinfo): Don't attempt to use path if it is not
+	set.
+	(nuke): Fix off by one error in allocation of environment variable.
+	(load_cygwin): Always set PATH even if cygwin environment is empty.
+
 2005-05-16  Christopher Faylor  <cgf@timesys.com>
 
 	* cygcheck.cc (cygwin_internal): Define as a "C" function.
