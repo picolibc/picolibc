@@ -1,3 +1,19 @@
+2005-05-19  Corinna Vinschen  <vinschen@redhat.com>
+
+	* arm/elf-redboot.ld, iq2000/sim.ld, m68hc11/sim-valid-m68hc11.ld,
+	* m68hc11/sim-valid-m68hc12.ld, mcore/elf-cmb.ld, mips/cfe.ld,
+	* mips/ddb-kseg0.ld, mips/ddb.ld, mips/dve.ld, mips/idt.ld,
+	* mips/idt32.ld, mips/idt64.ld, mips/jmr3904app-java.ld,
+	* mips/jmr3904app.ld, mips/jmr3904dram-java.ld, mips/jmr3904dram.ld,
+	* mips/nullmon.ld, mips/pmon.ld, mn10200/eval.ld, mn10200/sim.ld,
+	* mn10300/asb2303.ld, mn10300/asb2305.ld, mn10300/eval.ld,
+	* mn10300/sim.ld, rs6000/ads.ld, rs6000/mbx.ld, rs6000/yellowknife.ld,
+	* sh/sh1lcevb.ld, sh/sh2lcevb.ld, sh/sh3bb.ld, sh/sh3lcevb.ld,
+	* sparc/elfsim.ld, sparc/ex930.ld, sparc/ex931.ld, sparc/ex934.ld,
+	* sparc/sparc86x.ld, xstormy16/eva_app.ld, xstormy16/eva_stub.ld,
+	* xstormy16/sim_high.ld, xstormy16/sim_rom.ld: Add .debug_ranges
+	section.
+
 2005-05-05  Tobias Anderberg  <tobias.anderberg@axis.com>
 
         * arm/syscalls.c (get_errno): Fix output register constraint.
