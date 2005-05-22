@@ -67,7 +67,8 @@ get_full_path_of_dll (const char* str, char *name)
   path_conv real_filename;
 
   if (isabspath (name) ||
-      (ret = check_path_access ("LD_LIBRARY_PATH=", name, real_filename)) == NULL)
+      (ret = check_path_access ("LD_LIBRARY_PATH=", name, real_filename)
+             ?: check_path_access ("/usr/bin:/usr/lib", name, real_filename)) == NULL)
     real_filename.check (name);	/* Convert */
 
   if (!real_filename.error)

@@ -1,3 +1,16 @@
+2005-05-21  Christopher Faylor  <cgf@timesys.com>
+
+	* spawn.cc (find_exec): Accept a PATH-like string in place of an
+	environment variable.
+	* dlfcn.cc (get_full_path_of_dll): Search /usr/bin (for windows
+	compatibility) and /usr/lib (for UNIX compatibility) when looking for
+	shared libraries.
+	* environ.cc (conv_envvars): Put back LD_LIBRARY_PATH since it is used
+	by get_full_path_of_dll().
+	* errno.cc (errmap): Map MOD_NOT_FOUND to ENOENT.
+
+	* cygmagic: Remove debugging cruft.
+
 2005-05-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/in.h: Add comment.

@@ -111,17 +111,28 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
   const char *path;
   const char *posix_path;
 
-  /* Return the error condition if this is an absolute path or if there
-     is no PATH to search. */
-  if (has_slash || strchr (name, '\\') || isdrive (name)
+  posix = (opt & FE_NATIVE) ? NULL : tmp;
+
+  if (strchr (mywinenv, '/'))
+    {
+      /* it's not really an environment variable at all */
+      int n = cygwin_posix_to_win32_path_list_buf_size (mywinenv);
+      char *s = (char *) alloca (n + 1);
+      if (cygwin_posix_to_win32_path_list (mywinenv, s))
+	goto errout;
+      path = s;
+      posix_path = mywinenv - 1;
+    }
+  else if (has_slash || strchr (name, '\\') || isdrive (name)
       || !(winpath = getwinenv (mywinenv))
       || !(path = winpath->get_native ()) || *path == '\0')
+    /* Return the error condition if this is an absolute path or if there
+       is no PATH to search. */
     goto errout;
+  else
+    posix_path = winpath->get_posix () - 1;
 
   debug_printf ("%s%s", mywinenv, path);
-
-  posix = (opt & FE_NATIVE) ? NULL : tmp;
-  posix_path = winpath->get_posix () - 1;
   /* Iterate over the specified path, looking for the file with and
      without executable extensions. */
   do
