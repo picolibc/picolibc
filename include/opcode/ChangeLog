@@ -1,3 +1,10 @@
+2005-05-23  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	* hppa.h (FLAG_STRICT): Correct comment.
+	(pa_opcodes): Update load and store entries to allow both PA 1.X and
+	PA 2.0 mneumonics when equivalent.  Entries with cache control
+	completers now require PA 1.1.  Adjust whitespace.
+
 2005-05-19  Anton Blanchard  <anton@samba.org>
 
 	* ppc.h (PPC_OPCODE_POWER5): Define.
