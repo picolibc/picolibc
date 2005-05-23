@@ -870,6 +870,94 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
       }
 }
 
+/* This dumps information about each installed cygwin service, if cygrunsrv
+   is available.  */
+void
+dump_sysinfo_services ()
+{
+  char buf[1024];
+  char buf2[1024];
+  FILE *f;
+  
+  if (givehelp)
+    printf ("\nChecking for any Cygwin services... %s\n\n", 
+                  verbose ? "" : "(use -v for more detail)");
+  else
+    fputc ('\n', stdout);
+  
+  /* find the location of cygrunsrv.exe */
+  char *cygrunsrv = cygpath ("/bin/cygrunsrv.exe", NULL);  
+  for (char *p = cygrunsrv; (p = strchr (p, '/')); p++)
+    *p = '\\';
+
+  if (access (cygrunsrv, X_OK))
+    {
+      puts ("Can't find the cygrunsrv utility, skipping services check.\n");
+      return;
+    }
+  
+  /* check for a recent cygrunsrv */
+  snprintf (buf, sizeof (buf), "%s --version", cygrunsrv);
+  if ((f = popen (buf, "rt")) == NULL)    
+    {
+      printf ("Failed to execute '%s', skipping services check.\n", buf);
+      return;
+    }
+  int maj, min;
+  int ret = fscanf (f, "cygrunsrv V%u.%u", &maj, &min);
+  if (ferror (f) || feof (f) || ret == EOF || maj < 1 || min < 10)
+    {
+      puts ("The version of cygrunsrv installed is too old to dump service info.\n");
+      return;
+    }
+  fclose (f);
+  
+  /* run cygrunsrv --list */
+  snprintf (buf, sizeof (buf), "%s --list", cygrunsrv);
+  if ((f = popen (buf, "rt")) == NULL)
+    {
+      printf ("Failed to execute '%s', skipping services check.\n", buf);
+      return;
+    }
+  size_t nchars = fread ((void *) buf, 1, sizeof (buf), f);
+  pclose (f);
+  
+  /* were any services found?  */
+  if (nchars < 1)
+    {
+      puts ("No Cygwin services found.\n");
+      return;
+    }
+  
+  
+  /* In verbose mode, just run 'cygrunsrv --list --verbose' and copy the 
+     entire output.  Otherwise run 'cygrunsrv --query' for each service.  */
+  for (char *srv = strtok (buf, "\n"); srv; srv = strtok (NULL, "\n"))
+    {
+      if (verbose)
+        snprintf (buf2, sizeof (buf2), "%s --list --verbose", cygrunsrv);
+      else
+        snprintf (buf2, sizeof (buf2), "%s --query %s", cygrunsrv, srv);
+      if ((f = popen (buf2, "rt")) == NULL)
+        {
+          printf ("Failed to execute '%s', skipping services check.\n", buf2);
+          return;
+        }
+        
+      /* copy output to stdout */
+      do
+        {
+          nchars = fread ((void *)buf2, 1, sizeof (buf2), f);
+          fwrite ((void *)buf2, 1, nchars, stdout);
+        }
+      while (!feof (f) && !ferror (f));
+      pclose (f);
+      
+      if (verbose)
+        break;
+    }
+}
+
 static void
 dump_sysinfo ()
 {
@@ -877,6 +965,7 @@ dump_sysinfo ()
   char tmp[4000];
   time_t now;
   char *found_cygwin_dll;
+  bool is_nt = false;
 
   printf ("\nCygwin Configuration Diagnostics\n");
   time (&now);
@@ -916,6 +1005,7 @@ dump_sysinfo ()
 	}
       break;
     case VER_PLATFORM_WIN32_NT:
+      is_nt = true;
       if (osversion.dwMajorVersion == 5)
 	{
 	  BOOL more_info = FALSE;
@@ -1248,7 +1338,7 @@ dump_sysinfo ()
   printf ("\n");
 
   if (givehelp)
-    printf ("Looking for various Cygnus DLLs...  (-v gives version info)\n");
+    printf ("Looking for various Cygwin DLLs...  (-v gives version info)\n");
   int cygwin_dll_count = 0;
   for (i = 1; i < num_paths; i++)
     {
@@ -1288,6 +1378,9 @@ dump_sysinfo ()
     puts ("Warning: There are multiple cygwin1.dlls on your path");
   if (!cygwin_dll_count)
     puts ("Warning: cygwin1.dll not found on your path");
+
+  if (is_nt)
+    dump_sysinfo_services ();
 }
 
 static int

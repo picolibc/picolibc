@@ -1,3 +1,10 @@
+2005-05-22  Brian Dessent  <brian@dessent.net>
+
+	* cygcheck.cc (dump_sysinfo_services): Add new function that uses
+	new cygrunsrv options to dump service info.
+	(dump_sysinfo): Call dump_sysinfo_services if running under NT.
+	Change 'Cygnus' to 'Cygwin' in output.
+
 2005-05-20  Christopher Faylor  <cgf@timesys.com>
 
 	* cygcheck.cc (load_cygwin): Remove debugging statement.
