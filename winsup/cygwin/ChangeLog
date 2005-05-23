@@ -1,3 +1,7 @@
+2005-05-23  Eric Blake  <ebb9@byu.net>
+
+	* include/stdint.h (INTMAX_C, UINTMAX_C): Fix definition.
+
 2005-05-21  Christopher Faylor  <cgf@timesys.com>
 
 	* spawn.cc (find_exec): Accept a PATH-like string in place of an
@@ -10,6 +14,23 @@
 	* errno.cc (errmap): Map MOD_NOT_FOUND to ENOENT.
 
 	* cygmagic: Remove debugging cruft.
+
+2005-05-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (RtlDosPathNameToNtPathName_U): Import.
+	(RtlCreateUnicodeStringFromAsciiz): Import.
+	(RtlFreeUnicodeString): Import.
+	* fhandler.cc (fhandler_base::open): Drop wpath since
+	path_conv::get_nt_native_path now allocates the upath Buffer.
+	Remove call to RtlIsDosDeviceName_U.  Free upath.Buffer on
+	return.
+	* ntdll.h (RtlDosPathNameToNtPathName_U): Declare.
+	(RtlCreateUnicodeStringFromAsciiz): Declare.
+	(RtlFreeUnicodeString): Declare.
+	* path.cc: Include ntdll.h.
+	(path_conv::get_nt_native_path): Call RtlDosPathNameToNtPathName_U
+	to generate the correct NT path.  Use RtlCreateUnicodeStringFromAsciiz
+	to allocate Buffer in case of incoming NT paths.
 
 2005-05-19  Corinna Vinschen  <corinna@vinschen.de>
 

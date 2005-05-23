@@ -176,7 +176,7 @@ typedef unsigned long long uintmax_t;
 
 /* Macros for greatest-width integer constant expressions */
 
-#define INTMAX_C(x) x ## L
-#define UINTMAX_C(x) x ## UL
+#define INTMAX_C(x) x ## LL
+#define UINTMAX_C(x) x ## ULL
 
 #endif /* _STDINT_H */
