@@ -1,3 +1,7 @@
+2005-04-13  Mark Mitchell <mark@codesourcery.com>
+
+	* doc/binutils.info: Remove.
+
 2005-05-01  Paul Brook  <paul@codesourcery.com>
 
 	* bfd/elflink.c (_bfd_elf_merge_symbol): Skip weak definitions if a
