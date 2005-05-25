@@ -1,3 +1,16 @@
+2005-05-25  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* fhandler.h (fhandler_base::mkdir): New virtual method.
+	(fhandler_base::rmdir): Ditto.
+	(fhandler_disk_file:mkdir): New method.
+	(fhandler_disk_file:rmdir): Ditto.
+	* dir.cc (mkdir): Implement with fhandlers.
+	(rmdir): Ditto.
+	* fhandler.cc (fhandler_base::mkdir): New virtual method.
+	(fhandler_base::rmdir): Ditto.
+	(fhandler_disk_file::mkdir): New method.
+	(fhandler_disk_file::rmdir): Ditto.
+
 2005-05-24  Christopher Faylor  <cgf@timesys.com>
 
 	* include/cygwin/version.h: Bump API minor number to 129.

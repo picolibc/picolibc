@@ -1138,6 +1138,108 @@ fhandler_disk_file::lock (int cmd, struct __flock64 *fl)
   return 0;
 }
 
+int
+fhandler_disk_file::mkdir (mode_t mode)
+{
+  int res = -1;
+  SECURITY_ATTRIBUTES sa = sec_none_nih;
+  security_descriptor sd;
+
+  if (allow_ntsec && has_acls ())
+    set_security_attribute (S_IFDIR | ((mode & 07777) & ~cygheap->umask),
+			    &sa, sd);
+
+  if (CreateDirectoryA (get_win32_name (), &sa))
+    {
+      if (!allow_ntsec && allow_ntea)
+	set_file_attribute (false, NULL, get_win32_name (),
+			    S_IFDIR | ((mode & 07777) & ~cygheap->umask));
+#ifdef HIDDEN_DOT_FILES
+      char *c = strrchr (real_dir.get_win32 (), '\\');
+      if ((c && c[1] == '.') || *get_win32_name () == '.')
+	SetFileAttributes (get_win32_name (), FILE_ATTRIBUTE_HIDDEN);
+#endif
+      res = 0;
+    }
+  else
+    __seterrno ();
+
+  return res;
+}
+
+int
+fhandler_disk_file::rmdir ()
+{
+  int res = -1;
+
+  /* Even own directories can't be removed if R/O attribute is set. */
+  if (pc.has_attribute (FILE_ATTRIBUTE_READONLY))
+    SetFileAttributes (get_win32_name (),
+		       (DWORD) pc & ~FILE_ATTRIBUTE_READONLY);
+
+  for (bool is_cwd = false; ; is_cwd = true)
+    {
+      DWORD err, att = 0;
+      int rc = RemoveDirectory (get_win32_name ());
+
+      if (isremote () && exists ())
+	att = GetFileAttributes (get_win32_name ());
+
+      /* Sometimes smb indicates failure when it really succeeds, so check for
+	 this case specifically. */
+      if (rc || att == INVALID_FILE_ATTRIBUTES)
+	{
+	  /* RemoveDirectory on a samba drive doesn't return an error if the
+	     directory can't be removed because it's not empty. Checking for
+	     existence afterwards keeps us informed about success. */
+	  if (!isremote () || att == INVALID_FILE_ATTRIBUTES)
+	    {
+	      res = 0;
+	      break;
+	    }
+	  err = ERROR_DIR_NOT_EMPTY;
+	}
+      else
+	err = GetLastError ();
+
+      /* This kludge detects if we are attempting to remove the current working
+	 directory.  If so, we will move elsewhere to potentially allow the
+	 rmdir to succeed.  This means that cygwin's concept of the current working
+	 directory != Windows concept but, hey, whaddaregonnado?
+	 Note that this will not cause something like the following to work:
+	 $ cd foo
+	 $ rmdir .
+	 since the shell will have foo "open" in the above case and so Windows will
+	 not allow the deletion. (Actually it does on 9X.)
+	 FIXME: A potential workaround for this is for cygwin apps to *never* call
+	 SetCurrentDirectory. */
+
+      extern char windows_system_directory[];
+      if (strcasematch (get_win32_name (), cygheap->cwd.win32)
+	  && !strcasematch (windows_system_directory, cygheap->cwd.win32)
+	  && !is_cwd
+	  && SetCurrentDirectory (windows_system_directory))
+	continue;
+
+      /* On 9X ERROR_ACCESS_DENIED is returned
+	 if you try to remove a non-empty directory. */
+      if (err == ERROR_ACCESS_DENIED
+	  && wincap.access_denied_on_delete ())
+	err = ERROR_DIR_NOT_EMPTY;
+
+      __seterrno_from_win_error (err);
+
+      /* Directory still exists, restore its characteristics. */
+      if (pc.has_attribute (FILE_ATTRIBUTE_READONLY))
+	SetFileAttributes (get_win32_name (), (DWORD) pc);
+      if (is_cwd)
+	SetCurrentDirectory (get_win32_name ());
+      break;
+    }
+
+  return res;
+}
+
 DIR *
 fhandler_disk_file::opendir ()
 {

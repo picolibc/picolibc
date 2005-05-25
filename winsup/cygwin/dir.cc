@@ -221,39 +221,21 @@ extern "C" int
 mkdir (const char *dir, mode_t mode)
 {
   int res = -1;
-  SECURITY_ATTRIBUTES sa = sec_none_nih;
-  security_descriptor sd;
+  fhandler_base *fh = NULL;
 
-  path_conv real_dir (dir, PC_SYM_NOFOLLOW | PC_WRITABLE);
+  if (!(fh = build_fh_name (dir, NULL, PC_SYM_NOFOLLOW | PC_WRITABLE)))
+    goto done;   /* errno already set */;
 
-  if (real_dir.error)
+  if (fh->error ())
     {
-      set_errno (real_dir.case_clash ? ECASECLASH : real_dir.error);
-      goto done;
+      debug_printf ("got %d error from build_fh_name", fh->error ());
+      set_errno (fh->error ());
     }
+  else if (!fh->mkdir (mode))
+    res = 0;
+  delete fh;
 
-  nofinalslash (real_dir.get_win32 (), real_dir.get_win32 ());
-
-  if (allow_ntsec && real_dir.has_acls ())
-    set_security_attribute (S_IFDIR | ((mode & 07777) & ~cygheap->umask),
-			    &sa, sd);
-
-  if (CreateDirectoryA (real_dir.get_win32 (), &sa))
-    {
-      if (!allow_ntsec && allow_ntea)
-	set_file_attribute (false, NULL, real_dir.get_win32 (),
-			    S_IFDIR | ((mode & 07777) & ~cygheap->umask));
-#ifdef HIDDEN_DOT_FILES
-      char *c = strrchr (real_dir.get_win32 (), '\\');
-      if ((c && c[1] == '.') || *real_dir.get_win32 () == '.')
-	SetFileAttributes (real_dir.get_win32 (), FILE_ATTRIBUTE_HIDDEN);
-#endif
-      res = 0;
-    }
-  else
-    __seterrno ();
-
-done:
+ done:
   syscall_printf ("%d = mkdir (%s, %d)", res, dir, mode);
   return res;
 }
@@ -263,80 +245,21 @@ extern "C" int
 rmdir (const char *dir)
 {
   int res = -1;
+  fhandler_base *fh = NULL;
 
-  path_conv real_dir (dir, PC_SYM_NOFOLLOW | PC_WRITABLE);
+  if (!(fh = build_fh_name (dir, NULL, PC_SYM_NOFOLLOW | PC_WRITABLE)))
+    goto done;   /* errno already set */;
 
-  if (real_dir.error)
-    set_errno (real_dir.error);
-  else if (!real_dir.exists ())
-    set_errno (ENOENT);
-  else if  (!real_dir.isdir ())
-    set_errno (ENOTDIR);
-  else
+  if (fh->error ())
     {
-      /* Even own directories can't be removed if R/O attribute is set. */
-      if (real_dir.has_attribute (FILE_ATTRIBUTE_READONLY))
-	SetFileAttributes (real_dir,
-			   (DWORD) real_dir & ~FILE_ATTRIBUTE_READONLY);
-
-      for (bool is_cwd = false; ; is_cwd = true)
-	{
-	  DWORD err;
-	  int rc = RemoveDirectory (real_dir);
-	  DWORD att = GetFileAttributes (real_dir);
-
-	  /* Sometimes smb indicates failure when it really succeeds, so check for
-	     this case specifically. */
-	  if (rc || att == INVALID_FILE_ATTRIBUTES)
-	    {
-	      /* RemoveDirectory on a samba drive doesn't return an error if the
-		 directory can't be removed because it's not empty. Checking for
-		 existence afterwards keeps us informed about success. */
-	      if (att == INVALID_FILE_ATTRIBUTES)
-		{
-		  res = 0;
-		  break;
-		}
-	      err = ERROR_DIR_NOT_EMPTY;
-	    }
-	  else
-	    err = GetLastError ();
-
-	  /* This kludge detects if we are attempting to remove the current working
-	     directory.  If so, we will move elsewhere to potentially allow the
-	     rmdir to succeed.  This means that cygwin's concept of the current working
-	     directory != Windows concept but, hey, whaddaregonnado?
-	     Note that this will not cause something like the following to work:
-		     $ cd foo
-		     $ rmdir .
-	     since the shell will have foo "open" in the above case and so Windows will
-	     not allow the deletion. (Actually it does on 9X.)
-	     FIXME: A potential workaround for this is for cygwin apps to *never* call
-	     SetCurrentDirectory. */
-
-	  if (strcasematch (real_dir, cygheap->cwd.win32)
-	      && !strcasematch ("c:\\", cygheap->cwd.win32)
-	      && !is_cwd
-	      && SetCurrentDirectory ("c:\\"))
-	    continue;
-
-	  /* On 9X ERROR_ACCESS_DENIED is returned
-	     if you try to remove a non-empty directory. */
-	  if (err == ERROR_ACCESS_DENIED
-	      && wincap.access_denied_on_delete ())
-	    err = ERROR_DIR_NOT_EMPTY;
-
-	  __seterrno_from_win_error (err);
-
-	  /* Directory still exists, restore its characteristics. */
-	  if (real_dir.has_attribute (FILE_ATTRIBUTE_READONLY))
-	    SetFileAttributes (real_dir, real_dir);
-	  if (is_cwd)
-	    SetCurrentDirectory (real_dir);
-	  break;
-	}
+      debug_printf ("got %d error from build_fh_name", fh->error ());
+      set_errno (fh->error ());
     }
+  else if (!fh->rmdir ())
+    res = 0;
+  delete fh;
 
+ done:
   syscall_printf ("%d = rmdir (%s)", res, dir);
   return res;
 }

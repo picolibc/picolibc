@@ -1509,6 +1509,28 @@ fhandler_base::set_nonblocking (int yes)
   openflags = (openflags & ~O_NONBLOCK_MASK) | new_flags;
 }
 
+int
+fhandler_base::mkdir (mode_t)
+{
+  if (exists ())
+    set_errno (EEXIST);
+  else
+    set_errno (EROFS);
+  return -1;
+}
+
+int
+fhandler_base::rmdir ()
+{
+  if (!exists ())
+    set_errno (ENOENT);
+  else if (!pc.isdir ())
+    set_errno (ENOTDIR);
+  else
+    set_errno (EROFS);
+  return -1;
+}
+
 DIR *
 fhandler_base::opendir ()
 {

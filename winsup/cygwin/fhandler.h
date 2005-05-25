@@ -346,6 +346,8 @@ class fhandler_base
   void operator delete (void *);
   virtual HANDLE get_guard () const {return NULL;}
   virtual void set_eof () {}
+  virtual int mkdir (mode_t mode);
+  virtual int rmdir ();
   virtual DIR *opendir ();
   virtual dirent *readdir (DIR *);
   virtual _off64_t telldir (DIR *);
@@ -664,6 +666,8 @@ class fhandler_disk_file: public fhandler_base
   int msync (HANDLE h, caddr_t addr, size_t len, int flags);
   bool fixup_mmap_after_fork (HANDLE h, DWORD access, int flags,
 			      _off64_t offset, DWORD size, void *address);
+  int mkdir (mode_t mode);
+  int rmdir ();
   DIR *opendir ();
   struct dirent *readdir (DIR *);
   _off64_t telldir (DIR *);
