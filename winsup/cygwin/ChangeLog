@@ -1,5 +1,9 @@
 2005-05-24  Christopher Faylor  <cgf@timesys.com>
 
+	* include/cygwin/version.h: Bump API minor number to 129.
+
+2005-05-24  Christopher Faylor  <cgf@timesys.com>
+
 	* cygwin.din: Export mkdtemp.
 	* mktemp.cc: New file.
 	* Makefile.in (DLL_OFILES): Add mktemp.o
