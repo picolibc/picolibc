@@ -649,6 +649,7 @@ getmode SIGFE
 _getmode = getmode SIGFE
 getopt SIGFE
 getopt_long SIGFE
+getopt_long_only SIGFE
 getpagesize SIGFE
 _getpagesize = getpagesize SIGFE
 getpass SIGFE
@@ -910,6 +911,7 @@ memset NOSIGFE
 _memset = memset NOSIGFE
 mkdir SIGFE
 _mkdir = mkdir SIGFE
+mkdtemp SIGFE
 mkfifo SIGFE
 mknod SIGFE
 _mknod = mknod SIGFE
