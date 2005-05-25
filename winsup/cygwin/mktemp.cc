@@ -1,3 +1,9 @@
+/* mktemp.cc: mktemp functions
+
+This file is adapted for Cygwin from FreeBSD.
+
+See the copyright at the bottom of this file. */
+
 #include "winsup.h"
 #include "cygerrno.h"
 #include <sys/cdefs.h>
