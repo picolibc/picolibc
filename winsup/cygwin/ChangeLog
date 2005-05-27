@@ -1,3 +1,10 @@
+2005-05-27  Christopher Faylor  <cgf@timesys.com>
+
+	* cygheap.h: Reference _cygheap_start via .cygheap section.
+
+	* environ.cc: Fix force_into_environment typo throughout.
+	(spenvs): Export CYGWIN_DEBUG if DEBUGGING.
+
 2005-05-26  Christopher Faylor  <cgf@timesys.com>
 
 	* include/cygwin/version.h: Bump DLL minor number to 18.

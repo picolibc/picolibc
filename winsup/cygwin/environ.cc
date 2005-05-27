@@ -856,7 +856,7 @@ struct spenv
 {
   const char *name;
   size_t namelen;
-  bool force_into_environmentironment;	/* If true, always add to env if missing */
+  bool force_into_environment;	/* If true, always add to env if missing */
   bool add_if_exists;		/* if true, retrieve value from cache */
   const char * (cygheap_user::*from_cygheap) (const char *, size_t);
 
@@ -869,6 +869,9 @@ struct spenv
 /* Keep this list in upper case and sorted */
 static NO_COPY spenv spenvs[] =
 {
+#ifdef DEBUGGING
+  {NL ("CYGWIN_DEBUG="), false, true, &cygheap_user::env_homedrive},
+#endif
   {NL ("HOMEDRIVE="), false, false, &cygheap_user::env_homedrive},
   {NL ("HOMEPATH="), false, false, &cygheap_user::env_homepath},
   {NL ("LOGONSERVER="), false, false, &cygheap_user::env_logsrv},
@@ -977,7 +980,7 @@ build_env (const char * const *envp, char *&envblock, int &envc,
   assert ((srcp - envp) == n);
   /* Fill in any required-but-missing environment variables. */
   for (unsigned i = 0; i < SPENVS_SIZE; i++)
-    if (!saw_spenv[i] && (spenvs[i].force_into_environmentironment || cygheap->user.issetuid ()))
+    if (!saw_spenv[i] && (spenvs[i].force_into_environment || cygheap->user.issetuid ()))
       {
 	  *dstp = spenvs[i].retrieve (false);
 	  if (*dstp && *dstp != env_dontadd)
