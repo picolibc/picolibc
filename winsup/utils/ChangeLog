@@ -1,3 +1,9 @@
+2005-05-27  Christopher Faylor  <cgf@timesys.com>
+
+	* cygcheck.cc (load_cygwin): Make half-hearted attempt to work with
+	older DLLs.
+	* strace.cc (load_cygwin): Ditto.
+
 2005-05-22  Brian Dessent  <brian@dessent.net>
 
 	* cygcheck.cc (dump_sysinfo_services): Add new function that uses

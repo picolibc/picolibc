@@ -160,12 +160,12 @@ init_paths ()
 {
   char tmp[4000], *sl;
   add_path ((char *) ".", 1);	/* to be replaced later */
-  
+
   if (GetCurrentDirectory (4000, tmp))
     add_path (tmp, strlen (tmp));
   else
-    display_error ("init_paths: GetCurrentDirectory()");  
-  
+    display_error ("init_paths: GetCurrentDirectory()");
+
   if (GetSystemDirectory (tmp, 4000))
     add_path (tmp, strlen (tmp));
   else
@@ -878,15 +878,15 @@ dump_sysinfo_services ()
   char buf[1024];
   char buf2[1024];
   FILE *f;
-  
+
   if (givehelp)
-    printf ("\nChecking for any Cygwin services... %s\n\n", 
-                  verbose ? "" : "(use -v for more detail)");
+    printf ("\nChecking for any Cygwin services... %s\n\n",
+		  verbose ? "" : "(use -v for more detail)");
   else
     fputc ('\n', stdout);
-  
+
   /* find the location of cygrunsrv.exe */
-  char *cygrunsrv = cygpath ("/bin/cygrunsrv.exe", NULL);  
+  char *cygrunsrv = cygpath ("/bin/cygrunsrv.exe", NULL);
   for (char *p = cygrunsrv; (p = strchr (p, '/')); p++)
     *p = '\\';
 
@@ -895,10 +895,10 @@ dump_sysinfo_services ()
       puts ("Can't find the cygrunsrv utility, skipping services check.\n");
       return;
     }
-  
+
   /* check for a recent cygrunsrv */
   snprintf (buf, sizeof (buf), "%s --version", cygrunsrv);
-  if ((f = popen (buf, "rt")) == NULL)    
+  if ((f = popen (buf, "rt")) == NULL)
     {
       printf ("Failed to execute '%s', skipping services check.\n", buf);
       return;
@@ -911,7 +911,7 @@ dump_sysinfo_services ()
       return;
     }
   fclose (f);
-  
+
   /* run cygrunsrv --list */
   snprintf (buf, sizeof (buf), "%s --list", cygrunsrv);
   if ((f = popen (buf, "rt")) == NULL)
@@ -921,40 +921,39 @@ dump_sysinfo_services ()
     }
   size_t nchars = fread ((void *) buf, 1, sizeof (buf), f);
   pclose (f);
-  
+
   /* were any services found?  */
   if (nchars < 1)
     {
       puts ("No Cygwin services found.\n");
       return;
     }
-  
-  
-  /* In verbose mode, just run 'cygrunsrv --list --verbose' and copy the 
+
+  /* In verbose mode, just run 'cygrunsrv --list --verbose' and copy the
      entire output.  Otherwise run 'cygrunsrv --query' for each service.  */
   for (char *srv = strtok (buf, "\n"); srv; srv = strtok (NULL, "\n"))
     {
       if (verbose)
-        snprintf (buf2, sizeof (buf2), "%s --list --verbose", cygrunsrv);
+	snprintf (buf2, sizeof (buf2), "%s --list --verbose", cygrunsrv);
       else
-        snprintf (buf2, sizeof (buf2), "%s --query %s", cygrunsrv, srv);
+	snprintf (buf2, sizeof (buf2), "%s --query %s", cygrunsrv, srv);
       if ((f = popen (buf2, "rt")) == NULL)
-        {
-          printf ("Failed to execute '%s', skipping services check.\n", buf2);
-          return;
-        }
-        
+	{
+	  printf ("Failed to execute '%s', skipping services check.\n", buf2);
+	  return;
+	}
+
       /* copy output to stdout */
       do
-        {
-          nchars = fread ((void *)buf2, 1, sizeof (buf2), f);
-          fwrite ((void *)buf2, 1, nchars, stdout);
-        }
+	{
+	  nchars = fread ((void *)buf2, 1, sizeof (buf2), f);
+	  fwrite ((void *)buf2, 1, nchars, stdout);
+	}
       while (!feof (f) && !ferror (f));
       pclose (f);
-      
+
       if (verbose)
-        break;
+	break;
     }
 }
 
@@ -1552,15 +1551,15 @@ load_cygwin (int& argc, char **&argv)
     return;
 
   char **av = (char **) cygwin_internal (CW_ARGV);
-  if (av)
+  if (av && ((DWORD) av != (DWORD) -1))
     for (argc = 0, argv = av; *av; av++)
       argc++;
-	      
+
   char **envp = (char **) cygwin_internal (CW_ENVP);
-  if (envp)
+  if (envp && ((DWORD) envp != (DWORD) -1))
     {
       /* Store path and revert to this value, otherwise path gets overwritten
-         by the POSIXy Cygwin variation, which breaks cygcheck.
+	 by the POSIXy Cygwin variation, which breaks cygcheck.
 	 Another approach would be to use the Cygwin PATH and convert it to
 	 Win32 again. */
       char *path = NULL;
@@ -1570,7 +1569,7 @@ load_cygwin (int& argc, char **&argv)
 	  if (strncmp (*env, "PATH=", 5) == 0)
 	    path = strdup (*env);
 	  nuke (*env);
-        }
+	}
       for (char **ev = envp; *ev; ev++)
 	if (strncmp (*ev, "PATH=", 5) != 0)
 	 putenv (*ev);

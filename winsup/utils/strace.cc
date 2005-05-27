@@ -909,7 +909,7 @@ main (int argc, char **argv)
   if (load_cygwin ())
     {
       char **av = (char **) cygwin_internal (CW_ARGV);
-      if (av)
+      if (av && (DWORD) av != (DWORD) -1)
 	for (argc = 0, argv = av; *av; av++)
 	  argc++;
     }
