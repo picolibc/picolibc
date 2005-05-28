@@ -253,24 +253,15 @@ Vinschen for OpenSSH, see this message from the cygwin mailing list:
 
 @subsection Why doesn't @samp{mkdir -p} work on a network share?
 
-Unfortunately, you cannot do something like this:
+Starting with @samp{coreutils-5.3.0-6} and @samp{cygwin-1.5.17}, you can
+do something like this:
 
 @example
 bash$ mkdir -p //MACHINE/Share/path/to/new/dir
-mkdir: cannot create directory `//MACHINE': No such file or directory
 @end example
 
-This is because mkdir checks for the existence of each directory on the
-path, creating them as necessary.  Since @samp{//MACHINE} is not a
-directory (you can't cd to it either), mkdir tries to create it, and
-fails.
-
-This might get fixed someday, but for now, you have to work around it:
-
-@example
-bash$ cd //MACHINE/Share
-bash$ mkdir -p path/to/new/dir
-@end example
+However, coreutils expects Unix path names, so something like
+@samp{mkdir -p \\\\machine\\share\\path} will fail. 
 
 @subsection Why doesn't my shell script work?
 

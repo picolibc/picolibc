@@ -1,3 +1,8 @@
+2005-05-28  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* how-using.texinfo : Update the mkdir -p section to reflect 
+	changes in handling network drives.
+
 2005-05-18  Brian Dessent  <brian@dessent.net>
 
 	* install.texinfo ("How do I uninstall..."): Rewrite to cover
