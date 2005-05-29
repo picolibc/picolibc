@@ -1,5 +1,12 @@
 2005-05-28  Christopher Faylor  <cgf@timesys.com>
 
+	* thread.h (pthread_key::set): Inline.
+	(pthread_key::get): Ditto.
+	* thread.cc (pthread::set): Delete.
+	(pthread::get): Ditto.
+
+2005-05-28  Christopher Faylor  <cgf@timesys.com>
+
 	* cygwin.din: Remove signal front end from pthread_[gs]etspecific.
 
 2005-05-28  Christopher Faylor  <cgf@timesys.com>

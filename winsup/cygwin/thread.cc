@@ -1367,23 +1367,6 @@ pthread_key::~pthread_key ()
     }
 }
 
-int
-pthread_key::set (const void *value)
-{
-  /* the OS function doesn't perform error checking */
-  TlsSetValue (tls_index, (void *) value);
-  return 0;
-}
-
-void *
-pthread_key::get () const
-{
-  int saved_error = ::GetLastError ();
-  void *result = TlsGetValue (tls_index);
-  ::SetLastError (saved_error);
-  return result;
-}
-
 void
 pthread_key::_fixup_before_fork ()
 {

@@ -209,12 +209,12 @@ protected:
 
 class pthread_key: public verifyable_object
 {
+  DWORD tls_index;
 public:
   static bool is_good_object (pthread_key_t const *);
-  DWORD tls_index;
 
-  int set (const void *);
-  void *get () const;
+  int set (const void *value) {TlsSetValue (tls_index, (void *) value); return 0;}
+  void *get () const {return TlsGetValue (tls_index);}
 
   pthread_key (void (*)(void *));
   ~pthread_key ();
