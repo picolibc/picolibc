@@ -63,6 +63,9 @@ typedef struct
 #define STO_ALPHA_NOPV		0x80
 #define STO_ALPHA_STD_GPLOAD	0x88
 
+/* Special values for Elf64_Dyn tag.  */
+#define DT_ALPHA_PLTRO		DT_LOPROC
+
 #include "elf/reloc-macros.h"
 
 /* Alpha relocs.  */
