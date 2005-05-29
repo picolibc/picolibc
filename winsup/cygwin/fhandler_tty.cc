@@ -1048,7 +1048,7 @@ fhandler_tty_slave::tcflush (int queue)
     {
       size_t len = UINT_MAX;
       read (NULL, len);
-      ret = len >= 0;
+      ret = ((int) len) >= 0;
     }
   if (queue == TCOFLUSH || queue == TCIOFLUSH)
     {
