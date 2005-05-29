@@ -107,7 +107,6 @@ details. */
 #define ULONG_LONG_MAX (LONG_LONG_MAX * 2ULL + 1)
 #endif
 
-#if defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 /* Minimum and maximum values a `signed long long int' can hold.  */
 #undef LLONG_MIN
 #define LLONG_MIN (-LLONG_MAX-1)
@@ -117,7 +116,6 @@ details. */
 /* Maximum value an `unsigned long long int' can hold.  (Minimum is 0).  */
 #undef ULLONG_MAX
 #define ULLONG_MAX (LLONG_MAX * 2ULL + 1)
-#endif
 
 /* Maximum number of iovcnt in a writev (an arbitrary number) */
 #undef IOV_MAX

@@ -1,3 +1,7 @@
+2005-05-29  Eric Blake  <ebb9@byu.net>
+
+	* include/limits.h (LLONG_MIN, LLONG_MAX, ULLONG_MAX): Always define.
+
 2005-05-28  Christopher Faylor  <cgf@timesys.com>
 
 	* thread.h (pthread_key::set): Inline.
