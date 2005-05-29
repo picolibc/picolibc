@@ -1,3 +1,9 @@
+2005-05-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (path_conv::check): Move component to function scope. Set
+	PATH_RO only on *real* FH_NETDRIVEs or on non-FH_NETDRIVE virtual
+	paths. Allow non-retrievable shares to be handled as files.
+
 2005-05-29  Eric Blake  <ebb9@byu.net>
 
 	* include/limits.h (LLONG_MIN, LLONG_MAX, ULLONG_MAX): Always define.

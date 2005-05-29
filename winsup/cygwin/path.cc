@@ -550,6 +550,7 @@ path_conv::check (const char *src, unsigned opt,
   memset (&dev, 0, sizeof (dev));
   fs.clear ();
   normalized_path = NULL;
+  int component = 0;		// Number of translated components
 
   if (!(opt & PC_NULLEMPTY))
     error = 0;
@@ -582,7 +583,7 @@ path_conv::check (const char *src, unsigned opt,
 	 Also: be careful to preserve the errno returned from
 	 symlink.check as the caller may need it. */
       /* FIXME: Do we have to worry about multiple \'s here? */
-      int component = 0;		// Number of translated components
+      component = 0;		// Number of translated components
       sym.contents[0] = '\0';
 
       int symlen = 0;
@@ -671,7 +672,8 @@ path_conv::check (const char *src, unsigned opt,
 		      fileattr = INVALID_FILE_ATTRIBUTES;
 		    goto virtual_component_retry;
 		}
-	      path_flags |= PATH_RO;
+	      if (component == 0 || dev.devn != FH_NETDRIVE)
+		path_flags |= PATH_RO;
 	      goto out;
 	    }
 	  /* devn should not be a device.  If it is, then stop parsing now. */
@@ -886,8 +888,20 @@ out:
     }
   else if (isvirtual_dev (dev.devn) && fileattr == INVALID_FILE_ATTRIBUTES)
     {
-      error = dev.devn == FH_NETDRIVE ? ENOSHARE : ENOENT;
-      return;
+      if (dev.devn == FH_NETDRIVE && component)
+        {
+	  /* This case indicates a non-existant resp. a non-retrievable
+	     share.  This happens for instance if the share is a printer.
+	     In this case the path must not be treated like a FH_NETDRIVE,
+	     but like a FH_FS instead, so the usual open call for files
+	     is used on it. */
+	  dev.parse (FH_FS);
+	}
+      else
+        {
+	  error = dev.devn == FH_NETDRIVE ? ENOSHARE : ENOENT;
+	  return;
+	}
     }
   else if (!need_directory || error)
     /* nothing to do */;
