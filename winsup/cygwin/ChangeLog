@@ -1,5 +1,9 @@
 2005-05-28  Christopher Faylor  <cgf@timesys.com>
 
+	* cygwin.din: Remove signal front end from pthread_[gs]etspecific.
+
+2005-05-28  Christopher Faylor  <cgf@timesys.com>
+
 	* fhandler_tty.cc (fhandler_tty_slave:tcflush): Use signed comparison.
 
 2005-05-28  Christopher Faylor  <cgf@timesys.com>

@@ -1025,7 +1025,7 @@ pthread_exit SIGFE
 pthread_getconcurrency SIGFE
 pthread_getschedparam SIGFE
 pthread_getsequence_np SIGFE
-pthread_getspecific SIGFE
+pthread_getspecific NOSIGFE
 pthread_join SIGFE
 pthread_key_create SIGFE
 pthread_key_delete SIGFE
@@ -1064,7 +1064,7 @@ pthread_setcancelstate SIGFE
 pthread_setcanceltype SIGFE
 pthread_setconcurrency SIGFE
 pthread_setschedparam SIGFE
-pthread_setspecific SIGFE
+pthread_setspecific NOSIGFE
 pthread_sigmask SIGFE
 pthread_suspend SIGFE
 pthread_testcancel SIGFE
