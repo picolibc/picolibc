@@ -1,3 +1,7 @@
+2005-05-30  Christopher Faylor  <cgf@timesys.com>
+
+	* dlfcn.cc (set_dl_error): Use UNIX error rather than Windows error.
+
 2005-05-29  Christopher Faylor  <cgf@timesys.com>
 
 	* cygmagic: Remove debugging cruft missed on 2005-05-21.

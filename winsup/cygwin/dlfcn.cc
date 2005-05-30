@@ -27,7 +27,7 @@ details. */
 static void __stdcall
 set_dl_error (const char *str)
 {
-  __small_sprintf (_my_tls.locals.dl_buffer, "%s, %E", str);
+  strcpy (_my_tls.locals.dl_buffer, strerror (get_errno ()));
   _my_tls.locals.dl_error = 1;
 }
 
