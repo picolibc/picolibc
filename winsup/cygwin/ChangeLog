@@ -1,3 +1,7 @@
+2005-05-29  Christopher Faylor  <cgf@timesys.com>
+
+	* cygmagic: Remove debugging cruft missed on 2005-05-21.
+
 2005-05-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (path_conv::check): Move component to function scope. Set
