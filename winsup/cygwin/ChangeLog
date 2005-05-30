@@ -1,3 +1,9 @@
+2005-05-30  Vaclav Haisman  <v.haisman@sh.cvut.cz>
+
+	* thread.h (List_remove): Make node parameter const.  Use simple
+	comparison and assignment rather than InterlockedCompareExchangePointer
+	since access is already synchronized.
+
 2005-05-30  Christopher Faylor  <cgf@timesys.com>
 
 	* dlfcn.cc (set_dl_error): Use UNIX error rather than Windows error.

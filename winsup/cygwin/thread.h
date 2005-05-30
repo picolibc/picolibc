@@ -136,14 +136,16 @@ List_insert (list_node *&head, list_node *node)
 }
 
 template <class list_node> inline void
-List_remove (fast_mutex &mx, list_node *&head, list_node *node)
+List_remove (fast_mutex &mx, list_node *&head, list_node const *node)
 {
   if (!node)
     return;
   mx.lock ();
   if (head)
     {
-      if (InterlockedCompareExchangePointer (&head, node->next, node) != node)
+      if (head == node)
+        head = head->next;
+      else
 	{
 	  list_node *cur = head;
 
