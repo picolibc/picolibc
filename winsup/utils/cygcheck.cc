@@ -1017,10 +1017,9 @@ dump_sysinfo ()
 	      if (!more_info)
 		osname = (char *) "2000";
 	      else if (osversionex.wProductType == VER_NT_SERVER
-		       || osversionex.wProductType ==
-		       VER_NT_DOMAIN_CONTROLLER)
+		       || osversionex.wProductType == VER_NT_DOMAIN_CONTROLLER)
 		{
-		  if (osversionex.wSuiteMask &VER_SUITE_DATACENTER)
+		  if (osversionex.wSuiteMask & VER_SUITE_DATACENTER)
 		    osname = (char *) "2000 Datacenter Server";
 		  else if (osversionex.wSuiteMask & VER_SUITE_ENTERPRISE)
 		    osname = (char *) "2000 Advanced Server";
@@ -1030,24 +1029,31 @@ dump_sysinfo ()
 	      else
 		osname = (char *) "2000 Professional";
 	    }
-	  else
+	  else if (osversion.dwMinorVersion == 1)
+	    {
+	      if (GetSystemMetrics (SM_MEDIACENTER))
+	        osname = (char *) "XP Media Center Edition";
+	      else if (GetSystemMetrics (SM_TABLETPC))
+	        osname = (char *) "XP Tablet PC Edition";
+	      else if (!more_info)
+		osname = (char *) "XP";
+	      else if (osversionex.wSuiteMask & VER_SUITE_PERSONAL)
+	        osname = (char *) "XP Home Edition";
+	      else
+	        osname = (char *) "XP Professional";
+	    }
+	  else if (osversion.dwMinorVersion == 2)
 	    {
 	      if (!more_info)
-		osname = (char *) "XP";
-	      else if (osversionex.wProductType == VER_NT_SERVER
-		       || osversionex.wProductType ==
-		       VER_NT_DOMAIN_CONTROLLER)
-		{
-		  if (osversionex.wSuiteMask & VER_SUITE_ENTERPRISE)
-		    osname = (char *) ".NET Enterprise Server";
-		  else
-		    osname = (char *) ".NET Server";
-		}
-	      else if (osversionex.wSuiteMask & VER_SUITE_PERSONAL)
-		osname = (char *) "XP Home Edition";
+		osname = (char *) "2003 Server";
+	      else if (osversionex.wSuiteMask & VER_SUITE_BLADE)
+		osname = (char *) "2003 Web Server";
+	      else if (osversionex.wSuiteMask & VER_SUITE_DATACENTER)
+		osname = (char *) "2003 Datacenter Server";
+	      else if (osversionex.wSuiteMask & VER_SUITE_ENTERPRISE)
+		osname = (char *) "2003 Enterprise Server";
 	      else
-		osname = (char *) "XP Professional";
-
+		osname = (char *) "2003 Server";
 	    }
 	}
       else
@@ -1063,6 +1069,8 @@ dump_sysinfo ()
 	  osversion.dwBuildNumber : (osversion.dwBuildNumber & 0xffff),
 	  osversion.dwPlatformId == VER_PLATFORM_WIN32_NT ?
 	  osversion.szCSDVersion : "");
+  if (GetSystemMetrics (SM_REMOTESESSION))
+    printf ("Running in Terminal Service session\n\n");
 
   printf ("Path:");
   char *s = getenv ("PATH"), *e;

@@ -1,3 +1,9 @@
+2005-05-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (dump_sysinfo): Recognize XP Media Center and Tablet PC
+	Editions. Change .NET to 2003 throughout.  Recognize 2003 Web Server
+	and Datacenter Server. Report when running in terminal server session.
+
 2005-05-27  Christopher Faylor  <cgf@timesys.com>
 
 	* cygcheck.cc (load_cygwin): Make half-hearted attempt to work with
