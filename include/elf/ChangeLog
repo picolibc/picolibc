@@ -1,3 +1,7 @@
+2005-05-31  Richard Henderson  <rth@redhat.com>
+
+	* alpha.h (LITUSE_ALPHA_JSRDIRECT): New.
+
 2005-05-29  Richard Henderson  <rth@redhat.com>
 
 	* alpha.h (DT_ALPHA_PLTRO): New.
