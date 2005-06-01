@@ -1,5 +1,9 @@
 2005-06-01  Christopher Faylor  <cgf@timesys.com>
 
+	* include/machine/stdlib.h: New file.
+
+2005-06-01  Christopher Faylor  <cgf@timesys.com>
+
 	* thread.h (List_remove): Revert most of 2005-05-30 change.
 
 2005-06-01  Christopher Faylor  <cgf@timesys.com>
