@@ -29,7 +29,7 @@ init_cygheap NO_COPY *cygheap;
 void NO_COPY *cygheap_max;
 
 extern "C" char  _cygheap_mid[] __attribute__((section(".cygheap")));
-extern "C" char  _cygheap_end[] __attribute__((section(".cygheap_end")));
+extern "C" char  _cygheap_end[];
 
 static NO_COPY muto cygheap_protect;
 

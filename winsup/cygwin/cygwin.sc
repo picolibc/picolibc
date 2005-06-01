@@ -104,10 +104,9 @@ SECTIONS
   __section_alignment__ = 64 * 1024;
   .cygheap ALIGN(4096):
   {
-    __cygheap_mid = .;
+    __cygheap_mid = ABSOLUTE(.);
     . = ALIGN(512 * 1024, 0x10000);
     . += 8192;		/* inexplicably needed for alignment on 64K boundary?!? */
-_cygheap_foo = .;
   }
   __cygheap_end = ABSOLUTE(.);
 }

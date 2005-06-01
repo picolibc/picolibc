@@ -1,3 +1,8 @@
+2005-05-31  Christopher Faylor  <cgf@timesys.com>
+
+	* cygheap.cc (cygheap_end): Remove bogus section attribute.
+	* cygwin.sc: Make __cygheap_mid absolute.  Remove unused _cygheap_foo.
+
 2005-05-30  Christopher Faylor  <cgf@timesys.com>
 
 	* child_info.h (child_info::cygheap_h): Delete.
