@@ -143,9 +143,7 @@ List_remove (fast_mutex &mx, list_node *&head, list_node const *node)
   mx.lock ();
   if (head)
     {
-      if (head == node)
-        head = head->next;
-      else
+      if (InterlockedCompareExchangePointer (&head, node->next, node) != node)
 	{
 	  list_node *cur = head;
 
