@@ -416,8 +416,6 @@ class cygheap_fdenum : public cygheap_fdmanip
 };
 
 class child_info;
-void *__stdcall cygheap_setup_for_child (child_info *ci, bool dup_later) __attribute__ ((regparm(2)));
-void __stdcall cygheap_setup_for_child_cleanup (void *, child_info *, bool) __attribute__ ((regparm(3)));
 void __stdcall cygheap_fixup_in_child (bool);
 extern "C" {
 void __stdcall cfree (void *) __attribute__ ((regparm(1)));
@@ -428,5 +426,5 @@ char *__stdcall cstrdup (const char *) __attribute__ ((regparm(1)));
 char *__stdcall cstrdup1 (const char *) __attribute__ ((regparm(1)));
 void __stdcall cfree_and_set (char *&, char * = NULL) __attribute__ ((regparm(2)));
 void __stdcall cygheap_init ();
-extern DWORD _cygheap_start __attribute__((section(".cygheap")));
+extern char _cygheap_start[] __attribute__((section(".idata")));
 }

@@ -22,12 +22,16 @@
 #include "heap.h"
 #include "sync.h"
 #include "sigproc.h"
+#include "pinfo.h"
+#include <unistd.h>
 
 init_cygheap NO_COPY *cygheap;
 void NO_COPY *cygheap_max;
 
+extern "C" char  _cygheap_mid[] __attribute__((section(".cygheap")));
+extern "C" char  _cygheap_end[] __attribute__((section(".cygheap_end")));
+
 static NO_COPY muto cygheap_protect;
-static NO_COPY DWORD reserve_sz;
 
 struct cygheap_entry
   {
@@ -44,141 +48,20 @@ struct cygheap_entry
 #define MVMAP_OPTIONS (FILE_MAP_WRITE)
 
 extern "C" {
-static void __stdcall _cfree (void *ptr) __attribute__((regparm(1)));
-}
-
-static void
-init_cheap ()
-{
-#ifndef DEBUGGING
-  reserve_sz = CYGHEAPSIZE;
-#else
-  char buf[80];
-  DWORD initial_sz = 0;
-  if (!GetEnvironmentVariable ("CYGWIN_HEAPSIZE", buf, sizeof buf - 1))
-    initial_sz = reserve_sz = CYGHEAPSIZE;
-  else
-    {
-      initial_sz = reserve_sz = atoi (buf);
-      small_printf ("using cygheap size %d\n", reserve_sz);
-    }
-#endif
-  do
-    if ((cygheap = (init_cygheap *) VirtualAlloc ((void *) &_cygheap_start,
-						  reserve_sz, MEM_RESERVE,
-						  PAGE_NOACCESS)))
-      break;
-  while ((reserve_sz -= 2 * (1024 * 1024)) >= CYGHEAPSIZE_MIN);
-#ifdef DEBUGGING
-  if (reserve_sz != initial_sz)
-    small_printf ("reset initial cygheap size to %u\n", reserve_sz);
-#endif
-  if (!cygheap)
-    {
-      MEMORY_BASIC_INFORMATION m;
-      if (!VirtualQuery ((LPCVOID) &_cygheap_start, &m, sizeof m))
-	system_printf ("couldn't get memory info, %E");
-      system_printf ("Couldn't reserve %d bytes of space for cygwin's heap, %E",
-		     reserve_sz);
-      api_fatal ("AllocationBase %p, BaseAddress %p, RegionSize %p, State %p\n",
-		 m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
-    }
-  cygheap_max = cygheap;
-}
-
-static void dup_now (void *, child_info *, unsigned) __attribute__ ((regparm(3)));
-static void
-dup_now (void *newcygheap, child_info *ci, unsigned n)
-{
-  if (!VirtualAlloc (newcygheap, n, MEM_COMMIT, PAGE_READWRITE))
-    api_fatal ("couldn't allocate new cygwin heap %p, %d for child, %E",
-	       newcygheap, n);
-  memcpy (newcygheap, cygheap, n);
-}
-
-void *__stdcall
-cygheap_setup_for_child (child_info *ci, bool dup_later)
-{
-  void *newcygheap;
-  cygheap_protect.acquire ();
-  unsigned n = (char *) cygheap_max - (char *) cygheap;
-  unsigned size = reserve_sz;
-  if (size < n)
-    size = n + (128 * 1024);
-  ci->cygheap_h = CreateFileMapping (INVALID_HANDLE_VALUE, &sec_none,
-				     CFMAP_OPTIONS, 0, size, NULL);
-  if (!ci->cygheap_h)
-    api_fatal ("Couldn't create heap for child, size %d, %E", size);
-  newcygheap = MapViewOfFileEx (ci->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, NULL);
-  if (!newcygheap)
-    api_fatal ("couldn't map space for new cygheap, %E");
-  ProtectHandle1INH (ci->cygheap_h, passed_cygheap_h);
-  if (!dup_later)
-    dup_now (newcygheap, ci, n);
-  cygheap_protect.release ();
-  ci->cygheap = cygheap;
-  ci->cygheap_max = cygheap_max;
-  ci->cygheap_reserve_sz = size;
-  return newcygheap;
-}
-
-void __stdcall
-cygheap_setup_for_child_cleanup (void *newcygheap, child_info *ci,
-				 bool dup_it_now)
-{
-  if (dup_it_now)
-    {
-      /* NOTE: There is an assumption here that cygheap_max has not changed
-	 between the time that cygheap_setup_for_child was called and now.
-	 Make sure that this is a correct assumption.  */
-      cygheap_protect.acquire ();
-      dup_now (newcygheap, ci, (char *) cygheap_max - (char *) cygheap);
-      cygheap_protect.release ();
-    }
-  UnmapViewOfFile (newcygheap);
-  ForceCloseHandle1 (ci->cygheap_h, passed_cygheap_h);
+static void __stdcall _cfree (void *) __attribute__((regparm(1)));
+static void *__stdcall _csbrk (int);
 }
 
 /* Called by fork or spawn to reallocate cygwin heap */
 void __stdcall
 cygheap_fixup_in_child (bool execed)
 {
-  cygheap = child_proc_info->cygheap;
-  cygheap_max = child_proc_info->cygheap_max;
-  void *addr = !wincap.map_view_of_file_ex_sucks () ? cygheap : NULL;
-  void *newaddr;
-
-  newaddr = MapViewOfFileEx (child_proc_info->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, addr);
-  reserve_sz = child_proc_info->cygheap_reserve_sz;
-  if (newaddr != cygheap)
-    {
-      if (!newaddr)
-	newaddr = MapViewOfFileEx (child_proc_info->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, NULL);
-      DWORD n = (DWORD) cygheap_max - (DWORD) cygheap;
-      /* Reserve cygwin heap in same spot as parent */
-      if (!VirtualAlloc (cygheap, reserve_sz, MEM_RESERVE, PAGE_NOACCESS))
-	{
-	  MEMORY_BASIC_INFORMATION m;
-	  memset (&m, 0, sizeof m);
-	  if (!VirtualQuery ((LPCVOID) cygheap, &m, sizeof m))
-	    system_printf ("couldn't get memory info, %E");
-
-	  system_printf ("Couldn't reserve %d bytes of space for cygwin's heap (%p <%p>) in child, %E",
-			 reserve_sz, cygheap, newaddr);
-	  api_fatal ("m.AllocationBase %p, m.BaseAddress %p, m.RegionSize %p, m.State %p\n",
-		     m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
-	}
-
-      /* Allocate same amount of memory as parent */
-      if (!VirtualAlloc (cygheap, n, MEM_COMMIT, PAGE_READWRITE))
-	api_fatal ("Couldn't allocate space for child's heap %p, size %d, %E",
-		   cygheap, n);
-      memcpy (cygheap, newaddr, n);
-      UnmapViewOfFile (newaddr);
-    }
-
-  ForceCloseHandle1 (child_proc_info->cygheap_h, passed_cygheap_h);
-
+  cygheap_max = child_proc_info->cygheap;
+  cygheap = (init_cygheap *) cygheap_max;
+  _csbrk ((char *) child_proc_info->cygheap_max - (char *) cygheap);
+  child_copy (child_proc_info->parent, child_proc_info->dwProcessId, "cygheap", cygheap, cygheap_max);
+  if (execed)
+    CloseHandle (child_proc_info->parent);
   cygheap_init ();
   debug_fixup_after_fork_exec ();
 
@@ -222,30 +105,42 @@ init_cygheap::close_ctty ()
 #endif
 }
 
-#define pagetrunc(x) ((void *) (((DWORD) (x)) & ~(4096 - 1)))
+#define nextpage(x) ((char *) (((DWORD) ((char *) x + granmask)) & ~granmask))
+#define allocsize(x) ((DWORD) nextpage (x))
+#ifdef DEBUGGING
+#define somekinda_printf debug_printf
+#else
+#define somekinda_printf malloc_printf
+#endif
 
 static void *__stdcall
 _csbrk (int sbs)
 {
   void *prebrk = cygheap_max;
-  void *prebrka = pagetrunc (prebrk);
+  size_t granmask = getshmlba () - 1;
+  char *newbase = nextpage (prebrk);
   cygheap_max = (char *) cygheap_max + sbs;
-  if (!sbs || (prebrk != prebrka && prebrka == pagetrunc (cygheap_max)))
+  if (!sbs || (newbase > cygheap_max) || (cygheap_max < _cygheap_end))
     /* nothing to do */;
-  else if (!VirtualAlloc (prebrk, (DWORD) sbs, MEM_COMMIT, PAGE_READWRITE))
+  else
     {
-#ifdef DEBUGGING
-      system_printf ("couldn't commit memory for cygwin heap, prebrk %p, size %d, heapsize now %d, max heap size %u, %E",
-		     prebrk, sbs, (char *) cygheap_max - (char *) cygheap,
-		     reserve_sz);
-#else
-      malloc_printf ("couldn't commit memory for cygwin heap, prebrk %p, size %d, heapsize now %d, max heap size %u, %E",
-		     prebrk, sbs, (char *) cygheap_max - (char *) cygheap,
-		     reserve_sz);
-#endif
-      __seterrno ();
-      cygheap_max = (char *) cygheap_max - sbs;
-      return NULL;
+      if (prebrk <= _cygheap_end)
+	newbase = _cygheap_end;
+
+      DWORD adjsbs = allocsize ((char *) cygheap_max - newbase);
+      if (!VirtualAlloc (newbase, adjsbs, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE))
+	{
+	  MEMORY_BASIC_INFORMATION m;
+	  if (!VirtualQuery (newbase, &m, sizeof m))
+	    system_printf ("couldn't get memory info, %E");
+	  somekinda_printf ("Couldn't reserve/commit %d bytes of space for cygwin's heap, %E",
+			    adjsbs);
+	  somekinda_printf ("AllocationBase %p, BaseAddress %p, RegionSize %p, State %p\n",
+			    m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
+	  __seterrno ();
+	  cygheap_max = (char *) cygheap_max - sbs;
+	  return NULL;
+	}
     }
 
   return prebrk;
@@ -257,7 +152,13 @@ cygheap_init ()
   cygheap_protect.init ("cygheap_protect");
   if (!cygheap)
     {
-      init_cheap ();
+#if 1
+      cygheap = (init_cygheap *) memset (_cygheap_start, 0, _cygheap_mid - _cygheap_start);
+#else
+      cygheap = (init_cygheap *) _cygheap_start;
+#endif
+
+      cygheap_max = cygheap;
       (void) _csbrk (sizeof (*cygheap));
     }
   if (!cygheap->fdtab)

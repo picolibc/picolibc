@@ -766,7 +766,7 @@ dtable::vfork_parent_restore ()
   lock ();
 
   fhandler_tty_slave *ctty_on_hold = cygheap->ctty_on_hold;
-  close_all_files ();
+  close_all_files (false);
   fhandler_base **deleteme = fds;
   fds = fds_on_hold;
   fds_on_hold = NULL;

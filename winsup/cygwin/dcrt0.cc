@@ -1030,7 +1030,7 @@ do_exit (int status)
   if (exit_state < ES_CLOSEALL)
     {
       exit_state = ES_CLOSEALL;
-      close_all_files ();
+      close_all_files (false);
     }
 
   if (exit_state < ES_SIGPROCTERMINATE)

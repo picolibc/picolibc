@@ -81,7 +81,11 @@ fork_copy (PROCESS_INFORMATION &pi, const char *what, ...)
 	  DWORD done = 0;
 	  if (here + todo > high)
 	    todo = high - here;
-	  int res = WriteProcessMemory (pi.hProcess, here, here, todo, &done);
+	  int res;
+	  if (pi.hThread)
+	    res = WriteProcessMemory (pi.hProcess, here, here, todo, &done);
+	  else
+	    res = ReadProcessMemory (pi.hProcess, here, here, todo, &done);
 	  debug_printf ("child handle %p, low %p, high %p, res %d", pi.hProcess,
 			low, high, res);
 	  if (!res || todo != done)
@@ -223,18 +227,15 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   if (!load_dlls)
     {
       cygheap->fdtab.fixup_after_fork (hParent);
-      ProtectHandleINH (hParent);
       sync_with_parent ("performed fork fixup", false);
     }
   else
     {
       dlls.load_after_fork (hParent, first_dll);
       cygheap->fdtab.fixup_after_fork (hParent);
-      ProtectHandleINH (hParent);
       sync_with_parent ("loaded dlls", true);
     }
 
-  ForceCloseHandle (hParent);
   (void) ForceCloseHandle1 (fork_info->forker_finished, forker_finished);
 
   _my_tls.fixup_after_fork ();
@@ -276,8 +277,7 @@ slow_pid_reuse (HANDLE h)
 #endif
 
 static int __stdcall
-fork_parent (HANDLE& hParent, dll *&first_dll,
-	     bool& load_dlls, void *stack_here, child_info_fork &ch)
+fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_info_fork &ch)
 {
   HANDLE forker_finished;
   DWORD rc;
@@ -308,16 +308,6 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   if (cygheap->fdtab.need_fixup_before ())
     c_flags |= CREATE_SUSPENDED;
 
-  /* Create an inheritable handle to pass to the child process.  This will
-     allow the child to duplicate handles from the parent to itself. */
-  hParent = NULL;
-  if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &hParent, 0, TRUE,
-			DUPLICATE_SAME_ACCESS))
-    {
-      system_printf ("couldn't create handle to myself for child, %E");
-      return -1;
-    }
-
   /* Remember the address of the first loaded dll and decide
      if we need to load dlls.  We do this here so that this
      information will be available in the parent and, when
@@ -331,7 +321,6 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   forker_finished = CreateEvent (&sec_all, FALSE, FALSE, NULL);
   if (forker_finished == NULL)
     {
-      CloseHandle (hParent);
       system_printf ("unable to allocate forker_finished event, %E");
       return -1;
     }
@@ -349,13 +338,9 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   /* Remove impersonation */
   cygheap->user.deimpersonate ();
 
-  ch.parent = hParent;
-
   syscall_printf ("CreateProcess (%s, %s, 0, 0, 1, %x, 0, 0, %p, %p)",
 		  myself->progname, myself->progname, c_flags, &si, &pi);
   bool locked = __malloc_lock ();
-  void *newheap;
-  newheap = cygheap_setup_for_child (&ch, cygheap->fdtab.need_fixup_before ());
   rc = CreateProcess (myself->progname, /* image to run */
 		      myself->progname, /* what we send in arg0 */
 		      &sec_none_nih,
@@ -367,8 +352,6 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 		      &si,
 		      &pi);
 
-  CloseHandle (hParent);
-
   if (!rc)
     {
       __seterrno ();
@@ -376,19 +359,15 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
       ForceCloseHandle (forker_finished);
       /* Restore impersonation */
       cygheap->user.reimpersonate ();
-      cygheap_setup_for_child_cleanup (newheap, &ch, 0);
       __malloc_unlock ();
       return -1;
     }
 
   /* Fixup the parent datastructure if needed and resume the child's
      main thread. */
-  if (!cygheap->fdtab.need_fixup_before ())
-    cygheap_setup_for_child_cleanup (newheap, &ch, 0);
-  else
+  if (cygheap->fdtab.need_fixup_before ())
     {
       cygheap->fdtab.fixup_before_fork (pi.dwProcessId);
-      cygheap_setup_for_child_cleanup (newheap, &ch, 1);
       ResumeThread (pi.hThread);
     }
 
@@ -542,15 +521,15 @@ fork ()
 {
   struct
   {
-    HANDLE hParent;
     dll *first_dll;
     bool load_dlls;
+    child_info_fork ch;
   } grouped;
 
   MALLOC_CHECK;
 
   debug_printf ("entering");
-  grouped.hParent = grouped.first_dll = NULL;
+  grouped.first_dll = NULL;
   grouped.load_dlls = 0;
 
   void *esp;
@@ -558,19 +537,20 @@ fork ()
 
   myself->set_has_pgid_children ();
 
-  child_info_fork ch;
-  if (ch.subproc_ready == NULL)
+  if (grouped.ch.parent == NULL)
+    return -1;
+  if (grouped.ch.subproc_ready == NULL)
     {
       system_printf ("unable to allocate subproc_ready event, %E");
       return -1;
     }
 
   sig_send (NULL, __SIGHOLD);
-  int res = setjmp (ch.jmp);
+  int res = setjmp (grouped.ch.jmp);
   if (res)
-    res = fork_child (grouped.hParent, grouped.first_dll, grouped.load_dlls);
+    res = fork_child (grouped.ch.parent, grouped.first_dll, grouped.load_dlls);
   else
-    res = fork_parent (grouped.hParent, grouped.first_dll, grouped.load_dlls, esp, ch);
+    res = fork_parent (grouped.ch.parent, grouped.first_dll, grouped.load_dlls, esp, grouped.ch);
   sig_send (NULL, __SIGNOHOLD);
 
   MALLOC_CHECK;
@@ -663,4 +643,15 @@ vfork ()
   _my_tls = vf->tls;
   return pid;
 #endif
+}
+
+int
+child_copy (HANDLE h, DWORD pid, const char *what, void *child_start, void *child_end)
+{
+  PROCESS_INFORMATION pi;
+  pi.hProcess = h;
+  pi.dwProcessId = pid;
+  pi.hThread = NULL;
+  debug_printf ("%s, start %p, end %p", what, child_start, child_end);
+  return fork_copy (pi, what, child_start, child_end, NULL);
 }

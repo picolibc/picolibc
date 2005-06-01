@@ -1,3 +1,44 @@
+2005-05-30  Christopher Faylor  <cgf@timesys.com>
+
+	* child_info.h (child_info::cygheap_h): Delete.
+	(child_info::dwProcessId): New field.
+	* cygheap.cc (init_cheap): Delete.
+	(dup_now): Ditto.
+	(cygheap_setup_for_child): Ditto.
+	(cygheap_setup_for_child_cleanup): Ditto.
+	(cygheap_fixup_in_child): Simplify.  Use new "child_copy" function to
+	copy heap from parent.
+	(_csbrk): Don't attempt allocation if within cygheap section.  Fix so
+	that more than one allocation will succeed.
+	(cygheap_init): Reset possibly-nonzero region to zero.
+	* cygheap.h (cygheap_setup_for_child): Delete declaration.
+	(cygheap_setup_for_child_cleanup): Ditto.
+	(cygheap_start): Define as an array.
+	* cygwin.sc: Modernize.  Remove unneeded sections.  Define cygheap
+	here.
+	* dcrt0.cc (do_exit): Reflect argument change to close_all_files.
+	* dtable.cc (dtable::vfork_parent_restore): Ditto.
+	* dtable.h: Ditto.
+	* fhandler.h: Ditto.
+	* fork.cc (fork_copy): Call ReadProcessMemory if there is no thread
+	(indicating that we're execing).
+	(fork_child): Don't mess with hParent.
+	(fork_parent): Remove hParent stuff.  It happens earlier now.
+	Remove call to cygheap_setup_for_child* stuff.
+	(fork): Put child_info_stuff in grouped structure.  Issue error if
+	parent handle is not set.
+	(child_copy): New function.
+	* sigproc.cc (child_info::child_info): Put cygheap settings here.  Set
+	parent handle.
+	(child_info::~child_info): Close parent handle if it exists.
+	* spawn.cc (spawn_guts): Reorganize so that ciresrv is allocated at
+	only the last minute so that cygheap changes are reflected.  Delete
+	cygheap_setup* calls.
+	* syscalls.cc (close_all_files): Add an argument to flag when the fd
+	entry should be released.
+	* winsup.h (close_all_files): Add an argument to close_all_files
+	declaration.  Declare child_copy.
+
 2005-05-30  Vaclav Haisman  <v.haisman@sh.cvut.cz>
 
 	* thread.h (List_remove): Make node parameter const.  Use simple

@@ -390,12 +390,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   else
     chtype = PROC_EXEC;
 
-  child_info_spawn ciresrv (chtype);
-  si.lpReserved2 = (LPBYTE) &ciresrv;
-  si.cbReserved2 = sizeof (ciresrv);
-
-  ciresrv.moreinfo = (cygheap_exec_info *) ccalloc (HEAP_1_EXEC, 1, sizeof (cygheap_exec_info));
-  ciresrv.moreinfo->old_title = NULL;
+  cygheap_exec_info *moreinfo = (cygheap_exec_info *) ccalloc (HEAP_1_EXEC, 1, sizeof (cygheap_exec_info));
+  moreinfo->old_title = NULL;
 
   /* CreateProcess takes one long string that is the command line (sigh).
      We need to quote any argument that has whitespace or embedded "'s.  */
@@ -600,16 +596,16 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       return -1;
     }
 
-  ciresrv.moreinfo->argc = newargv.argc;
-  ciresrv.moreinfo->argv = newargv;
+  moreinfo->argc = newargv.argc;
+  moreinfo->argv = newargv;
 
   if (mode != _P_OVERLAY ||
       !DuplicateHandle (hMainProc, myself.shared_handle (), hMainProc,
-			&ciresrv.moreinfo->myself_pinfo, 0,
+			&moreinfo->myself_pinfo, 0,
 			TRUE, DUPLICATE_SAME_ACCESS))
-    ciresrv.moreinfo->myself_pinfo = NULL;
+    moreinfo->myself_pinfo = NULL;
   else
-    VerifyHandle (ciresrv.moreinfo->myself_pinfo);
+    VerifyHandle (moreinfo->myself_pinfo);
 
  skip_arg_parsing:
   PROCESS_INFORMATION pi = {NULL, 0, 0, 0};
@@ -665,12 +661,17 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   syscall_printf ("null_app_name %d (%s, %.9500s)", null_app_name, runpath, one_line.buf);
 
-  void *newheap;
-
   cygbench ("spawn-guts");
 
   cygheap->fdtab.set_file_pointers_for_exec ();
   cygheap->user.deimpersonate ();
+
+  moreinfo->envp = build_env (envp, envblock, moreinfo->envc, real_path.iscygexec ());
+  child_info_spawn ciresrv (chtype);
+  ciresrv.moreinfo = moreinfo;
+
+  si.lpReserved2 = (LPBYTE) &ciresrv;
+  si.cbReserved2 = sizeof (ciresrv);
 
   /* When ruid != euid we create the new process under the current original
      account and impersonate in child, this way maintaining the different
@@ -682,9 +683,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	  && cygheap->user.saved_gid == cygheap->user.real_gid
 	  && !cygheap->user.groups.issetgroups ()))
     {
-      ciresrv.moreinfo->envp = build_env (envp, envblock, ciresrv.moreinfo->envc,
-					  real_path.iscygexec ());
-      newheap = cygheap_setup_for_child (&ciresrv, cygheap->fdtab.need_fixup_before ());
       rc = CreateProcess (runpath,	/* image name - with full path */
 			  one_line.buf,	/* what was passed to exec */
 			  &sec_none_nih,/* process security attrs */
@@ -719,9 +717,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       strcat (wstname, dskname);
       si.lpDesktop = wstname;
 
-      ciresrv.moreinfo->envp = build_env (envp, envblock, ciresrv.moreinfo->envc,
-					  real_path.iscygexec ());
-      newheap = cygheap_setup_for_child (&ciresrv, cygheap->fdtab.need_fixup_before ());
       rc = CreateProcessAsUser (cygheap->user.primary_token (),
 		       runpath,		/* image name - with full path */
 		       one_line.buf,	/* what was passed to exec */
@@ -758,7 +753,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	  myself->sendsig = myself->exec_sendsig;
 	  myself->exec_sendsig = NULL;
 	}
-      cygheap_setup_for_child_cleanup (newheap, &ciresrv, 0);
       return -1;
     }
 
@@ -779,13 +773,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   /* Fixup the parent data structures if needed and resume the child's
      main thread. */
-  if (!cygheap->fdtab.need_fixup_before ())
-    cygheap_setup_for_child_cleanup (newheap, &ciresrv, 0);
-  else
-    {
-      cygheap->fdtab.fixup_before_exec (pi.dwProcessId);
-      cygheap_setup_for_child_cleanup (newheap, &ciresrv, 1);
-    }
+  if (cygheap->fdtab.need_fixup_before ())
+    cygheap->fdtab.fixup_before_exec (pi.dwProcessId);
 
   if (mode != _P_OVERLAY)
     cygpid = cygwin_pid (pi.dwProcessId);
@@ -807,7 +796,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       myself.hProcess = hExeced = pi.hProcess;
       strcpy (myself->progname, real_path); // FIXME: race?
       sigproc_printf ("new process name %s", myself->progname);
-      close_all_files ();
+      close_all_files (true);
       /* If wr_proc_pipe doesn't exist then this process was not started by a cygwin
 	 process.  So, we need to wait around until the process we've just "execed"
 	 dies.  Use our own wait facility to wait for our own pid to exit (there

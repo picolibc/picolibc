@@ -737,12 +737,23 @@ child_info::child_info (unsigned in_cb, child_info_types chtype)
   if (chtype != PROC_SPAWN)
     subproc_ready = CreateEvent (&sec_all, FALSE, FALSE, NULL);
   sigproc_printf ("subproc_ready %p", subproc_ready);
+  cygheap = ::cygheap;
+  cygheap_max = ::cygheap_max;
+  dwProcessId = myself->dwProcessId;
+  /* Create an inheritable handle to pass to the child process.  This will
+     allow the child to duplicate handles from the parent to itself. */
+  parent = NULL;
+  if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &parent, 0, TRUE,
+			DUPLICATE_SAME_ACCESS))
+    system_printf ("couldn't create handle to myself for child, %E");
 }
 
 child_info::~child_info ()
 {
   if (subproc_ready)
     CloseHandle (subproc_ready);
+  if (parent)
+    CloseHandle (parent);
 }
 
 child_info_fork::child_info_fork () :

@@ -221,7 +221,7 @@ void uinfo_init (void);
 void events_init (void);
 void events_terminate (void);
 
-void __stdcall close_all_files ();
+void __stdcall close_all_files (bool);
 
 /* Globals that handle initialization of winsock in a child process. */
 extern HANDLE wsock32_handle;
@@ -298,6 +298,7 @@ extern void multiple_cygwin_problem (const char *, unsigned, unsigned);
 
 extern "C" void vklog (int priority, const char *message, va_list ap);
 extern "C" void klog (int priority, const char *message, ...);
+int child_copy (HANDLE, DWORD, const char *, void *, void *);
 
 int symlink_worker (const char *, const char *, bool, bool)
   __attribute__ ((regparm (3)));
