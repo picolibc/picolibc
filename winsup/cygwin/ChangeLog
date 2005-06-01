@@ -1,3 +1,9 @@
+2005-06-01  Christopher Faylor  <cgf@timesys.com>
+
+	* cygwin.sc: Don't output .reloc or .rsrc sections.  Clean up stuff
+	around .cygheap and use a workaround to get things working with newer
+	(broken?) binutils.
+
 2005-05-31  Christopher Faylor  <cgf@timesys.com>
 
 	* cygheap.cc (cygheap_end): Remove bogus section attribute.

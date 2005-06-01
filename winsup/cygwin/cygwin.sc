@@ -63,6 +63,8 @@ SECTIONS
     *(.debug$T)
     *(.debug$F)
     *(.drectve)
+    *(.reloc)
+    *(.rsrc)
   }
   .stab ALIGN(__section_alignment__) (NOLOAD) :
   {
@@ -100,13 +102,13 @@ SECTIONS
     . = ALIGN(16);
     __cygheap_start = ABSOLUTE(.);
   }
-  osection_alignment = __section_alignment__;
-  __section_alignment__ = 64 * 1024;
-  .cygheap ALIGN(4096):
+  .cygheap ALIGN(__section_alignment__):
   {
-    __cygheap_mid = ABSOLUTE(.);
+    __cygheap_mid = .;
+    *(.cygheap)
     . = ALIGN(512 * 1024, 0x10000);
     . += 8192;		/* inexplicably needed for alignment on 64K boundary?!? */
   }
   __cygheap_end = ABSOLUTE(.);
+  __cygheap_end1 = __cygheap_mid + SIZEOF(.cygheap);
 }
