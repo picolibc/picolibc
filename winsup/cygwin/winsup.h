@@ -221,7 +221,7 @@ void uinfo_init (void);
 void events_init (void);
 void events_terminate (void);
 
-void __stdcall close_all_files (bool);
+void __stdcall close_all_files ();
 
 /* Globals that handle initialization of winsock in a child process. */
 extern HANDLE wsock32_handle;
