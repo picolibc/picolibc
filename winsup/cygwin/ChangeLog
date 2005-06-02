@@ -1,5 +1,10 @@
 2005-06-01  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::fchown): Make sure that
+	disk open is called in case we're passed in a non-existent device.
+
+2005-06-01  Christopher Faylor  <cgf@timesys.com>
+
 	* include/machine/stdlib.h: New file.
 
 2005-06-01  Christopher Faylor  <cgf@timesys.com>

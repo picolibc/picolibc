@@ -528,7 +528,7 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
   if (!get_io_handle ())
     {
       query_open (query_write_control);
-      if (!(oret = open (O_BINARY, 0)))
+      if (!(oret = fhandler_disk_file::open (O_BINARY, 0)))
 	return -1;
     }
 
