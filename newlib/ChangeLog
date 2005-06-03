@@ -1,3 +1,8 @@
+2005-06-03  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdlib/mallocr.c (MALLOC_COPY): Switch to use memmove
+	instead of memcpy.
+
 2005-05-12  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configure.host (mn10300-*): Add long long I/O support by default.

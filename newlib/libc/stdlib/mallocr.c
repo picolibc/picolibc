@@ -487,6 +487,10 @@ extern void __malloc_unlock();
 
 #define HAVE_MEMCPY 
 
+/* Although the original macro is called USE_MEMCPY, newlib actually
+   uses memmove to handle cases whereby a platform's memcpy implementation
+   copies backwards and thus destructive overlap may occur in realloc
+   whereby we are reclaiming free memory prior to the old allocation.  */
 #ifndef USE_MEMCPY
 #ifdef HAVE_MEMCPY
 #define USE_MEMCPY 1
@@ -500,9 +504,11 @@ extern void __malloc_unlock();
 #if __STD_C
 void* memset(void*, int, size_t);
 void* memcpy(void*, const void*, size_t);
+void* memmove(void*, const void*, size_t);
 #else
 Void_t* memset();
 Void_t* memcpy();
+Void_t* memmove();
 #endif
 #endif
 
@@ -544,7 +550,7 @@ do {                                                                          \
                                      *mcdst++ = *mcsrc++;                     \
                                      *mcdst++ = *mcsrc++;                     \
                                      *mcdst   = *mcsrc  ;                     \
-  } else memcpy(dest, src, mcsz);                                             \
+  } else memmove(dest, src, mcsz);                                             \
 } while(0)
 
 #else /* !USE_MEMCPY */
