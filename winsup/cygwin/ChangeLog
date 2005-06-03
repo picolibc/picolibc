@@ -1,3 +1,10 @@
+2005-06-02  Christopher Faylor  <cgf@timesys.com>
+
+	* dlfcn.cc (get_full_path_of_dll): Use a relative path when converting
+	so that the standard Windows rules for finding a library will be used
+	if no path is given.  Stop explicitly searching /usr/bin since that is
+	now in effect.
+
 2005-06-01  Christopher Faylor  <cgf@timesys.com>
 
 	Revert 2005-05-30 close_all_files changes.
