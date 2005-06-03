@@ -1,3 +1,7 @@
+2005-06-03  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (struct bfd_link_callbacks): Add einfo.
+
 2005-06-01  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
 	* libiberty.h (vsnprintf): Add format attribute.
@@ -81,7 +85,7 @@
 2005-03-28  Mark Mitchell <mark@codesourcery.com>
 
 	* libiberty.h (ffs): Declare, if necessary.
-	
+
 2005-03-27  Gabriel Dos Reis  <gdr@integreable-solutions.net>
 
 	* ternary.h: Don't use PARAMS anymore.

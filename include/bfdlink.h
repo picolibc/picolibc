@@ -422,11 +422,11 @@ struct bfd_link_info
 };
 
 /* This structures holds a set of callback functions.  These are
-   called by the BFD linker routines.  The first argument to each
-   callback function is the bfd_link_info structure being used.  Each
-   function returns a boolean value.  If the function returns FALSE,
-   then the BFD function which called it will return with a failure
-   indication.  */
+   called by the BFD linker routines.  Except for einfo, the first
+   argument to each callback function is the bfd_link_info structure
+   being used and each function returns a boolean value.  If the
+   function returns FALSE, then the BFD function which called it should
+   return with a failure indication.  */
 
 struct bfd_link_callbacks
 {
@@ -535,6 +535,9 @@ struct bfd_link_callbacks
   bfd_boolean (*notice)
     (struct bfd_link_info *, const char *name,
      bfd *abfd, asection *section, bfd_vma address);
+  /* General link info message.  */
+  void (*einfo)
+    (const char *fmt, ...);
 };
 
 /* The linker builds link_order structures which tell the code how to
