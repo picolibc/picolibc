@@ -955,7 +955,15 @@ dll_crt0 (per_process *uptr)
   _dll_crt0 ();
 }
 
-/* This must be called by anyone who uses LoadLibrary to load cygwin1.dll */
+/* This must be called by anyone who uses LoadLibrary to load cygwin1.dll.
+ * You must have CYGTLS_PADSIZE bytes reserved at the bottom of the stack
+ * calling this function, and that storage must not be overwritten until you
+ * unload cygwin1.dll, as it is used for _my_tls.  It is best to load
+ * cygwin1.dll before spawning any additional threads in your process.
+ *
+ * See winsup/testsuite/cygload for an example of how to use cygwin1.dll
+ * from MSVC and non-cygwin MinGW applications.
+ */
 extern "C" void
 cygwin_dll_init ()
 {
@@ -974,6 +982,9 @@ cygwin_dll_init ()
   user_data->envptr = &envp;
   user_data->fmode_ptr = &_fmode;
 
+  main_environ = user_data->envptr;
+  *main_environ = NULL;
+  initialize_main_tls((char *)&_my_tls);
   dll_crt0_1 (NULL);
 }
 

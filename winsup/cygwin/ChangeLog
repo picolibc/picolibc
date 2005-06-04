@@ -1,3 +1,9 @@
+2005-06-03  Max Kaehn <slothman@electric-cloud.com>
+
+	* dcrt0.cc (cygwin_dll_init): Now initializes main_environ and cygtls.
+	Comment to explain the caveats of this method.
+	* how-cygtls-works.txt: New file.
+
 2005-06-02  Christopher Faylor  <cgf@timesys.com>
 
 	* dlfcn.cc (get_full_path_of_dll): Use a relative path when converting
