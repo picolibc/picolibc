@@ -1,3 +1,8 @@
+2005-06-03  Max Kaehn <slothman@electric-cloud.com>
+
+	* how-programming.texinfo: Add "How do I load cygwin1.dll dynamically
+	from a Visual Studio or MinGW application?"
+
 2005-05-28  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* how-using.texinfo : Update the mkdir -p section to reflect 

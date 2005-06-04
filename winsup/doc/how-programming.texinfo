@@ -269,6 +269,22 @@ then generate import libraries for the MS VC linker.
 Thanks to Alastair Growcott (alastair dot growcott at bakbone dot co
 dot uk) for this tip.
 
+@subsection How do I load @samp{cygwin1.dll} dynamically from a Visual Studio or MinGW application?
+
+Read @code{how-cygtls-works.txt} and the sample code in
+@code{winsup/testsuite/cygload} if you want to understand how this works.
+The short version is:
+
+@enumerate
+@item Make sure you have 4K of scratch space at the bottom of your stack.
+@item Invoke @code{cygwin_dll_init()}:
+@example
+HMODULE h = LoadLibrary("cygwin1.dll");
+void (*init)() = GetProcAddress(h, "cygwin_dll_init");
+init();
+@end example
+@end enumerate
+
 @subsection How do I link against a @samp{.lib} file?
 
 If your @samp{.lib} file is a normal static or import library with
