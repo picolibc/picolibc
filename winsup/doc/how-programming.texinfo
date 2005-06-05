@@ -211,10 +211,26 @@ give them to you, but you can't give them to anyone else, which is
 something that Red Hat can't agree to.  Fortunately, we
 have our own Win32 headers which are pretty complete.
 
-@subsection How do I link against @samp{cygwin1.dll} with Visual Studio?
+@subsection How do I use @samp{cygwin1.dll} with Visual Studio or MinGW?
 
-To my knowledge, none of the Cygwin developers have done this, but we
-have this report from the mailing list that it can be done this way:
+If you want to load the DLL dynamically, read
+@code{winsup/cygwin/how-cygtls-works.txt} and the sample code in
+@code{winsup/testsuite/cygload} to understand how this works.
+The short version is:
+
+@enumerate
+@item Make sure you have 4K of scratch space at the bottom of your stack.
+@item Invoke @code{cygwin_dll_init()}:
+@example
+HMODULE h = LoadLibrary("cygwin1.dll");
+void (*init)() = GetProcAddress(h, "cygwin_dll_init");
+init();
+@end example
+@end enumerate
+
+If you want to link statically from Visual Studio, to my knowledge
+none of the Cygwin developers have done this, but we have this report
+from the mailing list that it can be done this way:
 
 @enumerate
 @item Use the impdef program to generate a .def file for the cygwin1.dll
@@ -268,22 +284,6 @@ then generate import libraries for the MS VC linker.
 
 Thanks to Alastair Growcott (alastair dot growcott at bakbone dot co
 dot uk) for this tip.
-
-@subsection How do I load @samp{cygwin1.dll} dynamically from a Visual Studio or MinGW application?
-
-Read @code{how-cygtls-works.txt} and the sample code in
-@code{winsup/testsuite/cygload} if you want to understand how this works.
-The short version is:
-
-@enumerate
-@item Make sure you have 4K of scratch space at the bottom of your stack.
-@item Invoke @code{cygwin_dll_init()}:
-@example
-HMODULE h = LoadLibrary("cygwin1.dll");
-void (*init)() = GetProcAddress(h, "cygwin_dll_init");
-init();
-@end example
-@end enumerate
 
 @subsection How do I link against a @samp{.lib} file?
 

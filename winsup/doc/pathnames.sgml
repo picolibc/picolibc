@@ -51,11 +51,13 @@ under HKEY_LOCAL_SYSTEM.  The user mount table takes precedence over
 the system-wide table if a path is mounted in both.  This includes the
 setting of the cygdrive prefix.</para>
 
-<para>Since Windows uses drive letters instead of a single filesystem
-root, the POSIX root <filename>/</filename> must be set to a directory
-in the Windows file system using the <command>mount</command> command.
-Without a <filename>/</filename> mount, Cygwin processes cannot
-distinguish between the Windows CurrentDrive and SystemDrive.
+<para>The <command>mount</command> command can set the POSIX root
+<filename>/</filename> to any directory in the Windows file system.
+In absence of such a mount, Cygwin maps <filename>/</filename> to the
+root of the current Windows working directory (for example, 
+<filename>H:\</filename> or <filename>\\computer\share</filename>). 
+Normally Cygwin's <command>setup.exe</command> creates the initial
+mount point for the POSIX root. 
 </para>
 
 <para>Whenever Cygwin generates a Win32 path from a POSIX one, it uses
