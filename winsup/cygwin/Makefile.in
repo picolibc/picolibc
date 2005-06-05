@@ -262,6 +262,7 @@ regerror_CFLAGS=-fomit-frame-pointer
 regexec_CFLAGS=-fomit-frame-pointer
 regfree_CFLAGS=-fomit-frame-pointer
 shared_CFLAGS:=-fomit-frame-pointer
+sync_CFLAGS:=-fomit-frame-pointer -O3
 smallprint_CFLAGS:=-fomit-frame-pointer
 syscalls_CFLAGS:=-fomit-frame-pointer
 sysconf_CFLAGS:=-fomit-frame-pointer
