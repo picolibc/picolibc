@@ -1,3 +1,7 @@
+2005-06-05  Christopher Faylor  <cgf@timesys.com>
+
+	* sync.cc (muto::acquire): Remove unneeded brackets and fix whitespace.
+
 2005-06-04  Christopher Faylor  <cgf@timesys.com>
 
 	* malloc.cc: Update to Doug Lea's malloc v2.8.0.

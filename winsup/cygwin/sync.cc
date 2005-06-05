@@ -94,16 +94,14 @@ muto::acquire (DWORD ms)
       LONG was_waiting = ms ? InterlockedIncrement (&waiters) : 0;
 
       while (was_waiting || InterlockedExchange (&sync, 1) != 0)
-	  {
-	    switch (WaitForSingleObject (bruteforce, ms))
-		{
-		case WAIT_OBJECT_0:
-		  was_waiting = 0;
-		  break;
-		default:
-		  return 0;	/* failed. */
-		}
-	  }
+	switch (WaitForSingleObject (bruteforce, ms))
+	    {
+	    case WAIT_OBJECT_0:
+	      was_waiting = 0;
+	      break;
+	    default:
+	      return 0;	/* failed. */
+	    }
 
       /* Have to do it this way to avoid a race */
       if (!ms)
