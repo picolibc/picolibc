@@ -1,3 +1,7 @@
+2005-06-04  Christopher Faylor  <cgf@timesys.com>
+
+	* malloc.cc: Update to Doug Lea's malloc v2.8.0.
+
 2005-06-03  Max Kaehn <slothman@electric-cloud.com>
 
 	* dcrt0.cc (cygwin_dll_init): Now initializes main_environ and cygtls.
