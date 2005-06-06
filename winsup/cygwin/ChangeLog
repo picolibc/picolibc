@@ -1,5 +1,9 @@
 2005-06-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* uname.cc (uname): Change "amd64" to "x86_64" as on Linux.
+
+2005-06-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* uname.cc (uname): Add missing break.
 
 2005-06-05  Christopher Faylor  <cgf@timesys.com>
