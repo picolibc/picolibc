@@ -1,3 +1,8 @@
+2005-06-06  Danny Smith  <dannysmith@users.sourceforge
+
+	* include/_mingw.h (__MINGW_ATTRIBUTE_NONNULL): Fix typo
+	in GNUC version guard.
+
 2005-05-20  Danny Smith  <dannysmith@users.sourceforge
 
 	* crt1.c (_gnu_exception_handler): Handle illegal instruction
@@ -7,7 +12,7 @@
 
 	* mingwex/math/nexttoward.c: New file.
 	* mingwex/math/nexttowardf.c: New file.
-	* mingwex/math/nextafterl.c: Add nexttowardl aliaa.
+	* mingwex/math/nextafterl.c: Add nexttowardl alias.
 	* mingwex/Makefile.in (MATH_DISTFILES): Add nexttoward.c,
 	mexttowardf.c,
 	(MATH_OBJS):  Add nexttoward.o,	mexttowardf.o,
