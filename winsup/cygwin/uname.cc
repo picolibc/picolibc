@@ -86,6 +86,7 @@ uname (struct utsname *name)
 	break;
       case PROCESSOR_ARCHITECTURE_IA32_ON_WIN64:
 	strcpy (name->machine, "ia32-win64");
+	break;
       case PROCESSOR_ARCHITECTURE_ALPHA:
 	strcpy (name->machine, "alpha");
 	break;
