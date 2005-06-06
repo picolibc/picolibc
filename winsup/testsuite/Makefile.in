@@ -186,7 +186,8 @@ check: $(TESTSUP_LIB_NAME) $(RUNTIME) cygrun.exe testsuite/site.exp
 	   TCL_LIBRARY=`cd .. ; cd ${srcdir}/../../tcl/library ; pwd` ; \
 	    export TCL_LIBRARY ; fi ; \
 	PATH=$(bupdir)/cygwin:$${PATH} ;\
-	$(RUNTEST) --tool winsup $(RUNTESTFLAGS)
+	$(RUNTEST) --tool winsup $(RUNTESTFLAGS) ;\
+	$(RUNTEST) --tool cygload $(RUNTESTFLAGS)
 
 cygrun.o: cygrun.c
 	$(CC) $(MINGW_CFLAGS) -o $@ -c $<

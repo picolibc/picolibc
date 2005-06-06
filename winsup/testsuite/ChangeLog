@@ -1,3 +1,13 @@
+2005-06-06  Max Kaehn <slothman@electric-cloud.com>
+
+	* Makefile.in: Test cygload.
+	* cygload: New directory.
+	* cygload/README: New file.
+	* cygload/Makefile: Ditto.
+	* cygload/cygload.h: Ditto.
+	* cygload/cygload.cc: Ditto.
+	* cygload/cygload.exp: Ditto.
+
 2005-05-17  Brian Dessent  <brian@dessent.net>
 
 	* winsup.api/signal-into-win32-api.c (main): Use 'NULL' instead of '0'
