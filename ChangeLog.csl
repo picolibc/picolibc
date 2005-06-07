@@ -1,3 +1,10 @@
+2005-06-06  Mark Mitchell  <mark@codesourcery.com>
+
+	* bfd/opncls.c (bfd_fopen): New API.
+	(bfd_openr): Use it.
+	(bfd_fdopenr): Likewise.
+	* bfd/bfd-in2.h: Regenerated.
+
 2005-04-29  Paul Brook  <paul@codesourcery.com>
 
 	* sim/common/callback.c (PIPE_BUF): Provide default refinition.
