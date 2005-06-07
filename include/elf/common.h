@@ -257,6 +257,8 @@
 /* Ubicom IP2xxx; no ABI */
 #define EM_IP2K_OLD		0x8217
 
+#define EM_MS1                  0x2530  /* Morpho MS1; no ABI */
+
 /* MSP430 magic number
       Written in the absense everything.  */
 #define EM_MSP430_OLD		0x1059
