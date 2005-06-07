@@ -187,6 +187,8 @@ extern "C" int dll_noncygwin_dllcrt0 (HMODULE, per_process *);
 enum exit_states
   {
     ES_NOT_EXITING = 0,
+    ES_SET_MUTO,
+    ES_GLOBAL_DTORS,
     ES_EVENTS_TERMINATE,
     ES_THREADTERM,
     ES_SIGNAL,

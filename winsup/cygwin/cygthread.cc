@@ -344,7 +344,7 @@ cygthread::detach (HANDLE sigwait)
 		break;
 	      default:
 		if (!exiting)
-		  api_fatal ("WFMO failed waiting for cygthread '%s'", __name);
+		  api_fatal ("WFMO failed waiting for cygthread '%s', %E", __name);
 		break;
 	      }
 	  /* WAIT_OBJECT_0 means that the thread successfully read something,

@@ -184,14 +184,15 @@ fhandler_fifo::dup (fhandler_base *child)
   if (!res)
     {
       fhandler_fifo *ff = (fhandler_fifo *) child;
-      if (!DuplicateHandle (hMainProc, get_output_handle (), hMainProc,
-			    &ff->get_output_handle (), false, true,
-			    DUPLICATE_SAME_ACCESS))
+      if (get_output_handle ()
+	  && !DuplicateHandle (hMainProc, get_output_handle (), hMainProc,
+			       &ff->get_output_handle (), false, true,
+			       DUPLICATE_SAME_ACCESS))
 	{
 	  __seterrno ();
 	  child->close ();
 	  res = -1;
 	}
     }
-  return 0;
+  return res;
 }

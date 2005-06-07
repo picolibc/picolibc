@@ -1,3 +1,14 @@
+2005-06-07  Christopher Faylor  <cgf@timesys.com>
+
+	* cygthread.cc (cygthread::detach): Make error message a little more
+	detailed.
+	* fhandler.cc (fhandler_base::raw_read): Ditto for debug message.
+	* dcrt0.cc (do_exit): Add some more synchronization tests.
+	* fhandler_fifo.cc (fhandler_fifo::dup): Don't duplicate a nonexistent
+	handle.  Use derived return value rather than always retuning 0.
+	* fhandler_netdrive.cc (fhandler_netdrive::exists): Wnet -> WNet.
+	* winsup.h (exit_states): Add a couple of new exit states.
+
 2005-06-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (symlink_info::check): If GetFileAttributes returns

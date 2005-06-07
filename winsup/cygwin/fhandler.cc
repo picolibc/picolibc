@@ -269,7 +269,7 @@ fhandler_base::raw_read (void *ptr, size_t& ulen)
 	      break;
 	    }
 	default:
-	  syscall_printf ("ReadFile %s failed, %E", get_name ());
+	  syscall_printf ("ReadFile %s(%p) failed, %E", get_name (), get_handle ());
 	  __seterrno_from_win_error (errcode);
 	  bytes_read = (size_t) -1;
 	  break;

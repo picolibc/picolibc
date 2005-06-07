@@ -123,7 +123,7 @@ fhandler_netdrive::exists ()
   nr.lpLocalName = NULL;
   nr.lpRemoteName = namebuf;
   DWORD ret = create_thread_and_wait (GET_RESOURCE_INFO, &nr, NULL, 0,
-				      "WnetGetResourceInformation");
+				      "WNetGetResourceInformation");
   if (ret != ERROR_MORE_DATA && ret != NO_ERROR)
     return 0;
   return 1;

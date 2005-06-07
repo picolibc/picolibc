@@ -1013,8 +1013,18 @@ do_exit (int status)
 #endif
 
   EnterCriticalSection (&exit_lock);
-  muto::set_exiting_thread ();
-  dll_global_dtors ();
+
+  if (exit_state < ES_SET_MUTO)
+    {
+      exit_state = ES_SET_MUTO;
+      muto::set_exiting_thread ();
+    }
+
+  if (exit_state < ES_GLOBAL_DTORS)
+    {
+      exit_state = ES_GLOBAL_DTORS;
+      dll_global_dtors ();
+    }
 
   if (exit_state < ES_EVENTS_TERMINATE)
     {
