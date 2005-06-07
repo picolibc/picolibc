@@ -772,14 +772,14 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
      is not well_known_null_sid, it must match pgrpsid */
   if (intern && !groups.issetgroups ())
     {
-      char sd_buf[MAX_SID_LEN + sizeof (SECURITY_DESCRIPTOR)];
+      const DWORD sd_buf_siz = MAX_SID_LEN + sizeof (SECURITY_DESCRIPTOR);
+      PSECURITY_DESCRIPTOR sd_buf = (PSECURITY_DESCRIPTOR) alloca (sd_buf_siz);
       cygpsid gsid (NO_SID);
       if (!GetKernelObjectSecurity (token, GROUP_SECURITY_INFORMATION,
-				    (PSECURITY_DESCRIPTOR) sd_buf,
-				    sizeof sd_buf, &size))
+				    sd_buf, sd_buf_siz, &size))
 	debug_printf ("GetKernelObjectSecurity(), %E");
-      else if (!GetSecurityDescriptorGroup ((PSECURITY_DESCRIPTOR) sd_buf,
-					    (PSID *) &gsid, (BOOL *) &size))
+      else if (!GetSecurityDescriptorGroup (sd_buf, (PSID *) &gsid,
+					    (BOOL *) &size))
 	debug_printf ("GetSecurityDescriptorGroup(), %E");
       if (well_known_null_sid != gsid)
 	return gsid == groups.pgsid;
@@ -1538,8 +1538,7 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
     }
 
   /* Initialize local access control list. */
-  char acl_buf[3072];
-  PACL acl = (PACL) acl_buf;
+  PACL acl = (PACL) alloca (3072);
   if (!InitializeAcl (acl, 3072, ACL_REVISION))
     {
       __seterrno ();

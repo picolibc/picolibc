@@ -1,3 +1,28 @@
+2005-06-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pinfo.cc (pinfo::init): Define sa_buf as PSECURITY_ATTRIBUTES and
+	allocate dynamically.
+	(pinfo::set_acl): Replace sa_buf by dynamically allocated acl_buf.
+	* sec_acl.cc (setacl): Allocate acl dynamically.
+	* sec_helper.cc (sec_acl): Add test for alignment of acl when
+	DEBUGGING is defined.
+	(__sec_user): Same for sa_buf.
+	* security.cc (verify_token): Define sd_buf as PSECURITY_DESCRIPTOR
+	and allocate dynamically.
+	(alloc_sd): Allocate acl dynamically.
+	security.h (sec_user_nih): Change first parameter to
+	SECURITY_ATTRIBUTES *.
+	(sec_user): Ditto.
+	* sigproc.cc (wait_sig): Define sa_buf as PSECURITY_ATTRIBUTES and
+	allocate dynamically.
+	* syscalls.cc (seteuid32): Define dacl_buf as PACL and allocate
+	dynamically.
+	* uinfo.cc (cygheap_user::init): Define sa_buf as PSECURITY_ATTRIBUTES
+	and allocate dynamically.
+	* winbase.h (ilockincr): Mark first argument of inline assembly as
+	earlyclobber.
+	(ilockdecr): Ditto.
+
 2005-06-07  Christopher Faylor  <cgf@timesys.com>
 
 	* cygthread.cc (cygthread::detach): Make error message a little more

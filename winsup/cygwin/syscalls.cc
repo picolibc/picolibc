@@ -2053,10 +2053,10 @@ seteuid32 (__uid32_t uid)
 				&groups.pgsid, sizeof (cygsid)))
 	debug_printf ("SetTokenInformation(user.token, TokenPrimaryGroup), %E");
       /* Try setting default DACL */
-      char dacl_buf[MAX_DACL_LEN (5)];
-      if (sec_acl ((PACL) dacl_buf, true, true, usersid))
+      PACL dacl_buf = (PACL) alloca (MAX_DACL_LEN (5));
+      if (sec_acl (dacl_buf, true, true, usersid))
 	{
-	  TOKEN_DEFAULT_DACL tdacl = { (PACL) dacl_buf };
+	  TOKEN_DEFAULT_DACL tdacl = { dacl_buf };
 	  if (!SetTokenInformation (new_token, TokenDefaultDacl,
 				    &tdacl, sizeof (tdacl)))
 	    debug_printf ("SetTokenInformation (TokenDefaultDacl), %E");

@@ -998,7 +998,7 @@ static DWORD WINAPI
 wait_sig (VOID *self)
 {
   HANDLE readsig;
-  char sa_buf[1024];
+  PSECURITY_ATTRIBUTES sa_buf = (PSECURITY_ATTRIBUTES) alloca (1024);
   Static bool holding_signals;
 
   /* Initialization */

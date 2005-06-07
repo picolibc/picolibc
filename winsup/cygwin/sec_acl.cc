@@ -94,8 +94,7 @@ setacl (HANDLE handle, const char *file, int nentries, __aclent32_t *aclbufp)
     }
 
   /* Fill access control list. */
-  char acl_buf[3072];
-  PACL acl = (PACL) acl_buf;
+  PACL acl = (PACL) alloca (3072);
   size_t acl_len = sizeof (ACL);
   int ace_off = 0;
 

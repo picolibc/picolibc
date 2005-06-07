@@ -382,13 +382,15 @@ int __stdcall NTReadEA (const char *file, const char *attrname, char *buf, int l
 BOOL __stdcall NTWriteEA (const char *file, const char *attrname, const char *buf, int len);
 
 extern inline SECURITY_ATTRIBUTES *
-sec_user_nih (char sa_buf[], PSID sid1 = NULL, PSID sid2 = NULL, DWORD access2 = 0)
+sec_user_nih (SECURITY_ATTRIBUTES *sa_buf, PSID sid1 = NULL, PSID sid2 = NULL,
+	      DWORD access2 = 0)
 {
   return __sec_user (sa_buf, sid1, sid2, access2, FALSE);
 }
 
 extern inline SECURITY_ATTRIBUTES *
-sec_user (char sa_buf[], PSID sid1 = NULL, PSID sid2 = NULL, DWORD access2 = 0)
+sec_user (SECURITY_ATTRIBUTES *sa_buf, PSID sid1 = NULL, PSID sid2 = NULL,
+	  DWORD access2 = 0)
 {
   return __sec_user (sa_buf, sid1, sid2, access2, TRUE);
 }

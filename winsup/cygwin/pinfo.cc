@@ -199,7 +199,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
     }
 
   procinfo = NULL;
-  char sa_buf[1024];
+  PSECURITY_ATTRIBUTES sa_buf = (PSECURITY_ATTRIBUTES) alloca (1024);
   PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf, cygheap->user.sid(),
 						   well_known_world_sid,
 						   FILE_MAP_READ);
@@ -307,14 +307,14 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 void
 pinfo::set_acl()
 {
-  char sa_buf[1024];
+  PACL acl_buf = (PACL) alloca (1024);
   SECURITY_DESCRIPTOR sd;
 
-  sec_acl ((PACL) sa_buf, true, true, cygheap->user.sid (),
+  sec_acl (acl_buf, true, true, cygheap->user.sid (),
 	   well_known_world_sid, FILE_MAP_READ);
   if (!InitializeSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION))
     debug_printf ("InitializeSecurityDescriptor %E");
-  else if (!SetSecurityDescriptorDacl (&sd, TRUE, (PACL) sa_buf, FALSE))
+  else if (!SetSecurityDescriptorDacl (&sd, TRUE, acl_buf, FALSE))
     debug_printf ("SetSecurityDescriptorDacl %E");
   else if (!SetKernelObjectSecurity (h, DACL_SECURITY_INFORMATION, &sd))
     debug_printf ("SetKernelObjectSecurity %E");

@@ -489,6 +489,10 @@ sec_acl (PACL acl, bool original, bool admins, PSID sid1, PSID sid2, DWORD acces
   LPVOID pAce;
   cygpsid psid;
 
+#ifdef DEBUGGING
+  if ((unsigned long) acl % 4)
+    api_fatal ("Incorrectly aligned incoming ACL buffer!");
+#endif
   if (!InitializeAcl (acl, acl_len, ACL_REVISION))
     {
       debug_printf ("InitializeAcl %E");
@@ -531,7 +535,12 @@ __sec_user (PVOID sa_buf, PSID sid1, PSID sid2, DWORD access2, BOOL inherit)
 			     ((char *) sa_buf + sizeof (*psa));
   PACL acl = (PACL) ((char *) sa_buf + sizeof (*psa) + sizeof (*psd));
 
-  if (!wincap.has_security () || !sec_acl (acl, true, true, sid1, sid2, access2))
+#ifdef DEBUGGING
+  if ((unsigned long) sa_buf % 4)
+    api_fatal ("Incorrectly aligned incoming SA buffer!");
+#endif
+  if (!wincap.has_security ()
+      || !sec_acl (acl, true, true, sid1, sid2, access2))
     return inherit ? &sec_none : &sec_none_nih;
 
   if (!InitializeSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION))

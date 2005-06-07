@@ -65,7 +65,7 @@ cygheap_user::init ()
     debug_printf ("SetTokenInformation(TokenOwner), %E");
 
   /* Standard way to build a security descriptor with the usual DACL */
-  char sa_buf[1024];
+  PSECURITY_ATTRIBUTES sa_buf = (PSECURITY_ATTRIBUTES) alloca (1024);
   psd = (PSECURITY_DESCRIPTOR)
   		(sec_user_nih (sa_buf, sid()))->lpSecurityDescriptor;
 
