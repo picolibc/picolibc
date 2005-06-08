@@ -1,5 +1,10 @@
 2005-06-08  Christopher Faylor  <cgf@timesys.com>
 
+	* cygwin.sc: Restore resource and reloc sections and use more modern
+	syntax for stabs sections.
+
+2005-06-08  Christopher Faylor  <cgf@timesys.com>
+
 	* environ.cc (spenvs): Remove cut/paste error which associated
 	CYGWIN_DEBUG with HOME.
 

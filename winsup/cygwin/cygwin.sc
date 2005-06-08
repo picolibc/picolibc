@@ -57,22 +57,29 @@ SECTIONS
   {
     *(.edata)
   }
+  .rsrc BLOCK(__section_alignment__) :
+  {
+    *(.rsrc)
+    *(SORT(.rsrc$*))
+  }
+  .reloc BLOCK(__section_alignment__) :
+  {
+    *(.reloc)
+  }
   /DISCARD/ :
   {
     *(.debug$S)
     *(.debug$T)
     *(.debug$F)
     *(.drectve)
-    *(.reloc)
-    *(.rsrc)
   }
   .stab ALIGN(__section_alignment__) (NOLOAD) :
   {
-    [ .stab ]
+    *(.stab)
   }
   .stabstr ALIGN(__section_alignment__) (NOLOAD) :
   {
-    [ .stabstr ]
+    *(.stabstr)
   }
   /* DWARF 1.1 and DWARF 2 */
   .debug_aranges  ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_aranges) }
