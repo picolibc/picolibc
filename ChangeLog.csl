@@ -1,5 +1,12 @@
 2005-06-08  Mark Mitchell  <mark@codesourcery.com>
 
+	Revert:
+	2005-03-28  Mark Mitchell <mark@codesourcery.com>
+	* readline/display.c (insert_some_chars): Likewise.
+	(delete_chars): Likewise.
+	
+2005-06-08  Mark Mitchell  <mark@codesourcery.com>
+
 	* readline/input.c (rL_getc): Use getch, not getche.
 	* readline/readline.c (bind_arrow_keys_internal): Translate
 	Windows keysequences into POSIX key sequences.
