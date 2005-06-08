@@ -1,3 +1,8 @@
+2005-06-08  Christopher Faylor  <cgf@timesys.com>
+
+	* environ.cc (spenvs): Remove cut/paste error which associated
+	CYGWIN_DEBUG with HOME.
+
 2005-06-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.cc (cygwin_logon_user): Run LogonUser in the primary
