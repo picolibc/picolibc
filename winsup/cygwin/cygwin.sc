@@ -66,6 +66,30 @@ SECTIONS
   {
     *(.reloc)
   }
+  .idata ALIGN(__section_alignment__) :
+  {
+    /* This cannot currently be handled with grouped sections.
+	See pe.em:sort_sections.  */
+    SORT(*)(.idata$2)
+    SORT(*)(.idata$3)
+    /* These zeroes mark the end of the import list.  */
+    LONG (0); LONG (0); LONG (0); LONG (0); LONG (0);
+    SORT(*)(.idata$4)
+    SORT(*)(.idata$5)
+    SORT(*)(.idata$6)
+    SORT(*)(.idata$7)
+    . = ALIGN(16);
+    __cygheap_start = ABSOLUTE(.);
+  }
+  .cygheap ALIGN(__section_alignment__):
+  {
+    __cygheap_mid = .;
+    *(.cygheap)
+    . = ALIGN(512 * 1024, 0x10000);
+    . += 8192;		/* inexplicably needed for alignment on 64K boundary?!? */
+  }
+  __cygheap_end = ABSOLUTE(.);
+  __cygheap_end1 = __cygheap_mid + SIZEOF(.cygheap);
   /DISCARD/ :
   {
     *(.debug$S)
@@ -94,28 +118,4 @@ SECTIONS
   .debug_macinfo  ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_macinfo) }
   .debug_macinfo  ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_macinfo) }
   .debug_ranges   ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_ranges) }
-  .idata ALIGN(__section_alignment__) :
-  {
-    /* This cannot currently be handled with grouped sections.
-	See pe.em:sort_sections.  */
-    SORT(*)(.idata$2)
-    SORT(*)(.idata$3)
-    /* These zeroes mark the end of the import list.  */
-    LONG (0); LONG (0); LONG (0); LONG (0); LONG (0);
-    SORT(*)(.idata$4)
-    SORT(*)(.idata$5)
-    SORT(*)(.idata$6)
-    SORT(*)(.idata$7)
-    . = ALIGN(16);
-    __cygheap_start = ABSOLUTE(.);
-  }
-  .cygheap ALIGN(__section_alignment__):
-  {
-    __cygheap_mid = .;
-    *(.cygheap)
-    . = ALIGN(512 * 1024, 0x10000);
-    . += 8192;		/* inexplicably needed for alignment on 64K boundary?!? */
-  }
-  __cygheap_end = ABSOLUTE(.);
-  __cygheap_end1 = __cygheap_mid + SIZEOF(.cygheap);
 }

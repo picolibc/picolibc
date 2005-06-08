@@ -1,5 +1,9 @@
 2005-06-08  Christopher Faylor  <cgf@timesys.com>
 
+	* cygwin.sc: Apparently nonloading sections need to go last.
+
+2005-06-08  Christopher Faylor  <cgf@timesys.com>
+
 	* cygwin.sc: Restore resource and reloc sections and use more modern
 	syntax for stabs sections.
 
