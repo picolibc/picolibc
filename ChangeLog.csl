@@ -1,10 +1,18 @@
+2005-06-08  Mark Mitchell  <mark@codesourcery.com>
+
+	* readline/input.c (rL_getc): Use getch, not getche.
+	* readline/readline.c (bind_arrow_keys_internal): Translate
+	Windows keysequences into POSIX key sequences.
+	* readline/rlnotty.c (tputs): Fix thinko.
+	(rl_prep_terminal): Set readline_echoing_p.
+
 2005-06-08  Alan Modra  <amodra@bigpond.net.au>
 
-        * opncls.c (bfd_fopen): Don't set bfd_error unconditionally.
+        * bfd/opncls.c (bfd_fopen): Don't set bfd_error unconditionally.
 	
 2005-06-07  Mark Mitchell  <mark@codesourcery.com>
 
-        * opncls.c (bfd_fdopenr): Add missing break statements.
+        * bfd/opncls.c (bfd_fdopenr): Add missing break statements.
 
 2005-06-07  Mark Mitchell  <mark@codesourcery.com>
 
