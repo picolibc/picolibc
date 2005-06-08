@@ -124,17 +124,26 @@ cygwin_logon_user (const struct passwd *pw, const char *password)
 
   extract_nt_dom_user (pw, nt_domain, nt_user);
   debug_printf ("LogonUserA (%s, %s, %s, ...)", nt_user, nt_domain, password);
+  /* CV 2005-06-08: LogonUser should run under the primary process token,
+     otherwise it returns with ERROR_ACCESS_DENIED on W2K. Don't ask me why. */
+  RevertToSelf ();
   if (!LogonUserA (nt_user, *nt_domain ? nt_domain : NULL, (char *) password,
 		   LOGON32_LOGON_INTERACTIVE,
 		   LOGON32_PROVIDER_DEFAULT,
-		   &hToken)
-      || !SetHandleInformation (hToken,
-				HANDLE_FLAG_INHERIT,
-				HANDLE_FLAG_INHERIT))
+		   &hToken))
     {
       __seterrno ();
-      return INVALID_HANDLE_VALUE;
+      hToken = INVALID_HANDLE_VALUE;
     }
+  else if (!SetHandleInformation (hToken,
+				  HANDLE_FLAG_INHERIT,
+				  HANDLE_FLAG_INHERIT))
+    {
+      __seterrno ();
+      CloseHandle (hToken);
+      hToken = INVALID_HANDLE_VALUE;
+    }
+  cygheap->user.reimpersonate ();
   debug_printf ("%d = logon_user(%s,...)", hToken, pw->pw_name);
   return hToken;
 }

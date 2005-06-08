@@ -1,4 +1,9 @@
-2005-06-06  Corinna Vinschen  <corinna@vinschen.de>
+2005-06-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (cygwin_logon_user): Run LogonUser in the primary
+	process token context.  Fix potential handle leak.
+
+2005-06-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pinfo.cc (pinfo::init): Define sa_buf as PSECURITY_ATTRIBUTES and
 	allocate dynamically.
