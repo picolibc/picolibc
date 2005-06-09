@@ -1,5 +1,9 @@
 2005-06-08  Mark Mitchell  <mark@codesourcery.com>
 
+	* bfd/opncls.c (bfd_fopen): Mark returned BFD as cacheable if FD == -1.
+
+2005-06-08  Mark Mitchell  <mark@codesourcery.com>
+
 	Revert:
 	2005-03-28  Mark Mitchell <mark@codesourcery.com>
 	* readline/display.c (insert_some_chars): Likewise.
