@@ -66,6 +66,10 @@ SECTIONS
   {
     *(.reloc)
   }
+  .cygwin_dll_common ALIGN(__section_alignment__):
+  {
+    *(.cygwin_dll_common)
+  }
   .idata ALIGN(__section_alignment__) :
   {
     /* This cannot currently be handled with grouped sections.
@@ -80,10 +84,6 @@ SECTIONS
     SORT(*)(.idata$7)
     . = ALIGN(16);
     __cygheap_start = ABSOLUTE(.);
-  }
-  .cygwin_dll_common ALIGN(__section_alignment__):
-  {
-    *(.cygwin_dll_common)
   }
   .cygheap ALIGN(__section_alignment__):
   {
