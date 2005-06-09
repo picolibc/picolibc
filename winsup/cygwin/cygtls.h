@@ -95,6 +95,10 @@ struct _local_storage
 
   /* cygthread.cc */
   char unknown_thread_name[30];
+
+  /* syscalls.cc */
+  int setmode_file;
+  int setmode_mode;
 };
 
 typedef struct struct_waitq

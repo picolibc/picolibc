@@ -1,5 +1,16 @@
 2005-06-09  Christopher Faylor  <cgf@timesys.com>
 
+	* cygtls.h (_local_storage::setmode_file): New element.
+	(_local_storage::setmode_mode): New element.
+	* tlsoffsets.h: Regenerate.
+	* cygwin.din (setmode): Define as cygwin_getmode.
+	* syscalls.cc (setmode_helper): Use setmode_* variables from tls rather
+	than using unthreadsafe static.
+	(setmode): Break out fwalk stuff.
+	(cygwin_setmode): New function.  Put fwalk stdio stuff here.
+
+2005-06-09  Christopher Faylor  <cgf@timesys.com>
+
 	* thread.cc (pthread_mutex::_lock): Use cancelable_wait rather than
 	WaitForSingleObject.
 

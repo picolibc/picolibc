@@ -1756,8 +1756,7 @@ int
 semaphore::_trywait ()
 {
   /* FIXME: signals should be able to interrupt semaphores...
-   *We probably need WaitForMultipleObjects here.
-   */
+    We probably need WaitForMultipleObjects here.  */
   if (WaitForSingleObject (win32_obj_id, 0) == WAIT_TIMEOUT)
     {
       set_errno (EAGAIN);

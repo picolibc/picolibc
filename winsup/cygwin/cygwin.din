@@ -1202,8 +1202,8 @@ _setlocale = setlocale NOSIGFE
 setlogmask NOSIGFE
 setmntent SIGFE
 _setmntent = setmntent SIGFE
-setmode SIGFE
-_setmode = setmode SIGFE
+setmode = cygwin_setmode SIGFE
+_setmode = cygwin_setmode SIGFE
 setpassent NOSIGFE
 _setpassent = setpassent NOSIGFE
 setpgid SIGFE

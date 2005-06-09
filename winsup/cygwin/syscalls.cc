@@ -1565,20 +1565,17 @@ _cygwin_istext_for_stdio (int fd)
 /* internal newlib function */
 extern "C" int _fwalk (struct _reent *ptr, int (*function) (FILE *));
 
-static int setmode_mode;
-static int setmode_file;
-
 static int
 setmode_helper (FILE *f)
 {
-  if (fileno (f) != setmode_file)
+  if (fileno (f) != _my_tls.locals.setmode_file)
     {
-      syscall_printf ("improbable, but %d != %d", fileno (f), setmode_file);
+      syscall_printf ("improbable, but %d != %d", fileno (f), _my_tls.locals.setmode_file);
       return 0;
     }
   syscall_printf ("file was %s now %s", f->_flags & __SCLE ? "text" : "binary",
-		  setmode_mode & O_TEXT ? "text" : "binary");
-  if (setmode_mode & O_TEXT)
+		  _my_tls.locals.setmode_mode & O_TEXT ? "text" : "binary");
+  if (_my_tls.locals.setmode_mode & O_TEXT)
     f->_flags |= __SCLE;
   else
     f->_flags &= ~__SCLE;
@@ -1628,15 +1625,24 @@ setmode (int fd, int mode)
   else
     cfd->set_flags ((cfd->get_flags () & ~(O_TEXT | O_BINARY)) | mode);
 
-  if (_cygwin_istext_for_stdio (fd))
-    setmode_mode = O_TEXT;
-  else
-    setmode_mode = O_BINARY;
-  setmode_file = fd;
-  _fwalk (_GLOBAL_REENT, setmode_helper);
-
   syscall_printf ("(%d<%s>, %p) returning %s", fd, cfd->get_name (),
 		  mode, res & O_TEXT ? "text" : "binary");
+  return res;
+}
+
+extern "C" int
+cygwin_setmode (int fd, int mode)
+{
+  int res = setmode (fd, mode);
+  if (res != -1)
+    {
+      _my_tls.locals.setmode_file = fd;
+      if (_cygwin_istext_for_stdio (fd))
+	_my_tls.locals.setmode_mode = O_TEXT;
+      else
+	_my_tls.locals.setmode_mode = O_BINARY;
+      _fwalk (_GLOBAL_REENT, setmode_helper);
+    }
   return res;
 }
 
