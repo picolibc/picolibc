@@ -623,7 +623,7 @@ cancelable_wait (HANDLE object, DWORD timeout, const bool do_cancel,
     cancel_n = (DWORD) -1;
   else
     {
-      cancel_n = num++;
+      cancel_n = WAIT_OBJECT_0 + num++;
       wait_objects[cancel_n] = thread->cancel_event;
     }
 
@@ -632,14 +632,13 @@ cancelable_wait (HANDLE object, DWORD timeout, const bool do_cancel,
     sig_n = (DWORD) -1;
   else
     {
-      sig_n = num++;
+      sig_n = WAIT_OBJECT_0 + num++;
       wait_objects[sig_n] = signal_arrived;
     }
 
   while (1)
     {
       res = WaitForMultipleObjects (num, wait_objects, FALSE, timeout);
-      res -= WAIT_OBJECT_0;
       if (res == cancel_n)
 	{
 	  if (do_cancel)

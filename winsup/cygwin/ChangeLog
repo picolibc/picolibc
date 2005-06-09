@@ -1,5 +1,10 @@
 2005-06-09  Christopher Faylor  <cgf@timesys.com>
 
+	* thread.cc (cancelable_wait): No-op change to make sure that res is
+	always a valid WFMO return.
+
+2005-06-09  Christopher Faylor  <cgf@timesys.com>
+
 	Change pthread::cancelable_wait to just cancelable_wait, throughout.
 	* thread.h (cw_sig_wait): New enum.
 	(fast_mutex::lock): Use cancelable_wait with resumable signal.
