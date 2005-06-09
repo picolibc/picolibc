@@ -1,3 +1,12 @@
+2005-06-09  Christopher Faylor  <cgf@timesys.com>
+
+	Change pthread::cancelable_wait to just cancelable_wait, throughout.
+	* thread.h (cw_sig_wait): New enum.
+	(fast_mutex::lock): Use cancelable_wait with resumable signal.
+	(cancelable_wait): Change fourth argument to cw_sig_wait enum.
+	* thread.cc (cancelable_wait): Ditto.  Loop on signal detection if
+	fourth argument == cw_sig_resume.
+
 2005-06-08  Christopher Faylor  <cgf@timesys.com>
 
 	* cygwin.sc: Apparently nonloading sections need to go last.

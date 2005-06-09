@@ -24,12 +24,22 @@ details. */
 #include <security.h>
 #include <errno.h>
 
+enum cw_sig_wait
+{
+  cw_sig_nosig,
+  cw_sig_eintr,
+  cw_sig_resume
+};
+
 extern "C"
 {
 void SetResourceLock (int, int, const char *) __attribute__ ((regparm (3)));
 void ReleaseResourceLock (int, int, const char *)
   __attribute__ ((regparm (3)));
 }
+
+DWORD cancelable_wait (HANDLE, DWORD, const bool = true, const enum cw_sig_wait = cw_sig_nosig)
+  __attribute__ ((regparm (3)));
 
 class fast_mutex
 {
@@ -59,13 +69,13 @@ public:
 
   void lock ()
   {
-    if (InterlockedIncrement ((long *)&lock_counter) != 1)
-      WaitForSingleObject (win32_obj_id, INFINITE);
+    if (InterlockedIncrement ((long *) &lock_counter) != 1)
+      cancelable_wait (win32_obj_id, INFINITE, false, cw_sig_resume);
   }
 
   void unlock ()
   {
-    if (InterlockedDecrement ((long *)&lock_counter))
+    if (InterlockedDecrement ((long *) &lock_counter))
       ::ReleaseSemaphore (win32_obj_id, 1, NULL);
   }
 
@@ -396,8 +406,6 @@ public:
 
   virtual void testcancel ();
   static void static_cancel_self ();
-
-  static DWORD cancelable_wait (HANDLE object, DWORD timeout, const bool do_cancel = true, const bool do_sig_wait = false);
 
   virtual int setcancelstate (int state, int *oldstate);
   virtual int setcanceltype (int type, int *oldtype);

@@ -604,13 +604,13 @@ pthread::static_cancel_self (void)
 }
 
 DWORD
-pthread::cancelable_wait (HANDLE object, DWORD timeout, const bool do_cancel,
-			  const bool do_sig_wait)
+cancelable_wait (HANDLE object, DWORD timeout, const bool do_cancel,
+		 const enum cw_sig_wait sig_wait)
 {
   DWORD res;
   DWORD num = 0;
   HANDLE wait_objects[3];
-  pthread_t thread = self ();
+  pthread_t thread = pthread::self ();
 
   /* Do not change the wait order.
      The object must have higher priority than the cancel event,
@@ -618,7 +618,7 @@ pthread::cancelable_wait (HANDLE object, DWORD timeout, const bool do_cancel,
      if both objects are signaled. */
   wait_objects[num++] = object;
   DWORD cancel_n;
-  if (!is_good_object (&thread) ||
+  if (!pthread::is_good_object (&thread) ||
       thread->cancelstate == PTHREAD_CANCEL_DISABLE)
     cancel_n = (DWORD) -1;
   else
@@ -628,7 +628,7 @@ pthread::cancelable_wait (HANDLE object, DWORD timeout, const bool do_cancel,
     }
 
   DWORD sig_n;
-  if (!do_sig_wait || &_my_tls != _main_tls)
+  if (sig_wait == cw_sig_nosig || &_my_tls != _main_tls)
     sig_n = (DWORD) -1;
   else
     {
@@ -636,14 +636,26 @@ pthread::cancelable_wait (HANDLE object, DWORD timeout, const bool do_cancel,
       wait_objects[sig_n] = signal_arrived;
     }
 
-  res = WaitForMultipleObjects (num, wait_objects, FALSE, timeout);
-  if (res == sig_n - WAIT_OBJECT_0)
-    res = WAIT_SIGNALED;
-  else if (res == cancel_n - WAIT_OBJECT_0)
+  while (1)
     {
-      if (do_cancel)
-	pthread::static_cancel_self ();
-      res = WAIT_CANCELED;
+      res = WaitForMultipleObjects (num, wait_objects, FALSE, timeout);
+      res -= WAIT_OBJECT_0;
+      if (res == cancel_n)
+	{
+	  if (do_cancel)
+	    pthread::static_cancel_self ();
+	  res = WAIT_CANCELED;
+	}
+      else if (res != sig_n)
+	/* all set */;
+      else if (sig_wait == cw_sig_eintr)
+	res = WAIT_SIGNALED;
+      else
+	{
+	  _my_tls.call_signal_handler ();
+	  continue;
+	}
+      break;
     }
   return res;
 }
@@ -943,7 +955,7 @@ pthread_cond::wait (pthread_mutex_t mutex, DWORD dwMilliseconds)
   ++mutex->condwaits;
   mutex->unlock ();
 
-  rv = pthread::cancelable_wait (sem_wait, dwMilliseconds, false, true);
+  rv = cancelable_wait (sem_wait, dwMilliseconds, false, cw_sig_eintr);
 
   mtx_out.lock ();
 
@@ -1777,7 +1789,7 @@ semaphore::_timedwait (const struct timespec *abstime)
   waitlength -= tv.tv_sec * 1000 + tv.tv_usec / 1000;
   if (waitlength < 0)
     waitlength = 0;
-  switch (pthread::cancelable_wait (win32_obj_id, waitlength, true, true))
+  switch (cancelable_wait (win32_obj_id, waitlength, true, cw_sig_eintr))
     {
     case WAIT_OBJECT_0:
       currentvalue--;
@@ -1799,7 +1811,7 @@ semaphore::_timedwait (const struct timespec *abstime)
 int
 semaphore::_wait ()
 {
-  switch (pthread::cancelable_wait (win32_obj_id, INFINITE, true, true))
+  switch (cancelable_wait (win32_obj_id, INFINITE, true, cw_sig_eintr))
     {
     case WAIT_OBJECT_0:
       currentvalue--;
@@ -2253,31 +2265,24 @@ pthread::join (pthread_t *thread, void **return_val)
       (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
       (*thread)->mutex.unlock ();
 
-      bool loop = false;
-      do
-	switch (cancelable_wait ((*thread)->win32_obj_id, INFINITE, false, true))
-	  {
-	  case WAIT_OBJECT_0:
-	    if (return_val)
-	      *return_val = (*thread)->return_ptr;
-	    delete (*thread);
-	    break;
-	  case WAIT_SIGNALED:
-	    _my_tls.call_signal_handler ();
-	    loop = true;
-	    break;
-	  case WAIT_CANCELED:
-	    // set joined thread back to joinable since we got canceled
-	    (*thread)->joiner = NULL;
-	    (*thread)->attr.joinable = PTHREAD_CREATE_JOINABLE;
-	    joiner->cancel_self ();
-	    // never reached
-	    break;
-	  default:
-	    // should never happen
-	    return EINVAL;
-	  }
-      while (loop);
+      switch (cancelable_wait ((*thread)->win32_obj_id, INFINITE, false, cw_sig_resume))
+	{
+	case WAIT_OBJECT_0:
+	  if (return_val)
+	    *return_val = (*thread)->return_ptr;
+	  delete (*thread);
+	  break;
+	case WAIT_CANCELED:
+	  // set joined thread back to joinable since we got canceled
+	  (*thread)->joiner = NULL;
+	  (*thread)->attr.joinable = PTHREAD_CREATE_JOINABLE;
+	  joiner->cancel_self ();
+	  // never reached
+	  break;
+	default:
+	  // should never happen
+	  return EINVAL;
+	}
     }
 
   return 0;

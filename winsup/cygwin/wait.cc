@@ -80,7 +80,7 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
       if ((waitfor = w->ev) == NULL)
 	goto nochildren;
 
-      res = pthread::cancelable_wait (waitfor, INFINITE);
+      res = cancelable_wait (waitfor, INFINITE);
 
       sigproc_printf ("%d = WaitForSingleObject (...)", res);
 

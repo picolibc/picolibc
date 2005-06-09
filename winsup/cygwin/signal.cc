@@ -88,7 +88,7 @@ nanosleep (const struct timespec *rqtp, struct timespec *rmtp)
   DWORD end_time = gtod.dmsecs () + req;
   syscall_printf ("nanosleep (%ld)", req);
 
-  int rc = pthread::cancelable_wait (signal_arrived, req);
+  int rc = cancelable_wait (signal_arrived, req);
   DWORD rem;
   if ((rem = end_time - gtod.dmsecs ()) > HIRES_DELAY_MAX)
     rem = 0;
