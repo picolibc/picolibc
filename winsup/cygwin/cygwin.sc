@@ -81,6 +81,10 @@ SECTIONS
     . = ALIGN(16);
     __cygheap_start = ABSOLUTE(.);
   }
+  .cygwin_dll_common ALIGN(__section_alignment__):
+  {
+    *(.cygwin_dll_common)
+  }
   .cygheap ALIGN(__section_alignment__):
   {
     __cygheap_mid = .;

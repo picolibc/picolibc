@@ -1,5 +1,10 @@
 2005-06-09  Christopher Faylor  <cgf@timesys.com>
 
+	* cygwin.sc: Place .cygwin_dll_common.
+	* init.cc (threadfunc_ix): Use a more common name for the section name.
+
+2005-06-09  Christopher Faylor  <cgf@timesys.com>
+
 	* include/pthread.h (PTHREAD_MUEXT_INITIALIZER): Change to
 	PTHREAD_NORMAL_MUTEX_INITIALIZER_NP to be closer to linux default.
 
