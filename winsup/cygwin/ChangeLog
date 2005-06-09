@@ -1,5 +1,10 @@
 2005-06-09  Christopher Faylor  <cgf@timesys.com>
 
+	* include/pthread.h (PTHREAD_MUEXT_INITIALIZER): Change to
+	PTHREAD_NORMAL_MUTEX_INITIALIZER_NP to be closer to linux default.
+
+2005-06-09  Christopher Faylor  <cgf@timesys.com>
+
 	* thread.cc (cancelable_wait): No-op change to make sure that res is
 	always a valid WFMO return.
 
