@@ -1,5 +1,10 @@
 2005-06-09  Christopher Faylor  <cgf@timesys.com>
 
+	* thread.cc (pthread_mutex::_lock): Use cancelable_wait rather than
+	WaitForSingleObject.
+
+2005-06-09  Christopher Faylor  <cgf@timesys.com>
+
 	* cygwin.sc: Place .cygwin_dll_common in a more sensible spot.
 
 2005-06-09  Christopher Faylor  <cgf@timesys.com>

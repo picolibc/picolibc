@@ -1554,7 +1554,7 @@ pthread_mutex::_lock (pthread_t self)
     }
   else
     {
-      WaitForSingleObject (win32_obj_id, INFINITE);
+      cancelable_wait (win32_obj_id, INFINITE, false, cw_sig_resume);
       set_owner (self);
     }
 
