@@ -1,5 +1,10 @@
 2005-06-09  Christopher Faylor  <cgf@timesys.com>
 
+	* cygthread.cc (cygthread::detach): Improve diagnostics for what should
+	be an impossible failure condition.
+
+2005-06-09  Christopher Faylor  <cgf@timesys.com>
+
 	* cygtls.h (_local_storage::setmode_file): New element.
 	(_local_storage::setmode_mode): New element.
 	* tlsoffsets.h: Regenerate.
