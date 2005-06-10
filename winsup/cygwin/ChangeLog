@@ -1,3 +1,17 @@
+2005-06-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din (imaxabs): Export.
+	(imaxdiv): Export.
+	(llabs): Export.
+	(lldiv): Export.
+	(strtoimax): Export.
+	(strtoumax): Export.
+	* include/inttypes.h (imaxabs): Activate declaration.
+	(imaxdiv): Ditto.
+	(strtoimax): Ditto.
+	(strtoumax): Ditto.
+	* include/cygwin/version.h: Bump API minor.
+
 2005-06-09  Christopher Faylor  <cgf@timesys.com>
 
 	* cygthread.cc (cygthread::detach): Improve diagnostics for what should

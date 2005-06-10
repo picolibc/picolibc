@@ -726,6 +726,8 @@ ilogb NOSIGFE
 _ilogb = ilogb NOSIGFE
 ilogbf NOSIGFE
 _ilogbf = ilogbf NOSIGFE
+imaxabs = llabs NOSIGFE
+imaxdiv = lldiv NOSIGFE
 index NOSIGFE
 _index = index NOSIGFE
 inet_makeaddr NOSIGFE
@@ -835,6 +837,8 @@ lgammaf_r NOSIGFE
 _lgammaf_r = lgammaf_r NOSIGFE
 link SIGFE
 _link = link SIGFE
+llabs NOSIGFE
+lldiv NOSIGFE
 localeconv NOSIGFE
 _localeconv = localeconv NOSIGFE
 localtime SIGFE
@@ -1383,11 +1387,13 @@ strtol NOSIGFE
 _strtol = strtol NOSIGFE
 strtoll NOSIGFE
 _strtoll = strtoll NOSIGFE
+strtoimax = strtoll NOSIGFE
 strtosigno NOSIGFE
 strtoul NOSIGFE
 _strtoul = strtoul NOSIGFE
 strtoull NOSIGFE
 _strtoull = strtoull NOSIGFE
+strtoumax = strtoull NOSIGFE
 strupr NOSIGFE
 _strupr = strupr NOSIGFE
 strxfrm NOSIGFE

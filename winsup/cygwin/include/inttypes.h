@@ -230,11 +230,12 @@ typedef struct {
   intmax_t rem;
 } imaxdiv_t;
 
-#if 0 /* Not yet defined */
 intmax_t _EXFUN(imaxabs, (intmax_t));
 imaxdiv_t _EXFUN(imaxdiv, (intmax_t, intmax_t));
 intmax_t _EXFUN(strtoimax, (const char *, char **, int));
 uintmax_t _EXFUN(strtoumax, (const char *, char **, int));
+
+#if 0 /* Not yet defined */
 intmax_t _EXFUN(wcstoimax, (const wchar_t *, wchar_t **, int));
 uintmax_t _EXFUN(wcstoumax, (const wchar_t *, wchar_t **, int));
 #endif
