@@ -121,7 +121,7 @@
 
 2004-09-15  Corinna Vinschen  <corinna@vinschen.de>
 
-	Fix copyright throughout. 
+	Fix copyright throughout.
 	Eliminate use of _impure_ptr outside Cygwin.
 	* bsd_helper.cc: Include errno.h instead of cygerrno.h.
 	* bsd_mutex.cc : Ditto.

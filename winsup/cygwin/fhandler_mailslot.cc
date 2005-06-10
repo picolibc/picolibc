@@ -136,7 +136,7 @@ fhandler_mailslot::write (const void *ptr, size_t len)
 }
 
 int
-fhandler_mailslot::ioctl (unsigned int cmd, void *buf) 
+fhandler_mailslot::ioctl (unsigned int cmd, void *buf)
 {
   int res = -1;
 
