@@ -1,5 +1,11 @@
 2005-06-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::sendto): Always initialize
+	ret to 0.
+	(fhandler_socket::sendmsg): Ditto.
+
+2005-06-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin.din (imaxabs): Export.
 	(imaxdiv): Export.
 	(llabs): Export.

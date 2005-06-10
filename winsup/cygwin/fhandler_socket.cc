@@ -1201,7 +1201,7 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
     return SOCKET_ERROR;
 
   int res = SOCKET_ERROR;
-  DWORD ret;
+  DWORD ret = 0;
 
   if (!winsock2_active)
     ret = res = ::sendto (get_socket (), (const char *) ptr, len,
@@ -1212,7 +1212,7 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
       WSABUF wsabuf = { len, (char *) ptr };
 
       if (is_nonblocking () || closed () || async_io ())
-	res = WSASendTo (get_socket (), &wsabuf, 1, (ret = 0, &ret),
+	res = WSASendTo (get_socket (), &wsabuf, 1, &ret,
 			 flags & MSG_WINMASK,
 			 (to ? (const struct sockaddr *) &sin : NULL), tolen,
 			 NULL, NULL);
@@ -1340,10 +1340,10 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags, ssize_t tot)
 	while (wsaptr != wsabuf);
       }
 
-      DWORD ret;
+      DWORD ret = 0;
 
       if (is_nonblocking () || closed () || async_io ())
-	res = WSASendTo (get_socket (), wsabuf, iovcnt, (ret = 0, &ret),
+	res = WSASendTo (get_socket (), wsabuf, iovcnt, &ret,
 			 flags, (struct sockaddr *) msg->msg_name,
 			 msg->msg_namelen, NULL, NULL);
       else
