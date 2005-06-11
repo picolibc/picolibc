@@ -383,7 +383,7 @@ fhandler_console::read (void *pv, size_t& buflen)
 		   an ASCII control character, interpret is as META. */
 		meta = (control_key_state & ALT_PRESSED) != 0
 		       && ((control_key_state & CTRL_PRESSED) == 0
-			   || (ich >= 0 && ich <= 0x1f || ich == 0x7f));
+			   || ((signed char) ich >= 0 && ich <= 0x1f || ich == 0x7f));
 	      else
 		/* Win9x: there's no way to distinguish Alt from AltGr, so rely
 		   on dev_state->meta_mask heuristic (see fhandler_console constructor). */

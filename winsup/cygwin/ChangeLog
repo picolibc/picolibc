@@ -1,3 +1,7 @@
+2005-06-11  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler_console.cc (fhandler_console::read): Fix a compiler warning.
+
 2005-06-10  Christopher Faylor  <cgf@timesys.com>
 
 	* include/pthread.h: Change PTHREAD_MUTEX_DEFAULT to
