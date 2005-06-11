@@ -1,3 +1,8 @@
+2005-06-11  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	* hppa.h (pa_opcodes): Use cM and cX instead of cm and cx,
+	respectively, in various floating-point load and store patterns.
+
 2005-05-23  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
 
 	* hppa.h (FLAG_STRICT): Correct comment.
