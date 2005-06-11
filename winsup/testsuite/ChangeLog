@@ -1,3 +1,10 @@
+2005-06-11  Christopher Faylor  <cgf@timesys.com>
+
+	* winsup.api/pthread/cancel2.c: Use explicit initializer for mutex.
+	* winsup.api/pthread/mutex4.c (main): Ditto.
+	* winsup.api/pthread/mutex5.c: Reflect change in cygwin default mutex type.
+	* winsup.api/pthread/mutex6d.c: Ditto.
+
 2005-06-10  Christopher Faylor  <cgf@timesys.com>
 
 	* winsup.api/winsup.exp: Remove (temporarily?) -nostdinc from build

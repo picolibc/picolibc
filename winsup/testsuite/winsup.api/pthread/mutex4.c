@@ -34,7 +34,7 @@ main()
   assert(pthread_mutexattr_init(&ma) == 0);
 
   wasHere = 0;
-  assert(pthread_mutexattr_settype(&ma, PTHREAD_MUTEX_DEFAULT) == 0);
+  assert(pthread_mutexattr_settype(&ma, PTHREAD_MUTEX_ERRORCHECK) == 0);
   assert(pthread_mutex_init(&mutex1, &ma) == 0);
   assert(pthread_mutex_lock(&mutex1) == 0);
   assert(pthread_create(&t, NULL, unlocker, (void *) EPERM) == 0);

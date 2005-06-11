@@ -15,7 +15,7 @@ main()
   int mxType = -1;
   int success = 0;   /* Use to quell GNU compiler warnings. */
 
-  assert(success = PTHREAD_MUTEX_DEFAULT == PTHREAD_MUTEX_ERRORCHECK);
+  assert(success = PTHREAD_MUTEX_DEFAULT == PTHREAD_MUTEX_NORMAL);
   assert(success = PTHREAD_MUTEX_DEFAULT != PTHREAD_MUTEX_RECURSIVE);
   assert(success = PTHREAD_MUTEX_RECURSIVE != PTHREAD_MUTEX_ERRORCHECK);
 
