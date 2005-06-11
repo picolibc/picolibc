@@ -313,9 +313,8 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
   else
     {
       postcreate ();
-      if (WaitForSingleObject (cancel_event, 5000) != WAIT_OBJECT_0)
-	thread_printf ("event never arrived after CreateThread");
-      ResetEvent (cancel_event);
+      while (!cygtls)
+	low_priority_sleep (0);
     }
   mutex.unlock ();
 }
@@ -604,7 +603,7 @@ pthread::static_cancel_self (void)
 }
 
 DWORD
-cancelable_wait (HANDLE object, DWORD timeout, const bool do_cancel,
+cancelable_wait (HANDLE object, DWORD timeout, const cw_cancel_action cancel_action,
 		 const enum cw_sig_wait sig_wait)
 {
   DWORD res;
@@ -618,7 +617,7 @@ cancelable_wait (HANDLE object, DWORD timeout, const bool do_cancel,
      if both objects are signaled. */
   wait_objects[num++] = object;
   DWORD cancel_n;
-  if (!pthread::is_good_object (&thread) ||
+  if (cancel_action == cw_no_cancel || !pthread::is_good_object (&thread) ||
       thread->cancelstate == PTHREAD_CANCEL_DISABLE)
     cancel_n = (DWORD) -1;
   else
@@ -641,7 +640,7 @@ cancelable_wait (HANDLE object, DWORD timeout, const bool do_cancel,
       res = WaitForMultipleObjects (num, wait_objects, FALSE, timeout);
       if (res == cancel_n)
 	{
-	  if (do_cancel)
+	  if (cancel_action == cw_cancel_self)
 	    pthread::static_cancel_self ();
 	  res = WAIT_CANCELED;
 	}
@@ -954,7 +953,7 @@ pthread_cond::wait (pthread_mutex_t mutex, DWORD dwMilliseconds)
   ++mutex->condwaits;
   mutex->unlock ();
 
-  rv = cancelable_wait (sem_wait, dwMilliseconds, false, cw_sig_eintr);
+  rv = cancelable_wait (sem_wait, dwMilliseconds, cw_no_cancel_self, cw_sig_eintr);
 
   mtx_out.lock ();
 
@@ -1504,7 +1503,7 @@ pthread_mutex::pthread_mutex (pthread_mutexattr *attr) :
   verifyable_object (PTHREAD_MUTEX_MAGIC),
   lock_counter (0),
   win32_obj_id (NULL), recursion_counter (0),
-  condwaits (0), owner (NULL), type (PTHREAD_MUTEX_DEFAULT),
+  condwaits (0), owner (NULL), type (PTHREAD_MUTEX_ERRORCHECK),
   pshared (PTHREAD_PROCESS_PRIVATE)
 {
   win32_obj_id = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
@@ -1544,18 +1543,18 @@ pthread_mutex::_lock (pthread_t self)
 
   if (InterlockedIncrement ((long *)&lock_counter) == 1)
     set_owner (self);
-  else if (type != PTHREAD_MUTEX_NORMAL && pthread::equal (owner, self))
+  else if (type == PTHREAD_MUTEX_NORMAL || !pthread::equal (owner, self))
+    {
+      (void) cancelable_wait (win32_obj_id, INFINITE, cw_no_cancel, cw_sig_resume);
+      set_owner (self);
+    }
+  else
     {
       InterlockedDecrement ((long *) &lock_counter);
       if (type == PTHREAD_MUTEX_RECURSIVE)
 	result = lock_recursive ();
       else
 	result = EDEADLK;
-    }
-  else
-    {
-      cancelable_wait (win32_obj_id, INFINITE, false, cw_sig_resume);
-      set_owner (self);
     }
 
   return result;
@@ -1640,7 +1639,7 @@ pthread_mutexattr::is_good_object (pthread_mutexattr_t const * attr)
 }
 
 pthread_mutexattr::pthread_mutexattr ():verifyable_object (PTHREAD_MUTEXATTR_MAGIC),
-pshared (PTHREAD_PROCESS_PRIVATE), mutextype (PTHREAD_MUTEX_DEFAULT)
+pshared (PTHREAD_PROCESS_PRIVATE), mutextype (PTHREAD_MUTEX_ERRORCHECK)
 {
 }
 
@@ -1787,7 +1786,7 @@ semaphore::_timedwait (const struct timespec *abstime)
   waitlength -= tv.tv_sec * 1000 + tv.tv_usec / 1000;
   if (waitlength < 0)
     waitlength = 0;
-  switch (cancelable_wait (win32_obj_id, waitlength, true, cw_sig_eintr))
+  switch (cancelable_wait (win32_obj_id, waitlength, cw_cancel_self, cw_sig_eintr))
     {
     case WAIT_OBJECT_0:
       currentvalue--;
@@ -1809,7 +1808,7 @@ semaphore::_timedwait (const struct timespec *abstime)
 int
 semaphore::_wait ()
 {
-  switch (cancelable_wait (win32_obj_id, INFINITE, true, cw_sig_eintr))
+  switch (cancelable_wait (win32_obj_id, INFINITE, cw_cancel_self, cw_sig_eintr))
     {
     case WAIT_OBJECT_0:
       currentvalue--;
@@ -1882,7 +1881,6 @@ pthread::thread_init_wrapper (void *arg)
 {
   pthread *thread = (pthread *) arg;
   set_tls_self_pointer (thread);
-  SetEvent (thread->cancel_event);
 
   thread->mutex.lock ();
 
@@ -2263,7 +2261,7 @@ pthread::join (pthread_t *thread, void **return_val)
       (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
       (*thread)->mutex.unlock ();
 
-      switch (cancelable_wait ((*thread)->win32_obj_id, INFINITE, false, cw_sig_resume))
+      switch (cancelable_wait ((*thread)->win32_obj_id, INFINITE, cw_no_cancel_self, cw_sig_resume))
 	{
 	case WAIT_OBJECT_0:
 	  if (return_val)

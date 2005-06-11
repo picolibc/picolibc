@@ -31,6 +31,13 @@ enum cw_sig_wait
   cw_sig_resume
 };
 
+enum cw_cancel_action
+{
+  cw_cancel_self,
+  cw_no_cancel_self,
+  cw_no_cancel
+};
+
 extern "C"
 {
 void SetResourceLock (int, int, const char *) __attribute__ ((regparm (3)));
@@ -38,7 +45,7 @@ void ReleaseResourceLock (int, int, const char *)
   __attribute__ ((regparm (3)));
 }
 
-DWORD cancelable_wait (HANDLE, DWORD, const bool = true, const enum cw_sig_wait = cw_sig_nosig)
+DWORD cancelable_wait (HANDLE, DWORD, const cw_cancel_action = cw_cancel_self, const enum cw_sig_wait = cw_sig_nosig)
   __attribute__ ((regparm (3)));
 
 class fast_mutex
@@ -70,7 +77,7 @@ public:
   void lock ()
   {
     if (InterlockedIncrement ((long *) &lock_counter) != 1)
-      cancelable_wait (win32_obj_id, INFINITE, false, cw_sig_resume);
+      cancelable_wait (win32_obj_id, INFINITE, cw_no_cancel, cw_sig_resume);
   }
 
   void unlock ()

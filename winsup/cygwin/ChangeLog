@@ -1,3 +1,21 @@
+2005-06-10  Christopher Faylor  <cgf@timesys.com>
+
+	* include/pthread.h: Change PTHREAD_MUTEX_DEFAULT to
+	PTHREAD_MUTEX_NORMAL.  Revert PTHREAD_MUTEX_INITIALIZER to
+	PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP since that is actually closer
+	to what linux does.
+	* thread.h (cw_cancel_action): New enum.
+	(cancelable_wait): Use cw_cancel_action as third argument.
+	* thread.cc (cancelable_wait): Ditto.  Don't wait for cancel if
+	cancel_action == cw_no_cancel.
+	(pthread::create): Don't wait for cancel event since that is racy.
+	(pthread_mutex::pthread_mutex): Set default to PTHREAD_MUTEX_ERRORCHECK.
+	(pthread_mutexattr::pthread_mutexattr): Ditto.
+	(pthread_mutex::_lock): Tell cancelable_wait not to wait for
+	cancellation event.
+	(semaphore::_timedwait): Accommodate change in cancelable_wait args.
+	(pthread::join): Ditto.
+
 2005-06-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::sendto): Always initialize
@@ -50,7 +68,7 @@
 
 2005-06-09  Christopher Faylor  <cgf@timesys.com>
 
-	* include/pthread.h (PTHREAD_MUEXT_INITIALIZER): Change to
+	* include/pthread.h (PTHREAD_MUTEX_INITIALIZER): Change to
 	PTHREAD_NORMAL_MUTEX_INITIALIZER_NP to be closer to linux default.
 
 2005-06-09  Christopher Faylor  <cgf@timesys.com>
