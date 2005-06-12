@@ -1,3 +1,9 @@
+2005-06-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::recvmsg): Avoid SEGV in OpenSSH
+	when trying to pass file descriptor by setting msg->msg_accrightslen
+	to 0.
+
 2005-06-11  Christopher Faylor  <cgf@timesys.com>
 
 	* Makefile.in: Avoid initial heap allocation since cygwin has its own

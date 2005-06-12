@@ -1063,6 +1063,7 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
 	 go ahead recv'ing the normal data blocks.  Otherwise start
 	 special handling for descriptor passing. */
       /*TODO*/
+      msg->msg_accrightslen = 0;
     }
 
   struct iovec *const iov = msg->msg_iov;
