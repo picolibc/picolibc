@@ -1,3 +1,8 @@
+2005-06-13  Zack Weinberg  <zack@codesourcery.com>
+
+	* depcomp: Update from automake CVS.  Add 'ia64hp' stanza.
+	In 'cpp' stanza, support '#line' as well as '# '.
+
 2005-06-07  Hans-Peter Nilsson  <hp@axis.com>
 
 	* configure.in (unsupported_languages): New macro.
