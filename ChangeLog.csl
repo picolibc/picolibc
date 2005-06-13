@@ -1,3 +1,12 @@
+2005-06-13  Mark Mitchell  <mark@codesourcery.com>
+
+	* gdb/corelow.c (core_open): Use bfd_fopen, not bfd_fdopenr.
+	* gdb/exec.c (exec_file_attach): Likewise.
+	* gdb/solib-frv.c (enable_break2): Likewise.
+	* gdb/solib-svr4.c (enable_break): Likewise.
+	* gdb/solib.c (solib_map_sections): Likewise.
+	* gdb/symfile.c (symfile_bfd_open): Likewise.
+
 2005-06-08  Mark Mitchell  <mark@codesourcery.com>
 
 	* bfd/opncls.c (bfd_fopen): Mark returned BFD as cacheable if FD == -1.
