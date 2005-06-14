@@ -886,22 +886,19 @@ out:
       error = EROFS;
       return;
     }
+  else if (dev.devn == FH_NETDRIVE && component)
+    {
+      /* This case indicates a non-existant resp. a non-retrievable
+	 share.  This happens for instance if the share is a printer.
+	 In this case the path must not be treated like a FH_NETDRIVE,
+	 but like a FH_FS instead, so the usual open call for files
+	 is used on it. */
+      dev.parse (FH_FS);
+    }
   else if (isvirtual_dev (dev.devn) && fileattr == INVALID_FILE_ATTRIBUTES)
     {
-      if (dev.devn == FH_NETDRIVE && component)
-        {
-	  /* This case indicates a non-existant resp. a non-retrievable
-	     share.  This happens for instance if the share is a printer.
-	     In this case the path must not be treated like a FH_NETDRIVE,
-	     but like a FH_FS instead, so the usual open call for files
-	     is used on it. */
-	  dev.parse (FH_FS);
-	}
-      else
-        {
-	  error = dev.devn == FH_NETDRIVE ? ENOSHARE : ENOENT;
-	  return;
-	}
+      error = dev.devn == FH_NETDRIVE ? ENOSHARE : ENOENT;
+      return;
     }
   else if (!need_directory || error)
     /* nothing to do */;
