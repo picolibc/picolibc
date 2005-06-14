@@ -1,3 +1,8 @@
+2005-06-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysv_sem.cc (semu_list): Define static to avoid gcc 4.x compiler
+	warning.
+
 2005-04-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* bsd_mutex.cc (msleep_cnt): Remove.

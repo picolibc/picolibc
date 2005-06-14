@@ -79,7 +79,7 @@ static int	semtot = 0;
 static struct semid_ds *sema;	/* semaphore id pool */
 static struct mtx *sema_mtx;	/* semaphore id pool mutexes*/
 static struct sem *sem;		/* semaphore pool */
-SLIST_HEAD(, sem_undo) semu_list;	/* list of active undo structures */
+static SLIST_HEAD(, sem_undo) semu_list;	/* list of active undo structures */
 static int	*semu;		/* undo structure pool */
 #ifndef __CYGWIN__
 static eventhandler_tag semexit_tag;
