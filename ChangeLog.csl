@@ -1,3 +1,7 @@
+2005-06-14  Mark Mitchell  <mark@codesourcery.com>
+
+	* readline/rlnotty.c (tgoto): New function.
+	
 2005-06-13  Mark Mitchell  <mark@codesourcery.com>
 
 	* gdb/corelow.c (core_open): Use bfd_fopen, not bfd_fdopenr.
