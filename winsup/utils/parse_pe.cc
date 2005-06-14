@@ -51,7 +51,7 @@ exclusion::sort_and_check ()
 	continue;
       if (p->base + size > q->base)
 	{
-	  fprintf (stderr, "region error @ (%8p + %d) > %8p\n", (unsigned) p->base, size, q->base);
+	  fprintf (stderr, "region error @ (%8p + %d) > %8p\n", p->base, size, q->base);
 	  return 0;
 	}
     }

@@ -1,3 +1,7 @@
+2005-06-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* parse_pe.c (exclusion::sort_and_check): Remove crude cast.
+
 2005-05-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (dump_sysinfo): Recognize XP Media Center and Tablet PC
