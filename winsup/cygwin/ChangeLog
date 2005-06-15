@@ -5,6 +5,7 @@
 	filename manipulation.
 	* sigproc.cc (sigproc_init): Don't create signal_arrived here.
 	* fork.cc (fork_child): Ditto.
+	* sigproc.h (create_signal_arrived): Declare.
 
 2005-06-14  Christopher Faylor  <cgf@timesys.com>
 
