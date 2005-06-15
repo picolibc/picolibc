@@ -79,6 +79,7 @@ int __stdcall sig_send (_pinfo *, int) __attribute__ ((regparm (2)));
 void __stdcall signal_fixup_after_exec ();
 void __stdcall wait_for_sigthread ();
 void __stdcall sigalloc ();
+void __stdcall create_signal_arrived ();
 
 int kill_pgrp (pid_t, siginfo_t&);
 int killsys (pid_t, int);

@@ -1,3 +1,11 @@
+2005-06-15  Christopher Faylor  <cgf@timesys.com>
+
+	* cygthread.cc (cygthread::detach): Fix debugging output.
+	* dcrt0.cc (dll_crt0_1): Create signal_arrived early -- before any
+	filename manipulation.
+	* sigproc.cc (sigproc_init): Don't create signal_arrived here.
+	* fork.cc (fork_child): Ditto.
+
 2005-06-14  Christopher Faylor  <cgf@timesys.com>
 
 	* path.cc (path_conv::check): Always reset to FH_FS when component != 0

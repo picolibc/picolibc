@@ -353,7 +353,7 @@ cygthread::detach (HANDLE sigwait)
 			case WAIT_TIMEOUT:
 			  break;
 			default:
-			  system_printf ("%s handle %p is bad", j ? "semaphore" : "signal_arrived", w4[j]);
+			  system_printf ("%s handle %p is bad", (j ? "signal_arrived" : "semaphore"), w4[j]);
 			  break;
 			}
 		    api_fatal ("exiting on fatal error");

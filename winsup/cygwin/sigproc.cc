@@ -490,8 +490,6 @@ sigproc_init ()
    */
   sync_proc_subproc.init ("sync_proc_subproc");
 
-  create_signal_arrived ();
-
   hwait_sig = new cygthread (wait_sig, cygself, "sig");
   hwait_sig->zap_h ();
 

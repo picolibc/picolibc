@@ -743,6 +743,8 @@ dll_crt0_1 (char *)
   strace.microseconds ();
 #endif
 
+  create_signal_arrived ();
+
   /* Initialize debug muto, if DLL is built with --enable-debugging.
      Need to do this before any helper threads start. */
   debug_init ();
