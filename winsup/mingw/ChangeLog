@@ -1,5 +1,12 @@
 2005-06-16  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* profile/profile.h (_MCOUNT_CALL): Define as regparm(2)
+	(_MCOUNT_DECL): Use it.
+	(MCOUNT): Save and restore eax, ecx, edx registers.
+	* profile/mcount.c (_mcount): ANSI-fy.
+
+2005-06-16  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/_mingw.h (__MINGW_GNUC_PREREQ): Define. Use to
 	guard __MINGW_ATTRIB macro definitions.
 	* include/math.h (logb[fl]):  Don't define inlines for
