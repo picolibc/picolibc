@@ -1,3 +1,12 @@
+2005-06-16  Christopher Faylor  <cgf@timesys.com>
+
+	* libc/stdio/vfprintf.c (cvt): Don't rely on pointer aliasing to
+	determine characteristics of long double.  Use a union instead.
+	* ldtoa.c (_ldtoa_r): Ditto.
+	(_ldcheck): Ditto.
+	(_strtold): Ditto.
+	(union uconv): New union.
+
 2005-06-03  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdlib/mallocr.c (MALLOC_COPY): Switch to use memmove

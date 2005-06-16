@@ -1260,7 +1260,11 @@ _DEFUN(cvt, (data, value, ndigits, flags, sign, decpt, ch, length),
 #ifdef _NO_LONGDBL
         union double_union tmp;
 #else
-        struct ldieee *ldptr;
+	union
+	{
+	  struct ldieee ieee;
+	  _LONG_DOUBLE val;
+	} ld;
 #endif
 
 	if (ch == 'f') {
@@ -1287,8 +1291,8 @@ _DEFUN(cvt, (data, value, ndigits, flags, sign, decpt, ch, length),
 
 	digits = _dtoa_r (data, value, mode, ndigits, decpt, &dsgn, &rve);
 #else /* !_NO_LONGDBL */
-	ldptr = (struct ldieee *)&value;
-	if (ldptr->sign) { /* this will check for < 0 and -0.0 */
+	ld.val = value;
+	if (ld.ieee.sign) { /* this will check for < 0 and -0.0 */
 		value = -value;
 		*sign = '-';
         } else
