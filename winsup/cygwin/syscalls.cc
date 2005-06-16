@@ -1731,16 +1731,27 @@ statvfs (const char *fname, struct statvfs *sfs)
 
   ULARGE_INTEGER availb, freeb, totalb;
   DWORD spc, bps, availc, freec, totalc, vsn, maxlen, flags;
-  BOOL status;
+  BOOL status, statusex;
 
   push_thread_privilege (SE_CHANGE_NOTIFY_PRIV, true);
 
   /* GetDiskFreeSpaceEx must be called before GetDiskFreeSpace on
      WinME, to avoid the MS KB 314417 bug */
-  status = GetDiskFreeSpaceEx (root, &availb, &totalb, &freeb);
-  if (GetDiskFreeSpace (root, &spc, &bps, &freec, &totalc))
+  statusex = GetDiskFreeSpaceEx (root, &availb, &totalb, &freeb);
+  status = GetDiskFreeSpace (root, &spc, &bps, &freec, &totalc);
+  if (!status && statusex)
     {
-      if (status)
+      /* Grrr, this can happen on 9x when a share isn't attached to
+         a drive letter.  Fake, fake, hoorah. */
+      status = TRUE;
+      bps = 512;
+      spc = 8;
+      while ((totalb.QuadPart % (spc*bps)) && spc > 1)
+        spc >>= 1;
+    }
+  if (status)
+    {
+      if (statusex)
 	{
 	  availc = availb.QuadPart / (spc*bps);
 	  totalc = totalb.QuadPart / (spc*bps);

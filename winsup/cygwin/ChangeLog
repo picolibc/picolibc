@@ -1,3 +1,9 @@
+2005-06-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (statvfs): Handle the case when GetDiskFreeSpaceEx
+	succeeds but GetDiskFreeSpace fails by faking bytes-per-sector and
+	sectors-per-cluster values.
+
 2005-06-15  Christopher Faylor  <cgf@timesys.com>
 
 	* cygthread.cc (cygthread::detach): Fix debugging output.
