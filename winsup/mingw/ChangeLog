@@ -1,9 +1,18 @@
-2005-06-06  Danny Smith  <dannysmith@users.sourceforge
+2005-06-16  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/_mingw.h (__MINGW_GNUC_PREREQ): Define. Use to
+	guard __MINGW_ATTRIB macro definitions.
+	* include/math.h (logb[fl]):  Don't define inlines for
+	GCC-4.0+ && __FAST_MATH__.
+	(rint[fl], lrint[fl], llrint[fl]); Likewise.  Clean up
+	line-continuation backslashes.
+
+2005-06-06  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/_mingw.h (__MINGW_ATTRIBUTE_NONNULL): Fix typo
 	in GNUC version guard.
 
-2005-05-20  Danny Smith  <dannysmith@users.sourceforge
+2005-05-20  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* crt1.c (_gnu_exception_handler): Handle illegal instruction
 	OS exception as a signal if user has defined a SIGILL handler.
@@ -15,7 +24,7 @@
 	* mingwex/math/nextafterl.c: Add nexttowardl alias.
 	* mingwex/Makefile.in (MATH_DISTFILES): Add nexttoward.c,
 	mexttowardf.c,
-	(MATH_OBJS):  Add nexttoward.o,	mexttowardf.o,
+	(MATH_OBJS):  Add nexttoward.o,	nexttowardf.o,
 	* include/math.h (nexttoward, nextowardf, nexttowardl): Add
 	prototypes.
 

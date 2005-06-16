@@ -110,6 +110,14 @@
 #define __CRT_INLINE extern __inline__
 #endif
 
+#if defined (__GNUC__) && defined (__GNUC_MINOR__)
+#define __MINGW_GNUC_PREREQ(major, minor) \
+  (__GNUC__ > (major) \
+   || (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#define __MINGW_GNUC_PREREQ(major, minor)  0
+#endif
+
 #ifdef __cplusplus
 # define __UNUSED_PARAM(x) 
 #else 
@@ -128,7 +136,7 @@
 #define __MINGW_ATTRIB_CONST
 #endif
 
-#if ( __GNUC__ >= 3)
+#if __MINGW_GNUC_PREREQ (3, 0)
 #define __MINGW_ATTRIB_MALLOC __attribute__ ((__malloc__))
 #define __MINGW_ATTRIB_PURE __attribute__ ((__pure__))
 #else
@@ -139,7 +147,7 @@
 /* Attribute `nonnull' was valid as of gcc 3.3.  We don't use GCC's
    variadiac macro facility, because variadic macros cause syntax
    errors with  --traditional-cpp.  */
-#if (__GNUC__ > 3 ||( __GNUC__ == 3 &&  __GNUC_MINOR__ >= 3))
+#if  __MINGW_GNUC_PREREQ (3, 3)
 #define __MINGW_ATTRIB_NONNULL(arg) __attribute__ ((__nonnull__ (arg)))
 #else
 #define __MINGW_ATTRIB_NONNULL(arg)

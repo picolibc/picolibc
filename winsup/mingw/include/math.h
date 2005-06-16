@@ -500,6 +500,9 @@ extern double __cdecl logb (double);
 extern float __cdecl logbf (float);
 extern long double __cdecl logbl (long double);
 
+/* Inline versions.  GCC-4.0+ can do a better fast-math optimization
+   with __builtins. */ 
+#if !(__MINGW_GNUC_PREREQ (4, 0) && defined __FAST_MATH__ )
 __CRT_INLINE double __cdecl logb (double x)
 {
   double res;
@@ -523,6 +526,7 @@ __CRT_INLINE long double __cdecl logbl (long double x)
        "fstp	%%st" : "=t" (res) : "0" (x));
   return res;
 }
+#endif /* !defined __FAST_MATH__ || !__MINGW_GNUC_PREREQ (4, 0) */
 
 /* 7.12.6.12  Double in C89 */
 extern float __cdecl modff (float, float*);
@@ -597,6 +601,22 @@ extern long double __cdecl nearbyintl (long double);
 
 /* 7.12.9.4 */
 /* round, using fpu control word settings */
+extern double __cdecl rint (double);
+extern float __cdecl rintf (float);
+extern long double __cdecl rintl (long double);
+
+/* 7.12.9.5 */
+extern long __cdecl lrint (double);
+extern long __cdecl lrintf (float);
+extern long __cdecl lrintl (long double);
+
+extern long long __cdecl llrint (double);
+extern long long __cdecl llrintf (float);
+extern long long __cdecl llrintl (long double);
+
+/* Inline versions of above. 
+   GCC 4.0+ can do a better fast-math job with __builtins. */
+#if !(__MINGW_GNUC_PREREQ (4, 0) && defined __FAST_MATH__ )
 __CRT_INLINE double __cdecl rint (double x)
 {
   double retval;
@@ -618,54 +638,54 @@ __CRT_INLINE long double __cdecl rintl (long double x)
   return retval;
 }
 
-/* 7.12.9.5 */
 __CRT_INLINE long __cdecl lrint (double x) 
 {
   long retval;  
-  __asm__ __volatile__							      \
-    ("fistpl %0"  : "=m" (retval) : "t" (x) : "st");				      \
+  __asm__ __volatile__
+    ("fistpl %0"  : "=m" (retval) : "t" (x) : "st");
   return retval;
 }
 
 __CRT_INLINE long __cdecl lrintf (float x) 
 {
   long retval;
-  __asm__ __volatile__							      \
-    ("fistpl %0"  : "=m" (retval) : "t" (x) : "st");				      \
+  __asm__ __volatile__
+    ("fistpl %0"  : "=m" (retval) : "t" (x) : "st");
   return retval;
 }
 
 __CRT_INLINE long __cdecl lrintl (long double x) 
 {
   long retval;
-  __asm__ __volatile__							      \
-    ("fistpl %0"  : "=m" (retval) : "t" (x) : "st");				      \
+  __asm__ __volatile__
+    ("fistpl %0"  : "=m" (retval) : "t" (x) : "st");
   return retval;
 }
 
-__CRT_INLINE long long __cdecl llrint (double x) 
+__CRT_INLINE long long __cdecl llrint (double x)
 {
   long long retval;
-  __asm__ __volatile__							      \
-    ("fistpll %0"  : "=m" (retval) : "t" (x) : "st");				      \
+  __asm__ __volatile__
+    ("fistpll %0"  : "=m" (retval) : "t" (x) : "st");
   return retval;
 }
 
-__CRT_INLINE long long __cdecl llrintf (float x) 
+__CRT_INLINE long long __cdecl llrintf (float x)
 {
   long long retval;
-  __asm__ __volatile__							      \
-    ("fistpll %0"  : "=m" (retval) : "t" (x) : "st");				      \
+  __asm__ __volatile__
+    ("fistpll %0"  : "=m" (retval) : "t" (x) : "st");
   return retval;
 }
 
 __CRT_INLINE long long __cdecl llrintl (long double x) 
 {
   long long retval;
-  __asm__ __volatile__							      \
-    ("fistpll %0"  : "=m" (retval) : "t" (x) : "st");				      \
+  __asm__ __volatile__
+    ("fistpll %0"  : "=m" (retval) : "t" (x) : "st");
   return retval;
 }
+#endif /* !__FAST_MATH__ || !__MINGW_GNUC_PREREQ (4,0)  */
 
 /* 7.12.9.6 */
 /* round away from zero, regardless of fpu control word settings */
