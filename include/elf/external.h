@@ -1,5 +1,5 @@
 /* ELF support for BFD.
-   Copyright 1991, 1992, 1993, 1995, 1997, 1998, 1999, 2001, 2003
+   Copyright 1991, 1992, 1993, 1995, 1997, 1998, 1999, 2001, 2003, 2005
    Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, from information published
@@ -272,5 +272,8 @@ typedef struct
   unsigned char		a_val[8];
 } Elf64_External_Auxv;
 
+/* Size of SHT_GROUP section entry.  */
+
+#define GRP_ENTRY_SIZE		4
 
 #endif /* _ELF_EXTERNAL_H */

@@ -1,3 +1,7 @@
+2005-06-17  Jakub Jelinek  <jakub@redhat.com>
+
+	* elf/external.h (GRP_ENTRY_SIZE): Define.
+
 2005-06-08  Zack Weinberg  <zack@codesourcery.com>
 
 	* dis-asm.h (get_arm_regnames): Update prototype.
