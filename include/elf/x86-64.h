@@ -34,7 +34,7 @@ START_RELOC_NUMBERS (elf_x86_64_reloc_type)
      RELOC_NUMBER (R_X86_64_JUMP_SLOT,7)      /* Create PLT entry */
      RELOC_NUMBER (R_X86_64_RELATIVE, 8)      /* Adjust by program base */
      RELOC_NUMBER (R_X86_64_GOTPCREL, 9)      /* 32 bit signed pc relative
-                                                 offset to GOT */
+                                                 offset to GOT entry */
      RELOC_NUMBER (R_X86_64_32,       10)     /* Direct 32 bit zero extended */
      RELOC_NUMBER (R_X86_64_32S,      11)     /* Direct 32 bit sign extended */
      RELOC_NUMBER (R_X86_64_16,       12)     /* Direct 16 bit zero extended */
@@ -49,6 +49,10 @@ START_RELOC_NUMBERS (elf_x86_64_reloc_type)
      RELOC_NUMBER (R_X86_64_DTPOFF32, 21)     /* Offset in TLS block */
      RELOC_NUMBER (R_X86_64_GOTTPOFF, 22)     /* PC relative offset to IE GOT entry */
      RELOC_NUMBER (R_X86_64_TPOFF32,  23)     /* Offset in initial TLS block */
+     RELOC_NUMBER (R_X86_64_PC64,     24)     /* PC relative 64 bit */
+     RELOC_NUMBER (R_X86_64_GOTOFF64, 25)     /* 64 bit offset to GOT */
+     RELOC_NUMBER (R_X86_64_GOTPC32,  26)     /* 32 bit signed pc relative
+                                                 offset to GOT */
      RELOC_NUMBER (R_X86_64_GNU_VTINHERIT, 250)       /* GNU C++ hack  */
      RELOC_NUMBER (R_X86_64_GNU_VTENTRY, 251)         /* GNU C++ hack  */
 END_RELOC_NUMBERS (R_X86_64_max)
