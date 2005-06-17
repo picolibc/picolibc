@@ -1,5 +1,15 @@
 2005-06-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin.din (inet_pton): Export.
+	(inet_ntop): Export.
+	* net.cc (cygwin_inet_pton): Implement inet_pton for AF_INET for now.
+	(cygwin_inet_ntop): Implement inet_ntop for AF_INET for now.
+	* include/arpa/inet.h (inet_pton): Declare.
+	(inet_ntop): Declare.
+	* include/cygwin/version.h: Bump API minor number.
+
+2005-06-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (fhandler_union): Add missing members corresponding to
 	fhandler_fifo and fhandler_netdrive.
 

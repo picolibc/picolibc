@@ -324,8 +324,10 @@ herror = cygwin_herror SIGFE
 hstrerror = cygwin_hstrerror NOSIGFE
 inet_addr = cygwin_inet_addr SIGFE
 inet_aton = cygwin_inet_aton SIGFE
+inet_pton = cygwin_inet_pton SIGFE
 inet_network = cygwin_inet_network SIGFE
 inet_ntoa = cygwin_inet_ntoa SIGFE
+inet_ntop = cygwin_inet_ntop SIGFE
 cygwin_internal NOSIGFE
 cygwin32_internal = cygwin_internal NOSIGFE
 listen = cygwin_listen SIGFE

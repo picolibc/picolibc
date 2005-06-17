@@ -2259,3 +2259,49 @@ cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
   syscall_printf ("%d = sendmsg (%d, %p, %x)", res, fd, msg, flags);
   return res;
 }
+
+/* See "UNIX Network Programming, Networing APIs: Sockets and XTI",
+   W. Richard Stevens, Prentice Hall PTR, 1998. */
+extern "C" int
+cygwin_inet_pton (int family, const char *strptr, void *addrptr)
+{
+  if (family == AF_INET)
+    {
+      struct in_addr in_val;
+
+      if (cygwin_inet_aton (strptr, &in_val))
+        {
+	  memcpy (addrptr, &in_val, sizeof (struct in_addr));
+	  return 1;
+	}
+      return 0;
+    }
+  set_errno (EAFNOSUPPORT);
+  return -1;
+}
+
+/* See "UNIX Network Programming, Networing APIs: Sockets and XTI",
+   W. Richard Stevens, Prentice Hall PTR, 1998. */
+extern "C" const char *
+cygwin_inet_ntop (int family, const void *addrptr, char *strptr, size_t len)
+{
+  const u_char *p = (const u_char *) addrptr;
+
+  if (__check_null_invalid_struct_errno (strptr, len))
+    return NULL;
+  if (family == AF_INET)
+    {
+      char temp[64]; /* Big enough for 4 ints ... */
+
+      __small_sprintf (temp, "%u.%u.%u.%u", p[0], p[1], p[2], p[3]);
+      if (strlen (temp) >= len)
+        {
+	  set_errno (ENOSPC);
+	  return NULL;
+	}
+      strcpy (strptr, temp);
+      return strptr;
+    }
+  set_errno (EAFNOSUPPORT);
+  return NULL;
+}

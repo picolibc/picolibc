@@ -257,12 +257,13 @@ details. */
       128: Export pselect.
       129: Export mkdtemp.
       130: Export strtoimax, strtoumax, llabs, imaxabs, lldiv, imaxdiv.
+      131: Export inet_ntop, inet_pton.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 130
+#define CYGWIN_VERSION_API_MINOR 131
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
