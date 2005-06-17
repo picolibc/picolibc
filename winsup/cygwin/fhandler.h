@@ -1289,7 +1289,10 @@ typedef union
   char __dev_tape[sizeof (fhandler_dev_tape)];
   char __dev_zero[sizeof (fhandler_dev_zero)];
   char __disk_file[sizeof (fhandler_disk_file)];
+  char __fifo[sizeof (fhandler_fifo)];
   char __mailslot[sizeof (fhandler_mailslot)];
+  char __netdrive[sizeof (fhandler_netdrive)];
+  char __nodevice[sizeof (fhandler_nodevice)];
   char __pipe[sizeof (fhandler_pipe)];
   char __proc[sizeof (fhandler_proc)];
   char __process[sizeof (fhandler_process)];
@@ -1303,7 +1306,6 @@ typedef union
   char __tty_slave[sizeof (fhandler_tty_slave)];
   char __virtual[sizeof (fhandler_virtual)];
   char __windows[sizeof (fhandler_windows)];
-  char __nodevice[sizeof (fhandler_nodevice)];
 } fhandler_union;
 
 struct select_record
