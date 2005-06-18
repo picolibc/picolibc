@@ -476,7 +476,7 @@ typedef struct _gettextex {
 	DWORD flags;
 	UINT codepage;
 	LPCSTR lpDefaultChar;
-	LPBOOL lpUsedDefaultChar;
+	LPBOOL lpUsedDefChar;
 } GETTEXTEX;
 typedef LONG (*EDITWORDBREAKPROCEX)(char*,LONG,BYTE,INT);
 /* Defines for EM_SETTYPOGRAPHYOPTIONS */

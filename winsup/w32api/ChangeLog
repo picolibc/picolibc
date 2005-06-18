@@ -1,5 +1,11 @@
 2005-06-18  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/winbase.h  (GETTEXTEX): Correct name of lpUsedDefChar
+	field.
+	Thanks to: Saulius Menkevicius  <bobas at users dot sf dot net>
+
+2005-06-18  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/winbase.h  (GolbalDiscard): Define as macro.
 	Thanks to: David Golub  <david_golub  at users dot sf dot net>
 
