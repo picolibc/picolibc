@@ -402,7 +402,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   av newargv (ac, argv);
 
-  bool msdos_exe = false;
+  bool win16_exe = false;
   int null_app_name = 0;
   if (ac == 3 && argv[1][0] == '/' && argv[1][1] == 'c' &&
       (iscmd (argv[0], "command.com") || iscmd (argv[0], "cmd.exe")))
@@ -434,7 +434,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   /* If the file name ends in either .exe, .com, .bat, or .cmd we assume
      that it is NOT a script file */
-  while (*ext == '\0' || strcasematch (ext, ".exe"))
+  while (*ext == '\0' || (wincap.detect_win16_exe () && strcasematch (ext, ".exe")))
     {
       HANDLE hnd = CreateFile (real_path, GENERIC_READ,
 			       FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -462,7 +462,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       if (buf[0] == 'M' && buf[1] == 'Z')
 	{
 	  unsigned off = (unsigned char) buf[0x18] | (((unsigned char) buf[0x19]) << 8);
-	  msdos_exe = off < sizeof (IMAGE_DOS_HEADER);
+	  win16_exe = off < sizeof (IMAGE_DOS_HEADER);
 	  break;
 	}
 
@@ -812,7 +812,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	 on this fact when we exit.  dup_proc_pipe will close our end of the pipe.
 	 Note that wr_proc_pipe may also be == INVALID_HANDLE_VALUE.  That will make
 	 dup_proc_pipe essentially a no-op.  */
-      if (!msdos_exe && myself->wr_proc_pipe)
+      if (!win16_exe && myself->wr_proc_pipe)
 	{
 	  myself->sync_proc_pipe ();	/* Make sure that we own wr_proc_pipe
 					   just in case we've been previously

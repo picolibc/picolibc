@@ -59,6 +59,7 @@ struct wincaps
   unsigned start_proc_suspended				: 1;
   unsigned has_extended_priority_class			: 1;
   unsigned has_guid_volumes				: 1;
+  unsigned detect_win16_exe				: 1;
 };
 
 class wincapc
@@ -122,6 +123,7 @@ public:
   bool	IMPLEMENT (start_proc_suspended)
   bool	IMPLEMENT (has_extended_priority_class)
   bool	IMPLEMENT (has_guid_volumes)
+  bool	IMPLEMENT (detect_win16_exe)
 
 #undef IMPLEMENT
 };

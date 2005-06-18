@@ -1,5 +1,13 @@
 2005-06-17  Christopher Faylor  <cgf@timesys.com>
 
+	* wincap.h (wincaps::detect_win16_exe): Declare.
+	(wincapc::detect_win16_exe): Implement.
+	* wincap.cc: Populate detect_win16_exe where appropriate.
+	* spawn.cc (spawn_guts): Only go out of the way to detect 16-bit apps
+	on systems which are flummoxed by them.
+
+2005-06-17  Christopher Faylor  <cgf@timesys.com>
+
 	* spawn.cc (spawn_guts): Detect when executing a 16-bit application and
 	avoid setting the process pipe since this causes conniptions in Windows
 	9x.

@@ -57,7 +57,8 @@ static NO_COPY wincaps wincap_unknown = {
   has_ioctl_storage_get_media_types_ex:false,
   start_proc_suspended:true,
   has_extended_priority_class:false,
-  has_guid_volumes:false
+  has_guid_volumes:false,
+  detect_win16_exe:true
 };
 
 static NO_COPY wincaps wincap_95 = {
@@ -106,7 +107,8 @@ static NO_COPY wincaps wincap_95 = {
   has_ioctl_storage_get_media_types_ex:false,
   start_proc_suspended:true,
   has_extended_priority_class:false,
-  has_guid_volumes:false
+  has_guid_volumes:false,
+  detect_win16_exe:true
 };
 
 static NO_COPY wincaps wincap_95osr2 = {
@@ -155,7 +157,8 @@ static NO_COPY wincaps wincap_95osr2 = {
   has_ioctl_storage_get_media_types_ex:false,
   start_proc_suspended:true,
   has_extended_priority_class:false,
-  has_guid_volumes:false
+  has_guid_volumes:false,
+  detect_win16_exe:true
 };
 
 static NO_COPY wincaps wincap_98 = {
@@ -204,7 +207,8 @@ static NO_COPY wincaps wincap_98 = {
   has_ioctl_storage_get_media_types_ex:false,
   start_proc_suspended:true,
   has_extended_priority_class:false,
-  has_guid_volumes:false
+  has_guid_volumes:false,
+  detect_win16_exe:true
 };
 
 static NO_COPY wincaps wincap_98se = {
@@ -253,7 +257,8 @@ static NO_COPY wincaps wincap_98se = {
   has_ioctl_storage_get_media_types_ex:false,
   start_proc_suspended:true,
   has_extended_priority_class:false,
-  has_guid_volumes:false
+  has_guid_volumes:false,
+  detect_win16_exe:true
 };
 
 static NO_COPY wincaps wincap_me = {
@@ -302,7 +307,8 @@ static NO_COPY wincaps wincap_me = {
   has_ioctl_storage_get_media_types_ex:false,
   start_proc_suspended:true,
   has_extended_priority_class:false,
-  has_guid_volumes:false
+  has_guid_volumes:false,
+  detect_win16_exe:true
 };
 
 static NO_COPY wincaps wincap_nt3 = {
@@ -351,7 +357,8 @@ static NO_COPY wincaps wincap_nt3 = {
   has_ioctl_storage_get_media_types_ex:false,
   start_proc_suspended:false,
   has_extended_priority_class:false,
-  has_guid_volumes:false
+  has_guid_volumes:false,
+  detect_win16_exe:false
 };
 
 static NO_COPY wincaps wincap_nt4 = {
@@ -400,7 +407,8 @@ static NO_COPY wincaps wincap_nt4 = {
   has_ioctl_storage_get_media_types_ex:false,
   start_proc_suspended:false,
   has_extended_priority_class:false,
-  has_guid_volumes:false
+  has_guid_volumes:false,
+  detect_win16_exe:false
 };
 
 static NO_COPY wincaps wincap_nt4sp4 = {
@@ -449,7 +457,8 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   has_ioctl_storage_get_media_types_ex:false,
   start_proc_suspended:false,
   has_extended_priority_class:false,
-  has_guid_volumes:false
+  has_guid_volumes:false,
+  detect_win16_exe:false
 };
 
 static NO_COPY wincaps wincap_2000 = {
@@ -498,7 +507,8 @@ static NO_COPY wincaps wincap_2000 = {
   has_ioctl_storage_get_media_types_ex:false,
   start_proc_suspended:false,
   has_extended_priority_class:true,
-  has_guid_volumes:true
+  has_guid_volumes:true,
+  detect_win16_exe:false
 };
 
 static NO_COPY wincaps wincap_xp = {
@@ -547,7 +557,8 @@ static NO_COPY wincaps wincap_xp = {
   has_ioctl_storage_get_media_types_ex:true,
   start_proc_suspended:false,
   has_extended_priority_class:true,
-  has_guid_volumes:true
+  has_guid_volumes:true,
+  detect_win16_exe:false
 };
 
 static NO_COPY wincaps wincap_2003 = {
@@ -596,7 +607,8 @@ static NO_COPY wincaps wincap_2003 = {
   has_ioctl_storage_get_media_types_ex:true,
   start_proc_suspended:false,
   has_extended_priority_class:true,
-  has_guid_volumes:true
+  has_guid_volumes:true,
+  detect_win16_exe:false
 };
 
 wincapc wincap;
