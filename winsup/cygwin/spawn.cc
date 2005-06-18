@@ -402,6 +402,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   av newargv (ac, argv);
 
+  bool msdos_exe = false;
   int null_app_name = 0;
   if (ac == 3 && argv[1][0] == '/' && argv[1][1] == 'c' &&
       (iscmd (argv[0], "command.com") || iscmd (argv[0], "cmd.exe")))
@@ -433,7 +434,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   /* If the file name ends in either .exe, .com, .bat, or .cmd we assume
      that it is NOT a script file */
-  while (*ext == '\0')
+  while (*ext == '\0' || strcasematch (ext, ".exe"))
     {
       HANDLE hnd = CreateFile (real_path, GENERIC_READ,
 			       FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -459,7 +460,11 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       CloseHandle (hnd);
 
       if (buf[0] == 'M' && buf[1] == 'Z')
-	break;
+	{
+	  unsigned off = (unsigned char) buf[0x18] | (((unsigned char) buf[0x19]) << 8);
+	  msdos_exe = off < sizeof (IMAGE_DOS_HEADER);
+	  break;
+	}
 
       debug_printf ("%s is a script", (char *) real_path);
 
@@ -617,7 +622,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   si.hStdError = handle (2, 1); /* Get output handle */
   si.cb = sizeof (si);
 
-  int flags = CREATE_DEFAULT_ERROR_MODE | GetPriorityClass (hMainProc);
+  int flags = CREATE_DEFAULT_ERROR_MODE | GetPriorityClass (hMainProc) | CREATE_SEPARATE_WOW_VDM;
 
   if (mode == _P_DETACH || !set_console_state_for_spawn ())
     flags |= DETACHED_PROCESS;
@@ -807,7 +812,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	 on this fact when we exit.  dup_proc_pipe will close our end of the pipe.
 	 Note that wr_proc_pipe may also be == INVALID_HANDLE_VALUE.  That will make
 	 dup_proc_pipe essentially a no-op.  */
-      if (myself->wr_proc_pipe)
+      if (!msdos_exe && myself->wr_proc_pipe)
 	{
 	  myself->sync_proc_pipe ();	/* Make sure that we own wr_proc_pipe
 					   just in case we've been previously
