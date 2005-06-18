@@ -1,3 +1,14 @@
+2005-06-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* glob.c: (glob0): New local variable `limit`. Use in calls to glob1
+	and globextend.
+	(glob1): Add `limit' parameter.
+	(glob2): Ditto.
+	(glob3): Ditto.
+	(globextend): Ditto. Implement GLOB_LIMIT handling.
+	* include/glob.h (GLOB_LIMIT): New define.
+	* include/cygwin/version.h: Bump API minor number.
+
 2005-06-17  Christopher Faylor  <cgf@timesys.com>
 
 	* wincap.h (wincaps::detect_win16_exe): Declare.

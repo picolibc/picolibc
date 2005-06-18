@@ -83,6 +83,10 @@
 #include "perprocess.h"
 #include "cygwin/version.h"
 
+#ifndef ARG_MAX
+#define ARG_MAX 32000	/* See CreateProcess */
+#endif
+
 #ifdef __weak_alias
 #ifdef __LIBC12_SOURCE__
 __weak_alias(glob,_glob);
@@ -160,10 +164,10 @@ static Char	*g_strcat __P((Char *, const Char *));
 #endif
 static int	 g_stat __P((Char *, struct STAT *, glob_t *));
 static int	 glob0 __P((const Char *, glob_t *));
-static int	 glob1 __P((Char *, glob_t *));
-static int	 glob2 __P((Char *, Char *, Char *, glob_t *));
-static int	 glob3 __P((Char *, Char *, Char *, Char *, glob_t *));
-static int	 globextend __P((const Char *, glob_t *));
+static int	 glob1 __P((Char *, glob_t *, size_t *));
+static int	 glob2 __P((Char *, Char *, Char *, glob_t *, size_t *));
+static int	 glob3 __P((Char *, Char *, Char *, Char *, glob_t *, size_t *));
+static int	 globextend __P((const Char *, glob_t *, size_t *));
 static const Char *	 globtilde __P((const Char *, Char *, glob_t *));
 static int	 globexp1 __P((const Char *, glob_t *));
 static int	 globexp2 __P((const Char *, const Char *, glob_t *, int *));
@@ -428,6 +432,7 @@ glob0(pattern, pglob)
 	const Char *qpatnext;
 	int c, err, oldpathc;
 	Char *bufnext, patbuf[MAXPATHLEN+1];
+	size_t limit = 0;
 
 	qpatnext = globtilde(pattern, patbuf, pglob);
 	oldpathc = pglob->gl_pathc;
@@ -485,7 +490,7 @@ glob0(pattern, pglob)
 	qprintf("glob0:", patbuf);
 #endif
 
-	if ((err = glob1(patbuf, pglob)) != 0)
+	if ((err = glob1(patbuf, pglob, &limit)) != 0)
 		return(err);
 
 	/*
@@ -498,7 +503,7 @@ glob0(pattern, pglob)
 	    ((pglob->gl_flags & GLOB_NOCHECK) ||
 	      ((pglob->gl_flags & GLOB_NOMAGIC) &&
 	       !(pglob->gl_flags & GLOB_MAGCHAR))))
-		return(globextend(pattern, pglob));
+		return(globextend(pattern, pglob, &limit));
 	else if (!(pglob->gl_flags & GLOB_NOSORT))
 		qsort(pglob->gl_pathv + pglob->gl_offs + oldpathc,
 		    pglob->gl_pathc - oldpathc, sizeof(char *), compare);
@@ -513,16 +518,17 @@ compare(p, q)
 }
 
 static int
-glob1(pattern, pglob)
+glob1(pattern, pglob, limit)
 	Char *pattern;
 	glob_t *pglob;
+	size_t *limit;
 {
 	Char pathbuf[MAXPATHLEN+1];
 
 	/* A null pathname is invalid -- POSIX 1003.1 sect. 2.4. */
 	if (*pattern == EOS)
 		return(0);
-	return(glob2(pathbuf, pathbuf, pattern, pglob));
+	return(glob2(pathbuf, pathbuf, pattern, pglob, limit));
 }
 
 /*
@@ -531,9 +537,10 @@ glob1(pattern, pglob)
  * meta characters.
  */
 static int
-glob2(pathbuf, pathend, pattern, pglob)
+glob2(pathbuf, pathend, pattern, pglob, limit)
 	Char *pathbuf, *pathend, *pattern;
 	glob_t *pglob;
+	size_t *limit;
 {
 	struct STAT sb;
 	Char *p, *q;
@@ -558,7 +565,7 @@ glob2(pathbuf, pathend, pattern, pglob)
 				*pathend = EOS;
 			}
 			++pglob->gl_matchc;
-			return(globextend(pathbuf, pglob));
+			return(globextend(pathbuf, pglob, limit));
 		}
 
 		/* Find end of next segment, copy tentatively to pathend. */
@@ -576,15 +583,17 @@ glob2(pathbuf, pathend, pattern, pglob)
 			while (*pattern == SEP)
 				*pathend++ = *pattern++;
 		} else			/* Need expansion, recurse. */
-			return(glob3(pathbuf, pathend, pattern, p, pglob));
+			return(glob3(pathbuf, pathend, pattern, p, pglob,
+				limit));
 	}
 	/* NOTREACHED */
 }
 
 static int
-glob3(pathbuf, pathend, pattern, restpattern, pglob)
+glob3(pathbuf, pathend, pattern, restpattern, pglob, limit)
 	Char *pathbuf, *pathend, *pattern, *restpattern;
 	glob_t *pglob;
+	size_t *limit;
 {
 	register struct dirent *dp;
 	DIR *dirp;
@@ -634,7 +643,7 @@ glob3(pathbuf, pathend, pattern, restpattern, pglob)
 			*pathend = EOS;
 			continue;
 		}
-		err = glob2(pathbuf, --dc, restpattern, pglob);
+		err = glob2(pathbuf, --dc, restpattern, pglob, limit);
 		if (err)
 			break;
 	}
@@ -662,13 +671,14 @@ glob3(pathbuf, pathend, pattern, restpattern, pglob)
  *	gl_pathv points to (gl_offs + gl_pathc + 1) items.
  */
 static int
-globextend(path, pglob)
+globextend(path, pglob, limit)
 	const Char *path;
 	glob_t *pglob;
+	size_t *limit;
 {
 	register char **pathv;
 	register int i;
-	u_int newsize;
+	size_t newsize, len;
 	char *copy;
 	const Char *p;
 
@@ -689,11 +699,19 @@ globextend(path, pglob)
 
 	for (p = path; *p++;)
 		continue;
-	if ((copy = malloc(p - path)) != NULL) {
+	len = (size_t)(p - path);
+	*limit += len;
+	if ((copy = malloc(len)) != NULL) {
 		g_Ctoc(path, copy);
 		pathv[pglob->gl_offs + pglob->gl_pathc++] = copy;
 	}
 	pathv[pglob->gl_offs + pglob->gl_pathc] = NULL;
+
+	if ((pglob->gl_flags & GLOB_LIMIT) && (newsize + *limit) >= ARG_MAX) {
+		errno = 0;
+		return(GLOB_NOSPACE);
+	}
+
 	return(copy == NULL ? GLOB_NOSPACE : 0);
 }
 
