@@ -1,3 +1,9 @@
+2005-06-19  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winldap.h (ldap_simple_bindW, ldap_simple_bind_sW,
+	ldap_bindW, ldap_bind_sW): Change PCHAR arg to PWCHAR.
+	Thanks to: Christian  <chhd at users dot sf dot net>
+
 2005-06-18  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/richedit.h (GETTEXTEX): Correct name of lpUsedDefChar
