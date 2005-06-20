@@ -1,3 +1,8 @@
+2005-06-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_proc.cc (format_proc_partitions): Only list recognized
+	partitions.  Use partition number given by PartitionNumber member.
+
 2005-06-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* glob.c: (glob0): New local variable `limit`. Use in calls to glob1

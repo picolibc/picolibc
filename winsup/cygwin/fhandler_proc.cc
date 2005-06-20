@@ -1009,10 +1009,11 @@ format_proc_partitions (char *destbuf, size_t maxsize)
 		  DRIVE_LAYOUT_INFORMATION *dli = (DRIVE_LAYOUT_INFORMATION *) buf;
 		  for (unsigned partition = 0; partition < dli->PartitionCount; partition++)
 		    {
-		      if (!dli->PartitionEntry[partition].PartitionLength.QuadPart)
+		      if (!dli->PartitionEntry[partition].PartitionLength.QuadPart
+		      	  || !dli->PartitionEntry[partition].RecognizedPartition)
 			continue;
 		      device dev;
-		      dev.parsedisk (drive_number, partition + 1);
+		      dev.parsedisk (drive_number, dli->PartitionEntry[partition].PartitionNumber);
 		      bufptr += __small_sprintf (bufptr, "%5d %5d %9U %s\n",
 						 dev.major, dev.minor,
 						 (long long)(dli->PartitionEntry[partition].PartitionLength.QuadPart >> 10),
