@@ -369,107 +369,107 @@ build_fh_pc (path_conv& pc)
 {
   fhandler_base *fh = NULL;
 
-    switch (pc.dev.major)
-      {
-      case DEV_TTYS_MAJOR:
-	fh = cnew (fhandler_tty_slave) ();
-	break;
-      case DEV_TTYM_MAJOR:
-	fh = cnew (fhandler_tty_master) ();
-	break;
-      case DEV_CYGDRIVE_MAJOR:
-	fh = cnew (fhandler_cygdrive) ();
-	break;
-      case DEV_FLOPPY_MAJOR:
-      case DEV_CDROM_MAJOR:
-      case DEV_SD_MAJOR:
-	fh = cnew (fhandler_dev_floppy) ();
-	break;
-      case DEV_TAPE_MAJOR:
-	fh = cnew (fhandler_dev_tape) ();
-	break;
-      case DEV_SERIAL_MAJOR:
-	fh = cnew (fhandler_serial) ();
-	break;
-      default:
-	switch (pc.dev)
+  switch (pc.dev.major)
+    {
+    case DEV_TTYS_MAJOR:
+      fh = cnew (fhandler_tty_slave) ();
+      break;
+    case DEV_TTYM_MAJOR:
+      fh = cnew (fhandler_tty_master) ();
+      break;
+    case DEV_CYGDRIVE_MAJOR:
+      fh = cnew (fhandler_cygdrive) ();
+      break;
+    case DEV_FLOPPY_MAJOR:
+    case DEV_CDROM_MAJOR:
+    case DEV_SD_MAJOR:
+      fh = cnew (fhandler_dev_floppy) ();
+      break;
+    case DEV_TAPE_MAJOR:
+      fh = cnew (fhandler_dev_tape) ();
+      break;
+    case DEV_SERIAL_MAJOR:
+      fh = cnew (fhandler_serial) ();
+      break;
+    default:
+      switch (pc.dev)
+	{
+	case FH_CONSOLE:
+	case FH_CONIN:
+	case FH_CONOUT:
+	  fh = cnew (fhandler_console) ();
+	  break;
+	case FH_PTYM:
+	  fh = cnew (fhandler_pty_master) ();
+	  break;
+	case FH_WINDOWS:
+	  fh = cnew (fhandler_windows) ();
+	  break;
+	case FH_FIFO:
+	  fh = cnew (fhandler_fifo) ();
+	  break;
+	case FH_PIPE:
+	case FH_PIPER:
+	case FH_PIPEW:
+	  fh = cnew (fhandler_pipe) ();
+	  break;
+	case FH_TCP:
+	case FH_UDP:
+	case FH_ICMP:
+	case FH_UNIX:
+	case FH_STREAM:
+	case FH_DGRAM:
+	  fh = cnew (fhandler_socket) ();
+	  break;
+	case FH_FS:
+	  fh = cnew (fhandler_disk_file) ();
+	  break;
+	case FH_NULL:
+	  fh = cnew (fhandler_dev_null) ();
+	  break;
+	case FH_ZERO:
+	case FH_FULL:
+	  fh = cnew (fhandler_dev_zero) ();
+	  break;
+	case FH_RANDOM:
+	case FH_URANDOM:
+	  fh = cnew (fhandler_dev_random) ();
+	  break;
+	case FH_MEM:
+	case FH_PORT:
+	  fh = cnew (fhandler_dev_mem) ();
+	  break;
+	case FH_CLIPBOARD:
+	  fh = cnew (fhandler_dev_clipboard) ();
+	  break;
+	case FH_OSS_DSP:
+	  fh = cnew (fhandler_dev_dsp) ();
+	  break;
+	case FH_PROC:
+	  fh = cnew (fhandler_proc) ();
+	  break;
+	case FH_REGISTRY:
+	  fh = cnew (fhandler_registry) ();
+	  break;
+	case FH_PROCESS:
+	  fh = cnew (fhandler_process) ();
+	  break;
+	case FH_NETDRIVE:
+	  fh = cnew (fhandler_netdrive) ();
+	  break;
+	case FH_TTY:
 	  {
-	  case FH_CONSOLE:
-	  case FH_CONIN:
-	  case FH_CONOUT:
-	    fh = cnew (fhandler_console) ();
+	    if (myself->ctty == TTY_CONSOLE)
+	      fh = cnew (fhandler_console) ();
+	    else if (myself->ctty >= 0)
+	      fh = cnew (fhandler_tty_slave) ();
 	    break;
-	  case FH_PTYM:
-	    fh = cnew (fhandler_pty_master) ();
-	    break;
-	  case FH_WINDOWS:
-	    fh = cnew (fhandler_windows) ();
-	    break;
-	  case FH_FIFO:
-	    fh = cnew (fhandler_fifo) ();
-	    break;
-	  case FH_PIPE:
-	  case FH_PIPER:
-	  case FH_PIPEW:
-	    fh = cnew (fhandler_pipe) ();
-	    break;
-	  case FH_TCP:
-	  case FH_UDP:
-	  case FH_ICMP:
-	  case FH_UNIX:
-	  case FH_STREAM:
-	  case FH_DGRAM:
-	    fh = cnew (fhandler_socket) ();
-	    break;
-	  case FH_FS:
-	    fh = cnew (fhandler_disk_file) ();
-	    break;
-	  case FH_NULL:
-	    fh = cnew (fhandler_dev_null) ();
-	    break;
-	  case FH_ZERO:
-	  case FH_FULL:
-	    fh = cnew (fhandler_dev_zero) ();
-	    break;
-	  case FH_RANDOM:
-	  case FH_URANDOM:
-	    fh = cnew (fhandler_dev_random) ();
-	    break;
-	  case FH_MEM:
-	  case FH_PORT:
-	    fh = cnew (fhandler_dev_mem) ();
-	    break;
-	  case FH_CLIPBOARD:
-	    fh = cnew (fhandler_dev_clipboard) ();
-	    break;
-	  case FH_OSS_DSP:
-	    fh = cnew (fhandler_dev_dsp) ();
-	    break;
-	  case FH_PROC:
-	    fh = cnew (fhandler_proc) ();
-	    break;
-	  case FH_REGISTRY:
-	    fh = cnew (fhandler_registry) ();
-	    break;
-	  case FH_PROCESS:
-	    fh = cnew (fhandler_process) ();
-	    break;
-	  case FH_NETDRIVE:
-	    fh = cnew (fhandler_netdrive) ();
-	    break;
-	  case FH_TTY:
-	    {
-	      if (myself->ctty == TTY_CONSOLE)
-		fh = cnew (fhandler_console) ();
-	      else if (myself->ctty >= 0)
-		fh = cnew (fhandler_tty_slave) ();
-	      break;
-	    }
-	  case FH_KMSG:
-	    fh = cnew (fhandler_mailslot) ();
-	    break;
-	}
+	  }
+	case FH_KMSG:
+	  fh = cnew (fhandler_mailslot) ();
+	  break;
       }
+    }
 
   if (!fh)
     fh = cnew (fhandler_nodevice) ();
