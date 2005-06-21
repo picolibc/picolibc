@@ -1,5 +1,12 @@
 2005-06-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* security.cc (get_initgroups_sidlist): Drop special_pgrp parameter.
+	(get_setgroups_sidlist): Avoid duplicate groups in group list.
+	(create_token): Remove special_pgrp local variable.  Accomodate
+	change to get_initgroups_sidlist call.
+
+2005-06-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* uinfo.cc (uinfo_init): Call reimpersonate to set the main thread's
 	impersonation token.
 

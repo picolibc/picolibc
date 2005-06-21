@@ -582,20 +582,19 @@ get_server_groups (cygsidlist &grp_list, PSID usersid, struct passwd *pw)
 static bool
 get_initgroups_sidlist (cygsidlist &grp_list,
 			PSID usersid, PSID pgrpsid, struct passwd *pw,
-			PTOKEN_GROUPS my_grps, LUID auth_luid, int &auth_pos,
-			bool &special_pgrp)
+			PTOKEN_GROUPS my_grps, LUID auth_luid, int &auth_pos)
 {
   grp_list += well_known_world_sid;
   grp_list += well_known_authenticated_users_sid;
   if (well_known_system_sid == usersid)
     auth_pos = -1;
-   else
-     get_token_group_sidlist (grp_list, my_grps, auth_luid, auth_pos);
+  else
+    get_token_group_sidlist (grp_list, my_grps, auth_luid, auth_pos);
   if (!get_server_groups (grp_list, usersid, pw))
     return false;
 
   /* special_pgrp true if pgrpsid is not in normal groups */
-  if ((special_pgrp = !grp_list.contains (pgrpsid)))
+  if (!grp_list.contains (pgrpsid))
     grp_list += pgrpsid;
   return true;
 }
@@ -609,7 +608,8 @@ get_setgroups_sidlist (cygsidlist &tmp_list, PTOKEN_GROUPS my_grps,
   tmp_list += well_known_authenticated_users_sid;
   get_token_group_sidlist (tmp_list, my_grps, auth_luid, auth_pos);
   for (int gidx = 0; gidx < groups.sgsids.count; gidx++)
-    tmp_list += groups.sgsids.sids[gidx];
+    if (!tmp_list.contains (groups.sgsids.sids[gidx]))
+      tmp_list += groups.sgsids.sids[gidx];
   if (!groups.sgsids.contains (pgpsid))
     tmp_list += pgpsid;
 }
@@ -851,7 +851,6 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   SECURITY_QUALITY_OF_SERVICE sqos =
     { sizeof sqos, SecurityImpersonation, SECURITY_STATIC_TRACKING, FALSE };
   OBJECT_ATTRIBUTES oa = { sizeof oa, 0, 0, 0, 0, &sqos };
-  bool special_pgrp = false;
   LUID auth_luid = SYSTEM_LUID;
   LARGE_INTEGER exp = { QuadPart:INT64_MAX };
 
@@ -920,8 +919,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
     get_setgroups_sidlist (tmp_gsids, my_tok_gsids, new_groups, auth_luid,
 			   auth_pos);
   else if (!get_initgroups_sidlist (tmp_gsids, usersid, new_groups.pgsid, pw,
-				    my_tok_gsids, auth_luid, auth_pos,
-				    special_pgrp))
+				    my_tok_gsids, auth_luid, auth_pos))
     goto out;
 
   /* Primary group. */
