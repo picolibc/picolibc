@@ -1,3 +1,7 @@
+2005-06-20  Geoffrey Keating  <geoffk@apple.com>
+
+	* libiberty.h (strverscmp): Prototype. 
+
 2005-06-17  Jakub Jelinek  <jakub@redhat.com>
 
 	* elf/external.h (GRP_ENTRY_SIZE): Define.
