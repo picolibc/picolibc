@@ -159,6 +159,7 @@ uinfo_init ()
   cygheap->user.curr_primary_token = NO_IMPERSONATION;
   cygheap->user.current_token = NO_IMPERSONATION;
   cygheap->user.set_saved_sid ();	/* Update the original sid */
+  cygheap->user.reimpersonate ();
 }
 
 extern "C" int
