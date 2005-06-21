@@ -1,3 +1,9 @@
+2005-06-20  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* how-resources.texinfo: Update section on cygwin-developers.
+	* how-using.texinfo: Add FAQ about firewall software. Update
+	section on mounting and specifically note using managed mounts.
+
 2005-06-03  Max Kaehn <slothman@electric-cloud.com>
 
 	* how-programming.texinfo: Add "How do I load cygwin1.dll dynamically

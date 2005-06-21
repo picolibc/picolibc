@@ -41,13 +41,14 @@ Similarly, to subscribe to the Cygwin announcements list, send a message
 to cygwin-announce-subscribe@@cygwin.com.  To unsubscribe,
 send a message to cygwin-announce-unsubscribe@@cygwin.com.
 
-If you are going to help develop the Cygwin library by volunteering for
-the project, you will want to subscribe to the Cygwin developers list,
-called cygwin-developers.  If you are contributing to Cygwin tools &
-applications, rather than the library itself, then you should subscribe
-to cygwin-apps.  The same mechanism as described for the first two lists
-works for these as well.  Both cygwin-developers and cygwin-apps are
-by-approval lists.
+If you want to contribe to Cygwin tools & applications, rather than
+the library itself, then you should subscribe to cygwin-apps. There
+is also a low-volume list called cygwin-developers which is reserved
+for knowledgeable people who regularly contribute to the Cygwin DLL.
+Please do not ask for read-only access to this mailing list.  Both
+cygwin-developers and cygwin-apps are by-approval lists.  The same
+mechanism as described for the first two lists works for these as
+well.  
 
 There is a searchable archive of the main mailing list at
 @file{http://cygwin.com/ml/cygwin/}.  There is an alternate

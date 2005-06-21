@@ -510,35 +510,33 @@ the following line to your .inputrc file:
 	"\e[2~": paste-from-clipboard 
 @end example 
 
+@subsection What firewall should I use with Cygwin? 
 
-@subsection What does "mount failed: Device or resource busy" mean?
+We have had good reports about Kerio Personal Firewall, ZoneLabs
+Integrity Desktop, and the built-in firewall in Windows XP. Other
+well-known products including ZoneAlarm and Norton Internet Security have
+caused problems for some users but work fine for others. If you are
+having strange connection-related problems, disabling the firewall is a
+good troubleshooting step.
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
-This usually means that you are trying to mount to a location
-already in use by mount.  For example, if c: is mounted as '/'
-and you try to mount d: there as well, you will get this error
-message.  First "umount" the old location, then "mount" the new one and
-you should have better luck.
-
-If you are trying to umount '/' and are getting this message, you may
-need to run @code{regedit.exe} and change the "native" key for the '/'
-mount in one of the mount points kept under
-HKEY_CURRENT_USER/Software/Red Hat, Inc./CYGWIN.DLL setup/<version>
-where <version> is the latest registry version associated with the
-Cygwin library.
+Cygwin uses sockets to implement many of its functions, such as IPC.
+Some overzealous firewalls install themselves deeply into the winsock
+stack (with the 'layered service provider' API) and install hooks
+throughout.  Sadly the mailing list archives are littered with examples
+of poorly written firewall-type software that causes things to break.
+Note that with many of these products, simply disabling the firewall
+does not remove these changes; it must be completely uninstalled.
 
 @subsection How can I share files between Unix and Windows?
 
-During development, we have both Unix boxes running Samba and
-NT/Windows 95/98 machines.  We often build with cross-compilers
-under Unix and copy binaries and source to the Windows system
-or just toy with them directly off the Samba-mounted partition.
-On dual-boot NT/Windows 9x machines, we usually use the FAT
-filesystem so we can also access the files under Windows 9x.
+During development, we have both Linix boxes running Samba and Windows
+machines.  We often build with cross-compilers under Linix and copy
+binaries and source to the Windows system or just toy with them
+directly off the Samba-mounted partition.  On dual-boot NT/Windows 9x
+machines, we usually use the FAT filesystem so we can also access the
+files under Windows 9x.
 
-@subsection Are mixed-case filenames possible with Cygwin?
+@subsection Is Cygwin case-sensitive? What are managed mounts?
 
 Several Unix programs expect to be able to use to filenames
 spelled the same way, but with different case.  A prime example
@@ -546,15 +544,21 @@ of this is perl's configuration script, which wants @code{Makefile} and
 @code{makefile}.  WIN32 can't tell the difference between files with
 just different case, so the configuration fails.
 
-In releases prior to beta 16, mount had a special mixed case option
-which renamed files in such a way as to allow mixed case filenames.  We
-chose to remove the support when we rewrote the path handling code for
-beta 16.  The standard Windows apps -- explorer.exe,
-cmd.exe/command.com, etc. -- do not distinguish filenames that differed
-only in case, resulting in some (very) undesirable behavior.
+To help with this problem, starting in @samp{cygwin-1.5.0} it is
+possible to have a case sensitive Cygwin managed mount. This is an
+experimental feature and should be used with caution. You should only
+use it for directories that are initially unpopulated and are due to
+be completely managed by cygwin (hence the name).  So, the best use
+would be to create an empty directory, mount it, and then add files to
+it:  
 
-Sergey Okhapkin had maintained a mixed-case patch ('coolview') until
-about B20.1, but this has not been updated to recent versions of Cygwin.
+@example
+mkdir /managed-dir
+mount -o managed c:/cygwin/managed-dir /managed-dir
+cd /managed-dir/
+touch makefile
+touch Makefile
+@end example 
 
 @subsection What about DOS special filenames?
 
