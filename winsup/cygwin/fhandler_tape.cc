@@ -1218,7 +1218,7 @@ fhandler_dev_tape::open (int flags, mode_t)
       set_errno (ENOENT);
       return 0;
     }
-  if (!(mt_mtx = CreateMutex (&sec_all, FALSE, NULL)))
+  if (!(mt_mtx = CreateMutex (&sec_all, TRUE, NULL)))
     {
       __seterrno ();
       return 0;
@@ -1256,6 +1256,7 @@ fhandler_dev_tape::close (void)
   ret = mt->drive (driveno ())->close (get_handle (), is_rewind_device ());
   if (mt_evt)
     CloseHandle (mt_evt);
+  CloseHandle (mt_mtx);
   if (ret)
     __seterrno_from_win_error (ret);
   cret = fhandler_dev_raw::close ();
@@ -1446,7 +1447,44 @@ int
 fhandler_dev_tape::dup (fhandler_base *child)
 {
   lock (-1);
+  fhandler_dev_tape *fh = (fhandler_dev_tape *) child;
+  if (!DuplicateHandle (hMainProc, mt_mtx, hMainProc, &fh->mt_mtx, 0, TRUE,
+  			DUPLICATE_SAME_ACCESS))
+    {
+      debug_printf ("dup(%s) failed, mutex handle %x, %E",
+		    get_name (), mt_mtx);
+      __seterrno ();
+      return unlock (-1);
+    }
+  fh->mt_evt = NULL;
+  if (mt_evt &&
+      !DuplicateHandle (hMainProc, mt_evt, hMainProc, &fh->mt_evt, 0, TRUE,
+  			DUPLICATE_SAME_ACCESS))
+    {
+      debug_printf ("dup(%s) failed, event handle %x, %E",
+		    get_name (), mt_evt);
+      __seterrno ();
+      return unlock (-1);
+    }
   return unlock (fhandler_dev_raw::dup (child));
+}
+
+void
+fhandler_dev_tape::fixup_after_fork (HANDLE parent)
+{
+  fhandler_dev_raw::fixup_after_fork (parent);
+  fork_fixup (parent, mt_mtx, "mt_mtx");
+  if (mt_evt)
+    fork_fixup (parent, mt_evt, "mt_evt");
+}
+
+void
+fhandler_dev_tape::set_close_on_exec (bool val)
+{
+  fhandler_dev_raw::set_close_on_exec (val);
+  set_no_inheritance (mt_mtx, val);
+  if (mt_evt)
+    set_no_inheritance (mt_evt, val);
 }
 
 int

@@ -1,3 +1,14 @@
+2005-06-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_dev_tape): Add declaration for
+	fixup_after_fork and set_close_on_exec.
+	* fhandler_tape.cc (fhandler_dev_tape::open): Create mt_mtx mutex
+	inheritable.
+	(fhandler_dev_tape::close): Close mt_mtx.
+	(fhandler_dev_tape::dup): Duplicate mt_mtx and mt_evt as necessary.
+	(fhandler_dev_tape::fixup_after_fork): New method.
+	(fhandler_dev_tape::set_close_on_exec): New method.
+
 2005-06-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.cc (get_initgroups_sidlist): Drop special_pgrp parameter.
