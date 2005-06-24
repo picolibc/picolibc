@@ -1,5 +1,10 @@
 2005-06-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (path_conv::check): Don't strip trailing dots and spaces
+	at the start of the path.
+
+2005-06-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (rootdir): Don't set errno.
 	* syscalls.cc (statvfs): Set errno to ENOTDIR if rootdir() failed.
 

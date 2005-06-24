@@ -928,7 +928,7 @@ out:
 	    else if (!tail)
 	      tail = p;
 
-	  if (!tail)
+	  if (!tail || tail == path)
 	    /* nothing */;
 	  else if (tail[-1] != '\\')
 	    {
