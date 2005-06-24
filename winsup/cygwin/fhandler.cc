@@ -1179,18 +1179,14 @@ rootdir (const char *full_path, char *root_path)
     {
       const char *cp = strchr (full_path + 2, '\\');
       if (!cp)
-	goto error;
+	return NULL;
       while (*++cp && *cp != '\\')
 	;
       memcpy (root_path, full_path, (len = cp - full_path));
       rootp = root_path + len;
     }
   else
-    {
-    error:
-      set_errno (ENOTDIR);
-      return NULL;
-    }
+    return NULL;
 
   *rootp++ = '\\';
   *rootp = '\0';

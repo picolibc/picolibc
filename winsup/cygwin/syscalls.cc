@@ -1727,7 +1727,10 @@ statvfs (const char *fname, struct statvfs *sfs)
 
   path_conv full_path (fname, PC_SYM_FOLLOW);
   if (!rootdir (full_path, root))
-    return -1;
+    {
+      set_errno (ENOTDIR);
+      return -1;
+    }
 
   ULARGE_INTEGER availb, freeb, totalb;
   DWORD spc, bps, availc, freec, totalc, vsn, maxlen, flags;
