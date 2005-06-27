@@ -1,3 +1,7 @@
+2005-06-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::facl): Add missing break.
+
 2005-06-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (path_conv::check): Don't strip trailing dots and spaces

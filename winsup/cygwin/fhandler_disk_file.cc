@@ -626,6 +626,7 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 	    break;
 	  case GETACLCNT:
 	    res = getacl (get_io_handle (), pc, pc, 0, NULL);
+	    break;
 	  default:
 	    set_errno (EINVAL);
 	    break;
