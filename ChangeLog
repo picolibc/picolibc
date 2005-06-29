@@ -1,3 +1,7 @@
+2005-06-30  Ben Elliston  <bje@au.ibm.com>
+
+	* setup.com (mpw): Remove unused directive.
+
 2005-06-22  Paolo Bonzini  <bonzini@gnu.org>
 
 	* Makefile.def (stagefeedback): Come after profile.
