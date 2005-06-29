@@ -32,10 +32,6 @@ config.guess; config.sub; readline/support/config.{sub,guess}
 		binutils@sources.redhat.com
 		gdb-patches@sources.redhat.com
 
-dejagnu/
-	dejagnu: http://www.gnu.org/software/dejagnu/
-	Patches to bug-dejagnu@gnu.org
-
 depcomp
         Send bug reports and patches to bug-automake@gnu.org.
 
