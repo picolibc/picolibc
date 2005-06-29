@@ -1,3 +1,9 @@
+2005-06-29  Christopher Faylor  <cgf@timesys.com>
+
+	* autoload.cc (LoadDLLprime): Use a more descriptive name for autoload
+	text sections.
+	* cygwin.sc: Ditto.
+
 2005-06-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::facl): Add missing break.

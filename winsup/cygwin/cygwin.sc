@@ -20,7 +20,7 @@ SECTIONS
   }
   .autoload_text ALIGN(__section_alignment__) :
   {
-    *(.*_text);
+    *(.*_autoload_text);
   }
   /* The Cygwin DLL uses a section to avoid copying certain data
      on fork.  This used to be named ".data".  The linker used
