@@ -970,7 +970,7 @@ fhandler_base::readv (const struct iovec *const iov, const int iovcnt,
   if (!len)
     return 0;
 
-  char *buf = (char *) alloca (tot);
+  char *buf = (char *) malloc (tot);
 
   if (!buf)
     {
@@ -992,6 +992,7 @@ fhandler_base::readv (const struct iovec *const iov, const int iovcnt,
       nbytes -= frag;
     }
 
+  free (buf);
   return len;
 }
 
@@ -1022,7 +1023,7 @@ fhandler_base::writev (const struct iovec *const iov, const int iovcnt,
   if (tot == 0)
     return 0;
 
-  char *const buf = (char *) alloca (tot);
+  char *const buf = (char *) malloc (tot);
 
   if (!buf)
     {
@@ -1042,8 +1043,9 @@ fhandler_base::writev (const struct iovec *const iov, const int iovcnt,
       iovptr += 1;
       nbytes -= frag;
     }
-
-  return write (buf, tot);
+  ssize_t ret = write (buf, tot);
+  free (buf);
+  return ret;
 }
 
 _off64_t

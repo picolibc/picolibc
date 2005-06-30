@@ -1,3 +1,8 @@
+2005-06-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::readv): Use malloc/free instead of alloca.
+	(fhandler_base::writev): Ditto.
+
 2005-06-29  Christopher Faylor  <cgf@timesys.com>
 
 	* cygerrno.h: Make multi-inclusion safe.
