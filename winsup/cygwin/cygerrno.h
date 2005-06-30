@@ -8,6 +8,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#ifndef _CYGERRNO_H
+#define _CYGERRNO_H
 #include <errno.h>
 
 void __stdcall seterrno_from_win_error (const char *file, int line, DWORD code) __attribute__ ((regparm(3)));
@@ -47,3 +49,4 @@ class save_errno
 
 extern const char *__sp_fn;
 extern int __sp_ln;
+#endif /*_CYGERRNO_H*/

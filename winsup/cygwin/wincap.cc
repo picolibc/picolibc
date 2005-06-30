@@ -58,7 +58,8 @@ static NO_COPY wincaps wincap_unknown = {
   start_proc_suspended:true,
   has_extended_priority_class:false,
   has_guid_volumes:false,
-  detect_win16_exe:true
+  detect_win16_exe:true,
+  has_null_console_handler_routine:false
 };
 
 static NO_COPY wincaps wincap_95 = {
@@ -108,7 +109,8 @@ static NO_COPY wincaps wincap_95 = {
   start_proc_suspended:true,
   has_extended_priority_class:false,
   has_guid_volumes:false,
-  detect_win16_exe:true
+  detect_win16_exe:true,
+  has_null_console_handler_routine:false
 };
 
 static NO_COPY wincaps wincap_95osr2 = {
@@ -158,7 +160,8 @@ static NO_COPY wincaps wincap_95osr2 = {
   start_proc_suspended:true,
   has_extended_priority_class:false,
   has_guid_volumes:false,
-  detect_win16_exe:true
+  detect_win16_exe:true,
+  has_null_console_handler_routine:false
 };
 
 static NO_COPY wincaps wincap_98 = {
@@ -208,7 +211,8 @@ static NO_COPY wincaps wincap_98 = {
   start_proc_suspended:true,
   has_extended_priority_class:false,
   has_guid_volumes:false,
-  detect_win16_exe:true
+  detect_win16_exe:true,
+  has_null_console_handler_routine:false
 };
 
 static NO_COPY wincaps wincap_98se = {
@@ -258,7 +262,8 @@ static NO_COPY wincaps wincap_98se = {
   start_proc_suspended:true,
   has_extended_priority_class:false,
   has_guid_volumes:false,
-  detect_win16_exe:true
+  detect_win16_exe:true,
+  has_null_console_handler_routine:false
 };
 
 static NO_COPY wincaps wincap_me = {
@@ -308,7 +313,8 @@ static NO_COPY wincaps wincap_me = {
   start_proc_suspended:true,
   has_extended_priority_class:false,
   has_guid_volumes:false,
-  detect_win16_exe:true
+  detect_win16_exe:true,
+  has_null_console_handler_routine:false
 };
 
 static NO_COPY wincaps wincap_nt3 = {
@@ -358,7 +364,8 @@ static NO_COPY wincaps wincap_nt3 = {
   start_proc_suspended:false,
   has_extended_priority_class:false,
   has_guid_volumes:false,
-  detect_win16_exe:false
+  detect_win16_exe:false,
+  has_null_console_handler_routine:true
 };
 
 static NO_COPY wincaps wincap_nt4 = {
@@ -408,7 +415,8 @@ static NO_COPY wincaps wincap_nt4 = {
   start_proc_suspended:false,
   has_extended_priority_class:false,
   has_guid_volumes:false,
-  detect_win16_exe:false
+  detect_win16_exe:false,
+  has_null_console_handler_routine:true
 };
 
 static NO_COPY wincaps wincap_nt4sp4 = {
@@ -458,7 +466,8 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   start_proc_suspended:false,
   has_extended_priority_class:false,
   has_guid_volumes:false,
-  detect_win16_exe:false
+  detect_win16_exe:false,
+  has_null_console_handler_routine:true
 };
 
 static NO_COPY wincaps wincap_2000 = {
@@ -508,7 +517,8 @@ static NO_COPY wincaps wincap_2000 = {
   start_proc_suspended:false,
   has_extended_priority_class:true,
   has_guid_volumes:true,
-  detect_win16_exe:false
+  detect_win16_exe:false,
+  has_null_console_handler_routine:true
 };
 
 static NO_COPY wincaps wincap_xp = {
@@ -558,7 +568,8 @@ static NO_COPY wincaps wincap_xp = {
   start_proc_suspended:false,
   has_extended_priority_class:true,
   has_guid_volumes:true,
-  detect_win16_exe:false
+  detect_win16_exe:false,
+  has_null_console_handler_routine:true
 };
 
 static NO_COPY wincaps wincap_2003 = {
@@ -608,7 +619,8 @@ static NO_COPY wincaps wincap_2003 = {
   start_proc_suspended:false,
   has_extended_priority_class:true,
   has_guid_volumes:true,
-  detect_win16_exe:false
+  detect_win16_exe:false,
+  has_null_console_handler_routine:true
 };
 
 wincapc wincap;

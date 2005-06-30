@@ -1,5 +1,19 @@
 2005-06-29  Christopher Faylor  <cgf@timesys.com>
 
+	* cygerrno.h: Make multi-inclusion safe.
+	* fhandler_termios.cc (fhandler_termios::tcsetpgrp): Deal with EINTR.
+	* dcrt0.cc (dll_crt0_0): Accommodate init_console_handler argument
+	change.
+	* winsup.h: Ditto.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Ditto.
+	* exceptions.cc (init_console_handler): Ditto.  Ignore console events
+	if we're not attached to a terminal.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Ditto.
+	* wincap.cc: Implement has_null_console_handler_routine throughout.
+	* wincap.h: Ditto.
+
+2005-06-29  Christopher Faylor  <cgf@timesys.com>
+
 	* autoload.cc (LoadDLLprime): Use a more descriptive name for autoload
 	text sections.
 	* cygwin.sc: Ditto.

@@ -21,6 +21,7 @@ details. */
 #include "pinfo.h"
 #include "tty.h"
 #include "sys/cygwin.h"
+#include "cygtls.h"
 
 /* Common functions shared by tty/console */
 
@@ -72,8 +73,30 @@ fhandler_termios::tcsetpgrp (const pid_t pgid)
       set_errno (EPERM);
       return -1;
     }
-  tc->setpgid (pgid);
-  return 0;
+  int res;
+  while (1)
+    {
+      res = bg_check (-SIGTTOU);
+
+      switch (res)
+	{
+	case bg_ok:
+	  tc->setpgid (pgid);
+	  init_console_handler (!!is_console ());
+	  res = 0;
+	  break;
+	case bg_signalled:
+	  if (_my_tls.call_signal_handler ())
+	    continue;
+	  set_errno (EINTR);
+	  /* fall through intentionally */
+	default:
+	  res = -1;
+	  break;
+	}
+      break;
+    }
+  return res;
 }
 
 int

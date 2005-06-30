@@ -263,7 +263,7 @@ void __stdcall time_as_timestruc_t (timestruc_t *);
 void __stdcall timeval_to_filetime (const struct timeval *, FILETIME *);
 
 void __stdcall set_console_title (char *);
-void init_console_handler ();
+void init_console_handler (BOOL);
 void init_global_security ();
 
 int __stdcall check_null_str (const char *name) __attribute__ ((regparm(1)));

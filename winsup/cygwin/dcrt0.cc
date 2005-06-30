@@ -636,7 +636,7 @@ dll_crt0_0 ()
   wincap.init ();
   initial_env ();
 
-  init_console_handler ();
+  init_console_handler (TRUE);
   init_global_security ();
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
 		       GetCurrentProcess (), &hMainProc, 0, FALSE,

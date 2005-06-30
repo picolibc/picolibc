@@ -591,7 +591,7 @@ fhandler_tty_slave::open (int flags, mode_t)
 				// stuff fails
       termios_printf ("%d = AllocConsole (), %E", b);
       if (b)
-	init_console_handler ();
+	init_console_handler (TRUE);
     }
 
   // FIXME: Do this better someday

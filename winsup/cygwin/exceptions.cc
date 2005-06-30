@@ -114,11 +114,24 @@ init_exceptions (exception_list *el)
   init_exception_handler (el, handle_exceptions);
 }
 
-void
-init_console_handler ()
+BOOL WINAPI
+dummy_ctrl_c_handler (DWORD dwCtrlType)
 {
+  return TRUE;
+}
+
+void
+init_console_handler (BOOL install_handler)
+{
+  BOOL res;
   (void) SetConsoleCtrlHandler (ctrl_c_handler, FALSE);
-  if (!SetConsoleCtrlHandler (ctrl_c_handler, TRUE))
+  if (install_handler)
+    res = SetConsoleCtrlHandler (ctrl_c_handler, TRUE);
+  else if (wincap.has_null_console_handler_routine ())
+    res = SetConsoleCtrlHandler (NULL, TRUE);
+  else
+    res = SetConsoleCtrlHandler (dummy_ctrl_c_handler, TRUE);
+  if (!res)
     system_printf ("SetConsoleCtrlHandler failed, %E");
 }
 
