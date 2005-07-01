@@ -1,3 +1,7 @@
+2005-07-01  Nick Clifton  <nickc@redhat.com>
+
+	* sparc.h: Add typedefs to structure declarations.
+
 2005-06-20  H.J. Lu  <hongjiu.lu@intel.com>
 
 	PR 1013
