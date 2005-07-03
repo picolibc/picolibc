@@ -6,6 +6,9 @@
 	inline static.
 	(pthread*::is_good_object): Move to directly after
 	verifyable_object_state verifyable_object_isvalid and make inline.
+	(check_valid_pointer): Delete function.
+	(pthread_cond_timedwait): Use myfault to detect valid pointer.
+	(pthread_mutex::init): Ditto.
 
 2005-07-02  Christopher Faylor  <cgf@timesys.com>
 
