@@ -137,11 +137,6 @@ typedef enum
   VALID_STATIC_OBJECT
 } verifyable_object_state;
 
-verifyable_object_state verifyable_object_isvalid (void const * objectptr, long magic,
-						   void *static_ptr1 = NULL,
-						   void *static_ptr2 = NULL,
-						   void *static_ptr3 = NULL);
-
 template <class list_node> inline void
 List_insert (list_node *&head, list_node *node)
 {

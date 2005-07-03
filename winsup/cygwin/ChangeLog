@@ -1,5 +1,14 @@
 2005-07-02  Christopher Faylor  <cgf@timesys.com>
 
+	* thread.h (verifyable_object_state verifyable_object_isvalid): Delete
+	function declaration that should have been static.
+	* thread.cc (verifyable_object_state verifyable_object_isvalid): Make
+	inline static.
+	(pthread*::is_good_object): Move to directly after
+	verifyable_object_state verifyable_object_isvalid and make inline.
+
+2005-07-02  Christopher Faylor  <cgf@timesys.com>
+
 	Replace valid memory checks with new myfault class "exception
 	handling", almost everywhere.  Leave some thread.cc stuff alone for
 	now.

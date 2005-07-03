@@ -48,6 +48,11 @@ details. */
 
 extern "C" void __fp_lock_all ();
 extern "C" void __fp_unlock_all ();
+static inline verifyable_object_state
+  verifyable_object_isvalid (void const * objectptr, long magic,
+			     void *static_ptr1 = NULL,
+			     void *static_ptr2 = NULL,
+			     void *static_ptr3 = NULL);
 
 extern int threadsafe;
 
@@ -107,7 +112,201 @@ __cygwin_lock_unlock (_LOCK_T *lock)
     }
 }
 
-inline LPCRITICAL_SECTION
+static inline verifyable_object_state
+verifyable_object_isvalid (void const * objectptr, long magic, void *static_ptr1,
+			   void *static_ptr2, void *static_ptr3)
+{
+  verifyable_object **object = (verifyable_object **) objectptr;
+  myfault efault;
+  if (efault.faulted ())
+    return INVALID_OBJECT;
+  if ((static_ptr1 && *object == static_ptr1) ||
+      (static_ptr2 && *object == static_ptr2) ||
+      (static_ptr3 && *object == static_ptr3))
+    return VALID_STATIC_OBJECT;
+  if ((*object)->magic != magic)
+    return INVALID_OBJECT;
+  return VALID_OBJECT;
+}
+
+/* static members */
+inline bool
+pthread_attr::is_good_object (pthread_attr_t const *attr)
+{
+  if (verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC) != VALID_OBJECT)
+    return false;
+  return true;
+}
+
+inline bool
+pthread_condattr::is_good_object (pthread_condattr_t const *attr)
+{
+  if (verifyable_object_isvalid (attr, PTHREAD_CONDATTR_MAGIC) != VALID_OBJECT)
+    return false;
+  return true;
+}
+
+inline bool
+pthread_rwlockattr::is_good_object (pthread_rwlockattr_t const *attr)
+{
+  if (verifyable_object_isvalid (attr, PTHREAD_RWLOCKATTR_MAGIC) != VALID_OBJECT)
+    return false;
+  return true;
+}
+
+inline bool
+pthread_key::is_good_object (pthread_key_t const *key)
+{
+  if (verifyable_object_isvalid (key, PTHREAD_KEY_MAGIC) != VALID_OBJECT)
+    return false;
+  return true;
+}
+
+inline bool
+pthread_mutex::is_good_object (pthread_mutex_t const *mutex)
+{
+  if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC) != VALID_OBJECT)
+    return false;
+  return true;
+}
+
+inline bool
+pthread_mutex::is_good_initializer (pthread_mutex_t const *mutex)
+{
+  if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC,
+				 PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP,
+				 PTHREAD_NORMAL_MUTEX_INITIALIZER_NP,
+				 PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP) != VALID_STATIC_OBJECT)
+    return false;
+  return true;
+}
+
+inline bool
+pthread_mutex::is_good_initializer_or_object (pthread_mutex_t const *mutex)
+{
+  if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC,
+				 PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP,
+				 PTHREAD_NORMAL_MUTEX_INITIALIZER_NP,
+				 PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP) == INVALID_OBJECT)
+    return false;
+  return true;
+}
+
+inline bool
+pthread_mutex::is_good_initializer_or_bad_object (pthread_mutex_t const *mutex)
+{
+  if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC,
+				 PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP,
+				 PTHREAD_NORMAL_MUTEX_INITIALIZER_NP,
+				 PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP) == VALID_OBJECT)
+    return false;
+  return true;
+}
+
+inline bool
+pthread_mutex::can_be_unlocked (pthread_mutex_t const *mutex)
+{
+  pthread_t self = pthread::self ();
+
+  if (!is_good_object (mutex))
+    return false;
+  /*
+   * Check if the mutex is owned by the current thread and can be unlocked
+   */
+  return ((*mutex)->recursion_counter == 1 && pthread::equal ((*mutex)->owner, self));
+}
+
+inline bool
+pthread_mutexattr::is_good_object (pthread_mutexattr_t const * attr)
+{
+  if (verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC) != VALID_OBJECT)
+    return false;
+  return true;
+}
+
+inline bool __attribute__ ((used))
+pthread::is_good_object (pthread_t const *thread)
+{
+  if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
+    return false;
+  return true;
+}
+
+/* Thread synchronisation */
+inline bool
+pthread_cond::is_good_object (pthread_cond_t const *cond)
+{
+  if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC) != VALID_OBJECT)
+    return false;
+  return true;
+}
+
+inline bool
+pthread_cond::is_good_initializer (pthread_cond_t const *cond)
+{
+  if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC, PTHREAD_COND_INITIALIZER) != VALID_STATIC_OBJECT)
+    return false;
+  return true;
+}
+
+inline bool
+pthread_cond::is_good_initializer_or_object (pthread_cond_t const *cond)
+{
+  if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC, PTHREAD_COND_INITIALIZER) == INVALID_OBJECT)
+    return false;
+  return true;
+}
+
+inline bool
+pthread_cond::is_good_initializer_or_bad_object (pthread_cond_t const *cond)
+{
+  if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC, PTHREAD_COND_INITIALIZER) == VALID_OBJECT)
+    return false;
+  return true;
+}
+
+/* RW locks */
+inline bool
+pthread_rwlock::is_good_object (pthread_rwlock_t const *rwlock)
+{
+  if (verifyable_object_isvalid (rwlock, PTHREAD_RWLOCK_MAGIC) != VALID_OBJECT)
+    return false;
+  return true;
+}
+
+inline bool
+pthread_rwlock::is_good_initializer (pthread_rwlock_t const *rwlock)
+{
+  if (verifyable_object_isvalid (rwlock, PTHREAD_RWLOCK_MAGIC, PTHREAD_RWLOCK_INITIALIZER) != VALID_STATIC_OBJECT)
+    return false;
+  return true;
+}
+
+inline bool
+pthread_rwlock::is_good_initializer_or_object (pthread_rwlock_t const *rwlock)
+{
+  if (verifyable_object_isvalid (rwlock, PTHREAD_RWLOCK_MAGIC, PTHREAD_RWLOCK_INITIALIZER) == INVALID_OBJECT)
+    return false;
+  return true;
+}
+
+inline bool
+pthread_rwlock::is_good_initializer_or_bad_object (pthread_rwlock_t const *rwlock)
+{
+  if (verifyable_object_isvalid (rwlock, PTHREAD_RWLOCK_MAGIC, PTHREAD_RWLOCK_INITIALIZER) == VALID_OBJECT)
+    return false;
+  return true;
+}
+
+inline bool
+semaphore::is_good_object (sem_t const * sem)
+{
+  if (verifyable_object_isvalid (sem, SEM_MAGIC) != VALID_OBJECT)
+    return false;
+  return true;
+}
+
+LPCRITICAL_SECTION
 ResourceLocks::Lock (int _resid)
 {
   return &lock;
@@ -777,15 +976,6 @@ pthread::resume ()
     ResumeThread (win32_obj_id);
 }
 
-/* static members */
-bool
-pthread_attr::is_good_object (pthread_attr_t const *attr)
-{
-  if (verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC) != VALID_OBJECT)
-    return false;
-  return true;
-}
-
 /* instance members */
 
 pthread_attr::pthread_attr ():verifyable_object (PTHREAD_ATTR_MAGIC),
@@ -797,14 +987,6 @@ inheritsched (PTHREAD_INHERIT_SCHED), stacksize (0)
 
 pthread_attr::~pthread_attr ()
 {
-}
-
-bool
-pthread_condattr::is_good_object (pthread_condattr_t const *attr)
-{
-  if (verifyable_object_isvalid (attr, PTHREAD_CONDATTR_MAGIC) != VALID_OBJECT)
-    return false;
-  return true;
 }
 
 pthread_condattr::pthread_condattr ():verifyable_object
@@ -1014,14 +1196,6 @@ pthread_cond::_fixup_after_fork ()
   sem_wait = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
   if (!sem_wait)
     api_fatal ("pthread_cond::_fixup_after_fork () failed to recreate win32 semaphore");
-}
-
-bool
-pthread_rwlockattr::is_good_object (pthread_rwlockattr_t const *attr)
-{
-  if (verifyable_object_isvalid (attr, PTHREAD_RWLOCKATTR_MAGIC) != VALID_OBJECT)
-    return false;
-  return true;
 }
 
 pthread_rwlockattr::pthread_rwlockattr ():verifyable_object
@@ -1347,14 +1521,6 @@ pthread_rwlock::_fixup_after_fork ()
 /* This stores pthread_key information across fork() boundaries */
 List<pthread_key> pthread_key::keys;
 
-bool
-pthread_key::is_good_object (pthread_key_t const *key)
-{
-  if (verifyable_object_isvalid (key, PTHREAD_KEY_MAGIC) != VALID_OBJECT)
-    return false;
-  return true;
-}
-
 /* non-static members */
 
 pthread_key::pthread_key (void (*aDestructor) (void *)):verifyable_object (PTHREAD_KEY_MAGIC), destructor (aDestructor)
@@ -1430,59 +1596,6 @@ pthread_key::run_destructor ()
    Isn't duplicated, it's reopened. */
 
 /* static members */
-bool
-pthread_mutex::is_good_object (pthread_mutex_t const *mutex)
-{
-  if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC) != VALID_OBJECT)
-    return false;
-  return true;
-}
-
-bool
-pthread_mutex::is_good_initializer (pthread_mutex_t const *mutex)
-{
-  if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC,
-				 PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP,
-				 PTHREAD_NORMAL_MUTEX_INITIALIZER_NP,
-				 PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP) != VALID_STATIC_OBJECT)
-    return false;
-  return true;
-}
-
-bool
-pthread_mutex::is_good_initializer_or_object (pthread_mutex_t const *mutex)
-{
-  if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC,
-				 PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP,
-				 PTHREAD_NORMAL_MUTEX_INITIALIZER_NP,
-				 PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP) == INVALID_OBJECT)
-    return false;
-  return true;
-}
-
-bool
-pthread_mutex::is_good_initializer_or_bad_object (pthread_mutex_t const *mutex)
-{
-  if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC,
-				 PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP,
-				 PTHREAD_NORMAL_MUTEX_INITIALIZER_NP,
-				 PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP) == VALID_OBJECT)
-    return false;
-  return true;
-}
-
-bool
-pthread_mutex::can_be_unlocked (pthread_mutex_t const *mutex)
-{
-  pthread_t self = pthread::self ();
-
-  if (!is_good_object (mutex))
-    return false;
-  /*
-   * Check if the mutex is owned by the current thread and can be unlocked
-   */
-  return ((*mutex)->recursion_counter == 1 && pthread::equal ((*mutex)->owner, self));
-}
 
 List<pthread_mutex> pthread_mutex::mutexes;
 
@@ -1628,14 +1741,6 @@ pthread_mutex::_fixup_after_fork ()
     api_fatal ("pthread_mutex::_fixup_after_fork () failed to recreate win32 semaphore for mutex");
 
   condwaits = 0;
-}
-
-bool
-pthread_mutexattr::is_good_object (pthread_mutexattr_t const * attr)
-{
-  if (verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC) != VALID_OBJECT)
-    return false;
-  return true;
 }
 
 pthread_mutexattr::pthread_mutexattr ():verifyable_object (PTHREAD_MUTEXATTR_MAGIC),
@@ -1848,35 +1953,6 @@ verifyable_object::~verifyable_object ()
   magic = 0;
 }
 
-/* Generic memory acccess routine - where should it live ? */
-int __stdcall
-check_valid_pointer (void const *pointer)
-{
-  if (!pointer || IsBadWritePtr ((void *) pointer, sizeof (verifyable_object)))
-    return EFAULT;
-  return 0;
-}
-
-verifyable_object_state
-verifyable_object_isvalid (void const * objectptr, long magic, void *static_ptr1,
-			   void *static_ptr2, void *static_ptr3)
-{
-  verifyable_object **object = (verifyable_object **)objectptr;
-  if (check_valid_pointer (object))
-    return INVALID_OBJECT;
-  if ((static_ptr1 && *object == static_ptr1) ||
-      (static_ptr2 && *object == static_ptr2) ||
-      (static_ptr3 && *object == static_ptr3))
-    return VALID_STATIC_OBJECT;
-  if (!*object)
-    return INVALID_OBJECT;
-  if (check_valid_pointer (*object))
-    return INVALID_OBJECT;
-  if ((*object)->magic != magic)
-    return INVALID_OBJECT;
-  return VALID_OBJECT;
-}
-
 DWORD WINAPI
 pthread::thread_init_wrapper (void *arg)
 {
@@ -1899,14 +1975,6 @@ pthread::thread_init_wrapper (void *arg)
   thread->exit (ret);
 
   return 0;	// just for show.  Never returns.
-}
-
-bool
-pthread::is_good_object (pthread_t const *thread)
-{
-  if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
-    return false;
-  return true;
 }
 
 unsigned long
@@ -2448,39 +2516,6 @@ pthread_getspecific (pthread_key_t key)
 
 }
 
-/* Thread synchronisation */
-bool
-pthread_cond::is_good_object (pthread_cond_t const *cond)
-{
-  if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC) != VALID_OBJECT)
-    return false;
-  return true;
-}
-
-bool
-pthread_cond::is_good_initializer (pthread_cond_t const *cond)
-{
-  if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC, PTHREAD_COND_INITIALIZER) != VALID_STATIC_OBJECT)
-    return false;
-  return true;
-}
-
-bool
-pthread_cond::is_good_initializer_or_object (pthread_cond_t const *cond)
-{
-  if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC, PTHREAD_COND_INITIALIZER) == INVALID_OBJECT)
-    return false;
-  return true;
-}
-
-bool
-pthread_cond::is_good_initializer_or_bad_object (pthread_cond_t const *cond)
-{
-  if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC, PTHREAD_COND_INITIALIZER) == VALID_OBJECT)
-    return false;
-  return true;
-}
-
 extern "C" int
 pthread_cond_destroy (pthread_cond_t *cond)
 {
@@ -2579,11 +2614,12 @@ pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
 {
   struct timeval tv;
   long waitlength;
+  myfault efault;
+
+  if (efault.faulted ())
+    return EINVAL;
 
   pthread_testcancel ();
-
-  if (check_valid_pointer (abstime))
-    return EINVAL;
 
   gettimeofday (&tv, NULL);
   waitlength = abstime->tv_sec * 1000 + abstime->tv_nsec / (1000 * 1000);
@@ -2648,39 +2684,6 @@ pthread_condattr_destroy (pthread_condattr_t *condattr)
   delete (*condattr);
   *condattr = NULL;
   return 0;
-}
-
-/* RW locks */
-bool
-pthread_rwlock::is_good_object (pthread_rwlock_t const *rwlock)
-{
-  if (verifyable_object_isvalid (rwlock, PTHREAD_RWLOCK_MAGIC) != VALID_OBJECT)
-    return false;
-  return true;
-}
-
-bool
-pthread_rwlock::is_good_initializer (pthread_rwlock_t const *rwlock)
-{
-  if (verifyable_object_isvalid (rwlock, PTHREAD_RWLOCK_MAGIC, PTHREAD_RWLOCK_INITIALIZER) != VALID_STATIC_OBJECT)
-    return false;
-  return true;
-}
-
-bool
-pthread_rwlock::is_good_initializer_or_object (pthread_rwlock_t const *rwlock)
-{
-  if (verifyable_object_isvalid (rwlock, PTHREAD_RWLOCK_MAGIC, PTHREAD_RWLOCK_INITIALIZER) == INVALID_OBJECT)
-    return false;
-  return true;
-}
-
-bool
-pthread_rwlock::is_good_initializer_or_bad_object (pthread_rwlock_t const *rwlock)
-{
-  if (verifyable_object_isvalid (rwlock, PTHREAD_RWLOCK_MAGIC, PTHREAD_RWLOCK_INITIALIZER) == VALID_OBJECT)
-    return false;
-  return true;
 }
 
 extern "C" int
@@ -2883,7 +2886,8 @@ pthread_mutex::init (pthread_mutex_t *mutex,
 {
   pthread_mutex_t new_mutex;
 
-  if (attr && !pthread_mutexattr::is_good_object (attr) || check_valid_pointer (mutex))
+  myfault efault;
+  if (attr && !pthread_mutexattr::is_good_object (attr) || efault.faulted ())
     return EINVAL;
 
   mutex_initialization_lock.lock ();
@@ -3111,13 +3115,6 @@ pthread_mutexattr_settype (pthread_mutexattr_t *attr, int type)
 /* Semaphores */
 
 /* static members */
-bool
-semaphore::is_good_object (sem_t const * sem)
-{
-  if (verifyable_object_isvalid (sem, SEM_MAGIC) != VALID_OBJECT)
-    return false;
-  return true;
-}
 
 int
 semaphore::init (sem_t *sem, int pshared, unsigned int value)
