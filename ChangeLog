@@ -1,4 +1,14 @@
-2005-06-30  Ben Elliston  <bje@au.ibm.com>
+2005-07-04  Ben Elliston  <bje@gnu.org>
+
+	* src-release (do-proto-toplev): Remove dejagnu bits.
+	(DEJAGNU_SUPPORT_DIRS): Remove.
+	(dejagnu.tar.bz2, dejagnu.tar): Likewise.
+	(GDBD_SUPPORT_DIRS): Likewise.
+	(gdb+dejagnu.tar.bz2, gdb+dejagnu.tar): Likewise.
+	(INSIGHTD_SUPPORT_DIRS): Likewise.
+	(insight+dejagnu.tar.bz2, insight+dejagnu.tar): Likewise.
+
+2005-06-30  Ben Elliston  <bje@gnu.org>
 
 	* setup.com (mpw): Remove unused directive.
 

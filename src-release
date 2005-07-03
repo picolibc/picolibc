@@ -159,14 +159,6 @@ do-proto-toplev: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
 	done
 	cd etc && $(MAKE) info
 	$(MAKE) distclean
-	# Kludge for pr gdb/708.  'configure' configures in
-	# dejagnu/example/calc, but 'make distclean' does not clean in
-	# dejagnu/example.  Someday somebody might fix this in dejagnu,
-	# and then import a new dejagnu into sourceware.  Right now, a
-	# couple of 'rm' commands will get the gdb snapshots working
-	# again.  -- chastain 2003-08-15
-	rm -f dejagnu/example/calc/config.status
-	rm -f dejagnu/example/calc/config.log
 	# Kludge for pr gdb/857.  intl/Makefile.in lacks a couple
 	# of files in the distclean rule.  Zack W is planning to make
 	# the gcc version of intl/ the master version and then push
@@ -284,30 +276,6 @@ gdb.tar: $(DIST_SUPPORT) $(GDB_SUPPORT_DIRS) gdb
 		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(GDB_SUPPORT_DIRS)"
 
-DEJAGNU_SUPPORT_DIRS=  tcl expect libiberty
-.PHONY: dejagnu.tar.bz2
-dejagnu.tar.bz2: $(DIST_SUPPORT) $(DEJAGNU_SUPPORT_DIRS) dejagnu
-	$(MAKE) -f $(SELF) gdb-taz TOOL=dejagnu \
-		MD5PROG="$(MD5PROG)" \
-		SUPPORT_FILES="$(DEJAGNU_SUPPORT_DIRS)"
-.PHONY: dejagnu.tar
-dejagnu.tar: $(DIST_SUPPORT) $(DEJAGNU_SUPPORT_DIRS) dejagnu
-	$(MAKE) -f $(SELF) gdb-tar TOOL=dejagnu \
-		MD5PROG="$(MD5PROG)" \
-		SUPPORT_FILES="$(DEJAGNU_SUPPORT_DIRS)"
-
-.PHONY: gdb+dejagnu.tar.bz2
-GDBD_SUPPORT_DIRS= $(GDB_SUPPORT_DIRS) tcl expect dejagnu
-gdb+dejagnu.tar.bz2: $(DIST_SUPPORT) $(GDBD_SUPPORT_DIRS) gdb
-	$(MAKE) -f $(SELF) gdb-taz TOOL=gdb PACKAGE=gdb+dejagnu \
-		MD5PROG="$(MD5PROG)" \
-		SUPPORT_FILES="$(GDBD_SUPPORT_DIRS)"
-.PHONY: gdb+dejagnu.tar
-gdb+dejagnu.tar: $(DIST_SUPPORT) $(GDBD_SUPPORT_DIRS) gdb
-	$(MAKE) -f $(SELF) gdb-tar TOOL=gdb PACKAGE=gdb+dejagnu \
-		MD5PROG="$(MD5PROG)" \
-		SUPPORT_FILES="$(GDBD_SUPPORT_DIRS)"
-
 .PHONY: insight.tar.bz2
 INSIGHT_SUPPORT_DIRS= $(GDB_SUPPORT_DIRS) tcl tk itcl libgui
 insight.tar.bz2: $(DIST_SUPPORT) $(GDB_SUPPORT_DIRS) gdb
@@ -319,18 +287,6 @@ insight.tar: $(DIST_SUPPORT) $(GDB_SUPPORT_DIRS) gdb
 	$(MAKE) -f $(SELF) gdb-tar TOOL=gdb PACKAGE=insight \
 		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(INSIGHT_SUPPORT_DIRS)"
-
-.PHONY: insight+dejagnu.tar.bz2
-INSIGHTD_SUPPORT_DIRS= $(INSIGHT_SUPPORT_DIRS) expect dejagnu
-insight+dejagnu.tar.bz2: $(DIST_SUPPORT) $(INSIGHTD_SUPPORT_DIRS) gdb
-	$(MAKE) -f $(SELF) gdb-taz TOOL=gdb PACKAGE="insight+dejagnu" \
-		MD5PROG="$(MD5PROG)" \
-		SUPPORT_FILES="$(INSIGHTD_SUPPORT_DIRS)"
-.PHONY: insight+dejagnu.tar
-insight+dejagnu.tar: $(DIST_SUPPORT) $(INSIGHTD_SUPPORT_DIRS) gdb
-	$(MAKE) -f $(SELF) gdb-tar TOOL=gdb PACKAGE="insight+dejagnu" \
-		MD5PROG="$(MD5PROG)" \
-		SUPPORT_FILES="$(INSIGHTD_SUPPORT_DIRS)"
 
 .NOEXPORT:
 MAKEOVERRIDES=
