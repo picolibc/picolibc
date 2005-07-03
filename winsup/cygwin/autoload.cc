@@ -86,7 +86,7 @@ details. */
 #define LoadDLLfuncEx3(name, n, dllname, notimp, err, fn) \
   LoadDLLprime (dllname, dll_func_load)			\
   __asm__ ("						\n\
-  .section	." #dllname "_text,\"wx\"		\n\
+  .section	." #dllname "_autoload_text,\"wx\"	\n\
   .global	_" mangle (name, n) "			\n\
   .global	_win32_" mangle (name, n) "		\n\
   .align	8					\n\
