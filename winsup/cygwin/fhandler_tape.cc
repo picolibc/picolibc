@@ -10,6 +10,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include "cygtls.h"
 #include <sys/termios.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -967,10 +968,11 @@ mtinfo_drive::set_options (HANDLE mt, long options)
 int
 mtinfo_drive::ioctl (HANDLE mt, unsigned int cmd, void *buf)
 {
+  myfault efault;
+  if (efault.faulted ())
+    return ERROR_NOACCESS;
   if (cmd == MTIOCTOP)
     {
-      if (__check_invalid_read_ptr (buf, sizeof (struct mtop)))
-	return ERROR_NOACCESS;
       struct mtop *op = (struct mtop *) buf;
       if (lasterr == ERROR_BUS_RESET)
 	{
@@ -1115,18 +1117,9 @@ mtinfo_drive::ioctl (HANDLE mt, unsigned int cmd, void *buf)
 	}
     }
   else if (cmd == MTIOCGET)
-    {
-      if (__check_null_invalid_struct (buf, sizeof (struct mtget)))
-	return ERROR_NOACCESS;
-      get_status (mt, (struct mtget *) buf);
-    }
-  else if (cmd == MTIOCPOS)
-    {
-      if (__check_null_invalid_struct (buf, sizeof (struct mtpos)))
-	return ERROR_NOACCESS;
-      if (!get_pos (mt))
-	((struct mtpos *) buf)->mt_blkno = block;
-    }
+    get_status (mt, (struct mtget *) buf);
+  else if (cmd == MTIOCPOS && !get_pos (mt))
+    ((struct mtpos *) buf)->mt_blkno = block;
 
   return lasterr;
 }

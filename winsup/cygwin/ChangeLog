@@ -1,5 +1,46 @@
 2005-07-02  Christopher Faylor  <cgf@timesys.com>
 
+	Replace valid memory checks with new myfault class "exception
+	handling", almost everywhere.  Leave some thread.cc stuff alone for
+	now.
+	* cygtls.h: Kludge some definitions to avoid including a problematic
+	windows header.
+	(_cygtls::_myfault): New entry.
+	(_cygtls::_myfault_errno): Ditto.
+	(_cygtls::fault_guarded): New function.
+	(_cygtls::setup_fault): Ditto.
+	(_cygtls::return_from_fault): Ditto.
+	(_cygtls::clear_fault): Ditto.
+	(myfault): New class.
+	* exceptions.cc (handle_exceptions): Handle case of guarded fault in
+	system routine.
+	* gendef: Add another entry point for setjmp that the compiler doesn't
+	know about and won't complain about.
+	* gentls_offsets: Just include windows.h rather than kludging a HANDLE
+	def.
+	* miscfuncs.cc (check_null_str): Delete.
+	(check_null_empty_str): Ditto.
+	(check_null_empty_str_errno): Ditto.
+	(check_null_str_errno): Ditto.
+	(__check_null_invalid_struct): Ditto.
+	(__check_null_invalid_struct_errno): Ditto.
+	(__check_invalid_read_ptr): Ditto.
+	(__check_invalid_read_ptr_errno): Ditto.
+	(dummytest): New function.
+	(check_iovec_for_read): Delete.
+	(chec_iovec): Rename from check_iovec_for_write.  Take a read/write
+	parameter.
+	* tlsoffsets.h: Regenerate.
+	* winsup.h: Remove check_* declarations.
+	(check_iovec_for_read): Delete declaration.  Turn into a define
+	instead.
+	(check_iovec_for_write): Ditto.
+	(check_iovec): New declaration.
+
+	* thread.h: Use ifdef guard name consistent with other header files.
+
+2005-07-02  Christopher Faylor  <cgf@timesys.com>
+
 	* include/cygwin/version.h: Bump DLL minor number to 19.
 
 2005-06-30  Corinna Vinschen  <corinna@vinschen.de>

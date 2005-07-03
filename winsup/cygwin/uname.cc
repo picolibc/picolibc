@@ -14,6 +14,7 @@ details. */
 #include <stdio.h>
 #include <sys/utsname.h>
 #include "cygwin_version.h"
+#include "cygtls.h"
 
 /* uname: POSIX 4.4.1.1 */
 extern "C" int
@@ -21,7 +22,8 @@ uname (struct utsname *name)
 {
   SYSTEM_INFO sysinfo;
 
-  if (check_null_invalid_struct_errno (name))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
 
   char *snp = strstr  (cygwin_version.dll_build_date, "SNP");

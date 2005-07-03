@@ -7,6 +7,9 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include <sys/time.h>
+#define USE_SYS_TYPES_FD_SET
+#include <winsock.h>
 #include "thread.h"
 #include "cygtls.h"
 #include "assert.h"

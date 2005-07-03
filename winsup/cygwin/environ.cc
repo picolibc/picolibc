@@ -331,20 +331,18 @@ _addenv (const char *name, const char *value, int overwrite)
 extern "C" int
 putenv (char *str)
 {
-  int res;
-  if ((res = check_null_empty_str (str)))
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+  if (*str)
     {
-      if (res == ENOENT)
-	return 0;
-      set_errno (res);
-      return  -1;
-    }
-  char *eq = strchr (str, '=');
-  if (eq)
-    return _addenv (str, eq + 1, -1);
+      char *eq = strchr (str, '=');
+      if (eq)
+	return _addenv (str, eq + 1, -1);
 
-  /* Remove str from the environment. */
-  unsetenv (str);
+      /* Remove str from the environment. */
+      unsetenv (str);
+    }
   return 0;
 }
 
@@ -353,19 +351,11 @@ putenv (char *str)
 extern "C" int
 setenv (const char *name, const char *value, int overwrite)
 {
-  int res;
-  if ((res = check_null_empty_str (value)) == EFAULT)
-    {
-      set_errno (res);
-      return  -1;
-    }
-  if ((res = check_null_empty_str (name)))
-    {
-      if (res == ENOENT)
-	return 0;
-      set_errno (res);
-      return  -1;
-    }
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+  if (!*name)
+    return 0;
   if (*value == '=')
     value++;
   return _addenv (name, value, !!overwrite);

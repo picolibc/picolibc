@@ -19,6 +19,7 @@ details. */
 #include <winbase.h>
 #include <winnls.h>
 #include "cygthread.h"
+#include "cygtls.h"
 
 long tls_ix = -1;
 
@@ -146,76 +147,6 @@ strcasestr (const char *searchee, const char *lookfor)
 }
 
 int __stdcall
-check_null_str (const char *name)
-{
-  if (name && !IsBadStringPtr (name, CYG_MAX_PATH))
-    return 0;
-
-  return EFAULT;
-}
-
-int __stdcall
-check_null_empty_str (const char *name)
-{
-  if (name && !IsBadStringPtr (name, CYG_MAX_PATH))
-    return !*name ? ENOENT : 0;
-
-  return EFAULT;
-}
-
-int __stdcall
-check_null_empty_str_errno (const char *name)
-{
-  int __err;
-  if ((__err = check_null_empty_str (name)))
-    set_errno (__err);
-  return __err;
-}
-
-int __stdcall
-check_null_str_errno (const char *name)
-{
-  int __err;
-  if ((__err = check_null_str (name)))
-    set_errno (__err);
-  return __err;
-}
-
-int __stdcall
-__check_null_invalid_struct (void *s, unsigned sz)
-{
-  if (s && !IsBadWritePtr (s, sz))
-    return 0;
-
-  return EFAULT;
-}
-
-int __stdcall
-__check_null_invalid_struct_errno (void *s, unsigned sz)
-{
-  int err;
-  if ((err = __check_null_invalid_struct (s, sz)))
-    set_errno (err);
-  return err;
-}
-
-int __stdcall
-__check_invalid_read_ptr (const void *s, unsigned sz)
-{
-  if (s && !IsBadReadPtr (s, sz))
-    return 0;
-  return EFAULT;
-}
-
-int __stdcall
-__check_invalid_read_ptr_errno (const void *s, unsigned sz)
-{
-  if (s && !IsBadReadPtr (s, sz))
-    return 0;
-  return set_errno (EFAULT);
-}
-
-int __stdcall
 check_invalid_virtual_addr (const void *s, unsigned sz)
 {
   MEMORY_BASIC_INFORMATION mbuf;
@@ -228,43 +159,13 @@ check_invalid_virtual_addr (const void *s, unsigned sz)
   return 0;
 }
 
-ssize_t
-check_iovec_for_read (const struct iovec *iov, int iovcnt)
+static char __attribute__ ((noinline))
+dummytest (volatile char *p)
 {
-  if (iovcnt <= 0 || iovcnt > IOV_MAX)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-
-  if (__check_invalid_read_ptr_errno (iov, iovcnt * sizeof (*iov)))
-    return -1;
-
-  size_t tot = 0;
-
-  while (iovcnt != 0)
-    {
-      if (iov->iov_len > SSIZE_MAX || (tot += iov->iov_len) > SSIZE_MAX)
-	{
-	  set_errno (EINVAL);
-	  return -1;
-	}
-
-      if (iov->iov_len
-	  && __check_null_invalid_struct_errno (iov->iov_base, iov->iov_len))
-	return -1;
-
-      iov += 1;
-      iovcnt -= 1;
-    }
-
-  assert (tot <= SSIZE_MAX);
-
-  return (ssize_t) tot;
+  return *p;
 }
-
 ssize_t
-check_iovec_for_write (const struct iovec *iov, int iovcnt)
+check_iovec (const struct iovec *iov, int iovcnt, bool forwrite)
 {
   if (iovcnt <= 0 || iovcnt > IOV_MAX)
     {
@@ -272,7 +173,8 @@ check_iovec_for_write (const struct iovec *iov, int iovcnt)
       return -1;
     }
 
-  if (__check_invalid_read_ptr_errno (iov, iovcnt * sizeof (*iov)))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
 
   size_t tot = 0;
@@ -285,12 +187,16 @@ check_iovec_for_write (const struct iovec *iov, int iovcnt)
 	  return -1;
 	}
 
-      if (iov->iov_len
-	  && __check_invalid_read_ptr_errno (iov->iov_base, iov->iov_len))
-	return -1;
+      volatile char *p = ((char *) iov->iov_base) + iov->iov_len - 1;
+      if (!iov->iov_len)
+	/* nothing to do */;
+      else if (!forwrite)
+	*p  = dummytest (p);
+      else
+	(void) dummytest (p);
 
-      iov += 1;
-      iovcnt -= 1;
+      iov++;
+      iovcnt--;
     }
 
   assert (tot <= SSIZE_MAX);

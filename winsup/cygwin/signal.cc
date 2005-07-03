@@ -147,17 +147,15 @@ handle_sigprocmask (int how, const sigset_t *set, sigset_t *oldset, sigset_t& op
       return -1;
     }
 
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+
   if (oldset)
-    {
-      if (check_null_invalid_struct_errno (oldset))
-	return -1;
-      *oldset = opmask;
-    }
+    *oldset = opmask;
 
   if (set)
     {
-      if (check_invalid_read_struct_errno (set))
-	return -1;
       sigset_t newmask = opmask;
       switch (how)
 	{

@@ -166,19 +166,16 @@ pselect(int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   struct timeval tv;
   sigset_t oldset = myself->getsigmask ();
 
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
   if (ts)
     {
-      if (check_invalid_read_struct_errno (ts))
-	return -1;
       tv.tv_sec = ts->tv_sec;
       tv.tv_usec = ts->tv_nsec / 1000;
     }
   if (set)
-    {
-      if (check_invalid_read_struct_errno (set))
-	return -1;
-      set_signal_mask (*set);
-    }
+    set_signal_mask (*set);
   int ret = cygwin_select (maxfds, readfds, writefds, exceptfds,
 			   ts ? &tv : NULL);
   if (set)

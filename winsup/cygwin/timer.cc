@@ -216,10 +216,10 @@ timer_tracker::settime (int in_flags, const itimerspec *value, itimerspec *ovalu
       return -1;
     }
 
-  if (__check_invalid_read_ptr_errno (value, sizeof (*value))
+  myfault efault;
+  if (efault.faulted (EFAULT)
       || it_bad (value->it_value)
-      || it_bad (value->it_interval)
-      || (ovalue && check_null_invalid_struct_errno (ovalue)))
+      || it_bad (value->it_interval))
     return -1;
 
   long long now = in_flags & TIMER_ABSTIME ? 0 : gtod.usecs (false);
@@ -271,11 +271,12 @@ timer_tracker::gettime (itimerspec *ovalue)
 extern "C" int
 timer_gettime (timer_t timerid, struct itimerspec *ovalue)
 {
-  if (check_null_invalid_struct_errno (ovalue))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
 
   timer_tracker *tt = (timer_tracker *) timerid;
-  if (check_null_invalid_struct (tt) || tt->magic != TT_MAGIC)
+  if (tt->magic != TT_MAGIC)
     {
       set_errno (EINVAL);
       return -1;
@@ -288,8 +289,8 @@ timer_gettime (timer_t timerid, struct itimerspec *ovalue)
 extern "C" int
 timer_create (clockid_t clock_id, struct sigevent *evp, timer_t *timerid)
 {
-  if (evp && check_null_invalid_struct_errno (evp)
-      || check_null_invalid_struct_errno (timerid))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
   if (clock_id != CLOCK_REALTIME)
     {
@@ -306,7 +307,10 @@ timer_settime (timer_t timerid, int flags, const struct itimerspec *value,
 	       struct itimerspec *ovalue)
 {
   timer_tracker *tt = (timer_tracker *) timerid;
-  if (check_null_invalid_struct (tt) || tt->magic != TT_MAGIC)
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+  if (tt->magic != TT_MAGIC)
     {
       set_errno (EINVAL);
       return -1;
@@ -319,7 +323,10 @@ extern "C" int
 timer_delete (timer_t timerid)
 {
   timer_tracker *in_tt = (timer_tracker *) timerid;
-  if (check_null_invalid_struct (in_tt) || in_tt->magic != TT_MAGIC)
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+  if (in_tt->magic != TT_MAGIC)
     {
       set_errno (EINVAL);
       return -1;
@@ -386,7 +393,8 @@ getitimer (int which, struct itimerval *ovalue)
       set_errno (EINVAL);
       return -1;
     }
-  if (check_null_invalid_struct_errno (ovalue))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
   struct itimerspec spec_ovalue;
   int ret = timer_gettime ((timer_t) &ttstart, &spec_ovalue);

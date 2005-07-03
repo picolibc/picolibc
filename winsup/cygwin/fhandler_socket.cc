@@ -35,6 +35,7 @@
 #include "wininfo.h"
 #include <unistd.h>
 #include <sys/acl.h>
+#include "cygtls.h"
 
 #define ASYNC_MASK (FD_READ|FD_WRITE|FD_OOB|FD_ACCEPT|FD_CONNECT)
 
@@ -1659,11 +1660,14 @@ fhandler_socket::getpeereid (pid_t *pid, __uid32_t *euid, __gid32_t *egid)
       return -1;
     }
 
-  if (!check_null_invalid_struct (pid))
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+  if (pid)
     *pid = sec_peer_pid;
-  if (!check_null_invalid_struct (euid))
+  if (euid)
     *euid = sec_peer_uid;
-  if (!check_null_invalid_struct (egid))
+  if (egid)
     *egid = sec_peer_gid;
   return 0;
 }

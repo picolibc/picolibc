@@ -12,11 +12,11 @@ details. */
 #include "cygerrno.h"
 #include <signal.h>
 #ifdef USE_SERVER
-#include <sys/types.h>
 #include <stdio.h>
 #include <unistd.h>
 
 #include "sigproc.h"
+#include "cygtls.h"
 
 #include "cygserver_ipc.h"
 #include "cygserver_msg.h"
@@ -100,31 +100,20 @@ msgctl (int msqid, int cmd, struct msqid_ds *buf)
 #ifdef USE_SERVER
   syscall_printf ("msgctl (msqid = %d, cmd = 0x%x, buf = %p)",
 		  msqid, cmd, buf);
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
   switch (cmd)
     {
       case IPC_STAT:
-	if (__check_null_invalid_struct_errno (buf, sizeof *buf))
-	  return -1;
 	break;
       case IPC_SET:
-	if (__check_invalid_read_ptr_errno (buf, sizeof *buf))
-	  return -1;
 	break;
       case IPC_RMID:
 	break;
       case IPC_INFO:
-	/* msqid == 0: Request for msginfo struct. */
-	if (!msqid
-	    && __check_null_invalid_struct_errno (buf, sizeof (struct msginfo)))
-	    return -1;
-	/* Otherwise, request msqid entries from internal msqid_ds array. */
-	if (msqid)
-	  if (__check_null_invalid_struct_errno (buf, msqid * sizeof (struct msqid_ds)))
-	    return -1;
 	break;
       case MSG_INFO:
-	if (__check_null_invalid_struct_errno (buf, sizeof (struct msg_info)))
-	  return -1;
 	break;
       default:
 	syscall_printf ("-1 [%d] = msgctl ()", EINVAL);
@@ -177,7 +166,8 @@ msgrcv (int msqid, void *msgp, size_t msgsz, long msgtyp, int msgflg)
   syscall_printf ("msgrcv (msqid = %d, msgp = %p, msgsz = %d, "
 		  "msgtyp = %d, msgflg = 0x%x)",
 		  msqid, msgp, msgsz, msgtyp, msgflg);
-  if (__check_null_invalid_struct_errno (msgp, msgsz))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
   client_request_msg request (msqid, msgp, msgsz, msgtyp, msgflg);
   if (request.make_request () == -1 || request.rcvval () == -1)
@@ -202,7 +192,8 @@ msgsnd (int msqid, const void *msgp, size_t msgsz, int msgflg)
 #ifdef USE_SERVER
   syscall_printf ("msgsnd (msqid = %d, msgp = %p, msgsz = %d, msgflg = 0x%x)",
 		  msqid, msgp, msgsz, msgflg);
-  if (__check_invalid_read_ptr_errno (msgp, msgsz))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
   client_request_msg request (msqid, msgp, msgsz, msgflg);
   if (request.make_request () == -1 || request.retval () == -1)

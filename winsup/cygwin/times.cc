@@ -53,7 +53,8 @@ times (struct tms *buf)
 {
   FILETIME creation_time, exit_time, kernel_time, user_time;
 
-  if (check_null_invalid_struct_errno (buf))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return ((clock_t) -1);
 
   DWORD ticks = GetTickCount ();

@@ -542,6 +542,12 @@ path_conv::check (const char *src, unsigned opt,
     }
 #endif
 
+  myfault efault;
+  if (efault.faulted ())
+    {
+      error = EFAULT;
+      return;
+    }
   int loop = 0;
   path_flags = 0;
   known_suffix = NULL;
@@ -554,8 +560,12 @@ path_conv::check (const char *src, unsigned opt,
 
   if (!(opt & PC_NULLEMPTY))
     error = 0;
-  else if ((error = check_null_empty_str (src)))
-    return;
+  else if (!*src)
+    {
+      error = ENOENT;
+      return;
+    }
+
   /* This loop handles symlink expansion.  */
   for (;;)
     {
@@ -2473,8 +2483,11 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
 {
   int res = -1;
 
-  if (check_null_empty_str_errno (posix_path))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     /* errno set */;
+  else if (!*posix_path || !*win32_path)
+    set_errno (EINVAL);
   else if (strpbrk (posix_path, "\\:"))
     set_errno (EINVAL);
   else if (flags & MOUNT_CYGDRIVE) /* normal mount */
@@ -2485,7 +2498,7 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
       res = mount_table->write_cygdrive_info_to_registry (posix_path, flags);
       win32_path = NULL;
     }
-  else if (!check_null_empty_str_errno (win32_path))
+  else
     res = mount_table->add_item (win32_path, posix_path, flags, true);
 
   syscall_printf ("%d = mount (%s, %s, %p)", res, win32_path, posix_path, flags);
@@ -2500,8 +2513,14 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
 extern "C" int
 umount (const char *path)
 {
-  if (check_null_empty_str_errno (path))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
+  if (!*path)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
   return cygwin_umount (path, 0);
 }
 
@@ -2619,9 +2638,14 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
   /* POSIX says that empty 'frompath' is invalid input while empty
      'topath' is valid -- it's symlink resolver job to verify if
      symlink contents point to existing filesystem object */
-  if (check_null_empty_str_errno (topath) == EFAULT ||
-      check_null_empty_str_errno (frompath))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     goto done;
+  if (!*topath || !*frompath)
+    {
+      set_errno (EINVAL);
+      goto done;
+    }
 
   if (strlen (topath) >= CYG_MAX_PATH)
     {
@@ -3424,9 +3448,12 @@ char *
 getcwd (char *buf, size_t ulen)
 {
   char* res = NULL;
-  if (ulen == 0 && buf)
+  myfault efault;
+  if (efault.faulted (EFAULT))
+      /* errno set */;
+  else if (ulen == 0 && buf)
     set_errno (EINVAL);
-  else if (buf == NULL || !__check_null_invalid_struct_errno (buf, ulen))
+  else
     res = cygheap->cwd.get (buf, 1, 1, ulen);
   return res;
 }
@@ -3442,8 +3469,14 @@ getwd (char *buf)
 extern "C" int
 chdir (const char *in_dir)
 {
-  if (check_null_empty_str_errno (in_dir))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
+  if (!*in_dir)
+    {
+      set_errno (ENOENT);
+      return -1;
+    }
 
   syscall_printf ("dir '%s'", in_dir);
 
@@ -3566,16 +3599,28 @@ cygwin_conv_to_full_win32_path (const char *path, char *win32_path)
 extern "C" int
 cygwin_conv_to_posix_path (const char *path, char *posix_path)
 {
-  if (check_null_empty_str_errno (path))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
+  if (!*path)
+    {
+      set_errno (ENOENT);
+      return -1;
+    }
   return_with_errno (mount_table->conv_to_posix_path (path, posix_path, 1));
 }
 
 extern "C" int
 cygwin_conv_to_full_posix_path (const char *path, char *posix_path)
 {
-  if (check_null_empty_str_errno (path))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
+  if (!*path)
+    {
+      set_errno (ENOENT);
+      return -1;
+    }
   return_with_errno (mount_table->conv_to_posix_path (path, posix_path, 0));
 }
 

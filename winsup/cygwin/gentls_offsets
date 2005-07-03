@@ -41,7 +41,7 @@ print TMP <<EOF;
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
-typedef void *HANDLE;
+#include <windows.h>
 $pre
 $def
 int

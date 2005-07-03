@@ -403,6 +403,7 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
 {
   static bool NO_COPY debugging;
   static int NO_COPY recursed;
+  _cygtls& me = _my_tls;
 
   if (debugging && ++debugging < 500000)
     {
@@ -520,11 +521,12 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
 	break;
       }
 
-  if (!cygwin_finished_initializing
-      || GetCurrentThreadId () == sigtid
-      || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_DFL
-      || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_IGN
-      || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_ERR)
+  if (!me.fault_guarded ()
+      && (!cygwin_finished_initializing
+	  || GetCurrentThreadId () == sigtid
+	  || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_DFL
+	  || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_IGN
+	  || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_ERR))
     {
       /* Print the exception to the console */
       if (!myself->cygstarted)
@@ -559,11 +561,14 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
   RtlUnwind (frame, ret_here, e0, 0);
   __asm__ volatile (".equ _ret_here,.");
 
+  if (me.fault_guarded ())
+    me.return_from_fault ();
+
   si.si_addr = ebp;
   si.si_code = SI_KERNEL;
   si.si_errno = si.si_pid = si.si_uid = 0;
-  _my_tls.push ((__stack_t) ebp, true);
-  sig_send (NULL, si, &_my_tls);	// Signal myself
+  me.push ((__stack_t) ebp, true);
+  sig_send (NULL, si, &me);	// Signal myself
   return 1;
 }
 

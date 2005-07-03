@@ -16,8 +16,34 @@ details. */
 #define _NOMNTENT_FUNCS
 #include <mntent.h>
 #undef _NOMNTENT_FUNCS
-#define USE_SYS_TYPES_FD_SET
-#include <winsock.h>
+#include <setjmp.h>
+
+#ifndef _WINSOCK_H
+/* Stupid hack: Including winsock.h explicitly causes too many problems. */
+struct sockaddr_in
+{
+  short   sin_family;
+  u_short sin_port;
+  struct in_addr
+  {
+    union
+    {
+      struct
+      {
+	u_char s_b1, s_b2, s_b3, s_b4;
+      } S_un_b;
+      struct
+      {
+	u_short s_w1, s_w2;
+      } S_un_w;
+      u_long S_addr;
+    } S_un;
+  };
+  struct  in_addr sin_addr;
+  char    sin_zero[8];
+};
+typedef unsigned int SOCKET;
+#endif
 
 #define CYGTLS_INITIALIZED 0x43227
 #define CYGTLS_EXCEPTION (0x43227 + true)
@@ -118,6 +144,12 @@ typedef struct struct_waitq
    of the compiler used to generate tlsoffsets.h and the cygwin cross compiler.
 */
 
+/*gentls_offsets*/
+#include "cygerrno.h"
+
+extern "C" int __sjfault (jmp_buf);
+/*gentls_offsets*/
+
 typedef __uint32_t __stack_t;
 struct _cygtls
 {
@@ -142,6 +174,8 @@ struct _cygtls
     };
   struct _local_storage locals;
   class cygthread *_ctinfo;
+  void *_myfault;
+  int _myfault_errno;
   waitq wq;
   struct _cygtls *prev, *next;
   __stack_t *stackptr;
@@ -172,7 +206,9 @@ struct _cygtls
 				  struct sigaction& siga)
     __attribute__((regparm(3)));
   void init_threadlist_exceptions (struct _exception_list *);
+#ifdef _THREAD_H
   operator HANDLE () const {return tid->win32_obj_id;}
+#endif
   void set_siginfo (struct sigpacket *) __attribute__ ((regparm (3)));
   void set_threadkill () {threadkill = true;}
   void reset_threadkill () {threadkill = false;}
@@ -182,6 +218,26 @@ struct _cygtls
   void lock () __attribute__ ((regparm (1)));
   void unlock () __attribute__ ((regparm (1)));
   bool locked () __attribute__ ((regparm (1)));
+  void*& fault_guarded () {return _myfault;}
+  void return_from_fault ()
+  {
+    if (_myfault_errno)
+      set_errno (_myfault_errno);
+    longjmp ((int *) _myfault, 1);
+  }
+  int setup_fault (jmp_buf j, int myerrno) __attribute__ ((always_inline))
+  {
+    if (_myfault)
+      return 0;
+    _myfault = (void *) j;
+    _myfault_errno = myerrno;
+    return __sjfault (j);
+  }
+  void clear_fault (jmp_buf j) __attribute__ ((always_inline))
+  {
+    if (j == _myfault)
+      _myfault = NULL;
+  }
   /*gentls_offsets*/
 };
 #pragma pack(pop)
@@ -190,6 +246,22 @@ extern char *_tlsbase __asm__ ("%fs:4");
 extern char *_tlstop __asm__ ("%fs:8");
 #define _my_tls (((_cygtls *) _tlsbase)[-1])
 extern _cygtls *_main_tls;
+
+/*gentls_offsets*/
+class myfault
+{
+  jmp_buf buf;
+public:
+  ~myfault () __attribute__ ((always_inline))
+    {
+      _my_tls.clear_fault (buf);
+    }
+  inline int faulted (int myerrno = 0) __attribute__ ((always_inline))
+  {
+    return _my_tls.setup_fault (buf, myerrno);
+  }
+};
+/*gentls_offsets*/
 
 #define __getreent() (&_my_tls.local_clib)
 

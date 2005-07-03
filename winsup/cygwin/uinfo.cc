@@ -169,9 +169,9 @@ getlogin_r (char *name, size_t namesize)
   size_t len = strlen (login) + 1;
   if (len > namesize)
     return ERANGE;
-  int err = __check_null_invalid_struct (name, len);
-  if (err)
-    return err;
+  myfault efault;
+  if (efault.faulted ())
+    return EFAULT;
   strncpy (name, login, len);
   return 0;
 }

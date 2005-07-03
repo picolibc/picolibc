@@ -1771,7 +1771,8 @@ semaphore::_timedwait (const struct timespec *abstime)
   struct timeval tv;
   long waitlength;
 
-  if (__check_invalid_read_ptr (abstime, sizeof *abstime))
+  myfault efault;
+  if (efault.faulted ())
     {
       /* According to SUSv3, abstime need not be checked for validity,
 	 if the semaphore can be locked immediately. */
@@ -3233,9 +3234,8 @@ semaphore::post (sem_t *sem)
 int
 semaphore::getvalue (sem_t *sem, int *sval)
 {
-
-  if (!is_good_object (sem)
-      || __check_null_invalid_struct (sval, sizeof (int)))
+  myfault efault;
+  if (efault.faulted () || !is_good_object (sem))
     {
       set_errno (EINVAL);
       return -1;

@@ -199,7 +199,8 @@ cygwin_internal (cygwin_getinfo_types t, ...)
       case CW_SET_CYGWIN_REGISTRY_NAME:
 	{
 	  const char *cr = va_arg (arg, char *);
-	  if (check_null_empty_str_errno (cr))
+	  myfault efault;
+	  if (efault.faulted (EFAULT) || !*cr)
 	    return (DWORD) NULL;
 	  cygheap->cygwin_regname = (char *) crealloc (cygheap->cygwin_regname,
 						       strlen (cr) + 1);

@@ -266,26 +266,11 @@ void __stdcall set_console_title (char *);
 void init_console_handler (BOOL);
 void init_global_security ();
 
-int __stdcall check_null_str (const char *name) __attribute__ ((regparm(1)));
-int __stdcall check_null_empty_str (const char *name) __attribute__ ((regparm(1)));
-int __stdcall check_null_empty_str_errno (const char *name) __attribute__ ((regparm(1)));
-int __stdcall check_null_str_errno (const char *name) __attribute__ ((regparm(1)));
-int __stdcall __check_null_invalid_struct (void *s, unsigned sz) __attribute__ ((regparm(2)));
-int __stdcall __check_null_invalid_struct_errno (void *s, unsigned sz) __attribute__ ((regparm(2)));
-int __stdcall __check_invalid_read_ptr (const void *s, unsigned sz) __attribute__ ((regparm(2)));
-int __stdcall __check_invalid_read_ptr_errno (const void *s, unsigned sz) __attribute__ ((regparm(2)));
 int __stdcall check_invalid_virtual_addr (const void *s, unsigned sz) __attribute__ ((regparm(2)));
 
-#define check_null_invalid_struct(s) \
-  __check_null_invalid_struct ((s), sizeof (*(s)))
-#define check_null_invalid_struct_errno(s) \
-  __check_null_invalid_struct_errno ((s), sizeof (*(s)))
-#define check_invalid_read_struct_errno(s) \
-  __check_invalid_read_ptr_errno ((s), sizeof (*(s)))
-
-struct iovec;
-ssize_t check_iovec_for_read (const struct iovec *, int) __attribute__ ((regparm(2)));
-ssize_t check_iovec_for_write (const struct iovec *, int) __attribute__ ((regparm(2)));
+ssize_t check_iovec (const struct iovec *, int, bool) __attribute__ ((regparm(3)));
+#define check_iovec_for_read(a, b) check_iovec ((a), (b), false)
+#define check_iovec_for_write(a, b) check_iovec ((a), (b), true)
 
 #define set_winsock_errno() __set_winsock_errno (__FUNCTION__, __LINE__)
 void __set_winsock_errno (const char *fn, int ln) __attribute__ ((regparm(2)));

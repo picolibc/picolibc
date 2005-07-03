@@ -550,7 +550,12 @@ open (const char *unix_path, int flags, ...)
   sig_dispatch_pending ();
 
   syscall_printf ("open (%s, %p)", unix_path, flags);
-  if (!check_null_empty_str_errno (unix_path))
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    /* errno already set */;
+  else if (!*unix_path)
+    set_errno (ENOENT);
+  else
     {
       /* check for optional mode argument */
       va_start (ap, flags);
@@ -1008,7 +1013,8 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow)
   int res = -1;
   fhandler_base *fh = NULL;
 
-  if (check_null_invalid_struct_errno (buf))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     goto error;
 
   if (!(fh = build_fh_name (name, NULL, nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW,
@@ -1299,13 +1305,14 @@ system (const char *cmdstring)
 {
   pthread_testcancel ();
 
-  if (check_null_empty_str_errno (cmdstring))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
 
   int res;
   const char* command[4];
 
-  if (cmdstring == (const char *) NULL)
+  if (cmdstring == NULL)
     return 1;
 
   command[0] = "sh";
@@ -1437,11 +1444,17 @@ fpathconf (int fd, int v)
 extern "C" long int
 pathconf (const char *file, int v)
 {
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+  if (!*file)
+    {
+      set_errno (ENOENT);
+      return -1;
+    }
   switch (v)
     {
     case _PC_PATH_MAX:
-      if (check_null_empty_str_errno (file))
-	  return -1;
       return PATH_MAX - strlen (file);
     case _PC_NAME_MAX:
       return PATH_MAX;
@@ -1483,8 +1496,9 @@ extern "C" int
 ttyname_r (int fd, char *buf, size_t buflen)
 {
   int ret = 0;
-  if (__check_null_invalid_struct (buf, buflen))
-    ret = EINVAL;
+  myfault efault;
+  if (efault.faulted ())
+    ret = EFAULT;
   else
     {
       cygheap_fdget cfd (fd, true);
@@ -1713,9 +1727,14 @@ statvfs (const char *fname, struct statvfs *sfs)
   int ret = -1;
   char root[CYG_MAX_PATH];
 
-  if (check_null_empty_str_errno (fname)
-      || check_null_invalid_struct_errno (sfs))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
+  if (!*fname)
+    {
+      set_errno (ENOENT);
+      return -1;
+    }
 
   syscall_printf ("statfs %s", fname);
 
@@ -1798,7 +1817,8 @@ fstatvfs (int fd, struct statvfs *sfs)
 extern "C" int
 statfs (const char *fname, struct statfs *sfs)
 {
-  if (check_null_invalid_struct_errno (sfs))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
   struct statvfs vfs;
   int ret = statvfs (fname, &vfs);
@@ -1837,33 +1857,27 @@ setpgid (pid_t pid, pid_t pgid)
     pgid = pid;
 
   if (pgid < 0)
-    {
-      set_errno (EINVAL);
-      goto out;
-    }
+    set_errno (EINVAL);
   else
     {
       pinfo p (pid, PID_MAP_RW);
       if (!p)
-	{
-	  set_errno (ESRCH);
-	  goto out;
-	}
+	set_errno (ESRCH);
+      else if (p->pgid == pgid)
+	res = 0;
       /* A process may only change the process group of itself and its children */
-      if (p == myself || p->ppid == myself->pid)
+      else if (p != myself && p->ppid != myself->pid)
+	set_errno (EPERM);
+      else
 	{
 	  p->pgid = pgid;
 	  if (p->pid != p->pgid)
 	    p->set_has_pgid_children (0);
 	  res = 0;
-	}
-      else
-	{
-	  set_errno (EPERM);
-	  goto out;
+	  // init_console_handler (FALSE);
 	}
     }
-out:
+
   syscall_printf ("pid %d, pgid %d, res %d", pid, pgid, res);
   return res;
 }
@@ -1924,8 +1938,14 @@ mknod_worker (const char *path, mode_t type, mode_t mode, _major_t major,
 extern "C" int
 mknod32 (const char *path, mode_t mode, __dev32_t dev)
 {
-  if (check_null_empty_str_errno (path))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
+  if (!*path)
+    {
+      set_errno (ENOENT);
+      return -1;
+    }
 
   if (strlen (path) >= CYG_MAX_PATH)
     return -1;
@@ -2627,7 +2647,8 @@ endutent ()
 extern "C" void
 utmpname (const char *file)
 {
-  if (check_null_empty_str (file))
+  myfault efault;
+  if (efault.faulted () || !*file)
     {
       debug_printf ("Invalid file");
       return;
@@ -2678,7 +2699,8 @@ getutent ()
 extern "C" struct utmp *
 getutid (struct utmp *id)
 {
-  if (check_null_invalid_struct_errno (id))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return NULL;
   if (utmp_fd < 0)
     {
@@ -2716,7 +2738,8 @@ getutid (struct utmp *id)
 extern "C" struct utmp *
 getutline (struct utmp *line)
 {
-  if (check_null_invalid_struct_errno (line))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return NULL;
   if (utmp_fd < 0)
     {
@@ -2738,7 +2761,8 @@ getutline (struct utmp *line)
 extern "C" struct utmp *
 pututline (struct utmp *ut)
 {
-  if (check_null_invalid_struct (ut))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return NULL;
   internal_setutent (true);
   if (utmp_fd < 0)
@@ -2786,7 +2810,8 @@ getutxid (const struct utmpx *id)
 {
   static struct utmpx utx;
 
-  if (__check_invalid_read_ptr (id, sizeof *id))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return NULL;
   ((struct utmpx *)id)->ut_time = id->ut_tv.tv_sec;
   return copy_ut_to_utx (getutid ((struct utmp *) id), &utx);
@@ -2797,7 +2822,8 @@ getutxline (const struct utmpx *line)
 {
   static struct utmpx utx;
 
-  if (__check_invalid_read_ptr (line, sizeof *line))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return NULL;
   ((struct utmpx *)line)->ut_time = line->ut_tv.tv_sec;
   return copy_ut_to_utx (getutline ((struct utmp *) line), &utx);
@@ -2808,7 +2834,8 @@ pututxline (const struct utmpx *utmpx)
 {
   static struct utmpx utx;
 
-  if (__check_invalid_read_ptr (utmpx, sizeof *utmpx))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return NULL;
   ((struct utmpx *)utmpx)->ut_time = utmpx->ut_tv.tv_sec;
   return copy_ut_to_utx (pututline ((struct utmp *) utmpx), &utx);

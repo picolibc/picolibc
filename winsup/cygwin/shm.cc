@@ -22,6 +22,7 @@ details. */
 
 #include "cygserver_ipc.h"
 #include "cygserver_shm.h"
+#include "cygtls.h"
 
 /*
  * client_request_shm Constructors
@@ -244,28 +245,9 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
 #ifdef USE_SERVER
   syscall_printf ("shmctl (shmid = %d, cmd = %d, buf = 0x%x)",
 		  shmid, cmd, buf);
-  switch (cmd)
-    {
-      case IPC_STAT:
-      case IPC_SET:
-	if (__check_null_invalid_struct_errno (buf, sizeof (struct shmid_ds)))
-	  return -1;
-	break;
-      case IPC_INFO:
-	/* shmid == 0: Request for shminfo struct. */
-	if (!shmid
-	    && __check_null_invalid_struct_errno (buf, sizeof (struct shminfo)))
-	    return -1;
-	/* Otherwise, request shmid entries from internal shmid_ds array. */
-	if (shmid)
-	  if (__check_null_invalid_struct_errno (buf, shmid * sizeof (struct shmid_ds)))
-	    return -1;
-	break;
-      case SHM_INFO:
-	if (__check_null_invalid_struct_errno (buf, sizeof (struct shm_info)))
-	  return -1;
-	break;
-    }
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
   client_request_shm request (shmid, cmd, buf);
   if (request.make_request () == -1 || request.retval () == -1)
     {

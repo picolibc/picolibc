@@ -271,8 +271,9 @@ EOF
 sub longjmp {
     return <<EOF;
 
-	.globl	_setjmp
+	.globl	_setjmp, ___sjfault
 _setjmp:
+___sjfault:
 	pushl	%ebp
 	movl	%esp,%ebp
 	pushl	%edi

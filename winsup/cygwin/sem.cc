@@ -21,6 +21,7 @@ details. */
 
 #include "cygserver_ipc.h"
 #include "cygserver_sem.h"
+#include "cygtls.h"
 
 /*
  * client_request_sem Constructors
@@ -93,22 +94,8 @@ semctl (int semid, int semnum, int cmd, ...)
     }
   syscall_printf ("semctl (semid = %d, semnum = %d, cmd = %d, arg.val = 0x%x)",
 		  semid, semnum, cmd, arg.val);
-  if ((cmd == IPC_STAT || cmd == IPC_SET)
-      && __check_null_invalid_struct_errno (arg.buf, sizeof (struct semid_ds)))
-    return -1;
-  if (cmd == IPC_INFO)
-    {
-      /* semid == 0: Request for seminfo struct. */
-      if (!semid
-	  && __check_null_invalid_struct_errno (arg.buf, sizeof (struct seminfo)))
-	  return -1;
-      /* Otherwise, request semid entries from internal semid_ds array. */
-      if (semid)
-	if (__check_null_invalid_struct_errno (arg.buf, semid * sizeof (struct semid_ds)))
-	  return -1;
-    }
-  if (cmd == SEM_INFO
-      && __check_null_invalid_struct_errno (arg.buf, sizeof (struct sem_info)))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
   client_request_sem request (semid, semnum, cmd, &arg);
   if (request.make_request () == -1 || request.retval () == -1)
@@ -156,7 +143,8 @@ semop (int semid, struct sembuf *sops, size_t nsops)
 #ifdef USE_SERVER
   syscall_printf ("semop (semid = %d, sops = %p, nsops = %d)",
 		  semid, sops, nsops);
-  if (__check_null_invalid_struct_errno (sops, nsops * sizeof (struct sembuf)))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
   client_request_sem request (semid, sops, nsops);
   if (request.make_request () == -1 || request.retval () == -1)

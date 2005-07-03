@@ -134,7 +134,8 @@ cygwin_inet_ntoa (struct in_addr in)
 extern "C" unsigned long
 cygwin_inet_addr (const char *cp)
 {
-  if (check_null_str_errno (cp))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return INADDR_NONE;
   unsigned long res = inet_addr (cp);
 
@@ -147,7 +148,8 @@ cygwin_inet_addr (const char *cp)
 extern "C" int
 cygwin_inet_aton (const char *cp, struct in_addr *inp)
 {
-  if (check_null_str_errno (cp) || check_null_invalid_struct_errno (inp))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return 0;
 
   unsigned long res = inet_addr (cp);
@@ -165,7 +167,8 @@ extern "C" unsigned int WINAPI inet_network (const char *);
 extern "C" unsigned int
 cygwin_inet_network (const char *cp)
 {
-  if (check_null_str_errno (cp))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return INADDR_NONE;
   unsigned int res = inet_network (cp);
 
@@ -536,7 +539,8 @@ __dup_ent (unionent *&dst, unionent *src, struct_type type)
 extern "C" struct protoent *
 cygwin_getprotobyname (const char *p)
 {
-  if (check_null_str_errno (p))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return NULL;
   return (protoent *) dup_ent (protoent_buf, getprotobyname (p), t_protoent);
 }
@@ -625,9 +629,8 @@ cygwin_sendto (int fd, const void *buf, int len, int flags,
 
   fhandler_socket *fh = get (fd);
 
-  if ((len && __check_invalid_read_ptr_errno (buf, (unsigned) len))
-      || (to && __check_invalid_read_ptr_errno (to, tolen))
-      || !fh)
+  myfault efault;
+  if (efault.faulted (EFAULT) || !fh)
     res = -1;
   else if ((res = len) != 0)
     res = fh->sendto (buf, len, flags, to, tolen);
@@ -648,11 +651,8 @@ cygwin_recvfrom (int fd, void *buf, int len, int flags,
 
   fhandler_socket *fh = get (fd);
 
-  if ((len && __check_null_invalid_struct_errno (buf, (unsigned) len))
-      || (from
-	  && (check_null_invalid_struct_errno (fromlen)
-	      || __check_null_invalid_struct_errno (from, (unsigned) *fromlen)))
-      || !fh)
+  myfault efault;
+  if (efault.faulted (EFAULT) || !fh)
     res = -1;
   else if ((res = len) != 0)
     res = fh->recvfrom (buf, len, flags, from, fromlen);
@@ -707,7 +707,8 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 	break;
     }
 
-  if ((optval && __check_invalid_read_ptr_errno (optval, optlen)) || !fh)
+  myfault efault;
+  if (efault.faulted (EFAULT) || !fh)
     res = -1;
   else
     {
@@ -771,10 +772,8 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval, int *optlen)
 	name = "SO_PEERCRED";
     }
 
-  if ((optval
-       && (check_null_invalid_struct_errno (optlen)
-	   || __check_null_invalid_struct_errno (optval, (unsigned) *optlen)))
-      || !fh)
+  myfault efault;
+  if (efault.faulted (EFAULT) || !fh)
     res = -1;
   else if (optname == SO_PEERCRED)
     {
@@ -822,7 +821,8 @@ cygwin_connect (int fd, const struct sockaddr *name, int namelen)
 
   fhandler_socket *fh = get (fd);
 
-  if (__check_invalid_read_ptr_errno (name, namelen) || !fh)
+  myfault efault;
+  if (efault.faulted (EFAULT) || !fh)
     res = -1;
   else
     {
@@ -886,8 +886,8 @@ extern "C" struct servent *
 cygwin_getservbyname (const char *name, const char *proto)
 {
   sig_dispatch_pending ();
-  if (check_null_str_errno (name)
-      || (proto != NULL && check_null_str_errno (proto)))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return NULL;
 
   servent *res = (servent *) dup_ent (servent_buf, getservbyname (name, proto), t_servent);
@@ -900,7 +900,8 @@ extern "C" struct servent *
 cygwin_getservbyport (int port, const char *proto)
 {
   sig_dispatch_pending ();
-  if (proto != NULL && check_null_str_errno (proto))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return NULL;
 
   servent *res = (servent *) dup_ent (servent_buf, getservbyport (port, proto), t_servent);
@@ -912,7 +913,8 @@ extern "C" int
 cygwin_gethostname (char *name, size_t len)
 {
   sig_dispatch_pending ();
-  if (__check_null_invalid_struct_errno (name, len))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
 
   if (gethostname (name, len))
@@ -934,7 +936,8 @@ extern "C" struct hostent *
 cygwin_gethostbyname (const char *name)
 {
   sig_dispatch_pending ();
-  if (check_null_str_errno (name))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return NULL;
 
   unsigned char tmp_addr[4];
@@ -980,7 +983,8 @@ extern "C" struct hostent *
 cygwin_gethostbyaddr (const char *addr, int len, int type)
 {
   sig_dispatch_pending ();
-  if (__check_invalid_read_ptr_errno (addr, len))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return NULL;
 
   hostent *res = (hostent *) dup_ent (hostent_buf, gethostbyaddr (addr, len, type), t_hostent);
@@ -1000,9 +1004,8 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
 
   fhandler_socket *fh = get (fd);
 
-  if ((peer && (check_null_invalid_struct_errno (len)
-		|| __check_null_invalid_struct_errno (peer, (unsigned) *len)))
-      || !fh)
+  myfault efault;
+  if (efault.faulted (EFAULT) || !fh)
     res = -1;
   else
     {
@@ -1031,7 +1034,8 @@ cygwin_bind (int fd, const struct sockaddr *my_addr, int addrlen)
   sig_dispatch_pending ();
   fhandler_socket *fh = get (fd);
 
-  if (__check_invalid_read_ptr_errno (my_addr, addrlen) || !fh)
+  myfault efault;
+  if (efault.faulted (EFAULT) || !fh)
     res = -1;
   else
     res = fh->bind (my_addr, addrlen);
@@ -1049,9 +1053,8 @@ cygwin_getsockname (int fd, struct sockaddr *addr, int *namelen)
 
   fhandler_socket *fh = get (fd);
 
-  if (check_null_invalid_struct_errno (namelen)
-      || __check_null_invalid_struct_errno (addr, (unsigned) *namelen)
-      || !fh)
+  myfault efault;
+  if (efault.faulted (EFAULT) || !fh)
     res = -1;
   else
     res = fh->getsockname (addr, namelen);
@@ -1112,7 +1115,8 @@ cygwin_hstrerror (int err)
 extern "C" void
 cygwin_herror (const char *s)
 {
-  if (s && check_null_str (s))
+  myfault efault;
+  if (efault.faulted ())
     return;
   if (cygheap->fdtab.not_open (2))
     return;
@@ -1151,9 +1155,8 @@ cygwin_getpeername (int fd, struct sockaddr *name, int *len)
 
   fhandler_socket *fh = get (fd);
 
-  if (check_null_invalid_struct_errno (len)
-      || __check_null_invalid_struct_errno (name, (unsigned) *len)
-      || !fh)
+  myfault efault;
+  if (efault.faulted (EFAULT) || !fh)
     res = -1;
   else
     res = fh->getpeername (name, len);
@@ -1188,7 +1191,8 @@ getdomainname (char *domain, size_t len)
    * Punt for now and assume MS-TCP on Win95.
    */
   sig_dispatch_pending ();
-  if (__check_null_invalid_struct_errno (domain, len))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
 
   PFIXED_INFO info = NULL;
@@ -1801,7 +1805,8 @@ get_ifconf (struct ifconf *ifc, int what)
   struct sockaddr_in *sa;
 
   sig_dispatch_pending ();
-  if (check_null_invalid_struct_errno (ifc))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
 
   /* Union maps buffer to correct struct */
@@ -1880,11 +1885,14 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
 
   sig_dispatch_pending ();
 
-  if (check_null_invalid_struct_errno (ahost) ||
-      check_null_empty_str_errno (*ahost) ||
-      (locuser && check_null_empty_str_errno (locuser)) ||
-      (remuser && check_null_str_errno (remuser)))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return (int) INVALID_SOCKET;
+  if (!*locuser)
+    {
+      set_errno (EINVAL);
+      return (int) INVALID_SOCKET;
+    }
 
   res = rcmd (ahost, inport, locuser, remuser, cmd, fd2p ? &fd2s : NULL);
   if (res != (int) INVALID_SOCKET)
@@ -1932,7 +1940,8 @@ cygwin_rresvport (int *port)
   int res;
   sig_dispatch_pending ();
 
-  if (check_null_invalid_struct_errno (port))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
 
   res = rresvport (port);
@@ -1960,10 +1969,8 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
   SOCKET fd2s;
   sig_dispatch_pending ();
 
-  if (check_null_invalid_struct_errno (ahost) ||
-      check_null_empty_str_errno (*ahost) ||
-      (locuser && check_null_empty_str_errno (locuser)) ||
-      (password && check_null_str_errno (password)))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return (int) INVALID_SOCKET;
 
   res = rexec (ahost, inport, locuser, password, cmd, fd2p ? &fd2s : NULL);
@@ -2016,7 +2023,8 @@ socketpair (int family, int type, int protocol, int *sb)
   int len;
 
   sig_dispatch_pending ();
-  if (__check_null_invalid_struct_errno (sb, 2 * sizeof (int)))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
 
   if (family != AF_LOCAL && family != AF_INET)
@@ -2217,11 +2225,8 @@ cygwin_recvmsg (int fd, struct msghdr *msg, int flags)
 
   fhandler_socket *fh = get (fd);
 
-  if (check_null_invalid_struct_errno (msg)
-      || (msg->msg_name
-	  && __check_null_invalid_struct_errno (msg->msg_name,
-						(unsigned) msg->msg_namelen))
-      || !fh)
+  myfault efault;
+  if (efault.faulted (EFAULT) || !fh)
     res = -1;
   else
     {
@@ -2243,11 +2248,8 @@ cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
 
   fhandler_socket *fh = get (fd);
 
-  if (__check_invalid_read_ptr_errno (msg, sizeof msg)
-      || (msg->msg_name
-	  && __check_invalid_read_ptr_errno (msg->msg_name,
-					     (unsigned) msg->msg_namelen))
-      || !fh)
+  myfault efault;
+  if (efault.faulted (EFAULT) || !fh)
     res = -1;
   else
     {
@@ -2287,7 +2289,8 @@ cygwin_inet_ntop (int family, const void *addrptr, char *strptr, size_t len)
 {
   const u_char *p = (const u_char *) addrptr;
 
-  if (__check_null_invalid_struct_errno (strptr, len))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return NULL;
   if (family == AF_INET)
     {

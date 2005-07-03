@@ -248,7 +248,8 @@ getprogname (void)
 extern "C" void
 setprogname (const char *newprogname)
 {
-  if (!check_null_str_errno (newprogname))
+  myfault efault;
+  if (!efault.faulted (EFAULT))
     {
       /* Per BSD man page, setprogname keeps a pointer to the last
 	 path component of the argument.  It does *not* copy the

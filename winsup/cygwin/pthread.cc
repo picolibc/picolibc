@@ -15,6 +15,7 @@
 #include "cygerrno.h"
 #include <stdarg.h>
 #include <sys/fcntl.h>
+#include "cygtls.h"
 
 extern "C"
 {
@@ -165,8 +166,14 @@ sem_destroy (sem_t * sem)
 static bool
 mangle_sem_name (char *mangled, const char *name)
 {
-  if (check_null_empty_str_errno (name))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return false;
+  if (!*name)
+    {
+      set_errno (ENOENT);
+      return false;
+    }
   int len = strlen (name);
   if (len >= CYG_MAX_PATH
       || (wincap.has_terminal_services () && len >= CYG_MAX_PATH - 7))

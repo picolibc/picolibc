@@ -18,6 +18,7 @@ details. */
 #include "cygerrno.h"
 #include "pinfo.h"
 #include "psapi.h"
+#include "cygtls.h"
 
 /* add timeval values */
 static void
@@ -113,7 +114,8 @@ getrlimit (int resource, struct rlimit *rlp)
 {
   MEMORY_BASIC_INFORMATION m;
 
-  if (check_null_invalid_struct_errno (rlp))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
 
   rlp->rlim_cur = RLIM_INFINITY;
@@ -157,7 +159,8 @@ getrlimit (int resource, struct rlimit *rlp)
 extern "C" int
 setrlimit (int resource, const struct rlimit *rlp)
 {
-  if (__check_invalid_read_ptr_errno (rlp, sizeof (*rlp)))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
 
   struct rlimit oldlimits;

@@ -11,8 +11,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#ifndef _CYGNUS_THREADS_
-#define _CYGNUS_THREADS_
+#ifndef _THREAD_H
+#define _THREAD_H
 
 #define LOCK_MMAP_LIST   1
 
@@ -707,4 +707,4 @@ struct MTinterface
 };
 
 #define MT_INTERFACE user_data->threadinterface
-#endif // _CYGNUS_THREADS_
+#endif // _THREAD_H

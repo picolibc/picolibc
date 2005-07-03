@@ -23,11 +23,13 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "cygtls.h"
 
 extern "C" int
 dirfd (DIR *dir)
 {
-  if (check_null_invalid_struct_errno (dir))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
   if (dir->__d_cookie != __DIRENT_COOKIE)
     {
@@ -67,7 +69,8 @@ opendir (const char *name)
 extern "C" struct dirent *
 readdir (DIR *dir)
 {
-  if (check_null_invalid_struct_errno (dir))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return NULL;
 
   if (dir->__d_cookie != __DIRENT_COOKIE)
@@ -141,7 +144,8 @@ readdir (DIR *dir)
 extern "C" _off64_t
 telldir64 (DIR *dir)
 {
-  if (check_null_invalid_struct_errno (dir))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
 
   if (dir->__d_cookie != __DIRENT_COOKIE)
@@ -159,7 +163,8 @@ telldir (DIR *dir)
 extern "C" void
 seekdir64 (DIR *dir, _off64_t loc)
 {
-  if (check_null_invalid_struct_errno (dir))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return;
 
   if (dir->__d_cookie != __DIRENT_COOKIE)
@@ -179,7 +184,8 @@ seekdir (DIR *dir, _off_t loc)
 extern "C" void
 rewinddir (DIR *dir)
 {
-  if (check_null_invalid_struct_errno (dir))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return;
 
   if (dir->__d_cookie != __DIRENT_COOKIE)
@@ -192,7 +198,8 @@ rewinddir (DIR *dir)
 extern "C" int
 closedir (DIR *dir)
 {
-  if (check_null_invalid_struct_errno (dir))
+  myfault efault;
+  if (efault.faulted (EFAULT))
     return -1;
 
   if (dir->__d_cookie != __DIRENT_COOKIE)
