@@ -278,7 +278,6 @@ struct init_cygheap
   HANDLE shared_h;
   HANDLE console_h;
   HANDLE mt_h;
-  char *cygwin_regname;
   cwdstuff cwd;
   dtable fdtab;
   LUID luid[SE_NUM_PRIVS];

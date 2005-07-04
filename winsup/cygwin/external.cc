@@ -197,17 +197,8 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	}
 
       case CW_SET_CYGWIN_REGISTRY_NAME:
-	{
-	  const char *cr = va_arg (arg, char *);
-	  myfault efault;
-	  if (efault.faulted (EFAULT) || !*cr)
-	    return (DWORD) NULL;
-	  cygheap->cygwin_regname = (char *) crealloc (cygheap->cygwin_regname,
-						       strlen (cr) + 1);
-	  strcpy (cygheap->cygwin_regname, cr);
-	}
       case CW_GET_CYGWIN_REGISTRY_NAME:
-	  return (DWORD) cygheap->cygwin_regname;
+	return 0;
 
       case CW_STRACE_TOGGLE:
 	{
@@ -281,17 +272,13 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	}
       case CW_GET_UID_FROM_SID:
 	{
-	  PSID psid = va_arg (arg, PSID);
-	  cygsid sid (psid);
-	  struct passwd *pw = internal_getpwsid (sid);
-	  return pw ? pw->pw_uid : (__uid32_t)-1;
+	  cygpsid psid = va_arg (arg, PSID);
+	  return psid.get_id (false, NULL);
 	}
       case CW_GET_GID_FROM_SID:
 	{
-	  PSID psid = va_arg (arg, PSID);
-	  cygsid sid (psid);
-	  struct __group32 *gr = internal_getgrsid (sid);
-	  return gr ? gr->gr_gid : (__gid32_t)-1;
+	  cygpsid psid = va_arg (arg, PSID);
+	  return psid.get_id (true, NULL);
 	}
       case CW_GET_BINMODE:
 	{

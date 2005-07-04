@@ -1,3 +1,11 @@
+2005-07-04  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* cygheap.h (struct init_cygheap): Delete cygwin_regname member.
+	* external.cc (cygwin_internal): Use cygpsid::get_id for
+	CW_GET_UID_FROM_SID and CW_GET_GID_FROM_SID.
+	Turn CW_SET_CYGWIN_REGISTRY_NAME and CW_GET_CYGWIN_REGISTRY_NAME
+	into noops.
+
 2005-07-03  Christopher Faylor  <cgf@timesys.com>
 
 	* thread.cc (pthread_mutex::init): Remove unneeded efault/mutex check.
