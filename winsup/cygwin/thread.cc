@@ -117,9 +117,11 @@ verifyable_object_isvalid (void const * objectptr, long magic, void *static_ptr1
 			   void *static_ptr2, void *static_ptr3)
 {
   verifyable_object **object = (verifyable_object **) objectptr;
+
   myfault efault;
   if (efault.faulted ())
     return INVALID_OBJECT;
+
   if ((static_ptr1 && *object == static_ptr1) ||
       (static_ptr2 && *object == static_ptr2) ||
       (static_ptr3 && *object == static_ptr3))
@@ -2614,8 +2616,8 @@ pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
 {
   struct timeval tv;
   long waitlength;
-  myfault efault;
 
+  myfault efault;
   if (efault.faulted ())
     return EINVAL;
 
@@ -2886,8 +2888,7 @@ pthread_mutex::init (pthread_mutex_t *mutex,
 {
   pthread_mutex_t new_mutex;
 
-  myfault efault;
-  if (attr && !pthread_mutexattr::is_good_object (attr) || efault.faulted ())
+  if (attr && !pthread_mutexattr::is_good_object (attr))
     return EINVAL;
 
   mutex_initialization_lock.lock ();
