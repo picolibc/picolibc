@@ -279,7 +279,7 @@ class fhandler_base
   virtual int __stdcall ftruncate (_off64_t) __attribute__ ((regparm (2)));
   virtual int __stdcall link (const char *) __attribute__ ((regparm (2)));
   virtual int __stdcall utimes (const struct timeval *) __attribute__ ((regparm (2)));
-  virtual int __stdcall fsync (void) __attribute__ ((regparm (1)));
+  virtual int __stdcall fsync () __attribute__ ((regparm (1)));
   virtual int ioctl (unsigned int cmd, void *);
   virtual int fcntl (int cmd, void *);
   virtual char const *ttyname () { return get_name (); }
@@ -289,7 +289,6 @@ class fhandler_base
   virtual ssize_t writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
   virtual _off64_t lseek (_off64_t offset, int whence);
   virtual int lock (int, struct __flock64 *);
-  virtual void dump ();
   virtual int dup (fhandler_base *child);
 
   virtual HANDLE mmap (caddr_t *addr, size_t len, DWORD access,
@@ -389,16 +388,16 @@ class fhandler_socket: public fhandler_base
   void af_local_set_secret (char *);
   void af_local_setblocking (bool &, bool &);
   void af_local_unsetblocking (bool, bool);
-  void af_local_set_cred (void);
+  void af_local_set_cred ();
   void af_local_copy (fhandler_socket *);
-  bool af_local_recv_secret (void);
-  bool af_local_send_secret (void);
-  bool af_local_recv_cred (void);
-  bool af_local_send_cred (void);
-  int af_local_accept (void);
+  bool af_local_recv_secret ();
+  bool af_local_send_secret ();
+  bool af_local_recv_cred ();
+  bool af_local_send_cred ();
+  int af_local_accept ();
  public:
-  int af_local_connect (void);
-  void af_local_set_sockpair_cred (void);
+  int af_local_connect ();
+  void af_local_set_sockpair_cred ();
 
  private:
   struct _WSAPROTOCOL_INFOA *prot_info_ptr;
@@ -576,11 +575,9 @@ class fhandler_dev_raw: public fhandler_base
   fhandler_dev_raw ();
 
  public:
-  ~fhandler_dev_raw (void);
+  ~fhandler_dev_raw ();
 
   int open (int flags, mode_t mode = 0);
-  int close (void);
-
   void raw_read (void *ptr, size_t& ulen);
   int raw_write (const void *ptr, size_t ulen);
 
@@ -617,7 +614,7 @@ class fhandler_dev_tape: public fhandler_dev_raw
 
   bool is_rewind_device () { return get_minor () < 128; }
   unsigned int driveno () { return (unsigned int) get_minor () & 0x7f; }
-  void drive_init (void);
+  void drive_init ();
 
   inline bool _lock ();
   inline int unlock (int ret = 0);
@@ -626,7 +623,7 @@ class fhandler_dev_tape: public fhandler_dev_raw
   fhandler_dev_tape ();
 
   virtual int open (int flags, mode_t mode = 0);
-  virtual int close (void);
+  virtual int close ();
 
   void raw_read (void *ptr, size_t& ulen);
   int raw_write (const void *ptr, size_t ulen);
@@ -645,7 +642,7 @@ class fhandler_dev_tape: public fhandler_dev_raw
 
 class fhandler_disk_file: public fhandler_base
 {
-  void touch_ctime (void);
+  void touch_ctime ();
 
  public:
   fhandler_disk_file ();
@@ -724,7 +721,6 @@ class fhandler_serial: public fhandler_base
   int tcgetattr (struct termios *t);
   _off64_t lseek (_off64_t, int) { return 0; }
   int tcflush (int);
-  void dump ();
   int is_tty () { return 1; }
   void fixup_after_fork (HANDLE parent);
   void fixup_after_exec ();
@@ -1027,7 +1023,6 @@ class fhandler_dev_null: public fhandler_base
   fhandler_dev_null ();
   int open (int, mode_t);
 
-  void dump ();
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
@@ -1041,8 +1036,6 @@ class fhandler_dev_zero: public fhandler_base
   int write (const void *ptr, size_t len);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   _off64_t lseek (_off64_t offset, int whence);
-
-  void dump ();
 };
 
 class fhandler_dev_random: public fhandler_base
@@ -1061,10 +1054,8 @@ class fhandler_dev_random: public fhandler_base
   int write (const void *ptr, size_t len);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   _off64_t lseek (_off64_t offset, int whence);
-  int close (void);
+  int close ();
   int dup (fhandler_base *child);
-
-  void dump ();
 };
 
 class fhandler_dev_mem: public fhandler_base
@@ -1075,13 +1066,12 @@ class fhandler_dev_mem: public fhandler_base
 
  public:
   fhandler_dev_mem ();
-  ~fhandler_dev_mem (void);
+  ~fhandler_dev_mem ();
 
   int open (int flags, mode_t mode = 0);
   int write (const void *ptr, size_t ulen);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   _off64_t lseek (_off64_t offset, int whence);
-  int close (void);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int dup (fhandler_base *child);
 
@@ -1090,30 +1080,25 @@ class fhandler_dev_mem: public fhandler_base
   int msync (HANDLE h, caddr_t addr, size_t len, int flags);
   bool fixup_mmap_after_fork (HANDLE h, DWORD access, int flags,
 			      _off64_t offset, DWORD size, void *address);
-
-  void dump ();
 } ;
 
 class fhandler_dev_clipboard: public fhandler_base
 {
- public:
-  fhandler_dev_clipboard ();
-  int is_windows (void) { return 1; }
-  int open (int flags, mode_t mode = 0);
-  int write (const void *ptr, size_t len);
-  void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
-  _off64_t lseek (_off64_t offset, int whence);
-  int close (void);
-
-  int dup (fhandler_base *child);
-
-  void dump ();
-
- private:
   _off64_t pos;
   void *membuffer;
   size_t msize;
   bool eof;
+ public:
+  fhandler_dev_clipboard ();
+  int is_windows () { return 1; }
+  int open (int flags, mode_t mode = 0);
+  int write (const void *ptr, size_t len);
+  void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
+  _off64_t lseek (_off64_t offset, int whence);
+  int close ();
+
+  int dup (fhandler_base *child);
+  void fixup_after_exec ();
 };
 
 class fhandler_windows: public fhandler_base
@@ -1123,13 +1108,13 @@ class fhandler_windows: public fhandler_base
   int method_;  // write method (Post or Send)
  public:
   fhandler_windows ();
-  int is_windows (void) { return 1; }
+  int is_windows () { return 1; }
   int open (int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   int ioctl (unsigned int cmd, void *);
   _off64_t lseek (_off64_t, int) { return 0; }
-  int close (void) { return 0; }
+  int close () { return 0; }
 
   void set_close_on_exec (bool val);
   void fixup_after_fork (HANDLE parent);
@@ -1160,9 +1145,8 @@ class fhandler_dev_dsp: public fhandler_base
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   int ioctl (unsigned int cmd, void *);
   _off64_t lseek (_off64_t, int);
-  int close (void);
+  int close ();
   int dup (fhandler_base *child);
-  void dump (void);
   void fixup_after_fork (HANDLE parent);
   void fixup_after_exec ();
  private:
@@ -1194,7 +1178,7 @@ class fhandler_virtual : public fhandler_base
   _off64_t lseek (_off64_t, int);
   int dup (fhandler_base *child);
   int open (int flags, mode_t mode = 0);
-  int close (void);
+  int close ();
   int __stdcall fstat (struct stat *buf) __attribute__ ((regparm (2)));
   int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
@@ -1246,7 +1230,7 @@ class fhandler_registry: public fhandler_proc
   int open (int flags, mode_t mode = 0);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   bool fill_filebuf ();
-  int close (void);
+  int close ();
 };
 
 class pinfo;

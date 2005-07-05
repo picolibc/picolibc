@@ -81,8 +81,6 @@ static bool __stdcall remove_proc (int);
 static bool __stdcall stopped_or_terminated (waitq *, _pinfo *);
 static DWORD WINAPI wait_sig (VOID *arg);
 
-extern HANDLE hExeced;
-
 /* wait_sig bookkeeping */
 
 class pending_signals

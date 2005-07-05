@@ -188,9 +188,9 @@ public:
 
   PSECURITY_DESCRIPTOR malloc (size_t nsize);
   PSECURITY_DESCRIPTOR realloc (size_t nsize);
-  void free (void);
+  void free ();
 
-  inline DWORD size (void) const { return sd_size; }
+  inline DWORD size () const { return sd_size; }
   inline operator const PSECURITY_DESCRIPTOR () { return psd; }
 };
 
@@ -368,7 +368,7 @@ void set_cygwin_privileges (HANDLE token);
 
 /* shared.cc: */
 /* Retrieve a security descriptor that allows all access */
-SECURITY_DESCRIPTOR *__stdcall get_null_sd (void);
+SECURITY_DESCRIPTOR *__stdcall get_null_sd ();
 
 /* Various types of security attributes for use in Create* functions. */
 extern SECURITY_ATTRIBUTES sec_none, sec_none_nih, sec_all, sec_all_nih;

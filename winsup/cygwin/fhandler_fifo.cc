@@ -62,7 +62,8 @@ fhandler_fifo::close ()
   fhandler_pipe::close ();
   if (get_output_handle ())
     CloseHandle (get_output_handle ());
-  set_use (-1);
+  if (!hExeced)
+    set_use (-1);
   return 0;
 }
 

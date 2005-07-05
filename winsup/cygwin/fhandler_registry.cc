@@ -534,7 +534,7 @@ fhandler_registry::close ()
 	  res = -1;
 	}
     }
-  if (value_name)
+  if (!hExeced && value_name)
     cfree (value_name);
   return res;
 }

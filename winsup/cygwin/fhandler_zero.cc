@@ -54,9 +54,3 @@ fhandler_dev_zero::lseek (_off64_t, int)
 {
   return 0;
 }
-
-void
-fhandler_dev_zero::dump ()
-{
-  paranoid_printf ("here, fhandler_dev_zero");
-}

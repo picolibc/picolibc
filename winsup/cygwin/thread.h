@@ -454,7 +454,7 @@ private:
 
   void _fixup_after_fork ();
 
-  void pop_all_cleanup_handlers (void);
+  void pop_all_cleanup_handlers ();
   void precreate (pthread_attr *);
   void postcreate ();
   bool create_cancel_event ();
@@ -689,8 +689,8 @@ struct MTinterface
   callback *pthread_parent;
 
   void Init ();
-  void fixup_before_fork (void);
-  void fixup_after_fork (void);
+  void fixup_before_fork ();
+  void fixup_after_fork ();
 
 #if 0 // avoid initialization since zero is implied and
   MTinterface () :

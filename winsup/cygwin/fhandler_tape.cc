@@ -1128,7 +1128,7 @@ mtinfo_drive::ioctl (HANDLE mt, unsigned int cmd, void *buf)
 /* mtinfo */
 
 void
-mtinfo::initialize (void)
+mtinfo::initialize ()
 {
   char name[CYG_MAX_PATH];
   HANDLE mtx;
@@ -1241,7 +1241,7 @@ fhandler_dev_tape::open (int flags, mode_t)
 }
 
 int
-fhandler_dev_tape::close (void)
+fhandler_dev_tape::close ()
 {
   int ret, cret;
 

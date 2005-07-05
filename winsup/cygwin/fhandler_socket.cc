@@ -165,7 +165,7 @@ fhandler_socket::open (int flags, mode_t mode)
 }
 
 void
-fhandler_socket::af_local_set_sockpair_cred (void)
+fhandler_socket::af_local_set_sockpair_cred ()
 {
   sec_pid = sec_peer_pid = getpid ();
   sec_uid = sec_peer_uid = geteuid32 ();
@@ -202,7 +202,7 @@ fhandler_socket::af_local_unsetblocking (bool async, bool nonblocking)
 }
 
 bool
-fhandler_socket::af_local_recv_secret (void)
+fhandler_socket::af_local_recv_secret ()
 {
   int out[4] = { 0, 0, 0, 0 };
   int rest = sizeof out;
@@ -232,7 +232,7 @@ fhandler_socket::af_local_recv_secret (void)
 }
 
 bool
-fhandler_socket::af_local_send_secret (void)
+fhandler_socket::af_local_send_secret ()
 {
   int rest = sizeof connect_secret;
   char *ptr = (char *) connect_secret;
@@ -250,7 +250,7 @@ fhandler_socket::af_local_send_secret (void)
 }
 
 bool
-fhandler_socket::af_local_recv_cred (void)
+fhandler_socket::af_local_recv_cred ()
 {
   struct ucred out = { (pid_t) 0, (__uid32_t) -1, (__gid32_t) -1 };
   int rest = sizeof out;
@@ -277,7 +277,7 @@ fhandler_socket::af_local_recv_cred (void)
 }
 
 bool
-fhandler_socket::af_local_send_cred (void)
+fhandler_socket::af_local_send_cred ()
 {
   struct ucred in = { sec_pid, sec_uid, sec_gid };
   int rest = sizeof in;
@@ -298,7 +298,7 @@ fhandler_socket::af_local_send_cred (void)
 }
 
 int
-fhandler_socket::af_local_connect (void)
+fhandler_socket::af_local_connect ()
 {
   /* This keeps the test out of select. */
   if (get_addr_family () != AF_LOCAL || get_socket_type () != SOCK_STREAM)
@@ -320,7 +320,7 @@ fhandler_socket::af_local_connect (void)
 }
 
 int
-fhandler_socket::af_local_accept (void)
+fhandler_socket::af_local_accept ()
 {
   debug_printf ("af_local_accept called");
   bool orig_async_io, orig_is_nonblocking;
@@ -339,7 +339,7 @@ fhandler_socket::af_local_accept (void)
 }
 
 void
-fhandler_socket::af_local_set_cred (void)
+fhandler_socket::af_local_set_cred ()
 {
   sec_pid = getpid ();
   sec_uid = geteuid32 ();

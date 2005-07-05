@@ -354,14 +354,14 @@ MTinterface::Init ()
 }
 
 void
-MTinterface::fixup_before_fork (void)
+MTinterface::fixup_before_fork ()
 {
   pthread_key::fixup_before_fork ();
 }
 
 /* This function is called from a single threaded process */
 void
-MTinterface::fixup_after_fork (void)
+MTinterface::fixup_after_fork ()
 {
   pthread_key::fixup_after_fork ();
 
@@ -570,7 +570,7 @@ pthread::exit (void *value_ptr)
 }
 
 int
-pthread::cancel (void)
+pthread::cancel ()
 {
   class pthread *thread = this;
   class pthread *self = pthread::self ();
@@ -788,7 +788,7 @@ opengroup specs.
 }
 
 void
-pthread::testcancel (void)
+pthread::testcancel ()
 {
   if (cancelstate == PTHREAD_CANCEL_DISABLE)
     return;
@@ -798,7 +798,7 @@ pthread::testcancel (void)
 }
 
 void
-pthread::static_cancel_self (void)
+pthread::static_cancel_self ()
 {
   pthread::self ()->cancel_self ();
 }
@@ -2038,7 +2038,7 @@ pthread::cancel (pthread_t thread)
 }
 
 void
-pthread::atforkprepare (void)
+pthread::atforkprepare ()
 {
   callback *cb = MT_INTERFACE->pthread_prepare;
   while (cb)
@@ -2053,7 +2053,7 @@ pthread::atforkprepare (void)
 }
 
 void
-pthread::atforkparent (void)
+pthread::atforkparent ()
 {
   __fp_unlock_all ();
 
@@ -2066,7 +2066,7 @@ pthread::atforkparent (void)
 }
 
 void
-pthread::atforkchild (void)
+pthread::atforkchild ()
 {
   MT_INTERFACE->fixup_after_fork ();
 
@@ -2419,7 +2419,7 @@ pthread::resume (pthread_t *thread)
    See http://www.opengroup.org/onlinepubs/007908799/xsh/pthread_getconcurrency.html
 */
 extern "C" int
-pthread_getconcurrency (void)
+pthread_getconcurrency ()
 {
   return MT_INTERFACE->concurrency;
 }

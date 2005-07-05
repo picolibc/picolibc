@@ -257,18 +257,21 @@ fhandler_dev_clipboard::lseek (_off64_t offset, int whence)
 }
 
 int
-fhandler_dev_clipboard::close (void)
+fhandler_dev_clipboard::close ()
 {
-  eof = true;
-  pos = 0;
-  if (membuffer)
-    free (membuffer);
-  msize = 0;
+  if (!hExeced)
+    {
+      eof = true;
+      pos = 0;
+      if (membuffer)
+	free (membuffer);
+      msize = 0;
+    }
   return 0;
 }
 
 void
-fhandler_dev_clipboard::dump ()
+fhandler_dev_clipboard::fixup_after_exec ()
 {
-  paranoid_printf ("here, fhandler_dev_clipboard");
+  (void) close ();
 }

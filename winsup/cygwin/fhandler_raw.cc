@@ -75,7 +75,7 @@ fhandler_dev_raw::fhandler_dev_raw ()
   need_fork_fixup (true);
 }
 
-fhandler_dev_raw::~fhandler_dev_raw (void)
+fhandler_dev_raw::~fhandler_dev_raw ()
 {
   if (devbufsiz > 1L)
     delete [] devbuf;
@@ -134,12 +134,6 @@ fhandler_dev_raw::open (int flags, mode_t)
     devbuf = new char [devbufsiz];
 
   return res;
-}
-
-int
-fhandler_dev_raw::close (void)
-{
-  return fhandler_base::close ();
 }
 
 void

@@ -94,7 +94,7 @@ class mmap_record
 
     bool alloc_page_map (_off64_t off, DWORD len);
     void free_page_map () { if (page_map_) cfree (page_map_); }
-    void fixup_page_map (void);
+    void fixup_page_map ();
 
     DWORD find_unused_pages (DWORD pages);
     _off64_t map_pages (_off64_t off, DWORD len);

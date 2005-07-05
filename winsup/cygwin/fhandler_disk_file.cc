@@ -443,7 +443,7 @@ fhandler_disk_file::fstat (struct __stat64 *buf)
 }
 
 void
-fhandler_disk_file::touch_ctime (void)
+fhandler_disk_file::touch_ctime ()
 {
   FILETIME ft;
 
@@ -966,9 +966,12 @@ out:
 int
 fhandler_disk_file::close ()
 {
-  /* Changing inode data requires setting ctime (only 9x). */
-  if (has_changed ())
-    touch_ctime ();
+  if (!hExeced)
+    {
+      /* Changing inode data requires setting ctime (only 9x). */
+      if (has_changed ())
+	touch_ctime ();
+    }
   return close_fs ();
 }
 

@@ -1109,17 +1109,20 @@ fhandler_dev_dsp::close_audio_out (bool immediately)
 }
 
 int
-fhandler_dev_dsp::close (void)
+fhandler_dev_dsp::close ()
 {
   debug_printf ("audio_in=%08x audio_out=%08x",
 		(int)audio_in_, (int)audio_out_);
-  if ((fhandler_dev_dsp *) archetype != this)
-    return ((fhandler_dev_dsp *)archetype)->close ();
-
-  if (--usecount == 0)
+  if (!hExeced)
     {
-      close_audio_in ();
-      close_audio_out (exit_state != ES_NOT_EXITING);
+      if ((fhandler_dev_dsp *) archetype != this)
+	return ((fhandler_dev_dsp *) archetype)->close ();
+
+      if (--usecount == 0)
+	{
+	  close_audio_in ();
+	  close_audio_out (exit_state != ES_NOT_EXITING);
+	}
     }
   return 0;
 }
@@ -1340,12 +1343,6 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
     };
   set_errno (EINVAL);
   return -1;
-}
-
-void
-fhandler_dev_dsp::dump ()
-{
-  paranoid_printf ("here");
 }
 
 void

@@ -75,13 +75,13 @@ public:
   client_request_msg (int, const void *, size_t, int);	// msgsnd
 #endif
 
-  int retval (void) const { return _parameters.out.ret; }
-  ssize_t rcvval (void) const { return _parameters.out.rcv; }
+  int retval () const { return _parameters.out.ret; }
+  ssize_t rcvval () const { return _parameters.out.rcv; }
 };
 
 #ifndef __INSIDE_CYGWIN__
-int msginit (void);
-int msgunload (void);
+int msginit ();
+int msgunload ();
 int msgctl (struct thread *, struct msgctl_args *);
 int msgget (struct thread *, struct msgget_args *);
 int msgsnd (struct thread *, struct msgsnd_args *);

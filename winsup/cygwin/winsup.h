@@ -205,7 +205,7 @@ extern exit_states exit_state;
 void __stdcall do_exit (int) __attribute__ ((regparm (1), noreturn));
 
 /* UID/GID */
-void uinfo_init (void);
+void uinfo_init ();
 
 #define ILLEGAL_UID16 ((__uid16_t)-1)
 #define ILLEGAL_UID ((__uid32_t)-1)
@@ -220,8 +220,8 @@ void uinfo_init (void);
 #define get_ll(pl)  (((long long) (pl).HighPart << 32) | (pl).LowPart)
 
 /* various events */
-void events_init (void);
-void events_terminate (void);
+void events_init ();
+void events_terminate ();
 
 void __stdcall close_all_files (bool = false);
 
@@ -297,7 +297,7 @@ int fcntl_worker (int fd, int cmd, void *arg);
 extern "C" int low_priority_sleep (DWORD) __attribute__ ((regparm (1)));
 #define SLEEP_0_STAY_LOW INFINITE
 
-size_t getshmlba (void);
+size_t getshmlba ();
 
 int winprio_to_nice (DWORD) __attribute__ ((regparm (1)));
 DWORD nice_to_winprio (int &) __attribute__ ((regparm (1)));
@@ -336,6 +336,7 @@ extern HANDLE hMainThread;
 extern HANDLE hMainProc;
 extern HANDLE hProcToken;
 extern HANDLE hProcImpToken;
+extern HANDLE hExeced;
 
 extern bool cygwin_testing;
 

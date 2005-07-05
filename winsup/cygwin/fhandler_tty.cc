@@ -612,20 +612,23 @@ out:
 int
 fhandler_tty_slave::close ()
 {
-  if (!--cygheap->open_fhs && myself->ctty == -1)
-    FreeConsole ();
-
-  archetype->usecount--;
-  report_tty_counts (this, "closed", "decremented ", "");
-
-  if (archetype->usecount)
+  if (!hExeced)
     {
+      if (!--cygheap->open_fhs && myself->ctty == -1)
+	FreeConsole ();
+
+      archetype->usecount--;
+      report_tty_counts (this, "closed", "decremented ", "");
+
+      if (archetype->usecount)
+	{
 #ifdef DEBUGGING
-      if (archetype->usecount < 0)
-	system_printf ("error: usecount %d", archetype->usecount);
+	  if (archetype->usecount < 0)
+	    system_printf ("error: usecount %d", archetype->usecount);
 #endif
-      termios_printf ("just returning because archetype usecount is != 0");
-      return 0;
+	  termios_printf ("just returning because archetype usecount is != 0");
+	  return 0;
+	}
     }
 
   termios_printf ("closing last open %s handle", ttyname ());
@@ -1208,8 +1211,11 @@ fhandler_tty_common::close ()
   if (!ForceCloseHandle1 (get_output_handle (), to_pty))
     termios_printf ("CloseHandle (get_output_handle ()<%p>), %E", get_output_handle ());
 
-  inuse = NULL;
-  set_io_handle (NULL);
+  if (!hExeced)
+    {
+      inuse = NULL;
+      set_io_handle (NULL);
+    }
   return 0;
 }
 
@@ -1235,7 +1241,8 @@ fhandler_pty_master::close ()
 	CloseHandle (get_ttyp ()->from_master);
       if (get_ttyp ()->to_master)
 	CloseHandle (get_ttyp ()->to_master);
-      get_ttyp ()->init ();
+      if (!hExeced)
+	get_ttyp ()->init ();
     }
 
   return 0;

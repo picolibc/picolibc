@@ -95,8 +95,8 @@ fhandler_base *build_fh_dev (const device&, const char * = NULL);
 fhandler_base *build_fh_name (const char *unix_name, HANDLE = NULL, unsigned = 0, suffix_info * = NULL);
 fhandler_base *build_fh_pc (path_conv& pc);
 
-void dtable_init (void);
-void stdio_init (void);
+void dtable_init ();
+void stdio_init ();
 extern dtable fdtab;
 
 extern "C" int getfdtabsize ();

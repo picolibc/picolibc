@@ -125,8 +125,8 @@ public:
   IMPLEMENT_STATUS_FLAG (bool, sysv)
   IMPLEMENT_STATUS_FLAG (bool, nowait)
 
-  PTAPE_GET_DRIVE_PARAMETERS dp (void) { return &_dp; }
-  PTAPE_GET_MEDIA_PARAMETERS mp (void) { return &_mp; }
+  PTAPE_GET_DRIVE_PARAMETERS dp () { return &_dp; }
+  PTAPE_GET_MEDIA_PARAMETERS mp () { return &_mp; }
   mtinfo_part *part (int num) { return &_part[num]; }
 };
 
@@ -137,7 +137,7 @@ class mtinfo
   mtinfo_drive _drive[MAX_DRIVE_NUM];
 
 public:
-  void initialize (void);
+  void initialize ();
   mtinfo_drive *drive (int num) { return &_drive[num]; }
 };
 

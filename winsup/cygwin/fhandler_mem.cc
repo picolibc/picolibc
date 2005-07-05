@@ -27,7 +27,7 @@ fhandler_dev_mem::fhandler_dev_mem ()
 {
 }
 
-fhandler_dev_mem::~fhandler_dev_mem (void)
+fhandler_dev_mem::~fhandler_dev_mem ()
 {
 }
 
@@ -218,12 +218,6 @@ fhandler_dev_mem::read (void *ptr, size_t& ulen)
 
   pos += ulen;
   return;
-}
-
-int
-fhandler_dev_mem::close (void)
-{
-  return fhandler_base::close ();
 }
 
 _off64_t
@@ -427,10 +421,4 @@ fhandler_dev_mem::dup (fhandler_base *child)
       fhc->pos = pos;
     }
   return ret;
-}
-
-void
-fhandler_dev_mem::dump ()
-{
-  paranoid_printf ("here, fhandler_dev_mem");
 }

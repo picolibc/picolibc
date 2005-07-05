@@ -146,9 +146,9 @@ fhandler_dev_random::lseek (_off64_t, int)
 }
 
 int
-fhandler_dev_random::close (void)
+fhandler_dev_random::close ()
 {
-  if (crypt_prov)
+  if (!hExeced && crypt_prov)
     while (!CryptReleaseContext (crypt_prov, 0)
 	   && GetLastError () == ERROR_BUSY)
       Sleep (10);
@@ -161,10 +161,4 @@ fhandler_dev_random::dup (fhandler_base *child)
   fhandler_dev_random *fhr = (fhandler_dev_random *) child;
   fhr->crypt_prov = (HCRYPTPROV)NULL;
   return 0;
-}
-
-void
-fhandler_dev_random::dump ()
-{
-  paranoid_printf ("here, fhandler_dev_random");
 }

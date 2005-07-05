@@ -38,7 +38,6 @@ extern void sigdelayed ();
 
 extern DWORD sigtid;
 
-extern HANDLE hExeced;
 extern DWORD dwExeced;
 
 static BOOL WINAPI ctrl_c_handler (DWORD);
@@ -1165,7 +1164,7 @@ signal_exit (int rc)
 HANDLE NO_COPY tty_mutex = NULL;
 
 void
-events_init (void)
+events_init ()
 {
   char *name;
   char mutex_name[CYG_MAX_PATH];
@@ -1196,7 +1195,7 @@ events_init (void)
 }
 
 void
-events_terminate (void)
+events_terminate ()
 {
   exit_already = 1;
 }

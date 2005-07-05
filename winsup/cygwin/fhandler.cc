@@ -1249,12 +1249,6 @@ fhandler_base::init (HANDLE f, DWORD a, mode_t bin)
   debug_printf ("created new fhandler_base for handle %p, bin %d", f, rbinary ());
 }
 
-void
-fhandler_base::dump (void)
-{
-  paranoid_printf ("here");
-}
-
 int
 fhandler_base::dup (fhandler_base *child)
 {
@@ -1345,7 +1339,7 @@ fhandler_base::tcsendbreak (int)
 }
 
 int
-fhandler_base::tcdrain (void)
+fhandler_base::tcdrain ()
 {
   set_errno (ENOTTY);
   return -1;
@@ -1380,7 +1374,7 @@ fhandler_base::tcsetpgrp (const pid_t)
 }
 
 int
-fhandler_base::tcgetpgrp (void)
+fhandler_base::tcgetpgrp ()
 {
   set_errno (ENOTTY);
   return -1;
@@ -1414,7 +1408,7 @@ fhandler_base::fhandler_base () :
 }
 
 /* Normal I/O destructor */
-fhandler_base::~fhandler_base (void)
+fhandler_base::~fhandler_base ()
 {
   if (rabuf)
     free (rabuf);
@@ -1426,12 +1420,6 @@ fhandler_base::~fhandler_base (void)
 fhandler_dev_null::fhandler_dev_null () :
 	fhandler_base ()
 {
-}
-
-void
-fhandler_dev_null::dump (void)
-{
-  paranoid_printf ("here");
 }
 
 int

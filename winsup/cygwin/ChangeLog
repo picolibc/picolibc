@@ -1,5 +1,37 @@
 2005-07-04  Christopher Faylor  <cgf@timesys.com>
 
+	Change foo (void) to foo () for all c++ functions throughout.
+	Remove all fhandler_*::dump functions throughout.
+
+	* fhandler.h (fhandler_dev_mem::close): Remove pass-through function in
+	favor of virtual method.
+	(handler_dev_raw::close): Ditto.
+	(fhandler_dev_clipboard::fixup_after_exec): New method.
+	* fhandler_dev_mem.cc (fhandler_dev_mem::close): Eliminate pass through
+	* fhandler_dev_raw.cc (fhandler_dev_raw::close): Ditto.
+	* fhandler_clipboard.cc (fhandler_dev_clipboard::close): Don't go to
+	extra effort when execing.
+	(fhandler_dev_clipboard::fixup_after_exec): New function.
+	* fhandler_console.cc (fhandler_console::close): Don't do "extra stuff"
+	when we know we're execing.
+	* fhandler_disk_file.cc (fhandler_disk_file::close): Ditto.
+	* fhandler_dsp.cc (fhandler_dev_dsp::close): Ditto.
+	* fhandler_fifo.cc (fhandler_fifo.cc::close): Ditto.
+	function in favor of base function.
+	* fhandler_random.cc (fhandler_dev_random::close): Ditto.
+	* fhandler_registry.cc (fhandler_registry::close): Ditto.
+	* fhandler_tty.cc (fhandler_tty_slave::close): Ditto.
+	* fhandler_virtual.cc (fhandler_virtual::close): Ditto.
+
+	* pinfo.cc (proc_waiter): Remove unneeded hExeced declaration.
+	* sigproc.cc: Ditto.
+	* winsup.h (hExeced): Define here.
+
+	* fhandler_virtual.cc (fhandler_virtual::fixup_after_exec): Just call
+	close() to reinitialize things to known state.
+
+2005-07-04  Christopher Faylor  <cgf@timesys.com>
+
         * cygtls.h (_cygtls): Perform minor reformatting.
 
 	* winsup.h (close_all_files): Reflect argument change.

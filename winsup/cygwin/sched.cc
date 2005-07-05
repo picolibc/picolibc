@@ -493,7 +493,7 @@ sched_setscheduler (pid_t pid, int policy,
 
 /* yield the cpu */
 int
-sched_yield (void)
+sched_yield ()
 {
   low_priority_sleep (0);
   return 0;

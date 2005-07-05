@@ -40,8 +40,7 @@ fhandler_virtual::~fhandler_virtual ()
 void
 fhandler_virtual::fixup_after_exec ()
 {
-  if (filebuf)
-    filebuf = NULL;
+  close ();
 }
 
 DIR *
@@ -166,11 +165,13 @@ fhandler_virtual::dup (fhandler_base * child)
 int
 fhandler_virtual::close ()
 {
-  if (filebuf)
-    free (filebuf);
-  filebuf = NULL;
-  bufalloc = (size_t) -1;
-  user_shared->delqueue.process_queue ();
+  if (!hExeced)
+    {
+      if (filebuf)
+	free (filebuf);
+      filebuf = NULL;
+      bufalloc = (size_t) -1;
+    }
   return 0;
 }
 

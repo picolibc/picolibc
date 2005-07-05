@@ -688,13 +688,11 @@ fhandler_console::open (int flags, mode_t)
 }
 
 int
-fhandler_console::close (void)
+fhandler_console::close ()
 {
   CloseHandle (get_io_handle ());
   CloseHandle (get_output_handle ());
-  set_io_handle (NULL);
-  set_output_handle (NULL);
-  if (--(cygheap->open_fhs) <= 0 && myself->ctty != TTY_CONSOLE)
+  if (!hExeced && --(cygheap->open_fhs) <= 0 && myself->ctty != TTY_CONSOLE)
     {
       syscall_printf ("open_fhs %d", cygheap->open_fhs);
       FreeConsole ();
@@ -1753,7 +1751,7 @@ fhandler_console::init (HANDLE f, DWORD a, mode_t bin)
 }
 
 int
-fhandler_console::igncr_enabled (void)
+fhandler_console::igncr_enabled ()
 {
   return tc->ti.c_iflag & IGNCR;
 }

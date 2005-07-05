@@ -198,12 +198,6 @@ err:
 }
 
 void
-fhandler_serial::dump (void)
-{
-  paranoid_printf ("here");
-}
-
-void
 fhandler_serial::init (HANDLE f, DWORD flags, mode_t bin)
 {
   (void) open (flags, bin & (O_BINARY | O_TEXT));
@@ -332,7 +326,7 @@ fhandler_serial::tcsendbreak (int duration)
 
 /* tcdrain: POSIX 7.2.2.1 */
 int
-fhandler_serial::tcdrain (void)
+fhandler_serial::tcdrain ()
 {
   if (FlushFileBuffers (get_handle ()) == 0)
     return -1;

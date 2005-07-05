@@ -55,7 +55,7 @@ ttyslot (void)
 }
 
 void __stdcall
-tty_init (void)
+tty_init ()
 {
   if (!myself->cygstarted && NOTSTATE (myself, PID_CYGPARENT))
     cygheap->fdtab.get_debugger_info ();
@@ -105,7 +105,7 @@ create_tty_master (int ttynum)
 }
 
 void __stdcall
-tty_terminate (void)
+tty_terminate ()
 {
   if (NOTSTATE (myself, PID_USETTY))
     return;
@@ -125,7 +125,7 @@ attach_tty (int num)
 }
 
 void
-tty_list::terminate (void)
+tty_list::terminate ()
 {
   int ttynum = myself->ctty;
 
@@ -186,7 +186,7 @@ tty_list::connect_tty (int ttynum)
 }
 
 void
-tty_list::init (void)
+tty_list::init ()
 {
   for (int i = 0; i < NTTYS; i++)
     {
@@ -365,7 +365,7 @@ tty::create_inuse (const char *fmt)
 }
 
 void
-tty::init (void)
+tty::init ()
 {
   output_stopped = 0;
   setsid (0);

@@ -130,7 +130,7 @@ pthread_setcanceltype (int type, int *oldtype)
 }
 
 void
-pthread_testcancel (void)
+pthread_testcancel ()
 {
   pthread::self ()->testcancel ();
 }

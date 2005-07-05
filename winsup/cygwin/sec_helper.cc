@@ -242,7 +242,7 @@ security_descriptor::realloc (size_t nsize)
 }
 
 void
-security_descriptor::free (void)
+security_descriptor::free ()
 {
   if (psd)
     ::free (psd);

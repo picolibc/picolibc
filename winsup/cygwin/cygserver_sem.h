@@ -71,12 +71,12 @@ public:
   client_request_sem (int, struct sembuf *, size_t);	// semop
 #endif
 
-  int retval (void) const { return _parameters.out.ret; }
+  int retval () const { return _parameters.out.ret; }
 };
 
 #ifndef __INSIDE_CYGWIN__
-int seminit (void);
-int semunload (void);
+int seminit ();
+int semunload ();
 void semexit_myhook(void *arg, struct proc *p);
 
 int semctl (struct thread *, struct semctl_args *);

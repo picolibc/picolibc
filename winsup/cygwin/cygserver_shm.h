@@ -78,14 +78,14 @@ public:
   client_request_shm (proc *);				// shmfork
 #endif
 
-  int retval (void) const { return _parameters.out.ret; }
-  void *ptrval (void) const { return (void *)_parameters.out.ptr; }
-  vm_object_t objval (void) const { return _parameters.out.obj; }
+  int retval () const { return _parameters.out.ret; }
+  void *ptrval () const { return (void *)_parameters.out.ptr; }
+  vm_object_t objval () const { return _parameters.out.obj; }
 };
 
 #ifndef __INSIDE_CYGWIN__
-void shminit (void);
-int shmunload (void);
+void shminit ();
+int shmunload ();
 void shmexit_myhook (struct vmspace *vm);
 int cygwin_shmfork_myhook (struct thread *, struct proc *);
 

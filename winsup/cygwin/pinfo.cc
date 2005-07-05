@@ -960,7 +960,6 @@ proc_waiter (void *arg)
     {
       DWORD nb;
       char buf = '\0';
-      extern HANDLE hExeced;
 
       if (!ReadFile (vchild.rd_proc_pipe, &buf, 1, &nb, NULL)
 	  && GetLastError () != ERROR_BROKEN_PIPE)
