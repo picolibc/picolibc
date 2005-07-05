@@ -41,7 +41,7 @@ details. */
 
 #define PREMAIN_LEN (sizeof (user_data->premain) / sizeof (user_data->premain[0]))
 
-extern "C" void cygwin_exit (int);
+extern "C" void cygwin_exit (int) __attribute__ ((noreturn));
 
 void ld_preload ();
 

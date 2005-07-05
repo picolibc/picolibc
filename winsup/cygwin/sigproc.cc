@@ -771,7 +771,9 @@ child_info::ready (bool execed)
       return;
     }
 
-  if (!SetEvent (subproc_ready))
+  if (dynamically_loaded)
+    sigproc_printf ("not really ready");
+  else if (!SetEvent (subproc_ready))
     api_fatal ("SetEvent failed");
   else
     sigproc_printf ("signalled %p that I was ready", subproc_ready);
