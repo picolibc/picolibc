@@ -1,3 +1,8 @@
+2005-07-05  Eric Blake  <ebb9@byu.net>
+
+	* cygcheck.cc (track_down, cygcheck): Return true on success.
+	(main): Reflect cygcheck failures in exit status.
+
 2005-06-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* parse_pe.c (exclusion::sort_and_check): Remove crude cast.
@@ -153,9 +158,9 @@
 
 2004-11-13  Pierre Humblet <pierre.humblet@ieee.org>
 
-	* kill.cc (forcekill): Do not pass negative pids to 
+	* kill.cc (forcekill): Do not pass negative pids to
 	cygwin_internal. Check if sig == 0. Improve error messages.
-	(main): Make pid a long long and distinguish between pids, gpids 
+	(main): Make pid a long long and distinguish between pids, gpids
 	(i.e. negative pids) and Win9x pids.
 
 2004-11-11  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>

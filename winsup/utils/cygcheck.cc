@@ -364,7 +364,7 @@ struct ImpDirectory
 };
 
 
-static void track_down (char *file, char *suffix, int lvl);
+static bool track_down (char *file, char *suffix, int lvl);
 
 #define CYGPREFIX (sizeof ("%%% Cygwin ") - 1)
 static void
@@ -554,26 +554,27 @@ dll_info (const char *path, HANDLE fh, int lvl, int recurse)
     cygwin_info (fh);
 }
 
-static void
+// Return true on success, false if error printed
+static bool
 track_down (char *file, char *suffix, int lvl)
 {
   if (file == NULL)
     {
       display_error ("track_down: NULL passed for file", true, false);
-      return;
+      return false;
     }
 
   if (suffix == NULL)
     {
       display_error ("track_down: NULL passed for suffix", false, false);
-      return;
+      return false;
     }
 
   char *path = find_on_path (file, suffix, 0, 1);
   if (!path)
     {
       printf ("Error: could not find %s\n", file);
-      return;
+      return false;
     }
 
   Did *d = already_did (file);
@@ -589,7 +590,7 @@ track_down (char *file, char *suffix, int lvl)
 	  printf ("%s", path);
 	  printf (" (recursive)\n");
 	}
-      return;
+      return true;
     case DID_INACTIVE:
       if (verbose)
 	{
@@ -598,7 +599,7 @@ track_down (char *file, char *suffix, int lvl)
 	  printf ("%s", path);
 	  printf (" (already done)\n");
 	}
-      return;
+      return true;
     default:
       break;
     }
@@ -609,7 +610,7 @@ track_down (char *file, char *suffix, int lvl)
   if (!path)
     {
       printf ("%s not found\n", file);
-      return;
+      return false;
     }
 
   printf ("%s", path);
@@ -620,7 +621,7 @@ track_down (char *file, char *suffix, int lvl)
   if (fh == INVALID_HANDLE_VALUE)
     {
       printf (" - Cannot open\n");
-      return;
+      return false;
     }
 
   d->state = DID_ACTIVE;
@@ -629,6 +630,7 @@ track_down (char *file, char *suffix, int lvl)
   d->state = DID_INACTIVE;
   if (!CloseHandle (fh))
     display_error ("track_down: CloseHandle()");
+  return true;
 }
 
 static void
@@ -653,14 +655,15 @@ ls (char *f)
     display_error ("ls: CloseHandle()");
 }
 
-static void
+// Return true on success, false if error printed
+static bool
 cygcheck (char *app)
 {
   char *papp = find_on_path (app, (char *) ".exe", 1, 0);
   if (!papp)
     {
       printf ("Error: could not find %s\n", app);
-      return;
+      return false;
     }
   char *s = strdup (papp);
   char *sl = 0, *t;
@@ -675,7 +678,7 @@ cygcheck (char *app)
       paths[0] = s;
     }
   did = 0;
-  track_down (papp, (char *) ".exe", 0);
+  return track_down (papp, (char *) ".exe", 0);
 }
 
 
@@ -1590,6 +1593,7 @@ int
 main (int argc, char **argv)
 {
   int i;
+  bool ok = true;
   load_cygwin (argc, argv);
 
   (void) putenv("POSIXLY_CORRECT=1");
@@ -1677,7 +1681,7 @@ main (int argc, char **argv)
       {
 	if (i)
 	  puts ("");
-	cygcheck (argv[i]);
+       ok &= cygcheck (argv[i]);
       }
 
   if (sysinfo)
@@ -1693,5 +1697,5 @@ main (int argc, char **argv)
 	puts ("Use -h to see help about each section");
     }
 
-  return 0;
+  return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
