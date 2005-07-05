@@ -4,7 +4,7 @@
   http://creativecommons.org/licenses/publicdomain.  Send questions,
   comments, complaints, performance data, etc to dl@cs.oswego.edu
 
-* Version 2.8.0 Mon May 30 14:59:49 2005  Doug Lea  (dl at gee)
+* Version 2.8.2 Sun Jun 12 16:05:14 2005  Doug Lea  (dl at gee)
 
    Note: There may be an updated version of this malloc obtainable at
 	   ftp://gee.cs.oswego.edu/pub/misc/malloc.c
@@ -621,6 +621,10 @@ struct mallinfo {
 #endif
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if !ONLY_MSPACES
 
 /* ------------------- Declarations of public routines ------------------- */
@@ -643,9 +647,6 @@ struct mallinfo {
 #define dlindependent_comalloc independent_comalloc
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*
   malloc(size_t n)
@@ -3774,8 +3775,8 @@ static void* internal_memalign(mstate m, size_t alignment, size_t bytes) {
 	  set_inuse(m, newp, newsize);
 	  set_inuse(m, p, leadsize);
 	  leader = chunk2mem(p);
-	  p = newp;
 	}
+        p = newp;
       }
 
       /* Give back spare room at the end */
@@ -3933,6 +3934,7 @@ static void** ialloc(mstate m,
   POSTACTION(m);
   return marray;
 }
+
 
 /* -------------------------- public routines ---------------------------- */
 
@@ -4793,6 +4795,13 @@ int mspace_mallopt(int param_number, int value) {
 
 /* -----------------------------------------------------------------------
 History:
+    C2.8.2 Sun Jun 12 16:01:10 2005  Doug Lea  (dl at gee)
+      * Fix memalign brace error.
+
+    V2.8.1 Wed Jun  8 16:11:46 2005  Doug Lea  (dl at gee)
+      * Fix improper #endif nesting in C++
+      * Add explicit casts needed for C++
+
     V2.8.0 Mon May 30 14:09:02 2005  Doug Lea  (dl at gee)
       * Use trees for large bins
       * Support mspaces
