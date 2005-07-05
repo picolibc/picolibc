@@ -1,3 +1,8 @@
+2005-07-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tape.cc (fhandler_dev_tape::close): Don't do "extra stuff"
+	when we know we're execing.
+
 2005-07-04  Christopher Faylor  <cgf@timesys.com>
 
 	Change foo (void) to foo () for all c++ functions throughout.
@@ -32,7 +37,7 @@
 
 2005-07-04  Christopher Faylor  <cgf@timesys.com>
 
-        * cygtls.h (_cygtls): Perform minor reformatting.
+	* cygtls.h (_cygtls): Perform minor reformatting.
 
 	* winsup.h (close_all_files): Reflect argument change.
 	* dtable.cc (close_all_files): Ditto.
@@ -45,8 +50,9 @@
 	* syscalls.cc (close_all_files): Take an argument denoting whether to
 	release closed files or not.
 
-        * path.cc (symlink): Change argument names to reflect linux man page.
-        (symlink_worker): Ditto.  Also appropriately set ENOENT for empty strings.
+	* path.cc (symlink): Change argument names to reflect linux man page.
+	(symlink_worker): Ditto.  Also appropriately set ENOENT for empty
+	strings.
 
 
 2005-07-04  Pierre Humblet <pierre.humblet@ieee.org>

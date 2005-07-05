@@ -1243,17 +1243,22 @@ fhandler_dev_tape::open (int flags, mode_t)
 int
 fhandler_dev_tape::close ()
 {
-  int ret, cret;
+  int ret = 0;
+  int cret = 0;
 
-  lock (-1);
-  ret = mt->drive (driveno ())->close (get_handle (), is_rewind_device ());
+  if (!hExeced)
+    {
+      lock (-1);
+      ret = mt->drive (driveno ())->close (get_handle (), is_rewind_device ());
+      if (ret)
+	__seterrno_from_win_error (ret);
+      cret = fhandler_dev_raw::close ();
+      unlock (0);
+    }
   if (mt_evt)
     CloseHandle (mt_evt);
   CloseHandle (mt_mtx);
-  if (ret)
-    __seterrno_from_win_error (ret);
-  cret = fhandler_dev_raw::close ();
-  return unlock (ret ? -1 : cret);
+  return ret ? -1 : cret;
 }
 
 void
