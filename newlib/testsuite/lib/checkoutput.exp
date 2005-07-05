@@ -9,10 +9,10 @@
 # It assumes one line of output per test.
 
 proc newlib_check_output { srcfile expectlist } {
-    global objdir subdir srcdir
+    global subdir srcdir tmpdir
 
     set srcfullname "$srcdir/$subdir/$srcfile"
-    set test_driver "$objdir/testsuite/[file tail [file rootname $srcfullname].x]"
+    set test_driver "$tmpdir/[file tail [file rootname $srcfullname].x]"
 
     set comp_output [newlib_target_compile "$srcfullname" "$test_driver" "executable" ""]
 

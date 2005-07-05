@@ -1,3 +1,16 @@
+2005-07-04  Mark Mitchell  <mark@codesourcery.com>
+
+	* Makefile.am (site.exp): Set tmpdir.
+	* Makefile.in: Regenerated.
+	* testsuite/lib/checkoutput.exp (newlib_check_output): Put
+	executables in $tmpdir.
+	* testsuite/lib/flags.exp (libgloss_link_flags): Use the original
+	libgloss version if not running in the build directory.
+	* testsuite/lib/newlib.exp (newlib_init): Put testglue.o in
+	$tmpdir.
+	* testsuite/lib/passfail.exp (newlib_pass_fail): Put executables
+	in $tmpdir.
+
 2005-06-28  Dave Korn  <dave.korn@artimi.com>
 
 	* libm/common/s_lrint.c (lrint):  Fix signed-vs-unsigned comparison

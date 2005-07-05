@@ -32,11 +32,11 @@ proc newlib_pass_fail_all { flag exclude_list } {
 # compiles and runs.
 
 proc newlib_pass_fail { srcfile } {
-    global srcdir objdir subdir
+    global srcdir tmpdir subdir
 
     set fullsrcfile "$srcdir/$subdir/$srcfile"
 
-    set test_driver "$objdir/testsuite/[file rootname $srcfile].x"
+    set test_driver "$tmpdir/[file rootname $srcfile].x"
 
     set comp_output [newlib_target_compile "$fullsrcfile" "$test_driver" "executable" ""]
 

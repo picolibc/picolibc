@@ -189,7 +189,7 @@ all-recursive: stmp-targ-include
 # used while building.
 stmp-targ-include: config.status
 	-rm -rf targ-include stmp-targ-include
-	mkdir targ-include targ-include/sys targ-include/machine
+	mkdir targ-include targ-include/sys targ-include/machine targ-include/bits
 	cp newlib.h targ-include/newlib.h
 	-for i in $(srcdir)/libc/machine/$(machine_dir)/machine/*.h; do \
 	    if [ -f $$i ]; then \
@@ -214,6 +214,11 @@ stmp-targ-include: config.status
 	-for i in $(srcdir)/libc/sys/$(sys_dir)/sys/*.h; do \
 	    if [ -f $$i ]; then \
 	      cp $$i targ-include/sys/`basename $$i`; \
+	    else true; fi ; \
+	  done
+	-for i in $(srcdir)/libc/sys/$(sys_dir)/bits/*.h; do \
+	    if [ -f $$i ]; then \
+	      cp $$i targ-include/bits/`basename $$i`; \
 	    else true; fi ; \
 	  done
 	-for i in $(srcdir)/libc/sys/$(sys_dir)/machine/*.h; do \
@@ -274,6 +279,11 @@ endif
 	  for i in $(srcdir)/libc/sys/$(sys_dir)/sys/*.h; do \
 	    if [ -f $$i ]; then \
 	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/sys/`basename $$i`; \
+	    else true; fi ; \
+	  done ; \
+	  for i in $(srcdir)/libc/sys/$(sys_dir)/bits/*.h; do \
+	    if [ -f $$i ]; then \
+	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/bits/`basename $$i`; \
 	    else true; fi ; \
 	  done ; \
 	  for i in $(srcdir)/libc/sys/$(sys_dir)/machine/*.h; do \
@@ -342,6 +352,7 @@ site.exp: Makefile
 	@echo 'set tool_version $(VERSION)' >> $@-t
 	@echo 'set srcdir $(srcdir)/testsuite' >> $@-t
 	@echo 'set objdir' `pwd` >> $@-t
+	@echo 'set tmpdir' `pwd`/testsuite >> $@-t
 	@echo 'set multibuildtop ./$(MULTIBUILDTOP)' >> $@-t
 	@echo 'set host_alias $(build_alias)' >> $@-t
 	@echo 'set host_triplet $(build_triplet)' >> $@-t

@@ -12,11 +12,19 @@
 # directories, rather than in the build and source paths of the
 # compiler being used.
 
+if {![llength [info procs saved_libgloss_link_flags]]} {
+    rename libgloss_link_flags saved_libgloss_link_flags
+}
+
 proc libgloss_link_flags { args } {
     global target_cpu
     # These values come from the local site.exp.
     global srcdir objdir
     global multibuildtop
+
+    if {![info exists multibuildtop]} {
+	return [saved_libgloss_link_flags $args]
+    }
 
     verbose "In newlib version of libgloss_link_flags...\n"
 

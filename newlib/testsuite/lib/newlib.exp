@@ -23,7 +23,7 @@ proc newlib_init { args } {
     global newlib_initialized
     global target_info
     # These values are initialized in the local site.exp file.
-    global srcdir objdir
+    global srcdir objdir tmpdir
     global host_triplet target_triplet
     global old_ld_library_path
 
@@ -34,7 +34,7 @@ proc newlib_init { args } {
     if {[target_info needs_status_wrapper] != "" && \
 	    [target_info needs_status_wrapper] != "0" && \
 	    ![info exists gluefile]} {
-	set gluefile ${objdir}/testsuite/testglue.o;
+	set gluefile ${tmpdir}/testglue.o;
 	set result [build_wrapper $gluefile];
 	if { $result != "" } {
 	    set gluefile [lindex $result 0];
