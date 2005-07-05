@@ -2615,48 +2615,48 @@ set_symlink_ea (const char* frompath, const char* topath)
 bool allow_winsymlinks = true;
 
 extern "C" int
-symlink (const char *topath, const char *frompath)
+symlink (const char *oldpath, const char *newpath)
 {
-  return symlink_worker (topath, frompath, allow_winsymlinks, false);
+  return symlink_worker (oldpath, newpath, allow_winsymlinks, false);
 }
 
 int
-symlink_worker (const char *topath, const char *frompath, bool use_winsym,
+symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 		bool isdevice)
 {
   HANDLE h;
   int res = -1;
-  path_conv win32_path, win32_topath;
+  path_conv win32_path, win32_oldpath;
   char from[CYG_MAX_PATH + 5];
   char cwd[CYG_MAX_PATH], *cp = NULL, c = 0;
-  char w32topath[CYG_MAX_PATH];
-  char reltopath[CYG_MAX_PATH] = { 0 };
+  char w32oldpath[CYG_MAX_PATH];
+  char reloldpath[CYG_MAX_PATH] = { 0 };
   DWORD written;
   SECURITY_ATTRIBUTES sa = sec_none_nih;
   security_descriptor sd;
 
-  /* POSIX says that empty 'frompath' is invalid input while empty
-     'topath' is valid -- it's symlink resolver job to verify if
+  /* POSIX says that empty 'newpath' is invalid input while empty
+     'oldpath' is valid -- it's symlink resolver job to verify if
      symlink contents point to existing filesystem object */
   myfault efault;
   if (efault.faulted (EFAULT))
     goto done;
-  if (!*topath || !*frompath)
+  if (!*oldpath || !*newpath)
     {
-      set_errno (EINVAL);
+      set_errno (ENOENT);
       goto done;
     }
 
-  if (strlen (topath) >= CYG_MAX_PATH)
+  if (strlen (oldpath) >= CYG_MAX_PATH)
     {
       set_errno (ENAMETOOLONG);
       goto done;
     }
 
-  win32_path.check (frompath, PC_SYM_NOFOLLOW);
+  win32_path.check (newpath, PC_SYM_NOFOLLOW);
   if (use_winsym && !win32_path.exists ())
     {
-      strcpy (from, frompath);
+      strcpy (from, newpath);
       strcat (from, ".lnk");
       win32_path.check (from, PC_SYM_NOFOLLOW);
     }
@@ -2667,7 +2667,7 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
       goto done;
     }
 
-  syscall_printf ("symlink (%s, %s)", topath, win32_path.get_win32 ());
+  syscall_printf ("symlink (%s, %s)", oldpath, win32_path.get_win32 ());
 
   if (win32_path.is_auto_device ())
     {
@@ -2680,13 +2680,13 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
     create_how = CREATE_NEW;
   else if (isdevice)
     {
-      strcpy (w32topath, topath);
+      strcpy (w32oldpath, oldpath);
       create_how = CREATE_ALWAYS;
       (void) SetFileAttributes (win32_path, FILE_ATTRIBUTE_NORMAL);
     }
   else
     {
-      if (!isabspath (topath))
+      if (!isabspath (oldpath))
 	{
 	  getcwd (cwd, CYG_MAX_PATH);
 	  if ((cp = strrchr (from, '/')) || (cp = strrchr (from, '\\')))
@@ -2695,23 +2695,23 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
 	      *cp = '\0';
 	      chdir (from);
 	    }
-	  backslashify (topath, reltopath, 0);
+	  backslashify (oldpath, reloldpath, 0);
 	  /* Creating an ITEMIDLIST requires an absolute path.  So if we
 	     create a shortcut file, we create relative and absolute Win32
 	     paths, the first for the relpath field and the latter for the
 	     ITEMIDLIST field. */
-	  if (GetFileAttributes (reltopath) == INVALID_FILE_ATTRIBUTES)
+	  if (GetFileAttributes (reloldpath) == INVALID_FILE_ATTRIBUTES)
 	    {
-	      win32_topath.check (topath, PC_SYM_NOFOLLOW);
-	      if (win32_topath.error != ENOENT)
-		strcpy (use_winsym ? reltopath : w32topath, win32_topath);
+	      win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW);
+	      if (win32_oldpath.error != ENOENT)
+		strcpy (use_winsym ? reloldpath : w32oldpath, win32_oldpath);
 	    }
 	  else if (!use_winsym)
-	    strcpy (w32topath, reltopath);
+	    strcpy (w32oldpath, reloldpath);
 	  if (use_winsym)
 	    {
-	      win32_topath.check (topath, PC_SYM_NOFOLLOW);
-	      strcpy (w32topath, win32_topath);
+	      win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW);
+	      strcpy (w32oldpath, win32_oldpath);
 	    }
 	  if (cp)
 	    {
@@ -2721,8 +2721,8 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
 	}
       else
 	{
-	  win32_topath.check (topath, PC_SYM_NOFOLLOW);
-	  strcpy (w32topath, win32_topath);
+	  win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW);
+	  strcpy (w32oldpath, win32_oldpath);
 	}
       create_how = CREATE_NEW;
     }
@@ -2761,7 +2761,7 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
 	  hres = SHGetDesktopFolder (&psl);
 	  if (SUCCEEDED (hres))
 	    {
-	      MultiByteToWideChar (CP_ACP, 0, w32topath, -1, wc_path,
+	      MultiByteToWideChar (CP_ACP, 0, w32oldpath, -1, wc_path,
 				   CYG_MAX_PATH);
 	      hres = psl->ParseDisplayName (NULL, NULL, wc_path, NULL,
 					    &pidl, NULL);
@@ -2780,19 +2780,19 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
 	      psl->Release ();
 	    }
 	  /* Creating a description */
-	  *(unsigned short *)cp = len = strlen (topath);
-	  memcpy (cp += 2, topath, len);
+	  *(unsigned short *)cp = len = strlen (oldpath);
+	  memcpy (cp += 2, oldpath, len);
 	  cp += len;
 	  /* Creating a relpath */
-	  if (reltopath[0])
+	  if (reloldpath[0])
 	    {
-	      *(unsigned short *)cp = len = strlen (reltopath);
-	      memcpy (cp += 2, reltopath, len);
+	      *(unsigned short *)cp = len = strlen (reloldpath);
+	      memcpy (cp += 2, reloldpath, len);
 	    }
 	  else
 	    {
-	      *(unsigned short *)cp = len = strlen (w32topath);
-	      memcpy (cp += 2, w32topath, len);
+	      *(unsigned short *)cp = len = strlen (w32oldpath);
+	      memcpy (cp += 2, w32oldpath, len);
 	    }
 	  cp += len;
 	  success = WriteFile (h, buf, cp - buf, &written, NULL)
@@ -2803,7 +2803,7 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
 	  /* This is the old technique creating a symlink. */
 	  char buf[sizeof (SYMLINK_COOKIE) + CYG_MAX_PATH + 10];
 
-	  __small_sprintf (buf, "%s%s", SYMLINK_COOKIE, topath);
+	  __small_sprintf (buf, "%s%s", SYMLINK_COOKIE, oldpath);
 	  DWORD len = strlen (buf) + 1;
 
 	  /* Note that the terminating nul is written.  */
@@ -2828,7 +2828,7 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
 	  SetFileAttributes (win32_path, attr);
 
 	  if (!isdevice && win32_path.fs_has_ea ())
-	    set_symlink_ea (win32_path, topath);
+	    set_symlink_ea (win32_path, oldpath);
 	  res = 0;
 	}
       else
@@ -2840,8 +2840,8 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
     }
 
 done:
-  syscall_printf ("%d = symlink_worker (%s, %s, %d, %d)", res, topath,
-		  frompath, use_winsym, isdevice);
+  syscall_printf ("%d = symlink_worker (%s, %s, %d, %d)", res, oldpath,
+		  newpath, use_winsym, isdevice);
   return res;
 }
 

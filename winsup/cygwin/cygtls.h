@@ -252,10 +252,7 @@ class myfault
 {
   jmp_buf buf;
 public:
-  ~myfault () __attribute__ ((always_inline))
-    {
-      _my_tls.clear_fault (buf);
-    }
+  ~myfault () __attribute__ ((always_inline)) { _my_tls.clear_fault (buf); }
   inline int faulted (int myerrno = 0) __attribute__ ((always_inline))
   {
     return _my_tls.setup_fault (buf, myerrno);

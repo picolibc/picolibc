@@ -82,7 +82,7 @@ enum query_state {
 class fhandler_base
 {
   friend class dtable;
-  friend void close_all_files ();
+  friend void close_all_files (bool);
 
   struct status_flags
   {

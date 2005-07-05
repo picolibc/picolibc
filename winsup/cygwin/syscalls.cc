@@ -94,7 +94,7 @@ static int __stdcall stat_worker (const char *name, struct __stat64 *buf,
    ensure we don't leave any such files lying around.  */
 
 void __stdcall
-close_all_files ()
+close_all_files (bool norelease)
 {
   cygheap->fdtab.lock ();
 
@@ -106,7 +106,8 @@ close_all_files ()
 	debug_printf ("closing fd %d", i);
 #endif
 	fh->close ();
-	cygheap->fdtab.release (i);
+	if (!norelease)
+	  cygheap->fdtab.release (i);
       }
 
   if (cygheap->ctty)

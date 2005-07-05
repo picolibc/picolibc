@@ -800,6 +800,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       strace.execing = 1;
       myself.hProcess = hExeced = pi.hProcess;
       strcpy (myself->progname, real_path); // FIXME: race?
+      close_all_files (true);
       sigproc_printf ("new process name %s", myself->progname);
       /* If wr_proc_pipe doesn't exist then this process was not started by a cygwin
 	 process.  So, we need to wait around until the process we've just "execed"
@@ -869,7 +870,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   switch (mode)
     {
     case _P_OVERLAY:
-      close_all_files ();
       if (!synced)
 	/* let myself.exit handle this */;
       else if (myself->wr_proc_pipe)
