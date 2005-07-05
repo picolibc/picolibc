@@ -1383,6 +1383,22 @@ static const template i386_optab[] =
 {"swapgs",   0, 0x0f01, 0xf8, Cpu64,	NoSuf|ImmExt,		{ 0, 0, 0} },
 {"rdtscp",   0, 0x0f01, 0xf9, CpuSledgehammer,NoSuf|ImmExt,	{ 0, 0, 0} },
 
+/* AMD Pacifica additions.  */
+{"clgi",     0, 0x0f01, 0xdd, CpuSVME,	NoSuf|ImmExt,		{ 0, 0, 0 } },
+{"invlpga",  0, 0x0f01, 0xdf, CpuSVME,	NoSuf|ImmExt,		{ 0, 0, 0 } },
+/* Need to ensure only "invlpga ...,%ecx" is accepted.  */
+{"invlpga",  2, 0x0f01, 0xdf, CpuSVME,	NoSuf|ImmExt,		{ AnyMem, Reg32, 0 } },
+{"skinit",   0, 0x0f01, 0xde, CpuSVME,	NoSuf|ImmExt,		{ 0, 0, 0 } },
+{"skinit",   1, 0x0f01, 0xde, CpuSVME,	NoSuf|ImmExt,		{ AnyMem, 0, 0 } },
+{"stgi",     0, 0x0f01, 0xdc, CpuSVME,	NoSuf|ImmExt,		{ 0, 0, 0 } },
+{"vmload",   0, 0x0f01, 0xda, CpuSVME,	NoSuf|ImmExt,		{ 0, 0, 0 } },
+{"vmload",   1, 0x0f01, 0xda, CpuSVME,	NoSuf|ImmExt,		{ AnyMem, 0, 0 } },
+{"vmmcall",  0, 0x0f01, 0xd9, CpuSVME,	NoSuf|ImmExt,		{ 0, 0, 0 } },
+{"vmrun",    0, 0x0f01, 0xd8, CpuSVME,	NoSuf|ImmExt,		{ 0, 0, 0 } },
+{"vmrun",    1, 0x0f01, 0xd8, CpuSVME,	NoSuf|ImmExt,		{ AnyMem, 0, 0 } },
+{"vmsave",   0, 0x0f01, 0xdb, CpuSVME,	NoSuf|ImmExt,		{ 0, 0, 0 } },
+{"vmsave",   1, 0x0f01, 0xdb, CpuSVME,	NoSuf|ImmExt,		{ AnyMem, 0, 0 } },
+
 /* VIA PadLock extensions.  */
 {"xstore-rng",0, 0x000fa7, 0xc0, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
 {"xcrypt-ecb",0, 0xf30fa7, 0xc8, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
