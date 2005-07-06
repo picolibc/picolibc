@@ -1,3 +1,15 @@
+2005-07-06  Aldy Hernandez  <aldyh@redhat.com>
+
+        * configure.host: Added entry for ms1*.
+        * libc/include/machine/ieeefp.h: Handle ms1.
+        * libc/include/machine/setjmp.h (_JBLEN): Define for ms1.
+        * libc/machine/ms1/aclocal.m4: New.
+        * libc/machine/ms1/configure: New.
+        * libc/machine/ms1/configure.in: New.
+        * libc/machine/ms1/Makefile.am: New.
+        * libc/machine/ms1/Makefile.in: New.
+        * libc/machine/ms1/setjmp.S: New.
+
 2005-07-04  Mark Mitchell  <mark@codesourcery.com>
 
 	* Makefile.am (site.exp): Set tmpdir.

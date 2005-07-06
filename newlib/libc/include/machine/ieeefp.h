@@ -226,6 +226,10 @@
 #define __IEEE_BIG_ENDIAN
 #endif
 
+#ifdef __ms1__
+#define __IEEE_BIG_ENDIAN
+#endif
+
 #ifdef __frv__
 #define __IEEE_BIG_ENDIAN
 #endif

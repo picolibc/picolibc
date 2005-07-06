@@ -200,6 +200,10 @@ _BEGIN_STD_C
 #define _JBTYPE unsigned long
 #endif
 
+#ifdef __ms1__
+#define _JBLEN 16
+#endif
+
 #ifdef __xstormy16__
 /* 4 GPRs plus SP plus PC. */
 #define _JBLEN 8
