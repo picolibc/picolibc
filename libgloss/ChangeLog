@@ -1,3 +1,45 @@
+2005-06-24  Aldy Hernandez  <aldyh@redhat.com>
+
+	* configure.in: Add ms1 case.
+	* configure: Regenerate.
+	* ms1/16-002.ld: New.
+	* ms1/16-003.ld: New.
+	* ms1/64-001.ld: New.
+	* ms1/access.c: New.
+	* ms1/chmod.c: New.
+	* ms1/close.c: New.
+	* ms1/configure: New.
+	* ms1/configure.in: New.
+	* ms1/crt0-16-002.S: New.
+	* ms1/crt0-16-003.S: New.
+	* ms1/crt0-64-001.S: New.
+	* ms1/crt0.S: New.
+	* ms1/exit-16-002.c: New.
+	* ms1/exit-16-003.c: New.
+	* ms1/exit-64-001.c: New.
+	* ms1/exit.c: New.
+	* ms1/fstat.c: New.
+	* ms1/getpid.c: New.
+	* ms1/gettime.c: New.
+	* ms1/isatty.c: New.
+	* ms1/kill.c: New.
+	* ms1/lseek.c: New.
+	* ms1/Makefile.in: New.
+	* ms1/open.c: New.
+	* ms1/read.c: New.
+	* ms1/sbrk.c: New.
+	* ms1/startup-16-002.S: New.
+	* ms1/startup-16-003.S: New.
+	* ms1/startup-64-001.S: New.
+	* ms1/stat.c: New.
+	* ms1/time.c: New.
+	* ms1/times.c: New.
+	* ms1/trap.h: New.
+	* ms1/trap.S: New.
+	* ms1/unlink.c: New.
+	* ms1/utime.c: New.
+	* ms1/write.c: New.
+
 2005-05-19  Corinna Vinschen  <vinschen@redhat.com>
 
 	* arm/elf-redboot.ld, iq2000/sim.ld, m68hc11/sim-valid-m68hc11.ld,
