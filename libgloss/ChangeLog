@@ -1,4 +1,4 @@
-2005-06-24  Aldy Hernandez  <aldyh@redhat.com>
+2005-07-06  Aldy Hernandez  <aldyh@redhat.com>
 
 	* configure.in: Add ms1 case.
 	* configure: Regenerate.
