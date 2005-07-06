@@ -162,7 +162,7 @@ cygheap_init ()
 #endif
 
       cygheap_max = cygheap;
-      (void) _csbrk (sizeof (*cygheap));
+      _csbrk (sizeof (*cygheap));
     }
   if (!cygheap->fdtab)
     cygheap->fdtab.init ();
@@ -304,7 +304,7 @@ extern "C" void __stdcall
 cfree (void *s)
 {
   assert (!inheap (s));
-  (void) _cfree (tocygheap (s));
+  _cfree (tocygheap (s));
   MALLOC_CHECK;
 }
 

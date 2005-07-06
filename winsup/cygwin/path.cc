@@ -1325,7 +1325,7 @@ special_name (const char *s, int inc = 1)
       || strncasematch (s, "con", 3))
     p = s + n;
   else if (strncasematch (s, "com", 3) || strncasematch (s, "lpt", 3))
-    (void) strtoul (s + 3, (char **) &p, 10);
+    strtoul (s + 3, (char **) &p, 10);
   if (p && (*p == '\0' || *p == '.'))
     return -1;
 
@@ -2682,7 +2682,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
     {
       strcpy (w32oldpath, oldpath);
       create_how = CREATE_ALWAYS;
-      (void) SetFileAttributes (win32_path, FILE_ATTRIBUTE_NORMAL);
+      SetFileAttributes (win32_path, FILE_ATTRIBUTE_NORMAL);
     }
   else
     {
@@ -3998,7 +3998,7 @@ etc::init (int n, const char *etc_fn)
 
   fn[n] = etc_fn;
   change_possible[n] = false;
-  (void) test_file_change (n);
+  test_file_change (n);
   paranoid_printf ("fn[%d] %s, curr_ix %d", n, fn[n], curr_ix);
   return n;
 }
@@ -4052,7 +4052,7 @@ etc::dir_changed (int n)
 	change_possible[n] = true;
       else if (WaitForSingleObject (changed_h, 0) == WAIT_OBJECT_0)
 	{
-	  (void) FindNextChangeNotification (changed_h);
+	  FindNextChangeNotification (changed_h);
 	  memset (change_possible, true, sizeof change_possible);
 	}
     }

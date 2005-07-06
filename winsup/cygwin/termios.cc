@@ -179,7 +179,7 @@ tcgetattr (int fd, struct termios *in_t)
   else if (!cfd->is_tty ())
     set_errno (ENOTTY);
   else if ((res = cfd->tcgetattr (t)) == 0)
-    (void) __toapp_termios (in_t, t);
+    __toapp_termios (in_t, t);
 
   if (res)
     termios_printf ("%d = tcgetattr (%d, %p)", res, fd, in_t);
@@ -291,7 +291,7 @@ cfsetospeed (struct termios *in_tp, speed_t speed)
 {
   struct termios *tp = __tonew_termios (in_tp);
   int res = setspeed (tp->c_ospeed, speed);
-  (void) __toapp_termios (in_tp, tp);
+  __toapp_termios (in_tp, tp);
   return res;
 }
 
@@ -301,6 +301,6 @@ cfsetispeed (struct termios *in_tp, speed_t speed)
 {
   struct termios *tp = __tonew_termios (in_tp);
   int res = setspeed (tp->c_ispeed, speed);
-  (void) __toapp_termios (in_tp, tp);
+  __toapp_termios (in_tp, tp);
   return res;
 }

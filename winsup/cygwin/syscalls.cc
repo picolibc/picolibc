@@ -202,7 +202,7 @@ unlink (const char *ourname)
       if (h != INVALID_HANDLE_VALUE)
 	{
 	  if (wincap.has_hard_links () && setattrs)
-	    (void) SetFileAttributes (win32_name, (DWORD) win32_name);
+	    SetFileAttributes (win32_name, (DWORD) win32_name);
 	  BOOL res = CloseHandle (h);
 	  syscall_printf ("%d = CloseHandle (%p)", res, h);
 	  if (GetFileAttributes (win32_name) == INVALID_FILE_ATTRIBUTES
@@ -230,7 +230,7 @@ unlink (const char *ourname)
   DWORD lasterr;
   lasterr = GetLastError ();
 
-  (void) SetFileAttributes (win32_name, (DWORD) win32_name);
+  SetFileAttributes (win32_name, (DWORD) win32_name);
 
   /* Windows 9x seems to report ERROR_ACCESS_DENIED rather than sharing
      violation.  So, set lasterr to ERROR_SHARING_VIOLATION in this case

@@ -1203,7 +1203,7 @@ fhandler_disk_file::fixup_mmap_after_fork (HANDLE h, DWORD access, int flags,
   if (base != address)
     {
       MEMORY_BASIC_INFORMATION m;
-      (void) VirtualQuery (address, &m, sizeof (m));
+      VirtualQuery (address, &m, sizeof (m));
       system_printf ("requested %p != %p mem alloc base %p, state %p, size %d, %E",
 		     address, base, m.AllocationBase, m.State, m.RegionSize);
     }

@@ -46,7 +46,7 @@ class cygthread
   bool SetThreadPriority (int nPriority) {return ::SetThreadPriority (h, nPriority);}
   void zap_h ()
   {
-    (void) CloseHandle (h);
+    CloseHandle (h);
     h = NULL;
   }
 };

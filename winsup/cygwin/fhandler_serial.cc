@@ -53,7 +53,7 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 		io_status.hEvent);
   if (!overlapped_armed)
     {
-      (void) SetCommMask (get_handle (), EV_RXCHAR);
+      SetCommMask (get_handle (), EV_RXCHAR);
       ResetEvent (io_status.hEvent);
     }
 
@@ -200,7 +200,7 @@ err:
 void
 fhandler_serial::init (HANDLE f, DWORD flags, mode_t bin)
 {
-  (void) open (flags, bin & (O_BINARY | O_TEXT));
+  open (flags, bin & (O_BINARY | O_TEXT));
 }
 
 int
@@ -218,14 +218,14 @@ fhandler_serial::open (int flags, mode_t mode)
 
   res = 1;
 
-  (void) SetCommMask (get_handle (), EV_RXCHAR);
+  SetCommMask (get_handle (), EV_RXCHAR);
 
   uninterruptible_io (true);	// Handled explicitly in read code
 
   overlapped_setup ();
 
   memset (&to, 0, sizeof (to));
-  (void) SetCommTimeouts (get_handle (), &to);
+  SetCommTimeouts (get_handle (), &to);
 
   /* Reset serial port to known state of 9600-8-1-no flow control
      on open for better behavior under Win 95.
@@ -295,7 +295,7 @@ fhandler_serial::open (int flags, mode_t mode)
 int
 fhandler_serial::close ()
 {
-  (void) ForceCloseHandle (io_status.hEvent);
+  ForceCloseHandle (io_status.hEvent);
   return fhandler_base::close ();
 }
 

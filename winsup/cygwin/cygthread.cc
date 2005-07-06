@@ -258,8 +258,8 @@ cygthread::terminate_thread ()
   if (!inuse)
     goto force_notterminated;
 
-  (void) TerminateThread (h, 0);
-  (void) WaitForSingleObject (h, INFINITE);
+  TerminateThread (h, 0);
+  WaitForSingleObject (h, INFINITE);
   CloseHandle (h);
 
   if (!inuse || exiting)
@@ -270,7 +270,7 @@ cygthread::terminate_thread ()
 
   MEMORY_BASIC_INFORMATION m;
   memset (&m, 0, sizeof (m));
-  (void) VirtualQuery (stack_ptr, &m, sizeof m);
+  VirtualQuery (stack_ptr, &m, sizeof m);
 
   if (!m.RegionSize)
     system_printf ("m.RegionSize 0?  stack_ptr %p", stack_ptr);
@@ -320,7 +320,7 @@ cygthread::detach (HANDLE sigwait)
 	  /* Lower our priority and give priority to the read thread */
 	  HANDLE hth = GetCurrentThread ();
 	  LONG prio = GetThreadPriority (hth);
-	  (void) ::SetThreadPriority (hth, THREAD_PRIORITY_BELOW_NORMAL);
+	  ::SetThreadPriority (hth, THREAD_PRIORITY_BELOW_NORMAL);
 
 	  HANDLE w4[2];
 	  unsigned n = 2;
@@ -363,7 +363,7 @@ cygthread::detach (HANDLE sigwait)
 	  /* WAIT_OBJECT_0 means that the thread successfully read something,
 	     so wait for the cygthread to "terminate". */
 	  if (res == WAIT_OBJECT_0)
-	    (void) WaitForSingleObject (*this, INFINITE);
+	    WaitForSingleObject (*this, INFINITE);
 	  else
 	    {
 	      /* Thread didn't terminate on its own, so maybe we have to
@@ -378,7 +378,7 @@ cygthread::detach (HANDLE sigwait)
 		set_sig_errno (EINTR);
 	      thread_was_reset = true;
 	    }
-	  (void) ::SetThreadPriority (hth, prio);
+	  ::SetThreadPriority (hth, prio);
 	}
 
       thread_printf ("%s returns %d, id %p", sigwait ? "WFMO" : "WFSO",
@@ -395,7 +395,7 @@ cygthread::detach (HANDLE sigwait)
 	{
 	  ResetEvent (*this);
 	  /* Mark the thread as available by setting inuse to zero */
-	  (void) InterlockedExchange (&inuse, 0);
+	  InterlockedExchange (&inuse, 0);
 	}
     }
   return signalled;

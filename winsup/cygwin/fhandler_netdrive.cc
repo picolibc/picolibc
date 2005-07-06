@@ -140,7 +140,7 @@ fhandler_netdrive::fstat (struct __stat64 *buf)
   const char *path = get_name ();
   debug_printf ("fstat (%s)", path);
 
-  (void) fhandler_base::fstat (buf);
+  fhandler_base::fstat (buf);
 
   buf->st_mode = S_IFDIR | STD_RBITS | STD_XBITS;
 

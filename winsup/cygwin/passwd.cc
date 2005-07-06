@@ -79,7 +79,7 @@ pwdgrp::read_passwd ()
     {
       static char linebuf[1024];	// must be static and
 					// should not be NO_COPY
-      (void) cygheap->user.ontherange (CH_HOME, NULL);
+      cygheap->user.ontherange (CH_HOME, NULL);
       snprintf (linebuf, sizeof (linebuf), "%s:*:%lu:%lu:,%s:%s:/bin/sh",
 		cygheap->user.name (),
 		myself->uid == ILLEGAL_UID ? UNKNOWN_UID : myself->uid,

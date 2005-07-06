@@ -772,7 +772,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       cleanup.oldquit = signal (SIGQUIT, SIG_IGN);
       sigemptyset (&child_block);
       sigaddset (&child_block, SIGCHLD);
-      (void) sigprocmask (SIG_BLOCK, &child_block, &cleanup.oldmask);
+      sigprocmask (SIG_BLOCK, &child_block, &cleanup.oldmask);
     }
   pthread_cleanup_push (do_cleanup, (void *) &cleanup);
 
@@ -819,7 +819,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 					   just in case we've been previously
 					   execed. */
 	  myself.zap_cwd ();
-	  (void) myself->dup_proc_pipe (pi.hProcess);
+	  myself->dup_proc_pipe (pi.hProcess);
 	}
     }
   else
@@ -844,7 +844,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	 the fields filled out by child.remember do not disappear and so there
 	 is not a brief period during which the pid is not available.
 	 However, we should try to find another way to do this eventually. */
-      (void) DuplicateHandle (hMainProc, child.shared_handle (), pi.hProcess,
+      DuplicateHandle (hMainProc, child.shared_handle (), pi.hProcess,
 			      NULL, 0, 0, DUPLICATE_SAME_ACCESS);
       child->start_time = time (NULL); /* Register child's starting time. */
       child->nice = myself->nice;

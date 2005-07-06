@@ -142,7 +142,7 @@ fhandler_process::fstat (struct __stat64 *buf)
 {
   const char *path = get_name ();
   int file_type = exists ();
-  (void) fhandler_base::fstat (buf);
+  fhandler_base::fstat (buf);
   path += proc_len + 1;
   pid = atoi (path);
   pinfo p (pid);

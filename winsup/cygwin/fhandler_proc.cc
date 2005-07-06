@@ -163,7 +163,7 @@ fhandler_proc::fstat (struct __stat64 *buf)
   debug_printf ("fstat (%s)", path);
 
   path += proc_len;
-  (void) fhandler_base::fstat (buf);
+  fhandler_base::fstat (buf);
 
   buf->st_mode &= ~_IFMT & NO_W;
 

@@ -88,7 +88,7 @@ create_tty_master (int ttynum)
       DWORD len = sizeof our_utmp.ut_host;
 
       bzero ((char *) &our_utmp, sizeof (utmp));
-      (void) time (&our_utmp.ut_time);
+      time (&our_utmp.ut_time);
       strncpy (our_utmp.ut_name, getlogin (), sizeof (our_utmp.ut_name));
       GetComputerName (our_utmp.ut_host, &len);
       __small_sprintf (our_utmp.ut_line, "tty%d", ttynum);

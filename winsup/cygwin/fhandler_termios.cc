@@ -122,7 +122,7 @@ tty_min::kill_pgrp (int sig)
       if (p == myself)
 	killself++;
       else
-	(void) sig_send (p, si);
+	sig_send (p, si);
     }
   if (killself)
     sig_send (myself, si);
@@ -316,7 +316,7 @@ fhandler_termios::line_edit (const char *rptr, int nread, termios& ti)
       else if (CCEQ (ti.c_cc[VEOF], c))
 	{
 	  termios_printf ("EOF");
-	  (void) accept_input ();
+	  accept_input ();
 	  ret = line_edit_input_done;
 	  continue;
 	}

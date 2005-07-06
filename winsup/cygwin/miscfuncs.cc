@@ -193,7 +193,7 @@ check_iovec (const struct iovec *iov, int iovcnt, bool forwrite)
       else if (!forwrite)
 	*p  = dummytest (p);
       else
-	(void) dummytest (p);
+	dummytest (p);
 
       iov++;
       iovcnt--;

@@ -129,9 +129,9 @@ wait_for_sigthread ()
 {
   sigproc_printf ("wait_sig_inited %p", wait_sig_inited);
   HANDLE hsig_inited = wait_sig_inited;
-  (void) WaitForSingleObject (hsig_inited, INFINITE);
+  WaitForSingleObject (hsig_inited, INFINITE);
   wait_sig_inited = NULL;
-  (void) ForceCloseHandle1 (hsig_inited, wait_sig_inited);
+  ForceCloseHandle1 (hsig_inited, wait_sig_inited);
 }
 
 /* Get the sync_proc_subproc muto to control access to
@@ -389,7 +389,7 @@ proc_terminate (void)
     {
       sync_proc_subproc.acquire (WPSP);
 
-      (void) proc_subproc (PROC_CLEARWAIT, 1);
+      proc_subproc (PROC_CLEARWAIT, 1);
 
       /* Clean out proc processes from the pid list. */
       int i;
@@ -457,7 +457,7 @@ sig_dispatch_pending (bool fast)
 #ifdef DEBUGGING
   sigproc_printf ("flushing");
 #endif
-  (void) sig_send (myself, fast ? __SIGFLUSHFAST : __SIGFLUSH);
+  sig_send (myself, fast ? __SIGFLUSHFAST : __SIGFLUSH);
 }
 
 void __stdcall
@@ -1000,7 +1000,7 @@ wait_sig (VOID *self)
   Static bool holding_signals;
 
   /* Initialization */
-  (void) SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
+  SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
 
   if (!CreatePipe (&readsig, &myself->sendsig, sec_user_nih (sa_buf), 0))
     api_fatal ("couldn't create signal pipe, %E");

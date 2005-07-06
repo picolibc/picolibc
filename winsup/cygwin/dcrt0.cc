@@ -648,7 +648,7 @@ dll_crt0_0 ()
   if (wincap.has_security ())
     OpenProcessToken (hMainProc, MAXIMUM_ALLOWED, &hProcToken);
 
-  (void) SetErrorMode (SEM_FAILCRITICALERRORS);
+  SetErrorMode (SEM_FAILCRITICALERRORS);
 
   device::init ();
   do_global_ctors (&__CTOR_LIST__, 1);
@@ -919,7 +919,7 @@ _dll_crt0 ()
     system_printf ("internal error: sync_startup not called at start.  Expect signal problems.");
   else
     {
-      (void) WaitForSingleObject (sync_startup, INFINITE);
+      WaitForSingleObject (sync_startup, INFINITE);
       CloseHandle (sync_startup);
     }
 
@@ -1155,7 +1155,7 @@ __api_fatal (const char *fmt, ...)
   strcat (buf, "\n");
   int len = strlen (buf);
   DWORD done;
-  (void) WriteFile (GetStdHandle (STD_ERROR_HANDLE), buf, len, &done, 0);
+  WriteFile (GetStdHandle (STD_ERROR_HANDLE), buf, len, &done, 0);
 
   /* Make sure that the message shows up on the screen, too, since this is
      a serious error. */
@@ -1165,14 +1165,14 @@ __api_fatal (const char *fmt, ...)
 			     FILE_SHARE_WRITE | FILE_SHARE_WRITE,
 			     &sec_none, OPEN_EXISTING, 0, 0);
       if (h != INVALID_HANDLE_VALUE)
-	(void) WriteFile (h, buf, len, &done, 0);
+	WriteFile (h, buf, len, &done, 0);
     }
 
   /* We are going down without mercy.  Make sure we reset
      our process_state. */
   sigproc_terminate ();
 #ifdef DEBUGGING
-  (void) try_to_debug ();
+  try_to_debug ();
 #endif
   myself.exit (1);
 }

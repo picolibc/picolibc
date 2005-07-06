@@ -167,7 +167,7 @@ fhandler_pty_master::accept_input ()
   DWORD bytes_left;
   int ret = 1;
 
-  (void) WaitForSingleObject (input_mutex, INFINITE);
+  WaitForSingleObject (input_mutex, INFINITE);
 
   bytes_left = eat_readahead (-1);
 

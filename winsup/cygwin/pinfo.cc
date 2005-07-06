@@ -53,7 +53,7 @@ set_myself (HANDLE h)
   myself->process_state |= PID_IN_USE;
   myself->dwProcessId = GetCurrentProcessId ();
 
-  (void) GetModuleFileName (NULL, myself->progname, sizeof (myself->progname));
+  GetModuleFileName (NULL, myself->progname, sizeof (myself->progname));
   if (!strace.active)
     strace.hello ();
   debug_printf ("myself->dwProcessId %u", myself->dwProcessId);
@@ -130,7 +130,7 @@ pinfo::zap_cwd ()
   /* Move to an innocuous location to avoid a race with other processes
      that may want to manipulate the current directory before this
      process has completely exited.  */
-  (void) SetCurrentDirectory (windows_system_directory);
+  SetCurrentDirectory (windows_system_directory);
 }
 
 void
@@ -610,7 +610,7 @@ _pinfo::commune_recv ()
 	    sigproc_printf ("WriteFile read handle failed, %E");
 	  }
 
-	(void) ReadFile (__fromthem, &nr, sizeof (nr), &nr, NULL);
+	ReadFile (__fromthem, &nr, sizeof (nr), &nr, NULL);
 	break;
       }
     }
@@ -761,7 +761,7 @@ _pinfo::commune_send (DWORD code, ...)
 	  }
 
 	DWORD x = ReadFile (fromthem, res.handles, sizeof (res.handles), &nr, NULL);
-	(void) WriteFile (tothem, &x, sizeof (x), &x, NULL);
+	WriteFile (tothem, &x, sizeof (x), &x, NULL);
 	if (!x)
 	  goto err;
 

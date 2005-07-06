@@ -185,7 +185,7 @@ fhandler_pipe::read (void *in_ptr, size_t& in_len)
       if (th->detach (read_state) && !in_len)
 	in_len = (size_t) -1;	/* received a signal */
     }
-  (void) ReleaseMutex (guard);
+  ReleaseMutex (guard);
   return;
 }
 

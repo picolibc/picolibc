@@ -414,7 +414,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 		      pc.set_exec ();
 		      buf->st_mode |= STD_XBITS;
 		    }
-		  (void) SetFilePointer (get_handle (), cur, NULL, FILE_BEGIN);
+		  SetFilePointer (get_handle (), cur, NULL, FILE_BEGIN);
 		}
 	    }
 	}
@@ -1334,7 +1334,7 @@ fhandler_disk_file::readdir (DIR *dir)
   else if (!FindNextFileA (dir->__handle, &buf))
     {
       DWORD lasterr = GetLastError ();
-      (void) FindClose (dir->__handle);
+      FindClose (dir->__handle);
       dir->__handle = INVALID_HANDLE_VALUE;
       /* POSIX says you shouldn't set errno when readdir can't
 	 find any more files; so, if another error we leave it set. */
@@ -1363,7 +1363,7 @@ fhandler_disk_file::readdir (DIR *dir)
 
   /* We get here if `buf' contains valid data.  */
   if (pc.isencoded ())
-    (void) fnunmunge (dir->__d_dirent->d_name, buf.cFileName);
+    fnunmunge (dir->__d_dirent->d_name, buf.cFileName);
   else
     strcpy (dir->__d_dirent->d_name, buf.cFileName);
 
@@ -1394,7 +1394,7 @@ fhandler_disk_file::rewinddir (DIR *dir)
 {
   if (dir->__handle != INVALID_HANDLE_VALUE)
     {
-      (void) FindClose (dir->__handle);
+      FindClose (dir->__handle);
       dir->__handle = INVALID_HANDLE_VALUE;
     }
   dir->__d_position = 0;

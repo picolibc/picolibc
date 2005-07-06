@@ -94,7 +94,7 @@ nanosleep (const struct timespec *rqtp, struct timespec *rmtp)
     rem = 0;
   if (rc == WAIT_OBJECT_0)
     {
-      (void) _my_tls.call_signal_handler ();
+      _my_tls.call_signal_handler ();
       set_errno (EINTR);
       res = -1;
     }
@@ -172,7 +172,7 @@ handle_sigprocmask (int how, const sigset_t *set, sigset_t *oldset, sigset_t& op
 	  newmask = *set;
 	  break;
 	}
-      (void) set_signal_mask (newmask, opmask);
+      set_signal_mask (newmask, opmask);
     }
   return 0;
 }
@@ -208,7 +208,7 @@ _pinfo::kill (siginfo_t& si)
       si2.si_signo = SIGCONT;
       si2.si_code = SI_KERNEL;
       si2.si_pid = si2.si_uid = si2.si_errno = 0;
-      (void) sig_send (this, si2);
+      sig_send (this, si2);
     }
 
   syscall_printf ("%d = _pinfo::kill (%d, %d), process_state %p", res, pid,
@@ -332,7 +332,7 @@ abort (void)
   set_signal_mask (sig_mask);
 
   raise (SIGABRT);
-  (void) _my_tls.call_signal_handler (); /* Call any signal handler */
+  _my_tls.call_signal_handler (); /* Call any signal handler */
   do_exit (SIGABRT);	/* signal handler didn't exit.  Goodbye. */
 }
 
@@ -466,7 +466,7 @@ extern "C" int
 siginterrupt (int sig, int flag)
 {
   struct sigaction act;
-  (void) sigaction(sig, NULL, &act);
+  sigaction(sig, NULL, &act);
   if (flag)
     act.sa_flags &= ~SA_RESTART;
   else

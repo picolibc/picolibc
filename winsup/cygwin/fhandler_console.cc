@@ -121,7 +121,7 @@ fhandler_console::get_tty_stuff (int flags = 0)
 void
 set_console_ctty ()
 {
-  (void) fhandler_console::get_tty_stuff ();
+  fhandler_console::get_tty_stuff ();
 }
 
 /* Return the tty structure associated with a given tty number.  If the
@@ -590,7 +590,7 @@ fhandler_console::scroll_screen (int x1, int y1, int x2, int y2, int xn, int yn)
   CHAR_INFO fill;
   COORD dest;
 
-  (void) dev_state->fillin_info (get_output_handle ());
+  dev_state->fillin_info (get_output_handle ());
   sr1.Left = x1 >= 0 ? x1 : dev_state->info.dwWinSize.X - 1;
   if (y1 == 0)
     sr1.Top = dev_state->info.winTop;
@@ -745,7 +745,7 @@ fhandler_console::ioctl (unsigned int cmd, void *buf)
 	  }
 	return 0;
       case TIOCSWINSZ:
-	(void) bg_check (SIGTTOU);
+	bg_check (SIGTTOU);
 	return 0;
       case TIOCLINUX:
 	if (* (int *) buf == 6)
@@ -969,7 +969,7 @@ fhandler_console::clear_screen (int x1, int y1, int x2, int y2)
   DWORD done;
   int num;
 
-  (void) dev_state->fillin_info (get_output_handle ());
+  dev_state->fillin_info (get_output_handle ());
 
   if (x1 < 0)
     x1 = dev_state->info.dwWinSize.X - 1;
@@ -1008,7 +1008,7 @@ fhandler_console::cursor_set (bool rel_to_top, int x, int y)
 {
   COORD pos;
 
-  (void) dev_state->fillin_info (get_output_handle ());
+  dev_state->fillin_info (get_output_handle ());
   if (y > dev_state->info.winBottom)
     y = dev_state->info.winBottom;
   else if (y < 0)
@@ -1029,7 +1029,7 @@ fhandler_console::cursor_set (bool rel_to_top, int x, int y)
 void
 fhandler_console::cursor_rel (int x, int y)
 {
-  (void) dev_state->fillin_info (get_output_handle ());
+  dev_state->fillin_info (get_output_handle ());
   x += dev_state->info.dwCursorPosition.X;
   y += dev_state->info.dwCursorPosition.Y;
   cursor_set (false, x, y);

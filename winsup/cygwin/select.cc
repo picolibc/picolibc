@@ -976,7 +976,7 @@ peek_serial (select_record *s, bool)
       goto out;
     }
 
-  (void) SetCommMask (h, EV_RXCHAR);
+  SetCommMask (h, EV_RXCHAR);
 
   if (!fh->overlapped_armed)
     {
@@ -1166,7 +1166,7 @@ fhandler_base::ready_for_read (int fd, DWORD howlong)
   me.fd = fd;
   while (!avail)
     {
-      (void) select_read (&me);
+      select_read (&me);
       avail = me.read_ready ?: me.peek (&me, false);
 
       if (fd >= 0 && cygheap->fdtab.not_open (fd))

@@ -1660,7 +1660,7 @@ pthread_mutex::_lock (pthread_t self)
     set_owner (self);
   else if (type == PTHREAD_MUTEX_NORMAL || !pthread::equal (owner, self))
     {
-      (void) cancelable_wait (win32_obj_id, INFINITE, cw_no_cancel, cw_sig_resume);
+      cancelable_wait (win32_obj_id, INFINITE, cw_no_cancel, cw_sig_resume);
       set_owner (self);
     }
   else

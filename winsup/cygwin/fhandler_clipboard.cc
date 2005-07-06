@@ -273,5 +273,5 @@ fhandler_dev_clipboard::close ()
 void
 fhandler_dev_clipboard::fixup_after_exec ()
 {
-  (void) close ();
+  close ();
 }

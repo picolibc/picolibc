@@ -135,12 +135,12 @@ muto::release ()
   if (!--visits)
     {
       tls = 0;		/* We were the last unlocker. */
-      (void) InterlockedExchange (&sync, 0); /* Reset trigger. */
+      InterlockedExchange (&sync, 0); /* Reset trigger. */
       /* This thread had incremented waiters but had never decremented it.
 	 Decrement it now.  If it is >= 0 then there are possibly other
 	 threads waiting for the lock, so trigger bruteforce.  */
       if (InterlockedDecrement (&waiters) >= 0)
-	(void) SetEvent (bruteforce); /* Wake up one of the waiting threads */
+	SetEvent (bruteforce); /* Wake up one of the waiting threads */
       else if (*name == '!')
 	{
 	  CloseHandle (bruteforce);	/* If *name == '!' and there are no

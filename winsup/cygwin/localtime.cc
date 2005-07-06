@@ -730,9 +730,9 @@ tzload(const char *name, struct state *sp)
 				return -1;
 			if ((strlen(p) + strlen(name) + 1) >= sizeof fullname)
 				return -1;
-			(void) strcpy(fullname, p);
-			(void) strcat(fullname, "/");
-			(void) strcat(fullname, name);
+			strcpy(fullname, p);
+			strcat(fullname, "/");
+			strcat(fullname, name);
 			/*
 			** Set doaccess if '.' (as in "../") shows up in name.
 			*/
@@ -1346,11 +1346,11 @@ tzparse(const char *name, struct state *sp, const int lastditch)
 	if ((size_t) sp->charcnt > sizeof sp->chars)
 		return -1;
 	cp = sp->chars;
-	(void) strncpy(cp, stdname, stdlen);
+	strncpy(cp, stdname, stdlen);
 	cp += stdlen;
 	*cp++ = '\0';
 	if (dstlen != 0) {
-		(void) strncpy(cp, dstname, dstlen);
+		strncpy(cp, dstname, dstlen);
 		*(cp + dstlen) = '\0';
 	}
 	return 0;
@@ -1360,7 +1360,7 @@ static void
 gmtload(struct state *sp)
 {
 	if (tzload(gmt, sp) != 0)
-		(void) tzparse(gmt, sp, true);
+		tzparse(gmt, sp, true);
 }
 
 #ifndef STD_INSPIRED
@@ -1479,7 +1479,7 @@ tzset P((void))
 		return;
 	lcl_is_set = (strlen(name) < sizeof (lcl_TZname));
 	if (lcl_is_set)
-		(void) strcpy(lcl_TZname, name);
+		strcpy(lcl_TZname, name);
 
 #ifdef ALL_STATE
 	if (lclptr == NULL) {
@@ -1498,10 +1498,10 @@ tzset P((void))
 		lclptr->timecnt = 0;
 		lclptr->ttis[0].tt_gmtoff = 0;
 		lclptr->ttis[0].tt_abbrind = 0;
-		(void) strcpy(lclptr->chars, gmt);
+		strcpy(lclptr->chars, gmt);
 	} else if (tzload(name, lclptr) != 0) {
 		if (name[0] == ':' || tzparse(name, lclptr, false) != 0)
-			(void) gmtload(lclptr);
+			gmtload(lclptr);
 	}
 	settzname();
 }

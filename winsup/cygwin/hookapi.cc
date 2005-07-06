@@ -59,7 +59,7 @@ putmem (PIMAGE_THUNK_DATA pi, const void *hookfn)
   void *origfn = (void *) pi->u1.Function;
   pi->u1.Function = (DWORD) hookfn;
 
-  (void) VirtualProtect (pi, sizeof (PVOID), flOldProtect, &flDontCare);
+  VirtualProtect (pi, sizeof (PVOID), flOldProtect, &flDontCare);
   return origfn;
 }
 

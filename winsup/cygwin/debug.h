@@ -13,7 +13,7 @@ details. */
 #include "dlmalloc.h"
 #define MALLOC_CHECK ({\
   debug_printf ("checking malloc pool");\
-  (void) mallinfo ();\
+  mallinfo ();\
 })
 #endif
 

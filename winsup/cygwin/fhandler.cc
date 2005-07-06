@@ -230,14 +230,14 @@ fhandler_base::raw_read (void *ptr, size_t& ulen)
     {
       h = GetCurrentThread ();
       prio = GetThreadPriority (h);
-      (void) SetThreadPriority (h, THREAD_PRIORITY_TIME_CRITICAL);
+      SetThreadPriority (h, THREAD_PRIORITY_TIME_CRITICAL);
       signal_read_state (1);
     }
   BOOL res = ReadFile (get_handle (), ptr, len, (DWORD *) &ulen, 0);
   if (read_state)
     {
       signal_read_state (1);
-      (void) SetThreadPriority (h, prio);
+      SetThreadPriority (h, prio);
     }
   if (!res)
     {

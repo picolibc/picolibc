@@ -213,7 +213,7 @@ class fhandler_base
 
   void signal_read_state (LONG n)
   {
-    (void) ReleaseSemaphore (read_state, n, NULL);
+    ReleaseSemaphore (read_state, n, NULL);
   }
 
   void set_fs_flags (DWORD flags) { fs_flags = flags; }

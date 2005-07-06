@@ -106,13 +106,13 @@ win_env::add_cache (const char *in_posix, const char *in_native)
   if (in_native)
     {
       native = (char *) realloc (native, namelen + 1 + strlen (in_native));
-      (void) strcpy (native, name);
-      (void) strcpy (native + namelen, in_native);
+      strcpy (native, name);
+      strcpy (native + namelen, in_native);
     }
   else
     {
       native = (char *) realloc (native, namelen + 1 + win32_len (in_posix));
-      (void) strcpy (native, name);
+      strcpy (native, name);
       towin32 (in_posix, native + namelen);
     }
   MALLOC_CHECK;
@@ -897,7 +897,7 @@ spenv::retrieve (bool no_envblock, const char *const env)
 	return env_dontadd;
       char *s = (char *) cmalloc (HEAP_1_STR, namelen + strlen (p) + 1);
       strcpy (s, name);
-      (void) strcpy (s + namelen, p);
+      strcpy (s + namelen, p);
       debug_printf ("using computed value for '%s'", name);
       return s;
     }

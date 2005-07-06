@@ -123,7 +123,7 @@ void
 init_console_handler (BOOL install_handler)
 {
   BOOL res;
-  (void) SetConsoleCtrlHandler (ctrl_c_handler, FALSE);
+  SetConsoleCtrlHandler (ctrl_c_handler, FALSE);
   if (install_handler)
     res = SetConsoleCtrlHandler (ctrl_c_handler, TRUE);
   else if (wincap.has_null_console_handler_routine ())
@@ -767,7 +767,7 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
       /* Just set pending if thread is already suspended */
       if (res)
 	{
-	  (void) ResumeThread (hth);
+	  ResumeThread (hth);
 	  break;
 	}
       if (tls->incyg || tls->in_exception () || tls->spinning || tls->locked ())
@@ -1144,8 +1144,8 @@ signal_exit (int rc)
   /* We'd like to stop the main thread from executing but when we do that it
      causes random, inexplicable hangs.  So, instead, we set up the priority
      of this thread really high so that it should do its thing and then exit. */
-  (void) SetThreadPriority (hMainThread, THREAD_PRIORITY_IDLE);
-  (void) SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
+  SetThreadPriority (hMainThread, THREAD_PRIORITY_IDLE);
+  SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
 
   user_data->resourcelocks->Delete ();
   user_data->resourcelocks->Init ();
@@ -1157,7 +1157,7 @@ signal_exit (int rc)
     }
 
   sigproc_printf ("about to call do_exit (%x)", rc);
-  (void) SetEvent (signal_arrived);
+  SetEvent (signal_arrived);
   do_exit (rc);
 }
 
@@ -1179,7 +1179,7 @@ events_init ()
   ProtectHandle (tty_mutex);
   mask_sync.init ("mask_sync");
   windows_system_directory[0] = '\0';
-  (void) GetSystemDirectory (windows_system_directory, sizeof (windows_system_directory) - 2);
+  GetSystemDirectory (windows_system_directory, sizeof (windows_system_directory) - 2);
   char *end = strchr (windows_system_directory, '\0');
   if (end == windows_system_directory)
     api_fatal ("can't find windows system directory");
@@ -1212,7 +1212,7 @@ _cygtls::call_signal_handler ()
       int thissig = sig;
       void (*sigfunc) (int) = func;
 
-      (void) pop ();
+      pop ();
       reset_signal_arrived ();
       sigset_t this_oldmask = set_process_mask_delta ();
       int this_errno = saved_errno;
@@ -1232,7 +1232,7 @@ extern "C" void __stdcall
 reset_signal_arrived ()
 {
   // NEEDED? WaitForSingleObject (signal_arrived, 10);
-  (void) ResetEvent (signal_arrived);
+  ResetEvent (signal_arrived);
   sigproc_printf ("reset signal_arrived");
   if (_my_tls.stackptr > _my_tls.stack)
     debug_printf ("stackptr[-1] %p", _my_tls.stackptr[-1]);

@@ -374,7 +374,7 @@ fhandler_registry::rewinddir (DIR * dir)
 {
   if (dir->__handle != INVALID_HANDLE_VALUE)
     {
-      (void) RegCloseKey ((HKEY) dir->__handle);
+      RegCloseKey ((HKEY) dir->__handle);
       dir->__handle = INVALID_HANDLE_VALUE;
     }
   dir->__d_position = 0;

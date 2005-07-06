@@ -126,7 +126,7 @@ internal_getlogin (cygheap_user &user)
 	    debug_printf ("gsid not found in augmented /etc/group");
 	}
     }
-  (void) cygheap->user.ontherange (CH_HOME, pw);
+  cygheap->user.ontherange (CH_HOME, pw);
 
   return;
 }
@@ -440,7 +440,7 @@ const char *
 cygheap_user::env_name (const char *name, size_t namelen)
 {
   if (!test_uid (pwinname, name, namelen))
-    (void) domain ();
+    domain ();
   return pwinname;
 }
 

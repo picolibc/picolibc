@@ -86,7 +86,7 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
   else
     {
       addr = offsets[m];
-      (void) VirtualFree (addr, 0, MEM_RELEASE);
+      VirtualFree (addr, 0, MEM_RELEASE);
     }
 
   if (shared_h)

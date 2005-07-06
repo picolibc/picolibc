@@ -233,7 +233,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
       sync_with_parent ("loaded dlls", true);
     }
 
-  (void) ForceCloseHandle1 (fork_info->forker_finished, forker_finished);
+  ForceCloseHandle1 (fork_info->forker_finished, forker_finished);
 
   _my_tls.fixup_after_fork ();
   sigproc_init ();
@@ -487,7 +487,7 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
 	    goto cleanup;
 	}
       /* Start the child up again. */
-      (void) resume_child (forker_finished);
+      resume_child (forker_finished);
     }
 
   ForceCloseHandle (pi.hThread);
