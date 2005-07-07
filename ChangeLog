@@ -1,3 +1,8 @@
+2005-07-06  Geoffrey Keating  <geoffk@apple.com>
+
+	* configure.in: Don't build sim or rda when targetting darwin.
+	* configure: Regenerate.
+
 2005-07-04  Ben Elliston  <bje@gnu.org>
 
 	* src-release (do-proto-toplev): Remove dejagnu bits.
