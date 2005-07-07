@@ -35,7 +35,7 @@ extern "C" {
 #include <stdio.h>
 #include "bfd.h"
 
-typedef int (*fprintf_ftype) (void *, const char*, ...);
+typedef int (*fprintf_ftype) (void *, const char*, ...) ATTRIBUTE_FPTR_PRINTF_2;
 
 enum dis_insn_type {
   dis_noninsn,			/* Not a valid instruction */
