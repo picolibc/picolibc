@@ -1,4 +1,4 @@
-2005-07-05  Shaun Jackman  <sjackman@gmail.com>
+2005-07-07  Shaun Jackman  <sjackman@gmail.com>
 
 	* newlib/libc/unix/ttyname.c (ttyname): Avoid calling _closedir
 	twice for the same directory. _closedir calls free, and freeing
