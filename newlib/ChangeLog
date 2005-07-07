@@ -1,3 +1,9 @@
+2005-07-05  Shaun Jackman  <sjackman@gmail.com>
+
+	* newlib/libc/unix/ttyname.c (ttyname): Avoid calling _closedir
+	twice for the same directory. _closedir calls free, and freeing
+	the same pointer twice may cause a crash.
+
 2005-07-06  Aldy Hernandez  <aldyh@redhat.com>
 
         * configure.host: Added entry for ms1*.

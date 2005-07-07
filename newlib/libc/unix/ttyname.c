@@ -56,7 +56,6 @@ ttyname (fd)
   struct dirent *dirp;
   DIR *dp;
   struct stat dsb;
-  char *rval;
 
   /* Must be a terminal. */
   if (tcgetattr (fd, &tty) < 0)
@@ -69,7 +68,7 @@ ttyname (fd)
   if ((dp = _opendir (_PATH_DEV)) == NULL)
     return NULL;
 
-  for (rval = NULL; dirp = _readdir (dp);)
+  while ((dirp = _readdir (dp)) != NULL)
     {
       if (dirp->d_ino != sb.st_ino)
 	continue;
@@ -78,9 +77,8 @@ ttyname (fd)
 	  sb.st_ino != dsb.st_ino)
 	continue;
       (void) _closedir (dp);
-      rval = buf;
-      break;
+      return buf;
     }
   (void) _closedir (dp);
-  return rval;
+  return NULL;
 }
