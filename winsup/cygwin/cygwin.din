@@ -35,6 +35,8 @@ __eprintf SIGFE
 __errno NOSIGFE
 __fpclassifyd NOSIGFE
 __fpclassifyf NOSIGFE
+__getline NOSIGFE
+__getdelim NOSIGFE
 __getreent NOSIGFE
 __infinity NOSIGFE
 __main NOSIGFE

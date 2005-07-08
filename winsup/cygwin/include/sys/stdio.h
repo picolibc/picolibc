@@ -1,6 +1,6 @@
 /* sys/stdio.h
 
-   Copyright 2004 Red Hat, Inc.
+   Copyright 2004, 2005 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -24,5 +24,8 @@ details. */
 #    define _funlockfile(fp) __cygwin_lock_unlock ((_LOCK_T *)&(fp)->_lock)
 #  endif
 #endif
+
+#define getline __getline
+#define getdelim __getdelim
 
 #endif
