@@ -529,8 +529,8 @@ does not remove these changes; it must be completely uninstalled.
 
 @subsection How can I share files between Unix and Windows?
 
-During development, we have both Linix boxes running Samba and Windows
-machines.  We often build with cross-compilers under Linix and copy
+During development, we have both Linux boxes running Samba and Windows
+machines.  We often build with cross-compilers under Linux and copy
 binaries and source to the Windows system or just toy with them
 directly off the Samba-mounted partition.  On dual-boot NT/Windows 9x
 machines, we usually use the FAT filesystem so we can also access the

@@ -1,3 +1,7 @@
+2005-07-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* how-using.texinfo: Fix typos.
+
 2005-06-20  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* how-resources.texinfo: Update section on cygwin-developers.
