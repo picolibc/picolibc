@@ -75,6 +75,7 @@ _DEFUN (wcsspn, (s, set),
 	{
 	  if (*p == *q)
 	    break;
+	  q++;
 	}
       if (!*q)
 	goto done;
