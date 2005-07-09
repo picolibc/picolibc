@@ -1,3 +1,7 @@
+2005-07-09  Christopher Faylor  <cgf@timesys.com>
+
+	* path.cc (mount): Only check win32_path when we know we need it.
+
 2005-07-09  Nicholas Wourms  <nwourms@gmail.com>
 
 	* cygwin.din (getline): Export.

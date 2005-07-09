@@ -2486,7 +2486,7 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
   myfault efault;
   if (efault.faulted (EFAULT))
     /* errno set */;
-  else if (!*posix_path || !*win32_path)
+  else if (!*posix_path)
     set_errno (EINVAL);
   else if (strpbrk (posix_path, "\\:"))
     set_errno (EINVAL);
@@ -2498,6 +2498,8 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
       res = mount_table->write_cygdrive_info_to_registry (posix_path, flags);
       win32_path = NULL;
     }
+  else if (!*win32_path)
+    set_errno (EINVAL);
   else
     res = mount_table->add_item (win32_path, posix_path, flags, true);
 
