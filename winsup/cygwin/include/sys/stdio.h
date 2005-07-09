@@ -11,6 +11,7 @@ details. */
 #ifndef _SYS_STDIO_H_
 #define _SYS_STDIO_H_
 
+#include <sys/cdefs.h>
 #include <sys/lock.h>
 
 #if !defined(__SINGLE_THREAD__)
@@ -25,7 +26,11 @@ details. */
 #  endif
 #endif
 
-#define getline __getline
-#define getdelim __getdelim
+__BEGIN_DECLS
+
+ssize_t	_EXFUN(getline, (char **, size_t *, FILE *));
+ssize_t	_EXFUN(getdelim, (char **, size_t *, int, FILE *));
+
+__END_DECLS
 
 #endif

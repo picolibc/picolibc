@@ -1,3 +1,11 @@
+2005-07-09  Nicholas Wourms  <nwourms@gmail.com>
+
+	* cygwin.din (getline): Export.
+	(getdelim): Export.
+	* include/sys/stdio.h (getline): Replace macro with function prototype.
+	(getdelim):  Likewise.
+	* include/cygwin/version.h: Bump API minor number.
+
 2005-07-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din (__getline): Export.

@@ -260,12 +260,13 @@ details. */
       131: Export inet_ntop, inet_pton.
       132: Add GLOB_LIMIT flag to glob.
       133: Export __getline, __getdelim.
+      134: Export getline, getdelim.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 133
+#define CYGWIN_VERSION_API_MINOR 134
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

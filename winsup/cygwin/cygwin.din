@@ -35,8 +35,6 @@ __eprintf SIGFE
 __errno NOSIGFE
 __fpclassifyd NOSIGFE
 __fpclassifyf NOSIGFE
-__getline NOSIGFE
-__getdelim NOSIGFE
 __getreent NOSIGFE
 __infinity NOSIGFE
 __main NOSIGFE
@@ -613,6 +611,8 @@ getchar_unlocked SIGFE
 _getchar_unlocked = getchar_unlocked SIGFE
 getcwd SIGFE
 _getcwd = getcwd SIGFE
+__getdelim NOSIGFE
+getdelim = __getdelim NOSIGFE
 getdomainname SIGFE
 _getdomainname = getdomainname SIGFE
 getdtablesize NOSIGFE
@@ -644,6 +644,8 @@ _getgroups = getgroups SIGFE
 _getgroups32 = getgroups32 SIGFE
 gethostid SIGFE
 getitimer SIGFE
+__getline NOSIGFE
+getline = __getline NOSIGFE
 getlogin_r NOSIGFE
 getlogin NOSIGFE
 _getlogin = getlogin NOSIGFE
