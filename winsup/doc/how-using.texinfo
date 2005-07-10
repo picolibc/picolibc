@@ -418,16 +418,36 @@ cause.  Then use the Windows System find utility to search your whole
 machine, not just components in your PATH (as 'type' would do) or
 cygwin-mounted filesystems (as Cygwin 'find' would do).
 
-@subsection Where can I find "more"?
-
-If you are looking for the "more" pager, you should use the "less" pager
-instead.
-
-@subsection Why isn't package XXXX available in Cygwin?  (Or, why is your package so out of date?)
+@subsection Why isn't package XYZ available in Cygwin?
 
 Probably because there is nobody willing or able to maintain it.  It
 takes time, and the priority for the Cygwin Team is the Cygwin package.
-The rest is a volunteer effort.  Want to contribute?  See below.
+The rest is a volunteer effort.  Want to contribute?  See
+@file{http://cygwin.com/setup.html}.
+
+@subsection Why is the Cygwin package of XYZ so out of date?
+
+(Also: Why is the version of package XYZ older than the version that I
+can download from the XYZ web site?  Why is the version of package XYZ
+older than the version that I installed on my linux system?  Is there
+something special about Cygwin which requires that only an older version
+of package XYZ will work on it?)
+
+Every package in the Cygwin distribution has a maintainer who is
+responsible for sending out updates of the package.  This person is a
+volunteer who is rarely the same person as the official developer of the
+package.  If you notice that a version of a package seems to be out of
+date, the reason is usually pretty simple -- the person who is
+maintaining the package hasn't gotten around to updating it yet. Rarely,
+the newer package actually requires complex changes that the maintainer
+is working out. 
+
+If you urgently need an update, sending a polite message to the cygwin
+mailing list pinging the maintainer is perfectly acceptable.  There are
+no guarantees that the maintainer will have time to update the package
+or that you'll receive a response to your request, however.
+
+Remeber that the operative term here is "volunteer".
 
 @subsection How can I access other drives?
 
@@ -515,10 +535,15 @@ the following line to your .inputrc file:
 We have had good reports about Kerio Personal Firewall, ZoneLabs
 Integrity Desktop, and the built-in firewall in Windows XP. Other
 well-known products including ZoneAlarm and Norton Internet Security have
-caused problems for some users but work fine for others. If you are
-having strange connection-related problems, disabling the firewall is a
-good troubleshooting step.
+caused problems for some users but work fine for others. At last report,
+Agnitum Outpost did not work with Cygwin.  If you are having strange
+connection-related problems, disabling the firewall is a good
+troubleshooting step (as is closing or disabling all other running
+applications, especially resource-intensive processes such as indexed
+search).
 
+On the whole, Cygwin doesn't care which firewall is used.  The few rare
+exceptions have to do with socket code.
 Cygwin uses sockets to implement many of its functions, such as IPC.
 Some overzealous firewalls install themselves deeply into the winsock
 stack (with the 'layered service provider' API) and install hooks

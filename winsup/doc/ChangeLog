@@ -1,3 +1,10 @@
+2005-07-10  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* cygwinenv.sgml: Update tty section to mention rxvt and xterm.
+	* how-programming.texinfo: Update GPL section of VS FAQ. 
+	* how-using.texinfo: Expand FAQ about out of date pacakages.
+	* setup-net.sgml: Add troubleshooting setup.exe section.
+
 2005-07-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* how-using.texinfo: Fix typos.

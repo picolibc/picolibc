@@ -175,13 +175,15 @@ switched on.  So, use at your own risk.</para>
 </listitem>
 <listitem>
 <para><envar>(no)tty</envar> - if set, Cygwin enables extra support
-(i.e., termios) for UNIX-like ttys. 
+(i.e., termios) for UNIX-like ttys in the Windows console. 
 It is not compatible with some Windows programs.
 Defaults to not set, in which case the tty is opened in text mode.
 Note that this has been changed such that ^D works as
 expected instead of ^Z, and is settable via <command>stty</command>.
 This option must be specified before starting a Cygwin shell 
-and it cannot be changed in the shell.</para>
+and it cannot be changed in the shell.  It should not be set when using
+other terminals (i.e., rxvt or xterm). 
+</para>
 </listitem>
 <listitem>
 <para><envar>(no)winsymlinks</envar> - if set, Cygwin creates

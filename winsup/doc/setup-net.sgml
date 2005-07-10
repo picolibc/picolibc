@@ -236,6 +236,19 @@ Relevant documentation can be found in the <literal>/usr/doc/Cygwin/</literal>
 or <literal>/usr/share/doc/Cygwin/</literal> directory.
 </para>
 </sect2>
+<sect2><title>Troubleshooting</title>
+<para>
+Unfortunately, the complex setup process means that odd problems can
+occur. If you're having trouble downloading packages, it may be network
+congestion, so try a different mirror and/or a different protocol (i.e.,
+HTTP instead of FTP).  If you notice something is not working after
+running setup, you can check the <command>setup.exe</command> log file
+at <literal>/var/log/setup.log.full</literal>. Make a backup of this
+file before running <command>setup.exe</command> again, and follow the
+steps for <ulink url="http://cygwin.com/problems.html">Reporting
+Problems with Cygwin</ulink>.
+</para>
+</sect2>
 
 </sect1>
 
