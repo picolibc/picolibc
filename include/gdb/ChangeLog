@@ -1,3 +1,7 @@
+2005-07-08  Ben Elliston  <bje@au.ibm.com>
+
+	* callback.h: Remove ANSI_PROTOTYPES conditional code.
+
 2005-01-28  Hans-Peter Nilsson  <hp@axis.com>
 
 	* callback.h (struct host_callback_struct): New members pipe,
