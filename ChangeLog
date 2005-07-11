@@ -1,3 +1,11 @@
+2005-07-11  Paolo Bonzini  <bonzini@gnu.org>
+
+	PR ada/22340
+
+	* Makefile.def: Sync with gcc.
+	* Makefile.tpl (POSTSTAGE1_FLAGS_TO_PASS): Fix pasto.
+	* Makefile.in: Regenerate.
+
 2005-07-07  Andreas Schwab  <schwab@suse.de>
 
 	* Makefile.def (flags_to_pass): Add CFLAGS_FOR_BUILD.
