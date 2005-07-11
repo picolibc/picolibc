@@ -1,3 +1,7 @@
+2005-07-10  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	* hppa.h (pa_opcode): Don't set FLAG_STRICT in pa10 loads and stores.
+
 2005-07-05  Jan Beulich  <jbeulich@novell.com>
 
 	* i386.h (i386_optab): Add new insns.
