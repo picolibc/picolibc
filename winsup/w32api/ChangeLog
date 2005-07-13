@@ -1,3 +1,10 @@
+2005-07-13  Benoit Blanchon  <bblanchon@users.sourceforge.net>
+
+	* include/wingdi.h (SHADEBLENDCAPS, SB_NONE, SB_CONST_ALPHA,
+	SB_PIXEL_ALPHA, SB_PREMULT_ALPHA, SB_GRAD_RECT, SB_GRAD_TRI,
+	COLORMGMTCAPS, CM_NONE, CM_DEVICE_ICM, CM_GAMMA_RAMP,
+	CM_CMYK_COLOR): Define.
+
 2005-07-08  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/objsafe.h: New file.
@@ -121,7 +128,7 @@
 
 2005-01-02  Earnie Boyd  <earnie@users.sf.net>
 
-	* include/w32api.h: Increment version.
+	* include/w32api.h: Increment version to 3.2.
 	* Makefile.in: Ditto.
 	* include/afxres.h: Remove the \r from the line ending.
 	* include/errorrep.h: Ditto.

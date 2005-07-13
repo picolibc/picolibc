@@ -646,6 +646,20 @@ extern "C" {
 #define DESKTOPHORZRES 118
 #define DESKTOPVERTRES 117
 #define BLTALIGNMENT 119
+#if(WINVER >= 0x0500)
+#define SHADEBLENDCAPS 120
+#define SB_NONE 0x00
+#define SB_CONST_ALPHA 0x01
+#define SB_PIXEL_ALPHA 0x02
+#define SB_PREMULT_ALPHA 0x04
+#define SB_GRAD_RECT 0x10
+#define SB_GRAD_TRI 0x20
+#define COLORMGMTCAPS 121
+#define CM_NONE 0x00
+#define CM_DEVICE_ICM 0x01
+#define CM_GAMMA_RAMP 0x02
+#define CM_CMYK_COLOR 0x04
+#endif
 #define RASTERCAPS 38
 #define RC_BANDING 2
 #define RC_BITBLT 1
