@@ -264,6 +264,7 @@ extern int print_insn_sh64		(bfd_vma, disassemble_info *);
 extern int print_insn_sh64x_media	(bfd_vma, disassemble_info *);
 extern int print_insn_frv		(bfd_vma, disassemble_info *);
 extern int print_insn_iq2000		(bfd_vma, disassemble_info *);
+extern int print_insn_m32c	(bfd_vma, disassemble_info *);
 
 extern disassembler_ftype arc_get_disassembler (void *);
 extern disassembler_ftype cris_get_disassembler (bfd *);

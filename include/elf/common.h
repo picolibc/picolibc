@@ -211,6 +211,9 @@
 /* (Deprecated) Temporary number for the OpenRISC processor.  */
 #define EM_OR32		0x8472
 
+/* Renesas M32C and M16C.  */
+#define EM_M32C			0xFEB0
+
 /* Cygnus M32R ELF backend.  Written in the absence of an ABI.  */
 #define EM_CYGNUS_M32R	0x9041
 

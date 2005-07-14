@@ -1,3 +1,9 @@
+2005-07-14  Jim Blandy  <jimb@redhat.com>
+
+	Add support for Renesas M32C and M16C.
+	* common.h (EM_M32C): New machine number.
+	* m32c.h: New file.
+	
 2005-06-17  Jan Beulich  <jbeulich@novell.com>
 
 	* x86-64.h (elf_x86_64_reloc_type): Adjust comment for
