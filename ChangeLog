@@ -1,3 +1,8 @@
+2005-07-13  Eric Christopher  <echristo@redhat.com>
+
+	* configure.in: Add toplevel noconfigdir support for tpf.
+	* configure: Regenerate.
+
 2005-07-11  Jakub Jelinek  <jakub@redhat.com>
 
 	* Makefile.def (target_modules): Add libssp.
