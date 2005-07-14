@@ -1,7 +1,7 @@
 /* ECOFF support on Alpha machines.
    coff/ecoff.h must be included before this file.
 
-   Copyright 2001 Free Software Foundation, Inc.
+   Copyright 2001, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -33,6 +33,9 @@ struct external_filehdr
 /* Magic numbers are defined in coff/ecoff.h.  */
 #define ALPHA_ECOFF_BADMAG(x) \
   ((x).f_magic != ALPHA_MAGIC && (x).f_magic != ALPHA_MAGIC_BSD)
+
+#define ALPHA_ECOFF_COMPRESSEDMAG(x) \
+  ((x).f_magic == ALPHA_MAGIC_COMPRESSED)
 
 /* The object type is encoded in the f_flags.  */
 #define F_ALPHA_OBJECT_TYPE_MASK	0x3000
