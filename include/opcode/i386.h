@@ -1347,6 +1347,20 @@ static const template i386_optab[] =
 /* Need to ensure only "mwait %eax,%ecx" is accepted.  */
 {"mwait",     2, 0x0f01, 0xc9, CpuPNI, NoSuf|ImmExt,	{ Reg32, Reg32, 0} },
 
+/* VMX instructions.  */
+{"vmcall",    0, 0x0f01, 0xc1, CpuVMX, NoSuf|ImmExt,	{ 0, 0, 0} },
+{"vmclear",   1, 0x660fc7,  6, CpuVMX, NoSuf|IgnoreSize|Modrm|NoRex64,	{ LLongMem, 0, 0} },
+{"vmlaunch",  0, 0x0f01, 0xc2, CpuVMX, NoSuf|ImmExt,	{ 0, 0, 0} },
+{"vmresume",  0, 0x0f01, 0xc3, CpuVMX, NoSuf|ImmExt,	{ 0, 0, 0} },
+{"vmptrld",   1, 0x0fc7,    6, CpuVMX, NoSuf|IgnoreSize|Modrm|NoRex64,	{ LLongMem, 0, 0} },
+{"vmptrst",   1, 0x0fc7,    7, CpuVMX, NoSuf|IgnoreSize|Modrm|NoRex64,	{ LLongMem, 0, 0} },
+{"vmread",    2, 0x0f78,    X, CpuVMX|CpuNo64, l_Suf|Modrm,{ Reg32, Reg32|LongMem, 0} },
+{"vmread",    2, 0x0f78,    X, CpuVMX|Cpu64, q_Suf|Modrm|NoRex64,{ Reg64, Reg64|LLongMem, 0} },
+{"vmwrite",   2, 0x0f79,    X, CpuVMX|CpuNo64, l_Suf|Modrm,{ Reg32|LongMem, Reg32, 0} },
+{"vmwrite",   2, 0x0f79,    X, CpuVMX|Cpu64, q_Suf|Modrm|NoRex64,{ Reg64|LLongMem, Reg64, 0} },
+{"vmxoff",    0, 0x0f01, 0xc4, CpuVMX, NoSuf|ImmExt,	{ 0, 0, 0} },
+{"vmxon",     1, 0xf30fc7,  6, CpuVMX, NoSuf|IgnoreSize|Modrm|NoRex64,	{ LLongMem, 0, 0} },
+
 /* AMD 3DNow! instructions.  */
 
 {"prefetch", 1, 0x0f0d,	   0, Cpu3dnow, NoSuf|IgnoreSize|Modrm,	{ ByteMem, 0, 0 } },

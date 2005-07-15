@@ -1,3 +1,7 @@
+2007-07-15  H.J. Lu <hongjiu.lu@intel.com>
+
+	* i386.h (i386_optab): Support Intel VMX Instructions.
+
 2005-07-10  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
 
 	* hppa.h (pa_opcode): Don't set FLAG_STRICT in pa10 loads and stores.
