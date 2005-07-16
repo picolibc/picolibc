@@ -908,7 +908,7 @@ out:
 extern "C" int
 cwait (int *result, int pid, int)
 {
-return waitpid (pid, result, 0);
+  return waitpid (pid, result, 0);
 }
 
 /*
@@ -920,51 +920,51 @@ extern "C" int
 spawnve (int mode, const char *path, const char *const *argv,
        const char *const *envp)
 {
-int ret;
+  int ret;
 #ifdef NEWVFORK
-vfork_save *vf = vfork_storage.val ();
+  vfork_save *vf = vfork_storage.val ();
 
-if (vf != NULL && (vf->pid < 0) && mode == _P_OVERLAY)
-  mode = _P_NOWAIT;
-else
-  vf = NULL;
+  if (vf != NULL && (vf->pid < 0) && mode == _P_OVERLAY)
+    mode = _P_NOWAIT;
+  else
+    vf = NULL;
 #endif
 
-syscall_printf ("spawnve (%s, %s, %x)", path, argv[0], envp);
+  syscall_printf ("spawnve (%s, %s, %x)", path, argv[0], envp);
 
-switch (mode)
-  {
-  case _P_OVERLAY:
-    /* We do not pass _P_SEARCH_PATH here. execve doesn't search PATH.*/
-    /* Just act as an exec if _P_OVERLAY set. */
-    spawn_guts (path, argv, envp, mode);
-    /* Errno should be set by spawn_guts.  */
-    ret = -1;
-    break;
-  case _P_VFORK:
-  case _P_NOWAIT:
-  case _P_NOWAITO:
-  case _P_WAIT:
-  case _P_DETACH:
-  case _P_SYSTEM:
-    ret = spawn_guts (path, argv, envp, mode);
+  switch (mode)
+    {
+    case _P_OVERLAY:
+      /* We do not pass _P_SEARCH_PATH here. execve doesn't search PATH.*/
+      /* Just act as an exec if _P_OVERLAY set. */
+      spawn_guts (path, argv, envp, mode);
+      /* Errno should be set by spawn_guts.  */
+      ret = -1;
+      break;
+    case _P_VFORK:
+    case _P_NOWAIT:
+    case _P_NOWAITO:
+    case _P_WAIT:
+    case _P_DETACH:
+    case _P_SYSTEM:
+      ret = spawn_guts (path, argv, envp, mode);
 #ifdef NEWVFORK
-    if (vf)
-      {
-	if (ret > 0)
-	  {
-	    debug_printf ("longjmping due to vfork");
-	    vf->restore_pid (ret);
-	  }
-      }
+      if (vf)
+	{
+	  if (ret > 0)
+	    {
+	      debug_printf ("longjmping due to vfork");
+	      vf->restore_pid (ret);
+	    }
+	}
 #endif
-    break;
-  default:
-    set_errno (EINVAL);
-    ret = -1;
-    break;
-  }
-return ret;
+      break;
+    default:
+      set_errno (EINVAL);
+      ret = -1;
+      break;
+    }
+  return ret;
 }
 
 /*
@@ -975,103 +975,103 @@ return ret;
 extern "C" int
 spawnl (int mode, const char *path, const char *arg0, ...)
 {
-int i;
-va_list args;
-const char *argv[256];
+  int i;
+  va_list args;
+  const char *argv[256];
 
-va_start (args, arg0);
-argv[0] = arg0;
-i = 1;
+  va_start (args, arg0);
+  argv[0] = arg0;
+  i = 1;
 
-do
-    argv[i] = va_arg (args, const char *);
-while (argv[i++] != NULL);
+  do
+      argv[i] = va_arg (args, const char *);
+  while (argv[i++] != NULL);
 
-va_end (args);
+  va_end (args);
 
-return spawnve (mode, path, (char * const  *) argv, cur_environ ());
+  return spawnve (mode, path, (char * const  *) argv, cur_environ ());
 }
 
 extern "C" int
 spawnle (int mode, const char *path, const char *arg0, ...)
 {
-int i;
-va_list args;
-const char * const *envp;
-const char *argv[256];
+  int i;
+  va_list args;
+  const char * const *envp;
+  const char *argv[256];
 
-va_start (args, arg0);
-argv[0] = arg0;
-i = 1;
+  va_start (args, arg0);
+  argv[0] = arg0;
+  i = 1;
 
-do
-  argv[i] = va_arg (args, const char *);
-while (argv[i++] != NULL);
+  do
+    argv[i] = va_arg (args, const char *);
+  while (argv[i++] != NULL);
 
-envp = va_arg (args, const char * const *);
-va_end (args);
+  envp = va_arg (args, const char * const *);
+  va_end (args);
 
-return spawnve (mode, path, (char * const *) argv, (char * const *) envp);
+  return spawnve (mode, path, (char * const *) argv, (char * const *) envp);
 }
 
 extern "C" int
 spawnlp (int mode, const char *path, const char *arg0, ...)
 {
-int i;
-va_list args;
-const char *argv[256];
+  int i;
+  va_list args;
+  const char *argv[256];
 
-va_start (args, arg0);
-argv[0] = arg0;
-i = 1;
+  va_start (args, arg0);
+  argv[0] = arg0;
+  i = 1;
 
-do
-    argv[i] = va_arg (args, const char *);
-while (argv[i++] != NULL);
+  do
+      argv[i] = va_arg (args, const char *);
+  while (argv[i++] != NULL);
 
-va_end (args);
+  va_end (args);
 
-return spawnvpe (mode, path, (char * const *) argv, cur_environ ());
+  return spawnvpe (mode, path, (char * const *) argv, cur_environ ());
 }
 
 extern "C" int
 spawnlpe (int mode, const char *path, const char *arg0, ...)
 {
-int i;
-va_list args;
-const char * const *envp;
-const char *argv[256];
+  int i;
+  va_list args;
+  const char * const *envp;
+  const char *argv[256];
 
-va_start (args, arg0);
-argv[0] = arg0;
-i = 1;
+  va_start (args, arg0);
+  argv[0] = arg0;
+  i = 1;
 
-do
-  argv[i] = va_arg (args, const char *);
-while (argv[i++] != NULL);
+  do
+    argv[i] = va_arg (args, const char *);
+  while (argv[i++] != NULL);
 
-envp = va_arg (args, const char * const *);
-va_end (args);
+  envp = va_arg (args, const char * const *);
+  va_end (args);
 
-return spawnvpe (mode, path, (char * const *) argv, envp);
+  return spawnvpe (mode, path, (char * const *) argv, envp);
 }
 
 extern "C" int
 spawnv (int mode, const char *path, const char * const *argv)
 {
-return spawnve (mode, path, argv, cur_environ ());
+  return spawnve (mode, path, argv, cur_environ ());
 }
 
 extern "C" int
 spawnvp (int mode, const char *path, const char * const *argv)
 {
-return spawnvpe (mode, path, argv, cur_environ ());
+  return spawnvpe (mode, path, argv, cur_environ ());
 }
 
 extern "C" int
 spawnvpe (int mode, const char *file, const char * const *argv,
 					   const char * const *envp)
 {
-path_conv buf;
-return spawnve (mode, find_exec (file, buf), argv, envp);
+  path_conv buf;
+  return spawnve (mode, find_exec (file, buf), argv, envp);
 }
