@@ -1,3 +1,7 @@
+2005-07-16  Kelley Cook  <kcook@gcc.gnu.org>
+
+	* all files: Update FSF address.
+
 2005-07-14  Jim Blandy  <jimb@redhat.com>
 
 	* configure.in: Add cases for Renesas m32c.
