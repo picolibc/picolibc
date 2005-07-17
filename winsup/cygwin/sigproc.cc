@@ -721,7 +721,7 @@ out:
 /* Initialize some of the memory block passed to child processes
    by fork/spawn/exec. */
 
-child_info::child_info (unsigned in_cb, child_info_types chtype)
+child_info::child_info (unsigned in_cb, child_info_types chtype, bool need_subproc_ready)
 {
   memset (this, 0, in_cb);
   cb = in_cb;
@@ -730,7 +730,7 @@ child_info::child_info (unsigned in_cb, child_info_types chtype)
   type = chtype;
   fhandler_union_cb = sizeof (fhandler_union);
   user_h = cygwin_user_h;
-  if (chtype != PROC_SPAWN)
+  if (need_subproc_ready)
     subproc_ready = CreateEvent (&sec_all, FALSE, FALSE, NULL);
   sigproc_printf ("subproc_ready %p", subproc_ready);
   cygheap = ::cygheap;
@@ -753,12 +753,12 @@ child_info::~child_info ()
 }
 
 child_info_fork::child_info_fork () :
-  child_info (sizeof *this, _PROC_FORK)
+  child_info (sizeof *this, _PROC_FORK, true)
 {
 }
 
-child_info_spawn::child_info_spawn (child_info_types chtype) :
-  child_info (sizeof *this, chtype)
+child_info_spawn::child_info_spawn (child_info_types chtype, bool need_subproc_ready) :
+  child_info (sizeof *this, chtype, need_subproc_ready)
 {
 }
 
@@ -786,7 +786,7 @@ child_info::ready (bool execed)
 }
 
 bool
-child_info::sync (pinfo& vchild, DWORD howlong)
+child_info::sync (pid_t pid, HANDLE hProcess, DWORD howlong)
 {
   if (!subproc_ready)
     {
@@ -796,14 +796,14 @@ child_info::sync (pinfo& vchild, DWORD howlong)
 
   HANDLE w4[2];
   w4[0] = subproc_ready;
-  w4[1] = vchild.hProcess;
+  w4[1] = hProcess;
 
   bool res;
   sigproc_printf ("waiting for subproc_ready(%p) and child process(%p)", w4[0], w4[1]);
   switch (WaitForMultipleObjects (2, w4, FALSE, howlong))
     {
     case WAIT_OBJECT_0:
-      sigproc_printf ("got subproc_ready for pid %d", vchild->pid);
+      sigproc_printf ("got subproc_ready for pid %d", pid);
       res = true;
       break;
     case WAIT_OBJECT_0 + 1:
@@ -813,7 +813,7 @@ child_info::sync (pinfo& vchild, DWORD howlong)
       res = false;
       break;
     default:
-      system_printf ("wait failed, pid %d, %E", vchild->pid);
+      system_printf ("wait failed, pid %d, %E", pid);
       res = false;
       break;
     }

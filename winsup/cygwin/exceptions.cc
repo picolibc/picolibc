@@ -320,8 +320,13 @@ extern "C" int
 try_to_debug (bool waitloop)
 {
   debug_printf ("debugger_command '%s'", debugger_command);
-  if (*debugger_command == '\0' || being_debugged ())
+  if (*debugger_command == '\0')
     return 0;
+  if (being_debugged ())
+    {
+      DebugBreak ();
+      return 0;
+    }
 
   __small_sprintf (strchr (debugger_command, '\0'), " %u", GetCurrentProcessId ());
 

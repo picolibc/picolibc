@@ -414,7 +414,7 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
 #endif
 
   /* Wait for subproc to initialize itself. */
-  if (!ch.sync (child, FORK_WAIT_TIMEOUT))
+  if (!ch.sync (child->pid, pi.hProcess, FORK_WAIT_TIMEOUT))
     {
       system_printf ("child %d died waiting for longjmp before initialization", child_pid);
       goto cleanup;
@@ -465,7 +465,7 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
   /* Start thread, and wait for it to reload dlls.  */
   if (!resume_child (forker_finished))
     goto cleanup;
-  else if (!ch.sync (child, FORK_WAIT_TIMEOUT))
+  else if (!ch.sync (child->pid, pi.hProcess, FORK_WAIT_TIMEOUT))
     {
       system_printf ("child %d died waiting for dll loading", child_pid);
       goto cleanup;

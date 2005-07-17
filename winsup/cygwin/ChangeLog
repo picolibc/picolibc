@@ -1,3 +1,32 @@
+2005-07-16  Christopher Faylor  <cgf@timesys.com>
+
+	* child_info.h (child_info::sync): Pass pid and HANDLE rather than
+	using pinfo.
+	(child_info::child_info): Accept an argument controlling whether to
+	create proc_subproc.
+	(child_info_spawn::child_info_spawn): Ditto.
+	* sigproc.cc (child_info::child_info): Ditto.
+	(child_info_spawn::child_info_spawn): Ditto.
+	(child_info::sync): Use passed in pid and HANDLE.
+	* fork.cc (fork_parent): Reflect additional arguments required for
+	child_info::sync.
+	* hookapi.cc (hook_or_detect_cygwin): Rename.  Change so that NULL 'fn'
+	argument just returns "true", indicating that program uses cygwin1.dll.
+	* spawn.cc (av::win16_exe): New element.
+	* spawn.cc (av::iscygwin): New element.
+	(av::fixup): New function.
+	(spawn_guts): Protect against SEGV.  Use fixup function to detect when
+	it is safe to wait for a spawned (as opposed to an execed) program.
+	Reflect changes in child_info::sync arguments.
+	* external.cc (cygwin_internal): Reflect function renaming to
+	hook_or_detect_cygwin.
+
+	* cygheap.cc (cygheap_fixup_in_child): Close handle after debug fixup
+	has been done to prevent false positives in handle collision.
+
+	* exceptions.cc (try_to_debug): Notify debugger if already being
+	debugged.
+
 2005-07-09  Christopher Faylor  <cgf@timesys.com>
 
 	* path.cc (mount): Only check win32_path when we know we need it.
@@ -47,6 +76,7 @@
 	(handler_dev_raw::close): Ditto.
 	(fhandler_dev_clipboard::fixup_after_exec): New method.
 	* fhandler_dev_mem.cc (fhandler_dev_mem::close): Eliminate pass through
+	function in favor of virtual method.
 	* fhandler_dev_raw.cc (fhandler_dev_raw::close): Ditto.
 	* fhandler_clipboard.cc (fhandler_dev_clipboard::close): Don't go to
 	extra effort when execing.
@@ -55,8 +85,8 @@
 	when we know we're execing.
 	* fhandler_disk_file.cc (fhandler_disk_file::close): Ditto.
 	* fhandler_dsp.cc (fhandler_dev_dsp::close): Ditto.
-	* fhandler_fifo.cc (fhandler_fifo.cc::close): Ditto.
-	function in favor of base function.
+	* fhandler_fifo.cc (fhandler_fifo.cc::close): Ditto.  function in favor
+	of base function.
 	* fhandler_random.cc (fhandler_dev_random::close): Ditto.
 	* fhandler_registry.cc (fhandler_registry::close): Ditto.
 	* fhandler_tty.cc (fhandler_tty_slave::close): Ditto.

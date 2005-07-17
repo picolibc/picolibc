@@ -150,7 +150,7 @@ makename (const char *name, char *&buf, int& i, int inc)
 
 // Top level routine to find the EXE's imports, and redirect them
 void *
-hook_cygwin (const char *name, const void *fn)
+hook_or_detect_cygwin (const char *name, const void *fn)
 {
   HMODULE hm = GetModuleHandle (NULL);
   PIMAGE_NT_HEADERS pExeNTHdr = PEHeaderFromHModule (hm);
@@ -170,16 +170,19 @@ hook_cygwin (const char *name, const void *fn)
   fh.origfn = NULL;
   fh.hookfn = fn;
   char *buf = (char *) alloca (strlen (name) + strlen ("64") + sizeof ("_"));
-  int i = -1;
-  while (!fh.origfn && (fh.name = makename (name, buf, i, 1)))
+  int i;
+  // Iterate through each import descriptor, and redirect if appropriate
+  for (PIMAGE_IMPORT_DESCRIPTOR pd = pdfirst; pd->FirstThunk; pd++)
     {
-      // Iterate through each import descriptor, and redirect if appropriate
-      for (PIMAGE_IMPORT_DESCRIPTOR pd = pdfirst; pd->FirstThunk; pd++)
-	{
-	  PSTR modname = rva (PSTR, hm, pd->Name);
-	  if (strcasematch (modname, "cygwin1.dll"))
-	    RedirectIAT (fh, pd, hm);
-	}
+      if (!strcasematch (rva (PSTR, hm, pd->Name), "cygwin1.dll"))
+	continue;
+      if (!fn)
+	return (void *) "found it";	// just checking if executable used cygwin1.dll
+      i = -1;
+      while (!fh.origfn && (fh.name = makename (name, buf, i, 1)))
+	RedirectIAT (fh, pd, hm);
+      if (fh.origfn)
+	break;
     }
 
   while (!fh.origfn && (fh.name = makename (name, buf, i, -1)))

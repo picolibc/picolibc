@@ -51,7 +51,7 @@ extern "C" {
 static void __stdcall _cfree (void *) __attribute__((regparm(1)));
 static void *__stdcall _csbrk (int);
 }
-
+ 
 /* Called by fork or spawn to reallocate cygwin heap */
 void __stdcall
 cygheap_fixup_in_child (bool execed)
@@ -60,13 +60,16 @@ cygheap_fixup_in_child (bool execed)
   cygheap = (init_cygheap *) cygheap_max;
   _csbrk ((char *) child_proc_info->cygheap_max - (char *) cygheap);
   child_copy (child_proc_info->parent, child_proc_info->dwProcessId, "cygheap", cygheap, cygheap_max);
+  cygheap_init ();
+  debug_fixup_after_fork_exec ();
+
+  /* Need to do this after debug_fixup_after_fork_exec or DEBUGGING handling of
+     handles might get confused. */
   if (execed)
     {
       CloseHandle (child_proc_info->parent);
       child_proc_info->parent = NULL;
     }
-  cygheap_init ();
-  debug_fixup_after_fork_exec ();
 
   if (execed)
     {

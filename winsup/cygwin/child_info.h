@@ -29,7 +29,7 @@ enum child_info_types
 
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
-#define CURR_CHILD_INFO_MAGIC 0xd94c588aU
+#define CURR_CHILD_INFO_MAGIC 0x5eecb012U
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -50,10 +50,10 @@ public:
   DWORD cygheap_reserve_sz;
   DWORD dwProcessId;
   unsigned fhandler_union_cb;
-  child_info (unsigned, child_info_types);
+  child_info (unsigned, child_info_types, bool);
   ~child_info ();
   void ready (bool);
-  bool sync (pinfo&, DWORD);
+  bool sync (int, HANDLE, DWORD) __attribute__ ((regparm (3)));
 };
 
 class mount_info;
@@ -104,7 +104,7 @@ public:
 	cfree (moreinfo);
       }
   }
-  child_info_spawn (child_info_types);
+  child_info_spawn (child_info_types, bool);
 };
 
 void __stdcall init_child_info (DWORD, child_info *, HANDLE);

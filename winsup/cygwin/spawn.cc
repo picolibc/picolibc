@@ -32,7 +32,7 @@ details. */
 #include "pinfo.h"
 #include "registry.h"
 #include "environ.h"
-#include "cygthread.h"
+#include "cygtls.h"
 
 #define LINE_BUF_CHUNK (CYG_MAX_PATH * 2)
 
@@ -264,7 +264,9 @@ class av
  public:
   int error;
   int argc;
-  av (int ac, const char * const *av) : calloced (0), error (false), argc (ac)
+  bool win16_exe;
+  bool iscygwin;
+  av (int ac, const char * const *av) : calloced (0), error (false), argc (ac), win16_exe (false), iscygwin (true)
   {
     argv = (char **) cmalloc (HEAP_1_ARGV, (argc + 5) * sizeof (char *));
     memcpy (argv, av, (argc + 1) * sizeof (char *));
@@ -303,6 +305,7 @@ class av
       if (!(argv[i] = cstrdup1 (argv[i])))
 	error = errno;
   }
+  int fixup (child_info_types, const char *, path_conv&, const char *);
 };
 
 int
@@ -360,8 +363,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   bool rc;
   pid_t cygpid;
 
-  MALLOC_CHECK;
-
   if (prog_arg == NULL)
     {
       syscall_printf ("prog_arg is NULL");
@@ -400,9 +401,12 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   for (ac = 0; argv[ac]; ac++)
     /* nothing */;
 
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;		// FIXME: Could be very leaky
+
   av newargv (ac, argv);
 
-  bool win16_exe = false;
   int null_app_name = 0;
   if (ac == 3 && argv[1][0] == '/' && argv[1][1] == 'c' &&
       (iscmd (argv[0], "command.com") || iscmd (argv[0], "cmd.exe")))
@@ -431,100 +435,10 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     }
 
   MALLOC_CHECK;
-
-  /* If the file name ends in either .exe, .com, .bat, or .cmd we assume
-     that it is NOT a script file */
-  while (*ext == '\0' || (wincap.detect_win16_exe () && strcasematch (ext, ".exe")))
-    {
-      HANDLE hnd = CreateFile (real_path, GENERIC_READ,
-			       FILE_SHARE_READ | FILE_SHARE_WRITE,
-			       &sec_none_nih, OPEN_EXISTING,
-			       FILE_ATTRIBUTE_NORMAL, 0);
-      if (hnd == INVALID_HANDLE_VALUE)
-	{
-	  __seterrno ();
-	  return -1;
-	}
-
-      DWORD done;
-
-      char buf[2 * CYG_MAX_PATH];
-      buf[0] = buf[1] = buf[2] = buf[sizeof (buf) - 1] = '\0';
-      if (!ReadFile (hnd, buf, sizeof (buf) - 1, &done, 0))
-	{
-	  CloseHandle (hnd);
-	  __seterrno ();
-	  return -1;
-	}
-
-      CloseHandle (hnd);
-
-      if (buf[0] == 'M' && buf[1] == 'Z')
-	{
-	  unsigned off = (unsigned char) buf[0x18] | (((unsigned char) buf[0x19]) << 8);
-	  win16_exe = off < sizeof (IMAGE_DOS_HEADER);
-	  break;
-	}
-
-      debug_printf ("%s is a script", (char *) real_path);
-
-      if (real_path.has_acls () && allow_ntsec
-	  && check_file_access (real_path, X_OK))
-	{
-	  debug_printf ("... but not executable");
-	  break;
-	}
-
-      char *pgm, *arg1;
-
-      if (buf[0] != '#' || buf[1] != '!')
-	{
-	  pgm = (char *) "/bin/sh";
-	  arg1 = NULL;
-	}
-      else
-	{
-	  char *ptr;
-	  pgm = buf + 2;
-	  pgm += strspn (pgm, " \t");
-	  for (ptr = pgm, arg1 = NULL;
-	       *ptr && *ptr != '\r' && *ptr != '\n';
-	       ptr++)
-	    if (!arg1 && (*ptr == ' ' || *ptr == '\t'))
-	      {
-		/* Null terminate the initial command and step over
-		   any additional white space.  If we've hit the
-		   end of the line, exit the loop.  Otherwise, we've
-		   found the first argument. Position the current
-		   pointer on the last known white space. */
-		*ptr = '\0';
-		char *newptr = ptr + 1;
-		newptr += strspn (newptr, " \t");
-		if (!*newptr || *newptr == '\r' || *newptr == '\n')
-		  break;
-		arg1 = newptr;
-		ptr = newptr - 1;
-	      }
-
-	  *ptr = '\0';
-	}
-
-      /* Replace argv[0] with the full path to the script if this is the
-	 first time through the loop. */
-      newargv.replace0_maybe (prog_arg);
-
-      /* pointers:
-       * pgm	interpreter name
-       * arg1	optional string
-       */
-      if (arg1)
-	newargv.unshift (arg1);
-
-      /* FIXME: This should not be using FE_NATIVE.  It should be putting
-	 the posix path on the argv list. */
-      find_exec (pgm, real_path, "PATH=", FE_NATIVE, &ext);
-      newargv.unshift (real_path, 1);
-    }
+  int res;
+  res = newargv.fixup (chtype, prog_arg, real_path, ext);
+  if (res)
+    return res;
 
   if (real_path.iscygexec ())
     newargv.dup_all ();
@@ -672,7 +586,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   cygheap->user.deimpersonate ();
 
   moreinfo->envp = build_env (envp, envblock, moreinfo->envc, real_path.iscygexec ());
-  child_info_spawn ciresrv (chtype);
+  child_info_spawn ciresrv (chtype, newargv.iscygwin);
   ciresrv.moreinfo = moreinfo;
 
   si.lpReserved2 = (LPBYTE) &ciresrv;
@@ -763,7 +677,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   /* FIXME: There is a small race here */
 
-  int res;
   pthread_cleanup cleanup;
   if (mode == _P_SYSTEM)
     {
@@ -794,6 +707,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   ProtectHandle1 (pi.hProcess, childhProc);
 
   bool synced;
+  pid_t pid;
   if (mode == _P_OVERLAY)
     {
       myself->dwProcessId = dwExeced = pi.dwProcessId;
@@ -813,7 +727,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	 on this fact when we exit.  dup_proc_pipe will close our end of the pipe.
 	 Note that wr_proc_pipe may also be == INVALID_HANDLE_VALUE.  That will make
 	 dup_proc_pipe essentially a no-op.  */
-      if (!win16_exe && myself->wr_proc_pipe)
+      if (!newargv.win16_exe && myself->wr_proc_pipe)
 	{
 	  myself->sync_proc_pipe ();	/* Make sure that we own wr_proc_pipe
 					   just in case we've been previously
@@ -821,6 +735,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	  myself.zap_cwd ();
 	  myself->dup_proc_pipe (pi.hProcess);
 	}
+      pid = myself->pid;
     }
   else
     {
@@ -856,6 +771,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	  res = -1;
 	  goto out;
 	}
+      pid = child->pid;
     }
 
   /* Start the child running */
@@ -865,7 +781,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
 
-  synced = ciresrv.sync (myself, INFINITE);
+  synced = ciresrv.sync (pid, pi.hProcess, INFINITE);
 
   switch (mode)
     {
@@ -1074,4 +990,105 @@ spawnvpe (int mode, const char *file, const char * const *argv,
 {
   path_conv buf;
   return spawnve (mode, find_exec (file, buf), argv, envp);
+}
+
+int
+av::fixup (child_info_types chtype, const char *prog_arg, path_conv& real_path, const char *ext)
+{
+  /* If the file name ends in either .exe, .com, .bat, or .cmd we assume
+     that it is NOT a script file */
+  while (*ext == '\0' || chtype == PROC_SPAWN || (wincap.detect_win16_exe () && strcasematch (ext, ".exe")))
+    {
+      HANDLE h = CreateFile (real_path, GENERIC_READ,
+			       FILE_SHARE_READ | FILE_SHARE_WRITE,
+			       &sec_none_nih, OPEN_EXISTING,
+			       FILE_ATTRIBUTE_NORMAL, 0);
+      if (h == INVALID_HANDLE_VALUE)
+	goto err;
+
+      HANDLE hm = CreateFileMapping (h, &sec_none_nih, PAGE_READONLY, 0, 0, NULL);
+      CloseHandle (h);
+      if (!hm)
+	goto err;
+      char *buf = (char *) MapViewOfFile(hm, FILE_MAP_READ, 0, 0, 0);
+      CloseHandle (hm);
+      if (!buf)
+	goto err;
+
+      if (buf[0] == 'M' && buf[1] == 'Z')
+	{
+	  unsigned off = (unsigned char) buf[0x18] | (((unsigned char) buf[0x19]) << 8);
+	  win16_exe = off < sizeof (IMAGE_DOS_HEADER);
+	  if (!win16_exe)
+	    iscygwin = hook_or_detect_cygwin (buf, NULL);
+	  UnmapViewOfFile (buf);
+	  break;
+	}
+
+      debug_printf ("%s is a script", (char *) real_path);
+
+      if (real_path.has_acls () && allow_ntsec
+	  && check_file_access (real_path, X_OK))
+	{
+	  debug_printf ("... but not executable");
+	  break;
+	}
+
+      char *pgm = NULL;
+      char *arg1 = NULL;
+      char *ptr = buf;
+      if (*ptr++ == '#' && *ptr++ == '!')
+	{
+	  ptr += strspn (ptr, " \t");
+	  size_t len = strcspn (ptr, "\r\n");
+	  if (len)
+	    {
+	      char *namebuf = (char *) alloca (len + 1);
+	      memcpy (namebuf, ptr, len);
+	      namebuf[len] = '\0';
+	      for (ptr = pgm = namebuf; *ptr; ptr++)
+		if (!arg1 && (*ptr == ' ' || *ptr == '\t'))
+		  {
+		    /* Null terminate the initial command and step over any additional white
+		       space.  If we've hit the end of the line, exit the loop.  Otherwise,
+		       we've found the first argument. Position the current pointer on the
+		       last known white space. */
+		    *ptr = '\0';
+		    char *newptr = ptr + 1;
+		    newptr += strspn (newptr, " \t");
+		    if (!*newptr)
+		      break;
+		    arg1 = newptr;
+		    ptr = newptr - 1;
+		  }
+	    }
+	}
+      UnmapViewOfFile (buf);
+      if (!pgm)
+	{
+	  pgm = (char *) "/bin/sh";
+	  arg1 = NULL;
+	}
+
+      /* Replace argv[0] with the full path to the script if this is the
+	 first time through the loop. */
+      replace0_maybe (prog_arg);
+
+      /* pointers:
+       * pgm	interpreter name
+       * arg1	optional string
+       */
+      if (arg1)
+	unshift (arg1);
+
+      /* FIXME: This should not be using FE_NATIVE.  It should be putting
+	 the posix path on the argv list. */
+      find_exec (pgm, real_path, "PATH=", FE_NATIVE, &ext);
+      unshift (real_path, 1);
+    }
+  return 0;
+
+err:
+  __seterrno ();
+  return -1;
 }
