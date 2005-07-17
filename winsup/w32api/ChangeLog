@@ -1,3 +1,7 @@
+2005-07-17  Benoit Blanchon  <bblanchon@users.sourceforge.net>
+
+	* include/winbase.h (QueueUserWorkItem): Add prototype.
+
 2005-07-13  Benoit Blanchon  <bblanchon@users.sourceforge.net>
 
 	* include/wingdi.h (SHADEBLENDCAPS, SB_NONE, SB_CONST_ALPHA,
