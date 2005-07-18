@@ -3349,6 +3349,9 @@ typedef OSVERSIONINFOEXA OSVERSIONINFOEX,*POSVERSIONINFOEX,*LPOSVERSIONINFOEX;
 
 #if (_WIN32_WINNT >= 0x0500)
 ULONGLONG WINAPI VerSetConditionMask(ULONGLONG,DWORD,BYTE);
+#define VER_SET_CONDITION(ConditionMask, TypeBitMask, ComparisonType)  \
+	((ConditionMask) = VerSetConditionMask((ConditionMask), \
+	(TypeBitMask), (ComparisonType)))
 #endif
 
 PVOID GetCurrentFiber(void);

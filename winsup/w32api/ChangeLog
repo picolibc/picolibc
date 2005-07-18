@@ -1,3 +1,7 @@
+2005-07-18  Daniel Atallah  <datallah@users.sourceforge.net>
+
+	* include/winnt.h (VER_SET_CONDITION): Define.
+
 2005-07-18  Michael Gerdau  <mgdde@users.sourceforge.net>
 
 	* include/wincon.h (AttachConsole): Correct _WIN32_WINNT guard.
