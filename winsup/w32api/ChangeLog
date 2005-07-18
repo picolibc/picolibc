@@ -1,8 +1,13 @@
-2005-06-18  Danny Smith  <dannysmith@users.sourceforge.net>
+2005-07-18  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/kernel32.def (GetUserGeoID): Correct suffix.
+	Thanks to: "bernd23" <bernd23 at users dot sourceforge dot net>
+
+2005-07-18  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/commctrl.h (TreeView_SetItemState): Initilise
 	_tvi.hItem.
-	Thanks to Joseph Remes <jremes at users dot sourceforge dot net>
+	Thanks to:  Joseph Remes <jremes at users dot sourceforge dot net>
 
 2005-07-18  Mattia Barbon  <mbarbon@users.sourceforge.net>
 

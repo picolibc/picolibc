@@ -428,7 +428,7 @@ GetTimeZoneInformation@4
 GetUserDefaultLCID@0
 GetUserDefaultLangID@0
 GetUserDefaultUILanguage@0
-GetUserGeoID@12
+GetUserGeoID@4
 GetVDMCurrentDirectories@8
 GetVersion@0
 GetVersionExA@4
