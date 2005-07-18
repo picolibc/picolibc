@@ -1,3 +1,7 @@
+2005-07-18  Jan Beulich  <jbeulich@novell.com>
+
+	* i386.h (i386_optab): Operands of aam and aad are unsigned.
+
 2007-07-15  H.J. Lu <hongjiu.lu@intel.com>
 
 	* i386.h (i386_optab): Support Intel VMX Instructions.

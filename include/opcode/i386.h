@@ -295,9 +295,9 @@ static const template i386_optab[] =
 {"daa",	   0,	0x27, X, CpuNo64,	NoSuf,			{ 0, 0, 0} },
 {"das",	   0,	0x2f, X, CpuNo64,	NoSuf,			{ 0, 0, 0} },
 {"aad",	   0, 0xd50a, X, CpuNo64,	NoSuf,			{ 0, 0, 0} },
-{"aad",	   1,   0xd5, X, CpuNo64,	NoSuf,			{ Imm8S, 0, 0} },
+{"aad",	   1,   0xd5, X, CpuNo64,	NoSuf,			{ Imm8, 0, 0} },
 {"aam",	   0, 0xd40a, X, CpuNo64,	NoSuf,			{ 0, 0, 0} },
-{"aam",	   1,   0xd4, X, CpuNo64,	NoSuf,			{ Imm8S, 0, 0} },
+{"aam",	   1,   0xd4, X, CpuNo64,	NoSuf,			{ Imm8, 0, 0} },
 
 /* Conversion insns.  */
 /* Intel naming */
