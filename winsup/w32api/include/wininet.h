@@ -484,6 +484,9 @@ GOPHER_TYPE_UNIX_UUENCODED|GOPHER_TYPE_BINARY|GOPHER_TYPE_GIF|GOPHER_TYPE_IMAGE|
 #define CACHEGROUP_SEARCH_BYURL	1
 #define INTERNET_CACHE_GROUP_ADD	0
 #define INTERNET_CACHE_GROUP_REMOVE	1
+#define WININET_API_FLAG_ASYNC 0x00000001	/* Force asynchronous operations.  */
+#define WININET_API_FLAG_SYNC 0x00000004	/* Force synchronous operations.  */
+#define WININET_API_FLAG_USE_CONTEXT 0x00000008	/* Force the API to use the context value, even if it is set to zero.  */
 
 #ifndef RC_INVOKED
 typedef PVOID HINTERNET;

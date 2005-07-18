@@ -1,3 +1,7 @@
+2005-07-18  Michael Gerdau  <mgdde@users.sourceforge.net>
+
+	* include/wininet.h (WININET_API_FLAG_*): Add defines.
+
 2005-07-18  Daniel Atallah  <datallah@users.sourceforge.net>
 
 	* include/winnt.h (VER_SET_CONDITION): Define.
