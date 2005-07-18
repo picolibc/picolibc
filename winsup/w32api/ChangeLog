@@ -1,3 +1,7 @@
+2005-07-18  Mattia Barbon  <mbarbon@users.sourceforge.net>
+
+	* include/commctrl.h (NMLVFINDITEM): Add structure.
+
 2005-07-18  Michael Gerdau  <mgdde@users.sourceforge.net>
 
 	* include/wininet.h (WININET_API_FLAG_*): Add defines.
