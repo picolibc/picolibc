@@ -1,3 +1,10 @@
+2005-07-18  Michael Gerdau  <mgdde@users.sourceforge.net>
+
+	* include/wincon.h (AttachConsole): Correct _WIN32_WINNT guard.
+	(ATTACH_PARENT_PROCESS): Define.
+	(CONSOLE_WINDOWED_MODE): Correct definition to match MSDN
+	documentation.
+
 2005-07-17  Benoit Blanchon  <bblanchon@users.sourceforge.net>
 
 	* include/winbase.h (QueueUserWorkItem): Add prototype.
@@ -58,7 +65,7 @@
 
 2005-03-16  Christopher Faylor  <cgf@timesys.com>
 
-	* winclude/winnt.h (SYSTEM_LUID): Fix definitition invalidated by below
+	* include/winnt.h (SYSTEM_LUID): Fix definitition invalidated by below
 	change.
 
 2005-03-16  Danny Smith  <dannysmith@users.sourceforge.net>
@@ -246,7 +253,7 @@
 
 	* include/winuser.h (LLKHF_EXTENDED, LLKHF_INJECTED, LLKHF_UP):
 	Add defines.
-	(LLKHF_ALTDOWN): Define based on KF_ALTDOWN,
+	(LLKHF_ALTDOWN): Define based on KF_ALTDOWN.
              
 2004-11-19  Benoit Blanchon  <bblanchon@users.sourceforge.net>
 
