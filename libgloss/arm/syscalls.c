@@ -7,6 +7,7 @@
 #include <sys/stat.h>
 #include <sys/fcntl.h>
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
 #include <sys/time.h>
 #include <sys/times.h>
@@ -18,11 +19,11 @@
 /* Forward prototypes.  */
 int     _system     _PARAMS ((const char *));
 int     _rename     _PARAMS ((const char *, const char *));
-int     isatty		_PARAMS ((int));
+int     _isatty		_PARAMS ((int));
 clock_t _times		_PARAMS ((struct tms *));
 int     _gettimeofday	_PARAMS ((struct timeval *, struct timezone *));
-void    _raise 		_PARAMS ((void));
-int     _unlink		_PARAMS ((void));
+int     _raise 		_PARAMS ((int));
+int     _unlink		_PARAMS ((const char *));
 int     _link 		_PARAMS ((void));
 int     _stat 		_PARAMS ((const char *, struct stat *));
 int     _fstat 		_PARAMS ((int, struct stat *));
@@ -345,8 +346,6 @@ _write (int    file,
   return len - x;
 }
 
-extern int strlen (const char *);
-
 int
 _swiopen (const char * path,
 	  int          flags)
@@ -461,7 +460,7 @@ _kill (int n, int m)
   n = n; m = m;
 }
 
-int
+int __attribute__((weak))
 _getpid (int n)
 {
   return 1;
@@ -501,9 +500,7 @@ _sbrk (int incr)
   return (caddr_t) prev_heap_end;
 }
 
-extern void memset (struct stat *, int, unsigned int);
-
-int
+int __attribute__((weak))
 _fstat (int file, struct stat * st)
 {
   memset (st, 0, sizeof (* st));
@@ -513,7 +510,8 @@ _fstat (int file, struct stat * st)
   file = file;
 }
 
-int _stat (const char *fname, struct stat *st)
+int __attribute__((weak))
+_stat (const char *fname, struct stat *st)
 {
   int file;
 
@@ -529,22 +527,30 @@ int _stat (const char *fname, struct stat *st)
   return 0;
 }
 
-int
+int __attribute__((weak))
 _link (void)
 {
+  errno = ENOSYS;
   return -1;
 }
 
 int
-_unlink (void)
+_unlink (const char *path)
 {
-  return -1;
+#ifdef ARM_RDI_MONITOR
+  return do_AngelSWI (AngelSWI_Reason_Remove, &path);
+#else
+  (void)path;
+  asm ("swi %a0" :: "i" (SWI_Remove));
+#endif
 }
 
-void
-_raise (void)
+int __attribute__((weak))
+_raise (int sig)
 {
-  return;
+  (void)sig;
+  errno = ENOSYS;
+  return -1;
 }
 
 int
@@ -601,24 +607,35 @@ _times (struct tms * tp)
 
 
 int
-isatty (int fd)
+_isatty (int fd)
 {
-  return 1;
-  fd = fd;
+#ifdef ARM_RDI_MONITOR
+  return do_AngelSWI (AngelSWI_Reason_IsTTY, &fd);
+#else
+  (void)fd;
+  asm ("swi %a0" :: "i" (SWI_IsTTY));
+#endif
 }
 
 int
 _system (const char *s)
 {
-  if (s == NULL)
-    return 0;
-  errno = ENOSYS;
-  return -1;
+#ifdef ARM_RDI_MONITOR
+  return do_AngelSWI (AngelSWI_Reason_System, &s);
+#else
+  (void)s;
+  asm ("swi %a0" :: "i" (SWI_CLI));
+#endif
 }
 
 int
 _rename (const char * oldpath, const char * newpath)
 {
-  errno = ENOSYS;
-  return -1;
+#ifdef ARM_RDI_MONITOR
+  const char *block[2] = {oldpath, newpath};
+  return do_AngelSWI (AngelSWI_Reason_Rename, block);
+#else
+  (void)oldpath; (void)newpath;
+  asm ("swi %a0" :: "i" (SWI_Rename));
+#endif
 }

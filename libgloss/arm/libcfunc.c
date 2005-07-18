@@ -5,10 +5,12 @@
    Note: These functions are in a seperate file so that OS providers can
    overrride the system call stubs (defined in syscalls.c) without having
    to provide libc funcitons as well.  */
+
 #include "swi.h"
+#include <errno.h>
+#include <unistd.h>
 
 #ifdef ARM_RDI_MONITOR
-
 static inline int
 do_AngelSWI (int reason, void * arg)
 {
@@ -22,19 +24,28 @@ do_AngelSWI (int reason, void * arg)
 }
 #endif /* ARM_RDI_MONITOR */
 
-
 void
 abort (void)
 {
+  extern void _exit (int n);
 #ifdef ARM_RDI_MONITOR
   do_AngelSWI (AngelSWI_Reason_ReportException,
 	      (void *) ADP_Stopped_RunTimeError);
 #else
- asm ("mov r0,#17\nswi %a0" :: "i" (SWI_Exit));
+  _exit(17);
 #endif
 }
 
-void
-alarm (void)
+unsigned __attribute__((weak))
+alarm (unsigned seconds)
 {
+	(void)seconds;
+	return 0;
+}
+
+int __attribute__((weak))
+pause (void)
+{
+	errno = ENOSYS;
+	return -1;
 }

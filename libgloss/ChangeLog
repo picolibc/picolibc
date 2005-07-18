@@ -1,3 +1,18 @@
+2005-07-18  Shaun Jackman  <sjackman@gmail.com>
+
+	* libgloss/arm/libcfunc.c (abort): Call _exit instead of the RDI swi.
+	(alarm): Add the weak attribute.
+	(pause): New function. Return ENOSYS.
+	* libgloss/arm/syscalls.c (_getpid): Add the weak attribute.
+	(_fstat): Ditto.
+	(_stat): Ditto.
+	(_link): Ditto. Return ENOSYS.
+	(_unlink): Call the swi instead of returning -1.
+	(_raise): Add the weak attribute. Return ENOSYS.
+	(isatty): Rename to _isatty. Call the swi instead of returning 1.
+	(_system): Call the swi instead of returning ENOSYS.
+	(_rename): Ditto.
+
 2005-07-06  Aldy Hernandez  <aldyh@redhat.com>
 
 	* configure.in: Add ms1 case.
