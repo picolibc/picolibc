@@ -41,10 +41,12 @@ proc newlib_pass_fail { srcfile } {
     set comp_output [newlib_target_compile "$fullsrcfile" "$test_driver" "executable" ""]
 
     if { $comp_output != "" } {
-	fail "Failed to compile $fullsrcfile.\n"
+	fail "$subdir/$srcfile compilation"
+	unresolved "$subdir/$srcfile execution"
     } else {
+	pass "$subdir/$srcfile compilation"
 	set result [newlib_load $test_driver ""]
 	set status [lindex $result 0]
-	$status "$fullsrcfile"
+	$status "$subdir/$srcfile execution"
     }
 }

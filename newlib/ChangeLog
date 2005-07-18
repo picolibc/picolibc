@@ -1,3 +1,10 @@
+2005-07-18  Joseph S. Myers  <joseph@codesourcery.com>
+
+	* testsuite/lib/checkoutput.exp (newlib_check_output): Use test
+	names after PASS and FAIL which do not depend on source directory
+	name or on whether test passed or failed.
+	* testsuite/lib/passfail.exp (newlib_pass_fail): Likewise.
+
 2005-07-08  Ola Hugosson   <Ola.Hugosson@anoto.com>
 
 	* libc/string/wcsspn.c (wcsspn): Add missing increment of q.

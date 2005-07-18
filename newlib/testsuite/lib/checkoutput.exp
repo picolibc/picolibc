@@ -17,9 +17,11 @@ proc newlib_check_output { srcfile expectlist } {
     set comp_output [newlib_target_compile "$srcfullname" "$test_driver" "executable" ""]
 
     if { $comp_output != "" } {
-	fail "Failed to compile $srcfile.\n"
+	fail "$subdir/$srcfile compilation"
+	unresolved "$subdir/$srcfile output"
 	return
     }
+    pass "$subdir/$srcfile compilation"
 
     set result [newlib_load $test_driver ""]
     set status [lindex $result 0]
@@ -30,11 +32,12 @@ proc newlib_check_output { srcfile expectlist } {
     foreach { expectedval } $expectlist {
 	set gotval [string trim [lindex $output_lines 0] "\r"]
 	if { ! [string match $expectedval $gotval] } {
-	    fail "$srcfile: Expected: $expectedval Got: $gotval "
+	    verbose -log "$subdir/$srcfile: Expected: $expectedval Got: $gotval "
+	    fail "$subdir/$srcfile output"
 	    return
 	}
 	set output_lines [lrange $output_lines 1 end]
     }
 
-    pass $srcfile
+    pass "$subdir/$srcfile output"
 }
