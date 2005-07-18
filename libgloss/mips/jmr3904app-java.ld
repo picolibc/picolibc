@@ -75,7 +75,7 @@ SECTIONS
   .sdata : {
     *(.sdata)
     *(.sdata.*)
-    *(.gnu.linkonce.s*)
+    *(.gnu.linkonce.s.*)
   }
   . = ALIGN(4);
    edata  =  .;
@@ -83,6 +83,8 @@ SECTIONS
    _fbss = .;
   .sbss : {
     *(.sbss)
+    *(.sbss.*)
+    *(.gnu.linkonce.sb.*)
     *(.scommon)
   }
   .bss : {

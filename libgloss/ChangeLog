@@ -1,3 +1,14 @@
+2005-07-18  Richard Sandiford  <richard@codesourcery.com>
+
+	* mips/array.ld (.sdata): Include .gnu.linkonce.s.*, not
+	.gnu.linkonce.s*.
+	(.sbss): Include .sbss.* and .gnu.linkonce.sb.*.
+	* mips/cfe.ld, mips/ddb-kseg0.ld, mips/ddb.ld, mips/dve.ld,
+	* mips/idt32.ld, mips/idt64.ld, mips/idtecoff.ld, mips/idt.ld,
+	* mips/jmr3904app-java.ld, mips/jmr3904app.ld,
+	* mips/jmr3904dram-java.ld, mips/jmr3904dram.ld,
+	* mips/lsi.ld, mips/nullmon.ld, mips/pmon.ld: As for mips/array.ld.
+
 2005-07-18  Shaun Jackman  <sjackman@gmail.com>
 
 	* libgloss/arm/libcfunc.c (abort): Call _exit instead of the RDI swi.

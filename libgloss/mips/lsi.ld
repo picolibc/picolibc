@@ -109,13 +109,15 @@ SECTIONS
   .sdata : {
     *(.sdata)
     *(.sdata.*)
-    *(.gnu.linkonce.s*)
+    *(.gnu.linkonce.s.*)
   }
    edata  =  .;
    _edata  =  .;
    _fbss = .;
   .sbss : {
     *(.sbss)
+    *(.sbss.*)
+    *(.gnu.linkonce.sb.*)
     *(.scommon)
   }
   .bss : {
