@@ -1,3 +1,9 @@
+2005-06-18  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/commctrl.h (TreeView_SetItemState): Initilise
+	_tvi.hItem.
+	Thanks to Joseph Remes <jremes at users dot sourceforge dot net>
+
 2005-07-18  Mattia Barbon  <mbarbon@users.sourceforge.net>
 
 	* include/commctrl.h (NMLVFINDITEM): Add structure.

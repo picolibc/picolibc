@@ -3233,6 +3233,7 @@ WINBOOL WINAPI ImageList_DrawIndirect(IMAGELISTDRAWPARAMS*);
 { \
 	TVITEM _tvi;\
 	_tvi.mask=TVIF_STATE;\
+	_tvi.hItem=i; \
 	_tvi.stateMask=m;\
 	_tvi.state=d;\
 	SNDMSG((w),TVM_SETITEM,0,(LPARAM)(TVITEM*)&_tvi);\
