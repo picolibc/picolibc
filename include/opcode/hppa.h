@@ -301,10 +301,10 @@ static const char *const completer_chars = ",CcY<>?!@+&U~FfGHINnOoZMadu|/=0123%e
       register index opcodes, short immediate opcodes, and finally
       long immediate opcodes.  Where there are opcodes for more
       than one architecture in any of these groups, the opcodes
-      for the higher architecture should come first.
+      for the higher architecture should come first,
 
    3) Where implicit addressing is available for an opcode, the
-      implicit opcode should precede the explicit opcode.
+      implicit opcode should precede the explicit opcode, and
 
    4) Opcodes without FLAG_STRICT should be order as follows: long
       immediate opcodes, short immediate opcodes and finally register
