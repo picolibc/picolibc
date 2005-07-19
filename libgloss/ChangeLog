@@ -1,3 +1,7 @@
+2005-07-19  Paul Brook  <paul@codesourcery.com>
+
+	* arm/crt0.S: Ensure doubleword stack alignment.
+
 2005-07-18  Richard Sandiford  <richard@codesourcery.com>
 
 	* mips/array.ld (.sdata): Include .gnu.linkonce.s.*, not
