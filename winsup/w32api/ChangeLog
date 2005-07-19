@@ -1,5 +1,9 @@
 2005-07-19  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/wingdi.h (SYSPAL_NOSTATIC256): Define.
+
+2005-07-19  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/wingdi.h (WINGDIAPI): Define to DECLSPEC_DLLIMPORT
 	if __W32API_USE_DLLIMPORT__.   Use throughout to qualify
 	prototypes.

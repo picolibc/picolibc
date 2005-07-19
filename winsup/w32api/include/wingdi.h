@@ -822,9 +822,10 @@ extern "C" {
 #define DC_BRUSH	18
 #define DC_PEN	19
 #endif
-#define SYSPAL_NOSTATIC 2
-#define SYSPAL_STATIC 1
 #define SYSPAL_ERROR 0
+#define SYSPAL_STATIC 1
+#define SYSPAL_NOSTATIC 2
+#define SYSPAL_NOSTATIC256 3 
 #define TA_BASELINE 24
 #define TA_BOTTOM 8
 #define TA_TOP 0
