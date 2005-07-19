@@ -1,3 +1,12 @@
+2005-07-18  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	* hppa.h (pa_opcode):  Add rules for opcode ordering.  Check first for
+	implicit space-register addressing.  Set space-register bits on opcodes
+	using implicit space-register addressing.  Add various missing pa20
+	long-immediate opcodes.  Remove various opcodes using implicit 3-bit
+	space-register addressing.  Use "fE" instead of "fe" in various
+	fstw opcodes.
+
 2005-07-18  Jan Beulich  <jbeulich@novell.com>
 
 	* i386.h (i386_optab): Operands of aam and aad are unsigned.
