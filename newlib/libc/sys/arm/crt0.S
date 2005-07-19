@@ -186,6 +186,11 @@ __change_mode:
 	add	r3, #4
 	b	.LC15
 .LC14:	
+	/* Ensure doubleword stack alignment.  */
+	mov	r4, sp
+	mov	r5, #7
+	bic	r4, r5
+	mov	sp, r4
 #else
 	add	r2, sp, r0, LSL #2	/* End of args */
 	mov	r3, sp			/* Start of args */
@@ -195,6 +200,8 @@ __change_mode:
 	strhi	r5, [r2, #-4]!
 	strhi	r4, [r3], #4
 	bhi	.LC13
+	/* Ensure doubleword stack alignment.  */
+	bic	sp, sp, #7
 #endif
 #endif
 
