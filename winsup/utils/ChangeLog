@@ -1,3 +1,8 @@
+2005-07-19  Christopher Faylor  <cgf@timesys.com>
+            Eric Blake  <ebb9@byu.net>
+
+	* cygcheck.cc (find_on_path): Perform .exe magic on non-PATH search.
+
 2005-07-05  Eric Blake  <ebb9@byu.net>
 
 	* cygcheck.cc (track_down, cygcheck): Return true on success.
