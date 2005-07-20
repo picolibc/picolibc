@@ -52,6 +52,8 @@ START_RELOC_NUMBERS (elf_m32r_reloc_type)
   RELOC_NUMBER (R_M32R_SDA16_RELA, 42)
   RELOC_NUMBER (R_M32R_RELA_GNU_VTINHERIT, 43)
   RELOC_NUMBER (R_M32R_RELA_GNU_VTENTRY, 44)
+
+  RELOC_NUMBER (R_M32R_REL32, 45)
                                                                                 
   RELOC_NUMBER (R_M32R_GOT24, 48)
   RELOC_NUMBER (R_M32R_26_PLTREL, 49)
@@ -70,6 +72,7 @@ START_RELOC_NUMBERS (elf_m32r_reloc_type)
   RELOC_NUMBER (R_M32R_GOTOFF_HI_ULO, 62)
   RELOC_NUMBER (R_M32R_GOTOFF_HI_SLO, 63)
   RELOC_NUMBER (R_M32R_GOTOFF_LO, 64)
+
 END_RELOC_NUMBERS (R_M32R_max)
 
 /* Processor specific section indices.  These sections do not actually
