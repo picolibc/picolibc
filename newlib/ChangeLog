@@ -1,3 +1,8 @@
+2005-07-20  Bob Wilson  <bob.wilson@acm.org>
+           Darin Petkov <darin@tensilica.com>
+
+       * libm/math/ef_atan2.c (pi, pi_lo): Use round-to-nearest value of pi.
+
 2005-07-19  Paul Brook  <paul@codesourcery.com>
 
 	* libc/sys/arm/crt0.S: Ensure doubleword stack alignment.
