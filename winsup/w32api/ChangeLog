@@ -1,3 +1,9 @@
+2005-07-20  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/richedit.h (SETTEXTEX): Define structure and
+	associated constants.
+	(GT_SELECTION): Define GETTEXTEX flag constant. 
+
 2005-07-19  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wingdi.h (SYSPAL_NOSTATIC256): Define.

@@ -257,8 +257,6 @@ extern "C" {
 #define TM_MULTILEVELUNDO	8
 #define TM_SINGLECODEPAGE	16
 #define TM_MULTICODEPAGE	32
-#define GT_DEFAULT	0
-#define GT_USECRLF	1
 #define yHeightCharPtsMost 1638
 #define lDefaultTab 720
 
@@ -478,6 +476,18 @@ typedef struct _gettextex {
 	LPCSTR lpDefaultChar;
 	LPBOOL lpUsedDefChar;
 } GETTEXTEX;
+/* GETTEXTEX flags */
+#define GT_DEFAULT	0
+#define GT_USECRLF	1
+#define GT_SELECTION	2
+typedef struct _settextex {
+	DWORD flags;
+	UINT codepage;
+} SETTEXTEX;
+/* SETTEXTEX flags */
+#define ST_DEFAULT	0
+#define ST_KEEPUNDO	1
+#define ST_SELECTION	2
 typedef LONG (*EDITWORDBREAKPROCEX)(char*,LONG,BYTE,INT);
 /* Defines for EM_SETTYPOGRAPHYOPTIONS */
 #define	TO_ADVANCEDTYPOGRAPHY	1
