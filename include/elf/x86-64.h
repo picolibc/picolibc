@@ -61,4 +61,9 @@ END_RELOC_NUMBERS (R_X86_64_max)
 
 #define SHT_X86_64_UNWIND	0x70000001	/* unwind information */
 
+/* Like SHN_COMMON but the symbol will be allocated in the .lbss
+   section.  */
+#define SHN_X86_64_LCOMMON 	0xff02
+
+#define SHF_X86_64_LARGE	0x10000000
 #endif

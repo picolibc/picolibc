@@ -1,3 +1,8 @@
+2005-07-25  Jan Hubicka  <jh@suse.cz>
+
+	* x86-64.h (SHN_X86_64_LCOMMON): New.
+	(SHF_X86_64_LARGE): New.
+
 2005-07-20  Kazuhiro Inaoka  <inaoka.kazuhiro@renesas.com>
 
 	* m32r.h (R_M32R_REL32): Added.
