@@ -39,6 +39,8 @@ typedef _off_t off_t;
 #endif
 #endif /*__off_t_defined*/
 
+typedef __loff_t loff_t;
+
 #ifndef __dev_t_defined
 #define __dev_t_defined
 typedef short __dev16_t;

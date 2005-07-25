@@ -1,3 +1,7 @@
+2005-07-25  Christopher Faylor  <cgf@timesys.com>
+
+	* include/cygwin/types.h: Define loff_t.
+
 2005-07-16  Christopher Faylor  <cgf@timesys.com>
 
 	* child_info.h (child_info::sync): Pass pid and HANDLE rather than
