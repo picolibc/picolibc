@@ -1,3 +1,7 @@
+2005-07-25  Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
+
+	* include/winuser.h (HSHELL_RUDEAPPACTIVATED): Define.
+
 2005-07-20  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wingdi.h (TT_PRIM_CSPLINE): Define.
