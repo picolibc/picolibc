@@ -30,6 +30,16 @@ along with this program; if not, write to the Free Software Foundation, Inc.,
      RELOC_NUMBER (R_M32C_32, 3)
      RELOC_NUMBER (R_M32C_8_PCREL, 4)
      RELOC_NUMBER (R_M32C_16_PCREL, 5)
+
+    /* 8 bit unsigned address, used for dsp8[a0] etc */
+     RELOC_NUMBER (R_M32C_8, 6)
+    /* Bits 0..15 of an address, for SMOVF's A0, A1A0, etc. */
+     RELOC_NUMBER (R_M32C_LO16, 7)
+    /* Bits 16..23 of an address, for SMOVF's R1H etc. */
+     RELOC_NUMBER (R_M32C_HI8, 8)
+    /* Bits 16..31 of an address, for LDE's A1A0 etc. */
+     RELOC_NUMBER (R_M32C_HI16, 9)
+
      END_RELOC_NUMBERS (R_M32C_max)
 
 #define EF_M32C_CPU_M16C	0x00000075      /* default */

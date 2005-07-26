@@ -1,3 +1,7 @@
+2005-07-25  DJ Delorie  <dj@redhat.com>
+
+	* m32c.h: Add R_M32C_8, R_M32C_LO16, R_M32C_HI8, and R_M32C_HI16.
+
 2005-07-25  Jan Hubicka  <jh@suse.cz>
 
 	* x86-64.h (SHN_X86_64_LCOMMON): New.
