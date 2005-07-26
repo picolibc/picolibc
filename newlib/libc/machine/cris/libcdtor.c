@@ -45,10 +45,13 @@ __asm__
 extern vfnp * const _Ctors asm(".$global.lib.ctors");
 extern vfnp * const _Dtors asm(".$global.lib.dtors");
 
-/* We better provide weak empty ctor and dtor lists, since they are not
-   created if the main program does not have ctor/dtors.  */
+/* We better provide weak empty ctor and dtor lists, since they are
+   not created if the main program does not have ctor/dtors.  Because
+   it's otherwise not used, GCC trunk "Mon Jul 25 22:33:14 UTC 2005"
+   thinks it can remove defaultors, so we need to artificially mark it
+   as used.  FIXME: Perhaps a GCC bug.  */
 
-static vfnp const defaultors[] = {0, 0};
+static vfnp const defaultors[] __attribute__ ((__used__)) = {0, 0};
 
 extern vfnp * __CTOR_LIST__ __attribute__ ((weak, alias ("defaultors")));
 extern vfnp * __DTOR_LIST__ __attribute__ ((weak, alias ("defaultors")));

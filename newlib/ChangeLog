@@ -1,3 +1,8 @@
+2005-07-26  Hans-Peter Nilsson  <hp@bitrange.com>
+
+	* libc/machine/cris/libcdtor.c (defaultors): Mark artificially as
+	used.
+
 2005-07-20  Bob Wilson  <bob.wilson@acm.org>
            Darin Petkov <darin@tensilica.com>
 
