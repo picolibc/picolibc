@@ -1,5 +1,9 @@
 2005-07-25  Christopher Faylor  <cgf@timesys.com>
 
+	* include/byteswap.h: New file.
+
+2005-07-25  Christopher Faylor  <cgf@timesys.com>
+
 	* include/cygwin/types.h: Define loff_t.
 
 2005-07-16  Christopher Faylor  <cgf@timesys.com>
