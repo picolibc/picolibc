@@ -1,5 +1,10 @@
 2005-07-27  Christopher Faylor  <cgf@timesys.com>
 
+	* gendef: Use nocr to remove \r's from input.
+	gendef (nocr): New function.
+
+2005-07-27  Christopher Faylor  <cgf@timesys.com>
+
 	* fhandler_clipboard.cc (fhandler_dev_clipboard::close): Set membuffer
 	to NULL.
 	(fhandler_dev_clipboard::fixup_after_exec): Don't call close here.
