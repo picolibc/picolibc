@@ -264,7 +264,10 @@ fhandler_dev_clipboard::close ()
       eof = true;
       pos = 0;
       if (membuffer)
-	free (membuffer);
+	{
+	  free (membuffer);
+	  membuffer = NULL;
+	}
       msize = 0;
     }
   return 0;
@@ -273,5 +276,7 @@ fhandler_dev_clipboard::close ()
 void
 fhandler_dev_clipboard::fixup_after_exec ()
 {
-  close ();
+  eof = false;
+  pos = msize = 0;
+  membuffer = NULL;
 }

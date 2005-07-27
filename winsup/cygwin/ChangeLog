@@ -1,3 +1,10 @@
+2005-07-27  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler_clipboard.cc (fhandler_dev_clipboard::close): Set membuffer
+	to NULL.
+	(fhandler_dev_clipboard::fixup_after_exec): Don't call close here.
+	Just set variables directly.
+
 2005-07-25  Christopher Faylor  <cgf@timesys.com>
 
 	* include/byteswap.h: New file.
