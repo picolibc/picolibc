@@ -1,5 +1,9 @@
 2005-07-27  Christopher Faylor  <cgf@timesys.com>
 
+	* include/cygwin/in.h (INET_ADDRSTRLEN): Add new definition.
+
+2005-07-27  Christopher Faylor  <cgf@timesys.com>
+
 	* gendef: Use nocr to remove \r's from input.
 	gendef (nocr): New function.
 
