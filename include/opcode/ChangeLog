@@ -1,3 +1,9 @@
+2005-07-27  Jan Beulich  <jbeulich@novell.com>
+
+	* i386.h (i386_optab): Add comment to movd. Use LongMem for all
+	movd-s. Add NoRex64 to movq-s dealing only with mmx or xmm registers.
+	Add movq-s as 64-bit variants of movd-s.
+
 2005-07-18  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
 
 	* hppa.h: Fix punctuation in comment.

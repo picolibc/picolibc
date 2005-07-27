@@ -995,16 +995,24 @@ static const template i386_optab[] =
 /* MMX/SSE2 instructions.  */
 
 {"emms",     0, 0x0f77, X, CpuMMX, NoSuf,			{ 0, 0, 0 } },
+/* These really shouldn't allow for Reg64 (movq is the right mnemonic for
+   copying between Reg64/Mem64 and RegXMM/RegMMX, as is mandated by Intel's
+   spec). AMD's spec, having been in existence for much longer, failed to
+   recognize that and specified movd for 32- and 64-bit operations.  */
 {"movd",     2, 0x0f6e, X, CpuMMX, NoSuf|IgnoreSize|Modrm, { Reg32|Reg64|LongMem, RegMMX, 0 } },
 {"movd",     2, 0x0f7e, X, CpuMMX, NoSuf|IgnoreSize|Modrm, { RegMMX, Reg32|Reg64|LongMem, 0 } },
-{"movd",     2, 0x660f6e,X,CpuSSE2,NoSuf|IgnoreSize|Modrm, { Reg32|Reg64|LLongMem, RegXMM, 0 } },
-{"movd",     2, 0x660f7e,X,CpuSSE2,NoSuf|IgnoreSize|Modrm, { RegXMM, Reg32|Reg64|LLongMem, 0 } },
+{"movd",     2, 0x660f6e,X,CpuSSE2,NoSuf|IgnoreSize|Modrm, { Reg32|Reg64|LongMem, RegXMM, 0 } },
+{"movd",     2, 0x660f7e,X,CpuSSE2,NoSuf|IgnoreSize|Modrm, { RegXMM, Reg32|Reg64|LongMem, 0 } },
 /* In the 64bit mode the short form mov immediate is redefined to have
    64bit displacement value.  */
-{"movq",     2, 0x0f6f, X, CpuMMX, NoSuf|IgnoreSize|Modrm, { RegMMX|LongMem, RegMMX, 0 } },
-{"movq",     2, 0x0f7f, X, CpuMMX, NoSuf|IgnoreSize|Modrm, { RegMMX, RegMMX|LongMem, 0 } },
-{"movq",     2, 0xf30f7e,X,CpuSSE2,NoSuf|IgnoreSize|Modrm, { RegXMM|LLongMem, RegXMM, 0 } },
-{"movq",     2, 0x660fd6,X,CpuSSE2,NoSuf|IgnoreSize|Modrm, { RegXMM, RegXMM|LLongMem, 0 } },
+{"movq",     2, 0x0f6f, X, CpuMMX, NoSuf|IgnoreSize|Modrm|NoRex64, { RegMMX|LLongMem, RegMMX, 0 } },
+{"movq",     2, 0x0f7f, X, CpuMMX, NoSuf|IgnoreSize|Modrm|NoRex64, { RegMMX, RegMMX|LLongMem, 0 } },
+{"movq",     2, 0xf30f7e,X,CpuSSE2,NoSuf|IgnoreSize|Modrm|NoRex64, { RegXMM|LLongMem, RegXMM, 0 } },
+{"movq",     2, 0x660fd6,X,CpuSSE2,NoSuf|IgnoreSize|Modrm|NoRex64, { RegXMM, RegXMM|LLongMem, 0 } },
+{"movq",     2, 0x0f6e, X, Cpu64,	NoSuf|IgnoreSize|Modrm, { Reg64|LLongMem, RegMMX, 0 } },
+{"movq",     2, 0x0f7e, X, Cpu64,	NoSuf|IgnoreSize|Modrm, { RegMMX, Reg64|LLongMem, 0 } },
+{"movq",     2, 0x660f6e,X,Cpu64,	NoSuf|IgnoreSize|Modrm, { Reg64|LLongMem, RegXMM, 0 } },
+{"movq",     2, 0x660f7e,X,Cpu64,	NoSuf|IgnoreSize|Modrm, { RegXMM, Reg64|LLongMem, 0 } },
 /* We put the 64bit displacement first and we only mark constants
    larger than 32bit as Disp64.  */
 {"movq",   2,   0xa0, X, Cpu64,  NoSuf|D|W|Size64, { Disp64, Acc, 0 } },
