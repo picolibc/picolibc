@@ -1,3 +1,9 @@
+2005-07-28  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/winnt.h (SUBLANG_PORTUGUESE, SUBLANG_PORTUGUESE_BRAZILIAN):
+	Correct their values.
+	Thanks to: Daniel K. O. <danielosmari at users dont sf dot net>
+
 2005-07-25  Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
 
 	* include/winuser.h (HSHELL_RUDEAPPACTIVATED): Define.
