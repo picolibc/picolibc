@@ -1,3 +1,9 @@
+2005-07-28  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	PR gas/336
+ 	* hppa.h (pa_opcodes): Allow 0 immediates in PA 2.0 variants of pdtlb
+	and pitlb.
+
 2005-07-27  Jan Beulich  <jbeulich@novell.com>
 
 	* i386.h (i386_optab): Add comment to movd. Use LongMem for all
