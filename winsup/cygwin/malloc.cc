@@ -3030,7 +3030,7 @@ static void internal_malloc_stats(mstate m) {
 #else
 #if MSPACES
 #define internal_malloc(m, b)\
-   (m == gm)? dlmalloc(b) : mspace_malloc(m, b)
+   ((m == gm)? dlmalloc(b) : mspace_malloc(m, b))
 #define internal_free(m, mem)\
    if (m == gm) dlfree(mem); else mspace_free(m,mem);
 #else

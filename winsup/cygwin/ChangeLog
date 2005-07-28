@@ -1,3 +1,11 @@
+2005-07-28  Christopher Faylor  <cgf@timesys.com>
+
+	* cygmalloc.h (MSPACES): Define.  This dropped through the cracks after
+	the last malloc update.
+	* dcrt0.cc: Fix a comment.
+	* malloc.cc (internal_malloc): Fix definition so that it can be safely
+	coerced.
+
 2005-07-27  Christopher Faylor  <cgf@timesys.com>
 
 	* include/cygwin/in.h (INET_ADDRSTRLEN): Add new definition.
