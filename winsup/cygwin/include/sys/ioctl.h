@@ -56,10 +56,10 @@ __BEGIN_DECLS
 #define _LINUX_IOWR(type,nr,size)	_IOC(_IOC_READ|_IOC_WRITE,(type),(nr),sizeof(size))
 
 #ifdef __USE_LINUX_IOCTL_DEFS
-#define _IO	_LINUX_IO
-#define _IOR	_LINUX_IOR
-#define _IOW	_LINUX_IOW
-#define _IOWR	_LINUX_IOWR
+# define _IO	_LINUX_IO
+# define _IOR	_LINUX_IOR
+# define _IOW	_LINUX_IOW
+# define _IOWR	_LINUX_IOWR
 #endif /*__USE_LINUX_IOCTL_DEFS */
 
 int __cdecl ioctl (int __fd, int __cmd, ...);
