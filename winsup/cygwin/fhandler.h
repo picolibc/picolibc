@@ -287,6 +287,8 @@ class fhandler_base
   virtual int write (const void *ptr, size_t len);
   virtual ssize_t readv (const struct iovec *, int iovcnt, ssize_t tot = -1);
   virtual ssize_t writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
+  virtual ssize_t __stdcall pread (void *, size_t, _off64_t) __attribute__ ((regparm (3)));
+  virtual ssize_t __stdcall pwrite (void *, size_t, _off64_t) __attribute__ ((regparm (3)));
   virtual _off64_t lseek (_off64_t offset, int whence);
   virtual int lock (int, struct __flock64 *);
   virtual int dup (fhandler_base *child);
@@ -673,6 +675,9 @@ class fhandler_disk_file: public fhandler_base
   void seekdir (DIR *, _off64_t);
   void rewinddir (DIR *);
   int closedir (DIR *);
+
+  ssize_t __stdcall pread (void *, size_t, _off64_t) __attribute__ ((regparm (3)));
+  ssize_t __stdcall pwrite (void *, size_t, _off64_t) __attribute__ ((regparm (3)));
 };
 
 class fhandler_cygdrive: public fhandler_disk_file

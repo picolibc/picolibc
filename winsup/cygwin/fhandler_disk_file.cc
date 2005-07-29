@@ -984,6 +984,30 @@ fhandler_base::close_fs ()
   return res;
 }
 
+ssize_t __stdcall
+fhandler_disk_file::pread (void *buf, size_t count, _off64_t offset)
+{
+  ssize_t res = lseek (offset, SEEK_SET);
+  if (res >= 0)
+    {
+      size_t tmp_count = count;
+      read (buf, tmp_count);
+      res = (ssize_t) tmp_count;
+    }
+  debug_printf ("%d = pread (%p, %d, %d)\n", res, buf, count, offset);
+  return res;
+}
+
+ssize_t __stdcall
+fhandler_disk_file::pwrite (void *buf, size_t count, _off64_t offset)
+{
+  ssize_t res = lseek (offset, SEEK_SET);
+  if (res >= 0)
+    res = write (buf, count);
+  debug_printf ("%d = pwrite (%p, %d, %d)\n", res, buf, count, offset);
+  return res;
+}
+
 /* FIXME: The correct way to do this to get POSIX locking semantics is to
    keep a linked list of posix lock requests and map them into Win32 locks.
    he problem is that Win32 does not deal correctly with overlapping lock

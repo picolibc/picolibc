@@ -1,5 +1,22 @@
 2005-07-29  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler.h (fhandler_base::pread): Declare new function.
+	(fhandler_base::pwrite): Ditto.
+	(fhandler_disk_file::pread): Ditto.
+	(fhandler_disk_file::pwrite): Ditto.
+	* fhandler.cc (fhandler_base::pread): Define new function.
+	(fhandler_base::pwrite): Ditto.
+	* fhandler_disk_file.cc (fhandler_base::pread): Ditto.
+	(fhandler_base::pwrite): Ditto.
+	* syscalls.cc (pread): Define new function.
+	(pwrite): Ditto.
+	* cygwin.din: Export pread, pwrite.
+
+	* include/sys/ioctl.h: Guard some _IO* declarations to avoid conflict
+	with socket.h.
+
+2005-07-29  Christopher Faylor  <cgf@timesys.com>
+
 	* include/sys/ioctl.h: Add some linux defines.
 
 2005-07-29  Christopher Faylor  <cgf@timesys.com>

@@ -20,6 +20,8 @@ details. */
 #define _open64 __FOO_open64__
 #define _lseek64 __FOO_lseek64__
 #define _fstat64 __FOO_fstat64__
+#define pread __FOO_pread
+#define pwrite __FOO_pwrite
 
 #include "winsup.h"
 #include <sys/stat.h>
@@ -46,6 +48,8 @@ details. */
 #undef fstat
 #undef lstat
 #undef stat
+#undef pread
+#undef pwrite
 
 #include <cygwin/version.h>
 #include <sys/cygwin.h>
@@ -386,6 +390,36 @@ read (int fd, void *ptr, size_t len)
     };
 
   return readv (fd, &iov, 1);
+}
+
+extern "C" ssize_t
+pread (int fd, void *ptr, size_t len, _off64_t off)
+{
+  ssize_t res;
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    res = -1;
+  else
+    res = cfd->pread (ptr, len, off);
+
+  syscall_printf ("%d = pread (%d, %p, %d, %d), errno %d",
+		  res, fd, ptr, len, off, get_errno ());
+  return res;
+}
+
+extern "C" ssize_t
+pwrite (int fd, void *ptr, size_t len, _off64_t off)
+{
+  ssize_t res;
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    res = -1;
+  else
+    res = cfd->pwrite (ptr, len, off);
+
+  syscall_printf ("%d = pwrite (%d, %p, %d, %d), errno %d",
+		  res, fd, ptr, len, off, get_errno ());
+  return res;
 }
 
 EXPORT_ALIAS (read, _read)

@@ -1116,6 +1116,20 @@ fhandler_base::lseek (_off64_t offset, int whence)
   return res;
 }
 
+ssize_t __stdcall
+fhandler_base::pread (void *, size_t, _off64_t)
+{
+  set_errno (ESPIPE);
+  return -1;
+}
+
+ssize_t __stdcall
+fhandler_base::pwrite (void *, size_t, _off64_t)
+{
+  set_errno (ESPIPE);
+  return -1;
+}
+
 int
 fhandler_base::close ()
 {
