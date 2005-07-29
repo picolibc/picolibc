@@ -987,12 +987,18 @@ fhandler_base::close_fs ()
 ssize_t __stdcall
 fhandler_disk_file::pread (void *buf, size_t count, _off64_t offset)
 {
-  ssize_t res = lseek (offset, SEEK_SET);
-  if (res >= 0)
+  ssize_t res;
+  _off64_t curpos = lseek (0, SEEK_CUR);
+  if (curpos < 0 || lseek (offset, SEEK_SET) < 0)
+    res = -1;
+  else
     {
       size_t tmp_count = count;
       read (buf, tmp_count);
-      res = (ssize_t) tmp_count;
+      if (lseek (curpos, SEEK_SET) == 0)
+	res = (ssize_t) tmp_count;
+      else
+	res = -1;
     }
   debug_printf ("%d = pread (%p, %d, %d)\n", res, buf, count, offset);
   return res;
@@ -1001,9 +1007,16 @@ fhandler_disk_file::pread (void *buf, size_t count, _off64_t offset)
 ssize_t __stdcall
 fhandler_disk_file::pwrite (void *buf, size_t count, _off64_t offset)
 {
-  ssize_t res = lseek (offset, SEEK_SET);
-  if (res >= 0)
-    res = write (buf, count);
+  int res;
+  _off64_t curpos = lseek (0, SEEK_CUR);
+  if (curpos < 0 || lseek (offset, SEEK_SET) < 0)
+    res = curpos;
+  else
+    {
+      res = (ssize_t) write (buf, count);
+      if (lseek (curpos, SEEK_SET) < 0)
+	res = -1;
+    }
   debug_printf ("%d = pwrite (%p, %d, %d)\n", res, buf, count, offset);
   return res;
 }

@@ -1,5 +1,11 @@
 2005-07-29  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler_disk_file.cc (fhandler_base::pread): Don't move file offset
+	pointer after I/O.
+	(fhandler_base::pwrite): Ditto.
+
+2005-07-29  Christopher Faylor  <cgf@timesys.com>
+
 	* fhandler.h (fhandler_base::pread): Declare new function.
 	(fhandler_base::pwrite): Ditto.
 	(fhandler_disk_file::pread): Ditto.
