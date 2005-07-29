@@ -370,8 +370,6 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
 
   int child_pid = cygwin_pid (pi.dwProcessId);
   pinfo child (child_pid, 1);
-  child->start_time = time (NULL); /* Register child's starting time. */
-  child->nice = myself->nice;
 
   if (!child)
     {
@@ -380,6 +378,9 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
 	set_errno (EAGAIN);
       goto cleanup;
     }
+
+  child->start_time = time (NULL); /* Register child's starting time. */
+  child->nice = myself->nice;
 
   /* Initialize things that are done later in dll_crt0_1 that aren't done
      for the forkee.  */

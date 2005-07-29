@@ -1,3 +1,7 @@
+2005-07-29  Arto Huusko  <arto.huusko@wmdata.fi>
+
+	* fork.cc (fork_parent): Fix null deref if pinfo creation fails.
+
 2005-07-28  Christopher Faylor  <cgf@timesys.com>
 
 	* cygmalloc.h (MSPACES): Define.  This dropped through the cracks after
