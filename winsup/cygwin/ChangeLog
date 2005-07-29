@@ -1,5 +1,9 @@
 2005-07-29  Christopher Faylor  <cgf@timesys.com>
 
+	* include/sys/ioctl.h: Add some linux defines.
+
+2005-07-29  Christopher Faylor  <cgf@timesys.com>
+
 	* pinfo.cc (pinfo::init): Put back accidentally removed debug_printf.
 
 2005-07-29  Arto Huusko  <arto.huusko@wmdata.fi>
