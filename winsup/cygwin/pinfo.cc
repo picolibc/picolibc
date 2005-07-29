@@ -233,8 +233,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 	    case ERROR_INVALID_ADDRESS:
 	      mapaddr = NULL;
 	    }
-
-	  debug_printf ("MapViewOfFileEx h0 %p, i %d failed, %E", h0, i);
+	  low_priority_sleep (0);
 	  continue;
 	}
 
