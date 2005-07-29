@@ -1,4 +1,9 @@
-2005-07-29  Christopher Faylor  <cgf@timesys.com>
+2005-07-29  Arto Huusko  <arto.huusko@wmdata.fi>
+
+	* cygthread.cc (cygthread::simplestub): Wait for h to be filled out
+	by main thread before assigning it.
+
+2005-07-29  Arto Huusko  <arto.huusko@wmdata.fi>
 
 	* pinfo.cc (pinfo::init): Sleep before retrying open_shared().
 

@@ -111,6 +111,9 @@ cygthread::simplestub (VOID *arg)
   cygthread *info = (cygthread *) arg;
   _my_tls._ctinfo = info;
   info->stack_ptr = &arg;
+  /* Wait for main thread to assign 'h' */
+  while (!info->h)
+    low_priority_sleep (0);
   info->ev = info->h;
   info->func (info->arg == cygself ? info : info->arg);
   return 0;
