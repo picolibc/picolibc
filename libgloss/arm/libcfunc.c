@@ -48,7 +48,7 @@ int __attribute__((weak))
 isatty(int fildes)
 {
 	/* GDB does not yet support the IsTTY SWI that _isatty
-	 * calls, so always return true for now. */
+	 * calls, so always return true for now.  */
 	(void)fildes;
 	return 1;
 }
