@@ -1,5 +1,9 @@
 2005-08-02  Shaun Jackman  <sjackman@gmail.com>
 
+        * libgloss/arm/libcfunc.c (isatty): New function.
+
+2005-08-02  Shaun Jackman  <sjackman@gmail.com>
+
         * libgloss/arm/syscalls.c (_exit): Call _kill with the second
         argument set to -1, which is an invalid signal number.
         (_kill): Comment and coding style changes only.

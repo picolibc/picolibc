@@ -43,6 +43,16 @@ alarm (unsigned seconds)
 	return 0;
 }
 
+int _isatty(int fildes);
+int __attribute__((weak))
+isatty(int fildes)
+{
+	/* GDB does not yet support the IsTTY SWI that _isatty
+	 * calls, so always return true for now. */
+	(void)fildes;
+	return 1;
+}
+
 int __attribute__((weak))
 pause (void)
 {
