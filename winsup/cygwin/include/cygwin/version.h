@@ -262,12 +262,13 @@ details. */
       133: Export __getline, __getdelim.
       134: Export getline, getdelim.
       135: Export pread, pwrite
+      136: Add TIOCMBIS/TIOCMBIC ioctl codes.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 135
+#define CYGWIN_VERSION_API_MINOR 136
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

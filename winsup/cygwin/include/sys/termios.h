@@ -1,6 +1,6 @@
 /* sys/termios.h
 
-   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -14,6 +14,8 @@ details. */
 #define _SYS_TERMIOS_H
 
 #define	TIOCMGET	0x5415
+#define	TIOCMBIS	0x5416
+#define	TIOCMBIC	0x5417
 #define	TIOCMSET	0x5418
 #define	TIOCINQ		0x541B
 

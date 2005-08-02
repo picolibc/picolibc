@@ -1,3 +1,13 @@
+2005-08-02  Yitzchak Scott-Thoennes  <sthoenna@efn.org>
+
+	* include/sys/termios.h: Define TIOCMBIS and TIOCMBIC.
+	* fhandler.h (class fhandler_serial): Declare switch_modem_lines.
+	* fhandler_serial.cc (fhandler_serial::switch_modem_lines): New
+	static function to set or clear DTR and/or RTS.
+	(fhandler_serial::ioctl): Use switch_modem_lines for TIOCMSET
+	and new TIOCMBIS and TIOCMBIC.
+	* include/cygwin/version.h: Bump API minor number.
+
 2005-07-29  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_disk_file.cc (fhandler_base::pread): Don't move file offset

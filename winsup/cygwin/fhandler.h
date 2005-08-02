@@ -722,6 +722,7 @@ class fhandler_serial: public fhandler_base
   int tcdrain ();
   int tcflow (int);
   int ioctl (unsigned int cmd, void *);
+  int switch_modem_lines (int set, int clr);
   int tcsetattr (int a, const struct termios *t);
   int tcgetattr (struct termios *t);
   _off64_t lseek (_off64_t, int) { return 0; }
