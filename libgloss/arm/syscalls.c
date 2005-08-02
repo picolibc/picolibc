@@ -22,7 +22,6 @@ int     _rename     _PARAMS ((const char *, const char *));
 int     _isatty		_PARAMS ((int));
 clock_t _times		_PARAMS ((struct tms *));
 int     _gettimeofday	_PARAMS ((struct timeval *, struct timezone *));
-int     _raise 		_PARAMS ((int));
 int     _unlink		_PARAMS ((const char *));
 int     _link 		_PARAMS ((void));
 int     _stat 		_PARAMS ((const char *, struct stat *));
@@ -434,30 +433,28 @@ _close (int file)
   return wrap (_swiclose (file));
 }
 
-void
-_exit (int n)
-{
-  /* FIXME: return code is thrown away.  */
-  
-#ifdef ARM_RDI_MONITOR
-  do_AngelSWI (AngelSWI_Reason_ReportException,
-	      (void *) ADP_Stopped_ApplicationExit);
-#else
-  asm ("swi %a0" :: "i" (SWI_Exit));
-#endif
-  n = n;
-}
-
 int
-_kill (int n, int m)
+_kill (int pid, int sig)
 {
+  (void)pid; (void)sig;
 #ifdef ARM_RDI_MONITOR
+  /* Note: Both arguments are thrown away.  */
   return do_AngelSWI (AngelSWI_Reason_ReportException,
 		      (void *) ADP_Stopped_ApplicationExit);
 #else
   asm ("swi %a0" :: "i" (SWI_Exit));
 #endif
-  n = n; m = m;
+}
+
+void
+_exit (int status)
+{
+  /* There is only one SWI for both _exit and _kill. For _exit, call
+     the SWI with the second argument set to -1, an invalid value for
+     signum, so that the SWI handler can distinguish the two calls.
+     Note: The RDI implementation of _kill throws away both its
+     arguments.  */
+  _kill(status, -1);
 }
 
 int __attribute__((weak))
@@ -543,14 +540,6 @@ _unlink (const char *path)
   (void)path;
   asm ("swi %a0" :: "i" (SWI_Remove));
 #endif
-}
-
-int __attribute__((weak))
-_raise (int sig)
-{
-  (void)sig;
-  errno = ENOSYS;
-  return -1;
 }
 
 int
