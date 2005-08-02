@@ -1,3 +1,8 @@
+2005-08-02  Bob Wilson  <bob.wilson@acm.org>
+
+         * libm/math/ef_hypot.c (__ieee754_hypotf): Add missing exponent bias
+         to the value for 2^126.
+
 2005-07-26  Hans-Peter Nilsson  <hp@bitrange.com>
 
 	* libc/machine/cris/libcdtor.c (defaultors): Mark artificially as

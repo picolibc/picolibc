@@ -50,7 +50,7 @@
 	    if(FLT_UWORD_IS_ZERO(hb)) {
 	        return a;
 	    } else if(FLT_UWORD_IS_SUBNORMAL(hb)) {
-		SET_FLOAT_WORD(t1,0x3f000000L);	/* t1=2^126 */
+		SET_FLOAT_WORD(t1,0x7e800000L);	/* t1=2^126 */
 		b *= t1;
 		a *= t1;
 		k -= 126;
