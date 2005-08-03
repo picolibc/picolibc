@@ -1,6 +1,6 @@
 /* mount.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -140,7 +140,7 @@ static struct option longopts[] =
   {"help", no_argument, NULL, 'h' },
   {"mount-commands", no_argument, NULL, 'm'},
   {"no-executable", no_argument, NULL, 'E'},
-  {"options", required_argument, NULL, 'E'},
+  {"options", required_argument, NULL, 'o'},
   {"show-cygdrive-prefix", no_argument, NULL, 'p'},
   {"system", no_argument, NULL, 's'},
   {"text", no_argument, NULL, 't'},

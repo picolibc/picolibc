@@ -1,3 +1,7 @@
+2005-08-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.cc (longopts): Fix typo which disallows --options option.
+
 2005-07-19  Christopher Faylor  <cgf@timesys.com>
             Eric Blake  <ebb9@byu.net>
 
