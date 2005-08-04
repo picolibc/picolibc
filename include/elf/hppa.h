@@ -1,5 +1,5 @@
 /* HPPA ELF support for BFD.
-   Copyright 1993, 1994, 1995, 1998, 1999, 2000
+   Copyright 1993, 1994, 1995, 1998, 1999, 2000, 2005
    Free Software Foundation, Inc.
 
 This file is part of BFD, the Binary File Descriptor library.
@@ -489,13 +489,18 @@ typedef enum elf_hppa_reloc_type elf_hppa_reloc_type;
 
 #define PT_PARISC_ARCHEXT	0x70000000
 #define PT_PARISC_UNWIND	0x70000001
-#define PF_PARISC_SBP		0x08000000
+
+/* Flag bits in p_flags of ElfXX_Phdr.  */
+#define PF_HP_CODE		0x00040000
+#define PF_HP_MODIFY		0x00080000
 #define PF_HP_PAGE_SIZE		0x00100000
 #define PF_HP_FAR_SHARED	0x00200000
 #define PF_HP_NEAR_SHARED	0x00400000
-#define PF_HP_CODE		0x01000000
-#define PF_HP_MODIFY		0x02000000
-#define PF_HP_LAZYSWAP		0x04000000
+#define PF_HP_LAZYSWAP		0x00800000
+#define PF_HP_CODE_DEPR		0x01000000
+#define PF_HP_MODIFY_DEPR	0x02000000
+#define PF_HP_LAZYSWAP_DEPR	0x04000000
+#define PF_PARISC_SBP		0x08000000
 #define PF_HP_SBP		0x08000000
 
 
@@ -517,19 +522,36 @@ typedef enum elf_hppa_reloc_type elf_hppa_reloc_type;
 #define DT_HP_GST_SIZE		(OLD_DT_LOOS + 0xa)
 #define DT_HP_GST_VERSION	(OLD_DT_LOOS + 0xb)
 #define DT_HP_GST_HASHVAL	(OLD_DT_LOOS + 0xc)
+#define DT_HP_EPLTREL		(OLD_DT_LOOS + 0xd)
+#define DT_HP_EPLTRELSZ		(OLD_DT_LOOS + 0xe)
+#define DT_HP_FILTERED		(OLD_DT_LOOS + 0xf)
+#define DT_HP_FILTER_TLS	(OLD_DT_LOOS + 0x10)
+#define DT_HP_COMPAT_FILTERED	(OLD_DT_LOOS + 0x11)
+#define DT_HP_LAZYLOAD		(OLD_DT_LOOS + 0x12)
+#define DT_HP_BIND_NOW_COUNT	(OLD_DT_LOOS + 0x13)
+#define DT_PLT			(OLD_DT_LOOS + 0x14)
+#define DT_PLT_SIZE		(OLD_DT_LOOS + 0x15)
+#define DT_DLT			(OLD_DT_LOOS + 0x16)
+#define DT_DLT_SIZE		(OLD_DT_LOOS + 0x17)
 
 /* Values for DT_HP_DLD_FLAGS.  */
-#define DT_HP_DEBUG_PRIVATE		0x0001 /* Map text private */
-#define DT_HP_DEBUG_CALLBACK		0x0002 /* Callback */
-#define DT_HP_DEBUG_CALLBACK_BOR	0x0004 /* BOR callback */
-#define DT_HP_NO_ENVVAR			0x0008 /* No env var */
-#define DT_HP_BIND_NOW			0x0010 /* Bind now */
-#define DT_HP_BIND_NONFATAL		0x0020 /* Bind non-fatal */
-#define DT_HP_BIND_VERBOSE		0x0040 /* Bind verbose */
-#define DT_HP_BIND_RESTRICTED		0x0080 /* Bind restricted */
-#define DT_HP_BIND_SYMBOLIC		0x0100 /* Bind symbolic */
-#define DT_HP_RPATH_FIRST		0x0200 /* RPATH first */
-#define DT_HP_BIND_DEPTH_FIRST		0x0400 /* Bind depth-first */
+#define DT_HP_DEBUG_PRIVATE		0x00001 /* Map text private */
+#define DT_HP_DEBUG_CALLBACK		0x00002 /* Callback */
+#define DT_HP_DEBUG_CALLBACK_BOR	0x00004 /* BOR callback */
+#define DT_HP_NO_ENVVAR			0x00008 /* No env var */
+#define DT_HP_BIND_NOW			0x00010 /* Bind now */
+#define DT_HP_BIND_NONFATAL		0x00020 /* Bind non-fatal */
+#define DT_HP_BIND_VERBOSE		0x00040 /* Bind verbose */
+#define DT_HP_BIND_RESTRICTED		0x00080 /* Bind restricted */
+#define DT_HP_BIND_SYMBOLIC		0x00100 /* Bind symbolic */
+#define DT_HP_RPATH_FIRST		0x00200 /* RPATH first */
+#define DT_HP_BIND_DEPTH_FIRST		0x00400 /* Bind depth-first */
+#define DT_HP_GST			0x00800 /* Dld global sym table */
+#define DT_HP_SHLIB_FIXED		0x01000 /* shared vtable support */
+#define DT_HP_MERGE_SHLIB_SEG		0x02000 /* merge shlib data segs */
+#define DT_HP_NODELETE			0x04000 /* never unload */
+#define DT_HP_GROUP			0x08000 /* bind only within group */
+#define DT_HP_PROTECT_LINKAGE_TABLE	0x10000 /* protected linkage table */
 
 /* Program header extensions.  */
 #define PT_HP_TLS		(PT_LOOS + 0x0)
@@ -544,9 +566,22 @@ typedef enum elf_hppa_reloc_type elf_hppa_reloc_type;
 #define PT_HP_CORE_MMF		(PT_LOOS + 0x9)
 #define PT_HP_PARALLEL		(PT_LOOS + 0x10)
 #define PT_HP_FASTBIND		(PT_LOOS + 0x11)
+#define PT_HP_OPT_ANNOT		(PT_LOOS + 0x12)
+#define PT_HP_HSL_ANNOT		(PT_LOOS + 0x13)
+#define PT_HP_STACK		(PT_LOOS + 0x14)
+#define PT_HP_CORE_UTSNAME	(PT_LOOS + 0x15)
 
 /* Additional symbol types.  */
 #define STT_HP_OPAQUE		(STT_LOOS + 0x1)
 #define STT_HP_STUB		(STT_LOOS + 0x2)
+
+/* Note types.  */
+#define NT_HP_COMPILER		1
+#define NT_HP_COPYRIGHT		2
+#define NT_HP_VERSION		3
+#define NT_HP_SRCFILE_INFO	4
+#define NT_HP_LINKER		5
+#define NT_HP_INSTRUMENTED	6
+#define NT_HP_UX_OPTIONS	7
 
 #endif /* _ELF_HPPA_H */
