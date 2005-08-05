@@ -1,3 +1,7 @@
+2005-08-05  Vaclav Haisman  <v.haisman@sh.cvut.cz>
+
+	* fhandler_tty.cc (fhandler_tty_slave::tcflush): Return either 0 or -1.
+
 2005-08-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* thread.cc (pthread_cond_timedwait): Check abstime for validity
