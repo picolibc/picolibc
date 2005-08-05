@@ -1,3 +1,9 @@
+2005-08-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* thread.cc (pthread_cond_timedwait): Check abstime for validity
+	according to SUSv3.  Rewrite timeout check and waitlength calculation
+	to avoid overflow problems.
+
 2005-08-02  Yitzchak Scott-Thoennes  <sthoenna@efn.org>
 
 	* include/sys/termios.h: Define TIOCMBIS and TIOCMBIC.

@@ -2615,7 +2615,7 @@ pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
 			const struct timespec *abstime)
 {
   struct timeval tv;
-  long waitlength;
+  DWORD waitlength;
 
   myfault efault;
   if (efault.faulted ())
@@ -2623,11 +2623,23 @@ pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
 
   pthread_testcancel ();
 
+  /* According to SUSv3, the abstime value must be checked for validity. */
+  if (abstime->tv_sec < 0
+      || abstime->tv_nsec < 0
+      || abstime->tv_nsec > 999999999)
+    return EINVAL;
+
   gettimeofday (&tv, NULL);
-  waitlength = abstime->tv_sec * 1000 + abstime->tv_nsec / (1000 * 1000);
-  waitlength -= tv.tv_sec * 1000 + tv.tv_usec / 1000;
-  if (waitlength < 0)
+  /* Check for immediate timeout before converting to microseconds, since
+     the resulting value can easily overflow long.  This also allows to
+     evaluate microseconds directly in DWORD. */
+  if (tv.tv_sec > abstime->tv_sec
+      || (tv.tv_sec == abstime->tv_sec
+          && tv.tv_usec > abstime->tv_nsec / 1000))
     return ETIMEDOUT;
+
+  waitlength = (abstime->tv_sec - tv.tv_sec) * 1000;
+  waitlength += (abstime->tv_nsec / 1000 - tv.tv_usec) / 1000;
   return __pthread_cond_dowait (cond, mutex, waitlength);
 }
 
