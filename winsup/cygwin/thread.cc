@@ -491,13 +491,15 @@ pthread::precreate (pthread_attr *newattr)
     magic = 0;
 }
 
-void
+bool
 pthread::create (void *(*func) (void *), pthread_attr *newattr,
 		 void *threadarg)
 {
+  bool retval;
+
   precreate (newattr);
   if (!magic)
-    return;
+    return false;
 
   function = func;
   arg = threadarg;
@@ -517,7 +519,9 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
       while (!cygtls)
 	low_priority_sleep (0);
     }
+  retval = magic;
   mutex.unlock ();
+  return retval;
 }
 
 void
@@ -1993,8 +1997,7 @@ pthread::create (pthread_t *thread, const pthread_attr_t *attr,
     return EINVAL;
 
   *thread = new pthread ();
-  (*thread)->create (start_routine, attr ? *attr : NULL, arg);
-  if (!is_good_object (thread))
+  if (!(*thread)->create (start_routine, attr ? *attr : NULL, arg))
     {
       delete (*thread);
       *thread = NULL;
@@ -3274,9 +3277,10 @@ pthread_null::~pthread_null ()
 {
 }
 
-void
+bool
 pthread_null::create (void *(*)(void *), pthread_attr *, void *)
 {
+  return true;
 }
 
 void

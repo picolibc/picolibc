@@ -1,3 +1,11 @@
+2005-08-05 Michael Gorse <mgorse@alum.wpi.edu>
+
+	* thread.cc (pthread::create(3 args)): Make bool.
+	(pthread_null::create): Ditto.
+	(pthread::create(4 args)): Check return of inner create rather than
+	calling is_good_object().
+	* thread.h: Ditto.
+
 2005-08-05  Vaclav Haisman  <v.haisman@sh.cvut.cz>
 
 	* fhandler_tty.cc (fhandler_tty_slave::tcflush): Return either 0 or -1.

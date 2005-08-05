@@ -380,7 +380,7 @@ public:
   HANDLE cancel_event;
   pthread_t joiner;
 
-  virtual void create (void *(*)(void *), pthread_attr *, void *);
+  virtual bool create (void *(*)(void *), pthread_attr *, void *);
 
   pthread ();
   virtual ~pthread ();
@@ -473,7 +473,7 @@ class pthread_null : public pthread
   /* From pthread These should never get called
   * as the ojbect is not verifyable
   */
-  void create (void *(*)(void *), pthread_attr *, void *);
+  bool create (void *(*)(void *), pthread_attr *, void *);
   void exit (void *value_ptr) __attribute__ ((noreturn));
   int cancel ();
   void testcancel ();
