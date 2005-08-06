@@ -1,0 +1,204 @@
+<!-- faq-what.xml -->
+<qandaentry id="faq.what">
+<question><para>What is it?</para></question>
+<answer>
+
+<para>The Cygwin tools are ports of the popular GNU development tools for
+Microsoft Windows.  They run thanks to the Cygwin library which
+provides the UNIX system calls and environment these programs expect.
+</para>
+<para>With these tools installed, it is possible to write Win32 console or
+GUI applications that make use of the standard Microsoft Win32 API
+and/or the Cygwin API.  As a result, it is possible to easily
+port many significant Unix programs without the need
+for extensive changes to the source code.  This includes configuring
+and building most of the available GNU software (including the packages
+included with the Cygwin development tools themselves).  Even if
+the development tools are of little to no use to you, you may have
+interest in the many standard Unix utilities provided with the package.
+They can be used both from the bash shell (provided) or from the
+standard Windows command shell.
+</para>
+</answer></qandaentry>
+
+<qandaentry id="faq.what.supported">
+<question><para>What versions of Windows are supported?</para></question>
+<answer>
+
+<para>Wait a minute... Cygwin is only <emphasis>supported</emphasis> if you are paying for
+it, such as through a support contract with Red Hat.  For information
+about getting a Red Hat support contract, see
+<ulink url="http://www.redhat.com/software/tools/cygwin/">http://www.redhat.com/software/tools/cygwin/</ulink>.
+</para>
+<para>That said, Cygwin can be expected to run on all modern 32 bit versions of
+Windows, except Windows CE.  This includes Windows 95/98/ME/NT/2000/XP.
+</para>
+<para>Keep in mind that Cygwin can only do as much as the underlying OS
+supports.  Because of this, Cygwin will behave differently, and
+exhibit different limitations, on the various versions of Windows.
+</para>
+</answer></qandaentry>
+
+<qandaentry id="faq.what.where">
+<question><para>Where can I get it?</para></question>
+<answer>
+
+<para>The home page for the Cygwin project is <ulink url="http://cygwin.com/">http://cygwin.com/</ulink>.
+There you should find everything you need for Cygwin, including links
+for download and setup, a current list of mirror sites, a User's
+Guide, an API Reference, mailing lists and archives, and additional
+ported software.
+</para>
+<para>You can find documentation for the individual GNU tools at
+<ulink url="http://www.fsf.org/manual/">http://www.fsf.org/manual/</ulink>.  (You should read GNU manuals from a
+local mirror.  Check <ulink url="http://www.fsf.org/server/list-mirrors.html">http://www.fsf.org/server/list-mirrors.html</ulink>
+for a list of them.)
+</para>
+</answer></qandaentry>
+
+<qandaentry id="faq.what.free">
+<question><para>Is it free software?</para></question>
+<answer>
+
+<para>Yes.  Parts are GNU software (gcc, gas, ld, etc...), parts are covered
+by the standard X11 license, some of it is public domain, some of
+it was written by Cygnus and placed under the GPL.  None of it is
+shareware.  You don't have to pay anyone to use it but you should be
+sure to read the copyright section of the FAQ for more information on
+how the GNU General Public License may affect your use of these tools.
+</para>
+<para>In particular, if you intend to port a proprietary (non-GPL'd)
+application using Cygwin, you will need the proprietary-use license 
+for the Cygwin library.  This is available for purchase; please visit
+<ulink url="http://www.redhat.com/software/tools/cygwin/">http://www.redhat.com/software/tools/cygwin/</ulink> for more information.
+All other questions should be sent to the project
+mailing list cygwin@cygwin.com.
+</para>
+<para>Note that when we say "free" we mean freedom, not price.  The goal of
+such freedom is that the people who use a given piece of software
+should be able to change it to fit their needs, learn from it, share
+it with their friends, etc.  The Cygwin license allows you those
+freedoms, so it is free software.
+</para>
+</answer></qandaentry>
+
+<qandaentry id="faq.what.version">
+<question><para>What version of Cygwin <emphasis>is</emphasis> this, anyway?</para></question>
+<answer>
+
+<para>To find the version of the Cygwin DLL installed, you can use
+<filename>uname</filename> as on Linux or <filename>cygcheck</filename>. Refer to each command's
+<literal>--help</literal> output and the <ulink url='http://cygwin.com/cygwin-ug-net/'>Cygwin User's Guide</ulink> for more information.
+</para>
+<para>If you are looking for the version number for the whole Cygwin
+release, there is none. Each package in the Cygwin release has its own
+version.  The packages in Cygwin are continually improving, thanks to
+the efforts of net volunteers who maintain the Cygwin binary ports.
+Each package has its own version numbers and its own release process.
+</para>
+<para>So, how do you get the most up-to-date version of Cygwin?  Easy.  Just
+download the Cygwin Setup program from
+<ulink url='http://cygwin.com/setup.exe'>http://cygwin.com/setup.exe</ulink>.  This program will handle the task
+of updating the packages on your system to the latest version. For
+more information about using Cygwin's <filename>setup.exe</filename>, see 
+<ulink url='http://cygwin.com/cygwin-ug-net/setup-net.html'>Setting Up Cygwin</ulink>
+in the Cygwin User's Guide. 
+</para></answer></qandaentry>
+
+<qandaentry id="faq.what.history">
+<question><para>History</para></question>
+<answer>
+<para>See <ulink url="http://cygwin.com/history.html">http://cygwin.com/history.html</ulink>.
+</para>
+</answer></qandaentry>
+
+<qandaentry id="faq.what.who">
+<question><para>Who's behind the project?</para></question>
+<answer>
+
+<para><emphasis role='bold'>(Please note that if you have cygwin-specific questions, all of these people will appreciate it if you use the cygwin mailing lists rather than sending personal email.)</emphasis>
+</para>
+<para>Chris Faylor is behind many of the recent changes in Cygwin.  Prior to
+joining Cygnus, he contributed significant fixes to the process control
+and environ code, reworked the strace mechanism, and rewrote the
+signal-related code from scratch as a Net contributor.  In addition to
+continuing to make technical contributions, Chris is also currently the
+group's manager.
+</para>
+<para>Corinna Vinschen has contributed several useful fixes to the path
+handling code, console support, improved security handling, and raw
+device support.  Corinna is currently employed by Red Hat as a
+GDB/Cygwin engineer.
+</para>
+<para>DJ Delorie has done important work in profiling Cygwin,
+worked on the Dejagnu automated testing framework, merged the dlltool
+functionality into ld, wrote a good deal of the Cygwin Users' Guide,
+authored the cygcheck utility, and made automated snapshots available
+from our project WWW page.  DJ is currently employed by Red Hat as
+a GCC engineer.
+</para>
+<para>Egor Duda has contributed many useful fixes.  He is responsible for
+Cygwin's ability to start a debugger on detection of a fatal error
+as well as produce core dumps.
+</para>
+<para>Robert Collins has contributed many improvements to thread handling
+as well as generic fixes to cygwin itself.
+</para>
+<para>Kazuhiro Fujieda has contributed many bug fixes and bug reports.
+</para>
+<para>Earnie Boyd has contributed many bug fixes and is the mingw and w32api
+maintainer.
+</para>
+<para>David Starks-Browning is our dedicated FAQ maintainer.
+</para>
+<para>Geoffrey Noer took over the Cygwin project from its initial author Steve
+Chamberlain in mid-1996.  As maintainer, he produced Net releases beta
+16 through 20; made the development snapshots; worked with Net
+contributors to fix bugs; made many various code improvements himself;
+wrote a paper on Cygwin for the 1998 Usenix NT Symposium; authored the
+project WWW pages, FAQ, README; etc.  Geoffrey is not currently employed
+by Red Hat.
+</para>
+<para>Steve Chamberlain designed and implemented
+Cygwin in 1995-1996 while working for Cygnus.  He worked with the Net
+to improve the technology, ported/integrated many of the user tools
+for the first time to Cygwin, and produced all of the releases up to
+beta 14.  Steve is not currently employed by Red Hat.
+</para>
+<para>Marco Fuykschot and Peter Boncz of Data Distilleries contributed nearly
+all of the changes required to make Cygwin thread-safe.  They also
+provided the pthreads interface.
+</para>
+<para>Sergey Okhapkin has been an invaluable Net contributor.  He implemented
+the tty/pty support, has played a significant role in revamping signal
+and exception handling, and has made countless contributions throughout
+the library.  He also provided binaries of the development snapshots to
+the Net after the beta 19 release.
+</para>
+<para>Mumit Khan has been most helpful on the EGCS end of things, providing
+quite a large number of stabilizing patches to the compiler tools for
+the B20 release.
+</para>
+<para>Philippe Giacinti contributed the implementation of dlopen, dlclose,
+dlsym, dlfork, and dlerror in Cygwin.
+</para>
+<para>Ian Lance Taylor did a much-needed rework of the path handling code for
+beta 18, and has made many assorted fixes throughout the code.  Jeremy
+Allison made significant contributions in the area of file handling and
+process control, and rewrote select from scratch.  Doug Evans rewrote
+the path-handling code in beta 16, among other things.  Kim Knuttila and
+Michael Meissner put in many long hours working on the now-defunct
+PowerPC port.  Jason Molenda and Mark Eichin have also made important
+contributions.
+</para>
+<para>Please note that all of us working on Cygwin try to
+be as responsive as possible and deal with patches and questions as we
+get them, but realistically we don't have time to answer all of the
+email that is sent to the main mailing list.  Making Net releases of the
+Win32 tools and helping people on the Net out is not our primary job
+function, so some email will have to go unanswered.
+</para>
+<para>Many thanks to everyone using the tools for their many contributions in
+the form of advice, bug reports, and code fixes.  Keep them coming!
+</para></answer></qandaentry>
+

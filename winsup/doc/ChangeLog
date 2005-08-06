@@ -1,3 +1,17 @@
+2005-08-05  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* cygwin.dsl: Add default DOCTYPE and output filename.
+	* Makefile: Update to switch FAQ from texinfo to DocBook.
+	* faq.xml: New file.
+	* faq-api.xml: New file.
+	* faq-problems.xml: New file.
+	* faq-programming.xml: New file.
+	* faq-resources.xml: New file.
+	* faq-sections.xml: New file.
+	* faq-setup.xml: New file.
+	* faq-using.xml: New file.
+	* faq-what.xml: New file.
+
 2005-07-10  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* cygwinenv.sgml: Update tty section to mention rxvt and xterm.

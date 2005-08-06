@@ -30,24 +30,25 @@ TEXI2HTML:=texi2html
 include $(srcdir)/../Makefile.common
 
 TOCLEAN:=faq.txt ./*.html readme.txt doctool.o doctool.exe *.junk \
-	 cygwin-ug.sgml cygwin-ug \
+	 cygwin-ug.sgml cygwin-ug cygwin-ug-net.html.gz \
 	 cygwin-ug-net.sgml cygwin-ug-net cygwin-ug-net.html \
-	 cygwin-api.sgml cygwin-api cygwin-api-int.sgml cygwin-api-int
+	 cygwin-api.sgml cygwin-api cygwin-api-int.sgml cygwin-api-int \
+	 faq
 
 .SUFFIXES:
 
 all : \
 	cygwin-ug-net/cygwin-ug-net.html \
-	cygwin-ug-net.html \
+	cygwin-ug-net/cygwin-ug-net.html.gz \
 	cygwin-api/cygwin-api.html \
-	$(HTMLDOC)
+	faq/faq.html faq/faq-nochunks.html
 
 clean:
 	rm -Rf $(TOCLEAN)
 
 install:	all
 
-cygwin-ug-net.html : cygwin-ug-net.sgml doctool
+cygwin-ug-net/cygwin-ug-net.html.gz : cygwin-ug-net.sgml doctool
 	-xmlto html-nochunks -m $(srcdir)/cygwin.dsl $<
 	-cp cygwin-ug-net.html cygwin-ug-net/cygwin-ug-net-nochunks.html
 	-rm -f cygwin-ug-net/cygwin-ug-net-nochunks.html.gz
@@ -55,17 +56,21 @@ cygwin-ug-net.html : cygwin-ug-net.sgml doctool
 
 cygwin-ug-net/cygwin-ug-net.html : cygwin-ug-net.sgml doctool
 	-xmlto html -o cygwin-ug-net/ -m $(srcdir)/cygwin.dsl $<
-	-mv cygwin-ug-net/index.html cygwin-ug-net/cygwin-ug-net.html
 
 cygwin-ug-net.sgml : cygwin-ug-net.in.sgml ./doctool Makefile
 	-./doctool -m $(SGMLDIRS) -s $(srcdir) -o $@ $<
 
 cygwin-api/cygwin-api.html : cygwin-api.sgml
 	-xmlto html -o cygwin-api/ -m $(srcdir)/cygwin.dsl $<
-	-mv cygwin-api/index.html cygwin-api/cygwin-api.html
 
 cygwin-api.sgml : cygwin-api.in.sgml ./doctool Makefile
 	-./doctool -m $(SGMLDIRS) -s $(srcdir) -o $@ $<
+
+faq/faq.html :
+	-xmlto html -o faq -m $(srcdir)/cygwin.dsl $(srcdir)/faq-sections.xml
+
+faq/faq-nochunks.html :
+	-xmlto html -o faq -m $(srcdir)/cygwin.dsl $(srcdir)/faq.xml
 
 ./doctool : doctool.c
 	gcc -g $< -o $@
@@ -95,24 +100,24 @@ readme.txt: $(srcdir)/readme.texinfo $(srcdir)/*.texinfo
 	-$(MAKEINFO) -I$(srcdir) --no-split --no-headers $< -o - |\
 	sed '/^Concept Index/,$$d' > $@
 
-faq0.html: $(srcdir)/faq.texinfo $(srcdir)/*.texinfo
-	-rm -f faq_toc.html; \
-	for i in $(srcdir)/*.texinfo ; do \
-		sed < $$i -e 's?@file{\([fth]*p://[^}]*\)}?@strong{<A HREF="\1">\1</A>}?' \
-	    -e 's?\([.+a-zA-Z0-9-]*@@[.a-zA-Z0-9-]*[a-zA-Z0-9]\)?<A HREF="mailto:\1">\1</A>?' >./`basename $$i` ; done; \
-	$(TEXI2HTML) -monolithic ./faq.texinfo; \
-	rm -f *.texinfo; \
-	sed -e 's;"faq.html;"faq0.html;g' faq.html > faq0.html; \
-	rm -f faq.html; exit 0
-
-faq.html: $(srcdir)/faq.texinfo $(srcdir)/*.texinfo
-	-rm -f faq_toc.html; \
-	for i in $(srcdir)/*.texinfo ; do \
-		sed < $$i -e 's?@file{\([fth]*p://[^}]*\)}?@strong{<A HREF="\1">\1</A>}?' \
-	    -e 's?\([.+a-zA-Z0-9-]*@@[.a-zA-Z0-9-]*[a-zA-Z0-9]\)?<A HREF="mailto:\1">\1</A>?' >./`basename $$i` ; done; \
-	$(TEXI2HTML) -split_chapter ./faq.texinfo; \
-	rm -f *.texinfo; \
-	[ -r faq_toc.html ] && mv faq_toc.html faq.html; exit 0
+#faq0.html: $(srcdir)/faq.texinfo $(srcdir)/*.texinfo
+#	-rm -f faq_toc.html; \
+#	for i in $(srcdir)/*.texinfo ; do \
+#		sed < $$i -e 's?@file{\([fth]*p://[^}]*\)}?@strong{<A HREF="\1">\1</A>}?' \
+#	    -e 's?\([.+a-zA-Z0-9-]*@@[.a-zA-Z0-9-]*[a-zA-Z0-9]\)?<A HREF="mailto:\1">\1</A>?' >./`basename $$i` ; done; \
+#	$(TEXI2HTML) -monolithic ./faq.texinfo; \
+#	rm -f *.texinfo; \
+#	sed -e 's;"faq.html;"faq0.html;g' faq.html > faq0.html; \
+#	rm -f faq.html; exit 0
+#
+#faq.html: $(srcdir)/faq.texinfo $(srcdir)/*.texinfo
+#	-rm -f faq_toc.html; \
+#	for i in $(srcdir)/*.texinfo ; do \
+#		sed < $$i -e 's?@file{\([fth]*p://[^}]*\)}?@strong{<A HREF="\1">\1</A>}?' \
+#	    -e 's?\([.+a-zA-Z0-9-]*@@[.a-zA-Z0-9-]*[a-zA-Z0-9]\)?<A HREF="mailto:\1">\1</A>?' >./`basename $$i` ; done; \
+#	$(TEXI2HTML) -split_chapter ./faq.texinfo; \
+#	rm -f *.texinfo; \
+#	[ -r faq_toc.html ] && mv faq_toc.html faq.html; exit 0
 
 TBFILES = cygwin-ug-net.dvi cygwin-ug-net.rtf cygwin-ug-net.ps \
 	  cygwin-ug-net.pdf cygwin-ug-net.sgml \
