@@ -255,11 +255,6 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 	  if (realpid == n)
 	    api_fatal ("retrieval of execed process info for pid %d failed due to recursion.", n);
 
-	  if ((flag & PID_ALLPIDS))
-	    {
-	      set_errno (ESRCH);
-	      break;
-	    }
 	  n = realpid;
 	  CloseHandle (h0);
 	  h0 = NULL;

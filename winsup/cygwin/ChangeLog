@@ -1,3 +1,13 @@
+2005-08-06  Christopher Faylor  <cgf@timesys.com>
+
+	* include/endian.h: Move everything into this file and define things
+	more like linux.
+	* include/cygwin/types.h: Include endian.h.
+	* include/sys/dirent.h: Define DT_* types and conversion macros.
+
+	* pinfo.cc (pinfo::init): Remove special handling for PID_ALLPIDS and
+	execed code, even though it probably still isn't quite right.
+
 2005-08-05 Michael Gorse <mgorse@alum.wpi.edu>
 
 	* thread.cc (pthread::create(3 args)): Make bool.

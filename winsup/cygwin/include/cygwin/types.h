@@ -19,6 +19,7 @@ extern "C"
 
 #include <sys/sysmacros.h>
 #include <stdint.h>
+#include <endian.h>
 
 #ifndef __timespec_t_defined
 #define __timespec_t_defined
