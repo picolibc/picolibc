@@ -1,5 +1,12 @@
 2005-08-06  Christopher Faylor  <cgf@timesys.com>
 
+	* Makefile.in: Warn when end of cygheap is not on 64k boundary.
+	* cygwin.sc: Try harder to ensure that cygheap is on a 64k boundary.
+	Move cygheap to end of image to stop interference from unstripped debug
+	regions.
+
+2005-08-06  Christopher Faylor  <cgf@timesys.com>
+
 	* include/endian.h: Move everything into this file and define things
 	more like linux.
 	* include/cygwin/types.h: Include endian.h.
