@@ -1,3 +1,7 @@
+2005-08-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in: Allow previous patch to work in a 64 bit environment.
+
 2005-08-06  Christopher Faylor  <cgf@timesys.com>
 
 	* Makefile.in: Warn when end of cygheap is not on 64k boundary.
