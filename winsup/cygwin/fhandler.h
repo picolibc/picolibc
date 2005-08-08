@@ -301,7 +301,7 @@ class fhandler_base
 				      _off64_t offset, DWORD size,
 				      void *address);
 
-  void *operator new (size_t, void *p) {return p;}
+  void *operator new (size_t, void *p) __attribute__ ((nothrow)) {return p;}
 
   virtual void init (HANDLE, DWORD, mode_t);
 

@@ -1,5 +1,20 @@
 2005-08-07  Christopher Faylor  <cgf@timesys.com>
 
+	* Makefile.in (dtable_CFLAGS): Use -fomit-frame-pointer and
+	-fcheck-new.
+	* cygheap.cc (cmalloc): Only emit system_printf warnings on failure if
+	DEBUGGING.
+	(crealloc): Ditto.
+	(ccalloc): Ditto.
+	* dtable.cc (build_fh_name): Treat NULL return from cnew as indicative
+	of EMFILE condition.
+	(build_fh_dev): Ditto.
+	(dtable::dup_worker): Handle NULL return from build_fh_pc.
+	(dtable::vfork_child_dup): Trust dup_worker to set errno.
+	* fhandler.h (fhandler_base::new): Mark as nothrow.
+
+2005-08-07  Christopher Faylor  <cgf@timesys.com>
+
 	* dllfixdbg: New perl script.
 	* configure.in: Detect objcopy, objdump, strip.
 	* configure: Regenerate.

@@ -342,8 +342,9 @@ build_fh_name (const char *name, HANDLE h, unsigned opt, suffix_info *si)
   if (pc.error)
     {
       fhandler_base *fh = cnew (fhandler_nodevice) ();
-      fh->set_error (pc.error);
-      set_errno (pc.error);
+      if (fh)
+	fh->set_error (pc.error);
+      set_errno (fh ? pc.error : EMFILE);
       return fh;
     }
 
@@ -364,10 +365,11 @@ build_fh_dev (const device& dev, const char *unix_name)
   return build_fh_pc (pc);
 }
 
+#define fh_unset ((fhandler_base *) 1)
 fhandler_base *
 build_fh_pc (path_conv& pc)
 {
-  fhandler_base *fh = NULL;
+  fhandler_base *fh = fh_unset;
 
   switch (pc.dev.major)
     {
@@ -472,9 +474,13 @@ build_fh_pc (path_conv& pc)
     }
 
   if (!fh)
-    fh = cnew (fhandler_nodevice) ();
-
-  fh->set_name (pc);
+    set_errno (EMFILE);
+  else
+    {
+      if (fh == fh_unset)
+	fh = cnew (fhandler_nodevice) ();
+      fh->set_name (pc);
+    }
 
   debug_printf ("fh %p", fh);
   return fh;
@@ -484,18 +490,23 @@ fhandler_base *
 dtable::dup_worker (fhandler_base *oldfh)
 {
   fhandler_base *newfh = build_fh_pc (oldfh->pc);
-  *newfh = *oldfh;
-  newfh->set_io_handle (NULL);
-  if (oldfh->dup (newfh))
+  if (!newfh)
+    debug_printf ("build_fh_pc failed");
+  else
     {
-      cfree (newfh);
-      newfh = NULL;
-      return NULL;
+      *newfh = *oldfh;
+      newfh->set_io_handle (NULL);
+      if (oldfh->dup (newfh))
+	{
+	  cfree (newfh);
+	  debug_printf ("oldfh->dup failed");
+	}
+      else
+	{
+	  newfh->close_on_exec (false);
+	  debug_printf ("duped '%s' old %p, new %p", oldfh->get_name (), oldfh->get_io_handle (), newfh->get_io_handle ());
+	}
     }
-
-  newfh->close_on_exec (false);
-  MALLOC_CHECK;
-  debug_printf ("duped '%s' old %p, new %p", oldfh->get_name (), oldfh->get_io_handle (), newfh->get_io_handle ());
   return newfh;
 }
 
@@ -745,7 +756,6 @@ dtable::vfork_child_dup ()
     else
       {
 	res = 0;
-	set_errno (EBADF);
 	goto out;
       }
 

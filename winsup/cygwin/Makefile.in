@@ -230,6 +230,7 @@ devices_CFLAGS:=-fomit-frame-pointer -Os
 dir_CFLAGS:=-fomit-frame-pointer
 dlfcn_CFLAGS:=-fomit-frame-pointer
 dll_init_CFLAGS:=-fomit-frame-pointer
+dtable_CFLAGS:=-fomit-frame-pointer -fcheck-new
 fcntl_CFLAGS:=-fomit-frame-pointer
 fhandler_CFLAGS:=-fomit-frame-pointer
 fhandler_clipboard_CFLAGS:=-fomit-frame-pointer

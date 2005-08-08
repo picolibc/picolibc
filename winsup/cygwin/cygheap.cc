@@ -279,8 +279,8 @@ cmalloc (cygheap_types x, DWORD n)
   c = (cygheap_entry *) _cmalloc (sizeof_cygheap (n));
   if (!c)
     {
-      system_printf ("cmalloc returned NULL");
 #ifdef DEBUGGING
+      system_printf ("cmalloc returned NULL");
       try_to_debug ();
 #endif
     }
@@ -298,8 +298,10 @@ crealloc (void *s, DWORD n)
   cygheap_entry *c = tocygheap (s);
   cygheap_types t = (cygheap_types) c->type;
   c = (cygheap_entry *) _crealloc (c, sizeof_cygheap (n));
+#ifdef DEBUGGING
   if (!c)
     system_printf ("crealloc returned NULL");
+#endif
   return creturn (t, c, n);
 }
 
@@ -328,8 +330,10 @@ ccalloc (cygheap_types x, DWORD n, DWORD size)
   c = (cygheap_entry *) _cmalloc (sizeof_cygheap (n));
   if (c)
     memset (c->data, 0, n);
+#ifdef DEBUGGING
   if (!c)
     system_printf ("ccalloc returned NULL");
+#endif
   return creturn (x, c, n);
 }
 

@@ -725,6 +725,11 @@ dll_crt0_1 (char *)
 
   check_sanity_and_sync (user_data);
   malloc_init ();
+#ifdef CGF
+  int i = 0;
+  while (i)
+    cmalloc (HEAP_STR, 2000000);
+#endif
 
   /* Initialize SIGSEGV handling, etc. */
   init_exceptions (&cygwin_except_entry);
