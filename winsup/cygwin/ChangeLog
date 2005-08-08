@@ -1,5 +1,11 @@
 2005-08-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* security.cc (get_reg_security): New static function.
+	(get_nt_object_security): Call get_reg_security for registry keys
+	to circumvent problems with predefined registry keys.
+
+2005-08-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_process.cc (fhandler_process::open): Allow opening of
 	/proc/<pid>/fd for reading.
 	* fhandler_registry.cc (fhandler_registry::open): Ditto for registry
