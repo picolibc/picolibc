@@ -517,6 +517,16 @@ _fiprintf = fiprintf SIGFE
 flock SIGFE
 flockfile SIGFE
 ftrylockfile SIGFE
+fts_children SIGFE
+fts_close SIGFE
+fts_get_clientptr NOSIGFE
+fts_get_stream NOSIGFE
+fts_open SIGFE
+fts_read SIGFE
+fts_set NOSIGFE
+fts_set_clientptr NOSIGFE
+ftw SIGFE
+nftw SIGFE
 funlockfile SIGFE
 floor NOSIGFE
 _floor = floor NOSIGFE

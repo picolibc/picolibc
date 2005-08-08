@@ -1,3 +1,16 @@
+2005-08-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Add fts.o, ftw.o, nftw.o.
+	* cygwin.din: Export fts_children, fts_close, fts_get_clientptr,
+	fts_get_stream, fts_open, fts_read, fts_set, fts_set_clientptr,
+	ftw, nftw.
+	* fts.c: New file, imported from FreeBSD.
+	* ftw.c: Ditto.
+	* nftw.c: Ditto.
+	* include/fts.h: Ditto.
+	* include/ftw.h: Ditto.
+	* include/cygwin/version.h: Bump API minor number.
+
 2005-08-07  Christopher Faylor  <cgf@timesys.com>
 
 	* Makefile.in (dtable_CFLAGS): Use -fomit-frame-pointer and
