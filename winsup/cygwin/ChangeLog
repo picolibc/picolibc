@@ -1,3 +1,15 @@
+2005-08-08  Christopher Faylor  <cgf@timesys.com>
+
+	* cygwin.sc: Use simpler method to align .cygheap.
+	* dllfixdbg: Just copy .stab and .stabstr sections when making
+	cygwin1.dbg, rather than relying on objcopy to keep only the debug
+	sections since objcopy seems to get it wrong.
+
+2005-08-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (build_fh_pc): Check setting fh to fhandler_nodevice for
+	NULL, too.
+
 2005-08-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ftw.c: Include winsup.h.

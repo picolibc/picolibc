@@ -473,14 +473,13 @@ build_fh_pc (path_conv& pc)
       }
     }
 
-  if (!fh)
-    set_errno (EMFILE);
+  if (fh == fh_unset)
+    fh = cnew (fhandler_nodevice) ();
+
+  if (fh)
+    fh->set_name (pc);
   else
-    {
-      if (fh == fh_unset)
-	fh = cnew (fhandler_nodevice) ();
-      fh->set_name (pc);
-    }
+    set_errno (EMFILE);
 
   debug_printf ("fh %p", fh);
   return fh;
