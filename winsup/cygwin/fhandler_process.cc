@@ -293,9 +293,8 @@ fhandler_process::open (int flags, mode_t mode)
     }
   if (process_file_no == PROCESS_FD)
     {
-      set_errno (EISDIR);
-      res = 0;
-      goto out;
+      flags |= O_DIROPEN;
+      goto success;
     }
   if (flags & O_WRONLY)
     {

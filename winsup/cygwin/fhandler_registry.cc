@@ -484,12 +484,18 @@ fhandler_registry::open (int flags, mode_t mode)
       goto out;
     }
 
-  handle = open_key (path, KEY_READ, true);
+  handle = open_key (path, KEY_READ, false);
   if (handle == (HKEY) INVALID_HANDLE_VALUE)
     {
-      res = 0;
-      goto out;
+      handle = open_key (path, KEY_READ, true);
+      if (handle == (HKEY) INVALID_HANDLE_VALUE)
+	{
+	  res = 0;
+	  goto out;
+	}
     }
+  else
+    flags |= O_DIROPEN;
 
   set_io_handle (handle);
 
@@ -498,7 +504,7 @@ fhandler_registry::open (int flags, mode_t mode)
   else
     value_name = cstrdup (file);
 
-  if (!fill_filebuf ())
+  if (!(flags & O_DIROPEN) && !fill_filebuf ())
     {
       RegCloseKey (handle);
       res = 0;
