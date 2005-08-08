@@ -1,5 +1,14 @@
 2005-08-08  Christopher Faylor  <cgf@timesys.com>
 
+	* include/sys/cdefs.h (__CONCAT): Define.
+	* include/elf.h: New file.
+	* include/sys/elf32.h: Ditto.
+	* include/sys/elf64.h: Ditto.
+	* include/sys/elf_common.h: Ditto.
+	* include/sys/elf_generic.h: Ditto.
+
+2005-08-08  Christopher Faylor  <cgf@timesys.com>
+
 	* cygwin.sc: Use simpler method to align .cygheap.
 	* dllfixdbg: Just copy .stab and .stabstr sections when making
 	cygwin1.dbg, rather than relying on objcopy to keep only the debug
