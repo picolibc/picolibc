@@ -1,3 +1,7 @@
+2005-08-08  Christopher Faylor  <cgf@timesys.com>
+
+	* include/sys/cdefs.h: Remove extra line.
+
 2005-08-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.cc (get_reg_security): New static function.

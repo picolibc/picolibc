@@ -19,6 +19,5 @@ details. */
 #endif
 #define __P(protos)     protos		/* full-blown ANSI C */
 #define  __CONCAT(__x,__y)   __x##__y
-#define  __CONCAT(__x,__y)   __x##__y
 #endif
 
