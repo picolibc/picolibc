@@ -567,6 +567,8 @@ main (const int argc, char *argv[])
 
   int opt;
 
+  wincap.init ();
+
   opterr = 0;
   while ((opt = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (opt)
@@ -701,7 +703,6 @@ main (const int argc, char *argv[])
   if (support_semaphores == TUN_UNDEF)
     support_semaphores = TUN_TRUE;
 
-  wincap.init ();
   if (wincap.has_security () && !setup_privileges ())
     panic ("Setting process privileges failed.");
 
