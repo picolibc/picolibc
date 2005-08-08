@@ -26,6 +26,9 @@ static const char rcsid[] = "$OpenBSD: ftw.c,v 1.4 2004/07/07 16:05:23 millert E
 #endif /* LIBC_SCCS and not lint */
 #endif
 
+#ifdef __CYGWIN__
+#include "winsup.h"
+#endif
 #include <sys/cdefs.h>
 #if 0
 __FBSDID("$FreeBSD: /repoman/r/ncvs/src/lib/libc/gen/ftw.c,v 1.4 2004/08/24 13:00:55 tjr Exp $");

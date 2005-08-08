@@ -1,5 +1,11 @@
 2005-08-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ftw.c: Include winsup.h.
+	* nftw.c: Ditto.
+	* include/ftw.h: Guard declarations appropriately.
+
+2005-08-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (DLL_OFILES): Add fts.o, ftw.o, nftw.o.
 	* cygwin.din: Export fts_children, fts_close, fts_get_clientptr,
 	fts_get_stream, fts_open, fts_read, fts_set, fts_set_clientptr,
