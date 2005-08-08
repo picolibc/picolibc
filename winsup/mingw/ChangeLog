@@ -1,3 +1,7 @@
+2005-08-08  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* moldname.def.in (sleep, beep, seterrormode): Remove.
+
 2005-06-16  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* profile/profile.h (_MCOUNT_CALL): Define as regparm(2)

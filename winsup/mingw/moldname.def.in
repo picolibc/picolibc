@@ -25,7 +25,6 @@
 ;
 EXPORTS
 access
-beep
 chdir
 chmod
 chsize
@@ -87,9 +86,7 @@ read
 rmdir
 rmtmp
 searchenv
-seterrormode
 setmode
-sleep
 sopen
 spawnl
 spawnle
