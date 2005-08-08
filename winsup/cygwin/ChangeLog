@@ -1,3 +1,14 @@
+2005-08-07  Christopher Faylor  <cgf@timesys.com>
+
+	* dllfixdbg: New perl script.
+	* configure.in: Detect objcopy, objdump, strip.
+	* configure: Regenerate.
+	* Makefile.in: Pass target objcopy/objdump to new dllfixdbg script.
+	Remove previous perl check.
+	* cygwin.sc: Add .gnu_debuglink_overlay section for eventual
+	replacement with .gnu_debuglink section.  Revert move of cygheap to end
+	of image.
+
 2005-08-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in: Allow previous patch to work in a 64 bit environment.

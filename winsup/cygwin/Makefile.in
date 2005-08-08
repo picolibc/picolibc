@@ -1,5 +1,5 @@
 # Makefile.in for Cygwin.
-# Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
+# Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
 #
 # This file is part of Cygwin.
 #
@@ -65,6 +65,9 @@ DLLTOOL:=@DLLTOOL@
 WINDRES:=@WINDRES@
 AS:=@AS@
 NM:=@NM@
+OBJCOPY:=@OBJCOPY@
+OBJDUMP:=@OBJDUMP@
+STRIP:=@STRIP@
 LDSCRIPT:=cygwin.sc
 
 #
@@ -366,18 +369,13 @@ maintainer-clean realclean: clean
 
 
 # Rule to build cygwin.dll
-$(TEST_DLL_NAME): $(LDSCRIPT) $(DLL_OFILES) $(DLL_IMPORTS) $(LIBSERVER) $(LIBC) $(LIBM) $(API_VER) Makefile winver_stamp
+$(TEST_DLL_NAME): $(LDSCRIPT) dllfixdbg $(DLL_OFILES) $(DLL_IMPORTS) $(LIBSERVER) $(LIBC) $(LIBM) $(API_VER) Makefile winver_stamp
 	$(CXX) $(CXXFLAGS) -Wl,--gc-sections $(nostdlib) -Wl,-T$(firstword $^) \
 	-Wl,--heap=0 -Wl,--out-implib,cygdll.a -shared -o $@ \
 	-e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o winver.o \
 	$(MALLOC_OBJ) $(LIBSERVER) $(LIBM) $(LIBC) \
 	-lgcc $(DLL_IMPORTS)
-	@$(NM) $@ | perl -Minteger -n -e '/^((0{8})?61[0-9a-f]+) A __cygheap_end/ and do {$$cygheap_end = $$1; exit;};\
-	    END { \
-		die "ERROR: _cygheap_end not found in $@\n" unless defined($$cygheap_end); \
-		die "ERROR: _cygheap_end is not on a 64k boundary (0x$$cygheap_end)!\n" if (hex($$cygheap_end) & 0xffff);\
-		exit 0; \
-	    }'
+	@$(word 2,$^) $(OBJDUMP) $(OBJCOPY) $@ ${patsubst %0.dll,%1.dbg,$@}
 	@ln -f $@ new-$(DLL_NAME)
 
 # Rule to build libcygwin.a
