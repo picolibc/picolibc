@@ -1,5 +1,11 @@
 2005-08-10  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/wctype.h (towupper, towlower): Change arg and return value
+	types to wint_t.
+	* include/ctype.h (towupper, towlower): Likewise.
+
+2005-08-10  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* mthr_stub.c (__mingwthr_key_dtor): Replace assert(0) with 
 	a diagnostic, guarded by #ifdef DEBUG.
 	(__mingwthr_remove_key_dtor): Likewise.

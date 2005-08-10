@@ -187,8 +187,11 @@ _CRTIMP int __cdecl iswspace(wint_t);
 _CRTIMP int __cdecl iswupper(wint_t);
 _CRTIMP int __cdecl iswxdigit(wint_t);
 
-_CRTIMP wchar_t __cdecl towlower(wchar_t);
-_CRTIMP wchar_t __cdecl towupper(wchar_t);
+/* Older MS docs uses wchar_t for arg and return type, while newer
+   online MS docs say arg is wint_t and return is int.
+   ISO C uses wint_t for both.  */
+_CRTIMP wint_t __cdecl towlower (wint_t);
+_CRTIMP wint_t __cdecl towupper (wint_t);
 
 _CRTIMP int __cdecl isleadbyte (int);
 
