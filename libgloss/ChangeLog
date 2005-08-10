@@ -3,7 +3,7 @@
 	* configure.in: Add m32c support.
 	* configure: Regenerated
 	* m32c: New directory, Renesas R8C/M16C/M32C support.
-	m32c/abort.S m32c/argvlen.S m32c/argv.S m32c/chdir.S, 
+	* m32c/abort.S m32c/argvlen.S m32c/argv.S m32c/chdir.S, 
 	m32c/chmod.S m32c/close.S m32c/configure m32c/configure.in,
 	m32c/crt0.S, m32c/crtn.S, m32c/exit.S, m32c/fstat.S,
 	m32c/genscript, m32c/getpid.S, m32c/gettimeofday.S,
