@@ -108,6 +108,9 @@ case "${target}" in
   xstormy16-*-*)
 	configdirs="${configdirs} xstormy16 testsuite"
 	;;
+  m32c-*-*)
+	configdirs="${configdirs} m32c testsuite"
+	;;
   strongarm-*-elf | strongarm-*-coff)
 	configdirs="${configdirs} arm testsuite";
 	;;

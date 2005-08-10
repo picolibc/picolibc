@@ -1,3 +1,17 @@
+2005-08-10  DJ Delorie  <dj@redhat.com>
+
+	* configure.in: Add m32c support.
+	* configure: Regenerated
+	* m32c: New directory, Renesas R8C/M16C/M32C support.
+	m32c/abort.S m32c/argvlen.S m32c/argv.S m32c/chdir.S, 
+	m32c/chmod.S m32c/close.S m32c/configure m32c/configure.in,
+	m32c/crt0.S, m32c/crtn.S, m32c/exit.S, m32c/fstat.S,
+	m32c/genscript, m32c/getpid.S, m32c/gettimeofday.S,
+	m32c/heaptop.S, m32c/isatty.S, m32c/kill.S, m32c/link.S,
+	m32c/lseek.S, m32c/m32csys.h, m32c/m32c.tmpl, m32c/Makefile.in,
+	m32c/open.S, m32c/read.S, m32c/sbrk.c, m32c/stat.S, m32c/time.S,
+	m32c/times.S, m32c/unlink.S, m32c/utime.S, m32c/write.S: New files
+
 2005-08-02  Shaun Jackman  <sjackman@gmail.com>
 
         * libgloss/arm/libcfunc.c (isatty): New function.
