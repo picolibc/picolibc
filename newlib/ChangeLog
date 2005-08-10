@@ -1,7 +1,21 @@
+2005-08-10  DJ Delorie  <dj@redhat.com>
+
+	* configure.host: Add m32c support.
+	* libc/include/machine/ieeefp.h: Likewise.
+	* libc/include/machine/setjmp.h: Likewise.
+	* libc/include/sys/config.h: Likewise.
+	* libc/machine/m32c: New directory, Renesas R8C/M16C/M32C support.
+	* libc/machine/m32c/aclocal.m4: New file.
+	* libc/machine/m32c/configure: Ditto.
+	* libc/machine/m32c/configure.in: Ditto.
+	* libc/machine/m32c/Makefile.am: Ditto.
+	* libc/machine/m32c/Makefile.in: Ditto.
+	* libc/machine/m32c/setjmp.S: Ditto.
+
 2005-08-02  Bob Wilson  <bob.wilson@acm.org>
 
-         * libm/math/ef_hypot.c (__ieee754_hypotf): Add missing exponent bias
-         to the value for 2^126.
+        * libm/math/ef_hypot.c (__ieee754_hypotf): Add missing exponent bias
+        to the value for 2^126.
 
 2005-07-26  Hans-Peter Nilsson  <hp@bitrange.com>
 

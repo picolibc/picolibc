@@ -67,7 +67,7 @@ case "${target_optspace}:${host}" in
   yes:*)
     newlib_cflags="${newlib_cflags} -Os"
     ;;
-  :m32r-* | :d10v-* | :d30v-* | :avr-*)
+  :m32r-* | :d10v-* | :d30v-* | :avr-* | :m32c-* )
     newlib_cflags="${newlib_cflags} -Os"
     ;;
   no:* | :*)
@@ -145,6 +145,11 @@ case "${host_cpu}" in
   iq2000)
 	machine_dir=iq2000
 	;;
+  m32c)
+	machine_dir=m32c
+	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -DABORT_PROVIDED -DSMALL_MEMORY"
+	;;
+
   m32r*)
 	machine_dir=m32r
 	;;

@@ -269,6 +269,11 @@
 #endif /* __ARMEL__ */
 #endif /* __MAVERICK__ */
 
+#ifdef __m32c__
+#define __IEEE_LITTLE_ENDIAN
+#define __SMALL_BITFIELDS
+#endif
+
 #ifdef __CRIS__
 #define __IEEE_LITTLE_ENDIAN
 #endif
