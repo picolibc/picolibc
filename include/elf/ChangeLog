@@ -1,3 +1,8 @@
+2005-08-09  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	* hppa.h (SHT_PARISC_DLKM, SHF_PARISC_WEAKORDER, PT_PARISC_WEAKORDER):
+	New defines.
+
 2005-08-04  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
 
 	* hppa.h (PF_HP_CODE, PF_HP_MODIFY, PF_HP_LAZYSWAP): Revise defines.

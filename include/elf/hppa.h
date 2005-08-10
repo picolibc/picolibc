@@ -74,6 +74,9 @@ Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA. 
 /* Section contains code annotations.  */
 #define SHT_PARISC_ANNOT	0x70000003
 
+/* DLKM special section.  */
+#define SHT_PARISC_DLKM		0x70000004
+
 /* These are strictly for compatibility with the older elf32-hppa
    implementation.  Hopefully we can eliminate them in the future.  */
 /* Optional section holding argument location/relocation info.  */
@@ -93,6 +96,8 @@ Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA. 
 /* Section should go near GP.  */
 #define SHF_PARISC_SHORT	0x20000000
 
+/* Section is weak ordered.  */
+#define SHF_PARISC_WEAKORDER	0x10000000
 
 /* Identifies the entry point of a millicode routine.  */
 #define STT_PARISC_MILLI	13
@@ -489,6 +494,7 @@ typedef enum elf_hppa_reloc_type elf_hppa_reloc_type;
 
 #define PT_PARISC_ARCHEXT	0x70000000
 #define PT_PARISC_UNWIND	0x70000001
+#define PT_PARISC_WEAKORDER	0x70000002
 
 /* Flag bits in p_flags of ElfXX_Phdr.  */
 #define PF_HP_CODE		0x00040000
