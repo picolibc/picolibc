@@ -1,3 +1,10 @@
+2005-08-10  Stephen Huw Clarke  <stephen.clarke@st.com>
+
+	* libm/common/sf_fmax.c: Fix to properly handle NaNs.
+	* libm/common/s_max.c: Ditto.
+	* libm/common/sf_fmin.c: Ditto.
+	* libm/common/s_min.c: Ditto.
+
 2005-08-10  DJ Delorie  <dj@redhat.com>
 
 	* configure.host: Add m32c support.
