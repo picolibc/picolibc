@@ -15,31 +15,30 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #undef WIN32_LEAN_AND_MEAN
-#include <assert.h>
 
 /*
  * __mingwthr_register_key_dtor (DWORD key, void (*dtor) (void *))
  *
  * Public interface called by C++ exception handling mechanism in
  * libgcc (cf: __gthread_key_create).
- *
- * THIS SHOULD NEVER BE CALLED!
- *
+ * No-op versions.
  */
 
 int
 __mingwthr_key_dtor (DWORD key, void (*dtor) (void *))
 {
-  assert (0);
-  /* NOTREACHED */
+#ifdef DEBUG
+  printf ("%s: ignoring key: (%ld) / dtor: (%x)\n", 
+          __FUNCTION__, key, dtor);
+#endif
   return 0;
 }
-
 
 int
 __mingwthr_remove_key_dtor (DWORD key )
 {
-  assert (0);
-  /* NOTREACHED */
+#ifdef DEBUG
+  printf ("%s: ignoring key: (%ld)\n", __FUNCTION__, key );
+#endif
   return 0;
 }
