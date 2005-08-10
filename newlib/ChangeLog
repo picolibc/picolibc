@@ -1,3 +1,7 @@
+2005-08-10  DJ Delorie  <dj@redhat.com>
+
+	* MAINTAINERS (CPU Ports): Add CPU port maintainer section.
+
 2005-08-10  Stephen Huw Clarke  <stephen.clarke@st.com>
 
 	* libm/common/sf_fmax.c: Fix to properly handle NaNs.
