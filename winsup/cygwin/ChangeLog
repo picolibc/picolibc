@@ -19,7 +19,7 @@
 	* spawn.cc (av()): New constructor.
 	(av::operator new): New operator.
 	(av::set): New function.
-	(spawn_guts): Reorganize so that classes which allocates are defined
+	(spawn_guts): Reorganize so that classes which allocate are defined
 	early in the function so that it can be properly cleaned up after an
 	efault.  Set errno to E2BIG in the event of a SEGV situation.
 
