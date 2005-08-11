@@ -1,5 +1,11 @@
 2005-08-11  Christopher Faylor  <cgf@timesys.com>
 
+	* dcrt0.cc: Remove ld_preload declaration.
+	* winsup.h: Move ld_preload declaration here.
+	* fork.cc (fork_child): Call ld_preload() before returning.
+
+2005-08-11  Christopher Faylor  <cgf@timesys.com>
+
 	* child_info.  (CURR_CHILD_INFO_MAGIC): Refresh.
 	(child_info::child_info()): New constructor.
 	(child_info_spawn::child_info_spawn()): Ditto.

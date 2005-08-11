@@ -242,6 +242,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   fixup_timers_after_fork ();
   fixup_hooks_after_fork ();
   cygbench ("fork-child");
+  ld_preload ();
   cygwin_finished_initializing = true;
   return 0;
 }

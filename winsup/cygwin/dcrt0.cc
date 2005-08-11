@@ -43,8 +43,6 @@ details. */
 
 extern "C" void cygwin_exit (int) __attribute__ ((noreturn));
 
-void ld_preload ();
-
 HANDLE NO_COPY hMainProc = (HANDLE) -1;
 HANDLE NO_COPY hMainThread;
 HANDLE NO_COPY hProcToken;

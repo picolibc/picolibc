@@ -236,6 +236,8 @@ extern HANDLE netapi32_handle;
 extern "C" void error_start_init (const char*);
 extern "C" int try_to_debug (bool waitloop = 1);
 
+extern void ld_preload ();
+
 void set_file_api_mode (codepage_type);
 
 extern bool cygwin_finished_initializing;
@@ -264,8 +266,10 @@ void __stdcall to_timestruc_t (FILETIME *, timestruc_t *);
 void __stdcall time_as_timestruc_t (timestruc_t *);
 void __stdcall timeval_to_filetime (const struct timeval *, FILETIME *);
 
+/* Console related */
 void __stdcall set_console_title (char *);
 void init_console_handler (BOOL);
+
 void init_global_security ();
 
 int __stdcall check_invalid_virtual_addr (const void *s, unsigned sz) __attribute__ ((regparm(2)));
