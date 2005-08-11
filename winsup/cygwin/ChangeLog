@@ -1,3 +1,8 @@
+2005-08-11  Troy Curtiss  <trcurtiss@gmail.com>
+
+	* fhandler_serial.cc (fhandler_serial::tcgetattr): Return current baud
+	rate regardless of current DTR state.
+
 2005-08-11  Christopher Faylor  <cgf@timesys.com>
 
 	* dcrt0.cc: Remove ld_preload declaration.

@@ -908,55 +908,50 @@ fhandler_serial::tcgetattr (struct termios *t)
   memset (t, 0, sizeof (*t));
 
   /* -------------- Baud rate ------------------ */
-
-  /* If DTR is NOT set, return B0 as our speed */
-  if (dtr != TIOCM_DTR)
-    t->c_cflag = t->c_ospeed = t->c_ispeed = B0;
-  else
-    switch (state.BaudRate)
-      {
-      case CBR_110:
+  switch (state.BaudRate)
+    {
+    case CBR_110:
 	t->c_cflag = t->c_ospeed = t->c_ispeed = B110;
 	break;
-      case CBR_300:
+    case CBR_300:
 	t->c_cflag = t->c_ospeed = t->c_ispeed = B300;
 	break;
-      case CBR_600:
+    case CBR_600:
 	t->c_cflag = t->c_ospeed = t->c_ispeed = B600;
 	break;
-      case CBR_1200:
+    case CBR_1200:
 	t->c_cflag = t->c_ospeed = t->c_ispeed = B1200;
 	break;
-      case CBR_2400:
+    case CBR_2400:
 	t->c_cflag = t->c_ospeed = t->c_ispeed = B2400;
 	break;
-      case CBR_4800:
+    case CBR_4800:
 	t->c_cflag = t->c_ospeed = t->c_ispeed = B4800;
 	break;
-      case CBR_9600:
+    case CBR_9600:
 	t->c_cflag = t->c_ospeed = t->c_ispeed = B9600;
 	break;
-      case CBR_19200:
+    case CBR_19200:
 	t->c_cflag = t->c_ospeed = t->c_ispeed = B19200;
 	break;
-      case CBR_38400:
+    case CBR_38400:
 	t->c_cflag = t->c_ospeed = t->c_ispeed = B38400;
 	break;
-      case CBR_57600:
+    case CBR_57600:
 	t->c_cflag = t->c_ospeed = t->c_ispeed = B57600;
 	break;
-      case CBR_115200:
+    case CBR_115200:
 	t->c_cflag = t->c_ospeed = t->c_ispeed = B115200;
 	break;
-      case 230400: /* CBR_230400 - not defined */
+    case 230400: /* CBR_230400 - not defined */
 	t->c_cflag = t->c_ospeed = t->c_ispeed = B230400;
 	break;
-      default:
+    default:
 	/* Unsupported baud rate! */
 	termios_printf ("Invalid baud rate %d", state.BaudRate);
 	set_errno (EINVAL);
 	return -1;
-      }
+    }
 
   /* -------------- Byte size ------------------ */
 
