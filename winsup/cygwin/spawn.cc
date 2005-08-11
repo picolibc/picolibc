@@ -266,11 +266,14 @@ class av
   int argc;
   bool win16_exe;
   bool iscygwin;
-  av (int ac, const char * const *av) : calloced (0), error (false), argc (ac), win16_exe (false), iscygwin (true)
+  av (): argv (NULL) {}
+  av (int ac_in, const char * const *av_in) : calloced (0), error (false), argc (ac_in), win16_exe (false), iscygwin (true)
   {
     argv = (char **) cmalloc (HEAP_1_ARGV, (argc + 5) * sizeof (char *));
-    memcpy (argv, av, (argc + 1) * sizeof (char *));
+    memcpy (argv, av_in, (argc + 1) * sizeof (char *));
   }
+  void *operator new (size_t, void *p) __attribute__ ((nothrow)) {return p;}
+  void set (int ac_in, const char * const *av_in) {new (this) av (ac_in, av_in);}
   ~av ()
   {
     if (argv)
@@ -362,6 +365,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 {
   bool rc;
   pid_t cygpid;
+  int res = -1;
 
   if (prog_arg == NULL)
     {
@@ -379,11 +383,35 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       return -1;
     }
 
-  path_conv real_path;
+  /* FIXME: There is a small race here and FIXME: not thread safe! */
 
+  pthread_cleanup cleanup;
+  if (mode == _P_SYSTEM)
+    {
+      sigset_t child_block;
+      cleanup.oldint = signal (SIGINT, SIG_IGN);
+      cleanup.oldquit = signal (SIGQUIT, SIG_IGN);
+      sigemptyset (&child_block);
+      sigaddset (&child_block, SIGCHLD);
+      sigprocmask (SIG_BLOCK, &child_block, &cleanup.oldmask);
+    }
+  pthread_cleanup_push (do_cleanup, (void *) &cleanup);
+  av newargv;
   linebuf one_line;
+  child_info_spawn ciresrv;
 
+  path_conv real_path;
+  bool reset_sendsig = false;
+
+  bool null_app_name = false;
   STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
+
+  myfault efault;
+  if (efault.faulted (E2BIG))
+    {
+      res = -1;
+      goto out;
+    }
 
   child_info_types chtype;
   if (mode != _P_OVERLAY)
@@ -401,13 +429,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   for (ac = 0; argv[ac]; ac++)
     /* nothing */;
 
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;		// FIXME: Could be very leaky
+  newargv.set (ac, argv);
 
-  av newargv (ac, argv);
-
-  int null_app_name = 0;
   if (ac == 3 && argv[1][0] == '/' && argv[1][1] == 'c' &&
       (iscmd (argv[0], "command.com") || iscmd (argv[0], "cmd.exe")))
     {
@@ -423,7 +446,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       one_line.add (" ");
       one_line.add (argv[2]);
       strcpy (real_path, argv[0]);
-      null_app_name = 1;
+      null_app_name = true;
       goto skip_arg_parsing;
     }
 
@@ -431,14 +454,14 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   if ((ext = perhaps_suffix (prog_arg, real_path)) == NULL)
     {
       set_errno (ENOENT);
-      return -1;
+      res = -1;
+      goto out;
     }
 
   MALLOC_CHECK;
-  int res;
   res = newargv.fixup (chtype, prog_arg, real_path, ext);
   if (res)
-    return res;
+    goto out;
 
   if (real_path.iscygexec ())
     newargv.dup_all ();
@@ -527,7 +550,9 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     VerifyHandle (moreinfo->myself_pinfo);
 
  skip_arg_parsing:
-  PROCESS_INFORMATION pi = {NULL, 0, 0, 0};
+  PROCESS_INFORMATION pi;
+  pi.hProcess = pi.hThread = NULL;
+  pi.dwProcessId = pi.dwThreadId = 0;
   si.lpReserved = NULL;
   si.lpDesktop = NULL;
   si.dwFlags = STARTF_USESTDHANDLES;
@@ -541,7 +566,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   if (mode == _P_DETACH || !set_console_state_for_spawn ())
     flags |= DETACHED_PROCESS;
 
-  bool reset_sendsig = false;
   if (mode != _P_OVERLAY)
     myself->exec_sendsig = NULL;
   else
@@ -586,7 +610,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   cygheap->user.deimpersonate ();
 
   moreinfo->envp = build_env (envp, envblock, moreinfo->envc, real_path.iscygexec ());
-  child_info_spawn ciresrv (chtype, newargv.iscygwin);
+  ciresrv.set (chtype, newargv.iscygwin);
   ciresrv.moreinfo = moreinfo;
 
   si.lpReserved2 = (LPBYTE) &ciresrv;
@@ -674,20 +698,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	}
       return -1;
     }
-
-  /* FIXME: There is a small race here */
-
-  pthread_cleanup cleanup;
-  if (mode == _P_SYSTEM)
-    {
-      sigset_t child_block;
-      cleanup.oldint = signal (SIGINT, SIG_IGN);
-      cleanup.oldquit = signal (SIGQUIT, SIG_IGN);
-      sigemptyset (&child_block);
-      sigaddset (&child_block, SIGCHLD);
-      sigprocmask (SIG_BLOCK, &child_block, &cleanup.oldmask);
-    }
-  pthread_cleanup_push (do_cleanup, (void *) &cleanup);
 
   /* Fixup the parent data structures if needed and resume the child's
      main thread. */

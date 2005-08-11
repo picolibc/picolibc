@@ -29,7 +29,7 @@ enum child_info_types
 
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
-#define CURR_CHILD_INFO_MAGIC 0x5eecb012U
+#define CURR_CHILD_INFO_MAGIC 0x38772070U
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -51,6 +51,7 @@ public:
   DWORD dwProcessId;
   unsigned fhandler_union_cb;
   child_info (unsigned, child_info_types, bool);
+  child_info (): subproc_ready (NULL), parent (NULL) {}
   ~child_info ();
   void ready (bool);
   bool sync (int, HANDLE, DWORD) __attribute__ ((regparm (3)));
@@ -104,7 +105,10 @@ public:
 	cfree (moreinfo);
       }
   }
+  child_info_spawn (): moreinfo (NULL) {};
   child_info_spawn (child_info_types, bool);
+  void *operator new (size_t, void *p) __attribute__ ((nothrow)) {return p;}
+  void set (child_info_types ci, bool b) { new (this) child_info_spawn (ci, b);}
 };
 
 void __stdcall init_child_info (DWORD, child_info *, HANDLE);
