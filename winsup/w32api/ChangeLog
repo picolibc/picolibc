@@ -1,3 +1,8 @@
+2005-08-12  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/imm32.def (ImmDisableIME): Add stub.
+	Thanks to: "kidmin"  <kidmin at users dot sourceforge dot net>
+
 2005-08-10  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
 	* include/w32api.h: Increment version to 3.3.

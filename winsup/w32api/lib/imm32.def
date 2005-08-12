@@ -9,6 +9,7 @@ ImmCreateSoftKeyboard@16
 ImmDestroyContext@4
 ImmDestroyIMCC@4
 ImmDestroySoftKeyboard@4
+ImmDisableIME@4
 ImmEnumRegisterWordA@24
 ImmEnumRegisterWordW@24
 ImmEscapeA@16
