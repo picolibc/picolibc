@@ -15,7 +15,7 @@ HidD_GetPhysicalDescriptor@12
 HidD_GetPreparsedData@8
 HidD_GetProductString@12
 HidD_GetSerialNumberString@12
-;HidD_Hello
+HidD_Hello@8
 HidD_SetConfiguration@12
 HidD_SetFeature@12
 HidD_SetNumInputBuffers@8
