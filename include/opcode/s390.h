@@ -35,7 +35,8 @@ enum s390_opcode_cpu_val
     S390_OPCODE_G5 = 0,
     S390_OPCODE_G6,
     S390_OPCODE_Z900,
-    S390_OPCODE_Z990
+    S390_OPCODE_Z990,
+    S390_OPCODE_Z9_109
   };
 
 /* The opcode table is an array of struct s390_opcode.  */
@@ -138,4 +139,8 @@ extern const struct s390_operand s390_operands[];
 /* This operand is a length.  */
 #define S390_OPERAND_LENGTH 0x200
 
-#endif /* S390_H */
+/* This operand is optional. Only a single operand at the end of
+   the instruction may be optional.  */
+#define S390_OPERAND_OPTIONAL 0x400
+
+	#endif /* S390_H */

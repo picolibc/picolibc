@@ -1,3 +1,7 @@
+2005-08-12 Martin Schwidefsky  <schwidefsky@de.ibm.com>
+
+	* s390.h (s390_opcode_cpu_val): Add enum for cpu type z9-109.
+
 2005-07-28  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
 
 	PR gas/336
