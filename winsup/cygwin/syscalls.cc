@@ -1799,12 +1799,12 @@ statvfs (const char *fname, struct statvfs *sfs)
   if (!status && statusex)
     {
       /* Grrr, this can happen on 9x when a share isn't attached to
-         a drive letter.  Fake, fake, hoorah. */
+	 a drive letter.  Fake, fake, hoorah. */
       status = TRUE;
       bps = 512;
       spc = 8;
       while ((totalb.QuadPart % (spc*bps)) && spc > 1)
-        spc >>= 1;
+	spc >>= 1;
     }
   if (status)
     {

@@ -87,30 +87,29 @@ int scandir (const char *__dir,
 int alphasort (const struct dirent **__a, const struct dirent **__b);
 /* File types for `d_type'.  */
 enum
-  {
-        DT_UNKNOWN = 0,
+{
+  DT_UNKNOWN = 0,
 # define DT_UNKNOWN     DT_UNKNOWN
-	    DT_FIFO = 1,
+  DT_FIFO = 1,
 # define DT_FIFO        DT_FIFO
-	        DT_CHR = 2,
+  DT_CHR = 2,
 # define DT_CHR         DT_CHR
-		    DT_DIR = 4,
+  DT_DIR = 4,
 # define DT_DIR         DT_DIR
-		        DT_BLK = 6,
+  DT_BLK = 6,
 # define DT_BLK         DT_BLK
-			    DT_REG = 8,
+  DT_REG = 8,
 # define DT_REG         DT_REG
-			        DT_LNK = 10,
+  DT_LNK = 10,
 # define DT_LNK         DT_LNK
-				    DT_SOCK = 12,
+  DT_SOCK = 12,
 # define DT_SOCK        DT_SOCK
-				        DT_WHT = 14
+  DT_WHT = 14
 # define DT_WHT         DT_WHT
-					    };
+};
 
 /* Convert between stat structure types and directory types.  */
-# define IFTODT(mode)   (((mode) & 0170000) >> 12)
+# define IFTODT(mode)		(((mode) & 0170000) >> 12)
 # define DTTOIF(dirtype)        ((dirtype) << 12)
 #endif /* _POSIX_SOURCE */
-
-#endif
+#endif /*_SYS_DIRENT_H*/

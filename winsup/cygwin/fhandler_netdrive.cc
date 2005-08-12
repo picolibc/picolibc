@@ -66,9 +66,9 @@ thread_netdrive (void *arg)
       ndi->ret = WNetGetResourceInformation ((LPNETRESOURCE) ndi->in,
 					     nro, &size, &dummy);
       if (ndi->ret != NO_ERROR)
-        break;
+	break;
       if (ndi->what == GET_RESOURCE_OPENENUMTOP)
-        {
+	{
 	  nro2 = nro;
 	  nro = (LPNETRESOURCE) alloca (size = 4096);
 	  ndi->ret = WNetGetResourceParent (nro2, nro, &size);
@@ -78,7 +78,7 @@ thread_netdrive (void *arg)
       ndi->ret = WNetOpenEnum (RESOURCE_GLOBALNET, RESOURCETYPE_DISK, 0, nro,
 			       &enumhdl);
       if (ndi->ret == NO_ERROR)
-        *(HANDLE *) ndi->out = enumhdl;
+	*(HANDLE *) ndi->out = enumhdl;
       break;
     case GET_RESOURCE_ENUM:
       ndi->ret = WNetEnumResource ((HANDLE) ndi->in, (size = 1, &size),
@@ -161,7 +161,7 @@ fhandler_netdrive::readdir (DIR *dir)
       NETRESOURCE nr = { 0 };
 
       if (len == 2)	/* // */
-        {
+	{
 	  namebuf = (char *) alloca (MAX_COMPUTERNAME_LENGTH + 3);
 	  strcpy (namebuf, "\\\\");
 	  size = MAX_COMPUTERNAME_LENGTH + 1;
@@ -172,7 +172,7 @@ fhandler_netdrive::readdir (DIR *dir)
 	    }
 	}
       else
-        {
+	{
 	  const char *from;
 	  char *to;
 	  namebuf = (char *) alloca (len + 1);
@@ -195,7 +195,7 @@ fhandler_netdrive::readdir (DIR *dir)
 	}
     }
   ret = create_thread_and_wait (GET_RESOURCE_ENUM, dir->__handle,
-  				nro = (LPNETRESOURCE) alloca (16384),
+				nro = (LPNETRESOURCE) alloca (16384),
 				16384, "WnetEnumResource");
   if (ret != NO_ERROR)
     {

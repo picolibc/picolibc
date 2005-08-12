@@ -51,7 +51,7 @@ extern "C" {
 static void __stdcall _cfree (void *) __attribute__((regparm(1)));
 static void *__stdcall _csbrk (int);
 }
- 
+
 /* Called by fork or spawn to reallocate cygwin heap */
 void __stdcall
 cygheap_fixup_in_child (bool execed)

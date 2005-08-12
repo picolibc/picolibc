@@ -1354,7 +1354,7 @@ get_reg_security (HANDLE handle, security_descriptor &sd_ret)
   if (ret == ERROR_INSUFFICIENT_BUFFER)
     {
       if (!sd_ret.malloc (len))
-        set_errno (ENOMEM);
+	set_errno (ENOMEM);
       else
 	ret = RegGetKeySecurity ((HKEY) handle,
 				 DACL_SECURITY_INFORMATION
@@ -1376,10 +1376,10 @@ get_nt_object_security (HANDLE handle, SE_OBJECT_TYPE object_type,
 {
   NTSTATUS ret;
   ULONG len = 0;
-  
+
   /* Unfortunately, NtQuerySecurityObject doesn't work on predefined registry
      keys like HKEY_LOCAL_MACHINE.  It fails with "Invalid Handle".  So we
-     have to retreat to the Win32 registry functions for registry keys. 
+     have to retreat to the Win32 registry functions for registry keys.
      What bugs me is that RegGetKeySecurity is obviously just a wrapper
      around NtQuerySecurityObject, but there seems to be no function to
      convert pseudo HKEY values to real handles. */

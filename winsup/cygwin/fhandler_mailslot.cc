@@ -59,11 +59,11 @@ fhandler_mailslot::open (int flags, mode_t mode)
     {
     case O_RDONLY:	/* Server */
       x = CreateMailslot (get_win32_name (),
-      			  0, /* Any message size */
-      			  (flags & O_NONBLOCK) ? 0 : MAILSLOT_WAIT_FOREVER,
-      			  &sec_none);
+			  0, /* Any message size */
+			  (flags & O_NONBLOCK) ? 0 : MAILSLOT_WAIT_FOREVER,
+			  &sec_none);
       if (x == INVALID_HANDLE_VALUE)
-        {
+	{
 	  /* FIXME: It's not possible to open the read side of an existing
 	     mailslot using CreateFile.  You'll get a handle, but using it
 	     in ReadFile returns ERROR_INVALID_PARAMETER.  On the other
@@ -95,10 +95,10 @@ fhandler_mailslot::open (int flags, mode_t mode)
       break;
     case O_WRONLY:	/* Client */
       /* The client is the DLL exclusively.  Don't allow opening from
-         application code. */
+	 application code. */
       extern fhandler_mailslot *dev_kmsg;
       if (this != dev_kmsg)
-        {
+	{
 	  set_errno (EPERM);	/* As on Linux. */
 	  break;
 	}

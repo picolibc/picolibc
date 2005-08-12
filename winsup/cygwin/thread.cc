@@ -2638,7 +2638,7 @@ pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
      evaluate microseconds directly in DWORD. */
   if (tv.tv_sec > abstime->tv_sec
       || (tv.tv_sec == abstime->tv_sec
-          && tv.tv_usec > abstime->tv_nsec / 1000))
+	  && tv.tv_usec > abstime->tv_nsec / 1000))
     return ETIMEDOUT;
 
   waitlength = (abstime->tv_sec - tv.tv_sec) * 1000;

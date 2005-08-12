@@ -171,7 +171,7 @@ _cygtls::remove (DWORD wait)
   if (wait)
     {
       /* FIXME: Need some sort of atthreadexit function to allow things like
-         select to control this themselves. */
+	 select to control this themselves. */
       if (locals.exitsock != INVALID_SOCKET)
 	{
 	  closesocket (locals.exitsock);

@@ -2272,7 +2272,7 @@ cygwin_inet_pton (int family, const char *strptr, void *addrptr)
       struct in_addr in_val;
 
       if (cygwin_inet_aton (strptr, &in_val))
-        {
+	{
 	  memcpy (addrptr, &in_val, sizeof (struct in_addr));
 	  return 1;
 	}
@@ -2298,7 +2298,7 @@ cygwin_inet_ntop (int family, const void *addrptr, char *strptr, size_t len)
 
       __small_sprintf (temp, "%u.%u.%u.%u", p[0], p[1], p[2], p[3]);
       if (strlen (temp) >= len)
-        {
+	{
 	  set_errno (ENOSPC);
 	  return NULL;
 	}

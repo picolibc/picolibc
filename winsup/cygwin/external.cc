@@ -311,7 +311,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	try_to_debug ();
 	break;
       default:
-        break;
+	break;
     }
   return (unsigned long) -1;
 }

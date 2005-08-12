@@ -385,42 +385,42 @@ fhandler_serial::switch_modem_lines (int set, int clr)
   if (set & TIOCM_RTS)
     {
       if (EscapeCommFunction (get_handle (), SETRTS))
-        rts = TIOCM_RTS;
+	rts = TIOCM_RTS;
       else
-        {
-          __seterrno ();
-          res = -1;
-        }
+	{
+	  __seterrno ();
+	  res = -1;
+	}
     }
   else if (clr & TIOCM_RTS)
     {
       if (EscapeCommFunction (get_handle (), CLRRTS))
-        rts = 0;
+	rts = 0;
       else
-        {
-          __seterrno ();
-          res = -1;
-        }
+	{
+	  __seterrno ();
+	  res = -1;
+	}
     }
   if (set & TIOCM_DTR)
     {
       if (EscapeCommFunction (get_handle (), SETDTR))
-        rts = TIOCM_DTR;
+	rts = TIOCM_DTR;
       else
-        {
-          __seterrno ();
-          res = -1;
-        }
+	{
+	  __seterrno ();
+	  res = -1;
+	}
     }
   else if (clr & TIOCM_DTR)
     {
       if (EscapeCommFunction (get_handle (), CLRDTR))
-        rts = 0;
+	rts = 0;
       else
-        {
-          __seterrno ();
-          res = -1;
-        }
+	{
+	  __seterrno ();
+	  res = -1;
+	}
     }
 
   return res;
@@ -482,17 +482,17 @@ fhandler_serial::ioctl (unsigned int cmd, void *buffer)
 	  }
 	break;
       case TIOCMSET:
-        if (switch_modem_lines (ipbuffer, ~ipbuffer))
-          res = -1;
+	if (switch_modem_lines (ipbuffer, ~ipbuffer))
+	  res = -1;
 	break;
       case TIOCMBIS:
 	if (switch_modem_lines (ipbuffer, 0))
-          res = -1;
-        break;
+	  res = -1;
+	break;
       case TIOCMBIC:
 	if (switch_modem_lines (0, ipbuffer))
-          res = -1;
-        break;
+	  res = -1;
+	break;
       case TIOCCBRK:
 	if (ClearCommBreak (get_handle ()) == 0)
 	  {

@@ -110,7 +110,7 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 	  ret = 1;
 	}
       else
-        __seterrno ();
+	__seterrno ();
       CloseHandle (fh);
       return ret;
     }

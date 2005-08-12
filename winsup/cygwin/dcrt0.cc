@@ -965,7 +965,7 @@ dll_crt0 (per_process *uptr)
    calling this function, and that storage must not be overwritten until you
    unload cygwin1.dll, as it is used for _my_tls.  It is best to load
    cygwin1.dll before spawning any additional threads in your process.
-  
+
    See winsup/testsuite/cygload for an example of how to use cygwin1.dll
    from MSVC and non-cygwin MinGW applications.  */
 extern "C" void
