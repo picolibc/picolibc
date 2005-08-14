@@ -15,6 +15,8 @@ details. */
 #include "perprocess.h"
 #include "cygtls.h"
 #include "pinfo.h"
+#include <ntdef.h>
+#include "ntdll.h"
 
 int NO_COPY dynamically_loaded;
 static char *search_for = (char *) cygthread::stub;
@@ -88,22 +90,47 @@ munge_threadfunc ()
     }
 }
 
-static void __attribute__ ((noreturn))
+inline static void
 respawn_wow64_process ()
 {
-  PROCESS_INFORMATION pi;
-  STARTUPINFO si;
-  GetStartupInfo (&si);
-  if (!CreateProcessA (NULL, GetCommandLineA (), NULL, NULL, TRUE,
-		       CREATE_DEFAULT_ERROR_MODE
-		       | GetPriorityClass (GetCurrentProcess ()),
-		       NULL, NULL, &si, &pi))
-    api_fatal ("Failed to create process <%s>, %E", GetCommandLineA ());
-  CloseHandle (pi.hThread);
-  if (WaitForSingleObject (pi.hProcess, INFINITE) == WAIT_FAILED)
-    api_fatal ("Waiting for process %d failed, %E", pi.dwProcessId);
-  CloseHandle (pi.hProcess);
-  ExitProcess (0);
+  NTSTATUS ret;
+  PROCESS_BASIC_INFORMATION pbi;
+  HANDLE parent;
+
+  BOOL is_wow64_proc = TRUE;	/* Opt on the safe side. */
+
+  /* Unfortunately there's no simpler way to retrieve the
+     parent process in NT, as far as I know.  Hints welcome. */
+  ret = NtQueryInformationProcess (GetCurrentProcess (),
+				   ProcessBasicInformation,
+				   (PVOID) &pbi,
+				   sizeof pbi, NULL);
+  if (ret == STATUS_SUCCESS
+      && (parent = OpenProcess (PROCESS_QUERY_INFORMATION,
+				FALSE,
+				pbi.InheritedFromUniqueProcessId)))
+    {
+      IsWow64Process (parent, &is_wow64_proc);
+      CloseHandle (parent);
+    }
+
+  /* The parent is a real 64 bit process?  Respawn! */
+  if (!is_wow64_proc)
+    {
+      PROCESS_INFORMATION pi;
+      STARTUPINFO si;
+      GetStartupInfo (&si);
+      if (!CreateProcessA (NULL, GetCommandLineA (), NULL, NULL, TRUE,
+			   CREATE_DEFAULT_ERROR_MODE
+			   | GetPriorityClass (GetCurrentProcess ()),
+			   NULL, NULL, &si, &pi))
+	api_fatal ("Failed to create process <%s>, %E", GetCommandLineA ());
+      CloseHandle (pi.hThread);
+      if (WaitForSingleObject (pi.hProcess, INFINITE) == WAIT_FAILED)
+	api_fatal ("Waiting for process %d failed, %E", pi.dwProcessId);
+      CloseHandle (pi.hProcess);
+      ExitProcess (0);
+    }
 }
 
 extern void __stdcall dll_crt0_0 ();
@@ -113,18 +140,23 @@ HMODULE NO_COPY cygwin_hmodule;
 extern "C" int WINAPI
 dll_entry (HANDLE h, DWORD reason, void *static_load)
 {
-  BOOL is_64bit_machine = FALSE;
+  BOOL is_wow64_proc = FALSE;
 
   switch (reason)
     {
     case DLL_PROCESS_ATTACH:
       cygwin_hmodule = (HMODULE) h;
       dynamically_loaded = (static_load == NULL);
-      /* Is the stack at an unusual high address?  Check if we're running on
-	 a 64 bit machine.  If so, respawn. */
-      if (&is_64bit_machine >= (PBOOL) 0x400000
-	  && IsWow64Process (hMainProc, &is_64bit_machine)
-	  && is_64bit_machine)
+
+      /* Is the stack at an unusual address?  This is, an address which
+         is in the usual space occupied by the process image, but below
+	 the auto load address of DLLs?
+	 Check if we're running in WOW64 on a 64 bit machine *and* are
+	 spawned by a genuine 64 bit process.  If so, respawn. */
+      if (&is_wow64_proc >= (PBOOL) 0x400000
+          && &is_wow64_proc <= (PBOOL) 0x10000000
+          && IsWow64Process (hMainProc, &is_wow64_proc)
+	  && is_wow64_proc)
 	respawn_wow64_process ();
 
       prime_threads ();

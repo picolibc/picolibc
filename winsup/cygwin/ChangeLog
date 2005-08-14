@@ -1,3 +1,11 @@
+2005-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* init.cc (respawn_wow64_process): Make inline function.  Remove
+	"noreturn" attribute.  Add additional check if parent process is
+	actually a 64 bit process.
+	(dll_entry): Only test WOW64 processes with a stack in the usual
+	"dangerous" process space area.
+
 2005-08-11  Troy Curtiss  <trcurtiss@gmail.com>
 
 	* fhandler_serial.cc (fhandler_serial::tcgetattr): Return current baud
