@@ -1,5 +1,5 @@
 /* ppc.h -- Header file for PowerPC opcode table
-   Copyright 1994, 1995, 1999, 2000, 2001, 2002, 2003, 2004
+   Copyright 1994, 1995, 1999, 2000, 2001, 2002, 2003, 2004, 2005
    Free Software Foundation, Inc.
    Written by Ian Lance Taylor, Cygnus Support
 
@@ -136,6 +136,9 @@ extern const int powerpc_num_opcodes;
 
 /* Opcode is only supported by Power5 architecture.  */
 #define PPC_OPCODE_POWER5	    0x1000000
+
+/* Opcode is supported by PowerPC e300 family.  */
+#define PPC_OPCODE_E300           0x2000000
 
 /* A macro to extract the major opcode from an instruction.  */
 #define PPC_OP(i) (((i) >> 26) & 0x3f)
