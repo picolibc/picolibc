@@ -1,3 +1,9 @@
+2005-08-16  Shaun Jackman  <sjackman@gmail.com>
+
+	* arm/syscalls.c (initialise_monitor_handles): Set
+	monitor_stderr to the result of SWI_open(":tt", "a")
+	instead of simply duplicating stdout.
+
 2005-08-10  DJ Delorie  <dj@redhat.com>
 
 	* configure.in: Add m32c support.

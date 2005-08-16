@@ -133,6 +133,16 @@ initialise_monitor_handles (void)
 {
   int i;
   
+  /* Open the standard file descriptors by opening the special
+   * teletype device, ":tt", read-only to obtain a descritpor for
+   * standard input and write-only to obtain a descriptor for standard
+   * output. Finally, open ":tt" in append mode to obtain a descriptor
+   * for standard error. Since this is a write mode, most kernels will
+   * probably return the same value as for standard output, but the
+   * kernel can differentiate the two using the mode flag and return a
+   * different descriptor for standard error.
+   */
+
 #ifdef ARM_RDI_MONITOR
   int volatile block[3];
   
@@ -144,7 +154,12 @@ initialise_monitor_handles (void)
   block[0] = (int) ":tt";
   block[2] = 3;     /* length of filename */
   block[1] = 4;     /* mode "w" */
-  monitor_stdout = monitor_stderr = do_AngelSWI (AngelSWI_Reason_Open, (void *) block);
+  monitor_stdout = do_AngelSWI (AngelSWI_Reason_Open, (void *) block);
+
+  block[0] = (int) ":tt";
+  block[2] = 3;     /* length of filename */
+  block[1] = 8;     /* mode "a" */
+  monitor_stderr = do_AngelSWI (AngelSWI_Reason_Open, (void *) block);
 #else
   int fh;
   const char * name;
@@ -161,7 +176,14 @@ initialise_monitor_handles (void)
        : "=r"(fh)
        : "i" (SWI_Open),"r"(name)
        : "r0","r1");
-  monitor_stdout = monitor_stderr = fh;
+  monitor_stdout = fh;
+
+  name = ":tt";
+  asm ("mov r0,%2; mov r1, #8; swi %a1; mov %0, r0"
+       : "=r"(fh)
+       : "i" (SWI_Open),"r"(name)
+       : "r0","r1");
+  monitor_stderr = fh;
 #endif
 
   for (i = 0; i < MAX_OPEN_FILES; i ++)
@@ -171,6 +193,8 @@ initialise_monitor_handles (void)
   openfiles[0].pos = 0;
   openfiles[1].handle = monitor_stdout;
   openfiles[1].pos = 0;
+  openfiles[2].handle = monitor_stderr;
+  openfiles[2].pos = 0;
 }
 
 static int
