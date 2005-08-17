@@ -1,3 +1,14 @@
+2005-08-17  Christopher Faylor  <cgf@timesys.com>
+
+	* dcrt0.cc (dll_crt0_1): Tweak debugging stuff.
+
+2005-08-17  Pavel Tsekov  <ptsekov@gmx.net>
+
+	* fhandler_tty.cc (fhandler_tty_common::close): Rearrange the code so
+	that the master end of the input and output pipes is closed before
+	signalling an EOF event to the slave.
+	(fhandler_pty_master::close): Likewise.
+
 2005-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* init.cc (respawn_wow64_process): Make inline function.  Remove

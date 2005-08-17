@@ -1196,6 +1196,10 @@ fhandler_tty_common::close ()
     termios_printf ("CloseHandle (input_mutex<%p>), %E", input_mutex);
   if (!ForceCloseHandle (output_mutex))
     termios_printf ("CloseHandle (output_mutex<%p>), %E", output_mutex);
+  if (!ForceCloseHandle1 (get_handle (), from_pty))
+    termios_printf ("CloseHandle (get_handle ()<%p>), %E", get_handle ());
+  if (!ForceCloseHandle1 (get_output_handle (), to_pty))
+    termios_printf ("CloseHandle (get_output_handle ()<%p>), %E", get_output_handle ());
 
   /* Send EOF to slaves if master side is closed */
   if (!get_ttyp ()->master_alive ())
@@ -1206,10 +1210,6 @@ fhandler_tty_common::close ()
 
   if (!ForceCloseHandle (input_available_event))
     termios_printf ("CloseHandle (input_available_event<%p>), %E", input_available_event);
-  if (!ForceCloseHandle1 (get_handle (), from_pty))
-    termios_printf ("CloseHandle (get_handle ()<%p>), %E", get_handle ());
-  if (!ForceCloseHandle1 (get_output_handle (), to_pty))
-    termios_printf ("CloseHandle (get_output_handle ()<%p>), %E", get_output_handle ());
 
   if (!hExeced)
     {
@@ -1226,9 +1226,10 @@ fhandler_pty_master::close ()
   while (accept_input () > 0)
     continue;
 #endif
-  fhandler_tty_common::close ();
 
-  if (!get_ttyp ()->master_alive ())
+  if (get_ttyp ()->master_alive ())
+    fhandler_tty_common::close ();
+  else
     {
       termios_printf ("freeing tty%d (%d)", get_unit (), get_ttyp ()->ntty);
 #if 0
@@ -1241,6 +1242,9 @@ fhandler_pty_master::close ()
 	CloseHandle (get_ttyp ()->from_master);
       if (get_ttyp ()->to_master)
 	CloseHandle (get_ttyp ()->to_master);
+
+      fhandler_tty_common::close ();
+
       if (!hExeced)
 	get_ttyp ()->init ();
     }

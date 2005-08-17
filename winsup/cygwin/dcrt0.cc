@@ -725,8 +725,9 @@ dll_crt0_1 (char *)
   malloc_init ();
 #ifdef CGF
   int i = 0;
-  while (i)
-    cmalloc (HEAP_STR, 2000000);
+  const int n = 2 * 1024 * 1024;
+  while (i--)
+    small_printf ("cmalloc returns %p\n", cmalloc (HEAP_STR, n));
 #endif
 
   /* Initialize SIGSEGV handling, etc. */
