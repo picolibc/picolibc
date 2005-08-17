@@ -158,8 +158,8 @@ specified with the flag <literal>O_BINARY</literal> and text mode with
 <filename>fcntl.h</filename>.</para>
 
 <para>In the <function>fopen()</function> function call, binary mode can be
-specified by adding a <literal>b</literal> to the mode string. There is no
-direct way to specify text mode.</para>
+specified by adding a <literal>b</literal> to the mode string. Text mode is specified
+by adding a <literal>t</literal> to the mode string.</para>
 
 <para>The mode of a file can be changed by the call
 <function>setmode(fd,mode)</function> where <literal>fd</literal> is a file
