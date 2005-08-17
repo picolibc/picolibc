@@ -601,6 +601,21 @@ DECLARE_INTERFACE_(IContextMenu2,IContextMenu)
 };
 typedef IContextMenu2 *LPCONTEXTMENU2;
 
+#undef INTERFACE
+#define INTERFACE IContextMenu3
+DECLARE_INTERFACE_(IContextMenu3,IContextMenu2)
+{
+ STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+ STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+ STDMETHOD_(ULONG,Release)(THIS) PURE;
+ STDMETHOD(QueryContextMenu)(THIS_ HMENU,UINT,UINT,UINT,UINT) PURE;
+ STDMETHOD(InvokeCommand)(THIS_ LPCMINVOKECOMMANDINFO) PURE;
+ STDMETHOD(GetCommandString)(THIS_ UINT,UINT,PUINT,LPSTR,UINT) PURE;
+ STDMETHOD(HandleMenuMsg)(THIS_ UINT,WPARAM,LPARAM) PURE;
+ STDMETHOD(HandleMenuMsg2)(THIS_ UINT,WPARAM,LPARAM,LRESULT*) PURE;
+};
+typedef IContextMenu3 *LPCONTEXTMENU3;
+
 #if (_WIN32_IE >= 0x0500)
 #pragma pack(push,8)
 typedef struct {
@@ -656,6 +671,17 @@ typedef enum {
 #define IContextMenu2_InvokeCommand(T,a) (T)->lpVtbl->InvokeCommand(T,a)
 #define IContextMenu2_GetCommandString(T,a,b,c,d,e) (T)->lpVtbl->GetCommandString(T,a,b,c,d,e)
 #define IContextMenu2_HandleMenuMsg(T,a,b,c) (T)->lpVtbl->HandleMenuMsg(T,a,b,c)
+#endif
+
+#ifdef COBJMACROS
+#define IContextMenu3_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IContextMenu3_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IContextMenu3_Release(T) (T)->lpVtbl->Release(T)
+#define IContextMenu3_QueryContextMenu(T,a,b,c,d,e) (T)->lpVtbl->QueryContextMenu(T,a,b,c,d,e)
+#define IContextMenu3_InvokeCommand(T,a) (T)->lpVtbl->InvokeCommand(T,a)
+#define IContextMenu3_GetCommandString(T,a,b,c,d,e) (T)->lpVtbl->GetCommandString(T,a,b,c,d,e)
+#define IContextMenu3_HandleMenuMsg(T,a,b,c) (T)->lpVtbl->HandleMenuMsg(T,a,b,c)
+#define IContextMenu3_HandleMenuMsg2(T,a,b,c,d) (T)->lpVtbl->HandleMenuMsg(T,a,b,c,d)
 #endif
 
 #undef INTERFACE
@@ -1473,6 +1499,15 @@ typedef BROWSEINFOA BROWSEINFO,*PBROWSEINFO,*LPBROWSEINFO;
 #define FILEGROUPDESCRIPTOR FILEGROUPDESCRIPTORA
 #define LPFILEGROUPDESCRIPTOR LPFILEGROUPDESCRIPTORA
 #endif /* UNICODE */
+
+DWORD WINAPI SHFormatDrive(HWND,UINT,UINT,UINT);
+
+#define SHFMT_ID_DEFAULT 0xFFFF
+#define SHFMT_OPT_FULL 1
+#define SHFMT_OPT_SYSONLY 2
+#define SHFMT_ERROR 0xFFFFFFFF
+#define SHFMT_CANCEL 0xFFFFFFFE
+#define SHFMT_NOFORMAT 0xFFFFFFFD
 
 #pragma pack(pop)
 #ifdef __cplusplus

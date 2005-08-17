@@ -36,6 +36,7 @@ extern const GUID IID_ICommDlgBrowser;
 extern const GUID IID_IEnumIDList;
 extern const GUID IID_IFileViewerSite;
 extern const GUID IID_IContextMenu2;
+extern const GUID IID_IContextMenu3;
 extern const GUID IID_IShellExecuteHookA;
 extern const GUID IID_IPropSheetPage;
 extern const GUID IID_INewShortcutHookW;

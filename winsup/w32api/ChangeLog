@@ -1,3 +1,14 @@
+2005-08-17  Martin Fuchs <martin-fuchs@gmx.net>
+
+	* include/shlobj.h (IContextMenu3): Define.
+	* include/shlguid.h (IID_IContextMenu3): Declare.
+	* lib/shell32.c (IID_IContextMenu3): Define.
+
+2005-08-17  Martin Fuchs <martin-fuchs@gmx.net>
+
+	* include/shlobj.h (SHFormatDrive): Declaration of function
+	and associated constants.
+
 2005-08-12  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/ddk/hidsdi.h:  New file.
