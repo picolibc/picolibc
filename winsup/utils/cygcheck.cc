@@ -888,6 +888,7 @@ dump_sysinfo_services ()
   char buf[1024];
   char buf2[1024];
   FILE *f;
+  bool no_services = false;
 
   if (givehelp)
     printf ("\nChecking for any Cygwin services... %s\n\n",
@@ -922,49 +923,60 @@ dump_sysinfo_services ()
     }
   fclose (f);
 
-  /* run cygrunsrv --list */
-  snprintf (buf, sizeof (buf), "%s --list", cygrunsrv);
+  /* For verbose mode, just run cygrunsrv --list --verbose and copy output
+     verbatim; otherwise run cygrunsrv --list and then cygrunsrv --query for
+     each service.  */
+  snprintf (buf, sizeof (buf), (verbose ? "%s --list --verbose" : "%s --list"),
+	    cygrunsrv);
   if ((f = popen (buf, "rt")) == NULL)
     {
       printf ("Failed to execute '%s', skipping services check.\n", buf);
       return;
     }
-  size_t nchars = fread ((void *) buf, 1, sizeof (buf), f);
-  pclose (f);
 
-  /* were any services found?  */
-  if (nchars < 1)
+  if (verbose)
     {
-      puts ("No Cygwin services found.\n");
-      return;
-    }
-
-  /* In verbose mode, just run 'cygrunsrv --list --verbose' and copy the
-     entire output.  Otherwise run 'cygrunsrv --query' for each service.  */
-  for (char *srv = strtok (buf, "\n"); srv; srv = strtok (NULL, "\n"))
-    {
-      if (verbose)
-	snprintf (buf2, sizeof (buf2), "%s --list --verbose", cygrunsrv);
-      else
-	snprintf (buf2, sizeof (buf2), "%s --query %s", cygrunsrv, srv);
-      if ((f = popen (buf2, "rt")) == NULL)
-	{
-	  printf ("Failed to execute '%s', skipping services check.\n", buf2);
-	  return;
-	}
-
       /* copy output to stdout */
-      do
-	{
-	  nchars = fread ((void *)buf2, 1, sizeof (buf2), f);
-	  fwrite ((void *)buf2, 1, nchars, stdout);
-	}
-      while (!feof (f) && !ferror (f));
+      size_t nchars = 0;
+      while (!feof (f) && !ferror (f))
+	  nchars += fwrite ((void *) buf, 1,
+			    fread ((void *) buf, 1, sizeof (buf), f), stdout);
+
+      /* cygrunsrv outputs nothing if there are no cygwin services found */
+      if (nchars < 1)
+	no_services = true;
+      pclose (f);
+    }
+  else
+    {
+      /* read the output of --list, and then run --query for each service */
+      size_t nchars = fread ((void *) buf, 1, sizeof (buf) - 1, f);
+      buf[nchars] = 0;
       pclose (f);
 
-      if (verbose)
-	break;
+      if (nchars > 0)
+	for (char *srv = strtok (buf, "\n"); srv; srv = strtok (NULL, "\n"))
+	  {
+	    snprintf (buf2, sizeof (buf2), "%s --query %s", cygrunsrv, srv);
+	    if ((f = popen (buf2, "rt")) == NULL)
+	      {
+		printf ("Failed to execute '%s', skipping services check.\n", buf2);
+		return;
+	      }
+
+	    /* copy output to stdout */
+	    while (!feof (f) && !ferror (f))
+	      fwrite ((void *) buf2, 1,
+		      fread ((void *) buf2, 1, sizeof (buf2), f), stdout);
+	    pclose (f);
+	  }
+      else
+	no_services = true;
     }
+
+  /* inform the user if nothing found */
+  if (no_services)
+    puts ("No Cygwin services found.\n");
 }
 
 static void
