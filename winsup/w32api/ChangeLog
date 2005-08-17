@@ -1,4 +1,10 @@
-2005-08-17  Martin Fuchs <martin-fuchs@gmx.net>
+2005-08-17  Michael Jung  <mjung@iss.tu-darmstadt.de> 
+
+	* lib/shell32.c (CLSID_RecycleBin, CLSID_ControlPanel,
+	CLSID_MyComputer,CLSID_Internet, CLSID_NetworkPlaces,
+	CLSID_MyDocuments, CLSID_FolderShortcut): Add GUIDs. 
+
+005-08-17  Martin Fuchs <martin-fuchs@gmx.net>
 
 	* include/shlobj.h (IContextMenu3): Define.
 	* include/shlguid.h (IID_IContextMenu3): Declare.
