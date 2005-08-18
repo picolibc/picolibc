@@ -1,3 +1,8 @@
+2005-08-11  DJ Delorie  <dj@redhat.com>
+
+	* m32c/Makefile.in: Block out memory regions reserved for monitors
+	and simulators.  Add monitor link scripts.
+
 2005-08-16  Shaun Jackman  <sjackman@gmail.com>
 
 	* arm/syscalls.c (initialise_monitor_handles): Set

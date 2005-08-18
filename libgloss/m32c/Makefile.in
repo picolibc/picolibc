@@ -56,7 +56,7 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 	then echo ${objroot}/../binutils/objcopy ; \
 	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
 
-SCRIPTS = r8c.ld m16c.ld m32cm.ld m32c.ld sim8.ld sim16.ld sim24.ld
+SCRIPTS = r8c.ld m16c.ld m32cm.ld m32c.ld m16cmon.ld m32cmon.ld sim8.ld sim16.ld sim24.ld
 CRT = crt0.o crtn.o
 SIM_BSP = libsim.a
 LIBNOSYS = ../libnosys/libnosys.a
@@ -106,28 +106,39 @@ $(SIM_BSP): $(SIM_OBJS)
 GDEP = $(srcdir)/m32c.tmpl $(srcdir)/genscript Makefile
 GS = $(SHELL) $(srcdir)/genscript $(srcdir) 
 
+# NOTE: The simulators and monitors reserve the following locations
+# for themselves, so we skip them:
+#   R8C/M16C:	0x400-0x4ff	0x0ff600-0x0ffcff
+#   M32C:	0x400-0x4ff	0xfff600-0xfffcff
 
 r8c.ld : $(GDEP)
-	$(GS) r8c   0x400  0x400   0xc000   0x3f24   0xff
+	$(GS) r8c   0x500  0x300   0xc000   0x3f24   0xff
 
 m16c.ld : $(GDEP)
-	$(GS) m16c  0x400 0x5000  0xc0000  0x3ff24  0xfff
+	$(GS) m16c  0x500 0x4f00  0xc0000  0x3f600  0xfff
 
 m32cm.ld : $(GDEP)
-	$(GS) m32cm 0x400 0x2800 0xfe0000 0x01ff24 0xffff
+	$(GS) m32cm 0x500 0x2700 0xfe0000 0x01f600 0xffff
 
 m32c.ld : $(GDEP)
-	$(GS) m32c  0x400 0x7c00 0xf80000 0x07ff24 0xffff
+	$(GS) m32c  0x500 0x7b00 0xf80000 0x07f600 0xffff
+
+
+m16cmon.ld : $(GDEP)
+	$(GS) m16c  0x400  0x100  0xff600    0x800  0xfff
+
+m32cmon.ld : $(GDEP)
+	$(GS) m16c  0x400  0x100 0xfff600    0x800 0xffff
 
 
 sim8.ld : $(GDEP)
-	$(GS) sim8 0x400 0xf724 0 0 0xff
+	$(GS) sim8  0x500 0xf624        0        0   0xff
 
 sim16.ld : $(GDEP)
-	$(GS) sim16 0x400 0xf800 0x20000 0x80000 0xfff
+	$(GS) sim16 0x500 0xf700  0x20000  0x80000  0xfff
 
 sim24.ld : $(GDEP)
-	$(GS) sim24 0x200000 0x800000 0 0 0xffff
+	$(GS) sim24 0x200000 0x800000   0        0 0xffff
 
 
 install: $(CRT) $(SIM_BSP) $(SCRIPTS)
