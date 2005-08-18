@@ -36,6 +36,7 @@ static struct option longopts[] =
 {
   {"cannot-change", no_argument, NULL, 'c'},
   {"can-change", no_argument, NULL, 'C'},
+  {"logonserver", required_argument, NULL, 'd'},
   {"never-expires", no_argument, NULL, 'e'},
   {"expires", no_argument, NULL, 'E'},
   {"help", no_argument, NULL, 'h' },
@@ -52,7 +53,7 @@ static struct option longopts[] =
   {NULL, 0, NULL, 0}
 };
 
-static char opts[] = "cCeEhi:ln:pPuvx:L:S";
+static char opts[] = "cCd:eEhi:ln:pPuvx:L:S";
 
 int
 eprint (int with_name, const char *fmt, ...)
@@ -108,7 +109,7 @@ EvalRet (int ret, const char *user)
 }
 
 PUSER_INFO_3
-GetPW (char *user, int print_win_name)
+GetPW (char *user, int print_win_name, LPCWSTR server)
 {
   char usr_buf[UNLEN + 1];
   WCHAR name[2 * (UNLEN + 1)];
@@ -133,12 +134,13 @@ GetPW (char *user, int print_win_name)
 	}
     }
   MultiByteToWideChar (CP_ACP, 0, user, -1, name, 2 * (UNLEN + 1));
-  ret = NetUserGetInfo (NULL, name, 3, (void *) &ui);
+  ret = NetUserGetInfo (server, name, 3, (void *) &ui);
   return EvalRet (ret, user) ? NULL : ui;
 }
 
 int
-ChangePW (const char *user, const char *oldpwd, const char *pwd, int justcheck)
+ChangePW (const char *user, const char *oldpwd, const char *pwd, int justcheck,
+	  LPCWSTR server)
 {
   WCHAR name[2 * (UNLEN + 1)], oldpass[512], pass[512];
   DWORD ret;
@@ -150,12 +152,12 @@ ChangePW (const char *user, const char *oldpwd, const char *pwd, int justcheck)
       USER_INFO_1003 ui;
 
       ui.usri1003_password = pass;
-      ret = NetUserSetInfo (NULL, name, 1003, (LPBYTE) &ui, NULL);
+      ret = NetUserSetInfo (server, name, 1003, (LPBYTE) &ui, NULL);
     }
   else
     {
       MultiByteToWideChar (CP_ACP, 0, oldpwd, -1, oldpass, 512);
-      ret = NetUserChangePassword (NULL, name, oldpass, pass);
+      ret = NetUserChangePassword (server, name, oldpass, pass);
     }
   if (justcheck && ret != ERROR_INVALID_PASSWORD)
     return 0;
@@ -167,7 +169,7 @@ ChangePW (const char *user, const char *oldpwd, const char *pwd, int justcheck)
 }
 
 void
-PrintPW (PUSER_INFO_3 ui)
+PrintPW (PUSER_INFO_3 ui, LPCWSTR server)
 {
   time_t t = time (NULL) - ui->usri3_password_age;
   int ret;
@@ -184,7 +186,7 @@ PrintPW (PUSER_INFO_3 ui)
   printf ("Password expired           : %s",
 	(ui->usri3_password_expired) ? "yes\n" : "no\n");
   printf ("Latest password change     : %s", ctime(&t));
-  ret = NetUserModalsGet (NULL, 0, (void *) &mi);
+  ret = NetUserModalsGet (server, 0, (void *) &mi);
   if (! ret)
     {
       if (mi->usrmod0_max_passwd_age == TIMEQ_FOREVER)
@@ -208,12 +210,12 @@ PrintPW (PUSER_INFO_3 ui)
 }
 
 int
-SetModals (int xarg, int narg, int iarg, int Larg)
+SetModals (int xarg, int narg, int iarg, int Larg, LPCWSTR server)
 {
   int ret;
   PUSER_MODALS_INFO_0 mi;
 
-  ret = NetUserModalsGet (NULL, 0, (void *) &mi);
+  ret = NetUserModalsGet (server, 0, (void *) &mi);
   if (! ret)
     {
       if (xarg == 0)
@@ -237,7 +239,7 @@ SetModals (int xarg, int narg, int iarg, int Larg)
       if (Larg >= 0)
 	mi->usrmod0_min_passwd_len = Larg;
 
-      ret = NetUserModalsSet (NULL, 0, (LPBYTE) mi, NULL);
+      ret = NetUserModalsSet (server, 0, (LPBYTE) mi, NULL);
       NetApiBufferFree (mi);
     }
   return EvalRet (ret, NULL);
@@ -270,6 +272,8 @@ usage (FILE * stream, int status)
   "  -L, --length LEN         set system minimum password length to LEN.\n"
   "\n"
   "Other options:\n"
+  "  -d, --logonserver SERVER connect to SERVER (e.g. domain controller).\n"
+  "                           default server is the content of $LOGONSERVER.\n"
   "  -S, --status             display password status for USER (locked, expired,\n"
   "                           etc.) plus global system password settings.\n"
   "  -h, --help               output usage information and exit.\n"
@@ -313,7 +317,7 @@ main (int argc, char **argv)
   char user[64], oldpwd[64], newpwd[64];
   int ret = 0;
   int cnt = 0;
-  int opt;
+  int opt, len;
   int Larg = -1;
   int xarg = -1;
   int narg = -1;
@@ -328,6 +332,7 @@ main (int argc, char **argv)
   int Popt = 0;
   int Sopt = 0;
   PUSER_INFO_3 ui, li;
+  LPWSTR server = NULL;
 
   prog_name = strrchr (argv[0], '/');
   if (prog_name == NULL)
@@ -388,6 +393,20 @@ main (int argc, char **argv)
 	Copt = 1;
         break;
 
+      case 'd':
+        {
+	  char *tmpbuf = alloca (strlen (optarg) + 3);
+	  tmpbuf[0] = '\0';
+	  if (*optarg != '\\')
+	    strcpy (tmpbuf, "\\\\");
+	  strcat (tmpbuf, optarg);
+	  server = alloca ((strlen (tmpbuf) + 1) * sizeof (WCHAR));
+	  if (MultiByteToWideChar (CP_ACP, 0, tmpbuf, -1, server,
+				   strlen (tmpbuf) + 1) <= 0)
+	    server = NULL;
+	}
+	break;
+
       case 'e':
 	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt)
 	  usage (stderr, 1);
@@ -445,20 +464,32 @@ main (int argc, char **argv)
       default:
         usage (stderr, 1);
       }
+
+  if (!server)
+    {
+      len = GetEnvironmentVariableW (L"LOGONSERVER", NULL, 0);
+      if (len > 0)
+	{
+	  server = alloca (len * sizeof (WCHAR));
+	  if (GetEnvironmentVariableW (L"LOGONSERVER", server, len) <= 0)
+	    server = NULL;
+	}
+    }
+
   if (Larg >= 0 || xarg >= 0 || narg >= 0 || iarg >= 0)
     {
       if (optind < argc)
         usage (stderr, 1);
-      return SetModals (xarg, narg, iarg, Larg);
+      return SetModals (xarg, narg, iarg, Larg, server);
     }
 
   strcpy (user, optind >= argc ? getlogin () : argv[optind]);
 
-  li = GetPW (getlogin (), 0);
+  li = GetPW (getlogin (), 0, server);
   if (! li)
     return 1;
 
-  ui = GetPW (user, 1);
+  ui = GetPW (user, 1, server);
   if (! ui)
     return 1;
 
@@ -492,12 +523,12 @@ main (int argc, char **argv)
 
       if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt)
 	{
-          ret = NetUserSetInfo (NULL, ui->usri3_name, 1008, (LPBYTE) &uif,
+          ret = NetUserSetInfo (server, ui->usri3_name, 1008, (LPBYTE) &uif,
 	  			NULL);
           return EvalRet (ret, NULL);
 	}
       // Sopt
-      PrintPW (ui);
+      PrintPW (ui, server);
       return 0;
     }
 
@@ -511,7 +542,7 @@ main (int argc, char **argv)
   if (li->usri3_priv != USER_PRIV_ADMIN)
     {
       strcpy (oldpwd, getpass ("Old password: "));
-      if (ChangePW (user, oldpwd, oldpwd, 1))
+      if (ChangePW (user, oldpwd, oldpwd, 1, server))
         return 1;
     }
 
@@ -520,7 +551,7 @@ main (int argc, char **argv)
       strcpy (newpwd, getpass ("New password: "));
       if (strcmp (newpwd, getpass ("Re-enter new password: ")))
         eprint (0, "Password is not identical.");
-      else if (! ChangePW (user, *oldpwd ? oldpwd : NULL, newpwd, 0))
+      else if (! ChangePW (user, *oldpwd ? oldpwd : NULL, newpwd, 0, server))
         ret = 1;
       if (! ret && cnt < 2)
         eprint (0, "Try again.");

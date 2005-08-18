@@ -1,7 +1,20 @@
+2005-08-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* passwd.c (longopts): Add --logonserver option.
+	(opts): Add -d option.
+	(GetPW): Add server parameter which is given to Net functions.
+	(ChangePW): Ditto.
+	(PrintPW): Ditto.
+	(SetModals): Ditto.
+	(usage): Add description for -d/--logonserver option.
+	(main): Add option handling for -d/--logonserver.  Use LOGONSERVER
+	environment variable content for server to contact, unless
+	-d/--logonserver option is given.  If both is missing, use NULL.
+
 2005-08-16  Brian Dessent  <brian@dessent.net>
 
-        * cygcheck.cc (dump_sysinfo_services): Properly null-terminate 'buf'.
-        Avoid extraneous cygrunsrv invocation if 'verbose' is true.
+	* cygcheck.cc (dump_sysinfo_services): Properly null-terminate 'buf'.
+	Avoid extraneous cygrunsrv invocation if 'verbose' is true.
 
 2005-08-03  Corinna Vinschen  <corinna@vinschen.de>
 
