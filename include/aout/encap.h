@@ -85,7 +85,6 @@ struct coffheader
    
 #define COFF_MAGIC_I386 0514 /* I386MAGIC */
 #define COFF_MAGIC_M68K 0520 /* MC68MAGIC */
-#define	COFF_MAGIC_A29K 0x17A	/* Used by asm29k cross-tools */
 
 #ifdef COFF_MAGIC
 short __header_offset_temp;

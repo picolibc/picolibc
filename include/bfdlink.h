@@ -510,8 +510,7 @@ struct bfd_link_callbacks
      const char *name, const char *reloc_name, bfd_vma addend,
      bfd *abfd, asection *section, bfd_vma address);
   /* A function which is called when a dangerous reloc is performed.
-     The canonical example is an a29k IHCONST reloc which does not
-     follow an IHIHALF reloc.  MESSAGE is an appropriate message.
+     MESSAGE is an appropriate message.
      ABFD, SECTION and ADDRESS identify the location at which the
      problem occurred; if this is the result of a
      bfd_section_reloc_link_order or bfd_symbol_reloc_link_order, then
