@@ -944,6 +944,7 @@ class fhandler_tty_common: public fhandler_termios
   tty *get_ttyp () { return (tty *) tc; }
 
   int close ();
+  _off64_t lseek (_off64_t, int);
   void set_close_on_exec (bool val);
   void fixup_after_fork (HANDLE parent);
   select_record *select_read (select_record *s);
@@ -971,7 +972,6 @@ class fhandler_tty_slave: public fhandler_tty_common
   int dup (fhandler_base *child);
   void fixup_after_fork (HANDLE parent);
 
-  _off64_t lseek (_off64_t, int) { return 0; }
   select_record *select_read (select_record *s);
   int cygserver_attach_tty (HANDLE*, HANDLE*);
   int get_unit ();
@@ -1002,7 +1002,6 @@ public:
   int tcflush (int);
   int ioctl (unsigned int cmd, void *);
 
-  _off64_t lseek (_off64_t, int) { return 0; }
   char *ptsname ();
 
   void set_close_on_exec (bool val);

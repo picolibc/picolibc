@@ -1180,6 +1180,13 @@ fhandler_pty_master::open (int flags, mode_t)
   return 1;
 }
 
+_off64_t
+fhandler_tty_common::lseek (_off64_t, int)
+{
+  set_errno (ESPIPE);
+  return -1;
+}
+
 int
 fhandler_tty_common::close ()
 {

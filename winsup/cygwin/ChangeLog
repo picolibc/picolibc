@@ -1,3 +1,10 @@
+2005-08-18  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler.h (fhandler_tty_common::lseek): Declare new method.
+	(fhandler_tty_slave::lseek): Delete old method.
+	(fhandler_tty_master::lseek): Delete old method.
+	* fhandler_tty.cc (fhandler_tty_common::lseek): Define new method.
+
 2005-08-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::recvfrom): Always initialize
