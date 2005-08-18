@@ -1004,7 +1004,7 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
 			   struct sockaddr *from, int *fromlen)
 {
   int res = SOCKET_ERROR;
-  DWORD ret;
+  DWORD ret = 0;
 
   flags &= MSG_WINMASK;
   if (!winsock2_active)
@@ -1016,7 +1016,7 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
       WSABUF wsabuf = { len, (char *) ptr };
 
       if (is_nonblocking () || closed () || async_io ())
-	res = WSARecvFrom (get_socket (), &wsabuf, 1, (ret = 0, &ret),
+	res = WSARecvFrom (get_socket (), &wsabuf, 1, &ret,
 			   (DWORD *) &flags, from, fromlen, NULL, NULL);
       else
 	{
@@ -1136,10 +1136,10 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
 	while (wsaptr != wsabuf);
       }
 
-      DWORD ret;
+      DWORD ret = 0;
 
       if (is_nonblocking () || closed () || async_io ())
-	res = WSARecvFrom (get_socket (), wsabuf, iovcnt, (ret = 0, &ret),
+	res = WSARecvFrom (get_socket (), wsabuf, iovcnt, &ret,
 			   (DWORD *) &flags, from, fromlen, NULL, NULL);
       else
 	{
