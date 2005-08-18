@@ -1,3 +1,7 @@
+2005-08-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* errno.cc (strerror): Check errnum for underflow.
+
 2005-08-17  Christopher Faylor  <cgf@timesys.com>
 
 	* dcrt0.cc (dll_crt0_1): Tweak debugging stuff.

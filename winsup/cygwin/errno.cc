@@ -330,7 +330,7 @@ extern "C" char *
 strerror (int errnum)
 {
   const char *error;
-  if (errnum < _sys_nerr)
+  if (errnum >= 0 && errnum < _sys_nerr)
     error = _sys_errlist [errnum];
   else
     {
