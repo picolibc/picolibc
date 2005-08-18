@@ -1,3 +1,7 @@
+2005-08-18  Alan Modra  <amodra@bigpond.net.au>
+
+	* a29k.h: Delete.
+
 2005-07-14  Daniel Marques  <marques@cs.cornell.edu>
 
 	* alpha.h (ALPHA_ECOFF_COMPRESSEDMAG): Define.

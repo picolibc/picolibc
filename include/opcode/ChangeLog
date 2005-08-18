@@ -1,3 +1,7 @@
+2005-08-18  Alan Modra  <amodra@bigpond.net.au>
+
+	* a29k.h: Delete.
+
 2005-08-15  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* ppc.h (PPC_OPCODE_E300): Define.
