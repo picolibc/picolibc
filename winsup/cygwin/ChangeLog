@@ -1,5 +1,11 @@
 2005-08-19  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler.h (dirent_states): Add dirent_saw_proc.
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir): Fill in "proc"
+	if it is the root dir and it is missing.
+
+2005-08-19  Christopher Faylor  <cgf@timesys.com>
+
 	* fhandler.h (dirent_states): Add dirent_isroot, dirent_saw_cygdrive,
 	dirent_saw_dev.
 	* dir.cc (opendir): Don't zero __flags here.  Push that responsibility

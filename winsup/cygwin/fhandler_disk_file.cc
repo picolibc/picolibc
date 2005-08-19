@@ -1379,6 +1379,11 @@ fhandler_disk_file::readdir (DIR *dir)
 	  strcpy (buf.cFileName, "dev");
 	  added = true;
 	}
+      else if (!(dir->__flags & dirent_saw_proc))
+	{
+	  strcpy (buf.cFileName, "proc");
+	  added = true;
+	}
       else if (!(dir->__flags & dirent_saw_cygdrive)
 	       && mount_table->cygdrive_len > 1)
 	{
@@ -1425,12 +1430,12 @@ fhandler_disk_file::readdir (DIR *dir)
     fnunmunge (dir->__d_dirent->d_name, buf.cFileName);
   else
     strcpy (dir->__d_dirent->d_name, buf.cFileName);
-  if (!(dir->__flags && dirent_isroot))
-    /* nothing */;
-  else
+  if (dir->__flags && dirent_isroot)
     {
       if (strcasematch (dir->__d_dirent->d_name, "dev"))
 	dir->__flags |= dirent_saw_dev;
+      else if (strcasematch (dir->__d_dirent->d_name, "proc"))
+	dir->__flags |= dirent_saw_proc;
       if (strlen (dir->__d_dirent->d_name) == mount_table->cygdrive_len - 2
 	  && strncasematch (dir->__d_dirent->d_name, mount_table->cygdrive + 1,
 			    mount_table->cygdrive_len - 2))
