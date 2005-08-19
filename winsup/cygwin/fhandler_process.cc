@@ -200,8 +200,12 @@ DIR *
 fhandler_process::opendir ()
 {
   DIR *dir = fhandler_virtual::opendir ();
-  if (dir && fileid == PROCESS_FD)
-    fill_filebuf ();
+  if (dir)
+    {
+      if (fileid == PROCESS_FD)
+	fill_filebuf ();
+      dir->__flags = 0;
+    }
   return dir;
 }
 

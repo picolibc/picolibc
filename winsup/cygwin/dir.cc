@@ -59,7 +59,7 @@ opendir (const char *name)
     }
 
   if (res)
-    res->__flags = 0;
+    /* nothing */;
   else if (fh)
     delete fh;
   return res;
@@ -169,7 +169,7 @@ seekdir64 (DIR *dir, _off64_t loc)
 
   if (dir->__d_cookie != __DIRENT_COOKIE)
     return;
-  dir->__flags = 0;
+  dir->__flags &= dirent_isroot;
   return ((fhandler_base *) dir->__fh)->seekdir (dir, loc);
 }
 
@@ -190,7 +190,7 @@ rewinddir (DIR *dir)
 
   if (dir->__d_cookie != __DIRENT_COOKIE)
     return;
-  dir->__flags = 0;
+  dir->__flags &= dirent_isroot;
   return ((fhandler_base *) dir->__fh)->rewinddir (dir);
 }
 

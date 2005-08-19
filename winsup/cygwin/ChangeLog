@@ -1,5 +1,20 @@
 2005-08-19  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler.h (dirent_states): Add dirent_isroot, dirent_saw_cygdrive,
+	dirent_saw_dev.
+	* dir.cc (opendir): Don't zero __flags here.  Push that responsibility
+	to opendir methods.
+	(seekdir): Preserve dirent_isrrot in __flags.
+	(rewinddir): Ditto.
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Set
+	dirent_isroot appropriately.
+	(fhandler_disk_file::readdir): Fill in "cygdrive" and "dev" if it is
+	the root dir and they are missing.
+	* fhandler_process.cc (fhandler_process::opendir): Set __flags here.
+	* fhandler_virtual.cc (fhandler_virtual::opendir): Set __flags here.
+
+2005-08-19  Christopher Faylor  <cgf@timesys.com>
+
 	* winsup.h (create_pipe): Declare new function.
 	(CreatePipe): New define.
 	* miscfuncs.cc (create_pipe): Define new function.

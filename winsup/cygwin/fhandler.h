@@ -40,10 +40,13 @@ struct __acl32;
 
 enum dirent_states
 {
-  dirent_ok = 0,
-  dirent_saw_dot = 1,
-  dirent_saw_dot_dot = 2,
-  dirent_saw_eof = 4
+  dirent_ok		= 0x0000,
+  dirent_saw_dot	= 0x0001,
+  dirent_saw_dot_dot	= 0x0002,
+  dirent_saw_eof	= 0x0004,
+  dirent_isroot		= 0x0008,
+  dirent_saw_cygdrive	= 0x0010,
+  dirent_saw_dev	= 0x0020
 };
 
 enum conn_state

@@ -84,6 +84,7 @@ fhandler_virtual::opendir ()
 	  dir->__d_dirhash = get_namehash ();
 	  dir->__flags = dirent_saw_dot | dirent_saw_dot_dot;
 	  res = dir;
+	  res->__flags = 0;
 	}
     }
 

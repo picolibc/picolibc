@@ -1287,6 +1287,7 @@ fhandler_disk_file::opendir ()
   DIR *dir;
   DIR *res = NULL;
   size_t len;
+  path_conv rootdir ("/");
 
   if (!pc.isdir ())
     set_errno (ENOTDIR);
@@ -1332,7 +1333,7 @@ fhandler_disk_file::opendir ()
       dir->__d_dirhash = get_namehash ();
 
       res = dir;
-
+      dir->__flags = strcasematch (pc, rootdir) ? dirent_isroot : 0;
     }
 
   syscall_printf ("%p = opendir (%s)", res, get_name ());
@@ -1370,15 +1371,36 @@ fhandler_disk_file::readdir (DIR *dir)
     return res;
   else if (!FindNextFileA (dir->__handle, &buf))
     {
-      DWORD lasterr = GetLastError ();
-      FindClose (dir->__handle);
-      dir->__handle = INVALID_HANDLE_VALUE;
-      /* POSIX says you shouldn't set errno when readdir can't
-	 find any more files; so, if another error we leave it set. */
-      if (lasterr != ERROR_NO_MORE_FILES)
-	  seterrno_from_win_error (__FILE__, __LINE__, lasterr);
-      syscall_printf ("%p = readdir (%p)", res, dir);
-      return res;
+      bool added = false;
+      if (!(dir->__flags & dirent_isroot))
+	/* nothing */;
+      else if (!(dir->__flags & dirent_saw_dev))
+	{
+	  strcpy (buf.cFileName, "dev");
+	  added = true;
+	}
+      else if (!(dir->__flags & dirent_saw_cygdrive)
+	       && mount_table->cygdrive_len > 1)
+	{
+	  strcpy (buf.cFileName, mount_table->cygdrive + 1);
+	  buf.cFileName[mount_table->cygdrive_len - 2] = '\0';
+	  added = true;
+	}
+
+      if (added)
+	buf.dwFileAttributes = 0;
+      else
+	{
+	  DWORD lasterr = GetLastError ();
+	  FindClose (dir->__handle);
+	  dir->__handle = INVALID_HANDLE_VALUE;
+	  /* POSIX says you shouldn't set errno when readdir can't
+	     find any more files; so, if another error we leave it set. */
+	  if (lasterr != ERROR_NO_MORE_FILES)
+	      seterrno_from_win_error (__FILE__, __LINE__, lasterr);
+	  syscall_printf ("%p = readdir (%p)", res, dir);
+	  return res;
+	}
     }
 
   /* Check for Windows shortcut. If it's a Cygwin or U/WIN
@@ -1403,11 +1425,22 @@ fhandler_disk_file::readdir (DIR *dir)
     fnunmunge (dir->__d_dirent->d_name, buf.cFileName);
   else
     strcpy (dir->__d_dirent->d_name, buf.cFileName);
+  if (!(dir->__flags && dirent_isroot))
+    /* nothing */;
+  else
+    {
+      if (strcasematch (dir->__d_dirent->d_name, "dev"))
+	dir->__flags |= dirent_saw_dev;
+      if (strlen (dir->__d_dirent->d_name) == mount_table->cygdrive_len - 2
+	  && strncasematch (dir->__d_dirent->d_name, mount_table->cygdrive + 1,
+			    mount_table->cygdrive_len - 2))
+	dir->__flags |= dirent_saw_cygdrive;
+    }
 
   dir->__d_position++;
   res = dir->__d_dirent;
-  syscall_printf ("%p = readdir (%p) (%s)",
-		  &dir->__d_dirent, dir, buf.cFileName);
+  syscall_printf ("%p = readdir (%p) (%s)", &dir->__d_dirent, dir,
+		  buf.cFileName);
   return res;
 }
 
