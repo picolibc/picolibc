@@ -1,3 +1,9 @@
+2005-08-19  Christopher Faylor  <cgf@timesys.com>
+
+	* winsup.h (create_pipe): Declare new function.
+	(CreatePipe): New define.
+	* miscfuncs.cc (create_pipe): Define new function.
+
 2005-08-18  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler.h (fhandler_tty_common::lseek): Declare new method.
