@@ -1,3 +1,10 @@
+2005-08-19  DJ Delorie  <dj@redhat.com>
+
+	* m32c/Makefile.in (m16cmon.ld, m32cmon.ld): Fix output names.
+	(*.o): Add dependencies.
+	* m32c/m32csys.h: Move syscall location to 0x400 as per Renesas
+	recommendations.
+
 2005-08-11  DJ Delorie  <dj@redhat.com>
 
 	* m32c/Makefile.in: Block out memory regions reserved for monitors

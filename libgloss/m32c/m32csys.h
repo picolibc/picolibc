@@ -32,12 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "syscall.h"
 
+/* Both the simulators and monitors reserve RAM areas 0x400 through
+   0x4ff for their internal use.  We use one of those memory locations
+   as our system call trap.  */
+
 #define POUND #
-#if defined(__r8c_cpu__) || defined(__m16c_cpu__)
-#define SYSCALL(N) mov.b POUND N,r0l | ste.b r0l,0xe0000
-#else
-#define SYSCALL(N) mov.b POUND N,0xe0000
-#endif
+#define SYSCALL(N) mov.b POUND N,0x400
 
 #define SYS__exit SYS_exit
 

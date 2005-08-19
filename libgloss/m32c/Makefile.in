@@ -125,10 +125,10 @@ m32c.ld : $(GDEP)
 
 
 m16cmon.ld : $(GDEP)
-	$(GS) m16c  0x400  0x100  0xff600    0x800  0xfff
+	$(GS) m16cmon  0x400  0x100  0xff600    0x800  0xfff
 
 m32cmon.ld : $(GDEP)
-	$(GS) m16c  0x400  0x100 0xfff600    0x800 0xffff
+	$(GS) m32cmon  0x400  0x100 0xfff600    0x800 0xffff
 
 
 sim8.ld : $(GDEP)
@@ -140,6 +140,32 @@ sim16.ld : $(GDEP)
 sim24.ld : $(GDEP)
 	$(GS) sim24 0x200000 0x800000   0        0 0xffff
 
+# Dependencies
+
+SDEPS = $(srcdir)/m32csys.h $(srcdir)/../syscall.h
+
+abort.o : $(SDEPS)
+argv.o : $(SDEPS)
+argvlen.o : $(SDEPS)
+chdir.o : $(SDEPS)
+chmod.o : $(SDEPS)
+close.o : $(SDEPS)
+exit.o : $(SDEPS)
+fstat.o : $(SDEPS)
+getpid.o : $(SDEPS)
+gettimeofday.o : $(SDEPS)
+heaptop.o : $(SDEPS)
+kill.o : $(SDEPS)
+link.o : $(SDEPS)
+lseek.o : $(SDEPS)
+open.o : $(SDEPS)
+read.o : $(SDEPS)
+stat.o : $(SDEPS)
+time.o : $(SDEPS)
+times.o : $(SDEPS)
+unlink.o : $(SDEPS)
+utime.o : $(SDEPS)
+write.o : $(SDEPS)
 
 install: $(CRT) $(SIM_BSP) $(SCRIPTS)
 	for c in $(CRT) $(SIM_BSP); do \
