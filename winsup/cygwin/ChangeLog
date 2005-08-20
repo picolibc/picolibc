@@ -23,6 +23,7 @@
 	* fhandler_netdrive.cc (fhandler_netdrive::readdir): Ditto.
 	* fhandler_registry.cc (fhandler_registry::readdir): Ditto.
 	* fhandler_process.cc (fhandler_process::readdir): Ditto.
+	* include/sys/dirent.h (readdir_r): Add declaration.
 
 2005-08-19  Christopher Faylor  <cgf@timesys.com>
 
