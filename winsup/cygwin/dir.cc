@@ -65,53 +65,51 @@ opendir (const char *name)
   return res;
 }
 
-/* readdir: POSIX 5.1.2.1 */
-extern "C" struct dirent *
-readdir (DIR *dir)
+int
+readdir_worker (DIR *dir, dirent *de)
 {
   myfault efault;
-  if (efault.faulted (EFAULT))
-    return NULL;
+  if (efault.faulted ())
+    return EFAULT;
 
   if (dir->__d_cookie != __DIRENT_COOKIE)
     {
-      set_errno (EBADF);
       syscall_printf ("%p = readdir (%p)", NULL, dir);
-      return NULL;
+      return EBADF;
     }
 
-  dirent *res = ((fhandler_base *) dir->__fh)->readdir (dir);
-
-  if (!res)
-    {
-      if (!(dir->__flags & dirent_saw_dot))
-	{
-	  res = dir->__d_dirent;
-	  strcpy (res->d_name, ".");
-	  dir->__flags |= dirent_saw_dot;
-	  dir->__d_position++;
-	}
-      else if (!(dir->__flags & dirent_saw_dot_dot))
-	{
-	  res = dir->__d_dirent;
-	  strcpy (res->d_name, "..");
-	  dir->__flags |= dirent_saw_dot_dot;
-	  dir->__d_position++;
-	}
-    }
+  int res = ((fhandler_base *) dir->__fh)->readdir (dir, de);
 
   if (res)
     {
+      if (!(dir->__flags & dirent_saw_dot))
+	{
+	  strcpy (de->d_name, ".");
+	  dir->__flags |= dirent_saw_dot;
+	  dir->__d_position++;
+	  res = 0;
+	}
+      else if (!(dir->__flags & dirent_saw_dot_dot))
+	{
+	  strcpy (de->d_name, "..");
+	  dir->__flags |= dirent_saw_dot_dot;
+	  dir->__d_position++;
+	  res = 0;
+	}
+    }
+
+  if (!res)
+    {
       /* Compute d_ino by combining filename hash with the directory hash
 	 (which was stored in dir->__d_dirhash when opendir was called). */
-      if (res->d_name[0] == '.')
+      if (de->d_name[0] == '.')
 	{
-	  if (res->d_name[1] == '\0')
+	  if (de->d_name[1] == '\0')
 	    {
-	      dir->__d_dirent->d_ino = dir->__d_dirhash;
+	      de->d_ino = dir->__d_dirhash;
 	      dir->__flags |= dirent_saw_dot;
 	    }
-	  else if (res->d_name[1] != '.' || res->d_name[2] != '\0')
+	  else if (de->d_name[1] != '.' || de->d_name[2] != '\0')
 	    goto hashit;
 	  else
 	    {
@@ -122,11 +120,11 @@ readdir (DIR *dir)
 		goto hashit;
 	      *p = '\0';
 	      if (!(p = strrchr (up, '\\')))
-		dir->__d_dirent->d_ino = hash_path_name (0, ".");
+		de->d_ino = hash_path_name (0, ".");
 	      else
 		{
 		  *p = '\0';
-		  dir->__d_dirent->d_ino = hash_path_name (0, up);
+		  de->d_ino = hash_path_name (0, up);
 		}
 	    }
 	}
@@ -134,9 +132,36 @@ readdir (DIR *dir)
 	{
       hashit:
 	  __ino64_t dino = hash_path_name (dir->__d_dirhash, "\\");
-	  dir->__d_dirent->d_ino = hash_path_name (dino, res->d_name);
+	  de->d_ino = hash_path_name (dino, de->d_name);
 	}
-      res->__ino32 = dir->__d_dirent->d_ino;	// for legacy applications
+      de->__ino32 = de->d_ino;	// for legacy applications
+    }
+  return res;
+}
+
+/* readdir: POSIX 5.1.2.1 */
+extern "C" struct dirent *
+readdir (DIR *dir)
+{
+  int res = readdir_worker (dir, dir->__d_dirent);
+  if (res == 0)
+    return dir->__d_dirent;
+  if (res != ENMFILE)
+    set_errno (res);
+  return NULL;
+}
+
+extern "C" int
+readdir_r (DIR *dir, dirent *de, dirent **ode)
+{
+  int res = readdir_worker (dir, de);
+  if (!res)
+    *ode = de;
+  else
+    {
+      *ode = NULL;
+      if (res != ENMFILE)
+	res = 0;
     }
   return res;
 }

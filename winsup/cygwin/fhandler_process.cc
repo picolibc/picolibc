@@ -209,30 +209,28 @@ fhandler_process::opendir ()
   return dir;
 }
 
-struct dirent *
-fhandler_process::readdir (DIR * dir)
+int
+fhandler_process::readdir (DIR *dir, dirent *de)
 {
+  int res = ENMFILE;
   if (fileid == PROCESS_FD)
     {
       if (dir->__d_position >= 2 + filesize / sizeof (int))
-	return NULL;
+	goto out;
     }
   else if (dir->__d_position >= PROCESS_LINK_COUNT)
-    return NULL;
+    goto out;
   if (fileid == PROCESS_FD && dir->__d_position > 1)
     {
       int *p = (int *) filebuf;
-      __small_sprintf (dir->__d_dirent->d_name, "%d", p[dir->__d_position++ - 2]);
-      syscall_printf ("%p = readdir (%p) (%s)", &dir->__d_dirent, dir,
-		      dir->__d_dirent->d_name);
+      __small_sprintf (de->d_name, "%d", p[dir->__d_position++ - 2]);
     }
   else
-    {
-      strcpy (dir->__d_dirent->d_name, process_listing[dir->__d_position++]);
-      syscall_printf ("%p = readdir (%p) (%s)", &dir->__d_dirent, dir,
-		      dir->__d_dirent->d_name);
-    }
-  return dir->__d_dirent;
+    strcpy (de->d_name, process_listing[dir->__d_position++]);
+  res = 0;
+out:
+  syscall_printf ("%d = readdir (%p, %p) (%s)", dir, de, de->d_name);
+  return res;
 }
 
 int

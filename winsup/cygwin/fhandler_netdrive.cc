@@ -147,12 +147,13 @@ fhandler_netdrive::fstat (struct __stat64 *buf)
   return 0;
 }
 
-struct dirent *
-fhandler_netdrive::readdir (DIR *dir)
+int
+fhandler_netdrive::readdir (DIR *dir, dirent *de)
 {
   DWORD size;
   NETRESOURCE *nro;
   DWORD ret;
+  int res;
 
   if (!dir->__d_position)
     {
@@ -167,8 +168,8 @@ fhandler_netdrive::readdir (DIR *dir)
 	  size = MAX_COMPUTERNAME_LENGTH + 1;
 	  if (!GetComputerName (namebuf + 2, &size))
 	    {
-	      __seterrno ();
-	      return NULL;
+	      res = geterrno_from_win_error ();
+	      goto out;
 	    }
 	}
       else
@@ -189,24 +190,26 @@ fhandler_netdrive::readdir (DIR *dir)
 				    &nr, &dir->__handle, 0, "WNetOpenEnum");
       if (ret != NO_ERROR)
 	{
-	  __seterrno_from_win_error (ret);
 	  dir->__handle = INVALID_HANDLE_VALUE;
-	  return NULL;
+	  res = geterrno_from_win_error (ret);
+	  goto out;
 	}
     }
   ret = create_thread_and_wait (GET_RESOURCE_ENUM, dir->__handle,
 				nro = (LPNETRESOURCE) alloca (16384),
 				16384, "WnetEnumResource");
   if (ret != NO_ERROR)
+    res = geterrno_from_win_error (ret);
+  else
     {
-      if (ret != ERROR_NO_MORE_ITEMS)
-	__seterrno_from_win_error (ret);
-      return NULL;
+      dir->__d_position++;
+      char *bs = strrchr (nro->lpRemoteName, '\\');
+      strcpy (de->d_name, bs ? bs + 1 : nro->lpRemoteName);
+      res = 0;
     }
-  dir->__d_position++;
-  char *bs = strrchr (nro->lpRemoteName, '\\');
-  strcpy (dir->__d_dirent->d_name, bs ? bs + 1 : nro->lpRemoteName);
-  return dir->__d_dirent;
+out:
+  syscall_printf ("%d = readdir (%p, %p)", res, dir, de);
+  return res;
 }
 
 void
@@ -216,7 +219,7 @@ fhandler_netdrive::seekdir (DIR *dir, _off64_t pos)
   if (pos < 0)
     return;
   while (dir->__d_position < pos)
-    if (!readdir (dir))
+    if (!readdir (dir, dir->__d_dirent))
       break;
 }
 

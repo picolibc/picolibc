@@ -354,7 +354,7 @@ class fhandler_base
   virtual int mkdir (mode_t mode);
   virtual int rmdir ();
   virtual DIR *opendir ();
-  virtual dirent *readdir (DIR *);
+  virtual int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   virtual _off64_t telldir (DIR *);
   virtual void seekdir (DIR *, _off64_t);
   virtual void rewinddir (DIR *);
@@ -674,7 +674,7 @@ class fhandler_disk_file: public fhandler_base
   int mkdir (mode_t mode);
   int rmdir ();
   DIR *opendir ();
-  struct dirent *readdir (DIR *);
+  int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   _off64_t telldir (DIR *);
   void seekdir (DIR *, _off64_t);
   void rewinddir (DIR *);
@@ -692,7 +692,7 @@ class fhandler_cygdrive: public fhandler_disk_file
  public:
   fhandler_cygdrive ();
   DIR *opendir ();
-  struct dirent *readdir (DIR *);
+  int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   void rewinddir (DIR *);
   int closedir (DIR *);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
@@ -1202,7 +1202,7 @@ class fhandler_proc: public fhandler_virtual
  public:
   fhandler_proc ();
   int exists();
-  struct dirent *readdir (DIR *);
+  int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   static DWORD get_proc_fhandler(const char *path);
 
   int open (int flags, mode_t mode = 0);
@@ -1215,7 +1215,7 @@ class fhandler_netdrive: public fhandler_virtual
  public:
   fhandler_netdrive ();
   int exists();
-  struct dirent *readdir (DIR *);
+  int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   void seekdir (DIR *, _off64_t);
   void rewinddir (DIR *);
   int closedir (DIR *);
@@ -1230,7 +1230,7 @@ class fhandler_registry: public fhandler_proc
  public:
   fhandler_registry ();
   int exists();
-  struct dirent *readdir (DIR *);
+  int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   _off64_t telldir (DIR *);
   void seekdir (DIR *, _off64_t);
   void rewinddir (DIR *);
@@ -1250,7 +1250,7 @@ class fhandler_process: public fhandler_proc
   fhandler_process ();
   int exists();
   DIR *opendir ();
-  struct dirent *readdir (DIR *);
+  int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   int open (int flags, mode_t mode = 0);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   bool fill_filebuf ();

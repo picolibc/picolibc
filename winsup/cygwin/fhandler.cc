@@ -1538,11 +1538,10 @@ fhandler_base::opendir ()
   return NULL;
 }
 
-struct dirent *
-fhandler_base::readdir (DIR *)
+int
+fhandler_base::readdir (DIR *, dirent *)
 {
-  set_errno (ENOTDIR);
-  return NULL;
+  return ENOTDIR;
 }
 
 _off64_t

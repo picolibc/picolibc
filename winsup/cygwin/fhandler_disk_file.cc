@@ -1348,27 +1348,29 @@ free_dir:
   return res;
 }
 
-struct dirent *
-fhandler_disk_file::readdir (DIR *dir)
+int
+fhandler_disk_file::readdir (DIR *dir, dirent *de)
 {
   WIN32_FIND_DATA buf;
   HANDLE handle;
-  struct dirent *res = NULL;
+  int res;
 
-  if (dir->__handle == INVALID_HANDLE_VALUE
-      && dir->__d_position == 0)
+  if (dir->__handle == INVALID_HANDLE_VALUE && dir->__d_position == 0)
     {
       handle = FindFirstFileA (dir->__d_dirname, &buf);
       DWORD lasterr = GetLastError ();
       dir->__handle = handle;
       if (handle == INVALID_HANDLE_VALUE && (lasterr != ERROR_NO_MORE_FILES))
 	{
-	  seterrno_from_win_error (__FILE__, __LINE__, lasterr);
-	  return res;
+	  res = geterrno_from_win_error ();
+	  goto out;
 	}
     }
   else if (dir->__handle == INVALID_HANDLE_VALUE)
-    return res;
+    {
+      res = EBADF;
+      goto out;
+    }
   else if (!FindNextFileA (dir->__handle, &buf))
     {
       bool added = false;
@@ -1396,15 +1398,10 @@ fhandler_disk_file::readdir (DIR *dir)
 	buf.dwFileAttributes = 0;
       else
 	{
-	  DWORD lasterr = GetLastError ();
+	  res = geterrno_from_win_error ();
 	  FindClose (dir->__handle);
 	  dir->__handle = INVALID_HANDLE_VALUE;
-	  /* POSIX says you shouldn't set errno when readdir can't
-	     find any more files; so, if another error we leave it set. */
-	  if (lasterr != ERROR_NO_MORE_FILES)
-	      seterrno_from_win_error (__FILE__, __LINE__, lasterr);
-	  syscall_printf ("%p = readdir (%p)", res, dir);
-	  return res;
+	  goto out;
 	}
     }
 
@@ -1427,25 +1424,25 @@ fhandler_disk_file::readdir (DIR *dir)
 
   /* We get here if `buf' contains valid data.  */
   if (pc.isencoded ())
-    fnunmunge (dir->__d_dirent->d_name, buf.cFileName);
+    fnunmunge (de->d_name, buf.cFileName);
   else
-    strcpy (dir->__d_dirent->d_name, buf.cFileName);
+    strcpy (de->d_name, buf.cFileName);
   if (dir->__flags && dirent_isroot)
     {
-      if (strcasematch (dir->__d_dirent->d_name, "dev"))
+      if (strcasematch (de->d_name, "dev"))
 	dir->__flags |= dirent_saw_dev;
-      else if (strcasematch (dir->__d_dirent->d_name, "proc"))
+      else if (strcasematch (de->d_name, "proc"))
 	dir->__flags |= dirent_saw_proc;
-      if (strlen (dir->__d_dirent->d_name) == mount_table->cygdrive_len - 2
-	  && strncasematch (dir->__d_dirent->d_name, mount_table->cygdrive + 1,
+      if (strlen (de->d_name) == mount_table->cygdrive_len - 2
+	  && strncasematch (de->d_name, mount_table->cygdrive + 1,
 			    mount_table->cygdrive_len - 2))
 	dir->__flags |= dirent_saw_cygdrive;
     }
 
   dir->__d_position++;
-  res = dir->__d_dirent;
-  syscall_printf ("%p = readdir (%p) (%s)", &dir->__d_dirent, dir,
-		  buf.cFileName);
+  res = 0;
+out:
+  syscall_printf ("%d = readdir (%p) (%s)", dir, &de, de->d_name);
   return res;
 }
 
@@ -1526,24 +1523,23 @@ fhandler_cygdrive::opendir ()
   return dir;
 }
 
-struct dirent *
-fhandler_cygdrive::readdir (DIR *dir)
+int
+fhandler_cygdrive::readdir (DIR *dir, dirent *de)
 {
   if (!pdrive || !*pdrive)
-    return NULL;
+    return ENMFILE;
   if (GetFileAttributes (pdrive) == INVALID_FILE_ATTRIBUTES)
     {
       pdrive = strchr (pdrive, '\0') + 1;
-      return readdir (dir);
+      return readdir (dir, de);
     }
 
-  *dir->__d_dirent->d_name = cyg_tolower (*pdrive);
-  dir->__d_dirent->d_name[1] = '\0';
+  *de->d_name = cyg_tolower (*pdrive);
+  de->d_name[1] = '\0';
   dir->__d_position++;
   pdrive = strchr (pdrive, '\0') + 1;
-  syscall_printf ("%p = readdir (%p) (%s)", &dir->__d_dirent, dir,
-		  dir->__d_dirent->d_name);
-  return dir->__d_dirent;
+  syscall_printf ("%p = readdir (%p) (%s)", &de, dir, de->d_name);
+  return 0;
 }
 
 void

@@ -1120,6 +1120,7 @@ read SIGFE
 _read = read SIGFE
 readdir SIGFE
 _readdir = readdir SIGFE
+readdir_r = readdir SIGFE
 readlink SIGFE
 _readlink = readlink SIGFE
 readv SIGFE

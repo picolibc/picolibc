@@ -1,3 +1,29 @@
+2005-08-20  Christopher Faylor  <cgf@timesys.com>
+
+	* cygerrno.h (geterrno_from_win_error): Change declaration to default
+	to using GetLastError and EACCESS.
+	* cygwin.din: Export readdir_r.
+	* include/cygwin/version.h: Bump API version number to 138.
+	* syscalls.cc (readdir_worker): New function, renamed from old
+	readdir() function.
+	(readdir): Use readdir_worker.
+	(readdir_r): New function.
+	* fhandler.h (fhandler_base::readdir): Accommodate second argument
+	indicating dirent buffer.
+	(fhandler_disk_file::readdir): Ditto.
+	(fhandler_cygdrive::readdir): Ditto.
+	(fhandler_proc::readdir): Ditto.
+	(fhandler_netdrive::readdir): Ditto.
+	(fhandler_registry::readdir): Ditto.
+	(fhandler_process::readdir): Ditto.
+	* fhandler.cc (fhandler_base::readdir): Ditto.
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir): Ditto.
+	* fhandler_cygdrive.cc (fhandler_cygdrive::readdir): Ditto.
+	* fhandler_proc.cc (fhandler_proc::readdir): Ditto.
+	* fhandler_netdrive.cc (fhandler_netdrive::readdir): Ditto.
+	* fhandler_registry.cc (fhandler_registry::readdir): Ditto.
+	* fhandler_process.cc (fhandler_process::readdir): Ditto.
+
 2005-08-19  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler.h (dirent_states): Add dirent_saw_proc.

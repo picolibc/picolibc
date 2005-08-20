@@ -273,26 +273,25 @@ fhandler_registry::fstat (struct __stat64 *buf)
   return 0;
 }
 
-struct dirent *
-fhandler_registry::readdir (DIR * dir)
+int
+fhandler_registry::readdir (DIR *dir, dirent *de)
 {
   DWORD buf_size = CYG_MAX_PATH;
   char buf[buf_size];
   HANDLE handle;
-  struct dirent *res = NULL;
   const char *path = dir->__d_dirname + proc_len + 1 + registry_len;
   LONG error;
+  int res = ENMFILE;
 
   if (*path == 0)
     {
       if (dir->__d_position >= ROOT_KEY_COUNT)
 	goto out;
-      strcpy (dir->__d_dirent->d_name, registry_listing[dir->__d_position++]);
-      res = dir->__d_dirent;
+      strcpy (de->d_name, registry_listing[dir->__d_position++]);
+      res = 0;
       goto out;
     }
-  if (dir->__handle == INVALID_HANDLE_VALUE
-      && dir->__d_position == 0)
+  if (dir->__handle == INVALID_HANDLE_VALUE && dir->__d_position == 0)
     {
       handle = open_key (path + 1, KEY_READ, false);
       dir->__handle = handle;
@@ -301,9 +300,8 @@ fhandler_registry::readdir (DIR * dir)
     goto out;
   if (dir->__d_position < SPECIAL_DOT_FILE_COUNT)
     {
-      strcpy (dir->__d_dirent->d_name,
-	      special_dot_files[dir->__d_position++]);
-      res = dir->__d_dirent;
+      strcpy (de->d_name, special_dot_files[dir->__d_position++]);
+      res = 0;
       goto out;
     }
 retry:
@@ -338,16 +336,16 @@ retry:
 
   /* We get here if `buf' contains valid data.  */
   if (*buf == 0)
-    strcpy (dir->__d_dirent->d_name, DEFAULT_VALUE_NAME);
+    strcpy (de->d_name, DEFAULT_VALUE_NAME);
   else
-    strcpy (dir->__d_dirent->d_name, buf);
+    strcpy (de->d_name, buf);
 
   dir->__d_position++;
   if (dir->__d_position & REG_ENUM_VALUES_MASK)
     dir->__d_position += 0x10000;
-  res = dir->__d_dirent;
+  res = 0;
 out:
-  syscall_printf ("%p = readdir (%p)", &dir->__d_dirent, dir);
+  syscall_printf ("%d = readdir (%p, %p)", res, dir, de);
   return res;
 }
 
@@ -365,7 +363,7 @@ fhandler_registry::seekdir (DIR * dir, _off64_t loc)
    */
   rewinddir (dir);
   while (loc > (dir->__d_position & REG_POSITION_MASK))
-    if (!readdir (dir))
+    if (!readdir (dir, dir->__d_dirent))
       break;
 }
 

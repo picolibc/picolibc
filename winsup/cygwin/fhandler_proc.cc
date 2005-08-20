@@ -195,27 +195,32 @@ fhandler_proc::fstat (struct __stat64 *buf)
   return -1;
 }
 
-struct dirent *
-fhandler_proc::readdir (DIR * dir)
+int
+fhandler_proc::readdir (DIR *dir, dirent *de)
 {
-  if (dir->__d_position >= PROC_LINK_COUNT)
+  int res;
+  if (dir->__d_position < PROC_LINK_COUNT)
+    {
+      strcpy (de->d_name, proc_listing[dir->__d_position++]);
+      res = 0;
+    }
+  else
     {
       winpids pids ((DWORD) 0);
       int found = 0;
+      res = ENMFILE;
       for (unsigned i = 0; i < pids.npids; i++)
 	if (found++ == dir->__d_position - PROC_LINK_COUNT)
 	  {
-	    __small_sprintf (dir->__d_dirent->d_name, "%d", pids[i]->pid);
+	    __small_sprintf (de->d_name, "%d", pids[i]->pid);
 	    dir->__d_position++;
-	    return dir->__d_dirent;
+	    res = 0;
+	    break;
 	  }
-      return NULL;
     }
 
-  strcpy (dir->__d_dirent->d_name, proc_listing[dir->__d_position++]);
-  syscall_printf ("%p = readdir (%p) (%s)", &dir->__d_dirent, dir,
-		  dir->__d_dirent->d_name);
-  return dir->__d_dirent;
+  syscall_printf ("%d = readdir (%p, %p) (%s)", res, dir, de, de->d_name);
+  return res;
 }
 
 int
