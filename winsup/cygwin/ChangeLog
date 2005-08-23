@@ -1,3 +1,21 @@
+2005-08-23  Christopher Faylor  <cgf@timesys.com>
+
+	* sigproc.h (set_signal_mask): Remove default on second parameter and
+	make pass by reference.
+	* signal.cc (abort): Accommodate change to set_signal_mask.
+	* select.cc (pselect): Ditto.
+	* exceptions.cc (handle_sigsuspend): Ditto.
+	(ctrl_c_handler): Ditto.
+	(sighold): Ditto.
+	(sigrelse): Ditto.
+	(set_process_mask_delta): Ditto.
+	(_cygtls::call_signal_handler): Ditto.
+
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir): Return ENMFILE
+	if __handle is not set.  Set __handle to NULL when out of files.
+	(fhandler_disk_file::rewinddir): Don't close handle if it's NULL.
+	(fhandler_disk_file::closedir): Ditto.
+
 2005-08-22  Christopher Faylor  <cgf@timesys.com>
 
 	* dir.cc (readdir_worker): Make static.  Only add '.' and '..' when

@@ -592,7 +592,7 @@ handle_sigsuspend (sigset_t tempmask)
 {
   sigset_t oldmask = myself->getsigmask ();	// Remember for restoration
 
-  set_signal_mask (tempmask, oldmask);
+  set_signal_mask (tempmask, myself->getsigmask ());
   sigproc_printf ("oldmask %p, newmask %p", oldmask, tempmask);
 
   pthread_testcancel ();
@@ -910,7 +910,7 @@ ctrl_c_handler (DWORD type)
 extern "C" void __stdcall
 set_process_mask (sigset_t newmask)
 {
-  set_signal_mask (newmask);
+  set_signal_mask (newmask, myself->getsigmask ());
 }
 
 extern "C" int
@@ -926,7 +926,7 @@ sighold (int sig)
   mask_sync.acquire (INFINITE);
   sigset_t mask = myself->getsigmask ();
   sigaddset (&mask, sig);
-  set_signal_mask (mask);
+  set_signal_mask (mask, myself->getsigmask ());
   mask_sync.release ();
   return 0;
 }
@@ -944,7 +944,7 @@ sigrelse (int sig)
   mask_sync.acquire (INFINITE);
   sigset_t mask = myself->getsigmask ();
   sigdelset (&mask, sig);
-  set_signal_mask (mask);
+  set_signal_mask (mask, myself->getsigmask ());
   mask_sync.release ();
   return 0;
 }
@@ -973,14 +973,14 @@ set_process_mask_delta ()
 /* Set the signal mask for this process.
    Note that some signals are unmaskable, as in UNIX.  */
 extern "C" void __stdcall
-set_signal_mask (sigset_t newmask, sigset_t oldmask)
+set_signal_mask (sigset_t newmask, sigset_t& oldmask)
 {
   mask_sync.acquire (INFINITE);
   newmask &= ~SIG_NONMASKABLE;
   sigset_t mask_bits = oldmask & ~newmask;
   sigproc_printf ("oldmask %p, newmask %p, mask_bits %p", oldmask, newmask,
 		  mask_bits);
-  myself->setsigmask (newmask);	// Set a new mask
+  oldmask = newmask;
   if (mask_bits)
     sig_dispatch_pending (true);
   else
@@ -1225,7 +1225,7 @@ _cygtls::call_signal_handler ()
       sig = 0;
       sigfunc (thissig);
       incyg++;
-      set_signal_mask (this_oldmask);
+      set_signal_mask (this_oldmask, myself->getsigmask ());
       if (this_errno >= 0)
 	set_errno (this_errno);
     }

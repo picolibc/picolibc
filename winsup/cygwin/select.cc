@@ -175,11 +175,11 @@ pselect(int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       tv.tv_usec = ts->tv_nsec / 1000;
     }
   if (set)
-    set_signal_mask (*set);
+    set_signal_mask (*set, myself->getsigmask ());
   int ret = cygwin_select (maxfds, readfds, writefds, exceptfds,
 			   ts ? &tv : NULL);
   if (set)
-    set_signal_mask (oldset);
+    set_signal_mask (oldset, myself->getsigmask ());
   return ret;
 }
 

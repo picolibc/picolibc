@@ -329,7 +329,7 @@ abort (void)
   sigset_t sig_mask;
   sigfillset (&sig_mask);
   sigdelset (&sig_mask, SIGABRT);
-  set_signal_mask (sig_mask);
+  set_signal_mask (sig_mask, myself->getsigmask ());
 
   raise (SIGABRT);
   _my_tls.call_signal_handler (); /* Call any signal handler */

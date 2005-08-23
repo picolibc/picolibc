@@ -56,7 +56,7 @@ extern HANDLE sigCONT;
 
 void __stdcall sig_dispatch_pending (bool fast = false);
 #ifdef _PINFO_H
-extern "C" void __stdcall set_signal_mask (sigset_t newmask, sigset_t = myself->getsigmask ());
+extern "C" void __stdcall set_signal_mask (sigset_t newmask, sigset_t&);
 #endif
 int __stdcall handle_sigprocmask (int sig, const sigset_t *set,
 				  sigset_t *oldset, sigset_t& opmask)

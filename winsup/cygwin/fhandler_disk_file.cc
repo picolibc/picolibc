@@ -1355,6 +1355,11 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
   HANDLE handle;
   int res;
 
+  if (!dir->__handle)
+    {
+      res = ENMFILE;
+      goto out;
+    }
   if (dir->__handle == INVALID_HANDLE_VALUE && dir->__d_position == 0)
     {
       handle = FindFirstFileA (dir->__d_dirname, &buf);
@@ -1399,11 +1404,8 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
       else
 	{
 	  res = geterrno_from_win_error ();
-	  if (res != ENMFILE)
-	    {
-	      FindClose (dir->__handle);
-	      dir->__handle = INVALID_HANDLE_VALUE;
-	    }
+	  FindClose (dir->__handle);
+	  dir->__handle = NULL;
 	  goto out;
 	}
     }
@@ -1469,7 +1471,8 @@ fhandler_disk_file::rewinddir (DIR *dir)
 {
   if (dir->__handle != INVALID_HANDLE_VALUE)
     {
-      FindClose (dir->__handle);
+      if (dir->__handle)
+	FindClose (dir->__handle);
       dir->__handle = INVALID_HANDLE_VALUE;
     }
   dir->__d_position = 0;
@@ -1479,8 +1482,8 @@ int
 fhandler_disk_file::closedir (DIR *dir)
 {
   int res = 0;
-  if (dir->__handle != INVALID_HANDLE_VALUE &&
-      FindClose (dir->__handle) == 0)
+  if (dir->__handle && dir->__handle != INVALID_HANDLE_VALUE
+      && FindClose (dir->__handle) == 0)
     {
       __seterrno ();
       res = -1;
