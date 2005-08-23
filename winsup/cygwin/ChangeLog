@@ -1,3 +1,10 @@
+2005-08-22  Christopher Faylor  <cgf@timesys.com>
+
+	* dir.cc (readdir_worker): Make static.  Only add '.' and '..' when
+	readdir fails due to ENMFILE.
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir): Only close
+	handle on error != ENMFILE.
+
 2005-08-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mtinfo.h (mtinfo_drive::error): Fix argument bug in debug_printf call.

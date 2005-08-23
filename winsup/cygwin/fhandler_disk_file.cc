@@ -1399,8 +1399,11 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
       else
 	{
 	  res = geterrno_from_win_error ();
-	  FindClose (dir->__handle);
-	  dir->__handle = INVALID_HANDLE_VALUE;
+	  if (res != ENMFILE)
+	    {
+	      FindClose (dir->__handle);
+	      dir->__handle = INVALID_HANDLE_VALUE;
+	    }
 	  goto out;
 	}
     }

@@ -65,7 +65,7 @@ opendir (const char *name)
   return res;
 }
 
-int
+static int
 readdir_worker (DIR *dir, dirent *de)
 {
   myfault efault;
@@ -80,7 +80,7 @@ readdir_worker (DIR *dir, dirent *de)
 
   int res = ((fhandler_base *) dir->__fh)->readdir (dir, de);
 
-  if (res)
+  if (res == ENMFILE)
     {
       if (!(dir->__flags & dirent_saw_dot))
 	{
