@@ -1,5 +1,12 @@
 2005-08-24  Christopher Faylor  <cgf@timesys.com>
 
+	* spawn.cc (perhaps_suffix): Record errno-type error value in third
+	argument.
+	(find_exec): On error, set errno returned from perhaps_suffix.
+	(spawn_guts): Ditto.
+
+2005-08-24  Christopher Faylor  <cgf@timesys.com>
+
 	* fhandler_virtual.cc (fhandler_virtual::close): Don't free filebuf if
 	it's NULL.
 	* pinfo.cc (_pinfo::commune_send): Fix test for incorrect number of

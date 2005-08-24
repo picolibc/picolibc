@@ -54,15 +54,24 @@ DWORD dwExeced;
    Returns (possibly NULL) suffix */
 
 static const char *
-perhaps_suffix (const char *prog, path_conv& buf)
+perhaps_suffix (const char *prog, path_conv& buf, int& err)
 {
   char *ext;
 
+  err = 0;
   debug_printf ("prog '%s'", prog);
-  buf.check (prog, PC_SYM_FOLLOW, std_suffixes);
+  buf.check (prog, PC_SYM_FOLLOW | PC_NULLEMPTY, std_suffixes);
 
-  if (!buf.exists () || buf.isdir ())
-    ext = NULL;
+  if (buf.isdir ())
+    {
+      err = EACCES;
+      ext = NULL;
+    }
+  else if (!buf.exists ())
+    {
+      err = ENOENT;
+      ext = NULL;
+    }
   else if (buf.known_suffix)
     ext = (char *) buf + (buf.known_suffix - buf.get_win32 ());
   else
@@ -90,12 +99,13 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
   char tmp[CYG_MAX_PATH];
   const char *posix = (opt & FE_NATIVE) ? NULL : name;
   bool has_slash = strchr (name, '/');
+  int err;
 
   /* Check to see if file can be opened as is first.
      Win32 systems always check . first, but PATH may not be set up to
      do this. */
   if ((has_slash || opt & FE_CWD)
-      && (suffix = perhaps_suffix (name, buf)) != NULL)
+      && (suffix = perhaps_suffix (name, buf, err)) != NULL)
     {
       if (posix && !has_slash)
 	{
@@ -149,7 +159,7 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
 
       debug_printf ("trying %s", tmp);
 
-      if ((suffix = perhaps_suffix (tmp, buf)) != NULL)
+      if ((suffix = perhaps_suffix (tmp, buf, err)) != NULL)
 	{
 	  if (posix == tmp)
 	    {
@@ -181,6 +191,8 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
   debug_printf ("%s = find_exec (%s)", (char *) buf, name);
   if (known_suffix)
     *known_suffix = suffix ?: strchr (buf, '\0');
+  if (!retval && err)
+    set_errno (err);
   return retval;
 }
 
@@ -450,10 +462,11 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       goto skip_arg_parsing;
     }
 
+  int err;
   const char *ext;
-  if ((ext = perhaps_suffix (prog_arg, real_path)) == NULL)
+  if ((ext = perhaps_suffix (prog_arg, real_path, err)) == NULL)
     {
-      set_errno (ENOENT);
+      set_errno (err);
       res = -1;
       goto out;
     }
