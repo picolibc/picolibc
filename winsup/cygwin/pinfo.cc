@@ -727,9 +727,9 @@ _pinfo::commune_send (DWORD code, ...)
 	res.s = NULL;
       else
 	{
-	  res.s = (char *) malloc (n);
+	  res.s = (char *) cmalloc (HEAP_COMMUNE, n);
 	  char *p;
-	  for (p = res.s; ReadFile (fromthem, p, n, &nr, NULL); p += nr)
+	  for (p = res.s; n && ReadFile (fromthem, p, n, &nr, NULL); p += nr, n -= nr)
 	    continue;
 	  if ((unsigned) (p - res.s) != n)
 	    {
@@ -817,9 +817,9 @@ _pinfo::fd (int fd, size_t &n)
     {
       cygheap_fdget cfd (fd);
       if (cfd < 0)
-	s = strdup ("");
+	s = cstrdup ("");
       else
-	s = cfd->get_proc_fd_name ((char *) malloc (CYG_MAX_PATH));
+	s = cfd->get_proc_fd_name ((char *) cmalloc (HEAP_COMMUNE, CYG_MAX_PATH));
       n = strlen (s) + 1;
     }
   return s;
@@ -845,7 +845,7 @@ _pinfo::fds (size_t &n)
       while ((fd = cfd.next ()) >= 0)
 	n += sizeof (int);
       cfd.rewind ();
-      s = (char *) malloc (n);
+      s = (char *) cmalloc (HEAP_COMMUNE, n);
       int *p = (int *) s;
       while ((fd = cfd.next ()) >= 0 && (char *) p - s < (int) n)
 	*p++ = fd;
@@ -868,9 +868,9 @@ _pinfo::root (size_t& n)
   else
     {
       if (cygheap->root.exists ())
-	s = strdup (cygheap->root.posix_path ());
+	s = cstrdup (cygheap->root.posix_path ());
       else
-	s = strdup ("/");
+	s = cstrdup ("/");
       n = strlen (s) + 1;
     }
   return s;
@@ -890,7 +890,7 @@ _pinfo::cwd (size_t& n)
     }
   else
     {
-      s = (char *) malloc (CYG_MAX_PATH);
+      s = (char *) cmalloc (HEAP_COMMUNE, CYG_MAX_PATH);
       cygheap->cwd.get (s, 1, 1, CYG_MAX_PATH);
       n = strlen (s) + 1;
     }
@@ -915,7 +915,7 @@ _pinfo::cmdline (size_t& n)
       for (char **a = __argv; *a; a++)
 	n += strlen (*a) + 1;
       char *p;
-      p = s = (char *) malloc (n);
+      p = s = (char *) cmalloc (HEAP_COMMUNE, n);
       for (char **a = __argv; *a; a++)
 	{
 	  strcpy (p, *a);

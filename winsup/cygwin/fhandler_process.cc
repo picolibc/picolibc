@@ -351,13 +351,13 @@ fhandler_process::fill_filebuf ()
 	if (!fdp || *++fdp == 'f') /* The "fd" directory itself. */
 	  {
 	    if (filebuf)
-	      free (filebuf);
+	      cfree (filebuf);
 	    filebuf = p->fds (fs);
 	  }
 	else
 	  {
 	    if (filebuf)
-	      free (filebuf);
+	      cfree (filebuf);
 	    int fd = atoi (fdp);
 	    if (fd < 0 || (fd == 0 && !isdigit (*fdp)))
 	      {
@@ -381,7 +381,7 @@ fhandler_process::fill_filebuf ()
     case PROCESS_CTTY:
     case PROCESS_PPID:
       {
-	filebuf = (char *) realloc (filebuf, bufalloc = 40);
+	filebuf = (char *) crealloc (filebuf, bufalloc = 40);
 	int num;
 	switch (fileid)
 	  {
@@ -416,7 +416,10 @@ fhandler_process::fill_filebuf ()
     case PROCESS_CMDLINE:
       {
 	if (filebuf)
-	  free (filebuf);
+	  {
+	    cfree (filebuf);
+	    filebuf = NULL;
+	  }
 	size_t fs;
 	switch (fileid)
 	  {
@@ -433,7 +436,7 @@ fhandler_process::fill_filebuf ()
 	filesize = fs;
 	if (!filebuf || !*filebuf)
 	  {
-	    filebuf = strdup ("<defunct>");
+	    filebuf = cstrdup ("<defunct>");
 	    filesize = strlen (filebuf) + 1;
 	  }
 	break;
@@ -441,7 +444,7 @@ fhandler_process::fill_filebuf ()
     case PROCESS_EXENAME:
     case PROCESS_EXE:
       {
-	filebuf = (char *) realloc (filebuf, bufalloc = CYG_MAX_PATH);
+	filebuf = (char *) crealloc (filebuf, bufalloc = CYG_MAX_PATH);
 	if (p->process_state & PID_EXITED)
 	  strcpy (filebuf, "<defunct>");
 	else
@@ -460,7 +463,7 @@ fhandler_process::fill_filebuf ()
       }
     case PROCESS_WINPID:
       {
-	filebuf = (char *) realloc (filebuf, bufalloc = 40);
+	filebuf = (char *) crealloc (filebuf, bufalloc = 40);
 	__small_sprintf (filebuf, "%d\n", p->dwProcessId);
 	filesize = strlen (filebuf);
 	break;
@@ -468,7 +471,7 @@ fhandler_process::fill_filebuf ()
     case PROCESS_WINEXENAME:
       {
 	int len = strlen (p->progname);
-	filebuf = (char *) realloc (filebuf, bufalloc = (len + 2));
+	filebuf = (char *) crealloc (filebuf, bufalloc = (len + 2));
 	strcpy (filebuf, p->progname);
 	filebuf[len] = '\n';
 	filesize = len + 1;
@@ -476,25 +479,25 @@ fhandler_process::fill_filebuf ()
       }
     case PROCESS_STATUS:
       {
-	filebuf = (char *) realloc (filebuf, bufalloc = 2048);
+	filebuf = (char *) crealloc (filebuf, bufalloc = 2048);
 	filesize = format_process_status (*p, filebuf, bufalloc);
 	break;
       }
     case PROCESS_STAT:
       {
-	filebuf = (char *) realloc (filebuf, bufalloc = 2048);
+	filebuf = (char *) crealloc (filebuf, bufalloc = 2048);
 	filesize = format_process_stat (*p, filebuf, bufalloc);
 	break;
       }
     case PROCESS_STATM:
       {
-	filebuf = (char *) realloc (filebuf, bufalloc = 2048);
+	filebuf = (char *) crealloc (filebuf, bufalloc = 2048);
 	filesize = format_process_statm (*p, filebuf, bufalloc);
 	break;
       }
     case PROCESS_MAPS:
       {
-	filebuf = (char *) realloc (filebuf, bufalloc = 2048);
+	filebuf = (char *) crealloc (filebuf, bufalloc = 2048);
 	filesize = format_process_maps (*p, filebuf, bufalloc);
 	break;
       }
@@ -560,7 +563,7 @@ format_process_maps (_pinfo *p, char *&destbuf, size_t maxsize)
 	    st.st_ino = 0;
 	  }
 	if (len + strlen (posix_modname) + 62 > maxsize - 1)
-	  destbuf = (char *) realloc (destbuf, maxsize += 2048);
+	  destbuf = (char *) crealloc (destbuf, maxsize += 2048);
 	if (workingset)
 	  for (unsigned i = 1; i <= wset_size; ++i)
 	    {
@@ -914,7 +917,7 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
   VM_COUNTERS vmc;
   MEMORY_WORKING_SET_LIST *mwsl;
   ULONG n = 0x1000, length;
-  PULONG p = new ULONG[n];
+  PULONG p = (PULONG) malloc (sizeof (ULONG) * n);
   unsigned page_size = getpagesize ();
   hProcess = OpenProcess (PROCESS_QUERY_INFORMATION,
 			  FALSE, dwProcessId);
@@ -930,8 +933,9 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
 				      (PVOID) p,
 				      n * sizeof *p, &length)),
 	 (ret == STATUS_SUCCESS || ret == STATUS_INFO_LENGTH_MISMATCH) &&
-	 length >= n * sizeof *p)
-    delete [] p, p = new ULONG[n *= 2];
+	 length >= (n * sizeof (*p)))
+      p = (PULONG) realloc (p, n *= (2 * sizeof (ULONG)));
+
   if (ret != STATUS_SUCCESS)
     {
       debug_printf ("NtQueryVirtualMemory: ret %d, Dos(ret) %d",
@@ -945,17 +949,15 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
       ++*vmrss;
       unsigned flags = mwsl->WorkingSetList[i] & 0x0FFF;
       if (flags & (WSLE_PAGE_EXECUTE | WSLE_PAGE_SHAREABLE) == (WSLE_PAGE_EXECUTE | WSLE_PAGE_SHAREABLE))
-	  ++*vmlib;
+	++*vmlib;
       else if (flags & WSLE_PAGE_SHAREABLE)
-	  ++*vmshare;
+	++*vmshare;
       else if (flags & WSLE_PAGE_EXECUTE)
-	  ++*vmtext;
+	++*vmtext;
       else
-	  ++*vmdata;
+	++*vmdata;
     }
-  ret = NtQueryInformationProcess (hProcess,
-				   ProcessVmCounters,
-				   (PVOID) &vmc,
+  ret = NtQueryInformationProcess (hProcess, ProcessVmCounters, (PVOID) &vmc,
 				   sizeof vmc, NULL);
   if (ret != STATUS_SUCCESS)
     {
@@ -966,7 +968,7 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
     }
   *vmsize = vmc.PagefileUsage / page_size;
 out:
-  delete [] p;
+  free (p);
   CloseHandle (hProcess);
   return res;
 }

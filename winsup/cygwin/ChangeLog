@@ -1,3 +1,26 @@
+2005-08-24  Christopher Faylor  <cgf@timesys.com>
+
+	* cygheap.h (cygheap_types): Add HEAP_COMMUNE.
+	* fhandler_proc.cc: Use cygheap rather than user heap for allocation of
+	filebuf throughout.
+	* fhandler_registry.cc: Ditto.
+	* fhandler_virtual.cc: Ditto.
+	* fhandler_process.cc: Ditto.
+	(get_mem_values): Use malloc/realloc/free rather than new.
+	* pinfo.cc (_pinfo::commune_send): Allocate on cygwin heap rather than
+	user heap.  Avoid calling ReadFile when correct number of characters
+	have been read or suffer buffer corruption.
+	(_pinfo::fd): Allocate on cygwin heap rather than user heap.
+	(_pinfo::fds): Ditto.
+	(_pinfo::root): Ditto.
+	(_pinfo::cwd): Ditto.
+	(_pinfo::cmdline): Ditto.
+
+	* devices.h (FH_DEV): New define.
+	* devices.in: Detect lone /dev.
+	* devices.cc: Regenerate.
+	* path.cc (path_conv::check): Treat FH_DEV as a special case.
+
 2005-08-23  Christopher Faylor  <cgf@timesys.com>
 
 	* sigproc.h (set_signal_mask): Remove default on second parameter and

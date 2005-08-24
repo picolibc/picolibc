@@ -20,6 +20,7 @@ enum cygheap_types
   HEAP_SIGS,
   HEAP_ARCHETYPES,
   HEAP_TLS,
+  HEAP_COMMUNE,
   HEAP_1_START,
   HEAP_1_HOOK,
   HEAP_1_STR,

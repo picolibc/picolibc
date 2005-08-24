@@ -24,6 +24,11 @@ const device dev_proc_storage =
 const device dev_netdrive_storage =
   {"", {FH_NETDRIVE}, ""};
 
+#if 0
+const device dev_dev_storage =
+  {"/dev", {FH_DEV}, "/dev"};
+#endif
+
 const device dev_registry_storage =
   {"", {FH_REGISTRY}, ""};
 
@@ -82,6 +87,7 @@ const device dev_bad_storage =
 "/dev/sd%{a-z}s", BRACK(FH_SD{uc $1}), "\\Device\\Harddisk{ord($1) - ord('a')}\\Partition0"
 "/dev/sd%{a-z}s%(1-15)d", BRACK(FH_SD{uc $1} | {$2}), "\\Device\\Harddisk{ord($1) - ord('a')}\\Partition{$2 % 16}"
 "/dev/kmsg", BRACK(FH_KMSG), "\\\\.\\mailslot\\cygwin\\dev\\kmsg"
+"/dev", BRACK(FH_DEV), "/dev"
 %other	{return	NULL;}
 %%
 #undef BRACK

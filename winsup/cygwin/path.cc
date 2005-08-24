@@ -634,9 +634,15 @@ path_conv::check (const char *src, unsigned opt,
 		fileattr = FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_READONLY;
 	      else
 		{
-		  dev.devn = FH_FS;
 		  fileattr = GetFileAttributes (this->path);
+		  dev.devn = FH_FS;
 		}
+	      goto out;
+	    }
+	  else if (dev == FH_DEV)
+	    {
+	      fileattr = FILE_ATTRIBUTE_DIRECTORY;
+	      dev.devn = FH_FS;
 	      goto out;
 	    }
 	  else if (isvirtual_dev (dev.devn))

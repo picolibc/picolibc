@@ -50,6 +50,7 @@ enum fh_devices
   FH_FS      = FHDEV (0, 247),	/* filesystem based device */
 
   FH_NETDRIVE= FHDEV (0, 246),
+  FH_DEV     = FHDEV (0, 245),
 
   DEV_FLOPPY_MAJOR = 2,
   FH_FLOPPY  = FHDEV (DEV_FLOPPY_MAJOR, 0),
