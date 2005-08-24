@@ -731,13 +731,13 @@ _pinfo::commune_send (DWORD code, ...)
 	  char *p;
 	  for (p = res.s; n && ReadFile (fromthem, p, n, &nr, NULL); p += nr, n -= nr)
 	    continue;
-	  if ((unsigned) (p - res.s) != n)
+	  if (n)
 	    {
 	      __seterrno ();
 	      goto err;
 	    }
+	  res.n = p - res.s;
 	}
-      res.n = n;
       break;
     case PICOM_FIFO:
       {

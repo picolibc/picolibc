@@ -169,8 +169,11 @@ fhandler_virtual::close ()
 {
   if (!hExeced)
     {
-      cfree (filebuf);
-      filebuf = NULL;
+      if (filebuf)
+	{
+	  cfree (filebuf);
+	  filebuf = NULL;
+	}
       bufalloc = (size_t) -1;
     }
   return 0;
