@@ -641,9 +641,13 @@ path_conv::check (const char *src, unsigned opt,
 	    }
 	  else if (dev == FH_DEV)
 	    {
-	      fileattr = FILE_ATTRIBUTE_DIRECTORY;
 	      dev.devn = FH_FS;
-	      goto out;
+	      fileattr = GetFileAttributes (this->path);
+	      if (!component && fileattr == INVALID_FILE_ATTRIBUTES)
+		{
+		  fileattr = FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_READONLY;
+		  goto out;
+		}
 	    }
 	  else if (isvirtual_dev (dev.devn))
 	    {
@@ -1053,7 +1057,7 @@ static bool
 win32_device_name (const char *src_path, char *win32_path, device& dev)
 {
   dev.parse (src_path);
-  if (dev.devn == FH_FS)
+  if (dev == FH_FS || dev == FH_DEV)
     return false;
   strcpy (win32_path, dev.native);
   return true;

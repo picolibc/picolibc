@@ -1,5 +1,12 @@
 2005-08-24  Christopher Faylor  <cgf@timesys.com>
 
+	* path.cc (path_conv::check): Fill in fileattr for /dev, defaulting to
+	directory if /dev doesn't actually exist.
+	(win32_device_name): Don't consider FH_DEV to be a device since it's
+	really a directory which should go through mount processing.
+
+2005-08-24  Christopher Faylor  <cgf@timesys.com>
+
 	* cygheap.h (cygheap_types): Add HEAP_COMMUNE.
 	* fhandler_proc.cc: Use cygheap rather than user heap for allocation of
 	filebuf throughout.
