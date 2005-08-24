@@ -3052,7 +3052,10 @@ extern "C" void
 endusershell ()
 {
   if (shell_fp)
-    fclose (shell_fp);
+    {
+      fclose (shell_fp);
+      shell_fp = NULL;
+    }
   shell_index = 0;
 }
 

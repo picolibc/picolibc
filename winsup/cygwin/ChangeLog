@@ -1,3 +1,8 @@
+2005-08-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (endusershell): Reset shell_fp to NULL to allow
+	subsequent getusershell calls.
+
 2005-08-24  Christopher Faylor  <cgf@timesys.com>
 
 	* path.cc (path_conv::check): Fill in fileattr for /dev, defaulting to
