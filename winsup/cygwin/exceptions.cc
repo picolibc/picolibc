@@ -590,6 +590,8 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
 int __stdcall
 handle_sigsuspend (sigset_t tempmask)
 {
+  if (&_my_tls != _main_tls)
+    Sleep (INFINITE);
   sigset_t oldmask = myself->getsigmask ();	// Remember for restoration
 
   set_signal_mask (tempmask, myself->getsigmask ());
@@ -911,6 +913,7 @@ extern "C" void __stdcall
 set_process_mask (sigset_t newmask)
 {
   set_signal_mask (newmask, myself->getsigmask ());
+sigproc_printf ("mask now %p\n", myself->getsigmask ());
 }
 
 extern "C" int
@@ -1014,9 +1017,12 @@ sigpacket::process ()
 
   myself->rusage_self.ru_nsignals++;
 
+  bool masked;
+  void *handler = (void *) thissig.sa_handler;
+
   if (si.si_signo == SIGKILL)
     goto exit_sig;
-  if ( si.si_signo == SIGSTOP)
+  if (si.si_signo == SIGSTOP)
     {
       sig_clear (SIGCONT);
       if (!tls)
@@ -1024,34 +1030,33 @@ sigpacket::process ()
       goto stop;
     }
 
-  bool masked;
-  bool special_case;
   bool insigwait_mask;
-  insigwait_mask = masked = false;
-  if (special_case = (/*VFORKPID || */ISSTATE (myself, PID_STOPPED)))
-    /* nothing to do */;
-  else if (tls && sigismember (&tls->sigwait_mask, si.si_signo))
-    insigwait_mask = true;
-  else if (!tls && (tls = _cygtls::find_tls (si.si_signo)))
-    insigwait_mask = true;
-  else if (!(masked = sigismember (mask, si.si_signo)) && tls)
-    masked  = sigismember (&tls->sigmask, si.si_signo);
+  if ((masked = ISSTATE (myself, PID_STOPPED)))
+    insigwait_mask = false;
+  else if (!tls)
+    insigwait_mask = !handler && (tls = _cygtls::find_tls (si.si_signo));
+  else
+    insigwait_mask = sigismember (&tls->sigwait_mask, si.si_signo);
 
   if (insigwait_mask)
     goto thread_specific;
 
+  if (masked)
+    /* nothing to do */;
+  else if (sigismember (mask, si.si_signo))
+    masked = true;
+  else if (tls)
+    masked  = sigismember (&tls->sigmask, si.si_signo);
+
   if (!tls)
     tls = _main_tls;
 
-  if (special_case || masked)
+  if (masked)
     {
       sigproc_printf ("signal %d blocked", si.si_signo);
       rc = -1;
       goto done;
     }
-
-  void *handler;
-  handler = (void *) thissig.sa_handler;
 
   /* Clear pending SIGCONT on stop signals */
   if (si.si_signo == SIGTSTP || si.si_signo == SIGTTIN || si.si_signo == SIGTTOU)

@@ -1,5 +1,15 @@
 2005-08-24  Christopher Faylor  <cgf@timesys.com>
 
+	* exceptions.cc (handle_sigsuspend): Just sleep forever if called from
+	non-main thread.
+	(sigpacket:process): Simplify logic which determines when and how a
+	signal is masked.  Don't trigger sigwait if there is a signal handler.
+	* sigproc.cc (wait_sig): Update comment.  Try to process a signal which
+	is in the queue if it isn't queued for the target thread (this is still
+	not right).
+
+2005-08-24  Christopher Faylor  <cgf@timesys.com>
+
 	* spawn.cc (perhaps_suffix): Record errno-type error value in third
 	argument.
 	(find_exec): On error, set errno returned from perhaps_suffix.
