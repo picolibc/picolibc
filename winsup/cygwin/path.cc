@@ -3653,24 +3653,43 @@ extern "C" char *
 realpath (const char *path, char *resolved)
 {
   extern suffix_info stat_suffixes[];
-  int err;
 
-  path_conv real_path (path, PC_SYM_FOLLOW, stat_suffixes);
-
-  if (real_path.error)
-    err = real_path.error;
-  else
+  /* Make sure the right errno is returned if path is NULL. */
+  if (!path)
     {
-      err = mount_table->conv_to_posix_path (real_path.get_win32 (), resolved, 0);
-      if (err == 0)
-	return resolved;
+      set_errno (EINVAL);
+      return NULL;
+    }
+
+  path_conv real_path (path, PC_SYM_FOLLOW | PC_POSIX, stat_suffixes);
+
+  /* Guard writing to a potentially invalid resolved. */
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return NULL;
+
+  /* Linux has this funny non-standard extension.  If "resolved" is NULL,
+     realpath mallocs the space by itself and returns it to the application.
+     The application is responsible for calling free() then.  This extension
+     is backed by POSIX, which allows implementation-defined behaviour if
+     "resolved" is NULL.  That's good enough for us to do the same here. */
+
+  if (!real_path.error && real_path.exists ())
+    {
+      if (!resolved)
+	{
+          resolved = (char *) malloc (strlen (real_path.normalized_path) + 1);
+          if (!resolved)
+	    return NULL;
+        }
+      return strcpy (resolved, real_path.normalized_path);
     }
 
   /* FIXME: on error, we are supposed to put the name of the path
      component which could not be resolved into RESOLVED.  */
-  resolved[0] = '\0';
-
-  set_errno (err);
+  if (resolved)
+    resolved[0] = '\0';
+  set_errno (real_path.error ?: ENOENT);
   return NULL;
 }
 
