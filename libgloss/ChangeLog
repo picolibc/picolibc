@@ -1,3 +1,7 @@
+2005-08-24  Aldy Hernandez  <aldyh@redhat.com>
+
+        * ms1/access.c: Change copyright notice.
+
 2005-08-19  DJ Delorie  <dj@redhat.com>
 
 	* m32c/Makefile.in (m16cmon.ld, m32cmon.ld): Fix output names.

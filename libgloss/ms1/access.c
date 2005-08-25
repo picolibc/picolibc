@@ -1,16 +1,15 @@
 /* This is file ACCESS.C */
 /*
-** Copyright (C) 1993 DJ Delorie, 24 Kirsten Ave, Rochester NH 03867-2954
-**
-** This file is distributed under the terms listed in the document
-** "copying.dj", available from DJ Delorie at the address above.
-** A copy of "copying.dj" should accompany this file; if not, a copy
-** should be available from where this file was obtained.  This file
-** may not be distributed without a verbatim copy of "copying.dj".
-**
-** This file is distributed WITHOUT ANY WARRANTY; without even the implied
-** warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-*/
+ * Copyright (C) 1993 DJ Delorie
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms is permitted
+ * provided that the above copyright notice and following paragraph are
+ * duplicated in all such forms.
+ *
+ * This file is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ */
 
 #include <fcntl.h>
 #include <sys/stat.h>
