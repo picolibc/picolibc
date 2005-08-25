@@ -6,10 +6,9 @@
    representation of the exception flags indicated by the argument
    excepts in the object pointed to by the argument flagp.  */
 
-int fegetexceptflag (fexcept_t * flagp, int excepts)
+void fegetexceptflag (fexcept_t * flagp, int excepts)
 {
   unsigned short _sw;
   __asm__ ("fnstsw %%ax;": "=a" (_sw));
   *flagp = _sw  & excepts & FE_ALL_EXCEPT;
-  return 0;
 }

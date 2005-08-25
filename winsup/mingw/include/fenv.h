@@ -65,10 +65,10 @@ extern "C" {
 /*TODO: Some of these could be inlined */
 /* 7.6.2 Exception */
 
-extern int __cdecl feclearexcept (int);
-extern int __cdecl fegetexceptflag (fexcept_t * flagp, int excepts);
-extern int __cdecl feraiseexcept (int excepts );
-extern int __cdecl fesetexceptflag (const fexcept_t *, int);
+extern void __cdecl feclearexcept (int);
+extern void __cdecl fegetexceptflag (fexcept_t * flagp, int excepts);
+extern void __cdecl feraiseexcept (int excepts );
+extern void __cdecl fesetexceptflag (const fexcept_t *, int);
 extern int __cdecl fetestexcept (int excepts);
 
 /* 7.6.3 Rounding */
@@ -78,9 +78,9 @@ extern int __cdecl fesetround (int mode);
 
 /* 7.6.4 Environment */
 
-extern int __cdecl fegetenv (fenv_t * envp);
-extern int __cdecl fesetenv (const fenv_t * );
-extern int __cdecl feupdateenv (const fenv_t *);
+extern void __cdecl fegetenv (fenv_t * envp);
+extern void __cdecl fesetenv (const fenv_t * );
+extern void __cdecl feupdateenv (const fenv_t *);
 extern int __cdecl feholdexcept (fenv_t *);
 
 #ifdef __cplusplus

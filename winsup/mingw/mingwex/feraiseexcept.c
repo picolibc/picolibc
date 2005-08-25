@@ -8,12 +8,11 @@
    the inexact exception whenever it raises the overflow
    or underflow exception is implementation-defined. */
 
-int feraiseexcept (int excepts)
+void feraiseexcept (int excepts)
 {
   fenv_t _env;
   __asm__ volatile ("fnstenv %0;" : "=m" (_env));
   _env.__status_word |= excepts & FE_ALL_EXCEPT;
   __asm__ volatile ("fldenv %0;"
 		    "fwait;" : : "m" (_env));
-  return 0;
 }

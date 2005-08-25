@@ -10,11 +10,10 @@
 
 /* FIXME: this works but surely there must be a better way.  */
 
-int feupdateenv (const fenv_t * envp)
+void feupdateenv (const fenv_t * envp)
 {
   unsigned int _fexcept = fetestexcept (FE_ALL_EXCEPT); /*save excepts */
   fesetenv (envp); /* install the env  */
   feraiseexcept (_fexcept); /* raise the execept */
-  return 0;
 }
 
