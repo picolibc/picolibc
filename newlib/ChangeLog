@@ -1,3 +1,7 @@
+2005-08-25  Christopher Faylor  <cgf@timesys.com>
+
+	* libc/include/string.h: For Cygwin, Define strerror_r as per ISO C.
+
 2005-08-22  Shaun Jackman  <sjackman@gmail.com>
 
 	* libc/include/_syslist.h: If HAVE_OPENDIR is not defined,
