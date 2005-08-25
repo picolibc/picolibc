@@ -13,7 +13,7 @@
 
 extern void (*_imp___fpreset)( void ) ;
 
-void fesetenv (const fenv_t * envp)
+int fesetenv (const fenv_t * envp)
 {
   if (envp == FE_PC64_ENV)
    /*
@@ -38,4 +38,6 @@ void fesetenv (const fenv_t * envp)
 
   else
     __asm__ ("fldenv %0;" : : "m" (*envp));
+
+  return 0;
 }

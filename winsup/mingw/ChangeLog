@@ -1,5 +1,24 @@
 2005-08-25  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* mingwex/fe*.c: Revert previous changes.
+	* include/fenv.h: Revert previous changes.
+
+2005-08-25  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/feclearexcept.c (feclearexcept): Change declaration.
+	Do not return a value.
+	* mingwex/fegetexceptflag.c (fegetexceptflag): Likewise.
+	* mingwex/feraiseexcept.c (feraiseexcept): Likewise.
+	* mingwex/fesetexceptflag.c (fesetexceptflag): Likewise.
+	* mingwex/fegetenv.c (fegetenv): Likewise.
+	* mingwex/fesetenv.c (fesetenv): Likewise.
+	* mingwex/feupdateenv.c (feupdateenv): Likewise.
+	* include/fenv.h (feclearexcept, fegetexceptflag, feraiseexcept,
+	fesetexceptflag, fegetenv, fesetenv, feupdateenv): Correct
+	prototypes.
+
+2005-08-25  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* mingwex/stdio/fseeko64.c (fseeko64): Flush stream before
 	getting filelength for SEEK_END.
 

@@ -9,7 +9,7 @@
    represented by the argument excepts. This function does not raise
    exceptions, but only sets the state of the flags. */ 
 
-void fesetexceptflag (const fexcept_t * flagp, int excepts) 
+int fesetexceptflag (const fexcept_t * flagp, int excepts) 
 { 
   fenv_t _env;
 
@@ -18,4 +18,5 @@ void fesetexceptflag (const fexcept_t * flagp, int excepts)
   _env.__status_word &= ~excepts;
   _env.__status_word |= (*flagp & excepts);
   __asm__ volatile ("fldenv %0;" : : "m" (_env));
+  return 0;
 }
