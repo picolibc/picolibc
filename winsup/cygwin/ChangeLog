@@ -1,3 +1,7 @@
+2005-08-25  Christopher Faylor  <cgf@timesys.com>
+
+	* errno.cc (errmap): Translate ERROR_NO_MORE_ITEMS to ENMFILE.
+
 2005-08-24  Christopher Faylor  <cgf@timesys.com>
 
 	* exceptions.cc (handle_sigsuspend): Just sleep forever if called from
