@@ -1089,18 +1089,29 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
   bool beg_src_slash = isdirsep (src[0]);
 
   tail = dst;
-  if (beg_src_slash && isdirsep (src[1]) && src[2])
+  if (beg_src_slash && isdirsep (src[1]))
     {
-      *tail++ = '\\';
-      src++;
-      if (src[1] == '.' && isdirsep (src[2]))
-	{
-	  *tail++ = '\\';
-	  *tail++ = '.';
+      if (isdirsep (src[2]))
+        {
+	  /* More than two slashes are just folded into one. */
 	  src += 2;
+	  while (isdirsep (src[1]))
+	    ++src;
+	}
+      else
+        {
+	  /* Two slashes start a network or device path. */
+	  *tail++ = '\\';
+	  src++;
+	  if (src[1] == '.' && isdirsep (src[2]))
+	    {
+	      *tail++ = '\\';
+	      *tail++ = '.';
+	      src += 2;
+	    }
 	}
     }
-  else if (!isdrive(src) && *src != '/')
+  if (tail == dst && !isdrive(src) && isdirsep (*src))
     {
       if (beg_src_slash)
 	tail += cygheap->cwd.get_drive (dst);
