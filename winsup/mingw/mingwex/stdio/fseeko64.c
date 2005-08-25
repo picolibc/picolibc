@@ -14,7 +14,11 @@ fseeko64 (FILE* stream, off64_t offset, int whence)
       pos += (fpos_t) offset;
     }
   else if (whence == SEEK_END)
-    pos = (fpos_t) (_filelengthi64 (_fileno (stream)) + offset);
+    {
+      /* If writing, we need to flush before getting file length.  */
+      fflush (stream);
+      pos = (fpos_t) (_filelengthi64 (_fileno (stream)) + offset);
+    }
   else if (whence == SEEK_SET)
     pos = (fpos_t) offset;
   else
@@ -24,4 +28,3 @@ fseeko64 (FILE* stream, off64_t offset, int whence)
     }
   return fsetpos (stream, &pos);
 }
-
