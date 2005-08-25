@@ -148,6 +148,28 @@ Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, US
 #define OP_MASK_EXTMSBD		0x1f	/* "ext" MSBD.  */
 #define OP_SH_EXTMSBD		11
 
+/* MIPS DSP ASE */
+#define OP_SH_DSPACC		11
+#define OP_MASK_DSPACC  	0x3
+#define OP_SH_DSPACC_S  	21
+#define OP_MASK_DSPACC_S	0x3
+#define OP_SH_DSPSFT		20
+#define OP_MASK_DSPSFT  	0x3f
+#define OP_SH_DSPSFT_7  	19
+#define OP_MASK_DSPSFT_7	0x7f
+#define OP_SH_SA3		21
+#define OP_MASK_SA3		0x7
+#define OP_SH_SA4		21
+#define OP_MASK_SA4		0xf
+#define OP_SH_IMM8		16
+#define OP_MASK_IMM8		0xff
+#define OP_SH_IMM10		16
+#define OP_MASK_IMM10		0x3ff
+#define OP_SH_WRDSP		11
+#define OP_MASK_WRDSP		0x3f
+#define OP_SH_RDDSP		16
+#define OP_MASK_RDDSP		0x3f
+
 #define	OP_OP_COP0		0x10
 #define	OP_OP_COP1		0x11
 #define	OP_OP_COP2		0x12
@@ -296,6 +318,19 @@ struct mips_opcode
    "Y"	MDMX source register (OP_*_FS)
    "Z"	MDMX source register (OP_*_FT)
 
+   DSP ASE usage:
+   "3" 3 bit unsigned immediate (OP_*_SA3)
+   "4" 4 bit unsigned immediate (OP_*_SA4)
+   "5" 8 bit unsigned immediate (OP_*_IMM8)
+   "6" 5 bit unsigned immediate (OP_*_RS)
+   "7" 2 bit dsp accumulator register (OP_*_DSPACC)
+   "8" 6 bit unsigned immediate (OP_*_WRDSP)
+   "9" 2 bit dsp accumulator register (OP_*_DSPACC_S)
+   "0" 6 bit signed immediate (OP_*_DSPSFT)
+   ":" 7 bit signed immediate (OP_*_DSPSFT_7)
+   "'" 6 bit unsigned immediate (OP_*_RDDSP)
+   "@" 10 bit signed immediate (OP_*_IMM10)
+
    Other:
    "()" parens surrounding optional value
    ","  separates operands
@@ -303,7 +338,8 @@ struct mips_opcode
    "+"  Start of extension sequence.
 
    Characters used so far, for quick reference when adding more:
-   "%[]<>(),+"
+   "34567890"
+   "%[]<>(),+:'@"
    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
    "abcdefhijklopqrstuvwxz"
 
@@ -413,6 +449,8 @@ struct mips_opcode
 /* Masks used for MIPS-defined ASEs.  */
 #define INSN_ASE_MASK		  0x0000f000
 
+/* DSP ASE */ 
+#define INSN_DSP                  0x00001000
 /* MIPS 16 ASE */
 #define INSN_MIPS16               0x00002000
 /* MIPS-3D ASE */

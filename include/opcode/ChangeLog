@@ -1,3 +1,14 @@
+2005-08-25  Chao-ying Fu  <fu@mips.com>
+
+	* mips.h (OP_SH_DSPACC, OP_MASK_DSPACC, OP_SH_DSPACC_S,
+	OP_MASK_DSPACC_S, OP_SH_DSPSFT, OP_MASK_DSPSFT, OP_SH_DSPSFT_7,
+	OP_MASK_DSPSFT_7, OP_SH_SA3, OP_MASK_SA3, OP_SH_SA4, OP_MASK_SA4,
+	OP_SH_IMM8, OP_MASK_IMM8, OP_SH_IMM10, OP_MASK_IMM10, OP_SH_WRDSP,
+	OP_MASK_WRDSP, OP_SH_RDDSP, OP_MASK_RDDSP): New define.
+	Document 3, 4, 5, 6, 7, 8, 9, 0, :, ', @ operand formats for DSP
+	instructions.
+	(INSN_DSP): New define for DSP ASE.
+
 2005-08-18  Alan Modra  <amodra@bigpond.net.au>
 
 	* a29k.h: Delete.
