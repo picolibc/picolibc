@@ -215,6 +215,7 @@ static int
 normalize_posix_path (const char *src, char *dst, char *&tail)
 {
   const char *in_src = src;
+  char *dst_start = dst;
   syscall_printf ("src %s", src);
 
   if (isdrive (src) || *src == '\\')
@@ -226,9 +227,11 @@ normalize_posix_path (const char *src, char *dst, char *&tail)
       if (!cygheap->cwd.get (dst))
 	return get_errno ();
       tail = strchr (tail, '\0');
+      if (isslash (dst[0]) && isslash (dst[1]))
+        ++dst_start;
       if (*src == '.')
 	{
-	  if (tail == dst + 1 && *dst == '/')
+	  if (tail == dst_start + 1 && *dst_start == '/')
 	     tail--;
 	  goto sawdot;
 	}
@@ -237,7 +240,10 @@ normalize_posix_path (const char *src, char *dst, char *&tail)
     }
   /* Two leading /'s?  If so, preserve them.  */
   else if (isslash (src[1]) && !isslash (src[2]))
-    *tail++ = *src++;
+    {
+      *tail++ = *src++;
+      ++dst_start;
+    }
 
   while (*src)
     {
@@ -271,7 +277,7 @@ normalize_posix_path (const char *src, char *dst, char *&tail)
 		break;
 	      else
 		{
-		  while (tail > dst && !isslash (*--tail))
+		  while (tail > dst_start && !isslash (*--tail))
 		    continue;
 		  src++;
 		}
@@ -1111,7 +1117,7 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
 	    }
 	}
     }
-  if (tail == dst && !isdrive(src) && isdirsep (*src))
+  if (tail == dst && !isdrive (src) && *src != '/')
     {
       if (beg_src_slash)
 	tail += cygheap->cwd.get_drive (dst);
@@ -3661,12 +3667,25 @@ realpath (const char *path, char *resolved)
       return NULL;
     }
 
-  path_conv real_path (path, PC_SYM_FOLLOW | PC_POSIX, stat_suffixes);
-
-  /* Guard writing to a potentially invalid resolved. */
+  /* Guard reading from a potentially invalid path and writing to a
+     potentially invalid resolved. */
   myfault efault;
   if (efault.faulted (EFAULT))
     return NULL;
+
+  char *tpath;
+  if (isdrive (path))
+    {
+      tpath = (char *) alloca (strlen (path)
+			       + strlen (mount_table->cygdrive)
+			       + 1);
+      mount_table->cygdrive_posix_path (path, tpath, 0);
+    }
+  else
+    tpath = (char *) path;
+
+  path_conv real_path (tpath, PC_SYM_FOLLOW | PC_POSIX, stat_suffixes);
+
 
   /* Linux has this funny non-standard extension.  If "resolved" is NULL,
      realpath mallocs the space by itself and returns it to the application.

@@ -90,6 +90,7 @@ class mount_info
   int remove_cygdrive_info_from_registry (const char *cygdrive_prefix, unsigned flags);
   int get_cygdrive_info (char *user, char *system, char* user_flags,
 			 char* system_flags);
+  void cygdrive_posix_path (const char *src, char *dst, int trailing_slash_p);
 
  private:
 
@@ -99,7 +100,6 @@ class mount_info
   void to_registry ();
 
   int cygdrive_win32_path (const char *src, char *dst, int& unit);
-  void cygdrive_posix_path (const char *src, char *dst, int trailing_slash_p);
   void read_cygdrive_info_from_registry ();
 };
 
