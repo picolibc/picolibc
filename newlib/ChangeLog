@@ -1,3 +1,7 @@
+2005-08-26  Christopher Faylor  <cgf@timesys.com>
+
+	* libc/include/string.h: Revert previous change.
+
 2005-08-25  Christopher Faylor  <cgf@timesys.com>
 
 	* libc/include/string.h: For Cygwin, Define strerror_r as per ISO C.
