@@ -1,3 +1,11 @@
+2005-08-26  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* Makefile.in: Remove extra anchor to make NN4 happy.
+	* faq.xml: Link to cygwin.com/license.html
+	* faq-resources.xml: Link instead of duplicating info.
+	* faq-using.xml: Split out services and network shares FAQ.
+	* faq-what.xml: Link to cygwin.com/license.html
+
 2005-08-17  Christopher Faylor  <cgf@timesys.com>
 
 	* textbinary.sgml: Correct incorrect information about ability to

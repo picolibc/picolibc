@@ -68,9 +68,11 @@ cygwin-api.sgml : cygwin-api.in.sgml ./doctool Makefile
 
 faq/faq.html :
 	-xmlto html -o faq -m $(srcdir)/cygwin.dsl $(srcdir)/faq-sections.xml
+	-sed -i 's;</a><a name="id[0-9]*"></a>;</a>;g' faq/faq.*.html
 
 faq/faq-nochunks.html :
 	-xmlto html -o faq -m $(srcdir)/cygwin.dsl $(srcdir)/faq.xml
+	-sed -i 's;</a><a name="id[0-9]*"></a>;</a>;g' faq/faq-nochunks.html
 
 ./doctool : doctool.c
 	gcc -g $< -o $@
