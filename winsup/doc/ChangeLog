@@ -1,3 +1,7 @@
+2005-08-26  Brian Dessent  <brian@dessent.net>
+
+	* faq-using.xml: Add 'net use' hint to network shares FAQ.
+
 2005-08-26  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* Makefile.in: Remove extra anchor to make NN4 happy.

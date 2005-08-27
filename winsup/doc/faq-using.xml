@@ -75,9 +75,11 @@ network shares are not available.  For more information, see
 <ulink url="http://cygwin.com/cygwin-ug-net/ntsec.html" />.
 </para>
 <para>Workarounds include using public network share that does not require
-authentication (for non-critical files), or running the service as
-your own user with <literal>cygrunsrv -u</literal> (see 
-<literal>/usr/share/doc/Cygwin/cygrunsrv.README</literal> for more information).
+authentication (for non-critical files), providing your password to a
+<command>net use</command> command, or running the service as your own
+user with <literal>cygrunsrv -u</literal> (see
+<literal>/usr/share/doc/Cygwin/cygrunsrv.README</literal> for more
+information).
 </para>
 </answer></qandaentry>
 
