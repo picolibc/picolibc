@@ -4,7 +4,7 @@
 	(_cygtls::return_from_fault): Use __ljfault.
 	* exceptions.cc (set_signal_mask): Revert previous checkin.
 	* gendef (__sjfault): Split out into a separate function which doesn't
-	bother with any special signal locking.  routines.
+	bother with any special signal locking.
 	(_ljfault): Return from a __sjfault without bothering with signals.
 
 2005-08-28  Christopher Faylor  <cgf@timesys.com>
