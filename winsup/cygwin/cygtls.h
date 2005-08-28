@@ -148,6 +148,8 @@ typedef struct struct_waitq
 #include "cygerrno.h"
 
 extern "C" int __sjfault (jmp_buf);
+extern "C" int __ljfault (jmp_buf, int);
+
 /*gentls_offsets*/
 
 typedef __uint32_t __stack_t;
@@ -223,7 +225,7 @@ struct _cygtls
   {
     if (_myfault_errno)
       set_errno (_myfault_errno);
-    longjmp ((int *) _myfault, 1);
+    __ljfault ((int *) _myfault, 1);
   }
   int setup_fault (jmp_buf j, int myerrno) __attribute__ ((always_inline))
   {

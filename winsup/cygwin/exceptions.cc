@@ -978,17 +978,19 @@ set_process_mask_delta ()
 extern "C" void __stdcall
 set_signal_mask (sigset_t newmask, sigset_t& oldmask)
 {
+  if (GetCurrentThreadId () == sigtid)
+    small_printf ("********* waiting in signal thread\n");
   mask_sync.acquire (INFINITE);
   newmask &= ~SIG_NONMASKABLE;
   sigset_t mask_bits = oldmask & ~newmask;
   sigproc_printf ("oldmask %p, newmask %p, mask_bits %p", oldmask, newmask,
 		  mask_bits);
   oldmask = newmask;
-  mask_sync.release ();
   if (mask_bits)
     sig_dispatch_pending (true);
   else
     sigproc_printf ("not calling sig_dispatch_pending");
+  mask_sync.release ();
   return;
 }
 

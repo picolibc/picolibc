@@ -272,9 +272,8 @@ EOF
 sub longjmp {
     return <<EOF;
 
-	.globl	_setjmp, ___sjfault
+	.globl	_setjmp
 _setjmp:
-___sjfault:
 	pushl	%ebp
 	movl	%esp,%ebp
 	pushl	%edi
@@ -310,6 +309,72 @@ ___sjfault:
 	popl	%edi
 	movl	\$0,%eax
 	leave
+	ret
+
+	.globl	___sjfault
+___sjfault:
+	pushl	%ebp
+	movl	%esp,%ebp
+	pushl	%edi
+	movl	8(%ebp),%edi
+	movl	%eax,0(%edi)
+	movl	%ebx,4(%edi)
+	movl	%ecx,8(%edi)
+	movl	%edx,12(%edi)
+	movl	%esi,16(%edi)
+	movl	-4(%ebp),%eax
+	movl	%eax,20(%edi)
+	movl	0(%ebp),%eax
+	movl	%eax,24(%edi)
+	movl	%esp,%eax
+	addl	\$12,%eax
+	movl	%eax,28(%edi)
+	movl	4(%ebp),%eax
+	movl	%eax,32(%edi)
+	movw	%es,%ax
+	movw	%ax,36(%edi)
+	movw	%fs,%ax
+	movw	%ax,38(%edi)
+	movw	%gs,%ax
+	movw	%ax,40(%edi)
+	movw	%ss,%ax
+	movw	%ax,42(%edi)
+	popl	%edi
+	movl	\$0,%eax
+	leave
+	ret
+
+	.global	___ljfault
+___ljfault:
+	pushl	%ebp
+	movl	%esp,%ebp
+	movl	8(%ebp),%edi
+
+	movl	12(%ebp),%eax
+	testl	%eax,%eax
+	jne	0f
+	incl	%eax
+
+0:	movl	%eax,0(%edi)
+	movl	24(%edi),%ebp
+	pushfl
+	popl	%ebx
+	movw	42(%edi),%ax
+	movw	%ax,%ss
+	movl	28(%edi),%esp
+	pushl	32(%edi)
+	pushl	%ebx
+	movw	36(%edi),%ax
+	movw	%ax,%es
+	movw	40(%edi),%ax
+	movw	%ax,%gs
+	movl	0(%edi),%eax
+	movl	4(%edi),%ebx
+	movl	8(%edi),%ecx
+	movl	16(%edi),%esi
+	movl	12(%edi),%edx
+	movl	20(%edi),%edi
+	popfl
 	ret
 
 	.globl	_longjmp

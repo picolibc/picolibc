@@ -1,5 +1,14 @@
 2005-08-28  Christopher Faylor  <cgf@timesys.com>
 
+	* cygtls.h (__ljfault): Declare.
+	(_cygtls::return_from_fault): Use __ljfault.
+	* exceptions.cc (set_signal_mask): Revert previous checkin.
+	* gendef (__sjfault): Split out into a separate function which doesn't
+	bother with any special signal locking.  routines.
+	(_ljfault): Return from a __sjfault without bothering with signals.
+
+2005-08-28  Christopher Faylor  <cgf@timesys.com>
+
 	* cygtls.h (_local_storage::strerror_buf): Allocate more space.
 	* errno.cc (strerror_worker): New function, adapted from strerror.
 	(strerror): Use strerror_worker.
