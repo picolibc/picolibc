@@ -1,7 +1,6 @@
 2005-08-27  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
 
-	*dir.cc (readdir_r): Invert sense on error-test.
-
+	* dir.cc (readdir_r): Invert sense on error-test.
 
 2005-08-25  Corinna Vinschen  <corinna@vinschen.de>
 	
