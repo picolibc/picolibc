@@ -1,3 +1,7 @@
+2005-08-28  Christopher Faylor  <cgf@timesys.com>
+
+	* cygwin.din: Correct readdir_r typo.
+
 2005-08-27  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
 
 	* dir.cc (readdir_r): Invert sense on error test.

@@ -97,7 +97,7 @@ struct _local_storage
   struct sockaddr_in exitsock_sin;
 
   /* strerror */
-  char strerror_buf[20];
+  char strerror_buf[sizeof ("Unknown error 4294967295")];
 
   /* sysloc.cc */
   char *process_ident;			// note: malloced

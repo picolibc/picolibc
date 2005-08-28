@@ -984,11 +984,11 @@ set_signal_mask (sigset_t newmask, sigset_t& oldmask)
   sigproc_printf ("oldmask %p, newmask %p, mask_bits %p", oldmask, newmask,
 		  mask_bits);
   oldmask = newmask;
+  mask_sync.release ();
   if (mask_bits)
     sig_dispatch_pending (true);
   else
     sigproc_printf ("not calling sig_dispatch_pending");
-  mask_sync.release ();
   return;
 }
 

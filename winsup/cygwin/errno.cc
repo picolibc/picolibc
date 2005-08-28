@@ -318,27 +318,38 @@ seterrno (const char *file, int line)
 
 extern char *_user_strerror _PARAMS ((int));
 
-/* FIXME: Why is strerror() a long switch and not just:
-	return sys_errlist[errnum];
-	(or moral equivalent).
-	Some entries in sys_errlist[] don't match the corresponding
-	entries in strerror().  This seems odd.
-*/
+static char *
+strerror_worker (int errnum)
+{
+  char *res;
+  if (errnum >= 0 && errnum < _sys_nerr)
+    res = (char *) _sys_errlist [errnum];
+  else
+    res = NULL;
+  return res;
+}
 
-/* CYGWIN internal */
 /* strerror: convert from errno values to error strings */
 extern "C" char *
 strerror (int errnum)
 {
-  const char *error;
-  if (errnum >= 0 && errnum < _sys_nerr)
-    error = _sys_errlist [errnum];
-  else
-    {
-      __small_sprintf (_my_tls.locals.strerror_buf, "error %d", errnum);
-      error = _my_tls.locals.strerror_buf;
-    }
-  /* FIXME: strerror should really be const in the appropriate newlib
-     include files. */
-  return (char *) error;
+  char *errstr = strerror_worker (errnum);
+  if (!errstr)
+    __small_sprintf (errstr = _my_tls.locals.strerror_buf, "Unknown error %u",
+		     (unsigned) errnum);
+  return errstr;
 }
+
+#if 0
+extern "C" int
+strerror_r (int errnum, char *buf, size_t n)
+{
+  char *errstr = strerror_worker (errnum);
+  if (!errstr)
+    return EINVAL;
+  if (strlen (errstr) >= n)
+    return ERANGE;
+  strcpy (buf, errstr);
+  return 0;
+}
+#endif
