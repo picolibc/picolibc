@@ -160,7 +160,7 @@ readdir_r (DIR *dir, dirent *de, dirent **ode)
   else
     {
       *ode = NULL;
-      if (res != ENMFILE)
+      if (res == ENMFILE)
 	res = 0;
     }
   return res;
