@@ -266,13 +266,12 @@ details. */
       137: fts_children, fts_close, fts_get_clientptr, fts_get_stream,
 	   fts_open, fts_read, fts_set, fts_set_clientptr, ftw, nftw.
       138: Export readdir_r.
-      139: Change strerror_r to be ISO C compliant.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 139
+#define CYGWIN_VERSION_API_MINOR 138
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

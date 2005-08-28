@@ -1,5 +1,15 @@
 2005-08-28  Christopher Faylor  <cgf@timesys.com>
 
+	* cygtls.h (_local_storage::strerror_buf): Allocate more space.
+	* errno.cc (strerror_worker): New function, adapted from strerror.
+	(strerror): Use strerror_worker.
+	* tlsoffsets.h: Regenerate.
+
+	* exceptions.cc (set_signal_mask): Minimize time during which mask_sync
+	is held.
+
+2005-08-28  Christopher Faylor  <cgf@timesys.com>
+
 	* cygwin.din: Correct readdir_r typo.
 
 2005-08-27  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
