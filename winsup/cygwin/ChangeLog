@@ -1,5 +1,11 @@
 2005-08-28  Christopher Faylor  <cgf@timesys.com>
 
+	* exceptions.cc (set_process_mask_delta): Conditionalize debugging
+	output.
+	* sigproc.cc (proc_subproc): Make strace output a little more verbose.
+
+2005-08-28  Christopher Faylor  <cgf@timesys.com>
+
 	* cygtls.h (__ljfault): Declare.
 	(_cygtls::return_from_fault): Use __ljfault.
 	* exceptions.cc (set_signal_mask): Revert previous checkin.

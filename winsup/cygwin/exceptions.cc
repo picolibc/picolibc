@@ -978,8 +978,10 @@ set_process_mask_delta ()
 extern "C" void __stdcall
 set_signal_mask (sigset_t newmask, sigset_t& oldmask)
 {
+#ifdef CGF
   if (GetCurrentThreadId () == sigtid)
     small_printf ("********* waiting in signal thread\n");
+#endif
   mask_sync.acquire (INFINITE);
   newmask &= ~SIG_NONMASKABLE;
   sigset_t mask_bits = oldmask & ~newmask;

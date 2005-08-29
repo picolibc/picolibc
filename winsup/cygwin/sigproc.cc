@@ -306,7 +306,7 @@ proc_subproc (DWORD what, DWORD val)
       if (val)
 	sigproc_printf ("clear waiting threads");
       else
-	sigproc_printf ("looking for processes to reap");
+	sigproc_printf ("looking for processes to reap, nprocs %d", nprocs);
       clearing = val;
 
     scan_wait:
