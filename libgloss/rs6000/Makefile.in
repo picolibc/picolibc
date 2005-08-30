@@ -16,7 +16,7 @@
 #
 
 DESTDIR =
-VPATH = @srcdir@ @srcdir@/..
+VPATH = @srcdir@:@srcdir@/..
 srcdir = @srcdir@
 objdir = .
 srcroot = $(srcdir)/../..

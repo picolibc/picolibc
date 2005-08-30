@@ -1,3 +1,7 @@
+2005-08-30  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* rs6000/Makefile.in (VPATH): Use colon as separator.
+
 2005-08-24  Aldy Hernandez  <aldyh@redhat.com>
 
         * ms1/access.c: Change copyright notice.
