@@ -1,0 +1,31 @@
+2005-08-30  Mark Mitchell  <mark@codesourcery.com>
+
+	* ld/ldmain.c (main): Use expandargv.
+	* binutils/addr2line.c (main): Likewise.
+	* binutils/ar.c (main): Likewise.
+	* binutils/coffdump.c (main): Likewise.
+	* binutils/cxxfilt.c (main): Likewise.
+	* binutils/dlltool.c (main): Likewise.
+	* binutils/dllwrap.c (main): Likewise.
+	* binutils/nlmconv.c (main): Likewise.
+	* binutils/nm.c (main): Likewise.
+	* binutils/objcopy.c (main): Likewise.
+	* binutils/objdump.c (main): Likewise.
+	* binutils/readelf.c (main): Likewise.
+	* binutils/size.c (main): Likeiwse.
+	* binutils/srcconv.c (main): Likewise.
+	* binutils/strings.c (main): Likewise.
+	* binutils/sysdump.c (main): Likewise.
+	* binutils/sysinfo.c (main): Likewise.
+	* binutils/windres.c (main): Likewise.
+	
+2005-08-30  Mark Mitchell  <mark@codesourcery.com>
+
+	* include/libiberty.h (expandargv): New function.
+	* libiberty/argv.c (safe-ctype.h): Include it.
+	(ISBLANK): Remove.
+	(stdio.h): Include.
+	(expandargv): New function.
+	* libiberty/Makefile.in: Regenerated.
+
+
