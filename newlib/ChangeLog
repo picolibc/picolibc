@@ -1,3 +1,19 @@
+2005-08-31  Paul Brook  <paul@codesourcery.com>
+
+	* configure.host: Set have_crt0 to no for Arm targts when not
+	providing syscalls.  Set sys_dir=arm unconditionally.
+	Default have_crt0 based on sys_dir.
+	* configure.in: Use have_crt0.
+	* libc/configure.in: Ditto.
+	* libc/sys/configure.in: Ditto.
+	* configure: Regenerate.
+	* libc/configure: Regenerate.
+	* libc/sys/configure: Regenerate.
+	* libc/sys/arm/Makefile.am (lib_a_SOURCES): Add aeabi_atexit.c.
+	Only build other files when providing syscalls.
+	* libc/sys/arm/Makefile.in: Regenerate.
+	* libc/sys/arm/aeabi_atexit.c: New file.
+
 2005-08-26  Christopher Faylor  <cgf@timesys.com>
 
 	* libc/include/string.h: Revert previous change.

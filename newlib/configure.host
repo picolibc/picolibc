@@ -42,6 +42,8 @@
 #   oext                object file extension - needed for libtool support
 #   crt1                name of crt1 object if one is provided
 #   crt1_dir            directory where crt1 object is found
+#   have_crt0		"yes"/"no" if crt0 is/isn't provided.
+#			"" if crt0 is provided when sys_dir is set
 
 newlib_cflags=
 libm_machine_dir=
@@ -55,6 +57,7 @@ unix_dir=
 mach_add_setjmp=
 crt1=
 crt1_dir=
+have_crt0=
 use_libtool=no
 have_sys_mach_dir=no
 default_newlib_io_long_long=no
@@ -318,8 +321,9 @@ case "${host}" in
 	sys_dir=arc
 	;;
   arm-*-*)
-	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
-	  sys_dir=arm
+	sys_dir=arm
+	if [ "x${newlib_may_supply_syscalls}" = "xno" ] ; then
+	  have_crt0="no"
 	fi
 	;;
   crx*)
@@ -332,8 +336,9 @@ case "${host}" in
 	sys_dir=
 	;;
   ep9312-*-*)
-	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
-	  sys_dir=arm
+	sys_dir=arm
+	if [ "x${newlib_may_supply_syscalls}" = "xno" ] ; then
+	  have_crt0="no"
 	fi
 	;;
   frv*)
@@ -413,13 +418,15 @@ case "${host}" in
 	unix_dir=unix
 	;;
   strongarm-*-*)
-	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
-	  sys_dir=arm
+	sys_dir=arm
+	if [ "x${newlib_may_supply_syscalls}" = "xno" ] ; then
+	  have_crt0="no"
 	fi
 	;;
   thumb-*-*)
-	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
-	  sys_dir=arm
+	sys_dir=arm
+	if [ "x${newlib_may_supply_syscalls}" = "xno" ] ; then
+	  have_crt0="no"
 	fi
 	;;
   tic80*)
@@ -444,8 +451,9 @@ case "${host}" in
 	sys_dir=w65
 	;;
   xscale-*-*)
-	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
-	  sys_dir=arm
+	sys_dir=arm
+	if [ "x${newlib_may_supply_syscalls}" = "xno" ] ; then
+	  have_crt0="no"
 	fi
 	;;
   z8k-*-coff)
@@ -724,4 +732,8 @@ if [ "x${newlib_io_pos_args}" = "x" ]; then
 	if [ ${default_newlib_io_pos_args} = "yes" ]; then
 		newlib_io_pos_args="yes";
 	fi
+fi
+
+if test -z "${have_crt0}" && test -n "${sys_dir}"; then
+  have_crt0="yes"
 fi
