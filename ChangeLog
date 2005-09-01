@@ -1,3 +1,8 @@
+2005-08-30  Phil Edwards  <phil@codesourcery.com>
+
+	* configure.in (*-*-vxworks*):  Add target-libstdc++-v3 to noconfigdirs.
+	* configure:  Regenerated.
+
 2005-08-20  Richard Earnshaw  <richard.earnshaw@arm.com>
 
         * Makefile.def (libssp): Add to lang_env_dependencies.
