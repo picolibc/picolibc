@@ -1,3 +1,9 @@
+2005-09-01  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libm/mathfp/s_pow.c: (pow): Change code so 0 raised to
+	any positive power results in 0.
+	* libm/mathfp/sf_pow.c (powf): Ditto.
+
 2005-08-31  Paul Brook  <paul@codesourcery.com>
 
 	* configure.host: Set have_crt0 to no for Arm targts when not
