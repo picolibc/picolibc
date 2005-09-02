@@ -547,7 +547,7 @@ initial_env ()
       len = GetModuleFileName (NULL, buf, CYG_MAX_PATH);
       console_printf ("Sleeping %d, pid %u %s\n", ms, GetCurrentProcessId (), buf);
       Sleep (ms);
-      if (!strace.active)
+      if (!strace.active && !dynamically_loaded)
 	{
 	  strace.inited = 0;
 	  strace.hello ();
@@ -634,7 +634,6 @@ dll_crt0_0 ()
   wincap.init ();
   initial_env ();
 
-  init_console_handler (TRUE);
   init_global_security ();
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
 		       GetCurrentProcess (), &hMainProc, 0, FALSE,

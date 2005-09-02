@@ -123,7 +123,8 @@ void
 init_console_handler (BOOL install_handler)
 {
   BOOL res;
-  SetConsoleCtrlHandler (ctrl_c_handler, FALSE);
+  while (SetConsoleCtrlHandler (ctrl_c_handler, FALSE))
+    continue;
   if (install_handler)
     res = SetConsoleCtrlHandler (ctrl_c_handler, TRUE);
   else if (wincap.has_null_console_handler_routine ())
@@ -833,6 +834,7 @@ has_visible_window_station ()
 static BOOL WINAPI
 ctrl_c_handler (DWORD type)
 {
+console_printf ("%u OUCH!\n", GetCurrentProcessId ());
   static bool saw_close;
 
   if (!cygwin_finished_initializing)
@@ -844,6 +846,11 @@ ctrl_c_handler (DWORD type)
     }
 
   _my_tls.remove (INFINITE);
+
+#if 0
+  if (type == CTRL_C_EVENT || type == CTRL_BREAK_EVENT)
+    proc_subproc (PROC_KILLFORKED, 0);
+#endif
 
   /* Return FALSE to prevent an "End task" dialog box from appearing
      for each Cygwin process window that's open when the computer

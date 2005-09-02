@@ -55,7 +55,7 @@ CC_FOR_TARGET:=$(CC)
 CFLAGS=@CFLAGS@
 override CFLAGS+=-MMD ${$(*F)_CFLAGS} -fmerge-constants -ftracer $(CCEXTRA)
 CXX=@CXX@
-CXXFLAGS=@CXXFLAGS@
+override CXXFLAGS=@CXXFLAGS@
 
 AR:=@AR@
 AR_FLAGS:=qv

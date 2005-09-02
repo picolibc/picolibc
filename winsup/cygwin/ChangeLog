@@ -1,3 +1,8 @@
+2005-09-02  Dave Korn  <dave.korn@artimi.com>
+
+	* Makefile.in (CXXFLAGS): Use 'override' to correctly set flags to
+	generate dependencies when invoked from top-level make.
+
 2005-08-28  Christopher Faylor  <cgf@timesys.com>
 
 	* exceptions.cc (set_process_mask_delta): Conditionalize debugging
