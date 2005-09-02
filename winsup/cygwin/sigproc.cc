@@ -346,6 +346,15 @@ proc_subproc (DWORD what, DWORD val)
       if (global_sigs[SIGCHLD].sa_handler == (void *) SIG_IGN)
 	for (int i = 0; i < nprocs; i += remove_proc (i))
 	  continue;
+      break;
+    case PROC_KILLFORKED:
+      for (int i = 0; i < nprocs; i++)
+	if (ISSTATE (procs[i], PID_INITIALIZING))
+	  {
+	    TerminateProcess (procs[i].hProcess, 1);
+	    procs[i]->process_state = PID_EXITED;
+	  }
+      break;
   }
 
 out:
