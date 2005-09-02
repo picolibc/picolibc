@@ -283,7 +283,8 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
 
   pthread::atforkprepare ();
 
-  int c_flags = GetPriorityClass (hMainProc);
+  int c_flags = GetPriorityClass (hMainProc) /*|
+		CREATE_NEW_PROCESS_GROUP*/;
   STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
 
   /* If we don't have a console, then don't create a console for the
@@ -335,7 +336,7 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
   /* Remove impersonation */
   cygheap->user.deimpersonate ();
 
-  syscall_printf ("CreateProcess (%s, %s, 0, 0, 1, %p, 0, 0, %p, %p)",
+  syscall_printf ("CreateProcess (%s, %s, 0, 0, 1, %x, 0, 0, %p, %p)",
 		  myself->progname, myself->progname, c_flags, &si, &pi);
   bool locked = __malloc_lock ();
   rc = CreateProcess (myself->progname, /* image to run */
@@ -417,8 +418,7 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
   /* Wait for subproc to initialize itself. */
   if (!ch.sync (child->pid, pi.hProcess, FORK_WAIT_TIMEOUT))
     {
-      if (NOTSTATE (child, PID_EXITED))
-	system_printf ("child %d died waiting for longjmp before initialization", child_pid);
+      system_printf ("child %d died waiting for longjmp before initialization", child_pid);
       goto cleanup;
     }
 
@@ -469,8 +469,7 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
     goto cleanup;
   else if (!ch.sync (child->pid, pi.hProcess, FORK_WAIT_TIMEOUT))
     {
-      if (NOTSTATE (child, PID_EXITED))
-	system_printf ("child %d died waiting for dll loading", child_pid);
+      system_printf ("child %d died waiting for dll loading", child_pid);
       goto cleanup;
     }
 
@@ -507,7 +506,7 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
     __malloc_unlock ();
 
   /* Remember to de-allocate the fd table. */
-  if (pi.hProcess && !child.hProcess)
+  if (pi.hProcess)
     ForceCloseHandle1 (pi.hProcess, childhProc);
   if (pi.hThread)
     ForceCloseHandle (pi.hThread);

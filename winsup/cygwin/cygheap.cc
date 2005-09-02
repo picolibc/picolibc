@@ -158,7 +158,12 @@ cygheap_init ()
   cygheap_protect.init ("cygheap_protect");
   if (!cygheap)
     {
+#if 1
       cygheap = (init_cygheap *) memset (_cygheap_start, 0, _cygheap_mid - _cygheap_start);
+#else
+      cygheap = (init_cygheap *) _cygheap_start;
+#endif
+
       cygheap_max = cygheap;
       _csbrk (sizeof (*cygheap));
     }

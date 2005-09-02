@@ -1196,7 +1196,8 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
       pinfolist = (pinfo *) realloc (pinfolist, size_pinfolist (npidlist + 1));
     }
 
-  pinfolist[nelem].init (cygpid, PID_NOREDIR | pinfo_access, NULL);
+  pinfolist[nelem].init (cygpid, PID_NOREDIR | (winpid ? PID_ALLPIDS : 0)
+			 | pinfo_access, NULL);
   if (winpid)
     goto out;
 
@@ -1204,7 +1205,7 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
     {
       if (!pinfo_access)
 	return;
-      pinfolist[nelem].init (cygpid, PID_NOREDIR, NULL);
+      pinfolist[nelem].init (cygpid, PID_NOREDIR | (winpid ? PID_ALLPIDS : 0), NULL);
       if (!pinfolist[nelem])
 	return;
       }
