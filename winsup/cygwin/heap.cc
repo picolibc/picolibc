@@ -34,11 +34,9 @@ extern "C" size_t getpagesize ();
 void
 heap_init ()
 {
-static int seen = 0;
   /* If we're the forkee, we must allocate the heap at exactly the same place
      as our parent.  If not, we don't care where it ends up.  */
 
-seen++;
   page_const = system_info.dwPageSize;
   if (!cygheap->user_heap.base)
     {
@@ -75,11 +73,11 @@ seen++;
 				     MEM_RESERVE, PAGE_READWRITE);
 	  if (p)
 	    break;
-	  if ((reserve_size -= page_const) < allocsize)
+	  if ((reserve_size -= page_const) <= allocsize)
 	    break;
 	}
       if (!p)
-	api_fatal ("couldn't allocate heap, %E, base %p, top %p, "
+	api_fatal ("couldn't allocate cygwin heap, %E, base %p, top %p, "
 		   "reserve_size %d, allocsize %d, page_const %d",
 		   cygheap->user_heap.base, cygheap->user_heap.top,
 		   reserve_size, allocsize, page_const);

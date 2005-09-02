@@ -34,8 +34,7 @@ enum procstuff
   PROC_DETACHED_CHILD	  = 2,	// set up a detached child
   PROC_CLEARWAIT	  = 3,	// clear all waits - signal arrived
   PROC_WAIT		  = 4,	// setup for wait() for subproc
-  PROC_KILLFORKED	  = 5,  // kill forked children on CTRL-C.
-  PROC_NOTHING		  = 6	// nothing, really
+  PROC_NOTHING		  = 5	// nothing, really
 };
 
 struct sigpacket
