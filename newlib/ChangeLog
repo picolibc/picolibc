@@ -1,3 +1,7 @@
+2005-09-02  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/stdio.h: Add prototype for viprintf.
+
 2005-09-01  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libm/mathfp/s_pow.c: (pow): Change code so 0 raised to

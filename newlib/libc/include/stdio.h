@@ -243,6 +243,7 @@ int	_EXFUN(vsnprintf, (char *, size_t, const char *, __VALIST));
 int	_EXFUN(vfiprintf, (FILE *, const char *, __VALIST));
 int	_EXFUN(vfiscanf, (FILE *, const char *, __VALIST));
 int	_EXFUN(vfscanf, (FILE *, const char *, __VALIST));
+int	_EXFUN(viprintf, (const char *, __VALIST));
 int	_EXFUN(viscanf, (const char *, __VALIST));
 int	_EXFUN(vscanf, (const char *, __VALIST));
 int	_EXFUN(vsiscanf, (const char *, const char *, __VALIST));
