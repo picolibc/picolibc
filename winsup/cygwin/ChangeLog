@@ -1,3 +1,16 @@
+2005-09-05  Christopher Faylor  <cgf@timesys.com>
+
+	* cygheap.cc (cygheap_init): Eliminate debugging #if.
+
+	* fork.cc (fork_parent): Don't issue errors if "somebody" has set the
+	PID_EXITED flag on a child.  Don't close process handle if it has
+	potentially already been closed.
+	* pinfo.cc (winpids::add): Eliminate PID_ALLPIDS handling which was
+	obsoleted by previous changes.
+
+	* spawn.cc (av::fixup): Do win16 detection for .com files.  Make sure
+	that buffer has been unmapped in all cases.
+
 2005-09-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* thread.h (pthread_mutex::get_pthread_self): Remove.

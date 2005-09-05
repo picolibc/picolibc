@@ -1020,7 +1020,9 @@ av::fixup (child_info_types chtype, const char *prog_arg, path_conv& real_path, 
 {
   /* If the file name ends in either .exe, .com, .bat, or .cmd we assume
      that it is NOT a script file */
-  while (*ext == '\0' || chtype == PROC_SPAWN || (wincap.detect_win16_exe () && strcasematch (ext, ".exe")))
+  while (*ext == '\0' || chtype == PROC_SPAWN
+	 || (wincap.detect_win16_exe () && (strcasematch (ext, ".exe")
+					    || strcasematch (ext, ".com"))))
     {
       HANDLE h = CreateFile (real_path, GENERIC_READ,
 			       FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -1053,6 +1055,7 @@ av::fixup (child_info_types chtype, const char *prog_arg, path_conv& real_path, 
       if (real_path.has_acls () && allow_ntsec
 	  && check_file_access (real_path, X_OK))
 	{
+	  UnmapViewOfFile (buf);
 	  debug_printf ("... but not executable");
 	  break;
 	}
