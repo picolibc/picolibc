@@ -1,3 +1,11 @@
+2005-09-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* thread.h (pthread_mutex::get_pthread_self): Remove.
+	(pthread_mutex::lock): Use ::pthread_self as self parameter.
+	(pthread_mutex::trylock): Ditto.
+	(pthread_mutex::unlock): Ditto.
+	(pthread_mutex::destroy): Ditto.
+
 2005-09-02  Dave Korn  <dave.korn@artimi.com>
 
 	* Makefile.in (CXXFLAGS): Use 'override' to correctly set flags to
