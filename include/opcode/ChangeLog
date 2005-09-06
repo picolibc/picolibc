@@ -1,3 +1,13 @@
+include/opcode/ChangeLog
+2005-09-06  Chao-ying Fu  <fu@mips.com>
+
+	* mips.h (OP_SH_MT_U, OP_MASK_MT_U, OP_SH_MT_H, OP_MASK_MT_H,
+	OP_SH_MTACC_T, OP_MASK_MTACC_T, OP_SH_MTACC_D, OP_MASK_MTACC_D): New
+	define.
+	Document !, $, *, &, g, +t, +T operand formats for MT instructions.
+	(INSN_ASE_MASK): Update to include INSN_MT.
+	(INSN_MT): New define for MT ASE.
+
 2005-08-25  Chao-ying Fu  <fu@mips.com>
 
 	* mips.h (OP_SH_DSPACC, OP_MASK_DSPACC, OP_SH_DSPACC_S,

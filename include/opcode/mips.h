@@ -170,6 +170,16 @@ Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, US
 #define OP_SH_RDDSP		16
 #define OP_MASK_RDDSP		0x3f
 
+/* MIPS MT ASE */
+#define OP_SH_MT_U		5
+#define OP_MASK_MT_U		0x1
+#define OP_SH_MT_H		4
+#define OP_MASK_MT_H		0x1
+#define OP_SH_MTACC_T		18
+#define OP_MASK_MTACC_T		0x3
+#define OP_SH_MTACC_D		13
+#define OP_MASK_MTACC_D		0x3
+
 #define	OP_OP_COP0		0x10
 #define	OP_OP_COP1		0x11
 #define	OP_OP_COP2		0x12
@@ -331,6 +341,15 @@ struct mips_opcode
    "'" 6 bit unsigned immediate (OP_*_RDDSP)
    "@" 10 bit signed immediate (OP_*_IMM10)
 
+   MT ASE usage:
+   "!" 1 bit immediate at bit 5
+   "$" 1 bit immediate at bit 4
+   "*" 2 bit dsp/smartmips accumulator register (OP_*_MTACC_T)
+   "&" 2 bit dsp/smartmips accumulator register (OP_*_MTACC_D)
+   "g" 5 bit coprocessor 1 and 2 destination register (OP_*_RD)
+   "+t" 5 bit coprocessor 0 destination register (OP_*_RT)
+   "+T" 5 bit coprocessor 0 destination register (OP_*_RT) - disassembly only
+
    Other:
    "()" parens surrounding optional value
    ","  separates operands
@@ -339,13 +358,14 @@ struct mips_opcode
 
    Characters used so far, for quick reference when adding more:
    "34567890"
-   "%[]<>(),+:'@"
+   "%[]<>(),+:'@!$*&"
    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-   "abcdefhijklopqrstuvwxz"
+   "abcdefghijklopqrstuvwxz"
 
    Extension character sequences used so far ("+" followed by the
    following), for quick reference when adding more:
-   "ABCDEFGHI"
+   "ABCDEFGHIT"
+   "t"
 */
 
 /* These are the bits which may be set in the pinfo field of an
@@ -447,7 +467,7 @@ struct mips_opcode
 #define INSN_ISA64R2              0x00000100
 
 /* Masks used for MIPS-defined ASEs.  */
-#define INSN_ASE_MASK		  0x0000f000
+#define INSN_ASE_MASK		  0x0400f000
 
 /* DSP ASE */ 
 #define INSN_DSP                  0x00001000
@@ -480,6 +500,8 @@ struct mips_opcode
 #define INSN_5400		  0x01000000
 /* NEC VR5500 instruction.  */
 #define INSN_5500		  0x02000000
+/* MT ASE */
+#define INSN_MT                   0x04000000
 
 /* MIPS ISA defines, use instead of hardcoding ISA level.  */
 
