@@ -1,3 +1,9 @@
+2005-09-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* thread.h: Revert patch from 2005-09-05.
+	* thread.cc (pthread_mutex::can_be_unlocked): Return true also if
+	mutex is owned by MUTEX_OWNER_ANONYMOUS.
+
 2005-09-05  Christopher Faylor  <cgf@timesys.com>
 
 	* cygheap.cc (cygheap_init): Eliminate debugging #if.

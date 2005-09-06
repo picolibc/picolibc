@@ -301,21 +301,27 @@ public:
   int type;
   int pshared;
 
+  pthread_t get_pthread_self () const
+  {
+    return PTHREAD_MUTEX_NORMAL == type ? MUTEX_OWNER_ANONYMOUS :
+      ::pthread_self ();
+  }
+
   int lock ()
   {
-    return _lock (::pthread_self ());
+    return _lock (get_pthread_self ());
   }
   int trylock ()
   {
-    return _trylock (::pthread_self ());
+    return _trylock (get_pthread_self ());
   }
   int unlock ()
   {
-    return _unlock (::pthread_self ());
+    return _unlock (get_pthread_self ());
   }
   int destroy ()
   {
-    return _destroy (::pthread_self ());
+    return _destroy (get_pthread_self ());
   }
 
   void set_owner (pthread_t self)

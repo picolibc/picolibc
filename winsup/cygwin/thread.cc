@@ -212,10 +212,11 @@ pthread_mutex::can_be_unlocked (pthread_mutex_t const *mutex)
 
   if (!is_good_object (mutex))
     return false;
-  /*
-   * Check if the mutex is owned by the current thread and can be unlocked
-   */
-  return ((*mutex)->recursion_counter == 1 && pthread::equal ((*mutex)->owner, self));
+  /* Check if the mutex is owned by the current thread and can be unlocked.
+   * Also check for the ANONYMOUS owner to cover NORMAL mutexes as well. */
+  return ((*mutex)->recursion_counter == 1
+	  && ((*mutex)->owner == MUTEX_OWNER_ANONYMOUS
+	      || pthread::equal ((*mutex)->owner, self)));
 }
 
 inline bool
