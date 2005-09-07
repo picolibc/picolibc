@@ -1,3 +1,22 @@
+2005-09-06  Christopher Faylor  <cgf@timesys.com>
+
+	* dcrt0.cc (initial_env): Don't attempt stracing if dynamically loaded.
+	(dll_crt0_0): Move console initialization earlier.
+	* init.cc (dll_entry): Move console initialization here.
+	* exceptions.cc (init_console_handler): Fully remove any old console
+	handler.
+
+	* spawn.cc (spawn_guts): Don't fill out windows argv if we've deduced
+	that this is a cygwin-using program.
+	(av::fixup): Always check executables to see if they are using
+	cygwin1.dll.  Don't consider .com files to be scripts.
+	* hookapi.cc (rvadelta): New function.
+	(PEHeaderFromHModule): Simplify slightly.
+	(hook_or_detect_cygwin): Use passed in name argument for "HMODULE"
+	rather than incorrectly reading current program.  Calculate delta
+	needed to read image data and file names if this isn't a real
+	"HMODULE".
+
 2005-09-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* thread.h: Revert patch from 2005-09-05.

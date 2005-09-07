@@ -23,10 +23,10 @@ struct function_hook
 static PIMAGE_NT_HEADERS
 PEHeaderFromHModule (HMODULE hModule)
 {
-  PIMAGE_NT_HEADERS pNTHeader = NULL;
+  PIMAGE_NT_HEADERS pNTHeader;
 
   if (PIMAGE_DOS_HEADER(hModule) ->e_magic != IMAGE_DOS_SIGNATURE)
-    /* nothing */;
+    pNTHeader = NULL;
   else
     {
       pNTHeader = PIMAGE_NT_HEADERS (PBYTE (hModule)
@@ -36,6 +36,18 @@ PEHeaderFromHModule (HMODULE hModule)
     }
 
   return pNTHeader;
+}
+
+long
+rvadelta (PIMAGE_NT_HEADERS pnt, long import_rva)
+{
+  PIMAGE_SECTION_HEADER section = (PIMAGE_SECTION_HEADER) (pnt + 1);
+  for (int i = 0; i < pnt->FileHeader.NumberOfSections; i++)
+    if (section[i].VirtualAddress <= import_rva
+	&& (section[i].VirtualAddress + section[i].Misc.VirtualSize) >= import_rva)
+    // if (strncasematch ((char *) section[i].Name, ".idata", IMAGE_SIZEOF_SHORT_NAME))
+      return section[i].VirtualAddress - section[i].PointerToRawData;
+  return -1;
 }
 
 void *
@@ -152,7 +164,7 @@ makename (const char *name, char *&buf, int& i, int inc)
 void *
 hook_or_detect_cygwin (const char *name, const void *fn)
 {
-  HMODULE hm = GetModuleHandle (NULL);
+  HMODULE hm = fn ? GetModuleHandle (NULL) : (HMODULE) name;
   PIMAGE_NT_HEADERS pExeNTHdr = PEHeaderFromHModule (hm);
 
   if (!pExeNTHdr)
@@ -163,18 +175,22 @@ hook_or_detect_cygwin (const char *name, const void *fn)
   if (!importRVA)
     return false;
 
+  long delta = fn ? 0 : rvadelta (pExeNTHdr, importRVA);
+  if (delta < 0)
+    return false;
+
   // Convert imports RVA to a usable pointer
-  PIMAGE_IMPORT_DESCRIPTOR pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, hm, importRVA);
+  PIMAGE_IMPORT_DESCRIPTOR pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, hm, importRVA - delta);
 
   function_hook fh;
   fh.origfn = NULL;
   fh.hookfn = fn;
-  char *buf = (char *) alloca (strlen (name) + strlen ("64") + sizeof ("_"));
+  char *buf = fn ? NULL : (char *) alloca (strlen (name) + strlen ("64") + sizeof ("_"));
   int i;
   // Iterate through each import descriptor, and redirect if appropriate
   for (PIMAGE_IMPORT_DESCRIPTOR pd = pdfirst; pd->FirstThunk; pd++)
     {
-      if (!strcasematch (rva (PSTR, hm, pd->Name), "cygwin1.dll"))
+      if (!strcasematch (rva (PSTR, hm, pd->Name - delta), "cygwin1.dll"))
 	continue;
       if (!fn)
 	return (void *) "found it";	// just checking if executable used cygwin1.dll

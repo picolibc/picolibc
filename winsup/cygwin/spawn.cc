@@ -279,7 +279,7 @@ class av
   bool win16_exe;
   bool iscygwin;
   av (): argv (NULL) {}
-  av (int ac_in, const char * const *av_in) : calloced (0), error (false), argc (ac_in), win16_exe (false), iscygwin (true)
+  av (int ac_in, const char * const *av_in) : calloced (0), error (false), argc (ac_in), win16_exe (false), iscygwin (false)
   {
     argv = (char **) cmalloc (HEAP_1_ARGV, (argc + 5) * sizeof (char *));
     memcpy (argv, av_in, (argc + 1) * sizeof (char *));
@@ -459,6 +459,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       one_line.add (argv[2]);
       strcpy (real_path, argv[0]);
       null_app_name = true;
+      newargv.iscygwin = false;
       goto skip_arg_parsing;
     }
 
@@ -476,7 +477,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   if (res)
     goto out;
 
-  if (real_path.iscygexec ())
+  if (real_path.iscygexec () || newargv.iscygwin)
     newargv.dup_all ();
   else
     {
@@ -1020,9 +1021,7 @@ av::fixup (child_info_types chtype, const char *prog_arg, path_conv& real_path, 
 {
   /* If the file name ends in either .exe, .com, .bat, or .cmd we assume
      that it is NOT a script file */
-  while (*ext == '\0' || chtype == PROC_SPAWN
-	 || (wincap.detect_win16_exe () && (strcasematch (ext, ".exe")
-					    || strcasematch (ext, ".com"))))
+  while (1)
     {
       HANDLE h = CreateFile (real_path, GENERIC_READ,
 			       FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -1092,6 +1091,11 @@ av::fixup (child_info_types chtype, const char *prog_arg, path_conv& real_path, 
       UnmapViewOfFile (buf);
       if (!pgm)
 	{
+	  if (strcasematch (ext, ".com"))
+	    {
+	      iscygwin = false;
+	      break;
+	    }
 	  pgm = (char *) "/bin/sh";
 	  arg1 = NULL;
 	}
