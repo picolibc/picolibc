@@ -5,6 +5,7 @@
 	* init.cc (dll_entry): Move console initialization here.
 	* exceptions.cc (init_console_handler): Fully remove any old console
 	handler.
+	(handle_sigsuspend): Make cancelable when called from non-main thread.
 
 	* spawn.cc (spawn_guts): Don't fill out windows argv if we've deduced
 	that this is a cygwin-using program.
