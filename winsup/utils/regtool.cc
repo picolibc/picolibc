@@ -1,6 +1,6 @@
 /* regtool.cc
 
-   Copyright 2000, 2001, 2002, 2003, 2004 Red Hat Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005 Red Hat Inc.
 
 This file is part of Cygwin.
 
@@ -138,7 +138,7 @@ print_version ()
   printf ("\
 %s (cygwin) %.*s\n\
 Registry Tool\n\
-Copyright 2000, 2001, 2002 Red Hat, Inc.\n\
+Copyright 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.\n\
 Compiled on %s\n\
 ", prog_name, len, v, __DATE__);
 }
@@ -398,6 +398,7 @@ cmd_list ()
 	m = maxvalnamelen + 1;
 	n = maxvaluelen + 1;
 	RegEnumValue (key, i, value_name, &m, 0, &t, (BYTE *) value_data, &n);
+	value_data[n] = 0;
 	if (!verbose)
 	  printf ("%s\n", value_name);
 	else
@@ -515,11 +516,11 @@ cmd_set ()
 			  sizeof (v));
       break;
     case KT_STRING:
-      rv = RegSetValueEx (key, value, 0, REG_SZ, (const BYTE *) a, strlen (a));
+      rv = RegSetValueEx (key, value, 0, REG_SZ, (const BYTE *) a, strlen (a) + 1);
       break;
     case KT_EXPAND:
       rv = RegSetValueEx (key, value, 0, REG_EXPAND_SZ, (const BYTE *) a,
-			  strlen (a));
+			  strlen (a) + 1);
       break;
     case KT_MULTI:
       for (i = 1, n = 1; argv[i]; i++)
@@ -569,15 +570,14 @@ cmd_get ()
   rv = RegQueryValueEx (key, value, 0, &vtype, 0, &dsize);
   if (rv != ERROR_SUCCESS)
     Fail (rv);
-  dsize++;
-  data = (char *) malloc (dsize);
+  data = (char *) malloc (dsize + 1);
   rv = RegQueryValueEx (key, value, 0, &vtype, (BYTE *) data, &dsize);
   if (rv != ERROR_SUCCESS)
     Fail (rv);
   switch (vtype)
     {
     case REG_BINARY:
-      fwrite (data, dsize, 0, stdout);
+      fwrite (data, dsize, 1, stdout);
       break;
     case REG_DWORD:
       printf ("%lu\n", *(DWORD *) data);
@@ -593,6 +593,7 @@ cmd_get ()
 	  bufsize = ExpandEnvironmentStrings (data, 0, 0);
 	  buf = (char *) malloc (bufsize + 1);
 	  ExpandEnvironmentStrings (data, buf, bufsize + 1);
+	  free (data);
 	  data = buf;
 	}
       printf ("%s\n", data);

@@ -1,3 +1,14 @@
+2005-09-08  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
+
+	* regtool.cc: Extend copyright-years.
+	(print_version): Ditto.
+	(cmd_list): Don't depend on terminating '\0' being present on
+	string-values.
+	(cmd_get): Don't attempt to read more than present, but keep
+	extra space for terminating '\0'. Really output REG_BINARY.
+	Don't leak memory.
+	(cmd_set): Include trailing '\0' in string's length.
+
 2005-08-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* passwd.c (longopts): Add --logonserver option.
