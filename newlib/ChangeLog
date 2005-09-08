@@ -1,3 +1,8 @@
+2005-09-08  Eric Blake  <ebb9@byu.net>
+
+	* libc/argz/argz_insert.c (argz_insert): Don't die with EINVAL when
+	before is NULL.
+
 2005-09-08  Brian Dessent  <brian@dessent.net>
 
 	* sf_lrint.c (lrintf): Mask 'i0' correctly when extracting

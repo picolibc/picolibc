@@ -1,4 +1,4 @@
-/* Copyright (C) 2002 by  Red Hat, Incorporated. All rights reserved.
+/* Copyright (C) 2002, 2005 by  Red Hat, Incorporated. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software
  * is freely granted, provided that this notice is preserved.
@@ -20,7 +20,7 @@ _DEFUN (argz_insert, (argz, argz_len, before, entry),
   int len = 0;
 
   if (before == NULL)
-    argz_add(argz, argz_len, entry);
+    return argz_add(argz, argz_len, entry);
 
   if (before < *argz || before >= *argz + *argz_len)
     return EINVAL;
