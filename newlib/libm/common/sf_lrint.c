@@ -63,7 +63,7 @@ TWO23[2]={
       if (j0 < -1)
         return 0;
       else if (j0 >= 23)
-        result = (long int) i0 << (j0 - 23);
+        result = (long int) ((i0 & 0x7fffff) | 0x800000) << (j0 - 23);
       else
         {
           w = TWO23[sx] + x;

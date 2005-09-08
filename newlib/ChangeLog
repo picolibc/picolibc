@@ -1,3 +1,9 @@
+2005-09-08  Brian Dessent  <brian@dessent.net>
+
+	* sf_lrint.c (lrintf): Mask 'i0' correctly when extracting
+	mantissa.
+	* s_lrint.c: Ditto.
+
 2005-09-02  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/stdio.h: Add prototype for viprintf.
