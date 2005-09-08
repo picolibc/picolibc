@@ -277,9 +277,8 @@ class av
   int error;
   int argc;
   bool win16_exe;
-  bool iscygwin;
   av (): argv (NULL) {}
-  av (int ac_in, const char * const *av_in) : calloced (0), error (false), argc (ac_in), win16_exe (false), iscygwin (false)
+  av (int ac_in, const char * const *av_in) : calloced (0), error (false), argc (ac_in), win16_exe (false)
   {
     argv = (char **) cmalloc (HEAP_1_ARGV, (argc + 5) * sizeof (char *));
     memcpy (argv, av_in, (argc + 1) * sizeof (char *));
@@ -459,7 +458,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       one_line.add (argv[2]);
       strcpy (real_path, argv[0]);
       null_app_name = true;
-      newargv.iscygwin = false;
       goto skip_arg_parsing;
     }
 
@@ -477,7 +475,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   if (res)
     goto out;
 
-  if (real_path.iscygexec () || newargv.iscygwin)
+  if (real_path.iscygexec ())
     newargv.dup_all ();
   else
     {
@@ -624,7 +622,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   cygheap->user.deimpersonate ();
 
   moreinfo->envp = build_env (envp, envblock, moreinfo->envc, real_path.iscygexec ());
-  ciresrv.set (chtype, newargv.iscygwin);
+  ciresrv.set (chtype, real_path.iscygexec ());
   ciresrv.moreinfo = moreinfo;
 
   si.lpReserved2 = (LPBYTE) &ciresrv;
@@ -1019,8 +1017,9 @@ spawnvpe (int mode, const char *file, const char * const *argv,
 int
 av::fixup (child_info_types chtype, const char *prog_arg, path_conv& real_path, const char *ext)
 {
-  /* If the file name ends in either .exe, .com, .bat, or .cmd we assume
-     that it is NOT a script file */
+  bool exeext = strcasematch (ext, ".exe");
+  if (exeext && real_path.iscygexec ())
+    return 0;
   while (1)
     {
       HANDLE h = CreateFile (real_path, GENERIC_READ,
@@ -1044,7 +1043,7 @@ av::fixup (child_info_types chtype, const char *prog_arg, path_conv& real_path, 
 	  unsigned off = (unsigned char) buf[0x18] | (((unsigned char) buf[0x19]) << 8);
 	  win16_exe = off < sizeof (IMAGE_DOS_HEADER);
 	  if (!win16_exe)
-	    iscygwin = hook_or_detect_cygwin (buf, NULL);
+	    real_path.set_cygexec (!!hook_or_detect_cygwin (buf, NULL));
 	  UnmapViewOfFile (buf);
 	  break;
 	}
@@ -1092,10 +1091,7 @@ av::fixup (child_info_types chtype, const char *prog_arg, path_conv& real_path, 
       if (!pgm)
 	{
 	  if (strcasematch (ext, ".com"))
-	    {
-	      iscygwin = false;
-	      break;
-	    }
+	    break;
 	  pgm = (char *) "/bin/sh";
 	  arg1 = NULL;
 	}

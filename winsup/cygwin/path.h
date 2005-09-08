@@ -151,6 +151,13 @@ class path_conv
   int is_lnk_special () const {return is_fs_device () || isfifo () || is_lnk_symlink ();}
   int issocket () const {return dev.devn == FH_UNIX;}
   int iscygexec () const {return path_flags & PATH_CYGWIN_EXEC;}
+  void set_cygexec (bool isset)
+  {
+    if (isset)
+      path_flags |= PATH_CYGWIN_EXEC;
+    else
+      path_flags &= ~PATH_CYGWIN_EXEC;
+  }
   bool isro () const {return !!(path_flags & PATH_RO);}
   bool exists () const {return fileattr != INVALID_FILE_ATTRIBUTES;}
   bool has_attribute (DWORD x) const {return exists () && (fileattr & x);}

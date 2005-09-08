@@ -39,7 +39,7 @@ PEHeaderFromHModule (HMODULE hModule)
 }
 
 long
-rvadelta (PIMAGE_NT_HEADERS pnt, long import_rva)
+rvadelta (PIMAGE_NT_HEADERS pnt, DWORD import_rva)
 {
   PIMAGE_SECTION_HEADER section = (PIMAGE_SECTION_HEADER) (pnt + 1);
   for (int i = 0; i < pnt->FileHeader.NumberOfSections; i++)

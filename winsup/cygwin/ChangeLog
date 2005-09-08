@@ -1,3 +1,15 @@
+2005-09-07  Christopher Faylor  <cgf@timesys.com>
+
+	* hookapi.cc (rvadelta): Change argument to DWORD to eliminate a
+	compiler warning.
+
+	* path.h (path_conv::set_cygexec): New function.
+	* spawn.cc (av::iscygwin): Eliminate.
+	(av::av): Don't initialize iscygwin.
+	(spawn_guts): Just use real_path.iscygexec for all tests.
+	(av::fixup): Short circuit test if .exe extension and known cygexec.
+	Set cygexec flag appropriately if we find that program uses cygwin1.dll.
+
 2005-09-06  Christopher Faylor  <cgf@timesys.com>
 
 	* dcrt0.cc (initial_env): Don't attempt stracing if dynamically loaded.
