@@ -1,3 +1,8 @@
+2005-09-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (ctrl_c_handler): Disable any special CTRL_LOGOFF_EVENT
+	handling and add longish comment about the reasons.
+
 2005-09-07  Christopher Faylor  <cgf@timesys.com>
 
 	* hookapi.cc (rvadelta): Change argument to DWORD to eliminate a

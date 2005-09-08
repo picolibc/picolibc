@@ -881,11 +881,25 @@ ctrl_c_handler (DWORD type)
 	}
       if (!saw_close && type == CTRL_LOGOFF_EVENT)
 	{
+#if 0
+	  /* CV, 2005-09-08: The CTRL_LOGOFF_EVENT is only send to services.
+	     It's send when *any* user logs off.  Services generally have
+	     a modified console handler which allows services to survive
+	     also after a user logged out, even if the service has a console
+	     window attached to the visible window station of the user
+	     ("Interact with desktop").  The below code contradicts this
+	     standard behaviour, so for now, we disable it and just return
+	     FALSE to get the default behaviour or the one the application's
+	     own console handler (if any) requires.
+	     In other words: We never send SIGHUP to services and their
+	     child processes on a LOGOFF event. */
+
 	  /* Check if the process is actually associated with a visible
 	     window station, one which actually represents a visible desktop.
 	     If not, the CTRL_LOGOFF_EVENT doesn't concern this process. */
 	  if (has_visible_window_station ())
 	    sig_send (myself_nowait, SIGHUP);
+#endif
 	  return FALSE;
 	}
     }
