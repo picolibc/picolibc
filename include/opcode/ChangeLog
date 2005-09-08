@@ -1,4 +1,3 @@
-include/opcode/ChangeLog
 2005-09-06  Chao-ying Fu  <fu@mips.com>
 
 	* mips.h (OP_SH_MT_U, OP_MASK_MT_U, OP_SH_MT_H, OP_MASK_MT_H,
