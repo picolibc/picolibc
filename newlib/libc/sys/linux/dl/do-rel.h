@@ -44,7 +44,8 @@
 static inline void
 elf_dynamic_do_rel (struct link_map *map,
 		    ElfW(Addr) reladdr, ElfW(Addr) relsize,
-		    int lazy)
+		    int lazy,
+		    struct r_scope_elem *scope[])
 {
   const ElfW(Rel) *r = (const void *) reladdr;
   const ElfW(Rel) *end = (const void *) (reladdr + relsize);
@@ -77,7 +78,7 @@ elf_dynamic_do_rel (struct link_map *map,
 	 RTLD_BOOTSTRAP) because rtld.c contains the common defn for
 	 _dl_rtld_map, which is incompatible with a weak decl in the same
 	 file.  */
-      weak_extern (_dl_rtld_map);
+      #pragma weak _dl_rtld_map
       if (map != &_dl_rtld_map) /* Already done in rtld itself.  */
 # ifndef DO_RELA
 	/* Rela platforms get the offset from r_addend and this must
@@ -101,13 +102,14 @@ elf_dynamic_do_rel (struct link_map *map,
 	      ElfW(Half) ndx = version[ELFW(R_SYM) (r->r_info)];
 	      elf_machine_rel (map, r, &symtab[ELFW(R_SYM) (r->r_info)],
 			       &map->l_versions[ndx],
-			       (void *) (l_addr + r->r_offset));
+			       (void *) (l_addr + r->r_offset),
+			       scope);
 	    }
 	}
       else
 	for (; r < end; ++r)
 	  elf_machine_rel (map, r, &symtab[ELFW(R_SYM) (r->r_info)], NULL,
-			   (void *) (l_addr + r->r_offset));
+			   (void *) (l_addr + r->r_offset), scope);
     }
 }
 

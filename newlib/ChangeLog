@@ -1,3 +1,39 @@
+2005-09-08  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* Makefile.am: Add include files under bits sub-directory.
+	* Makefile.in: Regenerated.
+	* libc/sys/linux/argp/argp-fs-xinl.c: Set __OPTIMIZE__ to
+	actual value of 1 to be compatible with newer glibc headers.
+	* libc/sys/linux/sys/cdefs.h: Fix to be compatible with newer
+	glibc headers.
+	* libc/sys/linux/sys/dirent.h: Ditto.
+	* libc/sys/linux/argp/argp-xinl.c: Ditto.
+	* libc/sys/linux/dl/dl-runtime.c: Make sure fixup and
+	profile_fixup routines are marked used so they won't be
+	optimized away.
+	* libc/sys/linux/dl/dl-cache.c: Don't use weak_extern macro
+	to mark functions as weak.
+	* libc/sys/linux/dl/dl-open.c: Ditto.
+	* libc/sys/linux/iconv/gconv_open.c: Fix to obey new gcc4
+	rules about lvalues.
+	* libc/sys/linux/iconv/gconv_simple.c: Ditto.
+	* libc/sys/linux/linuxthreads/bits/libc-lock.h: Don't use
+	weak_extern macro to mark functions as weak.  Instead always
+	use #pragma weak.
+	* iconvdata/jis0208.h: Fix to work with gcc4.
+	* libc/sys/linux/dl/dl-load.c: Ditto.
+	* libc/sys/linux/dl/dl-reloc.c: Ditto.
+	* libc/sys/linux/dl/do-rel.h: Ditto.
+	* libc/sys/linux/dl/dynamic-link.h: Ditto.
+	* libc/sys/linux/include/ltdl.h: Ditto.
+	* libc/sys/linux/machine/i386/dl-machine.h: Ditto.
+	* libc/sys/linux/machine/i386/weakalias.h: Ditto.
+	* libc/sys/linux/net/ns_ntoa.c: Ditto.
+	* libc/sys/linux/bits/initspin.h: New file.
+	* libc/sys/linux/bits/libc-lock.h: Ditto.
+	* libc/sys/linux/bits/pthreadtypes.h: Ditto.
+	* libc/sys/linux/bits/typesizes.h: Ditto.
+
 2005-09-08  Eric Blake  <ebb9@byu.net>
 
 	* libc/argz/argz_insert.c (argz_insert): Don't die with EINVAL when

@@ -75,7 +75,10 @@ internal_ucs4_loop (struct __gconv_step *step,
   size_t cnt;
 
   for (cnt = 0; cnt < n_convert; ++cnt, inptr += 4)
-    *((uint32_t *) outptr)++ = bswap_32 (*(const uint32_t *) inptr);
+    {
+      *((uint32_t *) outptr) = bswap_32 (*(const uint32_t *) inptr);
+      outptr = (unsigned char *)((uint32_t *) outptr + 1);
+    }
 
   *inptrp = inptr;
   *outptrp = outptr;
@@ -180,8 +183,13 @@ internal_ucs4_loop_single (struct __gconv_step *step,
 
   *outptrp += 4;
 #elif __BYTE_ORDER == __BIG_ENDIAN
-  /* XXX unaligned */
-  *(*((uint32_t **) outptrp)++) = state->__value.__wch;
+  {
+    uint32_t **p = (uint32_t **)outptrp;
+    uint32_t *q = *p;
+    /* XXX unaligned */
+    *q = state->__value.__wch;
+    outptrp = (unsigned char *)(p + 1);
+  }
 #else
 # error "This endianess is not supported."
 #endif
@@ -244,7 +252,7 @@ ucs4_internal_loop (struct __gconv_step *step,
 	  if (flags & __GCONV_IGNORE_ERRORS)
 	    {
 	      /* Just ignore this character.  */
-	      ++*irreversible;
+	      *irreversible = *irreversible + 1;
 	      continue;
 	    }
 
@@ -253,7 +261,8 @@ ucs4_internal_loop (struct __gconv_step *step,
 	  return __GCONV_ILLEGAL_INPUT;
 	}
 
-      *((uint32_t *) outptr)++ = inval;
+      *((uint32_t *) outptr) = inval;
+      outptr = (unsigned char *) ((uint32_t *) outptr + 1);
     }
 
   *inptrp = inptr;
@@ -301,7 +310,7 @@ ucs4_internal_loop_unaligned (struct __gconv_step *step,
 	  if (flags & __GCONV_IGNORE_ERRORS)
 	    {
 	      /* Just ignore this character.  */
-	      ++*irreversible;
+	      *irreversible = *irreversible + 1;
 	      continue;
 	    }
 
@@ -536,8 +545,13 @@ internal_ucs4le_loop_single (struct __gconv_step *step,
 
   *outptrp += 4;
 #else
+  {
   /* XXX unaligned */
-  *(*((uint32_t **) outptrp)++) = state->__value.__wch;
+  uint32_t **p = (uint32_t **)outptrp;
+  uint32_t *q = *p;
+  *q = state->__value.__wch;
+  outptrp = (unsigned char **)(p + 1);
+  }
 #endif
 
   /* Clear the state buffer.  */
@@ -604,7 +618,8 @@ ucs4le_internal_loop (struct __gconv_step *step,
 	  return __GCONV_ILLEGAL_INPUT;
 	}
 
-      *((uint32_t *) outptr)++ = inval;
+      *((uint32_t *) outptr) = inval;
+      outptr = (unsigned char *)((uint32_t *) outptr + 1);
     }
 
   *inptrp = inptr;
@@ -781,12 +796,16 @@ ucs4le_internal_loop_single (struct __gconv_step *step,
 	    break;							      \
 	  }								      \
 									      \
-	++*irreversible;						      \
+	*irreversible = *irreversible + 1;				      \
 	++inptr;							      \
       }									      \
     else								      \
-      /* It's an one byte sequence.  */					      \
-      *((uint32_t *) outptr)++ = *inptr++;				      \
+      { 								      \
+        /* It's an one byte sequence.  */				      \
+        *((uint32_t *) outptr) = *inptr;				      \
+        ++inptr;							      \
+        outptr = (unsigned char *)((uint32_t *) outptr + 1);		      \
+      }									      \
   }
 #define LOOP_NEED_FLAGS
 #include <iconv/loop.c>
@@ -815,8 +834,11 @@ ucs4le_internal_loop_single (struct __gconv_step *step,
 	STANDARD_ERR_HANDLER (4);					      \
       }									      \
     else								      \
-      /* It's an one byte sequence.  */					      \
-      *outptr++ = *((const uint32_t *) inptr)++;			      \
+      { 								      \
+        /* It's an one byte sequence.  */				      \
+        *outptr++ = *((const uint32_t *) inptr);			      \
+        inptr = ((const uint32_t *) inptr + 1);				      \
+      }									      \
   }
 #define LOOP_NEED_FLAGS
 #include <iconv/loop.c>
@@ -993,7 +1015,7 @@ ucs4le_internal_loop_single (struct __gconv_step *step,
 	      {								      \
 		/* Ignore it.  */					      \
 		inptr += i;						      \
-		++*irreversible;					      \
+		*irreversible = *irreversible + 1;			      \
 		continue;						      \
 	      }								      \
 									      \
@@ -1023,7 +1045,7 @@ ucs4le_internal_loop_single (struct __gconv_step *step,
 	    if (ignore_errors_p ())					      \
 	      {								      \
 		inptr += i;						      \
-		++*irreversible;					      \
+		*irreversible = *irreversible + 1;			      \
 		continue;						      \
 	      }								      \
 									      \
@@ -1035,7 +1057,8 @@ ucs4le_internal_loop_single (struct __gconv_step *step,
       }									      \
 									      \
     /* Now adjust the pointers and store the result.  */		      \
-    *((uint32_t *) outptr)++ = ch;					      \
+    *((uint32_t *) outptr) = ch;					      \
+    outptr = (unsigned char *)((uint32_t *) outptr + 1);		      \
   }
 #define LOOP_NEED_FLAGS
 
@@ -1174,11 +1197,12 @@ ucs4le_internal_loop_single (struct __gconv_step *step,
 	    break;							      \
 	  }								      \
 	inptr += 2;							      \
-	++*irreversible;						      \
+	*irreversible = *irreversible + 1;				      \
 	continue;							      \
       }									      \
 									      \
-    *((uint32_t *) outptr)++ = u1;					      \
+    *((uint32_t *) outptr) = u1;					      \
+    outptr = (unsigned char *)((uint32_t *) outptr + 1);		      \
     inptr += 2;								      \
   }
 #define LOOP_NEED_FLAGS
@@ -1223,12 +1247,13 @@ ucs4le_internal_loop_single (struct __gconv_step *step,
 	    break;							      \
 	  }								      \
 	inptr += 4;							      \
-	++*irreversible;						      \
+	*irreversible = *irreversible + 1;				      \
 	continue;							      \
       }									      \
     else 								      \
       {									      \
-	*((uint16_t *) outptr)++ = val;					      \
+	*((uint16_t *) outptr) = val;					      \
+	outptr = (unsigned char *)((uint16_t *) outptr + 1);		      \
 	inptr += 4;							      \
       }									      \
   }
@@ -1265,11 +1290,12 @@ ucs4le_internal_loop_single (struct __gconv_step *step,
 	    break;							      \
 	  }								      \
 	inptr += 2;							      \
-	++*irreversible;						      \
+	*irreversible = *irreversible + 1;				      \
 	continue;							      \
       }									      \
 									      \
-    *((uint32_t *) outptr)++ = u1;					      \
+    *((uint32_t *) outptr) = u1;					      \
+    outptr = (unsigned char *)((uint32_t *) outptr + 1);		      \
     inptr += 2;								      \
   }
 #define LOOP_NEED_FLAGS
@@ -1313,12 +1339,13 @@ ucs4le_internal_loop_single (struct __gconv_step *step,
 	    break;							      \
 	  }								      \
 	inptr += 4;							      \
-	++*irreversible;						      \
+	*irreversible = *irreversible + 1;				      \
 	continue;							      \
       }									      \
     else 								      \
       {									      \
-	*((uint16_t *) outptr)++ = bswap_16 (val);			      \
+	*((uint16_t *) outptr) = bswap_16 (val);			      \
+	outptr = (unsigned char *)((uint16_t *) outptr + 1);		      \
 	inptr += 4;							      \
       }									      \
   }

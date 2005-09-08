@@ -17,6 +17,9 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
+#ifndef __DYNAMIC_LINK_H__
+#define __DYNAMIC_LINK_H__
+
 #include <elf.h>
 #include <machine/dl-machine.h>
 #include <assert.h>
@@ -33,7 +36,7 @@ extern int _dl_verbose __attribute__ ((unused));
 
 /* Read the dynamic section at DYN and fill in INFO with indices DT_*.  */
 
-static inline void __attribute__ ((unused))
+static void __attribute__ ((unused))
 elf_get_dynamic_info (struct link_map *l)
 {
   ElfW(Dyn) *dyn = l->l_ld;
@@ -121,6 +124,17 @@ elf_get_dynamic_info (struct link_map *l)
     info[DT_RPATH] = NULL;
 }
 
+# if ! ELF_MACHINE_NO_REL
+#  include "do-rel.h"
+# endif
+
+# if ! ELF_MACHINE_NO_RELA
+#  define DO_RELA
+#  include "do-rel.h"
+# endif
+
+#endif  /* __DYNAMIC_LINK_H__ */
+
 #ifdef RESOLVE
 
 /* Get the definitions of `elf_dynamic_do_rel' and `elf_dynamic_do_rela'.
@@ -164,7 +178,8 @@ elf_get_dynamic_info (struct link_map *l)
       elf_dynamic_do_##reloc ((map),					      \
 			      ranges[ranges_index].start,		      \
 			      ranges[ranges_index].size,		      \
-			      ranges[ranges_index].lazy);		      \
+			      ranges[ranges_index].lazy,		      \
+			      scope);					      \
   } while (0)
 # else
 #  define _ELF_DYNAMIC_DO_RELOC(RELOC, reloc, map, do_lazy, test_rel) \
@@ -204,7 +219,8 @@ elf_get_dynamic_info (struct link_map *l)
       elf_dynamic_do_##reloc ((map),					      \
 			      ranges[ranges_index].start,		      \
 			      ranges[ranges_index].size,		      \
-			      ranges[ranges_index].lazy);		      \
+			      ranges[ranges_index].lazy,		      \
+			      scope);					      \
   } while (0)
 # endif
 
@@ -215,7 +231,6 @@ elf_get_dynamic_info (struct link_map *l)
 # endif
 
 # if ! ELF_MACHINE_NO_REL
-#  include "do-rel.h"
 #  define ELF_DYNAMIC_DO_REL(map, lazy) \
   _ELF_DYNAMIC_DO_RELOC (REL, rel, map, lazy, _ELF_CHECK_REL)
 # else
@@ -223,8 +238,6 @@ elf_get_dynamic_info (struct link_map *l)
 # endif
 
 # if ! ELF_MACHINE_NO_RELA
-#  define DO_RELA
-#  include "do-rel.h"
 #  define ELF_DYNAMIC_DO_RELA(map, lazy) \
   _ELF_DYNAMIC_DO_RELOC (RELA, rela, map, lazy, _ELF_CHECK_REL)
 # else

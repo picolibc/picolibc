@@ -172,7 +172,10 @@ __gconv_open (const char *toset, const char *fromset, __gconv_t *handle,
 	    lastp = runp;
 	  else
 	    /* This means we haven't found the module.  Remove it.  */
-	    (lastp == NULL ? trans : lastp->next) = runp->next;
+	    if (lastp == NULL)
+	      trans = runp->next;
+	    else
+	      lastp->next = runp->next;
 	}
 
       /* Allocate room for handle.  */

@@ -46,7 +46,7 @@
    function.  */
 
 #ifndef ELF_MACHINE_NO_PLT
-static ElfW(Addr) __attribute__ ((regparm (2), unused))
+static ElfW(Addr) __attribute__ ((regparm (2), used))
 fixup (
 # ifdef ELF_MACHINE_RUNTIME_FIXUP_ARGS
         ELF_MACHINE_RUNTIME_FIXUP_ARGS,
@@ -130,7 +130,7 @@ fixup (
 
 #if !defined PROF && !defined ELF_MACHINE_NO_PLT && !__BOUNDED_POINTERS__
 
-static ElfW(Addr) __attribute__ ((regparm (3), unused))
+static ElfW(Addr) __attribute__ ((regparm (3), used))
 profile_fixup (
 #ifdef ELF_MACHINE_RUNTIME_FIXUP_ARGS
        ELF_MACHINE_RUNTIME_FIXUP_ARGS,

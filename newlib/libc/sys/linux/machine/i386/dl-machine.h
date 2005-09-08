@@ -292,6 +292,20 @@ elf_machine_plt_value (struct link_map *map, const Elf32_Rel *reloc,
   return value;
 }
 
+static inline void __attribute__ ((unused))
+elf_machine_rel (struct link_map *map, const Elf32_Rel *reloc,
+		 const Elf32_Sym *sym, const struct r_found_version *version,
+		 Elf32_Addr *const reloc_addr,
+		 struct r_scope_elem *scope[]);
+
+static inline void __attribute__ ((unused))
+elf_machine_rel_relative (Elf32_Addr l_addr, const Elf32_Rel *reloc,
+			  Elf32_Addr *const reloc_addr);
+
+static inline void
+elf_machine_lazy_rel (struct link_map *map,
+		      Elf32_Addr l_addr, const Elf32_Rel *reloc);
+
 #endif /* !dl_machine_h */
 
 #ifdef RESOLVE
@@ -299,10 +313,11 @@ elf_machine_plt_value (struct link_map *map, const Elf32_Rel *reloc,
 /* Perform the relocation specified by RELOC and SYM (which is fully resolved).
    MAP is the object containing the reloc.  */
 
-static inline void
+static inline void __attribute__ ((unused))
 elf_machine_rel (struct link_map *map, const Elf32_Rel *reloc,
 		 const Elf32_Sym *sym, const struct r_found_version *version,
-		 Elf32_Addr *const reloc_addr)
+		 Elf32_Addr *const reloc_addr,
+		 struct r_scope_elem *scope[])
 {
   const unsigned int r_type = ELF32_R_TYPE (reloc->r_info);
 
@@ -316,7 +331,7 @@ elf_machine_rel (struct link_map *map, const Elf32_Rel *reloc,
 	 (i.e. #ifdef RTLD_BOOTSTRAP) because rtld.c contains the
 	 common defn for _dl_rtld_map, which is incompatible with a
 	 weak decl in the same file.  */
-      weak_extern (_dl_rtld_map);
+      #pragma weak _dl_rtld_map
       if (map != &_dl_rtld_map) /* Already done in rtld itself.  */
 # endif
 	*reloc_addr += map->l_addr;
@@ -331,7 +346,9 @@ elf_machine_rel (struct link_map *map, const Elf32_Rel *reloc,
 #ifndef RTLD_BOOTSTRAP
       const Elf32_Sym *const refsym = sym;
 #endif
-      Elf32_Addr value = RESOLVE (&sym, version, r_type);
+      /* String table object symbols.  */
+      const char *strtab = (const void *) D_PTR (map, l_info[DT_STRTAB]);
+      Elf32_Addr value = RESOLVE (&sym, version, r_type, scope);
       if (sym)
 	value += sym->st_value;
 
@@ -379,7 +396,7 @@ elf_machine_rel (struct link_map *map, const Elf32_Rel *reloc,
     }
 }
 
-static inline void
+static inline void __attribute__ ((unused))
 elf_machine_rel_relative (Elf32_Addr l_addr, const Elf32_Rel *reloc,
 			  Elf32_Addr *const reloc_addr)
 {

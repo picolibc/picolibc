@@ -281,6 +281,7 @@ endif
 	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/sys/`basename $$i`; \
 	    else true; fi ; \
 	  done ; \
+	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include/bits; \
 	  for i in $(srcdir)/libc/sys/$(sys_dir)/bits/*.h; do \
 	    if [ -f $$i ]; then \
 	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/bits/`basename $$i`; \

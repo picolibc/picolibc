@@ -29,7 +29,7 @@
 #endif
 #define ARGP_EI
 #undef __OPTIMIZE__
-#define __OPTIMIZE__
+#define __OPTIMIZE__ 1
 #include <argp.h>
 
 /* Add weak aliases.  */

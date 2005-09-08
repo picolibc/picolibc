@@ -36,8 +36,8 @@
 extern ElfW(Addr) _dl_sysdep_start (void **start_argptr,
 				    void (*dl_main) (const ElfW(Phdr) *phdr,
 						     ElfW(Word) phnum,
-						     ElfW(Addr) *user_entry));
-weak_extern (BP_SYM (_dl_sysdep_start))
+						     ElfW(Addr) *user_entry))
+				   weak_function;
 
 /* This function is used to unload the cache file if necessary.  */
 extern void _dl_unload_cache (void);

@@ -24,15 +24,6 @@
 #include <gconv.h>
 #include <stdint.h>
 
-/* Conversion table.  */
-extern const uint16_t __jis0208_to_ucs[];
-
-extern const char __jisx0208_from_ucs4_lat1[256][2];
-extern const char __jisx0208_from_ucs4_greek[0xc1][2];
-extern const struct jisx0208_ucs_idx __jisx0208_from_ucs_idx[];
-extern const char __jisx0208_from_ucs_tab[][2];
-
-
 /* Struct for table with indeces in UCS mapping table.  */
 struct jisx0208_ucs_idx
 {
@@ -41,6 +32,13 @@ struct jisx0208_ucs_idx
   uint16_t idx;
 };
 
+/* Conversion table.  */
+extern const uint16_t __jis0208_to_ucs[];
+
+extern const char __jisx0208_from_ucs4_lat1[256][2];
+extern const char __jisx0208_from_ucs4_greek[0xc1][2];
+extern const struct jisx0208_ucs_idx __jisx0208_from_ucs_idx[];
+extern const char __jisx0208_from_ucs_tab[][2];
 
 static inline uint32_t
 jisx0208_to_ucs4 (const unsigned char **s, size_t avail, unsigned char offset)

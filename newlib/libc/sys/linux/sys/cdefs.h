@@ -227,4 +227,12 @@
 # endif
 #endif
 
+/* The nonull function attribute allows to mark pointer parameters which
+   must not be NULL.  */
+#if __GNUC_PREREQ (3,3)
+# define __nonnull(params) __attribute__ ((__nonnull__ params))
+#else
+# define __nonnull(params)
+#endif
+
 #endif	 /* sys/cdefs.h */

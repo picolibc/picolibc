@@ -1,18 +1,19 @@
 /* libc-internal interface for mutex locks.  LinuxThreads version.
-   Copyright (C) 1996,1997,1998,1999,2000,2001 Free Software Foundation, Inc.
+   Copyright (C) 1996,1997,1998,1999,2000,2001,2002,2003
+   	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public License as
-   published by the Free Software Foundation; either version 2 of the
+   modify it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
    License, or (at your option) any later version.
 
    The GNU C Library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
+   Lesser General Public License for more details.
 
-   You should have received a copy of the GNU Library General Public
+   You should have received a copy of the GNU Lesser General Public
    License along with the GNU C Library; see the file COPYING.LIB.  If not,
    write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
@@ -21,6 +22,10 @@
 #define _BITS_LIBC_LOCK_H 1
 
 #include <pthread.h>
+
+#if defined _LIBC && !defined NOT_IN_libc
+#include <linuxthreads/internals.h>
+#endif
 
 /* Mutex type.  */
 #if defined(_LIBC) || defined(_IO_MTSAFE_IO)
@@ -31,6 +36,7 @@ typedef pthread_rwlock_t __libc_rwlock_t;
 # else
 typedef struct __libc_rwlock_opaque__ __libc_rwlock_t;
 # endif
+typedef __libc_lock_recursive_t __rtld_lock_recursive_t;
 #else
 typedef struct __libc_lock_opaque__ __libc_lock_t;
 typedef struct __libc_lock_recursive_opaque__ __libc_lock_recursive_t;
@@ -53,6 +59,8 @@ typedef pthread_key_t __libc_key_t;
   CLASS __libc_rwlock_t NAME;
 #define __libc_lock_define_recursive(CLASS,NAME) \
   CLASS __libc_lock_recursive_t NAME;
+#define __rtld_lock_define_recursive(CLASS,NAME) \
+  CLASS __rtld_lock_recursive_t NAME;
 
 /* Define an initialized lock variable NAME with storage class CLASS.
 
@@ -81,14 +89,60 @@ typedef pthread_key_t __libc_key_t;
 #define _LIBC_LOCK_RECURSIVE_INITIALIZER \
   {PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP}
 
+#define __rtld_lock_define_initialized_recursive(CLASS,NAME) \
+  CLASS __rtld_lock_recursive_t NAME = _RTLD_LOCK_RECURSIVE_INITIALIZER;
+#define _RTLD_LOCK_RECURSIVE_INITIALIZER \
+  {PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP}
+
+#if defined _LIBC && defined IS_IN_libpthread
+# define __libc_maybe_call(FUNC, ARGS, ELSE) FUNC ARGS
+#else
+# if defined __PIC__ || (defined _LIBC && defined SHARED)
+#  define __libc_maybe_call(FUNC, ARGS, ELSE) \
+  (__extension__ ({ __typeof (FUNC) *_fn = (FUNC); \
+                    _fn != NULL ? (*_fn) ARGS : ELSE; }))
+# else
+#  define __libc_maybe_call(FUNC, ARGS, ELSE) \
+  (FUNC != NULL ? FUNC ARGS : ELSE)
+# endif
+#endif
+#if defined _LIBC && !defined NOT_IN_libc && defined SHARED
+# define __libc_maybe_call2(FUNC, ARGS, ELSE) \
+  ({__builtin_expect (__libc_pthread_functions.ptr_##FUNC != NULL, 0) \
+    ? __libc_pthread_functions.ptr_##FUNC ARGS : ELSE; })
+#else
+# define __libc_maybe_call2(FUNC, ARGS, ELSE) __libc_maybe_call (__##FUNC, ARGS, ELSE)
+#endif
+
 /* Initialize the named lock variable, leaving it in a consistent, unlocked
    state.  */
+#if defined _LIBC && !defined NOT_IN_libc && defined SHARED
 #define __libc_lock_init(NAME) \
-  (__pthread_mutex_init != NULL ? __pthread_mutex_init (&(NAME), NULL) : 0);
+  ({									      \
+    (NAME).__m_count = 0;						      \
+    (NAME).__m_owner = NULL;						      \
+    (NAME).__m_kind = PTHREAD_MUTEX_TIMED_NP;				      \
+    (NAME).__m_lock.__status = 0;					      \
+    (NAME).__m_lock.__spinlock = __LT_SPINLOCK_INIT;			      \
+    0; })
+#else
+#define __libc_lock_init(NAME) \
+  (__libc_maybe_call2 (pthread_mutex_init, (&(NAME), NULL), 0))
+#endif
 #define __libc_rwlock_init(NAME) \
-  (__pthread_rwlock_init != NULL ? __pthread_rwlock_init (&(NAME), NULL) : 0);
+  (__libc_maybe_call (__pthread_rwlock_init, (&(NAME), NULL), 0));
 
 /* Same as last but this time we initialize a recursive mutex.  */
+#if defined _LIBC && !defined NOT_IN_libc && defined SHARED
+#define __libc_lock_init_recursive(NAME) \
+  ({									      \
+    (NAME).mutex.__m_count = 0;						      \
+    (NAME).mutex.__m_owner = NULL;					      \
+    (NAME).mutex.__m_kind = PTHREAD_MUTEX_RECURSIVE_NP;			      \
+    (NAME).mutex.__m_lock.__status = 0;					      \
+    (NAME).mutex.__m_lock.__spinlock = __LT_SPINLOCK_INIT;		      \
+    0; })
+#else
 #define __libc_lock_init_recursive(NAME) \
   do {									      \
     if (__pthread_mutex_init != NULL)					      \
@@ -100,51 +154,71 @@ typedef pthread_key_t __libc_key_t;
 	__pthread_mutexattr_destroy (&__attr);				      \
       }									      \
   } while (0);
+#endif
+#define __rtld_lock_init_recursive(NAME) \
+  __libc_lock_init_recursive (NAME)
 
 /* Finalize the named lock variable, which must be locked.  It cannot be
    used again until __libc_lock_init is called again on it.  This must be
    called on a lock variable before the containing storage is reused.  */
 #define __libc_lock_fini(NAME) \
-  (__pthread_mutex_destroy != NULL ? __pthread_mutex_destroy (&(NAME)) : 0);
+  (__libc_maybe_call2 (pthread_mutex_destroy, (&(NAME)), 0));
 #define __libc_rwlock_fini(NAME) \
-  (__pthread_rwlock_destroy != NULL ? __pthread_rwlock_destroy (&(NAME)) : 0);
+  (__libc_maybe_call (__pthread_rwlock_destroy, (&(NAME)), 0));
 
 /* Finalize recursive named lock.  */
 #define __libc_lock_fini_recursive(NAME) __libc_lock_fini ((NAME).mutex)
+#define __rtld_lock_fini_recursive(NAME) __libc_lock_fini_recursive (NAME)
 
 /* Lock the named lock variable.  */
 #define __libc_lock_lock(NAME) \
-  (__pthread_mutex_lock != NULL ? __pthread_mutex_lock (&(NAME)) : 0);
+  (__libc_maybe_call2 (pthread_mutex_lock, (&(NAME)), 0));
 #define __libc_rwlock_rdlock(NAME) \
-  (__pthread_rwlock_rdlock != NULL ? __pthread_rwlock_rdlock (&(NAME)) : 0);
+  (__libc_maybe_call (__pthread_rwlock_rdlock, (&(NAME)), 0));
 #define __libc_rwlock_wrlock(NAME) \
-  (__pthread_rwlock_wrlock != NULL ? __pthread_rwlock_wrlock (&(NAME)) : 0);
+  (__libc_maybe_call (__pthread_rwlock_wrlock, (&(NAME)), 0));
 
 /* Lock the recursive named lock variable.  */
 #define __libc_lock_lock_recursive(NAME) __libc_lock_lock ((NAME).mutex)
 
 /* Try to lock the named lock variable.  */
 #define __libc_lock_trylock(NAME) \
-  (__pthread_mutex_trylock != NULL ? __pthread_mutex_trylock (&(NAME)) : 0)
+  (__libc_maybe_call2 (pthread_mutex_trylock, (&(NAME)), 0))
 #define __libc_rwlock_tryrdlock(NAME) \
-  (__pthread_rwlock_tryrdlock != NULL \
-   ? __pthread_rwlock_tryrdlock (&(NAME)) : 0)
+  (__libc_maybe_call (__pthread_rwlock_tryrdlock, (&(NAME)), 0))
 #define __libc_rwlock_trywrlock(NAME) \
-  (__pthread_rwlock_trywrlock != NULL \
-   ? __pthread_rwlock_trywrlock (&(NAME)) : 0)
+  (__libc_maybe_call (__pthread_rwlock_trywrlock, (&(NAME)), 0))
 
 /* Try to lock the recursive named lock variable.  */
 #define __libc_lock_trylock_recursive(NAME) __libc_lock_trylock ((NAME).mutex)
+#define __rtld_lock_trylock_recursive(NAME) \
+  __libc_lock_trylock_recursive (NAME)
 
 /* Unlock the named lock variable.  */
 #define __libc_lock_unlock(NAME) \
-  (__pthread_mutex_unlock != NULL ? __pthread_mutex_unlock (&(NAME)) : 0);
+  (__libc_maybe_call2 (pthread_mutex_unlock, (&(NAME)), 0));
 #define __libc_rwlock_unlock(NAME) \
-  (__pthread_rwlock_unlock != NULL ? __pthread_rwlock_unlock (&(NAME)) : 0);
+  (__libc_maybe_call (__pthread_rwlock_unlock, (&(NAME)), 0));
 
 /* Unlock the recursive named lock variable.  */
 #define __libc_lock_unlock_recursive(NAME) __libc_lock_unlock ((NAME).mutex)
 
+#if defined _LIBC && defined SHARED
+# define __rtld_lock_default_lock_recursive(lock) \
+  ++((pthread_mutex_t *)(lock))->__m_count;
+
+# define __rtld_lock_default_unlock_recursive(lock) \
+  --((pthread_mutex_t *)(lock))->__m_count;
+
+# define __rtld_lock_lock_recursive(NAME) \
+  GL(dl_rtld_lock_recursive) (&(NAME).mutex)
+
+# define __rtld_lock_unlock_recursive(NAME) \
+  GL(dl_rtld_unlock_recursive) (&(NAME).mutex)
+#else
+#define __rtld_lock_lock_recursive(NAME) __libc_lock_lock_recursive (NAME)
+#define __rtld_lock_unlock_recursive(NAME) __libc_lock_unlock_recursive (NAME)
+#endif
 
 /* Define once control variable.  */
 #if PTHREAD_ONCE_INIT == 0
@@ -164,7 +238,7 @@ typedef pthread_key_t __libc_key_t;
       __pthread_once (&(ONCE_CONTROL), (INIT_FUNCTION));		      \
     else if ((ONCE_CONTROL) == PTHREAD_ONCE_INIT) {			      \
       INIT_FUNCTION ();							      \
-      (ONCE_CONTROL) = !PTHREAD_ONCE_INIT;				      \
+      (ONCE_CONTROL) = 2;						      \
     }									      \
   } while (0)
 
@@ -190,22 +264,30 @@ typedef pthread_key_t __libc_key_t;
       _pthread_cleanup_pop_restore (&_buffer, (DOIT));			      \
     }
 
+#define __libc_cleanup_push(fct, arg) \
+    { struct _pthread_cleanup_buffer _buffer; 				      \
+    __libc_maybe_call (_pthread_cleanup_push, (&_buffer, (fct), (arg)), 0)
+
+#define __libc_cleanup_pop(execute) \
+    __libc_maybe_call (_pthread_cleanup_pop, (&_buffer, execute), 0);	      \
+    }
+
 /* Create thread-specific key.  */
 #define __libc_key_create(KEY, DESTRUCTOR) \
-  (__pthread_key_create != NULL ? __pthread_key_create (KEY, DESTRUCTOR) : 1)
+  (__libc_maybe_call (__pthread_key_create, (KEY, DESTRUCTOR), 1))
 
 /* Get thread-specific data.  */
 #define __libc_getspecific(KEY) \
-  (__pthread_getspecific != NULL ? __pthread_getspecific (KEY) : NULL)
+  (__libc_maybe_call (__pthread_getspecific, (KEY), NULL))
 
 /* Set thread-specific data.  */
 #define __libc_setspecific(KEY, VALUE) \
-  (__pthread_setspecific != NULL ? __pthread_setspecific (KEY, VALUE) : 0)
+  (__libc_maybe_call (__pthread_setspecific, (KEY, VALUE), 0))
 
 
 /* Register handlers to execute before and after `fork'.  */
 #define __libc_atfork(PREPARE, PARENT, CHILD) \
-  (__pthread_atfork != NULL ? __pthread_atfork (PREPARE, PARENT, CHILD) : 0)
+  (__libc_maybe_call (__pthread_atfork, (PREPARE, PARENT, CHILD), 0))
 
 /* Functions that are used by this file and are internal to the GNU C
    library.  */
@@ -287,7 +369,8 @@ extern int __pthread_atfork (void (*__prepare) (void),
 #  pragma weak __pthread_atfork
 #  pragma weak _pthread_cleanup_push_defer
 #  pragma weak _pthread_cleanup_pop_restore
-# endif
+#  pragma weak _pthread_cleanup_push
+#  pragma weak _pthread_cleanup_pop
 #endif
 
 /* We need portable names for some functions.  E.g., when they are
