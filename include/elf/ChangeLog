@@ -1,3 +1,7 @@
+2005-09-09  Richard Earnshaw  <richard.earnshaw@arm.com>
+
+	* arm.h (SHT_ARM_PREEMPTMAP, SHT_ARM_ATTRIBUTES): New defines.
+
 2005-08-09  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
 
 	* hppa.h (SHT_PARISC_DLKM, SHF_PARISC_WEAKORDER, PT_PARISC_WEAKORDER):

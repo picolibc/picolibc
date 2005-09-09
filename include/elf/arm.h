@@ -71,6 +71,8 @@
 
 /* Additional section types.  */
 #define SHT_ARM_EXIDX	   0x70000001	/* Section holds ARM unwind info.  */
+#define SHT_ARM_PREEMPTMAP 0x70000002	/* Section pre-emption details.  */
+#define SHT_ARM_ATTRIBUTES 0x70000003	/* Section holds attributes.  */
 
 /* ARM-specific values for sh_flags.  */
 #define SHF_ENTRYSECT      0x10000000   /* Section contains an entry point.  */
