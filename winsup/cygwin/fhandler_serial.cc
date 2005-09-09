@@ -517,6 +517,10 @@ fhandler_serial::ioctl (unsigned int cmd, void *buffer)
        else
 	 ipbuffer = st.cbInQue;
        break;
+     case TIOCGWINSZ:
+       ((struct winsize *) buffer)->ws_row = 0;
+       ((struct winsize *) buffer)->ws_col = 0;
+       break;
      default:
        set_errno (ENOSYS);
        res = -1;
