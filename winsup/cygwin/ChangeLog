@@ -1,5 +1,10 @@
 2005-09-08  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler_serial.cc (fhandler_serial::tcgetattr): Just zero c_cflag
+	here rather than clearing CBAUD after the fact.
+
+2005-09-08  Christopher Faylor  <cgf@timesys.com>
+
 	* fhandler_serial.cc (fhandler_serial::ioctl): Always return 0 for
 	window size.
 	* termios.cc (tcgetattr): Clear out baud part of c_cflag since it is

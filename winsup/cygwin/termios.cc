@@ -179,10 +179,7 @@ tcgetattr (int fd, struct termios *in_t)
   else if (!cfd->is_tty ())
     set_errno (ENOTTY);
   else if ((res = cfd->tcgetattr (t)) == 0)
-    {
-      t->c_cflag &= ~CBAUD;
-      __toapp_termios (in_t, t);
-    }
+    __toapp_termios (in_t, t);
 
   if (res)
     termios_printf ("%d = tcgetattr (%d, %p)", res, fd, in_t);

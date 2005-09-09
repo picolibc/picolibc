@@ -911,44 +911,45 @@ fhandler_serial::tcgetattr (struct termios *t)
   /* for safety */
   memset (t, 0, sizeof (*t));
 
+  t->c_cflag = 0;
   /* -------------- Baud rate ------------------ */
   switch (state.BaudRate)
     {
     case CBR_110:
-	t->c_cflag = t->c_ospeed = t->c_ispeed = B110;
+	t->c_ospeed = t->c_ispeed = B110;
 	break;
     case CBR_300:
-	t->c_cflag = t->c_ospeed = t->c_ispeed = B300;
+	t->c_ospeed = t->c_ispeed = B300;
 	break;
     case CBR_600:
-	t->c_cflag = t->c_ospeed = t->c_ispeed = B600;
+	t->c_ospeed = t->c_ispeed = B600;
 	break;
     case CBR_1200:
-	t->c_cflag = t->c_ospeed = t->c_ispeed = B1200;
+	t->c_ospeed = t->c_ispeed = B1200;
 	break;
     case CBR_2400:
-	t->c_cflag = t->c_ospeed = t->c_ispeed = B2400;
+	t->c_ospeed = t->c_ispeed = B2400;
 	break;
     case CBR_4800:
-	t->c_cflag = t->c_ospeed = t->c_ispeed = B4800;
+	t->c_ospeed = t->c_ispeed = B4800;
 	break;
     case CBR_9600:
-	t->c_cflag = t->c_ospeed = t->c_ispeed = B9600;
+	t->c_ospeed = t->c_ispeed = B9600;
 	break;
     case CBR_19200:
-	t->c_cflag = t->c_ospeed = t->c_ispeed = B19200;
+	t->c_ospeed = t->c_ispeed = B19200;
 	break;
     case CBR_38400:
-	t->c_cflag = t->c_ospeed = t->c_ispeed = B38400;
+	t->c_ospeed = t->c_ispeed = B38400;
 	break;
     case CBR_57600:
-	t->c_cflag = t->c_ospeed = t->c_ispeed = B57600;
+	t->c_ospeed = t->c_ispeed = B57600;
 	break;
     case CBR_115200:
-	t->c_cflag = t->c_ospeed = t->c_ispeed = B115200;
+	t->c_ospeed = t->c_ispeed = B115200;
 	break;
     case 230400: /* CBR_230400 - not defined */
-	t->c_cflag = t->c_ospeed = t->c_ispeed = B230400;
+	t->c_ospeed = t->c_ispeed = B230400;
 	break;
     default:
 	/* Unsupported baud rate! */
