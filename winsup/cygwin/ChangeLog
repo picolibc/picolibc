@@ -1,7 +1,8 @@
 2005-09-09  Christopher Faylor  <cgf@timesys.com>
 
 	* heap.cc (heap_init): Be slightly more aggressive when trying to
-	allocate heap.  Change fatal error to avoid confusion with cygheap.
+	allocate heap.  Change fatal error message to avoid confusion with
+	cygheap.
 
 	* spawn.cc (linebuf::finish): New function.
 	(linebuf::add): Cosmetic change.
