@@ -35,6 +35,7 @@ details. */
 #include "cygtls.h"
 
 #define LINE_BUF_CHUNK (CYG_MAX_PATH * 2)
+#define MAXWINCMDLEN 32767
 
 static suffix_info std_suffixes[] =
 {
@@ -231,16 +232,30 @@ class linebuf
   size_t alloced;
   linebuf () : ix (0), buf (NULL), alloced (0) {}
   ~linebuf () {if (buf) free (buf);}
-  void add (const char *what, int len);
+  void add (const char *what, int len) __attribute__ ((regparm (3)));
   void add (const char *what) {add (what, strlen (what));}
   void prepend (const char *what, int len);
+  void finish (bool) __attribute__ ((regparm (2)));
 };
+
+void
+linebuf::finish (bool cmdlenoverflow_ok)
+{
+  if (!ix)
+    add ("", 1);
+  else
+    {
+      if (ix-- > MAXWINCMDLEN && cmdlenoverflow_ok)
+	ix = MAXWINCMDLEN - 1;
+      buf[ix] = '\0';
+    }
+}
 
 void
 linebuf::add (const char *what, int len)
 {
-  size_t newix;
-  if ((newix = ix + len) >= alloced || !buf)
+  size_t newix = ix + len;
+  if (newix >= alloced || !buf)
     {
       alloced += LINE_BUF_CHUNK + newix;
       buf = (char *) realloc (buf, alloced + 1);
@@ -470,12 +485,12 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       goto out;
     }
 
-  MALLOC_CHECK;
+  bool wascygexec = real_path.iscygexec ();
   res = newargv.fixup (chtype, prog_arg, real_path, ext);
   if (res)
     goto out;
 
-  if (real_path.iscygexec ())
+  if (wascygexec)
     newargv.dup_all ();
   else
     {
@@ -522,19 +537,12 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 		one_line.add (a);
 	      one_line.add ("\"", 1);
 	    }
-	  MALLOC_CHECK;
 	  one_line.add (" ", 1);
-	  MALLOC_CHECK;
 	}
 
-      MALLOC_CHECK;
-      if (one_line.ix)
-	one_line.buf[one_line.ix - 1] = '\0';
-      else
-	one_line.add ("", 1);
-      MALLOC_CHECK;
+      one_line.finish (real_path.iscygexec ());
 
-      if (one_line.ix > 32767)
+      if (one_line.ix >= MAXWINCMDLEN)
 	{
 	  debug_printf ("Command line too long (>32K), return E2BIG");
 	  set_errno (E2BIG);
@@ -690,10 +698,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   if (mode != _P_OVERLAY || !rc)
     cygheap->user.reimpersonate ();
 
-  MALLOC_CHECK;
   if (envblock)
     free (envblock);
-  MALLOC_CHECK;
 
   /* Set errno now so that debugging messages from it appear before our
      final debugging message [this is a general rule for debugging

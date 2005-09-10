@@ -73,11 +73,11 @@ heap_init ()
 				     MEM_RESERVE, PAGE_READWRITE);
 	  if (p)
 	    break;
-	  if ((reserve_size -= page_const) <= allocsize)
+	  if ((reserve_size -= page_const) < allocsize)
 	    break;
 	}
       if (!p)
-	api_fatal ("couldn't allocate cygwin heap, %E, base %p, top %p, "
+	api_fatal ("couldn't allocate heap, %E, base %p, top %p, "
 		   "reserve_size %d, allocsize %d, page_const %d",
 		   cygheap->user_heap.base, cygheap->user_heap.top,
 		   reserve_size, allocsize, page_const);

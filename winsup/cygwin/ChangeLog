@@ -1,7 +1,20 @@
+2005-09-09  Christopher Faylor  <cgf@timesys.com>
+
+	* heap.cc (heap_init): Be slightly more aggressive when trying to
+	allocate heap.  Change fatal error to avoid confusion with cygheap.
+
+	* spawn.cc (linebuf::finish): New function.
+	(linebuf::add): Cosmetic change.
+	(spawn_guts): Only avoid building windows command line if the program
+	being executed was actually mounted with -X.  Don't return E2BIG if we
+	hit the 32K size and we're executing a detected cygwin program.  Just
+	silently truncate the windows command line, instead.
+
 2005-09-08  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_serial.cc (fhandler_serial::tcgetattr): Just zero c_cflag
 	here rather than clearing CBAUD after the fact.
+	* termios.cc (tcgetattr): Revert previous change.
 
 2005-09-08  Christopher Faylor  <cgf@timesys.com>
 
@@ -265,7 +278,7 @@
 	dirent_saw_dev.
 	* dir.cc (opendir): Don't zero __flags here.  Push that responsibility
 	to opendir methods.
-	(seekdir): Preserve dirent_isrrot in __flags.
+	(seekdir): Preserve dirent_isroot in __flags.
 	(rewinddir): Ditto.
 	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Set
 	dirent_isroot appropriately.
