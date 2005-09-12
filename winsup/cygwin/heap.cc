@@ -47,7 +47,7 @@ heap_init ()
 	   * to assure contiguous memory.  */
 	  cygheap->user_heap.ptr = cygheap->user_heap.top =
 	  cygheap->user_heap.base =
-	    VirtualAlloc (NULL, cygheap->user_heap.chunk, MEM_RESERVE, PAGE_NOACCESS);
+	    VirtualAlloc (NULL, cygheap->user_heap.chunk, MEM_RESERVE | MEM_TOP_DOWN, PAGE_NOACCESS);
 	  if (cygheap->user_heap.base)
 	    break;
 	  cygheap->user_heap.chunk -= 1 * 1024 * 1024;
