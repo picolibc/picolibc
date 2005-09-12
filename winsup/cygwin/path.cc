@@ -648,12 +648,14 @@ path_conv::check (const char *src, unsigned opt,
 	  else if (dev == FH_DEV)
 	    {
 	      dev.devn = FH_FS;
+#if 0
 	      fileattr = GetFileAttributes (this->path);
 	      if (!component && fileattr == INVALID_FILE_ATTRIBUTES)
 		{
 		  fileattr = FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_READONLY;
 		  goto out;
 		}
+#endif
 	    }
 	  else if (isvirtual_dev (dev.devn))
 	    {

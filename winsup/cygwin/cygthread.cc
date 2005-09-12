@@ -184,7 +184,7 @@ cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
       h = CreateThread (&sec_none_nih, 0, is_freerange ? simplestub : stub,
 			this, 0, &id);
       if (!h)
-	api_fatal ("thread handle not set - %p<%p>, %E", h, id);
+	api_fatal ("CreateThread failed for %s - %p<%p>, %E", name, h, id);
       thread_printf ("created name '%s', thread %p, id %p", name, h, id);
 #ifdef DEBUGGING
       terminated = false;

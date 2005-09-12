@@ -1381,7 +1381,7 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
       bool added = false;
       if (!(dir->__flags & dirent_isroot))
 	/* nothing */;
-      else if (!(dir->__flags & dirent_saw_dev))
+      else if (0 && !(dir->__flags & dirent_saw_dev))
 	{
 	  strcpy (buf.cFileName, "dev");
 	  added = true;
