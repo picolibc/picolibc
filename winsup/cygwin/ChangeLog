@@ -1,5 +1,48 @@
 2005-09-13  Christopher Faylor  <cgf@timesys.com>
 
+	* dcrt0.cc (do_exit): Rely on sigproc_terminate to set exit_state
+	appropriately.
+	* pinfo.cc (pinfo::exit): Always call sigproc_terminate here.  Rely on
+	sigproc_terminate to signal signal thread to handle eventual process
+	exit.
+	* sigproc.cc (no_signals_available): Change criteria for determining if
+	this process can handle signals to itself.
+	(my_sendsig): New variable.  Copy of my sendsig handle.
+	(proc_can_be_signalled): Don't send signals if exit code is set.
+	(sigproc_terminate): Use and set exit_state appropriately to determine
+	when to do anything.  Send __SIGEXIT to self to control process exit.
+	(sig_send): Use my_sendsig for sending signals.  Don't call
+	proc_can_be_signalled for myself since the criteria is now different
+	for sending signals to myself.
+	(wait_sig): Copy myself->sendsig to my_sendsig for future use.  Exit
+	signal loop when __SIGEXIT is received.  Wait for main thread to exit
+	and use its exit status to actually exit process.
+	* sigproc.h (__SIGEXIT): New enum.
+
+2005-09-13  Christopher Faylor  <cgf@timesys.com>
+
+	* dcrt0.cc (alloc_stack): Eliminate superfluous "return;".
+	* debug.cc (add_handle): Ditto.
+	* devices.in (device::parse): Ditto.
+	* dtable.cc (dtable::vfork_parent_restore): Ditto.
+	(dtable::vfork_child_fixup): Ditto.
+	* environ.cc (parse_options): Ditto.
+	* errno.cc (seterrno_from_win_error): Ditto.
+	* exceptions.cc (sig_handle_tty_stop): Ditto.
+	(set_signal_mask): Ditto.
+	* fhandler.cc (fhandler_base::read): Ditto.
+	(fhandler_base::operator delete): Ditto.
+	(fhandler_base::seekdir): Ditto.
+	(fhandler_base::rewinddir): Ditto.
+	* fhandler_console.cc (fhandler_console::read): Ditto.
+	(fhandler_console::fixup_after_exec): Ditto.
+	* sigproc.cc (sigproc_init): Ditto.
+	(sigproc_terminate): Ditto.
+	
+	* devices.cc: Regenerate.
+
+2005-09-13  Christopher Faylor  <cgf@timesys.com>
+
 	* sigproc.cc (wait_sig): Be more defensive about detecting when we're
 	exiting.
 

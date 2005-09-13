@@ -306,7 +306,6 @@ seterrno_from_win_error (const char *file, int line, DWORD code)
 {
   syscall_printf ("%s:%d windows error %d", file, line, code);
   set_errno (geterrno_from_win_error (code, EACCES));
-  return;
 }
 
 /* seterrno: Set `errno' based on GetLastError (). */

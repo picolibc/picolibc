@@ -788,8 +788,6 @@ dtable::vfork_parent_restore ()
       cygheap->ctty->close ();			// Undo previous bump of this archetype
     }
   cygheap->ctty_on_hold = NULL;
-
-  return;
 }
 
 void
@@ -824,8 +822,6 @@ dtable::vfork_child_fixup ()
       cygheap->ctty_on_hold->close ();
       cygheap->ctty_on_hold = NULL;
     }
-
-  return;
 }
 #endif /*NEWVFORK*/
 

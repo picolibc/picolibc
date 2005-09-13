@@ -136,13 +136,12 @@ pinfo::zap_cwd ()
 void
 pinfo::exit (DWORD n)
 {
+  sigproc_terminate ();
   exit_state = ES_FINAL;
+
   cygthread::terminate ();
   if (n != EXITCODE_NOSET)
-    {
-      sigproc_terminate ();		/* Just terminate signal and process stuff */
-      self->exitcode = EXITCODE_SET | n;/* We're really exiting.  Record the UNIX exit code. */
-    }
+    self->exitcode = EXITCODE_SET | n;/* We're really exiting.  Record the UNIX exit code. */
 
   /* FIXME:  There is a potential race between an execed process and its
      parent here.  I hated to add a mutex just for this, though.  */
@@ -161,12 +160,25 @@ pinfo::exit (DWORD n)
   int exitcode = self->exitcode & 0xffff;
   if (!self->cygstarted)
     exitcode >>= 8;
-  release ();
 
   _my_tls.stacklock = 0;
   _my_tls.stackptr = _my_tls.stack;
-  sigproc_printf ("Calling ExitProcess hProcess %p, n %p, exitcode %p",
+  if (&_my_tls == _main_tls)
+    {
+      sigproc_printf ("Calling ExitProcess hProcess %p, n %p, exitcode %p",
+		      hProcess, n, exitcode);
+      ExitThread (exitcode);
+    }
+  else if (hMainThread)
+    {
+      sigproc_printf ("Calling TerminateThread since %p != %p, %p, n %p, exitcode %p",
+		      &_my_tls, _main_tls, hProcess, n, exitcode);
+      TerminateThread (hMainThread, exitcode);
+    }
+
+  sigproc_printf ("Calling ExitProcess since hMainthread is 0, hProcess %p, n %p, exitcode %p",
 		  hProcess, n, exitcode);
+  release ();
   ExitProcess (exitcode);
 }
 # undef self

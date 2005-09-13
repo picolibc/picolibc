@@ -14899,7 +14899,6 @@ device::parse (_major_t major, _minor_t minor)
 
   if (!*this)
     devn = FHDEV (major, minor);
-  return;
 }
 
 void

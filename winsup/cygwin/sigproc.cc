@@ -38,7 +38,7 @@ details. */
 #define WSSC		  60000	// Wait for signal completion
 #define WPSP		  40000	// Wait for proc_subproc mutex
 
-#define no_signals_available() (!hwait_sig || (myself->sendsig == INVALID_HANDLE_VALUE) || exit_state)
+#define no_signals_available() (!hwait_sig || (myself->exitcode & EXITCODE_SET) && !my_sendsig)
 
 #define NPROCS	256
 
@@ -80,6 +80,7 @@ static __inline__ bool get_proc_lock (DWORD, DWORD);
 static bool __stdcall remove_proc (int);
 static bool __stdcall stopped_or_terminated (waitq *, _pinfo *);
 static DWORD WINAPI wait_sig (VOID *arg);
+static HANDLE NO_COPY my_sendsig;
 
 /* wait_sig bookkeeping */
 
@@ -166,7 +167,7 @@ get_proc_lock (DWORD what, DWORD val)
 static bool __stdcall
 proc_can_be_signalled (_pinfo *p)
 {
-  if (p->sendsig != INVALID_HANDLE_VALUE)
+  if (!(p->exitcode & EXITCODE_SET))
     {
       if (p == myself_nowait || p == myself)
 	if (hwait_sig)
@@ -428,7 +429,6 @@ sig_clear (int target_sig)
 	  }
       sigq.restore (save);
     }
-  return;
 }
 
 extern "C" int
@@ -493,7 +493,6 @@ sigproc_init ()
 
   global_sigs[SIGSTOP].sa_flags = SA_RESTART | SA_NODEFER;
   sigproc_printf ("process/signal handling enabled(%x)", myself->process_state);
-  return;
 }
 
 /* Called on process termination to terminate signal and process threads.
@@ -501,23 +500,15 @@ sigproc_init ()
 void __stdcall
 sigproc_terminate (void)
 {
-  hwait_sig = NULL;
-
-  if (myself->sendsig == INVALID_HANDLE_VALUE)
-    sigproc_printf ("sigproc handling not active");
+  if (exit_state > ES_SIGPROCTERMINATE)
+    sigproc_printf ("already performed");
   else
     {
+      exit_state = ES_SIGPROCTERMINATE;
       sigproc_printf ("entering");
-      if (!hExeced)
-	{
-	  HANDLE sendsig = myself->sendsig;
-	  myself->sendsig = INVALID_HANDLE_VALUE;
-	  CloseHandle (sendsig);
-	}
+      sig_send (myself_nowait, __SIGEXIT);
+      proc_terminate ();		// clean up process stuff
     }
-  proc_terminate ();		// clean up process stuff
-
-  return;
 }
 
 int __stdcall
@@ -545,7 +536,18 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
   pack.wakeup = NULL;
   bool wait_for_completion;
   if (!(its_me = (p == NULL || p == myself || p == myself_nowait)))
-    wait_for_completion = false;
+    {
+      /* It is possible that the process is not yet ready to receive messages
+       * or that it has exited.  Detect this.
+       */
+      if (!proc_can_be_signalled (p))	/* Is the process accepting messages? */
+	{
+	  sigproc_printf ("invalid pid %d(%x), signal %d",
+			  p->pid, p->process_state, si.si_signo);
+	  goto out;
+	}
+      wait_for_completion = false;
+    }
   else
     {
       if (no_signals_available ())
@@ -561,18 +563,9 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
       p = myself;
     }
 
-  /* It is possible that the process is not yet ready to receive messages
-   * or that it has exited.  Detect this.
-   */
-  if (!proc_can_be_signalled (p))	/* Is the process accepting messages? */
-    {
-      sigproc_printf ("invalid pid %d(%x), signal %d",
-		  p->pid, p->process_state, si.si_signo);
-      goto out;
-    }
 
   if (its_me)
-    sendsig = myself->sendsig;
+    sendsig = my_sendsig;
   else
     {
       HANDLE dupsig;
@@ -1005,6 +998,7 @@ wait_sig (VOID *self)
   if (!CreatePipe (&readsig, &myself->sendsig, sec_user_nih (sa_buf), 0))
     api_fatal ("couldn't create signal pipe, %E");
   sigCONT = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+  my_sendsig = myself->sendsig;
 
   /* Setting dwProcessId flags that this process is now capable of receiving
      signals.  Prior to this, dwProcessId was set to the windows pid of
@@ -1028,7 +1022,7 @@ wait_sig (VOID *self)
       sigpacket pack;
       if (!ReadFile (readsig, &pack, sizeof (pack), &nb, NULL))
 	break;
-      if (exit_state || myself->sendsig == INVALID_HANDLE_VALUE)
+      if (exit_state || pack.si.si_signo == __SIGEXIT)
 	break;
 
       if (nb != sizeof (pack))
@@ -1128,6 +1122,16 @@ wait_sig (VOID *self)
 	}
     }
 
+  my_sendsig = NULL;
   sigproc_printf ("done");
+  if (WaitForSingleObject (hMainThread, 5000) == WAIT_OBJECT_0)
+    {
+      DWORD exitcode = 1;
+      myself.release ();
+      GetExitCodeThread (hMainThread, &exitcode);
+      sigproc_printf ("Calling ExitProcess, exitcode %p",
+		      exitcode);
+      ExitProcess (exitcode);
+    }
   ExitThread (0);
 }

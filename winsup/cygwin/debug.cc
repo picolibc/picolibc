@@ -153,8 +153,6 @@ add_handle (const char *func, int ln, HANDLE h, const char *name, bool inh)
   cygheap->debug.endh->next = hl;
   cygheap->debug.endh = hl;
   debug_printf ("protecting handle '%s', inherited flag %d", hl->name, hl->inherited);
-
-  return;
 }
 
 static void __stdcall

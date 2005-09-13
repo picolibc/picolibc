@@ -518,8 +518,6 @@ alloc_stack (child_info_fork *ci)
     ci->stacksize = 0;
   else
     alloc_stack_hard_way (ci, b + sizeof (b) - 1);
-
-  return;
 }
 
 #ifdef DEBUGGING
@@ -1059,10 +1057,7 @@ do_exit (int status)
     }
 
   if (exit_state < ES_SIGPROCTERMINATE)
-    {
-      exit_state = ES_SIGPROCTERMINATE;
-      sigproc_terminate ();
-    }
+    sigproc_terminate ();	// sets exit_state directly
 
   myself->stopsig = 0;
   if (exit_state < ES_TITLE)

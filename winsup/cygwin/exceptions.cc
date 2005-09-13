@@ -649,7 +649,6 @@ sig_handle_tty_stop (int sig)
       break;
     }
   _my_tls.incyg = 0;
-  return;
 }
 }
 
@@ -1017,7 +1016,6 @@ set_signal_mask (sigset_t newmask, sigset_t& oldmask)
   else
     sigproc_printf ("not calling sig_dispatch_pending");
   mask_sync.release ();
-  return;
 }
 
 int __stdcall

@@ -789,7 +789,6 @@ fhandler_base::read (void *in_ptr, size_t& len)
 
 out:
   debug_printf ("returning %d, %s mode", len, rbinary () ? "binary" : "text");
-  return;
 }
 
 int
@@ -1398,7 +1397,6 @@ void
 fhandler_base::operator delete (void *p)
 {
   cfree (p);
-  return;
 }
 
 /* Normal I/O constructor */
@@ -1555,14 +1553,12 @@ void
 fhandler_base::seekdir (DIR *, _off64_t)
 {
   set_errno (ENOTDIR);
-  return;
 }
 
 void
 fhandler_base::rewinddir (DIR *)
 {
   set_errno (ENOTDIR);
-  return;
 }
 
 int

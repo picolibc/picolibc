@@ -666,7 +666,6 @@ parse_options (char *buf)
 	  }
       }
   debug_printf ("returning");
-  return;
 }
 
 /* Set options from the registry. */

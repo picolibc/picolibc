@@ -546,7 +546,6 @@ err:
 sig_exit:
   set_sig_errno (EINTR);
   buflen = (size_t) -1;
-  return;
 }
 
 void
@@ -1824,5 +1823,4 @@ fhandler_console::fixup_after_exec ()
 
   CloseHandle (h);
   CloseHandle (oh);
-  return;
 }
