@@ -1028,7 +1028,7 @@ wait_sig (VOID *self)
       sigpacket pack;
       if (!ReadFile (readsig, &pack, sizeof (pack), &nb, NULL))
 	break;
-      if (myself->sendsig == INVALID_HANDLE_VALUE)
+      if (exit_state || myself->sendsig == INVALID_HANDLE_VALUE)
 	break;
 
       if (nb != sizeof (pack))

@@ -1,3 +1,8 @@
+2005-09-13  Christopher Faylor  <cgf@timesys.com>
+
+	* sigproc.cc (wait_sig): Be more defensive about detecting when we're
+	exiting.
+
 2005-09-12  Christopher Faylor  <cgf@timesys.com>
 
 	* cygthread.cc (cygthread::cygthread): Add more info to fatal error.
