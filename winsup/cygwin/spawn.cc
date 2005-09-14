@@ -289,11 +289,10 @@ class av
   char **argv;
   int calloced;
  public:
-  int error;
   int argc;
   bool win16_exe;
   av (): argv (NULL) {}
-  av (int ac_in, const char * const *av_in) : calloced (0), error (false), argc (ac_in), win16_exe (false)
+  av (int ac_in, const char * const *av_in) : calloced (0), argc (ac_in), win16_exe (false)
   {
     argv = (char **) cmalloc (HEAP_1_ARGV, (argc + 5) * sizeof (char *));
     memcpy (argv, av_in, (argc + 1) * sizeof (char *));
@@ -316,23 +315,21 @@ class av
   void replace0_maybe (const char *arg0)
   {
     /* Note: Assumes that argv array has not yet been "unshifted" */
-    if (!calloced
-	&& (argv[0] = cstrdup1 (arg0)))
-      calloced = true;
-    else
-      error = errno;
+    if (!calloced)
+      {
+	argv[0] = cstrdup1 (arg0);
+	calloced = true;
+      }
   }
   void dup_maybe (int i)
   {
-    if (i >= calloced
-	&& !(argv[i] = cstrdup1 (argv[i])))
-      error = errno;
+    if (i >= calloced)
+      argv[i] = cstrdup1 (argv[i]);
   }
   void dup_all ()
   {
     for (int i = calloced; i < argc; i++)
-      if (!(argv[i] = cstrdup1 (argv[i])))
-	error = errno;
+      argv[i] = cstrdup1 (argv[i]);
   }
   int fixup (child_info_types, const char *, path_conv&, const char *);
 };
@@ -356,10 +353,9 @@ av::unshift (const char *what, int conv)
 	*p = '\0';
       what = buf;
     }
-  if (!(*argv = cstrdup1 (what)))
-    error = errno;
-  argc++;
+  *argv = cstrdup1 (what);
   calloced++;
+  argc++;
   return 1;
 }
 
@@ -433,8 +429,12 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
 
   myfault efault;
-  if (efault.faulted (E2BIG))
+  if (efault.faulted ())
     {
+      if (get_errno () == ENOMEM)
+	set_errno (E2BIG);
+      else
+	set_errno (EFAULT);
       res = -1;
       goto out;
     }
@@ -552,12 +552,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   char *envblock;
   newargv.all_calloced ();
-  if (newargv.error)
-    {
-      set_errno (newargv.error);
-      return -1;
-    }
-
   moreinfo->argc = newargv.argc;
   moreinfo->argv = newargv;
 

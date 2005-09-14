@@ -1,5 +1,16 @@
 2005-09-14  Christopher Faylor  <cgf@timesys.com>
 
+	* spawn.cc (av::error): Eliminate.
+	(av::av): Remove reference to error.
+	(av::replace0_maybe): Ditto.
+	(av::dup_maybe): Ditto.
+	(av::dup_all): Ditto.
+	(av::unshift): Ditto.
+	(spawn_guts): On a fault, return E2BIG only if ENOMEM has been set.
+	Otherwise return EFAULT.
+
+2005-09-14  Christopher Faylor  <cgf@timesys.com>
+
 	* cygtls.h (san): New structure.
 	(cygtls::andreas): New element.  Replaces _myfault and _myfault_errno.
 	(cygtls::fault_guarded): Use andreas.
