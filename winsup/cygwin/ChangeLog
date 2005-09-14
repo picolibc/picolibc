@@ -5,7 +5,7 @@
 	this is the signal thread.
 	(set_signal_mask): Ditto for conditionalized CGF code.
 	* pinfo.cc (pinfo::exit): Exit the thread if we forcefully terminated
-	the main thread
+	the main thread.
 	* sigproc.cc (sigtid): Delete.
 	(_sig_tls): Define.
 	(sig_clear): Use _sig_tls rather than sigtid to determine if this is
