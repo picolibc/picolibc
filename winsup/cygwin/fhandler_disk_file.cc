@@ -1553,7 +1553,6 @@ fhandler_cygdrive::rewinddir (DIR *dir)
 {
   pdrive = get_win32_name ();
   dir->__d_position = 0;
-  return;
 }
 
 int

@@ -186,7 +186,6 @@ fhandler_pipe::read (void *in_ptr, size_t& in_len)
 	in_len = (size_t) -1;	/* received a signal */
     }
   ReleaseMutex (guard);
-  return;
 }
 
 int

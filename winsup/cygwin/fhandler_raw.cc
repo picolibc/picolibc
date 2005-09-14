@@ -267,7 +267,6 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
 
 err:
   ulen = (size_t) -1;
-  return;
 }
 
 int

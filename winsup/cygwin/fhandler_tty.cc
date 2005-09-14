@@ -912,7 +912,6 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
     }
   termios_printf ("%d=read(%x, %d)", totalread, ptr, len);
   len = (size_t) totalread;
-  return;
 }
 
 int
@@ -1283,7 +1282,6 @@ void __stdcall
 fhandler_pty_master::read (void *ptr, size_t& len)
 {
   len = (size_t) process_slave_output ((char *) ptr, len, pktmode);
-  return;
 }
 
 int

@@ -88,7 +88,6 @@ pwdgrp::read_passwd ()
       debug_printf ("Completing /etc/passwd: %s", linebuf);
       add_line (linebuf);
     }
-  return;
 }
 
 struct passwd *

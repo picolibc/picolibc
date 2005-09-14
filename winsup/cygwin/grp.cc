@@ -103,7 +103,6 @@ pwdgrp::read_group ()
   static char NO_COPY pretty_ls[] = "????????::-1:";
   if (wincap.has_security ())
     add_line (pretty_ls);
-  return;
 }
 
 muto NO_COPY pwdgrp::pglock;

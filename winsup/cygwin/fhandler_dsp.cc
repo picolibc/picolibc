@@ -1077,7 +1077,6 @@ fhandler_dev_dsp::read (void *ptr, size_t& len)
     }
 
   audio_in_->read ((char *)ptr, (int&)len);
-  return;
 }
 
 _off64_t

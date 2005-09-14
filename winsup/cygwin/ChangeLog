@@ -1,5 +1,9 @@
 2005-09-14  Christopher Faylor  <cgf@timesys.com>
 
+	Remove some more unneeded 'return;'s throughout. 
+
+2005-09-14  Christopher Faylor  <cgf@timesys.com>
+
 	* sigproc.h: Protect declaration so that it only happens when
 	__INSIDE_CYGWIN__.
 

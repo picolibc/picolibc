@@ -533,7 +533,6 @@ hires_us::prime ()
   primed_ft.QuadPart -= FACTOR;
   primed_ft.QuadPart /= 10;
   freq = (double) ((double) 1000000. / (double) ifreq.QuadPart);
-  return;
 }
 
 LONGLONG

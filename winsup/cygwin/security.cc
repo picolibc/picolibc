@@ -70,7 +70,6 @@ cygwin_set_impersonation_token (const HANDLE hToken)
 {
   debug_printf ("set_impersonation_token (%d)", hToken);
   cygheap->user.external_token = hToken == INVALID_HANDLE_VALUE ? NO_IMPERSONATION : hToken;
-  return;
 }
 
 void
@@ -1267,7 +1266,6 @@ get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
 		| ((allow & S_IXUSR) ? S_IXGRP : 0));
     }
   *attribute |= allow;
-  return;
 }
 
 static void
@@ -1326,7 +1324,6 @@ get_info_from_sd (PSECURITY_DESCRIPTOR psd, mode_t *attribute,
 
   syscall_printf ("%sACL %x, uid %d, gid %d",
 		  (!acl_exists || !acl)?"NO ":"", *attribute, uid, gid);
-  return;
 }
 
 static void

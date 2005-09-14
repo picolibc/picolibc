@@ -211,8 +211,6 @@ malloc_stats ()
       dlmalloc_stats ();
       __malloc_unlock ();
     }
-
-  return;
 }
 
 extern "C" struct mallinfo

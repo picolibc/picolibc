@@ -217,7 +217,6 @@ fhandler_dev_mem::read (void *ptr, size_t& ulen)
     }
 
   pos += ulen;
-  return;
 }
 
 _off64_t

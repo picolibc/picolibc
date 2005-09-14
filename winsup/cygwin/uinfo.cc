@@ -127,8 +127,6 @@ internal_getlogin (cygheap_user &user)
 	}
     }
   cygheap->user.ontherange (CH_HOME, pw);
-
-  return;
 }
 
 void
@@ -570,5 +568,4 @@ pwdgrp::load (const char *posix_fname)
 
   debug_printf ("%s load %s", posix_fname, res);
   initialized = true;
-  return;
 }
