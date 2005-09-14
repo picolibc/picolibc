@@ -1,5 +1,10 @@
 2005-09-14  Christopher Faylor  <cgf@timesys.com>
 
+	* sigproc.h: Protect declaration so that it only happens when
+	__INSIDE_CYGWIN__.
+
+2005-09-14  Christopher Faylor  <cgf@timesys.com>
+
 	* exceptions.cc (sigtid): Remove declaration.
 	(handle_exceptions): Use _sig_tls rather than sigtid to determine if
 	this is the signal thread.
