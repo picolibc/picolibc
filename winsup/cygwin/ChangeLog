@@ -1,5 +1,18 @@
 2005-09-14  Christopher Faylor  <cgf@timesys.com>
 
+	* cygtls.h (san): New structure.
+	(cygtls::andreas): New element.  Replaces _myfault and _myfault_errno.
+	(cygtls::fault_guarded): Use andreas.
+	(cygtls::return_from_fault): Ditto.
+	(cygtls::setup_fault): Add a parameter denoting where to store old
+	fault handler, if any and use it to "stack" faults.
+	(cygtls::reset_fault): Restore fault from parameter.
+	(myfault::sebastian): New variable.
+	(myfault::~myfault): Pass sebastian to reset_fault.
+	(myfault::myfault): Store old fault values in sebastian.
+
+2005-09-14  Christopher Faylor  <cgf@timesys.com>
+
 	* heap.cc (heap_init): Revert 2005-09-11 patch as it seems to
 	inexplicably cause problems with emacs.
 

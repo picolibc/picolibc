@@ -37,10 +37,8 @@
 //; $tls::plocals = 1264;
 //; $tls::_ctinfo = -1092;
 //; $tls::p_ctinfo = 2896;
-//; $tls::_myfault = -1088;
-//; $tls::p_myfault = 2900;
-//; $tls::_myfault_errno = -1084;
-//; $tls::p_myfault_errno = 2904;
+//; $tls::andreas = -1088;
+//; $tls::pandreas = 2900;
 //; $tls::wq = -1080;
 //; $tls::pwq = 2908;
 //; $tls::prev = -1052;
@@ -99,10 +97,8 @@
 #define tls_plocals (1264)
 #define tls__ctinfo (-1092)
 #define tls_p_ctinfo (2896)
-#define tls__myfault (-1088)
-#define tls_p_myfault (2900)
-#define tls__myfault_errno (-1084)
-#define tls_p_myfault_errno (2904)
+#define tls_andreas (-1088)
+#define tls_pandreas (2900)
 #define tls_wq (-1080)
 #define tls_pwq (2908)
 #define tls_prev (-1052)

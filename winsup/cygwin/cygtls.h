@@ -138,6 +138,12 @@ typedef struct struct_waitq
   HANDLE thread_ev;
 } waitq;
 
+typedef struct
+{
+  void *_myfault;
+  int _myfault_errno;
+} san;
+
 /* Changes to the below structure may require acompanying changes to the very
    simple parser in the perl script 'gentls_offsets' (<<-- start parsing here).
    The union in this structure is used to force alignment between the version
@@ -176,8 +182,7 @@ struct _cygtls
     };
   struct _local_storage locals;
   class cygthread *_ctinfo;
-  void *_myfault;
-  int _myfault_errno;
+  san andreas;
   waitq wq;
   struct _cygtls *prev, *next;
   __stack_t *stackptr;
@@ -220,25 +225,25 @@ struct _cygtls
   void lock () __attribute__ ((regparm (1)));
   void unlock () __attribute__ ((regparm (1)));
   bool locked () __attribute__ ((regparm (1)));
-  void*& fault_guarded () {return _myfault;}
+  void*& fault_guarded () {return andreas._myfault;}
   void return_from_fault ()
   {
-    if (_myfault_errno)
-      set_errno (_myfault_errno);
-    __ljfault ((int *) _myfault, 1);
+    if (andreas._myfault_errno)
+      set_errno (andreas._myfault_errno);
+    __ljfault ((int *) andreas._myfault, 1);
   }
-  int setup_fault (jmp_buf j, int myerrno) __attribute__ ((always_inline))
+  int setup_fault (jmp_buf j, san& old_j, int myerrno) __attribute__ ((always_inline))
   {
-    if (_myfault)
-      return 0;
-    _myfault = (void *) j;
-    _myfault_errno = myerrno;
+    old_j._myfault = andreas._myfault;
+    old_j._myfault_errno = andreas._myfault_errno;
+    andreas._myfault = (void *) j;
+    andreas._myfault_errno = myerrno;
     return __sjfault (j);
   }
-  void clear_fault (jmp_buf j) __attribute__ ((always_inline))
+  void reset_fault (san& old_j) __attribute__ ((always_inline))
   {
-    if (j == _myfault)
-      _myfault = NULL;
+    andreas._myfault = old_j._myfault;
+    andreas._myfault_errno = old_j._myfault_errno;
   }
   /*gentls_offsets*/
 };
@@ -254,11 +259,12 @@ extern _cygtls *_sig_tls;
 class myfault
 {
   jmp_buf buf;
+  san sebastian;
 public:
-  ~myfault () __attribute__ ((always_inline)) { _my_tls.clear_fault (buf); }
+  ~myfault () __attribute__ ((always_inline)) { _my_tls.reset_fault (sebastian); }
   inline int faulted (int myerrno = 0) __attribute__ ((always_inline))
   {
-    return _my_tls.setup_fault (buf, myerrno);
+    return _my_tls.setup_fault (buf, sebastian, myerrno);
   }
 };
 /*gentls_offsets*/
