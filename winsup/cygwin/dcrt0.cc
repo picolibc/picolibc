@@ -1056,17 +1056,7 @@ do_exit (int status)
       close_all_files ();
     }
 
-  if (exit_state < ES_SIGPROCTERMINATE)
-    sigproc_terminate ();	// sets exit_state directly
-
   myself->stopsig = 0;
-  if (exit_state < ES_TITLE)
-    {
-      exit_state = ES_TITLE;
-      /* restore console title */
-      if (old_title && display_title)
-	set_console_title (old_title);
-    }
 
   if (exit_state < ES_HUP_PGRP)
     {
@@ -1099,6 +1089,17 @@ do_exit (int status)
 	    tp->kill_pgrp (SIGHUP);
 	}
 
+    }
+
+  if (exit_state < ES_SIGPROCTERMINATE)
+    sigproc_terminate (ES_SIGPROCTERMINATE);	// sets exit_state directly
+
+  if (exit_state < ES_TITLE)
+    {
+      exit_state = ES_TITLE;
+      /* restore console title */
+      if (old_title && display_title)
+	set_console_title (old_title);
     }
 
   if (exit_state < ES_TTY_TERMINATE)
@@ -1165,9 +1166,6 @@ __api_fatal (const char *fmt, ...)
 	WriteFile (h, buf, len, &done, 0);
     }
 
-  /* We are going down without mercy.  Make sure we reset
-     our process_state. */
-  sigproc_terminate ();
 #ifdef DEBUGGING
   try_to_debug ();
 #endif

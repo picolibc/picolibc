@@ -248,6 +248,7 @@ extern char *_tlsbase __asm__ ("%fs:4");
 extern char *_tlstop __asm__ ("%fs:8");
 #define _my_tls (((_cygtls *) _tlsbase)[-1])
 extern _cygtls *_main_tls;
+extern _cygtls *_sig_tls;
 
 /*gentls_offsets*/
 class myfault

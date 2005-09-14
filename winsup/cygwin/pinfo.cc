@@ -136,8 +136,7 @@ pinfo::zap_cwd ()
 void
 pinfo::exit (DWORD n)
 {
-  sigproc_terminate ();
-  exit_state = ES_FINAL;
+  sigproc_terminate (ES_FINAL);
 
   cygthread::terminate ();
   if (n != EXITCODE_NOSET)
@@ -165,20 +164,25 @@ pinfo::exit (DWORD n)
   _my_tls.stackptr = _my_tls.stack;
   if (&_my_tls == _main_tls)
     {
-      sigproc_printf ("Calling ExitProcess hProcess %p, n %p, exitcode %p",
+      sigproc_printf ("Calling ExitThread hProcess %p, n %p, exitcode %p",
 		      hProcess, n, exitcode);
       ExitThread (exitcode);
     }
   else if (hMainThread)
     {
+#if 0	/* This would be nice, but I don't think that Windows guarantees that
+	   TerminateThread will not block. */
       sigproc_printf ("Calling TerminateThread since %p != %p, %p, n %p, exitcode %p",
 		      &_my_tls, _main_tls, hProcess, n, exitcode);
       TerminateThread (hMainThread, exitcode);
+      if (&_my_tls != _sig_tls)
+	ExitThread (0);
+#endif
     }
 
   sigproc_printf ("Calling ExitProcess since hMainthread is 0, hProcess %p, n %p, exitcode %p",
 		  hProcess, n, exitcode);
-  release ();
+  // release ();  Could race with signal thread.  Sigh.
   ExitProcess (exitcode);
 }
 # undef self

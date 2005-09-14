@@ -72,7 +72,7 @@ Static waitq waitq_head = {0, 0, 0, 0, 0, 0, 0};// Start of queue for wait'ing t
 
 static muto NO_COPY sync_proc_subproc;	// Control access to subproc stuff
 
-DWORD NO_COPY sigtid = 0;		// ID of the signal thread
+_cygtls NO_COPY *_sig_tls;
 
 /* Function declarations */
 static int __stdcall checkstate (waitq *) __attribute__ ((regparm (1)));
@@ -382,10 +382,9 @@ _cygtls::remove_wq (DWORD wait)
  * will not become procs.
  */
 void __stdcall
-proc_terminate (void)
+proc_terminate ()
 {
   sigproc_printf ("nprocs %d", nprocs);
-  /* Signal processing is assumed to be blocked in this routine. */
   if (nprocs)
     {
       sync_proc_subproc.acquire (WPSP);
@@ -414,7 +413,7 @@ proc_terminate (void)
 void __stdcall
 sig_clear (int target_sig)
 {
-  if (GetCurrentThreadId () != sigtid)
+  if (&_my_tls != _sig_tls)
     sig_send (myself, -target_sig);
   else
     {
@@ -445,11 +444,11 @@ sigpending (sigset_t *mask)
 void __stdcall
 sig_dispatch_pending (bool fast)
 {
-  if (exit_state || GetCurrentThreadId () == sigtid || !sigq.start.next)
+  if (exit_state || &_my_tls == _sig_tls || !sigq.start.next)
     {
 #ifdef DEBUGGING
-      sigproc_printf ("exit_state %d, cur thread id %p, sigtid %p, sigq.start.next %p",
-		      exit_state, GetCurrentThreadId (), sigtid, sigq.start.next);
+      sigproc_printf ("exit_state %d, cur thread id %p, _sig_tls %p, sigq.start.next %p",
+		      exit_state, GetCurrentThreadId (), _sig_tls, sigq.start.next);
 #endif
       return;
     }
@@ -498,13 +497,14 @@ sigproc_init ()
 /* Called on process termination to terminate signal and process threads.
  */
 void __stdcall
-sigproc_terminate (void)
+sigproc_terminate (exit_states es)
 {
-  if (exit_state > ES_SIGPROCTERMINATE)
+  exit_states prior_exit_state = exit_state;
+  exit_state = es;
+  if (prior_exit_state > ES_SIGPROCTERMINATE)
     sigproc_printf ("already performed");
   else
     {
-      exit_state = ES_SIGPROCTERMINATE;
       sigproc_printf ("entering");
       sig_send (myself_nowait, __SIGEXIT);
       proc_terminate ();		// clean up process stuff
@@ -1007,12 +1007,12 @@ wait_sig (VOID *self)
   myself->process_state |= PID_ACTIVE;
   myself->process_state &= ~PID_INITIALIZING;
 
+  _sig_tls = &_my_tls;
   sigproc_printf ("myself->dwProcessId %u", myself->dwProcessId);
   SetEvent (wait_sig_inited);
-  sigtid = GetCurrentThreadId ();
 
   exception_list el;
-  _my_tls.init_threadlist_exceptions (&el);
+  _sig_tls->init_threadlist_exceptions (&el);
   debug_printf ("entering ReadFile loop, readsig %p, myself->sendsig %p",
 		readsig, myself->sendsig);
 
@@ -1021,8 +1021,6 @@ wait_sig (VOID *self)
       DWORD nb;
       sigpacket pack;
       if (!ReadFile (readsig, &pack, sizeof (pack), &nb, NULL))
-	break;
-      if (exit_state || pack.si.si_signo == __SIGEXIT)
 	break;
 
       if (nb != sizeof (pack))
@@ -1083,6 +1081,9 @@ wait_sig (VOID *self)
 		clearwait = true;
 	    }
 	  break;
+	case __SIGEXIT:
+	  sigproc_printf ("saw __SIGEXIT");
+	  break;	/* handle below */
 	default:
 	  if (pack.si.si_signo < 0)
 	    sig_clear (-pack.si.si_signo);
@@ -1120,18 +1121,23 @@ wait_sig (VOID *self)
 	  SetEvent (pack.wakeup);
 	  sigproc_printf ("signalled %p", pack.wakeup);
 	}
+      if (pack.si.si_signo == __SIGEXIT)
+	break;
     }
 
   my_sendsig = NULL;
-  sigproc_printf ("done");
-  if (WaitForSingleObject (hMainThread, 5000) == WAIT_OBJECT_0)
+  DWORD res = WaitForSingleObject (hMainThread, 10000);
+
+  if (res != WAIT_OBJECT_0)
+    sigproc_printf ("wait for main thread returned %d", res);
+  else
     {
       DWORD exitcode = 1;
       myself.release ();
+      sigproc_printf ("calling ExitProcess, exitcode %p", exitcode);
       GetExitCodeThread (hMainThread, &exitcode);
-      sigproc_printf ("Calling ExitProcess, exitcode %p",
-		      exitcode);
       ExitProcess (exitcode);
     }
+  sigproc_printf ("exiting thread");
   ExitThread (0);
 }

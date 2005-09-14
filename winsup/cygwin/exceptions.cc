@@ -36,8 +36,6 @@ static int handle_exceptions (EXCEPTION_RECORD *, void *, CONTEXT *, void *);
 extern void sigdelayed ();
 };
 
-extern DWORD sigtid;
-
 extern DWORD dwExeced;
 
 static BOOL WINAPI ctrl_c_handler (DWORD);
@@ -528,7 +526,7 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
 
   if (!me.fault_guarded ()
       && (!cygwin_finished_initializing
-	  || GetCurrentThreadId () == sigtid
+	  || &_my_tls == _sig_tls
 	  || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_DFL
 	  || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_IGN
 	  || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_ERR))
@@ -1002,7 +1000,7 @@ extern "C" void __stdcall
 set_signal_mask (sigset_t newmask, sigset_t& oldmask)
 {
 #ifdef CGF
-  if (GetCurrentThreadId () == sigtid)
+  if (&_my_tls == _sig_tls)
     small_printf ("********* waiting in signal thread\n");
 #endif
   mask_sync.acquire (INFINITE);
