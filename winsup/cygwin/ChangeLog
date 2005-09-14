@@ -1,5 +1,10 @@
 2005-09-14  Christopher Faylor  <cgf@timesys.com>
 
+	* heap.cc (heap_init): Revert 2005-09-11 patch as it seems to
+	inexplicably cause problems with emacs.
+
+2005-09-14  Christopher Faylor  <cgf@timesys.com>
+
 	Remove some more unneeded 'return;'s throughout. 
 
 2005-09-14  Christopher Faylor  <cgf@timesys.com>

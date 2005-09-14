@@ -34,6 +34,7 @@ extern "C" size_t getpagesize ();
 void
 heap_init ()
 {
+  const DWORD alloctype = MEM_RESERVE;
   /* If we're the forkee, we must allocate the heap at exactly the same place
      as our parent.  If not, we don't care where it ends up.  */
 
@@ -47,7 +48,7 @@ heap_init ()
 	   * to assure contiguous memory.  */
 	  cygheap->user_heap.ptr = cygheap->user_heap.top =
 	  cygheap->user_heap.base =
-	    VirtualAlloc (NULL, cygheap->user_heap.chunk, MEM_RESERVE | MEM_TOP_DOWN, PAGE_NOACCESS);
+	    VirtualAlloc (NULL, cygheap->user_heap.chunk, alloctype, PAGE_NOACCESS);
 	  if (cygheap->user_heap.base)
 	    break;
 	  cygheap->user_heap.chunk -= 1 * 1024 * 1024;
@@ -70,7 +71,7 @@ heap_init ()
       while (1)
 	{
 	  p = (char *) VirtualAlloc (cygheap->user_heap.base, reserve_size,
-				     MEM_RESERVE, PAGE_READWRITE);
+				     alloctype, PAGE_READWRITE);
 	  if (p)
 	    break;
 	  if ((reserve_size -= page_const) < allocsize)
