@@ -1,5 +1,9 @@
 2005-09-14  Christopher Faylor  <cgf@timesys.com>
 
+	* spawn.cc (av::fixup): Avoid breaking out of the wrong "loop".
+
+2005-09-14  Christopher Faylor  <cgf@timesys.com>
+
 	* hookapi.cc (hook_or_detect_cygwin): Simplify very slightly.
 	* spawn.cc (av::fixup): Guard against problems reading an executable
 	which does not match Microsoft's documentation about PE format.

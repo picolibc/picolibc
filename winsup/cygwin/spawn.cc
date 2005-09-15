@@ -1047,25 +1047,24 @@ av::fixup (child_info_types chtype, const char *prog_arg, path_conv& real_path, 
       if (!buf)
 	goto err;
 
-      do
-	{
-	  myfault efault;
-	  if (efault.faulted ())
-	    {
-	      UnmapViewOfFile (buf);
-	      real_path.set_cygexec (false);
-	      break;
-	    }
-	  if (buf[0] == 'M' && buf[1] == 'Z')
-	    {
-	      unsigned off = (unsigned char) buf[0x18] | (((unsigned char) buf[0x19]) << 8);
-	      win16_exe = off < sizeof (IMAGE_DOS_HEADER);
-	      if (!win16_exe)
-		real_path.set_cygexec (!!hook_or_detect_cygwin (buf, NULL));
-	      UnmapViewOfFile (buf);
-	      break;
-	    }
-	} while (0);
+      {
+	myfault efault;
+	if (efault.faulted ())
+	  {
+	    UnmapViewOfFile (buf);
+	    real_path.set_cygexec (false);
+	    break;
+	  }
+	if (buf[0] == 'M' && buf[1] == 'Z')
+	  {
+	    unsigned off = (unsigned char) buf[0x18] | (((unsigned char) buf[0x19]) << 8);
+	    win16_exe = off < sizeof (IMAGE_DOS_HEADER);
+	    if (!win16_exe)
+	      real_path.set_cygexec (!!hook_or_detect_cygwin (buf, NULL));
+	    UnmapViewOfFile (buf);
+	    break;
+	  }
+      }
 
       debug_printf ("%s is possibly a script", (char *) real_path);
 
