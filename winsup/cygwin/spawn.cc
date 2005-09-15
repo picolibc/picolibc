@@ -1020,6 +1020,15 @@ av::fixup (child_info_types chtype, const char *prog_arg, path_conv& real_path, 
   bool exeext = strcasematch (ext, ".exe");
   if (exeext && real_path.iscygexec ())
     return 0;
+  char *buf = NULL;
+  myfault efault;
+  if (efault.faulted ())
+    {
+      if (buf)
+	UnmapViewOfFile (buf);
+      real_path.set_cygexec (false);
+      return 0;
+    }
   while (1)
     {
       HANDLE h = CreateFile (real_path, GENERIC_READ,
@@ -1033,22 +1042,32 @@ av::fixup (child_info_types chtype, const char *prog_arg, path_conv& real_path, 
       CloseHandle (h);
       if (!hm)
 	goto err;
-      char *buf = (char *) MapViewOfFile(hm, FILE_MAP_READ, 0, 0, 0);
+      buf = (char *) MapViewOfFile(hm, FILE_MAP_READ, 0, 0, 0);
       CloseHandle (hm);
       if (!buf)
 	goto err;
 
-      if (buf[0] == 'M' && buf[1] == 'Z')
+      do
 	{
-	  unsigned off = (unsigned char) buf[0x18] | (((unsigned char) buf[0x19]) << 8);
-	  win16_exe = off < sizeof (IMAGE_DOS_HEADER);
-	  if (!win16_exe)
-	    real_path.set_cygexec (!!hook_or_detect_cygwin (buf, NULL));
-	  UnmapViewOfFile (buf);
-	  break;
-	}
+	  myfault efault;
+	  if (efault.faulted ())
+	    {
+	      UnmapViewOfFile (buf);
+	      real_path.set_cygexec (false);
+	      break;
+	    }
+	  if (buf[0] == 'M' && buf[1] == 'Z')
+	    {
+	      unsigned off = (unsigned char) buf[0x18] | (((unsigned char) buf[0x19]) << 8);
+	      win16_exe = off < sizeof (IMAGE_DOS_HEADER);
+	      if (!win16_exe)
+		real_path.set_cygexec (!!hook_or_detect_cygwin (buf, NULL));
+	      UnmapViewOfFile (buf);
+	      break;
+	    }
+	} while (0);
 
-      debug_printf ("%s is a script", (char *) real_path);
+      debug_printf ("%s is possibly a script", (char *) real_path);
 
       if (real_path.has_acls () && allow_ntsec
 	  && check_file_access (real_path, X_OK))
