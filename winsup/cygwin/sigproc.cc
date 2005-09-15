@@ -1125,19 +1125,27 @@ wait_sig (VOID *self)
 	break;
     }
 
-  my_sendsig = NULL;
-  DWORD res = WaitForSingleObject (hMainThread, 10000);
+  HANDLE h = hMainThread;
+  my_sendsig = hMainThread = NULL;
+  DWORD res = h ? WAIT_OBJECT_0 : WaitForSingleObject (h, INFINITE);
 
-  if (res != WAIT_OBJECT_0)
-    sigproc_printf ("wait for main thread returned %d", res);
-  else
+  DWORD exitcode = 1;
+
+  myself.release ();
+  if (res == WAIT_OBJECT_0)
     {
-      DWORD exitcode = 1;
-      myself.release ();
-      sigproc_printf ("calling ExitProcess, exitcode %p", exitcode);
-      GetExitCodeThread (hMainThread, &exitcode);
-      ExitProcess (exitcode);
+      GetExitCodeThread (h, &exitcode);
+#ifdef DEBUGGING
+      hMainThread = INVALID_HANDLE_VALUE;
+#endif
+    } else {
+#ifdef DEBUGGING
+      console_printf ("wait for main thread %p returned %d", h, res);
+#else
+      debug_printf ("wait for main thread %p returned %d", h, res);
+#endif
     }
-  sigproc_printf ("exiting thread");
-  ExitThread (0);
+
+  sigproc_printf ("calling ExitProcess, exitcode %p", exitcode);
+  ExitProcess (exitcode);
 }
