@@ -111,16 +111,21 @@ Default is set.</para>
 If supplied, wildcard matching is case insensitive.  The default is <literal>noignorecase</literal></para>
 </listitem>
 <listitem>
-<para><envar>(no)ntea</envar> - if set, use the full NT Extended
-Attributes to store UNIX-like inode information.
-This option only operates under Windows NT. Defaults to not set. </para>
+<para><envar>(no)ntea</envar> - if set, use NT Extended Attributes to
+store UNIX-like inode information.
+This option only operates under Windows NT. Defaults to not set.
+Only FAT and NTFS support Extended Attributes, not FAT32, so it's
+of no use there.  Furthermore, on NTFS partitions ntsec, which provides
+real permissions, overrides ntea, which only provides faked permissions.
+So setting ntea only makes sense if you either have FAT partitions,
+or if you switch off ntsec explicitely. </para>
 <warning><title>Warning!</title> <para>This may create additional
-<emphasis>large</emphasis> files on non-NTFS partitions.</para></warning>
+<emphasis>large</emphasis> files on FAT partitions.</para></warning>
 </listitem>
 <listitem>
 <para><envar>(no)ntsec</envar> - if set, use the NT security
 model to set UNIX-like permissions on files and processes. The
-file permissions can only be set on NTFS partitions. FAT doesn't
+file permissions can only be set on NTFS partitions. FAT/FAT32 don't
 support the NT file security. Defaults to set. For more information, read
 the documentation in <xref linkend="ntsec"></xref>.</para>
 </listitem>

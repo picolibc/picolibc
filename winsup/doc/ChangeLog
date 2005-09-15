@@ -1,3 +1,8 @@
+2005-09-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwinenv.sgml (ntea): Add some wording to scare people away
+	from using this option.
+
 2005-08-26  Brian Dessent  <brian@dessent.net>
 
 	* faq-using.xml: Add 'net use' hint to network shares FAQ.
