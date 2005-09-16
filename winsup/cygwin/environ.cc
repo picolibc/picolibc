@@ -752,7 +752,13 @@ environ_init (char **envp, int envc)
 
   /* Allocate space for environment + trailing NULL + CYGWIN env. */
   lastenviron = envp = (char **) malloc ((4 + (envc = 100)) * sizeof (char *));
+
   rawenv = GetEnvironmentStrings ();
+  if (!rawenv)
+    {
+      system_printf ("GetEnvironmentStrings returned NULL, %E");
+      return;
+    }
 
   /* Current directory information is recorded as variables of the
      form "=X:=X:\foo\bar; these must be changed into something legal

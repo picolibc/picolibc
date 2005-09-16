@@ -1,3 +1,8 @@
+2005-09-16  Christopher Faylor  <cgf@timesys.com>
+
+	* environ.cc (environ_init): Issue an error if GetEnvironmentStrings
+	fails and return.
+
 2005-09-15  Christopher Faylor  <cgf@timesys.com>
 
 	* pinfo.h (EXITCODE_SET): Move out of range of Windows error.
