@@ -1,5 +1,15 @@
 2005-09-16  Christopher Faylor  <cgf@timesys.com>
 
+	* environ.cc (environ_init): Protect with a 'myfault' in case
+	GetEnvironmentStrings misbehaves.
+
+2005-09-16  Christopher Faylor  <cgf@timesys.com>
+
+	* environ.cc (environ_init): Add debugging output with value returned
+	from GetEnvironmentStrings.
+
+2005-09-16  Christopher Faylor  <cgf@timesys.com>
+
 	* environ.cc (environ_init): Issue an error if GetEnvironmentStrings
 	fails and return.
 

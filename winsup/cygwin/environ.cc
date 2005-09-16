@@ -706,6 +706,10 @@ environ_init (char **envp, int envc)
   bool envp_passed_in;
   bool got_something_from_registry;
   static char NO_COPY cygterm[] = "TERM=cygwin";
+  myfault efault;
+
+  if (efault.faulted ())
+    api_fatal ("internal error reading the windows environment - too many environment variables?");
 
   static int initted;
   if (!initted)
@@ -759,6 +763,7 @@ environ_init (char **envp, int envc)
       system_printf ("GetEnvironmentStrings returned NULL, %E");
       return;
     }
+  debug_printf ("GetEnvironmentStrings returned %p - \"%s\"", rawenv, rawenv);
 
   /* Current directory information is recorded as variables of the
      form "=X:=X:\foo\bar; these must be changed into something legal
