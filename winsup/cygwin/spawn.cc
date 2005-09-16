@@ -624,6 +624,11 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   cygheap->user.deimpersonate ();
 
   moreinfo->envp = build_env (envp, envblock, moreinfo->envc, real_path.iscygexec ());
+  if (!moreinfo->envp || !envblock)
+    {
+      set_errno (E2BIG);
+      goto out;
+    }
   ciresrv.set (chtype, real_path.iscygexec ());
   ciresrv.moreinfo = moreinfo;
 

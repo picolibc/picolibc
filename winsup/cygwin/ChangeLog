@@ -1,5 +1,11 @@
 2005-09-16  Christopher Faylor  <cgf@timesys.com>
 
+	* environ.cc (build_env): Clear envblock and return NULL on attempt to
+	use env var > 32K.
+	* spawn.cc (spawn_guts): Set E2BIG if build_env detects an error.
+
+2005-09-16  Christopher Faylor  <cgf@timesys.com>
+
 	* environ.cc (environ_init): Protect with a 'myfault' in case
 	GetEnvironmentStrings misbehaves.
 
