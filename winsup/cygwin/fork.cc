@@ -62,7 +62,7 @@ stack_base (child_info_fork &ch)
    The result is a boolean indicating success.  */
 
 static int
-fork_copy (PROCESS_INFORMATION &pi, const char *what, ...)
+fork_copy (PROCESS_INFORMATION& pi, const char *what, ...)
 {
   va_list args;
   char *low;

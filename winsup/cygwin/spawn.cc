@@ -1020,15 +1020,6 @@ av::fixup (child_info_types chtype, const char *prog_arg, path_conv& real_path, 
   bool exeext = strcasematch (ext, ".exe");
   if (exeext && real_path.iscygexec ())
     return 0;
-  char *buf = NULL;
-  myfault efault;
-  if (efault.faulted ())
-    {
-      if (buf)
-	UnmapViewOfFile (buf);
-      real_path.set_cygexec (false);
-      return 0;
-    }
   while (1)
     {
       HANDLE h = CreateFile (real_path, GENERIC_READ,
@@ -1042,7 +1033,7 @@ av::fixup (child_info_types chtype, const char *prog_arg, path_conv& real_path, 
       CloseHandle (h);
       if (!hm)
 	goto err;
-      buf = (char *) MapViewOfFile(hm, FILE_MAP_READ, 0, 0, 0);
+      char *buf = (char *) MapViewOfFile(hm, FILE_MAP_READ, 0, 0, 0);
       CloseHandle (hm);
       if (!buf)
 	goto err;

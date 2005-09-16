@@ -1,5 +1,16 @@
 2005-09-15  Christopher Faylor  <cgf@timesys.com>
 
+	* sigproc.cc (no_signals_available): Return true if sending to self
+	from the signal thread.
+	(wait_sig): Correct so that WaitForSingleObject is called when
+	hMainThread is != 0, rather than the reverse.
+
+	* cygheap.cc (cygheap_fixup_in_child): Clarify potential error message.
+
+	* fork.cc (fork_copy): Cosmetic change.
+
+2005-09-15  Christopher Faylor  <cgf@timesys.com>
+
 	* sigproc.cc (wait_sig): Reorganize exit case so that ExitProcess is
 	always called, since that is the intent of sending a __SIGEXIT.  Wait
 	forever for main thread to go away since, presumably, the main thread

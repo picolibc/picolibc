@@ -38,7 +38,7 @@ details. */
 #define WSSC		  60000	// Wait for signal completion
 #define WPSP		  40000	// Wait for proc_subproc mutex
 
-#define no_signals_available() (!hwait_sig || (myself->exitcode & EXITCODE_SET) && !my_sendsig)
+#define no_signals_available() (!hwait_sig || (myself->exitcode & EXITCODE_SET) || !my_sendsig || &_my_tls == _sig_tls)
 
 #define NPROCS	256
 
@@ -1127,7 +1127,7 @@ wait_sig (VOID *self)
 
   HANDLE h = hMainThread;
   my_sendsig = hMainThread = NULL;
-  DWORD res = h ? WAIT_OBJECT_0 : WaitForSingleObject (h, INFINITE);
+  DWORD res = !h ? WAIT_OBJECT_0 : WaitForSingleObject (h, INFINITE);
 
   DWORD exitcode = 1;
 
