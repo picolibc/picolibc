@@ -38,7 +38,7 @@ details. */
 #define WSSC		  60000	// Wait for signal completion
 #define WPSP		  40000	// Wait for proc_subproc mutex
 
-#define no_signals_available() (!hwait_sig || (myself->exitcode & EXITCODE_SET) || !my_sendsig || &_my_tls == _sig_tls)
+#define no_signals_available(x) (!my_sendsig || ((x) && myself->exitcode & EXITCODE_SET) || &_my_tls == _sig_tls)
 
 #define NPROCS	256
 
@@ -59,7 +59,6 @@ HANDLE NO_COPY signal_arrived;		// Event signaled when a signal has
 #define Static static NO_COPY
 
 HANDLE NO_COPY sigCONT;			// Used to "STOP" a process
-Static cygthread *hwait_sig;		// Handle of wait_sig thread
 
 Static HANDLE wait_sig_inited;		// Control synchronization of
 					//  message queue startup
@@ -169,15 +168,6 @@ proc_can_be_signalled (_pinfo *p)
 {
   if (!(p->exitcode & EXITCODE_SET))
     {
-      if (p == myself_nowait || p == myself)
-	if (hwait_sig)
-	  return true;
-	else
-	  {
-	    set_errno (EAGAIN);
-	    return hwait_sig;
-	  }
-
       if (ISSTATE (p, PID_INITIALIZING) ||
 	  (((p)->process_state & (PID_ACTIVE | PID_IN_USE)) ==
 	   (PID_ACTIVE | PID_IN_USE)))
@@ -487,7 +477,8 @@ sigproc_init ()
    */
   sync_proc_subproc.init ("sync_proc_subproc");
 
-  hwait_sig = new cygthread (wait_sig, cygself, "sig");
+  my_sendsig = INVALID_HANDLE_VALUE;	// changed later
+  cygthread *hwait_sig = new cygthread (wait_sig, cygself, "sig");
   hwait_sig->zap_h ();
 
   global_sigs[SIGSTOP].sa_flags = SA_RESTART | SA_NODEFER;
@@ -550,10 +541,10 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
     }
   else
     {
-      if (no_signals_available ())
+      if (!my_sendsig || (si.si_signo != __SIGEXIT && myself->exitcode & EXITCODE_SET) || &_my_tls == _sig_tls)
 	{
-	  sigproc_printf ("hwait_sig %p, myself->sendsig %p, exit_state %d",
-			  hwait_sig, myself->sendsig, exit_state);
+	  sigproc_printf ("my_sendsig %p, myself->sendsig %p, exit_state %d",
+			  my_sendsig, myself->sendsig, exit_state);
 	  set_errno (EAGAIN);
 	  goto out;		// Either exiting or not yet initializing
 	}
@@ -647,7 +638,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	}
       else
 	{
-	  if (no_signals_available ())
+	  if (no_signals_available (si.si_signo != __SIGEXIT))
 	    sigproc_printf ("I'm going away now");
 	  else if (!p->exec_sendsig)
 	    system_printf ("error sending signal %d to pid %d, pipe handle %p, %E",
@@ -688,7 +679,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
     rc = 0;		// Successful exit
   else
     {
-      if (!no_signals_available ())
+      if (!no_signals_available (true))
 	system_printf ("wait for sig_complete event failed, signal %d, rc %d, %E",
 		       si.si_signo, rc);
       set_errno (ENOSYS);

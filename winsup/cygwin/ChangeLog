@@ -1,5 +1,18 @@
 2005-09-15  Christopher Faylor  <cgf@timesys.com>
 
+	* pinfo.h (EXITCODE_SET): Move out of range of Windows error.
+	(EXITCODE_NOSET): Ditto.
+	* sigproc.cc (no_signals_available): Remove check for hwait_sig.  Just
+	rely on my_sendsig.  Pass in an argument controlling when it is
+	appropriate to test EXITCODE_SET.
+	(proc_can_be_signalled): Remove checks for myself since this function
+	is never called in that context.
+	(sigproc_init): Pre-initialize my_sendsig to non-zero so that
+	proc_can_be_signalled will know that we expect to be signalable soon.
+	(sig_send): Change debugging output.
+
+2005-09-15  Christopher Faylor  <cgf@timesys.com>
+
 	* sigproc.cc (no_signals_available): Return true if sending to self
 	from the signal thread.
 	(wait_sig): Correct so that WaitForSingleObject is called when
