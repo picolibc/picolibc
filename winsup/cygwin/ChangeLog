@@ -1,5 +1,12 @@
 2005-09-16  Christopher Faylor  <cgf@timesys.com>
 
+	* environ.cc (build_env): Use "kilo"bytes not "mega"bytes.  Return
+	immediately on error.
+	* spawn.cc (spawn_guts): Set return value to -1 on error from
+	build_env.
+
+2005-09-16  Christopher Faylor  <cgf@timesys.com>
+
 	* environ.cc (build_env): Clear envblock and return NULL on attempt to
 	use env var > 32K.
 	* spawn.cc (spawn_guts): Set E2BIG if build_env detects an error.

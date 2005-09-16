@@ -1034,11 +1034,11 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 	    p = *srcp;		/* Don't worry about it */
 
 	  len = strlen (p);
-	  if (len >= 32 * 1024 * 1024)
+	  if (len >= 32 * 1024)
 	    {
 	      free (envblock);
 	      envblock = NULL;
-	      break;
+	      goto out;
 	    }
 	  new_tl += len + 1;	/* Keep running total of block length so far */
 
@@ -1072,6 +1072,7 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 					   of buffer */
     }
 
+out:
   debug_printf ("envp %p, envc %d", newenv, envc);
   return newenv;
 }

@@ -627,6 +627,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   if (!moreinfo->envp || !envblock)
     {
       set_errno (E2BIG);
+      res = -1;
       goto out;
     }
   ciresrv.set (chtype, real_path.iscygexec ());
