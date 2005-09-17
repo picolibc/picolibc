@@ -119,7 +119,7 @@ fhandler_pipe::open (int flags, mode_t mode)
   if (flags & O_NOINHERIT)
     close_on_exec (true);
   uninterruptible_io (fh->uninterruptible_io ());
-  free (fh);
+  cfree (fh);
   CloseHandle (proc);
   return 1;
 out:
