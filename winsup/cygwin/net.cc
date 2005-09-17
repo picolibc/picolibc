@@ -2290,7 +2290,7 @@ cygwin_inet_pton (int family, const char *strptr, void *addrptr)
 /* See "UNIX Network Programming, Networing APIs: Sockets and XTI",
    W. Richard Stevens, Prentice Hall PTR, 1998. */
 extern "C" const char *
-cygwin_inet_ntop (int family, const void *addrptr, char *strptr, size_t len)
+cygwin_inet_ntop (int family, const void *addrptr, char *strptr, socklen_t len)
 {
   const u_char *p = (const u_char *) addrptr;
 
@@ -2302,7 +2302,7 @@ cygwin_inet_ntop (int family, const void *addrptr, char *strptr, size_t len)
       char temp[64]; /* Big enough for 4 ints ... */
 
       __small_sprintf (temp, "%u.%u.%u.%u", p[0], p[1], p[2], p[3]);
-      if (strlen (temp) >= len)
+      if (strlen (temp) >= (size_t) len)
 	{
 	  set_errno (ENOSPC);
 	  return NULL;

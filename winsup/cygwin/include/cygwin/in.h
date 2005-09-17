@@ -19,6 +19,7 @@
 #define _CYGWIN_IN_H
 
 #include <stdint.h>
+#include <cygwin/socket.h>
 
 /* Standard well-defined IP protocols.  If you ever add one here, don't
    forget to define it below. */

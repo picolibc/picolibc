@@ -1,3 +1,10 @@
+2005-09-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_inet_ntop): Change len argument to socklen_t to
+	follow SUSv3.
+	* include/arpa/inet.h (inet_ntop): Ditto.
+	* include/cygwin/in.h: Include cygwin/socket.h to get socklen_t.
+
 2005-09-16  Christopher Faylor  <cgf@timesys.com>
 
 	* environ.cc (build_env): Use "kilo"bytes not "mega"bytes.  Return

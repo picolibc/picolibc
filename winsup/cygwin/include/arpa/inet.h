@@ -27,7 +27,7 @@ in_addr_t inet_netof (struct in_addr);
 in_addr_t inet_network (const char *);
 char *inet_ntoa (struct in_addr);
 int inet_pton (int, const char *, void *);
-const char *inet_ntop (int, const void *, char *, size_t);
+const char *inet_ntop (int, const void *, char *, socklen_t);
 #endif
 
 #ifdef __cplusplus
