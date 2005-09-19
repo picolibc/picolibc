@@ -1,3 +1,8 @@
+2005-09-19  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winsock2.h (SO_EXCLUSIVEADDRUSE): Define.
+	Thanks to: Gisle Vanem  <giva at bgnett dot no>
+
 2005-09-08  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/reason.h  [_WIN32_WINNT >= 0x0501]
