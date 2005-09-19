@@ -1,3 +1,8 @@
+2005-09-19  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/rtems/include/stdint.h: Moved to...
+	* libc/include/stdint.h: ...here.
+
 2005-09-08  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* Makefile.am: Add include files under bits sub-directory.
