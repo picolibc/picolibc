@@ -310,8 +310,9 @@ _CRTIMP long __cdecl _wtol (const wchar_t *);
 #endif
 _CRTIMP double __cdecl	strtod	(const char*, char**);
 #if !defined __NO_ISOCEXT  /* extern stub in static libmingwex.a */
-__CRT_INLINE float __cdecl strtof (const char *nptr, char **endptr)
-  { return (strtod (nptr, endptr));}
+float __cdecl strtof (const char *, char **);
+__CRT_INLINE float __cdecl strtof (const char *__nptr, char **__endptr)
+  { return (strtod (__nptr, __endptr));}
 long double __cdecl strtold (const char * __restrict__, char ** __restrict__);
 #endif /* __NO_ISOCEXT */
 
@@ -322,8 +323,9 @@ _CRTIMP unsigned long __cdecl	strtoul	(const char*, char**, int);
 /*  also declared in wchar.h */
 _CRTIMP double __cdecl	wcstod	(const wchar_t*, wchar_t**);
 #if !defined __NO_ISOCEXT /* extern stub in static libmingwex.a */
-__CRT_INLINE float __cdecl wcstof( const wchar_t *nptr, wchar_t **endptr)
-{  return (wcstod(nptr, endptr)); }
+float __cdecl wcstof( const wchar_t *, wchar_t **);
+__CRT_INLINE float __cdecl wcstof( const wchar_t *__nptr, wchar_t **__endptr)
+{  return (wcstod(__nptr, __endptr)); }
 long double __cdecl wcstold (const wchar_t * __restrict__, wchar_t ** __restrict__);
 #endif /* __NO_ISOCEXT */
 
@@ -434,6 +436,13 @@ _CRTIMP unsigned int __cdecl _rotl(unsigned int, int) __MINGW_ATTRIB_CONST;
 _CRTIMP unsigned int __cdecl _rotr(unsigned int, int) __MINGW_ATTRIB_CONST;
 _CRTIMP unsigned long __cdecl _lrotl(unsigned long, int) __MINGW_ATTRIB_CONST;
 _CRTIMP unsigned long __cdecl _lrotr(unsigned long, int) __MINGW_ATTRIB_CONST;
+
+_CRTIMP int __cdecl _set_error_mode (int);
+#define _OUT_TO_DEFAULT	0
+#define _OUT_TO_STDERR	1
+#define _OUT_TO_MSGBOX	2
+#define _REPORT_ERRMODE	3
+
 #endif
 
 #ifndef	_NO_OLDNAMES
@@ -460,14 +469,15 @@ _CRTIMP char* __cdecl	gcvt (double, int, char*);
 /* C99 name for _exit */
 void __cdecl _Exit(int) __MINGW_ATTRIB_NORETURN;
 #ifndef __STRICT_ANSI__   /* inline using non-ansi functions */
-__CRT_INLINE void __cdecl _Exit(int status)
-	{  _exit(status); }
+__CRT_INLINE void __cdecl _Exit(int __status)
+	{  _exit (__status); }
 #endif 
 
 typedef struct { long long quot, rem; } lldiv_t;
 
 lldiv_t	__cdecl lldiv (long long, long long) __MINGW_ATTRIB_CONST;
 
+long long __cdecl llabs(long long);
 __CRT_INLINE long long __cdecl llabs(long long _j)
   {return (_j >= 0 ? _j : -_j);}
 
