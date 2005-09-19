@@ -117,7 +117,7 @@
 
 2005-09-14  Christopher Faylor  <cgf@timesys.com>
 
-	Remove some more unneeded 'return;'s throughout. 
+	Remove some more unneeded 'return;'s throughout.
 
 2005-09-14  Christopher Faylor  <cgf@timesys.com>
 
@@ -194,7 +194,7 @@
 	(fhandler_console::fixup_after_exec): Ditto.
 	* sigproc.cc (sigproc_init): Ditto.
 	(sigproc_terminate): Ditto.
-	
+
 	* devices.cc: Regenerate.
 
 2005-09-13  Christopher Faylor  <cgf@timesys.com>
@@ -345,7 +345,7 @@
 	* dir.cc (readdir_r): Invert sense on error test.
 
 2005-08-25  Corinna Vinschen  <corinna@vinschen.de>
-	
+
 	* path.cc (normalize_posix_path): Keep two leading slashes
 	intact throughout.
 	(normalize_win32_path): Revert to only checking for slash.
