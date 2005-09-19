@@ -922,13 +922,11 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
 }
 
 static void
-talktome ()
+talktome (siginfo_t& si)
 {
-  winpids pids ((DWORD) PID_MAP_RW);
-  for (unsigned i = 0; i < pids.npids; i++)
-    if (pids[i]->hello_pid == myself->pid)
-      if (!IsBadWritePtr (pids[i], sizeof (_pinfo)))
-	pids[i]->commune_recv ();
+  pinfo p (si.si_pid, PID_MAP_RW);
+  if (p)
+    p->commune_recv ();
 }
 
 void
@@ -1041,7 +1039,7 @@ wait_sig (VOID *self)
       switch (pack.si.si_signo)
 	{
 	case __SIGCOMMUNE:
-	  talktome ();
+	  talktome (pack.si);
 	  break;
 	case __SIGSTRACE:
 	  strace.hello ();

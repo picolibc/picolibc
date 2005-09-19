@@ -1,3 +1,10 @@
+2005-09-19  Christopher Faylor  <cgf@timesys.com>
+
+	* sigproc.cc (talktome): Take siginfo_t argument.  Don't scan all pids
+	trying to find one that's talking to me.  Just use the pid from
+	siginfo_t.
+	(wait_pid): Pass siginfo_t argument to talktome.
+
 2005-09-17  Christopher Faylor  <cgf@timesys.com>
 
 	* pipe.cc (fhandler_pipe::open): Use 'cfree' to free buffer since it is
