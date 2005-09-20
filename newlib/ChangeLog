@@ -1,5 +1,10 @@
 2005-09-20  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/sys/linux/include/stdint.h: Update to match functionality
+	of generic newlib stdint.h.
+
+2005-09-20  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/stdint.h (__EXP): Rename to __STDINT_EXP
 	and do not #undef the macro after it is used.  Fix typos.
 	Also change 64-bit constants to use the __have_long64 and
