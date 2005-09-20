@@ -1,3 +1,13 @@
+2005-09-20  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/stdint.h (__EXP): Rename to __STDINT_EXP
+	and do not #undef the macro after it is used.  Fix typos.
+	Also change 64-bit constants to use the __have_long64 and
+	__have_longlong64 flags to determine if long or long long
+	constants should be used.
+	* libc/include/inttypes.h: Include stddef.h to get wchar_t
+	type defined.
+
 2005-09-20  Shaun Jackman  <sjackman@gmail.com>
 
 	* libc/include/stdint.h: Fix typo in names of

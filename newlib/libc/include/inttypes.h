@@ -14,6 +14,8 @@
 #define _INTTYPES_H
 
 #include <stdint.h>
+#define __need_wchar_t
+#include <stddef.h>
 
 #define __STRINGIFY(a) #a
 

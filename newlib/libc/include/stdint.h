@@ -20,13 +20,13 @@ extern "C" {
 
 #if defined(__GNUC__) && (__GNUC__ >= 3 ) \
   && defined(__GNUC_MINOR__) && (__GNUC_MINOR__ > 2 ) 
-#define __EXP(x) __##x##__
+#define __STDINT_EXP(x) __##x##__
 #else
-#define __EXP(x) x
+#define __STDINT_EXP(x) x
 #include <limits.h>
 #endif
 
-#if __EXP(SCHAR_MAX) == 0x7f
+#if __STDINT_EXP(SCHAR_MAX) == 0x7f
 typedef signed char int8_t ;
 typedef unsigned char uint8_t ;
 #define __int8_t_defined 1
@@ -38,15 +38,15 @@ typedef unsigned char uint_least8_t;
 #define __int_least8_t_defined 1
 #endif
 
-#if __EXP(SHRT_MAX) == 0x7fff
+#if __STDINT_EXP(SHRT_MAX) == 0x7fff
 typedef signed short int16_t;
 typedef unsigned short uint16_t;
 #define __int16_t_defined 1
-#elif __EXP(INT_MAX) == 0x7fff
+#elif __STDINT_EXP(INT_MAX) == 0x7fff
 typedef signed int int16_t;
 typedef unsigned int uint16_t;
 #define __int16_t_defined 1
-#elif __EXP(SCHAR_MAX) == 0x7fff
+#elif __STDINT_EXP(SCHAR_MAX) == 0x7fff
 typedef signed char int16_t;
 typedef unsigned char uint16_t;
 #define __int16_t_defined 1
@@ -64,20 +64,20 @@ typedef uint16_t  	uint_least8_t;
 #endif
 #endif
 
-#if __EXP(INT_MAX) == 0x7fffffffL
+#if __STDINT_EXP(INT_MAX) == 0x7fffffffL
 typedef signed int int32_t;
 typedef unsigned int uint32_t;
 #define __int32_t_defined 1
-#elif __EXP(LONG_MAX) == 0x7fffffffL
+#elif __STDINT_EXP(LONG_MAX) == 0x7fffffffL
 typedef signed long int32_t;
 typedef unsigned long uint32_t;
 #define __int32_t_defined 1
 #define __have_long32 1
-#elif __EXP(SHRT_MAX) == 0x7fffffffL
+#elif __STDINT_EXP(SHRT_MAX) == 0x7fffffffL
 typedef signed short int32_t;
 typedef unsigned short uint32_t;
 #define __int32_t_defined 1
-#elif __EXP(SCHAR_MAX) == 0x7fffffffL
+#elif __STDINT_EXP(SCHAR_MAX) == 0x7fffffffL
 typedef signed char int32_t;
 typedef unsigned char uint32_t;
 #define __int32_t_defined 1
@@ -101,7 +101,7 @@ typedef uint32_t  	uint_least16_t;
 #endif
 #endif
 
-#if __EXP(LONG_MAX) > 0x7fffffff
+#if __STDINT_EXP(LONG_MAX) > 0x7fffffff
 typedef signed long int64_t;
 typedef unsigned long uint64_t;
 #define __int64_t_defined 1
@@ -116,7 +116,7 @@ typedef signed long long int64_t;
 typedef unsigned long long uint64_t;
 #define __int64_t_defined 1
 #define __have_longlong64 1
-#elif  __EXP(INT_MAX) > 0x7fffffff
+#elif  __STDINT_EXP(INT_MAX) > 0x7fffffff
 typedef signed int int64_t;
 typedef unsigned int uint64_t;
 #define __int64_t_defined 1
@@ -201,44 +201,54 @@ typedef unsigned long uintptr_t;
 #endif
 
 #if __int32_t_defined
-#define INT32_MIN 	-2147483648
+#define INT32_MIN 	 (-2147483647-1)
 #define INT32_MAX 	 2147483647
-#define UINT32_MAX       4294967295
+#define UINT32_MAX       4294967295U
 #endif
 
 #if __int_least32_t_defined
-#define INT_LEAST32_MIN -2147483648
+#define INT_LEAST32_MIN  (-2147483647-1)
 #define INT_LEAST32_MAX  2147483647
-#define UINT_LEAST32_MAX 4294967295
+#define UINT_LEAST32_MAX 4294967295U
 #else
 #error required type int_least32_t missing
 #endif
 
 #if __int64_t_defined
-#define INT64_MIN 	-9223372036854775808
-#define INT64_MAX 	 9223372036854775807
-#define UINT64_MAX 	18446744073709551615
+#ifdef __have_long64
+#define INT64_MIN 	(-9223372036854775807L-1L)
+#define INT64_MAX 	 9223372036854775807L
+#define UINT64_MAX 	18446744073709551615U
+#elif defined(__have_longlong64)
+#define INT64_MIN 	(-9223372036854775807LL-1LL)
+#define INT64_MAX 	 9223372036854775807LL
+#define UINT64_MAX 	18446744073709551615ULL
+#endif
 #endif
 
 #if __int_least64_t_defined
-#define INT_LEAST64_MIN -9223372036854775808
-#define INT_LEAST64_MAX  9223372036854775807
-#define UINT_LEAST64_MAX 18446744073709551615
+#ifdef __have_long64
+#define INT_LEAST64_MIN  (-9223372036854775807L-1L)
+#define INT_LEAST64_MAX  9223372036854775807L
+#define UINT_LEAST64_MAX 18446744073709551615U
+#elif defined(__have_longlong64)
+#define INT_LEAST64_MIN  (-9223372036854775807LL-1LL)
+#define INT_LEAST64_MAX  9223372036854775807LL
+#define UINT_LEAST64_MAX 18446744073709551615ULL
+#endif
 #endif
 
 /* This must match size_t in stddef.h, currently long unsigned int */
-#define SIZE_MIN (-__EXP(LONG_MAX) - 1L)
-#define SIZE_MAX __EXP(LONG_MAX)
+#define SIZE_MIN (-__STDINT_EXP(LONG_MAX) - 1L)
+#define SIZE_MAX __STDINT_EXP(LONG_MAX)
 
 /* This must match sig_atomic_t in <signal.h> (currently int) */
-#define SIG_ATOMIC_MIN (-__EXP(INT_MAX) - 1)
-#define SIG_ATOMIC_MAX __EXP(INT_MAX)
+#define SIG_ATOMIC_MIN (-__STDINT_EXP(INT_MAX) - 1)
+#define SIG_ATOMIC_MAX __STDINT_EXP(INT_MAX)
 
 /* This must match ptrdiff_t  in <stddef.h> (currently long int) */
-#define PTRDIFF_MIN (-__EXP(LONG_MAX) - 1L)
-#define PTHDIFF_MAX __EXT(LONG_MAX)
-
-#undef __EXP
+#define PTRDIFF_MIN (-__STDINT_EXP(LONG_MAX) - 1L)
+#define PTRDIFF_MAX __STDINT_EXP(LONG_MAX)
 
 /** Macros for minimum-width integer constant expressions */
 #define INT8_C(x)	x
