@@ -1024,7 +1024,8 @@ int
 av::fixup (child_info_types chtype, const char *prog_arg, path_conv& real_path, const char *ext)
 {
   bool exeext = strcasematch (ext, ".exe");
-  if (exeext && real_path.iscygexec ())
+  if (exeext && real_path.iscygexec () || strcasematch (ext, ".bat")
+      || strcasematch (ext, ".cmd"))
     return 0;
   while (1)
     {
