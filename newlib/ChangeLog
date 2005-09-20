@@ -1,3 +1,8 @@
+2005-09-20  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/rtems/include/inttypes.h: Moved to...
+	* libc/include/inttypes.h: ...here.
+
 2005-09-19  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/rtems/include/stdint.h: Moved to...
