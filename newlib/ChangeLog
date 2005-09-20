@@ -1,3 +1,8 @@
+2005-09-20  Shaun Jackman  <sjackman@gmail.com>
+
+	* libc/include/stdint.h: Fix typo in names of
+	LEAST macros.
+
 2005-09-20  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/rtems/include/inttypes.h: Moved to...

@@ -179,9 +179,9 @@ typedef unsigned long uintptr_t;
 #endif
 
 #if __int_least8_t_defined
-#define INTLEAST8_MIN 	-128
-#define INTLEAST8_MAX 	 127
-#define UINTLEAST8_MAX 	 255
+#define INT_LEAST8_MIN 	-128
+#define INT_LEAST8_MAX 	 127
+#define UINT_LEAST8_MAX	 255
 #else
 #error required type int_least8_t missing
 #endif
@@ -193,9 +193,9 @@ typedef unsigned long uintptr_t;
 #endif
 
 #if __int_least16_t_defined
-#define INTLEAST16_MIN 	-32768
-#define INTLEAST16_MAX 	 32767
-#define UINTLEAST16_MAX  65535
+#define INT_LEAST16_MIN	-32768
+#define INT_LEAST16_MAX	 32767
+#define UINT_LEAST16_MAX 65535
 #else
 #error required type int_least16_t missing
 #endif
@@ -207,9 +207,9 @@ typedef unsigned long uintptr_t;
 #endif
 
 #if __int_least32_t_defined
-#define INTLEAST32_MIN 	-2147483648
-#define INTLEAST32_MAX 	 2147483647
-#define UINTLEAST32_MAX  4294967295
+#define INT_LEAST32_MIN -2147483648
+#define INT_LEAST32_MAX  2147483647
+#define UINT_LEAST32_MAX 4294967295
 #else
 #error required type int_least32_t missing
 #endif
@@ -221,9 +221,9 @@ typedef unsigned long uintptr_t;
 #endif
 
 #if __int_least64_t_defined
-#define INTLEAST64_MIN 	-9223372036854775808
-#define INTLEAST64_MAX 	 9223372036854775807
-#define UINTLEAST64_MAX 18446744073709551615
+#define INT_LEAST64_MIN -9223372036854775808
+#define INT_LEAST64_MAX  9223372036854775807
+#define UINT_LEAST64_MAX 18446744073709551615
 #endif
 
 /* This must match size_t in stddef.h, currently long unsigned int */
