@@ -1,5 +1,25 @@
 2005-09-19  Christopher Faylor  <cgf@timesys.com>
 
+	* dcrt0.cc (do_exit): Only call sigproc_terminate from one location --
+	pinfo::exit.
+	* pinfo.cc (pinfo::exit): Move sigproc_terminate later so that signals
+	can be processed while waiting for hExeced child.
+	(pinfo::maybe_set_exit_code_from_windows): Set exit code from sigExeced
+	if it is non-zero.  Set exit_state to ES_EXEC_EXIT prior to waiting for
+	captive process exit code.
+	* exceptions.cc (sigExeced): New global variable.
+	(signal_exit): Remove noreturn attribute from declaration.
+	(signal_exit): Just terminate captive process and return if hExeced on
+	the theory that the exit will be subsequently handled in the main
+	thread.
+	* sigproc.cc (sigproc_terminate): Eliminate test for
+	ES_SIGPROCTERMINATE and use ES_FINAL instead.
+	(sig_send): Use no_signals_available instead of duplicate test.
+	* winsup.h (ES_EXEC_EXIT): New enum.
+	(ES_SIGPROCTERMINATE): Delete.
+
+2005-09-19  Christopher Faylor  <cgf@timesys.com>
+
 	* sigproc.cc (talktome): Take siginfo_t argument.  Don't scan all pids
 	trying to find one that's talking to me.  Just use the pid from
 	siginfo_t.

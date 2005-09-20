@@ -1091,9 +1091,6 @@ do_exit (int status)
 
     }
 
-  if (exit_state < ES_SIGPROCTERMINATE)
-    sigproc_terminate (ES_SIGPROCTERMINATE);	// sets exit_state directly
-
   if (exit_state < ES_TITLE)
     {
       exit_state = ES_TITLE;

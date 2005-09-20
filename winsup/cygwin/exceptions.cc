@@ -36,10 +36,11 @@ static int handle_exceptions (EXCEPTION_RECORD *, void *, CONTEXT *, void *);
 extern void sigdelayed ();
 };
 
-extern DWORD dwExeced;
+extern NO_COPY DWORD dwExeced;
+int NO_COPY sigExeced;
 
 static BOOL WINAPI ctrl_c_handler (DWORD);
-static void signal_exit (int) __attribute__ ((noreturn));
+static void signal_exit (int);
 char windows_system_directory[1024];
 static size_t windows_system_directory_length;
 
@@ -1160,7 +1161,7 @@ exit_sig:
     }
   sigproc_printf ("signal %d, about to call do_exit", si.si_signo);
   signal_exit (si.si_signo);
-  /* Never returns */
+  /* May not return */
 }
 
 CRITICAL_SECTION NO_COPY exit_lock;
@@ -1171,6 +1172,13 @@ CRITICAL_SECTION NO_COPY exit_lock;
 static void
 signal_exit (int rc)
 {
+  if (hExeced)
+    {
+      sigproc_printf ("terminating captive process");
+      TerminateProcess (hExeced, sigExeced = rc);
+      return;
+    }
+
   EnterCriticalSection (&exit_lock);
   if (exit_already++)
     myself.exit (rc);
@@ -1183,12 +1191,6 @@ signal_exit (int rc)
 
   user_data->resourcelocks->Delete ();
   user_data->resourcelocks->Init ();
-
-  if (hExeced)
-    {
-      sigproc_printf ("terminating captive process");
-      TerminateProcess (hExeced, rc);
-    }
 
   sigproc_printf ("about to call do_exit (%x)", rc);
   SetEvent (signal_arrived);

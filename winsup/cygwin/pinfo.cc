@@ -111,13 +111,15 @@ pinfo::maybe_set_exit_code_from_windows ()
 {
   DWORD x = 0xdeadbeef;
   DWORD oexitcode = self->exitcode;
+  extern int sigExeced;
+
   if (hProcess && !(self->exitcode & EXITCODE_SET))
     {
       WaitForSingleObject (hProcess, INFINITE);	// just to be safe, in case
 						// process hasn't quite exited
 						// after closing pipe
       GetExitCodeProcess (hProcess, &x);
-      self->exitcode = EXITCODE_SET | (x & 0xff) << 8;
+      self->exitcode = EXITCODE_SET | (sigExeced ?: (x & 0xff) << 8);
     }
   sigproc_printf ("pid %d, exit value - old %p, windows %p, cygwin %p",
 		  self->pid, oexitcode, x, self->exitcode);
@@ -136,19 +138,22 @@ pinfo::zap_cwd ()
 void
 pinfo::exit (DWORD n)
 {
-  sigproc_terminate (ES_FINAL);
-
   cygthread::terminate ();
   if (n != EXITCODE_NOSET)
     self->exitcode = EXITCODE_SET | n;/* We're really exiting.  Record the UNIX exit code. */
+  else
+    {
+      exit_state = ES_EXEC_EXIT;
+      maybe_set_exit_code_from_windows ();
+    }
+
+  sigproc_terminate (ES_FINAL);
 
   /* FIXME:  There is a potential race between an execed process and its
      parent here.  I hated to add a mutex just for this, though.  */
   struct rusage r;
   fill_rusage (&r, hMainProc);
   add_rusage (&self->rusage_self, &r);
-
-  maybe_set_exit_code_from_windows ();
 
   if (n != EXITCODE_NOSET)
     {

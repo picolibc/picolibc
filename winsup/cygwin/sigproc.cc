@@ -492,7 +492,7 @@ sigproc_terminate (exit_states es)
 {
   exit_states prior_exit_state = exit_state;
   exit_state = es;
-  if (prior_exit_state > ES_SIGPROCTERMINATE)
+  if (prior_exit_state >= ES_FINAL)
     sigproc_printf ("already performed");
   else
     {
@@ -541,7 +541,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
     }
   else
     {
-      if (!my_sendsig || (si.si_signo != __SIGEXIT && myself->exitcode & EXITCODE_SET) || &_my_tls == _sig_tls)
+      if (no_signals_available (si.si_signo != __SIGEXIT))
 	{
 	  sigproc_printf ("my_sendsig %p, myself->sendsig %p, exit_state %d",
 			  my_sendsig, myself->sendsig, exit_state);
@@ -638,7 +638,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	}
       else
 	{
-	  if (no_signals_available (si.si_signo != __SIGEXIT))
+	  if (no_signals_available (true))
 	    sigproc_printf ("I'm going away now");
 	  else if (!p->exec_sendsig)
 	    system_printf ("error sending signal %d to pid %d, pipe handle %p, %E",

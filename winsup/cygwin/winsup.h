@@ -195,7 +195,7 @@ enum exit_states
     ES_CLOSEALL,
     ES_HUP_PGRP,
     ES_HUP_SID,
-    ES_SIGPROCTERMINATE,
+    ES_EXEC_EXIT,
     ES_TITLE,
     ES_TTY_TERMINATE,
     ES_FINAL
