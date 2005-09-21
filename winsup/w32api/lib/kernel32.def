@@ -621,7 +621,8 @@ ReadProcessMemory@20
 ReadProcessMemoryVlm@20
 RegisterConsoleVDM@44
 RegisterWaitForInputIdle@4
-RegisterWaitForSingleObject@16
+RegisterWaitForSingleObject@24
+RegisterWaitForSingleObjectEx@20
 RegisterWowBaseHandlers@4
 RegisterWowExec@4
 ReleaseActCtx@4

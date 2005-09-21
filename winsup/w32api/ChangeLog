@@ -1,3 +1,12 @@
+2005-09-21	Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
+
+	* include/winbase.h (RegisterWaitForSingleObject,
+	RegisterWaitForSingleObjectEx): Define.
+	* lib/kernel32.def (RegisterWaitForSingleObjectEx@20): Define.
+	(RegisterWaitForSingleObject@16): Changed to
+	RegisterWaitForSingleObject@24.
+	Thanks to: Brandon Sneed <nivenh at users dot sourceforge dot net>
+
 2005-09-19  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winsock2.h (SO_EXCLUSIVEADDRUSE): Define.
