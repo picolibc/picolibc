@@ -20,7 +20,21 @@
 #include <ntsecapi.h>
 #include <ntdef.h>
 
+#define print_win_error(x) _print_win_error(x, __LINE__)
+
 static const char version[] = "$Revision$";
+
+typedef struct {
+  LPWSTR DomainControllerName;
+  LPWSTR DomainControllerAddress;
+  ULONG  DomainControllerAddressType;
+  GUID   DomainGuid;
+  LPWSTR DomainName;
+  LPWSTR DnsForestName;
+  ULONG  Flags;
+  LPWSTR DcSiteName;
+  LPWSTR ClientSiteName;
+} *PDOMAIN_CONTROLLER_INFOW;
 
 SID_IDENTIFIER_AUTHORITY sid_world_auth = {SECURITY_WORLD_SID_AUTHORITY};
 SID_IDENTIFIER_AUTHORITY sid_nt_auth = {SECURITY_NT_AUTHORITY};
@@ -38,6 +52,8 @@ NTSTATUS NTAPI (*lsaclose)(LSA_HANDLE);
 NTSTATUS NTAPI (*lsaopenpolicy)(PLSA_UNICODE_STRING,PLSA_OBJECT_ATTRIBUTES,ACCESS_MASK,PLSA_HANDLE);
 NTSTATUS NTAPI (*lsaqueryinformationpolicy)(LSA_HANDLE,POLICY_INFORMATION_CLASS,PVOID*);
 NTSTATUS NTAPI (*lsafreememory)(PVOID);
+
+NET_API_STATUS WINAPI (*dsgetdcname)(LPWSTR,LPWSTR,GUID*,LPWSTR,ULONG,PDOMAIN_CONTROLLER_INFOW*);
 
 #ifndef min
 #define min(a,b) (((a)<(b))?(a):(b))
@@ -67,6 +83,8 @@ load_netapi ()
     return FALSE;
   if (!(netgetdcname = (void *) GetProcAddress (h, "NetGetDCName")))
     return FALSE;
+
+  dsgetdcname = (void *) GetProcAddress (h, "DsGetDcNameW");
 
   if (!(h = LoadLibrary ("advapi32.dll")))
     return FALSE;
@@ -134,6 +152,22 @@ uni2ansi (LPWSTR wcs, char *mbs, int size)
 }
 
 void
+_print_win_error(DWORD code, int line)
+{
+  char buf[4096];
+
+  if (FormatMessage (FORMAT_MESSAGE_FROM_SYSTEM
+      | FORMAT_MESSAGE_IGNORE_INSERTS,
+      NULL,
+      code,
+      MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
+      (LPTSTR) buf, sizeof (buf), NULL))
+    fprintf (stderr, "mkgroup (%d): [%lu] %s", line, code, buf);
+  else
+    fprintf (stderr, "mkgroup (%d): error %lu", line, code);
+}
+
+void
 enum_local_users (LPWSTR groupname)
 {
   LOCALGROUP_MEMBERS_INFO_1 *buf1;
@@ -190,7 +224,7 @@ enum_local_groups (int print_sids, int print_users, char *disp_groupname)
       switch (rc)
 	{
 	case ERROR_ACCESS_DENIED:
-	  fprintf (stderr, "Access denied\n");
+	  print_win_error(rc);
 	  exit (1);
 
 	case ERROR_MORE_DATA:
@@ -198,7 +232,7 @@ enum_local_groups (int print_sids, int print_users, char *disp_groupname)
 	  break;
 
 	default:
-	  fprintf (stderr, "NetLocalGroupEnum() failed with %ld\n", rc);
+	  print_win_error(rc);
 	  exit (1);
 	}
 
@@ -218,8 +252,8 @@ enum_local_groups (int print_sids, int print_users, char *disp_groupname)
 				  &sid_length, domain_name, &domname_len,
 				  &acc_type))
 	    {
-	      fprintf (stderr, "LookupAccountName(%s) failed with %ld\n",
-		       localgroup_name, GetLastError ());
+	      print_win_error(rc);
+	      fprintf(stderr, " (%s)\n", localgroup_name);
 	      continue;
 	    }
           else if (acc_type == SidTypeDomain)
@@ -236,9 +270,8 @@ enum_local_groups (int print_sids, int print_users, char *disp_groupname)
                                       domain_name, &domname_len,
                                       &acc_type))
                 {
-                  fprintf (stderr,
-                           "LookupAccountName(%s) failed with error %ld\n",
-                           localgroup_name, GetLastError ());
+                  print_win_error(rc);
+		  fprintf(stderr, " (%s)\n", domname);
                   continue;
                 }
             }
@@ -322,7 +355,7 @@ enum_groups (LPWSTR servername, int print_sids, int print_users, int id_offset,
       switch (rc)
 	{
 	case ERROR_ACCESS_DENIED:
-	  fprintf (stderr, "Access denied\n");
+	  print_win_error(rc);
 	  exit (1);
 
 	case ERROR_MORE_DATA:
@@ -330,7 +363,7 @@ enum_groups (LPWSTR servername, int print_sids, int print_users, int id_offset,
 	  break;
 
 	default:
-	  fprintf (stderr, "NetGroupEnum() failed with %ld\n", rc);
+	  print_win_error(rc);
 	  exit (1);
 	}
 
@@ -354,11 +387,8 @@ enum_groups (LPWSTR servername, int print_sids, int print_users, int id_offset,
                                       domain_name, &domname_len,
 			              &acc_type))
                 {
-                  fprintf (stderr,
-                           "LookupAccountName (%s, %s) failed with error %ld\n",
-                           servername ? ansi_srvname : "NULL",
-                           groupname,
-                           GetLastError ());
+                  print_win_error(rc);
+		  fprintf(stderr, " (%s)\n", groupname);
                   continue;
                 }
               else if (acc_type == SidTypeDomain)
@@ -376,11 +406,8 @@ enum_groups (LPWSTR servername, int print_sids, int print_users, int id_offset,
                                           domain_name, &domname_len,
 			                  &acc_type))
                     {
-                      fprintf (stderr,
-                               "LookupAccountName(%s,%s) failed with error %ld\n",
-                               servername ? ansi_srvname : "NULL",
-                               domname,
-                               GetLastError ());
+                      print_win_error(rc);
+		      fprintf(stderr, " (%s)\n", domname);
                       continue;
                     }
                 }
@@ -443,22 +470,6 @@ print_special (int print_sids,
 }
 
 void
-print_win_error(DWORD code)
-{
-  char buf[4096];
-
-  if (FormatMessage (FORMAT_MESSAGE_FROM_SYSTEM
-      | FORMAT_MESSAGE_IGNORE_INSERTS,
-      NULL,
-      code,
-      MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
-      (LPTSTR) buf, sizeof (buf), NULL))
-    fprintf (stderr, "mkgroup: [%lu] %s", code, buf);
-  else
-    fprintf (stderr, "mkgroup: error %lu", code);
-}
-
-void
 current_group (int print_sids, int print_users, int id_offset)
 {
   char name[UNLEN + 1], *envname, *envdomain;
@@ -489,7 +500,6 @@ current_group (int print_sids, int print_users, int id_offset)
       if (errpos)
 	{
 	  print_win_error (GetLastError ());
-	  fprintf(stderr, " on line %d\n", errpos);
 	}
       return;
     }
@@ -662,8 +672,7 @@ main (int argc, char **argv)
     }
   if (!load_netapi ())
     {
-      fprintf (stderr, "Failed loading symbols from netapi32.dll "
-      		       "with error %lu\n", GetLastError ());
+      print_win_error(GetLastError ());
       return 1;
     }
 
@@ -741,22 +750,43 @@ main (int argc, char **argv)
   if (print_domain) 
     do
       {
-	if (domain_specified)
-          {
-	    mbstowcs (domain_name, argv[optind], (strlen (argv[optind]) + 1));
-	    rc = netgetdcname (NULL, domain_name, (void *) &servername);
+	PDOMAIN_CONTROLLER_INFOW pdci = NULL;
+
+	if (dsgetdcname)
+	  {
+	    if (domain_specified)
+	      {
+	        mbstowcs (domain_name, argv[optind], strlen (argv[optind]) + 1);
+		rc = dsgetdcname (NULL, domain_name, NULL, NULL, 0, &pdci);
+	      }
+	    else
+	      rc = dsgetdcname (NULL, NULL, NULL, NULL, 0, &pdci);
+	    if (rc != ERROR_SUCCESS)
+	      {
+	        print_win_error(rc);
+		return 1;
+	      }
+	    servername = pdci->DomainControllerName;
 	  }
 	else
-	  rc = netgetdcname (NULL, NULL, (void *) &servername);
-	
-	if (rc != ERROR_SUCCESS)
 	  {
-	    fprintf (stderr, "Cannot get PDC, code = %ld\n", rc);
-	    return 1;
+	    rc = netgetdcname (NULL, NULL, (void *) &servername);
+	    if (rc == ERROR_SUCCESS && domain_specified)
+	      {
+		LPWSTR server = servername;
+		mbstowcs (domain_name, argv[optind], strlen (argv[optind]) + 1);
+		rc = netgetdcname (NULL, domain_name, (void *) &servername);
+		netapibufferfree (server);
+	      }
+	    if (rc != ERROR_SUCCESS)
+	      {
+		print_win_error(rc);
+		return 1;
+	      }
 	  }
-
-	enum_groups (servername, print_sids, print_users, id_offset * i++, disp_groupname);
-	netapibufferfree (servername);	
+	enum_groups (servername, print_sids, print_users, id_offset * i++,
+		     disp_groupname);
+	netapibufferfree (pdci ? (PVOID) pdci : (PVOID) servername);
       }
     while (++optind < argc);
 

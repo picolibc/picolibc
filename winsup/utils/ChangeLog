@@ -1,3 +1,20 @@
+2005-09-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	Align error message handling to mkpasswd's error messages throughout.
+	* mkgroup.c (print_win_error): Create macro calling ...
+	(_print_win_error): ... this function created from former
+	print_win_error.  Move up in source.
+	(PDOMAIN_CONTROLLER_INFOW): Define return type of DcGetDcNameW.
+	(dsgetdcname): New function pointer for DcGetDcNameW.
+	(load_netapi): Get DcGetDcNameW address.
+	(main): If DcGetDcNameW is available, use it.
+	* mkpasswd.c (PDOMAIN_CONTROLLER_INFOW): Define return type of
+	DcGetDcNameW.
+	(dsgetdcname): New function pointer for DcGetDcNameW.
+	(load_netapi): Get DcGetDcNameW address.
+	(main): If DcGetDcNameW is available, use it.  Rename local variable
+	domain_name_specified to domain_specified as in mkgroup.c.
+
 2005-09-08  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
 
 	* regtool.cc: Extend copyright-years.

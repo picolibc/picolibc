@@ -30,11 +30,24 @@ static const char version[] = "$Revision$";
 SID_IDENTIFIER_AUTHORITY sid_world_auth = {SECURITY_WORLD_SID_AUTHORITY};
 SID_IDENTIFIER_AUTHORITY sid_nt_auth = {SECURITY_NT_AUTHORITY};
 
+typedef struct {
+  LPWSTR DomainControllerName;
+  LPWSTR DomainControllerAddress;
+  ULONG  DomainControllerAddressType;
+  GUID   DomainGuid;
+  LPWSTR DomainName;
+  LPWSTR DnsForestName;
+  ULONG  Flags;
+  LPWSTR DcSiteName;
+  LPWSTR ClientSiteName;
+} *PDOMAIN_CONTROLLER_INFOW;
+
 NET_API_STATUS WINAPI (*netapibufferfree)(PVOID);
 NET_API_STATUS WINAPI (*netuserenum)(LPWSTR,DWORD,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
 NET_API_STATUS WINAPI (*netlocalgroupenum)(LPWSTR,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
 NET_API_STATUS WINAPI (*netgetdcname)(LPWSTR,LPWSTR,PBYTE*);
 NET_API_STATUS WINAPI (*netusergetinfo)(LPWSTR,LPWSTR,DWORD,PBYTE*);
+NET_API_STATUS WINAPI (*dsgetdcname)(LPWSTR,LPWSTR,GUID*,LPWSTR,ULONG,PDOMAIN_CONTROLLER_INFOW*);
 
 #ifndef min
 #define min(a,b) (((a)<(b))?(a):(b))
@@ -58,6 +71,8 @@ load_netapi ()
     return FALSE;
   if (!(netusergetinfo = (void *) GetProcAddress (h, "NetUserGetInfo")))
     return FALSE;
+
+  dsgetdcname = (void *) GetProcAddress (h, "DsGetDcNameW");
 
   return TRUE;
 }
@@ -561,7 +576,7 @@ main (int argc, char **argv)
   int print_current = 0;
   int print_domain = 0;
   int print_local_groups = 0;
-  int domain_name_specified = 0;
+  int domain_specified = 0;
   int print_sids = 1;
   int print_cygpath = 1;
   int id_offset = 10000;
@@ -675,7 +690,7 @@ main (int argc, char **argv)
 		   "when `-d' is given.\n", argv[0]);
 	  return 1;
 	}
-      domain_name_specified = 1;
+      domain_specified = 1;
     }
   if (!load_netapi ())
     {
@@ -718,23 +733,43 @@ main (int argc, char **argv)
   if (print_domain) 
     do 
       {
-	if (domain_name_specified)
+	PDOMAIN_CONTROLLER_INFOW pdci = NULL;
+
+	if (dsgetdcname)
 	  {
-	    mbstowcs (domain_name, argv[optind], (strlen (argv[optind]) + 1));
-	    rc = netgetdcname (NULL, domain_name, (void *) &servername);
+	    if (domain_specified)
+	      {
+		mbstowcs (domain_name, argv[optind], strlen (argv[optind]) + 1);
+		rc = dsgetdcname (NULL, domain_name, NULL, NULL, 0, &pdci);
+	      }
+	    else
+	      rc = dsgetdcname (NULL, NULL, NULL, NULL, 0, &pdci);
+	    if (rc != ERROR_SUCCESS)
+	      {
+		print_win_error(rc);
+		return 1;
+	      }
+	    servername = pdci->DomainControllerName;
 	  }
 	else
-	  rc = netgetdcname (NULL, NULL, (void *) &servername);
-	
-	if (rc != ERROR_SUCCESS)
 	  {
-	    print_win_error(rc);
-	    return 1;
-	  }
-
+	    rc = netgetdcname (NULL, NULL, (void *) &servername);
+	    if (rc == ERROR_SUCCESS && domain_specified)
+	      {
+		LPWSTR server = servername;
+		mbstowcs (domain_name, argv[optind], strlen (argv[optind]) + 1);
+		rc = netgetdcname (server, domain_name, (void *) &servername);
+		netapibufferfree (server);
+	      }
+	    if (rc != ERROR_SUCCESS)
+	      {
+		print_win_error(rc);
+		return 1;
+	      }
+          }
 	enum_users (servername, print_sids, print_cygpath, passed_home_path,
 		    id_offset * i++, disp_username);
-	netapibufferfree (servername);
+	netapibufferfree (pdci ? (PVOID) pdci : (PVOID) servername);
       }
     while (++optind < argc);
 
