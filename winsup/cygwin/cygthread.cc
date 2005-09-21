@@ -153,11 +153,10 @@ new (size_t)
       }
 
 #ifdef DEBUGGING
-  char buf[1024];
-  if (!GetEnvironmentVariable ("CYGWIN_FREERANGE_NOCHECK", buf, sizeof (buf)))
-    api_fatal ("Overflowed cygwin thread pool");
+  if (!getenv ("CYGWIN_FREERANGE_NOCHECK"))
+    api_fatal ("overflowed cygwin thread pool");
   else
-    thread_printf ("Overflowed cygwin thread pool");
+    thread_printf ("overflowed cygwin thread pool");
 #endif
 
   info = freerange ();	/* exhausted thread pool */

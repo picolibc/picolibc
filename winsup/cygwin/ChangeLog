@@ -1,3 +1,9 @@
+2005-09-21  Christopher Faylor  <cgf@timesys.com>
+
+	* cygthread.cc (cygthread::operator new): Just use getenv() to look for
+	CYGWIN_FREERANGE_NOCHECK since the Windows environment may be truncated
+	by being previously execed.
+
 2005-09-20  Christopher Faylor  <cgf@timesys.com>
 
 	* spawn.cc (av::fixup): Just blindly run any file if it has a .bat or
