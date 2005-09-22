@@ -1,5 +1,9 @@
 2005-09-22  Christopher Faylor  <cgf@timesys.com>
 
+	* strace.cc (strace::vsprntf): Avoid accessing myself->pid if !myself.
+
+2005-09-22  Christopher Faylor  <cgf@timesys.com>
+
 	* include/sys/strace.h (_STRACE_ON): Remove semicolon from definition.
 	(_STRACE_OFF): Remove semicolon from definition.
 
