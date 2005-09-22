@@ -1,3 +1,8 @@
+2005-09-22  Christopher Faylor  <cgf@timesys.com>
+
+	* include/sys/strace.h (_STRACE_ON): Remove semicolon from definition.
+	(_STRACE_OFF): Remove semicolon from definition.
+
 2005-09-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_base::fstat_helper): Declare with additional
