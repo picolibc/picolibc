@@ -1,3 +1,20 @@
+2005-09-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_base::fstat_helper): Declare with additional
+	file attributes argument.
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Use
+	file attributes evaluated from NtQueryFileInformation or
+	FileInformationByHandle in call to fstat_helper.
+	Set pc.fileattr from just evaluated file attributes here.
+	(fhandler_base::fstat_by_name): Use file attributes evaluated from
+	FindFileFirst or default attribute in call to fstat_helper.
+	Set pc.fileattr from just evaluated file attributes here.
+	(fhandler_base::fstat_helper): Use file attributes given as argument,
+	not file attributes stored in this fhandler, since this information
+	is potentially wrong.  Add comment to explain this.
+	* path.h (has_attribute): New global inline function.
+	(path_conv::set_attributes): New method to change fileattr.
+
 2005-09-21  Christopher Faylor  <cgf@timesys.com>
 
 	* cygthread.cc (cygthread::operator new): Just use getenv() to look for

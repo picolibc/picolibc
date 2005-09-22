@@ -124,22 +124,26 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
       status = NtQueryInformationFile (get_handle (), &io, pfai, fai_size,
 				       FileAllInformation);
       if (NT_SUCCESS (status))
-	/* If the change time is 0, it's a file system which doesn't
-	   support a change timestamp.  In that case use the LastWriteTime
-	   entry, as in other calls to fstat_helper. */
-	return fstat_helper (buf,
-			 pfai->BasicInformation.ChangeTime.QuadPart ?
-			 *(FILETIME *) &pfai->BasicInformation.ChangeTime :
-			 *(FILETIME *) &pfai->BasicInformation.LastWriteTime,
-			 *(FILETIME *) &pfai->BasicInformation.LastAccessTime,
-			 *(FILETIME *) &pfai->BasicInformation.LastWriteTime,
-			 pfvi->VolumeSerialNumber,
-			 pfai->StandardInformation.EndOfFile.HighPart,
-			 pfai->StandardInformation.EndOfFile.LowPart,
-			 pfai->StandardInformation.AllocationSize.QuadPart,
-			 pfai->InternalInformation.IndexNumber.HighPart,
-			 pfai->InternalInformation.IndexNumber.LowPart,
-			 pfai->StandardInformation.NumberOfLinks);
+	{
+	  /* If the change time is 0, it's a file system which doesn't
+	     support a change timestamp.  In that case use the LastWriteTime
+	     entry, as in other calls to fstat_helper. */
+	  pc.set_attributes (pfai->BasicInformation.FileAttributes);
+	  return fstat_helper (buf,
+			   pfai->BasicInformation.ChangeTime.QuadPart ?
+			   *(FILETIME *) &pfai->BasicInformation.ChangeTime :
+			   *(FILETIME *) &pfai->BasicInformation.LastWriteTime,
+			   *(FILETIME *) &pfai->BasicInformation.LastAccessTime,
+			   *(FILETIME *) &pfai->BasicInformation.LastWriteTime,
+			   pfvi->VolumeSerialNumber,
+			   pfai->StandardInformation.EndOfFile.HighPart,
+			   pfai->StandardInformation.EndOfFile.LowPart,
+			   pfai->StandardInformation.AllocationSize.QuadPart,
+			   pfai->InternalInformation.IndexNumber.HighPart,
+			   pfai->InternalInformation.IndexNumber.LowPart,
+			   pfai->StandardInformation.NumberOfLinks,
+			   pfai->BasicInformation.FileAttributes);
+	}
 
       debug_printf ("%u = NtQueryInformationFile)",
 		    RtlNtStatusToDosError (status));
@@ -160,6 +164,7 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 	local.nFileSizeLow = 0;
     }
 
+  pc.set_attributes (local.dwFileAttributes);
   return fstat_helper (buf,
 		       local.ftLastWriteTime, /* see fstat_helper comment */
 		       local.ftLastAccessTime,
@@ -170,7 +175,8 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 		       -1LL,
 		       local.nFileIndexHigh,
 		       local.nFileIndexLow,
-		       local.nNumberOfLinks);
+		       local.nNumberOfLinks,
+		       local.dwFileAttributes);
 }
 
 int __stdcall
@@ -189,6 +195,7 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
   else if ((handle = FindFirstFile (pc, &local)) != INVALID_HANDLE_VALUE)
     {
       FindClose (handle);
+      pc.set_attributes (local.dwFileAttributes);
       res = fstat_helper (buf,
 			  local.ftLastWriteTime, /* see fstat_helper comment */
 			  local.ftLastAccessTime,
@@ -199,12 +206,14 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
 			  -1LL,
 			  0,
 			  0,
-			  1);
+			  1,
+			  local.dwFileAttributes);
     }
   else if (pc.isdir ())
     {
       FILETIME ft = {};
-      res = fstat_helper (buf, ft, ft, ft, pc.volser (), 0, 0, -1LL, 0, 0, 1);
+      res = fstat_helper (buf, ft, ft, ft, pc.volser (), 0, 0, -1LL, 0, 0, 1,
+			  FILE_ATTRIBUTE_DIRECTORY);
     }
   else
     {
@@ -270,7 +279,11 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
    it's faked using the LastWriteTime entry from GetFileInformationByHandle
    or FindFirstFile.  We're deliberatly not using the creation time anymore
    to simplify interaction with native Windows applications which choke on
-   creation times >= access or write times. */
+   creation times >= access or write times.
+
+   Note that the dwFileAttributes member of the file information evaluated
+   in the calling function is used here, not the pc.fileattr member, since
+   the latter might be old and not reflect the actual state of the file. */
 int __stdcall
 fhandler_base::fstat_helper (struct __stat64 *buf,
 			     FILETIME ftChangeTime,
@@ -282,7 +295,8 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 			     LONGLONG nAllocSize,
 			     DWORD nFileIndexHigh,
 			     DWORD nFileIndexLow,
-			     DWORD nNumberOfLinks)
+			     DWORD nNumberOfLinks,
+			     DWORD dwFileAttributes)
 {
   IO_STATUS_BLOCK st;
   FILE_COMPRESSION_INFORMATION fci;
@@ -328,11 +342,11 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
     /* A successful NtQueryInformationFile returns the allocation size
        correctly for compressed and sparse files as well. */
     buf->st_blocks = (nAllocSize + S_BLKSIZE - 1) / S_BLKSIZE;
-  else if (pc.has_attribute (FILE_ATTRIBUTE_COMPRESSED
-			     | FILE_ATTRIBUTE_SPARSE_FILE)
-      && get_io_handle () && !is_fs_special ()
-      && !NtQueryInformationFile (get_io_handle (), &st, (PVOID) &fci,
-				  sizeof fci, FileCompressionInformation))
+  else if (::has_attribute (dwFileAttributes, FILE_ATTRIBUTE_COMPRESSED
+					      | FILE_ATTRIBUTE_SPARSE_FILE)
+	   && get_io_handle () && !is_fs_special ()
+	   && !NtQueryInformationFile (get_io_handle (), &st, (PVOID) &fci,
+				      sizeof fci, FileCompressionInformation))
     /* Otherwise we request the actual amount of bytes allocated for
        compressed and sparsed files. */
     buf->st_blocks = (fci.CompressedSize.QuadPart + S_BLKSIZE - 1) / S_BLKSIZE;
@@ -357,11 +371,14 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
   else if (pc.issocket ())
     buf->st_mode = S_IFSOCK;
 
-  if (!get_file_attribute (pc.has_acls (), is_fs_special () ? NULL: get_io_handle (),
-			   get_win32_name (), &buf->st_mode, &buf->st_uid, &buf->st_gid))
+  if (!get_file_attribute (pc.has_acls (),
+			   is_fs_special () ? NULL: get_io_handle (),
+			   get_win32_name (), &buf->st_mode,
+			   &buf->st_uid, &buf->st_gid))
     {
       /* If read-only attribute is set, modify ntsec return value */
-      if (pc.has_attribute (FILE_ATTRIBUTE_READONLY) && !pc.issymlink ())
+      if (::has_attribute (dwFileAttributes, FILE_ATTRIBUTE_READONLY)
+	  && !pc.issymlink ())
 	buf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
 
       if (buf->st_mode & S_IFMT)
@@ -378,7 +395,8 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
     {
       buf->st_mode |= STD_RBITS;
 
-      if (!pc.has_attribute (FILE_ATTRIBUTE_READONLY) && !pc.issymlink ())
+      if (::has_attribute (dwFileAttributes, FILE_ATTRIBUTE_READONLY)
+	  && !pc.issymlink ())
 	buf->st_mode |= STD_WBITS;
       /* | S_IWGRP | S_IWOTH; we don't give write to group etc */
 
