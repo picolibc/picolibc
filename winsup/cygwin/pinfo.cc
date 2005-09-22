@@ -54,7 +54,9 @@ set_myself (HANDLE h)
   myself->dwProcessId = GetCurrentProcessId ();
 
   GetModuleFileName (NULL, myself->progname, sizeof (myself->progname));
+#ifndef DEBUGGING
   if (!strace.active)
+#endif
     strace.hello ();
   debug_printf ("myself->dwProcessId %u", myself->dwProcessId);
   myself.initialize_lock ();
@@ -287,7 +289,12 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 	   brief occurrence, so rather than introduce some kind of locking
 	   mechanism, just loop.  */
       if (!created && createit && (procinfo->process_state & PID_EXITED))
-	goto loop;
+	{
+	  debug_printf ("looping because pid %d, procinfo->pid %d, procinfo->dwProcessid %u has PID_EXITED set",
+			n, procinfo->pid, procinfo->dwProcessId);
+	  low_priority_sleep (0);
+	  goto loop;
+	}
 
       if (!created)
 	/* nothing */;
