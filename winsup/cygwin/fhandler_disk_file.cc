@@ -395,7 +395,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
     {
       buf->st_mode |= STD_RBITS;
 
-      if (::has_attribute (dwFileAttributes, FILE_ATTRIBUTE_READONLY)
+      if (!::has_attribute (dwFileAttributes, FILE_ATTRIBUTE_READONLY)
 	  && !pc.issymlink ())
 	buf->st_mode |= STD_WBITS;
       /* | S_IWGRP | S_IWOTH; we don't give write to group etc */
