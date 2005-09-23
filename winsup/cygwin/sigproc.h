@@ -47,6 +47,7 @@ struct sigpacket
   union
   {
     HANDLE wakeup;
+    HANDLE thread_handle;
     struct sigpacket *next;
   };
   int __stdcall process () __attribute__ ((regparm (1)));

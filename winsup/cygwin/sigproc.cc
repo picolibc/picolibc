@@ -500,11 +500,6 @@ sigproc_terminate (exit_states es)
       siginfo_t si;
       memset (&si, 0, sizeof (si));
       si.si_signo = __SIGEXIT;
-      if (&_my_tls == _main_tls)
-	_my_tls.thread_handle = hMainThread;
-      else
-	DuplicateHandle (hMainProc, GetCurrentThread (), hMainProc, &_my_tls.thread_handle, 0,
-			 FALSE, DUPLICATE_SAME_ACCESS);
       sig_send (myself_nowait, si, &_my_tls);
       proc_terminate ();		// clean up process stuff
     }
@@ -626,7 +621,15 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
     pack.si.si_uid = myself->uid;
   pack.pid = myself->pid;
   pack.tls = (_cygtls *) tls;
-  if (wait_for_completion)
+  if (si.si_signo == __SIGEXIT)
+    {
+      if (&_my_tls == _main_tls)
+	pack.thread_handle = hMainThread;
+      else
+	DuplicateHandle (hMainProc, GetCurrentThread (), hMainProc, &pack.thread_handle, 0,
+			 FALSE, DUPLICATE_SAME_ACCESS);
+    }
+  else if (wait_for_completion)
     {
       pack.wakeup = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
       sigproc_printf ("wakeup %p", pack.wakeup);
@@ -667,6 +670,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
     {
       sigproc_printf ("Waiting for pack.wakeup %p", pack.wakeup);
       rc = WaitForSingleObject (pack.wakeup, WSSC);
+      ForceCloseHandle (pack.wakeup);
     }
   else
     {
@@ -677,12 +681,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	ForceCloseHandle (sendsig);
     }
 
-  if (pack.wakeup)
-    {
-      ForceCloseHandle (pack.wakeup);
-      pack.wakeup = NULL;
-    }
-
+  pack.wakeup = NULL;
   if (rc == WAIT_OBJECT_0)
     rc = 0;		// Successful exit
   else
@@ -1124,11 +1123,9 @@ wait_sig (VOID *self)
     }
 
   my_sendsig = NULL;
-  if (!pack.tls)
-    api_fatal ("no exit packet received");
-  if (!pack.tls->thread_handle)
+  HANDLE& h = pack.thread_handle;
+  if (!h)
     api_fatal ("no thread handle set on exit");
-  HANDLE h = pack.tls->thread_handle;
   DWORD res = WaitForSingleObject (h, INFINITE);
 
   DWORD exitcode = 1;

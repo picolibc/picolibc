@@ -1,3 +1,12 @@
+2005-09-23  Christopher Faylor  <cgf@timesys.com>
+
+	* cygtls.h (struct _cygtls::thread_handle): Remove/revert.
+	* sigproc.h (struct sipacket::thread_handle): Put thread_handle here.
+	* sigproc.cc (sigproc_terminate): Move setting of thread_handle...
+	(sig_send): ...to here.  Put it in packet being sent.  Only close
+	pack.wakeup when we're waiting for completion.
+	(wait_sig): Use thread_handle directly from received packet.
+
 2005-09-22  Christopher Faylor  <cgf@timesys.com>
 
 	* cygheap.cc (cygheap_fixup_in_child): It's not just for exec.

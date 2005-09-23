@@ -184,7 +184,6 @@ struct _cygtls
   class cygthread *_ctinfo;
   san andreas;
   waitq wq;
-  HANDLE thread_handle;
   struct _cygtls *prev, *next;
   __stack_t *stackptr;
   int sig;
