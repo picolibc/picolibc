@@ -938,9 +938,7 @@ cygwin_gethostbyname (const char *name)
   sig_dispatch_pending ();
   myfault efault;
   if (efault.faulted (EFAULT))
-{ console_printf ("OUCH!\n");
       return NULL;
-}
 
   unsigned char tmp_addr[4];
   struct hostent tmp, *h;
