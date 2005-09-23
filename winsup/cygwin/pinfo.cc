@@ -172,7 +172,10 @@ pinfo::exit (DWORD n)
   _my_tls.stackptr = _my_tls.stack;
   sigproc_printf ("Calling ExitThread hProcess %p, n %p, exitcode %p",
 		  hProcess, n, exitcode);
-  ExitThread (exitcode);
+  if (&_my_tls == _sig_tls)
+    ExitProcess (exitcode);
+  else
+    ExitThread (exitcode);
 }
 # undef self
 

@@ -1,5 +1,10 @@
 2005-09-23  Christopher Faylor  <cgf@timesys.com>
 
+	* pinfo.cc (pinfo::exit): Call ExitProcess if called from signal
+	thread.
+
+2005-09-23  Christopher Faylor  <cgf@timesys.com>
+
 	* pinfo.cc (pinfo::exit): Eliminate use of _my_tls.thread_handle.
 	* tlsoffsets.h: Regenerate.
 
