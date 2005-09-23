@@ -43,6 +43,7 @@ SHLoadInProc@4
 SHIsFileAvailableOffline@8
 SHInvokePrinterCommandW@20
 SHInvokePrinterCommandA@20
+SHILCreateFromPath@12
 SHHelpShortcuts_RunDLL@16
 SHGetUnreadMailCountW@24
 SHGetSpecialFolderPathW@16
