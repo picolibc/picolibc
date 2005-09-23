@@ -1,3 +1,12 @@
+2005-09-23  James E Wilson  <wilson@specifix.com>
+
+	* mips/array.ld, mips/cfe.ld, mips/ddb-kseg0.ld, mips/ddb.ld,
+	mips/dve.ld, mips/idt.ld, mips/idt32.ld, mips/idt64.ld,
+	mips/idtecoff.ld, mips/jmr3904app-java.ld, mips/jmr3904app.ld,
+	jmr3904dram-java.ld, mips/jmr3904dram.ld, mips/lsi.ld, mips/nullmon.ld,
+	mips/pmon.ld: Change x* to x.* in existing linkonce lines.  Add
+	support for .gnu.linkonce.b.*.
+
 2005-08-30  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* rs6000/Makefile.in (VPATH): Use colon as separator.

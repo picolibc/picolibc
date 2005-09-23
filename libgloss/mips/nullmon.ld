@@ -38,7 +38,7 @@ SECTIONS
      eprol  =  .;
     *(.text)
     *(.text.*)
-    *(.gnu.linkonce.t*)
+    *(.gnu.linkonce.t.*)
     *(.mips16.fn.*)
     *(.mips16.call.*)
     PROVIDE (__runtime_reloc_start = .);
@@ -90,13 +90,13 @@ SECTIONS
     *(.rdata)
     *(.rodata)
     *(.rodata.*)
-    *(.gnu.linkonce.r*)
+    *(.gnu.linkonce.r.*)
   }
    _fdata = ALIGN(16);
   .data : {
     *(.data)
     *(.data.*)
-    *(.gnu.linkonce.d*)
+    *(.gnu.linkonce.d.*)
   }
   . = ALIGN(8);
   _gp = . + 0x8000;
@@ -125,6 +125,7 @@ SECTIONS
   .bss : {
     _bss_start = . ;
     *(.bss)
+    *(.gnu.linkonce.b.*)
     *(COMMON)
   }
    . = ALIGN(64) ;
