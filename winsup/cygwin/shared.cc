@@ -155,7 +155,7 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
 #endif
     }
 
-  debug_printf ("name %s, shared %p (wanted %p), h %p", name, shared, addr, shared_h);
+  debug_printf ("name %s, n %d, shared %p (wanted %p), h %p", name, n, shared, addr, shared_h);
 
   return shared;
 }
