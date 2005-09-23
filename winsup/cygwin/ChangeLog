@@ -1,5 +1,19 @@
 2005-09-23  Christopher Faylor  <cgf@timesys.com>
 
+	Semi-reversion of always-exit-from-sigthread change of 2005-09-15.
+	* exceptions.cc (sigpacket::process): Eliminate return after call to
+	reinstated noreturn function.
+	(signal_exit): Allow function to exit when a captive process has been
+	terminated.
+	* pinfo.cc (pinfo::exit): Enter exit_lock here.  Once again exit here
+	under control of exit_lock.
+	* sigproc.cc (sig_send): Don't wait for completion if process is exiting.
+	Remove special __SIGEXIT accommodations.
+	(wait_sig): Just exit the thread when a __SIGEXIT has been detected.
+	Don't exit the process.
+
+2005-09-23  Christopher Faylor  <cgf@timesys.com>
+
 	* net.cc (cygwin_gethostbyname): Remove debugging cruft.
 
 2005-09-23  Christopher Faylor  <cgf@timesys.com>

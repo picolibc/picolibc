@@ -553,7 +553,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	}
       if (wait_sig_inited)
 	wait_for_sigthread ();
-      wait_for_completion = p != myself_nowait && _my_tls.isinitialized ();
+      wait_for_completion = p != myself_nowait && _my_tls.isinitialized () && !exit_state;
       p = myself;
     }
 
@@ -621,15 +621,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
     pack.si.si_uid = myself->uid;
   pack.pid = myself->pid;
   pack.tls = (_cygtls *) tls;
-  if (si.si_signo == __SIGEXIT)
-    {
-      if (&_my_tls == _main_tls)
-	pack.thread_handle = hMainThread;
-      else
-	DuplicateHandle (hMainProc, GetCurrentThread (), hMainProc, &pack.thread_handle, 0,
-			 FALSE, DUPLICATE_SAME_ACCESS);
-    }
-  else if (wait_for_completion)
+  if (wait_for_completion)
     {
       pack.wakeup = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
       sigproc_printf ("wakeup %p", pack.wakeup);
@@ -1122,29 +1114,6 @@ wait_sig (VOID *self)
 	break;
     }
 
-  my_sendsig = NULL;
-  HANDLE& h = pack.thread_handle;
-  if (!h)
-    api_fatal ("no thread handle set on exit");
-  DWORD res = WaitForSingleObject (h, INFINITE);
-
-  DWORD exitcode = 1;
-
-  myself.release ();
-  if (res == WAIT_OBJECT_0)
-    {
-      GetExitCodeThread (h, &exitcode);
-#ifdef DEBUGGING
-      hMainThread = INVALID_HANDLE_VALUE;
-#endif
-    } else {
-#ifdef DEBUGGING
-      console_printf ("wait for main thread %p returned %d", h, res);
-#else
-      debug_printf ("wait for main thread %p returned %d", h, res);
-#endif
-    }
-
-  sigproc_printf ("calling ExitProcess, exitcode %p", exitcode);
-  ExitProcess (exitcode);
+  sigproc_printf ("signal thread exiting");
+  ExitThread (0);
 }

@@ -151,31 +151,19 @@ pinfo::exit (DWORD n)
     }
 
   sigproc_terminate (ES_FINAL);
+  zap_cwd ();
 
   /* FIXME:  There is a potential race between an execed process and its
      parent here.  I hated to add a mutex just for that, though.  */
   struct rusage r;
   fill_rusage (&r, hMainProc);
   add_rusage (&self->rusage_self, &r);
-
-  if (n != EXITCODE_NOSET)
-    {
-      zap_cwd ();
-      self->alert_parent (0);		/* Shave a little time by telling our
-					   parent that we have now exited.  */
-    }
   int exitcode = self->exitcode & 0xffff;
   if (!self->cygstarted)
     exitcode >>= 8;
-
-  _my_tls.stacklock = 0;
-  _my_tls.stackptr = _my_tls.stack;
-  sigproc_printf ("Calling ExitThread hProcess %p, n %p, exitcode %p",
-		  hProcess, n, exitcode);
-  if (&_my_tls == _sig_tls)
-    ExitProcess (exitcode);
-  else
-    ExitThread (exitcode);
+  release ();
+  sigproc_printf ("Calling ExitProcess n %p, exitcode %p", n, exitcode);
+  ExitProcess (exitcode);
 }
 # undef self
 

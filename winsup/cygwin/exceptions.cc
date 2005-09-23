@@ -40,7 +40,7 @@ extern NO_COPY DWORD dwExeced;
 int NO_COPY sigExeced;
 
 static BOOL WINAPI ctrl_c_handler (DWORD);
-static void signal_exit (int);
+static void signal_exit (int) __attribute__ ((noreturn));
 char windows_system_directory[1024];
 static size_t windows_system_directory_length;
 
@@ -1160,9 +1160,7 @@ exit_sig:
       si.si_signo |= 0x80;
     }
   sigproc_printf ("signal %d, about to call do_exit", si.si_signo);
-  signal_exit (si.si_signo);
-  /* May not return */
-  return rc;
+  signal_exit (si.si_signo);	/* never returns */
 }
 
 CRITICAL_SECTION NO_COPY exit_lock;
@@ -1177,11 +1175,10 @@ signal_exit (int rc)
     {
       sigproc_printf ("terminating captive process");
       TerminateProcess (hExeced, sigExeced = rc);
-      return;
     }
 
   EnterCriticalSection (&exit_lock);
-  if (exit_already++)
+  if (hExeced || exit_state)
     myself.exit (rc);
 
   /* We'd like to stop the main thread from executing but when we do that it
