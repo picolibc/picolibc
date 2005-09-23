@@ -1,5 +1,9 @@
 2005-09-23  Christopher Faylor  <cgf@timesys.com>
 
+	* pinfo.cc (pinfo::exit): Eliminate use of _my_tls.thread_handle.
+
+2005-09-23  Christopher Faylor  <cgf@timesys.com>
+
 	* cygtls.h (struct _cygtls::thread_handle): Remove/revert.
 	* sigproc.h (struct sipacket::thread_handle): Put thread_handle here.
 	* sigproc.cc (sigproc_terminate): Move setting of thread_handle...

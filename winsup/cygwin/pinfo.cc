@@ -170,17 +170,9 @@ pinfo::exit (DWORD n)
 
   _my_tls.stacklock = 0;
   _my_tls.stackptr = _my_tls.stack;
-  if (_my_tls.thread_handle)
-    {
-      sigproc_printf ("Calling ExitThread hProcess %p, n %p, exitcode %p",
-		      hProcess, n, exitcode);
-      ExitThread (exitcode);
-    }
-
-  sigproc_printf ("Calling ExitProcess since hMainthread is 0, hProcess %p, n %p, exitcode %p",
+  sigproc_printf ("Calling ExitThread hProcess %p, n %p, exitcode %p",
 		  hProcess, n, exitcode);
-  release ();
-  ExitProcess (exitcode);
+  ExitThread (exitcode);
 }
 # undef self
 
