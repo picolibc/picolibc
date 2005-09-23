@@ -1,5 +1,10 @@
 2005-09-23	Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
 
+	* lib/ddk/newdev.def: Added.
+	Thanks to: Stephan Meyer <ste_meyer at users dot sourceforge dot net>
+
+2005-09-23	Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
+
 	* include/commdlg.h (OPENFILENAME): Added WINNT >= 0x0500
 	component.
 	Thanks to: Gennady Feldman <gena01 at users dot sourceforge dot net>
