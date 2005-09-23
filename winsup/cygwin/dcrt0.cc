@@ -998,7 +998,6 @@ __main (void)
 }
 
 exit_states NO_COPY exit_state;
-extern CRITICAL_SECTION exit_lock;
 
 void __stdcall
 do_exit (int status)

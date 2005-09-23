@@ -176,14 +176,15 @@ struct _cygtls
   siginfo_t infodata;
   struct pthread *tid;
   union
-    {
-      struct _reent local_clib;
-      char __dontuse[8 * ((sizeof(struct _reent) + 4) / 8)];
-    };
+  {
+    struct _reent local_clib;
+    char __dontuse[8 * ((sizeof(struct _reent) + 4) / 8)];
+  };
   struct _local_storage locals;
   class cygthread *_ctinfo;
   san andreas;
   waitq wq;
+  HANDLE thread_handle;
   struct _cygtls *prev, *next;
   __stack_t *stackptr;
   int sig;

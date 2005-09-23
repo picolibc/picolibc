@@ -497,7 +497,15 @@ sigproc_terminate (exit_states es)
   else
     {
       sigproc_printf ("entering");
-      sig_send (myself_nowait, __SIGEXIT);
+      siginfo_t si;
+      memset (&si, 0, sizeof (si));
+      si.si_signo = __SIGEXIT;
+      if (&_my_tls == _main_tls)
+	_my_tls.thread_handle = hMainThread;
+      else
+	DuplicateHandle (hMainProc, GetCurrentThread (), hMainProc, &_my_tls.thread_handle, 0,
+			 FALSE, DUPLICATE_SAME_ACCESS);
+      sig_send (myself_nowait, si, &_my_tls);
       proc_terminate ();		// clean up process stuff
     }
 }
@@ -1005,10 +1013,11 @@ wait_sig (VOID *self)
   debug_printf ("entering ReadFile loop, readsig %p, myself->sendsig %p",
 		readsig, myself->sendsig);
 
+  sigpacket pack;
   for (;;)
     {
       DWORD nb;
-      sigpacket pack;
+      pack.tls = NULL;
       if (!ReadFile (readsig, &pack, sizeof (pack), &nb, NULL))
 	break;
 
@@ -1114,9 +1123,13 @@ wait_sig (VOID *self)
 	break;
     }
 
-  HANDLE h = hMainThread;
-  my_sendsig = hMainThread = NULL;
-  DWORD res = !h ? WAIT_OBJECT_0 : WaitForSingleObject (h, INFINITE);
+  my_sendsig = NULL;
+  if (!pack.tls)
+    api_fatal ("no exit packet received");
+  if (!pack.tls->thread_handle)
+    api_fatal ("no thread handle set on exit");
+  HANDLE h = pack.tls->thread_handle;
+  DWORD res = WaitForSingleObject (h, INFINITE);
 
   DWORD exitcode = 1;
 

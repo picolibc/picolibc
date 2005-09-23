@@ -1162,6 +1162,7 @@ exit_sig:
   sigproc_printf ("signal %d, about to call do_exit", si.si_signo);
   signal_exit (si.si_signo);
   /* May not return */
+  return rc;
 }
 
 CRITICAL_SECTION NO_COPY exit_lock;

@@ -347,6 +347,7 @@ extern HANDLE hMainProc;
 extern HANDLE hProcToken;
 extern HANDLE hProcImpToken;
 extern HANDLE hExeced;
+extern CRITICAL_SECTION exit_lock;
 
 extern bool cygwin_testing;
 

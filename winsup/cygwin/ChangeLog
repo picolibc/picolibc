@@ -1,5 +1,22 @@
 2005-09-22  Christopher Faylor  <cgf@timesys.com>
 
+	* cygheap.cc (cygheap_fixup_in_child): It's not just for exec.
+	* cygtls.h (struct _cygtls::thread_handle): New field.
+	* dcrt0.cc (exit_lock): Remove declaration.
+	* winsup.h (exit_lock): Add declaration.
+	* exceptions.cc (sigpacket::process): Properly return after
+	signal_exit.
+	* pinfo.cc (pinfo::exit): Only exit the process if
+	_my_tls.thread_handle has not been filled out -- which should be an
+	impossible event.
+	* sigproc.cc (sigproc_terminate): Fillout _my_tls.thread_handle to
+	provide something for wait_sig to wait for.  Use the siginfo_t version
+	of sig_send and fill out the tls argument with _my_tls.
+	(wait_sig): Wait for the thread specified in pack.tls or (for now)
+	complain bitterly if it doesn't exit.
+
+2005-09-22  Christopher Faylor  <cgf@timesys.com>
+
 	* pinfo.cc (set_myself): Call strace.hello unconditionally when
 	DEBUGGING.
 	(pinfo::init): Sleep and issue debugging output before looping when a

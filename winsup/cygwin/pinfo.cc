@@ -140,6 +140,7 @@ pinfo::zap_cwd ()
 void
 pinfo::exit (DWORD n)
 {
+  EnterCriticalSection (&exit_lock);
   cygthread::terminate ();
   if (n != EXITCODE_NOSET)
     self->exitcode = EXITCODE_SET | n;/* We're really exiting.  Record the UNIX exit code. */
@@ -152,7 +153,7 @@ pinfo::exit (DWORD n)
   sigproc_terminate (ES_FINAL);
 
   /* FIXME:  There is a potential race between an execed process and its
-     parent here.  I hated to add a mutex just for this, though.  */
+     parent here.  I hated to add a mutex just for that, though.  */
   struct rusage r;
   fill_rusage (&r, hMainProc);
   add_rusage (&self->rusage_self, &r);
@@ -169,27 +170,16 @@ pinfo::exit (DWORD n)
 
   _my_tls.stacklock = 0;
   _my_tls.stackptr = _my_tls.stack;
-  if (&_my_tls == _main_tls)
+  if (_my_tls.thread_handle)
     {
       sigproc_printf ("Calling ExitThread hProcess %p, n %p, exitcode %p",
 		      hProcess, n, exitcode);
       ExitThread (exitcode);
     }
-  else if (hMainThread)
-    {
-#if 0	/* This would be nice, but I don't think that Windows guarantees that
-	   TerminateThread will not block. */
-      sigproc_printf ("Calling TerminateThread since %p != %p, %p, n %p, exitcode %p",
-		      &_my_tls, _main_tls, hProcess, n, exitcode);
-      TerminateThread (hMainThread, exitcode);
-      if (&_my_tls != _sig_tls)
-	ExitThread (0);
-#endif
-    }
 
   sigproc_printf ("Calling ExitProcess since hMainthread is 0, hProcess %p, n %p, exitcode %p",
 		  hProcess, n, exitcode);
-  // release ();  Could race with signal thread.  Sigh.
+  release ();
   ExitProcess (exitcode);
 }
 # undef self
