@@ -283,11 +283,10 @@ _CRTIMP int __cdecl _set_SSE2_enable (int);
 #if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) \
 	|| !defined __STRICT_ANSI__ || defined __cplusplus
 
-#define NAN (0.0F/0.0F)
-#define HUGE_VALF (1.0F/0.0F)
-#define HUGE_VALL (1.0L/0.0L)
-#define INFINITY (1.0F/0.0F)
-
+#define HUGE_VALF	0x1.0p255f
+#define HUGE_VALL	0x1.0p32767L
+#define INFINITY	HUGE_VALF
+#define NAN (HUGE_VALF - HUGE_VALF)
 
 /* 7.12.3.1 */
 /*
