@@ -497,10 +497,7 @@ sigproc_terminate (exit_states es)
   else
     {
       sigproc_printf ("entering");
-      siginfo_t si;
-      memset (&si, 0, sizeof (si));
-      si.si_signo = __SIGEXIT;
-      sig_send (myself_nowait, si, &_my_tls);
+      sig_send (myself_nowait, __SIGEXIT);
       proc_terminate ();		// clean up process stuff
     }
 }
