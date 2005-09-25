@@ -1,3 +1,7 @@
+2005-09-24  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	* hppa.h (pa_opcodes): Add new "fdc" and "fic" opcode entries.
+
 2005-09-06  Chao-ying Fu  <fu@mips.com>
 
 	* mips.h (OP_SH_MT_U, OP_MASK_MT_U, OP_SH_MT_H, OP_MASK_MT_H,

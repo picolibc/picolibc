@@ -306,7 +306,7 @@ static const char *const completer_chars = ",CcY<>?!@+&U~FfGHINnOoZMadu|/=0123%e
    3) Where implicit addressing is available for an opcode, the
       implicit opcode should precede the explicit opcode, and
 
-   4) Opcodes without FLAG_STRICT should be order as follows: long
+   4) Opcodes without FLAG_STRICT should be ordered as follows: long
       immediate opcodes, short immediate opcodes and finally register
       index opcodes.  */
 	
@@ -753,8 +753,11 @@ static const struct pa_opcode pa_opcodes[] =
 { "iitlbp",	0x04000000, 0xfc001fff, "x,(S,b)", pa10, 0},
 { "pdc",	0x04001380, 0xfc00ffdf, "cZx(b)", pa10, 0},
 { "pdc",	0x04001380, 0xfc003fdf, "cZx(s,b)", pa10, 0},
+{ "fdc",	0x04003280, 0xfc00ffff, "5(b)", pa20, FLAG_STRICT},
+{ "fdc",	0x04003280, 0xfc003fff, "5(s,b)", pa20, FLAG_STRICT},
 { "fdc",	0x04001280, 0xfc00ffdf, "cZx(b)", pa10, 0},
 { "fdc",	0x04001280, 0xfc003fdf, "cZx(s,b)", pa10, 0},
+{ "fic",	0x040013c0, 0xfc00dfdf, "cZx(b)", pa20, FLAG_STRICT},
 { "fic",	0x04000280, 0xfc001fdf, "cZx(S,b)", pa10, 0},
 { "fdce",	0x040012c0, 0xfc00ffdf, "cZx(b)", pa10, 0},
 { "fdce",	0x040012c0, 0xfc003fdf, "cZx(s,b)", pa10, 0},
