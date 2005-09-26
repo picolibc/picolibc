@@ -432,47 +432,47 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
     case STATUS_FLOAT_INVALID_OPERATION:
     case STATUS_FLOAT_STACK_CHECK:
       si.si_signo = SIGFPE;
-      si.si_sigval.sival_int = FPE_FLTSUB;
+      si.si_code = FPE_FLTSUB;
       break;
     case STATUS_FLOAT_INEXACT_RESULT:
       si.si_signo = SIGFPE;
-      si.si_sigval.sival_int = FPE_FLTRES;
+      si.si_code = FPE_FLTRES;
       break;
     case STATUS_FLOAT_OVERFLOW:
       si.si_signo = SIGFPE;
-      si.si_sigval.sival_int = FPE_FLTOVF;
+      si.si_code = FPE_FLTOVF;
       break;
     case STATUS_FLOAT_UNDERFLOW:
       si.si_signo = SIGFPE;
-      si.si_sigval.sival_int = FPE_FLTUND;
+      si.si_code = FPE_FLTUND;
       break;
     case STATUS_INTEGER_DIVIDE_BY_ZERO:
       si.si_signo = SIGFPE;
-      si.si_sigval.sival_int = FPE_INTDIV;
+      si.si_code = FPE_INTDIV;
       break;
     case STATUS_INTEGER_OVERFLOW:
       si.si_signo = SIGFPE;
-      si.si_sigval.sival_int = FPE_INTOVF;
+      si.si_code = FPE_INTOVF;
       break;
 
     case STATUS_ILLEGAL_INSTRUCTION:
       si.si_signo = SIGILL;
-      si.si_sigval.sival_int = ILL_ILLOPC;
+      si.si_code = ILL_ILLOPC;
       break;
 
     case STATUS_PRIVILEGED_INSTRUCTION:
       si.si_signo = SIGILL;
-      si.si_sigval.sival_int = ILL_PRVOPC;
+      si.si_code = ILL_PRVOPC;
       break;
 
     case STATUS_NONCONTINUABLE_EXCEPTION:
       si.si_signo = SIGILL;
-      si.si_sigval.sival_int = ILL_ILLADR;
+      si.si_code = ILL_ILLADR;
       break;
 
     case STATUS_TIMEOUT:
       si.si_signo = SIGALRM;
-      si.si_sigval.sival_int = 0;
+      si.si_code = 0;
       break;
 
     case STATUS_ACCESS_VIOLATION:
@@ -484,12 +484,12 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
     case STATUS_INVALID_DISPOSITION:
     case STATUS_STACK_OVERFLOW:
       si.si_signo = SIGSEGV;
-      si.si_sigval.sival_int = SEGV_MAPERR;
+      si.si_code = SEGV_MAPERR;
       break;
 
     case STATUS_CONTROL_C_EXIT:
       si.si_signo = SIGINT;
-      si.si_sigval.sival_int = 0;
+      si.si_code = 0;
       break;
 
     case STATUS_INVALID_HANDLE:
@@ -569,7 +569,8 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
     me.return_from_fault ();
 
   si.si_addr = ebp;
-  si.si_code = SI_KERNEL;
+  if (!si_code)
+    si.si_code = SI_KERNEL;
   si.si_errno = si.si_pid = si.si_uid = 0;
   me.push ((__stack_t) ebp, true);
   sig_send (NULL, si, &me);	// Signal myself

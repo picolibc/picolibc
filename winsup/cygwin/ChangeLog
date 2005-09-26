@@ -1,3 +1,7 @@
+2005-09-26  Christopher Faylor  <cgf@timesys.com>
+
+	* exceptions.cc (handle_exceptions): Properly fill out si_code.
+
 2005-09-25  Christopher Faylor  <cgf@timesys.com>
 
 	* sigproc.cc (wait_sig): Cosmetic change.
