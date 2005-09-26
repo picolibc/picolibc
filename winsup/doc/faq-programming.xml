@@ -261,7 +261,7 @@ lines must start with tabs.  This is not specific to Cygwin.
 like it says that one may not "permit further redistribution of the
 Redistributables to their end users".  We take this to mean that we can
 give them to you, but you can't give them to anyone else, which is
-something that Red Hat can't agree to.  Fortunately, we
+something that we can't agree to.  Fortunately, we
 have our own Win32 headers which are pretty complete.
 </para>
 </answer></qandaentry>

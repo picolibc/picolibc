@@ -1,3 +1,10 @@
+2005-09-25  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* faq.xml: Remove copyright section, link to license.html
+	* faq-sections.xml: Remove copyright section, link to license.html
+	* faq-programming.xml: Remove confusing reference to Red Hat. 
+	* faq-what.xml: Reword "supported" FAQ.
+
 2005-09-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwinenv.sgml (ntea): Add some wording to scare people away

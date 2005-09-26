@@ -25,13 +25,13 @@ standard Windows command shell.
 <question><para>What versions of Windows are supported?</para></question>
 <answer>
 
-<para>Wait a minute... Cygwin is only <emphasis>supported</emphasis> if you are paying for
-it, such as through a support contract with Red Hat.  For information
-about getting a Red Hat support contract, see
-<ulink url="http://cygwin.com/license.html" />.
-</para>
-<para>That said, Cygwin can be expected to run on all modern 32 bit versions of
+<para>Cygwin can be expected to run on all modern 32 bit versions of
 Windows, except Windows CE.  This includes Windows 95/98/ME/NT/2000/XP.
+Since Cygwin is a community-supported free software project, patches to
+provide support for other versions would be thoughtfully considered.
+Paid support is available through a support contract with Red Hat.  For 
+information about getting a Red Hat support contract, see
+<ulink url="http://cygwin.com/license.html" />.
 </para>
 <para>Keep in mind that Cygwin can only do as much as the underlying OS
 supports.  Because of this, Cygwin will behave differently, and
@@ -50,8 +50,8 @@ Guide, an API Reference, mailing lists and archives, and additional
 ported software.
 </para>
 <para>You can find documentation for the individual GNU tools at
-<ulink url="http://www.fsf.org/manual/">http://www.fsf.org/manual/</ulink>.  (You should read GNU manuals from a
-local mirror.  Check <ulink url="http://www.fsf.org/server/list-mirrors.html">http://www.fsf.org/server/list-mirrors.html</ulink>
+<ulink url="http://www.gnu.org/manual/" />.  (You should read GNU manuals from a
+local mirror.  Check <ulink url="http://www.gnu.org/server/list-mirrors.html" />
 for a list of them.)
 </para>
 </answer></qandaentry>
