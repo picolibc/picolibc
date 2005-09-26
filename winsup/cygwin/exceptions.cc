@@ -424,6 +424,7 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
   CONTEXT in = *in0;
 
   siginfo_t si;
+  si.si_code = SI_KERNEL;
   /* Coerce win32 value to posix value.  */
   switch (e.ExceptionCode)
     {
@@ -472,7 +473,6 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
 
     case STATUS_TIMEOUT:
       si.si_signo = SIGALRM;
-      si.si_code = 0;
       break;
 
     case STATUS_ACCESS_VIOLATION:
@@ -489,7 +489,6 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
 
     case STATUS_CONTROL_C_EXIT:
       si.si_signo = SIGINT;
-      si.si_code = 0;
       break;
 
     case STATUS_INVALID_HANDLE:
@@ -569,8 +568,6 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
     me.return_from_fault ();
 
   si.si_addr = ebp;
-  if (!si_code)
-    si.si_code = SI_KERNEL;
   si.si_errno = si.si_pid = si.si_uid = 0;
   me.push ((__stack_t) ebp, true);
   sig_send (NULL, si, &me);	// Signal myself
@@ -1253,7 +1250,15 @@ _cygtls::call_signal_handler ()
       int this_errno = saved_errno;
       incyg--;
       sig = 0;
-      sigfunc (thissig);
+      if (this_sa_flags & SA_SIGINFO == 0)
+	sigfunc (thissig);
+      else
+        {
+	  siginfo_t thissi = infodata;
+          void (*sigact) (int, siginfo_t *, void *) = (void (*) (int, siginfo_t *, void *)) func;
+          /* no ucontext_t information provided yet */
+          sigact (thissig, &thissi, NULL);
+        }
       incyg++;
       set_signal_mask (this_oldmask, myself->getsigmask ());
       if (this_errno >= 0)

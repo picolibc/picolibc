@@ -120,7 +120,10 @@ signal_fixup_after_exec ()
     {
       global_sigs[i].sa_mask = 0;
       if (global_sigs[i].sa_handler != SIG_IGN)
-	global_sigs[i].sa_handler = SIG_DFL;
+	{
+	  global_sigs[i].sa_handler = SIG_DFL;
+	  global_sigs[i].sa_flags &= ~ SA_SIGINFO;
+	}
     }
 }
 

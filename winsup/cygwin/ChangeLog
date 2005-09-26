@@ -1,5 +1,20 @@
 2005-09-26  Christopher Faylor  <cgf@timesys.com>
 
+	* exceptions.cc (handle_exceptions): Just si_code to SI_KERNEL first
+	and let it be overridden.
+
+2005-09-26  Yitzchak Scott-Thoennes  <sthoenna@efn.org>
+
+	* exceptions.cc (_cygtls::call_signal_handler): Call signal handler
+	with extra siginfo_t * and void * parameters when SA_SIGINFO flag is
+	set.
+	* signal.cc (signal): Clear SA_SIGINFO flag.
+	(sigqueue): Fix incorrect setting of si_code.
+	* sigproc.cc (signal_fixup_after_exec): Clear SA_SIGINFO flag when
+	setting handler to SIG_DFL.
+
+2005-09-26  Christopher Faylor  <cgf@timesys.com>
+
 	* pinfo.cc (proc_waiter): Properly fill out si_code as according to SUSv3.
 
 2005-09-26  Christopher Faylor  <cgf@timesys.com>

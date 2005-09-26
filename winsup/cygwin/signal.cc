@@ -63,6 +63,7 @@ signal (int sig, _sig_func_ptr func)
   /* SA_RESTART is set to maintain BSD compatible signal behaviour by default.
      This is also compatible with the behaviour of signal(2) in Linux. */
   global_sigs[sig].sa_flags |= SA_RESTART;
+  global_sigs[sig].sa_flags &= ~ SA_SIGINFO;
   set_sigcatchers (prev, func);
 
   syscall_printf ("%p = signal (%d, %p)", prev, sig, func);
@@ -524,6 +525,10 @@ sigwaitinfo (const sigset_t *set, siginfo_t *info)
   return res;
 }
 
+/* FIXME: SUSv3 says that this function should block until the signal has
+   actually been delivered.  Currently, this will only happen when sending
+   signals to the current process.  It will not happen when sending signals
+   to other processes.  */
 extern "C" int
 sigqueue (pid_t pid, int sig, const union sigval value)
 {
@@ -535,7 +540,7 @@ sigqueue (pid_t pid, int sig, const union sigval value)
       return -1;
     }
   si.si_signo = sig;
-  si.si_code = SI_USER;
+  si.si_code = SI_QUEUE;
   si.si_pid = si.si_uid = si.si_errno = 0;
   si.si_value = value;
   return sig_send (dest, si);
