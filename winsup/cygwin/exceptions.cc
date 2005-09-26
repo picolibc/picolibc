@@ -1242,7 +1242,6 @@ _cygtls::call_signal_handler ()
       lock (); unlock ();	// make sure synchronized
       this_sa_flags = sa_flags;
       int thissig = sig;
-      void (*sigfunc) (int) = func;
 
       pop ();
       reset_signal_arrived ();
@@ -1250,8 +1249,11 @@ _cygtls::call_signal_handler ()
       int this_errno = saved_errno;
       incyg--;
       sig = 0;
-      if (this_sa_flags & SA_SIGINFO == 0)
-	sigfunc (thissig);
+      if (!(this_sa_flags & SA_SIGINFO))
+	{
+	  void (*sigfunc) (int) = func;
+	  sigfunc (thissig);
+	}
       else
         {
 	  siginfo_t thissi = infodata;
