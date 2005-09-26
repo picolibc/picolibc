@@ -1,6 +1,11 @@
 2005-09-26  Christopher Faylor  <cgf@timesys.com>
 
-	* exceptions.cc (handle_exceptions): Properly fill out si_code.
+	* pinfo.cc (proc_waiter): Properly fill out si_code as according to SUSv3.
+
+2005-09-26  Christopher Faylor  <cgf@timesys.com>
+
+	* exceptions.cc (handle_exceptions): Properly fill out si_code as
+	according to SUSv3.
 
 2005-09-25  Christopher Faylor  <cgf@timesys.com>
 

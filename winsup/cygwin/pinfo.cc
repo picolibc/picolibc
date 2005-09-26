@@ -939,7 +939,7 @@ proc_waiter (void *arg)
 
   siginfo_t si;
   si.si_signo = SIGCHLD;
-  si.si_code = SI_KERNEL;
+  si.si_code = CLD_EXITED;
   si.si_pid = vchild->pid;
   si.si_errno = 0;
 #if 0	// FIXME: This is tricky to get right
@@ -975,11 +975,11 @@ proc_waiter (void *arg)
 	  vchild.rd_proc_pipe = NULL;
 	  vchild.maybe_set_exit_code_from_windows ();
 	  if (WIFEXITED (vchild->exitcode))
-	    si.si_sigval.sival_int = CLD_EXITED;
+	    si.si_code = CLD_EXITED;
 	  else if (WCOREDUMP (vchild->exitcode))
-	    si.si_sigval.sival_int = CLD_DUMPED;
+	    si.si_code = CLD_DUMPED;
 	  else
-	    si.si_sigval.sival_int = CLD_KILLED;
+	    si.si_code = CLD_KILLED;
 	  si.si_status = vchild->exitcode;
 	  vchild->process_state = PID_EXITED;
 	  /* This should always be last.  Do not use vchild-> beyond this point */
@@ -991,7 +991,7 @@ proc_waiter (void *arg)
 	  if (ISSTATE (myself, PID_NOCLDSTOP))	// FIXME: No need for this flag to be in _pinfo any longer
 	    continue;
 	  /* Child stopped.  Signal myself.  */
-	  si.si_sigval.sival_int = CLD_STOPPED;
+	  si.si_code = CLD_STOPPED;
 	  break;
 	case SIGCONT:
 	  continue;
