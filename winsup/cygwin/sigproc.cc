@@ -971,7 +971,7 @@ pending_signals::next ()
 /* Process signals by waiting for signal data to arrive in a pipe.
    Set a completion event if one was specified. */
 static DWORD WINAPI
-wait_sig (VOID *self)
+wait_sig (VOID *)
 {
   HANDLE readsig;
   PSECURITY_ATTRIBUTES sa_buf = (PSECURITY_ATTRIBUTES) alloca (1024);

@@ -1,3 +1,9 @@
+2005-09-25  Christopher Faylor  <cgf@timesys.com>
+
+	* sigproc.cc (wait_sig): Cosmetic change.
+	* pinfo.cc (pinfo::exit): Don't explicitly remove myself since some
+	other thread may still be using it.
+
 2005-09-24  Christopher Faylor  <cgf@timesys.com>
 
 	* sigproc.cc (sigproc_terminate): More reversion of

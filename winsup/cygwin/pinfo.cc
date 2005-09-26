@@ -161,7 +161,6 @@ pinfo::exit (DWORD n)
   int exitcode = self->exitcode & 0xffff;
   if (!self->cygstarted)
     exitcode >>= 8;
-  release ();
   sigproc_printf ("Calling ExitProcess n %p, exitcode %p", n, exitcode);
   ExitProcess (exitcode);
 }
