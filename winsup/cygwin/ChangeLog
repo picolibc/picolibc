@@ -1,3 +1,7 @@
+2005-09-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* errno.cc (errmap): Map ERROR_SEEK and ERROR_SECTOR_NOT_FOUND.
+
 2005-09-26  Christopher Faylor  <cgf@timesys.com>
 
 	* exceptions.cc (_cygtls::call_signal_handler): Minor cleanup.
