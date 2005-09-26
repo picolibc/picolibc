@@ -1,3 +1,23 @@
+2005-09-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_dev_raw): Add drive information members
+	drive_size, current_position and bytes_per_sector.
+	(fhandler_dev_floppy::get_drive_info): Declare.
+	* fhandler_floppy.cc (fhandler_dev_floppy::is_eom): Define ERROR_SEEK
+	and ERROR_SECTOR_NOT_FOUND as end-of-medium conditions.
+	(fhandler_dev_floppy::get_drive_info): New method to have one function
+	retrieving drive info.
+	(fhandler_dev_floppy::open): Call get_drive_info to get drive
+	information right from the start.
+	(fhandler_dev_floppy::lseek): Use and set drive information members.
+	Especially keep track of current_position.
+	(fhandler_dev_floppy::ioctl): Ditto.
+	* fhandler_raw.cc (fhandler_dev_raw::write_file): Keep track of
+	current_position.
+	(fhandler_dev_raw::read_file): Ditto.
+	(fhandler_dev_raw::raw_read): Never try to read beyond end-of-medium.
+	(fhandler_dev_raw::dup): Handle new drive information members.
+
 2005-09-26  Christopher Faylor  <cgf@timesys.com>
 
 	* exceptions.cc (handle_exceptions): Just si_code to SI_KERNEL first

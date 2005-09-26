@@ -551,6 +551,9 @@ public:
 class fhandler_dev_raw: public fhandler_base
 {
  protected:
+  _off64_t drive_size;
+  _off64_t current_position;
+  unsigned long bytes_per_sector;
   char *devbuf;
   size_t devbufsiz;
   size_t devbufstart;
@@ -600,6 +603,9 @@ class fhandler_dev_raw: public fhandler_base
 
 class fhandler_dev_floppy: public fhandler_dev_raw
 {
+ private:
+  int fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo);
+
  protected:
   virtual int is_eom (int win_error);
   virtual int is_eof (int win_error);

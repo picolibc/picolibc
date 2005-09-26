@@ -51,6 +51,8 @@ fhandler_dev_raw::write_file (const void *buf, DWORD to_write,
   *err = 0;
   if (!(ret = WriteFile (get_handle (), buf, to_write, written, 0)))
     *err = GetLastError ();
+  else
+    current_position += *written;
   syscall_printf ("%d (err %d) = WriteFile (%d, %d, write %d, written %d, 0)",
 		  ret, *err, get_handle (), buf, to_write, *written);
   return ret;
@@ -64,6 +66,8 @@ fhandler_dev_raw::read_file (void *buf, DWORD to_read, DWORD *read, int *err)
   *err = 0;
   if (!(ret = ReadFile (get_handle (), buf, to_read, read, 0)))
     *err = GetLastError ();
+  else
+    current_position += *read;
   syscall_printf ("%d (err %d) = ReadFile (%d, %d, to_read %d, read %d, 0)",
 		  ret, *err, get_handle (), buf, to_read, *read);
   return ret;
@@ -188,7 +192,9 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
 	    {
 	      if (len >= devbufsiz)
 		{
-		  bytes_to_read = (len / 512) * 512;
+		  bytes_to_read = (len / bytes_per_sector) * bytes_per_sector;
+		  if (current_position + bytes_to_read >= drive_size)
+		    bytes_to_read = drive_size - current_position;
 		  tgt = p;
 		  debug_printf ("read %d bytes direct from file",bytes_to_read);
 		}
@@ -196,9 +202,17 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
 		{
 		  tgt = devbuf;
 		  bytes_to_read = devbufsiz;
+		  if (current_position + bytes_to_read >= drive_size)
+		    bytes_to_read = drive_size - current_position;
 		  debug_printf ("read %d bytes from file into buffer",
 				bytes_to_read);
 		}
+	      if (!bytes_to_read)
+		{
+		  eom_detected (true);
+		  break;
+		}
+
 	      if (!read_file (tgt, bytes_to_read, &read2, &ret))
 		{
 		  if (!is_eof (ret) && !is_eom (ret))
@@ -315,6 +329,9 @@ fhandler_dev_raw::dup (fhandler_base *child)
     {
       fhandler_dev_raw *fhc = (fhandler_dev_raw *) child;
 
+      fhc->drive_size = drive_size;
+      fhc->current_position = current_position;
+      fhc->bytes_per_sector = bytes_per_sector;
       fhc->devbufsiz = devbufsiz;
       if (devbufsiz > 1L)
 	fhc->devbuf = new char [devbufsiz];
@@ -368,7 +385,7 @@ fhandler_dev_raw::ioctl (unsigned int cmd, void *buf)
 		mop.mt_count = op->rd_parm;
 		ret = ioctl (MTIOCTOP, &mop);
 	      }
-	    else if (op->rd_parm % 512)
+	    else if (op->rd_parm % bytes_per_sector)
 	      ret = ERROR_INVALID_PARAMETER;
 	    else if (devbuf && op->rd_parm < devbufend - devbufstart)
 	      ret = ERROR_INVALID_PARAMETER;
