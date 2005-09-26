@@ -1,3 +1,7 @@
+2005-09-26  Mark Mitchell  <mark@codesourcery.com>
+
+	* libiberty.h (expandargv): New function.
+
 2005-08-18  Alan Modra  <amodra@bigpond.net.au>
 
 	* bfdlink.h: Remove mention of a29k.
