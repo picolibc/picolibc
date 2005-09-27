@@ -89,15 +89,14 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
       VirtualFree (addr, 0, MEM_RELEASE);
     }
 
+  char map_buf[CYG_MAX_PATH];
+  char *mapname = NULL;
+
   if (shared_h)
     m = SH_JUSTOPEN;
   else
     {
-      char *mapname;
-      char map_buf[CYG_MAX_PATH];
-      if (!name)
-	mapname = NULL;
-      else
+      if (name)
 	mapname = shared_name (map_buf, name, n);
       if (m == SH_JUSTOPEN)
 	shared_h = OpenFileMapping (access, FALSE, mapname);
@@ -133,7 +132,7 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
     }
 
   if (!shared)
-    api_fatal ("MapViewOfFileEx '%s'(%p), %E.  Terminating.", name, shared_h);
+    api_fatal ("MapViewOfFileEx '%s'(%p), %E.  Terminating.", mapname, shared_h);
 
   if (m == SH_CYGWIN_SHARED && offsets[0] && wincap.needs_memory_protection ())
     {
@@ -155,7 +154,7 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
 #endif
     }
 
-  debug_printf ("name %s, n %d, shared %p (wanted %p), h %p", name, n, shared, addr, shared_h);
+  debug_printf ("name %s, n %d, shared %p (wanted %p), h %p", mapname, n, shared, addr, shared_h);
 
   return shared;
 }
