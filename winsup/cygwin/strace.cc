@@ -149,7 +149,7 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
 	*p = '\000';
       p = progname;
       count = __small_sprintf (buf, fmt, p && *p ? p : "?",
-			      myself ? myself->pid : GetCurrentProcessId (),
+			      (myself && myself->pid) ? myself->pid : GetCurrentProcessId (),
 			       execing ? "!" : "");
       if (func)
 	count += getfunc (buf + count, func);

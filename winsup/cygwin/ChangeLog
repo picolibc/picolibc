@@ -1,3 +1,7 @@
+2005-09-27  Christopher Faylor  <cgf@timesys.com>
+
+	* strace.cc (strace::vsprntf): Avoid printing a zero pid.
+
 2005-09-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* init.cc (dll_entry): Call IsWow64Process with GetCurrentProcess
