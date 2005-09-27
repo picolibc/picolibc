@@ -1,5 +1,10 @@
 2005-09-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* pthread.cc (mangle_sem_name): Use cygheap->shared_prefix instead
+	of fiddling with wincap.has_terminal_services manually.
+
+2005-09-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.cc (cygheap_init): Add GLOBAL_PRIV to hProcToken explicitely
 	since hProcImpToken isn't initialized here.
 	* shared.cc (open_shared): Always print mapname instead of name in

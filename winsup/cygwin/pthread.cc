@@ -13,6 +13,10 @@
 #include "winsup.h"
 #include "thread.h"
 #include "cygerrno.h"
+#include "path.h"
+#include "fhandler.h"
+#include "dtable.h"
+#include "cygheap.h"
 #include <stdarg.h>
 #include <sys/fcntl.h>
 #include "cygtls.h"
@@ -174,15 +178,14 @@ mangle_sem_name (char *mangled, const char *name)
       set_errno (ENOENT);
       return false;
     }
-  int len = strlen (name);
-  if (len >= CYG_MAX_PATH
-      || (wincap.has_terminal_services () && len >= CYG_MAX_PATH - 7))
+  size_t len = strlen (cygheap->shared_prefix);
+  if (strlen (name) >= CYG_MAX_PATH - len)
     {
       set_errno (EINVAL);
       return false;
     }
-  strcpy (mangled, wincap.has_terminal_services () ? "Global\\" : "");
-  char *d = mangled + strlen (mangled);
+  strcpy (mangled, cygheap->shared_prefix);
+  char *d = mangled + len;
   const char *s = name;
   while (*s)
     *d++ = (*s == '\\') ? '/' : *s++;
