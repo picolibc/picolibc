@@ -1,3 +1,8 @@
+2005-09-27  Ralf Corsepius <ralf.corsepius@rtems.org>
+
+	* libc/include/stdint.h: Correct __STDINT_EXP macro incorrectly 
+	handling GCC >= 4.
+
 2005-09-20  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/include/stdint.h: Update to match functionality
