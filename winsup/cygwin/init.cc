@@ -157,7 +157,7 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
 	 spawned by a genuine 64 bit process.  If so, respawn. */
       if (&is_wow64_proc >= (PBOOL) 0x400000
           && &is_wow64_proc <= (PBOOL) 0x10000000
-          && IsWow64Process (hMainProc, &is_wow64_proc)
+          && IsWow64Process (GetCurrentProcess (), &is_wow64_proc)
 	  && is_wow64_proc)
 	respawn_wow64_process ();
 

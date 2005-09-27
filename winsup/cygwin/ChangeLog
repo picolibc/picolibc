@@ -1,5 +1,10 @@
 2005-09-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* init.cc (dll_entry): Call IsWow64Process with GetCurrentProcess
+	as process handle since hMainProc isn't initialized here.
+
+2005-09-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_floppy.cc (fhandler_dev_floppy::get_drive_info): Always
 	try IOCTL_DISK_GET_DRIVE_GEOMETRY_EX and
 	IOCTL_DISK_GET_PARTITION_INFO_EX ioctls first, to allow access to GPT
