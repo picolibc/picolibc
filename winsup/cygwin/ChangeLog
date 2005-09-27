@@ -1,3 +1,11 @@
+2005-09-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_floppy.cc (fhandler_dev_floppy::get_drive_info): Always
+	try IOCTL_DISK_GET_DRIVE_GEOMETRY_EX and
+	IOCTL_DISK_GET_PARTITION_INFO_EX ioctls first, to allow access to GPT
+	partitioned disks.  Fall back to old non-EX ioctls otherwise.
+	Add comment to explain NT4 weirdness.
+
 2005-09-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* errno.cc (errmap): Map ERROR_SEEK and ERROR_SECTOR_NOT_FOUND.
