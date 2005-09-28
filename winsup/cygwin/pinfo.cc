@@ -1040,13 +1040,14 @@ _pinfo::dup_proc_pipe (HANDLE hProcess)
     flags |= DUPLICATE_CLOSE_SOURCE;
   bool res = DuplicateHandle (hMainProc, wr_proc_pipe, hProcess, &wr_proc_pipe,
 			      0, FALSE, flags);
-  if (!res)
+  if (!res && WaitForSingleObject (hProcess, 0) != WAIT_OBJECT_0)
     sigproc_printf ("DuplicateHandle failed, pid %d, hProcess %p, %E", pid, hProcess);
   else
     {
       wr_proc_pipe_owner = dwProcessId;
       sigproc_printf ("closed wr_proc_pipe %p for pid %d(%u)", wr_proc_pipe,
 		      pid, dwProcessId);
+      res = true;
     }
   return res;
 }

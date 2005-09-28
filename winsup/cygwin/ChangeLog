@@ -1,3 +1,8 @@
+2005-09-28  Christopher Faylor  <cgf@timesys.com>
+
+	* pinfo.cc (_pinfo::dup_proc_pipe): Ignore error if the child process
+	has just gone away.
+
 2005-09-27  Christopher Faylor  <cgf@timesys.com>
 
 	* init.cc (prime_threads): Make this static, as it should be.
