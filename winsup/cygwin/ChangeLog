@@ -1,5 +1,24 @@
 2005-09-28  Christopher Faylor  <cgf@timesys.com>
 
+	* dcrt0.cc (getstack): New function.
+	(alloc_stack): Use tls stuff for stack info rather than calling
+	VirtualQuery.
+	(dll_crt0_0): Initialize _impure_ptr stuff much earlier.  Move
+	init_console_handler here.
+	* fork.cc (class frok): New class renamed from local fork() struct.
+	(stack_base): Change argument type.  Use tls stuff to determine stack
+	info rather than calling VirtualQuery.
+	(frok::child): Rename from fork_child.  Eliminate now unneeded
+	arguments.
+	(frok::parent): Rename from fork_parent and ditto.  Set error and errno
+	as appropriate.  Fixup impersonation in cleanup, if needed.  Try harder
+	to set errno appropriately.
+	(fork): Define "grouped" as a frok type.  Deal with errors from
+	fork_parent here.
+	* init.cc (dll_entry): Remove init_console_handler call.
+
+2005-09-28  Christopher Faylor  <cgf@timesys.com>
+
 	* pinfo.cc (_pinfo::dup_proc_pipe): Ignore error if the child process
 	has just gone away.
 

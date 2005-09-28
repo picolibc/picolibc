@@ -502,22 +502,29 @@ alloc_stack_hard_way (child_info_fork *ci, volatile char *b)
   b[0] = '\0';
 }
 
+void *getstack (void *) __attribute__ ((noinline));
+volatile char *
+getstack (volatile char *p)
+{
+  *p |= 0;
+  return p - 4096;
+}
+
 /* extend the stack prior to fork longjmp */
 
 static void
 alloc_stack (child_info_fork *ci)
 {
-  /* FIXME: adding 16384 seems to avoid a stack copy problem during
-     fork on Win95, but I don't know exactly why yet. DJ */
-  volatile char b[ci->stacksize + 16384];
-
-  if (!VirtualQuery ((LPCVOID) &b, &sm, sizeof sm))
-    api_fatal ("fork: couldn't get stack info, %E");
-
-  if (sm.AllocationBase == ci->stacktop)
-    ci->stacksize = 0;
+  volatile char *esp;
+  __asm__ volatile ("movl %%esp,%0": "=r" (esp));
+  if (_tlsbase != ci->stackbottom)
+    alloc_stack_hard_way (ci, esp);
   else
-    alloc_stack_hard_way (ci, b + sizeof (b) - 1);
+    {
+      while (_tlstop > ci->stacktop)
+	esp = getstack (esp);
+      ci->stacksize = 0;
+    }
 }
 
 #ifdef DEBUGGING
@@ -629,6 +636,12 @@ get_cygwin_startup_info ()
 void __stdcall
 dll_crt0_0 ()
 {
+  init_console_handler (TRUE);
+  _impure_ptr = _GLOBAL_REENT;
+  _impure_ptr->_stdin = &_impure_ptr->__sf[0];
+  _impure_ptr->_stdout = &_impure_ptr->__sf[1];
+  _impure_ptr->_stderr = &_impure_ptr->__sf[2];
+  _impure_ptr->_current_locale = "C";
   wincap.init ();
   initial_env ();
 
@@ -931,11 +944,6 @@ _dll_crt0 ()
   *main_environ = NULL;
 
   char padding[CYGTLS_PADSIZE];
-  _impure_ptr = _GLOBAL_REENT;
-  _impure_ptr->_stdin = &_impure_ptr->__sf[0];
-  _impure_ptr->_stdout = &_impure_ptr->__sf[1];
-  _impure_ptr->_stderr = &_impure_ptr->__sf[2];
-  _impure_ptr->_current_locale = "C";
 
   if (child_proc_info && child_proc_info->type == _PROC_FORK)
     user_data->forkee = true;

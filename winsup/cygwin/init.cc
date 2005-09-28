@@ -148,7 +148,6 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
     case DLL_PROCESS_ATTACH:
       cygwin_hmodule = (HMODULE) h;
       dynamically_loaded = (static_load == NULL);
-      init_console_handler (TRUE);
 
       /* Is the stack at an unusual address?  This is, an address which
          is in the usual space occupied by the process image, but below

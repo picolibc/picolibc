@@ -42,20 +42,28 @@ details. */
 #define dll_bss_start &_bss_start__
 #define dll_bss_end &_bss_end__
 
-static void
-stack_base (child_info_fork &ch)
+class frok
 {
-  MEMORY_BASIC_INFORMATION m;
-  memset (&m, 0, sizeof m);
-  if (!VirtualQuery ((LPCVOID) &m, &m, sizeof m))
-    system_printf ("couldn't get memory info, %E");
+  dll *first_dll;
+  bool load_dlls;
+  child_info_fork ch;
+  const char *error;
+  int child_pid;
+  int this_errno;
+  int __stdcall parent (void *esp);
+  int __stdcall child (void *esp);
+  friend int fork ();
+};
 
-  ch.stacktop = m.AllocationBase;
-  ch.stackbottom = (LPBYTE) m.BaseAddress + m.RegionSize;
-  ch.stacksize = (DWORD) ch.stackbottom - (DWORD) &m;
+static void
+stack_base (child_info_fork *ch)
+{
+  ch->stackbottom = _tlsbase;
+  ch->stacktop = &ch;
+  ch->stacksize = (char *) ch->stackbottom - (char *) &ch;
   debug_printf ("bottom %p, top %p, stack %p, size %d, reserve %d",
-		ch.stackbottom, ch.stacktop, &m, ch.stacksize,
-		(DWORD) ch.stackbottom - (DWORD) ch.stacktop);
+		ch->stackbottom, ch->stacktop, &ch, ch->stacksize,
+		(char *) ch->stackbottom - (char *) ch->stacktop);
 }
 
 /* Copy memory from parent to child.
@@ -153,9 +161,10 @@ sync_with_parent (const char *s, bool hang_self)
     }
 }
 
-static int __stdcall
-fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
+int __stdcall
+frok::child (void *)
 {
+  HANDLE& hParent = ch.parent;
   extern void fixup_hooks_after_fork ();
   extern void fixup_timers_after_fork ();
   debug_printf ("child is running.  pid %d, ppid %d, stack here %p",
@@ -247,6 +256,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   return 0;
 }
 
+#define NO_SLOW_PID_REUSE
 #ifndef NO_SLOW_PID_REUSE
 static void
 slow_pid_reuse (HANDLE h)
@@ -274,12 +284,17 @@ slow_pid_reuse (HANDLE h)
 }
 #endif
 
-static int __stdcall
-fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_info_fork &ch)
+int __stdcall
+frok::parent (void *stack_here)
 {
   HANDLE forker_finished;
   DWORD rc;
   PROCESS_INFORMATION pi = {0, NULL, 0, 0};
+  child_pid = -1;
+  error = NULL;
+  this_errno = 0;
+  bool fix_impersonation = false;
+  pinfo child;
 
   pthread::atforkprepare ();
 
@@ -318,7 +333,8 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
   forker_finished = CreateEvent (&sec_all, FALSE, FALSE, NULL);
   if (forker_finished == NULL)
     {
-      system_printf ("unable to allocate forker_finished event, %E");
+      this_errno = geterrno_from_win_error ();
+      error = "child %d - unable to allocate forker_finished event, %E";
       return -1;
     }
 
@@ -326,7 +342,7 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
 
   ch.forker_finished = forker_finished;
 
-  stack_base (ch);
+  stack_base (&ch);
 
   si.cb = sizeof (STARTUPINFO);
   si.lpReserved2 = (LPBYTE) &ch;
@@ -334,6 +350,7 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
 
   /* Remove impersonation */
   cygheap->user.deimpersonate ();
+  fix_impersonation = true;
 
   syscall_printf ("CreateProcess (%s, %s, 0, 0, 1, %p, 0, 0, %p, %p)",
 		  myself->progname, myself->progname, c_flags, &si, &pi);
@@ -351,14 +368,11 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
 
   if (!rc)
     {
-      __seterrno ();
-      syscall_printf ("CreateProcessA failed, %E");
-      ForceCloseHandle (forker_finished);
-      /* Restore impersonation */
-      cygheap->user.reimpersonate ();
-      __malloc_unlock ();
-      return -1;
+      this_errno = geterrno_from_win_error ();
+      error = "child %d - CreateProcessA failed, %E";
+      goto cleanup;
     }
+
 
   /* Fixup the parent datastructure if needed and resume the child's
      main thread. */
@@ -368,14 +382,17 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
       ResumeThread (pi.hThread);
     }
 
-  int child_pid = cygwin_pid (pi.dwProcessId);
-  pinfo child (child_pid, 1);
+  child_pid = cygwin_pid (pi.dwProcessId);
+  child.init (child_pid, 1, NULL);
 
   if (!child)
     {
+      this_errno = get_errno () == ENOMEM ? ENOMEM : EAGAIN;
+#ifdef DEBUGGING
+      error = "child %d - pinfo failed";
+#else
       syscall_printf ("pinfo failed");
-      if (get_errno () != ENOMEM)
-	set_errno (EAGAIN);
+#endif
       goto cleanup;
     }
 
@@ -388,6 +405,7 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
 
   /* Restore impersonation */
   cygheap->user.reimpersonate ();
+  fix_impersonation = false;
 
   ProtectHandle (pi.hThread);
   /* Protect the handle but name it similarly to the way it will
@@ -406,7 +424,10 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
   if (!child.remember (false))
     {
       TerminateProcess (pi.hProcess, 1);
-      set_errno (EAGAIN);
+      this_errno = EAGAIN;
+#ifdef DEBUGGING
+      error = "child %d - child.remember failed";
+#endif
       goto cleanup;
     }
 
@@ -417,8 +438,8 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
   /* Wait for subproc to initialize itself. */
   if (!ch.sync (child->pid, pi.hProcess, FORK_WAIT_TIMEOUT))
     {
-      if (NOTSTATE (child, PID_EXITED))
-	system_printf ("child %d died waiting for longjmp before initialization", child_pid);
+      this_errno = EAGAIN;
+      error = "child %d - died waiting for longjmp before initialization";
       goto cleanup;
     }
 
@@ -461,7 +482,13 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
       if (!fork_copy (pi, "linked dll data/bss", d->p.data_start, d->p.data_end,
 						 d->p.bss_start, d->p.bss_end,
 						 NULL))
-	goto cleanup;
+	{
+	  this_errno = get_errno ();
+#ifdef DEBUGGING
+	  error = "child %d - fork_copy for linked dll data/bss failed";
+#endif
+	  goto cleanup;
+	}
     }
 
   /* Start thread, and wait for it to reload dlls.  */
@@ -469,8 +496,8 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
     goto cleanup;
   else if (!ch.sync (child->pid, pi.hProcess, FORK_WAIT_TIMEOUT))
     {
-      if (NOTSTATE (child, PID_EXITED))
-	system_printf ("child %d died waiting for dll loading", child_pid);
+      this_errno = EAGAIN;
+      error = "child %d died waiting for dll loading";
       goto cleanup;
     }
 
@@ -487,7 +514,13 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
 	  if (!fork_copy (pi, "loaded dll data/bss", d->p.data_start, d->p.data_end,
 						     d->p.bss_start, d->p.bss_end,
 						     NULL))
-	    goto cleanup;
+	    {
+	      this_errno = get_errno ();
+#ifdef DEBUGGING
+	      error = "child %d - copying data/bss for a loaded dll";
+#endif
+	      goto cleanup;
+	    }
 	}
       /* Start the child up again. */
       resume_child (forker_finished);
@@ -502,7 +535,9 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
   return child_pid;
 
 /* Common cleanup code for failure cases */
- cleanup:
+cleanup:
+  if (fix_impersonation)
+    cygheap->user.reimpersonate ();
   if (locked)
     __malloc_unlock ();
 
@@ -513,19 +548,14 @@ fork_parent (HANDLE&, dll *&first_dll, bool& load_dlls, void *stack_here, child_
     ForceCloseHandle (pi.hThread);
   if (forker_finished)
     ForceCloseHandle (forker_finished);
+  debug_printf ("returning -1");
   return -1;
 }
 
 extern "C" int
 fork ()
 {
-  struct
-  {
-    dll *first_dll;
-    bool load_dlls;
-    child_info_fork ch;
-  } grouped;
-
+  frok grouped;
   MALLOC_CHECK;
 
   debug_printf ("entering");
@@ -546,15 +576,26 @@ fork ()
     }
 
   sig_send (NULL, __SIGHOLD);
-  int res = setjmp (grouped.ch.jmp);
-  if (res)
-    res = fork_child (grouped.ch.parent, grouped.first_dll, grouped.load_dlls);
+  int res;
+  int ischild = setjmp (grouped.ch.jmp);
+  if (!ischild)
+    res = grouped.parent (esp);
   else
-    res = fork_parent (grouped.ch.parent, grouped.first_dll, grouped.load_dlls, esp, grouped.ch);
-  sig_send (NULL, __SIGNOHOLD);
+    res = grouped.child (esp);
 
   MALLOC_CHECK;
+  if (ischild || res > 0)
+    /* everything is ok */;
+  else
+    {
+      if (!grouped.error)
+	syscall_printf ("fork failed - child pid %d", grouped.child_pid);
+      else
+	system_printf (grouped.error, grouped.child_pid);
+      set_errno (grouped.this_errno);
+    }
   syscall_printf ("%d = fork()", res);
+  sig_send (NULL, __SIGNOHOLD);
   return res;
 }
 #ifdef DEBUGGING
