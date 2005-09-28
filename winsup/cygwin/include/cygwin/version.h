@@ -88,6 +88,10 @@ details. */
 #define CYGWIN_VERSION_CHECK_FOR_USING_BIG_TYPES \
   (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) >= \
   79)
+
+#define CYGWIN_VERSION_CHECK_FOR_USING_ANCIENT_MSGHDR \
+  (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) <= \
+ 132)
      /* We used to use the DLL major/minor to track
 	non-backward-compatible interface changes to the API.  Now we
 	use an API major/minor number for this purpose. */
@@ -266,6 +270,10 @@ details. */
       137: fts_children, fts_close, fts_get_clientptr, fts_get_stream,
 	   fts_open, fts_read, fts_set, fts_set_clientptr, ftw, nftw.
       138: Export readdir_r.
+     */
+
+     /*
+      133: Start using POSIX definition of struct msghdr.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */

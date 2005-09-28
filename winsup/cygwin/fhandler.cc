@@ -555,12 +555,13 @@ fhandler_base::open (int flags, mode_t mode)
   if (!wincap.is_winnt ())
     return fhandler_base::open_9x (flags, mode);
 
-  WCHAR wpath[CYG_MAX_PATH + 10];
-  UNICODE_STRING upath = {0, sizeof (wpath), wpath};
-  pc.get_nt_native_path (upath);
-
-  if (RtlIsDosDeviceName_U (upath.Buffer))
-    return fhandler_base::open_9x (flags, mode);
+  UNICODE_STRING upath;
+  if (!pc.get_nt_native_path (upath))
+    {
+      syscall_printf ("0 = fhandler_base::open (%s, %p)",
+		      get_win32_name (), flags);
+      return 0;
+    }
 
   int res = 0;
   HANDLE x;
@@ -576,7 +577,8 @@ fhandler_base::open (int flags, mode_t mode)
 
   syscall_printf ("(%s, %p)", get_win32_name (), flags);
 
-  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+  InitializeObjectAttributes (&attr, &upath,
+			      OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
 			      sa.lpSecurityDescriptor, NULL);
 
   switch (query_open ())
@@ -681,6 +683,7 @@ done:
 
   syscall_printf ("%d = fhandler_base::open (%s, %p)", res, get_win32_name (),
 		  flags);
+  RtlFreeUnicodeString (&upath);
   return res;
 }
 
@@ -1263,14 +1266,15 @@ fhandler_base::init (HANDLE f, DWORD a, mode_t bin)
 }
 
 int
-fhandler_base::dup (fhandler_base *child)
+fhandler_base::dup (fhandler_base *child, HANDLE from_proc)
 {
   debug_printf ("in fhandler_base dup");
 
   HANDLE nh;
+  set_flags (child->get_flags ());
   if (!nohandle ())
     {
-      if (!DuplicateHandle (hMainProc, get_handle (), hMainProc, &nh, 0, TRUE,
+      if (!DuplicateHandle (from_proc, get_handle (), hMainProc, &nh, 0, TRUE,
 			    DUPLICATE_SAME_ACCESS))
 	{
 	  debug_printf ("dup(%s) failed, handle %x, %E",
@@ -1282,7 +1286,6 @@ fhandler_base::dup (fhandler_base *child)
       VerifyHandle (nh);
       child->set_io_handle (nh);
     }
-  set_flags (child->get_flags ());
   return 0;
 }
 

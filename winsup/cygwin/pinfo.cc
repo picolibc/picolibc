@@ -385,39 +385,18 @@ _pinfo::commune_recv ()
   char path[CYG_MAX_PATH];
   DWORD nr;
   DWORD code;
-  HANDLE hp;
-  HANDLE __fromthem = NULL;
-  HANDLE __tothem = NULL;
 
-  hp = OpenProcess (PROCESS_DUP_HANDLE, false, dwProcessId);
-  if (!hp)
-    {
-      sigproc_printf ("couldn't open handle for pid %d(%u)", pid, dwProcessId);
-      hello_pid = -1;
-      return;
-    }
-  if (!DuplicateHandle (hp, fromthem, hMainProc, &__fromthem, 0, false, DUPLICATE_SAME_ACCESS))
-    {
-      sigproc_printf ("couldn't duplicate fromthem, %E");
-      CloseHandle (hp);
-      hello_pid = -1;
-      return;
-    }
+  /* Don't remove.  It's necessary to copy to local variables for process
+     synchronization. */
+  HANDLE __fromthem = this->__fromthem;
+  HANDLE __tothem = this->__tothem;
+  HANDLE __them = this->__them;
+  HANDLE __gotit = this->__gotit;
 
-  if (!DuplicateHandle (hp, tothem, hMainProc, &__tothem, 0, false, DUPLICATE_SAME_ACCESS))
-    {
-      sigproc_printf ("couldn't duplicate tothem, %E");
-      CloseHandle (__fromthem);
-      CloseHandle (hp);
-      hello_pid = -1;
-      return;
-    }
-
-  hello_pid = 0;
+  SetEvent (__gotit);
 
   if (!ReadFile (__fromthem, &code, sizeof code, &nr, NULL) || nr != sizeof code)
     {
-      CloseHandle (hp);
       /* __seterrno ();*/	// this is run from the signal thread, so don't set errno
       goto out;
     }
@@ -431,7 +410,6 @@ _pinfo::commune_recv ()
 	extern int __argc_safe;
 	const char *argv[__argc_safe + 1];
 
-	CloseHandle (hp);
 	for (int i = 0; i < __argc_safe; i++)
 	  {
 	    if (IsBadStringPtr (__argv[i], INT32_MAX))
@@ -463,7 +441,6 @@ _pinfo::commune_recv ()
     case PICOM_CWD:
       {
 	CloseHandle (__fromthem); __fromthem = NULL;
-	CloseHandle (hp);
 	unsigned int n = strlen (cygheap->cwd.get (path, 1, 1,
 						   CYG_MAX_PATH)) + 1;
 	if (!WriteFile (__tothem, &n, sizeof n, &nr, NULL))
@@ -475,7 +452,6 @@ _pinfo::commune_recv ()
     case PICOM_ROOT:
       {
 	CloseHandle (__fromthem); __fromthem = NULL;
-	CloseHandle (hp);
 	unsigned int n;
 	if (cygheap->root.exists ())
 	  n = strlen (strcpy (path, cygheap->root.posix_path ())) + 1;
@@ -490,7 +466,6 @@ _pinfo::commune_recv ()
     case PICOM_FDS:
       {
 	CloseHandle (__fromthem); __fromthem = NULL;
-	CloseHandle (hp);
 	unsigned int n = 0;
 	int fd;
 	cygheap_fdenum cfd;
@@ -515,11 +490,9 @@ _pinfo::commune_recv ()
 	      || nr != sizeof hdl)
 	    {
 	      sigproc_printf ("ReadFile hdl failed, %E");
-	      CloseHandle (hp);
 	      goto out;
 	    }
 	  CloseHandle (__fromthem); __fromthem = NULL;
-	  CloseHandle (hp);
 	  unsigned int n = 0;
 	  cygheap_fdenum cfd;
 	  while (cfd.next () >= 0)
@@ -543,11 +516,9 @@ _pinfo::commune_recv ()
 	    || nr != sizeof fd)
 	  {
 	    sigproc_printf ("ReadFile fd failed, %E");
-	    CloseHandle (hp);
 	    goto out;
 	  }
 	CloseHandle (__fromthem); __fromthem = NULL;
-	CloseHandle (hp);
 	unsigned int n = 0;
 	cygheap_fdget cfd (fd);
 	if (cfd < 0)
@@ -566,7 +537,6 @@ _pinfo::commune_recv ()
 	if (!ReadFile (__fromthem, &len, sizeof len, &nr, NULL)
 	    || nr != sizeof len)
 	  {
-	    CloseHandle (hp);
 	    /* __seterrno ();*/	// this is run from the signal thread, so don't set errno
 	    goto out;
 	  }
@@ -574,7 +544,6 @@ _pinfo::commune_recv ()
 	if (!ReadFile (__fromthem, path, len, &nr, NULL)
 	    || nr != len)
 	  {
-	    CloseHandle (hp);
 	    /* __seterrno ();*/	// this is run from the signal thread, so don't set errno
 	    goto out;
 	  }
@@ -588,7 +557,7 @@ _pinfo::commune_recv ()
 	    it[0] = fh->get_handle ();
 	    it[1] = fh->get_output_handle ();
 	    for (int i = 0; i < 2; i++)
-	      if (!DuplicateHandle (hMainProc, it[i], hp, &it[i], 0, false,
+	      if (!DuplicateHandle (hMainProc, it[i], __them, &it[i], 0, false,
 				    DUPLICATE_SAME_ACCESS))
 		{
 		  it[0] = it[1] = NULL;	/* FIXME: possibly left a handle open in child? */
@@ -598,7 +567,6 @@ _pinfo::commune_recv ()
 	    fh->close_one_end ();  /* FIXME: not quite right - need more handshaking */
 	  }
 
-	CloseHandle (hp);
 	if (!WriteFile (__tothem, it, sizeof (it), &nr, NULL))
 	  {
 	    /*__seterrno ();*/	// this is run from the signal thread, so don't set errno
@@ -611,10 +579,10 @@ _pinfo::commune_recv ()
     }
 
 out:
-  if (__fromthem)
-    CloseHandle (__fromthem);
-  if (__tothem)
-    CloseHandle (__tothem);
+  CloseHandle (__fromthem);
+  CloseHandle (__tothem);
+  CloseHandle (__them);
+  CloseHandle (__gotit);
 }
 
 #define PIPEBUFSIZE (4096 * sizeof (DWORD))
@@ -663,31 +631,49 @@ _pinfo::commune_send (DWORD code, ...)
   if (sig_send (this, __SIGCOMMUNE))
     goto err;
 
-  /* FIXME: Need something better than an busy loop here */
-  bool isalive;
-  for (int i = 0; (isalive = alive ()) && (i < 10000); i++)
-    if (myself->hello_pid <= 0)
-      break;
-    else
-      low_priority_sleep (0);
+  {
+    bool isalive = true;
+    HANDLE w4[2] = { myself->gotit, myself->them };
+    /* FIXME: How long should we wait here? */
+    switch (WaitForMultipleObjects (2, w4, false, INFINITE))
+      {
+      case WAIT_OBJECT_0:
+	myself->hello_pid = 0;
+	break;
+      case WAIT_OBJECT_0 + 1:
+	isalive = false;
+	break;
+      default:
+	debug_printf ("WFMO failed with %E");
+	myself->hello_pid = -1;
+	break;
+      }
 
-  CloseHandle (tome);
-  tome = NULL;
-  CloseHandle (fromme);
-  fromme = NULL;
+    CloseHandle (tome);
+    tome = NULL;
+    CloseHandle (fromme);
+    fromme = NULL;
+    CloseHandle (myself->them);
+    myself->them = NULL;
+    CloseHandle (myself->gotit);
+    myself->gotit = NULL;
+    myself->__tothem = NULL;
+    myself->__fromthem = NULL;
+    myself->__them = NULL;
+    myself->__gotit = NULL;
 
-  if (!isalive)
-    {
-      set_errno (ESRCH);
-      goto err;
-    }
+    if (!isalive)
+      {
+	set_errno (ESRCH);
+	goto err;
+      }
 
-  if (myself->hello_pid < 0)
-    {
-      set_errno (ENOSYS);
-      goto err;
-    }
-
+    if (myself->hello_pid < 0)
+      {
+	set_errno (ENOSYS);
+	goto err;
+      }
+  }
   size_t n;
   switch (code)
     {
@@ -785,6 +771,7 @@ err:
 
 out:
   myself->hello_pid = 0;
+  tothem = fromthem = NULL;
   myself.unlock ();
   return res;
 }
@@ -925,6 +912,44 @@ _pinfo::cmdline (size_t& n)
     }
   return s;
 }
+
+bool
+_pinfo::send_descriptors (int cnt, int *fds)
+{
+  HANDLE target_proc;
+  HANDLE my_proc;
+
+  /* First try to create a handle of this process into the space of the
+     target process which allows the target process to duplicate handles.
+     If this fails, the target process will try the same. */
+  for (int i = 0; i < cnt; ++i)
+    {
+      cygheap_fdget cfd (fds[i]);
+      if (cfd < 0)
+        {
+	  set_errno (ENOENT);
+	  goto fault;
+	}
+      
+    }
+  return true;
+
+fault:
+  destroy_inflight_descriptors ();
+  return false;
+}
+
+void
+_pinfo::destroy_inflight_descriptors ()
+{
+}
+
+#if 0
+bool
+_pinfo::recv_descriptors ()
+{
+}
+#endif
 
 /* This is the workhorse which waits for the write end of the pipe
    created during new process creation.  If the pipe is closed or a zero

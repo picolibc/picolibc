@@ -582,7 +582,8 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	  sigproc_printf ("sendsig handle never materialized");
 	  goto out;
 	}
-      HANDLE hp = OpenProcess (PROCESS_DUP_HANDLE, false, dwProcessId);
+      HANDLE hp = OpenProcess (PROCESS_DUP_HANDLE | SYNCHRONIZE,
+			       false, dwProcessId);
       if (!hp)
 	{
 	  __seterrno ();
@@ -598,7 +599,59 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	  CloseHandle (hp);
 	  goto out;
 	}
-      CloseHandle (hp);
+      if (si.si_signo == __SIGCOMMUNE)
+        {
+	  if (!(myself->gotit = CreateEvent (&sec_none_nih, true, false, NULL)))
+	    {
+	      __seterrno ();
+	      sigproc_printf ("CreateEvent failed, %E");
+	      CloseHandle (hp);
+	      goto out;
+	    }
+	  if (!DuplicateHandle (hMainProc, myself->gotit, hp,
+	  			&myself->__gotit, false, 0,
+				DUPLICATE_SAME_ACCESS))
+	    {
+	      __seterrno ();
+	      sigproc_printf ("DuplicateHandle failed, %E");
+	      CloseHandle (myself->gotit);
+	      CloseHandle (hp);
+	      goto out;
+	    }
+	  if (!DuplicateHandle (hMainProc, myself->tothem, hp,
+	  			&myself->__tothem, false, 0,
+				DUPLICATE_SAME_ACCESS))
+	    {
+	      __seterrno ();
+	      sigproc_printf ("DuplicateHandle failed, %E");
+	      CloseHandle (myself->gotit);
+	      CloseHandle (hp);
+	      goto out;
+	    }
+	  if (!DuplicateHandle (hMainProc, myself->fromthem, hp,
+	  			&myself->__fromthem, false, 0,
+				DUPLICATE_SAME_ACCESS))
+	    {
+	      __seterrno ();
+	      sigproc_printf ("DuplicateHandle failed, %E");
+	      CloseHandle (myself->gotit);
+	      CloseHandle (hp);
+	      goto out;
+	    }
+	  if (!DuplicateHandle (hMainProc, hMainProc, hp,
+	  			&myself->__them, false, 0,
+				DUPLICATE_SAME_ACCESS))
+	    {
+	      __seterrno ();
+	      sigproc_printf ("DuplicateHandle failed, %E");
+	      CloseHandle (myself->gotit);
+	      CloseHandle (hp);
+	      goto out;
+	    }
+	  myself->them = hp;
+        }
+      else
+	CloseHandle (hp);
       VerifyHandle (sendsig);
     }
 

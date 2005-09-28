@@ -1442,11 +1442,11 @@ fhandler_dev_tape::fstat (struct __stat64 *buf)
 }
 
 int
-fhandler_dev_tape::dup (fhandler_base *child)
+fhandler_dev_tape::dup (fhandler_base *child, HANDLE from_proc)
 {
   lock (-1);
   fhandler_dev_tape *fh = (fhandler_dev_tape *) child;
-  if (!DuplicateHandle (hMainProc, mt_mtx, hMainProc, &fh->mt_mtx, 0, TRUE,
+  if (!DuplicateHandle (from_proc, mt_mtx, hMainProc, &fh->mt_mtx, 0, TRUE,
   			DUPLICATE_SAME_ACCESS))
     {
       debug_printf ("dup(%s) failed, mutex handle %x, %E",
@@ -1456,7 +1456,7 @@ fhandler_dev_tape::dup (fhandler_base *child)
     }
   fh->mt_evt = NULL;
   if (mt_evt &&
-      !DuplicateHandle (hMainProc, mt_evt, hMainProc, &fh->mt_evt, 0, TRUE,
+      !DuplicateHandle (from_proc, mt_evt, hMainProc, &fh->mt_evt, 0, TRUE,
   			DUPLICATE_SAME_ACCESS))
     {
       debug_printf ("dup(%s) failed, event handle %x, %E",
@@ -1464,7 +1464,7 @@ fhandler_dev_tape::dup (fhandler_base *child)
       __seterrno ();
       return unlock (-1);
     }
-  return unlock (fhandler_dev_raw::dup (child));
+  return unlock (fhandler_dev_raw::dup (child, from_proc));
 }
 
 void

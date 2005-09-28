@@ -1127,7 +1127,7 @@ fhandler_dev_dsp::close ()
 }
 
 int
-fhandler_dev_dsp::dup (fhandler_base * child)
+fhandler_dev_dsp::dup (fhandler_base * child, HANDLE from_proc)
 {
   debug_printf ("");
   child->archetype = archetype;

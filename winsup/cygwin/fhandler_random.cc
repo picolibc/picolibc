@@ -156,7 +156,7 @@ fhandler_dev_random::close ()
 }
 
 int
-fhandler_dev_random::dup (fhandler_base *child)
+fhandler_dev_random::dup (fhandler_base *child, HANDLE from_proc)
 {
   fhandler_dev_random *fhr = (fhandler_dev_random *) child;
   fhr->crypt_prov = (HCRYPTPROV)NULL;

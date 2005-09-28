@@ -27,6 +27,7 @@
 #include "perprocess.h"
 #include "path.h"
 #include "fhandler.h"
+#include "pinfo.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "sigproc.h"
@@ -454,7 +455,7 @@ fhandler_socket::fixup_after_exec ()
 }
 
 int
-fhandler_socket::dup (fhandler_base *child)
+fhandler_socket::dup (fhandler_base *child, HANDLE from_proc)
 {
   HANDLE nh;
 
@@ -477,7 +478,7 @@ fhandler_socket::dup (fhandler_base *child)
     }
   fhs->connect_state (connect_state ());
 
-  if (winsock2_active)
+  if (winsock2_active && from_proc == hMainProc)
     {
       /* Since WSADuplicateSocket() fails on NT systems when the process
 	 is currently impersonating a non-privileged account, we revert
@@ -506,7 +507,7 @@ fhandler_socket::dup (fhandler_base *child)
      having winsock called from fhandler_base and it creates only
      inheritable sockets which is wrong for winsock2. */
 
-  if (!DuplicateHandle (hMainProc, get_io_handle (), hMainProc, &nh, 0,
+  if (!DuplicateHandle (from_proc, get_io_handle (), hMainProc, &nh, 0,
 			!winsock2_active, DUPLICATE_SAME_ACCESS))
     {
       system_printf ("!DuplicateHandle(%x) failed, %E", get_io_handle ());
@@ -992,8 +993,9 @@ fhandler_socket::readv (const struct iovec *const iov, const int iovcnt,
       msg_namelen:	0,
       msg_iov:		(struct iovec *) iov, // const_cast
       msg_iovlen:	iovcnt,
-      msg_accrights:	NULL,
-      msg_accrightslen:	0
+      msg_control:	NULL,
+      msg_controllen:	0,
+      msg_flags:	0
     };
 
   return recvmsg (&msg, 0, tot);
@@ -1064,7 +1066,10 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
 	 go ahead recv'ing the normal data blocks.  Otherwise start
 	 special handling for descriptor passing. */
       /*TODO*/
-      msg->msg_accrightslen = 0;
+      if (CYGWIN_VERSION_CHECK_FOR_USING_ANCIENT_MSGHDR)
+        ((struct OLD_msghdr *) msg)->msg_accrightslen = 0;
+      else
+	msg->msg_controllen = 0;
     }
 
   struct iovec *const iov = msg->msg_iov;
@@ -1186,8 +1191,9 @@ fhandler_socket::writev (const struct iovec *const iov, const int iovcnt,
       msg_namelen:	0,
       msg_iov:		(struct iovec *) iov, // const_cast
       msg_iovlen:	iovcnt,
-      msg_accrights:	NULL,
-      msg_accrightslen:	0
+      msg_control:	NULL,
+      msg_controllen:	0,
+      msg_flags:	0
     };
 
   return sendmsg (&msg, 0, tot);
@@ -1263,13 +1269,64 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
 int
 fhandler_socket::sendmsg (const struct msghdr *msg, int flags, ssize_t tot)
 {
-  if (get_addr_family () == AF_LOCAL)
+  struct cmsghdr *cmsg;
+  bool descriptors_inflight = false;
+
+  if (get_addr_family () == AF_LOCAL
+      && get_socket_type () == SOCK_STREAM
+      && msg->msg_controllen > 0)	/* Works for ancient msghdr, too. */
     {
-      /* For AF_LOCAL/AF_UNIX sockets, if descriptors are given, start
+      /* For AF_LOCAL/SOCK_STREAM sockets, if descriptors are given, start
 	 the special handling for descriptor passing.  Otherwise just
 	 transmit an empty string to tell the receiver that no
 	 descriptor passing is done. */
-      /*TODO*/
+
+      /* NOTE: SOCK_DGRAMs are usually allowed, but we can't support them
+         unless credential passing works for SOCK_DGRAM sockets as well.
+	 OTOH, since DGRAMs can be easily discarded, they are not reliable
+	 and seldomly used anyway. */
+
+      struct msghdr lmsg;
+
+      union {
+        struct cmsghdr cm;
+	char control[CMSG_SPACE (sizeof (int))];
+      } control_un;
+      if (CYGWIN_VERSION_CHECK_FOR_USING_ANCIENT_MSGHDR)
+        {
+	  memcpy (&lmsg, msg, sizeof *msg);
+	  lmsg.msg_control = (void *) control_un.control;
+	  lmsg.msg_controllen = sizeof control_un.control;
+	  lmsg.msg_flags = 0;
+	  cmsg = CMSG_FIRSTHDR (&lmsg);
+	  cmsg->cmsg_len = CMSG_LEN (sizeof (int));
+	  cmsg->cmsg_level = SOL_SOCKET;
+	  cmsg->cmsg_type = SCM_RIGHTS;
+	  *((int *) CMSG_DATA (cmsg)) =
+			    *(int *) ((OLD_msghdr *) msg)->msg_accrights;
+	  msg = &lmsg;
+	}
+
+      pinfo p (sec_peer_pid);
+      if (!p)
+        {
+	  set_errno (ENOTCONN);
+	  return SOCKET_ERROR;
+	}
+      for (cmsg = CMSG_FIRSTHDR (msg); cmsg; cmsg = CMSG_NXTHDR (msg, cmsg))
+        {
+	  if (cmsg->cmsg_level != SOL_SOCKET || cmsg->cmsg_type != SCM_RIGHTS)
+	    {
+	      set_errno (ENOTSUP);
+	      return SOCKET_ERROR;
+	    }
+	  int *fds = (int *) CMSG_DATA (cmsg);
+	  int cnt = (cmsg->cmsg_len - CMSG_ALIGN (sizeof (struct cmsghdr)))
+		    / sizeof (int);
+	  if (!p->send_descriptors (cnt, fds))
+	    return SOCKET_ERROR;
+	  descriptors_inflight = true;
+	}
     }
 
   struct iovec *const iov = msg->msg_iov;
@@ -1369,22 +1426,34 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags, ssize_t tot)
 	}
 
       if (res == SOCKET_ERROR)
-	set_winsock_errno ();
+	{
+	  set_winsock_errno ();
+	}
       else
 	res = ret;
     }
 
-  /* Special handling for EPIPE and SIGPIPE.
-
-     EPIPE is generated if the local end has been shut down on a connection
-     oriented socket.  In this case the process will also receive a SIGPIPE
-     unless MSG_NOSIGNAL is set.  */
-  if (res == SOCKET_ERROR && get_errno () == ESHUTDOWN
-      && get_socket_type () == SOCK_STREAM)
+  if (res == SOCKET_ERROR)
     {
-      set_errno (EPIPE);
-      if (! (flags & MSG_NOSIGNAL))
-	raise (SIGPIPE);
+      /* If sendmsg fails, destroy all inflight descriptors. */
+      if (descriptors_inflight && WSAGetLastError () != WSAEWOULDBLOCK)
+	{
+	  pinfo p (sec_peer_pid);
+	  if (p)
+	    p->destroy_inflight_descriptors ();
+	}
+
+      /* Special handling for EPIPE and SIGPIPE.
+
+	 EPIPE is generated if the local end has been shut down on a connection
+	 oriented socket.  In this case the process will also receive a SIGPIPE
+	 unless MSG_NOSIGNAL is set.  */
+      if (get_errno () == ESHUTDOWN && get_socket_type () == SOCK_STREAM)
+	{
+	  set_errno (EPIPE);
+	  if (! (flags & MSG_NOSIGNAL))
+	    raise (SIGPIPE);
+	}
     }
 
   return res;

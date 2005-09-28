@@ -91,6 +91,12 @@ public:
   pid_t hello_pid;
   HANDLE tothem;
   HANDLE fromthem;
+  HANDLE __tothem;
+  HANDLE __fromthem;
+  HANDLE them;
+  HANDLE __them;
+  HANDLE gotit;
+  HANDLE __gotit;
 
   inline void set_has_pgid_children ()
   {
@@ -119,6 +125,8 @@ public:
   char *root (size_t &);
   char *cwd (size_t &);
   char *cmdline (size_t &);
+  bool send_descriptors (int, int *);
+  void destroy_inflight_descriptors ();
   void set_ctty (class tty_min *, int, class fhandler_tty_slave *);
   bool dup_proc_pipe (HANDLE) __attribute__ ((regparm(2)));
   void sync_proc_pipe ();

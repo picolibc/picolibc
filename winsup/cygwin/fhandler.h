@@ -296,7 +296,7 @@ class fhandler_base
   virtual ssize_t __stdcall pwrite (void *, size_t, _off64_t) __attribute__ ((regparm (3)));
   virtual _off64_t lseek (_off64_t offset, int whence);
   virtual int lock (int, struct __flock64 *);
-  virtual int dup (fhandler_base *child);
+  virtual int dup (fhandler_base *child, HANDLE from_proc);
 
   virtual HANDLE mmap (caddr_t *addr, size_t len, DWORD access,
 		       int flags, _off64_t off);
@@ -466,7 +466,7 @@ class fhandler_socket: public fhandler_base
   int shutdown (int how);
   int close ();
   void hclose (HANDLE) {close ();}
-  int dup (fhandler_base *child);
+  int dup (fhandler_base *child, HANDLE from_proc);
 
   void set_close_on_exec (bool val);
   virtual void fixup_before_fork_exec (DWORD);
@@ -513,7 +513,7 @@ public:
   int open (int flags, mode_t mode = 0);
   int close ();
   void create_guard (SECURITY_ATTRIBUTES *sa) {guard = CreateMutex (sa, FALSE, NULL);}
-  int dup (fhandler_base *child);
+  int dup (fhandler_base *child, HANDLE from_proc);
   int ioctl (unsigned int cmd, void *);
   virtual void fixup_after_fork (HANDLE);
   void fixup_after_exec ();
@@ -543,7 +543,7 @@ public:
   HANDLE& get_output_handle () { return output_handle; }
   void set_output_handle (HANDLE h) { output_handle = h; }
   void set_use ();
-  int dup (fhandler_base *child);
+  int dup (fhandler_base *child, HANDLE from_proc);
   bool is_slow () {return 1;}
   void close_one_end ();
 };
@@ -593,7 +593,7 @@ class fhandler_dev_raw: public fhandler_base
 
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
 
-  int dup (fhandler_base *child);
+  int dup (fhandler_base *child, HANDLE from_proc);
 
   int ioctl (unsigned int cmd, void *buf);
 
@@ -645,7 +645,7 @@ class fhandler_dev_tape: public fhandler_dev_raw
 
   virtual int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
 
-  virtual int dup (fhandler_base *child);
+  virtual int dup (fhandler_base *child, HANDLE from_proc);
   virtual void fixup_after_fork (HANDLE parent);
   virtual void set_close_on_exec (bool val);
   virtual int ioctl (unsigned int cmd, void *buf);
@@ -726,7 +726,7 @@ class fhandler_serial: public fhandler_base
   int close ();
   void init (HANDLE h, DWORD a, mode_t flags);
   void overlapped_setup ();
-  int dup (fhandler_base *child);
+  int dup (fhandler_base *child, HANDLE from_proc);
   void raw_read (void *ptr, size_t& ulen);
   int raw_write (const void *ptr, size_t ulen);
   int tcsendbreak (int);
@@ -909,7 +909,7 @@ class fhandler_console: public fhandler_termios
   int tcgetattr (struct termios *t);
 
   /* Special dup as we must dup two handles */
-  int dup (fhandler_base *child);
+  int dup (fhandler_base *child, HANDLE from_proc);
 
   int ioctl (unsigned int cmd, void *);
   void init (HANDLE, DWORD, mode_t);
@@ -950,7 +950,7 @@ class fhandler_tty_common: public fhandler_termios
   DWORD __acquire_output_mutex (const char *fn, int ln, DWORD ms);
   void __release_output_mutex (const char *fn, int ln);
 
-  virtual int dup (fhandler_base *child);
+  virtual int dup (fhandler_base *child, HANDLE from_proc);
 
   tty *get_ttyp () { return (tty *) tc; }
 
@@ -980,7 +980,7 @@ class fhandler_tty_slave: public fhandler_tty_common
   int tcflush (int);
   int ioctl (unsigned int cmd, void *);
   int close ();
-  int dup (fhandler_base *child);
+  int dup (fhandler_base *child, HANDLE from_proc);
   void fixup_after_fork (HANDLE parent);
 
   select_record *select_read (select_record *s);
@@ -1071,7 +1071,7 @@ class fhandler_dev_random: public fhandler_base
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   _off64_t lseek (_off64_t offset, int whence);
   int close ();
-  int dup (fhandler_base *child);
+  int dup (fhandler_base *child, HANDLE from_proc);
 };
 
 class fhandler_dev_mem: public fhandler_base
@@ -1089,7 +1089,7 @@ class fhandler_dev_mem: public fhandler_base
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   _off64_t lseek (_off64_t offset, int whence);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
-  int dup (fhandler_base *child);
+  int dup (fhandler_base *child, HANDLE from_proc);
 
   HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, _off64_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);
@@ -1113,7 +1113,7 @@ class fhandler_dev_clipboard: public fhandler_base
   _off64_t lseek (_off64_t offset, int whence);
   int close ();
 
-  int dup (fhandler_base *child);
+  int dup (fhandler_base *child, HANDLE from_proc);
   void fixup_after_exec ();
 };
 
@@ -1162,7 +1162,7 @@ class fhandler_dev_dsp: public fhandler_base
   int ioctl (unsigned int cmd, void *);
   _off64_t lseek (_off64_t, int);
   int close ();
-  int dup (fhandler_base *child);
+  int dup (fhandler_base *child, HANDLE from_proc);
   void fixup_after_fork (HANDLE parent);
   void fixup_after_exec ();
  private:
@@ -1192,7 +1192,7 @@ class fhandler_virtual : public fhandler_base
   int write (const void *ptr, size_t len);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   _off64_t lseek (_off64_t, int);
-  int dup (fhandler_base *child);
+  int dup (fhandler_base *child, HANDLE from_proc);
   int open (int flags, mode_t mode = 0);
   int close ();
   int __stdcall fstat (struct stat *buf) __attribute__ ((regparm (2)));
