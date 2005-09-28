@@ -99,7 +99,7 @@ fhandler_fifo::open_not_mine (int flags)
       commune_result r;
       if (p->pid != myself->pid)
 	{
-	  r = p->commune_send (PICOM_FIFO, get_win32_name ());
+	  r = p->commune_request (PICOM_FIFO, get_win32_name ());
 	  if (r.handles[0] == NULL)
 	    continue;		// process doesn't own fifo
 	  debug_printf ("pid %d, handles[0] %p, handles[1] %p", p->pid,

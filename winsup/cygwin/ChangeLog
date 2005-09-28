@@ -1,5 +1,37 @@
 2005-09-28  Christopher Faylor  <cgf@timesys.com>
 
+	Change name from commune_recv to commune_process throughout.
+	Change name from commune_send to commune_request throughout.
+	* pinfo.h (PICOM_EXTRASTR): New flag.
+	(PICOM_FIFO): Define with new flag.
+	(_pinfo::hello_pid): Delete.
+	(_pinfo::tothem): Delete.
+	(_pinfo::fromthem): Delete.
+	(_pinfo::commune_process): Rename from commune_recv.  Add a siginfo_t
+	argument to declaration.
+	(_pinfo::commune_request): Rename from commune_send.  Change DWORD to
+	__uint32_t in declaration.
+	* pinfo.cc (_pinfo::commune_process): Rename from commune_recv.  Add
+	siginfo_t argument.  Use information from argument rather than reading
+	from another pipe.  Synchronize with other process's commune event.
+	(_pinfo::commune_request): Rename from commune_send.  Change DWORD to
+	__uint32 in argument.  Fill out information in new siginfo_t element
+	and rely on extended operation of sig_send rather than trying to deal
+	with synchronization issues here.  Use process handle and read pipe
+	information filled out by sig_send to gather information from the other
+	process.
+	* sigproc.cc (sig_send): Take special action if "communing" to ensure
+	synchronization with the other process and to return information about
+	the other process to the caller.
+	(talktome): Accept a siginfo_t and handle arguments.  Read additional
+	information from the signal pipe when _si_commune._si_code has the
+	PICOM_EXTRASTR flag set.
+	(wait_sig): Pass the transmitted siginfo_t struct and the pipe handle
+	to talktome.  Close pipe read handle as soon as possible after we
+	detect that we're exiting.
+
+2005-09-28  Christopher Faylor  <cgf@timesys.com>
+
 	* hookapi.cc (hook_or_detect_cygwin): Correct inverted test for whether
 	to allocate a buffer by always allocating a buffer.
 

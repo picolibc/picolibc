@@ -380,58 +380,24 @@ _pinfo::alive ()
 extern char **__argv;
 
 void
-_pinfo::commune_recv ()
+_pinfo::commune_process (siginfo_t& si)
 {
   char path[CYG_MAX_PATH];
   DWORD nr;
-  DWORD code;
-  HANDLE hp;
-  HANDLE __fromthem = NULL;
-  HANDLE __tothem = NULL;
+  HANDLE& tothem = si._si_commune._si_write_handle;
+  HANDLE process_sync =
+    OpenSemaphore (SYNCHRONIZE, false, shared_name (path, "commune", si.si_pid));
+  if (process_sync)		// FIXME: this test shouldn't be necessary
+    ProtectHandle (process_sync);
 
-  hp = OpenProcess (PROCESS_DUP_HANDLE, false, dwProcessId);
-  if (!hp)
-    {
-      sigproc_printf ("couldn't open handle for pid %d(%u)", pid, dwProcessId);
-      hello_pid = -1;
-      return;
-    }
-  if (!DuplicateHandle (hp, fromthem, hMainProc, &__fromthem, 0, false, DUPLICATE_SAME_ACCESS))
-    {
-      sigproc_printf ("couldn't duplicate fromthem, %E");
-      CloseHandle (hp);
-      hello_pid = -1;
-      return;
-    }
-
-  if (!DuplicateHandle (hp, tothem, hMainProc, &__tothem, 0, false, DUPLICATE_SAME_ACCESS))
-    {
-      sigproc_printf ("couldn't duplicate tothem, %E");
-      CloseHandle (__fromthem);
-      CloseHandle (hp);
-      hello_pid = -1;
-      return;
-    }
-
-  hello_pid = 0;
-
-  if (!ReadFile (__fromthem, &code, sizeof code, &nr, NULL) || nr != sizeof code)
-    {
-      CloseHandle (hp);
-      /* __seterrno ();*/	// this is run from the signal thread, so don't set errno
-      goto out;
-    }
-
-  switch (code)
+  switch (si._si_commune._si_code)
     {
     case PICOM_CMDLINE:
       {
 	unsigned n = 1;
-	CloseHandle (__fromthem); __fromthem = NULL;
 	extern int __argc_safe;
 	const char *argv[__argc_safe + 1];
 
-	CloseHandle (hp);
 	for (int i = 0; i < __argc_safe; i++)
 	  {
 	    if (IsBadStringPtr (__argv[i], INT32_MAX))
@@ -441,19 +407,19 @@ _pinfo::commune_recv ()
 	    n += strlen (argv[i]) + 1;
 	  }
 	argv[__argc_safe] = NULL;
-	if (!WriteFile (__tothem, &n, sizeof n, &nr, NULL))
+	if (!WriteFile (tothem, &n, sizeof n, &nr, NULL))
 	  {
 	    /*__seterrno ();*/	// this is run from the signal thread, so don't set errno
 	    sigproc_printf ("WriteFile sizeof argv failed, %E");
 	  }
 	else
 	  for (const char **a = argv; *a; a++)
-	    if (!WriteFile (__tothem, *a, strlen (*a) + 1, &nr, NULL))
+	    if (!WriteFile (tothem, *a, strlen (*a) + 1, &nr, NULL))
 	      {
 		sigproc_printf ("WriteFile arg %d failed, %E", a - argv);
 		break;
 	      }
-	if (!WriteFile (__tothem, "", 1, &nr, NULL))
+	if (!WriteFile (tothem, "", 1, &nr, NULL))
 	  {
 	    sigproc_printf ("WriteFile null failed, %E");
 	    break;
@@ -462,46 +428,40 @@ _pinfo::commune_recv ()
       }
     case PICOM_CWD:
       {
-	CloseHandle (__fromthem); __fromthem = NULL;
-	CloseHandle (hp);
 	unsigned int n = strlen (cygheap->cwd.get (path, 1, 1,
 						   CYG_MAX_PATH)) + 1;
-	if (!WriteFile (__tothem, &n, sizeof n, &nr, NULL))
+	if (!WriteFile (tothem, &n, sizeof n, &nr, NULL))
 	  sigproc_printf ("WriteFile sizeof cwd failed, %E");
-	else if (!WriteFile (__tothem, path, n, &nr, NULL))
+	else if (!WriteFile (tothem, path, n, &nr, NULL))
 	  sigproc_printf ("WriteFile cwd failed, %E");
 	break;
       }
     case PICOM_ROOT:
       {
-	CloseHandle (__fromthem); __fromthem = NULL;
-	CloseHandle (hp);
-	unsigned int n;
+	unsigned n;
 	if (cygheap->root.exists ())
 	  n = strlen (strcpy (path, cygheap->root.posix_path ())) + 1;
 	else
 	  n = strlen (strcpy (path, "/")) + 1;
-	if (!WriteFile (__tothem, &n, sizeof n, &nr, NULL))
+	if (!WriteFile (tothem, &n, sizeof n, &nr, NULL))
 	  sigproc_printf ("WriteFile sizeof root failed, %E");
-	else if (!WriteFile (__tothem, path, n, &nr, NULL))
+	else if (!WriteFile (tothem, path, n, &nr, NULL))
 	  sigproc_printf ("WriteFile root failed, %E");
 	break;
       }
     case PICOM_FDS:
       {
-	CloseHandle (__fromthem); __fromthem = NULL;
-	CloseHandle (hp);
 	unsigned int n = 0;
 	int fd;
 	cygheap_fdenum cfd;
 	while ((fd = cfd.next ()) >= 0)
 	  n += sizeof (int);
 	cfd.rewind ();
-	if (!WriteFile (__tothem, &n, sizeof n, &nr, NULL))
+	if (!WriteFile (tothem, &n, sizeof n, &nr, NULL))
 	  sigproc_printf ("WriteFile sizeof fds failed, %E");
 	else
 	  while ((fd = cfd.next ()) >= 0)
-	    if (!WriteFile (__tothem, &fd, sizeof fd, &nr, NULL))
+	    if (!WriteFile (tothem, &fd, sizeof fd, &nr, NULL))
 	      {
 		sigproc_printf ("WriteFile fd %d failed, %E", fd);
 		break;
@@ -510,16 +470,7 @@ _pinfo::commune_recv ()
       }
     case PICOM_PIPE_FHANDLER:
 	{
-	  HANDLE hdl;
-	  if (!ReadFile (__fromthem, &hdl, sizeof hdl, &nr, NULL)
-	      || nr != sizeof hdl)
-	    {
-	      sigproc_printf ("ReadFile hdl failed, %E");
-	      CloseHandle (hp);
-	      goto out;
-	    }
-	  CloseHandle (__fromthem); __fromthem = NULL;
-	  CloseHandle (hp);
+	  HANDLE hdl = si._si_commune._si_pipe_fhandler;
 	  unsigned int n = 0;
 	  cygheap_fdenum cfd;
 	  while (cfd.next () >= 0)
@@ -527,59 +478,34 @@ _pinfo::commune_recv ()
 	      {
 		fhandler_pipe *fh = cfd;
 		n = sizeof *fh;
-		if (!WriteFile (__tothem, &n, sizeof n, &nr, NULL))
+		if (!WriteFile (tothem, &n, sizeof n, &nr, NULL))
 		  sigproc_printf ("WriteFile sizeof hdl failed, %E");
-		else if (!WriteFile (__tothem, fh, n, &nr, NULL))
+		else if (!WriteFile (tothem, fh, n, &nr, NULL))
 		  sigproc_printf ("WriteFile hdl failed, %E");
+		break;
 	      }
-	  if (!n && !WriteFile (__tothem, &n, sizeof n, &nr, NULL))
+	  if (!n && !WriteFile (tothem, &n, sizeof n, &nr, NULL))
 	    sigproc_printf ("WriteFile sizeof hdl failed, %E");
 	  break;
 	}
     case PICOM_FD:
       {
-	int fd;
-	if (!ReadFile (__fromthem, &fd, sizeof fd, &nr, NULL)
-	    || nr != sizeof fd)
-	  {
-	    sigproc_printf ("ReadFile fd failed, %E");
-	    CloseHandle (hp);
-	    goto out;
-	  }
-	CloseHandle (__fromthem); __fromthem = NULL;
-	CloseHandle (hp);
+	int fd = si._si_commune._si_fd;
 	unsigned int n = 0;
 	cygheap_fdget cfd (fd);
 	if (cfd < 0)
 	  n = strlen (strcpy (path, "")) + 1;
 	else
 	  n = strlen (cfd->get_proc_fd_name (path)) + 1;
-	if (!WriteFile (__tothem, &n, sizeof n, &nr, NULL))
+	if (!WriteFile (tothem, &n, sizeof n, &nr, NULL))
 	  sigproc_printf ("WriteFile sizeof fd failed, %E");
-	else if (!WriteFile (__tothem, path, n, &nr, NULL))
+	else if (!WriteFile (tothem, path, n, &nr, NULL))
 	  sigproc_printf ("WriteFile fd failed, %E");
 	break;
       }
     case PICOM_FIFO:
       {
-	unsigned len;
-	if (!ReadFile (__fromthem, &len, sizeof len, &nr, NULL)
-	    || nr != sizeof len)
-	  {
-	    CloseHandle (hp);
-	    /* __seterrno ();*/	// this is run from the signal thread, so don't set errno
-	    goto out;
-	  }
-	/* Get null-terminated path */
-	if (!ReadFile (__fromthem, path, len, &nr, NULL)
-	    || nr != len)
-	  {
-	    CloseHandle (hp);
-	    /* __seterrno ();*/	// this is run from the signal thread, so don't set errno
-	    goto out;
-	  }
-
-	fhandler_fifo *fh = cygheap->fdtab.find_fifo (path);
+	fhandler_fifo *fh = cygheap->fdtab.find_fifo (si._si_commune._si_str);
 	HANDLE it[2];
 	if (fh == NULL)
 	  it[0] = it[1] = NULL;
@@ -587,46 +513,40 @@ _pinfo::commune_recv ()
 	  {
 	    it[0] = fh->get_handle ();
 	    it[1] = fh->get_output_handle ();
-	    for (int i = 0; i < 2; i++)
-	      if (!DuplicateHandle (hMainProc, it[i], hp, &it[i], 0, false,
-				    DUPLICATE_SAME_ACCESS))
-		{
-		  it[0] = it[1] = NULL;	/* FIXME: possibly left a handle open in child? */
-		  break;
-		}
-	    debug_printf ("fifo found %p, %p", it[0], it[1]);
-	    fh->close_one_end ();  /* FIXME: not quite right - need more handshaking */
 	  }
 
-	CloseHandle (hp);
-	if (!WriteFile (__tothem, it, sizeof (it), &nr, NULL))
+	debug_printf ("fifo %sfound %p, %p", fh ? "" : "not ", it[0], it[1]);
+	if (!WriteFile (tothem, it, sizeof (it), &nr, NULL))
 	  {
 	    /*__seterrno ();*/	// this is run from the signal thread, so don't set errno
 	    sigproc_printf ("WriteFile read handle failed, %E");
 	  }
-
-	ReadFile (__fromthem, &nr, sizeof (nr), &nr, NULL);
+	WaitForSingleObject (process_sync, INFINITE);
+	process_sync = NULL;
+	if (fh)
+	  fh->close_one_end ();
 	break;
       }
     }
-
-out:
-  if (__fromthem)
-    CloseHandle (__fromthem);
-  if (__tothem)
-    CloseHandle (__tothem);
+  if (process_sync)
+    {
+      WaitForSingleObject (process_sync, INFINITE);
+      ForceCloseHandle (process_sync);
+    }
+  CloseHandle (tothem);
 }
 
-#define PIPEBUFSIZE (4096 * sizeof (DWORD))
-
 commune_result
-_pinfo::commune_send (DWORD code, ...)
+_pinfo::commune_request (__uint32_t code, ...)
 {
-  HANDLE fromthem = NULL, tome = NULL;
-  HANDLE fromme = NULL, tothem = NULL;
   DWORD nr;
   commune_result res;
   va_list args;
+  siginfo_t si = {0};
+  HANDLE& hp = si._si_commune._si_process_handle;
+  HANDLE& fromthem = si._si_commune._si_read_handle;
+  HANDLE request_sync = NULL;
+  bool locked = false;
 
   va_start (args, code);
 
@@ -638,86 +558,45 @@ _pinfo::commune_send (DWORD code, ...)
       set_errno (ESRCH);
       goto err;
     }
-  if (!CreatePipe (&fromthem, &tome, &sec_all_nih, PIPEBUFSIZE))
-    {
-      sigproc_printf ("first CreatePipe failed, %E");
-      __seterrno ();
-      goto err;
-    }
-  if (!CreatePipe (&fromme, &tothem, &sec_all_nih, PIPEBUFSIZE))
-    {
-      sigproc_printf ("second CreatePipe failed, %E");
-      __seterrno ();
-      goto err;
-    }
-  myself.lock ();
-  myself->tothem = tome;
-  myself->fromthem = fromme;
-  myself->hello_pid = pid;
-  if (!WriteFile (tothem, &code, sizeof code, &nr, NULL) || nr != sizeof code)
-    {
-      __seterrno ();
-      goto err;
-    }
 
-  if (sig_send (this, __SIGCOMMUNE))
-    goto err;
-
-  /* FIXME: Need something better than an busy loop here */
-  bool isalive;
-  for (int i = 0; (isalive = alive ()) && (i < 10000); i++)
-    if (myself->hello_pid <= 0)
+  si._si_commune._si_code = code;
+  switch (code)
+    {
+    case PICOM_PIPE_FHANDLER:
+      si._si_commune._si_pipe_fhandler = va_arg (args, HANDLE);
       break;
-    else
-      low_priority_sleep (0);
 
-  CloseHandle (tome);
-  tome = NULL;
-  CloseHandle (fromme);
-  fromme = NULL;
+    case PICOM_FD:
+      si._si_commune._si_fd = va_arg (args, int);
+      break;
 
-  if (!isalive)
-    {
-      set_errno (ESRCH);
-      goto err;
+    case PICOM_FIFO:
+      si._si_commune._si_str = va_arg (args, char *);
+    break;
     }
 
-  if (myself->hello_pid < 0)
-    {
-      set_errno (ENOSYS);
-      goto err;
-    }
+  myself.lock ();
+  locked = true;
+  char name_buf[CYG_MAX_PATH];
+  request_sync = CreateSemaphore (&sec_none_nih, 0, LONG_MAX,
+				  shared_name (name_buf, "commune", myself->pid));
+  if (!request_sync)
+    goto err;
+  ProtectHandle (request_sync);
+
+  si.si_signo = __SIGCOMMUNE;
+  if (sig_send (this, si))
+    goto err;
 
   size_t n;
   switch (code)
     {
-    case PICOM_PIPE_FHANDLER:
-      {
-	HANDLE hdl = va_arg (args, HANDLE);
-	if (!WriteFile (tothem, &hdl, sizeof hdl, &nr, NULL)
-	    || nr != sizeof hdl)
-	  {
-	    __seterrno ();
-	    goto err;
-	  }
-      }
-      goto business_as_usual;
-    case PICOM_FD:
-      {
-	int fd = va_arg (args, int);
-	if (!WriteFile (tothem, &fd, sizeof fd, &nr, NULL)
-	    || nr != sizeof fd)
-	  {
-	    __seterrno ();
-	    goto err;
-	  }
-      }
-      goto business_as_usual;
     case PICOM_CMDLINE:
     case PICOM_CWD:
     case PICOM_ROOT:
     case PICOM_FDS:
-  business_as_usual:
+    case PICOM_FD:
+    case PICOM_PIPE_FHANDLER:
       if (!ReadFile (fromthem, &n, sizeof n, &nr, NULL) || nr != sizeof n)
 	{
 	  __seterrno ();
@@ -741,51 +620,42 @@ _pinfo::commune_send (DWORD code, ...)
       break;
     case PICOM_FIFO:
       {
-	char *path = va_arg (args, char *);
-	size_t len = strlen (path) + 1;
-	if (!WriteFile (tothem, &len, sizeof (len), &nr, NULL)
-	    || nr != sizeof (len))
-	  {
-	    __seterrno ();
-	    goto err;
-	  }
-	if (!WriteFile (tothem, path, len, &nr, NULL) || nr != len)
-	  {
-	    __seterrno ();
-	    goto err;
-	  }
-
 	DWORD x = ReadFile (fromthem, res.handles, sizeof (res.handles), &nr, NULL);
-	WriteFile (tothem, &x, sizeof (x), &x, NULL);
-	if (!x)
-	  goto err;
-
-	if (nr != sizeof (res.handles))
+	if (!x || nr != sizeof (res.handles))
 	  {
-	    set_errno (EPIPE);
+	    __seterrno ();
 	    goto err;
 	  }
+	for (int i = 0; i < 2; i++)
+	  if (!DuplicateHandle (hp, res.handles[i], hMainProc, &res.handles[i],
+				0, false, DUPLICATE_SAME_ACCESS))
+	    {
+	      if (i)
+		CloseHandle (res.handles[0]);
+	      res.handles[0] = res.handles[1] = NULL;	/* FIXME: possibly left a handle open in child? */
+	      goto err;
+	    }
 	break;
       }
     }
-  CloseHandle (tothem);
-  CloseHandle (fromthem);
   goto out;
 
 err:
-  if (tome)
-    CloseHandle (tome);
-  if (fromthem)
-    CloseHandle (fromthem);
-  if (tothem)
-    CloseHandle (tothem);
-  if (fromme)
-    CloseHandle (fromme);
   memset (&res, 0, sizeof (res));
 
 out:
-  myself->hello_pid = 0;
-  myself.unlock ();
+  if (request_sync)
+    {
+      LONG res;
+      ReleaseSemaphore (request_sync, 1, &res);
+      ForceCloseHandle (request_sync);
+    }
+  if (locked)
+    myself.unlock ();
+  if (hp)
+    CloseHandle (hp);
+  if (fromthem)
+    CloseHandle (fromthem);
   return res;
 }
 
@@ -796,7 +666,7 @@ _pinfo::pipe_fhandler (HANDLE hdl, size_t &n)
     return NULL;
   if (pid == myself->pid)
     return NULL;
-  commune_result cr = commune_send (PICOM_PIPE_FHANDLER, hdl);
+  commune_result cr = commune_request (PICOM_PIPE_FHANDLER, hdl);
   n = cr.n;
   return (fhandler_pipe *) cr.s;
 }
@@ -809,7 +679,7 @@ _pinfo::fd (int fd, size_t &n)
     return NULL;
   if (pid != myself->pid)
     {
-      commune_result cr = commune_send (PICOM_FD, fd);
+      commune_result cr = commune_request (PICOM_FD, fd);
       s = cr.s;
       n = cr.n;
     }
@@ -833,7 +703,7 @@ _pinfo::fds (size_t &n)
     return NULL;
   if (pid != myself->pid)
     {
-      commune_result cr = commune_send (PICOM_FDS);
+      commune_result cr = commune_request (PICOM_FDS);
       s = cr.s;
       n = cr.n;
     }
@@ -861,7 +731,7 @@ _pinfo::root (size_t& n)
     return NULL;
   if (pid != myself->pid)
     {
-      commune_result cr = commune_send (PICOM_ROOT);
+      commune_result cr = commune_request (PICOM_ROOT);
       s = cr.s;
       n = cr.n;
     }
@@ -884,7 +754,7 @@ _pinfo::cwd (size_t& n)
     return NULL;
   if (pid != myself->pid)
     {
-      commune_result cr = commune_send (PICOM_CWD);
+      commune_result cr = commune_request (PICOM_CWD);
       s = cr.s;
       n = cr.n;
     }
@@ -905,7 +775,7 @@ _pinfo::cmdline (size_t& n)
     return NULL;
   if (pid != myself->pid)
     {
-      commune_result cr = commune_send (PICOM_CMDLINE);
+      commune_result cr = commune_request (PICOM_CMDLINE);
       s = cr.s;
       n = cr.n;
     }

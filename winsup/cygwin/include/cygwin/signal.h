@@ -42,6 +42,20 @@ typedef struct sigevent
 } sigevent_t;
 
 #pragma pack(push,4)
+struct _sigcommune
+{
+  __uint32_t _si_code;
+  void *_si_read_handle;
+  void *_si_write_handle;
+  void *_si_process_handle;
+  union
+  {
+    int _si_fd;
+    void *_si_pipe_fhandler;
+    char *_si_str;
+  };
+};
+
 typedef struct
 {
   int si_signo;				/* signal number */
@@ -53,6 +67,7 @@ typedef struct
   union
   {
     __uint32_t __pad[32];		/* plan for future growth */
+    struct _sigcommune _si_commune;	/* cygwin ipc */
     union
     {
       /* timers */

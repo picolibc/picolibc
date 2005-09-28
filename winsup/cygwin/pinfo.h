@@ -22,8 +22,9 @@ struct commune_result
 
 enum picom
 {
+  PICOM_EXTRASTR = 0x80000000,
   PICOM_CMDLINE = 1,
-  PICOM_FIFO = 2,
+  PICOM_FIFO = PICOM_EXTRASTR | 2,
   PICOM_CWD = 3,
   PICOM_ROOT = 4,
   PICOM_FDS = 5,
@@ -57,9 +58,8 @@ public:
   pid_t ppid;
 
   /* dwProcessId contains the processid used for sending signals.  It
-   * will be reset in a child process when it is capable of receiving
-   * signals.
-   */
+    will be reset in a child process when it is capable of receiving
+    signals.  */
   DWORD dwProcessId;
 
   /* Used to spawn a child for fork(), among other things. */
@@ -87,11 +87,6 @@ public:
   /* Non-zero if process was stopped by a signal. */
   char stopsig;
 
-  /* commune */
-  pid_t hello_pid;
-  HANDLE tothem;
-  HANDLE fromthem;
-
   inline void set_has_pgid_children ()
   {
     if (pgid == pid)
@@ -110,10 +105,10 @@ public:
     sig_mask = mask;
   }
 
-  void commune_recv ();
-  commune_result commune_send (DWORD, ...);
+  void commune_process (siginfo_t&);
+  commune_result commune_request (__uint32_t, ...);
   bool alive ();
-  fhandler_pipe *pipe_fhandler (HANDLE hdl, size_t &);
+  fhandler_pipe *pipe_fhandler (HANDLE, size_t &);
   char *fd (int fd, size_t &);
   char *fds (size_t &);
   char *root (size_t &);
@@ -156,7 +151,6 @@ public:
   HANDLE hProcess;
   CRITICAL_SECTION _lock;
   bool waiter_ready;
-  /* Handle associated with initial Windows pid which started it all. */
   class cygthread *wait_thread;
   void init (pid_t, DWORD, HANDLE) __attribute__ ((regparm(3)));
   pinfo () {}

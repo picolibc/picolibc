@@ -526,6 +526,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
   bool its_me;
   HANDLE sendsig;
   sigpacket pack;
+  bool communing = si.si_signo == __SIGCOMMUNE;
 
   pack.wakeup = NULL;
   bool wait_for_completion;
@@ -598,8 +599,29 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	  CloseHandle (hp);
 	  goto out;
 	}
-      CloseHandle (hp);
       VerifyHandle (sendsig);
+      if (!communing)
+	CloseHandle (hp);
+      else
+	{
+	  si._si_commune._si_process_handle = hp;
+
+	  HANDLE& tome = si._si_commune._si_write_handle;
+	  HANDLE& fromthem = si._si_commune._si_read_handle;
+	  if (!CreatePipe (&fromthem, &tome, &sec_all_nih, 0))
+	    {
+	      sigproc_printf ("CreatePipe for __SIGCOMMUNE failed, %E");
+	      __seterrno ();
+	      goto out;
+	    }
+	  if (!DuplicateHandle (hMainProc, tome, hp, &tome, false, 0,
+				DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
+	    {
+	      sigproc_printf ("DuplicateHandle for __SIGCOMMUNE failed, %E");
+	      __seterrno ();
+	      goto out;
+	    }
+	}
     }
 
   sigproc_printf ("sendsig %p, pid %d, signal %d, its_me %d", sendsig, p->pid, si.si_signo, its_me);
@@ -628,8 +650,25 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
       ProtectHandle (pack.wakeup);
     }
 
+  char *leader;
+  size_t packsize;
+  if (!communing || !(si._si_commune._si_code & PICOM_EXTRASTR))
+    {
+      leader = (char *) &pack;
+      packsize = sizeof (pack);
+    }
+  else
+    {
+      size_t n = strlen (si._si_commune._si_str);
+      char *p = leader = (char *) alloca (sizeof (pack) + sizeof (n) + n);
+      memcpy (p, &pack, sizeof (pack)); p += sizeof (pack);
+      memcpy (p, &n, sizeof (n)); p += sizeof (n);
+      memcpy (p, si._si_commune._si_str, n); p += n;
+      packsize = p - leader;
+    }
+
   DWORD nb;
-  if (!WriteFile (sendsig, &pack, sizeof (pack), &nb, NULL) || nb != sizeof (pack))
+  if (!WriteFile (sendsig, leader, packsize, &nb, NULL) || nb != packsize)
     {
       /* Couldn't send to the pipe.  This probably means that the
 	 process is exiting.  */
@@ -687,8 +726,16 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 
   if (wait_for_completion && si.si_signo != __SIGFLUSHFAST)
     _my_tls.call_signal_handler ();
+  goto out;
 
 out:
+  if (communing && rc)
+    {
+      if (si._si_commune._si_process_handle)
+	CloseHandle (si._si_commune._si_process_handle);
+      if (si._si_commune._si_read_handle)
+	CloseHandle (si._si_commune._si_read_handle);
+    }
   if (pack.wakeup)
     ForceCloseHandle (pack.wakeup);
   if (si.si_signo != __SIGPENDING)
@@ -921,11 +968,23 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
 }
 
 static void
-talktome (siginfo_t& si)
+talktome (siginfo_t& si, HANDLE readsig)
 {
-  pinfo p (si.si_pid, PID_MAP_RW);
-  if (p)
-    p->commune_recv ();
+  pinfo pi (si.si_pid);
+  if (si._si_commune._si_code & PICOM_EXTRASTR)
+    {
+      size_t n;
+      DWORD nb;
+      if (!ReadFile (readsig, &n, sizeof (n), &nb, NULL) || nb != sizeof (n))
+	return;
+      // FIXME: Is alloca here?
+      si._si_commune._si_str = (char *) alloca (n + 1);
+      if (!ReadFile (readsig, si._si_commune._si_str, n, &nb, NULL) || nb != n)
+	return;
+      si._si_commune._si_str[n] = '\0';
+    }
+  if (pi)
+    pi->commune_process (si);
 }
 
 void
@@ -1039,7 +1098,7 @@ wait_sig (VOID *)
       switch (pack.si.si_signo)
 	{
 	case __SIGCOMMUNE:
-	  talktome (pack.si);
+	  talktome (pack.si, readsig);
 	  break;
 	case __SIGSTRACE:
 	  strace.hello ();
