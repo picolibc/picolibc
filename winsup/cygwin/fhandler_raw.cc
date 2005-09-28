@@ -27,52 +27,6 @@
 /**********************************************************************/
 /* fhandler_dev_raw */
 
-int
-fhandler_dev_raw::is_eom (int win_error)
-{
-  return 0;
-}
-
-int
-fhandler_dev_raw::is_eof (int)
-{
-  return 0;
-}
-
-
-/* Wrapper functions to simplify error handling. */
-
-BOOL
-fhandler_dev_raw::write_file (const void *buf, DWORD to_write,
-			      DWORD *written, int *err)
-{
-  BOOL ret;
-
-  *err = 0;
-  if (!(ret = WriteFile (get_handle (), buf, to_write, written, 0)))
-    *err = GetLastError ();
-  else
-    current_position += *written;
-  syscall_printf ("%d (err %d) = WriteFile (%d, %d, write %d, written %d, 0)",
-		  ret, *err, get_handle (), buf, to_write, *written);
-  return ret;
-}
-
-BOOL
-fhandler_dev_raw::read_file (void *buf, DWORD to_read, DWORD *read, int *err)
-{
-  BOOL ret;
-
-  *err = 0;
-  if (!(ret = ReadFile (get_handle (), buf, to_read, read, 0)))
-    *err = GetLastError ();
-  else
-    current_position += *read;
-  syscall_printf ("%d (err %d) = ReadFile (%d, %d, to_read %d, read %d, 0)",
-		  ret, *err, get_handle (), buf, to_read, *read);
-  return ret;
-}
-
 fhandler_dev_raw::fhandler_dev_raw ()
   : fhandler_base (), status ()
 {
@@ -140,205 +94,20 @@ fhandler_dev_raw::open (int flags, mode_t)
   return res;
 }
 
-void
-fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
-{
-  DWORD bytes_read = 0;
-  DWORD read2;
-  DWORD bytes_to_read;
-  int ret;
-  size_t len = ulen;
-  char *tgt;
-  char *p = (char *) ptr;
-
-  /* Checking a previous end of file */
-  if (eof_detected () && !lastblk_to_read ())
-    {
-      eof_detected (false);
-      ulen = 0;
-      return;
-    }
-
-  /* Checking a previous end of media */
-  if (eom_detected () && !lastblk_to_read ())
-    {
-      set_errno (ENOSPC);
-      goto err;
-    }
-
-  if (devbuf)
-    {
-      while (len > 0)
-	{
-	  if (devbufstart < devbufend)
-	    {
-	      bytes_to_read = min (len, devbufend - devbufstart);
-	      debug_printf ("read %d bytes from buffer (rest %d)",
-			    bytes_to_read,
-			    devbufend - devbufstart - bytes_to_read);
-	      memcpy (p, devbuf + devbufstart, bytes_to_read);
-	      len -= bytes_to_read;
-	      p += bytes_to_read;
-	      bytes_read += bytes_to_read;
-	      devbufstart += bytes_to_read;
-
-	      if (lastblk_to_read ())
-		{
-		  lastblk_to_read (false);
-		  break;
-		}
-	    }
-	  if (len > 0)
-	    {
-	      if (len >= devbufsiz)
-		{
-		  bytes_to_read = (len / bytes_per_sector) * bytes_per_sector;
-		  if (current_position + bytes_to_read >= drive_size)
-		    bytes_to_read = drive_size - current_position;
-		  tgt = p;
-		  debug_printf ("read %d bytes direct from file",bytes_to_read);
-		}
-	      else
-		{
-		  tgt = devbuf;
-		  bytes_to_read = devbufsiz;
-		  if (current_position + bytes_to_read >= drive_size)
-		    bytes_to_read = drive_size - current_position;
-		  debug_printf ("read %d bytes from file into buffer",
-				bytes_to_read);
-		}
-	      if (!bytes_to_read)
-		{
-		  eom_detected (true);
-		  break;
-		}
-
-	      if (!read_file (tgt, bytes_to_read, &read2, &ret))
-		{
-		  if (!is_eof (ret) && !is_eom (ret))
-		    {
-		      __seterrno ();
-		      goto err;
-		    }
-
-		  if (is_eof (ret))
-		    eof_detected (true);
-		  else
-		    eom_detected (true);
-
-		  if (!read2)
-		    {
-		      if (!bytes_read && is_eom (ret))
-			{
-			  debug_printf ("return -1, set errno to ENOSPC");
-			  set_errno (ENOSPC);
-			  goto err;
-			}
-		      break;
-		    }
-		  lastblk_to_read (true);
-		}
-	      if (!read2)
-	       break;
-	      if (tgt == devbuf)
-		{
-		  devbufstart = 0;
-		  devbufend = read2;
-		}
-	      else
-		{
-		  len -= read2;
-		  p += read2;
-		  bytes_read += read2;
-		}
-	    }
-	}
-    }
-  else if (!read_file (p, len, &bytes_read, &ret))
-    {
-      if (!is_eof (ret) && !is_eom (ret))
-	{
-	  __seterrno ();
-	  goto err;
-	}
-      if (bytes_read)
-	{
-	  if (is_eof (ret))
-	    eof_detected (true);
-	  else
-	    eom_detected (true);
-	}
-      else if (is_eom (ret))
-	{
-	  debug_printf ("return -1, set errno to ENOSPC");
-	  set_errno (ENOSPC);
-	  goto err;
-	}
-    }
-
-  ulen = (size_t) bytes_read;
-  return;
-
-err:
-  ulen = (size_t) -1;
-}
-
-int
-fhandler_dev_raw::raw_write (const void *ptr, size_t len)
-{
-  DWORD bytes_written = 0;
-  char *p = (char *) ptr;
-  int ret;
-
-  /* Checking a previous end of media on tape */
-  if (eom_detected ())
-    {
-      set_errno (ENOSPC);
-      return -1;
-    }
-
-  /* Invalidate buffer. */
-  devbufstart = devbufend = 0;
-
-  if (len > 0)
-    {
-      if (!write_file (p, len, &bytes_written, &ret))
-	{
-	  if (!is_eom (ret))
-	    {
-	      __seterrno ();
-	      return -1;
-	    }
-	  eom_detected (true);
-	  if (!bytes_written)
-	    {
-	      set_errno (ENOSPC);
-	      return -1;
-	    }
-	}
-    }
-  return bytes_written;
-}
-
 int
 fhandler_dev_raw::dup (fhandler_base *child)
 {
   int ret = fhandler_base::dup (child);
 
-  if (! ret)
+  if (!ret)
     {
       fhandler_dev_raw *fhc = (fhandler_dev_raw *) child;
 
-      fhc->drive_size = drive_size;
-      fhc->current_position = current_position;
-      fhc->bytes_per_sector = bytes_per_sector;
       fhc->devbufsiz = devbufsiz;
       if (devbufsiz > 1L)
 	fhc->devbuf = new char [devbufsiz];
       fhc->devbufstart = 0;
       fhc->devbufend = 0;
-      fhc->eom_detected (eom_detected ());
-      fhc->eof_detected (eof_detected ());
       fhc->lastblk_to_read (false);
     }
   return ret;
@@ -385,8 +154,6 @@ fhandler_dev_raw::ioctl (unsigned int cmd, void *buf)
 		mop.mt_count = op->rd_parm;
 		ret = ioctl (MTIOCTOP, &mop);
 	      }
-	    else if (op->rd_parm % bytes_per_sector)
-	      ret = ERROR_INVALID_PARAMETER;
 	    else if (devbuf && op->rd_parm < devbufend - devbufstart)
 	      ret = ERROR_INVALID_PARAMETER;
 	    else if (!devbuf || op->rd_parm != devbufsiz)

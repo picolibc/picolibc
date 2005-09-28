@@ -551,36 +551,18 @@ public:
 class fhandler_dev_raw: public fhandler_base
 {
  protected:
-  _off64_t drive_size;
-  _off64_t current_position;
-  unsigned long bytes_per_sector;
   char *devbuf;
   size_t devbufsiz;
   size_t devbufstart;
   size_t devbufend;
   struct status_flags
   {
-    unsigned eom_detected    : 1;
-    unsigned eof_detected    : 1;
     unsigned lastblk_to_read : 1;
    public:
-    status_flags () :
-      eom_detected (0), eof_detected (0), lastblk_to_read (0)
-      {}
+    status_flags () : lastblk_to_read (0) {}
   } status;
 
-  IMPLEMENT_STATUS_FLAG (bool, eom_detected)
-  IMPLEMENT_STATUS_FLAG (bool, eof_detected)
   IMPLEMENT_STATUS_FLAG (bool, lastblk_to_read)
-
-  virtual BOOL write_file (const void *buf, DWORD to_write,
-			   DWORD *written, int *err);
-  virtual BOOL read_file (void *buf, DWORD to_read, DWORD *read, int *err);
-
-  /* returns not null, if `win_error' determines an end of media condition */
-  virtual int is_eom(int win_error);
-  /* returns not null, if `win_error' determines an end of file condition */
-  virtual int is_eof(int win_error);
 
   fhandler_dev_raw ();
 
@@ -588,13 +570,10 @@ class fhandler_dev_raw: public fhandler_base
   ~fhandler_dev_raw ();
 
   int open (int flags, mode_t mode = 0);
-  void raw_read (void *ptr, size_t& ulen);
-  int raw_write (const void *ptr, size_t ulen);
 
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
 
   int dup (fhandler_base *child);
-
   int ioctl (unsigned int cmd, void *buf);
 
   void fixup_after_fork (HANDLE);
@@ -604,20 +583,32 @@ class fhandler_dev_raw: public fhandler_base
 class fhandler_dev_floppy: public fhandler_dev_raw
 {
  private:
+  _off64_t drive_size;
+  unsigned long bytes_per_sector;
+  struct status_flags
+  {
+    unsigned eom_detected    : 1;
+   public:
+    status_flags () : eom_detected (0) {}
+  } status;
+
+  IMPLEMENT_STATUS_FLAG (bool, eom_detected)
+
+  inline _off64_t get_current_position ();
   int fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo);
 
- protected:
-  virtual int is_eom (int win_error);
-  virtual int is_eof (int win_error);
+  BOOL write_file (const void *buf, DWORD to_write, DWORD *written, int *err);
+  BOOL read_file (void *buf, DWORD to_read, DWORD *read, int *err);
 
  public:
   fhandler_dev_floppy ();
 
-  virtual int open (int flags, mode_t mode = 0);
-
-  virtual _off64_t lseek (_off64_t offset, int whence);
-
-  virtual int ioctl (unsigned int cmd, void *buf);
+  int open (int flags, mode_t mode = 0);
+  int dup (fhandler_base *child);
+  void raw_read (void *ptr, size_t& ulen);
+  int raw_write (const void *ptr, size_t ulen);
+  _off64_t lseek (_off64_t offset, int whence);
+  int ioctl (unsigned int cmd, void *buf);
 };
 
 class fhandler_dev_tape: public fhandler_dev_raw

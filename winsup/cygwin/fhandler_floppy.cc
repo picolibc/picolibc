@@ -14,6 +14,7 @@ details. */
 #include <unistd.h>
 #include <winioctl.h>
 #include <asm/socket.h>
+#include <cygwin/rdevio.h>
 #include <cygwin/hdreg.h>
 #include <cygwin/fs.h>
 #include "cygerrno.h"
@@ -21,31 +22,15 @@ details. */
 #include "path.h"
 #include "fhandler.h"
 
+#define IS_EOM(err)	((err) == ERROR_INVALID_PARAMETER \
+			 || (err) == ERROR_SEEK \
+			 || (err) == ERROR_SECTOR_NOT_FOUND)
+
 /**********************************************************************/
 /* fhandler_dev_floppy */
 
-int
-fhandler_dev_floppy::is_eom (int win_error)
-{
-  int ret = (win_error == ERROR_INVALID_PARAMETER
-	     || win_error == ERROR_SEEK
-	     || win_error == ERROR_SECTOR_NOT_FOUND);
-  if (ret)
-    debug_printf ("end of medium");
-  return ret;
-}
-
-int
-fhandler_dev_floppy::is_eof (int)
-{
-  int ret = 0;
-  if (ret)
-    debug_printf ("end of file");
-  return ret;
-}
-
 fhandler_dev_floppy::fhandler_dev_floppy ()
-  : fhandler_dev_raw ()
+  : fhandler_dev_raw (), status ()
 {
 }
 
@@ -62,9 +47,22 @@ fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo)
 
   /* Always try using the new EX ioctls first (>= XP).  If not available,
      fall back to trying the old non-EX ioctls. */
-  if (!DeviceIoControl (get_handle (),
-			IOCTL_DISK_GET_DRIVE_GEOMETRY_EX, NULL, 0,
-			dbuf, 256, &bytes_read, NULL))
+  if (wincap.has_disk_ex_ioctls ())
+    {
+      if (!DeviceIoControl (get_handle (),
+			    IOCTL_DISK_GET_DRIVE_GEOMETRY_EX, NULL, 0,
+			    dbuf, 256, &bytes_read, NULL))
+	{
+	  __seterrno ();
+	  return -1;
+	}
+      di = &((DISK_GEOMETRY_EX *) dbuf)->Geometry;
+      if (DeviceIoControl (get_handle (),
+			   IOCTL_DISK_GET_PARTITION_INFO_EX, NULL, 0,
+			   pbuf, 256, &bytes_read, NULL))
+	pix = (PARTITION_INFORMATION_EX *) pbuf;
+    }
+  else
     {
       if (!DeviceIoControl (get_handle (),
 			    IOCTL_DISK_GET_DRIVE_GEOMETRY, NULL, 0,
@@ -74,18 +72,11 @@ fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo)
 	  return -1;
 	}
       di = (DISK_GEOMETRY *) dbuf;
+      if (DeviceIoControl (get_handle (),
+			   IOCTL_DISK_GET_PARTITION_INFO, NULL, 0,
+			   pbuf, 256, &bytes_read, NULL))
+	pi = (PARTITION_INFORMATION *) pbuf;
     }
-  else
-    di = &((DISK_GEOMETRY_EX *) dbuf)->Geometry;
-    
-  if (DeviceIoControl (get_handle (),
-		       IOCTL_DISK_GET_PARTITION_INFO_EX, NULL, 0,
-		       pbuf, 256, &bytes_read, NULL))
-    pix = (PARTITION_INFORMATION_EX *) pbuf;
-  else if (DeviceIoControl (get_handle (),
-			    IOCTL_DISK_GET_PARTITION_INFO, NULL, 0,
-			    pbuf, 256, &bytes_read, NULL))
-    pi = (PARTITION_INFORMATION *) pbuf;
 
   debug_printf ("disk geometry: (%ld cyl)*(%ld trk)*(%ld sec)*(%ld bps)",
 		 di->Cylinders.LowPart,
@@ -132,22 +123,46 @@ fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo)
   return 0;
 }
 
+/* Wrapper functions for ReadFile and WriteFile to simplify error handling. */
+BOOL
+fhandler_dev_floppy::read_file (void *buf, DWORD to_read, DWORD *read, int *err)
+{
+  BOOL ret;
+
+  *err = 0;
+  if (!(ret = ReadFile (get_handle (), buf, to_read, read, 0)))
+    *err = GetLastError ();
+  syscall_printf ("%d (err %d) = ReadFile (%d, %d, to_read %d, read %d, 0)",
+		  ret, *err, get_handle (), buf, to_read, *read);
+  return ret;
+}
+
+BOOL
+fhandler_dev_floppy::write_file (const void *buf, DWORD to_write,
+				 DWORD *written, int *err)
+{
+  BOOL ret;
+
+  *err = 0;
+  if (!(ret = WriteFile (get_handle (), buf, to_write, written, 0)))
+    *err = GetLastError ();
+  syscall_printf ("%d (err %d) = WriteFile (%d, %d, write %d, written %d, 0)",
+		  ret, *err, get_handle (), buf, to_write, *written);
+  return ret;
+}
+
 int
 fhandler_dev_floppy::open (int flags, mode_t)
 {
-  /* The correct size of the buffer would be 512 bytes,
-   * which is the atomic size, supported by WinNT.
-   * Unfortunately, the performance is worse than
-   * access to file system on same device!
-   * Setting buffer size to a relatively big value
-   * increases performance by means.
-   * The new ioctl call with 'rdevio.h' header file
-   * supports changing this value.
-   *
-   * Let's be smart: Let's take a multiplier of typical tar
-   * and cpio buffer sizes by default!
-  */
-  devbufsiz = 61440L; /* 512L; */
+  /* The correct size of the buffer would be 512 bytes, which is the atomic
+     size, supported by WinNT.  Unfortunately, the performance is worse than
+     access to file system on same device!  Setting buffer size to a
+     relatively big value increases performance by means.  The new ioctl call
+     with 'rdevio.h' header file supports changing this value.
+
+     Let's try to be smart: Let's take a multiple of typical tar and cpio
+     buffer sizes by default. */
+  devbufsiz = 61440L;
   int ret =  fhandler_dev_raw::open (flags);
 
   if (ret && get_drive_info (NULL))
@@ -159,59 +174,244 @@ fhandler_dev_floppy::open (int flags, mode_t)
   return ret;
 }
 
+int
+fhandler_dev_floppy::dup (fhandler_base *child)
+{
+  int ret = fhandler_dev_raw::dup (child);
+
+  if (!ret)
+    {
+      fhandler_dev_floppy *fhc = (fhandler_dev_floppy *) child;
+
+      fhc->drive_size = drive_size;
+      fhc->bytes_per_sector = bytes_per_sector;
+      fhc->eom_detected (eom_detected ());
+    }
+  return ret;
+}
+
+inline _off64_t
+fhandler_dev_floppy::get_current_position ()
+{
+  LARGE_INTEGER off = { QuadPart: 0LL };
+  off.LowPart = SetFilePointer (get_handle (), 0, &off.HighPart, FILE_CURRENT);
+  return off.QuadPart;
+}
+
+void
+fhandler_dev_floppy::raw_read (void *ptr, size_t& ulen)
+{
+  DWORD bytes_read = 0;
+  DWORD read2;
+  DWORD bytes_to_read;
+  int ret;
+  size_t len = ulen;
+  char *tgt;
+  char *p = (char *) ptr;
+
+  /* Checking a previous end of media */
+  if (eom_detected () && !lastblk_to_read ())
+    {
+      set_errno (ENOSPC);
+      goto err;
+    }
+
+  if (devbuf)
+    {
+      while (len > 0)
+	{
+	  if (devbufstart < devbufend)
+	    {
+	      bytes_to_read = min (len, devbufend - devbufstart);
+	      debug_printf ("read %d bytes from buffer (rest %d)",
+			    bytes_to_read,
+			    devbufend - devbufstart - bytes_to_read);
+	      memcpy (p, devbuf + devbufstart, bytes_to_read);
+	      len -= bytes_to_read;
+	      p += bytes_to_read;
+	      bytes_read += bytes_to_read;
+	      devbufstart += bytes_to_read;
+
+	      if (lastblk_to_read ())
+		{
+		  lastblk_to_read (false);
+		  break;
+		}
+	    }
+	  if (len > 0)
+	    {
+	      if (len >= devbufsiz)
+		{
+		  bytes_to_read = (len / bytes_per_sector) * bytes_per_sector;
+		  tgt = p;
+		}
+	      else
+		{
+		  tgt = devbuf;
+		  bytes_to_read = devbufsiz;
+		}
+	      _off64_t current_position = get_current_position ();
+	      if (current_position + bytes_to_read >= drive_size)
+		bytes_to_read = drive_size - current_position;
+	      if (!bytes_to_read)
+		{
+		  eom_detected (true);
+		  break;
+		}
+
+	      debug_printf ("read %d bytes %s", bytes_to_read,
+			    len < devbufsiz ? "into buffer" : "directly");
+	      if (!read_file (tgt, bytes_to_read, &read2, &ret))
+		{
+		  if (!IS_EOM (ret))
+		    {
+		      __seterrno ();
+		      goto err;
+		    }
+
+		  eom_detected (true);
+
+		  if (!read2)
+		    {
+		      if (!bytes_read)
+			{
+			  debug_printf ("return -1, set errno to ENOSPC");
+			  set_errno (ENOSPC);
+			  goto err;
+			}
+		      break;
+		    }
+		  lastblk_to_read (true);
+		}
+	      if (!read2)
+	       break;
+	      if (tgt == devbuf)
+		{
+		  devbufstart = 0;
+		  devbufend = read2;
+		}
+	      else
+		{
+		  len -= read2;
+		  p += read2;
+		  bytes_read += read2;
+		}
+	    }
+	}
+    }
+  else if (!read_file (p, len, &bytes_read, &ret))
+    {
+      if (!IS_EOM (ret))
+	{
+	  __seterrno ();
+	  goto err;
+	}
+      if (bytes_read)
+	eom_detected (true);
+      else
+	{
+	  debug_printf ("return -1, set errno to ENOSPC");
+	  set_errno (ENOSPC);
+	  goto err;
+	}
+    }
+
+  ulen = (size_t) bytes_read;
+  return;
+
+err:
+  ulen = (size_t) -1;
+}
+
+int
+fhandler_dev_floppy::raw_write (const void *ptr, size_t len)
+{
+  DWORD bytes_written = 0;
+  char *p = (char *) ptr;
+  int ret;
+
+  /* Checking a previous end of media on tape */
+  if (eom_detected ())
+    {
+      set_errno (ENOSPC);
+      return -1;
+    }
+
+  /* Invalidate buffer. */
+  devbufstart = devbufend = 0;
+
+  if (len > 0)
+    {
+      if (!write_file (p, len, &bytes_written, &ret))
+	{
+	  if (!IS_EOM (ret))
+	    {
+	      __seterrno ();
+	      return -1;
+	    }
+	  eom_detected (true);
+	  if (!bytes_written)
+	    {
+	      set_errno (ENOSPC);
+	      return -1;
+	    }
+	}
+    }
+  return bytes_written;
+}
+
 _off64_t
 fhandler_dev_floppy::lseek (_off64_t offset, int whence)
 {
   char buf[512];
   _off64_t lloffset = offset;
-  _off64_t sector_aligned_offset;
+  LARGE_INTEGER sector_aligned_offset;
   _off64_t bytes_left;
-  DWORD low;
-  LONG high = 0;
 
-  if (whence == SEEK_END && drive_size > 0)
+  if (whence == SEEK_END)
     {
-      lloffset = offset + drive_size;
+      lloffset += drive_size;
+      whence = SEEK_SET;
+    }
+  else if (whence == SEEK_CUR)
+    {
+      lloffset += get_current_position () - (devbufend - devbufstart);
       whence = SEEK_SET;
     }
 
-  if (whence == SEEK_CUR)
-    {
-      lloffset += current_position - (devbufend - devbufstart);
-      whence = SEEK_SET;
-    }
-
-  if (whence != SEEK_SET
-      || lloffset < 0
-      || drive_size > 0 && lloffset >= drive_size)
+  if (whence != SEEK_SET || lloffset < 0 || lloffset >= drive_size)
     {
       set_errno (EINVAL);
       return -1;
     }
 
-  sector_aligned_offset = (lloffset / bytes_per_sector) * bytes_per_sector;
-  bytes_left = lloffset - sector_aligned_offset;
+  sector_aligned_offset.QuadPart = (lloffset / bytes_per_sector)
+				   * bytes_per_sector;
+  bytes_left = lloffset - sector_aligned_offset.QuadPart;
 
   /* Invalidate buffer. */
   devbufstart = devbufend = 0;
 
-  low = sector_aligned_offset & UINT32_MAX;
-  high = sector_aligned_offset >> 32;
-  if (SetFilePointer (get_handle (), low, &high, FILE_BEGIN)
-      == INVALID_SET_FILE_POINTER && GetLastError ())
+  sector_aligned_offset.LowPart =
+			SetFilePointer (get_handle (),
+					sector_aligned_offset.LowPart,
+					&sector_aligned_offset.HighPart,
+					FILE_BEGIN);
+  if (sector_aligned_offset.LowPart == INVALID_SET_FILE_POINTER
+      && GetLastError ())
     {
       __seterrno ();
       return -1;
     }
 
   eom_detected (false);
-  current_position = sector_aligned_offset;
+
   if (bytes_left)
     {
       size_t len = bytes_left;
       raw_read (buf, len);
     }
-  return current_position + bytes_left;
+  return sector_aligned_offset.QuadPart + bytes_left;
 }
 
 int
@@ -257,6 +457,18 @@ fhandler_dev_floppy::ioctl (unsigned int cmd, void *buf)
 	*(int *)buf = bytes_per_sector;
 	return 0;
       }
+    case RDSETBLK:
+      /* Just check the restriction that blocksize must be a multiple
+         of the sector size of the underlying volume sector size,
+	 then fall through to fhandler_dev_raw::ioctl. */
+      struct rdop *op = (struct rdop *) buf;
+      if (op->rd_parm % bytes_per_sector)
+	{
+	  SetLastError (ERROR_INVALID_PARAMETER);
+	  __seterrno ();
+	  return -1;
+	}
+      /*FALLTHRUGH*/
     default:
       return fhandler_dev_raw::ioctl (cmd, buf);
     }

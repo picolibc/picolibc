@@ -61,6 +61,7 @@ struct wincaps
   unsigned has_guid_volumes				: 1;
   unsigned detect_win16_exe				: 1;
   unsigned has_null_console_handler_routine		: 1;
+  unsigned has_disk_ex_ioctls				: 1;
 };
 
 class wincapc
@@ -126,6 +127,7 @@ public:
   bool	IMPLEMENT (has_guid_volumes)
   bool	IMPLEMENT (detect_win16_exe)
   bool	IMPLEMENT (has_null_console_handler_routine)
+  bool	IMPLEMENT (has_disk_ex_ioctls)
 
 #undef IMPLEMENT
 };
