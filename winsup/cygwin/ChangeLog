@@ -165,8 +165,8 @@
 
 2005-09-26  Christopher Faylor  <cgf@timesys.com>
 
-	* exceptions.cc (handle_exceptions): Just si_code to SI_KERNEL first
-	and let it be overridden.
+	* exceptions.cc (handle_exceptions): Just set si_code to SI_KERNEL
+	first and let it be overridden.
 
 2005-09-26  Yitzchak Scott-Thoennes  <sthoenna@efn.org>
 
