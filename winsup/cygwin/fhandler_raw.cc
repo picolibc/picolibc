@@ -321,9 +321,9 @@ fhandler_dev_raw::raw_write (const void *ptr, size_t len)
 }
 
 int
-fhandler_dev_raw::dup (fhandler_base *child, HANDLE from_proc)
+fhandler_dev_raw::dup (fhandler_base *child)
 {
-  int ret = fhandler_base::dup (child, from_proc);
+  int ret = fhandler_base::dup (child);
 
   if (! ret)
     {
@@ -345,9 +345,8 @@ fhandler_dev_raw::dup (fhandler_base *child, HANDLE from_proc)
 }
 
 void
-fhandler_dev_raw::fixup_after_fork (HANDLE parent)
+fhandler_dev_raw::fixup_after_fork (HANDLE)
 {
-  fhandler_base::fixup_after_fork (parent);
   devbufstart = 0;
   devbufend = 0;
   lastblk_to_read (false);

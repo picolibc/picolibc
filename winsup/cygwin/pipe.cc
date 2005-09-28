@@ -60,7 +60,7 @@ fhandler_pipe::open (int flags, mode_t mode)
 	      set_errno (EACCES);
 	      return 0;
 	    }
-	  if (!cfd->dup (this, hMainProc))
+	  if (!cfd->dup (this))
 	    return 1;
 	  return 0;
 	}
@@ -246,7 +246,7 @@ debug_printf ("here");
 }
 
 int
-fhandler_pipe::dup (fhandler_base *child, HANDLE from_proc)
+fhandler_pipe::dup (fhandler_base *child)
 {
   int res = -1;
   fhandler_pipe *ftp = (fhandler_pipe *) child;
@@ -254,14 +254,14 @@ fhandler_pipe::dup (fhandler_base *child, HANDLE from_proc)
 
   if (get_handle ())
     {
-      res = fhandler_base::dup (child, from_proc);
+      res = fhandler_base::dup (child);
       if (res)
 	goto err;
     }
 
   if (guard == NULL)
     ftp->guard = NULL;
-  else if (!DuplicateHandle (from_proc, guard, hMainProc, &ftp->guard, 0, 1,
+  else if (!DuplicateHandle (hMainProc, guard, hMainProc, &ftp->guard, 0, 1,
 			     DUPLICATE_SAME_ACCESS))
     {
       debug_printf ("couldn't duplicate guard %p, %E", guard);
@@ -270,7 +270,7 @@ fhandler_pipe::dup (fhandler_base *child, HANDLE from_proc)
 
   if (writepipe_exists == NULL)
     ftp->writepipe_exists = NULL;
-  else if (!DuplicateHandle (from_proc, writepipe_exists, hMainProc,
+  else if (!DuplicateHandle (hMainProc, writepipe_exists, hMainProc,
 			     &ftp->writepipe_exists, 0, 1,
 			     DUPLICATE_SAME_ACCESS))
     {
@@ -280,7 +280,7 @@ fhandler_pipe::dup (fhandler_base *child, HANDLE from_proc)
 
   if (read_state == NULL)
     ftp->read_state = NULL;
-  else if (!DuplicateHandle (from_proc, read_state, hMainProc,
+  else if (!DuplicateHandle (hMainProc, read_state, hMainProc,
 			     &ftp->read_state, 0, 0,
 			     DUPLICATE_SAME_ACCESS))
     {

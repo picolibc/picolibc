@@ -408,9 +408,9 @@ fhandler_dev_mem::fstat (struct __stat64 *buf)
 }
 
 int
-fhandler_dev_mem::dup (fhandler_base *child, HANDLE from_proc)
+fhandler_dev_mem::dup (fhandler_base *child)
 {
-  int ret = fhandler_base::dup (child, from_proc);
+  int ret = fhandler_base::dup (child);
 
   if (! ret)
     {

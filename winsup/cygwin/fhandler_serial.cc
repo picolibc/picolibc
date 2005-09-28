@@ -1069,11 +1069,11 @@ fhandler_serial::fixup_after_exec ()
 }
 
 int
-fhandler_serial::dup (fhandler_base *child, HANDLE from_proc)
+fhandler_serial::dup (fhandler_base *child)
 {
   fhandler_serial *fhc = (fhandler_serial *) child;
   fhc->overlapped_setup ();
   fhc->vmin_ = vmin_;
   fhc->vtime_ = vtime_;
-  return fhandler_base::dup (child, from_proc);
+  return fhandler_base::dup (child);
 }

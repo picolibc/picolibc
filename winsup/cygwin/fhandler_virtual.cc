@@ -146,9 +146,9 @@ fhandler_virtual::lseek (_off64_t offset, int whence)
 }
 
 int
-fhandler_virtual::dup (fhandler_base * child, HANDLE from_proc)
+fhandler_virtual::dup (fhandler_base * child)
 {
-  int ret = fhandler_base::dup (child, from_proc);
+  int ret = fhandler_base::dup (child);
 
   if (!ret)
     {

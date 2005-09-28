@@ -179,14 +179,14 @@ out:
 }
 
 int
-fhandler_fifo::dup (fhandler_base *child, HANDLE from_proc)
+fhandler_fifo::dup (fhandler_base *child)
 {
-  int res = fhandler_pipe::dup (child, from_proc);
+  int res = fhandler_pipe::dup (child);
   if (!res)
     {
       fhandler_fifo *ff = (fhandler_fifo *) child;
       if (get_output_handle ()
-	  && !DuplicateHandle (from_proc, get_output_handle (), hMainProc,
+	  && !DuplicateHandle (hMainProc, get_output_handle (), hMainProc,
 			       &ff->get_output_handle (), false, true,
 			       DUPLICATE_SAME_ACCESS))
 	{

@@ -915,12 +915,9 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
 }
 
 int
-fhandler_tty_slave::dup (fhandler_base *child, HANDLE from_proc)
+fhandler_tty_slave::dup (fhandler_base *child)
 {
   fhandler_tty_slave *arch = (fhandler_tty_slave *) archetype;
-  if (!arch)	/* Might happen on descriptor passing */
-    return !((fhandler_tty_slave *) child)->open (get_flags (), 0);
-
   *(fhandler_tty_slave *) child = *arch;
   child->usecount = 0;
   arch->usecount++;
@@ -931,7 +928,7 @@ fhandler_tty_slave::dup (fhandler_base *child, HANDLE from_proc)
 }
 
 int
-fhandler_tty_common::dup (fhandler_base *child, HANDLE from_proc)
+fhandler_tty_common::dup (fhandler_base *child)
 {
   fhandler_tty_slave *fts = (fhandler_tty_slave *) child;
   int errind;
@@ -944,7 +941,7 @@ fhandler_tty_common::dup (fhandler_base *child, HANDLE from_proc)
 
   if (output_done_event == NULL)
     fts->output_done_event = NULL;
-  else if (!DuplicateHandle (from_proc, output_done_event, hMainProc,
+  else if (!DuplicateHandle (hMainProc, output_done_event, hMainProc,
 			     &fts->output_done_event, 0, 1,
 			     DUPLICATE_SAME_ACCESS))
     {
@@ -953,7 +950,7 @@ fhandler_tty_common::dup (fhandler_base *child, HANDLE from_proc)
     }
   if (ioctl_request_event == NULL)
     fts->ioctl_request_event = NULL;
-  else if (!DuplicateHandle (from_proc, ioctl_request_event, hMainProc,
+  else if (!DuplicateHandle (hMainProc, ioctl_request_event, hMainProc,
 			     &fts->ioctl_request_event, 0, 1,
 			     DUPLICATE_SAME_ACCESS))
     {
@@ -962,35 +959,35 @@ fhandler_tty_common::dup (fhandler_base *child, HANDLE from_proc)
     }
   if (ioctl_done_event == NULL)
     fts->ioctl_done_event = NULL;
-  else if (!DuplicateHandle (from_proc, ioctl_done_event, hMainProc,
+  else if (!DuplicateHandle (hMainProc, ioctl_done_event, hMainProc,
 			     &fts->ioctl_done_event, 0, 1,
 			     DUPLICATE_SAME_ACCESS))
     {
       errind = 3;
       goto err;
     }
-  if (!DuplicateHandle (from_proc, input_available_event, hMainProc,
+  if (!DuplicateHandle (hMainProc, input_available_event, hMainProc,
 			&fts->input_available_event, 0, 1,
 			DUPLICATE_SAME_ACCESS))
     {
       errind = 4;
       goto err;
     }
-  if (!DuplicateHandle (from_proc, output_mutex, hMainProc,
+  if (!DuplicateHandle (hMainProc, output_mutex, hMainProc,
 			&fts->output_mutex, 0, 1,
 			DUPLICATE_SAME_ACCESS))
     {
       errind = 5;
       goto err;
     }
-  if (!DuplicateHandle (from_proc, input_mutex, hMainProc,
+  if (!DuplicateHandle (hMainProc, input_mutex, hMainProc,
 			&fts->input_mutex, 0, 1,
 			DUPLICATE_SAME_ACCESS))
     {
       errind = 6;
       goto err;
     }
-  if (!DuplicateHandle (from_proc, get_handle (), hMainProc,
+  if (!DuplicateHandle (hMainProc, get_handle (), hMainProc,
 			&nh, 0, 1,
 			DUPLICATE_SAME_ACCESS))
     {
@@ -999,7 +996,7 @@ fhandler_tty_common::dup (fhandler_base *child, HANDLE from_proc)
     }
   fts->set_io_handle (nh);
 
-  if (!DuplicateHandle (from_proc, get_output_handle (), hMainProc,
+  if (!DuplicateHandle (hMainProc, get_output_handle (), hMainProc,
 			&nh, 0, 1,
 			DUPLICATE_SAME_ACCESS))
     {
@@ -1010,7 +1007,7 @@ fhandler_tty_common::dup (fhandler_base *child, HANDLE from_proc)
 
   if (inuse == NULL)
     fts->inuse = NULL;
-  else if (!DuplicateHandle (from_proc, inuse, hMainProc,
+  else if (!DuplicateHandle (hMainProc, inuse, hMainProc,
 			     &fts->inuse, 0, 1,
 			     DUPLICATE_SAME_ACCESS))
     {

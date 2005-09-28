@@ -75,7 +75,6 @@ details. */
 #include "shared_info.h"
 #include "registry.h"
 #include "cygtls.h"
-#include "ntdll.h"
 #include <assert.h>
 
 static int normalize_win32_path (const char *, char *, char *&);
@@ -489,29 +488,25 @@ path_conv::set_normalized_path (const char *path_copy, bool strip_tail)
 PUNICODE_STRING
 path_conv::get_nt_native_path (UNICODE_STRING &upath)
 {
-  if (path[0] == '\\' && path[1] != '\\')
+  if (path[0] != '\\')			/* X:\...  or NUL, etc. */
     {
-      /* This handles all paths already given in NT speak.  On writing this
-         comment, these are the raw device paths. */
-      if (RtlCreateUnicodeStringFromAsciiz (&upath, path))
-	return &upath;
+      str2uni_cat (upath, "\\??\\");
+      str2uni_cat (upath, path);
     }
-  else
+  else if (path[1] != '\\')		/* \Device\... */
+    str2uni_cat (upath, path);
+  else if (path[2] != '.'
+	   || path[3] != '\\')		/* \\server\share\... */
     {
-      wchar_t wc_path[CYG_MAX_PATH];
-      sys_mbstowcs (wc_path, path, CYG_MAX_PATH);
-      if (RtlDosPathNameToNtPathName_U (wc_path, &upath, NULL, NULL))
-	{
-#ifdef DEBUGGING
-	  char nt_path[CYG_MAX_PATH + 7];
-	  sys_wcstombs (nt_path, upath.Buffer, CYG_MAX_PATH + 7);
-	  debug_printf ("DOS: <%s> NT: <%s>", path, nt_path);
-#endif
-	  return &upath;
-	}
+      str2uni_cat (upath, "\\??\\UNC\\");
+      str2uni_cat (upath, path + 2);
     }
-  set_errno (ENOMEM);
-  return NULL;
+  else					/* \\.\device */
+    {
+      str2uni_cat (upath, "\\??\\");
+      str2uni_cat (upath, path + 4);
+    }
+  return &upath;
 }
 
 /* Convert an arbitrary path SRC to a pure Win32 path, suitable for

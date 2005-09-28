@@ -706,7 +706,7 @@ fhandler_console::close ()
  */
 
 int
-fhandler_console::dup (fhandler_base *child, HANDLE from_proc)
+fhandler_console::dup (fhandler_base *child)
 {
   fhandler_console *fhc = (fhandler_console *) child;
 

@@ -507,8 +507,4 @@ extern "C"
   VOID NTAPI RtlInitUnicodeString (PUNICODE_STRING, PCWSTR);
   ULONG NTAPI RtlNtStatusToDosError (NTSTATUS);
   ULONG WINAPI RtlIsDosDeviceName_U (PCWSTR);
-  ULONG WINAPI RtlDosPathNameToNtPathName_U (PCWSTR, PUNICODE_STRING,
-					     PCWSTR *, PUNICODE_STRING);
-  ULONG WINAPI RtlCreateUnicodeStringFromAsciiz (PUNICODE_STRING, PCSTR);
-  ULONG WINAPI RtlFreeUnicodeString (PUNICODE_STRING);
 }

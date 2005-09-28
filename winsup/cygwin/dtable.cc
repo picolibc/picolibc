@@ -334,7 +334,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
     }
 }
 
-#define cnew(name) new ((void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_union))) name
+#define cnew(name) new ((void *) ccalloc (HEAP_FHANDLER, 1, sizeof (name))) name
 fhandler_base *
 build_fh_name (const char *name, HANDLE h, unsigned opt, suffix_info *si)
 {
@@ -495,7 +495,7 @@ dtable::dup_worker (fhandler_base *oldfh)
     {
       *newfh = *oldfh;
       newfh->set_io_handle (NULL);
-      if (oldfh->dup (newfh, hMainProc))
+      if (oldfh->dup (newfh))
 	{
 	  cfree (newfh);
 	  debug_printf ("oldfh->dup failed");

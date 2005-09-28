@@ -1,6 +1,6 @@
 /* cygwin/socket.h
 
-   Copyright 1999, 2000, 2001, 2005 Red Hat, Inc.
+   Copyright 1999, 2000, 2001 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -32,8 +32,8 @@ struct ucred {
 };
 
 struct linger {
-  unsigned short	l_onoff;	/* Linger active	*/
-  unsigned short	l_linger;	/* How long to linger for	*/
+  unsigned short			l_onoff;	/* Linger active		*/
+ unsigned short			l_linger;	/* How long to linger for	*/
 };
 
 struct msghdr
@@ -42,58 +42,9 @@ struct msghdr
 	int		msg_namelen;	/* Length of name		*/
 	struct iovec *	msg_iov;	/* Data blocks			*/
 	int		msg_iovlen;	/* Number of blocks		*/
-	void	*	msg_control;	/* Ancillary data		*/
-	size_t		msg_controllen;	/* Ancillary data length	*/
-	int		msg_flags;	/* Received flags on recvmsg	*/
-};
-
-struct cmsghdr
-{
-	size_t		cmsg_len;	/* Length of cmsghdr + data	*/
-	int		cmsg_level;	/* Protocol			*/
-	int		cmsg_type;	/* Protocol type		*/
-};
-
-#define CMSG_ALIGN(len) \
-	(((len) + sizeof (size_t) - 1) & ~(sizeof (size_t) - 1))
-#define CMSG_LEN(len) \
-	(CMSG_ALIGN (sizeof (struct cmsghdr)) + (len))
-#define CMSG_SPACE(len) \
-	(CMSG_ALIGN (sizeof (struct cmsghdr)) + CMSG_ALIGN(len))
-#define CMSG_FIRSTHDR(mhdr)	\
-	({ \
-	  struct msghdr *_m = (struct msghdr *) mhdr; \
-	  (_m)->msg_controllen >= sizeof (struct cmsghdr) \
-	  ? (struct cmsghdr *) (_m)->msg_control \
-	  : (struct cmsghdr *) NULL; \
-	})
-#define CMSG_NXTHDR(mhdr,cmsg)	\
-	({ \
-	  struct msghdr *_m = (struct msghdr *) mhdr; \
-	  struct cmsghdr *_c = (struct cmsghdr *) cmsg; \
-	  ((char *) _c + CMSG_SPACE (_c->cmsg_len) \
-	   > (char *) _m->msg_control + _m->msg_controllen) \
-	  ? (struct cmsghdr *) NULL \
-	  : (struct cmsghdr *) ((char *) _c + CMSG_ALIGN (_c->cmsg_len)); \
-	})
-#define CMSG_DATA(cmsg)		\
-	((unsigned char *) ((struct cmsghdr *)(cmsg) + 1))
-
-/* "Socket"-level control message types: */
-#define	SCM_RIGHTS	0x01		/* access rights (array of int) */
-
-#ifdef __INSIDE_CYGWIN__
-/* Definition of struct msghdr up to release 1.5.18 */
-struct OLD_msghdr
-{
-	void	*	msg_name;	/* Socket name			*/
-	int		msg_namelen;	/* Length of name		*/
-	struct iovec *	msg_iov;	/* Data blocks			*/
-	int		msg_iovlen;	/* Number of blocks		*/
 	void	*	msg_accrights;	/* Per protocol magic (eg BSD file descriptor passing) */
 	int		msg_accrightslen;	/* Length of rights list */
 };
-#endif
 
 #ifndef socklen_t
 #define socklen_t int
