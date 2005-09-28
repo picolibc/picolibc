@@ -1,3 +1,9 @@
+2005-09-27  Christopher Faylor  <cgf@timesys.com>
+
+	* init.cc (prime_threads): Make this static, as it should be.
+	(dll_entry): Apply cosmetic changes to define closer to the way MSDN
+	suggests.
+
 2005-09-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pthread.cc (mangle_sem_name): Use cygheap->shared_prefix instead

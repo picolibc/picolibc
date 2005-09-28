@@ -47,7 +47,7 @@ calibration_thread (VOID *arg)
    When it starts, a call will be made to dll_entry which will call munge_threadfunc
    looking for the calibration thread offset on the stack.  This offset will
    be stored and used by all executing cygwin processes. */
-void
+static void
 prime_threads ()
 {
   if (!threadfunc_ix[0])
@@ -137,7 +137,7 @@ extern void __stdcall dll_crt0_0 ();
 
 HMODULE NO_COPY cygwin_hmodule;
 
-extern "C" int WINAPI
+extern "C" BOOL WINAPI
 dll_entry (HANDLE h, DWORD reason, void *static_load)
 {
   BOOL is_wow64_proc = FALSE;
@@ -173,5 +173,6 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
       _my_tls.remove (0);
       break;
     }
-  return 1;
+
+  return TRUE;
 }
