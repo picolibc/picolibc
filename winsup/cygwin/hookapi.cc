@@ -185,7 +185,7 @@ hook_or_detect_cygwin (const char *name, const void *fn)
   function_hook fh;
   fh.origfn = NULL;
   fh.hookfn = fn;
-  char *buf = fn ? NULL : (char *) alloca (strlen (name) + sizeof ("_64"));
+  char *buf = (char *) alloca (strlen (name) + sizeof ("_64"));
   int i;
   // Iterate through each import descriptor, and redirect if appropriate
   for (PIMAGE_IMPORT_DESCRIPTOR pd = pdfirst; pd->FirstThunk; pd++)

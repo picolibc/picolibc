@@ -1,3 +1,8 @@
+2005-09-28  Christopher Faylor  <cgf@timesys.com>
+
+	* hookapi.cc (hook_or_detect_cygwin): Correct inverted test for whether
+	to allocate a buffer by always allocating a buffer.
+
 2005-09-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (class fhandler_dev_raw): Delete current_position and
