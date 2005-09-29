@@ -1,5 +1,17 @@
 2005-09-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_floppy.cc (fhandler_dev_floppy::get_drive_info): Don't call
+	EX ioctls on floppy drives.
+
+2005-09-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dir.cc (mkdir): Check for trailing /. or /.. component.
+	(rmdir): Ditto.
+	* path.cc (has_dot_last_component): New function.
+	* path.h (has_dot_last_component): Add declaration.
+
+2005-09-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* crt0.cc: Remove PPC considerations.
 	(WinMainCRTStartup): Add symbol as alias to mainCRTStartup.
 
