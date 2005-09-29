@@ -1,18 +1,10 @@
 /* crt0.c.
 
-   Copyright 2001 Red Hat, Inc.
+   Copyright 2001, 2005 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
-
-#ifdef __PPC__
-/* For the PowerPC, we want to make this function have its structured
-   exception table exception function point to something we control.  */
-
-extern void __cygwin_exception_handler();
-extern void mainCRTStartup(void) __attribute__((__exception__(__cygwin_exception_handler)));
-#endif
 
 /* In the following ifdef'd i386 code, the FPU precision is set to 80 bits
    and all FPU exceptions are masked.  The former is needed to make long
@@ -58,3 +50,6 @@ mainCRTStartup ()
 
   cygwin_crt0 (main);
 }
+
+void WinMainCRTStartup(void) __attribute__ ((alias("mainCRTStartup")));
+
