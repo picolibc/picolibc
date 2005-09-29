@@ -205,6 +205,24 @@ pathmatch (const char *path1, const char *path2)
 				      : strcasematch (path1, path2);
 }
 
+/* TODO: This function is used in mkdir and rmdir to generate correct
+   error messages in case of paths ending in /. or /.. components.
+   This test should eventually end up in path_conv::check in one way
+   or another.  Right now, normalize_posix_path will just normalize
+   those components away, which changes the semantics.  */
+bool
+has_dot_last_component (const char *dir)
+{
+  /* SUSv3: . and .. are not allowed as last components in various system
+     calls.  Don't test for backslash path separator since that's a Win32
+     path following Win32 rules. */
+  const char *last_comp = strrchr (dir, '/');
+  return last_comp
+  	 && last_comp[1] == '.'
+	 && (last_comp[2] == '\0'
+	     || (last_comp[2] == '.' && last_comp[3] == '\0'));
+}
+
 #define isslash(c) ((c) == '/')
 
 /* Normalize a POSIX path.

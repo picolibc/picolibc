@@ -255,6 +255,16 @@ mkdir (const char *dir, mode_t mode)
   int res = -1;
   fhandler_base *fh = NULL;
 
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+
+  if (has_dot_last_component (dir))
+    {
+      set_errno (ENOENT);
+      return -1;
+    }
+
   if (!(fh = build_fh_name (dir, NULL, PC_SYM_NOFOLLOW | PC_WRITABLE)))
     goto done;   /* errno already set */;
 
@@ -278,6 +288,16 @@ rmdir (const char *dir)
 {
   int res = -1;
   fhandler_base *fh = NULL;
+
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+
+  if (has_dot_last_component (dir))
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
 
   if (!(fh = build_fh_name (dir, NULL, PC_SYM_NOFOLLOW | PC_WRITABLE)))
     goto done;   /* errno already set */;
