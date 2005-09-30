@@ -388,7 +388,7 @@ try_to_debug (bool waitloop)
 	return dbg;
       SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
       while (!being_debugged ())
-	Sleep (0);
+	low_priority_sleep (0);
       Sleep (2000);
     }
 
@@ -1041,7 +1041,13 @@ sigpacket::process ()
   myself->rusage_self.ru_nsignals++;
 
   bool masked;
-  void *handler = (void *) thissig.sa_handler;
+  void *handler;
+  if (!hExeced || (void *) thissig.sa_handler == (void *) SIG_IGN)
+    handler = (void *) thissig.sa_handler;
+  else if (tls)
+    return 1;
+  else 
+    handler = NULL;
 
   if (si.si_signo == SIGKILL)
     goto exit_sig;
@@ -1175,7 +1181,7 @@ signal_exit (int rc)
       TerminateProcess (hExeced, sigExeced = rc);
     }
 
-  EnterCriticalSection (&exit_lock);
+  get_exit_lock ();
   if (hExeced || exit_state)
     myself.exit (rc);
 

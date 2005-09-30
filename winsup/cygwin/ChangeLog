@@ -1,3 +1,17 @@
+2005-09-30  Christopher Faylor  <cgf@timesys.com>
+
+	* dcrt0.cc (do_exit): Don't set ES_SET_MUTO here.  Call get_exit_lock()
+	instead.
+	(get_exit_lock): New function.  Grabs the lock and sets initial
+	exit_state.
+	* exceptions.cc (try_to_debug): Use low_priority_sleep.
+	(sigpacket::process): Avoid handler if this is an exec stub.
+	(signal_exit): Use get_exit_lock rather than manipulating the exit_lock
+	critical section directly.
+	* pinfo.cc (pinfo::exit): Ditto.
+	* winsup.h (get_exit_lock): Declare.
+	(exit_lock): Delete declaration.
+
 2005-09-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc: Change calls to pc.set_attributes into

@@ -1021,13 +1021,7 @@ do_exit (int status)
     }
 #endif
 
-  EnterCriticalSection (&exit_lock);
-
-  if (exit_state < ES_SET_MUTO)
-    {
-      exit_state = ES_SET_MUTO;
-      muto::set_exiting_thread ();
-    }
+  get_exit_lock ();
 
   if (exit_state < ES_GLOBAL_DTORS)
     {
@@ -1142,6 +1136,18 @@ extern "C" void
 _exit (int n)
 {
   do_exit (((DWORD) n & 0xff) << 8);
+}
+
+void
+get_exit_lock ()
+{
+  extern CRITICAL_SECTION exit_lock;
+  EnterCriticalSection (&exit_lock);
+  if (exit_state < ES_SET_MUTO)
+    {
+      exit_state = ES_SET_MUTO;
+      muto::set_exiting_thread ();
+    }
 }
 
 extern "C" void

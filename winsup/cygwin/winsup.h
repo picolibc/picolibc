@@ -203,6 +203,7 @@ enum exit_states
 
 extern exit_states exit_state;
 void __stdcall do_exit (int) __attribute__ ((regparm (1), noreturn));
+void __stdcall get_exit_lock ();
 
 /* UID/GID */
 void uinfo_init ();
@@ -347,7 +348,6 @@ extern HANDLE hMainProc;
 extern HANDLE hProcToken;
 extern HANDLE hProcImpToken;
 extern HANDLE hExeced;
-extern CRITICAL_SECTION exit_lock;
 
 extern bool cygwin_testing;
 

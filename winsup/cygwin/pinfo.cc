@@ -140,7 +140,7 @@ pinfo::zap_cwd ()
 void
 pinfo::exit (DWORD n)
 {
-  EnterCriticalSection (&exit_lock);
+  get_exit_lock ();
   cygthread::terminate ();
   if (n != EXITCODE_NOSET)
     self->exitcode = EXITCODE_SET | n;/* We're really exiting.  Record the UNIX exit code. */
