@@ -128,7 +128,7 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 	  /* If the change time is 0, it's a file system which doesn't
 	     support a change timestamp.  In that case use the LastWriteTime
 	     entry, as in other calls to fstat_helper. */
-	  pc.set_attributes (pfai->BasicInformation.FileAttributes);
+	  pc.file_attributes (pfai->BasicInformation.FileAttributes);
 	  return fstat_helper (buf,
 			   pfai->BasicInformation.ChangeTime.QuadPart ?
 			   *(FILETIME *) &pfai->BasicInformation.ChangeTime :
@@ -165,7 +165,7 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
       local.dwFileAttributes = DWORD (pc);
     }
   else
-    pc.set_attributes (local.dwFileAttributes);
+    pc.file_attributes (local.dwFileAttributes);
   return fstat_helper (buf,
 		       local.ftLastWriteTime, /* see fstat_helper comment */
 		       local.ftLastAccessTime,
@@ -196,7 +196,7 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
   else if ((handle = FindFirstFile (pc, &local)) != INVALID_HANDLE_VALUE)
     {
       FindClose (handle);
-      pc.set_attributes (local.dwFileAttributes);
+      pc.file_attributes (local.dwFileAttributes);
       res = fstat_helper (buf,
 			  local.ftLastWriteTime, /* see fstat_helper comment */
 			  local.ftLastAccessTime,

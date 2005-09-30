@@ -1,5 +1,11 @@
 2005-09-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc: Change calls to pc.set_attributes into
+	calls to pc.file_attributes throughout.
+	* path.h (class path_conv): Remove superfluous set_attributes method.
+
+2005-09-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_floppy.cc (fhandler_dev_floppy::get_drive_info): Use
 	fhandler method to access majoer device number.  Add comment to
 	explain floppy weirdness.

@@ -168,7 +168,6 @@ class path_conv
   bool isro () const {return !!(path_flags & PATH_RO);}
   bool exists () const {return fileattr != INVALID_FILE_ATTRIBUTES;}
   bool has_attribute (DWORD x) const {return exists () && (fileattr & x);}
-  void set_attributes (DWORD x) {fileattr = x;}
   int isdir () const {return has_attribute (FILE_ATTRIBUTE_DIRECTORY);}
   executable_states exec_state ()
   {
