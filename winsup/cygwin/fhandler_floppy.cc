@@ -46,8 +46,9 @@ fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo)
   DWORD bytes_read = 0;
 
   /* Always try using the new EX ioctls first (>= XP).  If not available,
-     fall back to trying the old non-EX ioctls. */
-  if (wincap.has_disk_ex_ioctls () && pc.dev.major != DEV_FLOPPY_MAJOR)
+     fall back to trying the old non-EX ioctls.
+     Unfortunately the EX ioctls are not implemented in the floppy driver. */
+  if (wincap.has_disk_ex_ioctls () && get_major () != DEV_FLOPPY_MAJOR)
     {
       if (!DeviceIoControl (get_handle (),
 			    IOCTL_DISK_GET_DRIVE_GEOMETRY_EX, NULL, 0,
