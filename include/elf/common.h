@@ -182,6 +182,7 @@
 #define EM_IP2K		101	/* Ubicom IP2022 micro controller */
 #define EM_CR		103	/* National Semiconductor CompactRISC */
 #define EM_MSP430	105	/* TI msp430 micro controller */
+#define EM_BLACKFIN	106	/* ADI Blackfin */
 #define EM_CRX		114	/* National Semiconductor CRX */
 
 /* If it is necessary to assign new unofficial EM_* values, please pick large
