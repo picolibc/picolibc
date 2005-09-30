@@ -162,6 +162,7 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 	 on shares. In this case reset filesize to 0. */
       if (local.nFileSizeLow == 0xffffffff && GetLastError ())
 	local.nFileSizeLow = 0;
+      local.dwFileAttributes = DWORD (pc);
     }
   else
     pc.set_attributes (local.dwFileAttributes);
