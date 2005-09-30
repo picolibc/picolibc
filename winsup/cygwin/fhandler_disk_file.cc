@@ -163,8 +163,8 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
       if (local.nFileSizeLow == 0xffffffff && GetLastError ())
 	local.nFileSizeLow = 0;
     }
-
-  pc.set_attributes (local.dwFileAttributes);
+  else
+    pc.set_attributes (local.dwFileAttributes);
   return fstat_helper (buf,
 		       local.ftLastWriteTime, /* see fstat_helper comment */
 		       local.ftLastAccessTime,

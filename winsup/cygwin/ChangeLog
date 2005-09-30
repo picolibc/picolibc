@@ -1,3 +1,8 @@
+2005-09-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Only write
+	attributes if call to GetFileInformationByHandle was successful.
+
 2005-09-29  Christopher Faylor  <cgf@timesys.com>
 
 	* fork.cc (frok::parent): Simplify error messages.  Don't issue an
