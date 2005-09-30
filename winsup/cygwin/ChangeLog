@@ -7,7 +7,7 @@
 2005-09-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_floppy.cc (fhandler_dev_floppy::get_drive_info): Use
-	fhandler method to access majoer device number.  Add comment to
+	fhandler method to access major device number.  Add comment to
 	explain floppy weirdness.
 
 2005-09-30  Corinna Vinschen  <corinna@vinschen.de>
