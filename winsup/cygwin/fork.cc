@@ -334,7 +334,7 @@ frok::parent (void *stack_here)
   if (forker_finished == NULL)
     {
       this_errno = geterrno_from_win_error ();
-      error = "child %d - unable to allocate forker_finished event, %E";
+      error = "unable to allocate forker_finished event";
       return -1;
     }
 
@@ -369,7 +369,7 @@ frok::parent (void *stack_here)
   if (!rc)
     {
       this_errno = geterrno_from_win_error ();
-      error = "child %d - CreateProcessA failed, %E";
+      error = "CreateProcessA failed";
       goto cleanup;
     }
 
@@ -389,7 +389,7 @@ frok::parent (void *stack_here)
     {
       this_errno = get_errno () == ENOMEM ? ENOMEM : EAGAIN;
 #ifdef DEBUGGING
-      error = "child %d - pinfo failed";
+      error = "pinfo failed";
 #else
       syscall_printf ("pinfo failed");
 #endif
@@ -425,8 +425,8 @@ frok::parent (void *stack_here)
     {
       TerminateProcess (pi.hProcess, 1);
       this_errno = EAGAIN;
-#ifdef DEBUGGING
-      error = "child %d - child.remember failed";
+#ifdef DEBUGGING0
+      error = "child.remember failed";
 #endif
       goto cleanup;
     }
@@ -439,7 +439,7 @@ frok::parent (void *stack_here)
   if (!ch.sync (child->pid, pi.hProcess, FORK_WAIT_TIMEOUT))
     {
       this_errno = EAGAIN;
-      error = "child %d - died waiting for longjmp before initialization";
+      error = "died waiting for longjmp before initialization";
       goto cleanup;
     }
 
@@ -485,7 +485,7 @@ frok::parent (void *stack_here)
 	{
 	  this_errno = get_errno ();
 #ifdef DEBUGGING
-	  error = "child %d - fork_copy for linked dll data/bss failed";
+	  error = "fork_copy for linked dll data/bss failed";
 #endif
 	  goto cleanup;
 	}
@@ -497,7 +497,7 @@ frok::parent (void *stack_here)
   else if (!ch.sync (child->pid, pi.hProcess, FORK_WAIT_TIMEOUT))
     {
       this_errno = EAGAIN;
-      error = "child %d died waiting for dll loading";
+      error = "died waiting for dll loading";
       goto cleanup;
     }
 
@@ -517,7 +517,7 @@ frok::parent (void *stack_here)
 	    {
 	      this_errno = get_errno ();
 #ifdef DEBUGGING
-	      error = "child %d - copying data/bss for a loaded dll";
+	      error = "copying data/bss for a loaded dll";
 #endif
 	      goto cleanup;
 	    }
@@ -589,9 +589,16 @@ fork ()
   else
     {
       if (!grouped.error)
-	syscall_printf ("fork failed - child pid %d", grouped.child_pid);
+	syscall_printf ("fork failed - child pid %d, errno %d", grouped.child_pid, grouped.this_errno);
       else
-	system_printf (grouped.error, grouped.child_pid);
+	{
+	  char buf[strlen (grouped.error) + sizeof ("child %d - , errno 4294967295  ")];
+	  strcpy (buf, "child %d - ");
+	  strcat (buf, grouped.error);
+	  strcat (buf, ", errno %d");
+	  system_printf (buf, grouped.child_pid, grouped.this_errno);
+	}
+
       set_errno (grouped.this_errno);
     }
   syscall_printf ("%d = fork()", res);
