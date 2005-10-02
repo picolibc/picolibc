@@ -970,7 +970,9 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
 static void
 talktome (siginfo_t& si, HANDLE readsig)
 {
+  sigproc_printf ("pid %d wants some information", si.si_pid);
   pinfo pi (si.si_pid);
+  sigproc_printf ("pid %d pi %p", si.si_pid, (_pinfo *) pi); // DELETEME
   if (si._si_commune._si_code & PICOM_EXTRASTR)
     {
       size_t n;
@@ -1173,6 +1175,7 @@ wait_sig (VOID *)
 	break;
     }
 
+  CloseHandle (readsig);
   sigproc_printf ("signal thread exiting");
   ExitThread (0);
 }

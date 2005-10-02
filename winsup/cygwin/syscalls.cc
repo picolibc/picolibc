@@ -2610,10 +2610,10 @@ locked_append (int fd, const void * buf, size_t size)
   int count = 0;
 
   do
-    if ((lock_buffer.l_start = lseek64 (fd, 0, SEEK_END)) != (_off64_t)-1
+    if ((lock_buffer.l_start = lseek64 (fd, 0, SEEK_END)) != (_off64_t) -1
 	&& fcntl_worker (fd, F_SETLKW, &lock_buffer) != -1)
       {
-	if (lseek64 (fd, 0, SEEK_END) != (_off64_t)-1)
+	if (lseek64 (fd, 0, SEEK_END) != (_off64_t) -1)
 	  write (fd, buf, size);
 	lock_buffer.l_type = F_UNLCK;
 	fcntl_worker (fd, F_SETLK, &lock_buffer);

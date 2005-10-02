@@ -1141,8 +1141,7 @@ _exit (int n)
 void
 get_exit_lock ()
 {
-  extern CRITICAL_SECTION exit_lock;
-  EnterCriticalSection (&exit_lock);
+  myself.lock ();
   if (exit_state < ES_SET_MUTO)
     {
       exit_state = ES_SET_MUTO;

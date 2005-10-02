@@ -1,3 +1,15 @@
+2005-10-01  Christopher Faylor  <cgf@timesys.com>
+
+	* dcrt0.cc (get_exit_lock): Use myself.lock rather than exit_lock.
+	* exceptions.cc (exit_lock): Delete.
+	(events_init): Don't init exit_lock.
+	* (_pinfo::commune_process): Add per-PICOM debugging.
+	* sigproc.cc (talktome): Add some temporary debugging statements.
+
+	* fhandler_proc.cc (format_proc_cpuinfo): Cosmetic change.
+	(format_proc_partitions): Ditto.
+	* syscalls.cc (locked_append): Ditto.
+
 2005-09-30  Christopher Faylor  <cgf@timesys.com>
 
 	* dcrt0.cc (do_exit): Don't set ES_SET_MUTO here.  Call get_exit_lock()

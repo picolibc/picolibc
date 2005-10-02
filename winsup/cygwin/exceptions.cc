@@ -1167,8 +1167,6 @@ exit_sig:
   signal_exit (si.si_signo);	/* never returns */
 }
 
-CRITICAL_SECTION NO_COPY exit_lock;
-
 /* Cover function to `do_exit' to handle exiting even in presence of more
    exceptions.  We used to call exit, but a SIGSEGV shouldn't cause atexit
    routines to run.  */
@@ -1229,7 +1227,6 @@ events_init ()
   windows_system_directory_length = end - windows_system_directory;
   debug_printf ("windows_system_directory '%s', windows_system_directory_length %d",
 		windows_system_directory, windows_system_directory_length);
-  InitializeCriticalSection (&exit_lock);
 }
 
 void

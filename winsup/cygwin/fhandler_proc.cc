@@ -635,7 +635,7 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 
   GetSystemInfo (&siSystemInfo);
 
-  for (cpu_number = 0;;cpu_number++)
+  for (cpu_number = 0; ; cpu_number++)
     {
       __small_sprintf (szBuffer, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\%d", cpu_number);
 
@@ -945,7 +945,7 @@ format_proc_partitions (char *destbuf, size_t maxsize)
 
   if (wincap.is_winnt ())
     {
-      for (int drive_number=0;;drive_number++)
+      for (int drive_number=0; ; drive_number++)
 	{
 	  CHAR szDriveName[CYG_MAX_PATH];
 	  __small_sprintf (szDriveName, "\\\\.\\PHYSICALDRIVE%d", drive_number);

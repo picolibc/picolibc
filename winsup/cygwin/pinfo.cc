@@ -394,6 +394,7 @@ _pinfo::commune_process (siginfo_t& si)
     {
     case PICOM_CMDLINE:
       {
+	sigproc_printf ("processing PICOM_CMDLINE");
 	unsigned n = 1;
 	extern int __argc_safe;
 	const char *argv[__argc_safe + 1];
@@ -428,6 +429,7 @@ _pinfo::commune_process (siginfo_t& si)
       }
     case PICOM_CWD:
       {
+	sigproc_printf ("processing PICOM_CWD");
 	unsigned int n = strlen (cygheap->cwd.get (path, 1, 1,
 						   CYG_MAX_PATH)) + 1;
 	if (!WriteFile (tothem, &n, sizeof n, &nr, NULL))
@@ -438,6 +440,7 @@ _pinfo::commune_process (siginfo_t& si)
       }
     case PICOM_ROOT:
       {
+	sigproc_printf ("processing PICOM_ROOT");
 	unsigned n;
 	if (cygheap->root.exists ())
 	  n = strlen (strcpy (path, cygheap->root.posix_path ())) + 1;
@@ -451,6 +454,7 @@ _pinfo::commune_process (siginfo_t& si)
       }
     case PICOM_FDS:
       {
+	sigproc_printf ("processing PICOM_FDS");
 	unsigned int n = 0;
 	int fd;
 	cygheap_fdenum cfd;
@@ -469,27 +473,29 @@ _pinfo::commune_process (siginfo_t& si)
 	break;
       }
     case PICOM_PIPE_FHANDLER:
-	{
-	  HANDLE hdl = si._si_commune._si_pipe_fhandler;
-	  unsigned int n = 0;
-	  cygheap_fdenum cfd;
-	  while (cfd.next () >= 0)
-	    if (cfd->get_handle () == hdl)
-	      {
-		fhandler_pipe *fh = cfd;
-		n = sizeof *fh;
-		if (!WriteFile (tothem, &n, sizeof n, &nr, NULL))
-		  sigproc_printf ("WriteFile sizeof hdl failed, %E");
-		else if (!WriteFile (tothem, fh, n, &nr, NULL))
-		  sigproc_printf ("WriteFile hdl failed, %E");
-		break;
-	      }
-	  if (!n && !WriteFile (tothem, &n, sizeof n, &nr, NULL))
-	    sigproc_printf ("WriteFile sizeof hdl failed, %E");
-	  break;
-	}
+      {
+	sigproc_printf ("processing PICOM_FDS");
+	HANDLE hdl = si._si_commune._si_pipe_fhandler;
+	unsigned int n = 0;
+	cygheap_fdenum cfd;
+	while (cfd.next () >= 0)
+	  if (cfd->get_handle () == hdl)
+	    {
+	      fhandler_pipe *fh = cfd;
+	      n = sizeof *fh;
+	      if (!WriteFile (tothem, &n, sizeof n, &nr, NULL))
+		sigproc_printf ("WriteFile sizeof hdl failed, %E");
+	      else if (!WriteFile (tothem, fh, n, &nr, NULL))
+		sigproc_printf ("WriteFile hdl failed, %E");
+	      break;
+	    }
+	if (!n && !WriteFile (tothem, &n, sizeof n, &nr, NULL))
+	  sigproc_printf ("WriteFile sizeof hdl failed, %E");
+	break;
+      }
     case PICOM_FD:
       {
+	sigproc_printf ("processing PICOM_FD");
 	int fd = si._si_commune._si_fd;
 	unsigned int n = 0;
 	cygheap_fdget cfd (fd);
@@ -505,6 +511,7 @@ _pinfo::commune_process (siginfo_t& si)
       }
     case PICOM_FIFO:
       {
+	sigproc_printf ("processing PICOM_FIFO");
 	fhandler_fifo *fh = cygheap->fdtab.find_fifo (si._si_commune._si_str);
 	HANDLE it[2];
 	if (fh == NULL)
@@ -530,7 +537,11 @@ _pinfo::commune_process (siginfo_t& si)
     }
   if (process_sync)
     {
-      WaitForSingleObject (process_sync, INFINITE);
+      DWORD res = WaitForSingleObject (process_sync, 5000);
+      if (res != WAIT_OBJECT_0)
+	sigproc_printf ("WFSO failed - %d, %E", res);
+      else
+	sigproc_printf ("synchronized with pid %d", si.si_pid);
       ForceCloseHandle (process_sync);
     }
   CloseHandle (tothem);
@@ -586,7 +597,11 @@ _pinfo::commune_request (__uint32_t code, ...)
 
   si.si_signo = __SIGCOMMUNE;
   if (sig_send (this, si))
-    goto err;
+    {
+      ForceCloseHandle (request_sync);	/* don't signal semaphore since there was apparently no receiving process */
+      request_sync = NULL;
+      goto err;
+    }
 
   size_t n;
   switch (code)
