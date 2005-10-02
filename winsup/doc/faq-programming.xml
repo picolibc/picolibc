@@ -76,7 +76,8 @@ main GCC distribution, anyway.
 
 <para>First of all, if you are using <literal>make -j[N]</literal>, then stop.  It doesn't
 work well. Also beware of using non-portable shell features in your
-Makefiles (see tips at <ulink url="http://cygwin.com/faq/faq_3.html#SEC46">http://cygwin.com/faq/faq_3.html#SEC46</ulink>).
+Makefiles (see tips at <ulink 
+url="http://cygwin.com/faq/faq.using.html#faq.using.shell-scripts" />).
 </para>
 <para>Errors of <literal>make: execvp: /bin/sh: Illegal Argument</literal> or 
 <literal>make: execvp: /bin/sh: Argument list too long</literal> are often
@@ -91,17 +92,28 @@ the command-line limit. To enable cygexec for <literal>/bin</literal> and
 <screen>
 mount -X -b -f c:\cygwin\bin /bin
 mount -X -b -f c:\cygwin\bin /usr/bin
-mount -x -b -f c:\cygwin\bin\strace.exe /usr/bin/strace.exe
-mount -x -b -f c:\cygwin\bin\strace.exe /bin/strace.exe
-mount -x -b -f c:\cygwin\bin\cygcheck.exe /usr/bin/cygcheck.exe
-mount -x -b -f c:\cygwin\bin\cygcheck.exe /bin/cygcheck.exe
+mount -x -b -f c:\cygwin\bin\tclsh84.exe /usr/bin/tclsh84.exe
+mount -x -b -f c:\cygwin\bin\tclsh84.exe /bin/tclsh84.exe
+mount -x -b -f c:\cygwin\bin\wish84.exe /usr/bin/wish84.exe
+mount -x -b -f c:\cygwin\bin\wish84.exe /bin/wish84.exe
 </screen>
 
-<para>Note that you must specifically exclude <literal>strace</literal> and <literal>cygcheck</literal>,
-which are not linked to the Cygwin DLL.
+<para>Note that if you have Tcl/Tk installed, you must specifically exclude 
+<literal>tclsh84</literal> and <literal>wish84</literal>, which are linked 
+to the Cygwin DLL but are not actually Cygwin programs. If you have added 
+other non-Cygwin programs to a path you want to mount cygexec, you can find
+them with a script like this:
 </para>
-<para>(See <ulink url="http://www.cygwin.com/cygwin-ug-net/using-utils.html#mount">http://www.cygwin.com/cygwin-ug-net/using-utils.html#mount</ulink> 
-for more information.)
+<screen>
+#!/bin/sh
+cd /bin; for f in `find . -type f -name '*.exe'`; do
+	cygcheck $f | (fgrep -qi cygwin1.dll || echo $f)
+done
+</screen>
+
+<para>
+See <ulink url="http://www.cygwin.com/cygwin-ug-net/using-utils.html#mount" /> 
+for more information on using mount.
 </para>
 
 </answer></qandaentry>
@@ -464,12 +476,12 @@ same time. Remove all but one.
 symbols that you see in gdb are basically meaningless. It is also a good
 idea to use the latest code in case the bug has been fixed, so we
 recommend trying the latest snapshot from
-<ulink url="http://cygwin.com/snapshots/">http://cygwin.com/snapshots/</ulink> or build the DLL from CVS.
+<ulink url="http://cygwin.com/snapshots/" /> or building the DLL from CVS.
 </para>
 <para>To build a debugging version of the Cygwin DLL, you will need to follow
-the instructions at <ulink url="http://cygwin.com/faq/faq_3.html#SEC102">http://cygwin.com/faq/faq_3.html#SEC102</ulink>. You
-can also contact the mailing list for pointers (a simple test case that
-demonstrates the bug is always welcome).
+the instructions at <ulink url="http://cygwin.com/faq/faq-nochunks.html#faq.programming.building-cygwin" />. 
+You can also contact the mailing list for pointers (a simple test case that 
+demonstrates the bug is always welcome).  
 </para>
 </answer></qandaentry>
 

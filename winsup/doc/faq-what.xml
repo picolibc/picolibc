@@ -26,11 +26,13 @@ standard Windows command shell.
 <answer>
 
 <para>Cygwin can be expected to run on all modern 32 bit versions of
-Windows, except Windows CE.  This includes Windows 95/98/ME/NT/2000/XP.
+Windows, except Windows CE.  This includes Windows 95/98/ME/NT/2000/XP/2003
+and the WOW64 32 bit environment on released 64 bit versions of Windows.
+As far as we know no one is working on a native 64 bit version of Cygwin.
 Since Cygwin is a community-supported free software project, patches to
 provide support for other versions would be thoughtfully considered.
-Paid support is available through a support contract with Red Hat.  For 
-information about getting a Red Hat support contract, see
+Paid support contracts or enhancements are available through Red Hat.  For 
+information about getting a Red Hat support contract, see 
 <ulink url="http://cygwin.com/license.html" />.
 </para>
 <para>Keep in mind that Cygwin can only do as much as the underlying OS

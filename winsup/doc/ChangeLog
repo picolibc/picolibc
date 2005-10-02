@@ -1,3 +1,8 @@
+2005-10-02  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* faq-what.xml: Add 2003 and WOW64 to "supported" FAQ.
+	* faq-programming.xml: Fix cygexec FAQ, building link.
+
 2005-09-25  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* faq.xml: Remove copyright section, link to license.html
