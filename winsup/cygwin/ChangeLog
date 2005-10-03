@@ -1,3 +1,7 @@
+2005-10-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* uname.cc (uname): Disable use of GetNativeSystemInfo.
+
 2005-10-01  Christopher Faylor  <cgf@timesys.com>
 
 	* dcrt0.cc (get_exit_lock): Use myself.lock rather than exit_lock.

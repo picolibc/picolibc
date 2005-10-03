@@ -31,10 +31,16 @@ uname (struct utsname *name)
   memset (name, 0, sizeof (*name));
   __small_sprintf (name->sysname, "CYGWIN_%s", wincap.osname ());
 
+#if 0
+  /* Recognition of the real 64 bit CPU inside of a WOW64 system, irritates
+     build systems which think the native system is a 64 bit system.  Since
+     we're actually running in a 32 bit environment, it looks more correct
+     just to use the CPU info given by WOW64. */
   BOOL is_64bit_machine = FALSE;
   if (IsWow64Process (hMainProc, &is_64bit_machine) && is_64bit_machine)
     GetNativeSystemInfo (&sysinfo);
   else
+#endif
     GetSystemInfo (&sysinfo);
 
   /* Computer name */
