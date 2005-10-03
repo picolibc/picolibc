@@ -90,6 +90,7 @@ SECTIONS
   .bss : {
     _bss_start = . ;
     *(.bss)
+    *(.bss.*)
     *(.gnu.linkonce.b.*)
     *(COMMON)
     . += 0x2000 ;  /* 8k bytes of stack. */

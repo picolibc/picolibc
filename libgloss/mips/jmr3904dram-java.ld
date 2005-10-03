@@ -92,6 +92,7 @@ SECTIONS
   .bss : {
     _bss_start = . ;
     *(.bss)
+    *(.bss.*)
     *(.gnu.linkonce.b.*)
     *(COMMON)
   }
