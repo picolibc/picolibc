@@ -136,6 +136,13 @@ System information:
   -P, --smprograms      output Start Menu `Programs' directory and exit
   -S, --sysdir          output system directory and exit
   -W, --windir          output `Windows' directory and exit
+Other options:
+  -f, --file FILE       read FILE for input; use - to read from STDIN
+  -o, --option          read options from FILE as well (for use with --file)
+  -c, --close HANDLE    close HANDLE (for use in captured process)
+  -i, --ignore          ignore missing argument
+  -h, --help            output usage information and exit
+  -v, --version         output version information and exit
 </screen>
 
 <para>The <command>cygpath</command> program is a utility that
