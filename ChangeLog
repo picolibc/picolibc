@@ -1,3 +1,8 @@
+2005-10-03  Catherine Moore  <clm@cm00re.com>
+
+	* configure.in (bfin-*-*): Support bfin.
+	* configure: Regenerated.
+
 2005-09-30  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* configure.in (*-*-darwin*): Build bfd, binutils and opcodes.
