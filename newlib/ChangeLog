@@ -1,3 +1,8 @@
+2005-10-03  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/include/stdint.h: Include <sys/types.h> and
+	incorporate Ralf's change below.
+
 2005-10-03  Ralf Corsepius <ralf.corsepius@rtems.org>
 
 	* libc/include/stdint.h: 

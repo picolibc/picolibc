@@ -14,6 +14,8 @@
 #ifndef _STDINT_H
 #define _STDINT_H
 
+#include <sys/types.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -122,14 +124,25 @@ typedef uint64_t  	uint_least32_t;
 #endif
 #endif
 
-#if __have_longlong64
-typedef signed long long intmax_t;
-typedef unsigned long long uintmax_t;
+/* Greatest-width integer types */
+/* Modern GCCs provide __INTMAX_TYPE__ */
+#if defined(__INTMAX_TYPE__)
+  typedef __INTMAX_TYPE__ intmax_t;
+#elif __have_longlong64
+  typedef signed long long intmax_t;
 #else
-typedef signed long intmax_t;
-typedef unsigned long uintmax_t;
+  typedef signed long intmax_t;
 #endif
 
+/* Modern GCCs provide __UINTMAX_TYPE__ */
+#if defined(__UINTMAX_TYPE__)
+  typedef __UINTMAX_TYPE__ uintmax_t;
+#elif __have_longlong64
+  typedef unsigned long long uintmax_t;
+#else
+  typedef unsigned long uintmax_t;
+#endif
+  
 /* Limits of Specified-Width Integer Types */
 
 #if __int8_t_defined
