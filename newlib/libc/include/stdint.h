@@ -148,16 +148,27 @@ typedef uint64_t  	uint_least32_t;
 #endif
 #endif
 
-#if __have_longlong64
-typedef signed long long intmax_t;
-typedef unsigned long long uintmax_t;
+/* Greatest-width integer types */
+/* Modern GCCs provide __INTMAX_TYPE__ */
+#if defined(__INTMAX_TYPE__)
+  typedef __INTMAX_TYPE__ intmax_t;
+#elif __have_longlong64
+  typedef signed long long intmax_t;
 #else
-typedef signed long intmax_t;
-typedef unsigned long uintmax_t;
+  typedef signed long intmax_t;
 #endif
 
+/* Modern GCCs provide __UINTMAX_TYPE__ */
+#if defined(__UINTMAX_TYPE__)
+  typedef __UINTMAX_TYPE__ uintmax_t;
+#elif __have_longlong64
+  typedef unsigned long long uintmax_t;
+ #else
+  typedef unsigned long uintmax_t;
+ #endif
+
 /*
- * GCC doesn't provide an propriate macro for [u]intptr_t
+ * GCC doesn't provide an appropriate macro for [u]intptr_t
  * For now, use __PTRDIFF_TYPE__
  */
 #if defined(__PTRDIFF_TYPE__)

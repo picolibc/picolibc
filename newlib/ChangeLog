@@ -1,3 +1,10 @@
+2005-10-03  Ralf Corsepius <ralf.corsepius@rtems.org>
+
+	* libc/include/stdint.h: 
+	Use __INTMAX_TYPE__ to derive intmax_t.
+	Use __UINTMAX_TYPE__ to derive uintmax_t.
+	Fix minor typo.
+
 2005-09-27  Ralf Corsepius <ralf.corsepius@rtems.org>
 
 	* libc/include/stdint.h: Correct __STDINT_EXP macro incorrectly 
