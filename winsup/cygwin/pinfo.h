@@ -149,7 +149,6 @@ class pinfo
 public:
   HANDLE rd_proc_pipe;
   HANDLE hProcess;
-  CRITICAL_SECTION _lock;
   bool waiter_ready;
   class cygthread *wait_thread;
   void init (pid_t, DWORD, HANDLE) __attribute__ ((regparm(3)));
@@ -166,9 +165,6 @@ public:
   }
   void exit (DWORD n) __attribute__ ((noreturn, regparm(2)));
   void maybe_set_exit_code_from_windows () __attribute__ ((regparm(1)));
-  void initialize_lock () {InitializeCriticalSection (&_lock);}
-  void lock () {EnterCriticalSection (&_lock);}
-  void unlock () {LeaveCriticalSection (&_lock);}
   _pinfo *operator -> () const {return procinfo;}
   int operator == (pinfo *x) const {return x->procinfo == procinfo;}
   int operator == (pinfo &x) const {return x.procinfo == procinfo;}

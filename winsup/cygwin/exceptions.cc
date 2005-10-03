@@ -26,6 +26,10 @@ details. */
 #include "shared_info.h"
 #include "perprocess.h"
 #include "security.h"
+#include "path.h"
+#include "fhandler.h"
+#include "dtable.h"
+#include "cygheap.h"
 
 #define CALL_HANDLER_RETRY 20
 
@@ -1179,7 +1183,7 @@ signal_exit (int rc)
       TerminateProcess (hExeced, sigExeced = rc);
     }
 
-  get_exit_lock ();
+  process_lock until_exit (true);
   if (hExeced || exit_state)
     myself.exit (rc);
 

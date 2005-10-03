@@ -1,3 +1,20 @@
+2005-10-03  Christopher Faylor  <cgf@timesys.com>
+
+	* cygheap.h (class process_lock): New class.
+	* dtable.h (class dtable): Add class process_lock as a friend.
+	* dcrt0.cc (get_exit_lock): Delete.
+	(do_exit): Use process_lock class instead of get_exit_lock.
+	* exceptions.cc (signal_exit): Ditto.
+	* pinfo.cc (pinfo::exit): Ditto.
+	(_pinfo::commune_process): Set process lock around this whole function.
+	(_pinfo::commune_request): Use process_lock rather than myself.lock.
+	* pinfo.h (pinfo::_lock): Delete.
+	(pinfo::initialize_lock): Delete.
+	(pinfo::lock): Delete.
+	(pinfo::unlock): Delete.
+	* winsup.h (get_exit_lock): Delete declaration.
+	
+
 2005-10-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* uname.cc (uname): Disable use of GetNativeSystemInfo.

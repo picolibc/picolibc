@@ -415,6 +415,27 @@ class cygheap_fdenum : public cygheap_fdmanip
   }
 };
 
+class process_lock
+{
+  bool skip_unlock;
+public:
+  process_lock (bool exiting = false)
+  {
+    cygheap->fdtab.lock ();
+    skip_unlock = exiting;
+    if (exiting && exit_state < ES_SET_MUTO)
+      {
+	exit_state = ES_SET_MUTO;
+	muto::set_exiting_thread ();
+      }
+  }
+  ~process_lock ()
+  {
+    if (!skip_unlock)
+      cygheap->fdtab.unlock ();
+  }
+};
+
 class child_info;
 void __stdcall cygheap_fixup_in_child (bool);
 extern "C" {

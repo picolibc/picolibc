@@ -59,7 +59,6 @@ set_myself (HANDLE h)
 #endif
     strace.hello ();
   debug_printf ("myself->dwProcessId %u", myself->dwProcessId);
-  myself.initialize_lock ();
   if (h)
     {
       /* here if execed */
@@ -140,7 +139,7 @@ pinfo::zap_cwd ()
 void
 pinfo::exit (DWORD n)
 {
-  get_exit_lock ();
+  process_lock until_exit ();
   cygthread::terminate ();
   if (n != EXITCODE_NOSET)
     self->exitcode = EXITCODE_SET | n;/* We're really exiting.  Record the UNIX exit code. */
@@ -390,6 +389,8 @@ _pinfo::commune_process (siginfo_t& si)
   if (process_sync)		// FIXME: this test shouldn't be necessary
     ProtectHandle (process_sync);
 
+  process_lock now (false);
+
   switch (si._si_commune._si_code)
     {
     case PICOM_CMDLINE:
@@ -586,7 +587,7 @@ _pinfo::commune_request (__uint32_t code, ...)
     break;
     }
 
-  myself.lock ();
+  process_lock now ();
   locked = true;
   char name_buf[CYG_MAX_PATH];
   request_sync = CreateSemaphore (&sec_none_nih, 0, LONG_MAX,
@@ -665,8 +666,6 @@ out:
       ReleaseSemaphore (request_sync, 1, &res);
       ForceCloseHandle (request_sync);
     }
-  if (locked)
-    myself.unlock ();
   if (hp)
     CloseHandle (hp);
   if (fromthem)

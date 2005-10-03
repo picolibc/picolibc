@@ -1021,7 +1021,7 @@ do_exit (int status)
     }
 #endif
 
-  get_exit_lock ();
+  process_lock until_exit (true);
 
   if (exit_state < ES_GLOBAL_DTORS)
     {
@@ -1136,17 +1136,6 @@ extern "C" void
 _exit (int n)
 {
   do_exit (((DWORD) n & 0xff) << 8);
-}
-
-void
-get_exit_lock ()
-{
-  myself.lock ();
-  if (exit_state < ES_SET_MUTO)
-    {
-      exit_state = ES_SET_MUTO;
-      muto::set_exiting_thread ();
-    }
 }
 
 extern "C" void
