@@ -1,3 +1,9 @@
+2005-10-04  Ralf Corsepius <ralf.corsepius@rtems.org>
+
+	* libc/include/stdint.h: Move magic to set __have_long* to the
+	beginning.  Use #if __have* instead of #if defined(__have*).
+	Minor typo fixes.
+
 2005-10-04  James E Wilson  <wilson@specifix.com>
 
 	* libc/include/sys/dirent.h (_DIRENT_H_): Delete #include_next.  Add
