@@ -1,3 +1,8 @@
+2005-10-04  James E Wilson  <wilson@specifix.com>
+
+	* libc/include/sys/dirent.h (_DIRENT_H_): Delete #include_next.  Add
+	#error.
+
 2005-10-03  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/include/stdint.h: Include <sys/types.h> and
