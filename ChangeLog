@@ -1,5 +1,10 @@
 2005-10-05  Paolo Bonzini  <bonzini@gnu.org>
 
+	* Makefile.tpl (all) [gcc-no-bootstrap]: Make prebootstrap packages
+	before other host packages.
+
+2005-10-05  Paolo Bonzini  <bonzini@gnu.org>
+
 	PR bootstrap/22340
 
 	* configure.in (default_target): Remove.
