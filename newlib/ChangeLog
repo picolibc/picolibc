@@ -1,3 +1,7 @@
+2005-10-06  Ralf Corsepius <ralf.corsepius@rtems.org>
+
+	* libc/include/stdint.h: Add [u]int_fast<N>_t types.
+
 2005-10-04  Ralf Corsepius <ralf.corsepius@rtems.org>
 
 	* libc/include/stdint.h: Move magic to set __have_long* to the

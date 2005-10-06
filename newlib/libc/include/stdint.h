@@ -154,6 +154,73 @@ typedef uint64_t  	uint_least32_t;
 #endif
 #endif
 
+/*
+ * Fastest minimum-width integer types
+ *
+ * Assume int to be the fastest type for all types with a width 
+ * less than __INT_MAX__ rsp. INT_MAX
+ */
+#if __STDINT_EXP(INT_MAX) >= 0x7f
+  typedef signed int int_fast8_t;
+  typedef unsigned int uint_fast8_t;
+#define __int_fast8_t_defined 1
+#endif
+
+#if __STDINT_EXP(INT_MAX) >= 0x7fff
+  typedef signed int int_fast16_t;
+  typedef unsigned int uint_fast16_t;
+#define __int_fast16_t_defined 1
+#endif
+
+#if __STDINT_EXP(INT_MAX) >= 0x7fffffff
+  typedef signed int int_fast32_t;
+  typedef unsigned int uint_fast32_t;
+#define __int_fast32_t_defined 1
+#endif
+
+#if __STDINT_EXP(INT_MAX) > 0x7fffffff
+  typedef signed int int_fast64_t;
+  typedef unsigned int uint_fast64_t;
+#define __int_fast64_t_defined 1
+#endif
+
+/*
+ * Fall back to [u]int_least<N>_t for [u]int_fast<N>_t types
+ * not having been defined, yet.
+ * Leave undefined, if [u]int_least<N>_t should not be available.
+ */
+#if !__int_fast8_t_defined
+#if __int_least8_t_defined
+  typedef int_least8_t int_fast8_t;
+  typedef uint_least8_t uint_fast8_t;
+#define __int_fast8_t_defined 1
+#endif
+#endif
+
+#if !__int_fast16_t_defined
+#if __int_least16_t_defined
+  typedef int_least16_t int_fast16_t;
+  typedef uint_least16_t uint_fast16_t;
+#define __int_fast16_t_defined 1
+#endif
+#endif
+
+#if !__int_fast32_t_defined
+#if __int_least32_t_defined
+  typedef int_least32_t int_fast32_t;
+  typedef uint_least32_t uint_fast32_t;
+#define __int_fast32_t_defined 1
+#endif
+#endif
+
+#if !__int_fast64_t_defined
+#if __int_least64_t_defined
+  typedef int_least64_t int_fast64_t;
+  typedef uint_least64_t uint_fast64_t;
+#define __int_fast64_t_defined 1
+#endif
+#endif
+
 /* Greatest-width integer types */
 /* Modern GCCs provide __INTMAX_TYPE__ */
 #if defined(__INTMAX_TYPE__)
@@ -255,6 +322,30 @@ typedef unsigned long uintptr_t;
 #define INT_LEAST64_MAX  9223372036854775807LL
 #define UINT_LEAST64_MAX 18446744073709551615ULL
 #endif
+#endif
+
+#if __int_fast8_t_defined
+#define INT_FAST8_MIN	INT8_MIN
+#define INT_FAST8_MAX	INT8_MAX
+#define UINT_FAST8_MAX	UINT8_MAX
+#endif
+
+#if __int_fast16_t_defined
+#define INT_FAST16_MIN	INT16_MIN
+#define INT_FAST16_MAX	INT16_MAX
+#define UINT_FAST16_MAX	UINT16_MAX
+#endif
+
+#if __int_fast32_t_defined
+#define INT_FAST32_MIN	INT32_MIN
+#define INT_FAST32_MAX	INT32_MAX
+#define UINT_FAST32_MAX	UINT32_MAX
+#endif
+
+#if __int_fast64_t_defined
+#define INT_FAST64_MIN	INT64_MIN
+#define INT_FAST64_MAX	INT64_MAX
+#define UINT_FAST64_MAX	UINT64_MAX
 #endif
 
 /* This must match size_t in stddef.h, currently long unsigned int */
