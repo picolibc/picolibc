@@ -268,6 +268,7 @@ extern "C" {
 
 #include <stdio.h>    /* needed for malloc_stats */
 #include <limits.h>   /* needed for overflow checks */
+#include <errno.h>    /* needed to set errno to ENOMEM */
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -335,6 +336,7 @@ extern void __malloc_unlock();
 #define RDECL struct _reent *reent_ptr;
 #endif
 
+#define RERRNO reent_ptr->_errno
 #define RCALL reent_ptr,
 #define RONECALL reent_ptr
 
@@ -344,6 +346,7 @@ extern void __malloc_unlock();
 #define RARG
 #define RONEARG
 #define RDECL
+#define RERRNO errno
 #define RCALL
 #define RONECALL
 
@@ -2341,7 +2344,10 @@ Void_t* mALLOc(RARG bytes) RDECL size_t bytes;
 
   /* Check for overflow and just fail, if so. */
   if (nb > INT_MAX || nb < bytes)
+  {
+    RERRNO = ENOMEM;
     return 0;
+  }
 
   MALLOC_LOCK;
 
@@ -2804,7 +2810,10 @@ Void_t* rEALLOc(RARG oldmem, bytes) RDECL Void_t* oldmem; size_t bytes;
 
   /* Check for overflow and just fail, if so. */
   if (nb > INT_MAX || nb < bytes)
+  {
+    RERRNO = ENOMEM;
     return 0;
+  }
 
 #if HAVE_MMAP
   if (chunk_is_mmapped(oldp)) 
@@ -3037,7 +3046,10 @@ Void_t* mEMALIGn(RARG alignment, bytes) RDECL size_t alignment; size_t bytes;
 
   /* Check for overflow. */
   if (nb > INT_MAX || nb < bytes)
+  {
+    RERRNO = ENOMEM;
     return 0;
+  }
 
   m  = (char*)(mALLOc(RCALL nb + alignment + MINSIZE));
 

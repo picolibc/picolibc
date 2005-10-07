@@ -1,3 +1,8 @@
+2005-10-07  Bob Wilson  <bob.wilson@acm.org>
+
+	* libc/stdlib/mallocr.c (mALLOc, rEALLOCc, mEMALIGn): Set errno
+	to ENOMEM on failure.
+
 2005-10-06  Ralf Corsepius <ralf.corsepius@rtems.org>
 
 	* libc/include/stdint.h: Add [u]int_fast<N>_t types.
