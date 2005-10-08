@@ -1,3 +1,10 @@
+2005-10-08  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	* hppa.h (FLAG_STRICT): Revise comment.
+	(pa_opcode): Revise ordering rules.  Add/move strict pa10 variants
+	before corresponding pa11 opcodes.  Add strict pa10 register-immediate
+	entries for "fdc".
+
 2005-09-24  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
 
 	* hppa.h (pa_opcodes): Add new "fdc" and "fic" opcode entries.
