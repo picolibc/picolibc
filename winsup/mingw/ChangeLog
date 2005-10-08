@@ -1,3 +1,9 @@
+2005-10-08  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/fegetenv.c (fegetenv): Restore exception masks.
+	* mingwex/feholdexcept.c (feholdexcept): Don't set exceptions
+	to non-stop. Use "fnclex" to clear exception flags.
+
 2005-09-24  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/math.h (HUGE_VALF, HUGE_VALL, INFINITY, NAN)
