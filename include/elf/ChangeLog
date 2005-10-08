@@ -1,3 +1,7 @@
+2005-10-08  Paul Brook  <paul@codesourcery.com>
+
+	* arm.h: Add prototypes for BFD object attribute routines.
+
 2005-09-09  Richard Earnshaw  <richard.earnshaw@arm.com>
 
 	* arm.h (SHT_ARM_PREEMPTMAP, SHT_ARM_ATTRIBUTES): New defines.

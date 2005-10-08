@@ -223,6 +223,54 @@ START_RELOC_NUMBERS (elf_arm_reloc_type)
   FAKE_RELOC (R_ARM_PC13,               R_ARM_LDR_PC_G0)  /* Unclear whether meaning is different.  */
 END_RELOC_NUMBERS (R_ARM_max)
 
+#ifdef BFD_ARCH_SIZE
+/* Routines for manipulating EABI object attributes.  */
+void elf32_arm_add_eabi_attr_int (bfd *, int, unsigned int);
+void elf32_arm_add_eabi_attr_string (bfd *, int, const char *);
+void elf32_arm_add_eabi_attr_compat (bfd *, unsigned int, const char *);
+
+void elf32_arm_set_eabi_attr_contents (bfd *, bfd_byte *, bfd_vma);
+bfd_vma elf32_arm_eabi_attr_size (bfd *);
+
+enum
+{
+  Tag_NULL,
+  Tag_File,
+  Tag_Section,
+  Tag_Symbol,
+  Tag_CPU_raw_name,
+  Tag_CPU_name,
+  Tag_CPU_arch,
+  Tag_CPU_arch_profile,
+  Tag_ARM_ISA_use,
+  Tag_THUMB_ISA_use,
+  Tag_VFP_arch,
+  Tag_WMMX_arch,
+  Tag_NEON_arch,
+  Tag_PCS_config,
+  Tag_ABI_PCS_R9_use,
+  Tag_ABI_PCS_RW_data,
+  Tag_ABI_PCS_RO_data,
+  Tag_ABI_PCS_GOT_use,
+  Tag_ABI_PCS_wchar_t,
+  Tag_ABI_FP_rounding,
+  Tag_ABI_FP_denormal,
+  Tag_ABI_FP_exceptions,
+  Tag_ABI_FP_user_exceptions,
+  Tag_ABI_FP_number_model,
+  Tag_ABI_align8_needed,
+  Tag_ABI_align8_preserved,
+  Tag_ABI_enum_size,
+  Tag_ABI_HardFP_use,
+  Tag_ABI_VFP_args,
+  Tag_ABI_WMMX_args,
+  Tag_ABI_optimization_goals,
+  Tag_ABI_FP_optimization_goals,
+  Tag_compatibility,
+};
+
+#endif
+
 /* The name of the note section used to identify arm variants.  */
 #define ARM_NOTE_SECTION ".note.gnu.arm.ident"
 
