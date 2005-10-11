@@ -1,3 +1,10 @@
+2005-10-11  Christopher Faylor  <cgf@timesys.com>
+
+	* (symlink_info::set_error): Change to return bool if input error
+	should be ignored.
+	(symlink_info::check): Treat path as a normal file if set_error returns
+	false.
+
 2005-10-03  Christopher Faylor  <cgf@timesys.com>
 
 	* cygheap.h (class process_lock): New class.

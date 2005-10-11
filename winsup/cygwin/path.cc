@@ -101,7 +101,7 @@ struct symlink_info
   bool case_check (char *path);
   int check_sysfile (const char *path, HANDLE h);
   int check_shortcut (const char *path, HANDLE h);
-  void set_error (int);
+  bool set_error (int);
 };
 
 muto NO_COPY cwdstuff::cwd_lock;
@@ -3130,12 +3130,23 @@ suffix_scan::next ()
     }
 }
 
-void
+bool
 symlink_info::set_error (int in_errno)
 {
-  if ((pflags & PATH_NO_ACCESS_CHECK) && in_errno != ENAMETOOLONG)
-    return;
-  error = in_errno;
+  bool res;
+  if (!(pflags & PATH_NO_ACCESS_CHECK) || in_errno == ENAMETOOLONG || in_errno == EIO)
+    {
+      error = in_errno;
+      res = true;
+    }
+  else if (in_errno == ENOENT)
+    res = true;
+  else
+    {
+      fileattr = FILE_ATTRIBUTE_NORMAL;
+      res = false;
+    }
+  return res;
 }
 
 bool
@@ -3243,8 +3254,8 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	      fileattr = 0;
 	      goto file_not_symlink;
 	    }
-	  set_error (geterrno_from_win_error (win_error, EACCES));
-	  continue;
+	  if (set_error (geterrno_from_win_error (win_error, EACCES)))
+	    continue;
 	}
 
       ext_tacked_on = !!*ext_here;
