@@ -800,6 +800,7 @@ reswitch:	switch (ch) {
 		case 'e':
 		case 'E':
 		case 'f':
+		case 'F':
 		case 'g':
 		case 'G':
 			if (prec == -1) {
@@ -819,12 +820,18 @@ reswitch:	switch (ch) {
 			if (isinf (_fpvalue)) {
 				if (_fpvalue < 0)
 					sign = '-';
-				cp = "Inf";
+				if (ch == 'E' || ch == 'F' || ch == 'G')
+					cp = "INF";
+				else
+					cp = "inf";
 				size = 3;
 				break;
 			}
 			if (isnan (_fpvalue)) {
-				cp = "NaN";
+				if (ch == 'E' || ch == 'F' || ch == 'G')
+					cp = "NAN";
+				else
+					cp = "nan";
 				size = 3;
 				break;
 			}

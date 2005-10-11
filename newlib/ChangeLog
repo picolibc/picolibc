@@ -1,3 +1,9 @@
+2005-10-11  David Weatherford  <weath@tensilica.com>
+
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Recognize 'F' format.
+	Print "inf" and "nan" in lowercase for e/f/g formats and in 
+	uppercase for E/F/G formats.
+
 2005-10-07  Bob Wilson  <bob.wilson@acm.org>
 
 	* libc/stdlib/mallocr.c (mALLOc, rEALLOCc, mEMALIGn): Set errno
