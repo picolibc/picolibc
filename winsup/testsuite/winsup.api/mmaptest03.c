@@ -103,7 +103,6 @@ main(int argc, char **argv)
       what = "child";
     }
 
-  if (argc > 1) sleep (10);
   if (pid == -1)
     perror_exit ("fork failed");
 
