@@ -1,3 +1,7 @@
+2005-10-11  Christopher Faylor  <cgf@timesys.com>
+
+	* Makefile.common (CFLAGS_COMMON): Add -Wstrict-aliasing.
+
 2005-03-22  Christopher Faylor  <cgf@timesys.com>
 
 	* Makefile.common: Add -dD to options when creating preprocess files.

@@ -128,7 +128,7 @@ get_child (DWORD id)
 }
 
 static void
-remove_child (DWORD id)
+remove_child (FILE *ofile, DWORD id)
 {
   child_list *c;
   if (id == lastid)
@@ -138,6 +138,9 @@ remove_child (DWORD id)
       {
 	child_list *c1 = c->next;
 	c->next = c1->next;
+	DWORD n = 0xdeadbeef;
+	GetExitCodeProcess (c1->hproc, &n);
+	fprintf (ofile, "process %u exited with status %p\n", id, n);
 	free (c1);
 	return;
       }
@@ -627,7 +630,7 @@ proc_child (unsigned mask, FILE *ofile, pid_t pid)
 	  break;
 
 	case EXIT_PROCESS_DEBUG_EVENT:
-	  remove_child (ev.dwProcessId);
+	  remove_child (ofile, ev.dwProcessId);
 	  break;
 	case EXCEPTION_DEBUG_EVENT:
 	  if (ev.u.Exception.ExceptionRecord.ExceptionCode !=
