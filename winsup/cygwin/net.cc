@@ -969,10 +969,7 @@ cygwin_gethostbyname (const char *name)
 
   hostent *res = (hostent *) dup_ent (hostent_buf, h, t_hostent);
   if (res)
-{
     debug_printf ("h_name %s", res->h_name);
-debug_printf ("HERE");
-}
   else
     {
       debug_printf ("dup_ent returned NULL for name %s, h %p", name, h);

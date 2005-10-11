@@ -1,3 +1,7 @@
+2005-10-11  Christopher Faylor  <cgf@timesys.com>
+
+	* net.cc (cygwin_gethostbyname): Remove debugging.
+
 2005-10-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syslog.cc (try_connect_syslogd): Add priority parameter. Use writev
