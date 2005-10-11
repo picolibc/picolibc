@@ -6,6 +6,7 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 GENERAL_SOURCES = \
 	clearerr.c 			\
+	dprintf.c			\
 	fclose.c 			\
 	fdopen.c 			\
 	feof.c 				\
@@ -70,6 +71,7 @@ GENERAL_SOURCES = \
 	tmpfile.c 			\
 	tmpnam.c 			\
 	ungetc.c 			\
+	vdprintf.c			\
 	viprintf.c 			\
 	viscanf.c			\
 	vprintf.c 			\
@@ -139,6 +141,7 @@ vfiscanf.$(oext): vfscanf.c
 
 CHEWOUT_FILES = \
 	clearerr.def		\
+	dprintf.def		\
 	fclose.def		\
 	fcloseall.def		\
 	fdopen.def		\

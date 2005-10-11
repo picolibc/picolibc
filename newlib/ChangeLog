@@ -1,3 +1,14 @@
+2005-10-11  Shaun Jackman  <sjackman@gmail.com>
+
+	* libc/include/stdio.h (dprintf): New declaration.
+	(vdprintf): Ditto.
+	* libc/stdio/Makefile.am (GENERAL_SOURCES): Add dprintf.c
+	and vdprintf.c.
+	* libc/stdio/Makefile.in: Regenerate.
+	* libc/stdio/dprintf.c: New file.
+	* libc/stdio/vdprintf.c: New file.
+	* libc/stdio/stdio.tex (dprintf): New entry.
+
 2005-10-11  David Weatherford  <weath@tensilica.com>
 
 	* libc/stdio/vfprintf.c (_VFPRINTF_R): Recognize 'F' format.
