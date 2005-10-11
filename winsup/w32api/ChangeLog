@@ -1,3 +1,7 @@
+2005-10-11  Christopher Faylor  <cgf@timesys.com>
+
+	* include/winbase.h (GetProcessId): Declare.
+
 2005-09-23	Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
 
 	* lib/ddk/newdev.def: Added.

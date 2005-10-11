@@ -351,8 +351,8 @@ struct sockproto {
 #define PF_INET6	AF_INET6
 #define PF_MAX	AF_MAX
 #define SOL_SOCKET	0xffff
-#if !(defined (__INSIDE_CYGWIN__) || defined (__INSIDE_MSYS__))
 #define SOMAXCONN	5
+#if !(defined (__INSIDE_CYGWIN__) || defined (__INSIDE_MSYS__))
 #define MSG_OOB	1
 #define MSG_PEEK	2
 #define MSG_DONTROUTE	4
