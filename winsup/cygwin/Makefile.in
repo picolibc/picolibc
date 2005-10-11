@@ -69,6 +69,7 @@ OBJCOPY:=@OBJCOPY@
 OBJDUMP:=@OBJDUMP@
 STRIP:=@STRIP@
 LDSCRIPT:=cygwin.sc
+MKDIRP:=$(INSTALL_DATA) -d
 
 #
 # Include common definitions for winsup directory
@@ -297,6 +298,7 @@ install: install-libs install-headers install-man install_target \
 uninstall: uninstall-libs uninstall-headers uninstall-man
 
 install-libs: $(TARGET_LIBS)
+	@$(MKDIRP) $(bindir)
 	$(INSTALL_PROGRAM) $(TEST_DLL_NAME) $(bindir)/$(DLL_NAME); \
 	for i in $^; do \
 	    $(INSTALL_DATA) $$i $(tooldir)/lib/`basename $$i` ; \
@@ -305,6 +307,7 @@ install-libs: $(TARGET_LIBS)
 install-headers:
 	cd $(srcdir); \
 	for sub in `find include -name '[a-z]*' -type d -print | sort`; do \
+	    $(MKDIRP) $(tooldir)/$$sub; \
 	    for i in $$sub/*.h ; do \
 	      $(INSTALL_DATA) $$i $(tooldir)/$$sub/`basename $$i` ; \
 	    done ; \
@@ -312,6 +315,7 @@ install-headers:
 	$(INSTALL_DATA) regex/regex.h $(tooldir)/include/regex.h
 
 install-man:
+	@$(MKDIRP) $(mandir)/man2 $(mandir)/man3 $(mandir)/man5 $(mandir)/man7
 	cd $(srcdir); \
 	for i in `find . -type f -name '*.2'`; do \
 	    $(INSTALL_DATA) $$i $(mandir)/man2/`basename $$i` ; \
