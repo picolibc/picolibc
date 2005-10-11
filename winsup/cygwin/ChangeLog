@@ -1,3 +1,11 @@
+2005-10-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syslog.cc (try_connect_syslogd): Add priority parameter. Use writev
+	to add the priority to the message in a syslog conformant way.
+	(vsyslog): If facility isn't set in the priority, use default facility
+	as given in call to openlog. Fix agressive use of spaces in syslog
+	output. Call try_connect_syslogd with priority parameter.
+
 2005-10-11  Christopher Faylor  <cgf@timesys.com>
 
 	* (symlink_info::set_error): Change to return bool if input error

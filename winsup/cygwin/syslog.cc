@@ -17,6 +17,7 @@ details. */
 #include <stdarg.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <sys/uio.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -189,7 +190,7 @@ extern "C" int cygwin_socket (int, int, int);
 extern "C" int cygwin_connect (int, const struct sockaddr *, int);
 
 static int
-try_connect_syslogd (const char *msg, int len)
+try_connect_syslogd (int priority, const char *msg, int len)
 {
   try_connect_guard.init ("try_connect_guard")->acquire ();
   if (!syslogd_inited)
@@ -225,10 +226,19 @@ try_connect_syslogd (const char *msg, int len)
       syslogd_inited = true;
     }
 out:
-  int ret = -1;
+  ssize_t ret = -1;
   if (syslogd_sock >= 0)
     {
-      ret = write (syslogd_sock, msg, len);
+      char pribuf[16];
+      sprintf (pribuf, "<%d>", priority);
+      struct iovec iv[2] =
+      {
+        { pribuf, strlen (pribuf) },
+	{ (char *) msg, len }
+      };
+
+
+      ret = writev (syslogd_sock, iv, 2);
       /* If write fails and LOG_CONS is set, return failure to vsyslog so
 	 it falls back to the usual logging method for this OS. */
       if (ret >= 0 || !(_my_tls.locals.process_logopt & LOG_CONS))
@@ -259,6 +269,10 @@ vsyslog (int priority, const char *message, va_list ap)
 		      priority, _my_tls.locals.process_logmask);
 	return;
       }
+
+    /* Add default facility if not in the given priority. */
+    if (!(priority & LOG_FACMASK))
+      priority |= _my_tls.locals.process_facility;
 
     /* Translate %m in the message to error text */
     char *errtext = strerror (get_errno ());
@@ -334,12 +348,12 @@ vsyslog (int priority, const char *message, va_list ap)
 	/* Deal with ident_string */
 	if (_my_tls.locals.process_ident != NULL)
 	  {
-	    if (pass.print ("%s : ", _my_tls.locals.process_ident) == -1)
+	    if (pass.print ("%s: ", _my_tls.locals.process_ident) == -1)
 	      return;
 	  }
 	if (_my_tls.locals.process_logopt & LOG_PID)
 	  {
-	    if (pass.print ("PID %u : ", getpid ()) == -1)
+	    if (pass.print ("PID %u: ", getpid ()) == -1)
 	      return;
 	  }
 
@@ -350,31 +364,31 @@ vsyslog (int priority, const char *message, va_list ap)
 	    switch (LOG_PRI (priority))
 	      {
 	     case LOG_EMERG:
-	       pass.print ("%s : ", "LOG_EMERG");
+	       pass.print ("%s: ", "LOG_EMERG");
 	       break;
 	     case LOG_ALERT:
-	       pass.print ("%s : ", "LOG_ALERT");
+	       pass.print ("%s: ", "LOG_ALERT");
 	       break;
 	     case LOG_CRIT:
-	       pass.print ("%s : ", "LOG_CRIT");
+	       pass.print ("%s: ", "LOG_CRIT");
 	       break;
 	      case LOG_ERR:
-		pass.print ("%s : ", "LOG_ERR");
+		pass.print ("%s: ", "LOG_ERR");
 		break;
 	      case LOG_WARNING:
-		pass.print ("%s : ", "LOG_WARNING");
+		pass.print ("%s: ", "LOG_WARNING");
 		break;
 	     case LOG_NOTICE:
-	       pass.print ("%s : ", "LOG_NOTICE");
+	       pass.print ("%s: ", "LOG_NOTICE");
 	       break;
 	      case LOG_INFO:
-		pass.print ("%s : ", "LOG_INFO");
+		pass.print ("%s: ", "LOG_INFO");
 	       break;
 	     case LOG_DEBUG:
-	       pass.print ("%s : ", "LOG_DEBUG");
+	       pass.print ("%s: ", "LOG_DEBUG");
 		break;
 	      default:
-		pass.print ("%s : ", "LOG_ERR");
+		pass.print ("%s: ", "LOG_ERR");
 		break;
 	      }
 	  }
@@ -396,7 +410,7 @@ vsyslog (int priority, const char *message, va_list ap)
       write (STDERR_FILENO, total_msg, len + 1);
 
     int fd;
-    if ((fd = try_connect_syslogd (total_msg, len + 1)) >= 0)
+    if ((fd = try_connect_syslogd (priority, total_msg, len + 1)) >= 0)
       ;
     else if (wincap.has_eventlog ())
       {
