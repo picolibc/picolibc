@@ -116,7 +116,7 @@ _CRTIMP char* __cdecl	_strtime(char*);
 
 /* These require newer versions of msvcrt.dll (6.10 or higher). */ 
 #if __MSVCRT_VERSION__ >= 0x0601
-_CRTIMP __time64_t __cdecl  _time64( __time64_t);
+_CRTIMP __time64_t __cdecl  _time64( __time64_t*);
 _CRTIMP __time64_t __cdecl  _mktime64 (struct tm*);
 _CRTIMP char* __cdecl _ctime64 (const __time64_t*);
 _CRTIMP struct tm*  __cdecl _gmtime64 (const __time64_t*);
