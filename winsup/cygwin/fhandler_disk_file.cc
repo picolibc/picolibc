@@ -1281,11 +1281,16 @@ fhandler_disk_file::rmdir ()
 	  && SetCurrentDirectory (windows_system_directory))
 	continue;
 
-      /* On 9X ERROR_ACCESS_DENIED is returned
-	 if you try to remove a non-empty directory. */
+      /* On 9X ERROR_ACCESS_DENIED is returned if you try to remove a
+         non-empty directory. */
       if (err == ERROR_ACCESS_DENIED
 	  && wincap.access_denied_on_delete ())
 	err = ERROR_DIR_NOT_EMPTY;
+      /* ...and, that's *not* funny, when trying to remove a non-existing
+         directory on a share, which is hosted by a 9x machine, the error
+	 code ERROR_INVALID_FUNCTION is returned.  */
+      else if (err == ERROR_INVALID_FUNCTION)
+        err = ERROR_FILE_NOT_FOUND;
 
       __seterrno_from_win_error (err);
 

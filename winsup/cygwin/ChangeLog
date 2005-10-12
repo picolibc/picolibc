@@ -1,3 +1,9 @@
+2005-10-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::rmdir): Convert an
+	ERROR_INVALID_FUNCTION into an ERROR_FILE_NOT_FOUND.  Add comment
+	to explain why.
+
 2005-10-11  Christopher Faylor  <cgf@timesys.com>
 
 	* Makefile.in: Make sure that directories are created prior to copying
