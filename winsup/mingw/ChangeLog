@@ -1,5 +1,12 @@
 2005-10-12  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* mingwex/complex/csqrt.c (csqrt): The sign of real part
+	of result is positive when real part of arg == 0;
+	* mingwex/complex/csqrtf.c (csqrtf): Ditto.
+	* mingwex/complex/csqrtl.c (csqrtl): Ditto.
+
+2005-10-12  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/time.h (_time64): Correct prototype.
 
 2005-10-08  Danny Smith  <dannysmith@users.sourceforge.net>

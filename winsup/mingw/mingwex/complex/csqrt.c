@@ -31,22 +31,23 @@ double complex  csqrt (double complex Z)
   else if (x == 0.0)
     {
       t = sqrt(0.5 * fabs (y));
-      __real__ Res = y > 0 ? t : -t;
-      __imag__ Res = t;
+      __real__ Res = t;
+      __imag__ Res = y > 0 ? t : -t;
     }
 
   else
     {
       t = sqrt (2.0  * (_hypot (x, y) + fabs (x)));
+      double u = t / 2.0;
       if ( x > 0.0)
         {	
-          __real__ Res = 0.5 * t;
+          __real__ Res = u;
           __imag__ Res = y / t;
         }
       else
         {
 	  __real__ Res = fabs ( y / t);
-	  __imag__ Res = (y < 0.0 ? -0.5 : 0.5) * t;
+	  __imag__ Res = y < 0.0 ? -u : u;
         }
     }
 

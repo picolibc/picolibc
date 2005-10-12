@@ -25,8 +25,8 @@ float complex  csqrtf (float complex Z)
   else if (x == 0.0f)
     {
       r = sqrtf(0.5f * fabsf (y));
-      __real__ Res = y > 0 ? r : -r;
-      __imag__ Res = r;
+      __real__ Res = r;
+      __imag__ Res = y > 0 ? r : -r;
     }
 
   else

@@ -31,8 +31,8 @@ long double complex  csqrtl (long double complex Z)
   else if (x == 0.0L)
     {
       r = sqrtl(0.5L * fabsl (y));
-      __real__ Res = y > 0 ? r : -r;
-      __imag__ Res = r;
+      __real__ Res = r;
+      __imag__ Res = y > 0 ? r : -r;
     }
 
   else
