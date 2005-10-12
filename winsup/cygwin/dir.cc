@@ -265,7 +265,7 @@ mkdir (const char *dir, mode_t mode)
       return -1;
     }
 
-  if (!(fh = build_fh_name (dir, NULL, PC_SYM_NOFOLLOW | PC_WRITABLE)))
+  if (!(fh = build_fh_name (dir, NULL, PC_SYM_NOFOLLOW)))
     goto done;   /* errno already set */;
 
   if (fh->error ())
@@ -299,13 +299,16 @@ rmdir (const char *dir)
       return -1;
     }
 
-  if (!(fh = build_fh_name (dir, NULL, PC_SYM_NOFOLLOW | PC_WRITABLE)))
+  if (!(fh = build_fh_name (dir, NULL, PC_SYM_NOFOLLOW)))
     goto done;   /* errno already set */;
 
   if (fh->error ())
     {
       debug_printf ("got %d error from build_fh_name", fh->error ());
-      set_errno (fh->error ());
+      if (fh->error ())
+	set_errno (EROFS);
+      else
+	set_errno (fh->error ());
     }
   else if (!fh->rmdir ())
     res = 0;

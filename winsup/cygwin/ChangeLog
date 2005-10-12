@@ -1,3 +1,11 @@
+2005-10-12  Christopher Faylor  <cgf@timesys.com>
+
+	* dir.cc (mkdir): Abandon use of PC_WRITABLE.
+	(rmdir): Ditto.
+	* path.h (PC_WRITABLE): Delete.
+	* path.cc (path_conv::check): Remove PC_WRITABLE accommodations.
+	Revisit later.
+
 2005-10-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::rmdir): Convert an

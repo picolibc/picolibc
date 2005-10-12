@@ -925,14 +925,7 @@ virtual_component_retry:
 
 out:
   bool strip_tail = false;
-  /* If the user wants a directory, do not return a symlink */
-  if ((opt & PC_WRITABLE) && (path_flags & PATH_RO))
-    {
-      debug_printf ("%s is on a read-only filesystem", path);
-      error = EROFS;
-      return;
-    }
-  else if (dev.devn == FH_NETDRIVE && component)
+  if (dev.devn == FH_NETDRIVE && component)
     {
       /* This case indicates a non-existant resp. a non-retrievable
 	 share.  This happens for instance if the share is a printer.
