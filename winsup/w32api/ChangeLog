@@ -1,3 +1,8 @@
+2005-10-12  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winbase.h (GetProcessId): Remove duplicate declaration.
+	Use _WIN32_WINNT >= 0x0501 guard. 
+
 2005-10-11  Christopher Faylor  <cgf@timesys.com>
 
 	* include/winbase.h (GetProcessId): Declare.
