@@ -1,5 +1,10 @@
 2005-10-12  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/stddef.h: Remove.
+	* include/stdarg.h: Remove.
+
+2005-10-12  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* mingwex/complex/csqrt.c (csqrt): The sign of real part
 	of result is positive when real part of arg == 0;
 	* mingwex/complex/csqrtf.c (csqrtf): Ditto.
