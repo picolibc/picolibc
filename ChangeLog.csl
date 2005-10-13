@@ -1,3 +1,18 @@
+2005-10-13  Mark Mitchell  <mark@codesourcery.com>
+
+	Issue #439
+	Backport:
+	2005-10-13  Mark Mitchell  <mark@codesourcery.com>
+	* ld.texino: Describe double-quoted string syntax for version
+	nodes.
+	* ldlang.h (lang_new_vers_pattern): Add literal_p parameter.
+	* ldgram.y (vers_defns): Allow NAME as well as VERS_IDENTIFIER.
+	Adjust calls to lang_new_vers_pattern to pass literal_p argument.
+	* ldlang.c (lang_vers_match): Fix indentation.  Do not glob-match
+	version nodes without a pattern.
+	(lang_new_vers_pattern): Add literal_p parameter.
+	(lang_do_version_exports_section): Pass it.
+
 2005-08-30  Mark Mitchell  <mark@codesourcery.com>
 
 	* ld/ldmain.c (main): Use expandargv.
