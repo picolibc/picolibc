@@ -1,3 +1,7 @@
+2005-10-12  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	* hppa.h (pa_opcodes): Remove lha entries.
+
 2005-10-08  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
 
 	* hppa.h (FLAG_STRICT): Revise comment.
