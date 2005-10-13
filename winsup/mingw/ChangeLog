@@ -1,3 +1,8 @@
+2005-10-13  Wu Yongwei  <adah@users.sourceforge.net>
+
+	* include/tchar.h: Include <wchar.h> when _UNICODE is defined.
+	(_TEOF): New macro definition for _UNICODE and non_UNICODE cases.
+
 2005-10-12  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/stddef.h: Remove.

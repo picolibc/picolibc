@@ -31,6 +31,10 @@
  */
 #ifdef	_UNICODE
 
+/*
+ * Include <wchar.h> for wchar_t and WEOF if _UNICODE.
+ */
+#include <wchar.h>
 
 /*
  * Use TCHAR instead of char or wchar_t. It will be appropriately translated
@@ -44,6 +48,11 @@ typedef wchar_t _TCHAR;
 #define _TCHAR_DEFINED
 #endif
 
+/*
+ * Use _TEOF instead of EOF or WEOF. It will be appropriately translated if
+ * _UNICODE is correctly defined (or not).
+ */
+#define _TEOF WEOF
 
 /*
  * __TEXT is a private macro whose specific use is to force the expansion of a
@@ -212,6 +221,7 @@ typedef wchar_t _TCHAR;
 #define _trewinddir	_wrewinddir
 #define _ttelldir	_wtelldir
 #define _tseekdir	_wseekdir
+
 #else	/* Not _UNICODE */
 
 /*
@@ -224,6 +234,11 @@ typedef char	_TCHAR;
 #endif
 #define _TCHAR_DEFINED
 #endif
+
+/*
+ * _TEOF, the constant you should use instead of EOF.
+ */
+#define _TEOF EOF
 
 /*
  * __TEXT is a private macro whose specific use is to force the expansion of a
