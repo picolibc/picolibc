@@ -94,7 +94,7 @@ u_int32_t _getlong(const u_char *src);
 u_int16_t _getshort(const u_char *src);
 
 #ifdef DEBUG
-static void dprintf(char *, int);
+static void dbgprintf(char *, int);
 #endif
 
 #if PACKETSZ > 1024
@@ -118,7 +118,7 @@ int _dns_ttl_;
 
 #ifdef DEBUG
 static void
-dprintf(msg, num)
+dbgprintf(msg, num)
 	char *msg;
 	int num;
 {
@@ -130,7 +130,7 @@ dprintf(msg, num)
 	}
 }
 #else
-# define dprintf(msg, num) /*nada*/
+# define dbgprintf(msg, num) /*nada*/
 #endif
 
 #define BOUNDED_INCR(x) \
@@ -397,13 +397,13 @@ gethostanswer(answer, anslen, qname, qtype, host, hostbuf, hostbuflen, herr)
 			bp += sizeof(align) - ((u_long)bp % sizeof(align));
 
 			if (bp + n >= &hostbuf[hostbuflen]) {
-				dprintf("size (%d) too big\n", n);
+				dbgprintf("size (%d) too big\n", n);
 				had_error++;
 				continue;
 			}
 			if (hap >= &host->__host_addrs[MAXADDRS-1]) {
 				if (!toobig++)
-					dprintf("Too many addresses (%d)\n",
+					dbgprintf("Too many addresses (%d)\n",
 						MAXADDRS);
 				cp += n;
 				continue;
@@ -418,7 +418,7 @@ gethostanswer(answer, anslen, qname, qtype, host, hostbuf, hostbuflen, herr)
 			}
 			break;
 		default:
-			dprintf("Impossible condition (type=%d)\n", type);
+			dbgprintf("Impossible condition (type=%d)\n", type);
 			*herr = NO_RECOVERY;
 			return (NULL);
 			/* BIND has abort() here, too risky on bad data */
@@ -606,7 +606,7 @@ _dns_gethostbyname(void *rval, void *cb_data, va_list ap)
 		}
 
 	if ((n = res_search(name, C_IN, type, buf.buf, sizeof(buf))) < 0) {
-		dprintf("res_search failed (%d)\n", n);
+		dbgprintf("res_search failed (%d)\n", n);
 		return NS_UNAVAIL;
 	}
 	*(struct hostent **)rval = gethostanswer(&buf, n, name, type, resultbuf, hostbuf, buflen, herr);
@@ -697,11 +697,11 @@ _dns_gethostbyaddr(void *rval, void *cb_data, va_list ap)
 	}
 	n = res_query(qbuf, C_IN, T_PTR, (u_char *)buf.buf, sizeof buf.buf);
 	if (n < 0) {
-		dprintf("res_query failed (%d)\n", n);
+		dbgprintf("res_query failed (%d)\n", n);
 		return NS_UNAVAIL;
 	}
 	if (n > sizeof buf.buf) {
-		dprintf("static buffer is too small (%d)\n", n);
+		dbgprintf("static buffer is too small (%d)\n", n);
 		return NS_UNAVAIL;
 	}
 	if (!(hp = gethostanswer(&buf, n, qbuf, T_PTR, resultbuf, hostbuf, buflen, herr)))

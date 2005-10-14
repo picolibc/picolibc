@@ -1,5 +1,10 @@
 2005-10-14  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/sys/linux/net/gethostbydns.c (dprintf): Rename to
+	dbgprintf to prevent conflict with new dprintf function.
+
+2005-10-14  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/stdio/vfprintf.c (_VFPRINTF_R): Fix up "inf" and
 	"nan" processing for systems that have long double support.
 
