@@ -849,12 +849,18 @@ reswitch:	switch (ch) {
 			if (tmp == 2) {
 				if (_fpvalue < 0)
 					sign = '-';
-				cp = "Inf";
+				if (ch == 'E' || ch == 'F' || ch == 'G')
+					cp = "INF";
+				else
+					cp = "inf";
 				size = 3;
 				break;
 			}
 			if (tmp == 1) {
-				cp = "NaN";
+				if (ch == 'E' || ch == 'F' || ch == 'G')
+					cp = "NAN";
+				else
+					cp = "nan";
 				size = 3;
 				break;
 			}

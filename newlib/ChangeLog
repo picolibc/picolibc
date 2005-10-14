@@ -1,5 +1,10 @@
 2005-10-14  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Fix up "inf" and
+	"nan" processing for systems that have long double support.
+
+2005-10-14  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/sys/linux/sys/types.h (int8_t): Add type.
 
 2005-10-14  Bob Wilson  <bob.wilson@acm.org>
