@@ -1,3 +1,11 @@
+2005-10-14  Bob Wilson  <bob.wilson@acm.org>
+
+        * libc/reent/reent.tex (Reentrancy): Replace "Cygnus C Library"
+        with "Red Hat newlib C Library".
+        * libc/sys.tex (Stubs): Likewise.
+        * libm/math/math.tex (Math): Likewise.
+        * libm/mathfp/mathfp.tex (Math): Likewise.
+
 2005-10-11  Shaun Jackman  <sjackman@gmail.com>
 
 	* libc/include/stdio.h (dprintf): New declaration.

@@ -4,8 +4,8 @@
 @cindex reentrancy
 Reentrancy is a characteristic of library functions which allows multiple
 processes to use the same address space with assurance that the values stored
-in those spaces will remain constant between calls. Cygnus's implementation
-of the library functions ensures that 
+in those spaces will remain constant between calls. The Red Hat
+newlib implementation of the library functions ensures that 
 whenever possible, these library functions are reentrant.  However,
 there are some functions that can not be trivially made reentrant.
 Hooks have been provided to allow you to use these functions in a fully

@@ -34,7 +34,7 @@ Graceful failure is permitted by returning an error code.  A minor
 complication arises here: the C library must be compatible with
 development environments that supply fully functional versions of these
 subroutines.  Such environments usually return error codes in a global
-@code{errno}.  However, the Cygnus C library provides a @emph{macro}
+@code{errno}.  However, the Red Hat newlib C library provides a @emph{macro}
 definition for @code{errno} in the header file @file{errno.h}, as part
 of its support for reentrant routines (@pxref{Reentrancy,,Reentrancy}).
 
