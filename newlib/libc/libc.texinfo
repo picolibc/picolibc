@@ -143,7 +143,7 @@ into another language, under the above conditions for modified versions.
 @end titlepage
 @end iftex
 
-@ifinfo
+@ifnottex
 @node Top
 @top The Red Hat newlib C Library
 
@@ -158,6 +158,7 @@ into another language, under the above conditions for modified versions.
 @include iconvset.texi
 
 @menu
+* Introduction::
 * Stdlib::
 * Ctype::
 * Stdio::
@@ -173,18 +174,36 @@ into another language, under the above conditions for modified versions.
 
 * Timefns::
 * Locale::
-* Syscalls::
+* Reentrancy::
 
 * Misc::
+* Syscalls::
 * Arglists::
-* Reentrancy::
 @ifset ICONV
 * Iconv::
 @end ifset
 
 * Library Index::
 @end menu
-@end ifinfo
+@end ifnottex
+
+@node Introduction
+@chapter Introduction
+
+This reference manual describes the functions provided by the Red Hat
+``newlib'' version of the standard ANSI C library.  This document is not
+intended as an overview or a tutorial for the C library.  Each library
+function is listed with a synopsis of its use, a brief description,
+return values (including error handling), and portability issues.
+
+Some of the library functions depend on support from the underlying
+operating system and may not be available on every platform.  For
+embedded systems in particular, many of these underlying operating
+system services may not be available or may not be fully functional.
+The specific operating system subroutines required for a particular
+library function are listed in the ``Portability'' section of the
+function description.  @xref{Syscalls}, for a description of the
+relevant operating system calls.
 
 @include targetdep.tex
 
