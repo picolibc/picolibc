@@ -69,7 +69,7 @@ OBJCOPY:=@OBJCOPY@
 OBJDUMP:=@OBJDUMP@
 STRIP:=@STRIP@
 LDSCRIPT:=cygwin.sc
-MKDIRP:=$(INSTALL_DATA) -d
+MKDIRP:=$(INSTALL) -d
 
 #
 # Include common definitions for winsup directory
