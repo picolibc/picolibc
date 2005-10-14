@@ -1,3 +1,14 @@
+2005-10-14  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	Backport:
+	2005-09-09  Richard Earnshaw  <richard.earnshaw@arm.com>
+	* bfd/elf32-arm.c (elf32_arm_section_from_shdr): Accept
+	SHT_ARM_PREEMPTMAP and SHT_ARM_ATTRIBUTES.
+
+	2005-09-09  Richard Earnshaw  <richard.earnshaw@arm.com>
+	* include/elf/arm.h (SHT_ARM_PREEMPTMAP, SHT_ARM_ATTRIBUTES): New
+	defines.
+
 2005-06-14  Mark Mitchell  <mark@codesourcery.com>
 
 	* readline/rlnotty.c (tgoto): New function.
