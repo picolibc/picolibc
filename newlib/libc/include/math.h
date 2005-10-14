@@ -14,18 +14,34 @@ _BEGIN_STD_C
 /* Define HUGE_VAL as infinity, unless HUGE_VAL is already defined
    (which might have been done by something like math-68881.h).  */
 
+union __fmath
+{
+  __ULong i[1];
+  float f;
+};
+
 union __dmath
 {
   __ULong i[2];
   double d;
 };
 
+union __ldmath
+{
+  __ULong i[4];
+  _LONG_DOUBLE ld;
+};
+
 /* Declare this as an array without bounds so that no matter what small data
    support a port and/or library has, this reference will be via the general
    method for accessing globals. */
 extern __IMPORT const union __dmath __infinity[];
+extern __IMPORT const union __fmath __infinityf[];
+extern __IMPORT const union __ldmath __infinityld[];
 
 #define HUGE_VAL (__infinity[0].d)
+#define HUGE_VALF (__infinityf[0].f)
+#define HUGE_VALL (__infinityld[0].ld)
 
 #endif /* ! defined (HUGE_VAL) */
 

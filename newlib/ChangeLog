@@ -1,5 +1,19 @@
 2005-10-14  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/include/math.h (HUGE_VALF, HUGE_VALL): New.
+	* libm/common/Makefile.am: Add s_infconst.c support.
+	* libm/common/Makefile.in: Regenerated.
+	* libm/common/s_infconst.c: New file with float and
+	long double infinity support added.
+	* libm/math/Makefile.am: Remove s_infconst.c support.
+	* libm/math/Makefile.in: Regenerated.
+	* libm/math/s_infconst.c: Moved to common directory.
+	* libm/mathfp/Makefile.am: Remove s_infconst.c support.
+	* libm/mathfp/Makefile.in: Regenerated.
+	* libm/mathfp/s_infconst.c: Moved to common directory.
+
+2005-10-14  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/sys/linux/net/gethostbydns.c (dprintf): Rename to
 	dbgprintf to prevent conflict with new dprintf function.
 

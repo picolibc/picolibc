@@ -5,7 +5,7 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 src = 	s_finite.c s_copysign.c s_modf.c s_scalbn.c \
-	s_cbrt.c s_expm1.c s_ilogb.c \
+	s_cbrt.c s_expm1.c s_ilogb.c s_infconst.c \
 	s_infinity.c s_log1p.c s_nan.c s_nextafter.c \
 	s_rint.c s_logb.c s_matherr.c s_lib_ver.c \
 	s_fdim.c s_fma.c s_fmax.c s_fmin.c s_fpclassify.c s_lrint.c \

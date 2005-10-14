@@ -25,7 +25,7 @@ src = 	k_standard.c k_rem_pio2.c \
 	s_frexp.c s_isnan.c s_ldexp.c \
 	s_signif.c s_sin.c \
 	s_tan.c s_tanh.c \
-	s_isinf.c s_infconst.c \
+	s_isinf.c \
 	w_exp2.c w_tgamma.c
 
 fsrc =	kf_rem_pio2.c \

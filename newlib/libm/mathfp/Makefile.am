@@ -21,7 +21,7 @@ src =	s_acos.c s_frexp.c s_mathcnst.c \
 	er_gamma.c er_lgamma.c \
 	s_erf.c e_j0.c e_j1.c w_jn.c e_hypot.c \
 	w_cabs.c w_drem.c s_asinh.c s_fmod.c \
-	e_scalb.c s_infconst.c s_signif.c \
+	e_scalb.c s_signif.c \
 	s_exp2.c s_tgamma.c
 
 fsrc =	sf_ceil.c \

@@ -98,7 +98,7 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-src = s_finite.c s_copysign.c s_modf.c s_scalbn.c 	s_cbrt.c s_expm1.c s_ilogb.c 	s_infinity.c s_log1p.c s_nan.c s_nextafter.c 	s_rint.c s_logb.c s_matherr.c s_lib_ver.c 	s_fdim.c s_fma.c s_fmax.c s_fmin.c s_fpclassify.c s_lrint.c 	s_lround.c s_nearbyint.c s_remquo.c s_round.c s_scalbln.c 	s_signbit.c s_trunc.c
+src = s_finite.c s_copysign.c s_modf.c s_scalbn.c 	s_cbrt.c s_expm1.c s_ilogb.c s_infconst.c 	s_infinity.c s_log1p.c s_nan.c s_nextafter.c 	s_rint.c s_logb.c s_matherr.c s_lib_ver.c 	s_fdim.c s_fma.c s_fmax.c s_fmin.c s_fpclassify.c s_lrint.c 	s_lround.c s_nearbyint.c s_remquo.c s_round.c s_scalbln.c 	s_signbit.c s_trunc.c
 
 
 fsrc = sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c 	sf_cbrt.c sf_expm1.c sf_ilogb.c 	sf_infinity.c sf_log1p.c sf_nan.c sf_nextafter.c 	sf_rint.c sf_logb.c 	sf_fdim.c sf_fma.c sf_fmax.c sf_fmin.c sf_lrint.c 	sf_lround.c sf_nearbyint.c sf_remquo.c sf_round.c 	sf_scalbln.c sf_trunc.c
@@ -136,36 +136,36 @@ lib_a_LIBADD =
 @USE_LIBTOOL_FALSE@s_copysign.$(OBJEXT) s_modf.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@s_scalbn.$(OBJEXT) s_cbrt.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@s_expm1.$(OBJEXT) s_ilogb.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@s_infinity.$(OBJEXT) s_log1p.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@s_nan.$(OBJEXT) s_nextafter.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@s_rint.$(OBJEXT) s_logb.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@s_matherr.$(OBJEXT) s_lib_ver.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@s_fdim.$(OBJEXT) s_fma.$(OBJEXT) s_fmax.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@s_fmin.$(OBJEXT) s_fpclassify.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@s_lrint.$(OBJEXT) s_lround.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@s_nearbyint.$(OBJEXT) s_remquo.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@s_round.$(OBJEXT) s_scalbln.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@s_signbit.$(OBJEXT) s_trunc.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sf_finite.$(OBJEXT) sf_copysign.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sf_modf.$(OBJEXT) sf_scalbn.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sf_cbrt.$(OBJEXT) sf_expm1.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sf_ilogb.$(OBJEXT) sf_infinity.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sf_log1p.$(OBJEXT) sf_nan.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sf_nextafter.$(OBJEXT) sf_rint.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sf_logb.$(OBJEXT) sf_fdim.$(OBJEXT) sf_fma.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sf_fmax.$(OBJEXT) sf_fmin.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sf_lrint.$(OBJEXT) sf_lround.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sf_nearbyint.$(OBJEXT) sf_remquo.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sf_round.$(OBJEXT) sf_scalbln.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sf_trunc.$(OBJEXT)
+@USE_LIBTOOL_FALSE@s_infconst.$(OBJEXT) s_infinity.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_log1p.$(OBJEXT) s_nan.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_nextafter.$(OBJEXT) s_rint.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_logb.$(OBJEXT) s_matherr.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_lib_ver.$(OBJEXT) s_fdim.$(OBJEXT) s_fma.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_fmax.$(OBJEXT) s_fmin.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_fpclassify.$(OBJEXT) s_lrint.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_lround.$(OBJEXT) s_nearbyint.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_remquo.$(OBJEXT) s_round.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_scalbln.$(OBJEXT) s_signbit.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_trunc.$(OBJEXT) sf_finite.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_copysign.$(OBJEXT) sf_modf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_scalbn.$(OBJEXT) sf_cbrt.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_expm1.$(OBJEXT) sf_ilogb.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_infinity.$(OBJEXT) sf_log1p.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_nan.$(OBJEXT) sf_nextafter.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_rint.$(OBJEXT) sf_logb.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_fdim.$(OBJEXT) sf_fma.$(OBJEXT) sf_fmax.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_fmin.$(OBJEXT) sf_lrint.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_lround.$(OBJEXT) sf_nearbyint.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_remquo.$(OBJEXT) sf_round.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_scalbln.$(OBJEXT) sf_trunc.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 libcommon_la_LIBADD = 
 @USE_LIBTOOL_TRUE@libcommon_la_OBJECTS =  s_finite.lo s_copysign.lo \
 @USE_LIBTOOL_TRUE@s_modf.lo s_scalbn.lo s_cbrt.lo s_expm1.lo s_ilogb.lo \
-@USE_LIBTOOL_TRUE@s_infinity.lo s_log1p.lo s_nan.lo s_nextafter.lo \
-@USE_LIBTOOL_TRUE@s_rint.lo s_logb.lo s_matherr.lo s_lib_ver.lo \
-@USE_LIBTOOL_TRUE@s_fdim.lo s_fma.lo s_fmax.lo s_fmin.lo \
+@USE_LIBTOOL_TRUE@s_infconst.lo s_infinity.lo s_log1p.lo s_nan.lo \
+@USE_LIBTOOL_TRUE@s_nextafter.lo s_rint.lo s_logb.lo s_matherr.lo \
+@USE_LIBTOOL_TRUE@s_lib_ver.lo s_fdim.lo s_fma.lo s_fmax.lo s_fmin.lo \
 @USE_LIBTOOL_TRUE@s_fpclassify.lo s_lrint.lo s_lround.lo s_nearbyint.lo \
 @USE_LIBTOOL_TRUE@s_remquo.lo s_round.lo s_scalbln.lo s_signbit.lo \
 @USE_LIBTOOL_TRUE@s_trunc.lo sf_finite.lo sf_copysign.lo sf_modf.lo \
