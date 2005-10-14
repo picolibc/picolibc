@@ -49,7 +49,6 @@ CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
 TARGETDOC = ../tmp.texi
 
 doc: $(chobj)
-	cat $(srcdir)/common.tex >> $(TARGETDOC)
 
 CLEANFILES = $(chobj) *.ref
 

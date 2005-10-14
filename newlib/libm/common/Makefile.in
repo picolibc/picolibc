@@ -410,7 +410,6 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 	touch stmp-def
 
 doc: $(chobj)
-	cat $(srcdir)/common.tex >> $(TARGETDOC)
 
 # Texinfo does not appear to support underscores in file names, so we
 # name the .def files without underscores.

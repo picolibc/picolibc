@@ -1,5 +1,13 @@
 2005-10-14  Bob Wilson  <bob.wilson@acm.org>
 
+        * libm/common/Makefile.am (doc): Do not append to $(TARGETDOC).
+        * libm/common/Makefile.in: Regenerate.
+        * libm/common/common.tex: Delete file.
+        * libm/math/math.tex: Include .def files from common/.
+        * libm/mathfp/mathfp.tex: Likewise.
+
+2005-10-14  Bob Wilson  <bob.wilson@acm.org>
+
 	* libc/libc.texinfo (Top): Surround this node with @ifnottex
 	instead of @ifinfo.  Update menu to add Introduction and match
 	SUBDIRS order.
