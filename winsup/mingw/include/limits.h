@@ -28,7 +28,7 @@
  * NOTE: Apparently the actual size of PATH_MAX is 260, but a space is
  *       required for the NUL. TODO: Test?
  */
-#define PATH_MAX	(259)
+#define PATH_MAX	259
 
 /*
  * Characteristics of the char data type.
@@ -75,26 +75,31 @@
  * TODO: This is not correct for Alphas, which have 64 bit longs.
  */
 #define LONG_MAX	2147483647L
-
 #define LONG_MIN	(-LONG_MAX-1)
 
 #define ULONG_MAX	0xffffffffUL
 
+#ifndef __STRICT_ANSI__
+/* POSIX wants this.  */ 
+#define SSIZE_MAX LONG_MAX
+#endif
+
+#if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) \
+     || !defined(__STRICT_ANSI__)
+/* ISO C9x macro names */
+#define LLONG_MAX 9223372036854775807LL
+#define LLONG_MIN (-LLONG_MAX - 1)
+#define ULLONG_MAX (2ULL * LLONG_MAX + 1)
+#endif
 
 /*
  * The GNU C compiler also allows 'long long int'
  */
-#if	!defined(__STRICT_ANSI__) && defined(__GNUC__)
+#if !defined(__STRICT_ANSI__) && defined(__GNUC__)
 
 #define LONG_LONG_MAX	9223372036854775807LL
 #define LONG_LONG_MIN	(-LONG_LONG_MAX-1)
-
 #define ULONG_LONG_MAX	(2ULL * LONG_LONG_MAX + 1)
-
-/* ISO C9x macro names */
-#define LLONG_MAX LONG_LONG_MAX
-#define LLONG_MIN LONG_LONG_MIN
-#define ULLONG_MAX ULONG_LONG_MAX
 
 /* MSVC compatibility */
 #define _I64_MIN LONG_LONG_MIN
