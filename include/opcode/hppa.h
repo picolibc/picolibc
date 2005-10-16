@@ -955,6 +955,8 @@ static const struct pa_opcode pa_opcodes[] =
 { "fnegabs",	0x3800e000, 0xfc1fe720, "IfA,fT", pa20, FLAG_STRICT},
 { "fcnv",	0x30000200, 0xfc1c0720, "{_fa,fT", pa20, FLAG_STRICT},
 { "fcnv",	0x38000200, 0xfc1c0720, "FGfA,fT", pa20, FLAG_STRICT},
+{ "fcmp",	0x30000400, 0xfc00e7e0, "F?ffa,fb", pa10, FLAG_STRICT},
+{ "fcmp",	0x38000400, 0xfc00e720, "I?ffA,fB", pa10, FLAG_STRICT},
 { "fcmp",	0x30000400, 0xfc0007e0, "F?ffa,fb,h", pa20, FLAG_STRICT},
 { "fcmp",	0x38000400, 0xfc000720, "I?ffA,fB,h", pa20, FLAG_STRICT},
 { "fcmp",	0x30000400, 0xfc00e7e0, "F?ffa,fb", pa10, 0},
@@ -962,9 +964,9 @@ static const struct pa_opcode pa_opcodes[] =
 { "xmpyu",	0x38004700, 0xfc00e720, "fX,fB,fT", pa11, 0},
 { "fmpyadd",	0x18000000, 0xfc000000, "Hfi,fj,fk,fl,fm", pa11, 0},
 { "fmpysub",	0x98000000, 0xfc000000, "Hfi,fj,fk,fl,fm", pa11, 0},
+{ "ftest",	0x30002420, 0xffffffff, "", pa10, FLAG_STRICT},
 { "ftest",	0x30002420, 0xffffffe0, ",=", pa20, FLAG_STRICT},
 { "ftest",	0x30000420, 0xffff1fff, "m", pa20, FLAG_STRICT},
-{ "ftest",	0x30002420, 0xffffffff, "", pa10, 0},
 { "fid",	0x30000000, 0xffffffff, "", pa11, 0},
 
 /* Performance Monitor Instructions.  */

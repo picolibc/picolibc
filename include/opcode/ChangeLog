@@ -1,3 +1,8 @@
+2005-10-16  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	* hppa.h (pa_opcodes): Add two fcmp opcodes.  Reorder ftest opcodes.
+	Add FLAG_STRICT to pa10 ftest opcode.
+
 2005-10-12  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
 
 	* hppa.h (pa_opcodes): Remove lha entries.
