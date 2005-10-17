@@ -244,22 +244,13 @@ std_dll_init ()
 
 /* Initialization function for winsock stuff. */
 bool NO_COPY wsock_started = 0;
+WSADATA NO_COPY wsadata;
 __attribute__ ((used, noinline, regparm(1))) static long long
 wsock_init ()
 {
   static LONG NO_COPY here = -1L;
   struct func_info *func = (struct func_info *) __builtin_return_address (0);
   struct dll_info *dll = func->dll;
-
-  __asm__ ("						\n\
-	.section .ws2_32_info				\n\
-	.equ	_ws2_32_handle,.ws2_32_info + 4		\n\
-	.global _ws2_32_handle				\n\
-	.section .wsock32_info				\n\
-	.equ	_wsock32_handle,.wsock32_info + 4	\n\
-	.global	_wsock32_handle				\n\
-	.text						\n\
-  ");
 
   while (InterlockedIncrement (&here))
     {
@@ -305,7 +296,6 @@ wsock_init ()
   return ret.ll;
 }
 
-LoadDLLprime (wsock32, _wsock_init)
 LoadDLLprime (ws2_32, _wsock_init)
 
 LoadDLLfunc (AccessCheck, 32, advapi32)
@@ -452,57 +442,54 @@ LoadDLLfunc (SetProcessWindowStation, 4, user32)
 LoadDLLfunc (SetTimer, 16, user32)
 LoadDLLfunc (SetUserObjectSecurity, 12, user32)
 
-LoadDLLfuncEx (load_wsock32, 0, wsock32, 1) // non-existent function forces wsock32 load
-LoadDLLfunc (WSAAsyncSelect, 16, wsock32)
-LoadDLLfunc (WSACleanup, 0, wsock32)
-LoadDLLfunc (WSAGetLastError, 0, wsock32)
-LoadDLLfunc (WSASetLastError, 4, wsock32)
-// LoadDLLfunc (WSAStartup, 8, wsock32)
-LoadDLLfunc (__WSAFDIsSet, 8, wsock32)
-LoadDLLfunc (accept, 12, wsock32)
-LoadDLLfunc (bind, 12, wsock32)
-LoadDLLfunc (closesocket, 4, wsock32)
-LoadDLLfunc (connect, 12, wsock32)
-LoadDLLfunc (gethostbyaddr, 12, wsock32)
-LoadDLLfunc (gethostbyname, 4, wsock32)
-LoadDLLfuncEx2 (gethostname, 8, wsock32, 1, 1)
-LoadDLLfunc (getpeername, 12, wsock32)
-LoadDLLfunc (getprotobyname, 4, wsock32)
-LoadDLLfunc (getprotobynumber, 4, wsock32)
-LoadDLLfunc (getservbyname, 8, wsock32)
-LoadDLLfunc (getservbyport, 8, wsock32)
-LoadDLLfunc (getsockname, 12, wsock32)
-LoadDLLfunc (getsockopt, 20, wsock32)
-LoadDLLfunc (inet_addr, 4, wsock32)
-LoadDLLfunc (inet_network, 4, wsock32)
-LoadDLLfunc (inet_ntoa, 4, wsock32)
-LoadDLLfunc (ioctlsocket, 12, wsock32)
-LoadDLLfunc (listen, 8, wsock32)
-LoadDLLfunc (rcmd, 24, wsock32)
-LoadDLLfunc (recv, 16, wsock32)
-LoadDLLfunc (recvfrom, 24, wsock32)
-LoadDLLfunc (rexec, 24, wsock32)
-LoadDLLfunc (rresvport, 4, wsock32)
-LoadDLLfunc (select, 20, wsock32)
-LoadDLLfunc (send, 16, wsock32)
-LoadDLLfunc (sendto, 24, wsock32)
-LoadDLLfunc (setsockopt, 20, wsock32)
-LoadDLLfunc (shutdown, 8, wsock32)
-LoadDLLfunc (socket, 12, wsock32)
-
-LoadDLLfuncEx (WSACloseEvent, 4, ws2_32, 1)
-LoadDLLfuncEx (WSACreateEvent, 0, ws2_32, 1)
-LoadDLLfuncEx (WSADuplicateSocketA, 12, ws2_32, 1)
-LoadDLLfuncEx (WSAGetOverlappedResult, 20, ws2_32, 1)
-LoadDLLfuncEx (WSARecv, 28, ws2_32, 1)
-LoadDLLfuncEx (WSARecvFrom, 36, ws2_32, 1)
-LoadDLLfuncEx (WSASend, 28, ws2_32, 1)
-LoadDLLfuncEx (WSASendTo, 36, ws2_32, 1)
-LoadDLLfuncEx (WSASetEvent, 4, ws2_32, 1)
-LoadDLLfuncEx (WSASocketA, 24, ws2_32, 1)
-LoadDLLfuncEx (WSAWaitForMultipleEvents, 20, ws2_32, 1)
-LoadDLLfuncEx (WSAEventSelect, 12, ws2_32, 1)
-LoadDLLfuncEx (WSAEnumNetworkEvents, 12, ws2_32, 1)
+LoadDLLfunc (accept, 12, ws2_32)
+LoadDLLfunc (bind, 12, ws2_32)
+LoadDLLfunc (closesocket, 4, ws2_32)
+LoadDLLfunc (connect, 12, ws2_32)
+LoadDLLfunc (gethostbyaddr, 12, ws2_32)
+LoadDLLfunc (gethostbyname, 4, ws2_32)
+LoadDLLfuncEx2 (gethostname, 8, ws2_32, 1, 1)
+LoadDLLfunc (getpeername, 12, ws2_32)
+LoadDLLfunc (getprotobyname, 4, ws2_32)
+LoadDLLfunc (getprotobynumber, 4, ws2_32)
+LoadDLLfunc (getservbyname, 8, ws2_32)
+LoadDLLfunc (getservbyport, 8, ws2_32)
+LoadDLLfunc (getsockname, 12, ws2_32)
+LoadDLLfunc (getsockopt, 20, ws2_32)
+LoadDLLfunc (inet_addr, 4, ws2_32)
+LoadDLLfunc (inet_network, 4, ws2_32)
+LoadDLLfunc (inet_ntoa, 4, ws2_32)
+LoadDLLfunc (ioctlsocket, 12, ws2_32)
+LoadDLLfunc (listen, 8, ws2_32)
+LoadDLLfunc (rcmd, 24, ws2_32)
+LoadDLLfunc (recv, 16, ws2_32)
+LoadDLLfunc (recvfrom, 24, ws2_32)
+LoadDLLfunc (rexec, 24, ws2_32)
+LoadDLLfunc (rresvport, 4, ws2_32)
+LoadDLLfunc (select, 20, ws2_32)
+LoadDLLfunc (send, 16, ws2_32)
+LoadDLLfunc (sendto, 24, ws2_32)
+LoadDLLfunc (setsockopt, 20, ws2_32)
+LoadDLLfunc (shutdown, 8, ws2_32)
+LoadDLLfunc (socket, 12, ws2_32)
+LoadDLLfunc (WSAAsyncSelect, 16, ws2_32)
+LoadDLLfunc (WSACloseEvent, 4, ws2_32)
+LoadDLLfunc (WSACreateEvent, 0, ws2_32)
+LoadDLLfunc (WSADuplicateSocketA, 12, ws2_32)
+LoadDLLfunc (WSAGetLastError, 0, ws2_32)
+LoadDLLfunc (WSAGetOverlappedResult, 20, ws2_32)
+LoadDLLfunc (WSARecv, 28, ws2_32)
+LoadDLLfunc (WSARecvFrom, 36, ws2_32)
+LoadDLLfunc (WSASend, 28, ws2_32)
+LoadDLLfunc (WSASendTo, 36, ws2_32)
+LoadDLLfunc (WSASetEvent, 4, ws2_32)
+LoadDLLfunc (WSASetLastError, 4, ws2_32)
+LoadDLLfunc (WSASocketA, 24, ws2_32)
+// LoadDLLfunc (WSAStartup, 8, ws2_32)
+LoadDLLfunc (WSAWaitForMultipleEvents, 20, ws2_32)
+LoadDLLfunc (WSAEventSelect, 12, ws2_32)
+LoadDLLfunc (WSAEnumNetworkEvents, 12, ws2_32)
+LoadDLLfunc (__WSAFDIsSet, 8, ws2_32)
 
 LoadDLLfuncEx (GetIfTable, 12, iphlpapi, 1)
 LoadDLLfuncEx (GetIfEntry, 4, iphlpapi, 1)

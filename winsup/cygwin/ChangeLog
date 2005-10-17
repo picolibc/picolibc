@@ -1,3 +1,58 @@
+2005-10-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc: Never load wsock32.dll. Load all wsock32 function
+	from ws2_32.  Rearrange symbol order accordingly.  None of the ws2_32
+	functions is optional right now.
+	(wsadata): Move from net.cc here.  Define NO_COPY.
+	(wsock_init): Drop unused symbols ws2_32_handle and wsock32_handle.
+	(load_wsock32): Remove.
+	(WSACleanup): Remove.
+	* fhandler_socket.cc: Drop Winsock 1 accommodations throughout.
+	(fhandler_socket::readv): Accomodate new POSIX style struct msghdr.
+	(fhandler_socket::writev): Ditto.
+	(fhandler_socket::recvmsg): Ditto. Handle "old" applications using
+	former struct msghdr correctly.
+	* net.cc: Drop Winsock 1 accommodations throughout.
+	(wsadata): Move definition to autoload.cc.
+	(set_socket_inheritance): Remove.
+	(convert_ws1_ip_optname): New static function to convert Winsock1
+	IPPROTO_IP option values into Winsock2 IPPROTO_IP option values.
+	(cygwin_setsockopt): Remove wrong and incomplete cleartext printing
+	of optname.  For "old" applications, convert optname from Winsock1
+	to Winsock2 values before using them.  Add comment to describe the
+	IP_TOS weirdness on W2K and above.
+	(cygwin_getsockopt): Remove wrong and incomplete cleartext printing
+	of optname.  For "old" applications, convert optname from Winsock1
+	to Winsock2 values before using them.
+	* select.cc (start_thread_socket): Forget about winsock2_active.
+	* winsup.h (wsock32_handle): Remove declaration.
+	(ws2_32_handle): Ditto.
+	(netapi32_handle): Ditto.
+	(wsadata): Ditto.
+	(winsock2_active): Remove definition.
+	* include/cygwin/socket.h: Change formatting slightly.
+	(socklen_t): Move definition up in file.
+	(struct msghdr): Convert to POSIX style.
+	(struct cmsghdr): New type.
+	(CMSG_ALIGN): New macro.
+	(CMSG_LEN): Ditto.
+	(CMSG_SPACE): Ditto.
+	(CMSG_FIRSTHDR): Ditto.
+	(CMSG_NXTHDR): Ditto.
+	(CMSG_DATA): Ditto.
+	(SCM_RIGHTS): Ditto.
+	(struct OLD_msghdr): Define old msghdr structure for Cygwin internal
+	purposes.
+	(MSG_TRUNC): New macro.
+	(MSG_CTRUNC): Ditto.
+	(IP_OPTIONS): Redefine IPPROTO_IP option values to Winsock2 values.
+	Keep Winsock1 values for Cygwin internal purposes.
+	* include/cygwin/version.h: Bump API minor version.
+	(CYGWIN_VERSION_CHECK_FOR_USING_ANCIENT_MSGHDR): Define to check for
+	applications using old struct msghdr.
+	(CYGWIN_VERSION_CHECK_FOR_USING_WINSOCK1_VALUES): Define to check for
+	applications using old Winsock1 IPPROTO_IP values.
+
 2005-10-13  David Rothenberger <daveroth@acm.org>
 	   Christopher Faylor  <cgf@timesys.com>
 

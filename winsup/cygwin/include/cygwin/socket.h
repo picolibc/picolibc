@@ -1,6 +1,6 @@
 /* cygwin/socket.h
 
-   Copyright 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2005 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -26,28 +26,78 @@ struct sockaddr {
 #include <sys/types.h>
 
 struct ucred {
-  pid_t		pid;
-  __uid32_t	uid;
-  __gid32_t	gid;
+  pid_t			pid;
+  __uid32_t		uid;
+  __gid32_t		gid;
 };
 
 struct linger {
-  unsigned short			l_onoff;	/* Linger active		*/
- unsigned short			l_linger;	/* How long to linger for	*/
-};
-
-struct msghdr
-{
-	void	*	msg_name;	/* Socket name			*/
-	int		msg_namelen;	/* Length of name		*/
-	struct iovec *	msg_iov;	/* Data blocks			*/
-	int		msg_iovlen;	/* Number of blocks		*/
-	void	*	msg_accrights;	/* Per protocol magic (eg BSD file descriptor passing) */
-	int		msg_accrightslen;	/* Length of rights list */
+  unsigned short	l_onoff;	/* Linger active	*/
+  unsigned short	l_linger;	/* How long to linger for	*/
 };
 
 #ifndef socklen_t
 #define socklen_t int
+#endif
+
+struct msghdr
+{
+  void *		msg_name;	/* Socket name			*/
+  socklen_t		msg_namelen;	/* Length of name		*/
+  struct iovec *	msg_iov;	/* Data blocks			*/
+  int			msg_iovlen;	/* Number of blocks		*/
+  void *		msg_control;	/* Ancillary data		*/
+  socklen_t		msg_controllen;	/* Ancillary data buffer length	*/
+  int			msg_flags;	/* Received flags on recvmsg	*/
+};
+
+struct cmsghdr
+{
+  socklen_t		cmsg_len;	/* Length of cmsghdr + data	*/
+  int			cmsg_level;	/* Protocol			*/
+  int			cmsg_type;	/* Protocol type		*/
+};
+
+#define CMSG_ALIGN(len) \
+	(((len) + sizeof (size_t) - 1) & ~(sizeof (size_t) - 1))
+#define CMSG_LEN(len) \
+	(CMSG_ALIGN (sizeof (struct cmsghdr)) + (len))
+#define CMSG_SPACE(len) \
+	(CMSG_ALIGN (sizeof (struct cmsghdr)) + CMSG_ALIGN(len))
+#define CMSG_FIRSTHDR(mhdr)	\
+	({ \
+	  struct msghdr *_m = (struct msghdr *) mhdr; \
+	  (_m)->msg_controllen >= sizeof (struct cmsghdr) \
+	  ? (struct cmsghdr *) (_m)->msg_control \
+	  : (struct cmsghdr *) NULL; \
+	})
+#define CMSG_NXTHDR(mhdr,cmsg)	\
+	({ \
+	  struct msghdr *_m = (struct msghdr *) mhdr; \
+	  struct cmsghdr *_c = (struct cmsghdr *) cmsg; \
+	  ((char *) _c + CMSG_SPACE (_c->cmsg_len) \
+	   > (char *) _m->msg_control + _m->msg_controllen) \
+	  ? (struct cmsghdr *) NULL \
+	  : (struct cmsghdr *) ((char *) _c + CMSG_ALIGN (_c->cmsg_len)); \
+	})
+#define CMSG_DATA(cmsg)		\
+	((unsigned char *) ((struct cmsghdr *)(cmsg) + 1))
+
+/* "Socket"-level control message types: */
+#define	SCM_RIGHTS	0x01		/* access rights (array of int) */
+
+#ifdef __INSIDE_CYGWIN__
+/* Definition of struct msghdr up to release 1.5.18 */
+struct OLD_msghdr
+{
+  void *		msg_name;	/* Socket name			*/
+  int			msg_namelen;	/* Length of name		*/
+  struct iovec *	msg_iov;	/* Data blocks			*/
+  int			msg_iovlen;	/* Number of blocks		*/
+  void *		msg_accrights;	/* Per protocol magic		*/
+  					/* (eg BSD descriptor passing)	*/
+  int			msg_accrightslen; /* Length of rights list	*/
+};
 #endif
 
 /* Socket types. */
@@ -124,6 +174,8 @@ struct msghdr
 #define MSG_DONTROUTE   0x4             /* send without using routing tables */
 #define MSG_WINMASK     0x7             /* flags understood by WinSock calls */
 #define MSG_NOSIGNAL    0x20            /* Don't raise SIGPIPE */
+#define MSG_TRUNC       0x0100          /* Normal data truncated */
+#define MSG_CTRUNC      0x0200          /* Control data truncated */
 
 /* Setsockoptions(2) level. Thanks to BSD these must match IPPROTO_xxx */
 #define SOL_IP		0
@@ -146,17 +198,35 @@ struct msghdr
 #define IP_DEFAULT_MULTICAST_LOOP       1
 #define IP_MAX_MEMBERSHIPS              20
 
-/* IP options for use with WinSock */
+/* IP options for use with getsockopt/setsockopt */
+#define IP_OPTIONS			 1
+#define IP_HDRINCL			 2
+#define IP_TOS				 3
+#define IP_TTL				 4
+#define IP_MULTICAST_IF			 9
+#define IP_MULTICAST_TTL		10
+#define IP_MULTICAST_LOOP		11
+#define IP_ADD_MEMBERSHIP		12
+#define IP_DROP_MEMBERSHIP		13
+#define IP_DONTFRAGMENT			14
+#define IP_ADD_SOURCE_MEMBERSHIP        15
+#define IP_DROP_SOURCE_MEMBERSHIP       16
+#define IP_BLOCK_SOURCE                 17
+#define IP_UNBLOCK_SOURCE               18
+#define IP_PKTINFO                      19
 
-#define IP_OPTIONS          1
-#define IP_MULTICAST_IF     2
-#define IP_MULTICAST_TTL    3
-#define IP_MULTICAST_LOOP   4
-#define IP_ADD_MEMBERSHIP   5
-#define IP_DROP_MEMBERSHIP  6
-#define IP_TTL              7
-#define IP_TOS              8
-#define IP_DONTFRAGMENT     9
+/* Old WinSock1 values, needed internally */
+#ifdef __INSIDE_CYGWIN__
+#define _WS1_IP_OPTIONS          1
+#define _WS1_IP_MULTICAST_IF     2
+#define _WS1_IP_MULTICAST_TTL    3
+#define _WS1_IP_MULTICAST_LOOP   4
+#define _WS1_IP_ADD_MEMBERSHIP   5
+#define _WS1_IP_DROP_MEMBERSHIP  6
+#define _WS1_IP_TTL              7
+#define _WS1_IP_TOS              8
+#define _WS1_IP_DONTFRAGMENT     9
+#endif
 
 /* IPX options */
 #define IPX_TYPE	1

@@ -88,6 +88,15 @@ details. */
 #define CYGWIN_VERSION_CHECK_FOR_USING_BIG_TYPES \
   (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) >= \
   79)
+
+#define CYGWIN_VERSION_CHECK_FOR_USING_ANCIENT_MSGHDR \
+  (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) <= \
+ 138)
+
+#define CYGWIN_VERSION_CHECK_FOR_USING_WINSOCK1_VALUES \
+  (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) <= \
+ 138)
+
      /* We used to use the DLL major/minor to track
 	non-backward-compatible interface changes to the API.  Now we
 	use an API major/minor number for this purpose. */
@@ -266,12 +275,14 @@ details. */
       137: fts_children, fts_close, fts_get_clientptr, fts_get_stream,
 	   fts_open, fts_read, fts_set, fts_set_clientptr, ftw, nftw.
       138: Export readdir_r.
+      139: Start using POSIX definition of struct msghdr and WinSock2
+	   IPPROTO_IP values.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 138
+#define CYGWIN_VERSION_API_MINOR 139
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

@@ -29,6 +29,8 @@ details. */
 #include <assert.h>
 #include "cygerrno.h"
 #include "security.h"
+#include "cygwin/version.h"
+#include "perprocess.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
@@ -50,8 +52,6 @@ extern "C"
   int sscanf (const char *, const char *, ...);
 }				/* End of "C" section */
 
-WSADATA wsadata;
-
 static fhandler_socket *
 get (const int fd)
 {
@@ -66,20 +66,6 @@ get (const int fd)
     set_errno (ENOTSOCK);
 
   return fh;
-}
-
-static SOCKET __stdcall
-set_socket_inheritance (SOCKET sock)
-{
-  SOCKET osock = sock;
-
-  if (!DuplicateHandle (hMainProc, (HANDLE) sock, hMainProc, (HANDLE *) &sock,
-			0, TRUE, DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
-    system_printf ("DuplicateHandle failed %E");
-  else
-    debug_printf ("DuplicateHandle succeeded osock %p, sock %p", osock, sock);
-  VerifyHandle ((HANDLE) sock);
-  return sock;
 }
 
 /* htonl: standards? */
@@ -555,24 +541,20 @@ cygwin_getprotobynumber (int number)
 bool
 fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
 {
-  if (!winsock2_active)
-    soc = set_socket_inheritance (soc);
-  else if (wincap.has_set_handle_information ())
+  if (wincap.has_set_handle_information ())
     {
       /* NT systems apparently set sockets to inheritable by default */
       SetHandleInformation ((HANDLE) soc, HANDLE_FLAG_INHERIT, 0);
-      debug_printf ("reset socket inheritance since winsock2_active %d",
-		    winsock2_active);
+      debug_printf ("reset socket inheritance");
     }
   else
-    debug_printf ("not setting socket inheritance since winsock2_active %d",
-		  winsock2_active);
+    debug_printf ("not setting socket inheritance");
   fd = build_fh_dev (*dev);
   if (!fd.isopen ())
     return false;
   fd->set_io_handle ((HANDLE) soc);
   fd->set_flags (O_RDWR | O_BINARY);
-  fd->uninterruptible_io (winsock2_active);
+  fd->uninterruptible_io (true);
   cygheap->fdtab.inc_need_fixup_before ();
   debug_printf ("fd %d, name '%s', soc %p", (int) fd, dev->name, soc);
   return true;
@@ -663,6 +645,27 @@ cygwin_recvfrom (int fd, void *buf, int len, int flags,
   return res;
 }
 
+static int
+convert_ws1_ip_optname (int optname)
+{
+  static int ws2_optname[] =
+  {
+    0,
+    IP_OPTIONS,
+    IP_MULTICAST_IF,
+    IP_MULTICAST_TTL,
+    IP_MULTICAST_LOOP,
+    IP_ADD_MEMBERSHIP,
+    IP_DROP_MEMBERSHIP,
+    IP_TTL,
+    IP_TOS,
+    IP_DONTFRAGMENT
+  };
+  return (optname < 1 || optname > _WS1_IP_DONTFRAGMENT)
+  	 ? optname
+	 : ws2_optname[optname];
+}
+
 /* exported as setsockopt: standards? */
 extern "C" int
 cygwin_setsockopt (int fd, int level, int optname, const void *optval,
@@ -670,48 +673,30 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 {
   int res;
   fhandler_socket *fh = get (fd);
-  const char *name = "error";
-
-  /* For the following debug_printf */
-  switch (optname)
-    {
-      case SO_DEBUG:
-	name = "SO_DEBUG";
-	break;
-      case SO_ACCEPTCONN:
-	name = "SO_ACCEPTCONN";
-	break;
-      case SO_REUSEADDR:
-	name = "SO_REUSEADDR";
-	break;
-      case SO_KEEPALIVE:
-	name = "SO_KEEPALIVE";
-	break;
-      case SO_DONTROUTE:
-	name = "SO_DONTROUTE";
-	break;
-      case SO_BROADCAST:
-	name = "SO_BROADCAST";
-	break;
-      case SO_USELOOPBACK:
-	name = "SO_USELOOPBACK";
-	break;
-      case SO_LINGER:
-	name = "SO_LINGER";
-	break;
-      case SO_OOBINLINE:
-	name = "SO_OOBINLINE";
-	break;
-      case SO_ERROR:
-	name = "SO_ERROR";
-	break;
-    }
 
   myfault efault;
   if (efault.faulted (EFAULT) || !fh)
     res = -1;
   else
     {
+      /* Old applications still use the old Winsock1 IPPROTO_IP values. */
+      if (level == IPPROTO_IP && CYGWIN_VERSION_CHECK_FOR_USING_WINSOCK1_VALUES)
+        optname = convert_ws1_ip_optname (optname);
+      /* FOR THE RECORDS:
+
+         Setting IP_TOS is disabled by default since W2K, the official
+	 reason being that IP_TOS setting would interfere with Windows
+	 QOS settings.  As result, setsockopt returns with WinSock error
+	 10022, WSAEINVAL, when running under W2K or later, instead of
+	 handling this gracefully.
+
+	 The workaround is described in KB article 248611.  Add a new
+	 registry DWORD value HKLM/System/CurrentControlSet/Services/...
+	 ... Tcpip/Parameters/DisableUserTOSSetting, set to 0, and reboot.
+	 
+	 FIXME: Maybe we should simply fake that IP_TOS could be set
+	 successfully, if DisableUserTOSSetting is not set to 0 on W2K
+	 and above? */
       res = setsockopt (fh->get_socket (), level, optname,
 			(const char *) optval, optlen);
 
@@ -722,8 +707,8 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 	set_winsock_errno ();
     }
 
-  syscall_printf ("%d = setsockopt (%d, %d, %x (%s), %p, %d)",
-		  res, fd, level, optname, name, optval, optlen);
+  syscall_printf ("%d = setsockopt (%d, %d, %x, %p, %d)",
+		  res, fd, level, optname, optval, optlen);
   return res;
 }
 
@@ -733,44 +718,6 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval, int *optlen)
 {
   int res;
   fhandler_socket *fh = get (fd);
-  const char *name = "error";
-
-  /* For the following debug_printf */
-  switch (optname)
-    {
-      case SO_DEBUG:
-	name = "SO_DEBUG";
-	break;
-      case SO_ACCEPTCONN:
-	name = "SO_ACCEPTCONN";
-	break;
-      case SO_REUSEADDR:
-	name = "SO_REUSEADDR";
-	break;
-      case SO_KEEPALIVE:
-	name = "SO_KEEPALIVE";
-	break;
-      case SO_DONTROUTE:
-	name = "SO_DONTROUTE";
-	break;
-      case SO_BROADCAST:
-	name = "SO_BROADCAST";
-	break;
-      case SO_USELOOPBACK:
-	name = "SO_USELOOPBACK";
-	break;
-      case SO_LINGER:
-	name = "SO_LINGER";
-	break;
-      case SO_OOBINLINE:
-	name = "SO_OOBINLINE";
-	break;
-      case SO_ERROR:
-	name = "SO_ERROR";
-	break;
-      case SO_PEERCRED:
-	name = "SO_PEERCRED";
-    }
 
   myfault efault;
   if (efault.faulted (EFAULT) || !fh)
@@ -782,6 +729,9 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval, int *optlen)
     }
   else
     {
+      /* Old applications still use the old Winsock1 IPPROTO_IP values. */
+      if (level == IPPROTO_IP && CYGWIN_VERSION_CHECK_FOR_USING_WINSOCK1_VALUES)
+        optname = convert_ws1_ip_optname (optname);
       res = getsockopt (fh->get_socket (), level, optname, (char *) optval,
 			(int *) optlen);
 
@@ -797,8 +747,8 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval, int *optlen)
 	set_winsock_errno ();
     }
 
-  syscall_printf ("%d = getsockopt (%d, %d, %x (%s), %p, %p)",
-		  res, fd, level, optname, name, optval, optlen);
+  syscall_printf ("%d = getsockopt (%d, %d, 0x%x, %p, %p)",
+		  res, fd, level, optname, optval, optlen);
   return res;
 }
 

@@ -225,13 +225,6 @@ void events_terminate ();
 
 void __stdcall close_all_files (bool = false);
 
-/* Globals that handle initialization of winsock in a child process. */
-extern HANDLE wsock32_handle;
-extern HANDLE ws2_32_handle;
-
-/* Globals that handle initialization of netapi in a child process. */
-extern HANDLE netapi32_handle;
-
 /* debug_on_trap support. see exceptions.cc:try_to_debug() */
 extern "C" void error_start_init (const char*);
 extern "C" int try_to_debug (bool waitloop = 1);
@@ -351,8 +344,5 @@ extern HANDLE hExeced;
 extern bool cygwin_testing;
 
 extern char almost_null[];
-
-#define winsock2_active (wsadata.wVersion >= 512)
-extern struct WSAData wsadata;
 
 #endif /* defined __cplusplus */

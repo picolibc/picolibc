@@ -1410,7 +1410,7 @@ start_thread_socket (select_record *me, select_stuff *stuff)
 	  select_printf ("getsockname error");
 	  goto err;
 	}
-      if (winsock2_active && wincap.has_set_handle_information ())
+      if (wincap.has_set_handle_information ())
 	SetHandleInformation ((HANDLE) si->exitsock, HANDLE_FLAG_INHERIT, 0);
       /* else
 	   too bad? */
