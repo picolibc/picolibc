@@ -81,15 +81,15 @@ fhandler_tty_master::init ()
   set_close_on_exec (true);
 
   cygthread *h;
-  h = new cygthread (process_input, cygself, "ttyin");
+  h = new cygthread (process_input, 0, cygself, "ttyin");
   h->SetThreadPriority (THREAD_PRIORITY_HIGHEST);
   h->zap_h ();
 
-  h = new cygthread (process_ioctl, cygself, "ttyioctl");
+  h = new cygthread (process_ioctl, 0, cygself, "ttyioctl");
   h->SetThreadPriority (THREAD_PRIORITY_HIGHEST);
   h->zap_h ();
 
-  h = new cygthread (process_output, cygself, "ttyout");
+  h = new cygthread (process_output, 0, cygself, "ttyout");
   h->SetThreadPriority (THREAD_PRIORITY_HIGHEST);
   h->zap_h ();
 

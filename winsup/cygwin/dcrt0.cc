@@ -1021,7 +1021,7 @@ do_exit (int status)
     }
 #endif
 
-  process_lock until_exit (true);
+  lock_process until_exit (true);
 
   if (exit_state < ES_GLOBAL_DTORS)
     {

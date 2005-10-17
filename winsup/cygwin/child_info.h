@@ -54,7 +54,7 @@ public:
   child_info (): subproc_ready (NULL), parent (NULL) {}
   ~child_info ();
   void ready (bool);
-  bool sync (int, HANDLE, DWORD) __attribute__ ((regparm (3)));
+  bool sync (int, HANDLE&, DWORD) __attribute__ ((regparm (3)));
 };
 
 class mount_info;

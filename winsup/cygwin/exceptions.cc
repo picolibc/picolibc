@@ -1183,7 +1183,7 @@ signal_exit (int rc)
       TerminateProcess (hExeced, sigExeced = rc);
     }
 
-  process_lock until_exit (true);
+  lock_process until_exit (true);
   if (hExeced || exit_state)
     myself.exit (rc);
 

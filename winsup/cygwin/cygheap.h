@@ -415,11 +415,11 @@ class cygheap_fdenum : public cygheap_fdmanip
   }
 };
 
-class process_lock
+class lock_process
 {
   bool skip_unlock;
 public:
-  process_lock (bool exiting = false)
+  lock_process (bool exiting = false)
   {
     cygheap->fdtab.lock ();
     skip_unlock = exiting;
@@ -429,7 +429,7 @@ public:
 	muto::set_exiting_thread ();
       }
   }
-  ~process_lock ()
+  ~lock_process ()
   {
     if (!skip_unlock)
       cygheap->fdtab.unlock ();

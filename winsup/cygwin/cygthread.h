@@ -23,6 +23,7 @@ class cygthread
   bool terminated;
 #endif
   LPTHREAD_START_ROUTINE func;
+  unsigned arglen;
   VOID *arg;
   bool is_freerange;
   static bool exiting;
@@ -33,9 +34,10 @@ class cygthread
   static DWORD WINAPI simplestub (VOID *);
   static DWORD main_thread_id;
   static const char * name (DWORD = 0);
+  void callfunc (bool) __attribute__ ((noinline, regparm (2)));
   void auto_release () {func = NULL;}
   void release (bool);
-  cygthread (LPTHREAD_START_ROUTINE, LPVOID, const char *, HANDLE = NULL);
+  cygthread (LPTHREAD_START_ROUTINE, unsigned, LPVOID, const char *, HANDLE = NULL);
   cygthread () {};
   static void init ();
   bool detach (HANDLE = NULL);

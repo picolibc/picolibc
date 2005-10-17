@@ -25,6 +25,36 @@ static cygthread NO_COPY threads[32];
 DWORD NO_COPY cygthread::main_thread_id;
 bool NO_COPY cygthread::exiting;
 
+void
+cygthread::callfunc (bool issimplestub)
+{
+  void *pass_arg;
+  if (arg == cygself)
+    pass_arg = this;
+  else if (!arglen)
+    pass_arg = arg;
+  else
+    {
+      if (issimplestub)
+	ev = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
+      pass_arg = alloca (arglen);
+      memcpy (pass_arg, arg, arglen);
+      SetEvent (ev);
+    }
+  if (issimplestub)
+    {
+      /* Wait for main thread to assign 'h' */
+      while (!h)
+	low_priority_sleep (0);
+      if (ev)
+	CloseHandle (ev);
+      ev = h;
+    }
+  /* Cygwin threads should not call ExitThread directly */
+  func (pass_arg);
+  /* ...so the above should always return */
+}
+
 /* Initial stub called by cygthread constructor. Performs initial
    per-thread initialization and loops waiting for another thread function
    to execute.  */
@@ -69,9 +99,7 @@ cygthread::stub (VOID *arg)
 	      return 0;
 	    }
 
-	  /* Cygwin threads should not call ExitThread directly */
-	  info->func (info->arg == cygself ? info : info->arg);
-	  /* ...so the above should always return */
+	  info->callfunc (false);
 
 	  HANDLE notify = info->notify_detached;
 	  /* If func is NULL, the above function has set that to indicate
@@ -111,11 +139,7 @@ cygthread::simplestub (VOID *arg)
   cygthread *info = (cygthread *) arg;
   _my_tls._ctinfo = info;
   info->stack_ptr = &arg;
-  /* Wait for main thread to assign 'h' */
-  while (!info->h)
-    low_priority_sleep (0);
-  info->ev = info->h;
-  info->func (info->arg == cygself ? info : info->arg);
+  info->callfunc (true);
   return 0;
 }
 
@@ -165,30 +189,43 @@ out:
   return info;
 }
 
-cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
+cygthread::cygthread (LPTHREAD_START_ROUTINE start, size_t n, void *param,
 		      const char *name, HANDLE notify)
- : __name (name), func (start), arg (param), notify_detached (notify)
+ : __name (name), func (start), arglen (n), arg (param), notify_detached (notify)
 {
   thread_printf ("name %s, id %p", name, id);
+  HANDLE htobe;
   if (h)
     {
+      if (ev)
+	ResetEvent (ev);
       while (!thread_sync)
 	low_priority_sleep (0);
       SetEvent (thread_sync);
       thread_printf ("activated name '%s', thread_sync %p for thread %p", name, thread_sync, id);
+      htobe = h;
     }
   else
     {
       stack_ptr = NULL;
-      h = CreateThread (&sec_none_nih, 0, is_freerange ? simplestub : stub,
-			this, 0, &id);
-      if (!h)
+      htobe = CreateThread (&sec_none_nih, 0, is_freerange ? simplestub : stub,
+			    this, 0, &id);
+      if (!htobe)
 	api_fatal ("CreateThread failed for %s - %p<%p>, %E", name, h, id);
       thread_printf ("created name '%s', thread %p, id %p", name, h, id);
 #ifdef DEBUGGING
       terminated = false;
 #endif
     }
+
+  if (n)
+    {
+      while (!ev)
+	low_priority_sleep (0);
+      WaitForSingleObject (ev, INFINITE);
+      ResetEvent (ev);
+    }
+  h = htobe;
 }
 
 /* Return the symbolic name of the current thread for debugging.
@@ -238,8 +275,6 @@ cygthread::release (bool nuke_h)
 #endif
   __name = NULL;
   func = NULL;
-  if (ev)
-    ResetEvent (ev);
   if (!InterlockedExchange (&inuse, 0))
 #ifdef DEBUGGING
     api_fatal ("released a thread that was not inuse");

@@ -181,7 +181,7 @@ fhandler_pipe::read (void *in_ptr, size_t& in_len)
   else
     {
       pipeargs pi = {dynamic_cast<fhandler_base *>(this), in_ptr, &in_len};
-      cygthread *th = new cygthread (read_pipe, &pi, "read_pipe");
+      cygthread *th = new cygthread (read_pipe, 0, &pi, "read_pipe");
       if (th->detach (read_state) && !in_len)
 	in_len = (size_t) -1;	/* received a signal */
     }
@@ -236,7 +236,6 @@ fhandler_pipe::fixup_after_exec ()
 void
 fhandler_pipe::fixup_after_fork (HANDLE parent)
 {
-debug_printf ("here");
   fhandler_base::fixup_after_fork (parent);
   if (guard)
     fork_fixup (parent, guard, "guard");

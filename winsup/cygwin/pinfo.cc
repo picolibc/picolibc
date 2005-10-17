@@ -139,8 +139,9 @@ pinfo::zap_cwd ()
 void
 pinfo::exit (DWORD n)
 {
-  process_lock until_exit ();
+  lock_process until_exit ();
   cygthread::terminate ();
+
   if (n != EXITCODE_NOSET)
     self->exitcode = EXITCODE_SET | n;/* We're really exiting.  Record the UNIX exit code. */
   else
@@ -378,9 +379,10 @@ _pinfo::alive ()
 
 extern char **__argv;
 
-void
-_pinfo::commune_process (siginfo_t& si)
+DWORD WINAPI
+commune_process (void *arg)
 {
+  siginfo_t& si = *((siginfo_t *) arg);
   char path[CYG_MAX_PATH];
   DWORD nr;
   HANDLE& tothem = si._si_commune._si_write_handle;
@@ -389,7 +391,7 @@ _pinfo::commune_process (siginfo_t& si)
   if (process_sync)		// FIXME: this test shouldn't be necessary
     ProtectHandle (process_sync);
 
-  process_lock now (false);
+  lock_process now (false);
 
   switch (si._si_commune._si_code)
     {
@@ -546,6 +548,8 @@ _pinfo::commune_process (siginfo_t& si)
       ForceCloseHandle (process_sync);
     }
   CloseHandle (tothem);
+  _my_tls._ctinfo->auto_release ();
+  return 0;
 }
 
 commune_result
@@ -587,7 +591,7 @@ _pinfo::commune_request (__uint32_t code, ...)
     break;
     }
 
-  process_lock now ();
+  lock_process now ();
   locked = true;
   char name_buf[CYG_MAX_PATH];
   request_sync = CreateSemaphore (&sec_none_nih, 0, LONG_MAX,
@@ -959,7 +963,7 @@ pinfo::wait ()
 
   waiter_ready = false;
   /* Fire up a new thread to track the subprocess */
-  cygthread *h = new cygthread (proc_waiter, this, "proc_waiter");
+  cygthread *h = new cygthread (proc_waiter, 0, this, "proc_waiter");
   if (!h)
     sigproc_printf ("tracking thread creation failed for pid %d", (*this)->pid);
   else

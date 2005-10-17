@@ -105,7 +105,6 @@ public:
     sig_mask = mask;
   }
 
-  void commune_process (siginfo_t&);
   commune_result commune_request (__uint32_t, ...);
   bool alive ();
   fhandler_pipe *pipe_fhandler (HANDLE, size_t &);
@@ -134,6 +133,8 @@ public:
   DWORD wr_proc_pipe_owner;
   friend class pinfo;
 };
+
+DWORD WINAPI commune_process (void *);
 
 enum parent_alerter
 {

@@ -1,3 +1,32 @@
+2005-10-17  Christopher Faylor  <cgf@timesys.com>
+
+	Change process_lock to lock_process throughout.
+	Change all calls to new cygthread to handle extra argument, throughout.
+	* cygthread.h (cygthread::callproc): Declare new method.
+	(cygthread::cygthread): Add optional length argument to allow copying
+	arguments to executing thread.
+	* cygthread.cc (cygthread::callproc): Define new method.
+	(cygthread::stub): Use callfunc to invoke thread func to allow
+	potentially allocating stack memory which will be returned.
+	(cygthread::simplestub): Ditto.
+	(cygthread::cygthread): Accept arglen argument.  Reset ev here prior to
+	activating thread.  Wait for ev after activating thread if we're
+	copying contents to the thread.  Wait until the end before setting h,
+	to allow thread synchronization.
+	(cygthread::release): Don't reset ev here.  Rely on that happening the next
+	time the thread is activated.
+	* pinfo.h (commune_process): Rename declaration from _pinfo::commune_process.
+	* pinfo.cc (commune_process): Ditto for definition.  Modify slightly to allow
+	running as a separate cygthread.
+	* sigproc.cc (child_info::sync): Always wait for both subproc_ready and
+	any hProcess if we have a cygwin parent.
+	(talktome): Change argument to be a pointer to siginfo_t.  Contiguously
+	allocate whole siginfo_t structure + any needed extra for eventual passing
+	to commune_process thread.
+	(wait_sig): Accommodate change in talktome argument.
+
+	* pipe.cc (fhandler_pipe::fixup_after_exec): Remove debugging.
+
 2005-10-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc: Never load wsock32.dll. Load all wsock32 function

@@ -481,7 +481,7 @@ sigproc_init ()
   sync_proc_subproc.init ("sync_proc_subproc");
 
   my_sendsig = INVALID_HANDLE_VALUE;	// changed later
-  cygthread *hwait_sig = new cygthread (wait_sig, cygself, "sig");
+  cygthread *hwait_sig = new cygthread (wait_sig, 0, cygself, "sig");
   hwait_sig->zap_h ();
 
   global_sigs[SIGSTOP].sa_flags = SA_RESTART | SA_NODEFER;
@@ -816,36 +816,44 @@ child_info::ready (bool execed)
 }
 
 bool
-child_info::sync (pid_t pid, HANDLE hProcess, DWORD howlong)
+child_info::sync (pid_t pid, HANDLE& hProcess, DWORD howlong)
 {
-  if (!subproc_ready)
-    {
-      sigproc_printf ("not waiting.  subproc_ready is NULL");
-      return false;
-    }
-
-  HANDLE w4[2];
-  w4[0] = subproc_ready;
-  w4[1] = hProcess;
-
   bool res;
-  sigproc_printf ("waiting for subproc_ready(%p) and child process(%p)", w4[0], w4[1]);
-  switch (WaitForMultipleObjects (2, w4, FALSE, howlong))
+  if (!subproc_ready && !myself->wr_proc_pipe)
+    res = false;
+  else
     {
-    case WAIT_OBJECT_0:
-      sigproc_printf ("got subproc_ready for pid %d", pid);
-      res = true;
-      break;
-    case WAIT_OBJECT_0 + 1:
-      sigproc_printf ("process exited before subproc_ready");
-      if (WaitForSingleObject (subproc_ready, 0) == WAIT_OBJECT_0)
-	sigproc_printf ("should never happen.  noticed subproc_ready after process exit");
-      res = false;
-      break;
-    default:
-      system_printf ("wait failed, pid %d, %E", pid);
-      res = false;
-      break;
+      HANDLE w4[2];
+      unsigned n = 0;
+      unsigned nsubproc_ready;
+
+      if (!subproc_ready)
+	nsubproc_ready = WAIT_OBJECT_0 + 3;
+      else
+	{
+	  w4[n++] = subproc_ready;
+	  nsubproc_ready = 0;
+	}
+      w4[n++] = hProcess;
+
+      sigproc_printf ("waiting for subproc_ready(%p) and child process(%p)", w4[0], w4[1]);
+      DWORD x = WaitForMultipleObjects (n, w4, FALSE, howlong);
+      x -= WAIT_OBJECT_0;
+      if (x >= n)
+	{
+	  system_printf ("wait failed, pid %d, %E", pid);
+	  res = false;
+	}
+      else
+	{
+	  if (n == nsubproc_ready)
+	    {
+	      CloseHandle (hProcess);
+	      hProcess = NULL;
+	    }
+	  sigproc_printf ("process %d synchronized, WFMO returned %d", pid, x);
+	  res = true;
+	}
     }
   return res;
 }
@@ -968,25 +976,28 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
 }
 
 static void
-talktome (siginfo_t& si, HANDLE readsig)
+talktome (siginfo_t *si, HANDLE readsig)
 {
-  sigproc_printf ("pid %d wants some information", si.si_pid);
-  pinfo pi (si.si_pid);
-  sigproc_printf ("pid %d pi %p", si.si_pid, (_pinfo *) pi); // DELETEME
-  if (si._si_commune._si_code & PICOM_EXTRASTR)
+  unsigned size = sizeof (*si);
+  sigproc_printf ("pid %d wants some information", si->si_pid);
+  if (si->_si_commune._si_code & PICOM_EXTRASTR)
     {
       size_t n;
       DWORD nb;
       if (!ReadFile (readsig, &n, sizeof (n), &nb, NULL) || nb != sizeof (n))
 	return;
-      // FIXME: Is alloca here?
-      si._si_commune._si_str = (char *) alloca (n + 1);
-      if (!ReadFile (readsig, si._si_commune._si_str, n, &nb, NULL) || nb != n)
+      siginfo_t *newsi = (siginfo_t *) alloca (size += n + 1);
+      *newsi = *si;
+      newsi->_si_commune._si_str = (char *) (newsi + 1);
+      if (!ReadFile (readsig, newsi->_si_commune._si_str, n, &nb, NULL) || nb != n)
 	return;
-      si._si_commune._si_str[n] = '\0';
+      newsi->_si_commune._si_str[n] = '\0';
+      si = newsi;
     }
+
+  pinfo pi (si->si_pid);
   if (pi)
-    pi->commune_process (si);
+    new cygthread (commune_process, size, si, "commune_process");
 }
 
 void
@@ -1100,7 +1111,7 @@ wait_sig (VOID *)
       switch (pack.si.si_signo)
 	{
 	case __SIGCOMMUNE:
-	  talktome (pack.si, readsig);
+	  talktome (&pack.si, readsig);
 	  break;
 	case __SIGSTRACE:
 	  strace.hello ();

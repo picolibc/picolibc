@@ -662,7 +662,7 @@ start_thread_pipe (select_record *me, select_stuff *stuff)
   pipeinf *pi = new pipeinf;
   pi->start = &stuff->start;
   pi->stop_thread_pipe = false;
-  pi->thread = new cygthread (thread_pipe, (LPVOID) pi, "select_pipe");
+  pi->thread = new cygthread (thread_pipe, 0, pi, "select_pipe");
   me->h = *pi->thread;
   if (!me->h)
     return 0;
@@ -1091,7 +1091,7 @@ start_thread_serial (select_record *me, select_stuff *stuff)
   serialinf *si = new serialinf;
   si->start = &stuff->start;
   si->stop_thread_serial = false;
-  si->thread = new cygthread (thread_serial, (LPVOID) si, "select_serial");
+  si->thread = new cygthread (thread_serial, 0,  si, "select_serial");
   me->h = *si->thread;
   stuff->device_specific_serial = (void *) si;
   return 1;
@@ -1422,7 +1422,7 @@ start_thread_socket (select_record *me, select_stuff *stuff)
   stuff->device_specific_socket = (void *) si;
   si->start = &stuff->start;
   select_printf ("stuff_start %p", &stuff->start);
-  si->thread = new cygthread (thread_socket, (LPVOID) si, "select_socket");
+  si->thread = new cygthread (thread_socket, 0,  si, "select_socket");
   me->h = *si->thread;
   return 1;
 
@@ -1674,7 +1674,7 @@ start_thread_mailslot (select_record *me, select_stuff *stuff)
   mailslotinf *mi = new mailslotinf;
   mi->start = &stuff->start;
   mi->stop_thread_mailslot = false;
-  mi->thread = new cygthread (thread_mailslot, (LPVOID) mi, "select_mailslot");
+  mi->thread = new cygthread (thread_mailslot, 0,  mi, "select_mailslot");
   me->h = *mi->thread;
   if (!me->h)
     return 0;
