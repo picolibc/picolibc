@@ -1,3 +1,8 @@
+2005-10-17  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* configure.in (bfin-*-*): Use test, not brackets, in if statement.
+	* configure: Regenerate.
+
 2005-10-09  Kazu Hirata  <kazu@codesourcery.com>
 
 	* configure.in (arm-*-linux-gnueabi): Add to noconfigdirs
