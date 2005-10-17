@@ -537,11 +537,11 @@ else
 fi
 
 if test "x$newlib_may_supply_syscalls" = "xyes"; then
-  BUILD_CRT0_TRUE=
-  BUILD_CRT0_FALSE='#'
-else
   BUILD_CRT0_TRUE='#'
   BUILD_CRT0_FALSE=
+else
+  BUILD_CRT0_TRUE=
+  BUILD_CRT0_FALSE='#'
 fi
 
 if test "$srcdir" = "." ; then

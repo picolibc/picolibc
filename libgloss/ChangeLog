@@ -1,3 +1,9 @@
+2005-10-17  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* arm/configure.in: Support building crt0.o when syscalls
+	are disabled in newlib.
+	* arm/configure: Regenerated.
+
 2005-10-03  James E Wilson  <wilson@specifix.com>
 
 	* mips/array.ld, mips/cfe.ld, mips/ddb-kseg0.ld, mips/ddb.ld,
