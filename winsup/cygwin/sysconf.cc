@@ -123,6 +123,8 @@ sysconf (int in)
 	return RTSIG_MAX;
       case _SC_TTY_NAME_MAX:
 	return TTY_NAME_MAX;
+      case _SC_MEMLOCK_RANGE:
+        return _POSIX_MEMLOCK_RANGE;
     }
 
   /* Invalid input or unimplemented sysconf name */

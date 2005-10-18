@@ -953,6 +953,8 @@ _modff = modff NOSIGFE
 mount SIGFE
 _mount = mount SIGFE
 mprotect SIGFE
+mlock SIGFE
+munlock SIGFE
 mrand48 NOSIGFE
 msgctl SIGFE
 msgget SIGFE

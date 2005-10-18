@@ -60,7 +60,8 @@ static NO_COPY wincaps wincap_unknown = {
   has_guid_volumes:false,
   detect_win16_exe:true,
   has_null_console_handler_routine:false,
-  has_disk_ex_ioctls:false
+  has_disk_ex_ioctls:false,
+  has_working_virtual_lock:false
 };
 
 static NO_COPY wincaps wincap_95 = {
@@ -112,7 +113,8 @@ static NO_COPY wincaps wincap_95 = {
   has_guid_volumes:false,
   detect_win16_exe:true,
   has_null_console_handler_routine:false,
-  has_disk_ex_ioctls:false
+  has_disk_ex_ioctls:false,
+  has_working_virtual_lock:false
 };
 
 static NO_COPY wincaps wincap_95osr2 = {
@@ -164,7 +166,8 @@ static NO_COPY wincaps wincap_95osr2 = {
   has_guid_volumes:false,
   detect_win16_exe:true,
   has_null_console_handler_routine:false,
-  has_disk_ex_ioctls:false
+  has_disk_ex_ioctls:false,
+  has_working_virtual_lock:false
 };
 
 static NO_COPY wincaps wincap_98 = {
@@ -216,7 +219,8 @@ static NO_COPY wincaps wincap_98 = {
   has_guid_volumes:false,
   detect_win16_exe:true,
   has_null_console_handler_routine:false,
-  has_disk_ex_ioctls:false
+  has_disk_ex_ioctls:false,
+  has_working_virtual_lock:false
 };
 
 static NO_COPY wincaps wincap_98se = {
@@ -268,7 +272,8 @@ static NO_COPY wincaps wincap_98se = {
   has_guid_volumes:false,
   detect_win16_exe:true,
   has_null_console_handler_routine:false,
-  has_disk_ex_ioctls:false
+  has_disk_ex_ioctls:false,
+  has_working_virtual_lock:false
 };
 
 static NO_COPY wincaps wincap_me = {
@@ -320,7 +325,8 @@ static NO_COPY wincaps wincap_me = {
   has_guid_volumes:false,
   detect_win16_exe:true,
   has_null_console_handler_routine:false,
-  has_disk_ex_ioctls:false
+  has_disk_ex_ioctls:false,
+  has_working_virtual_lock:false
 };
 
 static NO_COPY wincaps wincap_nt3 = {
@@ -372,7 +378,8 @@ static NO_COPY wincaps wincap_nt3 = {
   has_guid_volumes:false,
   detect_win16_exe:false,
   has_null_console_handler_routine:true,
-  has_disk_ex_ioctls:false
+  has_disk_ex_ioctls:false,
+  has_working_virtual_lock:true
 };
 
 static NO_COPY wincaps wincap_nt4 = {
@@ -424,7 +431,8 @@ static NO_COPY wincaps wincap_nt4 = {
   has_guid_volumes:false,
   detect_win16_exe:false,
   has_null_console_handler_routine:true,
-  has_disk_ex_ioctls:false
+  has_disk_ex_ioctls:false,
+  has_working_virtual_lock:true
 };
 
 static NO_COPY wincaps wincap_nt4sp4 = {
@@ -476,7 +484,8 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   has_guid_volumes:false,
   detect_win16_exe:false,
   has_null_console_handler_routine:true,
-  has_disk_ex_ioctls:false
+  has_disk_ex_ioctls:false,
+  has_working_virtual_lock:true
 };
 
 static NO_COPY wincaps wincap_2000 = {
@@ -528,7 +537,8 @@ static NO_COPY wincaps wincap_2000 = {
   has_guid_volumes:true,
   detect_win16_exe:false,
   has_null_console_handler_routine:true,
-  has_disk_ex_ioctls:false
+  has_disk_ex_ioctls:false,
+  has_working_virtual_lock:true
 };
 
 static NO_COPY wincaps wincap_xp = {
@@ -580,7 +590,8 @@ static NO_COPY wincaps wincap_xp = {
   has_guid_volumes:true,
   detect_win16_exe:false,
   has_null_console_handler_routine:true,
-  has_disk_ex_ioctls:true
+  has_disk_ex_ioctls:true,
+  has_working_virtual_lock:true
 };
 
 static NO_COPY wincaps wincap_2003 = {
@@ -632,7 +643,8 @@ static NO_COPY wincaps wincap_2003 = {
   has_guid_volumes:true,
   detect_win16_exe:false,
   has_null_console_handler_routine:true,
-  has_disk_ex_ioctls:true
+  has_disk_ex_ioctls:true,
+  has_working_virtual_lock:true
 };
 
 static NO_COPY wincaps wincap_vista = {
@@ -684,7 +696,8 @@ static NO_COPY wincaps wincap_vista = {
   has_guid_volumes:true,
   detect_win16_exe:false,
   has_null_console_handler_routine:true,
-  has_disk_ex_ioctls:true
+  has_disk_ex_ioctls:true,
+  has_working_virtual_lock:true
 };
 
 wincapc wincap;

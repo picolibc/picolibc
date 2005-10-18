@@ -49,6 +49,8 @@ extern void *mmap (void *__addr, size_t __len, int __prot, int __flags, int __fd
 extern int munmap (void *__addr, size_t __len);
 extern int mprotect (void *__addr, size_t __len, int __prot);
 extern int msync (void *__addr, size_t __len, int __flags);
+extern int mlock (const void *__addr, size_t __len);
+extern int munlock (const void *__addr, size_t __len);
 
 #ifdef __cplusplus
 };

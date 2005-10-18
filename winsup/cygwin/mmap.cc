@@ -977,6 +977,98 @@ mprotect (void *addr, size_t len, int prot)
   return 0;
 }
 
+extern "C" int
+mlock (const void *addr, size_t len)
+{
+  if (!wincap.has_working_virtual_lock ())
+    return 0;
+
+  int ret = -1;
+
+  /* Instead of using VirtualLock, which does not guarantee that the pages
+     aren't swapped out when the process is inactive, we're using
+     ZwLockVirtualMemory with the LOCK_VM_IN_RAM flag to do what mlock on
+     POSIX systems does.  On NT, this requires SeLockMemoryPrivilege,
+     which is given only to SYSTEM by default. */
+
+  push_thread_privilege (SE_LOCK_MEMORY_PRIV, true);
+
+  /* Align address and length values to page size. */
+  PVOID base = (PVOID) ((uintptr_t) addr & ~(getpagesize () - 1));
+  ULONG size = ((uintptr_t) addr - (uintptr_t) base) + len;
+  size = (size + getpagesize () - 1) & ~(getpagesize () - 1);
+  NTSTATUS status = 0;
+  do
+    {
+      status = NtLockVirtualMemory (hMainProc, &base, &size, LOCK_VM_IN_RAM);
+      if (status == STATUS_WORKING_SET_QUOTA)
+	{
+	  /* The working set is too small, try to increase it so that the
+	     requested locking region fits in.  Unfortunately I don't know
+	     any function which would return the currently locked pages of
+	     a process (no go with NtQueryVirtualMemory).
+	     
+	     So, except for the border cases, what we do here is something
+	     really embarrassing.  We raise the working set by 64K at a time
+	     and retry, until either we fail to raise the working set size
+	     further, or until NtLockVirtualMemory returns successfully (or
+	     with another error).  */
+	  ULONG min, max;
+	  if (!GetProcessWorkingSetSize (hMainProc, &min, &max))
+	    {
+	      set_errno (ENOMEM);
+	      break;
+	    }
+	  if (min < size)
+	    min = size + 12 * getpagesize ();	/* Evaluated by testing */
+	  else if (size < 65536)
+	    min += size;
+	  else
+	    min += 65536;
+	  if (max < min)
+	    max = min;
+	  if (!SetProcessWorkingSetSize (hMainProc, min, max))
+	    {
+	      set_errno (ENOMEM);
+	      break;
+	    }
+	}
+      else if (!NT_SUCCESS (status))
+	__seterrno_from_nt_status (status);
+      else
+        ret = 0;
+    }
+  while (status == STATUS_WORKING_SET_QUOTA);
+
+  pop_thread_privilege ();
+
+  return ret;
+}
+
+extern "C" int
+munlock (const void *addr, size_t len)
+{
+  if (!wincap.has_working_virtual_lock ())
+    return 0;
+
+  int ret = -1;
+
+  push_thread_privilege (SE_LOCK_MEMORY_PRIV, true);
+
+  PVOID base = (PVOID) addr;
+  ULONG size = len;
+  NTSTATUS status = NtUnlockVirtualMemory (hMainProc, &base, &size,
+					   LOCK_VM_IN_RAM);
+  if (!NT_SUCCESS (status))
+    __seterrno_from_nt_status (status);
+  else
+    ret = 0;
+
+  pop_thread_privilege ();
+
+  return ret;
+}
+
 /*
  * Base implementation:
  *

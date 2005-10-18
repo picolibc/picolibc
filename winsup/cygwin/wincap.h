@@ -62,6 +62,7 @@ struct wincaps
   unsigned detect_win16_exe				: 1;
   unsigned has_null_console_handler_routine		: 1;
   unsigned has_disk_ex_ioctls				: 1;
+  unsigned has_working_virtual_lock			: 1;
 };
 
 class wincapc
@@ -128,6 +129,7 @@ public:
   bool	IMPLEMENT (detect_win16_exe)
   bool	IMPLEMENT (has_null_console_handler_routine)
   bool	IMPLEMENT (has_disk_ex_ioctls)
+  bool	IMPLEMENT (has_working_virtual_lock)
 
 #undef IMPLEMENT
 };
