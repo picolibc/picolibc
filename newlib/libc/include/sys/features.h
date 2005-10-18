@@ -88,6 +88,7 @@ extern "C" {
 # define _POSIX_THREAD_ATTR_STACKSIZE           1
 # define _POSIX_SEMAPHORES                      1
 # define _POSIX_TIMERS				1
+# define _POSIX_MEMLOCK_RANGE			1
 #endif
 
 #ifdef __cplusplus

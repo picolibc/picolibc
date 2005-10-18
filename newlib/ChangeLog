@@ -1,3 +1,7 @@
+2005-10-18  Corinna Vinschen <corinna@vinschen.de>
+
+	* libc/include/sys/features.h: Define _POSIX_MEMLOCK_RANGE for Cygwin.
+
 2005-10-14  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/math.h (HUGE_VALF, HUGE_VALL): New.
