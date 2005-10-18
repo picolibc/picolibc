@@ -848,7 +848,7 @@ child_info::sync (pid_t pid, HANDLE& hProcess, DWORD howlong)
 	{
 	  if (type != _PROC_FORK && x == nsubproc_ready)
 	    {
-	      ForceCloseHandle (hProcess);
+	      ForceCloseHandle1 (hProcess, childhProcess);
 	      hProcess = NULL;
 	    }
 	  sigproc_printf ("process %d synchronized, WFMO returned %d", pid, x);
