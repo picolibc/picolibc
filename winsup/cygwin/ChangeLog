@@ -1,3 +1,8 @@
+2005-10-18  Christopher Faylor  <cgf@timesys.com>
+
+	* sigproc.cc (child_info::sync): Fix typo which caused hProcess to
+	never be cleared.  Only clear hProcess when not forking.
+
 2005-10-17  Christopher Faylor  <cgf@timesys.com>
 
 	Change process_lock to lock_process throughout.

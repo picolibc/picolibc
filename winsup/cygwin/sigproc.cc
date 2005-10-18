@@ -836,7 +836,7 @@ child_info::sync (pid_t pid, HANDLE& hProcess, DWORD howlong)
 	}
       w4[n++] = hProcess;
 
-      sigproc_printf ("waiting for subproc_ready(%p) and child process(%p)", w4[0], w4[1]);
+      sigproc_printf ("n %d, waiting for subproc_ready(%p) and child process(%p)", n, w4[0], w4[1]);
       DWORD x = WaitForMultipleObjects (n, w4, FALSE, howlong);
       x -= WAIT_OBJECT_0;
       if (x >= n)
@@ -846,9 +846,9 @@ child_info::sync (pid_t pid, HANDLE& hProcess, DWORD howlong)
 	}
       else
 	{
-	  if (n == nsubproc_ready)
+	  if (type != _PROC_FORK && x == nsubproc_ready)
 	    {
-	      CloseHandle (hProcess);
+	      ForceCloseHandle (hProcess);
 	      hProcess = NULL;
 	    }
 	  sigproc_printf ("process %d synchronized, WFMO returned %d", pid, x);
