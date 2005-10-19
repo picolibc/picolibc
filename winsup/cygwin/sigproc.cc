@@ -846,7 +846,7 @@ child_info::sync (pid_t pid, HANDLE& hProcess, DWORD howlong)
 	}
       else
 	{
-	  if (type != _PROC_FORK && x == nsubproc_ready)
+	  if (type == _PROC_EXEC && x == nsubproc_ready)
 	    {
 	      ForceCloseHandle1 (hProcess, childhProcess);
 	      hProcess = NULL;
@@ -1057,6 +1057,7 @@ wait_sig (VOID *)
 
   if (!CreatePipe (&readsig, &myself->sendsig, sec_user_nih (sa_buf), 0))
     api_fatal ("couldn't create signal pipe, %E");
+  ProtectHandle (readsig);
   sigCONT = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
   my_sendsig = myself->sendsig;
 
@@ -1186,7 +1187,7 @@ wait_sig (VOID *)
 	break;
     }
 
-  CloseHandle (readsig);
+  ForceCloseHandle (readsig);
   sigproc_printf ("signal thread exiting");
   ExitThread (0);
 }

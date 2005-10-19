@@ -1,3 +1,10 @@
+2005-10-18  Christopher Faylor  <cgf@timesys.com>
+
+	* cygtls.cc (handle_threadlist_exception): Improve diagnostic output.
+
+	* sigproc.cc (child_info::sync): Only clear hProcess when execing.
+	(wait_sig): Protect readsig handle.
+
 2005-10-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (NtLockVirtualMemory): Import.

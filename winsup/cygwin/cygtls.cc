@@ -241,26 +241,24 @@ _cygtls::set_siginfo (sigpacket *pack)
 
 extern "C" DWORD __stdcall RtlUnwind (void *, void *, void *, DWORD);
 static int
-handle_threadlist_exception (EXCEPTION_RECORD *e, void *frame, CONTEXT *, void *)
+handle_threadlist_exception (EXCEPTION_RECORD *e, void *frame, CONTEXT *c, void *)
 {
   if (e->ExceptionCode != STATUS_ACCESS_VIOLATION)
     {
-      system_printf ("handle_threadlist_exception called with exception code %d\n",
-		     e->ExceptionCode);
+      system_printf ("unhandled exception %p at %p", e->ExceptionCode, c->Eip);
       return 1;
     }
 
   sentry here;
   if (threadlist_ix == BAD_IX)
     {
-      system_printf ("handle_threadlist_exception called with threadlist_ix %d\n",
-		     BAD_IX);
+      system_printf ("called with threadlist_ix %d", BAD_IX);
       return 1;
     }
 
   if (!here.acquired ())
     {
-      system_printf ("handle_threadlist_exception couldn't aquire muto\n");
+      system_printf ("couldn't aquire muto");
       return 1;
     }
 
