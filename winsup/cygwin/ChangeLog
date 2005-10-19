@@ -1,3 +1,8 @@
+2005-10-19  Christopher Faylor  <cgf@timesys.com>
+
+	* sigproc.cc (child_info::sync): Move check for !wr_proc_pipe lower.
+	* spawn.cc (spawn_guts): Correct check for top-level process.
+
 2005-10-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc: Revert loading rcmd, rexec, rresvport and inet_network
