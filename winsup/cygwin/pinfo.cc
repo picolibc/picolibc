@@ -929,7 +929,7 @@ _pinfo::dup_proc_pipe (HANDLE hProcess)
   bool res = DuplicateHandle (hMainProc, wr_proc_pipe, hProcess, &wr_proc_pipe,
 			      0, FALSE, flags);
   if (!res && WaitForSingleObject (hProcess, 0) != WAIT_OBJECT_0)
-    sigproc_printf ("DuplicateHandle failed, pid %d, hProcess %p, %E", pid, hProcess);
+    system_printf ("DuplicateHandle failed, pid %d, hProcess %p, %E", pid, hProcess);
   else
     {
       wr_proc_pipe_owner = dwProcessId;
@@ -990,10 +990,13 @@ bool
 _pinfo::alert_parent (char sig)
 {
   DWORD nb = 0;
-  /* Send something to our parent.  If the parent has gone away,
-     close the pipe. */
-  if (wr_proc_pipe == INVALID_HANDLE_VALUE
-      || !myself->wr_proc_pipe)
+
+  /* Send something to our parent.  If the parent has gone away, close the pipe.
+     Don't send if this is an exec stub.
+
+     FIXME: Is there a race here if we run this while another thread is attempting
+     to exec()? */
+  if (wr_proc_pipe == INVALID_HANDLE_VALUE || !myself->wr_proc_pipe || hExeced)
     /* no parent */;
   else
     {
