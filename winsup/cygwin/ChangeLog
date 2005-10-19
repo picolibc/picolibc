@@ -1,5 +1,12 @@
 2005-10-19  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler_disk_file.cc (fhandler_base::utimes_fs): Use existing handle
+	if fhandler has one.
+	* times.cc (utimes): Scan open fds for matching paths and use existing
+	fhandler if one exists.
+
+2005-10-19  Christopher Faylor  <cgf@timesys.com>
+
 	* pinfo.cc (_pinfo::dup_proc_pipe): Make warning more severe by
 	actually printing it.
 	(_pinfo::alert_parent): Fix comment.  Don't send to parent if we are in

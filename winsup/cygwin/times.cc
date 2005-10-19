@@ -22,6 +22,7 @@ details. */
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
+#include "cygheap.h"
 #include "pinfo.h"
 #include "hires.h"
 #include "cygtls.h"
@@ -445,21 +446,37 @@ extern "C" int
 utimes (const char *path, const struct timeval *tvp)
 {
   int res = -1;
-  fhandler_base *fh;
+  path_conv win32 (path, PC_SYM_FOLLOW);
+  fhandler_base *fh = NULL;
+  bool fromfd = false;
 
-  if (!(fh = build_fh_name (path, NULL, PC_SYM_FOLLOW)))
-    goto error;
+  cygheap_fdenum cfd;
+  while (cfd.next () >= 0)
+    if (strcmp (cfd->get_win32_name (), win32) == 0)
+      {
+	fh = cfd;
+	fromfd = true;
+	break;
+      }
+
+  if (!fh)
+  {
+    if (!(fh = build_fh_name (path, NULL, PC_SYM_FOLLOW)))
+      goto error;
 
   if (fh->error ())
     {
       debug_printf ("got %d error from build_fh_name", fh->error ());
       set_errno (fh->error ());
     }
-  else
-    res = fh->utimes (tvp);
+  }
 
-  delete fh;
- error:
+  res = fh->utimes (tvp);
+
+  if (!fromfd)
+    delete fh;
+
+error:
   syscall_printf ("%d = utimes (%s, %p)", res, path, tvp);
   return res;
 }

@@ -865,20 +865,27 @@ fhandler_base::utimes_fs (const struct timeval *tvp)
 {
   FILETIME lastaccess, lastwrite;
   struct timeval tmp[2];
+  bool closeit;
 
-  query_open (query_write_attributes);
-  if (!open_fs (O_BINARY, 0))
+  if (get_handle ())
+    closeit = false;
+  else
     {
-      /* It's documented in MSDN that FILE_WRITE_ATTRIBUTES is sufficient
-	 to change the timestamps.  Unfortunately it's not sufficient for a
-	 remote HPFS which requires GENERIC_WRITE, so we just retry to open
-	 for writing, though this fails for R/O files of course. */
-      query_open (no_query);
-      if (!open_fs (O_WRONLY | O_BINARY, 0))
+      query_open (query_write_attributes);
+      if (!open_fs (O_BINARY, 0))
 	{
-	  syscall_printf ("Opening file failed");
-	  return -1;
+	  /* It's documented in MSDN that FILE_WRITE_ATTRIBUTES is sufficient
+	     to change the timestamps.  Unfortunately it's not sufficient for a
+	     remote HPFS which requires GENERIC_WRITE, so we just retry to open
+	     for writing, though this fails for R/O files of course. */
+	  query_open (no_query);
+	  if (!open_fs (O_WRONLY | O_BINARY, 0))
+	    {
+	      syscall_printf ("Opening file failed");
+	      return -1;
+	    }
 	}
+      closeit = true;
     }
 
   if (nohandle ())	/* Directory query_open on 9x. */
@@ -909,7 +916,8 @@ fhandler_base::utimes_fs (const struct timeval *tvp)
       return -1;
     }
 
-  close ();
+  if (closeit)
+    close ();
   return 0;
 }
 
