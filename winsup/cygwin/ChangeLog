@@ -1,5 +1,9 @@
 2005-10-19  Christopher Faylor  <cgf@timesys.com>
 
+	* times.cc (utimes): Only consider fds opened with write access.
+
+2005-10-19  Christopher Faylor  <cgf@timesys.com>
+
 	* fhandler_disk_file.cc (fhandler_base::utimes_fs): Use existing handle
 	if fhandler has one.
 	* times.cc (utimes): Scan open fds for matching paths and use existing

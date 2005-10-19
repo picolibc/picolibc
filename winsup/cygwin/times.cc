@@ -452,7 +452,8 @@ utimes (const char *path, const struct timeval *tvp)
 
   cygheap_fdenum cfd;
   while (cfd.next () >= 0)
-    if (strcmp (cfd->get_win32_name (), win32) == 0)
+    if (cfd->get_access () & (FILE_WRITE_ATTRIBUTES | GENERIC_WRITE)
+	&& strcmp (cfd->get_win32_name (), win32) == 0)
       {
 	fh = cfd;
 	fromfd = true;
