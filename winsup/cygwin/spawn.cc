@@ -815,7 +815,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     {
     case _P_OVERLAY:
       myself.hProcess = pi.hProcess;
-      if (!synced && !myself->wr_proc_pipe)
+      if (synced && !myself->wr_proc_pipe)
 	{
 	  extern bool is_toplevel_proc;
 	  is_toplevel_proc = true;
