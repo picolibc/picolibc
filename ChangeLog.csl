@@ -1,5 +1,12 @@
 2005-10-20  Julian Brown  <julian@codesourcery.com>
 
+	* gdb/arm-tdep.c (bitcount): Move function higher up in file.
+	(thumb2_it_block): New function. Find the next instruction to be
+	executed in an IT block.
+	(thumb_get_next_pc): Handle 16- and 32-bit Thumb-2 instructions.
+
+2005-10-20  Julian Brown  <julian@codesourcery.com>
+
 	* gdb/arm-tdep.c (submask, bit, bits, sbits): Move macro definitions.
 	(thumb_skip_prologue): Don't require frame pointer. Handle Thumb-2
 	prologue instructions.
