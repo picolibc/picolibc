@@ -1,5 +1,10 @@
 2005-10-20  Julian Brown  <julian@codesourcery.com>
 
+	* gdb/arm-tdep.c (thumb2_modify_constant): Silence compiler warning.
+	(thumb_scan_prologue): Fix typo.
+
+2005-10-20  Julian Brown  <julian@codesourcery.com>
+
 	* gdb/arm-tdep.c (bitcount): Move function higher up in file.
 	(thumb2_it_block): New function. Find the next instruction to be
 	executed in an IT block.
