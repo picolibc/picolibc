@@ -441,12 +441,11 @@ gmtime (const time_t *tim_p)
 
 #endif /* POSIX_LOCALTIME */
 
-/* utimes: POSIX/SUSv3 */
-extern "C" int
-utimes (const char *path, const struct timeval *tvp)
+static int
+utimes_worker (const char *path, const struct timeval *tvp, int nofollow)
 {
   int res = -1;
-  path_conv win32 (path, PC_SYM_FOLLOW);
+  path_conv win32 (path, nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW);
   fhandler_base *fh = NULL;
   bool fromfd = false;
 
@@ -479,6 +478,35 @@ utimes (const char *path, const struct timeval *tvp)
 
 error:
   syscall_printf ("%d = utimes (%s, %p)", res, path, tvp);
+  return res;
+}
+
+/* utimes: POSIX/SUSv3 */
+extern "C" int
+utimes (const char *path, const struct timeval *tvp)
+{
+  return utimes_worker (path, tvp, 0);
+}
+
+/* BSD */
+extern "C" int
+lutimes (const char *path, const struct timeval *tvp)
+{
+  return utimes_worker (path, tvp, 1);
+}
+
+/* BSD */
+extern "C" int
+futimes (int fd, const struct timeval *tvp)
+{
+  int res;
+
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    res = -1;
+  else
+    res = cfd->utimes (tvp);
+  syscall_printf ("%d = futimes (%d, %p)", res, fd, tvp);
   return res;
 }
 

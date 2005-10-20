@@ -1522,6 +1522,8 @@ utime SIGFE
 _utime = utime SIGFE
 utimes SIGFE
 _utimes = utimes SIGFE
+futimes SIGFE
+lutimes SIGFE
 utmpname SIGFE
 _utmpname = utmpname SIGFE
 utmpxname SIGFE

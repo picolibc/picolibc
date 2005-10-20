@@ -1,3 +1,14 @@
+2005-10-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din (futimes): Export.
+	(lutimes): Export.
+	* times.cc (utimes_worker): Created from utimes, add nofollow flag
+	to implement utimes and lutimes.
+	(utimes): Just call utimes_worker.
+	(lutimes): New function.
+	(futimes): Ditto.
+	* include/cygwin/version.h: Bump API minor version.
+
 2005-10-19  Christopher Faylor  <cgf@timesys.com>
 
 	* sigproc.cc (child_info::sync): Move check for !wr_proc_pipe lower.
