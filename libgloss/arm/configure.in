@@ -19,6 +19,9 @@ else
   BUILD_CRT0_FALSE='#'
 fi
 
+AC_SUBST(BUILD_CRT0_TRUE)
+AC_SUBST(BUILD_CRT0_FALSE)
+
 if test "$srcdir" = "." ; then
   if test "${with_target_subdir}" != "." ; then
     libgloss_topdir="${srcdir}/${with_multisrctop}../../.."
