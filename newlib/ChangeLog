@@ -1,3 +1,7 @@
+2005-10-20  Corinna Vinschen <corinna@vinschen.de>
+
+	* libc/include/sys/time.h: Declare futimes and lutimes for Cygwin.
+
 2005-10-18  Corinna Vinschen <corinna@vinschen.de>
 
 	* libc/include/sys/features.h: Define _POSIX_MEMLOCK_RANGE for Cygwin.
