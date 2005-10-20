@@ -1,3 +1,8 @@
+2005-10-20  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/math.h (HUGE_VAL, HUGE_VALF, HUGE_VALL): When
+	gcc is 3.3 or greater, use special gcc builtins.
+
 2005-10-20  Corinna Vinschen <corinna@vinschen.de>
 
 	* libc/include/sys/time.h: Declare futimes and lutimes for Cygwin.

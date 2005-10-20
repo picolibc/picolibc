@@ -9,41 +9,65 @@
 
 _BEGIN_STD_C
 
-#ifndef HUGE_VAL
-
-/* Define HUGE_VAL as infinity, unless HUGE_VAL is already defined
-   (which might have been done by something like math-68881.h).  */
-
-union __fmath
-{
-  __ULong i[1];
-  float f;
-};
-
 union __dmath
 {
   __ULong i[2];
   double d;
 };
-
+ 
+union __fmath
+{
+  __ULong i[1];
+  float f;
+};
+ 
 union __ldmath
 {
   __ULong i[4];
   _LONG_DOUBLE ld;
 };
 
-/* Declare this as an array without bounds so that no matter what small data
-   support a port and/or library has, this reference will be via the general
-   method for accessing globals. */
-extern __IMPORT const union __dmath __infinity[];
-extern __IMPORT const union __fmath __infinityf[];
-extern __IMPORT const union __ldmath __infinityld[];
+#if defined(__GNUC__) && \
+  ( (__GNUC__ >= 4) || \
+    ( (__GNUC__ >= 3) && defined(__GNUC_MINOR__) && (__GNUC_MINOR__ >= 3) ) )
 
-#define HUGE_VAL (__infinity[0].d)
-#define HUGE_VALF (__infinityf[0].f)
-#define HUGE_VALL (__infinityld[0].ld)
+ /* gcc >= 3.3 implicitly defines builtins for HUGE_VALx values.  */
 
-#endif /* ! defined (HUGE_VAL) */
+ #ifndef HUGE_VAL
+  #define HUGE_VAL (__builtin_huge_val())
+ #endif
+
+ #ifndef HUGE_VALF
+  #define HUGE_VALF (__builtin_huge_valf())
+ #endif
+
+ #ifndef HUGE_VALL
+  #define HUGE_VALL (__builtin_huge_vall())
+ #endif
+
+#else /* !gcc >= 3.3  */
+
+ /* No builtins.  Use floating-point unions instead.  Declare as an array 
+    without bounds so no matter what small data support a port and/or 
+    library has, the reference will be via the general method for accessing 
+    globals. */
+
+ #ifndef HUGE_VAL
+  extern __IMPORT const union __dmath __infinity[];
+  #define HUGE_VAL (__infinity[0].d)
+ #endif
+
+ #ifndef HUGE_VALF
+  extern __IMPORT const union __fmath __infinityf[];
+  #define HUGE_VALF (__infinityf[0].f)
+ #endif
+
+ #ifndef HUGE_VALL
+  extern __IMPORT const union __ldmath __infinityld[];
+  #define HUGE_VALL (__infinityld[0].ld)
+ #endif
+
+#endif /* !gcc >= 3.3  */
 
 /* Reentrant ANSI C functions.  */
 
