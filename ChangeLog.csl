@@ -1,3 +1,15 @@
+2005-10-20  Julian Brown  <julian@codesourcery.com>
+
+	* gdb/arm-tdep.c (submask, bit, bits, sbits): Move macro definitions.
+	(thumb_skip_prologue): Don't require frame pointer. Handle Thumb-2
+	prologue instructions.
+	(thumb_get_insn): New function. Read a Thumb or Thumb-2 instruction
+	from memory.
+	(arm_skip_prologue): Change comment to include Thumb-2.
+	(thumb2_modify_constant): New function. Perform the Thumb-2 12-bit
+	immediate transformation.
+	(thumb_scan_prologue): Handle Thumb-2 prologue instructions.
+
 2005-10-20  Paul Brook  <paul@codesourcery.com>
 
 	* arm-tdep.c (arm_iwmmxt_type): New.
