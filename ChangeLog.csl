@@ -1,3 +1,9 @@
+2005-10-20  Paul Brook  <paul@codesourcery.com>
+
+	* arm-tdep.c (arm_iwmmxt_type): New.
+	(arm_build_iwmmxt_type): New function.
+	(arm_register_type): Use it.
+
 2005-03-30  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* gdb/Makefile.in (arm-linux-nat.o): Update dependencies.
