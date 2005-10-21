@@ -1,3 +1,9 @@
+2005-10-21  Christopher Faylor  <cgf@timesys.com>
+
+	* dir.cc (rmdir): Eliminate nonsensical code.
+
+	* fork.cc (fork): Move exit debug_printf to last statement.
+
 2005-10-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din (futimes): Export.

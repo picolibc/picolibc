@@ -601,8 +601,8 @@ fork ()
 
       set_errno (grouped.this_errno);
     }
-  syscall_printf ("%d = fork()", res);
   sig_send (NULL, __SIGNOHOLD);
+  syscall_printf ("%d = fork()", res);
   return res;
 }
 #ifdef DEBUGGING

@@ -305,10 +305,7 @@ rmdir (const char *dir)
   if (fh->error ())
     {
       debug_printf ("got %d error from build_fh_name", fh->error ());
-      if (fh->error ())
-	set_errno (EROFS);
-      else
-	set_errno (fh->error ());
+      set_errno (fh->error ());
     }
   else if (!fh->rmdir ())
     res = 0;
