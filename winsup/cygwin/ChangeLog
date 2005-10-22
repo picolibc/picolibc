@@ -1,5 +1,16 @@
 2005-10-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (class fhandler_socket): Add timeout parameter to wait()
+	method.
+	* fhandler_socket.cc (fhandler_socket::connect): Use event driven
+	technique (prepare/wait/release) to implement interuptible connect.
+	(fhandler_socket::wait): Add timeout parameter.  Allow FD_CONNECT
+	handling.
+	* net.cc (cygwin_connect): Remove braindead workaround for allowing
+	blocking connect.  That's entirely in fhandler_socket::connect now.
+
+2005-10-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/version.h: Fix typo.
 
 2005-10-21  Christopher Faylor  <cgf@timesys.com>

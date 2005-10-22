@@ -681,7 +681,20 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
       return -1;
     }
 
-  res = ::connect (get_socket (), (struct sockaddr *) &sin, namelen);
+  if (is_nonblocking ())
+    res = ::connect (get_socket (), (struct sockaddr *) &sin, namelen);
+  else
+    {
+      HANDLE evt;
+      if (prepare (evt, FD_CONNECT))
+	{
+	  res = ::connect (get_socket (), (struct sockaddr *) &sin, namelen);
+	  if (res == SOCKET_ERROR
+	      && WSAGetLastError () == WSAEWOULDBLOCK)
+	     res = wait (evt, 0, INFINITE);
+	  release (evt);
+	}
+    }
 
   if (!res)
     err = 0;
@@ -877,14 +890,14 @@ fhandler_socket::prepare (HANDLE &event, long event_mask)
 }
 
 int
-fhandler_socket::wait (HANDLE event, int flags)
+fhandler_socket::wait (HANDLE event, int flags, DWORD timeout)
 {
   int ret = SOCKET_ERROR;
   int wsa_err = 0;
   WSAEVENT ev[2] = { event, signal_arrived };
   WSANETWORKEVENTS evts;
 
-  switch (WSAWaitForMultipleEvents (2, ev, FALSE, 10, FALSE))
+  switch (WSAWaitForMultipleEvents (2, ev, FALSE, timeout, FALSE))
     {
       case WSA_WAIT_TIMEOUT:
 	ret = 0;
@@ -910,7 +923,14 @@ fhandler_socket::wait (HANDLE event, int flags)
 		    break;
 		  }
 	      }
-	    if (evts.lNetworkEvents & FD_READ)
+	    if (evts.lNetworkEvents & FD_CONNECT)
+	      {
+	        if (evts.iErrorCode[FD_CONNECT_BIT])
+		  wsa_err = evts.iErrorCode[FD_CONNECT_BIT];
+		else
+		  ret = 0;
+	      }
+	    else if (evts.lNetworkEvents & FD_READ)
 	      {
 		if (evts.iErrorCode[FD_READ_BIT])
 		  wsa_err = evts.iErrorCode[FD_READ_BIT];
