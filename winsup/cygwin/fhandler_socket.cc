@@ -710,9 +710,9 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 
 	  if (err == WSAEWOULDBLOCK)
 	    WSASetLastError (err = WSAEINPROGRESS);
-	  else if (err == WSAEINVAL)
-	    WSASetLastError (err = WSAEISCONN);
 	}
+      if (err == WSAEINVAL)
+	WSASetLastError (err = WSAEISCONN);
       set_winsock_errno ();
     }
 
@@ -779,7 +779,21 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
   if (len && ((unsigned) *len < sizeof (struct sockaddr_in)))
     *len = sizeof (struct sockaddr_in);
 
-  res = ::accept (get_socket (), peer, len);
+  if (is_nonblocking ())
+    res = ::accept (get_socket (), peer, len);
+  else
+    {
+      HANDLE evt;
+      if (prepare (evt, FD_ACCEPT))
+	{
+	  res = wait (evt, 0, INFINITE);
+	  if (res != -1
+	      || (WSAGetLastError () != WSAEINTR
+		  && WSAGetLastError () != WSAEFAULT))
+	    res = ::accept (get_socket (), peer, len);
+	  release (evt);
+	}
+    }
 
   if (res == (int) INVALID_SOCKET)
     set_winsock_errno ();
@@ -922,6 +936,13 @@ fhandler_socket::wait (HANDLE event, int flags, DWORD timeout)
 		    WSASetLastError (WSAEINTR);
 		    break;
 		  }
+	      }
+	    if (evts.lNetworkEvents & FD_ACCEPT)
+	      {
+	        if (evts.iErrorCode[FD_ACCEPT_BIT])
+		  wsa_err = evts.iErrorCode[FD_ACCEPT_BIT];
+		else
+		  ret = 0;
 	      }
 	    if (evts.lNetworkEvents & FD_CONNECT)
 	      {

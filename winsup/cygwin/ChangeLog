@@ -1,5 +1,15 @@
 2005-10-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::connect): Don't restrict
+	WSAEINVAL -> WSAEISCONN conversion to nonblocking sockets.
+	(fhandler_socket::accept): Use event driven technique to implement
+	interuptible accept.
+	(fhandler_socket::wait): Allow FD_ACCEPT handling.
+	* net.cc (cygwin_accept): Remove workaround for allowing blocking
+	accept.  That's entirely in fhandler_socket::accept now.
+
+2005-10-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (class fhandler_socket): Add timeout parameter to wait()
 	method.
 	* fhandler_socket.cc (fhandler_socket::connect): Use event driven

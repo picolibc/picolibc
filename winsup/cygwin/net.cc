@@ -909,19 +909,7 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
   if (efault.faulted (EFAULT) || !fh)
     res = -1;
   else
-    {
-      if (!fh->is_nonblocking ())
-	{
-	  size_t fds_size = howmany (fd + 1, NFDBITS) * sizeof (fd_mask);
-	  fd_set *read_fds = (fd_set *) alloca (fds_size);
-	  memset (read_fds, 0, fds_size);
-	  FD_SET (fd, read_fds);
-	  res = cygwin_select (fd + 1, read_fds, NULL, NULL, NULL);
-	  if (res == -1)
-	    return -1;
-	}
-      res = fh->accept (peer, len);
-    }
+    res = fh->accept (peer, len);
 
   syscall_printf ("%d = accept (%d, %p, %p)", res, fd, peer, len);
   return res;
