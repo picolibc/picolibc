@@ -278,7 +278,7 @@ details. */
       139: Start using POSIX definition of struct msghdr and WinSock2
 	   IPPROTO_IP values.
       140: Export mlock, munlock.
-      140: Export futimes, lutimes.
+      141: Export futimes, lutimes.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
