@@ -398,6 +398,7 @@ class cygheap_fdenum : public cygheap_fdmanip
  public:
   cygheap_fdenum (int start_fd = -1, bool lockit = false)
   {
+    locked = lockit;
     if (lockit)
       cygheap->fdtab.lock ();
     this->start_fd = fd = start_fd < 0 ? -1 : start_fd;
@@ -412,27 +413,6 @@ class cygheap_fdenum : public cygheap_fdmanip
   void rewind ()
   {
     fd = start_fd;
-  }
-};
-
-class lock_process
-{
-  bool skip_unlock;
-public:
-  lock_process (bool exiting = false)
-  {
-    cygheap->fdtab.lock ();
-    skip_unlock = exiting;
-    if (exiting && exit_state < ES_SET_MUTO)
-      {
-	exit_state = ES_SET_MUTO;
-	muto::set_exiting_thread ();
-      }
-  }
-  ~lock_process ()
-  {
-    if (!skip_unlock)
-      cygheap->fdtab.unlock ();
   }
 };
 

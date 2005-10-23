@@ -1,3 +1,25 @@
+2005-10-23  Christopher Faylor  <cgf@timesys.com>
+
+	* cygheap.h (cygheap_fdenum::cygheap_fdenum): Record locked state or
+	suffer deadlocks.
+	(class locked_process): Move to another header.
+	* sync.h (lock_process): Define here.
+	* cygtls.cc (_cygtls::fixup_after_fork): Reset spinning state as well
+	as stacklock state.
+	* dcrt0.cc (lock_process::locker): Define.
+	(dtable::lock_cs): Delete.
+	* dtable.cc (dtable_init): Eliminate call to init_lock().
+	(dtable::fixup_after_fork): Ditto.
+	(dtable::init_lock): Delete definition.
+	* dtable.h (dtable::init_lock): Delete declaration.
+	(dtable::lock): Use process lock rather than dtable-specific lock.
+	(dtable::unlock): Ditto.
+
+	* sigproc.cc (sigproc_init): Minor change to debugging output.
+
+	* times.cc (utime_worker): Use build_fh_pc rather than reinterpreting
+	the posix path name again.  Return any error from path_conv immediately.
+
 2005-10-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::connect): Don't restrict
@@ -252,7 +274,6 @@
 	(pinfo::lock): Delete.
 	(pinfo::unlock): Delete.
 	* winsup.h (get_exit_lock): Delete declaration.
-	
 
 2005-10-03  Corinna Vinschen  <corinna@vinschen.de>
 

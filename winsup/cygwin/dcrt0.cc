@@ -47,8 +47,8 @@ HANDLE NO_COPY hMainProc = (HANDLE) -1;
 HANDLE NO_COPY hMainThread;
 HANDLE NO_COPY hProcToken;
 HANDLE NO_COPY hProcImpToken;
-muto NO_COPY dtable::lock_cs;	/* This should be in dtable.cc but it causes inexplicable
-				   errors there. */
+
+muto NO_COPY lock_process::locker;
 
 bool display_title;
 bool strip_title_path;
@@ -636,6 +636,7 @@ get_cygwin_startup_info ()
 void __stdcall
 dll_crt0_0 ()
 {
+  lock_process::init ();
   init_console_handler (TRUE);
   _impure_ptr = _GLOBAL_REENT;
   _impure_ptr->_stdin = &_impure_ptr->__sf[0];

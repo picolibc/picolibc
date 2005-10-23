@@ -485,7 +485,7 @@ sigproc_init ()
   hwait_sig->zap_h ();
 
   global_sigs[SIGSTOP].sa_flags = SA_RESTART | SA_NODEFER;
-  sigproc_printf ("process/signal handling enabled(%x)", myself->process_state);
+  sigproc_printf ("process/signal handling enabled, state %p", myself->process_state);
 }
 
 /* Called on process termination to terminate signal and process threads.

@@ -150,7 +150,7 @@ _cygtls::fixup_after_fork ()
       pop ();
       sig = 0;
     }
-  stacklock = 0;
+  stacklock = spinning = 0;
   locals.exitsock = INVALID_SOCKET;
   wq.thread_ev = NULL;
 }

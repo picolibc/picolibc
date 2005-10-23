@@ -20,7 +20,6 @@ class fhandler_fifo;
 #define BFH_OPTS (PC_NULLEMPTY | PC_FULL | PC_POSIX)
 class dtable
 {
-  static muto lock_cs;
   fhandler_base **fds;
 #ifdef NEWVFORK
   fhandler_base **fds_on_hold;
@@ -31,9 +30,8 @@ class dtable
   static const int initial_archetype_size = 8;
   int first_fd_for_open;
   int cnt_need_fixup_before;
-  void lock () {lock_cs.acquire ();}
-  void unlock () {lock_cs.release ();}
-  void init_lock ();
+  void lock () {lock_process::locker.acquire ();}
+  void unlock () {lock_process::locker.release ();}
 public:
   size_t size;
 

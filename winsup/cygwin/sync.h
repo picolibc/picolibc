@@ -44,4 +44,28 @@ public:
   static void set_exiting_thread () {exiting_thread = GetCurrentThreadId ();}
 };
 
+class lock_process
+{
+  bool skip_unlock;
+  static muto locker;
+public:
+  static void init () {locker.init ("lock_process");}
+  lock_process (bool exiting = false)
+  {
+    locker.acquire ();
+    skip_unlock = exiting;
+    if (exiting && exit_state < ES_SET_MUTO)
+      {
+	exit_state = ES_SET_MUTO;
+	muto::set_exiting_thread ();
+      }
+  }
+  ~lock_process ()
+  {
+    if (!skip_unlock)
+      locker.release ();
+  }
+  friend class dtable;
+};
+
 #endif /*_SYNC_H*/

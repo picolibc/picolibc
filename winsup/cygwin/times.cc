@@ -445,36 +445,42 @@ static int
 utimes_worker (const char *path, const struct timeval *tvp, int nofollow)
 {
   int res = -1;
-  path_conv win32 (path, nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW);
-  fhandler_base *fh = NULL;
-  bool fromfd = false;
+  path_conv win32 (path, PC_POSIX | (nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW));
 
-  cygheap_fdenum cfd;
-  while (cfd.next () >= 0)
-    if (cfd->get_access () & (FILE_WRITE_ATTRIBUTES | GENERIC_WRITE)
-	&& strcmp (cfd->get_win32_name (), win32) == 0)
-      {
-	fh = cfd;
-	fromfd = true;
-	break;
-      }
-
-  if (!fh)
-  {
-    if (!(fh = build_fh_name (path, NULL, PC_SYM_FOLLOW)))
-      goto error;
-
-  if (fh->error ())
+  if (win32.error)
+    set_errno (win32.error);
+  else
     {
-      debug_printf ("got %d error from build_fh_name", fh->error ());
-      set_errno (fh->error ());
+      fhandler_base *fh = NULL;
+      bool fromfd = false;
+
+      cygheap_fdenum cfd;
+      while (cfd.next () >= 0)
+	if (cfd->get_access () & (FILE_WRITE_ATTRIBUTES | GENERIC_WRITE)
+	    && strcmp (cfd->get_win32_name (), win32) == 0)
+	  {
+	    fh = cfd;
+	    fromfd = true;
+	    break;
+	  }
+
+      if (!fh)
+	{
+	  if (!(fh = build_fh_pc (win32)))
+	    goto error;
+
+	  if (fh->error ())
+	    {
+	      debug_printf ("got %d error from build_fh_name", fh->error ());
+	      set_errno (fh->error ());
+	  }
+	}
+
+      res = fh->utimes (tvp);
+
+      if (!fromfd)
+	delete fh;
     }
-  }
-
-  res = fh->utimes (tvp);
-
-  if (!fromfd)
-    delete fh;
 
 error:
   syscall_printf ("%d = utimes (%s, %p)", res, path, tvp);

@@ -47,8 +47,6 @@ dtable_init ()
 {
   if (!cygheap->fdtab.size)
     cygheap->fdtab.extend (NOFILE_INCR);
-  cygheap->fdtab.init_lock ();
-
 }
 
 void __stdcall
@@ -58,12 +56,6 @@ set_std_handle (int fd)
     SetStdHandle (std_consts[fd], cygheap->fdtab[fd]->get_handle ());
   else if (fd <= 2)
     SetStdHandle (std_consts[fd], cygheap->fdtab[fd]->get_output_handle ());
-}
-
-void
-dtable::init_lock ()
-{
-  lock_cs.init ("lock_cs");
 }
 
 int
@@ -687,7 +679,6 @@ dtable::fixup_after_exec ()
 {
   first_fd_for_open = 0;
   fhandler_base *fh;
-  cygheap->fdtab.init_lock ();
   for (size_t i = 0; i < size; i++)
     if ((fh = fds[i]) != NULL)
       {
@@ -713,7 +704,6 @@ void
 dtable::fixup_after_fork (HANDLE parent)
 {
   fhandler_base *fh;
-  cygheap->fdtab.init_lock ();
   for (size_t i = 0; i < size; i++)
     if ((fh = fds[i]) != NULL)
       {
