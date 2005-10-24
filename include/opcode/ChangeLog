@@ -1,3 +1,8 @@
+2005-10-24  Jan Beulich  <jbeulich@novell.com>
+
+	* ia64.h (enum ia64_opnd): Move memory operand out of set of
+	indirect operands.
+
 2005-10-16  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
 
 	* hppa.h (pa_opcodes): Add two fcmp opcodes.  Reorder ftest opcodes.
