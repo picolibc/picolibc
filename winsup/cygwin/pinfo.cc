@@ -729,7 +729,7 @@ _pinfo::fds (size_t &n)
     {
       n = 0;
       int fd;
-      cygheap_fdenum cfd;
+      cygheap_fdenum cfd (true);
       while ((fd = cfd.next ()) >= 0)
 	n += sizeof (int);
       cfd.rewind ();
