@@ -546,7 +546,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	{
 	  debug_printf ("Command line too long (>32K), return E2BIG");
 	  set_errno (E2BIG);
-	  return -1;
+	  res = -1;
+	  goto out;
 	}
     }
 
@@ -714,7 +715,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	  myself->sendsig = myself->exec_sendsig;
 	  myself->exec_sendsig = NULL;
 	}
-      return -1;
+      res = -1;
+      goto out;
     }
 
   /* Fixup the parent data structures if needed and resume the child's

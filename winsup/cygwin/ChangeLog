@@ -1,3 +1,8 @@
+2005-10-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* spawn.cc (spawn_guts): Don't leave the function with return inside
+	pthread cleanup brackets.
+
 2005-10-24  Christopher Faylor  <cgf@timesys.com>
 
 	* cygheap.h (cygheap_fdenum): Remove start_fd stuff.
