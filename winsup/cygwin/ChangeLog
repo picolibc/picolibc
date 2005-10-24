@@ -8,6 +8,7 @@
 	as stacklock state.
 	* dcrt0.cc (lock_process::locker): Define.
 	(dtable::lock_cs): Delete.
+	(dll_crt0_0): Initialize process lock here ASAP.
 	* dtable.cc (dtable_init): Eliminate call to init_lock().
 	(dtable::fixup_after_fork): Ditto.
 	(dtable::init_lock): Delete definition.
