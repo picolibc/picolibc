@@ -1,3 +1,10 @@
+2005-10-24  Christopher Faylor  <cgf@timesys.com>
+
+	* cygheap.h (cygheap_fdenum): Remove start_fd stuff.
+	(cygheap_fdenum::rewind): Ditto.
+	* pipe.cc (fhandler_pipe::open): Lock fdtab while enumerating.
+	* times.cc (utimes_worker): Ditto.
+
 2005-10-23  Christopher Faylor  <cgf@timesys.com>
 
 	* cygheap.h (cygheap_fdenum::cygheap_fdenum): Record locked state or

@@ -394,14 +394,13 @@ class cygheap_fdget : public cygheap_fdmanip
 
 class cygheap_fdenum : public cygheap_fdmanip
 {
-  int start_fd;
  public:
-  cygheap_fdenum (int start_fd = -1, bool lockit = false)
+  cygheap_fdenum (bool lockit = false)
   {
     locked = lockit;
     if (lockit)
       cygheap->fdtab.lock ();
-    this->start_fd = fd = start_fd < 0 ? -1 : start_fd;
+    fd = -1;
   }
   int next ()
   {
@@ -412,7 +411,7 @@ class cygheap_fdenum : public cygheap_fdmanip
   }
   void rewind ()
   {
-    fd = start_fd;
+    fd = -1;
   }
 };
 

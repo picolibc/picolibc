@@ -454,7 +454,7 @@ utimes_worker (const char *path, const struct timeval *tvp, int nofollow)
       fhandler_base *fh = NULL;
       bool fromfd = false;
 
-      cygheap_fdenum cfd;
+      cygheap_fdenum cfd (true);
       while (cfd.next () >= 0)
 	if (cfd->get_access () & (FILE_WRITE_ATTRIBUTES | GENERIC_WRITE)
 	    && strcmp (cfd->get_win32_name (), win32) == 0)

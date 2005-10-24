@@ -49,7 +49,7 @@ fhandler_pipe::open (int flags, mode_t mode)
   sscanf (get_name (), "/proc/%d/fd/pipe:[%d]", &pid, (int *) &pipe_hdl);
   if (pid == myself->pid)
     {
-      cygheap_fdenum cfd;
+      cygheap_fdenum cfd (true);
       while (cfd.next () >= 0)
 	{
 	  if (cfd->get_handle () != pipe_hdl)
