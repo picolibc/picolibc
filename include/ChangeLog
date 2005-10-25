@@ -1,8 +1,10 @@
+2005-10-25  Arnold Metselaar  <arnold.metselaar@planet.nl>
+
+	disasm.h: Add declaration for print_insn_z80
+
 2005-09-30  Catherine Moore  <clm@cm00re.com>
 
 	* dis-asm.h (print_insn_bfin): Declare.
-	* elf/bfin.h: New file.
-	* elf/common.h (EM_BLACKFIN): Define.
 	* opcode/bfin.h: New file.
 
 2005-09-26  Mark Mitchell  <mark@codesourcery.com>

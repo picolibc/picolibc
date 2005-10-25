@@ -1,3 +1,8 @@
+2005-10-25  Arnold Metselaar  <arnold.metselaar@planet.nl>
+
+	* internal.h: Add relocation number for Z80
+	* z80.h: New file.
+
 2005-08-18  Alan Modra  <amodra@bigpond.net.au>
 
 	* a29k.h: Delete.
