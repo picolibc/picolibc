@@ -129,8 +129,8 @@ SUBDIRS = argz stdlib ctype search stdio $(STDIO64_SUBDIR) string $(SIGNAL_SUBDI
 noinst_DATA = $(CRT0)
 
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libc.la
-@USE_LIBTOOL_TRUE@SUBLIBS = 	argz/libargz.$(aext) 	stdlib/libstdlib.$(aext) 	ctype/libctype.$(aext) 	search/libsearch.$(aext) 	stdio/libstdio.$(aext) 	$(LIBC_STDIO64_LIB) 	string/libstring.$(aext) 	$(LIBC_SIGNAL_LIB) 	time/libtime.$(aext) 	locale/liblocale.$(aext) 	$(LIBC_SYS_LIB) 	reent/libreent.$(aext) 	$(LIBC_EXTRA_LIB) 	errno/liberrno.$(aext) 	misc/libmisc.$(aext) 	$(LIBC_MACHINE_LIB) 	$(LIBC_UNIX_LIB) 	$(LIBC_POSIX_LIB) 	$(LIBC_SYSCALL_LIB)
-@USE_LIBTOOL_FALSE@SUBLIBS = 	argz/lib.$(aext) 	stdlib/lib.$(aext) 	ctype/lib.$(aext) 	search/lib.$(aext) 	stdio/lib.$(aext) 	$(LIBC_STDIO64_LIB) 	string/lib.$(aext) 	$(LIBC_SIGNAL_LIB) 	time/lib.$(aext) 	locale/lib.$(aext) 	$(LIBC_SYS_LIB) 	reent/lib.$(aext) 	$(LIBC_EXTRA_LIB) 	errno/lib.$(aext) 	misc/lib.$(aext) 	$(LIBC_MACHINE_LIB) 	$(LIBC_UNIX_LIB) 	$(LIBC_POSIX_LIB) 	$(LIBC_SYSCALL_LIB)         $(NEWLIB_ICONV_LIBS)
+@USE_LIBTOOL_TRUE@SUBLIBS = 	argz/libargz.$(aext) 	stdlib/libstdlib.$(aext) 	ctype/libctype.$(aext) 	search/libsearch.$(aext) 	stdio/libstdio.$(aext) 	$(LIBC_STDIO64_LIB) 	string/libstring.$(aext) 	$(LIBC_SIGNAL_LIB) 	time/libtime.$(aext) 	locale/liblocale.$(aext) 	reent/libreent.$(aext) 	$(LIBC_EXTRA_LIB) 	errno/liberrno.$(aext) 	misc/libmisc.$(aext) 	$(LIBC_UNIX_LIB) 	$(LIBC_POSIX_LIB) 	$(LIBC_SYSCALL_LIB) 	$(LIBC_MACHINE_LIB) 	$(LIBC_SYS_LIB)
+@USE_LIBTOOL_FALSE@SUBLIBS = 	argz/lib.$(aext) 	stdlib/lib.$(aext) 	ctype/lib.$(aext) 	search/lib.$(aext) 	stdio/lib.$(aext) 	$(LIBC_STDIO64_LIB) 	string/lib.$(aext) 	$(LIBC_SIGNAL_LIB) 	time/lib.$(aext) 	locale/lib.$(aext) 	reent/lib.$(aext) 	$(LIBC_EXTRA_LIB) 	errno/lib.$(aext) 	misc/lib.$(aext) 	$(LIBC_UNIX_LIB) 	$(LIBC_POSIX_LIB) 	$(LIBC_SYSCALL_LIB)         $(NEWLIB_ICONV_LIBS) 	$(LIBC_MACHINE_LIB) 	$(LIBC_SYS_LIB)
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = libc.a
 
 libc_la_LDFLAGS = -Xcompiler -nostdlib

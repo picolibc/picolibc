@@ -1,3 +1,8 @@
+2005-10-26  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/Makefile.am: Reorder SUBLIBS so machine and sys
+	directories can override properly.
+
 2005-10-20  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/math.h (HUGE_VAL, HUGE_VALF, HUGE_VALL): When

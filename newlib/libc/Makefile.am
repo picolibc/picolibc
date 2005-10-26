@@ -50,15 +50,15 @@ SUBLIBS = \
 	$(LIBC_SIGNAL_LIB) \
 	time/libtime.$(aext) \
 	locale/liblocale.$(aext) \
-	$(LIBC_SYS_LIB) \
 	reent/libreent.$(aext) \
 	$(LIBC_EXTRA_LIB) \
 	errno/liberrno.$(aext) \
 	misc/libmisc.$(aext) \
-	$(LIBC_MACHINE_LIB) \
 	$(LIBC_UNIX_LIB) \
 	$(LIBC_POSIX_LIB) \
-	$(LIBC_SYSCALL_LIB)
+	$(LIBC_SYSCALL_LIB) \
+	$(LIBC_MACHINE_LIB) \
+	$(LIBC_SYS_LIB)
 else
 noinst_LIBRARIES = libc.a
 SUBLIBS = \
@@ -72,16 +72,16 @@ SUBLIBS = \
 	$(LIBC_SIGNAL_LIB) \
 	time/lib.$(aext) \
 	locale/lib.$(aext) \
-	$(LIBC_SYS_LIB) \
 	reent/lib.$(aext) \
 	$(LIBC_EXTRA_LIB) \
 	errno/lib.$(aext) \
 	misc/lib.$(aext) \
-	$(LIBC_MACHINE_LIB) \
 	$(LIBC_UNIX_LIB) \
 	$(LIBC_POSIX_LIB) \
 	$(LIBC_SYSCALL_LIB) \
-        $(NEWLIB_ICONV_LIBS)
+        $(NEWLIB_ICONV_LIBS) \
+	$(LIBC_MACHINE_LIB) \
+	$(LIBC_SYS_LIB)
 endif
 
 libc_la_LDFLAGS = -Xcompiler -nostdlib
