@@ -287,7 +287,6 @@ extern int __pthread_atfork (void (*__prepare) (void),
 #  pragma weak __pthread_atfork
 #  pragma weak _pthread_cleanup_push_defer
 #  pragma weak _pthread_cleanup_pop_restore
-# endif
 #endif
 
 /* We need portable names for some functions.  E.g., when they are

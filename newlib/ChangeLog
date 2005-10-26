@@ -1,3 +1,12 @@
+2005-10-26  Shaun Jackman  <sjackman@gmail.com>
+
+	* libc/posix/scandir.c (scandir): Update the function
+	prototype to match the header.
+	* libc/sys/linux/linuxthreads/bits/libc-lock.h: Remove an
+	extraneous #endif.
+	* libc/sys/linux/sys/lock.h: Do not include
+	machine/weakalias.h, since it's not used by this file.
+
 2005-10-26  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/Makefile.am: Reorder SUBLIBS so machine and sys

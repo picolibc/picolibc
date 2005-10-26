@@ -74,8 +74,8 @@ int
 _DEFUN(scandir, (dirname, namelist, select, dcomp),
 	const char *dirname _AND
 	struct dirent ***namelist _AND
-	int (*select) __P((struct dirent *)) _AND
-	int (*dcomp) __P((const void *, const void *)))
+	int (*select) __P((const struct dirent *)) _AND
+	int (*dcomp) __P((const struct dirent **, const struct dirent **)))
 {
 	register struct dirent *d, *p, **names;
 	register size_t nitems;
@@ -155,7 +155,7 @@ _DEFUN(scandir, (dirname, namelist, select, dcomp),
 	}
 	closedir(dirp);
 	if (nitems && dcomp != NULL)
-		qsort(names, nitems, sizeof(struct dirent *), dcomp);
+		qsort(names, nitems, sizeof(struct dirent *), (void *)dcomp);
 	*namelist = names;
 #ifdef HAVE_DD_LOCK
 	__lock_release_recursive(dirp->dd_lock);
