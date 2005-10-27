@@ -1,3 +1,8 @@
+2005-10-27  Chris Sutcliffe  <ir0nh34d@users.sf.net>
+
+	* include/w32api.h: Increment version to 3.4.
+	* Makefile.in: Ditto.
+
 2005-10-12  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winbase.h (GetProcessId): Remove duplicate declaration.
