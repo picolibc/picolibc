@@ -158,8 +158,8 @@
 # define __MSVCRT_VERSION__ 0x0600
 #endif
 
-#define __MINGW32_VERSION 3.8
+#define __MINGW32_VERSION 3.9
 #define __MINGW32_MAJOR_VERSION 3
-#define __MINGW32_MINOR_VERSION 8
+#define __MINGW32_MINOR_VERSION 9
 
 #endif /* __MINGW_H */

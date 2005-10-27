@@ -1,3 +1,8 @@
+2005-10-27  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* Include/_mingw.h: Increment version to 3.9.
+	* Makefile.in: Ditto.
+
 2005-10-14  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/limits.h (SSIZE_MAX): Define.
