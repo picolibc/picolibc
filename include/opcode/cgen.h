@@ -22,6 +22,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #ifndef CGEN_H
 #define CGEN_H
 
+#include "symcat.h"
+#include "cgen-bitset.h"
 /* ??? This file requires bfd.h but only to get bfd_vma.
    Seems like an awful lot to require just to get such a fundamental type.
    Perhaps the definition of bfd_vma can be moved outside of bfd.h.
@@ -107,7 +109,13 @@ typedef struct cgen_cpu_desc *CGEN_CPU_DESC;
 
 /* Type of attribute values.  */
 
-typedef int CGEN_ATTR_VALUE_TYPE;
+typedef CGEN_BITSET     CGEN_ATTR_VALUE_BITSET_TYPE;
+typedef int             CGEN_ATTR_VALUE_ENUM_TYPE;
+typedef union
+{
+  CGEN_ATTR_VALUE_BITSET_TYPE bitset;
+  CGEN_ATTR_VALUE_ENUM_TYPE   nonbitset;
+} CGEN_ATTR_VALUE_TYPE;
 
 /* Struct to record attribute information.  */
 
@@ -153,7 +161,9 @@ struct { unsigned int bool; \
 #define CGEN_ATTR_VALUE(obj, attr_table, attr) \
 ((unsigned int) (attr) < CGEN_ATTR_NBOOL_OFFSET \
  ? ((CGEN_ATTR_BOOLS (attr_table) & CGEN_ATTR_MASK (attr)) != 0) \
- : ((attr_table)->nonbool[(attr) - CGEN_ATTR_NBOOL_OFFSET]))
+ : ((attr_table)->nonbool[(attr) - CGEN_ATTR_NBOOL_OFFSET].nonbitset))
+#define CGEN_BITSET_ATTR_VALUE(obj, attr_table, attr) \
+ ((attr_table)->nonbool[(attr) - CGEN_ATTR_NBOOL_OFFSET].bitset)
 
 /* Attribute name/value tables.
    These are used to assist parsing of descriptions at run-time.  */
@@ -161,7 +171,7 @@ struct { unsigned int bool; \
 typedef struct
 {
   const char * name;
-  CGEN_ATTR_VALUE_TYPE value;
+  unsigned value;
 } CGEN_ATTR_ENTRY;
 
 /* For each domain (ifld,hw,operand,insn), list of attributes.  */
@@ -965,6 +975,7 @@ typedef CGEN_ATTR_TYPE (CGEN_INSN_NBOOL_ATTRS) CGEN_INSN_ATTR_TYPE;
 typedef enum cgen_insn_attr {
   CGEN_INSN_ALIAS = 0
 } CGEN_INSN_ATTR;
+#define CGEN_ATTR_CGEN_INSN_ALIAS_VALUE(attrs) ((attrs)->bool & (1 << CGEN_INSN_ALIAS))
 #endif
 
 /* This struct defines each entry in the instruction table.  */
@@ -1016,6 +1027,8 @@ typedef struct
 /* Return value of attribute ATTR in INSN.  */
 #define CGEN_INSN_ATTR_VALUE(insn, attr) \
 CGEN_ATTR_VALUE ((insn), CGEN_INSN_ATTRS (insn), (attr))
+#define CGEN_INSN_BITSET_ATTR_VALUE(insn, attr) \
+  CGEN_BITSET_ATTR_VALUE ((insn), CGEN_INSN_ATTRS (insn), (attr))
 } CGEN_IBASE;
 
 /* Return non-zero if INSN is the "invalid" insn marker.  */
@@ -1179,10 +1192,9 @@ typedef struct cgen_cpu_desc
   /* Bitmap of selected machine(s) (a la BFD machine number).  */
   int machs;
 
-  /* Bitmap of selected isa(s).
-     ??? Simultaneous multiple isas might not make sense, but it's not (yet)
-     precluded.  */
-  int isas;
+  /* Bitmap of selected isa(s).  */
+  CGEN_BITSET *isas;
+#define CGEN_CPU_ISAS(cd) ((cd)->isas)
 
   /* Current endian.  */
   enum cgen_endian endian;

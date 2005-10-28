@@ -1,3 +1,12 @@
+2005-10-28  Dave Brolley  <brolley@redhat.com>
+
+	Contribute the following changes:
+	2005-02-16  Dave Brolley  <brolley@redhat.com>
+
+	* cgen-bitset.h: Rename CGEN_ISA_MASK to CGEN_BITSET. Rename
+	cgen_isa_mask_* to cgen_bitset_*.
+	* cgen.h: Likewise.
+
 2005-09-30  Catherine Moore  <clm@cm00re.com>
 
 	* bfin.h: New file.
