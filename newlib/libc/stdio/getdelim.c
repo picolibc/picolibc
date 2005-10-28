@@ -1,7 +1,7 @@
 /* Copyright 2002, Red Hat Inc. - all rights reserved */
 /*
 FUNCTION
-<<getdelim>>---read a line up to a specified line delimeter
+<<getdelim>>---read a line up to a specified line delimiter
 
 INDEX
 	getdelim
@@ -21,16 +21,16 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 <<getdelim>> reads a file <[fp]> up to and possibly including a specified
-delimeter <[delim]>.  The line is read into a buffer pointed to
+delimiter <[delim]>.  The line is read into a buffer pointed to
 by <[bufptr]> and designated with size *<[n]>.  If the buffer is
 not large enough, it will be dynamically grown by <<getdelim>>.
 As the buffer is grown, the pointer to the size <[n]> will be
 updated.
 
 RETURNS
-<<getdelim>> returns <<-1>> if no characters were successfully read,
+<<getdelim>> returns <<-1>> if no characters were successfully read;
 otherwise, it returns the number of bytes successfully read.
-at end of file, the result is nonzero.
+At end of file, the result is nonzero.
 
 PORTABILITY
 <<getdelim>> is a glibc extension.

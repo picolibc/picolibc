@@ -1,6 +1,6 @@
 /*
 FUNCTION
-	<<unctrl>>---translate characters to upper case
+	<<unctrl>>---get printable representation of a character
 
 INDEX
 	unctrl

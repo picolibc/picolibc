@@ -10,7 +10,7 @@ int _dummy_mstats = 1;
 
 /*
 FUNCTION
-<<mallinfo>>, <<malloc_stats>>, <<mallopt>>--malloc support
+<<mallinfo>>, <<malloc_stats>>, <<mallopt>>---malloc support
 
 INDEX
 	mallinfo

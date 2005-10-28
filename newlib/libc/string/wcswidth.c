@@ -17,22 +17,22 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 	The <<wcswidth>> function shall determine the number of column
-	positions required for n wide-character codes (or fewer than n
+	positions required for <[n]> wide-character codes (or fewer than <[n]>
 	wide-character codes if a null wide-character code is encountered
-	before n wide-character codes are exhausted) in the string pointed
-	to by pwcs.
+	before <[n]> wide-character codes are exhausted) in the string pointed
+	to by <[pwcs]>.
 
 RETURNS
-	The <<wcswidth>> function either shall return 0 (if pwcs points to a
+	The <<wcswidth>> function either shall return 0 (if <[pwcs]> points to a
 	null wide-character code), or return the number of column positions
-	to be occupied by the wide-character string pointed to by pwcs, or
-	return -1 (if any of the first n wide-character codes in the
-	wide-character string pointed to by pwcs is not a printable
+	to be occupied by the wide-character string pointed to by <[pwcs]>, or
+	return -1 (if any of the first <[n]> wide-character codes in the
+	wide-character string pointed to by <[pwcs]> is not a printable
 	wide-character code).
 
 PORTABILITY
-<<wcswidth>> has been introduced in the Single UNIX Specification Volume 2
-<<wcswidth>> has been marked as extension in Single UNIX Specification Volume 3
+<<wcswidth>> has been introduced in the Single UNIX Specification Volume 2.
+<<wcswidth>> has been marked as an extension in the Single UNIX Specification Volume 3.
 */
 
 #include <_ansi.h>

@@ -1,6 +1,6 @@
 /*
 FUNCTION
-<<ecvt>>,<<ecvtf>>,<<fcvt>>,<<fcvtf>>---double or float to string
+<<ecvt>>, <<ecvtf>>, <<fcvt>>, <<fcvtf>>---double or float to string
 
 INDEX
 	ecvt

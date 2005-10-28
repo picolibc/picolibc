@@ -1,6 +1,6 @@
 /*
 FUNCTION
-<<__env_lock>>, <<__env_unlock>>--lock environ variable
+<<__env_lock>>, <<__env_unlock>>---lock environ variable
 
 INDEX
 	__env_lock

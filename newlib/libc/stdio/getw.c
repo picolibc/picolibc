@@ -37,14 +37,15 @@ to get the next word from the file or stream identified by <[fp]>.  As
 a side effect, <<getw>> advances the file's current position
 indicator.
 
-RETURNS The next word (read as an <<int>>), unless there is no more
-data, or the host system reports a read error; in either of these
+RETURNS
+The next word (read as an <<int>>), unless there is no more
+data or the host system reports a read error; in either of these
 situations, <<getw>> returns <<EOF>>.  Since <<EOF>> is a valid
 <<int>>, you must use <<ferror>> or <<feof>> to distinguish these
 situations.
 
 PORTABILITY
-<<getw>> is a remnant of K&R C, it is not part of any ISO C Standard.
+<<getw>> is a remnant of K&R C; it is not part of any ISO C Standard.
 <<fread>> should be used instead.  In fact, this implementation of
 <<getw>> is based upon <<fread>>.
 

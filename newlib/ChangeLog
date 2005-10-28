@@ -1,3 +1,61 @@
+2005-10-28  Bob Wilson  <bob.wilson@acm.org>
+
+	* libc/misc/unctrl.c: Replace FUNCTION description.
+	* libc/signal/signal.c: Remove documentation for raise and  _raise_r.
+	* libc/stdio/getdelim.c: Fix spelling errors.
+	* libc/stdio/getw.c: Put RETURNS on a separate line.  Fix  punctuation.
+	* libc/stdio/putw.c: Likewise.
+	* libc/stdlib/a64l.c: Fix formatting, spelling and  punctuation in
+        documentation.
+	* libc/stdlib/assert.c: Do not capitalize FUNCTION description.
+	* libc/stdlib/efgcvt.c: Add spaces to FUNCTION description.
+	* libc/stdlib/envlock.c: Use em-dash in FUNCTION description.
+	* libc/stdlib/mlock.c: Likewise.
+	* libc/stdlib/mstats.c: Likewise.
+	* libc/time/tzlock.c: Likewise.
+	* libc/stdlib/rand.c: Use "multi-threaded" and "thread-safe"  in NOTES.
+	* libc/stdlib/rand48.c: Remove extra space in FUNCTION  description
+        and hyphenate "pseudo-random".
+	* libc/string/bcmp.c: Remove extra blank lines in  documentation.
+	* libc/string/strncat.c: Likewise.
+	* libc/string/memchr.c: Remove extra ">" character in  documentation.
+	* libc/string/strcspn.c: Use "characters" instead of "chars".
+	* libc/string/strpbrk.c: Likewise.
+	* libc/string/strerror_r.c: Capitalize "GNU".
+	* libc/string/strnlen.c: Likewise.
+	* libc/string/strtok.c: Fix formatting, spelling and  punctuation in
+        documentation.  Use "multi-threaded" and "thread-safe" in  NOTES.
+	* libc/string/wcscat.c: Split PORTABILITY into two paragraphs.
+	* libc/string/wcschr.c: Likewise.
+	* libc/string/wcscmp.c: Likewise.
+	* libc/string/wcscpy.c: Likewise.
+	* libc/string/wcscspn.c: Likewise.
+	* libc/string/wcslen.c: Likewise.
+	* libc/string/wcsncat.c: Likewise.
+	* libc/string/wcsncmp.c: Likewise.
+	* libc/string/wcsncpy.c: Likewise.
+	* libc/string/wcsnlen.c: Likewise.
+	* libc/string/wcspbrk.c: Likewise.
+	* libc/string/wcsrchr.c: Likewise.
+	* libc/string/wcsspn.c: Likewise.
+	* libc/string/wmemchr.c: Likewise.
+	* libc/string/wmemcmp.c: Likewise.
+	* libc/string/wmemcpy.c: Likewise.
+	* libc/string/wmemset.c: Likewise.
+	* libc/string/wmemmove.c: Likewise.  Also fix FUNCTION  description.
+	* libc/string/wcswidth.c: Formatting and punctuation in  documentation.
+	* libc/string/wcwidth.c: Likewise.
+	* libm/common/s_modf.c: Remove extra period from documentation.
+	* libm/math/s_isnan.c: Fix formatting, grammar and  punctuation in
+        documentation.
+	* libm/mathfp/s_isnan.c: Likewise.
+	* libm/math/s_ldexp.c: Fix punctuation.
+	* libm/mathfp/s_ldexp.c: Likewise.
+	* libm/math/w_log.c: Likewise.
+	* libm/mathfp/s_logarithm.c: Likewise.
+	* libm/math/w_j0.c: Add spaces to FUNCTION description.
+	* libm/mathfp/w_jn.c: Likewise. 
+
 2005-10-26  Shaun Jackman  <sjackman@gmail.com>
 
 	* libc/posix/scandir.c (scandir): Update the function

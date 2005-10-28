@@ -41,7 +41,7 @@ DESCRIPTION
 	storing the integer part in <<*<[ipart]>>>.  No rounding
 	whatsoever is done; the sum of the integer and fractional
 	parts is guaranteed to be exactly  equal to <[val]>.   That
-	is, if . <[realpart]> = modf(<[val]>, &<[intpart]>); then
+	is, if <[realpart]> = modf(<[val]>, &<[intpart]>); then
 	`<<<[realpart]>+<[intpart]>>>' is the same as <[val]>.
 	<<modff>> is identical, save that it takes and returns
 	<<float>> rather than <<double>> values. 

@@ -49,7 +49,7 @@ When <[x]> is negative, the returned value is <<-HUGE_VAL>> and
 <<matherr>>.
 
 PORTABILITY
-<<log>> is ANSI, <<logf>> is an extension.
+<<log>> is ANSI. <<logf>> is an extension.
 */
 
 /*

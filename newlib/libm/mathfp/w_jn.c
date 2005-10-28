@@ -13,7 +13,7 @@
 
 /*
 FUNCTION
-<<jN>>,<<jNf>>,<<yN>>,<<yNf>>---Bessel functions
+<<jN>>, <<jNf>>, <<yN>>, <<yNf>>---Bessel functions
 
 INDEX
 j0

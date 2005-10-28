@@ -1,6 +1,6 @@
 /*
 FUNCTION
-	<<strtok>>,<<strtok_r>>,<<strsep>>---get next token from a string
+	<<strtok>>, <<strtok_r>>, <<strsep>>---get next token from a string
 
 INDEX
 	strtok
@@ -40,25 +40,25 @@ DESCRIPTION
 	The first time that <<strtok>> is called, <<*<[source]>>> should be
 	specified; subsequent calls, wishing to obtain further tokens from
 	the same string, should pass a null pointer instead.  The separator
-	string, <<*<[delimiters]>>>, must be supplied each time, and may 
+	string, <<*<[delimiters]>>>, must be supplied each time and may 
 	change between calls.
 
 	The <<strtok>> function returns a pointer to the beginning of each 
 	subsequent token in the string, after replacing the separator 
-	character itself with a NUL character.  When no more tokens remain, 
+	character itself with a null character.  When no more tokens remain, 
 	a null pointer is returned.
 
 	The <<strtok_r>> function has the same behavior as <<strtok>>, except
-	a pointer to placeholder <<*[lasts]>> must be supplied by the caller.
+	a pointer to placeholder <<*<[lasts]>>> must be supplied by the caller.
 
 	The <<strsep>> function is similar in behavior to <<strtok>>, except
-	a pointer to the string pointer must be supplied <<[source_ptr]>> and
-	the function does not skip leading delimeters.  When the string starts
-	with a delimeter, the delimeter is changed to the NUL character and
+	a pointer to the string pointer must be supplied <<<[source_ptr]>>> and
+	the function does not skip leading delimiters.  When the string starts
+	with a delimiter, the delimiter is changed to the null character and
 	the empty string is returned.  Like <<strtok_r>> and <<strtok>>, the
-	<<*[source_ptr]>> is updated to the next character following the
-	last delimeter found or NULL if the end of string is reached with
-	no more delimeters.
+	<<*<[source_ptr]>>> is updated to the next character following the
+	last delimiter found or NULL if the end of string is reached with
+	no more delimiters.
 
 RETURNS
 	<<strtok>>, <<strtok_r>>, and <<strsep>> all return a pointer to the 
@@ -66,13 +66,13 @@ RETURNS
 	<<strsep>>, a token may be the empty string.
 
 NOTES
-	<<strtok>> is unsafe for multi-thread applications.  <<strtok_r>>
-	and <<strsep>> are MT-Safe and should be used instead.
+	<<strtok>> is unsafe for multi-threaded applications.  <<strtok_r>>
+	and <<strsep>> are thread-safe and should be used instead.
 
 PORTABILITY
 <<strtok>> is ANSI C.
 <<strtok_r>> is POSIX.
-<<strsep>> is a BSD-extension.
+<<strsep>> is a BSD extension.
 
 <<strtok>>, <<strtok_r>>, and <<strsep>> require no supporting OS subroutines.
 

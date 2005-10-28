@@ -28,9 +28,9 @@ RETURNS
 	<[c]> is not found, then <<NULL>> is returned.
 
 PORTABILITY
-<<memchr>>> is ANSI C.
+<<memchr>> is ANSI C.
 
-<<memchr>>  requires no supporting OS subroutines.
+<<memchr>> requires no supporting OS subroutines.
 
 QUICKREF
 	memchr ansi pure

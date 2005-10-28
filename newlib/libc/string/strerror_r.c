@@ -30,7 +30,7 @@ This function returns a pointer to a string.  Your application must
 not modify that string.
 
 PORTABILITY
-<<strerror_r>> is a gnu extension.
+<<strerror_r>> is a GNU extension.
 
 <<strerror_r>> requires no supporting OS subroutines.
 

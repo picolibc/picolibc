@@ -51,8 +51,8 @@ number between <<0>> and <<RAND_MAX>> (inclusive).
 <<srand>> does not return a result.
 
 NOTES
-<<rand>> and <<srand>> are unsafe for multi-thread applications.
-<<rand_r>> is MT-Safe and should be used instead.
+<<rand>> and <<srand>> are unsafe for multi-threaded applications.
+<<rand_r>> is thread-safe and should be used instead.
 
 
 PORTABILITY

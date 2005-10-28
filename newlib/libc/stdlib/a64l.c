@@ -1,6 +1,6 @@
 /*
 FUNCTION
-<<a64l>>,<<l64a>>---convert between radix-64 ascii string and long
+<<a64l>>, <<l64a>>---convert between radix-64 ASCII string and long
 
 INDEX
         a64l
@@ -21,31 +21,36 @@ TRAD_SYNOPSIS
         long <[input]>;
 
 DESCRIPTION
-Conversion is performed between long and radix-64 characters.  The <<l64a>> routine
-transforms up to 32-bits of input value starting from least significant bits to
-the most significant bits.  The input value is split up into a maximum of 5
-groups of 6-bits and possibly one group of 2 bits (bits 31 and 30).
+Conversion is performed between long and radix-64 characters.  The
+<<l64a>> routine transforms up to 32 bits of input value starting from
+least significant bits to the most significant bits.  The input value
+is split up into a maximum of 5 groups of 6 bits and possibly one
+group of 2 bits (bits 31 and 30).
 
-Each group of 6 bits forms a value from 0-63 which is translated into a character
-as follows:
+Each group of 6 bits forms a value from 0--63 which is translated into
+a character as follows:
 
-      0 = '.'
-      1 = '/'
-      2-11 = '0' to '9'
-      12-37 = 'A' to 'Z'
-      38-63 = 'a' to 'z'
+O+
+o     0 = '.'
+o     1 = '/'
+o     2--11 = '0' to '9'
+o     12--37 = 'A' to 'Z'
+o     38--63 = 'a' to 'z'
+O-
 
-When remaining bits are zero or all bits have been translated, a nul terminator
-is appended to the string.  An input value of 0 results in the empty string.
+When the remaining bits are zero or all bits have been translated, a
+null terminator is appended to the string.  An input value of 0
+results in the empty string.
 
-The <<a64l>> performs the reverse translation.  Each character is used to generate
-a 6-bit value for up to 30 bits and then a 2-bit value to complete a 32-bit result.
-The nul terminator means that the remaining digits are 0.  An empty input string or 
-NULL string results in 0L.  An invalid string results in undefined behavior.
-If the size of a long is > 32 bits, the result is sign-extended.
- 
+The <<a64l>> function performs the reverse translation.  Each
+character is used to generate a 6-bit value for up to 30 bits and then
+a 2-bit value to complete a 32-bit result.  The null terminator means
+that the remaining digits are 0.  An empty input string or NULL string
+results in 0L.  An invalid string results in undefined behavior.  If
+the size of a long is greater than 32 bits, the result is sign-extended.
+
 RETURNS
-<<l64a>> returns a nul-terminated string of 0 to 6 characters.
+<<l64a>> returns a null-terminated string of 0 to 6 characters.
 <<a64l>> returns the 32-bit translated value from the input character string.
 
 PORTABILITY

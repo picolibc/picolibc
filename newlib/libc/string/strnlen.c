@@ -25,7 +25,7 @@ RETURNS
 	<<strnlen>> returns the character count or <[n]>.
 
 PORTABILITY
-<<strnlen>> is a Gnu extension.
+<<strnlen>> is a GNU extension.
 
 <<strnlen>> requires no supporting OS subroutines.
 

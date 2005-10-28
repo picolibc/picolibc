@@ -1,6 +1,6 @@
 /*
 FUNCTION
-	<<strcspn>>---count chars not in string
+	<<strcspn>>---count characters not in string
 
 INDEX
 	strcspn

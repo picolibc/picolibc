@@ -13,7 +13,7 @@
 
 /*
 FUNCTION
-	<<isnan>>,<<isnanf>>,<<isinf>>,<<isinff>>,<<finite>>,<<finitef>>---test for exceptional numbers
+	<<isnan>>, <<isnanf>>, <<isinf>>, <<isinff>>, <<finite>>, <<finitef>>---test for exceptional numbers
 
 INDEX
 	isnan
@@ -58,14 +58,14 @@ DESCRIPTION
 	These functions provide information on the floating-point
 	argument supplied.
 
-	There are five major number formats - 
+	There are five major number formats:
 	o+
 	o zero
-	 a number which contains all zero bits.
+	  A number which contains all zero bits.
 	o subnormal
-	 Is used to represent  number with a zero exponent, but a nonzero fraction.
-	 o normal
-	  A number with an exponent, and a fraction
+	  A number with a zero exponent but a nonzero fraction.
+	o normal
+	  A number with an exponent and a fraction.
      	o infinity
 	  A number with an all 1's exponent and a zero fraction.
 	o NAN
@@ -77,7 +77,7 @@ DESCRIPTION
 	returns 1 if the argument is infinity.  <<finite>> returns 1 if the
 	argument is zero, subnormal or normal.
 	
-	The <<isnanf>>, <<isinff>> and <<finitef>> perform the same
+	The <<isnanf>>, <<isinff>> and <<finitef>> functions perform the same
 	operations as their <<isnan>>, <<isinf>> and <<finite>>
 	counterparts, but on single-precision floating-point numbers.
 

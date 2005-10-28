@@ -1,6 +1,6 @@
 /*
 FUNCTION
-	<<strpbrk>>---find chars in string
+	<<strpbrk>>---find characters in string
 
 INDEX
 	strpbrk

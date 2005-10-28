@@ -37,10 +37,11 @@ DESCRIPTION
 to write a word to the file or stream identified by <[fp]>.  As a side
 effect, <<putw>> advances the file's current position indicator.
 
-RETURNS Zero on success, <<EOF>> on failure.
+RETURNS
+Zero on success, <<EOF>> on failure.
 
 PORTABILITY
-<<putw>> is a remnant of K&R C, it is not part of any ISO C Standard.
+<<putw>> is a remnant of K&R C; it is not part of any ISO C Standard.
 <<fwrite>> should be used instead.  In fact, this implementation of
 <<putw>> is based upon <<fwrite>>.
 

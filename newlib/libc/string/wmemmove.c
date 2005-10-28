@@ -1,6 +1,6 @@
 /*
 FUNCTION
-	<<wmemmove>>---wmemmove - copy wide-characters in memory with overlapping areas 
+	<<wmemmove>>---copy wide characters in memory with overlapping areas 
 
 ANSI_SYNOPSIS
 	#include <wchar.h>
@@ -33,6 +33,7 @@ RETURNS
 
 PORTABILITY
 <<wmemmove>> is ISO/IEC 9899/AMD1:1995 (ISO C).
+
 No supporting OS subroutines are required.
 */
 

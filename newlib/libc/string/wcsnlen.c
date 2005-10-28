@@ -27,7 +27,8 @@ RETURNS
         characters.
 
 PORTABILITY
-<<wcsnlen>> is GNU extension..
+<<wcsnlen>> is a GNU extension.
+
 <<wcsnlen>> requires no supporting OS subroutines.
 */
 

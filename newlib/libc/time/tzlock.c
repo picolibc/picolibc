@@ -1,6 +1,6 @@
 /*
 FUNCTION
-<<__tz_lock>>, <<__tz_unlock>>--lock time zone global variables
+<<__tz_lock>>, <<__tz_unlock>>---lock time zone global variables
 
 INDEX
 	__tz_lock

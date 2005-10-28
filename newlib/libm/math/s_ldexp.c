@@ -56,7 +56,7 @@ On underflow, <<ldexp>> and <<ldexpf>> return 0.0.
 On overflow, <<ldexp>> returns plus or minus <<HUGE_VAL>>.
 
 PORTABILITY
-<<ldexp>> is ANSI, <<ldexpf>> is an extension.
+<<ldexp>> is ANSI. <<ldexpf>> is an extension.
               
 */   
 

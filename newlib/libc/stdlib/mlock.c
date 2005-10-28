@@ -1,7 +1,7 @@
 #ifndef MALLOC_PROVIDED
 /*
 FUNCTION
-<<__malloc_lock>>, <<__malloc_unlock>>--lock malloc pool
+<<__malloc_lock>>, <<__malloc_unlock>>---lock malloc pool
 
 INDEX
 	__malloc_lock

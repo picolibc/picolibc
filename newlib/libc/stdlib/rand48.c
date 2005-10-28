@@ -13,7 +13,7 @@
 
 /*
 FUNCTION
-   <<rand48>>, <<drand48>>, <<erand48>>, <<lrand48>>, <<nrand48>>, <<mrand48>>, <<jrand48>>, <<srand48>>, <<seed48>>, <<lcong48>> ---pseudo random number generators and initialization routines
+   <<rand48>>, <<drand48>>, <<erand48>>, <<lrand48>>, <<nrand48>>, <<mrand48>>, <<jrand48>>, <<srand48>>, <<seed48>>, <<lcong48>>---pseudo-random number generators and initialization routines
 
 INDEX
        rand48

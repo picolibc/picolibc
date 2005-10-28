@@ -24,6 +24,7 @@ RETURNS
 
 PORTABILITY
 <<wcschr>> is ISO/IEC 9899/AMD1:1995 (ISO C).
+
 No supporting OS subroutines are required.
 */
 
