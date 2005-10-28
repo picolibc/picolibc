@@ -1,6 +1,6 @@
 /*
 FUNCTION
-	<<wmemcmp>>---compare wide-characters in memory 
+	<<wmemcmp>>---compare wide characters in memory 
 
 ANSI_SYNOPSIS
 	#include <wchar.h>
@@ -13,10 +13,10 @@ TRAD_SYNOPSIS
 	size_t <[n]>;
 
 DESCRIPTION
-	The <<wmemcmp>> function compares the first <[n]> wide-characters of the
-	object pointed to by <[s1]> to the first <[n]> wide-characters of the
+	The <<wmemcmp>> function compares the first <[n]> wide characters of the
+	object pointed to by <[s1]> to the first <[n]> wide characters of the
 	object pointed to by <[s2]>. This function is not affected by locale
-	and all wchar_t values are treated identically. The null wide-character
+	and all wchar_t values are treated identically. The null wide character
 	and wchar_t values not corresponding to valid characters are not treated
 	specially.
 

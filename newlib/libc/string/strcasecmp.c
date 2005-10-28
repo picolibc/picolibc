@@ -1,6 +1,6 @@
 /*
 FUNCTION
-	<<strcasecmp>>---case insensitive character string compare
+	<<strcasecmp>>---case-insensitive character string compare
 	
 INDEX
 	strcasecmp
@@ -22,7 +22,7 @@ DESCRIPTION
 RETURNS 
 
 	If <<*<[a]>>> sorts lexicographically after <<*<[b]>>> (after
-	both are converted to upper case), <<strcasecmp>> returns a
+	both are converted to uppercase), <<strcasecmp>> returns a
 	number greater than zero.  If the two strings match,
 	<<strcasecmp>> returns zero.  If <<*<[a]>>> sorts
 	lexicographically before <<*<[b]>>>, <<strcasecmp>> returns a

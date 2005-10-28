@@ -1,6 +1,6 @@
 /*
 FUNCTION
-	<<iswxdigit>>---hexadecimal digit wide-character test
+	<<iswxdigit>>---hexadecimal digit wide character test
 
 INDEX
 	iswxdigit
@@ -15,11 +15,11 @@ TRAD_SYNOPSIS
 	wint_t <[c]>;
 
 DESCRIPTION
-<<iswxdigit>> is a function which classifies wide-character values that
+<<iswxdigit>> is a function which classifies wide character values that
 are hexadecimal digits.
 
 RETURNS
-<<iswxdigit>> returns non-zero if <[c]> is a hexadecimal digit wide-character.
+<<iswxdigit>> returns non-zero if <[c]> is a hexadecimal digit wide character.
 
 PORTABILITY
 <<iswxdigit>> is C99.

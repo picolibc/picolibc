@@ -1,6 +1,6 @@
 /*
 FUNCTION
-	<<strcoll>>---locale specific character string compare
+	<<strcoll>>---locale-specific character string compare
 	
 INDEX
 	strcoll

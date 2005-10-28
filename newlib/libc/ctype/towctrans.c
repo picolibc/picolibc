@@ -29,7 +29,7 @@
 
 /*
 FUNCTION
-	<<towctrans>>---extensible wide-character case mapping
+	<<towctrans>>---extensible wide-character translation
 
 INDEX
 	towctrans
@@ -46,7 +46,7 @@ TRAD_SYNOPSIS
 
 
 DESCRIPTION
-<<towctrans>> is a function which converts wide-characters based on
+<<towctrans>> is a function which converts wide characters based on
 a specified translation type <[w]>.  If the translation type is
 invalid or cannot be applied to the current character, no change
 to the character is made.

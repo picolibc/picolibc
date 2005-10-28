@@ -29,7 +29,7 @@
 
 /*
 FUNCTION
-	<<iswgraph>>---graphic wide-character test
+	<<iswgraph>>---graphic wide character test
 
 INDEX
 	iswgraph
@@ -48,7 +48,7 @@ DESCRIPTION
 are graphic.
 
 RETURNS
-<<iswgraph>> returns non-zero if <[c]> is a graphic wide-character.
+<<iswgraph>> returns non-zero if <[c]> is a graphic wide character.
 
 PORTABILITY
 <<iswgraph>> is C99.

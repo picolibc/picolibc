@@ -29,7 +29,7 @@
 
 /*
 FUNCTION
-	<<towupper>>---translate wide-characters to upper case
+	<<towupper>>---translate wide characters to uppercase
 
 INDEX
 	towupper
@@ -45,12 +45,12 @@ TRAD_SYNOPSIS
 
 
 DESCRIPTION
-<<towupper>> is a function which converts lower-case wide-characters to upper
-case, leaving all other characters unchanged.
+<<towupper>> is a function which converts lowercase wide characters to
+uppercase, leaving all other characters unchanged.
 
 RETURNS
-<<towupper>> returns the upper-case equivalent of <[c]> when it is a
-lower-case wide-character, otherwise, it returns the input character.
+<<towupper>> returns the uppercase equivalent of <[c]> when it is a
+lowercase wide character, otherwise, it returns the input character.
 
 PORTABILITY
 <<towupper>> is C99.

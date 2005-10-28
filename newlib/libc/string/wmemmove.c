@@ -13,20 +13,20 @@ TRAD_SYNOPSIS
 	size_t <[n]>;
 
 DESCRIPTION
-	The <<wmemmove>> function copies <[n]> wide-characters from the object
+	The <<wmemmove>> function copies <[n]> wide characters from the object
 	pointed to by <[s]> to the object pointed to by <[d]>. Copying takes
-	place as if the <[n]> wide-characters from the object pointed to by
-	<[s]> are first copied into a temporary array of <[n]> wide-characters
+	place as if the <[n]> wide characters from the object pointed to by
+	<[s]> are first copied into a temporary array of <[n]> wide characters
 	that does not overlap the objects pointed to by <[d]> or <[s]>, and then
-	the <[n]> wide-characters from the temporary array are copied into the
+	the <[n]> wide characters from the temporary array are copied into the
 	object pointed to by <[d]>.
 
 	This function is not affected by locale and all wchar_t values are
-	treated identically. The null wide-character and wchar_t values not
+	treated identically. The null wide character and wchar_t values not
 	corresponding to valid characters are not treated specially.
 
 	If <[n]> is zero, <[d]> and <[s]> must be a valid pointers, and the
-	function copies zero wide-characters. 
+	function copies zero wide characters. 
 
 RETURNS
 	The <<wmemmove>> function returns the value of <[d]>.

@@ -14,12 +14,12 @@ TRAD_SYNOPSIS
 	size_t <[siz]>;
 
 DESCRIPTION
-	The <<wcslcat>> function appends wide-characters from <[src]> to
+	The <<wcslcat>> function appends wide characters from <[src]> to
 	end of the <[dst]> wide-character string so that the resultant
-	wide-character string is not more than <[siz]> wide-characters
-	including terminating null wide-character code.  A terminating
-	null wide-character is always added unless <[siz]> is 0.  Thus,
-	the maximum number of wide-characters that can be appended from
+	wide-character string is not more than <[siz]> wide characters
+	including the terminating null wide-character code.  A terminating
+	null wide character is always added unless <[siz]> is 0.  Thus,
+	the maximum number of wide characters that can be appended from
 	<[src]> is <[siz]> - 1. If copying takes place between objects 
 	that overlap, the behaviour is undefined.
 
@@ -28,7 +28,7 @@ RETURNS
 	wide-character string length of <[src]> (does not include
 	terminating null wide-characters).  If the return value is
 	greater than or equal to <[siz]>, then truncation occurred and
-	not all wide-characters from <[src]> were appended.
+	not all wide characters from <[src]> were appended.
 
 PORTABILITY
 No supporting OS subroutines are required.

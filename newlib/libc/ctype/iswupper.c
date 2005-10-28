@@ -1,7 +1,7 @@
 
 /*
 FUNCTION
-	<<iswupper>>---upper-case wide-character test
+	<<iswupper>>---uppercase wide character test
 
 INDEX
 	iswupper
@@ -17,10 +17,10 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 <<iswupper>> is a function which classifies wide-character values that
-have an upper-case translation.
+have uppercase translations.
 
 RETURNS
-<<iswupper>> returns non-zero if <[c]> is a upper-case wide-character.
+<<iswupper>> returns non-zero if <[c]> is a uppercase wide character.
 
 PORTABILITY
 <<iswupper>> is C99.

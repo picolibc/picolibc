@@ -15,8 +15,8 @@ TRAD_SYNOPSIS
 	char *<[a]>;
 
 DESCRIPTION
-	<<strupr>> converts each characters in the string at <[a]> to
-	upper case.
+	<<strupr>> converts each character in the string at <[a]> to
+	uppercase.
 
 RETURNS
 	<<strupr>> returns its argument, <[a]>.

@@ -29,7 +29,7 @@
 
 /*
 FUNCTION
-	<<iswspace>>---wide-character space test
+	<<iswspace>>---whitespace wide character test
 
 INDEX
 	iswspace
@@ -45,10 +45,10 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 <<iswspace>> is a function which classifies wide-character values that
-are categorized as white-space.
+are categorized as whitespace.
 
 RETURNS
-<<iswspace>> returns non-zero if <[c]> is a white-space wide-character.
+<<iswspace>> returns non-zero if <[c]> is a whitespace wide character.
 
 PORTABILITY
 <<iswspace>> is C99.

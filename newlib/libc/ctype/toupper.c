@@ -1,6 +1,6 @@
 /*
 FUNCTION
-	<<toupper>>---translate characters to upper case
+	<<toupper>>---translate characters to uppercase
 
 INDEX
 	toupper
@@ -19,8 +19,8 @@ TRAD_SYNOPSIS
 
 
 DESCRIPTION
-<<toupper>> is a macro which converts lower-case characters to upper
-case, leaving all other characters unchanged.  It is only defined when
+<<toupper>> is a macro which converts lowercase characters to uppercase,
+leaving all other characters unchanged.  It is only defined when
 <[c]> is an integer in the range <<EOF>> to <<255>>.
 
 You can use a compiled subroutine instead of the macro definition by
@@ -30,10 +30,10 @@ undefining this macro using `<<#undef toupper>>'.
 only be used when <[c]> is known to be a lowercase character (<<a>>--<<z>>).
 
 RETURNS
-<<toupper>> returns the upper-case equivalent of <[c]> when it is a
+<<toupper>> returns the uppercase equivalent of <[c]> when it is a
 character between <<a>> and <<z>>, and <[c]> otherwise.
 
-<<_toupper>> returns the upper-case equivalent of <[c]> when it is a
+<<_toupper>> returns the uppercase equivalent of <[c]> when it is a
 character between <<a>> and <<z>>.  If <[c]> is not one of these
 characters, the behaviour of <<_toupper>> is undefined.
 

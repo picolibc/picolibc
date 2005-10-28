@@ -14,16 +14,16 @@ TRAD_SYNOPSIS
 	size_t <[siz]>;
 
 DESCRIPTION
-	<<wcslcpy>> copies wide-characters from <[src]> to <[dst]>
+	<<wcslcpy>> copies wide characters from <[src]> to <[dst]>
 	such that up to <[siz]> - 1 characters are copied.  A
 	terminating null is appended to the result, unless <[siz]>
 	is zero.
 
 RETURNS
-	<<wcslcpy>> returns the number of wide-characters in <[src]>,
-	not including the terminating null wide-character.  If the
+	<<wcslcpy>> returns the number of wide characters in <[src]>,
+	not including the terminating null wide character.  If the
 	return value is greater than or equal to <[siz]>, then
-	not all wide-characters were copied from <[src]> and truncation
+	not all wide characters were copied from <[src]> and truncation
 	occurred.
 
 PORTABILITY

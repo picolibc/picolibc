@@ -1,6 +1,6 @@
 /*
 FUNCTION
-       <<wmemset>>---set wide-characters in memory 
+       <<wmemset>>---set wide characters in memory 
 
 ANSI_SYNOPSIS
        #include <wchar.h>
@@ -14,16 +14,16 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
        The <<wmemset>> function copies the value of <[c]> into each of the
-       first <[n]> wide-characters of the object pointed to by <[s]>.  This
+       first <[n]> wide characters of the object pointed to by <[s]>.  This
        function is not affected by locale and all wchar_t values are treated
-       identically.  The null wide-character and wchar_t values not
+       identically.  The null wide character and wchar_t values not
        corresponding to valid characters are not treated specially.
 
        If <[n]> is zero, <[s]> must be a valid pointer and the function
-       copies zero wide-characters.
+       copies zero wide characters.
 
 RETURNS
-       The <<wmemset>> functions returns the value of <[s]>.
+       The <<wmemset>> function returns the value of <[s]>.
 
 PORTABILITY
 <<wmemset>> is ISO/IEC 9899/AMD1:1995 (ISO C).

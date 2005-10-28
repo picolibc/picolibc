@@ -29,7 +29,7 @@
 
 /*
 FUNCTION
-	<<iswcntrl>>---wide-character cntrl test
+	<<iswcntrl>>---control wide character test
 
 INDEX
 	iswcntrl
@@ -45,10 +45,10 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 <<iswcntrl>> is a function which classifies wide-character values that
-are categorized as a control character.
+are categorized as control characters.
 
 RETURNS
-<<iswcntrl>> returns non-zero if <[c]> is a control wide-character.
+<<iswcntrl>> returns non-zero if <[c]> is a control wide character.
 
 PORTABILITY
 <<iswcntrl>> is C99.

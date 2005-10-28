@@ -29,7 +29,7 @@
 
 /*
 FUNCTION
-	<<iswprint>>---printable wide-character test
+	<<iswprint>>---printable wide character test
 
 INDEX
 	iswprint
@@ -48,7 +48,7 @@ DESCRIPTION
 are printable.
 
 RETURNS
-<<iswprint>> returns non-zero if <[c]> is a printable wide-character.
+<<iswprint>> returns non-zero if <[c]> is a printable wide character.
 
 PORTABILITY
 <<iswprint>> is C99.

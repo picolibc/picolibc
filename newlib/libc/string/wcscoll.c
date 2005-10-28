@@ -1,6 +1,6 @@
 /*
 FUNCTION
-	<<wcscoll>>---locale specific wide-character string compare
+	<<wcscoll>>---locale-specific wide-character string compare
 	
 INDEX
 	wcscoll

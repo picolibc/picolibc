@@ -1,6 +1,6 @@
 /*
 FUNCTION
-	<<iswdigit>>---decimal digit wide-character test
+	<<iswdigit>>---decimal digit wide character test
 
 INDEX
 	iswdigit
@@ -19,7 +19,7 @@ DESCRIPTION
 are decimal digits.
 
 RETURNS
-<<iswdigit>> returns non-zero if <[c]> is a decimal digit wide-character.
+<<iswdigit>> returns non-zero if <[c]> is a decimal digit wide character.
 
 PORTABILITY
 <<iswdigit>> is C99.

@@ -14,7 +14,7 @@ TRAD_SYNOPSIS
 DESCRIPTION
 	The <<wcsstr>> function locates the first occurrence in the
 	wide-character string pointed to by <[big]> of the sequence of
-	wide-characters (excluding the terminating null wide-character) in the
+	wide characters (excluding the terminating null wide character) in the
 	wide-character string pointed to by <[little]>.
 
 RETURNS

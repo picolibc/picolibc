@@ -29,7 +29,7 @@
 
 /*
 FUNCTION
-	<<towlower>>---translate wide-characters to lower case
+	<<towlower>>---translate wide characters to lowercase
 
 INDEX
 	towlower
@@ -45,12 +45,12 @@ TRAD_SYNOPSIS
 
 
 DESCRIPTION
-<<towlower>> is a function which converts upper-case wide-characters to lower
-case, leaving all other characters unchanged.
+<<towlower>> is a function which converts uppercase wide characters to
+lowercase, leaving all other characters unchanged.
 
 RETURNS
-<<towlower>> returns the lower-case equivalent of <[c]> when it is a
-upper-case wide-character, otherwise, it returns the input character.
+<<towlower>> returns the lowercase equivalent of <[c]> when it is a
+uppercase wide character; otherwise, it returns the input character.
 
 PORTABILITY
 <<towlower>> is C99.

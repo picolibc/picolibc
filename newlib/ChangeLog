@@ -1,5 +1,45 @@
 2005-10-28  Bob Wilson  <bob.wilson@acm.org>
 
+	* libc/ctype/ctype.tex: Use hyphens as appropriate, but not  otherwise.
+	* libc/ctype/islower.c: Likewise.
+	* libc/ctype/isupper.c: Likewise.
+	* libc/ctype/iswalnum.c: Likewise.
+	* libc/ctype/iswalpha.c: Likewise.
+	* libc/ctype/iswblank.c: Likewise.
+	* libc/ctype/iswcntrl.c: Likewise.
+	* libc/ctype/iswdigit.c: Likewise.
+	* libc/ctype/iswgraph.c: Likewise.
+	* libc/ctype/iswlower.c: Likewise.
+	* libc/ctype/iswprint.c: Likewise.
+	* libc/ctype/iswpunct.c: Likewise.
+	* libc/ctype/iswspace.c: Likewise.
+	* libc/ctype/iswupper.c: Likewise.
+	* libc/ctype/iswxdigit.c: Likewise.
+	* libc/ctype/tolower.c: Likewise.
+	* libc/ctype/toupper.c: Likewise.
+	* libc/ctype/towctrans.c: Likewise.
+	* libc/ctype/towlower.c: Likewise.
+	* libc/ctype/towupper.c: Likewise.
+	* libc/string/strcasecmp.c: Likewise.
+	* libc/string/strcoll.c: Likewise.
+	* libc/string/strings.tex: Likewise.
+	* libc/string/strlwr.c: Likewise.
+	* libc/string/strncasecmp.c: Likewise.
+	* libc/string/strupr.c: Likewise.
+	* libc/string/wcscoll.c: Likewise.
+	* libc/string/wcslcat.c: Likewise.
+	* libc/string/wcslcpy.c: Likewise.
+	* libc/string/wcsnlen.c: Likewise.
+	* libc/string/wcsstr.c: Likewise.
+	* libc/string/wcstrings.tex: Likewise.
+	* libc/string/wmemchr.c: Likewise.
+	* libc/string/wmemcmp.c: Likewise.
+	* libc/string/wmemcpy.c: Likewise.
+	* libc/string/wmemmove.c: Likewise.
+	* libc/string/wmemset.c: Likewise. 
+
+2005-10-28  Bob Wilson  <bob.wilson@acm.org>
+
 	* libc/misc/unctrl.c: Replace FUNCTION description.
 	* libc/signal/signal.c: Remove documentation for raise and  _raise_r.
 	* libc/stdio/getdelim.c: Fix spelling errors.

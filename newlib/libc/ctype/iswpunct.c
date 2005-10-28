@@ -29,7 +29,7 @@
 
 /*
 FUNCTION
-	<<iswpunct>>---punctuation wide-character test
+	<<iswpunct>>---punctuation wide character test
 
 INDEX
 	iswpunct
@@ -48,7 +48,7 @@ DESCRIPTION
 are punctuation.
 
 RETURNS
-<<iswpunct>> returns non-zero if <[c]> is a punctuation wide-character.
+<<iswpunct>> returns non-zero if <[c]> is a punctuation wide character.
 
 PORTABILITY
 <<iswpunct>> is C99.

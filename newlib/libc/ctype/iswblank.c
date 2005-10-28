@@ -29,7 +29,7 @@
 
 /*
 FUNCTION
-	<<iswblank>>---wide-character blank test
+	<<iswblank>>---blank wide character test
 
 INDEX
 	iswblank
@@ -48,7 +48,7 @@ DESCRIPTION
 are categorized as blank.
 
 RETURNS
-<<iswblank>> returns non-zero if <[c]> is a blank wide-character.
+<<iswblank>> returns non-zero if <[c]> is a blank wide character.
 
 PORTABILITY
 <<iswblank>> is C99.

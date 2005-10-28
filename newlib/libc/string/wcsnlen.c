@@ -1,6 +1,6 @@
 /* 
 FUNCTION
-        <<wcsnlen>>---get fixed-size wide character string length
+        <<wcsnlen>>---get fixed-size wide-character string length
     
 INDEX
         wcsnlen
@@ -16,8 +16,8 @@ TRAD_SYNOPSIS
         size_t <[maxlen]>;
 
 DESCRIPTION
-        The <<wcsnlen>> function computes the number of wide character codes
-        in the wide character string pointed to by <[s]> not including the
+        The <<wcsnlen>> function computes the number of wide-character codes
+        in the wide-character string pointed to by <[s]> not including the
         terminating L'\0' wide character but at most <[maxlen]> wide
         characters.
 

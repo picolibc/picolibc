@@ -29,7 +29,7 @@
 
 /*
 FUNCTION
-	<<iswalpha>>---alphabetic wide-character test
+	<<iswalpha>>---alphabetic wide character test
 
 INDEX
 	iswalpha
@@ -48,7 +48,7 @@ DESCRIPTION
 are alphabetic.
 
 RETURNS
-<<iswalpha>> returns non-zero if <[c]> is an alphabetic wide-character.
+<<iswalpha>> returns non-zero if <[c]> is an alphabetic wide character.
 
 PORTABILITY
 <<iswalpha>> is C99.

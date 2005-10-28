@@ -1,7 +1,7 @@
 
 /*
 FUNCTION
-<<islower>>---lower-case character predicate
+<<islower>>---lowercase character predicate
 
 INDEX
 islower
@@ -17,14 +17,14 @@ int islower(<[c]>);
 DESCRIPTION
 <<islower>> is a macro which classifies ASCII integer values by table
 lookup.  It is a predicate returning non-zero for minuscules
-(lower-case alphabetic characters), and 0 for other characters.
+(lowercase alphabetic characters), and 0 for other characters.
 It is defined only when <<isascii>>(<[c]>) is true or <[c]> is EOF.
 
 You can use a compiled subroutine instead of the macro definition by
 undefining the macro using `<<#undef islower>>'.
 
 RETURNS
-<<islower>> returns non-zero if <[c]> is a lower case letter (<<a>>--<<z>>).
+<<islower>> returns non-zero if <[c]> is a lowercase letter (<<a>>--<<z>>).
 
 PORTABILITY
 <<islower>> is ANSI C.
