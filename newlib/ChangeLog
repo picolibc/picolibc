@@ -1,5 +1,11 @@
 2005-10-28  Bob Wilson  <bob.wilson@acm.org>
 
+	* libc/sys.tex (Stubs): Format examples consistently.   Change sbrk
+	example to use "_end" symbol instead of "end".  Change write  example
+	to use "outbyte" instead of "writechar".
+
+2005-10-28  Bob Wilson  <bob.wilson@acm.org>
+
 	* libc/ctype/ctype.tex: Use hyphens as appropriate, but not  otherwise.
 	* libc/ctype/islower.c: Likewise.
 	* libc/ctype/isupper.c: Likewise.

@@ -68,8 +68,8 @@ it (@code{exit}, @code{system}).
 Close a file.  Minimal implementation:
 
 @example
-int close(int file)@{
-    return -1;
+int close(int file) @{
+  return -1;
 @}
 @end example
 
@@ -90,8 +90,8 @@ without processes):
 #include <errno.h>
 #undef errno
 extern int errno;
-int execve(char *name, char **argv, char **env)@{
-  errno=ENOMEM;
+int execve(char *name, char **argv, char **env) @{
+  errno = ENOMEM;
   return -1;
 @}
 @end example
@@ -103,8 +103,8 @@ Create a new process.  Minimal implementation (for a system without processes):
 #include <errno.h>
 #undef errno
 extern int errno;
-int fork() @{
-  errno=EAGAIN;
+int fork(void) @{
+  errno = EAGAIN;
   return -1;
 @}
 @end example
@@ -129,7 +129,7 @@ conflict with other processes.  Minimal implementation, for a system
 without processes:
 
 @example
-int getpid() @{
+int getpid(void) @{
   return 1;
 @}
 @end example
@@ -140,8 +140,8 @@ other minimal implementations, which only support output to
 @code{stdout}, this minimal implementation is suggested:
 
 @example
-int isatty(int file)@{
-   return 1;
+int isatty(int file) @{
+  return 1;
 @}
 @end example
 
@@ -152,9 +152,9 @@ Send a signal.  Minimal implementation:
 #include <errno.h>
 #undef errno
 extern int errno;
-int kill(int pid, int sig)@{
-  errno=EINVAL;
-  return(-1);
+int kill(int pid, int sig) @{
+  errno = EINVAL;
+  return -1;
 @}
 @end example
 
@@ -165,8 +165,8 @@ Establish a new name for an existing file.  Minimal implementation:
 #include <errno.h>
 #undef errno
 extern int errno;
-int link(char *old, char *new)@{
-  errno=EMLINK;
+int link(char *old, char *new) @{
+  errno = EMLINK;
   return -1;
 @}
 @end example
@@ -175,8 +175,8 @@ int link(char *old, char *new)@{
 Set position in a file.  Minimal implementation:
 
 @example
-int lseek(int file, int ptr, int dir)@{
-    return 0;
+int lseek(int file, int ptr, int dir) @{
+  return 0;
 @}
 @end example
 
@@ -184,8 +184,8 @@ int lseek(int file, int ptr, int dir)@{
 Open a file.  Minimal implementation:
 
 @example
-int open(const char *name, int flags, int mode)@{
-    return -1;
+int open(const char *name, int flags, int mode) @{
+  return -1;
 @}
 @end example
 
@@ -193,8 +193,8 @@ int open(const char *name, int flags, int mode)@{
 Read from a file.  Minimal implementation:
 
 @example
-int read(int file, char *ptr, int len)@{
-    return 0;
+int read(int file, char *ptr, int len) @{
+  return 0;
 @}
 @end example
 
@@ -202,24 +202,23 @@ int read(int file, char *ptr, int len)@{
 Increase program data space.  As @code{malloc} and related functions
 depend on this, it is useful to have a working implementation.  The
 following suffices for a standalone system; it exploits the symbol
-@code{end} automatically defined by the GNU linker.
+@code{_end} automatically defined by the GNU linker.
 
 @example
 @group
-caddr_t sbrk(int incr)@{
-  extern char end;		/* @r{Defined by the linker} */
+caddr_t sbrk(int incr) @{
+  extern char _end;		/* @r{Defined by the linker} */
   static char *heap_end;
   char *prev_heap_end;
  
   if (heap_end == 0) @{
-    heap_end = &end;
+    heap_end = &_end;
   @}
   prev_heap_end = heap_end;
-  if (heap_end + incr > stack_ptr)
-    @{
-      _write (1, "Heap and stack collision\n", 25);
-      abort ();
-    @}
+  if (heap_end + incr > stack_ptr) @{
+    write (1, "Heap and stack collision\n", 25);
+    abort ();
+  @}
 
   heap_end += incr;
   return (caddr_t) prev_heap_end;
@@ -241,7 +240,7 @@ int stat(char *file, struct stat *st) @{
 Timing information for current process.  Minimal implementation:
 
 @example
-int times(struct tms *buf)@{
+int times(struct tms *buf) @{
   return -1;
 @}
 @end example
@@ -253,8 +252,8 @@ Remove a file's directory entry.  Minimal implementation:
 #include <errno.h>
 #undef errno
 extern int errno;
-int unlink(char *name)@{
-  errno=ENOENT;
+int unlink(char *name) @{
+  errno = ENOENT;
   return -1; 
 @}
 @end example
@@ -266,30 +265,30 @@ Wait for a child process.  Minimal implementation:
 #undef errno
 extern int errno;
 int wait(int *status) @{
-  errno=ECHILD;
+  errno = ECHILD;
   return -1;
 @}
 @end example
 
 @item write
-Write a character to a file.  @file{libc} subroutines will use this
+Write to a file.  @file{libc} subroutines will use this
 system routine for output to all files, @emph{including}
 @code{stdout}---so if you need to generate any output, for example to a
 serial port for debugging, you should make your minimal @code{write}
 capable of doing this.  The following minimal implementation is an
-incomplete example; it relies on a @code{writechar} subroutine (not
+incomplete example; it relies on a @code{outbyte} subroutine (not
 shown; typically, you must write this in assembler from examples
 provided by your hardware manufacturer) to actually perform the output.
 
 @example
 @group
-int write(int file, char *ptr, int len)@{
-    int todo;
-  
-    for (todo = 0; todo < len; todo++) @{
-        writechar(*ptr++);
-    @}
-    return len;
+int write(int file, char *ptr, int len) @{
+  int todo;
+
+  for (todo = 0; todo < len; todo++) @{
+    outbyte (*ptr++);
+  @}
+  return len;
 @}
 @end group
 @end example
