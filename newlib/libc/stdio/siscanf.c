@@ -34,10 +34,12 @@ ANSI_SYNOPSIS
         int siscanf(const char *<[str]>, const char *<[format]> 
                    [, <[arg]>, ...]);
 
-        int _iscanf_r(struct _reent *<[ptr]>, const char *<[format]> [, <[arg]>, ...]);
-        int _fiscanf_r(struct _reent *<[ptr]>, FILE *<[fd]>, const char *<[format]> [, <[arg]>, ...]);
-        int _siscanf_r(struct _reent *<[ptr]>, const char *<[str]>, const char *<[format]> 
+        int _iscanf_r(struct _reent *<[ptr]>, const char *<[format]>
                    [, <[arg]>, ...]);
+        int _fiscanf_r(struct _reent *<[ptr]>, FILE *<[fd]>, const char *<[format]>
+                   [, <[arg]>, ...]);
+        int _siscanf_r(struct _reent *<[ptr]>, const char *<[str]>,
+                   const char *<[format]> [, <[arg]>, ...]);
 
 
 TRAD_SYNOPSIS

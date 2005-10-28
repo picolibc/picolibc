@@ -37,8 +37,8 @@ ANSI_SYNOPSIS
                        va_list <[list]>);
 	int _vfscanf_r(struct _reent *<[reent]>, FILE *<[fp]>, const char *<[fmt]>, 
                        va_list <[list]>);
-	int _vsscanf_r(struct _reent *<[reent]>, const char *<[str]>, const char *<[fmt]>, 
-                       va_list <[list]>);
+	int _vsscanf_r(struct _reent *<[reent]>, const char *<[str]>,
+                       const char *<[fmt]>, va_list <[list]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>

@@ -1,5 +1,16 @@
 2005-10-28  Bob Wilson  <bob.wilson@acm.org>
 
+	* libc/stdio/siprintf.c: Wrap long lines in ANSI_SYNOPSIS.
+	* libc/stdio/siscanf.c: Likewise.
+	* libc/stdio/sprintf.c: Likewise.
+	* libc/stdio/sscanf.c: Likewise.
+	* libc/stdio/vfprintf.c: Likewise.
+	* libc/stdio/vfscanf.c: Likewise.
+	* libc/stdio/viprintf.c: Likewise.
+	* libc/stdio/viscanf.c: Likewise.
+
+2005-10-28  Bob Wilson  <bob.wilson@acm.org>
+
 	* libc/sys.tex (Stubs): Format examples consistently.   Change sbrk
 	example to use "_end" symbol instead of "end".  Change write  example
 	to use "outbyte" instead of "writechar".

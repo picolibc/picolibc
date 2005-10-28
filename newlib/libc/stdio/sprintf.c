@@ -37,7 +37,8 @@ ANSI_SYNOPSIS
         int fprintf(FILE *<[fd]>, const char *<[format]> [, <[arg]>, ...]);
         int sprintf(char *<[str]>, const char *<[format]> [, <[arg]>, ...]);
         int asprintf(char **<[strp]>, const char *<[format]> [, <[arg]>, ...]);
-        int snprintf(char *<[str]>, size_t <[size]>, const char *<[format]> [, <[arg]>, ...]);
+        int snprintf(char *<[str]>, size_t <[size]>, const char *<[format]>
+                     [, <[arg]>, ...]);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>

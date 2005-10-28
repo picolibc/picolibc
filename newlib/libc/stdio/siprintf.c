@@ -37,7 +37,8 @@ ANSI_SYNOPSIS
         int fiprintf(FILE *<[fd]>, const char *<[format]> [, <[arg]>, ...]);
         int siprintf(char *<[str]>, const char *<[format]> [, <[arg]>, ...]);
         int asiprintf(char **<[strp]>, const char *<[format]> [, <[arg]>, ...]);
-        int sniprintf(char *<[str]>, size_t <[size]>, const char *<[format]> [, <[arg]>, ...]);
+        int sniprintf(char *<[str]>, size_t <[size]>, const char *<[format]>
+                      [, <[arg]>, ...]);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>

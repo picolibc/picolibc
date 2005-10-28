@@ -54,18 +54,19 @@ ANSI_SYNOPSIS
 	int vfprintf(FILE *<[fp]>, const char *<[fmt]>, va_list <[list]>);
 	int vsprintf(char *<[str]>, const char *<[fmt]>, va_list <[list]>);
 	int vasprintf(char **<[strp]>, const char *<[fmt]>, va_list <[list]>);
-	int vsnprintf(char *<[str]>, size_t <[size]>, const char *<[fmt]>, va_list <[list]>);
+	int vsnprintf(char *<[str]>, size_t <[size]>, const char *<[fmt]>,
+                      va_list <[list]>);
 
 	int _vprintf_r(struct _reent *<[reent]>, const char *<[fmt]>,
                         va_list <[list]>);
 	int _vfprintf_r(struct _reent *<[reent]>, FILE *<[fp]>, const char *<[fmt]>,
                         va_list <[list]>);
-	int _vasprintf_r(struct _reent *<[reent]>, char **<[str]>, const char *<[fmt]>,
-                        va_list <[list]>);
-	int _vsprintf_r(struct _reent *<[reent]>, char *<[str]>, const char *<[fmt]>,
-                        va_list <[list]>);
-	int _vsnprintf_r(struct _reent *<[reent]>, char *<[str]>, size_t <[size]>, const char *<[fmt]>,
-                        va_list <[list]>);
+	int _vasprintf_r(struct _reent *<[reent]>, char **<[str]>,
+                        const char *<[fmt]>, va_list <[list]>);
+	int _vsprintf_r(struct _reent *<[reent]>, char *<[str]>,
+                        const char *<[fmt]>, va_list <[list]>);
+	int _vsnprintf_r(struct _reent *<[reent]>, char *<[str]>, size_t <[size]>,
+                         const char *<[fmt]>, va_list <[list]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>

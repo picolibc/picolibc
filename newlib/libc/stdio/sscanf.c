@@ -34,10 +34,12 @@ ANSI_SYNOPSIS
         int sscanf(const char *<[str]>, const char *<[format]> 
                    [, <[arg]>, ...]);
 
-        int _scanf_r(struct _reent *<[ptr]>, const char *<[format]> [, <[arg]>, ...]);
-        int _fscanf_r(struct _reent *<[ptr]>, FILE *<[fd]>, const char *<[format]> [, <[arg]>, ...]);
-        int _sscanf_r(struct _reent *<[ptr]>, const char *<[str]>, const char *<[format]> 
-                   [, <[arg]>, ...]);
+        int _scanf_r(struct _reent *<[ptr]>, const char *<[format]>
+                     [, <[arg]>, ...]);
+        int _fscanf_r(struct _reent *<[ptr]>, FILE *<[fd]>, const char *<[format]>
+                      [, <[arg]>, ...]);
+        int _sscanf_r(struct _reent *<[ptr]>, const char *<[str]>,
+                      const char *<[format]> [, <[arg]>, ...]);
 
 
 TRAD_SYNOPSIS

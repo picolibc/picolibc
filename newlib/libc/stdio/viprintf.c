@@ -35,18 +35,19 @@ ANSI_SYNOPSIS
 	int vfiprintf(FILE *<[fp]>, const char *<[fmt]>, va_list <[list]>);
 	int vsiprintf(char *<[str]>, const char *<[fmt]>, va_list <[list]>);
 	int vasiprintf(char **<[strp]>, const char *<[fmt]>, va_list <[list]>);
-	int vsniprintf(char *<[str]>, size_t <[size]>, const char *<[fmt]>, va_list <[list]>);
+	int vsniprintf(char *<[str]>, size_t <[size]>, const char *<[fmt]>,
+                       va_list <[list]>);
 
 	int _viprintf_r(struct _reent *<[reent]>, const char *<[fmt]>,
                         va_list <[list]>);
-	int _vfiprintf_r(struct _reent *<[reent]>, FILE *<[fp]>, const char *<[fmt]>,
-                        va_list <[list]>);
-	int _vasiprintf_r(struct _reent *<[reent]>, char **<[str]>, const char *<[fmt]>,
-                        va_list <[list]>);
-	int _vsiprintf_r(struct _reent *<[reent]>, char *<[str]>, const char *<[fmt]>,
-                        va_list <[list]>);
-	int _vsniprintf_r(struct _reent *<[reent]>, char *<[str]>, size_t <[size]>, const char *<[fmt]>,
-                        va_list <[list]>);
+	int _vfiprintf_r(struct _reent *<[reent]>, FILE *<[fp]>,
+                        const char *<[fmt]>, va_list <[list]>);
+	int _vasiprintf_r(struct _reent *<[reent]>, char **<[str]>,
+                        const char *<[fmt]>, va_list <[list]>);
+	int _vsiprintf_r(struct _reent *<[reent]>, char *<[str]>,
+                        const char *<[fmt]>, va_list <[list]>);
+	int _vsniprintf_r(struct _reent *<[reent]>, char *<[str]>, size_t <[size]>,
+                        const char *<[fmt]>, va_list <[list]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
