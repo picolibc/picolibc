@@ -78,7 +78,7 @@ typedef struct disassemble_info {
      for processors with run-time-switchable instruction sets.  The default,
      zero, means that there is no constraint.  CGEN-based opcodes ports
      may use ISA_foo masks.  */
-  unsigned long insn_sets;
+  void *insn_sets;
 
   /* Some targets need information about the current section to accurately
      display insns.  If this is NULL, the target disassembler function

@@ -1,3 +1,11 @@
+2005-10-28  Dave Brolley  <brolley@redhat.com>
+
+	Contribute the following changes:
+	2003-09-29  Dave Brolley  <brolley@redhat.com>
+
+	* dis-asm.h (disassemble_info): insn_sets now (void *) to allow for
+	more exotic underlying types to be used.
+
 2005-10-25  Arnold Metselaar  <arnold.metselaar@planet.nl>
 
 	disasm.h: Add declaration for print_insn_z80

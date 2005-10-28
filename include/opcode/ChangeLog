@@ -7,6 +7,28 @@
 	cgen_isa_mask_* to cgen_bitset_*.
 	* cgen.h: Likewise.
 
+	2003-10-21  Richard Sandiford  <rsandifo@redhat.com>
+
+	* cgen.h (CGEN_BITSET_ATTR_VALUE): Fix definition.
+	(CGEN_ATTR_ENTRY): Change "value" to type "unsigned".
+	(CGEN_CPU_TABLE): Make isas a ponter.
+
+	2003-09-29  Dave Brolley  <brolley@redhat.com>
+
+	* cgen.h (CGEN_ATTR_VALUE_BITSET_TYPE): New typedef.
+	(CGEN_ATTR_VALUE_ENUM_TYPE): Ditto.
+	(CGEN_ATTR_VALUE_TYPE): Use these new typedefs.
+
+	2002-12-13  Dave Brolley  <brolley@redhat.com>
+
+	* cgen.h (symcat.h): #include it.
+	(cgen-bitset.h): #include it.
+	(CGEN_ATTR_VALUE_TYPE): Now a union.
+	(CGEN_ATTR_VALUE): Reference macros generated in opcodes/<arch>-desc.h.
+	(CGEN_ATTR_ENTRY): 'value' now unsigned.
+	(cgen_cpu_desc): 'isas' now (CGEN_ISA_MASK*).
+	* cgen-bitset.h: New file.
+
 2005-09-30  Catherine Moore  <clm@cm00re.com>
 
 	* bfin.h: New file.
