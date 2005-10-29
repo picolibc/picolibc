@@ -114,7 +114,7 @@ __sigfe:
 
 	.global	__sigbe
 	.stabs	"_sigbe:F(0,1)",36,0,0,__sigbe
-__sigbe: # return here after cygwin syscall
+__sigbe:						# return here after cygwin syscall
 	pushl	%edx
 	pushl	%ebx
 	pushl	%eax					# don't clobber
@@ -131,7 +131,7 @@ __sigbe: # return here after cygwin syscall
 	xadd	%eax,$tls::stackptr(%ebx)		#  and get pointer
 	xorl	%edx,%edx
 	xchgl	%edx,-4(%eax)				# get return address from signal stack
-	xchgl	%edx,8(%esp)				# restore ebx/real return address
+	xchgl	%edx,8(%esp)				# restore edx/real return address
 	decl	$tls::incyg(%ebx)
 	decl	$tls::stacklock(%ebx)			# release lock
 	popl	%eax

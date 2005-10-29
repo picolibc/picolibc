@@ -1175,8 +1175,8 @@ wait_sig (VOID *)
 	proc_subproc (PROC_CLEARWAIT, 0);
       if (pack.wakeup)
 	{
+	  sigproc_printf ("signalling pack.wakeup %p", pack.wakeup);
 	  SetEvent (pack.wakeup);
-	  sigproc_printf ("signalled %p", pack.wakeup);
 	}
       if (pack.si.si_signo == __SIGEXIT)
 	break;

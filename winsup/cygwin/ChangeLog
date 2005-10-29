@@ -1,5 +1,14 @@
 2005-10-29  Christopher Faylor  <cgf@timesys.com>
 
+	* fork.cc (frok::child): Change order of cleanup prior to return.
+	(fork): Save more of the stack.
+
+	* gendef: Fix some comments.
+
+	* sigproc.cc (wait_sig): Clarify debug output.
+
+2005-10-29  Christopher Faylor  <cgf@timesys.com>
+
 	* child_info.h (CHILD_INFO_MAGIC): Reset.
 
 2005-10-24  Christopher Faylor  <cgf@timesys.com>

@@ -244,15 +244,15 @@ frok::child (void *)
 
   ForceCloseHandle1 (fork_info->forker_finished, forker_finished);
 
-  _my_tls.fixup_after_fork ();
   sigproc_init ();
 
   pthread::atforkchild ();
   fixup_timers_after_fork ();
-  fixup_hooks_after_fork ();
   cygbench ("fork-child");
   ld_preload ();
+  fixup_hooks_after_fork ();
   cygwin_finished_initializing = true;
+  _my_tls.fixup_after_fork ();
   return 0;
 }
 
@@ -562,7 +562,10 @@ fork ()
   grouped.first_dll = NULL;
   grouped.load_dlls = 0;
 
+  int res;
   void *esp;
+  int ischild;
+
   __asm__ volatile ("movl %%esp,%0": "=r" (esp));
 
   myself->set_has_pgid_children ();
@@ -576,8 +579,7 @@ fork ()
     }
 
   sig_send (NULL, __SIGHOLD);
-  int res;
-  int ischild = setjmp (grouped.ch.jmp);
+  ischild = setjmp (grouped.ch.jmp);
   if (!ischild)
     res = grouped.parent (esp);
   else
