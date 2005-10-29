@@ -576,7 +576,9 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   si.hStdError = handle (2, 1); /* Get output handle */
   si.cb = sizeof (si);
 
-  int flags = CREATE_DEFAULT_ERROR_MODE | GetPriorityClass (hMainProc) | CREATE_SEPARATE_WOW_VDM;
+  int flags = GetPriorityClass (hMainProc);
+  sigproc_printf ("priority class %d", flags);
+  flags |= CREATE_DEFAULT_ERROR_MODE | CREATE_SEPARATE_WOW_VDM;
 
   if (mode == _P_DETACH || !set_console_state_for_spawn ())
     flags |= DETACHED_PROCESS;

@@ -55,17 +55,6 @@ class frok
   friend int fork ();
 };
 
-static void
-stack_base (child_info_fork *ch)
-{
-  ch->stackbottom = _tlsbase;
-  ch->stacktop = &ch;
-  ch->stacksize = (char *) ch->stackbottom - (char *) &ch;
-  debug_printf ("bottom %p, top %p, stack %p, size %d, reserve %d",
-		ch->stackbottom, ch->stacktop, &ch, ch->stacksize,
-		(char *) ch->stackbottom - (char *) ch->stacktop);
-}
-
 /* Copy memory from parent to child.
    The result is a boolean indicating success.  */
 
@@ -299,6 +288,7 @@ frok::parent (void *stack_here)
   pthread::atforkprepare ();
 
   int c_flags = GetPriorityClass (hMainProc);
+  debug_printf ("priority class %d", c_flags);
   STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
 
   /* If we don't have a console, then don't create a console for the
@@ -342,7 +332,11 @@ frok::parent (void *stack_here)
 
   ch.forker_finished = forker_finished;
 
-  stack_base (&ch);
+  ch.stackbottom = _tlsbase;
+  ch.stacktop = stack_here;
+  ch.stacksize = (char *) ch.stackbottom - (char *) stack_here;
+  debug_printf ("stack - bottom %p, top %p, size %d",
+		ch.stackbottom, ch.stacktop, ch.stacksize);
 
   si.cb = sizeof (STARTUPINFO);
   si.lpReserved2 = (LPBYTE) &ch;

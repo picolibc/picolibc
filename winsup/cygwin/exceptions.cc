@@ -1187,10 +1187,8 @@ signal_exit (int rc)
   if (hExeced || exit_state)
     myself.exit (rc);
 
-  /* We'd like to stop the main thread from executing but when we do that it
-     causes random, inexplicable hangs.  So, instead, we set up the priority
-     of this thread really high so that it should do its thing and then exit. */
-  SetThreadPriority (hMainThread, THREAD_PRIORITY_IDLE);
+  /* Starve other threads in a vain attempt to stop them from doing something
+     stupid. */
   SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
 
   user_data->resourcelocks->Delete ();

@@ -1,5 +1,14 @@
 2005-10-29  Christopher Faylor  <cgf@timesys.com>
 
+	* exceptions.cc (signal_exit): Eliminate setting of main thread
+	priority since process lock should make that unnecessary.
+	* fork.cc (stack_base): Eliminate.
+	(frok::parent): Subsume stack_base and just set stack stuff here.
+	Report on priority class in debugging output.
+	* spawn.cc (spawn_guts): Report on priority class in debugging output.
+
+2005-10-29  Christopher Faylor  <cgf@timesys.com>
+
 	* fork.cc (frok::child): Change order of cleanup prior to return.
 	(fork): Save more of the stack.
 
