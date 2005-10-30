@@ -4,7 +4,7 @@
 #include <rpcndr.h>
 
 #ifndef _OBJBASE_H
-#define _OBJBASE_H_
+#define _OBJBASE_H
 #if __GNUC__ >=3
 #pragma GCC system_header
 #endif
