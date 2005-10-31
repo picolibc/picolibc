@@ -1,3 +1,8 @@
+2005-10-31  Darin Johnson  <darin@usa.net>
+
+	* libm/mathfp/s_mathcnst.c: Fix endian-ness check to be
+	correct for constants.
+
 2005-10-28  Bob Wilson  <bob.wilson@acm.org>
 
 	* libc/stdio/siprintf.c: Wrap long lines in ANSI_SYNOPSIS.
