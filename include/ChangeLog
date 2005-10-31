@@ -1,8 +1,24 @@
+2005-10-31  Mark Kettenis  <kettenis@gnu.org>
+
+	* floatformat.h (enum floatformat_byteorders): Add
+	floatformat_vax.
+	(floatformat_vax_aingle, floatformat_vax_double): Declare.
+
+2005-10-28  Dave Brolley  <brolley@redhat.com>
+
+	Contribute the following changes:
+	2003-09-29  Dave Brolley  <brolley@redhat.com>
+
+	* dis-asm.h (disassemble_info): insn_sets now (void *) to allow for
+	more exotic underlying types to be used.
+
+2005-10-25  Arnold Metselaar  <arnold.metselaar@planet.nl>
+
+	disasm.h: Add declaration for print_insn_z80
+
 2005-09-30  Catherine Moore  <clm@cm00re.com>
 
 	* dis-asm.h (print_insn_bfin): Declare.
-	* elf/bfin.h: New file.
-	* elf/common.h (EM_BLACKFIN): Define.
 	* opcode/bfin.h: New file.
 
 2005-09-26  Mark Mitchell  <mark@codesourcery.com>
