@@ -1,3 +1,7 @@
+2005-11-01  Ralf Corsepius <ralf.corsepius@rtems.org>
+
+	* libc/include/stdint.h: Cleanup #if vs. #ifdef.
+
 2005-10-31  Darin Johnson  <darin@usa.net>
 
 	* libm/mathfp/s_mathcnst.c: Fix endian-ness check to be

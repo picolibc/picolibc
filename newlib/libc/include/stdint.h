@@ -7,7 +7,6 @@
  */
 
 /*
- * @todo - Add fast<N>_t types.
  * @todo - Add support for wint_t types.
  */
 
@@ -73,7 +72,7 @@ typedef int16_t   	int_least16_t;
 typedef uint16_t 	uint_least16_t;
 #define __int_least16_t_defined 1
 
-#ifndef __int_least8_t_defined
+#if !__int_least8_t_defined
 typedef int16_t	   	int_least8_t;
 typedef uint16_t  	uint_least8_t;
 #define __int_least8_t_defined 1
@@ -103,13 +102,13 @@ typedef int32_t   	int_least32_t;
 typedef uint32_t 	uint_least32_t;
 #define __int_least32_t_defined 1
 
-#ifndef __int_least8_t_defined
+#if !__int_least8_t_defined
 typedef int32_t	   	int_least8_t;
 typedef uint32_t  	uint_least8_t;
 #define __int_least8_t_defined 1
 #endif
 
-#ifndef __int_least16_t_defined
+#if !__int_least16_t_defined
 typedef int32_t	   	int_least16_t;
 typedef uint32_t  	uint_least16_t;
 #define __int_least16_t_defined 1
@@ -135,19 +134,19 @@ typedef int64_t   	int_least64_t;
 typedef uint64_t 	uint_least64_t;
 #define __int_least64_t_defined 1
 
-#ifndef __int_least8_t_defined
+#if !__int_least8_t_defined
 typedef int64_t	   	int_least8_t;
 typedef uint64_t  	uint_least8_t;
 #define __int_least8_t_defined 1
 #endif
 
-#ifndef __int_least16_t_defined
+#if !__int_least16_t_defined
 typedef int64_t	   	int_least16_t;
 typedef uint64_t  	uint_least16_t;
 #define __int_least16_t_defined 1
 #endif
 
-#ifndef __int_least32_t_defined
+#if !__int_least32_t_defined
 typedef int64_t	   	int_least32_t;
 typedef uint64_t  	uint_least32_t;
 #define __int_least32_t_defined 1
@@ -301,7 +300,7 @@ typedef unsigned long uintptr_t;
 #endif
 
 #if __int64_t_defined
-#ifdef __have_long64
+#if __have_long64
 #define INT64_MIN 	(-9223372036854775807L-1L)
 #define INT64_MAX 	 9223372036854775807L
 #define UINT64_MAX 	18446744073709551615U
@@ -313,7 +312,7 @@ typedef unsigned long uintptr_t;
 #endif
 
 #if __int_least64_t_defined
-#ifdef __have_long64
+#if __have_long64
 #define INT_LEAST64_MIN  (-9223372036854775807L-1L)
 #define INT_LEAST64_MAX  9223372036854775807L
 #define UINT_LEAST64_MAX 18446744073709551615U
