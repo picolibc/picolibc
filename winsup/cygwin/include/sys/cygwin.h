@@ -17,6 +17,8 @@ details. */
 extern "C" {
 #endif
 
+#define _CYGWIN_SIGNAL_STRING "cYgSiGw00f"
+
 extern pid_t cygwin32_winpid_to_pid (int);
 extern void cygwin32_win32_to_posix_path_list (const char *, char *);
 extern int cygwin32_win32_to_posix_path_list_buf_size (const char *);

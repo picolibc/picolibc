@@ -1,3 +1,9 @@
+2005-11-01  Christopher Faylor  <cgf@timesys.com>
+
+	* include/sys/cygwin.h: Define CYGWIN_SIGNAL_STRING.
+	* exceptins.cc (sigpacket::process): Send a _CYGWIN_SIGNAL_STRING to
+	gdb if the process is being debugged.  A WIP.
+
 2005-10-29  Christopher Faylor  <cgf@timesys.com>
 
 	* exceptions.cc (signal_exit): Eliminate setting of main thread

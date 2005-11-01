@@ -1095,11 +1095,12 @@ sigpacket::process ()
   if (si.si_signo == SIGTSTP || si.si_signo == SIGTTIN || si.si_signo == SIGTTOU)
     sig_clear (SIGCONT);
 
-#if 0
-  char sigmsg[24];
-  __small_sprintf (sigmsg, "cygwin: signal %d\n", si.si_signo);
-  OutputDebugString (sigmsg);
-#endif
+  if (being_debugged ())
+    {
+      char sigmsg[sizeof (_CYGWIN_SIGNAL_STRING " 0xffffffff")];
+      __small_sprintf (sigmsg, _CYGWIN_SIGNAL_STRING " %p", si.si_signo);
+      OutputDebugString (sigmsg);
+    }
 
   if (handler == (void *) SIG_DFL)
     {
