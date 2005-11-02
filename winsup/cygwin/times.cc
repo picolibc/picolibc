@@ -152,7 +152,9 @@ extern "C" int
 gettimeofday (struct timeval *tv, struct timezone *tz)
 {
   static bool tzflag;
+debug_printf ("prior to gtod.usecs"); // DELETEME
   LONGLONG now = gtod.usecs (false);
+debug_printf ("after to gtod.usecs"); // DELETEME
   if (now == (LONGLONG) -1)
     return -1;
 

@@ -1,3 +1,7 @@
+2005-11-02  Christopher Faylor  <cgf@timesys.com>
+
+	* times.cc (gettimeofday): Add temporary debugging output.
+
 2005-11-01  Christopher Faylor  <cgf@timesys.com>
 
 	* include/sys/cygwin.h: Define CYGWIN_SIGNAL_STRING.
