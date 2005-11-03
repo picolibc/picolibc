@@ -1,4 +1,11 @@
-2005-10-29	Chris Sutcliffe <ir0nh34d@users.sf.net>
+2005-11-03  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/crypt32.def (CertOIDToAlgId, CertAlgIDToOID, CryptProtectData,
+	CryptUnprotectData, CryptDecodeObjectEx, CryptEncodeObjectEx,
+	CryptRegisterOIDFunction, CryptUnregisterOIDFunction): Add stubs.
+	Thanks to: F Richter  <res2002 at users dot sourceforge dot net>
+
+2005-10-29  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
 	* include/objbase.h: Fix typo.
 	* include/w32api.h: Increment version to 3.5.
@@ -18,23 +25,23 @@
 
 	* include/winbase.h (GetProcessId): Declare.
 
-2005-09-23	Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
+2005-09-23  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* lib/ddk/newdev.def: Added.
 	Thanks to: Stephan Meyer <ste_meyer at users dot sourceforge dot net>
 
-2005-09-23	Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
+2005-09-23  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/commdlg.h (OPENFILENAME): Added WINNT >= 0x0500
 	component.
 	Thanks to: Gennady Feldman <gena01 at users dot sourceforge dot net>
 
-2005-09-23	Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
+2005-09-23  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* lib/shell32.def (SHILCreateFromPath): Add stub.
 	Thanks to: Michael Jung <mjung at iss dot tu-darmstadt dot de>
 
-2005-09-21	Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
+2005-09-21  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/winbase.h (RegisterWaitForSingleObject,
 	RegisterWaitForSingleObjectEx): Define.

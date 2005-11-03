@@ -13,3 +13,11 @@ CertFreeCertificateContext@4
 CertGetIssuerCertificateFromStore@16
 CertFindChainInStore@24
 CertOpenStore@20
+CertOIDToAlgId@4
+CertAlgIDToOID@4
+CryptProtectData@28
+CryptUnprotectData@28
+CryptDecodeObjectEx@32
+CryptEncodeObjectEx@28
+CryptRegisterOIDFunction@20
+CryptUnregisterOIDFunction@12
