@@ -211,9 +211,9 @@ void    _EXFUN(sync, (void));
 #else /* defined(__rtems__) */
 int     _EXFUN(sync, (void));
 #endif
+#endif
 int     _EXFUN(readlink, (const char *__path, char *__buf, int __buflen));
 int     _EXFUN(symlink, (const char *__name1, const char *__name2));
-#endif
 
 #define	F_OK	0
 #define	R_OK	4

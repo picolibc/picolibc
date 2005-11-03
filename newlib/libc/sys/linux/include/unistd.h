@@ -15,6 +15,4 @@ extern char *optarg;
 extern int optind, opterr, optopt;
 
 
-int readlink(const char *path, char *buf, size_t bufsiz);
-
 #endif

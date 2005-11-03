@@ -1,3 +1,12 @@
+2005-11-03  Shaun Jackman  <sjackman@gmail.com>
+
+	* libc/include/sys/unistd.h (readlink, symlink): Provide these
+	prototypes by default.
+	* libc/sys/linux/include/unistd.h (readlink): Remove this
+	prototype.
+	* libc/sys/linux/sys/unistd.h (readlink, symlink): New
+	prototypes.
+
 2005-11-01  Ralf Corsepius <ralf.corsepius@rtems.org>
 
 	* libc/include/stdint.h: Cleanup #if vs. #ifdef.
