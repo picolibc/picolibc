@@ -90,7 +90,7 @@ getpass (prompt)
     if (p < buf + _PASSWORD_LEN)
       *p++ = ch;
   *p = '\0';
-  (void) _write (fileno (outfp), "\n", 1);
+  (void) write (fileno (outfp), "\n", 1);
   if (echo)
     {
       term.c_lflag |= ECHO;

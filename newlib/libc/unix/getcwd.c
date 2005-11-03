@@ -124,7 +124,7 @@ getcwd (pt, size)
   for (first = 1;; first = 0)
     {
       /* Stat the current level. */
-      if (_stat (up, &s))
+      if (stat (up, &s))
 	goto err;
 
       /* Save current node values. */
@@ -165,7 +165,7 @@ getcwd (pt, size)
       *bup = '\0';
 
       /* Open and stat parent directory. */
-      if (!(dir = _opendir (up)) || _fstat (__dirfd (dir), &s))
+      if (!(dir = opendir (up)) || fstat (__dirfd (dir), &s))
 	goto err;
 
       /* Add trailing slash for next directory. */
@@ -182,7 +182,7 @@ getcwd (pt, size)
 	{
 	  for (;;)
 	    {
-	      if (!(dp = _readdir (dir)))
+	      if (!(dp = readdir (dir)))
 		goto notfound;
 	      if (dp->d_ino == ino)
 		break;
@@ -191,7 +191,7 @@ getcwd (pt, size)
       else
 	for (;;)
 	  {
-	    if (!(dp = _readdir (dir)))
+	    if (!(dp = readdir (dir)))
 	      goto notfound;
 	    if (ISDOT (dp))
 	      continue;
@@ -238,7 +238,7 @@ getcwd (pt, size)
 	*--bpt = '/';
       bpt -= strlen (dp->d_name);
       bcopy (dp->d_name, bpt, strlen (dp->d_name));
-      (void) _closedir (dir);
+      (void) closedir (dir);
 
       /* Truncate any file name. */
       *bup = '\0';

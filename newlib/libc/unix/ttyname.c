@@ -62,13 +62,13 @@ ttyname (fd)
     return NULL;
 
   /* Must be a character device. */
-  if (_fstat (fd, &sb) || !S_ISCHR (sb.st_mode))
+  if (fstat (fd, &sb) || !S_ISCHR (sb.st_mode))
     return NULL;
 
-  if ((dp = _opendir (_PATH_DEV)) == NULL)
+  if ((dp = opendir (_PATH_DEV)) == NULL)
     return NULL;
 
-  while ((dirp = _readdir (dp)) != NULL)
+  while ((dirp = readdir (dp)) != NULL)
     {
       if (dirp->d_ino != sb.st_ino)
 	continue;
@@ -76,9 +76,9 @@ ttyname (fd)
       if (stat (buf, &dsb) || sb.st_dev != dsb.st_dev ||
 	  sb.st_ino != dsb.st_ino)
 	continue;
-      (void) _closedir (dp);
+      (void) closedir (dp);
       return buf;
     }
-  (void) _closedir (dp);
+  (void) closedir (dp);
   return NULL;
 }

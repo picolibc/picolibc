@@ -16,15 +16,15 @@ setutent ()
 {
   if (utmp_fd == -2)
     {
-      utmp_fd = _open (utmp_file, O_RDONLY);
+      utmp_fd = open (utmp_file, O_RDONLY);
     }
-  _lseek (utmp_fd, 0, SEEK_SET);
+  lseek (utmp_fd, 0, SEEK_SET);
 }
 
 void
 endutent ()
 {
-  _close (utmp_fd);
+  close (utmp_fd);
   utmp_fd = -2;
 }
 
@@ -39,7 +39,7 @@ getutent ()
 {
   if (utmp_fd == -2)
     setutent ();
-  if (_read (utmp_fd, &utmp_data, sizeof (utmp_data)) < sizeof (utmp_data))
+  if (read (utmp_fd, &utmp_data, sizeof (utmp_data)) < sizeof (utmp_data))
     return 0;
   return &utmp_data;
 }
@@ -47,7 +47,7 @@ getutent ()
 struct utmp *
 getutid (struct utmp *id)
 {
-  while (_read (utmp_fd, &utmp_data, sizeof (utmp_data)) == sizeof (utmp_data))
+  while (read (utmp_fd, &utmp_data, sizeof (utmp_data)) == sizeof (utmp_data))
     {
       switch (id->ut_type)
 	{
@@ -73,7 +73,7 @@ getutid (struct utmp *id)
 struct utmp *
 getutline (struct utmp *line)
 {
-  while (_read (utmp_fd, &utmp_data, sizeof (utmp_data)) == sizeof (utmp_data))
+  while (read (utmp_fd, &utmp_data, sizeof (utmp_data)) == sizeof (utmp_data))
     {
       if ((utmp_data.ut_type == LOGIN_PROCESS ||
 	   utmp_data.ut_type == USER_PROCESS) &&
