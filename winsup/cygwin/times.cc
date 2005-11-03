@@ -144,17 +144,16 @@ totimeval (struct timeval *dst, FILETIME *src, int sub, int flag)
   dst->tv_sec = x / (long long) (1e6);
 }
 
-hires_ms gtod;
-UINT NO_COPY hires_ms::minperiod;
+hires_ms NO_COPY gtod;
+UINT hires_ms::minperiod;
 
 /* FIXME: Make thread safe */
 extern "C" int
 gettimeofday (struct timeval *tv, struct timezone *tz)
 {
   static bool tzflag;
-debug_printf ("prior to gtod.usecs"); // DELETEME
   LONGLONG now = gtod.usecs (false);
-debug_printf ("after to gtod.usecs"); // DELETEME
+
   if (now == (LONGLONG) -1)
     return -1;
 
@@ -562,24 +561,35 @@ void
 hires_us::prime ()
 {
   LARGE_INTEGER ifreq;
+debug_printf ("before QueryPerformanceFrequency"); // DELETEME
   if (!QueryPerformanceFrequency (&ifreq))
     {
+debug_printf ("QueryPerformanceFrequency failed"); // DELETEME
       inited = -1;
       return;
     }
+debug_printf ("after QueryPerformanceFrequency"); // DELETEME
 
   FILETIME f;
   int priority = GetThreadPriority (GetCurrentThread ());
+
+debug_printf ("before SetThreadPriority(THREAD_PRIORITY_TIME_CRITICAL)"); // DELETEME
   SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
+debug_printf ("after SetThreadPriority(THREAD_PRIORITY_TIME_CRITICAL)"); // DELETEME
   if (!QueryPerformanceCounter (&primed_pc))
     {
+debug_printf ("QueryPerformanceCounter failed, %E");
       SetThreadPriority (GetCurrentThread (), priority);
+debug_printf ("After failing SetThreadPriority");
       inited = -1;
       return;
     }
+debug_printf ("after QueryPerformanceCounter"); // DELETEME
 
   GetSystemTimeAsFileTime (&f);
+debug_printf ("after GetSystemTimeAsFileTime"); // DELETEME
   SetThreadPriority (GetCurrentThread (), priority);
+debug_printf ("after SetThreadPriority(%d)", priority); // DELETEME
 
   inited = 1;
   primed_ft.HighPart = f.dwHighDateTime;

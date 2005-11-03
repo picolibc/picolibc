@@ -1,5 +1,11 @@
 2005-11-02  Christopher Faylor  <cgf@timesys.com>
 
+	* times.cc (hires_ms::minperiod): Make copy-on-fork.
+	(gettimeofday): Remove temporary debugging.
+	(hires_us::prime): Add lots of temporary debugging output.
+
+2005-11-02  Christopher Faylor  <cgf@timesys.com>
+
 	* times.cc (gettimeofday): Add temporary debugging output.
 
 2005-11-01  Christopher Faylor  <cgf@timesys.com>
