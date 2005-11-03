@@ -1,3 +1,7 @@
+2005-11-03  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (struct bfd_link_order): Tweak comment.
+
 2005-10-31  Mark Kettenis  <kettenis@gnu.org>
 
 	* floatformat.h (enum floatformat_byteorders): Add

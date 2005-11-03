@@ -554,7 +554,7 @@ enum bfd_link_order_type
 };
 
 /* This is the link_order structure itself.  These form a chain
-   attached to the section whose contents they are describing.  */
+   attached to the output section whose contents they are describing.  */
 
 struct bfd_link_order
 {
