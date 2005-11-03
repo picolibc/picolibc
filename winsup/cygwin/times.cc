@@ -629,22 +629,30 @@ hires_ms::prime ()
   TIMECAPS tc;
   FILETIME f;
 
+debug_printf ("entering, minperiod %d", minperiod);
   if (!minperiod)
     if (timeGetDevCaps (&tc, sizeof (tc)) != TIMERR_NOERROR)
       minperiod = 1;
     else
       {
+debug_printf ("timeGetDevCaps succeeded");
 	minperiod = min (max (tc.wPeriodMin, 1), tc.wPeriodMax);
 	timeBeginPeriod (minperiod);
       }
+debug_printf ("inited %d");
 
   if (!inited)
     {
       int priority = GetThreadPriority (GetCurrentThread ());
+debug_printf ("priority %d", priority);
       SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
+debug_printf ("SetThreadPriority to THREAD_PRIORITY_TIME_CRITICAL");
       initime_ms = timeGetTime ();
+debug_printf ("after timeGetTime");
       GetSystemTimeAsFileTime (&f);
+debug_printf ("after GetSystemTimeAsFileTime");
       SetThreadPriority (GetCurrentThread (), priority);
+debug_printf ("SetThreadPriority(%p, %d)", GetCurrentThread(), priority);
 
       inited = 1;
       initime_us.HighPart = f.dwHighDateTime;
@@ -652,6 +660,7 @@ hires_ms::prime ()
       initime_us.QuadPart -= FACTOR;
       initime_us.QuadPart /= 10;
     }
+debug_printf ("returning");
   return minperiod;
 }
 
