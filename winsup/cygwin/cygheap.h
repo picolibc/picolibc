@@ -8,6 +8,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "hires.h"
+
 #undef cfree
 
 enum cygheap_types
@@ -298,6 +300,7 @@ struct init_cygheap
   pid_t pid;			/* my pid */
   HANDLE pid_handle;		/* handle for my pid */
   hook_chain hooks;
+  hires_ms _gtod;
   void close_ctty ();
 };
 

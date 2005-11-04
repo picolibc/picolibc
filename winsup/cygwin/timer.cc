@@ -18,6 +18,10 @@ details. */
 #include "cygtls.h"
 #include "sigproc.h"
 #include "sync.h"
+#include "path.h"
+#include "fhandler.h"
+#include "dtable.h"
+#include "cygheap.h"
 
 #define TT_MAGIC 0x513e4a1c
 struct timer_tracker

@@ -1,5 +1,19 @@
 2005-11-04  Christopher Faylor  <cgf@timesys.com>
 
+	* cygheap.h (init_cygheap::_gtod): New hires_ms element.
+	* hires.h (hires_ms::minperiod): Remove static designation.
+	(hires::began_period): New field.
+	* signal.cc: Include headers required for cygheap.h now that gtod lives
+	in the cygheap.
+	* timer.c: Ditto.
+	* times.cc (gtod): Delete variable.
+	(gtod::minperiod): Ditto.
+	(gtod::began_period): Define.
+	(hires_ms::prime): Add more debugging output.  Call timeBeginPeriod
+	only when !began_period.
+
+2005-11-04  Christopher Faylor  <cgf@timesys.com>
+
 	* times.cc (hires_ms::prime): More debugging.
 	(hires_ms::usecs): Ditto.
 

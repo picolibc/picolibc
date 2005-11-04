@@ -21,6 +21,10 @@ details. */
 #include "hires.h"
 #include "security.h"
 #include "cygtls.h"
+#include "path.h"
+#include "fhandler.h"
+#include "dtable.h"
+#include "cygheap.h"
 
 int sigcatchers;	/* FIXME: Not thread safe. */
 

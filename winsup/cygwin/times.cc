@@ -144,8 +144,7 @@ totimeval (struct timeval *dst, FILETIME *src, int sub, int flag)
   dst->tv_sec = x / (long long) (1e6);
 }
 
-hires_ms gtod;
-UINT NO_COPY hires_ms::minperiod;	/* minperiod needs to be NO_COPY since it
+bool NO_COPY hires_ms::began_period;	/* minperiod needs to be NO_COPY since it
 					   is a trigger for setting timeBeginPeriod
 					   which needs to be set once for every
 					   program. */
@@ -633,18 +632,25 @@ hires_ms::prime ()
   TIMECAPS tc;
   FILETIME f;
 
-stupid_printf ("entering, minperiod %d", minperiod);
+stupid_printf ("entering, minperiod %d, began_period %d", minperiod, began_period);
   if (minperiod)
     /* done previously */;
   else if (timeGetDevCaps (&tc, sizeof (tc)) != TIMERR_NOERROR)
+{stupid_printf ("timeGetDevCaps failed, %E");
     minperiod = 1;
+}
   else
+{
+    minperiod = min (max (tc.wPeriodMin, 1), tc.wPeriodMax);
+stupid_printf ("timeGetDevCaps succeeded.  tc.wPeriodMin %u, tc.wPeriodMax %u, minperiod %u", tc.wPeriodMin, tc.wPeriodMax, minperiod); }
+stupid_printf ("inited %d, minperiod %u, began_period %d", minperiod, began_period);
+
+  if (!began_period)
     {
-      minperiod = min (max (tc.wPeriodMin, 1), tc.wPeriodMax);
-stupid_printf ("timeGetDevCaps succeeded.  tc.wPeriodMin %u, tc.wPeriodMax %u, minperiod %u", tc.wPeriodMin, tc.wPeriodMax, minperiod);
       timeBeginPeriod (minperiod);
+      began_period = true;
+stupid_printf ("timeBeginPeriod called");
     }
-stupid_printf ("inited %d");
 
   if (!inited)
     {
