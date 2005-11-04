@@ -557,39 +557,40 @@ cygwin_tzset ()
 {
 }
 
+#define stupid_printf if (cygwin_finished_initializing) debug_printf
 void
 hires_us::prime ()
 {
   LARGE_INTEGER ifreq;
-debug_printf ("before QueryPerformanceFrequency"); // DELETEME
+stupid_printf ("before QueryPerformanceFrequency"); // DELETEME
   if (!QueryPerformanceFrequency (&ifreq))
     {
-debug_printf ("QueryPerformanceFrequency failed"); // DELETEME
+stupid_printf ("QueryPerformanceFrequency failed"); // DELETEME
       inited = -1;
       return;
     }
-debug_printf ("after QueryPerformanceFrequency"); // DELETEME
+stupid_printf ("after QueryPerformanceFrequency"); // DELETEME
 
   FILETIME f;
   int priority = GetThreadPriority (GetCurrentThread ());
 
-debug_printf ("before SetThreadPriority(THREAD_PRIORITY_TIME_CRITICAL)"); // DELETEME
+stupid_printf ("before SetThreadPriority(THREAD_PRIORITY_TIME_CRITICAL)"); // DELETEME
   SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
-debug_printf ("after SetThreadPriority(THREAD_PRIORITY_TIME_CRITICAL)"); // DELETEME
+stupid_printf ("after SetThreadPriority(THREAD_PRIORITY_TIME_CRITICAL)"); // DELETEME
   if (!QueryPerformanceCounter (&primed_pc))
     {
-debug_printf ("QueryPerformanceCounter failed, %E");
+stupid_printf ("QueryPerformanceCounter failed, %E");
       SetThreadPriority (GetCurrentThread (), priority);
-debug_printf ("After failing SetThreadPriority");
+stupid_printf ("After failing SetThreadPriority");
       inited = -1;
       return;
     }
-debug_printf ("after QueryPerformanceCounter"); // DELETEME
+stupid_printf ("after QueryPerformanceCounter"); // DELETEME
 
   GetSystemTimeAsFileTime (&f);
-debug_printf ("after GetSystemTimeAsFileTime"); // DELETEME
+stupid_printf ("after GetSystemTimeAsFileTime"); // DELETEME
   SetThreadPriority (GetCurrentThread (), priority);
-debug_printf ("after SetThreadPriority(%d)", priority); // DELETEME
+stupid_printf ("after SetThreadPriority(%d)", priority); // DELETEME
 
   inited = 1;
   primed_ft.HighPart = f.dwHighDateTime;
@@ -629,30 +630,30 @@ hires_ms::prime ()
   TIMECAPS tc;
   FILETIME f;
 
-debug_printf ("entering, minperiod %d", minperiod);
+stupid_printf ("entering, minperiod %d", minperiod);
   if (!minperiod)
     if (timeGetDevCaps (&tc, sizeof (tc)) != TIMERR_NOERROR)
       minperiod = 1;
     else
       {
-debug_printf ("timeGetDevCaps succeeded");
+stupid_printf ("timeGetDevCaps succeeded");
 	minperiod = min (max (tc.wPeriodMin, 1), tc.wPeriodMax);
 	timeBeginPeriod (minperiod);
       }
-debug_printf ("inited %d");
+stupid_printf ("inited %d");
 
   if (!inited)
     {
       int priority = GetThreadPriority (GetCurrentThread ());
-debug_printf ("priority %d", priority);
+stupid_printf ("priority %d", priority);
       SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
-debug_printf ("SetThreadPriority to THREAD_PRIORITY_TIME_CRITICAL");
+stupid_printf ("SetThreadPriority to THREAD_PRIORITY_TIME_CRITICAL");
       initime_ms = timeGetTime ();
-debug_printf ("after timeGetTime");
+stupid_printf ("after timeGetTime");
       GetSystemTimeAsFileTime (&f);
-debug_printf ("after GetSystemTimeAsFileTime");
+stupid_printf ("after GetSystemTimeAsFileTime");
       SetThreadPriority (GetCurrentThread (), priority);
-debug_printf ("SetThreadPriority(%p, %d)", GetCurrentThread(), priority);
+stupid_printf ("SetThreadPriority(%p, %d)", GetCurrentThread(), priority);
 
       inited = 1;
       initime_us.HighPart = f.dwHighDateTime;
@@ -660,7 +661,7 @@ debug_printf ("SetThreadPriority(%p, %d)", GetCurrentThread(), priority);
       initime_us.QuadPart -= FACTOR;
       initime_us.QuadPart /= 10;
     }
-debug_printf ("returning");
+stupid_printf ("returning");
   return minperiod;
 }
 

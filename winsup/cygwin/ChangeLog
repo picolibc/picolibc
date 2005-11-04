@@ -1,5 +1,9 @@
 2005-11-03  Christopher Faylor  <cgf@timesys.com>
 
+	* times.cc (stupid_printf): Define and use throughout -- temporarily.
+
+2005-11-03  Christopher Faylor  <cgf@timesys.com>
+
 	* times.cc (hires_ms::prime): Add lots of temporary debugging output.
 
 2005-11-02  Christopher Faylor  <cgf@timesys.com>
