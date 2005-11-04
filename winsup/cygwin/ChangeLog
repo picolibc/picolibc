@@ -1,3 +1,8 @@
+2005-11-04  Christopher Faylor  <cgf@timesys.com>
+
+	* times.cc (hires_ms::prime): More debugging.
+	(hires_ms::usecs): Ditto.
+
 2005-11-03  Christopher Faylor  <cgf@timesys.com>
 
 	* times.cc (stupid_printf): Define and use throughout -- temporarily.

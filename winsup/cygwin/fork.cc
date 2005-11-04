@@ -240,8 +240,8 @@ frok::child (void *)
   cygbench ("fork-child");
   ld_preload ();
   fixup_hooks_after_fork ();
-  cygwin_finished_initializing = true;
   _my_tls.fixup_after_fork ();
+  cygwin_finished_initializing = true;
   return 0;
 }
 

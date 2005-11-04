@@ -144,8 +144,11 @@ totimeval (struct timeval *dst, FILETIME *src, int sub, int flag)
   dst->tv_sec = x / (long long) (1e6);
 }
 
-hires_ms NO_COPY gtod;
-UINT hires_ms::minperiod;
+hires_ms gtod;
+UINT NO_COPY hires_ms::minperiod;	/* minperiod needs to be NO_COPY since it
+					   is a trigger for setting timeBeginPeriod
+					   which needs to be set once for every
+					   program. */
 
 /* FIXME: Make thread safe */
 extern "C" int
@@ -631,15 +634,16 @@ hires_ms::prime ()
   FILETIME f;
 
 stupid_printf ("entering, minperiod %d", minperiod);
-  if (!minperiod)
-    if (timeGetDevCaps (&tc, sizeof (tc)) != TIMERR_NOERROR)
-      minperiod = 1;
-    else
-      {
-stupid_printf ("timeGetDevCaps succeeded");
-	minperiod = min (max (tc.wPeriodMin, 1), tc.wPeriodMax);
-	timeBeginPeriod (minperiod);
-      }
+  if (minperiod)
+    /* done previously */;
+  else if (timeGetDevCaps (&tc, sizeof (tc)) != TIMERR_NOERROR)
+    minperiod = 1;
+  else
+    {
+      minperiod = min (max (tc.wPeriodMin, 1), tc.wPeriodMax);
+stupid_printf ("timeGetDevCaps succeeded.  tc.wPeriodMin %u, tc.wPeriodMax %u, minperiod %u", tc.wPeriodMin, tc.wPeriodMax, minperiod);
+      timeBeginPeriod (minperiod);
+    }
 stupid_printf ("inited %d");
 
   if (!inited)
@@ -668,17 +672,23 @@ stupid_printf ("returning");
 LONGLONG
 hires_ms::usecs (bool justdelta)
 {
+stupid_printf ("before call to prime(), minperiod %u, process priority %d", minperiod, GetThreadPriority (GetCurrentThread ()));
   if (!minperiod) /* NO_COPY variable */
     prime ();
+stupid_printf ("after call to prime(), process priority %d", GetThreadPriority (GetCurrentThread ()));
+
   DWORD now = timeGetTime ();
+stupid_printf ("after call to timeGetTime, process priority %d", GetThreadPriority (GetCurrentThread ()));
   if ((int) (now - initime_ms) < 0)
     {
+stupid_printf ("special casing, process priority %d", GetThreadPriority (GetCurrentThread ()));
       inited = 0;
       prime ();
       now = timeGetTime ();
     }
   // FIXME: Not sure how this will handle the 49.71 day wrap around
   LONGLONG res = initime_us.QuadPart + ((LONGLONG) (now - initime_ms) * 1000);
+stupid_printf ("res %U, process priority %d", res, GetThreadPriority (GetCurrentThread ()));
   return res;
 }
 
