@@ -1,3 +1,7 @@
+2005-11-04  Michael Jung  <mjung@iss.tu-darmstadt.de> 
+
+	* lib/shell32.c (CLSID_ShellFSFolder): Add GUID.
+
 2005-11-03  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/crypt32.def (CertOIDToAlgId, CertAlgIDToOID, CryptProtectData,
