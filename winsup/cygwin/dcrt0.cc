@@ -636,6 +636,7 @@ get_cygwin_startup_info ()
 void __stdcall
 dll_crt0_0 ()
 {
+  init_global_security ();
   lock_process::init ();
   init_console_handler (TRUE);
   _impure_ptr = _GLOBAL_REENT;
@@ -646,7 +647,6 @@ dll_crt0_0 ()
   wincap.init ();
   initial_env ();
 
-  init_global_security ();
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
 		       GetCurrentProcess (), &hMainProc, 0, FALSE,
 			DUPLICATE_SAME_ACCESS))
