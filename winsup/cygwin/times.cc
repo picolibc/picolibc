@@ -513,8 +513,10 @@ futimes (int fd, const struct timeval *tvp)
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     res = -1;
-  else
+  else if (cfd->get_access () & (FILE_WRITE_ATTRIBUTES | GENERIC_WRITE))
     res = cfd->utimes (tvp);
+  else
+    res = utimes_worker (cfd->get_win32_name (), tvp, 1);
   syscall_printf ("%d = futimes (%d, %p)", res, fd, tvp);
   return res;
 }
