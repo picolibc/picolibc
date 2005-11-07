@@ -1,3 +1,7 @@
+2005-11-06  John David Anglin  <dave.anglin@nrc-crnc.gc.ca>
+
+	* elf/hppa.h (R_PARISC_DIR64WR, R_PARISC_DIR64DR): Remove relocs.
+
 2005-11-03  Alan Modra  <amodra@bigpond.net.au>
 
 	* bfdlink.h (struct bfd_link_order): Tweak comment.

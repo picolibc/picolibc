@@ -309,12 +309,6 @@ RELOC_NUMBER (R_PARISC_PCREL16DF,     	79)
 RELOC_NUMBER (R_PARISC_DIR64,         	80)
 /*		64-bit doubleword          symbol + addend    		  */
 
-RELOC_NUMBER (R_PARISC_DIR64WR,       	81)
-/*		64-bit doubleword          RR(symbol, addend) 		  */
-
-RELOC_NUMBER (R_PARISC_DIR64DR,       	82)
-/*		64-bit doubleword          RR(symbol, addend) 		  */
-
 RELOC_NUMBER (R_PARISC_DIR14WR,       	83)
 /*		load/store mod. comp. (2)  RR(symbol, addend) 		  */
 
