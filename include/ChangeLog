@@ -1,3 +1,8 @@
+2005-11-07  Nathan Sidwell  <nathan@codesourcery.com>
+
+	Add ms2.
+	* elf/ms1.h (EF_MS1_CPU_MS2): New.
+
 2005-11-06  John David Anglin  <dave.anglin@nrc-crnc.gc.ca>
 
 	* elf/hppa.h (R_PARISC_DIR64WR, R_PARISC_DIR64DR): Remove relocs.
