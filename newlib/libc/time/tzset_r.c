@@ -11,11 +11,6 @@ static char __tzname_std[11];
 static char __tzname_dst[11];
 static char *prev_tzenv = NULL;
 
-/* default to GMT */
-char *_tzname[2] = {"GMT", "GMT"};
-int _daylight = 0;
-long _timezone = 0;
-
 _VOID
 _DEFUN (_tzset_r, (reent_ptr),
         struct _reent *reent_ptr)

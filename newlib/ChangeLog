@@ -1,3 +1,12 @@
+2005-11-08  Tom Walsh  <tom@openhardware.net>
+
+	* libc/time/tzvars.c: New file.
+	* libc/time/tzset_r.c: Moved globals into tzvars.c
+	so other time functions needn't link in __tzset_r and its
+	dependencies.
+	* libc/time/Makefile.am: Add the new file.
+	* libc/time/Makefile.in: Regenerated.
+
 2005-11-08  Christopher Faylor  <cgf@timesys.com>
 
 	* libc/include/string.h: Add cygwin-specific function declaration.
