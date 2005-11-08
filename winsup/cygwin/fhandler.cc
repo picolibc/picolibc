@@ -969,7 +969,7 @@ fhandler_base::readv (const struct iovec *const iov, const int iovcnt,
   if (!len)
     return 0;
 
-  char *buf = (char *) malloc (tot);
+  char *buf = (char *) malloc (len);
 
   if (!buf)
     {
@@ -982,11 +982,12 @@ fhandler_base::readv (const struct iovec *const iov, const int iovcnt,
 
   const struct iovec *iovptr = iov;
 
+  char *p = buf;
   while (nbytes > 0)
     {
       const int frag = min (nbytes, (ssize_t) iovptr->iov_len);
-      memcpy (iovptr->iov_base, buf, frag);
-      buf += frag;
+      memcpy (iovptr->iov_base, p, frag);
+      p += frag;
       iovptr += 1;
       nbytes -= frag;
     }
