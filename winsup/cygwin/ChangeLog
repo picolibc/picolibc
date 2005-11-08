@@ -3,7 +3,7 @@
 	* memmem.cc: New file.
 	* include/cygwin/version.h: Bump API version number to 142.
 	* cygwin.din: Export memmem.
-	* Makefile; Build memmem.o.
+	* Makefile.in: Build memmem.o.
 
 2005-11-08  Christopher Faylor  <cgf@timesys.com>
 
