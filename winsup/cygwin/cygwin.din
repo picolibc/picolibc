@@ -929,6 +929,7 @@ memmove NOSIGFE
 _memmove = memmove NOSIGFE
 mempcpy NOSIGFE
 __mempcpy = mempcpy NOSIGFE
+memmem NOSIGFE
 memset NOSIGFE
 _memset = memset NOSIGFE
 mkdir SIGFE

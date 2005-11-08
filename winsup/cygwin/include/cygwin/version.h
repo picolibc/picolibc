@@ -279,12 +279,13 @@ details. */
 	   IPPROTO_IP values.
       140: Export mlock, munlock.
       141: Export futimes, lutimes.
+      142: Export memmem
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 141
+#define CYGWIN_VERSION_API_MINOR 142
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
