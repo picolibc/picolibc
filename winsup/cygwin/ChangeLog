@@ -1,3 +1,8 @@
+2005-11-10  Christopher Faylor  <cgf@timesys.com>
+
+	* include/endian.h: Remove USE_BSD ifdef since it is never defined on
+	Cygwin.
+
 2005-11-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syslog.cc (setlogmask): Don't mask the mask.
