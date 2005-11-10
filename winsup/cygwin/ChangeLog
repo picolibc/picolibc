@@ -1,3 +1,8 @@
+2005-11-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syslog.cc (setlogmask): Don't mask the mask.
+	(vsyslog): Fix priority check.
+
 2005-11-09  Scott Finneran  <scottf@pacom.com>
 
 	* include/cygwin/signal.h: Add missing sigrelse prototype.

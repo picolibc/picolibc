@@ -79,7 +79,7 @@ setlogmask (int maskpri)
     return _my_tls.locals.process_logmask;
 
   int old_mask = _my_tls.locals.process_logmask;
-  _my_tls.locals.process_logmask = maskpri & LOG_PRIMASK;
+  _my_tls.locals.process_logmask = maskpri;
 
   return old_mask;
 }
@@ -263,7 +263,7 @@ vsyslog (int priority, const char *message, va_list ap)
 {
     debug_printf ("%x %s", priority, message);
     /* If the priority fails the current mask, reject */
-    if (((priority & LOG_PRIMASK) & _my_tls.locals.process_logmask) == 0)
+    if ((LOG_MASK (LOG_PRI (priority)) & _my_tls.locals.process_logmask) == 0)
       {
 	debug_printf ("failing message %x due to priority mask %x",
 		      priority, _my_tls.locals.process_logmask);
