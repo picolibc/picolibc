@@ -1,3 +1,7 @@
+2005-11-09  Scott Finneran  <scottf@pacom.com>
+
+	* include/cygwin/signal.h: Add missing sigrelse prototype.
+
 2005-11-08  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_base.cc (fhandler_base::readv): Free buf, not a pointer into
