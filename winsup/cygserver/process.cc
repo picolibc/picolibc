@@ -88,11 +88,10 @@ process::~process ()
 }
 
 /* No need to be thread-safe as this is only ever called by
- * process_cache::remove_process ().  If it has to be made thread-safe
- * later on, it should not use the `access' critical section as that
- * is held by the client request handlers for an arbitrary length of
- * time, i.e. while they do whatever processing is required for a
- * client request.
+ * process_cache::check_and_remove_process ().  If it has to be made
+ * thread-safe later on, it should not use the `access' critical section as
+ * that is held by the client request handlers for an arbitrary length of time,
+ * i.e. while they do whatever processing is required for a client request.
  */
 DWORD
 process::check_exit_code ()
@@ -200,10 +199,12 @@ process_cache::submission_loop::request_loop ()
 
 /*****************************************************************************/
 
-process_cache::process_cache (const unsigned int initial_workers)
+process_cache::process_cache (const size_t max_procs,
+			      const unsigned int initial_workers)
   : _queue (initial_workers),
     _submitter (this, &_queue),	// true == interruptible
     _processes_count (0),
+    _max_process_count (max_procs),
     _processes_head (NULL),
     _cache_add_trigger (NULL)
 {
@@ -211,7 +212,7 @@ process_cache::process_cache (const unsigned int initial_workers)
   InitializeCriticalSection (&_cache_write_access);
 
   _cache_add_trigger = CreateEvent (NULL,  // SECURITY_ATTRIBUTES
-				    FALSE, // Auto-reset
+				    TRUE,  // Manual-reset
 				    FALSE, // Initially non-signalled
 				    NULL); // Anonymous
 
@@ -251,13 +252,12 @@ process_cache::process (const pid_t cygpid, const DWORD winpid,
 
   if (!entry)
     {
-      if (_processes_count + SPECIALS_COUNT >= MAXIMUM_WAIT_OBJECTS)
+      if (_processes_count >= _max_process_count)
 	{
 	  LeaveCriticalSection (&_cache_write_access);
 	  system_printf (("process limit (%d processes) reached; "
 			  "new connection refused for %d(%lu)"),
-			 MAXIMUM_WAIT_OBJECTS - SPECIALS_COUNT,
-			 cygpid, winpid);
+			 _max_process_count, cygpid, winpid);
 	  return NULL;
 	}
 
@@ -291,40 +291,93 @@ process_cache::process (const pid_t cygpid, const DWORD winpid,
   return entry;
 }
 
+struct pcache_wait_t
+{
+  size_t index;
+  size_t count;
+  HANDLE *hdls;
+};
+
+static DWORD WINAPI
+pcache_wait_thread (const LPVOID param)
+{
+  pcache_wait_t *p = (pcache_wait_t *) param;
+
+  DWORD rc = WaitForMultipleObjects (p->count, p->hdls, FALSE, INFINITE);
+  ExitThread (rc == WAIT_FAILED ? rc : rc + p->index);
+}
+
 void
 process_cache::wait_for_processes (const HANDLE interrupt_event)
 {
   // Update `_wait_array' with handles of all current processes.
+  size_t idx;
   const size_t count = sync_wait_array (interrupt_event);
 
   debug_printf ("waiting on %u objects in total (%u processes)",
 		count, _processes_count);
 
-  const DWORD rc = WaitForMultipleObjects (count, _wait_array,
-					   FALSE, INFINITE);
+  DWORD rc = WAIT_FAILED;
 
-  if (rc == WAIT_FAILED)
+  if (count <= 64)
     {
-      system_printf ("could not wait on the process handles, error = %lu",
-		     GetLastError ());
-      abort ();
+      /* If count <= 64, a single WaitForMultipleObjects is sufficient and
+         we can simply wait in the main thread. */
+      rc = WaitForMultipleObjects (count, _wait_array, FALSE, INFINITE);
+      if (rc == WAIT_FAILED)
+	{
+	  system_printf ("could not wait on the process handles, error = %lu",
+			 GetLastError ());
+	  abort ();
+	}
+    }
+  else
+    {
+      /* If count > 64 we have to create sub-threads which wait for the
+         actual wait objects and the main thread waits for the termination
+	 of one of the threads. */
+      HANDLE main_wait_array[5] = { NULL };
+      DWORD mcount = 0;
+
+      for (idx = 0; idx < count; idx += 64)
+	{
+	  pcache_wait_t p = { idx, min (count - idx, 64), _wait_array + idx };
+	  main_wait_array[mcount++] = CreateThread (NULL, 0, pcache_wait_thread,
+						    &p, 0, NULL);
+	}
+
+      rc = WaitForMultipleObjects (mcount, main_wait_array, FALSE, INFINITE);
+      if (rc == WAIT_FAILED)
+	{
+	  system_printf ("could not wait on the process handles, error = %lu",
+			 GetLastError ());
+	  abort ();
+	}
+
+      /* Check for error condition on signalled sub-thread. */
+      GetExitCodeThread (main_wait_array[rc], &rc);
+      if (rc == WAIT_FAILED)
+	{
+	  system_printf ("could not wait on the process handles, error = %lu",
+			 GetLastError ());
+	  abort ();
+	}
+
+      /* Wake up all waiting threads.  _cache_add_trigger gets reset
+         in sync_wait_array again. */
+      SetEvent (_cache_add_trigger);
+      WaitForMultipleObjects (mcount, main_wait_array, TRUE, INFINITE);
+      for (idx = 0; idx < mcount; idx++)
+	CloseHandle (main_wait_array[idx]);
     }
 
-  const size_t start = rc - WAIT_OBJECT_0;
-
-  if (rc < WAIT_OBJECT_0 || start > count)
-    {
-      system_printf (("unexpected return code %rc "
-		      "from WaitForMultipleObjects: "
-		      "expected [%u .. %u)"),
-		     rc, WAIT_OBJECT_0, WAIT_OBJECT_0 + count);
-      abort ();
-    }
-
-  // Tell all the processes, from the signalled point up, the bad news.
-  for (size_t index = start; index != count; index++)
-    if (_process_array[index])
-      check_and_remove_process (index);
+  /* Tell all processes the bad news.  This one formerly only checked
+     processes beginning with the index of the signalled process, but
+     this can result in processes which are signalled but never removed
+     under heavy load conditions. */
+  for (idx = 0; idx < count; idx++)
+    if (_process_array[idx])
+      check_and_remove_process (idx);
 }
 
 /*
@@ -343,12 +396,12 @@ size_t
 process_cache::sync_wait_array (const HANDLE interrupt_event)
 {
   assert (this);
-  assert (_cache_add_trigger && _cache_add_trigger != INVALID_HANDLE_VALUE);
   assert (interrupt_event && interrupt_event != INVALID_HANDLE_VALUE);
 
-  EnterCriticalSection (&_cache_write_access);
+  /* Always reset _cache_add_trigger before filling up the array again. */
+  ResetEvent (_cache_add_trigger);
 
-  assert (_processes_count + SPECIALS_COUNT <= elements (_wait_array));
+  EnterCriticalSection (&_cache_write_access);
 
   size_t index = 0;
 
@@ -360,19 +413,24 @@ process_cache::sync_wait_array (const HANDLE interrupt_event)
       _wait_array[index] = ptr->handle ();
       _process_array[index++] = ptr;
 
-      assert (index <= elements (_wait_array));
+      if (!ptr->_next || index % 64 == 62)
+	{
+	  /* Added at the end of each thread's array part for efficiency. */
+	  _wait_array[index] = interrupt_event;
+	  _process_array[index++] = NULL;
+	  _wait_array[index] = _cache_add_trigger;
+	  _process_array[index++] = NULL;
+	}
     }
 
-  /* Sorry for shouting, but THESE MUST BE ADDED AT THE END! */
-  /* Well, not strictly `must', but it's more efficient if they are :-) */
-
-  _wait_array[index] = interrupt_event;
-  _process_array[index++] = NULL;
-
-  _wait_array[index] = _cache_add_trigger;
-  _process_array[index++] = NULL;
-
-  /* Phew, back to normal volume now. */
+  if (!index)
+    {
+      /* To get at least *something* to wait for. */
+      _wait_array[index] = interrupt_event;
+      _process_array[index++] = NULL;
+      _wait_array[index] = _cache_add_trigger;
+      _process_array[index++] = NULL;
+    }
 
   assert (index <= elements (_wait_array));
 

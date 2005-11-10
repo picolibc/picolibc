@@ -37,7 +37,7 @@ details. */
 
 #define DEF_CONFIG_FILE	"" SYSCONFDIR "/cygserver.conf"
 
-#define SERVER_VERSION	"1.12"
+#define SERVER_VERSION	"1.20"
 
 GENERIC_MAPPING access_mapping;
 
@@ -466,6 +466,7 @@ print_usage (const char *const pgm)
 "\n"
 "Performance options:\n"
 "  -c, --cleanup-threads <num>   Number of cleanup threads to use.\n"
+"  -p, --process-cache <num>     Size of process cache.\n"
 "  -r, --request-threads <num>   Number of request threads to use.\n"
 "\n"
 "Logging options:\n"
@@ -534,6 +535,7 @@ main (const int argc, char *argv[])
     {"help", no_argument, NULL, 'h'},
     {"log-level", required_argument, NULL, 'l'},
     {"no-sharedmem", no_argument, NULL, 'm'},
+    {"process-cache", required_argument, NULL, 'p'},
     {"no-msgqueues", no_argument, NULL, 'q'},
     {"request-threads", required_argument, NULL, 'r'},
     {"no-semaphores", no_argument, NULL, 's'},
@@ -544,10 +546,11 @@ main (const int argc, char *argv[])
     {0, no_argument, NULL, 0}
   };
 
-  const char opts[] = "c:deEf:hl:mqr:sSvyY";
+  const char opts[] = "c:deEf:hl:mp:qr:sSvyY";
 
   long cleanup_threads = 0;
   long request_threads = 0;
+  long process_cache_size = 0;
   bool shutdown = false;
   const char *config_file = DEF_CONFIG_FILE;
   bool force_config_file = false;
@@ -568,6 +571,7 @@ main (const int argc, char *argv[])
   int opt;
 
   wincap.init ();
+  securityinit ();
 
   opterr = 0;
   while ((opt = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
@@ -576,8 +580,8 @@ main (const int argc, char *argv[])
       case 'c':
 	c = NULL;
 	cleanup_threads = strtol (optarg, &c, 10);
-	if (cleanup_threads <= 0 || cleanup_threads > 16 || (c && *c))
-	  panic ("Number of cleanup threads must be between 1 and 16");
+	if (cleanup_threads <= 0 || cleanup_threads > 32 || (c && *c))
+	  panic ("Number of cleanup threads must be between 1 and 32");
 	break;
 
       case 'd':
@@ -612,6 +616,13 @@ main (const int argc, char *argv[])
         support_sharedmem = TUN_FALSE;
 	break;
 
+      case 'p':
+	c = NULL;
+	process_cache_size = strtol (optarg, &c, 10);
+	if (process_cache_size <= 0 || process_cache_size > 310 || (c && *c))
+	  panic ("Size of process cache must be between 1 and 310");
+        break;
+
       case 'q':
         support_msgqueues = TUN_FALSE;
 	break;
@@ -619,8 +630,8 @@ main (const int argc, char *argv[])
       case 'r':
 	c = NULL;
 	request_threads = strtol (optarg, &c, 10);
-	if (request_threads <= 0 || request_threads > 64 || (c && *c))
-	  panic ("Number of request threads must be between 1 and 64");
+	if (request_threads <= 0 || request_threads > 310 || (c && *c))
+	  panic ("Number of request threads must be between 1 and 310");
 	break;
 
       case 's':
@@ -688,6 +699,11 @@ main (const int argc, char *argv[])
   if (!request_threads)
     request_threads = 10;
 
+  if (!process_cache_size)
+    TUNABLE_INT_FETCH ("kern.srv.process_cache_size", &process_cache_size);
+  if (!process_cache_size)
+    process_cache_size = 62;
+
   if (support_sharedmem == TUN_UNDEF)
     TUNABLE_BOOL_FETCH ("kern.srv.sharedmem", &support_sharedmem);
   if (support_sharedmem == TUN_UNDEF)
@@ -714,7 +730,7 @@ main (const int argc, char *argv[])
   transport_layer_base *const transport = create_server_transport ();
   assert (transport);
 
-  process_cache cache (cleanup_threads);
+  process_cache cache (process_cache_size, cleanup_threads);
 
   server_submission_loop submission_loop (&request_queue, transport, &cache);
 

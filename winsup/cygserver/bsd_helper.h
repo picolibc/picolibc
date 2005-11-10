@@ -37,6 +37,8 @@ extern tun_bool_t support_semaphores;
 
 extern SECURITY_ATTRIBUTES sec_all_nih;
 
+void securityinit (void);
+
 int win_copyin (struct thread *, const void *, void *, size_t);
 int win_copyout (struct thread *, const void *, void *, size_t);
 #define copyin(a,b,c) win_copyin((td),(a),(b),(c))

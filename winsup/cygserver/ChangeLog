@@ -1,6 +1,47 @@
 2005-11-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* bsd_helper.cc (securityinit): New function.  Move initialization
+	of security related variables from ipcinit here.
+	* bsd_helper.h (securityinit): Add prototype.
+	* cygserver.cc (main): Call securityinit right after wincap.init.
+
+2005-11-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* bsd_log.cc (_vpanic): LOG_EMERG is overkill, use LOG_CRIT.
+
+2005-11-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* process.cc (process_cache::process): Fix maximum process condition.
+
+2005-10-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* README: Add description for new -p/--process-cache option.
+	* bsd_helper.cc (default_tun_check): Add kern.srv.process_cache_size
+	entry to tunable_params. Set max value of kern.srv.request_threads
+	to 310.
+	* cygserver.cc (SERVER_VERSION): Set to 1.20.
+	(print_usage): Print usage of new parameter -p.
+	(main): Add process cache parameter handling. Accomodate new max
+	value of request threads.
+	* cygserver.conf: Add kern.srv.process_cache_size tunable parameter.
+	Accomodate new max value of kern.srv.request_threads.
+	* process.cc: Fix a comment.
+	(process_cache::process_cache): Add max process cache size parameter.
+	Change _cache_add_trigger to manual reset event.
+	(struct pcache_wait_t): New struct used as parameter to
+	pcache_wait_thread.
+	(pcache_wait_thread): New thread function used for threaded process
+	cache.
+	(process_cache::wait_for_processes): Use threaded waiting if number
+	of processes to wait for is bigger than 62. Always check all processes
+	to avoid race under heavy load.
+	(process_cache::sync_wait_array): Remove useless assert. Reset
+	_cache_add_trigger right at the start since it's manual reset now.
+	Accomodate threaded waiting.
+	* process.h (process_cache::process_cache): Add max_procs parameter.
+	(process_cache::_max_process_count): New member.
+	(process_cache::_wait_array: Raise to allow up to 5 wait threads.
+	(process_cache::_process_array): Ditto.
 
 2005-08-08  Christopher Faylor  <cgf@timesys.com>
 

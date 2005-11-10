@@ -1,6 +1,6 @@
 /* process.h
 
-   Copyright 2001, 2002, 2003, 2004 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004, 2005 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -141,7 +141,7 @@ class process_cache
   friend class submission_loop;
 
 public:
-  process_cache (unsigned int initial_workers);
+  process_cache (const size_t max_procs, const unsigned int initial_workers);
   ~process_cache ();
 
   class process *process (pid_t cygpid, DWORD winpid,
@@ -157,13 +157,14 @@ private:
   submission_loop _submitter;
 
   size_t _processes_count;
+  size_t _max_process_count;
   class process *_processes_head; // A list sorted by winpid.
 
   // Access to the _wait_array and related fields is not thread-safe,
   // since they are used solely by wait_for_processes () and its callees.
 
-  HANDLE _wait_array[MAXIMUM_WAIT_OBJECTS];
-  class process *_process_array[MAXIMUM_WAIT_OBJECTS];
+  HANDLE _wait_array[5 * MAXIMUM_WAIT_OBJECTS];
+  class process *_process_array[5 * MAXIMUM_WAIT_OBJECTS];
 
   HANDLE _cache_add_trigger;	// Actually both add and remove.
   CRITICAL_SECTION _cache_write_access; // Actually both read and write access.

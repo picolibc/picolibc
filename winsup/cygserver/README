@@ -51,6 +51,27 @@ Cygserver command line options:
     under heavy load conditions or on slow machines.
     Configuration file option:  kern.srv.request_threads
 
+  -p, --process-cache <num>
+
+    Number of processes which can connect concurrently to cygserver.
+    Default is 62.  Each process connected to cygserver is a synchronization
+    object which has to be maintained.  The data structure to maintain these
+    processes is the so-called "process cache".  In theory, an arbitrary
+    number of processes could connect to cygserver, but due to the need to
+    synchronize, the higher the number of connected processes, the more
+    synchronization overhead exists.  By using this option, you can set an
+    upper limit to the synchronization effort.  If more than 62 processes
+    try to connect to cygserver concurrently, two additional synchronization
+    threads are necessary, and one for each further 62 concurrent
+    processes.  So, useful values for the --process-cache option are 62, 124,
+    186, 248, 310.  310 is the maximum value.
+    Configuration file option:  kern.srv.process_cache_size
+
+    NOTE:  The number of child processes of a single parent process is limited
+    to 256.  So in case of taking advantage of a process cache size beyond 256,
+    keep in mind that not all of these processes can be child processes of one
+    single parent process.
+
   -d, --debug
   
     Log debug messages to stderr.  These will clutter your stderr output with

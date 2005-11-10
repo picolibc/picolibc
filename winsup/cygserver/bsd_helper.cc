@@ -248,6 +248,14 @@ SECURITY_ATTRIBUTES sec_all_nih = { sizeof (SECURITY_ATTRIBUTES),
 				    &sec_all_nih_sd,
 				    FALSE };
 
+void
+securityinit ()
+{
+  InitializeSecurityDescriptor (&sec_all_nih_sd, SECURITY_DESCRIPTOR_REVISION);
+  SetSecurityDescriptorDacl (&sec_all_nih_sd, TRUE, 0, FALSE);
+  init_admin_sid ();
+}
+
 /* Global vars, determining whether the IPC stuff should be started or not. */
 tun_bool_t support_sharedmem = TUN_UNDEF;
 tun_bool_t support_msgqueues = TUN_UNDEF;
@@ -256,10 +264,6 @@ tun_bool_t support_semaphores = TUN_UNDEF;
 void
 ipcinit ()
 {
-  InitializeSecurityDescriptor (&sec_all_nih_sd, SECURITY_DESCRIPTOR_REVISION);
-  SetSecurityDescriptorDacl (&sec_all_nih_sd, TRUE, 0, FALSE);
-
-  init_admin_sid ();
   mtx_init (&Giant, "Giant", NULL, MTX_DEF);
   msleep_init ();
   ipcexit_event = CreateEvent (NULL, TRUE, FALSE, NULL);
@@ -553,8 +557,9 @@ default_tun_check (tun_struct *that, char *value, const char *fname)
 static tun_struct tunable_params[] =
 {
   /* SRV */
-  { "kern.srv.cleanup_threads", TUN_INT, {0}, {1}, {16}, default_tun_check},
-  { "kern.srv.request_threads", TUN_INT, {0}, {1}, {64}, default_tun_check},
+  { "kern.srv.cleanup_threads", TUN_INT, {0}, {1}, {32}, default_tun_check},
+  { "kern.srv.request_threads", TUN_INT, {0}, {1}, {310}, default_tun_check},
+  { "kern.srv.process_cache_size", TUN_INT, {0}, {1}, {310}, default_tun_check},
   { "kern.srv.sharedmem", TUN_BOOL, {TUN_UNDEF}, {TUN_FALSE}, {TUN_TRUE}, default_tun_check},
   { "kern.srv.msgqueues", TUN_BOOL, {TUN_UNDEF}, {TUN_FALSE}, {TUN_TRUE}, default_tun_check},
   { "kern.srv.semaphores", TUN_BOOL, {TUN_UNDEF}, {TUN_FALSE}, {TUN_TRUE}, default_tun_check},
