@@ -1,3 +1,7 @@
+2005-11-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_log.cc (_vpanic): LOG_EMERG is overkill, use LOG_CRIT.
+
 2005-08-08  Christopher Faylor  <cgf@timesys.com>
 
 	* cygserver.cc (main): Call wincap.init() earlier to avoid a NULL

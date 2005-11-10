@@ -81,7 +81,7 @@ _log (const char *file, int line, int level, const char *fmt, ...)
 void
 _vpanic (const char *file, int line, const char *fmt, va_list ap)
 {
-  _vlog (file, line, LOG_EMERG, fmt, ap);
+  _vlog (file, line, LOG_CRIT, fmt, ap);
   exit (1);
 }
 
