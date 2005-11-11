@@ -300,7 +300,6 @@ struct init_cygheap
   pid_t pid;			/* my pid */
   HANDLE pid_handle;		/* handle for my pid */
   hook_chain hooks;
-  hires_ms _gtod;
   void close_ctty ();
 };
 

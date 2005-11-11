@@ -41,15 +41,12 @@ class hires_ms : hires_base
 {
   DWORD initime_ms;
   LARGE_INTEGER initime_us;
-  UINT minperiod;
-  static bool began_period;
-  UINT prime ();
+  void prime ();
  public:
-  LONGLONG usecs (bool justdelta);
+  LONGLONG usecs ();
   UINT dmsecs () { return timeGetTime (); }
-  UINT resolution () { return minperiod ?: prime (); }
-
+  UINT resolution ();
 };
 
-#define gtod cygheap->_gtod
+extern hires_ms gtod;
 #endif /*__HIRES_H__*/

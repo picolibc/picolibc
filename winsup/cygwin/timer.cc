@@ -133,7 +133,7 @@ timer_thread (VOID *x)
       long sleep_ms;
       /* Account for delays in starting thread
 	and sending the signal */
-      now = gtod.usecs (false);
+      now = gtod.usecs ();
       sleep_us = sleepto_us - now;
       if (sleep_us > 0)
 	{
@@ -226,7 +226,7 @@ timer_tracker::settime (int in_flags, const itimerspec *value, itimerspec *ovalu
       || it_bad (value->it_interval))
     return -1;
 
-  long long now = in_flags & TIMER_ABSTIME ? 0 : gtod.usecs (false);
+  long long now = in_flags & TIMER_ABSTIME ? 0 : gtod.usecs ();
 
   lock_timer_tracker here;
   cancel ();
@@ -263,7 +263,7 @@ timer_tracker::gettime (itimerspec *ovalue)
   else
     {
       ovalue->it_interval = it_interval;
-      long long now = gtod.usecs (false);
+      long long now = gtod.usecs ();
       long long left_us = sleepto_us - now;
       if (left_us < 0)
        left_us = 0;

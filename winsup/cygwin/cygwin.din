@@ -254,6 +254,8 @@ _clearerr = clearerr NOSIGFE
 clock SIGFE
 _clock = clock SIGFE
 clock_gettime SIGFE
+clock_getres SIGFE
+clock_setres SIGFE
 close SIGFE
 _close = close SIGFE
 closedir SIGFE

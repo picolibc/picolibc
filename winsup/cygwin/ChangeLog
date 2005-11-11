@@ -1,3 +1,27 @@
+2005-11-11  Christopher Faylor  <cgf@timesys.com>
+
+	* cygheap.h (init_cygheap::_gtod): Remove.
+	* cygwin.din: Export clock_getres and clock_setres.
+	* hires.h (hires_ms::minperiod): Delete declaration.
+	(hires_ms::began_period): Ditto.
+	(hires_ms::prime): Make void.
+	(hires_ms::resolution): Just define here.
+	(hires_ms::usecs): Remove unneeded argument.
+	(gtod): Redeclare as a variable.
+	* timer.cc (timer_thread): Eliminate argument to gtod.usecs().
+	(timer_tracker::gettime): Ditto.
+	(timer_tracker::settime): Ditto.
+	* times.cc (gettimeofday): Ditto.
+	(hires_ms::began_period): Delete declaration.
+	(hires_us::prime): Remove debugging.
+	(hires_ms::prime): Make void.  Eliminate period stuff.
+	(hires_ms::usecs): Eliminate argument to gtod.usecs().
+	(hires_ms::resolution): New function.
+	(clock_getres): Ditto.
+	(clock_setres): Ditto.
+	* version.h: Bump API version to 143.
+	* include/cygwin/time.h: New file.
+
 2005-11-10  Christopher Faylor  <cgf@timesys.com>
 
 	* times.cc (hires_ms::prime): Comment out call to timeBeginPeriod for

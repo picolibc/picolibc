@@ -144,17 +144,14 @@ totimeval (struct timeval *dst, FILETIME *src, int sub, int flag)
   dst->tv_sec = x / (long long) (1e6);
 }
 
-bool NO_COPY hires_ms::began_period;	/* minperiod needs to be NO_COPY since it
-					   is a trigger for setting timeBeginPeriod
-					   which needs to be set once for every
-					   program. */
+hires_ms NO_COPY gtod;
 
 /* FIXME: Make thread safe */
 extern "C" int
 gettimeofday (struct timeval *tv, struct timezone *tz)
 {
   static bool tzflag;
-  LONGLONG now = gtod.usecs (false);
+  LONGLONG now = gtod.usecs ();
 
   if (now == (LONGLONG) -1)
     return -1;
@@ -566,35 +563,25 @@ void
 hires_us::prime ()
 {
   LARGE_INTEGER ifreq;
-stupid_printf ("before QueryPerformanceFrequency"); // DELETEME
   if (!QueryPerformanceFrequency (&ifreq))
     {
-stupid_printf ("QueryPerformanceFrequency failed"); // DELETEME
       inited = -1;
       return;
     }
-stupid_printf ("after QueryPerformanceFrequency"); // DELETEME
 
   FILETIME f;
   int priority = GetThreadPriority (GetCurrentThread ());
 
-stupid_printf ("before SetThreadPriority(THREAD_PRIORITY_TIME_CRITICAL)"); // DELETEME
   SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
-stupid_printf ("after SetThreadPriority(THREAD_PRIORITY_TIME_CRITICAL)"); // DELETEME
   if (!QueryPerformanceCounter (&primed_pc))
     {
-stupid_printf ("QueryPerformanceCounter failed, %E");
       SetThreadPriority (GetCurrentThread (), priority);
-stupid_printf ("After failing SetThreadPriority");
       inited = -1;
       return;
     }
-stupid_printf ("after QueryPerformanceCounter"); // DELETEME
 
   GetSystemTimeAsFileTime (&f);
-stupid_printf ("after GetSystemTimeAsFileTime"); // DELETEME
   SetThreadPriority (GetCurrentThread (), priority);
-stupid_printf ("after SetThreadPriority(%d)", priority); // DELETEME
 
   inited = 1;
   primed_ft.HighPart = f.dwHighDateTime;
@@ -628,36 +615,12 @@ hires_us::usecs (bool justdelta)
   return res;
 }
 
-UINT
+void
 hires_ms::prime ()
 {
-  TIMECAPS tc;
-  FILETIME f;
-
-stupid_printf ("entering, minperiod %d, began_period %d", minperiod, began_period);
-  if (minperiod)
-    /* done previously */;
-  else if (timeGetDevCaps (&tc, sizeof (tc)) != TIMERR_NOERROR)
-{stupid_printf ("timeGetDevCaps failed, %E");
-    minperiod = 1;
-}
-  else
-{
-    minperiod = min (max (tc.wPeriodMin, 1), tc.wPeriodMax);
-stupid_printf ("timeGetDevCaps succeeded.  tc.wPeriodMin %u, tc.wPeriodMax %u, minperiod %u", tc.wPeriodMin, tc.wPeriodMax, minperiod); }
-stupid_printf ("inited %d, minperiod %u, began_period %d", minperiod, began_period);
-
-  if (!began_period)
-    {
-#if 0
-      timeBeginPeriod (minperiod);
-#endif
-      began_period = true;
-stupid_printf ("timeBeginPeriod called");
-    }
-
   if (!inited)
     {
+      FILETIME f;
       int priority = GetThreadPriority (GetCurrentThread ());
 stupid_printf ("priority %d", priority);
       SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
@@ -676,14 +639,14 @@ stupid_printf ("SetThreadPriority(%p, %d)", GetCurrentThread(), priority);
       initime_us.QuadPart /= 10;
     }
 stupid_printf ("returning");
-  return minperiod;
+  return;
 }
 
 LONGLONG
-hires_ms::usecs (bool justdelta)
+hires_ms::usecs ()
 {
-stupid_printf ("before call to prime(), minperiod %u, process priority %d", minperiod, GetThreadPriority (GetCurrentThread ()));
-  if (!inited || !began_period) /* NO_COPY variable */
+stupid_printf ("before call to prime(), process priority %d", GetThreadPriority (GetCurrentThread ()));
+  if (!inited)
     prime ();
 stupid_printf ("after call to prime(), process priority %d", GetThreadPriority (GetCurrentThread ()));
 
@@ -711,11 +674,87 @@ clock_gettime (clockid_t clk_id, struct timespec *tp)
       return -1;
     }
 
-  LONGLONG now = gtod.usecs (false);
+  LONGLONG now = gtod.usecs ();
   if (now == (LONGLONG) -1)
     return -1;
 
   tp->tv_sec = now / 1000000;
   tp->tv_nsec = (now % 1000000) * 1000;
+  return 0;
+}
+
+static DWORD minperiod;	// FIXME: Maintain period after a fork.
+
+UINT
+hires_ms::resolution ()
+{
+  if (!minperiod)
+    {
+      /* Try to empirically determine current timer resolution */
+      int priority = GetThreadPriority (GetCurrentThread ());
+      SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
+      DWORD period = 0;
+      for (int i = 0; i < 4; i++)
+	{
+	  DWORD now;
+	  DWORD then = timeGetTime ();
+	  while ((now = timeGetTime ()) == then)
+	    continue;
+	  then = now;
+	  while ((now = timeGetTime ()) == then)
+	    continue;
+	  period += now - then;
+	}
+      SetThreadPriority (GetCurrentThread (), priority);
+      period /= 4;
+      minperiod = period;
+    }
+  return minperiod;
+}
+
+extern "C" int
+clock_getres (clockid_t clk_id, struct timespec *tp)
+{
+  if (clk_id != CLOCK_REALTIME)
+    {
+      set_errno (ENOSYS);
+      return -1;
+    }
+
+  DWORD period = gtod.resolution ();
+
+  tp->tv_sec = period / 1000000;
+  tp->tv_nsec = (period % 1000000) * 1000;
+
+  return 0;
+}
+
+extern "C" int
+clock_setres (clockid_t clk_id, struct timespec *tp)
+{
+  static NO_COPY bool period_set;
+  if (clk_id != CLOCK_REALTIME)
+    {
+      set_errno (ENOSYS);
+      return -1;
+    }
+
+  if (period_set)
+    timeEndPeriod (minperiod);
+
+  DWORD period = (tp->tv_sec * 1000) + ((tp->tv_nsec) / 1000);
+
+  if (timeBeginPeriod (period))
+    {
+      minperiod = period;
+      period_set = true;
+    }
+  else
+    {
+      __seterrno ();
+      timeBeginPeriod (minperiod);
+      return -1;
+    }
+
   return 0;
 }
