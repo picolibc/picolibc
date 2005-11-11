@@ -649,7 +649,9 @@ stupid_printf ("inited %d, minperiod %u, began_period %d", minperiod, began_peri
 
   if (!began_period)
     {
+#if 0
       timeBeginPeriod (minperiod);
+#endif
       began_period = true;
 stupid_printf ("timeBeginPeriod called");
     }
@@ -681,7 +683,7 @@ LONGLONG
 hires_ms::usecs (bool justdelta)
 {
 stupid_printf ("before call to prime(), minperiod %u, process priority %d", minperiod, GetThreadPriority (GetCurrentThread ()));
-  if (!minperiod) /* NO_COPY variable */
+  if (!inited || !began_period) /* NO_COPY variable */
     prime ();
 stupid_printf ("after call to prime(), process priority %d", GetThreadPriority (GetCurrentThread ()));
 

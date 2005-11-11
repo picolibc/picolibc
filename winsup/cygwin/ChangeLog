@@ -1,5 +1,13 @@
 2005-11-10  Christopher Faylor  <cgf@timesys.com>
 
+	* times.cc (hires_ms::prime): Comment out call to timeBeginPeriod for
+	now.
+	(hires_ms::usecs): Call prime if haven't called began_period().
+
+	* param.h: Don't define stuff that is already defined in endian.h.
+
+2005-11-10  Christopher Faylor  <cgf@timesys.com>
+
 	* include/endian.h: Remove USE_BSD ifdef since it is never defined on
 	Cygwin.
 
