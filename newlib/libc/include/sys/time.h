@@ -24,7 +24,7 @@ struct timezone {
 };
 
 #ifdef __CYGWIN__
-#include <sys/select.h>
+#include <cygwin/time.h>
 #endif /* __CYGWIN__ */
 
 #endif /* _WINSOCK_H */

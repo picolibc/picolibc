@@ -1,3 +1,8 @@
+2005-11-11  Christopher Faylor  <cgf@timesys.com>
+
+	* libc/include/sys/time.h: For cygwin, use general header rather than
+	specific "sys/select.h".
+
 2005-11-08  Tom Walsh  <tom@openhardware.net>
 
 	* libc/time/tzvars.c: New file.
