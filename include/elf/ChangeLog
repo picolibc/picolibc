@@ -1,3 +1,9 @@
+2005-11-11  Nick Clifton  <nickc@redhat.com>
+
+	PR 1150
+	* mips.h (STO_OPTIONAL): Define.
+	(ELF_MIPS_IS_OPTIONAL): Define.
+
 2005-09-30  Catherine Moore  <clm@cm00re.com>
 
 	* bfin.h: New file.

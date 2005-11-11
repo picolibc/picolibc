@@ -718,6 +718,13 @@ extern void bfd_mips_elf32_swap_reginfo_out
 
 /* This value is used for a mips16 .text symbol.  */
 #define STO_MIPS16		0xf0
+
+/* This bit is used on Irix to indicate a symbol whose definition
+   is optional - if, at final link time, it cannot be found, no
+   error message should be produced.  */
+#define STO_OPTIONAL		(1 << 2)
+/* A macro to examine the STO_OPTIONAL bit.  */
+#define ELF_MIPS_IS_OPTIONAL(other)	((other) & STO_OPTIONAL)
 
 /* The 64-bit MIPS ELF ABI uses an unusual reloc format.  Each
    relocation entry specifies up to three actual relocations, all at
