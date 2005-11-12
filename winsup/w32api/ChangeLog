@@ -1,3 +1,9 @@
+2005-11-12  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wingdi.h (GetICMProfileA): Correct prototype.
+	(GetICMProfileW): Likewise.
+	Thanks to: Paul J Lucas
+
 2005-11-04  Michael Jung  <mjung@iss.tu-darmstadt.de> 
 
 	* lib/shell32.c (CLSID_ShellFSFolder): Add GUID.
