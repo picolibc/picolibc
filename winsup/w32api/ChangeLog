@@ -1,5 +1,12 @@
 2005-11-12  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/commdlg.h (OPENFILENAMEW): Add members for
+	_WIN32_WINNT >= 0x0500.
+	Thanks to Ricardo Dalcorsso Fodra.
+	(OPENFILENAMEA): Modify whitespace. Ansify comment.
+
+2005-11-12  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/wingdi.h (GetICMProfileA): Correct prototype.
 	(GetICMProfileW): Likewise.
 	Thanks to: Paul J Lucas

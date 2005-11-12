@@ -337,10 +337,10 @@ typedef struct tagOFNA {
 	LPOFNHOOKPROC lpfnHook;
 	LPCSTR lpTemplateName;
 #if (_WIN32_WINNT >= 0x0500)
-    void * pvReserved;
-    DWORD dwReserved;
-    DWORD FlagsEx;
-#endif // (_WIN32_WINNT >= 0x0500)
+	void * pvReserved;
+	DWORD dwReserved;
+	DWORD FlagsEx;
+#endif /* (_WIN32_WINNT >= 0x0500) */
 } OPENFILENAMEA,*LPOPENFILENAMEA;
 typedef struct tagOFNW {
 	DWORD lStructSize;
@@ -363,6 +363,11 @@ typedef struct tagOFNW {
 	DWORD lCustData;
 	LPOFNHOOKPROC lpfnHook;
 	LPCWSTR lpTemplateName;
+#if (_WIN32_WINNT >= 0x0500)
+	void * pvReserved;
+	DWORD dwReserved;
+	DWORD FlagsEx;
+#endif /* (_WIN32_WINNT >= 0x0500) */
 } OPENFILENAMEW,*LPOPENFILENAMEW;
 typedef struct _OFNOTIFYA {
 	NMHDR hdr;
