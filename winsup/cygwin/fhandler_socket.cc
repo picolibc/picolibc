@@ -1061,6 +1061,11 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
       if (WSAGetLastError () == WSAEMSGSIZE)
 	return len;
 
+      /* ESHUTDOWN isn't defined for recv in SUSv3.  Simply EOF is returned
+         in this case. */
+      if (WSAGetLastError () == WSAESHUTDOWN)
+        return 0;
+
       set_winsock_errno ();
     }
   else
@@ -1141,6 +1146,11 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
 	 condition is returned. */
       if (WSAGetLastError () == WSAEMSGSIZE)
 	return len;
+
+      /* ESHUTDOWN isn't defined for recv in SUSv3.  Simply EOF is returned
+         in this case. */
+      if (WSAGetLastError () == WSAESHUTDOWN)
+        return 0;
 
       set_winsock_errno ();
     }

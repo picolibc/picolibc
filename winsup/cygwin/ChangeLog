@@ -1,3 +1,10 @@
+2005-11-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::recvfrom): Just return 0 (EOF)
+	in case of WSAESHUTDOWN.
+	(fhandler_socket::recvmsg): Ditto.
+	* poll.cc (poll): Set revents to POLLIN instead of POLLHUP. Add comment.
+
 2005-11-11  Christopher Faylor  <cgf@timesys.com>
 
 	* cygheap.h (init_cygheap::_gtod): Remove.

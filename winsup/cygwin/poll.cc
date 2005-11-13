@@ -118,8 +118,11 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
 			      else
 				fds[i].revents |= POLLIN;
 			      break;
-			    case 0:  /* Closed on the read side. */
-			      fds[i].revents |= POLLHUP;
+			    case 0:  /* Closed on the read side... */
+			      /* ...or shutdown(SHUT_WR) on the write side.
+			         We set revents to POLLHUP until 1.5.18, but
+				 this is semantically borderline. */
+			      fds[i].revents |= POLLIN;
 			      break;
 			    default:
 			      fds[i].revents |= POLLIN;
