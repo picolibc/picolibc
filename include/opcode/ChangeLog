@@ -1,3 +1,9 @@
+2005-11-14  David Ung  <davidu@mips.com>
+
+	* mips.h: Assign 'm'/'M' codes to MIPS16e save/restore
+	instructions.  Define MIPS16_ALL_ARGS and MIPS16_ALL_STATICS for
+	save/restore encoding of the args field.
+
 2005-10-28  Dave Brolley  <brolley@redhat.com>
 
 	Contribute the following changes:
