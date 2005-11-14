@@ -1,3 +1,7 @@
+2005-11-14  Christopher Faylor  <cgf@timesys.com>
+
+	* include/sys/elf64.h: Fix types to reflect linux usage.
+
 2005-11-14  Corinna Vinschen  <corinna@vinschen.de>
 	    Christopher Faylor  <cgf@timesys.com>
 
