@@ -119,6 +119,7 @@ public:
   bool alert_parent (char);
   int __stdcall kill (siginfo_t&) __attribute__ ((regparm (2)));
   bool __stdcall exists () __attribute__ ((regparm (1)));
+  const char *_ctty (char *);
 
   friend void __stdcall set_myself (HANDLE);
 
@@ -239,6 +240,9 @@ extern pinfo myself;
 
 #define _P_VFORK 0
 #define _P_SYSTEM 512
+
+#define __ctty() _ctty ((char *) alloca (sizeof ("ctty /dev/tty") + 20))
+#define myctty() myself->__ctty ()
 
 /* For mmaps across fork(). */
 int __stdcall fixup_mmaps_after_fork (HANDLE parent);

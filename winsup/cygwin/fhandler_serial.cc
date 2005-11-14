@@ -1064,8 +1064,9 @@ fhandler_serial::fixup_after_fork (HANDLE parent)
 void
 fhandler_serial::fixup_after_exec ()
 {
-  overlapped_setup ();
-  debug_printf ("io_status.hEvent %p", io_status.hEvent);
+  if (!close_on_exec ())
+    overlapped_setup ();
+  debug_printf ("io_status.hEvent %p, close_on_exec %d", io_status.hEvent, close_on_exec ());
 }
 
 int

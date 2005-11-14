@@ -678,8 +678,7 @@ fhandler_console::open (int flags, mode_t)
 
   tc->rstcons (false);
   set_open_status ();
-  cygheap->open_fhs++;
-  debug_printf ("incremented open_fhs, now %d", cygheap->open_fhs);
+  cygheap->manage_console_count ("fhandler_console::open", 1);
   debug_printf ("opened conin$ %p, conout$ %p", get_io_handle (),
 		get_output_handle ());
 
@@ -691,12 +690,8 @@ fhandler_console::close ()
 {
   CloseHandle (get_io_handle ());
   CloseHandle (get_output_handle ());
-  if (!hExeced && --(cygheap->open_fhs) <= 0 && myself->ctty != TTY_CONSOLE)
-    {
-      syscall_printf ("open_fhs %d", cygheap->open_fhs);
-      FreeConsole ();
-    }
-  debug_printf ("decremented open_fhs, now %d", cygheap->open_fhs);
+  if (!hExeced)
+    cygheap->manage_console_count ("fhandler_console::close", -1);
   return 0;
 }
 
@@ -1771,9 +1766,12 @@ fhandler_console::fixup_after_fork (HANDLE)
   /* Windows does not allow duplication of console handles between processes
      so open the console explicitly. */
 
-  cygheap->open_fhs--;		/* The downside of storing this in cygheap. */
   if (!open (O_NOCTTY | get_flags (), 0))
     system_printf ("error opening console after fork, %E");
+
+  /* Need to decrement console_count since this open is basically a no-op to reopen
+     the console and we've already recorded that fact. */
+  cygheap->manage_console_count ("fhandler_console::fixup_after_fork", -1);
 
   if (!close_on_exec ())
     {
@@ -1802,8 +1800,9 @@ fhandler_console::fixup_after_exec ()
   HANDLE h = get_handle ();
   HANDLE oh = get_output_handle ();
 
-  cygheap->open_fhs--;		/* The downside of storing this in cygheap. */
-  if (!open (O_NOCTTY | get_flags (), 0))
+  if (close_on_exec () || open (O_NOCTTY | get_flags (), 0))
+    cygheap->manage_console_count ("fhandler_console::fixup_after_exec", -1);
+  else
     {
       bool sawerr = false;
       if (!get_io_handle ())
@@ -1821,6 +1820,9 @@ fhandler_console::fixup_after_exec ()
 	system_printf ("error opening console after exec, errno %d, %E", get_errno ());
     }
 
-  CloseHandle (h);
-  CloseHandle (oh);
+  if (!close_on_exec ())
+    {
+      CloseHandle (h);
+      CloseHandle (oh);
+    }
 }

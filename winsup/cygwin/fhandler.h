@@ -1261,10 +1261,9 @@ struct fhandler_nodevice: public fhandler_base
   // int __stdcall fstat (struct __stat64 *buf, path_conv *);
 };
 
-#define report_tty_counts(fh, call, fhs_op, use_op) \
-  termios_printf ("%s %s, %sopen_fhs %d, %susecount %d",\
+#define report_tty_counts(fh, call, use_op) \
+  termios_printf ("%s %s, %susecount %d",\
 		  fh->ttyname (), call,\
-		  fhs_op, cygheap->open_fhs,\
 		  use_op, ((fhandler_tty_slave *) fh)->archetype->usecount);
 
 typedef union

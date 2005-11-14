@@ -1361,11 +1361,14 @@ fhandler_dev_dsp::fixup_after_fork (HANDLE parent)
 void
 fhandler_dev_dsp::fixup_after_exec ()
 {
-  debug_printf ("audio_in=%08x audio_out=%08x",
-		(int)audio_in_, (int)audio_out_);
-  if (archetype != this)
-    return ((fhandler_dev_dsp *)archetype)->fixup_after_exec ();
+  debug_printf ("audio_in=%08x audio_out=%08x, close_on_exec %d",
+		(int) audio_in_, (int) audio_out_, close_on_exec ());
+  if (!close_on_exec ())
+    {
+      if (archetype != this)
+	return ((fhandler_dev_dsp *) archetype)->fixup_after_exec ();
 
-  audio_in_ = NULL;
-  audio_out_ = NULL;
+      audio_in_ = NULL;
+      audio_out_ = NULL;
+    }
 }

@@ -683,20 +683,17 @@ dtable::fixup_after_exec ()
     if ((fh = fds[i]) != NULL)
       {
 	fh->clear_readahead ();
+	fh->fixup_after_exec ();
 	if (fh->close_on_exec ())
 	  {
 	    if (fh->archetype)
 	      fh->close ();
 	    release (i);
 	  }
-	else
-	  {
-	    fh->fixup_after_exec ();
-	    if (i == 0)
-	      SetStdHandle (std_consts[i], fh->get_io_handle ());
-	    else if (i <= 2)
-	      SetStdHandle (std_consts[i], fh->get_output_handle ());
-	  }
+	else if (i == 0)
+	  SetStdHandle (std_consts[i], fh->get_io_handle ());
+	else if (i <= 2)
+	  SetStdHandle (std_consts[i], fh->get_output_handle ());
       }
 }
 
@@ -733,7 +730,7 @@ dtable::vfork_child_dup ()
   if (cygheap->ctty)
     {
       cygheap->ctty->usecount++;
-      cygheap->open_fhs++;
+      cygheap->console_count++;
       report_tty_counts (cygheap->ctty, "vfork dup", "incremented ", "");
     }
 

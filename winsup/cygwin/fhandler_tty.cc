@@ -457,7 +457,7 @@ fhandler_tty_slave::open (int flags, mode_t)
       *this = *(fhandler_tty_slave *) arch;
       termios_printf ("copied tty fhandler archetype");
       set_flags ((flags & ~O_TEXT) | O_BINARY);
-      cygheap->open_fhs++;
+      cygheap->manage_console_count ("fhandler_tty_slave::open<arch>", 1);
       goto out;
     }
 
@@ -576,7 +576,8 @@ fhandler_tty_slave::open (int flags, mode_t)
   set_output_handle (to_master_local);
 
   set_open_status ();
-  if (cygheap->open_fhs++ == 0 && !GetConsoleCP () && !output_done_event
+  if (cygheap->manage_console_count ("fhandler_tty_slave::open", 1) == 1
+      && !GetConsoleCP () && !output_done_event
       && wincap.pty_needs_alloc_console () && !GetProcessWindowStation ())
     {
       BOOL b;
@@ -603,7 +604,7 @@ fhandler_tty_slave::open (int flags, mode_t)
 out:
   usecount = 0;
   archetype->usecount++;
-  report_tty_counts (this, "opened", "incremented ", "");
+  report_tty_counts (this, "opened", "");
   myself->set_ctty (get_ttyp (), flags, arch);
 
   return 1;
@@ -614,11 +615,10 @@ fhandler_tty_slave::close ()
 {
   if (!hExeced)
     {
-      if (!--cygheap->open_fhs && myself->ctty == -1)
-	FreeConsole ();
+      cygheap->manage_console_count ("fhandler_tty_slave::close", -1);
 
       archetype->usecount--;
-      report_tty_counts (this, "closed", "decremented ", "");
+      report_tty_counts (this, "closed", "");
 
       if (archetype->usecount)
 	{
@@ -921,8 +921,8 @@ fhandler_tty_slave::dup (fhandler_base *child)
   *(fhandler_tty_slave *) child = *arch;
   child->usecount = 0;
   arch->usecount++;
-  cygheap->open_fhs++;
-  report_tty_counts (child, "duped", "incremented ", "");
+  cygheap->manage_console_count ("fhandler_tty_slave::dup", 1);
+  report_tty_counts (child, "duped", "");
   myself->set_ctty (get_ttyp (), openflags, arch);
   return 0;
 }
@@ -1070,8 +1070,8 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
       && myself->ctty == get_unit () && (get_ttyp ()->ti.c_lflag & TOSTOP))
     {
       /* background process */
-      termios_printf ("bg ioctl pgid %d, tpgid %d, ctty %d",
-		      myself->pgid, get_ttyp ()->getpgid (), myself->ctty);
+      termios_printf ("bg ioctl pgid %d, tpgid %d, %s", myself->pgid,
+		      get_ttyp ()->getpgid (), myctty ());
       raise (SIGTTOU);
     }
 
@@ -1389,7 +1389,7 @@ void
 fhandler_tty_slave::fixup_after_fork (HANDLE parent)
 {
   // fhandler_tty_common::fixup_after_fork (parent);
-  report_tty_counts (this, "inherited", "", "");
+  report_tty_counts (this, "inherited", "");
 }
 
 void
@@ -1434,7 +1434,7 @@ fhandler_tty_master::init_console ()
     return -1;
 
   console->init (INVALID_HANDLE_VALUE, GENERIC_READ | GENERIC_WRITE, O_BINARY);
-  cygheap->open_fhs--;		/* handled when individual fds are opened */
+  cygheap->manage_console_count ("fhandler_tty_master::init_console", -1, true);
   console->uninterruptible_io (true);
   return 0;
 }

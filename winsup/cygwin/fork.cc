@@ -647,8 +647,8 @@ vfork ()
       vf->sid = myself->sid;
       vf->pgid = myself->pgid;
       cygheap->ctty_on_hold = cygheap->ctty;
-      vf->open_fhs = cygheap->open_fhs;
-      debug_printf ("cygheap->ctty_on_hold %p, cygheap->open_fhs %d", cygheap->ctty_on_hold, cygheap->open_fhs);
+      vf->console_count = cygheap->console_count;
+      debug_printf ("cygheap->ctty_on_hold %p, cygheap->console_count %d", cygheap->ctty_on_hold, cygheap->console_count);
       int res = cygheap->fdtab.vfork_child_dup () ? 0 : -1;
       debug_printf ("%d = vfork()", res);
       _my_tls.call_signal_handler ();	// FIXME: racy
@@ -668,7 +668,7 @@ vfork ()
   myself->sid = vf->sid;
   myself->pgid = vf->pgid;
   termios_printf ("cygheap->ctty %p, cygheap->ctty_on_hold %p", cygheap->ctty, cygheap->ctty_on_hold);
-  cygheap->open_fhs = vf->open_fhs;
+  cygheap->console_count = vf->console_count;
 
   if (vf->pid < 0)
     {

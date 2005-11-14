@@ -276,7 +276,10 @@ fhandler_dev_clipboard::close ()
 void
 fhandler_dev_clipboard::fixup_after_exec ()
 {
-  eof = false;
-  pos = msize = 0;
-  membuffer = NULL;
+  if (!close_on_exec ())
+    {
+      eof = false;
+      pos = msize = 0;
+      membuffer = NULL;
+    }
 }

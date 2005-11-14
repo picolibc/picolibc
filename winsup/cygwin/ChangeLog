@@ -1,3 +1,44 @@
+2005-11-13  Christopher Faylor  <cgf@timesys.com>
+
+	* cygheap.h (init_cygheap::manage_console_count): Declare new function.
+	(init_cygheap::console_count): Renamed from open_fhs.  Make private.
+	* cygheap.cc (init_cygheap::manage_console_count): Define new function.
+	* dtable.cc (dtable::fixup_after_exec): Always call fixup_after_exec on
+	elements of fd even when they are about to be closed.
+	* fhandler.h (report_tty_counts): Remove open_fhs from debugging
+	output.
+	* fhandler_console.cc (fhandler_console::open): Use
+	manage_console_count rather than manipulating count directly.
+	(fhandler_console::close): Ditto.
+	(fhandler_console::fixup_after_fork): Ditto.
+	(fhandler_console::fixup_after_exec): Ditto.  Don't close handles if
+	close_on_exec.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Use
+	manage_console_count() rather than manipulating count directly.
+	Reflect change in arguments to report_tty_counts().
+	(fhandler_tty_slave::close): Ditto for both.
+	(fhandler_tty_slave::dup): Ditto for both.
+	(fhandler_tty_slave::ioctl): Use myctty() rather than raw ctty #.
+	(fhandler_tty_slave::fixup_after_fork): Reflect change in arguments to
+	report_tty_counts().
+	(fhandler_tty_master::init_console): Use manage_console_count() rather
+	than manipulating count directly.
+	* fhandler_clipboard.cc (fhandler_dev_clipboard::fixup_after_exec):
+	Don't perform any operations if close_on_exec.
+	* fhandler_dsp.cc (fhandler_dev_dsp::fixup_after_exec): Ditto.
+	* fhandler_raw.cc (fhandler_dev_raw::fixup_after_exec): Ditto.
+	* fhandler_serial.cc (fhandler_serial::fixup_after_exec): Ditto.
+	* pinfo.h (_pinfo::_ctty): Declare new function.
+	(myctty): Declare new macro.
+	(__ctty): Declare new macro.
+	* pinfo.cc (_pinfo::_ctty): Define new function.
+	(_pinfo::set_ctty): Use manage_console_count() rather than manipulating
+	count directly.
+	* signal.cc (kill_pgrp): Use myctty() and __ctty() macros rather than
+	raw ctty #.
+	* syscalls.cc (setsid): Ditto.  Use manage_console_count() rather than
+	manipulating count directly.
+
 2005-11-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::recvfrom): Just return 0 (EOF)

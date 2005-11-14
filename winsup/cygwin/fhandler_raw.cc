@@ -124,11 +124,14 @@ fhandler_dev_raw::fixup_after_fork (HANDLE)
 void
 fhandler_dev_raw::fixup_after_exec ()
 {
-  if (devbufsiz > 1L)
-    devbuf = new char [devbufsiz];
-  devbufstart = 0;
-  devbufend = 0;
-  lastblk_to_read (false);
+  if (!close_on_exec ())
+    {
+      if (devbufsiz > 1L)
+	devbuf = new char [devbufsiz];
+      devbufstart = 0;
+      devbufend = 0;
+      lastblk_to_read (false);
+    }
 }
 
 int

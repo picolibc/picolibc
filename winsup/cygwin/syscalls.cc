@@ -341,18 +341,14 @@ setsid (void)
     syscall_printf ("hmm.  pgid %d pid %d", myself->pgid, myself->pid);
   else
     {
-      if (myself->ctty >= 0 && cygheap->open_fhs <= 0)
-	{
-	  syscall_printf ("freeing console");
-	  FreeConsole ();
-	}
       myself->ctty = -1;
+      cygheap->manage_console_count ("setsid", 0);
       myself->sid = getpid ();
       myself->pgid = getpid ();
       if (cygheap->ctty)
 	cygheap->close_ctty ();
-      syscall_printf ("sid %d, pgid %d, ctty %d, open_fhs %d", myself->sid,
-		      myself->pgid, myself->ctty, cygheap->open_fhs);
+      syscall_printf ("sid %d, pgid %d, ctty %d", myself->sid, myself->pgid,
+		      myself->ctty);
       return myself->sid;
     }
 

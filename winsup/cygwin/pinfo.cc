@@ -315,6 +315,18 @@ pinfo::set_acl()
     debug_printf ("SetKernelObjectSecurity %E");
 }
 
+const char *
+_pinfo::_ctty (char *buf)
+{
+  if (ctty == TTY_CONSOLE)
+    strcpy (buf, "ctty /dev/console");
+  else if (ctty < 0)
+    strcpy (buf, "no ctty");
+  else
+    __small_sprintf (buf, "ctty /dev/tty%d", ctty);
+  return buf;
+}
+
 void
 _pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *arch)
 {
@@ -353,8 +365,8 @@ _pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *arch)
 	  if (arch)
 	    {
 	      arch->usecount++;
-	      cygheap->open_fhs++;
-	      report_tty_counts (cygheap->ctty, "ctty", "incremented ", "");
+	      cygheap->manage_console_count ("pinfo::set_ctty", 1);
+	      report_tty_counts (cygheap->ctty, "ctty", "");
 	    }
 	}
     }

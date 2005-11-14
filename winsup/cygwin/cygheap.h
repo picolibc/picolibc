@@ -296,12 +296,15 @@ struct init_cygheap
 #endif
   struct _cygtls **threadlist;
   size_t sthreads;
-  int open_fhs;
   pid_t pid;			/* my pid */
   HANDLE pid_handle;		/* handle for my pid */
   hook_chain hooks;
   void close_ctty ();
+  int manage_console_count (const char *, int, bool = false) __attribute__ ((regparm (3)));
+private:
+  int console_count;
 };
+
 
 #define _CYGHEAPSIZE_SLOP (128 * 1024)
 #define CYGHEAPSIZE (sizeof (init_cygheap) + (20000 * sizeof (fhandler_union)) + _CYGHEAPSIZE_SLOP)

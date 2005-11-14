@@ -432,7 +432,6 @@ fhandler_socket::fixup_after_fork (HANDLE parent)
 void
 fhandler_socket::fixup_after_exec ()
 {
-  debug_printf ("here");
   if (!close_on_exec ())
     fixup_after_fork (NULL);
 }

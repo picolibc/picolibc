@@ -289,8 +289,8 @@ kill_pgrp (pid_t pid, siginfo_t& si)
 	  (pid > 1 && p->pgid != pid) ||
 	  (si.si_signo < 0 && NOTSTATE (p, PID_STOPPED)))
 	continue;
-      sigproc_printf ("killing pid %d, pgrp %d, p->ctty %d, myself->ctty %d",
-		      p->pid, p->pgid, p->ctty, myself->ctty);
+      sigproc_printf ("killing pid %d, pgrp %d, p->%s, %s", p->pid, p->pgid,
+		      p->__ctty (), myctty ());
       if (p == myself)
 	killself++;
       else if (p->kill (si))
