@@ -909,9 +909,9 @@ class fhandler_console: public fhandler_termios
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
-  void fixup_after_fork_exec ();
-  void fixup_after_exec () {fixup_after_fork_exec ();}
-  void fixup_after_fork (HANDLE) {fixup_after_fork_exec ();}
+  void fixup_after_fork_exec (bool);
+  void fixup_after_exec () {fixup_after_fork_exec (true);}
+  void fixup_after_fork (HANDLE) {fixup_after_fork_exec (false);}
   void set_close_on_exec (bool val);
   void set_input_state ();
   void send_winch_maybe ();

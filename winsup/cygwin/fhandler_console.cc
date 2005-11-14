@@ -1769,12 +1769,12 @@ set_console_title (char *title)
 }
 
 void
-fhandler_console::fixup_after_fork_exec ()
+fhandler_console::fixup_after_fork_exec (bool execing)
 {
   HANDLE h = get_handle ();
   HANDLE oh = get_output_handle ();
 
-  if (close_on_exec () || open (O_NOCTTY | get_flags (), 0))
+  if ((execing && close_on_exec ()) || open (O_NOCTTY | get_flags (), 0))
     cygheap->manage_console_count ("fhandler_console::fixup_after_fork_exec", -1);
   else
     {

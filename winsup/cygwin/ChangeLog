@@ -1,3 +1,14 @@
+2005-11-14  Corinna Vinschen  <corinna@vinschen.de>
+	    Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler.h (fhandler_console::fixup_after_fork_exec): Define with
+	additional bool parameter.
+	(fhandler_console::fixup_after_exec): Accommodate
+	fixup_after_fork_exec's parameter.
+	(fhandler_console::fixup_after_fork): Ditto.
+	* fhandler_console.cc (fhandler_console::fixup_after_fork_exec): Avoid
+	opening new console only when close_on_exec AND execing.
+
 2005-11-14  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler.h (fhandler_console::fixup_after_fork_exec): Declare new function.
@@ -384,7 +395,7 @@
 	(load_wsock32): Remove.
 	(WSACleanup): Remove.
 	* fhandler_socket.cc: Drop Winsock 1 accommodations throughout.
-	(fhandler_socket::readv): Accomodate new POSIX style struct msghdr.
+	(fhandler_socket::readv): Accommodate new POSIX style struct msghdr.
 	(fhandler_socket::writev): Ditto.
 	(fhandler_socket::recvmsg): Ditto. Handle "old" applications using
 	former struct msghdr correctly.
@@ -1920,7 +1931,7 @@
 
 	* security.cc (get_initgroups_sidlist): Drop special_pgrp parameter.
 	(get_setgroups_sidlist): Avoid duplicate groups in group list.
-	(create_token): Remove special_pgrp local variable.  Accomodate
+	(create_token): Remove special_pgrp local variable.  Accommodate
 	change to get_initgroups_sidlist call.
 
 2005-06-21  Corinna Vinschen  <corinna@vinschen.de>
@@ -2361,7 +2372,7 @@
 2005-05-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/in.h: Define IPPROTO_xxx values as macros to
-	accomodate SUSv3.
+	accommodate SUSv3.
 
 2005-05-19  Christopher Faylor  <cgf@timesys.com>
 
@@ -2970,7 +2981,7 @@
 	* syscalls.cc (sync): Use renamed has_get_volume_pathnames wincap.
 	* wincap.h (wincaps::has_get_volume_pathnames): Rename from
 	has_guid_volumes
-	* wincap.cc: Accomodate above rename throughout.  Set to false on
+	* wincap.cc: Accommodate above rename throughout.  Set to false on
 	Windows 2000.
 
 2005-04-08  Christopher Faylor  <cgf@timesys.com>
