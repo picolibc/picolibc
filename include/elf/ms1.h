@@ -35,6 +35,7 @@ END_RELOC_NUMBERS(R_MS1_max)
 
 #define EF_MS1_CPU_MRISC	0x00000001	/* default */
 #define EF_MS1_CPU_MRISC2	0x00000002	/* MRISC2 */
+#define EF_MS1_CPU_MS2		0x00000003      /* MS2 */
 #define EF_MS1_CPU_MASK		0x00000003	/* specific cpu bits */
 #define EF_MS1_ALL_FLAGS	(EF_MS1_CPU_MASK)
 

@@ -928,7 +928,14 @@ extern int bfd_mips_num_opcodes;
    "A" 8 bit PC relative address * 4 (MIPS16OP_*_IMM8)
    "B" 5 bit PC relative address * 8 (MIPS16OP_*_IMM5)
    "E" 5 bit PC relative address * 4 (MIPS16OP_*_IMM5)
-   */
+   "m" 7 bit register list for save instruction (18 bit extended)
+   "M" 7 bit register list for restore instruction (18 bit extended)
+  */
+
+/* Save/restore encoding for the args field when all 4 registers are
+   either saved as arguments or saved/restored as statics.  */
+#define MIPS16_ALL_ARGS    0xe
+#define MIPS16_ALL_STATICS 0xb
 
 /* For the mips16, we use the same opcode table format and a few of
    the same flags.  However, most of the flags are different.  */
