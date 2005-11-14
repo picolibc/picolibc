@@ -114,7 +114,7 @@ close_all_files (bool norelease)
 	  cygheap->fdtab.release (i);
       }
 
-  if (cygheap->ctty)
+  if (!hExeced && cygheap->ctty)
     cygheap->close_ctty ();
 
   cygheap->fdtab.unlock ();
@@ -347,8 +347,7 @@ setsid (void)
       myself->pgid = getpid ();
       if (cygheap->ctty)
 	cygheap->close_ctty ();
-      syscall_printf ("sid %d, pgid %d, ctty %d", myself->sid, myself->pgid,
-		      myself->ctty);
+      syscall_printf ("sid %d, pgid %d, %s", myself->sid, myself->pgid, myctty ());
       return myself->sid;
     }
 

@@ -1,3 +1,15 @@
+2005-11-14  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler.h (fhandler_console::fixup_after_fork_exec): Declare new function.
+	(fhandler_console::fixup_after_fork): Use fixup_after_fork_exec.
+	(fhandler_console::fixup_after_exec): Ditto.
+	* fhandler_console.cc (fhandler_console::fixup_after_fork): Delete definition.
+	(fhandler_console::fixup_after_fork_exec): Rename from fixup_after_exec.
+	* pinfo.cc (_pinfo::set_ctty): Don't play with console count here.
+	* syscalls.cc (close_all_files): Don't close cygheap ctty if hExeced
+	since the child will be copying information from us.
+	(setsid): Use myctty() rather than raw ctty #.
+
 2005-11-13  Christopher Faylor  <cgf@timesys.com>
 
 	* cygheap.h (init_cygheap::manage_console_count): Declare new function.

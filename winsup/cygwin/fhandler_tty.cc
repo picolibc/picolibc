@@ -450,8 +450,7 @@ fhandler_tty_slave::open (int flags, mode_t)
 {
   if (get_device () == FH_TTY)
     pc.dev.tty_to_real_device ();
-  fhandler_tty_slave *arch = (fhandler_tty_slave *)
-    cygheap->fdtab.find_archetype (pc.dev);
+  fhandler_tty_slave *arch = (fhandler_tty_slave *) cygheap->fdtab.find_archetype (pc.dev);
   if (arch)
     {
       *this = *(fhandler_tty_slave *) arch;

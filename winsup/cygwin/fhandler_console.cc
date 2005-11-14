@@ -695,10 +695,7 @@ fhandler_console::close ()
   return 0;
 }
 
-/*
- * Special console dup to duplicate input and output
- * handles.
- */
+/*  Special console dup to duplicate input and output  handles.  */
 
 int
 fhandler_console::dup (fhandler_base *child)
@@ -1757,29 +1754,6 @@ fhandler_console::set_close_on_exec (bool val)
   set_no_inheritance (output_handle, val);
 }
 
-void
-fhandler_console::fixup_after_fork (HANDLE)
-{
-  HANDLE h = get_handle ();
-  HANDLE oh = get_output_handle ();
-
-  /* Windows does not allow duplication of console handles between processes
-     so open the console explicitly. */
-
-  if (!open (O_NOCTTY | get_flags (), 0))
-    system_printf ("error opening console after fork, %E");
-
-  /* Need to decrement console_count since this open is basically a no-op to reopen
-     the console and we've already recorded that fact. */
-  cygheap->manage_console_count ("fhandler_console::fixup_after_fork", -1);
-
-  if (!close_on_exec ())
-    {
-      CloseHandle (h);
-      CloseHandle (oh);
-    }
-}
-
 void __stdcall
 set_console_title (char *title)
 {
@@ -1795,29 +1769,29 @@ set_console_title (char *title)
 }
 
 void
-fhandler_console::fixup_after_exec ()
+fhandler_console::fixup_after_fork_exec ()
 {
   HANDLE h = get_handle ();
   HANDLE oh = get_output_handle ();
 
   if (close_on_exec () || open (O_NOCTTY | get_flags (), 0))
-    cygheap->manage_console_count ("fhandler_console::fixup_after_exec", -1);
+    cygheap->manage_console_count ("fhandler_console::fixup_after_fork_exec", -1);
   else
     {
       bool sawerr = false;
       if (!get_io_handle ())
 	{
-	  system_printf ("error opening input console handle after exec, errno %d, %E", get_errno ());
+	  system_printf ("error opening input console handle after fork/exec, errno %d, %E", get_errno ());
 	  sawerr = true;
 	}
       if (!get_output_handle ())
 	{
-	  system_printf ("error opening output console handle after exec, errno %d, %E", get_errno ());
+	  system_printf ("error opening output console handle after fork/exec, errno %d, %E", get_errno ());
 	  sawerr = true;
 	}
 
       if (!sawerr)
-	system_printf ("error opening console after exec, errno %d, %E", get_errno ());
+	system_printf ("error opening console after fork/exec, errno %d, %E", get_errno ());
     }
 
   if (!close_on_exec ())

@@ -909,9 +909,10 @@ class fhandler_console: public fhandler_termios
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
-  void fixup_after_exec ();
+  void fixup_after_fork_exec ();
+  void fixup_after_exec () {fixup_after_fork_exec ();}
+  void fixup_after_fork (HANDLE) {fixup_after_fork_exec ();}
   void set_close_on_exec (bool val);
-  void fixup_after_fork (HANDLE parent);
   void set_input_state ();
   void send_winch_maybe ();
   static tty_min *get_tty_stuff (int);
