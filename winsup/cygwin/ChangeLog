@@ -1,3 +1,7 @@
+2005-11-16  Christopher Faylor  <cgf@timesys.com>
+
+	* times.cc (hires_ms::prime): Don't escalate the priority.
+
 2005-11-14  Christopher Faylor  <cgf@timesys.com>
 
 	* include/sys/elf64.h: Fix types to reflect linux usage.

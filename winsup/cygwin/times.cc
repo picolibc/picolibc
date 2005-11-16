@@ -621,22 +621,22 @@ hires_ms::prime ()
   if (!inited)
     {
       FILETIME f;
-      int priority = GetThreadPriority (GetCurrentThread ());
-stupid_printf ("priority %d", priority);
-      SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
+      // int priority = GetThreadPriority (GetCurrentThread ());
+// stupid_printf ("priority %d", priority);
+      // SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
 stupid_printf ("SetThreadPriority to THREAD_PRIORITY_TIME_CRITICAL");
       initime_ms = timeGetTime ();
 stupid_printf ("after timeGetTime");
       GetSystemTimeAsFileTime (&f);
 stupid_printf ("after GetSystemTimeAsFileTime");
-      SetThreadPriority (GetCurrentThread (), priority);
-stupid_printf ("SetThreadPriority(%p, %d)", GetCurrentThread(), priority);
+      // SetThreadPriority (GetCurrentThread (), priority);
+// stupid_printf ("SetThreadPriority(%p, %d)", GetCurrentThread(), priority);
 
-      inited = 1;
       initime_us.HighPart = f.dwHighDateTime;
       initime_us.LowPart = f.dwLowDateTime;
       initime_us.QuadPart -= FACTOR;
       initime_us.QuadPart /= 10;
+      inited = 1;
     }
 stupid_printf ("returning");
   return;
