@@ -1,3 +1,8 @@
+2005-11-17  Shaun Jackman  <sjackman@gmail.com>
+
+	* libgloss/arm/libcfunc.c (isatty): Call _isatty. GDB now supports
+	the IsTTY SWI that _isatty calls.
+
 2005-11-17  Hans-Peter Nilsson  <hp@axis.com>
 
 	* cris/linunistd.h: Don't redefine errno as extern int.
