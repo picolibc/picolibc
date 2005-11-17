@@ -330,18 +330,18 @@ _pinfo::_ctty (char *buf)
 void
 _pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *arch)
 {
-  debug_printf ("checking if /dev/tty%d changed", ctty);
+  debug_printf ("old %s", __ctty ());
   if ((ctty < 0 || ctty == tc->ntty) && !(flags & O_NOCTTY))
     {
       ctty = tc->ntty;
-      syscall_printf ("attached tty%d sid %d, pid %d, tty->pgid %d, tty->sid %d",
-		      tc->ntty, sid, pid, pgid, tc->getsid ());
+      syscall_printf ("attached %s sid %d, pid %d, tty->pgid %d, tty->sid %d",
+		      __ctty (), sid, pid, pgid, tc->getsid ());
 
       pinfo p (tc->getsid ());
       if (sid == pid && (!p || p->pid == pid || !p->exists ()))
 	{
-	  paranoid_printf ("resetting tty%d sid.  Was %d, now %d.  pgid was %d, now %d.",
-			   tc->ntty, tc->getsid (), sid, tc->getpgid (), pgid);
+	  paranoid_printf ("resetting %s sid.  Was %d, now %d.  pgid was %d, now %d.",
+			   __ctty (), tc->getsid (), sid, tc->getpgid (), pgid);
 	  /* We are the session leader */
 	  tc->setsid (sid);
 	  tc->setpgid (pgid);

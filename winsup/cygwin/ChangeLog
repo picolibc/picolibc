@@ -1,3 +1,10 @@
+2005-11-17  Christopher Faylor  <cgf@timesys.com>
+
+	* fork.cc (fork): Move top-of-stack calculation later.
+
+	* pinfo.cc (_pinfo::set_ctty): Use __ctty to print current console in
+	debugging output.
+
 2005-11-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_tty.cc (fhandler_tty_slave::open):  Don't expect that

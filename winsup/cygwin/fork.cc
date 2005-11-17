@@ -557,10 +557,7 @@ fork ()
   grouped.load_dlls = 0;
 
   int res;
-  void *esp;
   int ischild;
-
-  __asm__ volatile ("movl %%esp,%0": "=r" (esp));
 
   myself->set_has_pgid_children ();
 
@@ -574,6 +571,10 @@ fork ()
 
   sig_send (NULL, __SIGHOLD);
   ischild = setjmp (grouped.ch.jmp);
+
+  void *esp;
+  __asm__ volatile ("movl %%esp,%0": "=r" (esp));
+
   if (!ischild)
     res = grouped.parent (esp);
   else
