@@ -577,15 +577,18 @@ fhandler_tty_slave::open (int flags, mode_t)
   set_open_status ();
   if (cygheap->manage_console_count ("fhandler_tty_slave::open", 1) == 1
       && !GetConsoleCP () && !output_done_event
-      && wincap.pty_needs_alloc_console () && !GetProcessWindowStation ())
+      && wincap.pty_needs_alloc_console ())
     {
       BOOL b;
-      HWINSTA h = CreateWindowStation (NULL, 0, GENERIC_READ | GENERIC_WRITE, &sec_none_nih);
-      termios_printf ("CreateWindowStation %p, %E", h);
-      if (h)
-	{
-	  b = SetProcessWindowStation (h);
-	  termios_printf ("SetProcessWindowStation %d, %E", b);
+      if (!GetProcessWindowStation ())
+        {
+	  HWINSTA h = CreateWindowStation (NULL, 0, GENERIC_READ | GENERIC_WRITE, &sec_none_nih);
+	  termios_printf ("CreateWindowStation %p, %E", h);
+	  if (h)
+	    {
+	      b = SetProcessWindowStation (h);
+	      termios_printf ("SetProcessWindowStation %d, %E", b);
+	    }
 	}
       b = AllocConsole ();	// will cause flashing if workstation
 				// stuff fails

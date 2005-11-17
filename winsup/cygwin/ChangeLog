@@ -1,3 +1,8 @@
+2005-11-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tty.cc (fhandler_tty_slave::open):  Don't expect that
+	service applications have no window station attached.
+
 2005-11-16  Christopher Faylor  <cgf@timesys.com>
 
 	* times.cc (hires_ms::prime): Don't escalate the priority.
