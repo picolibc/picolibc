@@ -37,8 +37,6 @@
 #include "libnosys/warning.h"
 
 #include <errno.h>
-#undef errno
-extern int errno;
 
 /*
  * This file contains the system call numbers, and stub macros for libc.

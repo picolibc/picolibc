@@ -1,3 +1,7 @@
+2005-11-17  Hans-Peter Nilsson  <hp@axis.com>
+
+	* cris/linunistd.h: Don't redefine errno as extern int.
+
 2005-10-20  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* arm/configure.in: Add AC_SUBST for BUILD_CRT0_TRUE and
