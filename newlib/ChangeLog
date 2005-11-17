@@ -1,3 +1,12 @@
+2005-11-17  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/dl/dl-local.h: New file based on old dlfcn.h
+	in libc/sys/linux/include.
+	* libc/sys/linux/dl/dlfcn.h: Moved to libc/sys/linux/include.
+	* libc/sys/linux/dl/ldsodefs.h: Include dl-local.h instead of dlfcn.h.
+	* libc/sys/linux/include/dlfcn.h: Replaced with dlfcn.h formerly
+	in libc/sys/linux/dl.
+
 2005-11-11  Christopher Faylor  <cgf@timesys.com>
 
 	* libc/include/sys/time.h: For cygwin, use general header rather than

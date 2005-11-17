@@ -1,65 +1,84 @@
-#ifndef _DLFCN_H
-#include <dl/dlfcn.h>
+/* User functions for run-time dynamic loading.
+   Copyright (C) 1995-1999, 2000, 2001 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
 
-#define internal_function
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
 
-/* Internally used flag.  */
-#define __RTLD_DLOPEN	0x80000000
-#define __RTLD_SPROF	0x40000000
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
 
-/* Now define the internal interfaces.  */
-extern void *__dlvsym (void *__handle, __const char *__name,
-		       __const char *__version);
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+   02111-1307 USA.  */
 
-extern void *__libc_dlopen  (__const char *__name);
-extern void *__libc_dlsym   (void *__map, __const char *__name);
-extern int   __libc_dlclose (void *__map);
+#ifndef	_DLFCN_H
+#define	_DLFCN_H 1
 
-/* Locate shared object containing the given address.  */
-extern int _dl_addr (const void *address, Dl_info *info)
-     internal_function;
+#include <features.h>
 
-/* Open the shared object NAME, relocate it, and run its initializer if it
-   hasn't already been run.  MODE is as for `dlopen' (see <dlfcn.h>).  If
-   the object is already opened, returns its existing map.  */
-extern void *_dl_open (const char *name, int mode, const void *caller)
-     internal_function;
+/* Collect various system dependent definitions and declarations.  */
+#include <sys/dlfcn.h>
 
-/* Close an object previously opened by _dl_open.  */
-extern void _dl_close (void *map)
-     internal_function;
 
-/* Look up NAME in shared object HANDLE (which may be RTLD_DEFAULT or
-   RTLD_NEXT).  WHO is the calling function, for RTLD_NEXT.  Returns
-   the symbol value, which may be NULL.  */
-extern void *_dl_sym (void *handle, const char *name, void *who)
-    internal_function;
+/* If the first argument of `dlsym' or `dlvsym' is set to RTLD_NEXT
+   the run-time address of the symbol called NAME in the next shared
+   object is returned.  The "next" relation is defined by the order
+   the shared objects were loaded.  */
+# define RTLD_NEXT	((void *) -1l)
 
-/* Look up version VERSION of symbol NAME in shared object HANDLE
-   (which may be RTLD_DEFAULT or RTLD_NEXT).  WHO is the calling
-   function, for RTLD_NEXT.  Returns the symbol value, which may be
-   NULL.  */
-extern void *_dl_vsym (void *handle, const char *name, const char *version,
-		       void *who)
-    internal_function;
+/* If the first argument to `dlsym' or `dlvsym' is set to RTLD_DEFAULT
+   the run-time address of the symbol called NAME in the global scope
+   is returned.  */
+# define RTLD_DEFAULT	((void *) 0)
 
-/* Call OPERATE, catching errors from `dl_signal_error'.  If there is no
-   error, *ERRSTRING is set to null.  If there is an error, *ERRSTRING is
-   set to a string constructed from the strings passed to _dl_signal_error,
-   and the error code passed is the return value and *OBJNAME is set to
-   the object name which experienced the problems.  ERRSTRING if nonzero
-   points to a malloc'ed string which the caller has to free after use.
-   ARGS is passed as argument to OPERATE.  */
-extern int _dl_catch_error (const char **objname, const char **errstring,
-			    void (*operate) (void *),
-			    void *args)
-     internal_function;
 
-/* Helper function for <dlfcn.h> functions.  Runs the OPERATE function via
-   _dl_catch_error.  Returns zero for success, nonzero for failure; and
-   arranges for `dlerror' to return the error details.
-   ARGS is passed as argument to OPERATE.  */
-extern int _dlerror_run (void (*operate) (void *), void *args)
-     internal_function;
+__BEGIN_DECLS
 
-#endif
+/* Open the shared object FILE and map it in; return a handle that can be
+   passed to `dlsym' to get symbol values from it.  */
+extern void *dlopen (__const char *__file, int __mode) __THROW;
+
+/* Unmap and close a shared object opened by `dlopen'.
+   The handle cannot be used again after calling `dlclose'.  */
+extern int dlclose (void *__handle) __THROW;
+
+/* Find the run-time address in the shared object HANDLE refers to
+   of the symbol called NAME.  */
+extern void *dlsym (void *__restrict __handle,
+		    __const char *__restrict __name) __THROW;
+
+/* Find the run-time address in the shared object HANDLE refers to
+   of the symbol called NAME with VERSION.  */
+extern void *dlvsym (void *__restrict __handle,
+		     __const char *__restrict __name,
+		     __const char *__restrict __version) __THROW;
+
+/* When any of the above functions fails, call this function
+   to return a string describing the error.  Each call resets
+   the error string so that a following call returns null.  */
+extern char *dlerror (void) __THROW;
+
+
+/* Structure containing information about object searched using
+   `dladdr'.  */
+typedef struct
+{
+  __const char *dli_fname;	/* File name of defining object.  */
+  void *dli_fbase;		/* Load address of that object.  */
+  __const char *dli_sname;	/* Name of nearest symbol.  */
+  void *dli_saddr;		/* Exact value of nearest symbol.  */
+} Dl_info;
+
+/* Fill in *INFO with the following information about ADDRESS.
+   Returns 0 iff no shared object's segments contain that address.  */
+extern int dladdr (__const void *__address, Dl_info *__info) __THROW;
+
+__END_DECLS
+
+#endif	/* dlfcn.h */
