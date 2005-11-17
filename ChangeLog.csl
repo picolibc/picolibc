@@ -1,0 +1,31 @@
+2005-11-16  Mark Mitchell  <mark@codesourcery.com>
+
+	* gdb/remote-sim.c (gdbsim_wait): Don't use target_signal_to_host
+	or target_signal_from_host.
+	* sim/arm/wrapper.c (gdb/signals.h): Include it.
+	(SIGTRAP): Don't define it.
+	(SIGBUS): Likewise.
+	(sim_stop_reason): Use TARGET_SIGNAL_*.
+	* sim/common/sim-reason.c (sim_stop_reason): Use
+	sim_signal_to_target, not sim_signal_to_host.
+	* sim/common/sim-signal.c (sim_signal_to_host): Fix typo.
+	(sim_signal_to_target): New function.
+	* sim/common/sim-signal.h: Declare it.
+	* sim/d10v/interp.c (gdb/signals.h): Include it.
+	(sim_stop_reason): Use TARGET_SIGNAL_*.
+	* sim/erc32/interf.c: (gdb/signals.h): Include it.
+	(sim_stop_reason): Use TARGET_SIGNAL_*.
+	* sim/ppc/sim_calls.c (gdb/signals.h): Include it.
+	(sim_stop_reason): Use TARGET_SIGNAL_*.
+
+2005-11-16  Mark Mitchell  <mark@codesourcery.com>
+
+	* sim/ppc/configure.ac (USE_WIN32API): Define it.
+	(sys/errno.h): Add it to AC_CHECK_HEADERS list.
+	* sim/ppc/configure.in: Regenerate.
+	* sim/ppc/config.in: Likewise.
+	* sim/ppc/emul_netbsd.c (sys/errno.h): Guard with HAVE_SYS_ERRNO_H.
+	(write_timezone): Guard with HAVE_GETTIMEOFDAY.
+	* sim/ppc/emul_unix.c (do_unix_mkdir): Handle Win32 1-argument mkdir. 
+	
+
