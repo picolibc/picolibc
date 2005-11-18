@@ -1,5 +1,9 @@
 2005-11-18  Christopher Faylor  <cgf@timesys.com>
 
+	* include/sys/time.h: Move more cygwin stuff to cygwin-specific header.
+
+2005-11-18  Christopher Faylor  <cgf@timesys.com>
+
 	* include/time.h: Remove more cygwin-specific stuff.
 
 2005-11-18  Christopher Faylor  <cgf@timesys.com>
