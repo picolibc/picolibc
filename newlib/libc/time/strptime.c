@@ -249,8 +249,12 @@ _DEFUN (strptime, (buf, format, timeptr),
 		timeptr->tm_year = (ret * 100) - tm_year_base;
 		buf = s;
 		break;
-	    case 'c' :
-		abort ();
+	    case 'c' :		/* %a %b %e %H:%M:%S %Y */
+		s = strptime (buf, "%a %b %e %H:%M:%S %Y", timeptr);
+		if (s == NULL)
+		    return NULL;
+		buf = s;
+		break;
 	    case 'D' :		/* %m/%d/%y */
 		s = strptime (buf, "%m/%d/%y", timeptr);
 		if (s == NULL)
@@ -412,7 +416,8 @@ _DEFUN (strptime, (buf, format, timeptr),
 		buf = s;
 		break;
 	    case 'Z' :
-		abort ();
+		/* Unsupported. Just ignore.  */
+		break;
 	    case '\0' :
 		--format;
 		/* FALLTHROUGH */

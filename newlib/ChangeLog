@@ -1,3 +1,8 @@
+2005-11-18  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/time/strptime.c (strptime): Don't abort for %c and %Z.
+	Treat %c as "%a %b %e %H:%M:%S %Y" and ignore %Z.
+
 2005-11-18  Christopher Faylor  <cgf@timesys.com>
 
 	* include/sys/time.h: Move more cygwin stuff to cygwin-specific header.
