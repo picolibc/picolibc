@@ -17,7 +17,9 @@ extern "C"
 {
 #endif
 
-int clock_setres (clockid_t, struct timespec *);
+int futimes (int, const struct timeval *);
+int lutimes (const char *, const struct timeval *);
+
 
 #ifdef __cplusplus
 }
