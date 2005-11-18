@@ -38,6 +38,10 @@
 
 	* libc/include/string.h: Add cygwin-specific function declaration.
 
+2005-11-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/ieeefp.h: Add C++ guards.
+
 2005-11-03  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/unix/getcwd.c: Don't use non-reentrant syscall names.
@@ -55,6 +59,7 @@
 	* libc/sys/linux/sys/unistd.h (readlink, symlink): New
 	prototypes.
 
+>>>>>>> 1.843
 2005-11-01  Ralf Corsepius <ralf.corsepius@rtems.org>
 
 	* libc/include/stdint.h: Cleanup #if vs. #ifdef.

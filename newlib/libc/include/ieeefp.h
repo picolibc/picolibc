@@ -5,6 +5,8 @@
 
 #include <machine/ieeefp.h>
 
+_BEGIN_STD_C
+
 /* FIXME FIXME FIXME:
    Neither of __ieee_{float,double}_shape_tape seem to be used anywhere
    except in libm/test.  If that is the case, please delete these from here.
@@ -237,5 +239,7 @@ int _EXFUN(finitef, (float));
 #define __ieee_double_shape_type __ieee_float_shape_type
 
 #endif /* _DOUBLE_IS_32BITS */
+
+_END_STD_C
 
 #endif /* _IEEE_FP_H_ */
