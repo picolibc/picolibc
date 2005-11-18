@@ -1,3 +1,9 @@
+2005-11-17  Carlos O'Donell  <carlos@codesourcery.com>
+
+	Issue #488
+	* libiberty/argv.c (expandargv): Check for errors with ferror,
+	rather than by looking at return value from fread.
+	
 2005-10-13  Mark Mitchell  <mark@codesourcery.com>
 
 	Issue #439
