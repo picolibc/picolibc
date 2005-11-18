@@ -19,6 +19,20 @@ int nanosleep (const struct timespec  *, struct timespec *);
 int clock_setres (clockid_t, struct timespec *);
 int clock_getres (clockid_t, struct timespec *);
 
+#define TIMER_RELTIME  0 /* For compatibility with HP/UX, Solaris, others? */
+
+#ifndef __STRICT_ANSI__
+# ifndef daylight
+#   define daylight _daylight
+# endif
+
+# ifndef timezonevar
+char *timezone (void);
+# elif !defined(timezone)
+#   define timezone _timezone
+# endif
+#endif /*__STRICT_ANSI__*/
+
 #ifdef __cplusplus
 }
 #endif

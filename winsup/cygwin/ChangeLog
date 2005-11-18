@@ -1,5 +1,10 @@
 2005-11-18  Christopher Faylor  <cgf@timesys.com>
 
+	* times.cc (timezone): Put back (void).
+	* include/cygwin/time.h: Add more cygwin stuff from newlib.
+
+2005-11-18  Christopher Faylor  <cgf@timesys.com>
+
 	* include/cygwin/sys_time.h: Rename from include/cygwin/time.h.
 	* include/cygwin/time.h: New file.
 

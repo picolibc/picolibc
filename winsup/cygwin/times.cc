@@ -122,7 +122,7 @@ settimeofday (const struct timeval *tv, const struct timezone *tz)
 
 /* timezone: standards? */
 extern "C" char *
-timezone ()
+timezone (void)
 {
   char *b = _my_tls.locals.timezone_buf;
 
