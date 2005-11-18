@@ -281,12 +281,13 @@ details. */
       141: Export futimes, lutimes.
       142: Export memmem
       143: Export clock_getres, clock_setres
+      144: Export timelocal, timegm.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 143
+#define CYGWIN_VERSION_API_MINOR 144
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

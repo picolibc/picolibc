@@ -19,6 +19,10 @@ int nanosleep (const struct timespec  *, struct timespec *);
 int clock_setres (clockid_t, struct timespec *);
 int clock_getres (clockid_t, struct timespec *);
 
+/* GNU extensions. */
+time_t timelocal (struct tm *);
+time_t timegm (struct tm *);
+
 #define TIMER_RELTIME  0 /* For compatibility with HP/UX, Solaris, others? */
 
 #ifndef __STRICT_ANSI__

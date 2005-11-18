@@ -14,7 +14,7 @@ srcdir:=@srcdir@
 objdir:=.
 
 CONFIG_DIR:=$(srcdir)/config/@CONFIG_DIR@
-VPATH:=$(srcdir):$(CONFIG_DIR):$(srcdir)/regex:$(srcdir)/regexp:$(srcdir)/lib
+VPATH:=$(srcdir):$(CONFIG_DIR):$(srcdir)/regex:$(srcdir)/regexp:$(srcdir)/lib:$(srcdir)/libc
 
 target_alias:=@target_alias@
 build_alias:=@build_alias@
@@ -138,10 +138,10 @@ DLL_OFILES:=assert.o autoload.o bsdlib.o ctype.o cxx.o cygheap.o cygthread.o \
 	nftw.o ntea.o passwd.o path.o pinfo.o pipe.o poll.o pthread.o regcomp.o \
 	regerror.o regexec.o regfree.o registry.o resource.o scandir.o sched.o \
 	sec_acl.o sec_helper.o security.o select.o sem.o shared.o shm.o \
-	sigfe.o signal.o sigproc.o smallprint.o spawn.o strace.o strsep.o \
-	strsig.o sync.o syscalls.o sysconf.o syslog.o termios.o thread.o \
-	timer.o times.o tty.o uinfo.o uname.o v8_regexp.o v8_regerror.o \
-	v8_regsub.o wait.o wincap.o window.o \
+	sigfe.o signal.o sigproc.o smallprint.o spawn.o strace.o strptime.o \
+	strsep.o strsig.o sync.o syscalls.o sysconf.o syslog.o termios.o thread.o \
+	timelocal.o timer.o times.o tty.o uinfo.o uname.o v8_regexp.o \
+	v8_regerror.o v8_regsub.o wait.o wincap.o window.o \
 	$(EXTRA_DLL_OFILES) $(EXTRA_OFILES) $(MALLOC_OFILES) $(MT_SAFE_OBJECTS)
 
 GMON_OFILES:=gmon.o mcount.o profil.o

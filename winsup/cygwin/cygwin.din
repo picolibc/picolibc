@@ -1470,6 +1470,8 @@ tfind NOSIGFE
 tgamma NOSIGFE
 tgammaf NOSIGFE
 time SIGFE
+timelocal SIGFE
+timegm SIGFE
 _time = time SIGFE
 timer_create SIGFE
 timer_delete SIGFE

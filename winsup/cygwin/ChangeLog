@@ -1,3 +1,17 @@
+2005-11-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc: Add subdirectory.
+	* Makefile.in (VPATH): Add libc subdir.
+	(DLL_OFILES): Add strptime.o and timelocal.o.
+	* cygwin.din: Export timelocal and timegm.
+	* localtime.cc: Define STD_INSPIRED unconditionally.
+	* include/cygwin/time.h (timelocal): Add declaration.
+	(timegm): Ditto.
+	* include/cygwin/version.h: Bump API minor version.
+	* libc/strptime.cc: New file.
+	* libc/timelocal.cc: New file.
+	* libc/timelocal.h: New file.
+
 2005-11-18  Christopher Faylor  <cgf@timesys.com>
 
 	* include/cygwin/sys_time.h: Move futimes and lutimes declaration here

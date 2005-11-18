@@ -7,6 +7,7 @@
 #include "winsup.h"
 #include "cygerrno.h"
 #include <windows.h>
+#define STD_INSPIRED
 #define lint
 
 #define USG_COMPAT
