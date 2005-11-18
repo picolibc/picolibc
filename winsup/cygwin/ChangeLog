@@ -1,3 +1,8 @@
+2005-11-18  Christopher Faylor  <cgf@timesys.com>
+
+	* include/cygwin/sys_time.h: Rename from include/cygwin/time.h.
+	* include/cygwin/time.h: New file.
+
 2005-11-17  Christopher Faylor  <cgf@timesys.com>
 
 	* fork.cc (fork): Move top-of-stack calculation later.
