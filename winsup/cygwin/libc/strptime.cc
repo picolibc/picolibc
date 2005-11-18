@@ -311,6 +311,7 @@ label:
 
 		case 'A':
 		case 'a':
+			len = 0;
 			for (i = 0; i < asizeof(tptr->weekday); i++) {
 				len = strlen(tptr->weekday[i]);
 				if (strncasecmp(buf, tptr->weekday[i],
@@ -400,6 +401,7 @@ label:
 		case 'B':
 		case 'b':
 		case 'h':
+			len = 0;
 			for (i = 0; i < asizeof(tptr->month); i++) {
 				if (Oalternative) {
 					if (c == 'B') {

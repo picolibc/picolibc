@@ -1,5 +1,9 @@
 2005-11-18  Christopher Faylor  <cgf@timesys.com>
 
+	* strptime.cc (_strptime): Fix gcc warnings.
+
+2005-11-18  Christopher Faylor  <cgf@timesys.com>
+
 	* memmem.cc: Move from here.
 	* lib/memmem.cc: Move to here.
 
