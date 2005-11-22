@@ -1,3 +1,18 @@
+2005-11-22  Brian Dessent  <brian@dessent.net>
+
+	* Makefile.in: Link cygcheck with libwininet.a.
+	* cygcheck.cc: Add includes.
+	(grep_packages): New global variable.
+	(display_internet_error): New function.
+	(safe_chars): New global variable.
+	(base_url): Ditto.
+	(package_grep): New function.
+	(usage): Reword --help output for clarity.  Document new argument.
+	(longopts): Add 'package-query' option.
+	(opts): Add 'p' option, reorder to be consistent with 'longopts'.
+	(main): Accommodate new option.
+	* utils.sgml (cygcheck): Update --help output.  Document new -p option.
+
 2005-09-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	Align error message handling to mkpasswd's error messages throughout.
@@ -457,9 +472,9 @@
 	correct system password settings just because the account has admin
 	privileges.
 	(usage): Define as "noreturn" function. Restructure and rephrase
-	output. Accomodate new options.
+	output. Accommodate new options.
 	(print_version): Fix copyright dates.
-	(main): Accomodate new options for setting UF_PASSWD_CANT_CHANGE,
+	(main): Accommodate new options for setting UF_PASSWD_CANT_CHANGE,
 	UF_DONT_EXPIRE_PASSWD and UF_PASSWD_NOTREQD settings.
 
 2003-10-17  Christopher Faylor  <cgf@redhat.com>

@@ -13,19 +13,37 @@ command-line utilities support the <literal>--help</literal> and
 <sect2 id="cygcheck"><title>cygcheck</title>
 
 <screen>
-Usage: cygcheck [OPTIONS] [PROGRAM...]
-Check system information or PROGRAM library dependencies
+Usage: cygcheck PROGRAM [ -v ] [ -h ]
+       cygcheck -c [ PACKAGE ... ] [ -d ]
+       cygcheck -s [ -r ] [ -v ] [ -h ]
+       cygcheck -k
+       cygcheck -f FILE [ FILE ... ]
+       cygcheck -l [ PACKAGE ... ]
+       cygcheck -p REGEXP
+List system information, check installed packages, or query package database.
 
- -c, --check-setup   check packages installed via setup.exe
- -d, --dump-only     no integrity checking of package contents (requires -c)
- -s, --sysinfo       system information (not with -k)
- -v, --verbose       verbose output (indented) (for -[cfls] or programs)
- -r, --registry      registry search (requires -s)
- -k, --keycheck      perform a keyboard check session (not with -[scfl])
- -f, --find-package  find installed packages containing files (not with -[cl])
- -l, --list-package  list the contents of installed packages (not with -[cf])
- -h, --help          give help about the info (not with -[cfl])
- -V, --version       output version information and exit
+At least one command option or a PROGRAM is required, as shown above.
+
+  PROGRAM              list library (DLL) dependencies of PROGRAM
+  -c, --check-setup    show installed version of PACKAGE and verify integrity
+                       (or for all installed packages if none specified)
+  -d, --dump-only      just list packages, do not verify (with -c)
+  -s, --sysinfo        produce diagnostic system information (implies -c -d)
+  -r, --registry       also scan registry for Cygwin settings (with -s)
+  -k, --keycheck       perform a keyboard check session (must be run from a
+                       plain console only, not from a pty/rxvt/xterm)
+  -f, --find-package   find the package that FILE belongs to
+  -l, --list-package   list contents of PACKAGE (or all packages if none given)
+  -p, --package-query  search for REGEXP in the entire cygwin.com package
+                       repository (requies internet connectivity)
+  -v, --verbose        produce more verbose output
+  -h, --help           annotate output with explanatory comments when given
+                       with another command, otherwise print this help
+  -V, --version        print the version of cygcheck and exit
+
+Note: -c, -f, and -l only report on packages that are currently installed. To
+  search all official Cygwin packages use -p instead.  The -p REGEXP matches
+  package names, descriptions, and names of files/paths within all packages.
 </screen>
 
 <para>
@@ -65,10 +83,10 @@ For example, to find out about <filename>/usr/bin/less</filename> and its
 package:
 <example><title>Example <command>cygcheck</command> usage</title>
 <screen>
-$ cygcheck.exe -f /usr/bin/less
+$ cygcheck -f /usr/bin/less
 less-381-1
 
-$ cygcheck.exe -l less
+$ cygcheck -l less
 /usr/bin/less.exe
 /usr/bin/lessecho.exe
 /usr/bin/lesskey.exe
@@ -97,6 +115,65 @@ that is relevent to Cygwin programs.  These registry entries are the
 ones that have "Cygwin" in the name.  If you are paranoid about
 privacy, you may remove information from this report, but please keep
 in mind that doing so makes it harder to diagnose your problems.</para>
+
+<para>In contrast to the other options that search the packages that are
+installed on your local system, the <literal>-p</literal> option can be used
+to search the entire official Cygwin package repository.  It takes as argument
+a Perl-compatible regular expression which is used to match package names, 
+package descriptions, and path/filenames of the contents of packages.  This
+feature requires an active internet connection, since it must query the
+<literal>cygwin.com</literal> web site.  In fact, it is equalivant to the
+search that is available on the <ulink url="http://cygwin.com/packages/">Cygwin
+package listing</ulink> page.</para>
+
+<para>For example, perhaps you are getting an error because you are missing a
+certain DLL and you want to know which package includes that file:
+<example><title>Searching all packages for a file</title>
+<screen>
+$ cygcheck -p 'cygintl-2\.dll'
+Found 1 matches for 'cygintl-2\.dll'.
+
+libintl2-0.12.1-3         GNU Internationalization runtime library
+
+$ cygcheck -p 'libexpat.*\.a'
+Found 2 matches for 'libexpat.*\.a'.
+
+expat-1.95.7-1            XML parser library written in C
+expat-1.95.8-1            XML parser library written in C
+
+$ cygcheck -p '/ls\.exe'
+Found 2 matches for '/ls\.exe'.
+
+coreutils-5.2.1-5         GNU core utilities (includes fileutils, sh-utils and textutils)
+coreutils-5.3.0-6         GNU core utilities (includes fileutils, sh-utils and textutils)
+</screen>
+</example>
+</para>
+
+<para>Note that this option takes a regular expression, not a glob or wildcard.
+This means that you need to use <literal>.*</literal> if you want something
+similar to the wildcard <literal>*</literal> commonly used in filename globbing.
+Similarly, to match the period character you should use <literal>\.</literal>
+since the <literal>.</literal> character in a regexp is a metacharacter that
+will match any character.  Also be aware that the characters such as 
+<literal>\</literal> and <literal>*</literal> are shell metacharacters, so 
+they must be either escaped or quoted, as in the example above.</para>
+
+<para>The third example above illustrates that if you want to match a whole 
+filename, you should include the <literal>/</literal> path seperator.  In the
+given example this ensures that filenames that happen to end in
+<literal>ls.exe</literal> such as <literal>ncftpls.exe</literal> are not shown.
+Note that this use does not mean "look for packages with <literal>ls</literal>
+in the root directory," since the <literal>/</literal> can match anywhere in the
+path.  It's just there to anchor the match so that it matches a full
+filename.</para>
+
+<para>By default the matching is case-sensitive.  To get a case insensitive
+match, begin your regexp with <literal>(?i)</literal> which is a PCRE-specific
+feature.  For complete documentation on Perl-compatible regular expression
+syntax and options, read the <command>perlre</command> manpage, or one of many
+websites such as <literal>perldoc.com</literal> that document the Perl
+language.</para>
 
 <para>The <command>cygcheck</command> program should be used to send
 information about your system for troubleshooting when requested.  

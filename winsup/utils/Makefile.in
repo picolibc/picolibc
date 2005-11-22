@@ -99,15 +99,15 @@ else
 	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,2,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
 endif
 
-cygcheck.exe: cygcheck.o path.o dump_setup.o $(MINGW_DEP_LDLIBS)
+cygcheck.exe: cygcheck.o path.o dump_setup.o $(MINGW_DEP_LDLIBS) $(w32api_lib)/libwininet.a
 ifeq "$(libz)" ""
 	@echo '*** Building cygcheck without package content checking due to missing mingw libz.a.'
 endif
 ifdef VERBOSE
-	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,3,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS) $(libz)
+	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,3,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS) $(libz) $(w32api_lib)/libwininet.a
 else
-	@echo $(CXX) -o $@ ${wordlist 1,3,$^} ${filter-out -B%, $(MINGW_CXXFLAGS) $(MINGW_LDFLAGS)} $(libz);\
-	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,3,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS) $(libz)
+	@echo $(CXX) -o $@ ${wordlist 1,3,$^} ${filter-out -B%, $(MINGW_CXXFLAGS) $(MINGW_LDFLAGS)} $(libz) $(w32api_lib)/libwininet.a;\
+	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,3,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS) $(libz) $(w32api_lib)/libwininet.a
 endif
 
 dumper.o: dumper.cc dumper.h

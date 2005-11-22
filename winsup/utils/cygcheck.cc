@@ -11,11 +11,13 @@
 #define cygwin_internal cygwin_internal_dontuse
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 #include <sys/time.h>
 #include <ctype.h>
 #include <io.h>
 #include <windows.h>
+#include <wininet.h>
 #include "path.h"
 #include <getopt.h>
 #include "cygwin/include/sys/cygwin.h"
@@ -33,6 +35,7 @@ int check_setup = 0;
 int dump_only = 0;
 int find_package = 0;
 int list_package = 0;
+int grep_packages = 0;
 
 #ifdef __GNUC__
 typedef long long longlong;
@@ -121,6 +124,39 @@ display_error (const char *name, bool show_error = true, bool print_failed = tru
   else
     fprintf (stderr, "cygcheck: %s%s\n", name,
 	print_failed ? " failed" : "");
+  return 1;
+}
+
+/* Display a WinInet error message, and close a variable number of handles.
+   (Passed a list of handles terminated by NULL.)  */
+static int
+display_internet_error (const char *message, ...)
+{
+  DWORD err = GetLastError ();
+  TCHAR err_buf[256];
+  va_list hptr;
+  HINTERNET h;
+
+  /* in the case of a successful connection but 404 response, there is no
+     win32 error message, but we still get passed a message to display.  */
+  if (err)
+    {
+      if (FormatMessage (FORMAT_MESSAGE_FROM_HMODULE,
+          GetModuleHandle ("wininet.dll"), err, 0, err_buf,
+          sizeof (err_buf), NULL) == 0)
+        strcpy (err_buf, "(Unknown error)");
+
+      fprintf (stderr, "cygcheck: %s: %s (win32 error %d)\n", message,
+               err_buf, err);
+    }
+  else
+    fprintf (stderr, "cygcheck: %s\n", message);
+
+  va_start (hptr, message);
+  while ((h = va_arg (hptr, HINTERNET)) != 0)
+    InternetCloseHandle (h);
+  va_end (hptr);
+
   return 1;
 }
 
@@ -1496,24 +1532,122 @@ check_keys ()
   return 0;
 }
 
+/* RFC1738 says that these do not need to be escaped.  */
+static const char safe_chars[] = "$-_.+!*'(),";
+
+/* the URL to query.  */
+static const char base_url[] =
+        "http://cygwin.com/cgi-bin2/package-grep.cgi?text=1&grep=";
+
+/* Queries Cygwin web site for packages containing files matching a regexp.
+   Return value is 1 if there was a problem, otherwise 0.  */
+static int
+package_grep (char *search)
+{
+  char buf[1024];
+
+  /* construct the actual URL by escaping  */
+  char *url = (char *) alloca (sizeof (base_url) + strlen (search) * 3);
+  strcpy (url, base_url);
+
+  char *dest;
+  for (dest = &url[sizeof (base_url) - 1]; *search; search++)
+    {
+      if (isalnum (*search)
+          || memchr (safe_chars, *search, sizeof (safe_chars) - 1))
+        {
+          *dest++ = *search;
+        }
+      else
+        {
+          *dest++ = '%';
+          sprintf (dest, "%02x", (unsigned char) *search);
+          dest += 2;
+        }
+    }
+  *dest = 0;
+
+  /* Connect to the net and open the URL.  */
+  if (InternetAttemptConnect (0) != ERROR_SUCCESS)
+    {
+      fputs ("An internet connection is required for this function.\n", stderr);
+      return 1;
+    }
+
+  /* Initialize WinInet and attempt to fetch our URL.  */
+  HINTERNET hi = NULL, hurl = NULL;
+  if (!(hi = InternetOpen ("cygcheck", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0)))
+    return display_internet_error ("InternetOpen() failed", NULL);
+
+  if (!(hurl = InternetOpenUrl (hi, url, NULL, 0, 0, 0)))
+    return display_internet_error ("unable to contact cygwin.com site, "
+                                   "InternetOpenUrl() failed", hi, NULL);
+
+  /* Check the HTTP response code.  */
+  DWORD rc = 0, rc_s = sizeof (DWORD);
+  if (!HttpQueryInfo (hurl, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER,
+                      (void *) &rc, &rc_s, NULL))
+    return display_internet_error ("HttpQueryInfo() failed", hurl, hi, NULL);
+
+  if (rc != HTTP_STATUS_OK)
+    {
+      sprintf (buf, "error retrieving results from cygwin.com site, "
+                    "HTTP status code %lu", rc);
+      return display_internet_error (buf, hurl, hi, NULL);
+    }
+
+  /* Fetch result and print to stdout.  */
+  DWORD numread;
+  do
+    {
+      if (!InternetReadFile (hurl, (void *) buf, sizeof (buf), &numread))
+        return display_internet_error ("InternetReadFile failed", hurl, hi, NULL);
+      if (numread)
+        fwrite ((void *) buf, (size_t) numread, 1, stdout);
+    }
+  while (numread);
+
+  InternetCloseHandle (hurl);
+  InternetCloseHandle (hi);
+  return 0;
+}
+
 static void
 usage (FILE * stream, int status)
 {
   fprintf (stream, "\
-Usage: cygcheck [OPTIONS] [PROGRAM...]\n\
-Check system information or PROGRAM library dependencies\n\
+Usage: cygcheck PROGRAM [ -v ] [ -h ]\n\
+       cygcheck -c [ PACKAGE ] [ -d ]\n\
+       cygcheck -s [ -r ] [ -v ] [ -h ]\n\
+       cygcheck -k\n\
+       cygcheck -f FILE [ FILE ... ]\n\
+       cygcheck -l [ PACKAGE ] [ PACKAGE ... ]\n\
+       cygcheck -p REGEXP\n\
+List system information, check installed packages, or query package database.\n\
 \n\
- -c, --check-setup   check packages installed via setup.exe\n\
- -d, --dump-only     no integrity checking of package contents (requires -c)\n\
- -s, --sysinfo       system information (not with -k)\n\
- -v, --verbose       verbose output (indented) (for -[cfls] or programs)\n\
- -r, --registry      registry search (requires -s)\n\
- -k, --keycheck      perform a keyboard check session (not with -[scfl])\n\
- -f, --find-package  find installed packages containing files (not with -[cl])\n\
- -l, --list-package  list the contents of installed packages (not with -[cf])\n\
- -h, --help          give help about the info (not with -[cfl])\n\
- -V, --version       output version information and exit\n\
-You must at least give either -s or -k or a program name\n");
+At least one command option or a PROGRAM is required, as shown above.\n\
+\n\
+  PROGRAM              list library (DLL) dependencies of PROGRAM\n\
+  -c, --check-setup    show installed version of PACKAGE and verify integrity\n\
+                       (or for all installed packages if none specified)\n\
+  -d, --dump-only      just list packages, do not verify (with -c)\n\
+  -s, --sysinfo        produce diagnostic system information (implies -c -d)\n\
+  -r, --registry       also scan registry for Cygwin settings (with -s)\n\
+  -k, --keycheck       perform a keyboard check session (must be run from a\n\
+                       plain console only, not from a pty/rxvt/xterm)\n\
+  -f, --find-package   find the package that FILE belongs to\n\
+  -l, --list-package   list contents of PACKAGE (or all packages if none given)\n\
+  -p, --package-query  search for REGEXP in the entire cygwin.com package\n\
+                       repository (requies internet connectivity)\n\
+  -v, --verbose        produce more verbose output\n\
+  -h, --help           annotate output with explanatory comments when given\n\
+                       with another command, otherwise print this help\n\
+  -V, --version        print the version of cygcheck and exit\n\
+\n\
+Note: -c, -f, and -l only report on packages that are currently installed. To\n\
+  search all official Cygwin packages use -p instead.  The -p REGEXP matches\n\
+  package names, descriptions, and names of files/paths within all packages.\n\
+\n");
   exit (status);
 }
 
@@ -1526,12 +1660,13 @@ struct option longopts[] = {
   {"keycheck", no_argument, NULL, 'k'},
   {"find-package", no_argument, NULL, 'f'},
   {"list-package", no_argument, NULL, 'l'},
+  {"package-query", no_argument, NULL, 'p'},
   {"help", no_argument, NULL, 'h'},
   {"version", no_argument, 0, 'V'},
   {0, no_argument, NULL, 0}
 };
 
-static char opts[] = "cdfhklrsvV";
+static char opts[] = "cdsrvkflphV";
 
 static void
 print_version ()
@@ -1643,6 +1778,9 @@ main (int argc, char **argv)
       case 'l':
 	list_package = 1;
 	break;
+      case 'p':
+        grep_packages = 1;
+        break;
       case 'h':
 	givehelp = 1;
 	break;
@@ -1661,20 +1799,23 @@ main (int argc, char **argv)
     else
       usage (stderr, 1);
 
-  if ((check_setup || sysinfo || find_package || list_package) && keycheck)
+  if ((check_setup || sysinfo || find_package || list_package || grep_packages)
+      && keycheck)
     usage (stderr, 1);
 
-  if ((find_package || list_package) && check_setup)
+  if ((find_package || list_package || grep_packages) && check_setup)
     usage (stderr, 1);
 
   if (dump_only && !check_setup)
     usage (stderr, 1);
 
-  if (find_package && list_package)
+  if (find_package + list_package + grep_packages > 1)
     usage (stderr, 1);
 
   if (keycheck)
     return check_keys ();
+  if (grep_packages)
+    return package_grep (*argv);
 
   init_paths ();
 

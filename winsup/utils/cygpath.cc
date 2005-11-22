@@ -379,6 +379,7 @@ dowin (char option)
 	  GetWindowsDirectory (buf, MAX_PATH);
 	  strcat (buf, "\\Profiles");
 	}
+fprintf (stderr, "************** buf %s\n", buf);
       break;
 
     case 'S':
