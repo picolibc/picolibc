@@ -6,6 +6,7 @@
 	situation.
 	* pinfo.cc (_pinfo::set_ctty): Reinstate incrementing of console count
 	when recording ctty so that the current tty is always around.
+	* autoload.cc (CloseWindowStation): Define.
 
 2005-11-18  Christopher Faylor  <cgf@timesys.com>
 
