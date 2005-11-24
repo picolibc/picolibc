@@ -365,6 +365,8 @@ _pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *arch)
 	  if (arch)
 	    {
 	      arch->usecount++;
+	      /* guard ctty arch */
+	      cygheap->manage_console_count ("_pinfo::set_ctty", 1);
 	      report_tty_counts (cygheap->ctty, "ctty", "");
 	    }
 	}
