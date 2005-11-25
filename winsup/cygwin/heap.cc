@@ -26,8 +26,6 @@ details. */
 
 static unsigned page_const;
 
-extern "C" size_t getpagesize ();
-
 #define MINHEAP_SIZE (4 * 1024 * 1024)
 
 /* Initialize the heap at process start up.  */

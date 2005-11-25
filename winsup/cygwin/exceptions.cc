@@ -923,8 +923,13 @@ ctrl_c_handler (DWORD type)
        that we have handled the signal).  At this point, type should be
        a CTRL_C_EVENT or CTRL_BREAK_EVENT. */
     {
+      int sig = SIGINT;
+      /* If intr and quit are both mapped to ^C, send SIGQUIT on ^BREAK */
+      if (type == CTRL_BREAK_EVENT
+          && t->ti.c_cc[VINTR] == 3 && t->ti.c_cc[VQUIT] == 3)
+        sig = SIGQUIT;
       t->last_ctrl_c = GetTickCount ();
-      killsys (-myself->pid, SIGINT);
+      killsys (-myself->pid, sig);
       t->last_ctrl_c = GetTickCount ();
       return TRUE;
     }

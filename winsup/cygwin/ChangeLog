@@ -1,3 +1,12 @@
+2005-11-25  Christopher Faylor  <cgf@timesys.com>
+
+	* heap.cc: Remove spurious getpagesize declaration.
+
+2005-11-25  Christian Franke  <Christian.Franke@t-online.de>
+
+	* exceptions.cc (ctrl_c_handler): Distinguish CTRL-BREAK from CTRL-C in
+	some cases.
+
 2005-11-23  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_tty.cc (fhandler_tty_slave::open): Reset the current windows
