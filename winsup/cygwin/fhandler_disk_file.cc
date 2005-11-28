@@ -317,14 +317,18 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 
   /* Assume that if a drive has ACL support it MAY have valid "inodes".
      It definitely does not have valid inodes if it does not have ACL
-     support. */
-  switch (pc.has_acls () && (nFileIndexHigh || nFileIndexLow)
+     support.  Decouple from has_acls() which follows smbntsec setting. */
+  switch ((pc.fs_flags () & FILE_PERSISTENT_ACLS)
+	  && (nFileIndexHigh || nFileIndexLow)
 	  ? pc.drive_type () : DRIVE_UNKNOWN)
     {
     case DRIVE_FIXED:
     case DRIVE_REMOVABLE:
     case DRIVE_CDROM:
     case DRIVE_RAMDISK:
+    /* Temporarily enable remote drives until we find out why we disabled them
+       in the first place. When we find out don't forget to write a comment! */
+    case DRIVE_REMOTE:
       /* Although the documentation indicates otherwise, it seems like
 	 "inodes" on these devices are persistent, at least across reboots. */
       buf->st_ino = (((__ino64_t) nFileIndexHigh) << 32)
