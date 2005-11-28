@@ -296,7 +296,11 @@ int fcntl_worker (int fd, int cmd, void *arg);
 extern "C" int low_priority_sleep (DWORD) __attribute__ ((regparm (1)));
 #define SLEEP_0_STAY_LOW INFINITE
 
-size_t getshmlba ();
+/* Returns the real page size, not the allocation size. */
+size_t getsystempagesize ();
+
+/* Init mmap function pointers. */
+void mmap_init ();
 
 int winprio_to_nice (DWORD) __attribute__ ((regparm (1)));
 DWORD nice_to_winprio (int &) __attribute__ ((regparm (1)));

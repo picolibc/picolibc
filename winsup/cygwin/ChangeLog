@@ -1,5 +1,91 @@
 2005-11-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (NtCreateSection): Define.
+	* cygheap.cc (_csbrk): Call getpagesize instead of getshmlba.
+	* dcrt0.cc (dll_crt0_0): Call mmap_init.
+	* external.cc (cygwin_internal): Call getpagesize instead of getshmlba.
+	* fhandler.h (fhandler_base::mmap): Change access to prot parameter.
+	(fhandler_base::fixup_mmap_after_fork): Ditto.
+	(fhandler_disk_file::mmap): Ditto.
+	(fhandler_disk_file::fixup_mmap_after_fork): Ditto.
+	(fhandler_dev_mem::mmap): Ditto.
+	(fhandler_dev_mem::fixup_mmap_after_fork): Ditto.
+	* fhandler_mem.cc (fhandler_dev_mem::write): Call getsystempagesize
+	instead of getpagesize.
+	(fhandler_dev_mem::read): Ditto.
+	(fhandler_dev_mem::fstat): Ditto.
+	(fhandler_dev_mem::mmap): Move to mmap.cc.
+	(fhandler_dev_mem::munmap): Ditto.
+	(fhandler_dev_mem::msync): Ditto.
+	(fhandler_dev_mem::fixup_mmap_after_fork): Ditto.
+	* fhandler_proc.cc (format_proc_meminfo): Call getsystempagesize
+	instead of getpagesize.
+	* fhandler_process.cc (format_process_stat): Ditto.
+	(format_process_status): Ditto.
+	(get_mem_values): Ditto.
+	* mmap.cc: Fix formatting.  Try to make more readable and modular.
+	Take advantage of pagesize==granularity.
+	(gen_protect): New static function to evaluate Windows
+	protection bits from POSIX protection and flags.
+	(gen_access): Ditto for Windows access mode.
+	(VirtualProt9x): Wrapper function to call VirtualProtect on 9x.
+	(VirtualProtNT): Ditto for NT.
+	(VirtualProtEx9x): Ditto for VirtualProtectEx on 9x.
+	(VirtualProtExNT): Ditto for NT.
+	(CreateMapping9x): Wrapper function for creating a mapping handle on 9x.
+	(CreateMappingNT): Ditto for NT.
+	(MapView9x): Wrapper function to map a view on 9x.
+	(MapViewNT): Ditto for NT.
+	(mmap_funcs_9x): Structure containing function pointers to wrapper
+	functions for 9x.
+	(mmap_funcs_nt): Ditto for NT.
+	(mmap_func): Pointer to wrapper functions used in subsequent code.
+	(mmap_init): Initialize mmap_func depending on OS.
+	(class mmap_record): Use sensible member names.  Add POSIX protection
+	member. Drop Windows access flags member.  Constify more methods.
+	Use accessors instead of direct member access inside of own methods.
+	(mmap_record::gen_protect): Class wrapper to evaluate matching
+	Windows protection bits.
+	(mmap_record::gen_access): Ditto for Windows access flags.
+	(mmap_record::compatible_flags): New function to check if flags are
+	compatible with flags of existing map.
+	(list::add_record): Drop offset and length arguments.
+	(class map): Change counters to unsigned.  Match usage throughout.
+	(mmapped_areas): Convert from pointer to global struct.
+	(mmap_record::alloc_page_map): Simplify.
+	(mmap_record::map_pages): Ditto.
+	(mmap_record::fixup_page_map): Delete.
+	(mmap64): Simplify.  Add workaround for Windows 98 bug.  Fix bug on
+	NT that existing anonymous mappings weren't searched for a match.
+	(munmap): Add workaround for Windows 98 bug.
+	(msync): Simplify.
+	(mprotect): Handle existing maps correctly.
+	(mlock): Add local pagesize variable and enlightening comment.
+	(fhandler_disk_file::mmap): Main functionality now in CreateMapping/
+	MapView wrapper functions.
+	(fhandler_disk_file::fixup_mmap_after_fork): Call MapView wrapper.
+	(fhandler_dev_mem::mmap): Moved from fhandler_mem.cc.  Simplify by
+	calling MapViewNT.
+	(fhandler_dev_mem::munmap): Moved from fhandler_mem.cc.
+	(fhandler_dev_mem::msync): Ditto.
+	(fhandler_dev_mem::fixup_mmap_after_fork): Ditto.  Call MapViewNT.
+	(fixup_mmaps_after_fork): Restructure and hopefully speed up loop for
+	setting protection and memory content on MAP_PRIVATE maps.
+	* ntdll.h (AT_ROUND_TO_PAGE): Remove define.
+	(AT_EXTENDABLE_FILE): Add define.
+	(NtCreateSection): Add prototype.
+	* syscalls.cc (getpagesize): Return granularity as pagesize now.
+	(getsystempagesize): New function to retrieve "real" pagesize.
+	(getshmlba): Delete since it's replaced by getpagesize now.
+	* wincap.h (wincaps::has_mmap_alignment_bug): New element.
+	* wincap.cc: Implement above element throughout.
+	* winsup.h (getshmlba): Drop prototype.
+	(getsystempagesize): Add prototype.
+	(mmap_init): Ditto.
+	* include/sys/mman.h: (Not yet) define MAP_NORESERVE.
+
+2005-11-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Don't rely on
 	has_acl() state for evaluating inodes.  Temporarily(?) enable "real"
 	inodes for remote drives.

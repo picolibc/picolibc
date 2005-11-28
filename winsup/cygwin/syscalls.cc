@@ -1380,15 +1380,15 @@ getpagesize ()
 {
   if (!system_info.dwPageSize)
     GetSystemInfo (&system_info);
-  return (int) system_info.dwPageSize;
+  return (size_t) system_info.dwAllocationGranularity;
 }
 
 size_t
-getshmlba ()
+getsystempagesize ()
 {
   if (!system_info.dwAllocationGranularity)
     GetSystemInfo (&system_info);
-  return system_info.dwAllocationGranularity;
+  return (size_t) system_info.dwPageSize;
 }
 
 static int

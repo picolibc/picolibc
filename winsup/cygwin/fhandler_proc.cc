@@ -435,8 +435,9 @@ format_proc_meminfo (char *destbuf, size_t maxsize)
       PSYSTEM_PAGEFILE_INFORMATION spp = spi;
       do
 	{
-	  swap_total += spp->CurrentSize * getpagesize ();
-	  swap_free += (spp->CurrentSize - spp->TotalUsed) * getpagesize ();
+	  swap_total += spp->CurrentSize * getsystempagesize ();
+	  swap_free += (spp->CurrentSize - spp->TotalUsed)
+		       * getsystempagesize ();
 	}
       while (spp->NextEntryOffset
 	     && (spp = (PSYSTEM_PAGEFILE_INFORMATION)

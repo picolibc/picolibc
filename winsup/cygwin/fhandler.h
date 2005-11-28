@@ -298,11 +298,11 @@ class fhandler_base
   virtual int lock (int, struct __flock64 *);
   virtual int dup (fhandler_base *child);
 
-  virtual HANDLE mmap (caddr_t *addr, size_t len, DWORD access,
+  virtual HANDLE mmap (caddr_t *addr, size_t len, int prot,
 		       int flags, _off64_t off);
   virtual int munmap (HANDLE h, caddr_t addr, size_t len);
   virtual int msync (HANDLE h, caddr_t addr, size_t len, int flags);
-  virtual bool fixup_mmap_after_fork (HANDLE h, DWORD access, int flags,
+  virtual bool fixup_mmap_after_fork (HANDLE h, int prot, int flags,
 				      _off64_t offset, DWORD size,
 				      void *address);
 
@@ -664,10 +664,10 @@ class fhandler_disk_file: public fhandler_base
   int __stdcall link (const char *) __attribute__ ((regparm (2)));
   int __stdcall utimes (const struct timeval *) __attribute__ ((regparm (2)));
 
-  HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, _off64_t off);
+  HANDLE mmap (caddr_t *addr, size_t len, int prot, int flags, _off64_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);
   int msync (HANDLE h, caddr_t addr, size_t len, int flags);
-  bool fixup_mmap_after_fork (HANDLE h, DWORD access, int flags,
+  bool fixup_mmap_after_fork (HANDLE h, int prot, int flags,
 			      _off64_t offset, DWORD size, void *address);
   int mkdir (mode_t mode);
   int rmdir ();
@@ -1083,10 +1083,10 @@ class fhandler_dev_mem: public fhandler_base
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int dup (fhandler_base *child);
 
-  HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, _off64_t off);
+  HANDLE mmap (caddr_t *addr, size_t len, int prot, int flags, _off64_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);
   int msync (HANDLE h, caddr_t addr, size_t len, int flags);
-  bool fixup_mmap_after_fork (HANDLE h, DWORD access, int flags,
+  bool fixup_mmap_after_fork (HANDLE h, int prot, int flags,
 			      _off64_t offset, DWORD size, void *address);
 } ;
 

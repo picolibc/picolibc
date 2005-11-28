@@ -136,7 +136,7 @@ fhandler_dev_mem::write (const void *ptr, size_t ulen)
   PHYSICAL_ADDRESS phys;
   NTSTATUS ret;
   void *viewmem = NULL;
-  DWORD len = ulen + getpagesize () - 1;
+  DWORD len = ulen + getsystempagesize () - 1;
 
   phys.QuadPart = (ULONGLONG) pos;
   if ((ret = NtMapViewOfSection (get_handle (),
@@ -188,7 +188,7 @@ fhandler_dev_mem::read (void *ptr, size_t& ulen)
   PHYSICAL_ADDRESS phys;
   NTSTATUS ret;
   void *viewmem = NULL;
-  DWORD len = ulen + getpagesize () - 1;
+  DWORD len = ulen + getsystempagesize () - 1;
 
   phys.QuadPart = (ULONGLONG) pos;
   if ((ret = NtMapViewOfSection (get_handle (),
@@ -251,150 +251,11 @@ fhandler_dev_mem::lseek (_off64_t offset, int whence)
   return pos;
 }
 
-HANDLE
-fhandler_dev_mem::mmap (caddr_t *addr, size_t len, DWORD access,
-			int flags, _off64_t off)
-{
-  if (off >= mem_size
-      || (DWORD) len >= mem_size
-      || off + len >= mem_size)
-    {
-      set_errno (EINVAL);
-      syscall_printf ("-1 = mmap(): illegal parameter, set EINVAL");
-      return INVALID_HANDLE_VALUE;
-    }
-
-  UNICODE_STRING memstr;
-  RtlInitUnicodeString (&memstr, L"\\device\\physicalmemory");
-
-  OBJECT_ATTRIBUTES attr;
-  InitializeObjectAttributes (&attr, &memstr,
-			      OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
-			      NULL, NULL);
-
-  ACCESS_MASK section_access;
-  ULONG protect;
-
-  if (access & FILE_MAP_COPY)
-    {
-      section_access = SECTION_MAP_READ | SECTION_MAP_WRITE;
-      protect = PAGE_WRITECOPY;
-    }
-  else if (access & FILE_MAP_WRITE)
-    {
-      section_access = SECTION_MAP_READ | SECTION_MAP_WRITE;
-      protect = PAGE_READWRITE;
-    }
-  else
-    {
-      section_access = SECTION_MAP_READ;
-      protect = PAGE_READONLY;
-    }
-
-  HANDLE h;
-  NTSTATUS ret = NtOpenSection (&h, section_access, &attr);
-  if (!NT_SUCCESS (ret))
-    {
-      __seterrno_from_nt_status (ret);
-      syscall_printf ("-1 = mmap(): NtOpenSection failed with %E");
-      return INVALID_HANDLE_VALUE;
-    }
-
-  PHYSICAL_ADDRESS phys;
-  void *base = *addr;
-  DWORD dlen = len;
-
-  phys.QuadPart = (ULONGLONG) off;
-
-  if ((ret = NtMapViewOfSection (h,
-				 INVALID_HANDLE_VALUE,
-				 &base,
-				 0L,
-				 dlen,
-				 &phys,
-				 &dlen,
-				 ViewShare /*??*/,
-				 0,
-				 protect)) != STATUS_SUCCESS)
-    {
-      __seterrno_from_nt_status (ret);
-      syscall_printf ("-1 = mmap(): NtMapViewOfSection failed with %E");
-      return INVALID_HANDLE_VALUE;
-    }
-  if ((flags & MAP_FIXED) && base != *addr)
-    {
-      set_errno (EINVAL);
-      syscall_printf ("-1 = mmap(): address shift with MAP_FIXED given");
-      NtUnmapViewOfSection (INVALID_HANDLE_VALUE, base);
-      return INVALID_HANDLE_VALUE;
-    }
-
-  *addr = (caddr_t) base;
-  return h;
-}
-
-int
-fhandler_dev_mem::munmap (HANDLE h, caddr_t addr, size_t len)
-{
-  NTSTATUS ret;
-  if (!NT_SUCCESS (ret = NtUnmapViewOfSection (INVALID_HANDLE_VALUE, addr)))
-    {
-      __seterrno_from_nt_status (ret);
-      return -1;
-    }
-  CloseHandle (h);
-  return 0;
-}
-
-int
-fhandler_dev_mem::msync (HANDLE h, caddr_t addr, size_t len, int flags)
-{
-  return 0;
-}
-
-bool
-fhandler_dev_mem::fixup_mmap_after_fork (HANDLE h, DWORD access, int flags,
-					 _off64_t offset, DWORD size,
-					 void *address)
-{
-  DWORD ret;
-  PHYSICAL_ADDRESS phys;
-  void *base = address;
-  DWORD dlen = size;
-  ULONG protect;
-
-  if (access & FILE_MAP_COPY)
-    protect = PAGE_WRITECOPY;
-  else if (access & FILE_MAP_WRITE)
-    protect = PAGE_READWRITE;
-  else
-    protect = PAGE_READONLY;
-
-  phys.QuadPart = (ULONGLONG) offset;
-
-  if ((ret = NtMapViewOfSection (h,
-				 INVALID_HANDLE_VALUE,
-				 &base,
-				 0L,
-				 dlen,
-				 &phys,
-				 &dlen,
-				 ViewShare /*??*/,
-				 0,
-				 protect)) != STATUS_SUCCESS)
-    {
-      __seterrno_from_nt_status (ret);
-      syscall_printf ("-1 = fixup_mmap_after_fork(): NtMapViewOfSection failed with %E");
-      return false;
-    }
-  return base == address;
-}
-
 int
 fhandler_dev_mem::fstat (struct __stat64 *buf)
 {
   fhandler_base::fstat (buf);
-  buf->st_blksize = getpagesize ();
+  buf->st_blksize = getsystempagesize ();
   if (is_auto_device ())
     {
       buf->st_mode = S_IFCHR;

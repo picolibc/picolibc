@@ -28,6 +28,7 @@ details. */
 #include "pwdgrp.h"
 #include "cygtls.h"
 #include "child_info.h"
+#include <unistd.h>
 
 child_info *get_cygwin_startup_info ();
 
@@ -267,7 +268,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	}
       case CW_GET_SHMLBA:
 	{
-	  return getshmlba ();
+	  return getpagesize ();
 	}
       case CW_GET_UID_FROM_SID:
 	{

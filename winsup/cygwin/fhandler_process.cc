@@ -708,7 +708,7 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
 	 start_time = (spt.KernelTme.QuadPart + spt.UserTime.QuadPart) * HZ / 10000000ULL;
 #endif
       priority = pbi.BasePriority;
-      unsigned page_size = getpagesize ();
+      unsigned page_size = getsystempagesize ();
       vmsize = vmc.PagefileUsage;
       vmrss = vmc.WorkingSetSize / page_size;
       vmmaxrss = ql.MaximumWorkingSetSize / page_size;
@@ -788,7 +788,7 @@ format_process_status (_pinfo *p, char *destbuf, size_t maxsize)
     {
       if (!get_mem_values (p->dwProcessId, &vmsize, &vmrss, &vmtext, &vmdata, &vmlib, &vmshare))
 	return 0;
-      unsigned page_size = getpagesize ();
+      unsigned page_size = getsystempagesize ();
       vmsize *= page_size; vmrss *= page_size; vmdata *= page_size;
       vmtext *= page_size; vmlib *= page_size;
     }
@@ -918,7 +918,7 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
   MEMORY_WORKING_SET_LIST *mwsl;
   ULONG n = 0x1000, length;
   PULONG p = (PULONG) malloc (sizeof (ULONG) * n);
-  unsigned page_size = getpagesize ();
+  unsigned page_size = getsystempagesize ();
   hProcess = OpenProcess (PROCESS_QUERY_INFORMATION,
 			  FALSE, dwProcessId);
   if (hProcess == NULL)

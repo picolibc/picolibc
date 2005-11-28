@@ -646,6 +646,7 @@ dll_crt0_0 ()
   _impure_ptr->_current_locale = "C";
   wincap.init ();
   initial_env ();
+  mmap_init ();
 
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
 		       GetCurrentProcess (), &hMainProc, 0, FALSE,

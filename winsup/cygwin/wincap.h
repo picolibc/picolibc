@@ -38,6 +38,7 @@ struct wincaps
   unsigned has_working_copy_on_write                    : 1;
   unsigned share_mmaps_only_by_name                     : 1;
   unsigned virtual_protect_works_on_shared_pages        : 1;
+  unsigned has_mmap_alignment_bug			: 1;
   unsigned has_hard_links                               : 1;
   unsigned can_open_directories                         : 1;
   unsigned has_move_file_ex                             : 1;
@@ -105,6 +106,7 @@ public:
   bool  IMPLEMENT (has_working_copy_on_write)
   bool  IMPLEMENT (share_mmaps_only_by_name)
   bool  IMPLEMENT (virtual_protect_works_on_shared_pages)
+  bool	IMPLEMENT (has_mmap_alignment_bug)
   bool  IMPLEMENT (has_hard_links)
   bool  IMPLEMENT (can_open_directories)
   bool  IMPLEMENT (has_move_file_ex)

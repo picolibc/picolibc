@@ -379,6 +379,7 @@ LoadDLLfunc (NetUserGetInfo, 16, netapi32)
 LoadDLLfunc (NetWkstaUserGetInfo, 12, netapi32)
 
 LoadDLLfuncEx (NtCreateFile, 44, ntdll, 1)
+LoadDLLfuncEx (NtCreateSection, 28, ntdll, 1)
 LoadDLLfuncEx (NtCreateToken, 52, ntdll, 1)
 LoadDLLfuncEx (NtLockVirtualMemory, 16, ntdll, 1)
 LoadDLLfuncEx (NtMapViewOfSection, 40, ntdll, 1)

@@ -31,6 +31,11 @@ extern "C" {
 #define MAP_ANONYMOUS 0x20
 #define MAP_ANON MAP_ANONYMOUS
 /* Non-standard flag */
+#if 0 /* Not yet implemented */
+#define MAP_NORESERVE 0x4000	/* Don't reserve swap space for this mapping.
+				   Page protection must be set explicitely
+				   to access page. */
+#endif
 #define MAP_AUTOGROW 0x8000	/* Grow underlying object to mapping size.
 				   File must be opened for writing. */
 
