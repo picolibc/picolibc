@@ -282,12 +282,13 @@ details. */
       142: Export memmem
       143: Export clock_getres, clock_setres
       144: Export timelocal, timegm.
+      145: Add MAP_NORESERVE flag to mmap.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 144
+#define CYGWIN_VERSION_API_MINOR 145
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

@@ -1,5 +1,9 @@
 2005-11-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/version.h: Bump API minor version.
+
+2005-11-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (fhandler_dev_zero::mmap): Add method.
 	(fhandler_dev_zero::munmap): Ditto.
 	(fhandler_dev_zero::msync): Ditto.
