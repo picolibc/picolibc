@@ -1,3 +1,0 @@
-LIBRARY dpnlobby.def
-EXPORTS
-DirectPlay8LobbyCreate@12
