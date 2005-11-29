@@ -1,3 +1,49 @@
+2005-11-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_dev_zero::mmap): Add method.
+	(fhandler_dev_zero::munmap): Ditto.
+	(fhandler_dev_zero::msync): Ditto.
+	(fhandler_dev_zero::fixup_mmap_after_fork): Ditto.
+	* mmap.cc: Implement anonymous mapping using fhandler_dev_zero class.
+	Implement private anonymous maps using VirtualAlloc/VirtualFree.  Fix
+	or add some more comments.
+	(fh_paging_file): Change to type fhandler_dev_zero.
+	(priv): New static inline function to avoid having lots of flag bit
+	tests in the code.  Use throughout were appropriate.
+	(fixed): Ditto.
+	(anonymous): Ditto.
+	(noreserve): Ditto.
+	(autogrow): Ditto.
+	(gen_protect): Never generate PAGE_WRITECOPY protection for
+	private anonymous maps.
+	(gen_access): Drop FILE_MAP_EXECUTE handling since it's not supported
+	correctly on 9x.
+	(VirtualProt9x): Move comment from mmap64 here.
+	(mmap_record::mmap_record): Gegerate correct device entry for
+	anonymous maps, though unused right now.
+	(mmap_record::priv): Call global priv function.
+	(mmap_record::fixed): Call global fixed function.
+	(mmap_record::anonymous): Call global anonymous function.
+	(mmap_record::noreserve): Call global noreserve function.
+	(mmap_record::autogrow): Call global autogrow function.
+	(list::anonymous): New method.  Use throughout were appropriate.
+	(mmap_record::compatible_flags): Drop now useless ifdef.
+	(mmap_record::alloc_page_map): Accomodate private anonymous maps.
+	(mmap_record::map_pages): Accomodate MAP_NORESERVE mappings.
+	(mmap_record::unmap_pages): Accomodate private anonymous maps.
+	(mmap64): Simplify argument check.  Don't remove the MAP_PRIVATE flag
+	for anonymous mappings on 9x anymore since that's now handled
+	gracefully.
+	(mprotect): Accomodate MAP_NORESERVE mappings.  Fix case when
+	non-mmap areas are just MEM_RESERVEd.
+	(fhandler_dev_zero::mmap): Implement anonymous mapping here.
+	(fhandler_dev_zero::munmap): Ditto.
+	(fhandler_dev_zero::msyn): Ditto.
+	(fhandler_dev_zero::fixup_mmap_after_fork): Ditto.
+	(fixup_mmaps_after_fork): Accomodate private anonymous maps.  Enhance
+	debug output in case VirtualProtect fails.
+	* include/sys/mman.h: Really define MAP_NORESERVE now.
+
 2005-11-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (NtCreateSection): Define.

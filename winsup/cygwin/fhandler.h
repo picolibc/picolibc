@@ -1044,6 +1044,14 @@ class fhandler_dev_zero: public fhandler_base
   int write (const void *ptr, size_t len);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   _off64_t lseek (_off64_t offset, int whence);
+
+  virtual HANDLE mmap (caddr_t *addr, size_t len, int prot,
+		       int flags, _off64_t off);
+  virtual int munmap (HANDLE h, caddr_t addr, size_t len);
+  virtual int msync (HANDLE h, caddr_t addr, size_t len, int flags);
+  virtual bool fixup_mmap_after_fork (HANDLE h, int prot, int flags,
+				      _off64_t offset, DWORD size,
+				      void *address);
 };
 
 class fhandler_dev_random: public fhandler_base
