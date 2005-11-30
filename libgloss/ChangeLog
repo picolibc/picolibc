@@ -1,3 +1,9 @@
+2005-11-30  Shaun Jackman  <sjackman@gmail.com>
+
+	* arm/libcfunc.c (clock, sleep, usleep): New functions.
+	* arm/syscalls.c (_clock): New function.
+	(_times): Call _clock.
+
 2005-11-17  Shaun Jackman  <sjackman@gmail.com>
 
 	* libgloss/arm/libcfunc.c (isatty): Call _isatty. GDB now supports

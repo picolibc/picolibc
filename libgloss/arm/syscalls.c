@@ -31,6 +31,7 @@ int     _getpid		_PARAMS ((int));
 int     _kill		_PARAMS ((int, int));
 void    _exit		_PARAMS ((int));
 int     _close		_PARAMS ((int));
+clock_t _clock		_PARAMS ((void));
 int     _swiclose	_PARAMS ((int));
 int     _open		_PARAMS ((const char *, int, ...));
 int     _swiopen	_PARAMS ((const char *, int));
@@ -597,7 +598,7 @@ _gettimeofday (struct timeval * tp, struct timezone * tzp)
 
 /* Return a clock that ticks at 100Hz.  */
 clock_t 
-_times (struct tms * tp)
+_clock (void)
 {
   clock_t timeval;
 
@@ -606,6 +607,14 @@ _times (struct tms * tp)
 #else
   asm ("swi %a1; mov %0, r0" : "=r" (timeval): "i" (SWI_Clock) : "r0");
 #endif
+  return timeval;
+}
+
+/* Return a clock that ticks at 100Hz.  */
+clock_t
+_times (struct tms * tp)
+{
+  clock_t timeval = _clock();
 
   if (tp)
     {

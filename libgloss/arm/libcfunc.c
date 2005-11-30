@@ -43,6 +43,13 @@ alarm (unsigned seconds)
 	return 0;
 }
 
+clock_t _clock(void);
+clock_t __attribute__((weak))
+clock(void)
+{
+      return _clock();
+}
+
 int _isatty(int fildes);
 int __attribute__((weak))
 isatty(int fildes)
@@ -51,8 +58,31 @@ isatty(int fildes)
 }
 
 int __attribute__((weak))
-pause (void)
+pause(void)
 {
 	errno = ENOSYS;
 	return -1;
+}
+
+#include <sys/types.h>
+#include <time.h>
+
+unsigned __attribute__((weak))
+sleep(unsigned seconds)
+{
+	clock_t t0 = _clock();
+	clock_t dt = seconds * CLOCKS_PER_SEC;
+
+	while (_clock() - t0  < dt);
+	return 0;
+}
+
+int __attribute__((weak))
+usleep(useconds_t useconds)
+{
+	clock_t t0 = _clock();
+	clock_t dt = useconds / (1000000/CLOCKS_PER_SEC);
+
+	while (_clock() - t0  < dt);
+	return 0;
 }
