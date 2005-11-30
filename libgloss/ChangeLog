@@ -1,5 +1,12 @@
 2005-11-30  Shaun Jackman  <sjackman@gmail.com>
 
+	* libnosys/Makefile.in (OBJS): Add chown, readlink, and symlink.
+	* libnosys/chown.c: New file.
+	* libnosys/readlink.c: New file.
+	* libnosys/symlink.c: New file.
+
+2005-11-30  Shaun Jackman  <sjackman@gmail.com>
+
 	* arm/libcfunc.c (clock, sleep, usleep): New functions.
 	* arm/syscalls.c (_clock): New function.
 	(_times): Call _clock.
