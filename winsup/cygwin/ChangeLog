@@ -1,3 +1,8 @@
+2005-11-30  Christopher Faylor  <cgf@timesys.com>
+
+	* times.cc (hires_ms::prime): Remove debugging stuff.
+	(hires_ms::usecs): Ditto.
+
 2005-11-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (list::try_map): New method, implementing trying to map

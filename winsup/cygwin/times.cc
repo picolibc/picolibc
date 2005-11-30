@@ -621,16 +621,11 @@ hires_ms::prime ()
   if (!inited)
     {
       FILETIME f;
-      // int priority = GetThreadPriority (GetCurrentThread ());
-// stupid_printf ("priority %d", priority);
-      // SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
-stupid_printf ("SetThreadPriority to THREAD_PRIORITY_TIME_CRITICAL");
+      int priority = GetThreadPriority (GetCurrentThread ());
+      SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
       initime_ms = timeGetTime ();
-stupid_printf ("after timeGetTime");
       GetSystemTimeAsFileTime (&f);
-stupid_printf ("after GetSystemTimeAsFileTime");
-      // SetThreadPriority (GetCurrentThread (), priority);
-// stupid_printf ("SetThreadPriority(%p, %d)", GetCurrentThread(), priority);
+      SetThreadPriority (GetCurrentThread (), priority);
 
       initime_us.HighPart = f.dwHighDateTime;
       initime_us.LowPart = f.dwLowDateTime;
@@ -638,30 +633,24 @@ stupid_printf ("after GetSystemTimeAsFileTime");
       initime_us.QuadPart /= 10;
       inited = 1;
     }
-stupid_printf ("returning");
   return;
 }
 
 LONGLONG
 hires_ms::usecs ()
 {
-stupid_printf ("before call to prime(), process priority %d", GetThreadPriority (GetCurrentThread ()));
   if (!inited)
     prime ();
-stupid_printf ("after call to prime(), process priority %d", GetThreadPriority (GetCurrentThread ()));
 
   DWORD now = timeGetTime ();
-stupid_printf ("after call to timeGetTime, process priority %d", GetThreadPriority (GetCurrentThread ()));
   if ((int) (now - initime_ms) < 0)
     {
-stupid_printf ("special casing, process priority %d", GetThreadPriority (GetCurrentThread ()));
       inited = 0;
       prime ();
       now = timeGetTime ();
     }
   // FIXME: Not sure how this will handle the 49.71 day wrap around
   LONGLONG res = initime_us.QuadPart + ((LONGLONG) (now - initime_ms) * 1000);
-stupid_printf ("res %U, process priority %d", res, GetThreadPriority (GetCurrentThread ()));
   return res;
 }
 
