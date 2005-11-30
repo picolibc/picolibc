@@ -453,6 +453,7 @@ class list
     mmap_record *search_record (_off64_t off, DWORD len);
     long search_record (caddr_t addr, DWORD len, caddr_t &m_addr, DWORD &m_len,
 		long start);
+    caddr_t try_map (void *addr, size_t len, int flags, _off64_t off);
 };
 
 class map
@@ -726,6 +727,52 @@ list::del_record (int i)
   return !nrecs;
 }
 
+caddr_t
+list::try_map (void *addr, size_t len, int flags, _off64_t off)
+{
+  mmap_record *rec;
+
+  if (off == 0 && !fixed (flags))
+    {
+      /* If MAP_FIXED isn't given, check if this mapping matches into the
+	 chunk of another already performed mapping. */
+      if ((rec = search_record (off, len)) != NULL
+	  && rec->compatible_flags (flags))
+	{
+	  if ((off = rec->map_pages (off, len)) == (_off64_t)-1)
+	    return (caddr_t) MAP_FAILED;
+	  return (caddr_t) rec->get_address () + off;
+	}
+    }
+  else if (fixed (flags))
+    {
+      /* If MAP_FIXED is given, test if the requested area is in an
+	 unmapped part of an still active mapping.  This can happen
+	 if a memory region is unmapped and remapped with MAP_FIXED. */
+      caddr_t u_addr;
+      DWORD u_len;
+      long record_idx = -1;
+      if ((record_idx = search_record ((caddr_t) addr, len, u_addr, u_len,
+				       record_idx)) >= 0)
+	{
+	  rec = get_record (record_idx);
+	  if (u_addr > (caddr_t) addr || u_addr + len < (caddr_t) addr + len
+	      || !rec->compatible_flags (flags))
+	    {
+	      /* Partial match only, or access mode doesn't match. */
+	      /* FIXME: Handle partial mappings gracefully if adjacent
+		 memory is available. */
+	      set_errno (EINVAL);
+	      return (caddr_t) MAP_FAILED;
+	    }
+	  if (!rec->map_pages ((caddr_t) addr, len))
+	    return (caddr_t) MAP_FAILED;
+	  return (caddr_t) addr;
+	}
+    }
+  return NULL;
+}
+
 list *
 map::get_list_by_fd (int fd)
 {
@@ -890,46 +937,13 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
   /* Test if an existing anonymous mapping can be recycled. */
   if (map_list && anonymous (flags))
     {
-      if (off == 0 && !fixed (flags))
-	{
-	  /* If MAP_FIXED isn't given, check if this mapping matches into the
-	     chunk of another already performed mapping. */
-	  if ((rec = map_list->search_record (off, len)) != NULL
-	      && rec->compatible_flags (flags))
-	    {
-	      if ((off = rec->map_pages (off, len)) == (_off64_t)-1)
-		goto out;
-	      ret = rec->get_address () + off;
-	      goto out;
-	    }
-	}
-      else if (fixed (flags))
-	{
-	  /* If MAP_FIXED is given, test if the requested area is in an
-	     unmapped part of an still active mapping.  This can happen
-	     if a memory region is unmapped and remapped with MAP_FIXED. */
-	  caddr_t u_addr;
-	  DWORD u_len;
-	  long record_idx = -1;
-	  if ((record_idx = map_list->search_record ((caddr_t)addr, len,
-						     u_addr, u_len,
-						     record_idx)) >= 0)
-	    {
-	      rec = map_list->get_record (record_idx);
-	      if (u_addr > (caddr_t)addr || u_addr + len < (caddr_t)addr + len
-		  || !rec->compatible_flags (flags))
-		{
-		  /* Partial match only, or access mode doesn't match. */
-		  /* FIXME: Handle partial mappings gracefully if adjacent
-		     memory is available. */
-		  set_errno (EINVAL);
-		  goto out;
-		}
-	      if (!rec->map_pages ((caddr_t)addr, len))
-		goto out;
-	      ret = (caddr_t)addr;
-	      goto out;
-	    }
+      caddr_t tried = map_list->try_map (addr, len, flags, off);
+      /* try_map returns NULL if no map matched, otherwise it returns
+         a valid address, of MAP_FAILED in case of a fatal error. */
+      if (tried)
+        {
+	  ret = tried;
+	  goto out;
 	}
     }
 
@@ -1434,9 +1448,11 @@ fhandler_dev_zero::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
   void *base;
   if (priv (flags))
     {
-      DWORD protect = gen_protect (prot, flags);
       DWORD alloc_type = MEM_RESERVE | (noreserve (flags) ? 0 : MEM_COMMIT);
-      base = VirtualAlloc (address, size, alloc_type, protect);
+      /* Always allocate R/W so that ReadProcessMemory doesn't fail
+         due to a non-writable target address.  The protection is
+	 set to the correct one anyway in the fixup loop. */
+      base = VirtualAlloc (address, size, alloc_type, PAGE_READWRITE);
     }
   else
     base = mmap_func->MapView (h, address, size, prot, flags, offset);
@@ -1719,8 +1735,7 @@ fixup_mmaps_after_fork (HANDLE parent)
 		      return -1;
 		    }
 		}
-	      /* Set child page protection to parent protection if
-	         protection differs from original protection. */
+	      /* Set child page protection to parent protection */
 	      if (!VirtualProtect (address, mbi.RegionSize,
 				   mbi.Protect, &old_prot))
 		{

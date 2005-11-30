@@ -1,3 +1,12 @@
+2005-11-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (list::try_map): New method, implementing trying to map
+	within another already existing map, moved from mmap64 here.
+	(mmap64): Just call try_map now.
+	(fhandler_dev_zero::fixup_mmap_after_fork): Always create new private
+	map with PAGE_READWRITE protection.
+	(fixup_mmaps_after_fork): Fix comment.
+
 2005-11-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h: Bump API minor version.
