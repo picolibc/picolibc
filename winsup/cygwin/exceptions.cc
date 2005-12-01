@@ -479,10 +479,14 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
       si.si_signo = SIGALRM;
       break;
 
+    case STATUS_GUARD_PAGE_VIOLATION:
+      si.si_signo = SIGBUS;
+      si.si_code = BUS_OBJERR;
+      break;
+
     case STATUS_ACCESS_VIOLATION:
     case STATUS_DATATYPE_MISALIGNMENT:
     case STATUS_ARRAY_BOUNDS_EXCEEDED:
-    case STATUS_GUARD_PAGE_VIOLATION:
     case STATUS_IN_PAGE_ERROR:
     case STATUS_NO_MEMORY:
     case STATUS_INVALID_DISPOSITION:

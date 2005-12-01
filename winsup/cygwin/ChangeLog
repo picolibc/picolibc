@@ -1,3 +1,8 @@
+2005-12-01  Christopher Faylor  <cgf@timesys.com>
+
+	* exceptions.cc (handle_exceptions): Translate a guard page exception
+	to a "SIGBUS".
+
 2005-12-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc: Make debug output more consistently.  Fix some comments.
