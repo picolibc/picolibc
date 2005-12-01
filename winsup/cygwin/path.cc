@@ -88,10 +88,11 @@ struct symlink_info
   int extn;
   unsigned pflags;
   DWORD fileattr;
-  int is_symlink;
+  int issymlink;
   bool ext_tacked_on;
   int error;
   bool case_clash;
+  bool isdevice;
   _major_t major;
   _minor_t minor;
   _mode_t mode;
@@ -749,7 +750,7 @@ path_conv::check (const char *src, unsigned opt,
 
 is_virtual_symlink:
 
-	  if (sym.minor || sym.major)
+	  if (sym.isdevice)
 	    {
 	      dev.parse (sym.major, sym.minor);
 	      dev.setfs (1);
@@ -797,7 +798,7 @@ is_virtual_symlink:
 	      /* If symlink.check found an existing non-symlink file, then
 		 it sets the appropriate flag.  It also sets any suffix found
 		 into `ext_here'. */
-	      if (!sym.is_symlink && sym.fileattr != INVALID_FILE_ATTRIBUTES)
+	      if (!sym.issymlink && sym.fileattr != INVALID_FILE_ATTRIBUTES)
 		{
 		  error = sym.error;
 		  if (component == 0)
@@ -3152,36 +3153,28 @@ symlink_info::parse_device (const char *contents)
 
   mymajor = strtol (contents += 2, &endptr, 16);
   if (endptr == contents)
-    return false;
+    return isdevice = false;
 
   contents = endptr;
   myminor = strtol (++contents, &endptr, 16);
   if (endptr == contents)
-    return false;
+    return isdevice = false;
 
   contents = endptr;
   mymode = strtol (++contents, &endptr, 16);
   if (endptr == contents)
-    return false;
+    return isdevice = false;
 
-  switch (mymode & S_IFMT)
+  if ((mymode & S_IFMT) == S_IFIFO)
     {
-    case S_IFIFO:
       mymajor = _major (FH_FIFO);
       myminor = _minor (FH_FIFO);
-      break;
-    case S_IFBLK:
-    case S_IFCHR:
-      if (mymajor || myminor)
-	break;
-    default:
-      return false;
     }
 
   major = mymajor;
   minor = myminor;
   mode = mymode;
-  return true;
+  return isdevice = true;
 }
 
 /* Check if PATH is a symlink.  PATH must be a valid Win32 path name.
@@ -3209,11 +3202,13 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
   suffix_scan suffix;
   contents[0] = '\0';
 
-  is_symlink = true;
+  issymlink = true;
+  isdevice = false;
   ext_here = suffix.has (path, suffixes);
   extn = ext_here - path;
   major = 0;
   minor = 0;
+  mode = 0;
 
   pflags &= ~(PATH_SYMLINK | PATH_LNK);
   unsigned pflags_or = pflags & PATH_NO_ACCESS_CHECK;
@@ -3323,8 +3318,8 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
       break;
 
     file_not_symlink:
-      is_symlink = false;
-      syscall_printf ("%s", (major || minor) ? "is a device" : "not a symlink");
+      issymlink = false;
+      syscall_printf ("%s", isdevice ? "is a device" : "not a symlink");
       res = 0;
       break;
     }
@@ -3343,7 +3338,8 @@ symlink_info::set (char *path)
   pflags = PATH_SYMLINK;
   fileattr = FILE_ATTRIBUTE_NORMAL;
   error = 0;
-  is_symlink = true;
+  issymlink = true;
+  isdevice = false;
   ext_tacked_on = case_clash = false;
   ext_here = NULL;
   extn = major = minor = mode = 0;

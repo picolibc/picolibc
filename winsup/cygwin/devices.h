@@ -14,8 +14,8 @@ typedef mode_t _mode_t;
 typedef __dev32_t _dev_t;
 
 #define FHDEV(maj, min) ((((unsigned) (maj)) << (sizeof (_major_t) * 8)) | (unsigned) (min))
-#define _minor(dev) ((dev) & ((1 << (sizeof (_minor_t) * 8)) - 1))
-#define _major(dev) ((dev) >> (sizeof (_major_t) * 8))
+#define _minor(dev) (((_minor_t) dev) & ((1 << (sizeof (_minor_t) * 8)) - 1))
+#define _major(dev) (((_major_t) dev) >> (sizeof (_major_t) * 8))
 
 enum fh_devices
 {
@@ -149,6 +149,7 @@ struct device
   inline operator int () const {return devn;}
   inline void setfs (bool x) {dev_on_fs = x;}
   inline bool isfs () const {return dev_on_fs || devn == FH_FS;}
+  inline bool is_fs_special () const {return dev_on_fs && devn != FH_FS;}
 };
 
 extern const device *console_dev;

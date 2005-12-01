@@ -153,7 +153,7 @@ class path_conv
   int isspecial () const {return dev.devn && dev.devn != FH_FS;}
   int is_auto_device () const {return isdevice () && !is_fs_special ();}
   int is_fs_device () const {return isdevice () && is_fs_special ();}
-  int is_fs_special () const {return isspecial () && dev.isfs ();}
+  int is_fs_special () const {return dev.is_fs_special ();}
   int is_lnk_special () const {return is_fs_device () || isfifo () || is_lnk_symlink ();}
   int issocket () const {return dev.devn == FH_UNIX;}
   int iscygexec () const {return path_flags & PATH_CYGWIN_EXEC;}

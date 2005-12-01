@@ -394,6 +394,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 	{
 	  buf->st_dev = dev ();
 	  buf->st_mode = dev ().mode;
+	  buf->st_size = 0;
 	}
     }
   else
@@ -413,6 +414,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 	{
 	  buf->st_dev = dev ();
 	  buf->st_mode = dev ().mode;
+	  buf->st_size = 0;
 	}
       else
 	{
@@ -1458,7 +1460,7 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 	  strcpy (fbuf, dir->__d_dirname);
 	  strcpy (fbuf + strlen (fbuf) - 1, c);
 	  path_conv fpath (fbuf, PC_SYM_NOFOLLOW);
-	  if (fpath.issymlink () || fpath.isspecial ())
+	  if (fpath.issymlink () || fpath.is_fs_special ())
 	    c[len - 4] = '\0';
 	}
     }

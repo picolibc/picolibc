@@ -1,3 +1,26 @@
+2005-12-01  Christopher Faylor  <cgf@timesys.com>
+
+	* devices.h (_minor): Coerce argument to proper type before
+	manipulating.
+	(_major): Ditto.
+	(device::is_fs_special): New function.
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Set the size to
+	0 for devices rather than reporting the size of the symlink.
+	(fhandler_disk_file::readdir): Use is_fs_special to determine if .lnk
+	should be stripped.
+	* path.cc: Rename symlink_info::is_symlink to symlink_info::issymlink
+	throughout.
+	(symlink_info::isdevice): New field.
+	(path_conv::check): Use 'isdevice' to determine if just-parsed entity
+	is a device rather than relying on non-zero major/minor.
+	(symlink_info::parse_device): Set isdevice to true if we've discovered
+	a device.
+	(symlink_info::check): Clear isdevice field prior to processing.  Use
+	isdevice to control debugging output.
+	(symlink_info::set): Set isdevice to false.
+	* path.h (path_conv::is_fs_special): New function.
+	* devices.cc: Regenerate.
+
 2005-11-30  Christopher Faylor  <cgf@timesys.com>
 
 	* times.cc (hires_ms::prime): Remove debugging stuff.
@@ -46,19 +69,19 @@
 	(mmap_record::autogrow): Call global autogrow function.
 	(list::anonymous): New method.  Use throughout were appropriate.
 	(mmap_record::compatible_flags): Drop now useless ifdef.
-	(mmap_record::alloc_page_map): Accomodate private anonymous maps.
-	(mmap_record::map_pages): Accomodate MAP_NORESERVE mappings.
-	(mmap_record::unmap_pages): Accomodate private anonymous maps.
+	(mmap_record::alloc_page_map): Accommodate private anonymous maps.
+	(mmap_record::map_pages): Accommodate MAP_NORESERVE mappings.
+	(mmap_record::unmap_pages): Accommodate private anonymous maps.
 	(mmap64): Simplify argument check.  Don't remove the MAP_PRIVATE flag
 	for anonymous mappings on 9x anymore since that's now handled
 	gracefully.
-	(mprotect): Accomodate MAP_NORESERVE mappings.  Fix case when
+	(mprotect): Accommodate MAP_NORESERVE mappings.  Fix case when
 	non-mmap areas are just MEM_RESERVEd.
 	(fhandler_dev_zero::mmap): Implement anonymous mapping here.
 	(fhandler_dev_zero::munmap): Ditto.
 	(fhandler_dev_zero::msyn): Ditto.
 	(fhandler_dev_zero::fixup_mmap_after_fork): Ditto.
-	(fixup_mmaps_after_fork): Accomodate private anonymous maps.  Enhance
+	(fixup_mmaps_after_fork): Accommodate private anonymous maps.  Enhance
 	debug output in case VirtualProtect fails.
 	* include/sys/mman.h: Really define MAP_NORESERVE now.
 
