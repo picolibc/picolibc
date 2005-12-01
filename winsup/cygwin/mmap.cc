@@ -68,7 +68,7 @@ autogrow (int flags)
 }
 
 /* Generate Windows protection flags from mmap prot and flag values. */
-static DWORD
+static inline DWORD
 gen_protect (int prot, int flags, bool create = false)
 {
   DWORD ret = PAGE_NOACCESS;
@@ -99,7 +99,7 @@ gen_protect (int prot, int flags, bool create = false)
 /* Generate Windows access flags from mmap prot and flag values.
    Only used on 9x.  PROT_EXEC not supported here since it's not
    necessary. */
-static DWORD
+static inline DWORD
 gen_access (int prot, int flags)
 {
   DWORD ret = 0;
@@ -302,7 +302,7 @@ MapViewNT (HANDLE h, void *addr, size_t len, int prot, int flags, _off64_t off)
      try again with NULL address. */
   ret = NtMapViewOfSection (h, GetCurrentProcess (), &base, 0, size, &offset,
 			    &size, ViewShare, 0, protect);
-  if (!NT_SUCCESS (ret) && addr  && !fixed (flags))
+  if (!NT_SUCCESS (ret) && addr && !fixed (flags))
     {
       base = NULL;
       ret = NtMapViewOfSection (h, GetCurrentProcess (), &base, 0, size,
@@ -313,8 +313,8 @@ MapViewNT (HANDLE h, void *addr, size_t len, int prot, int flags, _off64_t off)
       base = NULL;
       SetLastError (RtlNtStatusToDosError (ret));
     }
-  debug_printf ("%x = NtMapViewOfSection (h:%x, addr:%x 0, len:%u, off:%D, "
-		"protect:%x,)", base, h, addr, len, off, protect);
+  debug_printf ("%x = NtMapViewOfSection (h:%x, addr:%x, len:%u, off:%D, "
+		"protect:%x, type:%x)", base, h, addr, len, off, protect, 0);
   return base;
 }
 
@@ -425,8 +425,8 @@ class mmap_record
     fhandler_base *alloc_fh ();
     void free_fh (fhandler_base *fh);
     
-    DWORD gen_protect () const
-      { return ::gen_protect (get_prot (), get_flags ()); }
+    DWORD gen_protect (bool create = false) const
+      { return ::gen_protect (get_prot (), get_flags (), create); }
     DWORD gen_access () const
       { return ::gen_access (get_prot (), get_flags ()); }
     bool compatible_flags (int fl) const;
@@ -469,8 +469,7 @@ class map
     void del_list (unsigned i);
 };
 
-/* This is the global map structure pointer.  It's allocated once on the
-   first call to mmap64(). */
+/* This is the global map structure pointer. */
 static map mmapped_areas;
 
 bool
@@ -510,14 +509,16 @@ mmap_record::alloc_page_map ()
 				      sizeof (DWORD))))
     return false;
 
-  DWORD old_prot;
+  DWORD start_protect = gen_protect (true);
+  DWORD real_protect = gen_protect ();
+  if (real_protect != start_protect
+      && !VirtualProtect (get_address (), get_len (),
+			  real_protect, &start_protect))
+    system_printf ("Warning: VirtualProtect (addr: %p, len: 0x%x, "
+		   "new_prot: 0x%x, old_prot: 0x%x), %E",
+		   get_address (), get_len (),
+		   real_protect, start_protect);
   DWORD len = PAGE_CNT (get_len ());
-  DWORD protect = gen_protect ();
-  if (protect != PAGE_WRITECOPY && priv () && !anonymous ()
-      && !VirtualProtect (get_address (), len * getpagesize (),
-      			  protect, &old_prot))
-    syscall_printf ("VirtualProtect(%x,%D,%d) failed, %E",
-		    get_address (), len * getpagesize ());
   while (len-- > 0)
     MAP_SET (len);
   return true;
@@ -586,10 +587,10 @@ mmap_record::unmap_pages (caddr_t addr, DWORD len)
   if (anonymous () && priv () && noreserve ()
       && !VirtualFree (get_address () + off * getpagesize (),
 		       len * getpagesize (), MEM_DECOMMIT))
-    syscall_printf ("VirtualFree in unmap_pages () failed, %E");
+    debug_printf ("VirtualFree in unmap_pages () failed, %E");
   else if (!VirtualProtect (get_address () + off * getpagesize (),
 			    len * getpagesize (), PAGE_NOACCESS, &old_prot))
-    syscall_printf ("VirtualProtect in unmap_pages () failed, %E");
+    debug_printf ("VirtualProtect in unmap_pages () failed, %E");
 
   for (; len-- > 0; ++off)
     MAP_CLR (off);
@@ -890,6 +891,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
       /* Anonymous mappings are always forced to pagesize length. */
       len = PAGE_CNT (len) * pagesize;
       flags |= MAP_ANONYMOUS;
+      off = 0;
     }
   else if (fh->get_device () == FH_FS)
     {
@@ -1389,7 +1391,7 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
 	    {
 	      VirtualFree (base, len, MEM_RELEASE);
 	      set_errno (EINVAL);
-	      syscall_printf ("VirtualAlloc: address shift with MAP_FIXED given");
+	      debug_printf ("VirtualAlloc: address shift with MAP_FIXED given");
 	    }
 	  return INVALID_HANDLE_VALUE;
 	}
@@ -1402,7 +1404,7 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
       if (!h)
 	{
 	  __seterrno ();
-	  syscall_printf ("CreateMapping failed with %E");
+	  debug_printf ("CreateMapping failed with %E");
 	  return INVALID_HANDLE_VALUE;
 	}
 
@@ -1415,12 +1417,11 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
 	    {
 	      UnmapViewOfFile (base);
 	      set_errno (EINVAL);
-	      syscall_printf ("MapView: address shift with MAP_FIXED given");
+	      debug_printf ("MapView: address shift with MAP_FIXED given");
 	    }
 	  CloseHandle (h);
 	  return INVALID_HANDLE_VALUE;
 	}
-
     }
   *addr = (caddr_t) base;
   return h;
@@ -1460,9 +1461,9 @@ fhandler_dev_zero::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
     {
       MEMORY_BASIC_INFORMATION m;
       VirtualQuery (address, &m, sizeof (m));
-      system_printf ("requested %p != %p mem alloc base %p, state %p, "
-		     "size %d, %E", address, base, m.AllocationBase, m.State,
-		     m.RegionSize);
+      debug_printf ("requested %p != %p mem alloc base %p, state %p, "
+		    "size %d, %E", address, base, m.AllocationBase, m.State,
+		    m.RegionSize);
     }
   return base == address;
 }
@@ -1477,7 +1478,7 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, int prot,
   if (!h)
     {
       __seterrno ();
-      syscall_printf ("CreateMapping failed with %E");
+      debug_printf ("CreateMapping failed with %E");
       return INVALID_HANDLE_VALUE;
     }
 
@@ -1490,7 +1491,7 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, int prot,
 	{
 	  UnmapViewOfFile (base);
 	  set_errno (EINVAL);
-	  syscall_printf ("MapView: address shift with MAP_FIXED given");
+	  debug_printf ("MapView: address shift with MAP_FIXED given");
 	}
       CloseHandle (h);
       return INVALID_HANDLE_VALUE;
@@ -1546,7 +1547,7 @@ fhandler_dev_mem::mmap (caddr_t *addr, size_t len, int prot,
       || off + len >= mem_size)
     {
       set_errno (EINVAL);
-      syscall_printf ("-1 = mmap(): illegal parameter, set EINVAL");
+      debug_printf ("-1 = mmap(): illegal parameter, set EINVAL");
       return INVALID_HANDLE_VALUE;
     }
 
@@ -1573,7 +1574,7 @@ fhandler_dev_mem::mmap (caddr_t *addr, size_t len, int prot,
   if (!NT_SUCCESS (ret))
     {
       __seterrno_from_nt_status (ret);
-      syscall_printf ("-1 = mmap(): NtOpenSection failed with %E");
+      debug_printf ("-1 = mmap(): NtOpenSection failed with %E");
       return INVALID_HANDLE_VALUE;
     }
 
@@ -1586,7 +1587,7 @@ fhandler_dev_mem::mmap (caddr_t *addr, size_t len, int prot,
         {
 	  NtUnmapViewOfSection (GetCurrentProcess (), base);
 	  set_errno (EINVAL);
-	  syscall_printf ("MapView: address shift with MAP_FIXED given");
+	  debug_printf ("MapView: address shift with MAP_FIXED given");
 	}
       CloseHandle (h);
       return INVALID_HANDLE_VALUE;
@@ -1620,7 +1621,8 @@ fhandler_dev_mem::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
 					 _off64_t offset, DWORD size,
 					 void *address)
 {
-  void *base = MapViewNT (h, address, size, prot, flags | MAP_ANONYMOUS, offset);
+  void *base = MapViewNT (h, address, size, prot,
+			  flags | MAP_ANONYMOUS, offset);
   if (base != address)
     {
       MEMORY_BASIC_INFORMATION m;
@@ -1652,15 +1654,16 @@ fixup_mmaps_after_fork (HANDLE parent)
 	   (rec = map_list->get_record (record_idx));
 	   ++record_idx)
 	{
-	  debug_printf ("fd %d, h %x, access %x, offset %D, size %u, "
-	  		"address %p", rec->get_fd (), rec->get_handle (),
-			rec->gen_access (), rec->get_offset (),
-			rec->get_len (), rec->get_address ());
+	  debug_printf ("fd %d, h 0x%x, address %p, len 0x%x, prot: 0x%x, "
+			"flags: 0x%x, offset %X",
+			rec->get_fd (), rec->get_handle (), rec->get_address (),
+			rec->get_len (), rec->get_prot (), rec->get_flags (),
+			rec->get_offset ());
 
 	  fhandler_base *fh = rec->alloc_fh ();
 	  bool ret = fh->fixup_mmap_after_fork (rec->get_handle (),
 						rec->get_prot (),
-						rec->get_flags (),
+						rec->get_flags () | MAP_FIXED,
 						rec->get_offset (),
 						rec->get_len (),
 						rec->get_address ());
