@@ -1,5 +1,10 @@
 2005-12-01  Christopher Faylor  <cgf@timesys.com>
 
+	* devices.h (_major): Revert previous ill-advised change.
+	(_minor): Ditto.
+
+2005-12-01  Christopher Faylor  <cgf@timesys.com>
+
 	* exceptions.cc (handle_exceptions): Translate a guard page exception
 	to a "SIGBUS".
 

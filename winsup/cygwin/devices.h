@@ -14,8 +14,8 @@ typedef mode_t _mode_t;
 typedef __dev32_t _dev_t;
 
 #define FHDEV(maj, min) ((((unsigned) (maj)) << (sizeof (_major_t) * 8)) | (unsigned) (min))
-#define _minor(dev) (((_minor_t) dev) & ((1 << (sizeof (_minor_t) * 8)) - 1))
-#define _major(dev) (((_major_t) dev) >> (sizeof (_major_t) * 8))
+#define _minor(dev) ((dev) & ((1 << (sizeof (_minor_t) * 8)) - 1))
+#define _major(dev) ((dev) >> (sizeof (_major_t) * 8))
 
 enum fh_devices
 {
