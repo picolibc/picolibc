@@ -1,5 +1,10 @@
 2005-12-01  Christopher Faylor  <cgf@timesys.com>
 
+	* dcrt0.cc (getstack): Try harder to modify memory.
+	(alloc_stack): Alloc page prior to stack top, too.
+
+2005-12-01  Christopher Faylor  <cgf@timesys.com>
+
 	* devices.h (_major): Revert previous ill-advised change.
 	(_minor): Ditto.
 

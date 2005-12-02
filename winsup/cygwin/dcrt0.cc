@@ -504,9 +504,10 @@ alloc_stack_hard_way (child_info_fork *ci, volatile char *b)
 
 void *getstack (void *) __attribute__ ((noinline));
 volatile char *
-getstack (volatile char *p)
+getstack (volatile char * volatile p)
 {
-  *p |= 0;
+  *p ^= 1;
+  *p ^= 1;
   return p - 4096;
 }
 
@@ -515,13 +516,14 @@ getstack (volatile char *p)
 static void
 alloc_stack (child_info_fork *ci)
 {
-  volatile char *esp;
+  volatile char * volatile esp;
   __asm__ volatile ("movl %%esp,%0": "=r" (esp));
   if (_tlsbase != ci->stackbottom)
     alloc_stack_hard_way (ci, esp);
   else
     {
-      while (_tlstop > ci->stacktop)
+      char *stacktop = (char *) ci->stacktop - 4096;
+      while (_tlstop >= stacktop)
 	esp = getstack (esp);
       ci->stacksize = 0;
     }
