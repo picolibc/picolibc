@@ -36,7 +36,6 @@ details. */
 char debugger_command[2 * CYG_MAX_PATH + 20];
 
 extern "C" {
-static int handle_exceptions (EXCEPTION_RECORD *, void *, CONTEXT *, void *);
 extern void sigdelayed ();
 };
 
@@ -93,28 +92,6 @@ NO_COPY static struct
 };
 
 /* Initialization code.  */
-
-// Set up the exception handler for the current thread.  The PowerPC & Mips
-// use compiler generated tables to set up the exception handlers for each
-// region of code, and the kernel walks the call list until it finds a region
-// of code that handles exceptions.  The x86 on the other hand uses segment
-// register fs, offset 0 to point to the current exception handler.
-
-extern exception_list *_except_list asm ("%fs:0");
-
-void
-init_exception_handler (exception_list *el, exception_handler *eh)
-{
-  el->handler = eh;
-  el->prev = _except_list;
-  _except_list = el;
-}
-
-extern "C" void
-init_exceptions (exception_list *el)
-{
-  init_exception_handler (el, handle_exceptions);
-}
 
 BOOL WINAPI
 dummy_ctrl_c_handler (DWORD dwCtrlType)
@@ -403,11 +380,31 @@ try_to_debug (bool waitloop)
   return dbg;
 }
 
+extern "C" DWORD __stdcall RtlUnwind (void *, void *, void *, DWORD);
+static void __stdcall rtl_unwind (void *, PEXCEPTION_RECORD) __attribute__ ((noinline, regparm (3)));
+void __stdcall
+rtl_unwind (void *frame, PEXCEPTION_RECORD e)
+{
+  __asm__ ("\n\
+  pushl		%%ebx					\n\
+  pushl		%%edi					\n\
+  pushl		%%esi					\n\
+  pushl		$0					\n\
+  pushl		%1					\n\
+  pushl		$1f					\n\
+  pushl		%0					\n\
+  call		_RtlUnwind@16				\n\
+1:							\n\
+  popl		%%esi					\n\
+  popl		%%edi					\n\
+  popl		%%ebx					\n\
+": : "r" (frame), "r" (e));
+}
+
 /* Main exception handler. */
 
-extern "C" DWORD __stdcall RtlUnwind (void *, void *, void *, DWORD);
-static int
-handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
+int
+_cygtls::handle_exceptions (EXCEPTION_RECORD *e, void *frame, CONTEXT *in, void *)
 {
   static bool NO_COPY debugging;
   static int NO_COPY recursed;
@@ -421,16 +418,13 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
 
   /* If we've already exited, don't do anything here.  Returning 1
      tells Windows to keep looking for an exception handler.  */
-  if (exit_already)
+  if (exit_already || e->ExceptionFlags)
     return 1;
-
-  EXCEPTION_RECORD e = *e0;
-  CONTEXT in = *in0;
 
   siginfo_t si;
   si.si_code = SI_KERNEL;
   /* Coerce win32 value to posix value.  */
-  switch (e.ExceptionCode)
+  switch (e->ExceptionCode)
     {
     case STATUS_FLOAT_DENORMAL_OPERAND:
     case STATUS_FLOAT_DIVIDE_BY_ZERO:
@@ -514,8 +508,9 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
       return 1;
     }
 
-  debug_printf ("In cygwin_except_handler exc %p at %p sp %p", e.ExceptionCode, in.Eip, in.Esp);
-  debug_printf ("In cygwin_except_handler sig %d at %p", si.si_signo, in.Eip);
+  rtl_unwind (frame, e);
+  debug_printf ("In cygwin_except_handler exc %p at %p sp %p", e->ExceptionCode, in->Eip, in->Esp);
+  debug_printf ("In cygwin_except_handler sig %d at %p", si.si_signo, in->Eip);
 
   if (global_sigs[si.si_signo].sa_mask & SIGTOMASK (si.si_signo))
     syscall_printf ("signal %d, masked %p", si.si_signo,
@@ -524,9 +519,9 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
   debug_printf ("In cygwin_except_handler calling %p",
 		 global_sigs[si.si_signo].sa_handler);
 
-  DWORD *ebp = (DWORD *)in.Esp;
+  DWORD *ebp = (DWORD *) in->Esp;
   for (DWORD *bpend = (DWORD *) __builtin_frame_address (0); ebp > bpend; ebp--)
-    if (*ebp == in.SegCs && ebp[-1] == in.Eip)
+    if (*ebp == in->SegCs && ebp[-1] == in->Eip)
       {
 	ebp -= 2;
 	break;
@@ -534,7 +529,7 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
 
   if (!me.fault_guarded ()
       && (!cygwin_finished_initializing
-	  || &_my_tls == _sig_tls
+	  || &me == _sig_tls
 	  || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_DFL
 	  || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_IGN
 	  || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_ERR))
@@ -542,7 +537,7 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
       /* Print the exception to the console */
       if (!myself->cygstarted)
 	for (int i = 0; status_info[i].name; i++)
-	  if (status_info[i].code == e.ExceptionCode)
+	  if (status_info[i].code == e->ExceptionCode)
 	    {
 	      system_printf ("Exception: %s", status_info[i].name);
 	      break;
@@ -561,25 +556,22 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
 	    }
 
 	  open_stackdumpfile ();
-	  exception (&e, &in);
+	  exception (e, in);
 	  stackdump ((DWORD) ebp, 0, 1);
 	}
 
       signal_exit (0x80 | si.si_signo);	// Flag signal + core dump
     }
 
-  extern DWORD ret_here[];
-  RtlUnwind (frame, ret_here, e0, 0);
-  __asm__ volatile (".equ _ret_here,.");
-
   if (me.fault_guarded ())
     me.return_from_fault ();
 
-  si.si_addr = ebp;
+  si.si_addr = (void *) in->Eip;
   si.si_errno = si.si_pid = si.si_uid = 0;
   me.push ((__stack_t) ebp, true);
   sig_send (NULL, si, &me);	// Signal myself
-  return 1;
+  e->ExceptionFlags = 0;
+  return 0;
 }
 
 /* Utilities to call a user supplied exception handler.  */

@@ -184,7 +184,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	return (DWORD) fillout_pinfo (va_arg (arg, pid_t), 1);
 
       case CW_INIT_EXCEPTIONS:
-	init_exceptions (va_arg (arg, exception_list *));
+	/* noop */ /* init_exceptions (va_arg (arg, exception_list *)); */
 	return 0;
 
       case CW_GET_CYGDRIVE_INFO:

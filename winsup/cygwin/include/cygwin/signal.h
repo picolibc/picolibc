@@ -102,8 +102,8 @@ typedef struct
 
 enum
 {
-  SI_USER = 1,				/* sent by kill, raise, pthread_kill */
-  SI_ASYNCIO,				/* sent by AIO completion (currently
+  SI_USER = 0,				/* sent by kill, raise, pthread_kill */
+  SI_ASYNCIO = 2,			/* sent by AIO completion (currently
 					   unimplemented) */
   SI_MESGQ,				/* sent by real time mesq state change
 					   (currently unimplemented) */

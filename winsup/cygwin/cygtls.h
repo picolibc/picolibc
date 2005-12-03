@@ -17,6 +17,7 @@ details. */
 #include <mntent.h>
 #undef _NOMNTENT_FUNCS
 #include <setjmp.h>
+#include <exceptions.h>
 
 #ifndef _WINSOCK_H
 /* Stupid hack: Including winsock.h explicitly causes too many problems. */
@@ -182,6 +183,7 @@ struct _cygtls
   };
   struct _local_storage locals;
   class cygthread *_ctinfo;
+  exception_list el;
   san andreas;
   waitq wq;
   struct _cygtls *prev, *next;
@@ -212,7 +214,13 @@ struct _cygtls
   void __stdcall interrupt_setup (int sig, void *handler,
 				  struct sigaction& siga)
     __attribute__((regparm(3)));
-  void init_threadlist_exceptions (struct _exception_list *);
+
+  /* exception handling */
+  static int handle_exceptions (EXCEPTION_RECORD *, void *, CONTEXT *, void *);
+  static int handle_threadlist_exception (EXCEPTION_RECORD *e, void *frame, CONTEXT *c, void *);
+  void init_exception_handler (int (*) (EXCEPTION_RECORD *, void *, CONTEXT *, void*));
+  void init_threadlist_exceptions ();
+
 #ifdef _THREAD_H
   operator HANDLE () const {return tid->win32_obj_id;}
 #endif

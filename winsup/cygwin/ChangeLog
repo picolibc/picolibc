@@ -1,3 +1,39 @@
+2005-12-02  Christopher Faylor  <cgf@timesys.com>
+
+	* cygtls.h (_cygtls::el): New field.
+	(_cygtls::handle_exceptions): New function declaration.
+	(_cygtls::handle_threadlist_exception): Ditto.
+	(_cygtls::init_exception_handler): Ditto.
+	(_cygtls::init_threadlist_exceptions): Remove arg from declaration.
+	* cygtls.cc (_cygtls::call2): Don't initialize exceptions here.
+	(_cygtls::init_thread): Do it here instead and use member function.
+	(_cygtls::handle_threadlist_exception): Move into _cygtls class.
+	(_cygtls::init_exception_handler): Ditto.  Rely on existence of 'el'
+	memmber in _cygtls.
+	(_cygtls::init_threadlist_exceptions): Ditto.
+	* dcrt0.cc (dll_crt0_1): Remove exception_list definition and setting
+	since it now commonly resides in the tls.
+	* exceptions.cc (init_exception_handler): Move to cygtls.cc.
+	(init_exceptions): Ditto.
+	(rtl_unwind): New, safe wrapper function for RtlUnwind.
+	(_cygtls::handle_exceptions): Move to _cygtls.  Call rtl_unwind to
+	unwind frames and eliminate copying of structures.  Put address of
+	failing instruction in si_addr, not the address on the stack.  Return 0
+	to indicate that we've handled this exception.
+	* external.cc (cygwin_internal): Make CW_INIT_EXCEPTIONS a no-op.
+	* sigproc.cc (wait_sig): Accommodate argument change to
+	_cygtls::init_threadlist_exceptions.
+	* tlsoffsets.h: Regenerate.
+	* include/exceptions.h (exception_list): Add more stuff to the
+	exception list.  Apparently windows needs this?
+	(init_exceptions): Remove bogus declaration.
+
+	* include/cygwin/signal.h (SI_USER): Redefine as zero as per SUSv3.
+
+	* thread.cc (pthread_kill): Set si_pid and si_uid.
+
+	* timer.cc (timer_thread): Set si_code to SI_KERNEL.
+
 2005-12-01  Christopher Faylor  <cgf@timesys.com>
 
 	* dcrt0.cc (getstack): Try harder to modify memory.

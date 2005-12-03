@@ -2873,7 +2873,9 @@ pthread_kill (pthread_t thread, int sig)
   siginfo_t si;
   si.si_signo = sig;
   si.si_code = SI_USER;
-  si.si_pid = si.si_uid = si.si_errno = 0;
+  si.si_pid = myself->pid;
+  si.si_uid = myself->uid;
+  si.si_errno = 0;
   thread->cygtls->set_threadkill ();
   int rval = sig ? sig_send (NULL, si, thread->cygtls) : 0;
 

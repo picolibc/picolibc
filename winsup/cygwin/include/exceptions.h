@@ -106,12 +106,8 @@ typedef struct _exception_list
 {
   struct _exception_list *prev;
   exception_handler *handler;
-
-  /* We're apparently free to add more stuff here.
-     At present we don't need any.  */
+  unsigned long stuff[8];
 } exception_list;
-
-void init_exceptions (exception_list *);
 
 #ifdef __cplusplus
 };

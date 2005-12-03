@@ -730,11 +730,6 @@ dll_crt0_0 ()
 static void
 dll_crt0_1 (char *)
 {
-  /* According to onno@stack.urc.tue.nl, the exception handler record must
-     be on the stack.  */
-  /* FIXME: Verify forked children get their exception handler set up ok. */
-  exception_list cygwin_except_entry;
-
   check_sanity_and_sync (user_data);
   malloc_init ();
 #ifdef CGF
@@ -743,9 +738,6 @@ dll_crt0_1 (char *)
   while (i--)
     small_printf ("cmalloc returns %p\n", cmalloc (HEAP_STR, n));
 #endif
-
-  /* Initialize SIGSEGV handling, etc. */
-  init_exceptions (&cygwin_except_entry);
 
   user_data->resourcelocks->Init ();
   user_data->threadinterface->Init ();

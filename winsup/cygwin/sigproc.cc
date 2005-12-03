@@ -1067,8 +1067,7 @@ wait_sig (VOID *)
   sigproc_printf ("myself->dwProcessId %u", myself->dwProcessId);
   SetEvent (wait_sig_inited);
 
-  exception_list el;
-  _sig_tls->init_threadlist_exceptions (&el);
+  _sig_tls->init_threadlist_exceptions ();
   debug_printf ("entering ReadFile loop, readsig %p, myself->sendsig %p",
 		readsig, myself->sendsig);
 

@@ -283,12 +283,14 @@ details. */
       143: Export clock_getres, clock_setres
       144: Export timelocal, timegm.
       145: Add MAP_NORESERVE flag to mmap.
+      146: Change SI_USER definition.  FIXME: Need to develop compatibility macro
+           for this?
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 145
+#define CYGWIN_VERSION_API_MINOR 146
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

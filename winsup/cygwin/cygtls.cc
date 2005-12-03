@@ -88,10 +88,6 @@ _cygtls::call (DWORD (*func) (void *, void *), void *arg)
 void
 _cygtls::call2 (DWORD (*func) (void *, void *), void *arg, void *buf)
 {
-  exception_list except_entry;
-  /* Initialize this thread's ability to respond to things like
-     SIGSEGV or SIGFPE. */
-  init_exceptions (&except_entry);
   _my_tls.init_thread (buf, func);
   DWORD res = func (arg, buf);
   _my_tls.remove (INFINITE);
@@ -117,6 +113,9 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
 	}
       local_clib._current_locale = "C";
       locals.process_logmask = LOG_UPTO (LOG_DEBUG);
+      /* Initialize this thread's ability to respond to things like
+	 SIGSEGV or SIGFPE. */
+      init_exception_handler (handle_exceptions);
     }
 
   locals.exitsock = INVALID_SOCKET;
@@ -240,8 +239,8 @@ _cygtls::set_siginfo (sigpacket *pack)
 }
 
 extern "C" DWORD __stdcall RtlUnwind (void *, void *, void *, DWORD);
-static int
-handle_threadlist_exception (EXCEPTION_RECORD *e, void *frame, CONTEXT *c, void *)
+int
+_cygtls::handle_threadlist_exception (EXCEPTION_RECORD *e, void *frame, CONTEXT *c, void *)
 {
   if (e->ExceptionCode != STATUS_ACCESS_VIOLATION)
     {
@@ -269,9 +268,24 @@ handle_threadlist_exception (EXCEPTION_RECORD *e, void *frame, CONTEXT *c, void 
   return 0;
 }
 
+/* Set up the exception handler for the current thread.  The PowerPC & Mips
+   use compiler generated tables to set up the exception handlers for each
+   region of code, and the kernel walks the call list until it finds a region
+   of code that handles exceptions.  The x86 on the other hand uses segment
+   register fs, offset 0 to point to the current exception handler. */
+
+extern exception_list *_except_list asm ("%fs:0");
+
 void
-_cygtls::init_threadlist_exceptions (exception_list *el)
+_cygtls::init_exception_handler (exception_handler *eh)
 {
-  extern void init_exception_handler (exception_list *, exception_handler *);
-  init_exception_handler (el, handle_threadlist_exception);
+  el.handler = eh;
+  el.prev = _except_list;
+  _except_list = &el;
+}
+
+void
+_cygtls::init_threadlist_exceptions ()
+{
+  init_exception_handler (handle_threadlist_exception);
 }
