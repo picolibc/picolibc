@@ -29,6 +29,7 @@
 	(init_exceptions): Remove bogus declaration.
 
 	* include/cygwin/signal.h (SI_USER): Redefine as zero as per SUSv3.
+	* include/cygwin/version.h: Bump API minor version number to 146.
 
 	* thread.cc (pthread_kill): Set si_pid and si_uid.
 
