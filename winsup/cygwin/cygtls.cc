@@ -240,7 +240,7 @@ _cygtls::set_siginfo (sigpacket *pack)
 
 extern "C" DWORD __stdcall RtlUnwind (void *, void *, void *, DWORD);
 int
-_cygtls::handle_threadlist_exception (EXCEPTION_RECORD *e, void *frame, CONTEXT *c, void *)
+_cygtls::handle_threadlist_exception (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *c, void *)
 {
   if (e->ExceptionCode != STATUS_ACCESS_VIOLATION)
     {
@@ -281,6 +281,8 @@ _cygtls::init_exception_handler (exception_handler *eh)
 {
   el.handler = eh;
   el.prev = _except_list;
+  if (!el.prev->prev && !el.prev->handler)
+    el.prev = &el;
   _except_list = &el;
 }
 

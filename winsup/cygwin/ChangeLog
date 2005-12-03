@@ -1,5 +1,23 @@
 2005-12-02  Christopher Faylor  <cgf@timesys.com>
 
+	* include/exceptions.h (exception_list): Revert previous change.
+	Windows doesn't care.
+	(exception_handler): Use real exception_list parameter type rather than
+	void *
+	* tlsoffsets.h: Regenerate.
+	* cygtls.h (_cygtls::handle_exceptions): Use real exception_list
+	parameter type rather than void *.
+	(handle_threadlist_exception): Ditto.
+	(init_exception_handler): Ditto.
+	* cygtls.cc (_cygtls::handle_threadlist_exception ): Ditto.
+	(_cygtls::init_exception_handler): Add kludge to terminate linked list
+	with a loop, which seems to solve problem of RtlUnwind causing problems
+	* exceptions.cc (rtl_unwind): Use real exception_list parameter type
+	rather than void *.
+	(_cygtls::handle_exceptions): Ditto.
+
+2005-12-02  Christopher Faylor  <cgf@timesys.com>
+
 	* cygtls.h (_cygtls::el): New field.
 	(_cygtls::handle_exceptions): New function declaration.
 	(_cygtls::handle_threadlist_exception): Ditto.

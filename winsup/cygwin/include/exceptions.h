@@ -99,14 +99,13 @@ to install your own exception filter. This one is documented.
    a teensy bit of detail of the innards of exception handling (i.e. what we
    have to do).  */
 
-typedef int (exception_handler)
-     (EXCEPTION_RECORD *, void *, CONTEXT *, void *);
+typedef int (exception_handler) (EXCEPTION_RECORD *, struct _exception_list *,
+				 CONTEXT *, void *);
 
 typedef struct _exception_list
 {
   struct _exception_list *prev;
   exception_handler *handler;
-  unsigned long stuff[8];
 } exception_list;
 
 #ifdef __cplusplus

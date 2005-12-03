@@ -381,9 +381,9 @@ try_to_debug (bool waitloop)
 }
 
 extern "C" DWORD __stdcall RtlUnwind (void *, void *, void *, DWORD);
-static void __stdcall rtl_unwind (void *, PEXCEPTION_RECORD) __attribute__ ((noinline, regparm (3)));
+static void __stdcall rtl_unwind (exception_list *, PEXCEPTION_RECORD) __attribute__ ((noinline, regparm (3)));
 void __stdcall
-rtl_unwind (void *frame, PEXCEPTION_RECORD e)
+rtl_unwind (exception_list *frame, PEXCEPTION_RECORD e)
 {
   __asm__ ("\n\
   pushl		%%ebx					\n\
@@ -404,7 +404,7 @@ rtl_unwind (void *frame, PEXCEPTION_RECORD e)
 /* Main exception handler. */
 
 int
-_cygtls::handle_exceptions (EXCEPTION_RECORD *e, void *frame, CONTEXT *in, void *)
+_cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void *)
 {
   static bool NO_COPY debugging;
   static int NO_COPY recursed;
@@ -509,6 +509,7 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, void *frame, CONTEXT *in, void 
     }
 
   rtl_unwind (frame, e);
+
   debug_printf ("In cygwin_except_handler exc %p at %p sp %p", e->ExceptionCode, in->Eip, in->Esp);
   debug_printf ("In cygwin_except_handler sig %d at %p", si.si_signo, in->Eip);
 

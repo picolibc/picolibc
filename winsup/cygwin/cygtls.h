@@ -216,9 +216,9 @@ struct _cygtls
     __attribute__((regparm(3)));
 
   /* exception handling */
-  static int handle_exceptions (EXCEPTION_RECORD *, void *, CONTEXT *, void *);
-  static int handle_threadlist_exception (EXCEPTION_RECORD *e, void *frame, CONTEXT *c, void *);
-  void init_exception_handler (int (*) (EXCEPTION_RECORD *, void *, CONTEXT *, void*));
+  static int handle_exceptions (EXCEPTION_RECORD *, exception_list *, CONTEXT *, void *);
+  static int handle_threadlist_exception (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *c, void *);
+  void init_exception_handler (int (*) (EXCEPTION_RECORD *, exception_list *, CONTEXT *, void*));
   void init_threadlist_exceptions ();
 
 #ifdef _THREAD_H
