@@ -1,3 +1,8 @@
+2005-12-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* environ.cc (spenvs): Add "windir" as an "always export" variable
+	to accomodate WinSock on Windows 95.
+
 2005-12-02  Christopher Faylor  <cgf@timesys.com>
 
 	* include/exceptions.h (exception_list): Revert previous change.
