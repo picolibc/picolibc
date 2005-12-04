@@ -826,7 +826,6 @@ settings are for Emacs 21.1:
 	;; NT-emacs assumes a Windows command shell, which you change
 	;; here.
 	;;
-	(setq process-coding-system-alist '(("bash" . undecided-unix)))
 	(setq shell-file-name "bash")
 	(setenv "SHELL" shell-file-name) 
 	(setq explicit-shell-file-name shell-file-name) 

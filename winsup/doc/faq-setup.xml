@@ -191,7 +191,12 @@ code.
 Package Directory'', by default the location of <literal>setup.exe</literal>.  You
 may conserve disk space by deleting the subdirectories there.  These
 directories will have very weird looking names, being encoded with
-their URLs.
+their URLs  (named <literal>ftp%3a%2f...</literal>).
+</para>
+<para>Of course, you can keep them around in case you want to reinstall a
+package. If you want to clean out only the outdated packages, Michael Chase
+has written a script called <literal>clean_setup.pl</literal>, available
+at <ulink url="http://home.ix.netcom.com/~mchase/zip/" />.
 </para>
 </answer></qandaentry>
 

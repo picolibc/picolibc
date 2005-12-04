@@ -1,3 +1,8 @@
+2005-12-03  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* faq-setup.xml: Add note about clean_setup.pl.
+	* faq-using.xml: Remove unnecessary line of elisp.
+
 2005-10-02  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* faq-what.xml: Add 2003 and WOW64 to "supported" FAQ.
