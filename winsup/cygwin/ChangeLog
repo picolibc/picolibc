@@ -51,7 +51,7 @@
 
 	* thread.cc (pthread_kill): Set si_pid and si_uid.
 
-	* timer.cc (timer_thread): Set si_code to SI_KERNEL.
+	* timer.cc (timer_thread): Set si_code to SI_TIMER.
 
 2005-12-01  Christopher Faylor  <cgf@timesys.com>
 
