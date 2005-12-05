@@ -19,6 +19,10 @@
 #include <alloca.h>
 #endif
 
+#ifdef __CYGWIN__
+#include <cygwin/stdlib.h>
+#endif
+
 _BEGIN_STD_C
 
 typedef struct 
@@ -76,9 +80,6 @@ _VOID	_EXFUN(exit,(int __status) _ATTRIBUTE ((noreturn)));
 _VOID	_EXFUN(free,(_PTR));
 char *  _EXFUN(getenv,(const char *__string));
 char *	_EXFUN(_getenv_r,(struct _reent *, const char *__string));
-#ifdef __CYGWIN__
-const char *_EXFUN(getprogname,(void));
-#endif
 char *	_EXFUN(_findenv,(_CONST char *, int *));
 char *	_EXFUN(_findenv_r,(struct _reent *, _CONST char *, int *));
 long	_EXFUN(labs,(long));
@@ -103,9 +104,6 @@ char *  _EXFUN(mktemp,(char *));
 _VOID	_EXFUN(qsort,(_PTR __base, size_t __nmemb, size_t __size, int(*_compar)(const _PTR, const _PTR)));
 int	_EXFUN(rand,(_VOID));
 _PTR	_EXFUN(realloc,(_PTR __r, size_t __size));
-#ifdef __CYGWIN__
-void	_EXFUN(setprogname,(const char *));
-#endif
 _VOID	_EXFUN(srand,(unsigned __seed));
 double	_EXFUN(strtod,(const char *__n, char **__end_PTR));
 double	_EXFUN(_strtod_r,(struct _reent *,const char *__n, char **__end_PTR));
@@ -176,15 +174,8 @@ unsigned long long _EXFUN(_strtoull_r,(struct _reent *, const char *__n, char **
 
 #ifndef __CYGWIN__
 _VOID	_EXFUN(cfree,(_PTR));
-#else
-char *	_EXFUN(realpath,(const char *, char *));
 void	_EXFUN(unsetenv,(const char *__string));
 void	_EXFUN(_unsetenv_r,(struct _reent *, const char *__string));
-int	_EXFUN(random,(_VOID));
-long	_EXFUN(srandom,(unsigned __seed));
-char *  _EXFUN(ptsname, (int));
-int     _EXFUN(grantpt, (int));
-int     _EXFUN(unlockpt,(int));
 #endif
 
 #endif /* ! __STRICT_ANSI__ */
@@ -200,35 +191,6 @@ _VOID	_EXFUN(_mstats_r,(struct _reent *, char *));
 int	_EXFUN(_system_r,(struct _reent *, const char *));
 
 _VOID	_EXFUN(__eprintf,(const char *, const char *, unsigned int, const char *));
-
-#ifdef __CYGWIN__
-#undef _malloc_r
-#define _malloc_r(r, s) malloc (s)
-#undef _free_r
-#define _free_r(r, p) free (p)
-#undef _realloc_r
-#define _realloc_r(r, p, s) realloc (p, s)
-#undef _calloc_r
-#define _calloc_r(r, s1, s2) calloc (s1, s2);
-#undef _memalign_r
-#define _memalign_r(r, s1, s2) memalign (s1, s2);
-#undef _mallinfo_r
-#define _mallinfo_r(r) mallinfo ()
-#undef _malloc_stats_r
-#define _malloc_stats_r(r) malloc_stats ()
-#undef _mallopt_r
-#define _mallopt_r(i1, i2) mallopt (i1, i2)
-#undef _malloc_usable_size_r
-#define _malloc_usable_size_r(r, p) malloc_usable_size (p)
-#undef _valloc_r
-#define _valloc_r(r, s) valloc (s)
-#undef _pvalloc_r
-#define _pvalloc_r(r, s) pvalloc (s)
-#undef _malloc_trim_r
-#define _malloc_trim_r(r, s) malloc_trim (s)
-#undef _mstats_r
-#define _mstats_r(r, p) mstats (p)
-#endif
 
 _END_STD_C
 

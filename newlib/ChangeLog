@@ -1,3 +1,8 @@
+2005-12-05  Christopher Faylor  <cgf@timesys.com>
+
+	* libc/include/stdlib.h: Move cygwin declarations to cygwin-specific
+	file.  Declare unsetenv and _unsetenv_r when not cygwin.
+
 2005-11-18  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/time/strptime.c (strptime): Don't abort for %c and %Z.
