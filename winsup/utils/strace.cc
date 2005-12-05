@@ -35,7 +35,7 @@ static const char version[] = "$Revision$";
 static const char *pgm;
 static int forkdebug = 1;
 static int numerror = 1;
-static int usecs = 1;
+static int show_usecs = 1;
 static int delta = 1;
 static int hhmmss = 0;
 static int bufsize = 0;
@@ -381,7 +381,7 @@ syst (long long t)
 {
   FILETIME n;
   static SYSTEMTIME st;
-  long long now = t + ((long long) usecs * 10);
+  long long now = t /*+ ((long long) usecs * 10)*/;
   n.dwHighDateTime = now >> 32;
   n.dwLowDateTime = now & 0xffffffff;
   FileTimeToSystemTime (&n, &st);
@@ -475,7 +475,7 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
   else
     {
       ptrest = q;
-      ptusec = s;
+      ptusec = show_usecs ? s : ptrest;
       usecs = dusecs;
     }
 
@@ -817,6 +817,7 @@ Trace system calls and signals\n\
                                the default microsecond timestamp.  Implies -d\n\
   -T, --toggle                 toggle tracing in a process already being\n\
                                traced. Requires -p <pid>\n\
+  -u, --usecs                  toggle printing of microseconds timestamp\n\
   -v, --version                output version information and exit\n\
   -w, --new-window             spawn program under test in a new window\n\
 \n", pgm, pgm);
@@ -974,7 +975,8 @@ character #%d.\n", optarg, (int) (endptr - optarg), endptr);
 	break;
       case 'u':
 	// FIXME: currently unimplemented
-	usecs ^= 1;
+	show_usecs ^= 1;
+	delta ^= 1;
 	break;
       case 'v':
 	// Print version info and exit

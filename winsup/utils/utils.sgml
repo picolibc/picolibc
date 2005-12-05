@@ -1493,6 +1493,7 @@ Trace system calls and signals
   -t, --timestamp              use an absolute hh:mm:ss timestamp insted of 
                                the default microsecond timestamp.  Implies -d
   -T, --toggle                 toggle tracing in a process already being
+  -u, --usecs                  toggle printing of microseconds timestamp
                                traced. Requires -p &lt;pid&gt;
   -v, --version                output version information and exit
   -w, --new-window             spawn program under test in a new window
@@ -1540,9 +1541,8 @@ take a long time to complete.
 <para>
 Note that <command>strace</command> is a standalone Windows program and so does 
 not rely on the Cygwin DLL itself (you can verify this with 
-<command>cygcheck</command>). As a result it does not understand POSIX
-pathnames or symlinks.  This program is mainly useful for debugging the 
-Cygwin DLL itself.</para>
+<command>cygcheck</command>). As a result it does not understand symlinks.
+This program is mainly useful for debugging the Cygwin DLL itself.</para>
 
 </sect2>
 

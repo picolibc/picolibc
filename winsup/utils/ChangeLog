@@ -1,3 +1,12 @@
+2005-12-05  Christopher Faylor  <cgf@timesys.com>
+
+	* strace.cc (show_usecs): Renamed from 'usecs'.
+	(main): Use show_usecs rather than usecs.  Toggle delta if '-u' is
+	specified.
+	(handle_output_debug_string): Avoid printing microsecond timestamp if
+	show_usecs == 0.
+	* utils.sgml (strace): Add words to describe '-u'.
+
 2005-11-22  Brian Dessent  <brian@dessent.net>
 
 	* Makefile.in: Link cygcheck with libwininet.a.
