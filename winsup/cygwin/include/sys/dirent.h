@@ -20,7 +20,7 @@
 struct dirent
 {
   long d_version;	/* Used since Cygwin 1.3.3. */
-  __ino64_t d_ino;	/* still junk but with more bits */
+  __ino64_t __deprecated_d_ino;	/* still junk but with more bits */
   long d_fd;		/* File descriptor of open directory.
 			   Used since Cygwin 1.3.3. */
   unsigned __ino32;

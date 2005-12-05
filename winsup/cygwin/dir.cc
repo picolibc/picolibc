@@ -24,6 +24,8 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "cygtls.h"
+#include "perprocess.h"
+#include "cygwin/version.h"
 
 extern "C" int
 dirfd (DIR *dir)
@@ -99,43 +101,49 @@ readdir_worker (DIR *dir, dirent *de)
     }
 
   if (!res)
-    {
-      /* Compute d_ino by combining filename hash with the directory hash
-	 (which was stored in dir->__d_dirhash when opendir was called). */
-      if (de->d_name[0] == '.')
-	{
-	  if (de->d_name[1] == '\0')
-	    {
-	      de->d_ino = dir->__d_dirhash;
-	      dir->__flags |= dirent_saw_dot;
-	    }
-	  else if (de->d_name[1] != '.' || de->d_name[2] != '\0')
-	    goto hashit;
-	  else
-	    {
-	      dir->__flags |= dirent_saw_dot_dot;
-	      char *p, up[strlen (dir->__d_dirname) + 1];
-	      strcpy (up, dir->__d_dirname);
-	      if (!(p = strrchr (up, '\\')))
-		goto hashit;
-	      *p = '\0';
-	      if (!(p = strrchr (up, '\\')))
-		de->d_ino = hash_path_name (0, ".");
-	      else
-		{
-		  *p = '\0';
-		  de->d_ino = hash_path_name (0, up);
-		}
-	    }
-	}
-      else
-	{
-      hashit:
-	  __ino64_t dino = hash_path_name (dir->__d_dirhash, "\\");
-	  de->d_ino = hash_path_name (dino, de->d_name);
-	}
-      de->__ino32 = de->d_ino;	// for legacy applications
-    }
+    if (!CYGWIN_VERSION_CHECK_FOR_NEEDS_D_INO)
+      {
+	de->__deprecated_d_ino = 0;
+	de->__ino32 = 0;
+      }
+    else
+      {
+	/* Compute __deprecated_d_ino by combining filename hash with the directory hash
+	   (which was stored in dir->__d_dirhash when opendir was called). */
+	if (de->d_name[0] == '.')
+	  {
+	    if (de->d_name[1] == '\0')
+	      {
+		de->__deprecated_d_ino = dir->__d_dirhash;
+		dir->__flags |= dirent_saw_dot;
+	      }
+	    else if (de->d_name[1] != '.' || de->d_name[2] != '\0')
+	      goto hashit;
+	    else
+	      {
+		dir->__flags |= dirent_saw_dot_dot;
+		char *p, up[strlen (dir->__d_dirname) + 1];
+		strcpy (up, dir->__d_dirname);
+		if (!(p = strrchr (up, '\\')))
+		  goto hashit;
+		*p = '\0';
+		if (!(p = strrchr (up, '\\')))
+		  de->__deprecated_d_ino = hash_path_name (0, ".");
+		else
+		  {
+		    *p = '\0';
+		    de->__deprecated_d_ino = hash_path_name (0, up);
+		  }
+	      }
+	  }
+	else
+	  {
+	hashit:
+	    __ino64_t dino = hash_path_name (dir->__d_dirhash, "\\");
+	    de->__deprecated_d_ino = hash_path_name (dino, de->d_name);
+	  }
+	de->__ino32 = de->__deprecated_d_ino;	// for legacy applications
+      }
   return res;
 }
 

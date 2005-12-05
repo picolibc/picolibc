@@ -63,43 +63,38 @@ details. */
 
 #define CYGWIN_VERSION_DLL_BAD_SIGNAL_MASK	19005
 
+#define CYGWIN_VERSION_USER_API_VERSION_COMBINED \
+  CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor)
+
     /* API versions <= this had a termios structure whose members were
        too small to accomodate modern settings. */
 #define CYGWIN_VERSION_DLL_OLD_TERMIOS		5
 #define CYGWIN_VERSION_DLL_IS_OLD_TERMIOS \
-  (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) <= \
-  CYGWIN_VERSION_DLL_OLD_TERMIOS)
+  (CYGWIN_VERSION_USER_API_VERSION_COMBINED <= CYGWIN_VERSION_DLL_OLD_TERMIOS)
 
 #define CYGWIN_VERSION_DLL_MALLOC_ENV		28
      /* Old APIs had getc/putc macros that conflict with new CR/LF
 	handling in the stdio buffers */
 #define CYGWIN_VERSION_OLD_STDIO_CRLF_HANDLING \
-  (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) <= \
-  20)
+  (CYGWIN_VERSION_USER_API_VERSION_COMBINED <= 20)
 
 #define CYGWIN_VERSION_CHECK_FOR_S_IEXEC \
-  (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) >= \
-  36)
+  (CYGWIN_VERSION_USER_API_VERSION_COMBINED >= 36)
 
 #define CYGWIN_VERSION_CHECK_FOR_OLD_O_NONBLOCK \
-  (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) <= \
-  28)
+  (CYGWIN_VERSION_USER_API_VERSION_COMBINED <= 28)
 
 #define CYGWIN_VERSION_CHECK_FOR_USING_BIG_TYPES \
-  (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) >= \
-  79)
+  (CYGWIN_VERSION_USER_API_VERSION_COMBINED >= 79)
 
 #define CYGWIN_VERSION_CHECK_FOR_USING_ANCIENT_MSGHDR \
-  (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) <= \
- 138)
+  (CYGWIN_VERSION_USER_API_VERSION_COMBINED <= 138)
 
 #define CYGWIN_VERSION_CHECK_FOR_USING_WINSOCK1_VALUES \
-  (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) <= \
- 138)
+  (CYGWIN_VERSION_USER_API_VERSION_COMBINED <= 138)
 
-     /* We used to use the DLL major/minor to track
-	non-backward-compatible interface changes to the API.  Now we
-	use an API major/minor number for this purpose. */
+#define CYGWIN_VERSION_CHECK_FOR_NEEDS_D_INO \
+  (CYGWIN_VERSION_USER_API_VERSION_COMBINED < 147)
 
      /* API_MAJOR 0.0: Initial version.  API_MINOR changes:
 	1: Export cygwin32_ calls as cygwin_ as well.
@@ -285,12 +280,13 @@ details. */
       145: Add MAP_NORESERVE flag to mmap.
       146: Change SI_USER definition.  FIXME: Need to develop compatibility macro
            for this?
+      147: Eliminate problematic d_ino from dirent structure.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 146
+#define CYGWIN_VERSION_API_MINOR 147
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

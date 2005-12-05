@@ -1,5 +1,14 @@
 2005-12-05  Christopher Faylor  <cgf@timesys.com>
 
+	* dir.cc (readdir_workdir): Only fill out d_ino when linked into older
+	app.
+	* include/cygwin/version.h: Bump api minor number to 147, reflecting
+	obsolescence of d_ino.
+	(CYGWIN_VERSION_USER_API_VERSION_COMBINED): New convenience macro.
+	(CYGWIN_VERSION_CHECK_FOR_NEEDS_D_INO): New convenience macro.
+
+2005-12-05  Christopher Faylor  <cgf@timesys.com>
+
 	Remove unneeded whitespace.
 	* cygtls.cc (_cygtls::set_state): Delete.
 	(_cygtls::reset_exception): Ditto.
