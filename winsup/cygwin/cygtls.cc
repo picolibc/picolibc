@@ -59,24 +59,6 @@ _cygtls::init ()
   sentry::lock.init ("sentry_lock");
 }
 
-void
-_cygtls::set_state (bool is_exception)
-{
-  initialized = CYGTLS_INITIALIZED + is_exception;
-}
-
-void
-_cygtls::reset_exception ()
-{
-  if (initialized == CYGTLS_EXCEPTION)
-    {
-#ifdef DEBUGGING
-      debug_printf ("resetting stack after an exception stack %p, stackptr %p", stack, stackptr);
-#endif
-      set_state (false);
-    }
-}
-
 /* Two calls to get the stack right... */
 void
 _cygtls::call (DWORD (*func) (void *, void *), void *arg)
@@ -118,8 +100,8 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
       init_exception_handler (handle_exceptions);
     }
 
+  initialized = CYGTLS_INITIALIZED;
   locals.exitsock = INVALID_SOCKET;
-  set_state (false);
   errno_addr = &(local_clib._errno);
 
   if ((void *) func == (void *) cygthread::stub
@@ -202,14 +184,9 @@ _cygtls::remove (DWORD wait)
 }
 
 void
-_cygtls::push (__stack_t addr, bool exception)
+_cygtls::push (__stack_t addr)
 {
-  if (exception)
-    lock ();
   *stackptr++ = (__stack_t) addr;
-  if (exception)
-    unlock ();
-  set_state (exception);
 }
 
 #define BAD_IX ((size_t) -1)

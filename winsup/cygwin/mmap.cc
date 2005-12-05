@@ -326,7 +326,7 @@ struct mmap_func_t
   BOOL	 (*VirtualProtEx)(HANDLE, PVOID, SIZE_T, DWORD, PDWORD);
 };
 
-mmap_func_t mmap_funcs_9x = 
+mmap_func_t mmap_funcs_9x =
 {
   CreateMapping9x,
   MapView9x,
@@ -334,7 +334,7 @@ mmap_func_t mmap_funcs_9x =
   VirtualProtEx9x
 };
 
-mmap_func_t mmap_funcs_nt = 
+mmap_func_t mmap_funcs_nt =
 {
   CreateMappingNT,
   MapViewNT,
@@ -424,7 +424,7 @@ class mmap_record
 
     fhandler_base *alloc_fh ();
     void free_fh (fhandler_base *fh);
-    
+
     DWORD gen_protect (bool create = false) const
       { return ::gen_protect (get_prot (), get_flags (), create); }
     DWORD gen_access () const
@@ -1138,7 +1138,7 @@ mprotect (void *addr, size_t len, int prot)
   bool ret = false;
 
   SetResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "mprotect");
- 
+
   /* Iterate through the map, protect pages between addr and addr+len
      in all maps. */
   list *map_list;
@@ -1252,7 +1252,7 @@ mlock (const void *addr, size_t len)
 	     requested locking region fits in.  Unfortunately I don't know
 	     any function which would return the currently locked pages of
 	     a process (no go with NtQueryVirtualMemory).
-	     
+
 	     So, except for the border cases, what we do here is something
 	     really embarrassing.  We raise the working set by 64K at a time
 	     and retry, until either we fail to raise the working set size
@@ -1715,7 +1715,7 @@ fixup_mmaps_after_fork (HANDLE parent)
 			   && (mbi.Protect == PAGE_READWRITE
 			       || mbi.Protect == PAGE_EXECUTE_READWRITE))
 		    {
-		      /* A PAGE_WRITECOPY page which has been written to is 
+		      /* A PAGE_WRITECOPY page which has been written to is
 			 set to PAGE_READWRITE, but that's an incompatible
 			 protection to set the page to. */
 		      mbi.Protect &= ~PAGE_READWRITE;

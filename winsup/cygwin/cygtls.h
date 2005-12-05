@@ -47,7 +47,6 @@ typedef unsigned int SOCKET;
 #endif
 
 #define CYGTLS_INITIALIZED 0x43227
-#define CYGTLS_EXCEPTION (0x43227 + true)
 #define CYGTLSMAGIC "D0Ub313v31nm&G1c?";
 
 #ifndef CYG_MAX_PATH
@@ -203,12 +202,9 @@ struct _cygtls
   static void call2 (DWORD (*) (void *, void *), void *, void *) __attribute__ ((regparm (3)));
   static struct _cygtls *find_tls (int sig);
   void remove (DWORD);
-  void push (__stack_t, bool) __attribute__ ((regparm (3)));
+  void push (__stack_t) __attribute__ ((regparm (2)));
   __stack_t pop () __attribute__ ((regparm (1)));
-  bool isinitialized () const {return initialized == CYGTLS_INITIALIZED || initialized == CYGTLS_EXCEPTION;}
-  bool in_exception () const {return initialized == CYGTLS_EXCEPTION;}
-  void set_state (bool);
-  void reset_exception ();
+  bool isinitialized () const {return initialized == CYGTLS_INITIALIZED;}
   bool interrupt_now (CONTEXT *, int, void *, struct sigaction&)
     __attribute__((regparm(3)));
   void __stdcall interrupt_setup (int sig, void *handler,

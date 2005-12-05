@@ -99,6 +99,9 @@ readdir_worker (DIR *dir, dirent *de)
     }
 
   if (!res)
+#if 1
+    de->d_ino = 0;
+#else
     {
       /* Compute d_ino by combining filename hash with the directory hash
 	 (which was stored in dir->__d_dirhash when opendir was called). */
@@ -136,6 +139,7 @@ readdir_worker (DIR *dir, dirent *de)
 	}
       de->__ino32 = de->d_ino;	// for legacy applications
     }
+#endif
   return res;
 }
 

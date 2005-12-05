@@ -693,7 +693,7 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 	 The workaround is described in KB article 248611.  Add a new
 	 registry DWORD value HKLM/System/CurrentControlSet/Services/...
 	 ... Tcpip/Parameters/DisableUserTOSSetting, set to 0, and reboot.
-	 
+
 	 FIXME: Maybe we should simply fake that IP_TOS could be set
 	 successfully, if DisableUserTOSSetting is not set to 0 on W2K
 	 and above? */

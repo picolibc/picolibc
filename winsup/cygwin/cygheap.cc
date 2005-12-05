@@ -103,7 +103,7 @@ init_cygheap::manage_console_count (const char *something, int amount, bool avoi
     }
   return console_count;
 }
-  
+
 void
 init_cygheap::close_ctty ()
 {

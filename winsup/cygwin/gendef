@@ -386,6 +386,8 @@ _longjmp:
 	movl	44(%edi),%eax				# get old signal stack
 	movl	%eax,$tls::stackptr(%ebx)		# restore
 	decl	$tls::stacklock(%ebx)			# relinquish lock
+	xorl	%eax,%eax
+	movl	%eax,$tls::incyg(%ebx)			# we're definitely not in cygwin anymore
 
 	movl	12(%ebp),%eax
 	testl	%eax,%eax

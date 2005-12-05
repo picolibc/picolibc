@@ -569,8 +569,9 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
 
   si.si_addr = (void *) in->Eip;
   si.si_errno = si.si_pid = si.si_uid = 0;
-  me.push ((__stack_t) ebp, true);
+  me.incyg++;
   sig_send (NULL, si, &me);	// Signal myself
+  me.incyg--;
   e->ExceptionFlags = 0;
   return 0;
 }
@@ -683,7 +684,7 @@ interruptible (DWORD pc)
 void __stdcall
 _cygtls::interrupt_setup (int sig, void *handler, struct sigaction& siga)
 {
-  push ((__stack_t) sigdelayed, false);
+  push ((__stack_t) sigdelayed);
   deltamask = (siga.sa_mask | SIGTOMASK (sig)) & ~SIG_NONMASKABLE;
   sa_flags = siga.sa_flags;
   func = (void (*) (int)) handler;
@@ -707,7 +708,7 @@ bool
 _cygtls::interrupt_now (CONTEXT *ctx, int sig, void *handler,
 			struct sigaction& siga)
 {
-  push ((__stack_t) ctx->Eip, false);
+  push ((__stack_t) ctx->Eip);
   interrupt_setup (sig, handler, siga);
   ctx->Eip = pop ();
   SetThreadContext (*this, ctx); /* Restart the thread in a new location */
@@ -740,11 +741,10 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
   for (int i = 0; i < CALL_HANDLER_RETRY; i++)
     {
       tls->lock ();
-      if (tls->incyg || tls->in_exception ())
+      if (tls->incyg)
 	{
-	  sigproc_printf ("controlled interrupt. incyg %d, exception %d, stackptr %p, stack %p, stackptr[-1] %p",
-			  tls->incyg, tls->in_exception (), tls->stackptr, tls->stack, tls->stackptr[-1]);
-	  tls->reset_exception ();
+	  sigproc_printf ("controlled interrupt. stackptr %p, stack %p, stackptr[-1] %p",
+			  tls->stackptr, tls->stack, tls->stackptr[-1]);
 	  tls->interrupt_setup (sig, handler, siga);
 	  interrupted = true;
 	  tls->unlock ();
@@ -779,9 +779,9 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
 	  ResumeThread (hth);
 	  break;
 	}
-      if (tls->incyg || tls->in_exception () || tls->spinning || tls->locked ())
-	sigproc_printf ("incyg %d, in_exception %d, spinning %d, locked %d\n",
-			tls->incyg, tls->in_exception (), tls->spinning, tls->locked ());
+      if (tls->incyg || tls->spinning || tls->locked ())
+	sigproc_printf ("incyg %d, spinning %d, locked %d\n",
+			tls->incyg, tls->spinning, tls->locked ());
       else
 	{
 	  cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
@@ -1052,7 +1052,7 @@ sigpacket::process ()
     handler = (void *) thissig.sa_handler;
   else if (tls)
     return 1;
-  else 
+  else
     handler = NULL;
 
   if (si.si_signo == SIGKILL)

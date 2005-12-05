@@ -1,3 +1,22 @@
+2005-12-05  Christopher Faylor  <cgf@timesys.com>
+
+	Remove unneeded whitespace.
+	* cygtls.cc (_cygtls::set_state): Delete.
+	(_cygtls::reset_exception): Ditto.
+	(_cygtls::init_thread): Set initialized state directly here.
+	(_cygtls::push): Remove exception argument.  Don't treat exceptions
+	specially.
+	* cygtls.h (_cygtls::push): Ditto.
+	(_cygtls::isinitialized): Don't treat exceptions specially.
+	(_cygtls::reset_exception): Delete.
+	(_cygtls::set_state): Ditto.
+	(_cygtls::handle_exceptions): Don't push ebp on the stack prior to
+	calling sig_send.  Just set incyg instead.
+	(_cygtls::interrupt_setup): Accommodate _cygtls::push argument change.
+	(_cygtls::interrupt_now): Ditto.
+	(setup_handler): Don't treat exceptions specially.
+	* gendef (longjmp): Always zero incyg flag.
+
 2005-12-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* environ.cc (spenvs): Add "windir" as an "always export" variable
