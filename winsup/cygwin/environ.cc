@@ -362,17 +362,25 @@ setenv (const char *name, const char *value, int overwrite)
 }
 
 /* unsetenv(name) -- Delete environment variable "name".  */
-extern "C" void
+extern "C" int
 unsetenv (const char *name)
 {
   register char **e;
   int offset;
+  myfault efault;
+  if (efault.faulted () || *name == '\0' || strchr (name, '='))
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
 
   while (my_findenv (name, &offset))	/* if set multiple times */
     /* Move up the rest of the array */
     for (e = cur_environ () + offset; ; e++)
       if (!(*e = *(e + 1)))
 	break;
+
+  return 0;
 }
 
 /* Turn environment variable part of a=b string into uppercase. */

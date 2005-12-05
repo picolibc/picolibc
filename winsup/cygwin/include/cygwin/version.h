@@ -280,7 +280,8 @@ details. */
       145: Add MAP_NORESERVE flag to mmap.
       146: Change SI_USER definition.  FIXME: Need to develop compatibility macro
            for this?
-      147: Eliminate problematic d_ino from dirent structure.
+      147: Eliminate problematic d_ino from dirent structure.  unsetenv now returns
+           int, as per linux.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */

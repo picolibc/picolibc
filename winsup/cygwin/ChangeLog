@@ -1,5 +1,11 @@
 2005-12-05  Christopher Faylor  <cgf@timesys.com>
 
+	* include/cygwin/stdlib.h: New file.
+	* environ.cc (unsetenv): Change to return -1 on input error.
+	* include/cygwin/version.h: Add more description to latest api bump.
+
+2005-12-05  Christopher Faylor  <cgf@timesys.com>
+
 	* dir.cc (readdir_workdir): Only fill out d_ino when linked into older
 	app.
 	* include/cygwin/version.h: Bump api minor number to 147, reflecting
