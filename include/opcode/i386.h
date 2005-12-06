@@ -1346,14 +1346,24 @@ static const template i386_optab[] =
 {"hsubps",    2, 0xf20f7d,  X, CpuPNI, NoSuf|IgnoreSize|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
 {"lddqu",     2, 0xf20ff0,  X, CpuPNI, NoSuf|IgnoreSize|Modrm,	{ LLongMem, RegXMM, 0 } },
 {"monitor",   0, 0x0f01, 0xc8, CpuPNI, NoSuf|ImmExt,	{ 0, 0, 0} },
-/* Need to ensure only "monitor %eax,%ecx,%edx" is accepted. */
-{"monitor",   3, 0x0f01, 0xc8, CpuPNI, NoSuf|ImmExt,	{ Reg32, Reg32, Reg32} },
+/* monitor is very special. CX and DX are always 64bits with zero upper
+   32bits in 64bit mode, and 32bits in 16bit and 32bit modes. The
+   address size override prefix can be used to overrride the AX size in
+   all modes.  */
+/* Need to ensure only "monitor %eax/%ax,%ecx,%edx" is accepted. */
+{"monitor",   3, 0x0f01, 0xc8, CpuPNI|CpuNo64, NoSuf|ImmExt,	{ Reg16|Reg32, Reg32, Reg32 } },
+/* Need to ensure only "monitor %rax/%eax,%rcx,%rdx" is accepted. */
+{"monitor",   3, 0x0f01, 0xc8, CpuPNI|Cpu64, NoSuf|ImmExt|NoRex64,	{ Reg32|Reg64, Reg64, Reg64 } },
 {"movddup",   2, 0xf20f12,  X, CpuPNI, NoSuf|IgnoreSize|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
 {"movshdup",  2, 0xf30f16,  X, CpuPNI, NoSuf|IgnoreSize|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
 {"movsldup",  2, 0xf30f12,  X, CpuPNI, NoSuf|IgnoreSize|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
 {"mwait",     0, 0x0f01, 0xc9, CpuPNI, NoSuf|ImmExt,	{ 0, 0, 0} },
+/* mwait is very special. AX and CX are always 64bits with zero upper
+   32bits in 64bit mode, and 32bits in 16bit and 32bit modes.  */
 /* Need to ensure only "mwait %eax,%ecx" is accepted.  */
-{"mwait",     2, 0x0f01, 0xc9, CpuPNI, NoSuf|ImmExt,	{ Reg32, Reg32, 0} },
+{"mwait",     2, 0x0f01, 0xc9, CpuPNI|CpuNo64, NoSuf|ImmExt,	{ Reg32, Reg32, 0} },
+/* Need to ensure only "mwait %rax,%rcx" is accepted.  */
+{"mwait",     2, 0x0f01, 0xc9, CpuPNI|Cpu64, NoSuf|ImmExt|NoRex64,	{ Reg64, Reg64, 0} },
 
 /* VMX instructions.  */
 {"vmcall",    0, 0x0f01, 0xc1, CpuVMX, NoSuf|ImmExt,	{ 0, 0, 0} },

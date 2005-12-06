@@ -1,3 +1,8 @@
+2005-12-06  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR gas/1874
+	* i386.h (i386_optab): Add 64bit support for monitor and mwait.
+
 2005-11-14  David Ung  <davidu@mips.com>
 
 	* mips.h: Assign 'm'/'M' codes to MIPS16e save/restore
