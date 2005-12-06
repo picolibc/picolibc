@@ -1,3 +1,11 @@
+2005-12-06  Ralf Corsepius <ralf.corsepius@rtems.org>
+
+	* libc/sys/rtems/crt0.c: Add rtems_gxx_key_create,
+	rtems_gxx_key_delete, rtems_gxx_getspecific,
+	rtems_gxx_setspecific, rtems_gxx_mutex_trylock, 
+	rtems_gxx_recursive_mutex_init, rtems_gxx_recursive_mutex_lock, 
+	rtems_gxx_recursive_mutex_trylock, rtems_gxx_recursive_mutex_unlock.
+
 2005-12-05  Christopher Faylor  <cgf@timesys.com>
 
 	* libc/include/stdlib.h: Move cygwin declarations to cygwin-specific
