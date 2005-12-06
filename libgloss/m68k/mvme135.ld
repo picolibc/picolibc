@@ -64,7 +64,7 @@ SECTIONS
 {
   .text :
   {
-    *(.text)
+    *(.text .text.*)
     . = ALIGN(0x4);
      __CTOR_LIST__ = .;
     ___CTOR_LIST__ = .;
@@ -78,7 +78,7 @@ SECTIONS
     *(.dtors)
      LONG(0)
     __DTOR_END__ = .;
-    *(.rodata)
+    *(.rodata .rodata.*)
     *(.gcc_except_table) 
 
     . = ALIGN(0x2);
@@ -101,7 +101,7 @@ SECTIONS
   .data :
   {
     *(.shdata)
-    *(.data)
+    *(.data .data.*)
     _edata = .;
   } > ram
 
@@ -110,7 +110,7 @@ SECTIONS
     . = ALIGN(0x4);
     __bss_start = . ;
     *(.shbss)
-    *(.bss)
+    *(.bss .bss.*)
     *(COMMON)
     _end =  ALIGN (0x8);
     __end = _end;

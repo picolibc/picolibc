@@ -1,3 +1,13 @@
+2005-12-06  Paul Brook  <paul@codesourcery.com>
+
+	* m68k/bcc.ld: Add .text.*, .rodata.*, .data.* and .bss.*.
+	* m68k/idp.ld: Ditto.
+	* m68k/idpgdb: Ditto.
+	* m68k/mvme135.ld: Ditto.
+	* m68k/sbc5204.ld: Ditto.
+	* m68k/sbc5206.ld: Ditto.
+	* m68k/sim.ld: Ditto.
+
 2005-11-30  Shaun Jackman  <sjackman@gmail.com>
 
 	* libnosys/Makefile.in (OBJS): Add chown, readlink, and symlink.
