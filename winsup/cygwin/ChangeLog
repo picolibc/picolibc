@@ -1,3 +1,20 @@
+2005-12-07  Christopher Faylor  <cgf@timesys.com>
+
+	* hires.h (hires_ms::initime_ms): Delete.
+	(hires_ms::initime_us): Just define as LONGLONG.
+	(hires_ms::uptime): New function.
+	* select.cc (select_stuff::wait): Use gtod for timing to attempt to
+	avoid windows 32 bit wraparound.
+	* times.cc (systime): New function.
+	(times): Replace GetTickCount with gtod.uptime.
+	(hires_us::prime): Use systime() to calculate system time rather than
+	calling GetSystemTimeAsFileTime directly.
+	(hires_ms::prime): Ditto.  Eliminate initime_ms.
+	(hires_ms::usecs): Try harder to detect wraparound.
+
+	* fhandler_proc.cc (format_proc_partitions): Set drive_size to zero to
+	avoid a compiler warning.
+
 2005-12-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_proc.cc (format_proc_partitions): Use modern IOCTLs

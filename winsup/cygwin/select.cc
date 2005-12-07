@@ -276,7 +276,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       continue;
     }
 
-  DWORD start_time = GetTickCount ();	/* Record the current time for later use. */
+  LONGLONG start_time = gtod.msecs ();	/* Record the current time for later use. */
 
   debug_printf ("m %d, ms %u", m, ms);
   for (;;)
@@ -330,7 +330,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	}
       select_printf ("recalculating ms");
 
-      DWORD now = GetTickCount ();
+      LONGLONG now = gtod.msecs ();
       if (now > (start_time + ms))
 	{
 	  select_printf ("timed out after verification");

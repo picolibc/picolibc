@@ -997,6 +997,8 @@ format_proc_partitions (char *destbuf, size_t maxsize)
 			       * dg->SectorsPerTrack
 			       * dg->BytesPerSector;
 		}
+	      else
+		drive_size = 0;
 	      if (!pi && !pix && !dg)
 		debug_printf ("DeviceIoControl %E");
 	      else

@@ -39,13 +39,14 @@ class hires_us : hires_base
 
 class hires_ms : hires_base
 {
-  DWORD initime_ms;
-  LARGE_INTEGER initime_us;
+  LONGLONG initime_us;
   void prime ();
  public:
   LONGLONG usecs ();
+  LONGLONG msecs () {return usecs () / 1000LL;}
   UINT dmsecs () { return timeGetTime (); }
   UINT resolution ();
+  LONGLONG uptime () {return (usecs () - initime_us) / 1000LL;}
 };
 
 extern hires_ms gtod;

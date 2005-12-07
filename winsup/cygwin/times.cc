@@ -32,9 +32,22 @@ details. */
 #define FACTOR (0x19db1ded53e8000LL)
 #define NSPERSEC 10000000LL
 
+static inline LONGLONG
+systime ()
+{
+  LARGE_INTEGER x;
+  FILETIME ft;
+  GetSystemTimeAsFileTime (&ft);
+  x.HighPart = ft.dwHighDateTime;
+  x.LowPart = ft.dwLowDateTime;
+  x.QuadPart -= FACTOR;		/* Add conversion factor for UNIX vs. Windows base time */
+  x.QuadPart /= 10;		/* Convert to milliseconds */
+  return x.QuadPart;
+}
+
 /* Cygwin internal */
 static unsigned long long __stdcall
-__to_clock_t (FILETIME * src, int flag)
+__to_clock_t (FILETIME *src, int flag)
 {
   unsigned long long total = ((unsigned long long) src->dwHighDateTime << 32) + ((unsigned)src->dwLowDateTime);
   syscall_printf ("dwHighDateTime %u, dwLowDateTime %u", src->dwHighDateTime, src->dwLowDateTime);
@@ -44,7 +57,7 @@ __to_clock_t (FILETIME * src, int flag)
     total -= FACTOR;
 
   total /= (unsigned long long) (NSPERSEC / CLOCKS_PER_SEC);
-  syscall_printf ("total %08x %08x", (unsigned)(total>>32), (unsigned)(total));
+  syscall_printf ("total %08x %08x", (unsigned) (total>>32), (unsigned) (total));
   return total;
 }
 
@@ -58,10 +71,10 @@ times (struct tms *buf)
   if (efault.faulted (EFAULT))
     return ((clock_t) -1);
 
-  DWORD ticks = GetTickCount ();
+  LONGLONG ticks = gtod.uptime ();
   /* Ticks is in milliseconds, convert to our ticks. Use long long to prevent
      overflow. */
-  clock_t tc = (clock_t) ((long long) ticks * CLOCKS_PER_SEC / 1000);
+  clock_t tc = (clock_t) (ticks * CLOCKS_PER_SEC / 1000);
   if (wincap.has_get_process_times ())
     {
       GetProcessTimes (hMainProc, &creation_time, &exit_time,
@@ -569,7 +582,6 @@ hires_us::prime ()
       return;
     }
 
-  FILETIME f;
   int priority = GetThreadPriority (GetCurrentThread ());
 
   SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
@@ -580,15 +592,10 @@ hires_us::prime ()
       return;
     }
 
-  GetSystemTimeAsFileTime (&f);
-  SetThreadPriority (GetCurrentThread (), priority);
-
-  inited = 1;
-  primed_ft.HighPart = f.dwHighDateTime;
-  primed_ft.LowPart = f.dwLowDateTime;
-  primed_ft.QuadPart -= FACTOR;
-  primed_ft.QuadPart /= 10;
+  primed_ft.QuadPart = systime ();
   freq = (double) ((double) 1000000. / (double) ifreq.QuadPart);
+  inited = true;
+  SetThreadPriority (GetCurrentThread (), priority);
 }
 
 LONGLONG
@@ -620,18 +627,11 @@ hires_ms::prime ()
 {
   if (!inited)
     {
-      FILETIME f;
       int priority = GetThreadPriority (GetCurrentThread ());
       SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
-      initime_ms = timeGetTime ();
-      GetSystemTimeAsFileTime (&f);
+      initime_us = systime () - (((LONGLONG) timeGetTime ()) * 1000LL);
+      inited = true;
       SetThreadPriority (GetCurrentThread (), priority);
-
-      initime_us.HighPart = f.dwHighDateTime;
-      initime_us.LowPart = f.dwLowDateTime;
-      initime_us.QuadPart -= FACTOR;
-      initime_us.QuadPart /= 10;
-      inited = 1;
     }
   return;
 }
@@ -642,15 +642,13 @@ hires_ms::usecs ()
   if (!inited)
     prime ();
 
-  DWORD now = timeGetTime ();
-  if ((int) (now - initime_ms) < 0)
+  LONGLONG res = initime_us + (((LONGLONG) timeGetTime ()) * 1000LL);
+  if (res <= systime ())
     {
-      inited = 0;
+      inited = false;
       prime ();
-      now = timeGetTime ();
+      res = initime_us + (((LONGLONG) timeGetTime ()) * 1000LL);
     }
-  // FIXME: Not sure how this will handle the 49.71 day wrap around
-  LONGLONG res = initime_us.QuadPart + ((LONGLONG) (now - initime_ms) * 1000);
   return res;
 }
 
