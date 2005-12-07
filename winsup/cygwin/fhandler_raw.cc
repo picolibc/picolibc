@@ -157,21 +157,24 @@ fhandler_dev_raw::ioctl (unsigned int cmd, void *buf)
 		mop.mt_count = op->rd_parm;
 		ret = ioctl (MTIOCTOP, &mop);
 	      }
-	    else if (devbuf && op->rd_parm < devbufend - devbufstart)
+	    else if (devbuf && ((op->rd_parm <= 1 && (devbufend - devbufstart))
+				|| op->rd_parm < devbufend - devbufstart))
 	      ret = ERROR_INVALID_PARAMETER;
 	    else if (!devbuf || op->rd_parm != devbufsiz)
 	      {
 		char *buf = NULL;
 		if (op->rd_parm > 1L)
 		  buf = new char [op->rd_parm];
-		if (devbufsiz > 1L)
+		if (buf && devbufsiz > 1L)
 		  {
 		    memcpy (buf, devbuf + devbufstart, devbufend - devbufstart);
 		    devbufend -= devbufstart;
-		    delete [] devbuf;
 		  }
 		else
 		  devbufend = 0;
+
+		if (devbufsiz > 1L)
+		  delete [] devbuf;
 
 		devbufstart = 0;
 		devbuf = buf;
