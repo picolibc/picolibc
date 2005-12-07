@@ -232,8 +232,6 @@ GetClassInfoExW@12
 GetClassInfoW@12
 GetClassLongA@8
 GetClassLongW@8
-GetClassLongPtrA@8
-GetClassLongPtrW@8
 GetClassNameA@12
 GetClassNameW@12
 GetClassWord@8
@@ -517,8 +515,6 @@ SetCaretBlinkTime@4
 SetCaretPos@8
 SetClassLongA@12
 SetClassLongW@12
-SetClassLongPtrA@12
-SetClassLongPtrW@12
 SetClassWord@12
 SetClipboardData@8
 SetClipboardViewer@4
