@@ -1,3 +1,7 @@
+2005-12-07  Christopher Faylor  <cgf@timesys.com>
+
+	* include/cygwin/stdlib.h: Guard compilation of *unsetenv* in newlib.
+
 2005-12-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* exceptions.cc (_cygtls::handle_exceptions): In case of a

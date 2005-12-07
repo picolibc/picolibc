@@ -28,6 +28,11 @@ int grantpt (int);
 int unlockpt (int);
 #endif /*__STRICT_ANSI__*/
 
+#ifdef _COMPILING_NEWLIB
+#define unsetenv UNUSED_unsetenv
+#define _unsetenv_r UNUSED__unsetenv_r
+#endif
+
 #undef _malloc_r
 #define _malloc_r(r, s) malloc (s)
 #undef _free_r
