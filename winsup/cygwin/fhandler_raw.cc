@@ -161,7 +161,9 @@ fhandler_dev_raw::ioctl (unsigned int cmd, void *buf)
 	      ret = ERROR_INVALID_PARAMETER;
 	    else if (!devbuf || op->rd_parm != devbufsiz)
 	      {
-		char *buf = new char [op->rd_parm];
+		char *buf = NULL;
+		if (op->rd_parm > 1L)
+		  buf = new char [op->rd_parm];
 		if (devbufsiz > 1L)
 		  {
 		    memcpy (buf, devbuf + devbufstart, devbufend - devbufstart);
@@ -173,7 +175,7 @@ fhandler_dev_raw::ioctl (unsigned int cmd, void *buf)
 
 		devbufstart = 0;
 		devbuf = buf;
-		devbufsiz = op->rd_parm;
+		devbufsiz = op->rd_parm ?: 1L;
 	      }
 	    break;
 	  default:
@@ -187,7 +189,7 @@ fhandler_dev_raw::ioctl (unsigned int cmd, void *buf)
       if (!get)
 	ret = ERROR_INVALID_PARAMETER;
       else
-	get->bufsiz = devbufsiz ? devbufsiz : 1L;
+	get->bufsiz = devbufsiz ?: 1L;
     }
   else
     return fhandler_base::ioctl (cmd, buf);
