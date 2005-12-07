@@ -380,7 +380,7 @@ fhandler_dev_floppy::lseek (_off64_t offset, int whence)
       whence = SEEK_SET;
     }
 
-  if (whence != SEEK_SET || lloffset < 0 || lloffset >= drive_size)
+  if (whence != SEEK_SET || lloffset < 0 || lloffset > drive_size)
     {
       set_errno (EINVAL);
       return -1;

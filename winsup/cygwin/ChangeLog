@@ -1,3 +1,8 @@
+2005-12-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_floppy.cc (fhandler_dev_floppy::lseek): Fix test for
+	valid file position at EOM.
+
 2005-12-07  Christopher Faylor  <cgf@timesys.com>
 
 	* include/cygwin/stdlib.h: Guard compilation of *unsetenv* in newlib.
