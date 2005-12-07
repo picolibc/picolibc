@@ -289,7 +289,7 @@ GetDateFormatA@24
 GetDateFormatW@24
 GetDefaultCommConfigA@12
 GetDefaultCommConfigW@12
-GetDevicePowerState@4
+GetDevicePowerState@8
 GetDiskFreeSpaceA@20
 GetDiskFreeSpaceW@20
 GetDiskFreeSpaceExA@16
