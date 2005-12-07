@@ -299,8 +299,9 @@ extern "C" int low_priority_sleep (DWORD) __attribute__ ((regparm (1)));
 /* Returns the real page size, not the allocation size. */
 size_t getsystempagesize ();
 
-/* Init mmap function pointers. */
+/* mmap functions. */
 void mmap_init ();
+bool mmap_is_attached_page (ULONG_PTR);
 
 int winprio_to_nice (DWORD) __attribute__ ((regparm (1)));
 DWORD nice_to_winprio (int &) __attribute__ ((regparm (1)));

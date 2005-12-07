@@ -479,6 +479,13 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
       break;
 
     case STATUS_ACCESS_VIOLATION:
+      if (mmap_is_attached_page (e->ExceptionInformation[1]))
+	{
+	  si.si_signo = SIGBUS;
+	  si.si_code = BUS_OBJERR;
+	  break;
+	}
+      /*FALLTHRU*/
     case STATUS_DATATYPE_MISALIGNMENT:
     case STATUS_ARRAY_BOUNDS_EXCEEDED:
     case STATUS_IN_PAGE_ERROR:

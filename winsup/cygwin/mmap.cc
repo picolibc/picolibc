@@ -14,6 +14,7 @@ details. */
 #include <stdlib.h>
 #include <stddef.h>
 #include <sys/mman.h>
+#include <sys/param.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -24,6 +25,17 @@ details. */
 #include "sys/cygwin.h"
 #include "ntdll.h"
 
+/* __PROT_ATTACH indicates an anonymous mapping which is supposed to be
+   attached to a file mapping for pages beyond the file's EOF.  The idea
+   is to support mappings longer than the file, without the file growing
+   to mapping length (POSIX semantics). */
+#define __PROT_ATTACH   0x8000000
+/* Filler pages are the pages from the last file backed page to the next
+   64K boundary.  These pages are created as anonymous pages, but with
+   the same page protection as the file's pages, since POSIX applications
+   expect to be able to access this part the same way as the file pages. */
+#define __PROT_FILLER   0x4000000
+
 #define PAGE_CNT(bytes) howmany((bytes),getpagesize())
 
 #define PGBITS		(sizeof (DWORD)*8)
@@ -33,8 +45,10 @@ details. */
 #define MAP_CLR(n)	(page_map[(n)/PGBITS] &= ~(1L << ((n) % PGBITS)))
 #define MAP_ISSET(n)	(page_map[(n)/PGBITS] & (1L << ((n) % PGBITS)))
 
-/* Used for accessing the page file (anonymous mmaps). */
-static fhandler_dev_zero fh_paging_file;
+/* Used for anonymous mappings. */
+static fhandler_dev_zero fh_anonymous;
+/* Used for reopening a disk file when necessary. */
+static fhandler_disk_file fh_disk_file;
 
 /* Small helpers to avoid having lots of flag bit tests in the code. */
 static inline bool
@@ -67,32 +81,56 @@ autogrow (int flags)
   return (flags & MAP_AUTOGROW) == MAP_AUTOGROW;
 }
 
+static inline bool
+attached (int prot)
+{
+  return (prot & __PROT_ATTACH) == __PROT_ATTACH;
+}
+
+static inline bool
+filler (int prot)
+{
+  return (prot & __PROT_FILLER) == __PROT_FILLER;
+}
+
+static inline DWORD
+gen_create_protect (DWORD openflags, int flags)
+{
+  DWORD ret = PAGE_READONLY;
+
+  if (openflags & GENERIC_WRITE)
+    ret = priv (flags) ? PAGE_WRITECOPY : PAGE_READWRITE;
+
+  /* Ignore EXECUTE permission on 9x. */
+  if ((openflags & GENERIC_EXECUTE)
+      && wincap.virtual_protect_works_on_shared_pages ())
+    ret <<= 4;
+
+  return ret;
+}
+
 /* Generate Windows protection flags from mmap prot and flag values. */
 static inline DWORD
-gen_protect (int prot, int flags, bool create = false)
+gen_protect (int prot, int flags)
 {
   DWORD ret = PAGE_NOACCESS;
-  /* When creating a private map/section, the protection must be set to
-     PAGE_WRITECOPY, otherwise the page protection can't be set to
-     PAGE_WRITECOPY in later calls to VirtualProtect.  This does not
-     hold for private anonymous maps, since these are mapped using
-     VirtualAlloc.  The PAGE_WRITECOPY protection is never used for
-     them. */
-  if (create && priv (flags) && !anonymous (flags))
-    ret = PAGE_WRITECOPY;
-  else if (prot & PROT_WRITE)
-    {
-      /* Windows doesn't support write without read. */
-      ret <<= 2;
-      if (priv (flags) && !anonymous (flags))
-	ret <<= 1;
-    }
+
+  /* Attached pages are only reserved, but the protection must be a
+     valid value, so we just return PAGE_READWRITE. */
+  if (attached (prot))
+    return PAGE_EXECUTE_READWRITE;
+
+  if (prot & PROT_WRITE)
+    ret = (priv (flags) && (!anonymous (flags) || filler (prot)))
+	  ? PAGE_WRITECOPY : PAGE_READWRITE;
   else if (prot & PROT_READ)
-    ret <<= 1;
+    ret = PAGE_READONLY;
+
   /* Ignore EXECUTE permission on 9x. */
   if ((prot & PROT_EXEC)
       && wincap.virtual_protect_works_on_shared_pages ())
     ret <<= 4;
+
   return ret;
 }
 
@@ -100,15 +138,13 @@ gen_protect (int prot, int flags, bool create = false)
    Only used on 9x.  PROT_EXEC not supported here since it's not
    necessary. */
 static inline DWORD
-gen_access (int prot, int flags)
+gen_access (DWORD openflags, int flags)
 {
-  DWORD ret = 0;
+  DWORD ret = FILE_MAP_READ;
   if (priv (flags))
     ret = FILE_MAP_COPY;
-  else if (prot & PROT_WRITE)
+  else if (openflags & GENERIC_WRITE)
     ret = priv (flags) ? FILE_MAP_COPY : FILE_MAP_WRITE;
-  else if (prot & PROT_READ)
-    ret = FILE_MAP_READ;
   return ret;
 }
 
@@ -147,13 +183,13 @@ VirtualProtExNT (HANDLE parent, PVOID addr, SIZE_T len, DWORD prot,
 #define VirtualProtectEx(h,a,l,p,o) (mmap_func->VirtualProtEx((h),(a),(l),(p),(o)))
 
 static HANDLE
-CreateMapping9x (HANDLE fhdl, size_t len, _off64_t off, int prot, int flags,
-		 const char *name)
+CreateMapping9x (HANDLE fhdl, size_t len, _off64_t off, DWORD openflags,
+		 int prot, int flags, const char *name)
 {
   HANDLE h;
   DWORD high, low;
 
-  DWORD protect = gen_protect (prot, flags, true);
+  DWORD protect = gen_create_protect (openflags, flags);
 
   /* copy-on-write doesn't work properly on 9x with real files.  While the
      changes are not propagated to the file, they are visible to other
@@ -176,10 +212,23 @@ CreateMapping9x (HANDLE fhdl, size_t len, _off64_t off, int prot, int flags,
 	namebuf[i] = cyg_tolower (namebuf [i]);
 
       debug_printf ("named sharing");
-      DWORD access = gen_access (prot, flags);
+      DWORD access = gen_access (openflags, flags);
+      /* Different access modes result in incompatible mappings.  So we
+         create different maps per access mode by using different names. */
+      switch (access)
+        {
+	  case FILE_MAP_READ:
+	    namebuf[0] = 'R';
+	    break;
+	  case FILE_MAP_WRITE:
+	    namebuf[0] = 'W';
+	    break;
+	  case FILE_MAP_COPY:
+	    namebuf[0] = 'C';
+	    break;
+	}
       if (!(h = OpenFileMapping (access, TRUE, namebuf)))
-	h = CreateFileMapping (fhdl, &sec_none, protect, 0, 0,
-			       namebuf);
+	h = CreateFileMapping (fhdl, &sec_none, protect, 0, 0, namebuf);
     }
   else if (fhdl == INVALID_HANDLE_VALUE)
     {
@@ -212,15 +261,15 @@ CreateMapping9x (HANDLE fhdl, size_t len, _off64_t off, int prot, int flags,
 }
 
 static HANDLE
-CreateMappingNT (HANDLE fhdl, size_t len, _off64_t off, int prot, int flags,
-		 const char *)
+CreateMappingNT (HANDLE fhdl, size_t len, _off64_t off, DWORD openflags,
+		 int prot, int flags, const char *)
 {
   HANDLE h;
   NTSTATUS ret;
 
   LARGE_INTEGER sectionsize = { QuadPart: len };
-  ULONG protect = gen_protect (prot, flags, true);
-  ULONG attributes = SEC_COMMIT;	/* For now! */
+  ULONG protect = gen_create_protect (openflags, flags);
+  ULONG attributes = attached (prot) ? SEC_RESERVE : SEC_COMMIT;
 
   OBJECT_ATTRIBUTES oa;
   InitializeObjectAttributes (&oa, NULL, OBJ_INHERIT, NULL,
@@ -265,11 +314,12 @@ CreateMappingNT (HANDLE fhdl, size_t len, _off64_t off, int prot, int flags,
 }
 
 void *
-MapView9x (HANDLE h, void *addr, size_t len, int prot, int flags, _off64_t off)
+MapView9x (HANDLE h, void *addr, size_t len, DWORD openflags,
+	   int prot, int flags, _off64_t off)
 {
   DWORD high = off >> 32;
   DWORD low = off & UINT32_MAX;
-  DWORD access = gen_access (prot, flags);
+  DWORD access = gen_access (openflags, flags);
   void *base;
 
   /* Try mapping using the given address first, even if it's NULL.
@@ -289,24 +339,27 @@ MapView9x (HANDLE h, void *addr, size_t len, int prot, int flags, _off64_t off)
 }
 
 void *
-MapViewNT (HANDLE h, void *addr, size_t len, int prot, int flags, _off64_t off)
+MapViewNT (HANDLE h, void *addr, size_t len, DWORD openflags,
+	   int prot, int flags, _off64_t off)
 {
   NTSTATUS ret;
   LARGE_INTEGER offset = { QuadPart:off };
-  DWORD protect = gen_protect (prot, flags, true);
+  DWORD protect = gen_create_protect (openflags, flags);
   void *base = addr;
-  ULONG size = len;
+  ULONG commitsize = attached (prot) ? 0 : len;
+  ULONG viewsize = len;
+  ULONG alloc_type = base ? AT_ROUND_TO_PAGE : 0;
 
   /* Try mapping using the given address first, even if it's NULL.
      If it failed, and addr was not NULL and flags is not MAP_FIXED,
      try again with NULL address. */
-  ret = NtMapViewOfSection (h, GetCurrentProcess (), &base, 0, size, &offset,
-			    &size, ViewShare, 0, protect);
+  ret = NtMapViewOfSection (h, GetCurrentProcess (), &base, 0, commitsize,
+			    &offset, &viewsize, ViewShare, alloc_type, protect);
   if (!NT_SUCCESS (ret) && addr && !fixed (flags))
     {
       base = NULL;
-      ret = NtMapViewOfSection (h, GetCurrentProcess (), &base, 0, size,
-      				&offset, &size, ViewShare, 0, protect);
+      ret = NtMapViewOfSection (h, GetCurrentProcess (), &base, 0, commitsize,
+      				&offset, &viewsize, ViewShare, 0, protect);
     }
   if (!NT_SUCCESS (ret))
     {
@@ -320,8 +373,9 @@ MapViewNT (HANDLE h, void *addr, size_t len, int prot, int flags, _off64_t off)
 
 struct mmap_func_t
 {
-  HANDLE (*CreateMapping)(HANDLE, size_t, _off64_t, int, int, const char*);
-  void * (*MapView)(HANDLE, void *, size_t, int, int, _off64_t);
+  HANDLE (*CreateMapping)(HANDLE, size_t, _off64_t, DWORD, int, int,
+  			  const char *);
+  void * (*MapView)(HANDLE, void *, size_t, DWORD, int, int, _off64_t);
   BOOL	 (*VirtualProt)(PVOID, SIZE_T, DWORD, PDWORD);
   BOOL	 (*VirtualProtEx)(HANDLE, PVOID, SIZE_T, DWORD, PDWORD);
 };
@@ -372,6 +426,7 @@ class mmap_record
   private:
     int fd;
     HANDLE mapping_hdl;
+    DWORD openflags;
     int prot;
     int flags;
     _off64_t offset;
@@ -381,10 +436,11 @@ class mmap_record
     device dev;
 
   public:
-    mmap_record (int nfd, HANDLE h, int p, int f, _off64_t o, DWORD l,
+    mmap_record (int nfd, HANDLE h, DWORD of, int p, int f, _off64_t o, DWORD l,
     		 caddr_t b) :
        fd (nfd),
        mapping_hdl (h),
+       openflags (of),
        prot (p),
        flags (f),
        offset (o),
@@ -403,12 +459,15 @@ class mmap_record
     HANDLE get_handle () const { return mapping_hdl; }
     device& get_device () { return dev; }
     int get_prot () const { return prot; }
+    int get_openflags () const { return openflags; }
     int get_flags () const { return flags; }
     bool priv () const { return ::priv (flags); }
     bool fixed () const { return ::fixed (flags); }
     bool anonymous () const { return ::anonymous (flags); }
     bool noreserve () const { return ::noreserve (flags); }
     bool autogrow () const { return ::autogrow (flags); }
+    bool attached () const { return ::attached (prot); }
+    bool filler () const { return ::filler (prot); }
     _off64_t get_offset () const { return offset; }
     DWORD get_len () const { return len; }
     caddr_t get_address () const { return base_address; }
@@ -424,11 +483,13 @@ class mmap_record
 
     fhandler_base *alloc_fh ();
     void free_fh (fhandler_base *fh);
-
-    DWORD gen_protect (bool create = false) const
-      { return ::gen_protect (get_prot (), get_flags (), create); }
+    
+    DWORD gen_create_protect () const
+      { return ::gen_create_protect (get_openflags (), get_flags ()); }
+    DWORD gen_protect () const
+      { return ::gen_protect (get_prot (), get_flags ()); }
     DWORD gen_access () const
-      { return ::gen_access (get_prot (), get_flags ()); }
+      { return ::gen_access (get_openflags (), get_flags ()); }
     bool compatible_flags (int fl) const;
 };
 
@@ -509,7 +570,7 @@ mmap_record::alloc_page_map ()
 				      sizeof (DWORD))))
     return false;
 
-  DWORD start_protect = gen_protect (true);
+  DWORD start_protect = gen_create_protect ();
   DWORD real_protect = gen_protect ();
   if (real_protect != start_protect
       && !VirtualProtect (get_address (), get_len (),
@@ -616,8 +677,9 @@ mmap_record::alloc_fh ()
 {
   if (anonymous ())
     {
-      fh_paging_file.set_io_handle (INVALID_HANDLE_VALUE);
-      return &fh_paging_file;
+      fh_anonymous.set_io_handle (INVALID_HANDLE_VALUE);
+      fh_anonymous.set_access (GENERIC_READ | GENERIC_WRITE | GENERIC_EXECUTE);
+      return &fh_anonymous;
     }
 
   /* The file descriptor could have been closed or, even
@@ -625,7 +687,9 @@ mmap_record::alloc_fh ()
      the call to fork(). This requires creating a fhandler
      of the correct type to be sure to call the method of the
      correct class. */
-  return build_fh_dev (get_device ());
+  fhandler_base *fh = build_fh_dev (get_device ());
+  fh->set_access (get_openflags ());
+  return fh;
 }
 
 void
@@ -690,8 +754,11 @@ list::search_record (caddr_t addr, DWORD len, caddr_t &m_addr, DWORD &m_len,
   for (long i = start + 1; i < nrecs; ++i)
     {
       low = (addr >= recs[i].get_address ()) ? addr : recs[i].get_address ();
-      high = recs[i].get_address ()
-	     + (PAGE_CNT (recs[i].get_len ()) * getpagesize ());
+      high = recs[i].get_address ();
+      if (recs[i].filler ())
+        high += recs[i].get_len ();
+      else
+	high += (PAGE_CNT (recs[i].get_len ()) * getpagesize ());
       high = (addr + len < high) ? addr + len : high;
       if (low < high)
 	{
@@ -708,7 +775,14 @@ list::set (int nfd)
 {
   fd = nfd;
   if (!anonymous ())
-    hash = cygheap->fdtab[fd]->get_namehash ();
+    {
+      /* The fd isn't sufficient since it could already be the fd of another
+	 file.  So we use the inode number as evaluated by fstat to identify
+	 the file. */
+      struct stat st;
+      fstat (nfd, &st);
+      hash = st.st_ino;
+    }
   nrecs = maxrecs = 0;
   recs = NULL;
 }
@@ -779,13 +853,16 @@ map::get_list_by_fd (int fd)
 {
   unsigned i;
   for (i = 0; i < nlists; i++)
-    /* The fd isn't sufficient since it could already be the fd of another
-       file.  So we use the name hash value to identify the file unless
-       it's an anonymous mapping in which case the fd (-1) is sufficient. */
-    if ((fd == -1 && lists[i].anonymous ())
-	|| (fd != -1
-	    && lists[i].get_hash () == cygheap->fdtab[fd]->get_namehash ()))
-      return lists + i;
+    {
+      if (fd == -1 && lists[i].anonymous ())
+	return lists + i;
+      /* The fd isn't sufficient since it could already be the fd of another
+	 file.  So we use the inode number as evaluated by fstat to identify
+	 the file. */
+      struct stat st;
+      if (fd != -1 && !fstat (fd, &st) && lists[i].get_hash () == st.st_ino)
+	return lists + i;
+    }
   return 0;
 }
 
@@ -820,6 +897,56 @@ map::del_list (unsigned i)
     }
 }
 
+/* This function is called from exception_handler when a segmentation
+   violation has happened.  The function should return true, if the
+   faulting address (the parameter) is within attached pages.  In this
+   case the exception_handler raises SIGBUS, as demanded by the memory
+   protection extension described in SUSv3 (see the mmap man page).
+   If false is returned, a normal SIGSEGV is raised. */
+bool
+mmap_is_attached_page (ULONG_PTR addr)
+{
+  list *map_list;
+  long record_idx;
+  caddr_t u_addr;
+  DWORD u_len;
+  DWORD pagesize = getsystempagesize ();
+
+  addr = rounddown (addr, pagesize);
+  if (!(map_list = mmapped_areas.get_list_by_fd (-1)))
+    return false;
+  if ((record_idx = map_list->search_record ((caddr_t)addr, pagesize,
+					     u_addr, u_len, -1)) < 0)
+    return false;
+  if (!map_list->get_record (record_idx)->attached ())
+    return false;
+  return true;
+}
+
+static caddr_t
+mmap_worker (fhandler_base *fh, caddr_t base, size_t len, int prot, int flags,
+	     int fd, _off64_t off)
+{
+  list *map_list;
+  HANDLE h = fh->mmap (&base, len, prot, flags, off);
+  if (h == INVALID_HANDLE_VALUE)
+    return NULL;
+  if (!(map_list = mmapped_areas.get_list_by_fd (fd))
+      && !(map_list = mmapped_areas.add_list (fd)))
+    {
+      fh->munmap (h, base, len);
+      return NULL;
+    }
+  mmap_record mmap_rec (fd, h, fh->get_access (), prot, flags, off, len, base);
+  mmap_record *rec = map_list->add_record (mmap_rec);
+  if (!rec)
+    {
+      fh->munmap (h, base, len);
+      return NULL;
+    }
+  return base;
+}
+
 extern "C" void *
 mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 {
@@ -828,20 +955,26 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 
   caddr_t ret = (caddr_t) MAP_FAILED;
   fhandler_base *fh = NULL;
-  mmap_record *rec;
+  list *map_list = NULL;
+  size_t orig_len = 0;
+  caddr_t base = NULL;
 
   DWORD pagesize = getpagesize ();
 
+  fh_anonymous.set_io_handle (INVALID_HANDLE_VALUE);
+  fh_anonymous.set_access (GENERIC_READ | GENERIC_WRITE | GENERIC_EXECUTE);
+  fh_disk_file.set_io_handle (NULL);
+
   SetResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
 
-  /* Error conditions.  Note that the addr%pagesize test is deferred
+  /* EINVAL error conditions.  Note that the addr%pagesize test is deferred
      to workaround a serious alignment problem in Windows 98.  */
   if (off % pagesize
       || ((prot & ~(PROT_READ | PROT_WRITE | PROT_EXEC)))
       || ((flags & MAP_TYPE) != MAP_SHARED
 	  && (flags & MAP_TYPE) != MAP_PRIVATE)
 #if 0
-      || (fixed (flags) && ((DWORD)addr % pagesize))
+      || (fixed (flags) && ((uintptr_t) addr % pagesize))
 #endif
       || !len)
     {
@@ -858,66 +991,134 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
      free pages exist, check addr again, this time for the real alignment. */
   DWORD checkpagesize = wincap.has_mmap_alignment_bug () ?
   			getsystempagesize () : pagesize;
-  if (fixed (flags) && ((DWORD) addr % checkpagesize))
+  if (fixed (flags) && ((uintptr_t) addr % checkpagesize))
     {
       set_errno (EINVAL);
       goto out;
     }
 
-  if (anonymous (flags))
-    fd = -1;
-  else if (fd != -1)
+  if (!anonymous (flags) && fd != -1)
     {
       /* Ensure that fd is open */
       cygheap_fdget cfd (fd);
       if (cfd < 0)
 	goto out;
 
-      /* Convert /dev/zero mapping to MAP_ANONYMOUS mapping. */
       fh = cfd;
+
+      /* mmap /dev/zero is like MAP_ANONYMOUS. */
       if (fh->get_device () == FH_ZERO)
-	{
-	  /* mmap /dev/zero is like MAP_ANONYMOUS. */
-	  fd = -1;
-	  flags |= MAP_ANONYMOUS;
-	}
+	flags |= MAP_ANONYMOUS;
     }
-  /* Don't use anonymous() here since that doesn't catch the fd == -1 case
-     with no MAP_ANONYMOUS flags set. */
-  if (fd == -1)
+  if (anonymous (flags) || fd == -1)
     {
-      fh_paging_file.set_io_handle (INVALID_HANDLE_VALUE);
-      fh = &fh_paging_file;
-      /* Anonymous mappings are always forced to pagesize length. */
-      len = PAGE_CNT (len) * pagesize;
+      fh = &fh_anonymous;
+      fd = -1;
       flags |= MAP_ANONYMOUS;
+      /* Anonymous mappings are always forced to pagesize length with
+         no offset. */
+      len = roundup2 (len, pagesize);
       off = 0;
     }
   else if (fh->get_device () == FH_FS)
     {
-      /* File mappings needs some extra care. */
+      /* EACCES error conditions according to SUSv3.  File must be opened
+         for reading, regardless of the requested protection, and file must
+	 be opened for writing when PROT_WRITE together with MAP_SHARED
+	 is requested. */
+      if (!(fh->get_access () & GENERIC_READ)
+	  || (!(fh->get_access () & GENERIC_WRITE)
+	      && (prot & PROT_WRITE) && !priv (flags)))
+	{
+	  set_errno (EACCES);
+	  goto out;
+	}
+
+      /* On 9x you can't create mappings with PAGE_WRITECOPY protection if
+         the file isn't explicitely opened with WRITE access. */
+      if (!wincap.is_winnt () && priv (flags)
+      	  && !(fh->get_access () & GENERIC_WRITE))
+	{
+	  HANDLE h = CreateFile (fh->get_win32_name (),
+				 fh->get_access () | GENERIC_WRITE,
+				 wincap.shared (), &sec_none_nih,
+				 OPEN_EXISTING, 0, NULL);
+	  if (h == INVALID_HANDLE_VALUE)
+	    {
+	      set_errno (EACCES);
+	      goto out;
+	    }
+	  fh_disk_file.set_io_handle (h);
+	  fh_disk_file.set_access (fh->get_access () | GENERIC_WRITE);
+	  path_conv pc;
+	  pc.set_name (fh->get_win32_name (), "");
+	  fh_disk_file.set_name (pc);
+	  fh = &fh_disk_file;
+	}
+
+      /* On NT you can't create mappings with PAGE_EXECUTE protection if
+         the file isn't explicitely opened with EXECUTE access. */
+      if (wincap.is_winnt ())
+        {
+	  HANDLE h = CreateFile (fh->get_win32_name (),
+				 fh->get_access () | GENERIC_EXECUTE,
+				 wincap.shared (), &sec_none_nih,
+				 OPEN_EXISTING, 0, NULL);
+	  if (h != INVALID_HANDLE_VALUE)
+	    {
+	      fh_disk_file.set_io_handle (h);
+	      fh_disk_file.set_access (fh->get_access () | GENERIC_EXECUTE);
+	      fh = &fh_disk_file;
+	    }
+	  else if (prot & PROT_EXEC)
+	    {
+	      /* TODO: To be or not to be... I'm opting for refusing this
+		 mmap request rather than faking it, but that might break
+		 some non-portable code. */
+	      set_errno (EACCES);
+	      goto out;
+	    }
+	}
+
       DWORD high;
       DWORD low = GetFileSize (fh->get_handle (), &high);
       _off64_t fsiz = ((_off64_t)high << 32) + low;
 
-      /* Don't allow mappings beginning beyond EOF since Windows can't
+      /* Don't allow file mappings beginning beyond EOF since Windows can't
 	 handle that POSIX like, unless MAP_AUTOGROW flag is set, which
-	 mimics Windows behaviour.  FIXME: Still looking for a good idea
-	 to allow that under POSIX rules. */
+	 mimics Windows behaviour. */
       if (off >= fsiz && !autogrow (flags))
 	{
-	  set_errno (ENXIO);
-	  goto out;
+	  /* Instead, it seems suitable to return an anonymous mapping of
+	     the given size instead.  Mapped addresses beyond EOF aren't
+	     written back to the file anyway, so the handling is identical
+	     to other pages beyond EOF. */
+	  fh = &fh_anonymous;
+	  len = roundup2 (len, pagesize);
+	  prot = PROT_READ | PROT_WRITE | __PROT_ATTACH;
+	  flags &= MAP_FIXED;
+	  flags |= MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE;
+	  fd = -1;
+	  off = 0;
+	  goto go_ahead;
 	}
-      /* Don't map beyond EOF.  Windows would change the file to the
-	 new length otherwise, in contrast to POSIX.  Allow mapping
-	 beyond EOF if MAP_AUTOGROW flag is set. */
       fsiz -= off;
+      /* On NT systems we're creating the pages beyond EOF as reserved,
+	 anonymous pages.  That's not possible on 9x for two reasons.
+	 It neither allows to create reserved pages in the shared memory
+	 area, nor does it allow to create page aligend mappings (in
+	 contrast to granularity aligned mappings). */
+      if (wincap.virtual_protect_works_on_shared_pages ()
+	  && ((len > fsiz && !autogrow (flags))
+	      || len < pagesize))
+	orig_len = len;
       if (len > fsiz)
 	{
 	  if (autogrow (flags))
 	    {
-	      /* Check if file has been opened for writing. */
+	      /* Allow mapping beyond EOF if MAP_AUTOGROW flag is set.
+	         Check if file has been opened for writing, otherwise
+		 MAP_AUTOGROW is invalid. */
 	      if (!(fh->get_access () & GENERIC_WRITE))
 		{
 		  set_errno (EINVAL);
@@ -925,6 +1126,8 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 		}
 	    }
 	  else
+	    /* Otherwise, don't map beyond EOF, since Windows would change
+	       the file to the new length, in contrast to POSIX. */
 	    len = fsiz;
 	}
 
@@ -934,7 +1137,9 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 	flags &= ~MAP_AUTOGROW;
     }
 
-  list *map_list = mmapped_areas.get_list_by_fd (fd);
+go_ahead:
+
+  map_list = mmapped_areas.get_list_by_fd (fd);
 
   /* Test if an existing anonymous mapping can be recycled. */
   if (map_list && anonymous (flags))
@@ -951,39 +1156,62 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 
   /* Deferred alignment test, see above. */
   if (wincap.has_mmap_alignment_bug ()
-      && fixed (flags) && ((DWORD) addr % pagesize))
+      && fixed (flags) && ((uintptr_t) addr % pagesize))
     {
       set_errno (EINVAL);
       goto out;
     }
 
-  caddr_t base = (caddr_t)addr;
-  HANDLE h = fh->mmap (&base, len, prot, flags, off);
-  if (h == INVALID_HANDLE_VALUE)
+  base = mmap_worker (fh, (caddr_t) addr, len, prot, flags, fd, off);
+  if (!base)
     goto out;
 
-  /* At this point we should have a successfully mmapped area.
-     Now it's time for bookkeeping stuff. */
-
-  /* Get list of mmapped areas for this fd, create a new one if
-     one does not exist yet.  */
-  if (!map_list && !(map_list = mmapped_areas.add_list (fd)))
+  if (orig_len)
     {
-      fh->munmap (h, base, len);
-      set_errno (ENOMEM);
-      goto out;
-    }
+      /* If the requested length is bigger than the file size, the
+	 remainder is created as anonymous mapping.  Actually two
+	 mappings are created, first the reminder from the file end to
+	 the next 64K boundary as accessible pages with the same
+	 protection as the file's pages, then as much pages as necessary
+	 to accomodate the requested length, but as reserved pages which
+	 raise a SIGBUS when trying to access them.  AT_ROUND_TO_PAGE
+	 and page protection on shared pages is only supported by NT, so
+	 don't even try on 9x.  This is accomplished by not setting
+	 orig_len on 9x above. */
+      orig_len = roundup2 (orig_len, pagesize);
+      len = roundup2 (len, getsystempagesize ());
+      if (orig_len - len)
+	{
+	  orig_len -= len;
+	  size_t valid_page_len = orig_len % pagesize;
+	  size_t sigbus_page_len = orig_len - valid_page_len;
 
-  /* Insert into the list */
-  {
-    mmap_record mmap_rec (fd, h, prot, flags, off, len, base);
-    rec = map_list->add_record (mmap_rec);
-  }
-  if (!rec)
-    {
-      fh->munmap (h, base, len);
-      set_errno (ENOMEM);
-      goto out;
+	  caddr_t at_base = base + len;
+	  if (valid_page_len)
+	    {
+	      prot |= __PROT_FILLER;
+	      flags &= MAP_SHARED | MAP_PRIVATE;
+	      flags |= MAP_ANONYMOUS | MAP_FIXED;
+	      at_base = mmap_worker (&fh_anonymous, at_base, valid_page_len,
+				     prot, flags, -1, 0);
+	      if (!at_base)
+		{
+		  fh->munmap (fh->get_handle (), base, len);
+		  set_errno (ENOMEM);
+		  goto out;
+		}
+	      at_base += valid_page_len;
+	    }
+	  if (sigbus_page_len)
+	    {
+	      prot = PROT_READ | PROT_WRITE | __PROT_ATTACH;
+	      flags = MAP_ANONYMOUS | MAP_NORESERVE | MAP_FIXED;
+	      at_base = mmap_worker (&fh_anonymous, at_base, sigbus_page_len,
+				     prot, flags, -1, 0);
+	      if (!at_base)
+		debug_printf ("Warning: Mapping beyond EOF failed, %E");
+	    }
+	}
     }
 
   ret = base;
@@ -991,6 +1219,10 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 out:
 
   ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
+
+  if (fh_disk_file.get_handle ())
+    CloseHandle (fh_disk_file.get_handle ());
+
   syscall_printf ("%p = mmap() ", ret);
   return ret;
 }
@@ -1015,13 +1247,14 @@ munmap (void *addr, size_t len)
       return -1;
     }
   /* See comment in mmap64 for a description. */
-  DWORD checkpagesize = wincap.has_mmap_alignment_bug () ?
-  			getsystempagesize () : getpagesize ();
-  if (((DWORD) addr % checkpagesize) || !len)
+  size_t pagesize = wincap.has_mmap_alignment_bug () ?
+		    getsystempagesize () : getpagesize ();
+  if (((uintptr_t) addr % pagesize) || !len)
     {
       set_errno (EINVAL);
       return -1;
     }
+  len = roundup2 (len, pagesize);
 
   SetResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "munmap");
 
@@ -1072,20 +1305,24 @@ munmap (void *addr, size_t len)
 extern "C" int
 msync (void *addr, size_t len, int flags)
 {
-  syscall_printf ("addr %x, len %u, flags %x", addr, len, flags);
-
   int ret = -1;
   list *map_list;
 
+  syscall_printf ("msync (addr: %p, len %u, flags %x)", addr, len, flags);
+
   SetResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "msync");
 
-  /* However, check flags for validity. */
-  if ((flags & ~(MS_ASYNC | MS_SYNC | MS_INVALIDATE))
-      || ((flags & MS_ASYNC) && (flags & MS_SYNC)))
+  /* See comment in mmap64 for a description. */
+  size_t pagesize = wincap.has_mmap_alignment_bug () ?
+		    getsystempagesize () : getpagesize ();
+  if (((uintptr_t) addr % pagesize)
+      || (flags & ~(MS_ASYNC | MS_SYNC | MS_INVALIDATE))
+      || (flags & (MS_ASYNC | MS_SYNC) == (MS_ASYNC | MS_SYNC)))
     {
       set_errno (EINVAL);
       goto out;
     }
+  len = roundup2 (len, pagesize);
 
   /* Iterate through the map, looking for the mmapped area.
      Error if not found. */
@@ -1129,13 +1366,22 @@ out:
 extern "C" int
 mprotect (void *addr, size_t len, int prot)
 {
+  bool in_mapped = false;
+  bool ret = false;
   DWORD old_prot;
   DWORD new_prot = 0;
 
-  syscall_printf ("mprotect (addr %x, len %u, prot %x)", addr, len, prot);
+  syscall_printf ("mprotect (addr: %p, len %u, prot %x)", addr, len, prot);
 
-  bool in_mapped = false;
-  bool ret = false;
+  /* See comment in mmap64 for a description. */
+  size_t pagesize = wincap.has_mmap_alignment_bug () ?
+		    getsystempagesize () : getpagesize ();
+  if ((uintptr_t) addr % pagesize)
+    {
+      set_errno (EINVAL);
+      goto out;
+    }
+  len = roundup2 (len, pagesize);
 
   SetResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "mprotect");
 
@@ -1156,6 +1402,8 @@ mprotect (void *addr, size_t len, int prot)
        {
 	 mmap_record *rec = map_list->get_record (record_idx);
 	 in_mapped = true;
+	 if (rec->attached ())
+	   continue;
 	 new_prot = gen_protect (prot, rec->get_flags ());
 	 if (rec->anonymous () && rec->priv () && rec->noreserve ())
 	   {
@@ -1168,11 +1416,8 @@ mprotect (void *addr, size_t len, int prot)
 	   ret = VirtualProtect (u_addr, u_len, new_prot, &old_prot);
 	 if (!ret)
 	   {
-	     ReleaseResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK,
-				  "mprotect");
 	     __seterrno ();
-	     syscall_printf ("-1 = mprotect (), %E");
-	     return -1;
+	     break;
 	   }
        }
    }
@@ -1184,38 +1429,33 @@ mprotect (void *addr, size_t len, int prot)
       int flags = 0;
       MEMORY_BASIC_INFORMATION mbi;
 
-      if (!VirtualQuery (addr, &mbi, sizeof mbi))
+      ret = VirtualQuery (addr, &mbi, sizeof mbi);
+      if (ret)
         {
-	  __seterrno ();
-	  syscall_printf ("-1 = mprotect (), %E");
-	  return -1;
+	  /* If write protection is requested, check if the page was
+	     originally protected writecopy.  In this case call VirtualProtect
+	     requesting PAGE_WRITECOPY, otherwise the VirtualProtect will fail
+	     on NT version >= 5.0 */
+	  if (prot & PROT_WRITE)
+	    {
+	      if (mbi.AllocationProtect == PAGE_WRITECOPY
+		  || mbi.AllocationProtect == PAGE_EXECUTE_WRITECOPY)
+		flags = MAP_PRIVATE;
+	    }
+	  new_prot = gen_protect (prot, flags);
+	  if (new_prot != PAGE_NOACCESS && mbi.State == MEM_RESERVE)
+	    ret = VirtualAlloc (addr, len, MEM_COMMIT, new_prot);
+	  else
+	    ret = VirtualProtect (addr, len, new_prot, &old_prot);
 	}
-
-      /* If write protection is requested, check if the page was
-	 originally protected writecopy.  In this case call VirtualProtect
-	 requesting PAGE_WRITECOPY, otherwise the VirtualProtect will fail
-	 on NT version >= 5.0 */
-      if (prot & PROT_WRITE)
-	{
-	  if (mbi.AllocationProtect == PAGE_WRITECOPY
-	      || mbi.AllocationProtect == PAGE_EXECUTE_WRITECOPY)
-	    flags = MAP_PRIVATE;
-	}
-      new_prot = gen_protect (prot, flags);
-      if (new_prot != PAGE_NOACCESS && mbi.State == MEM_RESERVE)
-	ret = VirtualAlloc (addr, len, MEM_COMMIT, new_prot);
-      else
-	ret = VirtualProtect (addr, len, new_prot, &old_prot);
       if (!ret)
-	{
-	  __seterrno ();
-	  syscall_printf ("-1 = mprotect (), %E");
-	  return -1;
-	}
+	__seterrno ();
     }
 
-  syscall_printf ("0 = mprotect ()");
-  return 0;
+out:
+
+  syscall_printf ("%d = mprotect ()", ret ? 0 : -1);
+  return ret ? 0 : -1;
 }
 
 extern "C" int
@@ -1226,10 +1466,6 @@ mlock (const void *addr, size_t len)
 
   int ret = -1;
 
-  /* Note that we're using getpagesize, not getsystempagesize.  This way, the
-     alignment matches the notion the application has of the page size. */
-  size_t pagesize = getpagesize ();
-
   /* Instead of using VirtualLock, which does not guarantee that the pages
      aren't swapped out when the process is inactive, we're using
      ZwLockVirtualMemory with the LOCK_VM_IN_RAM flag to do what mlock on
@@ -1239,9 +1475,9 @@ mlock (const void *addr, size_t len)
   push_thread_privilege (SE_LOCK_MEMORY_PRIV, true);
 
   /* Align address and length values to page size. */
-  PVOID base = (PVOID) ((uintptr_t) addr & ~(pagesize - 1));
-  ULONG size = ((uintptr_t) addr - (uintptr_t) base) + len;
-  size = (size + pagesize - 1) & ~(pagesize - 1);
+  size_t pagesize = getpagesize ();
+  PVOID base = (PVOID) rounddown((uintptr_t) addr, pagesize);
+  ULONG size = roundup2 (((uintptr_t) addr - (uintptr_t) base) + len, pagesize);
   NTSTATUS status = 0;
   do
     {
@@ -1252,7 +1488,7 @@ mlock (const void *addr, size_t len)
 	     requested locking region fits in.  Unfortunately I don't know
 	     any function which would return the currently locked pages of
 	     a process (no go with NtQueryVirtualMemory).
-
+ 
 	     So, except for the border cases, what we do here is something
 	     really embarrassing.  We raise the working set by 64K at a time
 	     and retry, until either we fail to raise the working set size
@@ -1300,8 +1536,10 @@ munlock (const void *addr, size_t len)
 
   push_thread_privilege (SE_LOCK_MEMORY_PRIV, true);
 
-  PVOID base = (PVOID) addr;
-  ULONG size = len;
+  /* Align address and length values to page size. */
+  size_t pagesize = getpagesize ();
+  PVOID base = (PVOID) rounddown((uintptr_t) addr, pagesize);
+  ULONG size = roundup2 (((uintptr_t) addr - (uintptr_t) base) + len, pagesize);
   NTSTATUS status = NtUnlockVirtualMemory (hMainProc, &base, &size,
 					   LOCK_VM_IN_RAM);
   if (!NT_SUCCESS (status))
@@ -1366,7 +1604,7 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
   HANDLE h;
   void *base;
 
-  if (priv (flags))
+  if (priv (flags) && !filler (prot))
     {
       /* Private anonymous maps are now implemented using VirtualAlloc.
          This has two advantages:
@@ -1399,8 +1637,8 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
     }
   else
     {
-      h = mmap_func->CreateMapping (get_handle (), len, off, prot, flags,
-				    get_name ());
+      h = mmap_func->CreateMapping (get_handle (), len, off, get_access (),
+				    prot, flags, get_win32_name ());
       if (!h)
 	{
 	  __seterrno ();
@@ -1408,7 +1646,7 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
 	  return INVALID_HANDLE_VALUE;
 	}
 
-      base = mmap_func->MapView (h, *addr, len, prot, flags, off);
+      base = mmap_func->MapView (h, *addr, len, get_access(), prot, flags, off);
       if (!base || (fixed (flags) && base != *addr))
 	{
 	  if (!base)
@@ -1430,7 +1668,13 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
 int
 fhandler_dev_zero::munmap (HANDLE h, caddr_t addr, size_t len)
 {
-  VirtualFree (addr, len, MEM_RELEASE);
+  if (h == (HANDLE) 1)	/* See fhandler_dev_zero::mmap. */
+    VirtualFree (addr, len, MEM_RELEASE);
+  else
+    {
+      UnmapViewOfFile (addr);
+      CloseHandle (h);
+    }
   return 0;
 }
 
@@ -1447,7 +1691,7 @@ fhandler_dev_zero::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
 {
   /* Re-create the map */
   void *base;
-  if (priv (flags))
+  if (priv (flags) && !filler (prot))
     {
       DWORD alloc_type = MEM_RESERVE | (noreserve (flags) ? 0 : MEM_COMMIT);
       /* Always allocate R/W so that ReadProcessMemory doesn't fail
@@ -1456,7 +1700,8 @@ fhandler_dev_zero::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
       base = VirtualAlloc (address, size, alloc_type, PAGE_READWRITE);
     }
   else
-    base = mmap_func->MapView (h, address, size, prot, flags, offset);
+    base = mmap_func->MapView (h, address, size, get_access (),
+			       prot, flags, offset);
   if (base != address)
     {
       MEMORY_BASIC_INFORMATION m;
@@ -1473,8 +1718,8 @@ HANDLE
 fhandler_disk_file::mmap (caddr_t *addr, size_t len, int prot,
 			  int flags, _off64_t off)
 {
-  HANDLE h = mmap_func->CreateMapping (get_handle (), len, off, prot, flags,
-				       get_name ());
+  HANDLE h = mmap_func->CreateMapping (get_handle (), len, off, get_access (),
+				       prot, flags, get_win32_name ());
   if (!h)
     {
       __seterrno ();
@@ -1482,7 +1727,8 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, int prot,
       return INVALID_HANDLE_VALUE;
     }
 
-  void *base = mmap_func->MapView (h, *addr, len, prot, flags, off);
+  void *base = mmap_func->MapView (h, *addr, len, get_access (),
+  				   prot, flags, off);
   if (!base || (fixed (flags) && base != *addr))
     {
       if (!base)
@@ -1526,7 +1772,8 @@ fhandler_disk_file::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
 					   void *address)
 {
   /* Re-create the map */
-  void *base = mmap_func->MapView (h, address, size, prot, flags, offset);
+  void *base = mmap_func->MapView (h, address, size, get_access (),
+				   prot, flags, offset);
   if (base != address)
     {
       MEMORY_BASIC_INFORMATION m;
@@ -1578,7 +1825,8 @@ fhandler_dev_mem::mmap (caddr_t *addr, size_t len, int prot,
       return INVALID_HANDLE_VALUE;
     }
 
-  void *base = MapViewNT (h, *addr, len, prot, flags | MAP_ANONYMOUS, off);
+  void *base = MapViewNT (h, *addr, len, get_access (),
+  			  prot, flags | MAP_ANONYMOUS, off);
   if (!base || (fixed (flags) && base != *addr))
     {
       if (!base)
@@ -1621,7 +1869,7 @@ fhandler_dev_mem::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
 					 _off64_t offset, DWORD size,
 					 void *address)
 {
-  void *base = MapViewNT (h, address, size, prot,
+  void *base = MapViewNT (h, address, size, get_access (), prot,
 			  flags | MAP_ANONYMOUS, offset);
   if (base != address)
     {
@@ -1670,7 +1918,14 @@ fixup_mmaps_after_fork (HANDLE parent)
 	  rec->free_fh (fh);
 
 	  if (!ret)
-	    return -1;
+	    {
+	      if (rec->attached ())
+	        {
+		  system_printf ("Warning: Fixup mapping beyond EOF failed");
+		  continue;
+		}
+	      return -1;
+	    }
 
 	  MEMORY_BASIC_INFORMATION mbi;
 	  DWORD old_prot;
@@ -1685,12 +1940,9 @@ fixup_mmaps_after_fork (HANDLE parent)
 		  		 "address %p, %E", address);
 		  return -1;
 		}
-	      /* Set reserved pages to reserved in child. */
+	      /* Just skip reserved pages. */
 	      if (mbi.State == MEM_RESERVE)
-	        {
-		  VirtualFree (address, mbi.RegionSize, MEM_DECOMMIT);
-		  continue;
-		}
+		continue;
 	      /* Copy-on-write pages must be copied to the child to circumvent
 	         a strange notion how copy-on-write is supposed to work. */
 	      if (rec->priv ())
@@ -1711,7 +1963,7 @@ fixup_mmaps_after_fork (HANDLE parent)
 				     "address %p, %E", address);
 		      return -1;
 		    }
-		  else if (!rec->anonymous ()
+		  else if ((mbi.AllocationProtect & PAGE_WRITECOPY)
 			   && (mbi.Protect == PAGE_READWRITE
 			       || mbi.Protect == PAGE_EXECUTE_READWRITE))
 		    {

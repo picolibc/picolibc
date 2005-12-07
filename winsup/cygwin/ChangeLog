@@ -1,3 +1,61 @@
+2005-12-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (_cygtls::handle_exceptions): In case of a
+	STATUS_ACCESS_VIOLATION, check if the page is a mmaped page beyond
+	a file's EOF.  Generate SIGBUS instead of SIGSEGV then.
+	* mmap.cc (__PROT_ATTACH): New define.
+	(__PROT_FILLER): Ditto.
+	(fh_anonymous): Rename from fh_paging_file;
+	(fh_disk_file): New global static variable.
+	(attached): New inline function.
+	(filler): Ditto.
+	(gen_create_protect): Split off from gen_protect to use the file's
+	access mode to create mapping always with maximum allowed protections.
+	(gen_protect): Accomodate pages attached beyond EOF.  Use symbolic
+	values instead of numerics when possible.  Drop create parameter.
+	(gen_access): Use file's access mode instead of protection.
+	(CreateMapping9x): Create named mapping names so that different
+	creation access modes result in different mappings.
+	(CreateMappingNT): Only reserve attached pages, don't commit them.
+	(MapViewNT): Ditto.  Set AT_ROUND_TO_PAGE for all non-NULL base
+	addresses.
+	(mmap_func_t): Define CreateMapping and MapView function pointers
+	with additional openflags parameter.
+	(class mmap_record): Add openflags member.
+	(mmap_record::mmap_record): Add openflags parameter.
+	(mmap_record::get_openflags): New accessor.
+	(mmap_record::attached): Call global attached function.
+	(mmap_record::filler): Call global filler function.
+	(mmap_record::gen_create_protect): Call global gen_create_protect
+	function.
+	(mmap_record::gen_protect): Drop create parameter.
+	(mmap_record::alloc_fh): Set fhandler's access flags.
+	(list::search_record): Accomodate filler pages.
+	(list::set): Use inode number as hash value.
+	(map::get_list_by_fd): Check hash value against file's inode number.
+	(mmap_is_attached_page): New function to evaluate if a given address
+	is on a attached page.  Called from _cygtls::handle_exceptions.
+	(mmap_worker): New function to do mapping and bookkeeping in a
+	single call.
+	(mmap64): Use roundup2 to round length to pagesize alignment.
+	Initialize global fhandlers.  Simplify anonymous initialization.
+	Add SUSv3 compatible check of file open mode vs. requested protection.
+	Try creating new file handles to allow maximum page protection.
+	Allow creating attached pages in case of mapping beyond EOF.
+	Close new file handle if one has been created.
+	(munmap): Align len to pagesize.
+	(msync): Rework argument checks. Align len to pagesize.
+	(mprotect): Ditto.  Accomodate attached pages.
+	(mlock): Use roundup/rounddown macros instead of homemade expressions.
+	(munlock): Add page alignment as in mlock.
+	(fhandler_dev_zero::munmap): Fix unmapping of non-private mappings.
+	(fhandler_dev_zero::fixup_mmap_after_fork): Accomodate filler pages.
+	(fixup_mmaps_after_fork): Don't fail if attached pages couldn't be
+	created in child.  Avoid superfluous call to VirtualFree.  Check for
+	original allocation protection to fix PAGE_WRITECOPY protection.
+	* ntdll.h: Revert deletion of AT_ROUND_TO_PAGE define.
+	* winsup.h (mmap_is_attached_page): Declare.
+
 2005-12-05  Christopher Faylor  <cgf@timesys.com>
 
 	* include/cygwin/stdlib.h: New file.
