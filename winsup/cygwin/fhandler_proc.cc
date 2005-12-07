@@ -951,13 +951,9 @@ format_proc_partitions (char *destbuf, size_t maxsize)
 	  CHAR szDriveName[CYG_MAX_PATH];
 	  __small_sprintf (szDriveName, "\\\\.\\PHYSICALDRIVE%d", drive_number);
 	  HANDLE hDevice;
-	  hDevice = CreateFile (szDriveName,
-				GENERIC_READ,
+	  hDevice = CreateFile (szDriveName, GENERIC_READ,
 				FILE_SHARE_READ | FILE_SHARE_WRITE,
-				NULL,
-				OPEN_EXISTING,
-				0,
-				NULL);
+				NULL, OPEN_EXISTING, 0, NULL);
 	  if (hDevice == INVALID_HANDLE_VALUE)
 	    {
 	      if (GetLastError () == ERROR_PATH_NOT_FOUND)
@@ -968,27 +964,48 @@ format_proc_partitions (char *destbuf, size_t maxsize)
 	    }
 	  else
 	    {
-	      DWORD dwBytesReturned, dwRetCode;
-	      DISK_GEOMETRY dg;
-	      dwRetCode = DeviceIoControl (hDevice,
-					   IOCTL_DISK_GET_DRIVE_GEOMETRY,
-					   NULL,
-					   0,
-					   &dg,
-					   sizeof (dg),
-					   &dwBytesReturned,
-					   NULL);
-	      if (!dwRetCode)
+	      DWORD dwBytesReturned;
+	      /* Use a buffer since some ioctl buffers aren't fixed size. */
+	      char buf[256];
+	      PARTITION_INFORMATION *pi = NULL;
+	      PARTITION_INFORMATION_EX *pix = NULL;
+	      DISK_GEOMETRY *dg = NULL;
+	      unsigned long long drive_size;
+
+	      if (wincap.has_disk_ex_ioctls ()
+		  && DeviceIoControl (hDevice, IOCTL_DISK_GET_PARTITION_INFO_EX,
+				      NULL, 0, buf, 256, &dwBytesReturned,
+				      NULL))
+		{
+		  pix = (PARTITION_INFORMATION_EX *) buf;
+		  drive_size = pix->PartitionLength.QuadPart;
+		}
+	      else if (DeviceIoControl (hDevice, IOCTL_DISK_GET_PARTITION_INFO,
+	      				NULL, 0, buf, 256, &dwBytesReturned,
+					NULL))
+		{
+		  pi = (PARTITION_INFORMATION *) buf;
+		  drive_size = pi->PartitionLength.QuadPart;
+	        }
+	      else if (DeviceIoControl (hDevice, IOCTL_DISK_GET_DRIVE_GEOMETRY,
+	      				NULL, 0, buf, 256, &dwBytesReturned,
+					NULL))
+		{
+		  dg = (DISK_GEOMETRY *) buf;
+		  drive_size = (unsigned long long) dg->Cylinders.QuadPart
+			       * dg->TracksPerCylinder
+			       * dg->SectorsPerTrack
+			       * dg->BytesPerSector;
+		}
+	      if (!pi && !pix && !dg)
 		debug_printf ("DeviceIoControl %E");
 	      else
 		{
 		  device dev;
 		  dev.parsedisk (drive_number, 0);
 		  bufptr += __small_sprintf (bufptr, "%5d %5d %9U %s\n",
-					     dev.major,
-					     dev.minor,
-					     (long long)((dg.Cylinders.QuadPart * dg.TracksPerCylinder *
-					      dg.SectorsPerTrack * dg.BytesPerSector) >> 10),
+					     dev.major, dev.minor,
+					     drive_size >> 10,
 					     dev.name + 5);
 		}
 	      size_t buf_size = 8192;
