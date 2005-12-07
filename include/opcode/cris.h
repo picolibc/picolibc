@@ -194,8 +194,15 @@ extern const char *const cris_cc_strings[];
 #define JUMP_INDIR_Z_BITS (0xf2c0)
 #define JUMP_PC_INCR_OPCODE \
  (JUMP_INDIR_OPCODE + AUTOINCR_BIT * 0x0100 + REG_PC)
-#define ADD_PC_INCR_OPCODE \
- (0xfa00 + (2 << 4) + AUTOINCR_BIT * 0x0100 + REG_PC)
+
+#define MOVE_M_TO_PREG_OPCODE 0x0a30
+#define MOVE_M_TO_PREG_ZBITS 0x01c0
+
+/* BDAP.D N,PC.  */
+#define MOVE_PC_INCR_OPCODE_PREFIX \
+ (((BDAP_INCR_HIGH | (REG_PC << 4)) << 8) | BDAP_PC_LOW | (2 << 4))
+#define MOVE_PC_INCR_OPCODE_SUFFIX \
+ (MOVE_M_TO_PREG_OPCODE | REG_PC | (AUTOINCR_BIT << 8))
 
 #define JUMP_PC_INCR_OPCODE_V32 (0x0DBF)
 

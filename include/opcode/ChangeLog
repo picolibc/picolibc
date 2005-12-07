@@ -1,3 +1,9 @@
+2005-12-07  Hans-Peter Nilsson  <hp@axis.com>
+
+	* cris.h (MOVE_M_TO_PREG_OPCODE, MOVE_M_TO_PREG_ZBITS)
+	(MOVE_PC_INCR_OPCODE_PREFIX, MOVE_PC_INCR_OPCODE_SUFFIX): New macros.
+	(ADD_PC_INCR_OPCODE): Don't define.
+
 2005-12-06  H.J. Lu  <hongjiu.lu@intel.com>
 
 	PR gas/1874
