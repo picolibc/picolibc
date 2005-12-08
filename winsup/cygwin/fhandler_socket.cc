@@ -1028,12 +1028,14 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
   int res = SOCKET_ERROR;
   DWORD ret = 0;
 
-  flags &= MSG_WINMASK;
   WSABUF wsabuf = { len, (char *) ptr };
 
   if (is_nonblocking () || closed () || async_io ())
-    res = WSARecvFrom (get_socket (), &wsabuf, 1, &ret,
-		       (DWORD *) &flags, from, fromlen, NULL, NULL);
+    {
+      DWORD lflags = (DWORD) (flags & MSG_WINMASK);
+      res = WSARecvFrom (get_socket (), &wsabuf, 1, &ret,
+			 &lflags, from, fromlen, NULL, NULL);
+    }
   else
     {
       HANDLE evt;
@@ -1041,7 +1043,7 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
 	{
 	  do
 	    {
-	      DWORD lflags = (DWORD) flags;
+	      DWORD lflags = (DWORD) (flags & MSG_WINMASK);
 	      res = WSARecvFrom (get_socket (), &wsabuf, 1, &ret, &lflags,
 				 from, fromlen, NULL, NULL);
 	    }
@@ -1118,8 +1120,11 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
   DWORD ret = 0;
 
   if (is_nonblocking () || closed () || async_io ())
-    res = WSARecvFrom (get_socket (), wsabuf, iovcnt, &ret,
-		       (DWORD *) &flags, from, fromlen, NULL, NULL);
+    {
+      DWORD lflags = (DWORD) (flags & MSG_WINMASK);
+      res = WSARecvFrom (get_socket (), wsabuf, iovcnt, &ret,
+			 &lflags, from, fromlen, NULL, NULL);
+    }
   else
     {
       HANDLE evt;
@@ -1127,7 +1132,7 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
 	{
 	  do
 	    {
-	      DWORD lflags = (DWORD) flags;
+	      DWORD lflags = (DWORD) (flags & MSG_WINMASK);
 	      res = WSARecvFrom (get_socket (), wsabuf, iovcnt, &ret,
 				 &lflags, from, fromlen, NULL, NULL);
 	    }
@@ -1271,7 +1276,7 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags, ssize_t tot)
 
   if (is_nonblocking () || closed () || async_io ())
     res = WSASendTo (get_socket (), wsabuf, iovcnt, &ret,
-		     flags, (struct sockaddr *) msg->msg_name,
+		     flags & MSG_WINMASK, (struct sockaddr *) msg->msg_name,
 		     msg->msg_namelen, NULL, NULL);
   else
     {
@@ -1281,7 +1286,7 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags, ssize_t tot)
 	  do
 	    {
 	      res = WSASendTo (get_socket (), wsabuf, iovcnt,
-			       &ret, flags,
+			       &ret, flags & MSG_WINMASK,
 			       (struct sockaddr *) msg->msg_name,
 			       msg->msg_namelen, NULL, NULL);
 	    }
