@@ -251,11 +251,6 @@ typedef	struct _types_fd_set {
 #undef __MS_types__
 #undef _ST_INT32
 
-/* The following are actually standard POSIX 1003.1b-1993 threads, mutexes,
-   condition variables, and keys.  But since RTEMS is currently the only
-   newlib user of these, the ifdef is just on RTEMS. */
-
-#if defined(__rtems__) || defined(__CYGWIN__)
 
 #ifndef __clockid_t_defined
 typedef _CLOCKID_T_ clockid_t;
@@ -267,9 +262,7 @@ typedef _TIMER_T_ timer_t;
 #define __timer_t_defined
 #endif
 
-#if defined(__CYGWIN__) || defined(__rtems__)
 typedef long useconds_t;
-#endif
 
 #include <sys/features.h>
 
@@ -379,8 +372,6 @@ typedef struct {
 #include <cygwin/types.h>
 #endif
 #endif /* defined(_POSIX_THREADS) */
-
-#endif  /* defined(__rtems__) */
 
 #endif  /* !__need_inttypes */
 
