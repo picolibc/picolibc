@@ -1,3 +1,8 @@
+2005-12-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_raw.cc (fhandler_dev_raw::ioctl): Only allow 0, 1 or a
+	multiple of 512 as new buffersize.
+
 2005-12-08  Pekka Pessi <ppessi@gmail.com>
 	    Corinna Vinschen  <corinna@vinschen.de>
 

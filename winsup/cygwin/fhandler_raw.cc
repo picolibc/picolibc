@@ -157,8 +157,14 @@ fhandler_dev_raw::ioctl (unsigned int cmd, void *buf)
 		mop.mt_count = op->rd_parm;
 		ret = ioctl (MTIOCTOP, &mop);
 	      }
-	    else if (devbuf && ((op->rd_parm <= 1 && (devbufend - devbufstart))
-				|| op->rd_parm < devbufend - devbufstart))
+	    else if ((devbuf && ((op->rd_parm <= 1 && (devbufend - devbufstart))
+				 || op->rd_parm < devbufend - devbufstart))
+		     || (op->rd_parm > 1 && (op->rd_parm % 512)))
+	      /* The conditions for a *valid* parameter are these:
+	         - If there's still data in the current buffer, it must
+		   fit in the new buffer.
+		 - The new size is either 0 or 1, both indicating unbufferd
+		   I/O, or the new buffersize must be a multiple of 512. */
 	      ret = ERROR_INVALID_PARAMETER;
 	    else if (!devbuf || op->rd_parm != devbufsiz)
 	      {
