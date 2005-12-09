@@ -1,4 +1,25 @@
-2005=11-18  Brian Gunlogson  <gmb300@users.sourceforge.net>
+2005-12-09  Huw Davies <hdavies@users.sourceforge.net>
+	    Danny Smith <dannysmith@users.sourceforge.net>
+
+	* lib/msxml-uuid.c: New file to generate UUIDs for 
+	MSXML interfaces.
+	* lib/Makefile.in (UUID_OBJS): Add msxml-uuid.o.
+
+2005-12-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winbase.h (GetDevicePowerState): Add prototype.
+	* lib/kernel32.def (GetDevicePowerState): Correct suffix.
+
+2005-12-07  Brian Gunlogson  <gmb300@users.sourceforge.net>
+
+	* include/winuser.h (GetClassLongPtr{AW}): Guard prototypes with _WIN64.
+	Define as macro if !_WIN64.
+	(SetClassLongPtr{AW}): Likewise.
+	(GCLP_*): Add GetClassLongPtr defines.
+	* lib/user32.def (GetClassLongPtr{AW}): Remove stubs.
+	(SetClassLongPtr{AW}): Likewise.
+
+2005-11-18  Brian Gunlogson  <gmb300@users.sourceforge.net>
 
 	* include/winuser.h (GetClassLongPtr{AW}): Add prototypes.
 	(SetClassLongPtr{AW}): Likewise.
