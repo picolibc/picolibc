@@ -67,7 +67,7 @@ CreateDirectoryW@8
 CreateEventA@16
 CreateEventW@16
 CreateFiber@12
-CreateFiberEx@12
+CreateFiberEx@20
 CreateFileA@28
 CreateFileMappingA@24
 CreateFileMappingW@24
