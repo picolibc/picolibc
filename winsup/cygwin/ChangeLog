@@ -1,3 +1,8 @@
+2005-12-10  Christopher Faylor  <cgf@timesys.com>
+
+	* malloc.cc: Update to version 2.8.3.
+	* cygmalloc.h (MSPACE): Remove unneeded definition.
+
 2005-12-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_raw.cc (fhandler_dev_raw::ioctl): Only allow 0, 1 or a

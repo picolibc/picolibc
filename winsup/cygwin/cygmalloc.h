@@ -29,7 +29,6 @@ void dlmalloc_stats ();
 # define __malloc_unlock() mallock.release ()
 extern muto mallock;
 #endif
-#define MSPACES 1
 #ifdef __cplusplus
 }
 #endif
