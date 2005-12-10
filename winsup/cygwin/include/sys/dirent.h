@@ -1,6 +1,6 @@
 /* Posix dirent.h for WIN32.
 
-   Copyright 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2005 Red Hat, Inc.
 
    This software is a copyrighted work licensed under the terms of the
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -20,7 +20,7 @@
 struct dirent
 {
   long d_version;	/* Used since Cygwin 1.3.3. */
-  __ino64_t __deprecated_d_ino;	/* still junk but with more bits */
+  __ino64_t __deprecated_d_ino;
   long d_fd;		/* File descriptor of open directory.
 			   Used since Cygwin 1.3.3. */
   unsigned __ino32;
@@ -31,7 +31,7 @@ struct dirent
 struct dirent
 {
   long d_version;
-  ino_t d_ino;
+  ino_t __deprecated_d_ino;
   long d_fd;
   unsigned long __ino32;
   char d_name[256];
@@ -42,7 +42,7 @@ struct dirent
   long d_version;
   long d_reserved[2];
   long d_fd;
-  ino_t d_ino;
+  ino_t __deprecated_d_ino;
   char d_name[256];
 };
 #endif
