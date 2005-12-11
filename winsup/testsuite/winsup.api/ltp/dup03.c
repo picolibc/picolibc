@@ -271,8 +271,8 @@ cleanup()
 
     /* close the open file we've been dup'ing */
     if (Fd) {
-    	for (; Nfds >0 ; Nfds--) {
-    	    if (close(Fd[Nfds-1]) == -1) {
+    	while (Nfds-- >0) {
+    	    if (close(Fd[Nfds]) == -1) {
 		tst_resm(TWARN, "close(%s) Failed, errno=%d : %s",
 				Fname, errno, strerror(errno));
 	    }

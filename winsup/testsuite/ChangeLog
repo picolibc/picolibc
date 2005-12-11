@@ -1,3 +1,8 @@
+2005-12-11  Christopher Faylor  <cgf@timesys.com>
+
+	* winsup.api/ltp/dup03.c (cleanup): Fix longstanding off-by-one error
+	when setting array element to -1.
+
 2005-06-11  Christopher Faylor  <cgf@timesys.com>
 
 	* winsup.api/pthread/cancel2.c: Use explicit initializer for mutex.
