@@ -432,7 +432,7 @@
 2005-11-23  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_tty.cc (fhandler_tty_slave::open): Reset the current windows
-	station whenever ctty == -1 regardles of whetehr there's a windows
+	station whenever ctty == -1 regardles of whether there's a windows
 	station already assigned.  Close the old windows station in this
 	situation.
 	* pinfo.cc (_pinfo::set_ctty): Reinstate incrementing of console count
