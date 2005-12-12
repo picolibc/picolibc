@@ -11,7 +11,7 @@
 	(winpids::copied): New array.
 	(winpids::reset): Reset npids after releasing pinfos or suffer a memory
 	leak.
-	(winpids::winpids): Try harder to allocate all fields in the class.
+	(winpids::winpids): Try harder to zero all fields in the class.
 
 2005-12-12  Corinna Vinschen  <corinna@vinschen.de>
 
