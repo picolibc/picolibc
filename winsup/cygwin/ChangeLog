@@ -1,5 +1,9 @@
 2005-12-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (GetSystemTimes): Remove.
+
+2005-12-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_proc.cc (format_proc_uptime): Drop usage of GetSystemTimes.
 	Use NtQuerySystemInformation to evaluate uptime and idle_time from
 	all CPU's processor times.  Fallback to GetTickCount.
