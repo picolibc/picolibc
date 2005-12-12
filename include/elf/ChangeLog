@@ -1,3 +1,7 @@
+2005-12-12  Paul Brook  <paul@codesourcery.com>
+
+	* arm.h (elf32_arm_get_eabi_attr_int): Add prototype.
+
 2005-11-11  Nick Clifton  <nickc@redhat.com>
 
 	PR 1150
