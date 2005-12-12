@@ -98,8 +98,10 @@ gen_create_protect (DWORD openflags, int flags)
 {
   DWORD ret = PAGE_READONLY;
 
-  if (openflags & GENERIC_WRITE)
-    ret = priv (flags) ? PAGE_WRITECOPY : PAGE_READWRITE;
+  if (priv (flags))
+    ret = PAGE_WRITECOPY;
+  else if (openflags & GENERIC_WRITE)
+    ret = PAGE_READWRITE;
 
   /* Ignore EXECUTE permission on 9x. */
   if ((openflags & GENERIC_EXECUTE)
@@ -1963,16 +1965,16 @@ fixup_mmaps_after_fork (HANDLE parent)
 				     "address %p, %E", address);
 		      return -1;
 		    }
-		  else if ((mbi.AllocationProtect & PAGE_WRITECOPY)
+		  else if ((mbi.AllocationProtect == PAGE_WRITECOPY
+			    || mbi.AllocationProtect == PAGE_EXECUTE_WRITECOPY)
 			   && (mbi.Protect == PAGE_READWRITE
 			       || mbi.Protect == PAGE_EXECUTE_READWRITE))
-		    {
-		      /* A PAGE_WRITECOPY page which has been written to is
-			 set to PAGE_READWRITE, but that's an incompatible
-			 protection to set the page to. */
-		      mbi.Protect &= ~PAGE_READWRITE;
-		      mbi.Protect |= PAGE_WRITECOPY;
-		    }
+		    /* A WRITECOPY page which has been written to is set to
+		       READWRITE, but that's an incompatible protection to
+		       set the page to.  Convert the protection to WRITECOPY
+		       so that the below VirtualProtect doesn't fail. */
+		    mbi.Protect <<= 1;
+
 		  if (!ReadProcessMemory (parent, address, address,
 					  mbi.RegionSize, NULL))
 		    {

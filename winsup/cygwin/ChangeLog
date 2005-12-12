@@ -1,3 +1,10 @@
+2005-12-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (gen_create_protect): Always generate WRITECOPY protection
+	for private maps.
+	(fixup_mmaps_after_fork): Fix calculation of WRITECOPY protection for
+	VirtualProtect.  Add some words to the comment.
+
 2005-12-10  Christopher Faylor  <cgf@timesys.com>
 
 	* dirent.h: Change the rest of the d_ino's to __deprecated_d_ino.
