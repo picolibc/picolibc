@@ -1,3 +1,9 @@
+2005-12-12  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* configure.in: Replace ms1 arch with mt arch.
+	* configure: Rebuilt.
+	* mt: Renamed from ms1 dir.
+
 2005-12-06  Paul Brook  <paul@codesourcery.com>
 
 	* m68k/bcc.ld: Add .text.*, .rodata.*, .data.* and .bss.*.

@@ -1,3 +1,8 @@
+2005-12-12  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* configure.host: Replace ms1 arch with mt arch.
+	* libc/machine/mt: Renamed from ms1 dir.
+
 2005-12-08  Shaun Jackman  <sjackman@gmail.com>
 
 	* libc/include/sys/types.h: Remove the ifdef armour around

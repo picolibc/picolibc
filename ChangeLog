@@ -1,3 +1,9 @@
+2005-12-12  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* config.sub: Replace ms1 arch with mt.  Allow ms1 as alias.
+	* configure.in: Replace ms1 arch with mt.
+	* configure: Rebuilt.
+
 2005-12-05  Paolo Bonzini  <bonzini@gnu.org>
 
 	Sync with gcc:

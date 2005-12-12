@@ -792,8 +792,8 @@ case "${target}" in
   mcore-*-*)
 	configdirs="${configdirs} mcore testsuite"
 	;;
-  ms1-*-*)
-        configdirs="${configdirs} ms1 testsuite";;
+  mt-*-*)
+        configdirs="${configdirs} mt testsuite";;
   xstormy16-*-*)
 	configdirs="${configdirs} xstormy16 testsuite"
 	;;
