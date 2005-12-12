@@ -468,30 +468,37 @@ static _off64_t
 format_proc_uptime (char *destbuf, size_t maxsize)
 {
   unsigned long long uptime = 0ULL, idle_time = 0ULL;
-  SYSTEM_PROCESSOR_TIMES spt;
 
-  if (!GetSystemTimes ((FILETIME *) &spt.IdleTime, (FILETIME *) &spt.KernelTime,
-		       (FILETIME *) &spt.UserTime)
-      && GetLastError () == ERROR_PROC_NOT_FOUND)
+  if (wincap.is_winnt ())
     {
-      NTSTATUS ret = NtQuerySystemInformation (SystemProcessorTimes, (PVOID) &spt,
-					       sizeof spt, NULL);
-      if (!ret && GetLastError () == ERROR_PROC_NOT_FOUND)
-	{
-	  uptime = GetTickCount () / 10;
-	  goto out;
-	}
-      else if (ret != STATUS_SUCCESS)
+      NTSTATUS ret;
+      SYSTEM_BASIC_INFORMATION sbi;
+
+      ret = NtQuerySystemInformation (SystemBasicInformation, (PVOID) &sbi,
+				      sizeof sbi, NULL);
+      if (!NT_SUCCESS (ret))
 	{
 	  __seterrno_from_nt_status (ret);
-	  debug_printf("NtQuerySystemInformation: ret %d, Dos(ret) %E", ret);
-	  return 0;
+	  debug_printf ("NtQuerySystemInformation: ret %d, Dos(ret) %E", ret);
+	  sbi.NumberProcessors = 1;
 	}
+
+      SYSTEM_PROCESSOR_TIMES spt[sbi.NumberProcessors];
+      ret = NtQuerySystemInformation (SystemProcessorTimes, (PVOID) spt,
+				      sizeof spt[0] * sbi.NumberProcessors,
+				      NULL);
+      if (NT_SUCCESS (ret))
+	for (int i = 0; i < sbi.NumberProcessors; i++)
+	  {
+	    uptime += (spt[i].KernelTime.QuadPart + spt[i].UserTime.QuadPart)
+		      / 100000ULL;
+	    idle_time += spt[i].IdleTime.QuadPart / 100000ULL;
+	  }
+      uptime /= sbi.NumberProcessors;
+      idle_time /= sbi.NumberProcessors;
     }
-  idle_time = spt.IdleTime.QuadPart / 100000ULL;
-  uptime = (spt.KernelTime.QuadPart +
-	    spt.UserTime.QuadPart) / 100000ULL;
-out:
+  if (!uptime)
+    uptime = GetTickCount () / 10;
 
   return __small_sprintf (destbuf, "%U.%02u %U.%02u\n",
 			  uptime / 100, long (uptime % 100),

@@ -1,5 +1,11 @@
 2005-12-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_proc.cc (format_proc_uptime): Drop usage of GetSystemTimes.
+	Use NtQuerySystemInformation to evaluate uptime and idle_time from
+	all CPU's processor times.  Fallback to GetTickCount.
+
+2005-12-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mmap.cc (gen_create_protect): Always generate WRITECOPY protection
 	for private maps.
 	(fixup_mmaps_after_fork): Fix calculation of WRITECOPY protection for
