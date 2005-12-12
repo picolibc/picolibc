@@ -1,3 +1,18 @@
+2005-12-12  Christopher Faylor  <cgf@timesys.com>
+
+	* pinfo.cc (size_copied): New convenience macro.
+	(winpids::add): Alias the element that we are working on for slightly
+	better clarity.  Honor the "make_copy" flag.
+	(winpids::release): Free and zero procinfo field if it was allocated
+	via malloc.
+	(winpids::~winpids): Free copied array.
+	* pinfo.h (class pinfo): Make winpids class a friend.
+	(winpids::make_copy): New field.
+	(winpids::copied): New array.
+	(winpids::reset): Reset npids after releasing pinfos or suffer a memory
+	leak.
+	(winpids::winpids): Try harder to allocate all fields in the class.
+
 2005-12-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (GetSystemTimes): Remove.

@@ -1089,6 +1089,7 @@ cygwin_winpid_to_pid (int winpid)
 #define slop_pidlist 200
 #define size_pidlist(i) (sizeof (pidlist[0]) * ((i) + 1))
 #define size_pinfolist(i) (sizeof (pinfolist[0]) * ((i) + 1))
+#define size_copied(i) (sizeof (copied[0]) * ((i) + 1))
 
 inline void
 winpids::add (DWORD& nelem, bool winpid, DWORD pid)
@@ -1097,34 +1098,51 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
   if (nelem >= npidlist)
     {
       npidlist += slop_pidlist;
+      copied = (bool *) realloc (copied, size_copied (npidlist + 1));
       pidlist = (DWORD *) realloc (pidlist, size_pidlist (npidlist + 1));
       pinfolist = (pinfo *) realloc (pinfolist, size_pinfolist (npidlist + 1));
     }
 
-  pinfolist[nelem].init (cygpid, PID_NOREDIR | pinfo_access, NULL);
+  pinfo& p = pinfolist[nelem];
+
+  p.init (cygpid, PID_NOREDIR | pinfo_access, NULL);
   if (winpid)
     goto out;
 
-  if (!pinfolist[nelem])
+  if (!p)
     {
       if (!pinfo_access)
 	return;
-      pinfolist[nelem].init (cygpid, PID_NOREDIR, NULL);
-      if (!pinfolist[nelem])
+      p.init (cygpid, PID_NOREDIR, NULL);
+      if (!p)
 	return;
       }
 
   /* Scan list of previously recorded pids to make sure that this pid hasn't
      shown up before.  This can happen when a process execs. */
   for (unsigned i = 0; i < nelem; i++)
-    if (pinfolist[i]->pid == pinfolist[nelem]->pid)
+    if (pinfolist[i]->pid == p->pid)
       {
-	if ((_pinfo *) pinfolist[nelem] != (_pinfo *) myself)
-	  pinfolist[nelem].release ();
+	if ((_pinfo *) p != (_pinfo *) myself)
+	  p.release ();
 	return;
       }
 
 out:
+  copied[nelem] = false;
+  if (make_copy)
+    {
+      _pinfo *pnew = (_pinfo *) malloc (sizeof (*p.procinfo));
+      if (pnew)
+	{
+	  copied[nelem] = true;
+	  *pnew = *p.procinfo;
+	  if ((_pinfo *) p != (_pinfo *) myself)
+	    p.release ();
+	  p.procinfo = pnew;
+	  p.destroy = false;
+	}
+    }
   pidlist[nelem++] = pid;
 }
 
@@ -1219,9 +1237,16 @@ winpids::enum_init (bool winpid)
 void
 winpids::release ()
 {
+  _pinfo *p;
   for (unsigned i = 0; i < npids; i++)
     if (pinfolist[i] && (_pinfo *) pinfolist[i] != (_pinfo *) myself)
-      pinfolist[i].release ();
+      if (!copied[i])
+	pinfolist[i].release ();
+      else if ((p = pinfolist[i].procinfo))
+	{
+	  pinfolist[i].procinfo = NULL;
+	  free (p);
+	}
 }
 
 winpids::~winpids ()
@@ -1229,6 +1254,7 @@ winpids::~winpids ()
   if (npidlist)
     {
       release ();
+      free (copied);
       free (pidlist);
       free (pinfolist);
     }

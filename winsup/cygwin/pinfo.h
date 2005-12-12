@@ -193,6 +193,7 @@ public:
   void set_acl ();
   void zap_cwd ();
   friend class _pinfo;
+  friend class winpids;
 };
 
 #define ISSTATE(p, f)	(!!((p)->process_state & f))
@@ -200,9 +201,11 @@ public:
 
 class winpids
 {
-  DWORD *pidlist;
+  bool make_copy;
   DWORD npidlist;
+  DWORD *pidlist;
   pinfo *pinfolist;
+  bool *copied;
   DWORD pinfo_access;		// access type for pinfo open
   DWORD (winpids::* enum_processes) (bool winpid);
   DWORD enum_init (bool winpid);
@@ -211,15 +214,16 @@ class winpids
   void add (DWORD& nelem, bool, DWORD pid);
 public:
   DWORD npids;
-  inline void reset () { npids = 0; release (); }
+  inline void reset () { release (); npids = 0;}
   void set (bool winpid);
-  winpids (): enum_processes (&winpids::enum_init) {}
-  winpids (int): pinfo_access (0), enum_processes (&winpids::enum_init)
-    { reset (); }
-  winpids (DWORD acc): pidlist (NULL), npidlist (0), pinfolist (NULL),
-  			   enum_processes (&winpids::enum_init), npids (0)
+  winpids (): make_copy (true), enum_processes (&winpids::enum_init) {}
+  winpids (int): make_copy (false), npidlist (0), pidlist (NULL), pinfolist (NULL),
+		 copied (NULL), pinfo_access (0), enum_processes (&winpids::enum_init),
+		 npids (0) {}
+  winpids (DWORD acc): make_copy (false), npidlist (0), pidlist (NULL), pinfolist (NULL),
+		 copied (NULL), pinfo_access (acc), enum_processes (&winpids::enum_init),
+		 npids (0)
   {
-    pinfo_access = acc;
     set (0);
   }
   inline DWORD& winpid (int i) const {return pidlist[i];}
