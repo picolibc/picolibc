@@ -605,8 +605,11 @@ fhandler_tty_slave::open (int flags, mode_t)
 	}
       b = AllocConsole ();	// will cause flashing if workstation
 				// stuff fails
-      if (horig && h != horig)
-	SetProcessWindowStation (horig);
+      if (horig && h && h != horig)
+	{
+	  SetProcessWindowStation (horig);
+	  CloseHandle (h);
+	}
       termios_printf ("%d = AllocConsole (), %E", b);
       if (b)
 	init_console_handler (TRUE);

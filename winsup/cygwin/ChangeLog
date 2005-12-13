@@ -1,3 +1,8 @@
+2005-12-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tty.cc (fhandler_tty::open): Close newly created window
+	station after switching to original window station.
+
 2005-12-13  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_tty.cc (fhandler_tty::open): Add a comment.
