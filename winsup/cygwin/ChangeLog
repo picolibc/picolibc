@@ -1,3 +1,8 @@
+2005-12-12  Christopher Faylor  <cgf@timesys.com>
+
+	* times.cc (hires_ms::usecs): Subtract from slop from system time or
+	we'll always end up priming the pump.
+
 2005-12-12  Nick Duffek <nick@duffek.com>
 
 	* times.cc (systime): Correct precision referenced in comment.
