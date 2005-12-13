@@ -200,7 +200,7 @@ _BEGIN_STD_C
 #define _JBTYPE unsigned long
 #endif
 
-#ifdef __ms1__
+#ifdef __mt__
 #define _JBLEN 16
 #endif
 

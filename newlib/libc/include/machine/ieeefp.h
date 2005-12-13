@@ -226,7 +226,7 @@
 #define __IEEE_BIG_ENDIAN
 #endif
 
-#ifdef __ms1__
+#ifdef __mt__
 #define __IEEE_BIG_ENDIAN
 #endif
 

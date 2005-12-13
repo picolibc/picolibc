@@ -1,4 +1,4 @@
-# setjmp/longjmp for ms1.
+# setjmp/longjmp for mt.
 # 
 # The jmpbuf looks like this:
 #	

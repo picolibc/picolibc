@@ -1,3 +1,10 @@
+2005-12-13  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* libc/include/machine/ieeefp.h (__mt__): Renamed from __ms1__.
+	* libc/include/machine/setjmp.h (__mt__): Likewise.
+	* libc/machine/mt/setjmp.S: Rename ms1 reference to mt.
+	* libc/machine/configure.in: Ditto.
+
 2005-12-12  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* configure.host: Replace ms1 arch with mt arch.
