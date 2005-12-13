@@ -705,6 +705,14 @@ This is right <literal>gcc hello.cc -lstdc++</literal>.
 </para>
 </answer></qandaentry>
 
+<qandaentry id="faq.programming.stat64">
+<question><para>Why do I get an error using <literal>struct stat64</literal>?</para></question>
+<answer>
+
+<para><literal>struct stat64</literal> is not used in Cygwin, just
+use <literal>struct stat</literal>.</para>
+</answer></qandaentry>
+
 <qandaentry id="faq.programming.undeclared-functions">
 <question><para>I use a function I know is in the API, but I still get a link error.</para></question>
 <answer>

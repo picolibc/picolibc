@@ -1,3 +1,7 @@
+2005-12-12  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* faq-programming.xml: Add note about struct stat64.
+
 2005-12-03  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* faq-setup.xml: Add note about clean_setup.pl.
