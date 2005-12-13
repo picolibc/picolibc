@@ -1,5 +1,10 @@
 2005-12-13  Christopher Faylor  <cgf@timesys.com>
 
+	* cygtls.cc (_cygtls::remove): Don't bother if we're exiting.
+	* sigproc.cc (_cygtls::remove_wq): Ditto.
+
+2005-12-13  Christopher Faylor  <cgf@timesys.com>
+
 	* fhandler_tty.cc (fhandler_tty::open): Enhance comment.
 
 2005-12-13  Corinna Vinschen  <corinna@vinschen.de>
