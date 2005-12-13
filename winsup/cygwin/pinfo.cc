@@ -1130,7 +1130,7 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
 
 out:
   copied[nelem] = false;
-  if (make_copy)
+  if (make_copy && p)
     {
       _pinfo *pnew = (_pinfo *) malloc (sizeof (*p.procinfo));
       if (pnew)

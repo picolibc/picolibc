@@ -1,5 +1,10 @@
 2005-12-12  Christopher Faylor  <cgf@timesys.com>
 
+	* pinfo.cc (winpids::add): Don't copy procinfo when there is no cygwin
+	process associated with the pid, i.e., procinfo == NULL.
+
+2005-12-12  Christopher Faylor  <cgf@timesys.com>
+
 	* times.cc (hires_ms::usecs): Correct order when checking if high
 	precision time is <= current time.
 
