@@ -1,4 +1,4 @@
-# Startup Code for the Morpho ms1
+# Startup Code for the Morpho mt
 
 # Create a label for the start of the eh_frame section.
 	.section .eh_frame

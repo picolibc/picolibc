@@ -1,7 +1,7 @@
-OUTPUT_FORMAT("elf32-ms1", "elf32-ms1", "elf32-ms1")
-OUTPUT_ARCH(ms1)
+OUTPUT_FORMAT("elf32-mt", "elf32-mt", "elf32-mt")
+OUTPUT_ARCH(mt)
 ENTRY(__boot_start)
-SEARCH_DIR(/usr/local/mrisc1-elf/lib)
+
 /* Do we need any of these for elf?
    __DYNAMIC = 0;    */
 MEMORY
