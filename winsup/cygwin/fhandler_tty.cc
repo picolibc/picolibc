@@ -581,6 +581,17 @@ fhandler_tty_slave::open (int flags, mode_t)
     {
       BOOL b;
       HWINSTA h, horig;
+      /* The intent here is to allocate an "invisible" console if we have no
+	 controlling tty or to reuse the existing console if we already have
+	 a tty.  So, first get the old windows station.  If there is no controlling
+	 terminal, create a new windows station and then set it as the current
+	 windows station.  The subsequent AllocConsole will then be allocated
+	 invisibly.  But, after doing that we have to restore any existing windows
+	 station or, strangely, characters will not be displayed in any windows
+	 drawn on the current screen.  We only do this if we have changed to
+	 a new windows station and if we had an existing windows station previously.
+
+	 Phew.  */
       h = horig = GetProcessWindowStation ();
       if (myself->ctty == -1)
         {
