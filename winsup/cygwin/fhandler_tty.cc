@@ -590,8 +590,16 @@ fhandler_tty_slave::open (int flags, mode_t)
 	 station or, strangely, characters will not be displayed in any windows
 	 drawn on the current screen.  We only do this if we have changed to
 	 a new windows station and if we had an existing windows station previously.
+	 We also close the previously opened work station even though AllocConsole
+	 is now "using" it.  This doesn't seem to cause any problems.
 
-	 Phew.  */
+	 Things to watch out for if you make changes in this code:
+
+	 - Flashing, black consoles showing up when you start, e.g., ssh in
+	   an xterm.
+	 - Non-displaying of characters in rxvt or xemacs if you start a
+	   process using setsid: bash -lc "setsid rxvt".  */
+
       h = horig = GetProcessWindowStation ();
       if (myself->ctty == -1)
         {
