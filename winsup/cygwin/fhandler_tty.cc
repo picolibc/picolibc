@@ -580,21 +580,22 @@ fhandler_tty_slave::open (int flags, mode_t)
       && wincap.pty_needs_alloc_console ())
     {
       BOOL b;
-      HWINSTA horig = GetProcessWindowStation ();
+      HWINSTA h, horig;
+      h = horig = GetProcessWindowStation ();
       if (myself->ctty == -1)
         {
-	  HWINSTA h = CreateWindowStation (NULL, 0, GENERIC_READ | GENERIC_WRITE, &sec_none_nih);
+	  h = CreateWindowStation (NULL, 0, WINSTA_ALL_ACCESS, &sec_none_nih);
 	  termios_printf ("CreateWindowStation %p, %E", h);
 	  if (h)
 	    {
 	      b = SetProcessWindowStation (h);
 	      termios_printf ("SetProcessWindowStation %d, %E", b);
 	    }
-	  if (horig)
-	    CloseWindowStation (horig);
 	}
       b = AllocConsole ();	// will cause flashing if workstation
 				// stuff fails
+      if (horig && h != horig)
+	SetProcessWindowStation (horig);
       termios_printf ("%d = AllocConsole (), %E", b);
       if (b)
 	init_console_handler (TRUE);

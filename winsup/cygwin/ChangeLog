@@ -1,3 +1,16 @@
+2005-12-12  Nick Duffek <nick@duffek.com>
+
+	* times.cc (systime): Correct precision referenced in comment.
+
+2005-12-12  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler_tty.cc (fhandler_tty_slave::open): Don't free original
+	windows station since that will cause strange problems displaying
+	fonts.  Reset windows station to original station after creating
+	console.
+	* times.cc (hires_ms::usecs): Only reprime when calculated time is less
+	than system time.
+
 2005-12-12  Christopher Faylor  <cgf@timesys.com>
 
 	* pinfo.cc (winpids::add): Don't copy procinfo when there is no cygwin

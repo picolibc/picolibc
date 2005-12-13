@@ -41,7 +41,7 @@ systime ()
   x.HighPart = ft.dwHighDateTime;
   x.LowPart = ft.dwLowDateTime;
   x.QuadPart -= FACTOR;		/* Add conversion factor for UNIX vs. Windows base time */
-  x.QuadPart /= 10;		/* Convert to milliseconds */
+  x.QuadPart /= 10;		/* Convert to microseconds */
   return x.QuadPart;
 }
 
@@ -644,7 +644,7 @@ hires_ms::usecs ()
 
   LONGLONG t = systime ();
   LONGLONG res = initime_us + (((LONGLONG) timeGetTime ()) * 1000LL);
-  if (res <= t)
+  if (res < t)
     {
       inited = false;
       prime ();
