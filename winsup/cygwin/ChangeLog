@@ -1,5 +1,10 @@
 2005-12-12  Christopher Faylor  <cgf@timesys.com>
 
+	* times.cc (hires_ms::usecs): Correct order when checking if high
+	precision time is <= current time.
+
+2005-12-12  Christopher Faylor  <cgf@timesys.com>
+
 	* pinfo.cc (size_copied): New convenience macro.
 	(winpids::add): Alias the element that we are working on for slightly
 	better clarity.  Honor the "make_copy" flag.

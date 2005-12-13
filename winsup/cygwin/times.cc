@@ -642,8 +642,9 @@ hires_ms::usecs ()
   if (!inited)
     prime ();
 
+  LONGLONG t = systime ();
   LONGLONG res = initime_us + (((LONGLONG) timeGetTime ()) * 1000LL);
-  if (res <= systime ())
+  if (res <= t)
     {
       inited = false;
       prime ();
