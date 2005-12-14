@@ -298,7 +298,6 @@ written:
   return bytes_written;
 }
 
-#define ACCFLAGS(x) (x & (O_RDONLY | O_WRONLY | O_RDWR))
 int
 fhandler_base::get_default_fmode (int flags)
 {
@@ -306,11 +305,11 @@ fhandler_base::get_default_fmode (int flags)
   if (perfile_table)
     {
       size_t nlen = strlen (get_name ());
-      unsigned accflags = ACCFLAGS (flags);
+      unsigned accflags = (flags & O_ACCMODE);
       for (__cygwin_perfile *pf = perfile_table; pf->name; pf++)
-	if (!*pf->name && ACCFLAGS (pf->flags) == accflags)
+	if (!*pf->name && (pf->flags & O_ACCMODE) == accflags)
 	  {
-	    fmode = pf->flags & ~(O_RDONLY | O_WRONLY | O_RDWR);
+	    fmode = pf->flags & ~O_ACCMODE;
 	    break;
 	  }
 	else
@@ -319,9 +318,10 @@ fhandler_base::get_default_fmode (int flags)
 	    const char *stem = get_name () + nlen - pflen;
 	    if (pflen > nlen || (stem != get_name () && !isdirsep (stem[-1])))
 	      continue;
-	    else if (ACCFLAGS (pf->flags) == accflags && strcasematch (stem, pf->name))
+	    else if ((pf->flags & O_ACCMODE) == accflags
+		     && strcasematch (stem, pf->name))
 	      {
-		fmode = pf->flags & ~(O_RDONLY | O_WRONLY | O_RDWR);
+		fmode = pf->flags & ~O_ACCMODE;
 		break;
 	      }
 	  }
@@ -459,9 +459,9 @@ fhandler_base::open_9x (int flags, mode_t mode)
 	access = GENERIC_READ | FILE_WRITE_ATTRIBUTES;
 	break;
       default:
-	if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
+	if ((flags & O_ACCMODE) == O_RDONLY)
 	  access = GENERIC_READ;
-	else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY)
+	else if ((flags & O_ACCMODE) == O_WRONLY)
 	  access = GENERIC_WRITE;
 	else
 	  access = GENERIC_READ | GENERIC_WRITE;
@@ -524,7 +524,7 @@ fhandler_base::open_9x (int flags, mode_t mode)
     {
       if (pc.isdir ())
 	{
-	  if (flags & (O_WRONLY | O_RDWR))
+	  if ((flags & O_ACCMODE) != O_RDONLY)
 	    set_errno (EISDIR);
 	  else
 	    nohandle (true);
@@ -603,9 +603,9 @@ fhandler_base::open (int flags, mode_t mode)
 	break;
       default:
 	create_options = 0;
-	if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
+	if ((flags & O_ACCMODE) == O_RDONLY)
 	  access = GENERIC_READ;
-	else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY)
+	else if ((flags & O_ACCMODE) == O_WRONLY)
 	  access = GENERIC_WRITE | FILE_READ_ATTRIBUTES;
 	else
 	  access = GENERIC_READ | GENERIC_WRITE;

@@ -1,5 +1,17 @@
 2005-12-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (ACCFLAGS): Remove macro.
+	(fhandler_base::get_default_fmode): Use O_ACCMODE instead of ACCFLAGS
+	and or'ed read/write flags.
+	(fhandler_base::open_9x): Use O_ACCMODE instead of or'ed read/write
+	flags.
+	(fhandler_base::open): Ditto.
+	* fhandler_disk_file.cc (fhandler_base::open_fs): Ditto.
+	* fhandler_mem.cc (fhandler_dev_mem::open): Ditto.
+	* fhandler_raw.cc (fhandler_dev_raw::open): Ditto.
+
+2005-12-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (fhandler_base::open_9x): Handle O_SYNC and O_DIRECT
 	flags.
 	(fhandler_base::open): Ditto.

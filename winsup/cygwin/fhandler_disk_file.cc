@@ -956,7 +956,7 @@ fhandler_base::open_fs (int flags, mode_t mode)
 
   /* Unfortunately NT allows to open directories for writing, but that's
      disallowed according to SUSv3. */
-  if (pc.isdir () && (flags & (O_WRONLY | O_RDWR)))
+  if (pc.isdir () && (flags & O_ACCMODE) != O_RDONLY)
     {
       set_errno (EISDIR);
       return 0;

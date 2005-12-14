@@ -88,12 +88,12 @@ fhandler_dev_mem::open (int flags, mode_t)
 			      NULL, NULL);
 
   ACCESS_MASK section_access;
-  if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
+  if ((flags & O_ACCMODE) == O_RDONLY)
     {
       set_access (GENERIC_READ);
       section_access = SECTION_MAP_READ;
     }
-  else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY)
+  else if ((flags & O_ACCMODE) == O_WRONLY)
     {
       set_access (GENERIC_WRITE);
       section_access = SECTION_MAP_READ | SECTION_MAP_WRITE;

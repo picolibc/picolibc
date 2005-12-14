@@ -84,7 +84,7 @@ fhandler_dev_raw::open (int flags, mode_t)
   flags |= O_BINARY;
 
   /* Write-only doesn't work well with raw devices */
-  if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY)
+  if ((flags & O_ACCMODE) == O_WRONLY)
     flags = ((flags & ~O_WRONLY) | O_RDWR);
 
   int res = fhandler_base::open (flags, 0);
