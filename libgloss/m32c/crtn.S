@@ -41,5 +41,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define W l
 #endif
 
+	.section	.init,"ax",@progbits
+	jsr.a	_m32c_run_preinit_array
+	jsr.a	_m32c_run_init_array
+	exitd
+	.global	__m32c_init_end
+__m32c_init_end:
+
+	.section	.fini,"ax",@progbits
+
+	exitd
+	.global	__m32c_fini_end
+__m32c_fini_end:
+
 	.text
 

@@ -1,3 +1,10 @@
+2005-12-13  DJ Delorie  <dj@redhat.com>
+
+	* m32c/crt0.S: Add support for preinit, init, and fini arrays, and
+	.init and .fini processing.
+	* m32c/crtn.S: Likewise.
+	* m32c/exit.S: Likewise.
+
 2005-12-13  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* mt/16-002.ld: Change architecture to 'mt'.  Remove

@@ -74,6 +74,8 @@ _start:
 	mov.w	#0,r0
 	sstr.w
 
+	jsr.a	__m32c_init
+
 	jsr.a	_main
 .LFE2:
 
@@ -84,6 +86,61 @@ _start:
 #endif
 
 	jsr.a	_exit
+
+	.text
+
+	.global	_m32c_run_preinit_array
+	.type	_m32c_run_preinit_array,@function
+_m32c_run_preinit_array:
+	mov.W	#__preinit_array_start,a0
+	mov.W	#__preinit_array_end,a1
+	jmp.w	_m32c_run_inilist
+
+	.global	_m32c_run_init_array
+	.type	_m32c_run_init_array,@function
+_m32c_run_init_array:
+	mov.W	#__init_array_start,a0
+	mov.W	#__init_array_end,a1
+	jmp.w	_m32c_run_inilist
+
+	.global	_m32c_run_fini_array
+	.type	_m32c_run_fini_array,@function
+_m32c_run_fini_array:
+	mov.W	#__fini_array_start,a0
+	mov.W	#__fini_array_end,a1
+	/* fall through */
+
+_m32c_run_inilist:
+next_inilist:
+	cmp.W	a0,a1
+	jeq	done_inilist
+	pushm	a0,a1
+	mov.W	[a0],a0
+#ifdef A16
+	mov.b:s	#0,a1	/* zero extends */
+	jsri.a	a1a0
+#else
+	jsri.a	a0
+#endif
+	popm	a0,a1
+	add.W	A(#2,#4),a0
+	jmp.b	next_inilist
+done_inilist:
+	rts
+
+	.section	.init,"ax",@progbits
+
+	.global __m32c_init
+__m32c_init:
+	enter	#0
+
+	.section	.fini,"ax",@progbits
+
+	.global __m32c_fini
+__m32c_fini:
+	enter	#0
+	jsr.a	_m32c_run_fini_array
+
 
 ;;; Provide Dwarf unwinding information that will help GDB stop
 ;;; backtraces at the right place.  This is stolen from assembly
@@ -116,4 +173,5 @@ _start:
 	.byte 	0x30		; DW_OP_lit0
 	.p2align ALIGN
 .LEFDE0:
-.text
+
+	.text

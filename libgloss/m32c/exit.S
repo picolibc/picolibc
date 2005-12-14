@@ -32,4 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "m32csys.h"
 
-S(_exit)
+	.global	__exit
+__exit:
+	jsr.a	__m32c_fini
+	SYSCALL(SYS_exit)
