@@ -1,3 +1,8 @@
+2005-12-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/sys/fcntl.h: Define O_SYNC unconditionally.  Fix
+	typo in O_NDELAY comment.
+
 2005-12-13  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* libc/include/machine/ieeefp.h (__mt__): Renamed from __ms1__.
