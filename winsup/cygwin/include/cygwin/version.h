@@ -282,12 +282,13 @@ details. */
            for this?
       147: Eliminate problematic d_ino from dirent structure.  unsetenv now returns
            int, as per linux.
+      148: Add open(2) flags O_SYNC, O_RSYNC, O_DSYNC and O_DIRECT.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 147
+#define CYGWIN_VERSION_API_MINOR 148
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

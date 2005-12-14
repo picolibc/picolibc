@@ -159,12 +159,14 @@ fhandler_dev_raw::ioctl (unsigned int cmd, void *buf)
 	      }
 	    else if ((devbuf && ((op->rd_parm <= 1 && (devbufend - devbufstart))
 				 || op->rd_parm < devbufend - devbufstart))
-		     || (op->rd_parm > 1 && (op->rd_parm % 512)))
+		     || (op->rd_parm > 1 && (op->rd_parm % 512))
+		     || (get_flags () & O_DIRECT))
 	      /* The conditions for a *valid* parameter are these:
 	         - If there's still data in the current buffer, it must
 		   fit in the new buffer.
 		 - The new size is either 0 or 1, both indicating unbufferd
-		   I/O, or the new buffersize must be a multiple of 512. */
+		   I/O, or the new buffersize must be a multiple of 512.
+		 - In the O_DIRECT case, the whole request is invalid. */
 	      ret = ERROR_INVALID_PARAMETER;
 	    else if (!devbuf || op->rd_parm != devbufsiz)
 	      {
@@ -198,7 +200,7 @@ fhandler_dev_raw::ioctl (unsigned int cmd, void *buf)
       if (!get)
 	ret = ERROR_INVALID_PARAMETER;
       else
-	get->bufsiz = devbufsiz ?: 1L;
+	get->bufsiz = devbufsiz;
     }
   else
     return fhandler_base::ioctl (cmd, buf);

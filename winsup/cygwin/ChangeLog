@@ -1,3 +1,20 @@
+2005-12-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::open_9x): Handle O_SYNC and O_DIRECT
+	flags.
+	(fhandler_base::open): Ditto.
+	* fhandler_floppy.cc (fhandler_dev_floppy::open): Don't allocate devbuf
+	in O_DIRECT case.
+	* fhandler_raw.cc (fhandler_dev_raw::ioctl): Don't allow buffer
+	changes in O_DIRECT case.  Allow returning a buffer size 0, which
+	indicates O_DIRECT.
+	* fhandler_tape.cc (fhandler_dev_tape::open): Use O_SYNC flag to
+	hand down the !buffer_writes case.  Don't allocate devbuf in O_DIRECT
+	case.
+	(fhandler_dev_tape::raw_read): Don't mess with devbuf if it's NULL.
+	* include/fcntl.h: Define _FDIRECT, O_DIRECT, O_DSYNC and O_RSYNC.
+	* include/cygwin/version.h: Bump API minor version.
+
 2005-12-13  Christopher Faylor  <cgf@timesys.com>
 
 	* cygtls.cc (_cygtls::remove): Don't bother if we're exiting.

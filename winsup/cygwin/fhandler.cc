@@ -492,6 +492,10 @@ fhandler_base::open_9x (int flags, mode_t mode)
   file_attributes = FILE_ATTRIBUTE_NORMAL;
   if (flags & O_DIROPEN)
     file_attributes |= FILE_FLAG_BACKUP_SEMANTICS;
+  if (flags & O_SYNC)
+    file_attributes |= FILE_FLAG_WRITE_THROUGH;
+  if (flags & O_DIRECT)
+    file_attributes |= FILE_FLAG_NO_BUFFERING;
   if (get_major () == DEV_SERIAL_MAJOR)
     file_attributes |= FILE_FLAG_OVERLAPPED;
 
@@ -599,18 +603,16 @@ fhandler_base::open (int flags, mode_t mode)
 	break;
       default:
 	create_options = 0;
-	if (get_major () == DEV_TAPE_MAJOR && (flags & O_TEXT))
-	  {
-	    /* O_TEXT is used to indicate write-through on tape devices */
-	    create_options |= FILE_WRITE_THROUGH;
-	    flags &= ~O_TEXT;
-	  }
 	if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
 	  access = GENERIC_READ;
 	else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY)
 	  access = GENERIC_WRITE | FILE_READ_ATTRIBUTES;
 	else
 	  access = GENERIC_READ | GENERIC_WRITE;
+	if (flags & O_SYNC)
+	  create_options |= FILE_WRITE_THROUGH;
+	if (flags & O_DIRECT)
+	  create_options |= FILE_NO_INTERMEDIATE_BUFFERING;
 	if (get_major () != DEV_SERIAL_MAJOR && get_major () != DEV_TAPE_MAJOR)
 	  {
 	    create_options |= FILE_SYNCHRONOUS_IO_NONALERT;

@@ -1216,11 +1216,16 @@ fhandler_dev_tape::open (int flags, mode_t)
       __seterrno ();
       return 0;
     }
-  /* The O_TEXT flag is used to indicate write-through (non buffered writes)
-     to the underlying fhandler_dev_raw::open call. */
-  flags &= ~O_TEXT;
+
+  /* The O_SYNC flag is not supported by the tape driver.  Use the
+     MT_ST_BUFFER_WRITES and MT_ST_ASYNC_WRITES flags in the drive
+     settings instead.  In turn, the MT_ST_BUFFER_WRITES is translated
+     into O_SYNC, which controls the FILE_WRITE_THROUGH flag in the
+     NtCreateFile call in fhandler_base::open. */
+  flags &= ~O_SYNC;
   if (!mt->drive (driveno ())->buffer_writes ())
-    flags |= O_TEXT;
+    flags |= O_SYNC;
+
   ret = fhandler_dev_raw::open (flags);
   if (ret)
     {
@@ -1231,8 +1236,11 @@ fhandler_dev_tape::open (int flags, mode_t)
 	mt->drive (driveno ())->set_pos (get_handle (),
 					 TAPE_SPACE_FILEMARKS, 1, true);
 
-      devbufsiz = mt->drive (driveno ())->dp ()->MaximumBlockSize;
-      devbuf = new char [devbufsiz];
+      if (!(flags & O_DIRECT))
+        {
+	  devbufsiz = mt->drive (driveno ())->dp ()->MaximumBlockSize;
+	  devbuf = new char [devbufsiz];
+	}
       devbufstart = devbufend = 0;
     }
   else
@@ -1283,69 +1291,80 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
       return;
     }
   block_size = mt->drive (driveno ())->mp ()->BlockSize;
-  if (devbufend > devbufstart)
+  if (devbuf)
     {
-      bytes_to_read = min (len, devbufend - devbufstart);
-      debug_printf ("read %d bytes from buffer (rest %d)",
-		    bytes_to_read, devbufend - devbufstart - bytes_to_read);
-      memcpy (buf, devbuf + devbufstart, bytes_to_read);
-      len -= bytes_to_read;
-      bytes_read += bytes_to_read;
-      buf += bytes_to_read;
-      devbufstart += bytes_to_read;
-      if (devbufstart == devbufend)
-	devbufstart = devbufend = 0;
-      /* If a switch to variable block_size occured, just return the buffer
-	 remains until the buffer is empty, then proceed with usual variable
-	 block size handling (one block per read call). */
-      if (!block_size)
-	len = 0;
+      if (devbufend > devbufstart)
+	{
+	  bytes_to_read = min (len, devbufend - devbufstart);
+	  debug_printf ("read %d bytes from buffer (rest %d)",
+			bytes_to_read, devbufend - devbufstart - bytes_to_read);
+	  memcpy (buf, devbuf + devbufstart, bytes_to_read);
+	  len -= bytes_to_read;
+	  bytes_read += bytes_to_read;
+	  buf += bytes_to_read;
+	  devbufstart += bytes_to_read;
+	  if (devbufstart == devbufend)
+	    devbufstart = devbufend = 0;
+	  /* If a switch to variable block_size occured, just return the buffer
+	     remains until the buffer is empty, then proceed with usual variable
+	     block size handling (one block per read call). */
+	  if (!block_size)
+	    len = 0;
+	}
+      if (len > 0)
+	{
+	  if (!mt_evt && !(mt_evt = CreateEvent (&sec_none, TRUE, FALSE, NULL)))
+	    debug_printf ("Creating event failed, %E");
+	  size_t block_fit = !block_size ? len : rounddown(len,  block_size);
+	  if (block_fit)
+	    {
+	      debug_printf ("read %d bytes from tape (rest %d)",
+			    block_fit, len - block_fit);
+	      ret = mt->drive (driveno ())->read (get_handle (), mt_evt, buf,
+						  block_fit);
+	      if (ret)
+		__seterrno_from_win_error (ret);
+	      else if (block_fit)
+		{
+		  len -= block_fit;
+		  bytes_read += block_fit;
+		  buf += block_fit;
+		  /* Only one block in each read call, please. */
+		  if (!block_size)
+		    len = 0;
+		}
+	      else {
+		len = 0;
+		if (bytes_read)
+		  lastblk_to_read (true);
+	      }
+	    }
+	  if (!ret && len > 0)
+	    {
+	      debug_printf ("read %d bytes from tape (one block)", block_size);
+	      ret = mt->drive (driveno ())->read (get_handle (), mt_evt, devbuf,
+						  block_size);
+	      if (ret)
+		__seterrno_from_win_error (ret);
+	      else if (block_size)
+		{
+		  devbufstart = len;
+		  devbufend = block_size;
+		  bytes_read += len;
+		  memcpy (buf, devbuf, len);
+		}
+	      else if (bytes_read)
+		lastblk_to_read (true);
+	    }
+	}
     }
-  if (len > 0)
+  else
     {
       if (!mt_evt && !(mt_evt = CreateEvent (&sec_none, TRUE, FALSE, NULL)))
 	debug_printf ("Creating event failed, %E");
-      size_t block_fit = !block_size ? len : rounddown(len,  block_size);
-      if (block_fit)
-	{
-	  debug_printf ("read %d bytes from tape (rest %d)",
-			block_fit, len - block_fit);
-	  ret = mt->drive (driveno ())->read (get_handle (), mt_evt, buf,
-					      block_fit);
-	  if (ret)
-	    __seterrno_from_win_error (ret);
-	  else if (block_fit)
-	    {
-	      len -= block_fit;
-	      bytes_read += block_fit;
-	      buf += block_fit;
-	      /* Only one block in each read call, please. */
-	      if (!block_size)
-		len = 0;
-	    }
-	  else {
-	    len = 0;
-	    if (bytes_read)
-	      lastblk_to_read (true);
-	  }
-	}
-      if (!ret && len > 0)
-	{
-	  debug_printf ("read %d bytes from tape (one block)", block_size);
-	  ret = mt->drive (driveno ())->read (get_handle (), mt_evt, devbuf,
-					      block_size);
-	  if (ret)
-	    __seterrno_from_win_error (ret);
-	  else if (block_size)
-	    {
-	      devbufstart = len;
-	      devbufend = block_size;
-	      bytes_read += len;
-	      memcpy (buf, devbuf, len);
-	    }
-	  else if (bytes_read)
-	    lastblk_to_read (true);
-	}
+      bytes_read = ulen;
+      ret = mt->drive (driveno ())->read (get_handle (), mt_evt, ptr,
+					  bytes_read);
     }
   ulen = (ret ? (size_t) -1 : bytes_read);
   unlock ();

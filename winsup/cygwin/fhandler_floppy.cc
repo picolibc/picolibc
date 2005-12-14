@@ -161,9 +161,10 @@ fhandler_dev_floppy::open (int flags, mode_t)
      relatively big value increases performance by means.  The new ioctl call
      with 'rdevio.h' header file supports changing this value.
 
-     Let's try to be smart: Let's take a multiple of typical tar and cpio
-     buffer sizes by default. */
-  devbufsiz = 61440L;
+     As default buffer size, we're using some value which is a multiple of
+     the typical tar and cpio buffer sizes, Except O_DIRECT is set, in which
+     case we're not buffering at all. */
+  devbufsiz = (flags & O_DIRECT) ? 0L : 61440L;
   int ret =  fhandler_dev_raw::open (flags);
 
   if (ret && get_drive_info (NULL))
