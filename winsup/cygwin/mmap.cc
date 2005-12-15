@@ -1708,9 +1708,9 @@ fhandler_dev_zero::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
     {
       MEMORY_BASIC_INFORMATION m;
       VirtualQuery (address, &m, sizeof (m));
-      debug_printf ("requested %p != %p mem alloc base %p, state %p, "
-		    "size %d, %E", address, base, m.AllocationBase, m.State,
-		    m.RegionSize);
+      system_printf ("requested %p != %p mem alloc base %p, state %p, "
+		     "size %d, %E", address, base, m.AllocationBase, m.State,
+		     m.RegionSize);
     }
   return base == address;
 }
