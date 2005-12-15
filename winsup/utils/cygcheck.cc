@@ -89,14 +89,18 @@ static common_apps[] = {
   {"gcc", 0},
   {"gdb", 0},
   {"grep", 0},
+  {"kill", 0},
   {"ld", 0},
   {"ls", 0},
   {"make", 0},
   {"mv", 0},
+  {"perl", 0},
   {"rm", 0},
   {"sed", 0},
+  {"ssh", 0},
   {"sh", 0},
   {"tar", 0},
+  {"test", 0},
   {0, 0}
 };
 
