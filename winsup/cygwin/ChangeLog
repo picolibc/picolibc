@@ -1,5 +1,10 @@
 2005-12-16  Christopher Faylor  <cgf@timesys.com>
 
+	* init.cc (dll_entry): Call prime_threads after dll_crt0_0 to avoid
+	conflicts between heap allocation and thread stack allocation.
+
+2005-12-16  Christopher Faylor  <cgf@timesys.com>
+
 	* hookapi.cc (putmem): Remove query of previous memory protection since
 	we get that for free the first time we call VirtualProtect.
 

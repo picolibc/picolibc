@@ -160,8 +160,8 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
 	  && is_wow64_proc)
 	respawn_wow64_process ();
 
-      prime_threads ();
       dll_crt0_0 ();
+      prime_threads ();	// this should be the last thing to happen
       break;
     case DLL_PROCESS_DETACH:
       break;
