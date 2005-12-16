@@ -53,25 +53,14 @@ rvadelta (PIMAGE_NT_HEADERS pnt, DWORD import_rva)
 void *
 putmem (PIMAGE_THUNK_DATA pi, const void *hookfn)
 {
-
-  DWORD flOldProtect, flNewProtect, flDontCare;
-  MEMORY_BASIC_INFORMATION mbi;
-
-  /* Get the current protection attributes */
-  VirtualQuery (pi, &mbi, sizeof (mbi));
-
-  /* Remove ReadOnly and ExecuteRead attributes, add on ReadWrite flag */
-  flNewProtect = mbi.Protect;
-  flNewProtect &= ~(PAGE_READONLY | PAGE_EXECUTE_READ);
-  flNewProtect |= PAGE_READWRITE;
-
-  if (!VirtualProtect (pi, sizeof (PVOID), flNewProtect, &flOldProtect) )
+  DWORD ofl;
+  if (!VirtualProtect (pi, sizeof (PVOID), PAGE_READWRITE, &ofl) )
     return NULL;
 
   void *origfn = (void *) pi->u1.Function;
   pi->u1.Function = (DWORD) hookfn;
 
-  VirtualProtect (pi, sizeof (PVOID), flOldProtect, &flDontCare);
+  VirtualProtect (pi, sizeof (PVOID), ofl, &ofl);
   return origfn;
 }
 

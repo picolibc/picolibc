@@ -1,3 +1,8 @@
+2005-12-16  Christopher Faylor  <cgf@timesys.com>
+
+	* hookapi.cc (putmem): Remove query of previous memory protection since
+	we get that for free the first time we call VirtualProtect.
+
 2005-12-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (fhandler_dev_zero::fixup_mmap_after_fork): Use
