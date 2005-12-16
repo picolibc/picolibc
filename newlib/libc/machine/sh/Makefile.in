@@ -103,10 +103,10 @@ DEFS = @DEFS@ -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
-@SH64_TRUE@lib_a_OBJECTS =  memcpy.o memset.o setjmp.o strcpy.o strlen.o \
-@SH64_TRUE@strcmp.o strncpy.o
 @SH64_FALSE@lib_a_OBJECTS =  memcpy.o memset.o setjmp.o strcpy.o \
 @SH64_FALSE@strlen.o strcmp.o
+@SH64_TRUE@lib_a_OBJECTS =  memcpy.o memset.o setjmp.o strcpy.o strlen.o \
+@SH64_TRUE@strcmp.o strncpy.o
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)

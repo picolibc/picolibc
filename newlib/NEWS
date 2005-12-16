@@ -1,3 +1,14 @@
+*** Major changes in newlib version 1.14.0:
+
+* new platforms added (cris, mt, m32c)
+* more locking protection macros added
+* various C99/POSIX/SUSV3 compliance issue improvements
+* reentrancy cleanup
+* header file improvements (e.g. adding RTEMS stdint.h/inttypes.h)
+* various math fixes
+* changes made to allow use of gcc4 to build newlib
+* general bug fixes and cleanups
+
 *** Major changes in newlib version 1.13.0:
 
 * optimized iconv support

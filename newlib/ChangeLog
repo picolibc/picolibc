@@ -1,5 +1,22 @@
 2005-12-16  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* NEWS: Update with 1.14.0 info.
+	* README: Ditto.
+	* acinclude.m4: Change version number to 1.14.0.
+	* aclocal.m4: Regenerated.
+	* configure: Ditto.
+	* doc/aclocal.m4: Ditto.
+	* doc/configure: Ditto.
+	* libc/*/aclocal.m4: Ditto.
+	* libc/*/configure: Ditto.
+	* libc/libc.texinfo: Ditto.
+	* libm/*/aclocal.m4: Ditto.
+	* libm/*/configure: Ditto.
+	* libm/libm.texinfo: Ditto.
+	* libc/sys/linux/shared.ld: Add VERS_1.14.
+
+2005-12-16  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/sys/linux/sys/stat.h: Change *stat64 prototypes to
 	take a pointer to struct stat64 rather than struct stat.
 
@@ -111,7 +128,6 @@
 	* libc/sys/linux/sys/unistd.h (readlink, symlink): New
 	prototypes.
 
->>>>>>> 1.843
 2005-11-01  Ralf Corsepius <ralf.corsepius@rtems.org>
 
 	* libc/include/stdint.h: Cleanup #if vs. #ifdef.
