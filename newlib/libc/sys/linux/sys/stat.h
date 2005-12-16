@@ -24,10 +24,10 @@ int     _EXFUN(stat,( const char *__path, struct stat *__sbuf ));
 mode_t  _EXFUN(umask,( mode_t __mask ));
 
 #ifndef _POSIX_SOURCE
-int     _EXFUN(fstat64,( int __fd, struct stat *__sbuf ));
-int	_EXFUN(lstat,( const char *file_name, struct stat *buf));
-int	_EXFUN(lstat64,( const char *file_name, struct stat *buf));
-int     _EXFUN(stat64,( const char *__path, struct stat *__sbuf ));
+int     _EXFUN(fstat64,( int __fd, struct stat64 *__sbuf ));
+int	_EXFUN(lstat,( const char *file_name, struct stat64 *buf));
+int	_EXFUN(lstat64,( const char *file_name, struct stat64 *buf));
+int     _EXFUN(stat64,( const char *__path, struct stat64 *__sbuf ));
 #endif /* _POSIX_SOURCE */
 
 #endif /* _SYS_STAT_H */

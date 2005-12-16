@@ -1,3 +1,8 @@
+2005-12-16  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/sys/stat.h: Change *stat64 prototypes to
+	take a pointer to struct stat64 rather than struct stat.
+
 2005-12-16  Ralf Corsepius <ralf.corsepius@rtems.org>
 
 	* libc/include/stdint.h: Prefer long over int for int32_t.
