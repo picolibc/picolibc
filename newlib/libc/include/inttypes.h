@@ -112,7 +112,7 @@
 #define SCNxFAST16	__SCN16(x)
 
 /* 32-bit types */
-#if defined(__have_long32)
+#if __have_long32
 #define __PRI32(x) __STRINGIFY(l##x)
 #define __SCN32(x) __STRINGIFY(l##x)
 #else
@@ -163,10 +163,10 @@
 
 
 /* 64-bit types */
-#if defined(__have_longlong64)
+#if __have_longlong64
 #define __PRI64(x) __STRINGIFY(ll##x)
 #define __SCN64(x) __STRINGIFY(ll##x)
-#elif defined(__have_long64)
+#elif __have_long64
 #define __PRI64(x) __STRINGIFY(l##x)
 #define __SCN64(x) __STRINGIFY(l##x)
 #else
@@ -217,10 +217,10 @@
 #endif
 
 /* max-bit types */
-#if defined(__have_longlong64)
+#if __have_longlong64
 #define __PRIMAX(x) __STRINGIFY(ll##x)
 #define __SCNMAX(x) __STRINGIFY(ll##x)
-#elif defined(__have_long64)
+#elif __have_long64
 #define __PRIMAX(x) __STRINGIFY(l##x)
 #define __SCNMAX(x) __STRINGIFY(l##x)
 #else
@@ -242,10 +242,10 @@
 #define SCNxMAX		__SCNMAX(x)
 
 /* ptr types */
-#if defined(__have_longlong64)
+#if __have_longlong64
 #define __PRIPTR(x) __STRINGIFY(ll##x)
 #define __SCNPTR(x) __STRINGIFY(ll##x)
-#elif defined(__have_long64)
+#elif __have_long64
 #define __PRIPTR(x) __STRINGIFY(l##x)
 #define __SCNPTR(x) __STRINGIFY(l##x)
 #else
