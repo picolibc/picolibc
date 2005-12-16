@@ -1,3 +1,9 @@
+2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
+
+	Second part of ms1 to mt renaming.
+	* common.h (EM_MT): Renamed.
+	* mt.h: Rename relocs, cpu & other defines.
+
 2005-12-12  Paul Brook  <paul@codesourcery.com>
 
 	* arm.h (elf32_arm_get_eabi_attr_int): Add prototype.

@@ -17,30 +17,30 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software Foundation, Inc.,
 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ifndef _ELF_MS1_H
-#define _ELF_MS1_H
+#ifndef _ELF_MT_H
+#define _ELF_MT_H
 
 #include "elf/reloc-macros.h"
 
 /* Relocations.  */
-START_RELOC_NUMBERS (elf_ms1_reloc_type)
-  RELOC_NUMBER (R_MS1_NONE, 0)
-  RELOC_NUMBER (R_MS1_16, 1)
-  RELOC_NUMBER (R_MS1_32, 2)
-  RELOC_NUMBER (R_MS1_32_PCREL, 3)
-  RELOC_NUMBER (R_MS1_PC16, 4)
-  RELOC_NUMBER (R_MS1_HI16, 5)
-  RELOC_NUMBER (R_MS1_LO16, 6)
-END_RELOC_NUMBERS(R_MS1_max)
+START_RELOC_NUMBERS (elf_mt_reloc_type)
+  RELOC_NUMBER (R_MT_NONE, 0)
+  RELOC_NUMBER (R_MT_16, 1)
+  RELOC_NUMBER (R_MT_32, 2)
+  RELOC_NUMBER (R_MT_32_PCREL, 3)
+  RELOC_NUMBER (R_MT_PC16, 4)
+  RELOC_NUMBER (R_MT_HI16, 5)
+  RELOC_NUMBER (R_MT_LO16, 6)
+END_RELOC_NUMBERS(R_MT_max)
 
-#define EF_MS1_CPU_MRISC	0x00000001	/* default */
-#define EF_MS1_CPU_MRISC2	0x00000002	/* MRISC2 */
-#define EF_MS1_CPU_MS2		0x00000003      /* MS2 */
-#define EF_MS1_CPU_MASK		0x00000003	/* specific cpu bits */
-#define EF_MS1_ALL_FLAGS	(EF_MS1_CPU_MASK)
+#define EF_MT_CPU_MRISC		0x00000001	/* default */
+#define EF_MT_CPU_MRISC2	0x00000002	/* MRISC2 */
+#define EF_MT_CPU_MS2		0x00000003      /* MS2 */
+#define EF_MT_CPU_MASK		0x00000003	/* specific cpu bits */
+#define EF_MT_ALL_FLAGS		(EF_MT_CPU_MASK)
 
 /* The location of the memory mapped hardware stack.  */
-#define MS1_STACK_VALUE 0x0f000000
-#define MS1_STACK_SIZE  0x20
+#define MT_STACK_VALUE 0x0f000000
+#define MT_STACK_SIZE  0x20
 
-#endif /* _ELF_MS1_H */
+#endif /* _ELF_MT_H */

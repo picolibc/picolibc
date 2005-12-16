@@ -1,3 +1,8 @@
+2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
+
+	Second part of ms1 to mt renaming.
+	* dis-asm.h (print_insn_mt): Renamed.
+
 2005-12-12  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* elf/mt.h: Renamed from ms1.h
