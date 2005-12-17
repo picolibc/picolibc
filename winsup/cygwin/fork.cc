@@ -37,11 +37,6 @@ details. */
 /* FIXME: Once things stabilize, bump up to a few minutes.  */
 #define FORK_WAIT_TIMEOUT (300 * 1000)     /* 300 seconds */
 
-#define dll_data_start &_data_start__
-#define dll_data_end &_data_end__
-#define dll_bss_start &_bss_start__
-#define dll_bss_end &_bss_end__
-
 class frok
 {
   dll *first_dll;
@@ -54,60 +49,6 @@ class frok
   int __stdcall child (void *esp);
   friend int fork ();
 };
-
-/* Copy memory from parent to child.
-   The result is a boolean indicating success.  */
-
-static int
-fork_copy (PROCESS_INFORMATION& pi, const char *what, ...)
-{
-  va_list args;
-  char *low;
-  int pass = 0;
-
-  va_start (args, what);
-
-  while ((low = va_arg (args, char *)))
-    {
-      char *high = va_arg (args, char *);
-      DWORD todo = wincap.chunksize () ?: high - low;
-      char *here;
-
-      for (here = low; here < high; here += todo)
-	{
-	  DWORD done = 0;
-	  if (here + todo > high)
-	    todo = high - here;
-	  int res;
-	  if (pi.hThread)
-	    res = WriteProcessMemory (pi.hProcess, here, here, todo, &done);
-	  else
-	    res = ReadProcessMemory (pi.hProcess, here, here, todo, &done);
-	  debug_printf ("child handle %p, low %p, high %p, res %d", pi.hProcess,
-			low, high, res);
-	  if (!res || todo != done)
-	    {
-	      if (!res)
-		__seterrno ();
-	      /* If this happens then there is a bug in our fork
-		 implementation somewhere. */
-	      system_printf ("%s pass %d failed, %p..%p, done %d, windows pid %u, %E",
-			    what, pass, low, high, done, pi.dwProcessId);
-	      goto err;
-	    }
-	}
-
-      pass++;
-    }
-
-  debug_printf ("done");
-  return 1;
-
- err:
-  TerminateProcess (pi.hProcess, 1);
-  set_errno (EAGAIN);
-  return 0;
-}
 
 static int
 resume_child (HANDLE forker_finished)
@@ -197,9 +138,6 @@ frok::child (void *)
   set_file_api_mode (current_codepage);
 
   MALLOC_CHECK;
-
-  if (fixup_mmaps_after_fork (hParent))
-    api_fatal ("recreate_mmaps_after_fork_failed");
 
 #ifdef USE_SERVER
   /* Incredible but true:  If we use sockets and SYSV IPC shared memory,
@@ -367,7 +305,6 @@ frok::parent (void *stack_here)
       goto cleanup;
     }
 
-
   /* Fixup the parent datastructure if needed and resume the child's
      main thread. */
   if (cygheap->fdtab.need_fixup_before ())
@@ -446,22 +383,21 @@ frok::parent (void *stack_here)
 
 
   MALLOC_CHECK;
-  void *impure_beg;
-  void *impure_end;
+  const void *impure_beg;
+  const void *impure_end;
+  const char *impure;
   if (&_my_tls == _main_tls)
-    impure_beg = impure_end = NULL;
+    impure_beg = impure_end = impure = NULL;
   else
     {
+      impure = "impure";
       impure_beg = _impure_ptr;
       impure_end = _impure_ptr + 1;
     }
-  rc = fork_copy (pi, "user/cygwin data",
-		  user_data->data_start, user_data->data_end,
-		  user_data->bss_start, user_data->bss_end,
-		  cygheap->user_heap.base, cygheap->user_heap.ptr,
-		  stack_here, ch.stackbottom,
-		  dll_data_start, dll_data_end,
-		  dll_bss_start, dll_bss_end, impure_beg, impure_end, NULL);
+  rc = child_copy (pi.hProcess, true,
+		   "stack", stack_here, ch.stackbottom,
+		   impure, impure_beg, impure_end,
+		   NULL);
 
   __malloc_unlock ();
   locked = false;
@@ -473,9 +409,10 @@ frok::parent (void *stack_here)
   for (dll *d = dlls.istart (DLL_LINK); d; d = dlls.inext ())
     {
       debug_printf ("copying data/bss of a linked dll");
-      if (!fork_copy (pi, "linked dll data/bss", d->p.data_start, d->p.data_end,
-						 d->p.bss_start, d->p.bss_end,
-						 NULL))
+      if (!child_copy (pi.hProcess, true,
+		       "linked dll data", d->p.data_start, d->p.data_end,
+		       "linked dll bss", d->p.bss_start, d->p.bss_end,
+		       NULL))
 	{
 	  this_errno = get_errno ();
 #ifdef DEBUGGING
@@ -505,9 +442,10 @@ frok::parent (void *stack_here)
       for (dll *d = dlls.istart (DLL_LOAD); d; d = dlls.inext ())
 	{
 	  debug_printf ("copying data/bss for a loaded dll");
-	  if (!fork_copy (pi, "loaded dll data/bss", d->p.data_start, d->p.data_end,
-						     d->p.bss_start, d->p.bss_end,
-						     NULL))
+	  if (!child_copy (pi.hProcess, true,
+			   "loaded dll data", d->p.data_start, d->p.data_end,
+			   "loaded dll bss", d->p.bss_start, d->p.bss_end,
+			   NULL))
 	    {
 	      this_errno = get_errno ();
 #ifdef DEBUGGING
@@ -690,13 +628,52 @@ vfork ()
 #endif
 }
 
-int
-child_copy (HANDLE h, DWORD pid, const char *what, void *child_start, void *child_end)
+/* Copy memory from one process to another. */
+
+bool
+child_copy (HANDLE hp, bool write, ...)
 {
-  PROCESS_INFORMATION pi;
-  pi.hProcess = h;
-  pi.dwProcessId = pid;
-  pi.hThread = NULL;
-  debug_printf ("%s, start %p, end %p", what, child_start, child_end);
-  return fork_copy (pi, what, child_start, child_end, NULL);
+  va_list args;
+  va_start (args, write);
+  static const char *huh[] = {"read", "write"};
+
+  char *what;
+  while ((what = va_arg (args, char *)))
+    {
+      char *low = va_arg (args, char *);
+      char *high = va_arg (args, char *);
+      DWORD todo = wincap.chunksize () ?: high - low;
+      char *here;
+
+      for (here = low; here < high; here += todo)
+	{
+	  DWORD done = 0;
+	  if (here + todo > high)
+	    todo = high - here;
+	  int res;
+	  if (write)
+	    res = WriteProcessMemory (hp, here, here, todo, &done);
+	  else
+	    res = ReadProcessMemory (hp, here, here, todo, &done);
+	  debug_printf ("hp %p, low %p, high %p, res %d", hp, low, high, res);
+	  if (!res || todo != done)
+	    {
+	      if (!res)
+		__seterrno ();
+	      /* If this happens then there is a bug in our fork
+		 implementation somewhere. */
+	      system_printf ("%s %s copy failed, %p..%p, done %d, windows pid %u, %E",
+			    what, huh[write], low, high, done);
+	      goto err;
+	    }
+	}
+    }
+
+  debug_printf ("done");
+  return true;
+
+ err:
+  TerminateProcess (hp, 1);
+  set_errno (EAGAIN);
+  return false;
 }

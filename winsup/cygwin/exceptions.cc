@@ -786,17 +786,12 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
 	  ResumeThread (hth);
 	  break;
 	}
-      if (tls->incyg || tls->spinning || tls->locked ())
-	sigproc_printf ("incyg %d, spinning %d, locked %d\n",
-			tls->incyg, tls->spinning, tls->locked ());
-      else
-	{
-	  cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
-	  if (!GetThreadContext (hth, &cx))
-	    system_printf ("couldn't get context of main thread, %E");
-	  else if (interruptible (cx.Eip))
-	    interrupted = tls->interrupt_now (&cx, sig, handler, siga);
-	}
+      cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
+      if (!GetThreadContext (hth, &cx))
+	system_printf ("couldn't get context of main thread, %E");
+      else if (interruptible (cx.Eip) &&
+	       !(tls->incyg || tls->spinning || tls->locked ()))
+	interrupted = tls->interrupt_now (&cx, sig, handler, siga);
 
       res = ResumeThread (hth);
       if (interrupted)

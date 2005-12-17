@@ -635,6 +635,35 @@ get_cygwin_startup_info ()
   return res;
 }
 
+#define dll_data_start &_data_start__
+#define dll_data_end &_data_end__
+#define dll_bss_start &_bss_start__
+#define dll_bss_end &_bss_end__
+
+void
+handle_fork ()
+{
+  alloc_stack (fork_info);
+  cygheap_fixup_in_child (false);
+  memory_init ();
+  set_myself (NULL);
+  HANDLE hp = fork_info->parent;
+  child_copy (hp, false,
+	      "dll data", dll_data_start, dll_data_end,
+	      "dll bss", dll_bss_start, dll_bss_end,
+	      "user heap", cygheap->user_heap.base, cygheap->user_heap.ptr,
+	      NULL);
+  /* step 2 now that the dll has its heap filled in, we can fill in the
+     user's data and bss since user_data is now filled out. */
+  child_copy (hp, false,
+	      "data", user_data->data_start, user_data->data_end,
+	      "bss", user_data->bss_start, user_data->bss_end,
+	      NULL);
+
+  if (fixup_mmaps_after_fork (hp))
+    api_fatal ("recreate_mmaps_after_fork_failed");
+}
+
 void __stdcall
 dll_crt0_0 ()
 {
@@ -675,10 +704,7 @@ dll_crt0_0 ()
       switch (child_proc_info->type)
 	{
 	  case _PROC_FORK:
-	    alloc_stack (fork_info);
-	    cygheap_fixup_in_child (false);
-	    memory_init ();
-	    set_myself (NULL);
+	    handle_fork ();
 	    break;
 	  case _PROC_SPAWN:
 	  case _PROC_EXEC:
@@ -937,7 +963,9 @@ _dll_crt0 ()
     system_printf ("internal error: couldn't determine location of thread function on stack.  Expect signal problems.");
 
   main_environ = user_data->envptr;
+#if 0
   *main_environ = NULL;
+#endif
 
   char padding[CYGTLS_PADSIZE];
 
@@ -954,7 +982,7 @@ void
 dll_crt0 (per_process *uptr)
 {
   /* Set the local copy of the pointer into the user space. */
-  if (uptr && uptr != user_data)
+  if (!user_data->forkee && uptr && uptr != user_data)
     {
       memcpy (user_data, uptr, per_process_overwrite);
       *(user_data->impure_ptr_ptr) = _GLOBAL_REENT;
@@ -989,7 +1017,9 @@ cygwin_dll_init ()
   user_data->fmode_ptr = &_fmode;
 
   main_environ = user_data->envptr;
+#if 0
   *main_environ = NULL;
+#endif
   initialize_main_tls((char *)&_my_tls);
   dll_crt0_1 (NULL);
 }

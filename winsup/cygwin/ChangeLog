@@ -1,5 +1,32 @@
 2005-12-16  Christopher Faylor  <cgf@timesys.com>
 
+	* winsup.h (child_copy): Change prototype to match new functionality.
+	* cygheap.cc (cygheap_fixup_in_child): Accommodate new child_copy
+	arguments.
+	* dcrt0.cc (dll_data_start): Move definition here from fork.
+	(dll_data_end): Ditto.
+	(dll_bss_start): Ditto.
+	(dll_bss_end): Ditto.
+	(handle_fork): New function.  Called when forked to deal with fork
+	issues and copy data to this process from the parent.
+	(dll_crt0_0): Call handle_fork when _PROC_FORK condition.
+	(dll_crt0): Don't copy user_data when we've forked.  Don't zero first
+	element of main_environment ever.
+	(cygwin_dll_init): Ditto.
+	* fork.cc (child_copy): Rename from fork_copy and change arguments so
+	that each pair of things to copy gets its own descriptor.
+	(frok::child): Remove fixup_mmaps_after_fork call here.  Move to
+	handle_fork in dcrt0.cc.
+	(frok::parent): Use child_copy rather than fork_copy and accommodate
+	changes in parameters.
+
+	* exceptions.cc (setup_handler): Delay test of whether we're locked
+	until after GetThreadContext has been called since there are apparently
+	cases where SuspendThread does not cause an immediate thread
+	suspension.
+
+2005-12-16  Christopher Faylor  <cgf@timesys.com>
+
 	* init.cc (dll_entry): Call prime_threads after dll_crt0_0 to avoid
 	conflicts between heap allocation and thread stack allocation.
 
