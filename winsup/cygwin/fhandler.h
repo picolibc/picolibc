@@ -515,6 +515,7 @@ public:
   void create_guard (SECURITY_ATTRIBUTES *sa) {guard = CreateMutex (sa, FALSE, NULL);}
   int dup (fhandler_base *child);
   int ioctl (unsigned int cmd, void *);
+  void fixup_in_child ();
   virtual void fixup_after_fork (HANDLE);
   void fixup_after_exec ();
   bool hit_eof ();
@@ -864,6 +865,7 @@ class fhandler_console: public fhandler_termios
 {
  private:
   static dev_console *dev_state;
+  static bool invisible_console;
 
 /* Output calls */
   void set_default_attr ();
@@ -917,6 +919,8 @@ class fhandler_console: public fhandler_termios
   void send_winch_maybe ();
   static tty_min *get_tty_stuff (int);
   bool is_slow () {return 1;}
+  static bool need_invisible ();
+  static bool fhandler_console::has_a () {return !invisible_console;}
 };
 
 class fhandler_tty_common: public fhandler_termios
@@ -1360,6 +1364,6 @@ class select_stuff
 		   device_specific_mailslot (0) {}
 };
 
-int __stdcall set_console_state_for_spawn ();
+void __stdcall set_console_state_for_spawn ();
 
 #endif /* _FHANDLER_H_ */

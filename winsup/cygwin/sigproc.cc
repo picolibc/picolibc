@@ -845,7 +845,7 @@ child_info::sync (pid_t pid, HANDLE& hProcess, DWORD howlong)
     {
       if (type == _PROC_EXEC && x == nsubproc_ready && myself->wr_proc_pipe)
 	{
-	  ForceCloseHandle1 (hProcess, childhProcess);
+	  ForceCloseHandle1 (hProcess, childhProc);
 	  hProcess = NULL;
 	}
       sigproc_printf ("process %d synchronized, WFMO returned %d", pid, x);

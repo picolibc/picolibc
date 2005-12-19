@@ -576,52 +576,8 @@ fhandler_tty_slave::open (int flags, mode_t)
 
   set_open_status ();
   if (cygheap->manage_console_count ("fhandler_tty_slave::open", 1) == 1
-      && !GetConsoleCP () && !output_done_event
-      && wincap.pty_needs_alloc_console ())
-    {
-      BOOL b;
-      HWINSTA h, horig;
-      /* The intent here is to allocate an "invisible" console if we have no
-	 controlling tty or to reuse the existing console if we already have
-	 a tty.  So, first get the old windows station.  If there is no controlling
-	 terminal, create a new windows station and then set it as the current
-	 windows station.  The subsequent AllocConsole will then be allocated
-	 invisibly.  But, after doing that we have to restore any existing windows
-	 station or, strangely, characters will not be displayed in any windows
-	 drawn on the current screen.  We only do this if we have changed to
-	 a new windows station and if we had an existing windows station previously.
-	 We also close the previously opened work station even though AllocConsole
-	 is now "using" it.  This doesn't seem to cause any problems.
-
-	 Things to watch out for if you make changes in this code:
-
-	 - Flashing, black consoles showing up when you start, e.g., ssh in
-	   an xterm.
-	 - Non-displaying of characters in rxvt or xemacs if you start a
-	   process using setsid: bash -lc "setsid rxvt".  */
-
-      h = horig = GetProcessWindowStation ();
-      if (myself->ctty == -1)
-        {
-	  h = CreateWindowStation (NULL, 0, WINSTA_ALL_ACCESS, &sec_none_nih);
-	  termios_printf ("CreateWindowStation %p, %E", h);
-	  if (h)
-	    {
-	      b = SetProcessWindowStation (h);
-	      termios_printf ("SetProcessWindowStation %d, %E", b);
-	    }
-	}
-      b = AllocConsole ();	// will cause flashing if workstation
-				// stuff fails
-      if (horig && h && h != horig)
-	{
-	  SetProcessWindowStation (horig);
-	  CloseHandle (h);
-	}
-      termios_printf ("%d = AllocConsole (), %E", b);
-      if (b)
-	init_console_handler (TRUE);
-    }
+      && !output_done_event && fhandler_console::need_invisible ())
+    init_console_handler (TRUE);
 
   // FIXME: Do this better someday
   arch = (fhandler_tty_slave *) cmalloc (HEAP_ARCHETYPES, sizeof (*this));

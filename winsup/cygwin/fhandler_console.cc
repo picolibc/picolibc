@@ -142,15 +142,18 @@ tty_list::get_tty (int n)
 /* Determine if a console is associated with this process prior to a spawn.
    If it is, then we'll return 1.  If the console has been initialized, then
    set it into a more friendly state for non-cygwin apps. */
-int __stdcall
+void __stdcall
 set_console_state_for_spawn ()
 {
+  if (fhandler_console::need_invisible ())
+    return;
+
   HANDLE h = CreateFile ("CONIN$", GENERIC_READ, FILE_SHARE_WRITE,
 			 &sec_none_nih, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
 			 NULL);
 
   if (h == INVALID_HANDLE_VALUE)
-    return 0;
+    return;
 
   if (shared_console_info != NULL)
     {
@@ -160,7 +163,8 @@ set_console_state_for_spawn ()
     }
 
   CloseHandle (h);
-  return 1;
+
+  return;
 }
 
 /* The results of GetConsoleCP() and GetConsoleOutputCP() cannot be
@@ -1799,4 +1803,58 @@ fhandler_console::fixup_after_fork_exec (bool execing)
       CloseHandle (h);
       CloseHandle (oh);
     }
+}
+
+bool NO_COPY fhandler_console::invisible_console;
+
+bool
+fhandler_console::need_invisible ()
+{
+  BOOL b = false;
+  if (GetConsoleCP () || !wincap.pty_needs_alloc_console ())
+    invisible_console = false;
+  else
+    {
+      HWINSTA h, horig;
+      /* The intent here is to allocate an "invisible" console if we have no
+	 controlling tty or to reuse the existing console if we already have
+	 a tty.  So, first get the old windows station.  If there is no controlling
+	 terminal, create a new windows station and then set it as the current
+	 windows station.  The subsequent AllocConsole will then be allocated
+	 invisibly.  But, after doing that we have to restore any existing windows
+	 station or, strangely, characters will not be displayed in any windows
+	 drawn on the current screen.  We only do this if we have changed to
+	 a new windows station and if we had an existing windows station previously.
+	 We also close the previously opened work station even though AllocConsole
+	 is now "using" it.  This doesn't seem to cause any problems.
+
+	 Things to watch out for if you make changes in this code:
+
+	 - Flashing, black consoles showing up when you start, e.g., ssh in
+	   an xterm.
+	 - Non-displaying of characters in rxvt or xemacs if you start a
+	   process using setsid: bash -lc "setsid rxvt".  */
+
+      h = horig = GetProcessWindowStation ();
+      if (myself->ctty == -1)
+	{
+	  h = CreateWindowStation (NULL, 0, WINSTA_ALL_ACCESS, &sec_none_nih);
+	  termios_printf ("CreateWindowStation %p, %E", h);
+	  if (h)
+	    {
+	      b = SetProcessWindowStation (h);
+	      termios_printf ("SetProcessWindowStation %d, %E", b);
+	    }
+	}
+      b = AllocConsole ();	// will cause flashing if workstation
+				// stuff fails
+      debug_printf ("h (%p), horig (%p)", h, horig);
+      if (0 && horig && h && h != horig && SetProcessWindowStation (horig))
+	CloseHandle (h);
+      termios_printf ("%d = AllocConsole (), %E", b);
+      invisible_console = true;
+    }
+
+  debug_printf ("invisible_console %d", invisible_console);
+  return b;
 }

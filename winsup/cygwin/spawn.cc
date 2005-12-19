@@ -200,17 +200,20 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
 /* Utility for spawn_guts.  */
 
 static HANDLE
-handle (int n, int direction)
+handle (int fd, int direction)
 {
-  fhandler_base *fh = cygheap->fdtab[n];
+  HANDLE h;
+  cygheap_fdget cfd (fd);
 
-  if (!fh)
-    return INVALID_HANDLE_VALUE;
-  if (fh->close_on_exec ())
-    return INVALID_HANDLE_VALUE;
-  if (direction == 0)
-    return fh->get_handle ();
-  return fh->get_output_handle ();
+  if (cfd < 0)
+    h = INVALID_HANDLE_VALUE;
+  else if (cfd->close_on_exec ())
+    h = INVALID_HANDLE_VALUE;
+  else if (direction == 0)
+    h = cfd->get_handle ();
+  else
+    h = cfd->get_output_handle ();
+  return h;
 }
 
 int
@@ -580,7 +583,9 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   sigproc_printf ("priority class %d", flags);
   flags |= CREATE_DEFAULT_ERROR_MODE | CREATE_SEPARATE_WOW_VDM;
 
-  if (mode == _P_DETACH || !set_console_state_for_spawn ())
+  set_console_state_for_spawn ();
+
+  if (mode == _P_DETACH)
     flags |= DETACHED_PROCESS;
 
   if (mode != _P_OVERLAY)

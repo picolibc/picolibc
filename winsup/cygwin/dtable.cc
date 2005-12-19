@@ -160,9 +160,10 @@ dtable::stdio_init ()
 
   init_std_file_from_handle (1, out);
   init_std_file_from_handle (2, err);
+
   /* Assign the console as the controlling tty for this process if we actually
      have a console and no other controlling tty has been assigned. */
-  if (myself->ctty < 0 && GetConsoleCP () > 0)
+  if (!fhandler_console::need_invisible () && myself->ctty < 0)
     set_console_ctty ();
 }
 

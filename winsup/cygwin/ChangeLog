@@ -1,5 +1,29 @@
 2005-12-18  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler.h (fhandler_pipe::fixup_in_child): Declare new function.
+	(fhandler_console::invisible_console): Declare new variable.
+	(fhandler_console::need_invisible): Ditto.
+	(fhandler_console::has_a): Ditto.
+	* fhandler_console.cc (set_console_state_for_spawn): Eliminate return
+	value.  Set up an invisible console if necessary prior to spawning.
+	(fhandler_console::invisible_console): Define.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Use
+	fhandler_console::invisible_console to setup an invisible console.
+	* pipe.cc (fhandler_pipe::fixup_in_child): Define new function from
+	fixup_after_exec.
+	(fhandler_pipe::fixup_after_exec): Use fixup_in_child when appropriate.
+	(fhandler_pipe::fixup_after_fork): Ditto.
+	* spawn.cc (handle): Reorganize and modernize a little.
+	(spawn_guts): Rely on set_console_state_for_spawn to set the console
+	into the right state but don't create the process with "detached" flag
+	if we have no controlling tty since that confuses 'cmd'.
+	* dtable.cc (dtable::stdio_init): Don't set console as controlling
+	terminal if we have an invisible console.
+
+	* sigproc.cc (child_info::sync): Use correct name in ForceCloseHandle1.
+
+2005-12-18  Christopher Faylor  <cgf@timesys.com>
+
 	* include/sys/dirent.h: Change __deprecated_d_ino to __invalid_d_ino
 	throughout to make things a little clearer.
 	* dir.cc (readdir_worker): Reflect above change.
