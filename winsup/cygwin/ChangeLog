@@ -1,7 +1,8 @@
 2005-12-18  Christopher Faylor  <cgf@timesys.com>
 
-	* fhandler.h (fhandler_pipe::fixup_in_child): Declare new function.
-	(fhandler_console::invisible_console): Declare new variable.
+	* fhandler.h (fhandler_console::invisible_console): Declare new
+	variable.
+	(fhandler_pipe::fixup_in_child): Declare new function.
 	(fhandler_console::need_invisible): Ditto.
 	(fhandler_console::has_a): Ditto.
 	* fhandler_console.cc (set_console_state_for_spawn): Eliminate return
