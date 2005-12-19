@@ -1629,7 +1629,7 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
 	    __seterrno ();
 	  else
 	    {
-	      VirtualFree (base, len, MEM_RELEASE);
+	      VirtualFree (base, 0, MEM_RELEASE);
 	      set_errno (EINVAL);
 	      debug_printf ("VirtualAlloc: address shift with MAP_FIXED given");
 	    }
@@ -1671,7 +1671,7 @@ int
 fhandler_dev_zero::munmap (HANDLE h, caddr_t addr, size_t len)
 {
   if (h == (HANDLE) 1)	/* See fhandler_dev_zero::mmap. */
-    VirtualFree (addr, len, MEM_RELEASE);
+    VirtualFree (addr, 0, MEM_RELEASE);
   else
     {
       UnmapViewOfFile (addr);
