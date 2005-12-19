@@ -583,8 +583,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   sigproc_printf ("priority class %d", flags);
   flags |= CREATE_DEFAULT_ERROR_MODE | CREATE_SEPARATE_WOW_VDM;
 
-  set_console_state_for_spawn ();
-
   if (mode == _P_DETACH)
     flags |= DETACHED_PROCESS;
 
@@ -612,6 +610,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	ProtectHandle (cygheap->pid_handle);
       else
 	system_printf ("duplicate to pid_handle failed, %E");
+      set_console_state_for_spawn (real_path.iscygexec ());
     }
 
   /* Some file types (currently only sockets) need extra effort in the parent

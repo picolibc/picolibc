@@ -1,3 +1,14 @@
+2005-12-19  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler.h (set_console_state_for_spawn): Add an argument to the
+	declaration.
+	* fhandler_console.cc (set_console_state_for_spawn): Ditto for the
+	definition.  Only set invisible console for non-cygwin process.  Remove
+	debugging leftover.
+	* spawn.cc (spawn_guts): Pass argument denoting whether this is a
+	cygwin process to set_console_state_for_spawn and only call this
+	function when exec'ing.
+
 2005-12-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (fhandler_dev_zero::mmap): Call VirtualFree(MEM_RELEASE)

@@ -138,14 +138,13 @@ tty_list::get_tty (int n)
     return &nada;
 }
 
-
 /* Determine if a console is associated with this process prior to a spawn.
    If it is, then we'll return 1.  If the console has been initialized, then
    set it into a more friendly state for non-cygwin apps. */
 void __stdcall
-set_console_state_for_spawn ()
+set_console_state_for_spawn (bool noncygwin_process)
 {
-  if (fhandler_console::need_invisible ())
+  if (noncygwin_process && fhandler_console::need_invisible ())
     return;
 
   HANDLE h = CreateFile ("CONIN$", GENERIC_READ, FILE_SHARE_WRITE,
@@ -1849,7 +1848,7 @@ fhandler_console::need_invisible ()
       b = AllocConsole ();	// will cause flashing if workstation
 				// stuff fails
       debug_printf ("h (%p), horig (%p)", h, horig);
-      if (0 && horig && h && h != horig && SetProcessWindowStation (horig))
+      if (horig && h && h != horig && SetProcessWindowStation (horig))
 	CloseHandle (h);
       termios_printf ("%d = AllocConsole (), %E", b);
       invisible_console = true;
