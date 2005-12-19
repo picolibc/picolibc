@@ -103,18 +103,18 @@ readdir_worker (DIR *dir, dirent *de)
   if (!res)
     if (!CYGWIN_VERSION_CHECK_FOR_NEEDS_D_INO)
       {
-	de->__deprecated_d_ino = 0;
+	de->__invalid_d_ino = 0;
 	de->__ino32 = 0;
       }
     else
       {
-	/* Compute __deprecated_d_ino by combining filename hash with the directory hash
+	/* Compute __invalid_d_ino by combining filename hash with the directory hash
 	   (which was stored in dir->__d_dirhash when opendir was called). */
 	if (de->d_name[0] == '.')
 	  {
 	    if (de->d_name[1] == '\0')
 	      {
-		de->__deprecated_d_ino = dir->__d_dirhash;
+		de->__invalid_d_ino = dir->__d_dirhash;
 		dir->__flags |= dirent_saw_dot;
 	      }
 	    else if (de->d_name[1] != '.' || de->d_name[2] != '\0')
@@ -128,11 +128,11 @@ readdir_worker (DIR *dir, dirent *de)
 		  goto hashit;
 		*p = '\0';
 		if (!(p = strrchr (up, '\\')))
-		  de->__deprecated_d_ino = hash_path_name (0, ".");
+		  de->__invalid_d_ino = hash_path_name (0, ".");
 		else
 		  {
 		    *p = '\0';
-		    de->__deprecated_d_ino = hash_path_name (0, up);
+		    de->__invalid_d_ino = hash_path_name (0, up);
 		  }
 	      }
 	  }
@@ -140,9 +140,9 @@ readdir_worker (DIR *dir, dirent *de)
 	  {
 	hashit:
 	    __ino64_t dino = hash_path_name (dir->__d_dirhash, "\\");
-	    de->__deprecated_d_ino = hash_path_name (dino, de->d_name);
+	    de->__invalid_d_ino = hash_path_name (dino, de->d_name);
 	  }
-	de->__ino32 = de->__deprecated_d_ino;	// for legacy applications
+	de->__ino32 = de->__invalid_d_ino;	// for legacy applications
       }
   return res;
 }
