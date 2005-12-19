@@ -1,3 +1,7 @@
+2005-12-19  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
+
+	* dump_setup.cc (package_find): Fix is_alias computation for "/usr/lib".
+
 2005-12-14  Christopher Faylor  <cgf@timesys.com>
 
 	* cygcheck.cc (common_apps): Add a few more binaries to look for.

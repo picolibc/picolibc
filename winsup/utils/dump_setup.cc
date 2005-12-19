@@ -478,7 +478,7 @@ package_find (int verbose, char **argv)
 	    {
 	      // FIXME: verify that /bin is mounted on /usr/bin; ditto for /lib
 	      bool is_alias = !strncmp(filename, "/usr/bin/", 9) ||
-			      !strncmp(filename, "/usr/lib", 9);
+			      !strncmp(filename, "/usr/lib/", 9);
 	      int a = match_argv (argv, filename);
 	      if (!a && is_alias)
 		a = match_argv (argv, filename + 4);
