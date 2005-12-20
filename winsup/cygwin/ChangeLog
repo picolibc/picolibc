@@ -1,5 +1,12 @@
 2005-12-19  Christopher Faylor  <cgf@timesys.com>
 
+	* cygtls.h (_cygtls::interrupt_now): Subsume interruptible().
+	(interruptible): Delete.
+	(setup_handler): Remove interruptible call and just use return from
+	interrupt_now.
+
+2005-12-19  Christopher Faylor  <cgf@timesys.com>
+
 	* fhandler.h (set_console_state_for_spawn): Add an argument to the
 	declaration.
 	* fhandler_console.cc (set_console_state_for_spawn): Ditto for the

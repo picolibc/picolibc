@@ -659,14 +659,16 @@ sig_handle_tty_stop (int sig)
 }
 
 bool
-interruptible (DWORD pc)
+_cygtls::interrupt_now (CONTEXT *cx, int sig, void *handler,
+			struct sigaction& siga)
 {
   int res;
+  bool interrupted;
   MEMORY_BASIC_INFORMATION m;
 
   memset (&m, 0, sizeof m);
-  if (!VirtualQuery ((LPCVOID) pc, &m, sizeof m))
-    sigproc_printf ("couldn't get memory info, pc %p, %E", pc);
+  if (!VirtualQuery ((LPCVOID) cx->Eip, &m, sizeof m))
+    sigproc_printf ("couldn't get memory info, pc %p, %E", cx->Eip);
 
   char *checkdir = (char *) alloca (windows_system_directory_length + 4);
   memset (checkdir, 0, sizeof (checkdir));
@@ -684,10 +686,22 @@ interruptible (DWORD pc)
   else
     res = !strncasematch (windows_system_directory, checkdir,
 			  windows_system_directory_length);
-  sigproc_printf ("pc %p, h %p, interruptible %d", pc, h, res);
+  sigproc_printf ("pc %p, h %p, interruptible %d", cx->Eip, h, res);
 # undef h
-  return res;
+
+  if (!res || (incyg || spinning || locked ()))
+    interrupted = false;
+  else
+    {
+      push ((__stack_t) cx->Eip);
+      interrupt_setup (sig, handler, siga);
+      cx->Eip = pop ();
+      SetThreadContext (*this, cx); /* Restart the thread in a new location */
+      interrupted = true;
+    }
+  return interrupted;
 }
+
 void __stdcall
 _cygtls::interrupt_setup (int sig, void *handler, struct sigaction& siga)
 {
@@ -709,17 +723,6 @@ _cygtls::interrupt_setup (int sig, void *handler, struct sigaction& siga)
   proc_subproc (PROC_CLEARWAIT, 1);
   sigproc_printf ("armed signal_arrived %p, sig %d, res %d", signal_arrived,
 		  sig, res);
-}
-
-bool
-_cygtls::interrupt_now (CONTEXT *ctx, int sig, void *handler,
-			struct sigaction& siga)
-{
-  push ((__stack_t) ctx->Eip);
-  interrupt_setup (sig, handler, siga);
-  ctx->Eip = pop ();
-  SetThreadContext (*this, ctx); /* Restart the thread in a new location */
-  return 1;
 }
 
 extern "C" void __stdcall
@@ -789,8 +792,7 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
       cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
       if (!GetThreadContext (hth, &cx))
 	system_printf ("couldn't get context of main thread, %E");
-      else if (interruptible (cx.Eip) &&
-	       !(tls->incyg || tls->spinning || tls->locked ()))
+      else
 	interrupted = tls->interrupt_now (&cx, sig, handler, siga);
 
       res = ResumeThread (hth);
