@@ -309,7 +309,10 @@ DWORD nice_to_winprio (int &) __attribute__ ((regparm (1)));
 bool __stdcall create_pipe (PHANDLE hr, PHANDLE, LPSECURITY_ATTRIBUTES, DWORD)
   __attribute__ ((regparm (3)));
 #define CreatePipe create_pipe
-bool __stdcall flush_file_buffers (HANDLE h) __attribute__ ((regparm (1)));
+inline bool flush_file_buffers (HANDLE h)
+{
+  return (GetFileType (h) != FILE_TYPE_PIPE) ? FlushFileBuffers (h) : true;
+}
 #define FlushFileBuffers flush_file_buffers
 
 /**************************** Exports ******************************/

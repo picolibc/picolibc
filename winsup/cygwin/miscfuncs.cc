@@ -361,14 +361,3 @@ create_pipe (PHANDLE hr,PHANDLE hw, LPSECURITY_ATTRIBUTES sa, DWORD n)
       break;
   return false;
 }
-
-#undef FlushFileBuffers
-bool
-flush_file_buffers (HANDLE h)
-{
-  DWORD ftype = GetFileType (h);
-  /* Per MSDN, FlushFileBuffers on named pipes might block.  This is the last
-     we want it to do, especially when printing debug output  as when calling
-     system_printf. */
-  return (ftype != FILE_TYPE_PIPE) ? FlushFileBuffers (h) : true;
-}
