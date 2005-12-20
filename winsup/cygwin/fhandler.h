@@ -777,7 +777,7 @@ class fhandler_termios: public fhandler_base
   virtual DWORD __acquire_output_mutex (const char *fn, int ln, DWORD ms) {return 1;}
   virtual void __release_output_mutex (const char *fn, int ln) {}
   void fixup_after_fork (HANDLE);
-  void fixup_after_exec () { fixup_after_fork (NULL); }
+  void fixup_after_exec ();
   void echo_erase (int force = 0);
   virtual _off64_t lseek (_off64_t, int);
 };

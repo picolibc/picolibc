@@ -1,3 +1,9 @@
+2005-12-20  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler.h (fhandler_termios::fixup_after_exec): Make non-inlined.
+	* fhandler_termios.cc (fhandler_termios::fixup_after_exec): Don't call
+	fixup_after_fork if close_on_exec'ed.
+
 2005-12-19  Christopher Faylor  <cgf@timesys.com>
 
 	* cygtls.h (_cygtls::interrupt_now): Subsume interruptible().

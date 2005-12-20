@@ -358,6 +358,13 @@ fhandler_termios::line_edit (const char *rptr, int nread, termios& ti)
 }
 
 void
+fhandler_termios::fixup_after_exec ()
+{
+  if (!close_on_exec ())
+    fixup_after_fork (NULL);
+}
+
+void
 fhandler_termios::fixup_after_fork (HANDLE parent)
 {
   fhandler_base::fixup_after_fork (parent);
