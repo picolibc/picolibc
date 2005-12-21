@@ -96,8 +96,7 @@ init_cygheap::manage_console_count (const char *something, int amount, bool avoi
   console_count += amount;
   debug_printf ("%s: console_count %d, amount %d, %s, avoid_freeing_console %d",
 		something, console_count, amount, myctty (), avoid_freeing_console);
-  if (wincap.pty_needs_alloc_console () && !avoid_freeing_console && amount <= 0
-      && !console_count && myself->ctty == -1)
+  if (!avoid_freeing_console && amount <= 0 && !console_count && myself->ctty == -1)
     {
       FreeConsole ();
       debug_printf ("freed console");

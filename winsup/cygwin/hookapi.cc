@@ -151,13 +151,15 @@ makename (const char *name, char *&buf, int& i, int inc)
 
 // Top level routine to find the EXE's imports, and redirect them
 void *
-hook_or_detect_cygwin (const char *name, const void *fn)
+hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys)
 {
   HMODULE hm = fn ? GetModuleHandle (NULL) : (HMODULE) name;
   PIMAGE_NT_HEADERS pExeNTHdr = PEHeaderFromHModule (hm);
 
   if (!pExeNTHdr)
     return false;
+
+  subsys =  pExeNTHdr->OptionalHeader.Subsystem;
 
   DWORD importRVA = pExeNTHdr->OptionalHeader.DataDirectory
 		      [IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;

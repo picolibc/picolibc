@@ -294,8 +294,9 @@ class av
  public:
   int argc;
   bool win16_exe;
-  av (): argv (NULL) {}
-  av (int ac_in, const char * const *av_in) : calloced (0), argc (ac_in), win16_exe (false)
+  bool iscui;
+  av (): argv (NULL), iscui (false) {}
+  av (int ac_in, const char * const *av_in) : calloced (0), argc (ac_in), win16_exe (false), iscui (false)
   {
     argv = (char **) cmalloc (HEAP_1_ARGV, (argc + 5) * sizeof (char *));
     memcpy (argv, av_in, (argc + 1) * sizeof (char *));
@@ -578,6 +579,11 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   si.hStdOutput = handle (1, 1); /* Get output handle */
   si.hStdError = handle (2, 1); /* Get output handle */
   si.cb = sizeof (si);
+  if (!wincap.pty_needs_alloc_console () && newargv.iscui && !GetConsoleCP ())
+    {
+      si.dwFlags |= STARTF_USESHOWWINDOW;
+      si.wShowWindow = SW_HIDE;
+    }
 
   int flags = GetPriorityClass (hMainProc);
   sigproc_printf ("priority class %d", flags);
@@ -1060,11 +1066,13 @@ av::fixup (child_info_types chtype, const char *prog_arg, path_conv& real_path, 
 	  }
 	if (buf[0] == 'M' && buf[1] == 'Z')
 	  {
+	    WORD subsys;
 	    unsigned off = (unsigned char) buf[0x18] | (((unsigned char) buf[0x19]) << 8);
 	    win16_exe = off < sizeof (IMAGE_DOS_HEADER);
 	    if (!win16_exe)
-	      real_path.set_cygexec (!!hook_or_detect_cygwin (buf, NULL));
+	      real_path.set_cygexec (!!hook_or_detect_cygwin (buf, NULL, subsys));
 	    UnmapViewOfFile (buf);
+	    iscui = subsys == IMAGE_SUBSYSTEM_WINDOWS_CUI;
 	    break;
 	  }
       }

@@ -295,7 +295,8 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	{
 	  const char *name = va_arg (arg, const char *);
 	  const void *hookfn = va_arg (arg, const void *);
-	  return (unsigned long) hook_or_detect_cygwin (name, hookfn);
+	  WORD subsys;
+	  return (unsigned long) hook_or_detect_cygwin (name, hookfn, subsys);
 	}
       case CW_ARGV:
 	{

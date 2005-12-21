@@ -1,5 +1,19 @@
 2005-12-21  Christopher Faylor  <cgf@timesys.com>
 
+	* cygheap.cc (init_cygheap::manage_console_count): Revert previous
+	change.  Handle this a different way.
+	* external.cc (cygwin_internal): Accommodate extra
+	hook_or_detect_cygwin argument.
+	* hookapi.cc (cygwin_internal): Fill in subsys variable with the
+	subsystem of the executable.
+	* spawn.cc (av::iscui): New variable.
+	(spawn_guts): Hide window when we don't have a console and this isn't
+	NT/XP/2003.
+	(av::fixup): Set iscui flag.
+	* winsup.h (hook_or_detect_cygwin): Accommodate extra argument.
+
+2005-12-21  Christopher Faylor  <cgf@timesys.com>
+
 	* cygheap.cc (init_cygheap::manage_console_count): Don't call
 	FreeConsole on 9x/Me.
 
