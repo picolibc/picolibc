@@ -469,6 +469,8 @@ PostQuitMessage@4
 PostThreadMessageA@16
 PostThreadMessageW@16
 PrintWindow@12
+PrivateExtractIconsA@32
+PrivateExtractIconsW@32
 PtInRect@12
 RealChildWindowFromPoint@12
 RealGetWindowClassA@12
