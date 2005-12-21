@@ -1,5 +1,9 @@
 2005-12-21  Christopher Faylor  <cgf@timesys.com>
 
+	* pinfo.cc (pinfo::init): Remove spurious low_priority_sleep.
+
+2005-12-21  Christopher Faylor  <cgf@timesys.com>
+
 	* spawn.cc (spawn_guts): Hide the window whenever ctty == -1, not just
 	when we have no console.
 
