@@ -569,13 +569,9 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
 	 new ACL with these useless permissions results in a potentially
 	 broken symlink.  So what we do here is to set the underlying
 	 permissions of symlinks to a sensible value which allows the
-	 world to read the symlink and only the new owner to change it.
-	 As for the execute permissions... they *seem* to be not
-	 necessary, but for the sake of comleteness and to avoid
-	 struggling with yet another Windows weirdness, the execute bits
-	 are added as well.  */
+	 world to read the symlink and only the new owner to change it. */
       if (pc.issymlink ())
-        attrib = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
+        attrib = S_IFLNK | STD_RBITS | STD_WBITS;
       res = set_file_attribute (pc.has_acls (), get_io_handle (), pc,
 				uid, gid, attrib);
     }

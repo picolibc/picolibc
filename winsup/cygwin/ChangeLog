@@ -1,5 +1,10 @@
 2005-12-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* (fhandler_disk_file::fchown): Remove execute bits from "sensible"
+	permissions.  Use same setting as in symlink.
+
+2005-12-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Fix inode number
 	debug output.
 	(fhandler_disk_file::fchown): Always set sensible permission values 
