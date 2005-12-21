@@ -1,3 +1,8 @@
+2005-12-21  Christopher Faylor  <cgf@timesys.com>
+
+	* cygheap.cc (init_cygheap::manage_console_count): Don't call
+	FreeConsole on 9x/Me.
+
 2005-12-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* (fhandler_disk_file::fchown): Remove execute bits from "sensible"
