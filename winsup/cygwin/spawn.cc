@@ -579,7 +579,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   si.hStdOutput = handle (1, 1); /* Get output handle */
   si.hStdError = handle (2, 1); /* Get output handle */
   si.cb = sizeof (si);
-  if (!wincap.pty_needs_alloc_console () && newargv.iscui && !GetConsoleCP ())
+  if (!wincap.pty_needs_alloc_console () && newargv.iscui && myself->ctty == -1)
     {
       si.dwFlags |= STARTF_USESHOWWINDOW;
       si.wShowWindow = SW_HIDE;

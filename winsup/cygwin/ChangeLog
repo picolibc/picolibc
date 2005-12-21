@@ -1,5 +1,10 @@
 2005-12-21  Christopher Faylor  <cgf@timesys.com>
 
+	* spawn.cc (spawn_guts): Hide the window whenever ctty == -1, not just
+	when we have no console.
+
+2005-12-21  Christopher Faylor  <cgf@timesys.com>
+
 	* cygheap.cc (init_cygheap::manage_console_count): Revert previous
 	change.  Handle this a different way.
 	* external.cc (cygwin_internal): Accommodate extra
