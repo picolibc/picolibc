@@ -452,9 +452,9 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
     }
 
  done:
-  syscall_printf ("0 = fstat (, %p) st_atime=%x st_size=%D, st_mode=%p, st_ino=%d, sizeof=%d",
+  syscall_printf ("0 = fstat (, %p) st_atime=%x st_size=%D, st_mode=%p, st_ino=%D, sizeof=%d",
 		  buf, buf->st_atime, buf->st_size, buf->st_mode,
-		  (int) buf->st_ino, sizeof (*buf));
+		  buf->st_ino, sizeof (*buf));
   return 0;
 }
 
@@ -562,9 +562,23 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
     attrib |= S_IFDIR;
   int res = get_file_attribute (pc.has_acls (), get_io_handle (), pc, &attrib);
   if (!res)
-    res = set_file_attribute (pc.has_acls (), get_io_handle (), pc,
-			      uid, gid, attrib);
-
+    {
+      /* Typical Windows default ACLs can contain permissions for one
+	 group, while being owned by another user/group.  The permission
+	 bits returned above are pretty much useless then.  Creating a
+	 new ACL with these useless permissions results in a potentially
+	 broken symlink.  So what we do here is to set the underlying
+	 permissions of symlinks to a sensible value which allows the
+	 world to read the symlink and only the new owner to change it.
+	 As for the execute permissions... they *seem* to be not
+	 necessary, but for the sake of comleteness and to avoid
+	 struggling with yet another Windows weirdness, the execute bits
+	 are added as well.  */
+      if (pc.issymlink ())
+        attrib = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
+      res = set_file_attribute (pc.has_acls (), get_io_handle (), pc,
+				uid, gid, attrib);
+    }
   if (oret)
     close ();
 
