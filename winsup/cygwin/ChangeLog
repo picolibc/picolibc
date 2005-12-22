@@ -9,7 +9,8 @@
 	(winpids:add): Remove copied stuff.  Try to put process handle into
 	pinfo in question and use _onreturn class to control when to close it.
 	(winpids::release): Remove use of copied array.  Free procinfo when
-	hProc is NULL.  Otherwise call release and call CloseHandle on hProc.
+	hProcess is NULL.  Otherwise call release and call CloseHandle on
+	hProcess.
 	* pinfo.h (winpids::copied): Remove throughout class.
 
 2005-12-21  Christopher Faylor  <cgf@timesys.com>
