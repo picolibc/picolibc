@@ -1,5 +1,15 @@
 2005-12-21  Christopher Faylor  <cgf@timesys.com>
 
+	* pinfo.cc (pinfo::init): Clarify comment slightly.
+	(_onreturn): New helper class.
+	(winpids:add): Remove copied stuff.  Try to put process handle into
+	pinfo in question and use _onreturn class to control when to close it.
+	(winpids::release): Remove use of copied array.  Free procinfo when
+	hProc is NULL.  Otherwise call release and call CloseHandle on hProc.
+	* pinfo.h (winpids::copied): Remove throughout class.
+
+2005-12-21  Christopher Faylor  <cgf@timesys.com>
+
 	* pinfo.cc (pinfo::init): Remove spurious low_priority_sleep.
 
 2005-12-21  Christopher Faylor  <cgf@timesys.com>

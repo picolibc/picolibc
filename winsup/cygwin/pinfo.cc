@@ -256,13 +256,14 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 	  goto loop;
 	}
 
-      /* In certain rare cases, it is possible for the shared memory region to
-	 exist for a while after a process has exited.  This should only be a
-	 brief occurrence, so rather than introduce some kind of locking
-	 mechanism, just loop.  */
+      /* In certain pathological cases, it is possible for the shared memory
+	 region to exist for a while after a process has exited.  This should
+	 only be a brief occurrence, so rather than introduce some kind of
+	 locking mechanism, just loop.  */
       if (!created && createit && (procinfo->process_state & PID_EXITED))
 	{
-	  debug_printf ("looping because pid %d, procinfo->pid %d, procinfo->dwProcessid %u has PID_EXITED set",
+	  debug_printf ("looping because pid %d, procinfo->pid %d, "
+			"procinfo->dwProcessid %u has PID_EXITED set",
 			n, procinfo->pid, procinfo->dwProcessId);
 	  goto loop;
 	}
@@ -1088,26 +1089,67 @@ cygwin_winpid_to_pid (int winpid)
 #define slop_pidlist 200
 #define size_pidlist(i) (sizeof (pidlist[0]) * ((i) + 1))
 #define size_pinfolist(i) (sizeof (pinfolist[0]) * ((i) + 1))
-#define size_copied(i) (sizeof (copied[0]) * ((i) + 1))
+class _onreturn
+{
+  HANDLE& h;
+  HANDLE dummy_handle;
+public:
+  ~_onreturn ()
+  {
+    if (h)
+      {
+	CloseHandle (h);
+	h = NULL;
+      }
+  }
+  void no_close_p_handle () {h = dummy_handle;}
+  _onreturn (): h (dummy_handle), dummy_handle (NULL) {}
+  void set (HANDLE& _h) {h = _h;}
+};
 
 inline void
 winpids::add (DWORD& nelem, bool winpid, DWORD pid)
 {
+  _onreturn onreturn;
+  bool perform_copy = make_copy;
   pid_t cygpid = cygwin_pid (pid);
+
   if (nelem >= npidlist)
     {
       npidlist += slop_pidlist;
-      copied = (bool *) realloc (copied, size_copied (npidlist + 1));
       pidlist = (DWORD *) realloc (pidlist, size_pidlist (npidlist + 1));
       pinfolist = (pinfo *) realloc (pinfolist, size_pinfolist (npidlist + 1));
     }
 
   pinfo& p = pinfolist[nelem];
 
+  /* Open a the process to prevent a subsequent exit from invalidating the
+     shared memory region. */
+  p.hProcess = OpenProcess (PROCESS_QUERY_INFORMATION, false, pid);
+
   p.init (cygpid, PID_NOREDIR | pinfo_access, NULL);
+
+  /* If we couldn't open the process then we don't have rights to it and should
+     make a copy of the shared memory area if it exists (it may not).
+     Otherwise, if p is "false" then we couldn't open the shared memory region
+     for the given pid, so close the handle to that process since we don't need to
+     protect this pid while the shared memory is open.
+     If p is true and we've opened the handle then things look good but we want
+     to track the handle to eventually close it if things fall apart subsequently.
+  */
+  if (!p.hProcess)
+    perform_copy = true;
+  else if (!p)
+    CloseHandle (p.hProcess);
+  else
+    onreturn.set (p.hProcess);
+
+  /* If we're just looking for winpids then don't do any special cygwin "stuff* */
   if (winpid)
     goto out;
 
+  /* !p means that we couldn't find shared memory for this pid.  Probably means
+     that it isn't a cygwin process. */
   if (!p)
     {
       if (!pinfo_access)
@@ -1128,21 +1170,52 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
       }
 
 out:
-  copied[nelem] = false;
-  if (make_copy && p)
+  /* Exit here.
+
+     If p is "false" then, eventually any opened process handle will be closed and
+     the function will exit without adding anything to the pid list.
+
+     If p is "true" then we've discovered a cygwin process.
+     
+     Handle "myself" differently.  Don't copy it and close/zero the handle we
+     just opened to it.
+     If not performing a copy, then keep the process handle open for the duration
+     of the life of the procinfo region to potential races when a new process uses
+     this pid.
+     Otherwise, malloc some memory for a copy of the shared memory.
+     
+     If the malloc failed, then "oh well".  Just keep the shared memory around
+     and eventually close the handle when the winpids goes out of scope.
+
+     If malloc succeeds, copy the procinfo we just grabbed into the new region,
+     release the shared memory and allow the handle to be closed when this
+     function returns.
+
+     Oh, and add the pid to the list and bump the number of elements.  */
+
+  if (p)
     {
-      _pinfo *pnew = (_pinfo *) malloc (sizeof (*p.procinfo));
-      if (pnew)
+      if (p == (_pinfo *) myself)
+	/* handle specially.  Close the handle but (eventually) don't
+	   deallocate procinfo in release call */;
+      else if (!perform_copy)
+	onreturn.no_close_p_handle ();	/* Don't close the handle until release */
+      else
 	{
-	  copied[nelem] = true;
-	  *pnew = *p.procinfo;
-	  if ((_pinfo *) p != (_pinfo *) myself)
-	    p.release ();
-	  p.procinfo = pnew;
-	  p.destroy = false;
+	  _pinfo *pnew = (_pinfo *) malloc (sizeof (*p.procinfo));
+	  if (!pnew)
+	    onreturn.no_close_p_handle ();
+	  else
+	    {
+	      *pnew = *p.procinfo;
+	      if ((_pinfo *) p != (_pinfo *) myself)
+		p.release ();
+	      p.procinfo = pnew;
+	      p.destroy = false;
+	    }
 	}
+      pidlist[nelem++] = pid;
     }
-  pidlist[nelem++] = pid;
 }
 
 DWORD
@@ -1238,14 +1311,19 @@ winpids::release ()
 {
   _pinfo *p;
   for (unsigned i = 0; i < npids; i++)
-    if (pinfolist[i] && (_pinfo *) pinfolist[i] != (_pinfo *) myself)
-      if (!copied[i])
-	pinfolist[i].release ();
-      else if ((p = pinfolist[i].procinfo))
-	{
-	  pinfolist[i].procinfo = NULL;
-	  free (p);
-	}
+    if (pinfolist[i] == (_pinfo *) myself)
+      continue;
+    else if (pinfolist[i].hProc)
+      {
+	if (pinfolist[i])
+	  pinfolist[i].release ();
+	CloseHandle (pinfolist[i].hProc);
+      }
+    else if ((p = pinfolist[i]))
+      {
+	pinfolist[i].procinfo = NULL;
+	free (p);
+      }
 }
 
 winpids::~winpids ()
@@ -1253,7 +1331,6 @@ winpids::~winpids ()
   if (npidlist)
     {
       release ();
-      free (copied);
       free (pidlist);
       free (pinfolist);
     }

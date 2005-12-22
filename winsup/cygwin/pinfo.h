@@ -205,7 +205,6 @@ class winpids
   DWORD npidlist;
   DWORD *pidlist;
   pinfo *pinfolist;
-  bool *copied;
   DWORD pinfo_access;		// access type for pinfo open
   DWORD (winpids::* enum_processes) (bool winpid);
   DWORD enum_init (bool winpid);
@@ -218,10 +217,9 @@ public:
   void set (bool winpid);
   winpids (): make_copy (true), enum_processes (&winpids::enum_init) {}
   winpids (int): make_copy (false), npidlist (0), pidlist (NULL), pinfolist (NULL),
-		 copied (NULL), pinfo_access (0), enum_processes (&winpids::enum_init),
-		 npids (0) {}
+		 pinfo_access (0), enum_processes (&winpids::enum_init), npids (0) {}
   winpids (DWORD acc): make_copy (false), npidlist (0), pidlist (NULL), pinfolist (NULL),
-		 copied (NULL), pinfo_access (acc), enum_processes (&winpids::enum_init),
+		 pinfo_access (acc), enum_processes (&winpids::enum_init),
 		 npids (0)
   {
     set (0);
