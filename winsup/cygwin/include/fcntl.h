@@ -16,8 +16,10 @@ details. */
 
 /* sys/fcntl defines values up to 0x40000 (O_NOINHERIT). */
 #define _FDIRECT	0x80000
+#define _FNOFOLLOW	0x100000
 
 #define O_DIRECT	_FDIRECT
+#define O_NOFOLLOW	_FNOFOLLOW
 #define O_DSYNC		_FSYNC
 #define O_RSYNC		_FSYNC
 

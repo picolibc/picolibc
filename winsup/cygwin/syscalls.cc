@@ -597,8 +597,15 @@ open (const char *unix_path, int flags, ...)
 
       if (fd >= 0)
 	{
-	  if (!(fh = build_fh_name (unix_path, NULL, PC_SYM_FOLLOW)))
+	  if (!(fh = build_fh_name (unix_path, NULL, (flags & O_NOFOLLOW) ?
+				    PC_SYM_NOFOLLOW : PC_SYM_FOLLOW)))
 	    res = -1;		// errno already set
+	  else if ((flags & O_NOFOLLOW) && fh->issymlink ())
+	    {
+	      delete fh;
+	      res = -1;
+	      set_errno (ELOOP);
+	    }
 	  else if (((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL)) && fh->exists ())
 	    {
 	      delete fh;

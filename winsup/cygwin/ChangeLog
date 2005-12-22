@@ -1,3 +1,11 @@
+2005-12-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_base::issymlink): New method.
+	* syscalls.cc (open): Handle O_NOFOLLOW flag.
+	* include/fcntl.h (_FNOFOLLOW): New define.
+	(O_NOFOLLOW): Ditto.
+	* include/cygwin/version.h: Bump API minor number.
+
 2005-12-22  Christopher Faylor  <cgf@timesys.com>
 
 	* pinfo.cc (winpids::add): Increment nelem when winpid is true since we
