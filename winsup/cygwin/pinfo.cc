@@ -1313,11 +1313,11 @@ winpids::release ()
   for (unsigned i = 0; i < npids; i++)
     if (pinfolist[i] == (_pinfo *) myself)
       continue;
-    else if (pinfolist[i].hProc)
+    else if (pinfolist[i].hProcess)
       {
 	if (pinfolist[i])
 	  pinfolist[i].release ();
-	CloseHandle (pinfolist[i].hProc);
+	CloseHandle (pinfolist[i].hProcess);
       }
     else if ((p = pinfolist[i]))
       {

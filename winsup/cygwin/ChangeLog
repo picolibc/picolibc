@@ -1,3 +1,7 @@
+2005-12-22  Christopher Faylor  <cgf@timesys.com>
+
+	* pinfo.cc (winpids::release): Fix typo.
+
 2005-12-21  Christopher Faylor  <cgf@timesys.com>
 
 	* pinfo.cc (pinfo::init): Clarify comment slightly.
