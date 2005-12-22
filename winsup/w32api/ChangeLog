@@ -1,3 +1,9 @@
+2005-12-22  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/ws2_32.c: New file, defining IPv6 constants. 
+	* Makefile.in (SOURCES): Add ws2_32.c
+	(EXTRA_OBJS): Add ws2_32.o.
+
 2005-12-21  Michael Jung  <mjung@iss.tu-darmstadt.de>
 
 	* lib/user32.def (PrivateExtractIconsA@32, 

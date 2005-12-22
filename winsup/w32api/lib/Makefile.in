@@ -117,10 +117,10 @@ EXTRA_LIBS=libuuid.a libscrnsave.a libscrnsavw.a liblargeint.a
 LIBS = $(IMPLIBS) $(MIMPLIBS) $(EXTRA_LIBS)
 UUID_OBJS = uuid.o mshtml-uuid.o msxml-uuid.o
 EXTRA_OBJS = shell32.o scrnsave.o scrnsavw.o largeint.o \
-	$(UUID_OBJS) kernel32.o
+	$(UUID_OBJS) kernel32.o ws2_32.o
 UUID_SOURCES = uuid.c mshtml-uuid.c msxml-uuid.c
 SOURCES = scrnsave.c shell32.c  largeint.c $(UUID_SOURCES)\
-res.rc test.c kernel32.c
+res.rc test.c kernel32.c ws2_32.c
 
 DISTFILES = Makefile.in $(DEF_FILES) $(MRI_FILES) $(SOURCES)
 
