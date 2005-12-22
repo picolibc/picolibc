@@ -571,7 +571,7 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
 	 permissions of symlinks to a sensible value which allows the
 	 world to read the symlink and only the new owner to change it. */
       if (pc.issymlink ())
-        attrib = S_IFLNK | STD_RBITS | STD_WBITS;
+	attrib = S_IFLNK | STD_RBITS | STD_WBITS;
       res = set_file_attribute (pc.has_acls (), get_io_handle (), pc,
 				uid, gid, attrib);
     }
@@ -1306,15 +1306,15 @@ fhandler_disk_file::rmdir ()
 	continue;
 
       /* On 9X ERROR_ACCESS_DENIED is returned if you try to remove a
-         non-empty directory. */
+	 non-empty directory. */
       if (err == ERROR_ACCESS_DENIED
 	  && wincap.access_denied_on_delete ())
 	err = ERROR_DIR_NOT_EMPTY;
       /* ...and, that's *not* funny, when trying to remove a non-existing
-         directory on a share, which is hosted by a 9x machine, the error
+	 directory on a share, which is hosted by a 9x machine, the error
 	 code ERROR_INVALID_FUNCTION is returned.  */
       else if (err == ERROR_INVALID_FUNCTION)
-        err = ERROR_FILE_NOT_FOUND;
+	err = ERROR_FILE_NOT_FOUND;
 
       __seterrno_from_win_error (err);
 

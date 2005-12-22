@@ -1176,14 +1176,14 @@ out:
      the function will exit without adding anything to the pid list.
 
      If p is "true" then we've discovered a cygwin process.
-     
+
      Handle "myself" differently.  Don't copy it and close/zero the handle we
      just opened to it.
      If not performing a copy, then keep the process handle open for the duration
      of the life of the procinfo region to potential races when a new process uses
      this pid.
      Otherwise, malloc some memory for a copy of the shared memory.
-     
+
      If the malloc failed, then "oh well".  Just keep the shared memory around
      and eventually close the handle when the winpids goes out of scope.
 

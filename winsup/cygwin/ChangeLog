@@ -55,7 +55,7 @@
 
 	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Fix inode number
 	debug output.
-	(fhandler_disk_file::fchown): Always set sensible permission values 
+	(fhandler_disk_file::fchown): Always set sensible permission values
 	when creating the ACL for symlinks.
 
 2005-12-20  Corinna Vinschen  <corinna@vinschen.de>

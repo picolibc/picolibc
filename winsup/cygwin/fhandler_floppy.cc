@@ -102,7 +102,7 @@ fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo)
   else
     {
       /* Getting the partition size by using the drive geometry information
-         looks wrong, but this is a historical necessity.  NT4 didn't maintain
+	 looks wrong, but this is a historical necessity.  NT4 didn't maintain
 	 partition information for the whole drive (aka "partition 0"), but
 	 returned ERROR_INVALID_HANDLE instead.  That got fixed in W2K. */
       drive_size = di->Cylinders.QuadPart * di->TracksPerCylinder *
@@ -119,7 +119,7 @@ fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo)
       else if (pi)
 	geo->start = pi->StartingOffset.QuadPart >> 9ULL;
       else
-        geo->start = 0;
+	geo->start = 0;
     }
   return 0;
 }
@@ -461,7 +461,7 @@ fhandler_dev_floppy::ioctl (unsigned int cmd, void *buf)
       }
     case RDSETBLK:
       /* Just check the restriction that blocksize must be a multiple
-         of the sector size of the underlying volume sector size,
+	 of the sector size of the underlying volume sector size,
 	 then fall through to fhandler_dev_raw::ioctl. */
       struct rdop *op = (struct rdop *) buf;
       if (op->rd_parm % bytes_per_sector)

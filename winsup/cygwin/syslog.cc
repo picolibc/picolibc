@@ -233,7 +233,7 @@ out:
       sprintf (pribuf, "<%d>", priority);
       struct iovec iv[2] =
       {
-        { pribuf, strlen (pribuf) },
+	{ pribuf, strlen (pribuf) },
 	{ (char *) msg, len }
       };
 

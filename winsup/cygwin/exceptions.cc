@@ -927,8 +927,8 @@ ctrl_c_handler (DWORD type)
       int sig = SIGINT;
       /* If intr and quit are both mapped to ^C, send SIGQUIT on ^BREAK */
       if (type == CTRL_BREAK_EVENT
-          && t->ti.c_cc[VINTR] == 3 && t->ti.c_cc[VQUIT] == 3)
-        sig = SIGQUIT;
+	  && t->ti.c_cc[VINTR] == 3 && t->ti.c_cc[VQUIT] == 3)
+	sig = SIGQUIT;
       t->last_ctrl_c = GetTickCount ();
       killsys (-myself->pid, sig);
       t->last_ctrl_c = GetTickCount ();
@@ -1269,12 +1269,12 @@ _cygtls::call_signal_handler ()
 	  sigfunc (thissig);
 	}
       else
-        {
+	{
 	  siginfo_t thissi = infodata;
-          void (*sigact) (int, siginfo_t *, void *) = (void (*) (int, siginfo_t *, void *)) func;
-          /* no ucontext_t information provided yet */
-          sigact (thissig, &thissi, NULL);
-        }
+	  void (*sigact) (int, siginfo_t *, void *) = (void (*) (int, siginfo_t *, void *)) func;
+	  /* no ucontext_t information provided yet */
+	  sigact (thissig, &thissi, NULL);
+	}
       incyg++;
       set_signal_mask (this_oldmask, myself->getsigmask ());
       if (this_errno >= 0)

@@ -247,7 +247,7 @@ normalize_posix_path (const char *src, char *dst, char *&tail)
 	return get_errno ();
       tail = strchr (tail, '\0');
       if (isslash (dst[0]) && isslash (dst[1]))
-        ++dst_start;
+	++dst_start;
       if (*src == '.')
 	{
 	  if (tail == dst_start + 1 && *dst_start == '/')
@@ -1112,14 +1112,14 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
   if (beg_src_slash && isdirsep (src[1]))
     {
       if (isdirsep (src[2]))
-        {
+	{
 	  /* More than two slashes are just folded into one. */
 	  src += 2;
 	  while (isdirsep (src[1]))
 	    ++src;
 	}
       else
-        {
+	{
 	  /* Two slashes start a network or device path. */
 	  *tail++ = '\\';
 	  src++;
@@ -3717,10 +3717,10 @@ realpath (const char *path, char *resolved)
     {
       if (!resolved)
 	{
-          resolved = (char *) malloc (strlen (real_path.normalized_path) + 1);
-          if (!resolved)
+	  resolved = (char *) malloc (strlen (real_path.normalized_path) + 1);
+	  if (!resolved)
 	    return NULL;
-        }
+	}
       return strcpy (resolved, real_path.normalized_path);
     }
 

@@ -1063,9 +1063,9 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
 	return len;
 
       /* ESHUTDOWN isn't defined for recv in SUSv3.  Simply EOF is returned
-         in this case. */
+	 in this case. */
       if (WSAGetLastError () == WSAESHUTDOWN)
-        return 0;
+	return 0;
 
       set_winsock_errno ();
     }
@@ -1152,9 +1152,9 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
 	return len;
 
       /* ESHUTDOWN isn't defined for recv in SUSv3.  Simply EOF is returned
-         in this case. */
+	 in this case. */
       if (WSAGetLastError () == WSAESHUTDOWN)
-        return 0;
+	return 0;
 
       set_winsock_errno ();
     }

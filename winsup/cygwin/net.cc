@@ -681,10 +681,10 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
     {
       /* Old applications still use the old Winsock1 IPPROTO_IP values. */
       if (level == IPPROTO_IP && CYGWIN_VERSION_CHECK_FOR_USING_WINSOCK1_VALUES)
-        optname = convert_ws1_ip_optname (optname);
+	optname = convert_ws1_ip_optname (optname);
       /* FOR THE RECORDS:
 
-         Setting IP_TOS is disabled by default since W2K, the official
+	 Setting IP_TOS is disabled by default since W2K, the official
 	 reason being that IP_TOS setting would interfere with Windows
 	 QOS settings.  As result, setsockopt returns with WinSock error
 	 10022, WSAEINVAL, when running under W2K or later, instead of
@@ -731,7 +731,7 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval, int *optlen)
     {
       /* Old applications still use the old Winsock1 IPPROTO_IP values. */
       if (level == IPPROTO_IP && CYGWIN_VERSION_CHECK_FOR_USING_WINSOCK1_VALUES)
-        optname = convert_ws1_ip_optname (optname);
+	optname = convert_ws1_ip_optname (optname);
       res = getsockopt (fh->get_socket (), level, optname, (char *) optval,
 			(int *) optlen);
 
