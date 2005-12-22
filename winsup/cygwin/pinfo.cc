@@ -1214,8 +1214,9 @@ out:
 	      p.destroy = false;
 	    }
 	}
-      pidlist[nelem++] = pid;
     }
+  if (p || winpid)
+    pidlist[nelem++] = pid;
 }
 
 DWORD

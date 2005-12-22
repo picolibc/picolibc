@@ -1,5 +1,10 @@
 2005-12-22  Christopher Faylor  <cgf@timesys.com>
 
+	* pinfo.cc (winpids::add): Increment nelem when winpid is true since we
+	don't care if it's a cygwin process in that case.
+
+2005-12-22  Christopher Faylor  <cgf@timesys.com>
+
 	* pinfo.cc (winpids::release): Fix typo.
 
 2005-12-21  Christopher Faylor  <cgf@timesys.com>
