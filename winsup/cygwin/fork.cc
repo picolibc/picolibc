@@ -507,7 +507,14 @@ fork ()
       return -1;
     }
 
-  sig_send (NULL, __SIGHOLD);
+  if (sig_send (NULL, __SIGHOLD))
+    {
+      if (exit_state)
+	Sleep (INFINITE);
+      set_errno (EAGAIN);
+      return -1;
+    }
+
   ischild = setjmp (grouped.ch.jmp);
 
   void *esp;

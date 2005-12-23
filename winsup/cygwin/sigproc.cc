@@ -509,6 +509,8 @@ sigproc_terminate (exit_states es)
 int __stdcall
 sig_send (_pinfo *p, int sig)
 {
+  if (sig == __SIGNOHOLD)
+    SetEvent (sigCONT);
   siginfo_t si;
   si.si_signo = sig;
   si.si_code = SI_KERNEL;
@@ -1046,12 +1048,11 @@ wait_sig (VOID *)
 {
   HANDLE readsig;
   PSECURITY_ATTRIBUTES sa_buf = (PSECURITY_ATTRIBUTES) alloca (1024);
-  Static bool holding_signals;
 
   /* Initialization */
   SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
 
-  if (!CreatePipe (&readsig, &myself->sendsig, sec_user_nih (sa_buf), 0))
+  if (!CreatePipe (&readsig, &myself->sendsig, sec_user_nih (sa_buf), sizeof (sigpacket) - 4))
     api_fatal ("couldn't create signal pipe, %E");
   ProtectHandle (readsig);
   sigCONT = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
@@ -1121,11 +1122,9 @@ wait_sig (VOID *)
 	      *pack.mask |= bit;
 	  break;
 	case __SIGHOLD:
-	  holding_signals = 1;
+	  goto loop;
 	  break;
 	case __SIGNOHOLD:
-	  holding_signals = 0;
-	  /* fall through, intentionally */
 	case __SIGFLUSH:
 	case __SIGFLUSHFAST:
 	  sigq.reset ();
@@ -1144,8 +1143,6 @@ wait_sig (VOID *)
 	default:
 	  if (pack.si.si_signo < 0)
 	    sig_clear (-pack.si.si_signo);
-	  else if (holding_signals)
-	    sigq.add (pack);
 	  else
 	    {
 	      int sig = pack.si.si_signo;
@@ -1173,11 +1170,14 @@ wait_sig (VOID *)
 	}
       if (clearwait)
 	proc_subproc (PROC_CLEARWAIT, 0);
+    loop:
       if (pack.wakeup)
 	{
 	  sigproc_printf ("signalling pack.wakeup %p", pack.wakeup);
 	  SetEvent (pack.wakeup);
 	}
+      if (pack.si.si_signo == __SIGHOLD)
+	WaitForSingleObject (sigCONT, INFINITE);
       if (pack.si.si_signo == __SIGEXIT)
 	break;
     }

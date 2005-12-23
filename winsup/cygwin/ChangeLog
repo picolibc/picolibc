@@ -1,3 +1,12 @@
+2005-12-22  Christopher Faylor  <cgf@timesys.com>
+
+	* fork.cc (fork): Honor error return from sig_send.  Don't continue
+	with fork if we couldn't suspend signals.
+	* sigproc.cc (sig_send): Set sigCONT event when we see __SIGNOHOLD.
+	(wait_sig): Remove holding_signals.  Create pipe with a buffer which
+	will theoretically cause blocking if there is nothing reading on the
+	pipe.  Wait for sigCONT at end of loop when we have a __SIGHOLD.
+
 2005-12-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_base::issymlink): New method.
