@@ -132,9 +132,9 @@ __sigbe:						# return here after cygwin syscall
 	xorl	%edx,%edx
 	xchgl	%edx,-4(%eax)				# get return address from signal stack
 	xchgl	%edx,8(%esp)				# restore edx/real return address
-	decl	$tls::incyg(%ebx)
 	decl	$tls::stacklock(%ebx)			# release lock
 	popl	%eax
+	decl	$tls::incyg(%ebx)
 	popl	%ebx
 	ret
 
@@ -143,7 +143,7 @@ __sigbe:						# return here after cygwin syscall
 _sigreturn:
 	movl	%fs:4,%ebx
 	incl	$tls::incyg(%ebx)
-	addl	\$4,%esp				# Remove argument
+	addl	\$12,%esp				# remove arguments
 	call	_set_process_mask\@4
 
 1:	movl	\$1,%eax				# potential lock value
@@ -193,13 +193,19 @@ _sigdelayed:
 	pushl	$tls::saved_errno(%ebx)	# saved errno
 	call	_set_process_mask_delta
 	pushl	%eax
-	pushl	$tls::sig(%ebx)		# signal argument
-	pushl	\$_sigreturn
+
+	# fill out handler arguments
+	xorl	%eax,%eax		# ucontext_t (currently not set)
+	pushl	%eax
+	leal	$tls::infodata(%ebx),%eax
+	pushl	%eax			# siginfo
+	pushl	$tls::sig(%ebx)		# signal number
 
 	call	_reset_signal_arrived\@0
+	pushl	\$_sigreturn		# where to return
 	pushl	$tls::func(%ebx)	# signal func
 	cmpl	\$0,$tls::threadkill(%ebx)#pthread_kill signal?
-	jnz	4f			#yes.  Callee clears signal number
+	jnz	4f			# yes.  callee clears signal number
 	movl	\$0,$tls::sig(%ebx)	# zero the signal number as a
 					# flag to the signal handler thread
 					# that it is ok to set up sigsave

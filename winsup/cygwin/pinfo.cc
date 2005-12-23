@@ -1091,27 +1091,23 @@ cygwin_winpid_to_pid (int winpid)
 #define size_pinfolist(i) (sizeof (pinfolist[0]) * ((i) + 1))
 class _onreturn
 {
-  HANDLE& h;
-  HANDLE dummy_handle;
+  HANDLE *h;
 public:
   ~_onreturn ()
   {
     if (h)
       {
-	CloseHandle (h);
-	h = NULL;
+	CloseHandle (*h);
+	*h = NULL;
       }
   }
-  void no_close_p_handle () {h = dummy_handle;}
-  _onreturn (): h (dummy_handle), dummy_handle (NULL) {}
-  void set (HANDLE& _h) {h = _h;}
+  void no_close_p_handle () {h = NULL;}
+  _onreturn (HANDLE& _h): h (&_h) {}
 };
 
 inline void
 winpids::add (DWORD& nelem, bool winpid, DWORD pid)
 {
-  _onreturn onreturn;
-  bool perform_copy = make_copy;
   pid_t cygpid = cygwin_pid (pid);
 
   if (nelem >= npidlist)
@@ -1126,23 +1122,18 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
   /* Open a the process to prevent a subsequent exit from invalidating the
      shared memory region. */
   p.hProcess = OpenProcess (PROCESS_QUERY_INFORMATION, false, pid);
-
-  p.init (cygpid, PID_NOREDIR | pinfo_access, NULL);
+  _onreturn onreturn (p.hProcess);
 
   /* If we couldn't open the process then we don't have rights to it and should
      make a copy of the shared memory area if it exists (it may not).
-     Otherwise, if p is "false" then we couldn't open the shared memory region
-     for the given pid, so close the handle to that process since we don't need to
-     protect this pid while the shared memory is open.
-     If p is true and we've opened the handle then things look good but we want
-     to track the handle to eventually close it if things fall apart subsequently.
   */
+  bool perform_copy;
   if (!p.hProcess)
     perform_copy = true;
-  else if (!p)
-    CloseHandle (p.hProcess);
   else
-    onreturn.set (p.hProcess);
+    perform_copy = make_copy;
+
+  p.init (cygpid, PID_NOREDIR | pinfo_access, NULL);
 
   /* If we're just looking for winpids then don't do any special cygwin "stuff* */
   if (winpid)

@@ -18,31 +18,8 @@ details. */
 #undef _NOMNTENT_FUNCS
 #include <setjmp.h>
 #include <exceptions.h>
-
 #ifndef _WINSOCK_H
-/* Stupid hack: Including winsock.h explicitly causes too many problems. */
-struct sockaddr_in
-{
-  short   sin_family;
-  u_short sin_port;
-  struct in_addr
-  {
-    union
-    {
-      struct
-      {
-	u_char s_b1, s_b2, s_b3, s_b4;
-      } S_un_b;
-      struct
-      {
-	u_short s_w1, s_w2;
-      } S_un_w;
-      u_long S_addr;
-    } S_un;
-  };
-  struct  in_addr sin_addr;
-  char    sin_zero[8];
-};
+#include <netinet/in.h>
 typedef unsigned int SOCKET;
 #endif
 
@@ -186,11 +163,11 @@ struct _cygtls
   san andreas;
   waitq wq;
   struct _cygtls *prev, *next;
-  __stack_t *stackptr;
   int sig;
   unsigned incyg;
   unsigned spinning;
   unsigned stacklock;
+  __stack_t *stackptr;
   __stack_t stack[TLS_STACK_SIZE];
   unsigned padding[0];
 

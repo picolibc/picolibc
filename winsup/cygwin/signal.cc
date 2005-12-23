@@ -257,6 +257,7 @@ killsys (pid_t pid, int sig)
   si.si_pid = si.si_uid = si.si_errno = 0;
   return kill0 (pid, si);
 }
+
 int
 kill (pid_t pid, int sig)
 {
@@ -356,28 +357,29 @@ sigaction (int sig, const struct sigaction *newact, struct sigaction *oldact)
 
   struct sigaction oa = global_sigs[sig];
 
-  if (newact)
-    sigproc_printf ("signal %d, newact %p (handler %p), oa %p", sig, newact, newact->sa_handler, oa, oa.sa_handler);
-  else
+  if (!newact)
     sigproc_printf ("signal %d, newact %p, oa %p", sig, newact, oa, oa.sa_handler);
-
-  if (newact)
+  else
     {
+      sigproc_printf ("signal %d, newact %p (handler %p), oa %p", sig, newact, newact->sa_handler, oa, oa.sa_handler);
       if (sig == SIGKILL || sig == SIGSTOP)
 	{
 	  set_errno (EINVAL);
 	  return -1;
 	}
-      global_sigs[sig] = *newact;
-      if (newact->sa_handler == SIG_IGN)
+      struct sigaction& na = global_sigs[sig];
+      na = *newact;
+      if (!(na.sa_flags & SA_NODEFER))
+	na.sa_mask |= SIGTOMASK(sig);
+      if (na.sa_handler == SIG_IGN)
 	sig_clear (sig);
-      if (newact->sa_handler == SIG_DFL && sig == SIGCHLD)
+      if (na.sa_handler == SIG_DFL && sig == SIGCHLD)
 	sig_clear (sig);
-      set_sigcatchers (oa.sa_handler, newact->sa_handler);
+      set_sigcatchers (oa.sa_handler, na.sa_handler);
       if (sig == SIGCHLD)
 	{
 	  myself->process_state &= ~PID_NOCLDSTOP;
-	  if (newact->sa_flags & SA_NOCLDSTOP)
+	  if (na.sa_flags & SA_NOCLDSTOP)
 	    myself->process_state |= PID_NOCLDSTOP;
 	}
     }

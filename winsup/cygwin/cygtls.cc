@@ -228,7 +228,7 @@ _cygtls::handle_threadlist_exception (EXCEPTION_RECORD *e, exception_list *frame
   sentry here;
   if (threadlist_ix == BAD_IX)
     {
-      system_printf ("called with threadlist_ix %d", BAD_IX);
+      api_fatal ("called with threadlist_ix %d", BAD_IX);
       return 1;
     }
 

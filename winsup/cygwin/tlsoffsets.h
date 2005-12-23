@@ -47,16 +47,16 @@
 //; $tls::pprev = 2944;
 //; $tls::next = -1048;
 //; $tls::pnext = 2948;
-//; $tls::stackptr = -1044;
-//; $tls::pstackptr = 2952;
-//; $tls::sig = -1040;
-//; $tls::psig = 2956;
-//; $tls::incyg = -1036;
-//; $tls::pincyg = 2960;
-//; $tls::spinning = -1032;
-//; $tls::pspinning = 2964;
-//; $tls::stacklock = -1028;
-//; $tls::pstacklock = 2968;
+//; $tls::sig = -1044;
+//; $tls::psig = 2952;
+//; $tls::incyg = -1040;
+//; $tls::pincyg = 2956;
+//; $tls::spinning = -1036;
+//; $tls::pspinning = 2960;
+//; $tls::stacklock = -1032;
+//; $tls::pstacklock = 2964;
+//; $tls::stackptr = -1028;
+//; $tls::pstackptr = 2968;
 //; $tls::stack = -1024;
 //; $tls::pstack = 2972;
 //; $tls::padding = 0;
@@ -109,16 +109,16 @@
 #define tls_pprev (2944)
 #define tls_next (-1048)
 #define tls_pnext (2948)
-#define tls_stackptr (-1044)
-#define tls_pstackptr (2952)
-#define tls_sig (-1040)
-#define tls_psig (2956)
-#define tls_incyg (-1036)
-#define tls_pincyg (2960)
-#define tls_spinning (-1032)
-#define tls_pspinning (2964)
-#define tls_stacklock (-1028)
-#define tls_pstacklock (2968)
+#define tls_sig (-1044)
+#define tls_psig (2952)
+#define tls_incyg (-1040)
+#define tls_pincyg (2956)
+#define tls_spinning (-1036)
+#define tls_pspinning (2960)
+#define tls_stacklock (-1032)
+#define tls_pstacklock (2964)
+#define tls_stackptr (-1028)
+#define tls_pstackptr (2968)
 #define tls_stack (-1024)
 #define tls_pstack (2972)
 #define tls_padding (0)

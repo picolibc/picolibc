@@ -1,3 +1,28 @@
+2005-12-23  Christopher Faylor  <cgf@timesys.com>
+
+	* cygtls.cc (_cygtls::handle_threadlist_exception): Make an error
+	fatal.
+	* cygtls.h (sockaddr_in): Use header rather than defining our own
+	structure.
+	* exceptions.cc (_cygtls::interrupt_setup): Use exact contents of
+	sa_mask rather than assuming tht current sig should be masked, too.
+	(_cygtls::call_signal_handler): Use more aggressive locking.
+	* gendef (_sigbe): Wait until later before releasing incyg.
+	(_sigreturn): Remove more arguments to accommodate quasi-sa_sigaction
+	support.
+	(_sigdelayed): Push arguments for sa_sigaction.  More work needed here.
+	* signal.cc (sigaction): Implement SA_NODEFER.
+	* tlsoffsets.h: Regenerate.
+	
+	* sigproc.cc (wait_sig): Use default buffer size of Windows 9x complains.
+
+	* pinfo.cc (_onreturn::dummy_handle): Remove.
+	(_onreturn::h): Make this a pointer.
+	(_onreturn::~_onreturn): Detect whether pointer is NULL rather than value is NULL.
+	(_onreturn::_onreturn): Set h to NULL initially.
+	(_onreturn::no_close_p_handle): Set h to NULL.
+	(winpids::add): Initialize onreturn with value from p.hProcess immediately.
+
 2005-12-22  Christopher Faylor  <cgf@timesys.com>
 
 	* fork.cc (fork): Honor error return from sig_send.  Don't continue

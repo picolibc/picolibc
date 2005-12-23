@@ -1052,7 +1052,7 @@ wait_sig (VOID *)
   /* Initialization */
   SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
 
-  if (!CreatePipe (&readsig, &myself->sendsig, sec_user_nih (sa_buf), sizeof (sigpacket) - 4))
+  if (!CreatePipe (&readsig, &myself->sendsig, sec_user_nih (sa_buf), 0))
     api_fatal ("couldn't create signal pipe, %E");
   ProtectHandle (readsig);
   sigCONT = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);

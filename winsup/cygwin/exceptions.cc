@@ -50,7 +50,7 @@ static size_t windows_system_directory_length;
 /* This is set to indicate that we have already exited.  */
 
 static NO_COPY int exit_already = 0;
-static NO_COPY muto mask_sync;
+static muto NO_COPY mask_sync;
 
 NO_COPY static struct
 {
@@ -706,7 +706,7 @@ void __stdcall
 _cygtls::interrupt_setup (int sig, void *handler, struct sigaction& siga)
 {
   push ((__stack_t) sigdelayed);
-  deltamask = (siga.sa_mask | SIGTOMASK (sig)) & ~SIG_NONMASKABLE;
+  deltamask = siga.sa_mask & ~SIG_NONMASKABLE;
   sa_flags = siga.sa_flags;
   func = (void (*) (int)) handler;
   saved_errno = -1;		// Flag: no errno to save
@@ -982,8 +982,7 @@ sigrelse (int sig)
   return 0;
 }
 
-/* Update the signal mask for this process
-   and return the old mask.
+/* Update the signal mask for this process and return the old mask.
    Called from sigdelayed */
 extern "C" sigset_t
 set_process_mask_delta ()
@@ -1253,7 +1252,7 @@ _cygtls::call_signal_handler ()
   /* Call signal handler.  */
   while (sig)
     {
-      lock (); unlock ();	// make sure synchronized
+      lock ();
       this_sa_flags = sa_flags;
       int thissig = sig;
 
@@ -1261,8 +1260,9 @@ _cygtls::call_signal_handler ()
       reset_signal_arrived ();
       sigset_t this_oldmask = set_process_mask_delta ();
       int this_errno = saved_errno;
-      incyg--;
       sig = 0;
+      unlock ();	// make sure synchronized
+      incyg = 0;
       if (!(this_sa_flags & SA_SIGINFO))
 	{
 	  void (*sigfunc) (int) = func;
@@ -1275,7 +1275,7 @@ _cygtls::call_signal_handler ()
 	  /* no ucontext_t information provided yet */
 	  sigact (thissig, &thissi, NULL);
 	}
-      incyg++;
+      incyg = 1;
       set_signal_mask (this_oldmask, myself->getsigmask ());
       if (this_errno >= 0)
 	set_errno (this_errno);
