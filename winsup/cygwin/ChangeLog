@@ -1,3 +1,16 @@
+2005-12-26  Christopher Faylor  <cgf@timesys.com>
+
+	* dcrt0.cc (__api_fatal): Simplify to just use strace mechamisms.
+	(do_exit): Move minimal_printf...
+	* pinfo.cc (pinfo::exit): ...into here.
+	* strace.cc (strace::vprntf): Guarantee output to the console when
+	system_printf/api_fatal.
+
+	* heap.cc (heap_init): Wait a second before issuing an error when
+	ERROR_INVALID_ADDRESS since this is probably due to a CTRL-C handler
+	sneaking in, using the memory that we want to use for the heap, and,
+	eventually exiting.
+
 2005-12-23  Christopher Faylor  <cgf@timesys.com>
 
 	* cygtls.cc (_cygtls::handle_threadlist_exception): Make an error
@@ -5,7 +18,7 @@
 	* cygtls.h (sockaddr_in): Use header rather than defining our own
 	structure.
 	* exceptions.cc (_cygtls::interrupt_setup): Use exact contents of
-	sa_mask rather than assuming tht current sig should be masked, too.
+	sa_mask rather than assuming that current sig should be masked, too.
 	(_cygtls::call_signal_handler): Use more aggressive locking.
 	* gendef (_sigbe): Wait until later before releasing incyg.
 	(_sigreturn): Remove more arguments to accommodate quasi-sa_sigaction
@@ -13,8 +26,8 @@
 	(_sigdelayed): Push arguments for sa_sigaction.  More work needed here.
 	* signal.cc (sigaction): Implement SA_NODEFER.
 	* tlsoffsets.h: Regenerate.
-	
-	* sigproc.cc (wait_sig): Use default buffer size or Windows 9x complains.
+
+	* sigproc.cc (wait_sig): Use default buffer size or Windows 9x complains
 
 	* pinfo.cc (_onreturn::dummy_handle): Remove.
 	(_onreturn::h): Make this a pointer.

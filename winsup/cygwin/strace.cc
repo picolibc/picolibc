@@ -202,24 +202,35 @@ void
 strace::vprntf (unsigned category, const char *func, const char *fmt, va_list ap)
 {
   DWORD err = GetLastError ();
-  int count;
+  int len;
   char buf[10000];
 
   PROTECT (buf);
   SetLastError (err);
 
-  count = vsprntf (buf, func, fmt, ap);
+  len = vsprntf (buf, func, fmt, ap);
   CHECK (buf);
   if (category & _STRACE_SYSTEM)
     {
       DWORD done;
-      WriteFile (GetStdHandle (STD_ERROR_HANDLE), buf, count, &done, 0);
+      WriteFile (GetStdHandle (STD_ERROR_HANDLE), buf, len, &done, 0);
       FlushFileBuffers (GetStdHandle (STD_ERROR_HANDLE));
+      /* Make sure that the message shows up on the screen, too, since this is
+	 a serious error. */
+      if (GetFileType (GetStdHandle (STD_ERROR_HANDLE)) != FILE_TYPE_CHAR)
+	{
+	  HANDLE h = CreateFile ("CONOUT$", GENERIC_READ | GENERIC_WRITE,
+				 FILE_SHARE_WRITE | FILE_SHARE_WRITE,
+				 &sec_none, OPEN_EXISTING, 0, 0);
+	  if (h != INVALID_HANDLE_VALUE)
+	    WriteFile (h, buf, len, &done, 0);
+	  CloseHandle (h);
+	}
     }
 
 #ifndef NOSTRACE
   if (active)
-    write (category, buf, count);
+    write (category, buf, len);
 #endif
   SetLastError (err);
 }

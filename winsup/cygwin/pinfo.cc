@@ -139,6 +139,7 @@ pinfo::zap_cwd ()
 void
 pinfo::exit (DWORD n)
 {
+  minimal_printf ("winpid %d, exit %d", GetCurrentProcessId (), n);
   lock_process until_exit ();
   cygthread::terminate ();
 

@@ -1132,7 +1132,6 @@ do_exit (int status)
       tty_terminate ();
     }
 
-  minimal_printf ("winpid %d, exit %d", GetCurrentProcessId (), n);
   myself.exit (n);
 }
 
@@ -1171,24 +1170,10 @@ __api_fatal (const char *fmt, ...)
   va_list ap;
 
   va_start (ap, fmt);
-  int n = __small_sprintf (buf, "%P (%u): *** ", cygwin_pid (GetCurrentProcessId ()));
+  int n = __small_sprintf (buf, "%P: *** fatal error - ", cygwin_pid (GetCurrentProcessId ()));
   __small_vsprintf (buf + n, fmt, ap);
   va_end (ap);
-  strcat (buf, "\n");
-  int len = strlen (buf);
-  DWORD done;
-  WriteFile (GetStdHandle (STD_ERROR_HANDLE), buf, len, &done, 0);
-
-  /* Make sure that the message shows up on the screen, too, since this is
-     a serious error. */
-  if (GetFileType (GetStdHandle (STD_ERROR_HANDLE)) != FILE_TYPE_CHAR)
-    {
-      HANDLE h = CreateFile ("CONOUT$", GENERIC_READ | GENERIC_WRITE,
-			     FILE_SHARE_WRITE | FILE_SHARE_WRITE,
-			     &sec_none, OPEN_EXISTING, 0, 0);
-      if (h != INVALID_HANDLE_VALUE)
-	WriteFile (h, buf, len, &done, 0);
-    }
+  strace.prntf (_STRACE_SYSTEM, NULL, "%s", buf);
 
 #ifdef DEBUGGING
   try_to_debug ();
