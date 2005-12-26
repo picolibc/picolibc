@@ -912,7 +912,6 @@ dll_crt0_1 (char *)
   /* Disable case-insensitive globbing */
   ignore_case_with_glob = false;
 
-
   set_errno (0);
 
   MALLOC_CHECK;
