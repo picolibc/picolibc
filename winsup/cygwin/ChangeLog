@@ -1,5 +1,10 @@
 2005-12-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exceptions.cc (inside_kernel): Rename from interruptible.
+	Accommodate change throughout file.
+
+2005-12-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exceptions.cc (interruptible): New function, code stripped from
 	_cygtls::interrupt_now.
 	(_cygtls::handle_exceptions): Handle STATUS_DATATYPE_MISALIGNMENT as

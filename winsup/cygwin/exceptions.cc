@@ -287,7 +287,7 @@ stackdump (DWORD ebp, int open_file, bool isexception)
 }
 
 static bool
-interruptible (CONTEXT *cx)
+inside_kernel (CONTEXT *cx)
 {
   int res;
   MEMORY_BASIC_INFORMATION m;
@@ -620,7 +620,7 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
 	    error_code |= 1;
 	  if (e->ExceptionInformation[0])	/* Write access */
 	    error_code |= 2;
-	  if (!interruptible (in))		/* User space */
+	  if (!inside_kernel (in))		/* User space */
 	    error_code |= 4;
 	  klog (LOG_INFO, "%s[%d]: segfault at %08x rip %08x rsp %08x error %d",
 			  __progname, myself->pid,
@@ -725,7 +725,7 @@ _cygtls::interrupt_now (CONTEXT *cx, int sig, void *handler,
 {
   bool interrupted;
 
-  if (!interruptible (cx) || (incyg || spinning || locked ()))
+  if (!inside_kernel (cx) || (incyg || spinning || locked ()))
     interrupted = false;
   else
     {
