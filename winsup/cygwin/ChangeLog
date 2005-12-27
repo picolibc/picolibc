@@ -1,3 +1,10 @@
+2005-12-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (path_conv::check): Rework loop removing trailing dots
+	and spaces.
+
+	* syslog.cc (vklog): Set facility to LOG_KERN if not set.
+
 2005-12-26  Christopher Faylor  <cgf@timesys.com>
 
 	* dcrt0.cc (__api_fatal): Simplify to just use strace mechamisms.
