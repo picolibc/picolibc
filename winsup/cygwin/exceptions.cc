@@ -16,6 +16,7 @@ details. */
 #include <stdlib.h>
 #include <setjmp.h>
 #include <assert.h>
+#include <syslog.h>
 
 #include "exceptions.h"
 #include "sync.h"
@@ -285,6 +286,37 @@ stackdump (DWORD ebp, int open_file, bool isexception)
 	      i == 16 ? " (more stack frames may be present)" : "");
 }
 
+static bool
+interruptible (CONTEXT *cx)
+{
+  int res;
+  MEMORY_BASIC_INFORMATION m;
+
+  memset (&m, 0, sizeof m);
+  if (!VirtualQuery ((LPCVOID) cx->Eip, &m, sizeof m))
+    sigproc_printf ("couldn't get memory info, pc %p, %E", cx->Eip);
+
+  char *checkdir = (char *) alloca (windows_system_directory_length + 4);
+  memset (checkdir, 0, sizeof (checkdir));
+
+# define h ((HMODULE) m.AllocationBase)
+  /* Apparently Windows 95 can sometimes return bogus addresses from
+     GetThreadContext.  These resolve to a strange allocation base.
+     These should *never* be treated as interruptible. */
+  if (!h || m.State != MEM_COMMIT)
+    res = false;
+  else if (h == user_data->hmodule)
+    res = true;
+  else if (!GetModuleFileName (h, checkdir, windows_system_directory_length + 2))
+    res = false;
+  else
+    res = !strncasematch (windows_system_directory, checkdir,
+			  windows_system_directory_length);
+  sigproc_printf ("pc %p, h %p, interruptible %d", cx->Eip, h, res);
+# undef h
+  return res;
+}
+
 /* Temporary (?) function for external callers to get a stack dump */
 extern "C" void
 cygwin_stackdump ()
@@ -403,6 +435,7 @@ rtl_unwind (exception_list *frame, PEXCEPTION_RECORD e)
 
 /* Main exception handler. */
 
+extern "C" char *__progname;
 int
 _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void *)
 {
@@ -478,6 +511,11 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
       si.si_code = BUS_OBJERR;
       break;
 
+    case STATUS_DATATYPE_MISALIGNMENT:
+      si.si_signo = SIGBUS;
+      si.si_code = BUS_ADRALN;
+      break;
+
     case STATUS_ACCESS_VIOLATION:
       if (mmap_is_attached_page (e->ExceptionInformation[1]))
 	{
@@ -485,8 +523,15 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
 	  si.si_code = BUS_OBJERR;
 	  break;
 	}
-      /*FALLTHRU*/
-    case STATUS_DATATYPE_MISALIGNMENT:
+      else
+        {
+	  MEMORY_BASIC_INFORMATION m;
+	  VirtualQuery ((PVOID) e->ExceptionInformation[1], &m, sizeof m);
+	  si.si_signo = SIGSEGV;
+	  si.si_code = m.State == MEM_FREE ? SEGV_MAPERR : SEGV_ACCERR;
+	}
+      break;
+
     case STATUS_ARRAY_BOUNDS_EXCEEDED:
     case STATUS_IN_PAGE_ERROR:
     case STATUS_NO_MEMORY:
@@ -566,6 +611,22 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
 	  open_stackdumpfile ();
 	  exception (e, in);
 	  stackdump ((DWORD) ebp, 0, 1);
+	}
+
+      if (e->ExceptionCode == STATUS_ACCESS_VIOLATION)
+        {
+	  int error_code = 0;
+	  if (si.si_code == SEGV_ACCERR)	/* Address present */
+	    error_code |= 1;
+	  if (e->ExceptionInformation[0])	/* Write access */
+	    error_code |= 2;
+	  if (!interruptible (in))		/* User space */
+	    error_code |= 4;
+	  klog (LOG_INFO, "%s[%d]: segfault at %08x rip %08x rsp %08x error %d",
+			  __progname, myself->pid,
+			  e->ExceptionInformation[1], in->Eip, in->Esp,
+			  ((in->Eip >= 0x61000000 && in->Eip < 0x61200000)
+			   ? 0 : 4) | (e->ExceptionInformation[0] << 1));
 	}
 
       signal_exit (0x80 | si.si_signo);	// Flag signal + core dump
@@ -662,34 +723,9 @@ bool
 _cygtls::interrupt_now (CONTEXT *cx, int sig, void *handler,
 			struct sigaction& siga)
 {
-  int res;
   bool interrupted;
-  MEMORY_BASIC_INFORMATION m;
 
-  memset (&m, 0, sizeof m);
-  if (!VirtualQuery ((LPCVOID) cx->Eip, &m, sizeof m))
-    sigproc_printf ("couldn't get memory info, pc %p, %E", cx->Eip);
-
-  char *checkdir = (char *) alloca (windows_system_directory_length + 4);
-  memset (checkdir, 0, sizeof (checkdir));
-
-# define h ((HMODULE) m.AllocationBase)
-  /* Apparently Windows 95 can sometimes return bogus addresses from
-     GetThreadContext.  These resolve to a strange allocation base.
-     These should *never* be treated as interruptible. */
-  if (!h || m.State != MEM_COMMIT)
-    res = false;
-  else if (h == user_data->hmodule)
-    res = true;
-  else if (!GetModuleFileName (h, checkdir, windows_system_directory_length + 2))
-    res = false;
-  else
-    res = !strncasematch (windows_system_directory, checkdir,
-			  windows_system_directory_length);
-  sigproc_printf ("pc %p, h %p, interruptible %d", cx->Eip, h, res);
-# undef h
-
-  if (!res || (incyg || spinning || locked ()))
+  if (!interruptible (cx) || (incyg || spinning || locked ()))
     interrupted = false;
   else
     {

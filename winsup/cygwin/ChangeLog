@@ -1,5 +1,16 @@
 2005-12-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exceptions.cc (interruptible): New function, code stripped from
+	_cygtls::interrupt_now.
+	(_cygtls::handle_exceptions): Handle STATUS_DATATYPE_MISALIGNMENT as
+	SIGBUS error.  Differ between unmapped memory (SEGV_MAPERR) and access
+	violation (SEGV_ACCERR) in case of STATUS_ACCESS_VIOLATION.  Write
+	kernel log message in case of uncatched STATUS_ACCESS_VIOLATION.
+	(_cygtls::interrupt_now): Just call interruptible now instead of
+	evaluating interruptibility here.
+
+2005-12-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (path_conv::check): Rework loop removing trailing dots
 	and spaces.
 
