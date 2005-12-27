@@ -521,7 +521,6 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
 	{
 	  si.si_signo = SIGBUS;
 	  si.si_code = BUS_OBJERR;
-	  break;
 	}
       else
         {
