@@ -484,6 +484,8 @@ vklog (int priority, const char *message, va_list ap)
   /* TODO: kernel messages are under our control entirely and they should
      be quick.  No playing with /dev/null, but a fixed upper size for now. */
   char buf[2060];	/* 2048 + a prority */
+  if (!(priority & ~LOG_PRIMASK))
+    priority = LOG_KERN | LOG_PRI (priority);
   __small_sprintf (buf, "<%d>", priority);
   __small_vsprintf (buf + strlen (buf), message, ap);
   klog_guard.init ("klog_guard")->acquire ();

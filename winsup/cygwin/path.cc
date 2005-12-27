@@ -955,18 +955,26 @@ out:
     {
       if (strncmp (path, "\\\\.\\", 4))
 	{
-	  /* Windows ignores trailing dots and spaces */
+	  /* Windows ignores trailing dots and spaces in the last path
+	     component, and ignores exactly one trailing dot in inner
+	     path components. */
 	  char *tail = NULL;
 	  for (char *p = path; *p; p++)
-	    if (*p != '.' && *p != ' ')
-	      tail = NULL;
-	    else if (p[1] == '\\')
-	      {
-		memmove (p, p + 1, strlen (p));
+	    {
+	      if (*p != '.' && *p != ' ')
 		tail = NULL;
-	      }
-	    else if (!tail)
-	      tail = p;
+	      else if (!tail)
+		tail = p;
+	      if (tail && p[1] == '\\')
+	        {
+		  if (p > tail || *tail != '.')
+		    {
+		      error = ENOENT;
+		      return;
+		    }
+		  tail = NULL;
+	        }
+	    }
 
 	  if (!tail || tail == path)
 	    /* nothing */;
