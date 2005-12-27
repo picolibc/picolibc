@@ -54,10 +54,12 @@
 
 	* pinfo.cc (_onreturn::dummy_handle): Remove.
 	(_onreturn::h): Make this a pointer.
-	(_onreturn::~_onreturn): Detect whether pointer is NULL rather than value is NULL.
+	(_onreturn::~_onreturn): Detect whether pointer is NULL rather than
+	value is NULL.
 	(_onreturn::_onreturn): Set h to NULL initially.
 	(_onreturn::no_close_p_handle): Set h to NULL.
-	(winpids::add): Initialize onreturn with value from p.hProcess immediately.
+	(winpids::add): Initialize onreturn with value from p.hProcess
+	immediately.
 
 2005-12-22  Christopher Faylor  <cgf@timesys.com>
 
