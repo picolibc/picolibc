@@ -1,5 +1,11 @@
 2005-12-29  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler_tty.cc (fhandler_tty_common::__acquire_output_mutex): Use
+	strace method rather than accessing field directly.
+	(fhandler_tty_common::__release_output_mutex): Ditto.
+
+2005-12-29  Christopher Faylor  <cgf@timesys.com>
+
 	* child_info.h (CURR_CHILD_INFO_MAGIC): Reset.
 	(child_info::dwProcessId): Delete.
 	(child_info::straced): New variable.

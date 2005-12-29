@@ -118,7 +118,7 @@ fhandler_tty_common::__acquire_output_mutex (const char *fn, int ln,
   if (res == WAIT_OBJECT_0)
     {
 #ifndef DEBUGGING
-      if (strace.active)
+      if (strace.active ())
 	strace.prntf (_STRACE_TERMIOS, fn, "(%d): tty output_mutex: acquired", ln, res);
 #else
       ostack[osi].fn = fn;
@@ -137,7 +137,7 @@ fhandler_tty_common::__release_output_mutex (const char *fn, int ln)
   if (ReleaseMutex (output_mutex))
     {
 #ifndef DEBUGGING
-      if (strace.active)
+      if (strace.active ())
 	strace.prntf (_STRACE_TERMIOS, fn, "(%d): tty output_mutex released", ln);
 #else
       if (osi > 0)
