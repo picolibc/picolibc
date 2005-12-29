@@ -116,7 +116,7 @@ win_env::add_cache (const char *in_posix, const char *in_native)
       towin32 (in_posix, native + namelen);
     }
   MALLOC_CHECK;
-  if (immediate)
+  if (immediate && cygwin_finished_initializing)
     {
       char s[namelen];
       size_t n = namelen - 1;

@@ -1,3 +1,8 @@
+2005-12-28  Christopher Faylor  <cgf@timesys.com>
+
+	* environ.cc (win_env::add_cache): Don't add variables to the
+	environment during initialization.
+
 2005-12-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* exceptions.cc (_cygtls::handle_exceptions): Drop redundant `break'.
