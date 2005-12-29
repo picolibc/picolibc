@@ -37,11 +37,15 @@ static int forkdebug = 1;
 static int numerror = 1;
 static int show_usecs = 1;
 static int delta = 1;
-static int hhmmss = 0;
-static int bufsize = 0;
-static int new_window = 0;
-static long flush_period = 0;
-static int include_hex = 0;
+static int hhmmss;
+static int bufsize;
+static int new_window;
+static long flush_period;
+static int include_hex;
+static int quiet = -1;
+
+static unsigned char strace_active = 1;
+static int processes;
 
 static BOOL close_handle (HANDLE h, DWORD ok);
 
@@ -104,18 +108,6 @@ error (int geterrno, const char *fmt, ...)
 DWORD lastid = 0;
 HANDLE lasth;
 
-#define PROCFLAGS \
- PROCESS_ALL_ACCESS		/*(PROCESS_DUP_HANDLE | PROCESS_TERMINATE | PROCESS_VM_READ | PROCESS_VM_WRITE) */
-static void
-add_child (DWORD id, HANDLE hproc)
-{
-  child_list *c = children.next;
-  children.next = (child_list *) calloc (1, sizeof (child_list));
-  children.next->next = c;
-  lastid = children.next->id = id;
-  lasth = children.next->hproc = hproc;
-}
-
 static child_list *
 get_child (DWORD id)
 {
@@ -124,7 +116,23 @@ get_child (DWORD id)
     if (c->id == id)
       return c;
 
-  error (0, "no process id %d found", id);
+  return NULL;
+}
+
+static void
+add_child (DWORD id, HANDLE hproc)
+{
+  if (!get_child (id))
+    {
+      child_list *c = children.next;
+      children.next = (child_list *) calloc (1, sizeof (child_list));
+      children.next->next = c;
+      lastid = children.next->id = id;
+      lasth = children.next->hproc = hproc;
+      processes++;
+      if (!quiet)
+	fprintf (stderr, "Windows process %d attached\n", id);
+    }
 }
 
 static void
@@ -139,6 +147,9 @@ remove_child (DWORD id)
 	child_list *c1 = c->next;
 	c->next = c1->next;
 	free (c1);
+	if (!quiet)
+	  fprintf (stderr, "Windows process %d detached\n", id);
+	processes--;
 	return;
       }
 
@@ -283,15 +294,11 @@ attach_process (pid_t pid)
 {
   child_pid = (DWORD) cygwin_internal (CW_CYGWIN_PID_TO_WINPID, pid);
   if (!child_pid)
-    {
-      warn (0, "no such cygwin pid - %d", pid);
-      child_pid = pid;
-    }
+    child_pid = pid;
 
   if (!DebugActiveProcess (child_pid))
-    error (0, "couldn't attach to pid %d<%d> for debugging", pid, child_pid);
+    error (0, "couldn't attach to pid %d for debugging", child_pid);
 
-  printf ("Attached to pid %d (windows pid %u)\n", pid, (unsigned) child_pid);
   return;
 }
 
@@ -396,6 +403,8 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
   char alen[3 + 8 + 1];
   DWORD nbytes;
   child_list *child = get_child (id);
+  if (!child)
+    error (0, "no process id %d found", id);
   HANDLE hchild = child->hproc;
 #define INTROLEN (sizeof (alen) - 1)
 
@@ -423,7 +432,7 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
   else
     {
       special = len;
-      if (special == _STRACE_INTERFACE_ACTIVATE_ADDR)
+      if (special == _STRACE_INTERFACE_ACTIVATE_ADDR || special == _STRACE_CHILD_PID)
 	len = 17;
     }
 
@@ -441,14 +450,20 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
 
   s = strchr (s, '\0') + 1;
 
+  if (special == _STRACE_CHILD_PID)
+    {
+      if (!DebugActiveProcess (n))
+	error (0, "couldn't attach to subprocess %d for debugging, "
+	       "windows error %d", n, GetLastError ());
+      return;
+    }
+
   if (special == _STRACE_INTERFACE_ACTIVATE_ADDR)
     {
-      DWORD new_flag = 1;
-      if (!WriteProcessMemory (hchild, (LPVOID) n, &new_flag,
-			       sizeof (new_flag), &nbytes))
-	error (0,
-	       "couldn't write strace flag to subprocess at %p, windows error %d",
-	       n, GetLastError ());
+      if (!WriteProcessMemory (hchild, (LPVOID) n, &strace_active,
+			       sizeof (strace_active), &nbytes))
+	error (0, "couldn't write strace flag to subprocess at %p, "
+	       "windows error %d", n, GetLastError ());
       return;
     }
 
@@ -577,7 +592,6 @@ static void
 proc_child (unsigned mask, FILE *ofile, pid_t pid)
 {
   DEBUG_EVENT ev;
-  int processes = 0;
   time_t cur_time, last_time;
 
   SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_HIGHEST);
@@ -609,7 +623,6 @@ proc_child (unsigned mask, FILE *ofile, pid_t pid)
 	  if (ev.u.CreateProcessInfo.hFile)
 	    CloseHandle (ev.u.CreateProcessInfo.hFile);
 	  add_child (ev.dwProcessId, ev.u.CreateProcessInfo.hProcess);
-	  processes++;
 	  break;
 
 	case CREATE_THREAD_DEBUG_EVENT:
@@ -630,22 +643,20 @@ proc_child (unsigned mask, FILE *ofile, pid_t pid)
 	  remove_child (ev.dwProcessId);
 	  break;
 	case EXCEPTION_DEBUG_EVENT:
-	  if (ev.u.Exception.ExceptionRecord.ExceptionCode !=
-	      STATUS_BREAKPOINT)
+	  if (ev.u.Exception.ExceptionRecord.ExceptionCode != STATUS_BREAKPOINT)
 	    {
 	      status = DBG_EXCEPTION_NOT_HANDLED;
-#if 0
-	      fprintf (stderr, "exception %p at %p\n",
-		       ev.u.Exception.ExceptionRecord.ExceptionCode,
-		       ev.u.Exception.ExceptionRecord.ExceptionAddress);
-#endif
+	      if (ev.u.Exception.dwFirstChance)
+		fprintf (ofile, "--- Process %u, exception %p at %p\n", ev.dwProcessId,
+			 ev.u.Exception.ExceptionRecord.ExceptionCode,
+			 ev.u.Exception.ExceptionRecord.ExceptionAddress);
 	    }
 	  break;
 	}
       if (!ContinueDebugEvent (ev.dwProcessId, ev.dwThreadId, status))
 	error (0, "couldn't continue debug event, windows error %d",
 	       GetLastError ());
-      if (ev.dwDebugEventCode == EXIT_PROCESS_DEBUG_EVENT && --processes == 0)
+      if (!processes)
 	break;
     }
 }
@@ -864,6 +875,7 @@ struct option longopts[] = {
   {"output", required_argument, NULL, 'o'},
   {"no-delta", no_argument, NULL, 'd'},
   {"pid", required_argument, NULL, 'p'},
+  {"quiet", no_argument, NULL, 'q'},
   {"timestamp", no_argument, NULL, 't'},
   {"toggle", no_argument, NULL, 'T'},
   {"trace-children", no_argument, NULL, 'f'},
@@ -873,7 +885,7 @@ struct option longopts[] = {
   {NULL, 0, NULL, 0}
 };
 
-static const char *const opts = "+b:dhHfm:no:p:S:tTuvw";
+static const char *const opts = "+b:dhHfm:no:p:qS:tTuvw";
 
 static void
 print_version ()
@@ -906,6 +918,7 @@ main (int argc, char **argv)
   pid_t pid = 0;
   int opt;
   int toggle = 0;
+  int sawquiet = -1;
 
   if (load_cygwin ())
     {
@@ -963,6 +976,13 @@ character #%d.\n", optarg, (int) (endptr - optarg), endptr);
 	break;
       case 'p':
 	pid = strtoul (optarg, NULL, 10);
+	strace_active |= 2;
+	break;
+      case 'q':
+	if (sawquiet < 0)
+	  sawquiet = 1;
+	else
+	  sawquiet ^= 1;
 	break;
       case 'S':
 	flush_period = strtoul (optarg, NULL, 10);
@@ -998,6 +1018,13 @@ character #%d.\n", optarg, (int) (endptr - optarg), endptr);
 
   if (toggle && !pid)
     error (0, "must provide a process id to toggle tracing");
+
+  if (!pid)
+    quiet = sawquiet < 0 || !sawquiet;
+  else if (sawquiet < 0)
+    quiet = 0;
+  else
+    quiet = sawquiet;
 
   if (!mask)
     mask = _STRACE_ALL;

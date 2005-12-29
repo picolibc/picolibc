@@ -307,11 +307,13 @@ frok::parent (void *stack_here)
 
   /* Fixup the parent datastructure if needed and resume the child's
      main thread. */
-  if (cygheap->fdtab.need_fixup_before ())
+  if (c_flags & CREATE_SUSPENDED)
     {
       cygheap->fdtab.fixup_before_fork (pi.dwProcessId);
       ResumeThread (pi.hThread);
     }
+
+  strace.write_childpid (ch, pi.dwProcessId);
 
   child_pid = cygwin_pid (pi.dwProcessId);
   child.init (child_pid, 1, NULL);
@@ -662,7 +664,7 @@ child_copy (HANDLE hp, bool write, ...)
 	    res = WriteProcessMemory (hp, here, here, todo, &done);
 	  else
 	    res = ReadProcessMemory (hp, here, here, todo, &done);
-	  debug_printf ("hp %p, low %p, high %p, res %d", hp, low, high, res);
+	  debug_printf ("%s - hp %p low %p, high %p, res %d", what, hp, low, high, res);
 	  if (!res || todo != done)
 	    {
 	      if (!res)

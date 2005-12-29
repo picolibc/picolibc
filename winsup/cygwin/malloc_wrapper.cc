@@ -258,7 +258,7 @@ malloc_init ()
      calls to malloc/free/realloc to application provided. This may
      happen if some other dll calls cygwin's malloc, but main code provides
      its own malloc */
-  if (!user_data->forkee)
+  if (!in_forkee)
     {
       user_data->free (user_data->malloc (16));
       if (export_malloc_called)

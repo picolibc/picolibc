@@ -29,7 +29,7 @@ enum child_info_types
 
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
-#define CURR_CHILD_INFO_MAGIC 0xb530a54dU
+#define CURR_CHILD_INFO_MAGIC 0xc87757a7U
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -48,7 +48,7 @@ public:
   init_cygheap *cygheap;
   void *cygheap_max;
   DWORD cygheap_reserve_sz;
-  DWORD dwProcessId;
+  unsigned char straced;
   unsigned fhandler_union_cb;
   child_info (unsigned, child_info_types, bool);
   child_info (): subproc_ready (NULL), parent (NULL) {}
@@ -69,6 +69,7 @@ public:
   void *stacktop;	// location of top of parent stack
   void *stackbottom;	// location of bottom of parent stack
   child_info_fork ();
+  void handle_fork ();
 };
 
 class fhandler_base;

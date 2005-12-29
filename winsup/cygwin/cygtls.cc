@@ -147,7 +147,7 @@ void
 _cygtls::remove (DWORD wait)
 {
   debug_printf ("wait %p", wait);
-  if (!locals.exitsock || exit_state >= ES_FINAL)
+  if (1 || !isinitialized () || !locals.exitsock || exit_state >= ES_FINAL)
     return;
   if (wait)
     {

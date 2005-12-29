@@ -54,10 +54,7 @@ set_myself (HANDLE h)
   myself->dwProcessId = GetCurrentProcessId ();
 
   GetModuleFileName (NULL, myself->progname, sizeof (myself->progname));
-#ifndef DEBUGGING
-  if (!strace.active)
-#endif
-    strace.hello ();
+  strace.hello ();
   debug_printf ("myself->dwProcessId %u", myself->dwProcessId);
   if (h)
     {

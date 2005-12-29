@@ -772,7 +772,7 @@ fhandler_base::read (void *in_ptr, size_t& len)
   len = dst - (char *) ptr;
 
 #ifndef NOSTRACE
-  if (strace.active)
+  if (strace.active ())
     {
       char buf[16 * 6 + 1];
       char *p = buf;

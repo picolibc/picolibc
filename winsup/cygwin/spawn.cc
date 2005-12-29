@@ -424,7 +424,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   pthread_cleanup_push (do_cleanup, (void *) &cleanup);
   av newargv;
   linebuf one_line;
-  child_info_spawn ciresrv;
+  child_info_spawn ch;
 
   path_conv real_path;
   bool reset_sendsig = false;
@@ -643,11 +643,11 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       res = -1;
       goto out;
     }
-  ciresrv.set (chtype, real_path.iscygexec ());
-  ciresrv.moreinfo = moreinfo;
+  ch.set (chtype, real_path.iscygexec ());
+  ch.moreinfo = moreinfo;
 
-  si.lpReserved2 = (LPBYTE) &ciresrv;
-  si.cbReserved2 = sizeof (ciresrv);
+  si.lpReserved2 = (LPBYTE) &ch;
+  si.cbReserved2 = sizeof (ch);
 
   /* When ruid != euid we create the new process under the current original
      account and impersonate in child, this way maintaining the different
@@ -730,6 +730,9 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       res = -1;
       goto out;
     }
+
+  if (!(flags & CREATE_SUSPENDED))
+    strace.write_childpid (ch, pi.dwProcessId);
 
   /* Fixup the parent data structures if needed and resume the child's
      main thread. */
@@ -818,12 +821,15 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   /* Start the child running */
   if (flags & CREATE_SUSPENDED)
-    ResumeThread (pi.hThread);
+    {
+      ResumeThread (pi.hThread);
+      strace.write_childpid (ch, pi.dwProcessId);
+    }
   ForceCloseHandle (pi.hThread);
 
   sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
 
-  synced = ciresrv.sync (pid, pi.hProcess, INFINITE);
+  synced = ch.sync (pid, pi.hProcess, INFINITE);
 
   switch (mode)
     {

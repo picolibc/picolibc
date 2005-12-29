@@ -768,7 +768,7 @@ child_info::child_info (unsigned in_cb, child_info_types chtype, bool need_subpr
   sigproc_printf ("subproc_ready %p", subproc_ready);
   cygheap = ::cygheap;
   cygheap_max = ::cygheap_max;
-  dwProcessId = myself->dwProcessId;
+  straced = strace.attached ();
   /* Create an inheritable handle to pass to the child process.  This will
      allow the child to duplicate handles from the parent to itself. */
   parent = NULL;

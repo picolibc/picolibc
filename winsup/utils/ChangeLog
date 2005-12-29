@@ -1,5 +1,25 @@
 2005-12-29  Christopher Faylor  <cgf@timesys.com>
 
+	* strace.cc (nprocesses): Make static global.
+	(quiet): New variable.
+	(strace_active): Ditto.
+	(add_child): Increment nprocesses here.  Don't add a child if it is
+	already added (windows bug?).  Report on child if not quiet.
+	(get_child): Just return NULL if child not found.
+	(remove_child): Report on child if not quiet.
+	(attach_process): Don't complain if given a windows process.  Use
+	windows pid in error.
+	(handle_output_debug_string): Issue error if trying to manipulate a process that we don't know about.
+	Handle _STRACE_CHILD_PID - attach to reported child when we get this.
+	(proc_child): Move nprocesses to file scope.
+	Report on exceptions.
+	(longopts): Implement "--quiet".
+	(opts): Implement "-q".
+	(main): Manipulate quiet flag.
+	* utils.sgml (strace): Add words describing '-q'.
+
+2005-12-29  Christopher Faylor  <cgf@timesys.com>
+
 	* cygcheck.cc (common_apps): Add crontab, vi, vim.
 
 2005-12-19  Igor Pechtchanski  <pechtcha@cs.nyu.edu>

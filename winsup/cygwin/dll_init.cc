@@ -23,7 +23,6 @@ extern void __stdcall check_sanity_and_sync (per_process *);
 
 dll_list NO_COPY dlls;
 
-static int NO_COPY in_forkee;
 static bool dll_global_dtors_recorded;
 
 /* Run destructors for all DLLs on exit. */
@@ -283,7 +282,6 @@ release_upto (const char *name, DWORD here)
 void
 dll_list::load_after_fork (HANDLE parent, dll *first)
 {
-  in_forkee = 1;
   int try2 = 0;
   dll d;
 
@@ -346,7 +344,7 @@ dll_list::load_after_fork (HANDLE parent, dll *first)
 	}
       next = d.next;	/* Get the address of the next DLL. */
     }
-  in_forkee = 0;
+  in_forkee = false;
 }
 
 extern "C" int

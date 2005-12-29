@@ -112,7 +112,7 @@ DWORD
 fhandler_tty_common::__acquire_output_mutex (const char *fn, int ln,
 					   DWORD ms)
 {
-  if (strace.active)
+  if (strace.active ())
     strace.prntf (_STRACE_TERMIOS, fn, "(%d): tty output_mutex: waiting %d ms", ln, ms);
   DWORD res = WaitForSingleObject (output_mutex, ms);
   if (res == WAIT_OBJECT_0)

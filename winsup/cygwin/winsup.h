@@ -344,6 +344,7 @@ extern SYSTEM_INFO system_info;
 /* The title on program start. */
 extern char *old_title;
 extern bool display_title;
+extern bool in_forkee;
 
 extern HANDLE hMainThread;
 extern HANDLE hMainProc;

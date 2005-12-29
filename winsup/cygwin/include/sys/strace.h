@@ -1,14 +1,13 @@
 /* sys/strace.h
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005 Red Hat, Inc.
 
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
-
-/* sys/strace.h */
 
 /* This file contains routines for tracing system calls and other internal
    phenomenon.
@@ -33,21 +32,25 @@ details. */
 
 #ifdef __cplusplus
 
+class child_info;
 class strace
 {
   int vsprntf (char *buf, const char *func, const char *infmt, va_list ap);
   void write (unsigned category, const char *buf, int count);
+  unsigned char _active;
 public:
   int microseconds ();
   int version;
-  int active;
   int lmicrosec;
-  int execing;
-  int inited;
-  void hello ();
+  bool execing;
+  void hello () __attribute__ ((regparm (1)));
   void prntf (unsigned, const char *func, const char *, ...) /*__attribute__ ((regparm(3)))*/;
   void vprntf (unsigned, const char *func, const char *, va_list ap) /*__attribute__ ((regparm(3)))*/;
   void wm (int message, int word, int lon) __attribute__ ((regparm(3)));
+  void write_childpid (child_info&, unsigned long) __attribute__ ((regparm (2)));
+  bool attached () const {return _active == 3;}
+  bool active () const {return _active & 1;}
+  unsigned char& active_val () {return _active;}
 };
 
 extern strace strace;
@@ -56,6 +59,7 @@ extern strace strace;
 
 #define _STRACE_INTERFACE_ACTIVATE_ADDR  -1
 #define _STRACE_INTERFACE_ACTIVATE_ADDR1 -2
+#define _STRACE_CHILD_PID -3
 
 /* Bitmasks of tracing messages to print.  */
 
@@ -78,13 +82,6 @@ extern strace strace;
 #define _STRACE_MALLOC	 0x20000 // trace malloc calls
 #define _STRACE_THREAD	 0x40000 // thread-locking calls
 #define _STRACE_NOTALL	 0x80000 // don't include if _STRACE_ALL
-#if defined (DEBUGGING)
-# define _STRACE_ON strace.active = 1
-# define _STRACE_OFF strace.active = 0
-#else
-# define _STRACE_ON
-# define _STRACE_OFF
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -108,7 +105,7 @@ void strace_printf (unsigned, const char *func, const char *, ...);
 
 #define define_strace0(c,...) \
   do { \
-      if ((c & _STRACE_SYSTEM) || strace.active) \
+      if ((c & _STRACE_SYSTEM) || strace.active ()) \
 	strace.prntf (c, __PRETTY_FUNCTION__, __VA_ARGS__); \
     } \
   while (0)
@@ -130,13 +127,13 @@ void strace_printf (unsigned, const char *func, const char *, ...);
 #else
 #define strace_printf_wrap(what, fmt, args...) \
    ((void) ({\
-	if ((_STRACE_ ## what & _STRACE_SYSTEM) || strace.active) \
+	if ((_STRACE_ ## what & _STRACE_SYSTEM) || strace.active ()) \
 	  strace.prntf(_STRACE_ ## what, __PRETTY_FUNCTION__, fmt, ## args); \
 	0; \
     }))
 #define strace_printf_wrap1(what, fmt, args...) \
     ((void) ({\
-	if ((_STRACE_ ## what & _STRACE_SYSTEM) || strace.active) \
+	if ((_STRACE_ ## what & _STRACE_SYSTEM) || strace.active ()) \
 	  strace.prntf((_STRACE_ ## what) | _STRACE_NOTALL, __PRETTY_FUNCTION__, fmt, ## args); \
 	0; \
     }))

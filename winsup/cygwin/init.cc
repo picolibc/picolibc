@@ -41,6 +41,8 @@ calibration_thread (VOID *arg)
   ExitThread (0);
 }
 
+static DWORD calibration_id;
+
 /* We need to know where the OS stores the address of the thread function
    on the stack so that we can intercept the call and insert some tls
    stuff on the stack.  This function starts a known calibration thread.
@@ -50,11 +52,12 @@ calibration_thread (VOID *arg)
 static void
 prime_threads ()
 {
-  if (!threadfunc_ix[0])
+  if (threadfunc_ix[0])
+    sync_startup = INVALID_HANDLE_VALUE;
+  else
     {
-      DWORD id;
       search_for = (char *) calibration_thread;
-      sync_startup = CreateThread (NULL, 0, calibration_thread, 0, 0, &id);
+      sync_startup = CreateThread (NULL, 0, calibration_thread, 0, 0, &calibration_id);
     }
 }
 
@@ -72,7 +75,7 @@ munge_threadfunc ()
       for (peb = ebp, i = 0; peb < top && i < 7; peb++)
 	if (*peb == search_for)
 	  threadfunc_ix[i++] = peb - ebp;
-      if (!threadfunc_ix[0])
+      if (0 && !threadfunc_ix[0])
 	{
 	  try_to_debug ();
 	  return;
@@ -82,7 +85,7 @@ munge_threadfunc ()
   char *threadfunc = ebp[threadfunc_ix[0]];
   if (threadfunc == (char *) calibration_thread)
     /* no need for the overhead */;
-  else
+  else if (threadfunc_ix[0])
     {
       for (i = 0; threadfunc_ix[i]; i++)
 	ebp[threadfunc_ix[i]] = (char *) threadfunc_fe;
@@ -166,10 +169,12 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
     case DLL_PROCESS_DETACH:
       break;
     case DLL_THREAD_ATTACH:
-      munge_threadfunc ();
+      if (!sync_startup || GetCurrentThreadId () == calibration_id)
+	munge_threadfunc ();
       break;
     case DLL_THREAD_DETACH:
-      _my_tls.remove (0);
+      if (!sync_startup)
+	_my_tls.remove (0);
       break;
     }
 

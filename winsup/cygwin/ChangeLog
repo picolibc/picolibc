@@ -1,3 +1,73 @@
+2005-12-29  Christopher Faylor  <cgf@timesys.com>
+
+	* child_info.h (CURR_CHILD_INFO_MAGIC): Reset.
+	(child_info::dwProcessId): Delete.
+	(child_info::straced): New variable.
+	(child_info::handle_fork): New member function.
+	* dcrt0.cc (in_forkee): New global variable.
+	(__cygwin_user_data::forkee): Mark as obsolete.
+	(do_global_ctors): Use in_forkee rather than user_data->forkee.
+	(get_cygwin_startup_info): Ditto.  Deal with new straced field to allow
+	strace to deal with children of attached processes.
+	(initial_env): Accommodate changes to strace::hello.
+	(child_info_fork::handle_fork): Rename from plain old 'handle_fork'.
+	Move alloc_stack() call elsewhere.
+	(dll_crt0_0): Fill out more of user_data.  Reference handle_fork via
+	fork_info.  Add some debugging output.
+	(_dll_crt0): Don't wait for sync thread if sync_startup is invalid.
+	Zero sync_startup here.  Call alloc_stack() here, if appropriate.
+	(dll_crt0_1): Use in_forkee rather than user_data->forkee.
+	(dll_crt0): Ditto.
+	* malloc_wrapper.cc (malloc_init): Ditto.
+	* dll_init.cc (in_forkee): Remove local static version of this
+	variable.
+	(dll_list::load_after_fork): Don't set in_forkee here.
+	* external.cc (cygwin_internal): Use strace method rather than
+	accessing field directly.
+	* fhandler.cc (fhandler_base::read): Ditto.
+	* fhandler_tty.cc (fhandler_tty_common::__acquire_output_mutex): Ditto.
+	* fork.cc (frok::parent): Invoke strace write_childpid to communicate
+	with potential strace.
+	(child_copy): Add more detail to debugging output.
+	* init.cc (calibration_id): New static variable.
+	(prime_threads): Set sync_startup to invalid handle if we already know
+	about thread_func_ix.  Use static calibration_id to hold calibration
+	thread id.
+	* munge_threadfunc (munge_threadfunc): Don't try to debug if we don't
+	find threadfunc_ix.
+	(dll_entry): Avoid calling munge_threadfunc and _cygtls::remove on
+	non-cygwin threads invoked during process startup.
+	* pinfo.cc (set_myself): Always call strace.hello here regardless of
+	DEBUGGING.
+	* sigproc.cc (child_info::child_info): Remove spurious handling of
+	dwProcessId.  Set straced as appropriate.
+	* spawn.cc (spawn_guts): Rename ciresrv to ch.  Invoke strace
+	write_childpid to communicate with potential strace.
+	* strace.cc: Include child_info.h.
+	(strace::hello): Remove inited test.  Use active() method to test if
+	strace has been activated.  Handle case where we are started before
+	(mypid): New function.
+	(strace::vsprntf): Try to deal more intelligently with case where
+	progname may not be filled out.  Put pid in parentheses if it is a
+	windows pid rather than a cygwin pid.  myself has been filled out.
+	(strace::write_childpid): New function for notifying strace about the
+	creation of children.
+	(strace::vprntf): Use strace method rather than accessing field
+	directly.
+	(strace_printf): Ditto.
+	(strace::wm): Ditto.
+	* winsup.h (in_forkee): Declare.
+	* include/sys/strace.h (strace::write_childpid): Declare new function.
+	(strace::attached): Define new function.
+	(strace::active): Ditto.
+	(strace::active_val): Ditto.
+	(_STRACE_ON): Delete.
+	(_STRACE_OFF): Ditto.
+	(define_strace0): Use strace method rather than accessing field
+	directly.
+	(strace_printf_wrap): Ditto.
+	(strace_printf_wrap1): Ditto.
+
 2005-12-28  Christopher Faylor  <cgf@timesys.com>
 
 	* environ.cc (win_env::add_cache): Don't add variables to the

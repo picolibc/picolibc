@@ -218,7 +218,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 
       case CW_STRACE_ACTIVE:
 	{
-	  return strace.active;
+	  return strace.active ();
 	}
 
       case CW_CYGWIN_PID_TO_WINPID:

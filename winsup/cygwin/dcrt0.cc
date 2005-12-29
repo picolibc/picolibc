@@ -53,6 +53,7 @@ muto NO_COPY lock_process::locker;
 bool display_title;
 bool strip_title_path;
 bool allow_glob = true;
+bool NO_COPY in_forkee;
 codepage_type current_codepage = ansi_cp;
 
 int __argc_safe;
@@ -108,7 +109,7 @@ extern "C"
    /* premain */ {NULL, NULL, NULL, NULL},
    /* run_ctors_p */ 0,
    /* unused */ {0, 0, 0, 0, 0, 0, 0},
-   /* forkee */ 0,
+   /* UNUSED forkee */ 0,
    /* hmodule */ NULL,
    /* api_major */ CYGWIN_VERSION_API_MAJOR,
    /* api_minor */ CYGWIN_VERSION_API_MINOR,
@@ -141,7 +142,7 @@ do_global_dtors ()
 static void __stdcall
 do_global_ctors (void (**in_pfunc)(), int force)
 {
-  if (!force && user_data->forkee)
+  if (!force && in_forkee)
     return;		// inherit constructed stuff from parent pid
 
   /* Run ctors backwards, so skip the first entry and find how many
@@ -554,11 +555,8 @@ initial_env ()
       len = GetModuleFileName (NULL, buf, CYG_MAX_PATH);
       console_printf ("Sleeping %d, pid %u %s\n", ms, GetCurrentProcessId (), buf);
       Sleep (ms);
-      if (!strace.active && !dynamically_loaded)
-	{
-	  strace.inited = 0;
-	  strace.hello ();
-	}
+      if (!strace.active () && !dynamically_loaded)
+	strace.hello ();
     }
   if (GetEnvironmentVariable ("CYGWIN_DEBUG", buf, sizeof (buf) - 1))
     {
@@ -611,7 +609,7 @@ get_cygwin_startup_info ()
       switch (res->type)
 	{
 	  case _PROC_FORK:
-	    user_data->forkee = true;
+	    in_forkee = true;
 	    should_be_cb = sizeof (child_info_fork);
 	    /* fall through */;
 	  case _PROC_SPAWN:
@@ -622,6 +620,20 @@ get_cygwin_startup_info ()
 	      multiple_cygwin_problem ("proc size", res->cb, should_be_cb);
 	    else if (sizeof (fhandler_union) != res->fhandler_union_cb)
 	      multiple_cygwin_problem ("fhandler size", res->fhandler_union_cb, sizeof (fhandler_union));
+	    if (res->straced)
+	      {
+		res->ready (false);
+#if 0
+		DWORD prio = GetThreadPriority (GetCurrentThread ());
+		SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
+#endif
+		for (unsigned i = 0; !being_debugged () && i < 10000; i++)
+		  low_priority_sleep (0);
+#if 0
+		SetThreadPriority (GetCurrentThread (), prio);
+#endif
+		strace.hello ();
+	      }
 	    break;
 	  default:
 	    system_printf ("unknown exec type %d", res->type);
@@ -641,26 +653,24 @@ get_cygwin_startup_info ()
 #define dll_bss_end &_bss_end__
 
 void
-handle_fork ()
+child_info_fork::handle_fork ()
 {
-  alloc_stack (fork_info);
   cygheap_fixup_in_child (false);
   memory_init ();
   set_myself (NULL);
-  HANDLE hp = fork_info->parent;
-  child_copy (hp, false,
+  child_copy (parent, false,
 	      "dll data", dll_data_start, dll_data_end,
 	      "dll bss", dll_bss_start, dll_bss_end,
 	      "user heap", cygheap->user_heap.base, cygheap->user_heap.ptr,
 	      NULL);
   /* step 2 now that the dll has its heap filled in, we can fill in the
      user's data and bss since user_data is now filled out. */
-  child_copy (hp, false,
+  child_copy (parent, false,
 	      "data", user_data->data_start, user_data->data_end,
 	      "bss", user_data->bss_start, user_data->bss_end,
 	      NULL);
 
-  if (fixup_mmaps_after_fork (hp))
+  if (fixup_mmaps_after_fork (parent))
     api_fatal ("recreate_mmaps_after_fork_failed");
 }
 
@@ -675,6 +685,8 @@ dll_crt0_0 ()
   _impure_ptr->_stdout = &_impure_ptr->__sf[1];
   _impure_ptr->_stderr = &_impure_ptr->__sf[2];
   _impure_ptr->_current_locale = "C";
+  user_data->impure_ptr = _impure_ptr;
+  user_data->impure_ptr_ptr = &_impure_ptr;
   wincap.init ();
   initial_env ();
   mmap_init ();
@@ -690,7 +702,6 @@ dll_crt0_0 ()
     OpenProcessToken (hMainProc, MAXIMUM_ALLOWED, &hProcToken);
 
   SetErrorMode (SEM_FAILCRITICALERRORS);
-
   device::init ();
   do_global_ctors (&__CTOR_LIST__, 1);
   cygthread::init ();
@@ -704,7 +715,7 @@ dll_crt0_0 ()
       switch (child_proc_info->type)
 	{
 	  case _PROC_FORK:
-	    handle_fork ();
+	    fork_info->handle_fork ();
 	    break;
 	  case _PROC_SPAWN:
 	  case _PROC_EXEC:
@@ -747,6 +758,7 @@ dll_crt0_0 ()
     DuplicateTokenEx (hProcToken, MAXIMUM_ALLOWED, NULL,
 		      SecurityImpersonation, TokenImpersonation,
 		      &hProcImpToken);
+  debug_printf ("finished dll_crt0_0 initialization");
 }
 
 /* Take over from libc's crt0.o and start the application. Note the
@@ -772,7 +784,7 @@ dll_crt0_1 (char *)
 
   /* Initialize pthread mainthread when not forked and it is safe to call new,
      otherwise it is reinitalized in fixup_after_fork */
-  if (!user_data->forkee)
+  if (!in_forkee)
     pthread::init_mainthread ();
 
 #ifdef DEBUGGING
@@ -791,7 +803,7 @@ dll_crt0_1 (char *)
 #endif
 
   cygbench ("pre-forkee");
-  if (user_data->forkee)
+  if (in_forkee)
     {
       /* If we've played with the stack, stacksize != 0.  That means that
 	 fork() was invoked from other than the main thread.  Make sure that
@@ -946,18 +958,15 @@ initialize_main_tls (char *padding)
 extern "C" void __stdcall
 _dll_crt0 ()
 {
+  extern DWORD threadfunc_ix;
   extern HANDLE sync_startup;
-  extern unsigned threadfunc_ix;
-  if (threadfunc_ix)
-    /* nothing to do */;
-  else if (!sync_startup)
-    system_printf ("internal error: sync_startup not called at start.  Expect signal problems.");
-  else
+  if (sync_startup != INVALID_HANDLE_VALUE)
     {
       WaitForSingleObject (sync_startup, INFINITE);
       CloseHandle (sync_startup);
     }
 
+  sync_startup = NULL;
   if (!threadfunc_ix)
     system_printf ("internal error: couldn't determine location of thread function on stack.  Expect signal problems.");
 
@@ -968,8 +977,9 @@ _dll_crt0 ()
 
   char padding[CYGTLS_PADSIZE];
 
-  if (child_proc_info && child_proc_info->type == _PROC_FORK)
-    user_data->forkee = true;
+debug_printf ("in_forkee %d, fork_info %p", in_forkee, fork_info);
+  if (in_forkee)
+    alloc_stack (fork_info);
   else
     __sinit (_impure_ptr);
 
@@ -981,7 +991,7 @@ void
 dll_crt0 (per_process *uptr)
 {
   /* Set the local copy of the pointer into the user space. */
-  if (!user_data->forkee && uptr && uptr != user_data)
+  if (!in_forkee && uptr && uptr != user_data)
     {
       memcpy (user_data, uptr, per_process_overwrite);
       *(user_data->impure_ptr_ptr) = _GLOBAL_REENT;
