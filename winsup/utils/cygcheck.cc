@@ -85,6 +85,7 @@ static common_apps[] = {
   {"cat", 0},
   {"cp", 0},
   {"cpp", 1},
+  {"crontab", 0},
   {"find", 0},
   {"gcc", 0},
   {"gdb", 0},
@@ -101,6 +102,8 @@ static common_apps[] = {
   {"sh", 0},
   {"tar", 0},
   {"test", 0},
+  {"vi", 0},
+  {"vim", 0},
   {0, 0}
 };
 

@@ -1,3 +1,7 @@
+2005-12-29  Christopher Faylor  <cgf@timesys.com>
+
+	* cygcheck.cc (common_apps): Add crontab, vi, vim.
+
 2005-12-19  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
 
 	* dump_setup.cc (package_find): Fix is_alias computation for "/usr/lib".
