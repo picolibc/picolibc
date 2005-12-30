@@ -1,18 +1,6 @@
 <!-- faq-problems.xml --> 
 <para>Aware of the problem, no solution known.</para>
 
-<qandaentry id="faq.known-problems.hyperthreading">
-<question><para>Hangs with Hyperthreaded Processor</para></question>
-<answer>
-
-<para>Some users using processors with Intel's Hyperthreading turned on have
-reported hangs that do not appear with Hyperthreading off. So far
-the Cygwin developers have not been able to reproduce this problem.
-See <ulink url="http://www.cygwin.com/ml/cygwin/2004-07/msg01100.html">http://www.cygwin.com/ml/cygwin/2004-07/msg01100.html</ulink> and
-related messages for details.
-</para>
-</answer></qandaentry>
-
 <qandaentry id="faq.known-problems.pipe-key">
 <question><para>Pipe key (<literal>|</literal>) doesn't work on non-US keyboards in Win9x/ME</para></question>
 <answer>
