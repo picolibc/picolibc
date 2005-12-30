@@ -1,5 +1,9 @@
 2005-12-30  Christopher Faylor  <cgf@timesys.com>
 
+	* relnotes.texinfo: Remove entry about hyperthreaded processor.
+
+2005-12-30  Christopher Faylor  <cgf@timesys.com>
+
 	* faq-problems.html: Remove entry about hyperthreaded processor.
 
 2005-12-12  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
