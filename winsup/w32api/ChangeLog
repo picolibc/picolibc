@@ -1,3 +1,8 @@
+2005-12-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winsock2.h: Don't define struct sockaddr_storage when
+	building Cygwin.
+
 2005-12-22  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/ws2_32.c: New file, defining IPv6 constants. 

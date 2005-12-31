@@ -329,7 +329,6 @@ struct sockaddr {
 	u_short sa_family;
 	char	sa_data[14];
 };
-#endif /* ! (__INSIDE_CYGWIN__ || __INSIDE_MSYS__) */
 
 /* Portable IPv6/IPv4 version of sockaddr.
    Uses padding to force 8 byte alignment
@@ -340,6 +339,7 @@ struct sockaddr_storage {
     __int64 __ss_align; /* force alignment */
     char __ss_pad2[112];  /* pad to 128 */
 };
+#endif /* ! (__INSIDE_CYGWIN__ || __INSIDE_MSYS__) */
 
 struct sockproto {
 	u_short sp_family;
