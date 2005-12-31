@@ -1,5 +1,10 @@
 2005-12-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syslog.cc (vsyslog): Decrement len if trailing \n has been removed.
+	Add \n when writing to stderr if LOG_PERROR option is set.
+
+2005-12-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/in.h: Drop including stdint.h.  Move definition
 	of in_port_t and in_addr_t to top of file and use throughout. Use
 	sa_family_t type where appropriate.

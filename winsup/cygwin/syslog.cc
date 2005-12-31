@@ -402,12 +402,15 @@ vsyslog (int priority, const char *message, va_list ap)
     char *total_msg = pass.get_message ();
     int len = strlen (total_msg);
     if (len != 0 && (total_msg[len - 1] == '\n'))
-      total_msg[len - 1] = '\0';
+      total_msg[--len] = '\0';
 
     msg_strings[0] = total_msg;
 
     if (_my_tls.locals.process_logopt & LOG_PERROR)
-      write (STDERR_FILENO, total_msg, len + 1);
+      {
+	write (STDERR_FILENO, total_msg, len);
+	write (STDERR_FILENO, "\n", 1);
+      }
 
     int fd;
     if ((fd = try_connect_syslogd (priority, total_msg, len + 1)) >= 0)
