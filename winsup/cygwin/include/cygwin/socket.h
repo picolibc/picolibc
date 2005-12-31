@@ -15,9 +15,31 @@ details. */
 extern "C" {
 #endif /* __cplusplus */
 
+#include <stdint.h>
+
+#ifndef socklen_t
+#define socklen_t int			/* Not unsigned for backward compat. */
+#endif
+
+typedef uint16_t sa_family_t;
+
 struct sockaddr {
-  unsigned short	sa_family;	/* address family, AF_xxx	*/
+  sa_family_t		sa_family;	/* address family, AF_xxx	*/
   char			sa_data[14];	/* 14 bytes of protocol address	*/
+};
+
+/* Definition of sockaddr_storage according to SUSv3. */
+#define _SS_MAXSIZE 128			/* Maximum size. */
+#define _SS_ALIGNSIZE (sizeof (int64_t))/* Desired alignment. */
+#define _SS_PAD1SIZE (_SS_ALIGNSIZE - sizeof (sa_family_t))
+#define _SS_PAD2SIZE (_SS_MAXSIZE - (sizeof (sa_family_t) \
+		      + _SS_PAD1SIZE + _SS_ALIGNSIZE))
+
+struct sockaddr_storage {
+  sa_family_t		ss_familiy;
+  char			_ss_pad1[_SS_PAD1SIZE];
+  int64_t		__ss_align;
+  char			_ss_pad2[_SS_PAD2SIZE];
 };
 
 #include <asm/socket.h>			/* arch-dependent defines	*/
@@ -35,10 +57,6 @@ struct linger {
   unsigned short	l_onoff;	/* Linger active	*/
   unsigned short	l_linger;	/* How long to linger for	*/
 };
-
-#ifndef socklen_t
-#define socklen_t int
-#endif
 
 struct msghdr
 {

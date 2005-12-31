@@ -1,6 +1,6 @@
 /* sys/un.h
 
-   Copyright 1999, 2001 Red Hat, Inc.
+   Copyright 1999, 2001, 2005 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -11,11 +11,13 @@ details. */
 #ifndef _SYS_UN_H
 #define _SYS_UN_H
 
+#include <cygwin/socket.h>
+
 /* POSIX requires only at least 100 bytes */
 #define UNIX_PATH_LEN   108
 
 struct sockaddr_un {
-  unsigned short sun_family;              /* address family AF_LOCAL/AF_UNIX */
+  sa_family_t	 sun_family;              /* address family AF_LOCAL/AF_UNIX */
   char	         sun_path[UNIX_PATH_LEN]; /* 108 bytes of socket address     */
 };
 

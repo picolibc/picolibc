@@ -18,8 +18,10 @@
 #ifndef _CYGWIN_IN_H
 #define _CYGWIN_IN_H
 
-#include <stdint.h>
 #include <cygwin/socket.h>
+
+typedef uint16_t in_port_t;
+typedef uint32_t in_addr_t;
 
 /* Standard well-defined IP protocols.  If you ever add one here, don't
    forget to define it below. */
@@ -50,7 +52,6 @@ enum
 #define IPPROTO_IDP IPPROTO_IDP
 #define IPPROTO_RAW IPPROTO_RAW
 
-typedef uint16_t in_port_t;
 /* Standard well-known ports.  *//* from winsup/include/netinet/in.h */
 enum
 {
@@ -91,11 +92,10 @@ enum
   IPPORT_USERRESERVED = 5000
 };
 
-typedef uint32_t in_addr_t;
 /* Internet address. */
 struct in_addr
 {
-  unsigned int s_addr;
+  in_addr_t s_addr;
 };
 
 /* Request struct for multicast socket ops */
@@ -111,8 +111,8 @@ struct ip_mreq
 #define __SOCK_SIZE__	16		/* sizeof(struct sockaddr)	*/
 struct sockaddr_in
 {
-  short int sin_family;	/* Address family		*/
-  unsigned short int sin_port;	/* Port number			*/
+  sa_family_t	 sin_family;	/* Address family		*/
+  in_port_t	 sin_port;	/* Port number			*/
   struct in_addr sin_addr;	/* Internet address		*/
 
   /* Pad to size of `struct sockaddr'. */
@@ -190,15 +190,16 @@ struct sockaddr_in
    a beginning dont get excited 8) */
 struct in6_addr
 {
-  unsigned char s6_addr[16];
+  uint8_t 	  s6_addr[16];
 };
 
 struct sockaddr_in6
 {
-  unsigned short sin6_family;
-  unsigned short sin6_port;
-  unsigned long sin6_flowinfo;
-  struct in6_addr sin6_addr;
+  sa_family_t	  sin6_family;		/* AF_INET6 */
+  in_port_t	  sin6_port;		/* Port number. */
+  uint32_t	  sin6_flowinfo;	/* Traffic class and flow inf. */
+  struct in6_addr sin6_addr;		/* IPv6 address. */
+  uint32_t	  sin6_scope_id;	/* Set of interfaces for a scope. */
 };
 #endif
 #endif	/* _CYGWIN_IN_H */

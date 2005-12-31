@@ -1,3 +1,15 @@
+2005-12-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/in.h: Drop including stdint.h.  Move definition
+	of in_port_t and in_addr_t to top of file and use throughout. Use
+	sa_family_t type where appropriate.
+	(struct in6_addr): Change `unsigned char' to `uint8_t'.
+	(struct sockaddr_in6): Add sin6_scope_id member. Add comments.
+	* include/cygwin/socket.h: Include stdint.h.  Move definition of
+	socklen_t to top of file.  Define sa_family_t.  Define struct
+	sockaddr_storage as per SUSv3.
+	* include/sys/un.h: Include cygwin/socket.h.  Use sa_family_t type.
+
 2005-12-29  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_tty.cc (fhandler_tty_common::__acquire_output_mutex): Use
