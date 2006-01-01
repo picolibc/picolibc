@@ -744,6 +744,8 @@ _cygtls::interrupt_setup (int sig, void *handler, struct sigaction& siga)
   deltamask = siga.sa_mask & ~SIG_NONMASKABLE;
   sa_flags = siga.sa_flags;
   func = (void (*) (int)) handler;
+  if (siga.sa_flags & SA_RESETHAND)
+    siga.sa_handler = SIG_DFL;
   saved_errno = -1;		// Flag: no errno to save
   if (handler == sig_handle_tty_stop)
     {

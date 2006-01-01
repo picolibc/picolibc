@@ -179,6 +179,8 @@ struct sigaction
 #define SA_NODEFER   0x40000000		/* Don't automatically block the signal
 					   when its handler is being executed  */
 #define SA_RESETHAND 0x80000000		/* Reset to SIG_DFL on entry to handler */
+#define SA_ONESHOT   SA_RESETHAND	/* Historical linux name */
+#define SA_NOMASK    SA_NODEFER		/* Historical linux name */
 
 #define	SIGHUP	1	/* hangup */
 #define	SIGINT	2	/* interrupt */

@@ -623,15 +623,8 @@ get_cygwin_startup_info ()
 	    if (res->straced)
 	      {
 		res->ready (false);
-#if 0
-		DWORD prio = GetThreadPriority (GetCurrentThread ());
-		SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
-#endif
 		for (unsigned i = 0; !being_debugged () && i < 10000; i++)
 		  low_priority_sleep (0);
-#if 0
-		SetThreadPriority (GetCurrentThread (), prio);
-#endif
 		strace.hello ();
 	      }
 	    break;
