@@ -1082,7 +1082,7 @@ sigpacket::process ()
   int rc = 1;
 
   sigproc_printf ("signal %d processing", si.si_signo);
-  struct sigaction thissig = global_sigs[si.si_signo];
+  struct sigaction& thissig = global_sigs[si.si_signo];
 
   myself->rusage_self.ru_nsignals++;
 
@@ -1182,7 +1182,8 @@ stop:
   if (ISSTATE (myself, PID_STOPPED))
     goto done;
   handler = (void *) sig_handle_tty_stop;
-  thissig = global_sigs[SIGSTOP];
+  struct sigaction dummy = global_sigs[SIGSTOP];
+  thissig = dummy;
 
 dosig:
   /* Dispatch to the appropriate function. */

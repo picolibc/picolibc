@@ -1,5 +1,10 @@
 2006-01-01  Christopher Faylor  <cgf@timesys.com>
 
+	* exceptions.cc (sigpacket::process): Pass actual reference to signal's
+	sigaction structure to setup_handler.
+
+2006-01-01  Christopher Faylor  <cgf@timesys.com>
+
 	* exceptions.cc (_cygtls::interrupt_setup): Implement SA_RESETHAND.
 	* include/cygwin/signal.h: Define SA_ONESHOT and SA_NOMASK.
 
