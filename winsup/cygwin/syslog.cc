@@ -1,6 +1,7 @@
 /* syslog.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+   2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -498,8 +499,6 @@ vklog (int priority, const char *message, va_list ap)
     dev_kmsg->open (O_WRONLY, 0);
   if (dev_kmsg && dev_kmsg->get_handle ())
     dev_kmsg->write (buf, strlen (buf) + 1);
-  else
-    vsyslog (priority, message, ap);
   klog_guard.release ();
 }
 
