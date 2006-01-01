@@ -1,5 +1,9 @@
 2006-01-01  Christopher Faylor  <cgf@timesys.com>
 
+	* winsup.api/resethand.c: Use SIGSEGV for the signal to test.
+
+2006-01-01  Christopher Faylor  <cgf@timesys.com>
+
 	* winsup.api/resethand.c: New file.
 
 2005-12-11  Christopher Faylor  <cgf@timesys.com>

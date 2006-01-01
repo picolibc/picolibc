@@ -9,7 +9,7 @@ void
 ouch (int sig)
 {
   fprintf (stderr, "ouch %d\n", sig);
-  if (doit++ == 0)
+  if (doit++ > 0)
     kill (getpid (), SIGTERM);
 }
 
@@ -20,16 +20,17 @@ main (int argc, char **argv)
   if (argc == 1)
     act.sa_flags = SA_RESETHAND;
   act.sa_handler = ouch;
-  sigaction (SIGTERM, &act, NULL);
+  sigaction (SIGSEGV, &act, NULL);
   int pid = fork ();
   int status;
   if (pid > 0)
     waitpid (pid, &status, 0);
   else
     {
-      kill (getpid (), SIGTERM);
-      exit (0x27);
+      int *i = 0;
+      *i = 9;
+      exit (0x42);
     }
   fprintf (stderr, "pid %d exited with status %p\n", pid, status);
-  exit (argc == 1 ? !(status == SIGTERM) : !(status == 0x2700));
+  exit (argc == 1 ? !(status == SIGSEGV) : !(status == SIGTERM));
 }
