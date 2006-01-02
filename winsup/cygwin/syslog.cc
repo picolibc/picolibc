@@ -17,7 +17,7 @@ details. */
 #include <syslog.h>
 #include <stdarg.h>
 #include <unistd.h>
-#include <sys/socket.h>
+#include <sys/un.h>
 #include <sys/uio.h>
 #include "cygerrno.h"
 #include "security.h"
@@ -185,49 +185,65 @@ pass_handler::print_va (const char *fmt, va_list list)
 }
 
 static NO_COPY muto try_connect_guard;
-static bool syslogd_inited;
+static enum {
+  not_inited,
+  inited_failed,
+  inited_dgram,
+  inited_stream
+} syslogd_inited;
 static int syslogd_sock = -1;
 extern "C" int cygwin_socket (int, int, int);
 extern "C" int cygwin_connect (int, const struct sockaddr *, int);
 
+static void
+connect_syslogd ()
+{
+  struct __stat64 st;
+  int fd;
+  struct sockaddr_un sun;
+
+  if (syslogd_inited != not_inited && syslogd_sock >= 0)
+    close (syslogd_sock);
+  syslogd_inited = inited_failed;
+  syslogd_sock = -1;
+  if (stat64 (_PATH_LOG, &st) || !S_ISSOCK (st.st_mode))
+    return;
+  if ((fd = cygwin_socket (AF_LOCAL, SOCK_DGRAM, 0)) < 0)
+    return;
+  sun.sun_family = AF_LOCAL;
+  strncpy (sun.sun_path, _PATH_LOG, sizeof sun.sun_path);
+  if (cygwin_connect (fd, (struct sockaddr *) &sun, sizeof sun))
+    {
+      if (get_errno () != EPROTOTYPE)
+	{
+	  close (fd);
+	  return;
+	}
+      /* Retry with SOCK_STREAM. */
+      if ((fd = cygwin_socket (AF_LOCAL, SOCK_STREAM, 0)) < 0)
+	return;
+      if (cygwin_connect (fd, (struct sockaddr *) &sun, sizeof sun))
+	{
+	  close (fd);
+	  return;
+	}
+      syslogd_inited = inited_stream;
+    }
+  else
+    syslogd_inited = inited_dgram;
+  syslogd_sock = fd;
+  fcntl (syslogd_sock, F_SETFD, FD_CLOEXEC);
+  return;
+}
+
 static int
 try_connect_syslogd (int priority, const char *msg, int len)
 {
-  try_connect_guard.init ("try_connect_guard")->acquire ();
-  if (!syslogd_inited)
-    {
-      struct __stat64 st;
-      int fd;
-      struct sockaddr sa;
-
-      if (stat64 (_PATH_LOG, &st) || !S_ISSOCK (st.st_mode))
-	goto out;
-      if ((fd = cygwin_socket (AF_LOCAL, SOCK_DGRAM, 0)) < 0)
-	goto out;
-      sa.sa_family = AF_LOCAL;
-      strncpy (sa.sa_data, _PATH_LOG, sizeof sa.sa_data);
-      if (cygwin_connect (fd, &sa, sizeof sa))
-	{
-	  if (get_errno () != EPROTOTYPE)
-	    {
-	      close (fd);
-	      goto out;
-	    }
-	  /* Retry with SOCK_STREAM. */
-	  if ((fd = cygwin_socket (AF_LOCAL, SOCK_STREAM, 0)) < 0)
-	    goto out;
-	  if (cygwin_connect (fd, &sa, sizeof sa))
-	    {
-	      close (fd);
-	      goto out;
-	    }
-	}
-      syslogd_sock = fd;
-      fcntl (syslogd_sock, F_SETFD, FD_CLOEXEC);
-      syslogd_inited = true;
-    }
-out:
   ssize_t ret = -1;
+
+  try_connect_guard.init ("try_connect_guard")->acquire ();
+  if (syslogd_inited == not_inited)
+    connect_syslogd ();
   if (syslogd_sock >= 0)
     {
       char pribuf[16];
@@ -238,8 +254,16 @@ out:
 	{ (char *) msg, len }
       };
 
-
       ret = writev (syslogd_sock, iv, 2);
+      /* If the syslog daemon has been restarted and /dev/log was
+         a stream socket, the connection is broken.  In this case,
+	 try to reopen the socket and try again. */
+      if (ret < 0 && syslogd_inited == inited_stream)
+	{
+	  connect_syslogd ();
+	  if (syslogd_sock >= 0)
+	    ret = writev (syslogd_sock, iv, 2);
+	}
       /* If write fails and LOG_CONS is set, return failure to vsyslog so
 	 it falls back to the usual logging method for this OS. */
       if (ret >= 0 || !(_my_tls.locals.process_logopt & LOG_CONS))
@@ -515,11 +539,11 @@ extern "C" void
 closelog (void)
 {
   try_connect_guard.init ("try_connect_guard")->acquire ();
-  if (syslogd_inited && syslogd_sock >= 0)
+  if (syslogd_inited != not_inited && syslogd_sock >= 0)
     {
       close (syslogd_sock);
       syslogd_sock = -1;
-      syslogd_inited = false;
+      syslogd_inited = not_inited;
     }
   try_connect_guard.release ();
 }

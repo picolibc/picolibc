@@ -1,3 +1,15 @@
+2006-01-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syslog.cc: Include sys/un.h instead of sys/socket.h.
+	(syslogd_inited): Convert to enum type noting the exact result of
+	trying to connect to syslog daemon.  Use this way throughout.
+	(connect_syslogd): New static function taking over the task to
+	connect to syslog socket.  Use correct struct sockaddr_un instead of
+	struct sockaddr.
+	(try_connect_syslogd): Call connect_syslogd.  If write fails on
+	connection oriented socket, try to reconnect to syslog socket and
+	try to write again.
+
 2006-01-01  Christopher Faylor  <cgf@timesys.com>
 
 	* pinfo.cc (pinfo::exit): Swap signal and normal exit value when not
