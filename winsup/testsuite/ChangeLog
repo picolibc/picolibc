@@ -1,5 +1,10 @@
 2006-01-01  Christopher Faylor  <cgf@timesys.com>
 
+	* winsup.api/resethand.c (main): Remove core dump flag from exit
+	status.
+
+2006-01-01  Christopher Faylor  <cgf@timesys.com>
+
 	* winsup.api/resethand.c (main): Coerce argument to pointer to stop gcc
 	complaint.
 
