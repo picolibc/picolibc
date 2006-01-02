@@ -1,3 +1,9 @@
+2006-01-02  Christopher Faylor  <cgf@timesys.com>
+
+	* dcrt0.cc (_dll_crt0): Move more leftover debugging stuff.
+	(cygwin_dll_init): Remove unneeded initializations.  Call _dll_crt0
+	rather than dll_crt0_1.
+
 2006-01-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syslog.cc: Include sys/un.h instead of sys/socket.h.

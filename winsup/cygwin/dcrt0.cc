@@ -964,13 +964,9 @@ _dll_crt0 ()
     system_printf ("internal error: couldn't determine location of thread function on stack.  Expect signal problems.");
 
   main_environ = user_data->envptr;
-#if 0
-  *main_environ = NULL;
-#endif
 
   char padding[CYGTLS_PADSIZE];
 
-debug_printf ("in_forkee %d, fork_info %p", in_forkee, fork_info);
   if (in_forkee)
     alloc_stack (fork_info);
   else
@@ -1006,24 +1002,12 @@ cygwin_dll_init ()
   static char **envp;
   static int _fmode;
 
-  if (!DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
-		       GetCurrentProcess (), &hMainProc, 0, FALSE,
-			DUPLICATE_SAME_ACCESS))
-    hMainProc = GetCurrentProcess ();
-
-  DuplicateHandle (hMainProc, GetCurrentThread (), hMainProc,
-		   &hMainThread, 0, FALSE, DUPLICATE_SAME_ACCESS);
   user_data->magic_biscuit = sizeof (per_process);
 
   user_data->envptr = &envp;
   user_data->fmode_ptr = &_fmode;
 
-  main_environ = user_data->envptr;
-#if 0
-  *main_environ = NULL;
-#endif
-  initialize_main_tls((char *)&_my_tls);
-  dll_crt0_1 (NULL);
+  _dll_crt0 ();
 }
 
 extern "C" void
