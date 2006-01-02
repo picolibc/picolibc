@@ -1,5 +1,10 @@
 2006-01-01  Christopher Faylor  <cgf@timesys.com>
 
+	* cygtls.cc (_cygtls::remove): Remove left over debugging cruft which
+	caused this function to always return prematurely.
+
+2006-01-01  Christopher Faylor  <cgf@timesys.com>
+
 	* exceptions.cc (sigpacket::process): Pass actual reference to signal's
 	sigaction structure to setup_handler.
 

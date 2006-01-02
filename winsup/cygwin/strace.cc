@@ -223,9 +223,7 @@ strace::write_childpid (child_info& ch, DWORD pid)
 
   if (!attached () || !being_debugged ())
     return;
-int res =
   WaitForSingleObject (ch.subproc_ready, 30000);
-do { if ((0x00040 & 0x08000) || active ()) prntf (0x00040, __PRETTY_FUNCTION__, "res %d", res); } while (0);
   __small_sprintf (buf, "cYg%8x %x", _STRACE_CHILD_PID, pid);
   OutputDebugString (buf);
 }
