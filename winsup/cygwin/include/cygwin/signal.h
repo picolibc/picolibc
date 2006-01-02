@@ -1,6 +1,6 @@
 /* signal.h
 
-  Copyright 2004 Red Hat, Inc.
+  Copyright 2004, 2006 Red Hat, Inc.
 
   This file is part of Cygwin.
 
