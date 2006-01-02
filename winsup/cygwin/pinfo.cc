@@ -158,7 +158,7 @@ pinfo::exit (DWORD n)
   add_rusage (&self->rusage_self, &r);
   int exitcode = self->exitcode & 0xffff;
   if (!self->cygstarted)
-    exitcode >>= 8;
+    exitcode = ((exitcode & 0xff) << 8) | ((exitcode >> 8) & 0xff);
   sigproc_printf ("Calling ExitProcess n %p, exitcode %p", n, exitcode);
   ExitProcess (exitcode);
 }

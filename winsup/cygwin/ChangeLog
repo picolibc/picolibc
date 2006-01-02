@@ -1,5 +1,10 @@
 2006-01-01  Christopher Faylor  <cgf@timesys.com>
 
+	* pinfo.cc (pinfo::exit): Swap signal and normal exit value when not
+	started from a cygwin process - just like the good-old-days of B20.
+
+2006-01-01  Christopher Faylor  <cgf@timesys.com>
+
 	* strace.cc (strace::write_childpid):  Remove debugging output.
 
 2006-01-01  Christopher Faylor  <cgf@timesys.com>
