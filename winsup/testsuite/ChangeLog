@@ -1,5 +1,10 @@
 2006-01-01  Christopher Faylor  <cgf@timesys.com>
 
+	* winsup.api/resethand.c (main): Coerce argument to pointer to stop gcc
+	complaint.
+
+2006-01-01  Christopher Faylor  <cgf@timesys.com>
+
 	* winsup.api/resethand.c: Use SIGSEGV for the signal to test.
 
 2006-01-01  Christopher Faylor  <cgf@timesys.com>

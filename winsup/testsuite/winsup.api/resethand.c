@@ -31,6 +31,6 @@ main (int argc, char **argv)
       *i = 9;
       exit (0x42);
     }
-  fprintf (stderr, "pid %d exited with status %p\n", pid, status);
+  fprintf (stderr, "pid %d exited with status %p\n", pid, (void *) status);
   exit (argc == 1 ? !(status == SIGSEGV) : !(status == SIGTERM));
 }
