@@ -66,7 +66,7 @@ namespace cygwin
     // gdb reports sizeof(_cygtls) == 3964 at the time of this writing.
     // This is at the end of the object so it'll be toward the bottom
     // of the stack when it gets declared.
-    char _padding[4096];
+    char _padding[8192];
 
     static padding *_main;
     static DWORD _mainTID;

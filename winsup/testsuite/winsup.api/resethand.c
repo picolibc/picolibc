@@ -8,7 +8,6 @@ int doit = 0;
 void
 ouch (int sig)
 {
-  fprintf (stderr, "ouch %d\n", sig);
   if (doit++ > 0)
     kill (getpid (), SIGTERM);
 }
@@ -32,6 +31,6 @@ main (int argc, char **argv)
       exit (0x42);
     }
   status &= ~0x80;	// remove core dump flag
-  fprintf (stderr, "pid %d exited with status %p\n", pid, (void *) status);
+  printf ("pid %d exited with status %p\n", pid, (void *) status);
   exit (argc == 1 ? !(status == SIGSEGV) : !(status == SIGTERM));
 }

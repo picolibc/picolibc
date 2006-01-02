@@ -1,3 +1,16 @@
+2006-01-02  Christopher Faylor  <cgf@timesys.com>
+
+	* cygload/README: Delete.
+	* cygload/cygload.cc: Move to winsup.api.  Add comments from README.
+	* cygload/cygload.h: Move to winsup.api.
+	* cygload/cygload.exp: Move to winsup.api.
+	* Makefile.in: Remove cygload.
+	* winsup.api/winsup.exp: If a .exp file is detected, run it rather than
+	using standard compile.
+
+	* winsup.api/resethand.c (main): Use printf to print status or expect
+	thinks something is wrong.
+
 2006-01-01  Christopher Faylor  <cgf@timesys.com>
 
 	* winsup.api/resethand.c (main): Remove core dump flag from exit
