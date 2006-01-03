@@ -1,3 +1,8 @@
+2006-01-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/uxtheme.h  [_WIN32_WINNT >= 0x0501]
+	(TMT_*, BT_*): Add constants.
+
 2005-12-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/winsock2.h: Don't define struct sockaddr_storage when
