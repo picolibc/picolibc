@@ -1,3 +1,8 @@
+2006-01-03  Eric Blake  <ebb9@byu.net>
+
+	* dir.cc (readdir_worker): Ensure that saw_dot flags are updated when
+	not handling inodes.
+
 2006-01-02  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_console.cc (beep): New function.  Restores missing "Default
@@ -6,7 +11,7 @@
 
 2006-01-02  Christopher Faylor  <cgf@timesys.com>
 
-	* dcrt0.cc (_dll_crt0): Move more leftover debugging stuff.
+	* dcrt0.cc (_dll_crt0): Remove more leftover debugging stuff.
 	(cygwin_dll_init): Remove unneeded initializations.  Call _dll_crt0
 	rather than dll_crt0_1.
 

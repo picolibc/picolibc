@@ -1,6 +1,6 @@
 /* dir.cc: Posix directory-related routines
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -105,10 +105,17 @@ readdir_worker (DIR *dir, dirent *de)
       {
 	de->__invalid_d_ino = 0;
 	de->__ino32 = 0;
+	if (de->d_name[0] == '.')
+	  {
+	    if (de->d_name[1] == '\0')
+	       dir->__flags |= dirent_saw_dot;
+	     else if (de->d_name[1] == '.' && de->d_name[2] == '\0')
+	       dir->__flags |= dirent_saw_dot_dot;
+	   }
       }
     else
       {
-	/* Compute __invalid_d_ino by combining filename hash with the directory hash
+	/* Compute d_ino by combining filename hash with the directory hash
 	   (which was stored in dir->__d_dirhash when opendir was called). */
 	if (de->d_name[0] == '.')
 	  {
