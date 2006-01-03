@@ -29,6 +29,7 @@ details. */
 #include "pinfo.h"
 #include "shared_info.h"
 #include "cygtls.h"
+#include "registry.h"
 
 #define CONVERT_LIMIT 16384
 
@@ -1412,6 +1413,17 @@ bad_escape:
     }
 }
 
+static void
+beep ()
+{
+  char buf[4096];
+  reg_key r (HKEY_CURRENT_USER, KEY_ALL_ACCESS, "AppEvents", "Schemes", "Apps",
+	     ".Default", ".Default", ".current", NULL);
+  if (r.get_string ("", buf, sizeof (buf), "") != 0)
+    r.set_string ("", "Windows XP Ding.wav");
+  MessageBeep (0xFFFFFFFF);
+}
+
 const unsigned char *
 fhandler_console::write_normal (const unsigned char *src,
 				const unsigned char *end)
@@ -1470,7 +1482,7 @@ fhandler_console::write_normal (const unsigned char *src,
       switch (base_chars[*src])
 	{
 	case BEL:
-	  MessageBeep (0xFFFFFFFF);
+	  beep ();
 	  break;
 	case ESC:
 	  dev_state->state_ = gotesc;
