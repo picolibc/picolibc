@@ -1,6 +1,7 @@
 /* fhandler_console.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+   2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1416,11 +1417,17 @@ bad_escape:
 static void
 beep ()
 {
-  char buf[4096];
   reg_key r (HKEY_CURRENT_USER, KEY_ALL_ACCESS, "AppEvents", "Schemes", "Apps",
-	     ".Default", ".Default", ".current", NULL);
-  if (r.get_string ("", buf, sizeof (buf), "") != 0)
-    r.set_string ("", "Windows XP Ding.wav");
+	     ".Default", ".Default", ".Current", NULL);
+  if (r.created ())
+    {
+      char *buf = NULL;
+      UINT len = GetWindowsDirectory (buf, 0);
+      buf = (char *) alloca (len += sizeof ("\\media\\ding.wav"));
+      UINT res = GetWindowsDirectory (buf, len);
+      if (res && res <= len)
+	r.set_string ("", strcat (buf, "\\media\\ding.wav"));
+    }
   MessageBeep (0xFFFFFFFF);
 }
 

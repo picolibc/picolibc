@@ -1,6 +1,19 @@
+2006-01-03  Christopher Faylor  <cgf@timesys.com>
+
+	* dir.cc (readdir_worker): Minor code cleanup.
+
+	* fhandler_console.cc (beep): Use a more Windows-generic wav file if
+	the beep is missing.  Use a more foolproof way to find out whether we
+	should be recreating the missing key.
+
+	* registry.h (reg_key::_disposition): New field.
+	(reg_key::created): New function.
+	* registry.cc (reg_key::reg_key): Set _disposition to zero by default.
+	(reg_key::build_key): Fill in _disposition field.
+
 2006-01-03  Eric Blake  <ebb9@byu.net>
 
-	* dir.cc (readdir_worker): Ensure that saw_dot flags are updated when
+	* dir.cc (readdir_worker): Ensure that saw_dot* flags are updated when
 	not handling inodes.
 
 2006-01-02  Christopher Faylor  <cgf@timesys.com>

@@ -1,6 +1,6 @@
 /* registry.h: shared info for cygwin
 
-   Copyright 2000, 2001 Red Hat, Inc.
+   Copyright 2000, 2001, 2004, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -14,6 +14,7 @@ private:
 
   HKEY key;
   LONG key_is_invalid;
+  DWORD _disposition;
 
 public:
 
@@ -33,6 +34,7 @@ public:
   int get_string (const char *, char *buf, size_t len, const char *def);
   int set_string (const char *,const char *);
   int set_int (const char *, int val);
+  bool created () const {return _disposition & REG_CREATED_NEW_KEY;}
 
   ~reg_key ();
 };

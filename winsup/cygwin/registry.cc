@@ -1,7 +1,7 @@
 /* registry.cc: registry interface
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005 Red Hat, Inc.
+   2005, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -21,7 +21,7 @@ details. */
 #include "cygheap.h"
 static const char cygnus_class[] = "cygnus";
 
-reg_key::reg_key (HKEY top, REGSAM access, ...)
+reg_key::reg_key (HKEY top, REGSAM access, ...): _disposition (0)
 {
   va_list av;
   va_start (av, access);
@@ -32,7 +32,7 @@ reg_key::reg_key (HKEY top, REGSAM access, ...)
 /* Opens a key under the appropriate Cygwin key.
    Do not use HKCU per MS KB 199190  */
 
-reg_key::reg_key (bool isHKLM, REGSAM access, ...)
+reg_key::reg_key (bool isHKLM, REGSAM access, ...): _disposition (0)
 {
   va_list av;
   HKEY top;
@@ -91,7 +91,7 @@ reg_key::build_reg (HKEY top, REGSAM access, va_list av)
 				 access,
 				 &sec_none_nih,
 				 &key,
-				 NULL);
+				 &_disposition);
       if (r != top)
 	RegCloseKey (r);
       r = key;
