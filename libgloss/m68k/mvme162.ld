@@ -101,6 +101,7 @@ SECTIONS
 
   .data :
   {
+    *(.got.plt) *(.got)
     *(.shdata)
     *(.data .data.*)
     _edata = .;

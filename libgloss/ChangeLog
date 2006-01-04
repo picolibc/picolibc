@@ -1,3 +1,13 @@
+2006-01-04  Paul Brook  <paul@codesourcery.com>
+
+	* m68k/bcc.ld: Add .got.plt and .got
+	* m68k/idp.ld: Ditto.
+	* m68k/idpgdb: Ditto.
+	* m68k/mvme135.ld: Ditto.
+	* m68k/sbc5204.ld: Ditto.
+	* m68k/sbc5206.ld: Ditto.
+	* m68k/sim.ld: Ditto.
+
 2005-12-13  DJ Delorie  <dj@redhat.com>
 
 	* m32c/crt0.S: Add support for preinit, init, and fini arrays, and
