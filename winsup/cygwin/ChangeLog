@@ -1,3 +1,7 @@
+2006-01-04  Eric Blake  <ebb9@byu.net>
+
+	* path.cc (dot_special_chars): Add ", <, >, and |.
+
 2006-01-03  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_console.cc (beep): Use MB_OK which is documented as using
