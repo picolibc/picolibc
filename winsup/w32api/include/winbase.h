@@ -12,6 +12,14 @@
 #endif
 #endif
 
+#ifndef WINADVAPI
+#ifdef __W32API_USE_DLLIMPORT__
+#define WINADVAPI DECLSPEC_IMPORT
+#else
+#define WINADVAPI
+#endif
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
