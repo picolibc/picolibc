@@ -616,7 +616,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	ProtectHandle (cygheap->pid_handle);
       else
 	system_printf ("duplicate to pid_handle failed, %E");
-      set_console_state_for_spawn (real_path.iscygexec ());
+      if (mode != _P_DETACH)
+	set_console_state_for_spawn (real_path.iscygexec ());
     }
 
   /* Some file types (currently only sockets) need extra effort in the parent

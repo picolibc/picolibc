@@ -1856,8 +1856,8 @@ fhandler_console::need_invisible ()
       h = horig = GetProcessWindowStation ();
       if (myself->ctty == -1)
 	{
-	  h = CreateWindowStation (NULL, 0, WINSTA_ALL_ACCESS, &sec_none_nih);
-	  termios_printf ("CreateWindowStation %p, %E", h);
+	  h = CreateWindowStation ("CygwinInvisible", 0, WINSTA_ALL_ACCESS, &sec_none_nih);
+	  termios_printf ("CreateWindowStation(\"CygwinInvisible\", %p), %E", h);
 	  if (h)
 	    {
 	      b = SetProcessWindowStation (h);

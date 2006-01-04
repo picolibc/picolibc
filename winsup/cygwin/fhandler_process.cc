@@ -229,7 +229,7 @@ fhandler_process::readdir (DIR *dir, dirent *de)
     strcpy (de->d_name, process_listing[dir->__d_position++]);
   res = 0;
 out:
-  syscall_printf ("%d = readdir (%p, %p) (%s)", dir, de, de->d_name);
+  syscall_printf ("%d = readdir (%p, %p) (%s)", res, dir, de, de->d_name);
   return res;
 }
 

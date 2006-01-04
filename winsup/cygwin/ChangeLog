@@ -1,5 +1,16 @@
 2006-01-03  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler_process.cc (fhandler_process::readdir): Add missing argument
+	to syscall_printf.
+
+	* fhandler_console.cc (fhandler_console::need_invisible): Use made-up
+	name for windows station rather than asking Windows to create one for
+	us.
+
+	* spawn.cc (spawn_guts): Don't mess with console if we're detaching.
+
+2006-01-03  Christopher Faylor  <cgf@timesys.com>
+
 	* dir.cc (readdir_worker): Minor code cleanup.
 
 	* fhandler_console.cc (beep): Use a more Windows-generic wav file if
