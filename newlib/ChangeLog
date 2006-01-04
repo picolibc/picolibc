@@ -1,3 +1,9 @@
+2006-01-04  Gregory Pietsch  <gpietsch@comcast.net>
+
+	* libc/stdlib/getopt.c: Replaced with version
+	that adds getopt_long and getopt_long_only support.
+	* libc/include/getopt.h: New file.
+
 2005-12-16  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* NEWS: Update with 1.14.0 info.
