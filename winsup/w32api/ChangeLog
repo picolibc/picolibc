@@ -1,3 +1,9 @@
+2006-01-03  Christopher Faylor  <cgf@timesys.com>
+
+	* include/winuser.h (CreateWindowStation): Correctly identify first
+	argument as constant.
+	(CreateWindowStation@): Ditto.
+
 2006-01-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/uxtheme.h  [_WIN32_WINNT >= 0x0501]
