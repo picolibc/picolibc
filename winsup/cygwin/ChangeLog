@@ -1,5 +1,11 @@
 2006-01-03  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler_console.cc (beep): Use MB_OK which is documented as using
+	the default bell rather than -1 which seems to behave differently on
+	different versions of Windows.
+
+2006-01-03  Christopher Faylor  <cgf@timesys.com>
+
 	* fhandler_process.cc (fhandler_process::readdir): Add missing argument
 	to syscall_printf.
 

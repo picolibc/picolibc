@@ -1428,7 +1428,7 @@ beep ()
       if (res && res <= len)
 	r.set_string ("", strcat (buf, "\\media\\ding.wav"));
     }
-  MessageBeep (0xFFFFFFFF);
+  MessageBeep (MB_OK);
 }
 
 const unsigned char *
