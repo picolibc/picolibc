@@ -146,9 +146,10 @@ _cygtls::fixup_after_fork ()
 void
 _cygtls::remove (DWORD wait)
 {
-  debug_printf ("wait %p", wait);
   if (!isinitialized () || !locals.exitsock || exit_state >= ES_FINAL)
     return;
+
+  debug_printf ("wait %p", wait);
   if (wait)
     {
       /* FIXME: Need some sort of atthreadexit function to allow things like

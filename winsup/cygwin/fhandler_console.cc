@@ -141,7 +141,7 @@ tty_list::get_tty (int n)
 }
 
 /* Determine if a console is associated with this process prior to a spawn.
-   If it is, then we'll return 1.  If the console has been initialized, then
+   If it is, then just return.  If the console has been initialized, then
    set it into a more friendly state for non-cygwin apps. */
 void __stdcall
 set_console_state_for_spawn (bool noncygwin_process)

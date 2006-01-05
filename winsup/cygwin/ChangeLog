@@ -2,6 +2,11 @@
 
 	* cygtls.cc (_cygtls::remove): Don't output debugging info if this
 	isn't a cygwin thread.
+	* sigproc.cc (sigproc_init): Move clearing of sync_startup here to
+	lessen the likelihood of trying to deal with non-cygwin threads in
+	dll_entry.
+
+	* fhandler_console: Fix set_console_state_for_spawn comment.
 
 2006-01-05  Igor Peshansky  <pechtcha@cs.nyu.edu>
 

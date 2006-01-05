@@ -474,6 +474,7 @@ create_signal_arrived ()
 void __stdcall
 sigproc_init ()
 {
+  extern HANDLE sync_startup;
   wait_sig_inited = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
   ProtectHandle (wait_sig_inited);
 
@@ -483,6 +484,7 @@ sigproc_init ()
   sync_proc_subproc.init ("sync_proc_subproc");
 
   my_sendsig = INVALID_HANDLE_VALUE;	// changed later
+  sync_startup = NULL;
   cygthread *hwait_sig = new cygthread (wait_sig, 0, cygself, "sig");
   hwait_sig->zap_h ();
 
