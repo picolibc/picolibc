@@ -1,3 +1,8 @@
+2006-01-04  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler_console.cc (fhandler_console::need_invisible): Open up the
+	security of the newly created windows station.
+
 2006-01-04  Eric Blake  <ebb9@byu.net>
 
 	* path.cc (dot_special_chars): Add ", <, >, and |.
