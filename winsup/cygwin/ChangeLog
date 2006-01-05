@@ -1,5 +1,15 @@
 2006-01-05  Christopher Faylor  <cgf@timesys.com>
 
+	* sigproc.cc (no_signals_available): Use existence of signal thread
+	handle to figure out if we can actually send signals rather than
+	relying on my_sendsig.
+	(hwait_sig): Make static.
+	(sigproc_init): Don't set my_sendsig to anything special.  Use new
+	global static hwait_sig.
+	(wait_sig): Set hwait_sig to NULL when we are exiting.
+
+2006-01-05  Christopher Faylor  <cgf@timesys.com>
+
 	* include/getopt.h: Accommodate recent unfortunate newlib changes.
 
 2006-01-05  Christopher Faylor  <cgf@timesys.com>

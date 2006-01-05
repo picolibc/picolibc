@@ -39,7 +39,7 @@ details. */
 #define WSSC		  60000	// Wait for signal completion
 #define WPSP		  40000	// Wait for proc_subproc mutex
 
-#define no_signals_available(x) (!my_sendsig || ((x) && myself->exitcode & EXITCODE_SET) || &_my_tls == _sig_tls)
+#define no_signals_available(x) (!hwait_sig || ((x) && myself->exitcode & EXITCODE_SET) || &_my_tls == _sig_tls)
 
 #define NPROCS	256
 
@@ -61,6 +61,7 @@ HANDLE NO_COPY signal_arrived;		// Event signaled when a signal has
 
 HANDLE NO_COPY sigCONT;			// Used to "STOP" a process
 
+Static cygthread *hwait_sig;
 Static HANDLE wait_sig_inited;		// Control synchronization of
 					//  message queue startup
 
@@ -483,9 +484,8 @@ sigproc_init ()
    */
   sync_proc_subproc.init ("sync_proc_subproc");
 
-  my_sendsig = INVALID_HANDLE_VALUE;	// changed later
   sync_startup = NULL;
-  cygthread *hwait_sig = new cygthread (wait_sig, 0, cygself, "sig");
+  hwait_sig = new cygthread (wait_sig, 0, cygself, "sig");
   hwait_sig->zap_h ();
 
   global_sigs[SIGSTOP].sa_flags = SA_RESTART | SA_NODEFER;
@@ -1141,6 +1141,7 @@ wait_sig (VOID *)
 	    }
 	  break;
 	case __SIGEXIT:
+	  hwait_sig = NULL;
 	  sigproc_printf ("saw __SIGEXIT");
 	  break;	/* handle below */
 	default:
