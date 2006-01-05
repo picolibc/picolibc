@@ -1,5 +1,9 @@
 2006-01-05  Christopher Faylor  <cgf@timesys.com>
 
+	* include/getopt.h: Accommodate recent unfortunate newlib changes.
+
+2006-01-05  Christopher Faylor  <cgf@timesys.com>
+
 	* cygtls.cc (_cygtls::remove): Don't output debugging info if this
 	isn't a cygwin thread.
 	* sigproc.cc (sigproc_init): Move clearing of sync_startup here to

@@ -31,6 +31,9 @@
  * SUCH DAMAGE.
  */
 
+#ifdef _COMPILING_NEWLIB
+#include_next "getopt.h"
+#else
 #ifndef __GETOPT_H__
 #define __GETOPT_H__
 
@@ -84,3 +87,4 @@ int getopt_long (int, char *const *, const char *, const struct option *, int *)
 
 #endif /* __GETOPT_LONG_H__ */
 #endif /* __UNISTD_GETOPT__ */
+#endif /*_INSIDE_NEWLIB*/
