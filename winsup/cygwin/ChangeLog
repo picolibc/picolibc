@@ -1,3 +1,8 @@
+2006-01-05  Christopher Faylor  <cgf@timesys.com>
+
+	* cygtls.cc (_cygtls::remove): Don't output debugging info if this
+	isn't a cygwin thread.
+
 2006-01-05  Igor Peshansky  <pechtcha@cs.nyu.edu>
 
 	* spawn.cc (spawn_guts): Invert the argument to
