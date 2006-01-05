@@ -1856,7 +1856,9 @@ fhandler_console::need_invisible ()
       h = horig = GetProcessWindowStation ();
       if (myself->ctty == -1)
 	{
-	  h = CreateWindowStation ("CygwinInvisible", 0, WINSTA_ALL_ACCESS, &sec_all_nih);
+	  if (!(h = CreateWindowStation (NULL, 0, WINSTA_ALL_ACCESS, &sec_all_nih)))
+	    h = CreateWindowStation ("CygwinInvisible", 0, WINSTA_ALL_ACCESS,
+				     &sec_all_nih);
 	  termios_printf ("CreateWindowStation(\"CygwinInvisible\", %p), %E", h);
 	  if (h)
 	    {
@@ -1864,11 +1866,11 @@ fhandler_console::need_invisible ()
 	      termios_printf ("SetProcessWindowStation %d, %E", b);
 	    }
 	}
-      b = AllocConsole ();	// will cause flashing if workstation
-				// stuff fails
+      b = AllocConsole ();	/* will cause flashing if CreateWorkstation
+				   failed */
       debug_printf ("h (%p), horig (%p)", h, horig);
       if (horig && h && h != horig && SetProcessWindowStation (horig))
-	CloseHandle (h);
+	CloseWindowStation (h);
       termios_printf ("%d = AllocConsole (), %E", b);
       invisible_console = true;
     }

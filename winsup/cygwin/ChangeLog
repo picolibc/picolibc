@@ -1,5 +1,11 @@
 2006-01-04  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler_console.cc (fhandler_console::need_invisible): Only try to
+	open "CygwinInvisible" windows station if opening of default station
+	fails.  Use CloseWindowStation to close window station handle.
+
+2006-01-04  Christopher Faylor  <cgf@timesys.com>
+
 	* fhandler_console.cc (fhandler_console::need_invisible): Open up the
 	security of the newly created windows station.
 
