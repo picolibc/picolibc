@@ -951,15 +951,14 @@ initialize_main_tls (char *padding)
 extern "C" void __stdcall
 _dll_crt0 ()
 {
-  extern DWORD threadfunc_ix;
   extern HANDLE sync_startup;
+  extern DWORD threadfunc_ix;
   if (sync_startup != INVALID_HANDLE_VALUE)
     {
       WaitForSingleObject (sync_startup, INFINITE);
       CloseHandle (sync_startup);
     }
 
-  sync_startup = NULL;
   if (!threadfunc_ix)
     system_printf ("internal error: couldn't determine location of thread function on stack.  Expect signal problems.");
 
