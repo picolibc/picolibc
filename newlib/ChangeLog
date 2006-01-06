@@ -1,3 +1,8 @@
+2006-01-06  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/include/getopt.h: Add macros needed by
+	new version of getopt.c in libc/stdlib.
+
 2006-01-04  Gregory Pietsch  <gpietsch@comcast.net>
 
 	* libc/stdlib/getopt.c: Replaced with version

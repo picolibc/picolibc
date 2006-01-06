@@ -8,8 +8,11 @@
 
 #include <unistd.h>
 
-
-enum { no_argument, required_argument, optional_argument };
+enum { NO_ARG, REQUIRED_ARG, OPTIONAL_ARG };
+/* Define glibc names as well for compatibility.  */
+#define no_argument NO_ARG
+#define required_argument REQUIRED_ARG
+#define optional_argument OPTIONAL_ARG
 
 struct option {
     const char *name;
