@@ -146,7 +146,7 @@ tty_list::get_tty (int n)
 void __stdcall
 set_console_state_for_spawn (bool noncygwin_process)
 {
-  if (noncygwin_process && fhandler_console::need_invisible ())
+  if (fhandler_console::need_invisible ())
     return;
 
   HANDLE h = CreateFile ("CONIN$", GENERIC_READ, FILE_SHARE_WRITE,
@@ -1825,6 +1825,9 @@ fhandler_console::fixup_after_fork_exec (bool execing)
 
 bool NO_COPY fhandler_console::invisible_console;
 
+// #define WINSTA_ACCESS (WINSTA_READATTRIBUTES | STANDARD_RIGHTS_READ | STANDARD_RIGHTS_WRITE | WINSTA_CREATEDESKTOP | WINSTA_EXITWINDOWS)
+#define WINSTA_ACCESS STANDARD_RIGHTS_READ
+
 bool
 fhandler_console::need_invisible ()
 {
@@ -1854,25 +1857,39 @@ fhandler_console::need_invisible ()
 	   process using setsid: bash -lc "setsid rxvt".  */
 
       h = horig = GetProcessWindowStation ();
-      if (myself->ctty == -1)
+
+      USEROBJECTFLAGS oi;
+      DWORD len;
+      if (!horig
+	  || !GetUserObjectInformation (horig, UOI_FLAGS, &oi, sizeof (oi), &len)
+	  || !(oi.dwFlags & WSF_VISIBLE))
 	{
-	  if (!(h = CreateWindowStation (NULL, 0, WINSTA_ALL_ACCESS, &sec_all_nih)))
-	    h = CreateWindowStation ("CygwinInvisible", 0, WINSTA_ALL_ACCESS,
-				     &sec_all_nih);
-	  termios_printf ("CreateWindowStation(\"CygwinInvisible\", %p), %E", h);
-	  if (h)
-	    {
-	      b = SetProcessWindowStation (h);
-	      termios_printf ("SetProcessWindowStation %d, %E", b);
-	    }
+	  b = true;
+	  debug_printf ("window station is not visible");
+	  invisible_console = true;
 	}
-      b = AllocConsole ();	/* will cause flashing if CreateWorkstation
-				   failed */
-      debug_printf ("h (%p), horig (%p)", h, horig);
-      if (horig && h && h != horig && SetProcessWindowStation (horig))
-	CloseWindowStation (h);
-      termios_printf ("%d = AllocConsole (), %E", b);
-      invisible_console = true;
+      else
+	{
+	  if (myself->ctty == -1 && oi.dwFlags & WSF_VISIBLE)
+	    {
+	      h = CreateWindowStation (NULL, 0, WINSTA_ACCESS, NULL);
+	      termios_printf ("CreateWindowStation(NULL, %p), %E", h);
+	      if (h)
+		{
+		  b = SetProcessWindowStation (h);
+		  termios_printf ("SetProcessWindowStation %d, %E", b);
+		}
+	    }
+	  b = AllocConsole ();	/* will cause flashing if CreateWorkstation
+				       failed */
+	  debug_printf ("h %p, horig %p, flags %p", h, horig, oi.dwFlags);
+	  if (horig && h && h != horig && SetProcessWindowStation (horig))
+	    {
+	      CloseWindowStation (h);
+	    }
+	  termios_printf ("%d = AllocConsole (), %E", b);
+	  invisible_console = true;
+	}
     }
 
   debug_printf ("invisible_console %d", invisible_console);

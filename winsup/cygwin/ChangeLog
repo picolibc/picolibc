@@ -1,3 +1,14 @@
+2006-01-07  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler.h (set_console_state_for_spawn): Eliminate argument from
+	declaration.
+	* fhandler.cc (set_console_state_for_spawn): Eliminate argument from
+	definition.  Always check for invisible console.
+	(fhandler_console::need_invisible): Don't do anything if the windows
+	station is already not visible.
+	* spawn.cc (spawn_guts): Accommodate change of argument to
+	set_console_state_for_spawn.
+
 2006-01-05  Christopher Faylor  <cgf@timesys.com>
 
 	* sigproc.cc (no_signals_available): Use existence of signal thread
