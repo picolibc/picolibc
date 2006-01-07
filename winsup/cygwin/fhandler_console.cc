@@ -144,7 +144,7 @@ tty_list::get_tty (int n)
    If it is, then just return.  If the console has been initialized, then
    set it into a more friendly state for non-cygwin apps. */
 void __stdcall
-set_console_state_for_spawn (bool noncygwin_process)
+set_console_state_for_spawn ()
 {
   if (fhandler_console::need_invisible ())
     return;
@@ -1870,7 +1870,7 @@ fhandler_console::need_invisible ()
 	}
       else
 	{
-	  if (myself->ctty == -1 && oi.dwFlags & WSF_VISIBLE)
+	  if (myself->ctty == -1)
 	    {
 	      h = CreateWindowStation (NULL, 0, WINSTA_ACCESS, NULL);
 	      termios_printf ("CreateWindowStation(NULL, %p), %E", h);

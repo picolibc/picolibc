@@ -1,5 +1,10 @@
 2006-01-07  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler_console.cc (fhandler_console::need_invisible): Remove
+	duplicate test.
+
+2006-01-07  Christopher Faylor  <cgf@timesys.com>
+
 	* fhandler.h (set_console_state_for_spawn): Eliminate argument from
 	declaration.
 	* fhandler.cc (set_console_state_for_spawn): Eliminate argument from
