@@ -1,5 +1,11 @@
 2006-01-08  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler_tty.cc (fhandler_tty_slave::dup): Don't assign a controlling
+	terminal to a process when duped.  Linux doesn't do this, so we won't
+	either.
+
+2006-01-08  Christopher Faylor  <cgf@timesys.com>
+
 	* environ.cc (spenvs[]): windir -> WINDIR.
 
 2006-01-07  Christopher Faylor  <cgf@timesys.com>

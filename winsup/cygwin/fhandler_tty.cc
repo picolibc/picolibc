@@ -907,7 +907,9 @@ fhandler_tty_slave::dup (fhandler_base *child)
   arch->usecount++;
   cygheap->manage_console_count ("fhandler_tty_slave::dup", 1);
   report_tty_counts (child, "duped", "");
+#if 0 // CGF: Remove this again as it screws up expect
   myself->set_ctty (get_ttyp (), openflags, arch);
+#endif
   return 0;
 }
 
