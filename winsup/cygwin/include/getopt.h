@@ -73,6 +73,8 @@ struct option {
 };
 
 int getopt_long (int, char *const *, const char *, const struct option *, int *);
+int getopt_long_only (int, char *const *, const char *, const struct option *, int *);
+
 #ifndef HAVE_DECL_GETOPT
 #define HAVE_DECL_GETOPT 1
 #endif

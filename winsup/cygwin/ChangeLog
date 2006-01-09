@@ -1,3 +1,7 @@
+2006-01-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/getopt.h (getopt_long_only): Declare.
+
 2006-01-09  Eric Blake  <ebb9@byu.net>
 
 	* cygwin.din: Export getsubopt.
