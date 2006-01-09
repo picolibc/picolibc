@@ -28,6 +28,7 @@
 #define __FBSDID(s)	const char version[] = (s)
 #endif
 __FBSDID("$FreeBSD: /usr/local/www/cvsroot/FreeBSD/src/sys/kern/sysv_msg.c,v 1.52 2003/11/07 04:47:14 rwatson Exp $");
+/* CV, 2006-01-09: Inspected upstream up to version 1.60. */
 
 #define _KERNEL 1
 #define __BSD_VISIBLE 1

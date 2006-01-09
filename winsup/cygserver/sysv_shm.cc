@@ -40,6 +40,7 @@
 #define __FBSDID(s)	const char version[] = (s)
 #endif
 __FBSDID("$FreeBSD: /repoman/r/ncvs/src/sys/kern/sysv_shm.c,v 1.89 2003/11/07 04:47:14 rwatson Exp $");
+/* CV, 2006-01-09: Inspected upstream up to version 1.104. */
 
 #define _KERNEL 1
 #define __BSD_VISIBLE 1
@@ -954,7 +955,7 @@ shminit(void)
 
 	TUNABLE_INT_FETCH("kern.ipc.shmmaxpgs", &shminfo.shmall);
 	for (i = PAGE_SIZE; i > 0; i--) {
-		shminfo.shmmax = shminfo.shmall * PAGE_SIZE;
+		shminfo.shmmax = shminfo.shmall * i;
 		if (shminfo.shmmax >= shminfo.shmall)
 			break;
 	}

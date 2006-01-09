@@ -1,3 +1,10 @@
+2006-01-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	Check FreeBSD upstream changes and apply important patches.
+	* sysv_sem.cc (__semctl): Check copyin return value (from 1.76).
+	* sysv_shm.cc (shminit): Actually use the iterating variable in the
+	for loop when trying to avoid overflow (from 1.102).
+
 2005-11-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* bsd_helper.cc (securityinit): New function.  Move initialization

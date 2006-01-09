@@ -18,6 +18,7 @@
 #define __FBSDID(s)	const char version[] = (s)
 #endif
 __FBSDID("$FreeBSD: /repoman/r/ncvs/src/sys/kern/sysv_sem.c,v 1.70 2004/05/30 20:34:58 phk Exp $");
+/* CV, 2006-01-09: Inspected upstream up to version 1.78. */
 
 #define _KERNEL 1
 #define __BSD_VISIBLE 1
@@ -806,7 +807,7 @@ raced:
 		if ((error = copyin(arg, &real_arg, sizeof(real_arg))) != 0)
 			goto done2;
 		array = (u_short *) sys_malloc(sizeof(*array) * count, M_TEMP, M_WAITOK);
-		copyin(real_arg.array, array, count * sizeof(*array));
+		error = copyin(real_arg.array, array, count * sizeof(*array));
 		if (error)
 			break;
 		mtx_lock(sema_mtxp);
