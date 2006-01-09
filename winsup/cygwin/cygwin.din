@@ -321,6 +321,7 @@ getservbyport = cygwin_getservbyport SIGFE
 getservent = cygwin_getservent SIGFE
 getsockname = cygwin_getsockname SIGFE
 getsockopt = cygwin_getsockopt SIGFE
+getsubopt SIGFE
 getusershell SIGFE
 herror = cygwin_herror SIGFE
 hstrerror = cygwin_hstrerror NOSIGFE
