@@ -1,3 +1,8 @@
+2006-01-09  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/freopen.c (_freopen_r): Accept NULL filename.
+	* libc/stdio64/freopen64.c (_freopen64_r): Likewise.
+
 2006-01-06  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/include/getopt.h: Add macros needed by

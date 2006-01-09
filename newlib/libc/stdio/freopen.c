@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990 The Regents of the University of California.
+ * Copyright (c) 1990, 2006 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -55,6 +55,12 @@ it).
 
 <[file]> and <[mode]> are used just as in <<fopen>>.
 
+If <[file]> is <<NULL>>, the underlying stream is modified rather than
+closed.  The file cannot change access mode (for example, if it was
+previously read-only, <[mode]> must be "r", "rb", or "rt"), but can
+change status such as append or binary mode.  If modification is not
+possible, failure occurs.
+
 RETURNS
 If successful, the result is the same as the argument <[fp]>.  If the
 file cannot be opened as specified, the result is <<NULL>>.
@@ -70,6 +76,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <reent.h>
 #include <time.h>
 #include <stdio.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <sys/lock.h>
@@ -87,7 +94,8 @@ _DEFUN(_freopen_r, (ptr, file, mode, fp),
        register FILE *fp)
 {
   register int f;
-  int flags, oflags, e;
+  int flags, oflags;
+  int e = 0;
 
   __sfp_lock_acquire ();
 
@@ -117,17 +125,57 @@ _DEFUN(_freopen_r, (ptr, file, mode, fp),
     {
       if (fp->_flags & __SWR)
 	_CAST_VOID fflush (fp);
-      /* if close is NULL, closing is a no-op, hence pointless */
-      if (fp->_close != NULL)
+      /*
+       * If close is NULL, closing is a no-op, hence pointless.
+       * If file is NULL, the file should not be closed.
+       */
+      if (fp->_close != NULL && file != NULL)
 	_CAST_VOID (*fp->_close) (fp->_cookie);
     }
 
   /*
-   * Now get a new descriptor to refer to the new file.
+   * Now get a new descriptor to refer to the new file, or reuse the
+   * existing file descriptor if file is NULL.
    */
 
-  f = _open_r (ptr, (char *) file, oflags, 0666);
-  e = ptr->_errno;
+  if (file != NULL)
+    {
+      f = _open_r (ptr, (char *) file, oflags, 0666);
+      e = ptr->_errno;
+    }
+  else
+    {
+#ifdef HAVE_FCNTL
+      /*
+       * Reuse the file descriptor, but only if the access mode is
+       * unchanged.  F_SETFL correctly ignores creation flags.
+       */
+      f = fp->_file;
+      if ((oflags = _fcntl_r (ptr, f, F_GETFL, 0)) == -1
+          || ((oflags ^ flags) & O_ACCMODE) != 0
+          || _fcntl_r (ptr, f, F_SETFL, flags) == -1)
+        f = -1;
+#else
+      /* We cannot modify without fcntl support.  */
+      f = -1;
+#endif
+
+#ifdef __SCLE
+      /*
+       * F_SETFL doesn't change textmode.  Don't mess with modes of ttys.
+       */
+      if (0 <= f && ! _isatty (f)
+          && setmode (f, flags & (O_BINARY | O_TEXT)) == -1)
+        f = -1;
+#endif
+
+      if (f < 0)
+        {
+          e = EBADF;
+          if (fp->_close != NULL)
+            _CAST_VOID (*fp->_close) (fp->_cookie);
+        }
+    }
 
   /*
    * Finish closing fp.  Even if the open succeeded above,
