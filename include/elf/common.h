@@ -183,6 +183,7 @@
 #define EM_CR		103	/* National Semiconductor CompactRISC */
 #define EM_MSP430	105	/* TI msp430 micro controller */
 #define EM_BLACKFIN	106	/* ADI Blackfin */
+#define EM_ALTERA_NIOS2	113	/* Altera Nios II soft-core processor */
 #define EM_CRX		114	/* National Semiconductor CRX */
 
 /* If it is necessary to assign new unofficial EM_* values, please pick large
@@ -267,11 +268,14 @@
       Written in the absense everything.  */
 #define EM_MSP430_OLD		0x1059
 
+/* Old, unofficial value for Xtensa.  */
+#define EM_XTENSA_OLD		0xabc7
+
 /* Vitesse IQ2000.  */
 #define EM_IQ2000		0xFEBA
 
-/* Old, unofficial value for Xtensa.  */
-#define EM_XTENSA_OLD		0xabc7
+/* NIOS magic number - no EABI available.  */
+#define EM_NIOS32		0xFEBB
 
 /* See the above comment before you add a new EM_* value here.  */
 

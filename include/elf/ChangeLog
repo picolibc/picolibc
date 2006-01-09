@@ -1,3 +1,7 @@
+2006-01-09  Mike Frysinger  <vapier@gentoo.org>:
+
+	* common.h (EM_ALTERA_NIOS2, EM_NIOS32) Define.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.
