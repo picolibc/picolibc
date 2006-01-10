@@ -143,7 +143,7 @@ HMODULE NO_COPY cygwin_hmodule;
 extern "C" BOOL WINAPI
 dll_entry (HANDLE h, DWORD reason, void *static_load)
 {
-  BOOL is_wow64_proc = FALSE;
+  BOOL wow64_test_stack_marker;
   // _STRACE_ON;
 
   switch (reason)
@@ -152,15 +152,16 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
       cygwin_hmodule = (HMODULE) h;
       dynamically_loaded = (static_load == NULL);
 
+      wincap.init ();
+
       /* Is the stack at an unusual address?  This is, an address which
 	 is in the usual space occupied by the process image, but below
 	 the auto load address of DLLs?
 	 Check if we're running in WOW64 on a 64 bit machine *and* are
 	 spawned by a genuine 64 bit process.  If so, respawn. */
-      if (&is_wow64_proc >= (PBOOL) 0x400000
-	  && &is_wow64_proc <= (PBOOL) 0x10000000
-	  && IsWow64Process (GetCurrentProcess (), &is_wow64_proc)
-	  && is_wow64_proc)
+      if (wincap.is_wow64 ()
+	  && &wow64_test_stack_marker >= (PBOOL) 0x400000
+	  && &wow64_test_stack_marker <= (PBOOL) 0x10000000)
 	respawn_wow64_process ();
 
       dll_crt0_0 ();

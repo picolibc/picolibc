@@ -350,7 +350,7 @@ MapViewNT (HANDLE h, void *addr, size_t len, DWORD openflags,
   void *base = addr;
   ULONG commitsize = attached (prot) ? 0 : len;
   ULONG viewsize = len;
-  ULONG alloc_type = base ? AT_ROUND_TO_PAGE : 0;
+  ULONG alloc_type = base && !wincap.is_wow64 () ? AT_ROUND_TO_PAGE : 0;
 
   /* Try mapping using the given address first, even if it's NULL.
      If it failed, and addr was not NULL and flags is not MAP_FIXED,
@@ -1109,8 +1109,13 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 	 anonymous pages.  That's not possible on 9x for two reasons.
 	 It neither allows to create reserved pages in the shared memory
 	 area, nor does it allow to create page aligend mappings (in
-	 contrast to granularity aligned mappings). */
+	 contrast to granularity aligned mappings).
+	 
+	 Note that this isn't done in WOW64 environments since apparently
+	 WOW64 does not support the AT_ROUND_TO_PAGE flag which is required
+	 to get this right.  Too bad. */
       if (wincap.virtual_protect_works_on_shared_pages ()
+	  && !wincap.is_wow64 ()
 	  && ((len > fsiz && !autogrow (flags))
 	      || len < pagesize))
 	orig_len = len;
@@ -1177,9 +1182,9 @@ go_ahead:
 	 protection as the file's pages, then as much pages as necessary
 	 to accomodate the requested length, but as reserved pages which
 	 raise a SIGBUS when trying to access them.  AT_ROUND_TO_PAGE
-	 and page protection on shared pages is only supported by NT, so
-	 don't even try on 9x.  This is accomplished by not setting
-	 orig_len on 9x above. */
+	 and page protection on shared pages is only supported by 32 bit NT,
+	 so don't even try on 9x and in WOW64.  This is accomplished by not
+	 setting orig_len on 9x and in WOW64 above. */
       orig_len = roundup2 (orig_len, pagesize);
       len = roundup2 (len, getsystempagesize ());
       if (orig_len - len)

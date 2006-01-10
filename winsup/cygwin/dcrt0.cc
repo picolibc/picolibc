@@ -680,7 +680,6 @@ dll_crt0_0 ()
   _impure_ptr->_current_locale = "C";
   user_data->impure_ptr = _impure_ptr;
   user_data->impure_ptr_ptr = &_impure_ptr;
-  wincap.init ();
   initial_env ();
   mmap_init ();
 

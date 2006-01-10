@@ -713,7 +713,7 @@ static NO_COPY wincaps wincap_vista = {
   has_working_virtual_lock:true
 };
 
-wincapc wincap;
+wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));
 
 void
 wincapc::init ()
@@ -819,6 +819,10 @@ wincapc::init ()
       if (version.wProductType != VER_NT_WORKSTATION)
 	((wincaps *)this->caps)->is_server = true;
     }
+
+  BOOL is_wow64_proc = FALSE;
+  if (IsWow64Process (GetCurrentProcess (), &is_wow64_proc))
+    wow64 = is_wow64_proc;
 
   __small_sprintf (osnam, "%s-%d.%d", os, version.dwMajorVersion,
 		   version.dwMinorVersion);

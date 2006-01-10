@@ -1,3 +1,18 @@
+2006-01-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (dll_crt0_0): Remove call to wincap.init.
+	* init.cc (dll_entry): Rename is_wow64_proc to wow64_test_stack_marker.
+	Call wincap.init here before doing anything else.  Use wincap.is_wow64
+	to determine if we're running in a WOW64 emulator.
+	* mmap.cc (MapViewNT): Don't use AT_ROUND_TO_PAGE in WOW64, it's
+	apparently not supported.
+	(mmap64): Don't create mappings beyond EOF, which would need to use
+	AT_ROUND_TO_PAGE, on WOW64.
+	* wincap.cc (wincap): Throw into the .cygwin_dll_common section.
+	(wincapc::init): Determine if running in WOW64 and set wow_64 flag.
+	* wincap.h (class wincapc): Add wow64 member.
+	(wincapc::is_wow64): New method.
+
 2006-01-10  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_proc.cc (format_proc_cpuinfo): Avoid leading whitespace in

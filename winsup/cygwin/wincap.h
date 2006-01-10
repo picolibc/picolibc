@@ -70,6 +70,7 @@ class wincapc
 {
   OSVERSIONINFOEX  version;
   char             osnam[40];
+  bool             wow64;
   void             *caps;
 
 public:
@@ -78,6 +79,7 @@ public:
   void set_chunksize (DWORD nchunksize);
 
   const char *osname () const { return osnam; }
+  const bool is_wow64 () const { return wow64; }
 
 #define IMPLEMENT(cap) cap() const { return ((wincaps *) this->caps)->cap; }
 
