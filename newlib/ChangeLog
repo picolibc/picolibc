@@ -1,3 +1,8 @@
+2006-01-10  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/freopen.c (_freopen_r): Fix use of oflags.
+	* libc/stdio64/freopen64.c (_freopen64_r): Likewise.
+
 2006-01-10  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libm/mathfp/s_frexp.c: Check for special values on

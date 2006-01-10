@@ -146,14 +146,15 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
   else
     {
 #ifdef HAVE_FCNTL
+      int oldflags;
       /*
        * Reuse the file descriptor, but only if the access mode is
        * unchanged.  F_SETFL correctly ignores creation flags.
        */
       f = fp->_file;
-      if ((oflags = _fcntl_r (ptr, f, F_GETFL, 0)) == -1
-          || ((oflags ^ flags) & O_ACCMODE) != 0
-          || _fcntl_r (ptr, f, F_SETFL, flags) == -1)
+      if ((oldflags = _fcntl_r (ptr, f, F_GETFL, 0)) == -1
+          || ((oldflags ^ oflags) & O_ACCMODE) != 0
+          || _fcntl_r (ptr, f, F_SETFL, oflags) == -1)
         f = -1;
 #else
       /* We cannot modify without fcntl support.  */
