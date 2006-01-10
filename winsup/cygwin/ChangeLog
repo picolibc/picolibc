@@ -5,7 +5,7 @@
 	CREATE_SUSPENDED flag for a MS-DOS process since it doesn't work
 	anyway.  Avoid calling remember() when the child process has already
 	exited.
-	(av::fixup): Explicitly set cygexec flag to falseon a 16 bit process.
+	(av::fixup): Explicitly set cygexec flag to false on a 16 bit process.
 
 2006-01-09  Corinna Vinschen  <corinna@vinschen.de>
 
