@@ -793,7 +793,7 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 					     type_str,
 					     family,
 					     model,
-					     szBuffer,
+					     szBuffer + strspn (szBuffer, " 	"),
 					     stepping,
 					     brand_id,
 					     cpu_count,
