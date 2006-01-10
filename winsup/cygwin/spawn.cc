@@ -426,6 +426,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   linebuf one_line;
   child_info_spawn ch;
 
+  char *envblock;
   path_conv real_path;
   bool reset_sendsig = false;
 
@@ -461,6 +462,21 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   newargv.set (ac, argv);
 
+  int err;
+  const char *ext;
+  if ((ext = perhaps_suffix (prog_arg, real_path, err)) == NULL)
+    {
+      set_errno (err);
+      res = -1;
+      goto out;
+    }
+
+  bool wascygexec = real_path.iscygexec ();
+  res = newargv.fixup (chtype, prog_arg, real_path, ext);
+
+  if (res)
+    goto out;
+
   if (ac == 3 && argv[1][0] == '/' && argv[1][1] == 'c' &&
       (iscmd (argv[0], "command.com") || iscmd (argv[0], "cmd.exe")))
     {
@@ -477,98 +493,83 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       one_line.add (argv[2]);
       strcpy (real_path, argv[0]);
       null_app_name = true;
-      goto skip_arg_parsing;
     }
-
-  int err;
-  const char *ext;
-  if ((ext = perhaps_suffix (prog_arg, real_path, err)) == NULL)
-    {
-      set_errno (err);
-      res = -1;
-      goto out;
-    }
-
-  bool wascygexec = real_path.iscygexec ();
-  res = newargv.fixup (chtype, prog_arg, real_path, ext);
-  if (res)
-    goto out;
-
-  if (wascygexec)
-    newargv.dup_all ();
   else
     {
-      for (int i = 0; i < newargv.argc; i++)
+      if (wascygexec)
+	newargv.dup_all ();
+      else
 	{
-	  char *p = NULL;
-	  const char *a;
-
-	  newargv.dup_maybe (i);
-	  a = i ? newargv[i] : (char *) real_path;
-	  int len = strlen (a);
-	  if (len != 0 && !strpbrk (a, " \t\n\r\""))
-	    one_line.add (a, len);
-	  else
+	  for (int i = 0; i < newargv.argc; i++)
 	    {
-	      one_line.add ("\"", 1);
-	      /* Handle embedded special characters " and \.
-		 A " is always preceded by a \.
-		 A \ is not special unless it precedes a ".  If it does,
-		 then all preceding \'s must be doubled to avoid having
-		 the Windows command line parser interpret the \ as quoting
-		 the ".  This rule applies to a string of \'s before the end
-		 of the string, since cygwin/windows uses a " to delimit the
-		 argument. */
-	      for (; (p = strpbrk (a, "\"\\")); a = ++p)
+	      char *p = NULL;
+	      const char *a;
+
+	      newargv.dup_maybe (i);
+	      a = i ? newargv[i] : (char *) real_path;
+	      int len = strlen (a);
+	      if (len != 0 && !strpbrk (a, " \t\n\r\""))
+		one_line.add (a, len);
+	      else
 		{
-		  one_line.add (a, p - a);
-		  /* Find length of string of backslashes */
-		  int n = strspn (p, "\\");
-		  if (!n)
-		    one_line.add ("\\\"", 2);	/* No backslashes, so it must be a ".
-						   The " has to be protected with a backslash. */
-		  else
+		  one_line.add ("\"", 1);
+		  /* Handle embedded special characters " and \.
+		     A " is always preceded by a \.
+		     A \ is not special unless it precedes a ".  If it does,
+		     then all preceding \'s must be doubled to avoid having
+		     the Windows command line parser interpret the \ as quoting
+		     the ".  This rule applies to a string of \'s before the end
+		     of the string, since cygwin/windows uses a " to delimit the
+		     argument. */
+		  for (; (p = strpbrk (a, "\"\\")); a = ++p)
 		    {
-		      one_line.add (p, n);	/* Add the run of backslashes */
-		      /* Need to double up all of the preceding
-			 backslashes if they precede a quote or EOS. */
-		      if (!p[n] || p[n] == '"')
-			one_line.add (p, n);
-		      p += n - 1;		/* Point to last backslash */
+		      one_line.add (a, p - a);
+		      /* Find length of string of backslashes */
+		      int n = strspn (p, "\\");
+		      if (!n)
+			one_line.add ("\\\"", 2);	/* No backslashes, so it must be a ".
+						       The " has to be protected with a backslash. */
+		      else
+			{
+			  one_line.add (p, n);	/* Add the run of backslashes */
+			  /* Need to double up all of the preceding
+			     backslashes if they precede a quote or EOS. */
+			  if (!p[n] || p[n] == '"')
+			    one_line.add (p, n);
+			  p += n - 1;		/* Point to last backslash */
+			}
 		    }
+		  if (*a)
+		    one_line.add (a);
+		  one_line.add ("\"", 1);
 		}
-	      if (*a)
-		one_line.add (a);
-	      one_line.add ("\"", 1);
+	      one_line.add (" ", 1);
 	    }
-	  one_line.add (" ", 1);
+
+	  one_line.finish (real_path.iscygexec ());
+
+	  if (one_line.ix >= MAXWINCMDLEN)
+	    {
+	      debug_printf ("Command line too long (>32K), return E2BIG");
+	      set_errno (E2BIG);
+	      res = -1;
+	      goto out;
+	    }
 	}
 
-      one_line.finish (real_path.iscygexec ());
+      newargv.all_calloced ();
+      moreinfo->argc = newargv.argc;
+      moreinfo->argv = newargv;
 
-      if (one_line.ix >= MAXWINCMDLEN)
-	{
-	  debug_printf ("Command line too long (>32K), return E2BIG");
-	  set_errno (E2BIG);
-	  res = -1;
-	  goto out;
-	}
+      if (mode != _P_OVERLAY ||
+	  !DuplicateHandle (hMainProc, myself.shared_handle (), hMainProc,
+			    &moreinfo->myself_pinfo, 0,
+			    TRUE, DUPLICATE_SAME_ACCESS))
+	moreinfo->myself_pinfo = NULL;
+      else
+	VerifyHandle (moreinfo->myself_pinfo);
     }
 
-  char *envblock;
-  newargv.all_calloced ();
-  moreinfo->argc = newargv.argc;
-  moreinfo->argv = newargv;
-
-  if (mode != _P_OVERLAY ||
-      !DuplicateHandle (hMainProc, myself.shared_handle (), hMainProc,
-			&moreinfo->myself_pinfo, 0,
-			TRUE, DUPLICATE_SAME_ACCESS))
-    moreinfo->myself_pinfo = NULL;
-  else
-    VerifyHandle (moreinfo->myself_pinfo);
-
- skip_arg_parsing:
   PROCESS_INFORMATION pi;
   pi.hProcess = pi.hThread = NULL;
   pi.dwProcessId = pi.dwThreadId = 0;
@@ -624,8 +625,9 @@ spawn_guts (const char * prog_arg, const char *const *argv,
      after CreateProcess and before copying the datastructures to the child.
      So we have to start the child in suspend state, unfortunately, to avoid
      a race condition. */
-  if (wincap.start_proc_suspended () || mode != _P_OVERLAY
-      || cygheap->fdtab.need_fixup_before ())
+  if (!newargv.win16_exe
+      && (wincap.start_proc_suspended () || mode != _P_OVERLAY
+	  || cygheap->fdtab.need_fixup_before ()))
     flags |= CREATE_SUSPENDED;
 
   const char *runpath = null_app_name ? NULL : (const char *) real_path;
@@ -836,7 +838,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     {
     case _P_OVERLAY:
       myself.hProcess = pi.hProcess;
-      if (synced && !myself->wr_proc_pipe)
+      if (synced && WaitForSingleObject (pi.hProcess, 0) == WAIT_TIMEOUT
+	  && !myself->wr_proc_pipe)
 	{
 	  extern bool is_toplevel_proc;
 	  is_toplevel_proc = true;
@@ -1078,6 +1081,8 @@ av::fixup (child_info_types chtype, const char *prog_arg, path_conv& real_path, 
 	    win16_exe = off < sizeof (IMAGE_DOS_HEADER);
 	    if (!win16_exe)
 	      real_path.set_cygexec (!!hook_or_detect_cygwin (buf, NULL, subsys));
+	    else
+	      real_path.set_cygexec (false);
 	    UnmapViewOfFile (buf);
 	    iscui = subsys == IMAGE_SUBSYSTEM_WINDOWS_CUI;
 	    break;
