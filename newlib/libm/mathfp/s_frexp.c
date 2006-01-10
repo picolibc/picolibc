@@ -82,6 +82,17 @@ double frexp (double d, int *exp)
   double f;
   __uint32_t hd, ld, hf, lf;
 
+  /* Check for special values. */
+  switch (numtest (d))
+    {
+      case NAN:
+      case INF:
+        errno = EDOM;
+      case 0:
+        *exp = 0;
+        return (d);
+    }
+
   EXTRACT_WORDS (hd, ld, d);
 
   /* Get the exponent. */
@@ -93,16 +104,6 @@ double frexp (double d, int *exp)
   hf |= 0x3fe00000;
 
   INSERT_WORDS (f, hf, lf);
-
-  /* Check for special values. */
-  switch (numtest (f))
-    {
-      case NAN:
-      case INF:
-        errno = EDOM;
-        *exp = 0;
-        return (f);
-    }
 
   return (f);
 }

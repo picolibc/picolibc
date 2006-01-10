@@ -1,3 +1,12 @@
+2006-01-10  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libm/mathfp/s_frexp.c: Check for special values on
+	the original input, not the manipulated output value.
+	* libm/mathfp/sf_frexp.c: Ditto.
+	* libm/mathfp/s_atangent.c: Don't use local value branch
+	when checking for quadrant.
+	* libm/mathfp/sf_atangent.c: Ditto.
+
 2006-01-09  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/freopen.c: Switch to use isatty instead of _isatty.

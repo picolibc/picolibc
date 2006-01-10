@@ -197,9 +197,9 @@ _DEFUN (atangent, (double, double, double, int),
 
   if (arctan2)
     {
-      if (u < 0.0 || branch == 2)
+      if (u < 0.0)
         res = __PI - res;
-      if (v < 0.0 || branch == 1)
+      if (v < 0.0)
         res = -res;
     }
   else if (x < 0.0)
