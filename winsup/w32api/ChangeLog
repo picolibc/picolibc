@@ -1,3 +1,9 @@
+2006-01-12  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/aclapi.h (WINADVAPI): Add to prototypes.
+	* include/winreg.h (WINADVAPI): Likewise.
+	* include/winsvc.h (WINADVAPI): Likewise.
+
 2006-01-05  Michael Gerdau  <mgd@technosis.de>
 
 	* include/winbase.h (WINADVAPI): Define.
@@ -21,7 +27,7 @@
 2005-12-22  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/ws2_32.c: New file, defining IPv6 constants. 
-	* Makefile.in (SOURCES): Add ws2_32.c
+	* lib/Makefile.in (SOURCES): Add ws2_32.c
 	(EXTRA_OBJS): Add ws2_32.o.
 
 2005-12-21  Michael Jung  <mjung@iss.tu-darmstadt.de>
