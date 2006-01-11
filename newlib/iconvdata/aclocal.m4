@@ -165,6 +165,9 @@ AC_CHECK_TOOL(RANLIB, ranlib, :)
 
 AC_PROG_INSTALL
 
+# Hack to ensure that INSTALL won't be set to "../" with autoconf 2.13.  */
+ac_given_INSTALL=$INSTALL
+
 AM_MAINTAINER_MODE
 
 # We need AC_EXEEXT to keep automake happy in cygnus mode.  However,

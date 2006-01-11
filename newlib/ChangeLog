@@ -1,3 +1,21 @@
+2006-01-11  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* acinclude.m4: Add hack to prevent INSTALL in subdirs
+	from being set to "../".
+	* Makefile.am: Pass INSTALL in AM_MAKEFLAGS.
+	* aclocal.m4: Regenerated.
+	* configure: Ditto.
+	* Makefile.in: Ditto.
+	* doc/aclocal.m4: Ditto.
+	* doc/configure: Ditto.
+	* iconvdata/aclocal.m4: Ditto.
+	* iconvdata/configure: Ditto.
+	* libc/*/aclocal.m4: Ditto.
+	* libc/*/configure: Ditto.
+	* libc/libc.texinfo: Ditto.
+	* libm/*/aclocal.m4: Ditto.
+	* libm/*/configure: Ditto.
+
 2006-01-10  Eric Blake  <ebb9@byu.net>
 
 	* libc/stdio/freopen.c (_freopen_r): Fix use of oflags.

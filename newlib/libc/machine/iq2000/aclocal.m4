@@ -165,6 +165,9 @@ AC_CHECK_TOOL(RANLIB, ranlib, :)
 
 AC_PROG_INSTALL
 
+# Hack
+ac_given_INSTALL=$INSTALL
+
 AM_MAINTAINER_MODE
 
 # We need AC_EXEEXT to keep automake happy in cygnus mode.  However,
