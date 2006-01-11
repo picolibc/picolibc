@@ -1,5 +1,10 @@
 2006-01-12  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/wincrypt.h (WINADVAPI): Add to prototypes of
+	advapi32.dll functions.
+
+2006-01-12  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/winsock2.h (struct sockaddr_storage):  Use RFC 2553
 	names for padding size constants.
 
