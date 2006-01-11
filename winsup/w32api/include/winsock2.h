@@ -330,14 +330,26 @@ struct sockaddr {
 	char	sa_data[14];
 };
 
-/* Portable IPv6/IPv4 version of sockaddr.
-   Uses padding to force 8 byte alignment
-   and maximum size of 128 bytes */
+/* Portable IPv6/IPv4 version of sockaddr.  Based on RFC 2553.
+   Pad to force 8 byte alignment and maximum size of 128 bytes. */
+
+/*
+ * Desired design of maximum size and alignment
+ */
+#define _SS_MAXSIZE    128
+#define _SS_ALIGNSIZE  (sizeof (__int64)) 
+/*
+ * Definitions used for sockaddr_storage structure paddings design.
+ */
+#define _SS_PAD1SIZE   (_SS_ALIGNSIZE - sizeof (short))
+#define _SS_PAD2SIZE   (_SS_MAXSIZE - (sizeof (short) \
+				       + _SS_PAD1SIZE \
+				       + _SS_ALIGNSIZE))
 struct sockaddr_storage {
     short ss_family;
-    char __ss_pad1[6];    /* pad to 8 */
-    __int64 __ss_align; /* force alignment */
-    char __ss_pad2[112];  /* pad to 128 */
+    char __ss_pad1[_SS_PAD1SIZE];  /* pad to 8 */
+    __int64 __ss_align;  	   /* force alignment */
+    char __ss_pad2[_SS_PAD2SIZE];  /*  pad to 128 */
 };
 #endif /* ! (__INSIDE_CYGWIN__ || __INSIDE_MSYS__) */
 
