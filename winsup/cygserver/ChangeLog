@@ -1,3 +1,9 @@
+2006-01-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* wincap.cc: New file.
+	* wincap.h: New file.
+	* Makefile.in: Accomodate having our own wincap implementation now.
+
 2006-01-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	Check FreeBSD upstream changes and apply important patches.
