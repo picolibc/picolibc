@@ -1,6 +1,6 @@
 /* doctool.c
 
-   Copyright 1998,1999,2000,2001 Red Hat, Inc.
+   Copyright 1998,1999,2000,2001,2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -157,7 +157,7 @@ scan_directory(dirname)
 
     STAT(name, &st);
 
-    if (S_ISDIR(st.st_mode))
+    if (S_ISDIR(st.st_mode) && strcmp(de->d_name, "CVS") != 0)
     {
       scan_directory(name);
     }
