@@ -147,7 +147,7 @@ void __stdcall
 set_console_state_for_spawn (bool iscyg)
 {
   if (fhandler_console::need_invisible () || iscyg
-      || (myself->ctty > 0 && myself->ctty != TTY_CONSOLE))
+      || (myself->ctty >= 0 && myself->ctty != TTY_CONSOLE))
     return;
 
   HANDLE h = CreateFile ("CONIN$", GENERIC_READ, FILE_SHARE_WRITE,

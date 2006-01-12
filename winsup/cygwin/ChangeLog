@@ -1,5 +1,10 @@
 2006-01-12  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler_console.cc (set_console_state_for_spawn): Fix to recognize
+	ttys >= 0.
+
+2006-01-12  Christopher Faylor  <cgf@timesys.com>
+
 	* fhandler.h (set_console_state_for_spawn): Whackamole the argument
 	back to a bool.
 	* spawn.cc (spawn_guts): Ditto, i.e., once again call
