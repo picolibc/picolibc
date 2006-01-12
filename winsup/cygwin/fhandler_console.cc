@@ -144,9 +144,10 @@ tty_list::get_tty (int n)
    If it is, then just return.  If the console has been initialized, then
    set it into a more friendly state for non-cygwin apps. */
 void __stdcall
-set_console_state_for_spawn ()
+set_console_state_for_spawn (bool iscyg)
 {
-  if (fhandler_console::need_invisible ())
+  if (fhandler_console::need_invisible () || iscyg
+      || (myself->ctty > 0 && myself->ctty != TTY_CONSOLE))
     return;
 
   HANDLE h = CreateFile ("CONIN$", GENERIC_READ, FILE_SHARE_WRITE,
