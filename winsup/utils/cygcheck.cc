@@ -815,7 +815,7 @@ scan_registry (RegInfo * prev, HKEY hKey, char *name, int cygnus)
 		break;
 	      case REG_EXPAND_SZ:
 	      case REG_SZ:
-		printf ("`%s'\n", value_data);
+		printf ("'%s'\n", value_data);
 		break;
 	      default:
 		printf ("(unsupported type)\n");
@@ -861,7 +861,7 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
 
   if (access (id, X_OK))
     {
-      fprintf (stderr, "`id' program not found\n");
+      fprintf (stderr, "'id' program not found\n");
       return;
     }
 
@@ -876,7 +876,7 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
     uid += strlen ("uid=");
   else
     {
-      fprintf (stderr, "garbled output from `id' command - no uid= found\n");
+      fprintf (stderr, "garbled output from 'id' command - no uid= found\n");
       return;
     }
   char *gid = strtok (NULL, ")");
@@ -884,7 +884,7 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
     gid += strlen ("gid=") + 1;
   else
     {
-      fprintf (stderr, "garbled output from `id' command - no gid= found\n");
+      fprintf (stderr, "garbled output from 'id' command - no gid= found\n");
       return;
     }
 
@@ -1195,7 +1195,7 @@ dump_sysinfo ()
 	  if (strcmp (environ[i], "PATH") == 0)
 	    continue;		/* we handle this one specially */
 	  if (strcasecmp (environ[i], known_env_vars[j]) == 0)
-	    printf ("%s = `%s'\n", environ[i], eq + 1);
+	    printf ("%s = '%s'\n", environ[i], eq + 1);
 	  *eq = '=';
 	}
     }
@@ -1222,7 +1222,7 @@ dump_sysinfo ()
 	  if (!found)
 	    {
 	      *eq = 0;
-	      printf ("%s = `%s'\n", environ[i], eq + 1);
+	      printf ("%s = '%s'\n", environ[i], eq + 1);
 	      *eq = '=';
 	    }
 	}
@@ -1232,7 +1232,7 @@ dump_sysinfo ()
   if (registry)
     {
       if (givehelp)
-	printf ("Scanning registry for keys with `Cygnus' in them...\n");
+	printf ("Scanning registry for keys with 'Cygnus' in them...\n");
 #if 0
       /* big and not generally useful */
       scan_registry (0, HKEY_CLASSES_ROOT, (char *) "HKEY_CLASSES_ROOT", 0);
@@ -1248,7 +1248,7 @@ dump_sysinfo ()
       printf ("\n");
     }
   else
-    printf ("Use `-r' to scan registry\n\n");
+    printf ("Use '-r' to scan registry\n\n");
 
   if (givehelp)
     {
@@ -1486,7 +1486,7 @@ check_keys ()
   fputs ("\nThis key check works only in a console window,", stderr);
   fputs (" _NOT_ in a terminal session!\n", stderr);
   fputs ("Abort with Ctrl+C if in a terminal session.\n\n", stderr);
-  fputs ("Press `q' to exit.\n", stderr);
+  fputs ("Press 'q' to exit.\n", stderr);
 
   INPUT_RECORD in, prev_in;
 
