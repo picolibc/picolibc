@@ -36,10 +36,15 @@ uname (struct utsname *name)
      build systems which think the native system is a 64 bit system.  Since
      we're actually running in a 32 bit environment, it looks more correct
      just to use the CPU info given by WOW64. */
-  BOOL is_64bit_machine = FALSE;
-  if (IsWow64Process (hMainProc, &is_64bit_machine) && is_64bit_machine)
+  if (wincap.is_wow64 ())
     GetNativeSystemInfo (&sysinfo);
   else
+#else
+  /* But it seems ok to add a hint to the sysname, that we're running under
+     WOW64.  This might give an early clue if somebody encounters problems. */
+  if (wincap.is_wow64 ())
+    strncat (name->sysname, "-WOW64",
+	     sizeof name->sysname - strlen (name->sysname) - 1);
 #endif
     GetSystemInfo (&sysinfo);
 
