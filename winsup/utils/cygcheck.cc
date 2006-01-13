@@ -1137,7 +1137,7 @@ dump_sysinfo ()
 	  osversion.dwPlatformId == VER_PLATFORM_WIN32_NT ?
 	  osversion.szCSDVersion : "");
 
-  HINSTANCE k32 = LoadLibrary ("kernel32.dll");
+  HMODULE k32 = LoadLibrary ("kernel32.dll");
 
   BOOL (WINAPI *wow64_func) (HANDLE, PBOOL) = (BOOL (WINAPI *) (HANDLE, PBOOL))
     GetProcAddress (k32, "IsWow64Process");
