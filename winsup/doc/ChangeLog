@@ -1,6 +1,8 @@
 2006-01-12  Igor Peshansky  <pechtcha@cs.nyu.edu>
 
 	* doctool.c (scan_directory): Ignore "CVS" directories.
+	* faq-setup.xml (faq.setup.setup): Correct URL typo.
+	(faq.setup.snapshots): Clarify.
 
 2005-12-30  Christopher Faylor  <cgf@timesys.com>
 
