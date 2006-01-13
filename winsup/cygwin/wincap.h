@@ -64,6 +64,7 @@ struct wincaps
   unsigned has_null_console_handler_routine		: 1;
   unsigned has_disk_ex_ioctls				: 1;
   unsigned has_working_virtual_lock			: 1;
+  unsigned has_disabled_user_tos_setting		: 1;
 };
 
 class wincapc
@@ -134,6 +135,7 @@ public:
   bool	IMPLEMENT (has_null_console_handler_routine)
   bool	IMPLEMENT (has_disk_ex_ioctls)
   bool	IMPLEMENT (has_working_virtual_lock)
+  bool	IMPLEMENT (has_disabled_user_tos_setting)
 
 #undef IMPLEMENT
 };

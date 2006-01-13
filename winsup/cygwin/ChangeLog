@@ -1,3 +1,12 @@
+2006-01-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_setsockopt): Ignore errors when setting IP_TOS on
+	Windows 2000 and above. Clarify the comment about IP_TOS and move
+	to the place where the magic happens.
+	(get_ifconf): Remove unused code.
+	* wincap.h (wincaps::has_disabled_user_tos_setting): New element.
+	* wincap.cc: Implement above element throughout.
+
 2006-01-12  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_console.cc (set_console_state_for_spawn): Fix to recognize

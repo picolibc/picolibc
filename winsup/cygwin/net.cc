@@ -1,7 +1,7 @@
 /* net.cc: network-related routines.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005 Red Hat, Inc.
+   2005, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -682,21 +682,7 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
       /* Old applications still use the old Winsock1 IPPROTO_IP values. */
       if (level == IPPROTO_IP && CYGWIN_VERSION_CHECK_FOR_USING_WINSOCK1_VALUES)
 	optname = convert_ws1_ip_optname (optname);
-      /* FOR THE RECORDS:
 
-	 Setting IP_TOS is disabled by default since W2K, the official
-	 reason being that IP_TOS setting would interfere with Windows
-	 QOS settings.  As result, setsockopt returns with WinSock error
-	 10022, WSAEINVAL, when running under W2K or later, instead of
-	 handling this gracefully.
-
-	 The workaround is described in KB article 248611.  Add a new
-	 registry DWORD value HKLM/System/CurrentControlSet/Services/...
-	 ... Tcpip/Parameters/DisableUserTOSSetting, set to 0, and reboot.
-
-	 FIXME: Maybe we should simply fake that IP_TOS could be set
-	 successfully, if DisableUserTOSSetting is not set to 0 on W2K
-	 and above? */
       res = setsockopt (fh->get_socket (), level, optname,
 			(const char *) optval, optlen);
 
@@ -704,7 +690,38 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 	syscall_printf ("setsockopt optval=%x", *(long *) optval);
 
       if (res)
-	set_winsock_errno ();
+        {
+	  /* KB 248611:
+	  
+	     Windows 2000 and above don't support setting the IP_TOS field
+	     with setsockopt.  Additionally, TOS was always (also under 9x
+	     and NT) only implemented for UDP and ICMP, never for TCP.
+
+	     The difference is that beginning with Windows 2000 the
+	     setsockopt call returns WinSock error 10022, WSAEINVAL when
+	     trying to set the IP_TOS field, instead of just ignoring the
+	     call.  This is *not* explained in KB 248611, but only in KB
+	     258978.
+
+	     Either case, the official workaround is to add a new registry
+	     DWORD value HKLM/System/CurrentControlSet/Services/Tcpip/...
+	     ...  Parameters/DisableUserTOSSetting, set to 0, and reboot.
+
+	     Sidenote: The reasoning for dropping ToS in Win2K is that ToS
+	     per RFC 1349 is incompatible with DiffServ per RFC 2474/2475.
+
+	     We just ignore the return value of setting IP_TOS under Windows
+	     2000 and above entirely. */
+	  if (level == IPPROTO_IP && optname == IP_TOS
+	      && WSAGetLastError () == WSAEINVAL
+	      && wincap.has_disabled_user_tos_setting ())
+	    {
+	      debug_printf ("Faked IP_TOS success");
+	      res = 0;
+	    }
+	  else
+	    set_winsock_errno ();
+	}
     }
 
   syscall_printf ("%d = setsockopt (%d, %d, %x, %p, %d)",
@@ -1750,11 +1767,6 @@ get_ifconf (struct ifconf *ifc, int what)
 	return -1;
     }
 
-  OSVERSIONINFO os_version_info;
-
-  memset (&os_version_info, 0, sizeof os_version_info);
-  os_version_info.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-  GetVersionEx (&os_version_info);
   if (wincap.has_ip_helper_lib ())
     get_2k_ifconf (ifc, what);
   else if (wincap.is_winnt ())
