@@ -1039,38 +1039,40 @@ dump_sysinfo ()
   osversion.dwOSVersionInfoSize = sizeof (osversion);
   if (!GetVersionEx (&osversion))
     display_error ("dump_sysinfo: GetVersionEx()");
-  char *osname = (char *) "unknown OS";
+  const char *osname = "unknown OS";
   switch (osversion.dwPlatformId)
     {
     case VER_PLATFORM_WIN32s:
-      osname = (char *) "32s";
+      osname = "32s";
       break;
     case VER_PLATFORM_WIN32_WINDOWS:
       switch (osversion.dwMinorVersion)
 	{
 	case 0:
 	  if (strchr (osversion.szCSDVersion, 'C'))
-	    osname = (char *) "95 OSR2";
+	    osname = "95 OSR2";
 	  else
-	    osname = (char *) "95";
+	    osname = "95";
 	  break;
 	case 10:
 	  if (strchr (osversion.szCSDVersion, 'A'))
-	    osname = (char *) "98 SE";
+	    osname = "98 SE";
 	  else
-	    osname = (char *) "98";
+	    osname = "98";
 	  break;
 	case 90:
-	  osname = (char *) "ME";
+	  osname = "ME";
 	  break;
 	default:
-	  osname = (char *) "9X";
+	  osname = "9X";
 	  break;
 	}
       break;
     case VER_PLATFORM_WIN32_NT:
       is_nt = true;
-      if (osversion.dwMajorVersion == 5)
+      if (osversion.dwMajorVersion == 6)
+	osname = "Longhorn/Vista (not yet supported!)";
+      else if (osversion.dwMajorVersion == 5)
 	{
 	  BOOL more_info = FALSE;
 	  OSVERSIONINFOEX osversionex;
@@ -1080,64 +1082,91 @@ dump_sysinfo ()
 	  if (osversion.dwMinorVersion == 0)
 	    {
 	      if (!more_info)
-		osname = (char *) "2000";
+		osname = "2000";
 	      else if (osversionex.wProductType == VER_NT_SERVER
 		       || osversionex.wProductType == VER_NT_DOMAIN_CONTROLLER)
 		{
 		  if (osversionex.wSuiteMask & VER_SUITE_DATACENTER)
-		    osname = (char *) "2000 Datacenter Server";
+		    osname = "2000 Datacenter Server";
 		  else if (osversionex.wSuiteMask & VER_SUITE_ENTERPRISE)
-		    osname = (char *) "2000 Advanced Server";
+		    osname = "2000 Advanced Server";
 		  else
-		    osname = (char *) "2000 Server";
+		    osname = "2000 Server";
 		}
 	      else
-		osname = (char *) "2000 Professional";
+		osname = "2000 Professional";
 	    }
 	  else if (osversion.dwMinorVersion == 1)
 	    {
 	      if (GetSystemMetrics (SM_MEDIACENTER))
-	        osname = (char *) "XP Media Center Edition";
+	        osname = "XP Media Center Edition";
 	      else if (GetSystemMetrics (SM_TABLETPC))
-	        osname = (char *) "XP Tablet PC Edition";
+	        osname = "XP Tablet PC Edition";
 	      else if (!more_info)
-		osname = (char *) "XP";
+		osname = "XP";
 	      else if (osversionex.wSuiteMask & VER_SUITE_PERSONAL)
-	        osname = (char *) "XP Home Edition";
+	        osname = "XP Home Edition";
 	      else
-	        osname = (char *) "XP Professional";
+	        osname = "XP Professional";
 	    }
 	  else if (osversion.dwMinorVersion == 2)
 	    {
 	      if (!more_info)
-		osname = (char *) "2003 Server";
+		osname = "2003 Server";
 	      else if (osversionex.wSuiteMask & VER_SUITE_BLADE)
-		osname = (char *) "2003 Web Server";
+		osname = "2003 Web Server";
 	      else if (osversionex.wSuiteMask & VER_SUITE_DATACENTER)
-		osname = (char *) "2003 Datacenter Server";
+		osname = "2003 Datacenter Server";
 	      else if (osversionex.wSuiteMask & VER_SUITE_ENTERPRISE)
-		osname = (char *) "2003 Enterprise Server";
+		osname = "2003 Enterprise Server";
 	      else
-		osname = (char *) "2003 Server";
+		osname = "2003 Server";
 	    }
 	}
       else
-	osname = (char *) "NT";
+	osname = "NT";
       break;
     default:
-      osname = (char *) "??";
+      osname = "??";
       break;
     }
-  printf ("Windows %s Ver %lu.%lu Build %lu %s\n\n", osname,
+  printf ("Windows %s Ver %lu.%lu Build %lu %s\n", osname,
 	  osversion.dwMajorVersion, osversion.dwMinorVersion,
 	  osversion.dwPlatformId == VER_PLATFORM_WIN32_NT ?
 	  osversion.dwBuildNumber : (osversion.dwBuildNumber & 0xffff),
 	  osversion.dwPlatformId == VER_PLATFORM_WIN32_NT ?
 	  osversion.szCSDVersion : "");
-  if (GetSystemMetrics (SM_REMOTESESSION))
-    printf ("Running in Terminal Service session\n\n");
 
-  printf ("Path:");
+  HINSTANCE k32 = LoadLibrary ("kernel32.dll");
+
+  BOOL (WINAPI *wow64_func) (HANDLE, PBOOL) = (BOOL (WINAPI *) (HANDLE, PBOOL))
+    GetProcAddress (k32, "IsWow64Process");
+  BOOL is_wow64 = FALSE;
+  if (wow64_func && wow64_func (GetCurrentProcess (), &is_wow64) && is_wow64)
+    {
+      void (WINAPI *nativinfo) (LPSYSTEM_INFO) = (void (WINAPI *)
+        (LPSYSTEM_INFO)) GetProcAddress (k32, "GetNativeSystemInfo");
+      SYSTEM_INFO natinfo;
+      nativinfo (&natinfo);
+      fputs ("\nRunning under WOW64 on ", stdout);
+      switch (natinfo.wProcessorArchitecture)
+        {
+	  case PROCESSOR_ARCHITECTURE_IA64:
+	    puts ("IA64");
+	    break;
+	  case PROCESSOR_ARCHITECTURE_AMD64:
+	    puts ("AMD64");
+	    break;
+	  default:
+	    puts("??");
+	    break;
+	}
+    }
+
+  if (GetSystemMetrics (SM_REMOTESESSION))
+    printf ("\nRunning in Terminal Service session\n");
+
+  printf ("\nPath:");
   char *s = getenv ("PATH"), *e;
   if (!s)
     puts ("");
@@ -1259,7 +1288,6 @@ dump_sysinfo ()
     SetErrorMode (SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
   int drivemask = GetLogicalDrives ();
 
-  HINSTANCE k32 = LoadLibrary ("kernel32.dll");
   BOOL (WINAPI * gdfse) (LPCSTR, long long *, long long *, long long *) =
     (BOOL (WINAPI *) (LPCSTR, long long *, long long *, long long *))
     GetProcAddress (k32, "GetDiskFreeSpaceExA");
