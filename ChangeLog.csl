@@ -1,3 +1,10 @@
+2006-01-13  Mark Mitchell  <mark@codesourcery.com>
+
+	Backport:
+	2006-01-13  Mark Mitchell  <mark@codesourcery.com>
+	* event-loop.c (gdb_select): Detect file descriptors that have
+	been closed.
+
 2005-11-16  Mark Mitchell  <mark@codesourcery.com>
 
 	* gdb/remote-sim.c (gdbsim_wait): Don't use target_signal_to_host
