@@ -1,3 +1,11 @@
+2006-01-13  Brian Dessent  <brian@dessent.net>
+
+	* Makefile.in (cygcheck.exe): Do not link against libwininet.a.
+	* cygcheck.cc (pInternetCloseHandle): Define global function pointer.
+	(display_internet_error): Use it.
+	(package_grep): Attempt to load wininet.dll at runtime.  Call WinInet
+	API through function pointers throughout.
+
 2006-01-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (dump_sysinfo): Convert k32 to HMODULE.
