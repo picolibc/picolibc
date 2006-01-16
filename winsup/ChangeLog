@@ -1,5 +1,11 @@
 2006-01-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* configure.in: Add AC_PROG_INSTALL handling.
+	* configure: Regenerate.
+	* Makefile.in (install): Install CYGWIN_LICENSE.
+
+2006-01-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* CYGWIN_LICENSE: Fix contact information.
 
 2005-10-11  Christopher Faylor  <cgf@timesys.com>

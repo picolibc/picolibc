@@ -36,6 +36,10 @@ datadir:=@datadir@
 infodir:=@infodir@
 includedir:=@includedir@
 
+INSTALL:=@INSTALL@
+INSTALL_PROGRAM:=@INSTALL_PROGRAM@
+INSTALL_DATA:=@INSTALL_DATA@
+
 SUBDIRS=@SUBDIRS@
 INSTALL_SUBDIRS=${patsubst %,install_%,$(SUBDIRS)}
 CLEAN_SUBDIRS=${patsubst %,clean_%,$(SUBDIRS)}
@@ -56,7 +60,8 @@ endif
 
 all: Makefile $(SUBDIRS)
 
-install: Makefile $(INSTALL_SUBDIRS)
+install: Makefile CYGWIN_LICENSE $(INSTALL_SUBDIRS)
+	$(INSTALL_DATA) $(srcdir)/CYGWIN_LICENSE $(prefix)/share/doc/Cygwin/CYGWIN_LICENSE
 
 clean: $(CLEAN_SUBDIRS)
 
