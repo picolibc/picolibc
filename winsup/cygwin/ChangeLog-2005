@@ -152,7 +152,8 @@
 	* signal.cc (sigaction): Implement SA_NODEFER.
 	* tlsoffsets.h: Regenerate.
 
-	* sigproc.cc (wait_sig): Use default buffer size or Windows 9x complains
+	* sigproc.cc (wait_sig): Use default buffer size or Windows 9x
+	complains.
 
 	* pinfo.cc (_onreturn::dummy_handle): Remove.
 	(_onreturn::h): Make this a pointer.
