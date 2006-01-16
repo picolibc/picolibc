@@ -1,3 +1,9 @@
+2006-01-16  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* mt/Makefile.in (SCRIPTS, CRT0): Add ms2 files.
+	(crt0-ms2.o): New target.
+	* mt/crt0-ms2.S, mt/exit-ms2.c, mt/ms2.ld, mt/startup-ms2.S: New.
+
 2006-01-04  Paul Brook  <paul@codesourcery.com>
 
 	* m68k/bcc.ld: Add .got.plt and .got

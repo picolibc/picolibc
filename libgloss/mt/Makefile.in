@@ -56,10 +56,10 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 	then echo ${objroot}/../binutils/objcopy ; \
 	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
 
-SCRIPTS = 16-002.ld  16-003.ld  64-001.ld
-CRT0 = crt0.o crt0-64-001.o crt0-16-002.o crt0-16-003.o \
-	startup-64-001.o startup-16-002.o startup-16-003.o \
-	exit.o exit-64-001.o exit-16-002.o exit-16-003.o
+SCRIPTS = 16-002.ld  16-003.ld  64-001.ld ms2.ld
+CRT0 = crt0.o crt0-64-001.o crt0-16-002.o crt0-16-003.o crt0-ms2.o \
+	startup-64-001.o startup-16-002.o startup-16-003.o startup-ms2.o \
+	exit.o exit-64-001.o exit-16-002.o exit-16-003.o exit-ms2.o
 
 SIM_BSP = libsim.a
 SIM_OBJS = access.o chmod.o close.o \
@@ -97,6 +97,7 @@ crt0.o: $(srcdir)/crt0.S
 crt0-16-002.o: $(srcdir)/crt0-16-002.S
 crt0-16-003.o: $(srcdir)/crt0-16-003.S
 crt0-64-001.o: $(srcdir)/crt0-64-001.S
+crt0-ms2.o: $(srcdir)/crt0-ms2.S
 
 trap.o:	$(srcdir)/trap.S
 
