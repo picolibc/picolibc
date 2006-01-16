@@ -28,11 +28,13 @@ DLL itself.  If you distribute a (possibly modified) version of the DLL
 you must adhere to the terms of the GPL, i.e. you must provide sources
 for the cygwin DLL.
 
-See http://www.opensource.org/docs/definition_plain.html for the precise Open Source
-Definition referenced above.
+See http://www.opensource.org/docs/definition_plain.html for the precise
+Open Source Definition referenced above.
 
 Red Hat sells a special Cygwin License for customers who are unable to
 provide their application in open source code form.  For more
-information, please see: http://www.redhat.com/software/tools/cygwin/,
-or call 866-2REDHAT ext.  3007
+information, please see: http://www.redhat.com/software/cygwin/, or call
++1-866-2REDHAT ext. 45300 (toll-free in the US).
 
+Outside the US call your regional Red Hat office,
+see http://www.redhat.com/en_us/USA/home/company/contact/ww/.
