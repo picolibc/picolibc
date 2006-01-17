@@ -1,3 +1,27 @@
+2006-01-16  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+	2005-08-02  Khem Raj  <kraj@mvista.com>
+
+	* config/tc-arm.c (do_iwmmxt_wldstd): Correct the offset range for
+	WLDRD/WSTRD instruction.
+
+	2005-08-03  Nick Clifton  <nickc@redhat.com>
+
+	* gas/arm/iwmmxt-bad2.s: New file: Check for error messages about
+	erroneous offsets in iwmmxt instructions.  Cannot be part of
+	iwmmxt-bad.s because the errors there stop the assembler before it
+	gets to check the offsets in instructions.
+	* gas/arm/iwmmxt-bad2.d: New file.
+	* gas/arm/iwmmxt-bad2.l: New file: Expected error messages.
+
+	2005-08-02  Khem Raj  <kraj@mvista.com>
+
+	* gas/arm/iwmmxt.s: Change the offset values of the WLDRD, WSTRD
+	and WSTRW instructions to be larger than +/-255.
+	* gas/arm/iwmmxt.d: Fix the expected results for these
+	instructions.
+
 2005-04-13  Mark Mitchell <mark@codesourcery.com>
 
 	* doc/binutils.info: Remove.
