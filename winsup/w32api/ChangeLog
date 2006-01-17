@@ -1,3 +1,8 @@
+2006-01-17  Chris Sutcliffe  <ir0nh34d@users.sf.net>
+
+	* include/w32api.h: Increment version to 3.6.
+	* Makefile.in: Ditto.
+
 2006-01-12  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wincrypt.h (WINADVAPI): Add to prototypes of
