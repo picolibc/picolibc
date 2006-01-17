@@ -1,3 +1,9 @@
+2006-01-17  Andreas Schwab  <schwab@suse.de>
+
+	PR binutils/1486
+	* dis-asm.h (struct disassemble_info): Add
+	disassembler_needs_relocs.
+
 2006-01-09  Bob Wilson  <bob.wilson@acm.org>
 
 	* xtensa-config.h (XCHAL_HAVE_MUL32_HIGH): Define.

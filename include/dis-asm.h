@@ -172,6 +172,9 @@ typedef struct disassemble_info {
      alignment.  */
   unsigned int skip_zeroes_at_end;
 
+  /* Whether the disassembler always needs the relocations.  */
+  bfd_boolean disassembler_needs_relocs;
+
   /* Results from instruction decoders.  Not all decoders yet support
      this information.  This info is set each time an instruction is
      decoded, and is only valid for the last such instruction.
