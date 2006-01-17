@@ -1,3 +1,7 @@
+2006-01-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in: Replace etcdir with sysconfdir.
+
 2006-01-13  Brian Dessent  <brian@dessent.net>
 
 	* Makefile.in (cygcheck.exe): Do not link against libwininet.a.
