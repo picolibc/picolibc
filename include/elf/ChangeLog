@@ -1,3 +1,12 @@
+2006-01-18  Alexandre Oliva  <aoliva@redhat.com>
+
+	Introduce TLS descriptors for i386 and x86_64.
+	* common.h (DT_TLSDESC_GOT, DT_TLSDESC_PLT): New.
+	* i386.h (R_386_TLS_GOTDESC, R_386_TLS_DESC_CALL, R_386_TLS_DESC):
+	New.
+	* x86-64.h (R_X86_64_GOTPC32_TLSDESC, R_X86_64_TLSDESC_CALL,
+	R_X86_64_TLSDESC): New.
+
 2006-01-09  Mike Frysinger  <vapier@gentoo.org>:
 
 	* common.h (EM_ALTERA_NIOS2, EM_NIOS32) Define.

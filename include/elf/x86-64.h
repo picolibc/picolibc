@@ -1,5 +1,6 @@
 /* x86_64 ELF support for BFD.
-   Copyright (C) 2000, 2001, 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2000, 2001, 2002, 2004, 2005, 2006
+   Free Software Foundation, Inc.
    Contributed by Jan Hubicka <jh@suse.cz>
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -53,6 +54,14 @@ START_RELOC_NUMBERS (elf_x86_64_reloc_type)
      RELOC_NUMBER (R_X86_64_GOTOFF64, 25)     /* 64 bit offset to GOT */
      RELOC_NUMBER (R_X86_64_GOTPC32,  26)     /* 32 bit signed pc relative
                                                  offset to GOT */
+     /* 27 .. 33 */
+     RELOC_NUMBER (R_X86_64_GOTPC32_TLSDESC, 34)
+					      /* 32 bit signed pc relative
+						 offset to TLS descriptor
+						 in the GOT.  */
+     RELOC_NUMBER (R_X86_64_TLSDESC_CALL, 35) /* Relaxable call through TLS
+						 descriptor.  */
+     RELOC_NUMBER (R_X86_64_TLSDESC, 36)      /* 2x64-bit TLS descriptor.  */
      RELOC_NUMBER (R_X86_64_GNU_VTINHERIT, 250)       /* GNU C++ hack  */
      RELOC_NUMBER (R_X86_64_GNU_VTENTRY, 251)         /* GNU C++ hack  */
 END_RELOC_NUMBERS (R_X86_64_max)
