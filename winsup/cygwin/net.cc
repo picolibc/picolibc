@@ -18,6 +18,7 @@ details. */
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <iphlpapi.h>
+#include <syslog.h>
 
 #include <stdlib.h>
 #define gethostname cygwin_gethostname
@@ -1834,6 +1835,32 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
   return res;
 }
 
+/* The below implementation of rresvport looks pretty ugly, but there's
+   a problem in Winsock.  The bind(2) call does not fail if a local
+   address is still in TIME_WAIT state, and there's no way to get this
+   behaviour.  Unfortunately the first time when this is detected is when
+   the calling application tries to connect. 
+   
+   One (also not really foolproof) way around this problem would be to use
+   the iphlpapi function GetTcpTable and to check if the port in question is
+   in TIME_WAIT state and if so, choose another port number.  But this method
+   is as prone to races as the below one, or any other method using random
+   port numbers, etc.  The below method at least tries to avoid races between
+   multiple applications using rrecvport.
+
+   As for the question "why don't you just use the Winsock rresvport?"...
+   For some reason I do NOT understand, the call to WinSocks rresvport
+   corrupts the stack when Cygwin is built using -fomit-frame-pointers.
+   And then again, the Winsock rresvport function has the exact same
+   problem with reusing ports in the TIME_WAIT state as the socket/bind
+   method has.  So there's no gain in using that function. */
+
+#define PORT_LOW	(IPPORT_EFSSERVER + 1)
+#define PORT_HIGH	(IPPORT_RESERVED - 1)
+#define NUM_PORTS	(PORT_HIGH - PORT_LOW + 1)
+
+LONG last_used_rrecvport __attribute__((section (".cygwin_dll_common"), shared)) = IPPORT_RESERVED;
+
 /* exported as rresvport: standards? */
 extern "C" int
 cygwin_rresvport (int *port)
@@ -1845,7 +1872,38 @@ cygwin_rresvport (int *port)
   if (efault.faulted (EFAULT))
     return -1;
 
-  res = rresvport (port);
+  res = socket (AF_INET, SOCK_STREAM, 0);
+  if (res != (int) INVALID_SOCKET)
+    {
+      LONG myport;
+      int ret = SOCKET_ERROR;
+      struct sockaddr_in sin;
+      sin.sin_family = AF_INET;
+      sin.sin_addr.s_addr = INADDR_ANY;
+
+      for (int i = 0; i < NUM_PORTS; i++)
+	{
+	  while ((myport = InterlockedExchange (&last_used_rrecvport, 0)) == 0)
+	    low_priority_sleep (0);
+	  if (--myport < PORT_LOW)
+	    myport = PORT_HIGH;
+	  InterlockedExchange (&last_used_rrecvport, myport);
+
+	  sin.sin_port = htons (myport);
+	  if (!(ret = bind (res, (struct sockaddr *) &sin, sizeof sin)))
+	    break;
+	  int err = WSAGetLastError ();
+	  if (err != WSAEADDRINUSE && err != WSAEINVAL)
+	    break;
+	}
+      if (ret == SOCKET_ERROR)
+	{
+	  closesocket (res);
+	  res = (int) INVALID_SOCKET;
+	}
+      else if (port)
+        *port = myport;
+    }
 
   if (res != (int) INVALID_SOCKET)
     {

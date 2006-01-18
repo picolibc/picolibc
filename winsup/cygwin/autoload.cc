@@ -450,7 +450,6 @@ LoadDLLfunc (SetUserObjectSecurity, 12, user32)
 LoadDLLfunc (inet_network, 4, wsock32)
 LoadDLLfunc (rcmd, 24, wsock32)
 LoadDLLfunc (rexec, 24, wsock32)
-LoadDLLfunc (rresvport, 4, wsock32)
 
 LoadDLLfunc (accept, 12, ws2_32)
 LoadDLLfunc (bind, 12, ws2_32)
