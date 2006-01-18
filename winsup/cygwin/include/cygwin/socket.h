@@ -36,7 +36,7 @@ struct sockaddr {
 		      + _SS_PAD1SIZE + _SS_ALIGNSIZE))
 
 struct sockaddr_storage {
-  sa_family_t		ss_familiy;
+  sa_family_t		ss_family;
   char			_ss_pad1[_SS_PAD1SIZE];
   int64_t		__ss_align;
   char			_ss_pad2[_SS_PAD2SIZE];
