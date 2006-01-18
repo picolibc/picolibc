@@ -49,7 +49,6 @@ extern "C"
 		      char *remuser, char *cmd, SOCKET * fd2p);
   int __stdcall rexec (char **ahost, unsigned short inport, char *locuser,
 		       char *password, char *cmd, SOCKET * fd2p);
-  int __stdcall rresvport (int *);
   int sscanf (const char *, const char *, ...);
 }				/* End of "C" section */
 

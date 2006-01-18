@@ -1,5 +1,9 @@
 2006-01-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* net.cc (rresvport): Remove extern declaration.
+
+2006-01-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (rresvport): Remove.
 	* net.cc (last_used_rrecvport): New global shared variable.
 	(cygwin_rresvport): Implement rresvport without using rresvport from
