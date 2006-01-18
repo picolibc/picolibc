@@ -1,3 +1,7 @@
+2006-01-18  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* mt/ms2.ld (.sram): Correct typo in section names.
+
 2006-01-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* mt/Makefile.in (SCRIPTS, CRT0): Add ms2 files.

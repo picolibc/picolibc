@@ -210,9 +210,9 @@ SECTIONS
   /* For now, locate data ahead of code in onchip sram/memory. */
   .sram           : AT (LOADADDR(.auxdata) + SIZEOF(.auxdata))
   {
-    *(.data.sram)
+    *(.sram.data)
     . = ALIGN(4) ; /* Make sure that instructions are aligned... */
-    *(.text.sram)
+    *(.sram.text)
   } >sram
   
   _sram_data_start = LOADADDR ( .sram );
