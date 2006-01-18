@@ -1,3 +1,12 @@
+2006-01-18  Christopher Faylor  <cgf@timesys.com>
+
+	* Makefile.in (sysconfdir): Remove unneeded variable.
+
+	* mkgroup.c: Replace ` with ' throughout.
+	* mkpasswd.c: Ditto.
+	* setfacl.c: Ditto.
+	* ssp.c: Ditto.
+
 2006-01-18  Dave Korn  <dave.korn@artimi.com>
 
 	* cygpath.cc (dowin):  Remove stray debugging printf statement.
