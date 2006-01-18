@@ -76,14 +76,10 @@ heap_init ()
 	    break;
 	}
       if (!p)
-	{
-	  if (GetLastError () == ERROR_INVALID_ADDRESS)
-	    Sleep (2000);
-	  api_fatal ("couldn't allocate heap, %E, base %p, top %p, "
-		     "reserve_size %d, allocsize %d, page_const %d",
-		     cygheap->user_heap.base, cygheap->user_heap.top,
-		     reserve_size, allocsize, page_const);
-	}
+	api_fatal ("couldn't allocate heap, %E, base %p, top %p, "
+		   "reserve_size %d, allocsize %d, page_const %d",
+		   cygheap->user_heap.base, cygheap->user_heap.top,
+		   reserve_size, allocsize, page_const);
       if (p != cygheap->user_heap.base)
 	api_fatal ("heap allocated at wrong address %p (mapped) != %p (expected)", p, cygheap->user_heap.base);
       if (!VirtualAlloc (cygheap->user_heap.base, allocsize, MEM_COMMIT, PAGE_READWRITE))
