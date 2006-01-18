@@ -522,7 +522,7 @@ usage (FILE * stream, int isNT)
                    "   -h,--help               displays this message\n"
 	           "   -v,--version            version information and exit\n\n");
   if (isNT)
-    fprintf (stream, "One of `-l', `-d' or `-g' must be given.\n");
+    fprintf (stream, "One of '-l', '-d' or '-g' must be given.\n");
   return 1;
 }
 
@@ -622,7 +622,7 @@ main (int argc, char **argv)
 	  case 'p':
 	    if (optarg[0] != '/')
 	    {
-	      fprintf (stderr, "%s: `%s' is not a fully qualified path.\n",
+	      fprintf (stderr, "%s: '%s' is not a fully qualified path.\n",
 		       argv[0], optarg);
 	      return 1;
 	    }
@@ -640,7 +640,7 @@ main (int argc, char **argv)
 	    print_version ();
 	    return 0;
 	  default:
-	    fprintf (stderr, "Try `%s --help' for more information.\n", argv[0]);
+	    fprintf (stderr, "Try '%s --help' for more information.\n", argv[0]);
 	    return 1;
 	  }
     }
@@ -679,7 +679,7 @@ main (int argc, char **argv)
     }
   if (!print_local && !print_domain && !print_local_groups)
     {
-      fprintf (stderr, "%s: Specify one of `-l', `-d' or `-g'\n", argv[0]);
+      fprintf (stderr, "%s: Specify one of '-l', '-d' or '-g'\n", argv[0]);
       return 1;
     }
   if (optind < argc)
@@ -687,7 +687,7 @@ main (int argc, char **argv)
       if (!print_domain)
         {
 	  fprintf (stderr, "%s: A domain name is only accepted "
-		   "when `-d' is given.\n", argv[0]);
+		   "when '-d' is given.\n", argv[0]);
 	  return 1;
 	}
       domain_specified = 1;
@@ -704,18 +704,18 @@ main (int argc, char **argv)
         {
 #if 0
 	  /*
-	   * Get `Everyone' group
+	   * Get 'Everyone' group
 	   */
 	  print_special (print_sids, &sid_world_auth, 1, SECURITY_WORLD_RID,
 			 0, 0, 0, 0, 0, 0, 0);
 #endif
 	  /*
-	   * Get `system' group
+	   * Get 'system' group
 	   */
 	  print_special (print_sids, &sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
 			 0, 0, 0, 0, 0, 0, 0);
 	  /*
-	   * Get `administrators' group
+	   * Get 'administrators' group
 	   */
 	  if (!print_local_groups)
 	    print_special (print_sids, &sid_nt_auth, 2, SECURITY_BUILTIN_DOMAIN_RID,

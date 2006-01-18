@@ -533,7 +533,7 @@ usage (FILE * stream, int isNT)
   fprintf (stream, "   -h,--help              print this message\n"
 	           "   -v,--version           print version information and exit\n\n");
   if (isNT)
-    fprintf (stream, "One of `-l' or `-d' must be given.\n");
+    fprintf (stream, "One of '-l' or '-d' must be given.\n");
 
   return 1;
 }
@@ -643,7 +643,7 @@ main (int argc, char **argv)
 	  print_version ();
 	  return 0;
 	default:
-	  fprintf (stderr, "Try `%s --help' for more information.\n", argv[0]);
+	  fprintf (stderr, "Try '%s --help' for more information.\n", argv[0]);
 	  return 1;
 	}
     }
@@ -657,7 +657,7 @@ main (int argc, char **argv)
 
   if (!print_local && !print_domain)
     {
-      fprintf (stderr, "%s: Specify one of `-l' or `-d'\n", argv[0]);
+      fprintf (stderr, "%s: Specify one of '-l' or '-d'\n", argv[0]);
       return 1;
     }
   if (optind < argc)
@@ -665,7 +665,7 @@ main (int argc, char **argv)
       if (!print_domain)
         {
 	  fprintf (stderr, "%s: A domain name is only accepted "
-		   "when `-d' is given.\n", argv[0]);
+		   "when '-d' is given.\n", argv[0]);
 	  return 1;
 	}
       domain_specified = 1;
@@ -692,12 +692,12 @@ main (int argc, char **argv)
       if (disp_groupname == NULL)
         {
       /*
-       * Get `system' group
+       * Get 'system' group
        */
       print_special (print_sids, &sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
 		     0, 0, 0, 0, 0, 0, 0);
       /*
-       * Get `None' group
+       * Get 'None' group
       */
       len = 256;
       GetComputerName (name, &len);

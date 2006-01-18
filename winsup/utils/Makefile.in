@@ -16,7 +16,6 @@ prefix:=@prefix@
 exec_prefix:=@exec_prefix@
 
 bindir:=@bindir@
-sysconfdir:=@sysconfdir@
 program_transform_name:=@program_transform_name@
 
 override INSTALL:=@INSTALL@
@@ -182,7 +181,7 @@ realclean: clean
 	rm -f  Makefile config.cache
 
 install: all
-	$(SHELL) $(updir1)/mkinstalldirs $(bindir) $(sysconfdir)
+	$(SHELL) $(updir1)/mkinstalldirs $(bindir)
 	for i in $(PROGS) ; do \
 	  n=`echo $$i | sed '$(program_transform_name)'`; \
 	  $(INSTALL_PROGRAM) $$i $(bindir)/$$n; \

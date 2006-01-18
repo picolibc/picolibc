@@ -318,12 +318,12 @@ usage (FILE * stream)
             "\n"
             "         d[efault]:u[ser]:uid:perm\n"
             "\n"
-            "     `perm' is either a 3-char permissions string in the form\n"
+            "     'perm' is either a 3-char permissions string in the form\n"
             "     \"rwx\" with the character - for no permission\n"
             "     or it is the octal representation of the permissions, a\n"
             "     value from 0 (equivalent to \"---\") to 7 (\"rwx\").\n"
-            "     `uid' is a user name or a numerical uid.\n"
-            "     `gid' is a group name or a numerical gid.\n"
+            "     'uid' is a user name or a numerical uid.\n"
+            "     'gid' is a group name or a numerical gid.\n"
             "\n"
             "\n"
             "For each file given as parameter, %s will either replace its\n"
@@ -383,7 +383,7 @@ usage (FILE * stream)
             "account currently.\n", prog_name);
   }
   else
-    fprintf(stream, "Try `%s --help' for more information.\n", prog_name);
+    fprintf(stream, "Try '%s --help' for more information.\n", prog_name);
 }
 
 struct option longopts[] = {

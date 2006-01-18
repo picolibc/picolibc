@@ -900,7 +900,7 @@ main (int argc, char **argv)
   hits = (HISTCOUNTER *)malloc (high_pc-low_pc+4);
   memset (hits, 0, high_pc-low_pc+4);
 
-  fprintf (stderr, "prun: [%08x,%08x] Running `%s'\n",
+  fprintf (stderr, "prun: [%08x,%08x] Running '%s'\n",
 	  low_pc, high_pc, argv[optind]);
 
   run_program (argv[optind]);
