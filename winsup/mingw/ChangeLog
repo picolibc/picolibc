@@ -1,3 +1,7 @@
+2006-01-18  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* Makefile.in: Bump cygwin build number.
+
 2005-10-27  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* Include/_mingw.h: Increment version to 3.9.
