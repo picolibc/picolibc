@@ -13,19 +13,9 @@ VPATH = @srcdir@
 
 SGMLDIRS =  -d $(srcdir) -d $(utils_source) -d $(cygwin_source)
 
-# These *.info targets don't actually work, so remove them for now.
-# Put them back when we figure out what to do with them. (davisb)
-#DOC=faq.txt faq.info readme.txt readme.info
-DOC=faq.txt readme.txt
-HTMLDOC=faq0.html faq.html readme.html
-
 CC:=@CC@
 CC_FOR_TARGET:=@CC@
 exeext:=@build_exeext@
-
-MAKEINFO:=makeinfo
-TEXI2DVI:=texi2dvi
-TEXI2HTML:=texi2html
 
 include $(srcdir)/../Makefile.common
 
@@ -76,50 +66,6 @@ faq/faq-nochunks.html :
 
 ./doctool : doctool.c
 	gcc -g $< -o $@
-
-%.dvi: %.sgml
-	-db2dvi $<
-
-%.rtf: %.sgml
-	-db2rtf $<
-
-%.ps: %.sgml
-	-db2ps $<
-
-%.pdf: %.ps
-	-ps2pdf $< $@
-
-%.info: %.texinfo
-	-$(MAKEINFO) -I $(srcdir) $<
-
-%.txt: %.texinfo
-	-$(MAKEINFO) -I $(srcdir) $<
-
-%.html: %.texinfo
-	-$(TEXI2HTML) -I $(srcdir) $<
-
-readme.txt: $(srcdir)/readme.texinfo $(srcdir)/*.texinfo
-	-$(MAKEINFO) -I$(srcdir) --no-split --no-headers $< -o - |\
-	sed '/^Concept Index/,$$d' > $@
-
-#faq0.html: $(srcdir)/faq.texinfo $(srcdir)/*.texinfo
-#	-rm -f faq_toc.html; \
-#	for i in $(srcdir)/*.texinfo ; do \
-#		sed < $$i -e 's?@file{\([fth]*p://[^}]*\)}?@strong{<A HREF="\1">\1</A>}?' \
-#	    -e 's?\([.+a-zA-Z0-9-]*@@[.a-zA-Z0-9-]*[a-zA-Z0-9]\)?<A HREF="mailto:\1">\1</A>?' >./`basename $$i` ; done; \
-#	$(TEXI2HTML) -monolithic ./faq.texinfo; \
-#	rm -f *.texinfo; \
-#	sed -e 's;"faq.html;"faq0.html;g' faq.html > faq0.html; \
-#	rm -f faq.html; exit 0
-#
-#faq.html: $(srcdir)/faq.texinfo $(srcdir)/*.texinfo
-#	-rm -f faq_toc.html; \
-#	for i in $(srcdir)/*.texinfo ; do \
-#		sed < $$i -e 's?@file{\([fth]*p://[^}]*\)}?@strong{<A HREF="\1">\1</A>}?' \
-#	    -e 's?\([.+a-zA-Z0-9-]*@@[.a-zA-Z0-9-]*[a-zA-Z0-9]\)?<A HREF="mailto:\1">\1</A>?' >./`basename $$i` ; done; \
-#	$(TEXI2HTML) -split_chapter ./faq.texinfo; \
-#	rm -f *.texinfo; \
-#	[ -r faq_toc.html ] && mv faq_toc.html faq.html; exit 0
 
 TBFILES = cygwin-ug-net.dvi cygwin-ug-net.rtf cygwin-ug-net.ps \
 	  cygwin-ug-net.pdf cygwin-ug-net.sgml \

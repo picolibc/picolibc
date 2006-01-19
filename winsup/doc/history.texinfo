@@ -1,5 +1,0 @@
-@chapter History
-
-This section of the FAQ is no longer maintained.
-
-Instead, see @file{http://cygwin.com/history.html}.

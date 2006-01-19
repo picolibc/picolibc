@@ -1,3 +1,22 @@
+2006-01-18  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* Makefile.in : Remove references to old texinfo FAQ.
+	* calls.texinfo : Remove.
+	* changes.texinfo : Remove.
+	* copy.texinfo : Remove.
+	* faq.texinfo : Remove.
+	* history.texinfo : Remove.
+	* how-api.texinfo : Remove.
+	* how-programming.texinfo : Remove.
+	* how-resources.texinfo : Remove.
+	* how-using.texinfo : Remove.
+	* how.texinfo : Remove.
+	* install.texinfo : Remove.
+	* readme.texinfo : Remove.
+	* relnotes.texinfo : Remove.
+	* what.texinfo : Remove.
+	* who.texinfo : Remove.
+
 2006-01-12  Igor Peshansky  <pechtcha@cs.nyu.edu>
 
 	* doctool.c (scan_directory): Ignore "CVS" directories.
