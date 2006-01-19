@@ -1335,7 +1335,7 @@ fhandler_disk_file::opendir ()
   DIR *dir;
   DIR *res = NULL;
   size_t len;
-  path_conv rootdir ("/");
+  path_conv rootdir ("/", PC_POSIX);
 
   if (!pc.isdir ())
     set_errno (ENOTDIR);
@@ -1381,7 +1381,7 @@ fhandler_disk_file::opendir ()
       dir->__d_dirhash = get_namehash ();
 
       res = dir;
-      dir->__flags = strcasematch (pc, rootdir) ? dirent_isroot : 0;
+      dir->__flags = (pc.normalized_path[0] == '/' && pc.normalized_path[1] == '\0') ? dirent_isroot : 0;
     }
 
   syscall_printf ("%p = opendir (%s)", res, get_name ());
