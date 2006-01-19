@@ -112,8 +112,9 @@ static common_apps[] = {
   {0, 0}
 };
 
-static int num_paths = 0, max_paths = 0;
-static char **paths = 0;
+static int num_paths, max_paths;
+static char **paths;
+int first_nonsys_path;
 
 void
 eprintf (const char *format, ...)
@@ -226,9 +227,12 @@ init_paths ()
     }
   GetWindowsDirectory (tmp, 4000);
   add_path (tmp, strlen (tmp));
+  first_nonsys_path = num_paths;
 
   char *wpath = getenv ("PATH");
-  if (wpath)
+  if (!wpath)
+    fprintf (stderr, "WARNING: PATH is not set at all!\n");
+  else
     {
       char *b, *e;
       b = wpath;
@@ -242,8 +246,6 @@ init_paths ()
 	  b = e + 1;
 	}
     }
-  else
-    printf ("WARNING: PATH is not set at all!\n");
 }
 
 static char *
@@ -278,10 +280,8 @@ find_on_path (char *file, char *default_extension,
   if (strchr (file, '.'))
     default_extension = (char *) "";
 
-  for (int i = 0; i < num_paths; i++)
+  for (int i = search_sysdirs ? 0 : first_nonsys_path; i < num_paths; i++)
     {
-      if (!search_sysdirs && (i == 0 || i == 2 || i == 3))
-	continue;
       if (i == 0 || !search_sysdirs || strcasecmp (paths[i], paths[0]))
 	{
 	  sprintf (ptr, "%s\\%s%s", paths[i], file, default_extension);
