@@ -23,7 +23,7 @@ struct dirent
   __ino64_t __invalid_d_ino;
   long d_fd;		/* File descriptor of open directory.
 			   Used since Cygwin 1.3.3. */
-  unsigned __ino32;
+  unsigned __invalid_ino32;
   char d_name[256];	/* FIXME: use NAME_MAX? */
 };
 #else
@@ -33,7 +33,7 @@ struct dirent
   long d_version;
   ino_t __invalid_d_ino;
   long d_fd;
-  unsigned long __ino32;
+  unsigned long __invalid_ino32;
   char d_name[256];
 };
 #else
@@ -86,6 +86,7 @@ int scandir (const char *__dir,
 	     int (*compar) (const struct dirent **, const struct dirent **));
 
 int alphasort (const struct dirent **__a, const struct dirent **__b);
+#if 0  /* these make no sense in the absence of d_type */
 /* File types for `d_type'.  */
 enum
 {
@@ -112,5 +113,6 @@ enum
 /* Convert between stat structure types and directory types.  */
 # define IFTODT(mode)		(((mode) & 0170000) >> 12)
 # define DTTOIF(dirtype)        ((dirtype) << 12)
+#endif
 #endif /* _POSIX_SOURCE */
 #endif /*_SYS_DIRENT_H*/
