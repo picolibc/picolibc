@@ -100,6 +100,7 @@ static common_apps[] = {
   {"ls", 0},
   {"make", 0},
   {"mv", 0},
+  {"patch", 0},
   {"perl", 0},
   {"rm", 0},
   {"sed", 0},

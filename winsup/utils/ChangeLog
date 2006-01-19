@@ -1,5 +1,9 @@
 2006-01-19  Christopher Faylor  <cgf@timesys.com>
 
+	* cygcheck.cc (common_paths): Add "patch".
+
+2006-01-19  Christopher Faylor  <cgf@timesys.com>
+
 	* cygcheck.cc (init_paths): Record first_nonsys_path.
 	(find_on_path): Start on first nonsys path when !search_sysdirs.
 
