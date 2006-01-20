@@ -896,7 +896,7 @@ fhandler_socket::prepare (HANDLE &event, long event_mask)
     }
   if (WSAEventSelect (get_socket (), event, event_mask) == SOCKET_ERROR)
     {
-      debug_printf ("WSAEventSelect, %E");
+      debug_printf ("WSAEventSelect(evt), %d", WSAGetLastError ());
       return false;
     }
   return true;
@@ -994,7 +994,8 @@ fhandler_socket::release (HANDLE event)
 {
   int last_err = WSAGetLastError ();
   /* KB 168349: NT4 fails if the event parameter is not NULL. */
-  WSAEventSelect (get_socket (), NULL, 0);
+  if (WSAEventSelect (get_socket (), NULL, 0) == SOCKET_ERROR)
+    debug_printf ("WSAEventSelect(NULL), %d", WSAGetLastError ());
   WSACloseEvent (event);
   unsigned long non_block = 0;
   if (ioctlsocket (get_socket (), FIONBIO, &non_block))
@@ -1495,20 +1496,27 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
       /* We must cancel WSAAsyncSelect (if any) before setting socket to
        * blocking mode
        */
-      if (cmd == FIONBIO && async_io () && *(int *) p == 0)
-	WSAAsyncSelect (get_socket (), winmsg, 0, 0);
+      if (cmd == FIONBIO && *(int *) p == 0)
+	{
+	  if (async_io ())
+	    WSAAsyncSelect (get_socket (), winmsg, 0, 0);
+	  if (WSAEventSelect (get_socket (), NULL, 0) == SOCKET_ERROR)
+	    debug_printf ("WSAEventSelect(NULL), %d", WSAGetLastError ());
+	}
       res = ioctlsocket (get_socket (), cmd, (unsigned long *) p);
       if (res == SOCKET_ERROR)
 	  set_winsock_errno ();
       if (cmd == FIONBIO)
 	{
-	  syscall_printf ("socket is now %sblocking",
-			    *(int *) p ? "non" : "");
+	  if (!res)
+	    {
+	      syscall_printf ("socket is now %sblocking",
+				*(int *) p ? "non" : "");
+	      set_nonblocking (*(int *) p);
+	    }
 	  /* Start AsyncSelect if async socket unblocked */
 	  if (*(int *) p && async_io ())
 	    WSAAsyncSelect (get_socket (), winmsg, WM_ASYNCIO, ASYNC_MASK);
-
-	  set_nonblocking (*(int *) p);
 	}
       break;
     }

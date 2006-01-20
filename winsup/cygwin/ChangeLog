@@ -1,3 +1,11 @@
+2006-01-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::prepare): Fix debug output.
+	(fhandler_socket::release): Add debug output for WSAEventSelect failure.
+	(fhandler_socket::ioctl): Always cancel WSAEventSelect before switching
+	to blocking mode.  Only set nonblocking flag if ioctlsocket call
+	succeeded.  Only print new socket state if ioctlsocket call succeeded.
+
 2006-01-19  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Check posix path
