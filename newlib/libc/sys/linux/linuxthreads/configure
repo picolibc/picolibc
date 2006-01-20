@@ -1431,7 +1431,7 @@ test -z "$INSTALL_SCRIPT" && INSTALL_SCRIPT='${INSTALL_PROGRAM}'
 test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
 
 
-# Hack
+# Hack to ensure that INSTALL won't be set to "../" with autoconf 2.13.  */
 ac_given_INSTALL=$INSTALL
 
 echo $ac_n "checking whether to enable maintainer-specific portions of Makefiles""... $ac_c" 1>&6

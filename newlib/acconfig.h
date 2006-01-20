@@ -1,7 +1,7 @@
-/* newlib.hin.  Generated automatically from configure.in by autoheader.  */
 #ifndef __NEWLIB_H__
 
 #define __NEWLIB_H__ 1
+@TOP@
 
 /* EL/IX level */
 #undef _ELIX_LEVEL
@@ -36,13 +36,7 @@
 
 /* Define if the compiler supports aliasing an array to an address.  */
 #undef  _HAVE_ARRAY_ALIASING
-
-/* Name of package */
-#undef PACKAGE
-
-/* Version number of package */
-#undef VERSION
-
+@BOTTOM@
 /*
  * Iconv encodings enabled ("to" direction)
  */

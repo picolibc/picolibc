@@ -1,3 +1,15 @@
+2006-01-20  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* acconfig.h: New file to generate newlib.hin from.
+	* newlib.hin: Regenerated.
+	* stamp-h.in: Regenerated.
+	* Makefile.am: Add ACLOCAL_AMFLAGS so aclocal can be
+	called automatically.
+	* Makefile.in: Regenerated.
+	* acinclude.m4: Add proper comment for hack in previous change.
+	* aclocal.m4 */aclocal.m4: Regenerated.
+	* configure */configure: Regenerated.
+
 2006-01-11  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* acinclude.m4: Add hack to prevent INSTALL in subdirs
