@@ -6,8 +6,8 @@
 
 2006-01-19  Christopher Faylor  <cgf@timesys.com>
 
-	* dir.cc (readdir_worker): Fill in invalid fields with -1.  Accommodate
-	name change from __ino32 to __invalid_ino32.
+	* dir.cc (readdir_worker): Accommodate name change from __ino32 to
+	__invalid_ino32.
 	* include/sys/dirent.h (__invalid_ino32): Rename from __ino32.  Don't
 	define unused d_type macros.
 

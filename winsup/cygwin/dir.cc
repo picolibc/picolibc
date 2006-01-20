@@ -104,8 +104,8 @@ readdir_worker (DIR *dir, dirent *de)
     /* error return */;
   else if (!CYGWIN_VERSION_CHECK_FOR_NEEDS_D_INO)
     {
-      de->__invalid_d_ino = (ino_t) -1;
-      de->__invalid_ino32 = (uint32_t) -1;
+      de->__invalid_d_ino = (ino_t) 0;
+      de->__invalid_ino32 = (uint32_t) 0;
       if (de->d_name[0] == '.')
 	{
 	  if (de->d_name[1] == '\0')
