@@ -1,3 +1,9 @@
+2006-01-20  Christopher Faylor  <cgf@timesys.com>
+
+	* include/sys/dirent.h: Add comments for people who are REALLY confused
+	about whether they should be using something called __invalid_d_ino or
+	not.
+
 2006-01-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::prepare): Fix debug output.

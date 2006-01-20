@@ -19,21 +19,21 @@
 #ifdef __INSIDE_CYGWIN__
 struct dirent
 {
-  long d_version;	/* Used since Cygwin 1.3.3. */
-  __ino64_t __invalid_d_ino;
-  long d_fd;		/* File descriptor of open directory.
-			   Used since Cygwin 1.3.3. */
-  unsigned __invalid_ino32;
-  char d_name[256];	/* FIXME: use NAME_MAX? */
+  long d_version;			/* Used since Cygwin 1.3.3. */
+  __ino64_t __invalid_d_ino;		/* DO NOT USE: No longer available since cygwin 1.5.19 */
+  long d_fd;				/* File descriptor of open directory.
+					   Used since Cygwin 1.3.3. */
+  unsigned __invalid_ino32;		/* DO NOT USE: No longer available since cygwin 1.5.19 */
+  char d_name[256];			/* FIXME: use NAME_MAX? */
 };
 #else
 #ifdef __CYGWIN_USE_BIG_TYPES__
 struct dirent
 {
   long d_version;
-  ino_t __invalid_d_ino;
+  ino_t __invalid_d_ino;		/* DO NOT USE: No longer available since cygwin 1.5.19 */
   long d_fd;
-  unsigned long __invalid_ino32;
+  unsigned long __invalid_ino32;	/* DO NOT USE: No longer available since cygwin 1.5.19 */
   char d_name[256];
 };
 #else
@@ -42,7 +42,7 @@ struct dirent
   long d_version;
   long d_reserved[2];
   long d_fd;
-  ino_t __invalid_d_ino;
+  ino_t __invalid_d_ino;		/* DO NOT USE: No longer available since cygwin 1.5.19 */
   char d_name[256];
 };
 #endif
@@ -57,9 +57,9 @@ typedef struct __DIR
   /* This is first to set alignment in non _COMPILING_NEWLIB case.  */
   unsigned long __d_cookie;
   struct dirent *__d_dirent;
-  char *__d_dirname;		/* directory name with trailing '*' */
-  _off_t __d_position;		/* used by telldir/seekdir */
-  __ino64_t __d_dirhash;	/* hash of directory name for use by readdir */
+  char *__d_dirname;			/* directory name with trailing '*' */
+  _off_t __d_position;			/* used by telldir/seekdir */
+  __ino64_t __d_dirhash;		/* hash of directory name for use by readdir */
   void *__handle;
   void *__fh;
   unsigned __flags;
@@ -113,6 +113,6 @@ enum
 /* Convert between stat structure types and directory types.  */
 # define IFTODT(mode)		(((mode) & 0170000) >> 12)
 # define DTTOIF(dirtype)        ((dirtype) << 12)
-#endif
+#endif /* #if 0 */
 #endif /* _POSIX_SOURCE */
 #endif /*_SYS_DIRENT_H*/
