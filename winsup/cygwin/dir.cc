@@ -104,8 +104,8 @@ readdir_worker (DIR *dir, dirent *de)
     /* error return */;
   else if (!CYGWIN_VERSION_CHECK_FOR_NEEDS_D_INO)
     {
-      de->__invalid_d_ino = 0;
-      de->__ino32 = 0;
+      de->__invalid_d_ino = (ino_t) -1;
+      de->__invalid_ino32 = (uint32_t) -1;
       if (de->d_name[0] == '.')
 	{
 	  if (de->d_name[1] == '\0')
@@ -150,7 +150,7 @@ readdir_worker (DIR *dir, dirent *de)
 	  __ino64_t dino = hash_path_name (dir->__d_dirhash, "\\");
 	  de->__invalid_d_ino = hash_path_name (dino, de->d_name);
 	}
-      de->__ino32 = de->__invalid_d_ino;	// for legacy applications
+      de->__invalid_ino32 = de->__invalid_d_ino;	// for legacy applications
     }
   return res;
 }
