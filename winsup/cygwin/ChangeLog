@@ -11,7 +11,7 @@
 	to dirent structure.
 	* fhandler_virtual.cc (fhandler_virtual::opendir): Ditto.
 	* include/sys/dirent.h (struct dirent): Coalesce two similar
-	structures.  Remove all threads of the apparently highly confusing
+	structures.  Remove all shreds of the apparently highly confusing
 	references to inodes.  Add support for calculating a real inode if
 	__USE_EXPENSIVE_CYGWIN_D_INO is defined.
 
