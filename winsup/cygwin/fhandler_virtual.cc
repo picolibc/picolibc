@@ -71,18 +71,18 @@ fhandler_virtual::opendir ()
   else
     {
       strcpy (dir->__d_dirname, get_name ());
-      dir->__d_dirent->d_version = __DIRENT_VERSION;
+      dir->__d_dirent->__d_version = __DIRENT_VERSION;
       cygheap_fdnew fd;
       if (fd >= 0)
 	{
 	  fd = this;
 	  fd->nohandle (true);
-	  dir->__d_dirent->d_fd = fd;
+	  dir->__d_fd = fd;
 	  dir->__fh = this;
 	  dir->__d_cookie = __DIRENT_COOKIE;
 	  dir->__handle = INVALID_HANDLE_VALUE;
 	  dir->__d_position = 0;
-	  dir->__d_dirhash = get_namehash ();
+	  // dir->__d_dirhash = get_namehash ();
 	  dir->__flags = dirent_saw_dot | dirent_saw_dot_dot;
 	  res = dir;
 	  res->__flags = 0;

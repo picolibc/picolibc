@@ -1359,7 +1359,7 @@ fhandler_disk_file::opendir ()
   else
     {
       strcpy (dir->__d_dirname, get_win32_name ());
-      dir->__d_dirent->d_version = __DIRENT_VERSION;
+      dir->__d_dirent->__d_version = __DIRENT_VERSION;
       cygheap_fdnew fd;
 
       if (fd < 0)
@@ -1367,7 +1367,7 @@ fhandler_disk_file::opendir ()
 
       fd = this;
       fd->nohandle (true);
-      dir->__d_dirent->d_fd = fd;
+      dir->__d_fd = fd;
       dir->__fh = this;
       /* FindFirstFile doesn't seem to like duplicate /'s. */
       len = strlen (dir->__d_dirname);
@@ -1378,7 +1378,6 @@ fhandler_disk_file::opendir ()
       dir->__d_cookie = __DIRENT_COOKIE;
       dir->__handle = INVALID_HANDLE_VALUE;
       dir->__d_position = 0;
-      dir->__d_dirhash = get_namehash ();
 
       res = dir;
       dir->__flags = (pc.normalized_path[0] == '/' && pc.normalized_path[1] == '\0') ? dirent_isroot : 0;

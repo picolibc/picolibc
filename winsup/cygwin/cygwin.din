@@ -993,7 +993,7 @@ open SIGFE
 _open = open SIGFE
 _open64
 opendir SIGFE
-_opendir = opendir SIGFE
+__opendir_with_d_ino SIGFE
 openlog SIGFE
 _openlog = openlog SIGFE
 openpty SIGFE

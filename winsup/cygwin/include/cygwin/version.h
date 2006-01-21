@@ -286,12 +286,13 @@ details. */
       148: Add open(2) flags O_SYNC, O_RSYNC, O_DSYNC and O_DIRECT.
       149: Add open(2) flag O_NOFOLLOW.
       150: Export getsubopt.
+      151: Export __opendir_with_d_ino
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 150
+#define CYGWIN_VERSION_API_MINOR 151
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

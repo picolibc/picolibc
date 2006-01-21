@@ -16,25 +16,14 @@
 #define __DIRENT_VERSION	2
 
 #pragma pack(push,4)
-#ifdef __INSIDE_CYGWIN__
+#if defined(__INSIDE_CYGWIN__) || defined (__CYGWIN_USE_BIG_TYPES__)
 struct dirent
 {
-  long d_version;			/* Used since Cygwin 1.3.3. */
-  __ino64_t __invalid_d_ino;		/* DO NOT USE: No longer available since cygwin 1.5.19 */
-  long d_fd;				/* File descriptor of open directory.
-					   Used since Cygwin 1.3.3. */
-  unsigned __invalid_ino32;		/* DO NOT USE: No longer available since cygwin 1.5.19 */
+  long __d_version;			/* Used internally */
+  __ino64_t __dirent_internal;
+  __uint32_t __dirent_unused1;
+  __uint32_t __dirent_internal1;
   char d_name[256];			/* FIXME: use NAME_MAX? */
-};
-#else
-#ifdef __CYGWIN_USE_BIG_TYPES__
-struct dirent
-{
-  long d_version;
-  ino_t __invalid_d_ino;		/* DO NOT USE: No longer available since cygwin 1.5.19 */
-  long d_fd;
-  unsigned long __invalid_ino32;	/* DO NOT USE: No longer available since cygwin 1.5.19 */
-  char d_name[256];
 };
 #else
 struct dirent
@@ -45,7 +34,6 @@ struct dirent
   ino_t __invalid_d_ino;		/* DO NOT USE: No longer available since cygwin 1.5.19 */
   char d_name[256];
 };
-#endif
 #endif
 #pragma pack(pop)
 
@@ -59,14 +47,22 @@ typedef struct __DIR
   struct dirent *__d_dirent;
   char *__d_dirname;			/* directory name with trailing '*' */
   _off_t __d_position;			/* used by telldir/seekdir */
-  __ino64_t __d_dirhash;		/* hash of directory name for use by readdir */
+  int __d_fd;
+  unsigned __d_unused;
   void *__handle;
   void *__fh;
   unsigned __flags;
 } DIR;
 #pragma pack(pop)
 
+#ifndef __USE_EXPENSIVE_CYGWIN_D_INO
 DIR *opendir (const char *);
+#else
+#define d_ino __dirent_internal
+DIR *__opendir_with_d_ino (const char *);
+#define opendir __opendir_with_d_ino
+#endif
+
 struct dirent *readdir (DIR *);
 int readdir_r (DIR *, struct dirent *, struct dirent **);
 void rewinddir (DIR *);

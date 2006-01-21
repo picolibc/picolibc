@@ -39,7 +39,16 @@ dirfd (DIR *dir)
       syscall_printf ("-1 = dirfd (%p)", dir);
       return -1;
     }
-  return dir->__d_dirent->d_fd;
+  return dir->__d_fd;
+}
+
+extern "C" DIR *
+__opendir_with_d_ino (const char *name)
+{
+  DIR *res = opendir (name);
+  if (res)
+    res->__flags |= dirent_set_d_ino;
+  return res;
 }
 
 /* opendir: POSIX 5.1.2.1 */
@@ -61,7 +70,7 @@ opendir (const char *name)
     }
 
   if (res)
-    /* nothing */;
+    res->__flags |= CYGWIN_VERSION_CHECK_FOR_NEEDS_D_INO ? dirent_set_d_ino : 0;
   else if (fh)
     delete fh;
   return res;
@@ -100,58 +109,36 @@ readdir_worker (DIR *dir, dirent *de)
 	}
     }
 
-  if (res)
-    /* error return */;
-  else if (!CYGWIN_VERSION_CHECK_FOR_NEEDS_D_INO)
-    {
-      de->__invalid_d_ino = (ino_t) -1;
-      de->__invalid_ino32 = (uint32_t) -1;
-      if (de->d_name[0] == '.')
-	{
-	  if (de->d_name[1] == '\0')
-	     dir->__flags |= dirent_saw_dot;
-	   else if (de->d_name[1] == '.' && de->d_name[2] == '\0')
-	     dir->__flags |= dirent_saw_dot_dot;
-	 }
-    }
-  else
+  if (!res)
     {
       /* Compute d_ino by combining filename hash with the directory hash
 	 (which was stored in dir->__d_dirhash when opendir was called). */
-      if (de->d_name[0] == '.')
-	{
-	  if (de->d_name[1] == '\0')
-	    {
-	      de->__invalid_d_ino = dir->__d_dirhash;
-	      dir->__flags |= dirent_saw_dot;
-	    }
-	  else if (de->d_name[1] != '.' || de->d_name[2] != '\0')
-	    goto hashit;
-	  else
-	    {
-	      dir->__flags |= dirent_saw_dot_dot;
-	      char *p, up[strlen (dir->__d_dirname) + 1];
-	      strcpy (up, dir->__d_dirname);
-	      if (!(p = strrchr (up, '\\')))
-		goto hashit;
-	      *p = '\0';
-	      if (!(p = strrchr (up, '\\')))
-		de->__invalid_d_ino = hash_path_name (0, ".");
-	      else
-		{
-		  *p = '\0';
-		  de->__invalid_d_ino = hash_path_name (0, up);
-		}
-	    }
-	}
+      if (de->d_name[0] != '.')
+	/* relax */;
+      else if (de->d_name[1] == '\0')
+	dir->__flags |= dirent_saw_dot;
+      else if (de->d_name[1] == '.' && de->d_name[2] == '\0')
+	dir->__flags |= dirent_saw_dot_dot;
+      if (!(dir->__flags & dirent_set_d_ino))
+	de->__dirent_internal = 0;
       else
 	{
-      hashit:
-	  __ino64_t dino = hash_path_name (dir->__d_dirhash, "\\");
-	  de->__invalid_d_ino = hash_path_name (dino, de->d_name);
+	  size_t len = strlen (dir->__d_dirname) + strlen (de->d_name);
+	  char *path = (char *) alloca (len);
+	  char *p = strchr (strcpy (path, dir->__d_dirname), '\0');
+	  strcpy (p - 1, de->d_name);
+	  struct __stat64 st;
+	  if (lstat64 (path, &st) == 0)
+	    de->__dirent_internal = st.st_ino;
+	  else
+	    {
+	      de->__dirent_internal = hash_path_name (0, dir->__d_dirname);
+	      de->__dirent_internal = hash_path_name (de->__dirent_internal, de->d_name);
+	    }
 	}
-      de->__invalid_ino32 = de->__invalid_d_ino;	// for legacy applications
+      de->__dirent_internal1 = de->__dirent_internal;
     }
+
   return res;
 }
 
@@ -210,7 +197,7 @@ seekdir64 (DIR *dir, _off64_t loc)
 
   if (dir->__d_cookie != __DIRENT_COOKIE)
     return;
-  dir->__flags &= dirent_isroot;
+  dir->__flags &= (dirent_isroot | dirent_set_d_ino);
   return ((fhandler_base *) dir->__fh)->seekdir (dir, loc);
 }
 
@@ -255,7 +242,7 @@ closedir (DIR *dir)
 
   int res = ((fhandler_base *) dir->__fh)->closedir (dir);
 
-  cygheap->fdtab.release (dir->__d_dirent->d_fd);
+  cygheap->fdtab.release (dir->__d_fd);
 
   free (dir->__d_dirname);
   free (dir->__d_dirent);

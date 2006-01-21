@@ -47,7 +47,8 @@ enum dirent_states
   dirent_isroot		= 0x0008,
   dirent_saw_cygdrive	= 0x0010,
   dirent_saw_dev	= 0x0020,
-  dirent_saw_proc	= 0x0040
+  dirent_saw_proc	= 0x0040,
+  dirent_set_d_ino	= 0x0080
 };
 
 enum conn_state

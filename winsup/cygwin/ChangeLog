@@ -1,5 +1,22 @@
 2006-01-20  Christopher Faylor  <cgf@timesys.com>
 
+	* include/cygwin/version.h: Bump API minor number to 151.
+	* dir.cc (__opendir_with_d_ino): New function.
+	(opendir): Set flag if we should be calculating inodes.
+	(readdir_worker): Calculate d_ino by calling stat if the user has asked
+	for it.
+	(seekdir64): Maintain all persistent flag settings.
+	* fhandler.h (dirent_states): Add dirent_set_d_ino.
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Reflect changes
+	to dirent structure.
+	* fhandler_virtual.cc (fhandler_virtual::opendir): Ditto.
+	* include/sys/dirent.h (struct dirent): Coalesce two similar
+	structures.  Remove all threads of the apparently highly confusing
+	references to inodes.  Add support for calculating a real inode if
+	__USE_EXPENSIVE_CYGWIN_D_INO is defined.
+
+2006-01-20  Christopher Faylor  <cgf@timesys.com>
+
 	* include/sys/dirent.h: Add comments for people who are REALLY confused
 	about whether they should be using something called __invalid_d_ino or
 	not.
