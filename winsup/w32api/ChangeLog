@@ -1,3 +1,8 @@
+2006-01-23  Brandon Sneed  <brandon@redf.net>
+
+	* setupapi.def: Add all CM_* functions defined in ddk/cfgmgr32.h
+	to exports.
+
 2006-01-17  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
 	* include/w32api.h: Increment version to 3.6.
