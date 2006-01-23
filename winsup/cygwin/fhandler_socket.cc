@@ -424,7 +424,16 @@ fhandler_socket::fixup_after_fork (HANDLE parent)
     }
   else
     {
-      debug_printf ("WSASocket went fine new_sock %p, old_sock %p", new_sock, get_io_handle ());
+      debug_printf ("WSASocket went fine new_sock %p, old_sock %p", new_sock, get_socket ());
+
+      /* Go figure!  Even though the original socket was not inheritable,
+	 the duplicated socket is inheritable again.  This can lead to all
+	 sorts of trouble, apparently.  Note that there's no way to prevent
+	 this on 9x, not even by trying to reset socket inheritance using
+	 DuplicateHandle and closing the original socket. */
+      if (wincap.has_set_handle_information ())
+	SetHandleInformation ((HANDLE) new_sock, HANDLE_FLAG_INHERIT, 0);
+
       set_io_handle ((HANDLE) new_sock);
     }
 }

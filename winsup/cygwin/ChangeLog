@@ -1,3 +1,8 @@
+2006-01-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::fixup_after_fork): Reset
+	inheritance for duplicated socket.
+
 2006-01-20  Christopher Faylor  <cgf@timesys.com>
 
 	* include/cygwin/version.h: Bump API minor number to 151.
