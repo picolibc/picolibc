@@ -326,14 +326,36 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
     case DRIVE_REMOVABLE:
     case DRIVE_CDROM:
     case DRIVE_RAMDISK:
-    /* Temporarily enable remote drives until we find out why we disabled them
-       in the first place. When we find out don't forget to write a comment! */
-    case DRIVE_REMOTE:
       /* Although the documentation indicates otherwise, it seems like
 	 "inodes" on these devices are persistent, at least across reboots. */
       buf->st_ino = (((__ino64_t) nFileIndexHigh) << 32)
 		    | (__ino64_t) nFileIndexLow;
       break;
+
+    case DRIVE_REMOTE:
+      /* From own experiments and replies from the Cygwin mailing list,
+	 we're now trying to figure out how to determine remote file
+	 systems which are capable of returning persistent inode
+	 numbers.  It seems that NT4 NTFS, when accessed remotly, and
+	 some other remote file systems return unreliable values in
+	 nFileIndex.  The common factor of these unreliable remote FS
+	 seem to be that FILE_SUPPORTS_OBJECT_IDS isn't set, even though
+	 this should have nothing to do with inode numbers.
+	 An exception is Samba, which seems to return valid inode numbers
+	 without having the FILE_SUPPORTS_OBJECT_IDS flag set.  So we're
+	 testing for the flag values returned by a 3.x Samba explicitely
+	 for now. */
+#define FS_IS_SAMBA (FILE_CASE_SENSITIVE_SEARCH \
+		     | FILE_CASE_PRESERVED_NAMES \
+		     | FILE_PERSISTENT_ACLS)
+      if ((pc.fs_flags () & FILE_SUPPORTS_OBJECT_IDS)
+      	  || pc.fs_flags  () == FS_IS_SAMBA)
+	{
+	  buf->st_ino = (((__ino64_t) nFileIndexHigh) << 32)
+	  		| (__ino64_t) nFileIndexLow;
+	  break;
+	}
+      /*FALLTHRU*/
     default:
       /* Either the nFileIndex* fields are unreliable or unavailable.  Use the
 	 next best alternative. */

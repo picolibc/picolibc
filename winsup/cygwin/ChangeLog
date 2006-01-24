@@ -1,3 +1,9 @@
+2006-01-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Try harder
+	to determine remote file systems with reliable inode numbers.  Add
+	longish comment.
+
 2006-01-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::fixup_after_fork): Reset
