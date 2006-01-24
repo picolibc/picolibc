@@ -722,7 +722,7 @@ typedef struct _SP_DEVICE_INTERFACE_DATA {
     DWORD Flags;
     ULONG_PTR Reserved;
 } SP_DEVICE_INTERFACE_DATA, *PSP_DEVICE_INTERFACE_DATA;
-/* For backward compatability */
+/* For backward compatibility */
 typedef SP_DEVICE_INTERFACE_DATA  SP_INTERFACE_DEVICE_DATA, *PSP_INTERFACE_DEVICE_DATA;
 
 typedef struct _SP_DEVICE_INTERFACE_DETAIL_DATA_A {
@@ -733,7 +733,7 @@ typedef struct _SP_DEVICE_INTERFACE_DETAIL_DATA_W {
     DWORD  cbSize;
     WCHAR  DevicePath[ANYSIZE_ARRAY];
 } SP_DEVICE_INTERFACE_DETAIL_DATA_W, *PSP_DEVICE_INTERFACE_DETAIL_DATA_W;
-/* For backward compatability */
+/* For backward compatibility */
 typedef SP_DEVICE_INTERFACE_DETAIL_DATA_A SP_INTERFACE_DEVICE_DETAIL_DATA_A,
     *PSP_INTERFACE_DEVICE_DETAIL_DATA_A;
 typedef SP_DEVICE_INTERFACE_DETAIL_DATA_W SP_INTERFACE_DEVICE_DETAIL_DATA_W,
@@ -1317,7 +1317,7 @@ WINSETUPAPI BOOL WINAPI SetupSetSourceListW(DWORD,PCWSTR*,UINT);
 WINSETUPAPI VOID WINAPI SetupTermDefaultQueueCallback(PVOID);
 WINSETUPAPI BOOL WINAPI SetupTerminateFileLog(HSPFILELOG);
 
-/* for backward compatability */
+/* for backward compatibility */
 #define SetupDiCreateInterfaceDeviceW	SetupDiCreateDeviceInterfaceW
 #define SetupDiCreateInterfaceDeviceRegKeyW	SetupDiCreateDeviceInterfaceRegKeyW
 #define SetupDiOpenInterfaceDeviceW	SetupDiOpenDeviceInterfaceW

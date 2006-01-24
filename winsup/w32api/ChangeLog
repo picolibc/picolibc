@@ -1,5 +1,12 @@
 2006-01-24  Danny Smith  <dannysmith@users.sourceforge.net>
 
+        * include/commctrl.h: Correct spelling of 'compatibility' in
+	comments.
+	* include/setupapi.h: Likewise.
+	* include/ws2tcpip.h: Likewise.
+
+2006-01-24  Danny Smith  <dannysmith@users.sourceforge.net>
+
         * include/ddk/winddk.h (KeGetCurrentKPCR): Support -masm=intel.
 
 2006-01-24  Jiri Malak  <Jiri.Malak@iol.cz>

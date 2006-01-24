@@ -13,7 +13,7 @@
 #endif
 
 #if (defined _WINSOCK_H && !defined _WINSOCK2_H)
-#error "ws2tcpip.h is not compatable with winsock.h. Include winsock2.h instead."
+#error "ws2tcpip.h is not compatible with winsock.h. Include winsock2.h instead."
 #endif
 
 #include <winsock2.h>
@@ -316,7 +316,7 @@ WCHAR* WSAAPI gai_strerrorW(int);
 #endif  /* UNICODE */
 #endif /* 0 */
 
-/* Some older IPv4/IPv6 compatability stuff */
+/* Some older IPv4/IPv6 compatibility stuff */
 
 /* This struct lacks sin6_scope_id; retained for use in sockaddr_gen */
 struct sockaddr_in6_old {

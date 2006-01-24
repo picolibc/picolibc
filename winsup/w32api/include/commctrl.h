@@ -2066,7 +2066,7 @@ typedef struct _HDITEMW {
 	LPVOID pvFilter;
 #endif
 } HDITEMW, * LPHDITEMW;
-/* for backward compatability */
+/* for backward compatibility */
 #define HD_ITEMA HDITEMA
 #define HD_ITEMW HDITEMW
 #define HD_ITEM HDITEM
@@ -2074,7 +2074,7 @@ typedef struct _HD_LAYOUT {
 	RECT *prc;
 	WINDOWPOS *pwpos;
 } HDLAYOUT, *LPHDLAYOUT;
-#define HD_LAYOUT HDLAYOUT /*  backward compatability */
+#define HD_LAYOUT HDLAYOUT /*  backward compatibility */
 typedef struct _HD_HITTESTINFO {
 	POINT pt;
 	UINT flags;
@@ -2336,7 +2336,7 @@ typedef struct _NM_UPDOWN {
 	int iPos;
 	int iDelta;
 } NMUPDOWN,*LPNMUPDOWN;
-/* for backward compatability */
+/* for backward compatibility */
 #define NM_UPDOWN NMUPDOWN 
 #define LPNM_UPDOWN LPNMUPDOWN 
 typedef struct _LVITEMA {
@@ -2460,7 +2460,7 @@ typedef struct tagNMLISTVIEW {
 	POINT ptAction;
 	LPARAM lParam;
 } NMLISTVIEW, *LPNMLISTVIEW;
-/* for backward compatability */
+/* for backward compatibility */
 #define _NM_LISTVIEW  tagNMLISTVIEW
 #define NM_LISTVIEW NMLISTVIEW
 #define LPNM_LISTVIEW LPNMLISTVIEW
