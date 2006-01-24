@@ -1,3 +1,7 @@
+2006-01-24  Christopher Faylor  <cgf@timesys.com>
+
+	* dir.cc (readdir_worker): Turn off expensive inode calculation.
+
 2006-01-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_process.cc (fhandler_process::fill_filebuf): Disable

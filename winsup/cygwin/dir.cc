@@ -123,6 +123,7 @@ readdir_worker (DIR *dir, dirent *de)
 	de->__dirent_internal = 0;
       else
 	{
+#if 0
 	  size_t len = strlen (dir->__d_dirname) + strlen (de->d_name);
 	  char *path = (char *) alloca (len);
 	  char *p = strchr (strcpy (path, dir->__d_dirname), '\0');
@@ -132,9 +133,12 @@ readdir_worker (DIR *dir, dirent *de)
 	    de->__dirent_internal = st.st_ino;
 	  else
 	    {
+#endif
 	      de->__dirent_internal = hash_path_name (0, dir->__d_dirname);
 	      de->__dirent_internal = hash_path_name (de->__dirent_internal, de->d_name);
+#if 0
 	    }
+#endif
 	}
       de->__dirent_internal1 = de->__dirent_internal;
     }
