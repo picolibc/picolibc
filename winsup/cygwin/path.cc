@@ -3723,13 +3723,26 @@ realpath (const char *path, char *resolved)
 
   if (!real_path.error && real_path.exists ())
     {
+      /* Check for the suffix being tacked on. */
+      int tack_on = 0;
+      if (real_path.known_suffix)
+        {
+	  char *c = strrchr (real_path.normalized_path, '.');
+	  if (!c || !strcasematch (c, real_path.known_suffix))
+	    tack_on = strlen (real_path.known_suffix);
+	}
+
       if (!resolved)
 	{
-	  resolved = (char *) malloc (strlen (real_path.normalized_path) + 1);
+	  resolved = (char *) malloc (strlen (real_path.normalized_path)
+				      + tack_on + 1);
 	  if (!resolved)
 	    return NULL;
 	}
-      return strcpy (resolved, real_path.normalized_path);
+      strcpy (resolved, real_path.normalized_path);
+      if (tack_on)
+	strcat (resolved, real_path.known_suffix);
+      return resolved;
     }
 
   /* FIXME: on error, we are supposed to put the name of the path

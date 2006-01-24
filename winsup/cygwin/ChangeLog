@@ -1,5 +1,12 @@
 2006-01-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_process.cc (fhandler_process::fill_filebuf): Disable
+	stripping the .exe suffix from the link target in PROCESS_EXE and
+	PROCESS_EXENAME case.
+	* path.cc (realpath): Tack on .exe suffix if necessary.
+
+2006-01-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Try harder
 	to determine remote file systems with reliable inode numbers.  Add
 	longish comment.

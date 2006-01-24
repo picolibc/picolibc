@@ -450,6 +450,11 @@ fhandler_process::fill_filebuf ()
 	else
 	  {
 	    mount_table->conv_to_posix_path (p->progname, filebuf, 1);
+#if 0
+	    /* Temporarily disabled.  The link will have a suffix so that
+	       an open(2) call will succeed on /proc/$PID/exe now.  This
+	       might become unnecessary if open(2) handles the .exe suffix
+	       at one point. */
 	    int len = strlen (filebuf);
 	    if (len > 4)
 	      {
@@ -457,6 +462,7 @@ fhandler_process::fill_filebuf ()
 		if (strcasematch (s, ".exe"))
 		  *s = 0;
 	      }
+#endif
 	  }
 	filesize = strlen (filebuf);
 	break;
