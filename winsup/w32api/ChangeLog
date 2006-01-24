@@ -1,3 +1,18 @@
+2006-01-24  Danny Smith  <dannysmith@users.sourceforge.net>
+
+        * include/ddk/winddk.h (KeGetCurrentKPCR): Support -masm=intel.
+
+2006-01-24  Jiri Malak  <Jiri.Malak@iol.cz>
+
+	WATCOM compatibility changes. 
+	* include/ddk/ntddk.h (DECL_IMPORT): Define using __declspec,
+	rather than __attribute__.
+	(DECL_EXPORT): Likewise.
+	* include/ddk/winddk.h (DDKAPI): Avoid using __attribute__.
+	(DDKFASTAPI): Likewise.
+	(DDKCDECLAPI): Likwise.
+	(KeGetCurrentKPCR): Provide __WATCOMC__ syntax for inline code.
+
 2006-01-23  Brandon Sneed  <brandon@redf.net>
 
 	* setupapi.def: Add all CM_* functions defined in ddk/cfgmgr32.h

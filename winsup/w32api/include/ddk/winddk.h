@@ -34,9 +34,9 @@ extern "C" {
 /*
 ** Definitions specific to this Device Driver Kit
 */
-#define DDKAPI __attribute__((stdcall))
-#define DDKFASTAPI __attribute__((fastcall))
-#define DDKCDECLAPI __attribute__((cdecl))
+#define DDKAPI __stdcall
+#define DDKFASTAPI __fastcall
+#define DDKCDECLAPI __cdecl
 
 #if defined(_NTOSKRNL_)
 #ifndef NTOSAPI
@@ -114,17 +114,33 @@ typedef ULONG LOGICAL;
 #define TAG(_a, _b, _c, _d) (ULONG) \
 	(((_a) << 0) + ((_b) << 8) + ((_c) << 16) + ((_d) << 24))
 
+#ifdef __GNUC__
 static __inline struct _KPCR * KeGetCurrentKPCR(
   VOID)
 {
   ULONG Value;
 
-  __asm__ __volatile__ ("movl %%fs:0x18, %0\n\t"
-	  : "=r" (Value)
-    : /* no inputs */
+  __asm__ __volatile__ (
+#if (__GNUC__ >= 3)
+    /* support -masm=intel */
+    "mov{l} {%%fs:0x18, %0|%0, %%fs:0x18}\n\t"
+#else
+    "movl %%fs:0x18, %0\n\t"
+#endif
+     : "=r" (Value)
+     : /* no inputs */
   );
   return (struct _KPCR *) Value;
 }
+
+#elif defined( __WATCOMC__ )
+
+extern struct _KPCR * KeGetCurrentKPCR( void );
+#pragma aux KeGetCurrentKPCR = \
+  "mov eax, fs:[0x18]" \
+  value [ eax ];
+
+#endif
 
 /*
 ** Simple structures
