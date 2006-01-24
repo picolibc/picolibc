@@ -36,13 +36,6 @@
 
 /* Define if the compiler supports aliasing an array to an address.  */
 #undef  _HAVE_ARRAY_ALIASING
-
-/* Name of package */
-#undef PACKAGE
-
-/* Version number of package */
-#undef VERSION
-
 /*
  * Iconv encodings enabled ("to" direction)
  */

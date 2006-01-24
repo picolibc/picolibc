@@ -1,3 +1,11 @@
+2006-01-24  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* acinclude.m4: Add nodefine to AM_INIT_AUTOMAKE macro invocation
+	so as not to define PACKAGE and VERSION in newlib.h.
+	* aclocal.m4: Regenerated.
+	* configure: Ditto.
+	* newlib.hin: Ditto.
+
 2006-01-20  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* acconfig.h: New file to generate newlib.hin from.
