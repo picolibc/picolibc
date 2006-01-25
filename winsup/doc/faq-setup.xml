@@ -419,12 +419,12 @@ the following commands:
 <screen>
 	/bin/tar -C/ -jxvf /posix/path/to/cygwin-inst-YYYYMMDD.tar.bz2 --exclude=usr/bin/cygwin1.dll
 	/bin/tar -C/tmp -jxvf /posix/path/to/cygwin-inst-YYYYMMDD.tar.bz2 usr/bin/cygwin1.dll
-	/bin/mv /bin/cygwin1.dll /bin/cygwin1-prev.dll
 </screen>
 </para>
-<para>Note that after the "<literal>mv</literal>" command you will not be able to run any
-Cygwin programs.  Exit the bash shell, and use Explorer or the
-Windows command shell to move <literal>C:\cygwin\tmp\usr\bin\cygwin1.dll</literal>
+<para>Exit the bash shell, and use Explorer or the Windows command shell to
+first rename <literal>C:\cygwin\bin\cygwin1.dll</literal> to
+<literal>C:\cygwin\bin\cygwin1-prev.dll</literal> and then move
+<literal>C:\cygwin\tmp\usr\bin\cygwin1.dll</literal>
 to <literal>C:\cygwin\bin\cygwin1.dll</literal> (assuming you installed Cygwin in
 <literal>C:\cygwin</literal>).
 </para>

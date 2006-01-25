@@ -1,3 +1,7 @@
+2006-01-25  Igor Peshansky  <pechtcha@cs.nyu.edu>
+
+	* faq-setup.xml (faq.setup.snapshots): Rename DLL using Windows tools.
+
 2006-01-18  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* Makefile.in : Remove references to old texinfo FAQ.
