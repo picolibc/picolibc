@@ -11,6 +11,7 @@
 #define STATUS_INFO_LENGTH_MISMATCH ((NTSTATUS) 0xc0000004)
 #define STATUS_BUFFER_TOO_SMALL     ((NTSTATUS) 0xc0000023)
 #define STATUS_WORKING_SET_QUOTA    ((NTSTATUS) 0xc00000a1L)
+#define STATUS_NO_MORE_FILES	    ((NTSTATUS)0x80000006L)
 #define PDI_MODULES 0x01
 #define PDI_HEAPS 0x04
 #define LDRP_IMAGE_DLL 0x00000004
@@ -23,6 +24,89 @@
 #define WSLE_PAGE_EXECUTE_WRITECOPY 0x007
 #define WSLE_PAGE_SHARE_COUNT_MASK 0x0E0
 #define WSLE_PAGE_SHAREABLE 0x100
+
+typedef enum _FILE_INFORMATION_CLASS
+{
+  FileDirectoryInformation = 1,
+  FileFullDirectoryInformation, // 2
+  FileBothDirectoryInformation, // 3
+  FileBasicInformation, // 4 wdm
+  FileStandardInformation, // 5 wdm
+  FileInternalInformation, // 6
+  FileEaInformation, // 7
+  FileAccessInformation, // 8
+  FileNameInformation, // 9
+  FileRenameInformation, // 10
+  FileLinkInformation, // 11
+  FileNamesInformation, // 12
+  FileDispositionInformation, // 13
+  FilePositionInformation, // 14 wdm
+  FileFullEaInformation, // 15
+  FileModeInformation, // 16
+  FileAlignmentInformation, // 17
+  FileAllInformation, // 18
+  FileAllocationInformation, // 19
+  FileEndOfFileInformation, // 20 wdm
+  FileAlternateNameInformation, // 21
+  FileStreamInformation, // 22
+  FilePipeInformation, // 23
+  FilePipeLocalInformation, // 24
+  FilePipeRemoteInformation, // 25
+  FileMailslotQueryInformation, // 26
+  FileMailslotSetInformation, // 27
+  FileCompressionInformation, // 28
+  FileObjectIdInformation, // 29
+  FileCompletionInformation, // 30
+  FileMoveClusterInformation, // 31
+  FileQuotaInformation, // 32
+  FileReparsePointInformation, // 33
+  FileNetworkOpenInformation, // 34
+  FileAttributeTagInformation, // 35
+  FileTrackingInformation, // 36
+  FileIdBothDirectoryInformation, // 37
+  FileIdFullDirectoryInformation, // 38
+  FileValidDataLengthInformation, // 39
+  FileShortNameInformation, // 40
+  FileMaximumInformation
+} FILE_INFORMATION_CLASS, *PFILE_INFORMATION_CLASS;
+
+typedef struct _FILE_BOTH_DIR_INFORMATION
+{
+  ULONG  NextEntryOffset;
+  ULONG  FileIndex;
+  LARGE_INTEGER  CreationTime;
+  LARGE_INTEGER  LastAccessTime;
+  LARGE_INTEGER  LastWriteTime;
+  LARGE_INTEGER  ChangeTime;
+  LARGE_INTEGER  EndOfFile;
+  LARGE_INTEGER  AllocationSize;
+  ULONG  FileAttributes;
+  ULONG  FileNameLength;
+  ULONG  EaSize;
+  CCHAR  ShortNameLength;
+  WCHAR  ShortName[12];
+  WCHAR  FileName[1];
+} FILE_BOTH_DIR_INFORMATION, *PFILE_BOTH_DIR_INFORMATION;
+
+typedef struct _FILE_ID_BOTH_DIR_INFORMATION
+{
+  ULONG  NextEntryOffset;
+  ULONG  FileIndex;
+  LARGE_INTEGER  CreationTime;
+  LARGE_INTEGER  LastAccessTime;
+  LARGE_INTEGER  LastWriteTime;
+  LARGE_INTEGER  ChangeTime;
+  LARGE_INTEGER  EndOfFile;
+  LARGE_INTEGER  AllocationSize;
+  ULONG  FileAttributes;
+  ULONG  FileNameLength;
+  ULONG  EaSize;
+  CCHAR  ShortNameLength;
+  WCHAR  ShortName[12];
+  LARGE_INTEGER  FileId;
+  WCHAR  FileName[1];
+} FILE_ID_BOTH_DIR_INFORMATION, *PFILE_ID_BOTH_DIR_INFORMATION;
+
 
 #define AT_EXTENDABLE_FILE 0x00002000
 #define AT_ROUND_TO_PAGE 0x40000000
@@ -439,13 +523,6 @@ typedef struct _FILE_COMPRESSION_INFORMATION
   UCHAR ClusterSizeShift;
 } FILE_COMPRESSION_INFORMATION, *PFILE_COMPRESSION_INFORMATION;
 
-typedef enum _FILE_INFORMATION_CLASS
-{
-  FileAllInformation = 18,
-  FilePipeLocalInformation = 24,
-  FileCompressionInformation = 28
-} FILE_INFORMATION_CLASS, *PFILE_INFORMATION_CLASS;
-
 typedef struct _FILE_FS_VOLUME_INFORMATION
 {
   LARGE_INTEGER VolumeCreationTime;
@@ -516,4 +593,8 @@ extern "C"
   VOID NTAPI RtlInitUnicodeString (PUNICODE_STRING, PCWSTR);
   ULONG NTAPI RtlNtStatusToDosError (NTSTATUS);
   ULONG WINAPI RtlIsDosDeviceName_U (PCWSTR);
+  NTSTATUS NTAPI NtQueryDirectoryFile(HANDLE, HANDLE, PVOID, PVOID, PIO_STATUS_BLOCK,
+				      PVOID, ULONG, FILE_INFORMATION_CLASS, BOOLEAN,
+				      PUNICODE_STRING, BOOLEAN);
+  NTSTATUS NTAPI NtClose (HANDLE);
 }

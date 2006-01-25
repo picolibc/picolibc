@@ -1,3 +1,7 @@
+2006-01-25  Christopher Faylor  <cgf@timesys.com>
+
+	* ntdll.h: (temporarily?) Add more functions for querying directory.
+
 2006-01-24  Christopher Faylor  <cgf@timesys.com>
 
 	* dir.cc (readdir_worker): Turn off expensive inode calculation.
