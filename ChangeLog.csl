@@ -1,3 +1,8 @@
+2006-01-24  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* gdb/gdbserver/linux-arm-low.c: Move #include below ELF_GREGSET_T
+	definition.
+
 2005-10-20  Julian Brown  <julian@codesourcery.com>
 
 	* gdb/arm-tdep.c (thumb2_modify_constant): Silence compiler warning.
