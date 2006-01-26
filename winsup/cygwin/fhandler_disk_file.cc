@@ -1501,7 +1501,7 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
     fnunmunge (de->d_name, buf.cFileName);
   else
     strcpy (de->d_name, buf.cFileName);
-  if (dir->__flags && dirent_isroot)
+  if (dir->__flags & dirent_isroot)
     {
       if (strcasematch (de->d_name, "dev"))
 	dir->__flags |= dirent_saw_dev;

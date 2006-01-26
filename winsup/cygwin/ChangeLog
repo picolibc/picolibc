@@ -1,3 +1,8 @@
+2006-01-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir): Fix test for
+	dirent_isroot to use the correct boolean operator.
+
 2006-01-25  Christopher Faylor  <cgf@timesys.com>
 
 	* ntdll.h: (temporarily?) Add more functions for querying directory.
