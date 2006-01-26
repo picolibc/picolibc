@@ -1,5 +1,9 @@
 2006-01-26  Daniel Jacobowitz  <dan@codesourcery.com>
 
+	* gdb/regformats/regdat.sh: Include <stdlib.h>.
+
+2006-01-26  Daniel Jacobowitz  <dan@codesourcery.com>
+
 	Backport:
 	2006-01-24  Daniel Jacobowitz  <dan@codesourcery.com>
 
