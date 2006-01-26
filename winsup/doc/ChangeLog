@@ -1,3 +1,11 @@
+2006-01-25  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* faq-programming.xml (faq.programming.building-cygwin): Add
+	list of packages required for building and exact check instructions.
+	* faq-setup.xml (faq.setup.uninstall-service): New instructions
+	on uninstalling a cygwin service.
+	(faq.setup.uninstall-all): Reference new service uninstall FAQ.
+
 2006-01-25  Igor Peshansky  <pechtcha@cs.nyu.edu>
 
 	* faq-setup.xml (faq.setup.snapshots): Rename DLL using Windows tools.

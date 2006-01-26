@@ -320,6 +320,20 @@ the action reads ``Uninstall''.  Proceed by clicking ``Next''.
 </para>
 </answer></qandaentry>
 
+<qandaentry id="faq.setup.uninstall-service">
+<question><para>How do I uninstall a Cygwin service?</para></question>
+<answer>
+<para>If you don't know the name of the service, you can list all
+services you have installed with <literal>cygrunsrv -L</literal>. Before
+removing the service, you should stop it with 
+<literal>cygrunsrv --stop <replaceable>service_name</replaceable></literal>. 
+If you have <literal>inetd</literal> configured to run as a standalone
+service, it will not show up in the list, but <literal>cygrunsrv --stop inetd</literal>
+will work to stop it as well. Lastly, remove the service with
+<literal>cygrunsrv --remove <replaceable>service_name</replaceable></literal>.
+</para>
+</answer></qandaentry>
+
 <qandaentry id="faq.setup.uninstall-all">
 <question><para>How do I uninstall <emphasis role='bold'>all</emphasis> of Cygwin?</para></question>
 <answer>
@@ -328,11 +342,11 @@ the action reads ``Uninstall''.  Proceed by clicking ``Next''.
 of Cygwin is as follows:
 </para>
 <orderedlist>
-<listitem><para>Remove all Cygwin services.  If a service is currently running, it must 
-first be stopped with <literal>cygrunsrv -E name</literal>, where <literal>name</literal> 
-is the name of the service.  Then use <literal>cygrunsrv -R name</literal> to uninstall the 
-service from the registry.  Repeat this for all services that you installed.  
-Common services that might have been installed are <literal>sshd</literal>, <literal>cron</literal>, 
+<listitem><para>First remove all Cygwin services by repeating the instructions
+in <ulink
+url="http://cygwin.com/faq/faq.setup.html#faq.setup.uninstall-service" /> for
+all services that you installed.  Common services that might have been
+installed are <literal>sshd</literal>, <literal>cron</literal>, 
 <literal>cygserver</literal>, <literal>inetd</literal>, <literal>apache</literal>, and so on.
 </para>
 </listitem>
@@ -341,7 +355,7 @@ that might be running in the background.  Remove all mount information by typing
 <literal>umount -A</literal> and then exit the command prompt and ensure that no Cygwin 
 processes remain.  Note: If you want to save your mount points for a later 
 reinstall, first save the output of <literal>mount -m</literal> as described at 
-<ulink url="http://cygwin.com/cygwin-ug-net/using-utils.html#mount">http://cygwin.com/cygwin-ug-net/using-utils.html#mount</ulink>.
+<ulink url="http://cygwin.com/cygwin-ug-net/using-utils.html#mount" />.
 </para>
 </listitem>
 <listitem><para>Delete the Cygwin root folder and all subfolders.  If you get an error 
