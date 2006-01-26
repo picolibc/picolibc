@@ -3,6 +3,36 @@
 	Backport:
 	2006-01-24  Daniel Jacobowitz  <dan@codesourcery.com>
 
+	PR gdb/1914
+	* fork-child.c (fork_inferior): Don't call
+	solib_create_inferior_hook.
+	* infcmd.c (post_create_inferior): Call solib_add,
+	solib_create_inferior_hook, and re_enable_breakpoints_in_shlibs.
+	(attach_command): Don't call solib_add or
+	re_enable_breakpoints_in_shlibs.  Call post_create_inferior
+	instead.
+	* remote.c (remote_open_1): Don't call solib_create_inferior_hook
+	or observer_notify_inferior_created.  Call post_create_inferior
+	instead.
+	* corelow.c: Don't include "observer.h".
+	(solib_add_stub): Deleted.
+	(core_open): Don't call observer_notify_inferior_created or
+	solib_add_stub.  Call post_create_inferior instead.
+	* inf-ptrace.c: Don't include "observer.h".
+	(inf_ptrace_attach): Don't call observer_notify_inferior_created.
+	* inf-ttrace.c: Don't include "observer.h".
+	(inf_ttrace_attach): Don't call observer_notify_inferior_created.
+	* inferior.h (solib_create_inferior_hook): Remove redundant
+	prototype.
+	* inftarg.c: Don't include "observer.h".
+	(child_attach): Don't call observer_notify_inferior_created.
+	* Makefile.in: Update dependencies.
+
+2006-01-26  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	Backport:
+	2006-01-24  Daniel Jacobowitz  <dan@codesourcery.com>
+
 	* infcmd.c: Include "observer.h".
 	(post_create_inferior): New function.
 	(run_command_1): Call it.  Also call proceed.
