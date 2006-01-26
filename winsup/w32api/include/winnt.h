@@ -51,6 +51,14 @@ extern "C" {
 #endif
 #endif
 
+#ifndef DECLSPEC_SELECTANY
+#if (__GNUC__ >= 4)
+#define DECLSPEC_SELECTANY  __attribute__((selectany))
+#else
+#define DECLSPEC_SELECTANY
+#endif
+#endif
+
 #ifndef VOID
 #define VOID void
 #endif
