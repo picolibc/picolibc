@@ -43,6 +43,14 @@ extern "C" {
 #define UNALIGNED
 #endif
 
+#ifndef DECLSPEC_ALIGN
+#ifdef __GNUC__
+#define DECLSPEC_ALIGN(x) __attribute__((aligned(x)))
+#else
+#define DECLSPEC_ALIGN(x)
+#endif
+#endif
+
 #ifndef VOID
 #define VOID void
 #endif
