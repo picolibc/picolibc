@@ -1,3 +1,40 @@
+2006-01-26  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	Backport:
+	2006-01-24  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* infcmd.c: Include "observer.h".
+	(post_create_inferior): New function.
+	(run_command_1): Call it.  Also call proceed.
+	* inferior.h (post_create_inferior): New prototype.
+	* Makefile.in (infcmd.o): Update.
+
+	* gnu-nat.c (gnu_create_inferior): Don't call proceed.
+	* go32-nat.c (go32_create_inferior): Likewise.
+	* nto-procfs.c (procfs_create_inferior): Likewise.
+	* procfs.c (procfs_create_inferior): Likewise.
+	* remote-sim.c (gdbsim_create_inferior): Likewise.
+	* remote.c (extended_remote_create_inferior)
+	(extended_remote_async_create_inferior): Likewise.
+	* win32-nat.c (win32_create_inferior): Likewise.
+	* wince.c (child_create_inferior): Likewise.
+
+	* monitor.c (monitor_create_inferior): Don't call proceed.
+	Set the PC manually.
+	* ocd.c (ocd_create_inferior): Likewise.
+	* remote-e7000.c (e7000_create_inferior): Likewise.
+	* remote-m32r-sdi.c (m32r_create_inferior): Likewise.
+	* remote-mips.c (mips_create_inferior): Likewise.
+	* remote-rdi.c (arm_rdi_create_inferior): Likewise.
+	* remote-rdp.c (remote_rdp_create_inferior): Likewise.
+	* remote-sds.c (sds_create_inferior): Likewise.
+	* remote-st.c (st2000_create_inferior): Likewise.
+
+	* inf-ptrace.c (inf_ptrace_create_inferior): Don't call
+	proceed or observer_notify_inferior_created.
+	* inf-ttrace.c (inf_ttrace_create_inferior): Likewise.
+	* inftarg.c (child_create_inferior): Likewise.
+
 2006-01-13  Mark Mitchell  <mark@codesourcery.com>
 
 	Backport:
