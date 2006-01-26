@@ -581,7 +581,7 @@ fhandler_base::open (int flags, mode_t mode)
   syscall_printf ("(%s, %p)", get_win32_name (), flags);
 
   InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
-			      sa.lpSecurityDescriptor, NULL);
+			      NULL, sa.lpSecurityDescriptor);
 
   switch (query_open ())
     {
