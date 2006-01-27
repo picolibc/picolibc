@@ -1,5 +1,10 @@
 2006-01-26  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
+	* faq-programming.xml (faq.programming.building-cygwin): 
+	Simplify instructions, and remove tar usage basics.
+
+2006-01-26  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
 	* faq-programming.xml (faq.programming.ipc): Add new FAQ about
 	cygserver and its relation to the "Bad system call" error.
 	* faq-setup.xml (faq.setup.uninstall-all): Mention postgresql.

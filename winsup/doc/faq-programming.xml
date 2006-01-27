@@ -438,44 +438,36 @@ rewriting the runtime library in question from specs...
 
 <para>First, you need to make sure you have the necessary build tools
 installed; you at least need <literal>gcc</literal>, <literal>make</literal>, 
-and <literal>perl</literal>. If you want to run the tests
+and <literal>perl</literal>. If you want to run the tests, 
 <literal>cocom</literal> and <literal>dejagnu</literal> are also required,
 and you need to have <literal>CYGWIN=server</literal> set as described at 
 <ulink url="http://www.cygwin.com/cygwin-ug-net/using-cygserver.html" />.
-
-Next, get the Cygwin source.  Ideally, you should check out
-what you need from CVS (<ulink url="http://cygwin.com/cvs.html" />).  This is the
-<emphasis>preferred method</emphasis> for acquiring the sources.  Otherwise, you can
-install the cygwin source package from the distribution.
-</para>
-<para>If you are trying to duplicate a cygwin release then you should just
-download the corresponding source package and use "tar xjf" to unpack
-it.  This will unpack the sources into a directory named cygwin-x.y.z-n,
-where x.y.z-n correspond to the version numbering of the tar.bz2
-package.
-</para>
-<screen>
-tar xjf cygwin-1.5.12-1-src.tar.bz2
-cd cygwin-1.5.12-1
-</screen>
-
-<para>You <emphasis>must</emphasis> build cygwin in a separate directory from the source,
-so create something like a <literal>build/</literal> directory.  You will also want
-to install to a temporary location:
-</para>
-<screen>
-mkdir build
-mkdir /install 
-cd build
-(../configure --prefix=/install -v; make) &gt;&amp; make.out
-make install &gt; install.log 2&gt;&amp;1
-</screen>
-
-<para>Normally, this procedure ignores errors in building the documentation.
+Normally, building ignores any errors in building the documentation,
 which requires the <literal>docbook-xml42</literal>, <literal>docbook-xsl</literal>, and
 <literal>xmlto</literal> packages.  For more information on building the
 documentation, see the README included in the <literal>cygwin-doc</literal> package.
 </para>
+
+<para>Next, get the Cygwin source.  Ideally, you should check out
+what you need from CVS (<ulink url="http://cygwin.com/cvs.html" />).  This is the
+<emphasis>preferred method</emphasis> for acquiring the sources.  Otherwise, if
+you are trying to duplicate a cygwin release then you should 
+download the corresponding source package
+(<literal>cygwin-x.y.z-n-src.tar.bz2</literal>). </para> 
+
+<para>You <emphasis>must</emphasis> build cygwin in a separate directory from
+the source, so create something like a <literal>build/</literal> directory.
+Assuming you checked out the source in <literal>/oss/src/</literal>, and you
+also want to install to the temporary location <literal>install</literal>:
+</para>
+<screen>
+mkdir /oss/build
+mkdir /oss/install 
+cd build
+(/oss/src/configure --prefix=/oss/install -v; make) &gt;&amp; make.out
+make install &gt; install.log 2&gt;&amp;1
+</screen>
+
 <para>To check a cygwin1.dll, run "make check" in the winsup/testsuite
 directory.  If that works, install everything <emphasis>except</emphasis> the dll (if
 you can).  Then, close down all cygwin programs (including bash windows,
