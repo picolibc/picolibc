@@ -1,6 +1,6 @@
 /* fhandler_registry.cc: fhandler for /proc/registry virtual filesystem
 
-   Copyright 2002, 2003, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 2002, 2003, 2003, 2004, 2005, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -283,6 +283,7 @@ fhandler_registry::readdir (DIR *dir, dirent *de)
   LONG error;
   int res = ENMFILE;
 
+  dir->__flags |= dirent_saw_dot | dirent_saw_dot_dot;
   if (*path == 0)
     {
       if (dir->__d_position >= ROOT_KEY_COUNT)

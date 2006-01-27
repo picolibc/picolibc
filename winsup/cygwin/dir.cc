@@ -42,13 +42,12 @@ dirfd (DIR *dir)
   return dir->__d_fd;
 }
 
+/* Symbol kept for backward compatibility.  Don't remove.  Don't declare
+   in public header file. */
 extern "C" DIR *
 __opendir_with_d_ino (const char *name)
 {
-  DIR *res = opendir (name);
-  if (res)
-    res->__flags |= dirent_set_d_ino;
-  return res;
+  return opendir (name);
 }
 
 /* opendir: POSIX 5.1.2.1 */
@@ -69,9 +68,7 @@ opendir (const char *name)
       res = NULL;
     }
 
-  if (res)
-    res->__flags |= CYGWIN_VERSION_CHECK_FOR_NEEDS_D_INO ? dirent_set_d_ino : 0;
-  else if (fh)
+  if (!res && fh)
     delete fh;
   return res;
 }
@@ -89,6 +86,7 @@ readdir_worker (DIR *dir, dirent *de)
       return EBADF;
     }
 
+  de->d_ino = 0;
   int res = ((fhandler_base *) dir->__fh)->readdir (dir, de);
 
   if (res == ENMFILE)
@@ -109,39 +107,38 @@ readdir_worker (DIR *dir, dirent *de)
 	}
     }
 
-  if (!res)
+  if (!res && !de->d_ino)
     {
-      /* Compute d_ino by combining filename hash with the directory hash
-	 (which was stored in dir->__d_dirhash when opendir was called). */
-      if (de->d_name[0] != '.')
-	/* relax */;
-      else if (de->d_name[1] == '\0')
-	dir->__flags |= dirent_saw_dot;
-      else if (de->d_name[1] == '.' && de->d_name[2] == '\0')
-	dir->__flags |= dirent_saw_dot_dot;
-      if (!(dir->__flags & dirent_set_d_ino))
-	de->__dirent_internal = 0;
-      else
+      bool is_dot = false;
+      bool is_dot_dot = false;
+
+      if (de->d_name[0] == '.')
 	{
-#if 0
-	  size_t len = strlen (dir->__d_dirname) + strlen (de->d_name);
-	  char *path = (char *) alloca (len);
-	  char *p = strchr (strcpy (path, dir->__d_dirname), '\0');
-	  strcpy (p - 1, de->d_name);
-	  struct __stat64 st;
-	  if (lstat64 (path, &st) == 0)
-	    de->__dirent_internal = st.st_ino;
-	  else
-	    {
-#endif
-	      de->__dirent_internal = hash_path_name (0, dir->__d_dirname);
-	      de->__dirent_internal = hash_path_name (de->__dirent_internal, de->d_name);
-#if 0
-	    }
-#endif
+	  if (de->d_name[1] == '\0')
+	    is_dot = true;
+	  else if (de->d_name[1] == '.' && de->d_name[2] == '\0')
+	    is_dot_dot = true;
 	}
-      de->__dirent_internal1 = de->__dirent_internal;
+	
+      if (is_dot_dot && !(dir->__flags & dirent_isroot))
+	de->d_ino = readdir_get_ino (dir,
+				     ((fhandler_base *) dir->__fh)->get_name (),
+				     true);
+      else
+        {
+	  /* Compute d_ino by combining filename hash with directory hash. */
+	  de->d_ino = ((fhandler_base *) dir->__fh)->get_namehash ();
+	  if (!is_dot && !is_dot_dot)
+	    {
+	      const char *w32name = ((fhandler_base *) dir->__fh)->get_win32_name ();
+	      /* A drive's root dir has a trailing backslash already. */
+	      if (w32name[1] != ':' || w32name[2] != '\\' || w32name[3])
+		de->d_ino = hash_path_name (de->d_ino, "\\");
+	      de->d_ino = hash_path_name (de->d_ino, de->d_name);
+	    }
+	}
     }
+  de->__d_internal1 = de->d_ino;
 
   return res;
 }
@@ -201,7 +198,7 @@ seekdir64 (DIR *dir, _off64_t loc)
 
   if (dir->__d_cookie != __DIRENT_COOKIE)
     return;
-  dir->__flags &= (dirent_isroot | dirent_set_d_ino);
+  dir->__flags &= (dirent_isroot | dirent_get_d_ino | dirent_set_d_ino);
   return ((fhandler_base *) dir->__fh)->seekdir (dir, loc);
 }
 

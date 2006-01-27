@@ -1,6 +1,7 @@
 /* path.h: path data structures
 
-   Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005,
+   2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -135,7 +136,7 @@ class path_conv
   bool isremote () {return fs.is_remote_drive ();}
   int has_acls () const {return fs.has_acls (); }
   int has_symlinks () const {return path_flags & PATH_HAS_SYMLINKS;}
-  int hasgood_inode () const {return has_acls ();}  // Not strictly correct
+  bool hasgood_inode (); /* Implemented in fhandler_disk_file.cc */
   int has_buggy_open () const {return fs.has_buggy_open ();}
   bool isencoded () {return path_flags & PATH_ENC;}
   int binmode () const

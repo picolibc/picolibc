@@ -1,6 +1,6 @@
 /* ntdll.h.  Contains ntdll specific stuff not defined elsewhere.
 
-   Copyright 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -9,8 +9,10 @@
    details. */
 
 #define STATUS_INFO_LENGTH_MISMATCH ((NTSTATUS) 0xc0000004)
+#define STATUS_INVALID_PARAMETER    ((NTSTATUS) 0xc000000d)
 #define STATUS_BUFFER_TOO_SMALL     ((NTSTATUS) 0xc0000023)
 #define STATUS_WORKING_SET_QUOTA    ((NTSTATUS) 0xc00000a1L)
+#define STATUS_INVALID_LEVEL        ((NTSTATUS) 0xc0000148)
 #define STATUS_NO_MORE_FILES	    ((NTSTATUS)0x80000006L)
 #define PDI_MODULES 0x01
 #define PDI_HEAPS 0x04
@@ -460,7 +462,7 @@ typedef struct _FILE_STANDARD_INFORMATION {
 } FILE_STANDARD_INFORMATION, *PFILE_STANDARD_INFORMATION;
 
 typedef struct _FILE_INTERNAL_INFORMATION {
-  LARGE_INTEGER IndexNumber;
+  LARGE_INTEGER FileId;
 } FILE_INTERNAL_INFORMATION, *PFILE_INTERNAL_INFORMATION;
 
 typedef struct _FILE_EA_INFORMATION {

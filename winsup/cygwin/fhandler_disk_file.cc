@@ -1,7 +1,7 @@
 /* fhandler_disk_file.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005 Red Hat, Inc.
+   2005, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -96,6 +96,38 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
   return count + saw_dot;
 }
 
+bool
+path_conv::hasgood_inode ()
+{
+  /* Assume that if a drive has ACL support it MAY have valid "inodes".
+     It definitely does not have valid inodes if it does not have ACL
+     support.  Decouple from has_acls() which follows smbntsec setting. */
+  if (!(fs_flags () & FILE_PERSISTENT_ACLS) || drive_type () == DRIVE_UNKNOWN)
+    return false;
+  if (drive_type () == DRIVE_REMOTE)
+    {
+      /* From own experiments and replies from the Cygwin mailing list,
+	 we're now trying to figure out how to determine remote file
+	 systems which are capable of returning persistent inode
+	 numbers.  It seems that NT4 NTFS, when accessed remotly, and
+	 some other remote file systems return unreliable values in
+	 nFileIndex.  The common factor of these unreliable remote FS
+	 seem to be that FILE_SUPPORTS_OBJECT_IDS isn't set, even though
+	 this should have nothing to do with inode numbers.
+	 An exception is Samba, which seems to return valid inode numbers
+	 without having the FILE_SUPPORTS_OBJECT_IDS flag set.  So we're
+	 testing for the flag values returned by a 3.x Samba explicitely
+	 for now. */
+#define FS_IS_SAMBA (FILE_CASE_SENSITIVE_SEARCH \
+		     | FILE_CASE_PRESERVED_NAMES \
+		     | FILE_PERSISTENT_ACLS)
+      if (!(fs_flags () & FILE_SUPPORTS_OBJECT_IDS)
+      	  && fs_flags () != FS_IS_SAMBA)
+	return false;
+    }
+  return true;
+}
+
 int __stdcall
 fhandler_base::fstat_by_handle (struct __stat64 *buf)
 {
@@ -139,8 +171,8 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 			   pfai->StandardInformation.EndOfFile.HighPart,
 			   pfai->StandardInformation.EndOfFile.LowPart,
 			   pfai->StandardInformation.AllocationSize.QuadPart,
-			   pfai->InternalInformation.IndexNumber.HighPart,
-			   pfai->InternalInformation.IndexNumber.LowPart,
+			   pfai->InternalInformation.FileId.HighPart,
+			   pfai->InternalInformation.FileId.LowPart,
 			   pfai->StandardInformation.NumberOfLinks,
 			   pfai->BasicInformation.FileAttributes);
 	}
@@ -315,53 +347,11 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
      let's try it with `1' as link count. */
   buf->st_nlink = pc.ndisk_links (nNumberOfLinks);
 
-  /* Assume that if a drive has ACL support it MAY have valid "inodes".
-     It definitely does not have valid inodes if it does not have ACL
-     support.  Decouple from has_acls() which follows smbntsec setting. */
-  switch ((pc.fs_flags () & FILE_PERSISTENT_ACLS)
-	  && (nFileIndexHigh || nFileIndexLow)
-	  ? pc.drive_type () : DRIVE_UNKNOWN)
-    {
-    case DRIVE_FIXED:
-    case DRIVE_REMOVABLE:
-    case DRIVE_CDROM:
-    case DRIVE_RAMDISK:
-      /* Although the documentation indicates otherwise, it seems like
-	 "inodes" on these devices are persistent, at least across reboots. */
-      buf->st_ino = (((__ino64_t) nFileIndexHigh) << 32)
-		    | (__ino64_t) nFileIndexLow;
-      break;
-
-    case DRIVE_REMOTE:
-      /* From own experiments and replies from the Cygwin mailing list,
-	 we're now trying to figure out how to determine remote file
-	 systems which are capable of returning persistent inode
-	 numbers.  It seems that NT4 NTFS, when accessed remotly, and
-	 some other remote file systems return unreliable values in
-	 nFileIndex.  The common factor of these unreliable remote FS
-	 seem to be that FILE_SUPPORTS_OBJECT_IDS isn't set, even though
-	 this should have nothing to do with inode numbers.
-	 An exception is Samba, which seems to return valid inode numbers
-	 without having the FILE_SUPPORTS_OBJECT_IDS flag set.  So we're
-	 testing for the flag values returned by a 3.x Samba explicitely
-	 for now. */
-#define FS_IS_SAMBA (FILE_CASE_SENSITIVE_SEARCH \
-		     | FILE_CASE_PRESERVED_NAMES \
-		     | FILE_PERSISTENT_ACLS)
-      if ((pc.fs_flags () & FILE_SUPPORTS_OBJECT_IDS)
-      	  || pc.fs_flags  () == FS_IS_SAMBA)
-	{
-	  buf->st_ino = (((__ino64_t) nFileIndexHigh) << 32)
-	  		| (__ino64_t) nFileIndexLow;
-	  break;
-	}
-      /*FALLTHRU*/
-    default:
-      /* Either the nFileIndex* fields are unreliable or unavailable.  Use the
-	 next best alternative. */
-      buf->st_ino = get_namehash ();
-      break;
-    }
+  if (pc.hasgood_inode ())
+    buf->st_ino = (((__ino64_t) nFileIndexHigh) << 32)
+		  | (__ino64_t) nFileIndexLow;
+  else
+    buf->st_ino = get_namehash ();
 
   buf->st_blksize = S_BLKSIZE;
 
@@ -1376,7 +1366,7 @@ fhandler_disk_file::opendir ()
       set_errno (ENOMEM);
       goto free_dirname;
     }
-  else if (fhaccess (R_OK) != 0)
+  else if (!pc.isspecial () && fhaccess (R_OK) != 0)
     goto free_dirent;
   else
     {
@@ -1391,18 +1381,36 @@ fhandler_disk_file::opendir ()
       fd->nohandle (true);
       dir->__d_fd = fd;
       dir->__fh = this;
-      /* FindFirstFile doesn't seem to like duplicate /'s. */
+      /* FindFirstFile doesn't seem to like duplicate /'s.
+	 The dirname is generated with trailing backslash here which
+	 simplifies later usage of dirname for checking symlinks.
+	 Appending a "*" is moved right before calling FindFirstFile.
+	 Since FindFirstFile is only called once, this should even be a
+	 teeny little bit faster. */
       len = strlen (dir->__d_dirname);
-      if (len == 0 || isdirsep (dir->__d_dirname[len - 1]))
-	strcat (dir->__d_dirname, "*");
-      else
-	strcat (dir->__d_dirname, "\\*");  /**/
+      if (len && !isdirsep (dir->__d_dirname[len - 1]))
+        strcpy (dir->__d_dirname + len, "\\");
       dir->__d_cookie = __DIRENT_COOKIE;
       dir->__handle = INVALID_HANDLE_VALUE;
       dir->__d_position = 0;
 
-      res = dir;
       dir->__flags = (pc.normalized_path[0] == '/' && pc.normalized_path[1] == '\0') ? dirent_isroot : 0;
+      if (!pc.isspecial () && wincap.is_winnt ())
+        {
+	  dir->__handle = CreateFile (get_win32_name (), GENERIC_READ,
+				      wincap.shared (), NULL, OPEN_EXISTING,
+				      FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	  if (dir->__handle == INVALID_HANDLE_VALUE)
+	    {
+	      __seterrno ();
+	      goto free_dirent;
+	    }
+	  if (wincap.has_fileid_dirinfo ())
+	    dir->__flags |= dirent_get_d_ino;
+	  if (pc.hasgood_inode ())
+	    dir->__flags |= dirent_set_d_ino;
+	}
+      res = dir;
     }
 
   syscall_printf ("%p = opendir (%s)", res, get_name ());
@@ -1418,20 +1426,261 @@ free_dir:
 }
 
 int
+fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
+				    DWORD attr, char *fname)
+{
+  if (w32_err)
+    {
+      bool added = false;
+      if (!(dir->__flags & dirent_isroot))
+	/* nothing */;
+      else if (0 && !(dir->__flags & dirent_saw_dev))
+	{
+	  strcpy (fname, "dev");
+	  added = true;
+	}
+      else if (!(dir->__flags & dirent_saw_proc))
+	{
+	  strcpy (fname, "proc");
+	  added = true;
+	}
+      else if (!(dir->__flags & dirent_saw_cygdrive)
+	       && mount_table->cygdrive_len > 1)
+	{
+	  strcpy (fname, mount_table->cygdrive + 1);
+	  fname[mount_table->cygdrive_len - 2] = '\0';
+	  added = true;
+	}
+
+      if (added)
+	{
+	  attr = 0;
+	  dir->__flags &= ~dirent_set_d_ino;
+        }
+      else
+	return geterrno_from_win_error (w32_err);
+    }
+
+  /* Check for Windows shortcut. If it's a Cygwin or U/WIN
+     symlink, drop the .lnk suffix. */
+  if (attr & FILE_ATTRIBUTE_READONLY)
+    {
+      char *c = fname;
+      int len = strlen (c);
+      if (strcasematch (c + len - 4, ".lnk"))
+	{
+	  char fbuf[CYG_MAX_PATH];
+	  strcpy (fbuf, dir->__d_dirname);
+	  strcat (fbuf, c);
+	  path_conv fpath (fbuf, PC_SYM_NOFOLLOW);
+	  if (fpath.issymlink () || fpath.is_fs_special ())
+	    c[len - 4] = '\0';
+	}
+    }
+
+  if (pc.isencoded ())
+    fnunmunge (de->d_name, fname);
+  else
+    strcpy (de->d_name, fname);
+  if (dir->__flags & dirent_isroot)
+    {
+      if (strcasematch (de->d_name, "dev"))
+	{
+	  dir->__flags |= dirent_saw_dev;
+	  de->d_ino = hash_path_name (0, "/dev");
+	}
+      else if (strcasematch (de->d_name, "proc"))
+        {
+	  dir->__flags |= dirent_saw_proc;
+	  de->d_ino = hash_path_name (0, "/proc");
+	}
+      if (strlen (de->d_name) == mount_table->cygdrive_len - 2
+	  && strncasematch (de->d_name, mount_table->cygdrive + 1,
+			    mount_table->cygdrive_len - 2))
+	{
+	  dir->__flags |= dirent_saw_cygdrive;
+	  de->d_ino = 0;
+	}
+    }
+  if (dir->__d_position == 0 && !strcmp (fname, "."))
+    dir->__flags |= dirent_saw_dot;
+  else if (dir->__d_position == 1 && !strcmp (fname, ".."))
+    dir->__flags |= dirent_saw_dot_dot;
+  return 0;
+}
+
+static inline __ino64_t
+readdir_get_ino_by_handle (HANDLE hdl)
+{
+  IO_STATUS_BLOCK io;
+  FILE_INTERNAL_INFORMATION pfai;
+
+  if (!NtQueryInformationFile (hdl, &io, &pfai, sizeof pfai,
+			       FileInternalInformation))
+    return pfai.FileId.QuadPart;
+  return 0;
+}
+
+__ino64_t __stdcall
+readdir_get_ino (DIR *dir, const char *path, bool dot_dot)
+{
+  char fname[CYG_MAX_PATH];
+  struct __stat64 st;
+  HANDLE hdl;
+  __ino64_t ino = 0;
+
+  if (!(dir->__flags & dirent_isroot))
+    {
+      strcpy (fname, path);
+      if (dot_dot)
+	strcat (fname, (*fname && fname[strlen (fname) - 1] == '/')
+		       ? ".." : "/..");
+      path_conv pc (fname);
+      if (pc.isspecial ())
+	{
+	  if (!lstat64 (fname, &st))
+	    ino = st.st_ino;
+	}
+      else if (!pc.hasgood_inode ())
+	ino = hash_path_name (0, pc);
+      else if ((hdl = CreateFile (pc, GENERIC_READ, wincap.shared (), NULL,
+				  OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS,
+				  NULL)) != INVALID_HANDLE_VALUE)
+	{
+	  ino = readdir_get_ino_by_handle (hdl);
+	  CloseHandle (hdl);
+	}
+    }
+  else
+    ino = readdir_get_ino_by_handle (dir->__handle);
+  return ino;
+}
+
+int
 fhandler_disk_file::readdir (DIR *dir, dirent *de)
 {
-  WIN32_FIND_DATA buf;
-  HANDLE handle;
-  int res;
+  int res = 0;
+  NTSTATUS status = STATUS_SUCCESS;
 
   if (!dir->__handle)
     {
       res = ENMFILE;
       goto out;
     }
+
+  if (!wincap.is_winnt ())
+    return readdir_9x (dir, de);
+
+#define DIR_BUF_SIZE (sizeof (FILE_ID_BOTH_DIR_INFORMATION) + 2 * CYG_MAX_PATH)
+  PFILE_ID_BOTH_DIR_INFORMATION buf = (PFILE_ID_BOTH_DIR_INFORMATION)
+				      alloca (DIR_BUF_SIZE);
+  IO_STATUS_BLOCK io;
+  wchar_t *FileName = buf->FileName;
+  char fname[CYG_MAX_PATH];
+
+  if ((dir->__flags & dirent_get_d_ino))
+    {
+      status = NtQueryDirectoryFile (dir->__handle, NULL, NULL, 0, &io,
+				     buf, DIR_BUF_SIZE,
+				     FileIdBothDirectoryInformation,
+				     TRUE, NULL, dir->__d_position == 0);
+      /* FileIdBothDirectoryInformation isn't supported for remote drives
+         on NT4 and 2K systems, and it's also not supported on 2K at all,
+	 when accessing network drives on any remote OS.  We just fall
+	 back to using a standard directory query in this case and note
+	 this case using the dirent_get_d_ino flag. */
+      if (!status)
+        {
+	  if ((dir->__flags & dirent_set_d_ino))
+	    de->d_ino = buf->FileId.QuadPart;
+        }
+      else if (status == STATUS_INVALID_LEVEL
+	       || status == STATUS_INVALID_PARAMETER)
+	dir->__flags &= ~dirent_get_d_ino;
+    }
+  if (!(dir->__flags & dirent_get_d_ino))
+    {
+      status = NtQueryDirectoryFile (dir->__handle, NULL, NULL, 0, &io, buf,
+				     DIR_BUF_SIZE, FileBothDirectoryInformation,
+				     TRUE, NULL, dir->__d_position == 0);
+      FileName = ((PFILE_BOTH_DIR_INFORMATION) buf)->FileName;
+    }
+  if (!status && de->d_ino == 0 && (dir->__flags & dirent_set_d_ino))
+    {
+      OBJECT_ATTRIBUTES attr;
+
+      if (dir->__d_position == 0 && buf->FileNameLength == 2
+          && FileName[0] == '.')
+	de->d_ino = readdir_get_ino_by_handle (dir->__handle);
+      else if (dir->__d_position == 1 && buf->FileNameLength == 4
+	       && FileName[0] == '.' && FileName[1] == '.')
+	de->d_ino = readdir_get_ino (dir, pc.normalized_path, true);
+      else
+	{
+	  HANDLE hdl;
+	  UNICODE_STRING upath = {buf->FileNameLength, CYG_MAX_PATH * 2,
+	  			  FileName};
+	  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
+				      dir->__handle , NULL);
+	  if (!NtOpenFile (&hdl, READ_CONTROL, &attr, &io,
+			   wincap.shared (), 0))
+	    {
+	      de->d_ino = readdir_get_ino_by_handle (hdl);
+	      CloseHandle (hdl);
+	    }
+	}
+    }
+
+  if (!status)
+    {
+      wcstombs (fname, FileName, buf->FileNameLength / 2);
+      fname[buf->FileNameLength / 2] = '\0';
+    }
+
+  if (!(res = readdir_helper (dir, de, RtlNtStatusToDosError (status),
+			      buf->FileAttributes, fname)))
+    dir->__d_position++;
+  else if (!(dir->__flags & dirent_saw_dot))
+    {
+      strcpy (de->d_name , ".");
+      de->d_ino = readdir_get_ino_by_handle (dir->__handle);
+      dir->__d_position++;
+      dir->__flags |= dirent_saw_dot;
+      res = 0;
+    }
+  else if (!(dir->__flags & dirent_saw_dot))
+    {
+      strcpy (de->d_name , "..");
+      de->d_ino = readdir_get_ino (dir, pc.normalized_path, true);
+      dir->__d_position++;
+      dir->__flags |= dirent_saw_dot_dot;
+      res = 0;
+    }
+  else
+    {
+      CloseHandle (dir->__handle);
+      dir->__handle = NULL;
+    }
+
+out:
+  syscall_printf ("%d = readdir (%p) (%s)", dir, &de, de->d_name);
+  return res;
+}
+
+int
+fhandler_disk_file::readdir_9x (DIR *dir, dirent *de)
+{
+  WIN32_FIND_DATA buf;
+  HANDLE handle;
+  int res = 0;
+  BOOL ret = TRUE;
+
   if (dir->__handle == INVALID_HANDLE_VALUE && dir->__d_position == 0)
     {
+      int len = strlen (dir->__d_dirname);
+      strcpy (dir->__d_dirname + len, "*");
       handle = FindFirstFileA (dir->__d_dirname, &buf);
+      dir->__d_dirname[len] = '\0';
       DWORD lasterr = GetLastError ();
       dir->__handle = handle;
       if (handle == INVALID_HANDLE_VALUE && (lasterr != ERROR_NO_MORE_FILES))
@@ -1445,76 +1694,18 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
       res = EBADF;
       goto out;
     }
-  else if (!FindNextFileA (dir->__handle, &buf))
-    {
-      bool added = false;
-      if (!(dir->__flags & dirent_isroot))
-	/* nothing */;
-      else if (0 && !(dir->__flags & dirent_saw_dev))
-	{
-	  strcpy (buf.cFileName, "dev");
-	  added = true;
-	}
-      else if (!(dir->__flags & dirent_saw_proc))
-	{
-	  strcpy (buf.cFileName, "proc");
-	  added = true;
-	}
-      else if (!(dir->__flags & dirent_saw_cygdrive)
-	       && mount_table->cygdrive_len > 1)
-	{
-	  strcpy (buf.cFileName, mount_table->cygdrive + 1);
-	  buf.cFileName[mount_table->cygdrive_len - 2] = '\0';
-	  added = true;
-	}
-
-      if (added)
-	buf.dwFileAttributes = 0;
-      else
-	{
-	  res = geterrno_from_win_error ();
-	  FindClose (dir->__handle);
-	  dir->__handle = NULL;
-	  goto out;
-	}
-    }
-
-  /* Check for Windows shortcut. If it's a Cygwin or U/WIN
-     symlink, drop the .lnk suffix. */
-  if (buf.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
-    {
-      char *c = buf.cFileName;
-      int len = strlen (c);
-      if (strcasematch (c + len - 4, ".lnk"))
-	{
-	  char fbuf[CYG_MAX_PATH];
-	  strcpy (fbuf, dir->__d_dirname);
-	  strcpy (fbuf + strlen (fbuf) - 1, c);
-	  path_conv fpath (fbuf, PC_SYM_NOFOLLOW);
-	  if (fpath.issymlink () || fpath.is_fs_special ())
-	    c[len - 4] = '\0';
-	}
-    }
-
-  /* We get here if `buf' contains valid data.  */
-  if (pc.isencoded ())
-    fnunmunge (de->d_name, buf.cFileName);
   else
-    strcpy (de->d_name, buf.cFileName);
-  if (dir->__flags & dirent_isroot)
+    ret = FindNextFileA (dir->__handle, &buf);
+  
+  if (!(res = readdir_helper (dir, de, ret ? 0 : GetLastError (),
+			      buf.dwFileAttributes, buf.cFileName)))
+    dir->__d_position++;
+  else
     {
-      if (strcasematch (de->d_name, "dev"))
-	dir->__flags |= dirent_saw_dev;
-      else if (strcasematch (de->d_name, "proc"))
-	dir->__flags |= dirent_saw_proc;
-      if (strlen (de->d_name) == mount_table->cygdrive_len - 2
-	  && strncasematch (de->d_name, mount_table->cygdrive + 1,
-			    mount_table->cygdrive_len - 2))
-	dir->__flags |= dirent_saw_cygdrive;
+      FindClose (dir->__handle);
+      dir->__handle = NULL;
     }
 
-  dir->__d_position++;
-  res = 0;
 out:
   syscall_printf ("%d = readdir (%p) (%s)", dir, &de, de->d_name);
   return res;
@@ -1538,7 +1729,7 @@ fhandler_disk_file::seekdir (DIR *dir, _off64_t loc)
 void
 fhandler_disk_file::rewinddir (DIR *dir)
 {
-  if (dir->__handle != INVALID_HANDLE_VALUE)
+  if (!wincap.is_winnt () && dir->__handle != INVALID_HANDLE_VALUE)
     {
       if (dir->__handle)
 	FindClose (dir->__handle);
@@ -1552,7 +1743,8 @@ fhandler_disk_file::closedir (DIR *dir)
 {
   int res = 0;
   if (dir->__handle && dir->__handle != INVALID_HANDLE_VALUE
-      && FindClose (dir->__handle) == 0)
+      && ((wincap.is_winnt () && !CloseHandle (dir->__handle))
+          || (!wincap.is_winnt () && !FindClose (dir->__handle))))
     {
       __seterrno ();
       res = -1;
@@ -1580,6 +1772,9 @@ int
 fhandler_cygdrive::fstat (struct __stat64 *buf)
 {
   buf->st_mode = S_IFDIR | 0555;
+  /* Call get_namehash before calling set_drives, otherwise the namehash
+     is broken due to overwriting the win32 path in set_drives. */
+  buf->st_ino = get_namehash ();
   if (!ndrives)
     set_drives ();
   buf->st_nlink = ndrives + 2;
@@ -1592,6 +1787,9 @@ fhandler_cygdrive::opendir ()
   DIR *dir;
 
   dir = fhandler_disk_file::opendir ();
+  /* Call get_namehash before calling set_drives, otherwise the namehash
+     is broken due to overwriting the win32 path in set_drives. */
+  get_namehash ();
   if (dir && !ndrives)
     set_drives ();
 
@@ -1601,16 +1799,17 @@ fhandler_cygdrive::opendir ()
 int
 fhandler_cygdrive::readdir (DIR *dir, dirent *de)
 {
-  if (!pdrive || !*pdrive)
-    return ENMFILE;
-  if (GetFileAttributes (pdrive) == INVALID_FILE_ATTRIBUTES)
+  while (true)
     {
+      if (!pdrive || !*pdrive)
+	return ENMFILE;
+      if (GetFileAttributes (pdrive) != INVALID_FILE_ATTRIBUTES)
+        break;
       pdrive = strchr (pdrive, '\0') + 1;
-      return readdir (dir, de);
     }
-
   *de->d_name = cyg_tolower (*pdrive);
   de->d_name[1] = '\0';
+  de->d_ino = readdir_get_ino (dir, pdrive, false);
   dir->__d_position++;
   pdrive = strchr (pdrive, '\0') + 1;
   syscall_printf ("%p = readdir (%p) (%s)", &de, dir, de->d_name);

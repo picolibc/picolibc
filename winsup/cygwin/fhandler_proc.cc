@@ -202,6 +202,7 @@ fhandler_proc::readdir (DIR *dir, dirent *de)
   if (dir->__d_position < PROC_LINK_COUNT)
     {
       strcpy (de->d_name, proc_listing[dir->__d_position++]);
+      dir->__flags |= dirent_saw_dot | dirent_saw_dot_dot;
       res = 0;
     }
   else

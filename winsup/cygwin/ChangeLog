@@ -1,3 +1,57 @@
+2006-01-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (NtQueryDirectoryFile): Define.
+	* dir.cc (__opendir_with_d_ino): Just call opendir.
+	(opendir): Remove CYGWIN_VERSION_CHECK_FOR_NEEDS_D_INO handling.
+	(readdir_worker): Only try generating d_ino if it's 0.
+	Utilize namehash of directories fhandler.  Call readdir_get_ino to
+	generate d_ino for "..".
+	(seekdir64): Keep dirent_set_d_ino flag.
+	* fhandler.h (enum dirent_states): Add dirent_get_d_ino.
+	(class fhandler_disk_file): Declare new private methods readdir_helper
+	and readdir_9x.
+	* fhandler_disk_file.cc (path_conv::hasgood_inode): New method to
+	evaluate if a filesystem has reliable inode numbers.
+	(fhandler_base::fstat_by_handle): Accomodate structure member name
+	change from IndexNumber to FileId.
+	(fhandler_base::fstat_helper): Call hasgood_inode here.
+	(fhandler_disk_file::opendir): Call fhaccess only for real files.
+	Don't append '*' to __d_dirname here, move to readdir_9x.  On NT,
+	open directory handle here.  Set dirent_get_d_ino and dirent_set_d_ino
+	flags according to wincap and filesystem.
+	(fhandler_disk_file::readdir_helper): New method to implement readdir
+	postprocessing only once.
+	(readdir_get_ino_by_handle): New static function.
+	(readdir_get_ino): New function to centralize inode number evaluation
+	in case inode number hasn't been returned by NtQueryDirectoryFile.
+	(fhandler_disk_file::readdir): Move old functionality to readdir_9x.
+	Call readdir_9x when on 9x/Me.  Implement NT specific readdir here.
+	(fhandler_disk_file::readdir_9x): Move 9x specific readdir here.
+	(fhandler_disk_file::seekdir): Accomodate new NT readdir method.
+	(fhandler_disk_file::closedir): Ditto.
+	(fhandler_cygdrive::fstat): Set d_ino to namehash. Add comment.
+	(fhandler_cygdrive::opendir): Call get_namehash to prepare later
+	correct evaluation of d_ino.
+	(fhandler_cygdrive::readdir): Replace recursion with loop. Evaluate
+	drive's d_ino by calling readdir_get_ino.
+	* fhandler_proc.cc (fhandler_proc::readdir): Set dirent_saw_dot and
+	dirent_saw_dot_dot to avoid seeing . and .. entries twice.
+	* fhandler_process.cc (fhandler_process::readdir): Ditto.
+	* fhandler_registry.cc (fhandler_registry::readdir): Ditto.
+	* ntdll.h (STATUS_INVALID_PARAMETER): New define.
+	(STATUS_INVALID_LEVEL): New define.
+	(struct _FILE_INTERNAL_INFORMATION): Rename member IndexNumber to
+	FileId (as in Nebbitt).
+	* path.h (path_conv::hasgood_inode): Now implemented in
+	fhandler_disk_file.cc.
+	* wincap.h (wincaps::has_fileid_dirinfo): New element.
+	* wincap.cc: Implement above element throughout.
+	* winsup.h (readdir_get_ino): Add declaration.
+	* include/sys/dirent.h (struct dirent): Slightly rename structure
+	members to accomodate changes.
+	Remove __USE_EXPENSIVE_CYGWIN_D_INO handling and declaration of
+	__opendir_with_d_ino.
+
 2006-01-27  Christopher Faylor  <cgf@timesys.com>
 
 	* spawn.cc (spawn_guts): Fix potential handle leak when failing exec.

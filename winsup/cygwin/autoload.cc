@@ -1,6 +1,6 @@
 /* autoload.cc: all dynamic load stuff.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -385,6 +385,7 @@ LoadDLLfuncEx (NtLockVirtualMemory, 16, ntdll, 1)
 LoadDLLfuncEx (NtMapViewOfSection, 40, ntdll, 1)
 LoadDLLfuncEx (NtOpenFile, 24, ntdll, 1)
 LoadDLLfuncEx (NtOpenSection, 12, ntdll, 1)
+LoadDLLfuncEx2 (NtQueryDirectoryFile, 44, ntdll, 1, 1)
 LoadDLLfuncEx2 (NtQueryInformationFile, 20, ntdll, 1, 1)
 LoadDLLfuncEx (NtQueryInformationProcess, 20, ntdll, 1)
 LoadDLLfuncEx2 (NtQueryObject, 20, ntdll, 1, 1)

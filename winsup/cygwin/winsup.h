@@ -1,7 +1,7 @@
 /* winsup.h: main Cygwin header file.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005 Red Hat, Inc.
+   2005, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -292,6 +292,8 @@ int symlink_worker (const char *, const char *, bool, bool)
 class path_conv;
 
 int fcntl_worker (int fd, int cmd, void *arg);
+
+__ino64_t __stdcall readdir_get_ino (struct __DIR *dir, const char *path, bool dot_dot) __attribute__ ((regparm (3)));
 
 extern "C" int low_priority_sleep (DWORD) __attribute__ ((regparm (1)));
 #define SLEEP_0_STAY_LOW INFINITE

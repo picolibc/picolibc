@@ -1,6 +1,6 @@
 /* Posix dirent.h for WIN32.
 
-   Copyright 2001, 2002, 2003, 2005 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2005, 2006 Red Hat, Inc.
 
    This software is a copyrighted work licensed under the terms of the
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -20,9 +20,9 @@
 struct dirent
 {
   long __d_version;			/* Used internally */
-  __ino64_t __dirent_internal;
-  __uint32_t __dirent_unused1;
-  __uint32_t __dirent_internal1;
+  __ino64_t d_ino;
+  __uint32_t __d_fd;
+  __uint32_t __d_internal1;
   char d_name[256];			/* FIXME: use NAME_MAX? */
 };
 #else
@@ -31,7 +31,7 @@ struct dirent
   long d_version;
   long d_reserved[2];
   long d_fd;
-  ino_t __invalid_d_ino;		/* DO NOT USE: No longer available since cygwin 1.5.19 */
+  ino_t d_ino;
   char d_name[256];
 };
 #endif
@@ -55,14 +55,7 @@ typedef struct __DIR
 } DIR;
 #pragma pack(pop)
 
-#ifndef __USE_EXPENSIVE_CYGWIN_D_INO
 DIR *opendir (const char *);
-#else
-#define d_ino __dirent_internal
-DIR *__opendir_with_d_ino (const char *);
-#define opendir __opendir_with_d_ino
-#endif
-
 struct dirent *readdir (DIR *);
 int readdir_r (DIR *, struct dirent *, struct dirent **);
 void rewinddir (DIR *);

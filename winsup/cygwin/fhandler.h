@@ -48,7 +48,8 @@ enum dirent_states
   dirent_saw_cygdrive	= 0x0010,
   dirent_saw_dev	= 0x0020,
   dirent_saw_proc	= 0x0040,
-  dirent_set_d_ino	= 0x0080
+  dirent_set_d_ino	= 0x0080,
+  dirent_get_d_ino	= 0x0100
 };
 
 enum conn_state
@@ -650,6 +651,8 @@ class fhandler_dev_tape: public fhandler_dev_raw
 class fhandler_disk_file: public fhandler_base
 {
   void touch_ctime ();
+  int readdir_helper (DIR *, dirent *, DWORD, DWORD, char *) __attribute__ ((regparm (3)));
+  int readdir_9x (DIR *, dirent *) __attribute__ ((regparm (3)));
 
  public:
   fhandler_disk_file ();
