@@ -118,6 +118,20 @@ for more information on using mount.
 
 </answer></qandaentry>
 
+<qandaentry id="faq.programming.ipc">
+<question><para>How can I use IPC, or why do I get a <literal>Bad system call</literal>
+error?</para></question>
+<answer>
+
+<para>
+Try running cygserver.  Read 
+<ulink url="http://www.cygwin.com/cygwin-ug-net/using-cygserver.html" />. If you're
+trying to use PostgreSQL, also read 
+<literal>/usr/share/doc/Cygwin/postgresql-*.README</literal>.
+</para>
+
+</answer></qandaentry>
+
 <qandaentry id="faq.programming.winmain">
 <question><para>Why the undefined reference to <literal>WinMain@16</literal>?</para></question>
 <answer>

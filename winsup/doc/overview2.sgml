@@ -138,18 +138,24 @@ Control Lists (ACLs).  Cygwin maps Win32 file ownership and permissions to the
 more standard, older UNIX model by default.  Cygwin version 1.1 introduces
 support for ACLs according to the system calls used on newer versions of
 Solaris. This ability is used when the `ntsec' feature is switched on which
-is described in another chapter.
+is described in <xref linkend="ntsec"></xref>.
 The chmod call maps UNIX-style permissions
 back to the Win32 equivalents.  Because many programs expect to be able to find
-the /etc/passwd and /etc/group files, we provide utilities that can be used to
-construct them from the user and group information provided by the operating
-system.</para>
+the /etc/passwd and /etc/group files, we provide <ulink 
+url="http://cygwin.com/cygwin-ug-net/using-utils.html#mount">utilities</ulink>
+that can be used to construct them from the user and group information
+provided by the operating system.</para>
 
-<para>Under Windows NT, the administrator is permitted to chown files.  There
-is no mechanism to support the setuid concept or API call since Cygwin version
-1.1.2.  With version 1.1.3 Cygwin introduces a mechanism for setting real
-and effective UIDs under Windows NT/W2K. This is described in the ntsec
-section.</para>
+<para>Under Windows NT, users with Administrator rights are permitted to 
+chown files.  With version 1.1.3 Cygwin introduced a mechanism for setting real
+and effective UIDs under Windows NT/W2K. This is described in 
+<xref linkend="ntsec"></xref>.  As of version 1.5.13, the Cygwin developers
+are not aware of any feature in the Cygwin DLL that would allow users to gain
+privileges or to access objects to which they have no rights under Windows.
+However there is no guarantee that Cygwin is as secure as the Windows it runs
+on. Cygwin processes share some variables and are thus easier targets of
+denial of service type of attacks.
+</para>
 
 <para>Under Windows 9x, the situation is considerably different.  Since a
 security model is not provided, Cygwin fakes file ownership by making all
@@ -160,18 +166,6 @@ chown call succeeds immediately without actually performing any action
 whatsoever.  This is appropriate since essentially all users jointly own the
 files when no concept of file ownership exists.</para>
 
-<para>It is important that we discuss the implications of our "kernel" using
-shared memory areas to store information about Cygwin processes.  Because
-these areas are not yet protected in any way, in principle a malicious user
-could modify them to cause unexpected behavior in Cygwin processes.  While
-this is not a new problem under Windows 9x (because of the lack of operating
-system security), it does constitute a security hole under Windows NT.
-This is because one user could affect the Cygwin programs run by
-another user by changing the shared memory information in ways that
-they could not in a more typical WinNT program.  For this reason, it
-is not appropriate to use Cygwin in high-security applications.  In
-practice, this will not be a major problem for most uses of the
-library.</para>
 </sect2>
 
 <sect2 id="ov-hi-files"><title>File Access</title> <para>Cygwin supports

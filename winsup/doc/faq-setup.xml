@@ -347,7 +347,8 @@ in <ulink
 url="http://cygwin.com/faq/faq.setup.html#faq.setup.uninstall-service" /> for
 all services that you installed.  Common services that might have been
 installed are <literal>sshd</literal>, <literal>cron</literal>, 
-<literal>cygserver</literal>, <literal>inetd</literal>, <literal>apache</literal>, and so on.
+<literal>cygserver</literal>, <literal>inetd</literal>, <literal>apache</literal>, 
+<literal>postgresql</literal>, and so on.
 </para>
 </listitem>
 <listitem><para>Stop the X11 server if it is running, and terminate any Cygwin programs 
