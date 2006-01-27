@@ -731,7 +731,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	  myself->exec_sendsig = NULL;
 	}
       res = -1;
-      CloseHandle (moreinfo->myself_pinfo);
+      if (moreinfo->myself_pinfo)
+	CloseHandle (moreinfo->myself_pinfo);
       goto out;
     }
 

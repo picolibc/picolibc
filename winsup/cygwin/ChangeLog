@@ -1,5 +1,9 @@
 2006-01-27  Christopher Faylor  <cgf@timesys.com>
 
+	* spawn.cc (spawn_guts): Fix potential handle leak when failing exec.
+
+2006-01-27  Christopher Faylor  <cgf@timesys.com>
+
 	* exceptions.cc (inside_kernel): Fix to return true if we can't get the
 	name of the DLL for the given memory block since we are not in kernel
 	code.
