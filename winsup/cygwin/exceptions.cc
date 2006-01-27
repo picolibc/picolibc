@@ -308,7 +308,7 @@ inside_kernel (CONTEXT *cx)
   else if (h == user_data->hmodule)
     res = true;
   else if (!GetModuleFileName (h, checkdir, windows_system_directory_length + 2))
-    res = false;
+    res = true;
   else
     res = !strncasematch (windows_system_directory, checkdir,
 			  windows_system_directory_length);
