@@ -1257,6 +1257,8 @@ fhandler_disk_file::mkdir (mode_t mode)
 #endif
       res = 0;
     }
+  else if (pc.exists ())
+    set_errno (EEXIST);
   else
     __seterrno ();
 

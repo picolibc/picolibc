@@ -1,5 +1,10 @@
 2006-01-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::mkdir): In case or error,
+	check for existance explicitely and set errno to EEXIST.
+
+2006-01-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (DIR_NUM_ENTRIES): New define determining
 	minimum number of dir entries which fit into the readdir cache.
 	(DIR_BUF_SIZE): Define globally as size of readdir cache.
