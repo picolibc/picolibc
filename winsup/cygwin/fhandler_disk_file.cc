@@ -1341,6 +1341,28 @@ fhandler_disk_file::rmdir ()
   return res;
 }
 
+/* This is the minimal number of entries which fit into the readdir cache.
+   The number of bytes allocated by the cache is determined by this number,
+   To tune caching, just tweak this number.  To get a feeling for the size,
+   the size of the readdir cache is DIR_NUM_ENTRIES * 632 + 264 bytes.  */
+
+#define DIR_NUM_ENTRIES	25		/* Cache size 16064 bytes */
+
+#define DIR_BUF_SIZE	(DIR_NUM_ENTRIES \
+			 * (sizeof (FILE_ID_BOTH_DIR_INFORMATION) \
+			    + 2 * CYG_MAX_PATH))
+
+typedef struct __DIR_cache
+{
+  char  __name[CYG_MAX_PATH];
+  ULONG __pos;
+  char  __cache[DIR_BUF_SIZE];
+};
+
+#define d_dirname(d)	(((struct __DIR_cache *) (d)->__d_dirname)->__name)
+#define d_pos(d)	(((struct __DIR_cache *) (d)->__d_dirname)->__pos)
+#define d_cache(d)	(((struct __DIR_cache *) (d)->__d_dirname)->__cache)
+
 DIR *
 fhandler_disk_file::opendir ()
 {
@@ -1355,7 +1377,9 @@ fhandler_disk_file::opendir ()
     set_errno (ENAMETOOLONG);
   else if ((dir = (DIR *) malloc (sizeof (DIR))) == NULL)
     set_errno (ENOMEM);
-  else if ((dir->__d_dirname = (char *) malloc (len + 3)) == NULL)
+  else if ((dir->__d_dirname = (char *) malloc (wincap.is_winnt ()
+  						? sizeof (struct __DIR_cache)
+						: len + 3)) == NULL)
     {
       set_errno (ENOMEM);
       goto free_dir;
@@ -1370,7 +1394,8 @@ fhandler_disk_file::opendir ()
     goto free_dirent;
   else
     {
-      strcpy (dir->__d_dirname, get_win32_name ());
+      strcpy (d_dirname (dir), get_win32_name ());
+      d_pos (dir) = 0;
       dir->__d_dirent->__d_version = __DIRENT_VERSION;
       cygheap_fdnew fd;
 
@@ -1387,9 +1412,9 @@ fhandler_disk_file::opendir ()
 	 Appending a "*" is moved right before calling FindFirstFile.
 	 Since FindFirstFile is only called once, this should even be a
 	 teeny little bit faster. */
-      len = strlen (dir->__d_dirname);
-      if (len && !isdirsep (dir->__d_dirname[len - 1]))
-        strcpy (dir->__d_dirname + len, "\\");
+      len = strlen (d_dirname (dir));
+      if (len && !isdirsep (d_dirname (dir)[len - 1]))
+        strcpy (d_dirname (dir) + len, "\\");
       dir->__d_cookie = __DIRENT_COOKIE;
       dir->__handle = INVALID_HANDLE_VALUE;
       dir->__d_position = 0;
@@ -1470,7 +1495,7 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
       if (strcasematch (c + len - 4, ".lnk"))
 	{
 	  char fbuf[CYG_MAX_PATH];
-	  strcpy (fbuf, dir->__d_dirname);
+	  strcpy (fbuf, d_dirname (dir));
 	  strcat (fbuf, c);
 	  path_conv fpath (fbuf, PC_SYM_NOFOLLOW);
 	  if (fpath.issymlink () || fpath.is_fs_special ())
@@ -1561,6 +1586,10 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 {
   int res = 0;
   NTSTATUS status = STATUS_SUCCESS;
+  PFILE_ID_BOTH_DIR_INFORMATION buf = NULL;
+  wchar_t *FileName;
+  char fname[CYG_MAX_PATH];
+  IO_STATUS_BLOCK io;
 
   if (!dir->__handle)
     {
@@ -1571,74 +1600,79 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
   if (!wincap.is_winnt ())
     return readdir_9x (dir, de);
 
-#define DIR_BUF_SIZE (sizeof (FILE_ID_BOTH_DIR_INFORMATION) + 2 * CYG_MAX_PATH)
-  PFILE_ID_BOTH_DIR_INFORMATION buf = (PFILE_ID_BOTH_DIR_INFORMATION)
-				      alloca (DIR_BUF_SIZE);
-  IO_STATUS_BLOCK io;
-  wchar_t *FileName = buf->FileName;
-  char fname[CYG_MAX_PATH];
-
-  if ((dir->__flags & dirent_get_d_ino))
+  /* d_pos always refers to the next cache entry to use.  If it's 0, this means
+     we must reload the cache. */
+  if (d_pos (dir) == 0)
     {
-      status = NtQueryDirectoryFile (dir->__handle, NULL, NULL, 0, &io,
-				     buf, DIR_BUF_SIZE,
-				     FileIdBothDirectoryInformation,
-				     TRUE, NULL, dir->__d_position == 0);
-      /* FileIdBothDirectoryInformation isn't supported for remote drives
-         on NT4 and 2K systems, and it's also not supported on 2K at all,
-	 when accessing network drives on any remote OS.  We just fall
-	 back to using a standard directory query in this case and note
-	 this case using the dirent_get_d_ino flag. */
-      if (!status)
-        {
-	  if ((dir->__flags & dirent_set_d_ino))
-	    de->d_ino = buf->FileId.QuadPart;
-        }
-      else if (status == STATUS_INVALID_LEVEL
-	       || status == STATUS_INVALID_PARAMETER)
-	dir->__flags &= ~dirent_get_d_ino;
-    }
-  if (!(dir->__flags & dirent_get_d_ino))
-    {
-      status = NtQueryDirectoryFile (dir->__handle, NULL, NULL, 0, &io, buf,
-				     DIR_BUF_SIZE, FileBothDirectoryInformation,
-				     TRUE, NULL, dir->__d_position == 0);
-      FileName = ((PFILE_BOTH_DIR_INFORMATION) buf)->FileName;
-    }
-  if (!status && de->d_ino == 0 && (dir->__flags & dirent_set_d_ino))
-    {
-      OBJECT_ATTRIBUTES attr;
-
-      if (dir->__d_position == 0 && buf->FileNameLength == 2
-          && FileName[0] == '.')
-	de->d_ino = readdir_get_ino_by_handle (dir->__handle);
-      else if (dir->__d_position == 1 && buf->FileNameLength == 4
-	       && FileName[0] == '.' && FileName[1] == '.')
-	de->d_ino = readdir_get_ino (dir, pc.normalized_path, true);
-      else
+      if ((dir->__flags & dirent_get_d_ino))
 	{
-	  HANDLE hdl;
-	  UNICODE_STRING upath = {buf->FileNameLength, CYG_MAX_PATH * 2,
-	  			  FileName};
-	  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
-				      dir->__handle , NULL);
-	  if (!NtOpenFile (&hdl, READ_CONTROL, &attr, &io,
-			   wincap.shared (), 0))
-	    {
-	      de->d_ino = readdir_get_ino_by_handle (hdl);
-	      CloseHandle (hdl);
-	    }
+	  status = NtQueryDirectoryFile (dir->__handle, NULL, NULL, 0, &io,
+					 d_cache (dir), DIR_BUF_SIZE,
+					 FileIdBothDirectoryInformation,
+					 FALSE, NULL, dir->__d_position == 0);
+	  /* FileIdBothDirectoryInformation isn't supported for remote drives
+	     on NT4 and 2K systems, and it's also not supported on 2K at all,
+	     when accessing network drives on any remote OS.  We just fall
+	     back to using a standard directory query in this case and note
+	     this case using the dirent_get_d_ino flag. */
+	  if (status == STATUS_INVALID_LEVEL
+	      || status == STATUS_INVALID_PARAMETER)
+	    dir->__flags &= ~dirent_get_d_ino;
 	}
+      if (!(dir->__flags & dirent_get_d_ino))
+	status = NtQueryDirectoryFile (dir->__handle, NULL, NULL, 0, &io,
+				       d_cache (dir), DIR_BUF_SIZE,
+				       FileBothDirectoryInformation,
+				       FALSE, NULL, dir->__d_position == 0);
     }
 
   if (!status)
     {
+      buf = (PFILE_ID_BOTH_DIR_INFORMATION) (d_cache (dir) + d_pos (dir));
+      if (buf->NextEntryOffset == 0)
+        d_pos (dir) = 0;
+      else
+	d_pos (dir) += buf->NextEntryOffset;
+      if ((dir->__flags & dirent_get_d_ino))
+	{
+	  FileName = buf->FileName;
+	  if ((dir->__flags & dirent_set_d_ino))
+	    de->d_ino = buf->FileId.QuadPart;
+        }
+      else
+        FileName = ((PFILE_BOTH_DIR_INFORMATION) buf)->FileName;
+
+      if (de->d_ino == 0 && (dir->__flags & dirent_set_d_ino))
+	{
+	  OBJECT_ATTRIBUTES attr;
+
+	  if (dir->__d_position == 0 && buf->FileNameLength == 2
+	      && FileName[0] == '.')
+	    de->d_ino = readdir_get_ino_by_handle (dir->__handle);
+	  else if (dir->__d_position == 1 && buf->FileNameLength == 4
+		   && FileName[0] == '.' && FileName[1] == '.')
+	    de->d_ino = readdir_get_ino (dir, pc.normalized_path, true);
+	  else
+	    {
+	      HANDLE hdl;
+	      UNICODE_STRING upath = {buf->FileNameLength, CYG_MAX_PATH * 2,
+				      FileName};
+	      InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
+					  dir->__handle , NULL);
+	      if (!NtOpenFile (&hdl, READ_CONTROL, &attr, &io,
+			       wincap.shared (), 0))
+		{
+		  de->d_ino = readdir_get_ino_by_handle (hdl);
+		  CloseHandle (hdl);
+		}
+	    }
+	}
       wcstombs (fname, FileName, buf->FileNameLength / 2);
       fname[buf->FileNameLength / 2] = '\0';
     }
 
   if (!(res = readdir_helper (dir, de, RtlNtStatusToDosError (status),
-			      buf->FileAttributes, fname)))
+			      buf ? buf->FileAttributes : 0, fname)))
     dir->__d_position++;
   else if (!(dir->__flags & dirent_saw_dot))
     {

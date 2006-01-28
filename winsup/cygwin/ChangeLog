@@ -1,5 +1,19 @@
 2006-01-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (DIR_NUM_ENTRIES): New define determining
+	minimum number of dir entries which fit into the readdir cache.
+	(DIR_BUF_SIZE): Define globally as size of readdir cache.
+	(struct __DIR_cache): New structure used for readdir caching on NT.
+	(d_dirname): Accessor for struct __DIR_cache, use throughout.
+	(d_pos): Ditto.
+	(d_cache): Ditto.
+	(fhandler_disk_file::opendir): Allocate __d_dirname to contain readdir
+	cache on NT.
+	(fhandler_disk_file::readdir): Use buf as pointer into readdir cache.
+	Implement readdir caching.
+
+2006-01-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/sys/dirent.h (struct dirent): Revert misguided attempt to
 	rename __d_unused1 to __d_fd.
 
