@@ -21,7 +21,7 @@ struct dirent
 {
   long __d_version;			/* Used internally */
   __ino64_t d_ino;
-  __uint32_t __d_fd;
+  __uint32_t __d_unused1;
   __uint32_t __d_internal1;
   char d_name[256];			/* FIXME: use NAME_MAX? */
 };

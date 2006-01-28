@@ -1,4 +1,9 @@
-2006-01-26  Corinna Vinschen  <corinna@vinschen.de>
+2006-01-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/sys/dirent.h (struct dirent): Revert misguided attempt to
+	rename __d_unused1 to __d_fd.
+
+2006-01-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (NtQueryDirectoryFile): Define.
 	* dir.cc (__opendir_with_d_ino): Just call opendir.
