@@ -438,8 +438,8 @@ rewriting the runtime library in question from specs...
 
 <para>First, you need to make sure you have the necessary build tools
 installed; you at least need <literal>gcc</literal>, <literal>make</literal>, 
-and <literal>perl</literal>. If you want to run the tests, 
-<literal>cocom</literal> and <literal>dejagnu</literal> are also required,
+<literal>perl</literal>, and <literal>cocom</literal>. If you want to run 
+the tests, <literal>dejagnu</literal> is also required,
 and you need to have <literal>CYGWIN=server</literal> set as described at 
 <ulink url="http://www.cygwin.com/cygwin-ug-net/using-cygserver.html" />.
 Normally, building ignores any errors in building the documentation,
