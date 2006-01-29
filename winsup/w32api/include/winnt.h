@@ -59,6 +59,15 @@ extern "C" {
 #endif
 #endif
 
+#ifndef FORCEINLINE
+#if (__GNUC__ >= 3)
+#define FORCEINLINE __inline  __attribute__((always_inline))
+#else
+#define FORCEINLINE __inline
+#endif
+#endif
+
+
 #ifndef VOID
 #define VOID void
 #endif

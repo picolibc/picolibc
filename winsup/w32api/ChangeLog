@@ -1,3 +1,7 @@
+2006-01-29  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winnt.h (FORCEINLINE): Define.
+
 2006-01-26  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winnt.h (DECLSPEC_SELECTANY): Define.
