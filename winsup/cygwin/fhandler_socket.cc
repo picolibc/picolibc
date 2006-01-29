@@ -661,10 +661,33 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 	}
 #undef un_addr
     }
-  else if (::bind (get_socket (), name, namelen))
-    set_winsock_errno ();
   else
-    res = 0;
+    {
+      /* If the application didn't explicitely call setsockopt (SO_REUSEADDR),
+         enforce exclusive local address use using the SO_EXCLUSIVEADDRUSE
+	 socket option, to emulate POSIX socket behaviour more closely.
+	 
+	 KB 870562: Note that this option is only available since NT4 SP4.
+	 Also note that a bug in Win2K SP1-3 and XP up to SP1 only enables
+	 this option for users in the local administrators group. */
+      if (wincap.has_exclusiveaddruse ())
+        {
+	  if (!saw_reuseaddr ())
+	    {
+	      int on = 1;
+	      int ret = ::setsockopt (get_socket (), SOL_SOCKET,
+				      ~(SO_REUSEADDR),
+				      (const char *) &on, sizeof on);
+	      debug_printf ("%d = setsockopt (SO_EXCLUSIVEADDRUSE), %E", ret);
+	    }
+	  else
+	    debug_printf ("SO_REUSEADDR set");
+	}
+      if (::bind (get_socket (), name, namelen))
+	set_winsock_errno ();
+      else
+	res = 0;
+    }
 
 out:
   return res;

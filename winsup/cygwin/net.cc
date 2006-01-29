@@ -722,6 +722,8 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 	  else
 	    set_winsock_errno ();
 	}
+      else if (level == SOL_SOCKET && optname == SO_REUSEADDR)
+        fh->saw_reuseaddr (*(int *) optval);
     }
 
   syscall_printf ("%d = setsockopt (%d, %d, %x, %p, %d)",

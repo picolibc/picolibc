@@ -1,3 +1,14 @@
+2006-01-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_socket): Add saw_reuseaddr status flag.
+	* fhandler_socket.cc (fhandler_socket::bind): Set socket to
+	SO_EXCLUSIVEADDRUSE if application didn't explicitely set SO_REUSEADDR
+	socket option, on systems supporting SO_EXCLUSIVEADDRUSE.
+	* net.cc (cygwin_setsockopt): Set fhandler's saw_reuseaddr status flag
+	if SO_REUSEADDR socket option has been successsfully set.
+	* wincap.h (wincaps::has_exclusiveaddruse): New element.
+	* wincap.cc: Implement above element throughout.
+
 2006-01-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::mkdir): In case or error,
