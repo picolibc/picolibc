@@ -1,5 +1,10 @@
 2006-01-29  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/winsock2.h (WINSOCK_API_LINKAGE): Define.  Add to
+	prototypes.
+
+2006-01-29  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/winnt.h (FORCEINLINE): Define.
 
 2006-01-26  Danny Smith  <dannysmith@users.sourceforge.net>
