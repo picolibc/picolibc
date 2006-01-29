@@ -1562,7 +1562,7 @@ readdir_get_ino (DIR *dir, const char *path, bool dot_dot)
       if (dot_dot)
 	strcat (fname, (*fname && fname[strlen (fname) - 1] == '/')
 		       ? ".." : "/..");
-      path_conv pc (fname);
+      path_conv pc (fname, PC_SYM_NOFOLLOW);
       if (pc.isspecial ())
 	{
 	  if (!lstat64 (fname, &st))
