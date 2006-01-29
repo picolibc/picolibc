@@ -1,3 +1,8 @@
+2006-01-29  Christopher Faylor  <cgf@timesys.com>
+
+	* CYGWIN_LICENSE: Restrict to v2.
+	* COPYING: Add.
+
 2006-01-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* configure.in: Add AC_PROG_INSTALL handling.
