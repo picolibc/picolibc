@@ -1362,7 +1362,7 @@ typedef struct __DIR_cache
 };
 
 #define d_dirname(d)	(((struct __DIR_cache *) (d)->__d_dirname)->__name)
-#define d_pos(d)	(((struct __DIR_cache *) (d)->__d_dirname)->__pos)
+#define d_cachepos(d)	(((struct __DIR_cache *) (d)->__d_dirname)->__pos)
 #define d_cache(d)	(((struct __DIR_cache *) (d)->__d_dirname)->__cache)
 
 DIR *
@@ -1397,7 +1397,7 @@ fhandler_disk_file::opendir ()
   else
     {
       strcpy (d_dirname (dir), get_win32_name ());
-      d_pos (dir) = 0;
+      d_cachepos (dir) = 0;
       dir->__d_dirent->__d_version = __DIRENT_VERSION;
       cygheap_fdnew fd;
 
@@ -1602,9 +1602,9 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
   if (!wincap.is_winnt ())
     return readdir_9x (dir, de);
 
-  /* d_pos always refers to the next cache entry to use.  If it's 0, this means
+  /* d_cachepos always refers to the next cache entry to use.  If it's 0
      we must reload the cache. */
-  if (d_pos (dir) == 0)
+  if (d_cachepos (dir) == 0)
     {
       if ((dir->__flags & dirent_get_d_ino))
 	{
@@ -1630,11 +1630,11 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 
   if (!status)
     {
-      buf = (PFILE_ID_BOTH_DIR_INFORMATION) (d_cache (dir) + d_pos (dir));
+      buf = (PFILE_ID_BOTH_DIR_INFORMATION) (d_cache (dir) + d_cachepos (dir));
       if (buf->NextEntryOffset == 0)
-        d_pos (dir) = 0;
+        d_cachepos (dir) = 0;
       else
-	d_pos (dir) += buf->NextEntryOffset;
+	d_cachepos (dir) += buf->NextEntryOffset;
       if ((dir->__flags & dirent_get_d_ino))
 	{
 	  FileName = buf->FileName;
@@ -1765,6 +1765,8 @@ fhandler_disk_file::seekdir (DIR *dir, _off64_t loc)
 void
 fhandler_disk_file::rewinddir (DIR *dir)
 {
+  if (wincap.is_winnt ())
+    d_cachepos (dir) = 0;
   if (!wincap.is_winnt () && dir->__handle != INVALID_HANDLE_VALUE)
     {
       if (dir->__handle)
