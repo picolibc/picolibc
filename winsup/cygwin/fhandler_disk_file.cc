@@ -1767,7 +1767,7 @@ fhandler_disk_file::rewinddir (DIR *dir)
 {
   if (wincap.is_winnt ())
     d_cachepos (dir) = 0;
-  if (!wincap.is_winnt () && dir->__handle != INVALID_HANDLE_VALUE)
+  else if (dir->__handle != INVALID_HANDLE_VALUE)
     {
       if (dir->__handle)
 	FindClose (dir->__handle);
