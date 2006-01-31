@@ -138,6 +138,8 @@ readdir_worker (DIR *dir, dirent *de)
 	    }
 	}
     }
+  /* This fills out the old 32 bit d_ino field for old applications,
+     build under Cygwin before 1.5.x. */
   de->__d_internal1 = de->d_ino;
 
   return res;

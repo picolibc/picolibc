@@ -94,9 +94,6 @@ details. */
 #define CYGWIN_VERSION_CHECK_FOR_USING_WINSOCK1_VALUES \
   (CYGWIN_VERSION_USER_API_VERSION_COMBINED <= 138)
 
-#define CYGWIN_VERSION_CHECK_FOR_NEEDS_D_INO \
-  (CYGWIN_VERSION_USER_API_VERSION_COMBINED < 147)
-
      /* API_MAJOR 0.0: Initial version.  API_MINOR changes:
 	1: Export cygwin32_ calls as cygwin_ as well.
 	2: Export j1, jn, y1, yn.
@@ -279,20 +276,21 @@ details. */
       143: Export clock_getres, clock_setres
       144: Export timelocal, timegm.
       145: Add MAP_NORESERVE flag to mmap.
-      146: Change SI_USER definition.  FIXME: Need to develop compatibility macro
-           for this?
-      147: Eliminate problematic d_ino from dirent structure.  unsetenv now returns
-           int, as per linux.
+      146: Change SI_USER definition.  FIXME: Need to develop compatibility
+	   macro for this?
+      147: Eliminate problematic d_ino from dirent structure.  unsetenv now
+	   returns int, as per linux.
       148: Add open(2) flags O_SYNC, O_RSYNC, O_DSYNC and O_DIRECT.
       149: Add open(2) flag O_NOFOLLOW.
       150: Export getsubopt.
       151: Export __opendir_with_d_ino
+      152: Revert to having d_ino in dirent unconditionally.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 151
+#define CYGWIN_VERSION_API_MINOR 152
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
