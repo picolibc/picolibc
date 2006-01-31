@@ -362,6 +362,10 @@ case "${host}" in
   h8500-*-elf*)
 	sys_dir=h8500hms
 	;;
+  i[34567]86-*-rdos*)
+	sys_dir=rdos
+	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES"
+	;;
   i[34567]86-*-sco*)
 	sys_dir=sysvi386
 	unix_dir=unix

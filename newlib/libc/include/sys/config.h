@@ -59,7 +59,7 @@
 /* in other words, go32 */
 #define _FLOAT_RET double
 #endif
-#ifdef __linux__
+#if defined(__linux__) || defined(__RDOS__)
 /* we want the reentrancy structure to be returned by a function */
 #define __DYNAMIC_REENT__
 #define HAVE_GETDATE

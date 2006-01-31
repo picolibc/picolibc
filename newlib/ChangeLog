@@ -1,3 +1,25 @@
+2006-01-31  Leif Ekblad  <leif@rdos.net>
+
+	* configure.host: RDOS support added
+	* libc/include/sys/config.h: Ditto.
+	* libc/sys/rdos/Makefile.am, libc/sys/rdos/Makefile.in: New files.
+	* libc/sys/rdos/aclocal.m4, libc/sys/rdos/chown.c: Ditto.
+	* libc/sys/rdos/close.c, libc/sys/rdos/config.h: Ditto.
+	* libc/sys/rdos/configure, libc/sys/rdos/configure.in: Ditto.
+	* libc/sys/rdos/crt0.S, libc/sys/rdos/execve.c: Ditto.
+	* libc/sys/rdos/fork.c, libc/sys/rdos/fstat.c: Ditto.
+	* libc/sys/rdos/getenv.c, libc/sys/rdos/getpid.c: Ditto.
+	* libc/sys/rdos/gettod.c, libc/sys/rdos/isatty.c: Ditto.
+	* libc/sys/rdos/kill.c, libc/sys/rdos/link.c: Ditto.
+	* libc/sys/rdos/lseek.c, libc/sys/rdos/open.c: Ditto.
+	* libc/sys/rdos/rdos.S, libc/sys/rdos/rdos.h: Ditto.
+	* libc/sys/rdos/rdoshelp.c, libc/sys/rdos/read.c: Ditto.
+	* libc/sys/rdos/readlink.c, libc/sys/rdos/sbrk.c: Ditto.
+	* libc/sys/rdos/stat.c, libc/sys/rdos/symlink.c: Ditto.
+	* libc/sys/rdos/times.c, libc/sys/rdos/unlink.c: Ditto.
+	* libc/sys/rdos/user.def, libc/sys/rdos/wait.c: Ditto.
+	* libc/sys/rdos/write.c: Ditto.
+
 2006-01-24  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* acinclude.m4: Add nodefine to AM_INIT_AUTOMAKE macro invocation
