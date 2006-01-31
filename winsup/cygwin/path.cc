@@ -3978,8 +3978,9 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
 	    /* When calling SetCurrentDirectory for a non-existant dir on a
 	       Win9x share, it returns ERROR_INVALID_FUNCTION. */
 	    if (GetLastError () == ERROR_INVALID_FUNCTION)
-	      SetLastError (ERROR_FILE_NOT_FOUND);
-	    __seterrno ();
+	      set_errno (ENOENT);
+	    else
+	      __seterrno ();
 	    goto out;
 	 }
     }
