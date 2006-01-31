@@ -3118,7 +3118,7 @@ suffix_scan::next ()
 	  }
 
       while (suffixes && suffixes->name)
-	if (!suffixes->addon)
+	if (nextstate == SCAN_EXTRALNK && !suffixes->addon)
 	  suffixes++;
 	else
 	  {

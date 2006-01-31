@@ -1,5 +1,13 @@
 2006-01-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* spawn.cc (find_exec): Only return files with execute permission set
+	if ntsec is on.  Don't check execute permission of Windows batch files.
+	(av::fixup): Handle empty files gracefully.  Drop execute permission
+	test here.
+	* path.cc (suffix_scan::next): Don't skip any suffix on first run.
+
+2006-01-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (cwdstuff::set): Don't set win32 error, only POSIX errno.
 
 2006-01-31  Corinna Vinschen  <corinna@vinschen.de>

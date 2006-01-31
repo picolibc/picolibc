@@ -162,6 +162,11 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
 
       if ((suffix = perhaps_suffix (tmp, buf, err)) != NULL)
 	{
+	  if (buf.has_acls () && allow_ntsec
+	      && (*suffix == '\0' || strcmp (suffix, ".exe"))
+	      && check_file_access (buf, X_OK))
+	    continue;
+
 	  if (posix == tmp)
 	    {
 	      eotmp = strccpy (tmp, &posix_path, ':');
@@ -1052,6 +1057,9 @@ av::fixup (child_info_types chtype, const char *prog_arg, path_conv& real_path, 
     return 0;
   while (1)
     {
+      char *pgm = NULL;
+      char *arg1 = NULL;
+
       HANDLE h = CreateFile (real_path, GENERIC_READ,
 			       FILE_SHARE_READ | FILE_SHARE_WRITE,
 			       &sec_none_nih, OPEN_EXISTING,
@@ -1062,7 +1070,15 @@ av::fixup (child_info_types chtype, const char *prog_arg, path_conv& real_path, 
       HANDLE hm = CreateFileMapping (h, &sec_none_nih, PAGE_READONLY, 0, 0, NULL);
       CloseHandle (h);
       if (!hm)
-	goto err;
+        {
+	  /* ERROR_FILE_INVALID indicates very likely an empty file. */
+	  if (GetLastError () == ERROR_FILE_INVALID)
+	    {
+	      debug_printf ("zero length file, treat as script.");
+	      goto just_shell;
+	    }
+	  goto err;
+	}
       char *buf = (char *) MapViewOfFile(hm, FILE_MAP_READ, 0, 0, 0);
       CloseHandle (hm);
       if (!buf)
@@ -1093,16 +1109,6 @@ av::fixup (child_info_types chtype, const char *prog_arg, path_conv& real_path, 
 
       debug_printf ("%s is possibly a script", (char *) real_path);
 
-      if (real_path.has_acls () && allow_ntsec
-	  && check_file_access (real_path, X_OK))
-	{
-	  UnmapViewOfFile (buf);
-	  debug_printf ("... but not executable");
-	  break;
-	}
-
-      char *pgm = NULL;
-      char *arg1 = NULL;
       char *ptr = buf;
       if (*ptr++ == '#' && *ptr++ == '!')
 	{
@@ -1131,6 +1137,7 @@ av::fixup (child_info_types chtype, const char *prog_arg, path_conv& real_path, 
 	    }
 	}
       UnmapViewOfFile (buf);
+just_shell:
       if (!pgm)
 	{
 	  if (strcasematch (ext, ".com"))
