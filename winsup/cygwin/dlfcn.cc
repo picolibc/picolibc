@@ -37,7 +37,7 @@ set_dl_error (const char *str)
 inline const char * __stdcall
 check_path_access (const char *mywinenv, const char *name, path_conv& buf)
 {
-  return find_exec (name, buf, mywinenv, FE_NNF | FE_NATIVE | FE_CWD);
+  return find_exec (name, buf, mywinenv, FE_NNF | FE_NATIVE | FE_CWD | FE_DLL);
 }
 
 /* Search LD_LIBRARY_PATH for dll, if it exists.

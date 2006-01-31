@@ -266,7 +266,8 @@ enum fe_types
   FE_NADA = 0,		/* Nothing special */
   FE_NNF = 1,		/* Return NULL if not found */
   FE_NATIVE = 2,	/* Return native path in path_conv struct */
-  FE_CWD = 4		/* Search CWD for program */
+  FE_CWD = 4,		/* Search CWD for program */
+  FE_DLL = 8		/* Search for DLLs, not executables. */
 };
 const char * __stdcall find_exec (const char *name, path_conv& buf,
 				  const char *winenv = "PATH=",

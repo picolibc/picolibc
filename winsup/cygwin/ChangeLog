@@ -1,3 +1,16 @@
+2006-01-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dlfcn.cc (check_path_access): Call find_exec with FE_DLL option.
+	* path.h (enum fe_types): Add FE_DLL value.
+	* spawn.cc (std_suffixes): Remove.
+	(exe_suffixes): New suffix_info for executing files.
+	(dll_suffixes): New suffix_info for searching shared libraries.
+	(perhaps_suffix): Add opt argument.  Use dll_suffixes if FE_DLL
+	option is given, exe_suffixes otherwise.
+	(find_exec): Propagate opt argument to perhaps_suffix.  Drop suffix
+	check when testing execute permission.
+	(spawn_guts): Call perhaps_suffix with FE_NADA opt argument.
+
 2006-01-31  Christopher Faylor  <cgf@timesys.com>
 
 	* spawn.cc (av::fixup): Remove unused argument.

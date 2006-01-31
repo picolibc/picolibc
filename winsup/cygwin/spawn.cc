@@ -37,11 +37,16 @@ details. */
 #define LINE_BUF_CHUNK (CYG_MAX_PATH * 2)
 #define MAXWINCMDLEN 32767
 
-static suffix_info std_suffixes[] =
+static suffix_info exe_suffixes[] =
 {
   suffix_info (".exe", 1), suffix_info ("", 1),
-  suffix_info (".com"), suffix_info (".cmd"),
-  suffix_info (".bat"), suffix_info (".dll"),
+  suffix_info (".com"),
+  suffix_info (NULL)
+};
+
+static suffix_info dll_suffixes[] =
+{
+  suffix_info (".dll"),
   suffix_info (NULL)
 };
 
@@ -55,13 +60,14 @@ DWORD dwExeced;
    Returns (possibly NULL) suffix */
 
 static const char *
-perhaps_suffix (const char *prog, path_conv& buf, int& err)
+perhaps_suffix (const char *prog, path_conv& buf, int& err, unsigned opt)
 {
   char *ext;
 
   err = 0;
   debug_printf ("prog '%s'", prog);
-  buf.check (prog, PC_SYM_FOLLOW | PC_NULLEMPTY, std_suffixes);
+  buf.check (prog, PC_SYM_FOLLOW | PC_NULLEMPTY,
+	     (opt & FE_DLL) ? dll_suffixes : exe_suffixes);
 
   if (buf.isdir ())
     {
@@ -106,7 +112,7 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
      Win32 systems always check . first, but PATH may not be set up to
      do this. */
   if ((has_slash || opt & FE_CWD)
-      && (suffix = perhaps_suffix (name, buf, err)) != NULL)
+      && (suffix = perhaps_suffix (name, buf, err, opt)) != NULL)
     {
       if (posix && !has_slash)
 	{
@@ -160,11 +166,9 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
 
       debug_printf ("trying %s", tmp);
 
-      if ((suffix = perhaps_suffix (tmp, buf, err)) != NULL)
+      if ((suffix = perhaps_suffix (tmp, buf, err, opt)) != NULL)
 	{
-	  if (buf.has_acls () && allow_ntsec
-	      && (*suffix == '\0' || strcmp (suffix, ".exe"))
-	      && check_file_access (buf, X_OK))
+	  if (buf.has_acls () && allow_ntsec && check_file_access (buf, X_OK))
 	    continue;
 
 	  if (posix == tmp)
@@ -469,7 +473,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   int err;
   const char *ext;
-  if ((ext = perhaps_suffix (prog_arg, real_path, err)) == NULL)
+  if ((ext = perhaps_suffix (prog_arg, real_path, err, FE_NADA)) == NULL)
     {
       set_errno (err);
       res = -1;
