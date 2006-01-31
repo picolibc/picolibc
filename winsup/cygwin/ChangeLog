@@ -1,3 +1,15 @@
+2006-01-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (cwdstuff::set): When SetCurrentDirectory returns
+	ERROR_INVALID_FUNCTION, bend it over to ERROR_FILE_NOT_FOUND.  Add
+	comment to explain why.
+
+2006-01-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dir.cc (readdir_worker): Add comment about writing old 32 bit d_ino.
+	* include/cygwin/version.h: Bump API minor number to 152.
+	(CYGWIN_VERSION_CHECK_FOR_NEEDS_D_INO): Remove.
+
 2006-01-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::rewinddir): Simplify
