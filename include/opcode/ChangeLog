@@ -1,3 +1,12 @@
+2006-01-31  Paul Brook  <paul@codesourcery.com>
+	Richard Earnshaw <rearnsha@arm.com>
+
+	* arm.h: Use ARM_CPU_FEATURE.
+	(ARM_AEXT_*, FPU_ENDIAN_PURE, FPU_VFP_HARD): New.
+	(arm_feature_set): Change to a structure.
+	(ARM_CPU_HAS_FEATURE, ARM_MERGE_FEATURE_SETS, ARM_CLEAR_FEATURE,
+	ARM_FEATURE): New macros.
+
 2005-12-07  Hans-Peter Nilsson  <hp@axis.com>
 
 	* cris.h (MOVE_M_TO_PREG_OPCODE, MOVE_M_TO_PREG_ZBITS)
