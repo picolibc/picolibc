@@ -340,7 +340,7 @@ class av
     for (int i = calloced; i < argc; i++)
       argv[i] = cstrdup1 (argv[i]);
   }
-  int fixup (child_info_types, const char *, path_conv&, const char *);
+  int fixup (const char *, path_conv&, const char *);
 };
 
 int
@@ -477,7 +477,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     }
 
   bool wascygexec = real_path.iscygexec ();
-  res = newargv.fixup (chtype, prog_arg, real_path, ext);
+  res = newargv.fixup (prog_arg, real_path, ext);
 
   if (res)
     goto out;
@@ -555,7 +555,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
 	  if (one_line.ix >= MAXWINCMDLEN)
 	    {
-	      debug_printf ("Command line too long (>32K), return E2BIG");
+	      debug_printf ("command line too long (>32K), return E2BIG");
 	      set_errno (E2BIG);
 	      res = -1;
 	      goto out;
@@ -1049,7 +1049,7 @@ spawnvpe (int mode, const char *file, const char * const *argv,
 }
 
 int
-av::fixup (child_info_types chtype, const char *prog_arg, path_conv& real_path, const char *ext)
+av::fixup (const char *prog_arg, path_conv& real_path, const char *ext)
 {
   bool exeext = strcasematch (ext, ".exe");
   if (exeext && real_path.iscygexec () || strcasematch (ext, ".bat")
