@@ -47,6 +47,7 @@ static suffix_info exe_suffixes[] =
 static suffix_info dll_suffixes[] =
 {
   suffix_info (".dll"),
+  suffix_info (".exe", 1), suffix_info ("", 1),
   suffix_info (NULL)
 };
 
