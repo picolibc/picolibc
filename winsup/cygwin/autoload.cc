@@ -501,6 +501,7 @@ LoadDLLfuncEx (GetIfTable, 12, iphlpapi, 1)
 LoadDLLfuncEx (GetIfEntry, 4, iphlpapi, 1)
 LoadDLLfuncEx (GetIpAddrTable, 12, iphlpapi, 1)
 LoadDLLfuncEx (GetNetworkParams, 8, iphlpapi, 1)
+LoadDLLfuncEx (GetTcpTable, 12, iphlpapi, 1)
 
 LoadDLLfunc (CoTaskMemFree, 4, ole32)
 

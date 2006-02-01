@@ -17,6 +17,7 @@
 #include <sys/un.h>
 #include <sys/uio.h>
 #include <asm/byteorder.h>
+#include <iphlpapi.h>
 
 #include <stdlib.h>
 #define USE_SYS_TYPES_FD_SET
@@ -580,6 +581,29 @@ fhandler_socket::link (const char *newpath)
   return fhandler_base::link (newpath);
 }
 
+static inline bool
+address_in_use (struct sockaddr_in *addr)
+{
+  PMIB_TCPTABLE tab;
+  PMIB_TCPROW entry;
+  DWORD size = 0, i;
+
+  if (GetTcpTable (NULL, &size, FALSE) == ERROR_INSUFFICIENT_BUFFER)
+    {
+      tab = (PMIB_TCPTABLE) alloca (size);
+      if (!GetTcpTable (tab, &size, FALSE))
+        {
+	  for (i = tab->dwNumEntries, entry = tab->table; i > 0; --i, ++entry)
+	    if (entry->dwLocalAddr == addr->sin_addr.s_addr
+	    	&& entry->dwLocalPort == addr->sin_port
+		&& entry->dwState >= MIB_TCP_STATE_LISTEN
+		&& entry->dwState <= MIB_TCP_STATE_LAST_ACK)
+	      return true;
+	}
+    }
+  return false;
+}
+
 int
 fhandler_socket::bind (const struct sockaddr *name, int namelen)
 {
@@ -681,7 +705,24 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 	      debug_printf ("%d = setsockopt (SO_EXCLUSIVEADDRUSE), %E", ret);
 	    }
 	  else
-	    debug_printf ("SO_REUSEADDR set");
+	    {
+	      debug_printf ("SO_REUSEADDR set");
+	      /* There's a bug in SO_REUSEADDR handling in WinSock.
+	         Per standards, we must not be able to reuse a complete
+		 duplicate of a local TCP address (same IP, same port),
+		 even if SO_REUSEADDR has been set.  That's unfortunately
+		 possible in WinSock.  So we're testing here if the local
+		 address is already in use and don't bind, if so.  This
+		 only works for OSes with IP Helper support. */
+	      if (get_socket_type () == SOCK_STREAM
+		  && wincap.has_ip_helper_lib ()
+	      	  && address_in_use ((struct sockaddr_in *) name))
+	        {
+		  debug_printf ("Local address in use, don't bind");
+		  set_errno (EADDRINUSE);
+		  goto out;
+		}
+	    }
 	}
       if (::bind (get_socket (), name, namelen))
 	set_winsock_errno ();
