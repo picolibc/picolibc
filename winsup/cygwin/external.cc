@@ -28,7 +28,9 @@ details. */
 #include "pwdgrp.h"
 #include "cygtls.h"
 #include "child_info.h"
+#include "environ.h"
 #include <unistd.h>
+#include <stdlib.h>
 
 child_info *get_cygwin_startup_info ();
 
@@ -131,6 +133,25 @@ check_ntsec (const char *filename)
     return allow_ntsec;
   path_conv pc (filename);
   return allow_ntsec && pc.has_acls ();
+}
+
+/* Copy cygwin environment variables to the Windows environment. */
+static void
+setup_winenv ()
+{
+  char **envp = __cygwin_environ;
+  char *var, *val;
+  char dummy;
+
+  while (envp && *envp)
+    {
+      var = strdup (*envp++);
+      val = strchr (var, '=');
+      *val++ = '\0';
+      if (!GetEnvironmentVariable (var, &dummy, 1))
+	SetEnvironmentVariable (var, val);
+      free (var);
+    }
 }
 
 extern "C" unsigned long
@@ -312,6 +333,9 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	error_start_init (va_arg (arg, const char *));
 	try_to_debug ();
 	break;
+      case CW_SETUP_WINENV:
+	setup_winenv ();
+	return 0;
       default:
 	break;
     }
