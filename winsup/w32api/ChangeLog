@@ -1,3 +1,9 @@
+2006-02-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/iphlpapi.def: (NotifyAddrChange@8): Define.
+	Reported by: Daniel Atallah  <datallah at users dot sf dot net>
+	(NotifyRouteChange@8): Define.
+
 2006-01-29  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winsock2.h (WINSOCK_API_LINKAGE): Define.  Add to

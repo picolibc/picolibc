@@ -34,6 +34,8 @@ GetUdpTable@12
 GetUniDirectionalAdapterInfo@8
 IpReleaseAddress@4
 IpRenewAddress@4
+NotifyAddrChange@8
+NotifyRouteChange@8
 SendARP@16
 SetAdapterIpAddress@20
 SetIfEntry@4
