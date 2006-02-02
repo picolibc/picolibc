@@ -1,3 +1,10 @@
+2006-02-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din (updwtmpx): Export.
+	* syscalls.cc (updwtmpx): New function.
+	* include/utmpx.h (updwtmpx): Declare.
+	* include/cygwin/version.h: Bump API minor number to 153.
+
 2006-02-02  Christopher Faylor  <cgf@timesys.com>
 
 	* external.cc (setup_winenv): New function.

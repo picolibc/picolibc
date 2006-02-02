@@ -47,6 +47,7 @@ extern struct utmpx *getutxline (const struct utmpx *line);
 extern struct utmpx *pututxline (const struct utmpx *utmpx);
 extern void setutxent (void);
 extern void utmpxname (const char *file);
+extern void updwtmpx (const char *file, const struct utmpx *utmpx);
 
 #ifdef __cplusplus
 }

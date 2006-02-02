@@ -2878,6 +2878,13 @@ pututxline (const struct utmpx *utmpx)
   return copy_ut_to_utx (pututline ((struct utmp *) utmpx), &utx);
 }
 
+extern "C" void
+updwtmpx (const char *wtmpx_file, const struct utmpx *utmpx)
+{
+  ((struct utmpx *)utmpx)->ut_time = utmpx->ut_tv.tv_sec;
+  updwtmp (wtmpx_file, (const struct utmp *) utmpx);
+}
+
 extern "C"
 long gethostid (void)
 {
