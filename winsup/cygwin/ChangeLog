@@ -1,3 +1,17 @@
+2006-02-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (is_group_member): Use local group info type 1.  Test
+	group for being a global group or a well-known SID before adding it
+	to the group list.  Add comment.
+
+2006-02-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc  (GetTcpTable): Define.
+	* fhandler_socket.cc (address_in_use): New function to check if
+	sockaddr_in address is already in use.
+	(fhandler_socket::bind): Check if address is alreay in use in case of
+	SO_REUSEADDR, to circumvent WinSock non-standard behaviour.
+
 2006-02-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* spawn.cc (dll_suffixes): Add .exe and "no suffix" to the list.

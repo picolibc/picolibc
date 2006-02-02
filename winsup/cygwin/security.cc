@@ -367,24 +367,38 @@ get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user,
 static bool
 is_group_member (WCHAR *wgroup, PSID pusersid, cygsidlist &grp_list)
 {
-  LPLOCALGROUP_MEMBERS_INFO_0 buf;
+  LPLOCALGROUP_MEMBERS_INFO_1 buf;
   DWORD cnt, tot;
   NET_API_STATUS ret;
 
   /* Members can be users or global groups */
-  ret = NetLocalGroupGetMembers (NULL, wgroup, 0, (LPBYTE *) &buf,
+  ret = NetLocalGroupGetMembers (NULL, wgroup, 1, (LPBYTE *) &buf,
 				 MAX_PREFERRED_LENGTH, &cnt, &tot, NULL);
   if (ret)
     return false;
 
   bool retval = true;
   for (DWORD bidx = 0; bidx < cnt; ++bidx)
-    if (EqualSid (pusersid, buf[bidx].lgrmi0_sid))
+    if (EqualSid (pusersid, buf[bidx].lgrmi1_sid))
       goto done;
     else
-      for (int glidx = 0; glidx < grp_list.count; ++glidx)
-	if (EqualSid (grp_list.sids[glidx], buf[bidx].lgrmi0_sid))
-	  goto done;
+      {
+	/* The extra test for the group being a global group or a well-known
+	   group is necessary, since apparently also aliases (for instance
+	   Administrators or Users) can be members of local groups, even
+	   though MSDN states otherwise.  The GUI refuses to put aliases into
+	   local groups, but the CLI interface allows it.  However, a normal
+	   logon token does not contain those 2nd order aliases, so we also
+	   should not put them into the token group list.
+	   Note: Allowing those 2nd order aliases in our group list renders
+	   external tokens invalid, so that it becomes impossible to logon
+	   with password and valid logon token. */
+	for (int glidx = 0; glidx < grp_list.count; ++glidx)
+	  if ((buf[bidx].lgrmi1_sidusage == SidTypeGroup
+	       || buf[bidx].lgrmi1_sidusage == SidTypeWellKnownGroup)
+	      && EqualSid (grp_list.sids[glidx], buf[bidx].lgrmi1_sid))
+	    goto done;
+      }
 
   retval = false;
  done:
