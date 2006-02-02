@@ -388,11 +388,12 @@ is_group_member (WCHAR *wgroup, PSID pusersid, cygsidlist &grp_list)
 	   Administrators or Users) can be members of local groups, even
 	   though MSDN states otherwise.  The GUI refuses to put aliases into
 	   local groups, but the CLI interface allows it.  However, a normal
-	   logon token does not contain those 2nd order aliases, so we also
-	   should not put them into the token group list.
-	   Note: Allowing those 2nd order aliases in our group list renders
-	   external tokens invalid, so that it becomes impossible to logon
-	   with password and valid logon token. */
+	   logon token does not contain groups, in which the user is only
+	   indirectly a member by being a member of an alias in this group.
+	   So we also should not put them into the token group list.
+	   Note: Allowing those groups in our group list renders external
+	   tokens invalid, so that it becomes impossible to logon with
+	   password and valid logon token. */
 	for (int glidx = 0; glidx < grp_list.count; ++glidx)
 	  if ((buf[bidx].lgrmi1_sidusage == SidTypeGroup
 	       || buf[bidx].lgrmi1_sidusage == SidTypeWellKnownGroup)

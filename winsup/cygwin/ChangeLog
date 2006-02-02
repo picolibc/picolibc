@@ -1,5 +1,9 @@
 2006-02-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* security.cc (is_group_member): Fix comment.
+
+2006-02-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* security.cc (is_group_member): Use local group info type 1.  Test
 	group for being a global group or a well-known SID before adding it
 	to the group list.  Add comment.
