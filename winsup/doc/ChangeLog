@@ -1,3 +1,8 @@
+2006-02-01  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* faq-setup.xml (faq.setup.what-packages): 
+	Mention new cygcheck -p option.
+
 2006-01-27  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* faq-programming.xml (faq.programming.building-cygwin): 
