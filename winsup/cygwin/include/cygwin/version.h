@@ -285,7 +285,7 @@ details. */
       150: Export getsubopt.
       151: Export __opendir_with_d_ino
       152: Revert to having d_ino in dirent unconditionally.
-      153: Export updwtmpx.
+      153: Export updwtmpx, Implement CW_SETUP_WINENV.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
