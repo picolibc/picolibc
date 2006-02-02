@@ -1,3 +1,20 @@
+2006-02-01  Mark Mitchell  <mark@codesourcery.com>
+
+	Backport:
+	2006-02-01  Mark Mitchell  <mark@codesourcery.com>
+	* sim/ppc/emul_netbsd.c (emul_netbsd_create): Quote file-name property.
+	* sim/ppc/emul_unix.c (emul_unix_create): Likewise.
+	* sim/ppc/tree.c (libiberty.h): Include it.
+	(tree_quote_property): New function.
+	* sim/ppc/tree.h (tree_quote_property): Declare.
+
+2006-01-23  Mark Mitchell  <mark@codesourcery.com>
+
+	Backport:
+	2006-01-23  Mark Mitchell  <mark@codesourcery.com>
+	* sim/ppc/words.h (signed32): Define as "int".
+	(unsigned32): Define as "unsigned int".
+
 2006-01-26  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	Backport:
