@@ -1,3 +1,13 @@
+2006-02-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (suffix_scan::lnk_match): Return true beginning with 
+	SCAN_APPENDLNK.
+	(suffix_scan::next): Rearrange code to make .lnk append order slightly
+	more deterministic.
+	* spawn.cc (exe_suffixes): Try no suffix before .exe suffix to align
+	evaluation with stat_suffixes.
+	(dll_suffixes): Ditto.
+
 2006-02-02  Christopher Faylor  <cgf@timesys.com>
 
 	* cygwin/version.h: Mention CW_SETUP_WINENV in comment for API minor

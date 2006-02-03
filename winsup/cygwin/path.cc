@@ -3035,7 +3035,7 @@ public:
   const char *path;
   char *has (const char *, const suffix_info *);
   int next ();
-  int lnk_match () {return nextstate >= SCAN_EXTRALNK;}
+  int lnk_match () {return nextstate >= SCAN_APPENDLNK;}
 };
 
 char *
@@ -3092,22 +3092,20 @@ suffix_scan::next ()
 		nextstate = SCAN_LNK;
 		return 1;
 	      }
-	    if (!*suffixes->name)
-	      suffixes++;
 	    nextstate = SCAN_EXTRALNK;
 	    /* fall through to suffix checking below */
 	    break;
 	  case SCAN_HASLNK:
-	    nextstate = SCAN_EXTRALNK;	/* Skip SCAN_BEG */
+	    nextstate = SCAN_APPENDLNK;	/* Skip SCAN_BEG */
+	    return 1;
+	  case SCAN_EXTRALNK:
+	    nextstate = SCAN_DONE;
+	    *eopath = '\0';
+	    return 0;
+	  case SCAN_JUSTCHECK:
+	    nextstate = SCAN_LNK;
 	    return 1;
 	  case SCAN_LNK:
-	  case SCAN_EXTRALNK:
-	    strcpy (eopath, ".lnk");
-	    nextstate = SCAN_DONE;
-	    return 1;
-	  case SCAN_JUSTCHECK:
-	    nextstate = SCAN_APPENDLNK;
-	    return 1;
 	  case SCAN_APPENDLNK:
 	    strcat (eopath, ".lnk");
 	    nextstate = SCAN_DONE;

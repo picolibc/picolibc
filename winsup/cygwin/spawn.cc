@@ -39,7 +39,8 @@ details. */
 
 static suffix_info exe_suffixes[] =
 {
-  suffix_info (".exe", 1), suffix_info ("", 1),
+  suffix_info ("", 1),
+  suffix_info (".exe", 1),
   suffix_info (".com"),
   suffix_info (NULL)
 };
@@ -47,7 +48,8 @@ static suffix_info exe_suffixes[] =
 static suffix_info dll_suffixes[] =
 {
   suffix_info (".dll"),
-  suffix_info (".exe", 1), suffix_info ("", 1),
+  suffix_info ("", 1),
+  suffix_info (".exe", 1),
   suffix_info (NULL)
 };
 
