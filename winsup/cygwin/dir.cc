@@ -265,12 +265,6 @@ mkdir (const char *dir, mode_t mode)
   if (efault.faulted (EFAULT))
     return -1;
 
-  if (has_dot_last_component (dir))
-    {
-      set_errno (ENOENT);
-      return -1;
-    }
-
   if (!(fh = build_fh_name (dir, NULL, PC_SYM_NOFOLLOW)))
     goto done;   /* errno already set */;
 
@@ -279,6 +273,8 @@ mkdir (const char *dir, mode_t mode)
       debug_printf ("got %d error from build_fh_name", fh->error ());
       set_errno (fh->error ());
     }
+  else if (has_dot_last_component (dir))
+    set_errno (fh->exists () ? EEXIST : ENOENT);
   else if (!fh->mkdir (mode))
     res = 0;
   delete fh;

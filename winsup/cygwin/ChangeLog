@@ -1,3 +1,10 @@
+2006-02-03  Christopher Faylor  <cgf@timesys.com>
+
+	* dir.cc (mkdir): Reorganize check for trailing dot to return correct
+	error when directory exists.
+	* fhandler_disk_file.cc (fhandler_disk_file::mkdir): Remove special
+	test for path ending in '.'.
+
 2006-02-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (suffix_scan::lnk_match): Return true beginning with 
