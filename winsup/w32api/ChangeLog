@@ -1,3 +1,7 @@
+2006-02-04  Ron Lee  <ronl@users.sourceforge.net>
+
+	* include/winnls.h: Remove stray end ';' from preprocessor defines.
+
 2006-02-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/iphlpapi.def: (NotifyAddrChange@8): Define.
