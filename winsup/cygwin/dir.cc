@@ -295,12 +295,6 @@ rmdir (const char *dir)
   if (efault.faulted (EFAULT))
     return -1;
 
-  if (has_dot_last_component (dir))
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-
   if (!(fh = build_fh_name (dir, NULL, PC_SYM_NOFOLLOW)))
     goto done;   /* errno already set */;
 
@@ -309,8 +303,11 @@ rmdir (const char *dir)
       debug_printf ("got %d error from build_fh_name", fh->error ());
       set_errno (fh->error ());
     }
+  else if (has_dot_last_component (dir))
+    set_errno (fh->exists () ? EINVAL : ENOENT);
   else if (!fh->rmdir ())
     res = 0;
+
   delete fh;
 
  done:

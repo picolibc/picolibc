@@ -1,3 +1,8 @@
+2006-02-04  Christopher Faylor  <cgf@timesys.com>
+
+	* dir.cc (rmdir): Reorganize check for trailing dot to return correct
+	error when directory does not exist.
+
 2006-02-03  Christopher Faylor  <cgf@timesys.com>
 
 	* dir.cc (mkdir): Reorganize check for trailing dot to return correct
