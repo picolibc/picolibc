@@ -1591,12 +1591,6 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
   char fname[CYG_MAX_PATH];
   IO_STATUS_BLOCK io;
 
-  if (!dir->__handle)
-    {
-      res = ENMFILE;
-      goto out;
-    }
-
   if (!wincap.is_winnt ())
     return readdir_9x (dir, de);
 
@@ -1691,7 +1685,6 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
       res = 0;
     }
 
-out:
   syscall_printf ("%d = readdir (%p) (%s)", dir, &de, de->d_name);
   return res;
 }
@@ -1702,6 +1695,12 @@ fhandler_disk_file::readdir_9x (DIR *dir, dirent *de)
   WIN32_FIND_DATA buf;
   int res = 0;
   BOOL ret = TRUE;
+
+  if (!dir->__handle)
+    {
+      res = ENMFILE;
+      goto out;
+    }
 
   if (dir->__handle == INVALID_HANDLE_VALUE && dir->__d_position == 0)
     {
