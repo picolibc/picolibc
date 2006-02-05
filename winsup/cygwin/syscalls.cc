@@ -84,6 +84,8 @@ suffix_info stat_suffixes[] =
   suffix_info (NULL)
 };
 
+bool transparent_exe = false;
+
 SYSTEM_INFO system_info;
 
 static int __stdcall mknod_worker (const char *, mode_t, mode_t, _major_t,
@@ -139,7 +141,8 @@ unlink (const char *ourname)
   int res = -1;
   DWORD devn;
 
-  path_conv win32_name (ourname, PC_SYM_NOFOLLOW);
+  path_conv win32_name (ourname, PC_SYM_NOFOLLOW,
+  			transparent_exe ? stat_suffixes : NULL);
 
   if (win32_name.error)
     {
@@ -598,7 +601,8 @@ open (const char *unix_path, int flags, ...)
       if (fd >= 0)
 	{
 	  if (!(fh = build_fh_name (unix_path, NULL, (flags & O_NOFOLLOW) ?
-				    PC_SYM_NOFOLLOW : PC_SYM_FOLLOW)))
+				    PC_SYM_NOFOLLOW : PC_SYM_FOLLOW,
+				    transparent_exe ? stat_suffixes : NULL)))
 	    res = -1;		// errno already set
 	  else if ((flags & O_NOFOLLOW) && fh->issymlink ())
 	    {
@@ -722,7 +726,8 @@ link (const char *oldpath, const char *newpath)
   int res = -1;
   fhandler_base *fh;
 
-  if (!(fh = build_fh_name (oldpath, NULL, PC_SYM_NOFOLLOW)))
+  if (!(fh = build_fh_name (oldpath, NULL, PC_SYM_NOFOLLOW,
+			    transparent_exe ? stat_suffixes : NULL)))
     goto error;
 
   if (fh->error ())
@@ -1171,7 +1176,8 @@ rename (const char *oldpath, const char *newpath)
   int res = 0;
   char *lnk_suffix = NULL;
 
-  path_conv real_old (oldpath, PC_SYM_NOFOLLOW);
+  path_conv real_old (oldpath, PC_SYM_NOFOLLOW,
+		      transparent_exe ? stat_suffixes : NULL);
 
   if (real_old.error)
     {
@@ -1180,16 +1186,35 @@ rename (const char *oldpath, const char *newpath)
       return -1;
     }
 
-  path_conv real_new (newpath, PC_SYM_NOFOLLOW);
+  path_conv real_new (newpath, PC_SYM_NOFOLLOW,
+		      transparent_exe ? stat_suffixes : NULL);
 
-  /* Shortcut hack. */
-  char new_lnk_buf[CYG_MAX_PATH + 5];
-  if (real_old.is_lnk_special () && !real_new.error && !real_new.case_clash)
+  char new_buf[CYG_MAX_PATH + 5];
+  if (!real_new.error && !real_new.case_clash)
     {
-      strcpy (new_lnk_buf, newpath);
-      strcat (new_lnk_buf, ".lnk");
-      newpath = new_lnk_buf;
-      real_new.check (newpath, PC_SYM_NOFOLLOW);
+      DWORD bintype;
+      int len;
+
+      if (real_old.is_lnk_special ())
+	{
+	  /* Shortcut hack. */
+	  strcpy (new_buf, newpath);
+	  strcat (new_buf, ".lnk");
+	  newpath = new_buf;
+	  real_new.check (newpath, PC_SYM_NOFOLLOW);
+	}
+      else if (transparent_exe
+	       && !real_old.isdir ()
+	       && GetBinaryType (real_old, &bintype)
+	       && (len = strlen (real_new)) > 4
+	       && !strcasematch ((const char *) real_new + len - 4, ".exe"))
+        {
+	  /* Executable hack. */
+	  strcpy (new_buf, newpath);
+	  strcat (new_buf, ".exe");
+	  newpath = new_buf;
+	  real_new.check (newpath, PC_SYM_NOFOLLOW);
+	}
     }
 
   if (real_new.error || real_new.case_clash)
@@ -1510,7 +1535,8 @@ pathconf (const char *file, int v)
     case _PC_POSIX_PERMISSIONS:
     case _PC_POSIX_SECURITY:
       {
-	path_conv full_path (file, PC_SYM_FOLLOW);
+	path_conv full_path (file, PC_SYM_FOLLOW,
+			     transparent_exe ? stat_suffixes : NULL);
 	if (full_path.error)
 	  {
 	    set_errno (full_path.error);

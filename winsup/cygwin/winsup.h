@@ -347,6 +347,7 @@ extern SYSTEM_INFO system_info;
 extern char *old_title;
 extern bool display_title;
 extern bool in_forkee;
+extern bool transparent_exe;
 
 extern HANDLE hMainThread;
 extern HANDLE hMainProc;

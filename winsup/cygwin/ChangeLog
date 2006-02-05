@@ -1,3 +1,21 @@
+2006-02-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* environ.cc (struct parse_thing): Add transparent_exe option.
+	* fhandler_disk_file.cc (fhandler_disk_file::link): Accomodate
+	transparent_exe option.  Add .exe suffix for links to executable files,
+	if transparent_exe is set.
+	* fhandler_process.cc (fhandler_process::fill_filebuf): Remove .exe
+	suffix if transparent_exe option is set.
+	* path.cc (symlink_worker): Accomodate transparent_exe option.
+	(realpath): Don't tack on .exe suffix if transparent_exe is set.
+	* syscalls.cc (transparent_exe): New global variable.
+	(unlink): Accomodate transparent_exe option.
+	(open): Ditto.
+	(link): Ditto.
+	(rename): Ditto. Maybe add .exe suffix when renaming executable files.
+	(pathconf): Accomodate transparent_exe option.
+	* winsup.h: Declare transparent_exe.
+
 2006-02-05  Christopher Faylor  <cgf@timesys.com>
 	    Corinna Vinschen  <corinna@vinschen.de>
 

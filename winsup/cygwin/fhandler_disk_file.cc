@@ -734,9 +734,11 @@ fhandler_disk_file::ftruncate (_off64_t length)
 int
 fhandler_disk_file::link (const char *newpath)
 {
-  path_conv newpc (newpath, PC_SYM_NOFOLLOW | PC_POSIX);
   extern bool allow_winsymlinks;
+  extern suffix_info stat_suffixes[];
 
+  path_conv newpc (newpath, PC_SYM_NOFOLLOW | PC_POSIX,
+		   transparent_exe ? stat_suffixes : NULL);
   if (newpc.error)
     {
       set_errno (newpc.case_clash ? ECASECLASH : newpc.error);
@@ -757,14 +759,32 @@ fhandler_disk_file::link (const char *newpath)
       return -1;
     }
 
-  /* Shortcut hack. */
-  char new_lnk_buf[CYG_MAX_PATH + 5];
-  if (allow_winsymlinks && pc.is_lnk_special () && !newpc.case_clash)
+  char new_buf[CYG_MAX_PATH + 5];
+  if (!newpc.error && !newpc.case_clash)
     {
-      strcpy (new_lnk_buf, newpath);
-      strcat (new_lnk_buf, ".lnk");
-      newpath = new_lnk_buf;
-      newpc.check (newpath, PC_SYM_NOFOLLOW);
+      DWORD bintype;
+      int len;
+
+      if (allow_winsymlinks && pc.is_lnk_special ())
+	{
+	  /* Shortcut hack. */
+	  strcpy (new_buf, newpath);
+	  strcat (new_buf, ".lnk");
+	  newpath = new_buf;
+	  newpc.check (newpath, PC_SYM_NOFOLLOW);
+	}
+      else if (transparent_exe
+               && !pc.isdir ()
+               && GetBinaryType (pc, &bintype)
+               && (len = strlen (newpc)) > 4
+               && !strcasematch ((const char *) newpc + len - 4, ".exe"))
+        {
+          /* Executable hack. */
+          strcpy (new_buf, newpath);
+          strcat (new_buf, ".exe");
+          newpath = new_buf;
+          newpc.check (newpath, PC_SYM_NOFOLLOW);
+        }
     }
 
   query_open (query_write_attributes);

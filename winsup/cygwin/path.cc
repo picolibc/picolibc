@@ -2675,6 +2675,8 @@ int
 symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 		bool isdevice)
 {
+  extern suffix_info stat_suffixes[];
+
   HANDLE h;
   int res = -1;
   path_conv win32_path, win32_oldpath;
@@ -2704,7 +2706,8 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
       goto done;
     }
 
-  win32_path.check (newpath, PC_SYM_NOFOLLOW);
+  win32_path.check (newpath, PC_SYM_NOFOLLOW,
+		    transparent_exe ? stat_suffixes : NULL);
   if (use_winsym && !win32_path.exists ())
     {
       strcpy (from, newpath);
@@ -2753,7 +2756,8 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 	     ITEMIDLIST field. */
 	  if (GetFileAttributes (reloldpath) == INVALID_FILE_ATTRIBUTES)
 	    {
-	      win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW);
+	      win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW,
+	      			   transparent_exe ? stat_suffixes : NULL);
 	      if (win32_oldpath.error != ENOENT)
 		strcpy (use_winsym ? reloldpath : w32oldpath, win32_oldpath);
 	    }
@@ -2761,7 +2765,8 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 	    strcpy (w32oldpath, reloldpath);
 	  if (use_winsym)
 	    {
-	      win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW);
+	      win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW,
+	      			   transparent_exe ? stat_suffixes : NULL);
 	      strcpy (w32oldpath, win32_oldpath);
 	    }
 	  if (cp)
@@ -2772,7 +2777,8 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 	}
       else
 	{
-	  win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW);
+	  win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW,
+			       transparent_exe ? stat_suffixes : NULL);
 	  strcpy (w32oldpath, win32_oldpath);
 	}
       create_how = CREATE_NEW;
@@ -3723,7 +3729,7 @@ realpath (const char *path, char *resolved)
     {
       /* Check for the suffix being tacked on. */
       int tack_on = 0;
-      if (real_path.known_suffix)
+      if (!transparent_exe && real_path.known_suffix)
         {
 	  char *c = strrchr (real_path.normalized_path, '.');
 	  if (!c || !strcasematch (c, real_path.known_suffix))
