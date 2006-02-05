@@ -221,7 +221,7 @@ rewinddir (DIR *dir)
 
   if (dir->__d_cookie != __DIRENT_COOKIE)
     return;
-  dir->__flags &= dirent_isroot;
+  dir->__flags &= (dirent_isroot | dirent_get_d_ino | dirent_set_d_ino);
   return ((fhandler_base *) dir->__fh)->rewinddir (dir);
 }
 
