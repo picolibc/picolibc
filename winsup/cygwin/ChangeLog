@@ -1,5 +1,12 @@
 2006-02-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/features.h: Add comment to explain what's going to happen
+	here at one point.
+	* include/sys/stdio.h: Guard getline and getdelim prototypes with
+	_GNU_SOURCE to avoid collision with old-style declarations.
+
+2006-02-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* environ.cc (struct parse_thing): Add transparent_exe option.
 	* fhandler_disk_file.cc (fhandler_disk_file::link): Accomodate
 	transparent_exe option.  Add .exe suffix for links to executable files,

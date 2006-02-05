@@ -28,8 +28,10 @@ details. */
 
 __BEGIN_DECLS
 
+#ifdef _GNU_SOURCE
 ssize_t	_EXFUN(getline, (char **, size_t *, FILE *));
 ssize_t	_EXFUN(getdelim, (char **, size_t *, int, FILE *));
+#endif /* _GNU_SOURCE */
 
 __END_DECLS
 
