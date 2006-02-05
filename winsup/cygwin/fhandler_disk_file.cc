@@ -1715,11 +1715,6 @@ fhandler_disk_file::readdir_9x (DIR *dir, dirent *de)
 	  goto out;
 	}
     }
-  else if (dir->__handle == INVALID_HANDLE_VALUE)
-    {
-      res = EBADF;		/* FIXME: Isn't this just a case of repeated reading beyond EOF? */
-      goto out;
-    }
   else
     ret = FindNextFileA (dir->__handle, &buf);
   
