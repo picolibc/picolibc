@@ -1,3 +1,13 @@
+2006-02-05  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir): Don't close dir
+	handle when we hit EOF since rewwindir may reactivate it.
+	(fhandler_disk_file::readdir_9x): Eliminate superfluous temporary
+	variable.
+	(fhandler_disk_file::closedir): Return EBADF when trying to close
+	unopened DIR.  Reorganize slightly.  Return actual derived error value
+	rather than always returning 0.
+
 2006-02-04  Christopher Faylor  <cgf@timesys.com>
 
 	* dir.cc (rmdir): Reorganize check for trailing dot to return correct

@@ -1690,11 +1690,6 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
       dir->__flags |= dirent_saw_dot_dot;
       res = 0;
     }
-  else
-    {
-      CloseHandle (dir->__handle);
-      dir->__handle = NULL;
-    }
 
 out:
   syscall_printf ("%d = readdir (%p) (%s)", dir, &de, de->d_name);
@@ -1705,7 +1700,6 @@ int
 fhandler_disk_file::readdir_9x (DIR *dir, dirent *de)
 {
   WIN32_FIND_DATA buf;
-  HANDLE handle;
   int res = 0;
   BOOL ret = TRUE;
 
@@ -1713,11 +1707,10 @@ fhandler_disk_file::readdir_9x (DIR *dir, dirent *de)
     {
       int len = strlen (dir->__d_dirname);
       strcpy (dir->__d_dirname + len, "*");
-      handle = FindFirstFileA (dir->__d_dirname, &buf);
+      dir->__handle = FindFirstFile (dir->__d_dirname, &buf);
       dir->__d_dirname[len] = '\0';
       DWORD lasterr = GetLastError ();
-      dir->__handle = handle;
-      if (handle == INVALID_HANDLE_VALUE && (lasterr != ERROR_NO_MORE_FILES))
+      if (dir->__handle == INVALID_HANDLE_VALUE && (lasterr != ERROR_NO_MORE_FILES))
 	{
 	  res = geterrno_from_win_error ();
 	  goto out;
@@ -1725,7 +1718,7 @@ fhandler_disk_file::readdir_9x (DIR *dir, dirent *de)
     }
   else if (dir->__handle == INVALID_HANDLE_VALUE)
     {
-      res = EBADF;
+      res = EBADF;		/* FIXME: Isn't this just a case of repeated reading beyond EOF? */
       goto out;
     }
   else
@@ -1778,15 +1771,28 @@ int
 fhandler_disk_file::closedir (DIR *dir)
 {
   int res = 0;
-  if (dir->__handle && dir->__handle != INVALID_HANDLE_VALUE
-      && ((wincap.is_winnt () && !CloseHandle (dir->__handle))
-          || (!wincap.is_winnt () && !FindClose (dir->__handle))))
+  if (!dir->__handle)
+    /* ignore */;
+  else if (dir->__handle == INVALID_HANDLE_VALUE)
     {
-      __seterrno ();
+      set_errno (EBADF);
       res = -1;
     }
+  else
+    {
+      BOOL winres;
+      if (wincap.is_winnt ())
+	winres = CloseHandle (dir->__handle);
+      else
+	winres = FindClose (dir->__handle);
+      if (!winres)
+	{
+	  __seterrno ();
+	  res = -1;
+	}
+    }
   syscall_printf ("%d = closedir (%p)", res, dir);
-  return 0;
+  return res;
 }
 
 fhandler_cygdrive::fhandler_cygdrive () :
