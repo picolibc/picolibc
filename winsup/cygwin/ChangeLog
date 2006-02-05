@@ -1,3 +1,7 @@
+2006-02-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dir.cc (rewinddir): Keep dirent_get_d_ino and dirent_set_d_ino flags.
+
 2006-02-05  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::readdir): Don't close dir
