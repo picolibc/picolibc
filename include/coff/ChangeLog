@@ -1,3 +1,7 @@
+2006-02-05  Arnold Metselaar  <arnold.metselaar@planet.nl>
+
+	* internal.h: Add relocation number R_IMM24 for Z80.
+
 2005-10-25  Arnold Metselaar  <arnold.metselaar@planet.nl>
 
 	* internal.h: Add relocation number for Z80
