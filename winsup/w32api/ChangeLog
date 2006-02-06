@@ -1,3 +1,7 @@
+2006-02-06  Christopher Faylor  <cgf@timesys.com>
+
+	* include/shlobj.h (PathResolve): Fix typo.
+
 2006-02-06  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/shlobj.h (PathResolve): Define.
