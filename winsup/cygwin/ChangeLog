@@ -1,5 +1,10 @@
 2006-02-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::connect): Fix formatting.
+	(fhandler_socket::wait): Handle SA_RESTART when signal arrives.
+
+2006-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/socket.h (CMSG_FIRSTHDR): Avoid compiler warning.
 
 2006-02-05  Corinna Vinschen  <corinna@vinschen.de>

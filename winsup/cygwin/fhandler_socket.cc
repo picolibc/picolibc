@@ -763,7 +763,7 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 	  res = ::connect (get_socket (), (struct sockaddr *) &sin, namelen);
 	  if (res == SOCKET_ERROR
 	      && WSAGetLastError () == WSAEWOULDBLOCK)
-	     res = wait (evt, 0, INFINITE);
+	    res = wait (evt, 0, INFINITE);
 	  release (evt);
 	}
     }
@@ -983,6 +983,10 @@ fhandler_socket::wait (HANDLE event, int flags, DWORD timeout)
   WSAEVENT ev[2] = { event, signal_arrived };
   WSANETWORKEVENTS evts;
 
+/* If WSAWaitForMultipleEvents is interrupted by a signal, and the signal
+   has the SA_RESTART flag set, return to this label and... restart. */
+sa_restart:
+
   switch (WSAWaitForMultipleEvents (2, ev, FALSE, timeout, FALSE))
     {
       case WSA_WAIT_TIMEOUT:
@@ -1054,6 +1058,11 @@ fhandler_socket::wait (HANDLE event, int flags, DWORD timeout)
 	break;
       case WSA_WAIT_EVENT_0 + 1:
 	WSASetLastError (WSAEINTR);
+	if (_my_tls.call_signal_handler ())
+	  {
+	    sig_dispatch_pending ();
+	    goto sa_restart;
+	  }
 	break;
       default:
 	WSASetLastError (WSAEFAULT);
