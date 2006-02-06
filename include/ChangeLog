@@ -1,3 +1,7 @@
+2006-02-06  Steve Ellcey  <sje@cup.hp.com>
+
+	* elf/ia64.h (SHF_IA_64_HP_TLS): New.
+
 2006-01-18  DJ Delorie  <dj@redhat.com>
 
 	* md5.h: Include ansidecl.h

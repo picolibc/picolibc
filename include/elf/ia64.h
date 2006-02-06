@@ -57,6 +57,8 @@
 #define SHF_IA_64_SHORT		0x10000000	/* Section near gp.  */
 #define SHF_IA_64_NORECOV	0x20000000	/* Spec insns w/o recovery.  */
 
+#define SHF_IA_64_HP_TLS	0x01000000	/* HP specific TLS flag.  */
+
 /* Possible values for sh_type in Elf64_Shdr: */
 
 #define SHT_IA_64_EXT		(SHT_LOPROC + 0)	/* Extension bits.  */
