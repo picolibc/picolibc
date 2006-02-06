@@ -149,6 +149,8 @@ struct _cygtls
   sigset_t sigmask;
   sigset_t sigwait_mask;
   siginfo_t *sigwait_info;
+  struct ucontext thread_context;
+  DWORD thread_id;
   unsigned threadkill;
   siginfo_t infodata;
   struct pthread *tid;
@@ -193,6 +195,9 @@ struct _cygtls
   static int handle_threadlist_exception (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *c, void *);
   void init_exception_handler (int (*) (EXCEPTION_RECORD *, exception_list *, CONTEXT *, void*));
   void init_threadlist_exceptions ();
+  void signal_exit (int) __attribute__ ((noreturn, regparm(2)));
+  void copy_context (CONTEXT *) __attribute__ ((regparm(2)));
+  void signal_debugger (int) __attribute__ ((regparm(2)));
 
 #ifdef _THREAD_H
   operator HANDLE () const {return tid->win32_obj_id;}

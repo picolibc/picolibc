@@ -514,7 +514,7 @@ sig_send (_pinfo *p, int sig)
 {
   if (sig == __SIGNOHOLD)
     SetEvent (sigCONT);
-  siginfo_t si;
+  siginfo_t si = {0};
   si.si_signo = sig;
   si.si_code = SI_KERNEL;
   si.si_pid = si.si_uid = si.si_errno = 0;

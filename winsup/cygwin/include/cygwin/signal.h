@@ -1,6 +1,6 @@
 /* signal.h
 
-  Copyright 2004, 2006 Red Hat, Inc.
+  Copyright 2004, 2005, 2006 Red Hat, Inc.
 
   This file is part of Cygwin.
 
@@ -14,17 +14,50 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+struct _fpstate
+{
+  unsigned long cw;
+  unsigned long sw;
+  unsigned long tag;
+  unsigned long ipoff;
+  unsigned long cssel;
+  unsigned long dataoff;
+  unsigned long datasel;
+  unsigned char _st[80];
+  unsigned long nxst;
+};
 
-#if 0
 struct ucontext
 {
-  unsigned long uc_flags;
-  void *uc_link;
-  stack_t uc_stack;
-  struct sigcontext uc_mcontext;
-  sigset_t uc_sigmask;
+  unsigned long cr2;
+  unsigned long dr0;
+  unsigned long dr1;
+  unsigned long dr2;
+  unsigned long dr3;
+  unsigned long dr6;
+  unsigned long dr7;
+  struct _fpstate fpstate;
+  unsigned long gs;
+  unsigned long fs;
+  unsigned long es;
+  unsigned long ds;
+  unsigned long edi;
+  unsigned long esi;
+  unsigned long ebx;
+  unsigned long edx;
+  unsigned long ecx;
+  unsigned long eax;
+  unsigned long ebp;
+  unsigned long eip;
+  unsigned long cs;
+  unsigned long eflags;
+  unsigned long esp;
+  unsigned long ss;
+  unsigned char _internal;
+  unsigned long oldmask;
 };
-#endif
+
+#define __COPY_CONTEXT_SIZE ((unsigned) &((struct ucontext *) 0)->_internal)
 
 typedef union sigval
 {

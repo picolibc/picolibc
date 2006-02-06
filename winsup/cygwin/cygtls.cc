@@ -100,6 +100,7 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
       init_exception_handler (handle_exceptions);
     }
 
+  thread_id = GetCurrentThreadId ();
   initialized = CYGTLS_INITIALIZED;
   locals.exitsock = INVALID_SOCKET;
   errno_addr = &(local_clib._errno);

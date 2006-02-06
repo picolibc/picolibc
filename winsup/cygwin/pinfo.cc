@@ -836,17 +836,13 @@ proc_waiter (void *arg)
   pinfo vchild = *(pinfo *) arg;
   ((pinfo *) arg)->waiter_ready = true;
 
-  siginfo_t si;
+  siginfo_t si = {0};
   si.si_signo = SIGCHLD;
   si.si_code = CLD_EXITED;
   si.si_pid = vchild->pid;
-  si.si_errno = 0;
 #if 0	// FIXME: This is tricky to get right
   si.si_utime = pchildren[rc]->rusage_self.ru_utime;
   si.si_stime = pchildren[rc].rusage_self.ru_stime;
-#else
-  si.si_utime = 0;
-  si.si_stime = 0;
 #endif
   pid_t pid = vchild->pid;
 

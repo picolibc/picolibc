@@ -1,3 +1,30 @@
+2006-02-06  Christopher Faylor  <cgf@timesys.com>
+
+	Always zero all elements of siginfo_t throughout.
+	* cygtls.h (_cygtls::thread_context): Declare new field.
+	(_cygtls::thread_id): Ditto.
+	(_cygtls::signal_exit): Move into this class.
+	(_cygtls::copy_context): Declare new function.
+	(_cygtls::signal_debugger): Ditto.
+	* cygtls.cc (_cygtls::init_thread): Fill out thread id field.
+	* exceptions.cc (exception): Change message when exception info is
+	unknown.  Copy context to thread local storage.
+	(_cygtls::handle_exceptions): Avoid double test for fault_guarded.
+	Reflect move of signal_exit to _cygtls class.
+	(sigpacket::process): Copy context to thread local storage.
+	(_cygtls::signal_exit): Move to _cygtls class.  Call signal_debugger to
+	notify debugger of exiting signal (WIP).  Call stackdump here (WIP).
+	(_cygtls::copy_context): Define new function.
+	(_cygtls::signal_debugger): Ditto.
+	* tlsoffsets.h: Regenerate.
+	* include/cygwin.h (_fpstate): New internal structure.
+	(ucontext): Declare new structure (WIP).
+	(__COPY_CONTEXT_SIZE): New define.
+
+	* exceptions.cc (_cygtls::interrupt_setup): Clear "threadkill" field
+	when there is no sigwaiting thread.
+	(setup_handler): Move event handling into interrupt_setup.
+
 2006-02-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::connect): Fix formatting.

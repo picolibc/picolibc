@@ -209,10 +209,9 @@ _pinfo::kill (siginfo_t& si)
     }
   else if (sendSIGCONT)
     {
-      siginfo_t si2;
+      siginfo_t si2 = {0};
       si2.si_signo = SIGCONT;
       si2.si_code = SI_KERNEL;
-      si2.si_pid = si2.si_uid = si2.si_errno = 0;
       sig_send (this, si2);
     }
 
@@ -251,20 +250,18 @@ kill0 (pid_t pid, siginfo_t& si)
 int
 killsys (pid_t pid, int sig)
 {
-  siginfo_t si;
+  siginfo_t si = {0};
   si.si_signo = sig;
   si.si_code = SI_KERNEL;
-  si.si_pid = si.si_uid = si.si_errno = 0;
   return kill0 (pid, si);
 }
 
 int
 kill (pid_t pid, int sig)
 {
-  siginfo_t si;
+  siginfo_t si = {0};
   si.si_signo = sig;
   si.si_code = SI_USER;
-  si.si_pid = si.si_uid = si.si_errno = 0;
   return kill0 (pid, si);
 }
 
@@ -538,7 +535,7 @@ sigwaitinfo (const sigset_t *set, siginfo_t *info)
 extern "C" int
 sigqueue (pid_t pid, int sig, const union sigval value)
 {
-  siginfo_t si;
+  siginfo_t si = {0};
   pinfo dest (pid);
   if (!dest)
     {
@@ -547,7 +544,6 @@ sigqueue (pid_t pid, int sig, const union sigval value)
     }
   si.si_signo = sig;
   si.si_code = SI_QUEUE;
-  si.si_pid = si.si_uid = si.si_errno = 0;
   si.si_value = value;
   return sig_send (dest, si);
 }

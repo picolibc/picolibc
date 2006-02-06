@@ -164,8 +164,7 @@ timer_thread (VOID *x)
 	{
 	case SIGEV_SIGNAL:
 	  {
-	    siginfo_t si;
-	    memset (&si, 0, sizeof (si));
+	    siginfo_t si = {0};
 	    si.si_signo = tt->evp.sigev_signo;
 	    si.si_sigval.sival_ptr = tt->evp.sigev_value.sival_ptr;
 	    si.si_code = SI_TIMER;

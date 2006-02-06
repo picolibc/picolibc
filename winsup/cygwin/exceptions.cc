@@ -44,7 +44,6 @@ extern NO_COPY DWORD dwExeced;
 int NO_COPY sigExeced;
 
 static BOOL WINAPI ctrl_c_handler (DWORD);
-static void signal_exit (int) __attribute__ ((noreturn));
 char windows_system_directory[1024];
 static size_t windows_system_directory_length;
 
@@ -184,7 +183,7 @@ exception (EXCEPTION_RECORD *e,  CONTEXT *in)
   if (exception_name)
     small_printf ("Exception: %s at eip=%08x\r\n", exception_name, in->Eip);
   else
-    small_printf ("Exception %d at eip=%08x\r\n", e->ExceptionCode, in->Eip);
+    small_printf ("Signal %d at eip=%08x\r\n", e->ExceptionCode, in->Eip);
   small_printf ("eax=%08x ebx=%08x ecx=%08x edx=%08x esi=%08x edi=%08x\r\n",
 		in->Eax, in->Ebx, in->Ecx, in->Edx, in->Esi, in->Edi);
   small_printf ("ebp=%08x esp=%08x program=%s, pid %u, thread %s\r\n",
@@ -454,7 +453,7 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
   if (exit_already || e->ExceptionFlags)
     return 1;
 
-  siginfo_t si;
+  siginfo_t si = {0};
   si.si_code = SI_KERNEL;
   /* Coerce win32 value to posix value.  */
   switch (e->ExceptionCode)
@@ -579,12 +578,15 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
 	break;
       }
 
-  if (!me.fault_guarded ()
-      && (!cygwin_finished_initializing
-	  || &me == _sig_tls
-	  || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_DFL
-	  || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_IGN
-	  || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_ERR))
+  if (me.fault_guarded ())
+    me.return_from_fault ();
+
+  me.copy_context (in);
+  if (!cygwin_finished_initializing
+      || &me == _sig_tls
+      || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_DFL
+      || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_IGN
+      || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_ERR)
     {
       /* Print the exception to the console */
       if (!myself->cygstarted)
@@ -613,7 +615,7 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
 	}
 
       if (e->ExceptionCode == STATUS_ACCESS_VIOLATION)
-        {
+	{
 	  int error_code = 0;
 	  if (si.si_code == SEGV_ACCERR)	/* Address present */
 	    error_code |= 1;
@@ -628,11 +630,8 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
 			   ? 0 : 4) | (e->ExceptionInformation[0] << 1));
 	}
 
-      signal_exit (0x80 | si.si_signo);	// Flag signal + core dump
+      me.signal_exit (0x80 | si.si_signo);	// Flag signal + core dump
     }
-
-  if (me.fault_guarded ())
-    me.return_from_fault ();
 
   si.si_addr = (void *) in->Eip;
   si.si_errno = si.si_pid = si.si_uid = 0;
@@ -755,6 +754,15 @@ _cygtls::interrupt_setup (int sig, void *handler, struct sigaction& siga)
 
   this->sig = sig;			// Should always be last thing set to avoid a race
 
+  if (!event)
+    threadkill = false;
+  else
+    {
+      HANDLE h = event;
+      event = NULL;
+      SetEvent (h);
+    }
+
   /* Clear any waiting threads prior to dispatching to handler function */
   int res = SetEvent (signal_arrived);	// For an EINTR case
   proc_subproc (PROC_CLEARWAIT, 1);
@@ -841,12 +849,6 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
     }
 
 out:
-  if (interrupted && tls->event)
-    {
-      HANDLE h = tls->event;
-      tls->event = NULL;
-      SetEvent (h);
-    }
   sigproc_printf ("signal %d %sdelivered", sig, interrupted ? "" : "not ");
   return interrupted;
 }
@@ -1209,25 +1211,28 @@ exit_sig:
       CONTEXT c;
       c.ContextFlags = CONTEXT_FULL;
       GetThreadContext (hMainThread, &c);
-      if (!try_to_debug ())
-	stackdump (c.Ebp, 1, 1);
+      tls->copy_context (&c);
       si.si_signo |= 0x80;
     }
   sigproc_printf ("signal %d, about to call do_exit", si.si_signo);
-  signal_exit (si.si_signo);	/* never returns */
+  tls->signal_exit (si.si_signo);	/* never returns */
 }
 
 /* Cover function to `do_exit' to handle exiting even in presence of more
    exceptions.  We used to call exit, but a SIGSEGV shouldn't cause atexit
    routines to run.  */
-static void
-signal_exit (int rc)
+void
+_cygtls::signal_exit (int rc)
 {
   if (hExeced)
     {
       sigproc_printf ("terminating captive process");
       TerminateProcess (hExeced, sigExeced = rc);
     }
+
+  signal_debugger (rc & 0x7f);
+  if ((rc & 0x80) && !try_to_debug ())
+    stackdump (thread_context.ebp, 1, 1);
 
   lock_process until_exit (true);
   if (hExeced || exit_state)
@@ -1330,4 +1335,21 @@ reset_signal_arrived ()
   sigproc_printf ("reset signal_arrived");
   if (_my_tls.stackptr > _my_tls.stack)
     debug_printf ("stackptr[-1] %p", _my_tls.stackptr[-1]);
+}
+
+void
+_cygtls::copy_context (CONTEXT *c)
+{
+  memcpy (&thread_context, c, (&thread_context._internal - (unsigned char *) &thread_context));
+}
+
+void
+_cygtls::signal_debugger (int sig)
+{
+  if (being_debugged ())
+    {
+      char sigmsg[2 * sizeof (_CYGWIN_SIGNAL_STRING " ffffffff ffffffff")];
+      __small_sprintf (sigmsg, _CYGWIN_SIGNAL_STRING " %d %p %p", sig, thread_id, &thread_context);
+      OutputDebugString (sigmsg);
+    }
 }

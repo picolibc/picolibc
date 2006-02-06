@@ -110,10 +110,9 @@ tty_min::kill_pgrp (int sig)
 {
   int killself = 0;
   winpids pids ((DWORD) PID_MAP_RW);
-  siginfo_t si;
+  siginfo_t si = {0};
   si.si_signo = sig;
   si.si_code = SI_KERNEL;
-  si.si_pid = si.si_uid = si.si_errno = 0;
   for (unsigned i = 0; i < pids.npids; i++)
     {
       _pinfo *p = pids[i];
@@ -172,10 +171,9 @@ fhandler_termios::bg_check (int sig)
      by another signal. */
   if (WaitForSingleObject (signal_arrived, 0) != WAIT_OBJECT_0)
     {
-      siginfo_t si;
+      siginfo_t si = {0};
       si.si_signo = sig;
       si.si_code = SI_KERNEL;
-      si.si_pid = si.si_uid = si.si_errno = 0;
       kill_pgrp (myself->pgid, si);
     }
   return bg_signalled;
