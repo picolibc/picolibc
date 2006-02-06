@@ -182,3 +182,4 @@ ILIsParent@12
 ILLoadFromStream@8
 ILRemoveLastID@4
 ILSaveToStream@8
+PathResolve@12

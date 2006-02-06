@@ -1401,6 +1401,10 @@ DECLARE_INTERFACE_(IDropTargetHelper, IUnknown)
 
 #ifdef _WIN32_WINNT >= 0x0500
 BOOL WINAPI PathResolve(LPWSTR, LPCWSTR*, UINT);
+#define PRF_VERIFYEXISTS            0x0001
+#define PRF_TRYPROGRAMEXTENSIONS    (0x0002 | PRF_VERIFYEXISTS)
+#define PRF_FIRSTDIRDEF             0x0004
+#define PRF_DONTFINDLNK             0x0008
 #endif
 
 void WINAPI SHAddToRecentDocs(UINT,PCVOID);
