@@ -1,3 +1,7 @@
+2006-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/socket.h (CMSG_FIRSTHDR): Avoid compiler warning.
+
 2006-02-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/features.h: Add comment to explain what's going to happen

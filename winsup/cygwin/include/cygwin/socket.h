@@ -85,7 +85,7 @@ struct cmsghdr
 #define CMSG_FIRSTHDR(mhdr)	\
 	({ \
 	  struct msghdr *_m = (struct msghdr *) mhdr; \
-	  (_m)->msg_controllen >= sizeof (struct cmsghdr) \
+	  (unsigned) (_m)->msg_controllen >= sizeof (struct cmsghdr) \
 	  ? (struct cmsghdr *) (_m)->msg_control \
 	  : (struct cmsghdr *) NULL; \
 	})
