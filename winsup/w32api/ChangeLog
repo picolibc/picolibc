@@ -1,7 +1,7 @@
 2006-02-06  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/shlobj.h (PRF_VERIFYEXISTS, PRF_TRYPROGRAMEXTENSIONS,
-	PRF_FIRSTDIRDEF, PRF_DONTFINDLNK): Ditto.
+	PRF_FIRSTDIRDEF, PRF_DONTFINDLNK): Define.
 	* lib/shell32.def (PathResolve): Define.
 
 2006-02-06  Christopher Faylor  <cgf@timesys.com>
