@@ -306,11 +306,12 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	     sys_mbstowcs (wuser, winname (), sizeof (wuser) / sizeof (*wuser));
 	      if (!(ret = NetUserGetInfo (wlogsrv, wuser, 3, (LPBYTE *) &ui)))
 		{
-		  sys_wcstombs (homepath_env_buf, ui->usri3_home_dir, CYG_MAX_PATH);
+		  sys_wcstombs (homepath_env_buf, CYG_MAX_PATH,
+		  		ui->usri3_home_dir);
 		  if (!homepath_env_buf[0])
 		    {
-		      sys_wcstombs (homepath_env_buf, ui->usri3_home_dir_drive,
-				    CYG_MAX_PATH);
+		      sys_wcstombs (homepath_env_buf, CYG_MAX_PATH,
+				    ui->usri3_home_dir_drive);
 		      if (homepath_env_buf[0])
 			strcat (homepath_env_buf, "\\");
 		      else

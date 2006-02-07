@@ -1681,8 +1681,7 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 		}
 	    }
 	}
-      wcstombs (fname, FileName, buf->FileNameLength / 2);
-      fname[buf->FileNameLength / 2] = '\0';
+      sys_wcstombs (fname, CYG_MAX_PATH - 1, FileName, buf->FileNameLength / 2);
     }
 
   if (!(res = readdir_helper (dir, de, RtlNtStatusToDosError (status),

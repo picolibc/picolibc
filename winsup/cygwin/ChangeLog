@@ -1,5 +1,25 @@
 2006-02-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dtable.cc (handle_to_fn): Accomodate new argument order in call to
+	sys_wcstombs.
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir): Call sys_wcstombs
+	instead of just wcstombs to accomodate OEM codepages.
+	* miscfuncs.cc (sys_wcstombs): Split len argument in source and target
+	length.  Always 0-terminate result in target string.
+	* security.cc (lsa2wchar): Remove unused function.
+	(lsa2str): Ditto.
+	(get_lsa_srv_inf): Ditto.
+	(get_logon_server): Accomodate new argument order in call to
+	sys_wcstombs.
+	(get_user_groups): Ditto.
+	(get_user_local_groups): Ditto.
+	(get_priv_list): Call sys_wcstombs directly instead of lsa2str.
+	* uinfo.cc (cygheap_user::ontherange): Accomodate new argument order
+	in call to sys_wcstombs.
+	* winsup.h (sys_wcstombs): Change prototype to match new argument order.
+
+2006-02-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* init.cc (respawn_wow64_process): Exit with the exit code returned
 	by the respawned process.
 

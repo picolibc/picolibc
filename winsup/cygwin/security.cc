@@ -188,28 +188,6 @@ str2uni_cat (UNICODE_STRING &tgt, const char *srcstr)
     tgt.Length = tgt.MaximumLength = 0;
 }
 
-#if 0				/* unused */
-static void
-lsa2wchar (WCHAR *tgt, LSA_UNICODE_STRING &src, int size)
-{
-  size = (size - 1) * sizeof (WCHAR);
-  if (src.Length < size)
-    size = src.Length;
-  memcpy (tgt, src.Buffer, size);
-  size >>= 1;
-  tgt[size] = 0;
-}
-#endif
-
-static void
-lsa2str (char *tgt, LSA_UNICODE_STRING &src, int size)
-{
-  if (src.Length / 2 < size)
-    size = src.Length / 2;
-  sys_wcstombs (tgt, src.Buffer, size);
-  tgt[size] = 0;
-}
-
 static LSA_HANDLE
 open_local_policy ()
 {
@@ -229,60 +207,6 @@ close_local_policy (LSA_HANDLE &lsa)
     LsaClose (lsa);
   lsa = INVALID_HANDLE_VALUE;
 }
-
-#if 0 /* unused */
-static BOOL
-get_lsa_srv_inf (LSA_HANDLE lsa, char *logonserver, char *domain)
-{
-  NET_API_STATUS ret;
-  WCHAR *buf;
-  char name[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-  WCHAR account[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-  WCHAR primary[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-  PPOLICY_ACCOUNT_DOMAIN_INFO adi;
-  PPOLICY_PRIMARY_DOMAIN_INFO pdi;
-
-  if ((ret = LsaQueryInformationPolicy (lsa, PolicyAccountDomainInformation,
-					(PVOID *) &adi)) != STATUS_SUCCESS)
-    {
-      __seterrno_from_win_error (LsaNtStatusToWinError (ret));
-      return FALSE;
-    }
-  lsa2wchar (account, adi->DomainName, INTERNET_MAX_HOST_NAME_LENGTH + 1);
-  LsaFreeMemory (adi);
-  if ((ret = LsaQueryInformationPolicy (lsa, PolicyPrimaryDomainInformation,
-					(PVOID *) &pdi)) != STATUS_SUCCESS)
-    {
-      __seterrno_from_win_error (LsaNtStatusToWinError (ret));
-      return FALSE;
-    }
-  lsa2wchar (primary, pdi->Name, INTERNET_MAX_HOST_NAME_LENGTH + 1);
-  LsaFreeMemory (pdi);
-  /* If the SID given in the primary domain info is NULL, the machine is
-     not member of a domain.  The name in the primary domain info is the
-     name of the workgroup then. */
-  if (pdi->Sid &&
-      (ret =
-       NetGetDCName (NULL, primary, (LPBYTE *) &buf)) == STATUS_SUCCESS)
-    {
-      sys_wcstombs (name, buf, INTERNET_MAX_HOST_NAME_LENGTH + 1);
-      strcpy (logonserver, name);
-      if (domain)
-	sys_wcstombs (domain, primary, INTERNET_MAX_HOST_NAME_LENGTH + 1);
-    }
-  else
-    {
-      sys_wcstombs (name, account, INTERNET_MAX_HOST_NAME_LENGTH + 1);
-      strcpy (logonserver, "\\\\");
-      strcat (logonserver, name);
-      if (domain)
-	sys_wcstombs (domain, account, INTERNET_MAX_HOST_NAME_LENGTH + 1);
-    }
-  if (ret == STATUS_SUCCESS)
-    NetApiBufferFree (buf);
-  return TRUE;
-}
-#endif
 
 bool
 get_logon_server (const char *domain, char *server, WCHAR *wserver)
@@ -306,7 +230,7 @@ get_logon_server (const char *domain, char *server, WCHAR *wserver)
   sys_mbstowcs (wdomain, domain, INTERNET_MAX_HOST_NAME_LENGTH + 1);
   if ((ret = NetGetDCName (NULL, wdomain, (LPBYTE *) &buf)) == STATUS_SUCCESS)
     {
-      sys_wcstombs (server, buf, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+      sys_wcstombs (server, INTERNET_MAX_HOST_NAME_LENGTH + 1, buf);
       if (wserver)
 	for (WCHAR *ptr1 = buf; (*wserver++ = *ptr1++);)
 	  ;
@@ -350,7 +274,7 @@ get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user,
       DWORD dlen = sizeof (domain);
       SID_NAME_USE use = SidTypeInvalid;
 
-      sys_wcstombs (dgroup + len, buf[i].grui0_name, GNLEN + 1);
+      sys_wcstombs (dgroup + len, GNLEN + 1, buf[i].grui0_name);
       if (!LookupAccountName (NULL, dgroup, gsid, &glen, domain, &dlen, &use))
 	debug_printf ("LookupAccountName(%s), %E", dgroup);
       else if (legal_sid_type (use))
@@ -445,7 +369,7 @@ get_user_local_groups (cygsidlist &grp_list, PSID pusersid)
 	DWORD dlen = sizeof (domain);
 
 	use = SidTypeInvalid;
-	sys_wcstombs (bgroup + blen, buf[i].lgrpi0_name, GNLEN + 1);
+	sys_wcstombs (bgroup + blen, GNLEN + 1, buf[i].lgrpi0_name);
 	if (!LookupAccountName (NULL, bgroup, gsid, &glen, domain, &dlen, &use))
 	  {
 	    if (GetLastError () != ERROR_NONE_MAPPED)
@@ -714,7 +638,8 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list)
 	  PTOKEN_PRIVILEGES tmp;
 	  DWORD tmp_count;
 
-	  lsa2str (buf, privstrs[i], sizeof (buf) - 1);
+	  sys_wcstombs (buf, sizeof (buf),
+	  		privstrs[i].Buffer, privstrs[i].Length / 2);
 	  if (!(priv = privilege_luid_by_name (buf)))
 	    continue;
 

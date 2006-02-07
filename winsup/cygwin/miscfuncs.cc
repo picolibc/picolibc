@@ -210,10 +210,18 @@ get_cp ()
   return current_codepage == ansi_cp ? GetACP() : GetOEMCP();
 }
 
+/* tlen is always treated as the maximum buffer size, including the '\0'
+   character.  sys_wcstombs will always return a 0-terminated result, no
+   matter what. */
 int __stdcall
-sys_wcstombs (char *tgt, const WCHAR *src, int len)
+sys_wcstombs (char *tgt, int tlen, const WCHAR *src, int slen)
 {
-  return WideCharToMultiByte (get_cp (), 0, src, -1, tgt, len, NULL, NULL);
+  int ret;
+  
+  ret = WideCharToMultiByte (get_cp (), 0, src, slen, tgt, tlen, NULL, NULL);
+  if (ret)
+    tgt[ret < tlen ? ret : tlen - 1] = '\0';
+  return ret;
 }
 
 int __stdcall

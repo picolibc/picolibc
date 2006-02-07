@@ -119,7 +119,7 @@ extern codepage_type current_codepage;
 
 UINT get_cp ();
 
-int __stdcall sys_wcstombs(char *, const WCHAR *, int)
+int __stdcall sys_wcstombs(char *, int, const WCHAR *, int = -1)
   __attribute__ ((regparm(3)));
 
 int __stdcall sys_mbstowcs(WCHAR *, const char *, int)

@@ -848,7 +848,7 @@ handle_to_fn (HANDLE h, char *posix_fn)
   ntfn->Name.Buffer[ntfn->Name.Length / sizeof (WCHAR)] = 0;
 
   char win32_fn[CYG_MAX_PATH + 100];
-  sys_wcstombs (win32_fn, ntfn->Name.Buffer, ntfn->Name.Length);
+  sys_wcstombs (win32_fn, CYG_MAX_PATH + 100, ntfn->Name.Buffer);
   debug_printf ("nt name '%s'", win32_fn);
   if (!strncasematch (win32_fn, DEVICE_PREFIX, DEVICE_PREFIX_LEN)
       || !QueryDosDevice (NULL, fnbuf, sizeof (fnbuf)))
