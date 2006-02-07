@@ -122,6 +122,8 @@ respawn_wow64_process ()
     {
       PROCESS_INFORMATION pi;
       STARTUPINFO si;
+      DWORD ret = 0;
+
       GetStartupInfo (&si);
       if (!CreateProcessA (NULL, GetCommandLineA (), NULL, NULL, TRUE,
 			   CREATE_DEFAULT_ERROR_MODE
@@ -131,8 +133,9 @@ respawn_wow64_process ()
       CloseHandle (pi.hThread);
       if (WaitForSingleObject (pi.hProcess, INFINITE) == WAIT_FAILED)
 	api_fatal ("Waiting for process %d failed, %E", pi.dwProcessId);
+      GetExitCodeProcess (pi.hProcess, &ret);
       CloseHandle (pi.hProcess);
-      ExitProcess (0);
+      ExitProcess (ret);
     }
 }
 

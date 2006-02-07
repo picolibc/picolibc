@@ -1,3 +1,8 @@
+2006-02-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* init.cc (respawn_wow64_process): Exit with the exit code returned
+	by the respawned process.
+
 2006-02-06  Christopher Faylor  <cgf@timesys.com>
 
 	Always zero all elements of siginfo_t throughout.
