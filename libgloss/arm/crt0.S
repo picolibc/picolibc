@@ -18,15 +18,26 @@
 
 /* .text is used instead of .section .text so it works with arm-aout too.  */
 	.text
+#if defined(__thumb2__)
+	.syntax unified
+	.thumb
+.macro FUNC_START name
+	.global \name
+	.thumb_func
+\name:
+.endm
+#else
 	.code 32
+.macro FUNC_START name
+	.global \name
+\name:
+.endm
+#endif
 	.align 	0
 
-	.global	_mainCRTStartup
-	.global	_start
-	.global	start
-start:
-_start:
-_mainCRTStartup:
+	FUNC_START	_mainCRTStartup
+	FUNC_START	_start
+	FUNC_START	start
 #if defined(__ELF__) && !defined(__USING_SJLJ_EXCEPTIONS__)
 	/* Annotation for EABI unwinding tables.  */
 	.fnstart
@@ -45,7 +56,12 @@ _mainCRTStartup:
 	/*  Issue Angel SWI to read stack info */
 	mov	r0, #AngelSWI_Reason_HeapInfo
 	adr	r1, .LC0	/*  point at ptr to 4 words to receive data */
-	swi	AngelSWI_ARM	/*  We are always in ARM mode for startup */
+#if defined(__thumb2__)
+	bkpt	AngelSWI
+#else
+	/*  We are always in ARM mode for startup */
+	AngelSWIAsm	AngelSWI_ARM
+#endif
 	ldr	r0, .LC0	/*  point at values read */
 	ldr	sp, [r0, #8]
 	ldr	sl, [r0, #12]
@@ -124,8 +140,8 @@ _mainCRTStartup:
 	sub	a3, a3, a1		/* Third arg: length of block */
 	
 
-#ifdef __thumb__		/* Enter Thumb mode.... */
-
+#if defined(__thumb__) && !defined(__thumb2__)
+	/* Enter Thumb mode.... */
 	add	a4, pc, #1	/* Get the address of the Thumb block */
 	bx	a4		/* Go there and start Thumb decoding  */
 
@@ -165,7 +181,7 @@ __change_mode:
 #else
 	mov	r0, #AngelSWI_Reason_GetCmdLine
 	adr	r1, .LC30	/*  Space for command line */
-	swi	AngelSWI
+	AngelSWIAsm	AngelSWI
 	ldr	r1, .LC30
 #endif
 	/*  Parse string at r1 */
@@ -287,7 +303,7 @@ __change_mode:
 
 	bl	FUNCTION (exit)		/* Should not return.  */
 
-#ifdef __thumb__
+#if defined(__thumb__) && !defined(__thumb2__)
 	/* Come out of Thumb mode.  This code should be redundant.  */
 
 	mov	a4, pc

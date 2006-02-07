@@ -1,3 +1,11 @@
+2006-02-07  Paul Brook  <paul@codesourcery.com>
+
+	* arm/crt0.S: Add Thumb-2 startup code.
+	* arm/redboot-crt0.S: Ditto.
+	* arm/libcfunc.c (do_AngelSWI): Use AngelSWIInsn.
+	* arm/swi.h (AngelSWIInsn, AngelSWIAsm): Define.
+	* arm/trap.S: Disable for Thumb-2.
+
 2006-01-18  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* mt/ms2.ld (.sram): Correct typo in section names.
