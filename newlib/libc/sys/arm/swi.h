@@ -33,6 +33,14 @@
 #else
 #define AngelSWI 			AngelSWI_ARM
 #endif
+/* For Thumb-2 code use the BKPT instruction instead of SWI.  */
+#ifdef __thumb2__
+#define AngelSWIInsn			"bkpt"
+#define AngelSWIAsm			bkpt
+#else
+#define AngelSWIInsn			"swi"
+#define AngelSWIAsm			swi
+#endif
 
 /* The reason codes:  */
 #define AngelSWI_Reason_Open		0x01

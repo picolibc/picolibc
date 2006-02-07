@@ -51,17 +51,39 @@
    Function entry is much simpler.  If we are compiling for the Thumb we 
    just switch into ARM mode and then drop through into the rest of the
    function.  The function exit code will take care of the restore to
-   Thumb mode.  */
+   Thumb mode.
+   
+   For Thumb-2 do everything in Thumb mode.  */
 
 #ifdef __APCS_26__
 #define RET	movs		pc, lr
+#elif defined(__thumb2__)
+#define RET	bx lr
 #else
 #define RET	tst		lr, #1; \
 	        moveq		pc, lr ; \
 .word           0xe12fff1e	/* bx lr */
 #endif
 
-#ifdef __thumb__
+#ifdef __thumb2__
+.macro COND where when 
+	i\where	\when
+.endm
+#else
+.macro COND where when 
+.endm
+#endif
+
+#if defined(__thumb2__)
+.syntax unified
+.macro MODE
+	.thumb
+	.thumb_func
+.endm
+.macro PROLOGUE name
+.endm
+
+#elif defined(__thumb__)
 #define	MODE		.thumb_func
 .macro PROLOGUE name
 	.code 16
@@ -70,7 +92,7 @@
 	.code 32
 SYM (.arm_start_of.\name):
 .endm
-#else
+#else /* Arm */
 #define	MODE		.code 32
 .macro PROLOGUE name
 .endm
@@ -131,6 +153,9 @@ SYM (\name):
 	/* Put the return value into the integer result register.
 	   But if it is zero then return 1 instead.  */	
 	movs		a1, a2
+#ifdef __thumb2__
+	it		eq
+#endif
 	moveq		a1, #1
 
 	FUNC_END longjmp

@@ -1,3 +1,11 @@
+2006-02-07  Paul Brook  <paul@codesourcery.com>
+
+	* libc/machine/arm/setjmp.S: Add Thumb-2 support.
+	* libc/sys/arm/crt0.S: Add Thumb-2 startup code.
+	* libc/sys/arm/libcfunc.c (do_AngelSWI): Use AngelSWIInsn.
+	* libc/sys/arm/swi.h (AngelSWIInsn, AngelSWIAsm): Define.
+	* libc/sys/arm/trap.S: Disable for Thumb-2.
+
 2006-01-31  Leif Ekblad  <leif@rdos.net>
 
 	* configure.host: RDOS support added
