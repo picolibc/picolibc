@@ -1,5 +1,5 @@
 /* MC68k ELF support for BFD.
-   Copyright 1998, 1999, 2000, 2002, 2005 Free Software Foundation, Inc.
+   Copyright 1998, 1999, 2000, 2002, 2005, 2006 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -52,8 +52,22 @@ START_RELOC_NUMBERS (elf_m68k_reloc_type)
   RELOC_NUMBER (R_68K_GNU_VTENTRY, 24)
 END_RELOC_NUMBERS (R_68K_max)
 
-#define EF_CPU32    0x00810000
-#define EF_M68000   0x01000000
-#define EF_CFV4E    0x00008000
+#define EF_M68K_CPU32    0x00810000
+#define EF_M68K_M68000   0x01000000
+#define EF_M68K_CFV4E    0x00008000
 
+/* We use the bottom 8 bits to encode information about the
+   coldfire variant.  */
+#define EF_M68K_ISA_MASK	0x07  /* Which ISA */
+#define EF_M68K_ISA_A		0x01
+#define EF_M68K_ISA_A_PLUS	0x02
+#define EF_M68K_ISA_B		0x03
+#define EF_M68K_HW_DIV		0x08  /* Has HW divide */
+#define EF_M68K_MAC_MASK	0x30 
+#define EF_M68K_MAC		0x10  /* Has MAC */
+#define EF_M68K_EMAC		0x20  /* Has EMAC */
+#define EF_M68K_USP		0x40  /* Has USP insns */
+#define EF_M68K_FLOAT		0x80  /* Has float insns */
+#define EF_M68K_CF_MASK		0xFF
+     
 #endif

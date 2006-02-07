@@ -1,3 +1,15 @@
+2006-02-07  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* m68k.h (EF_CPU32, EF_M68000, EF_CFV4E): Rename to ...
+	(EF_M68K_CPU32, EF_M68K_M68000, EF_M68K_CFV4E): ... here.
+	(EF_M68K_ISA_MASK, EF_M68K_ISA_A, EF_M68K_M68K_ISA_A_PLUS,
+	EF_M68K_ISA_B, EF_M68K_HW_DIV, EF_M68K_MAC_MASK, EF_M68K_MAC,
+	EF_M68K_EMAC, EF_M68K_USP, EF_M68K_FLOAT): New.
+
+2006-02-06  Steve Ellcey  <sje@cup.hp.com>
+
+	* ia64.h (SHF_IA_64_HP_TLS): New.
+
 2006-01-18  Alexandre Oliva  <aoliva@redhat.com>
 
 	Introduce TLS descriptors for i386 and x86_64.
