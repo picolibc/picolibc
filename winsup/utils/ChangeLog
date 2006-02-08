@@ -1,3 +1,8 @@
+2006-02-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (find_on_path): Create copy of rv on successful access
+	check, since rv can be reused in subsequent calls.
+
 2006-01-19  Christopher Faylor  <cgf@timesys.com>
 
 	* cygcheck.cc (common_paths): Add "patch".

@@ -275,7 +275,7 @@ find_on_path (char *file, char *default_extension,
 	return fn;
       strcpy (rv, fn);
       strcat (rv, default_extension);
-      return access (rv, F_OK) == 0 ? rv : fn;
+      return access (rv, F_OK) == 0 ? strdup (rv) : fn;
     }
 
   if (strchr (file, '.'))
