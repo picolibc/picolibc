@@ -1450,10 +1450,20 @@ fhandler_disk_file::opendir ()
 	      __seterrno ();
 	      goto free_dirent;
 	    }
-	  if (wincap.has_fileid_dirinfo ())
-	    dir->__flags |= dirent_get_d_ino;
+	  /* FileIdBothDirectoryInformation is apparently unsupported on XP
+	     when accessing directories on UDF.  When trying to use it so,
+	     NtQueryDirectoryFile returns with STATUS_ACCESS_VIOLATION.  It's
+	     not clear if the call isn't also unsupported on other OS/FS
+	     combinations (say, Win2K/CDFS or so).  Instead of testing in
+	     readdir for yet another error code, let's use
+	     FileIdBothDirectoryInformation only on filesystems supporting
+	     persistent ACLs, FileBothDirectoryInformation otherwise. */
 	  if (pc.hasgood_inode ())
-	    dir->__flags |= dirent_set_d_ino;
+	    {
+	      dir->__flags |= dirent_set_d_ino;
+	      if (wincap.has_fileid_dirinfo ())
+		dir->__flags |= dirent_get_d_ino;
+	    }
 	}
       res = dir;
     }

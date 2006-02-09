@@ -1,3 +1,9 @@
+2006-02-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Only set
+	the dirent_get_d_ino flag on filesystems having useful File IDs.
+	Add comment explaining why.
+
 2006-02-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dtable.cc (handle_to_fn): Accomodate new argument order in call to
