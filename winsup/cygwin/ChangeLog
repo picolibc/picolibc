@@ -1,3 +1,11 @@
+2006-02-10  Christopher Faylor  <cgf@timesys.com>
+
+	* external.cc (sync_winenv): Rename from "setup_winenv".  Use same
+	mechanism as spawn to determine environment variables which should be
+	converted back to windows form.
+	(cygwin_internal): Reflect setup_winenv -> sync_winenv name change.
+	* include/sys/cygwin.h: Ditto.
+
 2006-02-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Only set
@@ -6,21 +14,21 @@
 
 2006-02-07  Corinna Vinschen  <corinna@vinschen.de>
 
-	* dtable.cc (handle_to_fn): Accomodate new argument order in call to
+	* dtable.cc (handle_to_fn): Accommodate new argument order in call to
 	sys_wcstombs.
 	* fhandler_disk_file.cc (fhandler_disk_file::readdir): Call sys_wcstombs
-	instead of just wcstombs to accomodate OEM codepages.
+	instead of just wcstombs to accommodate OEM codepages.
 	* miscfuncs.cc (sys_wcstombs): Split len argument in source and target
 	length.  Always 0-terminate result in target string.
 	* security.cc (lsa2wchar): Remove unused function.
 	(lsa2str): Ditto.
 	(get_lsa_srv_inf): Ditto.
-	(get_logon_server): Accomodate new argument order in call to
+	(get_logon_server): Accommodate new argument order in call to
 	sys_wcstombs.
 	(get_user_groups): Ditto.
 	(get_user_local_groups): Ditto.
 	(get_priv_list): Call sys_wcstombs directly instead of lsa2str.
-	* uinfo.cc (cygheap_user::ontherange): Accomodate new argument order
+	* uinfo.cc (cygheap_user::ontherange): Accommodate new argument order
 	in call to sys_wcstombs.
 	* winsup.h (sys_wcstombs): Change prototype to match new argument order.
 
@@ -75,19 +83,19 @@
 2006-02-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* environ.cc (struct parse_thing): Add transparent_exe option.
-	* fhandler_disk_file.cc (fhandler_disk_file::link): Accomodate
+	* fhandler_disk_file.cc (fhandler_disk_file::link): Accommodate
 	transparent_exe option.  Add .exe suffix for links to executable files,
 	if transparent_exe is set.
 	* fhandler_process.cc (fhandler_process::fill_filebuf): Remove .exe
 	suffix if transparent_exe option is set.
-	* path.cc (symlink_worker): Accomodate transparent_exe option.
+	* path.cc (symlink_worker): Accommodate transparent_exe option.
 	(realpath): Don't tack on .exe suffix if transparent_exe is set.
 	* syscalls.cc (transparent_exe): New global variable.
-	(unlink): Accomodate transparent_exe option.
+	(unlink): Accommodate transparent_exe option.
 	(open): Ditto.
 	(link): Ditto.
 	(rename): Ditto. Maybe add .exe suffix when renaming executable files.
-	(pathconf): Accomodate transparent_exe option.
+	(pathconf): Accommodate transparent_exe option.
 	* winsup.h: Declare transparent_exe.
 
 2006-02-05  Christopher Faylor  <cgf@timesys.com>
@@ -284,7 +292,7 @@
 	and readdir_9x.
 	* fhandler_disk_file.cc (path_conv::hasgood_inode): New method to
 	evaluate if a filesystem has reliable inode numbers.
-	(fhandler_base::fstat_by_handle): Accomodate structure member name
+	(fhandler_base::fstat_by_handle): Accommodate structure member name
 	change from IndexNumber to FileId.
 	(fhandler_base::fstat_helper): Call hasgood_inode here.
 	(fhandler_disk_file::opendir): Call fhaccess only for real files.
@@ -299,7 +307,7 @@
 	(fhandler_disk_file::readdir): Move old functionality to readdir_9x.
 	Call readdir_9x when on 9x/Me.  Implement NT specific readdir here.
 	(fhandler_disk_file::readdir_9x): Move 9x specific readdir here.
-	(fhandler_disk_file::seekdir): Accomodate new NT readdir method.
+	(fhandler_disk_file::seekdir): Accommodate new NT readdir method.
 	(fhandler_disk_file::closedir): Ditto.
 	(fhandler_cygdrive::fstat): Set d_ino to namehash. Add comment.
 	(fhandler_cygdrive::opendir): Call get_namehash to prepare later
@@ -320,7 +328,7 @@
 	* wincap.cc: Implement above element throughout.
 	* winsup.h (readdir_get_ino): Add declaration.
 	* include/sys/dirent.h (struct dirent): Slightly rename structure
-	members to accomodate changes.
+	members to accommodate changes.
 	Remove __USE_EXPENSIVE_CYGWIN_D_INO handling and declaration of
 	__opendir_with_d_ino.
 

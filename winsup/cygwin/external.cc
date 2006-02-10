@@ -137,21 +137,33 @@ check_ntsec (const char *filename)
 
 /* Copy cygwin environment variables to the Windows environment. */
 static void
-setup_winenv ()
+sync_winenv ()
 {
-  char **envp = __cygwin_environ;
-  char *var, *val;
-  char dummy;
+  int unused_envc;
+  char *envblock = NULL;
+  char **envp = build_env (__cygwin_environ, envblock, unused_envc, false);
+  char *p = envblock;
 
-  while (envp && *envp)
+  if (envp)
     {
-      var = strdup (*envp++);
-      val = strchr (var, '=');
-      *val++ = '\0';
-      if (!GetEnvironmentVariable (var, &dummy, 1))
-	SetEnvironmentVariable (var, val);
-      free (var);
+      for (char **e = envp; *e; e++)
+	cfree (*e);
+      cfree (envp);
     }
+  if (!p)
+    return;
+  while (*p)
+    {
+      char *eq = strchr (p, '=');
+      if (eq)
+	{
+	  *eq = '\0';
+	  SetEnvironmentVariable (p, ++eq);
+	  p = eq;
+	}
+      p = strchr (p, '\0') + 1;
+    }
+  free (envblock);
 }
 
 extern "C" unsigned long
@@ -333,8 +345,8 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	error_start_init (va_arg (arg, const char *));
 	try_to_debug ();
 	break;
-      case CW_SETUP_WINENV:
-	setup_winenv ();
+      case CW_SYNC_WINENV:
+	sync_winenv ();
 	return 0;
       default:
 	break;
