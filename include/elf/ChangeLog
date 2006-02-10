@@ -1,3 +1,9 @@
+2006-02-10  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR binutils/2258
+	* internal.h (ELF_IS_SECTION_IN_SEGMENT_FILE): New.
+	(ELF_IS_SECTION_IN_SEGMENT_MEMORY): Likewise.
+
 2006-02-07  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* m68k.h (EF_CPU32, EF_M68000, EF_CFV4E): Rename to ...
