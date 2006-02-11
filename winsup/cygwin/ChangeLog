@@ -1,3 +1,10 @@
+2006-02-10  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler_process.cc (format_process_stat): Use cygwin-derived start
+	time even on NT since it is the logical start time of the "process".
+	* pinfo.cc (set_myself): Don't set start time when it should have
+	already been set previously.
+
 2006-02-10  Brian Ford  <Brian.Ford@FlightSafety.com>
 
 	* times.cc (clock_getres): Use correct conversion from milliseconds to

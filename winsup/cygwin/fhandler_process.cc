@@ -639,9 +639,8 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
     state = 'T';
   else if (wincap.is_winnt ())
     state = get_process_state (p->dwProcessId);
-  if (!wincap.is_winnt ())
-    start_time = (GetTickCount () / 1000 - time (NULL) + p->start_time) * HZ;
-  else
+  start_time = (GetTickCount () / 1000 - time (NULL) + p->start_time) * HZ;
+  if (wincap.is_winnt ())
     {
       NTSTATUS ret;
       HANDLE hProcess;
@@ -700,7 +699,6 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
       fault_count = vmc.PageFaultCount;
       utime = put.UserTime.QuadPart * HZ / 10000000ULL;
       stime = put.KernelTime.QuadPart * HZ / 10000000ULL;
-      start_time = (put.CreateTime.QuadPart - stodi.BootTime.QuadPart) * HZ / 10000000ULL;
 #if 0
        if (stodi.CurrentTime.QuadPart > put.CreateTime.QuadPart)
 	 start_time = (spt.KernelTime.QuadPart + spt.UserTime.QuadPart -
