@@ -61,7 +61,7 @@ set_myself (HANDLE h)
       /* here if execed */
       static pinfo NO_COPY myself_identity;
       myself_identity.init (cygwin_pid (myself->dwProcessId), PID_EXECED, NULL);
-      // myself->start_time = time (NULL); /* Register our starting time. */
+      myself->start_time = time (NULL); /* Register our starting time. */
       myself->exec_sendsig = NULL;
       myself->exec_dwProcessId = 0;
     }
