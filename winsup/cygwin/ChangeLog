@@ -1,3 +1,9 @@
+2006-02-10  Brian Ford  <Brian.Ford@FlightSafety.com>
+
+	* times.cc (clock_getres): Use correct conversion from milliseconds to
+	seconds/nanoseconds.
+	(clock_setres): Use correct conversion to nanoseconds.
+
 2006-02-10  Christopher Faylor  <cgf@timesys.com>
 
 	* external.cc (sync_winenv): Rename from "setup_winenv".  Use same

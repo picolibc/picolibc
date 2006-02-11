@@ -711,8 +711,8 @@ clock_getres (clockid_t clk_id, struct timespec *tp)
 
   DWORD period = gtod.resolution ();
 
-  tp->tv_sec = period / 1000000;
-  tp->tv_nsec = (period % 1000000) * 1000;
+  tp->tv_sec = period / 1000;
+  tp->tv_nsec = (period % 1000) * 1000000;
 
   return 0;
 }
@@ -730,7 +730,7 @@ clock_setres (clockid_t clk_id, struct timespec *tp)
   if (period_set)
     timeEndPeriod (minperiod);
 
-  DWORD period = (tp->tv_sec * 1000) + ((tp->tv_nsec) / 1000);
+  DWORD period = (tp->tv_sec * 1000) + ((tp->tv_nsec) / 1000000);
 
   if (timeBeginPeriod (period))
     {
