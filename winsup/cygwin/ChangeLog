@@ -1,5 +1,9 @@
 2006-02-13  Igor Peshansky  <pechtcha@cs.nyu.edu>
 
+	* include/mntent.h: Add missing #include.
+
+2006-02-13  Igor Peshansky  <pechtcha@cs.nyu.edu>
+
 	* gentls_offsets: Fix typo in error message.
 
 2006-02-10  Christopher Faylor  <cgf@timesys.com>
