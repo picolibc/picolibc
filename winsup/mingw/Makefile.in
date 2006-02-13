@@ -165,6 +165,7 @@ LIBS = libcrtdll.a \
        libmsvcrt.a libmsvcrtd.a \
        libmsvcr70.a libmsvcr70d.a \
        libmsvcr71.a libmsvcr71d.a \
+       libmsvcr80.a libmsvcr80d.a \
        libmingw32.a \
        libcoldname.a \
        libmoldname.a libmoldnamed.a \
@@ -253,6 +254,7 @@ libmingw32.a: $(MINGW_OBJS)
 msvcrt.def msvcrtd.def \
 msvcr70.def msvcr70d.def \
 msvcr71.def msvcr71d.def \
+msvcr80.def msvcr80d.def \
 : msvcrt.def.in
 	$(CC) -DRUNTIME=$(basename $(notdir $@)) \
 		-D__$(basename $(notdir $@))__=1 \

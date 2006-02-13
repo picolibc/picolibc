@@ -1,3 +1,8 @@
+2006-02-13  Earnie Boyd  <earnie@users.sf.net>
+
+	* Makefile.in (libmsvcr80.a): Add import lib.
+	(libmsvcr80d.a): Ditto.
+
 2006-01-18  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* Makefile.in: Bump cygwin build number.
