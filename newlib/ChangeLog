@@ -1,3 +1,11 @@
+2006-02-13  Jeff Johnston  <jjohnstn@redhat.com>
+	    David Carne  <davidcarne@gmail.com>
+
+	* libc/string/strndup_r.c (_strndup_r): Use strnlen logic
+	instead of strlen to determine number of bytes to copy.
+	* libc/string/strnlen.c (strnlen): Fix so check for max limit occurs
+	before looking at storage location.
+
 2006-02-07  Paul Brook  <paul@codesourcery.com>
 
 	* libc/machine/arm/setjmp.S: Add Thumb-2 support.
