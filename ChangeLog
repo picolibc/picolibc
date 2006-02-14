@@ -1,3 +1,8 @@
+2006-02-14  Paolo Bonzini  <bonzini@gnu.org>
+	    Andreas Schwab  <schwab@suse.de>
+	 
+	* configure: Regenerate.
+
 2006-01-16  Paolo Bonzini  <bonzini@gnu.org>
 
 	* configure.in: Set with_gnu_as, with_gnu_ld, with_newlib earlier.
