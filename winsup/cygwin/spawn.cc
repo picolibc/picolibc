@@ -153,8 +153,8 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
     posix_path = winpath->get_posix () - 1;
 
   debug_printf ("%s%s", mywinenv, path);
-  /* Iterate over the specified path, looking for the file with and
-     without executable extensions. */
+  /* Iterate over the specified path, looking for the file with and without
+     executable extensions. */
   do
     {
       posix_path++;

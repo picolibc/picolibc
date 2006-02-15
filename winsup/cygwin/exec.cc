@@ -69,11 +69,9 @@ sexecve_is_bad ()
   return 0;
 }
 
-/*
- * Copy string, until c or <nul> is encountered.
- * NUL-terminate the destination string (s1).
- * Return pointer to terminating byte in dst string.
- */
+/* Copy string, until c or <nul> is encountered.
+   NUL-terminate the destination string (s1).
+   Return pointer to terminating byte in dst string.  */
 
 char * __stdcall
 strccpy (char *s1, const char **s2, char c)
