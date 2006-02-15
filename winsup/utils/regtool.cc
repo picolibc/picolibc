@@ -90,7 +90,7 @@ usage (FILE *where = stderr)
   " -s, --string         set type to REG_SZ\n"
   "\n"
   "Options for 'set' and 'unset' Actions:\n"
-  " -K<c>, --key-separator[=]<c>  set key separator to <c> instead of '\\'\n"
+  " -K<c>, --key-separator[=]<c>  set key-value separator to <c> instead of '\\'\n"
   "\n"
   "Other Options:\n"
   " -h, --help     output usage information and exit\n"

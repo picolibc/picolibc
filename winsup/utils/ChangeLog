@@ -1,3 +1,7 @@
+2006-02-15  Igor Peshansky  <pechtcha@cs.nyu.edu>
+
+	* regtool.cc (usage): Clarify help for "-K".
+
 2006-02-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (find_on_path): Update copyright text.
