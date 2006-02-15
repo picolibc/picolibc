@@ -14,8 +14,8 @@ extern "C" {
 
 #ifndef _WINSOCK_H
 struct timeval {
-  long tv_sec;
-  long tv_usec;
+  time_t      tv_sec;
+  suseconds_t tv_usec;
 };
 
 struct timezone {

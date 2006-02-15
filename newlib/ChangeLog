@@ -1,3 +1,11 @@
+2006-02-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/sys/time.h (struct timeval): Change member types
+	according to SUSv3.
+	* libc/include/sys/types.h (useconds_t): Change to unsigned
+	according to SUSv3.
+	(suseconds_t): Define type.
+
 2006-02-13  Jeff Johnston  <jjohnstn@redhat.com>
 	    David Carne  <davidcarne@gmail.com>
 
