@@ -1,3 +1,11 @@
+2006-02-16  Jerry D. Hedden  <jerry@hedden.us>
+
+	* ps.cc (longopts): Add --process option.
+	(opts): Add -p option.
+	(usage): Mention -p/--process option.
+	(main): Handle -p option.
+	* utils.sgml: Describe -p/--process option.
+
 2006-02-15  Igor Peshansky  <pechtcha@cs.nyu.edu>
 
 	* regtool.cc (usage): Clarify help for "-K".

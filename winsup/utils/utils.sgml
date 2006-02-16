@@ -970,6 +970,7 @@ Report process status
  -f, --full      show process uids, ppids
  -h, --help      output usage information and exit
  -l, --long      show process uids, ppids, pgids, winpids
+ -p, --process   show information for specified PID
  -s, --summary   show process summary
  -u, --user      list processes owned by UID
  -v, --version   output version information and exit
@@ -1008,7 +1009,9 @@ usernames for UIDs. The <literal>-l</literal> option is the default display
 mode, showing a "long" listing with all the above columns. The other display
 option is <literal>-s</literal>, which outputs a shorter listing of just
 PID, TTY, STIME, and COMMAND. The <literal>-u</literal> option allows you
-to show only processes owned by a specific user. The <literal>-W</literal>
+to show only processes owned by a specific user. The <literal>-p</literal>
+option allows you to show information for only the process with the
+specified PID. The <literal>-W</literal>
 option causes <command>ps</command> show non-Cygwin Windows processes as 
 well as Cygwin processes. The WINPID is also the PID, and they can be killed
 with the Cygwin <command>kill</command> command's <literal>-f</literal>

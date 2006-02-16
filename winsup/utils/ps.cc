@@ -29,6 +29,7 @@ static struct option longopts[] =
   {"full", no_argument, NULL, 'f' },
   {"help", no_argument, NULL, 'h' },
   {"long", no_argument, NULL, 'l' },
+  {"process", required_argument, NULL, 'p'},
   {"summary", no_argument, NULL, 's' },
   {"user", required_argument, NULL, 'u'},
   {"version", no_argument, NULL, 'v'},
@@ -36,7 +37,7 @@ static struct option longopts[] =
   {NULL, 0, NULL, 0}
 };
 
-static char opts[] = "aefhlsu:vW";
+static char opts[] = "aefhlp:su:vW";
 
 typedef BOOL (WINAPI *ENUMPROCESSMODULES)(
   HANDLE hProcess,      // handle to the process
@@ -200,7 +201,7 @@ static void
 usage (FILE * stream, int status)
 {
   fprintf (stream, "\
-Usage: %s [-aefls] [-u UID]\n\
+Usage: %s [-aefls] [-u UID] [-p PID]\n\
 Report process status\n\
 \n\
  -a, --all       show processes of all users\n\
@@ -208,6 +209,7 @@ Report process status\n\
  -f, --full      show process uids, ppids\n\
  -h, --help      output usage information and exit\n\
  -l, --long      show process uids, ppids, pgids, winpids\n\
+ -p, --process   show information for specified PID\n\
  -s, --summary   show process summary\n\
  -u, --user      list processes owned by UID\n\
  -v, --version   output version information and exit\n\
@@ -244,7 +246,7 @@ int
 main (int argc, char *argv[])
 {
   external_pinfo *p;
-  int aflag, lflag, fflag, sflag, uid;
+  int aflag, lflag, fflag, sflag, uid, proc_id;
   cygwin_getinfo_types query = CW_GETPINFO;
   const char *dtitle = "    PID TTY     STIME COMMAND\n";
   const char *dfmt   = "%7d%4s%10s %s\n";
@@ -256,6 +258,7 @@ main (int argc, char *argv[])
 
   aflag = lflag = fflag = sflag = 0;
   uid = getuid ();
+  proc_id = -1;
   lflag = 1;
 
   prog_name = strrchr (argv[0], '/');
@@ -280,6 +283,9 @@ main (int argc, char *argv[])
 	usage (stdout, 0);
       case 'l':
 	lflag = 1;
+	break;
+      case 'p':
+	proc_id = atoi (optarg);
 	break;
       case 's':
 	sflag = 1;
@@ -328,6 +334,9 @@ main (int argc, char *argv[])
        (p = (external_pinfo *) cygwin_internal (query, pid | CW_NEXTPID));
        pid = p->pid)
     {
+      if ((proc_id > 0) && (p->pid != proc_id))
+	continue;
+
       if (!aflag)
 	if (p->version >= EXTERNAL_PINFO_VERSION_32_BIT)
 	  {
