@@ -1,3 +1,10 @@
+2006-02-16  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/aio.c: Define _GNU_SOURCE so struct aioinit
+	will be defined.
+	* libc/sys/linux/sys/types.h: Move <sys/config.h> ahead of
+	<features.h> to preset special flags.
+
 2006-02-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/time.h (struct timeval): Change member types

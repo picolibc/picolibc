@@ -50,8 +50,8 @@
  * libc/include/sys/types.h.  Repeat those here and
  * skip the kernel's definitions. */
 
-#include <features.h>
 #include <sys/config.h>
+#include <features.h>
 #include <machine/types.h>
 #include <sys/_types.h>
 

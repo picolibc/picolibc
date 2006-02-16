@@ -4,6 +4,8 @@
 
 /* Currently asynchronous I/O is not implemented. */
 
+#define _GNU_SOURCE 1
+
 #include <sys/types.h>
 #include <aio.h>
 #include <errno.h>
