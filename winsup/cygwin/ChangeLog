@@ -1,3 +1,13 @@
+2006-02-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Export sigignore and sigset.
+	* exceptions.cc (sigset): New function.
+	(sigignore): New function.
+	* include/cygwin/signal.h (SIG_HOLD): Define.
+	(sigignore): Declare.
+	(sigset): Declare.
+	* include/cygwin/version.h: Bump API minor number to 154.
+
 2006-02-13  Igor Peshansky  <pechtcha@cs.nyu.edu>
 
 	* include/mntent.h: Add missing #include.

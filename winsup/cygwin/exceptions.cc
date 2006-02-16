@@ -1021,6 +1021,50 @@ sigrelse (int sig)
   return 0;
 }
 
+extern "C" _sig_func_ptr
+sigset (int sig, _sig_func_ptr func)
+{
+  sig_dispatch_pending ();
+  _sig_func_ptr prev;
+
+  /* check that sig is in right range */
+  if (sig < 0 || sig >= NSIG || sig == SIGKILL || sig == SIGSTOP)
+    {
+      set_errno (EINVAL);
+      syscall_printf ("SIG_ERR = sigset (%d, %p)", sig, func);
+      return (_sig_func_ptr) SIG_ERR;
+    }
+
+  mask_sync.acquire (INFINITE);
+  sigset_t mask = myself->getsigmask ();
+  /* If sig was in the signal mask return SIG_HOLD, otherwise return the
+     previous disposition. */
+  if (sigismember (&mask, sig))
+    prev = SIG_HOLD;
+  else
+    prev = global_sigs[sig].sa_handler;
+  /* If func is SIG_HOLD, add sig to the signal mask, otherwise set the
+     disposition to func and remove sig from the signal mask. */
+  if (func == SIG_HOLD)
+    sigaddset (&mask, sig);
+  else
+    {
+      /* No error checking.  The test which could return SIG_ERR has already
+         been made above. */
+      signal (sig, func);
+      sigdelset (&mask, sig);
+    }
+  set_signal_mask (mask, myself->getsigmask ());
+  mask_sync.release ();
+  return prev;
+}
+
+extern "C" int
+sigignore (int sig)
+{
+  return sigset (sig, SIG_IGN) == SIG_ERR ? -1 : 0;
+}
+
 /* Update the signal mask for this process and return the old mask.
    Called from sigdelayed */
 extern "C" sigset_t

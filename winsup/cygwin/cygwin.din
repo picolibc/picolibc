@@ -1284,6 +1284,7 @@ sigdelset SIGFE
 sigemptyset NOSIGFE
 sigfillset NOSIGFE
 sighold SIGFE
+sigignore SIGFE
 sigqueue SIGFE
 siginterrupt SIGFE
 sigismember SIGFE
@@ -1294,6 +1295,7 @@ sigpause SIGFE
 sigpending SIGFE
 sigprocmask SIGFE
 sigrelse SIGFE
+sigset SIGFE
 sigsuspend SIGFE
 sigwait SIGFE
 sigwaitinfo SIGFE

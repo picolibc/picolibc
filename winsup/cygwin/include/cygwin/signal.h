@@ -254,10 +254,15 @@ struct sigaction
 #define SIGRTMAX ((SIGRTMIN) + 0)
 #define NSIG	33      /* signal 0 implied */
 
+#define SIG_HOLD ((_sig_func_ptr)2)	/* Signal in signal mask */
+
 int sigwait (const sigset_t *, int *);
 int sigwaitinfo (const sigset_t *, siginfo_t *);
 int sighold (int);
+int sigignore (int);
 int sigrelse (int);
+_sig_func_ptr sigset (int, _sig_func_ptr);
+
 int sigqueue(pid_t, int, const union sigval);
 int siginterrupt (int, int);
 #ifdef __cplusplus

@@ -286,12 +286,13 @@ details. */
       151: Export __opendir_with_d_ino
       152: Revert to having d_ino in dirent unconditionally.
       153: Export updwtmpx, Implement CW_SETUP_WINENV.
+      154: Export sigset, sigignore.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 153
+#define CYGWIN_VERSION_API_MINOR 154
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
