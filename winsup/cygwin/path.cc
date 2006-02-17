@@ -1269,31 +1269,52 @@ nofinalslash (const char *src, char *dst)
 static int
 conv_path_list (const char *src, char *dst, int to_posix)
 {
-  char *s;
-  char *d = dst;
-  char src_delim = to_posix ? ';' : ':';
-  char dst_delim = to_posix ? ':' : ';';
-  int (*conv_fn) (const char *, char *) = (to_posix
-					   ? cygwin_conv_to_posix_path
-					   : cygwin_conv_to_win32_path);
+  char src_delim, dst_delim;
+  int (*conv_fn) (const char *, char *);
+
+  if (to_posix)
+    {
+      src_delim = ';';
+      dst_delim = ':';
+      conv_fn = cygwin_conv_to_posix_path;
+    }
+  else
+    {
+      src_delim = ':';
+      dst_delim = ';';
+      conv_fn = cygwin_conv_to_win32_path;
+    }
 
   char *srcbuf = (char *) alloca (strlen (src) + 1);
 
-  for (;;)
+  int err = 0;
+  char *d = dst - 1;
+  do
     {
-      s = strccpy (srcbuf, &src, src_delim);
+      char *s = strccpy (srcbuf, &src, src_delim);
       int len = s - srcbuf;
       if (len >= CYG_MAX_PATH)
-	return ENAMETOOLONG;
-      int err = (*conv_fn) (len ? srcbuf : ".", d);
+	{
+	  err = ENAMETOOLONG;
+	  break;
+	}
+      if (len)
+	err = conv_fn (srcbuf, ++d);
+      else if (!to_posix)
+	err = conv_fn (".", ++d);
+      else
+	continue;
       if (err)
-	return err;
-      if (!*src++)
 	break;
       d = strchr (d, '\0');
-      *d++ = dst_delim;
+      *d = dst_delim;
     }
-  return 0;
+  while (*src++);
+
+  if (d < dst)
+    d++;
+  *d = '\0';
+  return err;
 }
 
 /* init: Initialize the mount table.  */
@@ -3636,7 +3657,8 @@ cygwin_conv_to_win32_path (const char *path, char *win32_path)
       return -1;
     }
 
-  strcpy (win32_path, p);
+
+  strcpy (win32_path, strcmp ((char *) p, ".\\") == 0 ? "." : (char *) p);
   return 0;
 }
 

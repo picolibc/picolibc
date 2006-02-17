@@ -1,3 +1,9 @@
+2006-02-17  Christopher Faylor  <cgf@timesys.com>
+
+	* path.cc (conv_path_list): Eat empty paths when converting to POSIX.
+	(cygwin_conv_to_win32_path): Deal with Cygwin's necessity of adding a
+	'/' to the end of a path ending in '.'.
+
 2006-02-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din: Export sigignore and sigset.
