@@ -1,3 +1,7 @@
+2006-02-17  Jerry D. Hedden  <jerry@hedden.us>
+
+	* ps.cc (main): Set aflag if -p option is given.
+
 2006-02-16  Jerry D. Hedden  <jerry@hedden.us>
 
 	* ps.cc (longopts): Add --process option.

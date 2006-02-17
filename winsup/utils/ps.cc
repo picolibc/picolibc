@@ -286,6 +286,7 @@ main (int argc, char *argv[])
 	break;
       case 'p':
 	proc_id = atoi (optarg);
+	aflag = 1;
 	break;
       case 's':
 	sflag = 1;
