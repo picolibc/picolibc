@@ -1,3 +1,11 @@
+2006-02-17  Shrirang Khisti  <shrirangk@kpitcummins.com>
+            Anil Paranjape   <anilp1@kpitcummins.com>
+            Shilin Shakti    <shilins@kpitcummins.com>
+
+	* common.h (EM_XC16X): New entry for xc16x cpu.
+	Sort other EM_* numbers into numerical order.
+	* xc16x.h: New file.
+   	
 2006-02-10  H.J. Lu  <hongjiu.lu@intel.com>
 
 	PR binutils/2258
