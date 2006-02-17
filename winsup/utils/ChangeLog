@@ -1,3 +1,10 @@
+2006-02-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygpath.cc (get_long_name): Load GetLongPathNameA instead of incorrect
+	GetLongPathName.
+	(doit): Create mixed filename after converting to short or long pathname
+	respectively.
+
 2006-02-17  Jerry D. Hedden  <jerry@hedden.us>
 
 	* ps.cc (main): Set aflag if -p option is given.

@@ -234,7 +234,7 @@ get_long_name (const char *filename, DWORD& len)
   char *sbuf, buf[MAX_PATH];
   static HINSTANCE k32 = LoadLibrary ("kernel32.dll");
   static DWORD (WINAPI *GetLongPathName) (LPCSTR, LPSTR, DWORD) =
-    (DWORD (WINAPI *) (LPCSTR, LPSTR, DWORD)) GetProcAddress (k32, "GetLongPathName");
+    (DWORD (WINAPI *) (LPCSTR, LPSTR, DWORD)) GetProcAddress (k32, "GetLongPathNameA");
   if (!GetLongPathName)
     GetLongPathName = get_long_path_name_w32impl;
 
@@ -497,8 +497,6 @@ doit (char *filename)
 	conv_func = (absolute_flag ? cygwin_conv_to_full_win32_path :
 		     cygwin_conv_to_win32_path);
       err = conv_func (filename, buf);
-      if (mixed_flag)
-	buf = get_mixed_name (buf);
       if (err)
 	{
 	  fprintf (stderr, "%s: error converting \"%s\" - %s\n",
@@ -511,6 +509,8 @@ doit (char *filename)
 	    buf = get_short_name (buf);
 	  if (longname_flag)
 	    buf = get_long_name (buf, len);
+	  if (mixed_flag)
+	    buf = get_mixed_name (buf);
 	}
     }
 
