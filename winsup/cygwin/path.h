@@ -137,6 +137,7 @@ class path_conv
   int has_acls () const {return fs.has_acls (); }
   int has_symlinks () const {return path_flags & PATH_HAS_SYMLINKS;}
   bool hasgood_inode (); /* Implemented in fhandler_disk_file.cc */
+  bool is_samba ();      /* Implemented in fhandler_disk_file.cc */
   int has_buggy_open () const {return fs.has_buggy_open ();}
   bool isencoded () {return path_flags & PATH_ENC;}
   int binmode () const

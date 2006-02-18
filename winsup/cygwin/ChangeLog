@@ -1,3 +1,12 @@
+2006-02-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (FS_IS_SAMBA): Move out of
+	path_conv::hasgood_inode.
+	(path_conv::is_samba): New method.
+	(fhandler_base::fstat_by_handle): Don't even try to use
+	FileIdBothDirectoryInformation on Samba.
+	* path.h (class path_conv): Declare is_samba method.
+
 2006-02-17  Christopher Faylor  <cgf@timesys.com>
 
 	* path.cc (conv_path_list): Eat empty paths when converting to POSIX.
