@@ -1461,14 +1461,26 @@ fhandler_disk_file::opendir ()
       dir->__flags = (pc.normalized_path[0] == '/' && pc.normalized_path[1] == '\0') ? dirent_isroot : 0;
       if (!pc.isspecial () && wincap.is_winnt ())
         {
-	  dir->__handle = CreateFile (get_win32_name (), GENERIC_READ,
-				      wincap.shared (), NULL, OPEN_EXISTING,
-				      FILE_FLAG_BACKUP_SEMANTICS, NULL);
-	  if (dir->__handle == INVALID_HANDLE_VALUE)
+	  OBJECT_ATTRIBUTES attr;
+	  WCHAR wpath[CYG_MAX_PATH + 10];
+	  UNICODE_STRING upath = {0, sizeof (wpath), wpath};
+	  IO_STATUS_BLOCK io;
+	  NTSTATUS status;
+	  SECURITY_ATTRIBUTES sa = sec_none;
+	  pc.get_nt_native_path (upath);
+	  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+				      NULL, sa.lpSecurityDescriptor);
+
+	  status = NtOpenFile (&dir->__handle,
+			       SYNCHRONIZE | FILE_LIST_DIRECTORY,
+			       &attr, &io, wincap.shared (),
+			       FILE_SYNCHRONOUS_IO_NONALERT | FILE_DIRECTORY_FILE);
+	  if (!NT_SUCCESS (status))
 	    {
-	      __seterrno ();
+	      __seterrno_from_nt_status (status);
 	      goto free_dirent;
 	    }
+
 	  /* FileIdBothDirectoryInformation is apparently unsupported on XP
 	     when accessing directories on UDF.  When trying to use it so,
 	     NtQueryDirectoryFile returns with STATUS_ACCESS_VIOLATION.  It's
@@ -1669,7 +1681,7 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 				       FALSE, NULL, dir->__d_position == 0);
     }
 
-  if (!status)
+  if (NT_SUCCESS (status))
     {
       buf = (PFILE_ID_BOTH_DIR_INFORMATION) (d_cache (dir) + d_cachepos (dir));
       if (buf->NextEntryOffset == 0)
