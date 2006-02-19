@@ -1,3 +1,8 @@
+2006-02-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/ddk/ntifs.h (FILE_ID_FULL_DIRECTORY_INFORMATION): Add filler
+	value to force correct alignment.
+
 2006-02-19  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/commctrl.h (LPNMLVCACHEHINT): Correct spelling.

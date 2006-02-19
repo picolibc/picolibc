@@ -952,6 +952,7 @@ typedef struct _FILE_ID_FULL_DIRECTORY_INFORMATION {
 		ULONG           FileAttributes;
 		ULONG           FileNameLength;
 		ULONG           EaSize;
+		ULONG           __filler;
 		LARGE_INTEGER   FileId;
 		WCHAR           FileName[0];
 } FILE_ID_FULL_DIRECTORY_INFORMATION, *PFILE_ID_FULL_DIRECTORY_INFORMATION;
