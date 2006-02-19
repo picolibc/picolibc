@@ -1409,7 +1409,6 @@ fhandler_disk_file::opendir ()
   DIR *dir;
   DIR *res = NULL;
   size_t len;
-  path_conv rootdir ("/", PC_POSIX);
 
   if (!pc.isdir ())
     set_errno (ENOTDIR);
