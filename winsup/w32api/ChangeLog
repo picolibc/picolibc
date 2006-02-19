@@ -1,3 +1,10 @@
+2006-02-19  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/commctrl.h (LPNMLVCACHEHINT): Correct spelling.
+	Thanks to: Sebastian Pipping <hartwork at users dot sf dot net>
+	(PNM_CACHEHINT): Add backward compatibilty define.
+	(LPNM_CACHEHINT): Likewise.
+
 2006-02-06  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/shlobj.h (PathResolve): Fix typo in _WIN32_WINNT guard.
