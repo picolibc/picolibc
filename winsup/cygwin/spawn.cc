@@ -1058,9 +1058,13 @@ spawnvpe (int mode, const char *file, const char * const *argv,
 int
 av::fixup (const char *prog_arg, path_conv& real_path, const char *ext)
 {
+  const char *p;
   bool exeext = strcasematch (ext, ".exe");
-  if (exeext && real_path.iscygexec () || strcasematch (ext, ".bat")
-      || strcasematch (ext, ".cmd"))
+  if (exeext && real_path.iscygexec () || strcasematch (ext, ".bat"))
+    return 0;
+  if (!*ext && ((p = ext - 4) > (char *) real_path)
+      && (strcasematch (p, ".bat") || strcasematch (p, ".cmd")
+	  || strcasematch (p, ".btm"))
     return 0;
   while (1)
     {

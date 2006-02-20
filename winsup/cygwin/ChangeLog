@@ -1,3 +1,8 @@
+2006-02-20  Christopher Faylor  <cgf@timesys.com>
+
+	* spawn.cc (av::fixup): Check for .bat and friends specifically now
+	since these extensions are no longer automatically detected.
+
 2006-02-19  Christopher Faylor  <cgf@timesys.com>
 
 	* exceptions.cc (stackdump): Avoid dumping more than once.
