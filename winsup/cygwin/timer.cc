@@ -74,7 +74,6 @@ timer_tracker::cancel ()
   SetEvent (hcancel);
   if (WaitForSingleObject (syncthread, INFINITE) != WAIT_OBJECT_0)
     api_fatal ("WFSO failed waiting for timer thread, %E");
-  debug_printf ("cancelled");
   return true;
 }
 
