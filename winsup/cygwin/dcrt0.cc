@@ -124,6 +124,18 @@ extern "C"
 #endif
 };
 
+#ifdef DEBUGGING
+void __stdcall
+envvar ()
+{
+  const char *s = "PATH";
+  char buf[4096];
+  Sleep (500);
+  small_printf ("%d = GetEnvironmentVariable (\"%s\")\n", GetEnvironmentVariable (s, buf, sizeof buf), s);
+  small_printf ("value = '%s'\n", buf);
+}
+#endif
+
 char *old_title;
 char title_buf[TITLESIZE + 1];
 

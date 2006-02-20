@@ -262,12 +262,15 @@ static void
 stackdump (DWORD ebp, int open_file, bool isexception)
 {
   extern unsigned long rlim_core;
+  static bool already_dumped;
 
-  if (rlim_core == 0UL)
+  if (rlim_core == 0UL || (open_file && already_dumped))
     return;
 
   if (open_file)
     open_stackdumpfile ();
+
+  already_dumped = true;
 
   int i;
 

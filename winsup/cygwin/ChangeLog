@@ -1,5 +1,9 @@
 2006-02-19  Christopher Faylor  <cgf@timesys.com>
 
+	* exceptions.cc (stackdump): Avoid dumping more than once.
+
+2006-02-19  Christopher Faylor  <cgf@timesys.com>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Use NtOpenFile
 	to open the directory.
 	(fhandler_disk_file::readdir): Use NT_SUCCESS to determine if status
