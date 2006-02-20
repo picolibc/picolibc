@@ -1,3 +1,10 @@
+2006-02-20  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/fflush.c (fflush): For an fflush on a read-only
+	stream, turn off fseek/rewind optimization as per POSIX/SUSv3.
+	* libc/stdio/fseek.c (_fseek_r): After a successful unoptimized
+	seek, turn off the __SNPT no-optimization flag.
+
 2006-02-16  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/aio.c: Define _GNU_SOURCE so struct aioinit
