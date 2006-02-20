@@ -1064,7 +1064,7 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext)
     return 0;
   if (!*ext && ((p = ext - 4) > (char *) real_path)
       && (strcasematch (p, ".bat") || strcasematch (p, ".cmd")
-	  || strcasematch (p, ".btm"))
+	  || strcasematch (p, ".btm")))
     return 0;
   while (1)
     {
