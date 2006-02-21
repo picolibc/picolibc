@@ -1,3 +1,9 @@
+2006-02-21  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/ddk/ntifs,h (FILE_ID_FULL_DIRECTORY_INFORMATION): Revert
+	last change.
+	Remove file level #pragma pack(push,4)/#pragma pop.
+
 2006-02-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/ddk/ntifs.h (FILE_ID_FULL_DIRECTORY_INFORMATION): Add filler
