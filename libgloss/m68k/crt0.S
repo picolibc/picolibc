@@ -84,7 +84,7 @@ SYM (start):
 	subql	IMM(1), d0
 2:
 	clrb	(a0)+
-#if !defined(__mcoldfire__) && !defined(__mcf5200__)
+#if !defined(__mcoldfire__)
 	dbra	d0, 2b
 	clrw	d0
 	subql	IMM(1), d0

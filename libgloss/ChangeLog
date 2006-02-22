@@ -1,3 +1,13 @@
+2006-02-22  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* m68k/Makefile.in (CF_SCRIPTS): New.
+	(all): Add CF_SCRIPTS.
+	(m5208evb.ld, m5213evb.ld, m5235evb.ld, m5272c3.ld,
+	m5282evb.ld): New targets
+	(install): Iterate over CF_SCRIPTS.
+	* m68k/crt0.S: Don't use dbra on any cf chips.
+	* m68k/dbug-cf.sc: New.
+
 2006-02-07  Paul Brook  <paul@codesourcery.com>
 
 	* arm/crt0.S: Add Thumb-2 startup code.

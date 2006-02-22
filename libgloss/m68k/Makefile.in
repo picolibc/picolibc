@@ -123,6 +123,8 @@ IDPGDB_OBJS=	leds.o idp-inbyte.o idp-gdb-outbyte.o mc68ec.o
 DBUG_BSP=	libdbug.a
 DBUG_OBJS=	dbug-exit.o dbug-inbyte.o dbug-outbyte.o
 
+CF_SCRIPTS=   m5208evb.ld m5213evb.ld m5235evb.ld m5272c3.ld m5282evb.ld
+
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
 
@@ -130,7 +132,7 @@ DBUG_OBJS=	dbug-exit.o dbug-inbyte.o dbug-outbyte.o
 # build a test program for each target board. Just trying to get
 # it to link is a good test, so we ignore all the errors for now.
 #
-all: ${SIM_CRT0} ${SIM_BSP} ${CRT0} ${BCC_BSP} ${IDP_BSP} ${IDPGDB_BSP} ${MVME135_BSP} ${MVME162_BSP} ${DBUG_BSP}
+all: ${SIM_CRT0} ${SIM_BSP} ${CRT0} ${BCC_BSP} ${IDP_BSP} ${IDPGDB_BSP} ${MVME135_BSP} ${MVME162_BSP} ${DBUG_BSP} ${CF_SCRIPTS}
 
 #
 # here's where we build the board support packages for each target
@@ -162,6 +164,21 @@ ${MVME135_BSP}: $(OBJS) ${MVME135_OBJS}
 ${MVME162_BSP}: $(OBJS) ${MVME162_OBJS}
 	${AR} ${ARFLAGS} $@ $(OBJS) ${MVME162_OBJS}
 	${RANLIB} $@
+
+m5208evb.ld: dbug-cf.sc Makefile
+	RAMSTART=1024M RAMSIZE=16M RAMDBUG=128K ${SHELL} $< > $@
+
+m5213evb.ld: dbug-cf.sc Makefile
+	RAMSTART=512M RAMSIZE=32K RAMDBUG=8K ${SHELL} $< > $@
+
+m5235evb.ld: dbug-cf.sc Makefile
+	RAMSTART=0M RAMSIZE=16M RAMDBUG=64K ${SHELL} $< > $@
+
+m5272c3.ld: dbug-cf.sc Makefile
+	RAMSTART=0M RAMSIZE=4M RAMDBUG=128K ${SHELL} $< > $@
+
+m5282evb.ld: dbug-cf.sc Makefile
+	RAMSTART=0M RAMSIZE=16M RAMDBUG=64K ${SHELL} $< > $@
 
 leds.o: ${srcdir}/leds.c
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $<
@@ -283,6 +300,9 @@ install:
 	$(INSTALL_PROGRAM) $(DBUG_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(DBUG_BSP)
 	$(INSTALL_DATA) ${srcdir}/sbc5204.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/sbc5204.ld
 	$(INSTALL_DATA) ${srcdir}/sbc5206.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/sbc5206.ld
+	for script in $(CF_SCRIPTS) ; \
+	do $(INSTALL_DATA) $$script $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$script ; \
+	done
 
 # target specific makefile fragment comes in here.
 @target_makefile_frag@
