@@ -1,5 +1,10 @@
 2006-02-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exceptions.cc (_cygtls::interrupt_now): Reorder conditional
+	to call inside_kernel only if this isn't locked.
+
+2006-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (fhandler_base::open): Add FILE_READ_ATTRIBUTES to
 	access flags in case of query_read_control case, add FILE_READ_DATA
 	in case of query_stat_control.

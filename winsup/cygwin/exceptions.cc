@@ -726,7 +726,7 @@ _cygtls::interrupt_now (CONTEXT *cx, int sig, void *handler,
 {
   bool interrupted;
 
-  if (!inside_kernel (cx) || (incyg || spinning || locked ()))
+  if (incyg || spinning || locked () || !inside_kernel (cx))
     interrupted = false;
   else
     {
