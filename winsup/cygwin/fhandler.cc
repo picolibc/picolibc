@@ -586,11 +586,11 @@ fhandler_base::open (int flags, mode_t mode)
   switch (query_open ())
     {
       case query_read_control:
-	access = READ_CONTROL;
+	access = READ_CONTROL | FILE_READ_ATTRIBUTES;
 	create_options = FILE_OPEN_FOR_BACKUP_INTENT;
 	break;
       case query_stat_control:
-	access = READ_CONTROL | FILE_READ_ATTRIBUTES;
+	access = READ_CONTROL | FILE_READ_ATTRIBUTES | FILE_READ_DATA;
 	create_options = FILE_OPEN_FOR_BACKUP_INTENT;
 	break;
       case query_write_control:

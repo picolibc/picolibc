@@ -1,3 +1,9 @@
+2006-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::open): Add FILE_READ_ATTRIBUTES to
+	access flags in case of query_read_control case, add FILE_READ_DATA
+	in case of query_stat_control.
+
 2006-02-20  Christopher Faylor  <cgf@timesys.com>
 
 	* spawn.cc (av::fixup): Check for .bat and friends specifically now
