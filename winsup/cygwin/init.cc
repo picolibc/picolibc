@@ -142,12 +142,14 @@ respawn_wow64_process ()
 extern void __stdcall dll_crt0_0 ();
 
 HMODULE NO_COPY cygwin_hmodule;
+bool in_dllentry;
 
 extern "C" BOOL WINAPI
 dll_entry (HANDLE h, DWORD reason, void *static_load)
 {
   BOOL wow64_test_stack_marker;
-  // _STRACE_ON;
+
+  in_dllentry = true;
 
   switch (reason)
     {
@@ -182,5 +184,6 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
       break;
     }
 
+  in_dllentry = false;
   return TRUE;
 }

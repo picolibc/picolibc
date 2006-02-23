@@ -354,6 +354,7 @@ extern HANDLE hMainProc;
 extern HANDLE hProcToken;
 extern HANDLE hProcImpToken;
 extern HANDLE hExeced;
+extern HMODULE cygwin_hmodule;
 
 extern bool cygwin_testing;
 

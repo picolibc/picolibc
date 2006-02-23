@@ -111,7 +111,6 @@ RedirectIAT (function_hook& fh, PIMAGE_IMPORT_DESCRIPTOR pImportDesc,
 void
 get_export (function_hook& fh)
 {
-  extern HMODULE cygwin_hmodule;
   PIMAGE_DOS_HEADER pdh = (PIMAGE_DOS_HEADER) cygwin_hmodule;
   if (pdh->e_magic != IMAGE_DOS_SIGNATURE)
     return;

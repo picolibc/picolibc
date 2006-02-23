@@ -1,3 +1,15 @@
+2006-02-23  Christopher Faylor  <cgf@timesys.com>
+
+	* winsup.h (cygwin_hmodule): Declare.
+	* exceptions.cc (inside_kernel): Reverse return values to reflect
+	function name.  Return true if we're in cygwin1.dll or if we're
+	executing in dll_entry.
+	(_cygtls::interrupt_now): Reflect reversal of inside_kernel return
+	value.
+	* hookapi.cc (cygwin_hmodule): Remove declaration.
+	* init.cc (dll_entry): Use in_dllentry global to record that we are
+	executing in dllentry.
+
 2006-02-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* exceptions.cc (_cygtls::interrupt_now): Reorder conditional

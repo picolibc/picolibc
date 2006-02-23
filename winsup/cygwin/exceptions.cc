@@ -293,6 +293,10 @@ inside_kernel (CONTEXT *cx)
 {
   int res;
   MEMORY_BASIC_INFORMATION m;
+  extern bool in_dllentry;
+
+  if (in_dllentry)
+    return true;
 
   memset (&m, 0, sizeof m);
   if (!VirtualQuery ((LPCVOID) cx->Eip, &m, sizeof m))
@@ -305,16 +309,16 @@ inside_kernel (CONTEXT *cx)
   /* Apparently Windows 95 can sometimes return bogus addresses from
      GetThreadContext.  These resolve to a strange allocation base.
      These should *never* be treated as interruptible. */
-  if (!h || m.State != MEM_COMMIT)
-    res = false;
+  if (!h || m.State != MEM_COMMIT || h == cygwin_hmodule)
+    res = true;
   else if (h == user_data->hmodule)
-    res = true;
+    res = false;
   else if (!GetModuleFileName (h, checkdir, windows_system_directory_length + 2))
-    res = true;
+    res = false;
   else
-    res = !strncasematch (windows_system_directory, checkdir,
-			  windows_system_directory_length);
-  sigproc_printf ("pc %p, h %p, interruptible %d", cx->Eip, h, res);
+    res = strncasematch (windows_system_directory, checkdir,
+			 windows_system_directory_length);
+  sigproc_printf ("pc %p, h %p, inside_kernel %d", cx->Eip, h, res);
 # undef h
   return res;
 }
@@ -726,7 +730,7 @@ _cygtls::interrupt_now (CONTEXT *cx, int sig, void *handler,
 {
   bool interrupted;
 
-  if (incyg || spinning || locked () || !inside_kernel (cx))
+  if (incyg || spinning || locked () || inside_kernel (cx))
     interrupted = false;
   else
     {
