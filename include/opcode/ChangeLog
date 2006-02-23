@@ -1,3 +1,7 @@
+2006-02-23  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* ia64.h (ia64_opnd): Add IA64_OPND_IMMU5b.
+
 2006-01-31  Paul Brook  <paul@codesourcery.com>
 	Richard Earnshaw <rearnsha@arm.com>
 

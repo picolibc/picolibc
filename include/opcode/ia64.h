@@ -1,6 +1,7 @@
 /* ia64.h -- Header file for ia64 opcode table
-   Copyright (C) 1998, 1999, 2000, 2002 Free Software Foundation, Inc.
-	Contributed by David Mosberger-Tang <davidm@hpl.hp.com> */
+   Copyright (C) 1998, 1999, 2000, 2002, 2005, 2006
+   Free Software Foundation, Inc.
+   Contributed by David Mosberger-Tang <davidm@hpl.hp.com> */
 
 #ifndef opcode_ia64_h
 #define opcode_ia64_h
@@ -102,6 +103,7 @@ enum ia64_opnd
     IA64_OPND_CPOS6c,	/* 6-bit count (63 - bits 31-36) */
     IA64_OPND_IMM1,	/* signed 1-bit immediate (bit 36) */
     IA64_OPND_IMMU2,	/* unsigned 2-bit immediate (bits 13-14) */
+    IA64_OPND_IMMU5b,	/* unsigned 5-bit immediate (32 + bits 14-18) */
     IA64_OPND_IMMU7a,	/* unsigned 7-bit immediate (bits 13-19) */
     IA64_OPND_IMMU7b,	/* unsigned 7-bit immediate (bits 20-26) */
     IA64_OPND_SOF,	/* 8-bit stack frame size */
