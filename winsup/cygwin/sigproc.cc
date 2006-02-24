@@ -64,6 +64,7 @@ HANDLE NO_COPY sigCONT;			// Used to "STOP" a process
 Static cygthread *hwait_sig;
 Static HANDLE wait_sig_inited;		// Control synchronization of
 					//  message queue startup
+Static bool sigheld;			// True if holding signals
 
 Static int nprocs;			// Number of deceased children
 Static char cprocs[(NPROCS + 1) * sizeof (pinfo)];// All my children info
@@ -440,7 +441,7 @@ sigpending (sigset_t *mask)
 void __stdcall
 sig_dispatch_pending (bool fast)
 {
-  if (exit_state || &_my_tls == _sig_tls || !sigq.start.next)
+  if (exit_state || &_my_tls == _sig_tls)
     {
 #ifdef DEBUGGING
       sigproc_printf ("exit_state %d, cur thread id %p, _sig_tls %p, sigq.start.next %p",
@@ -512,8 +513,22 @@ sigproc_terminate (exit_states es)
 int __stdcall
 sig_send (_pinfo *p, int sig)
 {
-  if (sig == __SIGNOHOLD)
-    SetEvent (sigCONT);
+  if (sig == __SIGHOLD)
+    sigheld = true;
+  else if (!sigheld)
+    /* nothing */;
+  else if (sig != __SIGNOHOLD && sig != __SIGFLUSH && sig != __SIGFLUSHFAST)
+    {
+#ifdef DEBUGGING
+      system_printf ("internal signal sent while signals are on hold");
+#endif
+      return -1;
+    }
+  else
+    {
+      SetEvent (sigCONT);
+      sigheld = false;
+    }
   siginfo_t si = {0};
   si.si_signo = sig;
   si.si_code = SI_KERNEL;

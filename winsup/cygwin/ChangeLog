@@ -1,3 +1,11 @@
+2006-02-24  Christopher Faylor  <cgf@timesys.com>
+
+	* sigproc.cc (sigheld): Define new variable.
+	(sig_dispatch_pending): Don't check sigq since that's racy.
+	(sig_send): Set sigheld flag if __SIGHOLD is specified, reset it if
+	__SIGNOHOLD is specified.  Ignore flush signals if we're holding
+	signals.
+
 2006-02-23  Christopher Faylor  <cgf@timesys.com>
 
 	* cygwin.din (_exit): Use signal front end.
