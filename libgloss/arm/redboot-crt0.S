@@ -33,9 +33,13 @@
 	mov	r7, #0	/* Null frame pointer for Thumb.  */
 
 	/* Enable interrupts for gdb debugging.  */
+#ifdef __thumb2__
+	cpsie if
+#else
 	mrs    r0, cpsr
 	bic    r0, r0, #0xC0
 	msr    cpsr, r0
+#endif
 	
 	mov 	a2, #0			/* Second arg: fill value.  */
 	ldr	a1, .LC1		/* First arg: start of memory block.  */

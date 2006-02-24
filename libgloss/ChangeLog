@@ -1,3 +1,7 @@
+2006-02-24  Paul Brook  <paul@codesourcery.com>
+
+	* arm/redboot-crt0.S: Use cps in Thumb-2 mode.
+
 2006-02-22  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* m68k/Makefile.in (CF_SCRIPTS): New.
