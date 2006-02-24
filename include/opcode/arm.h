@@ -35,6 +35,15 @@
 #define ARM_EXT_V6K      0x00002000     /* ARM V6K.                */
 #define ARM_EXT_V6Z      0x00004000     /* ARM V6Z.                */
 #define ARM_EXT_V6T2	 0x00008000	/* Thumb-2.                */
+#define ARM_EXT_DIV	 0x00010000	/* Integer division.       */
+/* The 'M' in Arm V7M stands for Microcontroller.
+   On earlier architecture variants it stands for Multiply.  */
+#define ARM_EXT_V5E_NOTM 0x00020000	/* Arm V5E but not Arm V7M. */
+#define ARM_EXT_V6_NOTM	 0x00040000	/* Arm V6 but not Arm V7M. */
+#define ARM_EXT_V7	 0x00080000	/* Arm V7.                 */
+#define ARM_EXT_V7A	 0x00100000	/* Arm V7A.                */
+#define ARM_EXT_V7R	 0x00200000	/* Arm V7R.                */
+#define ARM_EXT_V7M	 0x00400000	/* Arm V7M.                */
 
 /* Co-processor space extensions.  */
 #define ARM_CEXT_XSCALE   0x00000001	/* Allow MIA etc.          */
@@ -75,10 +84,18 @@
 #define ARM_AEXT_V6K    (ARM_AEXT_V6    | ARM_EXT_V6K)
 #define ARM_AEXT_V6Z    (ARM_AEXT_V6    | ARM_EXT_V6Z)
 #define ARM_AEXT_V6ZK   (ARM_AEXT_V6    | ARM_EXT_V6K | ARM_EXT_V6Z)
-#define ARM_AEXT_V6T2   (ARM_AEXT_V6    | ARM_EXT_V6T2)
-#define ARM_AEXT_V6KT2  (ARM_AEXT_V6    | ARM_EXT_V6T2 | ARM_EXT_V6K)
-#define ARM_AEXT_V6ZT2  (ARM_AEXT_V6    | ARM_EXT_V6T2 | ARM_EXT_V6Z)
-#define ARM_AEXT_V6ZKT2 (ARM_AEXT_V6    | ARM_EXT_V6T2 | ARM_EXT_V6K | ARM_EXT_V6Z)
+#define ARM_AEXT_V6T2   (ARM_AEXT_V6    | ARM_EXT_V6T2 | ARM_EXT_V6_NOTM)
+#define ARM_AEXT_V6KT2  (ARM_AEXT_V6T2 | ARM_EXT_V6K)
+#define ARM_AEXT_V6ZT2  (ARM_AEXT_V6T2 | ARM_EXT_V6Z)
+#define ARM_AEXT_V6ZKT2 (ARM_AEXT_V6T2 | ARM_EXT_V6K | ARM_EXT_V6Z)
+#define ARM_AEXT_V7_ARM	(ARM_AEXT_V6T2 | ARM_EXT_V7)
+#define ARM_AEXT_V7A	(ARM_AEXT_V7_ARM | ARM_EXT_V7A)
+#define ARM_AEXT_V7R	(ARM_AEXT_V7_ARM | ARM_EXT_V7R | ARM_EXT_DIV)
+#define ARM_AEXT_NOTM \
+  (ARM_AEXT_V4 | ARM_EXT_V5ExP | ARM_EXT_V5J | ARM_EXT_V6_NOTM)
+#define ARM_AEXT_V7M \
+  ((ARM_AEXT_V7_ARM | ARM_EXT_V7M | ARM_EXT_DIV) & ~(ARM_AEXT_NOTM))
+#define ARM_AEXT_V7 (ARM_AEXT_V7A & ARM_AEXT_V7R & ARM_AEXT_V7M)
 
 /* Processors with specific extensions in the co-processor space.  */
 #define ARM_ARCH_XSCALE	ARM_FEATURE (ARM_AEXT_V5TE, ARM_CEXT_XSCALE)
@@ -130,13 +147,17 @@
 #define ARM_ARCH_V6KT2	ARM_FEATURE (ARM_AEXT_V6KT2, 0)
 #define ARM_ARCH_V6ZT2	ARM_FEATURE (ARM_AEXT_V6ZT2, 0)
 #define ARM_ARCH_V6ZKT2	ARM_FEATURE (ARM_AEXT_V6ZKT2, 0)
+#define ARM_ARCH_V7	ARM_FEATURE (ARM_AEXT_V7, 0)
+#define ARM_ARCH_V7A	ARM_FEATURE (ARM_AEXT_V7A, 0)
+#define ARM_ARCH_V7R	ARM_FEATURE (ARM_AEXT_V7R, 0)
+#define ARM_ARCH_V7M	ARM_FEATURE (ARM_AEXT_V7M, 0)
 
 /* Some useful combinations:  */
 #define ARM_ARCH_NONE	ARM_FEATURE (0, 0)
 #define FPU_NONE	ARM_FEATURE (0, 0)
 #define ARM_ANY		ARM_FEATURE (-1, 0)	/* Any basic core.  */
 #define FPU_ANY_HARD	ARM_FEATURE (0, FPU_FPA | FPU_VFP_HARD | FPU_MAVERICK)
-#define ARM_ARCH_THUMB2 ARM_FEATURE (ARM_EXT_V6T2, 0)
+#define ARM_ARCH_THUMB2 ARM_FEATURE (ARM_EXT_V6T2 | ARM_EXT_V7 | ARM_EXT_V7A | ARM_EXT_V7R | ARM_EXT_V7M | ARM_EXT_DIV, 0)
 
 /* There are too many feature bits to fit in a single word, so use a
    structure.  For simplicity we put all core features in one word and

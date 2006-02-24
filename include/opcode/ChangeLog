@@ -1,3 +1,7 @@
+2006-02-24  Paul Brook  <paul@codesourcery.com>
+
+	* arm.h: Add V7 feature bits.
+
 2006-02-23  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* ia64.h (ia64_opnd): Add IA64_OPND_IMMU5b.
