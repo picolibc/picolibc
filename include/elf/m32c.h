@@ -40,6 +40,14 @@ along with this program; if not, write to the Free Software Foundation, Inc.,
     /* Bits 16..31 of an address, for LDE's A1A0 etc. */
      RELOC_NUMBER (R_M32C_HI16, 9)
 
+    /* These are relocs we need when relaxing.  */
+    /* Marks various jump opcodes.  */
+     RELOC_NUMBER (R_M32C_RL_JUMP, 10)
+    /* Marks standard one-address form.  */
+     RELOC_NUMBER (R_M32C_RL_1ADDR, 11)
+    /* Marks standard two-address form.  */
+     RELOC_NUMBER (R_M32C_RL_2ADDR, 12)
+
      END_RELOC_NUMBERS (R_M32C_max)
 
 #define EF_M32C_CPU_M16C	0x00000075      /* default */

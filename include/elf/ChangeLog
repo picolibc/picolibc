@@ -1,3 +1,7 @@
+2006-02-24  DJ Delorie  <dj@redhat.com>
+
+	* m32c.h: Add relax relocs.
+
 2006-02-17  Shrirang Khisti  <shrirangk@kpitcummins.com>
             Anil Paranjape   <anilp1@kpitcummins.com>
             Shilin Shakti    <shilins@kpitcummins.com>
