@@ -46,7 +46,7 @@ __swbuf SIGFE
 _asprintf_r SIGFE
 asprintf_r = _asprintf_r SIGFE
 _dll_crt0@0 NOSIGFE
-_exit NOSIGFE
+_exit SIGFE
 _f_atan2 NOSIGFE
 __f_atan2 = _f_atan2 NOSIGFE
 _f_atan2f NOSIGFE
@@ -451,7 +451,7 @@ execve SIGFE
 _execve = execve SIGFE
 execvp SIGFE
 _execvp = execvp SIGFE
-exit = cygwin_exit NOSIGFE
+exit = cygwin_exit SIGFE
 exp NOSIGFE
 _exp = exp NOSIGFE
 exp2 NOSIGFE

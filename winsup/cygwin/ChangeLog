@@ -1,5 +1,10 @@
 2006-02-23  Christopher Faylor  <cgf@timesys.com>
 
+	* cygwin.din (_exit): Use signal front end.
+	(exit): Ditto.
+
+2006-02-23  Christopher Faylor  <cgf@timesys.com>
+
 	* winsup.h (cygwin_hmodule): Declare.
 	* exceptions.cc (inside_kernel): Reverse return values to reflect
 	function name.  Return true if we're in cygwin1.dll or if we're
