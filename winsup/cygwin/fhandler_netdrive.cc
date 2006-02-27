@@ -143,6 +143,7 @@ fhandler_netdrive::fstat (struct __stat64 *buf)
   fhandler_base::fstat (buf);
 
   buf->st_mode = S_IFDIR | STD_RBITS | STD_XBITS;
+  buf->st_ino = get_namehash ();
 
   return 0;
 }
@@ -205,6 +206,8 @@ fhandler_netdrive::readdir (DIR *dir, dirent *de)
       dir->__d_position++;
       char *bs = strrchr (nro->lpRemoteName, '\\');
       strcpy (de->d_name, bs ? bs + 1 : nro->lpRemoteName);
+      de->d_ino = hash_path_name (get_namehash (), de->d_name);
+
       res = 0;
     }
 out:

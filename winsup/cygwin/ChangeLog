@@ -1,3 +1,9 @@
+2006-02-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_netdrive.cc (fhandler_netdrive::fstat): Create unambiguous
+	inode number.
+	(fhandler_netdrive::readdir): Ditto.
+
 2006-02-24  Christopher Faylor  <cgf@timesys.com>
 
 	* sigproc.cc (sigheld): Define new variable.
