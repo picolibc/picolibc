@@ -22,10 +22,9 @@ src = 	k_standard.c k_rem_pio2.c \
 	w_cabs.c w_drem.c \
 	s_asinh.c s_atan.c s_ceil.c \
 	s_cos.c s_erf.c s_fabs.c s_floor.c \
-	s_frexp.c s_isnan.c s_ldexp.c \
+	s_frexp.c s_ldexp.c \
 	s_signif.c s_sin.c \
 	s_tan.c s_tanh.c \
-	s_isinf.c \
 	w_exp2.c w_tgamma.c
 
 fsrc =	kf_rem_pio2.c \
@@ -46,10 +45,9 @@ fsrc =	kf_rem_pio2.c \
 	wf_cabs.c wf_drem.c \
 	sf_asinh.c sf_atan.c sf_ceil.c \
 	sf_cos.c sf_erf.c sf_fabs.c sf_floor.c \
-	sf_frexp.c sf_isnan.c sf_ldexp.c \
+	sf_frexp.c sf_ldexp.c \
 	sf_signif.c sf_sin.c \
 	sf_tan.c sf_tanh.c \
-	sf_isinf.c \
 	wf_exp2.c wf_tgamma.c
 
 libmath_la_LDFLAGS = -Xcompiler -nostdlib
@@ -73,8 +71,7 @@ chobj =	wacos.def wacosh.def wasin.def sasinh.def \
 	wgamma.def whypot.def sldexp.def wlog.def \
 	wlog10.def \
 	wpow.def wremainder.def ssin.def wsinh.def \
-	wsqrt.def stan.def stanh.def \
-	sisnan.def
+	wsqrt.def stan.def stanh.def
 
 SUFFIXES = .def
 
@@ -177,9 +174,6 @@ stan.def: s_tan.c
 	touch stmp-def
 stanh.def: s_tanh.c
 	$(CHEW) < $(srcdir)/s_tanh.c >$@ 2>/dev/null
-	touch stmp-def
-sisnan.def: s_isnan.c
-	$(CHEW) < $(srcdir)/s_isnan.c >$@ 2>/dev/null
 	touch stmp-def
 
 # A partial dependency list.

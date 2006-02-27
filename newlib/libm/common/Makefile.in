@@ -98,10 +98,10 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-src = s_finite.c s_copysign.c s_modf.c s_scalbn.c 	s_cbrt.c s_expm1.c s_ilogb.c s_infconst.c 	s_infinity.c s_log1p.c s_nan.c s_nextafter.c 	s_rint.c s_logb.c s_matherr.c s_lib_ver.c 	s_fdim.c s_fma.c s_fmax.c s_fmin.c s_fpclassify.c s_lrint.c 	s_lround.c s_nearbyint.c s_remquo.c s_round.c s_scalbln.c 	s_signbit.c s_trunc.c
+src = s_finite.c s_copysign.c s_modf.c s_scalbn.c 	s_cbrt.c s_expm1.c s_ilogb.c s_infconst.c 	s_infinity.c s_isinf.c s_isinfd.c s_isnan.c s_isnand.c 	s_log1p.c s_nan.c s_nextafter.c 	s_rint.c s_logb.c s_matherr.c s_lib_ver.c 	s_fdim.c s_fma.c s_fmax.c s_fmin.c s_fpclassify.c s_lrint.c 	s_lround.c s_nearbyint.c s_remquo.c s_round.c s_scalbln.c 	s_signbit.c s_trunc.c
 
 
-fsrc = sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c 	sf_cbrt.c sf_expm1.c sf_ilogb.c 	sf_infinity.c sf_log1p.c sf_nan.c sf_nextafter.c 	sf_rint.c sf_logb.c 	sf_fdim.c sf_fma.c sf_fmax.c sf_fmin.c sf_lrint.c 	sf_lround.c sf_nearbyint.c sf_remquo.c sf_round.c 	sf_scalbln.c sf_trunc.c
+fsrc = sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c 	sf_cbrt.c sf_expm1.c sf_ilogb.c 	sf_infinity.c sf_isinf.c sf_isinff.c sf_isnan.c sf_isnanf.c 	sf_log1p.c sf_nan.c sf_nextafter.c 	sf_rint.c sf_logb.c 	sf_fdim.c sf_fma.c sf_fmax.c sf_fmin.c sf_lrint.c 	sf_lround.c sf_nearbyint.c sf_remquo.c sf_round.c 	sf_scalbln.c sf_trunc.c
 
 
 libcommon_la_LDFLAGS = -Xcompiler -nostdlib
@@ -113,7 +113,7 @@ libcommon_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
 @USE_LIBTOOL_FALSE@lib_a_SOURCES = $(src) $(fsrc)
 
-chobj = scbrt.def scopysign.def sexpm1.def silogb.def 	sinfinity.def slog1p.def smatherr.def smodf.def 	snan.def snextafter.def sscalbn.def
+chobj = scbrt.def scopysign.def sexpm1.def silogb.def 	sinfinity.def sisnan.def slog1p.def smatherr.def smodf.def 	snan.def snextafter.def sscalbn.def
 
 
 SUFFIXES = .def
@@ -137,6 +137,8 @@ lib_a_LIBADD =
 @USE_LIBTOOL_FALSE@s_scalbn.$(OBJEXT) s_cbrt.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@s_expm1.$(OBJEXT) s_ilogb.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@s_infconst.$(OBJEXT) s_infinity.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_isinf.$(OBJEXT) s_isinfd.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_isnan.$(OBJEXT) s_isnand.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@s_log1p.$(OBJEXT) s_nan.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@s_nextafter.$(OBJEXT) s_rint.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@s_logb.$(OBJEXT) s_matherr.$(OBJEXT) \
@@ -150,7 +152,9 @@ lib_a_LIBADD =
 @USE_LIBTOOL_FALSE@sf_copysign.$(OBJEXT) sf_modf.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@sf_scalbn.$(OBJEXT) sf_cbrt.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@sf_expm1.$(OBJEXT) sf_ilogb.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sf_infinity.$(OBJEXT) sf_log1p.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_infinity.$(OBJEXT) sf_isinf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_isinff.$(OBJEXT) sf_isnan.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_isnanf.$(OBJEXT) sf_log1p.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@sf_nan.$(OBJEXT) sf_nextafter.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@sf_rint.$(OBJEXT) sf_logb.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@sf_fdim.$(OBJEXT) sf_fma.$(OBJEXT) sf_fmax.$(OBJEXT) \
@@ -163,14 +167,16 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 libcommon_la_LIBADD = 
 @USE_LIBTOOL_TRUE@libcommon_la_OBJECTS =  s_finite.lo s_copysign.lo \
 @USE_LIBTOOL_TRUE@s_modf.lo s_scalbn.lo s_cbrt.lo s_expm1.lo s_ilogb.lo \
-@USE_LIBTOOL_TRUE@s_infconst.lo s_infinity.lo s_log1p.lo s_nan.lo \
+@USE_LIBTOOL_TRUE@s_infconst.lo s_infinity.lo s_isinf.lo s_isinfd.lo \
+@USE_LIBTOOL_TRUE@s_isnan.lo s_isnand.lo s_log1p.lo s_nan.lo \
 @USE_LIBTOOL_TRUE@s_nextafter.lo s_rint.lo s_logb.lo s_matherr.lo \
 @USE_LIBTOOL_TRUE@s_lib_ver.lo s_fdim.lo s_fma.lo s_fmax.lo s_fmin.lo \
 @USE_LIBTOOL_TRUE@s_fpclassify.lo s_lrint.lo s_lround.lo s_nearbyint.lo \
 @USE_LIBTOOL_TRUE@s_remquo.lo s_round.lo s_scalbln.lo s_signbit.lo \
 @USE_LIBTOOL_TRUE@s_trunc.lo sf_finite.lo sf_copysign.lo sf_modf.lo \
 @USE_LIBTOOL_TRUE@sf_scalbn.lo sf_cbrt.lo sf_expm1.lo sf_ilogb.lo \
-@USE_LIBTOOL_TRUE@sf_infinity.lo sf_log1p.lo sf_nan.lo sf_nextafter.lo \
+@USE_LIBTOOL_TRUE@sf_infinity.lo sf_isinf.lo sf_isinff.lo sf_isnan.lo \
+@USE_LIBTOOL_TRUE@sf_isnanf.lo sf_log1p.lo sf_nan.lo sf_nextafter.lo \
 @USE_LIBTOOL_TRUE@sf_rint.lo sf_logb.lo sf_fdim.lo sf_fma.lo sf_fmax.lo \
 @USE_LIBTOOL_TRUE@sf_fmin.lo sf_lrint.lo sf_lround.lo sf_nearbyint.lo \
 @USE_LIBTOOL_TRUE@sf_remquo.lo sf_round.lo sf_scalbln.lo sf_trunc.lo
@@ -448,6 +454,10 @@ silogb.def: s_ilogb.c
 
 sinfinity.def: s_infinity.c
 	$(CHEW) < $(srcdir)/s_infinity.c >$@ 2>/dev/null
+	touch stmp-def
+
+sisnan.def: s_isnan.c
+	$(CHEW) < $(srcdir)/s_isnan.c >$@ 2>/dev/null
 	touch stmp-def
 
 slog1p.def: s_log1p.c

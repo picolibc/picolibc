@@ -1,5 +1,3 @@
-
-/* @(#)s_isnan.c 5.1 93/09/24 */
 /*
  * ====================================================
  * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
@@ -76,6 +74,11 @@ DESCRIPTION
 	<<isnan>> returns 1 if the argument is a nan. <<isinf>>
 	returns 1 if the argument is infinity.  <<finite>> returns 1 if the
 	argument is zero, subnormal or normal.
+
+	Note that by the C99 standard, <<isnan>> and <<isinf>> are macros
+	taking any type of floating-point and are declared in
+	<<math.h>>.  Newlib has chosen to declare these as macros in
+	<<math.h>> and as functions in <<ieeefp.h>>.
 	
 	The <<isnanf>>, <<isinff>> and <<finitef>> functions perform the same
 	operations as their <<isnan>>, <<isinf>> and <<finite>>
@@ -96,7 +99,7 @@ QUICKREF
 */
 
 /*
- * isnan(x) returns 1 is x is nan, else 0;
+ * __isnand(x) returns 1 is x is nan, else 0;
  * no branching!
  */
 
@@ -104,12 +107,9 @@ QUICKREF
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
-	int isnan(double x)
-#else
-	int isnan(x)
-	double x;
-#endif
+int
+_DEFUN (__isnand, (x),
+	double x)
 {
 	__int32_t hx,lx;
 	EXTRACT_WORDS(hx,lx,x);

@@ -1,7 +1,3 @@
-/* sf_isnan.c -- float version of s_isnan.c.
- * Conversion to float by Ian Lance Taylor, Cygnus Support, ian@cygnus.com.
- */
-
 /*
  * ====================================================
  * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
@@ -14,17 +10,14 @@
  */
 
 /*
- * isnanf(x) returns 1 is x is nan, else 0;
+ * __isnanf(x) returns 1 is x is nan, else 0;
  */
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
-	int isnanf(float x)
-#else
-	int isnanf(x)
-	float x;
-#endif
+int
+_DEFUN (__isnanf, (x),
+	float x)
 {
 	__int32_t ix;
 	GET_FLOAT_WORD(ix,x);
@@ -34,14 +27,11 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
-	int isnan(double x)
-#else
-	int isnan(x)
-	double x;
-#endif
+int
+_DEFUN (__isnand, (x),
+	double x)
 {
-	return isnanf((float) x);
+	return __isnanf((float) x);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

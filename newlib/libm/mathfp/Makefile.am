@@ -16,7 +16,7 @@ src =	s_acos.c s_frexp.c s_mathcnst.c \
 	s_sincos.c \
 	s_atangent.c s_logarithm.c \
 	s_sineh.c \
-	s_ceil.c s_isnan.c s_isinf.c \
+	s_ceil.c \
 	e_acosh.c e_atanh.c e_remainder.c \
 	er_gamma.c er_lgamma.c \
 	s_erf.c e_j0.c e_j1.c w_jn.c e_hypot.c \
@@ -36,7 +36,6 @@ fsrc =	sf_ceil.c \
 	sf_sincos.c \
 	sf_atangent.c sf_logarithm.c sf_sineh.c \
 	sf_log.c sf_sineh.c \
-	sf_isnan.c sf_isinf.c \
 	ef_acosh.c ef_atanh.c ef_remainder.c \
 	erf_gamma.c erf_lgamma.c \
 	sf_erf.c ef_j0.c ef_j1.c wf_jn.c ef_hypot.c \
@@ -76,7 +75,6 @@ chobj = eacosh.def \
 	sfloor.def \
 	sfmod.def \
 	sfrexp.def \
-	sisnan.def \
 	sldexp.def \
 	slog10.def \
 	slogarithm.def \
@@ -159,9 +157,6 @@ sfmod.def: s_fmod.c
 	touch stmp-def
 sfrexp.def: s_frexp.c
 	$(CHEW) < $(srcdir)/s_frexp.c >$@ 2>/dev/null
-	touch stmp-def
-sisnan.def: s_isnan.c
-	$(CHEW) < $(srcdir)/s_isnan.c >$@ 2>/dev/null
 	touch stmp-def
 sldexp.def: s_ldexp.c
 	$(CHEW) < $(srcdir)/s_ldexp.c >$@ 2>/dev/null

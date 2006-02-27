@@ -1,3 +1,37 @@
+2006-02-27  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* Makefile.am (MATHOBJS_IN_LIBC): Add s_isinfd, sf_isinff, 
+	s_isnand, and sf_isnanf object files.
+	* Makefile.in: Regenerated.
+	* libc/include/ieeefp.h: Undef isnan and isinf to avoid
+	conflict if <math.h> has previously been included.
+	* libc/include/math.h
+	* libm/common/Makefile.am: Add new s_isinfd, s_isnand, sf_isinff,
+	and sf_isnanf files.  Also support s_isnan, sf_isnan, s_isinf, and
+	sf_isinf files which have been moved from math/mathfp directories. 
+	* libm/common/Makefile.in: Regenerated.
+	* libm/common/s_isinfd.c: New file.
+	* libm/common/s_isnand.c: Ditto.
+	* libm/common/sf_isinff.c: Ditto.
+	* libm/common/sf_isnanf.c: Ditto.
+	* libm/common/s_isinf.c: Moved from libm/math directory.
+	* libm/common/s_isnan.c: Ditto.
+	* libm/common/sf_isinf.c: Ditto.
+	* libm/common/sf_isnan.c: Ditto.
+	* libm/math/Makefile.am: Remove isinf and isnan family functions
+	which have been moved into common directory.
+	* libm/mathfp/Makefile.am: Ditto.
+	* libm/math/Makefile.in: Regenerated.
+	* libm/mathfp/Makefile.in: Ditto.
+	* libm/math/s_isinf.c: Removed.
+	* libm/math/s_isnan.c: Ditto.
+	* libm/math/sf_isinf.c: Ditto.
+	* libm/math/sf_isnan.c: Ditto.
+	* libm/mathfp/s_isinf.c: Ditto.
+	* libm/mathfp/s_isnan.c: Ditto.
+	* libm/mathfp/sf_isinf.c: Ditto.
+	* libm/mathfp/sf_isnan.c: Ditto.
+
 2006-02-20  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/fflush.c (fflush): For an fflush on a read-only
