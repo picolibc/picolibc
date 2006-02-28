@@ -6,6 +6,9 @@
 	* libc/include/ieeefp.h: Undef isnan and isinf to avoid
 	conflict if <math.h> has previously been included.
 	* libc/include/math.h
+	* libc/include/math.h: Make isnan and isinf macros to
+	conform to C99.
+	(__isinfd, __isinff, __isnand, __isnanf): New functions.
 	* libm/common/Makefile.am: Add new s_isinfd, s_isnand, sf_isinff,
 	and sf_isnanf files.  Also support s_isnan, sf_isnan, s_isinf, and
 	sf_isinf files which have been moved from math/mathfp directories. 
