@@ -206,7 +206,10 @@ fhandler_netdrive::readdir (DIR *dir, dirent *de)
       dir->__d_position++;
       char *bs = strrchr (nro->lpRemoteName, '\\');
       strcpy (de->d_name, bs ? bs + 1 : nro->lpRemoteName);
-      de->d_ino = hash_path_name (get_namehash (), de->d_name);
+      if (strlen (get_name ()) == 2)
+	de->d_ino = hash_path_name (get_namehash (), de->d_name);
+      else
+        de->d_ino = readdir_get_ino (dir, nro->lpRemoteName, false);
 
       res = 0;
     }

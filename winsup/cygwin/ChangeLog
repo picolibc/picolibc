@@ -1,3 +1,10 @@
+2006-02-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dir.cc (readdir_worker): Use slash as path separator when evaluating
+	namehash for paths below /proc.
+	* fhandler_netdrive.cc (fhandler_netdrive::readdir): Use expensive
+	inode number evaluation on share names.
+
 2006-02-27  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Only set
