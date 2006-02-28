@@ -373,11 +373,10 @@ _cygtls::remove_wq (DWORD wait)
 }
 
 /* Terminate the wait_subproc thread.
- * Called on process exit.
- * Also called by spawn_guts to disassociate any subprocesses from this
- * process.  Subprocesses will then know to clean up after themselves and
- * will not become procs.
- */
+   Called on process exit.
+   Also called by spawn_guts to disassociate any subprocesses from this
+   process.  Subprocesses will then know to clean up after themselves and
+   will not become procs.  */
 void __stdcall
 proc_terminate ()
 {
