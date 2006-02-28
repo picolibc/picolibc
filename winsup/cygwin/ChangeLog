@@ -1,5 +1,11 @@
 2006-02-27  Christopher Faylor  <cgf@timesys.com>
 
+	* include/sys/termios.h (cfsetispeed): Just define as a function rather
+	than resorting to a macro.
+	(cfsetospeed): Ditto.
+
+2006-02-27  Christopher Faylor  <cgf@timesys.com>
+
 	* sigproc.cc: Fix a comment.
 
 2006-02-27  Christopher Faylor  <cgf@timesys.com>

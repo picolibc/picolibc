@@ -1,6 +1,6 @@
 /* sys/termios.h
 
-   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005 Red Hat, Inc.
+   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -234,26 +234,28 @@ typedef unsigned int  speed_t;
 typedef unsigned short otcflag_t;
 typedef unsigned char ospeed_t;
 
-struct __oldtermios {
-	otcflag_t	c_iflag;
-	otcflag_t	c_oflag;
-	otcflag_t	c_cflag;
-	otcflag_t	c_lflag;
-	char		c_line;
-	cc_t		c_cc[NCCS];
-	ospeed_t	c_ispeed;
-	ospeed_t	c_ospeed;
+struct __oldtermios
+{
+  otcflag_t	c_iflag;
+  otcflag_t	c_oflag;
+  otcflag_t	c_cflag;
+  otcflag_t	c_lflag;
+  char		c_line;
+  cc_t		c_cc[NCCS];
+  ospeed_t	c_ispeed;
+  ospeed_t	c_ospeed;
 };
 
-struct termios {
-	tcflag_t	c_iflag;
-	tcflag_t	c_oflag;
-	tcflag_t	c_cflag;
-	tcflag_t	c_lflag;
-	char		c_line;
-	cc_t		c_cc[NCCS];
-	speed_t		c_ispeed;
-	speed_t		c_ospeed;
+struct termios
+{
+  tcflag_t	c_iflag;
+  tcflag_t	c_oflag;
+  tcflag_t	c_cflag;
+  tcflag_t	c_lflag;
+  char		c_line;
+  cc_t		c_cc[NCCS];
+  speed_t	c_ispeed;
+  speed_t	c_ospeed;
 };
 
 #ifdef CYGWIN_VERSION_DLL_IS_OLD_TERMIOS
@@ -307,8 +309,6 @@ struct termios {
 
 #define cfgetospeed(tp)		((tp)->c_ospeed)
 #define cfgetispeed(tp)		((tp)->c_ispeed)
-#define cfsetospeed(tp,s)	(((tp)->c_ospeed = (s)), 0)
-#define cfsetispeed(tp,s)	(((tp)->c_ispeed = (s)), 0)
 
 #ifdef __cplusplus
 extern "C" {
@@ -320,6 +320,8 @@ int tcsendbreak (int, int);
 int tcdrain (int);
 int tcflush (int, int);
 int tcflow (int, int);
+int cfsetispeed (struct termios *, speed_t); 
+int cfsetospeed (struct termios *, speed_t); 
 
 #ifdef __cplusplus
 }
