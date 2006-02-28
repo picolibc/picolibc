@@ -275,6 +275,7 @@ cygthread::release (bool nuke_h)
 #endif
   __name = NULL;
   func = NULL;
+  /* Must be last */
   if (!InterlockedExchange (&inuse, 0))
 #ifdef DEBUGGING
     api_fatal ("released a thread that was not inuse");
