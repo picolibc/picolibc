@@ -1429,7 +1429,7 @@ fhandler_disk_file::opendir ()
       set_errno (ENOMEM);
       goto free_dirname;
     }
-  else if (!pc.isspecial () && fhaccess (R_OK) != 0)
+  else if (!pc.iscygdrive () && fhaccess (R_OK) != 0)
     goto free_dirent;
   else
     {
@@ -1461,7 +1461,7 @@ fhandler_disk_file::opendir ()
       if (wincap.is_winnt ())
 	{
 	  d_cachepos (dir) = 0;
-	  if (!pc.isspecial ())
+	  if (!pc.iscygdrive ())
 	    {
 	      OBJECT_ATTRIBUTES attr;
 	      WCHAR wpath[CYG_MAX_PATH + 10];

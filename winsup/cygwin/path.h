@@ -153,6 +153,7 @@ class path_conv
   int isdevice () const {return dev.devn && dev.devn != FH_FS && dev.devn != FH_FIFO;}
   int isfifo () const {return dev == FH_FIFO;}
   int isspecial () const {return dev.devn && dev.devn != FH_FS;}
+  int iscygdrive () const {return dev.devn == FH_CYGDRIVE;}
   int is_auto_device () const {return isdevice () && !is_fs_special ();}
   int is_fs_device () const {return isdevice () && is_fs_special ();}
   int is_fs_special () const {return dev.is_fs_special ();}

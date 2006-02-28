@@ -1,3 +1,9 @@
+2006-02-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Use iscygdrive
+	instead of isspecial.
+	* path.h (path_conv::iscygdrive): New method.
+
 2006-02-28  Christopher Faylor  <cgf@timesys.com>
 
 	* exceptions.cc (_cygtls::interrupt_now): Remove "inside cygwin" check
