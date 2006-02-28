@@ -1,5 +1,14 @@
 2006-02-27  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Only set
+	d_cachepos under NT or suffer memory corruption.
+	(fhandler_disk_file::readdir_helper): Avoid else with a return.  Just
+	calculate extension location once when doing symlink checks.
+	(fhandler_disk_file::readdir): Make debug output more useful.
+	(fhandler_disk_file::readdir_9x): Ditto.  Eliminate redundant variable.
+
+2006-02-27  Christopher Faylor  <cgf@timesys.com>
+
 	* include/sys/termios.h (cfsetispeed): Just define as a function rather
 	than resorting to a macro.
 	(cfsetospeed): Ditto.

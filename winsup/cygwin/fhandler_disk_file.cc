@@ -1434,7 +1434,6 @@ fhandler_disk_file::opendir ()
   else
     {
       strcpy (d_dirname (dir), get_win32_name ());
-      d_cachepos (dir) = 0;
       dir->__d_dirent->__d_version = __DIRENT_VERSION;
       cygheap_fdnew fd;
 
@@ -1459,41 +1458,45 @@ fhandler_disk_file::opendir ()
       dir->__d_position = 0;
 
       dir->__flags = (pc.normalized_path[0] == '/' && pc.normalized_path[1] == '\0') ? dirent_isroot : 0;
-      if (!pc.isspecial () && wincap.is_winnt ())
-        {
-	  OBJECT_ATTRIBUTES attr;
-	  WCHAR wpath[CYG_MAX_PATH + 10];
-	  UNICODE_STRING upath = {0, sizeof (wpath), wpath};
-	  IO_STATUS_BLOCK io;
-	  NTSTATUS status;
-	  SECURITY_ATTRIBUTES sa = sec_none;
-	  pc.get_nt_native_path (upath);
-	  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
-				      NULL, sa.lpSecurityDescriptor);
-
-	  status = NtOpenFile (&dir->__handle,
-			       SYNCHRONIZE | FILE_LIST_DIRECTORY,
-			       &attr, &io, wincap.shared (),
-			       FILE_SYNCHRONOUS_IO_NONALERT | FILE_DIRECTORY_FILE);
-	  if (!NT_SUCCESS (status))
+      if (wincap.is_winnt ())
+	{
+	  d_cachepos (dir) = 0;
+	  if (!pc.isspecial ())
 	    {
-	      __seterrno_from_nt_status (status);
-	      goto free_dirent;
-	    }
+	      OBJECT_ATTRIBUTES attr;
+	      WCHAR wpath[CYG_MAX_PATH + 10];
+	      UNICODE_STRING upath = {0, sizeof (wpath), wpath};
+	      IO_STATUS_BLOCK io;
+	      NTSTATUS status;
+	      SECURITY_ATTRIBUTES sa = sec_none;
+	      pc.get_nt_native_path (upath);
+	      InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+					  NULL, sa.lpSecurityDescriptor);
 
-	  /* FileIdBothDirectoryInformation is apparently unsupported on XP
-	     when accessing directories on UDF.  When trying to use it so,
-	     NtQueryDirectoryFile returns with STATUS_ACCESS_VIOLATION.  It's
-	     not clear if the call isn't also unsupported on other OS/FS
-	     combinations (say, Win2K/CDFS or so).  Instead of testing in
-	     readdir for yet another error code, let's use
-	     FileIdBothDirectoryInformation only on filesystems supporting
-	     persistent ACLs, FileBothDirectoryInformation otherwise. */
-	  if (pc.hasgood_inode ())
-	    {
-	      dir->__flags |= dirent_set_d_ino;
-	      if (wincap.has_fileid_dirinfo () && !pc.is_samba ())
-		dir->__flags |= dirent_get_d_ino;
+	      status = NtOpenFile (&dir->__handle,
+				   SYNCHRONIZE | FILE_LIST_DIRECTORY,
+				   &attr, &io, wincap.shared (),
+				   FILE_SYNCHRONOUS_IO_NONALERT | FILE_DIRECTORY_FILE);
+	      if (!NT_SUCCESS (status))
+		{
+		  __seterrno_from_nt_status (status);
+		  goto free_dirent;
+		}
+
+	      /* FileIdBothDirectoryInformation is apparently unsupported on XP
+		 when accessing directories on UDF.  When trying to use it so,
+		 NtQueryDirectoryFile returns with STATUS_ACCESS_VIOLATION.  It's
+		 not clear if the call isn't also unsupported on other OS/FS
+		 combinations (say, Win2K/CDFS or so).  Instead of testing in
+		 readdir for yet another error code, let's use
+		 FileIdBothDirectoryInformation only on filesystems supporting
+		 persistent ACLs, FileBothDirectoryInformation otherwise. */
+	      if (pc.hasgood_inode ())
+		{
+		  dir->__flags |= dirent_set_d_ino;
+		  if (wincap.has_fileid_dirinfo () && !pc.is_samba ())
+		    dir->__flags |= dirent_get_d_ino;
+		}
 	    }
 	}
       res = dir;
@@ -1538,13 +1541,11 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
 	  added = true;
 	}
 
-      if (added)
-	{
-	  attr = 0;
-	  dir->__flags &= ~dirent_set_d_ino;
-        }
-      else
+      if (!added)
 	return geterrno_from_win_error (w32_err);
+
+      attr = 0;
+      dir->__flags &= ~dirent_set_d_ino;
     }
 
   /* Check for Windows shortcut. If it's a Cygwin or U/WIN
@@ -1552,15 +1553,15 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
   if (attr & FILE_ATTRIBUTE_READONLY)
     {
       char *c = fname;
-      int len = strlen (c);
-      if (strcasematch (c + len - 4, ".lnk"))
+      char *e = strchr (fname, '\0') - 4;
+      if (e > c && strcasematch (e, ".lnk"))
 	{
 	  char fbuf[CYG_MAX_PATH];
 	  strcpy (fbuf, d_dirname (dir));
 	  strcat (fbuf, c);
 	  path_conv fpath (fbuf, PC_SYM_NOFOLLOW);
 	  if (fpath.issymlink () || fpath.is_fs_special ())
-	    c[len - 4] = '\0';
+	    *e = '\0';
 	}
     }
 
@@ -1745,7 +1746,7 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
       res = 0;
     }
 
-  syscall_printf ("%d = readdir (%p) (%s)", dir, &de, de->d_name);
+  syscall_printf ("%d = readdir (%p, %p) (%s)", res, dir, &de, res ? "***" : de->d_name);
   return res;
 }
 
@@ -1754,32 +1755,37 @@ fhandler_disk_file::readdir_9x (DIR *dir, dirent *de)
 {
   WIN32_FIND_DATA buf;
   int res = 0;
-  BOOL ret = TRUE;
 
   if (!dir->__handle)
     {
       res = ENMFILE;
       goto out;
     }
-
-  if (dir->__handle == INVALID_HANDLE_VALUE && dir->__d_position == 0)
+  DWORD lasterr;
+  if (dir->__d_position != 0)
+    lasterr = FindNextFileA (dir->__handle, &buf) ? 0 : GetLastError ();
+  else if (dir->__handle != INVALID_HANDLE_VALUE)
+    {
+      res = EBADF;
+      goto out;
+    }
+  else
     {
       int len = strlen (dir->__d_dirname);
       strcpy (dir->__d_dirname + len, "*");
       dir->__handle = FindFirstFile (dir->__d_dirname, &buf);
       dir->__d_dirname[len] = '\0';
-      DWORD lasterr = GetLastError ();
-      if (dir->__handle == INVALID_HANDLE_VALUE && (lasterr != ERROR_NO_MORE_FILES))
+      if (dir->__handle != INVALID_HANDLE_VALUE)
+	lasterr = 0;
+      else if ((lasterr = GetLastError ()) != ERROR_NO_MORE_FILES)
 	{
-	  res = geterrno_from_win_error ();
+	  res = geterrno_from_win_error (lasterr);
 	  goto out;
 	}
     }
-  else
-    ret = FindNextFileA (dir->__handle, &buf);
   
-  if (!(res = readdir_helper (dir, de, ret ? 0 : GetLastError (),
-			      buf.dwFileAttributes, buf.cFileName)))
+  if (!(res = readdir_helper (dir, de, lasterr, buf.dwFileAttributes,
+			      buf.cFileName)))
     dir->__d_position++;
   else
     {
@@ -1788,7 +1794,7 @@ fhandler_disk_file::readdir_9x (DIR *dir, dirent *de)
     }
 
 out:
-  syscall_printf ("%d = readdir (%p) (%s)", dir, &de, de->d_name);
+  syscall_printf ("%d = readdir (%p, %p) (%s)", res, dir, &de, res ? "***" : de->d_name);
   return res;
 }
 
