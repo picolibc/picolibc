@@ -309,7 +309,7 @@ inside_kernel (CONTEXT *cx)
   /* Apparently Windows 95 can sometimes return bogus addresses from
      GetThreadContext.  These resolve to a strange allocation base.
      These should *never* be treated as interruptible. */
-  if (!h || m.State != MEM_COMMIT || h == cygwin_hmodule)
+  if (!h || m.State != MEM_COMMIT)
     res = true;
   else if (h == user_data->hmodule)
     res = false;
