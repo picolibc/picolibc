@@ -1,5 +1,10 @@
 2006-02-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin.din: Export __isinff, __isinfd, __isnanf, __isnand.
+	* include/cygwin/version.h: Bump API minor number to 155.
+
+2006-02-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dir.cc (readdir_worker): Use slash as path separator when evaluating
 	namehash for paths below /proc.
 	* fhandler_netdrive.cc (fhandler_netdrive::readdir): Use expensive

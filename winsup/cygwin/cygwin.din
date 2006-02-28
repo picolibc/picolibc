@@ -37,6 +37,10 @@ __fpclassifyd NOSIGFE
 __fpclassifyf NOSIGFE
 __getreent NOSIGFE
 __infinity NOSIGFE
+__isinff NOSIGFE
+__isinfd NOSIGFE
+__isnanf NOSIGFE
+__isnand NOSIGFE
 __main NOSIGFE
 __signbitd NOSIGFE
 __signbitf NOSIGFE
