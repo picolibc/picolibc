@@ -169,7 +169,7 @@ fhandler_proc::fstat (struct __stat64 *buf)
 
   if (!*path)
     {
-      buf->st_nlink = PROC_LINK_COUNT;
+      buf->st_nlink = 1;
       buf->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
       return 0;
     }

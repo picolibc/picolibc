@@ -1,5 +1,10 @@
 2006-03-01  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_proc.cc (fhandler_proc::fstat): Always return fixed link
+	count of 1 for /proc directory instead of incorrect PROC_LINK_COUNT.
+
+2006-03-01  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (enum dirent_states): Remove dirent_saw_cygdrive,
 	dirent_saw_dev and dirent_saw_proc.
 	(fhandler_cygdrive::open): Declare.
