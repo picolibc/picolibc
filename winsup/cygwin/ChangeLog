@@ -1,5 +1,13 @@
 2006-03-01  Christopher Faylor  <cgf@timesys.com>
 
+	* analyze_sigfe: New script.
+	* dllfixdbg: Add copyright.
+	* gendef: Ditto.
+	* gendevices: Ditto.
+	* gentls_offsets: Ditto.
+
+2006-03-01  Christopher Faylor  <cgf@timesys.com>
+
 	* cygthread.cc (cygthread::callfunc): Create ev as an auto-reset event
 	so that it will be reset by WaitFor*Object as appropriate.
 	(cygthread::stub): Ditto.

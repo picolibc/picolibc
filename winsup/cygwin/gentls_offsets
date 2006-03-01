@@ -1,4 +1,12 @@
 #!/usr/bin/perl -s
+# Copyright 2003, 2004, 2005 Red Hat, Inc.
+#
+# This file is part of Cygwin.
+#
+# This software is a copyrighted work licensed under the terms of the
+# Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+# details.
+#
 my $tls = shift;
 my $tls_out = shift;
 open(TLS, $tls) or die "$0: couldn't open tls file \"$tls\" - $!\n";
