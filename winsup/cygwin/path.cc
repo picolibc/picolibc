@@ -1718,6 +1718,30 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
   return rc;
 }
 
+int
+mount_info::get_mounts_here (const char *parent_dir, int parent_dir_len,
+			     char **mount_points)
+{
+  int n_mounts = 0;
+
+  for (int i = 0; i < nmounts; i++)
+    {
+      mount_item *mi = mount + posix_sorted[i];
+      char *last_slash = strrchr (mi->posix_path, '/');
+      if (!last_slash)
+        continue;
+      if (last_slash == mi->posix_path)
+        {
+	  if (parent_dir_len == 1 && mi->posix_pathlen > 1)
+	    mount_points[n_mounts++] = last_slash + 1;
+	}
+      else if (parent_dir_len == last_slash - mi->posix_path
+	       && strncasematch (parent_dir, mi->posix_path, parent_dir_len))
+	mount_points[n_mounts++] = last_slash + 1;
+    }
+  return n_mounts;
+}
+
 /* cygdrive_posix_path: Build POSIX path used as the
    mount point for cygdrives created when there is no other way to
    obtain a POSIX path from a Win32 one. */

@@ -91,6 +91,7 @@ class mount_info
   int get_cygdrive_info (char *user, char *system, char* user_flags,
 			 char* system_flags);
   void cygdrive_posix_path (const char *src, char *dst, int trailing_slash_p);
+  int get_mounts_here (const char *parent_dir, int, char **mount_points);
 
  private:
 

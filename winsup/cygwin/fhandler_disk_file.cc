@@ -1392,16 +1392,74 @@ fhandler_disk_file::rmdir ()
 			 * (sizeof (FILE_ID_BOTH_DIR_INFORMATION) \
 			    + 2 * CYG_MAX_PATH))
 
-typedef struct __DIR_cache
+struct __DIR_cache
 {
   char  __name[CYG_MAX_PATH];
   ULONG __pos;
   char  __cache[DIR_BUF_SIZE];
 };
 
-#define d_dirname(d)	(((struct __DIR_cache *) (d)->__d_dirname)->__name)
-#define d_cachepos(d)	(((struct __DIR_cache *) (d)->__d_dirname)->__pos)
-#define d_cache(d)	(((struct __DIR_cache *) (d)->__d_dirname)->__cache)
+#define d_dirname(d)	(((__DIR_cache *) (d)->__d_dirname)->__name)
+#define d_cachepos(d)	(((__DIR_cache *) (d)->__d_dirname)->__pos)
+#define d_cache(d)	(((__DIR_cache *) (d)->__d_dirname)->__cache)
+
+class __DIR_mounts
+{
+  int	      count;
+  const char *parent_dir;
+  int	      parent_dir_len;
+  char	     *mounts[MAX_MOUNTS];
+  bool	      found[MAX_MOUNTS];
+
+  __ino64_t eval_ino (int idx)
+    {
+      __ino64_t ino = 0;
+      char fname[CYG_MAX_PATH];
+      struct __stat64 st;
+      int len = parent_dir_len;
+
+      strcpy (fname, parent_dir);
+      if (fname[len - 1] != '/')
+	fname[len++] = '/';
+      strcpy (fname + len, mounts[idx]);
+      if (!lstat64 (fname, &st))
+	ino = st.st_ino;
+      return ino;
+    }
+
+public:
+  __DIR_mounts (const char *posix_path)
+  : parent_dir (posix_path)
+    {
+      parent_dir_len = strlen (parent_dir);
+      count = mount_table->get_mounts_here (parent_dir, parent_dir_len, mounts);
+      rewind ();
+    }
+  __ino64_t check_mount (const char *name, __ino64_t ino)
+    {
+      for (int i = 0; i < count; ++i)
+	if (strcasematch (name, mounts[i]))
+	  {
+	    found[i] = true;
+	    return eval_ino (i);
+	  }
+      return ino;
+    }
+  __ino64_t check_missing_mount (char *ret_name)
+    {
+      for (int i = 0; i < count; ++i)
+        if (!found[i])
+	  {
+	    found[i] = true;
+	    strcpy (ret_name, mounts[i]);
+	    return eval_ino (i);
+	  }
+      return 0;
+    }
+    void rewind () { memset (found, 0, sizeof found); }
+};
+
+#define d_mounts(d)	((__DIR_mounts *) (d)->__d_internal)
 
 DIR *
 fhandler_disk_file::opendir ()
@@ -1458,6 +1516,7 @@ fhandler_disk_file::opendir ()
       dir->__d_position = 0;
 
       dir->__flags = (pc.normalized_path[0] == '/' && pc.normalized_path[1] == '\0') ? dirent_isroot : 0;
+      dir->__d_internal = (unsigned) new __DIR_mounts (pc.normalized_path);
       if (wincap.is_winnt ())
 	{
 	  d_cachepos (dir) = 0;
@@ -1521,7 +1580,9 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
   if (w32_err)
     {
       bool added = false;
-      if (!(dir->__flags & dirent_isroot))
+      if ((de->d_ino = d_mounts (dir)->check_missing_mount (fname)))
+        added = true;
+      else if (!(dir->__flags & dirent_isroot))
 	/* nothing */;
       else if (0 && !(dir->__flags & dirent_saw_dev))
 	{
@@ -1574,7 +1635,13 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
       if (strcasematch (de->d_name, "dev"))
 	{
 	  dir->__flags |= dirent_saw_dev;
+	  /* In contrast to /proc, /dev has no own fhandler which cares
+	     for inode numbers.  So, if the directory exists physically,
+	     its "real" inode number should be used.  Otherwise it must
+	     not be faked until we add a /dev fhandler to Cygwin. */
+#if 0
 	  de->d_ino = hash_path_name (0, "/dev");
+#endif
 	}
       else if (strcasematch (de->d_name, "proc"))
         {
@@ -1697,7 +1764,9 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
         }
       else
         FileName = ((PFILE_BOTH_DIR_INFORMATION) buf)->FileName;
+      sys_wcstombs (fname, CYG_MAX_PATH - 1, FileName, buf->FileNameLength / 2);
 
+      de->d_ino = d_mounts (dir)->check_mount (fname, de->d_ino);
       if (de->d_ino == 0 && (dir->__flags & dirent_set_d_ino))
 	{
 	  OBJECT_ATTRIBUTES attr;
@@ -1723,7 +1792,6 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 		}
 	    }
 	}
-      sys_wcstombs (fname, CYG_MAX_PATH - 1, FileName, buf->FileNameLength / 2);
     }
 
   if (!(res = readdir_helper (dir, de, RtlNtStatusToDosError (status),
@@ -1783,7 +1851,8 @@ fhandler_disk_file::readdir_9x (DIR *dir, dirent *de)
 	  goto out;
 	}
     }
-  
+  if (!lasterr)
+    de->d_ino = d_mounts (dir)->check_mount (buf.cFileName, de->d_ino);
   if (!(res = readdir_helper (dir, de, lasterr, buf.dwFileAttributes,
 			      buf.cFileName)))
     dir->__d_position++;
@@ -1825,12 +1894,14 @@ fhandler_disk_file::rewinddir (DIR *dir)
       dir->__handle = INVALID_HANDLE_VALUE;
     }
   dir->__d_position = 0;
+  d_mounts (dir)->rewind ();
 }
 
 int
 fhandler_disk_file::closedir (DIR *dir)
 {
   int res = 0;
+  delete d_mounts (dir);
   if (!dir->__handle)
     /* ignore */;
   else if (dir->__handle == INVALID_HANDLE_VALUE)

@@ -48,7 +48,7 @@ typedef struct __DIR
   char *__d_dirname;			/* directory name with trailing '*' */
   _off_t __d_position;			/* used by telldir/seekdir */
   int __d_fd;
-  unsigned __d_unused;
+  unsigned __d_internal;
   void *__handle;
   void *__fh;
   unsigned __flags;

@@ -1,3 +1,30 @@
+2006-03-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/sys/dirent.h (struct __DIR): Rename __d_unused to
+	__d_internal.
+	* fhandler_disk_file.cc (struct __DIR_cache): Remove useless "typedef".
+	(d_dirname): Remove useless "struct".
+	(d_cachepos): Ditto.
+	(d_cache): Ditto.
+	(class __DIR_mounts): New class, implementing mount point tracking
+	for readdir.
+	(d_mounts): New macro for easy access to __DIR_mounts structure.
+	(fhandler_disk_file::opendir): Allocate __DIR_mounts structure and
+	let __d_internal element of dir point to it.
+	(fhandler_disk_file::readdir_helper): Add mount points in the current
+	directory, which don't have a real directory backing them.
+	Don't generate an inode number for /dev.  Add comment, why.
+	(fhandler_disk_file::readdir): Move filling fname to an earlier point.
+	Check if current entry is a mount point and evaluate correct inode
+	number for it.
+	(fhandler_disk_file::readdir_9x): Ditto.
+	(fhandler_disk_file::rewinddir): Set all mount points in this directory
+	to "not found" so that they are listed again after calling rewinddir().
+	(fhandler_disk_file::closedir): Deallocate __DIR_mounts structure.
+	* path.cc (mount_info::get_mounts_here): New method to evaluate a list
+	of mount points in a given parent directory.
+	* shared_info.h (class mount_info): Declare get_mounts_here.
+
 2006-02-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Use iscygdrive
