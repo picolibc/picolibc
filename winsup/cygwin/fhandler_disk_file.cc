@@ -34,6 +34,97 @@ details. */
 #define _COMPILING_NEWLIB
 #include <dirent.h>
 
+class __DIR_mounts
+{
+  int	      count;
+  const char *parent_dir;
+  int	      parent_dir_len;
+  char	     *mounts[MAX_MOUNTS];
+  bool	      found[MAX_MOUNTS + 2];
+
+#define __DIR_PROC	(MAX_MOUNTS)
+#define __DIR_CYGDRIVE	(MAX_MOUNTS+1)
+
+  __ino64_t eval_ino (int idx)
+    {
+      __ino64_t ino = 0;
+      char fname[CYG_MAX_PATH];
+      struct __stat64 st;
+      int len = parent_dir_len;
+
+      strcpy (fname, parent_dir);
+      if (fname[len - 1] != '/')
+	fname[len++] = '/';
+      strcpy (fname + len, mounts[idx]);
+      if (!lstat64 (fname, &st))
+	ino = st.st_ino;
+      return ino;
+    }
+
+public:
+  __DIR_mounts (const char *posix_path)
+  : parent_dir (posix_path)
+    {
+      parent_dir_len = strlen (parent_dir);
+      count = mount_table->get_mounts_here (parent_dir, parent_dir_len, mounts);
+      rewind ();
+    }
+  __ino64_t check_mount (const char *name, __ino64_t ino, bool eval = true)
+    {
+      if (parent_dir_len == 1)	/* root dir */
+        {
+	  if (strcasematch (name, "proc"))
+	    {
+	      found[__DIR_PROC] = true;
+	      return hash_path_name (0, "/proc");
+	    }
+	  if (strlen (name) == mount_table->cygdrive_len - 2
+	      && strncasematch (name, mount_table->cygdrive + 1,
+				mount_table->cygdrive_len - 2))
+	    {
+	      found[__DIR_CYGDRIVE] = true;
+	      return 2;
+	    }
+	}
+      for (int i = 0; i < count; ++i)
+	if (strcasematch (name, mounts[i]))
+	  {
+	    found[i] = true;
+	    return eval ? eval_ino (i) : 1;
+	  }
+      return ino;
+    }
+  __ino64_t check_missing_mount (char *ret_name, bool eval = true)
+    {
+      for (int i = 0; i < count; ++i)
+        if (!found[i])
+	  {
+	    found[i] = true;
+	    strcpy (ret_name, mounts[i]);
+	    return eval ? eval_ino (i) : 1;
+	  }
+      if (parent_dir_len == 1)  /* root dir */
+        {
+	  if (!found[__DIR_PROC])
+	    {
+	      found[__DIR_PROC] = true;
+	      strcpy (ret_name, "proc");
+	      return hash_path_name (0, "/proc");
+	    }
+	  if (!found[__DIR_CYGDRIVE])
+	    {
+	      found[__DIR_CYGDRIVE] = true;
+	      strncpy (ret_name, mount_table->cygdrive + 1,
+		       mount_table->cygdrive_len - 2);
+	      ret_name[mount_table->cygdrive_len - 2] = '\0';
+	      return 2;
+	    }
+	}
+      return 0;
+    }
+    void rewind () { memset (found, 0, sizeof found); }
+};
+
 unsigned __stdcall
 path_conv::ndisk_links (DWORD nNumberOfLinks)
 {
@@ -46,6 +137,7 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
 
   const char *s;
   unsigned count;
+  __DIR_mounts *dir = new __DIR_mounts (normalized_path);
   if (nNumberOfLinks <= 1)
     {
       s = "/*";
@@ -79,6 +171,7 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
 		&& (buf.cFileName[1] == '\0'
 		    || (buf.cFileName[1] == '.' && buf.cFileName[2] == '\0')))
 	      saw_dot--;
+	    dir->check_mount (buf.cFileName, 0, false);
 	  }
 	while (FindNextFileA (h, &buf));
       FindClose (h);
@@ -92,6 +185,10 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
 	saw_dot--;
       FindClose (h);
     }
+  while (dir->check_missing_mount (buf.cFileName, false))
+    ++count;
+
+  delete dir;
 
   return count + saw_dot;
 }
@@ -1403,62 +1500,6 @@ struct __DIR_cache
 #define d_cachepos(d)	(((__DIR_cache *) (d)->__d_dirname)->__pos)
 #define d_cache(d)	(((__DIR_cache *) (d)->__d_dirname)->__cache)
 
-class __DIR_mounts
-{
-  int	      count;
-  const char *parent_dir;
-  int	      parent_dir_len;
-  char	     *mounts[MAX_MOUNTS];
-  bool	      found[MAX_MOUNTS];
-
-  __ino64_t eval_ino (int idx)
-    {
-      __ino64_t ino = 0;
-      char fname[CYG_MAX_PATH];
-      struct __stat64 st;
-      int len = parent_dir_len;
-
-      strcpy (fname, parent_dir);
-      if (fname[len - 1] != '/')
-	fname[len++] = '/';
-      strcpy (fname + len, mounts[idx]);
-      if (!lstat64 (fname, &st))
-	ino = st.st_ino;
-      return ino;
-    }
-
-public:
-  __DIR_mounts (const char *posix_path)
-  : parent_dir (posix_path)
-    {
-      parent_dir_len = strlen (parent_dir);
-      count = mount_table->get_mounts_here (parent_dir, parent_dir_len, mounts);
-      rewind ();
-    }
-  __ino64_t check_mount (const char *name, __ino64_t ino)
-    {
-      for (int i = 0; i < count; ++i)
-	if (strcasematch (name, mounts[i]))
-	  {
-	    found[i] = true;
-	    return eval_ino (i);
-	  }
-      return ino;
-    }
-  __ino64_t check_missing_mount (char *ret_name)
-    {
-      for (int i = 0; i < count; ++i)
-        if (!found[i])
-	  {
-	    found[i] = true;
-	    strcpy (ret_name, mounts[i]);
-	    return eval_ino (i);
-	  }
-      return 0;
-    }
-    void rewind () { memset (found, 0, sizeof found); }
-};
-
 #define d_mounts(d)	((__DIR_mounts *) (d)->__d_internal)
 
 DIR *
@@ -1582,26 +1623,6 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
       bool added = false;
       if ((de->d_ino = d_mounts (dir)->check_missing_mount (fname)))
         added = true;
-      else if (!(dir->__flags & dirent_isroot))
-	/* nothing */;
-      else if (0 && !(dir->__flags & dirent_saw_dev))
-	{
-	  strcpy (fname, "dev");
-	  added = true;
-	}
-      else if (!(dir->__flags & dirent_saw_proc))
-	{
-	  strcpy (fname, "proc");
-	  added = true;
-	}
-      else if (!(dir->__flags & dirent_saw_cygdrive)
-	       && mount_table->cygdrive_len > 1)
-	{
-	  strcpy (fname, mount_table->cygdrive + 1);
-	  fname[mount_table->cygdrive_len - 2] = '\0';
-	  added = true;
-	}
-
       if (!added)
 	return geterrno_from_win_error (w32_err);
 
@@ -1630,32 +1651,6 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
     fnunmunge (de->d_name, fname);
   else
     strcpy (de->d_name, fname);
-  if (dir->__flags & dirent_isroot)
-    {
-      if (strcasematch (de->d_name, "dev"))
-	{
-	  dir->__flags |= dirent_saw_dev;
-	  /* In contrast to /proc, /dev has no own fhandler which cares
-	     for inode numbers.  So, if the directory exists physically,
-	     its "real" inode number should be used.  Otherwise it must
-	     not be faked until we add a /dev fhandler to Cygwin. */
-#if 0
-	  de->d_ino = hash_path_name (0, "/dev");
-#endif
-	}
-      else if (strcasematch (de->d_name, "proc"))
-        {
-	  dir->__flags |= dirent_saw_proc;
-	  de->d_ino = hash_path_name (0, "/proc");
-	}
-      if (strlen (de->d_name) == mount_table->cygdrive_len - 2
-	  && strncasematch (de->d_name, mount_table->cygdrive + 1,
-			    mount_table->cygdrive_len - 2))
-	{
-	  dir->__flags |= dirent_saw_cygdrive;
-	  de->d_ino = 0;
-	}
-    }
   if (dir->__d_position == 0 && !strcmp (fname, "."))
     dir->__flags |= dirent_saw_dot;
   else if (dir->__d_position == 1 && !strcmp (fname, ".."))
@@ -1931,6 +1926,31 @@ fhandler_cygdrive::fhandler_cygdrive () :
 {
 }
 
+int
+fhandler_cygdrive::open (int flags, mode_t mode)
+{
+  if ((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
+    {
+      set_errno (EEXIST);
+      return 0;
+    }
+  if (flags & O_WRONLY)
+    {
+      set_errno (EISDIR);
+      return 0;
+    }
+  flags |= O_DIROPEN;
+  set_flags (flags);
+  nohandle (true);
+  return 1;
+}
+
+int
+fhandler_cygdrive::close ()
+{
+  return 0;
+}
+
 #define DRVSZ sizeof ("x:\\")
 void
 fhandler_cygdrive::set_drives ()
@@ -1945,12 +1965,8 @@ int
 fhandler_cygdrive::fstat (struct __stat64 *buf)
 {
   buf->st_mode = S_IFDIR | 0555;
-  /* Call get_namehash before calling set_drives, otherwise the namehash
-     is broken due to overwriting the win32 path in set_drives. */
-  buf->st_ino = get_namehash ();
-  if (!ndrives)
-    set_drives ();
-  buf->st_nlink = ndrives + 2;
+  buf->st_ino = 2;
+  buf->st_nlink = 1;
   return 0;
 }
 
@@ -1960,9 +1976,6 @@ fhandler_cygdrive::opendir ()
   DIR *dir;
 
   dir = fhandler_disk_file::opendir ();
-  /* Call get_namehash before calling set_drives, otherwise the namehash
-     is broken due to overwriting the win32 path in set_drives. */
-  get_namehash ();
   if (dir && !ndrives)
     set_drives ();
 
@@ -1975,7 +1988,15 @@ fhandler_cygdrive::readdir (DIR *dir, dirent *de)
   while (true)
     {
       if (!pdrive || !*pdrive)
-	return ENMFILE;
+        {
+	  if (!(dir->__flags & dirent_saw_dot))
+	    {
+	      de->d_name[0] = '.';
+	      de->d_name[1] = '\0';
+	      de->d_ino = 2;
+	    }
+	  return ENMFILE;
+        }
       if (GetFileAttributes (pdrive) != INVALID_FILE_ATTRIBUTES)
         break;
       pdrive = strchr (pdrive, '\0') + 1;

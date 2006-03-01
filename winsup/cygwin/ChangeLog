@@ -1,3 +1,25 @@
+2006-03-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (enum dirent_states): Remove dirent_saw_cygdrive,
+	dirent_saw_dev and dirent_saw_proc.
+	(fhandler_cygdrive::open): Declare.
+	(fhandler_cygdrive::close): Declare.
+	* fhandler_disk_file.cc (class __DIR_mounts): Move to beginning of file.
+	(__DIR_mounts::check_mount): New parameter to indicate if inode number
+	is needed in calling function or not. Add /proc and /cygdrive handling.
+	(__DIR_mounts::check_missing_mount): Ditto.
+	(path_conv::ndisk_links): Use __DIR_mounts class to create correct
+	hardlink count for directories with mount points in them.
+	(fhandler_disk_file::readdir_helper): Remove /dev, /proc and /cygdrive
+	handling.
+	(fhandler_cygdrive::open): New method.
+	(fhandler_cygdrive::close): New method.
+	(fhandler_cygdrive::fstat): Always return fixed inode number 2 and
+	fixed link count of 1. Drop call to set_drives.
+	(fhandler_cygdrive::opendir): Drop call to get_namehash.
+	(fhandler_cygdrive::readdir): Handle "." entry to return fixed inode
+	number 2.
+
 2006-03-01  Christopher Faylor  <cgf@timesys.com>
 
 	* cygwin.din: Fix some erroneous SIGFE/NOSIGFE settings.

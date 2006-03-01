@@ -45,11 +45,8 @@ enum dirent_states
   dirent_saw_dot_dot	= 0x0002,
   dirent_saw_eof	= 0x0004,
   dirent_isroot		= 0x0008,
-  dirent_saw_cygdrive	= 0x0010,
-  dirent_saw_dev	= 0x0020,
-  dirent_saw_proc	= 0x0040,
-  dirent_set_d_ino	= 0x0080,
-  dirent_get_d_ino	= 0x0100
+  dirent_set_d_ino	= 0x0010,
+  dirent_get_d_ino	= 0x0020
 };
 
 enum conn_state
@@ -697,6 +694,8 @@ class fhandler_cygdrive: public fhandler_disk_file
   void set_drives ();
  public:
   fhandler_cygdrive ();
+  int open (int flags, mode_t mode);
+  int close ();
   DIR *opendir ();
   int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   void rewinddir (DIR *);
