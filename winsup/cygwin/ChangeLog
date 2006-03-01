@@ -1,3 +1,11 @@
+2006-03-01  Christopher Faylor  <cgf@timesys.com>
+
+	* cygthread.cc (cygthread::callfunc): Create ev as an auto-reset event
+	so that it will be reset by WaitFor*Object as appropriate.
+	(cygthread::stub): Ditto.
+	(cygthread::terminate_thread): Remove forced setting of thread
+	termination.
+
 2006-03-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/sys/dirent.h (struct __DIR): Rename __d_unused to
