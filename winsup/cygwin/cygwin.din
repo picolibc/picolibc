@@ -215,7 +215,7 @@ _atoi = atoi NOSIGFE
 atol NOSIGFE
 _atol = atol NOSIGFE
 atoll NOSIGFE
-basename SIGFE
+basename NOSIGFE
 bcmp NOSIGFE
 _bcmp = bcmp NOSIGFE
 bcopy NOSIGFE
@@ -253,8 +253,8 @@ _chown32 = chown32 SIGFE
 chroot SIGFE
 _chroot = chroot SIGFE
 cleanup_glue NOSIGFE
-clearerr NOSIGFE
-_clearerr = clearerr NOSIGFE
+clearerr SIGFE
+_clearerr = clearerr SIGFE
 clock SIGFE
 _clock = clock SIGFE
 clock_gettime SIGFE
@@ -264,8 +264,7 @@ close SIGFE
 _close = close SIGFE
 closedir SIGFE
 _closedir = closedir SIGFE
-closelog NOSIGFE
-_closelog = closelog NOSIGFE
+closelog SIGFE
 copysign NOSIGFE
 _copysign = copysign NOSIGFE
 copysignf NOSIGFE
@@ -280,7 +279,7 @@ coshf NOSIGFE
 _coshf = coshf NOSIGFE
 creat SIGFE
 _creat = creat SIGFE
-ctermid NOSIGFE
+ctermid SIGFE
 ctime SIGFE
 _ctime = ctime SIGFE
 ctime_r SIGFE
@@ -302,8 +301,8 @@ cygwin_conv_to_posix_path SIGFE
 cygwin32_conv_to_posix_path = cygwin_conv_to_posix_path SIGFE
 cygwin_conv_to_win32_path SIGFE
 cygwin32_conv_to_win32_path = cygwin_conv_to_win32_path SIGFE
-cygwin_detach_dll NOSIGFE
-cygwin32_detach_dll = cygwin_detach_dll NOSIGFE
+cygwin_detach_dll SIGFE
+cygwin32_detach_dll = cygwin_detach_dll SIGFE
 cygwin_dll_init NOSIGFE
 endprotoent = cygwin_endprotoent SIGFE
 endservent = cygwin_endservent SIGFE
@@ -325,7 +324,7 @@ getservbyport = cygwin_getservbyport SIGFE
 getservent = cygwin_getservent SIGFE
 getsockname = cygwin_getsockname SIGFE
 getsockopt = cygwin_getsockopt SIGFE
-getsubopt SIGFE
+getsubopt NOSIGFE
 getusershell SIGFE
 herror = cygwin_herror SIGFE
 hstrerror = cygwin_hstrerror NOSIGFE
@@ -336,15 +335,15 @@ inet_network = cygwin_inet_network SIGFE
 inet_ntoa = cygwin_inet_ntoa SIGFE
 inet_ntop = cygwin_inet_ntop SIGFE
 cygwin_internal NOSIGFE
-cygwin32_internal = cygwin_internal NOSIGFE
+cygwin32_internal = cygwin_internal SIGFE
 listen = cygwin_listen SIGFE
 cygwin_logon_user SIGFE
 lstat SIGFE
 _lstat = lstat SIGFE
 cygwin_posix_path_list_p NOSIGFE
 cygwin32_posix_path_list_p = cygwin_posix_path_list_p NOSIGFE
-cygwin_posix_to_win32_path_list NOSIGFE
-cygwin32_posix_to_win32_path_list = cygwin_posix_to_win32_path_list NOSIGFE
+cygwin_posix_to_win32_path_list SIGFE
+cygwin32_posix_to_win32_path_list = cygwin_posix_to_win32_path_list SIGFE
 cygwin_posix_to_win32_path_list_buf_size SIGFE
 cygwin32_posix_to_win32_path_list_buf_size = cygwin_posix_to_win32_path_list_buf_size SIGFE
 rcmd = cygwin_rcmd SIGFE
@@ -362,7 +361,7 @@ send = cygwin_send SIGFE
 sendmsg = cygwin_sendmsg SIGFE
 sendto = cygwin_sendto SIGFE
 cygwin_set_impersonation_token SIGFE
-setprogname SIGFE
+setprogname NOSIGFE
 setprotoent = cygwin_setprotoent SIGFE
 setservent = cygwin_setservent SIGFE
 setsockopt = cygwin_setsockopt SIGFE
@@ -373,8 +372,8 @@ cygwin_split_path NOSIGFE
 cygwin32_split_path = cygwin_split_path NOSIGFE
 cygwin_stackdump SIGFE
 cygwin_umount SIGFE
-cygwin_win32_to_posix_path_list NOSIGFE
-cygwin32_win32_to_posix_path_list = cygwin_win32_to_posix_path_list NOSIGFE
+cygwin_win32_to_posix_path_list SIGFE
+cygwin32_win32_to_posix_path_list = cygwin_win32_to_posix_path_list SIGFE
 cygwin_win32_to_posix_path_list_buf_size SIGFE
 cygwin32_win32_to_posix_path_list_buf_size = cygwin_win32_to_posix_path_list_buf_size SIGFE
 cygwin_winpid_to_pid SIGFE
@@ -384,7 +383,7 @@ difftime NOSIGFE
 _difftime = difftime NOSIGFE
 dirfd SIGFE
 _dirfd = dirfd SIGFE
-dirname SIGFE
+dirname NOSIGFE
 div NOSIGFE
 _div = div NOSIGFE
 dlclose SIGFE
@@ -500,8 +499,8 @@ _fdopen = fdopen SIGFE
 _fdopen64 = fdopen64 SIGFE
 feof SIGFE
 _feof = feof SIGFE
-ferror NOSIGFE
-_ferror = ferror NOSIGFE
+ferror SIGFE
+_ferror = ferror SIGFE
 fflush SIGFE
 _fflush = fflush SIGFE
 ffs NOSIGFE
@@ -513,8 +512,8 @@ _fgetpos = fgetpos SIGFE
 _fgetpos64 = fgetpos64 SIGFE
 fgets SIGFE
 _fgets = fgets SIGFE
-fileno NOSIGFE
-_fileno = fileno NOSIGFE
+fileno SIGFE
+_fileno = fileno SIGFE
 finite NOSIGFE
 _finite = finite NOSIGFE
 finitef NOSIGFE
@@ -630,8 +629,8 @@ getchar_unlocked SIGFE
 _getchar_unlocked = getchar_unlocked SIGFE
 getcwd SIGFE
 _getcwd = getcwd SIGFE
-__getdelim NOSIGFE
-getdelim = __getdelim NOSIGFE
+__getdelim SIGFE
+getdelim = __getdelim SIGFE
 getdomainname SIGFE
 _getdomainname = getdomainname SIGFE
 getdtablesize NOSIGFE
@@ -663,8 +662,8 @@ _getgroups = getgroups SIGFE
 _getgroups32 = getgroups32 SIGFE
 gethostid SIGFE
 getitimer SIGFE
-__getline NOSIGFE
-getline = __getline NOSIGFE
+__getline SIGFE
+getline = __getline SIGFE
 getlogin_r NOSIGFE
 getlogin NOSIGFE
 _getlogin = getlogin NOSIGFE
@@ -686,7 +685,7 @@ getpid NOSIGFE
 _getpid = getpid NOSIGFE
 getppid NOSIGFE
 _getppid = getppid NOSIGFE
-getpriority NOSIGFE
+getpriority SIGFE
 getpwduid NOSIGFE
 _getpwduid = getpwduid NOSIGFE
 getpwent SIGFE
@@ -1058,7 +1057,7 @@ pthread_exit SIGFE
 pthread_getconcurrency SIGFE
 pthread_getschedparam SIGFE
 pthread_getsequence_np SIGFE
-pthread_getspecific NOSIGFE
+pthread_getspecific SIGFE
 pthread_join SIGFE
 pthread_key_create SIGFE
 pthread_key_delete SIGFE
@@ -1097,7 +1096,7 @@ pthread_setcancelstate SIGFE
 pthread_setcanceltype SIGFE
 pthread_setconcurrency SIGFE
 pthread_setschedparam SIGFE
-pthread_setspecific NOSIGFE
+pthread_setspecific SIGFE
 pthread_sigmask SIGFE
 pthread_suspend SIGFE
 pthread_testcancel SIGFE
@@ -1244,7 +1243,7 @@ setpgid SIGFE
 _setpgid = setpgid SIGFE
 setpgrp SIGFE
 _setpgrp = setpgrp SIGFE
-setpriority NOSIGFE
+setpriority SIGFE
 setpwent NOSIGFE
 _setpwent = setpwent NOSIGFE
 setregid SIGFE
@@ -1369,10 +1368,10 @@ strcspn NOSIGFE
 _strcspn = strcspn NOSIGFE
 strdup SIGFE
 _strdup = strdup SIGFE
-strerror NOSIGFE
-_strerror = strerror NOSIGFE
-strerror_r NOSIGFE
-_strerror_r = strerror_r NOSIGFE
+strerror SIGFE
+_strerror = strerror SIGFE
+strerror_r SIGFE
+_strerror_r = strerror_r SIGFE
 strftime SIGFE
 _strftime = strftime SIGFE
 strlcat NOSIGFE
@@ -1401,7 +1400,7 @@ strrchr NOSIGFE
 _strrchr = strrchr NOSIGFE
 strsep NOSIGFE
 _strsep = strsep NOSIGFE
-strsignal NOSIGFE
+strsignal SIGFE
 strspn NOSIGFE
 _strspn = strspn NOSIGFE
 strstr NOSIGFE
@@ -1434,8 +1433,7 @@ swab NOSIGFE
 _swab = swab NOSIGFE
 symlink SIGFE
 _symlink = symlink SIGFE
-sync NOSIGFE
-_sync = sync NOSIGFE
+sync SIGFE
 sysconf SIGFE
 _sysconf = sysconf SIGFE
 syslog SIGFE
@@ -1479,7 +1477,7 @@ tgamma NOSIGFE
 tgammaf NOSIGFE
 time SIGFE
 timelocal SIGFE
-timegm SIGFE
+timegm NOSIGFE
 _time = time SIGFE
 timer_create SIGFE
 timer_delete SIGFE
@@ -1527,8 +1525,8 @@ _ungetc = ungetc SIGFE
 unlink SIGFE
 _unlink = unlink SIGFE
 unlockpt NOSIGFE
-unsetenv NOSIGFE
-_unsetenv = unsetenv NOSIGFE
+unsetenv SIGFE
+_unsetenv = unsetenv SIGFE
 usleep SIGFE
 _usleep = usleep SIGFE
 utime SIGFE

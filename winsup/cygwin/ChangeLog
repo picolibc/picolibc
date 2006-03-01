@@ -1,5 +1,18 @@
 2006-03-01  Christopher Faylor  <cgf@timesys.com>
 
+	* cygwin.din: Fix some erroneous SIGFE/NOSIGFE settings.
+
+2006-03-01  Christopher Faylor  <cgf@timesys.com>
+
+	* cygthread.cc (cygthread::callfunc): Revert below change.  Make ev a
+	manual reset event again.  so that it will be reset by WaitFor*Object
+	as appropriate.
+	(cygthread::stub): Ditto.
+	(cygthread::terminate_thread): Reset ev if it was found to have been
+	set.
+
+2006-03-01  Christopher Faylor  <cgf@timesys.com>
+
 	* analyze_sigfe: New script.
 	* dllfixdbg: Add copyright.
 	* gendef: Ditto.

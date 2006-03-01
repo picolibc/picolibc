@@ -36,7 +36,7 @@ cygthread::callfunc (bool issimplestub)
   else
     {
       if (issimplestub)
-	ev = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+	ev = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
       pass_arg = alloca (arglen);
       memcpy (pass_arg, arg, arglen);
       SetEvent (ev);
@@ -78,7 +78,7 @@ cygthread::stub (VOID *arg)
       debug_printf ("thread '%s', id %p, stack_ptr %p", info->name (), info->id, info->stack_ptr);
       if (!info->ev)
 	{
-	  info->ev = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+	  info->ev = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
 	  info->thread_sync = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
 	}
     }
@@ -303,8 +303,8 @@ cygthread::terminate_thread ()
   if (!inuse || exiting)
     goto force_notterminated;
 
-  if (ev)
-    terminated = WaitForSingleObject (ev, 0) != WAIT_OBJECT_0;
+  if (ev && !(terminated = WaitForSingleObject (ev, 0) != WAIT_OBJECT_0))
+    ResetEvent (ev);
 
   MEMORY_BASIC_INFORMATION m;
   memset (&m, 0, sizeof (m));
@@ -319,7 +319,12 @@ cygthread::terminate_thread ()
   if (is_freerange)
     free (this);
   else
-    release (true);
+    {
+#ifdef DEBUGGING
+      terminated = true;
+#endif
+      release (true);
+    }
 
   goto out;
 
