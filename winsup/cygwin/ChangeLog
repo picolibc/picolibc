@@ -1,3 +1,8 @@
+2006-03-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (__DIR_mounts::check_missing_mount): Check
+	cygdrive string length for those who have cygdrive mapped to "/".
+
 2006-03-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_helper.cc (set_cygwin_privileges): Request SE_BACKUP_NAME

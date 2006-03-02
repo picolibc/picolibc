@@ -114,10 +114,13 @@ public:
 	  if (!found[__DIR_CYGDRIVE])
 	    {
 	      found[__DIR_CYGDRIVE] = true;
-	      strncpy (ret_name, mount_table->cygdrive + 1,
-		       mount_table->cygdrive_len - 2);
-	      ret_name[mount_table->cygdrive_len - 2] = '\0';
-	      return 2;
+	      if (mount_table->cygdrive_len > 1)
+	        {
+		  strncpy (ret_name, mount_table->cygdrive + 1,
+			   mount_table->cygdrive_len - 2);
+		  ret_name[mount_table->cygdrive_len - 2] = '\0';
+		  return 2;
+		}
 	    }
 	}
       return 0;
