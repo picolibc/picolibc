@@ -1,3 +1,9 @@
+2006-03-02  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libm/math/math.tex: Fix reference to sisnan.def which
+	is now in common subdirectory.
+	* libm/mathfp/mathfp.tex: Ditto.
+
 2006-02-27  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* Makefile.am (MATHOBJS_IN_LIBC): Add s_isinfd, sf_isinff, 
