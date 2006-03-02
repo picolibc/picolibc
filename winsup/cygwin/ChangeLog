@@ -1,5 +1,10 @@
 2006-03-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (chroot): Disallow chroot into special directories.
+	Return EPERM instead.
+
+2006-03-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (__DIR_mounts::check_missing_mount): Check
 	cygdrive string length for those who have cygdrive mapped to "/".
 

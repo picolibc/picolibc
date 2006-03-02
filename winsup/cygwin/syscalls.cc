@@ -2359,6 +2359,8 @@ chroot (const char *newroot)
     set_errno (ENOENT);
   else if (!path.isdir ())
     set_errno (ENOTDIR);
+  else if (path.isspecial ())
+    set_errno (EPERM);
   else
     {
       getwinenv("PATH="); /* Save the native PATH */
