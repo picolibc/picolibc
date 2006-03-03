@@ -1,3 +1,8 @@
+2006-03-03  Bjoern Haase  <bjoern.m.haase@web.de>
+
+	* avr.h (R_AVR_MS8_LDI,R_AVR_MS8_LDI_NEG): Add.
+	(EF_AVR_LINKRELAX_PREPARED): Add.
+
 2006-03-02  Ben Elliston  <bje@au.ibm.com>
 
 	Import from the GCC tree:
