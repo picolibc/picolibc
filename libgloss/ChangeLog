@@ -1,3 +1,7 @@
+2006-03-02  DJ Delorie  <dj@redhat.com>
+
+	* m32c/exit.S: Preserve r1.
+
 2006-02-24  Paul Brook  <paul@codesourcery.com>
 
 	* arm/redboot-crt0.S: Use cps in Thumb-2 mode.
