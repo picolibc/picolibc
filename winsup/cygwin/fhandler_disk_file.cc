@@ -1542,10 +1542,6 @@ fhandler_disk_file::opendir ()
       if (fd < 0)
 	goto free_dirent;
 
-      fd = this;
-      fd->nohandle (true);
-      dir->__d_fd = fd;
-      dir->__fh = this;
       /* FindFirstFile doesn't seem to like duplicate /'s.
 	 The dirname is generated with trailing backslash here which
 	 simplifies later usage of dirname for checking symlinks.
@@ -1583,7 +1579,7 @@ fhandler_disk_file::opendir ()
 	      if (!NT_SUCCESS (status))
 		{
 		  __seterrno_from_nt_status (status);
-		  goto free_dirent;
+		  goto free_mounts;
 		}
 
 	      /* FileIdBothDirectoryInformation is apparently unsupported on XP
@@ -1602,12 +1598,22 @@ fhandler_disk_file::opendir ()
 		}
 	    }
 	}
+      /* Filling fd with `this' (aka storing this in the file descriptor table
+	 should only happen after it's clear that opendir doesn't fail,
+	 otherwise we end up cfree'ing the fhandler twice, once in opendir()
+	 in dir.cc, the second time on exit.  Nasty, nasty... */
+      fd = this;
+      fd->nohandle (true);
+      dir->__d_fd = fd;
+      dir->__fh = this;
       res = dir;
     }
 
   syscall_printf ("%p = opendir (%s)", res, get_name ());
   return res;
 
+free_mounts:
+  delete d_mounts (dir);
 free_dirent:
   free (dir->__d_dirent);
 free_dirname:

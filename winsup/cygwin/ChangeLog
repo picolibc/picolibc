@@ -1,3 +1,12 @@
+2006-03-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dir.cc (opendir): Fix indentation.
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Move storing
+	fhandler in file descriptor table to some point very late in function
+	to avoid double free'ing.  Add comment to explain what happens.
+	Add label free_mounts and don't forget to delete __DIR_mounts structure
+	if NtOpenFile fails.
+
 2006-03-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (chroot): Disallow chroot into special directories.

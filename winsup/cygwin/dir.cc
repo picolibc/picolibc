@@ -61,7 +61,7 @@ opendir (const char *name)
   if (!fh)
     res = NULL;
   else if (fh->exists ())
-      res = fh->opendir ();
+    res = fh->opendir ();
   else
     {
       set_errno (ENOENT);
