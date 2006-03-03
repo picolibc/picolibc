@@ -1023,7 +1023,7 @@ option.
 <sect2 id="regtool"><title>regtool</title>
 
 <screen>
-Usage: regtool.exe [OPTION] (add | check | get | list | remove | unset) KEY
+Usage: regtool [OPTION] (add|check|get|list|remove|unset|load|unload|save) KEY
 View or edit the Win32 registry
 
 Actions:
@@ -1034,13 +1034,20 @@ Actions:
  remove KEY                 remove KEY
  set KEY\VALUE [data ...]   set VALUE
  unset KEY\VALUE            removes VALUE from KEY
+ load KEY\SUBKEY PATH       load hive from PATH into new SUBKEY
+ unload KEY\SUBKEY          unload hive and remove SUBKEY
+ save KEY\SUBKEY PATH       save SUBKEY into new hive PATH
 
 Options for 'list' Action:
  -k, --keys           print only KEYs
  -l, --list           print only VALUEs
  -p, --postfix        like ls -p, appends '\' postfix to KEY names
 
+Options for 'get' Action:
+ -b, --binary         print REG_BINARY data as hex bytes
+
 Options for 'set' Action:
+ -b, --binary         set type to REG_BINARY (hex args or '-')
  -e, --expand-string  set type to REG_EXPAND_SZ
  -i, --integer        set type to REG_DWORD
  -m, --multi-string   set type to REG_MULTI_SZ
@@ -1109,6 +1116,10 @@ accidentally removing too much.
 </para>
 
 <para>The <literal>set</literal> action sets a value within a key.
+<literal>-b</literal> means it's binary data (REG_BINARY).
+The binary values are specified as hex bytes in the argument list.
+If the argument is <literal>'-'</literal>, binary data is read
+from stdin instead.
 <literal>-e</literal> means it's an expanding string (REG_EXPAND_SZ)
 that contains embedded environment variables.  
 <literal>-i</literal> means the value is an integer (REG_DWORD).
@@ -1120,6 +1131,17 @@ number, it's a DWORD.  If it starts with a percent, it's an expanding
 string.  If you give multiple values, it's a multi-string.  Else, it's
 a regular string.
 The <literal>unset</literal> action removes a value from a key.
+</para>
+
+<para>The <literal>load</literal> action adds a new subkey and loads
+the contents of a registry hive into it.
+The parent key must be HKEY_LOCAL_MACHINE or HKEY_USERS.
+The <literal>unload</literal> action unloads the file and removes
+the subkey.
+</para>
+
+<para>The <literal>save</literal> action saves a subkey into a
+registry hive.
 </para>
 
 <para>

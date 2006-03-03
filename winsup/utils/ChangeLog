@@ -1,3 +1,18 @@
+2006-03-03  Christian Franke <franke@computer.org>
+
+	* regtool.cc (options): Add 'binary'.
+	(usage): Document 'load|unload|save' and '-b'.
+	(find_key): Add 'options' parameter, add load/unload.
+	(cmd_set): Add KT_BINARY case.
+	(cmd_get): Add hex output in KT_BINARY case.
+	(cmd_load): New function.
+	(cmd_unload): New function.
+	(set_privilege): New function.
+	(cmd_save): New function.
+	(commands): Add load, unload and save.
+	(main): Add '-b'
+	* utils.sgml (regtool): Document it.
+
 2006-02-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygpath.cc (get_long_name): Load GetLongPathNameA instead of incorrect

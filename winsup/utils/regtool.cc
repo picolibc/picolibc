@@ -1,6 +1,6 @@
 /* regtool.cc
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005 Red Hat Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat Inc.
 
 This file is part of Cygwin.
 
@@ -10,15 +10,17 @@ details. */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <ctype.h>
 #include <getopt.h>
 #include <windows.h>
+#include <sys/cygwin.h>
 
 #define DEFAULT_KEY_SEPARATOR '\\'
 
 enum
 {
-  KT_AUTO, KT_INT, KT_STRING, KT_EXPAND, KT_MULTI
+  KT_AUTO, KT_BINARY, KT_INT, KT_STRING, KT_EXPAND, KT_MULTI
 } key_type = KT_AUTO;
 
 char key_sep = DEFAULT_KEY_SEPARATOR;
@@ -32,6 +34,7 @@ static char *prog_name;
 
 static struct option longopts[] =
 {
+  {"binary", no_argument, NULL, 'b' },
   {"expand-string", no_argument, NULL, 'e' },
   {"help", no_argument, NULL, 'h' },
   {"integer", no_argument, NULL, 'i' },
@@ -47,7 +50,7 @@ static struct option longopts[] =
   {NULL, 0, NULL, 0}
 };
 
-static char opts[] = "ehiklmpqsvVK:";
+static char opts[] = "behiklmpqsvVK:";
 
 int listwhat = 0;
 int postfix = 0;
@@ -62,7 +65,7 @@ static void
 usage (FILE *where = stderr)
 {
   fprintf (where, ""
-  "Usage: %s [OPTION] (add | check | get | list | remove | unset) KEY\n"
+  "Usage: %s [OPTION] (add|check|get|list|remove|unset|load|unload|save) KEY\n"
   "View or edit the Win32 registry\n"
   "\n"
   "", prog_name);
@@ -76,6 +79,9 @@ usage (FILE *where = stderr)
     " remove KEY                 remove KEY\n"
     " set KEY\\VALUE [data ...]   set VALUE\n"
     " unset KEY\\VALUE            removes VALUE from KEY\n"
+    " load KEY\\SUBKEY PATH       load hive from PATH into new SUBKEY\n"
+    " unload KEY\\SUBKEY          unload hive and remove SUBKEY\n"
+    " save KEY\\SUBKEY PATH       save SUBKEY into new hive PATH\n"
     "\n");
   fprintf (where, ""
   "Options for 'list' Action:\n"
@@ -83,7 +89,11 @@ usage (FILE *where = stderr)
   " -l, --list           print only VALUEs\n"
   " -p, --postfix        like ls -p, appends '\\' postfix to KEY names\n"
   "\n"
+  "Options for 'get' Action:\n"
+  " -b, --binary         print REG_BINARY data as hex bytes\n"
+  "\n"
   "Options for 'set' Action:\n"
+  " -b, --binary         set type to REG_BINARY (hex args or '-')\n"
   " -e, --expand-string  set type to REG_EXPAND_SZ\n"
   " -i, --integer        set type to REG_DWORD\n"
   " -m, --multi-string   set type to REG_MULTI_SZ\n"
@@ -265,7 +275,7 @@ translate (char *key)
 }
 
 void
-find_key (int howmanyparts, REGSAM access)
+find_key (int howmanyparts, REGSAM access, int option = 0)
 {
   HKEY base;
   int rv;
@@ -348,9 +358,44 @@ find_key (int howmanyparts, REGSAM access)
     key = base;
   else
     {
-      rv = RegOpenKeyEx (base, n, 0, access, &key);
-      if (rv != ERROR_SUCCESS)
-	Fail (rv);
+      if (access)
+	{
+	  rv = RegOpenKeyEx (base, n, 0, access, &key);
+	  if (option && (rv == ERROR_SUCCESS || rv == ERROR_ACCESS_DENIED))
+	    {
+	      /* reopen with desired option due to missing option support in RegOpenKeyE */
+	      /* FIXME: may create the key in rare cases (e.g. access denied in parent) */
+	      HKEY key2;
+	      if (RegCreateKeyEx (base, n, 0, NULL, option, access, NULL, &key2, NULL)
+		  == ERROR_SUCCESS)
+	        {
+		  if (rv == ERROR_SUCCESS)
+		    RegCloseKey (key);
+		  key = key2;
+		  rv = ERROR_SUCCESS;
+	        }
+	    }
+	  if (rv != ERROR_SUCCESS)
+	    Fail (rv);
+	}
+      else if (argv[1])
+	{ 
+	  char win32_path[MAX_PATH];
+	  cygwin_conv_to_win32_path (argv[1], win32_path);
+	  rv = RegLoadKey (base, n, win32_path);
+	  if (rv != ERROR_SUCCESS)
+	    Fail (rv);
+	  if (verbose)
+	    printf ("key %s loaded from file %s\n", n, win32_path);
+	}
+      else
+	{ 
+	  rv = RegUnLoadKey (base, n);
+	  if (rv != ERROR_SUCCESS)
+	    Fail (rv);
+	  if (verbose)
+	    printf ("key %s unloaded\n", n);
+	}
     }
   //printf("key `%s' value `%s'\n", n, value);
 }
@@ -491,7 +536,7 @@ cmd_set ()
 {
   int i, n;
   DWORD v, rv;
-  char *a = argv[1], *data;
+  char *a = argv[1], *data = 0;
   find_key (2, KEY_ALL_ACCESS);
 
   if (key_type == KT_AUTO)
@@ -510,6 +555,43 @@ cmd_set ()
 
   switch (key_type)
     {
+    case KT_BINARY:
+      for (n = 0; argv[n+1]; n++)
+        ;
+      if (n == 1 && strcmp (argv[1], "-") == 0)
+	{ /* read from stdin */
+	  i = n = 0;
+	  for (;;)
+	    {
+	      if (i <= n)
+		{
+		  i = n + BUFSIZ;
+		  data = (char *) realloc (data, i);
+		}
+	      int r = fread (data+n, 1, i-n, stdin);
+	      if (r <= 0)
+		break;
+	      n += r;
+	    }
+	}
+      else if (n > 0)
+	{ /* parse hex from argv */
+	  data = (char *) malloc (n);
+	  for (i = 0; i < n; i++)
+	    {
+	      char *e;
+	      errno = 0;
+	      v = strtoul (argv[i+1], &e, 16);
+	      if (errno || v > 0xff || *e)
+		{
+		  fprintf (stderr, "Invalid hex constant `%s'\n", argv[i+1]);
+		  exit (1);
+		}
+	      data[i] = (char) v;
+	    }
+	}
+      rv = RegSetValueEx (key, value, 0, REG_BINARY, (const BYTE *) data, n);
+      break;
     case KT_INT:
       v = strtoul (a, 0, 0);
       rv = RegSetValueEx (key, value, 0, REG_DWORD, (const BYTE *) &v,
@@ -542,6 +624,9 @@ cmd_set ()
       rv = ERROR_INVALID_CATEGORY;
       break;
     }
+ 
+  if (data)
+    free(data);
 
   if (rv != ERROR_SUCCESS)
     Fail (rv);
@@ -577,7 +662,14 @@ cmd_get ()
   switch (vtype)
     {
     case REG_BINARY:
-      fwrite (data, dsize, 1, stdout);
+      if (key_type == KT_BINARY)
+	{
+	  for (unsigned i = 0; i < dsize; i++)
+	    printf ("%02x%c", (unsigned char)data[i],
+	      (i < dsize-1 ? ' ' : '\n'));
+	}
+      else
+ 	fwrite (data, dsize, 1, stdout);
       break;
     case REG_DWORD:
       printf ("%lu\n", *(DWORD *) data);
@@ -610,6 +702,72 @@ cmd_get ()
   return 0;
 }
 
+int
+cmd_load ()
+{
+  if (!argv[1])
+    {
+      usage ();
+      return 1;
+    }
+  find_key (1, 0);
+  return 0;
+}
+
+int
+cmd_unload ()
+{
+  if (argv[1])
+    {
+      usage ();
+      return 1;
+    }
+  find_key (1, 0);
+  return 0;
+}
+
+DWORD
+set_privilege (const char * name)
+{
+  TOKEN_PRIVILEGES tp;
+  if (!LookupPrivilegeValue (NULL, name, &tp.Privileges[0].Luid))
+    return GetLastError ();
+  tp.PrivilegeCount = 1;
+  tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+  HANDLE t;
+  /* OpenProcessToken does not work here, because main thread has its own
+     impersonation token */
+  if (!OpenThreadToken (GetCurrentThread (), TOKEN_ADJUST_PRIVILEGES, FALSE, &t))
+    return GetLastError ();
+  AdjustTokenPrivileges (t, FALSE, &tp, 0, NULL, NULL);
+  DWORD rv = GetLastError ();
+  CloseHandle (t);
+  return rv;
+}
+
+int
+cmd_save ()
+{
+  if (!argv[1])
+    {
+      usage ();
+      return 1;
+    }
+  /* try to set SeBackupPrivilege, let RegSaveKey report the error */
+  set_privilege (SE_BACKUP_NAME);
+  /* REG_OPTION_BACKUP_RESTORE is necessary to save /HKLM/SECURITY */
+  find_key (1, KEY_QUERY_VALUE, REG_OPTION_BACKUP_RESTORE);
+  char win32_path[MAX_PATH];
+  cygwin_conv_to_win32_path (argv[1], win32_path);
+  DWORD rv = RegSaveKey (key, win32_path, NULL);
+  if (rv != ERROR_SUCCESS)
+    Fail (rv);
+  if (verbose)
+    printf ("key saved to %s\n", win32_path);
+  return 0;
+}
+
+
 struct
 {
   const char *name;
@@ -623,6 +781,9 @@ struct
   {"set", cmd_set},
   {"unset", cmd_unset},
   {"get", cmd_get},
+  {"load", cmd_load},
+  {"unload", cmd_unload},
+  {"save", cmd_save},
   {0, 0}
 };
 
@@ -642,6 +803,9 @@ main (int argc, char **_argv)
   while ((g = getopt_long (argc, _argv, opts, longopts, NULL)) != EOF)
     switch (g)
 	{
+	case 'b':
+	  key_type = KT_BINARY;
+	  break;
 	case 'e':
 	  key_type = KT_EXPAND;
 	  break;
