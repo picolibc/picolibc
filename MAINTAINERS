@@ -5,7 +5,11 @@ COPYING, COPYING.LIB, README
 	http://gnu.org.
 
 Makefile.*; configure; configure.in; src-release
-	Please notify the following of any committed patches.
+	Any global maintainer can approve changes to these
+	files, but they should be aware	that they need to
+	be kept in sync with their counterparts in the GCC
+	repository.  Also please notify the following of
+	any committed patches:
 		binutils@sources.redhat.com
 		gdb-patches@sources.redhat.com
 
@@ -94,9 +98,17 @@ winsup/
 	General discussion cygwin@sources.redhat.com.
 	See also winsup/MAINTAINERS.
 
-config-ml.in; setup.com; missing; makefile.vms; utils/; config/;
-makefile.vms; missing; ylwrap; mkdep; etc/; install-sh; intl/
-	Ask DJ Delorie <dj@redhat.com> after reading the libiberty entry.
+config-ml.in; makefile.vms; mkdep; setup.com;
+etc/; intl/; utils/;
+	Any global maintainer can approve changes to these
+	files and directories.
+
+compile; depcomp; install-sh; missing; ylwrap;
+config/
+	Any global maintainer can approve changes to these
+	files and directories, but they should be aware
+	that they need to be kept in sync with their
+	counterparts in the GCC repository.
 
 modules file
 	Obviously changes to this file should not go through

@@ -1,3 +1,7 @@
+2006-02-27  H.J. Lu <hongjiu.lu@intel.com>
+
+	* i386.h (i386_optab): Support Intel Merom New Instructions.
+
 2006-02-24  Paul Brook  <paul@codesourcery.com>
 
 	* arm.h: Add V7 feature bits.
