@@ -1,3 +1,8 @@
+2006-03-04  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	* hppa.h (pa_opcodes): Reorder bb opcodes so that pa10 opcodes come
+	first.  Correct mask of bb "B" opcode.
+
 2006-02-27  H.J. Lu <hongjiu.lu@intel.com>
 
 	* i386.h (i386_optab): Support Intel Merom New Instructions.
