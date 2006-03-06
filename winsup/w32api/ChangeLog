@@ -1,4 +1,8 @@
 2006-03-06  Danny Smith  <dannysmith@users.sourceforge.net>
+	* include/wingdi.h (CS_*): Correct WINVER guard on
+	Image Color Matching colour definitions.
+
+2006-03-06  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/shlobj.h (SFGAO_ISSLOW): Define.
 	(SFGAO_DISPLAYATTRMASK): Define in terms of preceding display
