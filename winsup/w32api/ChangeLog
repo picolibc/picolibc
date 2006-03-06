@@ -1,3 +1,10 @@
+2006-03-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/wingdi.h  [WINVER >= 0x0500]
+	 (INTERNET_CONNECTED_INFO): Define structure.
+	(INTERNET_STATE_*): Define flags.
+	(INTERNET_OPTION_CONNECTED_STATE): Define constant.
+
 2006-03-05  Paul J. Lucas  <pauljlucas@users.sourceforge.net>
 
 	* include/wininet.h (INTERNET_CONNECTED_INFO): Define structure.
@@ -10,7 +17,7 @@
 
 2006-02-21  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/ddk/ntifs,h (FILE_ID_FULL_DIRECTORY_INFORMATION): Revert
+	* include/ddk/ntifs.h (FILE_ID_FULL_DIRECTORY_INFORMATION): Revert
 	last change.
 	Remove file level #pragma pack(push,4)/#pragma pop.
 
