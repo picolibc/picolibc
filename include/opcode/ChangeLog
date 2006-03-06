@@ -280,6 +280,14 @@
 	FloatMF to fldcw, fstcw, fnstcw, and the memory formas of fstsw and
 	fnstsw.
 
+2006-02-07  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* m68k.h (m68008, m68ec030, m68882): Remove.
+	(m68k_mask): New.
+	(cpu_m68k, cpu_cf): New.
+	(mcf5200, mcf5206e, mcf521x, mcf5249, mcf528x, mcf5307, mcf5407,
+	mcf5470, mcf5480): Rename to cpu_<foo>. Add m680x0 variants.
+
 2005-01-25  Alexandre Oliva  <aoliva@redhat.com>
 
 	2004-11-10  Alexandre Oliva  <aoliva@redhat.com>
