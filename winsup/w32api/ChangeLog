@@ -1,9 +1,8 @@
 2006-03-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/wingdi.h  [WINVER >= 0x0500]
-	 (INTERNET_CONNECTED_INFO): Define structure.
-	(INTERNET_STATE_*): Define flags.
-	(INTERNET_OPTION_CONNECTED_STATE): Define constant.
+	(INTERNET_STATE_*,*_EMBEDED): Included in Windows 2000 and later.
+	Thanks to: David A. Capello <dacap at users dot sf dot net>
 
 2006-03-05  Paul J. Lucas  <pauljlucas@users.sourceforge.net>
 
