@@ -1,3 +1,9 @@
+2006-03-06  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/shlobj.h (SFGAO_ISSLOW): Define.
+	(SFGAO_DISPLAYATTRMASK): Define in terms of preceding display
+	attribute constants.
+
 2006-03-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/wingdi.h  [WINVER >= 0x0500]
