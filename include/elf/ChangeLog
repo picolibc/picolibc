@@ -1,3 +1,12 @@
+2006-03-06  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* m68k.h (EF_M68K_ISA_MASK, EF_M68K_ISA_A,
+	EF_M68K_ISA_A_PLUS, EF_M68K_ISA_B, EF_M68K_ISA_C): Adjust.
+	(EF_M68K_ISA_A_NODIV, EF_M68K_ISA_B_NOUSP): New.
+	(EF_M68K_HW_DIV, EF_M68K_USP): Remove.
+	(EF_M68K_MAC, EF_M68K_EMAC, EF_M68K_FLOAT): Adjust.
+	(EF_M68K_EMAC_B): New.
+
 2006-03-03  Bjoern Haase  <bjoern.m.haase@web.de>
 
 	* avr.h (R_AVR_MS8_LDI,R_AVR_MS8_LDI_NEG): Add.
