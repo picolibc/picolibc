@@ -1,6 +1,12 @@
 2006-03-07  Paul Brook  <paul@codesourcery.com>
 
 	Backport from mainline.
+	2006-03-03  Khem Raj <khem@mvista.com>
+	* remote-rdp.c (remote_rdp_xfer_inferior_memory): Use gdb_byte.
+
+2006-03-07  Paul Brook  <paul@codesourcery.com>
+
+	Backport from mainline.
 	* gdb.arch/altivec-abi.exp: Use nowarnings instead of
 	additional_flags=-w.
 	* gdb.arch/altivec-regs.exp: Ditto.
