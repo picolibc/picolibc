@@ -1,3 +1,7 @@
+2006-03-07  Bas van Gompel  <cygwin-patch.buzz<at>bavag.tmfweb.nl>
+
+	* cygwinenv.sgml: Add missing </para> at transparent_exe.
+
 2006-02-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwinenv.sgml: Explain transparent_exe option.

@@ -177,7 +177,7 @@ suffix transparently.  These functions are <function>link(2)</function>,
 treated as too dangerous to act on files with .exe suffix if the .exe
 suffix wasn't given explicitely in the file name argument, and this is
 still the case if the transparent_exe option is not set.  Default is not
-set.
+set.</para>
 </listitem>
 <listitem>
 <para><envar>(no)traverse</envar> - This option only affects NT systems.
