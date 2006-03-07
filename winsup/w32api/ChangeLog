@@ -1,3 +1,9 @@
+2006-03-07  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+	* include/shellapi.h (NOTIFYICONDATA_V*_SIZE): Define.
+	Thanks to:  Daniel Atallah <datallah at users dot sf dot net>
+	* include/shellapi.h  [_WIN32_IE >= 0x0500]
+	(NIS_*): Introduced in Version 5.0.
+
 2006-03-06  Danny Smith  <dannysmith@users.sourceforge.net>
 	* include/wingdi.h (CS_*): Correct WINVER guard on
 	Image Color Matching colour definitions.

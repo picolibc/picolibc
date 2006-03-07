@@ -46,7 +46,7 @@ extern "C" {
 #define NIM_ADD	0
 #define NIM_MODIFY	1
 #define NIM_DELETE	2
-#if _WIN32_IE >= 0x0500
+#if (_WIN32_IE >= 0x0500)
 #define NOTIFYICON_VERSION 3
 #define NIM_SETFOCUS	3
 #define NIM_SETVERSION	4
@@ -71,8 +71,10 @@ extern "C" {
 #define NIIF_ICON_MASK	0x0000000F
 #define NIIF_NOSOUND	0x00000010
 #endif
-#define NIS_HIDDEN	1
-#define NIS_SHAREDICON	2
+#if (_WIN32_IE >= 0x0500)
+#define NIS_HIDDEN	0x00000001
+#define NIS_SHAREDICON	0x00000002
+#endif
 #define SE_ERR_FNF	2
 #define SE_ERR_PNF	3
 #define SE_ERR_ACCESSDENIED	5
@@ -123,6 +125,13 @@ extern "C" {
 #define SHERB_NOCONFIRMATION 1
 #define SHERB_NOPROGRESSUI 2
 #define SHERB_NOSOUND 4
+#ifdef UNICODE
+#define NOTIFYICONDATA_V2_SIZE 936
+#define NOTIFYICONDATA_V1_SIZE 152
+#else
+#define NOTIFYICONDATA_V2_SIZE 488
+#define NOTIFYICONDATA_V1_SIZE 88
+#endif
 
 typedef WORD FILEOP_FLAGS;
 typedef WORD PRINTEROP_FLAGS;
