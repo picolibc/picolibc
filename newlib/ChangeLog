@@ -1,3 +1,8 @@
+2006-03-07  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libm/common/sf_isinf.c[_DOUBLE_IS_32BITS]: Undef isinf.
+	* libm/common/sf_isnan.c[_DOUBLE_IS_32BITS]: Undef isnan.
+
 2006-03-02  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libm/math/math.tex: Fix reference to sisnan.def which

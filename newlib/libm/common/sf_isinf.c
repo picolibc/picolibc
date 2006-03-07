@@ -19,6 +19,8 @@ _DEFUN (isinff, (x),
 
 #ifdef _DOUBLE_IS_32BITS
 
+#undef isinf
+
 int
 _DEFUN (isinf, (x),
 	double x)

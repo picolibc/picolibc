@@ -32,6 +32,8 @@ _DEFUN (isnanf, (x),
 
 #ifdef _DOUBLE_IS_32BITS
 
+#undef isnan
+
 int
 _DEFUN (isnan, (x),
 	double x)
