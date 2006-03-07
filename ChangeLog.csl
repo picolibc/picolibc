@@ -1,6 +1,11 @@
 2006-03-07  Paul Brook  <paul@codesourcery.com>
 
 	Backport from mainline.
+	* sim/arm/elfos.c (ARMul_OSHandleSWI): Call correct function for IsTTY.
+
+2006-03-07  Paul Brook  <paul@codesourcery.com>
+
+	Backport from mainline.
 	* gdb/testsuite/lib/compiler.c: Extract armcc version number.
 	* gdb/testsuite/lib/compiler.cc: Ditto.
 
