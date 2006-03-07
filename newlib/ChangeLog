@@ -1,3 +1,10 @@
+2006-03-07  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/freopen.c (_freopen_r) [HAVE_FCNTL]: For NULL
+	filename, allow read-only or write-only FILE atop O_RDWR file
+	descriptor.
+	* libc/stdio64/freopen64.c (_freopen64_r) [HAVE_FCNTL]: Likewise.
+
 2006-03-07  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libm/common/sf_isinf.c[_DOUBLE_IS_32BITS]: Undef isinf.

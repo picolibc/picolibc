@@ -56,10 +56,10 @@ it).
 <[file]> and <[mode]> are used just as in <<fopen>>.
 
 If <[file]> is <<NULL>>, the underlying stream is modified rather than
-closed.  The file cannot change access mode (for example, if it was
-previously read-only, <[mode]> must be "r", "rb", or "rt"), but can
-change status such as append or binary mode.  If modification is not
-possible, failure occurs.
+closed.  The file cannot be given a more permissive access mode (for
+example, a <[mode]> of "w" will fail on a read-only file descriptor),
+but can change status such as append or binary mode.  If modification
+is not possible, failure occurs.
 
 RETURNS
 If successful, the result is the same as the argument <[fp]>.  If the
@@ -148,12 +148,14 @@ _DEFUN(_freopen_r, (ptr, file, mode, fp),
 #ifdef HAVE_FCNTL
       int oldflags;
       /*
-       * Reuse the file descriptor, but only if the access mode is
-       * unchanged.  F_SETFL correctly ignores creation flags.
+       * Reuse the file descriptor, but only if the new access mode is
+       * equal or less permissive than the old.  F_SETFL correctly
+       * ignores creation flags.
        */
       f = fp->_file;
       if ((oldflags = _fcntl_r (ptr, f, F_GETFL, 0)) == -1
-          || ((oldflags ^ oflags) & O_ACCMODE) != 0
+          || ! ((oldflags & O_ACCMODE) == O_RDWR
+                || ((oldflags ^ oflags) & O_ACCMODE) == 0)
           || _fcntl_r (ptr, f, F_SETFL, oflags) == -1)
         f = -1;
 #else
