@@ -1,6 +1,12 @@
 2006-03-07  Paul Brook  <paul@codesourcery.com>
 
 	Backport from mainline.
+	* gdb/testsuite/lib/compiler.c: Extract armcc version number.
+	* gdb/testsuite/lib/compiler.cc: Ditto.
+
+2006-03-07  Paul Brook  <paul@codesourcery.com>
+
+	Backport from mainline.
 	2006-03-03  Khem Raj <khem@mvista.com>
 	* remote-rdp.c (remote_rdp_xfer_inferior_memory): Use gdb_byte.
 
