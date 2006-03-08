@@ -1,3 +1,10 @@
+2006-03-08  Paul Brook  <paul@codesourcery.com>
+
+	Backport from mainline.
+	* gdb/arm-tdep.c (arm_push_dummy_call): Remove stack alignment.
+	(arm_frame_align): New function.
+	(arm_gdbarch_init): Use it.
+
 2006-03-07  Paul Brook  <paul@codesourcery.com>
 
 	Backport from mainline.
