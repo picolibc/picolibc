@@ -1,5 +1,9 @@
 2006-03-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (statvfs): Simplify path name expression.
+
+2006-03-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc: Include winioctl.h.
 	(statvfs): Request correct volume size using DeviceIoControl if
 	quotas are enforced on the file system.
