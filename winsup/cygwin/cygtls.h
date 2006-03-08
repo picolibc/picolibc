@@ -183,6 +183,7 @@ struct _cygtls
   void remove (DWORD);
   void push (__stack_t) __attribute__ ((regparm (2)));
   __stack_t pop () __attribute__ ((regparm (1)));
+  __stack_t retaddr () {return stackptr[-1];}
   bool isinitialized () const {return initialized == CYGTLS_INITIALIZED;}
   bool interrupt_now (CONTEXT *, int, void *, struct sigaction&)
     __attribute__((regparm(3)));

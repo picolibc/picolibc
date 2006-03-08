@@ -1,6 +1,6 @@
 /* dll_init.cc
 
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006  Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -18,6 +18,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "pinfo.h"
+#include "cygtls.h"
 
 extern void __stdcall check_sanity_and_sync (per_process *);
 
@@ -403,7 +404,7 @@ dll_noncygwin_dllcrt0 (HMODULE h, per_process *p)
 extern "C" void
 cygwin_detach_dll (dll *)
 {
-  dlls.detach (__builtin_return_address (0));
+  dlls.detach ((HANDLE) _my_tls.retaddr ());
 }
 
 extern "C" void
@@ -420,8 +421,6 @@ update_envptrs ()
 {
   extern char ***main_environ;
   for (dll *d = dlls.istart (DLL_ANY); d; d = dlls.inext ())
-    {
-	*(d->p.envptr) = __cygwin_environ;
-    }
+    *(d->p.envptr) = __cygwin_environ;
   *main_environ = __cygwin_environ;
 }

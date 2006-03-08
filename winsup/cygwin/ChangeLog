@@ -1,3 +1,11 @@
+2006-03-08  Christopher Faylor  <cgf@timesys.com>
+
+	* cygtls.h (_cygtls::retaddr): New method.
+	* dll_init.cc (cygwin_detach_dll): Use new tls method to find return
+	address since this function is now signal guarded.
+	(update_envptrs): Remove unneeded braces.
+	* syscalls.cc (statvfs): Coerce full_path to avoid a gcc warning.
+
 2006-03-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (statvfs): Simplify path name expression.

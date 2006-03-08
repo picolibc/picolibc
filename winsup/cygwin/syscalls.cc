@@ -1850,14 +1850,14 @@ statvfs (const char *fname, struct statvfs *sfs)
 				       OPEN_EXISTING,
 				       FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	      if (hdl == INVALID_HANDLE_VALUE)
-	        debug_printf ("CreateFile (%s) failed, %E", full_path);
+	        debug_printf ("CreateFile (%s) failed, %E", (char *) full_path);
 	      else
 	        {
 		  NTFS_VOLUME_DATA_BUFFER nvdb;
 		  DWORD bytes;
 		  if (!DeviceIoControl (hdl, FSCTL_GET_NTFS_VOLUME_DATA, NULL,
 					0, &nvdb, sizeof nvdb, &bytes, NULL))
-		    debug_printf ("DeviceIoControl (%s) failed, %E", full_path);
+		    debug_printf ("DeviceIoControl (%s) failed, %E", (char *) full_path);
 		  else
 		    totalc = nvdb.TotalClusters.QuadPart;
 		  CloseHandle (hdl);
