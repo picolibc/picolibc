@@ -42,6 +42,7 @@ details. */
 #include <setjmp.h>
 #include <winnls.h>
 #include <wininet.h>
+#include <winioctl.h>
 #include <lmcons.h> /* for UNLEN */
 #include <rpc.h>
 
@@ -1841,6 +1842,27 @@ statvfs (const char *fname, struct statvfs *sfs)
 	  availc = availb.QuadPart / (spc*bps);
 	  totalc = totalb.QuadPart / (spc*bps);
 	  freec = freeb.QuadPart / (spc*bps);
+	  if (freec > availc)
+	    {
+	      /* Quotas active.  We can't trust totalc. */
+	      HANDLE hdl = CreateFile (full_path.get_win32 (), READ_CONTROL,
+				       wincap.shared (), &sec_none_nih,
+				       OPEN_EXISTING,
+				       FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	      if (hdl == INVALID_HANDLE_VALUE)
+	        debug_printf ("CreateFile (%s) failed, %E", full_path.get_win32 ());
+	      else
+	        {
+		  NTFS_VOLUME_DATA_BUFFER nvdb;
+		  DWORD bytes;
+		  if (!DeviceIoControl (hdl, FSCTL_GET_NTFS_VOLUME_DATA, NULL,
+					0, &nvdb, sizeof nvdb, &bytes, NULL))
+		    debug_printf ("DeviceIoControl (%s) failed, %E", full_path.get_win32 ());
+		  else
+		    totalc = nvdb.TotalClusters.QuadPart;
+		  CloseHandle (hdl);
+		}
+	    }
 	}
       else
 	availc = freec;
