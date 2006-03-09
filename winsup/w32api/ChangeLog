@@ -1,4 +1,11 @@
 2006-03-09  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+	* include/winspool.h (DI_MEMORYMAP_WRITE): Define (DWORD type).
+	(FORM_USER,FORM_PRINTER): Define (DWORD type).
+	* include/winspool.h [_WIN32_WINNT >= 0x0500]
+	(DSPRINT_*): Define (DWORD type).
+	Thanks to:   Roland Schwingel <rolandschwingel at users dot sf dot net>
+
+2006-03-09  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 	* include/winspool.h (JOB_CONTROL_*,JOB_STATUS_*): Define.
 	Thanks to:   Roland Schwingel <rolandschwingel at users dot sf dot net>
 
