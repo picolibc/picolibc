@@ -1,5 +1,11 @@
 2006-03-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (rename): Move existance check for oldpath further up
+	to the start of the function.  Avoid another case of a name collision
+	if oldpath is a shortcut and a file or directory newpath already exists.
+
+2006-03-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (NtClose): Define.
 	(NtOpenDirectoryObject): Define.
 	(NtQueryDirectoryObject): Define.

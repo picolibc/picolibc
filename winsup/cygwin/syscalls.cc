@@ -1176,6 +1176,7 @@ rename (const char *oldpath, const char *newpath)
 {
   int res = 0;
   char *lnk_suffix = NULL;
+  bool no_lnk_file_exists = false;
 
   path_conv real_old (oldpath, PC_SYM_NOFOLLOW,
 		      transparent_exe ? stat_suffixes : NULL);
@@ -1184,6 +1185,13 @@ rename (const char *oldpath, const char *newpath)
     {
       syscall_printf ("-1 = rename (%s, %s)", oldpath, newpath);
       set_errno (real_old.error);
+      return -1;
+    }
+
+  if (!real_old.exists ()) /* file to move doesn't exist */
+    {
+      syscall_printf ("file to move doesn't exist");
+      set_errno (ENOENT);
       return -1;
     }
 
@@ -1198,6 +1206,21 @@ rename (const char *oldpath, const char *newpath)
 
       if (real_old.is_lnk_special ())
 	{
+	  if (real_new.exists ())
+	    {
+	      /* This early directory test is necessary because the below test
+		 tests against the name with attached .lnk suffix.  To avoid
+		 name collisions, we shouldn't rename a file to "foo.lnk"
+		 if a "foo" directory exists. */
+	      if (real_new.isdir ())
+		{
+		  syscall_printf ("newpath is directory, but oldpath is not");
+		  set_errno (EISDIR);
+		  return -1;
+		}
+	      /* Shortcut hack, No. 3, part 1 */
+	      no_lnk_file_exists = true;
+	    }
 	  /* Shortcut hack. */
 	  strcpy (new_buf, newpath);
 	  strcat (new_buf, ".lnk");
@@ -1222,13 +1245,6 @@ rename (const char *oldpath, const char *newpath)
     {
       syscall_printf ("-1 = rename (%s, %s)", oldpath, newpath);
       set_errno (real_new.case_clash ? ECASECLASH : real_new.error);
-      return -1;
-    }
-
-  if (!real_old.exists ()) /* file to move doesn't exist */
-    {
-      syscall_printf ("file to move doesn't exist");
-      set_errno (ENOENT);
       return -1;
     }
 
@@ -1353,6 +1369,18 @@ done:
       if (lnk_suffix)
 	{
 	  *lnk_suffix = '.';
+	  DeleteFile (real_new);
+	}
+      /* Shortcut hack, No. 3, part 2 */
+      /* If a file with the given name exists, it must be deleted after the
+         symlink has been renamed.  Otherwise we end up with two files of
+	 the same name in the directory, one file "newpath", which already
+	 exited before rename has been called, and one file "newpath.lnk",
+	 which is the result of the rename operation. */
+      else if (no_lnk_file_exists)
+        {
+	  lnk_suffix = strrchr (real_new.get_win32 (), '.');
+	  *lnk_suffix = '\0';
 	  DeleteFile (real_new);
 	}
     }
