@@ -1,3 +1,18 @@
+2006-03-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (NtClose): Define.
+	(NtOpenDirectoryObject): Define.
+	(NtQueryDirectoryObject): Define.
+	* fhandler_proc.cc: Include ctype.h and wchar.h.
+	(format_proc_partitions): Revamp loop over existing harddisks by
+	scanning the NT native \Device object directory and looking for
+	Harddisk entries.
+	* ntdll.h: Rearrange system call declarations alphabetically.
+	(DIRECTORY_QUERY): Define.
+	(struct _DIRECTORY_BASIC_INFORMATION): Define.
+	(NtOpenDirectoryObject): Declare.
+	(NtQueryDirectoryObject): Declare.
+
 2006-03-08  Christopher Faylor  <cgf@timesys.com>
 
 	* cygtls.h (_cygtls::retaddr): New method.
