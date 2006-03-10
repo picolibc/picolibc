@@ -1,3 +1,7 @@
+2006-03-10  Paul Brook  <paul@codesourcery.com>
+
+	* arm.h (EF_ARM_EABI_VER5): Define.
+
 2006-03-06  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* m68k.h (EF_M68K_ISA_MASK, EF_M68K_ISA_A,
