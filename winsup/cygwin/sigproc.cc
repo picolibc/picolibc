@@ -61,10 +61,10 @@ HANDLE NO_COPY signal_arrived;		// Event signaled when a signal has
 
 HANDLE NO_COPY sigCONT;			// Used to "STOP" a process
 
-Static cygthread *hwait_sig;
+cygthread *hwait_sig;
 Static HANDLE wait_sig_inited;		// Control synchronization of
 					//  message queue startup
-Static bool sigheld;			// True if holding signals
+static bool sigheld;			// True if holding signals
 
 Static int nprocs;			// Number of deceased children
 Static char cprocs[(NPROCS + 1) * sizeof (pinfo)];// All my children info
@@ -475,7 +475,6 @@ create_signal_arrived ()
 void __stdcall
 sigproc_init ()
 {
-  extern HANDLE sync_startup;
   wait_sig_inited = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
   ProtectHandle (wait_sig_inited);
 
@@ -484,7 +483,6 @@ sigproc_init ()
    */
   sync_proc_subproc.init ("sync_proc_subproc");
 
-  sync_startup = NULL;
   hwait_sig = new cygthread (wait_sig, 0, cygself, "sig");
   hwait_sig->zap_h ();
 
@@ -523,6 +521,8 @@ sig_send (_pinfo *p, int sig)
 #endif
       return -1;
     }
+  else if (sig == __SIGFLUSH || sig == __SIGFLUSHFAST)
+    return 0;
   else
     {
       SetEvent (sigCONT);
@@ -1091,8 +1091,12 @@ wait_sig (VOID *)
 		readsig, myself->sendsig);
 
   sigpacket pack;
+  if (in_forkee)
+    pack.si.si_signo = __SIGHOLD;
   for (;;)
     {
+      if (pack.si.si_signo == __SIGHOLD)
+	WaitForSingleObject (sigCONT, INFINITE);
       DWORD nb;
       pack.tls = NULL;
       if (!ReadFile (readsig, &pack, sizeof (pack), &nb, NULL))
@@ -1194,8 +1198,6 @@ wait_sig (VOID *)
 	  sigproc_printf ("signalling pack.wakeup %p", pack.wakeup);
 	  SetEvent (pack.wakeup);
 	}
-      if (pack.si.si_signo == __SIGHOLD)
-	WaitForSingleObject (sigCONT, INFINITE);
       if (pack.si.si_signo == __SIGEXIT)
 	break;
     }

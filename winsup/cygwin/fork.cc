@@ -171,8 +171,6 @@ frok::child (void *)
 
   ForceCloseHandle1 (fork_info->forker_finished, forker_finished);
 
-  sigproc_init ();
-
   pthread::atforkchild ();
   fixup_timers_after_fork ();
   cygbench ("fork-child");

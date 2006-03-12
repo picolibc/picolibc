@@ -23,8 +23,7 @@ details. */
 typedef unsigned int SOCKET;
 #endif
 
-#define CYGTLS_INITIALIZED 0x43227
-#define CYGTLSMAGIC "D0Ub313v31nm&G1c?";
+#define CYGTLS_INITIALIZED 0xc763173f
 
 #ifndef CYG_MAX_PATH
 # define CYG_MAX_PATH 260

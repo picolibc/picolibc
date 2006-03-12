@@ -404,7 +404,12 @@ dll_noncygwin_dllcrt0 (HMODULE h, per_process *p)
 extern "C" void
 cygwin_detach_dll (dll *)
 {
-  dlls.detach ((HANDLE) _my_tls.retaddr ());
+  HANDLE retaddr;
+  if (_my_tls.isinitialized ())
+    retaddr = (HANDLE) _my_tls.retaddr ();
+  else
+    retaddr = __builtin_return_address (0);
+  dlls.detach (retaddr);
 }
 
 extern "C" void

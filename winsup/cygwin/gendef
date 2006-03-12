@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Copyright 2003, 2004, 2005 Red Hat, Inc.
+# Copyright 2003, 2004, 2005, 2006 Red Hat, Inc.
 #
 # This file is part of Cygwin.
 #
@@ -43,12 +43,14 @@ for (@in) {
     chomp;
     if (/=/o) {
 	if (s/\s+NOSIGFE\s*$//) {
-	} elsif (s/ SIGFE$//) {
-	  my $func = (split(' '))[2];
-	  $sigfe{$func} = '_sigfe_' . $func;
+	    # nothing
+	} elsif (s/ SIGFE(_MAYBE)?$//) {
+	    my $func = (split(' '))[2];
+	    my $maybe = lc $1 . '_';
+	    $sigfe{$func} = '_sigfe' . $maybe . $func;
 	}
     } else {
-	my ($func, $sigfe) = m%^\s*(\S+)(?:\s+((?:NO)?SIGR?FE))?$%o;
+	my ($func, $sigfe) = m%^\s*(\S+)(?:\s+((?:NO)?SIGFE(?:_MAYBE)?))?$%o;
 	if (defined($sigfe) && $sigfe =~ /^NO/o) {
 	    $_ = $func;
 	} else {
@@ -83,13 +85,14 @@ close SIGFE;
 sub fefunc {
     my $func = '_' . shift;
     my $fe = '_' . shift;
+    my $sigfe_func = ($fe =~ /^(.*)$func/)[0];
     my $extra;
     my $res = <<EOF;
 	.extern	$func
 	.global	$fe
 $fe:
 	pushl	\$$func
-	jmp	__sigfe
+	jmp	$sigfe_func
 
 EOF
     if (!$main::first++) {
@@ -97,6 +100,18 @@ EOF
 	.text
 
 	.stabs	"_sigfe:F(0,1)",36,0,0,__sigfe
+__sigfe_maybe:
+	pushl	%ebx
+	pushl	%edx
+	movl	%fs:4,%ebx				# location of bottom of stack
+	movl	$tls::initialized(%ebx),%eax
+	cmpl	\$0xc763173f,%eax			# initialized?
+	je	1f
+	popl	%edx
+	popl	%ebx
+	popl	%eax
+	jmp	*%eax
+
 __sigfe:
 	pushl	%ebx
 	pushl	%edx

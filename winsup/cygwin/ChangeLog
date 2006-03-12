@@ -1,3 +1,29 @@
+2006-03-12  Christopher Faylor  <cgf@timesys.com>
+
+	* cygtls.h (CYGTLS_INITIALIZED): Change to a little more unlikely value.
+	(CYGTLSMAGIC): Delete.
+	* dcrt0.cc (dll_crt0_0): Call sigproc_init during init startup.
+	(_dll_crt0): Don't worry about sync_startup.  Just wait for sigthread here.
+	* dll_init.cc (cygwin_detach_dll): Only pick up tls version of retaddr
+	if we have a valid tls.
+	* fork.cc (frok::child): Remove sigproc_init initialization since it
+	happens much earlier now.
+	* gendef: Recognize SIGFE_MAYBE.
+	(fefunc): Generate calls to _sigfe_maybe, if appropriate.
+	(_sigfe_maybe): New function.
+	* init.cc (search_for): Always initialize search_for, even on fork.
+	(calibration_thread): Delete.
+	(calibration_id): Delete.
+	(prime_threads): Delete.
+	(munge_threadfunc): Remove calibration_thread special case.  Avoid
+	calling thread function if we haven't yet hit the "search_for" thread.
+	(dll_entry): Remove prime_threads call.  Only call munge_threadfunc
+	when hwait_sig is active.  Ditto. for _my_tls.remove ();
+	* sigproc.cc (hwait_sig): Make global.
+	(sigproc_init): Don't bother with sync_startup.
+	(sig_send): Treat flush as a no-op when signals are held.
+	(wait_sig): Cause signals to be held after fork.
+
 2006-03-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (rename): Move existance check for oldpath further up

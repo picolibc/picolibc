@@ -750,6 +750,8 @@ dll_crt0_0 ()
     DuplicateTokenEx (hProcToken, MAXIMUM_ALLOWED, NULL,
 		      SecurityImpersonation, TokenImpersonation,
 		      &hProcImpToken);
+  /* Initialize signal/subprocess handling. */
+  sigproc_init ();
   debug_printf ("finished dll_crt0_0 initialization");
 }
 
@@ -834,9 +836,6 @@ dll_crt0_1 (char *)
 
   /* Initialize user info. */
   uinfo_init ();
-
-  /* Initialize signal/subprocess handling. */
-  sigproc_init ();
 
   /* Connect to tty. */
   tty_init ();
@@ -924,7 +923,6 @@ dll_crt0_1 (char *)
   /* Flush signals and ensure that signal thread is up and running. Can't
      do this for noncygwin case since the signal thread is blocked due to
      LoadLibrary serialization. */
-  wait_for_sigthread ();
   ld_preload ();
   if (user_data->main)
     cygwin_exit (user_data->main (__argc, __argv, *user_data->envptr));
@@ -950,14 +948,8 @@ initialize_main_tls (char *padding)
 extern "C" void __stdcall
 _dll_crt0 ()
 {
-  extern HANDLE sync_startup;
   extern DWORD threadfunc_ix;
-  if (sync_startup != INVALID_HANDLE_VALUE)
-    {
-      WaitForSingleObject (sync_startup, INFINITE);
-      CloseHandle (sync_startup);
-    }
-
+  wait_for_sigthread ();
   if (!threadfunc_ix)
     system_printf ("internal error: couldn't determine location of thread function on stack.  Expect signal problems.");
 

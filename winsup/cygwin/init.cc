@@ -19,11 +19,9 @@ details. */
 #include "ntdll.h"
 
 int NO_COPY dynamically_loaded;
-static char *search_for = (char *) cygthread::stub;
+static char NO_COPY *search_for = (char *) cygthread::stub;
 unsigned threadfunc_ix[8] __attribute__((section (".cygwin_dll_common"), shared));
-DWORD tls_func;
-
-HANDLE sync_startup;
+extern cygthread *hwait_sig;
 
 #define OLDFUNC_OFFSET -1
 
@@ -33,32 +31,6 @@ threadfunc_fe (VOID *arg)
   (void)__builtin_return_address(1);
   asm volatile ("andl $-16,%%esp" ::: "%esp");
   _cygtls::call ((DWORD (*)  (void *, void *)) (((char **) _tlsbase)[OLDFUNC_OFFSET]), arg);
-}
-
-static DWORD WINAPI
-calibration_thread (VOID *arg)
-{
-  ExitThread (0);
-}
-
-static DWORD calibration_id;
-
-/* We need to know where the OS stores the address of the thread function
-   on the stack so that we can intercept the call and insert some tls
-   stuff on the stack.  This function starts a known calibration thread.
-   When it starts, a call will be made to dll_entry which will call munge_threadfunc
-   looking for the calibration thread offset on the stack.  This offset will
-   be stored and used by all executing cygwin processes. */
-static void
-prime_threads ()
-{
-  if (threadfunc_ix[0])
-    sync_startup = INVALID_HANDLE_VALUE;
-  else
-    {
-      search_for = (char *) calibration_thread;
-      sync_startup = CreateThread (NULL, 0, calibration_thread, 0, 0, &calibration_id);
-    }
 }
 
 /* If possible, redirect the thread entry point to a cygwin routine which
@@ -82,14 +54,16 @@ munge_threadfunc ()
 	}
     }
 
-  char *threadfunc = ebp[threadfunc_ix[0]];
-  if (threadfunc == (char *) calibration_thread)
-    /* no need for the overhead */;
-  else if (threadfunc_ix[0])
+  if (threadfunc_ix[0])
     {
-      for (i = 0; threadfunc_ix[i]; i++)
-	ebp[threadfunc_ix[i]] = (char *) threadfunc_fe;
-      ((char **) _tlsbase)[OLDFUNC_OFFSET] = threadfunc;
+      char *threadfunc = ebp[threadfunc_ix[0]];
+      if (!search_for || threadfunc == search_for)
+	{
+	  search_for = NULL;
+	  for (i = 0; threadfunc_ix[i]; i++)
+	    ebp[threadfunc_ix[i]] = (char *) threadfunc_fe;
+	  ((char **) _tlsbase)[OLDFUNC_OFFSET] = threadfunc;
+	}
     }
 }
 
@@ -170,16 +144,15 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
 	respawn_wow64_process ();
 
       dll_crt0_0 ();
-      prime_threads ();	// this should be the last thing to happen
       break;
     case DLL_PROCESS_DETACH:
       break;
     case DLL_THREAD_ATTACH:
-      if (!sync_startup || GetCurrentThreadId () == calibration_id)
+      if (hwait_sig)
 	munge_threadfunc ();
       break;
     case DLL_THREAD_DETACH:
-      if (!sync_startup)
+      if (hwait_sig)
 	_my_tls.remove (0);
       break;
     }
