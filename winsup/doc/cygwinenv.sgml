@@ -93,11 +93,16 @@ There is no default set.
 </para>
 </listitem>
 <listitem>
-<para><envar>forkchunk:32768</envar> - causes <function>fork()</function>
+<para><envar>forkchunk:32768</envar> - causes the <function>fork()</function>
 to copy memory some number of bytes at a time, in the above example 
 32768 bytes (32Kb) at a time. The default is to copy as many bytes as 
 possible, which is preferable in most cases but may slow some older systems
 down.
+</para>
+</listitem>
+<listitem>
+<para><envar>fork_retry:n</envar> - causes the <function>fork()</function>
+to retry n times when a child process fails due to certain specific errors.
 </para>
 </listitem>
 <listitem>
