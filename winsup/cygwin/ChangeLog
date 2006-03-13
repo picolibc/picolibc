@@ -1,3 +1,17 @@
+2006-03-13  Christopher Faylor  <cgf@timesys.com>
+
+	* dcrt0.cc (dll_crt0_0): Reorganize so that sigproc_init is called a
+	little later.  Add a comment.
+	* fork.cc (resume_child): Make void.
+	(frok::parent): Only zero pi when necessary.  Explicitly zero si.  Set
+	this_errno when child_copy fails.  Accommodate change to resume_child.
+	* sigproc.cc (sigalloc): Move global_sigs initialization here.
+	(sigproc_init): Move global_sigs.
+	(sig_send): Just check for flush signals once.
+
+	* wincap.h: Define supports_setconsolectrlhandler_null throughout.
+	* wincap.cc: Ditto.
+
 2006-03-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (LoadDLLfuncNt): New define to wrap NT native functions.

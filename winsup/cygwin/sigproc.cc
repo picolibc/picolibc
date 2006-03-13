@@ -112,6 +112,7 @@ sigalloc ()
 {
   cygheap->sigs = global_sigs =
     (struct sigaction *) ccalloc (HEAP_SIGS, NSIG, sizeof (struct sigaction));
+  global_sigs[SIGSTOP].sa_flags = SA_RESTART | SA_NODEFER;
 }
 
 void __stdcall
@@ -479,14 +480,12 @@ sigproc_init ()
   ProtectHandle (wait_sig_inited);
 
   /* sync_proc_subproc is used by proc_subproc.  It serialises
-   * access to the children and proc arrays.
-   */
+     access to the children and proc arrays.  */
   sync_proc_subproc.init ("sync_proc_subproc");
 
   hwait_sig = new cygthread (wait_sig, 0, cygself, "sig");
   hwait_sig->zap_h ();
 
-  global_sigs[SIGSTOP].sa_flags = SA_RESTART | SA_NODEFER;
   sigproc_printf ("process/signal handling enabled, state %p", myself->process_state);
 }
 
@@ -514,19 +513,19 @@ sig_send (_pinfo *p, int sig)
     sigheld = true;
   else if (!sigheld)
     /* nothing */;
-  else if (sig != __SIGNOHOLD && sig != __SIGFLUSH && sig != __SIGFLUSHFAST)
+  else if (sig == __SIGFLUSH || sig == __SIGFLUSHFAST)
+    return 0;
+  else if (sig == __SIGNOHOLD)
+    {
+      SetEvent (sigCONT);
+      sigheld = false;
+    }
+  else
     {
 #ifdef DEBUGGING
       system_printf ("internal signal sent while signals are on hold");
 #endif
       return -1;
-    }
-  else if (sig == __SIGFLUSH || sig == __SIGFLUSHFAST)
-    return 0;
-  else
-    {
-      SetEvent (sigCONT);
-      sigheld = false;
     }
   siginfo_t si = {0};
   si.si_signo = sig;

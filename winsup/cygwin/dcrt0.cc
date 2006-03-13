@@ -671,6 +671,13 @@ void __stdcall
 dll_crt0_0 ()
 {
   init_global_security ();
+  initial_env ();
+
+  /* Initialize signal processing here, early, in the hopes that the creation
+     of a thread early in the process will cause more predictability in memory
+     layout for the main thread. */
+  sigproc_init ();
+
   lock_process::init ();
   init_console_handler (TRUE);
   _impure_ptr = _GLOBAL_REENT;
@@ -680,7 +687,6 @@ dll_crt0_0 ()
   _impure_ptr->_current_locale = "C";
   user_data->impure_ptr = _impure_ptr;
   user_data->impure_ptr_ptr = &_impure_ptr;
-  initial_env ();
   mmap_init ();
 
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
@@ -750,8 +756,6 @@ dll_crt0_0 ()
     DuplicateTokenEx (hProcToken, MAXIMUM_ALLOWED, NULL,
 		      SecurityImpersonation, TokenImpersonation,
 		      &hProcImpToken);
-  /* Initialize signal/subprocess handling. */
-  sigproc_init ();
   debug_printf ("finished dll_crt0_0 initialization");
 }
 

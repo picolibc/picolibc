@@ -50,12 +50,12 @@ class frok
   friend int fork ();
 };
 
-static int
+static void
 resume_child (HANDLE forker_finished)
 {
   SetEvent (forker_finished);
   debug_printf ("signalled child");
-  return 1;
+  return;
 }
 
 /* Notify parent that it is time for the next step. */
@@ -214,7 +214,6 @@ frok::parent (void *stack_here)
 {
   HANDLE forker_finished;
   DWORD rc;
-  PROCESS_INFORMATION pi = {0, NULL, 0, 0};
   child_pid = -1;
   error = NULL;
   this_errno = 0;
@@ -225,7 +224,6 @@ frok::parent (void *stack_here)
 
   int c_flags = GetPriorityClass (hMainProc);
   debug_printf ("priority class %d", c_flags);
-  STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
 
   /* If we don't have a console, then don't create a console for the
      child either.  */
@@ -274,6 +272,10 @@ frok::parent (void *stack_here)
   debug_printf ("stack - bottom %p, top %p, size %d",
 		ch.stackbottom, ch.stacktop, ch.stacksize);
 
+  PROCESS_INFORMATION pi;
+  STARTUPINFO si;
+
+  memset (&si, 0, sizeof (si));
   si.cb = sizeof (STARTUPINFO);
   si.lpReserved2 = (LPBYTE) &ch;
   si.cbReserved2 = sizeof (ch);
@@ -300,6 +302,7 @@ frok::parent (void *stack_here)
     {
       this_errno = geterrno_from_win_error ();
       error = "CreateProcessA failed";
+      memset (&pi, 0, sizeof (pi));
       goto cleanup;
     }
 
@@ -403,7 +406,10 @@ frok::parent (void *stack_here)
   locked = false;
   MALLOC_CHECK;
   if (!rc)
-    goto cleanup;
+    {
+      this_errno = get_errno ();
+      goto cleanup;
+    }
 
   /* Now fill data/bss of any DLLs that were linked into the program. */
   for (dll *d = dlls.istart (DLL_LINK); d; d = dlls.inext ())
@@ -422,10 +428,9 @@ frok::parent (void *stack_here)
 	}
     }
 
-  /* Start thread, and wait for it to reload dlls.  */
-  if (!resume_child (forker_finished))
-    goto cleanup;
-  else if (!ch.sync (child->pid, pi.hProcess, FORK_WAIT_TIMEOUT))
+  /* Start thread, and then wait for it to reload dlls.  */
+  resume_child (forker_finished);
+  if (!ch.sync (child->pid, pi.hProcess, FORK_WAIT_TIMEOUT))
     {
       this_errno = EAGAIN;
       error = "died waiting for dll loading";

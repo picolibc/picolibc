@@ -67,6 +67,7 @@ struct wincaps
   unsigned has_disabled_user_tos_setting		: 1;
   unsigned has_fileid_dirinfo				: 1;
   unsigned has_exclusiveaddruse				: 1;
+  unsigned supports_setconsolectrlhandler_null		: 1;
 };
 
 class wincapc
@@ -140,6 +141,7 @@ public:
   bool	IMPLEMENT (has_disabled_user_tos_setting)
   bool	IMPLEMENT (has_fileid_dirinfo)
   bool	IMPLEMENT (has_exclusiveaddruse)
+  bool	IMPLEMENT (supports_setconsolectrlhandler_null)
 
 #undef IMPLEMENT
 };
