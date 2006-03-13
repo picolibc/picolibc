@@ -144,7 +144,6 @@ struct _cygtls
   sigset_t deltamask;
   HANDLE event;
   int *errno_addr;
-  unsigned initialized;
   sigset_t sigmask;
   sigset_t sigwait_mask;
   siginfo_t *sigwait_info;
@@ -170,6 +169,7 @@ struct _cygtls
   unsigned stacklock;
   __stack_t *stackptr;
   __stack_t stack[TLS_STACK_SIZE];
+  unsigned initialized;
   unsigned padding[0];
 
   /*gentls_offsets*/

@@ -1,5 +1,15 @@
 2006-03-12  Christopher Faylor  <cgf@timesys.com>
 
+	* cygtls.cc (_cygtls::remove): Reset initialized flag right away if we
+	were previously initialized.
+	* cygtls.h (_cygtls::initialized): Move nearer the end to catch
+	situation when Windows 98 mysteriously changes pieces of cygtls when
+	thread is detaching.
+	* gendef (__sigfe_maybe): Simplify slightly.
+	* tlsoffsets.h: Regenerate.
+
+2006-03-12  Christopher Faylor  <cgf@timesys.com>
+
 	* cygtls.h (CYGTLS_INITIALIZED): Change to a little more unlikely value.
 	(CYGTLSMAGIC): Delete.
 	* dcrt0.cc (dll_crt0_0): Call sigproc_init during init startup.

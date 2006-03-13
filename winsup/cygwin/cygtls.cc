@@ -147,7 +147,10 @@ _cygtls::fixup_after_fork ()
 void
 _cygtls::remove (DWORD wait)
 {
-  if (!isinitialized () || !locals.exitsock || exit_state >= ES_FINAL)
+  if (!isinitialized ())
+     return;
+  initialized = 0;
+  if (!locals.exitsock || exit_state >= ES_FINAL)
     return;
 
   debug_printf ("wait %p", wait);

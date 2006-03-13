@@ -109,8 +109,7 @@ __sigfe_maybe:
 	je	1f
 	popl	%edx
 	popl	%ebx
-	popl	%eax
-	jmp	*%eax
+	ret
 
 __sigfe:
 	pushl	%ebx
