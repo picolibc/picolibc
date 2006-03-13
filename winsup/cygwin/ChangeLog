@@ -2,8 +2,8 @@
 
 	* cygtls.cc (_cygtls::remove): Reset initialized flag right away if we
 	were previously initialized.
-	* cygtls.h (_cygtls::initialized): Move nearer the end to catch
-	situation when Windows 98 mysteriously changes pieces of cygtls when
+	* cygtls.h (_cygtls::initialized): Move nearer to the end to catch
+	situation when Windows 98 mysteriously changes parts of _my_tls when
 	thread is detaching.
 	* gendef (__sigfe_maybe): Simplify slightly.
 	* tlsoffsets.h: Regenerate.
