@@ -1,3 +1,10 @@
+2006-03-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (LoadDLLfuncNt): New define to wrap NT native functions.
+	Use for NT native functions throughout.
+	* dtable.cc (handle_to_fn): Treate return value of NtQueryObject as
+	NTSTATUS value.
+
 2006-03-12  Christopher Faylor  <cgf@timesys.com>
 
 	* cygtls.cc (_cygtls::remove): Reset initialized flag right away if we

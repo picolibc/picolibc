@@ -829,9 +829,10 @@ handle_to_fn (HANDLE h, char *posix_fn)
   ntfn->Name.MaximumLength = sizeof (fnbuf) - sizeof (*ntfn);
   ntfn->Name.Buffer = (WCHAR *) (ntfn + 1);
 
-  DWORD res = NtQueryObject (h, ObjectNameInformation, ntfn, sizeof (fnbuf), NULL);
+  NTSTATUS res = NtQueryObject (h, ObjectNameInformation, ntfn, sizeof (fnbuf),
+  				NULL);
 
-  if (res)
+  if (NT_SUCCESS (res))
     {
       strcpy (posix_fn, unknown_file);
       debug_printf ("NtQueryObject failed");
