@@ -29,7 +29,7 @@ enum child_info_types
 
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
-#define CURR_CHILD_INFO_MAGIC 0xc87757a7U
+#define CURR_CHILD_INFO_MAGIC 0x4160e87bU
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -68,8 +68,10 @@ public:
   jmp_buf jmp;		// where child will jump to
   void *stacktop;	// location of top of parent stack
   void *stackbottom;	// location of bottom of parent stack
+  int retry;		// number of times we've tried to fork
   child_info_fork ();
   void handle_fork ();
+  bool handle_failure (DWORD);
 };
 
 class fhandler_base;

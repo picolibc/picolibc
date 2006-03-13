@@ -21,6 +21,7 @@ details. */
 #include "cygheap.h"
 #include "registry.h"
 #include "cygwin_version.h"
+#include "child_info.h"
 
 #define assert(x)
 
@@ -75,7 +76,7 @@ heap_init ()
 	  if ((reserve_size -= page_const) < allocsize)
 	    break;
 	}
-      if (!p)
+      if (!p && in_forkee && !fork_info->handle_failure (GetLastError ()))
 	api_fatal ("couldn't allocate heap, %E, base %p, top %p, "
 		   "reserve_size %d, allocsize %d, page_const %d",
 		   cygheap->user_heap.base, cygheap->user_heap.top,

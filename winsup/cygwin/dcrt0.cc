@@ -122,6 +122,7 @@ extern "C"
 #ifdef DEBUGGING
   int pinger;
 #endif
+  int NO_COPY __api_fatal_exit_val = 1;
 };
 
 char *old_title;
@@ -638,6 +639,14 @@ get_cygwin_startup_info ()
     }
 
   return res;
+}
+
+bool
+child_info_fork::handle_failure (DWORD err)
+{
+  if (retry > 0)
+    ExitProcess (EXITCODE_RETRY);
+  return 0;
 }
 
 #define dll_data_start &_data_start__
@@ -1157,7 +1166,7 @@ __api_fatal (const char *fmt, ...)
 #ifdef DEBUGGING
   try_to_debug ();
 #endif
-  myself.exit (1);
+  myself.exit (__api_fatal_exit_val);
 }
 
 void

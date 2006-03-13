@@ -39,7 +39,7 @@ details. */
 #define WSSC		  60000	// Wait for signal completion
 #define WPSP		  40000	// Wait for proc_subproc mutex
 
-#define no_signals_available(x) (!hwait_sig || ((x) && myself->exitcode & EXITCODE_SET) || &_my_tls == _sig_tls)
+#define no_signals_available(x) (!hwait_sig || ((x) && myself->exitcode & EXITCODE_SET) || &_my_tls == _sig_tls || in_dllentry)
 
 #define NPROCS	256
 
@@ -856,18 +856,23 @@ child_info::sync (pid_t pid, HANDLE& hProcess, DWORD howlong)
   x -= WAIT_OBJECT_0;
   if (x >= n)
     {
-      system_printf ("wait failed, pid %d, %E", pid);
+      system_printf ("wait failed, pid %u, %E", pid);
       res = false;
     }
   else
     {
-      if (type == _PROC_EXEC && x == nsubproc_ready && myself->wr_proc_pipe)
+      if (x != nsubproc_ready)
+	res = type != _PROC_FORK;
+      else
 	{
-	  ForceCloseHandle1 (hProcess, childhProc);
-	  hProcess = NULL;
+	  if (type == _PROC_EXEC && myself->wr_proc_pipe)
+	    {
+	      ForceCloseHandle1 (hProcess, childhProc);
+	      hProcess = NULL;
+	    }
+	  res = true;
 	}
-      sigproc_printf ("process %d synchronized, WFMO returned %d", pid, x);
-      res = true;
+      sigproc_printf ("pid %u, WFMO returned %d, res %d", pid, x, res);
     }
   return res;
 }

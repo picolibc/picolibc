@@ -1,5 +1,31 @@
 2006-03-13  Christopher Faylor  <cgf@timesys.com>
 
+	* child_info.h (child_info_fork::handle_failure): Declare new function.
+	(child_info_fork::retry): New field.
+	* dcrt0.cc (__api_fatal_exit_val): Define.
+	(child_info_fork::handle_failure): Define new function.
+	(__api_fatal): Exit using __api_fatal_exit_val value.
+	* environ.cc (set_fork_retry): Set fork_retry based on CYGWIN
+	environment variable.
+	(parse_thing): Add "fork_retry" setting.
+	* fork.cc (fork_retry): Define.
+	(frok::parent): Reorganize to allow retry of failed child creation if
+	child signalled that it was ok to do so.
+	* heap.cc (heap_init): Signal parent via handle_failure when
+	VirtualAlloc fails.
+	* pinfo.h (EXITCODE_RETRY): Declare.
+	* sigproc.cc (child_info::sync): Properly exit with failure condition
+	if called for fork and didn't see subproc_ready.
+	* spawn.cc (spawn_guts): Use windows pid as first argument.
+	* winsup.h: Remove obsolete NEW_MACRO_VARARGS define.
+	(__api_fatal_exit_val): Declare.
+	(set_api_fatal_return): Define.
+	(in_dllentry): Declare.
+	* exceptions.cc (inside_kernel): Remove unneeded in_dllentry
+	declaration.
+
+2006-03-13  Christopher Faylor  <cgf@timesys.com>
+
 	* dcrt0.cc (dll_crt0_0): Reorganize so that sigproc_init is called a
 	little later.  Add a comment.
 	* fork.cc (resume_child): Make void.

@@ -32,8 +32,9 @@ enum picom
   PICOM_PIPE_FHANDLER = 7
 };
 
-#define EXITCODE_SET 0x8000000
-#define EXITCODE_NOSET 0x4000000
+#define EXITCODE_SET	0x8000000
+#define EXITCODE_NOSET	0x4000000
+#define EXITCODE_RETRY	0x2000000
 
 class fhandler_pipe;
 

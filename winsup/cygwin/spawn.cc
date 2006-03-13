@@ -846,7 +846,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
 
-  synced = ch.sync (pid, pi.hProcess, INFINITE);
+  synced = ch.sync (pi.dwProcessId, pi.hProcess, INFINITE);
 
   switch (mode)
     {

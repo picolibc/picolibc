@@ -33,6 +33,8 @@ details. */
 
 #define NPIDS_HELD 4
 
+int fork_retry = 5;
+
 /* Timeout to wait for child to start, parent to init child, etc.  */
 /* FIXME: Once things stabilize, bump up to a few minutes.  */
 #define FORK_WAIT_TIMEOUT (300 * 1000)     /* 300 seconds */
@@ -287,34 +289,55 @@ frok::parent (void *stack_here)
   syscall_printf ("CreateProcess (%s, %s, 0, 0, 1, %p, 0, 0, %p, %p)",
 		  myself->progname, myself->progname, c_flags, &si, &pi);
   bool locked = __malloc_lock ();
-  rc = CreateProcess (myself->progname, /* image to run */
-		      myself->progname, /* what we send in arg0 */
-		      &sec_none_nih,
-		      &sec_none_nih,
-		      TRUE,	  /* inherit handles from parent */
-		      c_flags,
-		      NULL,	  /* environment filled in later */
-		      0,	  /* use current drive/directory */
-		      &si,
-		      &pi);
-
-  if (!rc)
+  time_t start_time;
+  ch.retry = fork_retry;
+  while (1)
     {
-      this_errno = geterrno_from_win_error ();
-      error = "CreateProcessA failed";
-      memset (&pi, 0, sizeof (pi));
-      goto cleanup;
-    }
+      start_time = time (NULL);
+      rc = CreateProcess (myself->progname, /* image to run */
+			  myself->progname, /* what we send in arg0 */
+			  &sec_none_nih,
+			  &sec_none_nih,
+			  TRUE,	  /* inherit handles from parent */
+			  c_flags,
+			  NULL,	  /* environment filled in later */
+			  0,	  /* use current drive/directory */
+			  &si,
+			  &pi);
 
-  /* Fixup the parent datastructure if needed and resume the child's
-     main thread. */
-  if (c_flags & CREATE_SUSPENDED)
-    {
-      cygheap->fdtab.fixup_before_fork (pi.dwProcessId);
-      ResumeThread (pi.hThread);
-    }
+      if (!rc)
+	{
+	  this_errno = geterrno_from_win_error ();
+	  error = "CreateProcessA failed";
+	  memset (&pi, 0, sizeof (pi));
+	  goto cleanup;
+	}
 
-  strace.write_childpid (ch, pi.dwProcessId);
+      /* Fixup the parent datastructure if needed and resume the child's
+	 main thread. */
+      if (c_flags & CREATE_SUSPENDED)
+	{
+	  cygheap->fdtab.fixup_before_fork (pi.dwProcessId);
+	  ResumeThread (pi.hThread);
+	}
+
+      strace.write_childpid (ch, pi.dwProcessId);
+
+      /* Wait for subproc to initialize itself. */
+      if (!ch.sync (pi.dwProcessId, pi.hProcess, FORK_WAIT_TIMEOUT))
+	{
+	  DWORD exit_code;
+	  if (GetExitCodeProcess (pi.hProcess, &exit_code) && exit_code == EXITCODE_RETRY)
+	    {
+	      ch.retry--;
+	      continue;
+	    }
+	  this_errno = EAGAIN;
+	  error = "died waiting for longjmp before initialization";
+	  goto cleanup;
+	}
+      break;
+    }
 
   child_pid = cygwin_pid (pi.dwProcessId);
   child.init (child_pid, 1, NULL);
@@ -330,7 +353,7 @@ frok::parent (void *stack_here)
       goto cleanup;
     }
 
-  child->start_time = time (NULL); /* Register child's starting time. */
+  child->start_time = start_time; /* Register child's starting time. */
   child->nice = myself->nice;
 
   /* Initialize things that are done later in dll_crt0_1 that aren't done
@@ -368,14 +391,6 @@ frok::parent (void *stack_here)
 #ifndef NO_SLOW_PID_REUSE
   slow_pid_reuse (pi.hProcess);
 #endif
-
-  /* Wait for subproc to initialize itself. */
-  if (!ch.sync (child->pid, pi.hProcess, FORK_WAIT_TIMEOUT))
-    {
-      this_errno = EAGAIN;
-      error = "died waiting for longjmp before initialization";
-      goto cleanup;
-    }
 
   /* CHILD IS STOPPED */
   debug_printf ("child is alive (but stopped)");

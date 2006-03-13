@@ -35,10 +35,6 @@ details. */
 
 #define EXPORT_ALIAS(sym,symalias) extern "C" __typeof (sym) symalias __attribute__ ((alias(#sym)));
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ >= 199900L
-#define NEW_MACRO_VARARGS
-#endif
-
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0501
 #endif
@@ -157,11 +153,9 @@ extern HANDLE tty_mutex;
 #define SIGTOMASK(sig)	(1 << ((sig) - signal_shift_subtract))
 extern unsigned int signal_shift_subtract;
 
-#ifdef NEW_MACRO_VARARGS
-# define api_fatal(...) __api_fatal (__VA_ARGS__)
-#else
-# define api_fatal(fmt, args...) __api_fatal ("%P: *** " fmt,## args)
-#endif
+extern int __api_fatal_exit_val;
+#define set_api_fatal_return(n) do {extern int __api_fatal_exit_val; __api_fatal_exit_val = (n);} while (0)
+#define api_fatal(fmt, args...) __api_fatal ("%P: *** " fmt,## args)
 
 #undef issep
 #define issep(ch) (strchr (" \t\n\r", (ch)) != NULL)
@@ -346,8 +340,10 @@ extern SYSTEM_INFO system_info;
 /* The title on program start. */
 extern char *old_title;
 extern bool display_title;
-extern bool in_forkee;
 extern bool transparent_exe;
+
+extern bool in_forkee;
+extern bool in_dllentry;
 
 extern HANDLE hMainThread;
 extern HANDLE hMainProc;

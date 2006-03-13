@@ -293,7 +293,6 @@ inside_kernel (CONTEXT *cx)
 {
   int res;
   MEMORY_BASIC_INFORMATION m;
-  extern bool in_dllentry;
 
   if (in_dllentry)
     return true;
