@@ -2,7 +2,7 @@
 
 	* autoload.cc (LoadDLLfuncNt): New define to wrap NT native functions.
 	Use for NT native functions throughout.
-	* dtable.cc (handle_to_fn): Treate return value of NtQueryObject as
+	* dtable.cc (handle_to_fn): Treat return value of NtQueryObject as
 	NTSTATUS value.
 
 2006-03-12  Christopher Faylor  <cgf@timesys.com>
