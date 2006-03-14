@@ -1,5 +1,9 @@
 2006-03-14  Christopher Faylor  <cgf@timesys.com>
 
+	* fork.cc (frok::parent): Improve error message.
+
+2006-03-14  Christopher Faylor  <cgf@timesys.com>
+
 	* dcrt0.cc (main_environ): Initialize to &__cygwin_environment.
 	(dll_crt0_1): Move resourcelocks, thread interface, pinfo_init, and
 	uinfo_init...

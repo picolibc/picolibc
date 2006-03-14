@@ -333,7 +333,13 @@ frok::parent (void *stack_here)
 	      continue;
 	    }
 	  this_errno = EAGAIN;
-	  error = "died waiting for longjmp before initialization";
+	  /* Not thread safe, but do we care? */
+	  static char buf[sizeof("died waiting for longjmp before "
+				 "initialization, retry 4294967295, "
+				 "exit code 0xfffffffff")];
+	  __small_sprintf (buf, "died waiting for longjmp before initialization, "
+			   "retry %d, exit code %p", ch.retry, exit_code);
+	  error = buf;
 	  goto cleanup;
 	}
       break;
