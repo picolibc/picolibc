@@ -1,3 +1,15 @@
+2006-03-14  Christopher Faylor  <cgf@timesys.com>
+
+	* dcrt0.cc (main_environ): Initialize to &__cygwin_environment.
+	(dll_crt0_1): Move resourcelocks, thread interface, pinfo_init, and
+	uinfo_init...
+	(dll_crt0_0): ...to here.
+	(_dll_crt0): Call update_envptrs here after setting main_environ.
+	* environ.cc (environ_init): Eliminate initted variable.  Don't call
+	update_envptrs here.
+	* sigproc.cc (wait_sig): Use my_sendsig when calling CreatePipe to
+	avoid a dereference.
+
 2006-03-13  Christopher Faylor  <cgf@timesys.com>
 
 	* child_info.h (child_info_fork::handle_failure): Declare new function.

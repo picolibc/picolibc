@@ -424,7 +424,6 @@ dlfork (int val)
 void __stdcall
 update_envptrs ()
 {
-  extern char ***main_environ;
   for (dll *d = dlls.istart (DLL_ANY); d; d = dlls.inext ())
     *(d->p.envptr) = __cygwin_environ;
   *main_environ = __cygwin_environ;

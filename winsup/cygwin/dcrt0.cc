@@ -36,6 +36,7 @@ details. */
 #include "dll_init.h"
 #include "sync.h"
 #include "heap.h"
+#include "environ.h"
 
 #define MAX_AT_FILE_LEVEL 10
 
@@ -92,7 +93,7 @@ extern "C"
   /* This is an exported copy of environ which can be used by DLLs
      which use cygwin.dll.  */
   char **__cygwin_environ;
-  char ***main_environ;
+  char ***main_environ = &__cygwin_environ;
   /* __progname used in getopt error message */
   char *__progname;
   struct per_process __cygwin_user_data =
@@ -753,6 +754,14 @@ dll_crt0_0 ()
 	}
     }
 
+  user_data->resourcelocks->Init ();
+  user_data->threadinterface->Init ();
+
+  if (!in_forkee)
+    {
+      pinfo_init (envp, envc);
+      uinfo_init ();	/* initialize user info */
+    }
   _cygtls::init ();
 
   /* Initialize events */
@@ -784,8 +793,6 @@ dll_crt0_1 (char *)
     small_printf ("cmalloc returns %p\n", cmalloc (HEAP_STR, n));
 #endif
 
-  user_data->resourcelocks->Init ();
-  user_data->threadinterface->Init ();
   ProtectHandle (hMainProc);
   ProtectHandle (hMainThread);
 
@@ -834,9 +841,6 @@ dll_crt0_1 (char *)
   }
 #endif
 
-  /* Initialize our process table entry. */
-  pinfo_init (envp, envc);
-
   /* Can be set only after environment has been initialized. */
   if (wincap.has_security ())
     set_cygwin_privileges (hProcImpToken);
@@ -846,9 +850,6 @@ dll_crt0_1 (char *)
 
   /* Allocate cygheap->fdtab */
   dtable_init ();
-
-  /* Initialize user info. */
-  uinfo_init ();
 
   /* Connect to tty. */
   tty_init ();
@@ -967,6 +968,7 @@ _dll_crt0 ()
     system_printf ("internal error: couldn't determine location of thread function on stack.  Expect signal problems.");
 
   main_environ = user_data->envptr;
+  update_envptrs ();
 
   char padding[CYGTLS_PADSIZE];
 

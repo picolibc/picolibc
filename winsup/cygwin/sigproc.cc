@@ -523,7 +523,7 @@ sig_send (_pinfo *p, int sig)
   else
     {
 #ifdef DEBUGGING
-      system_printf ("internal signal sent while signals are on hold");
+      system_printf ("signal %d sent to %p while signals are on hold", p, sig);
 #endif
       return -1;
     }
@@ -1073,11 +1073,11 @@ wait_sig (VOID *)
   /* Initialization */
   SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
 
-  if (!CreatePipe (&readsig, &myself->sendsig, sec_user_nih (sa_buf), 0))
+  sigCONT = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+  if (!CreatePipe (&readsig, &my_sendsig, sec_user_nih (sa_buf), 0))
     api_fatal ("couldn't create signal pipe, %E");
   ProtectHandle (readsig);
-  sigCONT = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
-  my_sendsig = myself->sendsig;
+  myself->sendsig = my_sendsig;
 
   /* Setting dwProcessId flags that this process is now capable of receiving
      signals.  Prior to this, dwProcessId was set to the windows pid of

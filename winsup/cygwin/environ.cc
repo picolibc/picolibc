@@ -729,16 +729,12 @@ environ_init (char **envp, int envc)
   if (efault.faulted ())
     api_fatal ("internal error reading the windows environment - too many environment variables?");
 
-  static int initted;
-  if (!initted)
-    {
-      for (int i = 0; conv_envvars[i].name != NULL; i++)
-	{
-	  conv_start_chars[(int) cyg_tolower (conv_envvars[i].name[0])] = 1;
-	  conv_start_chars[(int) cyg_toupper (conv_envvars[i].name[0])] = 1;
-	}
-      initted = 1;
-    }
+  if (!conv_start_chars[0])
+    for (int i = 0; conv_envvars[i].name != NULL; i++)
+      {
+	conv_start_chars[(int) cyg_tolower (conv_envvars[i].name[0])] = 1;
+	conv_start_chars[(int) cyg_toupper (conv_envvars[i].name[0])] = 1;
+      }
 
   got_something_from_registry = regopt ("default");
   if (myself->progname[0])
@@ -814,7 +810,6 @@ environ_init (char **envp, int envc)
 
 out:
   __cygwin_environ = envp;
-  update_envptrs ();
   if (envp_passed_in)
     {
       p = getenv ("CYGWIN");
