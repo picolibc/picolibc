@@ -84,8 +84,6 @@ GDB_NLM_DEPS =
 # the libraries.
 RPATH_ENVVAR = @RPATH_ENVVAR@
 
-# This is the list of directories to be built for the build system.
-BUILD_CONFIGDIRS = libiberty
 # Build programs are put under this directory.
 BUILD_SUBDIR = @build_subdir@
 # This is set by the configure script to the arguments to use when configuring
@@ -178,9 +176,6 @@ POSTSTAGE1_HOST_EXPORTS = \
 	  -B$$r/$(HOST_SUBDIR)/prev-gcc/ \
 	  -B$(build_tooldir)/bin/"; export CC_FOR_BUILD;
 
-# This is set by the configure script to the list of directories which
-# should be built using the target tools.
-TARGET_CONFIGDIRS = @target_configdirs@
 # Target libraries are put under this directory:
 TARGET_SUBDIR = @target_subdir@
 # This is set by the configure script to the arguments to use when configuring
@@ -36669,7 +36664,7 @@ POSTSTAGE1_FLAGS_TO_PASS = \
 	CFLAGS="$(BOOT_CFLAGS)" \
 	LIBCFLAGS="$(BOOT_CFLAGS)" \
 	LDFLAGS="$(BOOT_LDFLAGS)" \
-	ADAC="\$$(CC)"
+	"`echo 'ADAFLAGS=$(BOOT_ADAFLAGS)' | sed -e s'/[^=][^=]*=$$/XFOO=/'`"
 
 # For stage 1:
 # * We force-disable intermodule optimizations, even if
@@ -37967,13 +37962,13 @@ do-distclean: distclean-stage1
 # not work as a dependency, just as the minimum necessary to avoid errors.
 stage_last:
 	$(MAKE) $(RECURSE_FLAGS_TO_PASS) stage1-bubble
-@endif gcc-bootstrap
 
 .PHONY: restrap
 restrap:
 	@: $(MAKE); $(stage)
 	rm -rf stage1-$(TARGET_SUBDIR) stage2 stage3 stage4 stageprofile stagefeedback 
 	$(MAKE) $(RECURSE_FLAGS_TO_PASS) all
+@endif gcc-bootstrap
 
 # --------------------------------------
 # Dependencies between different modules
