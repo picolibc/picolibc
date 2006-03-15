@@ -1,3 +1,8 @@
+2006-03-15  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/wsetup.c (__swsetup): Don't make a buffer
+	for a string I/O file that isn't using the asprintf family.
+
 2006-03-07  Eric Blake  <ebb9@byu.net>
 
 	* libc/stdio/freopen.c (_freopen_r) [HAVE_FCNTL]: For NULL
