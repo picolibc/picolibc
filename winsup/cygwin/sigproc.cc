@@ -515,7 +515,7 @@ sig_send (_pinfo *p, int sig)
     /* nothing */;
   else if (sig == __SIGFLUSH || sig == __SIGFLUSHFAST)
     return 0;
-  else if (sig == __SIGNOHOLD)
+  else if (sig == __SIGNOHOLD || sig == __SIGEXIT)
     {
       SetEvent (sigCONT);
       sigheld = false;

@@ -29,7 +29,7 @@ enum child_info_types
 
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
-#define CURR_CHILD_INFO_MAGIC 0x4160e87bU
+#define CURR_CHILD_INFO_MAGIC 0x88e640f7U
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -72,6 +72,7 @@ public:
   child_info_fork ();
   void handle_fork ();
   bool handle_failure (DWORD);
+  DWORD fork_retry (HANDLE);
 };
 
 class fhandler_base;

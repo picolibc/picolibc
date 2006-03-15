@@ -326,12 +326,9 @@ frok::parent (void *stack_here)
       /* Wait for subproc to initialize itself. */
       if (!ch.sync (pi.dwProcessId, pi.hProcess, FORK_WAIT_TIMEOUT))
 	{
-	  DWORD exit_code;
-	  if (GetExitCodeProcess (pi.hProcess, &exit_code) && exit_code == EXITCODE_RETRY)
-	    {
-	      ch.retry--;
-	      continue;
-	    }
+	  DWORD exit_code = ch.fork_retry (pi.hProcess);
+	  if (!exit_code)
+	    continue;
 	  this_errno = EAGAIN;
 	  /* Not thread safe, but do we care? */
 	  static char buf[sizeof("died waiting for longjmp before "

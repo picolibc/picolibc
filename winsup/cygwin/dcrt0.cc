@@ -642,6 +642,26 @@ get_cygwin_startup_info ()
   return res;
 }
 
+DWORD
+child_info_fork::fork_retry (HANDLE h)
+{
+  DWORD exit_code;
+  if (!GetExitCodeProcess (h, &exit_code))
+    return STILL_ACTIVE;	/* should never happen */
+  switch (exit_code)
+    {
+    case STATUS_CONTROL_C_EXIT:
+      if (retry-- > 0)
+	return 0;
+      break;
+    case EXITCODE_RETRY:
+      if (retry-- > 0)
+	return 0;
+      break;
+    }
+  return exit_code;
+}
+
 bool
 child_info_fork::handle_failure (DWORD err)
 {
