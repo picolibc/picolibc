@@ -1,57 +1,24 @@
-2005-11-28  Mark Mitchell  <mark@codesourcery.com>
+2006-03-16  Carlos O'Donell  <carlos@codesourcery.com>
 
-	* binutils/dlltool.c (main): Fix typo.
-	* binutils/windres.c (main): Likewise.
-
-2005-11-17  Carlos O'Donell  <carlos@codesourcery.com>
-
-	Issue #488
-	* libiberty/argv.c (expandargv): Check for errors with ferror,
-	rather than by looking at return value from fread.
-	
-2005-10-13  Mark Mitchell  <mark@codesourcery.com>
-
-	Issue #439
-	Backport:
-	2005-10-13  Mark Mitchell  <mark@codesourcery.com>
-	* ld.texino: Describe double-quoted string syntax for version
-	nodes.
-	* ldlang.h (lang_new_vers_pattern): Add literal_p parameter.
-	* ldgram.y (vers_defns): Allow NAME as well as VERS_IDENTIFIER.
-	Adjust calls to lang_new_vers_pattern to pass literal_p argument.
-	* ldlang.c (lang_vers_match): Fix indentation.  Do not glob-match
-	version nodes without a pattern.
-	(lang_new_vers_pattern): Add literal_p parameter.
-	(lang_do_version_exports_section): Pass it.
-
-2005-08-30  Mark Mitchell  <mark@codesourcery.com>
-
-	* ld/ldmain.c (main): Use expandargv.
-	* binutils/addr2line.c (main): Likewise.
-	* binutils/ar.c (main): Likewise.
-	* binutils/coffdump.c (main): Likewise.
-	* binutils/cxxfilt.c (main): Likewise.
-	* binutils/dlltool.c (main): Likewise.
-	* binutils/dllwrap.c (main): Likewise.
-	* binutils/nlmconv.c (main): Likewise.
-	* binutils/nm.c (main): Likewise.
-	* binutils/objcopy.c (main): Likewise.
-	* binutils/objdump.c (main): Likewise.
-	* binutils/readelf.c (main): Likewise.
-	* binutils/size.c (main): Likeiwse.
-	* binutils/srcconv.c (main): Likewise.
-	* binutils/strings.c (main): Likewise.
-	* binutils/sysdump.c (main): Likewise.
-	* binutils/sysinfo.c (main): Likewise.
-	* binutils/windres.c (main): Likewise.
-	
-2005-08-30  Mark Mitchell  <mark@codesourcery.com>
-
-	* include/libiberty.h (expandargv): New function.
-	* libiberty/argv.c (safe-ctype.h): Include it.
-	(ISBLANK): Remove.
-	(stdio.h): Include.
-	(expandargv): New function.
-	* libiberty/Makefile.in: Regenerated.
-
+	* binutils/rcparse.c: Remove generated file.
+	* binutils/rcparse.h: Likewise.
+	* binutils/nlmheader.c: Likewise.
+	* binutils/nlmheader.h: Likewise.
+	* binutils/arparse.c: Likewise.
+	* binutils/arparse.h: Likewise.
+	* binutils/sysinfo.c: Likewise.
+	* binutils/sysinfo.h: Likewise.
+	* binutils/defparse.c: Likewise.
+	* binutils/defparse.h: Likewise.
+	* binutils/rclex.c: Likewise.
+	* binutils/syslex.c: Likewise.
+	* binutils/deflex.c: Likewise.
+	* binutils/arlex: Likewise.
+	* gas/itbl-parse.c: Remove generated file.
+	* gas/itbl-parse.h: Likewise.
+	* gas/m68k-parse.c: Likewise.
+	* gas/itbl-lex.c: Likewise.
+	* ld/ldgram.c: Remove generated file.
+	* ld/ldgram.h: Likewise.
+	* ld/ldlex.c: Likewise.
 
