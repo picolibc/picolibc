@@ -1,3 +1,8 @@
+2006-03-15  Christopher Faylor  <cgf@timesys.com>
+
+	* include/winbase.h (STATUS_DLL_INIT_FAILED): New define.
+	(STATUS_DLL_INIT_FAILED_LOGOFF): Ditto.
+
 2006-03-09  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 	* include/winspool.h (DI_MEMORYMAP_WRITE): Define (DWORD type).
 	(FORM_USER,FORM_PRINTER): Define (DWORD type).
