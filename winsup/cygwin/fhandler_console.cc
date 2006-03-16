@@ -1885,9 +1885,7 @@ fhandler_console::need_invisible ()
 				       failed */
 	  debug_printf ("h %p, horig %p, flags %p", h, horig, oi.dwFlags);
 	  if (horig && h && h != horig && SetProcessWindowStation (horig))
-	    {
-	      CloseWindowStation (h);
-	    }
+	    CloseWindowStation (h);
 	  termios_printf ("%d = AllocConsole (), %E", b);
 	  invisible_console = true;
 	}

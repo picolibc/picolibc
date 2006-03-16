@@ -100,7 +100,7 @@ dummy_ctrl_c_handler (DWORD dwCtrlType)
 }
 
 void
-init_console_handler (BOOL install_handler)
+init_console_handler (bool install_handler)
 {
   BOOL res;
   while (SetConsoleCtrlHandler (ctrl_c_handler, FALSE))

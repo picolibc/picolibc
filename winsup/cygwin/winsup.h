@@ -255,7 +255,7 @@ void __stdcall timeval_to_filetime (const struct timeval *, FILETIME *);
 
 /* Console related */
 void __stdcall set_console_title (char *);
-void init_console_handler (BOOL);
+void init_console_handler (bool);
 
 void init_global_security ();
 

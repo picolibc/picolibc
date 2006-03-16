@@ -1,3 +1,20 @@
+2006-03-15  Christopher Faylor  <cgf@timesys.com>
+
+	* cygheap.cc (init_cygheap::manage_console_count): Turn console control
+	handler on/off depending on whether we have allocated a console or not.
+	* dcrt0.cc (child_info_fork::fork_retry): Add more potential retry
+	statuses.
+	(dll_crt0_0): Turn on/off console control depending on whether we have
+	a controlling tty or not.
+	* exceptions.cc (init_console_handler): Change BOOL to bool.
+	* fhandler_console.cc (fhandler_console::need_invisible): Cosmetic
+	change.
+	* winsup.h (init_console_handler): Reflect argument type change.
+
+	* wincap.h (supports_setconsolectrlhandler_null): Remove duplicate
+	capability throughout.
+	* wincap.cc: Ditto.
+
 2006-03-14  Christopher Faylor  <cgf@timesys.com>
 
 	* child_info.h (child_info_fork::fork_retry): Declare new function.

@@ -651,9 +651,8 @@ child_info_fork::fork_retry (HANDLE h)
   switch (exit_code)
     {
     case STATUS_CONTROL_C_EXIT:
-      if (retry-- > 0)
-	return 0;
-      break;
+    case STATUS_DLL_INIT_FAILED:
+    case STATUS_DLL_INIT_FAILED_LOGOFF:
     case EXITCODE_RETRY:
       if (retry-- > 0)
 	return 0;
@@ -709,7 +708,6 @@ dll_crt0_0 ()
   sigproc_init ();
 
   lock_process::init ();
-  init_console_handler (TRUE);
   _impure_ptr = _GLOBAL_REENT;
   _impure_ptr->_stdin = &_impure_ptr->__sf[0];
   _impure_ptr->_stdout = &_impure_ptr->__sf[1];
@@ -736,7 +734,10 @@ dll_crt0_0 ()
 
   child_proc_info = get_cygwin_startup_info ();
   if (!child_proc_info)
-    memory_init ();
+    {
+      memory_init ();
+      init_console_handler (myself->ctty >= 0);
+    }
   else
     {
       cygwin_user_h = child_proc_info->user_h;
@@ -772,6 +773,7 @@ dll_crt0_0 ()
 	      }
 	    break;
 	}
+	init_console_handler (myself->ctty >= 0);
     }
 
   user_data->resourcelocks->Init ();
@@ -782,6 +784,7 @@ dll_crt0_0 ()
       pinfo_init (envp, envc);
       uinfo_init ();	/* initialize user info */
     }
+
   _cygtls::init ();
 
   /* Initialize events */
