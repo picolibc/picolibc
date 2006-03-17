@@ -1,3 +1,8 @@
+2006-03-17  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/linuxthreads/config.h: Remove definition
+	of UINT32_C.
+
 2006-03-15  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/wsetup.c (__swsetup): Don't make a buffer

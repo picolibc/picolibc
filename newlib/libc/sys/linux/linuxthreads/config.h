@@ -11,4 +11,3 @@
        while (__result == -1L && errno == EINTR);                             \
        __result; }))
 
-#define UINT32_C(c)    c ## U
