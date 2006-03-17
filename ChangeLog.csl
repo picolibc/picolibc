@@ -1,3 +1,30 @@
+2006-03-17  Jim Blandy  <jimb@codesourcery.com>
+
+	Add support for 'target remote |' on MinGW.
+	* gdb/ser-mingw.c (struct pipe_state): New structure.
+	(make_pipe_state, free_pipe_state, cleanup_pipe_state)
+	(pipe_windows_open, pipe_windows_close, pipe_windows_read)
+	(pipe_windows_write, pipe_wait_handle): New functions.
+	(_initialize_ser_windows): Register a "pipe" interface based on
+	them.
+
+ 	* libiberty/pex-common.c (pex_write_input): New function.
+ 	* libiberty/pexecute.txh (pex_write_input): Document it.
+ 	* libiberty/pex-common.h (struct pex_funcs): New function ptr fdopenw.
+ 	* libiberty/pex-unix.c (pex_unix_fdopenw): New function.
+ 	(funcs): List it as our fdopenw function.
+ 	* libiberty/pex-win32.c (pex_win32_fdopenw): New function.
+ 	(funcs): List it as our fdopenw function.
+ 	* libiberty/pex-djgpp.c (funcs): Leave fdopenw null.
+ 	* libiberty/pex-msdos (funcs): Same.
+ 	* libiberty/functions.texi: Regenerated.
+
+ 	* include/libiberty.h (pex_write_input): New declaration.
+
+	* libiberty/pex-common.h (struct pex_obj): Doc fixes.
+
+	* libibery/functions.texi: Regenerate.
+
 2006-03-08  Paul Brook  <paul@codesourcery.com>
 
 	Backport from mainline.
