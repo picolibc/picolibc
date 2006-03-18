@@ -35,6 +35,7 @@ enum picom
 #define EXITCODE_SET	0x8000000
 #define EXITCODE_NOSET	0x4000000
 #define EXITCODE_RETRY	0x2000000
+#define EXITCODE_OK	0x1000000
 
 class fhandler_pipe;
 

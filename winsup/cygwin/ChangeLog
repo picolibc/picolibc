@@ -1,5 +1,13 @@
 2006-03-18  Christopher Faylor  <cgf@timesys.com>
 
+	* pinfo.h (EXITCODE_OK): Define new constant.
+	* sigproc.cc (child_info::sync): Return EXITCODE_OK if entering with
+	exit_code == 0.
+	(sig_send): Don't complain if sending signals while blocked if the
+	sender isn't in the main thread.
+
+2006-03-18  Christopher Faylor  <cgf@timesys.com>
+
 	* child_info.h (CURR_CHILD_INFO_MAGIC): Regenerate.
 	(child_info::retry): Move here from fork subclass.
 	(child_info::exit_code): New field.

@@ -520,7 +520,7 @@ sig_send (_pinfo *p, int sig)
       SetEvent (sigCONT);
       sigheld = false;
     }
-  else
+  else if (&_my_tls == _main_tls)
     {
 #ifdef DEBUGGING
       system_printf ("signal %d sent to %p while signals are on hold", sig, p);
@@ -886,6 +886,8 @@ child_info::sync (pid_t pid, HANDLE& hProcess, DWORD howlong)
 DWORD
 child_info::proc_retry (HANDLE h)
 {
+  if (!exit_code)
+    return EXITCODE_OK;
   switch (exit_code)
     {
     case STILL_ACTIVE:	/* shouldn't happen */
