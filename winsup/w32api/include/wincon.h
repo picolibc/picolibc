@@ -19,7 +19,7 @@ extern "C" {
 #if (_WIN32_WINNT >= 0x0501)
 #define CONSOLE_FULLSCREEN_MODE	1
 #define CONSOLE_WINDOWED_MODE	2
-#endif 
+#endif
 #define CTRL_C_EVENT 0
 #define CTRL_BREAK_EVENT 1
 #define CTRL_CLOSE_EVENT 2
@@ -30,6 +30,10 @@ extern "C" {
 #define ENABLE_PROCESSED_INPUT 1
 #define ENABLE_WINDOW_INPUT 8
 #define ENABLE_MOUSE_INPUT 16
+#define ENABLE_INSERT_MODE 32
+#define ENABLE_QUICK_EDIT_MODE 64
+#define ENABLE_EXTENDED_FLAGS  128
+#define ENABLE_AUTO_POSITION   256
 #define ENABLE_PROCESSED_OUTPUT 1
 #define ENABLE_WRAP_AT_EOL_OUTPUT 2
 #define KEY_EVENT 1
@@ -98,7 +102,7 @@ typedef struct _KEY_EVENT_RECORD {
 		CHAR AsciiChar;
 	} uChar;
 	DWORD dwControlKeyState;
-} 
+}
 #ifdef __GNUC__
 /* gcc's alignment is not what win32 expects */
  PACKED
