@@ -1,3 +1,53 @@
+2006-03-18  Christopher Faylor  <cgf@timesys.com>
+
+	* child_info.h (CURR_CHILD_INFO_MAGIC): Regenerate.
+	(child_info::retry): Move here from fork subclass.
+	(child_info::exit_code): New field.
+	(child_info::retry_count): Max retry count for process start.
+	(child_info::proc_retry): Declare new function.
+	(child_info_fork::retry): Move to parent.
+	(child_info_fork::fork_retry): Ditto.
+	* dcrt0.cc (child_info::fork_retry): Rename and move.
+	(child_info_fork::handle_failure): Move.
+	(dll_crt0_0): Initialize console handler based on whether we have a
+	controlling tty or not.  Avoid nonsensical check for fork where it can
+	never occur.
+	* environ.cc (set_proc_retry): Rename from set_fork_retry.  Set
+	retry_count in child_info.
+	(parse_thing): Reflect above change.
+	* exceptions.cc (dummy_ctrl_c_handler): Remove unused variable name.
+	(ctrl_c_handler): Always return TRUE for the annoying
+	CTRL_LOGOFF_EVENT.
+	* fhandler_termios.cc (fhandler_termios::tcsetpgrp): Remove call to
+	init_console_handler.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Just call
+	mange_console_count here and let it decide what to do with initializing
+	console control handling.
+	* fork.cc (fork_retry): Remove definition.
+	(frok::parent): Define static errbuf and use in error messages (not
+	thread safe yet).  Close pi.hThread as soon as possible.  Protect
+	pi.hProcess as soon as possible.  Don't set retry_count.  That happens
+	automatically in the constructor now.  Accommodate name change from
+	fork_retry to proc_retry.
+	* init.cc (dll_entry): Turn off ctrl-c handling early until we know how
+	it is supposed to be handled.
+	* pinfo.cc (_pinfo::dup_proc_pipe): Remember original proc pipe value
+	for failure error message.  Tweak debug message slightly.
+	* sigproc.cc (child_info::retry_count): Define.
+	(child_info::child_info): Initialize retry count.
+	(child_info::sync): Set exit code if process dies before
+	synchronization.
+	(child_info::proc_retry): Rename from child_info_fork::fork_retry.  Use
+	previously derived exit code.  Be more defensive about what is
+	classified as an error exit.
+	(child_info_fork::handle_failure): Move here from dcrt0.cc.
+	* spawn.cc (spawn_guts): Maintain error mode when starting new process
+	to avoid annoying pop ups.  Move deimpersonate call within new loop.
+	Move envblock freeing to end.  Loop if process dies prematurely with
+	bad exit code.
+	* syscalls.cc (init_console_handler): Remove hopefully unneeded call to
+	init_console_handler.
+
 2006-03-15  Christopher Faylor  <cgf@timesys.com>
 
 	* cygheap.cc (init_cygheap::manage_console_count): Turn console control

@@ -1987,7 +1987,6 @@ setpgid (pid_t pid, pid_t pgid)
 	  if (p->pid != p->pgid)
 	    p->set_has_pgid_children (0);
 	  res = 0;
-	  // init_console_handler (FALSE);
 	}
     }
 

@@ -33,8 +33,6 @@ details. */
 
 #define NPIDS_HELD 4
 
-int fork_retry = 5;
-
 /* Timeout to wait for child to start, parent to init child, etc.  */
 /* FIXME: Once things stabilize, bump up to a few minutes.  */
 #define FORK_WAIT_TIMEOUT (300 * 1000)     /* 300 seconds */
@@ -171,6 +169,7 @@ frok::child (void *)
       sync_with_parent ("loaded dlls", true);
     }
 
+  init_console_handler (myself->ctty >= 0);
   ForceCloseHandle1 (fork_info->forker_finished, forker_finished);
 
   pthread::atforkchild ();
@@ -221,6 +220,7 @@ frok::parent (void *stack_here)
   this_errno = 0;
   bool fix_impersonation = false;
   pinfo child;
+  static char errbuf[256];
 
   pthread::atforkprepare ();
 
@@ -290,7 +290,6 @@ frok::parent (void *stack_here)
 		  myself->progname, myself->progname, c_flags, &si, &pi);
   bool locked = __malloc_lock ();
   time_t start_time;
-  ch.retry = fork_retry;
   while (1)
     {
       start_time = time (NULL);
@@ -321,22 +320,25 @@ frok::parent (void *stack_here)
 	  ResumeThread (pi.hThread);
 	}
 
+      CloseHandle (pi.hThread);
+
+      /* Protect the handle but name it similarly to the way it will
+	 be called in subproc handling. */
+      ProtectHandle1 (pi.hProcess, childhProc);
+
       strace.write_childpid (ch, pi.dwProcessId);
 
       /* Wait for subproc to initialize itself. */
       if (!ch.sync (pi.dwProcessId, pi.hProcess, FORK_WAIT_TIMEOUT))
 	{
-	  DWORD exit_code = ch.fork_retry (pi.hProcess);
+	  DWORD exit_code = ch.proc_retry (pi.hProcess);
 	  if (!exit_code)
 	    continue;
 	  this_errno = EAGAIN;
 	  /* Not thread safe, but do we care? */
-	  static char buf[sizeof("died waiting for longjmp before "
-				 "initialization, retry 4294967295, "
-				 "exit code 0xfffffffff")];
-	  __small_sprintf (buf, "died waiting for longjmp before initialization, "
+	  __small_sprintf (errbuf, "died waiting for longjmp before initialization, "
 			   "retry %d, exit code %p", ch.retry, exit_code);
-	  error = buf;
+	  error = errbuf;
 	  goto cleanup;
 	}
       break;
@@ -366,11 +368,6 @@ frok::parent (void *stack_here)
   /* Restore impersonation */
   cygheap->user.reimpersonate ();
   fix_impersonation = false;
-
-  ProtectHandle (pi.hThread);
-  /* Protect the handle but name it similarly to the way it will
-     be called in subproc handling. */
-  ProtectHandle1 (pi.hProcess, childhProc);
 
   /* Fill in fields in the child's process table entry.  */
   child->dwProcessId = pi.dwProcessId;
@@ -426,6 +423,11 @@ frok::parent (void *stack_here)
   if (!rc)
     {
       this_errno = get_errno ();
+      DWORD exit_code;
+      if (!GetExitCodeProcess (pi.hProcess, &exit_code))
+	exit_code = 0xdeadbeef;
+      __small_sprintf (errbuf, "pid %u, exitval %p", pi.dwProcessId, exit_code);
+      error = errbuf;
       goto cleanup;
     }
 
@@ -440,7 +442,11 @@ frok::parent (void *stack_here)
 	{
 	  this_errno = get_errno ();
 #ifdef DEBUGGING
-	  error = "fork_copy for linked dll data/bss failed";
+	  DWORD exit_code;
+	  if (!GetExitCodeProcess (pi.hProcess, &exit_code))
+	    exit_code = 0xdeadbeef;
+	  __small_sprintf (errbuf, "pid %u, exitval %p", pi.dwProcessId, exit_code);
+	  error = errbuf;
 #endif
 	  goto cleanup;
 	}
@@ -481,10 +487,8 @@ frok::parent (void *stack_here)
       resume_child (forker_finished);
     }
 
-  ForceCloseHandle (pi.hThread);
   ForceCloseHandle (forker_finished);
   forker_finished = NULL;
-  pi.hThread = NULL;
   pthread::atforkparent ();
 
   return child_pid;
@@ -499,8 +503,6 @@ cleanup:
   /* Remember to de-allocate the fd table. */
   if (pi.hProcess && !child.hProcess)
     ForceCloseHandle1 (pi.hProcess, childhProc);
-  if (pi.hThread)
-    ForceCloseHandle (pi.hThread);
   if (forker_finished)
     ForceCloseHandle (forker_finished);
   debug_printf ("returning -1");

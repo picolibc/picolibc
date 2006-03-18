@@ -927,7 +927,8 @@ bool
 _pinfo::dup_proc_pipe (HANDLE hProcess)
 {
   DWORD flags = DUPLICATE_SAME_ACCESS;
-  /* Grr.  Can't set DUPLICATE_CLOSE_SOURCE for exec case because we could be
+  HANDLE orig_wr_proc_pipe = wr_proc_pipe;
+  /* Can't set DUPLICATE_CLOSE_SOURCE for exec case because we could be
      execing a non-cygwin process and we need to set the exit value before the
      parent sees it.  */
   if (this != myself || is_toplevel_proc)
@@ -935,11 +936,12 @@ _pinfo::dup_proc_pipe (HANDLE hProcess)
   bool res = DuplicateHandle (hMainProc, wr_proc_pipe, hProcess, &wr_proc_pipe,
 			      0, FALSE, flags);
   if (!res && WaitForSingleObject (hProcess, 0) != WAIT_OBJECT_0)
-    system_printf ("DuplicateHandle failed, pid %d, hProcess %p, %E", pid, hProcess);
+    system_printf ("DuplicateHandle failed, pid %d, hProcess %p, wr_proc_pipe %p, %E",
+		   pid, hProcess, orig_wr_proc_pipe);
   else
     {
       wr_proc_pipe_owner = dwProcessId;
-      sigproc_printf ("closed wr_proc_pipe %p for pid %d(%u)", wr_proc_pipe,
+      sigproc_printf ("duped wr_proc_pipe %p for pid %d(%u)", wr_proc_pipe,
 		      pid, dwProcessId);
       res = true;
     }

@@ -128,10 +128,11 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
   switch (reason)
     {
     case DLL_PROCESS_ATTACH:
+      wincap.init ();
+      init_console_handler (false);
+
       cygwin_hmodule = (HMODULE) h;
       dynamically_loaded = (static_load == NULL);
-
-      wincap.init ();
 
       /* Is the stack at an unusual address?  This is, an address which
 	 is in the usual space occupied by the process image, but below

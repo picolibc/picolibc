@@ -82,7 +82,6 @@ fhandler_termios::tcsetpgrp (const pid_t pgid)
 	{
 	case bg_ok:
 	  tc->setpgid (pgid);
-	  init_console_handler (!!is_console ());
 	  res = 0;
 	  break;
 	case bg_signalled:

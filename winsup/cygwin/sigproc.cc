@@ -523,7 +523,7 @@ sig_send (_pinfo *p, int sig)
   else
     {
 #ifdef DEBUGGING
-      system_printf ("signal %d sent to %p while signals are on hold", p, sig);
+      system_printf ("signal %d sent to %p while signals are on hold", sig, p);
 #endif
       return -1;
     }
@@ -767,6 +767,7 @@ out:
   return rc;
 }
 
+int child_info::retry_count = 10;
 /* Initialize some of the memory block passed to child processes
    by fork/spawn/exec. */
 
@@ -785,6 +786,7 @@ child_info::child_info (unsigned in_cb, child_info_types chtype, bool need_subpr
   cygheap = ::cygheap;
   cygheap_max = ::cygheap_max;
   straced = strace.attached ();
+  retry = child_info::retry_count;
   /* Create an inheritable handle to pass to the child process.  This will
      allow the child to duplicate handles from the parent to itself. */
   parent = NULL;
@@ -862,19 +864,61 @@ child_info::sync (pid_t pid, HANDLE& hProcess, DWORD howlong)
   else
     {
       if (x != nsubproc_ready)
-	res = type != _PROC_FORK;
+	{
+	  res = false;
+	  GetExitCodeProcess (hProcess, &exit_code);
+	}
       else
 	{
+	  res = true;
+	  exit_code = STILL_ACTIVE;
 	  if (type == _PROC_EXEC && myself->wr_proc_pipe)
 	    {
 	      ForceCloseHandle1 (hProcess, childhProc);
 	      hProcess = NULL;
 	    }
-	  res = true;
 	}
       sigproc_printf ("pid %u, WFMO returned %d, res %d", pid, x, res);
     }
   return res;
+}
+
+DWORD
+child_info::proc_retry (HANDLE h)
+{
+  switch (exit_code)
+    {
+    case STILL_ACTIVE:	/* shouldn't happen */
+      sigproc_printf ("STILL_ACTIVE?  How'd we get here?");
+      break;
+    case STATUS_CONTROL_C_EXIT:
+    case STATUS_DLL_INIT_FAILED:
+    case STATUS_DLL_INIT_FAILED_LOGOFF:
+    case EXITCODE_RETRY:
+      if (retry-- > 0)
+	exit_code = 0;
+      break;
+    /* Count down non-recognized exit codes more quickly since they aren't
+       due to known conditions.  */
+    default:
+      if ((exit_code & 0xc0000000) != 0xc0000000)
+	break;
+      if ((retry -= 2) < 0)
+	retry = 0;
+      else
+	exit_code = 0;
+    }
+  if (!exit_code)
+    ForceCloseHandle1 (h, childhProc);
+  return exit_code;
+}
+
+bool
+child_info_fork::handle_failure (DWORD err)
+{
+  if (retry > 0)
+    ExitProcess (EXITCODE_RETRY);
+  return 0;
 }
 
 /* Check the state of all of our children to see if any are stopped or

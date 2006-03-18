@@ -302,9 +302,10 @@ bool mmap_is_attached_page (ULONG_PTR);
 int winprio_to_nice (DWORD) __attribute__ ((regparm (1)));
 DWORD nice_to_winprio (int &) __attribute__ ((regparm (1)));
 
-bool __stdcall create_pipe (PHANDLE hr, PHANDLE, LPSECURITY_ATTRIBUTES, DWORD)
+bool __stdcall create_pipe (PHANDLE, PHANDLE, LPSECURITY_ATTRIBUTES, DWORD)
   __attribute__ ((regparm (3)));
 #define CreatePipe create_pipe
+
 inline bool flush_file_buffers (HANDLE h)
 {
   return (GetFileType (h) != FILE_TYPE_PIPE) ? FlushFileBuffers (h) : true;

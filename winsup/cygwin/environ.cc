@@ -39,7 +39,6 @@ static bool envcache = true;
 #ifdef USE_SERVER
 extern bool allow_server;
 #endif
-extern int fork_retry;
 
 static char **lastenviron;
 
@@ -520,9 +519,9 @@ set_chunksize (const char *buf)
 }
 
 static void
-set_fork_retry (const char *buf)
+set_proc_retry (const char *buf)
 {
-  fork_retry = strtoul (buf, NULL, 0);
+  child_info::retry_count = strtoul (buf, NULL, 0);
 }
 
 static void
@@ -594,7 +593,7 @@ static struct parse_thing
   {"tty", {NULL}, set_process_state, NULL, {{0}, {PID_USETTY}}},
   {"winsymlinks", {&allow_winsymlinks}, justset, NULL, {{false}, {true}}},
   {"transparent_exe", {&transparent_exe}, justset, NULL, {{false}, {true}}},
-  {"fork_retry", {func: set_fork_retry}, isfunc, NULL, {{0}, {5}}},
+  {"proc_retry", {func: set_proc_retry}, isfunc, NULL, {{0}, {5}}},
   {NULL, {0}, justset, 0, {{0}, {0}}}
 };
 

@@ -438,12 +438,13 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   linebuf one_line;
   child_info_spawn ch;
 
-  char *envblock;
+  char *envblock = NULL;
   path_conv real_path;
   bool reset_sendsig = false;
 
   bool null_app_name = false;
   STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
+  int looped = 0;
 
   myfault efault;
   if (efault.faulted ())
@@ -600,7 +601,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   int flags = GetPriorityClass (hMainProc);
   sigproc_printf ("priority class %d", flags);
-  flags |= CREATE_DEFAULT_ERROR_MODE | CREATE_SEPARATE_WOW_VDM;
+  flags |= /* CREATE_DEFAULT_ERROR_MODE | */CREATE_SEPARATE_WOW_VDM;
 
   if (mode == _P_DETACH)
     flags |= DETACHED_PROCESS;
@@ -649,7 +650,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   cygbench ("spawn-guts");
 
   cygheap->fdtab.set_file_pointers_for_exec ();
-  cygheap->user.deimpersonate ();
 
   moreinfo->envp = build_env (envp, envblock, moreinfo->envc, real_path.iscygexec ());
   if (!moreinfo->envp || !envblock)
@@ -669,6 +669,9 @@ spawn_guts (const char * prog_arg, const char *const *argv,
      effective vs. real ids.
      FIXME: If ruid != euid and ruid != saved_uid we currently give
      up on ruid. The new process will have ruid == euid. */
+loop:
+  cygheap->user.deimpersonate ();
+
   if (!cygheap->user.issetuid ()
       || (cygheap->user.saved_uid == cygheap->user.real_uid
 	  && cygheap->user.saved_gid == cygheap->user.real_gid
@@ -726,9 +729,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   if (mode != _P_OVERLAY || !rc)
     cygheap->user.reimpersonate ();
 
-  if (envblock)
-    free (envblock);
-
   /* Set errno now so that debugging messages from it appear before our
      final debugging message [this is a general rule for debugging
      messages].  */
@@ -776,7 +776,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       strace.execing = 1;
       myself.hProcess = hExeced = pi.hProcess;
       strcpy (myself->progname, real_path); // FIXME: race?
-      close_all_files (true);
+      if (!looped)
+	close_all_files (true);
       sigproc_printf ("new process name %s", myself->progname);
       /* If wr_proc_pipe doesn't exist then this process was not started by a cygwin
 	 process.  So, we need to wait around until the process we've just "execed"
@@ -791,10 +792,13 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	 dup_proc_pipe essentially a no-op.  */
       if (!newargv.win16_exe && myself->wr_proc_pipe)
 	{
-	  myself->sync_proc_pipe ();	/* Make sure that we own wr_proc_pipe
-					   just in case we've been previously
-					   execed. */
-	  myself.zap_cwd ();
+	  if (!looped)
+	    {
+	      myself->sync_proc_pipe ();	/* Make sure that we own wr_proc_pipe
+					       just in case we've been previously
+					       execed. */
+	      myself.zap_cwd ();
+	    }
 	  myself->dup_proc_pipe (pi.hProcess);
 	}
       pid = myself->pid;
@@ -852,8 +856,16 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     {
     case _P_OVERLAY:
       myself.hProcess = pi.hProcess;
-      if (synced && WaitForSingleObject (pi.hProcess, 0) == WAIT_TIMEOUT
-	  && !myself->wr_proc_pipe)
+      if (!synced)
+	{
+	  if (ch.proc_retry (pi.hProcess) == 0)
+	    {
+	      looped++;
+	      goto loop;
+	    }
+	}
+      else if (!myself->wr_proc_pipe
+	       && WaitForSingleObject (pi.hProcess, 0) == WAIT_TIMEOUT)
 	{
 	  extern bool is_toplevel_proc;
 	  is_toplevel_proc = true;
@@ -880,6 +892,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     }
 
 out:
+  if (envblock)
+    free (envblock);
   pthread_cleanup_pop (1);
   return (int) res;
 }

@@ -642,33 +642,6 @@ get_cygwin_startup_info ()
   return res;
 }
 
-DWORD
-child_info_fork::fork_retry (HANDLE h)
-{
-  DWORD exit_code;
-  if (!GetExitCodeProcess (h, &exit_code))
-    return STILL_ACTIVE;	/* should never happen */
-  switch (exit_code)
-    {
-    case STATUS_CONTROL_C_EXIT:
-    case STATUS_DLL_INIT_FAILED:
-    case STATUS_DLL_INIT_FAILED_LOGOFF:
-    case EXITCODE_RETRY:
-      if (retry-- > 0)
-	return 0;
-      break;
-    }
-  return exit_code;
-}
-
-bool
-child_info_fork::handle_failure (DWORD err)
-{
-  if (retry > 0)
-    ExitProcess (EXITCODE_RETRY);
-  return 0;
-}
-
 #define dll_data_start &_data_start__
 #define dll_data_end &_data_end__
 #define dll_bss_start &_bss_start__
@@ -736,7 +709,7 @@ dll_crt0_0 ()
   if (!child_proc_info)
     {
       memory_init ();
-      init_console_handler (myself->ctty >= 0);
+      init_console_handler (!!GetConsoleCP ());
     }
   else
     {
@@ -757,8 +730,7 @@ dll_crt0_0 ()
 				  DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
 	      h = NULL;
 	    set_myself (h);
-	    if (child_proc_info->type != _PROC_FORK)
-	      child_proc_info->ready (true);
+	    child_proc_info->ready (true);
 	    __argc = spawn_info->moreinfo->argc;
 	    __argv = spawn_info->moreinfo->argv;
 	    envp = spawn_info->moreinfo->envp;
@@ -773,7 +745,6 @@ dll_crt0_0 ()
 	      }
 	    break;
 	}
-	init_console_handler (myself->ctty >= 0);
     }
 
   user_data->resourcelocks->Init ();

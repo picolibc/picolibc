@@ -29,7 +29,7 @@ enum child_info_types
 
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
-#define CURR_CHILD_INFO_MAGIC 0x88e640f7U
+#define CURR_CHILD_INFO_MAGIC 0x482b2eaU
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -50,11 +50,15 @@ public:
   DWORD cygheap_reserve_sz;
   unsigned char straced;
   unsigned fhandler_union_cb;
+  int retry;		// number of times we've tried to start child process
+  DWORD exit_code;	// process exit code
+  static int retry_count;// retry count;
   child_info (unsigned, child_info_types, bool);
   child_info (): subproc_ready (NULL), parent (NULL) {}
   ~child_info ();
   void ready (bool);
   bool sync (int, HANDLE&, DWORD) __attribute__ ((regparm (3)));
+  DWORD proc_retry (HANDLE);
 };
 
 class mount_info;
@@ -68,11 +72,9 @@ public:
   jmp_buf jmp;		// where child will jump to
   void *stacktop;	// location of top of parent stack
   void *stackbottom;	// location of bottom of parent stack
-  int retry;		// number of times we've tried to fork
   child_info_fork ();
   void handle_fork ();
   bool handle_failure (DWORD);
-  DWORD fork_retry (HANDLE);
 };
 
 class fhandler_base;

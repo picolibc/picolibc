@@ -94,7 +94,7 @@ NO_COPY static struct
 /* Initialization code.  */
 
 BOOL WINAPI
-dummy_ctrl_c_handler (DWORD dwCtrlType)
+dummy_ctrl_c_handler (DWORD)
 {
   return TRUE;
 }
@@ -103,6 +103,7 @@ void
 init_console_handler (bool install_handler)
 {
   BOOL res;
+
   while (SetConsoleCtrlHandler (ctrl_c_handler, FALSE))
     continue;
   if (install_handler)
@@ -113,6 +114,7 @@ init_console_handler (bool install_handler)
     res = SetConsoleCtrlHandler (dummy_ctrl_c_handler, TRUE);
   if (!res)
     system_printf ("SetConsoleCtrlHandler failed, %E");
+  return;
 }
 
 extern "C" void
@@ -946,7 +948,7 @@ ctrl_c_handler (DWORD type)
 	  if (has_visible_window_station ())
 	    sig_send (myself_nowait, SIGHUP);
 #endif
-	  return FALSE;
+	  return TRUE;
 	}
     }
 
