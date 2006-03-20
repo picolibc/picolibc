@@ -707,10 +707,7 @@ dll_crt0_0 ()
 
   child_proc_info = get_cygwin_startup_info ();
   if (!child_proc_info)
-    {
-      memory_init ();
-      init_console_handler (!!GetConsoleCP ());
-    }
+    memory_init ();
   else
     {
       cygwin_user_h = child_proc_info->user_h;

@@ -104,8 +104,9 @@ init_console_handler (bool install_handler)
 {
   BOOL res;
 
-  while (SetConsoleCtrlHandler (ctrl_c_handler, FALSE))
-    continue;
+   SetConsoleCtrlHandler (ctrl_c_handler, FALSE);
+   if (wincap.has_null_console_handler_routine ())
+     SetConsoleCtrlHandler (NULL, FALSE);
   if (install_handler)
     res = SetConsoleCtrlHandler (ctrl_c_handler, TRUE);
   else if (wincap.has_null_console_handler_routine ())
@@ -114,7 +115,6 @@ init_console_handler (bool install_handler)
     res = SetConsoleCtrlHandler (dummy_ctrl_c_handler, TRUE);
   if (!res)
     system_printf ("SetConsoleCtrlHandler failed, %E");
-  return;
 }
 
 extern "C" void
