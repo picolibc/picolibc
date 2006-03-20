@@ -490,6 +490,30 @@ typedef enum elf_hppa_reloc_type elf_hppa_reloc_type;
 #define PT_PARISC_UNWIND	0x70000001
 #define PT_PARISC_WEAKORDER	0x70000002
 
+/* Flag bits in sh_flags of ElfXX_Shdr.  */
+#define SHF_HP_TLS              0x01000000
+#define SHF_HP_NEAR_SHARED      0x02000000
+#define SHF_HP_FAR_SHARED       0x04000000
+#define SHF_HP_COMDAT           0x08000000
+#define SHF_HP_CONST            0x00800000
+
+/* Reserved section header indices.  */
+#define SHN_TLS_COMMON          (SHN_LOOS + 0x0)
+#define SHN_NS_COMMON           (SHN_LOOS + 0x1)
+#define SHN_FS_COMMON           (SHN_LOOS + 0x2)
+#define SHN_NS_UNDEF            (SHN_LOOS + 0x3)
+#define SHN_FS_UNDEF            (SHN_LOOS + 0x4)
+#define SHN_HP_EXTERN           (SHN_LOOS + 0x5)
+#define SHN_HP_EXTHINT          (SHN_LOOS + 0x6)
+#define SHN_HP_UNDEF_BIND_IMM   (SHN_LOOS + 0x7)
+
+/* Values of sh_type in ElfXX_Shdr.  */
+#define SHT_HP_OVLBITS  (SHT_LOOS + 0x0)
+#define SHT_HP_DLKM     (SHT_LOOS + 0x1)
+#define SHT_HP_COMDAT   (SHT_LOOS + 0x2)
+#define SHT_HP_OBJDICT  (SHT_LOOS + 0x3)
+#define SHT_HP_ANNOT    (SHT_LOOS + 0x4)
+
 /* Flag bits in p_flags of ElfXX_Phdr.  */
 #define PF_HP_CODE		0x00040000
 #define PF_HP_MODIFY		0x00080000
@@ -570,6 +594,9 @@ typedef enum elf_hppa_reloc_type elf_hppa_reloc_type;
 #define PT_HP_HSL_ANNOT		(PT_LOOS + 0x13)
 #define PT_HP_STACK		(PT_LOOS + 0x14)
 #define PT_HP_CORE_UTSNAME	(PT_LOOS + 0x15)
+
+/* Binding information.  */
+#define STB_HP_ALIAS		(STB_LOOS + 0x0)
 
 /* Additional symbol types.  */
 #define STT_HP_OPAQUE		(STT_LOOS + 0x1)

@@ -1,3 +1,24 @@
+2006-03-19  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	* hppa.h (SHF_HP_TLS, SHF_HP_NEAR_SHARED, SHF_HP_FAR_SHARED,
+	SHF_HP_COMDAT, SHF_HP_CONST, SHN_TLS_COMMON, SHN_NS_COMMON,
+	SHN_NS_UNDEF, SHN_FS_UNDEF, SHN_HP_EXTERN, SHN_HP_EXTHINT,
+	SHN_HP_UNDEF_BIND_IMM, SHT_HP_OVLBITS, SHT_HP_DLKM, SHT_HP_COMDAT,
+	SHT_HP_OBJDICT, SHT_HP_ANNOT, STB_HP_ALIAS): Define.
+
+2006-03-10  Paul Brook  <paul@codesourcery.com>
+
+	* arm.h (EF_ARM_EABI_VER5): Define.
+
+2006-03-06  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* m68k.h (EF_M68K_ISA_MASK, EF_M68K_ISA_A,
+	EF_M68K_ISA_A_PLUS, EF_M68K_ISA_B, EF_M68K_ISA_C): Adjust.
+	(EF_M68K_ISA_A_NODIV, EF_M68K_ISA_B_NOUSP): New.
+	(EF_M68K_HW_DIV, EF_M68K_USP): Remove.
+	(EF_M68K_MAC, EF_M68K_EMAC, EF_M68K_FLOAT): Adjust.
+	(EF_M68K_EMAC_B): New.
+
 2006-03-03  Bjoern Haase  <bjoern.m.haase@web.de>
 
 	* avr.h (R_AVR_MS8_LDI,R_AVR_MS8_LDI_NEG): Add.

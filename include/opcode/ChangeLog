@@ -1,3 +1,12 @@
+2006-03-10  Paul Brook  <paul@codesourcery.com>
+
+	* arm.h (ARM_AEXT_V7_ARM): Include v6ZK extensions.
+
+2006-03-04  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	* hppa.h (pa_opcodes): Reorder bb opcodes so that pa10 opcodes come
+	first.  Correct mask of bb "B" opcode.
+
 2006-02-27  H.J. Lu <hongjiu.lu@intel.com>
 
 	* i386.h (i386_optab): Support Intel Merom New Instructions.
@@ -274,6 +283,14 @@
 	* i386.h (i386_optab): Add x_Suf to fbld and fbstp. Add w_Suf and
 	FloatMF to fldcw, fstcw, fnstcw, and the memory formas of fstsw and
 	fnstsw.
+
+2006-02-07  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* m68k.h (m68008, m68ec030, m68882): Remove.
+	(m68k_mask): New.
+	(cpu_m68k, cpu_cf): New.
+	(mcf5200, mcf5206e, mcf521x, mcf5249, mcf528x, mcf5307, mcf5407,
+	mcf5470, mcf5480): Rename to cpu_<foo>. Add m680x0 variants.
 
 2005-01-25  Alexandre Oliva  <aoliva@redhat.com>
 
