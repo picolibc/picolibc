@@ -1,9 +1,15 @@
 2006-03-20  Paul Brook  <paul@codesourcery.com>
 
-gas/
-	* config/tc-arm.c (THUMB2_LOAD_BIT): Define.
+	* gas/config/tc-arm.c (md_apply_fix): Set H bit on blx instruction.
+
+	* gas/testsuite/gas/arm/blx-local.d: New test.
+	* gas/testsuite/gas/arm/blx-local.d: New test.
+
+2006-03-20  Paul Brook  <paul@codesourcery.com>
+
+	* gas/config/tc-arm.c (THUMB2_LOAD_BIT): Define.
 	(move_or_literal_pool): Handle Thumb-2 instructions.
 	(do_t_ldst): Call move_or_literal_pool for =N addressing modes.
-gas/testsuite/
-	* gas/arm/thumb2_pool.d: New test.
-	* gas/arm/thumb2_pool.s: New test.
+
+	* gas/testsuite/gas/arm/thumb2_pool.d: New test.
+	* gas/testsuite/gas/arm/thumb2_pool.s: New test.
