@@ -1,5 +1,10 @@
 2006-03-20  Paul Brook  <paul@codesourcery.com>
 
+	* gas/config/tc-arm.c (insns): Correct opcodes for ldrbt and strbt.
+	* gas/testsuite/gas/arm/thumb32.d: Correct expected output.
+
+2006-03-20  Paul Brook  <paul@codesourcery.com>
+
 	* gas/config/tc-arm.c (parse_operands): Set default error message.
 
 2006-03-20  Paul Brook  <paul@codesourcery.com>
