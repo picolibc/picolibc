@@ -1,3 +1,29 @@
+	* configure.tgt (arm*-stellaris-*): Use armv7m configuration.
+	* config/arm/armv7m.mt: New file.
+	* config/arm/tm-armv7m.h: Likewise.
+	* arm-tdep.c (arm_register_name_strings): Use xPSR on ARM V7M.
+	(arm_pc_is_thumb): ARM V7M is always Thumb.
+	(set_disassembly_style): Use xPSR on ARM V7M.
+	(arm_write_pc): Do not set T bit in CSPR on V7M.
+
+2006-03-20  Mark Mitchell  <mark@codesourcery.com>
+
+	* libiberty/pex-win32.c (<errno.h>): Include.
+	(fix_argv): Remove.
+	(argv_to_cmdline): New function.
+	(std_suffixes): New variable.
+	(no_suffixes): Likewise.
+	(find_executable): New function.
+	(win32_spawn): Likewise.
+	(spawn_script): Use win32_spawn instead of _spawnv[p].
+	(pex_win32_exec_child): Replace MSVCRT calls with Win32 API calls.
+	(pex_win32_wait): Likewise.
+
+2006-03-19  Mark Mitchell  <mark@codesourcery.com>
+
+	* gdb/ser-mingw.c (free_pipe_state): Close pipe before calling
+	pex_free. 
+
 2006-03-17  Mark Mitchell  <mark@codesourcery.com>
 
 	* gdb/config/arm/embed.mt (TDEPFILES): Remove remote-rdp.o.
