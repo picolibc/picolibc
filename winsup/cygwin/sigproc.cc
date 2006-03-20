@@ -679,10 +679,14 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
   else
     {
       size_t n = strlen (si._si_commune._si_str);
-      char *p = leader = (char *) alloca (sizeof (pack) + sizeof (n) + n);
-      memcpy (p, &pack, sizeof (pack)); p += sizeof (pack);
-      memcpy (p, &n, sizeof (n)); p += sizeof (n);
-      memcpy (p, si._si_commune._si_str, n); p += n;
+      char *p = leader = (char *) alloca (sizeof (pack) + sizeof (n) + n /*DELETEME*/ + 1);
+      memcpy (p, &pack, sizeof (pack));
+      p += sizeof (pack);
+      memcpy (p, &n, sizeof (n));
+      p += sizeof (n);
+      memcpy (p, si._si_commune._si_str, n);
+p[n] = '\0'; sigproc_printf ("n %d, si_str %s", n, p);
+      p += n;
       packsize = p - leader;
     }
 

@@ -1,5 +1,10 @@
 2006-03-19  Christopher Faylor  <cgf@timesys.com>
 
+	* pinfo.cc (commune_process): Fix randomly invalid pointer which caused
+	fifos to work incorrectly.
+
+2006-03-19  Christopher Faylor  <cgf@timesys.com>
+
 	* dcrt0.cc (dll_crt0_0): Oops.  We need to bother with setting this in
 	the fork/exec case.
 

@@ -402,6 +402,8 @@ commune_process (void *arg)
     ProtectHandle (process_sync);
 
   lock_process now (false);
+  if (si._si_commune._si_code & PICOM_EXTRASTR)
+    si._si_commune._si_str = (char *) (&si + 1);
 
   switch (si._si_commune._si_code)
     {
@@ -524,7 +526,7 @@ commune_process (void *arg)
       }
     case PICOM_FIFO:
       {
-	sigproc_printf ("processing PICOM_FIFO");
+	sigproc_printf ("processing PICOM_FIFO for %s", si._si_commune._si_str);
 	fhandler_fifo *fh = cygheap->fdtab.find_fifo (si._si_commune._si_str);
 	HANDLE it[2];
 	if (fh == NULL)
