@@ -742,6 +742,7 @@ dll_crt0_0 ()
 	      }
 	    break;
 	}
+      init_console_handler (myself->ctty >= 0);
     }
 
   user_data->resourcelocks->Init ();

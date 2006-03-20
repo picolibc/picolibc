@@ -1,5 +1,10 @@
 2006-03-19  Christopher Faylor  <cgf@timesys.com>
 
+	* dcrt0.cc (dll_crt0_0): Oops.  We need to bother with setting this in
+	the fork/exec case.
+
+2006-03-19  Christopher Faylor  <cgf@timesys.com>
+
 	* dcrt0.cc (dll_crt0_0): Don't bother with setting init_console_handler
 	here since it will be set later when we discover if we have a ctty or
 	not.
