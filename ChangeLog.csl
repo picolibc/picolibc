@@ -1,5 +1,9 @@
 2006-03-20  Paul Brook  <paul@codesourcery.com>
 
+	* gas/config/tc-arm.c (parse_operands): Set default error message.
+
+2006-03-20  Paul Brook  <paul@codesourcery.com>
+
 	* gas/config/tc-arm.c (parse_tb): Set inst.error before returning FAIL.
 
 2006-03-20  Paul Brook  <paul@codesourcery.com>
