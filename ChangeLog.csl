@@ -1,5 +1,9 @@
 2006-03-20  Paul Brook  <paul@codesourcery.com>
 
+	* gas/config/tc-arm.c (parse_tb): Set inst.error before returning FAIL.
+
+2006-03-20  Paul Brook  <paul@codesourcery.com>
+
 	* gas/config/tc-arm.c (md_apply_fix): Set H bit on blx instruction.
 
 	* gas/testsuite/gas/arm/blx-local.d: New test.
