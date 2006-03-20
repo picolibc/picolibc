@@ -601,7 +601,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   int flags = GetPriorityClass (hMainProc);
   sigproc_printf ("priority class %d", flags);
-  flags |= /* CREATE_DEFAULT_ERROR_MODE | */CREATE_SEPARATE_WOW_VDM;
+  flags |= CREATE_SEPARATE_WOW_VDM;
 
   if (mode == _P_DETACH)
     flags |= DETACHED_PROCESS;

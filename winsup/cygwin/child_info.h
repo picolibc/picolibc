@@ -18,6 +18,12 @@ enum child_info_types
   _PROC_WHOOPS
 };
 
+enum child_status
+{
+  _CI_STRACED	= 0x01,
+  _CI_ISCYGWIN	= 0x0
+};
+
 #define OPROC_MAGIC_MASK 0xff00ff00
 #define OPROC_MAGIC_GENERIC 0xaf00f000
 
@@ -29,7 +35,8 @@ enum child_info_types
 
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
-#define CURR_CHILD_INFO_MAGIC 0x482b2eaU
+/* Change this value if you get a message indicating that it is out-of-sync. */
+#define CURR_CHILD_INFO_MAGIC 0xa189e57U
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -48,7 +55,7 @@ public:
   init_cygheap *cygheap;
   void *cygheap_max;
   DWORD cygheap_reserve_sz;
-  unsigned char straced;
+  unsigned char flag;
   unsigned fhandler_union_cb;
   int retry;		// number of times we've tried to start child process
   DWORD exit_code;	// process exit code
@@ -58,7 +65,9 @@ public:
   ~child_info ();
   void ready (bool);
   bool sync (int, HANDLE&, DWORD) __attribute__ ((regparm (3)));
-  DWORD proc_retry (HANDLE);
+  DWORD proc_retry (HANDLE) __attribute__ ((regparm (2)));
+  bool isstraced () const {return flag & _CI_STRACED;}
+  bool iscygwin () const {return flag & _CI_ISCYGWIN;}
 };
 
 class mount_info;
@@ -73,8 +82,8 @@ public:
   void *stacktop;	// location of top of parent stack
   void *stackbottom;	// location of bottom of parent stack
   child_info_fork ();
-  void handle_fork ();
-  bool handle_failure (DWORD);
+  void handle_fork () __attribute__ ((regparm (1)));;
+  bool handle_failure (DWORD) __attribute__ ((regparm (2)));
 };
 
 class fhandler_base;
@@ -115,6 +124,7 @@ public:
   child_info_spawn (child_info_types, bool);
   void *operator new (size_t, void *p) __attribute__ ((nothrow)) {return p;}
   void set (child_info_types ci, bool b) { new (this) child_info_spawn (ci, b);}
+  void handle_spawn () __attribute__ ((regparm (1)));
 };
 
 void __stdcall init_child_info (DWORD, child_info *, HANDLE);

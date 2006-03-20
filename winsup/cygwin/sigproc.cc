@@ -785,7 +785,11 @@ child_info::child_info (unsigned in_cb, child_info_types chtype, bool need_subpr
   sigproc_printf ("subproc_ready %p", subproc_ready);
   cygheap = ::cygheap;
   cygheap_max = ::cygheap_max;
-  straced = strace.attached ();
+  flag = 0;
+  if (strace.attached ())
+    flag |= _CI_STRACED;
+  if (need_subproc_ready)
+    flag |= _CI_ISCYGWIN;
   retry = child_info::retry_count;
   /* Create an inheritable handle to pass to the child process.  This will
      allow the child to duplicate handles from the parent to itself. */
@@ -903,7 +907,7 @@ child_info::proc_retry (HANDLE h)
     /* Count down non-recognized exit codes more quickly since they aren't
        due to known conditions.  */
     default:
-      if ((exit_code & 0xc0000000) != 0xc0000000)
+      if (!iscygwin () && (exit_code & 0xc0000000) != 0xc0000000)
 	break;
       if ((retry -= 2) < 0)
 	retry = 0;

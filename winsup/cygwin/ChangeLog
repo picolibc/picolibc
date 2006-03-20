@@ -1,3 +1,22 @@
+2006-03-20  Christopher Faylor  <cgf@timesys.com>
+
+	* child_info.h (child_status): New enum.
+	(child_info::flag): Rename from 'straced'.
+	(child_info::isstraced): New function.
+	(child_info::iscygwin): Ditto.
+	(child_info_fork::handle_fork): Reparmize.
+	(child_info_fork::handle_failure): Ditto.
+	(child_info_spawn::handle_spawn): New function.
+	* dcrt0.cc (get_cygwin_startup_info): Use isstraced method.
+	(child_info_spawn::handle_spawn): Define new function from code
+	previously in dll_crt0_0.
+	(dll_crt0_0): Move spawn stuff into handle_spawn.  Only call
+	init_console_handler for fork case.
+	* sigproc.cc (child_info::child_info): Set flag appropriately.
+	(child_info::proc_retry): Treat exit code as "funny" if it's a cygwin
+	process.
+	* spawn.cc (spawn_guts): Remove commented out flag setting.
+
 2006-03-19  Christopher Faylor  <cgf@timesys.com>
 
 	* pinfo.cc (commune_process): Fix randomly invalid pointer which caused

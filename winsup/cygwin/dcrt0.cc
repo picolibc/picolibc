@@ -622,7 +622,7 @@ get_cygwin_startup_info ()
 	      multiple_cygwin_problem ("proc size", res->cb, should_be_cb);
 	    else if (sizeof (fhandler_union) != res->fhandler_union_cb)
 	      multiple_cygwin_problem ("fhandler size", res->fhandler_union_cb, sizeof (fhandler_union));
-	    if (res->straced)
+	    if (res->isstraced ())
 	      {
 		res->ready (false);
 		for (unsigned i = 0; !being_debugged () && i < 10000; i++)
@@ -667,6 +667,33 @@ child_info_fork::handle_fork ()
 
   if (fixup_mmaps_after_fork (parent))
     api_fatal ("recreate_mmaps_after_fork_failed");
+}
+
+void
+child_info_spawn::handle_spawn ()
+{
+  HANDLE h;
+  cygheap_fixup_in_child (true);
+  memory_init ();
+  if (!moreinfo->myself_pinfo ||
+      !DuplicateHandle (hMainProc, moreinfo->myself_pinfo, hMainProc, &h, 0,
+			FALSE, DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
+    h = NULL;
+  set_myself (h);
+  ready (true);
+  __argc = moreinfo->argc;
+  __argv = moreinfo->argv;
+  envp = moreinfo->envp;
+  envc = moreinfo->envc;
+  if (!dynamically_loaded)
+    cygheap->fdtab.fixup_after_exec ();
+  signal_fixup_after_exec ();
+  if (moreinfo->old_title)
+    {
+      old_title = strcpy (title_buf, moreinfo->old_title);
+      cfree (moreinfo->old_title);
+    }
+  init_console_handler (myself->ctty >= 0);
 }
 
 void __stdcall
@@ -718,31 +745,9 @@ dll_crt0_0 ()
 	    break;
 	  case _PROC_SPAWN:
 	  case _PROC_EXEC:
-	    HANDLE h;
-	    cygheap_fixup_in_child (true);
-	    memory_init ();
-	    if (!spawn_info->moreinfo->myself_pinfo ||
-		!DuplicateHandle (hMainProc, spawn_info->moreinfo->myself_pinfo,
-				  hMainProc, &h, 0, FALSE,
-				  DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
-	      h = NULL;
-	    set_myself (h);
-	    child_proc_info->ready (true);
-	    __argc = spawn_info->moreinfo->argc;
-	    __argv = spawn_info->moreinfo->argv;
-	    envp = spawn_info->moreinfo->envp;
-	    envc = spawn_info->moreinfo->envc;
-	    if (!dynamically_loaded)
-	      cygheap->fdtab.fixup_after_exec ();
-	    signal_fixup_after_exec ();
-	    if (spawn_info->moreinfo->old_title)
-	      {
-		old_title = strcpy (title_buf, spawn_info->moreinfo->old_title);
-		cfree (spawn_info->moreinfo->old_title);
-	      }
+	    spawn_info->handle_spawn ();
 	    break;
 	}
-      init_console_handler (myself->ctty >= 0);
     }
 
   user_data->resourcelocks->Init ();
