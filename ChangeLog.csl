@@ -1,1 +1,9 @@
-Local patches on this branch
+2006-03-20  Paul Brook  <paul@codesourcery.com>
+
+gas/
+	* config/tc-arm.c (THUMB2_LOAD_BIT): Define.
+	(move_or_literal_pool): Handle Thumb-2 instructions.
+	(do_t_ldst): Call move_or_literal_pool for =N addressing modes.
+gas/testsuite/
+	* gas/arm/thumb2_pool.d: New test.
+	* gas/arm/thumb2_pool.s: New test.
