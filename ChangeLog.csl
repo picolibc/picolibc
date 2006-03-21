@@ -1,3 +1,7 @@
+2006-03-21  Paul Brook  <paul@codesourcery.com>
+
+	* gas/config/tc-arm.c (md_apply_fix): Fix typo in offset mask.
+
 2006-03-21  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* gas/config/tc-m68k.c (find_cf_chip): Merge into ...
