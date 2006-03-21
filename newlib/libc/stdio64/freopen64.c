@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990, 2006 The Regents of the University of California.
+ * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -55,12 +55,6 @@ it).
 
 <[file]> and <[mode]> are used just as in <<fopen>>.
 
-If <[file]> is <<NULL>>, the underlying stream is modified rather than
-closed.  The file cannot be given a more permissive access mode (for
-example, a <[mode]> of "w" will fail on a read-only file descriptor),
-but can change status such as append or binary mode.  If modification
-is not possible, failure occurs.
-
 RETURNS
 If successful, the result is the same as the argument <[fp]>.  If the
 file cannot be opened as specified, the result is <<NULL>>.
@@ -74,10 +68,8 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 #include <time.h>
 #include <stdio.h>
-#include <errno.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#include <sys/lock.h>
 #include "local64.h"
 
 /*
@@ -94,20 +86,16 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
 	register FILE *fp)
 {
   register int f;
-  int flags, oflags;
-  int e = 0;
-
-  __sfp_lock_acquire ();
-
-  CHECK_INIT (ptr);
+  int flags, oflags, e;
 
   _flockfile(fp);
 
+  CHECK_INIT (fp);
+
   if ((flags = __sflags (ptr, mode, &oflags)) == 0)
     {
+      (void) fclose (fp);
       _funlockfile(fp);
-      (void) _fclose_r (ptr, fp);
-      __sfp_lock_release ();
       return NULL;
     }
 
@@ -125,60 +113,17 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
     {
       if (fp->_flags & __SWR)
 	(void) fflush (fp);
-      /*
-       * If close is NULL, closing is a no-op, hence pointless.
-       * If file is NULL, the file should not be closed.
-       */
-      if (fp->_close != NULL && file != NULL)
+      /* if close is NULL, closing is a no-op, hence pointless */
+      if (fp->_close != NULL)
 	(void) (*fp->_close) (fp->_cookie);
     }
 
   /*
-   * Now get a new descriptor to refer to the new file, or reuse the
-   * existing file descriptor if file is NULL.
+   * Now get a new descriptor to refer to the new file.
    */
 
-  if (file != NULL)
-    {
-      f = _open64_r (ptr, (char *) file, oflags, 0666);
-      e = ptr->_errno;
-    }
-  else
-    {
-#ifdef HAVE_FCNTL
-      int oldflags;
-      /*
-       * Reuse the file descriptor, but only if the new access mode is
-       * equal or less permissive than the old.  F_SETFL correctly
-       * ignores creation flags.
-       */
-      f = fp->_file;
-      if ((oldflags = _fcntl_r (ptr, f, F_GETFL, 0)) == -1
-          || ! ((oldflags & O_ACCMODE) == O_RDWR
-                || ((oldflags ^ oflags) & O_ACCMODE) == 0)
-          || _fcntl_r (ptr, f, F_SETFL, oflags) == -1)
-        f = -1;
-#else
-      /* We cannot modify without fcntl support.  */
-      f = -1;
-#endif
-
-#ifdef __SCLE
-      /*
-       * F_SETFL doesn't change textmode.  Don't mess with modes of ttys.
-       */
-      if (0 <= f && ! isatty (f)
-          && setmode (f, flags & (O_BINARY | O_TEXT)) == -1)
-        f = -1;
-#endif
-
-      if (f < 0)
-        {
-          e = EBADF;
-          if (fp->_close != NULL)
-            (void) (*fp->_close) (fp->_cookie);
-        }
-    }
+  f = _open64_r (ptr, (char *) file, oflags, 0666);
+  e = ptr->_errno;
 
   /*
    * Finish closing fp.  Even if the open succeeded above,
@@ -207,10 +152,6 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
       fp->_flags = 0;		/* set it free */
       ptr->_errno = e;		/* restore in case _close clobbered */
       _funlockfile(fp);
-#ifndef __SINGLE_THREAD__
-      __lock_close_recursive (fp->_lock);
-#endif
-      __sfp_lock_release ();
       return NULL;
     }
 
@@ -231,7 +172,6 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
   fp->_flags |= __SL64;
 
   _funlockfile(fp);
-  __sfp_lock_release ();
   return fp;
 }
 

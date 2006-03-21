@@ -4,35 +4,32 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-GENERAL_SOURCES = \
-	utf-8.c \
-	utf-16.c \
-	ucs-2.c \
-	us-ascii.c \
-	ucs-4.c \
+GENERAL_SOURCES = euc-jp.c \
+	euc-kr.c \
+	euc-tw.c \
+	gb2312.c \
+	iso-10646-ucs-2.c \
+	iso-10646-ucs-4.c \
 	ucs-2-internal.c \
 	ucs-4-internal.c \
-	cesbi.c \
-	table.c \
-	table-pcs.c \
-	euc.c
+	utf-16.c \
+	utf-8.c
 
 ## The following interfaces are EL/IX level 2
 if ELIX_LEVEL_1
+LIB_OBJS =
+else
 LIB_OBJS = \
-	utf-8.$(oext) \
-	utf-16.$(oext) \
-	ucs-2.$(oext) \
-	us-ascii.$(oext) \
-	ucs-4.$(oext) \
+	euc-jp.$(oext) \
+	euc-kr.$(oext) \
+	euc-tw.$(oext) \
+	gb2312.$(oext) \
+	iso-10646-ucs-2.$(oext) \
+	iso-10646-ucs-4.$(oext) \
 	ucs-2-internal.$(oext) \
 	ucs-4-internal.$(oext) \
-	cesbi.$(oext) \
-	table.$(oext) \
-	table-pcs.$(oext) \
-	euc.$(oext)
-else
-LIB_OBJS = 
+	utf-16.$(oext) \
+	utf-8.$(oext)
 endif
 
 noinst_LIBRARIES = lib.a

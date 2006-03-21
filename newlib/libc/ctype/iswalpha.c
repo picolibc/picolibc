@@ -29,7 +29,7 @@
 
 /*
 FUNCTION
-	<<iswalpha>>---alphabetic wide character test
+	<<iswalpha>>---alphabetic wide-character test
 
 INDEX
 	iswalpha
@@ -48,7 +48,7 @@ DESCRIPTION
 are alphabetic.
 
 RETURNS
-<<iswalpha>> returns non-zero if <[c]> is an alphabetic wide character.
+<<iswalpha>> returns non-zero if <[c]> is an alphabetic wide-character.
 
 PORTABILITY
 <<iswalpha>> is C99.
@@ -56,15 +56,14 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 #include <_ansi.h>
-#include <newlib.h>
 #include <wctype.h>
 #include <string.h>
 #include <ctype.h>
 #include "local.h"
 
-#ifdef _MB_CAPABLE
+#ifdef MB_CAPABLE
 #include "utf8alpha.h"
-#endif /* _MB_CAPABLE */
+#endif /* MB_CAPABLE */
 
 int
 _DEFUN(iswalpha,(c), wint_t c)
@@ -75,7 +74,7 @@ _DEFUN(iswalpha,(c), wint_t c)
       unicode = 0;
       /* fall-through */ 
     }
-#ifdef _MB_CAPABLE
+#ifdef MB_CAPABLE
   else if (!strcmp (__lc_ctype, "C-JIS"))
     {
       c = __jp2uc (c, JP_JIS);
@@ -336,7 +335,7 @@ _DEFUN(iswalpha,(c), wint_t c)
       /* not in table */
       return 0;
     }
-#endif /* _MB_CAPABLE */
+#endif /* MB_CAPABLE */
 
   return (c < (wint_t)0x100 ? isalpha (c) : 0);
 }

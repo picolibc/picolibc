@@ -16,8 +16,9 @@
  */
 
 /*
+
 FUNCTION
-<<scanf>>, <<fscanf>>, <<sscanf>>---scan and format input
+	<<scanf>>, <<fscanf>>, <<sscanf>>---scan and format input
 
 INDEX
 	scanf
@@ -34,12 +35,10 @@ ANSI_SYNOPSIS
         int sscanf(const char *<[str]>, const char *<[format]> 
                    [, <[arg]>, ...]);
 
-        int _scanf_r(struct _reent *<[ptr]>, const char *<[format]>
-                     [, <[arg]>, ...]);
-        int _fscanf_r(struct _reent *<[ptr]>, FILE *<[fd]>, const char *<[format]>
-                      [, <[arg]>, ...]);
-        int _sscanf_r(struct _reent *<[ptr]>, const char *<[str]>,
-                      const char *<[format]> [, <[arg]>, ...]);
+        int _scanf_r(struct _reent *<[ptr]>, const char *<[format]> [, <[arg]>, ...]);
+        int _fscanf_r(struct _reent *<[ptr]>, FILE *<[fd]>, const char *<[format]> [, <[arg]>, ...]);
+        int _sscanf_r(struct _reent *<[ptr]>, const char *<[str]>, const char *<[format]> 
+                   [, <[arg]>, ...]);
 
 
 TRAD_SYNOPSIS
@@ -376,11 +375,12 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 /* | ARGSUSED */
 /*SUPPRESS 590*/
-static _READ_WRITE_RETURN_TYPE
-_DEFUN(eofread, (cookie, buf, len),
-       _PTR cookie _AND
-       char *buf   _AND
-       int len)
+static
+_READ_WRITE_RETURN_TYPE
+eofread (cookie, buf, len)
+     _PTR cookie;
+     char *buf;
+     int len;
 {
   return 0;
 }
@@ -389,28 +389,25 @@ _DEFUN(eofread, (cookie, buf, len),
 
 #ifdef _HAVE_STDC
 int 
-_DEFUN(sscanf, (str, fmt),
-       _CONST char *str _AND
-       _CONST char *fmt _DOTS)
+_DEFUN (sscanf, (str, fmt), _CONST char *str _AND _CONST char *fmt _DOTS)
 #else
 int 
-sscanf(str, fmt, va_alist)
-       _CONST char *str;
-       _CONST char *fmt;
-       va_dcl
+sscanf (str, fmt, va_alist)
+     _CONST char *str;
+     _CONST char *fmt;
+     va_dcl
 #endif
 {
   int ret;
   va_list ap;
   FILE f;
 
-  f._flags = __SRD | __SSTR;
+  f._flags = __SRD;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._r = strlen (str);
   f._read = eofread;
   f._ub._base = NULL;
   f._lb._base = NULL;
-  f._file = -1;  /* No file. */
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else
@@ -425,30 +422,26 @@ sscanf(str, fmt, va_alist)
 
 #ifdef _HAVE_STDC
 int 
-_DEFUN(_sscanf_r, (ptr, str, fmt), 
-       struct _reent *ptr _AND
-       _CONST char *str   _AND
-       _CONST char *fmt _DOTS)
+_DEFUN (_sscanf_r, (ptr, str, fmt), struct _reent *ptr _AND _CONST char *str _AND _CONST char *fmt _DOTS)
 #else
 int 
-_sscanf_r(ptr, str, fmt, va_alist)
-          struct _reent *ptr;
-          _CONST char *str;
-          _CONST char *fmt;
-          va_dcl
+_sscanf_r (ptr, str, fmt, va_alist)
+     struct _reent *ptr;
+     _CONST char *str;
+     _CONST char *fmt;
+     va_dcl
 #endif
 {
   int ret;
   va_list ap;
   FILE f;
 
-  f._flags = __SRD | __SSTR;
+  f._flags = __SRD;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._r = strlen (str);
   f._read = eofread;
   f._ub._base = NULL;
   f._lb._base = NULL;
-  f._file = -1;  /* No file. */
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else

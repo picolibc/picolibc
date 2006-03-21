@@ -29,7 +29,7 @@
 
 /*
 FUNCTION
-	<<towlower>>---translate wide characters to lowercase
+	<<towlower>>---translate wide-characters to lower case
 
 INDEX
 	towlower
@@ -45,12 +45,12 @@ TRAD_SYNOPSIS
 
 
 DESCRIPTION
-<<towlower>> is a function which converts uppercase wide characters to
-lowercase, leaving all other characters unchanged.
+<<towlower>> is a function which converts upper-case wide-characters to lower
+case, leaving all other characters unchanged.
 
 RETURNS
-<<towlower>> returns the lowercase equivalent of <[c]> when it is a
-uppercase wide character; otherwise, it returns the input character.
+<<towlower>> returns the lower-case equivalent of <[c]> when it is a
+upper-case wide-character, otherwise, it returns the input character.
 
 PORTABILITY
 <<towlower>> is C99.
@@ -59,7 +59,6 @@ No supporting OS subroutines are required.
 */
 
 #include <_ansi.h>
-#include <newlib.h>
 #include <string.h>
 #include <reent.h>
 #include <ctype.h>
@@ -76,7 +75,7 @@ _DEFUN(towlower,(c), wint_t c)
       unicode = 0;
       /* fall-through */ 
     }
-#ifdef _MB_CAPABLE
+#ifdef MB_CAPABLE
   else if (!strcmp (__lc_ctype, "C-JIS"))
     {
       c = __jp2uc (c, JP_JIS);
@@ -472,7 +471,7 @@ _DEFUN(towlower,(c), wint_t c)
 	    return 0x00e5;
 	}
     }     
-#endif /* _MB_CAPABLE */
+#endif /* MB_CAPABLE */
   
   return (c < 0x00ff ? (wint_t)(tolower ((int)c)) : c);
 }

@@ -15,7 +15,7 @@ _read_r (struct _reent *r, int fd, void *buf, size_t nbytes)
 
   SYSCALL (SYS_read, rc, err, fd, buf, nbytes);
   if (err)
-    __errno_r (r) = err;
+    errno = err;
   return rc;
 }
 
@@ -27,7 +27,7 @@ _write_r (struct _reent *r, int fd, const void *buf, size_t nbytes)
 
   SYSCALL (SYS_write, rc, err, fd, buf, nbytes);
   if (err)
-    __errno_r (r) = err;
+    errno = err;
   return rc;
 }
 
@@ -48,8 +48,7 @@ _open_r (struct _reent *r, const char *buf, int flags, int mode)
 #endif
 
   SYSCALL (SYS_open, rc, err, buf, flags, mode);
-  if (err)
-    __errno_r (r) = err;
+  errno = err;
   return rc;
 }
 
@@ -60,7 +59,7 @@ _close_r (struct _reent *r, int fd)
 
   SYSCALL (SYS_close, rc, err, fd, 0, 0);
   if (err)
-    __errno_r (r) = err;
+    errno = err;
   return rc;
 }
 
@@ -72,7 +71,7 @@ _lseek_r (struct _reent *r, int fd,  off_t offset, int whence)
 
   SYSCALL (SYS_lseek, rc, err, fd, offset, whence);
   if (err)
-    __errno_r (r) = err;
+    errno = err;
   return rc;
 }
 
@@ -83,7 +82,7 @@ _fstat_r (struct _reent *r, int fd, struct stat *buf)
 
   SYSCALL (SYS_fstat, rc, err, fd, buf, 0);
   if (err)
-    __errno_r (r) = err;
+    errno = err;
   return rc;
 }
 
@@ -126,6 +125,6 @@ _kill_r (struct _reent *r, int pid, int sig)
 
   SYSCALL (SYS_kill, rc, err, pid, sig, 0);
   if (err)
-    __errno_r (r) = err;
+    errno = err;
   return rc;
 }

@@ -29,7 +29,7 @@
 
 /*
 FUNCTION
-	<<towupper>>---translate wide characters to uppercase
+	<<towupper>>---translate wide-characters to upper case
 
 INDEX
 	towupper
@@ -45,12 +45,12 @@ TRAD_SYNOPSIS
 
 
 DESCRIPTION
-<<towupper>> is a function which converts lowercase wide characters to
-uppercase, leaving all other characters unchanged.
+<<towupper>> is a function which converts lower-case wide-characters to upper
+case, leaving all other characters unchanged.
 
 RETURNS
-<<towupper>> returns the uppercase equivalent of <[c]> when it is a
-lowercase wide character, otherwise, it returns the input character.
+<<towupper>> returns the upper-case equivalent of <[c]> when it is a
+lower-case wide-character, otherwise, it returns the input character.
 
 PORTABILITY
 <<towupper>> is C99.
@@ -59,7 +59,6 @@ No supporting OS subroutines are required.
 */
 
 #include <_ansi.h>
-#include <newlib.h>
 #include <string.h>
 #include <reent.h>
 #include <ctype.h>
@@ -76,7 +75,7 @@ _DEFUN(towupper,(c), wint_t c)
       unicode = 0;
       /* fall-through */ 
     }
-#ifdef _MB_CAPABLE
+#ifdef MB_CAPABLE
   else if (!strcmp (__lc_ctype, "C-JIS"))
     {
       c = __jp2uc (c, JP_JIS);
@@ -499,7 +498,7 @@ _DEFUN(towupper,(c), wint_t c)
 	    return (c - 0x28);
 	}
     }     
-#endif /* _MB_CAPABLE */
+#endif /* MB_CAPABLE */
   
   return (c < 0x00ff ? (wint_t)(toupper ((int)c)) : c);
 }

@@ -16,9 +16,9 @@
  */
 
 /*
+
 FUNCTION
         <<printf>>, <<fprintf>>, <<asprintf>>, <<sprintf>>, <<snprintf>>---format output
-
 INDEX
 	fprintf
 INDEX
@@ -37,8 +37,7 @@ ANSI_SYNOPSIS
         int fprintf(FILE *<[fd]>, const char *<[format]> [, <[arg]>, ...]);
         int sprintf(char *<[str]>, const char *<[format]> [, <[arg]>, ...]);
         int asprintf(char **<[strp]>, const char *<[format]> [, <[arg]>, ...]);
-        int snprintf(char *<[str]>, size_t <[size]>, const char *<[format]>
-                     [, <[arg]>, ...]);
+        int snprintf(char *<[str]>, size_t <[size]>, const char *<[format]> [, <[arg]>, ...]);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -306,8 +305,6 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
-#include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #ifdef _HAVE_STDC
 #include <stdarg.h>
@@ -315,20 +312,18 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <varargs.h>
 #endif
 #include <limits.h>
+#include <_ansi.h>
 #include "local.h"
 
 int
 #ifdef _HAVE_STDC
-_DEFUN(_sprintf_r, (ptr, str, fmt),
-       struct _reent *ptr _AND
-       char *str          _AND
-       _CONST char *fmt _DOTS)
+_DEFUN (_sprintf_r, (ptr, str, fmt), struct _reent *ptr _AND char *str _AND _CONST char *fmt _DOTS)
 #else
-_sprintf_r(ptr, str, fmt, va_alist)
-           struct _reent *ptr;
-           char *str;
-           _CONST char *fmt;
-           va_dcl
+_sprintf_r (ptr, str, fmt, va_alist)
+     struct _reent *ptr;
+     char *str;
+     _CONST char *fmt;
+     va_dcl
 #endif
 {
   int ret;
@@ -354,14 +349,12 @@ _sprintf_r(ptr, str, fmt, va_alist)
 
 int
 #ifdef _HAVE_STDC
-_DEFUN(sprintf, (str, fmt),
-       char *str _AND
-       _CONST char *fmt _DOTS)
+_DEFUN (sprintf, (str, fmt), char *str _AND _CONST char *fmt _DOTS)
 #else
-sprintf(str, fmt, va_alist)
-        char *str;
-        _CONST char *fmt;
-        va_dcl
+sprintf (str, fmt, va_alist)
+     char *str;
+     _CONST char *fmt;
+     va_dcl
 #endif
 {
   int ret;

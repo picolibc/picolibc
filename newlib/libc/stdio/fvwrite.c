@@ -1,3 +1,5 @@
+/* No user fns here.  Pesch 15apr92. */
+
 /*
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
@@ -14,9 +16,7 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-/* No user fns here.  Pesch 15apr92. */
 
-#include <_ansi.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -24,7 +24,7 @@
 #include "fvwrite.h"
 
 #define	MIN(a, b) ((a) < (b) ? (a) : (b))
-#define	COPY(n)	  _CAST_VOID memmove ((_PTR) fp->_p, (_PTR) p, (size_t) (n))
+#define	COPY(n)	  (void) memmove((void *) fp->_p, (void *) p, (size_t) (n))
 
 #define GETIOV(extra_work) \
   while (len == 0) \
@@ -43,12 +43,12 @@
  */
 
 int
-_DEFUN(__sfvwrite, (fp, uio),
-       register FILE *fp _AND
-       register struct __suio *uio)
+__sfvwrite (fp, uio)
+     register FILE *fp;
+     register struct __suio *uio;
 {
   register size_t len;
-  register _CONST char *p = NULL;
+  register _CONST char *p;
   register struct __siov *iov;
   register int w, s;
   char *nl;
@@ -72,7 +72,7 @@ _DEFUN(__sfvwrite, (fp, uio),
           GETIOV (;);
           while (len > 0)
             {
-              if (putc (*p, fp) == EOF)
+              if (putc(*p, fp) == EOF)
                 return EOF;
               p++;
               len--;
@@ -129,11 +129,7 @@ _DEFUN(__sfvwrite, (fp, uio),
                                                      fp->_bf._base, 
                                                      curpos + len);
 		  if (!ptr)
-		    {
-		      /* Free buffer which is no longer used.  */
-		      _free_r (_REENT, fp->_bf._base);
-		      goto err;
-		    }
+		    goto err;
 		  fp->_bf._base = ptr;
 		  fp->_p = ptr + curpos;
 		  fp->_bf._size = curpos + len;
@@ -185,13 +181,12 @@ _DEFUN(__sfvwrite, (fp, uio),
        * that the amount to write is MIN(len,nldist).
        */
       nlknown = 0;
-      nldist = 0;
       do
 	{
 	  GETIOV (nlknown = 0);
 	  if (!nlknown)
 	    {
-	      nl = memchr ((_PTR) p, '\n', len);
+	      nl = memchr ((void *) p, '\n', len);
 	      nldist = nl ? nl + 1 - p : len + 1;
 	      nlknown = 1;
 	    }

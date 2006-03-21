@@ -1,14 +1,11 @@
 #ifndef __SYS_LOCK_H__
 #define __SYS_LOCK_H__
 
+#include <machine/weakalias.h>
 #include <features.h>
 
 #define  _LIBC  1
 #define  NOT_IN_libc 1
-
-#ifndef __USE_GNU
-#define __USE_GNU 1
-#endif
 
 #include <bits/libc-lock.h>
 
@@ -17,7 +14,7 @@ typedef __libc_lock_recursive_t _LOCK_RECURSIVE_T;
 
 #define __LOCK_INIT(class,lock) \
   __libc_lock_define_initialized(class, lock)
-#define __LOCK_INIT_RECURSIVE(class, lock) \
+#define __LOCK_RECURSIVE_INIT(class, lock) \
   __libc_lock_define_initialized_recursive(class, lock)
 
 #define __lock_init(__lock) __libc_lock_init(__lock)

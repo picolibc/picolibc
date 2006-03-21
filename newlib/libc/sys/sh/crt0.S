@@ -79,14 +79,12 @@ start_l:
 	cmp/ge	r0,r1
 	bt	start_l
 
-#ifndef __SH2A_NOFPU__
-#if defined (__SH3E__) || defined(__SH4_SINGLE__) || defined(__SH4__) || defined(__SH4_SINGLE_ONLY) || defined(__SH2A__)
+#if defined (__SH3E__) || defined(__SH4_SINGLE__) || defined(__SH4__) || defined(__SH4_SINGLE_ONLY)
 	mov.l set_fpscr_k, r1
 	jsr @r1
 	mov #0,r4
 	lds r3,fpscr
-#endif /*  defined (__SH3E__) || defined(__SH4_SINGLE__) || defined(__SH4__) || defined(__SH4_SINGLE_ONLY__) || defined(__SH2A__) */
-#endif /* !__SH2A_NOFPU__ */
+#endif /*  defined (__SH3E__) || defined(__SH4_SINGLE__) || defined(__SH4__) || defined(__SH4_SINGLE_ONLY__) */
 
 	! call the mainline	
 	mov.l	main_k,r0
@@ -100,12 +98,10 @@ start_l:
 	or	r0,r0
 
 	.align 2
-#ifndef __SH2A_NOFPU__
-#if defined (__SH3E__) || defined(__SH4_SINGLE__) || defined(__SH4__) || defined(__SH4_SINGLE_ONLY__) || defined(__SH2A__)
+#if defined (__SH3E__) || defined(__SH4_SINGLE__) || defined(__SH4__) || defined(__SH4_SINGLE_ONLY__)
 set_fpscr_k:
 	.long	___set_fpscr
-#endif /*  defined (__SH3E__) || defined(__SH4_SINGLE__) || defined(__SH4__) || defined(SH4_SINGLE_ONLY) || defined(__SH2A__) */
-#endif /* !__SH2A_NOFPU__ */
+#endif /*  defined (__SH3E__) || defined(__SH4_SINGLE__) || defined(__SH4__) || defined(SH4_SINGLE_ONLY) */
 stack_k:
 	.long	_stack	
 edata_k:

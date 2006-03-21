@@ -105,7 +105,7 @@ _start:
 	call	 EXT(__frv_fixptrs)
 #endif /* ! __FRV_FDPIC__ */
 
-					/* fixup the user .rofixup list */
+					/* fixup the .dtors list */
 	P(sethi) #gprelhi(EXT(__ROFIXUP_LIST__)), gr9
 	sethi	 #gprelhi(EXT(__ROFIXUP_END__)), gr10
 	P(setlo) #gprello(EXT(__ROFIXUP_LIST__)), gr9

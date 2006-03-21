@@ -61,7 +61,6 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
-#include <_ansi.h>
 #include <stdio.h>
 #include <string.h>
 #if 0
@@ -78,11 +77,11 @@ static char sccsid[] = "%W% (Berkeley) %G%";
  */
 
 size_t
-_DEFUN(fwrite, (buf, size, count, fp),
-       _CONST _PTR buf _AND
-       size_t size     _AND
-       size_t count    _AND
-       FILE * fp)
+_DEFUN (fwrite, (buf, size, count, fp),
+	_CONST _PTR buf _AND
+	size_t size _AND
+	size_t count _AND
+	FILE * fp)
 {
   size_t n;
   struct __suio uio;
@@ -99,14 +98,12 @@ _DEFUN(fwrite, (buf, size, count, fp),
    * generally slow and since this occurs whenever size==0.
    */
 
-  CHECK_INIT(_REENT);
-
-  _flockfile (fp);
+  _flockfile(fp);
   if (__sfvwrite (fp, &uio) == 0)
     {
-      _funlockfile (fp);
+      _funlockfile(fp);
       return count;
     }
-  _funlockfile (fp);
+  _funlockfile(fp);
   return (n - uio.uio_resid) / size;
 }

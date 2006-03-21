@@ -85,12 +85,6 @@ case "${target}" in
   mn10300-*-*)
 	configdirs="${configdirs} mn10300 testsuite"
 	;;
-  cris-*-* | crisv32-*-*)
-	configdirs="${configdirs} cris testsuite"
-	;;
-  crx-*-*)
-	configdirs="${configdirs} crx"
-	;;
   d30v-*-*)
 	configdirs="${configdirs} d30v testsuite"
 	;;
@@ -103,13 +97,8 @@ case "${target}" in
   mcore-*-*)
 	configdirs="${configdirs} mcore testsuite"
 	;;
-  mt-*-*)
-        configdirs="${configdirs} mt testsuite";;
   xstormy16-*-*)
 	configdirs="${configdirs} xstormy16 testsuite"
-	;;
-  m32c-*-*)
-	configdirs="${configdirs} m32c testsuite"
 	;;
   strongarm-*-elf | strongarm-*-coff)
 	configdirs="${configdirs} arm testsuite";
@@ -117,14 +106,9 @@ case "${target}" in
   arm*-*-elf | arm*-*-coff)
 	configdirs="${configdirs} arm testsuite";
 	;;
-  ep9312-*-elf | ep9312-*-coff)
-	configdirs="${configdirs} arm testsuite";
-	;;
   xscale-*-elf | xscale-*-coff)
 	configdirs="${configdirs} arm testsuite";
 	;;
-  iq2000-*-*)
-	configdirs="${configdirs} iq2000 testsuite";;
 
 esac
 

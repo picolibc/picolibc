@@ -29,9 +29,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <newlib.h>
-
-#ifdef _MB_CAPABLE
+#ifdef MB_CAPABLE
 
 #include <_ansi.h>
 #include <wctype.h>
@@ -142,4 +140,4 @@ _DEFUN (__jp2uc, (c, type), wint_t c _AND int type)
   return WEOF; 
 }
 
-#endif /* _MB_CAPABLE */
+#endif /* MB_CAPABLE */

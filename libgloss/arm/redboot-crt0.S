@@ -12,34 +12,18 @@
 
     .text
      /* Setup the assembly entry point.  */
-#ifdef __thumb2__
-.macro FUNC_START name
-	.global \name
-	.thumb_func
-\name:
-.endm
-	.syntax unified
-	.thumb
-#else
-.macro FUNC_START name
-	.global \name
-\name:
-.endm
-	.code 32
-#endif
-	FUNC_START SYM_NAME(start)
-	FUNC_START SYM_NAME(_start)
+    .code 32
+    .globl SYM_NAME(start)
+    .globl SYM_NAME(_start)
+SYM_NAME(start):
+SYM_NAME(_start):
 	mov	fp, #0	/* Null frame pointer.  */
 	mov	r7, #0	/* Null frame pointer for Thumb.  */
 
 	/* Enable interrupts for gdb debugging.  */
-#ifdef __thumb2__
-	cpsie if
-#else
 	mrs    r0, cpsr
 	bic    r0, r0, #0xC0
 	msr    cpsr, r0
-#endif
 	
 	mov 	a2, #0			/* Second arg: fill value.  */
 	ldr	a1, .LC1		/* First arg: start of memory block.  */
@@ -62,7 +46,7 @@
 	/* Nothing to left to clear.  */
 #endif
 
-#if defined(__thumb__) && !defined(__thumb2__)	/* Enter Thumb mode. */
+#ifdef __thumb__		/* Enter Thumb mode. */
 	add	a4, pc, #1	/* Get the address of the Thumb block.  */
 	bx	a4		/* Go there and start Thumb decoding.   */
 

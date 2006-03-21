@@ -80,12 +80,6 @@ static void einfin(register short unsigned int *x, register LDPARMS *ldp);
 static void efloor(short unsigned int *x, short unsigned int *y, LDPARMS *ldp);
 static void etoasc(short unsigned int *x, char *string, int ndigs, int outformat, LDPARMS *ldp);
 
-union uconv
-{
-  unsigned short pe;
-  long double d;
-};
-
 #if LDBL_MANT_DIG == 24
 static void e24toe(short unsigned int *pe, short unsigned int *y, LDPARMS *ldp);
 #elif LDBL_MANT_DIG == 53
@@ -2718,8 +2712,6 @@ LDPARMS rnd;
 LDPARMS *ldp = &rnd;
 char *outstr;
 char outbuf[NDEC + MAX_EXP_DIGITS + 10];
-union uconv du;
-du.d = d;
 
 orig_ndigits = ndigits;
 rnd.rlast = -1;
@@ -2737,13 +2729,13 @@ if (_REENT_MP_RESULT(ptr))
   }
 
 #if LDBL_MANT_DIG == 24
-e24toe( &du.pe, e, ldp );
+e24toe( (unsigned short *)&d, e, ldp );
 #elif LDBL_MANT_DIG == 53
-e53toe( &du.pe, e, ldp );
+e53toe( (unsigned short *)&d, e, ldp );
 #elif LDBL_MANT_DIG == 64
-e64toe( &du.pe, e, ldp );
+e64toe( (unsigned short *)&d, e, ldp );
 #else
-e113toe( &du.pe, e, ldp );
+e113toe( (unsigned short *)&d, e, ldp );
 #endif
 
 if( eisneg(e) )
@@ -2872,16 +2864,14 @@ LDPARMS *ldp = &rnd;
 rnd.rlast = -1;
 rnd.rndprc = NBITS;
 
-union uconv du;
-du.d = *d;
 #if LDBL_MANT_DIG == 24
-e24toe( &du.pe, e, ldp );
+e24toe( (unsigned short *)d, e, ldp );
 #elif LDBL_MANT_DIG == 53
-e53toe( &du.pe, e, ldp );
+e53toe( (unsigned short *)d, e, ldp );
 #elif LDBL_MANT_DIG == 64
-e64toe( &du.pe, e, ldp );
+e64toe( (unsigned short *)d, e, ldp );
 #else
-e113toe( &du.pe, e, ldp );
+e113toe( (unsigned short *)d, e, ldp );
 #endif
 
 if( (e[NE-1] & 0x7fff) == 0x7fff )
@@ -3230,7 +3220,7 @@ ldp->outexpon =  expon;
 
 long double _strtold (char *s, char **se)
 {
-  union uconv x;
+  long double x;
   LDPARMS rnd;
   LDPARMS *ldp = &rnd;
   int lenldstr;
@@ -3238,10 +3228,10 @@ long double _strtold (char *s, char **se)
   rnd.rlast = -1;
   rnd.rndprc = NBITS;
 
-  lenldstr = asctoeg( s, &x.pe, LDBL_MANT_DIG, ldp );
+  lenldstr = asctoeg( s, (unsigned short *)&x, LDBL_MANT_DIG, ldp );
   if (se)
     *se = s + lenldstr;
-  return x.d;
+  return x;
 }
 
 #define REASONABLE_LEN 200

@@ -1,5 +1,4 @@
 #include <reent.h>
-#include <newlib.h>
 #include <wchar.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -15,7 +14,7 @@ _DEFUN (_wcrtomb_r, (ptr, s, wc, ps),
   int retval = 0;
   char buf[10];
 
-#ifdef _MB_CAPABLE
+#ifdef MB_CAPABLE
   if (ps == NULL)
     {
       _REENT_CHECK_MISC(ptr);

@@ -15,14 +15,12 @@
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 
 _off_t
-_DEFUN(_ftello_r, (ptr, fp),
-       struct _reent * ptr _AND
-       register FILE * fp)
+_DEFUN (_ftello_r, (ptr, fp),
+	struct _reent * ptr _AND
+	register FILE * fp)
 {
   /* for now we simply cast since off_t should be long */
   return (_off_t)_ftell_r (ptr, fp);
@@ -31,8 +29,8 @@ _DEFUN(_ftello_r, (ptr, fp),
 #ifndef _REENT_ONLY
 
 _off_t
-_DEFUN(ftello, (fp),
-       register FILE * fp)
+_DEFUN (ftello, (fp),
+	register FILE * fp)
 {
   return (_off_t)_ftell_r (_REENT, fp);
 }

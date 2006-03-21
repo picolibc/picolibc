@@ -33,9 +33,6 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <time.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdlib.h>
 
 static const char *abb_weekdays[] = {
     "Sun",
@@ -78,7 +75,7 @@ static const char *abb_month[] = {
 static const char *full_month[] = {
     "January",
     "February",
-    "March",
+    "Mars",
     "April",
     "May",
     "June",
@@ -249,12 +246,8 @@ _DEFUN (strptime, (buf, format, timeptr),
 		timeptr->tm_year = (ret * 100) - tm_year_base;
 		buf = s;
 		break;
-	    case 'c' :		/* %a %b %e %H:%M:%S %Y */
-		s = strptime (buf, "%a %b %e %H:%M:%S %Y", timeptr);
-		if (s == NULL)
-		    return NULL;
-		buf = s;
-		break;
+	    case 'c' :
+		abort ();
 	    case 'D' :		/* %m/%d/%y */
 		s = strptime (buf, "%m/%d/%y", timeptr);
 		if (s == NULL)
@@ -416,8 +409,7 @@ _DEFUN (strptime, (buf, format, timeptr),
 		buf = s;
 		break;
 	    case 'Z' :
-		/* Unsupported. Just ignore.  */
-		break;
+		abort ();
 	    case '\0' :
 		--format;
 		/* FALLTHROUGH */

@@ -84,25 +84,21 @@ SECTIONS
   . = 0x80020000;
   .text : {
      _ftext = . ;
-    KEEP (*(.init))
+    *(.init)
      eprol  =  .;
     *(.text)
     *(.text.*)
-    *(.gnu.linkonce.t.*)
+    *(.gnu.linkonce.t*)
     *(.mips16.fn.*)
     *(.mips16.call.*)
     PROVIDE (__runtime_reloc_start = .);
     *(.rel.sdata)
     PROVIDE (__runtime_reloc_stop = .);
-    KEEP (*(.fini))
+    *(.fini)
      etext  =  .;
      _etext  =  .;
   }
   
-  .eh_frame_hdr : { *(.eh_frame_hdr) }
-  .eh_frame : { KEEP (*(.eh_frame)) }
-  .gcc_except_table : { *(.gcc_except_table) }
-  .jcr : { KEEP (*(.jcr)) }
   .ctors    :
   {
     /* gcc uses crtbegin.o to find the start of
@@ -140,13 +136,13 @@ SECTIONS
     *(.rdata)
     *(.rodata)
     *(.rodata.*)
-    *(.gnu.linkonce.r.*)
+    *(.gnu.linkonce.r*)
   }
    _fdata = ALIGN(16);
   .data : {
     *(.data)
     *(.data.*)
-    *(.gnu.linkonce.d.*)
+    *(.gnu.linkonce.d*)
   }
    _gp = ALIGN(16) + 0x8000;
   .lit8 : {
@@ -158,22 +154,18 @@ SECTIONS
   .sdata : {
     *(.sdata)
     *(.sdata.*)
-    *(.gnu.linkonce.s.*)
+    *(.gnu.linkonce.s*)
   }
    edata  =  .;
    _edata  =  .;
    _fbss = .;
   .sbss : {
     *(.sbss)
-    *(.sbss.*)
-    *(.gnu.linkonce.sb.*)
     *(.scommon)
   }
   .bss : {
     _bss_start = . ;
     *(.bss)
-    *(.bss.*)
-    *(.gnu.linkonce.b.*)
     *(COMMON)
   }
    end = .;

@@ -11,14 +11,14 @@ ANSI_SYNOPSIS
 	#include <stdio.h>
 	FILE *tmpfile(void);
 
-	FILE *_tmpfile_r(struct _reent *<[reent]>);
+	FILE *_tmpfile_r(void *<[reent]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	FILE *tmpfile();
 
 	FILE *_tmpfile_r(<[reent]>)
-	struct _reent *<[reent]>;
+	char *<[reent]>;
 
 DESCRIPTION
 Create a temporary file (a file which will be deleted automatically),
@@ -45,14 +45,12 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<getpid>>,
 <<tmpfile>> also requires the global pointer <<environ>>.
 */
 
-#include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <errno.h>
 
 FILE *
-_DEFUN(_tmpfile_r, (ptr),
-       struct _reent *ptr)
+_DEFUN (_tmpfile_r, (ptr),
+	struct _reent *ptr)
 {
   FILE *fp;
   int e;
@@ -71,7 +69,7 @@ _DEFUN(_tmpfile_r, (ptr),
 #ifndef _REENT_ONLY
 
 FILE *
-_DEFUN_VOID(tmpfile)
+_DEFUN_VOID (tmpfile)
 {
   return _tmpfile_r (_REENT);
 }

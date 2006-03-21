@@ -1,8 +1,9 @@
-	.global	_setjmp
-	.global	_longjmp
 
 #ifdef __Z8001__
 	segm
+
+	.global	_setjmp
+	.globl	_longjmp
 
 #ifdef __STD_CALL__
 
@@ -55,31 +56,10 @@ _longjmp:
 	unseg
 
 #ifdef __STD_CALL__
+#warning Z8002 std call not implemented!
+#endif
 
-_setjmp:
-	ld	r7,r15(#2)	! get argument
-	ld	r2,@r15		! fetch pc
-	ld	@r7,r2		! save it
-	ldl	r7(#14),rr8
-	ldl	r7(#2),rr10
-	ldl	r7(#6),rr12	! remember frame pointer
-	ldl	r7(#10),rr14	! remember stack pointer
-	ldk	r7,#0
-	ret	t
-
-_longjmp:
-	ld	r4,r15(#2)	! get first argument (jmp_buf)
-	ld	r7,r15(#4)	! get return value
-	ldl	rr8,r4(#14)
-	ldl	rr10,r4(#2)
-	ldl	rr12,r4(#6)	! restore old frame pointer
-	ldl	rr14,r4(#10)	! restore old stack pointer
-	ld	r4,@r4		! return address
-	inc	r15,#2
-	jp	@r4
-
-#else /* above __STD_CALL_, below not */
-
+	.global	_setjmp
 _setjmp:
 	ld	r2,@r15	! fetch pc
 	ld	@r7,r2	! save it
@@ -89,14 +69,14 @@ _setjmp:
 	ldk	r2,#0
 	ret	t
 	
+	.globl	_longjmp
+
 _longjmp:
 	ld	r2,r6		! get return value
 	ld	r4,@r7
-	ldl	rr10,r7(4)
-	ldl	rr12,r7(8)
-	ldl	rr14,r7(12)
-	inc	r15,#2
-	jp	@r4
+	ldl	rr10,rr7(4)
+	ldl	rr12,rr7(8)
+	ldl	rr14,rr7(12)
+	jp	@rr4
 	
-#endif  /* not __STD_CALL__ */
 #endif  /* Z8002 version */

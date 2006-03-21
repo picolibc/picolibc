@@ -71,11 +71,8 @@ char    _EXFUN(*getlogin, (void ));
 #if defined(_POSIX_THREAD_SAFE_FUNCTIONS)
 int _EXFUN(getlogin_r, (char *name, size_t namesize) );
 #endif
-char 	_EXFUN(*getpass, (const char *__prompt));
+char 	_EXFUN(*getpass, (__const char *__prompt));
 size_t  _EXFUN(getpagesize, (void));
-#if defined(__CYGWIN__)
-int    _EXFUN(getpeereid, (int, uid_t *, gid_t *));
-#endif
 pid_t   _EXFUN(getpgid, (pid_t));
 pid_t   _EXFUN(getpgrp, (void ));
 pid_t   _EXFUN(getpid, (void ));
@@ -147,9 +144,6 @@ long    _EXFUN(sysconf, (int __name ));
 pid_t   _EXFUN(tcgetpgrp, (int __fildes ));
 int     _EXFUN(tcsetpgrp, (int __fildes, pid_t __pgrp_id ));
 char    _EXFUN(*ttyname, (int __fildes ));
-#if defined(__CYGWIN__)
-int     _EXFUN(ttyname_r, (int, char *, size_t)); 
-#endif
 int     _EXFUN(unlink, (const char *__path ));
 int     _EXFUN(vhangup, (void ));
 _READ_WRITE_RETURN_TYPE _EXFUN(write, (int __fd, const void *__buf, size_t __nbyte ));
@@ -206,14 +200,10 @@ unsigned _EXFUN(usleep, (unsigned int __useconds));
  int	_EXFUN(gethostname, (char *__name, size_t __len));
 #endif
 char *	_EXFUN(mktemp, (char *));
-#if defined(__CYGWIN__)
-void    _EXFUN(sync, (void));
-#else /* defined(__rtems__) */
 int     _EXFUN(sync, (void));
-#endif
-#endif
 int     _EXFUN(readlink, (const char *__path, char *__buf, int __buflen));
 int     _EXFUN(symlink, (const char *__name1, const char *__name2));
+#endif
 
 #define	F_OK	0
 #define	R_OK	4

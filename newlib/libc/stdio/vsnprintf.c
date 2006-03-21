@@ -1,3 +1,7 @@
+/* doc in vfprintf.c */
+
+/* This code created by modifying vsprintf.c so copyright inherited. */
+
 /*
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
@@ -14,7 +18,6 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-/* doc in vfprintf.c */
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "%W% (Berkeley) %G%";
@@ -33,11 +36,11 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(vsnprintf, (str, size, fmt, ap),
-       char *str        _AND
-       size_t size      _AND
-       _CONST char *fmt _AND
-       va_list ap)
+_DEFUN (vsnprintf, (str, size, fmt, ap),
+     char *str _AND
+     size_t size _AND
+     _CONST char *fmt _AND
+     va_list ap)
 {
   int ret;
   FILE f;
@@ -45,7 +48,6 @@ _DEFUN(vsnprintf, (str, size, fmt, ap),
   f._flags = __SWR | __SSTR;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = (size > 0 ? size - 1 : 0);
-  f._file = -1;  /* No file. */
   ret = _vfprintf_r (_REENT, &f, fmt, ap);
   if (size > 0)
     *f._p = 0;
@@ -55,12 +57,12 @@ _DEFUN(vsnprintf, (str, size, fmt, ap),
 #endif /* !_REENT_ONLY */
 
 int
-_DEFUN(_vsnprintf_r, (ptr, str, size, fmt, ap),
-       struct _reent *ptr _AND
-       char *str          _AND
-       size_t size        _AND
-       _CONST char *fmt   _AND
-       va_list ap)
+_DEFUN (_vsnprintf_r, (ptr, str, size, fmt, ap),
+     struct _reent *ptr _AND
+     char *str _AND
+     size_t size _AND
+     _CONST char *fmt _AND
+     va_list ap)
 {
   int ret;
   FILE f;
@@ -68,7 +70,6 @@ _DEFUN(_vsnprintf_r, (ptr, str, size, fmt, ap),
   f._flags = __SWR | __SSTR;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = (size > 0 ? size - 1 : 0);
-  f._file = -1;  /* No file. */
   ret = _vfprintf_r (ptr, &f, fmt, ap);
   if (size > 0)
     *f._p = 0;

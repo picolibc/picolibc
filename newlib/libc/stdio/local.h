@@ -23,38 +23,34 @@
  */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdarg.h>
 #include <reent.h>
-#include <stdlib.h>
 #include <unistd.h>
 
 extern int    _EXFUN(__svfscanf_r,(struct _reent *,FILE *, _CONST char *,va_list));
-extern int    _EXFUN(__svfiscanf_r,(struct _reent *,FILE *, _CONST char *,va_list));
 extern FILE  *_EXFUN(__sfp,(struct _reent *));
 extern int    _EXFUN(__sflags,(struct _reent *,_CONST char*, int*));
 extern int    _EXFUN(__srefill,(FILE *));
-extern _READ_WRITE_RETURN_TYPE _EXFUN(__sread,(_PTR, char *, int));
-extern _READ_WRITE_RETURN_TYPE _EXFUN(__swrite,(_PTR, char _CONST *, int));
-extern _fpos_t _EXFUN(__sseek,(_PTR, _fpos_t, int));
-extern int    _EXFUN(__sclose,(_PTR));
+extern _READ_WRITE_RETURN_TYPE _EXFUN(__sread,(void *, char *, int));
+extern _READ_WRITE_RETURN_TYPE _EXFUN(__swrite,(void *, char const *, int));
+extern _fpos_t _EXFUN(__sseek,(void *, _fpos_t, int));
+extern int    _EXFUN(__sclose,(void *));
 extern int    _EXFUN(__stextmode,(int));
-extern _VOID   _EXFUN(__sinit,(struct _reent *));
-extern _VOID   _EXFUN(_cleanup_r,(struct _reent *));
-extern _VOID   _EXFUN(__smakebuf,(FILE *));
+extern void   _EXFUN(__sinit,(struct _reent *));
+extern void   _EXFUN(_cleanup_r,(struct _reent *));
+extern void   _EXFUN(__smakebuf,(FILE *));
 extern int    _EXFUN(_fwalk,(struct _reent *, int (*)(FILE *)));
-extern int    _EXFUN(_fwalk_reent,(struct _reent *, int (*)(struct _reent *, FILE *)));
 struct _glue * _EXFUN(__sfmoreglue,(struct _reent *,int n));
 extern int   _EXFUN(__srefill,(FILE *fp));
 
 /* Called by the main entry point fns to ensure stdio has been initialized.  */
 
-#define CHECK_INIT(ptr) \
-  do						\
-    {						\
-      if ((ptr) && !(ptr)->__sdidinit)		\
-	__sinit (ptr);				\
-    }						\
+#define CHECK_INIT(fp) \
+  do					\
+    {					\
+      if (!_REENT->__sdidinit)		\
+	__sinit (_REENT);		\
+    }					\
   while (0)
 
 /* Return true iff the given FILE cannot be written now.  */
@@ -91,15 +87,3 @@ char *_EXFUN(_llicvt,(char *, long long, char));
 #define CVT_BUF_SIZE 128
 
 #define	NDYNAMIC 4	/* add four more whenever necessary */
-
-#ifdef __SINGLE_THREAD__
-#define __sfp_lock_acquire()
-#define __sfp_lock_release()
-#define __sinit_lock_acquire()
-#define __sinit_lock_release()
-#else
-_VOID _EXFUN(__sfp_lock_acquire,(_VOID));
-_VOID _EXFUN(__sfp_lock_release,(_VOID));
-_VOID _EXFUN(__sinit_lock_acquire,(_VOID));
-_VOID _EXFUN(__sinit_lock_release,(_VOID));
-#endif

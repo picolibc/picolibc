@@ -34,7 +34,6 @@ SECTIONS
     *(.rel.sdata)
     PROVIDE (__runtime_reloc_stop = .);
     *(.fini)
-    . = ALIGN(4);
      __CTOR_LIST__ = .;
     CONSTRUCTORS
     LONG(-1)
@@ -55,7 +54,6 @@ SECTIONS
   }
   .rodata : {
     *(.rodata)
-    *(.rodata.*)
   }
   .eh_frame :
   {

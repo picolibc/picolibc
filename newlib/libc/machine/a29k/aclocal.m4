@@ -47,6 +47,33 @@ AC_ARG_ENABLE(malloc-debugging,
   *)   AC_MSG_ERROR(bad value ${enableval} for malloc-debugging option) ;;
  esac], [malloc_debugging=])dnl
 
+dnl Support --enable-newlib-mb
+AC_ARG_ENABLE(newlib-mb,
+[  --enable-newlib-mb        enable multibyte support],
+[case "${enableval}" in
+  yes) newlib_mb=yes ;;
+  no)  newlib_mb=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-mb option) ;;
+ esac], [newlib_mb=])dnl
+
+dnl Support --enable-newlib-iconv
+AC_ARG_ENABLE(newlib-iconv,
+[  --enable-newlib-iconv     enable iconv library support],
+[case "${enableval}" in
+  yes) newlib_iconv=yes ;;
+  no)  newlib_iconv=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-iconv option) ;;
+ esac], [newlib_iconv=])dnl
+
+dnl Support --enable-newlib-builtin-converters
+AC_ARG_ENABLE(newlib-builtin-converters,
+[  --enable-newlib-builtin-converters   enable specific comma-separated list of iconv converters to be built-in],
+[if test x${enableval} = x; then
+   AC_MSG_ERROR(bad value ${enableval} for newlib-builtin-converters option - use comma-separated list)
+ fi
+ builtin_converters=${enableval}
+ ], [builtin_converters=])dnl
+
 dnl Support --enable-newlib-multithread
 AC_ARG_ENABLE(newlib-multithread,
 [  --enable-newlib-multithread        enable support for multiple threads],
@@ -55,17 +82,6 @@ AC_ARG_ENABLE(newlib-multithread,
   no)  newlib_multithread=no ;;
   *)   AC_MSG_ERROR(bad value ${enableval} for newlib-multithread option) ;;
  esac], [newlib_multithread=yes])dnl
-
-dnl Support --enable-newlib-iconv
-AC_ARG_ENABLE(newlib-iconv,
-[  --enable-newlib-iconv     enable iconv library support],
-[if test "${newlib_iconv+set}" != set; then
-   case "${enableval}" in
-     yes) newlib_iconv=yes ;;
-     no)  newlib_iconv=no ;;
-     *)   AC_MSG_ERROR(bad value ${enableval} for newlib-iconv option) ;;
-   esac
- fi], [newlib_iconv=${newlib_iconv}])dnl
 
 dnl Support --enable-newlib-elix-level
 AC_ARG_ENABLE(newlib-elix-level,
@@ -117,7 +133,7 @@ AC_SUBST(newlib_basedir)
 
 AC_CANONICAL_SYSTEM
 
-AM_INIT_AUTOMAKE(newlib, 1.14.0)
+AM_INIT_AUTOMAKE(newlib, 1.12.0)
 
 # FIXME: We temporarily define our own version of AC_PROG_CC.  This is
 # copied from autoconf 2.12, but does not call AC_PROG_CC_WORKS.  We
@@ -164,9 +180,6 @@ AC_CHECK_TOOL(AR, ar)
 AC_CHECK_TOOL(RANLIB, ranlib, :)
 
 AC_PROG_INSTALL
-
-# Hack
-ac_given_INSTALL=$INSTALL
 
 AM_MAINTAINER_MODE
 

@@ -51,21 +51,11 @@
 */
 
 #if (defined(__arm__) || defined(__thumb__)) && !defined(__MAVERICK__)
-/* ARM traditionally used big-endian words; and within those words the
-   byte ordering was big or little endian depending upon the target.
-   Modern floating-point formats are naturally ordered; in this case
-   __VFP_FP__ will be defined, even if soft-float.  */
-#ifdef __VFP_FP__
-# ifdef __ARMEL__
-#  define __IEEE_LITTLE_ENDIAN
-# else
-#  define __IEEE_BIG_ENDIAN
-# endif
-#else
-# define __IEEE_BIG_ENDIAN
-# ifdef __ARMEL__
-#  define __IEEE_BYTES_LITTLE_ENDIAN
-# endif
+/* ARM always has big-endian words.  Within those words the byte ordering
+   will be big or little endian depending upon the target.  */
+#define __IEEE_BIG_ENDIAN
+#ifdef __ARMEL__
+#define __IEEE_BYTES_LITTLE_ENDIAN
 #endif
 #endif
 
@@ -92,7 +82,7 @@
 #endif
 #endif
 
-#if defined (__H8300__) || defined (__H8300H__) || defined (__H8300S__) || defined (__H8500__) || defined (__H8300SX__)
+#if defined (__H8300__) || defined (__H8300H__) || defined (__H8300S__) || defined (__H8500__)
 #define __IEEE_BIG_ENDIAN
 #define _FLOAT_ARG float
 #define _DOUBLE_IS_32BITS
@@ -104,7 +94,7 @@
 #else
 #define __IEEE_BIG_ENDIAN
 #endif
-#if defined(__SH2E__) || defined(__SH3E__) || defined(__SH4_SINGLE_ONLY__) || defined(__SH2A_SINGLE_ONLY__)
+#if defined(__SH2E__) || defined(__SH3E__) || defined(__SH4_SINGLE_ONLY__)
 #define _DOUBLE_IS_32BITS
 #endif
 #endif
@@ -214,19 +204,11 @@
 #endif
 #endif
 
-#ifdef __CRX__
-#define __IEEE_LITTLE_ENDIAN
-#endif
-
 #ifdef __fr30__
 #define __IEEE_BIG_ENDIAN
 #endif
 
 #ifdef __mcore__
-#define __IEEE_BIG_ENDIAN
-#endif
-
-#ifdef __mt__
 #define __IEEE_BIG_ENDIAN
 #endif
 
@@ -268,15 +250,6 @@
 #  define __IEEE_BIG_ENDIAN
 #endif /* __ARMEL__ */
 #endif /* __MAVERICK__ */
-
-#ifdef __m32c__
-#define __IEEE_LITTLE_ENDIAN
-#define __SMALL_BITFIELDS
-#endif
-
-#ifdef __CRIS__
-#define __IEEE_LITTLE_ENDIAN
-#endif
 
 #ifndef __IEEE_BIG_ENDIAN
 #ifndef __IEEE_LITTLE_ENDIAN

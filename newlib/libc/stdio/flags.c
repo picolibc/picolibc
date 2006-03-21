@@ -1,3 +1,5 @@
+/* No user fns here. Pesch 15apr92 */
+
 /*
  * Copyright (c) 1990 Regents of the University of California.
  * All rights reserved.
@@ -14,12 +16,11 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-/* No user fns here. Pesch 15apr92 */
 
-#include <_ansi.h>
 #include <stdio.h>
 #include <time.h>
 #include <fcntl.h>
+
 #include <errno.h>
 #include <sys/types.h>
 
@@ -30,10 +31,10 @@
  */
 
 int
-_DEFUN(__sflags, (ptr, mode, optr),
-       struct _reent *ptr  _AND
-       register char *mode _AND
-       int *optr)
+__sflags (ptr, mode, optr)
+     struct _reent *ptr;
+     register char *mode;
+     int *optr;
 {
   register int ret, m, o;
 

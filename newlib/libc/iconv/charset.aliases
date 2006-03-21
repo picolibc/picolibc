@@ -1,0 +1,38 @@
+# Charset alias table. The main name starts at the first position of a line,
+# followed by zero or more aliases, separated by any whitespace
+# character(s). Alias list may continue on the next line if the latter
+# begins with a whitespace.
+# Comments begin with '#' and cannot be used between multiple lines
+# of aliases of the same charset.
+us_ascii ansi_x3.4_1968 ansi_x3.4_1986 iso_646.irv:1991 ascii iso646_us us ibm367 cp367 csascii
+big5 csbig5 big_five bigfive cn_big5 cp950
+cns11643_plane1
+cns11643_plane2
+cns11643_plane14
+shift_jis sjis cp932 ms_kanji csshiftjis
+ksx1001 ks_x_1001
+jis_x0212_1990
+jis_x0208_1983 jis_c6226-1983 iso_ir_87 x0208
+jis_x0201 x0201 cshalfwidthkatakana
+gb_2312_80 gb2312 gb2312_80 euc_cn eucch cn_gb csgb2312 iso_ir_58 chinese
+cp866 866 IBM866 CSIBM866
+cp855 ibm855 855 csibm855
+cp852 ibm852 852 cspcp852
+cp850 ibm850 850 cspc850multilingual
+cp775 ibm775 cspc775baltic
+koi8_u koi8u
+koi8_r cskoi8r koi8r koi8
+iso_8859_1 iso8859_1 iso88591 iso_8859_1:1987 iso_ir_100 latin1 l1 ibm819 cp819 csisolatin1
+iso_8859_2 iso8859_2 iso88592 iso_8859_2:1987 iso_ir_101 latin2 l2 csisolatin2
+iso_8859_4 iso8859_4 iso88594 iso_8859_4:1988 iso_ir_110 latin4 l4 csisolatin4
+iso_8859_5 iso8859_5 iso88595 iso_8859_5:1988 iso_ir_144 cyrillic csisolatincyrillic
+iso_8859_15 iso8859_15 iso885915 iso_8859_15:1998 iso8859_15 iso885915
+euc_jp eucjp
+euc_kr euckr
+euc_tw euctw
+iso_10646_ucs_2 iso10646_ucs_2 iso_10646_ucs2 iso10646_ucs2 iso1064ucs2 ucs2 ucs_2
+iso_10646_ucs_4 iso10646_ucs_4 iso_10646_ucs4 iso10646_ucs4 iso1064ucs4 ucs4 ucs_4
+ucs_2_internal ucs2_internal ucs2internal
+ucs_4_internal ucs4_internal ucs4internal
+utf_16 utf16
+utf_8 utf8

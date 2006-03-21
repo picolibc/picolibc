@@ -56,26 +56,24 @@ No supporting OS subroutines are required.
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
-#include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 
-_VOID
-_DEFUN(_rewind_r, (ptr, fp),
-       struct _reent * ptr _AND
-       register FILE * fp)
+void
+_DEFUN (_rewind_r, (ptr, fp),
+	struct _reent * ptr _AND
+	register FILE * fp)
 {
-  _CAST_VOID _fseek_r (ptr, fp, 0L, SEEK_SET);
-  clearerr (fp);
+	(void) _fseek_r (ptr, fp, 0L, SEEK_SET);
+	clearerr(fp);
 }
 
 #ifndef _REENT_ONLY
 
-_VOID
-_DEFUN(rewind, (fp),
-       register FILE * fp)
+void
+_DEFUN (rewind, (fp),
+	register FILE * fp)
 {
-  _CAST_VOID _fseek_r (_REENT, fp, 0L, SEEK_SET);
+	(void) _fseek_r (_REENT, fp, 0L, SEEK_SET);
 }
 
 #endif /* !_REENT_ONLY */

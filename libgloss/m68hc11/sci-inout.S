@@ -1,5 +1,5 @@
 /* M68HC11/M68HC12 serial line operations
- * Copyright (C) 1999, 2001, 2003, 2004 Stephane Carrez (stcarrez@nerim.fr)
+ * Copyright (C) 1999, 2001 Stephane Carrez (stcarrez@nerim.fr)	
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -12,25 +12,6 @@
  * they apply.
  */
 
-#ifdef __HAVE_SHORT_INT__
-	.mode mshort
-#else
-	.mode mlong
-#endif
-
-#if defined(__USE_RTC__)
-	.macro ret
-#if defined(mc68hc12)
-	rtc
-#else
-	jmp __return_32
-#endif
-	.endm
-#else
-	.macro ret
-	rts
-	.endm
-#endif
 #ifdef mc68hc12
 	SC0CR1 = 0xC2
 	SC0CR2 = 0xC3
@@ -58,7 +39,7 @@ L1:
 	ldab	SC0CR2,x
 	orab	#0x8
 	stab	SC0CR2,x
-	ret
+	rts
 
 	.sect .text
 	.globl inbyte
@@ -71,7 +52,7 @@ inbyte:
 	bita	#0x20
 	beq	inbyte
 	ldab	SC0CR2,x
-	ret
+	rts
 
 	.globl _sci_init
 	.sect .text
@@ -118,7 +99,7 @@ L1:
 	ldab	SCCR2,x
 	orab	#0x8
 	stab	SCCR2,x
-	ret
+	rts
 
 	.sect .text
 	.globl inbyte
@@ -131,7 +112,7 @@ inbyte:
 	bita	#0x20
 	beq	inbyte
 	ldab	SCDR,x
-	ret
+	rts
 
 	.globl _sci_init
 	.sect .text

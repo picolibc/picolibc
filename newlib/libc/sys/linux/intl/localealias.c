@@ -1,6 +1,4 @@
-#include <newlib.h>
-
-#ifdef _MB_CAPABLE
+#ifdef MB_CAPABLE
 
 /* Handle aliases for locale names.
    Copyright (C) 1995-1999, 2000, 2001 Free Software Foundation, Inc.
@@ -442,4 +440,4 @@ alias_compare (map1, map2)
 #endif
 }
 
-#endif /* _MB_CAPABLE */
+#endif /* MB_CAPABLE */

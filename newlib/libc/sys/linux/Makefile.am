@@ -146,7 +146,8 @@ ELIX_3_OBJS = \
 
 ELIX_4_OBJS = \
 	getlogin.$(oext) \
-	getpwent.$(oext) \
+	getpwnam.$(oext) \
+	getpwuid.$(oext) \
 	stack.$(oext)
 
 if ELIX_LEVEL_1
@@ -165,7 +166,7 @@ endif
 
 # This will handle both /usr/src/linux-2.4/include/asm/signal.h (in Red Hat Linux 7.1)
 # and also /usr/src/linux/include/asm/signal.h in older versions of Red Hat Linux
-SIGNAL_H = /usr/include/asm/signal.h
+SIGNAL_H = /usr/src/$(shell ls /usr/src/ | grep ^linux | head -n 1)/include/asm/signal.h
 
 liblinux_la_LDFLAGS = -Xcompiler -nostdlib
 
@@ -229,8 +230,7 @@ machine/crt0.o: ; @true
 sig.$(oext):	siglist.inc
 
 siglist.inc:
-		$(AWK) '{ max = 32 } \
-		  /#define.SIG.*[1-9][0-9]*/ { n[$$3] = $$2 } \
+		$(AWK) '/#define.SIG.*[1-9][0-9]*/ { n[$$3] = $$2 } \
 		  /#define.NSIG.*[1-9][0-9]*/ { max = $$3 } \
 		  /#define.SIGUNUSED/ \
 		    { for (i = 0; i <= max; i++) print "\"" n[i] "\"," }' \

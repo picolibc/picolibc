@@ -1,6 +1,4 @@
-#include <newlib.h>
-
-#ifdef _MB_CAPABLE
+#ifdef MB_CAPABLE
 
 /* Copyright (C) 1995-1998, 2000, 2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -203,4 +201,4 @@ _nl_explode_name (name, language, modifier, territory, codeset,
   return mask;
 }
 
-#endif /* _MB_CAPABLE */
+#endif /* MB_CAPABLE */

@@ -21,38 +21,24 @@
 
 #ifndef __INTTYPES_DEFINED__
 #define __INTTYPES_DEFINED__
+typedef short int __int16_t;
+typedef unsigned short int __uint16_t;
 
-#include <machine/_types.h>
-
-#if defined(__rtems__)
-/*
- *  The following section is RTEMS specific and is needed to more
- *  closely match the types defined in the BSD sys/types.h.
- *  This is needed to let the RTEMS/BSD TCP/IP stack compile.
- */
-
-/* deprecated */
-#if ___int8_t_defined
-typedef __uint8_t	u_int8_t;
-#endif
-#if ___int16_t_defined
-typedef __uint16_t	u_int16_t;
-#endif 
-#if ___int32_t_defined
-typedef __uint32_t	u_int32_t;
+#if __INT_MAX__ == 32767
+typedef long int __int32_t;
+typedef unsigned long int __uint32_t;
+#else
+typedef int __int32_t;
+typedef unsigned int __uint32_t;
 #endif
 
-#if ___int64_t_defined
-typedef __uint64_t	u_int64_t;
-
-/* deprecated */
-typedef	__uint64_t	u_quad_t;
-typedef	__int64_t	quad_t;
-typedef	quad_t *	qaddr_t;
+#if __LONG_MAX__ > 2147483647 || !defined(__GNUC__)
+typedef long int __int64_t;
+typedef unsigned long int __uint64_t;
+#else
+__extension__ typedef long long __int64_t;
+__extension__ typedef unsigned long long __uint64_t;
 #endif
-
-#endif
-
 #endif /* ! __INTTYPES_DEFINED */
 
 #ifndef __need_inttypes
@@ -251,6 +237,11 @@ typedef	struct _types_fd_set {
 #undef __MS_types__
 #undef _ST_INT32
 
+/* The following are actually standard POSIX 1003.1b-1993 threads, mutexes,
+   condition variables, and keys.  But since RTEMS is currently the only
+   newlib user of these, the ifdef is just on RTEMS. */
+
+#if defined(__rtems__) || defined(__CYGWIN__)
 
 #ifndef __clockid_t_defined
 typedef _CLOCKID_T_ clockid_t;
@@ -262,8 +253,9 @@ typedef _TIMER_T_ timer_t;
 #define __timer_t_defined
 #endif
 
-typedef unsigned long useconds_t;
-typedef long suseconds_t;
+#if defined(__CYGWIN__) || defined(__rtems__)
+typedef long useconds_t;
+#endif
 
 #include <sys/features.h>
 
@@ -373,6 +365,8 @@ typedef struct {
 #include <cygwin/types.h>
 #endif
 #endif /* defined(_POSIX_THREADS) */
+
+#endif  /* defined(__rtems__) */
 
 #endif  /* !__need_inttypes */
 

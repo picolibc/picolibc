@@ -44,14 +44,12 @@ POSIX 1003.1 requires <<putc_unlocked>>.  <<putc_unlocked>> may be
 implemented as a macro, so arguments should not have side-effects.
 
 Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
-<<lseek>>, <<read>>, <<sbrk>>, <<write>>.
-*/
+<<lseek>>, <<read>>, <<sbrk>>, <<write>>.  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
-#include <_ansi.h>
 #include <stdio.h>
 
 /*
@@ -61,9 +59,9 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #undef putc_unlocked
 
 int
-_DEFUN(putc_unlocked, (c, fp),
-       int c _AND
-       register FILE *fp)
+putc_unlocked (c, fp)
+     int c;
+     register FILE *fp;
 {
   /* CHECK_INIT is (eventually) called by __swbuf.  */
 

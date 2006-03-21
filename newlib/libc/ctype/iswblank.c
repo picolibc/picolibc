@@ -29,7 +29,7 @@
 
 /*
 FUNCTION
-	<<iswblank>>---blank wide character test
+	<<iswblank>>---wide-character blank test
 
 INDEX
 	iswblank
@@ -48,7 +48,7 @@ DESCRIPTION
 are categorized as blank.
 
 RETURNS
-<<iswblank>> returns non-zero if <[c]> is a blank wide character.
+<<iswblank>> returns non-zero if <[c]> is a blank wide-character.
 
 PORTABILITY
 <<iswblank>> is C99.
@@ -56,7 +56,6 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 #include <_ansi.h>
-#include <newlib.h>
 #include <wctype.h>
 #include <ctype.h>
 #include <string.h>
@@ -71,7 +70,7 @@ _DEFUN(iswblank,(c), wint_t c)
       unicode = 0;
       /* fall-through */ 
     }
-#ifdef _MB_CAPABLE
+#ifdef MB_CAPABLE
   else if (!strcmp (__lc_ctype, "C-JIS"))
     {
       c = __jp2uc (c, JP_JIS);
@@ -99,7 +98,7 @@ _DEFUN(iswblank,(c), wint_t c)
               (c >= 0x2008 && c <= 0x200b) ||
               c == 0x205f || c == 0x3000);
     }
-#endif /* _MB_CAPABLE */
+#endif /* MB_CAPABLE */
 
   return (c < 0x100 ? isblank (c) : 0);
 }

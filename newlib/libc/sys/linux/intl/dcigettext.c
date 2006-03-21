@@ -17,9 +17,7 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#include <newlib.h>
-
-#ifdef _MB_CAPABLE
+#ifdef MB_CAPABLE
 
 /* Tell glibc's <string.h> to provide a prototype for mempcpy().
    This must come before <config.h> because <config.h> may include
@@ -1239,7 +1237,7 @@ free_mem (void)
 
 text_set_element (__libc_subfreeres, free_mem);
 #endif
-#else  /* !_MB_CAPABLE */
+#else  /* !MB_CAPABLE */
 
 #include <machine/weakalias.h>
 #include <sys/lock.h>
@@ -1283,4 +1281,4 @@ __dcigettext (domainname, msgid1, msgid2, plural, n, category)
 }
 weak_alias(__dcigettext, dcigettext)
 
-#endif /* !_MB_CAPABLE */
+#endif /* !MB_CAPABLE */

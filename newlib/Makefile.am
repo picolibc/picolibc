@@ -1,7 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 
 AUTOMAKE_OPTIONS = cygnus dejagnu
-ACLOCAL_AMFLAGS = -I .
 
 # Multilib support variables.
 MULTISRCTOP =
@@ -28,7 +27,6 @@ AM_MAKEFLAGS = \
 	"CFLAGS=$(CFLAGS)" \
 	"CFLAGS_FOR_BUILD=$(CFLAGS_FOR_BUILD)" \
 	"CFLAGS_FOR_TARGET=$(CFLAGS_FOR_TARGET)" \
-	"INSTALL=$(INSTALL)" \
 	"LDFLAGS=$(LDFLAGS)" \
 	"LIBCFLAGS=$(LIBCFLAGS)" \
 	"LIBCFLAGS_FOR_TARGET=$(LIBCFLAGS_FOR_TARGET)" \
@@ -91,9 +89,6 @@ toollib_DATA = $(CRT0) $(CRT1)
 MATHOBJS_IN_LIBC = \
 	s_isinf.$(oext) sf_isinf.$(oext) \
 	s_isnan.$(oext) sf_isnan.$(oext) \
-	s_isinfd.$(oext) sf_isinff.$(oext) \
-	s_isnand.$(oext) sf_isnanf.$(oext) \
-	s_nan.$(oext) sf_nan.$(oext) \
 	s_ldexp.$(oext) sf_ldexp.$(oext) \
 	s_frexp.$(oext) sf_frexp.$(oext) \
 	s_modf.$(oext) \
@@ -129,9 +124,9 @@ LIBM_OBJECTLISTS = \
 	libm/common/objectlist.awk.in \
 	$(LIBM_MACHINE_OBJECTLIST)
 
-libm_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/libc/sys/linux/shared.ld -lgcc -objectlist libm-libtool-objectlist
+libm_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/libc/sys/linux/shared.ld -objectlist libm-libtool-objectlist
 
-libc_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/libc/sys/linux/shared.ld -lgcc -objectlist libc-libtool-objectlist
+libc_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/libc/sys/linux/shared.ld -objectlist libc-libtool-objectlist
 
 if USE_LIBTOOL
 libm_la_SOURCES =
@@ -193,21 +188,11 @@ all-recursive: stmp-targ-include
 # used while building.
 stmp-targ-include: config.status
 	-rm -rf targ-include stmp-targ-include
-	mkdir targ-include targ-include/sys targ-include/machine targ-include/bits
+	mkdir targ-include targ-include/sys targ-include/machine
 	cp newlib.h targ-include/newlib.h
 	-for i in $(srcdir)/libc/machine/$(machine_dir)/machine/*.h; do \
 	    if [ -f $$i ]; then \
 	      cp $$i targ-include/machine/`basename $$i`; \
-	    else true; fi ; \
-	  done
-	-for i in $(srcdir)/libc/machine/$(machine_dir)/sys/*.h; do \
-	    if [ -f $$i ]; then \
-	      cp $$i targ-include/sys/`basename $$i`; \
-	    else true; fi ; \
-	  done
-	-for i in $(srcdir)/libc/machine/$(machine_dir)/include/*.h; do \
-	    if [ -f $$i ]; then \
-	      cp $$i targ-include/`basename $$i`; \
 	    else true; fi ; \
 	  done
 	-for i in $(srcdir)/libc/sys/$(sys_dir)/include/*.h; do \
@@ -218,11 +203,6 @@ stmp-targ-include: config.status
 	-for i in $(srcdir)/libc/sys/$(sys_dir)/sys/*.h; do \
 	    if [ -f $$i ]; then \
 	      cp $$i targ-include/sys/`basename $$i`; \
-	    else true; fi ; \
-	  done
-	-for i in $(srcdir)/libc/sys/$(sys_dir)/bits/*.h; do \
-	    if [ -f $$i ]; then \
-	      cp $$i targ-include/bits/`basename $$i`; \
 	    else true; fi ; \
 	  done
 	-for i in $(srcdir)/libc/sys/$(sys_dir)/machine/*.h; do \
@@ -270,25 +250,9 @@ endif
 	  for i in $(srcdir)/libc/include/sys/*.h; do \
 	   $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/sys/`basename $$i`; \
 	  done; \
-	  for i in $(srcdir)/libc/machine/$(machine_dir)/sys/*.h; do \
-	    if [ -f $$i ]; then \
-	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/sys/`basename $$i`; \
-	    else true; fi ; \
-	  done ; \
-	  for i in $(srcdir)/libc/machine/$(machine_dir)/include/*.h; do \
-	    if [ -f $$i ]; then \
-	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/`basename $$i`; \
-	    else true; fi ; \
-	  done ; \
 	  for i in $(srcdir)/libc/sys/$(sys_dir)/sys/*.h; do \
 	    if [ -f $$i ]; then \
 	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/sys/`basename $$i`; \
-	    else true; fi ; \
-	  done ; \
-	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include/bits; \
-	  for i in $(srcdir)/libc/sys/$(sys_dir)/bits/*.h; do \
-	    if [ -f $$i ]; then \
-	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/bits/`basename $$i`; \
 	    else true; fi ; \
 	  done ; \
 	  for i in $(srcdir)/libc/sys/$(sys_dir)/machine/*.h; do \
@@ -357,7 +321,6 @@ site.exp: Makefile
 	@echo 'set tool_version $(VERSION)' >> $@-t
 	@echo 'set srcdir $(srcdir)/testsuite' >> $@-t
 	@echo 'set objdir' `pwd` >> $@-t
-	@echo 'set tmpdir' `pwd`/testsuite >> $@-t
 	@echo 'set multibuildtop ./$(MULTIBUILDTOP)' >> $@-t
 	@echo 'set host_alias $(build_alias)' >> $@-t
 	@echo 'set host_triplet $(build_triplet)' >> $@-t

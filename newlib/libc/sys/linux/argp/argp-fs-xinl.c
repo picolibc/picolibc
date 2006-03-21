@@ -24,7 +24,7 @@
 
 #define ARGP_FS_EI
 #undef __OPTIMIZE__
-#define __OPTIMIZE__ 1
+#define __OPTIMIZE__
 #include "argp-fmtstream.h"
 
 /* Add weak aliases.  */

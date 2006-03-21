@@ -1,3 +1,5 @@
+/* No user fns here.  Pesch 15apr92. */
+
 /*
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
@@ -14,14 +16,13 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-/* No user fns here.  Pesch 15apr92. */
 
-#include <_ansi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/unistd.h>
+
 #include "local.h"
 
 /*
@@ -32,9 +33,9 @@
  * optimization) right after the _fstat() that finds the buffer size.
  */
 
-_VOID
-_DEFUN(__smakebuf, (fp),
-       register FILE *fp)
+void
+__smakebuf (fp)
+     register FILE *fp;
 {
   register size_t size, couldbetty;
   register _PTR p;

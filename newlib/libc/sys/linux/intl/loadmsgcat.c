@@ -1,6 +1,4 @@
-#include <newlib.h>
-
-#ifdef _MB_CAPABLE 
+#ifdef MB_CAPABLE 
 
 /* Load needed message catalogs.
    Copyright (C) 1995-1999, 2000, 2001 Free Software Foundation, Inc.

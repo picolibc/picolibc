@@ -1,3 +1,5 @@
+/* No user fns here.  Pesch 15apr92. */
+
 /*
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
@@ -14,99 +16,39 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-/* No user fns here.  Pesch 15apr92. */
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
-#include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include "local.h"
 
-static int
-_DEFUN(__fwalk, (ptr, function),
-       struct _reent *ptr _AND
-       register int (*function) (FILE *))
+int
+_fwalk (ptr, function)
+     struct _reent *ptr;
+     register int (*function) ();
 {
   register FILE *fp;
   register int n, ret = 0;
   register struct _glue *g;
 
-  for (g = &ptr->__sglue; g != NULL; g = g->_next)
+  /* Must traverse given list for std streams.  */
+  if (ptr != _GLOBAL_REENT)
+    {
+      for (g = &ptr->__sglue; g != NULL; g = g->_next)
+        for (fp = g->_iobs, n = g->_niobs; --n >= 0; fp++)
+          if (fp->_flags != 0)
+	    ret |= (*function) (fp);
+    }
+
+  /* Must traverse global list for all other streams.  */
+  for (g = &_GLOBAL_REENT->__sglue; g != NULL; g = g->_next)
     for (fp = g->_iobs, n = g->_niobs; --n >= 0; fp++)
       if (fp->_flags != 0)
-        {
-          _flockfile (fp);
-          if (fp->_flags != 0 && fp->_file != -1)
-            ret |= (*function) (fp);
-          _funlockfile (fp);
-        }
-
-  return ret;
-}
-
-/* Special version of __fwalk where the function pointer is a reentrant
-   I/O function (e.g. _fclose_r).  */
-static int
-_DEFUN(__fwalk_reent, (ptr, reent_function),
-       struct _reent *ptr _AND
-       register int (*reent_function) (struct _reent *, FILE *))
-{
-  register FILE *fp;
-  register int n, ret = 0;
-  register struct _glue *g;
-
-  for (g = &ptr->__sglue; g != NULL; g = g->_next)
-    for (fp = g->_iobs, n = g->_niobs; --n >= 0; fp++)
-      if (fp->_flags != 0)
-        {
-          _flockfile (fp);
-          if (fp->_flags != 0 && fp->_file != -1)
-            ret |= (*reent_function) (ptr, fp);
-          _funlockfile (fp);
-        }
-
-  return ret;
-}
-
-int
-_DEFUN(_fwalk, (ptr, function),
-       struct _reent *ptr _AND
-       register int (*function)(FILE *))
-{
-  register int ret = 0;
-
-  __sfp_lock_acquire ();
-
-  /* Must traverse given list for streams.  Note that _GLOBAL_REENT
-     only walked once in exit().  */
-  ret |= __fwalk (ptr, function);
-
-  __sfp_lock_release ();
-
-  return ret;
-}
-
-/* Special version of _fwalk which handles a function pointer to a
-   reentrant I/O function (e.g. _fclose_r).  */
-int
-_DEFUN(_fwalk_reent, (ptr, reent_function),
-       struct _reent *ptr _AND
-       register int (*reent_function) (struct _reent *, FILE *))
-{
-  register int ret = 0;
-
-  __sfp_lock_acquire ();
-
-  /* Must traverse given list for streams.  Note that _GLOBAL_REENT
-     only walked once in exit().  */
-  ret |= __fwalk_reent (ptr, reent_function);
-
-  __sfp_lock_release ();
+	ret |= (*function) (fp);
 
   return ret;
 }

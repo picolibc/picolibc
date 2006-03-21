@@ -1,4 +1,36 @@
 /*
+FUNCTION
+<<fclose>>---close a file
+
+INDEX
+	fclose
+
+ANSI_SYNOPSIS
+	#include <stdio.h>
+	int fclose(FILE *<[fp]>);
+
+TRAD_SYNOPSIS
+	#include <stdio.h>
+	int fclose(<[fp]>)
+	FILE *<[fp]>;
+
+DESCRIPTION
+If the file or stream identified by <[fp]> is open, <<fclose>> closes
+it, after first ensuring that any pending data is written (by calling
+<<fflush(<[fp]>)>>).
+
+RETURNS
+<<fclose>> returns <<0>> if successful (including when <[fp]> is
+<<NULL>> or not an open file); otherwise, it returns <<EOF>>.
+
+PORTABILITY
+<<fclose>> is required by ANSI C.
+
+Required OS subroutines: <<close>>, <<fstat>>, <<isatty>>, <<lseek>>,
+<<read>>, <<sbrk>>, <<write>>.
+*/
+
+/*
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
@@ -15,105 +47,47 @@
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-/*
-FUNCTION
-<<fclose>>---close a file
-
-INDEX
-	fclose
-INDEX
-	_fclose_r
-
-ANSI_SYNOPSIS
-	#include <stdio.h>
-	int fclose(FILE *<[fp]>);
-	int _fclose_r(struct _reent *<[reent]>, FILE *<[fp]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	int fclose(<[fp]>)
-	FILE *<[fp]>;
-        
-	int fclose(<[fp]>)
-        struct _reent *<[reent]>
-	FILE *<[fp]>;
-
-DESCRIPTION
-If the file or stream identified by <[fp]> is open, <<fclose>> closes
-it, after first ensuring that any pending data is written (by calling
-<<fflush(<[fp]>)>>).
-
-The alternate function <<_fclose_r>> is a reentrant version.
-The extra argument <[reent]> is a pointer to a reentrancy structure.
-
-RETURNS
-<<fclose>> returns <<0>> if successful (including when <[fp]> is
-<<NULL>> or not an open file); otherwise, it returns <<EOF>>.
-
-PORTABILITY
-<<fclose>> is required by ANSI C.
-
-Required OS subroutines: <<close>>, <<fstat>>, <<isatty>>, <<lseek>>,
-<<read>>, <<sbrk>>, <<write>>.
-*/
-
-#include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/lock.h>
 #include "local.h"
+#include <sys/lock.h>
+
+/*
+ * Close a file.
+ */
 
 int
-_DEFUN(_fclose_r, (rptr, fp),
-      struct _reent *rptr _AND
-      register FILE * fp)
+_DEFUN (fclose, (fp),
+	register FILE * fp)
 {
   int r;
 
   if (fp == NULL)
     return (0);			/* on NULL */
 
-  __sfp_lock_acquire ();
-
-  CHECK_INIT (rptr);
-
-  _flockfile (fp);
+  _flockfile(fp);
   
+  CHECK_INIT (fp);
+
   if (fp->_flags == 0)		/* not open! */
     {
-      _funlockfile (fp);
-      __sfp_lock_release ();
+      _funlockfile(fp);
       return (0);
     }
   r = fp->_flags & __SWR ? fflush (fp) : 0;
   if (fp->_close != NULL && (*fp->_close) (fp->_cookie) < 0)
     r = EOF;
   if (fp->_flags & __SMBF)
-    _free_r (rptr, (char *) fp->_bf._base);
+    _free_r (_REENT, (char *) fp->_bf._base);
   if (HASUB (fp))
     FREEUB (fp);
   if (HASLB (fp))
     FREELB (fp);
-  fp->_flags = 0;		/* release this FILE for reuse */
-  _funlockfile (fp);
+  _funlockfile(fp);
 #ifndef __SINGLE_THREAD__
-  __lock_close_recursive (fp->_lock);
+  __lock_close_recursive (*(_LOCK_RECURSIVE_T *)&fp->_lock);
 #endif
-
-  __sfp_lock_release ();
+  fp->_flags = 0;		/* release this FILE for reuse */
 
   return (r);
 }
-
-#ifndef _REENT_ONLY
-
-int
-_DEFUN(fclose, (fp),
-       register FILE * fp)
-{
-  return _fclose_r(_REENT, fp);
-}
-
-#endif
-

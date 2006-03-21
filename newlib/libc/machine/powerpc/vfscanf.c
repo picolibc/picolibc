@@ -103,8 +103,6 @@ Supporting OS subroutines required:
  */
 
 #include <_ansi.h>
-#include <reent.h>
-#include <newlib.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -129,13 +127,13 @@ Supporting OS subroutines required:
    This could be changed in the future should the _ldtoa_r code be
    preferred over _dtoa_r.  */
 #define _NO_LONGDBL
-#if defined _WANT_IO_LONG_DOUBLE && (LDBL_MANT_DIG > DBL_MANT_DIG)
+#if defined WANT_IO_LONG_DBL && (LDBL_MANT_DIG > DBL_MANT_DIG)
 #undef _NO_LONGDBL
 extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
 #endif
 
 #define _NO_LONGLONG
-#if defined _WANT_IO_LONG_LONG && defined __GNUC__
+#if defined WANT_PRINTF_LONG_LONG && defined __GNUC__
 # undef _NO_LONGLONG
 #endif
 
@@ -155,9 +153,9 @@ extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
 #define	LONG		0x01	/* l: long or double */
 #define	LONGDBL		0x02	/* L: long double or long long */
 #define	SHORT		0x04	/* h: short */
-#define	SUPPRESS	0x10	/* suppress assignment */
-#define	POINTER		0x20	/* weird %p pointer (`fake hex') */
-#define	NOSKIP		0x40	/* do not skip blanks */
+#define	SUPPRESS	0x08	/* suppress assignment */
+#define	POINTER		0x10	/* weird %p pointer (`fake hex') */
+#define	NOSKIP		0x20	/* do not skip blanks */
 
 /*
  * The following are used in numeric conversions only:
@@ -165,19 +163,18 @@ extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
  * SIGNOK, NDIGITS, PFXOK, and NZDIGITS are for integral.
  */
 
-#define	SIGNOK		0x80	/* +/- is (still) legal */
-#define	NDIGITS		0x100	/* no digits detected */
+#define	SIGNOK		0x40	/* +/- is (still) legal */
+#define	NDIGITS		0x80	/* no digits detected */
 
-#define	DPTOK		0x200	/* (float) decimal point is still legal */
-#define	EXPOK		0x400	/* (float) exponent (e+3, etc) still legal */
+#define	DPTOK		0x100	/* (float) decimal point is still legal */
+#define	EXPOK		0x200	/* (float) exponent (e+3, etc) still legal */
 
-#define	PFXOK		0x200	/* 0x prefix is (still) legal */
-#define	NZDIGITS	0x400	/* no zero digits detected */
-#define	NNZDIGITS	0x800	/* no non-zero digits detected */
+#define	PFXOK		0x100	/* 0x prefix is (still) legal */
+#define	NZDIGITS	0x200	/* no zero digits detected */
 
-#define	VECTOR		0x2000	/* v: vector */
-#define	FIXEDPOINT	0x4000	/* r/R: fixed-point */
-#define	SIGNED  	0x8000	/* r: signed fixed-point */
+#define	VECTOR		0x400	/* v: vector */
+#define	FIXEDPOINT	0x800	/* r/R: fixed-point */
+#define	SIGNED  	0x1000	/* r: signed fixed-point */
 
 /*
  * Conversion types.
@@ -224,8 +221,8 @@ _DEFUN (vfscanf, (fp, fmt, ap),
     _CONST char *fmt _AND 
     va_list ap)
 {
-  CHECK_INIT(_REENT);
-  return __svfscanf_r (_REENT, fp, fmt, ap);
+  CHECK_INIT(fp);
+  return __svfscanf_r (fp->_data, fp, fmt, ap);
 }
 
 int
@@ -281,7 +278,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
   char buf[BUF];		/* buffer for numeric conversions */
   vec_union vec_buf;
   char *lptr;                   /* literal pointer */
-#ifdef _MB_CAPABLE
+#ifdef MB_CAPABLE
   mbstate_t state;                /* value to keep track of multibyte state */
 #endif
 
@@ -306,7 +303,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
   nread = 0;
   for (;;)
     {
-#ifndef _MB_CAPABLE
+#ifndef MB_CAPABLE
       wc = *fmt;
 #else
       memset (&state, '\0', sizeof (state));
@@ -801,21 +798,18 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	  continue;
 
 	case CT_INT:
-	  {
-	  unsigned int_width_left = 0;
-	  int skips = 0;
+	  /* scan an integer as if by strtol/strtoul */
 	  int_width = width;
 #ifdef hardway
 	  if (int_width == 0 || int_width > sizeof (buf) - 1)
+	    int_width = sizeof (buf) - 1;
 #else
 	  /* size_t is unsigned, hence this optimisation */
-	  if (int_width - 1 > sizeof (buf) - 2)
+	  if (--int_width > sizeof (buf) - 2)
+	    int_width = sizeof (buf) - 2;
+	  int_width++;
 #endif
-	    {
-	      int_width_left = width - (sizeof (buf) - 1);
-	      int_width = sizeof (buf) - 1;
-	    }
-	  flags |= SIGNOK | NDIGITS | NZDIGITS | NNZDIGITS;
+	  flags |= SIGNOK | NDIGITS | NZDIGITS;
 	  for (p = buf; int_width; int_width--)
 	    {
 	      c = *fp->_p;
@@ -835,26 +829,16 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 		   * will turn it off if we have scanned any nonzero digits).
 		   */
 		case '0':
-		  if (! (flags & NNZDIGITS))
-		    goto ok;
 		  if (base == 0)
 		    {
 		      base = 8;
 		      flags |= PFXOK;
 		    }
 		  if (flags & NZDIGITS)
-		    {
-		      flags &= ~(SIGNOK | NZDIGITS | NDIGITS);
-		      goto ok;
-		    }
-		  flags &= ~(SIGNOK | PFXOK | NDIGITS);
-		  if (int_width_left)
-		    {
-		      int_width_left--;
-		      int_width++;
-		    }
-		  ++skips;
-		  goto skip;
+		    flags &= ~(SIGNOK | NZDIGITS | NDIGITS);
+		  else
+		    flags &= ~(SIGNOK | PFXOK | NDIGITS);
+		  goto ok;
 
 		  /* 1 through 7 always legal */
 		case '1':
@@ -865,7 +849,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 		case '6':
 		case '7':
 		  base = basefix[base];
-		  flags &= ~(SIGNOK | PFXOK | NDIGITS | NNZDIGITS);
+		  flags &= ~(SIGNOK | PFXOK | NDIGITS);
 		  goto ok;
 
 		  /* digits 8 and 9 ok iff decimal or hex */
@@ -874,7 +858,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 		  base = basefix[base];
 		  if (base <= 8)
 		    break;	/* not legal here */
-		  flags &= ~(SIGNOK | PFXOK | NDIGITS | NNZDIGITS);
+		  flags &= ~(SIGNOK | PFXOK | NDIGITS);
 		  goto ok;
 
 		  /* letters ok iff hex */
@@ -893,7 +877,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 		  /* no need to fix base here */
 		  if (base <= 10)
 		    break;	/* not legal here */
-		  flags &= ~(SIGNOK | PFXOK | NDIGITS | NNZDIGITS);
+		  flags &= ~(SIGNOK | PFXOK | NDIGITS);
 		  goto ok;
 
 		  /* sign ok only as first character */
@@ -913,10 +897,6 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 		    {
 		      base = 16;/* if %i */
 		      flags &= ~PFXOK;
-		      /* We must reset the NZDIGITS and NDIGITS
-		         flags that would have been unset by seeing
-		         the zero that preceded the X or x.  */
-		      flags |= NZDIGITS | NDIGITS;
 		      goto ok;
 		    }
 		  break;
@@ -932,7 +912,6 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	       * c is legal: store it and look at the next.
 	       */
 	      *p++ = c;
-	    skip:
 	      if (--fp->_r > 0)
 		fp->_p++;
 	      else
@@ -1011,9 +990,8 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	      if (!(flags & VECTOR))
 		nassigned++;
 	    }
-	  nread += p - buf + skips;
+	  nread += p - buf;
 	  break;
-	  }
 
 #ifdef FLOATING_POINT
 	case CT_FLOAT:
@@ -1026,18 +1004,16 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	  long leading_zeroes = 0;
 	  long zeroes, exp_adjust;
 	  char *exp_start = NULL;
-	  unsigned fl_width = width;
-	  unsigned width_left = 0;
+	  int fl_width = width;
 #ifdef hardway
 	  if (fl_width == 0 || fl_width > sizeof (buf) - 1)
+	    fl_width = sizeof (buf) - 1;
 #else
 	  /* size_t is unsigned, hence this optimisation */
-	  if (fl_width - 1 > sizeof (buf) - 2)
+	  if (--fl_width > sizeof (buf) - 2)
+	    fl_width = sizeof (buf) - 2;
+	  fl_width++;
 #endif
-	    {
-	      width_left = fl_width - (sizeof (buf) - 1);
-	      fl_width = sizeof (buf) - 1;
-	    }
 	  flags |= SIGNOK | NDIGITS | DPTOK | EXPOK;
 	  zeroes = 0;
 	  exp_adjust = 0;
@@ -1056,11 +1032,6 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 		    {
 		      flags &= ~SIGNOK;
 		      zeroes++;
-		      if (width_left)
-			{
-			  width_left--;
-			  fl_width++;
-			}
 		      goto fskip;
 		    }
 		  /* Fall through.  */
@@ -1260,3 +1231,106 @@ match_failure:
   return nassigned;
 }
 
+/*
+ * Fill in the given table from the scanset at the given format
+ * (just after `[').  Return a pointer to the character past the
+ * closing `]'.  The table has a 1 wherever characters should be
+ * considered part of the scanset.
+ */
+
+/*static*/
+u_char *
+__sccl (tab, fmt)
+     register char *tab;
+     register u_char *fmt;
+{
+  register int c, n, v;
+
+  /* first `clear' the whole table */
+  c = *fmt++;			/* first char hat => negated scanset */
+  if (c == '^')
+    {
+      v = 1;			/* default => accept */
+      c = *fmt++;		/* get new first char */
+    }
+  else
+    v = 0;			/* default => reject */
+  /* should probably use memset here */
+  for (n = 0; n < 256; n++)
+    tab[n] = v;
+  if (c == 0)
+    return fmt - 1;		/* format ended before closing ] */
+
+  /*
+   * Now set the entries corresponding to the actual scanset to the
+   * opposite of the above.
+   *
+   * The first character may be ']' (or '-') without being special; the
+   * last character may be '-'.
+   */
+
+  v = 1 - v;
+  for (;;)
+    {
+      tab[c] = v;		/* take character c */
+    doswitch:
+      n = *fmt++;		/* and examine the next */
+      switch (n)
+	{
+
+	case 0:		/* format ended too soon */
+	  return fmt - 1;
+
+	case '-':
+	  /*
+	   * A scanset of the form [01+-] is defined as `the digit 0, the
+	   * digit 1, the character +, the character -', but the effect of a
+	   * scanset such as [a-zA-Z0-9] is implementation defined.  The V7
+	   * Unix scanf treats `a-z' as `the letters a through z', but treats
+	   * `a-a' as `the letter a, the character -, and the letter a'.
+	   *
+	   * For compatibility, the `-' is not considerd to define a range if
+	   * the character following it is either a close bracket (required by
+	   * ANSI) or is not numerically greater than the character we just
+	   * stored in the table (c).
+	   */
+	  n = *fmt;
+	  if (n == ']' || n < c)
+	    {
+	      c = '-';
+	      break;		/* resume the for(;;) */
+	    }
+	  fmt++;
+	  do
+	    {			/* fill in the range */
+	      tab[++c] = v;
+	    }
+	  while (c < n);
+#if 1			/* XXX another disgusting compatibility hack */
+	  /*
+	   * Alas, the V7 Unix scanf also treats formats such
+	   * as [a-c-e] as `the letters a through e'. This too
+	   * is permitted by the standard....
+	   */
+	  goto doswitch;
+#else
+	  c = *fmt++;
+	  if (c == 0)
+	    return fmt - 1;
+	  if (c == ']')
+	    return fmt;
+#endif
+
+	  break;
+
+
+	case ']':		/* end of scanset */
+	  return fmt;
+
+	default:		/* just another character */
+	  c = n;
+	  break;
+	}
+    }
+  /* NOTREACHED */
+}

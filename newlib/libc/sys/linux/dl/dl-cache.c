@@ -208,7 +208,7 @@ _dl_load_cache_lookup (const char *name)
       /* This file ends in static libraries where we don't have a hwcap.  */
       unsigned long int *hwcap;
       uint64_t platform;
-      #pragma weak _dl_hwcap
+      weak_extern (_dl_hwcap);
 
       /* This is where the strings start.  */
       cache_data = (const char *) cache_new;

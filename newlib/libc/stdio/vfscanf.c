@@ -1,20 +1,3 @@
-/*-
- * Copyright (c) 1990 The Regents of the University of California.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms are permitted
- * provided that the above copyright notice and this paragraph are
- * duplicated in all such forms and that any documentation,
- * advertising materials, and other materials related to such
- * distribution and use acknowledge that the software was developed
- * by the University of California, Berkeley.  The name of the
- * University may not be used to endorse or promote products derived
- * from this software without specific prior written permission.
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
- */
-
 /*
 FUNCTION
 <<vscanf>>, <<vfscanf>>, <<vsscanf>>---format argument list
@@ -33,12 +16,12 @@ ANSI_SYNOPSIS
 	int vfscanf(FILE *<[fp]>, const char *<[fmt]>, va_list <[list]>);
 	int vsscanf(const char *<[str]>, const char *<[fmt]>, va_list <[list]>);
 
-	int _vscanf_r(struct _reent *<[reent]>, const char *<[fmt]>, 
+	int _vscanf_r(void *<[reent]>, const char *<[fmt]>, 
                        va_list <[list]>);
-	int _vfscanf_r(struct _reent *<[reent]>, FILE *<[fp]>, const char *<[fmt]>, 
+	int _vfscanf_r(void *<[reent]>, FILE *<[fp]>, const char *<[fmt]>, 
                        va_list <[list]>);
-	int _vsscanf_r(struct _reent *<[reent]>, const char *<[str]>,
-                       const char *<[fmt]>, va_list <[list]>);
+	int _vsscanf_r(void *<[reent]>, const char *<[str]>, const char *<[fmt]>, 
+                       va_list <[list]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -58,18 +41,18 @@ TRAD_SYNOPSIS
 	va_list <[list]>;
 
 	int _vscanf_r( <[reent]>, <[fmt]>, <[ist]>)
-	struct _reent *<[reent]>;
+	char *<[reent]>;
 	char *<[fmt]>;
 	va_list <[list]>;
 
 	int _vfscanf_r( <[reent]>, <[fp]>, <[fmt]>, <[list]>)
-	struct _reent *<[reent]>;
+	char *<[reent]>;
 	FILE *<[fp]>;
 	char *<[fmt]>;
 	va_list <[list]>;
 	
 	int _vsscanf_r( <[reent]>, <[str]>, <[fmt]>, <[list]>)
-	struct _reent *<[reent]>;
+	char *<[reent]>;
 	char *<[str]>;
 	char *<[fmt]>;
 	va_list <[list]>;
@@ -102,9 +85,24 @@ These are GNU extensions.
 Supporting OS subroutines required:
 */
 
+/*-
+ * Copyright (c) 1990 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * advertising materials, and other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * by the University of California, Berkeley.  The name of the
+ * University may not be used to endorse or promote products derived
+ * from this software without specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
+
 #include <_ansi.h>
-#include <reent.h>
-#include <newlib.h>
 #include <ctype.h>
 #include <wctype.h>
 #include <stdio.h>
@@ -119,32 +117,25 @@ Supporting OS subroutines required:
 #endif
 #include "local.h"
 
-#ifdef INTEGER_ONLY
-#define VFSCANF vfiscanf
-#define _VFSCANF_R _vfiscanf_r
-#define __SVFSCANF __svfiscanf
-#define __SVFSCANF_R __svfiscanf_r
-#else
-#define VFSCANF vfscanf
-#define _VFSCANF_R _vfscanf_r
-#define __SVFSCANF __svfscanf
-#define __SVFSCANF_R __svfscanf_r
-#ifndef NO_FLOATING_POINT
+#ifndef	NO_FLOATING_POINT
 #define FLOATING_POINT
-#endif
 #endif
 
 #ifdef FLOATING_POINT
-#include <math.h>
 #include <float.h>
 
 /* Currently a test is made to see if long double processing is warranted.
    This could be changed in the future should the _ldtoa_r code be
    preferred over _dtoa_r.  */
 #define _NO_LONGDBL
-#if defined _WANT_IO_LONG_DOUBLE && (LDBL_MANT_DIG > DBL_MANT_DIG)
+#if defined WANT_IO_LONG_DBL && (LDBL_MANT_DIG > DBL_MANT_DIG)
 #undef _NO_LONGDBL
 extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
+#endif
+
+#define _NO_LONGLONG
+#if defined WANT_PRINTF_LONG_LONG && defined __GNUC__
+# undef _NO_LONGLONG
 #endif
 
 #include "floatio.h"
@@ -160,11 +151,6 @@ extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
 #define MAX_LONG_LEN ((CHAR_BIT * sizeof (long)  - 1) * 4 / 13 + 2)
 #else
 #define	BUF	40
-#endif
-
-#define _NO_LONGLONG
-#if defined _WANT_IO_LONG_LONG && defined __GNUC__
-# undef _NO_LONGLONG
 #endif
 
 /*
@@ -193,7 +179,6 @@ extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
 
 #define	PFXOK		0x200	/* 0x prefix is (still) legal */
 #define	NZDIGITS	0x400	/* no zero digits detected */
-#define	NNZDIGITS	0x800	/* no non-zero digits detected */
 
 /*
  * Conversion types.
@@ -226,44 +211,43 @@ typedef unsigned long long u_long_long;
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(VFSCANF, (fp, fmt, ap), 
-       register FILE *fp _AND 
-       _CONST char *fmt _AND 
-       va_list ap)
+_DEFUN (vfscanf, (fp, fmt, ap), 
+    register FILE *fp _AND 
+    _CONST char *fmt _AND 
+    va_list ap)
 {
-  CHECK_INIT(_REENT);
-  return __SVFSCANF_R (_REENT, fp, fmt, ap);
+  CHECK_INIT(fp);
+  return __svfscanf_r (_REENT, fp, fmt, ap);
 }
 
 int
-_DEFUN(__SVFSCANF, (fp, fmt0, ap),
-       register FILE *fp _AND
-       char _CONST *fmt0 _AND
-       va_list ap)
+__svfscanf (fp, fmt0, ap)
+     register FILE *fp;
+     char _CONST *fmt0;
+     va_list ap;
 {
-  return __SVFSCANF_R (_REENT, fp, fmt0, ap);
+  return __svfscanf_r (_REENT, fp, fmt0, ap);
 }
 
 #endif /* !_REENT_ONLY */
 
 int
-_DEFUN(_VFSCANF_R, (data, fp, fmt, ap),
-       struct _reent *data _AND 
-       register FILE *fp   _AND 
-       _CONST char *fmt    _AND 
-       va_list ap)
+_DEFUN (_vfscanf_r, (data, fp, fmt, ap),
+    struct _reent *data _AND 
+    register FILE *fp _AND 
+    _CONST char *fmt _AND 
+    va_list ap)
 {
-  CHECK_INIT(data);
-  return __SVFSCANF_R (data, fp, fmt, ap);
+  return __svfscanf_r (data, fp, fmt, ap);
 }
 
 
 int
-_DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
-       struct _reent *rptr _AND
-       register FILE *fp   _AND
-       char _CONST *fmt0   _AND
-       va_list ap)
+__svfscanf_r (rptr, fp, fmt0, ap)
+     struct _reent *rptr;
+     register FILE *fp;
+     char _CONST *fmt0;
+     va_list ap;
 {
   register u_char *fmt = (u_char *) fmt0;
   register int c;		/* character from format, or conversion */
@@ -301,13 +285,11 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
   static _CONST short basefix[17] =
     {10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
 
-  _flockfile (fp);
- 
   nassigned = 0;
   nread = 0;
   for (;;)
     {
-#ifndef _MB_CAPABLE
+#ifndef MB_CAPABLE
       wc = *fmt;
 #else
       memset (&state, '\0', sizeof (state));
@@ -315,7 +297,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 #endif
       fmt += nbytes;
       if (wc == 0)
-	goto all_done;
+	return nassigned;
       if (nbytes == 1 && isspace (wc))
 	{
 	  for (;;)
@@ -517,7 +499,6 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	   * Disgusting backwards compatibility hacks.	XXX
 	   */
 	case '\0':		/* compat */
-	  _funlockfile (fp);
 	  return EOF;
 
 	default:		/* compat */
@@ -570,7 +551,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
           if (flags & LONG) 
             {
               if ((flags & SUPPRESS) == 0)
-                wcp = va_arg (ap, wchar_t *);
+                wcp = va_arg(ap, wchar_t *);
               else
                 wcp = NULL;
               n = 0;
@@ -581,8 +562,8 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                   buf[n++] = *fp->_p;
                   fp->_r -= 1;
                   fp->_p += 1;
-                  memset ((_PTR)&state, '\0', sizeof (mbstate_t));
-                  if ((mbslen = _mbrtowc_r (rptr, wcp, buf, n, &state)) 
+                  memset((void *)&state, '\0', sizeof(mbstate_t));
+                  if ((mbslen = _mbrtowc_r(rptr, wcp, buf, n, &state)) 
                                                          == (size_t)-1)
                     goto input_failure; /* Invalid sequence */
                   if (mbslen == 0 && !(flags & SUPPRESS))
@@ -699,19 +680,19 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
             {
               /* Process %S and %ls placeholders */
               if ((flags & SUPPRESS) == 0)
-                wcp = va_arg (ap, wchar_t *);
+                wcp = va_arg(ap, wchar_t *);
               else
                 wcp = &wc;
               n = 0;
-              while (!isspace (*fp->_p) && width != 0) 
+              while (!isspace(*fp->_p) && width != 0) 
                 {
                   if (n == MB_CUR_MAX)
                     goto input_failure;
                   buf[n++] = *fp->_p;
                   fp->_r -= 1;
                   fp->_p += 1;
-                  memset ((_PTR)&state, '\0', sizeof (mbstate_t));
-                  if ((mbslen = _mbrtowc_r (rptr, wcp, buf, n, &state)) 
+                  memset((void *)&state, '\0', sizeof(mbstate_t));
+                  if ((mbslen = _mbrtowc_r(rptr, wcp, buf, n, &state)) 
                                                         == (size_t)-1)
                     goto input_failure;
                   if (mbslen == 0)
@@ -721,7 +702,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                       if (iswspace(*wcp)) 
                         {
                           while (n != 0)
-                            ungetc (buf[--n], fp);
+                            ungetc(buf[--n], fp);
                           break;
                         }
                       nread += n;
@@ -775,21 +756,17 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  continue;
 
 	case CT_INT:
-	{
 	  /* scan an integer as if by strtol/strtoul */
-	  unsigned width_left = 0;
-	  int skips = 0;
 #ifdef hardway
 	  if (width == 0 || width > sizeof (buf) - 1)
+	    width = sizeof (buf) - 1;
 #else
 	  /* size_t is unsigned, hence this optimisation */
-	  if (width - 1 > sizeof (buf) - 2)
+	  if (--width > sizeof (buf) - 2)
+	    width = sizeof (buf) - 2;
+	  width++;
 #endif
-	    {
-	      width_left = width - (sizeof (buf) - 1);
-	      width = sizeof (buf) - 1;
-	    }
-	  flags |= SIGNOK | NDIGITS | NZDIGITS | NNZDIGITS;
+	  flags |= SIGNOK | NDIGITS | NZDIGITS;
 	  for (p = buf; width; width--)
 	    {
 	      c = *fp->_p;
@@ -809,26 +786,16 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		   * will turn it off if we have scanned any nonzero digits).
 		   */
 		case '0':
-		  if (! (flags & NNZDIGITS))
-		    goto ok;
 		  if (base == 0)
 		    {
 		      base = 8;
 		      flags |= PFXOK;
 		    }
 		  if (flags & NZDIGITS)
-		    {
-		      flags &= ~(SIGNOK | NZDIGITS | NDIGITS);
-		      goto ok;
-		    }
-		  flags &= ~(SIGNOK | PFXOK | NDIGITS);
-		  if (width_left)
-		    {
-		      width_left--;
-		      width++;
-		    }
-		  ++skips;
-		  goto skip;
+		    flags &= ~(SIGNOK | NZDIGITS | NDIGITS);
+		  else
+		    flags &= ~(SIGNOK | PFXOK | NDIGITS);
+		  goto ok;
 
 		  /* 1 through 7 always legal */
 		case '1':
@@ -839,7 +806,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		case '6':
 		case '7':
 		  base = basefix[base];
-		  flags &= ~(SIGNOK | PFXOK | NDIGITS | NNZDIGITS);
+		  flags &= ~(SIGNOK | PFXOK | NDIGITS);
 		  goto ok;
 
 		  /* digits 8 and 9 ok iff decimal or hex */
@@ -848,7 +815,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		  base = basefix[base];
 		  if (base <= 8)
 		    break;	/* not legal here */
-		  flags &= ~(SIGNOK | PFXOK | NDIGITS | NNZDIGITS);
+		  flags &= ~(SIGNOK | PFXOK | NDIGITS);
 		  goto ok;
 
 		  /* letters ok iff hex */
@@ -867,7 +834,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		  /* no need to fix base here */
 		  if (base <= 10)
 		    break;	/* not legal here */
-		  flags &= ~(SIGNOK | PFXOK | NDIGITS | NNZDIGITS);
+		  flags &= ~(SIGNOK | PFXOK | NDIGITS);
 		  goto ok;
 
 		  /* sign ok only as first character */
@@ -887,10 +854,6 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		    {
 		      base = 16;/* if %i */
 		      flags &= ~PFXOK;
-		      /* We must reset the NZDIGITS and NDIGITS
-		         flags that would have been unset by seeing
-			 the zero that preceded the X or x.  */
-		      flags |= NZDIGITS | NDIGITS;
 		      goto ok;
 		    }
 		  break;
@@ -906,7 +869,6 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	       * c is legal: store it and look at the next.
 	       */
 	      *p++ = c;
-	    skip:
 	      if (--fp->_r > 0)
 		fp->_p++;
 	      else
@@ -972,9 +934,9 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		}
 	      nassigned++;
 	    }
-	  nread += p - buf + skips;
+	  nread += p - buf;
 	  break;
-	}
+
 #ifdef FLOATING_POINT
 	case CT_FLOAT:
 	{
@@ -986,18 +948,15 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  long leading_zeroes = 0;
 	  long zeroes, exp_adjust;
 	  char *exp_start = NULL;
-	  unsigned width_left = 0;
-	  int nancount = 0;
 #ifdef hardway
 	  if (width == 0 || width > sizeof (buf) - 1)
+	    width = sizeof (buf) - 1;
 #else
 	  /* size_t is unsigned, hence this optimisation */
-	  if (width - 1 > sizeof (buf) - 2)
+	  if (--width > sizeof (buf) - 2)
+	    width = sizeof (buf) - 2;
+	  width++;
 #endif
-	    {
-	      width_left = width - (sizeof (buf) - 1);
-	      width = sizeof (buf) - 1;
-	    }
 	  flags |= SIGNOK | NDIGITS | DPTOK | EXPOK;
 	  zeroes = 0;
 	  exp_adjust = 0;
@@ -1010,16 +969,12 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	       */
 	      switch (c)
 		{
+
 		case '0':
 		  if (flags & NDIGITS)
 		    {
 		      flags &= ~SIGNOK;
 		      zeroes++;
-		      if (width_left)
-			{
-			  width_left--;
-			  width++;
-			}
 		      goto fskip;
 		    }
 		  /* Fall through.  */
@@ -1032,42 +987,14 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		case '7':
 		case '8':
 		case '9':
-		  if (nancount == 0)
-		    {
-		      flags &= ~(SIGNOK | NDIGITS);
-		      goto fok;
-		    }
-		  break;
+		  flags &= ~(SIGNOK | NDIGITS);
+		  goto fok;
 
 		case '+':
 		case '-':
 		  if (flags & SIGNOK)
 		    {
 		      flags &= ~SIGNOK;
-		      goto fok;
-		    }
-		  break;
-		case 'n':
-		case 'N':
-	          if (nancount == 0
-		      && (flags & (SIGNOK | NDIGITS | DPTOK | EXPOK)) ==
-		      	          (SIGNOK | NDIGITS | DPTOK | EXPOK))
-		    {
-		      flags &= ~(SIGNOK | DPTOK | EXPOK | NDIGITS);
-		      nancount = 1;
-		      goto fok;
-		    }
-		  else if (nancount == 2)
-		    {
-		      nancount = 3;
-		      goto fok;
-		    }
-		  break;
-		case 'a':
-		case 'A':
-		  if (nancount == 1)
-		    {
-		      nancount = 2;
 		      goto fok;
 		    }
 		  break;
@@ -1112,24 +1039,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	    }
 	  if (zeroes)
 	    flags &= ~NDIGITS;
-          /* We may have a 'N' or possibly even a 'Na' as the start of 'NaN', 
-	     only to run out of chars before it was complete (or having 
-	     encountered a non- matching char).  So check here if we have an 
-	     outstanding nancount, and if so put back the chars we did 
-	     swallow and treat as a failed match. */
-          if (nancount && nancount != 3)
-            {
-              /* Ok... what are we supposed to do in the event that the
-              __srefill call above was triggered in the middle of the partial
-              'NaN' and so we can't put it all back? */
-              while (nancount-- && (p > buf))
-                {
-                  ungetc (*(u_char *)--p, fp);
-                  --nread;
-                }
-              goto match_failure;
-            }
-          /*
+	  /*
 	   * If no digits, might be missing exponent digits
 	   * (just give back the exponent) or might be missing
 	   * regular digits, but had sign and/or decimal point.
@@ -1141,7 +1051,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		  /* no digits at all */
 		  while (p > buf)
                     {
-		      ungetc (*(u_char *)--p, fp);
+		      ungetc (*(u_char *)-- p, fp);
                       --nread;
                     }
 		  goto match_failure;
@@ -1210,10 +1120,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	      else
 		{
 		  flp = va_arg (ap, float *);
-		  if (isnan (res))
-		    *flp = nanf (NULL);
-		  else
-		    *flp = res;
+		  *flp = res;
 		}
 	      nassigned++;
 	    }
@@ -1223,10 +1130,111 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	}
     }
 input_failure:
-  _funlockfile (fp);
   return nassigned ? nassigned : -1;
 match_failure:
-all_done:
-  _funlockfile (fp);
   return nassigned;
+}
+
+/*
+ * Fill in the given table from the scanset at the given format
+ * (just after `[').  Return a pointer to the character past the
+ * closing `]'.  The table has a 1 wherever characters should be
+ * considered part of the scanset.
+ */
+
+/*static*/
+u_char *
+__sccl (tab, fmt)
+     register char *tab;
+     register u_char *fmt;
+{
+  register int c, n, v;
+
+  /* first `clear' the whole table */
+  c = *fmt++;			/* first char hat => negated scanset */
+  if (c == '^')
+    {
+      v = 1;			/* default => accept */
+      c = *fmt++;		/* get new first char */
+    }
+  else
+    v = 0;			/* default => reject */
+  /* should probably use memset here */
+  for (n = 0; n < 256; n++)
+    tab[n] = v;
+  if (c == 0)
+    return fmt - 1;		/* format ended before closing ] */
+
+  /*
+   * Now set the entries corresponding to the actual scanset to the
+   * opposite of the above.
+   *
+   * The first character may be ']' (or '-') without being special; the
+   * last character may be '-'.
+   */
+
+  v = 1 - v;
+  for (;;)
+    {
+      tab[c] = v;		/* take character c */
+    doswitch:
+      n = *fmt++;		/* and examine the next */
+      switch (n)
+	{
+
+	case 0:		/* format ended too soon */
+	  return fmt - 1;
+
+	case '-':
+	  /*
+	   * A scanset of the form [01+-] is defined as `the digit 0, the
+	   * digit 1, the character +, the character -', but the effect of a
+	   * scanset such as [a-zA-Z0-9] is implementation defined.  The V7
+	   * Unix scanf treats `a-z' as `the letters a through z', but treats
+	   * `a-a' as `the letter a, the character -, and the letter a'.
+	   *
+	   * For compatibility, the `-' is not considerd to define a range if
+	   * the character following it is either a close bracket (required by
+	   * ANSI) or is not numerically greater than the character we just
+	   * stored in the table (c).
+	   */
+	  n = *fmt;
+	  if (n == ']' || n < c)
+	    {
+	      c = '-';
+	      break;		/* resume the for(;;) */
+	    }
+	  fmt++;
+	  do
+	    {			/* fill in the range */
+	      tab[++c] = v;
+	    }
+	  while (c < n);
+#if 1			/* XXX another disgusting compatibility hack */
+	  /*
+	   * Alas, the V7 Unix scanf also treats formats such
+	   * as [a-c-e] as `the letters a through e'. This too
+	   * is permitted by the standard....
+	   */
+	  goto doswitch;
+#else
+	  c = *fmt++;
+	  if (c == 0)
+	    return fmt - 1;
+	  if (c == ']')
+	    return fmt;
+#endif
+
+	  break;
+
+
+	case ']':		/* end of scanset */
+	  return fmt;
+
+	default:		/* just another character */
+	  c = n;
+	  break;
+	}
+    }
+  /* NOTREACHED */
 }

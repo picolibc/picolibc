@@ -70,7 +70,7 @@ _stack:	.long 	1
 
 #endif
 
-#if defined (__H8300S__) || defined (__H8300SX__)
+#ifdef __H8300S__
 
 	.section .text
 	.global	_start

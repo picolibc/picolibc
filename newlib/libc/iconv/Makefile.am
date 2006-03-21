@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS = cygnus
 SUBDIRS = ces ccs lib .
 
 cctdir=$(datadir)/iconv_data
-cct_DATA=encoding.aliases
+cct_DATA=charset.aliases
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 

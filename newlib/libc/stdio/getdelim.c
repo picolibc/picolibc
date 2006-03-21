@@ -1,7 +1,6 @@
-/* Copyright 2002, Red Hat Inc. - all rights reserved */
 /*
 FUNCTION
-<<getdelim>>---read a line up to a specified line delimiter
+<<getdelim>>---read a line up to a specified line delimeter
 
 INDEX
 	getdelim
@@ -21,16 +20,16 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 <<getdelim>> reads a file <[fp]> up to and possibly including a specified
-delimiter <[delim]>.  The line is read into a buffer pointed to
+delimeter <[delim]>.  The line is read into a buffer pointed to
 by <[bufptr]> and designated with size *<[n]>.  If the buffer is
 not large enough, it will be dynamically grown by <<getdelim>>.
 As the buffer is grown, the pointer to the size <[n]> will be
 updated.
 
 RETURNS
-<<getdelim>> returns <<-1>> if no characters were successfully read;
+<<getdelim>> returns <<-1>> if no characters were successfully read,
 otherwise, it returns the number of bytes successfully read.
-At end of file, the result is nonzero.
+at end of file, the result is nonzero.
 
 PORTABILITY
 <<getdelim>> is a glibc extension.
@@ -38,7 +37,8 @@ PORTABILITY
 No supporting OS subroutines are directly required.
 */
 
-#include <_ansi.h>
+/* Copyright 2002, Red Hat Inc. - all rights reserved */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -48,11 +48,11 @@ No supporting OS subroutines are directly required.
 #define DEFAULT_LINE_SIZE 128
 
 ssize_t
-_DEFUN(__getdelim, (bufptr, n, delim, fp),
-       char **bufptr _AND
-       size_t *n     _AND
-       int delim     _AND 
-       FILE *fp)
+__getdelim (bufptr, n, delim, fp)
+     char **bufptr;
+     size_t *n;
+     int delim;
+     FILE *fp;
 {
   char *buf;
   char *ptr;
@@ -79,9 +79,9 @@ _DEFUN(__getdelim, (bufptr, n, delim, fp),
       *n = DEFAULT_LINE_SIZE;
     }
 
-  CHECK_INIT (_REENT);
+  _flockfile(fp);
 
-  _flockfile (fp);
+  CHECK_INIT(fp);
 
   numbytes = *n;
   ptr = buf;

@@ -29,7 +29,7 @@
 
 /*
 FUNCTION
-	<<iswspace>>---whitespace wide character test
+	<<iswspace>>---wide-character space test
 
 INDEX
 	iswspace
@@ -45,10 +45,10 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 <<iswspace>> is a function which classifies wide-character values that
-are categorized as whitespace.
+are categorized as white-space.
 
 RETURNS
-<<iswspace>> returns non-zero if <[c]> is a whitespace wide character.
+<<iswspace>> returns non-zero if <[c]> is a white-space wide-character.
 
 PORTABILITY
 <<iswspace>> is C99.
@@ -56,7 +56,6 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 #include <_ansi.h>
-#include <newlib.h>
 #include <wctype.h>
 #include <ctype.h>
 #include <string.h>
@@ -71,7 +70,7 @@ _DEFUN(iswspace,(c), wint_t c)
       unicode = 0;
       /* fall-through */ 
     }
-#ifdef _MB_CAPABLE
+#ifdef MB_CAPABLE
   else if (!strcmp (__lc_ctype, "C-JIS"))
     {
       c = __jp2uc (c, JP_JIS);
@@ -100,7 +99,7 @@ _DEFUN(iswspace,(c), wint_t c)
               c == 0x2028 || c == 0x2029 ||
               c == 0x205f || c == 0x3000);
     }
-#endif /* _MB_CAPABLE */
+#endif /* MB_CAPABLE */
 
   return (c < 0x100 ? isspace (c) : 0);
 }

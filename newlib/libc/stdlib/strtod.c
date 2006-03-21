@@ -111,16 +111,15 @@ _DEFUN (_strtod_r, (ptr, s00, se),
   int bb2, bb5, bbe, bd2, bd5, bbbits, bs2, c, dsign, e1, esign, i, j,
     k, nd, nd0, nf, nz, nz0, sign;
   long e;
-  _CONST char *s, *s0, *s1, *s2;
+  _CONST char *s, *s0, *s1;
   double aadj, aadj1, adj;
   long L;
   unsigned long z;
   __ULong y;
   union double_union rv, rv0;
-  int nanflag;
 
   _Bigint *bb, *bb1, *bd, *bd0, *bs, *delta;
-  sign = nz0 = nz = nanflag = 0;
+  sign = nz0 = nz = 0;
   rv.d = 0.;
   for (s = s00;; s++)
     switch (*s)
@@ -146,23 +145,7 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 	goto break2;
       }
 break2:
-  if (*s == 'n' || *s == 'N')
-    {
-      ++s; 
-      if (*s == 'a' || *s == 'A')
-        {
-          ++s;
-          if (*s == 'n' || *s == 'N')
-            {
-              nanflag = 1;
-              ++s;
-              goto ret;
-            }
-        }
-      s = s00;
-      goto ret;
-    }
-  else if (*s == '0')
+  if (*s == '0')
     {
       nz0 = 1;
       while (*++s == '0');
@@ -222,7 +205,7 @@ dig_done:
 	  s = s00;
 	  goto ret;
 	}
-      s2 = s;
+      s00 = s;
       esign = 0;
       switch (c = *++s)
 	{
@@ -253,7 +236,7 @@ dig_done:
 	    e = 0;
 	}
       else
-	s = s2;
+	s = s00;
     }
   if (!nd)
     {
@@ -725,10 +708,7 @@ retfree:
 ret:
   if (se)
     *se = (char *) s;
-
-  if (nanflag)
-    return nan (NULL);
-  return (sign && (s != s00)) ? -rv.d : rv.d;
+  return sign ? -rv.d : rv.d;
 }
 
 #ifndef NO_REENT
@@ -745,10 +725,7 @@ _DEFUN (strtof, (s00, se),
 	_CONST char *s00 _AND
 	char **se)
 {
-  double retval = _strtod_r (_REENT, s00, se);
-  if (isnan (retval))
-    return nanf (NULL);
-  return (float)retval;
+  return (float)_strtod_r (_REENT, s00, se);
 }
 
 #endif

@@ -1,8 +1,5 @@
 /* Version of sbrk for no operating system.  */
 
-#include "config.h"
-#include <_syslist.h>
-
 void *
 _sbrk (incr)
      int incr;

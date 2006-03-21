@@ -29,7 +29,7 @@
 
 /*
 FUNCTION
-	<<iswcntrl>>---control wide character test
+	<<iswcntrl>>---wide-character cntrl test
 
 INDEX
 	iswcntrl
@@ -45,10 +45,10 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 <<iswcntrl>> is a function which classifies wide-character values that
-are categorized as control characters.
+are categorized as a control character.
 
 RETURNS
-<<iswcntrl>> returns non-zero if <[c]> is a control wide character.
+<<iswcntrl>> returns non-zero if <[c]> is a control wide-character.
 
 PORTABILITY
 <<iswcntrl>> is C99.
@@ -56,7 +56,6 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 #include <_ansi.h>
-#include <newlib.h>
 #include <wctype.h>
 #include <ctype.h>
 #include <string.h>
@@ -71,7 +70,7 @@ _DEFUN(iswcntrl,(c), wint_t c)
       unicode = 0;
       /* fall-through */ 
     }
-#ifdef _MB_CAPABLE
+#ifdef MB_CAPABLE
   else if (!strcmp (__lc_ctype, "C-JIS"))
     {
       c = __jp2uc (c, JP_JIS);
@@ -98,7 +97,7 @@ _DEFUN(iswcntrl,(c), wint_t c)
               (c >= 0x007f && c <= 0x009f) ||
               c == 0x2028 || c == 0x2029);
     }
-#endif /* _MB_CAPABLE */
+#endif /* MB_CAPABLE */
 
   return (c < 0x100 ? iscntrl (c) : 0);
 }
