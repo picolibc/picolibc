@@ -2,8 +2,6 @@
  * mktm_r.c
  * Original Author:	Adapted from tzcode maintained by Arthur David Olson.
  * Modifications:       Changed to mktm_r and added __tzcalc_limits - 04/10/02, Jeff Johnston
- *                      Fixed bug in mday computations - 08/12/04, Alex Mogilnikov <alx@intellectronika.ru>
- *                      Fixed bug in __tzcalc_limits - 08/12/04, Alex Mogilnikov <alx@intellectronika.ru>
  *
  * Converts the calendar time pointed to by tim_p into a broken-down time
  * expressed as local time. Returns a pointer to a structure containing the
@@ -32,10 +30,10 @@ _DEFUN (_mktm_r, (tim_p, res, is_gmtime),
 {
   long days, rem;
   time_t lcltime;
+  int i;
   int y;
   int yleap;
   _CONST int *ip;
-   __tzinfo_type *tz = __gettzinfo ();
 
   /* base decision about std/dst time on current time */
   lcltime = *tim_p;
@@ -95,33 +93,29 @@ _DEFUN (_mktm_r, (tim_p, res, is_gmtime),
 
   if (!is_gmtime)
     {
-      long offset;
+      int offset;
       int hours, mins, secs;
 
       TZ_LOCK;
       if (_daylight)
 	{
-	  if (y == tz->__tzyear || __tzcalc_limits (y))
-	    res->tm_isdst = (tz->__tznorth 
-			     ? (*tim_p >= tz->__tzrule[0].change 
-				&& *tim_p < tz->__tzrule[1].change)
-			     : (*tim_p >= tz->__tzrule[0].change 
-				|| *tim_p < tz->__tzrule[1].change));
+	  if (y == __tzyear || __tzcalc_limits (y))
+	    res->tm_isdst = (__tznorth 
+			     ? (*tim_p >= __tzrule[0].change && *tim_p < __tzrule[1].change)
+			     : (*tim_p >= __tzrule[0].change || *tim_p < __tzrule[1].change));
 	  else
 	    res->tm_isdst = -1;
 	}
       else
 	res->tm_isdst = 0;
 
-      offset = (res->tm_isdst == 1 
-		  ? tz->__tzrule[1].offset 
-		  : tz->__tzrule[0].offset);
+      offset = (res->tm_isdst == 1 ? __tzrule[1].offset : __tzrule[0].offset);
 
-      hours = (int) (offset / SECSPERHOUR);
+      hours = offset / SECSPERHOUR;
       offset = offset % SECSPERHOUR;
       
-      mins = (int) (offset / SECSPERMIN);
-      secs = (int) (offset % SECSPERMIN);
+      mins = offset / SECSPERMIN;
+      secs = offset % SECSPERMIN;
 
       res->tm_sec -= secs;
       res->tm_min -= mins;
@@ -155,9 +149,9 @@ _DEFUN (_mktm_r, (tim_p, res, is_gmtime),
 	    res->tm_wday = 0;
 	  ++res->tm_mday;
 	  res->tm_hour -= HOURSPERDAY;
-	  if (res->tm_mday > ip[res->tm_mon])
+	  if (res->tm_mday >= ip[res->tm_mon])
 	    {
-	      res->tm_mday -= ip[res->tm_mon];
+	      res->tm_mday -= ip[res->tm_mon] - 1;
 	      res->tm_mon += 1;
 	      if (res->tm_mon == 12)
 		{
@@ -201,12 +195,11 @@ _DEFUN (__tzcalc_limits, (year),
 {
   int days, year_days, years;
   int i, j;
-  __tzinfo_type *tz = __gettzinfo ();
 
   if (year < EPOCH_YEAR)
     return 0;
 
-  tz->__tzyear = year;
+  __tzyear = year;
 
   years = (year - EPOCH_YEAR);
 
@@ -216,11 +209,10 @@ _DEFUN (__tzcalc_limits, (year),
   
   for (i = 0; i < 2; ++i)
     {
-      if (tz->__tzrule[i].ch == 'J')
-	days = year_days + tz->__tzrule[i].d + 
-		(isleap(year) && tz->__tzrule[i].d >= 60);
-      else if (tz->__tzrule[i].ch == 'D')
-	days = year_days + tz->__tzrule[i].d;
+      if (__tzrule[i].ch == 'J')
+	days = year_days + __tzrule[i].d + (isleap(year) && __tzrule[i].d >= 60);
+      else if (__tzrule[i].ch == 'D')
+	days = year_days + __tzrule[i].d;
       else
 	{
 	  int yleap = isleap(year);
@@ -229,28 +221,27 @@ _DEFUN (__tzcalc_limits, (year),
 
 	  days = year_days;
 
-	  for (j = 1; j < tz->__tzrule[i].m; ++j)
+	  for (j = 1; j < __tzrule[i].m; ++j)
 	    days += ip[j-1];
 
 	  m_wday = (EPOCH_WDAY + days) % DAYSPERWEEK;
 	  
-	  wday_diff = tz->__tzrule[i].d - m_wday;
+	  wday_diff = __tzrule[i].d - m_wday;
 	  if (wday_diff < 0)
 	    wday_diff += DAYSPERWEEK;
-	  m_day = (tz->__tzrule[i].n - 1) * DAYSPERWEEK + wday_diff;
+	  m_day = (__tzrule[i].n - 1) * DAYSPERWEEK + wday_diff;
 
-	  while (m_day >= ip[j-1])
+	  while (m_day >= ip[j])
 	    m_day -= DAYSPERWEEK;
 
 	  days += m_day;
 	}
 
       /* store the change-over time in GMT form by adding offset */
-      tz->__tzrule[i].change = days * SECSPERDAY + 
-	      			tz->__tzrule[i].s + tz->__tzrule[i].offset;
+      __tzrule[i].change = days * SECSPERDAY + __tzrule[i].s + __tzrule[i].offset;
     }
 
-  tz->__tznorth = (tz->__tzrule[0].change < tz->__tzrule[1].change);
+  __tznorth = (__tzrule[0].change < __tzrule[1].change);
 
   return 1;
 }

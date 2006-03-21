@@ -30,7 +30,6 @@
 #include <unistd.h>
 
 extern int    _EXFUN(__svfscanf_r,(struct _reent *,FILE *, _CONST char *,va_list));
-extern int    _EXFUN(__svfiscanf_r,(struct _reent *,FILE *, _CONST char *,va_list));
 extern FILE  *_EXFUN(__sfp,(struct _reent *));
 extern int    _EXFUN(__sflags,(struct _reent *,_CONST char*, int*));
 extern int    _EXFUN(__srefill,(FILE *));
@@ -49,11 +48,11 @@ extern int   _EXFUN(__srefill,(FILE *fp));
 
 /* Called by the main entry point fns to ensure stdio has been initialized.  */
 
-#define CHECK_INIT(ptr) \
+#define CHECK_INIT(fp) \
   do						\
     {						\
-      if ((ptr) && !(ptr)->__sdidinit)		\
-	__sinit (ptr);				\
+      if (_REENT && !_REENT->__sdidinit)	\
+	__sinit (_REENT);			\
     }						\
   while (0)
 
@@ -95,11 +94,7 @@ char *_EXFUN(_llicvt,(char *, long long, char));
 #ifdef __SINGLE_THREAD__
 #define __sfp_lock_acquire()
 #define __sfp_lock_release()
-#define __sinit_lock_acquire()
-#define __sinit_lock_release()
 #else
 _VOID _EXFUN(__sfp_lock_acquire,(_VOID));
 _VOID _EXFUN(__sfp_lock_release,(_VOID));
-_VOID _EXFUN(__sinit_lock_acquire,(_VOID));
-_VOID _EXFUN(__sinit_lock_release,(_VOID));
 #endif

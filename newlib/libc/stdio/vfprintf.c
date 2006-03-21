@@ -54,19 +54,18 @@ ANSI_SYNOPSIS
 	int vfprintf(FILE *<[fp]>, const char *<[fmt]>, va_list <[list]>);
 	int vsprintf(char *<[str]>, const char *<[fmt]>, va_list <[list]>);
 	int vasprintf(char **<[strp]>, const char *<[fmt]>, va_list <[list]>);
-	int vsnprintf(char *<[str]>, size_t <[size]>, const char *<[fmt]>,
-                      va_list <[list]>);
+	int vsnprintf(char *<[str]>, size_t <[size]>, const char *<[fmt]>, va_list <[list]>);
 
 	int _vprintf_r(struct _reent *<[reent]>, const char *<[fmt]>,
                         va_list <[list]>);
 	int _vfprintf_r(struct _reent *<[reent]>, FILE *<[fp]>, const char *<[fmt]>,
                         va_list <[list]>);
-	int _vasprintf_r(struct _reent *<[reent]>, char **<[str]>,
-                        const char *<[fmt]>, va_list <[list]>);
-	int _vsprintf_r(struct _reent *<[reent]>, char *<[str]>,
-                        const char *<[fmt]>, va_list <[list]>);
-	int _vsnprintf_r(struct _reent *<[reent]>, char *<[str]>, size_t <[size]>,
-                         const char *<[fmt]>, va_list <[list]>);
+	int _vasprintf_r(struct _reent *<[reent]>, char **<[str]>, const char *<[fmt]>,
+                        va_list <[list]>);
+	int _vsprintf_r(struct _reent *<[reent]>, char *<[str]>, const char *<[fmt]>,
+                        va_list <[list]>);
+	int _vsnprintf_r(struct _reent *<[reent]>, char *<[str]>, size_t <[size]>, const char *<[fmt]>,
+                        va_list <[list]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -158,7 +157,6 @@ static char *rcsid = "$Id$";
  *
  * This code is large and complicated...
  */
-#include <newlib.h>
 
 #ifdef INTEGER_ONLY
 #define VFPRINTF vfiprintf
@@ -177,6 +175,8 @@ static char *rcsid = "$Id$";
 #endif
 
 #include <_ansi.h>
+#include <reent.h>
+#include <newlib.h>
 #include <reent.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -533,8 +533,8 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	    (u_long)GET_ARG (N, ap, u_int))
 #endif
 
-	CHECK_INIT (data);
 	_flockfile (fp);
+	CHECK_INIT (fp);
 
 	/* sorry, fprintf(read_only_file, "") returns EOF, not 0 */
 	if (cantwrite (fp)) {
@@ -801,7 +801,6 @@ reswitch:	switch (ch) {
 		case 'e':
 		case 'E':
 		case 'f':
-		case 'F':
 		case 'g':
 		case 'G':
 			if (prec == -1) {
@@ -821,18 +820,12 @@ reswitch:	switch (ch) {
 			if (isinf (_fpvalue)) {
 				if (_fpvalue < 0)
 					sign = '-';
-				if (ch == 'E' || ch == 'F' || ch == 'G')
-					cp = "INF";
-				else
-					cp = "inf";
+				cp = "Inf";
 				size = 3;
 				break;
 			}
 			if (isnan (_fpvalue)) {
-				if (ch == 'E' || ch == 'F' || ch == 'G')
-					cp = "NAN";
-				else
-					cp = "nan";
+				cp = "NaN";
 				size = 3;
 				break;
 			}
@@ -850,18 +843,12 @@ reswitch:	switch (ch) {
 			if (tmp == 2) {
 				if (_fpvalue < 0)
 					sign = '-';
-				if (ch == 'E' || ch == 'F' || ch == 'G')
-					cp = "INF";
-				else
-					cp = "inf";
+				cp = "Inf";
 				size = 3;
 				break;
 			}
 			if (tmp == 1) {
-				if (ch == 'E' || ch == 'F' || ch == 'G')
-					cp = "NAN";
-				else
-					cp = "nan";
+				cp = "NaN";
 				size = 3;
 				break;
 			}
@@ -1274,11 +1261,7 @@ _DEFUN(cvt, (data, value, ndigits, flags, sign, decpt, ch, length),
 #ifdef _NO_LONGDBL
         union double_union tmp;
 #else
-	union
-	{
-	  struct ldieee ieee;
-	  _LONG_DOUBLE val;
-	} ld;
+        struct ldieee *ldptr;
 #endif
 
 	if (ch == 'f') {
@@ -1305,8 +1288,8 @@ _DEFUN(cvt, (data, value, ndigits, flags, sign, decpt, ch, length),
 
 	digits = _dtoa_r (data, value, mode, ndigits, decpt, &dsgn, &rve);
 #else /* !_NO_LONGDBL */
-	ld.val = value;
-	if (ld.ieee.sign) { /* this will check for < 0 and -0.0 */
+	ldptr = (struct ldieee *)&value;
+	if (ldptr->sign) { /* this will check for < 0 and -0.0 */
 		value = -value;
 		*sign = '-';
         } else

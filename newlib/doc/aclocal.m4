@@ -117,7 +117,7 @@ AC_SUBST(newlib_basedir)
 
 AC_CANONICAL_SYSTEM
 
-AM_INIT_AUTOMAKE(newlib, 1.14.0)
+AM_INIT_AUTOMAKE(newlib, 1.12.0)
 
 # FIXME: We temporarily define our own version of AC_PROG_CC.  This is
 # copied from autoconf 2.12, but does not call AC_PROG_CC_WORKS.  We
@@ -164,9 +164,6 @@ AC_CHECK_TOOL(AR, ar)
 AC_CHECK_TOOL(RANLIB, ranlib, :)
 
 AC_PROG_INSTALL
-
-# Hack to ensure that INSTALL won't be set to "../" with autoconf 2.13.  */
-ac_given_INSTALL=$INSTALL
 
 AM_MAINTAINER_MODE
 

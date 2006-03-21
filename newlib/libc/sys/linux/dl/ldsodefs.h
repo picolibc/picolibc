@@ -28,11 +28,10 @@
 #include <string.h>
 
 #include <elf.h>
+#include <dlfcn.h>
 #include <link.h>
 #include <dl-lookupcfg.h>
 #include <bits/libc-lock.h>
-
-#include "dl-local.h"
 
 __BEGIN_DECLS
 

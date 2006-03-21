@@ -24,7 +24,7 @@
 
 int
 _DEFUN (putenv, (str),
-	char *str)
+	_CONST char *str)
 {
   return _putenv_r (_REENT, str);
 }

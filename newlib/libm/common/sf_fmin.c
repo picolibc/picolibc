@@ -15,9 +15,9 @@
 #endif
 {
   if (__fpclassifyf(x) == FP_NAN)
-    return y;
-  if (__fpclassifyf(y) == FP_NAN)
     return x;
+  if (__fpclassifyf(y) == FP_NAN)
+    return y;
   
   return x < y ? x : y;
 }

@@ -1,6 +1,6 @@
 /*
 FUNCTION
-	<<strlwr>>---force string to lowercase
+	<<strlwr>>---force string to lower case
 	
 INDEX
 	strlwr
@@ -15,8 +15,8 @@ TRAD_SYNOPSIS
 	char *<[a]>;
 
 DESCRIPTION
-	<<strlwr>> converts each character in the string at <[a]> to
-	lowercase.
+	<<strlwr>> converts each characters in the string at <[a]> to
+	lower case.
 
 RETURNS
 	<<strlwr>> returns its argument, <[a]>.

@@ -12,15 +12,12 @@ AC_ARG_ENABLE(newlib-supplied-syscalls,
  esac], [newlib_may_supply_syscalls=yes])dnl
 
 if test "x$newlib_may_supply_syscalls" = "xyes"; then
-  BUILD_CRT0_TRUE='#'
-  BUILD_CRT0_FALSE=
-else
   BUILD_CRT0_TRUE=
   BUILD_CRT0_FALSE='#'
+else
+  BUILD_CRT0_TRUE='#'
+  BUILD_CRT0_FALSE=
 fi
-
-AC_SUBST(BUILD_CRT0_TRUE)
-AC_SUBST(BUILD_CRT0_FALSE)
 
 if test "$srcdir" = "." ; then
   if test "${with_target_subdir}" != "." ; then
@@ -86,7 +83,7 @@ AC_SUBST(LD)
 AC_PROG_RANLIB
 
 case "${target}" in
-  *-*-elf | *-*-eabi)
+  *-*-elf)
 	objtype=elf-
 	;;
   *-*-coff)

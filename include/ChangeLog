@@ -1,0 +1,144 @@
+2004-09-17  Paul Brook  <paul@codesourcery.com>
+
+	* elf/arm.h: Remove R_ARM_STKCHK and R_ARM_THM_STKCHK.
+	Add R_ARM_TARGET2, R_ARM_PREL31, R_ARM_GOT_ABS, R_ARM_GOT_PREL,
+	R_ARM_GOT_BREL12, R_ARM_GOTOFF12 and R_ARM_GOTRELAX.
+
+2004-09-17  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (struct bfd_link_hash_entry): Move und_next into elements
+	of union.
+
+2004-09-13  Aaron W. LaFramboise  <aaronavay62@aaronwl.com>
+
+	* libiberty.h (basename): Prototype for __MINGW32__.
+
+2004-09-13  Paul Brook  <paul@codesourcery.com>
+
+	* elf/arm.h: Rename RELABS to TARGET1.
+
+2004-09-04  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* ansidecl.h (ATTRIBUTE_SENTINEL): Define.
+	* libiberty.h (concat, reconcat, concat_length, concat_copy,
+	concat_copy2): Use ATTRIBUTE_SENTINEL.
+
+2004-08-13  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (struct bfd_link_callbacks): Remove "error_handler".
+	(LD_DEFINITION_IN_DISCARDED_SECTION): Delete.
+
+2004-08-02  Gabriel Dos Reis  <gdr@integrable-solutions.net>
+
+	* libiberty.h (XDELETE, XDELETEVEC, XRESIZEVEC): Remove any
+	const-qualification before disposal.
+
+2004-07-24  Bernardo Innocenti  <bernie@develer.com>
+
+	* ansidecl.h (ARG_UNUSED): New Macro.
+
+2004-07-23  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* bin-bugs.h (REPORT_BUGS_TO): Set to
+	"<URL:http://www.sourceware.org/bugzilla/>".
+
+2004-07-21  Paolo Bonzini  <bonzini@gnu.org>
+
+	* ansidecl.h (ATTRIBUTE_PURE): New.
+
+2004-07-13  Bernardo Innocenti  <bernie@develer.com>
+
+	* libiberty.h (XNEW, XCNEW, XNEWVEC, XCNEWVEC, XOBNEW): Move here from
+	libcpp/internal.h.
+	(XDELETE, XRESIZEVEC, XDELETEVEC, XNEWVAR, XCNEWVAR, XRESIZEVAR): New
+	macros.
+
+2004-07-13  Bernardo Innocenti  <bernie@develer.com>
+
+	* libiberty.h (ASTRDUP): Add casts required for stricter
+	type conversion rules of C++.
+	* obstack.h (obstack_free): Likewise.
+
+2004-07-07  Tomer Levi  <Tomer.Levi@nsc.com>
+
+	* dis-asm.h (print_insn_crx): Declare.
+
+2004-06-24  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (struct bfd_link_order): Update comment.
+
+2004-05-11  Jakub Jelinek  <jakub@redhat.com>
+
+	* bfdlink.h (struct bfd_link_info): Add relro, relro_start and
+	relro_end fields.
+	* elf/common.h (PT_GNU_EH_FRAME, PT_GNU_STACK): Add comments.
+	(PT_GNU_RELRO): Define.
+
+2004-05-04  Andreas Jaeger  <aj@suse.de>
+
+	* demangle.h: Do not use C++ reserved keyword typename as
+	parameter for cplus_demangle_fill_builtin_type.
+
+2004-04-22  Richard Henderson  <rth@redhat.com>
+
+	* hashtab.h (struct htab): Add size_prime_index.
+
+2004-04-13  Jeff Law  <law@redhat.com>
+
+	* hashtab.h (htab_remove_elt_with_hash): Prototype new function.
+
+2004-03-30  Zack Weinberg  <zack@codesourcery.com>
+
+	* hashtab.h, splay-tree.h: Use new shorter form of GTY markers.
+
+2004-03-25  Stan Shebs  <shebs@apple.com>
+
+	* mpw/: Remove subdirectory and everything in it.
+
+2004-03-23  Alan Modra  <amodra@bigpond.net.au>
+
+	PR 51.
+	* bfdlink.h (struct bfd_link_info): Add wrap_char.
+
+2004-03-20  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* bfdlink.h (bfd_link_info): Correct comments for the
+	unresolved_syms_in_objects field.
+
+2004-02-24  Ian Lance Taylor  <ian@wasabisystems.com>
+
+	* dyn-string.h: Update copyright date.
+
+2004-02-23  Ian Lance Taylor  <ian@wasabisystems.com>
+
+	* dyn-string.h: Remove test of IN_LIBGCC2 and IN_GLIBCPP_V3 and
+	the associated #defines.
+
+2004-01-12  Ian Lance Taylor  <ian@wasabisystems.com>
+
+	* demangle.h: Instead of checking ANSI_PROTOTYPES, just include
+	"libiberty.h".
+
+	* demangle.h: If ANSI_PROTOTYPES is defined, include <stddef.h>.
+
+	* demangle.h (enum demangle_component_type): Define.
+	(struct demangle_operator_info): Declare.
+	(struct demangle_builtin_type_info): Declare.
+	(struct demangle_component): Define.
+	(cplus_demangle_fill_component): Declare.
+	(cplus_demangle_fill_name): Declare.
+	(cplus_demangle_fill_builtin_type): Declare.
+	(cplus_demangle_fill_operator): Declare.
+	(cplus_demangle_fill_extended_operator): Declare.
+	(cplus_demangle_fill_ctor, cplus_demangle_fill_dtor): Declare.
+	(cplus_demangle_v3_components): Declare.
+	(cplus_demangle_print): Declare.
+
+For older changes see ChangeLog-9103
+
+Local Variables:
+mode: change-log
+left-margin: 8
+fill-column: 74
+version-control: never
+End:

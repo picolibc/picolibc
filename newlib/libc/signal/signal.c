@@ -6,12 +6,21 @@ INDEX
 	signal
 INDEX
 	_signal_r
+INDEX
+	raise
+INDEX
+	_raise_r
 
 ANSI_SYNOPSIS
 	#include <signal.h>
-	void (*signal(int <[sig]>, void(*<[func]>)(int))) (int);
+	void ( * signal(int <[sig]>, void(*<[func]>)(int)) )(int);
 
-	void (*_signal_r(void *<[reent]>, int <[sig]>, void(*<[func]>)(int))) (int);
+	void ( * _signal_r(void *<[reent]>, 
+                           int <[sig]>, void(*<[func]>)(int)) )(int);
+
+	int raise (int <[sig]>);
+
+	int _raise_r (void *<[reent]>, int <[sig]>);
 
 TRAD_SYNOPSIS
 	#include <signal.h>
@@ -24,8 +33,15 @@ TRAD_SYNOPSIS
 	int <[sig]>;
 	char ( * <[func]> )();
 
+	int raise (<[sig]>)()
+	int <[sig]>;
+
+	int _raise_r (<[reent]>, <[sig]>)()
+	char *<[reent]>;
+	int <[sig]>;
+
 DESCRIPTION
-<<signal>> provides a simple signal-handling implementation for embedded
+<<signal, raise>> provide a simple signal/raise implementation for embedded
 targets.
 
 <<signal>> allows you to request changed treatment for a particular
@@ -36,7 +52,7 @@ that identifies a subroutine in your program as the handler for this signal.
 
 Some of the execution environment for signal handlers is
 unpredictable; notably, the only library function required to work
-correctly from within a signal handler is <<signal>> itself, and
+correctly from within a signal handler is @code{signal} itself, and
 only when used to redefine the handler for the current signal value.
 
 Static storage is likewise unreliable for signal handlers, with one
@@ -50,8 +66,12 @@ where it was when the signal was raised (whether by your program
 itself, or by an external event).  Signal handlers can also
 use functions such as <<exit>> and <<abort>> to avoid returning.
 
-The alternate function <<_signal_r>> is the reentrant version.
+<<raise>> sends the signal sig to the executing program.  It returns zero if
+successful, non-zero if unsuccessful.
+
+The alternate functions <<_signal_r, _raise_r>> are the reentrant versions.
 The extra argument <[reent]> is a pointer to a reentrancy structure.
+
 
 @c FIXME: do we have setjmp.h and assoc fns?
 
@@ -63,7 +83,7 @@ Otherwise, the result is the previous handler (a function pointer or
 one of the predefined macros).
 
 PORTABILITY
-ANSI C requires <<signal>>.
+ANSI C requires <<raise>>, <<signal>>.
 
 No supporting OS subroutines are required to link with <<signal>>, but
 it will not have any useful effects, except for software generated signals,

@@ -2,6 +2,7 @@
 
 #ifndef _SYS_SIGNAL_H
 #define _SYS_SIGNAL_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -300,11 +301,5 @@ int _EXFUN(sigqueue, (pid_t pid, int signo, const union sigval value));
 
 #ifdef __cplusplus
 }
-#endif
-
-#ifndef _SIGNAL_H_
-/* Some applications take advantage of the fact that <sys/signal.h>
- * and <signal.h> are equivalent in glibc.  Allow for that here.  */
-#include <signal.h>
 #endif
 #endif /* _SYS_SIGNAL_H */

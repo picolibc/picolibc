@@ -71,26 +71,6 @@ char      *_EXFUN(strptime,     (const char *, const char *, struct tm *));
 _VOID      _EXFUN(tzset,	(_VOID));
 _VOID      _EXFUN(_tzset_r,	(struct _reent *));
 
-typedef struct __tzrule_struct
-{
-  char ch;
-  int m;
-  int n;
-  int d;
-  int s;
-  time_t change;
-  long offset; /* Match type of _timezone. */
-} __tzrule_type;
-
-typedef struct __tzinfo_struct
-{
-  int __tznorth;
-  int __tzyear;
-  __tzrule_type __tzrule[2];
-} __tzinfo_type;
-
-__tzinfo_type *_EXFUN (__gettzinfo, (_VOID));
-
 /* getdate functions */
 
 #ifdef HAVE_GETDATE
@@ -115,7 +95,7 @@ int		_EXFUN(getdate_r, (const char *, struct tm *));
 #endif /* HAVE_GETDATE */
 
 /* defines for the opengroup specifications Derived from Issue 1 of the SVID.  */
-extern __IMPORT long _timezone;
+extern __IMPORT time_t _timezone;
 extern __IMPORT int _daylight;
 extern __IMPORT char *_tzname[2];
 
@@ -123,6 +103,20 @@ extern __IMPORT char *_tzname[2];
 #ifndef tzname
 #define tzname _tzname
 #endif
+
+/* CYGWIN also exposes daylight and timezone in the name space */
+#ifdef __CYGWIN__
+#ifndef daylight
+#define daylight _daylight
+#endif
+#ifdef timezonevar
+#ifndef timezone
+#define timezone ((long int) _timezone)
+#endif
+#else
+char *_EXFUN(timezone, (void));
+#endif
+#endif /* __CYGWIN__ */
 #endif /* !__STRICT_ANSI__ */
 
 #ifdef __cplusplus
@@ -130,10 +124,6 @@ extern __IMPORT char *_tzname[2];
 #endif
 
 #include <sys/features.h>
-
-#ifdef __CYGWIN__
-#include <cygwin/time.h>
-#endif /*__CYGWIN__*/
 
 #if defined(_POSIX_TIMERS)
 
@@ -173,6 +163,16 @@ int _EXFUN(nanosleep, (const struct timespec  *rqtp, struct timespec *rmtp));
 #ifdef __cplusplus
 }
 #endif
+#else
+#ifdef __CYGWIN__
+#ifdef __cplusplus
+extern "C" {
+#endif
+int _EXFUN(nanosleep, (const struct timespec  *rqtp, struct timespec *rmtp));
+#ifdef __cplusplus
+}
+#endif
+#endif /* __CYGWIN__ */
 #endif /* _POSIX_TIMERS */
 
 #ifdef __cplusplus
@@ -203,6 +203,10 @@ extern "C" {
    associated with a time.  */
 
 #define TIMER_ABSTIME	4
+#ifdef __CYGWIN__
+# define TIMER_RELTIME	0	/* For compatibility with HP/UX, Solaris,
+				   others? */
+#endif
 
 /* Manifest Constants, P1003.4b/D8, p. 55 */
 

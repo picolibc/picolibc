@@ -59,7 +59,6 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 #include <_ansi.h>
 #include <stdio.h>
-#include "local.h"
 
 int
 _DEFUN(fputc, (ch, file),
@@ -67,7 +66,6 @@ _DEFUN(fputc, (ch, file),
        FILE * file)
 {
   int result;
-  CHECK_INIT(_REENT);
    _flockfile (file);
   result = putc (ch, file);
   _funlockfile (file);

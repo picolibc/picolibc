@@ -9,10 +9,6 @@ _BEGIN_STD_C
 #define _JBLEN 23
 #endif
 
-#if defined(__AVR__)
-#define _JBLEN 24
-#endif
-
 #ifdef __sparc__
 /*
  * onsstack,sigmask,sp,pc,npc,psr,g1,o0,wbcnt (sigcontext).
@@ -178,10 +174,6 @@ _BEGIN_STD_C
 #define _JBTYPE double
 #endif
 
-#ifdef __CRX__
-#define _JBLEN 9
-#endif
-
 #ifdef __fr30__
 #define _JBLEN 10
 #endif
@@ -200,27 +192,10 @@ _BEGIN_STD_C
 #define _JBTYPE unsigned long
 #endif
 
-#ifdef __mt__
-#define _JBLEN 16
-#endif
-
 #ifdef __xstormy16__
 /* 4 GPRs plus SP plus PC. */
 #define _JBLEN 8
 #endif
-
-#ifdef __CRIS__
-#define _JBLEN 18
-#endif
-
-#ifdef __m32c__
-#if defined(__r8c_cpu__) || defined(__m16c_cpu__)
-#define _JBLEN (22/2)
-#else
-#define _JBLEN (34/2)
-#endif
-#define _JBTYPE unsigned short
-#endif /* __m32c__ */
 
 #ifdef _JBLEN
 #ifdef _JBTYPE
@@ -249,27 +224,6 @@ typedef int sigjmp_buf[_JBLEN+2];
 # define _CYGWIN_WORKING_SIGSETJMP
 #endif
 
-#if defined(__GNUC__)
-
-#define sigsetjmp(env, savemask) \
-            ({ \
-              sigjmp_buf *_sjbuf = &(env); \
-              ((*_sjbuf)[_SAVEMASK] = savemask,\
-              sigprocmask (SIG_SETMASK, 0, (sigset_t *)((*_sjbuf) + _SIGMASK)),\
-              setjmp (*_sjbuf)); \
-            })
-
-#define siglongjmp(env, val) \
-            ({ \
-              sigjmp_buf *_sjbuf = &(env); \
-              ((((*_sjbuf)[_SAVEMASK]) ? \
-               sigprocmask (SIG_SETMASK, (sigset_t *)((*_sjbuf) + _SIGMASK), 0)\
-               : 0), \
-               longjmp (*_sjbuf, val)); \
-            })
-
-#else /* !__GNUC__ */
-
 #define sigsetjmp(env, savemask) ((env)[_SAVEMASK] = savemask,\
                sigprocmask (SIG_SETMASK, 0, (sigset_t *) ((env) + _SIGMASK)),\
                setjmp (env))
@@ -277,8 +231,6 @@ typedef int sigjmp_buf[_JBLEN+2];
 #define siglongjmp(env, val) ((((env)[_SAVEMASK])?\
                sigprocmask (SIG_SETMASK, (sigset_t *) ((env) + _SIGMASK), 0):0),\
                longjmp (env, val))
-
-#endif
 
 #ifdef __cplusplus
 }

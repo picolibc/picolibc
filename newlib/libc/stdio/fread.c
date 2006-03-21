@@ -125,8 +125,6 @@ _DEFUN(fread, (buf, size, count, fp),
   if ((resid = count * size) == 0)
     return 0;
 
-  CHECK_INIT(_REENT);
-
   _flockfile (fp);
   if (fp->_r < 0)
     fp->_r = 0;
@@ -151,7 +149,7 @@ _DEFUN(fread, (buf, size, count, fp),
 	FREEUB (fp);
 
       /* Finally read directly into user's buffer if needed.  */
-      while (resid > 0)
+      if (resid > 0)
 	{
 	  int rc = 0;
 	  /* save fp buffering state */
@@ -164,20 +162,20 @@ _DEFUN(fread, (buf, size, count, fp),
 	  fp->_p = p;
 	  rc = __srefill (fp);
 	  /* restore fp buffering back to original state */
+	  resid -= fp->_r;
+	  fp->_r = 0;
 	  fp->_bf._base = old_base;
 	  fp->_bf._size = old_size;
 	  fp->_p = old_p;
-	  resid -= fp->_r;
-	  p += fp->_r;
-	  fp->_r = 0;
 	  if (rc)
 	    {
+	      /* no more input: return partial result */
 #ifdef __SCLE
-              if (fp->_flags & __SCLE)
-	        {
-	          _funlockfile (fp);
-	          return crlf (fp, buf, total-resid, 1) / size;
-	        }
+	      if (fp->_flags & __SCLE)
+		{
+		  _funlockfile (fp);
+		  return crlf (fp, buf, total-resid, 1) / size;
+		}
 #endif
 	      _funlockfile (fp);
 	      return (total - resid) / size;

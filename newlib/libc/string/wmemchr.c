@@ -1,6 +1,6 @@
 /*
 FUNCTION
-	<<wmemchr>>---find a wide character in memory
+	<<wmemchr>>---find a wide-character in memory
  
 
 ANSI_SYNOPSIS
@@ -15,9 +15,9 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 	The <<wmemchr>> function locates the first occurrence of <[c]> in the
-	initial <[n]> wide characters of the object pointed to be <[s]>. This
+	initial <[n]> wide-characters of the object pointed to be <[s]>. This
 	function is not affected by locale and all wchar_t values are treated
-	identically.  The null wide character and wchar_t values not
+	identically.  The null wide-character and wchar_t values not
 	corresponding to valid characters are not treated specially.
 
 	If <[n]> is zero, <[s]> must be a valid pointer and the function
@@ -25,12 +25,11 @@ DESCRIPTION
 
 RETURNS
 	The <<wmemchr>> function returns a pointer to the located
-	wide character, or a null pointer if the wide character does not occur
+	wide-character, or a null pointer if the wide-character does not occur
 	in the object. 
 
 PORTABILITY
 <<wmemchr>> is ISO/IEC 9899/AMD1:1995 (ISO C).
-
 No supporting OS subroutines are required.
 */
 

@@ -91,11 +91,11 @@ _DEFUN (_ftello64_r, (ptr, fp),
 {
   _fpos64_t pos;
 
+  _flockfile(fp);
+
   /* Ensure stdio is set up.  */
 
-  CHECK_INIT (ptr);
-
-  _flockfile(fp);
+  CHECK_INIT (fp);
 
   if (fp->_seek64 == NULL)
     {

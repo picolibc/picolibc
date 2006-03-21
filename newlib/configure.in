@@ -85,17 +85,6 @@ AC_ARG_ENABLE(newlib-iconv-external-ccs,
    esac
  fi], [newlib_iconv_external_ccs=${newlib_iconv_external_ccs}])dnl
 
-dnl Support --disable-newlib-atexit-dynamic-alloc
-AC_ARG_ENABLE(newlib-atexit-dynamic-alloc,
-[  --disable-newlib-atexit-alloc    disable dynamic allocation of atexit entries],
-[if test "${newlib_atexit_dynamic_alloc+set}" != set; then
-  case "${enableval}" in
-    yes) newlib_atexit_dynamic_alloc=yes ;;
-    no)  newlib_atexit_dynamic_alloc=no  ;;
-    *)   AC_MSG_ERROR(bad value ${enableval} for newlib-atexit-dynamic-alloc option) ;;
-  esac
- fi], [newlib_atexit_dynamic_alloc=yes])dnl
-
 NEWLIB_CONFIGURE(.)
 
 dnl We have to enable libtool after NEWLIB_CONFIGURE because if we try and
@@ -150,7 +139,7 @@ AC_CONFIG_SUBDIRS(${configdirs})
 
 CRT0=
 CRT0_DIR=
-if test "x${have_crt0}" = "xyes"; then
+if test -n "${sys_dir}"; then
   CRT0=crt0.o
   CRT0_DIR=libc/
 fi
@@ -241,10 +230,6 @@ fi
 
 if test "${newlib_iconv_external_ccs}" = "yes"; then
 AC_DEFINE_UNQUOTED(_ICONV_ENABLE_EXTERNAL_CCS)
-fi
-
-if test "${newlib_atexit_dynamic_alloc}" = "yes"; then
-AC_DEFINE_UNQUOTED(_ATEXIT_DYNAMIC_ALLOC)
 fi
 
 AC_DEFINE_UNQUOTED(_NEWLIB_VERSION,"$VERSION")
@@ -343,50 +328,6 @@ if test "x${iconv_encodings}" != "x" \
       AC_DEFINE_UNQUOTED($opt,1)
   done
 fi;
-
-AC_CACHE_CHECK(for .preinit_array/.init_array/.fini_array support,
-	       libc_cv_initfinit_array, [dnl
-cat > conftest.c <<EOF
-int _start (void) { return 0; }
-int __start (void) { return 0; }
-int foo (void) { return 1; }
-int (*fp) (void) __attribute__ ((section (".init_array"))) = foo;
-EOF
-if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS $LDFLAGS -o conftest conftest.c
-		   -static -nostartfiles -nostdlib 1>&AS_MESSAGE_LOG_FD])
-then
-  if readelf -S conftest | grep -e INIT_ARRAY > /dev/null; then
-    libc_cv_initfinit_array=yes
-  else
-    libc_cv_initfinit_array=no
-  fi
-else
-  libc_cv_initfinit_array=no
-fi
-rm -f conftest*])
-AC_SUBST(libc_cv_initfinit_array)
-if test $libc_cv_initfinit_array = yes; then
-  AC_DEFINE_UNQUOTED(HAVE_INITFINI_ARRAY)
-fi
-
-AC_CACHE_CHECK(for array aliasing support,
-	       libc_cv_array_aliasing, [dnl
-cat > conftest.c <<EOF
-char x[3] = { 'a', 'b', 'c' };
-extern char y[2] __attribute__((alias ("x+1")));
-EOF
-if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS -c conftest.c
-		   1>&AS_MESSAGE_LOG_FD])
-then
-  libc_cv_array_aliasing=yes
-else
-  libc_cv_array_aliasing=no
-fi
-rm -f conftest*])
-AC_SUBST(libc_cv_array_aliasing)
-if test $libc_cv_array_aliasing = yes; then
-  AC_DEFINE_UNQUOTED(_HAVE_ARRAY_ALIASING)
-fi
 
 AC_OUTPUT(Makefile,
 [if test -n "$CONFIG_FILES"; then

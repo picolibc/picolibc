@@ -1,4 +1,3 @@
-#include "newlib.h"
 #include "swi.h"
 
 /* ANSI concatenation macros.  */
@@ -11,37 +10,17 @@
 #error __USER_LABEL_PREFIX is not defined
 #endif
 
-#ifdef HAVE_INITFINI_ARRAY
-#define _init	__libc_init_array
-#define _fini	__libc_fini_array
-#endif
-
 /* .text is used instead of .section .text so it works with arm-aout too.  */
 	.text
-#if defined(__thumb2__)
-	.syntax unified
-	.thumb
-.macro FUNC_START name
-	.global \name
-	.thumb_func
-\name:
-.endm
-#else
 	.code 32
-.macro FUNC_START name
-	.global \name
-\name:
-.endm
-#endif
 	.align 	0
 
-	FUNC_START	_mainCRTStartup
-	FUNC_START	_start
-	FUNC_START	start
-#if defined(__ELF__) && !defined(__USING_SJLJ_EXCEPTIONS__)
-	/* Annotation for EABI unwinding tables.  */
-	.fnstart
-#endif
+	.global	_mainCRTStartup
+	.global	_start
+	.global	start
+start:
+_start:
+_mainCRTStartup:
 
 /* Start by setting up a stack */
 #ifdef ARM_RDP_MONITOR
@@ -56,12 +35,7 @@
 	/*  Issue Angel SWI to read stack info */
 	mov	r0, #AngelSWI_Reason_HeapInfo
 	adr	r1, .LC0	/*  point at ptr to 4 words to receive data */
-#if defined(__thumb2__)
-	bkpt	AngelSWI
-#else
-	/*  We are always in ARM mode for startup */
-	AngelSWIAsm	AngelSWI_ARM
-#endif
+	swi	AngelSWI_ARM	/*  We are always in ARM mode for startup */
 	ldr	r0, .LC0	/*  point at values read */
 	ldr	sp, [r0, #8]
 	ldr	sl, [r0, #12]
@@ -140,8 +114,8 @@
 	sub	a3, a3, a1		/* Third arg: length of block */
 	
 
-#if defined(__thumb__) && !defined(__thumb2__)
-	/* Enter Thumb mode.... */
+#ifdef __thumb__		/* Enter Thumb mode.... */
+
 	add	a4, pc, #1	/* Get the address of the Thumb block */
 	bx	a4		/* Go there and start Thumb decoding  */
 
@@ -181,7 +155,7 @@ __change_mode:
 #else
 	mov	r0, #AngelSWI_Reason_GetCmdLine
 	adr	r1, .LC30	/*  Space for command line */
-	AngelSWIAsm	AngelSWI
+	swi	AngelSWI
 	ldr	r1, .LC30
 #endif
 	/*  Parse string at r1 */
@@ -267,11 +241,6 @@ __change_mode:
 	add	r3, #4
 	b	.LC15
 .LC14:	
-	/* Ensure doubleword stack alignment.  */
-	mov	r4, sp
-	mov	r5, #7
-	bic	r4, r5
-	mov	sp, r4
 #else
 	add	r2, sp, r0, LSL #2	/* End of args */
 	mov	r3, sp			/* Start of args */
@@ -281,8 +250,6 @@ __change_mode:
 	strhi	r5, [r2, #-4]!
 	strhi	r4, [r3], #4
 	bhi	.LC13
-	/* Ensure doubleword stack alignment.  */
-	bic	sp, sp, #7
 #endif
 #endif
 
@@ -303,7 +270,7 @@ __change_mode:
 
 	bl	FUNCTION (exit)		/* Should not return.  */
 
-#if defined(__thumb__) && !defined(__thumb2__)
+#ifdef __thumb__
 	/* Come out of Thumb mode.  This code should be redundant.  */
 
 	mov	a4, pc
@@ -361,11 +328,6 @@ change_back:
 	.weak FUNCTION (software_init_hook)
 #endif
 	
-#endif
-#if defined(__ELF__) && !defined(__USING_SJLJ_EXCEPTIONS__)
-	/* Protect against unhandled exceptions.  */
-	.cantunwind
-	.fnend
 #endif
 .LC1:
 	.word	__bss_start__

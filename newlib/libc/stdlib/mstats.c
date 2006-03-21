@@ -10,7 +10,7 @@ int _dummy_mstats = 1;
 
 /*
 FUNCTION
-<<mallinfo>>, <<malloc_stats>>, <<mallopt>>---malloc support
+<<mallinfo>>, <<malloc_stats>>, <<mallopt>>--malloc support
 
 INDEX
 	mallinfo
@@ -140,7 +140,7 @@ _DEFUN (_mstats_r, (ptr, s),
 	struct _reent *ptr _AND
 	char *s)
 {
-  _REENT_SMALL_CHECK_INIT(ptr);
+  _REENT_SMALL_CHECK_INIT(_stderr_r (ptr));
   fiprintf (_stderr_r (ptr), "Memory allocation statistics %s\n", s);
   _malloc_stats_r (ptr);
 }

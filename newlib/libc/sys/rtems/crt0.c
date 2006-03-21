@@ -21,27 +21,10 @@ void *realloc() { return 0; }
 void free() { ; }
 void abort() { ; }
 int raise() { return -1; }
-
-#if defined(__GNUC__)
-/*
- * stubs for libstdc++ rtems-threads support functions from gcc/gthr-rtems.h
- */
-int rtems_gxx_once() { return -1; }
-int rtems_gxx_key_create() { return -1; }
-int rtems_gxx_key_delete() { return -1; }
-void *rtems_gxx_getspecific() { return 0; }
-int rtems_gxx_setspecific() { return -1; }
-
 void rtems_gxx_mutex_init() { }
 int rtems_gxx_mutex_lock() { return -1; }
-int rtems_gxx_mutex_trylock() { return -1; }
 int rtems_gxx_mutex_unlock() { return -1; }
-
-void rtems_gxx_recursive_mutex_init() { }
-int rtems_gxx_recursive_mutex_lock() { return -1; }
-int rtems_gxx_recursive_mutex_trylock() { return -1; }
-int rtems_gxx_recursive_mutex_unlock() { return -1; }
-#endif
+int rtems_gxx_once() { return -1; }
 
 /* stubs for functions from reent.h */
 int _close_r (struct _reent *r, int fd) { return -1; }
@@ -138,12 +121,4 @@ asm (".equ    V_FILL, 65" );
 
 asm (".equ    V_BSD_OS, 66" );
 asm (".equ    V_EPI_OS, 69" );
-#endif
-
-#if defined(__AVR__)
-/*
- * Initial stack pointer address "__stack"
- *  hard coded into GCC instead of providing it through ldscripts
- */
-const char* __stack ;
 #endif

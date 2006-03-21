@@ -21,6 +21,8 @@ DESCRIPTION
 	object pointed to by <[s1]> with the object pointed to by <[s2]>.
 
 	This function is identical to <<memcmp>>.
+	
+
 
 RETURNS
 	The function returns an integer greater than, equal to or

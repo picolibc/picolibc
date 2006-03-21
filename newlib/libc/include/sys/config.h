@@ -59,7 +59,7 @@
 /* in other words, go32 */
 #define _FLOAT_RET double
 #endif
-#if defined(__linux__) || defined(__RDOS__)
+#ifdef __linux__
 /* we want the reentrancy structure to be returned by a function */
 #define __DYNAMIC_REENT__
 #define HAVE_GETDATE
@@ -105,22 +105,6 @@
 #define __BUFSIZ__ 16
 #define _REENT_SMALL
 #endif
-#ifdef __m32c__
-#define __SMALL_BITFIELDS
-#undef INT_MAX
-#undef UINT_MAX
-#define INT_MAX __INT_MAX__
-#define UINT_MAX (__INT_MAX__ * 2U + 1)
-#define MALLOC_ALIGNMENT 8
-#if defined(__r8c_cpu__) || defined(__m16c_cpu__)
-#define _POINTER_INT short
-#else
-#define _POINTER_INT long
-#endif
-#define __BUFSIZ__ 16
-#define _REENT_SMALL
-#endif /* __m32c__ */
-
 
 /* This block should be kept in sync with GCC's limits.h.  The point
    of having these definitions here is to not include limits.h, which

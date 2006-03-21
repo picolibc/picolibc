@@ -77,7 +77,7 @@ SECTIONS
   .text :
   {
     CREATE_OBJECT_SYMBOLS
-    *(.text .text.*)
+    *(.text)
 
     . = ALIGN(0x4);
     /* These are for running static constructors and destructors under ELF.  */
@@ -90,7 +90,7 @@ SECTIONS
     KEEP (*(SORT(.dtors.*)))
     KEEP (*(.dtors))
 
-    *(.rodata .rodata.*)
+    *(.rodata)
 
     . = ALIGN(0x4);
     *(.gcc_except_table) 
@@ -118,9 +118,8 @@ SECTIONS
 
   .data :
   {
-    *(.got.plt) *(.got)
     *(.shdata)
-    *(.data .data.*)
+    *(.data)
     _edata = .;
   } > ram
 
@@ -129,7 +128,7 @@ SECTIONS
     . = ALIGN(0x4);
     __bss_start = . ;
     *(.shbss)
-    *(.bss .bss.*)
+    *(.bss)
     *(COMMON)
     _end =  ALIGN (0x8);
     __end = _end;

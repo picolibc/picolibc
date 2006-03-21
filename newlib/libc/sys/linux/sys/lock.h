@@ -1,6 +1,7 @@
 #ifndef __SYS_LOCK_H__
 #define __SYS_LOCK_H__
 
+#include <machine/weakalias.h>
 #include <features.h>
 
 #define  _LIBC  1

@@ -56,9 +56,6 @@ int	 _EXFUN(ffs,(int));
 char 	*_EXFUN(index,(const char *, int));
 _PTR	 _EXFUN(memccpy,(_PTR, const _PTR, int, size_t));
 _PTR	 _EXFUN(mempcpy,(_PTR, const _PTR, size_t));
-#ifdef __CYGWIN__
-extern void *memmem (__const void *, size_t,  __const void *, size_t);
-#endif
 char 	*_EXFUN(rindex,(const char *, int));
 int	 _EXFUN(strcasecmp,(const char *, const char *));
 char 	*_EXFUN(strdup,(const char *));
@@ -78,6 +75,8 @@ char	*_EXFUN(strupr,(char *));
 const char  *_EXFUN(strsignal, (int __signo));
 #endif
 int     _EXFUN(strtosigno, (const char *__name));
+#elif defined(__linux__)
+char	*_EXFUN(strsignal, (int __signo));
 #endif
 
 /* These function names are used on Windows and perhaps other systems.  */
@@ -95,8 +94,6 @@ int     _EXFUN(strtosigno, (const char *__name));
 #endif
 
 #endif /* ! __STRICT_ANSI__ */
-
-#include <sys/string.h>
 
 _END_STD_C
 
