@@ -1,5 +1,9 @@
 2006-03-21  Nathan Sidwell  <nathan@codesourcery.com>
 
+	* gas/config/tc-m68k.c (find_cf_chip): Merge into ...
+	(m68k_ip): ... here.  Use for all chips.  Protect against buffer
+	overrun and avoid excessive copying.
+
 	* gcc/config/tc-m68k.c (m68000_control_regs, m68010_control_regs,
 	m68020_control_regs, m68040_control_regs, m68060_control_regs,
 	mcf_control_regs, mcf5208_control_regs, mcf5213_control_regs,
