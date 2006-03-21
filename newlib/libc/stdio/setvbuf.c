@@ -104,9 +104,9 @@ _DEFUN(setvbuf, (fp, buf, mode, size),
 {
   int ret = 0;
 
-  CHECK_INIT (_REENT);
-
   _flockfile (fp);
+
+  CHECK_INIT (fp);
 
   /*
    * Verify arguments.  The `int' limit on `size' is due to this

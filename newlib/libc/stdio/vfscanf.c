@@ -37,8 +37,8 @@ ANSI_SYNOPSIS
                        va_list <[list]>);
 	int _vfscanf_r(struct _reent *<[reent]>, FILE *<[fp]>, const char *<[fmt]>, 
                        va_list <[list]>);
-	int _vsscanf_r(struct _reent *<[reent]>, const char *<[str]>,
-                       const char *<[fmt]>, va_list <[list]>);
+	int _vsscanf_r(struct _reent *<[reent]>, const char *<[str]>, const char *<[fmt]>, 
+                       va_list <[list]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -135,7 +135,6 @@ Supporting OS subroutines required:
 #endif
 
 #ifdef FLOATING_POINT
-#include <math.h>
 #include <float.h>
 
 /* Currently a test is made to see if long double processing is warranted.
@@ -231,7 +230,7 @@ _DEFUN(VFSCANF, (fp, fmt, ap),
        _CONST char *fmt _AND 
        va_list ap)
 {
-  CHECK_INIT(_REENT);
+  CHECK_INIT(fp);
   return __SVFSCANF_R (_REENT, fp, fmt, ap);
 }
 
@@ -253,7 +252,6 @@ _DEFUN(_VFSCANF_R, (data, fp, fmt, ap),
        _CONST char *fmt    _AND 
        va_list ap)
 {
-  CHECK_INIT(data);
   return __SVFSCANF_R (data, fp, fmt, ap);
 }
 
@@ -987,7 +985,6 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  long zeroes, exp_adjust;
 	  char *exp_start = NULL;
 	  unsigned width_left = 0;
-	  int nancount = 0;
 #ifdef hardway
 	  if (width == 0 || width > sizeof (buf) - 1)
 #else
@@ -1010,6 +1007,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	       */
 	      switch (c)
 		{
+
 		case '0':
 		  if (flags & NDIGITS)
 		    {
@@ -1032,42 +1030,14 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		case '7':
 		case '8':
 		case '9':
-		  if (nancount == 0)
-		    {
-		      flags &= ~(SIGNOK | NDIGITS);
-		      goto fok;
-		    }
-		  break;
+		  flags &= ~(SIGNOK | NDIGITS);
+		  goto fok;
 
 		case '+':
 		case '-':
 		  if (flags & SIGNOK)
 		    {
 		      flags &= ~SIGNOK;
-		      goto fok;
-		    }
-		  break;
-		case 'n':
-		case 'N':
-	          if (nancount == 0
-		      && (flags & (SIGNOK | NDIGITS | DPTOK | EXPOK)) ==
-		      	          (SIGNOK | NDIGITS | DPTOK | EXPOK))
-		    {
-		      flags &= ~(SIGNOK | DPTOK | EXPOK | NDIGITS);
-		      nancount = 1;
-		      goto fok;
-		    }
-		  else if (nancount == 2)
-		    {
-		      nancount = 3;
-		      goto fok;
-		    }
-		  break;
-		case 'a':
-		case 'A':
-		  if (nancount == 1)
-		    {
-		      nancount = 2;
 		      goto fok;
 		    }
 		  break;
@@ -1112,24 +1082,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	    }
 	  if (zeroes)
 	    flags &= ~NDIGITS;
-          /* We may have a 'N' or possibly even a 'Na' as the start of 'NaN', 
-	     only to run out of chars before it was complete (or having 
-	     encountered a non- matching char).  So check here if we have an 
-	     outstanding nancount, and if so put back the chars we did 
-	     swallow and treat as a failed match. */
-          if (nancount && nancount != 3)
-            {
-              /* Ok... what are we supposed to do in the event that the
-              __srefill call above was triggered in the middle of the partial
-              'NaN' and so we can't put it all back? */
-              while (nancount-- && (p > buf))
-                {
-                  ungetc (*(u_char *)--p, fp);
-                  --nread;
-                }
-              goto match_failure;
-            }
-          /*
+	  /*
 	   * If no digits, might be missing exponent digits
 	   * (just give back the exponent) or might be missing
 	   * regular digits, but had sign and/or decimal point.
@@ -1141,7 +1094,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		  /* no digits at all */
 		  while (p > buf)
                     {
-		      ungetc (*(u_char *)--p, fp);
+		      ungetc (*(u_char *)-- p, fp);
                       --nread;
                     }
 		  goto match_failure;
@@ -1210,10 +1163,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	      else
 		{
 		  flp = va_arg (ap, float *);
-		  if (isnan (res))
-		    *flp = nanf (NULL);
-		  else
-		    *flp = res;
+		  *flp = res;
 		}
 	      nassigned++;
 	    }

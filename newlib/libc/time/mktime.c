@@ -158,7 +158,6 @@ mktime (tim_p)
   time_t tim = 0;
   long days = 0;
   int year, isdst;
-  __tzinfo_type *tz = __gettzinfo ();
 
   /* validate structure */
   validate_structure (tim_p);
@@ -207,34 +206,27 @@ mktime (tim_p)
   if (_daylight)
     {
       int y = tim_p->tm_year + YEAR_BASE;
-      if (y == tz->__tzyear || __tzcalc_limits (y))
+      if (y == __tzyear || __tzcalc_limits (y))
 	{
 	  /* calculate start of dst in dst local time and 
 	     start of std in both std local time and dst local time */
-          time_t startdst_dst = tz->__tzrule[0].change
-	    - (time_t) tz->__tzrule[1].offset;
-	  time_t startstd_dst = tz->__tzrule[1].change
-	    - (time_t) tz->__tzrule[1].offset;
-	  time_t startstd_std = tz->__tzrule[1].change
-	    - (time_t) tz->__tzrule[0].offset;
+          time_t startdst_dst = __tzrule[0].change - __tzrule[1].offset;
+	  time_t startstd_dst = __tzrule[1].change - __tzrule[1].offset;
+	  time_t startstd_std = __tzrule[1].change - __tzrule[0].offset;
 	  /* if the time is in the overlap between dst and std local times */
 	  if (tim >= startstd_std && tim < startstd_dst)
 	    ; /* we let user decide or leave as -1 */
           else
 	    {
-	      isdst = (tz->__tznorth
+	      isdst = (__tznorth
 		       ? (tim >= startdst_dst && tim < startstd_std)
 		       : (tim >= startdst_dst || tim < startstd_std));
 	      /* if user committed and was wrong, perform correction */
 	      if ((isdst ^ tim_p->tm_isdst) == 1)
 		{
 		  /* we either subtract or add the difference between
-		     time zone offsets, depending on which way the user got it
-		     wrong. The diff is typically one hour, or 3600 seconds,
-		     and should fit in a 16-bit int, even though offset
-		     is a long to accomodate 12 hours. */
-		  int diff = (int) (tz->__tzrule[0].offset
-				    - tz->__tzrule[1].offset);
+		     time zone offsets, depending on which way the user got it wrong */
+		  int diff = __tzrule[0].offset - __tzrule[1].offset;
 		  if (!isdst)
 		    diff = -diff;
 		  tim_p->tm_sec += diff;
@@ -247,9 +239,9 @@ mktime (tim_p)
 
   /* add appropriate offset to put time in gmt format */
   if (isdst == 1)
-    tim += (time_t) tz->__tzrule[1].offset;
+    tim += __tzrule[1].offset;
   else /* otherwise assume std time */
-    tim += (time_t) tz->__tzrule[0].offset;
+    tim += __tzrule[0].offset;
 
   /* reset isdst flag to what we have calculated */
   tim_p->tm_isdst = isdst;

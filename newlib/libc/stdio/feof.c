@@ -46,9 +46,6 @@ No supporting OS subroutines are required.
 */
 
 #include <stdio.h>
-#include "local.h"
-
-/* A subroutine version of the macro feof.  */
 
 #undef feof
 
@@ -57,7 +54,6 @@ _DEFUN(feof, (fp),
        FILE * fp)
 {
   int result;
-  CHECK_INIT(_REENT);
   _flockfile (fp);
   result = __sfeof (fp);
   _funlockfile (fp);

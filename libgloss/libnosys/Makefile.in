@@ -44,15 +44,15 @@ SHELL =	/bin/sh
 CC = @CC@
 
 #AS = @AS@
-AS = `if [ -f ${objroot}/../gas/as-new ] ; \
-	then echo ${objroot}/../gas/as-new ; \
+AS = `if [ -f ${objroot}/../gas/as.new ] ; \
+	then echo ${objroot}/../gas/as.new ; \
 	else echo as ; fi`
 
 AR = @AR@
 
 #LD = @LD@
-LD = `if [ -f ${objroot}/../ld/ld-new ] ; \
-	then echo ${objroot}/../ld/ld-new ; \
+LD = `if [ -f ${objroot}/../ld/ld.new ] ; \
+	then echo ${objroot}/../ld/ld.new ; \
 	else echo ld ; fi`
 
 RANLIB = @RANLIB@
@@ -65,10 +65,9 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
 
 # object files needed
-OBJS = chown.o close.o environ.o errno.o execve.o fork.o fstat.o \
-	getpid.o gettod.o isatty.o kill.o link.o lseek.o open.o \
-	read.o readlink.o sbrk.o stat.o symlink.o times.o unlink.o \
-	wait.o write.o _exit.o
+OBJS = close.o environ.o errno.o execve.o fork.o fstat.o getpid.o gettod.o \
+	isatty.o kill.o link.o lseek.o open.o read.o sbrk.o stat.o \
+	times.o unlink.o wait.o write.o _exit.o
 
 # Object files specific to particular targets.
 EVALOBJS = ${OBJS}

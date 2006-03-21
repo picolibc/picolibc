@@ -82,7 +82,7 @@ int
 _DEFUN(_getchar_r, (f),
        struct _reent *f)
 {
-  _REENT_SMALL_CHECK_INIT (f);
+  _REENT_SMALL_CHECK_INIT (_stdin_r (f));
   return getc (_stdin_r (f));
 }
 

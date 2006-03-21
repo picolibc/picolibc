@@ -1095,7 +1095,7 @@ _dl_map_object_from_fd (const char *name, int fd, struct filebuf *fbp,
       }
     else
       /* Adjust the PT_PHDR value by the runtime load address.  */
-      l->l_phdr = (ElfW(Addr)) l->l_phdr + l->l_addr;
+      (ElfW(Addr)) l->l_phdr += l->l_addr;
   }
 
   /* We are done mapping in the file.  We no longer need the descriptor.  */
@@ -1115,7 +1115,7 @@ _dl_map_object_from_fd (const char *name, int fd, struct filebuf *fbp,
 	}
     }
   else
-    l->l_ld = (ElfW(Addr)) l->l_ld + l->l_addr;
+    (ElfW(Addr)) l->l_ld += l->l_addr;
 
   l->l_entry += l->l_addr;
 

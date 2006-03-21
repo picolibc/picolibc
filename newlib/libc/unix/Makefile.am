@@ -15,8 +15,6 @@ ELIX_2_OBJS = \
 	ttyname.$(oext)
 
 ELIX_4_OBJS = \
-	basename.$(oext)	\
-	dirname.$(oext)		\
 	getlogin.$(oext)	\
 	getpass.$(oext) 	\
 	getpwent.$(oext) 	\
@@ -31,7 +29,9 @@ else
 if ELIX_LEVEL_3
 LIB_OBJS = $(ELIX_2_OBJS)
 else
+if ELIX_LEVEL_4
 LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_4_OBJS)
+endif
 endif
 endif
 endif

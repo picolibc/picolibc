@@ -53,7 +53,9 @@ int     _EXFUN(fchown, (int __fildes, uid_t __owner, gid_t __group ));
 pid_t   _EXFUN(fork, (void ));
 long    _EXFUN(fpathconf, (int __fd, int __name ));
 int     _EXFUN(fsync, (int __fd));
+#ifndef __CYGWIN__
 int     _EXFUN(fdatasync, (int __fd));
+#endif
 char    _EXFUN(*getcwd, (char *__buf, size_t __size ));
 #if defined(__CYGWIN__)
 int	_EXFUN(getdomainname ,(char *__name, size_t __len));
@@ -73,9 +75,6 @@ int _EXFUN(getlogin_r, (char *name, size_t namesize) );
 #endif
 char 	_EXFUN(*getpass, (const char *__prompt));
 size_t  _EXFUN(getpagesize, (void));
-#if defined(__CYGWIN__)
-int    _EXFUN(getpeereid, (int, uid_t *, gid_t *));
-#endif
 pid_t   _EXFUN(getpgid, (pid_t));
 pid_t   _EXFUN(getpgrp, (void ));
 pid_t   _EXFUN(getpid, (void ));
@@ -211,9 +210,9 @@ void    _EXFUN(sync, (void));
 #else /* defined(__rtems__) */
 int     _EXFUN(sync, (void));
 #endif
-#endif
 int     _EXFUN(readlink, (const char *__path, char *__buf, int __buflen));
 int     _EXFUN(symlink, (const char *__name1, const char *__name2));
+#endif
 
 #define	F_OK	0
 #define	R_OK	4

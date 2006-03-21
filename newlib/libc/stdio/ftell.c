@@ -105,11 +105,11 @@ _DEFUN(_ftell_r, (ptr, fp),
 {
   _fpos_t pos;
 
+  _flockfile (fp);
+
   /* Ensure stdio is set up.  */
 
-  CHECK_INIT (ptr);
-
-  _flockfile (fp);
+  CHECK_INIT (fp);
 
   if (fp->_seek == NULL)
     {
@@ -143,7 +143,7 @@ _DEFUN(_ftell_r, (ptr, fp),
       if (HASUB (fp))
 	pos -= fp->_ur;
     }
-  else if ((fp->_flags & __SWR) && fp->_p != NULL)
+  else if (fp->_flags & __SWR && fp->_p != NULL)
     {
       /*
        * Writing.  Any buffered characters cause the

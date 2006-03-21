@@ -55,17 +55,20 @@ register char * stack_ptr asm ("sp");
 
 /* following is copied from libc/stdio/local.h to check std streams */
 extern void   _EXFUN(__sinit,(struct _reent *));
-#define CHECK_INIT(ptr) \
-  do						\
-    {						\
-      if ((ptr) && !(ptr)->__sdidinit)		\
-	__sinit (ptr);				\
-    }						\
+#define CHECK_INIT(fp) \
+  do                                    \
+    {                                   \
+      if ((fp)->_data == 0)             \
+        (fp)->_data = _REENT;           \
+      if (!(fp)->_data->__sdidinit)     \
+        __sinit ((fp)->_data);          \
+    }                                   \
   while (0)
 
 /* Adjust our internal handles to stay away from std* handles.  */
 #define FILE_HANDLE_OFFSET (0x20)
 
+static int std_files_checked;
 static int monitor_stdin;
 static int monitor_stdout;
 static int monitor_stderr;
@@ -98,7 +101,7 @@ static inline int
 do_AngelSWI (int reason, void * arg)
 {
   int value;
-  asm volatile ("mov r0, %1; mov r1, %2; " AngelSWIInsn " %a3; mov %0, r0"
+  asm volatile ("mov r0, %1; mov r1, %2; swi %a3; mov %0, r0"
        : "=r" (value) /* Outputs */
        : "r" (reason), "r" (arg), "i" (AngelSWI) /* Inputs */
        : "r0", "r1", "r2", "r3", "ip", "lr", "memory", "cc"
@@ -116,8 +119,13 @@ do_AngelSWI (int reason, void * arg)
 static int
 remap_handle (int fh)
 {
-  CHECK_INIT(_REENT);
-
+  if (!std_files_checked)
+    {
+       CHECK_INIT(stdin);
+       CHECK_INIT(stdout);
+       CHECK_INIT(stderr);
+       std_files_checked = 1;
+    }
   if (fh == STDIN_FILENO)
     return monitor_stdin;
   if (fh == STDOUT_FILENO)

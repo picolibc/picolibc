@@ -268,7 +268,6 @@ extern "C" {
 
 #include <stdio.h>    /* needed for malloc_stats */
 #include <limits.h>   /* needed for overflow checks */
-#include <errno.h>    /* needed to set errno to ENOMEM */
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -336,7 +335,6 @@ extern void __malloc_unlock();
 #define RDECL struct _reent *reent_ptr;
 #endif
 
-#define RERRNO reent_ptr->_errno
 #define RCALL reent_ptr,
 #define RONECALL reent_ptr
 
@@ -346,7 +344,6 @@ extern void __malloc_unlock();
 #define RARG
 #define RONEARG
 #define RDECL
-#define RERRNO errno
 #define RCALL
 #define RONECALL
 
@@ -490,10 +487,6 @@ extern void __malloc_unlock();
 
 #define HAVE_MEMCPY 
 
-/* Although the original macro is called USE_MEMCPY, newlib actually
-   uses memmove to handle cases whereby a platform's memcpy implementation
-   copies backwards and thus destructive overlap may occur in realloc
-   whereby we are reclaiming free memory prior to the old allocation.  */
 #ifndef USE_MEMCPY
 #ifdef HAVE_MEMCPY
 #define USE_MEMCPY 1
@@ -507,11 +500,9 @@ extern void __malloc_unlock();
 #if __STD_C
 void* memset(void*, int, size_t);
 void* memcpy(void*, const void*, size_t);
-void* memmove(void*, const void*, size_t);
 #else
 Void_t* memset();
 Void_t* memcpy();
-Void_t* memmove();
 #endif
 #endif
 
@@ -553,7 +544,7 @@ do {                                                                          \
                                      *mcdst++ = *mcsrc++;                     \
                                      *mcdst++ = *mcsrc++;                     \
                                      *mcdst   = *mcsrc  ;                     \
-  } else memmove(dest, src, mcsz);                                             \
+  } else memcpy(dest, src, mcsz);                                             \
 } while(0)
 
 #else /* !USE_MEMCPY */
@@ -2344,10 +2335,7 @@ Void_t* mALLOc(RARG bytes) RDECL size_t bytes;
 
   /* Check for overflow and just fail, if so. */
   if (nb > INT_MAX || nb < bytes)
-  {
-    RERRNO = ENOMEM;
     return 0;
-  }
 
   MALLOC_LOCK;
 
@@ -2810,10 +2798,7 @@ Void_t* rEALLOc(RARG oldmem, bytes) RDECL Void_t* oldmem; size_t bytes;
 
   /* Check for overflow and just fail, if so. */
   if (nb > INT_MAX || nb < bytes)
-  {
-    RERRNO = ENOMEM;
     return 0;
-  }
 
 #if HAVE_MMAP
   if (chunk_is_mmapped(oldp)) 
@@ -3046,10 +3031,7 @@ Void_t* mEMALIGn(RARG alignment, bytes) RDECL size_t alignment; size_t bytes;
 
   /* Check for overflow. */
   if (nb > INT_MAX || nb < bytes)
-  {
-    RERRNO = ENOMEM;
     return 0;
-  }
 
   m  = (char*)(mALLOc(RCALL nb + alignment + MINSIZE));
 
@@ -3502,7 +3484,7 @@ void malloc_stats(RONEARG) RDECL
   MALLOC_UNLOCK;
 
 #ifdef INTERNAL_NEWLIB
-  _REENT_SMALL_CHECK_INIT(reent_ptr);
+  _REENT_SMALL_CHECK_INIT(_stderr_r (reent_ptr));
   fp = _stderr_r(reent_ptr);
 #define fprintf fiprintf
 #else

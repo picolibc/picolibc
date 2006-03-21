@@ -5,11 +5,7 @@ COPYING, COPYING.LIB, README
 	http://gnu.org.
 
 Makefile.*; configure; configure.in; src-release
-	Any global maintainer can approve changes to these
-	files, but they should be aware	that they need to
-	be kept in sync with their counterparts in the GCC
-	repository.  Also please notify the following of
-	any committed patches:
+	Please notify the following of any committed patches.
 		binutils@sources.redhat.com
 		gdb-patches@sources.redhat.com
 
@@ -36,13 +32,17 @@ config.guess; config.sub; readline/support/config.{sub,guess}
 		binutils@sources.redhat.com
 		gdb-patches@sources.redhat.com
 
+dejagnu/
+	dejagnu: http://www.gnu.org/software/dejagnu/
+	Patches to bug-dejagnu@gnu.org
+
 depcomp
         Send bug reports and patches to bug-automake@gnu.org.
 
-gdb/; readline/; sim/; GDB's part of include/
-	GDB: http://www.gnu.org/software/gdb/
+gdb/; mmalloc/; readline/; sim/; GDB's part of include/ & dejagnu/
+	gdb: http://sources.redhat.com/gdb/
 	Patches to gdb-patches@sources.redhat.com.
-	See also gdb/MAINTAINERS and sim/MAINTAINERS.
+	See also gdb/MAINTAINERS, sim/MAINTAINERS, mmalloc/MAINTAINERS.
 
 include/
 	See binutils/, gdb/, sid/, gcc/, libiberty/ etc.
@@ -98,17 +98,9 @@ winsup/
 	General discussion cygwin@sources.redhat.com.
 	See also winsup/MAINTAINERS.
 
-config-ml.in; makefile.vms; mkdep; setup.com;
-etc/; intl/; utils/;
-	Any global maintainer can approve changes to these
-	files and directories.
-
-compile; depcomp; install-sh; missing; ylwrap;
-config/
-	Any global maintainer can approve changes to these
-	files and directories, but they should be aware
-	that they need to be kept in sync with their
-	counterparts in the GCC repository.
+config-ml.in; setup.com; missing; makefile.vms; utils/; config/;
+makefile.vms; missing; ylwrap; mkdep; etc/; install-sh; intl/
+	Ask DJ Delorie <dj@redhat.com> after reading the libiberty entry.
 
 modules file
 	Obviously changes to this file should not go through

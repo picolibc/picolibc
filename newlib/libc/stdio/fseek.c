@@ -129,11 +129,11 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
   struct stat st;
   int havepos;
 
+  _flockfile (fp);
+
   /* Make sure stdio is set up.  */
 
-  CHECK_INIT (ptr);
-
-  _flockfile (fp);
+  CHECK_INIT (fp);
 
   /* If we've been doing some writing, and we're in append mode
      then we don't really know where the filepos is.  */
@@ -359,13 +359,6 @@ dumb:
   fp->_r = 0;
   /* fp->_w = 0; *//* unnecessary (I think...) */
   fp->_flags &= ~__SEOF;
-  /* Reset no-optimization flag after successful seek.  The
-     no-optimization flag may be set in the case of a read
-     stream that is flushed which by POSIX/SUSv3 standards,
-     means that a corresponding seek must not optimize.  The
-     optimization is then allowed if no subsequent flush
-     is performed.  */
-  fp->_flags &= ~__SNPT;
   _funlockfile (fp);
   return 0;
 }

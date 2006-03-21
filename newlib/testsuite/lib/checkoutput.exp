@@ -9,19 +9,17 @@
 # It assumes one line of output per test.
 
 proc newlib_check_output { srcfile expectlist } {
-    global subdir srcdir tmpdir
+    global objdir subdir srcdir
 
     set srcfullname "$srcdir/$subdir/$srcfile"
-    set test_driver "$tmpdir/[file tail [file rootname $srcfullname].x]"
+    set test_driver "$objdir/testsuite/[file tail [file rootname $srcfullname].x]"
 
     set comp_output [newlib_target_compile "$srcfullname" "$test_driver" "executable" ""]
 
     if { $comp_output != "" } {
-	fail "$subdir/$srcfile compilation"
-	unresolved "$subdir/$srcfile output"
+	fail "Failed to compile $srcfile.\n"
 	return
     }
-    pass "$subdir/$srcfile compilation"
 
     set result [newlib_load $test_driver ""]
     set status [lindex $result 0]
@@ -32,12 +30,11 @@ proc newlib_check_output { srcfile expectlist } {
     foreach { expectedval } $expectlist {
 	set gotval [string trim [lindex $output_lines 0] "\r"]
 	if { ! [string match $expectedval $gotval] } {
-	    verbose -log "$subdir/$srcfile: Expected: $expectedval Got: $gotval "
-	    fail "$subdir/$srcfile output"
+	    fail "$srcfile: Expected: $expectedval Got: $gotval "
 	    return
 	}
 	set output_lines [lrange $output_lines 1 end]
     }
 
-    pass "$subdir/$srcfile output"
+    pass $srcfile
 }

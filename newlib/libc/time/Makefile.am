@@ -11,7 +11,6 @@ LIB_SOURCES = \
 	ctime.c		\
 	ctime_r.c	\
 	difftime.c	\
-	gettzinfo.c	\
 	gmtime.c	\
 	gmtime_r.c	\
 	lcltime.c	\
@@ -23,8 +22,7 @@ LIB_SOURCES = \
 	time.c		\
 	tzlock.c	\
 	tzset.c		\
-	tzset_r.c	\
-	tzvars.c
+	tzset_r.c
 
 libtime_la_LDFLAGS = -Xcompiler -nostdlib
 

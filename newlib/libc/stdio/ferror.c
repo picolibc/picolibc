@@ -55,7 +55,6 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 #include <_ansi.h>
 #include <stdio.h>
-#include "local.h"
 
 /* A subroutine version of the macro ferror.  */
 
@@ -66,7 +65,6 @@ _DEFUN(ferror, (fp),
        FILE * fp)
 {
   int result;
-  CHECK_INIT(_REENT);
   _flockfile (fp);
   result = __sferror (fp);
   _funlockfile (fp);

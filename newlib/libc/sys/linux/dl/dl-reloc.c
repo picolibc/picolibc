@@ -105,47 +105,50 @@ _dl_relocate_object (struct link_map *l, struct r_scope_elem *scope[],
   {
     /* Do the actual relocation of the object's GOT and other data.  */
 
+    /* String table object symbols.  */
+    const char *strtab = (const void *) D_PTR (l, l_info[DT_STRTAB]);
+
     /* This macro is used as a callback from the ELF_DYNAMIC_RELOCATE code.  */
-#define RESOLVE_MAP(ref, version, r_type, scope) \
+#define RESOLVE_MAP(ref, version, r_type) \
     (ELFW(ST_BIND) ((*ref)->st_info) != STB_LOCAL			      \
-     ? ((__builtin_expect ((*ref) == map->l_lookup_cache.sym, 0)	      \
-	 && elf_machine_type_class (r_type) == map->l_lookup_cache.type_class)\
+     ? ((__builtin_expect ((*ref) == l->l_lookup_cache.sym, 0)		      \
+	 && elf_machine_type_class (r_type) == l->l_lookup_cache.type_class)  \
 	? (++_dl_num_cache_relocations,					      \
-	   (*ref) = map->l_lookup_cache.ret,				      \
-	   map->l_lookup_cache.value)					      \
+	   (*ref) = l->l_lookup_cache.ret,				      \
+	   l->l_lookup_cache.value)					      \
 	: ({ lookup_t _lr;						      \
 	     int _tc = elf_machine_type_class (r_type);			      \
-	     map->l_lookup_cache.type_class = _tc;			      \
-	     map->l_lookup_cache.sym = (*ref);				      \
+	     l->l_lookup_cache.type_class = _tc;			      \
+	     l->l_lookup_cache.sym = (*ref);				      \
 	     _lr = ((version) != NULL && (version)->hash != 0		      \
 		    ? _dl_lookup_versioned_symbol (strtab + (*ref)->st_name,  \
-						   map, (ref), scope,	      \
+						   l, (ref), scope,	      \
 						   (version), _tc, 0)	      \
-		    : _dl_lookup_symbol (strtab + (*ref)->st_name, map, (ref),\
+		    : _dl_lookup_symbol (strtab + (*ref)->st_name, l, (ref),  \
 					 scope, _tc, 0));		      \
-	     map->l_lookup_cache.ret = (*ref);				      \
-	     map->l_lookup_cache.value = _lr; }))				      \
-     : map)
-#define RESOLVE(ref, version, r_type, scope) \
+	     l->l_lookup_cache.ret = (*ref);				      \
+	     l->l_lookup_cache.value = _lr; }))				      \
+     : l)
+#define RESOLVE(ref, version, r_type) \
     (ELFW(ST_BIND) ((*ref)->st_info) != STB_LOCAL			      \
-     ? ((__builtin_expect ((*ref) == map->l_lookup_cache.sym, 0)	      \
-	 && elf_machine_type_class (r_type) == map->l_lookup_cache.type_class)\
+     ? ((__builtin_expect ((*ref) == l->l_lookup_cache.sym, 0)		      \
+	 && elf_machine_type_class (r_type) == l->l_lookup_cache.type_class)  \
 	? (++_dl_num_cache_relocations,					      \
-	   (*ref) = map->l_lookup_cache.ret,				      \
-	   map->l_lookup_cache.value)					      \
+	   (*ref) = l->l_lookup_cache.ret,				      \
+	   l->l_lookup_cache.value)					      \
 	: ({ lookup_t _lr;						      \
 	     int _tc = elf_machine_type_class (r_type);			      \
-	     map->l_lookup_cache.type_class = _tc;			      \
-	     map->l_lookup_cache.sym = (*ref);				      \
+	     l->l_lookup_cache.type_class = _tc;			      \
+	     l->l_lookup_cache.sym = (*ref);				      \
 	     _lr = ((version) != NULL && (version)->hash != 0		      \
 		    ? _dl_lookup_versioned_symbol (strtab + (*ref)->st_name,  \
-						   map, (ref), scope,	      \
+						   l, (ref), scope,	      \
 						   (version), _tc, 0)	      \
-		    : _dl_lookup_symbol (strtab + (*ref)->st_name, map, (ref),\
+		    : _dl_lookup_symbol (strtab + (*ref)->st_name, l, (ref),  \
 					 scope, _tc, 0));		      \
-	     map->l_lookup_cache.ret = (*ref);				      \
-	     map->l_lookup_cache.value = _lr; }))			      \
-     : map->l_addr)
+	     l->l_lookup_cache.ret = (*ref);				      \
+	     l->l_lookup_cache.value = _lr; }))				      \
+     : l->l_addr)
 
 #include "dynamic-link.h"
 
@@ -194,7 +197,6 @@ _dl_relocate_object (struct link_map *l, struct r_scope_elem *scope[],
     }
 }
 
-#include <machine/dl-machine.h>
 
 void
 internal_function
