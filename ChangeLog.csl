@@ -1,5 +1,8 @@
 2006-03-20  Mark Mitchell  <mark@codesourcery.com>
 
+	* libiberty/pex-common.c (pex_run): Close the write end of the
+	pipe after starting the child.
+
 	* gdb/config/arm/armv7m.mt (TDEPFILES): Add prologue-value.o.
 
 2006-03-21  Paul Brook  <paul@codesourcery.com>
