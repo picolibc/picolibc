@@ -37,9 +37,9 @@ extern "C" {
 #define	O_CREAT		_FCREAT
 #define	O_TRUNC		_FTRUNC
 #define	O_EXCL		_FEXCL
-#define O_SYNC		_FSYNC
+/*	O_SYNC		_FSYNC		not posix, defined below */
 /*	O_NDELAY	_FNDELAY 	set in include/fcntl.h */
-/*	O_NDELAY	_FNBIO 		set in include/fcntl.h */
+/*	O_NDELAY	_FNBIO 		set in 5include/fcntl.h */
 #define	O_NONBLOCK	_FNONBLOCK
 #define	O_NOCTTY	_FNOCTTY
 /* For machines which care - */
@@ -67,6 +67,8 @@ extern "C" {
 #endif
 
 #ifndef	_POSIX_SOURCE
+
+#define	O_SYNC		_FSYNC
 
 /*
  * Flags that work for fcntl(fd, F_SETFL, FXXXX)

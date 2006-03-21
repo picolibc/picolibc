@@ -23,8 +23,7 @@ LIB_SOURCES = \
 	time.c		\
 	tzlock.c	\
 	tzset.c		\
-	tzset_r.c	\
-	tzvars.c
+	tzset_r.c
 
 libtime_la_LDFLAGS = -Xcompiler -nostdlib
 

@@ -32,21 +32,19 @@ proc newlib_pass_fail_all { flag exclude_list } {
 # compiles and runs.
 
 proc newlib_pass_fail { srcfile } {
-    global srcdir tmpdir subdir
+    global srcdir objdir subdir
 
     set fullsrcfile "$srcdir/$subdir/$srcfile"
 
-    set test_driver "$tmpdir/[file rootname $srcfile].x"
+    set test_driver "$objdir/testsuite/[file rootname $srcfile].x"
 
     set comp_output [newlib_target_compile "$fullsrcfile" "$test_driver" "executable" ""]
 
     if { $comp_output != "" } {
-	fail "$subdir/$srcfile compilation"
-	unresolved "$subdir/$srcfile execution"
+	fail "Failed to compile $fullsrcfile.\n"
     } else {
-	pass "$subdir/$srcfile compilation"
 	set result [newlib_load $test_driver ""]
 	set status [lindex $result 0]
-	$status "$subdir/$srcfile execution"
+	$status "$fullsrcfile"
     }
 }

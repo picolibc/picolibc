@@ -14,8 +14,8 @@ extern "C" {
 
 #ifndef _WINSOCK_H
 struct timeval {
-  time_t      tv_sec;
-  suseconds_t tv_usec;
+  long tv_sec;
+  long tv_usec;
 };
 
 struct timezone {
@@ -24,7 +24,7 @@ struct timezone {
 };
 
 #ifdef __CYGWIN__
-#include <cygwin/sys_time.h>
+#include <sys/select.h>
 #endif /* __CYGWIN__ */
 
 #endif /* _WINSOCK_H */

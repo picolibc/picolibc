@@ -23,7 +23,6 @@ RETURNS
 
 PORTABILITY
 <<wcsspn>> is ISO/IEC 9899/AMD1:1995 (ISO C).
-
 No supporting OS subroutines are required.
 */
 
@@ -76,7 +75,6 @@ _DEFUN (wcsspn, (s, set),
 	{
 	  if (*p == *q)
 	    break;
-	  q++;
 	}
       if (!*q)
 	goto done;

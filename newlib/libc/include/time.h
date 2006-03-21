@@ -123,6 +123,20 @@ extern __IMPORT char *_tzname[2];
 #ifndef tzname
 #define tzname _tzname
 #endif
+
+/* CYGWIN also exposes daylight and timezone in the name space */
+#ifdef __CYGWIN__
+#ifndef daylight
+#define daylight _daylight
+#endif
+#ifdef timezonevar
+#ifndef timezone
+#define timezone _timezone
+#endif
+#else
+char *_EXFUN(timezone, (void));
+#endif
+#endif /* __CYGWIN__ */
 #endif /* !__STRICT_ANSI__ */
 
 #ifdef __cplusplus
@@ -130,10 +144,6 @@ extern __IMPORT char *_tzname[2];
 #endif
 
 #include <sys/features.h>
-
-#ifdef __CYGWIN__
-#include <cygwin/time.h>
-#endif /*__CYGWIN__*/
 
 #if defined(_POSIX_TIMERS)
 
@@ -173,6 +183,16 @@ int _EXFUN(nanosleep, (const struct timespec  *rqtp, struct timespec *rmtp));
 #ifdef __cplusplus
 }
 #endif
+#else
+#ifdef __CYGWIN__
+#ifdef __cplusplus
+extern "C" {
+#endif
+int _EXFUN(nanosleep, (const struct timespec  *rqtp, struct timespec *rmtp));
+#ifdef __cplusplus
+}
+#endif
+#endif /* __CYGWIN__ */
 #endif /* _POSIX_TIMERS */
 
 #ifdef __cplusplus
@@ -203,6 +223,10 @@ extern "C" {
    associated with a time.  */
 
 #define TIMER_ABSTIME	4
+#ifdef __CYGWIN__
+# define TIMER_RELTIME	0	/* For compatibility with HP/UX, Solaris,
+				   others? */
+#endif
 
 /* Manifest Constants, P1003.4b/D8, p. 55 */
 

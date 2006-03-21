@@ -1,6 +1,6 @@
 /*
 FUNCTION
-	<<iswalnum>>---alphanumeric wide character test
+	<<iswalnum>>---alpha-numeric wide-character test
 
 INDEX
 	iswalnum
@@ -16,10 +16,10 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 <<iswalnum>> is a function which classifies wide-character values that
-are alphanumeric.
+are alpha-numeric.
 
 RETURNS
-<<iswalnum>> returns non-zero if <[c]> is a alphanumeric wide character.
+<<iswalnum>> returns non-zero if <[c]> is a alpha-numeric wide-character.
 
 PORTABILITY
 <<iswalnum>> is C99.

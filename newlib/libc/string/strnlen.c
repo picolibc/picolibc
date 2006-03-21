@@ -25,7 +25,7 @@ RETURNS
 	<<strnlen>> returns the character count or <[n]>.
 
 PORTABILITY
-<<strnlen>> is a GNU extension.
+<<strnlen>> is a Gnu extension.
 
 <<strnlen>> requires no supporting OS subroutines.
 
@@ -42,7 +42,7 @@ _DEFUN (strnlen, (str, n),
 {
   _CONST char *start = str;
 
-  while (n-- > 0 && *str)
+  while (*str && n-- > 0)
     str++;
 
   return str - start;

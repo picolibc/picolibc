@@ -38,7 +38,7 @@ SECTIONS
     PROVIDE (eprol  =  .);
     *(.text)
     *(.text.*)
-    *(.gnu.linkonce.t.*)
+    *(.gnu.linkonce.t*)
     *(.mips16.fn.*)
     *(.mips16.call.*)
   }
@@ -97,13 +97,13 @@ SECTIONS
     *(.rdata)
     *(.rodata)
     *(.rodata.*)
-    *(.gnu.linkonce.r.*)
+    *(.gnu.linkonce.r*)
   }
    _fdata = ALIGN(16);
   .data : {
     *(.data)
     *(.data.*)
-    *(.gnu.linkonce.d.*)
+    *(.gnu.linkonce.d*)
   }
   . = ALIGN(8);
   _gp = . + 0x8000;
@@ -117,7 +117,7 @@ SECTIONS
   .sdata : {
     *(.sdata)
     *(.sdata.*)
-    *(.gnu.linkonce.s.*)
+    *(.gnu.linkonce.s*)
   }
   . = ALIGN(4);
   PROVIDE (edata  =  .);
@@ -125,15 +125,11 @@ SECTIONS
   _fbss = .;
   .sbss : {
     *(.sbss)
-    *(.sbss.*)
-    *(.gnu.linkonce.sb.*)
     *(.scommon)
   }
   .bss : {
     _bss_start = . ;
     *(.bss)
-    *(.bss.*)
-    *(.gnu.linkonce.b.*)
     *(COMMON)
   }
 
@@ -164,7 +160,6 @@ SECTIONS
   .debug_str      0 : { *(.debug_str) }
   .debug_loc      0 : { *(.debug_loc) }
   .debug_macinfo  0 : { *(.debug_macinfo) }
-  .debug_ranges   0 : { *(.debug_ranges) }
 
   /* SGI/MIPS DWARF 2 extensions */
   .debug_weaknames 0 : { *(.debug_weaknames) }

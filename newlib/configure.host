@@ -42,8 +42,6 @@
 #   oext                object file extension - needed for libtool support
 #   crt1                name of crt1 object if one is provided
 #   crt1_dir            directory where crt1 object is found
-#   have_crt0		"yes"/"no" if crt0 is/isn't provided.
-#			"" if crt0 is provided when sys_dir is set
 
 newlib_cflags=
 libm_machine_dir=
@@ -57,7 +55,6 @@ unix_dir=
 mach_add_setjmp=
 crt1=
 crt1_dir=
-have_crt0=
 use_libtool=no
 have_sys_mach_dir=no
 default_newlib_io_long_long=no
@@ -70,7 +67,7 @@ case "${target_optspace}:${host}" in
   yes:*)
     newlib_cflags="${newlib_cflags} -Os"
     ;;
-  :m32r-* | :d10v-* | :d30v-* | :avr-* | :m32c-* )
+  :m32r-* | :d10v-* | :d30v-* | :avr-*)
     newlib_cflags="${newlib_cflags} -Os"
     ;;
   no:* | :*)
@@ -148,11 +145,6 @@ case "${host_cpu}" in
   iq2000)
 	machine_dir=iq2000
 	;;
-  m32c)
-	machine_dir=m32c
-	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -DABORT_PROVIDED -DSMALL_MEMORY"
-	;;
-
   m32r*)
 	machine_dir=m32r
 	;;
@@ -186,12 +178,8 @@ case "${host_cpu}" in
 	machine_dir=mn10200
 	;;
   mn10300)
-	default_newlib_io_long_long="yes"
 	machine_dir=mn10300
 	;;
-  mt*)
-        machine_dir=mt
-        ;;
   or16)
 	;;
   or32)
@@ -321,9 +309,8 @@ case "${host}" in
 	sys_dir=arc
 	;;
   arm-*-*)
-	sys_dir=arm
-	if [ "x${newlib_may_supply_syscalls}" = "xno" ] ; then
-	  have_crt0="no"
+	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
+	  sys_dir=arm
 	fi
 	;;
   crx*)
@@ -336,9 +323,8 @@ case "${host}" in
 	sys_dir=
 	;;
   ep9312-*-*)
-	sys_dir=arm
-	if [ "x${newlib_may_supply_syscalls}" = "xno" ] ; then
-	  have_crt0="no"
+	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
+	  sys_dir=arm
 	fi
 	;;
   frv*)
@@ -361,10 +347,6 @@ case "${host}" in
 	;;
   h8500-*-elf*)
 	sys_dir=h8500hms
-	;;
-  i[34567]86-*-rdos*)
-	sys_dir=rdos
-	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES"
 	;;
   i[34567]86-*-sco*)
 	sys_dir=sysvi386
@@ -422,15 +404,13 @@ case "${host}" in
 	unix_dir=unix
 	;;
   strongarm-*-*)
-	sys_dir=arm
-	if [ "x${newlib_may_supply_syscalls}" = "xno" ] ; then
-	  have_crt0="no"
+	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
+	  sys_dir=arm
 	fi
 	;;
   thumb-*-*)
-	sys_dir=arm
-	if [ "x${newlib_may_supply_syscalls}" = "xno" ] ; then
-	  have_crt0="no"
+	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
+	  sys_dir=arm
 	fi
 	;;
   tic80*)
@@ -455,9 +435,8 @@ case "${host}" in
 	sys_dir=w65
 	;;
   xscale-*-*)
-	sys_dir=arm
-	if [ "x${newlib_may_supply_syscalls}" = "xno" ] ; then
-	  have_crt0="no"
+	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
+	  sys_dir=arm
 	fi
 	;;
   z8k-*-coff)
@@ -736,8 +715,4 @@ if [ "x${newlib_io_pos_args}" = "x" ]; then
 	if [ ${default_newlib_io_pos_args} = "yes" ]; then
 		newlib_io_pos_args="yes";
 	fi
-fi
-
-if test -z "${have_crt0}" && test -n "${sys_dir}"; then
-  have_crt0="yes"
 fi

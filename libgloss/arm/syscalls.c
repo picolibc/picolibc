@@ -7,7 +7,6 @@
 #include <sys/stat.h>
 #include <sys/fcntl.h>
 #include <stdio.h>
-#include <string.h>
 #include <time.h>
 #include <sys/time.h>
 #include <sys/times.h>
@@ -19,10 +18,11 @@
 /* Forward prototypes.  */
 int     _system     _PARAMS ((const char *));
 int     _rename     _PARAMS ((const char *, const char *));
-int     _isatty		_PARAMS ((int));
+int     isatty		_PARAMS ((int));
 clock_t _times		_PARAMS ((struct tms *));
 int     _gettimeofday	_PARAMS ((struct timeval *, struct timezone *));
-int     _unlink		_PARAMS ((const char *));
+void    _raise 		_PARAMS ((void));
+int     _unlink		_PARAMS ((void));
 int     _link 		_PARAMS ((void));
 int     _stat 		_PARAMS ((const char *, struct stat *));
 int     _fstat 		_PARAMS ((int, struct stat *));
@@ -31,7 +31,6 @@ int     _getpid		_PARAMS ((int));
 int     _kill		_PARAMS ((int, int));
 void    _exit		_PARAMS ((int));
 int     _close		_PARAMS ((int));
-clock_t _clock		_PARAMS ((void));
 int     _swiclose	_PARAMS ((int));
 int     _open		_PARAMS ((const char *, int, ...));
 int     _swiopen	_PARAMS ((const char *, int));
@@ -99,7 +98,7 @@ static inline int
 do_AngelSWI (int reason, void * arg)
 {
   int value;
-  asm volatile ("mov r0, %1; mov r1, %2; " AngelSWIInsn " %a3; mov %0, r0"
+  asm volatile ("mov r0, %1; mov r1, %2; swi %a3; mov %0, r0"
        : "=r" (value) /* Outputs */
        : "r" (reason), "r" (arg), "i" (AngelSWI) /* Inputs */
        : "r0", "r1", "r2", "r3", "ip", "lr", "memory", "cc"
@@ -134,16 +133,6 @@ initialise_monitor_handles (void)
 {
   int i;
   
-  /* Open the standard file descriptors by opening the special
-   * teletype device, ":tt", read-only to obtain a descritpor for
-   * standard input and write-only to obtain a descriptor for standard
-   * output. Finally, open ":tt" in append mode to obtain a descriptor
-   * for standard error. Since this is a write mode, most kernels will
-   * probably return the same value as for standard output, but the
-   * kernel can differentiate the two using the mode flag and return a
-   * different descriptor for standard error.
-   */
-
 #ifdef ARM_RDI_MONITOR
   int volatile block[3];
   
@@ -155,12 +144,7 @@ initialise_monitor_handles (void)
   block[0] = (int) ":tt";
   block[2] = 3;     /* length of filename */
   block[1] = 4;     /* mode "w" */
-  monitor_stdout = do_AngelSWI (AngelSWI_Reason_Open, (void *) block);
-
-  block[0] = (int) ":tt";
-  block[2] = 3;     /* length of filename */
-  block[1] = 8;     /* mode "a" */
-  monitor_stderr = do_AngelSWI (AngelSWI_Reason_Open, (void *) block);
+  monitor_stdout = monitor_stderr = do_AngelSWI (AngelSWI_Reason_Open, (void *) block);
 #else
   int fh;
   const char * name;
@@ -177,14 +161,7 @@ initialise_monitor_handles (void)
        : "=r"(fh)
        : "i" (SWI_Open),"r"(name)
        : "r0","r1");
-  monitor_stdout = fh;
-
-  name = ":tt";
-  asm ("mov r0,%2; mov r1, #8; swi %a1; mov %0, r0"
-       : "=r"(fh)
-       : "i" (SWI_Open),"r"(name)
-       : "r0","r1");
-  monitor_stderr = fh;
+  monitor_stdout = monitor_stderr = fh;
 #endif
 
   for (i = 0; i < MAX_OPEN_FILES; i ++)
@@ -194,8 +171,6 @@ initialise_monitor_handles (void)
   openfiles[0].pos = 0;
   openfiles[1].handle = monitor_stdout;
   openfiles[1].pos = 0;
-  openfiles[2].handle = monitor_stderr;
-  openfiles[2].pos = 0;
 }
 
 static int
@@ -205,7 +180,7 @@ get_errno (void)
   return do_AngelSWI (AngelSWI_Reason_Errno, NULL);
 #else
   register r0 asm("r0");
-  asm ("swi %a1" : "=r"(r0) : "i" (SWI_GetErrno));
+  asm ("swi %a1" : "=3Dr"(r0) : "i" (SWI_GetErrno));
   return r0;
 #endif
 }
@@ -370,6 +345,8 @@ _write (int    file,
   return len - x;
 }
 
+extern int strlen (const char *);
+
 int
 _swiopen (const char * path,
 	  int          flags)
@@ -458,31 +435,33 @@ _close (int file)
   return wrap (_swiclose (file));
 }
 
-int
-_kill (int pid, int sig)
+void
+_exit (int n)
 {
-  (void)pid; (void)sig;
+  /* FIXME: return code is thrown away.  */
+  
 #ifdef ARM_RDI_MONITOR
-  /* Note: Both arguments are thrown away.  */
+  do_AngelSWI (AngelSWI_Reason_ReportException,
+	      (void *) ADP_Stopped_ApplicationExit);
+#else
+  asm ("swi %a0" :: "i" (SWI_Exit));
+#endif
+  n = n;
+}
+
+int
+_kill (int n, int m)
+{
+#ifdef ARM_RDI_MONITOR
   return do_AngelSWI (AngelSWI_Reason_ReportException,
 		      (void *) ADP_Stopped_ApplicationExit);
 #else
   asm ("swi %a0" :: "i" (SWI_Exit));
 #endif
+  n = n; m = m;
 }
 
-void
-_exit (int status)
-{
-  /* There is only one SWI for both _exit and _kill. For _exit, call
-     the SWI with the second argument set to -1, an invalid value for
-     signum, so that the SWI handler can distinguish the two calls.
-     Note: The RDI implementation of _kill throws away both its
-     arguments.  */
-  _kill(status, -1);
-}
-
-int __attribute__((weak))
+int
 _getpid (int n)
 {
   return 1;
@@ -522,7 +501,9 @@ _sbrk (int incr)
   return (caddr_t) prev_heap_end;
 }
 
-int __attribute__((weak))
+extern void memset (struct stat *, int, unsigned int);
+
+int
 _fstat (int file, struct stat * st)
 {
   memset (st, 0, sizeof (* st));
@@ -532,8 +513,7 @@ _fstat (int file, struct stat * st)
   file = file;
 }
 
-int __attribute__((weak))
-_stat (const char *fname, struct stat *st)
+int _stat (const char *fname, struct stat *st)
 {
   int file;
 
@@ -549,22 +529,22 @@ _stat (const char *fname, struct stat *st)
   return 0;
 }
 
-int __attribute__((weak))
+int
 _link (void)
 {
-  errno = ENOSYS;
   return -1;
 }
 
 int
-_unlink (const char *path)
+_unlink (void)
 {
-#ifdef ARM_RDI_MONITOR
-  return do_AngelSWI (AngelSWI_Reason_Remove, &path);
-#else
-  (void)path;
-  asm ("swi %a0" :: "i" (SWI_Remove));
-#endif
+  return -1;
+}
+
+void
+_raise (void)
+{
+  return;
 }
 
 int
@@ -598,7 +578,7 @@ _gettimeofday (struct timeval * tp, struct timezone * tzp)
 
 /* Return a clock that ticks at 100Hz.  */
 clock_t 
-_clock (void)
+_times (struct tms * tp)
 {
   clock_t timeval;
 
@@ -607,14 +587,6 @@ _clock (void)
 #else
   asm ("swi %a1; mov %0, r0" : "=r" (timeval): "i" (SWI_Clock) : "r0");
 #endif
-  return timeval;
-}
-
-/* Return a clock that ticks at 100Hz.  */
-clock_t
-_times (struct tms * tp)
-{
-  clock_t timeval = _clock();
 
   if (tp)
     {
@@ -629,35 +601,24 @@ _times (struct tms * tp)
 
 
 int
-_isatty (int fd)
+isatty (int fd)
 {
-#ifdef ARM_RDI_MONITOR
-  return do_AngelSWI (AngelSWI_Reason_IsTTY, &fd);
-#else
-  (void)fd;
-  asm ("swi %a0" :: "i" (SWI_IsTTY));
-#endif
+  return 1;
+  fd = fd;
 }
 
 int
 _system (const char *s)
 {
-#ifdef ARM_RDI_MONITOR
-  return do_AngelSWI (AngelSWI_Reason_System, &s);
-#else
-  (void)s;
-  asm ("swi %a0" :: "i" (SWI_CLI));
-#endif
+  if (s == NULL)
+    return 0;
+  errno = ENOSYS;
+  return -1;
 }
 
 int
 _rename (const char * oldpath, const char * newpath)
 {
-#ifdef ARM_RDI_MONITOR
-  const char *block[2] = {oldpath, newpath};
-  return do_AngelSWI (AngelSWI_Reason_Rename, block);
-#else
-  (void)oldpath; (void)newpath;
-  asm ("swi %a0" :: "i" (SWI_Rename));
-#endif
+  errno = ENOSYS;
+  return -1;
 }

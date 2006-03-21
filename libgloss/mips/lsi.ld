@@ -38,7 +38,7 @@ SECTIONS
      eprol  =  .;
     *(.text)
     *(.text.*)
-    *(.gnu.linkonce.t.*)
+    *(.gnu.linkonce.t*)
     PROVIDE (__runtime_reloc_start = .);
     *(.rel.sdata)
     PROVIDE (__runtime_reloc_stop = .);
@@ -88,13 +88,13 @@ SECTIONS
     *(.rdata)
     *(.rodata)
     *(.rodata.*)
-    *(.gnu.linkonce.r.*)
+    *(.gnu.linkonce.r*)
   }
    _fdata = ALIGN(16);
   .data : {
     *(.data)
     *(.data.*)
-    *(.gnu.linkonce.d.*)
+    *(.gnu.linkonce.d*)
     CONSTRUCTORS
   }
   . = ALIGN(8);
@@ -109,22 +109,18 @@ SECTIONS
   .sdata : {
     *(.sdata)
     *(.sdata.*)
-    *(.gnu.linkonce.s.*)
+    *(.gnu.linkonce.s*)
   }
    edata  =  .;
    _edata  =  .;
    _fbss = .;
   .sbss : {
     *(.sbss)
-    *(.sbss.*)
-    *(.gnu.linkonce.sb.*)
     *(.scommon)
   }
   .bss : {
     _bss_start = . ;
     *(.bss)
-    *(.bss.*)
-    *(.gnu.linkonce.b.*)
     *(COMMON)
   }
    end = .;
