@@ -1,3 +1,10 @@
+2006-03-22  Mark Mitchell  <mark@codesourcery.com>
+
+	* configure.host: Allow hosts to set the default
+	newlib_atexit_dynamic_alloc value.
+	* configure.in: Likewise.
+	* configure: Regenerated.
+
 2006-03-20  Mark Mitchell  <mark@codesourcery.com>
 
 	* acconfig.h (_ATEXIT_DYNAMIC_ALLOC): Undef.

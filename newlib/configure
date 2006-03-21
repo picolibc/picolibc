@@ -705,7 +705,7 @@ if test "${enable_newlib_atexit_dynamic_alloc+set}" = set; then
   esac
  fi
 else
-  newlib_atexit_dynamic_alloc=yes
+  newlib_atexit_dynamic_alloc=${newlib_atexit_dynamic_alloc}
 fi
 
 am__api_version="1.4"
