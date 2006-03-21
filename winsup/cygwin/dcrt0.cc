@@ -702,6 +702,8 @@ dll_crt0_0 ()
   init_global_security ();
   initial_env ();
 
+  SetErrorMode (SEM_FAILCRITICALERRORS);
+
   /* Initialize signal processing here, early, in the hopes that the creation
      of a thread early in the process will cause more predictability in memory
      layout for the main thread. */
@@ -727,7 +729,6 @@ dll_crt0_0 ()
   if (wincap.has_security ())
     OpenProcessToken (hMainProc, MAXIMUM_ALLOWED, &hProcToken);
 
-  SetErrorMode (SEM_FAILCRITICALERRORS);
   device::init ();
   do_global_ctors (&__CTOR_LIST__, 1);
   cygthread::init ();

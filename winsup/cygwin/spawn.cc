@@ -445,6 +445,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   bool null_app_name = false;
   STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
   int looped = 0;
+  HANDLE orig_wr_proc_pipe = NULL;
 
   myfault efault;
   if (efault.faulted ())
@@ -795,11 +796,11 @@ loop:
 	  if (!looped)
 	    {
 	      myself->sync_proc_pipe ();	/* Make sure that we own wr_proc_pipe
-					       just in case we've been previously
-					       execed. */
+						   just in case we've been previously
+						   execed. */
 	      myself.zap_cwd ();
 	    }
-	  myself->dup_proc_pipe (pi.hProcess);
+	  orig_wr_proc_pipe = myself->dup_proc_pipe (pi.hProcess);
 	}
       pid = myself->pid;
     }
@@ -858,6 +859,11 @@ loop:
       myself.hProcess = pi.hProcess;
       if (!synced)
 	{
+	  if (orig_wr_proc_pipe)
+	    {
+	      myself->wr_proc_pipe_owner = GetCurrentProcessId ();
+	      myself->wr_proc_pipe = orig_wr_proc_pipe;
+	    }
 	  if (ch.proc_retry (pi.hProcess) == 0)
 	    {
 	      looped++;

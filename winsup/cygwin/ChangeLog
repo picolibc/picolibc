@@ -1,5 +1,14 @@
 2006-03-20  Christopher Faylor  <cgf@timesys.com>
 
+	* dcrt0.cc (dll_crt0_0): Call SetErrorMode earlier.
+	* pinfo.cc (_pinfo::dup_proc_pipe): Reset wr_proc_pipe on failure.
+	Return previous pipe handle.
+	* pinfo.h (_pinfo::dup_proc_pipe): Reflect change to return value.
+	* spawn.cc (spawn_guts): Restore previous proc pipe on retry or if
+	process exits before synchronization.
+
+2006-03-20  Christopher Faylor  <cgf@timesys.com>
+
 	* child_info.h (child_status): New enum.
 	(child_info::flag): Rename from 'straced'.
 	(child_info::isstraced): New function.

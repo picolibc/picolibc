@@ -925,7 +925,7 @@ proc_waiter (void *arg)
   return 0;
 }
 
-bool
+HANDLE
 _pinfo::dup_proc_pipe (HANDLE hProcess)
 {
   DWORD flags = DUPLICATE_SAME_ACCESS;
@@ -938,8 +938,11 @@ _pinfo::dup_proc_pipe (HANDLE hProcess)
   bool res = DuplicateHandle (hMainProc, wr_proc_pipe, hProcess, &wr_proc_pipe,
 			      0, FALSE, flags);
   if (!res && WaitForSingleObject (hProcess, 0) != WAIT_OBJECT_0)
-    system_printf ("DuplicateHandle failed, pid %d, hProcess %p, wr_proc_pipe %p, %E",
-		   pid, hProcess, orig_wr_proc_pipe);
+    {
+      wr_proc_pipe = orig_wr_proc_pipe;
+      system_printf ("DuplicateHandle failed, pid %d, hProcess %p, wr_proc_pipe %p, %E",
+		     pid, hProcess, wr_proc_pipe);
+    }
   else
     {
       wr_proc_pipe_owner = dwProcessId;
@@ -947,7 +950,7 @@ _pinfo::dup_proc_pipe (HANDLE hProcess)
 		      pid, dwProcessId);
       res = true;
     }
-  return res;
+  return orig_wr_proc_pipe;
 }
 
 /* function to set up the process pipe and kick off proc_waiter */
