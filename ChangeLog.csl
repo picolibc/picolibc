@@ -1,3 +1,24 @@
+2006-03-21  Paul Brook  <paul@codesourcery.com>
+	Daniel Jacobowitz <dan@codesourcery.com>
+	Jim Blandy <jimb@codesourcery.com>
+
+	* gdb/Makefile.in: Add prologue_value.{c,h}
+	* gdb/arm-tdep.c: Include prologue-value.h.
+	(thumb_skip_prologue): Remove.
+	(thumb_analyze_prologue): New function.
+	(arm_skip_prologue): Use thumb_analyze_prologue.
+	(thumb_scan_prologue): Ditto.
+	* gdb/prologue-value.c: New file.
+	* gdb/prologue-value.h: New file.
+	* gdb/config/arm/embed.mt (TDEPFILES): Add prologue-value.o.
+	* gdb/config/arm/linux.mt (TDEPFILES): Add prologue-value.o.
+	* gdb/config/arm/nbsd.mt (TDEPFILES): Add prologue-value.o.
+	* gdb/config/arm/wince.mt (TDEPFILES): Add prologue-value.o.
+	* gdb/testsuite/gdb.arch/thumb-prologue.c: New file.
+	* gdb/testsuite/gdb.arch/thumb-prologue.exp: New file.
+
+2006-03-20  Mark Mitchell  <mark@codesourcery.com>
+
 	* configure.tgt (arm*-stellaris-*): Use armv7m configuration.
 	* config/arm/armv7m.mt: New file.
 	* config/arm/tm-armv7m.h: Likewise.
