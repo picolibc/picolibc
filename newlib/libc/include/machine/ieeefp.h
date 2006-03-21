@@ -226,10 +226,6 @@
 #define __IEEE_BIG_ENDIAN
 #endif
 
-#ifdef __mt__
-#define __IEEE_BIG_ENDIAN
-#endif
-
 #ifdef __frv__
 #define __IEEE_BIG_ENDIAN
 #endif
@@ -268,11 +264,6 @@
 #  define __IEEE_BIG_ENDIAN
 #endif /* __ARMEL__ */
 #endif /* __MAVERICK__ */
-
-#ifdef __m32c__
-#define __IEEE_LITTLE_ENDIAN
-#define __SMALL_BITFIELDS
-#endif
 
 #ifdef __CRIS__
 #define __IEEE_LITTLE_ENDIAN

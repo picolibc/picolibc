@@ -200,10 +200,6 @@ _BEGIN_STD_C
 #define _JBTYPE unsigned long
 #endif
 
-#ifdef __mt__
-#define _JBLEN 16
-#endif
-
 #ifdef __xstormy16__
 /* 4 GPRs plus SP plus PC. */
 #define _JBLEN 8
@@ -212,15 +208,6 @@ _BEGIN_STD_C
 #ifdef __CRIS__
 #define _JBLEN 18
 #endif
-
-#ifdef __m32c__
-#if defined(__r8c_cpu__) || defined(__m16c_cpu__)
-#define _JBLEN (22/2)
-#else
-#define _JBLEN (34/2)
-#endif
-#define _JBTYPE unsigned short
-#endif /* __m32c__ */
 
 #ifdef _JBLEN
 #ifdef _JBTYPE

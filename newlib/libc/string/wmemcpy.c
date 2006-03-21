@@ -1,6 +1,6 @@
 /*
 FUNCTION
-	<<wmemcpy>>---copy wide characters in memory 
+	<<wmemcpy>>---copy wide-characters in memory 
 
 ANSI_SYNOPSIS
 	#include <wchar.h>
@@ -13,21 +13,20 @@ TRAD_SYNOPSIS
 	size_t <[n]>;
 
 DESCRIPTION
-	The <<wmemcpy>> function copies <[n]> wide characters from the object
+	The <<wmemcpy>> function copies <[n]> wide-characters from the object
 	pointed to by <[s]> to the object pointed to be <[d]>. This function
 	is not affected by locale and all wchar_t values are treated
-	identically.  The null wide character and wchar_t values not
+	identically.  The null wide-character and wchar_t values not
 	corresponding to valid characters are not treated specially.
 
 	If <[n]> is zero, <[d]> and <[s]> must be a valid pointers, and the
-	function copies zero wide characters. 
+	function copies zero wide-characters. 
 
 RETURNS
 	The <<wmemcpy>> function returns the value of <[d]>.
 
 PORTABILITY
 <<wmemcpy>> is ISO/IEC 9899/AMD1:1995 (ISO C).
-
 No supporting OS subroutines are required.
 */
 

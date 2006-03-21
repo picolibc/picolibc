@@ -24,17 +24,6 @@ float frexpf (float d, int *exp)
   float f;
   __int32_t wf, wd;
 
-  /* Check for special values. */
-  switch (numtestf (d))
-    {
-      case NAN:
-      case INF:
-        errno = EDOM;
-      case 0:
-        *exp = 0;
-        return (d);
-    }
-
   GET_FLOAT_WORD (wd, d);
 
   /* Get the exponent. */
@@ -45,6 +34,16 @@ float frexpf (float d, int *exp)
   wf |= 0x3f000000;
 
   SET_FLOAT_WORD (f, wf);
+
+  /* Check for special values. */
+  switch (numtestf (f))
+    {
+      case NAN:
+      case INF:
+        errno = EDOM;
+        *exp = 0;
+        return (f);
+    }
 
   return (f);
 }

@@ -41,7 +41,6 @@ int closedir(DIR *);
 
 /* internal prototype */
 void _seekdir(DIR *dir,off_t offset);
-DIR *_opendir(const char *);
 
 #ifndef _POSIX_SOURCE
 long telldir (DIR *);

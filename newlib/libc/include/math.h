@@ -1,3 +1,4 @@
+/* math.h -- Definitions for the math floating point package.  */
 
 #ifndef  _MATH_H_
 #define  _MATH_H_
@@ -8,65 +9,25 @@
 
 _BEGIN_STD_C
 
+#ifndef HUGE_VAL
+
+/* Define HUGE_VAL as infinity, unless HUGE_VAL is already defined
+   (which might have been done by something like math-68881.h).  */
+
 union __dmath
 {
   __ULong i[2];
   double d;
 };
- 
-union __fmath
-{
-  __ULong i[1];
-  float f;
-};
- 
-union __ldmath
-{
-  __ULong i[4];
-  _LONG_DOUBLE ld;
-};
 
-#if defined(__GNUC__) && \
-  ( (__GNUC__ >= 4) || \
-    ( (__GNUC__ >= 3) && defined(__GNUC_MINOR__) && (__GNUC_MINOR__ >= 3) ) )
+/* Declare this as an array without bounds so that no matter what small data
+   support a port and/or library has, this reference will be via the general
+   method for accessing globals. */
+extern __IMPORT const union __dmath __infinity[];
 
- /* gcc >= 3.3 implicitly defines builtins for HUGE_VALx values.  */
+#define HUGE_VAL (__infinity[0].d)
 
- #ifndef HUGE_VAL
-  #define HUGE_VAL (__builtin_huge_val())
- #endif
-
- #ifndef HUGE_VALF
-  #define HUGE_VALF (__builtin_huge_valf())
- #endif
-
- #ifndef HUGE_VALL
-  #define HUGE_VALL (__builtin_huge_vall())
- #endif
-
-#else /* !gcc >= 3.3  */
-
- /* No builtins.  Use floating-point unions instead.  Declare as an array 
-    without bounds so no matter what small data support a port and/or 
-    library has, the reference will be via the general method for accessing 
-    globals. */
-
- #ifndef HUGE_VAL
-  extern __IMPORT const union __dmath __infinity[];
-  #define HUGE_VAL (__infinity[0].d)
- #endif
-
- #ifndef HUGE_VALF
-  extern __IMPORT const union __fmath __infinityf[];
-  #define HUGE_VALF (__infinityf[0].f)
- #endif
-
- #ifndef HUGE_VALL
-  extern __IMPORT const union __ldmath __infinityld[];
-  #define HUGE_VALL (__infinityld[0].ld)
- #endif
-
-#endif /* !gcc >= 3.3  */
+#endif /* ! defined (HUGE_VAL) */
 
 /* Reentrant ANSI C functions.  */
 
@@ -118,10 +79,6 @@ typedef double double_t;
 #define FP_SUBNORMAL   3
 #define FP_NORMAL      4
 
-extern int __isinff (float x);
-extern int __isinfd (double x);
-extern int __isnanf (float x);
-extern int __isnand (double x);
 extern int __fpclassifyf (float x);
 extern int __fpclassifyd (double x);
 extern int __signbitf (float x);
@@ -134,19 +91,9 @@ extern int __signbitd (double x);
 #define isfinite(y) \
           (__extension__ ({__typeof__(y) __y = (y); \
                            fpclassify(__y) != FP_INFINITE && fpclassify(__y) != FP_NAN;}))
-
-/* Note: isinf and isnan were once functions in newlib that took double
- *       arguments.  C99 specifies that these names are reserved for macros
- *       supporting multiple floating point types.  Thus, they are
- *       now defined as macros.  Implementations of the old functions
- *       taking double arguments still exist for compatibility purposes.  */
-#define isinf(x) \
-          (__extension__ ({__typeof__(x) __x = (x); \
-                           (sizeof (__x) == sizeof (float))  ? __isinff(__x) : __isinfd(__x);}))
-#define isnan(x) \
-          (__extension__ ({__typeof__(x) __x = (x); \
-                           (sizeof (__x) == sizeof (float))  ? __isnanf(__x) : __isnand(__x);}))
-#define isnormal(y) (fpclassify(y) == FP_NORMAL)
+#define isnormal(z) \
+          (__extension__ ({__typeof__(z) __z = (z); \
+                           fpclassify(__z) == FP_NORMAL;}))
 #define signbit(x) \
           (__extension__ ({__typeof__(x) __x = (x); \
                            (sizeof(__x) == sizeof(float)) ? __signbitf(__x) : __signbitd(__x);}))
@@ -175,6 +122,8 @@ extern int __signbitd (double x);
 
 extern double infinity _PARAMS((void));
 extern double nan _PARAMS((const char *));
+extern int isnan _PARAMS((double));
+extern int isinf _PARAMS((double));
 extern int finite _PARAMS((double));
 extern double copysign _PARAMS((double, double));
 extern int ilogb _PARAMS((double));

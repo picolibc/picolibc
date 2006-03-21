@@ -75,10 +75,9 @@ double pow (double x, double y)
         }
     }
 
-  if (x == 0.0)
+  if (x == 0.0 && y <= 0.0)
     {
-      if (y <= 0.0)
-        errno = EDOM;
+      errno = EDOM;
     }
   else if ((t = y * log (fabs (x))) >= BIGX) 
     {

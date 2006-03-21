@@ -72,18 +72,8 @@ _DEFUN(fflush, (fp),
   _flockfile (fp);
 
   t = fp->_flags;
-  if ((t & __SWR) == 0)
+  if ((t & __SWR) == 0 || (p = fp->_bf._base) == NULL)
     {
-      /* For a read stream, an fflush causes the next seek to be
-         unoptimized (i.e. forces a system-level seek).  This conforms
-         to the POSIX and SUSv3 standards.  */
-      fp->_flags |= __SNPT;
-      _funlockfile (fp);
-      return 0;
-    }
-  if ((p = fp->_bf._base) == NULL)
-    {
-      /* Nothing to flush.  */
       _funlockfile (fp);
       return 0;
     }

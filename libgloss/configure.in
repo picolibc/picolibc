@@ -103,13 +103,8 @@ case "${target}" in
   mcore-*-*)
 	configdirs="${configdirs} mcore testsuite"
 	;;
-  mt-*-*)
-        configdirs="${configdirs} mt testsuite";;
   xstormy16-*-*)
 	configdirs="${configdirs} xstormy16 testsuite"
-	;;
-  m32c-*-*)
-	configdirs="${configdirs} m32c testsuite"
 	;;
   strongarm-*-elf | strongarm-*-coff)
 	configdirs="${configdirs} arm testsuite";

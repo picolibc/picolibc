@@ -1,7 +1,7 @@
 
 /*
 FUNCTION
-	<<iswlower>>---lowercase wide character test
+	<<iswlower>>---lower-case wide-character test
 
 INDEX
 	iswlower
@@ -17,10 +17,10 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 <<iswlower>> is a function which classifies wide-character values that
-have uppercase translations.
+have an upper-case translation.
 
 RETURNS
-<<iswlower>> returns non-zero if <[c]> is a lowercase wide character.
+<<iswlower>> returns non-zero if <[c]> is a lower-case wide-character.
 
 PORTABILITY
 <<iswlower>> is C99.
