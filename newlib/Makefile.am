@@ -1,7 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 
 AUTOMAKE_OPTIONS = cygnus dejagnu
-ACLOCAL_AMFLAGS = -I .
 
 # Multilib support variables.
 MULTISRCTOP =
@@ -28,7 +27,6 @@ AM_MAKEFLAGS = \
 	"CFLAGS=$(CFLAGS)" \
 	"CFLAGS_FOR_BUILD=$(CFLAGS_FOR_BUILD)" \
 	"CFLAGS_FOR_TARGET=$(CFLAGS_FOR_TARGET)" \
-	"INSTALL=$(INSTALL)" \
 	"LDFLAGS=$(LDFLAGS)" \
 	"LIBCFLAGS=$(LIBCFLAGS)" \
 	"LIBCFLAGS_FOR_TARGET=$(LIBCFLAGS_FOR_TARGET)" \
@@ -91,8 +89,6 @@ toollib_DATA = $(CRT0) $(CRT1)
 MATHOBJS_IN_LIBC = \
 	s_isinf.$(oext) sf_isinf.$(oext) \
 	s_isnan.$(oext) sf_isnan.$(oext) \
-	s_isinfd.$(oext) sf_isinff.$(oext) \
-	s_isnand.$(oext) sf_isnanf.$(oext) \
 	s_nan.$(oext) sf_nan.$(oext) \
 	s_ldexp.$(oext) sf_ldexp.$(oext) \
 	s_frexp.$(oext) sf_frexp.$(oext) \

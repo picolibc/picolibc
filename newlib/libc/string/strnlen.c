@@ -42,7 +42,7 @@ _DEFUN (strnlen, (str, n),
 {
   _CONST char *start = str;
 
-  while (n-- > 0 && *str)
+  while (*str && n-- > 0)
     str++;
 
   return str - start;

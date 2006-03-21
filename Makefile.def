@@ -4,7 +4,7 @@ AutoGen definitions Makefile.tpl;
 // Makefile.in is generated from Makefile.tpl by 'autogen Makefile.def'.
 // This file was originally written by Nathanael Nerode.
 //
-//   Copyright 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+//   Copyright 2002, 2003 Free Software Foundation
 //
 // This file is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -117,7 +117,6 @@ host_modules= { module= gnattools; };
 target_modules = { module= libstdc++-v3; lib_path=.libs; raw_cxx=true; };
 target_modules = { module= libmudflap; lib_path=.libs; };
 target_modules = { module= libssp; lib_path=.libs; };
-target_modules = { module= libgcc-math; lib_path=.libs; };
 target_modules = { module= newlib; };
 target_modules = { module= libgfortran; };
 target_modules = { module= libobjc; };
@@ -138,7 +137,6 @@ target_modules = { module= boehm-gc; };
 target_modules = { module= qthreads; };
 target_modules = { module= rda; };
 target_modules = { module= libada; };
-target_modules = { module= libgomp; lib_path=.libs; };
 
 // These are (some of) the make targets to be done in each subdirectory.
 // Not all; these are the ones which don't have special options.
@@ -207,18 +205,12 @@ flags_to_pass = { flag= SHELL ; };
 flags_to_pass = { flag= YACC ; };
 
 // Host tools
-flags_to_pass = { flag= ADAFLAGS ; optional=true ; };
 flags_to_pass = { flag= AR_FLAGS ; };
-flags_to_pass = { flag= BOOT_ADAFLAGS ; optional=true ; };
-flags_to_pass = { flag= BOOT_CFLAGS ; };
-flags_to_pass = { flag= BOOT_LDFLAGS ; };
 flags_to_pass = { flag= CFLAGS ; };
 flags_to_pass = { flag= CXXFLAGS ; };
 flags_to_pass = { flag= LDFLAGS ; };
 flags_to_pass = { flag= LIBCFLAGS ; };
 flags_to_pass = { flag= LIBCXXFLAGS ; };
-flags_to_pass = { flag= STAGE1_CFLAGS ; };
-flags_to_pass = { flag= STAGE1_LANGUAGES ; };
 
 // Target tools
 flags_to_pass = { flag= AR_FOR_TARGET ; };
@@ -241,10 +233,6 @@ flags_to_pass = { flag= OBJDUMP_FOR_TARGET ; };
 flags_to_pass = { flag= RANLIB_FOR_TARGET ; };
 flags_to_pass = { flag= STRIP_FOR_TARGET ; };
 flags_to_pass = { flag= WINDRES_FOR_TARGET ; };
-
-// Miscellaneous
-flags_to_pass = { flag= LANGUAGES ; optional=true ; };
-flags_to_pass = { flag= LEAN ; };
 
 // Inter-module dependencies
 
@@ -464,7 +452,7 @@ bootstrap_stage = {
 	id=1 ;
 	stage_configure_flags='--disable-intermodule \
 	  --disable-coverage --enable-languages="$(STAGE1_LANGUAGES)"' ;
-	stage_make_flags='CFLAGS="$(STAGE1_CFLAGS)" LIBCFLAGS="$(STAGE1_CFLAGS)"' ; };
+	stage_make_flags='CFLAGS="$(STAGE1_CFLAGS)"' ; };
 bootstrap_stage = {
 	id=2 ; prev=1 ;
 	bootstrap_target=bootstrap2 ;

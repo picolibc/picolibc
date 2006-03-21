@@ -1,5 +1,4 @@
         /* Run-time exception support */
-#if !defined(__thumb2__)
 #include "swi.h"
 
 /* .text is used instead of .section .text so it works with arm-aout too.  */
@@ -92,4 +91,3 @@ __rt_stkovf_split_big:
         @ We now know how much extra stack the function requires.
         @ Terminate the program for the moment:
         swi     SWI_Exit
-#endif

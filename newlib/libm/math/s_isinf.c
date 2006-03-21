@@ -1,5 +1,5 @@
 /*
- * __isinfd(x) returns 1 if x is infinity, else 0;
+ * isinf(x) returns 1 if x is infinity, else 0;
  * no branching!
  * Added by Cygnus Support.
  */
@@ -8,9 +8,12 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
-int
-_DEFUN (__isinfd, (x),
-	double x)
+#ifdef __STDC__
+	int isinf(double x)
+#else
+	int isinf(x)
+	double x;
+#endif
 {
 	__int32_t hx,lx;
 	EXTRACT_WORDS(hx,lx,x);

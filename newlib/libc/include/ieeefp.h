@@ -184,9 +184,6 @@ typedef int fp_rdi;
 fp_rdi _EXFUN(fpgetroundtoi,(void));
 fp_rdi _EXFUN(fpsetroundtoi,(fp_rdi));
 
-#undef isnan
-#undef isinf
-
 int _EXFUN(isnan, (double));
 int _EXFUN(isinf, (double));
 int _EXFUN(finite, (double));

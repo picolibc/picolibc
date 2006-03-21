@@ -58,11 +58,9 @@ _DEFUN(__swsetup, (fp),
 
   /*
    * Make a buffer if necessary, then set _w.
-   * A string I/O file should not explicitly allocate a buffer
-   * unless asprintf is being used.
    */
-  if (fp->_bf._base == NULL 
-        && (!(fp->_flags & __SSTR) || (fp->_flags & __SMBF)))
+  /* NOT NEEDED FOR CYGNUS SPRINTF ONLY jpg */
+  if (fp->_bf._base == NULL)
     __smakebuf (fp);
 
   if (fp->_flags & __SLBF)

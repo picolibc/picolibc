@@ -1,33 +1,3 @@
-2006-02-14  Paolo Bonzini  <bonzini@gnu.org>
-            Andreas Schwab  <schwab@suse.de>
-
-        * acx.m4 (NCN_STRICT_CHECK_TARGET_TOOLS): Use correct program name.
-	(ACX_CHECK_INSTALLED_TARGET_TOOL): Likewise, and always set $1.
-
-2006-01-26  Paolo Bonzini  <bonzini@gnu.org>
-
-	* acx.m4 (NCN_STRICT_CHECK_TARGET_TOOLS): Test $with_build_time_tools.
-	(ACX_PATH_SEP): New.
-	(ACX_TOOL_DIRS): Move here from the gcc directory.
-	(ACX_CHECK_INSTALLED_TARGET_TOOL): New.
-	(GCC_TARGET_TOOL): Do not use a host tool if we found a target tool
-	with a complete path in either $with_build_time_tools or $exec_prefix.
-
-2006-01-02  Paolo Bonzini  <bonzini@gnu.org>
-
-        PR target/25259
-        * stdint.m4: New.
-
-2005-12-20  Paolo Bonzini  <bonzini@gnu.org>
-
-        Revert Ada-related part of the previous change.
-
-        * mt-ppc-aix: Delete.
-
-2005-12-19  Paolo Bonzini  <bonzini@gnu.org>
-        
-        * mt-ppc-aix, mh-ppc-aix: New.
-        
 2005-12-05  Paolo Bonzini  <bonzini@gnu.org>
 
 	* acx.m4 (GCC_TARGET_TOOL): New.

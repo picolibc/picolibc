@@ -1,15 +1,16 @@
 /*
  * isinff(x) returns 1 if x is +-infinity, else 0;
- *
- * isinff is an extension declared in <ieeefp.h> and
- * <math.h>.
+ * Added by Cygnus Support.
  */
 
 #include "fdlibm.h"
 
-int
-_DEFUN (isinff, (x),
-	float x)
+#ifdef __STDC__
+	int isinff(float x)
+#else
+	int isinff(x)
+	float x;
+#endif
 {
 	__int32_t ix;
 	GET_FLOAT_WORD(ix,x);
@@ -19,11 +20,12 @@ _DEFUN (isinff, (x),
 
 #ifdef _DOUBLE_IS_32BITS
 
-#undef isinf
-
-int
-_DEFUN (isinf, (x),
-	double x)
+#ifdef __STDC__
+	int isinf(double x)
+#else
+	int isinf(x)
+	double x;
+#endif
 {
 	return isinff((float) x);
 }
