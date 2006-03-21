@@ -35,6 +35,9 @@ _DEFUN (__register_exitproc,
     _GLOBAL_REENT->_atexit = p = &_GLOBAL_REENT->_atexit0;
   if (p->_ind >= _ATEXIT_SIZE)
     {
+#ifndef _ATEXIT_DYNAMIC_ALLOC
+      return -1;
+#else
       p = (struct _atexit *) malloc (sizeof *p);
       if (p == NULL)
 	{
@@ -49,6 +52,7 @@ _DEFUN (__register_exitproc,
 #ifndef _REENT_SMALL
       p->_on_exit_args._fntypes = 0;
       p->_on_exit_args._is_cxa = 0;
+#endif
 #endif
     }
 

@@ -1,3 +1,15 @@
+2006-03-20  Mark Mitchell  <mark@codesourcery.com>
+
+	* acconfig.h (_ATEXIT_DYNAMIC_ALLOC): Undef.
+	* configure.in (--disable-newlib-atexit-dynamic-alloc): New
+	option. 
+	* configure: Regenerated.
+	* newlib.hin: Regenerated.
+	* libc/stdlib/__atexit.c (__register_exitproc): Don't call malloc
+	if _ATEXIT_DYNAMIC_ALLOC is undefined.
+	* libc/stdlib/__call_atexit.c (__call_exitprocs): Don't call free
+	if _ATEXIT_DYNAMIC_ALLOC is undefined.
+
 2006-03-17  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/linuxthreads/config.h: Remove definition
