@@ -1,3 +1,23 @@
+2006-03-21  Richard Sandiford  <richard@codesourcery.com>
+
+	* bfd/cpu-m68k.c (bfd_m68k_compatible): Treat ISA A+ and ISA B code as
+	incompatible.  Likewise MAC and EMAC code.
+	* bfd/elf32-m68k.c (elf32_m68k_merge_private_bfd_data): Use
+	bfd_get_compatible to set the new bfd architecture.  Rely on it
+	to detect incompatibilities.
+	* gas/config/tc-m68k.c (m68k_cpus): Change cpu_cf5208 entries to use
+	mcfemac instead of mcfmac.
+	* ld/testsuite/ld-m68k/merge-error-1a.s,
+	* ld/testsuite/ld-m68k/merge-error-1b.s,
+	* ld/testsuite/ld-m68k/merge-error-1a.d,
+	* ld/testsuite/ld-m68k/merge-error-1b.d,
+	* ld/testsuite/ld-m68k/merge-error-1c.d,
+	* ld/testsuite/ld-m68k/merge-error-1d.d,
+	* ld/testsuite/ld-m68k/merge-error-1e.d,
+	* ld/testsuite/ld-m68k/merge-ok-1a.d,
+	* ld/testsuite/ld-m68k/merge-ok-1b.d: New tests.
+	* ld/testsuite/ld-m68k/m68k.exp: Run them.
+
 2006-03-20  Paul Brook  <paul@codesourcery.com>
 
 	* gas/config/tc-arm.c (insns): Correct opcodes for ldrbt and strbt.
