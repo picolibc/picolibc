@@ -178,6 +178,7 @@ frok::child (void *)
   ld_preload ();
   fixup_hooks_after_fork ();
   _my_tls.fixup_after_fork ();
+  wait_for_sigthread ();
   cygwin_finished_initializing = true;
   return 0;
 }
@@ -545,10 +546,13 @@ fork ()
   void *esp;
   __asm__ volatile ("movl %%esp,%0": "=r" (esp));
 
-  if (!ischild)
-    res = grouped.parent (esp);
-  else
+  if (ischild)
     res = grouped.child (esp);
+  else
+    {
+      res = grouped.parent (esp);
+      sig_send (NULL, __SIGNOHOLD);
+    }
 
   MALLOC_CHECK;
   if (ischild || res > 0)
@@ -568,7 +572,6 @@ fork ()
 
       set_errno (grouped.this_errno);
     }
-  sig_send (NULL, __SIGNOHOLD);
   syscall_printf ("%d = fork()", res);
   return res;
 }

@@ -1304,7 +1304,7 @@ int fhandler_base::fcntl (int cmd, void *arg)
       break;
     case F_GETFL:
       res = get_flags ();
-      debug_printf ("GETFL: %d", res);
+      debug_printf ("GETFL: %p", res);
       break;
     case F_SETFL:
       {

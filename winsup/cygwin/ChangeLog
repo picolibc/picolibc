@@ -1,3 +1,22 @@
+2006-03-22  Eric Blake  <ebb9@byu.net>
+
+	* fhandler.cc (fcntl): Print flags in hex.
+
+2006-03-22  Christopher Faylor  <cgf@timesys.com>
+
+	* dcrt0.cc (dll_crt0_0): Semi-revert 2006-03-14 change which moved
+	pinfo_init and uinfo_init here.
+	(dll_crt0_1): Ditto.
+	(__dll_crt0): Ditto. Don't call update_envptrs here.
+	(dll_crt0_1): Ditto. Move wait_for_sigthread call here from dll_crt0_0.
+	* environ.cc (environ_init): Call it here instead.
+	* sigproc.cc (my_readsig): New static variable.
+	(wait_for_sigthread): Set up read pipe here since we are assured that
+	we have the proper privileges when this is called.
+	(talktome): Eliminate second argument since it is available as a global
+	now.
+	(wait_sig): Reflect use of my_readsig.
+
 2006-03-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* thread.cc (pthread_cond::init): Disable validity test of object
@@ -58,8 +77,8 @@
 
 2006-03-19  Christopher Faylor  <cgf@timesys.com>
 
-	* dcrt0.cc (dll_crt0_0): Oops.  We need to bother with setting this in
-	the fork/exec case.
+	* dcrt0.cc (dll_crt0_0): Oops.  We need to bother with setting
+	init_console_handler in the fork/exec case.
 
 2006-03-19  Christopher Faylor  <cgf@timesys.com>
 
@@ -691,7 +710,7 @@
 
 2006-02-03  Corinna Vinschen  <corinna@vinschen.de>
 
-	* path.cc (suffix_scan::lnk_match): Return true beginning with 
+	* path.cc (suffix_scan::lnk_match): Return true beginning with
 	SCAN_APPENDLNK.
 	(suffix_scan::next): Rearrange code to make .lnk append order slightly
 	more deterministic.

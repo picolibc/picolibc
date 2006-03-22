@@ -754,12 +754,6 @@ dll_crt0_0 ()
   user_data->resourcelocks->Init ();
   user_data->threadinterface->Init ();
 
-  if (!in_forkee)
-    {
-      pinfo_init (envp, envc);
-      uinfo_init ();	/* initialize user info */
-    }
-
   _cygtls::init ();
 
   /* Initialize events */
@@ -838,6 +832,7 @@ dll_crt0_1 (char *)
   fork_init ();
   }
 #endif
+  pinfo_init (envp, envc);
 
   /* Can be set only after environment has been initialized. */
   if (wincap.has_security ())
@@ -848,6 +843,14 @@ dll_crt0_1 (char *)
 
   /* Allocate cygheap->fdtab */
   dtable_init ();
+
+  uinfo_init ();	/* initialize user info */
+
+  wait_for_sigthread ();
+  extern DWORD threadfunc_ix;
+  if (!threadfunc_ix)
+    system_printf ("internal error: couldn't determine location of thread function on stack.  Expect signal problems.");
+
 
   /* Connect to tty. */
   tty_init ();
@@ -960,13 +963,7 @@ initialize_main_tls (char *padding)
 extern "C" void __stdcall
 _dll_crt0 ()
 {
-  extern DWORD threadfunc_ix;
-  wait_for_sigthread ();
-  if (!threadfunc_ix)
-    system_printf ("internal error: couldn't determine location of thread function on stack.  Expect signal problems.");
-
   main_environ = user_data->envptr;
-  update_envptrs ();
 
   char padding[CYGTLS_PADSIZE];
 

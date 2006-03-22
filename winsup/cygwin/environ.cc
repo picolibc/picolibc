@@ -809,6 +809,7 @@ environ_init (char **envp, int envc)
 
 out:
   __cygwin_environ = envp;
+  update_envptrs ();
   if (envp_passed_in)
     {
       p = getenv ("CYGWIN");

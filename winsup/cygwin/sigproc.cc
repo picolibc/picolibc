@@ -64,7 +64,7 @@ HANDLE NO_COPY sigCONT;			// Used to "STOP" a process
 cygthread *hwait_sig;
 Static HANDLE wait_sig_inited;		// Control synchronization of
 					//  message queue startup
-static bool sigheld;			// True if holding signals
+static NO_COPY bool sigheld;		// True if holding signals
 
 Static int nprocs;			// Number of deceased children
 Static char cprocs[(NPROCS + 1) * sizeof (pinfo)];// All my children info
@@ -76,13 +76,15 @@ static muto NO_COPY sync_proc_subproc;	// Control access to subproc stuff
 
 _cygtls NO_COPY *_sig_tls;
 
+Static HANDLE my_sendsig;
+Static HANDLE my_readsig;
+
 /* Function declarations */
 static int __stdcall checkstate (waitq *) __attribute__ ((regparm (1)));
 static __inline__ bool get_proc_lock (DWORD, DWORD);
 static bool __stdcall remove_proc (int);
 static bool __stdcall stopped_or_terminated (waitq *, _pinfo *);
 static DWORD WINAPI wait_sig (VOID *arg);
-static HANDLE NO_COPY my_sendsig;
 
 /* wait_sig bookkeeping */
 
@@ -138,11 +140,17 @@ signal_fixup_after_exec ()
 void __stdcall
 wait_for_sigthread ()
 {
+  PSECURITY_ATTRIBUTES sa_buf = (PSECURITY_ATTRIBUTES) alloca (1024);
+  if (!CreatePipe (&my_readsig, &my_sendsig, sec_user_nih (sa_buf), 0))
+    api_fatal ("couldn't create signal pipe, %E");
+  ProtectHandle (my_readsig);
+  myself->sendsig = my_sendsig;
   sigproc_printf ("wait_sig_inited %p", wait_sig_inited);
   HANDLE hsig_inited = wait_sig_inited;
   WaitForSingleObject (hsig_inited, INFINITE);
   wait_sig_inited = NULL;
   ForceCloseHandle1 (hsig_inited, wait_sig_inited);
+  SetEvent (sigCONT);
 }
 
 /* Get the sync_proc_subproc muto to control access to
@@ -1049,7 +1057,7 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
 }
 
 static void
-talktome (siginfo_t *si, HANDLE readsig)
+talktome (siginfo_t *si)
 {
   unsigned size = sizeof (*si);
   sigproc_printf ("pid %d wants some information", si->si_pid);
@@ -1057,12 +1065,12 @@ talktome (siginfo_t *si, HANDLE readsig)
     {
       size_t n;
       DWORD nb;
-      if (!ReadFile (readsig, &n, sizeof (n), &nb, NULL) || nb != sizeof (n))
+      if (!ReadFile (my_readsig, &n, sizeof (n), &nb, NULL) || nb != sizeof (n))
 	return;
       siginfo_t *newsi = (siginfo_t *) alloca (size += n + 1);
       *newsi = *si;
       newsi->_si_commune._si_str = (char *) (newsi + 1);
-      if (!ReadFile (readsig, newsi->_si_commune._si_str, n, &nb, NULL) || nb != n)
+      if (!ReadFile (my_readsig, newsi->_si_commune._si_str, n, &nb, NULL) || nb != n)
 	return;
       newsi->_si_commune._si_str[n] = '\0';
       si = newsi;
@@ -1121,17 +1129,10 @@ pending_signals::next ()
 static DWORD WINAPI
 wait_sig (VOID *)
 {
-  HANDLE readsig;
-  PSECURITY_ATTRIBUTES sa_buf = (PSECURITY_ATTRIBUTES) alloca (1024);
-
   /* Initialization */
   SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
 
   sigCONT = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
-  if (!CreatePipe (&readsig, &my_sendsig, sec_user_nih (sa_buf), 0))
-    api_fatal ("couldn't create signal pipe, %E");
-  ProtectHandle (readsig);
-  myself->sendsig = my_sendsig;
 
   /* Setting dwProcessId flags that this process is now capable of receiving
      signals.  Prior to this, dwProcessId was set to the windows pid of
@@ -1145,19 +1146,18 @@ wait_sig (VOID *)
   SetEvent (wait_sig_inited);
 
   _sig_tls->init_threadlist_exceptions ();
-  debug_printf ("entering ReadFile loop, readsig %p, myself->sendsig %p",
-		readsig, myself->sendsig);
+  debug_printf ("entering ReadFile loop, my_readsig %p, myself->sendsig %p",
+		my_readsig, myself->sendsig);
 
   sigpacket pack;
-  if (in_forkee)
-    pack.si.si_signo = __SIGHOLD;
+  pack.si.si_signo = __SIGHOLD;
   for (;;)
     {
       if (pack.si.si_signo == __SIGHOLD)
 	WaitForSingleObject (sigCONT, INFINITE);
       DWORD nb;
       pack.tls = NULL;
-      if (!ReadFile (readsig, &pack, sizeof (pack), &nb, NULL))
+      if (!ReadFile (my_readsig, &pack, sizeof (pack), &nb, NULL))
 	break;
 
       if (nb != sizeof (pack))
@@ -1187,7 +1187,7 @@ wait_sig (VOID *)
       switch (pack.si.si_signo)
 	{
 	case __SIGCOMMUNE:
-	  talktome (&pack.si, readsig);
+	  talktome (&pack.si);
 	  break;
 	case __SIGSTRACE:
 	  strace.hello ();
@@ -1260,7 +1260,7 @@ wait_sig (VOID *)
 	break;
     }
 
-  ForceCloseHandle (readsig);
+  ForceCloseHandle (my_readsig);
   sigproc_printf ("signal thread exiting");
   ExitThread (0);
 }
