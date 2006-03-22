@@ -1,3 +1,13 @@
+2006-03-21  Mark Mitchell  <mark@codesourcery.com>
+
+	* gdb/ser-mingw.c (net_windows_state): Add mutex.
+	(net_windows_select_thread): Grab lock around access to
+	read_event.
+	(net_windows_wait_handle): Do not reset the read_event.
+	(net_windows_open): Create a mutex.
+	(net_windows_read_prim): New function.
+	(_initialize_ser_windows): Use it.
+
 2006-03-20  Mark Mitchell  <mark@codesourcery.com>
 
 	* libiberty/pex-common.c (pex_run): Close the write end of the
