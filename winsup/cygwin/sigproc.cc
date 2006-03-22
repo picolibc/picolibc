@@ -113,6 +113,10 @@ sigalloc ()
   cygheap->sigs = global_sigs =
     (struct sigaction *) ccalloc (HEAP_SIGS, NSIG, sizeof (struct sigaction));
   global_sigs[SIGSTOP].sa_flags = SA_RESTART | SA_NODEFER;
+  for (int i = 0; i < NSIG; i++)
+    /* SA_RESTART is set to maintain BSD compatible signal behaviour by default.
+       This is also compatible with the behaviour of signal(2) in Linux. */
+    global_sigs[i].sa_flags = SA_RESTART;
 }
 
 void __stdcall

@@ -64,10 +64,7 @@ signal (int sig, _sig_func_ptr func)
   prev = global_sigs[sig].sa_handler;
   global_sigs[sig].sa_handler = func;
   global_sigs[sig].sa_mask = 0;
-  /* SA_RESTART is set to maintain BSD compatible signal behaviour by default.
-     This is also compatible with the behaviour of signal(2) in Linux. */
-  global_sigs[sig].sa_flags |= SA_RESTART;
-  global_sigs[sig].sa_flags &= ~ SA_SIGINFO;
+  global_sigs[sig].sa_flags &= ~SA_SIGINFO;
   set_sigcatchers (prev, func);
 
   syscall_printf ("%p = signal (%d, %p)", prev, sig, func);
@@ -470,7 +467,7 @@ extern "C" int
 siginterrupt (int sig, int flag)
 {
   struct sigaction act;
-  sigaction(sig, NULL, &act);
+  sigaction (sig, NULL, &act);
   if (flag)
     act.sa_flags &= ~SA_RESTART;
   else

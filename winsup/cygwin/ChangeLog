@@ -1,5 +1,11 @@
 2006-03-21  Christopher Faylor  <cgf@timesys.com>
 
+	* signal.cc (signal): Don't set SA_RESTART here.
+	(siginterrupt): White space.
+	* sigproc.cc (sigalloc): Set SA_RESTART here, on initialization.
+
+2006-03-21  Christopher Faylor  <cgf@timesys.com>
+
 	* child_info.h (child_status): Fix typo which made it impossible to set
 	iscygwin.
 	(child_info::isstraced): Booleanize.
