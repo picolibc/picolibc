@@ -1,3 +1,13 @@
+2006-03-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* thread.cc (pthread_mutex::is_good_initializer_or_bad_object): Delete.
+	(pthread_cond::is_good_initializer_or_bad_object): Delete.
+	(pthread_rwlock::is_good_initializer_or_bad_object): Delete.
+	(pthread_cond::init): Remove disabled code.  Guard assignment to
+	object to initialize against access violation.
+	(pthread_rwlock::init): Ditto.
+	(pthread_mutex::init): Ditto.
+
 2006-03-22  Eric Blake  <ebb9@byu.net>
 
 	* fhandler.cc (fcntl): Print flags in hex.

@@ -195,17 +195,6 @@ pthread_mutex::is_good_initializer_or_object (pthread_mutex_t const *mutex)
 }
 
 inline bool
-pthread_mutex::is_good_initializer_or_bad_object (pthread_mutex_t const *mutex)
-{
-  if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC,
-				 PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP,
-				 PTHREAD_NORMAL_MUTEX_INITIALIZER_NP,
-				 PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP) == VALID_OBJECT)
-    return false;
-  return true;
-}
-
-inline bool
 pthread_mutex::can_be_unlocked (pthread_mutex_t const *mutex)
 {
   pthread_t self = pthread::self ();
@@ -260,14 +249,6 @@ pthread_cond::is_good_initializer_or_object (pthread_cond_t const *cond)
   return true;
 }
 
-inline bool
-pthread_cond::is_good_initializer_or_bad_object (pthread_cond_t const *cond)
-{
-  if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC, PTHREAD_COND_INITIALIZER) == VALID_OBJECT)
-    return false;
-  return true;
-}
-
 /* RW locks */
 inline bool
 pthread_rwlock::is_good_object (pthread_rwlock_t const *rwlock)
@@ -289,14 +270,6 @@ inline bool
 pthread_rwlock::is_good_initializer_or_object (pthread_rwlock_t const *rwlock)
 {
   if (verifyable_object_isvalid (rwlock, PTHREAD_RWLOCK_MAGIC, PTHREAD_RWLOCK_INITIALIZER) == INVALID_OBJECT)
-    return false;
-  return true;
-}
-
-inline bool
-pthread_rwlock::is_good_initializer_or_bad_object (pthread_rwlock_t const *rwlock)
-{
-  if (verifyable_object_isvalid (rwlock, PTHREAD_RWLOCK_MAGIC, PTHREAD_RWLOCK_INITIALIZER) == VALID_OBJECT)
     return false;
   return true;
 }
@@ -2543,28 +2516,27 @@ pthread_cond_destroy (pthread_cond_t *cond)
 int
 pthread_cond::init (pthread_cond_t *cond, const pthread_condattr_t *attr)
 {
-
   pthread_cond_t new_cond;
 
   if (attr && !pthread_condattr::is_good_object (attr))
     return EINVAL;
 
   cond_initialization_lock.lock ();
-#if 0
-  /* Disabled since recognition of a valid object doesn't work reliably
-     if the object is uninitialized. */
-  if (!is_good_initializer_or_bad_object (cond))
-    {
-      cond_initialization_lock.unlock ();
-      return EBUSY;
-    }
-#endif
+
   new_cond = new pthread_cond (attr ? (*attr) : NULL);
   if (!is_good_object (&new_cond))
     {
       delete new_cond;
       cond_initialization_lock.unlock ();
       return EAGAIN;
+    }
+
+  myfault efault;
+  if (efault.faulted ())
+    {
+      delete new_cond;
+      cond_initialization_lock.unlock ();
+      return EINVAL;
     }
 
   *cond = new_cond;
@@ -2733,21 +2705,21 @@ pthread_rwlock::init (pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr
     return EINVAL;
 
   rwlock_initialization_lock.lock ();
-#if 0
-  /* Disabled since recognition of a valid object doesn't work reliably
-     if the object is uninitialized. */
-  if (!is_good_initializer_or_bad_object (rwlock))
-    {
-      rwlock_initialization_lock.unlock ();
-      return EBUSY;
-    }
-#endif
+
   new_rwlock = new pthread_rwlock (attr ? (*attr) : NULL);
   if (!is_good_object (&new_rwlock))
     {
       delete new_rwlock;
       rwlock_initialization_lock.unlock ();
       return EAGAIN;
+    }
+
+  myfault efault;
+  if (efault.faulted ())
+    {
+      delete new_rwlock;
+      rwlock_initialization_lock.unlock ();
+      return EINVAL;
     }
 
   *rwlock = new_rwlock;
@@ -2913,15 +2885,7 @@ pthread_mutex::init (pthread_mutex_t *mutex,
     return EINVAL;
 
   mutex_initialization_lock.lock ();
-#if 0
-  /* Disabled since recognition of a valid object doesn't work reliably
-     if the object is uninitialized. */
-  if (!is_good_initializer_or_bad_object (mutex))
-    {
-      mutex_initialization_lock.unlock ();
-      return EBUSY;
-    }
-#endif
+
   new_mutex = new pthread_mutex (attr ? (*attr) : NULL);
   if (!is_good_object (&new_mutex))
     {
@@ -2938,6 +2902,14 @@ pthread_mutex::init (pthread_mutex_t *mutex,
 	new_mutex->type = PTHREAD_MUTEX_NORMAL;
       else if (initializer == PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP)
 	new_mutex->type = PTHREAD_MUTEX_ERRORCHECK;
+    }
+
+  myfault efault;
+  if (efault.faulted ())
+    {
+      delete new_mutex;
+      mutex_initialization_lock.unlock ();
+      return EINVAL;
     }
 
   *mutex = new_mutex;
