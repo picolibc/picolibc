@@ -1,3 +1,10 @@
+2006-03-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* thread.cc (pthread_cond::init): Disable validity test of object
+	to initialize since test of uninitialized content is unreliable.
+	(pthread_rwlock::init): Ditto.
+	(pthread_mutex::init): Ditto.
+
 2006-03-21  Christopher Faylor  <cgf@timesys.com>
 
 	* signal.cc (signal): Don't set SA_RESTART here.

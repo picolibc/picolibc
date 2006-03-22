@@ -2550,13 +2550,15 @@ pthread_cond::init (pthread_cond_t *cond, const pthread_condattr_t *attr)
     return EINVAL;
 
   cond_initialization_lock.lock ();
-
+#if 0
+  /* Disabled since recognition of a valid object doesn't work reliably
+     if the object is uninitialized. */
   if (!is_good_initializer_or_bad_object (cond))
     {
       cond_initialization_lock.unlock ();
       return EBUSY;
     }
-
+#endif
   new_cond = new pthread_cond (attr ? (*attr) : NULL);
   if (!is_good_object (&new_cond))
     {
@@ -2731,13 +2733,15 @@ pthread_rwlock::init (pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr
     return EINVAL;
 
   rwlock_initialization_lock.lock ();
-
+#if 0
+  /* Disabled since recognition of a valid object doesn't work reliably
+     if the object is uninitialized. */
   if (!is_good_initializer_or_bad_object (rwlock))
     {
       rwlock_initialization_lock.unlock ();
       return EBUSY;
     }
-
+#endif
   new_rwlock = new pthread_rwlock (attr ? (*attr) : NULL);
   if (!is_good_object (&new_rwlock))
     {
@@ -2909,13 +2913,15 @@ pthread_mutex::init (pthread_mutex_t *mutex,
     return EINVAL;
 
   mutex_initialization_lock.lock ();
-
+#if 0
+  /* Disabled since recognition of a valid object doesn't work reliably
+     if the object is uninitialized. */
   if (!is_good_initializer_or_bad_object (mutex))
     {
       mutex_initialization_lock.unlock ();
       return EBUSY;
     }
-
+#endif
   new_mutex = new pthread_mutex (attr ? (*attr) : NULL);
   if (!is_good_object (&new_mutex))
     {
