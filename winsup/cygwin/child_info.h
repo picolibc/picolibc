@@ -21,7 +21,7 @@ enum child_info_types
 enum child_status
 {
   _CI_STRACED	= 0x01,
-  _CI_ISCYGWIN	= 0x0
+  _CI_ISCYGWIN	= 0x02
 };
 
 #define OPROC_MAGIC_MASK 0xff00ff00
@@ -36,7 +36,7 @@ enum child_status
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
 /* Change this value if you get a message indicating that it is out-of-sync. */
-#define CURR_CHILD_INFO_MAGIC 0xa189e57U
+#define CURR_CHILD_INFO_MAGIC 0x1630848cU
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -66,8 +66,8 @@ public:
   void ready (bool);
   bool sync (int, HANDLE&, DWORD) __attribute__ ((regparm (3)));
   DWORD proc_retry (HANDLE) __attribute__ ((regparm (2)));
-  bool isstraced () const {return flag & _CI_STRACED;}
-  bool iscygwin () const {return flag & _CI_ISCYGWIN;}
+  bool isstraced () const {return !!(flag & _CI_STRACED);}
+  bool iscygwin () const {return !!(flag & _CI_ISCYGWIN);}
 };
 
 class mount_info;

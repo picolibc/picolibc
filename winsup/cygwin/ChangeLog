@@ -1,3 +1,15 @@
+2006-03-21  Christopher Faylor  <cgf@timesys.com>
+
+	* child_info.h (child_status): Fix typo which made it impossible to set
+	iscygwin.
+	(child_info::isstraced): Booleanize.
+	(child_info::iscygwin): Ditto.
+	* sigproc.cc (child_info::child_info): Minor cleanup of flag setting.
+	* spawn.cc (spawn_guts): Only close_all_files when we know the process
+	has started successfully.
+
+	* exceptions.cc (init_console_handler): Fix indentation.
+
 2006-03-20  Christopher Faylor  <cgf@timesys.com>
 
 	* dcrt0.cc (dll_crt0_0): Call SetErrorMode earlier.

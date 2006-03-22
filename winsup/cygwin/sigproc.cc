@@ -780,16 +780,16 @@ child_info::child_info (unsigned in_cb, child_info_types chtype, bool need_subpr
   type = chtype;
   fhandler_union_cb = sizeof (fhandler_union);
   user_h = cygwin_user_h;
-  if (need_subproc_ready)
-    subproc_ready = CreateEvent (&sec_all, FALSE, FALSE, NULL);
-  sigproc_printf ("subproc_ready %p", subproc_ready);
-  cygheap = ::cygheap;
-  cygheap_max = ::cygheap_max;
-  flag = 0;
   if (strace.attached ())
     flag |= _CI_STRACED;
   if (need_subproc_ready)
-    flag |= _CI_ISCYGWIN;
+    {
+      subproc_ready = CreateEvent (&sec_all, FALSE, FALSE, NULL);
+      flag |= _CI_ISCYGWIN;
+    }
+  sigproc_printf ("subproc_ready %p", subproc_ready);
+  cygheap = ::cygheap;
+  cygheap_max = ::cygheap_max;
   retry = child_info::retry_count;
   /* Create an inheritable handle to pass to the child process.  This will
      allow the child to duplicate handles from the parent to itself. */

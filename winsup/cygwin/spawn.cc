@@ -777,8 +777,6 @@ loop:
       strace.execing = 1;
       myself.hProcess = hExeced = pi.hProcess;
       strcpy (myself->progname, real_path); // FIXME: race?
-      if (!looped)
-	close_all_files (true);
       sigproc_printf ("new process name %s", myself->progname);
       /* If wr_proc_pipe doesn't exist then this process was not started by a cygwin
 	 process.  So, we need to wait around until the process we've just "execed"
@@ -864,19 +862,25 @@ loop:
 	      myself->wr_proc_pipe_owner = GetCurrentProcessId ();
 	      myself->wr_proc_pipe = orig_wr_proc_pipe;
 	    }
-	  if (ch.proc_retry (pi.hProcess) == 0)
+	  DWORD res = ch.proc_retry (pi.hProcess);
+	  if (!res)
 	    {
 	      looped++;
 	      goto loop;
 	    }
+	  close_all_files (true);
 	}
-      else if (!myself->wr_proc_pipe
-	       && WaitForSingleObject (pi.hProcess, 0) == WAIT_TIMEOUT)
+      else
 	{
-	  extern bool is_toplevel_proc;
-	  is_toplevel_proc = true;
-	  myself.remember (false);
-	  waitpid (myself->pid, &res, 0);
+	  close_all_files (true);
+	  if (!myself->wr_proc_pipe
+	      && WaitForSingleObject (pi.hProcess, 0) == WAIT_TIMEOUT)
+	    {
+	      extern bool is_toplevel_proc;
+	      is_toplevel_proc = true;
+	      myself.remember (false);
+	      waitpid (myself->pid, &res, 0);
+	    }
 	}
       myself.exit (EXITCODE_NOSET);
       break;
