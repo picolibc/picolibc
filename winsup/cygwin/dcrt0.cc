@@ -693,7 +693,6 @@ child_info_spawn::handle_spawn ()
       old_title = strcpy (title_buf, moreinfo->old_title);
       cfree (moreinfo->old_title);
     }
-  init_console_handler (myself->ctty >= 0);
 }
 
 void __stdcall

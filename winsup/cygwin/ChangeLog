@@ -1,5 +1,11 @@
 2006-03-23  Christopher Faylor  <cgf@timesys.com>
 
+	* dcrt0.cc (child_info_spawn::handle_spawn): Don't initialize the
+	console handler here.
+	* dtable.cc (dtable::stdio_init): Initialize console handler here.
+
+2006-03-23  Christopher Faylor  <cgf@timesys.com>
+
 	* sigproc.cc (sigalloc): Don't set SA_RESTART here.
 	* signal.cc (_SA_NORESTART): New flag.
 	(sigaction_worker): New function, derived from sigaction.  Don't set

@@ -134,7 +134,10 @@ dtable::stdio_init ()
      in case they're missed.  */
 
   if (myself->cygstarted || ISSTATE (myself, PID_CYGPARENT))
-    return;
+    {
+      init_console_handler (myself->ctty >= 0);
+      return;
+    }
 
   HANDLE in = GetStdHandle (STD_INPUT_HANDLE);
   HANDLE out = GetStdHandle (STD_OUTPUT_HANDLE);
