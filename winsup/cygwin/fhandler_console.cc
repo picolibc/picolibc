@@ -1804,12 +1804,12 @@ fhandler_console::fixup_after_fork_exec (bool execing)
       bool sawerr = false;
       if (!get_io_handle ())
 	{
-	  system_printf ("error opening input console handle after fork/exec, errno %d, %E", get_errno ());
+	  system_printf ("error opening input console handle for %s after fork/exec, errno %d, %E", get_name (), get_errno ());
 	  sawerr = true;
 	}
       if (!get_output_handle ())
 	{
-	  system_printf ("error opening output console handle after fork/exec, errno %d, %E", get_errno ());
+	  system_printf ("error opening output console handle for %s after fork/exec, errno %d, %E", get_name (), get_errno ());
 	  sawerr = true;
 	}
 

@@ -603,7 +603,6 @@ _pinfo::commune_request (__uint32_t code, ...)
     break;
     }
 
-  lock_process now ();
   locked = true;
   char name_buf[CYG_MAX_PATH];
   request_sync = CreateSemaphore (&sec_none_nih, 0, LONG_MAX,
@@ -652,6 +651,7 @@ _pinfo::commune_request (__uint32_t code, ...)
       break;
     case PICOM_FIFO:
       {
+	lock_process now ();
 	DWORD x = ReadFile (fromthem, res.handles, sizeof (res.handles), &nr, NULL);
 	if (!x || nr != sizeof (res.handles))
 	  {

@@ -1,5 +1,12 @@
 2006-03-23  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler_console.cc (fhandler_console::fixup_after_fork_exec): Make
+	error message more explicit.
+	* pinfo.cc (_pinfo::commune_request): Don't lock process unless we're
+	looking for fifos.
+
+2006-03-23  Christopher Faylor  <cgf@timesys.com>
+
 	* dcrt0.cc (child_info_spawn::handle_spawn): Don't initialize the
 	console handler here.
 	* dtable.cc (dtable::stdio_init): Initialize console handler here.
