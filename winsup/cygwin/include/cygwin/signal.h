@@ -215,6 +215,10 @@ struct sigaction
 #define SA_ONESHOT   SA_RESETHAND	/* Historical linux name */
 #define SA_NOMASK    SA_NODEFER		/* Historical linux name */
 
+/* Used internally by cygwin.  Included here to group everything in one place.
+   Do not use.  */
+#define _SA_INTERNAL_MASK 0xf000	/* bits in this range are internal */
+
 #define	SIGHUP	1	/* hangup */
 #define	SIGINT	2	/* interrupt */
 #define	SIGQUIT	3	/* quit */

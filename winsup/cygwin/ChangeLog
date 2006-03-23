@@ -1,3 +1,15 @@
+2006-03-23  Christopher Faylor  <cgf@timesys.com>
+
+	* sigproc.cc (sigalloc): Don't set SA_RESTART here.
+	* signal.cc (_SA_NORESTART): New flag.
+	(sigaction_worker): New function, derived from sigaction.  Don't set
+	internal flags unless called internally.
+	(sigaction): Use sigaction_worker.
+	(signal): Honor new _SA_NORESTART flag.
+	(siginterrupt): Set _SA_NORESTART flag appropriately.  Use
+	sigaction_worker to set flags.
+	* include/cygwin/signal.h: Define _SA_INTERNAL_MASK here.
+
 2006-03-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* thread.cc (pthread_mutex::is_good_initializer_or_bad_object): Delete.

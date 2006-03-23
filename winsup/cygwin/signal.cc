@@ -28,6 +28,11 @@ details. */
 
 int sigcatchers;	/* FIXME: Not thread safe. */
 
+#define _SA_NORESTART	0x8000
+
+static int sigaction_worker (int, const struct sigaction *, struct sigaction *, bool)
+  __attribute__ ((regparm (3)));
+
 #define sigtrapped(func) ((func) != SIG_IGN && (func) != SIG_DFL)
 
 static inline void
@@ -62,9 +67,16 @@ signal (int sig, _sig_func_ptr func)
     }
 
   prev = global_sigs[sig].sa_handler;
-  global_sigs[sig].sa_handler = func;
-  global_sigs[sig].sa_mask = 0;
-  global_sigs[sig].sa_flags &= ~SA_SIGINFO;
+  struct sigaction& gs = global_sigs[sig];
+  if (gs.sa_flags & _SA_NORESTART)
+    gs.sa_flags &= ~SA_RESTART;
+  else
+    gs.sa_flags |= SA_RESTART;
+
+  gs.sa_mask = 0;
+  gs.sa_handler = func;
+  gs.sa_flags &= ~SA_SIGINFO;
+
   set_sigcatchers (prev, func);
 
   syscall_printf ("%p = signal (%d, %p)", prev, sig, func);
@@ -336,8 +348,8 @@ abort (void)
   do_exit (SIGABRT);	/* signal handler didn't exit.  Goodbye. */
 }
 
-extern "C" int
-sigaction (int sig, const struct sigaction *newact, struct sigaction *oldact)
+static int
+sigaction_worker (int sig, const struct sigaction *newact, struct sigaction *oldact, bool isinternal)
 {
   sig_dispatch_pending ();
   /* check that sig is in right range */
@@ -361,27 +373,39 @@ sigaction (int sig, const struct sigaction *newact, struct sigaction *oldact)
 	  set_errno (EINVAL);
 	  return -1;
 	}
-      struct sigaction& na = global_sigs[sig];
-      na = *newact;
-      if (!(na.sa_flags & SA_NODEFER))
-	na.sa_mask |= SIGTOMASK(sig);
-      if (na.sa_handler == SIG_IGN)
+      struct sigaction na = *newact;
+      struct sigaction& gs = global_sigs[sig];
+      if (!isinternal)
+	na.sa_flags &= ~_SA_INTERNAL_MASK;
+      gs = na;
+      if (!(gs.sa_flags & SA_NODEFER))
+	gs.sa_mask |= SIGTOMASK(sig);
+      if (gs.sa_handler == SIG_IGN)
 	sig_clear (sig);
-      if (na.sa_handler == SIG_DFL && sig == SIGCHLD)
+      if (gs.sa_handler == SIG_DFL && sig == SIGCHLD)
 	sig_clear (sig);
-      set_sigcatchers (oa.sa_handler, na.sa_handler);
+      set_sigcatchers (oa.sa_handler, gs.sa_handler);
       if (sig == SIGCHLD)
 	{
 	  myself->process_state &= ~PID_NOCLDSTOP;
-	  if (na.sa_flags & SA_NOCLDSTOP)
+	  if (gs.sa_flags & SA_NOCLDSTOP)
 	    myself->process_state |= PID_NOCLDSTOP;
 	}
     }
 
   if (oldact)
-    *oldact = oa;
+    {
+      *oldact = oa;
+      oa.sa_flags &= ~_SA_INTERNAL_MASK;
+    }
 
   return 0;
+}
+
+extern "C" int
+sigaction (int sig, const struct sigaction *newact, struct sigaction *oldact)
+{
+  return sigaction_worker (sig, newact, oldact, false);
 }
 
 extern "C" int
@@ -469,10 +493,16 @@ siginterrupt (int sig, int flag)
   struct sigaction act;
   sigaction (sig, NULL, &act);
   if (flag)
-    act.sa_flags &= ~SA_RESTART;
+    {
+      act.sa_flags &= ~SA_RESTART;
+      act.sa_flags |= _SA_NORESTART;
+    }
   else
-    act.sa_flags |= SA_RESTART;
-  return sigaction (sig, &act, NULL);
+    {
+      act.sa_flags &= ~_SA_NORESTART;
+      act.sa_flags |= SA_RESTART;
+    }
+  return sigaction_worker (sig, &act, NULL, true);
 }
 
 extern "C" int
