@@ -1,0 +1,22 @@
+2006-03-23  Mark Mitchell  <mark@codesourcery.com>
+
+	* libc/sys/arm/Makefile.am (extra_objs): Add _exit.o _nmi_isr.o
+	_fault_isr.o.
+	* libc/sys/arm/Makefile.in: Regenerated.
+	* libc/sys/arm/_exit.c: New file. 
+	* libc/sys/arm/_fault_isr.c: Likewise.
+	* libc/sys/arm/_nmi_isr.c: Likewise.
+	* libc/sys/arm/configure.in (--enable-newlib-arm-v7m): New option.
+	* libc/sys/arm/configure: 
+	* libc/sys/arm/crt0.S (_start): Do not use semihosting calls in
+	_start when configured for ARM V7M.  Do not call
+	initialise_monitor_handles.  Indent preprocessor directives.
+	(.isr_vector): New section, on ARM V7M.
+	* libc/sys/arm/swi.h (do_AngelSWI): New function.
+	* syscalls.c (_exit): Remove.
+	(do_AngelSWI): Likewise.
+	(CHECK_INIT): Remove.
+	(remap_handle): Call initialise_monitor_handles.
+	(__arm_monitor_handles_lock): New variable.
+	(initialise_monitor_handles): Make sure to run only once.
+

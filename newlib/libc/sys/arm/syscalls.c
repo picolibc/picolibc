@@ -29,7 +29,6 @@ int     _fstat 		_PARAMS ((int, struct stat *));
 caddr_t _sbrk		_PARAMS ((int));
 int     _getpid		_PARAMS ((int));
 int     _kill		_PARAMS ((int, int));
-void    _exit		_PARAMS ((int));
 int     _close		_PARAMS ((int));
 int     _swiclose	_PARAMS ((int));
 int     _open		_PARAMS ((const char *, int, ...));
@@ -40,28 +39,16 @@ int     _lseek		_PARAMS ((int, int, int));
 int     _swilseek	_PARAMS ((int, int, int));
 int     _read		_PARAMS ((int, char *, int));
 int     _swiread	_PARAMS ((int, char *, int));
-void    initialise_monitor_handles _PARAMS ((void));
 
+static void    initialise_monitor_handles _PARAMS ((void));
 static int	wrap		_PARAMS ((int));
 static int	error		_PARAMS ((int));
 static int	get_errno	_PARAMS ((void));
 static int	remap_handle	_PARAMS ((int));
-static int	do_AngelSWI	_PARAMS ((int, void *));
 static int 	findslot	_PARAMS ((int));
 
 /* Register name faking - works in collusion with the linker.  */
 register char * stack_ptr asm ("sp");
-
-
-/* following is copied from libc/stdio/local.h to check std streams */
-extern void   _EXFUN(__sinit,(struct _reent *));
-#define CHECK_INIT(ptr) \
-  do						\
-    {						\
-      if ((ptr) && !(ptr)->__sdidinit)		\
-	__sinit (ptr);				\
-    }						\
-  while (0)
 
 /* Adjust our internal handles to stay away from std* handles.  */
 #define FILE_HANDLE_OFFSET (0x20)
@@ -92,31 +79,11 @@ findslot (int fh)
   return i;
 }
 
-#ifdef ARM_RDI_MONITOR
-
-static inline int
-do_AngelSWI (int reason, void * arg)
-{
-  int value;
-  asm volatile ("mov r0, %1; mov r1, %2; " AngelSWIInsn " %a3; mov %0, r0"
-       : "=r" (value) /* Outputs */
-       : "r" (reason), "r" (arg), "i" (AngelSWI) /* Inputs */
-       : "r0", "r1", "r2", "r3", "ip", "lr", "memory", "cc"
-		/* Clobbers r0 and r1, and lr if in supervisor mode */);
-                /* Accordingly to page 13-77 of ARM DUI 0040D other registers
-                   can also be clobbered.  Some memory positions may also be
-                   changed by a system call, so they should not be kept in
-                   registers. Note: we are assuming the manual is right and
-                   Angel is respecting the APCS.  */
-  return value;
-}
-#endif /* ARM_RDI_MONITOR */
-
 /* Function to convert std(in|out|err) handles to internal versions.  */
 static int
 remap_handle (int fh)
 {
-  CHECK_INIT(_REENT);
+  initialise_monitor_handles ();
 
   if (fh == STDIN_FILENO)
     return monitor_stdin;
@@ -128,11 +95,28 @@ remap_handle (int fh)
   return fh - FILE_HANDLE_OFFSET;
 }
 
+#ifndef __SINGLE_THREAD__
+__LOCK_INIT_RECURSIVE (static, __arm_monitor_handles_lock);
+#endif
+
 void
 initialise_monitor_handles (void)
 {
   int i;
-  
+  static int initialized;
+
+  /* We need do this only once.  */
+  if (initialized)
+    return;
+
+#ifndef __SINGLE_THREAD__
+  __lock_acquire_recursive (__arm_monitor_handles_lock);
+#endif
+  initialized = 1;
+#ifndef __SINGLE_THREAD__
+  __lock_release_recursive (__arm_monitor_handles_lock);
+#endif
+
 #ifdef ARM_RDI_MONITOR
   int volatile block[3];
   
@@ -431,20 +415,6 @@ int
 _close (int file)
 {
   return wrap (_swiclose (file));
-}
-
-void
-_exit (int n)
-{
-  /* FIXME: return code is thrown away.  */
-  
-#ifdef ARM_RDI_MONITOR
-  do_AngelSWI (AngelSWI_Reason_ReportException,
-	      (void *) ADP_Stopped_ApplicationExit);
-#else
-  asm ("swi %a0" :: "i" (SWI_Exit));
-#endif
-  n = n;
 }
 
 int

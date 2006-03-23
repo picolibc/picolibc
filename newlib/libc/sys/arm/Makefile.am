@@ -7,7 +7,7 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 noinst_LIBRARIES = lib.a
 
 if MAY_SUPPLY_SYSCALLS
-extra_objs = libcfunc.o trap.o syscalls.o
+extra_objs = libcfunc.o trap.o syscalls.o _exit.o _nmi_isr.o _fault_isr.o
 else
 extra_objs =
 endif
