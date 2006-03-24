@@ -1,3 +1,12 @@
+2006-03-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_floppy.cc: Include ntdef.h and ntdll.h.
+	(fhandler_dev_floppy::get_drive_info): Rearrange so that now
+	NtQueryVolumeInformationFile is called on drives which don't support
+	IOCTL_DISK_GET_DRIVE_GEOMETRY.
+	* ntdll.h (struct _FILE_FS_SIZE_INFORMATION): Add.
+	(enum _FSINFOCLASS): Add missing values.
+
 2006-03-23  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_console.cc (fhandler_console::fixup_after_fork_exec): Make

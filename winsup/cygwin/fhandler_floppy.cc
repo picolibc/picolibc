@@ -21,6 +21,8 @@ details. */
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
+#include <ntdef.h>
+#include "ntdll.h"
 
 #define IS_EOM(err)	((err) == ERROR_INVALID_PARAMETER \
 			 || (err) == ERROR_SEEK \
@@ -40,7 +42,7 @@ fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo)
   char dbuf[256];
   char pbuf[256];
 
-  DISK_GEOMETRY *di;
+  DISK_GEOMETRY *di = NULL;
   PARTITION_INFORMATION_EX *pix = NULL;
   PARTITION_INFORMATION *pi = NULL;
   DWORD bytes_read = 0;
@@ -53,74 +55,115 @@ fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo)
       if (!DeviceIoControl (get_handle (),
 			    IOCTL_DISK_GET_DRIVE_GEOMETRY_EX, NULL, 0,
 			    dbuf, 256, &bytes_read, NULL))
+	__seterrno ();
+      else
 	{
-	  __seterrno ();
-	  return -1;
+	  di = &((DISK_GEOMETRY_EX *) dbuf)->Geometry;
+	  if (!DeviceIoControl (get_handle (),
+				IOCTL_DISK_GET_PARTITION_INFO_EX, NULL, 0,
+				pbuf, 256, &bytes_read, NULL))
+	    __seterrno ();
+	  else
+	    pix = (PARTITION_INFORMATION_EX *) pbuf;
 	}
-      di = &((DISK_GEOMETRY_EX *) dbuf)->Geometry;
-      if (DeviceIoControl (get_handle (),
-			   IOCTL_DISK_GET_PARTITION_INFO_EX, NULL, 0,
-			   pbuf, 256, &bytes_read, NULL))
-	pix = (PARTITION_INFORMATION_EX *) pbuf;
     }
-  else
+  if (!di)
     {
       if (!DeviceIoControl (get_handle (),
 			    IOCTL_DISK_GET_DRIVE_GEOMETRY, NULL, 0,
 			    dbuf, 256, &bytes_read, NULL))
+	__seterrno ();
+      else
 	{
-	  __seterrno ();
+	  di = (DISK_GEOMETRY *) dbuf;
+	  if (!DeviceIoControl (get_handle (),
+				IOCTL_DISK_GET_PARTITION_INFO, NULL, 0,
+				pbuf, 256, &bytes_read, NULL))
+	    __seterrno ();
+	  else
+	    pi = (PARTITION_INFORMATION *) pbuf;
+	}
+    }
+  if (!di)
+    {
+      /* Up to Win2K, even IOCTL_DISK_GET_DRIVE_GEOMETRY fails when trying
+         it on CD or DVD drives.  In that case fall back to requesting
+	 simple file system information. */
+      NTSTATUS status;
+      IO_STATUS_BLOCK io;
+      FILE_FS_SIZE_INFORMATION ffsi;
+      
+      status = NtQueryVolumeInformationFile (get_handle (), &io, &ffsi,
+					     sizeof ffsi,
+					     FileFsSizeInformation);
+      if (!NT_SUCCESS (status))
+        {
+	  __seterrno_from_nt_status (status);
 	  return -1;
 	}
-      di = (DISK_GEOMETRY *) dbuf;
-      if (DeviceIoControl (get_handle (),
-			   IOCTL_DISK_GET_PARTITION_INFO, NULL, 0,
-			   pbuf, 256, &bytes_read, NULL))
-	pi = (PARTITION_INFORMATION *) pbuf;
-    }
-
-  debug_printf ("disk geometry: (%ld cyl)*(%ld trk)*(%ld sec)*(%ld bps)",
-		 di->Cylinders.LowPart,
-		 di->TracksPerCylinder,
-		 di->SectorsPerTrack,
-		 di->BytesPerSector);
-  bytes_per_sector = di->BytesPerSector;
-  if (pix)
-    {
-      debug_printf ("partition info: offset %D  length %D",
-		    pix->StartingOffset.QuadPart,
-		    pix->PartitionLength.QuadPart);
-      drive_size = pix->PartitionLength.QuadPart;
-    }
-  else if (pi)
-    {
-      debug_printf ("partition info: offset %D  length %D",
-		    pi->StartingOffset.QuadPart,
-		    pi->PartitionLength.QuadPart);
-      drive_size = pi->PartitionLength.QuadPart;
+      debug_printf ("fsys geometry: (%D units)*(%u sec)*(%u bps)",
+		    ffsi.TotalAllocationUnits.QuadPart,
+		    ffsi.SectorsPerAllocationUnit,
+		    ffsi.BytesPerSector);
+      bytes_per_sector = ffsi.BytesPerSector;
+      drive_size = ffsi.TotalAllocationUnits.QuadPart
+		   * ffsi.SectorsPerAllocationUnit
+      		   * ffsi.BytesPerSector;
+      if (geo)
+        {
+	  geo->heads = 1;
+	  geo->sectors = ffsi.SectorsPerAllocationUnit;
+	  geo->cylinders = ffsi.TotalAllocationUnits.LowPart;
+	  geo->start = 0;
+	}
     }
   else
     {
-      /* Getting the partition size by using the drive geometry information
-	 looks wrong, but this is a historical necessity.  NT4 didn't maintain
-	 partition information for the whole drive (aka "partition 0"), but
-	 returned ERROR_INVALID_HANDLE instead.  That got fixed in W2K. */
-      drive_size = di->Cylinders.QuadPart * di->TracksPerCylinder *
-		   di->SectorsPerTrack * di->BytesPerSector;
+      debug_printf ("disk geometry: (%D cyl)*(%u trk)*(%u sec)*(%u bps)",
+		     di->Cylinders.QuadPart,
+		     di->TracksPerCylinder,
+		     di->SectorsPerTrack,
+		     di->BytesPerSector);
+      bytes_per_sector = di->BytesPerSector;
+      if (pix)
+	{
+	  debug_printf ("partition info: offset %D  length %D",
+			pix->StartingOffset.QuadPart,
+			pix->PartitionLength.QuadPart);
+	  drive_size = pix->PartitionLength.QuadPart;
+	}
+      else if (pi)
+	{
+	  debug_printf ("partition info: offset %D  length %D",
+			pi->StartingOffset.QuadPart,
+			pi->PartitionLength.QuadPart);
+	  drive_size = pi->PartitionLength.QuadPart;
+	}
+      else
+	{
+	  /* Getting the partition size by using the drive geometry information
+	     looks wrong, but this is a historical necessity.  NT4 didn't
+	     maintain partition information for the whole drive (aka
+	     "partition 0"), but returned ERROR_INVALID_HANDLE instead.  That
+	     got fixed in W2K. */
+	  drive_size = di->Cylinders.QuadPart * di->TracksPerCylinder
+		       * di->SectorsPerTrack * di->BytesPerSector;
+	}
+      if (geo)
+	{
+	  geo->heads = di->TracksPerCylinder;
+	  geo->sectors = di->SectorsPerTrack;
+	  geo->cylinders = di->Cylinders.LowPart;
+	  if (pix)
+	    geo->start = pix->StartingOffset.QuadPart >> 9ULL;
+	  else if (pi)
+	    geo->start = pi->StartingOffset.QuadPart >> 9ULL;
+	  else
+	    geo->start = 0;
+	}
     }
   debug_printf ("drive size: %D", drive_size);
-  if (geo)
-    {
-      geo->heads = di->TracksPerCylinder;
-      geo->sectors = di->SectorsPerTrack;
-      geo->cylinders = di->Cylinders.LowPart;
-      if (pix)
-	geo->start = pix->StartingOffset.QuadPart >> 9ULL;
-      else if (pi)
-	geo->start = pi->StartingOffset.QuadPart >> 9ULL;
-      else
-	geo->start = 0;
-    }
+   
   return 0;
 }
 

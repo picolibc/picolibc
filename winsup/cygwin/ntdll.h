@@ -536,9 +536,25 @@ typedef struct _FILE_FS_VOLUME_INFORMATION
   WCHAR VolumeLabel[1];
 } FILE_FS_VOLUME_INFORMATION, *PFILE_FS_VOLUME_INFORMATION;
 
-typedef enum _FSINFOCLASS
+typedef struct _FILE_FS_SIZE_INFORMATION
 {
-  FileFsVolumeInformation = 1
+  LARGE_INTEGER TotalAllocationUnits;
+  LARGE_INTEGER AvailableAllocationUnits;
+  ULONG SectorsPerAllocationUnit;
+  ULONG BytesPerSector;
+} FILE_FS_SIZE_INFORMATION, *PFILE_FS_SIZE_INFORMATION;
+
+typedef enum _FSINFOCLASS {
+  FileFsVolumeInformation = 1,
+  FileFsLabelInformation,
+  FileFsSizeInformation,
+  FileFsDeviceInformation,
+  FileFsAttributeInformation,
+  FileFsControlInformation,
+  FileFsFullSizeInformation,
+  FileFsObjectIdInformation,
+  FileFsDriverPathInformation,
+  FileFsMaximumInformation
 } FS_INFORMATION_CLASS, *PFS_INFORMATION_CLASS;
 
 typedef enum _OBJECT_INFORMATION_CLASS
