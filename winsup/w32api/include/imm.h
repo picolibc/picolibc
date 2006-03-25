@@ -207,6 +207,8 @@ extern "C" {
 #define IME_REGWORD_STYLE_EUDC 1
 #define IME_REGWORD_STYLE_USER_FIRST 0x80000000
 #define IME_REGWORD_STYLE_USER_LAST 0xFFFFFFFF
+#define IMR_RECONVERTSTRING 4
+#define IMR_QUERYCHARPOSITION 6
 #define SOFTKEYBOARD_TYPE_T1 1
 #define SOFTKEYBOARD_TYPE_C1 2
 #define IMEMENUITEM_STRING_SIZE 80
@@ -267,6 +269,23 @@ typedef struct tagCANDIDATELIST {
 	DWORD dwPageSize;
 	DWORD dwOffset[1];
 } CANDIDATELIST,*PCANDIDATELIST,*LPCANDIDATELIST;
+typedef struct tagIMECHARPOSITION {
+  DWORD  dwSize;
+  DWORD  dwCharPos;
+  POINT  pt;
+  UINT   cLineHeight;
+  RECT   rcDocument;
+} IMECHARPOSITION, *PIMECHARPOSITION;
+typedef struct tagRECONVERTSTRING {
+  DWORD dwSize;
+  DWORD dwVersion;
+  DWORD dwStrLen;
+  DWORD dwStrOffset;
+  DWORD dwCompStrLen;
+  DWORD dwCompStrOffset;
+  DWORD dwTargetStrLen;
+  DWORD dwTargetStrOffset;
+} RECONVERTSTRING, *PRECONVERTSTRING;
 typedef struct tagREGISTERWORDA {
 	LPSTR lpReading;
 	LPSTR lpWord;

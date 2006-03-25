@@ -1,3 +1,20 @@
+2006-03-26  Hansres Engel  <engel@node.ch>
+
+         Add Uniscribe API for typography and for complex scripts.
+	 * include/usp10.h: New file.
+         * lib/usp10.def: New file.
+
+	* include/winver.h:  Change first argument of GetFileVersionInfo[...] to const.
+
+        * include/imm.h (IMECHARPOSITION): Add structure.
+	(RECONVERTSTRING): Likwise.
+
+	* include/commdlg.h (OPENFILENAME_SIZE_VERSION_400): Define.
+	
+        * lib/uuid.c (CMultiLanguage): Add UUID definition.
+	(IMLangFontLink2): Likewise.
+	(IMultiLanguage): Likewise.
+
 2006-03-18  Julien Lecomte <julienlecomte@users.sourceforge.net>
 
 	* include/wincon.h  (ENABLE_*): Add more defines.

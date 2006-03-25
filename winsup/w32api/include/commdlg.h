@@ -193,6 +193,9 @@ extern "C" {
 #define CD_LBSELSUB      1
 #define CD_LBSELADD      2
 #define DN_DEFAULTPRN	1
+#if (_WIN32_WINNT >= 0x0500)
+#define OPENFILENAME_SIZE_VERSION_400  76
+#endif /* (_WIN32_WINNT >= 0x0500) */
 
 #ifndef SNDMSG
 #ifdef __cplusplus
