@@ -1,3 +1,8 @@
+2006-03-26  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* gas/config/tc-m68k.c (m68k_init_arch): Move checking of
+	cfloat/m68881 to correct architecture before using it.
+
 2006-03-21  Paul Brook  <paul@codesourcery.com>
 
 	* gas/config/tc-arm.c (md_apply_fix): Fix typo in offset mask.
