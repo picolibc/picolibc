@@ -600,12 +600,12 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       si.wShowWindow = SW_HIDE;
     }
 
-  int flags = GetPriorityClass (hMainProc);
-  sigproc_printf ("priority class %d", flags);
-  flags |= CREATE_SEPARATE_WOW_VDM;
+  int c_flags = GetPriorityClass (hMainProc);
+  sigproc_printf ("priority class %d", c_flags);
+  c_flags |= CREATE_SEPARATE_WOW_VDM;
 
   if (mode == _P_DETACH)
-    flags |= DETACHED_PROCESS;
+    c_flags |= DETACHED_PROCESS;
 
   if (mode != _P_OVERLAY)
     myself->exec_sendsig = NULL;
@@ -642,7 +642,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   if (!newargv.win16_exe
       && (wincap.start_proc_suspended () || mode != _P_OVERLAY
 	  || cygheap->fdtab.need_fixup_before ()))
-    flags |= CREATE_SUSPENDED;
+    c_flags |= CREATE_SUSPENDED;
 
   const char *runpath = null_app_name ? NULL : (const char *) real_path;
 
@@ -683,7 +683,7 @@ loop:
 			  &sec_none_nih,/* process security attrs */
 			  &sec_none_nih,/* thread security attrs */
 			  TRUE,		/* inherit handles from parent */
-			  flags,
+			  c_flags,
 			  envblock,	/* environment */
 			  0,		/* use current drive/directory */
 			  &si,
@@ -718,7 +718,7 @@ loop:
 		       &sec_none_nih,   /* process security attrs */
 		       &sec_none_nih,   /* thread security attrs */
 		       TRUE,		/* inherit handles from parent */
-		       flags,
+		       c_flags,
 		       envblock,	/* environment */
 		       0,		/* use current drive/directory */
 		       &si,
@@ -749,7 +749,7 @@ loop:
       goto out;
     }
 
-  if (!(flags & CREATE_SUSPENDED))
+  if (!(c_flags & CREATE_SUSPENDED))
     strace.write_childpid (ch, pi.dwProcessId);
 
   /* Fixup the parent data structures if needed and resume the child's
@@ -801,6 +801,8 @@ loop:
 	  orig_wr_proc_pipe = myself->dup_proc_pipe (pi.hProcess);
 	}
       pid = myself->pid;
+      if (!ch.iscygwin ())
+	close_all_files ();
     }
   else
     {
@@ -840,7 +842,7 @@ loop:
     }
 
   /* Start the child running */
-  if (flags & CREATE_SUSPENDED)
+  if (c_flags & CREATE_SUSPENDED)
     {
       ResumeThread (pi.hThread);
       strace.write_childpid (ch, pi.dwProcessId);

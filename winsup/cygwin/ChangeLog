@@ -1,5 +1,10 @@
 2006-03-26  Christopher Faylor  <cgf@timesys.com>
 
+	* spawn.cc (spawn_guts): Close handles if we know that we will not be
+	seeing a sync event from the child.
+
+2006-03-26  Christopher Faylor  <cgf@timesys.com>
+
 	* sigproc.cc (wait_sig): Move myself manipulation...
 	(wait_for_sigthread): ...to here.
 
