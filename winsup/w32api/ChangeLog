@@ -1,3 +1,7 @@
+2006-03-27  Hansres Engel  <engel@node.ch>
+
+	* include/mlang.h: New file.
+
 2006-03-26  Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
 
     * include/winbase.h (SetProcessWorkingSetSize): Corrected define.
