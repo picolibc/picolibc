@@ -141,6 +141,10 @@ wait_for_sigthread ()
     api_fatal ("couldn't create signal pipe, %E");
   ProtectHandle (my_readsig);
   myself->sendsig = my_sendsig;
+
+  myself->process_state |= PID_ACTIVE;
+  myself->process_state &= ~PID_INITIALIZING;
+
   sigproc_printf ("wait_sig_inited %p", wait_sig_inited);
   HANDLE hsig_inited = wait_sig_inited;
   WaitForSingleObject (hsig_inited, INFINITE);
@@ -1130,17 +1134,10 @@ wait_sig (VOID *)
 
   sigCONT = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
 
-  /* Setting dwProcessId flags that this process is now capable of receiving
-     signals.  Prior to this, dwProcessId was set to the windows pid of
-     of the original windows process which spawned us unless this was a
-     "toplevel" process.  */
-  myself->process_state |= PID_ACTIVE;
-  myself->process_state &= ~PID_INITIALIZING;
-
-  _sig_tls = &_my_tls;
   sigproc_printf ("myself->dwProcessId %u", myself->dwProcessId);
   SetEvent (wait_sig_inited);
 
+  _sig_tls = &_my_tls;
   _sig_tls->init_threadlist_exceptions ();
   debug_printf ("entering ReadFile loop, my_readsig %p, myself->sendsig %p",
 		my_readsig, myself->sendsig);
