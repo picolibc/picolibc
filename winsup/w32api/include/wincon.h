@@ -152,6 +152,9 @@ DWORD WINAPI GetConsoleTitleW(LPWSTR,DWORD);
 BOOL WINAPI GetConsoleDisplayMode(LPDWORD);
 HWND WINAPI GetConsoleWindow(void);
 #endif
+#if (_WIN32_WINNT >= 0x0501)
+DWORD WINAPI GetConsoleProcessList(LPDWORD, DWORD);
+#endif
 COORD WINAPI GetLargestConsoleWindowSize(HANDLE);
 BOOL WINAPI GetNumberOfConsoleInputEvents(HANDLE,PDWORD);
 BOOL WINAPI GetNumberOfConsoleMouseButtons(PDWORD);

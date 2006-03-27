@@ -1,3 +1,8 @@
+
+2006-03-27  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wincon.h (GetConsoleProcessList): Declare.
+
 2006-03-27  Hansres Engel  <engel@node.ch>
 
 	* include/mlang.h: New file.
