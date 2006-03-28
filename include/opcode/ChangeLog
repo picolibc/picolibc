@@ -1,3 +1,11 @@
+2006-03-28  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* m68k.h (cpu_m68k, cpu_cf, cpu_m68000, cpu_m68008, cpu_m68010,
+	cpu_m68020, cpu_m68ec030, cpu_m68040, cpu_m68060, cpu_m68851,
+	cpu_m68881, cpu_m68882, cpu_cpu32, cpu_cf5200, cpu_cf5206e,
+	cpu_cf5208, cpu_cf521x, cpu_cf5213, cpu_cf5249, cpu_cf528x,
+	cpu_cf5307, cpu_cf5329, cpu_cf5407, cpu_cf547x, cpu_cf548x): Remove.
+
 2006-03-10  Paul Brook  <paul@codesourcery.com>
 
 	* arm.h (ARM_AEXT_V7_ARM): Include v6ZK extensions.
