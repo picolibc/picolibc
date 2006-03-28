@@ -53,44 +53,6 @@
 #define	mfloat  (m68881 | m68040 | m68060)
 #define	mmmu    (m68851 | m68030 | m68040 | m68060)
 
-/* CPU numbering.  There are too many of these to use a bit vector.
-   These are a one-of-many selection.  Choose a numbering scheme that
-   simply maps onto manufacturer's part numbers. */
-
-/* All m68k cpus */
-#define cpu_m68k 0
-/* All coldfire cpus */
-#define cpu_cf  1000000
-
-#define cpu_m68000  (cpu_m68k + 68000)
-#define	cpu_m68008  cpu_m68000 /* Synonym for -m68000.  otherwise unused.  */
-#define	cpu_m68010  (cpu_m68k + 68010)
-#define	cpu_m68020  (cpu_m68k + 68020)
-#define	cpu_m68030  (cpu_m68k + 68030)
-#define cpu_m68ec030 cpu_m68030 /* Similar enough to -m68030 to ignore
-			   differences; gas will deal with the few
-			   differences.  */
-#define	cpu_m68040  (cpu_m68k + 68040)
-/* There is no 68050.  */
-#define cpu_m68060  (cpu_m68k + 68060)
-#define	cpu_m68851  (cpu_m68k + 68851)
-#define	cpu_m68881  (cpu_m68k + 68881)
-#define	cpu_m68882   cpu_m68881 /* Synonym for -m68881.  otherwise unused.  */
-#define cpu_cpu32   (cpu_m68k + 32)
-
-#define cpu_cf5200  (cpu_cf + 5200)
-#define cpu_cf5206e (cpu_cf + 5206)
-#define cpu_cf5208  (cpu_cf + 5208)
-#define cpu_cf521x  (cpu_cf + 5210)
-#define cpu_cf5213  (cpu_cf + 5213)
-#define cpu_cf5249  (cpu_cf + 5249)
-#define cpu_cf528x  (cpu_cf + 5280)
-#define cpu_cf5307  (cpu_cf + 5307)
-#define cpu_cf5329  (cpu_cf + 5329)
-#define cpu_cf5407  (cpu_cf + 5407)
-#define cpu_cf547x  (cpu_cf + 5470)
-#define cpu_cf548x  (cpu_cf + 5480)
-
 /* The structure used to hold information for an opcode.  */
 
 struct m68k_opcode

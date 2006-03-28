@@ -1,3 +1,12 @@
+2006-03-22  Richard Sandiford  <richard@codesourcery.com>
+	    Daniel Jacobowitz  <dan@codesourcery.com>
+	    Phil Edwards  <phil@codesourcery.com>
+	    Zack Weinberg  <zack@codesourcery.com>
+	    Mark Mitchell  <mark@codesourcery.com>
+	    Nathan Sidwell  <nathan@codesourcery.com>
+
+	* mips.h (R_MIPS_COPY, R_MIPS_JUMP_SLOT): New relocs.
+
 2006-03-19  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
 
 	* hppa.h (SHF_HP_TLS, SHF_HP_NEAR_SHARED, SHF_HP_FAR_SHARED,

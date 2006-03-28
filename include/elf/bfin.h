@@ -43,6 +43,21 @@ START_RELOC_NUMBERS (elf_bfin_reloc_type)
   RELOC_NUMBER (R_byte2_data, 0x11)     /* 0x11, 0x00) .byte2 var = symbol */
   RELOC_NUMBER (R_byte4_data, 0x12)     /* 0x12, 0x00) .byte4 var = symbol and .var var=symbol */
   RELOC_NUMBER (R_pcrel11, 0x13)        /* 0x13, 0x00) lsetup part b */
+  RELOC_NUMBER (R_BFIN_GOT17M4, 0x14)
+  RELOC_NUMBER (R_BFIN_GOTHI, 0x15)
+  RELOC_NUMBER (R_BFIN_GOTLO, 0x16)
+  RELOC_NUMBER (R_BFIN_FUNCDESC, 0x17)
+  RELOC_NUMBER (R_BFIN_FUNCDESC_GOT17M4, 0x18)
+  RELOC_NUMBER (R_BFIN_FUNCDESC_GOTHI, 0x19)
+  RELOC_NUMBER (R_BFIN_FUNCDESC_GOTLO, 0x1a)
+  RELOC_NUMBER (R_BFIN_FUNCDESC_VALUE, 0x1b)
+  RELOC_NUMBER (R_BFIN_FUNCDESC_GOTOFF17M4, 0x1c)
+  RELOC_NUMBER (R_BFIN_FUNCDESC_GOTOFFHI, 0x1d)
+  RELOC_NUMBER (R_BFIN_FUNCDESC_GOTOFFLO, 0x1e)
+  RELOC_NUMBER (R_BFIN_GOTOFF17M4, 0x1f)
+  RELOC_NUMBER (R_BFIN_GOTOFFHI, 0x20)
+  RELOC_NUMBER (R_BFIN_GOTOFFLO, 0x21)
+
   RELOC_NUMBER (R_push, 0xE0)
   RELOC_NUMBER (R_const, 0xE1)
   RELOC_NUMBER (R_add, 0xE2)
@@ -69,4 +84,9 @@ START_RELOC_NUMBERS (elf_bfin_reloc_type)
   RELOC_NUMBER (R_BFIN_GNU_VTENTRY, 0x43) /* C++, gnu only */
 END_RELOC_NUMBERS (R_max)
 
+/* Processor specific flags for the ELF header e_flags field.  */
+#define EF_BFIN_PIC		0x00000001	/* -fpic */
+#define EF_BFIN_FDPIC		0x00000002      /* -mfdpic */
+
+#define	EF_BFIN_PIC_FLAGS	(EF_BFIN_PIC | EF_BFIN_FDPIC)
 #endif /* _ELF_BFIN_H */

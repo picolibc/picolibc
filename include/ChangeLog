@@ -1,3 +1,13 @@
+2006-03-25  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* elf/bfin.h (R_BFIN_GOT17M4, R_BFIN_GOTHI, R_BFIN_GOTLO,
+	R_BFIN_FUNCDESC, R_BFIN_FUNCDESC_GOT17M4,  R_BFIN_FUNCDESC_GOTHI,
+	R_BFIN_FUNCDESC_GOTLO, R_BFIN_FUNCDESC_VALUE,
+	R_BFIN_FUNCDESC_GOTOFF17M4, R_BFIN_FUNCDESC_GOTOFFHI,
+	R_BFIN_FUNCDESC_GOTOFFLO, R_BFIN_GOTOFF17M4, R_BFIN_GOTOFFHI,
+	R_BFIN_GOTOFFLO): New relocs.
+	(EF_BFIN_PIC, EF_BFIN_FDPIC, EF_BFIN_PIC_FLAGS): New macros.
+
 2006-02-17  Shrirang Khisti  <shrirangk@kpitcummins.com>
             Anil Paranjape   <anilp1@kpitcummins.com>
             Shilin Shakti    <shilins@kpitcummins.com>
