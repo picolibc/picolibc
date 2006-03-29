@@ -1,5 +1,11 @@
 2006-03-29  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/sys/linux/io.c (__mknod): Fix declaration of
+	syscall to pass a dev_t as third argument rather than
+	a pointer to dev_t.
+
+2006-03-29  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/sys/linux/net/name6.c: Fix struct references.
 
 2006-03-22  Mark Mitchell  <mark@codesourcery.com>
