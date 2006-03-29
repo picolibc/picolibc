@@ -1,5 +1,15 @@
 2006-03-29  Shaun Jackman  <sjackman@gmail.com>
 
+	* libc/sys/linux/include/net/if.h: Include sys/socket.h for
+	struct sockaddr.
+	(IFF_SMART): Replace this define with IFF_NOTRAILERS.
+	(IFF_CANTCHANGE): Replace IFF_SMART reference with IFF_NOTRAILERS.
+	(IFF_NOTRAILERS): New define.
+	(struct ifreq): Add ifru_netmask.
+	(ifr_netmask): New define.
+
+2006-03-29  Shaun Jackman  <sjackman@gmail.com>
+
 	* libc/sys/linux/sys/ioccom.h (ioctl): Change declaration to
 	match sys/ioctl.h.
 
