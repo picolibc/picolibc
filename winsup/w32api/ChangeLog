@@ -1,4 +1,11 @@
 2006-03-29  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+	* include/winspool.h (JOB_INFO_3): Add structure.
+	(PROVIDOR_INFO_*{AW}): Add structure.
+	* include/winspool.h [_WIN32_WINNT >= 0x0500]
+	(PRINTER_ENUM_VALUES{AW}): Add structure.
+	(PRINTPROCESSOR_CAPS): Add structure.
+
+2006-03-29  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 	* include/winspool.h [_WIN32_WINNT >= 0x0500]
 	(PRINTER_INFO_7A): Correct definition.
 
