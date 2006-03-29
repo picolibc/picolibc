@@ -123,7 +123,26 @@ IDPGDB_OBJS=	leds.o idp-inbyte.o idp-gdb-outbyte.o mc68ec.o
 DBUG_BSP=	libdbug.a
 DBUG_OBJS=	dbug-exit.o dbug-inbyte.o dbug-outbyte.o
 
-CF_SCRIPTS=   m5208evb.ld m5213evb.ld m5235evb.ld m5272c3.ld m5282evb.ld
+#
+# here's all the BDM semihosting stuff
+#
+BDM_BSP=	libbdm.a
+BDM_OBJS=	bdm-exit.o bdm-inbyte.o bdm-outbyte.o bdm-isv.o \
+		bdm-semihost.o $(patsubst %,bdm-%.o,${BDM_ISRS})
+BDM_ISRS=	other_interrupt reset access_error address_error \
+	illegal_instruction divide_by_zero privilege_violation \
+	trace unimplemented_line_a_opcode unimplemented_line_f_opcode \
+	non_pc_breakpoint_debug_interrupt pc_breakpoint_debug_interrupt \
+	format_error spurious_interrupt trap0 trap1 trap2 trap3 trap4 \
+	trap5 trap6 trap7 trap8 trap9 trap10 trap11 trap12 trap13 trap14 \
+	trap15 fp_branch_unordered fp_inexact_result fp_divide_by_zero \
+	fp_underflow fp_operand_error fp_overflow fp_input_not_a_number \
+	fp_input_denormalized_number unsupported_instruction
+
+CF_SCRIPTS=   m5208evb-dbug.ld m5213evb-dbug.ld m5235evb-dbug.ld \
+	m5272c3-dbug.ld m5282evb-dbug.ld m5485evb-dbug.ld \
+	m5208evb-bdm.ld m5213evb-bdm.ld m5235evb-bdm.ld \
+	m5272c3-bdm.ld m5282evb-bdm.ld m5485evb-bdm.ld
 
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
@@ -132,7 +151,7 @@ CF_SCRIPTS=   m5208evb.ld m5213evb.ld m5235evb.ld m5272c3.ld m5282evb.ld
 # build a test program for each target board. Just trying to get
 # it to link is a good test, so we ignore all the errors for now.
 #
-all: ${SIM_CRT0} ${SIM_BSP} ${CRT0} ${BCC_BSP} ${IDP_BSP} ${IDPGDB_BSP} ${MVME135_BSP} ${MVME162_BSP} ${DBUG_BSP} ${CF_SCRIPTS}
+all: ${SIM_CRT0} ${SIM_BSP} ${CRT0} ${BCC_BSP} ${IDP_BSP} ${IDPGDB_BSP} ${MVME135_BSP} ${MVME162_BSP} ${DBUG_BSP} ${BDM_BSP} ${CF_SCRIPTS}
 
 #
 # here's where we build the board support packages for each target
@@ -157,6 +176,10 @@ ${DBUG_BSP}: $(OBJS) ${DBUG_OBJS}
 	${AR} ${ARFLAGS} $@ $(OBJS) ${DBUG_OBJS}
 	${RANLIB} $@
 
+${BDM_BSP}: $(OBJS) ${BDM_OBJS}
+	${AR} ${ARFLAGS} $@ $(OBJS) ${BDM_OBJS}
+	${RANLIB} $@
+
 ${MVME135_BSP}: $(OBJS) ${MVME135_OBJS}
 	${AR} ${ARFLAGS} $@ $(OBJS) ${MVME135_OBJS}
 	${RANLIB} $@
@@ -165,20 +188,51 @@ ${MVME162_BSP}: $(OBJS) ${MVME162_OBJS}
 	${AR} ${ARFLAGS} $@ $(OBJS) ${MVME162_OBJS}
 	${RANLIB} $@
 
-m5208evb.ld: dbug-cf.sc Makefile
+bdm-isv.o : bdm-isv.c bdm-semihost.h
+bdm-exit.o : bdm-exit.c bdm-semihost.h
+bdm-outbyte.o : bdm-outbyte.c bdm-semihost.h
+bdm-semihost.o : bdm-semihost.c
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $< -o $@ -fomit-frame-pointer
+
+$(patsubst %,bdm-%.o,${BDM_ISRS}) : bdm-isrs.c
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $< -o $@ \
+	  -DL_$(patsubst bdm-%.o,%,$@) -fno-omit-frame-pointer
+
+m5208evb-dbug.ld: cf.sc Makefile
 	RAMSTART=1024M RAMSIZE=16M RAMDBUG=128K ${SHELL} $< > $@
 
-m5213evb.ld: dbug-cf.sc Makefile
+m5213evb-dbug.ld: cf.sc Makefile
 	RAMSTART=512M RAMSIZE=32K RAMDBUG=8K ${SHELL} $< > $@
 
-m5235evb.ld: dbug-cf.sc Makefile
+m5235evb-dbug.ld: cf.sc Makefile
 	RAMSTART=0M RAMSIZE=16M RAMDBUG=64K ${SHELL} $< > $@
 
-m5272c3.ld: dbug-cf.sc Makefile
+m5272c3-dbug.ld: cf.sc Makefile
 	RAMSTART=0M RAMSIZE=4M RAMDBUG=128K ${SHELL} $< > $@
 
-m5282evb.ld: dbug-cf.sc Makefile
+m5282evb-dbug.ld: cf.sc Makefile
 	RAMSTART=0M RAMSIZE=16M RAMDBUG=64K ${SHELL} $< > $@
+
+m5485evb-dbug.ld: cf.sc Makefile
+	RAMSTART=0M RAMSIZE=64M RAMDBUG=128K ${SHELL} $< > $@
+
+m5208evb-bdm.ld: cf.sc Makefile
+	ISV=1 RAMSTART=1024M RAMSIZE=16M ${SHELL} $< > $@
+
+m5213evb-bdm.ld: cf.sc Makefile
+	ISV=1 RAMSTART=512M RAMSIZE=32K ${SHELL} $< > $@
+
+m5235evb-bdm.ld: cf.sc Makefile
+	ISV=1 RAMSTART=0M RAMSIZE=16M ${SHELL} $< > $@
+
+m5272c3-bdm.ld: cf.sc Makefile
+	ISV=1 RAMSTART=0M RAMSIZE=4M ${SHELL} $< > $@
+
+m5282evb-bdm.ld: cf.sc Makefile
+	RAMSTART=0M RAMSIZE=16M ${SHELL} $< > $@
+
+m5485evb-bdm.ld: cf.sc Makefile
+	ISV=1 RAMSTART=0M RAMSIZE=64M ${SHELL} $< > $@
 
 leds.o: ${srcdir}/leds.c
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $<
@@ -298,6 +352,9 @@ install:
 	$(INSTALL_DATA) ${srcdir}/mvme162.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/mvme162.ld
 	# install DBUG stuff
 	$(INSTALL_PROGRAM) $(DBUG_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(DBUG_BSP)
+	# install BDM stuff
+	$(INSTALL_PROGRAM) $(BDM_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(BDM_BSP)
+
 	$(INSTALL_DATA) ${srcdir}/sbc5204.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/sbc5204.ld
 	$(INSTALL_DATA) ${srcdir}/sbc5206.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/sbc5206.ld
 	for script in $(CF_SCRIPTS) ; \

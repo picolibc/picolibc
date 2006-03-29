@@ -1,3 +1,29 @@
+2006-03-29  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* libgloss/m68k/Makefile.in (BDM_BSP, BDM_OBJS, BDM_ISRS): New.
+	(CF_SCRIPTS): Rename dbug scripts.  Add bdm scripts. Add m5485
+	scripts.
+	(all): Add new targets.
+	(BDM_BSP): New target.
+	(bdm-isv.o, bdm-exit.o, bdm-outbyte.o, bdm-semihost.o): New
+	targets.
+	(BDM_ISRS): New targets.
+	(m5208evb.ld, m5213evb.ld, m5235evb.ld, m5272c3.ld, m5282evb.ld):
+	Rename and adjust.
+	(m5485evb-dbug): New.
+	(m5208evb-bdm.ld, m5213evb-bdm.ld, m5235evb-bdm.ld,
+	m5272c3-bdm.ld, m5282evb-bdm.ld, m5485evb-bdm.ld): New.
+	(install): Add BDM_BSP.
+	* libgloss/m68k/bdm-exit.c: New
+	* libgloss/m68k/bdm-inbyte.c: New
+	* libgloss/m68k/bdm-outbyte.c: New
+	* libgloss/m68k/bdm-semihost.c: New
+	* libgloss/m68k/bdm-semihost.h: New
+	* libgloss/m68k/bdm-isrs.c: New.
+	* libgloss/m68k/bdm-isv.c: New.
+	* cf-dbug.sc: Renamed to ...
+	* cf.sc: ... here.  Add bdm flexibility. Remove GROUP
+
 2006-03-23  Mark Mitchell  <mark@codesourcery.com>
 
 	* libc/sys/arm/Makefile.am (extra_objs): Add _exit.o _nmi_isr.o

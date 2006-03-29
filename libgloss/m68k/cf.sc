@@ -2,15 +2,13 @@
 # RAMSTART - start of board's ram
 # RAMSIZE - size of board's ram
 # RAMDBUG - bytes at start of RAM for DBUG use
+# ISV - nonnull if interrupt service vector should be provided.
 
 cat <<EOF
 STARTUP(crt0.o)
 OUTPUT_ARCH(m68k)
-/* DBUG loads SREC files */
-/*OUTPUT_FORMAT(srec)*/
 ENTRY(start)
 SEARCH_DIR(.)
-GROUP(-ldbug -lc -lgcc -ldbug)
 __DYNAMIC  =  0;
 
 MEMORY
@@ -19,20 +17,19 @@ MEMORY
 		 LENGTH = ${RAMSIZE} - ${RAMDBUG:-0}
 }
 
+/* Place the stack at the end of memory, unless specified otherwise. */
 PROVIDE (__stack = ${RAMSTART} + ${RAMSIZE});
+
+/* Inhibit an interrupt vector, if one is not specified.  */
+PROVIDE (__interrupt_vector = -1);
 
 /*
  * Initalize some symbols to be zero so we can reference them in the
  * crt0 without core dumping. These functions are all optional, but
  * we do this so we can have our crt0 always use them if they exist. 
- * This is so BSPs work better when using the crt0 installed gcc.
- * We have to initalize them twice, so we cover a.out (which prepends
- * an underscore) and coff object file formats.
  */
 PROVIDE (hardware_init_hook = 0);
-PROVIDE (_hardware_init_hook = 0);
 PROVIDE (software_init_hook = 0);
-PROVIDE (_software_init_hook = 0);
 /*
  * stick everything in ram (of course)
  */
@@ -41,6 +38,7 @@ SECTIONS
   .text :
   {
     CREATE_OBJECT_SYMBOLS
+    ${ISV+__interrupt_vector = .; . += 256 * 4;}
     *(.text .text.*)
 
     . = ALIGN(0x4);
