@@ -67,7 +67,7 @@
 #include <sys/cdefs.h>
 
 __BEGIN_DECLS
-int	ioctl(int, unsigned long, ...);
+int	ioctl(int __fd, int __request, ...);
 __END_DECLS
 
 #endif

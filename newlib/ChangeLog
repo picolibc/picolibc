@@ -1,5 +1,10 @@
 2006-03-29  Shaun Jackman  <sjackman@gmail.com>
 
+	* libc/sys/linux/sys/ioccom.h (ioctl): Change declaration to
+	match sys/ioctl.h.
+
+2006-03-29  Shaun Jackman  <sjackman@gmail.com>
+
 	* libtool.m4: Set lt_cv_deplibs_check_method=pass_all for 
 	linux-newlib libc implementations.
 
