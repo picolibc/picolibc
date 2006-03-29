@@ -1,7 +1,7 @@
 /*
  * bdm-isv.c -- 
  *
- * Copyright (c) 2006 CodeSourcery CSI
+ * Copyright (c) 2006 CodeSourcery Inc
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
