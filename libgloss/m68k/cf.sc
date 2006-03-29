@@ -3,12 +3,14 @@
 # RAMSIZE - size of board's ram
 # RAMDBUG - bytes at start of RAM for DBUG use
 # ISV - nonnull if interrupt service vector should be provided.
+# IO - io library
 
 cat <<EOF
 STARTUP(crt0.o)
 OUTPUT_ARCH(m68k)
 ENTRY(start)
 SEARCH_DIR(.)
+GROUP(-lc -l${IO})
 __DYNAMIC  =  0;
 
 MEMORY

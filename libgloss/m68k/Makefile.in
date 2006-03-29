@@ -139,10 +139,13 @@ BDM_ISRS=	other_interrupt reset access_error address_error \
 	fp_underflow fp_operand_error fp_overflow fp_input_not_a_number \
 	fp_input_denormalized_number unsupported_instruction
 
-CF_SCRIPTS=   m5208evb-dbug.ld m5213evb-dbug.ld m5235evb-dbug.ld \
-	m5272c3-dbug.ld m5282evb-dbug.ld m5485evb-dbug.ld \
-	m5208evb-bdm.ld m5213evb-bdm.ld m5235evb-bdm.ld \
-	m5272c3-bdm.ld m5282evb-bdm.ld m5485evb-bdm.ld
+CF_SCRIPTS=   m5208evb-dbug.ld 	m5208evb-bdm.ld \
+	m5213evb-dbug.ld m5213evb-bdm.ld \
+	m5235evb-dbug.ld m5235evb-bdm.ld \
+	m5272c3-dbug.ld m5272c3-bdm.ld \
+	m5282evb-dbug.ld m5282evb-bdm.ld \
+	m5329evb-dbug.ld m5329evb-bdm.ld \
+	m5485evb-dbug.ld m5485evb-bdm.ld
 
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
@@ -199,40 +202,46 @@ $(patsubst %,bdm-%.o,${BDM_ISRS}) : bdm-isrs.c
 	  -DL_$(patsubst bdm-%.o,%,$@) -fno-omit-frame-pointer
 
 m5208evb-dbug.ld: cf.sc Makefile
-	RAMSTART=1024M RAMSIZE=16M RAMDBUG=128K ${SHELL} $< > $@
-
-m5213evb-dbug.ld: cf.sc Makefile
-	RAMSTART=512M RAMSIZE=32K RAMDBUG=8K ${SHELL} $< > $@
-
-m5235evb-dbug.ld: cf.sc Makefile
-	RAMSTART=0M RAMSIZE=16M RAMDBUG=64K ${SHELL} $< > $@
-
-m5272c3-dbug.ld: cf.sc Makefile
-	RAMSTART=0M RAMSIZE=4M RAMDBUG=128K ${SHELL} $< > $@
-
-m5282evb-dbug.ld: cf.sc Makefile
-	RAMSTART=0M RAMSIZE=16M RAMDBUG=64K ${SHELL} $< > $@
-
-m5485evb-dbug.ld: cf.sc Makefile
-	RAMSTART=0M RAMSIZE=64M RAMDBUG=128K ${SHELL} $< > $@
+	IO=dbug RAMSTART=1024M RAMSIZE=16M RAMDBUG=128K ${SHELL} $< > $@
 
 m5208evb-bdm.ld: cf.sc Makefile
-	ISV=1 RAMSTART=1024M RAMSIZE=16M ${SHELL} $< > $@
+	IO=bdm ISV=1 RAMSTART=1024M RAMSIZE=16M ${SHELL} $< > $@
+
+m5213evb-dbug.ld: cf.sc Makefile
+	IO=dbug RAMSTART=512M RAMSIZE=32K RAMDBUG=8K ${SHELL} $< > $@
 
 m5213evb-bdm.ld: cf.sc Makefile
-	ISV=1 RAMSTART=512M RAMSIZE=32K ${SHELL} $< > $@
+	IO=bdm ISV=1 RAMSTART=512M RAMSIZE=32K ${SHELL} $< > $@
+
+m5235evb-dbug.ld: cf.sc Makefile
+	IO=dbug RAMSTART=0M RAMSIZE=16M RAMDBUG=64K ${SHELL} $< > $@
 
 m5235evb-bdm.ld: cf.sc Makefile
-	ISV=1 RAMSTART=0M RAMSIZE=16M ${SHELL} $< > $@
+	IO=bdm ISV=1 RAMSTART=0M RAMSIZE=16M ${SHELL} $< > $@
+
+m5272c3-dbug.ld: cf.sc Makefile
+	IO=dbug RAMSTART=0M RAMSIZE=4M RAMDBUG=128K ${SHELL} $< > $@
 
 m5272c3-bdm.ld: cf.sc Makefile
-	ISV=1 RAMSTART=0M RAMSIZE=4M ${SHELL} $< > $@
+	IO=bdm ISV=1 RAMSTART=0M RAMSIZE=4M ${SHELL} $< > $@
+
+m5282evb-dbug.ld: cf.sc Makefile
+	IO=dbug RAMSTART=0M RAMSIZE=16M RAMDBUG=64K ${SHELL} $< > $@
 
 m5282evb-bdm.ld: cf.sc Makefile
-	RAMSTART=0M RAMSIZE=16M ${SHELL} $< > $@
+	IO=bdm ISV=1 RAMSTART=0M RAMSIZE=16M ${SHELL} $< > $@
+
+m5329evb-dbug.ld: cf.sc Makefile
+	IO=dbug RAMSTART=1024M RAMSIZE=32M RAMDBUG=128K ${SHELL} $< > $@
+
+m5329evb-bdm.ld: cf.sc Makefile
+	IO=bdm ISV=1 RAMSTART=1024M RAMSIZE=32M RAMDBUG=128K ${SHELL} $< > $@
+
+m5485evb-dbug.ld: cf.sc Makefile
+	IO=dbug RAMSTART=0M RAMSIZE=64M RAMDBUG=128K ${SHELL} $< > $@
 
 m5485evb-bdm.ld: cf.sc Makefile
-	ISV=1 RAMSTART=0M RAMSIZE=64M ${SHELL} $< > $@
+	IO=bdm ISV=1 RAMSTART=0M RAMSIZE=64M ${SHELL} $< > $@
 
 leds.o: ${srcdir}/leds.c
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $<

@@ -1,5 +1,11 @@
 2006-03-29  Nathan Sidwell  <nathan@codesourcery.com>
 
+	* libgloss/m68k/Makefile.in (CF_SCRIPTS): Add m5329 board.
+	Reorder.
+	(*-dbug.ld, *-bdm.ld): Add appropriate IO definition.
+	(m5329evb-dbug.ld, m5329evb-bdm.ld): New.
+	* cf.sc (GROUP): Revert previous change.  Add IO library.
+
 	* libgloss/m68k/Makefile.in (BDM_BSP, BDM_OBJS, BDM_ISRS): New.
 	(CF_SCRIPTS): Rename dbug scripts.  Add bdm scripts. Add m5485
 	scripts.
