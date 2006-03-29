@@ -1,5 +1,7 @@
 2006-03-29  Nathan Sidwell  <nathan@codesourcery.com>
 
+	* libgloss/m68k/bdm-isv.c (software_init_hook): Fix trap numbering.
+
 	* libgloss/m68k/Makefile.in (CF_SCRIPTS): Add m5329 board.
 	Reorder.
 	(*-dbug.ld, *-bdm.ld): Add appropriate IO definition.
