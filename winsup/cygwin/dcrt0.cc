@@ -653,6 +653,9 @@ child_info_fork::handle_fork ()
   cygheap_fixup_in_child (false);
   memory_init ();
   set_myself (NULL);
+  myself->uid = cygheap->user.real_uid;
+  myself->gid = cygheap->user.real_gid;
+
   child_copy (parent, false,
 	      "dll data", dll_data_start, dll_data_end,
 	      "dll bss", dll_bss_start, dll_bss_end,
@@ -750,9 +753,6 @@ dll_crt0_0 ()
 	}
     }
 
-  user_data->resourcelocks->Init ();
-  user_data->threadinterface->Init ();
-
   _cygtls::init ();
 
   /* Initialize events */
@@ -761,10 +761,16 @@ dll_crt0_0 ()
   cygheap->cwd.init ();
 
   /* Late duplicate simplifies tweaking the process token in uinfo.cc. */
-  if (wincap.has_security ())
-    DuplicateTokenEx (hProcToken, MAXIMUM_ALLOWED, NULL,
-		      SecurityImpersonation, TokenImpersonation,
-		      &hProcImpToken);
+  if (wincap.has_security ()
+      && !DuplicateTokenEx (hProcToken, MAXIMUM_ALLOWED, NULL,
+			    SecurityImpersonation, TokenImpersonation,
+			    &hProcImpToken))
+#ifdef DEBUGGING
+    system_printf ("DuplicateTokenEx failed, %E");
+#else
+    ;
+#endif
+
   debug_printf ("finished dll_crt0_0 initialization");
 }
 
@@ -784,6 +790,8 @@ dll_crt0_1 (char *)
     small_printf ("cmalloc returns %p\n", cmalloc (HEAP_STR, n));
 #endif
 
+  user_data->resourcelocks->Init ();
+  user_data->threadinterface->Init ();
   ProtectHandle (hMainProc);
   ProtectHandle (hMainThread);
 
@@ -796,7 +804,7 @@ dll_crt0_1 (char *)
   strace.microseconds ();
 #endif
 
-  create_signal_arrived ();
+  create_signal_arrived (); /* FIXME: move into wait_sig? */
 
   /* Initialize debug muto, if DLL is built with --enable-debugging.
      Need to do this before any helper threads start. */
@@ -838,7 +846,7 @@ dll_crt0_1 (char *)
     set_cygwin_privileges (hProcImpToken);
 
   if (!old_title && GetConsoleTitle (title_buf, TITLESIZE))
-      old_title = title_buf;
+    old_title = title_buf;
 
   /* Allocate cygheap->fdtab */
   dtable_init ();

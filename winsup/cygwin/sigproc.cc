@@ -134,11 +134,12 @@ signal_fixup_after_exec ()
 }
 
 void __stdcall
-wait_for_sigthread ()
+wait_for_sigthread (bool forked)
 {
-  PSECURITY_ATTRIBUTES sa_buf = (PSECURITY_ATTRIBUTES) alloca (1024);
-  if (!CreatePipe (&my_readsig, &my_sendsig, sec_user_nih (sa_buf), 0))
-    api_fatal ("couldn't create signal pipe, %E");
+  char char_sa_buf[1024];
+  PSECURITY_ATTRIBUTES sa_buf = sec_user_nih ((PSECURITY_ATTRIBUTES) char_sa_buf);
+  if (!CreatePipe (&my_readsig, &my_sendsig, sa_buf, 0))
+    api_fatal ("couldn't create signal pipe%s, %E", forked ? " for forked process" : "");
   ProtectHandle (my_readsig);
   myself->sendsig = my_sendsig;
 
@@ -151,6 +152,7 @@ wait_for_sigthread ()
   wait_sig_inited = NULL;
   ForceCloseHandle1 (hsig_inited, wait_sig_inited);
   SetEvent (sigCONT);
+  sigproc_printf ("process/signal handling enabled, state %p", myself->process_state);
 }
 
 /* Get the sync_proc_subproc muto to control access to
@@ -497,8 +499,6 @@ sigproc_init ()
 
   hwait_sig = new cygthread (wait_sig, 0, cygself, "sig");
   hwait_sig->zap_h ();
-
-  sigproc_printf ("process/signal handling enabled, state %p", myself->process_state);
 }
 
 /* Called on process termination to terminate signal and process threads.
@@ -1134,13 +1134,12 @@ wait_sig (VOID *)
 
   sigCONT = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
 
-  sigproc_printf ("myself->dwProcessId %u", myself->dwProcessId);
   SetEvent (wait_sig_inited);
 
   _sig_tls = &_my_tls;
   _sig_tls->init_threadlist_exceptions ();
-  debug_printf ("entering ReadFile loop, my_readsig %p, myself->sendsig %p",
-		my_readsig, myself->sendsig);
+  sigproc_printf ("entering ReadFile loop, my_readsig %p, my_sendsig %p",
+		  my_readsig, my_sendsig);
 
   sigpacket pack;
   pack.si.si_signo = __SIGHOLD;

@@ -1,3 +1,20 @@
+2006-03-29  Christopher Faylor  <cgf@timesys.com>
+
+	* dcrt0.cc (child_info_fork::handle_fork): Set uid/gid in myself so
+	that it can be used by subsequent startup functions.
+	(dll_crt0_0): Issue a warning if DuplicateTokenEx fails and DEBUGGING.
+	(dll_crt0_1): Move user_data->{resourcelocks,threadinterface}
+	initialization here from dll_crt0_0.
+	* fork.cc (frok::child): Tell wait_for_sigthread that this is fork.
+	(frok::parent): Only initialize start_time once.  Tighten time when
+	we're "deimpersonated".
+	* sigproc.cc (signal_fixup_after_exec): Rework (futiley) sa_buf stuff.
+	Add debugging output.
+	(wait_for_sigthread): Accept an argument which illustrates whether we
+	are forked or not.
+	(wait_sig): Avoid using myself pointer.
+	* winsup.h ((wait_for_sigthread): Reflect change to argument.
+
 2006-03-26  Christopher Faylor  <cgf@timesys.com>
 
 	* spawn.cc (spawn_guts): Close handles if we know that we will not be

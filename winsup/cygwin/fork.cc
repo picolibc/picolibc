@@ -178,7 +178,7 @@ frok::child (void *)
   ld_preload ();
   fixup_hooks_after_fork ();
   _my_tls.fixup_after_fork ();
-  wait_for_sigthread ();
+  wait_for_sigthread (true);
   cygwin_finished_initializing = true;
   return 0;
 }
@@ -283,17 +283,17 @@ frok::parent (void *stack_here)
   si.lpReserved2 = (LPBYTE) &ch;
   si.cbReserved2 = sizeof (ch);
 
+  syscall_printf ("CreateProcess (%s, %s, 0, 0, 1, %p, 0, 0, %p, %p)",
+		  myself->progname, myself->progname, c_flags, &si, &pi);
+  bool locked = __malloc_lock ();
+  time_t start_time = time (NULL);
+
   /* Remove impersonation */
   cygheap->user.deimpersonate ();
   fix_impersonation = true;
 
-  syscall_printf ("CreateProcess (%s, %s, 0, 0, 1, %p, 0, 0, %p, %p)",
-		  myself->progname, myself->progname, c_flags, &si, &pi);
-  bool locked = __malloc_lock ();
-  time_t start_time;
   while (1)
     {
-      start_time = time (NULL);
       rc = CreateProcess (myself->progname, /* image to run */
 			  myself->progname, /* what we send in arg0 */
 			  &sec_none_nih,
@@ -345,6 +345,10 @@ frok::parent (void *stack_here)
       break;
     }
 
+  /* Restore impersonation */
+  cygheap->user.reimpersonate ();
+  fix_impersonation = false;
+
   child_pid = cygwin_pid (pi.dwProcessId);
   child.init (child_pid, 1, NULL);
 
@@ -365,10 +369,6 @@ frok::parent (void *stack_here)
   /* Initialize things that are done later in dll_crt0_1 that aren't done
      for the forkee.  */
   strcpy (child->progname, myself->progname);
-
-  /* Restore impersonation */
-  cygheap->user.reimpersonate ();
-  fix_impersonation = false;
 
   /* Fill in fields in the child's process table entry.  */
   child->dwProcessId = pi.dwProcessId;
@@ -396,10 +396,10 @@ frok::parent (void *stack_here)
   /* CHILD IS STOPPED */
   debug_printf ("child is alive (but stopped)");
 
-  /* Initialize, in order: data, bss, heap, stack, dll data, dll bss
-     Note: variables marked as NO_COPY will not be copied
-     since they are placed in a protected segment. */
-
+  /* Initialize, in order: stack, dll data, dll bss.
+     data, bss, heap were done earlier (in dcrt0.cc)
+     Note: variables marked as NO_COPY will not be copied since they are
+     placed in a protected segment.  */
 
   MALLOC_CHECK;
   const void *impure_beg;
