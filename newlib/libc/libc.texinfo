@@ -28,7 +28,7 @@ END-INFO-DIR-ENTRY
 @ifinfo
 This file documents the ANSI C library.
 
-Copyright (C) 1992, 1993, 1994-2004 Red Hat, Inc.
+Copyright (C) 1992, 1993 Cygnus Support
 
 @file{libc} includes software developed by the
 University of California, Berkeley and its contributors.
@@ -36,7 +36,7 @@ University of California, Berkeley and its contributors.
 libc includes software developed by Martin Jackson, Graham Haley
 and Steve Chamberlain of Tadpole Technology and released to Cygnus.
 
-libc uses floating-point conversion software developed at AT&T, which
+libc uses floating point converstion software developed at AT&T, which
 includes this copyright information:
 
  The author of this software is David M. Gay.
@@ -79,23 +79,22 @@ into another language, under the above conditions for modified versions.
 @c @cropmarks
 @finalout
 @setchapternewpage odd
-@settitle Red Hat newlib C Library, Full
+@settitle Cygnus C Support Library, Full
 @titlepage
-@title The Red Hat newlib C Library
+@title The Cygnus C Support Library
 @subtitle Full Configuration
 @sp 1
-@subtitle @code{libc} 1.14.0
-@subtitle December 2005
+@subtitle @code{libc} 1.4
+@subtitle May 1993
 @author {Steve Chamberlain}
 @author {Roland Pesch}
-@author {Red Hat Support}
-@author {Jeff Johnston}
+@author {Cygnus Support}
 @page
 
 @tex
 {\parskip=0pt
-sac@@cygnus.com, pesch@@cygnus.com, jjohnstn@@redhat.com\hfill {\it The Red Hat newlib C Library}\par
-Copyright \copyright{} 1992, 1993, 1994-2004 Red Hat Inc. 
+sac@@cygnus.com, pesch@@cygnus.com\hfill {\it The Cygnus C Support Library}\par
+Copyright \copyright{} 1992, 1993 Cygnus Support
 }
 \global\parindent=0pt % Steve likes it this way
 @end tex
@@ -106,7 +105,7 @@ University of California, Berkeley and its contributors.
 @file{libc} includes software developed by Martin Jackson, Graham Haley
 and Steve Chamberlain of Tadpole Technology and released to Cygnus.
 
-@file{libc} uses floating-point conversion software developed at AT&T,
+@file{libc} uses floating point converstion software developed at AT&T,
 which includes this copyright information:
 
 @cartouche
@@ -143,9 +142,9 @@ into another language, under the above conditions for modified versions.
 @end titlepage
 @end iftex
 
-@ifnottex
+@ifinfo
 @node Top
-@top The Red Hat newlib C Library
+@top The Cygnus C Support Library
 
 @c The menu contents depend on the configuration, so we include them
 @c as a separate file
@@ -153,57 +152,25 @@ into another language, under the above conditions for modified versions.
 @c switch to set SIGNALS on or off, according to whether config picks up
 @c signal subdirectory:
 @include sigset.texi
-@include extra.texi
-@include stdio64.texi
-@include iconvset.texi
 
 @menu
-* Introduction::
 * Stdlib::
 * Ctype::
 * Stdio::
-@ifset STDIO64
-* Stdio64::
-@end ifset
-
 * Strings::
-* Wchar strings::
 @ifset SIGNALS
 * Signals::
 @end ifset
 
 * Timefns::
 * Locale::
-* Reentrancy::
-
-* Misc::
 * Syscalls::
+* Misc::
 * Arglists::
-@ifset ICONV
-* Iconv::
-@end ifset
-
+* Reentrancy::
 * Library Index::
 @end menu
-@end ifnottex
-
-@node Introduction
-@chapter Introduction
-
-This reference manual describes the functions provided by the Red Hat
-``newlib'' version of the standard ANSI C library.  This document is not
-intended as an overview or a tutorial for the C library.  Each library
-function is listed with a synopsis of its use, a brief description,
-return values (including error handling), and portability issues.
-
-Some of the library functions depend on support from the underlying
-operating system and may not be available on every platform.  For
-embedded systems in particular, many of these underlying operating
-system services may not be available or may not be fully functional.
-The specific operating system subroutines required for a particular
-library function are listed in the ``Portability'' section of the
-function description.  @xref{Syscalls}, for a description of the
-relevant operating system calls.
+@end ifinfo
 
 @include targetdep.tex
 

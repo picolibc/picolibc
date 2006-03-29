@@ -28,7 +28,7 @@ ANSI_SYNOPSIS
 	#include <stdio.h>
 	FILE *fopen(const char *<[file]>, const char *<[mode]>);
 
-	FILE *_fopen_r(struct _reent *<[reent]>, 
+	FILE *_fopen_r(void *<[reent]>, 
                        const char *<[file]>, const char *<[mode]>);
 
 TRAD_SYNOPSIS
@@ -38,7 +38,7 @@ TRAD_SYNOPSIS
 	char *<[mode]>;
 
 	FILE *_fopen_r(<[reent]>, <[file]>, <[mode]>)
-	struct _reent *<[reent]>;
+	char *<[reent]>;
 	char *<[file]>;
 	char *<[mode]>;
 
@@ -113,21 +113,18 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
-#include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <errno.h>
-#include <sys/lock.h>
+#include "local.h"
 #ifdef __CYGWIN__
 #include <fcntl.h>
 #endif
-#include "local.h"
 
 FILE *
-_DEFUN(_fopen_r, (ptr, file, mode),
-       struct _reent *ptr _AND
-       _CONST char *file _AND
-       _CONST char *mode)
+_DEFUN (_fopen_r, (ptr, file, mode),
+	struct _reent *ptr _AND
+	_CONST char *file _AND
+	_CONST char *mode)
 {
   register FILE *fp;
   register int f;
@@ -138,18 +135,11 @@ _DEFUN(_fopen_r, (ptr, file, mode),
   if ((fp = __sfp (ptr)) == NULL)
     return NULL;
 
-  if ((f = _open_r (ptr, file, oflags, 0666)) < 0)
+  if ((f = _open_r (fp->_data, file, oflags, 0666)) < 0)
     {
-      __sfp_lock_acquire (); 
       fp->_flags = 0;		/* release */
-#ifndef __SINGLE_THREAD__
-      __lock_close_recursive (fp->_lock);
-#endif
-      __sfp_lock_release (); 
       return NULL;
     }
-
-  _flockfile (fp);
 
   fp->_file = f;
   fp->_flags = flags;
@@ -160,23 +150,22 @@ _DEFUN(_fopen_r, (ptr, file, mode),
   fp->_close = __sclose;
 
   if (fp->_flags & __SAPP)
-    _fseek_r (ptr, fp, 0, SEEK_END);
+    fseek (fp, 0, SEEK_END);
 
 #ifdef __SCLE
   if (__stextmode (fp->_file))
     fp->_flags |= __SCLE;
 #endif
 
-  _funlockfile (fp);
   return fp;
 }
 
 #ifndef _REENT_ONLY
 
 FILE *
-_DEFUN(fopen, (file, mode),
-       _CONST char *file _AND
-       _CONST char *mode)
+_DEFUN (fopen, (file, mode),
+	_CONST char *file _AND
+	_CONST char *mode)
 {
   return _fopen_r (_REENT, file, mode);
 }

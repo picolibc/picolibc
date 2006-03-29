@@ -34,7 +34,7 @@ Graceful failure is permitted by returning an error code.  A minor
 complication arises here: the C library must be compatible with
 development environments that supply fully functional versions of these
 subroutines.  Such environments usually return error codes in a global
-@code{errno}.  However, the Red Hat newlib C library provides a @emph{macro}
+@code{errno}.  However, the Cygnus C library provides a @emph{macro}
 definition for @code{errno} in the header file @file{errno.h}, as part
 of its support for reentrant routines (@pxref{Reentrancy,,Reentrancy}).
 
@@ -68,8 +68,8 @@ it (@code{exit}, @code{system}).
 Close a file.  Minimal implementation:
 
 @example
-int close(int file) @{
-  return -1;
+int close(int file)@{
+    return -1;
 @}
 @end example
 
@@ -90,8 +90,8 @@ without processes):
 #include <errno.h>
 #undef errno
 extern int errno;
-int execve(char *name, char **argv, char **env) @{
-  errno = ENOMEM;
+int execve(char *name, char **argv, char **env)@{
+  errno=ENOMEM;
   return -1;
 @}
 @end example
@@ -103,8 +103,8 @@ Create a new process.  Minimal implementation (for a system without processes):
 #include <errno.h>
 #undef errno
 extern int errno;
-int fork(void) @{
-  errno = EAGAIN;
+int fork() @{
+  errno=EAGAIN;
   return -1;
 @}
 @end example
@@ -129,7 +129,7 @@ conflict with other processes.  Minimal implementation, for a system
 without processes:
 
 @example
-int getpid(void) @{
+int getpid() @{
   return 1;
 @}
 @end example
@@ -140,8 +140,8 @@ other minimal implementations, which only support output to
 @code{stdout}, this minimal implementation is suggested:
 
 @example
-int isatty(int file) @{
-  return 1;
+int isatty(int file)@{
+   return 1;
 @}
 @end example
 
@@ -152,9 +152,9 @@ Send a signal.  Minimal implementation:
 #include <errno.h>
 #undef errno
 extern int errno;
-int kill(int pid, int sig) @{
-  errno = EINVAL;
-  return -1;
+int kill(int pid, int sig)@{
+  errno=EINVAL;
+  return(-1);
 @}
 @end example
 
@@ -165,8 +165,8 @@ Establish a new name for an existing file.  Minimal implementation:
 #include <errno.h>
 #undef errno
 extern int errno;
-int link(char *old, char *new) @{
-  errno = EMLINK;
+int link(char *old, char *new)@{
+  errno=EMLINK;
   return -1;
 @}
 @end example
@@ -175,26 +175,19 @@ int link(char *old, char *new) @{
 Set position in a file.  Minimal implementation:
 
 @example
-int lseek(int file, int ptr, int dir) @{
-  return 0;
+int lseek(int file, int ptr, int dir)@{
+    return 0;
 @}
 @end example
 
-@item open
-Open a file.  Minimal implementation:
-
-@example
-int open(const char *name, int flags, int mode) @{
-  return -1;
-@}
-@end example
+@c FIXME! Why no stub for open?
 
 @item read
 Read from a file.  Minimal implementation:
 
 @example
-int read(int file, char *ptr, int len) @{
-  return 0;
+int read(int file, char *ptr, int len)@{
+    return 0;
 @}
 @end example
 
@@ -202,23 +195,24 @@ int read(int file, char *ptr, int len) @{
 Increase program data space.  As @code{malloc} and related functions
 depend on this, it is useful to have a working implementation.  The
 following suffices for a standalone system; it exploits the symbol
-@code{_end} automatically defined by the GNU linker.
+@code{end} automatically defined by the GNU linker.
 
 @example
 @group
-caddr_t sbrk(int incr) @{
-  extern char _end;		/* @r{Defined by the linker} */
+caddr_t sbrk(int incr)@{
+  extern char end;		/* @r{Defined by the linker} */
   static char *heap_end;
   char *prev_heap_end;
  
   if (heap_end == 0) @{
-    heap_end = &_end;
+    heap_end = &end;
   @}
   prev_heap_end = heap_end;
-  if (heap_end + incr > stack_ptr) @{
-    write (1, "Heap and stack collision\n", 25);
-    abort ();
-  @}
+  if (heap_end + incr > stack_ptr)
+    @{
+      _write (1, "Heap and stack collision\n", 25);
+      abort ();
+    @}
 
   heap_end += incr;
   return (caddr_t) prev_heap_end;
@@ -240,7 +234,7 @@ int stat(char *file, struct stat *st) @{
 Timing information for current process.  Minimal implementation:
 
 @example
-int times(struct tms *buf) @{
+int times(struct tms *buf)@{
   return -1;
 @}
 @end example
@@ -252,8 +246,8 @@ Remove a file's directory entry.  Minimal implementation:
 #include <errno.h>
 #undef errno
 extern int errno;
-int unlink(char *name) @{
-  errno = ENOENT;
+int unlink(char *name)@{
+  errno=ENOENT;
   return -1; 
 @}
 @end example
@@ -265,30 +259,30 @@ Wait for a child process.  Minimal implementation:
 #undef errno
 extern int errno;
 int wait(int *status) @{
-  errno = ECHILD;
+  errno=ECHILD;
   return -1;
 @}
 @end example
 
 @item write
-Write to a file.  @file{libc} subroutines will use this
+Write a character to a file.  @file{libc} subroutines will use this
 system routine for output to all files, @emph{including}
 @code{stdout}---so if you need to generate any output, for example to a
 serial port for debugging, you should make your minimal @code{write}
 capable of doing this.  The following minimal implementation is an
-incomplete example; it relies on a @code{outbyte} subroutine (not
+incomplete example; it relies on a @code{writechar} subroutine (not
 shown; typically, you must write this in assembler from examples
 provided by your hardware manufacturer) to actually perform the output.
 
 @example
 @group
-int write(int file, char *ptr, int len) @{
-  int todo;
-
-  for (todo = 0; todo < len; todo++) @{
-    outbyte (*ptr++);
-  @}
-  return len;
+int write(int file, char *ptr, int len)@{
+    int todo;
+  
+    for (todo = 0; todo < len; todo++) @{
+        writechar(*ptr++);
+    @}
+    return len;
 @}
 @end group
 @end example
@@ -347,17 +341,6 @@ int _open_r(void *@var{reent},
     const char *@var{file}, int @var{flags}, int @var{mode});
 @end example
 
-@ifset STDIO64
-@item _open64_r
-A reentrant version of @code{open64}.  It takes a pointer
-to the global data block, which holds @code{errno}.
-
-@example
-int _open64_r(void *@var{reent},
-    const char *@var{file}, int @var{flags}, int @var{mode});
-@end example
-@end ifset
-
 @item _close_r
 A reentrant version of @code{close}.  It takes a pointer to the global
 data block, which holds @code{errno}.
@@ -374,17 +357,6 @@ data block, which holds @code{errno}.
 off_t _lseek_r(void *@var{reent},
     int @var{fd}, off_t @var{pos}, int @var{whence});
 @end example
-
-@ifset STDIO64
-@item _lseek64_r
-A reentrant version of @code{lseek64}.  It takes a pointer to the global
-data block, which holds @code{errno}.
-
-@example
-off_t _lseek64_r(void *@var{reent},
-    int @var{fd}, off_t @var{pos}, int @var{whence});
-@end example
-@end ifset
 
 @item _read_r
 A reentrant version of @code{read}.  It takes a pointer to the global
@@ -437,17 +409,6 @@ data block, which holds @code{errno}.
 int _fstat_r(void *@var{reent},
     int @var{fd}, struct stat *@var{pstat});
 @end example
-
-@ifset STDIO64
-@item _fstat64_r
-A reentrant version of @code{fstat64}.  It takes a pointer to the global
-data block, which holds @code{errno}.
-
-@example
-int _fstat64_r(void *@var{reent},
-    int @var{fd}, struct stat *@var{pstat});
-@end example
-@end ifset
 
 @item _link_r
 A reentrant version of @code{link}.  It takes a pointer to the global

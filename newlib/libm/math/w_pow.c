@@ -35,7 +35,7 @@ TRAD_SYNOPSIS
 	float <[x]>, <[y]>;
 
 DESCRIPTION
-	<<pow>> and <<powf>> calculate <[x]> raised to the exponent <[y]>.
+	<<pow>> and <<powf>> calculate <[x]> raised to the exp1.0nt <[y]>.
 	@tex
 	(That is, $x^y$.)
 	@end tex

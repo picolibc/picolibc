@@ -39,61 +39,36 @@ static char sccsid[] = "@(#)readdir.c	5.7 (Berkeley) 6/1/90";
 
 #include <dirent.h>
 
-extern int getdents (int fd, void *dp, int count);
-
 /*
  * get next entry in a directory.
  */
 struct dirent *
-_DEFUN(readdir, (dirp),
-       register DIR *dirp)
-{
+readdir(dirp)
+register DIR *dirp; {
   register struct dirent *dp;
- 
-#ifdef HAVE_DD_LOCK
-  __lock_acquire_recursive(dirp->dd_lock);
-#endif
-
-  if (dirp->dd_fd == -1)
-    return NULL;
- 
+  
   for (;;) {
     if (dirp->dd_loc == 0) {
       dirp->dd_size = getdents (dirp->dd_fd,
 				dirp->dd_buf,
 				dirp->dd_len);
       
-      if (dirp->dd_size <= 0) {
-#ifdef HAVE_DD_LOCK
-        __lock_release_recursive(dirp->dd_lock);
-#endif
+      if (dirp->dd_size <= 0)
 	return NULL;
-      }
     }
     if (dirp->dd_loc >= dirp->dd_size) {
       dirp->dd_loc = 0;
       continue;
     }
     dp = (struct dirent *)(dirp->dd_buf + dirp->dd_loc);
-    if ((int)dp & 03) {	/* bogus pointer check */
-#ifdef HAVE_DD_LOCK
-      __lock_release_recursive(dirp->dd_lock);
-#endif
+    if ((int)dp & 03)	/* bogus pointer check */
       return NULL;
-    }
     if (dp->d_reclen <= 0 ||
-	dp->d_reclen > dirp->dd_len + 1 - dirp->dd_loc) {
-#ifdef HAVE_DD_LOCK
-      __lock_release_recursive(dirp->dd_lock);
-#endif
+	dp->d_reclen > dirp->dd_len + 1 - dirp->dd_loc)
       return NULL;
-    }
     dirp->dd_loc += dp->d_reclen;
     if (dp->d_ino == 0)
       continue;
-#ifdef HAVE_DD_LOCK
-    __lock_release_recursive(dirp->dd_lock);
-#endif
     return (dp);
   }
 }

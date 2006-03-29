@@ -8,13 +8,8 @@
 
 #include <sys/types.h>
 #include <linux/dirent.h>
-#define _LIBC 1
-#define  NOT_IN_libc 1
-#include <sys/lock.h>
-#undef _LIBC
 
 #define HAVE_NO_D_NAMLEN	/* no struct dirent->d_namlen */
-#define HAVE_DD_LOCK  		/* have locking mechanism */
 
 #define MAXNAMLEN 255		/* sizeof(struct dirent.d_name)-1 */
 
@@ -26,7 +21,6 @@ typedef struct {
     char *dd_buf;	/* buffer */
     int dd_len;		/* buffer length */
     int dd_size;	/* amount of data in buffer */
-    _LOCK_RECURSIVE_T dd_lock;
 } DIR;
 
 
@@ -41,7 +35,6 @@ int closedir(DIR *);
 
 /* internal prototype */
 void _seekdir(DIR *dir,off_t offset);
-DIR *_opendir(const char *);
 
 #ifndef _POSIX_SOURCE
 long telldir (DIR *);

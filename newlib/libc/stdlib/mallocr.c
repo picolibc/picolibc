@@ -168,6 +168,10 @@ int _dummy_mallocr = 1;
   MALLOC_ALIGNMENT          (default: NOT defined)
      Define this to 16 if you need 16 byte alignment instead of 8 byte alignment
      which is the normal default.
+  SIZE_T_SMALLER_THAN_LONG (default: NOT defined)
+     Define this when the platform you are compiling has sizeof(long) > sizeof(size_t).
+     The option causes some extra code to be generated to handle operations
+     that use size_t operands and have long results.
   REALLOC_ZERO_BYTES_FREES (default: NOT defined) 
      Define this if you think that realloc(p, 0) should be equivalent
      to free(p). Otherwise, since malloc returns a unique pointer for
@@ -267,13 +271,7 @@ extern "C" {
 #endif
 
 #include <stdio.h>    /* needed for malloc_stats */
-#include <limits.h>   /* needed for overflow checks */
-#include <errno.h>    /* needed to set errno to ENOMEM */
 
-#ifdef WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
 
 /*
   Compile-time options
@@ -336,7 +334,6 @@ extern void __malloc_unlock();
 #define RDECL struct _reent *reent_ptr;
 #endif
 
-#define RERRNO reent_ptr->_errno
 #define RCALL reent_ptr,
 #define RONECALL reent_ptr
 
@@ -346,7 +343,6 @@ extern void __malloc_unlock();
 #define RARG
 #define RONEARG
 #define RDECL
-#define RERRNO errno
 #define RCALL
 #define RONECALL
 
@@ -447,10 +443,11 @@ extern void __malloc_unlock();
   fact that assignment from unsigned to signed won't sign extend.
 */
 
-#define long_sub_size_t(x, y)				\
-  (sizeof (long) > sizeof (INTERNAL_SIZE_T) && x < y	\
-   ? -(long) (y - x)					\
-   : (long) (x - y))
+#ifdef SIZE_T_SMALLER_THAN_LONG
+#define long_sub_size_t(x, y) ( (x < y) ? -((long)(y - x)) : (x - y) );
+#else
+#define long_sub_size_t(x, y) ( (long)(x - y) )
+#endif
 
 /*
   REALLOC_ZERO_BYTES_FREES should be set if a call to
@@ -490,10 +487,6 @@ extern void __malloc_unlock();
 
 #define HAVE_MEMCPY 
 
-/* Although the original macro is called USE_MEMCPY, newlib actually
-   uses memmove to handle cases whereby a platform's memcpy implementation
-   copies backwards and thus destructive overlap may occur in realloc
-   whereby we are reclaiming free memory prior to the old allocation.  */
 #ifndef USE_MEMCPY
 #ifdef HAVE_MEMCPY
 #define USE_MEMCPY 1
@@ -507,11 +500,9 @@ extern void __malloc_unlock();
 #if __STD_C
 void* memset(void*, int, size_t);
 void* memcpy(void*, const void*, size_t);
-void* memmove(void*, const void*, size_t);
 #else
 Void_t* memset();
 Void_t* memcpy();
-Void_t* memmove();
 #endif
 #endif
 
@@ -553,7 +544,7 @@ do {                                                                          \
                                      *mcdst++ = *mcsrc++;                     \
                                      *mcdst++ = *mcsrc++;                     \
                                      *mcdst   = *mcsrc  ;                     \
-  } else memmove(dest, src, mcsz);                                             \
+  } else memcpy(dest, src, mcsz);                                             \
 } while(0)
 
 #else /* !USE_MEMCPY */
@@ -1085,7 +1076,7 @@ struct mallinfo mALLINFo();
 
 #ifdef WIN32
 
-#define AlignPage(add) (((add) + (malloc_getpagesize-1)) & \
+#define AlignPage(add) (((add) + (malloc_getpagesize-1)) &
 ~(malloc_getpagesize-1))
 
 /* resrve 64MB to insure large contiguous space */ 
@@ -1408,8 +1399,8 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 /* pad request bytes into a usable size */
 
 #define request2size(req) \
- (((unsigned long)((req) + (SIZE_SZ + MALLOC_ALIGN_MASK)) < \
-  (unsigned long)(MINSIZE + MALLOC_ALIGN_MASK)) ? ((MINSIZE + MALLOC_ALIGN_MASK) & ~(MALLOC_ALIGN_MASK)) : \
+ (((long)((req) + (SIZE_SZ + MALLOC_ALIGN_MASK)) < \
+  (long)(MINSIZE + MALLOC_ALIGN_MASK)) ? ((MINSIZE + MALLOC_ALIGN_MASK) & ~(MALLOC_ALIGN_MASK)) : \
    (((req) + (SIZE_SZ + MALLOC_ALIGN_MASK)) & ~(MALLOC_ALIGN_MASK)))
 
 /* Check if m has acceptable alignment */
@@ -1945,8 +1936,8 @@ static void do_check_malloced_chunk(p, s) mchunkptr p; INTERNAL_SIZE_T s;
 {                                                                             \
   BK = P->bk;                                                                 \
   FD = P->fd;                                                                 \
-  FD->bk = BK;                                                        \
-  BK->fd = FD;                                                        \
+  FD->bk = BK;                                                                \
+  BK->fd = FD;                                                                \
 }                                                                             \
 
 /* Place p as the last remainder */
@@ -2137,7 +2128,6 @@ static void malloc_extend_top(RARG nb) RDECL INTERNAL_SIZE_T nb;
   char*     brk;                  /* return value from sbrk */
   INTERNAL_SIZE_T front_misalign; /* unusable bytes at front of sbrked space */
   INTERNAL_SIZE_T correction;     /* bytes for 2nd sbrk call */
-  int correction_failed = 0;      /* whether we should relax the assertion */
   char*     new_brk;              /* return of 2nd sbrk call */
   INTERNAL_SIZE_T top_size;       /* new size of top chunk */
 
@@ -2162,13 +2152,11 @@ static void malloc_extend_top(RARG nb) RDECL INTERNAL_SIZE_T nb;
   /* Fail if sbrk failed or if a foreign sbrk call killed our space */
   if (brk == (char*)(MORECORE_FAILURE) || 
       (brk < old_end && old_top != initial_top))
-    return;
+    return;     
 
   sbrked_mem += sbrk_size;
 
-  if (brk == old_end /* can just add bytes to current top, unless
-			previous correction failed */
-      && ((POINTER_UINT)old_end & (pagesz - 1)) == 0)
+  if (brk == old_end) /* can just add bytes to current top */
   {
     top_size = sbrk_size + old_top_size;
     set_head(top, top_size | PREV_INUSE);
@@ -2195,12 +2183,7 @@ static void malloc_extend_top(RARG nb) RDECL INTERNAL_SIZE_T nb;
 
     /* Allocate correction */
     new_brk = (char*)(MORECORE (correction));
-    if (new_brk == (char*)(MORECORE_FAILURE))
-      {
-	correction = 0;
-	correction_failed = 1;
-	new_brk = brk;
-      }
+    if (new_brk == (char*)(MORECORE_FAILURE)) return; 
 
     sbrked_mem += correction;
 
@@ -2245,8 +2228,7 @@ static void malloc_extend_top(RARG nb) RDECL INTERNAL_SIZE_T nb;
 #endif
 
   /* We always land on a page boundary */
-  assert(((unsigned long)((char*)top + top_size) & (pagesz - 1)) == 0
-	 || correction_failed);
+  assert(((unsigned long)((char*)top + top_size) & (pagesz - 1)) == 0);
 }
 
 #endif /* DEFINE_MALLOC */
@@ -2341,13 +2323,6 @@ Void_t* mALLOc(RARG bytes) RDECL size_t bytes;
   mbinptr q;                         /* misc temp */
 
   INTERNAL_SIZE_T nb  = request2size(bytes);  /* padded request size; */
-
-  /* Check for overflow and just fail, if so. */
-  if (nb > INT_MAX || nb < bytes)
-  {
-    RERRNO = ENOMEM;
-    return 0;
-  }
 
   MALLOC_LOCK;
 
@@ -2808,13 +2783,6 @@ Void_t* rEALLOc(RARG oldmem, bytes) RDECL Void_t* oldmem; size_t bytes;
 
   nb = request2size(bytes);
 
-  /* Check for overflow and just fail, if so. */
-  if (nb > INT_MAX || nb < bytes)
-  {
-    RERRNO = ENOMEM;
-    return 0;
-  }
-
 #if HAVE_MMAP
   if (chunk_is_mmapped(oldp)) 
   {
@@ -3043,14 +3011,6 @@ Void_t* mEMALIGn(RARG alignment, bytes) RDECL size_t alignment; size_t bytes;
   /* Call malloc with worst case padding to hit alignment. */
 
   nb = request2size(bytes);
-
-  /* Check for overflow. */
-  if (nb > INT_MAX || nb < bytes)
-  {
-    RERRNO = ENOMEM;
-    return 0;
-  }
-
   m  = (char*)(mALLOc(RCALL nb + alignment + MINSIZE));
 
   if (m == 0) return 0; /* propagate failure */
@@ -3502,7 +3462,6 @@ void malloc_stats(RONEARG) RDECL
   MALLOC_UNLOCK;
 
 #ifdef INTERNAL_NEWLIB
-  _REENT_SMALL_CHECK_INIT(reent_ptr);
   fp = _stderr_r(reent_ptr);
 #define fprintf fiprintf
 #else

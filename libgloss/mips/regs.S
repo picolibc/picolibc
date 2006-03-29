@@ -53,21 +53,20 @@
 #define fp1	$f1
 
 /* Useful memory constants: */
+#define K0BASE		0x80000000
 #ifndef __mips64
-#define K0BASE          0x80000000
 #define K1BASE		0xA0000000
 #define K0BASE_ADDR	((char *)K0BASE)
 #define K1BASE_ADDR	((char *)K1BASE)
 #else
-#define K0BASE          0xFFFFFFFF80000000
-#define K1BASE		0xFFFFFFFFA0000000
+#define K1BASE		0xFFFFFFFFA0000000LL
 #define K0BASE_ADDR	((char *)0xFFFFFFFF80000000LL)
-#define K1BASE_ADDR	((char *)0xFFFFFFFFA0000000LL)
+#define K1BASE_ADDR	((char *)K1BASE)
 #endif
 
 #define PHYS_TO_K1(a)   ((unsigned)(a) | K1BASE)
 
-/* Standard Co-Processor 0 registers */
+/* Standard Co-Processor 0 register numbers:
 #define C0_COUNT	$9		/* Count Register */
 #define C0_SR		$12		/* Status Register */
 #define C0_CAUSE	$13		/* last exception description */

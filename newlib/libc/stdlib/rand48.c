@@ -13,7 +13,7 @@
 
 /*
 FUNCTION
-   <<rand48>>, <<drand48>>, <<erand48>>, <<lrand48>>, <<nrand48>>, <<mrand48>>, <<jrand48>>, <<srand48>>, <<seed48>>, <<lcong48>>---pseudo-random number generators and initialization routines
+   <<rand48>>, <<drand48>>, <<erand48>>, <<lrand48>>, <<nrand48>>, <<mrand48>>, <<jrand48>>, <<srand48>>, <<seed48>>, <<lcong48>> ---pseudo random number generators and initialization routines
 
 INDEX
        rand48
@@ -163,7 +163,6 @@ _DEFUN (__dorand48, (r, xseed),
   unsigned long accu;
   unsigned short temp[2];
 
-  _REENT_CHECK_RAND48(r);
   accu = (unsigned long) __rand48_mult[0] * (unsigned long) xseed[0] +
     (unsigned long) __rand48_add;
   temp[0] = (unsigned short) accu;     /* lower 16 bits */

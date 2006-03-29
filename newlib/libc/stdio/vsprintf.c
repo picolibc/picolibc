@@ -1,3 +1,5 @@
+/* doc in vfprintf.c */
+
 /*
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
@@ -14,7 +16,6 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-/* doc in vfprintf.c */
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "%W% (Berkeley) %G%";
@@ -30,13 +31,11 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include <varargs.h>
 #endif
 
-#ifndef _REENT_ONLY 
-
 int
-_DEFUN(vsprintf, (str, fmt, ap),
-       char *str        _AND
-       _CONST char *fmt _AND
-       va_list ap)
+_DEFUN (vsprintf, (str, fmt, ap),
+     char *str _AND
+     _CONST char *fmt _AND
+     va_list ap)
 {
   int ret;
   FILE f;
@@ -44,20 +43,18 @@ _DEFUN(vsprintf, (str, fmt, ap),
   f._flags = __SWR | __SSTR;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = INT_MAX;
-  f._file = -1;  /* No file. */
-  ret = _vfprintf_r (_REENT, &f, fmt, ap);
+  f._data = _REENT;
+  ret = vfprintf (&f, fmt, ap);
   *f._p = 0;
   return ret;
 }
 
-#endif /* !_REENT_ONLY */
-
 int
-_DEFUN(_vsprintf_r, (ptr, str, fmt, ap),
-       struct _reent *ptr _AND
-       char *str          _AND
-       _CONST char *fmt   _AND
-       va_list ap)
+_DEFUN (_vsprintf_r, (ptr, str, fmt, ap),
+     struct _reent *ptr _AND
+     char *str _AND
+     _CONST char *fmt _AND
+     va_list ap)
 {
   int ret;
   FILE f;
@@ -65,7 +62,7 @@ _DEFUN(_vsprintf_r, (ptr, str, fmt, ap),
   f._flags = __SWR | __SSTR;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = INT_MAX;
-  f._file = -1;  /* No file. */
+  f._data = ptr;
   ret = _vfprintf_r (ptr, &f, fmt, ap);
   *f._p = 0;
   return ret;

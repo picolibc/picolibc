@@ -25,7 +25,7 @@ Since the error handling code calls @code{fputs}, the mathematical
 subroutines require stubs or minimal implementations for the same list
 of OS subroutines as @code{fputs}: @code{close}, @code{fstat},
 @code{isatty}, @code{lseek}, @code{read}, @code{sbrk}, @code{write}.
-@xref{syscalls,,System Calls, libc.info, The Red Hat newlib C Library},
+@xref{syscalls,,System Calls, libc.info, The Cygnus C Support Library},
 for a discussion and for sample minimal implementations of these support
 subroutines.
 
@@ -102,7 +102,7 @@ In X/Open mode, @code{errno} is set correctly, and @code{matherr} is
 called, but warning message are not printed.
 
 In SVID mode, functions which overflow return 3.40282346638528860e+38,
-the maximum single-precision floating-point value, rather than infinity.
+the maximum single precision floating point value, rather than infinity.
 Also, @code{errno} is set correctly, @code{matherr} is called, and, if
 @code{matherr} returns 0, warning messages are printed for some errors.
 For example, by default @samp{log(-1.0)} writes this message on standard
@@ -139,12 +139,6 @@ The library is set to X/Open mode by default.
 @include mathfp/wjn.def
 
 @page
-@include common/scbrt.def
-
-@page
-@include common/scopysign.def
-
-@page
 @include mathfp/scosh.def
 
 @page
@@ -152,9 +146,6 @@ The library is set to X/Open mode by default.
 
 @page
 @include mathfp/sexp.def
-
-@page
-@include common/sexpm1.def
 
 @page
 @include mathfp/sfabs.def
@@ -175,13 +166,7 @@ The library is set to X/Open mode by default.
 @include mathfp/ehypot.def
 
 @page
-@include common/silogb.def
-
-@page
-@include common/sinfinity.def
-
-@page
-@include common/sisnan.def
+@include mathfp/sisnan.def
 
 @page
 @include mathfp/sldexp.def
@@ -193,28 +178,10 @@ The library is set to X/Open mode by default.
 @include mathfp/slog10.def
 
 @page
-@include common/slog1p.def
-
-@page
-@include common/smatherr.def
-
-@page
-@include common/smodf.def
-
-@page
-@include common/snan.def
-
-@page
-@include common/snextafter.def
-
-@page
 @include mathfp/spow.def
 
 @page
 @include mathfp/eremainder.def
-
-@page
-@include common/sscalbn.def
 
 @page
 @include mathfp/ssqrt.def

@@ -1,7 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 
-AUTOMAKE_OPTIONS = cygnus dejagnu
-ACLOCAL_AMFLAGS = -I .
+AUTOMAKE_OPTIONS = cygnus
 
 # Multilib support variables.
 MULTISRCTOP =
@@ -28,7 +27,6 @@ AM_MAKEFLAGS = \
 	"CFLAGS=$(CFLAGS)" \
 	"CFLAGS_FOR_BUILD=$(CFLAGS_FOR_BUILD)" \
 	"CFLAGS_FOR_TARGET=$(CFLAGS_FOR_TARGET)" \
-	"INSTALL=$(INSTALL)" \
 	"LDFLAGS=$(LDFLAGS)" \
 	"LIBCFLAGS=$(LIBCFLAGS)" \
 	"LIBCFLAGS_FOR_TARGET=$(LIBCFLAGS_FOR_TARGET)" \
@@ -45,10 +43,9 @@ AM_MAKEFLAGS = \
 	"libdir=$(libdir)" \
 	"prefix=$(prefix)" \
 	"tooldir=$(tooldir)" \
-	"top_toollibdir=$(toollibdir)" \
 	"AR=$(AR)" \
 	"AS=$(AS)" \
-	"CC=$(CC_FOR_NEWLIB)" \
+	"CC=$(CC)" \
 	"LD=$(LD)" \
 	"LIBCFLAGS=$(LIBCFLAGS)" \
 	"NM=$(NM)" \
@@ -60,12 +57,9 @@ FLAGS_TO_PASS=$(AM_MAKEFLAGS)
 
 if HAVE_DOC
 DOCDIR = doc
-else
-DOCDIR =
 endif
 
-SUBDIRS = libc libm \
-	$(DOCDIR) . $(EXTRA_DIRS)
+SUBDIRS = libc libm $(DOCDIR) .
 
 tooldir = $(exec_prefix)/$(host_alias)
 toollibdir = $(tooldir)/lib$(MULTISUBDIR)
@@ -73,16 +67,14 @@ toollibdir = $(tooldir)/lib$(MULTISUBDIR)
 AR_FLAGS = rc
 
 if USE_LIBTOOL
-toollib_LTLIBRARIES = libm.la \
-	libc.la
+toollib_LTLIBRARIES = libm.la libc.la
 else
-toollib_LIBRARIES = libm.a \
-	libc.a
+toollib_LIBRARIES = libm.a libc.a
 endif
 
 noinst_DATA = stmp-targ-include
 
-toollib_DATA = $(CRT0) $(CRT1)
+toollib_DATA = $(CRT0)
 
 
 # The functions ldexp, frexp and modf are traditionally supplied in
@@ -91,9 +83,6 @@ toollib_DATA = $(CRT0) $(CRT1)
 MATHOBJS_IN_LIBC = \
 	s_isinf.$(oext) sf_isinf.$(oext) \
 	s_isnan.$(oext) sf_isnan.$(oext) \
-	s_isinfd.$(oext) sf_isinff.$(oext) \
-	s_isnand.$(oext) sf_isnanf.$(oext) \
-	s_nan.$(oext) sf_nan.$(oext) \
 	s_ldexp.$(oext) sf_ldexp.$(oext) \
 	s_frexp.$(oext) sf_frexp.$(oext) \
 	s_modf.$(oext) \
@@ -108,12 +97,9 @@ LIBC_OBJECTLISTS = \
 	$(SIGNAL_OBJECTLIST) \
 	$(SYSCALL_OBJECTLIST) \
 	$(UNIX_OBJECTLIST) \
-	$(STDIO64_OBJECTLIST) \
-	libc/argz/objectlist.awk.in \
 	libc/stdlib/objectlist.awk.in \
 	libc/time/objectlist.awk.in \
 	libc/ctype/objectlist.awk.in \
-	libc/search/objectlist.awk.in \
 	libc/string/objectlist.awk.in \
 	libc/locale/objectlist.awk.in \
 	libc/misc/objectlist.awk.in \
@@ -121,17 +107,16 @@ LIBC_OBJECTLISTS = \
 	libc/errno/objectlist.awk.in \
 	libc/stdio/objectlist.awk.in \
 	$(MACHINE_OBJECTLIST) \
-	$(SYS_OBJECTLIST) \
-	$(SYS_MACH_OBJECTLIST)
+	$(SYS_OBJECTLIST)
 
 LIBM_OBJECTLISTS = \
 	libm/$(MATHDIR)/objectlist.awk.in \
 	libm/common/objectlist.awk.in \
 	$(LIBM_MACHINE_OBJECTLIST)
 
-libm_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/libc/sys/linux/shared.ld -lgcc -objectlist libm-libtool-objectlist
+libm_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/libc/sys/linux/shared.ld `cat libm-libtool-objectlist`
 
-libc_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/libc/sys/linux/shared.ld -lgcc -objectlist libc-libtool-objectlist
+libc_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/libc/sys/linux/shared.ld `cat libc-libtool-objectlist`
 
 if USE_LIBTOOL
 libm_la_SOURCES =
@@ -171,20 +156,12 @@ libm/libm.a: ; @true
 
 endif # USE_LIBTOOL
 
-crt0.o: $(CRT0_DIR)$(CRT0)
+crt0.o: $(CRT0_DIR)/$(CRT0)
 	rm -f $@
-	ln $(CRT0_DIR)$(CRT0) $@ >/dev/null 2>/dev/null \
-	 || cp $(CRT0_DIR)$(CRT0) $@
+	ln $(CRT0_DIR)/$(CRT0) $@ >/dev/null 2>/dev/null \
+	 || cp $(CRT0_DIR)/$(CRT0) $@
 
-$(CRT0_DIR)$(CRT0): ; @true
-
-crt1.o: $(CRT1_DIR)$(CRT1)
-	rm -f $@
-	ln $(CRT0_DIR)$(CRT0) $@ >/dev/null 2>/dev/null \
-	 || cp $(CRT0_DIR)$(CRT0) $@
-
-$(CRT1_DIR)$(CRT1): ; @true
-
+$(CRT0_DIR)/$(CRT0): ; @true
 
 all-recursive: stmp-targ-include
 
@@ -193,21 +170,10 @@ all-recursive: stmp-targ-include
 # used while building.
 stmp-targ-include: config.status
 	-rm -rf targ-include stmp-targ-include
-	mkdir targ-include targ-include/sys targ-include/machine targ-include/bits
-	cp newlib.h targ-include/newlib.h
+	mkdir targ-include targ-include/sys targ-include/machine
 	-for i in $(srcdir)/libc/machine/$(machine_dir)/machine/*.h; do \
 	    if [ -f $$i ]; then \
 	      cp $$i targ-include/machine/`basename $$i`; \
-	    else true; fi ; \
-	  done
-	-for i in $(srcdir)/libc/machine/$(machine_dir)/sys/*.h; do \
-	    if [ -f $$i ]; then \
-	      cp $$i targ-include/sys/`basename $$i`; \
-	    else true; fi ; \
-	  done
-	-for i in $(srcdir)/libc/machine/$(machine_dir)/include/*.h; do \
-	    if [ -f $$i ]; then \
-	      cp $$i targ-include/`basename $$i`; \
 	    else true; fi ; \
 	  done
 	-for i in $(srcdir)/libc/sys/$(sys_dir)/include/*.h; do \
@@ -220,26 +186,6 @@ stmp-targ-include: config.status
 	      cp $$i targ-include/sys/`basename $$i`; \
 	    else true; fi ; \
 	  done
-	-for i in $(srcdir)/libc/sys/$(sys_dir)/bits/*.h; do \
-	    if [ -f $$i ]; then \
-	      cp $$i targ-include/bits/`basename $$i`; \
-	    else true; fi ; \
-	  done
-	-for i in $(srcdir)/libc/sys/$(sys_dir)/machine/*.h; do \
-	    if [ -f $$i ]; then \
-	      cp $$i targ-include/machine/`basename $$i`; \
-	    else true; fi ; \
-	  done
-	-for i in $(srcdir)/libc/sys/$(sys_dir)/machine/$(machine_dir)/*.h; do \
-	    if [ -f $$i ]; then \
-	      cp $$i targ-include/machine/`basename $$i`; \
-	    else true; fi ; \
-	  done
-	-for i in $(srcdir)/libc/sys/$(sys_dir)/machine/$(machine_dir)/include/*.h; do \
-	    if [ -f $$i ]; then \
-	      cp $$i targ-include/machine/`basename $$i`; \
-	    else true; fi ; \
-	  done
 	touch $@
 
 CLEANFILES = targ-include stmp-targ-include
@@ -250,13 +196,12 @@ else
 	rm -f $(DESTDIR)$(toollibdir)/libg.a
 	ln $(DESTDIR)$(toollibdir)/libc.a $(DESTDIR)$(toollibdir)/libg.a >/dev/null 2>/dev/null || cp $(DESTDIR)$(toollibdir)/libc.a $(DESTDIR)$(toollibdir)/libg.a
 endif
-	$(MULTIDO) $(AM_MAKEFLAGS) DO=install multi-do # $(MAKE)
+	$(MULTIDO) $(AM_MAKEFLAGS) DO=install multi-do
 	-if [ -z "$(MULTISUBDIR)" ]; then \
 	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include; \
 	  for i in $(srcdir)/libc/include/*.h; do \
 	   $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/`basename $$i`; \
 	  done; \
-	  $(INSTALL_DATA) newlib.h $(DESTDIR)$(tooldir)/include/newlib.h; \
 	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include/machine; \
 	  for i in $(srcdir)/libc/include/machine/*.h; do \
 	   $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/machine/`basename $$i`; \
@@ -270,40 +215,14 @@ endif
 	  for i in $(srcdir)/libc/include/sys/*.h; do \
 	   $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/sys/`basename $$i`; \
 	  done; \
-	  for i in $(srcdir)/libc/machine/$(machine_dir)/sys/*.h; do \
-	    if [ -f $$i ]; then \
-	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/sys/`basename $$i`; \
-	    else true; fi ; \
-	  done ; \
-	  for i in $(srcdir)/libc/machine/$(machine_dir)/include/*.h; do \
-	    if [ -f $$i ]; then \
-	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/`basename $$i`; \
-	    else true; fi ; \
-	  done ; \
 	  for i in $(srcdir)/libc/sys/$(sys_dir)/sys/*.h; do \
 	    if [ -f $$i ]; then \
 	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/sys/`basename $$i`; \
 	    else true; fi ; \
 	  done ; \
-	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include/bits; \
-	  for i in $(srcdir)/libc/sys/$(sys_dir)/bits/*.h; do \
-	    if [ -f $$i ]; then \
-	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/bits/`basename $$i`; \
-	    else true; fi ; \
-	  done ; \
-	  for i in $(srcdir)/libc/sys/$(sys_dir)/machine/*.h; do \
-	    if [ -f $$i ]; then \
-	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/machine/`basename $$i`; \
-	    else true; fi ; \
-	  done ; \
 	  for i in $(srcdir)/libc/sys/$(sys_dir)/include/*.h; do \
 	    if [ -f $$i ]; then \
 	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/`basename $$i`; \
-	    else true; fi ; \
-	  done ; \
-	  for i in $(srcdir)/libc/sys/$(sys_dir)/machine/$(machine_dir)/include/*.h; do \
-	    if [ -f $$i ]; then \
-	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/machine/`basename $$i`; \
 	    else true; fi ; \
 	  done ; \
 	else true; fi
@@ -317,92 +236,24 @@ doc/makedoc:
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 
 # Multilib support.
-.PHONY: all-multi check-multi mostlyclean-multi clean-multi distclean-multi \
+.PHONY: all-multi mostlyclean-multi clean-multi distclean-multi \
 	maintainer-clean-multi
 
 all-recursive: all-multi
-check-recursive: check-multi
 mostlyclean-recursive: mostlyclean-multi
 clean-recursive: clean-multi
 distclean-recursive: distclean-multi
 maintainer-clean-recursive: maintainer-clean-multi
 
-# The $(MAKE) comments below are to enable parallel building.
 all-multi:
-	$(MULTIDO) $(AM_MAKEFLAGS) DO=all multi-do # $(MAKE)
-check-multi:
-	$(MULTIDO) $(AM_MAKEFLAGS) DO=check multi-do # $(MAKE)
+	$(MULTIDO) $(AM_MAKEFLAGS) DO=all multi-do
 mostlyclean-multi:
-	$(MULTICLEAN) $(AM_MAKEFLAGS) DO=mostlyclean multi-clean # $(MAKE)
+	$(MULTICLEAN) $(AM_MAKEFLAGS) DO=mostlyclean multi-clean
 clean-multi:
-	$(MULTICLEAN) $(AM_MAKEFLAGS) DO=clean multi-clean # $(MAKE)
+	$(MULTICLEAN) $(AM_MAKEFLAGS) DO=clean multi-clean
 distclean-multi:
-	$(MULTICLEAN) $(AM_MAKEFLAGS) DO=distclean multi-clean # $(MAKE)
+	$(MULTICLEAN) $(AM_MAKEFLAGS) DO=distclean multi-clean
 maintainer-clean-multi:
-	$(MULTICLEAN) $(AM_MAKEFLAGS) DO=maintainer-clean multi-clean # $(MAKE)
+	$(MULTICLEAN) $(AM_MAKEFLAGS) DO=maintainer-clean multi-clean
 
 MAKEOVERRIDES=
-
-# dejagnu support
-
-RUNTESTFLAGS=
-
-site.exp: Makefile
-	@echo 'Making a new site.exp file...'
-	@test ! -f site.bak || rm -f site.bak
-	@echo '## these variables are automatically generated by make ##' > $@-t
-	@echo '# Do not edit here.  If you wish to override these values' >> $@-t
-	@echo '# edit the last section' >> $@-t
-	@echo 'set tool $(DEJATOOL)' >> $@-t
-	@echo 'set tool_version $(VERSION)' >> $@-t
-	@echo 'set srcdir $(srcdir)/testsuite' >> $@-t
-	@echo 'set objdir' `pwd` >> $@-t
-	@echo 'set tmpdir' `pwd`/testsuite >> $@-t
-	@echo 'set multibuildtop ./$(MULTIBUILDTOP)' >> $@-t
-	@echo 'set host_alias $(build_alias)' >> $@-t
-	@echo 'set host_triplet $(build_triplet)' >> $@-t
-	@echo 'set target_alias $(host_alias)' >> $@-t
-	@echo 'set target_triplet $(host_triplet)' >> $@-t
-	@echo '## All variables above are generated by configure. Do Not Edit ##' >> $@-t
-	@test ! -f site.exp || sed '1,/^## All variables above are.*##/ d' site.exp >> $@-t
-	@test ! -f site.exp || mv site.exp site.bak
-	@mv $@-t site.exp
-
-check-DEJAGNU: site.exp
-	@if [ -d testsuite ] ; then \
-	  true ; \
-	else \
-	  mkdir testsuite ; \
-	fi
-	@rm -f testsuite/site.exp
-	@cp site.exp testsuite/site.exp
-	@rootme=`pwd` ; \
-	export rootme ; \
-	srcdir=`cd ${srcdir}; pwd` ; \
-	export srcdir ; \
-	EXPECT=`if [ -f $${rootme}/${MULTIBUILDTOP}../../expect/expect ] ; then \
-	          echo $${rootme}/${MULTIBUILDTOP}../../expect/expect ; \
-	        else \
-	          echo expect ; \
-	        fi` ; \
-	export EXPECT ; \
-	echo "Found expect: $${EXPECT}" ; \
-	if [ -f $(top_builddir)/$(MULTIBUILDTOP)../../expect/expect ] ; then \
-	  TCL_LIBRARY=`cd $(top_srcdir)/../tcl/library && pwd` ; \
-	  export TCL_LIBRARY ; \
-	  echo "Found TCL library directory: $${TCL_LIBRARY}" ; \
-	fi ; \
-	RUNTEST=`if [ -f $${srcdir}/../dejagnu/runtest ] ; then \
-	           echo $${srcdir}/../dejagnu/runtest ; \
-	         else \
-	           echo runtest ; \
-	         fi` ; \
-	export RUNTEST ; \
-	echo "Found runtest: $${RUNTEST}" ; \
-	cd testsuite ; \
-	if $(SHELL) -c "$$RUNTEST --version" > /dev/null 2>&1 ; then \
-	   $$RUNTEST --tool $(DEJATOOL) --srcdir $${srcdir}/testsuite $(RUNTESTFLAGS) ; \
-	   : ; \
-	else \
-	   echo "WARNING: could not find \`runtest'" 1>&2 ; \
-	fi

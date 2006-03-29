@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
+# Makefile.in generated automatically by automake 1.4 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -57,22 +57,14 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_alias = @build_alias@
-build_triplet = @build@
 host_alias = @host_alias@
 host_triplet = @host@
-target_alias = @target_alias@
-target_triplet = @target@
 AR = @AR@
 AS = @AS@
 CC = @CC@
 CPP = @CPP@
-CXX = @CXX@
-CXXCPP = @CXXCPP@
 DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
-GCJ = @GCJ@
-GCJFLAGS = @GCJFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBM_MACHINE_LIB = @LIBM_MACHINE_LIB@
 LIBTOOL = @LIBTOOL@
@@ -81,10 +73,8 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
 OBJDUMP = @OBJDUMP@
-OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
-STRIP = @STRIP@
 VERSION = @VERSION@
 aext = @aext@
 libm_machine_dir = @libm_machine_dir@
@@ -94,18 +84,18 @@ oext = @oext@
 sys_dir = @sys_dir@
 
 AUTOMAKE_OPTIONS = cygnus
-@NEWLIB_HW_FP_TRUE@MATHDIR = mathfp
-@NEWLIB_HW_FP_FALSE@MATHDIR = math
+@NEWLIB_HW_FP_TRUE@MATHDIR = @NEWLIB_HW_FP_TRUE@mathfp
+@NEWLIB_HW_FP_FALSE@MATHDIR = @NEWLIB_HW_FP_FALSE@math
 
 SUBDIRS = $(MATHDIR) common machine
 
 libm_la_LDFLAGS = -Xcompiler -nostdlib
-@USE_LIBTOOL_TRUE@SUBLIBS = $(MATHDIR)/lib$(MATHDIR).$(aext) common/libcommon.$(aext) $(LIBM_MACHINE_LIB)
-@USE_LIBTOOL_FALSE@SUBLIBS = $(MATHDIR)/lib.$(aext) common/lib.$(aext) $(LIBM_MACHINE_LIB)
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libm.la
+@USE_LIBTOOL_TRUE@SUBLIBS = @USE_LIBTOOL_TRUE@$(MATHDIR)/lib$(MATHDIR).$(aext) common/libcommon.$(aext) $(LIBM_MACHINE_LIB)
+@USE_LIBTOOL_FALSE@SUBLIBS = @USE_LIBTOOL_FALSE@$(MATHDIR)/lib.$(aext) common/lib.$(aext) $(LIBM_MACHINE_LIB)
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libm.la
 @USE_LIBTOOL_TRUE@libm_la_SOURCES = 
-@USE_LIBTOOL_TRUE@libm_la_LIBADD = $(SUBLIBS)
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = libm.a
+@USE_LIBTOOL_TRUE@libm_la_LIBADD = @USE_LIBTOOL_TRUE@$(SUBLIBS)
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@libm.a
 
 info_TEXINFOS = libm.texinfo
 
@@ -124,7 +114,7 @@ CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 libm_a_LIBADD = 
 libm_a_SOURCES = libm.a.c
-libm_a_OBJECTS =  libm.a.$(OBJEXT)
+libm_a_OBJECTS =  libm.a.o
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 @USE_LIBTOOL_TRUE@libm_la_DEPENDENCIES =  \
@@ -150,11 +140,11 @@ TAR = gtar
 GZIP_ENV = --best
 DIST_SUBDIRS =  mathfp math common machine
 SOURCES = libm.a.c $(libm_la_SOURCES)
-OBJECTS = libm.a.$(OBJEXT) $(libm_la_OBJECTS)
+OBJECTS = libm.a.o $(libm_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .dvi .info .lo .o .obj .ps .s .texi .texinfo .txi
+.SUFFIXES: .S .c .dvi .info .lo .o .ps .s .texi .texinfo .txi
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus Makefile
 
@@ -163,7 +153,7 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ configure.in  ../acinclude.m4 \
-		../aclocal.m4 ../libtool.m4
+		../aclocal.m4
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
 config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
@@ -183,11 +173,6 @@ maintainer-clean-noinstLIBRARIES:
 .c.o:
 	$(COMPILE) -c $<
 
-# FIXME: We should only use cygpath when building on Windows,
-# and only if it is available.
-.c.obj:
-	$(COMPILE) -c `cygpath -w $<`
-
 .s.o:
 	$(COMPILE) -c $<
 
@@ -196,7 +181,6 @@ maintainer-clean-noinstLIBRARIES:
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
-	-rm -f *.$(OBJEXT)
 
 clean-compile:
 
@@ -309,7 +293,7 @@ uninstall-info:
 	else ii=; fi; \
 	list='$(INFO_DEPS)'; \
 	for file in $$list; do \
-	  test -z "$$ii" \
+	  test -z "$ii" \
 	    || install-info --info-dir=$(DESTDIR)$(infodir) --remove $$file; \
 	done
 	@$(NORMAL_UNINSTALL)
@@ -383,7 +367,7 @@ maintainer-clean-recursive:
 	dot_seen=no; \
 	rev=''; list='$(SUBDIRS)'; for subdir in $$list; do \
 	  rev="$$subdir $$rev"; \
-	  test "$$subdir" != "." || dot_seen=yes; \
+	  test "$$subdir" = "." && dot_seen=yes; \
 	done; \
 	test "$$dot_seen" = "no" && rev=". $$rev"; \
 	target=`echo $@ | sed s/-recursive//`; \
@@ -603,8 +587,6 @@ maintainer-clean
 $(SUBLIBS):
 
 libm.info: targetdep.tex math/stmp-def
-
-libm.dvi: targetdep.tex math/stmp-def
 
 stmp-targetdep: force
 	rm -f tmp.texi

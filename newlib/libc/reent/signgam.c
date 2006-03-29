@@ -8,9 +8,9 @@
 #ifndef _REENT_ONLY
 
 int *
-_DEFUN_VOID (__signgam)
+__signgam ()
 {
-  return &_REENT_SIGNGAM(_REENT);
+  return &_REENT->_new._reent._gamma_signgam;
 }
 
 #endif

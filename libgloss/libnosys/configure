@@ -755,8 +755,6 @@ case "${target}" in
 	;;
   strongarm-*-*)
 	;;
-  cris-*-* | crisv32-*-*)
-	;;
   d10v*)
 	;;
   h8300*-*-*)
@@ -789,8 +787,6 @@ case "${target}" in
 	;;
   w65-*-*)
 	;;	
-  xstormy16-*-*)
-	;;
   z8k-*-*)
 	;;
   *)
@@ -813,94 +809,64 @@ echo "configure:813: checking for .previous assembler directive" >&5
 if eval "test \"`echo '$''{'libc_cv_asm_previous_directive'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
-          libc_cv_asm_previous_directive=no
-        cat > conftest.s <<EOF
+          cat > conftest.s <<EOF
 .section foo_section
 .previous
 EOF
-        if { ac_try='${CC-cc} -c $CFLAGS conftest.s 1>&5'; { (eval echo configure:822: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; }; then
-          libc_cv_asm_previous_directive=yes
+        if { ac_try='${CC-cc} -c $CFLAGS conftest.s 1>&5'; { (eval echo configure:821: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; }; then
           cat >> confdefs.h <<\EOF
 #define HAVE_ASM_PREVIOUS_DIRECTIVE 1
 EOF
 
-        fi
-        rm -f conftest*
+        else
+          rm -f conftest*
 fi
 
 echo "$ac_t""$libc_cv_asm_previous_directive" 1>&6
-
-        echo $ac_n "checking for .popsection assembler directive""... $ac_c" 1>&6
-echo "configure:835: checking for .popsection assembler directive" >&5
+          echo $ac_n "checking for .popsection assembler directive""... $ac_c" 1>&6
+echo "configure:832: checking for .popsection assembler directive" >&5
 if eval "test \"`echo '$''{'libc_cv_asm_popsection_directive'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
-          libc_cv_asm_popsection_directive=no
-        cat > conftest.s <<EOF
+            cat > conftest.s <<EOF
 .pushsection foo_section
 .popsection
 EOF
-        if { ac_try='${CC-cc} -c $CFLAGS conftest.s 1>&5'; { (eval echo configure:844: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; }; then
-          libc_cv_asm_popsection_directive=yes
-          cat >> confdefs.h <<\EOF
+          if { ac_try='${CC-cc} -c $CFLAGS conftest.s 1>&5'; { (eval echo configure:840: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; }; then
+            cat >> confdefs.h <<\EOF
 #define HAVE_ASM_POPSECTION_DIRECTIVE 1
 EOF
 
+          fi
         fi
         rm -f conftest*
 fi
 
 echo "$ac_t""$libc_cv_asm_popsection_directive" 1>&6
-
-        echo $ac_n "checking for section attributes""... $ac_c" 1>&6
-echo "configure:857: checking for section attributes" >&5
-if eval "test \"`echo '$''{'libc_cv_section_attributes'+set}'`\" = set"; then
-  echo $ac_n "(cached) $ac_c" 1>&6
-else
-          libc_cv_section_attributes=no
-        cat > conftest.c <<EOF
-int secttest __attribute__ ((section (".gnu.warning.secttest"))) = 10;
-int main() {}
-EOF
-        if { ac_try='${CC-cc} -c $CFLAGS conftest.c 1>&5'; { (eval echo configure:866: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; }; then
-          libc_cv_section_attributes=yes
-          cat >> confdefs.h <<\EOF
-#define HAVE_SECTION_ATTRIBUTES 1
-EOF
-
-        fi
-        rm -f conftest*
-fi
-
-echo "$ac_t""$libc_cv_section_attributes" 1>&6
-        ;;
+	;;
 esac
 
-echo $ac_n "checking for symbol prefix""... $ac_c" 1>&6
-echo "configure:881: checking for symbol prefix" >&5
-if eval "test \"`echo '$''{'libc_symbol_prefix'+set}'`\" = set"; then
+echo $ac_n "checking for function prefix""... $ac_c" 1>&6
+echo "configure:855: checking for function prefix" >&5
+if eval "test \"`echo '$''{'libc_dollar_prefix'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.c <<\EOF
 foo () { }
 EOF
-libc_symbol_prefix=none
-if { ac_try='${CC-cc} -S conftest.c -o - | fgrep "\$foo" > /dev/null'; { (eval echo configure:889: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; };
+if { ac_try='${CC-cc} -S conftest.c -o - | fgrep "\$foo" > /dev/null'; { (eval echo configure:862: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; };
 then
-  libc_symbol_prefix='$'
+  libc_dollar_prefix=yes
 else
-  if { ac_try='${CC-cc} -S conftest.c -o - | fgrep "_foo" > /dev/null'; { (eval echo configure:893: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; };
-  then
-    libc_symbol_prefix=_
-  fi
+  libc_dollar_prefix=no
 fi
 rm -f conftest* 
 fi
 
-echo "$ac_t""$libc_symbol_prefix" 1>&6
-if test $libc_symbol_prefix != none; then
-  cat >> confdefs.h <<EOF
-#define __SYMBOL_PREFIX "$libc_symbol_prefix"
+echo "$ac_t""$libc_dollar_prefix" 1>&6
+if test $libc_dollar_prefix = yes ; then
+  cat >> confdefs.h <<\EOF
+#define __SYMBOL_PREFIX "$"
 EOF
 
 else
@@ -913,7 +879,7 @@ fi
 # Extract the first word of "gcc", so it can be a program name with args.
 set dummy gcc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:917: checking for $ac_word" >&5
+echo "configure:887: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -943,7 +909,7 @@ if test -z "$CC"; then
   # Extract the first word of "cc", so it can be a program name with args.
 set dummy cc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:947: checking for $ac_word" >&5
+echo "configure:917: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -992,7 +958,7 @@ fi
 fi
 
 echo $ac_n "checking whether we are using GNU C""... $ac_c" 1>&6
-echo "configure:996: checking whether we are using GNU C" >&5
+echo "configure:966: checking whether we are using GNU C" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_gcc'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1001,7 +967,7 @@ else
   yes;
 #endif
 EOF
-if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:1005: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
+if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:975: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
   ac_cv_prog_gcc=yes
 else
   ac_cv_prog_gcc=no
@@ -1016,7 +982,7 @@ if test $ac_cv_prog_gcc = yes; then
   ac_save_CFLAGS="$CFLAGS"
   CFLAGS=
   echo $ac_n "checking whether ${CC-cc} accepts -g""... $ac_c" 1>&6
-echo "configure:1020: checking whether ${CC-cc} accepts -g" >&5
+echo "configure:990: checking whether ${CC-cc} accepts -g" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_cc_g'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1052,7 +1018,7 @@ LD=${LD-ld}
 # Extract the first word of "ranlib", so it can be a program name with args.
 set dummy ranlib; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:1056: checking for $ac_word" >&5
+echo "configure:1026: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_RANLIB'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else

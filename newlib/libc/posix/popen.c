@@ -63,20 +63,15 @@ static struct pid {
 } *pidlist; 
 	
 FILE *
-_DEFUN(popen, (program, type),
-	const char *program _AND
-	const char *type)
+popen(program, type)
+	const char *program;
+	const char *type;
 {
 	struct pid *cur;
 	FILE *iop;
 	int pdes[2], pid;
 
-       if ((*type != 'r' && *type != 'w')
-	   || (type[1]
-#ifdef __CYGWIN__
-	       && (type[2] || (type[1] != 'b' && type[1] != 't'))
-#endif
-			       )) {
+       if ((*type != 'r' && *type != 'w') || type[1]) {
 		errno = EINVAL;
 		return (NULL);
 	}
@@ -144,8 +139,8 @@ _DEFUN(popen, (program, type),
  *	if already `pclosed', or waitpid returns an error.
  */
 int
-_DEFUN(pclose, (iop),
-	FILE *iop)
+pclose(iop)
+	FILE *iop;
 {
 	register struct pid *cur, *last;
 	int pstat;

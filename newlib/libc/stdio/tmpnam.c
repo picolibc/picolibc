@@ -2,6 +2,7 @@
  * tmpname.c
  * Original Author:	G. Haley
  */
+
 /*
 FUNCTION
 <<tmpnam>>, <<tempnam>>---name for a temporary file
@@ -19,8 +20,8 @@ ANSI_SYNOPSIS
 	#include <stdio.h>
 	char *tmpnam(char *<[s]>);
 	char *tempnam(char *<[dir]>, char *<[pfx]>);
-	char *_tmpnam_r(struct _reent *<[reent]>, char *<[s]>);
-	char *_tempnam_r(struct _reent *<[reent]>, char *<[dir]>, char *<[pfx]>);
+	char *_tmpnam_r(void *<[reent]>, char *<[s]>);
+	char *_tempnam_r(void *<[reent]>, char *<[dir]>, char *<[pfx]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -32,11 +33,11 @@ TRAD_SYNOPSIS
 	char *<[pfx]>;
 
 	char *_tmpnam_r(<[reent]>, <[s]>)
-	struct _reent *<[reent]>;
+	char *<[reent]>;
 	char *<[s]>;
 
 	char *_tempnam_r(<[reent]>, <[dir]>, <[pfx]>)
-	struct *<[reent]>;
+	char *<[reent]>;
 	char *<[dir]>;
 	char *<[pfx]>;
 
@@ -92,7 +93,6 @@ The global pointer <<environ>> is also required.
 */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -104,13 +104,13 @@ The global pointer <<environ>> is also required.
    another one.  Return nonzero if successful, otherwise zero.  */
 
 static int
-_DEFUN(worker, (ptr, result, part1, part2, part3, part4),
-       struct _reent *ptr _AND
-       char *result       _AND
-       _CONST char *part1 _AND
-       _CONST char *part2 _AND
-       int part3          _AND
-       int *part4)
+worker (ptr, result, part1, part2, part3, part4)
+     struct _reent *ptr;
+     char *result;
+     _CONST char *part1;
+     _CONST char *part2;
+     int part3;
+     int *part4;
 {
   /*  Generate the filename and make sure that there isn't one called
       it already.  */
@@ -136,9 +136,9 @@ _DEFUN(worker, (ptr, result, part1, part2, part3, part4),
 }
 
 char *
-_DEFUN(_tmpnam_r, (p, s),
-       struct _reent *p _AND
-       char *s)
+_DEFUN (_tmpnam_r, (p, s),
+	struct _reent *p _AND
+	char *s)
 {
   char *result;
   int pid;
@@ -146,8 +146,7 @@ _DEFUN(_tmpnam_r, (p, s),
   if (s == NULL)
     {
       /* ANSI states we must use an internal static buffer if s is NULL */
-      _REENT_CHECK_EMERGENCY(p);
-      result = _REENT_EMERGENCY(p);
+      result = p->_emergency;
     }
   else
     {
@@ -165,10 +164,10 @@ _DEFUN(_tmpnam_r, (p, s),
 }
 
 char *
-_DEFUN(_tempnam_r, (p, dir, pfx),
-       struct _reent *p _AND
-       _CONST char *dir _AND
-       _CONST char *pfx)
+_DEFUN (_tempnam_r, (p, dir, pfx),
+	struct _reent *p _AND
+	_CONST char *dir _AND
+	_CONST char *pfx)
 {
   char *filename;
   int length;
@@ -192,16 +191,16 @@ _DEFUN(_tempnam_r, (p, dir, pfx),
 #ifndef _REENT_ONLY
 
 char *
-_DEFUN(tempnam, (dir, pfx),
-       _CONST char *dir _AND
-       _CONST char *pfx)
+_DEFUN (tempnam, (dir, pfx),
+	_CONST char *dir _AND
+	_CONST char *pfx)
 {
   return _tempnam_r (_REENT, dir, pfx);
 }
 
 char *
-_DEFUN(tmpnam, (s),
-       char *s)
+_DEFUN (tmpnam, (s),
+	char *s)
 {
   return _tmpnam_r (_REENT, s);
 }

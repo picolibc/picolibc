@@ -19,9 +19,9 @@ Divide
 @tex
 $n/d$,
 @end tex
-@ifnottex
+@ifinfo
 <[n]>/<[d]>,
-@end ifnottex
+@end ifinfo
 returning quotient and remainder as two long integers in a structure <<ldiv_t>>.
 
 RETURNS

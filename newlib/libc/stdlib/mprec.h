@@ -31,7 +31,6 @@
 #include <float.h>
 #include <errno.h>
 #include <sys/config.h>
-#include <sys/types.h>
 
 #ifdef __IEEE_LITTLE_ENDIAN
 #define IEEE_8087

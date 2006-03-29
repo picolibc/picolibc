@@ -35,7 +35,7 @@ variables vary from one system to another.
 */
 
 /* This file may have been modified by DJ Delorie (Jan 1991).  If so,
-** these modifications are Copyright (C) 1991 DJ Delorie.
+** these modifications are Copyright (C) 1991 DJ Delorie
 */
 
 /*
@@ -94,10 +94,7 @@ _DEFUN (_findenv_r, (reent_ptr, name, offset),
   /* In some embedded systems, this does not get set.  This protects
      newlib from dereferencing a bad pointer.  */
   if (!*p_environ)
-    {
-      ENV_UNLOCK;
-      return NULL;
-    }
+    return NULL;
 
   c = name;
   len = 0;

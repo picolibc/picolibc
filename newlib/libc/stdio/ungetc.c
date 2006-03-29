@@ -19,8 +19,6 @@
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
-#include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -35,9 +33,8 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 /*static*/
 int
-_DEFUN(__submore, (rptr, fp),
-       struct _reent *rptr _AND
-       register FILE *fp)
+__submore (fp)
+     register FILE *fp;
 {
   register int i;
   register unsigned char *p;
@@ -47,7 +44,7 @@ _DEFUN(__submore, (rptr, fp),
       /*
        * Get a new buffer (rather than expanding the old one).
        */
-      if ((p = (unsigned char *) _malloc_r (rptr, (size_t) BUFSIZ)) == NULL)
+      if ((p = (unsigned char *) _malloc_r (fp->_data, (size_t) BUFSIZ)) == NULL)
 	return EOF;
       fp->_ub._base = p;
       fp->_ub._size = BUFSIZ;
@@ -58,10 +55,10 @@ _DEFUN(__submore, (rptr, fp),
       return 0;
     }
   i = fp->_ub._size;
-  p = (unsigned char *) _realloc_r (rptr, (_PTR) (fp->_ub._base), i << 1);
+  p = (unsigned char *) _realloc_r (fp->_data, (_PTR) (fp->_ub._base), i << 1);
   if (p == NULL)
     return EOF;
-  _CAST_VOID memcpy ((_PTR) (p + i), (_PTR) p, (size_t) i);
+  (void) memcpy ((void *) (p + i), (void *) p, (size_t) i);
   fp->_p = p + i;
   fp->_ub._base = p;
   fp->_ub._size = i << 1;
@@ -69,10 +66,9 @@ _DEFUN(__submore, (rptr, fp),
 }
 
 int
-_DEFUN(_ungetc_r, (rptr, c, fp),
-       struct _reent *rptr _AND
-       int c               _AND
-       register FILE *fp)
+ungetc (c, fp)
+     int c;
+     register FILE *fp;
 {
   if (c == EOF)
     return (EOF);
@@ -81,10 +77,8 @@ _DEFUN(_ungetc_r, (rptr, c, fp),
      ??? Might be able to remove this as some other stdio routine should
      have already been called to get the char we are un-getting.  */
 
-  CHECK_INIT (rptr);
+  CHECK_INIT (fp);
 
-  _flockfile (fp);
-  
   /* After ungetc, we won't be at eof anymore */
   fp->_flags &= ~__SEOF;
 
@@ -95,17 +89,11 @@ _DEFUN(_ungetc_r, (rptr, c, fp),
        * Otherwise, flush any current write stuff.
        */
       if ((fp->_flags & __SRW) == 0)
-        {
-          _funlockfile (fp);
-          return EOF;
-        }
+	return EOF;
       if (fp->_flags & __SWR)
 	{
 	  if (fflush (fp))
-            {
-              _funlockfile (fp);
-              return EOF;
-            }
+	    return EOF;
 	  fp->_flags &= ~__SWR;
 	  fp->_w = 0;
 	  fp->_lbfsize = 0;
@@ -121,14 +109,10 @@ _DEFUN(_ungetc_r, (rptr, c, fp),
 
   if (HASUB (fp))
     {
-      if (fp->_r >= fp->_ub._size && __submore (rptr, fp))
-        {
-          _funlockfile (fp);
-          return EOF;
-        }
+      if (fp->_r >= fp->_ub._size && __submore (fp))
+	return EOF;
       *--fp->_p = c;
       fp->_r++;
-      _funlockfile (fp);
       return c;
     }
 
@@ -142,7 +126,6 @@ _DEFUN(_ungetc_r, (rptr, c, fp),
     {
       fp->_p--;
       fp->_r++;
-      _funlockfile (fp);
       return c;
     }
 
@@ -158,17 +141,5 @@ _DEFUN(_ungetc_r, (rptr, c, fp),
   fp->_ubuf[sizeof (fp->_ubuf) - 1] = c;
   fp->_p = &fp->_ubuf[sizeof (fp->_ubuf) - 1];
   fp->_r = 1;
-  _funlockfile (fp);
   return c;
 }
-
-#ifndef _REENT_ONLY
-int
-_DEFUN(ungetc, (c, fp),
-       int c               _AND
-       register FILE *fp)
-{
-  return _ungetc_r (_REENT, c, fp);
-}
-#endif /* !_REENT_ONLY */
-

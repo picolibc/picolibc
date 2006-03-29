@@ -1,54 +1,55 @@
-/* BSD-like signal function.
-   Copyright (C) 1991, 1992, 1996, 1997, 2000 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
+/* libc/sys/linux/signal.c - Signal handling functions */
 
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
+/* Written 2000 by Werner Almesberger */
 
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
 
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
-
-#include <errno.h>
 #include <signal.h>
-#include <machine/weakalias.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/syscall.h>
 
-sigset_t _sigintr;		/* Set by siginterrupt.  */
 
-/* Set the handler for the signal SIG to HANDLER,
-   returning the old handler, or SIG_ERR on error.  */
-__sighandler_t
-__bsd_signal (sig, handler)
-     int sig;
-     __sighandler_t handler;
+#define __NR___sgetmask __NR_sgetmask /* avoid name space pollution */
+#define __NR___ssetmask __NR_ssetmask /* avoid name space pollution */
+
+_syscall2(int,kill,pid_t,pid,int,sig)
+_syscall2(__sighandler_t,signal,int,signum,__sighandler_t,handler)
+_syscall3(int,sigaction,int,signum,const struct sigaction *,act,
+  struct sigaction *,oldact)
+_syscall1(int,sigsuspend,const sigset_t *,mask)
+_syscall1(int,sigpending,sigset_t *,set)
+_syscall0(int,pause)
+_syscall1(unsigned int,alarm,unsigned int,seconds)
+_syscall3(int,sigprocmask,int,how,const sigset_t *,set,sigset_t *,oldset)
+
+static _syscall0(int,__sgetmask)
+static _syscall1(int,__ssetmask,int,newmask)
+
+
+int sigsetmask(int newmask) /* BSD */
 {
-  struct sigaction act, oact;
-
-  /* Check signal extents to protect __sigismember.  */
-  if (handler == SIG_ERR || sig < 1 || sig >= NSIG)
-    {
-      errno = (EINVAL);
-      return SIG_ERR;
-    }
-
-  act.sa_handler = handler;
-  if (sigemptyset (&act.sa_mask) < 0
-      || sigaddset (&act.sa_mask, sig) < 0)
-    return SIG_ERR;
-  act.sa_flags = sigismember (&_sigintr, sig) ? 0 : SA_RESTART;
-  if (sigaction (sig, &act, &oact) < 0)
-    return SIG_ERR;
-
-  return oact.sa_handler;
+    return __ssetmask(newmask);
 }
-weak_alias (__bsd_signal, bsd_signal)
-weak_alias (__bsd_signal, signal)
-weak_alias (__bsd_signal, ssignal)
+
+
+int sigmask(int signum) /* BSD */
+{
+    return 1 << signum;
+}
+
+
+int sigblock(int mask) /* BSD */
+{
+    return __ssetmask(mask | __sgetmask());
+}
+
+
+int raise(int sig)
+{
+    return kill(getpid(),sig);
+}
+
+
+const char *const sys_siglist[] = {
+#include "siglist.inc"
+};

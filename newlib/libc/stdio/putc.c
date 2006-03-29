@@ -65,9 +65,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
-#include <_ansi.h>
 #include <stdio.h>
-#include "local.h"
 
 /*
  * A subroutine version of the macro putc.
@@ -76,14 +74,11 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #undef putc
 
 int
-_DEFUN(putc, (c, fp),
-       int c _AND
-       register FILE *fp)
+putc (c, fp)
+     int c;
+     register FILE *fp;
 {
-  int result;
-  CHECK_INIT (_REENT);
-  _flockfile (fp);
-  result = __sputc (c, fp);
-  _funlockfile (fp);
-  return result;
+  /* CHECK_INIT is (eventually) called by __swbuf.  */
+
+  return __sputc (c, fp);
 }

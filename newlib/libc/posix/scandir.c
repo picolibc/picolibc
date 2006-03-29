@@ -49,7 +49,6 @@ static char sccsid[] = "@(#)scandir.c	5.10 (Berkeley) 2/23/91";
 #include <dirent.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/lock.h>
 
 /*
  * The DIRSIZ macro gives the minimum record length which will hold
@@ -71,11 +70,11 @@ static char sccsid[] = "@(#)scandir.c	5.10 (Berkeley) 2/23/91";
 #endif
 
 int
-_DEFUN(scandir, (dirname, namelist, select, dcomp),
-	const char *dirname _AND
-	struct dirent ***namelist _AND
-	int (*select) __P((const struct dirent *)) _AND
-	int (*dcomp) __P((const struct dirent **, const struct dirent **)))
+scandir(dirname, namelist, select, dcomp)
+	const char *dirname;
+	struct dirent ***namelist;
+	int (*select) __P((struct dirent *));
+	int (*dcomp) __P((const void *, const void *));
 {
 	register struct dirent *d, *p, **names;
 	register size_t nitems;
@@ -85,15 +84,8 @@ _DEFUN(scandir, (dirname, namelist, select, dcomp),
 
 	if ((dirp = opendir(dirname)) == NULL)
 		return(-1);
-#ifdef HAVE_DD_LOCK
-	__lock_acquire_recursive(dirp->dd_lock);
-#endif
-	if (fstat(dirp->dd_fd, &stb) < 0) {
-#ifdef HAVE_DD_LOCK
-		__lock_release_recursive(dirp->dd_lock);
-#endif
+	if (fstat(dirp->dd_fd, &stb) < 0)
 		return(-1);
-	}
 
 	/*
 	 * estimate the array size by taking the size of the directory file
@@ -101,12 +93,8 @@ _DEFUN(scandir, (dirname, namelist, select, dcomp),
 	 */
 	arraysz = (stb.st_size / 24);
 	names = (struct dirent **)malloc(arraysz * sizeof(struct dirent *));
-	if (names == NULL) {
-#ifdef HAVE_DD_LOCK
-		__lock_release_recursive(dirp->dd_lock);
-#endif
+	if (names == NULL)
 		return(-1);
-	}
 
 	nitems = 0;
 	while ((d = readdir(dirp)) != NULL) {
@@ -116,12 +104,8 @@ _DEFUN(scandir, (dirname, namelist, select, dcomp),
 		 * Make a minimum size copy of the data
 		 */
 		p = (struct dirent *)malloc(DIRSIZ(d));
-		if (p == NULL) {
-#ifdef HAVE_DD_LOCK
-			__lock_release_recursive(dirp->dd_lock);
-#endif
+		if (p == NULL)
 			return(-1);
-		}
 		p->d_ino = d->d_ino;
 		p->d_reclen = d->d_reclen;
 #ifdef _DIRENT_HAVE_D_NAMLEN
@@ -135,31 +119,20 @@ _DEFUN(scandir, (dirname, namelist, select, dcomp),
 		 * realloc the maximum size.
 		 */
 		if (++nitems >= arraysz) {
-			if (fstat(dirp->dd_fd, &stb) < 0) {
-#ifdef HAVE_DD_LOCK
-				__lock_release_recursive(dirp->dd_lock);
-#endif
+			if (fstat(dirp->dd_fd, &stb) < 0)
 				return(-1);	/* just might have grown */
-			}
 			arraysz = stb.st_size / 12;
 			names = (struct dirent **)realloc((char *)names,
 				arraysz * sizeof(struct dirent *));
-			if (names == NULL) {
-#ifdef HAVE_DD_LOCK
-				__lock_release_recursive(dirp->dd_lock);
-#endif
+			if (names == NULL)
 				return(-1);
-			}
 		}
 		names[nitems-1] = p;
 	}
 	closedir(dirp);
 	if (nitems && dcomp != NULL)
-		qsort(names, nitems, sizeof(struct dirent *), (void *)dcomp);
+		qsort(names, nitems, sizeof(struct dirent *), dcomp);
 	*namelist = names;
-#ifdef HAVE_DD_LOCK
-	__lock_release_recursive(dirp->dd_lock);
-#endif
 	return(nitems);
 }
 
@@ -167,9 +140,9 @@ _DEFUN(scandir, (dirname, namelist, select, dcomp),
  * Alphabetic order comparison routine for those who want it.
  */
 int
-_DEFUN(alphasort, (d1, d2),
-       const struct dirent **d1 _AND
-       const struct dirent **d2)
+alphasort(d1, d2)
+       const struct dirent **d1;
+       const struct dirent **d2;
 {
        return(strcmp((*d1)->d_name, (*d2)->d_name));
 }

@@ -1,73 +1,3 @@
-2006-02-27  Carlos O'Donell  <carlos@codesourcery.com>
-
-	* Makefile.in: TEXI2HTML uses makeinfo. Define 
-	HTMLFILES. Add html targets.
-	* configure.texi: Use ifnottex. Add alternative 
-	image format specifier as jpg.
-	* standards.texi: Use ifnottex.
-
-2005-10-21  Mark Mitchell  <mark@codesourcery.com>
-
-	* texi2pod.pl: Substitue for @value even when part of @include. 
-
-2005-10-21  Bob Wilson  <bob.wilson@acm.org>
-
-	* texi2pod.pl: Import latest version from GCC.
-
-2005-05-19  Zack Weinberg  <zack@codesourcery.com>
-
-	* Makefile.in: Have 'all' depend on 'info'.
-
-2003-05-16  Kelley Cook  <kelleycook@wideopenwest.com>
-
-	* configure.texi: Use "i[3-7]86" in example.
-
-2003-01-02  H.J. Lu <hjl@gnu.org>
-
-	* Makefile.in (DESTDIR): New.
-	(install-info): Use it.
-
-2002-06-11  Nick Clifton  <nickc@cambridge.redhat.com>
-
-	Import the following patches from the FSF GCC sources:
-	2002-03-25  Zack Weinberg  <zack@codesourcery.com>
-
-	* texi2pod.pl: Handle @end ftable and @end vtable.
-
-	2001-12-12  Matthias Klose  <doko@debian.org>
-
-	* texi2pod.pl: Merge changes from binutils' texi2pod.pl. Allows
-	generation of more than one man page from one source.
-	Add '-' to set of valid chars for an identifier.
-	Let -D option accept flags of the form <flag>=<value>.
-	Use \s+ for whitespace detection in '@c man' lines.
-	Handle @set and @clear independent of $output.
-	Substitute all @value{}'s in a line.
-
-	2001-11-14  Joseph S. Myers  <jsm28@cam.ac.uk>
-
-	* texi2pod.pl: Handle @ifnottex, @iftex and @display.  Handle @var
-	in verbatim blocks specially.  Handle @unnumbered, @unnumberedsec
-	and @center.  Allow [a-z] after @enumerate.  Handle 0 and numbers
-	greater than 9 in enumerations.
-
-	2001-07-03  Joseph S. Myers  <jsm28@cam.ac.uk>
-
-	* texi2pod.pl: Handle @r inside @item.
-
-2002-02-27  Andrew Cagney  <ac131313@redhat.com>
-
-	* fdl.texi: New file.
-
-2002-02-24  Andrew Cagney  <ac131313@redhat.com>
-
-	* standards.texi: Import February 14, 2002 version.
-	* make-stds.texi: Import 2001 version.
-
-2002-01-26  Hans-Peter Nilsson  <hp@bitrange.com>
-
-	* Makefile.in (install): Depend on install-info.
-
 2001-03-25  Stephane Carrez  <Stephane.Carrez@worldnet.fr>
 
 	* texi2pod.pl: New file (from gcc/contrib).
@@ -76,24 +6,24 @@
 
 	* add-log.el, add-log.vi: New files.
 
-1999-01-20  Angela Marie Thomas (angela@cygnus.com)
+Wed Jan 20 01:33:50 1999  Angela Marie Thomas (angela@cygnus.com)
 
 	* comp-tools-verify: Remove some checks that are no longer valid.
 
 1998-12-03  Nick Clifton  <nickc@cygnus.com>
 
 	* targetdoc/fr30.texi: New document.
-
-1998-10-01  Angela Marie Thomas (angela@cygnus.com)
+	
+Thu Oct  1 21:15:59 1998  Angela Marie Thomas (angela@cygnus.com)
 
 	* comp-tools-fix, cross-tools-fix: Replace /usr/include
 	with ${FIXINCDIR}.
 
-1998-08-11  Doug Evans  <devans@canuck.cygnus.com>
+Tue Aug 11 19:22:11 1998  Doug Evans  <devans@canuck.cygnus.com>
 
 	* make-rel-sym-tree (version): Update calculation.
 
-1998-06-12  Ian Lance Taylor  <ian@cygnus.com>
+Fri Jun 12 21:34:01 1998  Ian Lance Taylor  <ian@cygnus.com>
 
 	* configure.texi: Various additions.
 	* Makefile.in (TEXI2HTML, DVIPS): New variables.
@@ -108,7 +38,7 @@
 	* configbuild.ein: New file (EPS version of configbuild.fig).
 	* configbuild.jin: New file (JPEG version of configbuild.fig).
 
-1998-06-10  Ian Lance Taylor  <ian@cygnus.com>
+Wed Jun 10 14:41:25 1998  Ian Lance Taylor  <ian@cygnus.com>
 
 	* configure.texi: New file.
 	* configdev.tin: New file.
@@ -148,7 +78,7 @@ Mon May 18 14:27:37 1998  Angela Marie Thomas (angela@cygnus.com)
 Thu May 14 14:43:10 1998  Nick Clifton  <nickc@cygnus.com>
 
 	* targetdoc/arm-interwork.texi: Document dlltool support of
-	interworking.
+	interworking. 
 
 Thu May  7 16:49:38 1998  Jason Molenda  (crash@bugshack.cygnus.com)
 
@@ -157,7 +87,7 @@ Thu May  7 16:49:38 1998  Jason Molenda  (crash@bugshack.cygnus.com)
 
 Wed Apr  1 17:11:44 1998  Nick Clifton  <nickc@cygnus.com>
 
-	* targetdoc/arm-interwork.texi: Document ARM/thumb interworking.
+	* targetdoc/arm-interwork.texi: Document ARM/thumb interworking. 
 
 Tue Mar 31 15:28:20 1998  Ian Lance Taylor  <ian@cygnus.com>
 
@@ -167,7 +97,7 @@ Tue Mar 31 15:28:20 1998  Ian Lance Taylor  <ian@cygnus.com>
 Tue Mar 24 16:13:26 1998  Stu Grossman  <grossman@bhuna.cygnus.co.uk>
 
 	* configure:  Regenerate with autoconf 2.12.1 to fix shell issues
-	for NT native builds.
+	for NT native builds. 
 
 Mon Mar  9 16:41:04 1998  Doug Evans  <devans@canuck.cygnus.com>
 
@@ -203,7 +133,7 @@ Tue Jun 17 15:50:23 1997  Angela Marie Thomas (angela@cygnus.com)
 
 Thu Jun 12 13:47:00 1997  Angela Marie Thomas (angela@cygnus.com)
 
-	* Install.in (show_exec_prefix_msg): fix quoting
+        * Install.in (show_exec_prefix_msg): fix quoting
 
 Wed Jun  4 15:31:43 1997  Jason Molenda  (crash@godzilla.cygnus.co.jp)
 
@@ -251,8 +181,8 @@ Thu Apr 10 23:23:33 1997  Jason Molenda  (crash@godzilla.cygnus.co.jp)
 
 Mon Apr  7 18:15:00 1997  Brendan Kehoe <brendan@cygnus.com>
 
-	* Fix the version string for OSF1 4.0 to recognize either
-	V4.* or X4.*
+        * Fix the version string for OSF1 4.0 to recognize either
+        V4.* or X4.*
 
 Mon Apr  7 15:34:47 1997  Ian Lance Taylor  <ian@cygnus.com>
 
@@ -323,8 +253,8 @@ Mon Aug 28 17:25:49 1995  Jason Molenda  (crash@phydeaux.cygnus.com)
 
 Tue Aug 15 21:51:58 1995  Jason Molenda  (crash@phydeaux.cygnus.com)
 
-	* Install.in (guess_system): Match OSF/1 v3.x as the same as
-	v2.x--v2.x binaries are upward compatible.
+	* Install.in (guess_system): Match OSF/1 v3.x as the same as 
+        v2.x--v2.x binaries are upward compatible.
 
 Tue Aug 15 21:46:54 1995  Jason Molenda  (crash@phydeaux.cygnus.com)
 
@@ -339,8 +269,8 @@ Tue Aug  8 13:11:56 1995  Brendan Kehoe  <brendan@lisa.cygnus.com>
 
 Thu Jun  8 00:42:56 1995  Angela Marie Thomas  <angela@cirdan.cygnus.com>
 
-	* subst-strings: change du commands to $BINDIR/. & $SRCDIR/. just
-	in case they are symlinks.
+        * subst-strings: change du commands to $BINDIR/. & $SRCDIR/. just
+        in case they are symlinks.
 
 Tue Apr 18 14:23:10 1995  J.T. Conklin  <jtc@rtl.cygnus.com>
 
@@ -355,7 +285,7 @@ Tue Apr 18 14:23:10 1995  J.T. Conklin  <jtc@rtl.cygnus.com>
 	* Install.in (do_mkdir): New function.
 
 	* Install.in: Added support for --with and --without options.
-	  Changed so that tape commands are not run when extracting
+	  Changed so that tape commands are not run when extracting 
 	  from a file.
 	  (do_mt): Changed to take only one argument.
 
@@ -363,7 +293,7 @@ Wed Mar 29 11:16:38 1995  Jason Molenda (crash@phydeaux.cygnus.com)
 
 	* Install.in: catch UNAME==alpha-dec-osf2.x and correct entry for
 	alpha-dec-osf1.x
-
+	
 Fri Jan 27 12:04:29 1995  J.T. Conklin  <jtc@rtl.cygnus.com>
 
 	* subst-strings (mips-sgi-irix5): New entry in table.
@@ -408,8 +338,8 @@ Thu Apr 28 14:42:22 1994  David J. Mackenzie  (djm@rtl.cygnus.com)
 
 Tue Apr 26 17:18:03 1994  Jason Molenda (crash@sendai.cygnus.com)
 
-	* Install.in:  fixincludes output is actually put in fixincludes.log,
-	but echo'ed messages claim it is fixinc.log.  This is the same
+        * Install.in:  fixincludes output is actually put in fixincludes.log,
+        but echo'ed messages claim it is fixinc.log.  This is the same
 	messages as I logged in March 4 1994, but for some reason we found
 	the change hadn't been done.  I'll have to dig through the logs
 	and find out what I really did do that day. :)
@@ -469,21 +399,21 @@ Wed Mar 23 23:38:24 1994  Jason Molenda  (crash@sendai.cygnus.com)
 
 Wed Mar 23 13:42:48 1994  Jason Molenda  (crash@sendai.cygnus.com)
 
-	* Install.in: set PATH to $PATH:/bin:/usr/bin so we can pick
-	up native tools even if the user doesn't have them in his
-	path.
+        * Install.in: set PATH to $PATH:/bin:/usr/bin so we can pick
+        up native tools even if the user doesn't have them in his
+        path.
 
-	* Install.in: ``hppa-1.1-hp-hpux'' -> ``hppa1.1-hp-hpux''.
+        * Install.in: ``hppa-1.1-hp-hpux'' -> ``hppa1.1-hp-hpux''.
 
 Tue Mar 15 22:09:20 1994  Jason Molenda  (crash@sendai.cygnus.com)
-
-	* Install.in: TAPE_REWIND and TAPE_FORWARD variables for Unixunaware,
-	added switch statement to detect if system is Unixunaware.
+        
+        * Install.in: TAPE_REWIND and TAPE_FORWARD variables for Unixunaware,
+        added switch statement to detect if system is Unixunaware.
 
 Fri Mar  4 12:10:30 1994  Jason Molenda (crash@sendai.cygnus.com)
 
-	* Install.in:  fixincludes output is actually put in fixincludes.log,
-	but echo'ed messages claim it is fixinc.log.
+        * Install.in:  fixincludes output is actually put in fixincludes.log,
+        but echo'ed messages claim it is fixinc.log.
 
 Wed Nov  3 02:58:02 1993  Jeffrey Osier  (jeffrey@thepub.cygnus.com)
 
@@ -514,9 +444,9 @@ Thu Jun 10 16:01:25 1993  Jeffrey Osier  (jeffrey@cygnus.com)
 
 Wed Jun  9 19:23:59 1993  Jeffrey Osier  (jeffrey@rtl.cygnus.com)
 
-	* install-texi.in:	added conditionals (nearly complete)
-				  cleaned up
-				  added support for other releases (not done)
+        * install-texi.in:        added conditionals (nearly complete)
+                                  cleaned up
+                                  added support for other releases (not done)
 
 Wed Jun  9 15:53:58 1993  Jim Kingdon  (kingdon@cygnus.com)
 
@@ -531,7 +461,7 @@ Fri Jun  4 17:09:56 1993  Jeffrey Osier  (jeffrey@cygnus.com)
 
 Thu Jun  3 00:37:01 1993  david d `zoo' zuhn  (zoo at cirdan.cygnus.com)
 
-	* Install.in: pull COPYING and COPYING.LIB off of the tape
+	* Install.in: pull COPYING and COPYING.LIB off of the tape 
 
 Tue Jun  1 16:52:08 1993  david d `zoo' zuhn  (zoo at cirdan.cygnus.com)
 

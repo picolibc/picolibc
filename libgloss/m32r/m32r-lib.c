@@ -109,22 +109,15 @@ void phex(long x)
   mesg(buf);
 }
 
-/*
- * These routines set and get exception handlers.  They look a little
- * funny because the M32R uses branch instructions in its exception
- * vectors, not just the addresses.  The instruction format used is
- * BRA pcdisp24.
- */
-
-#define TRAP_VECTOR_BASE_ADDR   0x00000040
-
 /* Setup trap TT to go to ROUTINE. */
-void 
+
+void
 exceptionHandler (int tt, unsigned long routine)
 {
 #ifndef REVC
-  unsigned long *tb = (unsigned long *) TRAP_VECTOR_BASE_ADDR;
-  tb[tt] = (0xff000000 | ((routine - (unsigned long) (&tb[tt])) >> 2));
+  unsigned long *tb = (unsigned long *) 0x40;	/* Trap vector base address */
+
+  tb[tt] = ((routine >> 2) | 0xff000000) - tt - (0x40 >> 2);
 #else
   unsigned long *tb = 0;	/* Trap vector base address */
 
@@ -133,12 +126,14 @@ exceptionHandler (int tt, unsigned long routine)
 }
 
 /* Return the address of trap TT handler */
+
 unsigned long
 getExceptionHandler (int tt)
 {
 #ifndef REVC
-  unsigned long *tb = (unsigned long *) TRAP_VECTOR_BASE_ADDR;
-  return ((tb[tt] & ~0xff000000) << 2) + (unsigned long) (&tb[tt]);
+  unsigned long *tb = (unsigned long *) 0x40;	/* Trap vector base address */
+
+  return ((tb[tt] + tt + (0x40 >> 2)) | 0xff000000) << 2;
 #else
   unsigned long *tb = 0;	/* Trap vector base address */
 

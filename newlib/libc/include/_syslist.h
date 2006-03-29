@@ -2,7 +2,6 @@
    and only provide C names, so that we end up in violation of ANSI */
 #ifndef __SYSLIST_H
 #define __SYSLIST_H
-
 #ifdef MISSING_SYSCALL_NAMES
 #define _close close
 #define _execve execve
@@ -22,17 +21,9 @@
 #define _unlink unlink
 #define _wait wait
 #define _write write
-#endif /* MISSING_SYSCALL_NAMES */
-
-#if defined MISSING_SYSCALL_NAMES || !defined HAVE_OPENDIR
-/* If the system call interface is missing opendir, readdir, and
-   closedir, there is an implementation of these functions in
-   libc/posix that is implemented using open, getdents, and close. 
-   Note, these functions are currently not in the libc/syscalls
-   directory.  */
+/* functions not yet sysfaked */
 #define _opendir opendir
 #define _readdir readdir
 #define _closedir closedir
-#endif /* MISSING_SYSCALL_NAMES || !HAVE_OPENDIR */
-
-#endif /* !__SYSLIST_H_ */
+#endif
+#endif

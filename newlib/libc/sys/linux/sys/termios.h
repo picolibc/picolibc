@@ -7,7 +7,6 @@
 #define _SYS_TERMIOS_H
 
 #include <linux/termios.h>
-#include <machine/termios.h>
 
 /* grr, this shouldn't have to be here */
 

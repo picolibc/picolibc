@@ -1,21 +1,4 @@
 /*
- * Copyright (c) 1990 The Regents of the University of California.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms are permitted
- * provided that the above copyright notice and this paragraph are
- * duplicated in all such forms and that any documentation,
- * advertising materials, and other materials related to such
- * distribution and use acknowledge that the software was developed
- * by the University of California, Berkeley.  The name of the
- * University may not be used to endorse or promote products derived
- * from this software without specific prior written permission.
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
- */
-
-/*
 FUNCTION
 <<fputc>>---write a character on a stream or file
 
@@ -57,19 +40,12 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
-#include <_ansi.h>
 #include <stdio.h>
-#include "local.h"
 
 int
-_DEFUN(fputc, (ch, file),
-       int ch _AND
-       FILE * file)
+_DEFUN (fputc, (ch, file),
+	int ch _AND
+	FILE * file)
 {
-  int result;
-  CHECK_INIT(_REENT);
-   _flockfile (file);
-  result = putc (ch, file);
-  _funlockfile (file);
-  return result;
+  return putc (ch, file);
 }

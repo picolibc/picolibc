@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
+# Makefile.in generated automatically by automake 1.4 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -58,32 +58,20 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_alias = @build_alias@
-build_triplet = @build@
 host_alias = @host_alias@
 host_triplet = @host@
-target_alias = @target_alias@
-target_triplet = @target@
 AR = @AR@
 AS = @AS@
 CC = @CC@
 CPP = @CPP@
 CRT0 = @CRT0@
-CXX = @CXX@
-CXXCPP = @CXXCPP@
 DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
-GCJ = @GCJ@
-GCJFLAGS = @GCJFLAGS@
 LDFLAGS = @LDFLAGS@
-LIBC_EXTRA_DEF = @LIBC_EXTRA_DEF@
-LIBC_EXTRA_LIB = @LIBC_EXTRA_LIB@
 LIBC_MACHINE_LIB = @LIBC_MACHINE_LIB@
 LIBC_POSIX_LIB = @LIBC_POSIX_LIB@
 LIBC_SIGNAL_DEF = @LIBC_SIGNAL_DEF@
 LIBC_SIGNAL_LIB = @LIBC_SIGNAL_LIB@
-LIBC_STDIO64_DEF = @LIBC_STDIO64_DEF@
-LIBC_STDIO64_LIB = @LIBC_STDIO64_LIB@
 LIBC_SYSCALL_LIB = @LIBC_SYSCALL_LIB@
 LIBC_SYS_LIB = @LIBC_SYS_LIB@
 LIBC_UNIX_LIB = @LIBC_UNIX_LIB@
@@ -93,13 +81,10 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
 OBJDUMP = @OBJDUMP@
-OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
-STRIP = @STRIP@
 VERSION = @VERSION@
 aext = @aext@
-extra_dir = @extra_dir@
 libm_machine_dir = @libm_machine_dir@
 machine_dir = @machine_dir@
 newlib_basedir = @newlib_basedir@
@@ -110,25 +95,60 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-GENERAL_SOURCES =  	bcopy.c 	bzero.c 	index.c 	memchr.c 	memcmp.c 	memcpy.c 	memmove.c 	memset.c 	rindex.c 	strcasecmp.c 	strcat.c 	strchr.c 	strcmp.c 	strcoll.c 	strcpy.c 	strcspn.c 	strdup.c 	strdup_r.c 	strerror.c 	strerror_r.c 	strlcat.c 	strlcpy.c 	strlen.c  	strlwr.c 	strncasecmp.c 	strncat.c 	strncmp.c 	strncpy.c 	strnlen.c 	strpbrk.c 	strrchr.c 	strsep.c 	strspn.c 	strtok.c 	strtok_r.c 	strupr.c 	strxfrm.c  	strstr.c 	swab.c 	u_strerr.c 	wcscat.c 	wcschr.c 	wcscmp.c 	wcscoll.c 	wcscpy.c 	wcscspn.c 	wcslcat.c 	wcslcpy.c 	wcslen.c 	wcsncat.c 	wcsncmp.c 	wcsncpy.c 	wcsnlen.c 	wcspbrk.c 	wcsrchr.c 	wcsspn.c 	wcsstr.c 	wcswidth.c 	wcwidth.c 	wmemchr.c 	wmemcmp.c 	wmemcpy.c 	wmemmove.c 	wmemset.c
+LIB_SOURCES = \
+	bcmp.c \
+	bcopy.c \
+	bzero.c \
+	index.c \
+	memchr.c \
+	memcmp.c \
+	memcpy.c \
+	memmove.c \
+	memset.c \
+	rindex.c \
+	strcat.c \
+	strchr.c \
+	strcmp.c \
+	strcasecmp.c \
+	strcoll.c \
+	strcpy.c \
+	strcspn.c \
+	strerror.c \
+	strlen.c  \
+	strlwr.c \
+	strncat.c \
+	strncmp.c \
+	strncasecmp.c \
+	strncpy.c \
+	strpbrk.c \
+	strrchr.c \
+	strspn.c \
+	strtok.c \
+	strtok_r.c \
+	strupr.c \
+	strxfrm.c  \
+	strstr.c \
+	swab.c \
+	u_strerr.c
 
-@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
-@ELIX_LEVEL_1_FALSE@LIB_OBJS = 	bcmp.$(oext) 	memccpy.$(oext) 	mempcpy.$(oext) 	strndup.$(oext) 	strndup_r.$(oext)
 
 libstring_la_LDFLAGS = -Xcompiler -nostdlib
 
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libstring.la
-@USE_LIBTOOL_TRUE@libstring_la_SOURCES = $(GENERAL_SOURCES)
-@USE_LIBTOOL_TRUE@libstring_la_LIBADD = $(LIB_OBJS)
-@USE_LIBTOOL_TRUE@libstring_la_DEPENDENCIES = $(LIB_OBJS)
-@USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libstring.la
+@USE_LIBTOOL_TRUE@libstring_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
+@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIB_OBJS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
 
-CHEWOUT_FILES =  bcmp.def	memcpy.def	strcmp.def	strncat.def strstr.def bcopy.def	memmove.def	strcoll.def	strncmp.def strtok.def bzero.def	memset.def	strcpy.def	strncpy.def strxfrm.def index.def	rindex.def	strcspn.def	strpbrk.def swab.def memchr.def	strcat.def	strerror.def	strerror_r.def strrchr.def memcmp.def	strchr.def	strlen.def	strnlen.def strspn.def strcasecmp.def	strncasecmp.def strlwr.def	strupr.def  memccpy.def mempcpy.def wcscat.def	wcschr.def	wcscmp.def	wcscoll.def wcscpy.def	wcscspn.def wcslcat.def	wcslcpy.def	wcslen.def	wcsncat.def wcsncmp.def	wcsncpy.def	wcsnlen.def	wcspbrk.def wcsrchr.def	wcsspn.def	wcsstr.def wcswidth.def	wcwidth.def	wmemchr.def wmemcmp.def	wmemcpy.def	wmemmove.def	wmemset.def
+CHEWOUT_FILES = \
+bcmp.def	memcpy.def	strcmp.def	strncat.def strstr.def \
+bcopy.def	memmove.def	strcoll.def	strncmp.def strtok.def \
+bzero.def	memset.def	strcpy.def	strncpy.def strxfrm.def \
+index.def	rindex.def	strcspn.def	strpbrk.def swab.def \
+memchr.def	strcat.def	strerror.def	strrchr.def \
+memcmp.def	strchr.def	strlen.def	strspn.def \
+strcasecmp.def	strncasecmp.def strlwr.def	strupr.def
 
 
 SUFFIXES = .def
@@ -146,49 +166,25 @@ LIBRARIES =  $(noinst_LIBRARIES)
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  bcopy.$(OBJEXT) bzero.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@index.$(OBJEXT) memchr.$(OBJEXT) memcmp.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@memcpy.$(OBJEXT) memmove.$(OBJEXT) memset.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@rindex.$(OBJEXT) strcasecmp.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strcat.$(OBJEXT) strchr.$(OBJEXT) strcmp.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strcoll.$(OBJEXT) strcpy.$(OBJEXT) strcspn.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strdup.$(OBJEXT) strdup_r.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strerror.$(OBJEXT) strerror_r.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strlcat.$(OBJEXT) strlcpy.$(OBJEXT) strlen.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strlwr.$(OBJEXT) strncasecmp.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strncat.$(OBJEXT) strncmp.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strncpy.$(OBJEXT) strnlen.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strpbrk.$(OBJEXT) strrchr.$(OBJEXT) strsep.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strspn.$(OBJEXT) strtok.$(OBJEXT) strtok_r.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strupr.$(OBJEXT) strxfrm.$(OBJEXT) strstr.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@swab.$(OBJEXT) u_strerr.$(OBJEXT) wcscat.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wcschr.$(OBJEXT) wcscmp.$(OBJEXT) wcscoll.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wcscpy.$(OBJEXT) wcscspn.$(OBJEXT) wcslcat.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wcslcpy.$(OBJEXT) wcslen.$(OBJEXT) wcsncat.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wcsncmp.$(OBJEXT) wcsncpy.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wcsnlen.$(OBJEXT) wcspbrk.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wcsrchr.$(OBJEXT) wcsspn.$(OBJEXT) wcsstr.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wcswidth.$(OBJEXT) wcwidth.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wmemchr.$(OBJEXT) wmemcmp.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wmemcpy.$(OBJEXT) wmemmove.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wmemset.$(OBJEXT)
+lib_a_LIBADD = 
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  bcmp.o bcopy.o bzero.o index.o \
+@USE_LIBTOOL_FALSE@memchr.o memcmp.o memcpy.o memmove.o memset.o \
+@USE_LIBTOOL_FALSE@rindex.o strcat.o strchr.o strcmp.o strcasecmp.o \
+@USE_LIBTOOL_FALSE@strcoll.o strcpy.o strcspn.o strerror.o strlen.o \
+@USE_LIBTOOL_FALSE@strlwr.o strncat.o strncmp.o strncasecmp.o strncpy.o \
+@USE_LIBTOOL_FALSE@strpbrk.o strrchr.o strspn.o strtok.o strtok_r.o \
+@USE_LIBTOOL_FALSE@strupr.o strxfrm.o strstr.o swab.o u_strerr.o
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
-@USE_LIBTOOL_TRUE@libstring_la_OBJECTS =  bcopy.lo bzero.lo index.lo \
-@USE_LIBTOOL_TRUE@memchr.lo memcmp.lo memcpy.lo memmove.lo memset.lo \
-@USE_LIBTOOL_TRUE@rindex.lo strcasecmp.lo strcat.lo strchr.lo strcmp.lo \
-@USE_LIBTOOL_TRUE@strcoll.lo strcpy.lo strcspn.lo strdup.lo strdup_r.lo \
-@USE_LIBTOOL_TRUE@strerror.lo strerror_r.lo strlcat.lo strlcpy.lo \
-@USE_LIBTOOL_TRUE@strlen.lo strlwr.lo strncasecmp.lo strncat.lo \
-@USE_LIBTOOL_TRUE@strncmp.lo strncpy.lo strnlen.lo strpbrk.lo \
-@USE_LIBTOOL_TRUE@strrchr.lo strsep.lo strspn.lo strtok.lo strtok_r.lo \
-@USE_LIBTOOL_TRUE@strupr.lo strxfrm.lo strstr.lo swab.lo u_strerr.lo \
-@USE_LIBTOOL_TRUE@wcscat.lo wcschr.lo wcscmp.lo wcscoll.lo wcscpy.lo \
-@USE_LIBTOOL_TRUE@wcscspn.lo wcslcat.lo wcslcpy.lo wcslen.lo wcsncat.lo \
-@USE_LIBTOOL_TRUE@wcsncmp.lo wcsncpy.lo wcsnlen.lo wcspbrk.lo \
-@USE_LIBTOOL_TRUE@wcsrchr.lo wcsspn.lo wcsstr.lo wcswidth.lo wcwidth.lo \
-@USE_LIBTOOL_TRUE@wmemchr.lo wmemcmp.lo wmemcpy.lo wmemmove.lo \
-@USE_LIBTOOL_TRUE@wmemset.lo
+libstring_la_LIBADD = 
+@USE_LIBTOOL_TRUE@libstring_la_OBJECTS =  bcmp.lo bcopy.lo bzero.lo \
+@USE_LIBTOOL_TRUE@index.lo memchr.lo memcmp.lo memcpy.lo memmove.lo \
+@USE_LIBTOOL_TRUE@memset.lo rindex.lo strcat.lo strchr.lo strcmp.lo \
+@USE_LIBTOOL_TRUE@strcasecmp.lo strcoll.lo strcpy.lo strcspn.lo \
+@USE_LIBTOOL_TRUE@strerror.lo strlen.lo strlwr.lo strncat.lo strncmp.lo \
+@USE_LIBTOOL_TRUE@strncasecmp.lo strncpy.lo strpbrk.lo strrchr.lo \
+@USE_LIBTOOL_TRUE@strspn.lo strtok.lo strtok_r.lo strupr.lo strxfrm.lo \
+@USE_LIBTOOL_TRUE@strstr.lo swab.lo u_strerr.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -208,7 +204,7 @@ OBJECTS = $(lib_a_OBJECTS) $(libstring_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .def .lo .o .obj .s
+.SUFFIXES: .S .c .def .lo .o .s
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/../../Makefile.shared
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus string/Makefile
 
@@ -229,11 +225,6 @@ maintainer-clean-noinstLIBRARIES:
 .c.o:
 	$(COMPILE) -c $<
 
-# FIXME: We should only use cygpath when building on Windows,
-# and only if it is available.
-.c.obj:
-	$(COMPILE) -c `cygpath -w $<`
-
 .s.o:
 	$(COMPILE) -c $<
 
@@ -242,7 +233,6 @@ maintainer-clean-noinstLIBRARIES:
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
-	-rm -f *.$(OBJEXT)
 
 clean-compile:
 
@@ -426,7 +416,6 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 
 doc: $(CHEWOUT_FILES)
 	cat $(srcdir)/strings.tex >> $(TARGETDOC)
-	cat $(srcdir)/wcstrings.tex >> $(TARGETDOC)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

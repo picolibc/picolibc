@@ -18,14 +18,13 @@ src = 	k_standard.c k_rem_pio2.c \
 	w_j1.c w_jn.c w_lgamma.c wr_lgamma.c \
 	w_log.c w_log10.c w_pow.c w_remainder.c \
 	w_scalb.c w_sinh.c w_sqrt.c \
-	w_sincos.c \
 	w_cabs.c w_drem.c \
 	s_asinh.c s_atan.c s_ceil.c \
 	s_cos.c s_erf.c s_fabs.c s_floor.c \
-	s_frexp.c s_ldexp.c \
+	s_frexp.c s_isnan.c s_ldexp.c \
 	s_signif.c s_sin.c \
 	s_tan.c s_tanh.c \
-	w_exp2.c w_tgamma.c
+	s_isinf.c s_infconst.c
 
 fsrc =	kf_rem_pio2.c \
 	kf_cos.c kf_sin.c kf_tan.c \
@@ -41,14 +40,13 @@ fsrc =	kf_rem_pio2.c \
 	wf_j1.c wf_jn.c wf_lgamma.c wrf_lgamma.c \
 	wf_log.c wf_log10.c wf_pow.c wf_remainder.c \
 	wf_scalb.c wf_sinh.c wf_sqrt.c \
-	wf_sincos.c \
 	wf_cabs.c wf_drem.c \
 	sf_asinh.c sf_atan.c sf_ceil.c \
 	sf_cos.c sf_erf.c sf_fabs.c sf_floor.c \
-	sf_frexp.c sf_ldexp.c \
+	sf_frexp.c sf_isnan.c sf_ldexp.c \
 	sf_signif.c sf_sin.c \
 	sf_tan.c sf_tanh.c \
-	wf_exp2.c wf_tgamma.c
+	sf_isinf.c
 
 libmath_la_LDFLAGS = -Xcompiler -nostdlib
 
@@ -71,7 +69,8 @@ chobj =	wacos.def wacosh.def wasin.def sasinh.def \
 	wgamma.def whypot.def sldexp.def wlog.def \
 	wlog10.def \
 	wpow.def wremainder.def ssin.def wsinh.def \
-	wsqrt.def stan.def stanh.def
+	wsqrt.def stan.def stanh.def \
+	sisnan.def
 
 SUFFIXES = .def
 
@@ -174,6 +173,9 @@ stan.def: s_tan.c
 	touch stmp-def
 stanh.def: s_tanh.c
 	$(CHEW) < $(srcdir)/s_tanh.c >$@ 2>/dev/null
+	touch stmp-def
+sisnan.def: s_isnan.c
+	$(CHEW) < $(srcdir)/s_isnan.c >$@ 2>/dev/null
 	touch stmp-def
 
 # A partial dependency list.

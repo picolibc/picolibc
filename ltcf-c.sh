@@ -17,7 +17,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 # As a special exception to the GNU General Public License, if you
 # distribute this file as part of a program that contains a
@@ -108,7 +108,7 @@ EOF
     extract_expsyms_cmds='test -f $output_objdir/impgen.c || \
       sed -e "/^# \/\* impgen\.c starts here \*\//,/^# \/\* impgen.c ends here \*\// { s/^# //; p; }" -e d < $0 > $output_objdir/impgen.c~
       test -f $output_objdir/impgen.exe || (cd $output_objdir && \
-      if test "x$BUILD_CC" != "x" ; then $BUILD_CC -o impgen impgen.c ; \
+      if test "x$HOST_CC" != "x" ; then $HOST_CC -o impgen impgen.c ; \
       else $CC -o impgen impgen.c ; fi)~
       $output_objdir/impgen $dir/$soroot > $output_objdir/$soname-def'
 
@@ -185,7 +185,7 @@ EOF
     whole_archive_flag_spec='-all_load $convenience'
     ;;
 
-  netbsd* | knetbsd*-gnu)
+  netbsd*)
     if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
       archive_cmds='$LD -Bshareable $libobjs $deplibs $linker_flags -o $lib'
       wlarc=
@@ -221,10 +221,6 @@ EOF
     wlarc=
     hardcode_direct=yes
     hardcode_shlibpath_var=no
-    ;;
-
-  tpf*)
-    ld_shlibs=yes
     ;;
 
   *)
@@ -413,7 +409,7 @@ else
     ;;
 
   # FreeBSD 3 and greater uses gcc -shared to do shared libraries.
-  freebsd* | kfreebsd*-gnu)
+  freebsd*)
     archive_cmds='$CC -shared -o $lib $libobjs $deplibs $compiler_flags'
     hardcode_libdir_flag_spec='-R$libdir'
     hardcode_direct=yes
@@ -421,32 +417,23 @@ else
     ;;
 
   hpux9* | hpux10* | hpux11*)
-    case "$host_cpu" in
-    ia64*)
-      hardcode_direct=no
-      hardcode_shlibpath_var=no
-      archive_cmds='$LD -b +h $soname -o $lib $libobjs $deplibs $linker_flags'
-      hardcode_libdir_flag_spec='-L$libdir' ;;
-    *)
-      if test $with_gcc = yes; then
-        case "$host_os" in
-        hpux9*) archive_cmds='$rm $output_objdir/$soname~$CC -shared -fPIC ${wl}+b ${wl}$install_libdir -o $output_objdir/$soname $libobjs $deplibs $compiler_flags~test $output_objdir/$soname = $lib || mv $output_objdir/$soname $lib' ;;
-        *) archive_cmds='$CC -shared -fPIC ${wl}+h ${wl}$soname ${wl}+b ${wl}$install_libdir -o $lib $libobjs $deplibs $compiler_flags' ;;
-        esac
-      else
-        case $host_os in
-        hpux9*) archive_cmds='$rm $output_objdir/$soname~$LD -b +b $install_libdir -o $output_objdir/$soname $libobjs $deplibs $linker_flags~test $output_objdir/$soname = $lib || mv $output_objdir/$soname $lib' ;;
-        *) archive_cmds='$LD -b +h $soname +b $install_libdir -o $lib $libobjs $deplibs $linker_flags' ;;
-        esac
-      fi
-      hardcode_libdir_flag_spec='${wl}+b ${wl}$libdir'
-      hardcode_libdir_separator=:
-      hardcode_minus_L=yes # Not in the search PATH, but as the default
-			   # location of the library.
-      ;;
-    esac
-    export_dynamic_flag_spec='${wl}-E'
+    if test $with_gcc = yes; then
+      case "$host_os" in
+      hpux9*) archive_cmds='$rm $output_objdir/$soname~$CC -shared -fPIC ${wl}+b ${wl}$install_libdir -o $output_objdir/$soname $libobjs $deplibs $compiler_flags~test $output_objdir/$soname = $lib || mv $output_objdir/$soname $lib' ;;
+      *) archive_cmds='$CC -shared -fPIC ${wl}+h ${wl}$soname ${wl}+b ${wl}$install_libdir -o $lib $libobjs $deplibs $compiler_flags' ;;
+      esac
+    else
+      case $host_os in
+      hpux9*) archive_cmds='$rm $output_objdir/$soname~$LD -b +b $install_libdir -o $output_objdir/$soname $libobjs $deplibs $linker_flags~test $output_objdir/$soname = $lib || mv $output_objdir/$soname $lib' ;;
+      *) archive_cmds='$LD -b +h $soname +b $install_libdir -o $lib $libobjs $deplibs $linker_flags' ;;
+      esac
+    fi
+    hardcode_libdir_flag_spec='${wl}+b ${wl}$libdir'
+    hardcode_libdir_separator=:
     hardcode_direct=yes
+    hardcode_minus_L=yes # Not in the search PATH, but as the default
+			 # location of the library.
+    export_dynamic_flag_spec='${wl}-E'
     ;;
 
   irix5* | irix6*)
@@ -460,7 +447,7 @@ else
     link_all_deplibs=yes
     ;;
 
-  netbsd* | knetbsd*-gnu)
+  netbsd*)
     if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
       archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'  # a.out
     else

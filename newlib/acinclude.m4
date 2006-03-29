@@ -35,57 +35,14 @@ AC_ARG_ENABLE(malloc-debugging,
   *)   AC_MSG_ERROR(bad value ${enableval} for malloc-debugging option) ;;
  esac], [malloc_debugging=])dnl
 
-dnl Support --enable-newlib-multithread
-AC_ARG_ENABLE(newlib-multithread,
-[  --enable-newlib-multithread        enable support for multiple threads],
+dnl Support --enable-newlib-mb
+AC_ARG_ENABLE(newlib-mb,
+[  --enable-newlib-mb        enable multibyte support],
 [case "${enableval}" in
-  yes) newlib_multithread=yes ;;
-  no)  newlib_multithread=no ;;
-  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-multithread option) ;;
- esac], [newlib_multithread=yes])dnl
-
-dnl Support --enable-newlib-iconv
-AC_ARG_ENABLE(newlib-iconv,
-[  --enable-newlib-iconv     enable iconv library support],
-[if test "${newlib_iconv+set}" != set; then
-   case "${enableval}" in
-     yes) newlib_iconv=yes ;;
-     no)  newlib_iconv=no ;;
-     *)   AC_MSG_ERROR(bad value ${enableval} for newlib-iconv option) ;;
-   esac
- fi], [newlib_iconv=${newlib_iconv}])dnl
-
-dnl Support --enable-newlib-elix-level
-AC_ARG_ENABLE(newlib-elix-level,
-[  --enable-newlib-elix-level         supply desired elix library level (1-4)],
-[case "${enableval}" in
-  0)   newlib_elix_level=0 ;;
-  1)   newlib_elix_level=1 ;;
-  2)   newlib_elix_level=2 ;;
-  3)   newlib_elix_level=3 ;;
-  4)   newlib_elix_level=4 ;;
-  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-elix-level option) ;;
- esac], [newlib_elix_level=0])dnl
-
-dnl Support --disable-newlib-io-float
-AC_ARG_ENABLE(newlib-io-float,
-[  --disable-newlib-io-float disable printf/scanf family float support],
-[case "${enableval}" in
-  yes) newlib_io_float=yes ;;
-  no)  newlib_io_float=no ;;
-  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-io-float option) ;;
- esac], [newlib_io_float=yes])dnl
-
-dnl Support --disable-newlib-supplied-syscalls
-AC_ARG_ENABLE(newlib-supplied-syscalls,
-[  --disable-newlib-supplied-syscalls disable newlib from supplying syscalls],
-[case "${enableval}" in
-  yes) newlib_may_supply_syscalls=yes ;;
-  no)  newlib_may_supply_syscalls=no ;;
-  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-supplied-syscalls option) ;;
- esac], [newlib_may_supply_syscalls=yes])dnl
-
-AM_CONDITIONAL(MAY_SUPPLY_SYSCALLS, test x[$]{newlib_may_supply_syscalls} = xyes)
+  yes) newlib_mb=yes ;;
+  no)  newlib_mb=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-mb option) ;;
+ esac], [newlib_mb=no])dnl
 
 dnl We may get other options which we don't document:
 dnl --with-target-subdir, --with-multisrctop, --with-multisubdir
@@ -103,9 +60,9 @@ else
 fi
 AC_SUBST(newlib_basedir)
 
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_HOST
 
-AM_INIT_AUTOMAKE(newlib, 1.14.0, nodefine)
+AM_INIT_AUTOMAKE(newlib, 1.10.0)
 
 # FIXME: We temporarily define our own version of AC_PROG_CC.  This is
 # copied from autoconf 2.12, but does not call AC_PROG_CC_WORKS.  We
@@ -147,14 +104,17 @@ fi
 
 LIB_AC_PROG_CC
 
+# AC_CHECK_TOOL does AC_REQUIRE (AC_CANONICAL_BUILD).  If we don't
+# run it explicitly here, it will be run implicitly before
+# NEWLIB_CONFIGURE, which doesn't work because that means that it will
+# be run before AC_CANONICAL_HOST.
+AC_CANONICAL_BUILD
+
 AC_CHECK_TOOL(AS, as)
 AC_CHECK_TOOL(AR, ar)
 AC_CHECK_TOOL(RANLIB, ranlib, :)
 
 AC_PROG_INSTALL
-
-# Hack to ensure that INSTALL won't be set to "../" with autoconf 2.13.  */
-ac_given_INSTALL=$INSTALL
 
 AM_MAINTAINER_MODE
 
@@ -171,6 +131,18 @@ fi
 
 . [$]{newlib_basedir}/configure.host
 
+case [$]{newlib_basedir} in
+/* | [A-Za-z]:[/\\]*) newlib_flagbasedir=[$]{newlib_basedir} ;;
+*) newlib_flagbasedir='[$](top_builddir)/'[$]{newlib_basedir} ;;
+esac
+
+newlib_cflags="[$]{newlib_cflags} -I"'[$](top_builddir)'"/$1/targ-include -I[$]{newlib_flagbasedir}/libc/include"
+case "${host}" in
+  *-*-cygwin*)
+    newlib_cflags="[$]{newlib_cflags} -I[$]{newlib_flagbasedir}/../winsup/cygwin/include  -I[$]{newlib_flagbasedir}/../winsup/w32api/include"
+    ;;
+esac
+
 newlib_cflags="[$]{newlib_cflags} -fno-builtin"
 
 NEWLIB_CFLAGS=${newlib_cflags}
@@ -179,19 +151,7 @@ AC_SUBST(NEWLIB_CFLAGS)
 LDFLAGS=${ldflags}
 AC_SUBST(LDFLAGS)
 
-AM_CONDITIONAL(ELIX_LEVEL_0, test x[$]{newlib_elix_level} = x0)
-AM_CONDITIONAL(ELIX_LEVEL_1, test x[$]{newlib_elix_level} = x1)
-AM_CONDITIONAL(ELIX_LEVEL_2, test x[$]{newlib_elix_level} = x2)
-AM_CONDITIONAL(ELIX_LEVEL_3, test x[$]{newlib_elix_level} = x3)
-AM_CONDITIONAL(ELIX_LEVEL_4, test x[$]{newlib_elix_level} = x4)
-
 AM_CONDITIONAL(USE_LIBTOOL, test x[$]{use_libtool} = xyes)
-
-# Hard-code OBJEXT.  Normally it is set by AC_OBJEXT, but we
-# use oext, which is set in configure.host based on the target platform.
-OBJEXT=${oext}
-
-AC_SUBST(OBJEXT)
 AC_SUBST(oext)
 AC_SUBST(aext)
 

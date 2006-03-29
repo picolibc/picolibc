@@ -1,7 +1,7 @@
 /*
  * Standard x86 syscalls for user programs running under Cygmon
  *
- * Copyright (c) 1998, 2000 Cygnus Support
+ * Copyright (c) 1998 Cygnus Support
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -22,15 +22,8 @@
 extern int errno;
 
 _syscall3(int,write,int,i,char *,c,int,len);
-#if 0
+
 _syscall3(int,read,int,i,char *,c,int,len);
-#else
-int
-read (int des, char *dest, int len)
-{
-  return -1;
-}
-#endif
 
 _syscall2(int,kill,int,pid,int,signal);
 
@@ -50,11 +43,7 @@ _syscall1(int, close, int, fd);
 int
 open (const char *filename, int mode, ...)
 {
-#if 0
   return __open (filename, mode, 0644); 
-#else
-  return -1;
-#endif
 }
 
 /* Ultra-super cheezy. */
@@ -63,12 +52,6 @@ isatty (int i)
 {
   return i<3;
 }
-
-int unlink (const char *p)
-{
-  return -1;
-}
-
 
 char *
 sbrk (int amt)
@@ -125,7 +108,7 @@ clock ()
   return t.tv_sec * 1000 + (t.tv_usec / 1000);
 }
 
-#if ! defined(COFF) && ! defined(AOUT)
+#ifndef COFF
 typedef void (*ctp)();
 void
 __do_global_ctors ()

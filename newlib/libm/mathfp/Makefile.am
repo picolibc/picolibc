@@ -13,16 +13,14 @@ src =	s_acos.c s_frexp.c s_mathcnst.c \
 	s_atan2.c s_fabs.c s_log.c s_tanh.c \
 	s_log10.c s_sin.c \
 	s_floor.c s_sine.c \
-	s_sincos.c \
 	s_atangent.c s_logarithm.c \
 	s_sineh.c \
-	s_ceil.c \
+	s_ceil.c s_isnan.c s_isinf.c \
 	e_acosh.c e_atanh.c e_remainder.c \
 	er_gamma.c er_lgamma.c \
 	s_erf.c e_j0.c e_j1.c w_jn.c e_hypot.c \
 	w_cabs.c w_drem.c s_asinh.c s_fmod.c \
-	e_scalb.c s_signif.c \
-	s_exp2.c s_tgamma.c
+	e_scalb.c s_infconst.c s_signif.c
 
 fsrc =	sf_ceil.c \
 	sf_acos.c sf_frexp.c \
@@ -33,15 +31,14 @@ fsrc =	sf_ceil.c \
 	sf_atan2.c sf_fabs.c sf_tanh.c \
 	sf_atan.c sf_log10.c sf_sin.c\
 	sf_floor.c sf_sine.c \
-	sf_sincos.c \
 	sf_atangent.c sf_logarithm.c sf_sineh.c \
 	sf_log.c sf_sineh.c \
+	sf_isnan.c sf_isinf.c \
 	ef_acosh.c ef_atanh.c ef_remainder.c \
 	erf_gamma.c erf_lgamma.c \
 	sf_erf.c ef_j0.c ef_j1.c wf_jn.c ef_hypot.c \
 	wf_cabs.c wf_drem.c sf_asinh.c sf_fmod.c \
-	ef_scalb.c sf_signif.c \
-	sf_exp2.c sf_tgamma.c
+	ef_scalb.c sf_signif.c
 
 libmathfp_la_LDFLAGS = -Xcompiler -nostdlib
 
@@ -75,6 +72,7 @@ chobj = eacosh.def \
 	sfloor.def \
 	sfmod.def \
 	sfrexp.def \
+	sisnan.def \
 	sldexp.def \
 	slog10.def \
 	slogarithm.def \
@@ -157,6 +155,9 @@ sfmod.def: s_fmod.c
 	touch stmp-def
 sfrexp.def: s_frexp.c
 	$(CHEW) < $(srcdir)/s_frexp.c >$@ 2>/dev/null
+	touch stmp-def
+sisnan.def: s_isnan.c
+	$(CHEW) < $(srcdir)/s_isnan.c >$@ 2>/dev/null
 	touch stmp-def
 sldexp.def: s_ldexp.c
 	$(CHEW) < $(srcdir)/s_ldexp.c >$@ 2>/dev/null

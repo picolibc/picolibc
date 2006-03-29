@@ -34,10 +34,10 @@ DESCRIPTION
         its calculations on <<floats>>.
 
 RETURNS
-        @ifnottex
+        @ifinfo
         <<acos>> and <<acosf>> return values in radians, in the range of 0 to pi
 .
-        @end ifnottex
+        @end ifinfo
         @tex
         <<acos>> and <<acosf>> return values in radians, in the range of <<0>> t
 o $\pi$.

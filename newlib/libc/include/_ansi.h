@@ -12,7 +12,6 @@
 #ifndef	_ANSIDECL_H_
 #define	_ANSIDECL_H_
 
-#include <newlib.h>
 #include <sys/config.h>
 
 /* First try to figure out whether we really are in an ANSI C environment.  */
@@ -73,23 +72,6 @@
 #define _ATTRIBUTE(attrs) __attribute__ (attrs)
 #else
 #define _ATTRIBUTE(attrs)
-#endif
-
-/*  ISO C++.  */
-
-#ifdef __cplusplus
-#if !(defined(_BEGIN_STD_C) && defined(_END_STD_C))
-#ifdef _HAVE_STD_CXX
-#define _BEGIN_STD_C namespace std { extern "C" {
-#define _END_STD_C  } }
-#else
-#define _BEGIN_STD_C extern "C" {
-#define _END_STD_C  }
-#endif
-#endif
-#else
-#define _BEGIN_STD_C
-#define _END_STD_C
 #endif
 
 #endif /* _ANSIDECL_H_ */

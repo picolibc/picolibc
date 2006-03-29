@@ -76,9 +76,9 @@ $\mit ln\bigl(\Gamma(x)\bigr)$,
 the natural logarithm of the gamma function of <[x]>.  The gamma function
 (<<exp(gamma(<[x]>))>>) is a generalization of factorial, and retains
 the property that
-@ifnottex
+@ifinfo
 <<exp(gamma(N))>> is equivalent to <<N*exp(gamma(N-1))>>.
-@end ifnottex
+@end ifinfo
 @tex
 $\mit \Gamma(N)\equiv N\times\Gamma(N-1)$.
 @end tex
@@ -87,10 +87,10 @@ quickly.  <<gamma>> is defined as
 @tex
 $\mit ln\bigl(\Gamma(x)\bigr)$ rather than simply $\mit \Gamma(x)$
 @end tex
-@ifnottex
+@ifinfo
 the natural log of the gamma function, rather than the gamma function
 itself,
-@end ifnottex
+@end ifinfo
 to extend the useful range of results representable.
 
 The sign of the result is returned in the global variable <<signgam>>,
@@ -285,7 +285,7 @@ static double zero=  0.00000000000000000000e+00;
 	GET_HIGH_WORD(ix,x);
 	ix &= 0x7fffffff;
 
-	if(ix<0x3fd00000) return sin(pi*x);
+	if(ix<0x3fd00000) return __kernel_sin(pi*x,zero,0);
 	y = -x;		/* x is assume negative */
 
     /*
@@ -309,14 +309,14 @@ static double zero=  0.00000000000000000000e+00;
             }
         }
 	switch (n) {
-	    case 0:   y =  sin(pi*y); break;
+	    case 0:   y =  __kernel_sin(pi*y,zero,0); break;
 	    case 1:   
-	    case 2:   y =  cos(pi*(0.5-y)); break;
+	    case 2:   y =  __kernel_cos(pi*(0.5-y),zero); break;
 	    case 3:  
-	    case 4:   y =  sin(pi*(one-y)); break;
+	    case 4:   y =  __kernel_sin(pi*(one-y),zero,0); break;
 	    case 5:
-	    case 6:   y = -cos(pi*(y-1.5)); break;
-	    default:  y =  sin(pi*(y-2.0)); break;
+	    case 6:   y = -__kernel_cos(pi*(y-1.5),zero); break;
+	    default:  y =  __kernel_sin(pi*(y-2.0),zero,0); break;
 	    }
 	return -y;
 }
@@ -331,8 +331,6 @@ static double zero=  0.00000000000000000000e+00;
 {
 	double t,y,z,nadj,p,p1,p2,p3,q,r,w;
 	__int32_t i,hx,lx,ix;
-
-        nadj = 0;
 
 	EXTRACT_WORDS(hx,lx,x);
 
@@ -421,10 +419,4 @@ static double zero=  0.00000000000000000000e+00;
 	    r =  x*(log(x)-one);
 	if(hx<0) r = nadj - r;
 	return r;
-}
-
-double
-lgamma(double x)
-{
-  return lgamma_r(x, &(_REENT_SIGNGAM(_REENT)));
 }

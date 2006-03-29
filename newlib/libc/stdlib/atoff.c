@@ -5,5 +5,5 @@ float
 _DEFUN (atoff, (s),
 	_CONST char *s)
 {
-  return strtof (s, NULL);
+  return strtodf (s, NULL);
 }

@@ -37,16 +37,14 @@ DESCRIPTION
 to write a word to the file or stream identified by <[fp]>.  As a side
 effect, <<putw>> advances the file's current position indicator.
 
-RETURNS
-Zero on success, <<EOF>> on failure.
+RETURNS Zero on success, <<EOF>> on failure.
 
 PORTABILITY
-<<putw>> is a remnant of K&R C; it is not part of any ISO C Standard.
+<<putw>> is a remnant of K&R C, it is not part of any ISO C Standard.
 <<fwrite>> should be used instead.  In fact, this implementation of
 <<putw>> is based upon <<fwrite>>.
 
-Supporting OS subroutines required: <<fwrite>>.
-*/
+Supporting OS subroutines required: <<fwrite>>.  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "%W% (Berkeley) %G%";
@@ -55,11 +53,11 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include <stdio.h>
 
 int
-_DEFUN(putw, (w, fp),
-       int w _AND
-       register FILE *fp)
+putw (w, fp)
+     int w;
+     register FILE *fp;
 {
-  if (fwrite ((_CONST char*)&w, sizeof (w), 1, fp) != 1)
+  if (fwrite((const char*)&w, sizeof(w), 1, fp) != 1)
     return EOF;
   return 0;
 }

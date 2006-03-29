@@ -48,7 +48,8 @@ Supporting OS subroutines required: <<_exit>>.
 #include <stdlib.h>
 #include <unistd.h>	/* for _exit() declaration */
 #include <reent.h>
-#include "atexit.h"
+
+#ifndef _REENT_ONLY
 
 /*
  * Exit, flushing stdio buffers if necessary.
@@ -58,9 +59,15 @@ void
 _DEFUN (exit, (code),
 	int code)
 {
-  __call_exitprocs (code, NULL);
+  register struct _atexit *p;
+  register int n;
 
-  if (_GLOBAL_REENT->__cleanup)
-    (*_GLOBAL_REENT->__cleanup) (_GLOBAL_REENT);
+  for (p = _REENT->_atexit; p; p = p->_next)
+    for (n = p->_ind; --n >= 0;)
+      (*p->_fns[n]) ();
+  if (_REENT->__cleanup)
+    (*_REENT->__cleanup) (_REENT);
   _exit (code);
 }
+
+#endif

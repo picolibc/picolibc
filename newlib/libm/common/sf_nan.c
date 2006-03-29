@@ -5,7 +5,7 @@
 
 #include "fdlibm.h"
 
-	float nanf(const char *unused)
+	float nanf()
 {
 	float x;
 
@@ -15,9 +15,9 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-	double nan(const char *arg)
+	double nan()
 {
-	return (double) nanf(arg);
+	return (double) nanf();
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

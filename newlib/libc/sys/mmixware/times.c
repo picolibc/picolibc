@@ -1,6 +1,6 @@
 /* times stub for MMIXware.
 
-   Copyright (C) 2001, 2002 Hans-Peter Nilsson
+   Copyright (C) 2001 Hans-Peter Nilsson
 
    Permission to use, copy, modify, and distribute this software is
    freely granted, provided that the above copyright notice, this notice
@@ -18,7 +18,7 @@
 #include "sys/times.h"
 
 clock_t
-_times (struct tms *buffer)
+times (struct tms *buffer)
 {
   memset (buffer, 0, sizeof (*buffer));
   return 0;

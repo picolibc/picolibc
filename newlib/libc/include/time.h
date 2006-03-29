@@ -8,7 +8,10 @@
 #define _TIME_H_
 
 #include "_ansi.h"
-#include <sys/reent.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifndef NULL
 #define	NULL	0
@@ -27,8 +30,6 @@
 #include <stddef.h>
 
 #include <sys/types.h>
-
-_BEGIN_STD_C
 
 struct tm
 {
@@ -60,88 +61,35 @@ char	  *_EXFUN(ctime_r,	(const time_t *, char *));
 struct tm *_EXFUN(gmtime_r,	(const time_t *, struct tm *));
 struct tm *_EXFUN(localtime_r,	(const time_t *, struct tm *));
 
-_END_STD_C
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
+#ifdef __CYGWIN__
 #ifndef __STRICT_ANSI__
-char      *_EXFUN(strptime,     (const char *, const char *, struct tm *));
-_VOID      _EXFUN(tzset,	(_VOID));
-_VOID      _EXFUN(_tzset_r,	(struct _reent *));
-
-typedef struct __tzrule_struct
-{
-  char ch;
-  int m;
-  int n;
-  int d;
-  int s;
-  time_t change;
-  long offset; /* Match type of _timezone. */
-} __tzrule_type;
-
-typedef struct __tzinfo_struct
-{
-  int __tznorth;
-  int __tzyear;
-  __tzrule_type __tzrule[2];
-} __tzinfo_type;
-
-__tzinfo_type *_EXFUN (__gettzinfo, (_VOID));
-
-/* getdate functions */
-
-#ifdef HAVE_GETDATE
-#ifndef _REENT_ONLY
-#define getdate_err (*__getdate_err())
-int *_EXFUN(__getdate_err,(_VOID));
-
-struct tm *	_EXFUN(getdate, (const char *));
-/* getdate_err is set to one of the following values to indicate the error.
-     1  the DATEMSK environment variable is null or undefined,
-     2  the template file cannot be opened for reading,
-     3  failed to get file status information,
-     4  the template file is not a regular file,
-     5  an error is encountered while reading the template file,
-     6  memory allication failed (not enough memory available),
-     7  there is no line in the template that matches the input,
-     8  invalid input specification  */
-#endif /* !_REENT_ONLY */
-
-/* getdate_r returns the error code as above */
-int		_EXFUN(getdate_r, (const char *, struct tm *));
-#endif /* HAVE_GETDATE */
-
-/* defines for the opengroup specifications Derived from Issue 1 of the SVID.  */
-extern __IMPORT long _timezone;
+extern __IMPORT time_t _timezone;
 extern __IMPORT int _daylight;
 extern __IMPORT char *_tzname[2];
-
-/* POSIX defines the external tzname being defined in time.h */
+/* defines for the opengroup specifications Derived from Issue 1 of the SVID.  */
 #ifndef tzname
 #define tzname _tzname
 #endif
-#endif /* !__STRICT_ANSI__ */
-
-#ifdef __cplusplus
-}
+#ifndef daylight
+#define daylight _daylight
 #endif
+#if timezonevar
+#ifndef timezone
+#define timezone ((long int) _timezone)
+#endif
+#else
+char *_EXFUN(timezone, (void));
+#endif
+void _EXFUN(tzset, (void));
+#endif
+#endif /* __CYGWIN__ */
 
 #include <sys/features.h>
 
-#ifdef __CYGWIN__
-#include <cygwin/time.h>
-#endif /*__CYGWIN__*/
 
 #if defined(_POSIX_TIMERS)
 
 #include <signal.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* Clocks, P1003.1b-1993, p. 263 */
 
@@ -170,14 +118,7 @@ int _EXFUN(timer_getoverrun, (timer_t timerid));
 
 int _EXFUN(nanosleep, (const struct timespec  *rqtp, struct timespec *rmtp));
 
-#ifdef __cplusplus
-}
-#endif
 #endif /* _POSIX_TIMERS */
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* CPU-time Clock Attributes, P1003.4b/D8, p. 54 */
 
@@ -202,7 +143,7 @@ extern "C" {
 /* Flag indicating time is "absolute" with respect to the clock
    associated with a time.  */
 
-#define TIMER_ABSTIME	4
+#define TIMER_ABSTIME  4
 
 /* Manifest Constants, P1003.4b/D8, p. 55 */
 
@@ -246,6 +187,5 @@ int _EXFUN(clock_getenable_attr, (clockid_t clock_id, int *attr));
 #ifdef __cplusplus
 }
 #endif
-
 #endif /* _TIME_H_ */
 

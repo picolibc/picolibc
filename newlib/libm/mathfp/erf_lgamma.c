@@ -107,7 +107,7 @@ static float zero=  0.0000000000e+00;
 	GET_FLOAT_WORD(ix,x);
 	ix &= 0x7fffffff;
 
-	if(ix<0x3e800000) return sinf(pi*x);
+	if(ix<0x3e800000) return __kernel_sinf(pi*x,zero,0);
 	y = -x;		/* x is assume negative */
 
     /*
@@ -131,14 +131,14 @@ static float zero=  0.0000000000e+00;
             }
         }
 	switch (n) {
-	    case 0:   y =  sinf(pi*y); break;
+	    case 0:   y =  __kernel_sinf(pi*y,zero,0); break;
 	    case 1:   
-	    case 2:   y =  cosf(pi*((float)0.5-y)); break;
+	    case 2:   y =  __kernel_cosf(pi*((float)0.5-y),zero); break;
 	    case 3:  
-	    case 4:   y =  sinf(pi*(one-y)); break;
+	    case 4:   y =  __kernel_sinf(pi*(one-y),zero,0); break;
 	    case 5:
-	    case 6:   y = -cosf(pi*(y-(float)1.5)); break;
-	    default:  y =  sinf(pi*(y-(float)2.0)); break;
+	    case 6:   y = -__kernel_cosf(pi*(y-(float)1.5),zero); break;
+	    default:  y =  __kernel_sinf(pi*(y-(float)2.0),zero,0); break;
 	    }
 	return -y;
 }
@@ -156,9 +156,7 @@ static float zero=  0.0000000000e+00;
 
 	GET_FLOAT_WORD(hx,x);
 
-        nadj = 0;
-
-        /* purge off +-inf, NaN, +-0, and negative arguments */
+    /* purge off +-inf, NaN, +-0, and negative arguments */
 	*signgamp = 1;
 	ix = hx&0x7fffffff;
 	if(ix>=0x7f800000) return x*x;
@@ -243,9 +241,4 @@ static float zero=  0.0000000000e+00;
 	    r =  x*(logf(x)-one);
 	if(hx<0) r = nadj - r;
 	return r;
-}
-
-float lgammaf(float x)
-{
-  return lgammaf_r(x, &(_REENT_SIGNGAM(_REENT)));
 }

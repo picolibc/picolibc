@@ -4,8 +4,8 @@
 @cindex reentrancy
 Reentrancy is a characteristic of library functions which allows multiple
 processes to use the same address space with assurance that the values stored
-in those spaces will remain constant between calls. The Red Hat
-newlib implementation of the library functions ensures that 
+in those spaces will remain constant between calls. Cygnus's implementation
+of the library functions ensures that 
 whenever possible, these library functions are reentrant.  However,
 there are some functions that can not be trivially made reentrant.
 Hooks have been provided to allow you to use these functions in a fully
@@ -28,10 +28,6 @@ and @var{mode}, and uses the global reentrancy structure.  The function
 @code{_fopen_r} takes the arguments, @var{struct_reent}, which is a
 pointer to an instance of the reentrancy structure, @var{file}
 and @var{mode}.	
-
-There are two versions of @samp{struct _reent}, a normal one and one
-for small memory systems, controlled by the @code{_REENT_SMALL}
-definition from the (automatically included) @file{<sys/config.h>}.
 
 @cindex global reentrancy structure
 @findex _impure_ptr
@@ -106,11 +102,6 @@ _fork_r         _read_r
 _fstat_r        _sbrk_r
 _gettimeofday_r _stat_r
 _getpid_r       _times_r
-
-@ifset STDIO64
-@exdent @emph{Additional 64-bit I/O System functions:}
-_fstat64_r	_lseek64_r	_open64_r
-@end ifset
 
 @exdent @emph{Time function:}
 _asctime_r

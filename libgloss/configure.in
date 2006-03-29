@@ -28,14 +28,11 @@ else
 fi
 
 case "${target}" in
-  i[[3456]]86-*-elf*|i[[3456]]86-*-coff*)
+  i386-*-elf*)
 	configdirs="${configdirs} i386 testsuite";
 	;;
   m32r-*-*)
 	configdirs="${configdirs} m32r testsuite"
-	;;
-  m68hc11-*-*|m6811-*-*|m68hc12-*-*|m6812-*-*)
-	configdirs="m68hc11 testsuite"
 	;;
   m68*-*-*)
 	configdirs="${configdirs} m68k testsuite"
@@ -64,9 +61,6 @@ case "${target}" in
   *arm-wince-pe)
 	configdirs="wince"
 	;;
-  *arm-*-*)
-	configdirs="${configdirs} arm"
-	;;
   sh*-*-pe)
 	configdirs="wince"
 	;;
@@ -85,47 +79,15 @@ case "${target}" in
   mn10300-*-*)
 	configdirs="${configdirs} mn10300 testsuite"
 	;;
-  cris-*-* | crisv32-*-*)
-	configdirs="${configdirs} cris testsuite"
-	;;
-  crx-*-*)
-	configdirs="${configdirs} crx"
-	;;
   d30v-*-*)
 	configdirs="${configdirs} d30v testsuite"
 	;;
   fr30-*-*)
 	configdirs="${configdirs} fr30 testsuite"
 	;;
-  frv*-*-*)
-	configdirs="${configdirs} frv testsuite"
-	;;
   mcore-*-*)
 	configdirs="${configdirs} mcore testsuite"
 	;;
-  mt-*-*)
-        configdirs="${configdirs} mt testsuite";;
-  xstormy16-*-*)
-	configdirs="${configdirs} xstormy16 testsuite"
-	;;
-  m32c-*-*)
-	configdirs="${configdirs} m32c testsuite"
-	;;
-  strongarm-*-elf | strongarm-*-coff)
-	configdirs="${configdirs} arm testsuite";
-	;;
-  arm*-*-elf | arm*-*-coff)
-	configdirs="${configdirs} arm testsuite";
-	;;
-  ep9312-*-elf | ep9312-*-coff)
-	configdirs="${configdirs} arm testsuite";
-	;;
-  xscale-*-elf | xscale-*-coff)
-	configdirs="${configdirs} arm testsuite";
-	;;
-  iq2000-*-*)
-	configdirs="${configdirs} iq2000 testsuite";;
-
 esac
 
 # temporarily strip out testsuite

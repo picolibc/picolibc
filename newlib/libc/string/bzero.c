@@ -7,12 +7,12 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <string.h>
-	void bzero(void *<[b]>, size_t <[length]>);
+	void bzero(char *<[b]>, size_t <[length]>);
 
 TRAD_SYNOPSIS
 	#include <string.h>
 	void bzero(<[b]>, <[length]>)
-	void *<[b]>;
+	char *<[b]>;
 	size_t <[length]>;
 
 DESCRIPTION
@@ -34,10 +34,9 @@ Neither ANSI C nor the System V Interface Definition (Issue 2) require
 
 _VOID
 _DEFUN (bzero, (b, length),
-	void *b _AND
+	char *b _AND
 	size_t length)
 {
-  char *ptr = (char *)b;
   while (length--)
-    *ptr++ = 0;
+    *b++ = 0;
 }

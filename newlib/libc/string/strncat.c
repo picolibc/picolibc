@@ -28,6 +28,7 @@ WARNINGS
 	Note that a null is always appended, so that if the copy is
 	limited by the <[length]> argument, the number of characters
 	appended to <[dst]> is <<n + 1>>.
+	
 
 RETURNS
 	This function returns the initial value of <[dst]>

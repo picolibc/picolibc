@@ -37,12 +37,13 @@
 # else
 #  define LA(t,x) la t,x-PICBASE ; addu t,s0,t
 # endif
-#else /* __mips_embedded_pic */
+#else /* __mips_embedded_pic */ 
 # define LA(t,x) la t,x
-#endif /* __mips_embedded_pic */
+#endif /* __mips_embedded_pic */ 
 
 	.comm	__memsize, 12
 	.comm	__lstack, STARTUP_STACK_SIZE
+	.comm   __stackbase,4
 
 	.text
 	.align	2
@@ -53,19 +54,17 @@
  */
 	nop
 
-	.globl	hardware_hazard_hook .text
 	.globl	_start
 	.ent	_start
 _start:
 	.set	noreorder
 #ifdef __mips_embedded_pic
-#define PICBASE start_PICBASE
 	PICBASE = .+8
         bal	PICBASE
 	nop
 	move	s0,$31
 #endif
-#if !defined(__mips64) || (__mips_fpr==32)
+#if (__mips < 3) || (__mips_fpr==32)
 #define STATUS_MASK (SR_CU1|SR_PE)
 #else
 # For mips3 or mips4, turn on 64-bit addressing and additional float regs
@@ -75,14 +74,6 @@ _start:
 	mtc0	v0, C0_SR
 	mtc0	zero, C0_CAUSE
 	nop
-
-	/* Avoid hazard from FPU enable and other SR changes.  */
-	LA (t0, hardware_hazard_hook)
-	beq	t0,zero,1f
-	nop
-	jal	t0
-	nop
-1:
 
 /* Check for FPU presence.  Don't check if we know that soft_float is
    being used.  (This also avoids illegal instruction exceptions.)  */
@@ -106,16 +97,10 @@ _start:
 	li	v0, (STATUS_MASK-(STATUS_MASK & SR_CU1))
 	mtc0	v0, C0_SR
 	nop
-	/* Avoid hazard from FPU disable.  */
-	LA (t0, hardware_hazard_hook)
-	beq	t0,zero,2f
-	nop
-	jal	t0
-	nop
 2:
 
 
-/* Fix high bits, if any, of the PC so that exception handling
+/* Fix high bits, if any, of the PC so that exception handling 
    doesn't get confused.  */
 	LA (v0, 3f)
 	jr	v0
@@ -153,16 +138,22 @@ zerobss:
 
 	/* NOTE: a0[0] contains the amount of memory available, and
 	         not the last memory address. */
-	la	a0, __memsize
 	lw	t0,0(a0)			# last address of memory available
 	la	t1,K0BASE			# cached kernel memory
 	addu	t0,t0,t1			# get the end of memory address
-	/* Allocate 32 bytes for the register parameters.  Allocate 16
-	   bytes for a null argv and envp.  Round the result up to 64
-	   bytes to preserve alignment.  */
-	subu	t0,t0,64
+	/* We must subtract 24 bytes for the 3 8 byte arguments to main, in
+	   case main wants to write them back to the stack.  The caller is
+	   supposed to allocate stack space for parameters in registers in
+	   the old MIPS ABIs.  We must do this even though we aren't passing
+	   arguments, because main might be declared to have them. 
+
+	   Some ports need a larger alignment for the stack, so we subtract
+	   32, which satisifes the stack for the arguments and keeps the
+	   stack pointer better aligned.  */
+	subu	t0,t0,32			# and generate a starting stack-pointer
 4:
 	move	sp,t0				# set stack pointer
+	sw	sp,__stackbase			# keep this for future ref
 	.end	zerobss
 
 /*
@@ -202,33 +193,18 @@ init:
 	nop
 #endif
 
-
 	jal	_init				# run global constructors
 	nop
 
-	addiu	a1,sp,32			# argv = sp + 32
-	addiu	a2,sp,40			# envp = sp + 40
-#if __mips64
-	sd	zero,(a1)			# argv[argc] = 0
-	sd	zero,(a2)			# envp[0] = 0
-#else
-	sw	zero,(a1)
-	sw	zero,(a2)
-#endif
-	jal	main				# call the program start function
 	move	a0,zero				# set argc to 0
+	jal	main				# call the program start function
+	nop
 
 	# fall through to the "exit" routine
 	jal	exit				# call libc exit to run the G++
 						# destructors
 	move	a0,v0				# pass through the exit code
 	.end	init
-
- 
-/* Assume the PICBASE set up above is no longer valid below here.  */
-#ifdef __mips_embedded_pic
-#undef PICBASE
-#endif
 	
 /*
  * _exit -- Exit from the application. Normally we cause a user trap
@@ -238,41 +214,19 @@ init:
  *          executables that contain a complete world to be linked with
  *          just the crt0.o object.
  */
-	.globl	hardware_exit_hook .text
 	.globl	_exit
 	.ent _exit
 _exit:
 7:
-#ifdef __mips_embedded_pic
-	/* Need to reinit PICBASE, since we might be called via exit()
-	   rather than via a return path which would restore old s0.  */
-#define PICBASE exit_PICBASE
-	PICBASE = .+8
-	bal	PICBASE
-	nop
-	move	s0,$31
-#endif
 #ifdef GCRT0
-	LA (t0, _mcleanup)
-	jal	t0
+	jal	_mcleanup
 	nop
 #endif
-	LA (t0, hardware_exit_hook)
-	beq	t0,zero,1f
-	nop
-	jal	t0
-	nop
-1:
-
 	# break instruction can cope with 0xfffff, but GAS limits the range:
 	break	1023
+	nop
 	b	7b				# but loop back just in-case
 	nop
 	.end _exit
- 
-/* Assume the PICBASE set up above is no longer valid below here.  */
-#ifdef __mips_embedded_pic
-#undef PICBASE
-#endif
 
 /* EOF crt0.S */

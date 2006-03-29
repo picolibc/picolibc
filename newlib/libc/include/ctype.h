@@ -1,9 +1,10 @@
 #ifndef _CTYPE_H_
+#ifdef __cplusplus
+extern "C" {
+#endif
 #define _CTYPE_H_
 
 #include "_ansi.h"
-
-_BEGIN_STD_C
 
 int _EXFUN(isalnum, (int __c));
 int _EXFUN(isalpha, (int __c));
@@ -20,7 +21,6 @@ int _EXFUN(tolower, (int __c));
 int _EXFUN(toupper, (int __c));
 
 #ifndef __STRICT_ANSI__
-int _EXFUN(isblank, (int __c));
 int _EXFUN(isascii, (int __c));
 int _EXFUN(toascii, (int __c));
 int _EXFUN(_tolower, (int __c));
@@ -36,23 +36,20 @@ int _EXFUN(_toupper, (int __c));
 #define _X	0100
 #define	_B	0200
 
-extern	__IMPORT _CONST char	*__ctype_ptr;
-extern	__IMPORT _CONST char	_ctype_[];  /* For backward compatibility.  */
+extern	__IMPORT _CONST char	_ctype_[];
 
 #ifndef __cplusplus
-#define	isalpha(c)	((__ctype_ptr)[(unsigned)(c)]&(_U|_L))
-#define	isupper(c)	((__ctype_ptr)[(unsigned)(c)]&_U)
-#define	islower(c)	((__ctype_ptr)[(unsigned)(c)]&_L)
-#define	isdigit(c)	((__ctype_ptr)[(unsigned)(c)]&_N)
-#define	isxdigit(c)	((__ctype_ptr)[(unsigned)(c)]&(_X|_N))
-#define	isspace(c)	((__ctype_ptr)[(unsigned)(c)]&_S)
-#define ispunct(c)	((__ctype_ptr)[(unsigned)(c)]&_P)
-#define isalnum(c)	((__ctype_ptr)[(unsigned)(c)]&(_U|_L|_N))
-#define isprint(c)	((__ctype_ptr)[(unsigned)(c)]&(_P|_U|_L|_N|_B))
-#define	isgraph(c)	((__ctype_ptr)[(unsigned)(c)]&(_P|_U|_L|_N))
-#define iscntrl(c)	((__ctype_ptr)[(unsigned)(c)]&_C)
-
-
+#define	isalpha(c)	((_ctype_+1)[(unsigned)(c)]&(_U|_L))
+#define	isupper(c)	((_ctype_+1)[(unsigned)(c)]&_U)
+#define	islower(c)	((_ctype_+1)[(unsigned)(c)]&_L)
+#define	isdigit(c)	((_ctype_+1)[(unsigned)(c)]&_N)
+#define	isxdigit(c)	((_ctype_+1)[(unsigned)(c)]&(_X|_N))
+#define	isspace(c)	((_ctype_+1)[(unsigned)(c)]&_S)
+#define ispunct(c)	((_ctype_+1)[(unsigned)(c)]&_P)
+#define isalnum(c)	((_ctype_+1)[(unsigned)(c)]&(_U|_L|_N))
+#define isprint(c)	((_ctype_+1)[(unsigned)(c)]&(_P|_U|_L|_N|_B))
+#define	isgraph(c)	((_ctype_+1)[(unsigned)(c)]&(_P|_U|_L|_N))
+#define iscntrl(c)	((_ctype_+1)[(unsigned)(c)]&_C)
 /* Non-gcc versions will get the library versions, and will be
    slightly slower */
 #ifdef __GNUC__
@@ -68,6 +65,7 @@ extern	__IMPORT _CONST char	_ctype_[];  /* For backward compatibility.  */
 #define toascii(c)	((c)&0177)
 #endif
 
-_END_STD_C
-
+#ifdef __cplusplus
+}
+#endif
 #endif /* _CTYPE_H_ */

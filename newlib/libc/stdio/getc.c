@@ -62,9 +62,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
-#include <_ansi.h>
 #include <stdio.h>
-#include "local.h"
 
 /*
  * A subroutine version of the macro getc.
@@ -73,13 +71,10 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #undef getc
 
 int
-_DEFUN(getc, (fp),
-       register FILE *fp)
+getc (fp)
+     register FILE *fp;
 {
-  int result;
-  CHECK_INIT (_REENT);
-  _flockfile (fp);
-  result = __sgetc (fp);
-  _funlockfile (fp);
-  return result;
+  /* CHECK_INIT is called (eventually) by __srefill.  */
+
+  return __sgetc (fp);
 }

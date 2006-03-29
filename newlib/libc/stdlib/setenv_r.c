@@ -1,5 +1,5 @@
 /* This file may have been modified by DJ Delorie (Jan 1991).  If so,
-** these modifications are Copyright (C) 1991 DJ Delorie.
+** these modifications are Copyright (C) 1991 DJ Delorie
 */
 
 /*
@@ -26,7 +26,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include "envlock.h"
 
 extern char **environ;
@@ -70,11 +69,8 @@ _DEFUN (_setenv_r, (reent_ptr, name, value, rewrite),
         }
       if (strlen (C) >= l_value)
 	{			/* old larger; copy over */
-	  while ((*C++ = *value++) != 0);
+         while ((*C++ = *value++) != 0);
           ENV_UNLOCK;
-	  /* if we are changing the TZ environment variable, update timezone info */
-	  if (strcmp (name, "TZ") == 0)
-	    tzset ();
 	  return 0;
 	}
     }
@@ -120,10 +116,6 @@ _DEFUN (_setenv_r, (reent_ptr, name, value, rewrite),
   for (*C++ = '='; (*C++ = *value++) != 0;);
 
   ENV_UNLOCK;
-
-  /* if we are setting the TZ environment variable, update timezone info */
-  if (strncmp ((*p_environ)[offset], "TZ=", 3) == 0)
-    tzset ();
 
   return 0;
 }

@@ -28,10 +28,5 @@
 	double x; int *signgamp;
 #endif
 {
-	return exp (lgamma_r(x,signgamp));
-}
-
-double gamma(double x)
-{
-  return gamma_r(x, &(_REENT_SIGNGAM(_REENT)));
+	return lgamma_r(x,signgamp);
 }

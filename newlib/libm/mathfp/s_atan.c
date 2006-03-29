@@ -30,9 +30,9 @@ DESCRIPTION
 <<atanf>> is identical to <<atan>>, save that it operates on <<floats>>.
 
 RETURNS
-@ifnottex
+@ifinfo
 <<atan>> returns a value in radians, in the range of -pi/2 to pi/2.
-@end ifnottex
+@end ifinfo
 @tex
 <<atan>> returns a value in radians, in the range of $-\pi/2$ to $\pi/2$.
 @end tex

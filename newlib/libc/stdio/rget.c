@@ -1,3 +1,5 @@
+/* No user fns here. Pesch 15apr92. */
+
 /*
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
@@ -14,13 +16,11 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-/* No user fns here. Pesch 15apr92. */
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
-#include <_ansi.h>
 #include <stdio.h>
 #include "local.h"
 
@@ -31,8 +31,8 @@ static char sccsid[] = "%W% (Berkeley) %G%";
  */
 
 int
-_DEFUN(__srget, (fp),
-       register FILE *fp)
+__srget (fp)
+     register FILE *fp;
 {
   if (__srefill (fp) == 0)
     {

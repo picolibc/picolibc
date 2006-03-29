@@ -1,3 +1,5 @@
+/* No user fns here.  Pesch 15apr92. */
+
 /*
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
@@ -14,16 +16,14 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-/* No user fns here.  Pesch 15apr92. */
 
-#include <_ansi.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include "local.h"
+#include <stdlib.h>
 
 static int
-_DEFUN(lflush, (fp),
-       FILE *fp)
+lflush (fp)
+     FILE *fp;
 {
   if ((fp->_flags & (__SLBF | __SWR)) == (__SLBF | __SWR))
     return fflush (fp);
@@ -36,20 +36,18 @@ _DEFUN(lflush, (fp),
  */
 
 int
-_DEFUN(__srefill, (fp),
-       register FILE * fp)
+_DEFUN (__srefill, (fp),
+	register FILE * fp)
 {
   /* make sure stdio is set up */
 
-  CHECK_INIT (_REENT);
+  CHECK_INIT (fp);
 
   fp->_r = 0;			/* largely a convenience for callers */
 
-#ifndef __CYGWIN__
   /* SysV does not make this test; take it out for compatibility */
   if (fp->_flags & __SEOF)
     return EOF;
-#endif
 
   /* if not already reading, have to be reading and writing */
   if ((fp->_flags & __SRD) == 0)
@@ -96,17 +94,11 @@ _DEFUN(__srefill, (fp),
    */
 
   if (fp->_flags & (__SLBF | __SNBF))
-    _CAST_VOID _fwalk (_GLOBAL_REENT, lflush);
+    (void) _fwalk (fp->_data, lflush);
   fp->_p = fp->_bf._base;
   fp->_r = (*fp->_read) (fp->_cookie, (char *) fp->_p, fp->_bf._size);
   fp->_flags &= ~__SMOD;	/* buffer contents are again pristine */
-#ifndef __CYGWIN__
   if (fp->_r <= 0)
-#else
-  if (fp->_r > 0)
-    fp->_flags &= ~__SEOF;
-  else
-#endif
     {
       if (fp->_r == 0)
 	fp->_flags |= __SEOF;

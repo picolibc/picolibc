@@ -3,7 +3,7 @@
 #include <reent.h>
 
 int
-_DEFUN_VOID (getpid)
+getpid ()
 {
 #ifdef REENTRANT_SYSCALLS_PROVIDED
   return _getpid_r (_REENT);

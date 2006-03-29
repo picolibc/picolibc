@@ -736,7 +736,7 @@ _DEFUN (strerror, (errnum),
         error = "Socket is already connected";
         break;
 #endif
-#if defined(EOPNOTSUPP) && (!defined(ENOTSUP) || (ENOTSUP != EOPNOTSUPP))
+#ifdef EOPNOTSUPP
     case EOPNOTSUPP:
         error = "Operation not supported on socket";
         break;

@@ -55,19 +55,17 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
-#include <_ansi.h>
 #include <stdio.h>
 #include <string.h>
-#include <malloc.h>
 #include "local.h"
 
 #ifdef __SCLE
 static size_t
-_DEFUN(crlf, (fp, buf, count, eof),
-       FILE * fp _AND
-       char * buf _AND
-       size_t count _AND
-       int eof)
+_DEFUN (crlf, (fp, buf, count, eof),
+      FILE * fp _AND
+      char * buf _AND
+      size_t count _AND
+      int eof)
 {
   int newcount = 0, r;
   char *s, *d, *e;
@@ -79,28 +77,28 @@ _DEFUN(crlf, (fp, buf, count, eof),
   for (s=d=buf; s<e-1; s++)
     {
       if (*s == '\r' && s[1] == '\n')
-        s++;
+      s++;
       *d++ = *s;
     }
   if (s < e)
     {
       if (*s == '\r')
-        {
-          int c = __sgetc_raw (fp);
-          if (c == '\n')
-            *s = '\n';
-          else
-            ungetc (c, fp);
-        }
+      {
+        int c = __sgetc_raw(fp);
+        if (c == '\n')
+          *s = '\n';
+        else
+          ungetc(c, fp);
+      }
       *d++ = *s++;
     }
 
 
   while (d < e)
     {
-      r = getc (fp);
+      r = getc(fp);
       if (r == EOF)
-        return count - (e-d);
+      return count - (e-d);
       *d++ = r;
     }
 
@@ -111,11 +109,11 @@ _DEFUN(crlf, (fp, buf, count, eof),
 #endif
 
 size_t
-_DEFUN(fread, (buf, size, count, fp),
-       _PTR buf _AND
-       size_t size _AND
-       size_t count _AND
-       FILE * fp)
+_DEFUN (fread, (buf, size, count, fp),
+	_PTR buf _AND
+	size_t size _AND
+	size_t count _AND
+	FILE * fp)
 {
   register size_t resid;
   register char *p;
@@ -124,103 +122,34 @@ _DEFUN(fread, (buf, size, count, fp),
 
   if ((resid = count * size) == 0)
     return 0;
-
-  CHECK_INIT(_REENT);
-
-  _flockfile (fp);
   if (fp->_r < 0)
     fp->_r = 0;
   total = resid;
   p = buf;
 
-#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
-
-  /* Optimize unbuffered I/O.  */
-  if (fp->_flags & __SNBF)
+  while (resid > (r = fp->_r))
     {
-      /* First copy any available characters from ungetc buffer.  */
-      int copy_size = resid > fp->_r ? fp->_r : resid;
-      _CAST_VOID memcpy ((_PTR) p, (_PTR) fp->_p, (size_t) copy_size);
-      fp->_p += copy_size;
-      fp->_r -= copy_size;
-      p += copy_size;
-      resid -= copy_size;
-
-      /* If still more data needed, free any allocated ungetc buffer.  */
-      if (HASUB (fp) && resid > 0)
-	FREEUB (fp);
-
-      /* Finally read directly into user's buffer if needed.  */
-      while (resid > 0)
+      (void) memcpy ((void *) p, (void *) fp->_p, (size_t) r);
+      fp->_p += r;
+      /* fp->_r = 0 ... done in __srefill */
+      p += r;
+      resid -= r;
+      if (__srefill (fp))
 	{
-	  int rc = 0;
-	  /* save fp buffering state */
-	  void *old_base = fp->_bf._base;
-	  void * old_p = fp->_p;
-	  int old_size = fp->_bf._size;
-	  /* allow __refill to use user's buffer */
-	  fp->_bf._base = p;
-	  fp->_bf._size = resid;
-	  fp->_p = p;
-	  rc = __srefill (fp);
-	  /* restore fp buffering back to original state */
-	  fp->_bf._base = old_base;
-	  fp->_bf._size = old_size;
-	  fp->_p = old_p;
-	  resid -= fp->_r;
-	  p += fp->_r;
-	  fp->_r = 0;
-	  if (rc)
-	    {
+	  /* no more input: return partial result */
 #ifdef __SCLE
-              if (fp->_flags & __SCLE)
-	        {
-	          _funlockfile (fp);
-	          return crlf (fp, buf, total-resid, 1) / size;
-	        }
+        if (fp->_flags & __SCLE)
+            return crlf(fp, buf, total-resid, 1) / size;
 #endif
-	      _funlockfile (fp);
-	      return (total - resid) / size;
-	    }
+	  return (total - resid) / size;
 	}
     }
-  else
-#endif /* !PREFER_SIZE_OVER_SPEED && !__OPTIMIZE_SIZE__ */
-    {
-      while (resid > (r = fp->_r))
-	{
-	  _CAST_VOID memcpy ((_PTR) p, (_PTR) fp->_p, (size_t) r);
-	  fp->_p += r;
-	  /* fp->_r = 0 ... done in __srefill */
-	  p += r;
-	  resid -= r;
-	  if (__srefill (fp))
-	    {
-	      /* no more input: return partial result */
-#ifdef __SCLE
-	      if (fp->_flags & __SCLE)
-		{
-		  _funlockfile (fp);
-		  return crlf (fp, buf, total-resid, 1) / size;
-		}
-#endif
-	      _funlockfile (fp);
-	      return (total - resid) / size;
-	    }
-	}
-      _CAST_VOID memcpy ((_PTR) p, (_PTR) fp->_p, resid);
-      fp->_r -= resid;
-      fp->_p += resid;
-    }
-
-  /* Perform any CR/LF clean-up if necessary.  */
+  (void) memcpy ((void *) p, (void *) fp->_p, resid);
+  fp->_r -= resid;
+  fp->_p += resid;
 #ifdef __SCLE
   if (fp->_flags & __SCLE)
-    {
-      _funlockfile (fp);
-      return crlf(fp, buf, total, 0) / size;
-    }
+    return crlf(fp, buf, total, 0) / size;
 #endif
-  _funlockfile (fp);
   return count;
 }

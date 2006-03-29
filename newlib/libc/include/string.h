@@ -7,6 +7,10 @@
 #ifndef _STRING_H_
 #define	_STRING_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "_ansi.h"
 #include <sys/reent.h>
 
@@ -16,8 +20,6 @@
 #ifndef NULL
 #define NULL 0
 #endif
-
-_BEGIN_STD_C
 
 _PTR 	 _EXFUN(memchr,(const _PTR, int, size_t));
 int 	 _EXFUN(memcmp,(const _PTR, const _PTR, size_t));
@@ -49,27 +51,17 @@ size_t	 _EXFUN(strxfrm,(char *, const char *, size_t));
 #ifndef __STRICT_ANSI__
 char 	*_EXFUN(strtok_r,(char *, const char *, char **));
 
-int	 _EXFUN(bcmp,(const void *, const void *, size_t));
-void	 _EXFUN(bcopy,(const void *, void *, size_t));
-void	 _EXFUN(bzero,(void *, size_t));
+int	 _EXFUN(bcmp,(const char *, const char *, size_t));
+void	 _EXFUN(bcopy,(const char *, char *, size_t));
+void	 _EXFUN(bzero,(char *, size_t));
 int	 _EXFUN(ffs,(int));
 char 	*_EXFUN(index,(const char *, int));
 _PTR	 _EXFUN(memccpy,(_PTR, const _PTR, int, size_t));
-_PTR	 _EXFUN(mempcpy,(_PTR, const _PTR, size_t));
-#ifdef __CYGWIN__
-extern void *memmem (__const void *, size_t,  __const void *, size_t);
-#endif
 char 	*_EXFUN(rindex,(const char *, int));
 int	 _EXFUN(strcasecmp,(const char *, const char *));
 char 	*_EXFUN(strdup,(const char *));
 char 	*_EXFUN(_strdup_r,(struct _reent *, const char *));
-char 	*_EXFUN(strndup,(const char *, size_t));
-char 	*_EXFUN(_strndup_r,(struct _reent *, const char *, size_t));
-char 	*_EXFUN(strerror_r,(int, char *, size_t));
-size_t	 _EXFUN(strlcat,(char *, const char *, size_t));
-size_t	 _EXFUN(strlcpy,(char *, const char *, size_t));
 int	 _EXFUN(strncasecmp,(const char *, const char *, size_t));
-size_t	 _EXFUN(strnlen,(const char *, size_t));
 char 	*_EXFUN(strsep,(char **, const char *));
 char	*_EXFUN(strlwr,(char *));
 char	*_EXFUN(strupr,(char *));
@@ -96,8 +88,7 @@ int     _EXFUN(strtosigno, (const char *__name));
 
 #endif /* ! __STRICT_ANSI__ */
 
-#include <sys/string.h>
-
-_END_STD_C
-
+#ifdef __cplusplus
+}
+#endif
 #endif /* _STRING_H_ */

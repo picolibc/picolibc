@@ -96,17 +96,14 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
  */
 
 int
-_DEFUN(setvbuf, (fp, buf, mode, size),
-       register FILE * fp _AND
-       char *buf          _AND
-       register int mode  _AND
-       register size_t size)
+_DEFUN (setvbuf, (fp, buf, mode, size),
+	register FILE * fp _AND
+	char *buf _AND
+	register int mode _AND
+	register size_t size)
 {
   int ret = 0;
-
-  CHECK_INIT (_REENT);
-
-  _flockfile (fp);
+  CHECK_INIT (fp);
 
   /*
    * Verify arguments.  The `int' limit on `size' is due to this
@@ -114,10 +111,7 @@ _DEFUN(setvbuf, (fp, buf, mode, size),
    */
 
   if ((mode != _IOFBF && mode != _IOLBF && mode != _IONBF) || (int)(_POINTER_INT) size < 0)
-    {
-      _funlockfile (fp);
-      return (EOF);
-    }
+    return (EOF);
 
   /*
    * Write current buffer, if any; drop read count, if any.
@@ -126,11 +120,11 @@ _DEFUN(setvbuf, (fp, buf, mode, size),
    * non buffer flags, and clear malloc flag.
    */
 
-  _CAST_VOID fflush (fp);
+  (void) fflush (fp);
   fp->_r = 0;
   fp->_lbfsize = 0;
   if (fp->_flags & __SMBF)
-    _free_r (_REENT, (_PTR) fp->_bf._base);
+    _free_r (fp->_data, (void *) fp->_bf._base);
   fp->_flags &= ~(__SLBF | __SNBF | __SMBF);
 
   if (mode == _IONBF)
@@ -151,16 +145,15 @@ _DEFUN(setvbuf, (fp, buf, mode, size),
 	  size = BUFSIZ;
 	}
       if (buf == NULL)
-        {
-          /* Can't allocate it, let's try another approach */
+	{
+	  /* Can't allocate it, let's try another approach */
 nbf:
-          fp->_flags |= __SNBF;
-          fp->_w = 0;
-          fp->_bf._base = fp->_p = fp->_nbuf;
-          fp->_bf._size = 1;
-          _funlockfile (fp);
-          return (ret);
-        }
+	  fp->_flags |= __SNBF;
+	  fp->_w = 0;
+	  fp->_bf._base = fp->_p = fp->_nbuf;
+	  fp->_bf._size = 1;
+	  return (ret);
+	}
       fp->_flags |= __SMBF;
     }
   /*
@@ -180,7 +173,7 @@ nbf:
 
     case _IOFBF:
       /* no flag */
-      _REENT->__cleanup = _cleanup_r;
+      fp->_data->__cleanup = _cleanup_r;
       fp->_bf._base = fp->_p = (unsigned char *) buf;
       fp->_bf._size = size;
       break;
@@ -193,6 +186,5 @@ nbf:
   if (fp->_flags & __SWR)
     fp->_w = fp->_flags & (__SLBF | __SNBF) ? 0 : size;
 
-  _funlockfile (fp);
   return 0;
 }

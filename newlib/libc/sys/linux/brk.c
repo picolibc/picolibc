@@ -6,7 +6,7 @@
 #include <stddef.h> /* for NULL */
 #include <sys/types.h>
 #include <sys/unistd.h>
-#include <machine/syscall.h>
+#include <sys/syscall.h>
 
 
 static char *curr_brk = NULL;
@@ -28,7 +28,7 @@ int brk(void *end_data_segment)
 }
 
 
-void *sbrk(ptrdiff_t increment) /* SHOULD be ptrdiff_t */
+void *sbrk(size_t increment) /* SHOULD be ptrdiff_t */
 {
     char *old_brk,*new_brk;
 

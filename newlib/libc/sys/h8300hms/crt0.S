@@ -1,7 +1,5 @@
 ; h8/300 and h8/300h start up file.
 
-#include "setarch.h"
-
 #ifdef __H8300__
 
 	.section .text
@@ -11,21 +9,15 @@ _start:
 	mov.w	#_edata,r0
 	mov.w	#_end,r1
 	sub.w   r2,r2
-.Loop:	mov.w	r2,@r0
+.loop:	mov.w	r2,@r0
 	adds	#2,r0
 	cmp	r1,r0
-	blo	.Loop
+	blo	.loop
 #ifdef __ELF__
 	mov.l   #__fini,r0
 	jsr     @_atexit
-#ifdef __SIMULATOR__
-        jsr     @0xcc
-#endif
 	jsr     @__init
 #else
-#ifdef __SIMULATOR__
-        jsr     @0xcc
-#endif
 	jsr	@___main
 #endif
 	jsr	@_main
@@ -38,6 +30,7 @@ _stack:	.word 	1
 
 #ifdef __H8300H__
 
+	.h8300h
 	.section .text
 	.global	_start
 _start:
@@ -45,21 +38,15 @@ _start:
 	mov.l	#_edata,er0
 	mov.l	#_end,er1
 	sub.w   r2,r2           ; not sure about alignment requirements
-.Loop:	mov.w	r2,@er0		; playing it safe for now
+.loop:	mov.w	r2,@er0		; playing it safe for now
 	adds	#2,er0
 	cmp.l	er1,er0
-	blo	.Loop
+	blo	.loop
 #ifdef __ELF__
-	mov.l   #__fini,er0
+	mov.l   #__fini,r0
 	jsr     @_atexit
-#ifdef __SIMULATOR__
-        jsr     @0xcc
-#endif
 	jsr     @__init
 #else
-#ifdef __SIMULATOR__
-        jsr     @0xcc
-#endif
 	jsr	@___main
 #endif
 	jsr	@_main
@@ -70,8 +57,9 @@ _stack:	.long 	1
 
 #endif
 
-#if defined (__H8300S__) || defined (__H8300SX__)
+#ifdef __H8300S__
 
+	.h8300s
 	.section .text
 	.global	_start
 _start:
@@ -79,21 +67,15 @@ _start:
 	mov.l	#_edata,er0
 	mov.l	#_end,er1
 	sub.w   r2,r2           ; not sure about alignment requirements
-.Loop:	mov.w	r2,@er0		; playing it safe for now
+.loop:	mov.w	r2,@er0		; playing it safe for now
 	adds	#2,er0
 	cmp.l	er1,er0
-	blo	.Loop
+	blo	.loop
 #ifdef __ELF__
-	mov.l   #__fini,er0
+	mov.l   #__fini,r0
 	jsr     @_atexit
-#ifdef __SIMULATOR__
-        jsr     @0xcc
-#endif
 	jsr     @__init
 #else
-#ifdef __SIMULATOR__
-        jsr     @0xcc
-#endif
 	jsr	@___main
 #endif
 	jsr	@_main

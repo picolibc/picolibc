@@ -41,25 +41,20 @@ static char sccsid[] = "@(#)opendir.c	5.11 (Berkeley) 2/23/91";
 #include <fcntl.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/lock.h>
 
 /*
  * open a directory.
  */
 DIR *
-_DEFUN(opendir, (name),
-	const char *name)
+opendir(name)
+	const char *name;
 {
 	register DIR *dirp;
 	register int fd;
-	int rc = 0;
 
 	if ((fd = open(name, 0)) == -1)
 		return NULL;
-#ifdef HAVE_FCNTL
-	rc = fcntl(fd, F_SETFD, 1);
-#endif
-	if (rc == -1 ||
+	if (fcntl(fd, F_SETFD, 1) == -1 ||
 	    (dirp = (DIR *)malloc(sizeof(DIR))) == NULL) {
 		close (fd);
 		return NULL;
@@ -83,12 +78,6 @@ _DEFUN(opendir, (name),
 	/*
 	 * Set up seek point for rewinddir.
 	 */
-
-#ifdef HAVE_DD_LOCK
-	/* if we have a locking mechanism, initialize it */
-	__lock_init_recursive(dirp->dd_lock);
-#endif
-
 	return dirp;
 }
 

@@ -1,4 +1,3 @@
-#ifndef MALLOC_PROVIDED
 /* malign.c -- a wrapper for memalign_r.  */
 
 #include <_ansi.h>
@@ -16,5 +15,4 @@ _DEFUN (memalign, (align, nbytes),
   return _memalign_r (_REENT, align, nbytes);
 }
 
-#endif
 #endif

@@ -1,6 +1,13 @@
-#include "setarch.h"
-
 #include "defines.h"
+
+#ifdef __H8300H__
+	.h8300h
+#endif
+
+#ifdef __H8300S__
+	.h8300s
+#endif
+
 
 	; dst A0
 	; src A1
@@ -14,12 +21,8 @@ ___reg_memcpy:
 	CMPP	A0P,A3P	; see if anything to do
 	beq	quit
 
-loop:
-#ifdef __NORMAL_MODE__
-	sub     #1,A1P		; point to byte
-#else
-	subs    #1,A1P          ; point to byte
-#endif
+
+loop:	subs	#1,A1P		; point to byte
 	mov.b	@A1P,A2L	; get byte
 	mov.b	A2L,@-A0P	; save byte
 	CMPP	A0P,A3P 	; at the front again ?

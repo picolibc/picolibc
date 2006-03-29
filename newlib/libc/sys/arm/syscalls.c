@@ -12,19 +12,15 @@
 #include <sys/times.h>
 #include <errno.h>
 #include <reent.h>
-#include <unistd.h>
 #include "swi.h"
 
 /* Forward prototypes.  */
-int     _system     _PARAMS ((const char *));
-int     _rename     _PARAMS ((const char *, const char *));
 int     isatty		_PARAMS ((int));
 clock_t _times		_PARAMS ((struct tms *));
 int     _gettimeofday	_PARAMS ((struct timeval *, struct timezone *));
 void    _raise 		_PARAMS ((void));
 int     _unlink		_PARAMS ((void));
 int     _link 		_PARAMS ((void));
-int     _stat 		_PARAMS ((const char *, struct stat *));
 int     _fstat 		_PARAMS ((int, struct stat *));
 caddr_t _sbrk		_PARAMS ((int));
 int     _getpid		_PARAMS ((int));
@@ -55,17 +51,20 @@ register char * stack_ptr asm ("sp");
 
 /* following is copied from libc/stdio/local.h to check std streams */
 extern void   _EXFUN(__sinit,(struct _reent *));
-#define CHECK_INIT(ptr) \
-  do						\
-    {						\
-      if ((ptr) && !(ptr)->__sdidinit)		\
-	__sinit (ptr);				\
-    }						\
+#define CHECK_INIT(fp) \
+  do                                    \
+    {                                   \
+      if ((fp)->_data == 0)             \
+        (fp)->_data = _REENT;           \
+      if (!(fp)->_data->__sdidinit)     \
+        __sinit ((fp)->_data);          \
+    }                                   \
   while (0)
 
 /* Adjust our internal handles to stay away from std* handles.  */
 #define FILE_HANDLE_OFFSET (0x20)
 
+static int std_files_checked;
 static int monitor_stdin;
 static int monitor_stdout;
 static int monitor_stderr;
@@ -98,7 +97,7 @@ static inline int
 do_AngelSWI (int reason, void * arg)
 {
   int value;
-  asm volatile ("mov r0, %1; mov r1, %2; " AngelSWIInsn " %a3; mov %0, r0"
+  asm volatile ("mov r0, %1; mov r1, %2; swi %a3; mov %0, r0"
        : "=r" (value) /* Outputs */
        : "r" (reason), "r" (arg), "i" (AngelSWI) /* Inputs */
        : "r0", "r1", "r2", "r3", "ip", "lr", "memory", "cc"
@@ -116,13 +115,18 @@ do_AngelSWI (int reason, void * arg)
 static int
 remap_handle (int fh)
 {
-  CHECK_INIT(_REENT);
-
-  if (fh == STDIN_FILENO)
+  if (!std_files_checked)
+    {
+       CHECK_INIT(stdin);
+       CHECK_INIT(stdout);
+       CHECK_INIT(stderr);
+       std_files_checked = 1;
+    }
+  if (fh == __sfileno (stdin))
     return monitor_stdin;
-  if (fh == STDOUT_FILENO)
+  if (fh == __sfileno (stdout))
     return monitor_stdout;
-  if (fh == STDERR_FILENO)
+  if (fh == __sfileno (stderr))
     return monitor_stderr;
 
   return fh - FILE_HANDLE_OFFSET;
@@ -466,6 +470,8 @@ _getpid (int n)
   n = n;
 }
 
+extern void abort (void);
+
 caddr_t
 _sbrk (int incr)
 {
@@ -480,18 +486,8 @@ _sbrk (int incr)
   
   if (heap_end + incr > stack_ptr)
     {
-      /* Some of the libstdc++-v3 tests rely upon detecting
-	 out of memory errors, so do not abort here.  */
-#if 0
-      extern void abort (void);
-
       _write (1, "_sbrk: Heap and stack collision\n", 32);
-      
       abort ();
-#else
-      errno = ENOMEM;
-      return (caddr_t) -1;
-#endif
     }
   
   heap_end += incr;
@@ -509,22 +505,6 @@ _fstat (int file, struct stat * st)
   st->st_blksize = 1024;
   return 0;
   file = file;
-}
-
-int _stat (const char *fname, struct stat *st)
-{
-  int file;
-
-  /* The best we can do is try to open the file readonly.  If it exists,
-     then we can guess a few things about it.  */
-  if ((file = _open (fname, O_RDONLY)) < 0)
-    return -1;
-
-  memset (st, 0, sizeof (* st));
-  st->st_mode = S_IFREG | S_IREAD;
-  st->st_blksize = 1024;
-  _swiclose (file); /* Not interested in the error.  */
-  return 0;
 }
 
 int
@@ -603,20 +583,4 @@ isatty (int fd)
 {
   return 1;
   fd = fd;
-}
-
-int
-_system (const char *s)
-{
-  if (s == NULL)
-    return 0;
-  errno = ENOSYS;
-  return -1;
-}
-
-int
-_rename (const char * oldpath, const char * newpath)
-{
-  errno = ENOSYS;
-  return -1;
 }

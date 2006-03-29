@@ -4,10 +4,10 @@
 #include <unistd.h>
 
 off_t
-_DEFUN (lseek, (fd, pos, whence),
-     int fd _AND
-     off_t pos _AND
-     int whence)
+lseek (fd, pos, whence)
+     int fd;
+     off_t pos;
+     int whence;
 {
 #ifdef REENTRANT_SYSCALLS_PROVIDED
   return _lseek_r (_REENT, fd, pos, whence);

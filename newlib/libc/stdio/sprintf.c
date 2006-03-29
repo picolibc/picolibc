@@ -16,15 +16,13 @@
  */
 
 /*
-FUNCTION
-        <<printf>>, <<fprintf>>, <<asprintf>>, <<sprintf>>, <<snprintf>>---format output
 
+FUNCTION
+        <<printf>>, <<fprintf>>, <<sprintf>>, <<snprintf>>---format output
 INDEX
 	fprintf
 INDEX
 	printf
-INDEX
-	asprintf
 INDEX
 	sprintf
 INDEX
@@ -36,9 +34,7 @@ ANSI_SYNOPSIS
         int printf(const char *<[format]> [, <[arg]>, ...]);
         int fprintf(FILE *<[fd]>, const char *<[format]> [, <[arg]>, ...]);
         int sprintf(char *<[str]>, const char *<[format]> [, <[arg]>, ...]);
-        int asprintf(char **<[strp]>, const char *<[format]> [, <[arg]>, ...]);
-        int snprintf(char *<[str]>, size_t <[size]>, const char *<[format]>
-                     [, <[arg]>, ...]);
+        int snprintf(char *<[str]>, size_t <[size]>, const char *<[format]> [, <[arg]>, ...]);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -48,10 +44,6 @@ TRAD_SYNOPSIS
 
 	int fprintf(<[fd]>, <[format]> [, <[arg]>, ...]);
 	FILE *<[fd]>;
-	char *<[format]>;
-
-	int asprintf(<[strp]>, <[format]> [, <[arg]>, ...]);
-	char **<[strp]>;
 	char *<[format]>;
 
 	int sprintf(<[str]>, <[format]> [, <[arg]>, ...]);
@@ -73,22 +65,19 @@ DESCRIPTION
         If there are more arguments than the format requires, excess
         arguments are ignored.
 
-        <<fprintf>>, <<asprintf>>, <<sprintf>> and <<snprintf>> are identical 
-	to <<printf>>, other than the destination of the formatted output: 
-	<<fprintf>> sends the output to a specified file <[fd]>, while 
-	<<asprintf>> stores the output in a dynamically allocated buffer,
-	while <<sprintf>> stores the output in the specified char array 
-	<[str]> and <<snprintf>> limits number of characters written to 
-	<[str]> to at most <[size]> (including terminating <<0>>).  For 
-	<<sprintf>> and <<snprintf>>, the behavior is undefined if the 
-	output <<*<[str]>>> overlaps with one of the arguments. For
-	<<asprintf>>, <[strp]> points to a pointer to char which is filled
-	in with the dynamically allocated buffer.  <[format]> is a pointer 
-	to a charater string containing two types of objects: ordinary 
-	characters (other than <<%>>), which are copied unchanged to the 
-	output, and conversion specifications, each of which is introduced 
-	by <<%>>. (To include <<%>> in the output, use <<%%>> in the format 
-	string.) A conversion specification has the following form:
+        <<fprintf>>, <<sprintf>> and <<snprintf>> are identical to <<printf>>,
+        other than the destination of the formatted output: <<fprintf>> sends
+        the output to a specified file <[fd]>, while <<sprintf>> stores the
+        output in the specified char array <[str]> and <<snprintf>> limits
+        number of characters written to <[str]> to at most <[size]> (including
+        terminating <<0>>).  For <<sprintf>> and <<snprintf>>, the behavior is
+        also undefined if the output <<*<[str]>>> overlaps with one of the
+        arguments. <[format]> is a pointer to a charater string containing
+        two types of objects: ordinary characters (other than <<%>>), which
+        are copied unchanged to the output, and conversion
+        specifications, each of which is introduced by <<%>>.
+        (To include <<%>> in the output, use <<%%>> in the format string.)
+        A conversion specification has the following form:
 
 .       %[<[flags]>][<[width]>][.<[prec]>][<[size]>][<[type]>]
 
@@ -206,8 +195,7 @@ DESCRIPTION
 		<<l>> forces the following <<d>>, <<i>>, <<o>>, <<u>>,
 		<<x>> or <<X>> conversion <[type]> to apply to a <<long>> or
 		<<unsigned long>>.  <<l>> also forces a following <<n>> <[type]> to
-		apply to a pointer to a <<long>>.  <<l>> with <<c>>, <<s>> is
-		equivalent to <<C>>, <<S>> respectively.  If an <<h>>
+		apply to a pointer to a <<long>>. If an <<h>>
 		or an <<l>> appears with another conversion
 		specifier, the behavior is undefined.  <<L>> forces a
 		following <<e>>, <<E>>, <<f>>, <<g>> or <<G>> conversion <[type]> to
@@ -226,17 +214,9 @@ DESCRIPTION
 		o c
 		prints <[arg]> as single character
 		
-		o C
-		prints wchar_t <[arg]> as single multibyte character
-		
 		o s
 		prints characters until precision is reached or a null terminator
 		is encountered; takes a string pointer
-
-		o S
-		converts wchar_t characters to multibyte output characters until
-		precision is reached or a null wchar_t terminator
-		is encountered; takes a wchar_t pointer
 
 		o d
 		prints a signed decimal integer; takes an <<int>> (same as <<i>>)
@@ -260,24 +240,24 @@ DESCRIPTION
 
 		o f
 		prints a signed value of the form <<[-]9999.9999>>; takes
-		a floating-point number
+		a floating point number
 	
 		o e
 		prints a signed	value of the form <<[-]9.9999e[+|-]999>>; takes a
-		floating-point number
+		floating point number
 
 		o E
 		prints the same way as <<e>>, but using <<E>> to introduce the
-		exponent; takes a floating-point number
+		exponent; takes a floating point number
 
 		o g
 		prints a signed value in either <<f>> or <<e>> form, based on given
 		value and precision---trailing zeros and the decimal point are
-		printed only if necessary; takes a floating-point number
+		printed only if necessary; takes a floating point number
 	
 		o G
 		prints the same way as <<g>>, but using <<E>> for the exponent if an
-		exponent is needed; takes a floating-point number
+		exponent is needed; takes a floating point number
 
 		o n
 		stores (in the same object) a count of the characters written;
@@ -292,11 +272,11 @@ O-
 
 
 RETURNS
-<<sprintf>> and <<asprintf>> return the number of bytes in the output string,
+<<sprintf>> returns the number of bytes in the output string,
 save that the concluding <<NULL>> is not counted.
 <<printf>> and <<fprintf>> return the number of characters transmitted.
-If an error occurs, <<printf>> and <<fprintf>> return <<EOF>> and
-<<asprintf>> returns -1.  No error returns occur for <<sprintf>>.
+If an error occurs, <<printf>> and <<fprintf>> return <<EOF>>. No
+error returns occur for <<sprintf>>.
 
 PORTABILITY
         The  ANSI C standard specifies that implementations must
@@ -306,8 +286,6 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
-#include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #ifdef _HAVE_STDC
 #include <stdarg.h>
@@ -315,20 +293,18 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <varargs.h>
 #endif
 #include <limits.h>
+#include <_ansi.h>
 #include "local.h"
 
 int
 #ifdef _HAVE_STDC
-_DEFUN(_sprintf_r, (ptr, str, fmt),
-       struct _reent *ptr _AND
-       char *str          _AND
-       _CONST char *fmt _DOTS)
+_DEFUN (_sprintf_r, (ptr, str, fmt), struct _reent *ptr _AND char *str _AND _CONST char *fmt _DOTS)
 #else
-_sprintf_r(ptr, str, fmt, va_alist)
-           struct _reent *ptr;
-           char *str;
-           _CONST char *fmt;
-           va_dcl
+_sprintf_r (ptr, str, fmt, va_alist)
+     struct _reent *ptr;
+     char *str;
+     _CONST char *fmt;
+     va_dcl
 #endif
 {
   int ret;
@@ -338,13 +314,13 @@ _sprintf_r(ptr, str, fmt, va_alist)
   f._flags = __SWR | __SSTR;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = INT_MAX;
-  f._file = -1;  /* No file. */
+  f._data = ptr;
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else
   va_start (ap);
 #endif
-  ret = _vfprintf_r (ptr, &f, fmt, ap);
+  ret = vfprintf (&f, fmt, ap);
   va_end (ap);
   *f._p = 0;
   return (ret);
@@ -354,14 +330,12 @@ _sprintf_r(ptr, str, fmt, va_alist)
 
 int
 #ifdef _HAVE_STDC
-_DEFUN(sprintf, (str, fmt),
-       char *str _AND
-       _CONST char *fmt _DOTS)
+_DEFUN (sprintf, (str, fmt), char *str _AND _CONST char *fmt _DOTS)
 #else
-sprintf(str, fmt, va_alist)
-        char *str;
-        _CONST char *fmt;
-        va_dcl
+sprintf (str, fmt, va_alist)
+     char *str;
+     _CONST char *fmt;
+     va_dcl
 #endif
 {
   int ret;
@@ -371,13 +345,13 @@ sprintf(str, fmt, va_alist)
   f._flags = __SWR | __SSTR;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = INT_MAX;
-  f._file = -1;  /* No file. */
+  f._data = _REENT;
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else
   va_start (ap);
 #endif
-  ret = _vfprintf_r (_REENT, &f, fmt, ap);
+  ret = vfprintf (&f, fmt, ap);
   va_end (ap);
   *f._p = 0;
   return (ret);

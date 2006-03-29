@@ -5,7 +5,7 @@
 
 The official maintainers of newlib:
 
-Jeff Johnston			jjohnstn@redhat.com
+Jeff Johnston			jjohnstn@cygnus.com
 
 
 		     Various Domain Maintainers
@@ -21,25 +21,17 @@ If there are several maintainers for a given domain then
 responsibility falls to the first maintainer.  The first maintainer is
 free to devolve that responsibility among the other maintainers.
 
-Makefile.in, configure*:	jjohnstn@redhat.com
+Makefile.in, configure*:	jjohnstn@cygnus.com
 
-Cygwin:				cgf@redhat.com
+Cygwin:				cgf@cygnus.com
 
-Web pages:			jjohnstn@redhat.com
+Web pages:			jjohnstn@cygnus.com
 
-
-			CPU Port Maintainers	(CPU alphabetical order)
-
-CPU port maintainers may make changes in cpu-specific directories, as
-well as cpu-specific portions of the build system, without approval.
-
-m32c port		DJ Delorie		dj@redhat.com
 
 
 			Write After Approval
 
 These are users with general write privileges after getting approval:
 
-DJ Delorie			dj@redhat.com
-Christopher G. Faylor		cgf@redhat.com
-Jim Wilson			wilson@specifixinc.com
+DJ Delorie			dj@cygnus.com
+Christopher G. Faylor		cgf@cygnus.com

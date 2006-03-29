@@ -44,9 +44,9 @@ RETURNS
         <<atanh>> and <<atanhf>> return the calculated value.
 
         If
-        @ifnottex
+        @ifinfo
         |<[x]>|
-        @end ifnottex
+        @end ifinfo
         @tex
         $|x|$
         @end tex
@@ -54,9 +54,9 @@ RETURNS
         the result is a NaN.  A <<DOMAIN error>> is reported.
 
         If
-        @ifnottex
+        @ifinfo
         |<[x]>|
-        @end ifnottex
+        @end ifinfo
         @tex
         $|x|$
         @end tex

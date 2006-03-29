@@ -25,7 +25,7 @@ DESCRIPTION
 <<atoff>> converts the initial portion of a string to a <<float>>.
 
 The functions parse the character string <[s]>,
-locating a substring which can be converted to a floating-point
+locating a substring which can be converted to a floating point
 value. The substring must match the format:
 . [+|-]<[digits]>[.][<[digits]>][(e|E)[+|-]<[digits]>]
 The substring converted is the longest initial
@@ -36,7 +36,7 @@ of whitespace, or if the first non-whitespace character is
 something other than <<+>>, <<->>, <<.>>, or a digit.
 
 <<atof(<[s]>)>> is implemented as <<strtod(<[s]>, NULL)>>.
-<<atoff(<[s]>)>> is implemented as <<strtof(<[s]>, NULL)>>.
+<<atoff(<[s]>)>> is implemented as <<strtodf(<[s]>, NULL)>>.
 
 RETURNS
 <<atof>> returns the converted substring value, if any, as a

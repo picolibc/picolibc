@@ -69,10 +69,7 @@ _system_r (ptr, s)
      struct _reent *ptr;
      _CONST char *s;
 {
-#if defined(HAVE_SYSTEM)
-  return _system (s);
-  ptr = ptr;
-#elif defined(NO_EXEC)
+#ifdef NO_EXEC
   if (s == NULL)
     return 0;
   errno = ENOSYS;

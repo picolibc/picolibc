@@ -10,7 +10,7 @@ int _dummy_mstats = 1;
 
 /*
 FUNCTION
-<<mallinfo>>, <<malloc_stats>>, <<mallopt>>---malloc support
+<<mallinfo>>, <<malloc_stats>>, <<mallopt>>--malloc support
 
 INDEX
 	mallinfo
@@ -110,7 +110,6 @@ _DEFUN_VOID (mallinfo)
   return _mallinfo_r (_REENT);
 }
 
-#if !defined (_ELIX_LEVEL) || _ELIX_LEVEL >= 2
 void
 _DEFUN_VOID (malloc_stats)
 {
@@ -125,11 +124,7 @@ _DEFUN (mallopt, (p, v),
   return _mallopt_r (_REENT, p, v);
 }
 
-#endif /* !_ELIX_LEVEL || _ELIX_LEVEL >= 2 */
-
 #endif
-
-#if !defined (_ELIX_LEVEL) || _ELIX_LEVEL >= 2
 
 /* mstats is now compatibility code.  It used to be real, for a
    previous version of the malloc routines.  It now just calls
@@ -140,7 +135,6 @@ _DEFUN (_mstats_r, (ptr, s),
 	struct _reent *ptr _AND
 	char *s)
 {
-  _REENT_SMALL_CHECK_INIT(ptr);
   fiprintf (_stderr_r (ptr), "Memory allocation statistics %s\n", s);
   _malloc_stats_r (ptr);
 }
@@ -154,7 +148,4 @@ _DEFUN (mstats, (s),
 }
 
 #endif
-
-#endif /* !_ELIX_LEVEL || _ELIX_LEVEL >= 2 */
-
 #endif /* ! defined (MALLOC_PROVIDED) */

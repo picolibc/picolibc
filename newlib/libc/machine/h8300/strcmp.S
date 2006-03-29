@@ -1,23 +1,13 @@
-#include "setarch.h"
-
 #include "defines.h"
 
-#if defined (__H8300SX__)
-	.global _strcmp
-_strcmp:
-	mov.l	er0,er2
-loop:
-	mov.b	@er2+,r0l
-	beq	eos
-	sub.b	@er1+,r0l
-	beq	loop
-	exts.l	#2,er0
-	rts
-eos:
-	sub.b	@er1,r0l
-	exts.l	#2,er0
-	rts
-#else
+#ifdef __H8300H__
+	.h8300h
+#endif
+
+#ifdef __H8300S__
+	.h8300s
+#endif
+
 	.section .text
 	.align 2
 	.global _strcmp
@@ -30,11 +20,7 @@ _strcmp:
 	mov.b	@A3P+,A0L
 	cmp.b	A0L,A1L
 	beq	.L5
-#ifdef __NORMAL_MODE__
-	sub	#1,A3P
-#else
 	subs	#1,A3P
-#endif
 .L3:
 	mov.b	@(-1,A2P),A0L
 	mov.b	@A3P,A1L
@@ -57,4 +43,3 @@ _strcmp:
 #endif
 	rts
 	.end
-#endif

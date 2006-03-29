@@ -31,7 +31,7 @@ _DEFUN (read, (fd, buf, nbytes),
   for (i = 0; i < nbytes; i++) {
     *(buf + i) = inbyte();
     if ((*(buf + i) == '\n') || (*(buf + i) == '\r')) {
-      i++;
+      (*(buf + i + 1)) = 0;
       break;
     }
   }

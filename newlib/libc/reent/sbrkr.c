@@ -34,13 +34,13 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <reent.h>
-	void *_sbrk_r(struct _reent *<[ptr]>, ptrdiff_t <[incr]>);
+	void *_sbrk_r(struct _reent *<[ptr]>, size_t <[incr]>);
 
 TRAD_SYNOPSIS
 	#include <reent.h>
 	void *_sbrk_r(<[ptr]>, <[incr]>)
 	struct _reent *<[ptr]>;
-	ptrdiff_t <[incr]>;
+	size_t <[incr]>;
 
 DESCRIPTION
 	This is a reentrant version of <<sbrk>>.  It
@@ -49,12 +49,12 @@ DESCRIPTION
 */
 
 void *
-_DEFUN (_sbrk_r, (ptr, incr),
-     struct _reent *ptr _AND
-     ptrdiff_t incr)
+_sbrk_r (ptr, incr)
+     struct _reent *ptr;
+     size_t incr;
 {
   char *ret;
-  void *_sbrk(ptrdiff_t);
+  void *_sbrk(size_t);
 
   errno = 0;
   if ((ret = (char *)(_sbrk (incr))) == (void *) -1 && errno != 0)

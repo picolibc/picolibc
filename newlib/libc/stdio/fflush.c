@@ -51,42 +51,29 @@ ANSI C requires <<fflush>>.
 No supporting OS subroutines are required.
 */
 
-#include <_ansi.h>
 #include <stdio.h>
 #include "local.h"
 
 /* Flush a single file, or (if fp is NULL) all files.  */
 
 int
-_DEFUN(fflush, (fp),
-       register FILE * fp)
+_DEFUN (fflush, (fp),
+	register FILE * fp)
 {
   register unsigned char *p;
   register int n, t;
 
+
+
+
   if (fp == NULL)
-    return _fwalk (_GLOBAL_REENT, fflush);
+    return _fwalk (_REENT, fflush);
 
-  CHECK_INIT (_REENT);
-
-  _flockfile (fp);
+  CHECK_INIT (fp);
 
   t = fp->_flags;
-  if ((t & __SWR) == 0)
-    {
-      /* For a read stream, an fflush causes the next seek to be
-         unoptimized (i.e. forces a system-level seek).  This conforms
-         to the POSIX and SUSv3 standards.  */
-      fp->_flags |= __SNPT;
-      _funlockfile (fp);
-      return 0;
-    }
-  if ((p = fp->_bf._base) == NULL)
-    {
-      /* Nothing to flush.  */
-      _funlockfile (fp);
-      return 0;
-    }
+  if ((t & __SWR) == 0 || (p = fp->_bf._base) == NULL)
+    return 0;
   n = fp->_p - p;		/* write this much */
 
   /*
@@ -102,13 +89,11 @@ _DEFUN(fflush, (fp),
       t = (*fp->_write) (fp->_cookie, (char *) p, n);
       if (t <= 0)
 	{
-          fp->_flags |= __SERR;
-          _funlockfile (fp);
-          return EOF;
+	  fp->_flags |= __SERR;
+	  return EOF;
 	}
       p += t;
       n -= t;
     }
-  _funlockfile (fp);
   return 0;
 }

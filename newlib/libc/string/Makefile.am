@@ -4,7 +4,8 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-GENERAL_SOURCES = \
+LIB_SOURCES = \
+	bcmp.c \
 	bcopy.c \
 	bzero.c \
 	index.c \
@@ -14,29 +15,22 @@ GENERAL_SOURCES = \
 	memmove.c \
 	memset.c \
 	rindex.c \
-	strcasecmp.c \
 	strcat.c \
 	strchr.c \
 	strcmp.c \
+	strcasecmp.c \
 	strcoll.c \
 	strcpy.c \
 	strcspn.c \
-	strdup.c \
-	strdup_r.c \
 	strerror.c \
-	strerror_r.c \
-	strlcat.c \
-	strlcpy.c \
 	strlen.c  \
 	strlwr.c \
-	strncasecmp.c \
 	strncat.c \
 	strncmp.c \
+	strncasecmp.c \
 	strncpy.c \
-	strnlen.c \
 	strpbrk.c \
 	strrchr.c \
-	strsep.c \
 	strspn.c \
 	strtok.c \
 	strtok_r.c \
@@ -44,56 +38,17 @@ GENERAL_SOURCES = \
 	strxfrm.c  \
 	strstr.c \
 	swab.c \
-	u_strerr.c \
-	wcscat.c \
-	wcschr.c \
-	wcscmp.c \
-	wcscoll.c \
-	wcscpy.c \
-	wcscspn.c \
-	wcslcat.c \
-	wcslcpy.c \
-	wcslen.c \
-	wcsncat.c \
-	wcsncmp.c \
-	wcsncpy.c \
-	wcsnlen.c \
-	wcspbrk.c \
-	wcsrchr.c \
-	wcsspn.c \
-	wcsstr.c \
-	wcswidth.c \
-	wcwidth.c \
-	wmemchr.c \
-	wmemcmp.c \
-	wmemcpy.c \
-	wmemmove.c \
-	wmemset.c
-
-if ELIX_LEVEL_1
-LIB_OBJS =
-else
-LIB_OBJS = \
-	bcmp.$(oext) \
-	memccpy.$(oext) \
-	mempcpy.$(oext) \
-	strndup.$(oext) \
-	strndup_r.$(oext)
-endif
+	u_strerr.c
 
 libstring_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libstring.la
-libstring_la_SOURCES = $(GENERAL_SOURCES)
-libstring_la_LIBADD = $(LIB_OBJS)
-libstring_la_DEPENDENCIES = $(LIB_OBJS)
+libstring_la_SOURCES = $(LIB_SOURCES)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(GENERAL_SOURCES)
-lib_a_LIBADD = $(LIB_OBJS)
-lib_a_DEPENDENCIES = $(LIB_OBJS)
+lib_a_SOURCES = $(LIB_SOURCES)
 noinst_DATA =
 endif # USE_LIBTOOL
 
@@ -104,17 +59,9 @@ bcmp.def	memcpy.def	strcmp.def	strncat.def strstr.def \
 bcopy.def	memmove.def	strcoll.def	strncmp.def strtok.def \
 bzero.def	memset.def	strcpy.def	strncpy.def strxfrm.def \
 index.def	rindex.def	strcspn.def	strpbrk.def swab.def \
-memchr.def	strcat.def	strerror.def	strerror_r.def strrchr.def \
-memcmp.def	strchr.def	strlen.def	strnlen.def strspn.def \
-strcasecmp.def	strncasecmp.def strlwr.def	strupr.def  memccpy.def \
-mempcpy.def \
-wcscat.def	wcschr.def	wcscmp.def	wcscoll.def \
-wcscpy.def	wcscspn.def \
-wcslcat.def	wcslcpy.def	wcslen.def	wcsncat.def \
-wcsncmp.def	wcsncpy.def	wcsnlen.def	wcspbrk.def \
-wcsrchr.def	wcsspn.def	wcsstr.def \
-wcswidth.def	wcwidth.def	wmemchr.def \
-wmemcmp.def	wmemcpy.def	wmemmove.def	wmemset.def
+memchr.def	strcat.def	strerror.def	strrchr.def \
+memcmp.def	strchr.def	strlen.def	strspn.def \
+strcasecmp.def	strncasecmp.def strlwr.def	strupr.def
 
 SUFFIXES = .def
 
@@ -128,6 +75,5 @@ TARGETDOC = ../tmp.texi
 
 doc: $(CHEWOUT_FILES)
 	cat $(srcdir)/strings.tex >> $(TARGETDOC)
-	cat $(srcdir)/wcstrings.tex >> $(TARGETDOC)
 
 CLEANFILES = $(CHEWOUT_FILES) *.ref

@@ -4,51 +4,18 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-GENERAL_SOURCES = \
-	getcwd.c 	\
-	pread.c 	\
-	pwrite.c 	\
-	sigset.c
-
-## Distinguish different EL/IX level interfaces
-ELIX_2_OBJS = \
-	ttyname.$(oext)
-
-ELIX_4_OBJS = \
-	basename.$(oext)	\
-	dirname.$(oext)		\
-	getlogin.$(oext)	\
-	getpass.$(oext) 	\
-	getpwent.$(oext) 	\
-	getut.$(oext)
-
-if ELIX_LEVEL_1
-LIB_OBJS =
-else
-if ELIX_LEVEL_2
-LIB_OBJS = $(ELIX_2_OBJS)
-else
-if ELIX_LEVEL_3
-LIB_OBJS = $(ELIX_2_OBJS)
-else
-LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_4_OBJS)
-endif
-endif
-endif
+LIB_SOURCES = \
+	getpass.c sigset.c getpwent.c ttyname.c getut.c getlogin.c getcwd.c
 
 libunix_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libunix.la
-libunix_la_SOURCES = $(GENERAL_SOURCES)
-libunix_la_LIBADD = $(LIB_OBJS)
-libunix_la_DEPENDENCIES = $(LIB_OBJS)
+libunix_la_SOURCES = $(LIB_SOURCES)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(GENERAL_SOURCES)
-lib_a_LIBADD = $(LIB_OBJS)
-lib_a_DEPENDENCIES = $(LIB_OBJS)
+lib_a_SOURCES = $(LIB_SOURCES)
 noinst_DATA =
 endif # USE_LIBTOOL
 

@@ -37,9 +37,9 @@ extern "C" {
 #define	O_CREAT		_FCREAT
 #define	O_TRUNC		_FTRUNC
 #define	O_EXCL		_FEXCL
-#define O_SYNC		_FSYNC
+/*	O_SYNC		_FSYNC		not posix, defined below */
 /*	O_NDELAY	_FNDELAY 	set in include/fcntl.h */
-/*	O_NDELAY	_FNBIO 		set in include/fcntl.h */
+/*	O_NDELAY	_FNBIO 		set in 5include/fcntl.h */
 #define	O_NONBLOCK	_FNONBLOCK
 #define	O_NOCTTY	_FNOCTTY
 /* For machines which care - */
@@ -67,6 +67,8 @@ extern "C" {
 #endif
 
 #ifndef	_POSIX_SOURCE
+
+#define	O_SYNC		_FSYNC
 
 /*
  * Flags that work for fcntl(fd, F_SETFL, FXXXX)
@@ -133,7 +135,6 @@ extern "C" {
 
 /*#include <sys/stdtypes.h>*/
 
-#ifndef __CYGWIN__
 /* file segment locking set data type - information passed to system by user */
 struct flock {
 	short	l_type;		/* F_RDLCK, F_WRLCK, or F_UNLCK */
@@ -143,7 +144,6 @@ struct flock {
 	short	l_pid;		/* returned with F_GETLK */
 	short	l_xxx;		/* reserved for future use */
 };
-#endif /* __CYGWIN__ */
 
 #ifndef	_POSIX_SOURCE
 /* extended file segment locking set data type */
@@ -169,13 +169,8 @@ extern int fcntl _PARAMS ((int, int, ...));
 
 /* Provide _<systemcall> prototypes for functions provided by some versions
    of newlib.  */
-#ifdef _COMPILING_NEWLIB
 extern int _open _PARAMS ((const char *, int, ...));
 extern int _fcntl _PARAMS ((int, int, ...));
-#ifdef __LARGE64_FILES
-extern int _open64 _PARAMS ((const char *, int, ...));
-#endif
-#endif
 
 #ifdef __cplusplus
 }

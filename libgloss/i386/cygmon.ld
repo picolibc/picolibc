@@ -1,5 +1,5 @@
 STARTUP(cygmon-crt0.o)
-ENTRY(__start)
+ENTRY(_start)
 GROUP(-lcygmon -lc -lcygmon -lgcc)
 SEARCH_DIR(.)
 __DYNAMIC  =  0;
@@ -34,7 +34,6 @@ SECTIONS
     *(.rel.sdata)
     PROVIDE (__runtime_reloc_stop = .);
     *(.fini)
-    . = ALIGN(4);
      __CTOR_LIST__ = .;
     CONSTRUCTORS
     LONG(-1)
@@ -46,28 +45,16 @@ SECTIONS
     *(.dtors)
      LONG(0)
     __DTOR_END__ = .;
-    PROVIDE(_etext  =  .);
-    PROVIDE(__etext  =  .);
+     etext  =  .;
+     _etext  =  .;
   }
   . = .;
   .rdata : {
     *(.rdata)
   }
-  .rodata : {
-    *(.rodata)
-    *(.rodata.*)
-  }
-  .eh_frame :
-  {
-    PROVIDE (__EH_FRAME_BEGIN__ = .);
-    *(.eh_frame)
-    PROVIDE (__EH_FRAME_END__ = .);
-  }
-  _fdata = ALIGN(16);
+   _fdata = ALIGN(16);
   .data : {
     *(.data)
-    *(.gcc_except_table)
-    *(.gcc_exc)
   }
   . = ALIGN(8);
   _gp = . + 0x8000;
@@ -82,20 +69,20 @@ SECTIONS
     *(.sdata)
   }
   . = ALIGN(4);
-   PROVIDE(_edata  =  .);
-   PROVIDE(__edata  =  .);
+   edata  =  .;
+   _edata  =  .;
    fbss = .;
    _fbss = .;
   .sbss : {
-    PROVIDE(__bss_start = .);
     *(.sbss)
     *(.scommon)
   }
   .bss : {
+    __bss_start = . ;
     *(.bss)
     *(COMMON)
-    PROVIDE(__bss_end = .);
+    __bss_end = . ;
   }
-  PROVIDE(_end = .);
-  PROVIDE(__end = .);
+   end = .;
+   _end = .;
 }

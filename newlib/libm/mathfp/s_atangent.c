@@ -55,10 +55,10 @@ DESCRIPTION
 <<atanf>> is identical to <<atan>>, save that it operates on <<floats>>.
 
 RETURNS
-@ifnottex
+@ifinfo
 <<atan>> returns a value in radians, in the range of -pi/2 to pi/2.
 <<atan2>> returns a value in radians, in the range of -pi/2 to pi/2.
-@end ifnottex
+@end ifinfo
 @tex
 <<atan>> returns a value in radians, in the range of $-\pi/2$ to $\pi/2$.
 <<atan2>> returns a value in radians, in the range of $-\pi/2$ to $\pi/2$.
@@ -197,9 +197,9 @@ _DEFUN (atangent, (double, double, double, int),
 
   if (arctan2)
     {
-      if (u < 0.0)
+      if (u < 0.0 || branch == 2)
         res = __PI - res;
-      if (v < 0.0)
+      if (v < 0.0 || branch == 1)
         res = -res;
     }
   else if (x < 0.0)

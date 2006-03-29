@@ -28,6 +28,7 @@ program_suffix=NONE
 program_transform_name=s,x,x,
 silent=
 site=
+sitefile=
 srcdir=
 target=NONE
 verbose=
@@ -142,6 +143,7 @@ Configuration:
   --help                  print this message
   --no-create             do not create output files
   --quiet, --silent       do not print \`checking...' messages
+  --site-file=FILE        use FILE as the site file
   --version               print the version of autoconf that created configure
 Directory and file names:
   --prefix=PREFIX         install architecture-independent files in PREFIX
@@ -312,6 +314,11 @@ EOF
   -site=* | --site=* | --sit=*)
     site="$ac_optarg" ;;
 
+  -site-file | --site-file | --site-fil | --site-fi | --site-f)
+    ac_prev=sitefile ;;
+  -site-file=* | --site-file=* | --site-fil=* | --site-fi=* | --site-f=*)
+    sitefile="$ac_optarg" ;;
+
   -srcdir | --srcdir | --srcdi | --srcd | --src | --sr)
     ac_prev=srcdir ;;
   -srcdir=* | --srcdir=* | --srcdi=* | --srcd=* | --src=* | --sr=*)
@@ -477,12 +484,16 @@ fi
 srcdir=`echo "${srcdir}" | sed 's%\([^/]\)/*$%\1%'`
 
 # Prefer explicitly selected file to automatically selected ones.
-if test -z "$CONFIG_SITE"; then
-  if test "x$prefix" != xNONE; then
-    CONFIG_SITE="$prefix/share/config.site $prefix/etc/config.site"
-  else
-    CONFIG_SITE="$ac_default_prefix/share/config.site $ac_default_prefix/etc/config.site"
+if test -z "$sitefile"; then
+  if test -z "$CONFIG_SITE"; then
+    if test "x$prefix" != xNONE; then
+      CONFIG_SITE="$prefix/share/config.site $prefix/etc/config.site"
+    else
+      CONFIG_SITE="$ac_default_prefix/share/config.site $ac_default_prefix/etc/config.site"
+    fi
   fi
+else
+  CONFIG_SITE="$sitefile"
 fi
 for ac_site_file in $CONFIG_SITE; do
   if test -r "$ac_site_file"; then
@@ -567,7 +578,7 @@ ac_configure=$ac_aux_dir/configure # This should be Cygnus configure.
 # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
 # ./install, which can be erroneously created by make from ./install.sh.
 echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
-echo "configure:571: checking for a BSD compatible install" >&5
+echo "configure:582: checking for a BSD compatible install" >&5
 if test -z "$INSTALL"; then
 if eval "test \"`echo '$''{'ac_cv_path_install'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -648,7 +659,7 @@ else { echo "configure: error: can not run $ac_config_sub" 1>&2; exit 1; }
 fi
 
 echo $ac_n "checking host system type""... $ac_c" 1>&6
-echo "configure:652: checking host system type" >&5
+echo "configure:663: checking host system type" >&5
 
 host_alias=$host
 case "$host_alias" in
@@ -669,7 +680,7 @@ host_os=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 echo "$ac_t""$host" 1>&6
 
 echo $ac_n "checking target system type""... $ac_c" 1>&6
-echo "configure:673: checking target system type" >&5
+echo "configure:684: checking target system type" >&5
 
 target_alias=$target
 case "$target_alias" in
@@ -687,7 +698,7 @@ target_os=`echo $target | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 echo "$ac_t""$target" 1>&6
 
 echo $ac_n "checking build system type""... $ac_c" 1>&6
-echo "configure:691: checking build system type" >&5
+echo "configure:702: checking build system type" >&5
 
 build_alias=$build
 case "$build_alias" in
@@ -717,14 +728,11 @@ else
 fi
 
 case "${target}" in
-  i[3456]86-*-elf*|i[3456]86-*-coff*)
+  i386-*-elf*)
 	configdirs="${configdirs} i386 testsuite";
 	;;
   m32r-*-*)
 	configdirs="${configdirs} m32r testsuite"
-	;;
-  m68hc11-*-*|m6811-*-*|m68hc12-*-*|m6812-*-*)
-	configdirs="m68hc11 testsuite"
 	;;
   m68*-*-*)
 	configdirs="${configdirs} m68k testsuite"
@@ -753,9 +761,6 @@ case "${target}" in
   *arm-wince-pe)
 	configdirs="wince"
 	;;
-  *arm-*-*)
-	configdirs="${configdirs} arm"
-	;;
   sh*-*-pe)
 	configdirs="wince"
 	;;
@@ -774,47 +779,15 @@ case "${target}" in
   mn10300-*-*)
 	configdirs="${configdirs} mn10300 testsuite"
 	;;
-  cris-*-* | crisv32-*-*)
-	configdirs="${configdirs} cris testsuite"
-	;;
-  crx-*-*)
-	configdirs="${configdirs} crx"
-	;;
   d30v-*-*)
 	configdirs="${configdirs} d30v testsuite"
 	;;
   fr30-*-*)
 	configdirs="${configdirs} fr30 testsuite"
 	;;
-  frv*-*-*)
-	configdirs="${configdirs} frv testsuite"
-	;;
   mcore-*-*)
 	configdirs="${configdirs} mcore testsuite"
 	;;
-  mt-*-*)
-        configdirs="${configdirs} mt testsuite";;
-  xstormy16-*-*)
-	configdirs="${configdirs} xstormy16 testsuite"
-	;;
-  m32c-*-*)
-	configdirs="${configdirs} m32c testsuite"
-	;;
-  strongarm-*-elf | strongarm-*-coff)
-	configdirs="${configdirs} arm testsuite";
-	;;
-  arm*-*-elf | arm*-*-coff)
-	configdirs="${configdirs} arm testsuite";
-	;;
-  ep9312-*-elf | ep9312-*-coff)
-	configdirs="${configdirs} arm testsuite";
-	;;
-  xscale-*-elf | xscale-*-coff)
-	configdirs="${configdirs} arm testsuite";
-	;;
-  iq2000-*-*)
-	configdirs="${configdirs} iq2000 testsuite";;
-
 esac
 
 # temporarily strip out testsuite
@@ -834,7 +807,7 @@ subdirs="$configdirs"
 # Extract the first word of "gcc", so it can be a program name with args.
 set dummy gcc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:838: checking for $ac_word" >&5
+echo "configure:826: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -864,7 +837,7 @@ if test -z "$CC"; then
   # Extract the first word of "cc", so it can be a program name with args.
 set dummy cc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:868: checking for $ac_word" >&5
+echo "configure:856: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -913,7 +886,7 @@ fi
 fi
 
 echo $ac_n "checking whether we are using GNU C""... $ac_c" 1>&6
-echo "configure:917: checking whether we are using GNU C" >&5
+echo "configure:905: checking whether we are using GNU C" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_gcc'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -922,7 +895,7 @@ else
   yes;
 #endif
 EOF
-if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:926: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
+if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:914: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
   ac_cv_prog_gcc=yes
 else
   ac_cv_prog_gcc=no
@@ -937,7 +910,7 @@ if test $ac_cv_prog_gcc = yes; then
   ac_save_CFLAGS="$CFLAGS"
   CFLAGS=
   echo $ac_n "checking whether ${CC-cc} accepts -g""... $ac_c" 1>&6
-echo "configure:941: checking whether ${CC-cc} accepts -g" >&5
+echo "configure:929: checking whether ${CC-cc} accepts -g" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_cc_g'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -969,7 +942,7 @@ AS=${AS-as}
 # Extract the first word of "ar", so it can be a program name with args.
 set dummy ar; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:973: checking for $ac_word" >&5
+echo "configure:961: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_AR'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1003,7 +976,7 @@ LD=${LD-ld}
 # Extract the first word of "ranlib", so it can be a program name with args.
 set dummy ranlib; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:1007: checking for $ac_word" >&5
+echo "configure:995: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_RANLIB'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else

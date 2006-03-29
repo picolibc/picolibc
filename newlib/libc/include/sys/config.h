@@ -1,18 +1,31 @@
 #ifndef __SYS_CONFIG_H__
 #define __SYS_CONFIG_H__
 
-#include <machine/ieeefp.h>  /* floating point macros */
-
 /* exceptions first */
-#if defined(__H8500__) || defined(__W65__)
+/* ??? Why is much of this stuff duplicated with machine/ieeefp.h?  */
+#if defined(__H8300__) || defined(__H8500__) || defined (__H8300H__) ||  defined(__W65__) || defined (__H8300S__)
+#define _FLOAT_ARG float
 #define __SMALL_BITFIELDS
+#define _DOUBLE_IS_32BITS
+#define __IEEE_BIG_ENDIAN
 /* ???  This conditional is true for the h8500 and the w65, defining H8300
    in those cases probably isn't the right thing to do.  */
 #define H8300 1
 #endif
 
+#ifdef __W65__
+#define _DOUBLE_IS_32BITS
+#define __SMALL_BITFIELDS
+#define __IEEE_BIG_ENDIAN
+#undef INT_MAX
+#undef UINT_MAX
+#define INT_MAX 32767
+#define UINT_MAX 65535
+
+#endif
+
 /* 16 bit integer machines */
-#if defined(__Z8001__) || defined(__Z8002__) || defined(__H8500__) || defined(__W65__) || defined (__mn10200__) || defined (__AVR__)
+#if defined(__Z8001__) || defined(__Z8002__) || defined(__H8300__) || defined(__H8500__) || defined(__W65__) || defined (__H8300H__) || defined (__H8300S__) || defined (__mn10200__) || defined (__AVR__)
 
 #undef INT_MAX
 #undef UINT_MAX
@@ -20,34 +33,14 @@
 #define UINT_MAX 65535
 #endif
 
-#if defined (__H8300__) || defined (__H8300H__) || defined(__H8300S__) || defined (__H8300SX__)
-#define __SMALL_BITFIELDS
-#define H8300 1
-#undef INT_MAX
-#undef UINT_MAX
-#define INT_MAX __INT_MAX__
-#define UINT_MAX (__INT_MAX__ * 2U + 1)
-#endif
-
-#ifdef __W65__
-#define __SMALL_BITFIELDS
-#endif
-
 #if defined(__D10V__)
-#define __SMALL_BITFIELDS
 #undef INT_MAX
 #undef UINT_MAX
 #define INT_MAX __INT_MAX__
 #define UINT_MAX (__INT_MAX__ * 2U + 1)
+#define _DOUBLE_IS_32BITS
 #define _POINTER_INT short
-#endif
-
-#if defined(__mc68hc11__) || defined(__mc68hc12__) || defined(__mc68hc1x__)
-#undef INT_MAX
-#undef UINT_MAX
-#define INT_MAX __INT_MAX__
-#define UINT_MAX (__INT_MAX__ * 2U + 1)
-#define _POINTER_INT short
+#define __IEEE_BIG_ENDIAN
 #endif
 
 #ifdef ___AM29K__
@@ -59,112 +52,92 @@
 /* in other words, go32 */
 #define _FLOAT_RET double
 #endif
-#if defined(__linux__) || defined(__RDOS__)
-/* we want the reentrancy structure to be returned by a function */
-#define __DYNAMIC_REENT__
-#define HAVE_GETDATE
-#define _HAVE_SYSTYPES
-#define _READ_WRITE_RETURN_TYPE _ssize_t
-#define __LARGE64_FILES 1
-/* we use some glibc header files so turn on glibc large file feature */
-#define _LARGEFILE64_SOURCE 1
 #endif
+
+#ifdef __M32R__
+#define __IEEE_BIG_ENDIAN
+#endif
+
+#ifdef __m68k__
+/* This is defined in machine/ieeefp.h; need to check is it redundant here? */
+#define __IEEE_BIG_ENDIAN
+#endif
+
+#ifdef __mn10300__
+#define __IEEE_LITTLE_ENDIAN
 #endif
 
 #ifdef __mn10200__
+#define _DOUBLE_IS_32BITS
 #define __SMALL_BITFIELDS
+#define __IEEE_LITTLE_ENDIAN
+#endif
+
+#ifdef __MMIX__
+#define __IEEE_BIG_ENDIAN
 #endif
 
 #ifdef __AVR__
+#define _DOUBLE_IS_32BITS
 #define __SMALL_BITFIELDS
+#define __IEEE_LITTLE_ENDIAN
 #define _POINTER_INT short
+#endif
+
+#ifdef __TIC80__
+#define __IEEE_LITTLE_ENDIAN
 #endif
 
 #ifdef __v850
+#define __IEEE_LITTLE_ENDIAN
 #define __ATTRIBUTE_IMPURE_PTR__ __attribute__((__sda__))
 #endif
 
+#ifdef __D30V__
+#define __IEEE_BIG_ENDIAN
+#endif
+
 /* For the PowerPC eabi, force the _impure_ptr to be in .sdata */
-#if defined(__PPC__)
-#if defined(_CALL_SYSV)
+#if defined(__PPC__) && defined(_CALL_SYSV)
 #define __ATTRIBUTE_IMPURE_PTR__ __attribute__((__section__(".sdata")))
 #endif
-#ifdef __SPE__
-#define _LONG_DOUBLE double
-#endif
-#endif
 
-#ifdef __xstormy16__
-#define __SMALL_BITFIELDS
-#undef INT_MAX
-#undef UINT_MAX
-#define INT_MAX __INT_MAX__
-#define UINT_MAX (__INT_MAX__ * 2U + 1)
-#define MALLOC_ALIGNMENT 8
-#define _POINTER_INT short
-#define __BUFSIZ__ 16
-#define _REENT_SMALL
-#endif
-#ifdef __m32c__
-#define __SMALL_BITFIELDS
-#undef INT_MAX
-#undef UINT_MAX
-#define INT_MAX __INT_MAX__
-#define UINT_MAX (__INT_MAX__ * 2U + 1)
-#define MALLOC_ALIGNMENT 8
-#if defined(__r8c_cpu__) || defined(__m16c_cpu__)
-#define _POINTER_INT short
+#ifdef __sparc__
+#ifdef __LITTLE_ENDIAN_DATA__
+#define __IEEE_LITTLE_ENDIAN
 #else
-#define _POINTER_INT long
+#define __IEEE_BIG_ENDIAN
 #endif
-#define __BUFSIZ__ 16
-#define _REENT_SMALL
-#endif /* __m32c__ */
-
-
-/* This block should be kept in sync with GCC's limits.h.  The point
-   of having these definitions here is to not include limits.h, which
-   would pollute the user namespace, while still using types of the
-   the correct widths when deciding how to define __int32_t and
-   __int64_t.  */
-#ifndef __INT_MAX__
-# ifdef INT_MAX
-#  define __INT_MAX__ INT_MAX
-# else
-#  define __INT_MAX__ 2147483647
-# endif
 #endif
 
-#ifndef __LONG_MAX__
-# ifdef LONG_MAX
-#  define __LONG_MAX__ LONG_MAX
-# else
-#  if defined (__alpha__) || (defined (__sparc__) && defined(__arch64__)) \
-      || defined (__sparcv9)
-#   define __LONG_MAX__ 9223372036854775807L
-#  else
-#   define __LONG_MAX__ 2147483647L
-#  endif /* __alpha__ || sparc64 */
-# endif
+#if INT_MAX == 32767
+typedef long int __int32_t;
+typedef unsigned long int __uint32_t;
+#else
+typedef int __int32_t;
+typedef unsigned int __uint32_t;
 #endif
-/* End of block that should be kept in sync with GCC's limits.h.  */
 
 #ifndef _POINTER_INT
 #define _POINTER_INT long
 #endif
 
-#ifdef __frv__
-#define __ATTRIBUTE_IMPURE_PTR__ __attribute__((__section__(".sdata")))
-#endif
 #undef __RAND_MAX
-#if __INT_MAX__ == 32767
+#if INT_MAX == 32767
 #define __RAND_MAX 32767
 #else
 #define __RAND_MAX 0x7fffffff
 #endif
 
-#if defined(__CYGWIN__)
-#include <cygwin/config.h>
+
+#if defined(__CYGWIN32__) || defined(__CYGWIN__)
+#define __FILENAME_MAX__ (260 - 1 /* NUL */)
+#define _READ_WRITE_RETURN_TYPE _ssize_t
+#if defined(__INSIDE_CYGWIN__) || defined(_COMPILING_NEWLIB)
+#define __IMPORT
+#else
+#define __IMPORT __declspec(dllimport)
+#endif
 #endif
 
 #if defined(__rtems__)
@@ -181,12 +154,6 @@
    "int" for some time.  If not specified, "int" is defaulted.  */
 #ifndef _READ_WRITE_RETURN_TYPE
 #define _READ_WRITE_RETURN_TYPE int
-#endif
-
-#ifndef __WCHAR_MAX__
-#if __INT_MAX__ == 32767 || defined (_WIN32)
-#define __WCHAR_MAX__ 0xffffu
-#endif
 #endif
 
 #endif /* __SYS_CONFIG_H__ */

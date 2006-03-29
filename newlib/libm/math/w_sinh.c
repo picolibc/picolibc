@@ -37,9 +37,9 @@ TRAD_SYNOPSIS
 DESCRIPTION
 	<<sinh>> computes the hyperbolic sine of the argument <[x]>.
 	Angles are specified in radians.   <<sinh>>(<[x]>) is defined as 
-	@ifnottex
+	@ifinfo
 	. (exp(<[x]>) - exp(-<[x]>))/2
-	@end ifnottex
+	@end ifinfo
 	@tex
 	$${e^x - e^{-x}}\over 2$$
 	@end tex

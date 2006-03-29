@@ -1,21 +1,4 @@
 /*
- * Copyright (c) 1990 The Regents of the University of California.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms are permitted
- * provided that the above copyright notice and this paragraph are
- * duplicated in all such forms and that any documentation,
- * advertising materials, and other materials related to such
- * distribution and use acknowledge that the software was developed
- * by the University of California, Berkeley.  The name of the
- * University may not be used to endorse or promote products derived
- * from this software without specific prior written permission.
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
- */
-
-/*
 FUNCTION
 <<rename>>---rename a file
 
@@ -28,7 +11,7 @@ ANSI_SYNOPSIS
 	#include <stdio.h>
 	int rename(const char *<[old]>, const char *<[new]>);
 
-	int _rename_r(struct _reent *<[reent]>, 
+	int _rename_r(void *<[reent]>, 
                       const char *<[old]>, const char *<[new]>);
 
 TRAD_SYNOPSIS
@@ -38,7 +21,7 @@ TRAD_SYNOPSIS
 	char *<[new]>;
 
 	int _rename_r(<[reent]>, <[old]>, <[new]>)
-	struct _reent *<[reent]>;
+	char *<[reent]>;
 	char *<[old]>;
 	char *<[new]>;
 
@@ -65,16 +48,15 @@ as <<*<[new]>>> may vary from one implementation to another.
 Supporting OS subroutines required: <<link>>, <<unlink>>, or <<rename>>.
 */
 
-#include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <sys/unistd.h>
+#include <reent.h>
 
 int
-_DEFUN(_rename_r, (ptr, old, new),
-       struct _reent *ptr _AND
-       _CONST char *old   _AND
-       _CONST char *new)
+_rename_r (ptr, old, new)
+     struct _reent *ptr;
+     _CONST char *old;
+     _CONST char *new;
 {
 #ifdef HAVE_RENAME
   return _rename (old,new);
@@ -94,9 +76,9 @@ _DEFUN(_rename_r, (ptr, old, new),
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(rename, (old, new),
-       _CONST char *old _AND
-       _CONST char *new)
+rename (old, new)
+     _CONST char *old;
+     _CONST char *new;
 {
   return _rename_r (_REENT, old, new);
 }

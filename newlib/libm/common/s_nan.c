@@ -5,7 +5,7 @@
 
 /*
 FUNCTION
-	<<nan>>, <<nanf>>---representation of ``Not a Number''
+	<<nan>>, <<nanf>>---representation of infinity
 
 INDEX
 	nan
@@ -14,8 +14,8 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <math.h>
-	double nan(const char *);
-	float nanf(const char *);
+	double nan(void);
+	float nanf(void);
 
 TRAD_SYNOPSIS
 	#include <math.h>
@@ -25,8 +25,7 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 	<<nan>> and <<nanf>> return an IEEE NaN (Not a Number) in
-	double- and single-precision arithmetic respectively.  The
-	argument is currently disregarded.
+	double and single precision arithmetic respectivly.
 
 QUICKREF
 	nan - pure
@@ -37,7 +36,7 @@ QUICKREF
 
 #ifndef _DOUBLE_IS_32BITS
 
-	double nan(const char *unused)
+	double nan()
 {
 	double x;
 

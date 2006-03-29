@@ -95,22 +95,21 @@ _DEFUN (Balloc, (ptr, k), struct _reent *ptr _AND int k)
   int x;
   _Bigint *rv ;
 
-  _REENT_CHECK_MP(ptr);
-  if (_REENT_MP_FREELIST(ptr) == NULL)
+  if (ptr->_freelist == NULL)
     {
       /* Allocate a list of pointers to the mprec objects */
-      _REENT_MP_FREELIST(ptr) = (struct _Bigint **) _calloc_r (ptr, 
+      ptr->_freelist = (struct _Bigint **) _calloc_r (ptr, 
 						      sizeof (struct _Bigint *),
 						      _Kmax + 1);
-      if (_REENT_MP_FREELIST(ptr) == NULL)
+      if (ptr->_freelist == NULL)
 	{
 	  return NULL;
 	}
     }
 
-  if ((rv = _REENT_MP_FREELIST(ptr)[k]) != 0)
+  if ((rv = ptr->_freelist[k]) != 0)
     {
-      _REENT_MP_FREELIST(ptr)[k] = rv->_next;
+      ptr->_freelist[k] = rv->_next;
     }
   else
     {
@@ -131,11 +130,10 @@ _DEFUN (Balloc, (ptr, k), struct _reent *ptr _AND int k)
 void
 _DEFUN (Bfree, (ptr, v), struct _reent *ptr _AND _Bigint * v)
 {
-  _REENT_CHECK_MP(ptr);
   if (v)
     {
-      v->_next = _REENT_MP_FREELIST(ptr)[v->_k];
-      _REENT_MP_FREELIST(ptr)[v->_k] = v;
+      v->_next = ptr->_freelist[v->_k];
+      ptr->_freelist[v->_k] = v;
     }
 }
 
@@ -427,11 +425,10 @@ _DEFUN (pow5mult,
 
   if (!(k >>= 2))
     return b;
-  _REENT_CHECK_MP(ptr);
-  if (!(p5 = _REENT_MP_P5S(ptr)))
+  if (!(p5 = ptr->_p5s))
     {
       /* first time */
-      p5 = _REENT_MP_P5S(ptr) = i2b (ptr, 625);
+      p5 = ptr->_p5s = i2b (ptr, 625);
       p5->_next = 0;
     }
   for (;;)

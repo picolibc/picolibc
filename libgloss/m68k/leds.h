@@ -32,6 +32,5 @@
 #define FUDGE(x) ((x >= 0xa && x <= 0xf) ? (x + 'a') & 0x7f : (x + '0') & 0x7f)
 
 extern void led_putnum( char );
-void zylons();
 
 #endif		/* __LEDS_H__ */

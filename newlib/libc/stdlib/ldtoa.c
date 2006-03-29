@@ -41,10 +41,7 @@ void _IO_ldtostr(long double *, char *, int, int, char);
  /* The exponent of 1.0 */
  #define EXONE (0x3fff)
 
- /* Maximum exponent digits - base 10 */
- #define MAX_EXP_DIGITS 5
-
-/* Control structure for long double conversion including rounding precision values.
+/* Control structure for long doublue conversion including rounding precision values.
  * rndprc can be set to 80 (if NE=6), 64, 56, 53, or 24 bits.
  */
 typedef struct
@@ -79,12 +76,6 @@ static void eclear(register short unsigned int *x);
 static void einfin(register short unsigned int *x, register LDPARMS *ldp);
 static void efloor(short unsigned int *x, short unsigned int *y, LDPARMS *ldp);
 static void etoasc(short unsigned int *x, char *string, int ndigs, int outformat, LDPARMS *ldp);
-
-union uconv
-{
-  unsigned short pe;
-  long double d;
-};
 
 #if LDBL_MANT_DIG == 24
 static void e24toe(short unsigned int *pe, short unsigned int *y, LDPARMS *ldp);
@@ -1868,7 +1859,7 @@ if((yy[NE-1] & 0x7fff) == 0 && (yy[NE-2] & 0x8000) == 0)
 #ifdef INFINITY
 /* Point to the exponent field.  */
 p = &yy[NE-1];
-if( (*p & 0x7fff) == 0x7fff )
+if( *p == 0x7fff )
 	{
 #ifdef NANS
 #ifdef IBMPC
@@ -2712,38 +2703,31 @@ _ldtoa_r (struct _reent *ptr, long double d, int mode, int ndigits, int *decpt,
 {
 unsigned short e[NI];
 char *s, *p;
-int i, j, k;
-int orig_ndigits;
+int k;
 LDPARMS rnd;
 LDPARMS *ldp = &rnd;
 char *outstr;
-char outbuf[NDEC + MAX_EXP_DIGITS + 10];
-union uconv du;
-du.d = d;
 
-orig_ndigits = ndigits;
 rnd.rlast = -1;
 rnd.rndprc = NBITS;
 
-  _REENT_CHECK_MP(ptr);
-
 /* reentrancy addition to use mprec storage pool */
-if (_REENT_MP_RESULT(ptr))
+if (ptr->_result)
   {
-    _REENT_MP_RESULT(ptr)->_k = _REENT_MP_RESULT_K(ptr);
-    _REENT_MP_RESULT(ptr)->_maxwds = 1 << _REENT_MP_RESULT_K(ptr);
-    Bfree (ptr, _REENT_MP_RESULT(ptr));
-    _REENT_MP_RESULT(ptr) = 0;
+    ptr->_result->_k = ptr->_result_k;
+    ptr->_result->_maxwds = 1 << ptr->_result_k;
+    Bfree (ptr, ptr->_result);
+    ptr->_result = 0;
   }
 
 #if LDBL_MANT_DIG == 24
-e24toe( &du.pe, e, ldp );
+e24toe( (unsigned short *)&d, e, ldp );
 #elif LDBL_MANT_DIG == 53
-e53toe( &du.pe, e, ldp );
+e53toe( (unsigned short *)&d, e, ldp );
 #elif LDBL_MANT_DIG == 64
-e64toe( &du.pe, e, ldp );
+e64toe( (unsigned short *)&d, e, ldp );
 #else
-e113toe( &du.pe, e, ldp );
+e113toe( (unsigned short *)&d, e, ldp );
 #endif
 
 if( eisneg(e) )
@@ -2758,14 +2742,18 @@ if( mode != 3 )
    For now, just ask for 20 digits which is enough but sometimes too many.  */
 if( mode == 0 )
         ndigits = 20;
-
 /* This sanity limit must agree with the corresponding one in etoasc, to
    keep straight the returned value of outexpon.  */
 if( ndigits > NDEC )
         ndigits = NDEC;
 
-etoasc( e, outbuf, ndigits, mode, ldp );
-s =  outbuf;
+/* reentrancy addition to use mprec storage pool */
+ptr->_result = Balloc (ptr, 3);
+ptr->_result_k = 3;
+outstr = (char *)ptr->_result;
+
+etoasc( e, outstr, ndigits, mode, ldp );
+s =  outstr;
 if( eisinf(e) || eisnan(e) )
         {
         *decpt = 9999;
@@ -2776,7 +2764,7 @@ if( eisinf(e) || eisnan(e) )
 /* Transform the string returned by etoasc into what the caller wants.  */
 
 /* Look for decimal point and delete it from the string. */
-s = outbuf;
+s = outstr;
 while( *s != '\0' )
         {
         if( *s == '.' )
@@ -2797,19 +2785,19 @@ while( *s != '\0' )
 nodecpt:
 
 /* Back up over the exponent field. */
-while( *s != 'E' && s > outbuf)
+while( *s != 'E' && s > outstr)
         --s;
 *s = '\0';
 
 stripspaces:
 
 /* Strip leading spaces and sign. */
-p = outbuf;
+p = outstr;
 while( *p == ' ' || *p == '-')
         ++p;
 
 /* Find new end of string.  */
-s = outbuf;
+s = outstr;
 while( (*s++ = *p++) != '\0' )
         ;
 --s;
@@ -2822,38 +2810,20 @@ else if( ndigits > ldp->outexpon )
 else
         k = ldp->outexpon;
 
-while( *(s-1) == '0' && ((s - outbuf) > k))
+while( *(s-1) == '0' && ((s - outstr) > k))
         *(--s) = '\0';
 
 /* In f format, flush small off-scale values to zero.
    Rounding has been taken care of by etoasc. */
 if( mode == 3 && ((ndigits + ldp->outexpon) < 0))
         {
-        s = outbuf;
+        s = outstr;
         *s = '\0';
         *decpt = 0;
         }
 
-/* reentrancy addition to use mprec storage pool */
-/* we want to have enough space to hold the formatted result */
-
-if (mode == 3) /* f format, account for sign + dec digits + decpt + frac */
-  i = *decpt + orig_ndigits + 3;
-else /* account for sign + max precision digs + E + exp sign + exponent */
-  i = orig_ndigits + MAX_EXP_DIGITS + 4;
-
-j = sizeof (__ULong);
-for (_REENT_MP_RESULT_K(ptr) = 0; sizeof (_Bigint) - sizeof (__ULong) + j <= i; j <<= 1)
-  _REENT_MP_RESULT_K(ptr)++;
-_REENT_MP_RESULT(ptr) = Balloc (ptr, _REENT_MP_RESULT_K(ptr));
-
-/* Copy from internal temporary buffer to permanent buffer.  */
-outstr = (char *)_REENT_MP_RESULT(ptr);
-strcpy (outstr, outbuf);
-
 if( rve )
-        *rve = outstr + (s - outbuf);
-
+        *rve = s;
 return outstr;
 }
 
@@ -2866,22 +2836,23 @@ int
 _ldcheck (long double *d)
 {
 unsigned short e[NI];
+char *s, *p;
+int k;
 LDPARMS rnd;
 LDPARMS *ldp = &rnd;
+char *outstr;
 
 rnd.rlast = -1;
 rnd.rndprc = NBITS;
 
-union uconv du;
-du.d = *d;
 #if LDBL_MANT_DIG == 24
-e24toe( &du.pe, e, ldp );
+e24toe( (unsigned short *)d, e, ldp );
 #elif LDBL_MANT_DIG == 53
-e53toe( &du.pe, e, ldp );
+e53toe( (unsigned short *)d, e, ldp );
 #elif LDBL_MANT_DIG == 64
-e64toe( &du.pe, e, ldp );
+e64toe( (unsigned short *)d, e, ldp );
 #else
-e113toe( &du.pe, e, ldp );
+e113toe( (unsigned short *)d, e, ldp );
 #endif
 
 if( (e[NE-1] & 0x7fff) == 0x7fff )
@@ -3230,7 +3201,7 @@ ldp->outexpon =  expon;
 
 long double _strtold (char *s, char **se)
 {
-  union uconv x;
+  long double x;
   LDPARMS rnd;
   LDPARMS *ldp = &rnd;
   int lenldstr;
@@ -3238,10 +3209,10 @@ long double _strtold (char *s, char **se)
   rnd.rlast = -1;
   rnd.rndprc = NBITS;
 
-  lenldstr = asctoeg( s, &x.pe, LDBL_MANT_DIG, ldp );
+  lenldstr = asctoeg( s, (unsigned short *)&x, LDBL_MANT_DIG, ldp );
   if (se)
     *se = s + lenldstr;
-  return x.d;
+  return x;
 }
 
 #define REASONABLE_LEN 200

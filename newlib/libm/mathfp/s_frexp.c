@@ -26,17 +26,17 @@ TRAD_SYNOPSIS
 
 
 DESCRIPTION
-        All nonzero, normal numbers can be described as <[m]> * 2**<[p]>.
+        All non zero, normal numbers can be described as <[m]> * 2**<[p]>.
         <<frexp>> represents the double <[val]> as a mantissa <[m]>
         and a power of two <[p]>. The resulting mantissa will always
         be greater than or equal to <<0.5>>, and less than <<1.0>> (as
         long as <[val]> is nonzero). The power of two will be stored
         in <<*>><[exp]>.
 
-@ifnottex
+@ifinfo
 <[m]> and <[p]> are calculated so that
 <[val]> is <[m]> times <<2>> to the power <[p]>.
-@end ifnottex
+@end ifinfo
 @tex
 <[m]> and <[p]> are calculated so that
 $ val = m \times 2^p $.
@@ -82,17 +82,6 @@ double frexp (double d, int *exp)
   double f;
   __uint32_t hd, ld, hf, lf;
 
-  /* Check for special values. */
-  switch (numtest (d))
-    {
-      case NAN:
-      case INF:
-        errno = EDOM;
-      case 0:
-        *exp = 0;
-        return (d);
-    }
-
   EXTRACT_WORDS (hd, ld, d);
 
   /* Get the exponent. */
@@ -104,6 +93,16 @@ double frexp (double d, int *exp)
   hf |= 0x3fe00000;
 
   INSERT_WORDS (f, hf, lf);
+
+  /* Check for special values. */
+  switch (numtest (f))
+    {
+      case NAN:
+      case INF:
+        errno = EDOM;
+        *exp = 0;
+        return (f);
+    }
 
   return (f);
 }

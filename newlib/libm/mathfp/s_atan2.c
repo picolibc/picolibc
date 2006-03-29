@@ -29,9 +29,9 @@ DESCRIPTION
 
 <<atan2>> computes the inverse tangent (arc tangent) of <[y]>/<[x]>.
 <<atan2>> produces the correct result even for angles near
-@ifnottex
+@ifinfo
 pi/2 or -pi/2
-@end ifnottex
+@end ifinfo
 @tex
 $\pi/2$ or $-\pi/2$
 @end tex
@@ -42,9 +42,9 @@ $\pi/2$ or $-\pi/2$
 
 RETURNS
 <<atan2>> and <<atan2f>> return a value in radians, in the range of
-@ifnottex
+@ifinfo
 -pi to pi.
-@end ifnottex
+@end ifinfo
 @tex
 $-\pi$ to $\pi$.
 @end tex

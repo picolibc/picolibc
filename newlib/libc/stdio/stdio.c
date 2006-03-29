@@ -1,3 +1,5 @@
+/* No user fns here.  Pesch 15apr92. */
+
 /*
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
@@ -14,10 +16,7 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-/* No user fns here.  Pesch 15apr92. */
 
-#include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <fcntl.h>
@@ -30,10 +29,10 @@
  */
 
 _READ_WRITE_RETURN_TYPE
-_DEFUN(__sread, (cookie, buf, n),
-       _PTR cookie _AND
-       char *buf   _AND
-       int n)
+__sread (cookie, buf, n)
+     _PTR cookie;
+     char *buf;
+     int n;
 {
   register FILE *fp = (FILE *) cookie;
   register int ret;
@@ -41,14 +40,14 @@ _DEFUN(__sread, (cookie, buf, n),
 #ifdef __SCLE
   int oldmode = 0;
   if (fp->_flags & __SCLE)
-    oldmode = setmode (fp->_file, O_BINARY);
+    oldmode = setmode(fp->_file, O_BINARY);
 #endif
 
-  ret = _read_r (_REENT, fp->_file, buf, n);
+  ret = _read_r (fp->_data, fp->_file, buf, n);
 
 #ifdef __SCLE
   if (oldmode)
-    setmode (fp->_file, oldmode);
+    setmode(fp->_file, oldmode);
 #endif
 
   /* If the read succeeded, update the current offset.  */
@@ -61,10 +60,10 @@ _DEFUN(__sread, (cookie, buf, n),
 }
 
 _READ_WRITE_RETURN_TYPE
-_DEFUN(__swrite, (cookie, buf, n),
-       _PTR cookie      _AND
-       char _CONST *buf _AND
-       int n)
+__swrite (cookie, buf, n)
+     _PTR cookie;
+     char _CONST *buf;
+     int n;
 {
   register FILE *fp = (FILE *) cookie;
   int w;
@@ -73,34 +72,34 @@ _DEFUN(__swrite, (cookie, buf, n),
 #endif
 
   if (fp->_flags & __SAPP)
-    _CAST_VOID _lseek_r (_REENT, fp->_file, (_off_t) 0, SEEK_END);
+    (void) _lseek_r (fp->_data, fp->_file, (off_t) 0, SEEK_END);
   fp->_flags &= ~__SOFF;	/* in case O_APPEND mode is set */
 
 #ifdef __SCLE
   if (fp->_flags & __SCLE)
-    oldmode = setmode (fp->_file, O_BINARY);
+    oldmode = setmode(fp->_file, O_BINARY);
 #endif
 
-  w = _write_r (_REENT, fp->_file, buf, n);
+  w = _write_r (fp->_data, fp->_file, buf, n);
 
 #ifdef __SCLE
   if (oldmode)
-    setmode (fp->_file, oldmode);
+    setmode(fp->_file, oldmode);
 #endif
 
   return w;
 }
 
-_fpos_t
-_DEFUN(__sseek, (cookie, offset, whence),
-       _PTR cookie    _AND
-       _fpos_t offset _AND
-       int whence)
+fpos_t
+__sseek (cookie, offset, whence)
+     _PTR cookie;
+     fpos_t offset;
+     int whence;
 {
   register FILE *fp = (FILE *) cookie;
-  register _off_t ret;
+  register off_t ret;
 
-  ret = _lseek_r (_REENT, fp->_file, (_off_t) offset, whence);
+  ret = _lseek_r (fp->_data, fp->_file, (off_t) offset, whence);
   if (ret == -1L)
     fp->_flags &= ~__SOFF;
   else
@@ -112,18 +111,17 @@ _DEFUN(__sseek, (cookie, offset, whence),
 }
 
 int
-_DEFUN(__sclose, (cookie),
-       _PTR cookie)
+__sclose (cookie)
+     _PTR cookie;
 {
   FILE *fp = (FILE *) cookie;
 
-  return _close_r (_REENT, fp->_file);
+  return _close_r (fp->_data, fp->_file);
 }
 
 #ifdef __SCLE
 int
-_DEFUN(__stextmode, (fd), 
-       int fd)
+__stextmode (int fd)
 {
 #ifdef __CYGWIN__
   return _cygwin_istext_for_stdio (fd);

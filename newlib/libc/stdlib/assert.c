@@ -1,6 +1,6 @@
 /*
 FUNCTION
-<<assert>>---macro for debugging diagnostics
+<<assert>>---Macro for Debugging Diagnostics
 
 INDEX
 	assert

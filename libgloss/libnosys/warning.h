@@ -7,22 +7,18 @@
 /* We want the .gnu.warning.SYMBOL section to be unallocated.  */
 #  ifdef HAVE_ASM_PREVIOUS_DIRECTIVE
 #   define __make_section_unallocated(section_string)   \
-  asm(".section " section_string "\n .previous");
+  asm(".section " section_string "; .previous");
 #  elif defined (HAVE_ASM_POPSECTION_DIRECTIVE)
 #   define __make_section_unallocated(section_string)   \
-  asm(".pushsection " section_string "\n .popsection");
+  asm(".pushsection " section_string "; .popsection");
 #  else
 #   define __make_section_unallocated(section_string)
 #  endif
 
-#  ifdef HAVE_SECTION_ATTRIBUTES
-#   define link_warning(symbol, msg)                     \
+#  define link_warning(symbol, msg)                     \
+  __make_section_unallocated (".gnu.warning." #symbol)  \
   static const char __evoke_link_warning_##symbol[]     \
-    __attribute__ ((section (".gnu.warning." __SYMBOL_PREFIX #symbol), \
-		   __used__)) = msg;
-#  else
-#   define link_warning(symbol, msg)
-#  endif
+    __attribute__ ((section (".gnu.warning." #symbol))) = msg;
 
 #else /* !ELF */
 
@@ -35,10 +31,9 @@
 # define link_warning(symbol, msg)
 #endif
 
-/* A canned warning for sysdeps/stub functions.
-   The GNU linker prepends a "warning: " string.  */
+/* A canned warning for sysdeps/stub functions.  */
 #define stub_warning(name) \
   link_warning (name, \
-                #name " is not implemented and will always fail")
+                "warning: " #name " is not implemented and will always fail")
 
 #endif /* __WARNING_H__ */

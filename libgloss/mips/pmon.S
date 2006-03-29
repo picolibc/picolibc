@@ -1,7 +1,7 @@
 /*
  * pmon.S -- low-level entry points into PMON monitor.
  *
- * Copyright (c) 1996, 1997, 2002 Cygnus Support
+ * Copyright (c) 1996, 1997 Cygnus Support
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -19,7 +19,7 @@
 	.set nomips16
 #endif
 
-#if !defined(__mips64)
+#if __mips < 3
   /* This machine does not support 64-bit operations.  */
   #define ADDU addu
   #define SUBU subu

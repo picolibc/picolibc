@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
+# Makefile.in generated automatically by automake 1.4 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -58,22 +58,14 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_alias = @build_alias@
-build_triplet = @build@
 host_alias = @host_alias@
 host_triplet = @host@
-target_alias = @target_alias@
-target_triplet = @target@
 AR = @AR@
 AS = @AS@
 CC = @CC@
 CPP = @CPP@
-CXX = @CXX@
-CXXCPP = @CXXCPP@
 DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
-GCJ = @GCJ@
-GCJFLAGS = @GCJFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -81,10 +73,8 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
 OBJDUMP = @OBJDUMP@
-OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
-STRIP = @STRIP@
 VERSION = @VERSION@
 aext = @aext@
 libm_machine_dir = @libm_machine_dir@
@@ -96,26 +86,22 @@ sys_dir = @sys_dir@
 AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = -I $(newlib_basedir)/libm/common $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
-@MACH_ADD_SETJMP_TRUE@mach_add_obj = setjmp.$(oext)
-@MACH_ADD_SETJMP_FALSE@mach_add_obj = 
+@MACH_ADD_SETJMP_TRUE@mach_add_src = @MACH_ADD_SETJMP_TRUE@setjmp.S
+@MACH_ADD_SETJMP_FALSE@mach_add_src = 
 
-LIB_SOURCES =  	memchr.S memcmp.S memcpy.S memset.S strchr.S 	memmove.S strlen.S i386mach.h
+LIB_SOURCES = \
+	memchr.S memcmp.S memcpy.S memset.S strchr.S \
+	memmove.S strlen.S $(mach_add_src) i386mach.h
 
 
 libi386_la_LDFLAGS = -Xcompiler -nostdlib
 
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libi386.la
-@USE_LIBTOOL_TRUE@libi386_la_SOURCES = $(LIB_SOURCES)
-@USE_LIBTOOL_TRUE@EXTRA_libi386_la_SOURCES = setjmp.S
-@USE_LIBTOOL_TRUE@libi386_la_LIBADD = $(mach_add_obj)
-@USE_LIBTOOL_TRUE@libi386_la_DEPENDENCIES = $(mach_add_obj)
-@USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libi386.la
+@USE_LIBTOOL_TRUE@libi386_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
+@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(LIB_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(mach_add_obj)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(mach_add_obj)
-@USE_LIBTOOL_FALSE@EXTRA_lib_a_SOURCES = setjmp.S
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
 
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
@@ -128,11 +114,12 @@ LIBRARIES =  $(noinst_LIBRARIES)
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  memchr.$(OBJEXT) memcmp.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@memcpy.$(OBJEXT) memset.$(OBJEXT) strchr.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@memmove.$(OBJEXT) strlen.$(OBJEXT)
+lib_a_LIBADD = 
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  memchr.o memcmp.o memcpy.o memset.o \
+@USE_LIBTOOL_FALSE@strchr.o memmove.o strlen.o
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
+libi386_la_LIBADD = 
 @USE_LIBTOOL_TRUE@libi386_la_OBJECTS =  memchr.lo memcmp.lo memcpy.lo \
 @USE_LIBTOOL_TRUE@memset.lo strchr.lo memmove.lo strlen.lo
 CFLAGS = @CFLAGS@
@@ -149,12 +136,12 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-SOURCES = $(lib_a_SOURCES) $(EXTRA_lib_a_SOURCES) $(libi386_la_SOURCES) $(EXTRA_libi386_la_SOURCES)
+SOURCES = $(lib_a_SOURCES) $(libi386_la_SOURCES)
 OBJECTS = $(lib_a_OBJECTS) $(libi386_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .lo .o .obj .s
+.SUFFIXES: .S .c .lo .o .s
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/../../../Makefile.shared
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus Makefile
 
@@ -163,8 +150,7 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ configure.in  \
-		../../../acinclude.m4 ../../../aclocal.m4 \
-		../../../libtool.m4
+		../../../acinclude.m4 ../../../aclocal.m4
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
 config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
@@ -184,11 +170,6 @@ maintainer-clean-noinstLIBRARIES:
 .c.o:
 	$(COMPILE) -c $<
 
-# FIXME: We should only use cygpath when building on Windows,
-# and only if it is available.
-.c.obj:
-	$(COMPILE) -c `cygpath -w $<`
-
 .s.o:
 	$(COMPILE) -c $<
 
@@ -197,7 +178,6 @@ maintainer-clean-noinstLIBRARIES:
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
-	-rm -f *.$(OBJEXT)
 
 clean-compile:
 

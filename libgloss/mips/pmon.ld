@@ -2,7 +2,6 @@
    workspace. */
 
 ENTRY(_start)
-STARTUP(crt0.o)
 OUTPUT_ARCH("mips:4000")
 OUTPUT_FORMAT("elf32-bigmips", "elf32-bigmips", "elf32-littlemips")
 GROUP(-lc -lpmon -lgcc)
@@ -24,8 +23,6 @@ PROVIDE (__stack = 0);
  * We have to initalize them twice, so we multiple object file
  * formats, as some prepend an underscore.
  */
-PROVIDE (hardware_exit_hook = 0);
-PROVIDE (hardware_hazard_hook = 0);
 PROVIDE (hardware_init_hook = 0);
 PROVIDE (software_init_hook = 0);
 
@@ -34,25 +31,21 @@ SECTIONS
   . = 0xA0020000;
   .text : {
      _ftext = . ;
-    KEEP (*(.init))
+    *(.init)
      eprol  =  .;
     *(.text)
     *(.text.*)
-    *(.gnu.linkonce.t.*)
+    *(.gnu.linkonce.t*)
     *(.mips16.fn.*)
     *(.mips16.call.*)
     PROVIDE (__runtime_reloc_start = .);
     *(.rel.sdata)
     PROVIDE (__runtime_reloc_stop = .);
-    KEEP (*(.fini))
+    *(.fini)
      etext  =  .;
      _etext  =  .;
   }
   
-  .eh_frame_hdr : { *(.eh_frame_hdr) }
-  .eh_frame : { KEEP (*(.eh_frame)) }
-  .gcc_except_table : { *(.gcc_except_table) }
-  .jcr : { KEEP (*(.jcr)) }
   .ctors    :
   {
     /* gcc uses crtbegin.o to find the start of
@@ -90,13 +83,13 @@ SECTIONS
     *(.rdata)
     *(.rodata)
     *(.rodata.*)
-    *(.gnu.linkonce.r.*)
+    *(.gnu.linkonce.r*)
   }
    _fdata = ALIGN(16);
   .data : {
     *(.data)
     *(.data.*)
-    *(.gnu.linkonce.d.*)
+    *(.gnu.linkonce.d*)
   }
   . = ALIGN(8);
   _gp = . + 0x8000;
@@ -110,7 +103,7 @@ SECTIONS
   .sdata : {
     *(.sdata)
     *(.sdata.*)
-    *(.gnu.linkonce.s.*)
+    *(.gnu.linkonce.s*)
   }
   . = ALIGN(4);
    edata  =  .;
@@ -118,15 +111,11 @@ SECTIONS
    _fbss = .;
   .sbss : {
     *(.sbss)
-    *(.sbss.*)
-    *(.gnu.linkonce.sb.*)
     *(.scommon)
   }
   .bss : {
     _bss_start = . ;
     *(.bss)
-    *(.bss.*)
-    *(.gnu.linkonce.b.*)
     *(COMMON)
   }
 
@@ -157,7 +146,6 @@ SECTIONS
   .debug_str      0 : { *(.debug_str) }
   .debug_loc      0 : { *(.debug_loc) }
   .debug_macinfo  0 : { *(.debug_macinfo) }
-  .debug_ranges   0 : { *(.debug_ranges) }
 
   /* SGI/MIPS DWARF 2 extensions */
   .debug_weaknames 0 : { *(.debug_weaknames) }

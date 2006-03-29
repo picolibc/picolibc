@@ -96,7 +96,6 @@ extern __IMPORT int sys_nerr;
 #define	ELBIN 75	/* Inode is remote (not really error) */
 #define	EDOTDOT 76	/* Cross mount point (not really error) */
 #define EBADMSG 77	/* Trying to read unreadable message */
-#define EFTYPE 79	/* Inappropriate file type or format */
 #define ENOTUNIQ 80	/* Given log. name not unique */
 #define EBADFD 81	/* f.d. invalid for this operation */
 #define EREMCHG 82	/* Remote address changed */
@@ -146,8 +145,6 @@ extern __IMPORT int sys_nerr;
 #define ENOMEDIUM 135   /* No medium (in tape drive) */
 #define ENOSHARE 136    /* No such host or network path */
 #define ECASECLASH 137  /* Filename exists with different case */
-#define EILSEQ 138
-#define EOVERFLOW 139	/* Value too large for defined data type */
 
 /* From cygwin32.  */
 #define EWOULDBLOCK EAGAIN	/* Operation would block */

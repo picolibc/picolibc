@@ -14,20 +14,20 @@
 
    1) Define the reentrant versions of the syscalls directly.
       (eg: _open_r, _close_r, etc.).  Please keep the namespace clean.
-      When you do this, set "syscall_dir" to "syscalls" and add
-      -DREENTRANT_SYSCALLS_PROVIDED to newlib_cflags in configure.host.
+      When you do this, set "syscall_dir" to "syscalls" in configure.in,
+      and add -DREENTRANT_SYSCALLS_PROVIDED to target_cflags in configure.in.
 
    2) Define namespace clean versions of the system calls by prefixing
       them with '_' (eg: _open, _close, etc.).  Technically, there won't be
       true reentrancy at the syscall level, but the library will be namespace
       clean.
-      When you do this, set "syscall_dir" to "syscalls" in configure.host.
+      When you do this, set "syscall_dir" to "syscalls" in configure.in.
 
    3) Define or otherwise provide the regular versions of the syscalls
       (eg: open, close, etc.).  The library won't be reentrant nor namespace
       clean, but at least it will work.
-      When you do this, add -DMISSING_SYSCALL_NAMES to newlib_cflags in
-      configure.host.
+      When you do this, add -DMISSING_SYSCALL_NAMES to target_cflags in
+      configure.in.
 
    Stubs of the reentrant versions of the syscalls exist in the libc/reent
    source directory and are used if REENTRANT_SYSCALLS_PROVIDED isn't defined.
@@ -50,7 +50,6 @@ extern "C" {
 #include <machine/types.h>
 
 #define __need_size_t
-#define __need_ptrdiff_t
 #include <stddef.h>
 
 /* FIXME: not namespace clean */
@@ -72,7 +71,7 @@ extern int _link_r _PARAMS ((struct _reent *, const char *, const char *));
 extern _off_t _lseek_r _PARAMS ((struct _reent *, int, _off_t, int));
 extern int _open_r _PARAMS ((struct _reent *, const char *, int, int));
 extern _ssize_t _read_r _PARAMS ((struct _reent *, int, void *, size_t));
-extern void *_sbrk_r _PARAMS ((struct _reent *, ptrdiff_t));
+extern void *_sbrk_r _PARAMS ((struct _reent *, size_t));
 extern int _stat_r _PARAMS ((struct _reent *, const char *, struct stat *));
 extern _CLOCK_T_ _times_r _PARAMS ((struct _reent *, struct tms *));
 extern int _unlink_r _PARAMS ((struct _reent *, const char *));
@@ -81,19 +80,6 @@ extern _ssize_t _write_r _PARAMS ((struct _reent *, int, const void *, size_t));
 
 /* This one is not guaranteed to be available on all targets.  */
 extern int _gettimeofday_r _PARAMS ((struct _reent *, struct timeval *tp, struct timezone *tzp));
-
-#ifdef __LARGE64_FILES
-
-#if defined(__CYGWIN__) && defined(_COMPILING_NEWLIB)
-#define stat64 __stat64
-#endif
-
-struct stat64;
-
-extern _off64_t _lseek64_r _PARAMS ((struct _reent *, int, _off64_t, int));
-extern int _fstat64_r _PARAMS ((struct _reent *, int, struct stat64 *));
-extern int _open64_r _PARAMS ((struct _reent *, const char *, int, int));
-#endif
 
 #ifdef __cplusplus
 }

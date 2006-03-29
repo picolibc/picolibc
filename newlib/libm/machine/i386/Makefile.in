@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
+# Makefile.in generated automatically by automake 1.4 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -58,22 +58,14 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_alias = @build_alias@
-build_triplet = @build@
 host_alias = @host_alias@
 host_triplet = @host@
-target_alias = @target_alias@
-target_triplet = @target@
 AR = @AR@
 AS = @AS@
 CC = @CC@
 CPP = @CPP@
-CXX = @CXX@
-CXXCPP = @CXXCPP@
 DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
-GCJ = @GCJ@
-GCJFLAGS = @GCJFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -81,10 +73,8 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
 OBJDUMP = @OBJDUMP@
-OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
-STRIP = @STRIP@
 VERSION = @VERSION@
 aext = @aext@
 libm_machine_dir = @libm_machine_dir@
@@ -97,17 +87,20 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = -I $(newlib_basedir)/../newlib/libm/common $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES =  	f_atan2.S f_atan2f.S f_exp.c f_expf.c 	f_frexp.S f_frexpf.S f_log.S f_logf.S f_log10.S f_log10f.S 	f_ldexp.S f_ldexpf.S f_pow.c f_powf.c f_tan.S f_tanf.S f_math.h i386mach.h
+LIB_SOURCES = \
+	f_atan2.S f_atan2f.S f_exp.c f_expf.c \
+	f_frexp.S f_frexpf.S f_log.S f_logf.S f_log10.S f_log10f.S \
+	f_ldexp.S f_ldexpf.S f_pow.c f_powf.c f_tan.S f_tanf.S f_math.h i386mach.h
 
 
 libi386_la_LDFLAGS = -Xcompiler -nostdlib
 
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libi386.la
-@USE_LIBTOOL_TRUE@libi386_la_SOURCES = $(LIB_SOURCES)
-@USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libi386.la
+@USE_LIBTOOL_TRUE@libi386_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
+@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(LIB_SOURCES)
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
 
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
@@ -121,12 +114,10 @@ DEFS = @DEFS@ -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  f_atan2.$(OBJEXT) f_atan2f.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@f_exp.$(OBJEXT) f_expf.$(OBJEXT) f_frexp.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@f_frexpf.$(OBJEXT) f_log.$(OBJEXT) f_logf.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@f_log10.$(OBJEXT) f_log10f.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@f_ldexp.$(OBJEXT) f_ldexpf.$(OBJEXT) f_pow.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@f_powf.$(OBJEXT) f_tan.$(OBJEXT) f_tanf.$(OBJEXT)
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  f_atan2.o f_atan2f.o f_exp.o \
+@USE_LIBTOOL_FALSE@f_expf.o f_frexp.o f_frexpf.o f_log.o f_logf.o \
+@USE_LIBTOOL_FALSE@f_log10.o f_log10f.o f_ldexp.o f_ldexpf.o f_pow.o \
+@USE_LIBTOOL_FALSE@f_powf.o f_tan.o f_tanf.o
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 libi386_la_LIBADD = 
@@ -153,7 +144,7 @@ OBJECTS = $(lib_a_OBJECTS) $(libi386_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .lo .o .obj .s
+.SUFFIXES: .S .c .lo .o .s
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/../../../Makefile.shared
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus Makefile
 
@@ -162,8 +153,7 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ configure.in  \
-		../../../acinclude.m4 ../../../aclocal.m4 \
-		../../../libtool.m4
+		../../../acinclude.m4 ../../../aclocal.m4
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
 config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
@@ -183,11 +173,6 @@ maintainer-clean-noinstLIBRARIES:
 .c.o:
 	$(COMPILE) -c $<
 
-# FIXME: We should only use cygpath when building on Windows,
-# and only if it is available.
-.c.obj:
-	$(COMPILE) -c `cygpath -w $<`
-
 .s.o:
 	$(COMPILE) -c $<
 
@@ -196,7 +181,6 @@ maintainer-clean-noinstLIBRARIES:
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
-	-rm -f *.$(OBJEXT)
 
 clean-compile:
 

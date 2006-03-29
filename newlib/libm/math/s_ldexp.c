@@ -39,9 +39,9 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 <<ldexp>> calculates the value 
-@ifnottex
+@ifinfo
 <[val]> times 2 to the power <[exp]>.
-@end ifnottex
+@end ifinfo
 @tex
 $val\times 2^{exp}$.
 @end tex
@@ -56,7 +56,7 @@ On underflow, <<ldexp>> and <<ldexpf>> return 0.0.
 On overflow, <<ldexp>> returns plus or minus <<HUGE_VAL>>.
 
 PORTABILITY
-<<ldexp>> is ANSI. <<ldexpf>> is an extension.
+<<ldexp>> is ANSI, <<ldexpf>> is an extension.
               
 */   
 

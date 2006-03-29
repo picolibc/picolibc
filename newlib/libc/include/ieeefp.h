@@ -5,8 +5,6 @@
 
 #include <machine/ieeefp.h>
 
-_BEGIN_STD_C
-
 /* FIXME FIXME FIXME:
    Neither of __ieee_{float,double}_shape_tape seem to be used anywhere
    except in libm/test.  If that is the case, please delete these from here.
@@ -184,9 +182,6 @@ typedef int fp_rdi;
 fp_rdi _EXFUN(fpgetroundtoi,(void));
 fp_rdi _EXFUN(fpsetroundtoi,(fp_rdi));
 
-#undef isnan
-#undef isinf
-
 int _EXFUN(isnan, (double));
 int _EXFUN(isinf, (double));
 int _EXFUN(finite, (double));
@@ -242,7 +237,5 @@ int _EXFUN(finitef, (float));
 #define __ieee_double_shape_type __ieee_float_shape_type
 
 #endif /* _DOUBLE_IS_32BITS */
-
-_END_STD_C
 
 #endif /* _IEEE_FP_H_ */

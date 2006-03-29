@@ -14,8 +14,8 @@ extern "C" {
 
 #ifndef _WINSOCK_H
 struct timeval {
-  time_t      tv_sec;
-  suseconds_t tv_usec;
+  long tv_sec;
+  long tv_usec;
 };
 
 struct timezone {
@@ -24,7 +24,7 @@ struct timezone {
 };
 
 #ifdef __CYGWIN__
-#include <cygwin/sys_time.h>
+#include <sys/select.h>
 #endif /* __CYGWIN__ */
 
 #endif /* _WINSOCK_H */
@@ -72,7 +72,7 @@ struct  itimerval {
 
 int _EXFUN(gettimeofday, (struct timeval *__p, struct timezone *__z));
 int _EXFUN(settimeofday, (const struct timeval *, const struct timezone *));
-int _EXFUN(utimes, (const char *__path, const struct timeval *__tvp));
+int _EXFUN(utimes, (const char *__path, struct timeval *__tvp));
 int _EXFUN(getitimer, (int __which, struct itimerval *__value));
 int _EXFUN(setitimer, (int __which, const struct itimerval *__value,
 					struct itimerval *__ovalue));

@@ -30,16 +30,6 @@ _read (int file,
       return -1;
     }
 
-  if (isatty(file))
-    {
-      ret = TRAP3f (SYS_Fgets, file, ptr, len);
-
-      if (ret == -1)
-        return 0;
-
-      return ret;
-    }
-
   ret = TRAP3f (SYS_Fread, file, ptr, len);
 
   /* Map the return codes:

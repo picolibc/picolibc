@@ -24,12 +24,12 @@ _DEFUN_VOID(test_strtod)
 }
 
 void
-_DEFUN_VOID(test_strtof)
+_DEFUN_VOID(test_strtodf)
 {
   char *tail;
   double v;
   /* On average we'll loose 1/2 a bit, so the test is for within 1 bit  */
-  v = strtof(pd->string, &tail);
+  v = strtodf(pd->string, &tail);
   test_mok(v, pd->value, 32);
   test_iok(tail - pd->string, pd->endscan);
 }
@@ -358,7 +358,7 @@ _DEFUN_VOID(test_cvt)
   iterate(test_atof, "atof");
   iterate(test_atoff, "atoff");
 
-  iterate(test_strtof, "strtof");
+  iterate(test_strtodf, "strtodf");
 
   int_iterate(test_atoi,"atoi");
   int_iterate(test_atol,"atol");

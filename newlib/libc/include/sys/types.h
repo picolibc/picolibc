@@ -16,49 +16,11 @@
  */
 
 #ifndef _SYS_TYPES_H
-
-#include <_ansi.h>
-
-#ifndef __INTTYPES_DEFINED__
-#define __INTTYPES_DEFINED__
-
-#include <machine/_types.h>
-
-#if defined(__rtems__)
-/*
- *  The following section is RTEMS specific and is needed to more
- *  closely match the types defined in the BSD sys/types.h.
- *  This is needed to let the RTEMS/BSD TCP/IP stack compile.
- */
-
-/* deprecated */
-#if ___int8_t_defined
-typedef __uint8_t	u_int8_t;
-#endif
-#if ___int16_t_defined
-typedef __uint16_t	u_int16_t;
-#endif 
-#if ___int32_t_defined
-typedef __uint32_t	u_int32_t;
-#endif
-
-#if ___int64_t_defined
-typedef __uint64_t	u_int64_t;
-
-/* deprecated */
-typedef	__uint64_t	u_quad_t;
-typedef	__int64_t	quad_t;
-typedef	quad_t *	qaddr_t;
-#endif
-
-#endif
-
-#endif /* ! __INTTYPES_DEFINED */
-
-#ifndef __need_inttypes
-
 #define _SYS_TYPES_H
-#include <sys/_types.h>
+
+#if defined (_WIN32) || defined (__CYGWIN__)
+#define __MS_types__
+#endif
 
 #ifdef __i386__
 #if defined (GO32) || defined (__MSDOS__)
@@ -125,7 +87,6 @@ struct itimerspec {
 typedef	long	daddr_t;
 typedef	char *	caddr_t;
 
-#ifndef __CYGWIN__
 #if defined(__MS_types__) || defined(__rtems__)
 typedef	unsigned long	ino_t;
 #else
@@ -135,7 +96,6 @@ typedef	unsigned long	ino_t;
 typedef	unsigned short	ino_t;
 #endif
 #endif
-#endif /*__CYGWIN__*/
 
 #ifdef __MS_types__
 typedef unsigned long vm_offset_t;
@@ -143,7 +103,7 @@ typedef unsigned long vm_size_t;
 
 #define __BIT_TYPES_DEFINED__
 
-typedef signed char int8_t;
+typedef char int8_t;
 typedef unsigned char u_int8_t;
 typedef short int16_t;
 typedef unsigned short u_int16_t;
@@ -165,25 +125,17 @@ typedef int32_t register_t;
 /* device numbers are 32-bit major and and 32-bit minor */
 typedef unsigned long long dev_t;
 #else
-#ifndef __CYGWIN__
 typedef	short	dev_t;
 #endif
-#endif
 
-#ifndef __CYGWIN__	/* which defines these types in it's own types.h. */
-typedef long		off_t;
+typedef	long	off_t;
 
 typedef	unsigned short	uid_t;
 typedef	unsigned short	gid_t;
-#endif
-
 typedef int pid_t;
-#ifndef __CYGWIN__
 typedef	long key_t;
-#endif
-typedef _ssize_t ssize_t;
+typedef long ssize_t;
 
-#ifndef __CYGWIN__
 #ifdef __MS_types__
 typedef	char *	addr_t;
 typedef int mode_t;
@@ -198,7 +150,6 @@ typedef unsigned short mode_t;
 typedef unsigned int mode_t _ST_INT32;
 #endif
 #endif /* ! __MS_types__ */
-#endif /*__CYGWIN__*/
 
 typedef unsigned short nlink_t;
 
@@ -251,6 +202,11 @@ typedef	struct _types_fd_set {
 #undef __MS_types__
 #undef _ST_INT32
 
+/* The following are actually standard POSIX 1003.1b-1993 threads, mutexes,
+   condition variables, and keys.  But since RTEMS is currently the only
+   newlib user of these, the ifdef is just on RTEMS. */
+
+#if defined(__rtems__) || defined(__CYGWIN__)
 
 #ifndef __clockid_t_defined
 typedef _CLOCKID_T_ clockid_t;
@@ -262,8 +218,9 @@ typedef _TIMER_T_ timer_t;
 #define __timer_t_defined
 #endif
 
-typedef unsigned long useconds_t;
-typedef long suseconds_t;
+#if defined(__CYGWIN__) || defined(__rtems__)
+typedef long useconds_t;
+#endif
 
 #include <sys/features.h>
 
@@ -374,8 +331,6 @@ typedef struct {
 #endif
 #endif /* defined(_POSIX_THREADS) */
 
-#endif  /* !__need_inttypes */
-
-#undef __need_inttypes
+#endif  /* defined(__rtems__) */
 
 #endif	/* _SYS_TYPES_H */

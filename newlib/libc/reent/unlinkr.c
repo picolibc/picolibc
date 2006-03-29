@@ -44,9 +44,9 @@ DESCRIPTION
 */
 
 int
-_DEFUN (_unlink_r, (ptr, file),
-     struct _reent *ptr _AND
-     _CONST char *file)
+_unlink_r (ptr, file)
+     struct _reent *ptr;
+     _CONST char *file;
 {
   int ret;
 

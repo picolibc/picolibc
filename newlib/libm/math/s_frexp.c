@@ -36,17 +36,17 @@ TRAD_SYNOPSIS
 
 
 DESCRIPTION
-	All nonzero, normal numbers can be described as <[m]> * 2**<[p]>.
+	All non zero, normal numbers can be described as <[m]> * 2**<[p]>.
 	<<frexp>> represents the double <[val]> as a mantissa <[m]>
 	and a power of two <[p]>. The resulting mantissa will always
 	be greater than or equal to <<0.5>>, and less than <<1.0>> (as
 	long as <[val]> is nonzero). The power of two will be stored
 	in <<*>><[exp]>. 
 
-@ifnottex
+@ifinfo
 <[m]> and <[p]> are calculated so that
 <[val]> is <[m]> times <<2>> to the power <[p]>.
-@end ifnottex
+@end ifinfo
 @tex
 <[m]> and <[p]> are calculated so that
 $ val = m \times 2^p $.

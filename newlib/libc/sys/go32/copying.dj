@@ -1,0 +1,61 @@
+This is the file "copying.dj".
+
+   Copyright Information for sources and executables that are marked
+   Copyright (C) DJ Delorie
+
+This document is Copyright (C) DJ Delorie and may be distributed
+verbatim, but changing it is not allowed.
+
+Source code copyright DJ Delorie is distributed under the terms of the
+GNU General Public Licence, with the following exceptions:
+
+
+* Source code copyright DJ Delorie is distributed under the terms of the
+  GNU General Public Licence, with the following exceptions:
+  ("go32.exe" refers to go32.exe and debug32.exe)
+
+  * There are no conditions on distributing copies of stub.exe as
+    it is originally distributed in this software package, prepended
+    onto a binary or otherwise.  This is the recommended distribution
+    mechanism for applications.
+  
+  * Binaries of emu387 may be distributed with no restrictions.
+
+  * If a user creates an application, prepends a copy of go32.exe onto
+    the beginning of it, and distributes it free of charge, then the
+    user is under no obligations to distribute source or pay royalties.
+    Note that the copyright terms of the FSF and/or UCB must be
+    obeyed regardless of this.
+  
+  * If a user creates an application, prepends a copy of go32.exe onto
+    the beginning of it, and charges a fee for the software, then a
+    royalty of $5 or 5% of the selling price per copy sold must be paid
+    to DJ Delorie.  DJ's mailing address is documented on the web page:
+    http://www.delorie.com/users/dj/.  Note that shareware programs are 
+    not considered "sold" until payment is rendered for them.
+
+  * For all other cases, source code for go32.exe must be distributed
+    with any distributed copies of go32.exe.
+  
+  * Software that requires go32.exe to run, but is not distributed with
+    a copy of go32.exe, incurs no obligations with regards to the
+    above sections.
+
+  * Contact me for special terms if none of the above are suitable.
+
+  * Donations are always appreciated.
+
+  The intent of this copyright is this: If you make money by using the
+  programs I wrote, I get some of it.  If you use your sources to
+  teach others how to write programs, I'll support you.
+
+Changes to source code copyright BSD or FSF are copyright DJ Delorie, but
+fall under the terms of the original copyright.
+
+A copy of the file "COPYING" is included with this document.  If you did not
+receive a copy of "COPYING", you may obtain one from whence this document
+was obtained, or by writing:
+      Free Software Foundation
+      675 Mass Ave
+      Cambridge, MA  02139
+      USA

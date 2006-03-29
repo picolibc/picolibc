@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1991, 2000 The Regents of the University of California.
+ * Copyright (c) 1991 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -221,10 +221,10 @@ _mcount()
 
   if (! already_setup) 
     {
-      extern _etext();
+      extern etext();
       extern _ftext();
       already_setup = 1;
-      monstartup(_ftext, _etext);
+      monstartup(_ftext, etext);
       atexit(_mcleanup);
     }
   /*

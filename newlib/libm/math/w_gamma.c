@@ -76,9 +76,9 @@ $\mit ln\bigl(\Gamma(x)\bigr)$,
 the natural logarithm of the gamma function of <[x]>.  The gamma function
 (<<exp(gamma(<[x]>))>>) is a generalization of factorial, and retains
 the property that  
-@ifnottex
+@ifinfo
 <<exp(gamma(N))>> is equivalent to <<N*exp(gamma(N-1))>>.
-@end ifnottex
+@end ifinfo
 @tex
 $\mit \Gamma(N)\equiv N\times\Gamma(N-1)$.
 @end tex
@@ -87,10 +87,10 @@ quickly.  <<gamma>> is defined as
 @tex
 $\mit ln\bigl(\Gamma(x)\bigr)$ rather than simply $\mit \Gamma(x)$
 @end tex
-@ifnottex
+@ifinfo
 the natural log of the gamma function, rather than the gamma function
 itself, 
-@end ifnottex
+@end ifinfo
 to extend the useful range of results representable.
 
 The sign of the result is returned in the global variable <<signgam>>,
@@ -145,11 +145,11 @@ Neither <<gamma>> nor <<gammaf>> is ANSI C.  */
 #endif
 {
 #ifdef _IEEE_LIBM
-	return __ieee754_gamma_r(x,&(_REENT_SIGNGAM(_REENT)));
+	return __ieee754_gamma_r(x,&(_REENT->_new._reent._gamma_signgam));
 #else
         double y;
 	struct exception exc;
-        y = __ieee754_gamma_r(x,&(_REENT_SIGNGAM(_REENT)));
+        y = __ieee754_gamma_r(x,&(_REENT->_new._reent._gamma_signgam));
         if(_LIB_VERSION == _IEEE_) return y;
         if(!finite(y)&&finite(x)) {
 #ifndef HUGE_VAL 

@@ -9,6 +9,12 @@ extern "C" {
 #include <time.h>
 #include <sys/types.h>
 
+#ifdef __i386__
+#ifdef __MSDOS__
+#include "stat-dj.h"
+#endif
+#endif
+
 /* dj's stat defines _STAT_H_ */
 #ifndef _STAT_H_
 
@@ -16,12 +22,6 @@ extern "C" {
    sizes of any of the basic types change (short, int, long) [via a compile
    time option].  */
 
-#ifdef __CYGWIN__
-#include <cygwin/stat.h>
-#ifdef _COMPILING_NEWLIB
-#define stat64 __stat64
-#endif
-#else
 struct	stat 
 {
   dev_t		st_dev;
@@ -49,7 +49,6 @@ struct	stat
   long	st_spare4[2];
 #endif
 };
-#endif
 
 #define	_IFMT		0170000	/* type of file */
 #define		_IFDIR	0040000	/* directory */
@@ -124,21 +123,15 @@ int	_EXFUN(mkfifo,( const char *__path, mode_t __mode ));
 int	_EXFUN(stat,( const char *__path, struct stat *__sbuf ));
 mode_t	_EXFUN(umask,( mode_t __mask ));
 
-#if defined(__rtems__) || defined(__CYGWIN__) && !defined(__INSIDE_CYGWIN__)
+#if defined(__rtems__) || defined(__CYGWIN__)
 int	_EXFUN(lstat,( const char *__path, struct stat *__buf ));
 int	_EXFUN(mknod,( const char *__path, mode_t __mode, dev_t __dev ));
 #endif
 
 /* Provide prototypes for most of the _<systemcall> names that are
    provided in newlib for some compilers.  */
-#ifdef _COMPILING_NEWLIB
 int	_EXFUN(_fstat,( int __fd, struct stat *__sbuf ));
 int	_EXFUN(_stat,( const char *__path, struct stat *__sbuf ));
-#ifdef __LARGE64_FILES
-struct stat64;
-int	_EXFUN(_fstat64,( int __fd, struct stat64 *__sbuf ));
-#endif
-#endif
 
 #endif /* !_STAT_H_ */
 #ifdef __cplusplus

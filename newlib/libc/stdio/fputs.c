@@ -47,22 +47,19 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
-#include <_ansi.h>
 #include <stdio.h>
 #include <string.h>
 #include "fvwrite.h"
-#include "local.h"
 
 /*
  * Write the given string to the given file.
  */
 
 int
-_DEFUN(fputs, (s, fp),
-       char _CONST * s _AND
-       FILE * fp)
+_DEFUN (fputs, (s, fp),
+	char _CONST * s _AND
+	FILE * fp)
 {
-  int result;
   struct __suio uio;
   struct __siov iov;
 
@@ -70,11 +67,5 @@ _DEFUN(fputs, (s, fp),
   iov.iov_len = uio.uio_resid = strlen (s);
   uio.uio_iov = &iov;
   uio.uio_iovcnt = 1;
-
-  CHECK_INIT(_REENT);
-
-  _flockfile (fp);
-  result = __sfvwrite (fp, &uio);
-  _funlockfile (fp);
-  return result;
+  return __sfvwrite (fp, &uio);
 }

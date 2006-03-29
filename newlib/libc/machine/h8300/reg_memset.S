@@ -1,6 +1,13 @@
-#include "setarch.h"
-
 #include "defines.h"
+
+#ifdef __H8300H__
+	.h8300h
+#endif
+
+#ifdef __H8300S__
+	.h8300s
+#endif
+
 
 	; dst A0
 	; src A1
@@ -14,13 +21,8 @@ ___reg_memset:
 
 memloop:
 	mov.b	A1L,@A0P
-#ifdef __NORMAL_MODE__
-	add	#1,A0P
-	sub	#1,A2P
-#else
 	adds	#1,A0P
 	subs	#1,A2P
-#endif
 	MOVP	A2P,A2P
 	bne	memloop
 

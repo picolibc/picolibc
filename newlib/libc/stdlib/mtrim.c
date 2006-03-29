@@ -1,4 +1,3 @@
-#ifndef MALLOC_PROVIDED
 /* mtrim.c -- a wrapper for malloc_trim.  */
 
 #include <_ansi.h>
@@ -15,5 +14,4 @@ _DEFUN (malloc_trim, (pad),
   return _malloc_trim_r (_REENT, pad);
 }
 
-#endif
 #endif

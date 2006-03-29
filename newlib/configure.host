@@ -22,28 +22,18 @@
 #   host_cpu		The configuration host CPU
 #   newlib_mb		--enable-newlib-mb ("yes", "no")
 #   target_optspace	--enable-target-optspace ("yes", "no", "")
-#   newlib_multithread	--enable-newlib-multithread ("yes", "no", "yes")
-#   newlib_elix_level	--enable-newlib-elix-level ("1","2","3","4") ("4")
-#   newlib_io_long_long --enable-newlib-io-long-long ("yes", "no", "")
-#   newlib_io_long_double --enable-newlib-io-long-double ("yes", "no", "")
 
 # It sets the following shell variables:
 #   newlib_cflags	Special CFLAGS to use when building
 #   machine_dir		Subdirectory of libc/machine to configure
 #   sys_dir		Subdirectory of libc/sys to configure
-#   have_sys_mach_dir	Is there a machine subdirectory in sys subdirectory
 #   posix_dir		"posix" to build libc/posix, "" otherwise
 #   signal_dir		"signal" to build libc/signal, "" otherwise
-#   stdio64_dir		"stdio64" to build libc/stdio64, "" otherwise
 #   syscall_dir		"syscalls" to build libc/syscalls, "" otherwise
 #   unix_dir		"unix" to build libc/unix, "" otherwise
 #   use_libtool         flag: use libtool to build newlib?
 #   aext                library extension - needed for libtool support
 #   oext                object file extension - needed for libtool support
-#   crt1                name of crt1 object if one is provided
-#   crt1_dir            directory where crt1 object is found
-#   have_crt0		"yes"/"no" if crt0 is/isn't provided.
-#			"" if crt0 is provided when sys_dir is set
 
 newlib_cflags=
 libm_machine_dir=
@@ -51,19 +41,10 @@ machine_dir=
 sys_dir=
 posix_dir=
 signal_dir=signal
-stdio64_dir=
 syscall_dir=
 unix_dir=
 mach_add_setjmp=
-crt1=
-crt1_dir=
-have_crt0=
 use_libtool=no
-have_sys_mach_dir=no
-default_newlib_io_long_long=no
-default_newlib_io_long_double=no
-default_newlib_io_pos_args=no
-default_newlib_atexit_dynamic_alloc=yes
 aext=a
 oext=o
 
@@ -71,7 +52,7 @@ case "${target_optspace}:${host}" in
   yes:*)
     newlib_cflags="${newlib_cflags} -Os"
     ;;
-  :m32r-* | :d10v-* | :d30v-* | :avr-* | :m32c-* )
+  :m32r-* | :d10v-* | :d30v-* | :avr-*)
     newlib_cflags="${newlib_cflags} -Os"
     ;;
   no:* | :*)
@@ -97,27 +78,16 @@ case "${host_cpu}" in
   avr*)
 	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -mcall-prologues"
 	;;
-  cris | crisv32)
-	machine_dir=cris
-	;;
-  crx*)
-	machine_dir=crx
-	;;
+
   d10v*)
 	machine_dir=d10v
 	;;
   d30v*)
 	machine_dir=d30v
 	;;
-  ep9312)
-	machine_dir=arm
-	;;
   fr30)
 	machine_dir=fr30
 	;;
-  frv)
-	machine_dir=frv
-        ;;
   h8300)
 	machine_dir=h8300
 	;;
@@ -130,10 +100,10 @@ case "${host_cpu}" in
   i960)
 	machine_dir=i960
 	;;
-  i[34567]86)
+  i[3456]86)
 	# Don't use for these since they provide their own setjmp.
 	case ${host} in
-	*-*-sco* | *-*-cygwin*) 
+	*-*-go32 | *-*-sco* | *-*-cygwin*) 
 		libm_machine_dir=i386
 		machine_dir=i386
 		;;
@@ -146,27 +116,11 @@ case "${host_cpu}" in
 	;;
   ia64*)
 	;;
-  iq2000)
-	machine_dir=iq2000
-	;;
-  m32c)
-	machine_dir=m32c
-	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -DABORT_PROVIDED -DSMALL_MEMORY"
-	;;
-
   m32r*)
 	machine_dir=m32r
 	;;
-
-  m68hc11|m6811|m68hc12|m6812)
-	machine_dir=m68hc11
-	newlib_cflags="-DPREFER_SIZE_OVER_SPEED -Os -mrelax"
-	CFLAGS="-g -Os"
-	;;
-  
   m68*)
 	machine_dir=m68k
-	newlib_cflags="${newlib_cflags} -DCOMPACT_CTYPE"
 	;;
   m88k)
 	machine_dir=m88k
@@ -187,12 +141,8 @@ case "${host_cpu}" in
 	machine_dir=mn10200
 	;;
   mn10300)
-	default_newlib_io_long_long="yes"
 	machine_dir=mn10300
 	;;
-  mt*)
-        machine_dir=mt
-        ;;
   or16)
 	;;
   or32)
@@ -200,7 +150,7 @@ case "${host_cpu}" in
   powerpc*)
 	machine_dir=powerpc
 	;;
-  sh | sh64)
+  sh)
 	machine_dir=sh
 	;;
   sparc*)
@@ -217,9 +167,6 @@ case "${host_cpu}" in
   thumb)
 	machine_dir=arm
 	;;
-  tic4x|c4x)
-	machine_dir=tic4x
-	;;
   tic80*)
 	machine_dir=tic80
 	;;
@@ -233,16 +180,15 @@ case "${host_cpu}" in
 	;;
   v850e)
 	machine_dir=v850
-	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED "
+	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -mv850 "
+	;;
+  v850ea)
+	machine_dir=v850
+	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -mv850 "
 	;;
   w65*)
 	machine_dir=w65
 	;;
-  xstormy16)
-	machine_dir=xstormy16
-	newlib_cflags="${newlib_cflags} -DMALLOC_PROVIDED"
-	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED"
-        ;;
   z8k)
 	machine_dir=z8k
 	;;
@@ -252,33 +198,10 @@ case "${host_cpu}" in
 	;;
 esac
 
-# Disable thread support if requested.
+# Enable multibyte support if requested.
 
-if [ "${newlib_multithread}" = "no" ] ; then
-	newlib_cflags="${newlib_cflags} -D__SINGLE_THREAD__"
-fi
-
-# Disable syscall support if requested.
-
-if [ "${newlib_may_supply_syscalls}" = "no" ] ; then
-        newlib_cflags="${newlib_cflags} -D__NO_SYSCALLS__"
-fi
-
-# Enable multibyte support if requested or it is defaulted
-# for target.
-
-if [ "x${newlib_mb}" = "x" ]; then
-	case "${host}" in
-  	  i[34567]86-pc-linux-*|*-*-cygwin*)
-		newlib_mb=yes
-	  	;;
-	esac
-fi
-
-# Disable printf/scanf floating-point support if requested.
-
-if [ "${newlib_io_float}" = "no" ] ; then
-	newlib_cflags="${newlib_cflags} -DNO_FLOATING_POINT"
+if [ "${newlib_mb}" = "yes" ] ; then
+	newlib_cflags="${newlib_cflags} -DMB_CAPABLE"
 fi
 
 # Verify if shared newlib support is allowed and set appropriate variables
@@ -286,10 +209,8 @@ fi
 # support shared libraries.  This is because it adds executable tests which
 # we don't want for most embedded platforms.
 case "${host}" in
-  i[34567]86-pc-linux-*)
+  i[3456]86-pc-linux-*)
     use_libtool=yes
-    have_sys_mach_dir=yes
-    stdio64_dir=stdio64
     oext=lo
     aext=la ;;
   *) ;; #shared library not supported for ${host}
@@ -303,8 +224,8 @@ esac
 
 case "${host}" in
   *-*-cygwin*)
+	sys_dir=cygwin
 	posix_dir=posix
-	stdio64_dir=stdio64
 	;;
   *-*-netware*)
 	signal_dir=
@@ -322,13 +243,7 @@ case "${host}" in
 	sys_dir=arc
 	;;
   arm-*-*)
-	sys_dir=arm
-	if [ "x${newlib_may_supply_syscalls}" = "xno" ] ; then
-	  have_crt0="no"
-	fi
-	;;
-  crx*)
-	sys_dir=
+	sys_dir=arm 
 	;;
   d10v*)
 	sys_dir=d10v
@@ -336,22 +251,10 @@ case "${host}" in
   d30v*)
 	sys_dir=
 	;;
-  ep9312-*-*)
-	sys_dir=arm
-	if [ "x${newlib_may_supply_syscalls}" = "xno" ] ; then
-	  have_crt0="no"
-	fi
-	;;
-  frv*)
-        sys_dir=
-        ;;
   h8300-*-hms*)
 	sys_dir=h8300hms
 	;;
   h8300-*-elf*)
-	sys_dir=h8300hms
-	;;
-  h8300-*-coff*)
 	sys_dir=h8300hms
 	;;
   h8300-*-xray*)
@@ -363,28 +266,22 @@ case "${host}" in
   h8500-*-elf*)
 	sys_dir=h8500hms
 	;;
-  i[34567]86-*-rdos*)
-	sys_dir=rdos
-	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES"
+  i[3456]86-*-go32)
+	sys_dir=go32
 	;;
-  i[34567]86-*-sco*)
+  i[3456]86-*-sco*)
 	sys_dir=sysvi386
 	unix_dir=unix
 	;;
-  i[34567]86-pc-linux-*)
+  i[3456]86-pc-linux-*)
 	sys_dir=linux
 	unix_dir=unix
 	posix_dir=posix
-	crt1=crt1.o
-	crt1_dir=libc/sys/${sys_dir}	
 	gcc_dir=`gcc -print-search-dirs | awk '/^install:/{print $2}'`
-	default_newlib_io_long_double="yes"
-	default_newlib_io_long_long="yes"
-	default_newlib_io_pos_args="yes"
 	#newlib_cflags="${newlib_cflags} -Werror" # DEBUGGING ONLY;BREAKS BUILD
 	newlib_cflags="${newlib_cflags} -Wall"
 	newlib_cflags="${newlib_cflags} -D_I386MACH_ALLOW_HW_INTERRUPTS"
-	newlib_cflags="${newlib_cflags} -DHAVE_FCNTL"
+	newlib_cflags="${newlib_cflags} -D_LOOSE_KERNEL_NAMES -DHAVE_FCNTL"
 	# --- Required when building a shared library ------------------------
 	newlib_cflags="${newlib_cflags} -fPIC -D_I386MACH_NEED_SOTYPE_FUNCTION"
 	# --- The three lines below are optional ------------------------------
@@ -392,10 +289,6 @@ case "${host}" in
 	##newlib_cflags="${newlib_cflags} -I`newlib-flags --kernel-dir`/include"
 	##newlib_cflags="${newlib_cflags} -idirafter ${gcc_dir}include"
 	;;
-
-  m68hc11-*-*|m6811-*-*|m6812-*-*|m68hc12-*-*)
-	;;
-
   m68k-sun-sunos*)
 	unix_dir=unix
 	;;
@@ -409,6 +302,7 @@ case "${host}" in
 	sys_dir=mmixware
 	;;
   powerpcle-*-pe)
+	sys_dir=cygwin
 	posix_dir=posix
 	;;
   sh*-*)
@@ -423,16 +317,13 @@ case "${host}" in
 	unix_dir=unix
 	;;
   strongarm-*-*)
-	sys_dir=arm
-	if [ "x${newlib_may_supply_syscalls}" = "xno" ] ; then
-	  have_crt0="no"
-	fi
+	sys_dir=arm 
+	;;
+  xscale-*-*)
+	sys_dir=arm 
 	;;
   thumb-*-*)
-	sys_dir=arm
-	if [ "x${newlib_may_supply_syscalls}" = "xno" ] ; then
-	  have_crt0="no"
-	fi
+	sys_dir=arm 
 	;;
   tic80*)
 	sys_dir=tic80
@@ -455,12 +346,6 @@ case "${host}" in
   w65-*-*)
 	sys_dir=w65
 	;;
-  xscale-*-*)
-	sys_dir=arm
-	if [ "x${newlib_may_supply_syscalls}" = "xno" ] ; then
-	  have_crt0="no"
-	fi
-	;;
   z8k-*-coff)
 	sys_dir=z8ksim
 	;;
@@ -472,13 +357,11 @@ esac
 
 case "${host}" in
   *-*-cygwin*)
-	test -z "$cygwin_srcdir" && cygwin_srcdir=`cd ${srcdir}/../winsup/cygwin; pwd`
-	export cygwin_srcdir
-	default_newlib_io_long_long="yes"
-	default_newlib_io_long_double="yes"
-	default_newlib_io_pos_args="yes"
-	CC="${CC} -I${cygwin_srcdir}/include"
-	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DSIGNAL_PROVIDED -D_COMPILING_NEWLIB -DHAVE_FCNTL -DMALLOC_PROVIDED"
+	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DSIGNAL_PROVIDED -DWANT_IO_LONG_DBL -DWANT_PRINTF_LONG_LONG -D_COMPILING_NEWLIB -DHAVE_FCNTL"
+# CYGWIN provides its own malloc if --enable-malloc-debugging is set
+	if [ "x${malloc_debugging}" = "xyes" ] ; then
+	  newlib_cflags="${newlib_cflags} -DMALLOC_PROVIDED"
+	fi
 	syscall_dir=syscalls
 	;;
 # RTEMS supplies its own versions of some routines:
@@ -489,8 +372,7 @@ case "${host}" in
 #
 #  NOTE: When newlib malloc uses a semaphore, RTEMS will switch to that.
   *-*-rtems*)
-	default_newlib_io_long_long="yes"
-	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY -DMALLOC_PROVIDED -DEXIT_PROVIDED -DMISSING_SYSCALL_NAMES -DSIGNAL_PROVIDED -DREENTRANT_SYSCALLS_PROVIDED -DHAVE_OPENDIR -DNO_EXEC -DHAVE_FCNTL"
+	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY -DMALLOC_PROVIDED -DEXIT_PROVIDED -DMISSING_SYSCALL_NAMES -DSIGNAL_PROVIDED -DREENTRANT_SYSCALLS_PROVIDED -DHAVE_OPENDIR -DNO_EXEC -DWANT_PRINTF_LONG_LONG -DHAVE_FCNTL"
 	;;
 # VxWorks supplies its own version of malloc, and the newlib one
 # doesn't work because VxWorks does not have sbrk.
@@ -508,37 +390,22 @@ case "${host}" in
   arm-*-pe)
 	syscall_dir=syscalls
 	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
+# Don't use the debugging protocols just yet.
 	;;
   arm-*-*)
 	syscall_dir=syscalls
 	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
-# If newlib is supplying syscalls, select which debug protocol is being used.
+# Select which debug protocol is being used.
 # ARM_RDP_MONITOR selects the Demon monitor.
 # ARM_RDI_MONITOR selects the Angel monitor.
 # If neither are defined, then hard coded defaults will be used
 # to create the program's environment.
-# If --disable-newlib-supplied-syscalls is specified, then the end-user
-# may specify the protocol via gcc spec files supplied by libgloss.
 # See also thumb below.
-	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
-#         newlib_cflags="${newlib_cflags} -DARM_RDP_MONITOR"
-	  newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
-	fi
-	;;
-  arc*)
-	newlib_cflags="${newlib_cflags} -DREENTRANT_SYSCALLS_PROVIDED"
+#	newlib_cflags="${newlib_cflags} -DARM_RDP_MONITOR"
+	newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
 	;;
   avr*)
 	newlib_cflags="${newlib_cflags} -DNO_EXEC -DSMALL_MEMORY -DMISSING_SYSCALL_NAMES"
-	;;
-  cris-*-* | crisv32-*-*)
-	default_newlib_io_long_long="yes"
-	newlib_cflags="${newlib_cflags} -DHAVE_RENAME -DHAVE_GETTIMEOFDAY -D_USE_WRITE -DCOMPACT_CTYPE"
-	syscall_dir=syscalls
-	;;
-  crx-*-*)
-	newlib_cflags="${newlib_cflags} -DHAVE_RENAME -DMISSING_SYSCALL_NAMES"
-	syscall_dir=
 	;;
   d10v*)
 	newlib_cflags="${newlib_cflags} -DSMALL_MEMORY"
@@ -548,41 +415,26 @@ case "${host}" in
 	newlib_cflags="${newlib_cflags} -DABORT_MESSAGE -DSMALL_MEMORY -DMISSING_SYSCALL_NAMES"
 	syscall_dir=
 	;;
-  ep9312-*-*)
-	syscall_dir=syscalls
-	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
-	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
-	  newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
-	fi
-	;;
   fr30-*-*)
+	newlib_cflags="${newlib_cflags}"
 	syscall_dir=syscalls
 	;;
-  frv-*-*)
-        syscall_dir=syscalls
-	default_newlib_io_long_long="yes"
-        ;;
   h8300*-*-*)
 	syscall_dir=syscalls	
-	default_newlib_io_long_long="yes"
 	newlib_cflags="${newlib_cflags} -DSMALL_DTOA -DSMALL_MEMORY"
-	# Simulator only extensions for H8300.
-	# Uncomment the next line to enable them.
-	# newlib_cflags="${newlib_cflags} -D__SIMULATOR__"
 	;;	
   h8500-*-*)
 	syscall_dir=syscalls	
 	newlib_cflags="${newlib_cflags} -DSMALL_DTOA -DSMALL_MEMORY"
 	;;	
-  i[34567]86-*-sco*)
+  i[3456]86-*-sco*)
 	newlib_cflags="${newlib_cflags} -DSIGNAL_PROVIDED -DHAVE_FCNTL"
 	;;
-  i[34567]86-*-netware*)
+  i[3456]86-*-netware*)
 	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES -DNO_EXEC -DABORT_PROVIDED -DCLOCK_PROVIDED -DMALLOC_PROVIDED -DHAVE_FCNTL"
 	;;
-  iq2000*)
-	syscall_dir=syscalls
-	default_newlib_io_long_long="yes"
+  i[3456]86-*-go32)
+	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES -DNO_EXEC -DHAVE_FCNTL"
 	;;
   m32r-*-*)
 	# Pass -msdata=sdata so _impure_ptr goes in .sdata.
@@ -592,19 +444,9 @@ case "${host}" in
 	newlib_cflags="${newlib_cflags} -msdata=sdata"
 	syscall_dir=syscalls
 	;;
-  m68hc11-*-*|m6811-*-*|m68hc12-*-*|m6812-*-*)
-	newlib_cflags="${newlib_cflags} -DNO_EXEC -DABORT_PROVIDED -DSMALL_MEMORY -DMISSING_SYSCALL_NAMES"
-	;;
   mcore-*-*)
+	newlib_cflags="${newlib_cflags}"
 	syscall_dir=syscalls
-	;;
-  mips64vr*-*-*)
-	default_newlib_io_long_long="yes"
-	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES"
-	;;
-  mips*-*-elf*)
-	default_newlib_io_long_long="yes"
-	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES"
 	;;
   mmix-*)
 	syscall_dir=syscalls
@@ -615,21 +457,12 @@ case "${host}" in
   mn10?00-*-*)
 	syscall_dir=syscalls
 	;;
-  powerpc*-*-eabialtivec*)
-	default_newlib_io_long_long="yes"
-	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES"
-	;;
-  powerpc*-*-eabispe*)
-	default_newlib_io_long_long="yes"
-	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES"
-	;;
   powerpc*-*-eabi* | \
   powerpc*-*-elf* | \
   powerpc*-*-linux* | \
   powerpc*-*-rtem* | \
   powerpc*-*-sysv* | \
   powerpc*-*-solaris*)
-	default_newlib_io_long_long="yes"
 	newlib_cflags="${newlib_cflags} -mrelocatable-lib -mno-eabi -mstrict-align -DMISSING_SYSCALL_NAMES"
 	;;
   powerpcle-*-pe)
@@ -637,7 +470,6 @@ case "${host}" in
 	syscall_dir=syscalls
 	;;
   sh*-*-*)
-	default_newlib_io_long_long="yes"
 	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY"
 	syscall_dir=syscalls
 	;;
@@ -658,6 +490,12 @@ case "${host}" in
   strongarm-*-*)
 	syscall_dir=syscalls
 	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
+	newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
+	;;
+  xscale-*-*)
+	syscall_dir=syscalls
+	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
+	newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
 	;;
   thumb-*-pe)
 	syscall_dir=syscalls
@@ -667,17 +505,14 @@ case "${host}" in
   thumb-*-*)
 	syscall_dir=syscalls
 	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
-# If newlib is supplying syscalls, select which debug protocol is being used.
+# Select which debug protocol is being used.
 # ARM_RDP_MONITOR selects the Demon monitor.
 # ARM_RDI_MONITOR selects the Angel monitor.
 # If neither are defined, then hard coded defaults will be used
 # to create the program's environment.
-# If --disable-newlib-supplied-syscalls is specified, then the end-user
-# may specify the protocol via gcc spec files supplied by libgloss.
-	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
-#         newlib_cflags="${newlib_cflags} -DARM_RDP_MONITOR"
-	  newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
-	fi
+# See also arm and strongarm above.
+#	newlib_cflags="${newlib_cflags} -DARM_RDP_MONITOR"
+	newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
 	;;
   tic80*)
 	syscall_dir=syscalls
@@ -695,18 +530,6 @@ case "${host}" in
 	syscall_dir=syscalls	
 	newlib_cflags="${newlib_cflags} -DSMALL_DTOA -DSMALL_MEMORY"
 	;;	
-  xscale-*-*)
-	syscall_dir=syscalls
-	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
-	newlib_cflags="${newlib_cflags} -DHAVE_SYSTEM -DHAVE_RENAME"
-	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
-	  newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
-	fi
-	;;
-  xstormy16-*-*)
-	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY"
-	syscall_dir=syscalls
-	;;
   z8k-*-*)
 	syscall_dir=syscalls
 	;;
@@ -715,37 +538,3 @@ case "${host}" in
 	syscall_dir=
 	;;
 esac
-
-# Use defaults for certain settings if not specified by user
-
-# Enable long long support in I/O routines if requested.
-if [ "x${newlib_io_long_long}" = "x" ]; then
-	if [ ${default_newlib_io_long_long} = "yes" ]; then
-		newlib_io_long_long="yes";
-	fi
-fi
-
-# Enable long double support in I/O routines if requested.
-if [ "x${newlib_io_long_double}" = "x" ]; then
-	if [ ${default_newlib_io_long_double} = "yes" ]; then
-		newlib_io_long_double="yes";
-	fi
-fi
-
-# Enable printf positional argument support if requested.
-if [ "x${newlib_io_pos_args}" = "x" ]; then
-	if [ ${default_newlib_io_pos_args} = "yes" ]; then
-		newlib_io_pos_args="yes";
-	fi
-fi
-
-# Disable atexit dynamic allocation if requested.
-if [ "x${newlib_atexit_dynamic_alloc}" = "x" ]; then
-	if [ ${default_newlib_atexit_dynamic_alloc} = "yes" ]; then
-		newlib_atexit_dynamic_alloc="yes"; 
-	fi
-fi
-
-if test -z "${have_crt0}" && test -n "${sys_dir}"; then
-  have_crt0="yes"
-fi

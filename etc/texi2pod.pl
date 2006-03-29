@@ -1,23 +1,23 @@
 #! /usr/bin/perl -w
 
-#   Copyright (C) 1999, 2000, 2001, 2003 Free Software Foundation, Inc.
+#   Copyright (C) 1999, 2000, 2001 Free Software Foundation, Inc.
 
-# This file is part of GCC.
+# This file is part of GNU CC.
 
-# GCC is free software; you can redistribute it and/or modify
+# GNU CC is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2, or (at your option)
 # any later version.
 
-# GCC is distributed in the hope that it will be useful,
+# GNU CC is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with GCC; see the file COPYING.  If not, write to
-# the Free Software Foundation, 51 Franklin Street, Fifth Floor,
-# Boston MA 02110-1301, USA.
+# along with GNU CC; see the file COPYING.  If not, write to
+# the Free Software Foundation, 59 Temple Place - Suite 330,
+# Boston MA 02111-1307, USA.
 
 # This does trivial (and I mean _trivial_) conversion of Texinfo
 # markup to Perl POD format.  It's intended to be used to extract
@@ -30,12 +30,9 @@ $section = "";
 @icstack = ();
 @endwstack = ();
 @skstack = ();
-@instack = ();
 $shift = "";
 %defs = ();
 $fnno = 1;
-$inf = "";
-$ibase = "";
 
 while ($_ = shift) {
     if (/^-D(.*)$/) {
@@ -44,13 +41,15 @@ while ($_ = shift) {
 	} else {
 	    $flag = shift;
 	}
-	$value = "";
-	($flag, $value) = ($flag =~ /^([^=]+)(?:=(.+))?/);
+	$value=$flag;
+	$value =~ s,^[a-zA-Z0-9_]+,,;
+	$value =~ s,.*=,,;
+	$flag =~ s,=.*$,,;
 	die "no flag specified for -D\n"
 	    unless $flag ne "";
-	die "flags may only contain letters, digits, hyphens, dashes and underscores\n"
-	    unless $flag =~ /^[a-zA-Z0-9_-]+$/;
+	#print STDERR "FL = $flag, V = $value\n";
 	$defs{$flag} = $value;
+
     } elsif (/^-/) {
 	usage();
     } else {
@@ -61,19 +60,14 @@ while ($_ = shift) {
 }
 
 if (defined $in) {
-    $inf = gensym();
-    open($inf, "<$in") or die "opening \"$in\": $!\n";
-    $ibase = $1 if $in =~ m|^(.+)/[^/]+$|;
-} else {
-    $inf = \*STDIN;
+    open(STDIN, $in) or die "opening \"$in\": $!\n";
 }
-
 if (defined $out) {
     open(STDOUT, ">$out") or die "opening \"$out\": $!\n";
 }
 
-while(defined $inf) {
-while(<$inf>) {
+while(<STDIN>)
+{
     # Certain commands are discarded without further processing.
     /^\@(?:
 	 [a-z]+index		# @*index: useful only in complete manual
@@ -81,9 +75,8 @@ while(<$inf>) {
 	 |(?:end\s+)?group	# @group .. @end group: ditto
 	 |page			# @page: ditto
 	 |node			# @node: useful only in .info file
-	 |(?:end\s+)?ifnottex   # @ifnottex .. @end ifnottex: use contents
 	)\b/x and next;
-
+    
     chomp;
 
     # Look for filename and title markers.
@@ -91,7 +84,7 @@ while(<$inf>) {
     /^\@settitle\s+([^.]+)/ and $tl = postprocess($1), next;
 
     # Identify a man title but keep only the one we are interested in.
-    /^\@c\s+man\s+title\s+([A-Za-z0-9-]+)\s+(.+)/ and do {
+    /^\@c man title ([A-Za-z0-9]+) (.+)/ and do {
 	if (exists $defs{$1}) {
 	    $fn = $1;
 	    $tl = postprocess($2);
@@ -102,30 +95,19 @@ while(<$inf>) {
     # Look for blocks surrounded by @c man begin SECTION ... @c man end.
     # This really oughta be @ifman ... @end ifman and the like, but such
     # would require rev'ing all other Texinfo translators.
-    /^\@c\s+man\s+begin\s+([A-Z]+)\s+([A-Za-z0-9-]+)/ and do {
+    /^\@c man begin ([A-Z]+) ([A-Za-z0-9]+)/ and do {
 	$output = 1 if exists $defs{$2};
         $sect = $1;
 	next;
     };
-    /^\@c\s+man\s+begin\s+([A-Z]+)/ and $sect = $1, $output = 1, next;
-    /^\@c\s+man\s+end/ and do {
+    /^\@c man begin ([A-Z]+)/ and $sect = $1, $output = 1, next;
+    /^\@c man end/ and do {
 	$sects{$sect} = "" unless exists $sects{$sect};
 	$sects{$sect} .= postprocess($section);
 	$section = "";
 	$output = 0;
 	next;
     };
-
-    # handle variables
-    /^\@set\s+([a-zA-Z0-9_-]+)\s*(.*)$/ and do {
-	$defs{$1} = $2;
-	next;
-    };
-    /^\@clear\s+([a-zA-Z0-9_-]+)/ and do {
-	delete $defs{$1};
-	next;
-    };
-
     next unless $output;
 
     # Discard comments.  (Can't do it above, because then we'd never see
@@ -138,20 +120,20 @@ while(<$inf>) {
 	# Ignore @end foo, where foo is not an operation which may
 	# cause us to skip, if we are presently skipping.
 	my $ended = $1;
-	next if $skipping && $ended !~ /^(?:ifset|ifclear|ignore|menu|iftex|copying)$/;
+	next if $skipping && $ended !~ /^(?:ifset|ifclear|ignore|menu)$/;
 
 	die "\@end $ended without \@$ended at line $.\n" unless defined $endw;
 	die "\@$endw ended by \@end $ended at line $.\n" unless $ended eq $endw;
 
 	$endw = pop @endwstack;
 
-	if ($ended =~ /^(?:ifset|ifclear|ignore|menu|iftex)$/) {
+	if ($ended =~ /^(?:ifset|ifclear|ignore|menu)$/) {
 	    $skipping = pop @skstack;
 	    next;
-	} elsif ($ended =~ /^(?:example|smallexample|display)$/) {
+	} elsif ($ended =~ /^(?:example|smallexample)$/) {
 	    $shift = "";
 	    $_ = "";	# need a paragraph break
-	} elsif ($ended =~ /^(?:itemize|enumerate|[fv]?table)$/) {
+	} elsif ($ended =~ /^(?:itemize|enumerate|table)$/) {
 	    $_ = "\n=back\n";
 	    $ic = pop @icstack;
 	} else {
@@ -178,7 +160,7 @@ while(<$inf>) {
 	next;
     };
 
-    /^\@(ignore|menu|iftex|copying)\b/ and do {
+    /^\@(ignore|menu)\b/ and do {
 	push @endwstack, $endw;
 	push @skstack, $skipping;
 	$endw = $1;
@@ -207,12 +189,6 @@ while(<$inf>) {
     s/\@\{/&lbrace;/g;
     s/\@\}/&rbrace;/g;
     s/\@\@/&at;/g;
-
-    # Inside a verbatim block, handle @var specially.
-    if ($shift ne "") {
-	s/\@var\{([^\}]*)\}/<$1>/g;
-    }
-
     # POD doesn't interpret E<> inside a verbatim block.
     if ($shift eq "") {
 	s/</&lt;/g;
@@ -223,38 +199,22 @@ while(<$inf>) {
     }
 
     # Single line command handlers.
+    /^\@set\s+([a-zA-Z0-9_-]+)\s*(.*)$/ and $defs{$1} = $2, next;
+    /^\@clear\s+([a-zA-Z0-9_-]+)/ and delete $defs{$1}, next;
 
-    /^\@include\s+(.+)$/ and do {
-	push @instack, $inf;
-	$inf = gensym();
-	$file = postprocess($1);
-
-	# Try cwd and $ibase.
-	open($inf, "<" . $file) 
-	    or open($inf, "<" . $ibase . "/" . $file)
-		or die "cannot open $file or $ibase/$file: $!\n";
-	next;
-    };
-
-    /^\@(?:section|unnumbered|unnumberedsec|center)\s+(.+)$/
-	and $_ = "\n=head2 $1\n";
-    /^\@subsection\s+(.+)$/
-	and $_ = "\n=head3 $1\n";
+    /^\@section\s+(.+)$/ and $_ = "\n=head2 $1\n";
+    /^\@subsection\s+(.+)$/ and $_ = "\n=head3 $1\n";
 
     # Block command handlers:
-    /^\@itemize(?:\s+(\@[a-z]+|\*|-))?/ and do {
+    /^\@itemize\s+(\@[a-z]+|\*|-)/ and do {
 	push @endwstack, $endw;
 	push @icstack, $ic;
-	if (defined $1) {
-	    $ic = $1;
-	} else {
-	    $ic = '@bullet';
-	}
+	$ic = $1;
 	$_ = "\n=over 4\n";
 	$endw = "itemize";
     };
 
-    /^\@enumerate(?:\s+([a-zA-Z0-9]+))?/ and do {
+    /^\@enumerate(?:\s+([A-Z0-9]+))?/ and do {
 	push @endwstack, $endw;
 	push @icstack, $ic;
 	if (defined $1) {
@@ -266,19 +226,19 @@ while(<$inf>) {
 	$endw = "enumerate";
     };
 
-    /^\@([fv]?table)\s+(\@[a-z]+)/ and do {
+    /^\@table\s+(\@[a-z]+)/ and do {
 	push @endwstack, $endw;
 	push @icstack, $ic;
-	$endw = $1;
-	$ic = $2;
+	$ic = $1;
 	$ic =~ s/\@(?:samp|strong|key|gcctabopt|env)/B/;
 	$ic =~ s/\@(?:code|kbd)/C/;
 	$ic =~ s/\@(?:dfn|var|emph|cite|i)/I/;
 	$ic =~ s/\@(?:file)/F/;
 	$_ = "\n=over 4\n";
+	$endw = "table";
     };
 
-    /^\@((?:small)?example|display)/ and do {
+    /^\@((?:small)?example)/ and do {
 	push @endwstack, $endw;
 	$endw = $1;
 	$shift = "\t";
@@ -291,16 +251,11 @@ while(<$inf>) {
 	    $_ = "\n=item $ic\&LT;$1\&GT;\n";
 	} else {
 	    $_ = "\n=item $ic\n";
-	    $ic =~ y/A-Ya-y/B-Zb-z/;
-	    $ic =~ s/(\d+)/$1 + 1/eg;
+	    $ic =~ y/A-Ya-y1-8/B-Zb-z2-9/;
 	}
     };
 
     $section .= $shift.$_."\n";
-}
-# End of current file.
-close($inf);
-$inf = pop @instack;
 }
 
 die "No filename or title\n" unless defined $fn && defined $tl;
@@ -329,15 +284,13 @@ sub postprocess
     local $_ = $_[0];
 
     # @value{foo} is replaced by whatever 'foo' is defined as.
-    while (m/(\@value\{([a-zA-Z0-9_-]+)\})/g) {
-	if (! exists $defs{$2}) {
-	    print STDERR "Option $2 not defined\n";
-	    s/\Q$1\E//;
-	} else {
-	    $value = $defs{$2};
-	    s/\Q$1\E/$value/;
+    if (/\@value\{([a-zA-Z0-9_-]+)\}/) {
+	if (! exists $defs{$1}) {
+	    print STDERR "Option $1 not define\n";
 	}
+
     }
+    s/\@value\{([a-zA-Z0-9_-]+)\}/$defs{$1}/g;
 
     # Formatting commands.
     # Temporary escape for @r.
@@ -350,12 +303,8 @@ sub postprocess
     s/\@w\{([^\}]*)\}/S<$1>/g;
     s/\@(?:dmn|math)\{([^\}]*)\}/$1/g;
 
-    # keep references of the form @ref{...}, print them bold
-    s/\@(?:ref)\{([^\}]*)\}/B<$1>/g;
-
-    # Change double single quotes to double quotes.
-    s/''/"/g;
-    s/``/"/g;
+    # Handle @r inside bold.
+    1 while s/B<((?:[^<>]|I<[^<>]*>)*)R<([^>]*)>/B<$1>${2}B</g;
 
     # Cross references are thrown away, as are @noindent and @refill.
     # (@noindent is impossible in .pod, and @refill is unnecessary.)
@@ -377,18 +326,12 @@ sub postprocess
     s/\@uref\{([^\},]*),([^\},]*)\}/$2 (C<$1>)/g;
     s/\@uref\{([^\},]*),([^\},]*),([^\},]*)\}/$3/g;
 
-    # Un-escape <> at this point.
+    # Turn B<blah I<blah> blah> into B<blah> I<blah> B<blah> to
+    # match Texinfo semantics of @emph inside @samp.
     s/&LT;/</g;
     s/&GT;/>/g;
-
-    # Now un-nest all B<>, I<>, R<>.  Theoretically we could have
-    # indefinitely deep nesting; in practice, one level suffices.
-    1 while s/([BIR])<([^<>]*)([BIR])<([^<>]*)>/$1<$2>$3<$4>$1</g;
-
-    # Replace R<...> with bare ...; eliminate empty markup, B<>;
-    # shift white space at the ends of [BI]<...> expressions outside
-    # the expression.
-    s/R<([^<>]*)>/$1/g;
+    1 while (s/B<([^<>]*)I<([^>]+)>/B<$1>I<$2>B</g);
+    1 while (s/I<([^<>]*)B<([^>]+)>/I<$1>B<$2>I</g);
     s/[BI]<>//g;
     s/([BI])<(\s+)([^>]+)>/$2$1<$3>/g;
     s/([BI])<([^>]+?)(\s+)>/$1<$2>$3/g;
@@ -429,15 +372,4 @@ sub add_footnote
     $sects{FOOTNOTES} .= $_[0];
     $sects{FOOTNOTES} .= "\n\n";
 }
-
-# stolen from Symbol.pm
-{
-    my $genseq = 0;
-    sub gensym
-    {
-	my $name = "GEN" . $genseq++;
-	my $ref = \*{$name};
-	delete $::{$name};
-	return $ref;
-    }
-}
+    
