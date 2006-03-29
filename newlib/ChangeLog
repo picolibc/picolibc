@@ -1,5 +1,10 @@
 2006-03-29  Shaun Jackman  <sjackman@gmail.com>
 
+	* libc/sys/linux/include/netinet/ip.h: Include netinet/in_systm.h
+	for the declaration of n_long.
+
+2006-03-29  Shaun Jackman  <sjackman@gmail.com>
+
 	* libc/sys/linux/include/net/if.h: Include sys/socket.h for
 	struct sockaddr.
 	(IFF_SMART): Replace this define with IFF_NOTRAILERS.
