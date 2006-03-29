@@ -1499,16 +1499,16 @@ _dns_ghbyname(void *rval, void *cb_data, va_list ap)
 #ifdef INET6
 	switch (af) {
 	case AF_UNSPEC:
-		&rtl4->rtl_entry = NULL; rtl4.rtl_type = T_A;
-		&rtl6->rtl_entry = &rtl4; rtl6.rtl_type = T_AAAA;
+		rtl4.rtl_entry = NULL; rtl4.rtl_type = T_A;
+		rtl6.rtl_entry = &rtl4; rtl6.rtl_type = T_AAAA;
 		rtl = &rtl6;
 		break;
 	case AF_INET6:
-		&rtl6->rtl_entry = NULL; rtl6.rtl_type = T_AAAA;
+		rtl6.rtl_entry = NULL; rtl6.rtl_type = T_AAAA;
 		rtl = &rtl6;
 		break;
 	case AF_INET:
-		&rtl4->rtl_entry = NULL; rtl4.rtl_type = T_A;
+		rtl4.rtl_entry = NULL; rtl4.rtl_type = T_A;
 		rtl = &rtl4;
 		break;
 	}
