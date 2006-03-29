@@ -1,3 +1,11 @@
+2006-03-29  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* gdb/m68k-tdep.c (M68K_FPREG_TYPE, M68K_LONG_DOUBLE_FORMAT,
+	M68K_RETURN_FP0): New.  Set for Coldfire.
+	(m68k_register_type, m68k_register_to_value,
+	m68k_svr4_extract_return_value, m68k_svr4_store_return_value,
+	m68k_gdbarch_init): Use them.
+
 2006-03-21  Mark Mitchell  <mark@codesourcery.com>
 
 	* gdb/ser-mingw.c (net_windows_state): Add mutex.
