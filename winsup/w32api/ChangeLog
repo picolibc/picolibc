@@ -1,5 +1,9 @@
 2006-03-29  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 	* include/winspool.h [_WIN32_WINNT >= 0x0500]
+	(DRIVER_INFO_7A): Correct definition.
+
+2006-03-29  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+	* include/winspool.h [_WIN32_WINNT >= 0x0500]
 	(DRIVER_INFO_*{AW}): Add structure.
 	(PRINTER_INFO_*{AW}): Add structure.
 	Thanks to:   Roland Schwingel <rolandschwingel at users dot sf dot net>

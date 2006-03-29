@@ -607,7 +607,7 @@ typedef struct _PRINTER_INFO_6 {
 #if (_WIN32_WINNT >= 0x0500)
 typedef struct _PRINTER_INFO_7A {
 	LPWSTR pszObjectGUID;
-	DWORD dwStatus;
+	DWORD dwAction;
 } PRINTER_INFO_7A,*PPRINTER_INFO_7A,*LPPRINTER_INFO_7A;
 typedef struct _PRINTER_INFO_7W {
 	LPWSTR pszObjectGUID;
