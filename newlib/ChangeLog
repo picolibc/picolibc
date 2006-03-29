@@ -1,3 +1,8 @@
+2006-03-29  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/freopen.c (_freopen_r) [__SCLE]: Fix typo.
+	* libc/stdio64/freopen64.c (_freopen64_r) [__SCLE]: Likewise.
+
 2006-03-29  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/io.c (__mknod): Fix declaration of
