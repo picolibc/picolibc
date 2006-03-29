@@ -38,6 +38,7 @@
 #define	_NET_IF_H_
 
 #include <sys/queue.h>
+#include <sys/socket.h>
 
 /*
  * <net/if.h> does not depend on <sys/time.h> on most other systems.  This
@@ -122,7 +123,7 @@ struct if_data {
 #define	IFF_DEBUG	0x4		/* turn on debugging */
 #define	IFF_LOOPBACK	0x8		/* is a loopback net */
 #define	IFF_POINTOPOINT	0x10		/* interface is point-to-point link */
-#define	IFF_SMART	0x20		/* interface manages own routes */
+#define	IFF_NOTRAILERS	0x20		/* avoid use of trailers */
 #define	IFF_RUNNING	0x40		/* resources allocated */
 #define	IFF_NOARP	0x80		/* no address resolution protocol */
 #define	IFF_PROMISC	0x100		/* receive all packets */
@@ -147,7 +148,7 @@ struct if_data {
 /* flags set internally only: */
 #define	IFF_CANTCHANGE \
 	(IFF_BROADCAST|IFF_POINTOPOINT|IFF_RUNNING|IFF_OACTIVE|\
-	    IFF_SIMPLEX|IFF_MULTICAST|IFF_ALLMULTI|IFF_SMART)
+	    IFF_SIMPLEX|IFF_MULTICAST|IFF_ALLMULTI|IFF_NOTRAILERS)
 
 /* Capabilities that interfaces can advertise. */
 #define IFCAP_RXCSUM		0x0001  /* can offload checksum on RX */
@@ -227,6 +228,7 @@ struct	ifreq {
 		struct	sockaddr ifru_addr;
 		struct	sockaddr ifru_dstaddr;
 		struct	sockaddr ifru_broadaddr;
+		struct	sockaddr ifru_netmask;
 		short	ifru_flags[2];
 		short	ifru_index;
 		int	ifru_metric;
@@ -239,6 +241,7 @@ struct	ifreq {
 #define	ifr_addr	ifr_ifru.ifru_addr	/* address */
 #define	ifr_dstaddr	ifr_ifru.ifru_dstaddr	/* other end of p-to-p link */
 #define	ifr_broadaddr	ifr_ifru.ifru_broadaddr	/* broadcast address */
+#define	ifr_netmask	ifr_ifru.ifru_netmask	/* interface net mask	*/
 #define	ifr_flags	ifr_ifru.ifru_flags[0]	/* flags */
 #define	ifr_prevflags	ifr_ifru.ifru_flags[1]	/* flags */
 #define	ifr_metric	ifr_ifru.ifru_metric	/* metric */

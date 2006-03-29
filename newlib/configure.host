@@ -63,6 +63,7 @@ have_sys_mach_dir=no
 default_newlib_io_long_long=no
 default_newlib_io_long_double=no
 default_newlib_io_pos_args=no
+default_newlib_atexit_dynamic_alloc=yes
 aext=a
 oext=o
 
@@ -735,6 +736,13 @@ fi
 if [ "x${newlib_io_pos_args}" = "x" ]; then
 	if [ ${default_newlib_io_pos_args} = "yes" ]; then
 		newlib_io_pos_args="yes";
+	fi
+fi
+
+# Disable atexit dynamic allocation if requested.
+if [ "x${newlib_atexit_dynamic_alloc}" = "x" ]; then
+	if [ ${default_newlib_atexit_dynamic_alloc} = "yes" ]; then
+		newlib_atexit_dynamic_alloc="yes"; 
 	fi
 fi
 

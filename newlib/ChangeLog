@@ -1,3 +1,50 @@
+2006-03-29  Shaun Jackman  <sjackman@gmail.com>
+
+	* libc/sys/linux/include/netinet/ip.h: Include netinet/in_systm.h
+	for the declaration of n_long.
+
+2006-03-29  Shaun Jackman  <sjackman@gmail.com>
+
+	* libc/sys/linux/include/net/if.h: Include sys/socket.h for
+	struct sockaddr.
+	(IFF_SMART): Replace this define with IFF_NOTRAILERS.
+	(IFF_CANTCHANGE): Replace IFF_SMART reference with IFF_NOTRAILERS.
+	(IFF_NOTRAILERS): New define.
+	(struct ifreq): Add ifru_netmask.
+	(ifr_netmask): New define.
+
+2006-03-29  Shaun Jackman  <sjackman@gmail.com>
+
+	* libc/sys/linux/sys/ioccom.h (ioctl): Change declaration to
+	match sys/ioctl.h.
+
+2006-03-29  Shaun Jackman  <sjackman@gmail.com>
+
+	* libtool.m4: Set lt_cv_deplibs_check_method=pass_all for 
+	linux-newlib libc implementations.
+
+2006-03-29  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/freopen.c (_freopen_r) [__SCLE]: Fix typo.
+	* libc/stdio64/freopen64.c (_freopen64_r) [__SCLE]: Likewise.
+
+2006-03-29  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/io.c (__mknod): Fix declaration of
+	syscall to pass a dev_t as third argument rather than
+	a pointer to dev_t.
+
+2006-03-29  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/net/name6.c: Fix struct references.
+
+2006-03-22  Mark Mitchell  <mark@codesourcery.com>
+
+	* configure.host: Allow hosts to set the default
+	newlib_atexit_dynamic_alloc value.
+	* configure.in: Likewise.
+	* configure: Regenerated.
+
 2006-03-20  Mark Mitchell  <mark@codesourcery.com>
 
 	* acconfig.h (_ATEXIT_DYNAMIC_ALLOC): Undef.

@@ -65,12 +65,12 @@ int flock(int fd,int operation)
 
 #if !defined(_ELIX_LEVEL) || _ELIX_LEVEL >= 3
 
-static _syscall3(int,__mknod,const char *,path,mode_t,mode,dev_t *,dev)
+static _syscall3(int,__mknod,const char *,path,mode_t,mode,dev_t,dev)
 
 int mkfifo(const char *path, mode_t mode)
 {
    dev_t dev = 0;
-   return __mknod(path, mode | S_IFIFO, &dev);
+   return __mknod(path, mode | S_IFIFO, dev);
 }
 #endif
 

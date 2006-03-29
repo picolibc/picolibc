@@ -1,3 +1,9 @@
+2006-03-22  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* mt/startup-16-002.S (.internal_io): Make @nobits.
+	* mt/startup-16-003.S (.internal_io): Make @nobits.
+	* mt/startup-ms2.S (.internal_io): Make @nobits.
+
 2006-03-02  DJ Delorie  <dj@redhat.com>
 
 	* m32c/exit.S: Preserve r1.

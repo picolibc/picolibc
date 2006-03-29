@@ -94,7 +94,7 @@ AC_ARG_ENABLE(newlib-atexit-dynamic-alloc,
     no)  newlib_atexit_dynamic_alloc=no  ;;
     *)   AC_MSG_ERROR(bad value ${enableval} for newlib-atexit-dynamic-alloc option) ;;
   esac
- fi], [newlib_atexit_dynamic_alloc=yes])dnl
+ fi], [newlib_atexit_dynamic_alloc=${newlib_atexit_dynamic_alloc}])dnl
 
 NEWLIB_CONFIGURE(.)
 
