@@ -1,3 +1,8 @@
+2006-03-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.h (sec_user_nih): Make sid1 argument mandatory.
+	(sec_user): Ditto.
+
 2006-03-29  Christopher Faylor  <cgf@timesys.com>
 
 	* sigproc.cc (wait_for_sigthread): Use the current user sid when

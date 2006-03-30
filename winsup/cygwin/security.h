@@ -381,15 +381,17 @@ extern bool sec_acl (PACL acl, bool original, bool admins, PSID sid1 = NO_SID,
 int __stdcall NTReadEA (const char *file, const char *attrname, char *buf, int len);
 BOOL __stdcall NTWriteEA (const char *file, const char *attrname, const char *buf, int len);
 
+/* Note: sid1 is usually (read: currently always) the current user's
+   effective sid (cygheap->user.sid ()). */
 extern inline SECURITY_ATTRIBUTES *
-sec_user_nih (SECURITY_ATTRIBUTES *sa_buf, PSID sid1 = NULL, PSID sid2 = NULL,
+sec_user_nih (SECURITY_ATTRIBUTES *sa_buf, PSID sid1, PSID sid2 = NULL,
 	      DWORD access2 = 0)
 {
   return __sec_user (sa_buf, sid1, sid2, access2, FALSE);
 }
 
 extern inline SECURITY_ATTRIBUTES *
-sec_user (SECURITY_ATTRIBUTES *sa_buf, PSID sid1 = NULL, PSID sid2 = NULL,
+sec_user (SECURITY_ATTRIBUTES *sa_buf, PSID sid1, PSID sid2 = NULL,
 	  DWORD access2 = 0)
 {
   return __sec_user (sa_buf, sid1, sid2, access2, TRUE);
