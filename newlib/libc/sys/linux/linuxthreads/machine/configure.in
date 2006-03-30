@@ -18,7 +18,9 @@ AM_PROG_LIBTOOL
 fi
 
 if test -n "${machine_dir}"; then
-  AC_CONFIG_SUBDIRS(${machine_dir})
+  case ${machine_dir} in
+	i386) AC_CONFIG_SUBDIRS(i386) ;;
+  esac;
 fi
 
 AM_CONDITIONAL(HAVE_MACHINE_DIR, test x${machine_dir} != x)

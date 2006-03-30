@@ -8,7 +8,11 @@ else
 MATHDIR = math
 endif
 
+if HAVE_LIBM_MACHINE_DIR
 SUBDIRS = $(MATHDIR) common machine
+else
+SUBDIRS = $(MATHDIR) common
+endif
 
 libm_la_LDFLAGS = -Xcompiler -nostdlib
 

@@ -40,6 +40,7 @@
 #   use_libtool         flag: use libtool to build newlib?
 #   aext                library extension - needed for libtool support
 #   oext                object file extension - needed for libtool support
+#   lpfx		library object prefix - generated when no libtool
 #   crt1                name of crt1 object if one is provided
 #   crt1_dir            directory where crt1 object is found
 #   have_crt0		"yes"/"no" if crt0 is/isn't provided.
@@ -66,6 +67,7 @@ default_newlib_io_pos_args=no
 default_newlib_atexit_dynamic_alloc=yes
 aext=a
 oext=o
+lpfx="lib_a-"
 
 case "${target_optspace}:${host}" in
   yes:*)
@@ -291,6 +293,7 @@ case "${host}" in
     have_sys_mach_dir=yes
     stdio64_dir=stdio64
     oext=lo
+    lpfx=
     aext=la ;;
   *) ;; #shared library not supported for ${host}
 esac

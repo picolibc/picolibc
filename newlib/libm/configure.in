@@ -38,5 +38,6 @@ if test -n "${libm_machine_dir}"; then
 fi
 
 AC_SUBST(LIBM_MACHINE_LIB)
+AM_CONDITIONAL(HAVE_LIBM_MACHINE_DIR, test x${libm_machine_dir} != x)
 
 AC_OUTPUT(Makefile math/Makefile mathfp/Makefile common/Makefile)

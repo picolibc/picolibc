@@ -18,7 +18,32 @@ AM_PROG_LIBTOOL
 fi
 
 if test -n "${sys_dir}"; then
-  AC_CONFIG_SUBDIRS(${sys_dir})
+  case ${sys_dir} in
+	a29khif) AC_CONFIG_SUBDIRS(a29khif) ;;
+	arc) AC_CONFIG_SUBDIRS(arc) ;;
+	arm) AC_CONFIG_SUBDIRS(arm) ;;
+	d10v) AC_CONFIG_SUBDIRS(d10v) ;;
+	decstation) AC_CONFIG_SUBDIRS(decstation) ;;
+	h8300hms) AC_CONFIG_SUBDIRS(h8300hms) ;;
+	h8500hms) AC_CONFIG_SUBDIRS(h8500hms) ;;
+	linux) AC_CONFIG_SUBDIRS(linux) ;;
+	m88kbug) AC_CONFIG_SUBDIRS(m88kbug) ;;
+	mmixware) AC_CONFIG_SUBDIRS(mmixware) ;;
+	netware) AC_CONFIG_SUBDIRS(netware) ;;
+	rdos) AC_CONFIG_SUBDIRS(rdos) ;;
+	rtems) AC_CONFIG_SUBDIRS(rtems) ;;
+	sh) AC_CONFIG_SUBDIRS(sh) ;;
+	sparc64) AC_CONFIG_SUBDIRS(sparc64) ;;
+	sun4) AC_CONFIG_SUBDIRS(sun4) ;;
+	sysmec) AC_CONFIG_SUBDIRS(sysmec) ;;
+	sysnec810) AC_CONFIG_SUBDIRS(sysnec810) ;;
+	sysnecv850) AC_CONFIG_SUBDIRS(sysnecv850) ;;
+	sysvi386) AC_CONFIG_SUBDIRS(sysvi386) ;;
+	sysvnecv70) AC_CONFIG_SUBDIRS(sysvnecv70) ;;
+	tic80) AC_CONFIG_SUBDIRS(tic80) ;;
+	w65) AC_CONFIG_SUBDIRS(w65) ;;
+	z8ksim) AC_CONFIG_SUBDIRS(z8ksim) ;;
+  esac;
 fi
 
 CRT0=

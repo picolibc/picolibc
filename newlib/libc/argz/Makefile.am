@@ -42,6 +42,7 @@ else
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = dummy.c
 lib_a_LIBADD = $(LIB_OBJS)
+lib_a_CFLAGS = $(AM_CFLAGS)
 lib_a_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA =
 endif # USE_LIBTOOL

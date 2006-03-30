@@ -18,6 +18,8 @@ noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
+lib_a_CFLAGS = $(AM_CFLAGS)
+lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 noinst_DATA = 
 endif # USE_LIBTOOL
 

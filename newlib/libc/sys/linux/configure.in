@@ -32,8 +32,10 @@ AC_SUBST(LINUX_MACH_LIB)
 EXTRA_SUBDIRS=
 EXTRA_SUBLIBS=
 
+AC_CONFIG_SUBDIRS(machine)
+
 if test "${newlib_multithread}" = "yes"; then
-EXTRA_CONFIG_DIRS=linuxthreads
+AC_CONFIG_SUBDIRS(linuxthreads)
 fi
 if test "x${newlib_elix_level}" = "x1"; then
 EXTRA_SUBDIRS=linuxthreads net
@@ -44,7 +46,5 @@ fi
 
 AC_SUBST(EXTRA_SUBDIRS)
 AC_SUBST(EXTRA_SUBLIBS)
-
-AC_CONFIG_SUBDIRS(machine $EXTRA_CONFIG_DIRS)
 
 AC_OUTPUT(Makefile intl/Makefile net/Makefile stdlib/Makefile iconv/Makefile dl/Makefile cmath/Makefile argp/Makefile)

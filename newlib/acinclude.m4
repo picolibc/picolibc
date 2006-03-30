@@ -6,7 +6,7 @@ dnl including AM_INIT_AUTOMAKE and AC_CANONICAL_HOST.  It also runs
 dnl configure.host.  The only argument is the relative path to the top
 dnl newlib directory.
 
-AC_DEFUN(NEWLIB_CONFIGURE,
+AC_DEFUN([NEWLIB_CONFIGURE],
 [
 dnl Default to --enable-multilib
 AC_ARG_ENABLE(multilib,
@@ -113,15 +113,39 @@ AM_INIT_AUTOMAKE(newlib, 1.14.0, nodefine)
 # link an executable.  This should really be fixed in autoconf
 # itself.
 
-AC_DEFUN(LIB_AC_PROG_CC,
+AC_DEFUN([LIB_AC_PROG_CC_GNU],
+[AC_CACHE_CHECK(whether we are using GNU C, ac_cv_prog_gcc,
+[dnl The semicolon is to pacify NeXT's syntax-checking cpp.
+cat > conftest.c <<EOF
+#ifdef __GNUC__
+  yes;
+#endif
+EOF
+if AC_TRY_COMMAND(${CC-cc} -E conftest.c) | egrep yes >/dev/null 2>&1; then
+  ac_cv_prog_gcc=yes
+else
+  ac_cv_prog_gcc=no
+fi])])
+
+AC_DEFUN([LIB_AM_PROG_AS],
+[# By default we simply use the C compiler to build assembly code.
+AC_REQUIRE([LIB_AC_PROG_CC])
+test "${CCAS+set}" = set || CCAS=$CC
+test "${CCASFLAGS+set}" = set || CCASFLAGS=$CFLAGS
+AC_ARG_VAR([CCAS],      [assembler compiler command (defaults to CC)])
+AC_ARG_VAR([CCASFLAGS], [assembler compiler flags (defaults to CFLAGS)])
+])
+
+AC_DEFUN([LIB_AC_PROG_CC],
 [AC_BEFORE([$0], [AC_PROG_CPP])dnl
 AC_CHECK_PROG(CC, gcc, gcc)
+_AM_DEPENDENCIES(CC)
 if test -z "$CC"; then
   AC_CHECK_PROG(CC, cc, cc, , , /usr/ucb/cc)
   test -z "$CC" && AC_MSG_ERROR([no acceptable cc found in \$PATH])
 fi
 
-AC_PROG_CC_GNU
+LIB_AC_PROG_CC_GNU
 
 if test $ac_cv_prog_gcc = yes; then
   GCC=yes
@@ -131,7 +155,7 @@ dnl normal versions of a library), tasteless as that idea is.
   ac_test_CFLAGS="${CFLAGS+set}"
   ac_save_CFLAGS="$CFLAGS"
   CFLAGS=
-  AC_PROG_CC_G
+  _AC_PROG_CC_G
   if test "$ac_test_CFLAGS" = set; then
     CFLAGS="$ac_save_CFLAGS"
   elif test $ac_cv_prog_cc_g = yes; then
@@ -157,6 +181,7 @@ AC_PROG_INSTALL
 ac_given_INSTALL=$INSTALL
 
 AM_MAINTAINER_MODE
+LIB_AM_PROG_AS
 
 # We need AC_EXEEXT to keep automake happy in cygnus mode.  However,
 # at least currently, we never actually build a program, so we never
@@ -167,6 +192,7 @@ AM_MAINTAINER_MODE
 # the result.
 if false; then
   AC_EXEEXT
+  dummy_var=1
 fi
 
 . [$]{newlib_basedir}/configure.host
@@ -194,6 +220,7 @@ OBJEXT=${oext}
 AC_SUBST(OBJEXT)
 AC_SUBST(oext)
 AC_SUBST(aext)
+AC_SUBST(lpfx)
 
 AC_SUBST(libm_machine_dir)
 AC_SUBST(machine_dir)

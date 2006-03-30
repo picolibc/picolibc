@@ -77,11 +77,13 @@ else
 toollib_LIBRARIES = libpthread.a libthread_db.a
 libpthread_a_SOURCES = $(LIB_SOURCES)
 libpthread_a_LIBADD = $(LIBADD_OBJS) $(EXTRA_OBJS) $(MACHINE_LIB)
+libpthread_a_CFLAGS = $(AM_CFLAGS)
 ## libpthread_a_DEPENDENCIES = defs.h crti.S
 libpthread_a_DEPENDENCIES = $(LIBADD_OBJS) $(EXTRA_OBJS) $(MACHINE_LIB)
 LIB_COMPILE = $(COMPILE)
 
 libthread_db_a_SOURCES = $(LIB_DB_SOURCES)
+libthread_db_a_CFLAGS = $(AM_CFLAGS)
 
 endif # USE_LIBTOOL
 

@@ -22,7 +22,9 @@ fi
 machlib=
 
 if test -n "${libm_machine_dir}"; then
-  AC_CONFIG_SUBDIRS(${libm_machine_dir})
+  case ${libm_machine_dir} in
+	i386) AC_CONFIG_SUBDIRS(i386) ;;
+  esac;
   if test "${use_libtool}" = "yes"; then
     machlib=${libm_machine_dir}/lib${libm_machine_dir}.${aext}
   else
