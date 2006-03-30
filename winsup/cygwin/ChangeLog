@@ -1,5 +1,11 @@
 2006-03-29  Christopher Faylor  <cgf@timesys.com>
 
+	* sigproc.cc (wait_for_sigthread): Use the current user sid when
+	setting up the signal pipe rather than relying on (eventually) the
+	effective sid.
+
+2006-03-29  Christopher Faylor  <cgf@timesys.com>
+
 	* dcrt0.cc (child_info_fork::handle_fork): Set uid/gid in myself so
 	that it can be used by subsequent startup functions.
 	(dll_crt0_0): Issue a warning if DuplicateTokenEx fails and DEBUGGING.

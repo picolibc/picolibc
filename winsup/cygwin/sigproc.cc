@@ -137,7 +137,7 @@ void __stdcall
 wait_for_sigthread (bool forked)
 {
   char char_sa_buf[1024];
-  PSECURITY_ATTRIBUTES sa_buf = sec_user_nih ((PSECURITY_ATTRIBUTES) char_sa_buf);
+  PSECURITY_ATTRIBUTES sa_buf = sec_user_nih ((PSECURITY_ATTRIBUTES) char_sa_buf, cygheap->user.sid());
   if (!CreatePipe (&my_readsig, &my_sendsig, sa_buf, 0))
     api_fatal ("couldn't create signal pipe%s, %E", forked ? " for forked process" : "");
   ProtectHandle (my_readsig);
