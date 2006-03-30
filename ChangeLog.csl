@@ -1,3 +1,9 @@
+2006-03-30  Paul Brook  <paul@codesourcery.com>
+
+	Backport form mainline.
+	* gdb/testsuite/gdb.mi/mi-until.exp: kfail broken until command.
+	* gdb/testsuite/gdb.mi/mi2-until.exp: Ditto.
+
 2006-03-29  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* gdb/m68k-tdep.c (M68K_FPREG_TYPE, M68K_LONG_DOUBLE_FORMAT,
