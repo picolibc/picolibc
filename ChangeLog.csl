@@ -1,3 +1,29 @@
+2006-03-30  Mark Mitchell <mark@codesourcery.com>
+
+	* libiberty/configure.ac: Add cygpath for mingw hosts.
+	* libiberty.configure: Rebuilt.
+	* libiberty/Makefile.in: Add cygpath.
+	* libiberty/cygpath.c: New.
+
+2006-03-30  Jim Blandy	<jimb@codesourcery.com>
+
+	* include/libiberty.h (pex_write_input): New declaration.
+
+	* libiberty/pex-common.c (pex_write_input): New function.
+	* libiberty/pexecute.txh (pex_write_input): Document it.
+	* libiberty/pex-common.h (struct pex_funcs): New function ptr fdopenw.
+	* libiberty/pex-unix.c (pex_unix_fdopenw): New function.
+	(funcs): List it as our fdopenw function.
+	* libiberty/pex-win32.c (pex_win32_fdopenw): New function.
+	(funcs): List it as our fdopenw function.
+	* libiberty/pex-djgpp.c (funcs): Leave fdopenw null.
+	* libiberty/pex-msdos (funcs): Same.
+	* libiberty/functions.texi: Regenerated.
+
+	* libiberty/pex-common.h (struct pex_obj): Doc fixes.
+
+	* libiberty/functions.texi: Regenerate.
+
 2006-03-27  Mark Mitchell  <mark@codesourcery.com>
 
 	* libiberty/pex-win32.c (pex_win32_exec_child): Close stdout/stderr
