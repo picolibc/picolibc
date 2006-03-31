@@ -1,3 +1,10 @@
+2006-03-30  Mark Mitchell <mark@codesourcery.com>
+
+	* libiberty/configure.ac: Add cygpath for mingw hosts.
+	* libiberty/configure: Rebuilt.
+	* libiberty/Makefile.in: Add cygpath.
+	* libiberty/cygpath.c: New.
+
 2006-03-30  Paul Brook  <paul@codesourcery.com>
 
 	Backport form mainline.
