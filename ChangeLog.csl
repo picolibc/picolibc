@@ -1,5 +1,9 @@
 2006-03-31  Nathan Sidwell  <nathan@codesourcery.com>
 
+	* gdb/config/m68k/monitor.mt (TDEPFILES): Remove unneeded
+	monitors.
+	(DEPRECATED_TM_FILE): Remove.
+
 	* gdb/m68k-tdep.c (M68K_FPREG_SIZE): Define.
 	(REGISTER_BYTES_FP): Use it.
 
