@@ -1,3 +1,9 @@
+2006-03-31  Ben Elliston  <bje@au.ibm.com>
+
+	PR binutils/1860
+	* configure.in: Require makeinfo 4.4 or higher.
+	* configure: Regenerate.
+
 2006-03-14  Paolo Bonzini  <bonzini@gnu.org>
 
 	* Makefile.in: Regenerate.
