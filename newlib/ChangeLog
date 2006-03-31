@@ -10,6 +10,8 @@
 	* configure.in: Individually specify libc and libm
 	to AC_CONFIG_SUBDIRS.  Add square bracket quoting as
 	necessary.
+	* Makefile.am: Use $(lpfx) to get object names for
+	math-library functions that should also be in libc.
 	* libc/machine/configure.in: Use case statement to determine
 	AC_CONFIG_SUBDIRS statement.
 	* libc/sys/linux/linuxthreads/machine/configure.in: Ditto.
