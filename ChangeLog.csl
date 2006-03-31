@@ -1,3 +1,15 @@
+2006-03-31  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* gdb/gdbserver/Makefile.in (reg-cf.o, reg-cf.c): New targets.
+	* gdb/gdbserver/configure.srv (m68k*-*-uclinux*): New target.
+	* gdb/gdbserver/linux-low.c (linux_create_inferior): Use vfork on
+	mmuless systems.
+	(linux_resume_one_process): Remove extraneous cast.
+	(linux_read_offsets): New.
+	(linux_target_op): Add linux_read_offsets on mmuless systems.
+	* gdb/gdbserver/server.c (handle_query): Add qOffsets logic.
+	* gdb/gdbserver/target.h (struct target_ops): Add read_offsets.
+
 2006-03-30  Mark Mitchell <mark@codesourcery.com>
 
 	* libiberty/configure.ac: Add cygpath for mingw hosts.
