@@ -1,3 +1,8 @@
+2006-03-31  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winnetwk.h (WNetGetResourceInformationW):  Correct first param.
+	Thanks to: Rene Rivera  <grafik at users dot sf dot net>
+
 2006-03-29  Christopher Faylor  <cgf@timesys.com>
 
 	* include/winspool.h: Protect use of PRINTER_ENUM_VALUESW with proper
