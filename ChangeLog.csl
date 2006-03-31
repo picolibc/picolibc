@@ -1,5 +1,8 @@
 2006-03-31  Nathan Sidwell  <nathan@codesourcery.com>
 
+	* gdb/remote.c (remote_fetch_registers): Don't warn about short
+	register packet if we've not set the expected value.
+
 	* gdb/gdbserver/linux-low.c (linux_read_offsets): Remove debugging
 	printf.
 
