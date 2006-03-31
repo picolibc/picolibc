@@ -1,5 +1,8 @@
 2006-03-31  Nathan Sidwell  <nathan@codesourcery.com>
 
+	* gdb/gdbserver/linux-low.c (linux_read_offsets): Remove debugging
+	printf.
+
 	* gdb/gdbserver/Makefile.in (reg-cf.o, reg-cf.c): New targets.
 	* gdb/gdbserver/configure.srv (m68k*-*-uclinux*): New target.
 	* gdb/gdbserver/linux-low.c (linux_create_inferior): Use vfork on
