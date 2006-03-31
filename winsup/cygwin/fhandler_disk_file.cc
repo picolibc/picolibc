@@ -200,6 +200,12 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
 		     | FILE_CASE_PRESERVED_NAMES \
 		     | FILE_PERSISTENT_ACLS)
 
+#define FS_IS_SAMBA_WITH_QUOTA \
+		    (FILE_CASE_SENSITIVE_SEARCH \
+		     | FILE_CASE_PRESERVED_NAMES \
+		     | FILE_PERSISTENT_ACLS \
+		     | FILE_VOLUME_QUOTAS)
+
 bool
 path_conv::hasgood_inode ()
 {
@@ -223,7 +229,8 @@ path_conv::hasgood_inode ()
 	 testing for the flag values returned by a 3.x Samba explicitely
 	 for now.  But note the comment in the below "is_samba" function. */
       if (!(fs_flags () & FILE_SUPPORTS_OBJECT_IDS)
-      	  && fs_flags () != FS_IS_SAMBA)
+      	  && fs_flags () != FS_IS_SAMBA
+      	  && fs_flags () != FS_IS_SAMBA_WITH_QUOTA)
 	return false;
     }
   return true;
@@ -232,9 +239,10 @@ path_conv::hasgood_inode ()
 bool
 path_conv::is_samba ()
 {
-  /* Something weird happens on Samba.  FileIdBothDirectoryInformation
-     seems to work nicely, but only up to the 128th entry in the
-     directory.  After reaching this entry, the next call to
+  /* Something weird happens on Samba up to version 3.0.21c, which is
+     fixed in 3.0.22.  FileIdBothDirectoryInformation seems to work
+     nicely, but only up to the 128th entry in the directory.  After
+     reaching this entry, the next call to
      NtQueryDirectoryFile(FileIdBothDirectoryInformation) returns
      STATUS_INVAILD_LEVEL.  Why should we care, we can just switch to
      FileBothDirectoryInformation, isn't it?  Nope!  The next call to
@@ -245,7 +253,9 @@ path_conv::is_samba ()
      can read the whole directory unmolested.  So we have to excempt
      Samba from the usage of FileIdBothDirectoryInformation entirely,
      even though Samba returns valid File IDs. */
-  return drive_type () == DRIVE_REMOTE && fs_flags () == FS_IS_SAMBA;
+  return drive_type () == DRIVE_REMOTE
+	 && (fs_flags () == FS_IS_SAMBA
+	     || fs_flags () == FS_IS_SAMBA_WITH_QUOTA);
 }
 
 int __stdcall

@@ -1,3 +1,11 @@
+2006-03-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (FS_IS_SAMBA_WITH_QUOTA): New define.
+	(path_conv::hasgood_inode): Recognize Samba with quota support
+	compiled in.
+	(path_conv::is_samba): Ditto.  Fix comment to include Samba version
+	numbers for later reference.
+
 2006-03-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.h (sec_user_nih): Make sid1 argument mandatory.
