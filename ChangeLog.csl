@@ -1,5 +1,10 @@
 2006-03-31  Nathan Sidwell  <nathan@codesourcery.com>
 
+	* gdb/m68k-tdep.c (M68K_FPREG_SIZE): Define.
+	(REGISTER_BYTES_FP): Use it.
+
+	* gdb/configure.tgt (m68k-*-uclinux*): target is linux.
+
 	* gdb/remote.c (remote_fetch_registers): Revert bogus change.
 
 	* gdb/remote.c (remote_fetch_registers): Don't warn about short
