@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = -I $(newlib_basedir)/libm/common $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-AM_CCASFLAGS = $(AM_CCASFLAGS) $(INCLUDES)
+AM_CCASFLAGS = $(INCLUDES)
 
 if MACH_ADD_SETJMP
 mach_add_obj=setjmp.$(oext)
