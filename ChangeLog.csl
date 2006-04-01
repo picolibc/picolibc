@@ -1,3 +1,7 @@
+2005-04-01  Paul Brook  <paul@codesourcery.com>
+
+	* config/tc-arm.c (arm_fix_adjustable): Return 0 for function symbols.
+
 2006-03-30  Mark Mitchell <mark@codesourcery.com>
 
 	* libiberty/configure.ac: Add cygpath for mingw hosts.
