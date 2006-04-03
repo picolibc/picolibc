@@ -1,3 +1,10 @@
+2006-04-03  Christopher Faylor  <cgf@timesys.com>
+
+	* dcrt0.cc (sm): Delete.
+	(alloc_stack_hard_way): Figure out where the stack lives here rather
+	than relying on previously filled out information which has been
+	invalid since 1.5.19.
+
 2006-03-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (FS_IS_SAMBA_WITH_QUOTA): New define.

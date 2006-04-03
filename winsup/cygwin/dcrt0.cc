@@ -452,7 +452,6 @@ check_sanity_and_sync (per_process *p)
 }
 
 child_info NO_COPY *child_proc_info = NULL;
-static MEMORY_BASIC_INFORMATION NO_COPY sm;
 
 #define CYGWIN_GUARD ((wincap.has_page_guard ()) ? \
 		     PAGE_EXECUTE_READWRITE|PAGE_GUARD : PAGE_NOACCESS)
@@ -464,10 +463,14 @@ alloc_stack_hard_way (child_info_fork *ci, volatile char *b)
   MEMORY_BASIC_INFORMATION m;
   void *newbase;
   int newlen;
-  LPBYTE curbot = (LPBYTE) sm.BaseAddress + sm.RegionSize;
   bool noguard;
 
-  if (ci->stacktop > (LPBYTE) sm.AllocationBase && ci->stacktop < curbot)
+  if (!VirtualQuery ((LPCVOID) &b, &m, sizeof m))
+    api_fatal ("fork: couldn't get stack info, %E");
+
+  LPBYTE curbot = (LPBYTE) m.BaseAddress + m.RegionSize;
+
+  if (ci->stacktop > (LPBYTE) m.AllocationBase && ci->stacktop < curbot)
     {
       newbase = curbot;
       newlen = (LPBYTE) ci->stackbottom - (LPBYTE) curbot;
