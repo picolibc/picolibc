@@ -250,20 +250,16 @@ class linebuf
   void add (const char *what, int len) __attribute__ ((regparm (3)));
   void add (const char *what) {add (what, strlen (what));}
   void prepend (const char *what, int len);
-  void finish (bool) __attribute__ ((regparm (2)));
+  void finish () __attribute__ ((regparm (1)));
 };
 
 void
-linebuf::finish (bool cmdlenoverflow_ok)
+linebuf::finish ()
 {
   if (!ix)
     add ("", 1);
   else
-    {
-      if (ix-- > MAXWINCMDLEN && cmdlenoverflow_ok)
-	ix = MAXWINCMDLEN - 1;
-      buf[ix] = '\0';
-    }
+    buf[--ix] = '\0';
 }
 
 void
@@ -485,7 +481,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       goto out;
     }
 
-  bool wascygexec = real_path.iscygexec ();
   res = newargv.fixup (prog_arg, real_path, ext);
 
   if (res)
@@ -510,7 +505,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     }
   else
     {
-      if (wascygexec)
+      if (real_path.iscygexec ())
 	newargv.dup_all ();
       else
 	{
@@ -560,7 +555,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	      one_line.add (" ", 1);
 	    }
 
-	  one_line.finish (real_path.iscygexec ());
+	  one_line.finish ();
 
 	  if (one_line.ix >= MAXWINCMDLEN)
 	    {
