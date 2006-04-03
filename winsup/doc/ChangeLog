@@ -1,3 +1,8 @@
+2006-03-18  Christopher Faylor  <cgf@timesys.com>
+
+	* cygwinenv.sgml: Rename fork_retry to proc_retry since it has turned
+	out to be more general than just fork.
+
 2006-03-13  Christopher Faylor  <cgf@timesys.com>
 
 	* cygwinenv.sgml: Explain about new fork_retry CYGWIN environment

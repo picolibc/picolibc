@@ -101,8 +101,9 @@ down.
 </para>
 </listitem>
 <listitem>
-<para><envar>fork_retry:n</envar> - causes the <function>fork()</function>
-to retry n times when a child process fails due to certain specific errors.
+<para><envar>proc_retry:n</envar> - causes the <function>fork()</function> and <function>exec*()</function>
+to retry n times when a child process fails due to certain windows-specific errors.  These errors usually
+occur when processes are being started while a user is logging off.
 </para>
 </listitem>
 <listitem>
