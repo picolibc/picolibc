@@ -1,3 +1,208 @@
+2005-04-03  Julian Brown  <julian@codesourcery.com>
+	    Nathan Sidwell  <nathan@codesourcery.com>
+
+	* binutils/readelf.c (arm_attr_tag_VFP_arch): Add VFPv3.
+    
+	* gas/config/tc-arm.c (limits.h): Include.
+	(fpu_arch_vfp_v3, fpu_vfp_ext_v3, fpu_neon_ext_v1)
+	(fpu_vfp_v3_or_neon_ext): Declare constants.
+	(neon_el_type): New enumeration of types for Neon vector elements.
+	(neon_type_el): New struct. Define type and size of a vector element.
+   	(NEON_MAX_TYPE_ELS): Define constant. The maximum number of types per
+	instruction.
+	(neon_type): Define struct. The type of an instruction.
+	(arm_it): Add 'vectype' for the current instruction.
+	(isscalar, immisalign, regisimm, isquad): New predicates for operands.
+	(vfp_sp_reg_pos): Rename to...
+	(vfp_reg_pos): ...this, and add VFP_REG_Dd, VFP_REG_Dm, VFP_REG_Dn
+	tags.
+	(arm_reg_type): Add REG_TYPE_NQ (Neon Q register) and REG_TYPE_NDQ
+	(Neon D or Q register).
+	(reg_expected_msgs): Sync with above. Allow VFD to mean VFP or Neon
+	D register.
+	(GE_OPT_PREFIX_BIG): Define constant, for use in...
+	(my_get_expression): Allow above constant as argument to accept
+	64-bit constants with optional prefix.
+	(arm_reg_parse): Add extra argument to return the specific type of
+	register in when either a D or Q register (REG_TYPE_NDQ) is requested.
+	Can be NULL.
+	(parse_scalar): New function. Parse Neon scalar (vector reg and index).
+	(parse_reg_list): Update for new arm_reg_parse args.
+	(parse_vfp_reg_list): Allow parsing of Neon D/Q register lists.
+	(parse_neon_el_struct_list): New function. Parse element/structure
+	register lists for VLD<n>/VST<n> instructions.
+	(s_arm_unwind_save_vfp): Update for new parse_vfp_reg_list args.
+	(s_arm_unwind_save_mmxwr): Likewise.
+	(s_arm_unwind_save_mmxwcg): Likewise.
+	(s_arm_unwind_movsp): Likewise.
+	(s_arm_unwind_setfp): Likewise.
+	(parse_big_immediate): New function. Parse an immediate, which may
+	be 64 bits wide. Put results in inst.operands[i].
+	(parse_shift): Update for new arm_reg_parse args.
+	(parse_address): Likewise. Add parsing of alignment specifiers.
+	(parse_neon_mov): Parse the operands of a VMOV instruction.
+	(operand_parse_code): Add OP_RND, OP_RNQ, OP_RNDQ, OP_RNSC,
+	OP_NRDLST, OP_NSTRLST, OP_NILO, OP_RNDQ_I0, OP_RR_RNSC,
+	OP_RNDQ_RNSC, OP_RND_RNSC, OP_VMOV, OP_RNDQ_IMVNb, OP_RNDQ_I63b,
+	OP_I0, OP_I16z, OP_I32z, OP_I64, OP_I64z, OP_oI32b, OP_oRND,
+	OP_oRNQ, OP_oRNDQ.
+	(parse_operands): Handle new codes above.
+	(encode_arm_vfp_sp_reg): Rename to...
+	(encode_arm_vfp_reg): ...this. Handle D regs (0-31) too. Complain if
+	selected VFP version only supports D0-D15.
+	(do_vfp_sp_monadic, do_vfp_sp_dyadic, do_vfp_sp_compare_z)
+	(do_vfp_dp_sp_cvt, do_vfp_reg_from_sp, do_vfp_reg2_from_sp2)
+	(do_vfp_sp_from_reg, do_vfp_sp2_from_reg2, do_vfp_sp_ldst)
+	(do_vfp_dp_ldst, vfp_sp_ldstm, vfp_dp_ldstm): Update for new
+	encode_arm_vfp_reg name, and allow 32 D regs.
+	(do_vfp_dp_rd_rm, do_vfp_dp_rn_rd, do_vfp_dp_rd_rn)
+	(do_vfp_dp_rd_rn_rm, do_vfp_rm_rd_rn): New functions to encode VFP
+	insns allowing 32 D regs.
+	(do_vfp_sp_const, do_vfp_dp_const, vfp_conv, do_vfp_sp_conv_16)
+	(do_vfp_dp_conv_16, do_vfp_sp_conv_32, do_vfp_dp_conv_32): Handle
+	constant-load and conversion insns introduced with VFPv3.
+	(neon_tab_entry): New struct.
+	(NEON_ENC_TAB): Bit patterns for overloaded Neon instructions, and
+	those which are the targets of pseudo-instructions.
+	(neon_opc): Enumerate opcodes, use as indices into...
+	(neon_enc_tab): ...this. Hold data from NEON_ENC_TAB.
+	(NEON_ENC_INTEGER, NEON_ENC_ARMREG, NEON_ENC_POLY, NEON_ENC_FLOAT)
+	(NEON_ENC_SCALAR, NEON_ENC_IMMED, NEON_ENC_INTERLV, NEON_ENC_LANE)
+	(NEON_ENC_DUP): Define meaningful helper macros to look up values in
+	neon_enc_tab.
+	(neon_shape): Enumerate shapes (permitted register widths, etc.) for
+	Neon instructions.
+	(neon_type_mask): New. Compact type representation for type
+	checking.
+	(N_SU_ALL, N_SU_32, N_SU_16_64, N_SUF_32, N_I_ALL, N_IF_32): Common
+	permitted type combinations.
+	(N_IGNORE_TYPE): New macro.
+	(neon_check_shape): New function. Check an instruction shape for
+	multiple alternatives. Return the specific shape for the current
+	instruction.
+	(neon_modify_type_size): New function. Modify a vector type and
+	size, depending on the bit mask in argument 1.
+	(neon_type_promote): New function. Convert a given "key" type (of an
+	operand) into the correct type for a different operand, based on a bit
+	mask.
+	(type_chk_of_el_type): New function. Convert a type and size into the
+	compact representation used for type checking.
+	(el_type_of_type_ckh): New function. Reverse of above (only when a
+	single bit is set in the bit mask).
+	(modify_types_allowed): New function. Alter a mask of allowed types
+	based on a bit mask of modifications.
+	(neon_check_type): New function. Check the type of the current
+	instruction against the variable argument list. The "key" type of the
+	instruction is returned.
+	(neon_dp_fixup): New function. Fill in and modify instruction bits for
+	a Neon data-processing instruction depending on whether we're in ARM
+	mode or Thumb-2 mode.
+	(neon_logbits): New function.
+	(neon_three_same, neon_two_same, do_neon_dyadic_i_su)
+	(do_neon_dyadic_i64_su, neon_imm_shift, do_neon_shl_imm)
+	(do_neon_qshl_imm, neon_cmode_for_logic_imm)
+	(neon_bits_same_in_bytes, neon_squash_bits, neon_is_quarter_float)
+	(neon_qfloat_bits, neon_cmode_for_move_imm, neon_write_immbits)
+	(neon_invert_size, do_neon_logic, do_neon_bitfield, neon_dyadic)
+	(do_neon_dyadic_if_su, do_neon_dyadic_if_su_d, do_neon_dyadic_if_i)
+	(do_neon_dyadic_if_i_d, do_neon_addsub_if_i, neon_exchange_operands)
+	(neon_compare, do_neon_cmp, do_neon_cmp_inv, do_neon_ceq)
+	(neon_scalar_for_mul, neon_mul_mac, do_neon_mac_maybe_scalar)
+	(do_neon_tst, do_neon_mul, do_neon_qdmulh, do_neon_fcmp_absolute)
+	(do_neon_fcmp_absolute_inv, do_neon_step, do_neon_abs_neg)
+	(do_neon_sli, do_neon_sri, do_neon_qshlu_imm, do_neon_qmovn)
+	(do_neon_qmovun, do_neon_rshift_sat_narrow)
+	(do_neon_rshift_sat_narrow_u, do_neon_movn, do_neon_rshift_narrow)
+	(do_neon_shll, neon_cvt_flavour, do_neon_cvt, neon_move_immediate)
+	(do_neon_mvn, neon_mixed_length, do_neon_dyadic_long, do_neon_abal)
+	(neon_mac_reg_scalar_long, do_neon_mac_maybe_scalar_long)
+	(do_neon_dyadic_wide, do_neon_vmull, do_neon_ext, do_neon_rev)
+	(do_neon_dup, do_neon_mov, do_neon_rshift_round_imm, do_neon_movl)
+	(do_neon_trn, do_neon_zip_uzp, do_neon_sat_abs_neg)
+	(do_neon_pair_long, do_neon_recip_est, do_neon_cls, do_neon_clz)
+	(do_neon_cnt, do_neon_swp, do_neon_tbl_tbx, do_neon_ldm_stm)
+	(do_neon_ldr_str, do_neon_ld_st_interleave, neon_alignment_bit)
+	(do_neon_ld_st_lane, do_neon_ld_dup, do_neon_ldx_stx): New
+	functions. Neon bit encoding and encoding helpers.
+	(parse_neon_type): New function. Parse Neon type specifier.
+	(opcode_lookup): Allow parsing of Neon type specifiers.
+	(REGNUM2, REGSETH, REGSET2): New macros.
+	(reg_names): Add new VFPv3 and Neon registers.
+	(NUF, nUF, NCE, nCE): New macros for opcode table.
+	(insns): More VFP registers allowed in fcpyd, fmdhr, fmdlr, fmrdh,
+	fmrdl, fabsd, fnegd, fsqrtd, faddd, fsubd, fmuld, fdivd, fmacd,
+	fmscd, fnmuld, fnmacd, fnmscd, fcmpd, fcmpzd, fcmped, fcmpezd,
+	fmdrr, fmrrd. Add Neon instructions vaba, vhadd, vrhadd, vhsub,
+	vqadd, vqsub, vrshl, vqrshl, vshl, vqshl{u}, vand, vbic, vorr, vorn,
+	veor, vbsl, vbit, vbif, vabd, vmax, vmin, vcge, vcgt, vclt, vcle,
+	vceq, vpmax, vpmin, vmla, vmls, vpadd, vadd, vsub, vtst, vmul,
+	vqdmulh, vqrdmulh, vacge, vacgt, vaclt, vacle, vrecps, vrsqrts,
+	vabs, vneg, v{r}shr,  v{r}sra, vsli, vsri, vqshrn, vq{r}shr{u}n,
+	v{r}shrn, vshll, vcvt, vmov, vmvn, vabal, vabdl, vaddl, vsubl,
+	vmlal, vmlsl, vaddw, vsubw, v{r}addhn, v{r}subhn, vqdmlal, vqdmlsl,
+	vqdmull, vmull, vext, vrev64, vrev32, vrev16, vdup, vmovl, v{q}movn,
+	vzip, vuzp, vqabs, vqneg, vpadal, vpaddl, vrecpe, vrsqrte, vcls,
+	vclz, vcnt, vswp, vtrn, vtbl, vtbx, vldm, vstm, vldr, vstr,
+	vld[1234], vst[1234], fconst[sd], f[us][lh]to[sd], fto[us][lh][sd].
+	(tc_arm_regname_to_dw2regnum): Update for arm_reg_parse args.
+	(arm_cpu_option_table): Add Neon and VFPv3 to Cortex-A8.
+	(arm_option_cpu_value): Add vfp3 and neon.
+	(aeabi_set_public_attributes): Support VFPv3 and NEON attributes.
+	Fix VFPv1 attribute.
+
+	* gas/testsuite/gas/arm/copro.s: Avoid ldcl which encodes as a bad Neon
+	instruction.
+	* gas/testsuite/gas/arm/copro.d: Update accordingly.
+	* gas/testsuite/gas/arm/neon-cond.s: New test. Conditional Neon opcodes
+	in ARM mode.
+	* gas/testsuite/gas/arm/neon-cond.d: Expected results of above.
+	* gas/testsuite/gas/arm/neon-cov.s: New test. Coverage of Neon
+	instructions.
+	* gas/testsuite/gas/arm/neon-cov.d: Expected results of above.
+	* gas/testsuite/gas/arm/neon-ldst-es.s: New test. Element and structure
+	loads and stores.
+	* gas/testsuite/gas/arm/neon-ldst-es.d: Expected results of above.
+	* gas/testsuite/gas/arm/neon-ldst-rm.s: New test. Single and multiple
+	register loads and stores.
+	* gas/testsuite/gas/arm/neon-ldst-rm.d: Expected results of above.
+	* gas/testsuite/gas/arm/neon-omit.s: New test. Omission of optional
+	operands.
+	* gas/testsuite/gas/arm/neon-omit.d: Expected results of above.
+	* gas/testsuite/gas/arm/vfp1.d: Expect Neon syntax for some VFP
+	instructions.
+	* gas/testsuite/gas/arm/vfp1_t2.d: Likewise.
+	* gas/testsuite/gas/arm/vfp1xD.d: Likewise.
+	* gas/testsuite/gas/arm/vfp1xD_t2.d: Likewise.
+	* gas/testsuite/gas/arm/vfp2.d: Likewise.
+	* gas/testsuite/gas/arm/vfp2_t2.d: Likewise.
+	* gas/testsuite/gas/arm/vfp3-32drs.s: New test. Extended D register
+	range for VFP instructions.
+	* gas/testsuite/gas/arm/vfp3-32drs.d: Expected results of above.
+	* gas/testsuite/gas/arm/vfp3-const-conv.s: New test. VFPv3
+	constant-load and conversion instructions.
+	* gas/testsuite/gas/arm/vfp3-const-conv.d: Expected results of above.
+
+	* include/opcode/arm.h (FPU_VFP_EXT_V3): Define constant.
+	(FPU_NEON_EXT_V1): Likewise.
+	(FPU_VFP_HARD): Update.
+	(FPU_VFP_V3): Define macro.
+	(FPU_ARCH_VFP_V3, FPU_ARCH_VFP_V3_PLUS_NEON_V1): Define macros.
+
+	* opcodes/arm-dis.c (coprocessor_opcodes): Add %A, %B, %k,
+	convert %<code>[zy] into %[zy]<code>.  Expand meaning of
+	%<bitfield>['`?].
+	Add unified load/store instruction names.
+	(neon_opcode_table): New.
+	(arm_opcodes): Expand meaning of %<bitfield>['`?].
+	(arm_decode_bitfield): New.
+	(print_insn_coprocessor): Add pc argument. Add %A & %B specifiers.
+	Use arm_decode_bitfield and adjust numeric specifiers.
+	Adjust %z & %y.
+	(print_insn_neon): New.
+	(print_insn_arm): Adjust print_insn_coprocessor call. Call
+	print_insn_neon. Use arm_decode_bitfield and adjust numeric specifiers.
+	(print_insn_thumb32): Likewise.
+
 2005-04-01  Paul Brook  <paul@codesourcery.com>
 
 	* config/tc-arm.c (arm_fix_adjustable): Return 0 for function symbols.
