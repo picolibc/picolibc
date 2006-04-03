@@ -1,3 +1,62 @@
+2006-04-03  Carlos O'Donell <carlos@codesourcery.com>
+
+	* Makefile.tpl: Add install-html target.
+	* Makefile.def: Add install-html target.
+	* Makefile.in: Regenerate.
+	* configure.in: Add --with-datarootdir, --with-docdir,
+	and --with-htmldir options.
+	* configure: Regenerate.
+	* opcodes/Makefile.am: Add install-html target.
+	* opcodes/Makefile.in: Regenerate.
+	* libiberty/Makefile.in: Add install-html, install-html-am, and
+	install-html-recursive targets. Define mkdir_p and 
+	NORMAL_INSTALL. 
+	* libiberty/configure.ac: AC_SUBST datarootdir, docdir, htmldir.
+	* libiberty/configure: Regenerate.
+	* libiberty/testsuite/Makefile.in: Add install-html and html targets.
+	* ld/Makefile.am: Add install-html, install-html-am, and
+	install-html-recursive targets.
+	* ld/Makefile.in: Regenerate.
+	* ld/configure.in: AC_SUBST datarootdir, docdir, htmldir.
+	* ld/configure: Regenerate.
+	* ld/po/Make-in: Add install-html target.
+	* intl/Makefile.in: Add html info and dvi and install-html to .PHONY
+	Add install-html target.
+	* gprof/po/Make-in: Add install-html target.
+	* gprof/Makefile.am: Add install-html, install-html-am and 
+	install-html-recursive targets. 
+	* gprof/Makefile.in: Regenerate.
+	* gprof/configure.in: AC_SUBST datarootdir, docdir, htmldir.
+	* gprof/configure: Regenerate.
+	* gas/po/Make-in: Add install-html target.
+	* gas/Makefile.am: Add install-html and install-html-recursive targets.
+	* gas/Makefile.in: Regenerate.
+	* gas/configure.in: AC_SUBST datarootdir, docdir, htmldir.
+	* gas/configure: Regenerate.
+	* gas/doc/Makefile.am: Add install-html and install-html-am targets.
+	* gas/doc/Makefile.in: Regenerate.
+	* binutils/po/Make-in: Add install-html target.
+	* binutils/Makefile.am: Add install-html and install-html-recursive targets.
+	* binutils/Makefile.in: Regenerate.
+	* binutils/configure.in: AC_SUBST datarootdir, docdir and htmldir.
+	* binutils/configure: Regenerate.
+	* binutils/doc/Makefile.am: Add install-html and install-html-am targets.
+	* binutils/doc/Makefile.in: Regenerate.
+	* bfd/po/Make-in: Add install-html target.
+	* bfd/Makefile.am: Rename docdir to bfddocdir. Add datarootdir, docdir
+	htmldir. Add install-html and install-html-recursive targets.
+	* bfd/Makefile.in: Regenerate.
+	* bfd/configure.in: AC_SUBST for datarootdir, docdir and htmldir.
+	* bfd/configure: Regenerate.
+	* bfd/doc/Makefile.am: Add install-html and install-html-am targets. 
+	Define datarootdir, docdir and htmldir.
+	* bfd/doc/Makefile.in: Regenerate.
+	* etc/Makefile.in: Add install-html target. Add htmldir,
+	docdir and datarootdir.
+	* etc/configure.texi: Document install-html target.
+	* etc/configure.in: AC_SUBST datarootdir, docdir, htmldir.
+	* etc/configure: Regenerate.
+
 2005-04-03  Julian Brown  <julian@codesourcery.com>
 	    Nathan Sidwell  <nathan@codesourcery.com>
 
