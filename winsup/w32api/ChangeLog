@@ -1,5 +1,10 @@
 2006-04-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/commctrl.h (ListView_*):  Define and correct.
+	(LVM_*): Define.
+
+2006-04-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winuser.h (WM_IME_*): Define (DWORD type).
 	(EM_*IMESTATUS): Define.
 	(WM_*): Define.
