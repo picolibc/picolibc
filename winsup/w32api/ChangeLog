@@ -1,3 +1,11 @@
+2006-04-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/winuser.h (WM_IME_*): Define (DWORD type).
+	(EM_*IMESTATUS): Define.
+	(WM_*): Define.
+	(XBUTTON*): Define.
+	Thanks to:    Steve Folly <spfolly at users dot sf dot net>
+
 2006-03-31  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winnetwk.h (WNetGetResourceInformationW):  Correct first param.
