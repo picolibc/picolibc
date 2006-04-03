@@ -1,3 +1,12 @@
+2006-04-03  Christopher Faylor  <cgf@timesys.com>
+
+	* child_info.h (CURR_CHILD_INFO_MAGIC): Update.
+	(child_info_fork::alloc_stack): Move into this class.
+	(child_info_fork::alloc_stack_hard_way): Ditto.
+	* dcrt0.cc (child_info_fork::alloc_stack): Ditto.
+	(child_info_fork::alloc_stack_hard_way): Ditto.
+	(_dll_crt0): Reference alloc_stack via fork_info.
+
 2006-04-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* spawn.cc (linebuf::finish): Drop argument.  Don't check command line

@@ -456,8 +456,8 @@ child_info NO_COPY *child_proc_info = NULL;
 #define CYGWIN_GUARD ((wincap.has_page_guard ()) ? \
 		     PAGE_EXECUTE_READWRITE|PAGE_GUARD : PAGE_NOACCESS)
 
-static void
-alloc_stack_hard_way (child_info_fork *ci, volatile char *b)
+void
+child_info_fork::alloc_stack_hard_way (volatile char *b)
 {
   void *new_stack_pointer;
   MEMORY_BASIC_INFORMATION m;
@@ -470,28 +470,27 @@ alloc_stack_hard_way (child_info_fork *ci, volatile char *b)
 
   LPBYTE curbot = (LPBYTE) m.BaseAddress + m.RegionSize;
 
-  if (ci->stacktop > (LPBYTE) m.AllocationBase && ci->stacktop < curbot)
+  if (stacktop > (LPBYTE) m.AllocationBase && stacktop < curbot)
     {
       newbase = curbot;
-      newlen = (LPBYTE) ci->stackbottom - (LPBYTE) curbot;
+      newlen = (LPBYTE) stackbottom - (LPBYTE) curbot;
       noguard = 1;
     }
   else
     {
-      newbase = ci->stacktop;
-      newlen = (DWORD) ci->stackbottom - (DWORD) ci->stacktop;
+      newbase = stacktop;
+      newlen = (DWORD) stackbottom - (DWORD) stacktop;
       noguard = 0;
     }
   if (!VirtualAlloc (newbase, newlen, MEM_RESERVE, PAGE_NOACCESS))
     api_fatal ("fork: can't reserve memory for stack %p - %p, %E",
-		ci->stacktop, ci->stackbottom);
+		stacktop, stackbottom);
 
-  new_stack_pointer = (void *) ((LPBYTE) ci->stackbottom - ci->stacksize);
-
-  if (!VirtualAlloc (new_stack_pointer, ci->stacksize, MEM_COMMIT,
+  new_stack_pointer = (void *) ((LPBYTE) stackbottom - stacksize); 
+  if (!VirtualAlloc (new_stack_pointer, stacksize, MEM_COMMIT,
 		     PAGE_EXECUTE_READWRITE))
     api_fatal ("fork: can't commit memory for stack %p(%d), %E",
-	       new_stack_pointer, ci->stacksize);
+	       new_stack_pointer, stacksize);
   if (!VirtualQuery ((LPCVOID) new_stack_pointer, &m, sizeof m))
     api_fatal ("fork: couldn't get new stack info, %E");
   if (!noguard)
@@ -504,7 +503,7 @@ alloc_stack_hard_way (child_info_fork *ci, volatile char *b)
     }
   if (!VirtualQuery ((LPCVOID) m.BaseAddress, &m, sizeof m))
     api_fatal ("fork: couldn't get new stack info, %E");
-  ci->stacktop = m.BaseAddress;
+  stacktop = m.BaseAddress;
   b[0] = '\0';
 }
 
@@ -519,19 +518,19 @@ getstack (volatile char * volatile p)
 
 /* extend the stack prior to fork longjmp */
 
-static void
-alloc_stack (child_info_fork *ci)
+void
+child_info_fork::alloc_stack ()
 {
   volatile char * volatile esp;
   __asm__ volatile ("movl %%esp,%0": "=r" (esp));
-  if (_tlsbase != ci->stackbottom)
-    alloc_stack_hard_way (ci, esp);
+  if (_tlsbase != stackbottom)
+    alloc_stack_hard_way (esp);
   else
     {
-      char *stacktop = (char *) ci->stacktop - 4096;
-      while (_tlstop >= stacktop)
+      char *st = (char *) stacktop - 4096;
+      while (_tlstop >= st)
 	esp = getstack (esp);
-      ci->stacksize = 0;
+      stacksize = 0;
     }
 }
 
@@ -978,7 +977,7 @@ _dll_crt0 ()
   char padding[CYGTLS_PADSIZE];
 
   if (in_forkee)
-    alloc_stack (fork_info);
+    fork_info->alloc_stack ();
   else
     __sinit (_impure_ptr);
 

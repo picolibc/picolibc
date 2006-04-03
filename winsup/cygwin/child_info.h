@@ -36,7 +36,7 @@ enum child_status
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
 /* Change this value if you get a message indicating that it is out-of-sync. */
-#define CURR_CHILD_INFO_MAGIC 0x1630848cU
+#define CURR_CHILD_INFO_MAGIC 0x110015eaU
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -84,6 +84,8 @@ public:
   child_info_fork ();
   void handle_fork () __attribute__ ((regparm (1)));;
   bool handle_failure (DWORD) __attribute__ ((regparm (2)));
+  void alloc_stack ();
+  void alloc_stack_hard_way (volatile char *);
 };
 
 class fhandler_base;
