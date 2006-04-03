@@ -1,3 +1,51 @@
+2006-04-02  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* Makefile.def (host_modules, dependencies): Add expat.
+	* configure.in (host_libs): Add expat.
+	* Makefile.in, configure: Regenerate.
+	* expat: New directory.
+
+	* gdb/Makefile.in: Add expat, new files, and xml-builtin.c.  Update
+	dependencies.
+	* gdb/acinclude.m4: Include stdint.m4.
+	* gdb/configure.ac: Use AC_C_BIGENDIAN and GCC_HEADER_STDINT.
+	* gdb/aclocal.m4, gdb/config.in, gdb/configure: Regenerate.
+
+	* gdb/auxv.h: Remove target_auxv_read prototype.
+	* gdb/auxv.c, gdb/avr-tdep.c, gdb/ia64-tdep.c, gdb/linux-nat.c,
+	gdb/procfs.c: Use target_read_whole.
+	* gdb/sparc-tdep.c: Use target_read.
+
+	* gdb/frame.c: Work around null frame_id handling.
+
+	* gdb/breakpoint.c, gdb/f-valprint.c, gdb/infcmd.c, gdb/inflow.c,
+	gdb/infrun.c, gdb/stack.c, gdb/valops.c, gdb/varobj.c,
+	gdb/cli-cmds.c, gdb/testsuite/gdb.base/default.exp,
+	gdb/tui/tui-disasm.c, gdb/tui/tui-source.c,
+	gdb/tui/tui-winsource.c: Selected frame fixups.
+
+	* gdb/README.AVAIL, gdb/available.c, gdb/available.h,
+	gdb/parse-avail.c, gdb/sha1.c, gdb/features/feature_to_c.sh,
+	gdb/features/gdb-target.dtd: New files.
+	* gdb/arm-tdep.c: Handle missing FPA, present VFP, and
+	self-described registers.  Decode VFP register numbers from DWARF.
+	* gdb/arm-tdep.h: Add flags for VFP and FPA.
+	* gdb/gdbarch.sh: Add available_features_support and feature_set.
+	Export the arch's obstack.  Check feature sets.  Improve error
+	handling.
+	* gdb/gdbarch.c, gdb/gdbarch.h: Regenerated.
+	* gdb/infcmd.c: Trigger architecture selection.
+	* gdb/remote.c: Available feature support.  qPacketInfo support.
+	Improved g/G packet support.  Improved qPart support.
+	qPart:features support.
+	* gdb/symfile.c: Adjust download_write_size.
+	* gdb/target.c: Revise partial transfer support.  Handle available
+	features method.  Add target_read_whole.
+	* gdb/target.h: Add the available features object and methods.
+	* gdb/doc/gdb.texinfo: Document new features.
+
+	* gdb/symfile.h: Include symtab.h.
+
 2006-03-31  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* gdb/config/m68k/monitor.mt (TDEPFILES): Remove unneeded

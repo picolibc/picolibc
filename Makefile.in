@@ -566,6 +566,7 @@ configure-host:  \
     maybe-configure-diff \
     maybe-configure-dosutils \
     maybe-configure-etc \
+    maybe-configure-expat \
     maybe-configure-fastjar \
     maybe-configure-fileutils \
     maybe-configure-findutils \
@@ -694,6 +695,7 @@ all-host: maybe-all-dejagnu
 all-host: maybe-all-diff
 all-host: maybe-all-dosutils
 all-host: maybe-all-etc
+all-host: maybe-all-expat
 all-host: maybe-all-fastjar
 all-host: maybe-all-fileutils
 all-host: maybe-all-findutils
@@ -819,6 +821,7 @@ info-host: maybe-info-dejagnu
 info-host: maybe-info-diff
 info-host: maybe-info-dosutils
 info-host: maybe-info-etc
+info-host: maybe-info-expat
 info-host: maybe-info-fastjar
 info-host: maybe-info-fileutils
 info-host: maybe-info-findutils
@@ -923,6 +926,7 @@ dvi-host: maybe-dvi-dejagnu
 dvi-host: maybe-dvi-diff
 dvi-host: maybe-dvi-dosutils
 dvi-host: maybe-dvi-etc
+dvi-host: maybe-dvi-expat
 dvi-host: maybe-dvi-fastjar
 dvi-host: maybe-dvi-fileutils
 dvi-host: maybe-dvi-findutils
@@ -1027,6 +1031,7 @@ html-host: maybe-html-dejagnu
 html-host: maybe-html-diff
 html-host: maybe-html-dosutils
 html-host: maybe-html-etc
+html-host: maybe-html-expat
 html-host: maybe-html-fastjar
 html-host: maybe-html-fileutils
 html-host: maybe-html-findutils
@@ -1131,6 +1136,7 @@ TAGS-host: maybe-TAGS-dejagnu
 TAGS-host: maybe-TAGS-diff
 TAGS-host: maybe-TAGS-dosutils
 TAGS-host: maybe-TAGS-etc
+TAGS-host: maybe-TAGS-expat
 TAGS-host: maybe-TAGS-fastjar
 TAGS-host: maybe-TAGS-fileutils
 TAGS-host: maybe-TAGS-findutils
@@ -1235,6 +1241,7 @@ install-info-host: maybe-install-info-dejagnu
 install-info-host: maybe-install-info-diff
 install-info-host: maybe-install-info-dosutils
 install-info-host: maybe-install-info-etc
+install-info-host: maybe-install-info-expat
 install-info-host: maybe-install-info-fastjar
 install-info-host: maybe-install-info-fileutils
 install-info-host: maybe-install-info-findutils
@@ -1339,6 +1346,7 @@ installcheck-host: maybe-installcheck-dejagnu
 installcheck-host: maybe-installcheck-diff
 installcheck-host: maybe-installcheck-dosutils
 installcheck-host: maybe-installcheck-etc
+installcheck-host: maybe-installcheck-expat
 installcheck-host: maybe-installcheck-fastjar
 installcheck-host: maybe-installcheck-fileutils
 installcheck-host: maybe-installcheck-findutils
@@ -1443,6 +1451,7 @@ mostlyclean-host: maybe-mostlyclean-dejagnu
 mostlyclean-host: maybe-mostlyclean-diff
 mostlyclean-host: maybe-mostlyclean-dosutils
 mostlyclean-host: maybe-mostlyclean-etc
+mostlyclean-host: maybe-mostlyclean-expat
 mostlyclean-host: maybe-mostlyclean-fastjar
 mostlyclean-host: maybe-mostlyclean-fileutils
 mostlyclean-host: maybe-mostlyclean-findutils
@@ -1547,6 +1556,7 @@ clean-host: maybe-clean-dejagnu
 clean-host: maybe-clean-diff
 clean-host: maybe-clean-dosutils
 clean-host: maybe-clean-etc
+clean-host: maybe-clean-expat
 clean-host: maybe-clean-fastjar
 clean-host: maybe-clean-fileutils
 clean-host: maybe-clean-findutils
@@ -1651,6 +1661,7 @@ distclean-host: maybe-distclean-dejagnu
 distclean-host: maybe-distclean-diff
 distclean-host: maybe-distclean-dosutils
 distclean-host: maybe-distclean-etc
+distclean-host: maybe-distclean-expat
 distclean-host: maybe-distclean-fastjar
 distclean-host: maybe-distclean-fileutils
 distclean-host: maybe-distclean-findutils
@@ -1755,6 +1766,7 @@ maintainer-clean-host: maybe-maintainer-clean-dejagnu
 maintainer-clean-host: maybe-maintainer-clean-diff
 maintainer-clean-host: maybe-maintainer-clean-dosutils
 maintainer-clean-host: maybe-maintainer-clean-etc
+maintainer-clean-host: maybe-maintainer-clean-expat
 maintainer-clean-host: maybe-maintainer-clean-fastjar
 maintainer-clean-host: maybe-maintainer-clean-fileutils
 maintainer-clean-host: maybe-maintainer-clean-findutils
@@ -1912,6 +1924,7 @@ check-host:  \
     maybe-check-diff \
     maybe-check-dosutils \
     maybe-check-etc \
+    maybe-check-expat \
     maybe-check-fastjar \
     maybe-check-fileutils \
     maybe-check-findutils \
@@ -2043,6 +2056,7 @@ install-host-nogcc:  \
     maybe-install-diff \
     maybe-install-dosutils \
     maybe-install-etc \
+    maybe-install-expat \
     maybe-install-fastjar \
     maybe-install-fileutils \
     maybe-install-findutils \
@@ -2113,6 +2127,7 @@ install-host:  \
     maybe-install-diff \
     maybe-install-dosutils \
     maybe-install-etc \
+    maybe-install-expat \
     maybe-install-fastjar \
     maybe-install-fileutils \
     maybe-install-findutils \
@@ -8353,6 +8368,343 @@ maintainer-clean-etc:
 	  || exit 1
 
 @endif etc
+
+
+
+.PHONY: configure-expat maybe-configure-expat
+maybe-configure-expat:
+@if expat
+maybe-configure-expat: configure-expat
+configure-expat: 
+	@: $(MAKE); $(unstage)
+	@r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	test ! -f $(HOST_SUBDIR)/expat/Makefile || exit 0; \
+	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/expat ; \
+	$(HOST_EXPORTS) \
+	echo Configuring in $(HOST_SUBDIR)/expat; \
+	cd "$(HOST_SUBDIR)/expat" || exit 1; \
+	case $(srcdir) in \
+	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
+	  *) topdir=`echo $(HOST_SUBDIR)/expat/ | \
+		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
+	esac; \
+	srcdiroption="--srcdir=$${topdir}/expat"; \
+	libsrcdir="$$s/expat"; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption}  \
+	  || exit 1
+@endif expat
+
+
+
+
+
+.PHONY: all-expat maybe-all-expat
+maybe-all-expat:
+@if expat
+TARGET-expat=all
+maybe-all-expat: all-expat
+all-expat: configure-expat
+	@: $(MAKE); $(unstage)
+	@r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	(cd $(HOST_SUBDIR)/expat && \
+	  $(MAKE) $(FLAGS_TO_PASS)  $(TARGET-expat))
+@endif expat
+
+
+
+
+.PHONY: check-expat maybe-check-expat
+maybe-check-expat:
+@if expat
+maybe-check-expat: check-expat
+
+check-expat:
+	@: $(MAKE); $(unstage)
+	@r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	(cd $(HOST_SUBDIR)/expat && \
+	  $(MAKE) $(FLAGS_TO_PASS)  check)
+
+@endif expat
+
+.PHONY: install-expat maybe-install-expat
+maybe-install-expat:
+@if expat
+maybe-install-expat: install-expat
+
+install-expat: installdirs
+	@: $(MAKE); $(unstage)
+	@r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	(cd $(HOST_SUBDIR)/expat && \
+	  $(MAKE) $(FLAGS_TO_PASS)  install)
+
+@endif expat
+
+# Other targets (info, dvi, etc.)
+
+.PHONY: maybe-info-expat info-expat
+maybe-info-expat:
+@if expat
+maybe-info-expat: info-expat
+
+info-expat: \
+    configure-expat 
+	@: $(MAKE); $(unstage)
+	@[ -f ./expat/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing info in expat" ; \
+	(cd $(HOST_SUBDIR)/expat && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          info) \
+	  || exit 1
+
+@endif expat
+
+.PHONY: maybe-dvi-expat dvi-expat
+maybe-dvi-expat:
+@if expat
+maybe-dvi-expat: dvi-expat
+
+dvi-expat: \
+    configure-expat 
+	@: $(MAKE); $(unstage)
+	@[ -f ./expat/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing dvi in expat" ; \
+	(cd $(HOST_SUBDIR)/expat && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          dvi) \
+	  || exit 1
+
+@endif expat
+
+.PHONY: maybe-html-expat html-expat
+maybe-html-expat:
+@if expat
+maybe-html-expat: html-expat
+
+html-expat: \
+    configure-expat 
+	@: $(MAKE); $(unstage)
+	@[ -f ./expat/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing html in expat" ; \
+	(cd $(HOST_SUBDIR)/expat && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          html) \
+	  || exit 1
+
+@endif expat
+
+.PHONY: maybe-TAGS-expat TAGS-expat
+maybe-TAGS-expat:
+@if expat
+maybe-TAGS-expat: TAGS-expat
+
+TAGS-expat: \
+    configure-expat 
+	@: $(MAKE); $(unstage)
+	@[ -f ./expat/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing TAGS in expat" ; \
+	(cd $(HOST_SUBDIR)/expat && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          TAGS) \
+	  || exit 1
+
+@endif expat
+
+.PHONY: maybe-install-info-expat install-info-expat
+maybe-install-info-expat:
+@if expat
+maybe-install-info-expat: install-info-expat
+
+install-info-expat: \
+    configure-expat \
+    info-expat 
+	@: $(MAKE); $(unstage)
+	@[ -f ./expat/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-info in expat" ; \
+	(cd $(HOST_SUBDIR)/expat && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-info) \
+	  || exit 1
+
+@endif expat
+
+.PHONY: maybe-installcheck-expat installcheck-expat
+maybe-installcheck-expat:
+@if expat
+maybe-installcheck-expat: installcheck-expat
+
+installcheck-expat: \
+    configure-expat 
+	@: $(MAKE); $(unstage)
+	@[ -f ./expat/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing installcheck in expat" ; \
+	(cd $(HOST_SUBDIR)/expat && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          installcheck) \
+	  || exit 1
+
+@endif expat
+
+.PHONY: maybe-mostlyclean-expat mostlyclean-expat
+maybe-mostlyclean-expat:
+@if expat
+maybe-mostlyclean-expat: mostlyclean-expat
+
+mostlyclean-expat: 
+	@: $(MAKE); $(unstage)
+	@[ -f ./expat/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing mostlyclean in expat" ; \
+	(cd $(HOST_SUBDIR)/expat && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          mostlyclean) \
+	  || exit 1
+
+@endif expat
+
+.PHONY: maybe-clean-expat clean-expat
+maybe-clean-expat:
+@if expat
+maybe-clean-expat: clean-expat
+
+clean-expat: 
+	@: $(MAKE); $(unstage)
+	@[ -f ./expat/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing clean in expat" ; \
+	(cd $(HOST_SUBDIR)/expat && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          clean) \
+	  || exit 1
+
+@endif expat
+
+.PHONY: maybe-distclean-expat distclean-expat
+maybe-distclean-expat:
+@if expat
+maybe-distclean-expat: distclean-expat
+
+distclean-expat: 
+	@: $(MAKE); $(unstage)
+	@[ -f ./expat/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing distclean in expat" ; \
+	(cd $(HOST_SUBDIR)/expat && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          distclean) \
+	  || exit 1
+
+@endif expat
+
+.PHONY: maybe-maintainer-clean-expat maintainer-clean-expat
+maybe-maintainer-clean-expat:
+@if expat
+maybe-maintainer-clean-expat: maintainer-clean-expat
+
+maintainer-clean-expat: 
+	@: $(MAKE); $(unstage)
+	@[ -f ./expat/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing maintainer-clean in expat" ; \
+	(cd $(HOST_SUBDIR)/expat && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          maintainer-clean) \
+	  || exit 1
+
+@endif expat
 
 
 
@@ -38269,6 +38621,7 @@ all-gdb: maybe-all-readline
 all-gdb: maybe-all-build-bison
 all-gdb: maybe-all-build-byacc
 all-gdb: maybe-all-sim
+all-gdb: maybe-all-expat
 configure-libgui: maybe-configure-tcl
 configure-libgui: maybe-configure-tk
 all-libgui: maybe-all-tcl
