@@ -1,3 +1,9 @@
+2006-04-04  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/arm/Makefile.am: Add EXTRA sources including
+	trap.S so that automake will generate a .S.o suffix rule.
+	* libc/sys/arm/Makefile.in: Regenerated.
+
 2006-03-30  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* acinclude.m4: Properly add square brackets for
