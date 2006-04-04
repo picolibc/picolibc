@@ -557,6 +557,15 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
   fd->uninterruptible_io (true);
   cygheap->fdtab.inc_need_fixup_before ();
   debug_printf ("fd %d, name '%s', soc %p", (int) fd, dev->name, soc);
+
+  /* Same default buffer sizes as on Linux (instead of WinSock default 8K). */
+  int rmem = dev == tcp_dev ? 87380 : 120832;
+  int wmem = dev == tcp_dev ? 16384 : 120832;
+  if (::setsockopt (soc, SOL_SOCKET, SO_RCVBUF, (char *) &rmem, sizeof (int)))
+    debug_printf ("setsockopt(SO_RCVBUF) failed, %lu", WSAGetLastError ());
+  if (::setsockopt (soc, SOL_SOCKET, SO_SNDBUF, (char *) &wmem, sizeof (int)))
+    debug_printf ("setsockopt(SO_SNDBUF) failed, %lu", WSAGetLastError ());
+
   return true;
 }
 
