@@ -373,9 +373,21 @@ extern "C" {
 #define LOCKFILE_EXCLUSIVE_LOCK 2
 #define LOGON32_PROVIDER_DEFAULT	0
 #define LOGON32_PROVIDER_WINNT35	1
+#if (_WIN32_WINNT >= 0x0400)
+#define LOGON32_PROVIDER_WINNT40	2
+#endif
+#if (_WIN32_WINNT >= 0x0500)
+#define LOGON32_PROVIDER_WINNT50	3
+#endif
 #define LOGON32_LOGON_INTERACTIVE	2
+#define LOGON32_LOGON_NETWORK	3
 #define LOGON32_LOGON_BATCH	4
 #define LOGON32_LOGON_SERVICE	5
+#define LOGON32_LOGON_UNLOCK	7
+#if (_WIN32_WINNT >= 0x0500)
+#define LOGON32_LOGON_NETWORK_CLEARTEXT	8
+#define LOGON32_LOGON_NEW_CREDENTIALS	9
+#endif
 #define MOVEFILE_REPLACE_EXISTING 1
 #define MOVEFILE_COPY_ALLOWED 2
 #define MOVEFILE_DELAY_UNTIL_REBOOT 4
@@ -1013,7 +1025,7 @@ typedef enum {
 	LowMemoryResourceNotification ,
 	HighMemoryResourceNotification
 } MEMORY_RESOURCE_NOTIFICATION_TYPE;
-#endif /* (_WIN32_WINNT >= 0x0501) */
+#endif
 #if (_WIN32_WINNT >= 0x0500)
 typedef enum _COMPUTER_NAME_FORMAT {
 	ComputerNameNetBIOS, 
@@ -1026,7 +1038,7 @@ typedef enum _COMPUTER_NAME_FORMAT {
 	ComputerNamePhysicalDnsFullyQualified, 
 	ComputerNameMax
 } COMPUTER_NAME_FORMAT;
-#endif /* (_WIN32_WINNT >= 0x0500) */
+#endif
 #if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0410)
 typedef DWORD EXECUTION_STATE;
 #endif
