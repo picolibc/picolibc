@@ -1,5 +1,12 @@
 2006-04-05  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/iphlpapi.h (GAA_FLAG_*): Define.
+	(GetAdaptersAddresses): Add function declaration.
+	* lib/iphlpapi.def (GetAdaptersAddresses): Add function stub.
+	Thanks to:    ross <rossboulet at users dot sf dot net>
+
+2006-04-05  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/iptypes.h (IP_INTERFACE_NAME_INFO,
 	IP_ADAPTER_ANYCAST_ADDRESS,IP_ADAPTER_MULTICAST_ADDRESS,
 	IP_ADAPTER_UNICAST_ADDRESS,IP_ADAPTER_DNS_SERVER_ADDRESS,

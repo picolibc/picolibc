@@ -10,6 +10,7 @@ DeleteIpNetEntry@4
 DeleteProxyArpEntry@12
 EnableRouter@8
 FlushIpNetTable@4
+GetAdaptersAddresses@20
 GetAdapterIndex@8
 GetAdaptersInfo@8
 GetBestInterface@8
