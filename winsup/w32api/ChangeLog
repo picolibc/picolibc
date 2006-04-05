@@ -1,5 +1,11 @@
 2006-04-05  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* lib/mqrt.def: New file.
+	Needs the mq.h file to work properly, working on it.
+	Thanks to:    Pascal Obry <pobry at users dot sf dot net>
+
+2006-04-05  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winerror.h (STG_E_*):  Define.
 	Thanks to:    Oliver Stoeneberg <kidkat at users dot sf dot net>
 	* include/winerror.h (STG_S_*): Define.
