@@ -1,3 +1,12 @@
+2006-04-05  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/winerror.h (STG_E_*):  Define.
+	Thanks to:    Oliver Stoeneberg <kidkat at users dot sf dot net>
+	* include/winerror.h (STG_S_*): Define.
+	(CO_S_MACHINENAMENOTFOUND): Define.
+	(RPC_E_*): Define.
+	(NTE_*): Define.
+
 2006-04-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/commctrl.h (ListView_*):  Define and correct.
