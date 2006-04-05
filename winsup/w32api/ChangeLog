@@ -1,5 +1,10 @@
 2006-04-05  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/mq.h: New file.
+	* lib/mqrt.def: (MQ*): Define a few missing functions.
+
+2006-04-05  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* lib/mqrt.def: New file.
 	Needs the mq.h file to work properly, working on it.
 	Thanks to:    Pascal Obry <pobry at users dot sf dot net>
