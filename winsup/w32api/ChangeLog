@@ -1,5 +1,15 @@
 2006-04-05  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/iptypes.h (IP_INTERFACE_NAME_INFO,
+	IP_ADAPTER_ANYCAST_ADDRESS,IP_ADAPTER_MULTICAST_ADDRESS,
+	IP_ADAPTER_UNICAST_ADDRESS,IP_ADAPTER_DNS_SERVER_ADDRESS,
+	IP_ADAPTER_PREFIX,IP_ADAPTER_ADDRESSES): Add structures.
+	(IF_OPER_STATUS,IP_DAD_STATE,IP_PREFIX_ORIGIN,IP_SUFFIX_ORIGIN,
+	SCOPE_LEVEL): Add enums.
+	(IP_ADAPTER_*): Define.
+
+2006-04-05  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winuser.h (GetWindowExtEx): Removed, belongs to wingdi.h.
 	Thanks to:    Sergey Philippov <phis at users dot sf dot net>
 
