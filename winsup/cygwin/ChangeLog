@@ -1,5 +1,11 @@
 2006-04-05  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler_socket.cc: Move iptypes.h include after winsock2 since it
+	now relies on it.
+	* net.cc: Ditto.
+
+2006-04-05  Christopher Faylor  <cgf@timesys.com>
+
 	* dcrt0.cc (dll_crt0_0): Move user_data->{resourcelocks,threadinterface}
 	initialization here from dll_crt0_1.
 	(dll_crt0_1): See above.

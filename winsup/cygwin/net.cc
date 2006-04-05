@@ -17,7 +17,6 @@ details. */
 #include <ctype.h>
 #include <sys/socket.h>
 #include <sys/un.h>
-#include <iphlpapi.h>
 #include <syslog.h>
 
 #include <stdlib.h>
@@ -27,6 +26,7 @@ details. */
 #include <netdb.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
+#include <iphlpapi.h>
 #include <assert.h>
 #include "cygerrno.h"
 #include "security.h"

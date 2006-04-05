@@ -17,11 +17,11 @@
 #include <sys/un.h>
 #include <sys/uio.h>
 #include <asm/byteorder.h>
-#include <iphlpapi.h>
 
 #include <stdlib.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
+#include <iphlpapi.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "cygwin/version.h"
