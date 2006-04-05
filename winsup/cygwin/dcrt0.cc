@@ -755,6 +755,9 @@ dll_crt0_0 ()
 	}
     }
 
+  user_data->resourcelocks->Init ();
+  user_data->threadinterface->Init ();
+
   _cygtls::init ();
 
   /* Initialize events */
@@ -792,8 +795,6 @@ dll_crt0_1 (char *)
     small_printf ("cmalloc returns %p\n", cmalloc (HEAP_STR, n));
 #endif
 
-  user_data->resourcelocks->Init ();
-  user_data->threadinterface->Init ();
   ProtectHandle (hMainProc);
   ProtectHandle (hMainThread);
 
