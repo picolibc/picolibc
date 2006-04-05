@@ -1,5 +1,11 @@
 2006-04-05  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/objidl.h (PIDSI_*): Define.
+	(PRSPEC_*): Define.
+	Thanks to:    Oliver Stoeneberg <kidkat at users dot sf dot net>
+
+2006-04-05  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winbase.h (LOGON32_PROVIDER_WINNT40,
 	LOGON32_PROVIDER_WINNT50, LOGON32_LOGON_NETWORK,
 	LOGON32_LOGON_UNLOCK, LOGON32_LOGON_NETWORK_CLEARTEXT,
