@@ -282,24 +282,17 @@ must create the whatis database.  Just run the command
 <question><para>Why doesn't chmod work?</para></question>
 <answer>
 
-<para><literal>ntsec</literal> will allow UNIX permissions in Windows NT on NTFS file
-systems.  This is on by default (a recent change).
+<para>The most common case is that your <literal>/etc/passwd</literal>
+or <literal>/etc/group</literal> files are not properly set up. If 
+<literal>ls -l</literal> shows a group of <literal>mkpasswd</literal> 
+or <literal>mkgroup</literal>, you need to run one or both of those
+commands.
 </para>
-<para><literal>ntea</literal> works on NTFS <emphasis>and</emphasis> FAT but it creates a huge,
-<emphasis role='bold'>undeletable</emphasis> file on FAT filesystems.
-</para>
-<para>(The <literal>ntsec</literal> and <literal>ntea</literal> settings are values for the
-<literal>CYGWIN</literal> environment variable.  See the Cygwin User's Guide at
-<ulink url="http://cygwin.com/cygwin-ug-net/cygwin-ug-net.html">http://cygwin.com/cygwin-ug-net/cygwin-ug-net.html</ulink> for more
-information on this variable and its settings.)
-</para>
-<para>There is no solution at all for Windows 9x.
-</para>
-<para>If you have an application that requires a certain permission mode on a
-file, you may be able to work around this requirement by modifying the
-application's source code.  For a hint, based on work done by Corinna
-Vinschen for OpenSSH, see this message from the cygwin mailing list:
-<ulink url="http://cygwin.com/ml/cygwin/2000-11/msg01176.html">http://cygwin.com/ml/cygwin/2000-11/msg01176.html</ulink>.
+<para>For other cases, understand that Cygwin attempts to show UNIX 
+permissions based on the security features of Windows, so the Windows 
+ACLs are likely the source of your problem.  See the Cygwin User's 
+Guide at <ulink url="http://cygwin.com/cygwin-ug-net/ntsec.html" />
+for more information on how Cygwin maps Windows permissions.
 </para>
 </answer></qandaentry>
 

@@ -516,10 +516,10 @@ incompatibilities. Please send us patches if you do this work!
 <para>If you need to change the maximum amount of memory available to Cygwin, see
 <ulink url="http://cygwin.com/cygwin-ug-net/setup-maxmem.html">http://cygwin.com/cygwin-ug-net/setup-maxmem.html</ulink>. Otherwise,
 just pass heap/stack linker arguments to gcc.  To create foo.exe with
-a heap size of 1024 and a stack size of 4096, you would invoke
+a heap size of 200MB and a stack size of 8MB, you would invoke
 gcc as:
 </para>
-<para><literal>gcc -Wl,--heap,1024,--stack,4096 -o foo foo.c</literal>
+<para><literal>gcc -Wl,--heap,200000000,--stack,8000000 -o foo foo.c</literal>
 </para>
 </answer></qandaentry>
 

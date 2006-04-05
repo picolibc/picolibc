@@ -1,3 +1,10 @@
+2006-04-04  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* faq-programming.xml (faq.programming.adjusting-heap):
+	Clarify argument parameter sizes.
+	* faq-using.xml (faq.using.chmod):
+	Improve chmod FAQ.
+
 2006-03-18  Christopher Faylor  <cgf@timesys.com>
 
 	* cygwinenv.sgml: Rename fork_retry to proc_retry since it has turned
