@@ -1,5 +1,10 @@
 2006-04-05  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winuser.h (GetWindowExtEx): Removed, belongs to wingdi.h.
+	Thanks to:    Sergey Philippov <phis at users dot sf dot net>
+
+2006-04-05  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/objidl.h (PIDSI_*): Define.
 	(PRSPEC_*): Define.
 	Thanks to:    Oliver Stoeneberg <kidkat at users dot sf dot net>
