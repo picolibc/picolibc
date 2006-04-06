@@ -45,5 +45,8 @@
 #define IE55	0x0501
 #define IE56	0x0560
 #define IE6	0x0600
+#define IE601	0x0601
+#define IE602	0x0603
+#define IE7	0x0700
 
 #endif /* ndef _W32API_H */
