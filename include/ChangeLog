@@ -1,3 +1,8 @@
+2006-04-06  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* bfdlink.h (bfd_link_info): Replace need_relax_finalize with
+	relax_pass.
+
 2006-03-25  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* elf/bfin.h (R_BFIN_GOT17M4, R_BFIN_GOTHI, R_BFIN_GOTLO,
