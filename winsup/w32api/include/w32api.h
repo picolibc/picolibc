@@ -1,4 +1,5 @@
-#ifndef _W32API_H_
+#ifndef _W32API_H
+#define _W32API_H
 #define _W32API_H_
 #if __GNUC__ >=3
 #pragma GCC system_header
@@ -45,4 +46,4 @@
 #define IE56	0x0560
 #define IE6	0x0600
 
-#endif /* ndef _W32API_H_ */
+#endif /* ndef _W32API_H */

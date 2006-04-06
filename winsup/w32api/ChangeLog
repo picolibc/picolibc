@@ -1,5 +1,10 @@
 2006-04-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/w32api.h (_W32API_H): Define.
+	Define in addition to _W32API_H_, this is the w32api standard.
+
+2006-04-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/w32api.h (WindowsVista): Define.
 
 2006-04-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
