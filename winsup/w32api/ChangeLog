@@ -1,5 +1,9 @@
 2006-04-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/w32api.h (WindowsVista): Define.
+
+2006-04-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/iptypes.h (IP_ADAPTER_*): Define parts that depend
 	on SOCKET_ADDRESS only if winsock2.h has already been included.
 

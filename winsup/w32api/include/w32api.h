@@ -19,16 +19,17 @@
 
 /* Use these values to set _WIN32_WINDOWS and WINVER to your minimum support 
  * level */
-#define Windows95   0x0400
-#define Windows98   0x0410
-#define WindowsME   0x0500
+#define Windows95    0x0400
+#define Windows98    0x0410
+#define WindowsME    0x0500
 
 /* Use these values to set _WIN32_WINNT and WINVER to your mimimum support 
  * level. */
-#define WindowsNT4  0x0400
-#define Windows2000 0x0500
-#define WindowsXP   0x0501
-#define Windows2003 0x0502
+#define WindowsNT4   0x0400
+#define Windows2000  0x0500
+#define WindowsXP    0x0501
+#define Windows2003  0x0502
+#define WindowsVista 0x0600
 
 /* Use these values to set _WIN32_IE to your minimum support level */
 #define IE3	0x0300
