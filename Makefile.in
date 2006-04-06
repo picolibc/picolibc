@@ -50,6 +50,9 @@ libdir = @libdir@
 includedir = @includedir@
 oldincludedir = @oldincludedir@
 infodir = @infodir@
+datarootdir = @datarootdir@
+docdir = @docdir@
+htmldir = @htmldir@
 mandir = @mandir@
 man1dir = $(mandir)/man1
 man2dir = $(mandir)/man2
@@ -405,7 +408,10 @@ BASE_FLAGS_TO_PASS = \
 	"datadir=$(datadir)" \
 	"exec_prefix=$(exec_prefix)" \
 	"includedir=$(includedir)" \
+	"datarootdir=$(datarootdir)" \
+	"docdir=$(docdir)" \
 	"infodir=$(infodir)" \
+	"htmldir=$(htmldir)" \
 	"libdir=$(libdir)" \
 	"libexecdir=$(libexecdir)" \
 	"lispdir=$(lispdir)" \
@@ -1309,6 +1315,110 @@ install-info-target: maybe-install-info-target-rda
 install-info-target: maybe-install-info-target-libada
 install-info-target: maybe-install-info-target-libgomp
 
+.PHONY: do-install-html
+do-install-html:
+	@: $(MAKE); $(unstage)
+	@r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(MAKE) $(RECURSE_FLAGS_TO_PASS) install-html-host \
+	  install-html-target
+
+
+.PHONY: install-html-host
+
+install-html-host: maybe-install-html-ash
+install-html-host: maybe-install-html-autoconf
+install-html-host: maybe-install-html-automake
+install-html-host: maybe-install-html-bash
+install-html-host: maybe-install-html-bfd
+install-html-host: maybe-install-html-opcodes
+install-html-host: maybe-install-html-binutils
+install-html-host: maybe-install-html-bison
+install-html-host: maybe-install-html-byacc
+install-html-host: maybe-install-html-bzip2
+install-html-host: maybe-install-html-dejagnu
+install-html-host: maybe-install-html-diff
+install-html-host: maybe-install-html-dosutils
+install-html-host: maybe-install-html-etc
+install-html-host: maybe-install-html-fastjar
+install-html-host: maybe-install-html-fileutils
+install-html-host: maybe-install-html-findutils
+install-html-host: maybe-install-html-find
+install-html-host: maybe-install-html-fixincludes
+install-html-host: maybe-install-html-flex
+install-html-host: maybe-install-html-gas
+install-html-host: maybe-install-html-gcc
+install-html-host: maybe-install-html-gawk
+install-html-host: maybe-install-html-gettext
+install-html-host: maybe-install-html-gnuserv
+install-html-host: maybe-install-html-gprof
+install-html-host: maybe-install-html-gzip
+install-html-host: maybe-install-html-hello
+install-html-host: maybe-install-html-indent
+install-html-host: maybe-install-html-intl
+install-html-host: maybe-install-html-tcl
+install-html-host: maybe-install-html-itcl
+install-html-host: maybe-install-html-ld
+install-html-host: maybe-install-html-libcpp
+install-html-host: maybe-install-html-libdecnumber
+install-html-host: maybe-install-html-libgui
+install-html-host: maybe-install-html-libiberty
+install-html-host: maybe-install-html-libtool
+install-html-host: maybe-install-html-m4
+install-html-host: maybe-install-html-make
+install-html-host: maybe-install-html-mmalloc
+install-html-host: maybe-install-html-patch
+install-html-host: maybe-install-html-perl
+install-html-host: maybe-install-html-prms
+install-html-host: maybe-install-html-rcs
+install-html-host: maybe-install-html-readline
+install-html-host: maybe-install-html-release
+install-html-host: maybe-install-html-recode
+install-html-host: maybe-install-html-sed
+install-html-host: maybe-install-html-send-pr
+install-html-host: maybe-install-html-shellutils
+install-html-host: maybe-install-html-sid
+install-html-host: maybe-install-html-sim
+install-html-host: maybe-install-html-tar
+install-html-host: maybe-install-html-texinfo
+install-html-host: maybe-install-html-textutils
+install-html-host: maybe-install-html-time
+install-html-host: maybe-install-html-uudecode
+install-html-host: maybe-install-html-wdiff
+install-html-host: maybe-install-html-zip
+install-html-host: maybe-install-html-zlib
+install-html-host: maybe-install-html-gdb
+install-html-host: maybe-install-html-expect
+install-html-host: maybe-install-html-guile
+install-html-host: maybe-install-html-tk
+install-html-host: maybe-install-html-libtermcap
+install-html-host: maybe-install-html-utils
+install-html-host: maybe-install-html-gnattools
+
+.PHONY: install-html-target
+
+install-html-target: maybe-install-html-target-libstdc++-v3
+install-html-target: maybe-install-html-target-libmudflap
+install-html-target: maybe-install-html-target-libssp
+install-html-target: maybe-install-html-target-libgcc-math
+install-html-target: maybe-install-html-target-newlib
+install-html-target: maybe-install-html-target-libgfortran
+install-html-target: maybe-install-html-target-libobjc
+install-html-target: maybe-install-html-target-libtermcap
+install-html-target: maybe-install-html-target-winsup
+install-html-target: maybe-install-html-target-libgloss
+install-html-target: maybe-install-html-target-libiberty
+install-html-target: maybe-install-html-target-gperf
+install-html-target: maybe-install-html-target-examples
+install-html-target: maybe-install-html-target-libffi
+install-html-target: maybe-install-html-target-libjava
+install-html-target: maybe-install-html-target-zlib
+install-html-target: maybe-install-html-target-boehm-gc
+install-html-target: maybe-install-html-target-qthreads
+install-html-target: maybe-install-html-target-rda
+install-html-target: maybe-install-html-target-libada
+install-html-target: maybe-install-html-target-libgomp
+
 .PHONY: do-installcheck
 do-installcheck:
 	@: $(MAKE); $(unstage)
@@ -1832,7 +1942,7 @@ maintainer-clean-target: maybe-maintainer-clean-target-libgomp
 
 # Here are the targets which correspond to the do-X targets.
 
-.PHONY: info installcheck dvi html install-info
+.PHONY: info installcheck dvi html install-info install-html
 .PHONY: clean distclean mostlyclean maintainer-clean realclean
 .PHONY: local-clean local-distclean local-maintainer-clean
 info: do-info
@@ -1849,6 +1959,8 @@ install-info: do-install-info dir.info
 	if [ -f dir.info ] ; then \
 	  $(INSTALL_DATA) dir.info $(DESTDIR)$(infodir)/dir.info ; \
 	else true ; fi
+
+install-html: do-install-html
 
 local-clean:
 	-rm -f *.a TEMP errs core *.o *~ \#* TAGS *.E *.log
@@ -2801,6 +2913,33 @@ install-info-ash: \
 
 @endif ash
 
+.PHONY: maybe-install-html-ash install-html-ash
+maybe-install-html-ash:
+@if ash
+maybe-install-html-ash: install-html-ash
+
+install-html-ash: \
+    configure-ash \
+    html-ash 
+	@: $(MAKE); $(unstage)
+	@[ -f ./ash/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in ash" ; \
+	(cd $(HOST_SUBDIR)/ash && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif ash
+
 .PHONY: maybe-installcheck-ash installcheck-ash
 maybe-installcheck-ash:
 @if ash
@@ -3134,6 +3273,33 @@ install-info-autoconf: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif autoconf
+
+.PHONY: maybe-install-html-autoconf install-html-autoconf
+maybe-install-html-autoconf:
+@if autoconf
+maybe-install-html-autoconf: install-html-autoconf
+
+install-html-autoconf: \
+    configure-autoconf \
+    html-autoconf 
+	@: $(MAKE); $(unstage)
+	@[ -f ./autoconf/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in autoconf" ; \
+	(cd $(HOST_SUBDIR)/autoconf && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif autoconf
@@ -3475,6 +3641,33 @@ install-info-automake: \
 
 @endif automake
 
+.PHONY: maybe-install-html-automake install-html-automake
+maybe-install-html-automake:
+@if automake
+maybe-install-html-automake: install-html-automake
+
+install-html-automake: \
+    configure-automake \
+    html-automake 
+	@: $(MAKE); $(unstage)
+	@[ -f ./automake/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in automake" ; \
+	(cd $(HOST_SUBDIR)/automake && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif automake
+
 .PHONY: maybe-installcheck-automake installcheck-automake
 maybe-installcheck-automake:
 @if automake
@@ -3808,6 +4001,33 @@ install-info-bash: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif bash
+
+.PHONY: maybe-install-html-bash install-html-bash
+maybe-install-html-bash:
+@if bash
+maybe-install-html-bash: install-html-bash
+
+install-html-bash: \
+    configure-bash \
+    html-bash 
+	@: $(MAKE); $(unstage)
+	@[ -f ./bash/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in bash" ; \
+	(cd $(HOST_SUBDIR)/bash && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif bash
@@ -4501,6 +4721,32 @@ install-info-bfd: \
 
 @endif bfd
 
+.PHONY: maybe-install-html-bfd install-html-bfd
+maybe-install-html-bfd:
+@if bfd
+maybe-install-html-bfd: install-html-bfd
+
+install-html-bfd: \
+    configure-bfd \
+    html-bfd 
+	@[ -f ./bfd/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in bfd" ; \
+	(cd $(HOST_SUBDIR)/bfd && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif bfd
+
 .PHONY: maybe-installcheck-bfd installcheck-bfd
 maybe-installcheck-bfd:
 @if bfd
@@ -5181,6 +5427,32 @@ install-info-opcodes: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif opcodes
+
+.PHONY: maybe-install-html-opcodes install-html-opcodes
+maybe-install-html-opcodes:
+@if opcodes
+maybe-install-html-opcodes: install-html-opcodes
+
+install-html-opcodes: \
+    configure-opcodes \
+    html-opcodes 
+	@[ -f ./opcodes/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in opcodes" ; \
+	(cd $(HOST_SUBDIR)/opcodes && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif opcodes
@@ -5869,6 +6141,32 @@ install-info-binutils: \
 
 @endif binutils
 
+.PHONY: maybe-install-html-binutils install-html-binutils
+maybe-install-html-binutils:
+@if binutils
+maybe-install-html-binutils: install-html-binutils
+
+install-html-binutils: \
+    configure-binutils \
+    html-binutils 
+	@[ -f ./binutils/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in binutils" ; \
+	(cd $(HOST_SUBDIR)/binutils && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif binutils
+
 .PHONY: maybe-installcheck-binutils installcheck-binutils
 maybe-installcheck-binutils:
 @if binutils
@@ -6200,6 +6498,33 @@ install-info-bison: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif bison
+
+.PHONY: maybe-install-html-bison install-html-bison
+maybe-install-html-bison:
+@if bison
+maybe-install-html-bison: install-html-bison
+
+install-html-bison: \
+    configure-bison \
+    html-bison 
+	@: $(MAKE); $(unstage)
+	@[ -f ./bison/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in bison" ; \
+	(cd $(HOST_SUBDIR)/bison && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif bison
@@ -6544,6 +6869,33 @@ install-info-byacc: \
 
 @endif byacc
 
+.PHONY: maybe-install-html-byacc install-html-byacc
+maybe-install-html-byacc:
+@if byacc
+maybe-install-html-byacc: install-html-byacc
+
+install-html-byacc: \
+    configure-byacc \
+    html-byacc 
+	@: $(MAKE); $(unstage)
+	@[ -f ./byacc/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in byacc" ; \
+	(cd $(HOST_SUBDIR)/byacc && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif byacc
+
 .PHONY: maybe-installcheck-byacc installcheck-byacc
 maybe-installcheck-byacc:
 @if byacc
@@ -6877,6 +7229,33 @@ install-info-bzip2: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif bzip2
+
+.PHONY: maybe-install-html-bzip2 install-html-bzip2
+maybe-install-html-bzip2:
+@if bzip2
+maybe-install-html-bzip2: install-html-bzip2
+
+install-html-bzip2: \
+    configure-bzip2 \
+    html-bzip2 
+	@: $(MAKE); $(unstage)
+	@[ -f ./bzip2/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in bzip2" ; \
+	(cd $(HOST_SUBDIR)/bzip2 && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif bzip2
@@ -7218,6 +7597,33 @@ install-info-dejagnu: \
 
 @endif dejagnu
 
+.PHONY: maybe-install-html-dejagnu install-html-dejagnu
+maybe-install-html-dejagnu:
+@if dejagnu
+maybe-install-html-dejagnu: install-html-dejagnu
+
+install-html-dejagnu: \
+    configure-dejagnu \
+    html-dejagnu 
+	@: $(MAKE); $(unstage)
+	@[ -f ./dejagnu/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in dejagnu" ; \
+	(cd $(HOST_SUBDIR)/dejagnu && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif dejagnu
+
 .PHONY: maybe-installcheck-dejagnu installcheck-dejagnu
 maybe-installcheck-dejagnu:
 @if dejagnu
@@ -7555,6 +7961,33 @@ install-info-diff: \
 
 @endif diff
 
+.PHONY: maybe-install-html-diff install-html-diff
+maybe-install-html-diff:
+@if diff
+maybe-install-html-diff: install-html-diff
+
+install-html-diff: \
+    configure-diff \
+    html-diff 
+	@: $(MAKE); $(unstage)
+	@[ -f ./diff/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in diff" ; \
+	(cd $(HOST_SUBDIR)/diff && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif diff
+
 .PHONY: maybe-installcheck-diff installcheck-diff
 maybe-installcheck-diff:
 @if diff
@@ -7882,6 +8315,33 @@ install-info-dosutils: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif dosutils
+
+.PHONY: maybe-install-html-dosutils install-html-dosutils
+maybe-install-html-dosutils:
+@if dosutils
+maybe-install-html-dosutils: install-html-dosutils
+
+install-html-dosutils: \
+    configure-dosutils \
+    html-dosutils 
+	@: $(MAKE); $(unstage)
+	@[ -f ./dosutils/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in dosutils" ; \
+	(cd $(HOST_SUBDIR)/dosutils && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif dosutils
@@ -8219,6 +8679,33 @@ install-info-etc: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif etc
+
+.PHONY: maybe-install-html-etc install-html-etc
+maybe-install-html-etc:
+@if etc
+maybe-install-html-etc: install-html-etc
+
+install-html-etc: \
+    configure-etc \
+    html-etc 
+	@: $(MAKE); $(unstage)
+	@[ -f ./etc/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in etc" ; \
+	(cd $(HOST_SUBDIR)/etc && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif etc
@@ -8563,6 +9050,33 @@ install-info-fastjar: \
 
 @endif fastjar
 
+.PHONY: maybe-install-html-fastjar install-html-fastjar
+maybe-install-html-fastjar:
+@if fastjar
+maybe-install-html-fastjar: install-html-fastjar
+
+install-html-fastjar: \
+    configure-fastjar \
+    html-fastjar 
+	@: $(MAKE); $(unstage)
+	@[ -f ./fastjar/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in fastjar" ; \
+	(cd $(HOST_SUBDIR)/fastjar && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif fastjar
+
 .PHONY: maybe-installcheck-fastjar installcheck-fastjar
 maybe-installcheck-fastjar:
 @if fastjar
@@ -8896,6 +9410,33 @@ install-info-fileutils: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif fileutils
+
+.PHONY: maybe-install-html-fileutils install-html-fileutils
+maybe-install-html-fileutils:
+@if fileutils
+maybe-install-html-fileutils: install-html-fileutils
+
+install-html-fileutils: \
+    configure-fileutils \
+    html-fileutils 
+	@: $(MAKE); $(unstage)
+	@[ -f ./fileutils/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in fileutils" ; \
+	(cd $(HOST_SUBDIR)/fileutils && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif fileutils
@@ -9237,6 +9778,33 @@ install-info-findutils: \
 
 @endif findutils
 
+.PHONY: maybe-install-html-findutils install-html-findutils
+maybe-install-html-findutils:
+@if findutils
+maybe-install-html-findutils: install-html-findutils
+
+install-html-findutils: \
+    configure-findutils \
+    html-findutils 
+	@: $(MAKE); $(unstage)
+	@[ -f ./findutils/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in findutils" ; \
+	(cd $(HOST_SUBDIR)/findutils && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif findutils
+
 .PHONY: maybe-installcheck-findutils installcheck-findutils
 maybe-installcheck-findutils:
 @if findutils
@@ -9574,6 +10142,33 @@ install-info-find: \
 
 @endif find
 
+.PHONY: maybe-install-html-find install-html-find
+maybe-install-html-find:
+@if find
+maybe-install-html-find: install-html-find
+
+install-html-find: \
+    configure-find \
+    html-find 
+	@: $(MAKE); $(unstage)
+	@[ -f ./find/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in find" ; \
+	(cd $(HOST_SUBDIR)/find && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif find
+
 .PHONY: maybe-installcheck-find installcheck-find
 maybe-installcheck-find:
 @if find
@@ -9843,6 +10438,33 @@ maybe-install-info-fixincludes: install-info-fixincludes
 
 # fixincludes doesn't support install-info.
 install-info-fixincludes:
+
+@endif fixincludes
+
+.PHONY: maybe-install-html-fixincludes install-html-fixincludes
+maybe-install-html-fixincludes:
+@if fixincludes
+maybe-install-html-fixincludes: install-html-fixincludes
+
+install-html-fixincludes: \
+    configure-fixincludes \
+    html-fixincludes 
+	@: $(MAKE); $(unstage)
+	@[ -f ./fixincludes/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in fixincludes" ; \
+	(cd $(HOST_SUBDIR)/fixincludes && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
 
 @endif fixincludes
 
@@ -10166,6 +10788,33 @@ install-info-flex: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif flex
+
+.PHONY: maybe-install-html-flex install-html-flex
+maybe-install-html-flex:
+@if flex
+maybe-install-html-flex: install-html-flex
+
+install-html-flex: \
+    configure-flex \
+    html-flex 
+	@: $(MAKE); $(unstage)
+	@[ -f ./flex/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in flex" ; \
+	(cd $(HOST_SUBDIR)/flex && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif flex
@@ -10859,6 +11508,32 @@ install-info-gas: \
 
 @endif gas
 
+.PHONY: maybe-install-html-gas install-html-gas
+maybe-install-html-gas:
+@if gas
+maybe-install-html-gas: install-html-gas
+
+install-html-gas: \
+    configure-gas \
+    html-gas 
+	@[ -f ./gas/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in gas" ; \
+	(cd $(HOST_SUBDIR)/gas && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif gas
+
 .PHONY: maybe-installcheck-gas installcheck-gas
 maybe-installcheck-gas:
 @if gas
@@ -11543,6 +12218,32 @@ install-info-gcc: \
 
 @endif gcc
 
+.PHONY: maybe-install-html-gcc install-html-gcc
+maybe-install-html-gcc:
+@if gcc
+maybe-install-html-gcc: install-html-gcc
+
+install-html-gcc: \
+    configure-gcc \
+    html-gcc 
+	@[ -f ./gcc/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) $(EXTRA_GCC_FLAGS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in gcc" ; \
+	(cd $(HOST_SUBDIR)/gcc && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif gcc
+
 .PHONY: maybe-installcheck-gcc installcheck-gcc
 maybe-installcheck-gcc:
 @if gcc
@@ -11871,6 +12572,33 @@ install-info-gawk: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif gawk
+
+.PHONY: maybe-install-html-gawk install-html-gawk
+maybe-install-html-gawk:
+@if gawk
+maybe-install-html-gawk: install-html-gawk
+
+install-html-gawk: \
+    configure-gawk \
+    html-gawk 
+	@: $(MAKE); $(unstage)
+	@[ -f ./gawk/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in gawk" ; \
+	(cd $(HOST_SUBDIR)/gawk && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif gawk
@@ -12212,6 +12940,33 @@ install-info-gettext: \
 
 @endif gettext
 
+.PHONY: maybe-install-html-gettext install-html-gettext
+maybe-install-html-gettext:
+@if gettext
+maybe-install-html-gettext: install-html-gettext
+
+install-html-gettext: \
+    configure-gettext \
+    html-gettext 
+	@: $(MAKE); $(unstage)
+	@[ -f ./gettext/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in gettext" ; \
+	(cd $(HOST_SUBDIR)/gettext && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif gettext
+
 .PHONY: maybe-installcheck-gettext installcheck-gettext
 maybe-installcheck-gettext:
 @if gettext
@@ -12545,6 +13300,33 @@ install-info-gnuserv: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif gnuserv
+
+.PHONY: maybe-install-html-gnuserv install-html-gnuserv
+maybe-install-html-gnuserv:
+@if gnuserv
+maybe-install-html-gnuserv: install-html-gnuserv
+
+install-html-gnuserv: \
+    configure-gnuserv \
+    html-gnuserv 
+	@: $(MAKE); $(unstage)
+	@[ -f ./gnuserv/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in gnuserv" ; \
+	(cd $(HOST_SUBDIR)/gnuserv && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif gnuserv
@@ -12886,6 +13668,33 @@ install-info-gprof: \
 
 @endif gprof
 
+.PHONY: maybe-install-html-gprof install-html-gprof
+maybe-install-html-gprof:
+@if gprof
+maybe-install-html-gprof: install-html-gprof
+
+install-html-gprof: \
+    configure-gprof \
+    html-gprof 
+	@: $(MAKE); $(unstage)
+	@[ -f ./gprof/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in gprof" ; \
+	(cd $(HOST_SUBDIR)/gprof && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif gprof
+
 .PHONY: maybe-installcheck-gprof installcheck-gprof
 maybe-installcheck-gprof:
 @if gprof
@@ -13219,6 +14028,33 @@ install-info-gzip: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif gzip
+
+.PHONY: maybe-install-html-gzip install-html-gzip
+maybe-install-html-gzip:
+@if gzip
+maybe-install-html-gzip: install-html-gzip
+
+install-html-gzip: \
+    configure-gzip \
+    html-gzip 
+	@: $(MAKE); $(unstage)
+	@[ -f ./gzip/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in gzip" ; \
+	(cd $(HOST_SUBDIR)/gzip && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif gzip
@@ -13560,6 +14396,33 @@ install-info-hello: \
 
 @endif hello
 
+.PHONY: maybe-install-html-hello install-html-hello
+maybe-install-html-hello:
+@if hello
+maybe-install-html-hello: install-html-hello
+
+install-html-hello: \
+    configure-hello \
+    html-hello 
+	@: $(MAKE); $(unstage)
+	@[ -f ./hello/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in hello" ; \
+	(cd $(HOST_SUBDIR)/hello && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif hello
+
 .PHONY: maybe-installcheck-hello installcheck-hello
 maybe-installcheck-hello:
 @if hello
@@ -13893,6 +14756,33 @@ install-info-indent: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif indent
+
+.PHONY: maybe-install-html-indent install-html-indent
+maybe-install-html-indent:
+@if indent
+maybe-install-html-indent: install-html-indent
+
+install-html-indent: \
+    configure-indent \
+    html-indent 
+	@: $(MAKE); $(unstage)
+	@[ -f ./indent/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in indent" ; \
+	(cd $(HOST_SUBDIR)/indent && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif indent
@@ -14586,6 +15476,32 @@ install-info-intl: \
 
 @endif intl
 
+.PHONY: maybe-install-html-intl install-html-intl
+maybe-install-html-intl:
+@if intl
+maybe-install-html-intl: install-html-intl
+
+install-html-intl: \
+    configure-intl \
+    html-intl 
+	@[ -f ./intl/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in intl" ; \
+	(cd $(HOST_SUBDIR)/intl && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif intl
+
 .PHONY: maybe-installcheck-intl installcheck-intl
 maybe-installcheck-intl:
 @if intl
@@ -14918,6 +15834,33 @@ install-info-tcl: \
 
 @endif tcl
 
+.PHONY: maybe-install-html-tcl install-html-tcl
+maybe-install-html-tcl:
+@if tcl
+maybe-install-html-tcl: install-html-tcl
+
+install-html-tcl: \
+    configure-tcl \
+    html-tcl 
+	@: $(MAKE); $(unstage)
+	@[ -f ./tcl/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in tcl" ; \
+	(cd $(HOST_SUBDIR)/tcl && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif tcl
+
 .PHONY: maybe-installcheck-tcl installcheck-tcl
 maybe-installcheck-tcl:
 @if tcl
@@ -15236,6 +16179,33 @@ install-info-itcl: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif itcl
+
+.PHONY: maybe-install-html-itcl install-html-itcl
+maybe-install-html-itcl:
+@if itcl
+maybe-install-html-itcl: install-html-itcl
+
+install-html-itcl: \
+    configure-itcl \
+    html-itcl 
+	@: $(MAKE); $(unstage)
+	@[ -f ./itcl/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in itcl" ; \
+	(cd $(HOST_SUBDIR)/itcl && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif itcl
@@ -15929,6 +16899,32 @@ install-info-ld: \
 
 @endif ld
 
+.PHONY: maybe-install-html-ld install-html-ld
+maybe-install-html-ld:
+@if ld
+maybe-install-html-ld: install-html-ld
+
+install-html-ld: \
+    configure-ld \
+    html-ld 
+	@[ -f ./ld/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in ld" ; \
+	(cd $(HOST_SUBDIR)/ld && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif ld
+
 .PHONY: maybe-installcheck-ld installcheck-ld
 maybe-installcheck-ld:
 @if ld
@@ -16609,6 +17605,32 @@ install-info-libcpp: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif libcpp
+
+.PHONY: maybe-install-html-libcpp install-html-libcpp
+maybe-install-html-libcpp:
+@if libcpp
+maybe-install-html-libcpp: install-html-libcpp
+
+install-html-libcpp: \
+    configure-libcpp \
+    html-libcpp 
+	@[ -f ./libcpp/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in libcpp" ; \
+	(cd $(HOST_SUBDIR)/libcpp && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif libcpp
@@ -17297,6 +18319,32 @@ install-info-libdecnumber: \
 
 @endif libdecnumber
 
+.PHONY: maybe-install-html-libdecnumber install-html-libdecnumber
+maybe-install-html-libdecnumber:
+@if libdecnumber
+maybe-install-html-libdecnumber: install-html-libdecnumber
+
+install-html-libdecnumber: \
+    configure-libdecnumber \
+    html-libdecnumber 
+	@[ -f ./libdecnumber/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in libdecnumber" ; \
+	(cd $(HOST_SUBDIR)/libdecnumber && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif libdecnumber
+
 .PHONY: maybe-installcheck-libdecnumber installcheck-libdecnumber
 maybe-installcheck-libdecnumber:
 @if libdecnumber
@@ -17625,6 +18673,33 @@ install-info-libgui: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif libgui
+
+.PHONY: maybe-install-html-libgui install-html-libgui
+maybe-install-html-libgui:
+@if libgui
+maybe-install-html-libgui: install-html-libgui
+
+install-html-libgui: \
+    configure-libgui \
+    html-libgui 
+	@: $(MAKE); $(unstage)
+	@[ -f ./libgui/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in libgui" ; \
+	(cd $(HOST_SUBDIR)/libgui && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif libgui
@@ -18318,6 +19393,32 @@ install-info-libiberty: \
 
 @endif libiberty
 
+.PHONY: maybe-install-html-libiberty install-html-libiberty
+maybe-install-html-libiberty:
+@if libiberty
+maybe-install-html-libiberty: install-html-libiberty
+
+install-html-libiberty: \
+    configure-libiberty \
+    html-libiberty 
+	@[ -f ./libiberty/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in libiberty" ; \
+	(cd $(HOST_SUBDIR)/libiberty && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif libiberty
+
 .PHONY: maybe-installcheck-libiberty installcheck-libiberty
 maybe-installcheck-libiberty:
 @if libiberty
@@ -18646,6 +19747,33 @@ install-info-libtool: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif libtool
+
+.PHONY: maybe-install-html-libtool install-html-libtool
+maybe-install-html-libtool:
+@if libtool
+maybe-install-html-libtool: install-html-libtool
+
+install-html-libtool: \
+    configure-libtool \
+    html-libtool 
+	@: $(MAKE); $(unstage)
+	@[ -f ./libtool/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in libtool" ; \
+	(cd $(HOST_SUBDIR)/libtool && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif libtool
@@ -18987,6 +20115,33 @@ install-info-m4: \
 
 @endif m4
 
+.PHONY: maybe-install-html-m4 install-html-m4
+maybe-install-html-m4:
+@if m4
+maybe-install-html-m4: install-html-m4
+
+install-html-m4: \
+    configure-m4 \
+    html-m4 
+	@: $(MAKE); $(unstage)
+	@[ -f ./m4/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in m4" ; \
+	(cd $(HOST_SUBDIR)/m4 && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif m4
+
 .PHONY: maybe-installcheck-m4 installcheck-m4
 maybe-installcheck-m4:
 @if m4
@@ -19324,6 +20479,33 @@ install-info-make: \
 
 @endif make
 
+.PHONY: maybe-install-html-make install-html-make
+maybe-install-html-make:
+@if make
+maybe-install-html-make: install-html-make
+
+install-html-make: \
+    configure-make \
+    html-make 
+	@: $(MAKE); $(unstage)
+	@[ -f ./make/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in make" ; \
+	(cd $(HOST_SUBDIR)/make && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif make
+
 .PHONY: maybe-installcheck-make installcheck-make
 maybe-installcheck-make:
 @if make
@@ -19651,6 +20833,33 @@ install-info-mmalloc: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif mmalloc
+
+.PHONY: maybe-install-html-mmalloc install-html-mmalloc
+maybe-install-html-mmalloc:
+@if mmalloc
+maybe-install-html-mmalloc: install-html-mmalloc
+
+install-html-mmalloc: \
+    configure-mmalloc \
+    html-mmalloc 
+	@: $(MAKE); $(unstage)
+	@[ -f ./mmalloc/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in mmalloc" ; \
+	(cd $(HOST_SUBDIR)/mmalloc && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif mmalloc
@@ -19992,6 +21201,33 @@ install-info-patch: \
 
 @endif patch
 
+.PHONY: maybe-install-html-patch install-html-patch
+maybe-install-html-patch:
+@if patch
+maybe-install-html-patch: install-html-patch
+
+install-html-patch: \
+    configure-patch \
+    html-patch 
+	@: $(MAKE); $(unstage)
+	@[ -f ./patch/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in patch" ; \
+	(cd $(HOST_SUBDIR)/patch && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif patch
+
 .PHONY: maybe-installcheck-patch installcheck-patch
 maybe-installcheck-patch:
 @if patch
@@ -20325,6 +21561,33 @@ install-info-perl: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif perl
+
+.PHONY: maybe-install-html-perl install-html-perl
+maybe-install-html-perl:
+@if perl
+maybe-install-html-perl: install-html-perl
+
+install-html-perl: \
+    configure-perl \
+    html-perl 
+	@: $(MAKE); $(unstage)
+	@[ -f ./perl/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in perl" ; \
+	(cd $(HOST_SUBDIR)/perl && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif perl
@@ -20666,6 +21929,33 @@ install-info-prms: \
 
 @endif prms
 
+.PHONY: maybe-install-html-prms install-html-prms
+maybe-install-html-prms:
+@if prms
+maybe-install-html-prms: install-html-prms
+
+install-html-prms: \
+    configure-prms \
+    html-prms 
+	@: $(MAKE); $(unstage)
+	@[ -f ./prms/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in prms" ; \
+	(cd $(HOST_SUBDIR)/prms && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif prms
+
 .PHONY: maybe-installcheck-prms installcheck-prms
 maybe-installcheck-prms:
 @if prms
@@ -20999,6 +22289,33 @@ install-info-rcs: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif rcs
+
+.PHONY: maybe-install-html-rcs install-html-rcs
+maybe-install-html-rcs:
+@if rcs
+maybe-install-html-rcs: install-html-rcs
+
+install-html-rcs: \
+    configure-rcs \
+    html-rcs 
+	@: $(MAKE); $(unstage)
+	@[ -f ./rcs/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in rcs" ; \
+	(cd $(HOST_SUBDIR)/rcs && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif rcs
@@ -21340,6 +22657,33 @@ install-info-readline: \
 
 @endif readline
 
+.PHONY: maybe-install-html-readline install-html-readline
+maybe-install-html-readline:
+@if readline
+maybe-install-html-readline: install-html-readline
+
+install-html-readline: \
+    configure-readline \
+    html-readline 
+	@: $(MAKE); $(unstage)
+	@[ -f ./readline/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in readline" ; \
+	(cd $(HOST_SUBDIR)/readline && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif readline
+
 .PHONY: maybe-installcheck-readline installcheck-readline
 maybe-installcheck-readline:
 @if readline
@@ -21661,6 +23005,33 @@ install-info-release: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif release
+
+.PHONY: maybe-install-html-release install-html-release
+maybe-install-html-release:
+@if release
+maybe-install-html-release: install-html-release
+
+install-html-release: \
+    configure-release \
+    html-release 
+	@: $(MAKE); $(unstage)
+	@[ -f ./release/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in release" ; \
+	(cd $(HOST_SUBDIR)/release && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif release
@@ -22002,6 +23373,33 @@ install-info-recode: \
 
 @endif recode
 
+.PHONY: maybe-install-html-recode install-html-recode
+maybe-install-html-recode:
+@if recode
+maybe-install-html-recode: install-html-recode
+
+install-html-recode: \
+    configure-recode \
+    html-recode 
+	@: $(MAKE); $(unstage)
+	@[ -f ./recode/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in recode" ; \
+	(cd $(HOST_SUBDIR)/recode && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif recode
+
 .PHONY: maybe-installcheck-recode installcheck-recode
 maybe-installcheck-recode:
 @if recode
@@ -22335,6 +23733,33 @@ install-info-sed: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif sed
+
+.PHONY: maybe-install-html-sed install-html-sed
+maybe-install-html-sed:
+@if sed
+maybe-install-html-sed: install-html-sed
+
+install-html-sed: \
+    configure-sed \
+    html-sed 
+	@: $(MAKE); $(unstage)
+	@[ -f ./sed/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in sed" ; \
+	(cd $(HOST_SUBDIR)/sed && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif sed
@@ -22676,6 +24101,33 @@ install-info-send-pr: \
 
 @endif send-pr
 
+.PHONY: maybe-install-html-send-pr install-html-send-pr
+maybe-install-html-send-pr:
+@if send-pr
+maybe-install-html-send-pr: install-html-send-pr
+
+install-html-send-pr: \
+    configure-send-pr \
+    html-send-pr 
+	@: $(MAKE); $(unstage)
+	@[ -f ./send-pr/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in send-pr" ; \
+	(cd $(HOST_SUBDIR)/send-pr && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif send-pr
+
 .PHONY: maybe-installcheck-send-pr installcheck-send-pr
 maybe-installcheck-send-pr:
 @if send-pr
@@ -23009,6 +24461,33 @@ install-info-shellutils: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif shellutils
+
+.PHONY: maybe-install-html-shellutils install-html-shellutils
+maybe-install-html-shellutils:
+@if shellutils
+maybe-install-html-shellutils: install-html-shellutils
+
+install-html-shellutils: \
+    configure-shellutils \
+    html-shellutils 
+	@: $(MAKE); $(unstage)
+	@[ -f ./shellutils/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in shellutils" ; \
+	(cd $(HOST_SUBDIR)/shellutils && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif shellutils
@@ -23350,6 +24829,33 @@ install-info-sid: \
 
 @endif sid
 
+.PHONY: maybe-install-html-sid install-html-sid
+maybe-install-html-sid:
+@if sid
+maybe-install-html-sid: install-html-sid
+
+install-html-sid: \
+    configure-sid \
+    html-sid 
+	@: $(MAKE); $(unstage)
+	@[ -f ./sid/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in sid" ; \
+	(cd $(HOST_SUBDIR)/sid && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif sid
+
 .PHONY: maybe-installcheck-sid installcheck-sid
 maybe-installcheck-sid:
 @if sid
@@ -23683,6 +25189,33 @@ install-info-sim: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif sim
+
+.PHONY: maybe-install-html-sim install-html-sim
+maybe-install-html-sim:
+@if sim
+maybe-install-html-sim: install-html-sim
+
+install-html-sim: \
+    configure-sim \
+    html-sim 
+	@: $(MAKE); $(unstage)
+	@[ -f ./sim/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in sim" ; \
+	(cd $(HOST_SUBDIR)/sim && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif sim
@@ -24024,6 +25557,33 @@ install-info-tar: \
 
 @endif tar
 
+.PHONY: maybe-install-html-tar install-html-tar
+maybe-install-html-tar:
+@if tar
+maybe-install-html-tar: install-html-tar
+
+install-html-tar: \
+    configure-tar \
+    html-tar 
+	@: $(MAKE); $(unstage)
+	@[ -f ./tar/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in tar" ; \
+	(cd $(HOST_SUBDIR)/tar && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif tar
+
 .PHONY: maybe-installcheck-tar installcheck-tar
 maybe-installcheck-tar:
 @if tar
@@ -24351,6 +25911,33 @@ install-info-texinfo: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif texinfo
+
+.PHONY: maybe-install-html-texinfo install-html-texinfo
+maybe-install-html-texinfo:
+@if texinfo
+maybe-install-html-texinfo: install-html-texinfo
+
+install-html-texinfo: \
+    configure-texinfo \
+    html-texinfo 
+	@: $(MAKE); $(unstage)
+	@[ -f ./texinfo/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in texinfo" ; \
+	(cd $(HOST_SUBDIR)/texinfo && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif texinfo
@@ -24692,6 +26279,33 @@ install-info-textutils: \
 
 @endif textutils
 
+.PHONY: maybe-install-html-textutils install-html-textutils
+maybe-install-html-textutils:
+@if textutils
+maybe-install-html-textutils: install-html-textutils
+
+install-html-textutils: \
+    configure-textutils \
+    html-textutils 
+	@: $(MAKE); $(unstage)
+	@[ -f ./textutils/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in textutils" ; \
+	(cd $(HOST_SUBDIR)/textutils && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif textutils
+
 .PHONY: maybe-installcheck-textutils installcheck-textutils
 maybe-installcheck-textutils:
 @if textutils
@@ -25025,6 +26639,33 @@ install-info-time: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif time
+
+.PHONY: maybe-install-html-time install-html-time
+maybe-install-html-time:
+@if time
+maybe-install-html-time: install-html-time
+
+install-html-time: \
+    configure-time \
+    html-time 
+	@: $(MAKE); $(unstage)
+	@[ -f ./time/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in time" ; \
+	(cd $(HOST_SUBDIR)/time && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif time
@@ -25366,6 +27007,33 @@ install-info-uudecode: \
 
 @endif uudecode
 
+.PHONY: maybe-install-html-uudecode install-html-uudecode
+maybe-install-html-uudecode:
+@if uudecode
+maybe-install-html-uudecode: install-html-uudecode
+
+install-html-uudecode: \
+    configure-uudecode \
+    html-uudecode 
+	@: $(MAKE); $(unstage)
+	@[ -f ./uudecode/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in uudecode" ; \
+	(cd $(HOST_SUBDIR)/uudecode && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif uudecode
+
 .PHONY: maybe-installcheck-uudecode installcheck-uudecode
 maybe-installcheck-uudecode:
 @if uudecode
@@ -25699,6 +27367,33 @@ install-info-wdiff: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif wdiff
+
+.PHONY: maybe-install-html-wdiff install-html-wdiff
+maybe-install-html-wdiff:
+@if wdiff
+maybe-install-html-wdiff: install-html-wdiff
+
+install-html-wdiff: \
+    configure-wdiff \
+    html-wdiff 
+	@: $(MAKE); $(unstage)
+	@[ -f ./wdiff/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in wdiff" ; \
+	(cd $(HOST_SUBDIR)/wdiff && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif wdiff
@@ -26039,6 +27734,33 @@ install-info-zip: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif zip
+
+.PHONY: maybe-install-html-zip install-html-zip
+maybe-install-html-zip:
+@if zip
+maybe-install-html-zip: install-html-zip
+
+install-html-zip: \
+    configure-zip \
+    html-zip 
+	@: $(MAKE); $(unstage)
+	@[ -f ./zip/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in zip" ; \
+	(cd $(HOST_SUBDIR)/zip && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif zip
@@ -26720,6 +28442,32 @@ install-info-zlib: \
 
 @endif zlib
 
+.PHONY: maybe-install-html-zlib install-html-zlib
+maybe-install-html-zlib:
+@if zlib
+maybe-install-html-zlib: install-html-zlib
+
+install-html-zlib: \
+    configure-zlib \
+    html-zlib 
+	@[ -f ./zlib/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in zlib" ; \
+	(cd $(HOST_SUBDIR)/zlib && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif zlib
+
 .PHONY: maybe-installcheck-zlib installcheck-zlib
 maybe-installcheck-zlib:
 @if zlib
@@ -27048,6 +28796,33 @@ install-info-gdb: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif gdb
+
+.PHONY: maybe-install-html-gdb install-html-gdb
+maybe-install-html-gdb:
+@if gdb
+maybe-install-html-gdb: install-html-gdb
+
+install-html-gdb: \
+    configure-gdb \
+    html-gdb 
+	@: $(MAKE); $(unstage)
+	@[ -f ./gdb/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) $(X11_FLAGS_TO_PASS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in gdb" ; \
+	(cd $(HOST_SUBDIR)/gdb && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif gdb
@@ -27389,6 +29164,33 @@ install-info-expect: \
 
 @endif expect
 
+.PHONY: maybe-install-html-expect install-html-expect
+maybe-install-html-expect:
+@if expect
+maybe-install-html-expect: install-html-expect
+
+install-html-expect: \
+    configure-expect \
+    html-expect 
+	@: $(MAKE); $(unstage)
+	@[ -f ./expect/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) $(X11_FLAGS_TO_PASS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in expect" ; \
+	(cd $(HOST_SUBDIR)/expect && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif expect
+
 .PHONY: maybe-installcheck-expect installcheck-expect
 maybe-installcheck-expect:
 @if expect
@@ -27722,6 +29524,33 @@ install-info-guile: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif guile
+
+.PHONY: maybe-install-html-guile install-html-guile
+maybe-install-html-guile:
+@if guile
+maybe-install-html-guile: install-html-guile
+
+install-html-guile: \
+    configure-guile \
+    html-guile 
+	@: $(MAKE); $(unstage)
+	@[ -f ./guile/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) $(X11_FLAGS_TO_PASS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in guile" ; \
+	(cd $(HOST_SUBDIR)/guile && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif guile
@@ -28063,6 +29892,33 @@ install-info-tk: \
 
 @endif tk
 
+.PHONY: maybe-install-html-tk install-html-tk
+maybe-install-html-tk:
+@if tk
+maybe-install-html-tk: install-html-tk
+
+install-html-tk: \
+    configure-tk \
+    html-tk 
+	@: $(MAKE); $(unstage)
+	@[ -f ./tk/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) $(X11_FLAGS_TO_PASS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in tk" ; \
+	(cd $(HOST_SUBDIR)/tk && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif tk
+
 .PHONY: maybe-installcheck-tk installcheck-tk
 maybe-installcheck-tk:
 @if tk
@@ -28394,6 +30250,33 @@ install-info-libtermcap: \
 
 @endif libtermcap
 
+.PHONY: maybe-install-html-libtermcap install-html-libtermcap
+maybe-install-html-libtermcap:
+@if libtermcap
+maybe-install-html-libtermcap: install-html-libtermcap
+
+install-html-libtermcap: \
+    configure-libtermcap \
+    html-libtermcap 
+	@: $(MAKE); $(unstage)
+	@[ -f ./libtermcap/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in libtermcap" ; \
+	(cd $(HOST_SUBDIR)/libtermcap && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
+	  || exit 1
+
+@endif libtermcap
+
 .PHONY: maybe-installcheck-libtermcap installcheck-libtermcap
 maybe-installcheck-libtermcap:
 @if libtermcap
@@ -28661,6 +30544,33 @@ install-info-utils: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif utils
+
+.PHONY: maybe-install-html-utils install-html-utils
+maybe-install-html-utils:
+@if utils
+maybe-install-html-utils: install-html-utils
+
+install-html-utils: \
+    configure-utils \
+    html-utils 
+	@: $(MAKE); $(unstage)
+	@[ -f ./utils/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in utils" ; \
+	(cd $(HOST_SUBDIR)/utils && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif utils
@@ -28998,6 +30908,33 @@ install-info-gnattools: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	          install-info) \
+	  || exit 1
+
+@endif gnattools
+
+.PHONY: maybe-install-html-gnattools install-html-gnattools
+maybe-install-html-gnattools:
+@if gnattools
+maybe-install-html-gnattools: install-html-gnattools
+
+install-html-gnattools: \
+    configure-gnattools \
+    html-gnattools 
+	@: $(MAKE); $(unstage)
+	@[ -f ./gnattools/Makefile ] || exit 0; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing install-html in gnattools" ; \
+	(cd $(HOST_SUBDIR)/gnattools && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	          install-html) \
 	  || exit 1
 
 @endif gnattools
@@ -29361,6 +31298,33 @@ install-info-target-libstdc++-v3: \
 
 @endif target-libstdc++-v3
 
+.PHONY: maybe-install-html-target-libstdc++-v3 install-html-target-libstdc++-v3
+maybe-install-html-target-libstdc++-v3:
+@if target-libstdc++-v3
+maybe-install-html-target-libstdc++-v3: install-html-target-libstdc++-v3
+
+install-html-target-libstdc++-v3: \
+    configure-target-libstdc++-v3 \
+    html-target-libstdc++-v3 
+	@: $(MAKE); $(unstage)
+	@[ -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile ] || exit 0 ; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(RAW_CXX_TARGET_EXPORTS) \
+	echo "Doing install-html in $(TARGET_SUBDIR)/libstdc++-v3" ; \
+	for flag in $(EXTRA_TARGET_FLAGS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	(cd $(TARGET_SUBDIR)/libstdc++-v3 && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	           install-html) \
+	  || exit 1
+
+@endif target-libstdc++-v3
+
 .PHONY: maybe-installcheck-target-libstdc++-v3 installcheck-target-libstdc++-v3
 maybe-installcheck-target-libstdc++-v3:
 @if target-libstdc++-v3
@@ -29711,6 +31675,33 @@ install-info-target-libmudflap: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	           install-info) \
+	  || exit 1
+
+@endif target-libmudflap
+
+.PHONY: maybe-install-html-target-libmudflap install-html-target-libmudflap
+maybe-install-html-target-libmudflap:
+@if target-libmudflap
+maybe-install-html-target-libmudflap: install-html-target-libmudflap
+
+install-html-target-libmudflap: \
+    configure-target-libmudflap \
+    html-target-libmudflap 
+	@: $(MAKE); $(unstage)
+	@[ -f $(TARGET_SUBDIR)/libmudflap/Makefile ] || exit 0 ; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(NORMAL_TARGET_EXPORTS) \
+	echo "Doing install-html in $(TARGET_SUBDIR)/libmudflap" ; \
+	for flag in $(EXTRA_TARGET_FLAGS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	(cd $(TARGET_SUBDIR)/libmudflap && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	           install-html) \
 	  || exit 1
 
 @endif target-libmudflap
@@ -30069,6 +32060,33 @@ install-info-target-libssp: \
 
 @endif target-libssp
 
+.PHONY: maybe-install-html-target-libssp install-html-target-libssp
+maybe-install-html-target-libssp:
+@if target-libssp
+maybe-install-html-target-libssp: install-html-target-libssp
+
+install-html-target-libssp: \
+    configure-target-libssp \
+    html-target-libssp 
+	@: $(MAKE); $(unstage)
+	@[ -f $(TARGET_SUBDIR)/libssp/Makefile ] || exit 0 ; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(NORMAL_TARGET_EXPORTS) \
+	echo "Doing install-html in $(TARGET_SUBDIR)/libssp" ; \
+	for flag in $(EXTRA_TARGET_FLAGS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	(cd $(TARGET_SUBDIR)/libssp && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	           install-html) \
+	  || exit 1
+
+@endif target-libssp
+
 .PHONY: maybe-installcheck-target-libssp installcheck-target-libssp
 maybe-installcheck-target-libssp:
 @if target-libssp
@@ -30419,6 +32437,33 @@ install-info-target-libgcc-math: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	           install-info) \
+	  || exit 1
+
+@endif target-libgcc-math
+
+.PHONY: maybe-install-html-target-libgcc-math install-html-target-libgcc-math
+maybe-install-html-target-libgcc-math:
+@if target-libgcc-math
+maybe-install-html-target-libgcc-math: install-html-target-libgcc-math
+
+install-html-target-libgcc-math: \
+    configure-target-libgcc-math \
+    html-target-libgcc-math 
+	@: $(MAKE); $(unstage)
+	@[ -f $(TARGET_SUBDIR)/libgcc-math/Makefile ] || exit 0 ; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(NORMAL_TARGET_EXPORTS) \
+	echo "Doing install-html in $(TARGET_SUBDIR)/libgcc-math" ; \
+	for flag in $(EXTRA_TARGET_FLAGS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	(cd $(TARGET_SUBDIR)/libgcc-math && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	           install-html) \
 	  || exit 1
 
 @endif target-libgcc-math
@@ -30777,6 +32822,33 @@ install-info-target-newlib: \
 
 @endif target-newlib
 
+.PHONY: maybe-install-html-target-newlib install-html-target-newlib
+maybe-install-html-target-newlib:
+@if target-newlib
+maybe-install-html-target-newlib: install-html-target-newlib
+
+install-html-target-newlib: \
+    configure-target-newlib \
+    html-target-newlib 
+	@: $(MAKE); $(unstage)
+	@[ -f $(TARGET_SUBDIR)/newlib/Makefile ] || exit 0 ; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(NORMAL_TARGET_EXPORTS) \
+	echo "Doing install-html in $(TARGET_SUBDIR)/newlib" ; \
+	for flag in $(EXTRA_TARGET_FLAGS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	(cd $(TARGET_SUBDIR)/newlib && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	           install-html) \
+	  || exit 1
+
+@endif target-newlib
+
 .PHONY: maybe-installcheck-target-newlib installcheck-target-newlib
 maybe-installcheck-target-newlib:
 @if target-newlib
@@ -31127,6 +33199,33 @@ install-info-target-libgfortran: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	           install-info) \
+	  || exit 1
+
+@endif target-libgfortran
+
+.PHONY: maybe-install-html-target-libgfortran install-html-target-libgfortran
+maybe-install-html-target-libgfortran:
+@if target-libgfortran
+maybe-install-html-target-libgfortran: install-html-target-libgfortran
+
+install-html-target-libgfortran: \
+    configure-target-libgfortran \
+    html-target-libgfortran 
+	@: $(MAKE); $(unstage)
+	@[ -f $(TARGET_SUBDIR)/libgfortran/Makefile ] || exit 0 ; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(NORMAL_TARGET_EXPORTS) \
+	echo "Doing install-html in $(TARGET_SUBDIR)/libgfortran" ; \
+	for flag in $(EXTRA_TARGET_FLAGS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	(cd $(TARGET_SUBDIR)/libgfortran && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	           install-html) \
 	  || exit 1
 
 @endif target-libgfortran
@@ -31485,6 +33584,33 @@ install-info-target-libobjc: \
 
 @endif target-libobjc
 
+.PHONY: maybe-install-html-target-libobjc install-html-target-libobjc
+maybe-install-html-target-libobjc:
+@if target-libobjc
+maybe-install-html-target-libobjc: install-html-target-libobjc
+
+install-html-target-libobjc: \
+    configure-target-libobjc \
+    html-target-libobjc 
+	@: $(MAKE); $(unstage)
+	@[ -f $(TARGET_SUBDIR)/libobjc/Makefile ] || exit 0 ; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(NORMAL_TARGET_EXPORTS) \
+	echo "Doing install-html in $(TARGET_SUBDIR)/libobjc" ; \
+	for flag in $(EXTRA_TARGET_FLAGS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	(cd $(TARGET_SUBDIR)/libobjc && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	           install-html) \
+	  || exit 1
+
+@endif target-libobjc
+
 .PHONY: maybe-installcheck-target-libobjc installcheck-target-libobjc
 maybe-installcheck-target-libobjc:
 @if target-libobjc
@@ -31834,6 +33960,33 @@ install-info-target-libtermcap: \
 
 @endif target-libtermcap
 
+.PHONY: maybe-install-html-target-libtermcap install-html-target-libtermcap
+maybe-install-html-target-libtermcap:
+@if target-libtermcap
+maybe-install-html-target-libtermcap: install-html-target-libtermcap
+
+install-html-target-libtermcap: \
+    configure-target-libtermcap \
+    html-target-libtermcap 
+	@: $(MAKE); $(unstage)
+	@[ -f $(TARGET_SUBDIR)/libtermcap/Makefile ] || exit 0 ; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(NORMAL_TARGET_EXPORTS) \
+	echo "Doing install-html in $(TARGET_SUBDIR)/libtermcap" ; \
+	for flag in $(EXTRA_TARGET_FLAGS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	(cd $(TARGET_SUBDIR)/libtermcap && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	           install-html) \
+	  || exit 1
+
+@endif target-libtermcap
+
 .PHONY: maybe-installcheck-target-libtermcap installcheck-target-libtermcap
 maybe-installcheck-target-libtermcap:
 @if target-libtermcap
@@ -32124,6 +34277,33 @@ install-info-target-winsup: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	           install-info) \
+	  || exit 1
+
+@endif target-winsup
+
+.PHONY: maybe-install-html-target-winsup install-html-target-winsup
+maybe-install-html-target-winsup:
+@if target-winsup
+maybe-install-html-target-winsup: install-html-target-winsup
+
+install-html-target-winsup: \
+    configure-target-winsup \
+    html-target-winsup 
+	@: $(MAKE); $(unstage)
+	@[ -f $(TARGET_SUBDIR)/winsup/Makefile ] || exit 0 ; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(NORMAL_TARGET_EXPORTS) \
+	echo "Doing install-html in $(TARGET_SUBDIR)/winsup" ; \
+	for flag in $(EXTRA_TARGET_FLAGS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	(cd $(TARGET_SUBDIR)/winsup && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	           install-html) \
 	  || exit 1
 
 @endif target-winsup
@@ -32473,6 +34653,33 @@ install-info-target-libgloss: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	           install-info) \
+	  || exit 1
+
+@endif target-libgloss
+
+.PHONY: maybe-install-html-target-libgloss install-html-target-libgloss
+maybe-install-html-target-libgloss:
+@if target-libgloss
+maybe-install-html-target-libgloss: install-html-target-libgloss
+
+install-html-target-libgloss: \
+    configure-target-libgloss \
+    html-target-libgloss 
+	@: $(MAKE); $(unstage)
+	@[ -f $(TARGET_SUBDIR)/libgloss/Makefile ] || exit 0 ; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(NORMAL_TARGET_EXPORTS) \
+	echo "Doing install-html in $(TARGET_SUBDIR)/libgloss" ; \
+	for flag in $(EXTRA_TARGET_FLAGS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	(cd $(TARGET_SUBDIR)/libgloss && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	           install-html) \
 	  || exit 1
 
 @endif target-libgloss
@@ -32831,6 +35038,33 @@ install-info-target-libiberty: \
 
 @endif target-libiberty
 
+.PHONY: maybe-install-html-target-libiberty install-html-target-libiberty
+maybe-install-html-target-libiberty:
+@if target-libiberty
+maybe-install-html-target-libiberty: install-html-target-libiberty
+
+install-html-target-libiberty: \
+    configure-target-libiberty \
+    html-target-libiberty 
+	@: $(MAKE); $(unstage)
+	@[ -f $(TARGET_SUBDIR)/libiberty/Makefile ] || exit 0 ; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(NORMAL_TARGET_EXPORTS) \
+	echo "Doing install-html in $(TARGET_SUBDIR)/libiberty" ; \
+	for flag in $(EXTRA_TARGET_FLAGS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	(cd $(TARGET_SUBDIR)/libiberty && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	           install-html) \
+	  || exit 1
+
+@endif target-libiberty
+
 .PHONY: maybe-installcheck-target-libiberty installcheck-target-libiberty
 maybe-installcheck-target-libiberty:
 @if target-libiberty
@@ -33185,6 +35419,33 @@ install-info-target-gperf: \
 
 @endif target-gperf
 
+.PHONY: maybe-install-html-target-gperf install-html-target-gperf
+maybe-install-html-target-gperf:
+@if target-gperf
+maybe-install-html-target-gperf: install-html-target-gperf
+
+install-html-target-gperf: \
+    configure-target-gperf \
+    html-target-gperf 
+	@: $(MAKE); $(unstage)
+	@[ -f $(TARGET_SUBDIR)/gperf/Makefile ] || exit 0 ; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(NORMAL_TARGET_EXPORTS) \
+	echo "Doing install-html in $(TARGET_SUBDIR)/gperf" ; \
+	for flag in $(EXTRA_TARGET_FLAGS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	(cd $(TARGET_SUBDIR)/gperf && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	           install-html) \
+	  || exit 1
+
+@endif target-gperf
+
 .PHONY: maybe-installcheck-target-gperf installcheck-target-gperf
 maybe-installcheck-target-gperf:
 @if target-gperf
@@ -33525,6 +35786,33 @@ install-info-target-examples: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	           install-info) \
+	  || exit 1
+
+@endif target-examples
+
+.PHONY: maybe-install-html-target-examples install-html-target-examples
+maybe-install-html-target-examples:
+@if target-examples
+maybe-install-html-target-examples: install-html-target-examples
+
+install-html-target-examples: \
+    configure-target-examples \
+    html-target-examples 
+	@: $(MAKE); $(unstage)
+	@[ -f $(TARGET_SUBDIR)/examples/Makefile ] || exit 0 ; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(NORMAL_TARGET_EXPORTS) \
+	echo "Doing install-html in $(TARGET_SUBDIR)/examples" ; \
+	for flag in $(EXTRA_TARGET_FLAGS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	(cd $(TARGET_SUBDIR)/examples && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	           install-html) \
 	  || exit 1
 
 @endif target-examples
@@ -33883,6 +36171,33 @@ install-info-target-libffi: \
 
 @endif target-libffi
 
+.PHONY: maybe-install-html-target-libffi install-html-target-libffi
+maybe-install-html-target-libffi:
+@if target-libffi
+maybe-install-html-target-libffi: install-html-target-libffi
+
+install-html-target-libffi: \
+    configure-target-libffi \
+    html-target-libffi 
+	@: $(MAKE); $(unstage)
+	@[ -f $(TARGET_SUBDIR)/libffi/Makefile ] || exit 0 ; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(NORMAL_TARGET_EXPORTS) \
+	echo "Doing install-html in $(TARGET_SUBDIR)/libffi" ; \
+	for flag in $(EXTRA_TARGET_FLAGS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	(cd $(TARGET_SUBDIR)/libffi && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	           install-html) \
+	  || exit 1
+
+@endif target-libffi
+
 .PHONY: maybe-installcheck-target-libffi installcheck-target-libffi
 maybe-installcheck-target-libffi:
 @if target-libffi
@@ -34233,6 +36548,33 @@ install-info-target-libjava: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	           install-info) \
+	  || exit 1
+
+@endif target-libjava
+
+.PHONY: maybe-install-html-target-libjava install-html-target-libjava
+maybe-install-html-target-libjava:
+@if target-libjava
+maybe-install-html-target-libjava: install-html-target-libjava
+
+install-html-target-libjava: \
+    configure-target-libjava \
+    html-target-libjava 
+	@: $(MAKE); $(unstage)
+	@[ -f $(TARGET_SUBDIR)/libjava/Makefile ] || exit 0 ; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(RAW_CXX_TARGET_EXPORTS) \
+	echo "Doing install-html in $(TARGET_SUBDIR)/libjava" ; \
+	for flag in $(EXTRA_TARGET_FLAGS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	(cd $(TARGET_SUBDIR)/libjava && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	           install-html) \
 	  || exit 1
 
 @endif target-libjava
@@ -34591,6 +36933,33 @@ install-info-target-zlib: \
 
 @endif target-zlib
 
+.PHONY: maybe-install-html-target-zlib install-html-target-zlib
+maybe-install-html-target-zlib:
+@if target-zlib
+maybe-install-html-target-zlib: install-html-target-zlib
+
+install-html-target-zlib: \
+    configure-target-zlib \
+    html-target-zlib 
+	@: $(MAKE); $(unstage)
+	@[ -f $(TARGET_SUBDIR)/zlib/Makefile ] || exit 0 ; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(NORMAL_TARGET_EXPORTS) \
+	echo "Doing install-html in $(TARGET_SUBDIR)/zlib" ; \
+	for flag in $(EXTRA_TARGET_FLAGS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	(cd $(TARGET_SUBDIR)/zlib && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	           install-html) \
+	  || exit 1
+
+@endif target-zlib
+
 .PHONY: maybe-installcheck-target-zlib installcheck-target-zlib
 maybe-installcheck-target-zlib:
 @if target-zlib
@@ -34941,6 +37310,33 @@ install-info-target-boehm-gc: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	           install-info) \
+	  || exit 1
+
+@endif target-boehm-gc
+
+.PHONY: maybe-install-html-target-boehm-gc install-html-target-boehm-gc
+maybe-install-html-target-boehm-gc:
+@if target-boehm-gc
+maybe-install-html-target-boehm-gc: install-html-target-boehm-gc
+
+install-html-target-boehm-gc: \
+    configure-target-boehm-gc \
+    html-target-boehm-gc 
+	@: $(MAKE); $(unstage)
+	@[ -f $(TARGET_SUBDIR)/boehm-gc/Makefile ] || exit 0 ; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(NORMAL_TARGET_EXPORTS) \
+	echo "Doing install-html in $(TARGET_SUBDIR)/boehm-gc" ; \
+	for flag in $(EXTRA_TARGET_FLAGS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	(cd $(TARGET_SUBDIR)/boehm-gc && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	           install-html) \
 	  || exit 1
 
 @endif target-boehm-gc
@@ -35299,6 +37695,33 @@ install-info-target-qthreads: \
 
 @endif target-qthreads
 
+.PHONY: maybe-install-html-target-qthreads install-html-target-qthreads
+maybe-install-html-target-qthreads:
+@if target-qthreads
+maybe-install-html-target-qthreads: install-html-target-qthreads
+
+install-html-target-qthreads: \
+    configure-target-qthreads \
+    html-target-qthreads 
+	@: $(MAKE); $(unstage)
+	@[ -f $(TARGET_SUBDIR)/qthreads/Makefile ] || exit 0 ; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(NORMAL_TARGET_EXPORTS) \
+	echo "Doing install-html in $(TARGET_SUBDIR)/qthreads" ; \
+	for flag in $(EXTRA_TARGET_FLAGS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	(cd $(TARGET_SUBDIR)/qthreads && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	           install-html) \
+	  || exit 1
+
+@endif target-qthreads
+
 .PHONY: maybe-installcheck-target-qthreads installcheck-target-qthreads
 maybe-installcheck-target-qthreads:
 @if target-qthreads
@@ -35649,6 +38072,33 @@ install-info-target-rda: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	           install-info) \
+	  || exit 1
+
+@endif target-rda
+
+.PHONY: maybe-install-html-target-rda install-html-target-rda
+maybe-install-html-target-rda:
+@if target-rda
+maybe-install-html-target-rda: install-html-target-rda
+
+install-html-target-rda: \
+    configure-target-rda \
+    html-target-rda 
+	@: $(MAKE); $(unstage)
+	@[ -f $(TARGET_SUBDIR)/rda/Makefile ] || exit 0 ; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(NORMAL_TARGET_EXPORTS) \
+	echo "Doing install-html in $(TARGET_SUBDIR)/rda" ; \
+	for flag in $(EXTRA_TARGET_FLAGS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	(cd $(TARGET_SUBDIR)/rda && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	           install-html) \
 	  || exit 1
 
 @endif target-rda
@@ -36007,6 +38457,33 @@ install-info-target-libada: \
 
 @endif target-libada
 
+.PHONY: maybe-install-html-target-libada install-html-target-libada
+maybe-install-html-target-libada:
+@if target-libada
+maybe-install-html-target-libada: install-html-target-libada
+
+install-html-target-libada: \
+    configure-target-libada \
+    html-target-libada 
+	@: $(MAKE); $(unstage)
+	@[ -f $(TARGET_SUBDIR)/libada/Makefile ] || exit 0 ; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(NORMAL_TARGET_EXPORTS) \
+	echo "Doing install-html in $(TARGET_SUBDIR)/libada" ; \
+	for flag in $(EXTRA_TARGET_FLAGS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	(cd $(TARGET_SUBDIR)/libada && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	           install-html) \
+	  || exit 1
+
+@endif target-libada
+
 .PHONY: maybe-installcheck-target-libada installcheck-target-libada
 maybe-installcheck-target-libada:
 @if target-libada
@@ -36357,6 +38834,33 @@ install-info-target-libgomp: \
 	          "RANLIB=$${RANLIB}" \
 	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 	           install-info) \
+	  || exit 1
+
+@endif target-libgomp
+
+.PHONY: maybe-install-html-target-libgomp install-html-target-libgomp
+maybe-install-html-target-libgomp:
+@if target-libgomp
+maybe-install-html-target-libgomp: install-html-target-libgomp
+
+install-html-target-libgomp: \
+    configure-target-libgomp \
+    html-target-libgomp 
+	@: $(MAKE); $(unstage)
+	@[ -f $(TARGET_SUBDIR)/libgomp/Makefile ] || exit 0 ; \
+	r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(NORMAL_TARGET_EXPORTS) \
+	echo "Doing install-html in $(TARGET_SUBDIR)/libgomp" ; \
+	for flag in $(EXTRA_TARGET_FLAGS); do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	(cd $(TARGET_SUBDIR)/libgomp && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+	           install-html) \
 	  || exit 1
 
 @endif target-libgomp

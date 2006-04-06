@@ -276,7 +276,9 @@ directory is controlled by @samp{configure} options, as described below.
 
 In the Cygnus tree at present, the info files are built and installed as
 a separate step.  To build them, run @samp{make info}.  To install them,
-run @samp{make install-info}.
+run @samp{make install-info}. The equivalent html files are also built
+and installed in a separate step. To build the html files, run
+@samp{make html}. To install the html files run @samp{make install-html}.
 
 All @samp{configure} scripts support a wide variety of options.  The
 most interesting ones are @samp{--with} and @samp{--enable} options
