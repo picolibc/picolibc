@@ -20,7 +20,7 @@ extern "C" {
 #define WM_IME_CHAR 0x286
 #define WM_IME_KEYDOWN 0x290
 #define WM_IME_KEYUP 0x291
-#if (WINVER >= 0x0500)
+#if (_WIN32_WINNT >= 0x0500)
 #define WM_IME_REQUEST 0x0288
 #endif
 #define IMC_GETCANDIDATEPOS 7

@@ -1,3 +1,7 @@
+2006-04-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/winuser.h (WM_IME_*): Remove. Defined in imm.h.
+
 2006-04-05  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/iphlpapi.h (GAA_FLAG_*): Define.
