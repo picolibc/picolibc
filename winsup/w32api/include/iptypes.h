@@ -83,7 +83,7 @@ typedef struct _FIXED_INFO {
   UINT EnableProxy;
   UINT EnableDns;
 } FIXED_INFO, *PFIXED_INFO;
-#if (_WIN32_WINNT >= 0x0501)
+#if (_WIN32_WINNT >= 0x0501) && defined(_WINSOCK2_H)
 typedef enum {
   IfOperStatusUp = 1,
   IfOperStatusDown,

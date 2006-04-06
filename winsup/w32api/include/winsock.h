@@ -15,6 +15,7 @@
 #endif
 
 #define _GNU_H_WINDOWS32_SOCKETS
+
 #include <windows.h>
 
 #ifdef __cplusplus
