@@ -1,3 +1,89 @@
+2006-04-07  Julian Brown  <julian@codesourcery.com>
+
+	* gas/config/tc-arm.c (neon_el_type): Make NT_invtype be the zero (so
+	zero-initialising structures containing it will lead to invalid
+	types).
+	(arm_it): Add vectype to each operand.
+	(NTA_HASTYPE, NTA_HASINDEX): Constants used in neon_typed_alias
+	defined field.
+	(neon_typed_alias): New structure. Extra information for typed
+	register aliases.
+	(reg_entry): Add neon type info field.
+	(arm_reg_parse): Remove RTYPE argument (revert to previous arguments).
+	Break out alternative syntax for coprocessor registers, etc. into...
+	(arm_reg_alt_syntax): New function. Alternate syntax handling broken
+	out from arm_reg_parse.
+	(parse_neon_type): Move. Return SUCCESS/FAIL.
+	(first_error): New function. Call to ensure first error which occurs
+	is reported.
+	(parse_neon_operand_type): Parse exactly one type.
+	(NEON_ALL_LANES, NEON_INTERLEAVE_LANES): Move.
+	(parse_typed_reg_or_scalar): New function. Handle core of both
+	arm_typed_reg_parse and parse_scalar.
+	(arm_typed_reg_parse): Parse a register with an optional type.
+	(NEON_SCALAR_REG, NEON_SCALAR_INDEX): Extract parts of parse_scalar
+	result.
+	(parse_scalar): Parse a Neon scalar with optional type.
+	(parse_reg_list): Use first_error.
+	(parse_vfp_reg_list): Use arm_typed_reg_parse instead of arm_reg_parse.
+	(neon_alias_types_same): New function. Return true if two (alias) types
+	are the same.
+	(parse_neon_el_struct_list): Use parse_typed_reg_or_scalar. Return type
+	of elements.
+	(insert_reg_alias): Return new reg_entry not void.
+	(insert_neon_reg_alias): New function. Insert type/index information as
+	well as register for alias.
+	(create_neon_reg_alias): New function. Parse .dn/.qn directives and
+	make typed register aliases accordingly.
+	(s_dn, s_qn): New functions. Handle incorrectly used .dn/.qn at start
+	of line.
+	(s_unreq): Delete type information if present.
+	(s_arm_unwind_save_mmxwr): Remove arg 3 from arm_reg_parse calls.
+	(s_arm_unwind_save_mmxwcg): Likewise.
+	(s_arm_unwind_movsp): Likewise.
+	(s_arm_unwind_setfp): Likewise.
+	(parse_shift): Likewise.
+	(parse_shifter_operand): Likewise.
+	(parse_address): Likewise.
+	(parse_tb): Likewise.
+	(tc_arm_regname_to_dw2regnum): Likewise.
+	(md_pseudo_table): Add dn, qn.
+	(parse_neon_mov): Handle typed operands.
+	(parse_operands): Likewise.
+	(neon_type_mask): Add N_SIZ.
+	(N_ALLMODS): New macro.
+	(neon_check_shape): Fix typo in NS_DDD_QQQ case. Use first_error.
+	(el_type_of_type_chk): Add some safeguards.
+	(modify_types_allowed): Fix logic bug.
+	(neon_check_type): Handle operands with types.
+	(neon_three_same): Remove redundant optional arg handling.
+	(do_neon_dyadic_i64_su, do_neon_shl_imm, do_neon_qshl_imm)
+	(do_neon_logic, do_neon_qdmulh, do_neon_fcmp_absolute)
+	(do_neon_step): Adjust accordingly.
+	(neon_cmode_for_logic_imm): Use first_error.
+	(do_neon_bitfield): Call neon_check_type.
+	(neon_dyadic): Rename to...
+	(neon_dyadic_misc): ...this. New name for neon_dyadic. Add bitfield to
+	allow modification of type of the destination.
+	(do_neon_dyadic_if_su, do_neon_dyadic_if_i, do_neon_dyadic_if_i_d)
+	(do_neon_addsub_if_i, do_neon_mul): Adjust accordingly.
+	(do_neon_compare): Make destination be an untyped bitfield.
+	(neon_scalar_for_mul): Use NEON_SCALAR_REG, NEON_SCALAR_INDEX.
+	(neon_mul_mac): Return early in case of errors.
+	(neon_move_immediate): Use first_error.
+	(neon_mac_reg_scalar_long): Fix type to include scalar.
+	(do_neon_dup): Likewise.
+	(do_neon_mov): Likewise (in several places).
+	(do_neon_tbl_tbx): Fix type.
+	(do_neon_ld_st_interleave, neon_alignment_bit, do_neon_ld_st_lane)
+	(do_neon_ld_dup): Exit early in case of errors and/or use first_error.
+	(opcode_lookup): Update for parse_neon_type returning SUCCESS/FAIL.
+	Handle .dn/.qn directives.
+	(REGDEF): Add zero for reg_entry neon field.
+
+	* gas/testsuite/gas/arm/neon-psyn.s: Basic test of programmers syntax.
+	* gas/testsuite/gas/arm/neon-psyn.d: Expected output of above.
+
 2006-04-03  Carlos O'Donell <carlos@codesourcery.com>
 
 	* Makefile.tpl: Add install-html target.
