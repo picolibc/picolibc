@@ -1,5 +1,11 @@
 2006-04-07  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/commdlg.h [WINVER >= 0x0500]
+	(PD_RESULT_*,START_PAGE_GENERAL): Define.
+	Thanks to:    Wolfgang Glas <softadm at users dot sf dot net>
+
+2006-04-07  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/wingdi.h [WINVER >= 0x0410]
 	(AlphaBlend,GradientFill,TransparentBlt): Windows 98 and better.
 	Thanks to:    Alessandro Antonello <aleantonello at users dot sf dot net>

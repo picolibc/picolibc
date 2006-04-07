@@ -195,7 +195,11 @@ extern "C" {
 #define DN_DEFAULTPRN	1
 #if (_WIN32_WINNT >= 0x0500)
 #define OPENFILENAME_SIZE_VERSION_400  76
-#endif /* (_WIN32_WINNT >= 0x0500) */
+#define PD_RESULT_CANCEL	0
+#define PD_RESULT_PRINT	1
+#define PD_RESULT_APPLY	2
+#define START_PAGE_GENERAL	0XFFFFFFFF
+#endif
 
 #ifndef SNDMSG
 #ifdef __cplusplus
