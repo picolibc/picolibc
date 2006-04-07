@@ -1,3 +1,8 @@
+2006-04-07  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/time/time.c (time): Do not check for HAVE_GETTIMEOFDAY
+	anymore.  Assume there is a gettimeofday syscall.
+
 2006-03-29  Shaun Jackman  <sjackman@gmail.com>
 
 	* libc/sys/linux/include/netinet/ip.h: Include netinet/in_systm.h

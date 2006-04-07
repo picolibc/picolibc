@@ -1,5 +1,3 @@
-/* FIXME: doc says "not avail" due to #if 0.
-   	  DELETE that line if inappropriate! */
 /*
 FUNCTION
 <<time>>---get current calendar time (as single number)
@@ -32,8 +30,6 @@ Supporting OS subroutine required: Some implementations require
 <<gettimeofday>>.
 */
 
-#ifdef HAVE_GETTIMEOFDAY
-
 /* Most times we have a system call in newlib/libc/sys/.. to do this job */
 
 #include <_ansi.h>
@@ -55,5 +51,3 @@ _DEFUN (time, (t),
     }
   return -1;
 }
-
-#endif
