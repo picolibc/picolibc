@@ -1,3 +1,11 @@
+2006-04-07  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/wingdi.h (CAPTUREBLT,NOMIRRORBITMAP): Define.
+	* include/commctrl.h (WC_LINK{AW},LIF_*,LIM_*,LM_*,
+	MAX_LINKID_TEXT,L_MAX_URL_LENGTH): Define.
+	(LITEM,LHITTESTINFO,NMLINK): Add structures.
+	Thanks to:    Brandon Sneed <brandon at redf dot net>
+
 2006-04-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/w32api.h (IE*): Define for recent versions of IE.
