@@ -205,6 +205,7 @@ extern "C" {
 #define PROV_RSA_SIG 2
 #define PROV_DSS 3
 #define PROV_FORTEZZA 4
+#define PROV_MS_EXCHANGE 5
 #define PROV_MS_MAIL 5
 #define PROV_SSL 6
 #define PROV_STT_MER 7

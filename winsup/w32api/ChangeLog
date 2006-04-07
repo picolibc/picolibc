@@ -1,5 +1,12 @@
 2006-04-07  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/wincrypt.h (PROV_MS_EXCHANGE): Define.
+	We should probably remove PROV_MS_MAIL but I'm keeping it for
+	now for compatibility reasons.
+	Thanks to:    Marcus Agehall <agehall at users dot sf dot net>
+
+2006-04-07  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/commdlg.h [WINVER >= 0x0500]
 	(PD_RESULT_*,START_PAGE_GENERAL): Define.
 	Thanks to:    Wolfgang Glas <softadm at users dot sf dot net>
