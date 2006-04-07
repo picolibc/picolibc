@@ -1,5 +1,11 @@
 2006-04-07  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/wingdi.h [WINVER >= 0x0410]
+	(AlphaBlend,GradientFill,TransparentBlt): Windows 98 and better.
+	Thanks to:    Alessandro Antonello <aleantonello at users dot sf dot net>
+
+2006-04-07  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/wingdi.h (CAPTUREBLT,NOMIRRORBITMAP): Define.
 	* include/commctrl.h (WC_LINK{AW},LIF_*,LIM_*,LM_*,
 	MAX_LINKID_TEXT,L_MAX_URL_LENGTH): Define.
