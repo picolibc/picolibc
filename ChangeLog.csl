@@ -1,5 +1,120 @@
 2006-04-11  Daniel Jacobowitz  <dan@codesourcery.com>
 
+	* gdb/breakpoint.c (insert_bp_location, reattach_breakpoints)
+	(remove_breakpoint, delete_breakpoint): Update calls to changed
+	methods.
+	(deprecated_insert_raw_breakpoint, deprecated_remove_raw_breakpoint)
+	(single_step_breakpoints, insert_single_step_breakpoint)
+	(remove_single_step_breakpoints): New.
+	* gdb/breakpoint.h (struct bp_location): Add placed_address and
+	placed_size.  Move shadow_contents below the new comment.
+	(deprecated_insert_raw_breakpoint, deprecated_remove_raw_breakpoint)
+	(insert_single_step_breakpoint, remove_single_step_breakpoints): New
+	prototypes.
+	* gdb/gdbarch.sh: Forward struct bp_location in gdbarch.h.
+	(memory_insert_breakpoint, memory_remove_breakpoint): Update second
+	argument.
+	* gdb/mem-break.c (default_memory_insert_breakpoint): Update.  Set
+	placed_address and placed_size.
+	(default_memory_remove_breakpoint): Update.  Don't use
+	BREAKPOINT_FROM_PC.
+	(memory_insert_breakpoint, memory_remove_breakpoint): Update.
+	* gdb/target.c (update_current_target): Update prototypes for changed
+	functions.
+	(debug_to_insert_breakpoint, debug_to_remove_breakpoint)
+	(debug_to_insert_hw_breakpoint, debug_to_remove_hw_breakpoint):
+	Update.
+	* gdb/target.h: Forward declare struct bp_location.
+	(struct target_ops): Use a bp_location argument for
+	to_insert_breakpoint, to_remove_breakpoint,
+	to_insert_hw_breakpoint, and to_remove_hw_breakpoint.
+	(target_insert_breakpoint, target_remove_breakpoint)
+	(target_insert_hw_breakpoint, target_remove_hw_breakpoint)
+	(memory_insert_breakpoint, memory_remove_breakpoint)
+	(default_memory_insert_breakpoint, default_memory_remove_breakpoint):
+	Update.
+	* gdb/config/i386/nm-i386.h: Forward declare struct bp_location.
+	(i386_insert_hw_breakpoint, i386_remove_hw_breakpoint): Update.
+	(target_insert_hw_breakpoint, target_remove_hw_breakpoint): Likewise.
+
+	* gdb/gdbarch.c, gdbarch.h: Regenerated.
+
+	* gdb/alpha-tdep.c (alpha_software_single_step): Use
+	insert_single_step_breakpoint and remove_single_step_breakpoints.
+	Remove unused statics.
+	* gdb/arm-tdep.c (arm_software_single_step): Likewise.  Add a note.
+	* gdb/cris-tdep.c (cris_software_single_step): Likewise.
+	* gdb/mips-tdep.c (mips_software_single_step): Likewise.
+	* gdb/rs6000-tdep.c (rs6000_software_single_step): Likewise.
+	* gdb/sparc-tdep.c (sparc_software_single_step): Likewise.
+	* gdb/wince.c (struct thread_info_struct): Remove step_prev.
+	(undoSStep): Use remove_single_step_breakpoints.
+	(wince_software_single_step): Use insert_single_step_breakpoint.
+
+	* gdb/corelow.c (ignore): Remove unneeded prototype.  Update second
+	argument.
+	* gdb/exec.c (ignore): Likewise.
+	* gdb/sol-thread.c (ignore): Likewise.
+
+	* gdb/procfs.c (dbx_link_bpt_addr, dbx_link_shadow_contents): Delete.
+	(dbx_link_bpt): New.
+	(procfs_wait): Check it.
+	(procfs_mourn_inferior): Remove it if necessary.
+	(remove_dbx_link_breakpoint): Use it.
+	(insert_dbx_link_bpt_in_file): Set it.
+	(procfs_init_inferior): Don't update dbx_link_bpt_addr.
+	* gdb/rs6000-nat.c (exec_one_dummy_insn): Use
+	deprecated_insert_raw_breakpoint and
+	deprecated_remove_raw_breakpoint.
+	* gdb/solib-irix.c (shadow_contents, breakpoint_addr): Delete.
+	(base_breakpoint): New.
+	(disable_break): Use it.
+	(enable_break): Set it.
+
+	* gdb/i386-nat.c (i386_insert_hw_breakpoint, i386_remove_hw_breakpoint):
+	Update.
+	* gdb/ia64-tdep.c (ia64_memory_insert_breakpoint)
+	(ia64_memory_remove_breakpoint): Likewise.
+	* gdb/m32r-tdep.c (m32r_memory_insert_breakpoint)
+	(m32r_memory_remove_breakpoint): Likewise.
+	* gdb/monitor.c (monitor_insert_breakpoint, monitor_remove_breakpoint):
+	Likewise.  Remove unnecessary prototypes.  Use placed_address
+	and placed_size.  Removed useless read from memory.
+	* gdb/nto-procfs.c (procfs_insert_breakpoint)
+	(procfs_remove_breakpoint, procfs_insert_hw_breakpoint)
+	(procfs_remove_hw_breakpoint): Update.
+	* gdb/ocd.c (ocd_insert_breakpoint, ocd_remove_breakpoint): Likewise.
+	* gdb/ocd.h (ocd_insert_breakpoint, ocd_remove_breakpoint): Likewise.
+	* gdb/ppc-linux-tdep.c (ppc_linux_memory_remove_breakpoint): Likewise.
+	* gdb/ppc-tdep.h (ppc_linux_memory_remove_breakpoint): Likewise.
+	* gdb/remote-e7000.c (e7000_insert_breakpoint)
+	(e7000_remove_breakpoint): Likewise.
+	* gdb/remote-m32r-sdi.c (m32r_insert_breakpoint)
+	(m32r_remove_breakpoint): Likewise.
+	* gdb/remote-mips.c (mips_insert_breakpoint)
+	(mips_remove_breakpoint): Likewise.
+	* gdb/remote-rdp.c (remote_rdp_insert_breakpoint)
+	(remote_rdp_remove_breakpoint): Likewise.
+	(rdp_step): Use deprecated_insert_raw_breakpoint and
+	deprecated_remove_raw_breakpoint.
+	* gdb/remote-sds.c (sds_insert_breakpoint, sds_remove_breakpoint):
+	Update.
+	* gdb/remote-sim.c (gdbsim_insert_breakpoint, gdbsim_remove_breakpoint):
+	Delete.
+	(init_gdbsim_ops): Use memory_insert_breakpoint and
+	memory_remove_breakpoint.
+	* gdb/remote-st.c (st2000_insert_breakpoint)
+	(st2000_remove_breakpoint): Update.  Remove unused
+	BREAKPOINT_FROM_PC.
+	* gdb/remote.c (remote_insert_breakpoint, remote_remove_breakpoint):
+	Update.  Use placed_address and placed_size.
+	(remote_insert_hw_breakpoint, remote_remove_hw_breakpoint): Likewise.
+
+	* gdb/doc/gdbint.texinfo (Watchpoints, Target Conditionals): Update insert
+	and remove breakpoint prototypes.
+
+2006-04-11  Daniel Jacobowitz  <dan@codesourcery.com>
+
 	Backport:
 	2006-04-07  Daniel Jacobowitz  <dan@codesourcery.com>
 	* remote.c (remote_wait): Convert warning to error before
