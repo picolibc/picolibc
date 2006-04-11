@@ -54,6 +54,7 @@ else
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
 lib_a_LIBADD = $(LIB_OBJS)
+lib_a_CFLAGS = $(AM_CFLAGS)
 lib_a_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA =
 endif # USE_LIBTOOL
@@ -84,4 +85,4 @@ install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(tooldir)/include/rpc; \
 	for i in $(srcdir)/../include/rpc/*.h; do \
 	  $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/rpc/`basename $$i`; \
-	done; \
+	done;

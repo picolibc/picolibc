@@ -107,8 +107,6 @@ AM_PROG_LIBTOOL
 AC_PROG_AWK
 fi
 
-configdirs="libc libm"
-
 AC_ARG_ENABLE(newlib_hw_fp,
 [  --enable-newlib-hw-fp    Turn on hardware floating point math],
 [case "${enableval}" in
@@ -117,23 +115,6 @@ AC_ARG_ENABLE(newlib_hw_fp,
    *) AC_MSG_ERROR(bad value ${enableval} for --enable-newlib-hw-fp) ;;
  esac],[newlib_hw_fp=false])
 AM_CONDITIONAL(NEWLIB_HW_FP, test x$newlib_hw_fp = xtrue)
-
-if test -z "${with_multisubdir}"; then
-  configdirs="${configdirs} doc"
-  have_doc=yes
-else
-  have_doc=
-fi
-AM_CONDITIONAL(HAVE_DOC, test x$have_doc = xyes)
-
-EXTRA_DIRS=
-case $host in
-  i[[34567]]86-pc-linux-*)
-	configdirs="${configdirs} iconvdata"
-	EXTRA_DIRS=iconvdata
-	;;
-esac
-AC_SUBST(EXTRA_DIRS)
 
 # These get added in the top-level configure.in, except in the case where
 # newlib is being built natively.
@@ -146,7 +127,25 @@ else
 fi
 AC_SUBST(CC_FOR_NEWLIB)
 
-AC_CONFIG_SUBDIRS(${configdirs})
+AC_CONFIG_SUBDIRS(libc)
+AC_CONFIG_SUBDIRS(libm)
+
+if test -z "${with_multisubdir}"; then
+  AC_CONFIG_SUBDIRS(doc)
+  have_doc=yes
+else
+  have_doc=
+fi
+AM_CONDITIONAL(HAVE_DOC, test x$have_doc = xyes)
+
+EXTRA_DIRS=
+case $host in
+  i[[34567]]86-pc-linux-*)
+  	AC_CONFIG_SUBDIRS(iconvdata)
+	EXTRA_DIRS=iconvdata
+	;;
+esac
+AC_SUBST(EXTRA_DIRS)
 
 CRT0=
 CRT0_DIR=
@@ -243,10 +242,6 @@ if test "${newlib_iconv_external_ccs}" = "yes"; then
 AC_DEFINE_UNQUOTED(_ICONV_ENABLE_EXTERNAL_CCS)
 fi
 
-if test "${newlib_atexit_dynamic_alloc}" = "yes"; then
-AC_DEFINE_UNQUOTED(_ATEXIT_DYNAMIC_ALLOC)
-fi
-
 AC_DEFINE_UNQUOTED(_NEWLIB_VERSION,"$VERSION")
 
 if test "${multilib}" = "yes"; then
@@ -266,16 +261,19 @@ if test "x${newlib_iconv_external_ccs}" = "xyes"; then
   AC_DEFINE_UNQUOTED(_ICONV_ENABLE_EXTERNAL_CCS,1)
 fi
 
+if test "${newlib_atexit_dynamic_alloc}" = "yes"; then
+AC_DEFINE_UNQUOTED(_ATEXIT_DYNAMIC_ALLOC)
+fi
+
 dnl
 dnl Parse --enable-newlib-iconv-encodings option argument
 dnl
+
 if test "x${iconv_encodings}" != "x" \
    || test "x${iconv_to_encodings}" != "x" \
    || test "x${iconv_from_encodings}" != "x"; then
-  
-  dnl Check that --enable-newlib-iconv was enabled
   if test "x${newlib_iconv}" = "x"; then
-      AC_MSG_ERROR(--enable-newlib-iconv-encodings, --enable-newlib-iconv-from-encodings and --enable-newlib-iconv-to-encodings option can't be used if iconv library is disabled, use --enable-newlib-iconv to enable it.)
+      AC_MSG_ERROR([--enable-newlib-iconv-encodings, --enable-newlib-iconv-from-encodings and --enable-newlib-iconv-to-encodings option can't be used if iconv library is disabled, use --enable-newlib-iconv to enable it.])
   fi
   
   dnl Normalize encodings names and delete commas

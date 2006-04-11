@@ -1,3 +1,125 @@
+2006-04-11  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* acinclude.m4: Properly add square brackets for
+	AC_DEFUN macros.  Rewrite LIB_AC_PROG_CC to remove
+	macros no longer available.  Add LIB_AM_PROG_AS to
+	remove prereq of AC_PROG_CC.  Add LIB_AC_PROG_CC_GNU
+	macro.  Substitute lpfx (library object prefix).
+	* configure.host: Set lpfx depending on whether
+	libtool is used or not.
+	* configure.in: Individually specify libc and libm
+	to AC_CONFIG_SUBDIRS.  Add square bracket quoting as
+	necessary.
+	* Makefile.am: Use $(lpfx) to get object names for
+	math-library functions that should also be in libc.
+	* libc/machine/configure.in: Use case statement to determine
+	AC_CONFIG_SUBDIRS statement.
+	* libc/sys/linux/linuxthreads/machine/configure.in: Ditto.
+	* libc/sys/linux/machine/configure.in: Ditto.
+	* libc/sys/configure.in: Ditto.
+	* libm/machine/configure.in: Ditto.
+	* libc/sys/linux/configure.in: Fix up AC_CONFIG_SUBDIRS.
+	* libm/configure.in: Add AM_CONDITIONAL statement
+	for HAVE_LIBM_MACHINE_DIR.
+	* libc/machine/a29k/Makefile.am: Modified to work with
+	latest automake.  Change includes setting AM_CCASFLAGS
+	so building .S files will properly pick up flags used
+	to build C files.
+	* libc/machine/arm/Makefile.am: Ditto.
+	* libc/machine/crx/Makefile.am: Ditto.
+	* libc/machine/d10v/Makefile.am: Ditto.
+	* libc/machine/d30v/Makefile.am: Ditto.
+	* libc/machine/fr30/Makefile.am: Ditto.
+	* libc/machine/frv/Makefile.am: Ditto.
+	* libc/machine/h8300/Makefile.am: Ditto.
+	* libc/machine/h8500/Makefile.am: Ditto.
+	* libc/machine/hppa/Makefile.am: Ditto.
+	* libc/machine/i386/Makefile.am: Ditto.
+	* libc/machine/iq2000/Makefile.am: Ditto.
+	* libc/machine/m32c/Makefile.am: Ditto.
+	* libc/machine/m32r/Makefile.am: Ditto.
+	* libc/machine/m68hc11/Makefile.am: Ditto.
+	* libc/machine/m68k/Makefile.am: Ditto.
+	* libc/machine/m88k/Makefile.am: Ditto.
+	* libc/machine/mips/Makefile.am: Ditto.
+	* libc/machine/mn10200/Makefile.am: Ditto.
+	* libc/machine/mn10300/Makefile.am: Ditto.
+	* libc/machine/mt/Makefile.am: Ditto.
+	* libc/machine/necv70/Makefile.am: Ditto.
+	* libc/machine/powerpc/Makefile.am: Ditto.
+	* libc/machine/sh/Makefile.am: Ditto.
+	* libc/machine/sparc/Makefile.am: Ditto.
+	* libc/machine/tic4x/Makefile.am: Ditto.
+	* libc/machine/tic80/Makefile.am: Ditto.
+	* libc/machine/v850/Makefile.am: Ditto.
+	* libc/machine/w65/Makefile.am: Ditto.
+	* libc/machine/xscale/Makefile.am: Ditto.
+	* libc/machine/xstormy16/Makefile.am: Ditto.
+	* libc/machine/z8k/Makefile.am: Ditto.
+	* libc/sys/a29khif/Makefile.am: Ditto.
+	* libc/sys/arc/Makefile.am: Ditto.
+	* libc/sys/arm/Makefile.am: Ditto.
+	* libc/sys/d10v/Makefile.am: Ditto.
+	* libc/sys/decstation/Makefile.am: Ditto.
+	* libc/sys/h8300hms/Makefile.am: Ditto.
+	* libc/sys/h8500hms/Makefile.am: Ditto.
+	* libc/sys/linux/linuxthreads/machine/i386/Makefile.am: Ditto.
+	* libc/sys/linux/machine/i386/Makefile.am: Ditto.
+	* libc/sys/m88kbug/Makefile.am: Ditto.
+	* libc/sys/mmixware/Makefile.am: Ditto.
+	* libc/sys/netware/Makefile.am: Ditto.
+	* libc/sys/rdos/Makefile.am: Ditto.
+	* libc/sys/rtems/Makefile.am: Ditto.
+	* libc/sys/sh/Makefile.am: Ditto.
+	* libc/sys/sparc64/Makefile.am: Ditto.
+	* libc/sys/sysmec/Makefile.am: Ditto.
+	* libc/sys/sysnec810/Makefile.am: Ditto.
+	* libc/sys/sysnecv850/Makefile.am: Ditto.
+	* libc/sys/sysvi386/Makefile.am: Ditto.
+	* libc/sys/sysvnecv70/Makefile.am: Ditto.
+	* libc/sys/tic80/Makefile.am: Ditto.
+	* libc/sys/w65/Makefile.am: Ditto.
+	* libc/sys/z8ksim/Makefile.am: Ditto.
+	* libm/machine/i386/Makefile.am: Ditto.
+	* libc/sys/arm/Makefile.am: Ditto plus add EXTRA sources including
+	trap.S so that automake will generate a .S.o suffix rule.
+	* libc/argz/Makefile.am: Modified to work with
+	latest automake.  Change includes adding lib_a_CFLAGS
+	so automake doesn't complain about libtool and non-libtool
+	libraries sharing objects.
+	* libc/ctype/Makefile.am: Ditto.
+	* libc/errno/Makefile.am: Ditto.
+	* libc/iconv/ccs/Makefile.am: Ditto.
+	* libc/iconv/ces/Makefile.am: Ditto.
+	* libc/iconv/lib/Makefile.am: Ditto.
+	* libc/locale/Makefile.am: Ditto.
+	* libc/misc/Makefile.am: Ditto.
+	* libc/posix/Makefile.am: Ditto.
+	* libc/reent/Makefile.am: Ditto.
+	* libc/search/Makefile.am: Ditto.
+	* libc/signal/Makefile.am: Ditto.
+	* libc/stdio/Makefile.am: Ditto.
+	* libc/stdio64/Makefile.am: Ditto.
+	* libc/stdlib/Makefile.am: Ditto.
+	* libc/string/Makefile.am: Ditto.
+	* libc/sys/linux/Makefile.am: Ditto.
+	* libc/sys/linux/argp/Makefile.am: Ditto.
+	* libc/sys/linux/cmath/Makefile.am: Ditto.
+	* libc/sys/linux/dl/Makefile.am: Ditto.
+	* libc/sys/linux/iconv/Makefile.am: Ditto.
+	* libc/sys/linux/intl/Makefile.am: Ditto.
+	* libc/sys/linux/linuxthreads/Makefile.am: Ditto.
+	* libc/sys/linux/net/Makefile.am: Ditto.
+	* libc/sys/linux/stdlib/Makefile.am: Ditto.
+	* libc/syscalls/Makefile.am: Ditto.
+	* libc/time/Makefile.am: Ditto.
+	* libc/unix/Makefile.am: Ditto.
+	* libm/Makefile.am: Ditto.
+	* libm/common/Makefile.am: Ditto.
+	* libm/math/Makefile.am: Ditto.
+	* libm/mathfp/Makefile.am: Ditto.
+	* Regenerate all aclocal.m4, Makefile.in, and configure files.
+
 2006-04-07  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/time/time.c (time): Do not check for HAVE_GETTIMEOFDAY

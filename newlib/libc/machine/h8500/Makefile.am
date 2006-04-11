@@ -4,6 +4,8 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
+AM_CCASFLAGS = $(INCLUDES)
+
 noinst_LIBRARIES = lib.a
 
 lib_a_SOURCES = divsi3.c mulsi3.c divhi3.S shifts.c cmpsi.c psi.S setjmp.S

@@ -6,6 +6,8 @@ AUTOMAKE_OPTIONS = cygnus
 # to output a definition for newlib_basedir.
 INCLUDES = -I $(newlib_basedir)/libm/common $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
+AM_CCASFLAGS = $(INCLUDES)
+
 noinst_LIBRARIES = lib.a
 
 lib_a_SOURCES = setjmp.S

@@ -4,6 +4,8 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = -I $(newlib_basedir)/libm/common $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
+AM_CCASFLAGS = $(INCLUDES)
+
 if MACH_ADD_SETJMP
 mach_add_obj=setjmp.$(oext)
 else
@@ -27,6 +29,7 @@ else
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
 lib_a_LIBADD = $(mach_add_obj)
+lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_DEPENDENCIES = $(mach_add_obj)
 EXTRA_lib_a_SOURCES = setjmp.S
 noinst_DATA =

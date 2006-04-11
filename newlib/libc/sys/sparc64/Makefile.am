@@ -4,6 +4,8 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
+AM_CCASFLAGS = $(INCLUDES)
+
 noinst_LIBRARIES = lib.a
 
 # _r.o is for the reentrant syscall stubs.

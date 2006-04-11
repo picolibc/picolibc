@@ -186,6 +186,7 @@ else
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(GENERAL_SOURCES)
 lib_a_LIBADD = $(ADD_OBJS) $(LIB_OBJS)
+lib_a_CFLAGS = $(AM_CFLAGS)
 lib_a_DEPENDENCIES = $(ADD_OBJS) $(LIB_OBJS)
 LIBC_COMPILE = $(COMPILE)
 noinst_DATA =

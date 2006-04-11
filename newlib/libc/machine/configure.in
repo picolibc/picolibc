@@ -20,7 +20,42 @@ AM_PROG_LIBTOOL
 fi
 
 if test -n "${machine_dir}"; then
-  AC_CONFIG_SUBDIRS(${machine_dir})
+  case ${machine_dir} in
+	a29k) AC_CONFIG_SUBDIRS(a29k) ;;
+	arm) AC_CONFIG_SUBDIRS(arm) ;;
+	cris) AC_CONFIG_SUBDIRS(cris) ;;
+	crx) AC_CONFIG_SUBDIRS(crx) ;;
+	d10v) AC_CONFIG_SUBDIRS(d10v) ;;
+	d30v) AC_CONFIG_SUBDIRS(d30v) ;;
+	fr30) AC_CONFIG_SUBDIRS(fr30) ;;
+	frv) AC_CONFIG_SUBDIRS(frv) ;;
+	h8300) AC_CONFIG_SUBDIRS(h8300) ;;
+	h8500) AC_CONFIG_SUBDIRS(h8500) ;;
+	hppa) AC_CONFIG_SUBDIRS(hppa) ;;
+	i386) AC_CONFIG_SUBDIRS(i386) ;;
+	i960) AC_CONFIG_SUBDIRS(i960) ;;
+	iq2000) AC_CONFIG_SUBDIRS(iq2000) ;;
+	m32c) AC_CONFIG_SUBDIRS(m32c) ;;
+	m32r) AC_CONFIG_SUBDIRS(m32r) ;;
+	m68hc11) AC_CONFIG_SUBDIRS(m68hc11) ;;
+	m68k) AC_CONFIG_SUBDIRS(m68k) ;;
+	m88k) AC_CONFIG_SUBDIRS(m88k) ;;
+	mips) AC_CONFIG_SUBDIRS(mips) ;;
+	mn10200) AC_CONFIG_SUBDIRS(mn10200) ;;
+	mn10300) AC_CONFIG_SUBDIRS(mn10300) ;;
+	mt) AC_CONFIG_SUBDIRS(mt) ;;
+	necv70) AC_CONFIG_SUBDIRS(necv70) ;;
+	powerpc) AC_CONFIG_SUBDIRS(powerpc) ;;
+	sh) AC_CONFIG_SUBDIRS(sh) ;;
+	sparc) AC_CONFIG_SUBDIRS(sparc) ;;
+	tic4x) AC_CONFIG_SUBDIRS(tic4x) ;;
+	tic80) AC_CONFIG_SUBDIRS(tic80) ;;
+	v850) AC_CONFIG_SUBDIRS(v850) ;;
+	w65) AC_CONFIG_SUBDIRS(w65) ;;
+	xscale) AC_CONFIG_SUBDIRS(xscale) ;;
+	xstormy16) AC_CONFIG_SUBDIRS(xstormy16) ;;
+	z8k) AC_CONFIG_SUBDIRS(z8k) ;;
+  esac;
 fi
 
 AM_CONDITIONAL(HAVE_MACHINE_DIR, test x${machine_dir} != x)
