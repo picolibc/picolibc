@@ -466,7 +466,6 @@ typedef union tagBINDPTR {
         LPTYPECOMP lptcomp;
 } BINDPTR,*LPBINDPTR;
 
-#undef INTERFACE
 #define INTERFACE IDispatch
 DECLARE_INTERFACE_(IDispatch,IUnknown)
 {
@@ -478,6 +477,7 @@ DECLARE_INTERFACE_(IDispatch,IUnknown)
 	STDMETHOD(GetIDsOfNames)(THIS_ REFIID,LPOLESTR*,UINT,LCID,DISPID*) PURE;
 	STDMETHOD(Invoke)(THIS_ DISPID,REFIID,LCID,WORD,DISPPARAMS*,VARIANT*,EXCEPINFO*,UINT*) PURE;
 };
+#undef INTERFACE
 
 #ifdef COBJMACROS
 #define IDispatch_QueryInterface(p,a,b) (p)->lpVtbl->QueryInterface(p,a,b)
@@ -489,7 +489,6 @@ DECLARE_INTERFACE_(IDispatch,IUnknown)
 #define IDispatch_Invoke(p,a,b,c,d,e,f,g,h) (p)->lpVtbl->Invoke(p,a,b,c,d,e,f,g,h)
 #endif
   
-#undef INTERFACE
 #define INTERFACE IEnumVARIANT
 DECLARE_INTERFACE_(IEnumVARIANT,IUnknown)
 {
@@ -501,8 +500,8 @@ DECLARE_INTERFACE_(IEnumVARIANT,IUnknown)
 	STDMETHOD(Reset)(THIS) PURE;
 	STDMETHOD(Clone)(THIS_ IEnumVARIANT**) PURE;
 };
-
 #undef INTERFACE
+
 #define INTERFACE ITypeComp
 DECLARE_INTERFACE_(ITypeComp,IUnknown)
 {
@@ -512,8 +511,8 @@ DECLARE_INTERFACE_(ITypeComp,IUnknown)
 	STDMETHOD(Bind)(THIS_ LPOLESTR,ULONG,WORD,LPTYPEINFO*,DESCKIND*,LPBINDPTR) PURE;
 	STDMETHOD(BindType)(THIS_ LPOLESTR,ULONG,LPTYPEINFO*,LPTYPECOMP*) PURE;
 };
-
 #undef INTERFACE
+
 #define INTERFACE ITypeInfo
 DECLARE_INTERFACE_(ITypeInfo,IUnknown)
 {
@@ -540,6 +539,7 @@ DECLARE_INTERFACE_(ITypeInfo,IUnknown)
 	STDMETHOD_(void,ReleaseFuncDesc)(THIS_ LPFUNCDESC) PURE;
 	STDMETHOD_(void,ReleaseVarDesc)(THIS_ LPVARDESC) PURE;
 };
+#undef INTERFACE
 
 #ifdef COBJMACROS
 #define ITypeInfo_QueryInterface(p,a,b) (p)->lpVtbl->QueryInterface(p,a,b)
@@ -566,7 +566,6 @@ DECLARE_INTERFACE_(ITypeInfo,IUnknown)
 #define ITypeInfo_ReleaseVarDesc(p,a) (p)->lpVtbl->ReleaseVarDesc(p,a)
 #endif
 
-#undef INTERFACE
 #define INTERFACE ITypeInfo2
 DECLARE_INTERFACE_(ITypeInfo2,ITypeInfo)
 {
@@ -608,8 +607,8 @@ DECLARE_INTERFACE_(ITypeInfo2,ITypeInfo)
 	STDMETHOD(GetAllVarCustData)(THIS_ UINT,CUSTDATA*) PURE;
 	STDMETHOD(GetAllImplTypeCustData)(THIS_ UINT,CUSTDATA*) PURE;
 };
-
 #undef INTERFACE
+
 #define INTERFACE ITypeLib
 DECLARE_INTERFACE_(ITypeLib,IUnknown)
 {
@@ -627,8 +626,8 @@ DECLARE_INTERFACE_(ITypeLib,IUnknown)
 	STDMETHOD(FindName)(THIS_ LPOLESTR,ULONG,ITypeInfo**,MEMBERID*,USHORT*) PURE;
 	STDMETHOD_(void,ReleaseTLibAttr)(THIS_ TLIBATTR*) PURE;
 };
-
 #undef INTERFACE
+
 #define INTERFACE ITypeLib2
 DECLARE_INTERFACE_(ITypeLib2,ITypeLib)
 {
@@ -650,9 +649,9 @@ DECLARE_INTERFACE_(ITypeLib2,ITypeLib)
 	STDMETHOD(GetDocumentation2)(THIS_ INT,LCID,BSTR*,DWORD*,BSTR*) PURE;
 	STDMETHOD(GetAllCustData)(THIS_ CUSTDATA*) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_IErrorInfo;
-#undef INTERFACE
 #define INTERFACE IErrorInfo
 DECLARE_INTERFACE_(IErrorInfo, IUnknown)
 {
@@ -665,6 +664,7 @@ DECLARE_INTERFACE_(IErrorInfo, IUnknown)
 	STDMETHOD(GetHelpFile)(THIS_ BSTR*) PURE;
 	STDMETHOD(GetHelpContext)(THIS_ DWORD*) PURE;
 };
+#undef INTERFACE
 
 #ifdef COBJMACROS
 #define IErrorInfo_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
@@ -678,7 +678,6 @@ DECLARE_INTERFACE_(IErrorInfo, IUnknown)
 #endif
 
 EXTERN_C const IID IID_ICreateErrorInfo;
-#undef INTERFACE
 #define INTERFACE ICreateErrorInfo
 DECLARE_INTERFACE_(ICreateErrorInfo, IUnknown)
 {
@@ -691,9 +690,9 @@ DECLARE_INTERFACE_(ICreateErrorInfo, IUnknown)
 	STDMETHOD(SetHelpFile)(THIS_ LPOLESTR) PURE;
 	STDMETHOD(SetHelpContext)(THIS_ DWORD) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_ISupportErrorInfo;
-#undef INTERFACE
 #define INTERFACE ISupportErrorInfo
 DECLARE_INTERFACE_(ISupportErrorInfo, IUnknown)
 {
@@ -702,9 +701,9 @@ DECLARE_INTERFACE_(ISupportErrorInfo, IUnknown)
 	STDMETHOD_(ULONG,Release)(THIS) PURE;
 	STDMETHOD(InterfaceSupportsErrorInfo)(THIS_ REFIID) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_IRecordInfo;
-#undef INTERFACE
 #define INTERFACE IRecordInfo
 DECLARE_INTERFACE_(IRecordInfo, IUnknown)
 {
@@ -728,6 +727,7 @@ DECLARE_INTERFACE_(IRecordInfo, IUnknown)
 	STDMETHOD(RecordCreateCopy)(THIS_ PVOID,PVOID*) PURE;
 	STDMETHOD(RecordDestroy )(THIS_ PVOID) PURE;
 };
+#undef INTERFACE
 
 #ifdef COBJMACROS
 #define IRecordInfo_QueryInterface(p,a,b) (p)->lpVtbl->QueryInterface(p,a,b)
@@ -752,7 +752,6 @@ DECLARE_INTERFACE_(IRecordInfo, IUnknown)
 #endif
 
 EXTERN_C const IID IID_ITypeMarshal;
-#undef INTERFACE
 #define INTERFACE ITypeMarshal
 DECLARE_INTERFACE_(ITypeMarshal, IUnknown)
 {
@@ -764,6 +763,7 @@ DECLARE_INTERFACE_(ITypeMarshal, IUnknown)
 	STDMETHOD(Unmarshal)(THIS_ PVOID,DWORD,ULONG,BYTE*,ULONG*) PURE;
 	STDMETHOD(Free)(THIS_ PVOID) PURE;
 };
+#undef INTERFACE
 
 #ifdef __cplusplus
 }

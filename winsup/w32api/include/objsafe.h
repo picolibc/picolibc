@@ -12,13 +12,13 @@ extern "C" {
 #define INTERFACESAFE_FOR_UNTRUSTED_DATA 0x00000002
 
 EXTERN_C const IID IID_IObjectSafety;
-#undef INTERFACE
 #define INTERFACE IObjectSafety
 DECLARE_INTERFACE_(IObjectSafety,IUnknown)
 {
 	STDMETHOD(GetInterfaceSafetyOptions)(THIS_ REFIID,DWORD*,DWORD*) PURE;
 	STDMETHOD(SetInterfaceSafetyOptions)(THIS_ REFIID,DWORD,DWORD) PURE;
 };
+#undef INTERFACE
 
 #ifdef __cplusplus
 }

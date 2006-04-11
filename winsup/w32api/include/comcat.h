@@ -18,7 +18,6 @@ extern "C"{
 EXTERN_C const IID IID_IEnumGUID;
 typedef interface IEnumGUID *LPENUMGUID;
 
-#undef INTERFACE
 #define INTERFACE IEnumGUID
 DECLARE_INTERFACE_(IEnumGUID,IUnknown)
 {
@@ -145,7 +144,6 @@ DECLARE_INTERFACE_(ICatRegister,IUnknown)
 #endif
 
 EXTERN_C const IID IID_IEnumCATEGORYINFO;
-#undef INTERFACE
 #define INTERFACE IEnumCATEGORYINFO
 DECLARE_INTERFACE_(IEnumCATEGORYINFO,IUnknown)
 {

@@ -28,7 +28,6 @@ typedef interface IOmHistory *LPOMHISTORY;
 typedef interface IOmNavigator *LPOMNAVIGATOR;
 
 EXTERN_C const IID IID_IHTMLLinkElement;
-#undef INTERFACE
 #define INTERFACE IHTMLLinkElement
 DECLARE_INTERFACE_(IHTMLLinkElement,IDispatch)
 {
@@ -61,9 +60,9 @@ DECLARE_INTERFACE_(IHTMLLinkElement,IDispatch)
 	STDMETHOD(put_media)(THIS_ BSTR) PURE;
 	STDMETHOD(get_media)(THIS_ BSTR*) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_IHTMLImgElement;
-#undef INTERFACE
 #define INTERFACE IHTMLImgElement
 DECLARE_INTERFACE_(IHTMLImgElement,IDispatch)
 {
@@ -124,9 +123,9 @@ DECLARE_INTERFACE_(IHTMLImgElement,IDispatch)
 	STDMETHOD(put_start)(THIS_ BSTR) PURE;
 	STDMETHOD(get_start)(THIS_ BSTR*) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_IHTMLElementCollection;
-#undef INTERFACE
 #define INTERFACE IHTMLElementCollection
 DECLARE_INTERFACE_(IHTMLElementCollection,IDispatch)
 {
@@ -145,10 +144,10 @@ DECLARE_INTERFACE_(IHTMLElementCollection,IDispatch)
 	STDMETHOD(item)(THIS_ VARIANT,VARIANT,IDispatch**) PURE;
 	STDMETHOD(tags)(THIS_ VARIANT,IDispatch**) PURE;
 };
+#undef INTERFACE
 
 
 EXTERN_C const IID IID_IHTMLDocument;
-#undef INTERFACE
 #define INTERFACE IHTMLDocument
 DECLARE_INTERFACE_(IHTMLDocument,IDispatch)
 {
@@ -162,9 +161,9 @@ DECLARE_INTERFACE_(IHTMLDocument,IDispatch)
 
 	STDMETHOD(get_Script)(THIS_ IDispatch**) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_IHTMLDocument2;
-#undef INTERFACE
 #define INTERFACE IHTMLDocument2
 DECLARE_INTERFACE_(IHTMLDocument2,IHTMLDocument)
 {
@@ -287,9 +286,9 @@ DECLARE_INTERFACE_(IHTMLDocument2,IHTMLDocument)
 	STDMETHOD(toString)(THIS_ BSTR*) PURE;
 	STDMETHOD(createStyleSheet)(THIS_ BSTR,long,LPHTMLSTYLESHEET*) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_IHTMLSelectionObject;
-#undef INTERFACE
 #define INTERFACE IHTMLSelectionObject
 DECLARE_INTERFACE_(IHTMLSelectionObject,IDispatch)
 {
@@ -306,9 +305,9 @@ DECLARE_INTERFACE_(IHTMLSelectionObject,IDispatch)
 	STDMETHOD(clear)(THIS) PURE;
 	STDMETHOD(get_type)(THIS_ BSTR*) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_IHTMLTxtRange;
-#undef INTERFACE
 #define INTERFACE IHTMLTxtRange
 DECLARE_INTERFACE_(IHTMLTxtRange,IDispatch)
 {
@@ -351,9 +350,9 @@ DECLARE_INTERFACE_(IHTMLTxtRange,IDispatch)
 	STDMETHOD(execCommand)(THIS_ BSTR,VARIANT_BOOL,VARIANT,VARIANT_BOOL*) PURE;
 	STDMETHOD(execCommandShowHelp)(THIS_ BSTR,VARIANT_BOOL*) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_IHTMLElement;
-#undef INTERFACE
 #define INTERFACE IHTMLElement
 DECLARE_INTERFACE_(IHTMLElement,IDispatch)
 {
@@ -453,9 +452,9 @@ DECLARE_INTERFACE_(IHTMLElement,IDispatch)
 	STDMETHOD(get_children)(THIS_ IDispatch**) PURE;
 	STDMETHOD(get_all)(THIS_ IDispatch**) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_IHTMLFramesCollection2;
-#undef INTERFACE
 #define INTERFACE IHTMLFramesCollection2
 DECLARE_INTERFACE_(IHTMLFramesCollection2,IDispatch)
 {
@@ -470,9 +469,9 @@ DECLARE_INTERFACE_(IHTMLFramesCollection2,IDispatch)
     STDMETHOD(item)(THIS_ VARIANT*,VARIANT*) PURE;
     STDMETHOD(get_length)(THIS_ long*) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_IHTMLWindow2;
-#undef INTERFACE
 #define INTERFACE IHTMLWindow2
 DECLARE_INTERFACE_(IHTMLWindow2,IHTMLFramesCollection2)
 {
@@ -555,9 +554,9 @@ DECLARE_INTERFACE_(IHTMLWindow2,IHTMLFramesCollection2)
 	STDMETHOD(resizeBy)(THIS_ long,long) PURE;
 	STDMETHOD(get_external)(THIS_ IDispatch**) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_IHTMLFrameBase;
-#undef INTERFACE
 #define INTERFACE IHTMLFrameBase
 DECLARE_INTERFACE_(IHTMLFrameBase,IDispatch)
 {
@@ -588,9 +587,9 @@ DECLARE_INTERFACE_(IHTMLFrameBase,IDispatch)
 	STDMETHOD(put_scrolling)(THIS_ BSTR) PURE;
 	STDMETHOD(get_scrolling)(THIS_ BSTR*) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_IHTMLFrameBase2;
-#undef INTERFACE
 #define INTERFACE IHTMLFrameBase2
 DECLARE_INTERFACE_(IHTMLFrameBase2,IDispatch)
 {
@@ -611,9 +610,9 @@ DECLARE_INTERFACE_(IHTMLFrameBase2,IDispatch)
 	STDMETHOD(put_allowTransparency)(THIS_ VARIANT_BOOL) PURE;
 	STDMETHOD(get_allowTransparency)(THIS_ VARIANT_BOOL*) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_IHTMLFrameBase3;
-#undef INTERFACE
 #define INTERFACE IHTMLFrameBase3
 DECLARE_INTERFACE_(IHTMLFrameBase3,IDispatch)
 {
@@ -628,9 +627,9 @@ DECLARE_INTERFACE_(IHTMLFrameBase3,IDispatch)
 	STDMETHOD(put_longDesc)(THIS_ BSTR) PURE;
 	STDMETHOD(get_longDesc)(THIS_ BSTR*) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_IHTMLBodyElement;
-#undef INTERFACE
 #define INTERFACE IHTMLBodyElement
 DECLARE_INTERFACE_(IHTMLBodyElement,IDispatch)
 {
@@ -678,9 +677,9 @@ DECLARE_INTERFACE_(IHTMLBodyElement,IDispatch)
 	STDMETHOD(get_onbeforeunload)(THIS_ VARIANT*) PURE;
 	STDMETHOD(createTextRange)(THIS_ IHTMLTxtRange**) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_IHTMLBodyElement2;
-#undef INTERFACE
 #define INTERFACE IHTMLBodyElement2
 DECLARE_INTERFACE_(IHTMLBodyElement2,IDispatch)
 {
@@ -697,6 +696,7 @@ DECLARE_INTERFACE_(IHTMLBodyElement2,IDispatch)
 	STDMETHOD(put_onafterprint)(THIS_ VARIANT) PURE;
 	STDMETHOD(get_onafterprint)(THIS_ VARIANT*) PURE;
 };
+#undef INTERFACE
 
 #ifdef __cplusplus
 }

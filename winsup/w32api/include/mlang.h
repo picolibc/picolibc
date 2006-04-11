@@ -154,7 +154,6 @@ typedef struct tagUNICODERANGE {
 typedef struct tagSCRIPTFONTINFO SCRIPTFONTINFO;
   
 EXTERN_C const IID IID_IEnumCodePage;
-#undef INTERFACE
 #define INTERFACE IEnumCodePage
 DECLARE_INTERFACE_(IEnumCodePage,IUnknown)
 {
@@ -166,9 +165,9 @@ DECLARE_INTERFACE_(IEnumCodePage,IUnknown)
         STDMETHOD(Reset)(THIS) PURE;
         STDMETHOD(Skip)(THIS_ ULONG) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_IEnumRfc1766;
-#undef INTERFACE
 #define INTERFACE IEnumRfc1766
 DECLARE_INTERFACE_(IEnumRfc1766,IUnknown)
 {
@@ -180,9 +179,9 @@ DECLARE_INTERFACE_(IEnumRfc1766,IUnknown)
         STDMETHOD(Reset)(THIS) PURE;
         STDMETHOD(Skip)(THIS_ ULONG) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_IEnumScript;
-#undef INTERFACE
 #define INTERFACE IEnumScript
 DECLARE_INTERFACE_(IEnumScript,IUnknown)
 {
@@ -194,9 +193,9 @@ DECLARE_INTERFACE_(IEnumScript,IUnknown)
         STDMETHOD(Reset)(THIS) PURE;
         STDMETHOD(Skip)(THIS_ ULONG) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_IMLangCodePages;
-#undef INTERFACE
 #define INTERFACE IMLangCodePages
 DECLARE_INTERFACE_(IMLangCodePages,IUnknown)
 {
@@ -208,9 +207,9 @@ DECLARE_INTERFACE_(IMLangCodePages,IUnknown)
         STDMETHOD(CodePageToCodePages)(THIS_ UINT,DWORD*) PURE;
         STDMETHOD(CodePagesToCodePage)(THIS_ DWORD,UINT,UINT*) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_IMLangConvertCharset;
-#undef INTERFACE
 #define INTERFACE IMLangConvertCharset
 DECLARE_INTERFACE_(IMLangConvertCharset,IUnknown)
 {
@@ -225,10 +224,10 @@ DECLARE_INTERFACE_(IMLangConvertCharset,IUnknown)
         STDMETHOD(DoConversionToUnicode)(THIS_ CHAR*,UINT*,WCHAR*,UINT*) PURE;
         STDMETHOD(DoConversionFromUnicode)(THIS_ WCHAR*,UINT*,CHAR*,UINT*) PURE;
 };
+#undef INTERFACE
 EXTERN_C const CLSID CLSID_CMLangConvertCharset;
 
 EXTERN_C const IID IID_IMLangFontLink;
-#undef INTERFACE
 #define INTERFACE IMLangFontLink
 DECLARE_INTERFACE_(IMLangFontLink,IMLangCodePages)
 {
@@ -244,9 +243,9 @@ DECLARE_INTERFACE_(IMLangFontLink,IMLangCodePages)
         STDMETHOD(ResetFontMapping)(THIS) PURE;
         STDMETHOD(MapFont)(THIS_ HDC,DWORD,WCHAR,HFONT*) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_IMLangFontLink2;
-#undef INTERFACE
 #define INTERFACE IMLangFontLink2
 DECLARE_INTERFACE_(IMLangFontLink2,IMLangCodePages)
 {
@@ -265,9 +264,9 @@ DECLARE_INTERFACE_(IMLangFontLink2,IMLangCodePages)
         STDMETHOD(GetScriptFontInfo)(THIS_ SCRIPT_ID,DWORD,UINT*,SCRIPTFONTINFO*) PURE;
         STDMETHOD(CodePageToScriptID)(THIS) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_IMLangLineBreakConsole;
-#undef INTERFACE
 #define INTERFACE IMLangLineBreakConsole
 DECLARE_INTERFACE_(IMLangLineBreakConsole,IMLangCodePages)
 {
@@ -278,9 +277,9 @@ DECLARE_INTERFACE_(IMLangLineBreakConsole,IMLangCodePages)
         STDMETHOD(BreakLineW)(THIS_ LCID,const WCHAR*,long,long,long*,long*) PURE;
         STDMETHOD(BreakLineA)(THIS_ LCID,UINT,const CHAR*,long,long,long*,long*) PURE;
 };
+#undef INTERFACE
 
 EXTERN_C const IID IID_IMultiLanguage;
-#undef INTERFACE
 #define INTERFACE IMultiLanguage
 DECLARE_INTERFACE_(IMultiLanguage,IUnknown)
 {
@@ -303,10 +302,10 @@ DECLARE_INTERFACE_(IMultiLanguage,IUnknown)
         STDMETHOD(GetRfc1766Info)(THIS_ LCID,PRFC1766INFO) PURE;
         STDMETHOD(CreateConvertCharset)(THIS_ UINT,UINT,DWORD,IMLangConvertCharset**) PURE;
 };
+#undef INTERFACE
 EXTERN_C const CLSID CLSID_CMultiLanguage;
 
 EXTERN_C const IID IID_IMultiLanguage2;
-#undef INTERFACE
 #define INTERFACE IMultiLanguage2
 DECLARE_INTERFACE_(IMultiLanguage2,IUnknown)
 {
@@ -340,6 +339,7 @@ DECLARE_INTERFACE_(IMultiLanguage2,IUnknown)
         STDMETHOD(GetNumberOfScripts)(THIS_ UINT*) PURE;
         STDMETHOD(EnumScripts)(THIS_ DWORD,LANGID,IEnumScript**) PURE;
 };
+#undef INTERFACE
 
   
 #pragma pack(pop)

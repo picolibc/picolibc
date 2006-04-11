@@ -10,7 +10,6 @@ extern "C" {
 
 #define ACO_AUTOSUGGEST 0x01
 
-#undef INTERFACE
 #define INTERFACE IAutoComplete
 DECLARE_INTERFACE_(IAutoComplete, IUnknown)
 {
@@ -20,6 +19,7 @@ DECLARE_INTERFACE_(IAutoComplete, IUnknown)
 	STDMETHOD(Init)(THIS_ HWND,IUnknown*,LPCOLESTR,LPCOLESTR) PURE;
 	STDMETHOD(Enable)(THIS_ BOOL) PURE;
 };
+#undef INTERFACE
 typedef IAutoComplete *LPAUTOCOMPLETE;
 
 #ifdef COBJMACROS
@@ -30,7 +30,6 @@ typedef IAutoComplete *LPAUTOCOMPLETE;
 #define IAutoComplete_Enable(T,a) (T)->lpVtbl->Enable(T,a)
 #endif
 
-#undef INTERFACE
 #define INTERFACE IAutoComplete2
 DECLARE_INTERFACE_(IAutoComplete2, IAutoComplete)
 {
@@ -42,6 +41,7 @@ DECLARE_INTERFACE_(IAutoComplete2, IAutoComplete)
 	STDMETHOD(SetOptions)(THIS_ DWORD) PURE;
 	STDMETHOD(GetOptions)(THIS_ DWORD*) PURE;
 };
+#undef INTERFACE
 typedef IAutoComplete2 *LPAUTOCOMPLETE2;
 
 #ifdef COBJMACROS
