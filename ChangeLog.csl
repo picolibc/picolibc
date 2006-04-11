@@ -1,5 +1,12 @@
 2006-04-11  Daniel Jacobowitz  <dan@codesourcery.com>
 
+	Backport:
+	2006-04-07  Daniel Jacobowitz  <dan@codesourcery.com>
+	* remote.c (remote_wait): Convert warning to error before
+	parsing corrupt packets.
+
+2006-04-11  Daniel Jacobowitz  <dan@codesourcery.com>
+
 	* bfd/cpu-arm.c (bfd_is_arm_mapping_symbol_name): Accept more
 	mapping symbols.
 
