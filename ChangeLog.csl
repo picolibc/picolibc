@@ -1,5 +1,10 @@
 2006-04-11  Daniel Jacobowitz  <dan@codesourcery.com>
 
+	* bfd/cpu-arm.c (bfd_is_arm_mapping_symbol_name): Accept more
+	mapping symbols.
+
+2006-04-11  Daniel Jacobowitz  <dan@codesourcery.com>
+
 	Backport:
 	2006-03-09  Paul Brook  <paul@codesourcery.com>
 	* bfd/cpu-arm.c (bfd_is_arm_mapping_symbol_name): Recognise additional
