@@ -25,7 +25,10 @@ man6dir = $(mandir)/man6
 man7dir = $(mandir)/man7
 man8dir = $(mandir)/man8
 man9dir = $(mandir)/man9
+datarootdir = @datarootdir@
+docdir = @docdir@
 infodir = @infodir@
+htmldir = @htmldir@
 
 SHELL = /bin/sh
 
@@ -97,6 +100,20 @@ html:
 	  fi; \
 	done
 
+install-html: html
+	$(SHELL) $(srcdir)/../mkinstalldirs $(DESTDIR)$(htmldir)
+	if test ! -f standards.html; then cd $(srcdir); fi; \
+	if test -f standards.html; then \
+	  for i in standards.html*; do \
+	    $(INSTALL_DATA) $$i $(DESTDIR)$(htmldir)/$$i; \
+	  done; \
+	fi
+	if test ! -f configure.html; then cd $(srcdir); fi; \
+	if test -f configure.html; then \
+	  for i in configure.html*; do \
+	    $(INSTALL_DATA) $$i $(DESTDIR)$(htmldir)/$$i; \
+	  done; \
+	fi
 
 dvi:
 	for f in $(DVIFILES); do \

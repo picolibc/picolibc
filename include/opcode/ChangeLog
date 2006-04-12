@@ -1,3 +1,7 @@
+2006-04-07  Joerg Wunsch <j.gnu@uriah.heep.sax.de>
+
+	* avr.h (AVR_ISA_PWMx): New.
+
 2006-03-28  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* m68k.h (cpu_m68k, cpu_cf, cpu_m68000, cpu_m68008, cpu_m68010,

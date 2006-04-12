@@ -1,3 +1,11 @@
+2006-04-06  Carlos O'Donell  <carlos@codesourcery.com>
+
+	* Makefile.in: Add install-html target. Add htmldir,
+	docdir and datarootdir.
+	* configure.texi: Document install-html target.
+	* configure.in: AC_SUBST datarootdir, docdir, htmldir.
+	* configure: Regenerate.
+
 2006-02-27  Carlos O'Donell  <carlos@codesourcery.com>
 
 	* Makefile.in: TEXI2HTML uses makeinfo. Define 
