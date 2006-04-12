@@ -1,3 +1,15 @@
+2006-04-11  Mark Mitchell  <mark@codesourcery.com>
+
+	Issue #658
+	* gdb/mt-tdep.c (mt_gdb_regnums): Define
+	MT_COPRO_PSEUDOREG_MAC_REGNUM.
+	(mt_register_name): Use it.
+	(mt_copro_register_type): Likewise.
+	(mt_register_type): Likewise.
+	(mt_pseudo_register_read): Likewise.  Read the MAC register, not
+	the coprocessor register.
+	(mt_pseudo_register_write): Likewise.
+
 2006-04-11  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* bfd/cpu-arm.c (bfd_is_arm_mapping_symbol_name): Accept more
