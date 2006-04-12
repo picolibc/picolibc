@@ -1,3 +1,10 @@
+2006-04-11  Christopher Faylor  <cgf@timesys.com>
+
+	* Makefile.in (DLL_OFILES): Add winf.o.
+	* spawn.cc: Move command line handling stuff into winf.cc.
+	* winf.h: New file.
+	* winf.cc: New file.
+
 2006-04-05  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_socket.cc: Move iptypes.h include after winsock2 since it

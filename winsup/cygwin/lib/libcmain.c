@@ -13,7 +13,7 @@ details. */
 
 #define SP " \t\n"
 
-/* Allow apps which don't have a main work, as long as they define WinMain */
+/* Allow apps which don't have a main to work, as long as they define WinMain */
 int
 main ()
 {

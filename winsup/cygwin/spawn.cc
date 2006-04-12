@@ -33,9 +33,7 @@ details. */
 #include "registry.h"
 #include "environ.h"
 #include "cygtls.h"
-
-#define LINE_BUF_CHUNK (CYG_MAX_PATH * 2)
-#define MAXWINCMDLEN 32767
+#include "winf.h"
 
 static suffix_info exe_suffixes[] =
 {
@@ -239,138 +237,6 @@ iscmd (const char *argv0, const char *what)
 	 (n == 0 || isdirsep (argv0[n - 1]));
 }
 
-class linebuf
-{
- public:
-  size_t ix;
-  char *buf;
-  size_t alloced;
-  linebuf () : ix (0), buf (NULL), alloced (0) {}
-  ~linebuf () {if (buf) free (buf);}
-  void add (const char *what, int len) __attribute__ ((regparm (3)));
-  void add (const char *what) {add (what, strlen (what));}
-  void prepend (const char *what, int len);
-  void finish () __attribute__ ((regparm (1)));
-};
-
-void
-linebuf::finish ()
-{
-  if (!ix)
-    add ("", 1);
-  else
-    buf[--ix] = '\0';
-}
-
-void
-linebuf::add (const char *what, int len)
-{
-  size_t newix = ix + len;
-  if (newix >= alloced || !buf)
-    {
-      alloced += LINE_BUF_CHUNK + newix;
-      buf = (char *) realloc (buf, alloced + 1);
-    }
-  memcpy (buf + ix, what, len);
-  ix = newix;
-  buf[ix] = '\0';
-}
-
-void
-linebuf::prepend (const char *what, int len)
-{
-  int buflen;
-  size_t newix;
-  if ((newix = ix + len) >= alloced)
-    {
-      alloced += LINE_BUF_CHUNK + newix;
-      buf = (char *) realloc (buf, alloced + 1);
-      buf[ix] = '\0';
-    }
-  if ((buflen = strlen (buf)))
-      memmove (buf + len, buf, buflen + 1);
-  else
-      buf[newix] = '\0';
-  memcpy (buf, what, len);
-  ix = newix;
-}
-
-class av
-{
-  char **argv;
-  int calloced;
- public:
-  int argc;
-  bool win16_exe;
-  bool iscui;
-  av (): argv (NULL), iscui (false) {}
-  av (int ac_in, const char * const *av_in) : calloced (0), argc (ac_in), win16_exe (false), iscui (false)
-  {
-    argv = (char **) cmalloc (HEAP_1_ARGV, (argc + 5) * sizeof (char *));
-    memcpy (argv, av_in, (argc + 1) * sizeof (char *));
-  }
-  void *operator new (size_t, void *p) __attribute__ ((nothrow)) {return p;}
-  void set (int ac_in, const char * const *av_in) {new (this) av (ac_in, av_in);}
-  ~av ()
-  {
-    if (argv)
-      {
-	for (int i = 0; i < calloced; i++)
-	  if (argv[i])
-	    cfree (argv[i]);
-	cfree (argv);
-      }
-  }
-  int unshift (const char *what, int conv = 0);
-  operator char **() {return argv;}
-  void all_calloced () {calloced = argc;}
-  void replace0_maybe (const char *arg0)
-  {
-    /* Note: Assumes that argv array has not yet been "unshifted" */
-    if (!calloced)
-      {
-	argv[0] = cstrdup1 (arg0);
-	calloced = true;
-      }
-  }
-  void dup_maybe (int i)
-  {
-    if (i >= calloced)
-      argv[i] = cstrdup1 (argv[i]);
-  }
-  void dup_all ()
-  {
-    for (int i = calloced; i < argc; i++)
-      argv[i] = cstrdup1 (argv[i]);
-  }
-  int fixup (const char *, path_conv&, const char *);
-};
-
-int
-av::unshift (const char *what, int conv)
-{
-  char **av;
-  av = (char **) crealloc (argv, (argc + 2) * sizeof (char *));
-  if (!av)
-    return 0;
-
-  argv = av;
-  memmove (argv + 1, argv, (argc + 1) * sizeof (char *));
-  char buf[CYG_MAX_PATH];
-  if (conv)
-    {
-      cygwin_conv_to_posix_path (what, buf);
-      char *p = strchr (buf, '\0') - 4;
-      if (p > buf && strcasematch (p, ".exe"))
-	*p = '\0';
-      what = buf;
-    }
-  *argv = cstrdup1 (what);
-  calloced++;
-  argc++;
-  return 1;
-}
-
 struct pthread_cleanup
 {
   _sig_func_ptr oldint;
@@ -507,64 +373,12 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     {
       if (real_path.iscygexec ())
 	newargv.dup_all ();
-      else
+      else if (!one_line.fromargv (newargv, real_path))
 	{
-	  for (int i = 0; i < newargv.argc; i++)
-	    {
-	      char *p = NULL;
-	      const char *a;
-
-	      newargv.dup_maybe (i);
-	      a = i ? newargv[i] : (char *) real_path;
-	      int len = strlen (a);
-	      if (len != 0 && !strpbrk (a, " \t\n\r\""))
-		one_line.add (a, len);
-	      else
-		{
-		  one_line.add ("\"", 1);
-		  /* Handle embedded special characters " and \.
-		     A " is always preceded by a \.
-		     A \ is not special unless it precedes a ".  If it does,
-		     then all preceding \'s must be doubled to avoid having
-		     the Windows command line parser interpret the \ as quoting
-		     the ".  This rule applies to a string of \'s before the end
-		     of the string, since cygwin/windows uses a " to delimit the
-		     argument. */
-		  for (; (p = strpbrk (a, "\"\\")); a = ++p)
-		    {
-		      one_line.add (a, p - a);
-		      /* Find length of string of backslashes */
-		      int n = strspn (p, "\\");
-		      if (!n)
-			one_line.add ("\\\"", 2);	/* No backslashes, so it must be a ".
-						       The " has to be protected with a backslash. */
-		      else
-			{
-			  one_line.add (p, n);	/* Add the run of backslashes */
-			  /* Need to double up all of the preceding
-			     backslashes if they precede a quote or EOS. */
-			  if (!p[n] || p[n] == '"')
-			    one_line.add (p, n);
-			  p += n - 1;		/* Point to last backslash */
-			}
-		    }
-		  if (*a)
-		    one_line.add (a);
-		  one_line.add ("\"", 1);
-		}
-	      one_line.add (" ", 1);
-	    }
-
-	  one_line.finish ();
-
-	  if (one_line.ix >= MAXWINCMDLEN)
-	    {
-	      debug_printf ("command line too long (>32K), return E2BIG");
-	      set_errno (E2BIG);
-	      res = -1;
-	      goto out;
-	    }
+	  res = -1;
+	  goto out;
 	}
+
 
       newargv.all_calloced ();
       moreinfo->argc = newargv.argc;
