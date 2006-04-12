@@ -1,5 +1,133 @@
 2006-04-12  Daniel Jacobowitz  <dan@codesourcery.com>
 
+	* gdb/Makefile.in (ALLDEPFILES): Add solib-target.c.
+	(remote.o): Update dependencies.
+	(solib-target.o, symbian-tdep.o): New rules.
+	* gdb/arm-tdep.c (arm_mode_strings, arm_fallback_mode_string)
+	(arm_force_mode_string): New.
+	(arm_pc_is_thumb): Use them.
+	(thumb_scan_prologue): Abort scan when symbols are missing.
+	(arm_show_fallback_mode, arm_show_force_mode): New.
+	(_initialize_arm_tdep): Register fallback-mode and force-mode.
+	* gdb/configure.tgt: Add arm*-*-symbian*.
+	* gdb/infcmd.c (_initialize_infcmd): Make "set args" a string
+	variable.
+	* gdb/inflow.c (kill_command): Assume that a target with stack
+	can have a frame.
+	* gdb/infrun.c (init_wait_for_inferior): Clear
+	target_last_wait_ptid.
+	(insert_step_resume_breakpoint_at_frame): Add use_previous argument.
+	Use get_prev_frame if requested.
+	(handle_inferior_event): Update TARGET_WAITKIND_LOADED support.
+	Update calls to insert_step_resume_breakpoint_at_frame.
+	* gdb/remote.c: Include "solist.h".
+	(remote_exec_file): New variable.
+	(PACKET_vAttach, PACKET_vRun, PACKET_qfDllInfo): New enums.
+	(remote_mark_running, remote_mark_killed): New functions.
+	(extended_remote_restart): Don't send a query.
+	(get_offsets): Handle TextSeg and DataSeg response.
+	(parse_load_response, remote_get_shared_libraries): New functions.
+	(remote_start_remote): Take a target as the second argument for
+	extended mode.  Check whether the target is running.  Reset
+	inferior_ptid here.
+	(remote_open_1): Assume the target is running.  Don't reset
+	inferior_ptid here.  Pass the target to remote_start_remote
+	in extended mode.  Only do some setup if the target is running.
+	(remote_detach_1): New function, renamed from remote_detach.
+	Don't say we are disconnecting if we aren't.
+	(remote_detach): Call remote_detach_1.
+	(extended_remote_detach): New function.
+	(remote_disconnect): Take a target_ops argument.  Correct the
+	error message.  Call remote_mourn_1 directly.
+	(extended_remote_attach_1, extended_remote_attach)
+	(extended_async_remote_attach): New functions.
+	(remote_wait): Handle load and unload events.
+	(extended_remote_mourn_1): New function.
+	(extended_remote_mourn): Replace with a call to
+	extended_remote_mourn_1.
+	(extended_async_remote_mourn): New function.
+	(extended_remote_run): New function.
+	(extended_remote_create_inferior_1): New function, from
+	extended_remote_create_inferior.  Call get_offsets.
+	(extended_remote_create_inferior)
+	(extended_remote_async_create_inferior): Use it.
+	(remote_stopped_by_watchpoint, crc32_table)
+	(compare_sections_command): Whitespace tweaks.
+	(init_remote_ops, init_extended_remote_ops): Update.
+	(init_remote_async_ops): Whitespace tweaks and update.
+	(init_extended_async_remote_ops): Update.
+	(_initialize_remote): Add new configurable packets.  Add
+	"set remote exec-file".
+	* gdb/solib-som.c (som_current_sos): Set addr_low and addr_high.
+	* gdb/solib-target.c: New file.
+	* gdb/solib.c (solib_symbols_extension): New variable.
+	(solib_open): Use it.
+	(solib_map_sections): Set addr_low and addr_high instead of
+	textsection.
+	(info_sharedlibrary_command): Use addr_low and addr_high.
+	* gdb/solib.h (solib_symbols_extension): New declaration.
+	* gdb/solist.h (struct so_list): Replace textsection
+	with addr_low and addr_high.
+	(struct target_so_ops): Add add_one_solib and remove_one_solib.
+	* gdb/symbian-tdep.c: New file.
+	* gdb/symfile.c (init_objfile_sect_indices): Use
+	symfile_find_segment_sections to find the text section.
+	(symfile_find_segments, symfile_find_segment_sections)
+	(symfile_map_offsets_to_segments, symfile_find_segment_lengths)
+	(symfile_section_offset_from_segment): New functions.
+	* gdb/symfile.h (symfile_map_offsets_to_segments)
+	(symfile_section_offset_from_segment)
+	(symfile_find_segment_lengths): New prototypes.
+	* gdb/target.c (debug_to_disconnect): Delete.
+	(update_current_target): Make global.  Do not inherit to_disconnect.
+	Mention to_get_shared_libraries.
+	(target_disconnect): Search for to_disconnect.
+	(target_get_shared_libraries): New.
+	(setup_target_debug): Update.
+	* gdb/target.h (struct target_ops): Update to_disconnect prototype.
+	Add to_get_shared_libraries.
+	(target_has_execution): Update comment.
+	(target_get_shared_libraries, update_current_target): New
+	prototypes.
+	* gdb/cli/cli-setshow.c (do_setshow_command): Revise string variable
+	handling.
+	* gdb/config/arm/symbian.mt: New file.
+	* gdb/doc/gdb.texinfo (ARM): Document set/show arm fallback-mode
+	and set/show arm force-mode.
+
+	* gdb/testsuite/gdb.base/define.exp: Don't use backslashes in the
+	prompt.
+
+	* readline/emacs_keymap.c: Add a MINGW32 hack.
+	* readline/readline.c: Use _rl_bind_if_unbound to avoid macro bugs.
+
+	* gdb/gdbserver/linux-low.c (linux_kill): Reset inferior thread and
+	process lists.
+	(linux_detach): Likewise.
+	(linux_wait_for_process): Discard unexpected exits.
+	* gdb/gdbserver/remote-utils.c (unblock_async_io): Ignore if we are
+	restarting.
+	* gdb/gdbserver/server.c (exit_requested, restarting_program)
+	(program_argv): New variables.
+	(attached): Move higher.
+	(start_inferior): Clear attached.  Use restarting_program to avoid
+	troubles with the 'R' packet.
+	(attach_inferior): Set attached.
+	(handle_query): Implement "monitor exit".
+	(handle_query_non_running): New function.
+	(handle_v_cont): Report errors.
+	(handle_v_attach, handle_v_run): New.
+	(handle_v_requests): Handle vAttach and vRun.
+	(handle_v_requests_non_running, non_running): New.
+	(debug_threads): Add declaration.
+	(main): Handle --debug.  Don't adjust attached here.
+	Save the argv.  Keep track of requested exits.  Use
+	non_running when the target is dead.  Do not always exit
+	after detach.  Fix up Hc support.  Do not automatically
+	restart the inferior in extended mode.
+
+2006-04-12  Daniel Jacobowitz  <dan@codesourcery.com>
+
 	Backport:
 	2006-04-12  Daniel Jacobowitz  <dan@codesourcery.com>
 	* remote.c (extended_remote_restart): Pass the correct length
