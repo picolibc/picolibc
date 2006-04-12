@@ -1,7 +1,12 @@
 #ifndef _SECEXT_H
 #define _SECEXT_H
+
 #if __GNUC__ >= 3
 #pragma GCC system_header
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 #ifndef RC_INVOKED
@@ -37,7 +42,11 @@ BOOLEAN WINAPI TranslateNameW(LPCWSTR,EXTENDED_NAME_FORMAT,EXTENDED_NAME_FORMAT,
 #define TranslateName TranslateNameA
 #endif
 
-
 #endif /* ! RC_INVOKED */
 #endif /* _WIN32_WINNT >= 0x0500 */
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* ! _SECEXT_H */
