@@ -1,4 +1,4 @@
-2006-04-10  Carlos O'Donell  <carlos@codesourcery.com>
+2006-04-12  Carlos O'Donell  <carlos@codesourcery.com>
 
 	* Makefile.tpl: Add install-html to install target deps.
 	* Makefile.in: Regenerate.
