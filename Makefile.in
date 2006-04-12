@@ -2132,7 +2132,7 @@ install:
 	@: $(MAKE); $(unstage)
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	$(MAKE) $(RECURSE_FLAGS_TO_PASS) installdirs install-host install-target
+	$(MAKE) $(RECURSE_FLAGS_TO_PASS) installdirs install-host install-target install-html
 
 .PHONY: install-host-nogcc
 install-host-nogcc:  \

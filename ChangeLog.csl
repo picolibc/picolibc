@@ -1,3 +1,8 @@
+2006-04-10  Carlos O'Donell  <carlos@codesourcery.com>
+
+	* Makefile.tpl: Add install-html to install target deps.
+	* Makefile.in: Regenerate.
+
 2006-04-07  Julian Brown  <julian@codesourcery.com>
 
 	* gas/config/tc-arm.c (neon_el_type): Make NT_invtype be the zero (so
@@ -84,7 +89,7 @@
 	* gas/testsuite/gas/arm/neon-psyn.s: Basic test of programmers syntax.
 	* gas/testsuite/gas/arm/neon-psyn.d: Expected output of above.
 
-2006-04-03  Carlos O'Donell <carlos@codesourcery.com>
+2006-04-03  Carlos O'Donell  <carlos@codesourcery.com>
 
 	* Makefile.tpl: Add install-html target.
 	* Makefile.def: Add install-html target.
