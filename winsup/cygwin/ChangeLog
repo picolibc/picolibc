@@ -1,3 +1,16 @@
+2006-04-12  Corinna Vinschen  <corinna@vinschen.de>
+	    Christopher Faylor  <cgf@timesys.com>
+
+	* spawn.cc (spawn_guts): Revert patch which treated derived cygwin
+	programs differently from those which are mounted with -X.  Pass extra
+	argument to linebuf::fromargv.
+	* winf.h (MAXCYGWINCMDLEN): New define.
+	(linebuf::finish): Add a new argument denoting when command line
+	overflow is ok.
+	(linebuf::fromargv): Ditto.
+	* winf.cc (linebuf::finish): Implement above change.
+	(linebuf::fromargv): Ditto.
+
 2006-04-11  Christopher Faylor  <cgf@timesys.com>
 
 	* Makefile.in (DLL_OFILES): Add winf.o.

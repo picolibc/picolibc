@@ -19,12 +19,16 @@ details. */
 #include "sys/cygwin.h"
 
 void
-linebuf::finish ()
+linebuf::finish (bool cmdlenoverflow_ok)
 {
   if (!ix)
     add ("", 1);
   else
-    buf[--ix] = '\0';
+    {
+      if (ix-- > MAXCYGWINCMDLEN && cmdlenoverflow_ok)
+	ix = MAXCYGWINCMDLEN - 1;
+      buf[ix] = '\0';
+    }
 }
 
 void
@@ -61,7 +65,7 @@ linebuf::prepend (const char *what, int len)
 }
 
 bool
-linebuf::fromargv (av& newargv, char *real_path)
+linebuf::fromargv (av& newargv, char *real_path, bool cmdlenoverflow_ok)
 {
   bool success = true;
   for (int i = 0; i < newargv.argc; i++)
@@ -110,7 +114,7 @@ linebuf::fromargv (av& newargv, char *real_path)
       add (" ", 1);
     }
 
-  finish ();
+  finish (cmdlenoverflow_ok);
 
   if (ix >= MAXWINCMDLEN)
     {

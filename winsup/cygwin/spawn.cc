@@ -347,6 +347,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       goto out;
     }
 
+  bool wascygexec = real_path.iscygexec ();
   res = newargv.fixup (prog_arg, real_path, ext);
 
   if (res)
@@ -371,9 +372,9 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     }
   else
     {
-      if (real_path.iscygexec ())
+      if (wascygexec)
 	newargv.dup_all ();
-      else if (!one_line.fromargv (newargv, real_path))
+      else if (!one_line.fromargv (newargv, real_path, real_path.iscygexec ()))
 	{
 	  res = -1;
 	  goto out;
@@ -461,6 +462,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   cygheap->fdtab.set_file_pointers_for_exec ();
 
+  ch.set (chtype, real_path.iscygexec ());
   moreinfo->envp = build_env (envp, envblock, moreinfo->envc, real_path.iscygexec ());
   if (!moreinfo->envp || !envblock)
     {
@@ -468,7 +470,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       res = -1;
       goto out;
     }
-  ch.set (chtype, real_path.iscygexec ());
   ch.moreinfo = moreinfo;
 
   si.lpReserved2 = (LPBYTE) &ch;

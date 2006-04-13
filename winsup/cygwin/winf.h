@@ -9,6 +9,14 @@ details. */
 #ifndef _WINF_H
 #define _WINF_H
 
+/* Hack for Cygwin processes.  If the Windows command line length gets slightly
+   bigger than this value, the stack position is suddenly moved up by 64K for
+   no apparent reason, which results in subsequent forks failing.  Since Cygwin
+   processes get the full command line as argv array anyway, this only affects
+   the maximum command line length of Cygwin applications which non-sensically
+   have a WinMain instead of a main entry point. */
+#define MAXCYGWINCMDLEN 31767
+
 #define MAXWINCMDLEN 32767
 #define LINE_BUF_CHUNK (CYG_MAX_PATH * 2)
 
@@ -74,8 +82,8 @@ class linebuf
   void add (const char *what, int len) __attribute__ ((regparm (3)));
   void add (const char *what) {add (what, strlen (what));}
   void prepend (const char *what, int len);
-  void finish () __attribute__ ((regparm (1)));
-  bool fromargv(av&, char *);
+  void finish (bool) __attribute__ ((regparm (2)));
+  bool fromargv(av&, char *, bool) __attribute__ ((regparm (3)));;
   operator char *() {return buf;}
 };
 
