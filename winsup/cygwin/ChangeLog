@@ -1,3 +1,9 @@
+2006-04-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysconf.cc (sysconf): Add _SC_THREADS, _SC_THREAD_ATTR_STACKSIZE,
+	_SC_THREAD_PRIORITY_SCHEDULING, _SC_THREAD_PROCESS_SHARED,
+	_SC_THREAD_SAFE_FUNCTIONS, _SC_TIMERS handling.
+
 2006-04-12  Corinna Vinschen  <corinna@vinschen.de>
 	    Christopher Faylor  <cgf@timesys.com>
 
