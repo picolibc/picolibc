@@ -462,7 +462,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   cygheap->fdtab.set_file_pointers_for_exec ();
 
-  ch.set (chtype, real_path.iscygexec ());
   moreinfo->envp = build_env (envp, envblock, moreinfo->envc, real_path.iscygexec ());
   if (!moreinfo->envp || !envblock)
     {
@@ -470,6 +469,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       res = -1;
       goto out;
     }
+  ch.set (chtype, real_path.iscygexec ());
   ch.moreinfo = moreinfo;
 
   si.lpReserved2 = (LPBYTE) &ch;
