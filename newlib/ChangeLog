@@ -1,3 +1,86 @@
+2006-04-13  Ralf Corsepius  <ralf.corsepius@rtems.org>
+
+        * acinclude.m4: New _NEWLIB_VERSION.
+        * acinclude.m4(NEWLIB_CONFIGURE): AC_REQUIRE(_NEWLIB_VERSION).
+        Use AC_CANONICAL_HOST instead of AC_CANONICAL_SYSTEM.
+        Use new form of AC_INIT_AUTOMAKE.
+        * configure.in: AC_PREREQ(2.59).
+        Use autoconf-2.5.x version of AC_INIT.
+        Use AC_CONFIG_FILES and autoconf-2.5x AC_OUTPUT instead of
+        autoconf-2.13's AC_OUTPUT.
+        * libm/configure.in: Ditto.
+        * libm/machine/configure.in: Ditto.
+        * libm/machine/i386/configure.in: Ditto.
+        * libc/configure.in: Ditto.
+        * libc/machine/a29k/configure.in: Ditto.
+        * libc/machine/arm/configure.in: Ditto.
+        * libc/machine/configure.in: Ditto.
+        * libc/machine/mn10300/configure.in: Ditto.
+        * libc/machine/powerpc/configure.in: Ditto.
+        * libc/machine/z8k/configure.in: Ditto.
+        * libc/machine/h8300/configure.in: Ditto.
+        * libc/machine/mips/configure.in: Ditto.
+        * libc/machine/crx/configure.in: Ditto.
+        * libc/machine/m68hc11/configure.in: Ditto.
+        * libc/machine/h8500/configure.in: Ditto.
+        * libc/machine/xscale/configure.in: Ditto.
+        * libc/machine/d10v/configure.in: Ditto.
+        * libc/machine/fr30/configure.in: Ditto.
+        * libc/machine/sh/configure.in: Ditto.
+        * libc/machine/tic80/configure.in: Ditto.
+        * libc/machine/m32r/configure.in: Ditto.
+        * libc/machine/xstormy16/configure.in: Ditto.
+        * libc/machine/i386/configure.in: Ditto.
+        * libc/machine/d30v/configure.in: Ditto.
+        * libc/machine/mn10200/configure.in: Ditto.
+        * libc/machine/frv/configure.in: Ditto.
+        * libc/machine/mt/configure.in: Ditto.
+        * libc/machine/i960/configure.in: Ditto.
+        * libc/machine/v850/configure.in: Ditto.
+        * libc/machine/necv70/configure.in: Ditto.
+        * libc/machine/tic4x/configure.in: Ditto.
+        * libc/machine/cris/configure.in: Ditto.
+        * libc/machine/m68k/configure.in: Ditto.
+        * libc/machine/m32c/configure.in: Ditto.
+        * libc/machine/hppa/configure.in: Ditto.
+        * libc/machine/w65/configure.in: Ditto.
+        * libc/machine/iq2000/configure.in: Ditto.
+        * libc/machine/sparc/configure.in: Ditto.
+        * libc/machine/m88k/configure.in: Ditto.
+        * libc/sys/linux/configure.in: Ditto.
+        * libc/sys/linux/machine/configure.in: Ditto.
+        * libc/sys/linux/machine/i386/configure.in: Ditto.
+        * libc/sys/linux/linuxthreads/configure.in: Ditto.
+        * libc/sys/linux/linuxthreads/machine/configure.in: Ditto.
+        * libc/sys/linux/linuxthreads/machine/i386/configure.in: Ditto.
+        * libc/sys/arm/configure.in: Ditto.
+        * libc/sys/configure.in: Ditto.
+        * libc/sys/decstation/configure.in: Ditto.
+        * libc/sys/a29khif/configure.in: Ditto.
+        * libc/sys/sysnecv850/configure.in: Ditto.
+        * libc/sys/d10v/configure.in: Ditto.
+        * libc/sys/netware/configure.in: Ditto.
+        * libc/sys/mmixware/configure.in: Ditto.
+        * libc/sys/h8500hms/configure.in: Ditto.
+        * libc/sys/sh/configure.in: Ditto.
+        * libc/sys/tic80/configure.in: Ditto.
+        * libc/sys/rdos/configure.in: Ditto.
+        * libc/sys/sysmec/configure.in: Ditto.
+        * libc/sys/sysvi386/configure.in: Ditto.
+        * libc/sys/h8300hms/configure.in: Ditto.
+        * libc/sys/sparc64/configure.in: Ditto.
+        * libc/sys/arc/configure.in: Ditto.
+        * libc/sys/sysnec810/configure.in: Ditto.
+        * libc/sys/m88kbug/configure.in: Ditto.
+        * libc/sys/sysvnecv70/configure.in: Ditto.
+        * libc/sys/z8ksim/configure.in: Ditto.
+        * libc/sys/rtems/configure.in: Ditto.
+        * libc/sys/w65/configure.in: Ditto.
+        * libc/sys/sun4/configure.in: Ditto.
+        * doc/configure.in: Ditto.
+        * iconvdata/configure.in: Ditto.
+        * configure.in: Use AC_CONFIG_HEADER instead of AM_CONFIG_HEADER.
+
 2006-04-11  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* acinclude.m4: Properly add square brackets for

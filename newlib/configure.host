@@ -193,8 +193,8 @@ case "${host_cpu}" in
 	machine_dir=mn10300
 	;;
   mt*)
-        machine_dir=mt
-        ;;
+	machine_dir=mt
+	;;
   or16)
 	;;
   or32)

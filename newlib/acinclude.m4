@@ -1,13 +1,16 @@
 dnl This provides configure definitions used by all the newlib
 dnl configure.in files.
 
+AC_DEFUN([_NEWLIB_VERSION],
+m4_define([NEWLIB_VERSION],[1.14.0]))
+
 dnl Basic newlib configury.  This calls basic introductory stuff,
 dnl including AM_INIT_AUTOMAKE and AC_CANONICAL_HOST.  It also runs
 dnl configure.host.  The only argument is the relative path to the top
 dnl newlib directory.
 
 AC_DEFUN([NEWLIB_CONFIGURE],
-[
+[AC_REQUIRE([_NEWLIB_VERSION])
 dnl Default to --enable-multilib
 AC_ARG_ENABLE(multilib,
 [  --enable-multilib         build many library versions (default)],
@@ -103,9 +106,9 @@ else
 fi
 AC_SUBST(newlib_basedir)
 
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_HOST
 
-AM_INIT_AUTOMAKE(newlib, 1.14.0, nodefine)
+AM_INIT_AUTOMAKE([cygnus no-define 1.9.5])
 
 # FIXME: We temporarily define our own version of AC_PROG_CC.  This is
 # copied from autoconf 2.12, but does not call AC_PROG_CC_WORKS.  We

@@ -1,9 +1,10 @@
 dnl This is the newlib configure.in file.
 dnl Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.13)
-AC_INIT(libc)
-AM_CONFIG_HEADER(newlib.h:newlib.hin)
+AC_PREREQ(2.59)
+AC_INIT([newlib],[NEWLIB_VERSION])
+AC_CONFIG_SRCDIR([libc])
+AC_CONFIG_HEADER(newlib.h:newlib.hin)
 
 dnl Can't be done in NEWLIB_CONFIGURE because that confuses automake. 
 AC_CONFIG_AUX_DIR(..)
@@ -386,14 +387,13 @@ if test $libc_cv_array_aliasing = yes; then
   AC_DEFINE_UNQUOTED(_HAVE_ARRAY_ALIASING)
 fi
 
-AC_OUTPUT(Makefile,
+AC_CONFIG_FILES([Makefile],
 [if test -n "$CONFIG_FILES"; then
   unset ac_file
   . ${newlib_basedir}/../config-ml.in
 fi],
 srcdir=${srcdir}
 host=${host}
-target=${target}
 with_multisubdir=${with_multisubdir}
 ac_configure_args="${multilib_arg} ${ac_configure_args}"
 CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
@@ -401,3 +401,4 @@ newlib_basedir=${newlib_basedir}
 CC="${CC}"
 LDFLAGS="${LDFLAGS}"
 )
+AC_OUTPUT

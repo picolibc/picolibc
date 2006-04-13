@@ -1,8 +1,9 @@
 dnl This is the newlib/libc configure.in file.
 dnl Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.5)
-AC_INIT(sys.tex)
+AC_PREREQ(2.59)
+AC_INIT([newlib],[NEWLIB_VERSION])
+AC_CONFIG_SRCDIR([sys.tex])
 
 dnl Can't be done in NEWLIB_CONFIGURE because that confuses automake. 
 AC_CONFIG_AUX_DIR(../..)
@@ -135,4 +136,5 @@ fi
 AC_SUBST(LIBC_MACHINE_LIB)
 AC_SUBST(machine_dir)
 
-AC_OUTPUT(Makefile argz/Makefile ctype/Makefile errno/Makefile locale/Makefile misc/Makefile reent/Makefile search/Makefile stdio/Makefile stdio64/Makefile stdlib/Makefile string/Makefile time/Makefile posix/Makefile signal/Makefile syscalls/Makefile unix/Makefile iconv/Makefile iconv/ces/Makefile iconv/ccs/Makefile iconv/ccs/binary/Makefile iconv/lib/Makefile)
+AC_CONFIG_FILES([Makefile argz/Makefile ctype/Makefile errno/Makefile locale/Makefile misc/Makefile reent/Makefile search/Makefile stdio/Makefile stdio64/Makefile stdlib/Makefile string/Makefile time/Makefile posix/Makefile signal/Makefile syscalls/Makefile unix/Makefile iconv/Makefile iconv/ces/Makefile iconv/ccs/Makefile iconv/ccs/binary/Makefile iconv/lib/Makefile])
+AC_OUTPUT
