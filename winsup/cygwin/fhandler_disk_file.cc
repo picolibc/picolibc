@@ -206,37 +206,17 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
 		     | FILE_PERSISTENT_ACLS \
 		     | FILE_VOLUME_QUOTAS)
 
-bool
+inline bool
 path_conv::hasgood_inode ()
 {
   /* Assume that if a drive has ACL support it MAY have valid "inodes".
      It definitely does not have valid inodes if it does not have ACL
      support.  Decouple from has_acls() which follows smbntsec setting. */
-  if (!(fs_flags () & FILE_PERSISTENT_ACLS) || drive_type () == DRIVE_UNKNOWN)
-    return false;
-  if (drive_type () == DRIVE_REMOTE)
-    {
-      /* From own experiments and replies from the Cygwin mailing list,
-	 we're now trying to figure out how to determine remote file
-	 systems which are capable of returning persistent inode
-	 numbers.  It seems that NT4 NTFS, when accessed remotly, and
-	 some other remote file systems return unreliable values in
-	 nFileIndex.  The common factor of these unreliable remote FS
-	 seem to be that FILE_SUPPORTS_OBJECT_IDS isn't set, even though
-	 this should have nothing to do with inode numbers.
-	 An exception is Samba, which seems to return valid inode numbers
-	 without having the FILE_SUPPORTS_OBJECT_IDS flag set.  So we're
-	 testing for the flag values returned by a 3.x Samba explicitely
-	 for now.  But note the comment in the below "is_samba" function. */
-      if (!(fs_flags () & FILE_SUPPORTS_OBJECT_IDS)
-      	  && fs_flags () != FS_IS_SAMBA
-      	  && fs_flags () != FS_IS_SAMBA_WITH_QUOTA)
-	return false;
-    }
-  return true;
+  return ((fs_flags () & FILE_PERSISTENT_ACLS)
+	  && drive_type () != DRIVE_UNKNOWN);
 }
 
-bool
+inline bool
 path_conv::is_samba ()
 {
   /* Something weird happens on Samba up to version 3.0.21c, which is
@@ -477,7 +457,10 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
      let's try it with `1' as link count. */
   buf->st_nlink = pc.ndisk_links (nNumberOfLinks);
 
-  if (pc.hasgood_inode ())
+  /* We can't trust remote inode numbers of only 32 bit.  That means,
+     all remote inode numbers when running under NT4, as well as remote NT4
+     NTFS, as well as shares of Samba version < 3.0. */
+  if (pc.hasgood_inode () && (nFileIndexHigh || !pc.isremote ()))
     buf->st_ino = (((__ino64_t) nFileIndexHigh) << 32)
 		  | (__ino64_t) nFileIndexLow;
   else
@@ -1592,12 +1575,12 @@ fhandler_disk_file::opendir ()
 		  goto free_mounts;
 		}
 
-	      /* FileIdBothDirectoryInformation is apparently unsupported on XP
-		 when accessing directories on UDF.  When trying to use it so,
-		 NtQueryDirectoryFile returns with STATUS_ACCESS_VIOLATION.  It's
-		 not clear if the call isn't also unsupported on other OS/FS
-		 combinations (say, Win2K/CDFS or so).  Instead of testing in
-		 readdir for yet another error code, let's use
+	      /* FileIdBothDirectoryInformation is apparently unsupported on
+	         XP when accessing directories on UDF.  When trying to use it
+		 so, NtQueryDirectoryFile returns with STATUS_ACCESS_VIOLATION.
+		 It's not clear if the call isn't also unsupported on other
+		 OS/FS combinations (say, Win2K/CDFS or so).  Instead of
+		 testing in readdir for yet another error code, let's use
 		 FileIdBothDirectoryInformation only on filesystems supporting
 		 persistent ACLs, FileBothDirectoryInformation otherwise. */
 	      if (pc.hasgood_inode ())
@@ -1804,6 +1787,14 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 		  de->d_ino = readdir_get_ino_by_handle (hdl);
 		  CloseHandle (hdl);
 		}
+	    }
+	  /* We can't trust remote inode numbers of only 32 bit.  That means,
+	     all remote inode numbers when running under NT4, as well as
+	     remote NT4 NTFS, as well as shares of Samba version < 3.0. */
+	  if (de->d_ino <= UINT_MAX && pc.isremote ())
+	    {
+	      dir->__flags &= ~dirent_set_d_ino;
+	      de->d_ino = 0;
 	    }
 	}
     }

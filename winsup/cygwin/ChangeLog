@@ -1,3 +1,15 @@
+2006-04-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (path_conv::hasgood_inode): Make inline.
+	Drop remote fs handling entirely since unreliable inode numbers
+	are now recognized differently.
+	(path_conv::is_samba): Make inline.
+	(fhandler_disk_file::opendir): Reformat comment.
+	(fhandler_base::fstat_helper): Special case remote file systems
+	returning (unreliable) 32 bit inode numbers.
+	(fhandler_base::readdir): Ditto.
+	* fhandler_netdrive.cc (fhandler_netdrive::readdir): Ditto.
+
 2006-04-13  Christopher Faylor  <cgf@timesys.com>
 
 	* spawn.cc (spawn_guts): Move ch.set() call back to where it was

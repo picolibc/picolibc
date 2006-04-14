@@ -209,7 +209,14 @@ fhandler_netdrive::readdir (DIR *dir, dirent *de)
       if (strlen (get_name ()) == 2)
 	de->d_ino = hash_path_name (get_namehash (), de->d_name);
       else
-        de->d_ino = readdir_get_ino (dir, nro->lpRemoteName, false);
+	{
+	  de->d_ino = readdir_get_ino (dir, nro->lpRemoteName, false);
+	  /* We can't trust remote inode numbers of only 32 bit.  That means,
+	     all remote inode numbers when running under NT4, as well as
+	     remote NT4 NTFS, as well as shares of Samba version < 3.0. */
+	  if (de->d_ino <= UINT_MAX)
+	    de->d_ino = hash_path_name (0, nro->lpRemoteName);
+	}
 
       res = 0;
     }
