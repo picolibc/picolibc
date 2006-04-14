@@ -1,4 +1,9 @@
-2006-04-13	Chris Sutcliffe	<ir0nh34d@users.sourceforge.net>
+2006-04-14  Chris Sutcliffe  <ir0nh34d@users.sf.net>
+
+	* include/w32api.h: Increment version to 3.7.
+	* Makefile.in: Ditto.
+
+2006-04-13  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/winbase.h (GET_MODULE_HANDLE_EX_FLAG_*): Define.
 	Thanks to:	Brandon Sneed <brandon at redf dot net>
@@ -8,28 +13,28 @@
 	* include/secext.h: Enclose function declarations in extern "C"
 	if __cplusplus.
 
-2006-04-11  Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
+2006-04-11  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
-    * include/comcat.h: INTERFACE should not remain defined
-    at the end of the header.
-    * include/docobj.h: Ditto.
-    * include/exdisp.h: Ditto.
-    * include/intshcut.h: Ditto.
-    * include/mlang.h: Ditto.
-    * include/mshtml.h: Ditto.
-    * include/oaidl.h: Ditto.
-    * include/objidl.h: Ditto.
-    * include/objsafe.h: Ditto.
-    * include/ocidl.h: Ditto.
-    * include/oleacc.h: Ditto.
-    * include/oledlg.h: Ditto.
-    * include/oleidl.h: Ditto.
-    * include/richole.h: Ditto.
-    * include/shldisp.h: Ditto.
-    * include/shlobj.h: Ditto.
-    * include/unknwn.h: Ditto.
-    * include/vfw.h: Ditto.
-    Thanks to:  Brandon Sneed <brandon at redf dot net>
+	* include/comcat.h: INTERFACE should not remain defined
+	at the end of the header.
+	* include/docobj.h: Ditto.
+	* include/exdisp.h: Ditto.
+	* include/intshcut.h: Ditto.
+	* include/mlang.h: Ditto.
+	* include/mshtml.h: Ditto.
+	* include/oaidl.h: Ditto.
+	* include/objidl.h: Ditto.
+	* include/objsafe.h: Ditto.
+	* include/ocidl.h: Ditto.
+	* include/oleacc.h: Ditto.
+	* include/oledlg.h: Ditto.
+	* include/oleidl.h: Ditto.
+	* include/richole.h: Ditto.
+	* include/shldisp.h: Ditto.
+	* include/shlobj.h: Ditto.
+	* include/unknwn.h: Ditto.
+	* include/vfw.h: Ditto.
+	Thanks to:  Brandon Sneed <brandon at redf dot net>
 
 2006-04-11  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
