@@ -1,3 +1,10 @@
+2006-04-14  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/rpcndr.h (boolean): Add typedef.
+	Thanks to:    James du Russel <ephelon at users dot sf dot net>
+	* include/rpcndr.h (_RPCNDR_H): Define.
+	Define in addition to __RPCNDR_H__, this is the w32api standard.
+
 2006-04-14  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
 	* include/w32api.h: Increment version to 3.7.
@@ -6,7 +13,7 @@
 2006-04-13  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/winbase.h (GET_MODULE_HANDLE_EX_FLAG_*): Define.
-	Thanks to:	Brandon Sneed <brandon at redf dot net>
+	Thanks to:    Brandon Sneed <brandon at redf dot net>
 
 2006-04-08  Danny Smith  <dannysmith@users.sourceforge.net>
 
@@ -34,7 +41,7 @@
 	* include/shlobj.h: Ditto.
 	* include/unknwn.h: Ditto.
 	* include/vfw.h: Ditto.
-	Thanks to:  Brandon Sneed <brandon at redf dot net>
+	Thanks to:    Brandon Sneed <brandon at redf dot net>
 
 2006-04-11  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 

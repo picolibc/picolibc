@@ -1,4 +1,5 @@
-#ifndef __RPCNDR_H__
+#ifndef _RPCNDR_H
+#define _RPCNDR_H
 #define __RPCNDR_H__
 #if __GNUC__ >=3
 #pragma GCC system_header
@@ -48,6 +49,7 @@ extern "C" {
 #endif
 #define small char
 typedef unsigned char byte;
+typedef unsigned char boolean;
 #define NDRSContextValue(hContext) (&(hContext)->userContext)
 #define cbNDRContext 20
 #define byte_from_ndr(source, target) { *(target) = *(*(char**)&(source)->Buffer)++; }
