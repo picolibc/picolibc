@@ -1,5 +1,9 @@
-#ifndef _RASDLG_H_
-#define _RASDLG_H_
+#ifndef _RASDLG_H
+#define _RASDLG_H
+#if __GNUC__ >= 3
+#pragma GCC system_header
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

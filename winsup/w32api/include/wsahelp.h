@@ -1,5 +1,8 @@
 #ifndef _WSAHELP_H
 #define _WSAHELP_H
+#if __GNUC__ >= 3
+#pragma GCC system_header
+#endif
 
 #include <winsock2.h>
 #include <ntsecapi.h>
@@ -92,5 +95,4 @@ typedef DWORD (WINAPI *PWSH_GET_WINSOCK_MAPPING)(PWINSOCK_MAPPING,DWORD);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-#endif /* _WSAHELP_H */
+#endif

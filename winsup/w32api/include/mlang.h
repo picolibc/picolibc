@@ -1,5 +1,5 @@
-#ifndef _MLANG_H_
-#define _MLANG_H_
+#ifndef _MLANG_H
+#define _MLANG_H
 #if __GNUC__ >= 3
 #pragma GCC system_header
 #endif
@@ -346,5 +346,4 @@ DECLARE_INTERFACE_(IMultiLanguage2,IUnknown)
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* ndef _MLANG_H_ */
+#endif

@@ -1,5 +1,5 @@
-#ifndef _SETUPAPI_H_
-#define _SETUPAPI_H_
+#ifndef _SETUPAPI_H
+#define _SETUPAPI_H
 #if __GNUC__ >=3
 #pragma GCC system_header
 #endif
@@ -1573,7 +1573,5 @@ WINSETUPAPI BOOL WINAPI SetupTerminateFileLog(HSPFILELOG);
 #ifdef __cplusplus
 }
 #endif
-
 #include <poppack.h>
-#endif /* _SETUPAPI_H_ */
-
+#endif

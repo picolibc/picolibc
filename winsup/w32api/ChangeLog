@@ -1,5 +1,17 @@
 2006-04-14  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/wsahelp.h (system_header): Add pragma.
+	* include/ws2spi.h (system_header): Add pragma.
+	* include/rasdlg.h (system_header): Add pragma.
+	* include/rasdlg.h (_RASDLG_H): Define.
+	Define instead of _RASDLG_H_, this is the w32api standard.
+	* include/mlang.h (_MLANG_H): Define.
+	Define instead of _MLANG_H_, this is the w32api standard.
+	* include/setupapi.h (_SETUPAPI_H): Define.
+	Define instead of _SETUPAPI_H_, this is the w32api standard.
+
+2006-04-14  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/rpcndr.h (boolean): Add typedef.
 	Thanks to:    James du Russel <ephelon at users dot sf dot net>
 	* include/rpcndr.h (_RPCNDR_H): Define.
