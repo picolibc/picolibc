@@ -1791,7 +1791,7 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 	  /* We can't trust remote inode numbers of only 32 bit.  That means,
 	     all remote inode numbers when running under NT4, as well as
 	     remote NT4 NTFS, as well as shares of Samba version < 3.0. */
-	  if (de->d_ino <= UINT_MAX && pc.isremote ())
+	  if (de->d_ino <= UINT32_MAX && pc.isremote ())
 	    {
 	      dir->__flags &= ~dirent_set_d_ino;
 	      de->d_ino = 0;
