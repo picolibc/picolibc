@@ -1405,4 +1405,3 @@
 
 	* syslog.cc (vklog): Never log kernel messages using the vsyslog
 	interface.
-
