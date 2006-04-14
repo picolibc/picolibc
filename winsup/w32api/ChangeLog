@@ -1,3 +1,8 @@
+2006-04-13	Chris Sutcliffe	<ir0nh34d@users.sourceforge.net>
+
+	* include/winbase.h (GET_MODULE_HANDLE_EX_FLAG_*): Define.
+	Thanks to:	Brandon Sneed <brandon at redf dot net>
+
 2006-04-08  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/secext.h: Enclose function declarations in extern "C"
