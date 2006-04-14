@@ -304,17 +304,33 @@ int WSAAPI getnameinfo(const struct sockaddr*,socklen_t,char*,DWORD,
 /* FIXME: Need WS protocol-independent API helpers.  */
 #endif
 
-#if 0
-/* These are not exported from any known w32api library.  Are they
-   implemented as macros or inline finctions?  */
-char* WSAAPI gai_strerrorA(int);
-WCHAR* WSAAPI gai_strerrorW(int);
+static __inline char*
+gai_strerrorA(int ecode)
+{
+	static char message[1024+1];
+	DWORD dwFlags = FORMAT_MESSAGE_FROM_SYSTEM
+	              | FORMAT_MESSAGE_IGNORE_INSERTS
+		      | FORMAT_MESSAGE_MAX_WIDTH_MASK;
+	DWORD dwLanguageId = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
+  	FormatMessageA(dwFlags, NULL, ecode, dwLanguageId, (LPSTR)message, 1024, NULL);
+	return message;
+}
+static __inline WCHAR*
+gai_strerrorW(int ecode)
+{
+	static WCHAR message[1024+1];
+	DWORD dwFlags = FORMAT_MESSAGE_FROM_SYSTEM
+	              | FORMAT_MESSAGE_IGNORE_INSERTS
+		      | FORMAT_MESSAGE_MAX_WIDTH_MASK;
+	DWORD dwLanguageId = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
+  	FormatMessageW(dwFlags, NULL, ecode, dwLanguageId, (LPWSTR)message, 1024, NULL);
+	return message;
+}
 #ifdef UNICODE
-#define gai_strerror   gai_strerrorW
+#define gai_strerror gai_strerrorW
 #else
-#define gai_strerror   gai_strerrorA
-#endif  /* UNICODE */
-#endif /* 0 */
+#define gai_strerror gai_strerrorA
+#endif
 
 /* Some older IPv4/IPv6 compatibility stuff */
 
@@ -360,5 +376,4 @@ typedef struct _OLD_INTERFACE_INFO {
 #ifdef  __cplusplus
 }
 #endif
-
-#endif	/* _WS2TCPIP_H */
+#endif

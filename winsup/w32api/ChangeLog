@@ -1,5 +1,9 @@
 2006-04-14  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/ws2tcpip.h (gai_strerror{AW}): Implement as inline function.
+
+2006-04-14  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/wsahelp.h (system_header): Add pragma.
 	* include/ws2spi.h (system_header): Add pragma.
 	* include/rasdlg.h (system_header): Add pragma.
