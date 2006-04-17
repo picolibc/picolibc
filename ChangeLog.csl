@@ -1,3 +1,20 @@
+2006-04-17  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* gdb/buildsym.c (start_subfile): Handle producer.
+	(record_producer): New function.
+	* gdb/buildsym.h (struct subfile): Include producer.
+	(record_producer): New prototype.
+	* gdb/dwarf2-frame.c (struct dwarf2_cie): Add version.
+	(struct dwarf2_frame_state): Add armcc_cfa_offsets_sf and
+	armcc_cfa_offsets_reversed.
+	(execute_cfa_program): Handle armcc_cfa_offsets_sf.
+	(dwarf2_frame_find_quirks): New function.
+	(dwarf2_frame_cache): Call it.  Handle armcc_cfa_offsets_reversed.
+	(decode_frame_entry_1): Record the CIE version.
+	* gdb/dwarf2read.c (read_file_scope): Save the producer.
+	* gdb/symtab.h (struct symtab): Rename unused version member to
+	producer.
+
 2006-04-12  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* gdb/Makefile.in (ALLDEPFILES): Add solib-target.c.
