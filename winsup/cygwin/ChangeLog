@@ -1,3 +1,7 @@
+2006-04-17  Eric Blake  <ebb9@byu.net>
+
+	* mktemp.cc (_gettemp): Open temp files in binary mode.
+
 2006-04-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::readdir): Use UINT32_MAX
