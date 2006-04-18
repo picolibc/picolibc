@@ -98,7 +98,6 @@ typedef enum _SI_PAGE_TYPE
 
 #ifndef __ISecurityInformation_INTERFACE_DEFINED__
 #define __ISecurityInformation_INTERFACE_DEFINED__
-#undef INTERFACE
 #define INTERFACE ISecurityInformation
 DECLARE_INTERFACE_(ISecurityInformation, IUnknown)
 {
@@ -114,6 +113,7 @@ DECLARE_INTERFACE_(ISecurityInformation, IUnknown)
 		STDMETHOD(GetInheritTypes)(THIS_ PSI_INHERIT_TYPE*,ULONG*) PURE;
 		STDMETHOD(PropertySheetPageCallback)(THIS_ HWND,UINT,SI_PAGE_TYPE) PURE;
 };
+#undef INTERFACE
 typedef ISecurityInformation *LPSECURITYINFO;
 #endif
 

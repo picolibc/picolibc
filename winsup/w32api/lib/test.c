@@ -105,7 +105,7 @@
 #include <mshtml.h>
 #include <servprov.h>
 #include <aclui.h>
-#inlcude <mlang.h>
+#include <mlang.h>
 #else
 #undef BOOL
 #endif
