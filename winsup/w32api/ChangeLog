@@ -1,3 +1,36 @@
+2006-04-18  Eric House  <ehouse@eehouse.org>
+
+	PocketPC support.
+	* include/aygshell.h: New file [_WIN32_WCE]. Declare most common
+	functions for using aygshell on PocketPC:
+	SHCreateMenuBar, SHFindMenuBar, SHCreateNewItem, SHFullScreen,
+	SHSipInfo, SHHandleWMActivate, SHHandleWMSettingChange
+
+	* include/commctrl.h [_WIN32_WCE] Add function prototypes for
+	command bar API on PocketPC:
+	CommandBar_Create, CommandBar_Show, CommandBar_AddBitmap,
+	CommandBar_InsertComboBox, CommandBar_InsertMenubar,
+	CommandBar_InsertMenubarEx, CommandBar_DrawMenuBar,
+	CommandBar_GetMenu, CommandBar_AddAdornments, CommandBar_Height,
+	CommandBar_InsertButton, CommandBar_Destroy.
+
+	* include/winbase.h [_WIN32_WCE] (WIN32_FIND_DATA{A|W}): Remove
+	fields not present on PocketPC.
+	(GetCurrentThreadId): Conditionally declare as extern function
+	without dllimport attribute on PocketPC.
+ 	(ResetEvent): Likwise.
+	(SetEvent): Likewise.
+
+	* include/wingdi.h [_WIN32_WCE]  (GetTextExtentPoint32{A|W}):
+	Conditionally declare as extern function without dllimport
+	 attribute on PocketPC.
+	* winuser.h  [_WIN32_WCE] (DialogBoxParam{A|W}): Conditionally
+	declare as extern function without dllimport attribute on PocketPC.
+
+2006-04-18  Thorsten Dahlheimer (dahlheim@users.sf.net>
+
+	* lib/test.c: Include icm.h.
+
 2006-04-18  Thorsten Dahlheimer (dahlheim@users.sf.net>
 
 	* include/wingdi.h (ColorCorrectPalette): Add declaration.

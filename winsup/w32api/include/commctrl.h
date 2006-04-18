@@ -15,6 +15,15 @@ extern "C" {
 #endif
 #endif
 
+#ifndef COMMCTRLAPI
+#ifdef __W32API_USE_DLLIMPORT__
+#define COMMCTRLAPI DECLSPEC_IMPORT
+#else
+#define COMMCTRLAPI
+#endif
+#endif
+
+
 #ifndef SNDMSG
 #ifdef __cplusplus
 #define SNDMSG ::SendMessage
@@ -3704,6 +3713,28 @@ typedef REBARBANDINFOA REBARBANDINFO,*LPREBARBANDINFO;
 #define RB_SETBANDINFO RB_SETBANDINFOA
 #endif
 #endif /* RC_INVOKED */
+
+#ifdef _WIN32_WCE               /* these are PPC only */
+
+COMMCTRLAPI HWND WINAPI CommandBar_Create(HINSTANCE, HWND, int); 
+COMMCTRLAPI BOOL WINAPI CommandBar_Show(HWND, BOOL); 
+COMMCTRLAPI int WINAPI CommandBar_AddBitmap(HWND, HINSTANCE, int, int, int, int); 
+COMMCTRLAPI HWND WINAPI CommandBar_InsertComboBox(HWND, HINSTANCE, int, UINT, WORD, WORD); 
+COMMCTRLAPI BOOL WINAPI CommandBar_InsertMenubar(HWND, HINSTANCE, WORD, WORD );
+COMMCTRLAPI BOOL WINAPI CommandBar_InsertMenubarEx(HWND, HINSTANCE, LPTSTR, WORD);
+COMMCTRLAPI BOOL WINAPI CommandBar_DrawMenuBar(HWND, WORD); 
+COMMCTRLAPI HMENU WINAPI CommandBar_GetMenu(HWND, WORD); 
+COMMCTRLAPI BOOL WINAPI CommandBar_AddAdornments(HWND, DWORD, DWORD); 
+COMMCTRLAPI int WINAPI CommandBar_Height(HWND hwndCB); 
+
+/* These two are not in the DLL */
+#define CommandBar_InsertButton(hwnd,i,lptbbutton)              \
+    SendMessage((hwnd),TB_INSERTBUTTON,(i),(lptbbutton))
+#define CommandBar_Destroy(hwnd)                                \
+    DestroyWindow(hwnd)
+
+
+#endif /* _WIN32_WCE */
 
 #ifdef __cplusplus
 }

@@ -29,6 +29,7 @@
 
 #include <dbt.h>
 #include <httpext.h>
+#include <icm.h>
 #include <imagehlp.h>
 #include <initguid.h>
 #include <ipexport.h>
