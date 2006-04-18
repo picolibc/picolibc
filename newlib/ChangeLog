@@ -1,3 +1,8 @@
+2006-04-18  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/signal.h (sigdelset, sigfillset, sigismember): New macros.
+	(sigaddset, sigemptyset): Add return code.
+
 2006-04-13  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
         * acinclude.m4: New _NEWLIB_VERSION.

@@ -125,8 +125,11 @@ struct sigaction
 /* These depend upon the type of sigset_t, which right now 
    is always a long.. They're in the POSIX namespace, but
    are not ANSI. */
-#define sigaddset(what,sig) (*(what) |= (1<<(sig)))
-#define sigemptyset(what)   (*(what) = 0)
+#define sigaddset(what,sig) (*(what) |= (1<<(sig)), 0)
+#define sigdelset(what,sig) (*(what) &= ~(1<<(sig)), 0)
+#define sigemptyset(what)   (*(what) = 0, 0)
+#define sigfillset(what)    (*(what) = ~(0), 0)
+#define sigismember(what,sig) (((*(what)) & (1<<(sig))) != 0)
 
 int _EXFUN(sigprocmask, (int how, const sigset_t *set, sigset_t *oset));
 
@@ -137,7 +140,10 @@ int _EXFUN(pthread_sigmask, (int how, const sigset_t *set, sigset_t *oset));
 /* protos for functions found in winsup sources for CYGWIN */
 #if defined(__CYGWIN__) || defined(__rtems__)
 #undef sigaddset
+#undef sigdelset
 #undef sigemptyset
+#undef sigfillset
+#undef sigismember
 /* The first argument to kill should be pid_t.  Right now
    <sys/types.h> always defines pid_t to be int.  If that ever
    changes, then we will need to do something else, perhaps along the
