@@ -185,7 +185,7 @@ _IVEC_DEFAULT:
 	or	r0, r0, r0
 
 
-	.section .internal_io, "a", @progbits
+	.section .internal_io, "a", @nobits
 	.fill 256		; Fill the first page.
 
 	; This is the memory-mapped I/O region.
