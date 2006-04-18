@@ -1,3 +1,23 @@
+2006-04-18  Thorsten Dahlheimer (dahlheim@users.sf.net>
+
+	* include/winnt.h (IMAGE_FILE_MACHINE_IA64): New define.
+	(IMAGE_FILE_MACHINE_AMD64): New define.
+	(IMAGE_NT_OPTIONAL_HDR{32|64}_MAGIC. New. Map to IMAGE_NT_OPTIONAL_HDR_MAGIC.
+	(IMAGE_SUBSYSTEM_NATIVE_WINDOWS): New define.
+	(IMAGE_SUBSYSTEM_WINDOWS_CE_GUI): New define.
+	(IMAGE_DLLCHARACTERISTICS_WDM_DRIVER): New define.
+	(IMAGE_DIRECTORY_ENTRY_*): New defines.
+	(IMAGE_SCN_TYPE_*): New defines.
+	(IMAGE_SCN_ALIGN_*): New defines.
+	(IMAGE_DEBUG_TYPE_BORLAND): New define.
+	(IMAGE_OPTIONAL_HEADER{32|64}): New structure definitions and typedefs.  Map to
+	IMAGE_OPTIONAL_HEADERS.
+	(IMAGE_NT_HEADERS{32|64}): New structure definitions and typedefs.  Map to
+	IMAGE_NT_HEADERS.
+	(IMAGE_LOAD_CONFIG_DIRECTORY64): New structure definition and typedefs.
+	(IMAGE_CE_RUNTIME_FUNCTION_ENTRY): Likewise.
+	(IMAGE_FUNCTION_ENTRY64): Likewise.
+
 2006-04-18  Bart Oldeman  <bartoldeman@users.sf.net>
 
 	* lib/test.c: Fix typo in #inlcude.
