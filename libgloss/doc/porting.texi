@@ -131,6 +131,7 @@ new library is called Libgloss, for Gnu Low-level OS support.
                                 supports.
 * Building libgloss::           How to configure and built libgloss
                                 for a target.
+* Board support::               How to add support for a new board.
 @end menu
 
 @node Supported targets, Building libgloss, Libgloss, Libgloss
@@ -231,7 +232,7 @@ will allow the loading of files via a bidirectional parallel port. This
 has never been tested with the output of GNU SOM, as this manual is
 mostly for Unix based systems. 
 
-@node Building libgloss, , Supported targets, Libgloss
+@node Building libgloss, Board support, Supported targets, Libgloss
 @subsection Configuring and building libgloss.
 
 Libgloss uses an autoconf based script to configure. Autoconf scripts
@@ -299,6 +300,52 @@ is done with an installed cross compiler, then none of this needs to be
 used. This is done so libgloss will build automatically with a fresh,
 and uninstalled object tree. It also makes it easier to debug the other
 tools using libgloss's test suites.
+
+@node Board support, , Building libgloss, Libgloss
+@subsection Adding Support for a New Board
+
+This section explains how to add support for a new board to libgloss.
+In order to add support for a board, you must already have developed a
+toolchain for the target architecture.
+
+All of the changes you will make will be in the subdirectory named
+after the architecture used by your board.  For example, if you are
+developing support for a new ColdFire board, you will modify files in
+the @file{m68k} subdirectory, as that subdirectory contains support
+for all 68K devices, including architecture variants like ColdFire.
+
+In general, you will be adding three components: a @file{crt0.S} file
+(@pxref{Crt0}), a linker script (@pxref{Linker Scripts}), and a
+hardware support library.  Each should be prefixed with the name of
+your board.  For example, if you ard adding support for a new Surf
+board, then you will be adding the assembly @file{surf-crt0.S} (which
+will be assembled into @file{surf-crt0.o}), the linker script
+@file{surf.ld}, and other C and assembly files which will be combined
+into the hardware support library @file{libsurf.a}.
+
+You should modify @file{Makefile.in} to define new variables
+corresponding to your board.  Although there is some variation between
+architectures, the general convention is to use the following format:
+
+@example
+# The name of the crt0.o file.
+SURF_CRT0    = surf-crt0.o
+# The name of the linker script.
+SURF_SCRIPTS = surf.ld
+# The name of the hardware support library.
+SURF_BSP     = libsurf.a
+# The object files that make up the hardware support library.
+SURF_OBJS    = surf-file1.o surf-file2.o 
+# The name of the Makefile target to use for installation.
+SURF_INSTALL = install-surf
+@end example
+
+Then, you should create the @code{$@{SURF_BSP@}} and
+@code{$@{SURF_INSTALL@}} make targets.  Add @code{$@{SURF_CRT0@}} to
+the dependencies for the @code{all} target and add
+@code{$@{SURF_INSTALL@}} to the dependencies for the @code{install}
+target.  Now, when libgloss is built and installed, support for your
+BSP will be installed as well.
 
 @node GCC, Libraries, Libgloss, Top
 @chapter Porting GCC

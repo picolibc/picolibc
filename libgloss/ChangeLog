@@ -1,3 +1,7 @@
+2006-04-18  Mark Mitchell  <mark@codesourcery.com>
+
+	* doc/porting.texi: Document libgloss build conventions.
+
 2006-03-22  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* mt/startup-16-002.S (.internal_io): Make @nobits.
