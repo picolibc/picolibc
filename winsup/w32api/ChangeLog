@@ -1,5 +1,14 @@
 2006-04-18  Thorsten Dahlheimer (dahlheim@users.sf.net>
 
+	* include/wingdi.h (ColorCorrectPalette): Add declaration.
+	(CreateColorSpace): Add UNICODE mappings.
+	* lib/gdi32.def (ColorCorrectPalette): Add stub. 
+	* include/icm.h: New file.
+	* lib/mscms.def: New file.
+	* lib/icmui.def: New file.
+
+2006-04-18  Thorsten Dahlheimer (dahlheim@users.sf.net>
+
 	* include/winnt.h (IMAGE_FILE_MACHINE_IA64): New define.
 	(IMAGE_FILE_MACHINE_AMD64): New define.
 	(IMAGE_NT_OPTIONAL_HDR{32|64}_MAGIC. New. Map to IMAGE_NT_OPTIONAL_HDR_MAGIC.

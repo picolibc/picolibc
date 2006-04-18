@@ -2573,7 +2573,10 @@ WINGDIAPI int WINAPI ChoosePixelFormat(HDC,CONST PIXELFORMATDESCRIPTOR*);
 WINGDIAPI HENHMETAFILE WINAPI CloseEnhMetaFile(HDC);
 WINGDIAPI BOOL WINAPI CloseFigure(HDC);
 WINGDIAPI HMETAFILE WINAPI CloseMetaFile(HDC);
+#if (_WIN32_WINDOWS >= 0x0410 || _WIN32_WINNT >= 0x0500)
+WINGDIAPI BOOL WINAPI ColorCorrectPalette(HDC,HPALETTE,DWORD,DWORD);
 WINGDIAPI BOOL WINAPI ColorMatchToTarget(HDC,HDC,DWORD);
+#endif
 WINGDIAPI int WINAPI CombineRgn(HRGN,HRGN,HRGN,int);
 WINGDIAPI BOOL WINAPI CombineTransform(LPXFORM,const XFORM*,const XFORM*);
 WINGDIAPI HENHMETAFILE WINAPI CopyEnhMetaFileA(HENHMETAFILE,LPCSTR);
@@ -2942,6 +2945,7 @@ typedef DISPLAY_DEVICEW DISPLAY_DEVICE, *PDISPLAY_DEVICE, *LPDISPLAY_DEVICE;
 #endif
 #define CopyEnhMetaFile CopyEnhMetaFileW
 #define CopyMetaFile CopyMetaFileW
+#define CreateColorSpace CreateColorSpaceW
 #define CreateDC CreateDCW
 #define CreateEnhMetaFile CreateEnhMetaFileW
 #define CreateFont CreateFontW
@@ -3019,6 +3023,7 @@ typedef DISPLAY_DEVICEA DISPLAY_DEVICE, *PDISPLAY_DEVICE, *LPDISPLAY_DEVICE;
 #endif
 #define CopyEnhMetaFile CopyEnhMetaFileA
 #define CopyMetaFile CopyMetaFileA
+#define CreateColorSpace CreateColorSpaceA
 #define CreateDC CreateDCA
 #define CreateEnhMetaFile CreateEnhMetaFileA
 #define CreateFont CreateFontA
