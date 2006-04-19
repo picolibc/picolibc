@@ -1009,7 +1009,8 @@ typedef struct pcmwaveformat_tag {
 	WAVEFORMAT wf;
 	WORD wBitsPerSample;
 } PCMWAVEFORMAT, *PPCMWAVEFORMAT,*LPPCMWAVEFORMAT;
-#ifndef _WAVEFORMATEX_
+#ifndef _LPCWAVEFORMATEX_DEFINED
+#define _LPCWAVEFORMATEX_DEFINED
 #define _WAVEFORMATEX_
 typedef struct tWAVEFORMATEX {
 	WORD wFormatTag;

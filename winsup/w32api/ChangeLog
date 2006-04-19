@@ -1,7 +1,15 @@
 2006-04-19  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
-	* include/winnt.h, include/ddk/winddk.h (FIELD_OFFSET):
-	Compile with recent C++ compiler such as gcc 3.4.
+	* include/mmsystem.h (_LPCWAVEFORMATEX_DEFINED): Define.
+	Use as guard for the WAVEFORMATEX structure instead of
+	_WAVEFORMATEX_ to avoid clashes with DirectSound. Keep
+	_WAVEFORMATEX_ for compatibility.
+	Thanks to:    Andrew Jones <guln at sf dot net>
+
+2006-04-19  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/winnt.h (FIELD_OFFSET): Compile.
+	Recent C++ compiler (gcc 3.4 and better) don't like the original macro.
 	* include/ddk/winddk.h: Ditto.
 
 2006-04-19  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
