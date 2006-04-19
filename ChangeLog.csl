@@ -1,3 +1,9 @@
+2006-04-19  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* gdb/doc/gdb.texinfo (Remote configuration): Mention "set remote
+	load-offsets".
+	(General Query Packets): Document qPartInfo.
+
 2006-04-18  Mark Mitchell  <mark@codesourcery.com>
 
 	Issue #655
