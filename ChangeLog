@@ -1,3 +1,10 @@
+2006-04-18  DJ Delorie  <dj@redhat.com>
+
+	* configure.in (m32c): Build libstdc++-v3.  Pass flags to
+	reference libgloss so that libssp can be built in a combined
+	tree.
+	* configure: Regenerate.
+
 2006-04-10  Ben Elliston  <bje@au.ibm.com>
 
 	* contrib: Remove directory.
