@@ -15,7 +15,7 @@
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 dnl Process this file with autoconf to produce a configure script.
-AC_PREREQ(2.5)dnl
+AC_PREREQ(2.59)
 AC_INIT(libsys-crt0.S)
 
 if test "$srcdir" = "." ; then
@@ -28,7 +28,7 @@ fi
 
 AC_PROG_INSTALL
 
-AC_PROG_CC
+LIB_AC_PROG_CC
 AS=${AS-as}
 AC_SUBST(AS)
 AR=${AR-ar}
@@ -36,6 +36,7 @@ AC_SUBST(AR)
 LD=${LD-ld}
 AC_SUBST(LD)
 AC_PROG_RANLIB
+LIB_AM_PROG_AS
 
 host_makefile_frag=${srcdir}/../../config/default.mh
 

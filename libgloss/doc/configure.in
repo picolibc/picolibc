@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_PREREQ(2.5)dnl
+AC_PREREQ(2.59)
 AC_INIT(porting.texi)
 
 if test "$srcdir" = "." ; then
@@ -12,4 +12,5 @@ fi
 
 AC_PROG_INSTALL
 
-AC_OUTPUT(Makefile)
+AC_CONFIG_FILES(Makefile)
+AC_OUTPUT

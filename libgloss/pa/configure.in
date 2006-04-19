@@ -12,7 +12,7 @@
  *
  * Process this file with autoconf to produce a configure script.
  */
-AC_PREREQ(2.5)dnl
+AC_PREREQ(2.59)
 AC_INIT(crt0.S)
 
 if test "${enable_shared}" = "yes" ; then
@@ -35,7 +35,7 @@ AC_ARG_PROGRAM
 
 AC_PROG_INSTALL
 
-AC_PROG_CC
+LIB_AC_PROG_CC
 AS=${AS-as}
 AC_SUBST(AS)
 AR=${AR-ar}
@@ -43,6 +43,7 @@ AC_SUBST(AR)
 LD=${LD-ld}
 AC_SUBST(LD)
 AC_PROG_RANLIB
+LIB_AM_PROG_AS
 
 host_makefile_frag=${srcdir}/../config/default.mh
 target_makefile_frag=${srcdir}/../config/default.mt
@@ -58,7 +59,7 @@ target_makefile_frag_path=$target_makefile_frag
 AC_SUBST(target_makefile_frag_path)
 AC_SUBST_FILE(target_makefile_frag)
 
-AC_OUTPUT(Makefile,
+AC_CONFIG_FILES(Makefile,
 . ${libgloss_topdir}/config-ml.in,
 srcdir=${srcdir}
 target=${target}
@@ -66,3 +67,4 @@ ac_configure_args="${ac_configure_args} --enable-multilib"
 CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
 libgloss_topdir=${libgloss_topdir}
 )
+AC_OUTPUT

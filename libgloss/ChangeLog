@@ -1,3 +1,38 @@
+2006-04-19  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.in: Modified to support autoconf 2.59.
+	* */configure.in: Ditto.
+	* configure: Regenerated.
+	* */configure: Ditto.
+	* wince/aclocal.m4: Ditto.
+	* acinclude.m4: New file.
+	* aclocal.m4: Ditto.
+	* arm/aclocal.m4: Ditto.
+	* cris/aclocal.m4: Ditto.
+	* crx/aclocal.m4: Ditto.
+	* d30v/aclocal.m4: Ditto.
+	* fr30/aclocal.m4: Ditto.
+	* frv/aclocal.m4: Ditto.
+	* hp74x/aclocal.m4: Ditto.
+	* i386/aclocal.m4: Ditto.
+	* i960/aclocal.m4: Ditto.
+	* iq2000/aclocal.m4: Ditto.
+	* libnosys/aclocal.m4: Ditto.
+	* m32c/aclocal.m4: Ditto.
+	* m32r/aclocal.m4: Ditto.
+	* m68hc11/aclocal.m4: Ditto.
+	* m68k/aclocal.m4: Ditto.
+	* mcore/aclocal.m4: Ditto.
+	* mips/aclocal.m4: Ditto.
+	* mn10200/aclocal.m4: Ditto.
+	* mn10300/aclocal.m4: Ditto.
+	* mt/aclocal.m4: Ditto.
+	* pa/aclocal.m4: Ditto.
+	* rs6000/aclocal.m4: Ditto.
+	* sparc/aclocal.m4: Ditto.
+	* sparc/libsys/aclocal.m4: Ditto.
+	* xstormy16/aclocal.m4: Ditto.
+
 2006-04-18  Mark Mitchell  <mark@codesourcery.com>
 
 	* doc/porting.texi: Document libgloss build conventions.

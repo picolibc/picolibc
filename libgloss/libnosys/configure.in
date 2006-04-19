@@ -12,7 +12,7 @@
 #
 # Process this file with autoconf to produce a configure script.
 #
-AC_PREREQ(2.5)dnl
+AC_PREREQ(2.59)
 AC_INIT(close.c)
 AC_CONFIG_HEADER(config.h)
 
@@ -35,44 +35,6 @@ AC_CANONICAL_SYSTEM
 AC_ARG_PROGRAM
 
 AC_PROG_INSTALL
-
-# FIXME: We temporarily define our own version of AC_PROG_CC.  This is
-# copied from autoconf 2.12, but does not call AC_PROG_CC_WORKS.  We
-# are building a library that must be included in all links, so we 
-# can't link an executable until this lib is built.
-# autoconf should provide a way to do this.
-
-AC_DEFUN(LIB_AC_PROG_CC,
-[AC_BEFORE([$0], [AC_PROG_CPP])dnl
-AC_CHECK_PROG(CC, gcc, gcc)
-if test -z "$CC"; then
-  AC_CHECK_PROG(CC, cc, cc, , , /usr/ucb/cc)
-  test -z "$CC" && AC_MSG_ERROR([no acceptable cc found in \$PATH])
-fi
-
-AC_PROG_CC_GNU
-
-if test $ac_cv_prog_gcc = yes; then
-  GCC=yes
-dnl Check whether -g works, even if CFLAGS is set, in case the package
-dnl plays around with CFLAGS (such as to build both debugging and
-dnl normal versions of a library), tasteless as that idea is.
-  ac_test_CFLAGS="${CFLAGS+set}"
-  ac_save_CFLAGS="$CFLAGS"
-  CFLAGS=
-  AC_PROG_CC_G
-  if test "$ac_test_CFLAGS" = set; then
-    CFLAGS="$ac_save_CFLAGS"
-  elif test $ac_cv_prog_cc_g = yes; then
-    CFLAGS="-g -O2"
-  else
-    CFLAGS="-O2"
-  fi
-else
-  GCC=
-  test "${CFLAGS+set}" = set || CFLAGS="-g"
-fi
-])
 
 AC_DEFINE(HAVE_GNU_LD)
 dnl Make sure syscall names match those being used by newlib
@@ -137,7 +99,7 @@ case "${target}" in
   *-*-elf)
         AC_DEFINE(HAVE_ELF)
 
-        AC_CACHE_CHECK(for .previous assembler directive,
+        AC_CACHE_CHECK([for .previous assembler directive],
                          libc_cv_asm_previous_directive, [dnl
         libc_cv_asm_previous_directive=no
         cat > conftest.s <<EOF
@@ -146,11 +108,14 @@ case "${target}" in
 EOF
         if AC_TRY_COMMAND(${CC-cc} -c $CFLAGS conftest.s 1>&AC_FD_CC); then
           libc_cv_asm_previous_directive=yes
-          AC_DEFINE(HAVE_ASM_PREVIOUS_DIRECTIVE)
         fi
         rm -f conftest*])
 
-        AC_CACHE_CHECK(for .popsection assembler directive,
+	if test "x${libc_cv_asm_previous_directive}" = "xyes"; then
+          AC_DEFINE(HAVE_ASM_PREVIOUS_DIRECTIVE)
+	fi
+
+        AC_CACHE_CHECK([for .popsection assembler directive],
                          libc_cv_asm_popsection_directive, [dnl
         libc_cv_asm_popsection_directive=no
         cat > conftest.s <<EOF
@@ -159,11 +124,14 @@ EOF
 EOF
         if AC_TRY_COMMAND(${CC-cc} -c $CFLAGS conftest.s 1>&AC_FD_CC); then
           libc_cv_asm_popsection_directive=yes
-          AC_DEFINE(HAVE_ASM_POPSECTION_DIRECTIVE)
         fi
         rm -f conftest*])
 
-        AC_CACHE_CHECK(for section attributes,
+	if test "x${libc_cv_asm_popsection_directive}" = "xyes"; then
+          AC_DEFINE(HAVE_ASM_POPSECTION_DIRECTIVE)
+	fi
+
+        AC_CACHE_CHECK([for section attributes],
                          libc_cv_section_attributes, [dnl
         libc_cv_section_attributes=no
         cat > conftest.c <<EOF
@@ -172,13 +140,15 @@ int main() {}
 EOF
         if AC_TRY_COMMAND(${CC-cc} -c $CFLAGS conftest.c 1>&AC_FD_CC); then
           libc_cv_section_attributes=yes
-          AC_DEFINE(HAVE_SECTION_ATTRIBUTES)
         fi
         rm -f conftest*])
+	if test "x${libc_cv_section_attributes}" = "xyes"; then
+          AC_DEFINE(HAVE_SECTION_ATTRIBUTES)
+	fi
         ;;
 esac
 
-AC_CACHE_CHECK(for symbol prefix, libc_symbol_prefix, [dnl
+AC_CACHE_CHECK([for symbol prefix], libc_symbol_prefix, [dnl
 cat > conftest.c <<\EOF
 foo () { }
 EOF
@@ -208,6 +178,7 @@ AC_SUBST(AR)
 LD=${LD-ld}
 AC_SUBST(LD)
 AC_PROG_RANLIB
+LIB_AM_PROG_AS
 
 host_makefile_frag=${srcdir}/../config/default.mh
 
@@ -219,7 +190,7 @@ host_makefile_frag_path=$host_makefile_frag
 AC_SUBST(host_makefile_frag_path)
 AC_SUBST_FILE(host_makefile_frag)
 
-AC_OUTPUT(Makefile,
+AC_CONFIG_FILES(Makefile,
 ac_file=Makefile . ${libgloss_topdir}/config-ml.in,
 srcdir=${srcdir}
 target=${target}
@@ -227,5 +198,6 @@ ac_configure_args="${ac_configure_args} --enable-multilib"
 CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
 libgloss_topdir=${libgloss_topdir}
 )
+AC_OUTPUT
 
 
