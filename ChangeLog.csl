@@ -1,3 +1,11 @@
+2006-04-18  Mark Mitchell  <mark@codesourcery.com>
+
+	Issue #655
+	* gdb/mt-tdep.c (mt_gdb_regnums): Add ZI2, ZQ2, Ichannel2,
+	Iscramb2, Qscramb2, Qchannel2.
+	(mt_register_name): Likewise.
+	(mt_copro_register_type): Describe ZI2 and ZQ2.
+	
 2006-04-11  Mark Mitchell  <mark@codesourcery.com>
 
 	Issue #658
