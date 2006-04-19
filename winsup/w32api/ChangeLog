@@ -1,5 +1,9 @@
 2006-04-19  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/edevdefs.h: New file.
+
+2006-04-19  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/mmsystem.h (_LPCWAVEFORMATEX_DEFINED): Define.
 	Use as guard for the WAVEFORMATEX structure instead of
 	_WAVEFORMATEX_ to avoid clashes with DirectSound. Keep
