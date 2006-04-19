@@ -3296,11 +3296,9 @@ WINUSERAPI DWORD WINAPI CharLowerBuffW(LPWSTR,DWORD);
 WINUSERAPI LPSTR WINAPI CharNextA(LPCSTR);
 WINUSERAPI LPWSTR WINAPI CharNextW(LPCWSTR);
 WINUSERAPI LPSTR WINAPI CharNextExA(WORD,LPCSTR,DWORD);
-WINUSERAPI LPWSTR WINAPI CharNextExW(WORD,LPCWSTR,DWORD);
 WINUSERAPI LPSTR WINAPI CharPrevA(LPCSTR,LPCSTR);
 WINUSERAPI LPWSTR WINAPI CharPrevW(LPCWSTR,LPCWSTR);
 WINUSERAPI LPSTR WINAPI CharPrevExA(WORD,LPCSTR,LPCSTR,DWORD);
-WINUSERAPI LPWSTR WINAPI CharPrevExW(WORD,LPCWSTR,LPCWSTR,DWORD);
 WINUSERAPI BOOL WINAPI CharToOemA(LPCSTR,LPSTR);
 WINUSERAPI BOOL WINAPI CharToOemW(LPCWSTR,LPSTR);
 WINUSERAPI BOOL WINAPI CharToOemBuffA(LPCSTR,LPSTR,DWORD);
@@ -3986,9 +3984,7 @@ typedef MONITORINFOEXW MONITORINFOEX, *LPMONITORINFOEX;
 #define CharLower CharLowerW
 #define CharLowerBuff CharLowerBuffW
 #define CharNext CharNextW
-#define CharNextEx CharNextExW
 #define CharPrev CharPrevW
-#define CharPrevEx CharPrevExW
 #define CharToOem CharToOemW
 #define CharToOemBuff CharToOemBuffW
 #define CharUpper CharUpperW
@@ -4153,9 +4149,7 @@ typedef MONITORINFOEXA MONITORINFOEX, *LPMONITORINFOEX;
 #define CharLower CharLowerA
 #define CharLowerBuff CharLowerBuffA
 #define CharNext CharNextA
-#define CharNextEx CharNextExA
 #define CharPrev CharPrevA
-#define CharPrevEx CharPrevExA
 #define CharToOem CharToOemA
 #define CharToOemBuff CharToOemBuffA
 #define CharUpper CharUpperA

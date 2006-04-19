@@ -1,3 +1,9 @@
+2006-04-19  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/winuser.h (CharNextEx,CharNextExW,CharPrevEx,CharPrevExW):
+	Delete. Only CharNextExA and CharPrevExA are documented in MSDN.
+	Thanks to:    David Golub <david_golub at sf dot net>
+
 2006-04-18  Eric House  <ehouse@eehouse.org>
 
 	PocketPC support.
