@@ -1,3 +1,30 @@
+2006-04-19  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	Merge from gdb-csl-20060226-branch:
+
+	2006-04-19  Daniel Jacobowitz  <dan@codesourcery.com>
+	* gdb/doc/gdb.texinfo (Remote configuration): Mention "set remote
+	load-offsets".
+	(General Query Packets): Document qPartInfo.
+
+	2006-04-18  Mark Mitchell  <mark@codesourcery.com>
+	Issue #655
+	* gdb/mt-tdep.c (mt_gdb_regnums): Add ZI2, ZQ2, Ichannel2,
+	Iscramb2, Qscramb2, Qchannel2.
+	(mt_register_name): Likewise.
+	(mt_copro_register_type): Describe ZI2 and ZQ2.
+	
+	2006-04-11  Mark Mitchell  <mark@codesourcery.com>
+	Issue #658
+	* gdb/mt-tdep.c (mt_gdb_regnums): Define
+	MT_COPRO_PSEUDOREG_MAC_REGNUM.
+	(mt_register_name): Use it.
+	(mt_copro_register_type): Likewise.
+	(mt_register_type): Likewise.
+	(mt_pseudo_register_read): Likewise.  Read the MAC register, not
+	the coprocessor register.
+	(mt_pseudo_register_write): Likewise.
+
 2006-04-17  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* gdb/buildsym.c (start_subfile): Handle producer.
