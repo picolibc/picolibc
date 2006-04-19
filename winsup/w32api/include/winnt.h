@@ -845,7 +845,12 @@ typedef DWORD FLONG;
 #define RTL_CRITSECT_TYPE 0
 #define RTL_RESOURCE_TYPE 1
 /* Also in winddk.h */
+#ifdef __cplusplus
+#define FIELD_OFFSET(t,f) (reinterpret_cast<LONG> \
+	(&reinterpret_cast<char&>(static_cast<t*>(0)->f)))
+#else
 #define FIELD_OFFSET(t,f) ((LONG)&(((t*)0)->f))
+#endif
 #ifndef CONTAINING_RECORD
 #define CONTAINING_RECORD(address, type, field) \
   ((type*)((PCHAR)(address) - (PCHAR)(&((type *)0)->field)))

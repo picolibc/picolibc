@@ -1,5 +1,11 @@
 2006-04-19  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winnt.h, include/ddk/winddk.h (FIELD_OFFSET):
+	Compile with recent C++ compiler such as gcc 3.4.
+	* include/ddk/winddk.h: Ditto.
+
+2006-04-19  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winuser.h (CharNextEx,CharNextExW,CharPrevEx,CharPrevExW):
 	Delete. Only CharNextExA and CharPrevExA are documented in MSDN.
 	Thanks to:    David Golub <david_golub at sf dot net>
