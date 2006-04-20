@@ -3967,13 +3967,8 @@ KefReleaseSpinLockFromDpcLevel(
  *   IN PCHAR  Field);
  */
 #ifndef FIELD_OFFSET
-#ifdef __cplusplus
-#define FIELD_OFFSET(Type, Field) (reinterpret_cast<LONG> \
-  (&reinterpret_cast<char&>(static_cast<Type *>(0)->Field)))
-#else
 #define FIELD_OFFSET(Type, Field) \
   ((LONG) (&(((Type *) 0)->Field)))
-#endif
 #endif
 
 /*
