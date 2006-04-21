@@ -1,3 +1,10 @@
+2006-04-21  Pierre Humblet Pierre.Humblet@ieee.org
+	    Christopher Faylor  <cgf@timesys.com>
+
+	* environ.cc (getearly): Use GetEnvironmentVariable and cmalloc instead
+	of GetEnvironmentStrings.
+	(environ_init): Revert rawenv stuff.
+
 2006-04-21  Christopher Faylor  <cgf@timesys.com>
 
 	* environ.cc (rawenv): Make this variable a file-scope static.

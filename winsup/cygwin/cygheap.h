@@ -30,6 +30,7 @@ enum cygheap_types
   HEAP_1_BUF,
   HEAP_1_EXEC,
   HEAP_1_MAX = 100,
+  HEAP_2_STR,
   HEAP_MMAP = 200
 };
 

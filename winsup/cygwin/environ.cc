@@ -220,25 +220,26 @@ my_findenv (const char *name, int *offset)
   return NULL;
 }
   
-static NO_COPY char *rawenv;
-
 /* Primitive getenv before the environment is built.  */
 
 static char __stdcall *
-getearly (const char * name, int *offset __attribute__ ((unused)))
+getearly (const char * name, int *)
 {
-  char *p;
+  char *ret;
   char **ptr;
-  int len = strlen (name);
+  int len;
 
-  if (spawn_info && (ptr = spawn_info->moreinfo->envp)) 
-    for (; *ptr; ptr++)
-      if (strncasematch (name, *ptr, len) && *ptr[len] == '=')
-	return *ptr + len + 1;
-  else if (rawenv || (rawenv = GetEnvironmentStrings ()))
-    for (p = rawenv; *p; p = strchr (p, '\0') + 1)
-      if (strncasematch (name, p, len) && p[len] == '=')
-	return p + len + 1;
+  if (spawn_info && (ptr = spawn_info->moreinfo->envp))
+    {
+      len = strlen (name);
+      for (; *ptr; ptr++)
+	if (strncasematch (name, *ptr, len) && *ptr[len] == '=')
+	  return *ptr + len + 1;
+    }
+  else if ((len = GetEnvironmentVariable (name, NULL, 0))
+	   && (ret = (char *) cmalloc (HEAP_2_STR, len))
+	   && GetEnvironmentVariable (name, ret, len))
+    return ret;
 
   return NULL;
 }
@@ -733,6 +734,7 @@ regopt (const char *name)
 void
 environ_init (char **envp, int envc)
 {
+  char *rawenv;
   int i;
   char *p;
   char *newp;
@@ -781,27 +783,19 @@ environ_init (char **envp, int envc)
 	    cfree (p);
 	  }
       envp_passed_in = 1;
-      if (rawenv)
-	{
-	  FreeEnvironmentStrings (rawenv);
-	  rawenv = NULL;
-	}
       goto out;
     }
 
   /* Allocate space for environment + trailing NULL + CYGWIN env. */
   lastenviron = envp = (char **) malloc ((4 + (envc = 100)) * sizeof (char *));
 
+  rawenv = GetEnvironmentStrings ();
   if (!rawenv)
     {
-      rawenv = GetEnvironmentStrings ();
-      if (!rawenv)
-	{
-	  system_printf ("GetEnvironmentStrings returned NULL, %E");
-	  return;
-	}
+      system_printf ("GetEnvironmentStrings returned NULL, %E");
+      return;
     }
-  debug_printf ("rawenv %p - \"%s\"", rawenv, rawenv);
+  debug_printf ("GetEnvironmentStrings returned %p - \"%s\"", rawenv, rawenv);
 
   /* Current directory information is recorded as variables of the
      form "=X:=X:\foo\bar; these must be changed into something legal
@@ -831,7 +825,6 @@ environ_init (char **envp, int envc)
     envp[i++] = strdup (cygterm);
   envp[i] = NULL;
   FreeEnvironmentStrings (rawenv);
-  rawenv = NULL;
 
 out:
   findenv_func = (char * (*)(const char*, int*)) my_findenv;
