@@ -1057,12 +1057,12 @@ sa_restart:
 	  }
 	break;
       case WSA_WAIT_EVENT_0 + 1:
-	WSASetLastError (WSAEINTR);
 	if (_my_tls.call_signal_handler ())
 	  {
 	    sig_dispatch_pending ();
 	    goto sa_restart;
 	  }
+	WSASetLastError (WSAEINTR);
 	break;
       default:
 	WSASetLastError (WSAEFAULT);

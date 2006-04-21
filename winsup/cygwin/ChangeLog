@@ -1,5 +1,10 @@
 2006-04-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::wait): Reorder setting
+	WSAError to avoid spurious errors with WSAError set to 0.
+
+2006-04-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/asm/byteorder.h: Include stdint.h.  Per standard, change
 	datatypes in ntohX and htonX functions to uintXX_t types.
 
