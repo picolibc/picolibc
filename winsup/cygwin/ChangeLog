@@ -1,3 +1,18 @@
+2006-04-21  Christopher Faylor  <cgf@timesys.com>
+
+	* tty.h (tty::hwnd): Move to tty_min.
+	(tty::gethwnd): Ditto.
+	(tty::sethwnd): Ditto.
+	(tty_min::hwnd): Receive variable from tty class.
+	(tty_min::gethwnd): Receive function from tty classs.
+	(tty_min::sethwnd): Ditto.
+	* dtable.cc (dtable::stdio_init): Only call init_console_handler when
+	we actually own the console.
+	* fhandler_console.cc (fhandler_console::get_tty_stuff): Set tty's hwnd
+	to non-zero value.
+	* fhandler_termios.cc (fhandler_termios::tcsetpgrp): Semi-reinstate
+	handling of console when pgrp is set.
+
 2006-04-21  Pierre Humblet  <Pierre.Humblet@ieee.org>
 	    Corinna Vinschen  <corinna@vinschen.de>
 

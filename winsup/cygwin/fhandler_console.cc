@@ -115,6 +115,7 @@ fhandler_console::get_tty_stuff (int flags = 0)
       if (PRIMARYLANGID (LOWORD (GetKeyboardLayout (0))) == LANG_ENGLISH)
 	dev_state->meta_mask |= RIGHT_ALT_PRESSED;
       dev_state->set_default_attr ();
+      shared_console_info->tty_min_state.sethwnd ((HWND) INVALID_HANDLE_VALUE);
     }
 
   return &shared_console_info->tty_min_state;

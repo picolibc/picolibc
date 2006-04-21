@@ -32,7 +32,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "ntdll.h"
-#include "tty.h"
+#include "shared_info.h"
 
 static const char NO_COPY unknown_file[] = "some disk file";
 
@@ -135,7 +135,9 @@ dtable::stdio_init ()
 
   if (myself->cygstarted || ISSTATE (myself, PID_CYGPARENT))
     {
-      init_console_handler (myself->ctty >= 0);
+      tty_min *t = cygwin_shared->tty.get_tty (myself->ctty);
+      if (t && t->getpgid () == myself->pid && t->gethwnd ())
+	init_console_handler (true);
       return;
     }
 

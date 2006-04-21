@@ -46,18 +46,12 @@ public:
   pid_t pgid;
   int output_stopped;
   int ntty;
-  DWORD last_ctrl_c;	// tick count of last ctrl-c
+  DWORD last_ctrl_c;	/* tick count of last ctrl-c */
+  HWND hwnd;		/* Console window handle tty belongs to */
 
   IMPLEMENT_STATUS_FLAG (bool, initialized)
   IMPLEMENT_STATUS_FLAG (bool, rstcons)
 
-  tty_min (int t = -1, pid_t s = -1) : sid (s), ntty (t) {}
-  void setntty (int n) {ntty = n;}
-  pid_t getpgid () {return pgid;}
-  void setpgid (int pid) {pgid = pid;}
-  int getsid () {return sid;}
-  void setsid (pid_t tsid) {sid = tsid;}
-  void kill_pgrp (int sig);
   struct termios ti;
   struct winsize winsize;
 
@@ -74,8 +68,17 @@ public:
    * -ERRNO
    */
   int ioctl_retval;
-
   int write_error;
+
+  tty_min (int t = -1, pid_t s = -1) : sid (s), ntty (t) {}
+  void setntty (int n) {ntty = n;}
+  pid_t getpgid () {return pgid;}
+  void setpgid (int pid) {pgid = pid;}
+  int getsid () {return sid;}
+  void setsid (pid_t tsid) {sid = tsid;}
+  void kill_pgrp (int sig);
+  HWND gethwnd () {return hwnd;}
+  void sethwnd (HWND wnd) {hwnd = wnd;}
 };
 
 class fhandler_pty_master;
@@ -85,8 +88,6 @@ class tty: public tty_min
   HANDLE get_event (const char *fmt, BOOL manual_reset = FALSE)
     __attribute__ ((regparm (3)));
 public:
-  HWND  hwnd;	/* Console window handle tty belongs to */
-
   DWORD master_pid;	/* Win32 PID of tty master process */
 
   HANDLE from_master, to_slave;
@@ -101,8 +102,6 @@ public:
   bool alive (const char *fmt);
   bool slave_alive ();
   bool master_alive ();
-  HWND gethwnd () {return hwnd;}
-  void sethwnd (HWND wnd) {hwnd = wnd;}
   bool make_pipes (fhandler_pty_master *ptym);
   HANDLE open_mutex (const char *mutex);
   HANDLE open_output_mutex ();
