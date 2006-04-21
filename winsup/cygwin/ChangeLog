@@ -1,3 +1,12 @@
+2006-04-21  Pierre Humblet  <Pierre.Humblet@ieee.org>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* environ.cc (getearly): New function.
+	(findenv_func): New function pointer, predefined to getearly.
+	(getenv): Call findenv function over the findenv_func pointer.
+	(environ_init): Change findenv_func pointer to my_findenv after Cygwin
+	environment is initialized.
+
 2006-04-21  Lars Munch  <lars@segv.dk>
 
 	* include/asm/byteorder.h (__ntohl): Fix the missing uint32_t.

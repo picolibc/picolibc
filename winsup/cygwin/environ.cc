@@ -224,6 +224,41 @@ my_findenv (const char *name, int *offset)
 }
 
 /*
+ * getearly --
+ *	Primitive getenv before the environment is built.
+ */
+
+static char * __stdcall
+getearly (const char * name, int *offset __attribute__ ((unused)))
+{
+  int s = strlen (name);
+  char * rawenv;
+  char ** ptr;
+  child_info *get_cygwin_startup_info ();
+  child_info_spawn *ci = (child_info_spawn *) get_cygwin_startup_info ();
+
+  if (ci && (ptr = ci->moreinfo->envp)) 
+    {
+      for (; *ptr; ptr++)
+	if (strncasematch (name, *ptr, s)
+	    && (*(*ptr + s) == '='))
+	  return *ptr + s + 1;
+    }
+  else if ((rawenv = GetEnvironmentStrings ()))
+    {
+      while (*rawenv)
+	if (strncasematch (name, rawenv, s)
+	    && (*(rawenv + s) == '='))
+	  return rawenv + s + 1;
+	else
+	  rawenv = strchr (rawenv, 0) + 1;
+    }
+  return NULL;
+}
+
+static char * (*findenv_func)(const char *, int *) = (char * (*)(const char *, int *)) getearly;
+
+/*
  * getenv --
  *	Returns ptr to value associated with name, if any, else NULL.
  */
@@ -232,8 +267,7 @@ extern "C" char *
 getenv (const char *name)
 {
   int offset;
-
-  return my_findenv (name, &offset);
+  return findenv_func (name, &offset);
 }
 
 static int __stdcall
@@ -808,6 +842,7 @@ environ_init (char **envp, int envc)
   FreeEnvironmentStrings (rawenv);
 
 out:
+  findenv_func = (char * (*)(const char*, int*)) my_findenv;
   __cygwin_environ = envp;
   update_envptrs ();
   if (envp_passed_in)
