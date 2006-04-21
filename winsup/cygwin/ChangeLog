@@ -1,3 +1,8 @@
+2006-04-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/asm/byteorder.h: Include stdint.h.  Per standard, change
+	datatypes in ntohX and htonX functions to uintXX_t types.
+
 2006-04-18  Christopher Faylor  <cgf@timesys.com>
 
 	* exceptions.cc (ctrl_c_handler): Only exit TRUE on CTRL_LOGOFF_EVENT

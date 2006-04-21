@@ -11,15 +11,10 @@ details. */
 #ifndef _I386_BYTEORDER_H
 #define _I386_BYTEORDER_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-#if 0
-#undef ntohl
-#undef ntohs
-#undef htonl
-#undef htons
 #endif
 
 #ifndef __LITTLE_ENDIAN
@@ -30,18 +25,17 @@ extern "C" {
 #define __LITTLE_ENDIAN_BITFIELD
 #endif
 
-#if 1
-extern unsigned long int	ntohl(unsigned long int);
-extern unsigned short int	ntohs(unsigned short int);
-extern unsigned long int	htonl(unsigned long int);
-extern unsigned short int	htons(unsigned short int);
+extern uint32_t	ntohl(uint32_t);
+extern uint16_t	ntohs(uint16_t);
+extern uint32_t	htonl(uint32_t);
+extern uint16_t	htons(uint16_t);
 
-extern __inline__ unsigned long int	__ntohl(unsigned long int);
-extern __inline__ unsigned short int	__ntohs(unsigned short int);
-extern __inline__ unsigned long int	__constant_ntohl(unsigned long int);
-extern __inline__ unsigned short int	__constant_ntohs(unsigned short int);
+extern __inline__ uint32_t	__ntohl(uint32_t);
+extern __inline__ uint16_t	__ntohs(uint16_t);
+extern __inline__ uint32_t	__constant_ntohl(uint32_t);
+extern __inline__ uint16_t	__constant_ntohs(uint16_t);
 
-extern __inline__ unsigned long int
+extern __inline__ uint32_t
 __ntohl(unsigned long int x)
 {
 	__asm__("xchgb %b0,%h0\n\t"	/* swap lower bytes	*/
@@ -53,13 +47,13 @@ __ntohl(unsigned long int x)
 }
 
 #define __constant_ntohl(x) \
-	((unsigned long int)((((unsigned long int)(x) & 0x000000ffU) << 24) | \
-			     (((unsigned long int)(x) & 0x0000ff00U) <<  8) | \
-			     (((unsigned long int)(x) & 0x00ff0000U) >>  8) | \
-			     (((unsigned long int)(x) & 0xff000000U) >> 24)))
+	((uint32_t)((((uint32_t)(x) & 0x000000ffU) << 24) | \
+		   (((uint32_t)(x) & 0x0000ff00U) <<  8) | \
+		   (((uint32_t)(x) & 0x00ff0000U) >>  8) | \
+		   (((uint32_t)(x) & 0xff000000U) >> 24)))
 
-extern __inline__ unsigned short int
-__ntohs(unsigned short int x)
+extern __inline__ uint16_t
+__ntohs(uint16_t x)
 {
 	__asm__("xchgb %b0,%h0"		/* swap bytes		*/
 		: "=q" (x)
@@ -68,8 +62,8 @@ __ntohs(unsigned short int x)
 }
 
 #define __constant_ntohs(x) \
-	((unsigned short int)((((unsigned short int)(x) & 0x00ff) << 8) | \
-			      (((unsigned short int)(x) & 0xff00) >> 8))) \
+	((uint16_t)((((uint16_t)(x) & 0x00ff) << 8) | \
+		   (((uint16_t)(x) & 0xff00) >> 8))) \
 
 #define __htonl(x) __ntohl(x)
 #define __htons(x) __ntohs(x)
@@ -93,7 +87,6 @@ __ntohs(unsigned short int x)
 (__builtin_constant_p((short)(x)) ? \
  __constant_htons((x)) : \
  __htons((x)))
-#endif
 #endif
 
 #ifdef __cplusplus
