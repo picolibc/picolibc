@@ -189,13 +189,10 @@ posify (char **here, const char *value)
   MALLOC_CHECK;
 }
 
-/*
- * my_findenv --
- *	Returns pointer to value associated with name, if any, else NULL.
- *	Sets offset to be the offset of the name/value combination in the
- *	environment array, for use by setenv(3) and unsetenv(3).
- *	Explicitly removes '=' in argument name.
- */
+/* Returns pointer to value associated with name, if any, else NULL.
+  Sets offset to be the offset of the name/value combination in the
+  environment array, for use by setenv(3) and unsetenv(3).
+  Explicitly removes '=' in argument name.  */
 
 static char * __stdcall
 my_findenv (const char *name, int *offset)
