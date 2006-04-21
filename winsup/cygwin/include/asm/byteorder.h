@@ -36,7 +36,7 @@ extern __inline__ uint32_t	__constant_ntohl(uint32_t);
 extern __inline__ uint16_t	__constant_ntohs(uint16_t);
 
 extern __inline__ uint32_t
-__ntohl(unsigned long int x)
+__ntohl(uint32_t x)
 {
 	__asm__("xchgb %b0,%h0\n\t"	/* swap lower bytes	*/
 		"rorl $16,%0\n\t"	/* swap words		*/

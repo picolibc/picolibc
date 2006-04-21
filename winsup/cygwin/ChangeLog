@@ -1,3 +1,7 @@
+2006-04-21  Lars Munch  <lars@segv.dk>
+
+	* include/asm/byteorder.h (__ntohl): Fix the missing uint32_t.
+
 2006-04-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::wait): Reorder setting
