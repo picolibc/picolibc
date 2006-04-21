@@ -1,5 +1,15 @@
 2006-04-21  Christopher Faylor  <cgf@timesys.com>
 
+	* environ.cc (rawenv): Make this variable a file-scope static.
+	(getearly): Rename 's' variable to 'len' since 's' is used fairly
+	consistently throughout cygwin as a string variable.  Remove rawenv
+	declaration.  Perform other minor cleanups.
+	(environ_init): Remove rawenv declaration.  Only set rawenv to
+	GetEnvironmentStrings() if it has not already been set.  Properly free
+	rawenv in all cases.
+
+2006-04-21  Christopher Faylor  <cgf@timesys.com>
+
 	* tty.h (tty::hwnd): Move to tty_min.
 	(tty::gethwnd): Ditto.
 	(tty::sethwnd): Ditto.

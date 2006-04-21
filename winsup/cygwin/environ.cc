@@ -222,46 +222,33 @@ my_findenv (const char *name, int *offset)
   MALLOC_CHECK;
   return NULL;
 }
+  
+static NO_COPY char *rawenv;
 
-/*
- * getearly --
- *	Primitive getenv before the environment is built.
- */
+/* Primitive getenv before the environment is built.  */
 
-static char * __stdcall
+static char __stdcall *
 getearly (const char * name, int *offset __attribute__ ((unused)))
 {
-  int s = strlen (name);
-  char * rawenv;
-  char ** ptr;
-  child_info *get_cygwin_startup_info ();
-  child_info_spawn *ci = (child_info_spawn *) get_cygwin_startup_info ();
+  char *p;
+  char **ptr;
+  int len = strlen (name);
 
-  if (ci && (ptr = ci->moreinfo->envp)) 
-    {
-      for (; *ptr; ptr++)
-	if (strncasematch (name, *ptr, s)
-	    && (*(*ptr + s) == '='))
-	  return *ptr + s + 1;
-    }
-  else if ((rawenv = GetEnvironmentStrings ()))
-    {
-      while (*rawenv)
-	if (strncasematch (name, rawenv, s)
-	    && (*(rawenv + s) == '='))
-	  return rawenv + s + 1;
-	else
-	  rawenv = strchr (rawenv, 0) + 1;
-    }
+  if (spawn_info && (ptr = spawn_info->moreinfo->envp)) 
+    for (; *ptr; ptr++)
+      if (strncasematch (name, *ptr, len) && *ptr[len] == '=')
+	return *ptr + len + 1;
+  else if (rawenv || (rawenv = GetEnvironmentStrings ()))
+    for (p = rawenv; *p; p = strchr (p, '\0') + 1)
+      if (strncasematch (name, p, len) && p[len] == '=')
+	return p + len + 1;
+
   return NULL;
 }
 
 static char * (*findenv_func)(const char *, int *) = (char * (*)(const char *, int *)) getearly;
 
-/*
- * getenv --
- *	Returns ptr to value associated with name, if any, else NULL.
- */
+/* Returns ptr to value associated with name, if any, else NULL.  */
 
 extern "C" char *
 getenv (const char *name)
@@ -362,7 +349,7 @@ _addenv (const char *name, const char *value, int overwrite)
   return 0;
 }
 
-/* putenv Sets an environment variable */
+/* Set an environment variable */
 extern "C" int
 putenv (char *str)
 {
@@ -381,7 +368,7 @@ putenv (char *str)
   return 0;
 }
 
-/* setenv -- Set the value of the environment variable "name" to be
+/* Set the value of the environment variable "name" to be
    "value".  If overwrite is set, replace any current value.  */
 extern "C" int
 setenv (const char *name, const char *value, int overwrite)
@@ -396,7 +383,7 @@ setenv (const char *name, const char *value, int overwrite)
   return _addenv (name, value, !!overwrite);
 }
 
-/* unsetenv(name) -- Delete environment variable "name".  */
+/* Delete environment variable "name".  */
 extern "C" int
 unsetenv (const char *name)
 {
@@ -749,7 +736,6 @@ regopt (const char *name)
 void
 environ_init (char **envp, int envc)
 {
-  char *rawenv;
   int i;
   char *p;
   char *newp;
@@ -798,19 +784,27 @@ environ_init (char **envp, int envc)
 	    cfree (p);
 	  }
       envp_passed_in = 1;
+      if (rawenv)
+	{
+	  FreeEnvironmentStrings (rawenv);
+	  rawenv = NULL;
+	}
       goto out;
     }
 
   /* Allocate space for environment + trailing NULL + CYGWIN env. */
   lastenviron = envp = (char **) malloc ((4 + (envc = 100)) * sizeof (char *));
 
-  rawenv = GetEnvironmentStrings ();
   if (!rawenv)
     {
-      system_printf ("GetEnvironmentStrings returned NULL, %E");
-      return;
+      rawenv = GetEnvironmentStrings ();
+      if (!rawenv)
+	{
+	  system_printf ("GetEnvironmentStrings returned NULL, %E");
+	  return;
+	}
     }
-  debug_printf ("GetEnvironmentStrings returned %p - \"%s\"", rawenv, rawenv);
+  debug_printf ("rawenv %p - \"%s\"", rawenv, rawenv);
 
   /* Current directory information is recorded as variables of the
      form "=X:=X:\foo\bar; these must be changed into something legal
@@ -840,6 +834,7 @@ environ_init (char **envp, int envc)
     envp[i++] = strdup (cygterm);
   envp[i] = NULL;
   FreeEnvironmentStrings (rawenv);
+  rawenv = NULL;
 
 out:
   findenv_func = (char * (*)(const char*, int*)) my_findenv;
