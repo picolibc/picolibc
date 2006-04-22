@@ -327,6 +327,7 @@ killpg (pid_t pgrp, int sig)
 extern "C" void
 abort (void)
 {
+  _my_tls.incyg++;
   sig_dispatch_pending ();
   /* Flush all streams as per SUSv2.
      From my reading of this document, this isn't strictly correct.
@@ -344,9 +345,7 @@ abort (void)
   sigdelset (&sig_mask, SIGABRT);
   set_signal_mask (sig_mask, myself->getsigmask ());
 
-  _my_tls.incyg++;
   raise (SIGABRT);
-  _my_tls.incyg--;
   _my_tls.call_signal_handler (); /* Call any signal handler */
   do_exit (SIGABRT);	/* signal handler didn't exit.  Goodbye. */
 }

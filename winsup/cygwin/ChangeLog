@@ -1,7 +1,11 @@
 2006-04-22  Christopher Faylor  <cgf@timesys.com>
 
-	* abort.cc (abort): Set incyg manually to help get a reliable gdb stack
-	trace.
+	* signal.cc (abort): On second thought, just set incyg once.
+
+2006-04-22  Christopher Faylor  <cgf@timesys.com>
+
+	* signal.cc (abort): Set incyg manually to help get a reliable gdb
+	stack trace.
 	* cygwin.din (abort): Make NOSIGFE.
 
 2006-04-21  Pierre Humblet Pierre.Humblet@ieee.org
