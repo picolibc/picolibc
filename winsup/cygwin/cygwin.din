@@ -109,7 +109,7 @@ vscanf_r = _vscanf_r SIGFE
 _vsscanf_r SIGFE
 vsscanf_r = _vsscanf_r SIGFE
 a64l NOSIGFE
-abort SIGFE
+abort NOSIGFE
 _abort = abort SIGFE
 abs NOSIGFE
 _abs = abs NOSIGFE
