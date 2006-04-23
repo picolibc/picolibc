@@ -1,3 +1,10 @@
+2006-04-23  Corinna Vinschen  <corinna@vinschen.de>
+	    Christopher Faylor  <cgf@timesys.com>
+
+	* select.cc (thread_pipe): Raise sleep time dynamically to speed up
+	select on pipes when copying lots of data.
+	(thread_mailslot): Ditto for mailslots.
+
 2006-04-22  Christopher Faylor  <cgf@timesys.com>
 
 	* signal.cc (abort): On second thought, just set incyg once.

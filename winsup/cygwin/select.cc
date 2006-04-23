@@ -622,6 +622,7 @@ thread_pipe (void *arg)
 {
   pipeinf *pi = (pipeinf *) arg;
   bool gotone = false;
+  DWORD sleep_time = 0;
 
   for (;;)
     {
@@ -645,7 +646,9 @@ thread_pipe (void *arg)
 	}
       if (gotone)
 	break;
-      Sleep (10);
+      Sleep (sleep_time >> 1);
+      if (sleep_time < 20)
+        ++sleep_time;
     }
 out:
   return 0;
@@ -1634,6 +1637,7 @@ thread_mailslot (void *arg)
 {
   mailslotinf *mi = (mailslotinf *) arg;
   bool gotone = false;
+  DWORD sleep_time = 0;
 
   for (;;)
     {
@@ -1657,7 +1661,9 @@ thread_mailslot (void *arg)
 	}
       if (gotone)
 	break;
-      Sleep (10);
+      Sleep (sleep_time >> 1);
+      if (sleep_time < 20)
+        ++sleep_time;
     }
 out:
   return 0;
