@@ -1,3 +1,9 @@
+2006-04-24  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* arm-tdep.c (thumb_heuristic_function_start): New function.
+	(thumb_scan_prologue): Use it.
+	(arm_prologue_this_id): Adjust LOWEST_PC check.
+
 2006-04-19  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	Merge from gdb-csl-20060226-branch:
