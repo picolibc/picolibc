@@ -304,8 +304,6 @@ int WSAAPI getnameinfo(const struct sockaddr*,socklen_t,char*,DWORD,
 /* FIXME: Need WS protocol-independent API helpers.  */
 #endif
 
-/* One might well ask if gai_strerror has been ripped from MS Platform SDK
-   headers.  It is obviously not thread-safe.  */
 static __inline char*
 gai_strerrorA(int ecode)
 {

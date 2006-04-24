@@ -1,3 +1,10 @@
+2006-04-24  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/ws2tcpip.h (gai_strerror): Remove thread-safety comment.
+	This function cannot be made thread-safe, the API would have to be
+	changed for that, just like strerror() -> strerror_r() and similar
+	ISO C or POSIX functions...
+
 2006-04-19  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/edevdefs.h: New file.
