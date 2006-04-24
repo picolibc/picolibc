@@ -233,7 +233,7 @@ getearly (const char * name, int *)
     {
       len = strlen (name);
       for (; *ptr; ptr++)
-	if (strncasematch (name, *ptr, len) && *ptr[len] == '=')
+	if (strncasematch (name, *ptr, len) && (*ptr)[len] == '=')
 	  return *ptr + len + 1;
     }
   else if ((len = GetEnvironmentVariable (name, NULL, 0))
