@@ -1,3 +1,8 @@
+2006-04-24  Julian Brown  <julian@codesourcery.com>
+
+	* libiberty/floatformat.c (floatformat_to_double): Fix (biased)
+	exponent=0 case.
+
 2006-04-12  Carlos O'Donell  <carlos@codesourcery.com>
 
 	* Makefile.tpl: Add install-html to install target deps.
