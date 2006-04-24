@@ -10,6 +10,8 @@ AC_CONFIG_AUX_DIR(../../../..)
 
 NEWLIB_CONFIGURE(../../..)
 
+AC_NO_EXECUTABLES
+
 AC_EGREP_CPP([sh5], [
 #if __SH5__
   sh5

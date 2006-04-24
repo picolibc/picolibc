@@ -1,3 +1,8 @@
+2006-04-24  DJ Delorie  <dj@redhat.com>
+
+	* libc/machine/sh/configure.in: Avoid link tests.
+	* libc/machine/sh/configure: Regenerate.
+
 2006-04-18  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/signal.h (sigdelset, sigfillset, sigismember): New macros.
