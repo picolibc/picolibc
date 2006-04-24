@@ -646,8 +646,8 @@ thread_pipe (void *arg)
 	}
       if (gotone)
 	break;
-      Sleep (sleep_time >> 1);
-      if (sleep_time < 20)
+      Sleep (sleep_time >> 3);
+      if (sleep_time < 80)
         ++sleep_time;
     }
 out:
@@ -1661,8 +1661,8 @@ thread_mailslot (void *arg)
 	}
       if (gotone)
 	break;
-      Sleep (sleep_time >> 1);
-      if (sleep_time < 20)
+      Sleep (sleep_time >> 3);
+      if (sleep_time < 80)
         ++sleep_time;
     }
 out:

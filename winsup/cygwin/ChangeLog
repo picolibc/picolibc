@@ -1,3 +1,8 @@
+2006-04-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* select.cc (thread_pipe): Raise sleep time only every 8th iteration.
+	(thread_mailslot): Ditto.
+
 2006-04-23  Corinna Vinschen  <corinna@vinschen.de>
 	    Christopher Faylor  <cgf@timesys.com>
 
