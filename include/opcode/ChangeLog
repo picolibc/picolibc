@@ -1,4 +1,9 @@
-2006-04-07  Joerg Wunsch <j.gnu@uriah.heep.sax.de>
+2006-04-26  Thiemo Seufer  <ths@networkno.de>
+
+	* mips.h: Improve comments describing the bitfield instruction
+	fields.
+
+2006-04-07  Joerg Wunsch  <j.gnu@uriah.heep.sax.de>
 
 	* avr.h (AVR_ISA_PWMx): New.
 

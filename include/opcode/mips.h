@@ -268,19 +268,20 @@ struct mips_opcode
    "x" accept and ignore register name
    "z" must be zero register
    "K" 5 bit Hardware Register (rdhwr instruction) (OP_*_RD)
-   "+A" 5 bit ins/ext position, which becomes LSB (OP_*_SHAMT).
+   "+A" 5 bit ins/ext/dins/dext/dinsm/dextm position, which becomes
+        LSB (OP_*_SHAMT).
 	Enforces: 0 <= pos < 32.
-   "+B" 5 bit ins size, which becomes MSB (OP_*_INSMSB).
+   "+B" 5 bit ins/dins size, which becomes MSB (OP_*_INSMSB).
 	Requires that "+A" or "+E" occur first to set position.
 	Enforces: 0 < (pos+size) <= 32.
-   "+C" 5 bit ext size, which becomes MSBD (OP_*_EXTMSBD).
+   "+C" 5 bit ext/dext size, which becomes MSBD (OP_*_EXTMSBD).
 	Requires that "+A" or "+E" occur first to set position.
 	Enforces: 0 < (pos+size) <= 32.
 	(Also used by "dext" w/ different limits, but limits for
 	that are checked by the M_DEXT macro.)
-   "+E" 5 bit dins/dext position, which becomes LSB-32 (OP_*_SHAMT).
+   "+E" 5 bit dinsu/dextu position, which becomes LSB-32 (OP_*_SHAMT).
 	Enforces: 32 <= pos < 64.
-   "+F" 5 bit "dinsm" size, which becomes MSB-32 (OP_*_INSMSB).
+   "+F" 5 bit "dinsm/dinsu" size, which becomes MSB-32 (OP_*_INSMSB).
 	Requires that "+A" or "+E" occur first to set position.
 	Enforces: 32 < (pos+size) <= 64.
    "+G" 5 bit "dextm" size, which becomes MSBD-32 (OP_*_EXTMSBD).
