@@ -1,3 +1,23 @@
+2006-04-26  Julian Brown  <julian@codesourcery.com>
+
+	* gas/config/tc-arm.c (neon_is_quarter_float): Move, and rename to...
+	(is_quarter_float): Rename from above. Simplify slightly.
+	(parse_qfloat_immediate): Parse a "quarter precision" floating-point
+	number.
+	(parse_neon_mov): Parse floating-point constants.
+	(neon_qfloat_bits): Fix encoding.
+	(neon_cmode_for_move_imm): Tweak to use floating-point encoding in
+	preference to integer encoding when using the F32 type.
+
+   	* gas/testsuite/gas/arm/neon-const.s: New testcase. Neon floating-point
+	constants.
+	* gas/testsuite/gas/arm/neon-const.d: Expected output of above.
+	* gas/testsuite/gas/arm/neon-cov.d: Expect floating-point disassembly
+	for VMOV.F32.
+
+   	* opcodes/arm-dis.c (print_insn_neon): Disassemble floating-point
+	constant VMOV.
+
 2006-04-24  Julian Brown  <julian@codesourcery.com>
 
 	* libiberty/floatformat.c (floatformat_to_double): Fix (biased)
