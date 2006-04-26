@@ -92,8 +92,12 @@ struct fs_info
     unsigned has_buggy_open  : 1;
     unsigned has_ea          : 1;
     unsigned has_acls        : 1;
-    unsigned is_fat          : 1;
+    unsigned hasgood_inode   : 1;
     unsigned drive_type      : 3;
+    unsigned is_fat          : 1;
+    unsigned is_ntfs         : 1;
+    unsigned is_samba        : 1;
+    unsigned is_nfs          : 1;
   } status;
  public:
   void clear ()
@@ -104,18 +108,26 @@ struct fs_info
     has_buggy_open (false);
     has_ea (false);
     has_acls (false);
-    is_fat (false);
+    hasgood_inode (false);
     drive_type (false);
+    is_fat (false);
+    is_ntfs (false);
+    is_samba (false);
+    is_nfs (false);
   }
   inline DWORD& flags () {return status.flags;};
   inline DWORD& serial () {return status.serial;};
 
   IMPLEMENT_STATUS_FLAG (bool, is_remote_drive)
   IMPLEMENT_STATUS_FLAG (bool, has_buggy_open)
-  IMPLEMENT_STATUS_FLAG (bool, is_fat)
   IMPLEMENT_STATUS_FLAG (bool, has_ea)
   IMPLEMENT_STATUS_FLAG (bool, has_acls)
+  IMPLEMENT_STATUS_FLAG (bool, hasgood_inode)
   IMPLEMENT_STATUS_FLAG (DWORD, drive_type)
+  IMPLEMENT_STATUS_FLAG (bool, is_fat)
+  IMPLEMENT_STATUS_FLAG (bool, is_ntfs)
+  IMPLEMENT_STATUS_FLAG (bool, is_samba)
+  IMPLEMENT_STATUS_FLAG (bool, is_nfs)
 
   bool update (const char *);
 };
@@ -133,13 +145,13 @@ class path_conv
   device dev;
   bool case_clash;
 
-  bool isremote () {return fs.is_remote_drive ();}
-  int has_acls () const {return fs.has_acls (); }
+  bool isremote () const {return fs.is_remote_drive ();}
+  bool has_acls () const {return fs.has_acls (); }
+  bool hasgood_inode () const {return fs.hasgood_inode (); }
+  bool isgood_inode (__ino64_t ino) const;
   int has_symlinks () const {return path_flags & PATH_HAS_SYMLINKS;}
-  bool hasgood_inode (); /* Implemented in fhandler_disk_file.cc */
-  bool is_samba ();      /* Implemented in fhandler_disk_file.cc */
   int has_buggy_open () const {return fs.has_buggy_open ();}
-  bool isencoded () {return path_flags & PATH_ENC;}
+  bool isencoded () const {return path_flags & PATH_ENC;}
   int binmode () const
   {
     if (path_flags & PATH_BINARY)
@@ -222,14 +234,17 @@ class path_conv
   operator DWORD &() {return fileattr;}
   operator int () {return fileattr; }
   char operator [](int i) const {return path[i];}
-  DWORD get_devn () {return dev.devn;}
-  short get_unitn () {return dev.minor;}
-  DWORD file_attributes () {return fileattr;}
+  DWORD get_devn () const {return dev.devn;}
+  short get_unitn () const {return dev.minor;}
+  DWORD file_attributes () const {return fileattr;}
   void file_attributes (DWORD new_attr) {fileattr = new_attr;}
-  DWORD drive_type () {return fs.drive_type ();}
+  DWORD drive_type () const {return fs.drive_type ();}
   DWORD fs_flags () {return fs.flags ();}
-  bool fs_has_ea () {return fs.has_ea ();}
-  bool fs_is_fat () {return fs.is_fat ();}
+  bool fs_has_ea () const {return fs.has_ea ();}
+  bool fs_is_fat () const {return fs.is_fat ();}
+  bool fs_is_ntfs () const {return fs.is_ntfs ();}
+  bool fs_is_samba () const {return fs.is_samba ();}
+  bool fs_is_nfs () const {return fs.is_nfs ();}
   void set_path (const char *p) {strcpy (path, p);}
   DWORD volser () { return fs.serial (); }
   void fillin (HANDLE h);

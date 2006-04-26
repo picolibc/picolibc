@@ -423,15 +423,26 @@ fs_info::update (const char *win32_path)
       return false;
     }
 
-  /* FIXME: Samba by default returns "NTFS" in file system name, but
-   * doesn't support Extended Attributes. If there's some fast way to
-   * distinguish between samba and real ntfs, it should be implemented
-   * here.
-   */
-  has_ea (!is_remote_drive () && strcmp (fsname, "NTFS") == 0);
+#define FS_IS_SAMBA (FILE_CASE_SENSITIVE_SEARCH \
+		     | FILE_CASE_PRESERVED_NAMES \
+		     | FILE_PERSISTENT_ACLS)
+#define FS_IS_SAMBA_WITH_QUOTA \
+		    (FILE_CASE_SENSITIVE_SEARCH \
+		     | FILE_CASE_PRESERVED_NAMES \
+		     | FILE_PERSISTENT_ACLS \
+		     | FILE_VOLUME_QUOTAS)
+  is_fat (strncasematch (fsname, "FAT", 3));
+  is_samba (strcmp (fsname, "NTFS") == 0 && is_remote_drive ()
+	    && (flags () == FS_IS_SAMBA || flags () == FS_IS_SAMBA_WITH_QUOTA));
+  is_ntfs (strcmp (fsname, "NTFS") == 0 && !is_samba ());
+  is_nfs (strcmp (fsname, "NFS") == 0);
+
+  has_ea (is_ntfs ());
   has_acls ((flags () & FS_PERSISTENT_ACLS)
 	    && (allow_smbntsec || !is_remote_drive ()));
-  is_fat (strncasematch (fsname, "FAT", 3));
+  hasgood_inode (((flags () & FILE_PERSISTENT_ACLS)
+		  && drive_type () != DRIVE_UNKNOWN)
+		 || is_nfs ());
   /* Known file systems with buggy open calls. Further explanation
      in fhandler.cc (fhandler_disk_file::open). */
   has_buggy_open (!strcmp (fsname, "SUNWNFS"));

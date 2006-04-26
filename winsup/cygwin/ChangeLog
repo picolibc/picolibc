@@ -1,3 +1,30 @@
+2006-04-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_base): Change fstat_helper prototype
+	to take file size and inode number as 64 bit values.
+	* fhandler_disk_file.cc (FS_IS_SAMBA): Move to path.cc
+	(FS_IS_SAMBA_WITH_QUOTA): Ditto.
+	(path_conv::hasgood_inode): Delete.
+	(path_conv::is_samba): Delete.
+	(path_conv::isgood_inode): Centralized function to recognize
+	a good inode number.
+	(fhandler_base::fstat_by_handle): Constify fvi_size and fai_size.
+	Accomodate argument change in fstat_helper.
+	(fhandler_base::fstat_by_name): Ditto.
+	(fhandler_base::fstat_helper): Accomodate argument change.  Call
+	path_conv::isgood_inode to recognize good inodes.
+	(fhandler_disk_file::opendir): Explain Samba weirdness here.
+	Call path_conv::fs_is_samba instead of path_conv::is_samba.
+	(fhandler_disk_file::readdir): Add STATUS_INVALID_INFO_CLASS
+	as valid return code from NtQueryDirectoryFile to indicate that
+	FileIdBothDirectoryInformation is not supported.
+	Call path_conv::isgood_inode to recognize good inodes.
+	* ntdll.h (STATUS_INVALID_INFO_CLASS): Define.
+	* path.cc (fs_info::update): Rework file system recognition
+	and set appropriate flags.
+	* path.h (struct fs_info): Add is_ntfs, is_samba and is_nfs flags.
+	Constify pure read accessors.
+
 2006-04-24  Christopher Faylor  <cgf@timesys.com>
 
 	* environ.cc (getearly): Force correct dereference order when

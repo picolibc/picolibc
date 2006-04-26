@@ -196,46 +196,15 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
   return count + saw_dot;
 }
 
-#define FS_IS_SAMBA (FILE_CASE_SENSITIVE_SEARCH \
-		     | FILE_CASE_PRESERVED_NAMES \
-		     | FILE_PERSISTENT_ACLS)
-
-#define FS_IS_SAMBA_WITH_QUOTA \
-		    (FILE_CASE_SENSITIVE_SEARCH \
-		     | FILE_CASE_PRESERVED_NAMES \
-		     | FILE_PERSISTENT_ACLS \
-		     | FILE_VOLUME_QUOTAS)
-
 inline bool
-path_conv::hasgood_inode ()
+path_conv::isgood_inode (__ino64_t ino) const
 {
-  /* Assume that if a drive has ACL support it MAY have valid "inodes".
-     It definitely does not have valid inodes if it does not have ACL
-     support.  Decouple from has_acls() which follows smbntsec setting. */
-  return ((fs_flags () & FILE_PERSISTENT_ACLS)
-	  && drive_type () != DRIVE_UNKNOWN);
-}
-
-inline bool
-path_conv::is_samba ()
-{
-  /* Something weird happens on Samba up to version 3.0.21c, which is
-     fixed in 3.0.22.  FileIdBothDirectoryInformation seems to work
-     nicely, but only up to the 128th entry in the directory.  After
-     reaching this entry, the next call to
-     NtQueryDirectoryFile(FileIdBothDirectoryInformation) returns
-     STATUS_INVAILD_LEVEL.  Why should we care, we can just switch to
-     FileBothDirectoryInformation, isn't it?  Nope!  The next call to
-     NtQueryDirectoryFile(FileBothDirectoryInformation) actually returns
-     STATUS_NO_MORE_FILES, regardless how many files are left unread in
-     the directory.  This does not happen when using
-     FileBothDirectoryInformation right from the start.  In that case we
-     can read the whole directory unmolested.  So we have to excempt
-     Samba from the usage of FileIdBothDirectoryInformation entirely,
-     even though Samba returns valid File IDs. */
-  return drive_type () == DRIVE_REMOTE
-	 && (fs_flags () == FS_IS_SAMBA
-	     || fs_flags () == FS_IS_SAMBA_WITH_QUOTA);
+  /* We can't trust remote inode numbers of only 32 bit.  That means,
+     all remote inode numbers when running under NT4, as well as remote NT4
+     NTFS, as well as shares of Samba version < 3.0.
+     The known exception are SFU NFS shares, which return the valid 32 bit 
+     inode number from the remote file system unchanged. */
+  return hasgood_inode () && (ino > UINT32_MAX || !isremote () || fs_is_nfs ());
 }
 
 int __stdcall
@@ -248,8 +217,9 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
       NTSTATUS status;
       IO_STATUS_BLOCK io;
       /* The entries potentially contain a name of MAX_PATH wide characters. */
-      DWORD fvi_size = 2 * CYG_MAX_PATH + sizeof (FILE_FS_VOLUME_INFORMATION);
-      DWORD fai_size = 2 * CYG_MAX_PATH + sizeof (FILE_ALL_INFORMATION);
+      const DWORD fvi_size = 2 * CYG_MAX_PATH
+			     + sizeof (FILE_FS_VOLUME_INFORMATION);
+      const DWORD fai_size = 2 * CYG_MAX_PATH + sizeof (FILE_ALL_INFORMATION);
 
       PFILE_FS_VOLUME_INFORMATION pfvi = (PFILE_FS_VOLUME_INFORMATION)
       					 alloca (fvi_size);
@@ -278,11 +248,9 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 			   *(FILETIME *) &pfai->BasicInformation.LastAccessTime,
 			   *(FILETIME *) &pfai->BasicInformation.LastWriteTime,
 			   pfvi->VolumeSerialNumber,
-			   pfai->StandardInformation.EndOfFile.HighPart,
-			   pfai->StandardInformation.EndOfFile.LowPart,
+			   pfai->StandardInformation.EndOfFile.QuadPart,
 			   pfai->StandardInformation.AllocationSize.QuadPart,
-			   pfai->InternalInformation.FileId.HighPart,
-			   pfai->InternalInformation.FileId.LowPart,
+			   pfai->InternalInformation.FileId.QuadPart,
 			   pfai->StandardInformation.NumberOfLinks,
 			   pfai->BasicInformation.FileAttributes);
 	}
@@ -313,11 +281,11 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 		       local.ftLastAccessTime,
 		       local.ftLastWriteTime,
 		       local.dwVolumeSerialNumber,
-		       local.nFileSizeHigh,
-		       local.nFileSizeLow,
+		       (ULONGLONG) local.nFileSizeHigh << 32
+				   | local.nFileSizeLow,
 		       -1LL,
-		       local.nFileIndexHigh,
-		       local.nFileIndexLow,
+		       (ULONGLONG) local.nFileIndexHigh << 32
+				   | local.nFileIndexLow,
 		       local.nNumberOfLinks,
 		       local.dwFileAttributes);
 }
@@ -344,18 +312,17 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
 			  local.ftLastAccessTime,
 			  local.ftLastWriteTime,
 			  pc.volser (),
-			  local.nFileSizeHigh,
-			  local.nFileSizeLow,
+			  (ULONGLONG) local.nFileSizeHigh << 32
+				      | local.nFileSizeLow,
 			  -1LL,
-			  0,
-			  0,
+			  0ULL,
 			  1,
 			  local.dwFileAttributes);
     }
   else if (pc.isdir ())
     {
       FILETIME ft = {};
-      res = fstat_helper (buf, ft, ft, ft, pc.volser (), 0, 0, -1LL, 0, 0, 1,
+      res = fstat_helper (buf, ft, ft, ft, pc.volser (), 0ULL, -1LL, 0ULL, 1,
 			  FILE_ATTRIBUTE_DIRECTORY);
     }
   else
@@ -433,11 +400,9 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 			     FILETIME ftLastAccessTime,
 			     FILETIME ftLastWriteTime,
 			     DWORD dwVolumeSerialNumber,
-			     DWORD nFileSizeHigh,
-			     DWORD nFileSizeLow,
+			     ULONGLONG nFileSize,
 			     LONGLONG nAllocSize,
-			     DWORD nFileIndexHigh,
-			     DWORD nFileIndexLow,
+			     ULONGLONG nFileIndex,
 			     DWORD nNumberOfLinks,
 			     DWORD dwFileAttributes)
 {
@@ -448,7 +413,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
   to_timestruc_t (&ftLastWriteTime, &buf->st_mtim);
   to_timestruc_t (&ftChangeTime, &buf->st_ctim);
   buf->st_dev = dwVolumeSerialNumber ?: pc.volser ();
-  buf->st_size = ((_off64_t) nFileSizeHigh << 32) + nFileSizeLow;
+  buf->st_size = (_off64_t) nFileSize;
   /* The number of links to a directory includes the
      number of subdirectories in the directory, since all
      those subdirectories point to it.
@@ -457,12 +422,9 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
      let's try it with `1' as link count. */
   buf->st_nlink = pc.ndisk_links (nNumberOfLinks);
 
-  /* We can't trust remote inode numbers of only 32 bit.  That means,
-     all remote inode numbers when running under NT4, as well as remote NT4
-     NTFS, as well as shares of Samba version < 3.0. */
-  if (pc.hasgood_inode () && (nFileIndexHigh || !pc.isremote ()))
-    buf->st_ino = (((__ino64_t) nFileIndexHigh) << 32)
-		  | (__ino64_t) nFileIndexLow;
+  /* Enforce namehash as inode number on untrusted file systems. */
+  if (pc.isgood_inode (nFileIndex))
+    buf->st_ino = (__ino64_t) nFileIndex;
   else
     buf->st_ino = get_namehash ();
 
@@ -1586,7 +1548,23 @@ fhandler_disk_file::opendir ()
 	      if (pc.hasgood_inode ())
 		{
 		  dir->__flags |= dirent_set_d_ino;
-		  if (wincap.has_fileid_dirinfo () && !pc.is_samba ())
+		  /* Something weird happens on Samba up to version 3.0.21c,
+		     which is fixed in 3.0.22.  FileIdBothDirectoryInformation
+		     seems to work nicely, but only up to the 128th entry in
+		     the directory.  After reaching this entry, the next call
+		     to NtQueryDirectoryFile(FileIdBothDirectoryInformation)
+		     returns STATUS_INVALID_LEVEL.  Why should we care, we can
+		     just switch to FileBothDirectoryInformation, isn't it?
+		     Nope!  The next call to
+		     NtQueryDirectoryFile(FileBothDirectoryInformation)
+		     actually returns STATUS_NO_MORE_FILES, regardless how
+		     many files are left unread in the directory.  This does
+		     not happen when using FileBothDirectoryInformation right
+		     from the start.  In that case we can read the whole
+		     directory unmolested.  So we have to excempt Samba from
+		     the usage of FileIdBothDirectoryInformation entirely,
+		     even though Samba returns valid File IDs. */
+		  if (wincap.has_fileid_dirinfo () && !pc.fs_is_samba ())
 		    dir->__flags |= dirent_get_d_ino;
 		}
 	    }
@@ -1736,7 +1714,8 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 	     back to using a standard directory query in this case and note
 	     this case using the dirent_get_d_ino flag. */
 	  if (status == STATUS_INVALID_LEVEL
-	      || status == STATUS_INVALID_PARAMETER)
+	      || status == STATUS_INVALID_PARAMETER
+	      || status == STATUS_INVALID_INFO_CLASS)
 	    dir->__flags &= ~dirent_get_d_ino;
 	}
       if (!(dir->__flags & dirent_get_d_ino))
@@ -1788,10 +1767,8 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 		  CloseHandle (hdl);
 		}
 	    }
-	  /* We can't trust remote inode numbers of only 32 bit.  That means,
-	     all remote inode numbers when running under NT4, as well as
-	     remote NT4 NTFS, as well as shares of Samba version < 3.0. */
-	  if (de->d_ino <= UINT32_MAX && pc.isremote ())
+	  /* Enforce namehash as inode number on untrusted file systems. */
+	  if (!pc.isgood_inode (de->d_ino))
 	    {
 	      dir->__flags &= ~dirent_set_d_ino;
 	      de->d_ino = 0;

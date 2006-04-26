@@ -8,6 +8,7 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
+#define STATUS_INVALID_INFO_CLASS   ((NTSTATUS) 0xc0000003)
 #define STATUS_INFO_LENGTH_MISMATCH ((NTSTATUS) 0xc0000004)
 #define STATUS_INVALID_PARAMETER    ((NTSTATUS) 0xc000000d)
 #define STATUS_BUFFER_TOO_SMALL     ((NTSTATUS) 0xc0000023)

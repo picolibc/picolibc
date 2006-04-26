@@ -266,11 +266,9 @@ class fhandler_base
 			      FILETIME ftLastAccessTime,
 			      FILETIME ftLastWriteTime,
 			      DWORD dwVolumeSerialNumber,
-			      DWORD nFileSizeHigh,
-			      DWORD nFileSizeLow,
+			      ULONGLONG nFileSize,
 			      LONGLONG nAllocSize,
-			      DWORD nFileIndexHigh,
-			      DWORD nFileIndexLow,
+			      ULONGLONG nFileIndex,
 			      DWORD nNumberOfLinks,
 			      DWORD dwFileAttributes)
     __attribute__ ((regparm (3)));
