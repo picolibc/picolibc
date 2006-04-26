@@ -1,5 +1,23 @@
 2006-04-26  Julian Brown  <julian@codesourcery.com>
 
+	* gas/config/tc-arm.c (parse_vfp_reg_list): Improve register bounds
+	checking.
+	(do_neon_mov): Enable several VMOV variants for VFP. Add suitable
+	architecture version checks.
+	(insns): Allow overlapping instructions to be used in VFP mode.
+
+   	* gas/testsuite/gas/arm/vfp-neon-overlap.s: New test. Overlapping
+	VFP/Neon instructions.
+	* gas/testsuite/gas/arm/vfp-neon-overlap.d: Expected output of above.
+	* gas/testsuite/gas/arm/vfp1xD.d: Test for fldmx/fstmx.
+	* gas/testsuite/gas/arm/vfp1xD_t2.d: Likewise.
+	* gas/testsuite/gas/arm/vfpv3-32drs.d: Likewise.
+
+   	* opcodes/arm-dis.c (coprocessor_opcodes): Don't interpret fldmx/fstmx
+	as vldm/vstm.
+
+2006-04-26  Julian Brown  <julian@codesourcery.com>
+
 	* gas/config/tc-arm.c (neon_is_quarter_float): Move, and rename to...
 	(is_quarter_float): Rename from above. Simplify slightly.
 	(parse_qfloat_immediate): Parse a "quarter precision" floating-point
