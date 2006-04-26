@@ -1,3 +1,11 @@
+2006-04-26  Julian Brown  <julian@codesourcery.com>
+
+	* opcode/arm.h (FPU_VFP_EXT_V3): Define constant.
+	(FPU_NEON_EXT_V1): Likewise.
+	(FPU_VFP_HARD): Update.
+	(FPU_VFP_V3): Define macro.
+	(FPU_ARCH_VFP_V3, FPU_ARCH_VFP_V3_PLUS_NEON_V1): Define macros.
+
 2006-04-11  Jim Blandy  <jimb@codesourcery.com>
 
 	* libiberty.h (pex_input_file, pex_input_pipe): New declarations.
