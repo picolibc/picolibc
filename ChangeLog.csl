@@ -1,5 +1,20 @@
 2006-04-27  Richard Sandiford  <richard@codesourcery.com>
 
+	include/opcodes/
+	* m68k.h (mcf_mask): Define.
+
+	opcodes/
+	* m68k-opc.c (m68k_opcodes): Fix the masks of the Coldfire fmovemd
+	and fmovem entries.  Put register list entries before immediate
+	mask entries.  Use "l" rather than "L" in the fmovem entries.
+	* m68k-dis.c (match_insn_m68k): Remove the PRIV argument and work it
+	out from INFO.
+	(m68k_scan_mask): New function, split out from...
+	(print_insn_m68k): ...here.  If no architecture has been set,
+	first try printing an m680x0 instruction, then try a Coldfire one.
+
+2006-04-27  Richard Sandiford  <richard@codesourcery.com>
+
 	bfd/
 	* elf32-m68k.c (elf_m68k_pcrel_insn): New structure.
 	(elf_m68k_plt_info): Likewise.
