@@ -1,3 +1,7 @@
+2006-04-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pipe.cc (DEFAULT_PIPEBUFSIZE): Raise to 64K.
+
 2006-04-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_base): Change fstat_helper prototype

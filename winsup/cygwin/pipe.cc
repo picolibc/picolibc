@@ -494,7 +494,7 @@ fhandler_pipe::ioctl (unsigned int cmd, void *p)
   return 0;
 }
 
-#define DEFAULT_PIPEBUFSIZE (4 * PIPE_BUF)
+#define DEFAULT_PIPEBUFSIZE (16 * PIPE_BUF)
 
 extern "C" int
 pipe (int filedes[2])
