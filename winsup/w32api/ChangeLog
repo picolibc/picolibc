@@ -1,5 +1,10 @@
 2006-04-28  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winnt.h (WT_SET_MAX_THREADPOOL_THREADS): Define.
+	Thanks to:    Bruce M Simpson <bms_spc at sf dot net>
+
+2006-04-28  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/ipifcons.h (MIN_IF_TYPE,IF_TYPE_*,MAX_IF_TYPE,IF_ACCESS_*,
 	IF_CHECK_*,IF_CONNECTION_*,IF_ADMIN_*,IF_OPER_*): Define.
 	* include/winbase.h (CancelWaitableTimer,UnregisterWait):
