@@ -1,5 +1,10 @@
 2006-04-28  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/ddk/winddk.h (KAFFINITY): Fix typo.
+	Thanks to:    Oliver Stoeneberg <kidkat at sf dot net>
+
+2006-04-28  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winbase.h (ENUMRES*PROC{AW}): ANSI and Unicode versions.
 	Thanks to:    Oliver Stoeneberg <kidkat at sf dot net>
 

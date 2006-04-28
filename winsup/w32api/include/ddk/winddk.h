@@ -149,7 +149,7 @@ extern struct _KPCR * KeGetCurrentKPCR( void );
 typedef LONG KPRIORITY;
 typedef UCHAR KIRQL, *PKIRQL;
 typedef ULONG_PTR KSPIN_LOCK, *PKSPIN_LOCK;
-typedef ULONG KAFFINITY, *PKAFFINITY;
+typedef ULONG_PTR KAFFINITY, *PKAFFINITY;
 typedef CCHAR KPROCESSOR_MODE;
 
 typedef enum _MODE {
