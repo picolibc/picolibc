@@ -1,5 +1,9 @@
 2006-04-28  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/wingdi.h (BITMAPV5HEADER): New structure definition.
+
+2006-04-28  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/basetyps.h (REFFMTID): Define properly.
 
 2006-04-28  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
