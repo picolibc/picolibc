@@ -1,3 +1,26 @@
+2006-04-29  Paul Brook  <paul@codesourcery.com>
+
+	* opcodes/arm-dis.c (coprocessor_opcodes): Add %c to unconditional
+	arm instructions.
+	(neon_opcodes): Add conditional execution specifiers.
+	(thumb_opcodes): Ditto.
+	(thumb32_opcodes): Ditto.
+	(arm_conditional): Change 0xe to "al" and add "" to end.
+	(ifthen_state, ifthen_next_state, ifthen_address): New.
+	(IFTHEN_COND): Define.
+	(print_insn_coprocessor, print_insn_neon): Print thumb conditions.
+	(print_insn_arm): Change %c to use new values of arm_conditional.
+	(print_insn_thumb16): Print thumb conditions.  Add %I.
+	(print_insn_thumb32): Print thumb conditions.
+	(find_ifthen_state): New function.
+	(print_insn): Track IT block state.
+	* gas/testsuite/gas/arm/thumb2_bcond.d: Update expected output.
+	* gas/testsuite/gas/arm/thumb32.d: Ditto.
+	* gas/testsuite/gas/arm/vfp1_t2.d: Ditto.
+	* gas/testsuite/gas/arm/vfp1xD_t2.d: Ditto.
+	* binutils/testsuite/binutils-all/arm/objdump.exp: New file.
+	* binutils/testsuite/binutils-all/arm/thumb2-cond.s: New test.
+
 2006-04-28  Mark Mitchell  <mark@codesourcery.com>
 
 	* doc/as.texinfo: Mention that some .type syntaxes are not
