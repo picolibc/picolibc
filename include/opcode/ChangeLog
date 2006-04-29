@@ -3,6 +3,14 @@
 	* mips.h: Improve comments describing the bitfield instruction
 	fields.
 
+2006-04-26  Julian Brown  <julian@codesourcery.com>
+
+	* arm.h (FPU_VFP_EXT_V3): Define constant.
+	(FPU_NEON_EXT_V1): Likewise.
+	(FPU_VFP_HARD): Update.
+	(FPU_VFP_V3): Define macro.
+	(FPU_ARCH_VFP_V3, FPU_ARCH_VFP_V3_PLUS_NEON_V1): Define macros.
+
 2006-04-07  Joerg Wunsch  <j.gnu@uriah.heep.sax.de>
 
 	* avr.h (AVR_ISA_PWMx): New.
