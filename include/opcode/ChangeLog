@@ -1,3 +1,10 @@
+2006-04-30  Thiemo Seufer  <ths@mips.com>
+            David Ung  <davidu@mips.com>
+
+	* mips.h: Defines udi bits and masks.  Add description of
+	characters which may appear in the args field of udi
+	instructions.
+
 2006-04-26  Thiemo Seufer  <ths@networkno.de>
 
 	* mips.h: Improve comments describing the bitfield instruction

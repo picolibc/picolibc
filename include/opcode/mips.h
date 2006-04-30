@@ -203,6 +203,16 @@ Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, US
 #define MDMX_FMTSEL_VEC_QH	0x15
 #define MDMX_FMTSEL_VEC_OB	0x16
 
+/* UDI */
+#define OP_SH_UDI1		6
+#define OP_MASK_UDI1		0x1f
+#define OP_SH_UDI2		6
+#define OP_MASK_UDI2		0x3ff
+#define OP_SH_UDI3		6
+#define OP_MASK_UDI3		0x7fff
+#define OP_SH_UDI4		6
+#define OP_MASK_UDI4		0xfffff
+
 /* This structure holds information for a particular instruction.  */
 
 struct mips_opcode
@@ -351,6 +361,12 @@ struct mips_opcode
    "+t" 5 bit coprocessor 0 destination register (OP_*_RT)
    "+T" 5 bit coprocessor 0 destination register (OP_*_RT) - disassembly only
 
+   UDI immediates:
+   "+1" UDI immediate bits 6-10
+   "+2" UDI immediate bits 6-15
+   "+3" UDI immediate bits 6-20
+   "+4" UDI immediate bits 6-25
+
    Other:
    "()" parens surrounding optional value
    ","  separates operands
@@ -365,6 +381,7 @@ struct mips_opcode
 
    Extension character sequences used so far ("+" followed by the
    following), for quick reference when adding more:
+   "1234"
    "ABCDEFGHIT"
    "t"
 */
