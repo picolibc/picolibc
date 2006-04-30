@@ -203,6 +203,16 @@ Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, US
 #define MDMX_FMTSEL_VEC_QH	0x15
 #define MDMX_FMTSEL_VEC_OB	0x16
 
+/* UDI */
+#define OP_SH_UDI1		6
+#define OP_MASK_UDI1		0x1f
+#define OP_SH_UDI2		6
+#define OP_MASK_UDI2		0x3ff
+#define OP_SH_UDI3		6
+#define OP_MASK_UDI3		0x7fff
+#define OP_SH_UDI4		6
+#define OP_MASK_UDI4		0xfffff
+
 /* This structure holds information for a particular instruction.  */
 
 struct mips_opcode
@@ -268,19 +278,20 @@ struct mips_opcode
    "x" accept and ignore register name
    "z" must be zero register
    "K" 5 bit Hardware Register (rdhwr instruction) (OP_*_RD)
-   "+A" 5 bit ins/ext position, which becomes LSB (OP_*_SHAMT).
+   "+A" 5 bit ins/ext/dins/dext/dinsm/dextm position, which becomes
+        LSB (OP_*_SHAMT).
 	Enforces: 0 <= pos < 32.
-   "+B" 5 bit ins size, which becomes MSB (OP_*_INSMSB).
+   "+B" 5 bit ins/dins size, which becomes MSB (OP_*_INSMSB).
 	Requires that "+A" or "+E" occur first to set position.
 	Enforces: 0 < (pos+size) <= 32.
-   "+C" 5 bit ext size, which becomes MSBD (OP_*_EXTMSBD).
+   "+C" 5 bit ext/dext size, which becomes MSBD (OP_*_EXTMSBD).
 	Requires that "+A" or "+E" occur first to set position.
 	Enforces: 0 < (pos+size) <= 32.
 	(Also used by "dext" w/ different limits, but limits for
 	that are checked by the M_DEXT macro.)
-   "+E" 5 bit dins/dext position, which becomes LSB-32 (OP_*_SHAMT).
+   "+E" 5 bit dinsu/dextu position, which becomes LSB-32 (OP_*_SHAMT).
 	Enforces: 32 <= pos < 64.
-   "+F" 5 bit "dinsm" size, which becomes MSB-32 (OP_*_INSMSB).
+   "+F" 5 bit "dinsm/dinsu" size, which becomes MSB-32 (OP_*_INSMSB).
 	Requires that "+A" or "+E" occur first to set position.
 	Enforces: 32 < (pos+size) <= 64.
    "+G" 5 bit "dextm" size, which becomes MSBD-32 (OP_*_EXTMSBD).
@@ -350,6 +361,12 @@ struct mips_opcode
    "+t" 5 bit coprocessor 0 destination register (OP_*_RT)
    "+T" 5 bit coprocessor 0 destination register (OP_*_RT) - disassembly only
 
+   UDI immediates:
+   "+1" UDI immediate bits 6-10
+   "+2" UDI immediate bits 6-15
+   "+3" UDI immediate bits 6-20
+   "+4" UDI immediate bits 6-25
+
    Other:
    "()" parens surrounding optional value
    ","  separates operands
@@ -364,6 +381,7 @@ struct mips_opcode
 
    Extension character sequences used so far ("+" followed by the
    following), for quick reference when adding more:
+   "1234"
    "ABCDEFGHIT"
    "t"
 */

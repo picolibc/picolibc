@@ -17,6 +17,11 @@
 	R_BFIN_GOTOFFLO): New relocs.
 	(EF_BFIN_PIC, EF_BFIN_FDPIC, EF_BFIN_PIC_FLAGS): New macros.
 
+2006-03-23  Michael Matz  <matz@suse.de>
+
+	* elf/x86-64.h: Add the new relocations with their official
+	numbers.
+
 2006-02-17  Shrirang Khisti  <shrirangk@kpitcummins.com>
             Anil Paranjape   <anilp1@kpitcummins.com>
             Shilin Shakti    <shilins@kpitcummins.com>
