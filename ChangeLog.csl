@@ -1,3 +1,15 @@
+2006-05-01  Paul Brook  <paul@codesourcery.com>
+
+	* bfd/elf32-arm.c (elf32_arm_final_link_relocate): Set thumb funciton
+	bit for R_ARM_REL32.
+	* gas/config/tc-arm.c (arm_optimize_expr): New function.
+	* gas/config/tc-arm.h (md_optimize_expr): Define
+	(arm_optimize_expr): Add prototype.
+	(TC_FORCE_RELOCATION_SUB_SAME): Define.
+	* ld/testsuite/ld-arm/arm-elf.exp: Add thumb-rel32.
+	* ld/testsuite/ld-arm/thumb-rel32.d: New test.
+	* ld/testsuite/ld-arm/thumb-rel32.s: New test.
+
 2006-04-29  Paul Brook  <paul@codesourcery.com>
 
 	* opcodes/arm-dis.c (coprocessor_opcodes): Add %c to unconditional
