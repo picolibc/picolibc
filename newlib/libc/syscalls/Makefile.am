@@ -24,15 +24,15 @@ GENERAL_SOURCES = \
 
 ## Weed out EL/IX level 3 interfaces if necessary
 if ELIX_LEVEL_1
-LIB_OBJS =
+ELIX_SOURCES =
 else
 if ELIX_LEVEL_2
-LIB_OBJS =
+ELIX_SOURCES =
 else
-LIB_OBJS = \
-	sysexecve.$(oext)	\
-	sysfork.$(oext)		\
-	syswait.$(oext)
+ELIX_SOURCES = \
+	sysexecve.c	\
+	sysfork.c	\
+	syswait.c
 endif
 endif
 
@@ -40,16 +40,12 @@ libsyscalls_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libsyscalls.la
-libsyscalls_la_SOURCES = $(GENERAL_SOURCES)
-libsyscalls_la_LIBADD = $(LIB_OBJS)
-libsyscalls_la_DEPENDENCIES = $(LIB_OBJS)
+libsyscalls_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(GENERAL_SOURCES)
-lib_a_LIBADD = $(LIB_OBJS)
+lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA =
 endif
 

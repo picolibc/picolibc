@@ -53,24 +53,15 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-am__DEPENDENCIES_1 = freer.$(oext) reallocr.$(oext) callocr.$(oext) \
-	cfreer.$(oext) mallinfor.$(oext) mallstatsr.$(oext) \
-	msizer.$(oext) mallocr.$(oext)
-am__DEPENDENCIES_2 = a64l.$(oext) btowc.$(oext) getopt.$(oext) \
-	getsubopt.$(oext) l64a.$(oext) malign.$(oext) malignr.$(oext) \
-	malloptr.$(oext) mbrlen.$(oext) mbrtowc.$(oext) \
-	mbsinit.$(oext) mbsrtowcs.$(oext) on_exit.$(oext) \
-	pvallocr.$(oext) valloc.$(oext) vallocr.$(oext) \
-	wcrtomb.$(oext) wcsrtombs.$(oext) wctob.$(oext)
-am__DEPENDENCIES_3 = putenv.$(oext) putenv_r.$(oext) setenv.$(oext) \
-	setenv_r.$(oext)
-am__DEPENDENCIES_4 = system.$(oext)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__DEPENDENCIES_5 = $(am__DEPENDENCIES_2) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__DEPENDENCIES_3) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__DEPENDENCIES_4)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@am__DEPENDENCIES_5 = $(am__DEPENDENCIES_2) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@	$(am__DEPENDENCIES_3)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__DEPENDENCIES_5 =  \
+am__DEPENDENCIES_1 = $(lpfx)freer.$(oext) $(lpfx)reallocr.$(oext) \
+	$(lpfx)callocr.$(oext) $(lpfx)cfreer.$(oext) \
+	$(lpfx)mallinfor.$(oext) $(lpfx)mallstatsr.$(oext) \
+	$(lpfx)msizer.$(oext) $(lpfx)mallocr.$(oext)
+am__DEPENDENCIES_2 = $(lpfx)malignr.$(oext) $(lpfx)malloptr.$(oext) \
+	$(lpfx)pvallocr.$(oext) $(lpfx)vallocr.$(oext)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__DEPENDENCIES_3 = $(am__DEPENDENCIES_2)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@am__DEPENDENCIES_3 = $(am__DEPENDENCIES_2)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__DEPENDENCIES_3 =  \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@	$(am__DEPENDENCIES_2)
 am__objects_1 = lib_a-__adjust.$(OBJEXT) lib_a-__atexit.$(OBJEXT) \
 	lib_a-__call_atexit.$(OBJEXT) lib_a-__exp10.$(OBJEXT) \
@@ -108,11 +99,29 @@ am__objects_2 = lib_a-cxa_atexit.$(OBJEXT) \
 	lib_a-strtoll_r.$(OBJEXT) lib_a-strtoull.$(OBJEXT) \
 	lib_a-strtoull_r.$(OBJEXT) lib_a-atoll.$(OBJEXT) \
 	lib_a-llabs.$(OBJEXT) lib_a-lldiv.$(OBJEXT)
+am__objects_3 = lib_a-a64l.$(OBJEXT) lib_a-btowc.$(OBJEXT) \
+	lib_a-getopt.$(OBJEXT) lib_a-getsubopt.$(OBJEXT) \
+	lib_a-l64a.$(OBJEXT) lib_a-malign.$(OBJEXT) \
+	lib_a-mbrlen.$(OBJEXT) lib_a-mbrtowc.$(OBJEXT) \
+	lib_a-mbsinit.$(OBJEXT) lib_a-mbsrtowcs.$(OBJEXT) \
+	lib_a-on_exit.$(OBJEXT) lib_a-valloc.$(OBJEXT) \
+	lib_a-wcrtomb.$(OBJEXT) lib_a-wcsrtombs.$(OBJEXT) \
+	lib_a-wctob.$(OBJEXT)
+am__objects_4 = lib_a-putenv.$(OBJEXT) lib_a-putenv_r.$(OBJEXT) \
+	lib_a-setenv.$(OBJEXT) lib_a-setenv_r.$(OBJEXT)
+am__objects_5 = lib_a-system.$(OBJEXT)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_6 = $(am__objects_3) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_4) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_5)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@am__objects_6 = $(am__objects_3) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@	$(am__objects_4)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__objects_6 =  \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@	$(am__objects_3)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
-@USE_LIBTOOL_FALSE@	$(am__objects_2)
+@USE_LIBTOOL_FALSE@	$(am__objects_2) $(am__objects_6)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-am__objects_3 = __adjust.lo __atexit.lo __call_atexit.lo __exp10.lo \
+am__objects_7 = __adjust.lo __atexit.lo __call_atexit.lo __exp10.lo \
 	__ten_mu.lo _Exit.lo abort.lo abs.lo assert.lo atexit.lo \
 	atof.lo atoff.lo atoi.lo atol.lo calloc.lo div.lo dtoa.lo \
 	dtoastub.lo environ.lo envlock.lo eprintf.lo exit.lo getenv.lo \
@@ -121,13 +130,25 @@ am__objects_3 = __adjust.lo __atexit.lo __call_atexit.lo __exp10.lo \
 	mlock.lo mprec.lo mstats.lo rand.lo rand_r.lo realloc.lo \
 	strtod.lo strtol.lo strtoul.lo wcstombs.lo wcstombs_r.lo \
 	wctomb.lo wctomb_r.lo
-am__objects_4 = cxa_atexit.lo cxa_finalize.lo drand48.lo ecvtbuf.lo \
+am__objects_8 = cxa_atexit.lo cxa_finalize.lo drand48.lo ecvtbuf.lo \
 	efgcvt.lo erand48.lo jrand48.lo lcong48.lo lrand48.lo \
 	mrand48.lo msize.lo mtrim.lo nrand48.lo rand48.lo seed48.lo \
 	srand48.lo strtoll.lo strtoll_r.lo strtoull.lo strtoull_r.lo \
 	atoll.lo llabs.lo lldiv.lo
-@USE_LIBTOOL_TRUE@am_libstdlib_la_OBJECTS = $(am__objects_3) \
-@USE_LIBTOOL_TRUE@	$(am__objects_4)
+am__objects_9 = a64l.lo btowc.lo getopt.lo getsubopt.lo l64a.lo \
+	malign.lo mbrlen.lo mbrtowc.lo mbsinit.lo mbsrtowcs.lo \
+	on_exit.lo valloc.lo wcrtomb.lo wcsrtombs.lo wctob.lo
+am__objects_10 = putenv.lo putenv_r.lo setenv.lo setenv_r.lo
+am__objects_11 = system.lo
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_12 = $(am__objects_9) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_10) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_11)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@am__objects_12 = $(am__objects_9) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@	$(am__objects_10)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__objects_12 =  \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@	$(am__objects_9)
+@USE_LIBTOOL_TRUE@am_libstdlib_la_OBJECTS = $(am__objects_7) \
+@USE_LIBTOOL_TRUE@	$(am__objects_8) $(am__objects_12)
 libstdlib_la_OBJECTS = $(am_libstdlib_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libstdlib_la_rpath =
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -359,59 +380,67 @@ EXTENDED_SOURCES = \
 	llabs.c		\
 	lldiv.c
 
+ELIX_2_SOURCES = \
+	a64l.c		\
+	btowc.c		\
+	getopt.c	\
+	getsubopt.c	\
+	l64a.c		\
+	malign.c	\
+	mbrlen.c	\
+	mbrtowc.c	\
+	mbsinit.c	\
+	mbsrtowcs.c	\
+	on_exit.c	\
+	valloc.c	\
+	wcrtomb.c	\
+	wcsrtombs.c	\
+	wctob.c
+
 ELIX_2_OBJS = \
-	a64l.$(oext)		\
-	btowc.$(oext)		\
-	getopt.$(oext)		\
-	getsubopt.$(oext)	\
-	l64a.$(oext)		\
-	malign.$(oext)		\
-	malignr.$(oext)		\
-	malloptr.$(oext)	\
-	mbrlen.$(oext)		\
-	mbrtowc.$(oext)		\
-	mbsinit.$(oext)		\
-	mbsrtowcs.$(oext)	\
-	on_exit.$(oext)		\
-	pvallocr.$(oext)	\
-	valloc.$(oext)		\
-	vallocr.$(oext)		\
-	wcrtomb.$(oext)		\
-	wcsrtombs.$(oext)	\
-	wctob.$(oext)
+	$(lpfx)malignr.$(oext) 	\
+	$(lpfx)malloptr.$(oext) \
+	$(lpfx)pvallocr.$(oext)	\
+	$(lpfx)vallocr.$(oext)
 
-ELIX_3_OBJS = \
-	putenv.$(oext)		\
-	putenv_r.$(oext)	\
-	setenv.$(oext)		\
-	setenv_r.$(oext)
+ELIX_3_SOURCES = \
+	putenv.c	\
+	putenv_r.c	\
+	setenv.c	\
+	setenv_r.c
 
-ELIX_4_OBJS = \
-	system.$(oext)
+ELIX_4_SOURCES = \
+	system.c
 
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS) $(ELIX_4_OBJS)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@LIB_OBJS = $(ELIX_2_OBJS)
-@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@ELIX_SOURCES = $(ELIX_2_SOURCES) $(ELIX_3_SOURCES) $(ELIX_4_SOURCES)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@ELIX_SOURCES = $(ELIX_2_SOURCES) $(ELIX_3_SOURCES)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@ELIX_SOURCES = $(ELIX_2_SOURCES)
+@ELIX_LEVEL_1_TRUE@ELIX_SOURCES = 
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@ELIX_OBJS = $(ELIX_2_OBJS)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@ELIX_OBJS = $(ELIX_2_OBJS)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@ELIX_OBJS = $(ELIX_2_OBJS)
+@ELIX_LEVEL_1_TRUE@ELIX_OBJS = 
 
 # Because of how libtool moves objects around, mallocr must be built last.
-LIBADD_OBJS = freer.$(oext) reallocr.$(oext) callocr.$(oext) cfreer.$(oext) \
-	mallinfor.$(oext) mallstatsr.$(oext) msizer.$(oext) mallocr.$(oext)
+LIBADD_OBJS = $(lpfx)freer.$(oext) $(lpfx)reallocr.$(oext) \
+	$(lpfx)callocr.$(oext) $(lpfx)cfreer.$(oext) \
+	$(lpfx)mallinfor.$(oext) $(lpfx)mallstatsr.$(oext) \
+	$(lpfx)msizer.$(oext) $(lpfx)mallocr.$(oext)
 
 libstdlib_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libstdlib.la
-@USE_LIBTOOL_TRUE@libstdlib_la_SOURCES = $(GENERAL_SOURCES) $(EXTENDED_SOURCES)
-@USE_LIBTOOL_TRUE@libstdlib_la_LIBADD = $(LIB_OBJS) $(LIBADD_OBJS)
-@USE_LIBTOOL_TRUE@libstdlib_la_DEPENDENCIES = $(LIB_OBJS) $(LIBADD_OBJS)
+@USE_LIBTOOL_TRUE@libstdlib_la_SOURCES = $(GENERAL_SOURCES) $(EXTENDED_SOURCES) $(ELIX_SOURCES)
+@USE_LIBTOOL_TRUE@libstdlib_la_LIBADD = $(LIBADD_OBJS) $(ELIX_OBJS)
+@USE_LIBTOOL_TRUE@libstdlib_la_DEPENDENCIES = $(LIBADD_OBJS) $(ELIX_OBJS)
 @USE_LIBTOOL_FALSE@LIB_COMPILE = $(COMPILE)
 @USE_LIBTOOL_TRUE@LIB_COMPILE = $(LTCOMPILE)
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(EXTENDED_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIBADD_OBJS) $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(EXTENDED_SOURCES) $(ELIX_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIBADD_OBJS) $(ELIX_OBJS)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIBADD_OBJS) $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIBADD_OBJS) $(ELIX_OBJS)
 MALLOC_COMPILE = $(LIB_COMPILE) -DINTERNAL_NEWLIB
 CHEWOUT_FILES = \
 	_Exit.def	\
@@ -944,6 +973,126 @@ lib_a-lldiv.o: lldiv.c
 lib_a-lldiv.obj: lldiv.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lldiv.obj `if test -f 'lldiv.c'; then $(CYGPATH_W) 'lldiv.c'; else $(CYGPATH_W) '$(srcdir)/lldiv.c'; fi`
 
+lib_a-a64l.o: a64l.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-a64l.o `test -f 'a64l.c' || echo '$(srcdir)/'`a64l.c
+
+lib_a-a64l.obj: a64l.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-a64l.obj `if test -f 'a64l.c'; then $(CYGPATH_W) 'a64l.c'; else $(CYGPATH_W) '$(srcdir)/a64l.c'; fi`
+
+lib_a-btowc.o: btowc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-btowc.o `test -f 'btowc.c' || echo '$(srcdir)/'`btowc.c
+
+lib_a-btowc.obj: btowc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-btowc.obj `if test -f 'btowc.c'; then $(CYGPATH_W) 'btowc.c'; else $(CYGPATH_W) '$(srcdir)/btowc.c'; fi`
+
+lib_a-getopt.o: getopt.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getopt.o `test -f 'getopt.c' || echo '$(srcdir)/'`getopt.c
+
+lib_a-getopt.obj: getopt.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getopt.obj `if test -f 'getopt.c'; then $(CYGPATH_W) 'getopt.c'; else $(CYGPATH_W) '$(srcdir)/getopt.c'; fi`
+
+lib_a-getsubopt.o: getsubopt.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getsubopt.o `test -f 'getsubopt.c' || echo '$(srcdir)/'`getsubopt.c
+
+lib_a-getsubopt.obj: getsubopt.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getsubopt.obj `if test -f 'getsubopt.c'; then $(CYGPATH_W) 'getsubopt.c'; else $(CYGPATH_W) '$(srcdir)/getsubopt.c'; fi`
+
+lib_a-l64a.o: l64a.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-l64a.o `test -f 'l64a.c' || echo '$(srcdir)/'`l64a.c
+
+lib_a-l64a.obj: l64a.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-l64a.obj `if test -f 'l64a.c'; then $(CYGPATH_W) 'l64a.c'; else $(CYGPATH_W) '$(srcdir)/l64a.c'; fi`
+
+lib_a-malign.o: malign.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-malign.o `test -f 'malign.c' || echo '$(srcdir)/'`malign.c
+
+lib_a-malign.obj: malign.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-malign.obj `if test -f 'malign.c'; then $(CYGPATH_W) 'malign.c'; else $(CYGPATH_W) '$(srcdir)/malign.c'; fi`
+
+lib_a-mbrlen.o: mbrlen.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mbrlen.o `test -f 'mbrlen.c' || echo '$(srcdir)/'`mbrlen.c
+
+lib_a-mbrlen.obj: mbrlen.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mbrlen.obj `if test -f 'mbrlen.c'; then $(CYGPATH_W) 'mbrlen.c'; else $(CYGPATH_W) '$(srcdir)/mbrlen.c'; fi`
+
+lib_a-mbrtowc.o: mbrtowc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mbrtowc.o `test -f 'mbrtowc.c' || echo '$(srcdir)/'`mbrtowc.c
+
+lib_a-mbrtowc.obj: mbrtowc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mbrtowc.obj `if test -f 'mbrtowc.c'; then $(CYGPATH_W) 'mbrtowc.c'; else $(CYGPATH_W) '$(srcdir)/mbrtowc.c'; fi`
+
+lib_a-mbsinit.o: mbsinit.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mbsinit.o `test -f 'mbsinit.c' || echo '$(srcdir)/'`mbsinit.c
+
+lib_a-mbsinit.obj: mbsinit.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mbsinit.obj `if test -f 'mbsinit.c'; then $(CYGPATH_W) 'mbsinit.c'; else $(CYGPATH_W) '$(srcdir)/mbsinit.c'; fi`
+
+lib_a-mbsrtowcs.o: mbsrtowcs.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mbsrtowcs.o `test -f 'mbsrtowcs.c' || echo '$(srcdir)/'`mbsrtowcs.c
+
+lib_a-mbsrtowcs.obj: mbsrtowcs.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mbsrtowcs.obj `if test -f 'mbsrtowcs.c'; then $(CYGPATH_W) 'mbsrtowcs.c'; else $(CYGPATH_W) '$(srcdir)/mbsrtowcs.c'; fi`
+
+lib_a-on_exit.o: on_exit.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-on_exit.o `test -f 'on_exit.c' || echo '$(srcdir)/'`on_exit.c
+
+lib_a-on_exit.obj: on_exit.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-on_exit.obj `if test -f 'on_exit.c'; then $(CYGPATH_W) 'on_exit.c'; else $(CYGPATH_W) '$(srcdir)/on_exit.c'; fi`
+
+lib_a-valloc.o: valloc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-valloc.o `test -f 'valloc.c' || echo '$(srcdir)/'`valloc.c
+
+lib_a-valloc.obj: valloc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-valloc.obj `if test -f 'valloc.c'; then $(CYGPATH_W) 'valloc.c'; else $(CYGPATH_W) '$(srcdir)/valloc.c'; fi`
+
+lib_a-wcrtomb.o: wcrtomb.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcrtomb.o `test -f 'wcrtomb.c' || echo '$(srcdir)/'`wcrtomb.c
+
+lib_a-wcrtomb.obj: wcrtomb.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcrtomb.obj `if test -f 'wcrtomb.c'; then $(CYGPATH_W) 'wcrtomb.c'; else $(CYGPATH_W) '$(srcdir)/wcrtomb.c'; fi`
+
+lib_a-wcsrtombs.o: wcsrtombs.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcsrtombs.o `test -f 'wcsrtombs.c' || echo '$(srcdir)/'`wcsrtombs.c
+
+lib_a-wcsrtombs.obj: wcsrtombs.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcsrtombs.obj `if test -f 'wcsrtombs.c'; then $(CYGPATH_W) 'wcsrtombs.c'; else $(CYGPATH_W) '$(srcdir)/wcsrtombs.c'; fi`
+
+lib_a-wctob.o: wctob.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wctob.o `test -f 'wctob.c' || echo '$(srcdir)/'`wctob.c
+
+lib_a-wctob.obj: wctob.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wctob.obj `if test -f 'wctob.c'; then $(CYGPATH_W) 'wctob.c'; else $(CYGPATH_W) '$(srcdir)/wctob.c'; fi`
+
+lib_a-putenv.o: putenv.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-putenv.o `test -f 'putenv.c' || echo '$(srcdir)/'`putenv.c
+
+lib_a-putenv.obj: putenv.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-putenv.obj `if test -f 'putenv.c'; then $(CYGPATH_W) 'putenv.c'; else $(CYGPATH_W) '$(srcdir)/putenv.c'; fi`
+
+lib_a-putenv_r.o: putenv_r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-putenv_r.o `test -f 'putenv_r.c' || echo '$(srcdir)/'`putenv_r.c
+
+lib_a-putenv_r.obj: putenv_r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-putenv_r.obj `if test -f 'putenv_r.c'; then $(CYGPATH_W) 'putenv_r.c'; else $(CYGPATH_W) '$(srcdir)/putenv_r.c'; fi`
+
+lib_a-setenv.o: setenv.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-setenv.o `test -f 'setenv.c' || echo '$(srcdir)/'`setenv.c
+
+lib_a-setenv.obj: setenv.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-setenv.obj `if test -f 'setenv.c'; then $(CYGPATH_W) 'setenv.c'; else $(CYGPATH_W) '$(srcdir)/setenv.c'; fi`
+
+lib_a-setenv_r.o: setenv_r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-setenv_r.o `test -f 'setenv_r.c' || echo '$(srcdir)/'`setenv_r.c
+
+lib_a-setenv_r.obj: setenv_r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-setenv_r.obj `if test -f 'setenv_r.c'; then $(CYGPATH_W) 'setenv_r.c'; else $(CYGPATH_W) '$(srcdir)/setenv_r.c'; fi`
+
+lib_a-system.o: system.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-system.o `test -f 'system.c' || echo '$(srcdir)/'`system.c
+
+lib_a-system.obj: system.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-system.obj `if test -f 'system.c'; then $(CYGPATH_W) 'system.c'; else $(CYGPATH_W) '$(srcdir)/system.c'; fi`
+
 mostlyclean-libtool:
 	-rm -f *.lo
 
@@ -1098,40 +1247,40 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 	  echo $$i `pwd`/$$i >> objectlist.awk.in ; \
 	done
 
-mallocr.$(oext): mallocr.c
+$(lpfx)mallocr.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_MALLOC -c $(srcdir)/mallocr.c -o $@
 
-freer.$(oext): mallocr.c
+$(lpfx)freer.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_FREE -c $(srcdir)/mallocr.c -o $@
 
-reallocr.$(oext): mallocr.c
+$(lpfx)reallocr.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_REALLOC -c $(srcdir)/mallocr.c -o $@
 
-callocr.$(oext): mallocr.c
+$(lpfx)callocr.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_CALLOC -c $(srcdir)/mallocr.c -o $@
 
-cfreer.$(oext): mallocr.c
+$(lpfx)cfreer.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_CFREE -c $(srcdir)/mallocr.c -o $@
 
-malignr.$(oext): mallocr.c
+$(lpfx)malignr.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_MEMALIGN -c $(srcdir)/mallocr.c -o $@
 
-vallocr.$(oext): mallocr.c
+$(lpfx)vallocr.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_VALLOC -c $(srcdir)/mallocr.c -o $@
 
-pvallocr.$(oext): mallocr.c
+$(lpfx)pvallocr.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_PVALLOC -c $(srcdir)/mallocr.c -o $@
 
-mallinfor.$(oext): mallocr.c
+$(lpfx)mallinfor.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_MALLINFO -c $(srcdir)/mallocr.c -o $@
 
-mallstatsr.$(oext): mallocr.c
+$(lpfx)mallstatsr.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_MALLOC_STATS -c $(srcdir)/mallocr.c -o $@
 
-msizer.$(oext): mallocr.c
+$(lpfx)msizer.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_MALLOC_USABLE_SIZE -c $(srcdir)/mallocr.c -o $@
 
-malloptr.$(oext): mallocr.c
+$(lpfx)malloptr.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_MALLOPT -c $(srcdir)/mallocr.c -o $@
 
 .c.def:
@@ -1141,25 +1290,25 @@ malloptr.$(oext): mallocr.c
 doc: $(CHEWOUT_FILES)
 	cat $(srcdir)/stdlib.tex >> $(TARGETDOC)
 
-dtoa.$(oext): dtoa.c mprec.h
-ldtoa.$(oext): ldtoa.c mprec.h
-ecvtbuf.$(oext): ecvtbuf.c mprec.h
-mbtowc_r.$(oext): mbtowc_r.c mbctype.h
+$(lpfx)dtoa.$(oext): dtoa.c mprec.h
+$(lpfx)ldtoa.$(oext): ldtoa.c mprec.h
+$(lpfx)ecvtbuf.$(oext): ecvtbuf.c mprec.h
+$(lpfx)mbtowc_r.$(oext): mbtowc_r.c mbctype.h
 	$(LIB_COMPILE) -c -fshort-enums $(srcdir)/mbtowc_r.c -o $@
 
-mprec.$(oext): mprec.c mprec.h
-strtod.$(oext): strtod.c mprec.h
-wctomb_r.$(oext): wctomb_r.c mbctype.h
-drand48.$(oext): drand48.c rand48.h
-erand48.$(oext): erand48.c rand48.h
-jrand48.$(oext): jrand48.c rand48.h
-lcong48.$(oext): lcong48.c rand48.h
-lrand48.$(oext): lrand48.c rand48.h
-mrand48.$(oext): mrand48.c rand48.h
-nrand48.$(oext): nrand48.c rand48.h
-rand48.$(oext): rand48.c rand48.h
-seed48.$(oext): seed48.c rand48.h
-srand48.$(oext): srand48.c rand48.h
+$(lpfx)mprec.$(oext): mprec.c mprec.h
+$(lpfx)strtod.$(oext): strtod.c mprec.h
+$(lpfx)wctomb_r.$(oext): wctomb_r.c mbctype.h
+$(lpfx)drand48.$(oext): drand48.c rand48.h
+$(lpfx)erand48.$(oext): erand48.c rand48.h
+$(lpfx)jrand48.$(oext): jrand48.c rand48.h
+$(lpfx)lcong48.$(oext): lcong48.c rand48.h
+$(lpfx)lrand48.$(oext): lrand48.c rand48.h
+$(lpfx)mrand48.$(oext): mrand48.c rand48.h
+$(lpfx)nrand48.$(oext): nrand48.c rand48.h
+$(lpfx)rand48.$(oext): rand48.c rand48.h
+$(lpfx)seed48.$(oext): seed48.c rand48.h
+$(lpfx)srand48.$(oext): srand48.c rand48.h
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

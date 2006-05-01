@@ -55,9 +55,10 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-am_lib_a_OBJECTS = reg_memcpy.$(OBJEXT) reg_memset.$(OBJEXT) \
-	strcmp.$(OBJEXT) memcpy.$(OBJEXT) memset.$(OBJEXT) \
-	setjmp.$(OBJEXT) h8sx_strcpy.$(OBJEXT)
+am_lib_a_OBJECTS = lib_a-reg_memcpy.$(OBJEXT) \
+	lib_a-reg_memset.$(OBJEXT) lib_a-strcmp.$(OBJEXT) \
+	lib_a-memcpy.$(OBJEXT) lib_a-memset.$(OBJEXT) \
+	lib_a-setjmp.$(OBJEXT) lib_a-h8sx_strcpy.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -185,6 +186,8 @@ lib_a_SOURCES = reg_memcpy.S reg_memset.S strcmp.S memcpy.S memset.S \
 
 lib_a_LIBADD = 
 lib_a_DEPENDENCIES = 
+lib_a_CCASFLAGS = $(AM_CCASFLAGS)
+lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
@@ -243,6 +246,48 @@ distclean-compile:
 
 .S.obj:
 	$(CCASCOMPILE) -c `$(CYGPATH_W) '$<'`
+
+lib_a-reg_memcpy.o: reg_memcpy.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-reg_memcpy.o `test -f 'reg_memcpy.S' || echo '$(srcdir)/'`reg_memcpy.S
+
+lib_a-reg_memcpy.obj: reg_memcpy.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-reg_memcpy.obj `if test -f 'reg_memcpy.S'; then $(CYGPATH_W) 'reg_memcpy.S'; else $(CYGPATH_W) '$(srcdir)/reg_memcpy.S'; fi`
+
+lib_a-reg_memset.o: reg_memset.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-reg_memset.o `test -f 'reg_memset.S' || echo '$(srcdir)/'`reg_memset.S
+
+lib_a-reg_memset.obj: reg_memset.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-reg_memset.obj `if test -f 'reg_memset.S'; then $(CYGPATH_W) 'reg_memset.S'; else $(CYGPATH_W) '$(srcdir)/reg_memset.S'; fi`
+
+lib_a-strcmp.o: strcmp.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strcmp.o `test -f 'strcmp.S' || echo '$(srcdir)/'`strcmp.S
+
+lib_a-strcmp.obj: strcmp.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strcmp.obj `if test -f 'strcmp.S'; then $(CYGPATH_W) 'strcmp.S'; else $(CYGPATH_W) '$(srcdir)/strcmp.S'; fi`
+
+lib_a-memcpy.o: memcpy.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcpy.o `test -f 'memcpy.S' || echo '$(srcdir)/'`memcpy.S
+
+lib_a-memcpy.obj: memcpy.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcpy.obj `if test -f 'memcpy.S'; then $(CYGPATH_W) 'memcpy.S'; else $(CYGPATH_W) '$(srcdir)/memcpy.S'; fi`
+
+lib_a-memset.o: memset.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memset.o `test -f 'memset.S' || echo '$(srcdir)/'`memset.S
+
+lib_a-memset.obj: memset.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memset.obj `if test -f 'memset.S'; then $(CYGPATH_W) 'memset.S'; else $(CYGPATH_W) '$(srcdir)/memset.S'; fi`
+
+lib_a-setjmp.o: setjmp.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.o `test -f 'setjmp.S' || echo '$(srcdir)/'`setjmp.S
+
+lib_a-setjmp.obj: setjmp.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.obj `if test -f 'setjmp.S'; then $(CYGPATH_W) 'setjmp.S'; else $(CYGPATH_W) '$(srcdir)/setjmp.S'; fi`
+
+lib_a-h8sx_strcpy.o: h8sx_strcpy.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-h8sx_strcpy.o `test -f 'h8sx_strcpy.S' || echo '$(srcdir)/'`h8sx_strcpy.S
+
+lib_a-h8sx_strcpy.obj: h8sx_strcpy.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-h8sx_strcpy.obj `if test -f 'h8sx_strcpy.S'; then $(CYGPATH_W) 'h8sx_strcpy.S'; else $(CYGPATH_W) '$(srcdir)/h8sx_strcpy.S'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

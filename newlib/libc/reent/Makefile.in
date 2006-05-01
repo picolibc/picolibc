@@ -53,15 +53,7 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-@HAVE_STDIO64_DIR_TRUE@am__DEPENDENCIES_1 = fstat64r.$(oext) \
-@HAVE_STDIO64_DIR_TRUE@	lseek64r.$(oext) open64r.$(oext)
-am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
-am__DEPENDENCIES_3 = execr.$(oext)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@am__DEPENDENCIES_4 =  \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	$(am__DEPENDENCIES_2) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	$(am__DEPENDENCIES_3)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__DEPENDENCIES_4 =  \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@	$(am__DEPENDENCIES_2)
+lib_a_LIBADD =
 am__objects_1 = lib_a-closer.$(OBJEXT) lib_a-reent.$(OBJEXT) \
 	lib_a-impure.$(OBJEXT) lib_a-fcntlr.$(OBJEXT) \
 	lib_a-fstatr.$(OBJEXT) lib_a-getreent.$(OBJEXT) \
@@ -71,13 +63,35 @@ am__objects_1 = lib_a-closer.$(OBJEXT) lib_a-reent.$(OBJEXT) \
 	lib_a-sbrkr.$(OBJEXT) lib_a-statr.$(OBJEXT) \
 	lib_a-timer.$(OBJEXT) lib_a-unlinkr.$(OBJEXT) \
 	lib_a-writer.$(OBJEXT)
-@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1)
+@HAVE_STDIO64_DIR_TRUE@am__objects_2 = lib_a-fstat64r.$(OBJEXT) \
+@HAVE_STDIO64_DIR_TRUE@	lib_a-lseek64r.$(OBJEXT) \
+@HAVE_STDIO64_DIR_TRUE@	lib_a-open64r.$(OBJEXT)
+am__objects_3 = $(am__objects_2)
+am__objects_4 = lib_a-execr.$(OBJEXT)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@am__objects_5 =  \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	$(am__objects_3) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	$(am__objects_4)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__objects_5 =  \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@	$(am__objects_3)
+@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
+@USE_LIBTOOL_FALSE@	$(am__objects_5)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-am__objects_2 = closer.lo reent.lo impure.lo fcntlr.lo fstatr.lo \
+libreent_la_LIBADD =
+am__objects_6 = closer.lo reent.lo impure.lo fcntlr.lo fstatr.lo \
 	getreent.lo linkr.lo lseekr.lo openr.lo readr.lo signalr.lo \
 	signgam.lo sbrkr.lo statr.lo timer.lo unlinkr.lo writer.lo
-@USE_LIBTOOL_TRUE@am_libreent_la_OBJECTS = $(am__objects_2)
+@HAVE_STDIO64_DIR_TRUE@am__objects_7 = fstat64r.lo lseek64r.lo \
+@HAVE_STDIO64_DIR_TRUE@	open64r.lo
+am__objects_8 = $(am__objects_7)
+am__objects_9 = execr.lo
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@am__objects_10 =  \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	$(am__objects_8) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	$(am__objects_9)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__objects_10 =  \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@	$(am__objects_8)
+@USE_LIBTOOL_TRUE@am_libreent_la_OBJECTS = $(am__objects_6) \
+@USE_LIBTOOL_TRUE@	$(am__objects_10)
 libreent_la_OBJECTS = $(am_libreent_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libreent_la_rpath =
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -235,21 +249,21 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
-@HAVE_STDIO64_DIR_TRUE@STDIO64_OBJECTS = \
-@HAVE_STDIO64_DIR_TRUE@	fstat64r.$(oext) \
-@HAVE_STDIO64_DIR_TRUE@	lseek64r.$(oext) \
-@HAVE_STDIO64_DIR_TRUE@	open64r.$(oext)
+@HAVE_STDIO64_DIR_TRUE@STDIO64_SOURCES = \
+@HAVE_STDIO64_DIR_TRUE@	fstat64r.c \
+@HAVE_STDIO64_DIR_TRUE@	lseek64r.c \
+@HAVE_STDIO64_DIR_TRUE@	open64r.c
 
 @HAVE_STDIO64_DIR_TRUE@STDIO64_DEFS = \
 @HAVE_STDIO64_DIR_TRUE@	fstat64r.def \
 @HAVE_STDIO64_DIR_TRUE@	lseek64r.def \
 @HAVE_STDIO64_DIR_TRUE@	open64r.def
 
-ELIX_2_OBJS = $(STDIO64_OBJECTS)
-ELIX_3_OBJS = execr.$(oext)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@LIB_OBJS = $(ELIX_2_OBJS)
-@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
+ELIX_2_SOURCES = $(STDIO64_SOURCES)
+ELIX_3_SOURCES = execr.c
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@ELIX_SOURCES = $(ELIX_2_SOURCES) $(ELIX_3_SOURCES)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@ELIX_SOURCES = $(ELIX_2_SOURCES)
+@ELIX_LEVEL_1_TRUE@ELIX_SOURCES = 
 GENERAL_SOURCES = \
 	closer.c \
 	reent.c \
@@ -271,16 +285,12 @@ GENERAL_SOURCES = \
 
 libreent_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libreent.la
-@USE_LIBTOOL_TRUE@libreent_la_SOURCES = $(GENERAL_SOURCES)
-@USE_LIBTOOL_TRUE@libreent_la_LIBADD = $(LIB_OBJS)
-@USE_LIBTOOL_TRUE@libreent_la_DEPENDENCIES = $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@libreent_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIB_OBJS)
 CHEWOUT_FILES = \
 	closer.def \
 	reent.def \
@@ -472,6 +482,30 @@ lib_a-writer.o: writer.c
 lib_a-writer.obj: writer.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-writer.obj `if test -f 'writer.c'; then $(CYGPATH_W) 'writer.c'; else $(CYGPATH_W) '$(srcdir)/writer.c'; fi`
 
+lib_a-fstat64r.o: fstat64r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fstat64r.o `test -f 'fstat64r.c' || echo '$(srcdir)/'`fstat64r.c
+
+lib_a-fstat64r.obj: fstat64r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fstat64r.obj `if test -f 'fstat64r.c'; then $(CYGPATH_W) 'fstat64r.c'; else $(CYGPATH_W) '$(srcdir)/fstat64r.c'; fi`
+
+lib_a-lseek64r.o: lseek64r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lseek64r.o `test -f 'lseek64r.c' || echo '$(srcdir)/'`lseek64r.c
+
+lib_a-lseek64r.obj: lseek64r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lseek64r.obj `if test -f 'lseek64r.c'; then $(CYGPATH_W) 'lseek64r.c'; else $(CYGPATH_W) '$(srcdir)/lseek64r.c'; fi`
+
+lib_a-open64r.o: open64r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-open64r.o `test -f 'open64r.c' || echo '$(srcdir)/'`open64r.c
+
+lib_a-open64r.obj: open64r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-open64r.obj `if test -f 'open64r.c'; then $(CYGPATH_W) 'open64r.c'; else $(CYGPATH_W) '$(srcdir)/open64r.c'; fi`
+
+lib_a-execr.o: execr.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execr.o `test -f 'execr.c' || echo '$(srcdir)/'`execr.c
+
+lib_a-execr.obj: execr.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execr.obj `if test -f 'execr.c'; then $(CYGPATH_W) 'execr.c'; else $(CYGPATH_W) '$(srcdir)/execr.c'; fi`
+
 mostlyclean-libtool:
 	-rm -f *.lo
 
@@ -633,7 +667,7 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 doc: $(CHEWOUT_FILES)
 	cat $(srcdir)/reent.tex >> $(TARGETDOC)
 
-impure.$(oext): $(srcdir)/impure.c $(srcdir)/../include/sys/reent.h
+$(lpfx)impure.$(oext): $(srcdir)/impure.c $(srcdir)/../include/sys/reent.h
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

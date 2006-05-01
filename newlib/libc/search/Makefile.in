@@ -53,19 +53,33 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-@ELIX_LEVEL_1_FALSE@am__DEPENDENCIES_1 = hash.$(oext) \
-@ELIX_LEVEL_1_FALSE@	hash_bigkey.$(oext) hash_buf.$(oext) \
-@ELIX_LEVEL_1_FALSE@	hash_func.$(oext) hash_log2.$(oext) \
-@ELIX_LEVEL_1_FALSE@	hash_page.$(oext) hcreate.$(oext) \
-@ELIX_LEVEL_1_FALSE@	hcreate_r.$(oext) tdelete.$(oext) \
-@ELIX_LEVEL_1_FALSE@	tdestroy.$(oext) tfind.$(oext) \
-@ELIX_LEVEL_1_FALSE@	tsearch.$(oext) twalk.$(oext)
+lib_a_LIBADD =
 am__objects_1 = lib_a-bsearch.$(OBJEXT) lib_a-qsort.$(OBJEXT)
-@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1)
+@ELIX_LEVEL_1_FALSE@am__objects_2 = lib_a-hash.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-hash_bigkey.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-hash_buf.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-hash_func.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-hash_log2.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-hash_page.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-hcreate.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-hcreate_r.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-tdelete.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-tdestroy.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-tfind.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-tsearch.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-twalk.$(OBJEXT)
+@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
+@USE_LIBTOOL_FALSE@	$(am__objects_2)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-am__objects_2 = bsearch.lo qsort.lo
-@USE_LIBTOOL_TRUE@am_libsearch_la_OBJECTS = $(am__objects_2)
+libsearch_la_LIBADD =
+am__objects_3 = bsearch.lo qsort.lo
+@ELIX_LEVEL_1_FALSE@am__objects_4 = hash.lo hash_bigkey.lo hash_buf.lo \
+@ELIX_LEVEL_1_FALSE@	hash_func.lo hash_log2.lo hash_page.lo \
+@ELIX_LEVEL_1_FALSE@	hcreate.lo hcreate_r.lo tdelete.lo \
+@ELIX_LEVEL_1_FALSE@	tdestroy.lo tfind.lo tsearch.lo twalk.lo
+@USE_LIBTOOL_TRUE@am_libsearch_la_OBJECTS = $(am__objects_3) \
+@USE_LIBTOOL_TRUE@	$(am__objects_4)
 libsearch_la_OBJECTS = $(am_libsearch_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libsearch_la_rpath =
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -231,34 +245,30 @@ GENERAL_SOURCES = \
 	page.h \
 	qsort.c
 
-@ELIX_LEVEL_1_FALSE@LIB_OBJS = \
-@ELIX_LEVEL_1_FALSE@	hash.$(oext) \
-@ELIX_LEVEL_1_FALSE@	hash_bigkey.$(oext) \
-@ELIX_LEVEL_1_FALSE@	hash_buf.$(oext) \
-@ELIX_LEVEL_1_FALSE@	hash_func.$(oext) \
-@ELIX_LEVEL_1_FALSE@	hash_log2.$(oext) \
-@ELIX_LEVEL_1_FALSE@	hash_page.$(oext) \
-@ELIX_LEVEL_1_FALSE@	hcreate.$(oext) \
-@ELIX_LEVEL_1_FALSE@	hcreate_r.$(oext) \
-@ELIX_LEVEL_1_FALSE@	tdelete.$(oext) \
-@ELIX_LEVEL_1_FALSE@	tdestroy.$(oext) \
-@ELIX_LEVEL_1_FALSE@	tfind.$(oext) \
-@ELIX_LEVEL_1_FALSE@	tsearch.$(oext) \
-@ELIX_LEVEL_1_FALSE@	twalk.$(oext)
+@ELIX_LEVEL_1_FALSE@ELIX_SOURCES = \
+@ELIX_LEVEL_1_FALSE@	hash.c \
+@ELIX_LEVEL_1_FALSE@	hash_bigkey.c \
+@ELIX_LEVEL_1_FALSE@	hash_buf.c \
+@ELIX_LEVEL_1_FALSE@	hash_func.c \
+@ELIX_LEVEL_1_FALSE@	hash_log2.c \
+@ELIX_LEVEL_1_FALSE@	hash_page.c \
+@ELIX_LEVEL_1_FALSE@	hcreate.c \
+@ELIX_LEVEL_1_FALSE@	hcreate_r.c \
+@ELIX_LEVEL_1_FALSE@	tdelete.c \
+@ELIX_LEVEL_1_FALSE@	tdestroy.c \
+@ELIX_LEVEL_1_FALSE@	tfind.c \
+@ELIX_LEVEL_1_FALSE@	tsearch.c \
+@ELIX_LEVEL_1_FALSE@	twalk.c
 
-@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
+@ELIX_LEVEL_1_TRUE@ELIX_SOURCES = 
 libsearch_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libsearch.la
-@USE_LIBTOOL_TRUE@libsearch_la_SOURCES = $(GENERAL_SOURCES)
-@USE_LIBTOOL_TRUE@libsearch_la_LIBADD = $(LIB_OBJS)
-@USE_LIBTOOL_TRUE@libsearch_la_DEPENDENCIES = $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@libsearch_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIB_OBJS)
 SUFFIXES = .def
 CHEWOUT_FILES = 
 CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
@@ -342,6 +352,84 @@ lib_a-qsort.o: qsort.c
 
 lib_a-qsort.obj: qsort.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-qsort.obj `if test -f 'qsort.c'; then $(CYGPATH_W) 'qsort.c'; else $(CYGPATH_W) '$(srcdir)/qsort.c'; fi`
+
+lib_a-hash.o: hash.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash.o `test -f 'hash.c' || echo '$(srcdir)/'`hash.c
+
+lib_a-hash.obj: hash.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash.obj `if test -f 'hash.c'; then $(CYGPATH_W) 'hash.c'; else $(CYGPATH_W) '$(srcdir)/hash.c'; fi`
+
+lib_a-hash_bigkey.o: hash_bigkey.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_bigkey.o `test -f 'hash_bigkey.c' || echo '$(srcdir)/'`hash_bigkey.c
+
+lib_a-hash_bigkey.obj: hash_bigkey.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_bigkey.obj `if test -f 'hash_bigkey.c'; then $(CYGPATH_W) 'hash_bigkey.c'; else $(CYGPATH_W) '$(srcdir)/hash_bigkey.c'; fi`
+
+lib_a-hash_buf.o: hash_buf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_buf.o `test -f 'hash_buf.c' || echo '$(srcdir)/'`hash_buf.c
+
+lib_a-hash_buf.obj: hash_buf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_buf.obj `if test -f 'hash_buf.c'; then $(CYGPATH_W) 'hash_buf.c'; else $(CYGPATH_W) '$(srcdir)/hash_buf.c'; fi`
+
+lib_a-hash_func.o: hash_func.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_func.o `test -f 'hash_func.c' || echo '$(srcdir)/'`hash_func.c
+
+lib_a-hash_func.obj: hash_func.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_func.obj `if test -f 'hash_func.c'; then $(CYGPATH_W) 'hash_func.c'; else $(CYGPATH_W) '$(srcdir)/hash_func.c'; fi`
+
+lib_a-hash_log2.o: hash_log2.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_log2.o `test -f 'hash_log2.c' || echo '$(srcdir)/'`hash_log2.c
+
+lib_a-hash_log2.obj: hash_log2.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_log2.obj `if test -f 'hash_log2.c'; then $(CYGPATH_W) 'hash_log2.c'; else $(CYGPATH_W) '$(srcdir)/hash_log2.c'; fi`
+
+lib_a-hash_page.o: hash_page.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_page.o `test -f 'hash_page.c' || echo '$(srcdir)/'`hash_page.c
+
+lib_a-hash_page.obj: hash_page.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_page.obj `if test -f 'hash_page.c'; then $(CYGPATH_W) 'hash_page.c'; else $(CYGPATH_W) '$(srcdir)/hash_page.c'; fi`
+
+lib_a-hcreate.o: hcreate.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hcreate.o `test -f 'hcreate.c' || echo '$(srcdir)/'`hcreate.c
+
+lib_a-hcreate.obj: hcreate.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hcreate.obj `if test -f 'hcreate.c'; then $(CYGPATH_W) 'hcreate.c'; else $(CYGPATH_W) '$(srcdir)/hcreate.c'; fi`
+
+lib_a-hcreate_r.o: hcreate_r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hcreate_r.o `test -f 'hcreate_r.c' || echo '$(srcdir)/'`hcreate_r.c
+
+lib_a-hcreate_r.obj: hcreate_r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hcreate_r.obj `if test -f 'hcreate_r.c'; then $(CYGPATH_W) 'hcreate_r.c'; else $(CYGPATH_W) '$(srcdir)/hcreate_r.c'; fi`
+
+lib_a-tdelete.o: tdelete.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tdelete.o `test -f 'tdelete.c' || echo '$(srcdir)/'`tdelete.c
+
+lib_a-tdelete.obj: tdelete.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tdelete.obj `if test -f 'tdelete.c'; then $(CYGPATH_W) 'tdelete.c'; else $(CYGPATH_W) '$(srcdir)/tdelete.c'; fi`
+
+lib_a-tdestroy.o: tdestroy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tdestroy.o `test -f 'tdestroy.c' || echo '$(srcdir)/'`tdestroy.c
+
+lib_a-tdestroy.obj: tdestroy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tdestroy.obj `if test -f 'tdestroy.c'; then $(CYGPATH_W) 'tdestroy.c'; else $(CYGPATH_W) '$(srcdir)/tdestroy.c'; fi`
+
+lib_a-tfind.o: tfind.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tfind.o `test -f 'tfind.c' || echo '$(srcdir)/'`tfind.c
+
+lib_a-tfind.obj: tfind.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tfind.obj `if test -f 'tfind.c'; then $(CYGPATH_W) 'tfind.c'; else $(CYGPATH_W) '$(srcdir)/tfind.c'; fi`
+
+lib_a-tsearch.o: tsearch.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tsearch.o `test -f 'tsearch.c' || echo '$(srcdir)/'`tsearch.c
+
+lib_a-tsearch.obj: tsearch.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tsearch.obj `if test -f 'tsearch.c'; then $(CYGPATH_W) 'tsearch.c'; else $(CYGPATH_W) '$(srcdir)/tsearch.c'; fi`
+
+lib_a-twalk.o: twalk.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-twalk.o `test -f 'twalk.c' || echo '$(srcdir)/'`twalk.c
+
+lib_a-twalk.obj: twalk.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-twalk.obj `if test -f 'twalk.c'; then $(CYGPATH_W) 'twalk.c'; else $(CYGPATH_W) '$(srcdir)/twalk.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

@@ -1,3 +1,95 @@
+2006-05-01  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/argz/Makefile.am: Prefix any objects specified with $(lpfx).  If source file can
+	be specified instead of object, do so.
+	* libc/ctype/Makefile.am: Ditto.
+	* libc/iconv/ccs/Makefile.am: Ditto.
+	* libc/iconv/ces/Makefile.am: Ditto.
+	* libc/iconv/lib/Makefile.am: Ditto.
+	* libc/locale/Makefile.am: Ditto.
+	* libc/posix/Makefile.am: Ditto.
+	* libc/reent/Makefile.am: Ditto.
+	* libc/search/Makefile.am: Ditto.
+	* libc/stdio/Makefile.am: Ditto.
+	* libc/stdio64/Makefile.am: Ditto.
+	* libc/stdlib/Makefile.am: Ditto.
+	* libc/string/Makefile.am: Ditto.
+	* libc/syscalls/Makefile.am: Ditto.
+	* libc/unix/Makefile.am: Ditto.
+	* libc/machine/a29k/Makefile.am: Specify lib_a_CCASFLAGS so .S files will get
+	prefix added automatically.  Any specified rules must use $(lpfx) for
+	object file names.
+	* libc/machine/arm/Makefile.am: Ditto.
+	* libc/machine/cris/Makefile.am: Ditto.
+	* libc/machine/crx/Makefile.am: Ditto.
+	* libc/machine/d10v/Makefile.am: Ditto.
+	* libc/machine/d30v/Makefile.am: Ditto.
+	* libc/machine/fr30/Makefile.am: Ditto.
+	* libc/machine/frv/Makefile.am: Ditto.
+	* libc/machine/h8300/Makefile.am: Ditto.
+	* libc/machine/h8500/Makefile.am: Ditto.
+	* libc/machine/hppa/Makefile.am: Ditto.
+	* libc/machine/i386/Makefile.am: Ditto.
+	* libc/machine/i960/Makefile.am: Ditto.
+	* libc/machine/iq2000/Makefile.am: Ditto.
+	* libc/machine/m32c/Makefile.am: Ditto.
+	* libc/machine/m32r/Makefile.am: Ditto.
+	* libc/machine/m68hc11/Makefile.am: Ditto.
+	* libc/machine/m68k/Makefile.am: Ditto.
+	* libc/machine/m88k/Makefile.am: Ditto.
+	* libc/machine/mips/Makefile.am: Ditto.
+	* libc/machine/mn10200/Makefile.am: Ditto.
+	* libc/machine/mn10300/Makefile.am: Ditto.
+	* libc/machine/mt/Makefile.am: Ditto.
+	* libc/machine/necv70/Makefile.am: Ditto.
+	* libc/machine/powerpc/Makefile.am: Ditto.
+	* libc/machine/sh/Makefile.am: Ditto.
+	* libc/machine/sh/Makefile.in: Ditto.
+	* libc/machine/sparc/Makefile.am: Ditto.
+	* libc/machine/tic4x/Makefile.am: Ditto.
+	* libc/machine/tic80/Makefile.am: Ditto.
+	* libc/machine/v850/Makefile.am: Ditto.
+	* libc/machine/w65/Makefile.am: Ditto.
+	* libc/machine/xscale/Makefile.am: Ditto.
+	* libc/machine/xstormy16/Makefile.am: Ditto.
+	* libc/machine/z8k/Makefile.am: Ditto.
+	* libc/sys/a29khif/Makefile.am: Ditto.
+	* libc/sys/arm/Makefile.am: Ditto.
+	* libc/sys/d10v/Makefile.am: Ditto.
+	* libc/sys/h8300hms/Makefile.am: Ditto.
+	* libc/sys/h8500hms/Makefile.am: Ditto.
+	* libc/sys/linux/Makefile.am: Ditto.
+	* libc/sys/linux/linuxthreads/Makefile.am: Ditto.
+	* libc/sys/linux/net/Makefile.am: Ditto.
+	* libc/sys/linux/stdlib/Makefile.am: Ditto.
+	* libc/sys/m88kbug/Makefile.am: Ditto.
+	* libc/sys/mmixware/Makefile.am: Ditto.
+	* libc/sys/rdos/Makefile.am: Ditto.
+	* libc/sys/rtems/Makefile.am: Ditto.
+	* libc/sys/sh/Makefile.am: Ditto.
+	* libc/sys/sun4/Makefile.am: Ditto.
+	* libc/sys/sysmec/Makefile.am: Ditto.
+	* libc/sys/sysnec810/Makefile.am: Ditto.
+	* libc/sys/sysnecv850/Makefile.am: Ditto.
+	* libc/sys/sysvi386/Makefile.am: Ditto.
+	* libc/sys/sysvnecv70/Makefile.am: Ditto.
+	* libc/sys/tic80/Makefile.am: Ditto.
+	* libc/sys/w65/Makefile.am: Ditto.
+	* libc/sys/z8ksim/Makefile.am: Ditto.
+	* libc/machine/necv70/fastmath.S: Renamed from .s file.
+	* libc/machine/necv70/setjmp.S: Ditto.
+	* libc/machine/necv70/fastmath.s: Removed.
+	* libc/machine/necv70/setjmp.s: Ditto.
+	* libc/machine/w65/*.S: New files renamed from .s files.
+	* libc/machine/w65/*.s: Renamed and removed.
+	* libc/sys/a29khif/*.S: New files renamed from .s files.
+	* libc/sys/a29khif/*.s: Renamed and removed.
+	* libc/sys/sysvi386/*.S: New files renamed from .s files.
+	* libc/sys/sysvi386/*.s: Renamed and removed.
+	* libc/sys/sysvnecv70/*.S: New files renamed from .s files.
+	* libc/sys/sysvnecv70/*.s: Renamed and removed.
+	* libc/*Makefile.in: Regenerated as appropriate.
+
 2006-04-24  DJ Delorie  <dj@redhat.com>
 
 	* libc/machine/sh/configure.in: Avoid link tests.

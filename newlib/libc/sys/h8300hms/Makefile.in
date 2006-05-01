@@ -41,7 +41,9 @@ host_triplet = @host@
 DIST_COMMON = $(srcdir)/../../../../config.guess \
 	$(srcdir)/../../../../config.sub $(srcdir)/Makefile.in \
 	$(srcdir)/Makefile.am $(top_srcdir)/configure \
-	$(am__configure_deps) $(srcdir)/../../../../mkinstalldirs
+	$(am__configure_deps) $(srcdir)/../../../../mkinstalldirs \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../../acinclude.m4 \
@@ -56,10 +58,12 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am_lib_a_OBJECTS = syscalls.$(OBJEXT) _exit.$(OBJEXT) sbrk.$(OBJEXT) \
-	misc.$(OBJEXT) crt1.$(OBJEXT) close.$(OBJEXT) fstat.$(OBJEXT) \
-	lseek.$(OBJEXT) open.$(OBJEXT) read.$(OBJEXT) stat.$(OBJEXT) \
-	write.$(OBJEXT)
+am_lib_a_OBJECTS = lib_a-syscalls.$(OBJEXT) lib_a-_exit.$(OBJEXT) \
+	lib_a-sbrk.$(OBJEXT) lib_a-misc.$(OBJEXT) lib_a-crt1.$(OBJEXT) \
+	lib_a-close.$(OBJEXT) lib_a-fstat.$(OBJEXT) \
+	lib_a-lseek.$(OBJEXT) lib_a-open.$(OBJEXT) \
+	lib_a-read.$(OBJEXT) lib_a-stat.$(OBJEXT) \
+	lib_a-write.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -185,6 +189,8 @@ noinst_LIBRARIES = lib.a
 lib_a_SOURCES = syscalls.c _exit.S sbrk.c misc.c crt1.c \
 	close.S fstat.S lseek.S open.S read.S stat.S write.S
 
+lib_a_CCASFLAGS = $(AM_CCASFLAGS)
+lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
@@ -244,11 +250,83 @@ distclean-compile:
 .S.obj:
 	$(CCASCOMPILE) -c `$(CYGPATH_W) '$<'`
 
+lib_a-_exit.o: _exit.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-_exit.o `test -f '_exit.S' || echo '$(srcdir)/'`_exit.S
+
+lib_a-_exit.obj: _exit.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-_exit.obj `if test -f '_exit.S'; then $(CYGPATH_W) '_exit.S'; else $(CYGPATH_W) '$(srcdir)/_exit.S'; fi`
+
+lib_a-close.o: close.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-close.o `test -f 'close.S' || echo '$(srcdir)/'`close.S
+
+lib_a-close.obj: close.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-close.obj `if test -f 'close.S'; then $(CYGPATH_W) 'close.S'; else $(CYGPATH_W) '$(srcdir)/close.S'; fi`
+
+lib_a-fstat.o: fstat.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fstat.o `test -f 'fstat.S' || echo '$(srcdir)/'`fstat.S
+
+lib_a-fstat.obj: fstat.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fstat.obj `if test -f 'fstat.S'; then $(CYGPATH_W) 'fstat.S'; else $(CYGPATH_W) '$(srcdir)/fstat.S'; fi`
+
+lib_a-lseek.o: lseek.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-lseek.o `test -f 'lseek.S' || echo '$(srcdir)/'`lseek.S
+
+lib_a-lseek.obj: lseek.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-lseek.obj `if test -f 'lseek.S'; then $(CYGPATH_W) 'lseek.S'; else $(CYGPATH_W) '$(srcdir)/lseek.S'; fi`
+
+lib_a-open.o: open.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-open.o `test -f 'open.S' || echo '$(srcdir)/'`open.S
+
+lib_a-open.obj: open.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-open.obj `if test -f 'open.S'; then $(CYGPATH_W) 'open.S'; else $(CYGPATH_W) '$(srcdir)/open.S'; fi`
+
+lib_a-read.o: read.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-read.o `test -f 'read.S' || echo '$(srcdir)/'`read.S
+
+lib_a-read.obj: read.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-read.obj `if test -f 'read.S'; then $(CYGPATH_W) 'read.S'; else $(CYGPATH_W) '$(srcdir)/read.S'; fi`
+
+lib_a-stat.o: stat.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-stat.o `test -f 'stat.S' || echo '$(srcdir)/'`stat.S
+
+lib_a-stat.obj: stat.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-stat.obj `if test -f 'stat.S'; then $(CYGPATH_W) 'stat.S'; else $(CYGPATH_W) '$(srcdir)/stat.S'; fi`
+
+lib_a-write.o: write.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-write.o `test -f 'write.S' || echo '$(srcdir)/'`write.S
+
+lib_a-write.obj: write.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-write.obj `if test -f 'write.S'; then $(CYGPATH_W) 'write.S'; else $(CYGPATH_W) '$(srcdir)/write.S'; fi`
+
 .c.o:
 	$(COMPILE) -c $<
 
 .c.obj:
 	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+lib_a-syscalls.o: syscalls.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-syscalls.o `test -f 'syscalls.c' || echo '$(srcdir)/'`syscalls.c
+
+lib_a-syscalls.obj: syscalls.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-syscalls.obj `if test -f 'syscalls.c'; then $(CYGPATH_W) 'syscalls.c'; else $(CYGPATH_W) '$(srcdir)/syscalls.c'; fi`
+
+lib_a-sbrk.o: sbrk.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sbrk.o `test -f 'sbrk.c' || echo '$(srcdir)/'`sbrk.c
+
+lib_a-sbrk.obj: sbrk.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sbrk.obj `if test -f 'sbrk.c'; then $(CYGPATH_W) 'sbrk.c'; else $(CYGPATH_W) '$(srcdir)/sbrk.c'; fi`
+
+lib_a-misc.o: misc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-misc.o `test -f 'misc.c' || echo '$(srcdir)/'`misc.c
+
+lib_a-misc.obj: misc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-misc.obj `if test -f 'misc.c'; then $(CYGPATH_W) 'misc.c'; else $(CYGPATH_W) '$(srcdir)/misc.c'; fi`
+
+lib_a-crt1.o: crt1.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-crt1.o `test -f 'crt1.c' || echo '$(srcdir)/'`crt1.c
+
+lib_a-crt1.obj: crt1.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-crt1.obj `if test -f 'crt1.c'; then $(CYGPATH_W) 'crt1.c'; else $(CYGPATH_W) '$(srcdir)/crt1.c'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

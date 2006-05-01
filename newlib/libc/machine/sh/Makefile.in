@@ -56,12 +56,14 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-@SH64_FALSE@am_lib_a_OBJECTS = memcpy.$(OBJEXT) memset.$(OBJEXT) \
-@SH64_FALSE@	setjmp.$(OBJEXT) strcpy.$(OBJEXT) strlen.$(OBJEXT) \
-@SH64_FALSE@	strcmp.$(OBJEXT)
-@SH64_TRUE@am_lib_a_OBJECTS = memcpy.$(OBJEXT) memset.$(OBJEXT) \
-@SH64_TRUE@	setjmp.$(OBJEXT) strcpy.$(OBJEXT) strlen.$(OBJEXT) \
-@SH64_TRUE@	strcmp.$(OBJEXT) strncpy.$(OBJEXT)
+@SH64_FALSE@am_lib_a_OBJECTS = lib_a-memcpy.$(OBJEXT) \
+@SH64_FALSE@	lib_a-memset.$(OBJEXT) lib_a-setjmp.$(OBJEXT) \
+@SH64_FALSE@	lib_a-strcpy.$(OBJEXT) lib_a-strlen.$(OBJEXT) \
+@SH64_FALSE@	lib_a-strcmp.$(OBJEXT)
+@SH64_TRUE@am_lib_a_OBJECTS = lib_a-memcpy.$(OBJEXT) \
+@SH64_TRUE@	lib_a-memset.$(OBJEXT) lib_a-setjmp.$(OBJEXT) \
+@SH64_TRUE@	lib_a-strcpy.$(OBJEXT) lib_a-strlen.$(OBJEXT) \
+@SH64_TRUE@	lib_a-strcmp.$(OBJEXT) lib_a-strncpy.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -194,6 +196,8 @@ AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
 @SH64_FALSE@lib_a_SOURCES = memcpy.S memset.S setjmp.S strcpy.S strlen.S strcmp.S
 @SH64_TRUE@lib_a_SOURCES = memcpy.S memset.S setjmp.S strcpy.S strlen.S strcmp.S strncpy.S
+lib_a_CCASFLAGS = $(AM_CCASFLAGS)
+lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
@@ -252,6 +256,48 @@ distclean-compile:
 
 .S.obj:
 	$(CCASCOMPILE) -c `$(CYGPATH_W) '$<'`
+
+lib_a-memcpy.o: memcpy.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcpy.o `test -f 'memcpy.S' || echo '$(srcdir)/'`memcpy.S
+
+lib_a-memcpy.obj: memcpy.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcpy.obj `if test -f 'memcpy.S'; then $(CYGPATH_W) 'memcpy.S'; else $(CYGPATH_W) '$(srcdir)/memcpy.S'; fi`
+
+lib_a-memset.o: memset.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memset.o `test -f 'memset.S' || echo '$(srcdir)/'`memset.S
+
+lib_a-memset.obj: memset.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memset.obj `if test -f 'memset.S'; then $(CYGPATH_W) 'memset.S'; else $(CYGPATH_W) '$(srcdir)/memset.S'; fi`
+
+lib_a-setjmp.o: setjmp.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.o `test -f 'setjmp.S' || echo '$(srcdir)/'`setjmp.S
+
+lib_a-setjmp.obj: setjmp.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.obj `if test -f 'setjmp.S'; then $(CYGPATH_W) 'setjmp.S'; else $(CYGPATH_W) '$(srcdir)/setjmp.S'; fi`
+
+lib_a-strcpy.o: strcpy.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strcpy.o `test -f 'strcpy.S' || echo '$(srcdir)/'`strcpy.S
+
+lib_a-strcpy.obj: strcpy.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strcpy.obj `if test -f 'strcpy.S'; then $(CYGPATH_W) 'strcpy.S'; else $(CYGPATH_W) '$(srcdir)/strcpy.S'; fi`
+
+lib_a-strlen.o: strlen.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strlen.o `test -f 'strlen.S' || echo '$(srcdir)/'`strlen.S
+
+lib_a-strlen.obj: strlen.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strlen.obj `if test -f 'strlen.S'; then $(CYGPATH_W) 'strlen.S'; else $(CYGPATH_W) '$(srcdir)/strlen.S'; fi`
+
+lib_a-strcmp.o: strcmp.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strcmp.o `test -f 'strcmp.S' || echo '$(srcdir)/'`strcmp.S
+
+lib_a-strcmp.obj: strcmp.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strcmp.obj `if test -f 'strcmp.S'; then $(CYGPATH_W) 'strcmp.S'; else $(CYGPATH_W) '$(srcdir)/strcmp.S'; fi`
+
+lib_a-strncpy.o: strncpy.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strncpy.o `test -f 'strncpy.S' || echo '$(srcdir)/'`strncpy.S
+
+lib_a-strncpy.obj: strncpy.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strncpy.obj `if test -f 'strncpy.S'; then $(CYGPATH_W) 'strncpy.S'; else $(CYGPATH_W) '$(srcdir)/strncpy.S'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
@@ -391,12 +437,12 @@ uninstall-am:
 	uninstall-am uninstall-info-am
 
 
-memcpy.o: asm.h
-memset.o: asm.h
-setjmp.o: asm.h
-strcpy.o: asm.h
-strcmp.o: asm.h
-strncpy.o: asm.h
+$(lpfx)memcpy.o: asm.h
+$(lpfx)memset.o: asm.h
+$(lpfx)setjmp.o: asm.h
+$(lpfx)strcpy.o: asm.h
+$(lpfx)strcmp.o: asm.h
+$(lpfx)strncpy.o: asm.h
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

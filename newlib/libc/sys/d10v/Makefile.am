@@ -9,6 +9,8 @@ AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
 
 lib_a_SOURCES = syscalls.c trap.S creat.c
+lib_a_CCASFLAGS = $(AM_CCASFLAGS)
+lib_a_CFLAGS = $(AM_CFLAGS)
 
 all: crt0.o
 

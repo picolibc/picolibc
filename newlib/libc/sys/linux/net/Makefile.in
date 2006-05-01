@@ -53,8 +53,7 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-am__DEPENDENCIES_1 = rcmd.$(oext) rcmdsh.$(oext)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
+lib_a_LIBADD =
 am__objects_1 = lib_a-addr2ascii.$(OBJEXT) lib_a-ascii2addr.$(OBJEXT) \
 	lib_a-base64.$(OBJEXT) lib_a-bindresvport.$(OBJEXT) \
 	lib_a-ether_addr.$(OBJEXT) lib_a-getaddrinfo.$(OBJEXT) \
@@ -87,10 +86,14 @@ am__objects_1 = lib_a-addr2ascii.$(OBJEXT) lib_a-ascii2addr.$(OBJEXT) \
 	lib_a-res_mkupdate.$(OBJEXT) lib_a-res_query.$(OBJEXT) \
 	lib_a-res_send.$(OBJEXT) lib_a-res_update.$(OBJEXT) \
 	lib_a-rthdr.$(OBJEXT) lib_a-vars.$(OBJEXT)
-@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1)
+am__objects_2 =
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_3 = $(am__objects_2)
+@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
+@USE_LIBTOOL_FALSE@	$(am__objects_3)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-am__objects_2 = libnet_la-addr2ascii.lo libnet_la-ascii2addr.lo \
+libnet_la_LIBADD =
+am__objects_4 = libnet_la-addr2ascii.lo libnet_la-ascii2addr.lo \
 	libnet_la-base64.lo libnet_la-bindresvport.lo \
 	libnet_la-ether_addr.lo libnet_la-getaddrinfo.lo \
 	libnet_la-gethostbydns.lo libnet_la-gethostbyht.lo \
@@ -121,7 +124,8 @@ am__objects_2 = libnet_la-addr2ascii.lo libnet_la-ascii2addr.lo \
 	libnet_la-res_mkupdate.lo libnet_la-res_query.lo \
 	libnet_la-res_send.lo libnet_la-res_update.lo \
 	libnet_la-rthdr.lo libnet_la-vars.lo
-@USE_LIBTOOL_TRUE@am_libnet_la_OBJECTS = $(am__objects_2)
+@USE_LIBTOOL_TRUE@am_libnet_la_OBJECTS = $(am__objects_4) \
+@USE_LIBTOOL_TRUE@	$(am__objects_3)
 libnet_la_OBJECTS = $(am_libnet_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libnet_la_rpath =
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -257,7 +261,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = cygnus
 INCLUDES = -I$(srcdir)/../include $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
-LIB_SOURCES = addr2ascii.c ascii2addr.c base64.c bindresvport.c ether_addr.c getaddrinfo.c \
+GENERAL_SOURCES = addr2ascii.c ascii2addr.c base64.c bindresvport.c ether_addr.c getaddrinfo.c \
 	gethostbydns.c gethostbyht.c gethostbynis.c gethostnamadr.c \
 	getifaddrs.c getnameinfo.c \
 	getnetbydns.c getnetbyht.c getnetbynis.c getnetnamadr.c \
@@ -276,27 +280,23 @@ LIB_SOURCES = addr2ascii.c ascii2addr.c base64.c bindresvport.c ether_addr.c get
 	res_init.c res_mkquery.c res_mkupdate.c res_query.c \
 	res_send.c res_update.c rthdr.c vars.c
 
-ELIX_4_OBJS = \
+ELIX_4_SOURCES = \
 	rcmd.$(oext) \
 	rcmdsh.$(oext)
 
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@LIB_OBJS = $(ELIX_4_OBJS)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@LIB_OBJS = 
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@LIB_OBJS = 
-@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@ELIX_SOURCES = $(ELIX_4_SOURCES)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@ELIX_SOURCES = 
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@ELIX_SOURCES = 
+@ELIX_LEVEL_1_TRUE@ELIX_SOURCES = 
 libnet_la_LDFLAGS = -Xcompiler -nostdlib
 libnet_la_CFLAGS = -DINET6
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libnet.la
-@USE_LIBTOOL_TRUE@libnet_la_SOURCES = $(LIB_SOURCES)
-@USE_LIBTOOL_TRUE@libnet_la_LIBADD = $(LIB_OBJS)
-@USE_LIBTOOL_TRUE@libnet_la_DEPENDENCIES = $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@libnet_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(LIB_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIB_OBJS)
 all: all-am
 
 .SUFFIXES:

@@ -53,21 +53,34 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-am__DEPENDENCIES_1 = ttyname.$(oext)
-am__DEPENDENCIES_2 = basename.$(oext) dirname.$(oext) getlogin.$(oext) \
-	getpass.$(oext) getpwent.$(oext) getut.$(oext)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__DEPENDENCIES_3 = $(am__DEPENDENCIES_1) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__DEPENDENCIES_2)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@am__DEPENDENCIES_3 = $(am__DEPENDENCIES_1)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__DEPENDENCIES_3 =  \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@	$(am__DEPENDENCIES_1)
+lib_a_LIBADD =
 am__objects_1 = lib_a-getcwd.$(OBJEXT) lib_a-pread.$(OBJEXT) \
 	lib_a-pwrite.$(OBJEXT) lib_a-sigset.$(OBJEXT)
-@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1)
+am__objects_2 = lib_a-ttyname.$(OBJEXT)
+am__objects_3 = lib_a-basename.$(OBJEXT) lib_a-dirname.$(OBJEXT) \
+	lib_a-getlogin.$(OBJEXT) lib_a-getpass.$(OBJEXT) \
+	lib_a-getpwent.$(OBJEXT) lib_a-getut.$(OBJEXT)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_4 = $(am__objects_2) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_3)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@am__objects_4 = $(am__objects_2)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__objects_4 =  \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@	$(am__objects_2)
+@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
+@USE_LIBTOOL_FALSE@	$(am__objects_4)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-am__objects_2 = getcwd.lo pread.lo pwrite.lo sigset.lo
-@USE_LIBTOOL_TRUE@am_libunix_la_OBJECTS = $(am__objects_2)
+libunix_la_LIBADD =
+am__objects_5 = getcwd.lo pread.lo pwrite.lo sigset.lo
+am__objects_6 = ttyname.lo
+am__objects_7 = basename.lo dirname.lo getlogin.lo getpass.lo \
+	getpwent.lo getut.lo
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_8 = $(am__objects_6) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_7)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@am__objects_8 = $(am__objects_6)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__objects_8 =  \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@	$(am__objects_6)
+@USE_LIBTOOL_TRUE@am_libunix_la_OBJECTS = $(am__objects_5) \
+@USE_LIBTOOL_TRUE@	$(am__objects_8)
 libunix_la_OBJECTS = $(am_libunix_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libunix_la_rpath =
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -231,33 +244,29 @@ GENERAL_SOURCES = \
 	pwrite.c 	\
 	sigset.c
 
-ELIX_2_OBJS = \
-	ttyname.$(oext)
+ELIX_2_SOURCES = \
+	ttyname.c
 
-ELIX_4_OBJS = \
-	basename.$(oext)	\
-	dirname.$(oext)		\
-	getlogin.$(oext)	\
-	getpass.$(oext) 	\
-	getpwent.$(oext) 	\
-	getut.$(oext)
+ELIX_4_SOURCES = \
+	basename.c	\
+	dirname.c	\
+	getlogin.c	\
+	getpass.c 	\
+	getpwent.c 	\
+	getut.c
 
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_4_OBJS)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@LIB_OBJS = $(ELIX_2_OBJS)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@LIB_OBJS = $(ELIX_2_OBJS)
-@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@ELIX_SOURCES = $(ELIX_2_SOURCES) $(ELIX_4_SOURCES)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@ELIX_SOURCES = $(ELIX_2_SOURCES)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@ELIX_SOURCES = $(ELIX_2_SOURCES)
+@ELIX_LEVEL_1_TRUE@ELIX_SOURCES = 
 libunix_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libunix.la
-@USE_LIBTOOL_TRUE@libunix_la_SOURCES = $(GENERAL_SOURCES)
-@USE_LIBTOOL_TRUE@libunix_la_LIBADD = $(LIB_OBJS)
-@USE_LIBTOOL_TRUE@libunix_la_DEPENDENCIES = $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@libunix_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIB_OBJS)
 CHEWOUT_FILES = 
 SUFFIXES = .def
 CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
@@ -353,6 +362,48 @@ lib_a-sigset.o: sigset.c
 
 lib_a-sigset.obj: sigset.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sigset.obj `if test -f 'sigset.c'; then $(CYGPATH_W) 'sigset.c'; else $(CYGPATH_W) '$(srcdir)/sigset.c'; fi`
+
+lib_a-ttyname.o: ttyname.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ttyname.o `test -f 'ttyname.c' || echo '$(srcdir)/'`ttyname.c
+
+lib_a-ttyname.obj: ttyname.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ttyname.obj `if test -f 'ttyname.c'; then $(CYGPATH_W) 'ttyname.c'; else $(CYGPATH_W) '$(srcdir)/ttyname.c'; fi`
+
+lib_a-basename.o: basename.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-basename.o `test -f 'basename.c' || echo '$(srcdir)/'`basename.c
+
+lib_a-basename.obj: basename.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-basename.obj `if test -f 'basename.c'; then $(CYGPATH_W) 'basename.c'; else $(CYGPATH_W) '$(srcdir)/basename.c'; fi`
+
+lib_a-dirname.o: dirname.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dirname.o `test -f 'dirname.c' || echo '$(srcdir)/'`dirname.c
+
+lib_a-dirname.obj: dirname.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dirname.obj `if test -f 'dirname.c'; then $(CYGPATH_W) 'dirname.c'; else $(CYGPATH_W) '$(srcdir)/dirname.c'; fi`
+
+lib_a-getlogin.o: getlogin.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getlogin.o `test -f 'getlogin.c' || echo '$(srcdir)/'`getlogin.c
+
+lib_a-getlogin.obj: getlogin.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getlogin.obj `if test -f 'getlogin.c'; then $(CYGPATH_W) 'getlogin.c'; else $(CYGPATH_W) '$(srcdir)/getlogin.c'; fi`
+
+lib_a-getpass.o: getpass.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getpass.o `test -f 'getpass.c' || echo '$(srcdir)/'`getpass.c
+
+lib_a-getpass.obj: getpass.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getpass.obj `if test -f 'getpass.c'; then $(CYGPATH_W) 'getpass.c'; else $(CYGPATH_W) '$(srcdir)/getpass.c'; fi`
+
+lib_a-getpwent.o: getpwent.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getpwent.o `test -f 'getpwent.c' || echo '$(srcdir)/'`getpwent.c
+
+lib_a-getpwent.obj: getpwent.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getpwent.obj `if test -f 'getpwent.c'; then $(CYGPATH_W) 'getpwent.c'; else $(CYGPATH_W) '$(srcdir)/getpwent.c'; fi`
+
+lib_a-getut.o: getut.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getut.o `test -f 'getut.c' || echo '$(srcdir)/'`getut.c
+
+lib_a-getut.obj: getut.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getut.obj `if test -f 'getut.c'; then $(CYGPATH_W) 'getut.c'; else $(CYGPATH_W) '$(srcdir)/getut.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

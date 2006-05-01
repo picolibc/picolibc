@@ -53,17 +53,29 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-@ELIX_LEVEL_1_FALSE@am__DEPENDENCIES_1 = fdopen64.$(oext) \
-@ELIX_LEVEL_1_FALSE@	fgetpos64.$(oext) fopen64.$(oext) \
-@ELIX_LEVEL_1_FALSE@	freopen64.$(oext) fseeko64.$(oext) \
-@ELIX_LEVEL_1_FALSE@	fsetpos64.$(oext) ftello64.$(oext) \
-@ELIX_LEVEL_1_FALSE@	stdio64.$(oext) tmpfile64.$(oext)
+lib_a_LIBADD =
 am__objects_1 = lib_a-dummy.$(OBJEXT)
-@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1)
+@ELIX_LEVEL_1_FALSE@am__objects_2 = lib_a-fdopen64.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-fgetpos64.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-fopen64.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-freopen64.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-fseeko64.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-fsetpos64.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-ftello64.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-stdio64.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-tmpfile64.$(OBJEXT)
+@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
+@USE_LIBTOOL_FALSE@	$(am__objects_2)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-am__objects_2 = dummy.lo
-@USE_LIBTOOL_TRUE@am_libstdio64_la_OBJECTS = $(am__objects_2)
+libstdio64_la_LIBADD =
+am__objects_3 = dummy.lo
+@ELIX_LEVEL_1_FALSE@am__objects_4 = fdopen64.lo fgetpos64.lo \
+@ELIX_LEVEL_1_FALSE@	fopen64.lo freopen64.lo fseeko64.lo \
+@ELIX_LEVEL_1_FALSE@	fsetpos64.lo ftello64.lo stdio64.lo \
+@ELIX_LEVEL_1_FALSE@	tmpfile64.lo
+@USE_LIBTOOL_TRUE@am_libstdio64_la_OBJECTS = $(am__objects_3) \
+@USE_LIBTOOL_TRUE@	$(am__objects_4)
 libstdio64_la_OBJECTS = $(am_libstdio64_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libstdio64_la_rpath =
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -224,32 +236,28 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 # need a dummy object so objectlist.awk.in will build every time
 GENERAL_SOURCES = dummy.c local64.h
-@ELIX_LEVEL_1_FALSE@LIB_OBJS = \
-@ELIX_LEVEL_1_FALSE@	fdopen64.$(oext) 	\
-@ELIX_LEVEL_1_FALSE@	fgetpos64.$(oext)	\
-@ELIX_LEVEL_1_FALSE@	fopen64.$(oext) 	\
-@ELIX_LEVEL_1_FALSE@	freopen64.$(oext) 	\
-@ELIX_LEVEL_1_FALSE@	fseeko64.$(oext) 	\
-@ELIX_LEVEL_1_FALSE@	fsetpos64.$(oext) 	\
-@ELIX_LEVEL_1_FALSE@	ftello64.$(oext)	\
-@ELIX_LEVEL_1_FALSE@	stdio64.$(oext)		\
-@ELIX_LEVEL_1_FALSE@	tmpfile64.$(oext)
+@ELIX_LEVEL_1_FALSE@ELIX_SOURCES = \
+@ELIX_LEVEL_1_FALSE@	fdopen64.c 	\
+@ELIX_LEVEL_1_FALSE@	fgetpos64.c	\
+@ELIX_LEVEL_1_FALSE@	fopen64.c 	\
+@ELIX_LEVEL_1_FALSE@	freopen64.c 	\
+@ELIX_LEVEL_1_FALSE@	fseeko64.c 	\
+@ELIX_LEVEL_1_FALSE@	fsetpos64.c 	\
+@ELIX_LEVEL_1_FALSE@	ftello64.c	\
+@ELIX_LEVEL_1_FALSE@	stdio64.c	\
+@ELIX_LEVEL_1_FALSE@	tmpfile64.c
 
-@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
+@ELIX_LEVEL_1_TRUE@ELIX_SOURCES = 
 libstdio64_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libstdio64.la
-@USE_LIBTOOL_TRUE@libstdio64_la_SOURCES = $(GENERAL_SOURCES)
-@USE_LIBTOOL_TRUE@libstdio64_la_LIBADD = $(LIB_OBJS)
-@USE_LIBTOOL_TRUE@libstdio64_la_DEPENDENCIES = $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@libstdio64_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@LIB_COMPILE = $(COMPILE)
 @USE_LIBTOOL_TRUE@LIB_COMPILE = $(LTCOMPILE)
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIB_OBJS)
 AM_CFLAGS = -I $(srcdir)/../stdio
 CHEWOUT_FILES = \
 	fgetpos64.def		\
@@ -336,6 +344,60 @@ lib_a-dummy.o: dummy.c
 
 lib_a-dummy.obj: dummy.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dummy.obj `if test -f 'dummy.c'; then $(CYGPATH_W) 'dummy.c'; else $(CYGPATH_W) '$(srcdir)/dummy.c'; fi`
+
+lib_a-fdopen64.o: fdopen64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fdopen64.o `test -f 'fdopen64.c' || echo '$(srcdir)/'`fdopen64.c
+
+lib_a-fdopen64.obj: fdopen64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fdopen64.obj `if test -f 'fdopen64.c'; then $(CYGPATH_W) 'fdopen64.c'; else $(CYGPATH_W) '$(srcdir)/fdopen64.c'; fi`
+
+lib_a-fgetpos64.o: fgetpos64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fgetpos64.o `test -f 'fgetpos64.c' || echo '$(srcdir)/'`fgetpos64.c
+
+lib_a-fgetpos64.obj: fgetpos64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fgetpos64.obj `if test -f 'fgetpos64.c'; then $(CYGPATH_W) 'fgetpos64.c'; else $(CYGPATH_W) '$(srcdir)/fgetpos64.c'; fi`
+
+lib_a-fopen64.o: fopen64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fopen64.o `test -f 'fopen64.c' || echo '$(srcdir)/'`fopen64.c
+
+lib_a-fopen64.obj: fopen64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fopen64.obj `if test -f 'fopen64.c'; then $(CYGPATH_W) 'fopen64.c'; else $(CYGPATH_W) '$(srcdir)/fopen64.c'; fi`
+
+lib_a-freopen64.o: freopen64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-freopen64.o `test -f 'freopen64.c' || echo '$(srcdir)/'`freopen64.c
+
+lib_a-freopen64.obj: freopen64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-freopen64.obj `if test -f 'freopen64.c'; then $(CYGPATH_W) 'freopen64.c'; else $(CYGPATH_W) '$(srcdir)/freopen64.c'; fi`
+
+lib_a-fseeko64.o: fseeko64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fseeko64.o `test -f 'fseeko64.c' || echo '$(srcdir)/'`fseeko64.c
+
+lib_a-fseeko64.obj: fseeko64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fseeko64.obj `if test -f 'fseeko64.c'; then $(CYGPATH_W) 'fseeko64.c'; else $(CYGPATH_W) '$(srcdir)/fseeko64.c'; fi`
+
+lib_a-fsetpos64.o: fsetpos64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fsetpos64.o `test -f 'fsetpos64.c' || echo '$(srcdir)/'`fsetpos64.c
+
+lib_a-fsetpos64.obj: fsetpos64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fsetpos64.obj `if test -f 'fsetpos64.c'; then $(CYGPATH_W) 'fsetpos64.c'; else $(CYGPATH_W) '$(srcdir)/fsetpos64.c'; fi`
+
+lib_a-ftello64.o: ftello64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ftello64.o `test -f 'ftello64.c' || echo '$(srcdir)/'`ftello64.c
+
+lib_a-ftello64.obj: ftello64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ftello64.obj `if test -f 'ftello64.c'; then $(CYGPATH_W) 'ftello64.c'; else $(CYGPATH_W) '$(srcdir)/ftello64.c'; fi`
+
+lib_a-stdio64.o: stdio64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stdio64.o `test -f 'stdio64.c' || echo '$(srcdir)/'`stdio64.c
+
+lib_a-stdio64.obj: stdio64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stdio64.obj `if test -f 'stdio64.c'; then $(CYGPATH_W) 'stdio64.c'; else $(CYGPATH_W) '$(srcdir)/stdio64.c'; fi`
+
+lib_a-tmpfile64.o: tmpfile64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tmpfile64.o `test -f 'tmpfile64.c' || echo '$(srcdir)/'`tmpfile64.c
+
+lib_a-tmpfile64.obj: tmpfile64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tmpfile64.obj `if test -f 'tmpfile64.c'; then $(CYGPATH_W) 'tmpfile64.c'; else $(CYGPATH_W) '$(srcdir)/tmpfile64.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

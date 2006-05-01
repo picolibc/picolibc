@@ -112,6 +112,9 @@ DIST_COMMON = $(srcdir)/../../../../Makefile.shared \
 	$(srcdir)/../../../../../compile \
 	$(srcdir)/../../../../../compile \
 	$(srcdir)/../../../../../compile \
+	$(srcdir)/../../../../../compile \
+	$(srcdir)/../../../../../compile \
+	$(srcdir)/../../../../../compile \
 	$(srcdir)/../../../../../ltmain.sh \
 	$(srcdir)/../../../../../config.guess \
 	$(srcdir)/../../../../../config.sub
@@ -137,15 +140,9 @@ toollibLIBRARIES_INSTALL = $(INSTALL_DATA)
 LIBRARIES = $(toollib_LIBRARIES)
 ARFLAGS = cru
 libpthread_a_AR = $(AR) $(ARFLAGS)
-am__DEPENDENCIES_1 = mutex.$(oext) specific.$(oext) pthread.$(oext) \
-	cancel.$(oext)
-am__DEPENDENCIES_2 = ptfork.$(oext)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@am__DEPENDENCIES_3 =  \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	$(am__DEPENDENCIES_2)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__DEPENDENCIES_3 =  \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@	reqsyscalls.$(oext)
-@ELIX_LEVEL_1_TRUE@am__DEPENDENCIES_3 = reqsyscalls.$(oext)
-am__DEPENDENCIES_4 =
+am__DEPENDENCIES_1 = $(lpfx)mutex.$(oext) $(lpfx)specific.$(oext) \
+	$(lpfx)pthread.$(oext) $(lpfx)cancel.$(oext)
+am__DEPENDENCIES_2 =
 am__objects_1 = libpthread_a-attr.$(OBJEXT) \
 	libpthread_a-barrier.$(OBJEXT) libpthread_a-condvar.$(OBJEXT) \
 	libpthread_a-events.$(OBJEXT) \
@@ -169,11 +166,17 @@ am__objects_1 = libpthread_a-attr.$(OBJEXT) \
 	libpthread_a-timer_gettime.$(OBJEXT) \
 	libpthread_a-timer_settime.$(OBJEXT) \
 	libpthread_a-wrapsyscall.$(OBJEXT)
-@USE_LIBTOOL_FALSE@am_libpthread_a_OBJECTS = $(am__objects_1)
+am__objects_2 = libpthread_a-ptfork.$(OBJEXT)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@am__objects_3 =  \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	$(am__objects_2)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__objects_3 = libpthread_a-reqsyscalls.$(OBJEXT)
+@ELIX_LEVEL_1_TRUE@am__objects_3 = libpthread_a-reqsyscalls.$(OBJEXT)
+@USE_LIBTOOL_FALSE@am_libpthread_a_OBJECTS = $(am__objects_1) \
+@USE_LIBTOOL_FALSE@	$(am__objects_3)
 libpthread_a_OBJECTS = $(am_libpthread_a_OBJECTS)
 libthread_db_a_AR = $(AR) $(ARFLAGS)
 libthread_db_a_LIBADD =
-am__objects_2 = libthread_db_a-td_init.$(OBJEXT) \
+am__objects_4 = libthread_db_a-td_init.$(OBJEXT) \
 	libthread_db_a-td_log.$(OBJEXT) \
 	libthread_db_a-td_ta_delete.$(OBJEXT) \
 	libthread_db_a-td_ta_get_nthreads.$(OBJEXT) \
@@ -211,11 +214,11 @@ am__objects_2 = libthread_db_a-td_init.$(OBJEXT) \
 	libthread_db_a-td_ta_event_getmsg.$(OBJEXT) \
 	libthread_db_a-td_ta_clear_event.$(OBJEXT) \
 	libthread_db_a-td_symbol_list.$(OBJEXT)
-@USE_LIBTOOL_FALSE@am_libthread_db_a_OBJECTS = $(am__objects_2)
+@USE_LIBTOOL_FALSE@am_libthread_db_a_OBJECTS = $(am__objects_4)
 libthread_db_a_OBJECTS = $(am_libthread_db_a_OBJECTS)
 toollibLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(toollib_LTLIBRARIES)
-am__objects_3 = attr.lo barrier.lo condvar.lo events.lo \
+am__objects_5 = attr.lo barrier.lo condvar.lo events.lo \
 	getcpuclockid.lo getreent.lo join.lo lockfile.lo manager.lo \
 	mq_notify.lo oldsemaphore.lo prio.lo ptclock_gettime.lo \
 	ptclock_settime.lo ptlongjmp.lo pt-machine.lo reent.lo \
@@ -223,11 +226,17 @@ am__objects_3 = attr.lo barrier.lo condvar.lo events.lo \
 	timer_create.lo timer_getoverr.lo timer_routines.lo \
 	timer_delete.lo timer_gettime.lo timer_settime.lo \
 	wrapsyscall.lo
-@USE_LIBTOOL_TRUE@am_libpthread_la_OBJECTS = $(am__objects_3)
+am__objects_6 = ptfork.lo
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@am__objects_7 =  \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	$(am__objects_6)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__objects_7 = reqsyscalls.lo
+@ELIX_LEVEL_1_TRUE@am__objects_7 = reqsyscalls.lo
+@USE_LIBTOOL_TRUE@am_libpthread_la_OBJECTS = $(am__objects_5) \
+@USE_LIBTOOL_TRUE@	$(am__objects_7)
 libpthread_la_OBJECTS = $(am_libpthread_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libpthread_la_rpath = -rpath $(toollibdir)
 libthread_db_la_LIBADD =
-am__objects_4 = td_init.lo td_log.lo td_ta_delete.lo \
+am__objects_8 = td_init.lo td_log.lo td_ta_delete.lo \
 	td_ta_get_nthreads.lo td_ta_get_ph.lo td_ta_map_id2thr.lo \
 	td_ta_map_lwp2thr.lo td_ta_new.lo td_ta_thr_iter.lo \
 	td_ta_tsd_iter.lo td_thr_get_info.lo td_thr_getfpregs.lo \
@@ -241,7 +250,7 @@ am__objects_4 = td_init.lo td_log.lo td_ta_delete.lo \
 	td_thr_clear_event.lo td_thr_event_getmsg.lo \
 	td_ta_set_event.lo td_ta_event_getmsg.lo td_ta_clear_event.lo \
 	td_symbol_list.lo
-@USE_LIBTOOL_TRUE@am_libthread_db_la_OBJECTS = $(am__objects_4)
+@USE_LIBTOOL_TRUE@am_libthread_db_la_OBJECTS = $(am__objects_8)
 libthread_db_la_OBJECTS = $(am_libthread_db_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libthread_db_la_rpath = -rpath $(toollibdir)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -412,33 +421,34 @@ LIB_DB_SOURCES = td_init.c td_log.c td_ta_delete.c td_ta_get_nthreads.c      \
 
 
 # Because of how libtool moves objects around, these files must be built last.
-LIBADD_OBJS = mutex.$(oext) specific.$(oext) pthread.$(oext) \
-	cancel.$(oext) 
+LIBADD_OBJS = \
+	$(lpfx)mutex.$(oext) $(lpfx)specific.$(oext) \
+	$(lpfx)pthread.$(oext) $(lpfx)cancel.$(oext) 
 
-ELIX_3_OBJS = \
-	ptfork.$(oext)
+ELIX_3_SOURCES = \
+	ptfork.c
 
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@EXTRA_OBJS = $(ELIX_3_OBJS)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@EXTRA_OBJS = reqsyscalls.$(oext)
-@ELIX_LEVEL_1_TRUE@EXTRA_OBJS = reqsyscalls.$(oext)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@ELIX_SOURCES = $(ELIX_3_SOURCES)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@ELIX_SOURCES = reqsyscalls.c
+@ELIX_LEVEL_1_TRUE@ELIX_SOURCES = reqsyscalls.c
 SUBDIRS = machine .
 tooldir = $(tooldir)
 toollibdir = $(top_toollibdir)
 libpthread_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -lgcc -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/../shared.ld `cat extra-libtool-objlist`
 libthread_db_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -lgcc -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/../shared.ld 
 @USE_LIBTOOL_TRUE@toollib_LTLIBRARIES = libpthread.la libthread_db.la
-@USE_LIBTOOL_TRUE@libpthread_la_SOURCES = $(LIB_SOURCES)
-@USE_LIBTOOL_TRUE@libpthread_la_LIBADD = $(LIBADD_OBJS) $(EXTRA_OBJS)
-@USE_LIBTOOL_TRUE@libpthread_la_DEPENDENCIES = $(LIBADD_OBJS) $(EXTRA_OBJS) extra-libtool-objlist
+@USE_LIBTOOL_TRUE@libpthread_la_SOURCES = $(LIB_SOURCES) $(ELIX_SOURCES)
+@USE_LIBTOOL_TRUE@libpthread_la_LIBADD = $(LIBADD_OBJS)
+@USE_LIBTOOL_TRUE@libpthread_la_DEPENDENCIES = $(LIBADD_OBJS) extra-libtool-objlist
 @USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@LIB_COMPILE = $(COMPILE)
 @USE_LIBTOOL_TRUE@LIB_COMPILE = $(LTCOMPILE)
 @USE_LIBTOOL_TRUE@libthread_db_la_SOURCES = $(LIB_DB_SOURCES)
 @USE_LIBTOOL_FALSE@toollib_LIBRARIES = libpthread.a libthread_db.a
-@USE_LIBTOOL_FALSE@libpthread_a_SOURCES = $(LIB_SOURCES)
-@USE_LIBTOOL_FALSE@libpthread_a_LIBADD = $(LIBADD_OBJS) $(EXTRA_OBJS) $(MACHINE_LIB)
+@USE_LIBTOOL_FALSE@libpthread_a_SOURCES = $(LIB_SOURCES) $(ELIX_SOURCES)
+@USE_LIBTOOL_FALSE@libpthread_a_LIBADD = $(LIBADD_OBJS) $(MACHINE_LIB)
 @USE_LIBTOOL_FALSE@libpthread_a_CFLAGS = $(AM_CFLAGS)
-@USE_LIBTOOL_FALSE@libpthread_a_DEPENDENCIES = $(LIBADD_OBJS) $(EXTRA_OBJS) $(MACHINE_LIB)
+@USE_LIBTOOL_FALSE@libpthread_a_DEPENDENCIES = $(LIBADD_OBJS) $(MACHINE_LIB)
 @USE_LIBTOOL_FALSE@libthread_db_a_SOURCES = $(LIB_DB_SOURCES)
 @USE_LIBTOOL_FALSE@libthread_db_a_CFLAGS = $(AM_CFLAGS)
 AM_CFLAGS = -D_XOPEN_SOURCE=600 -D_GNU_SOURCE=1
@@ -742,6 +752,18 @@ libpthread_a-wrapsyscall.o: wrapsyscall.c
 
 libpthread_a-wrapsyscall.obj: wrapsyscall.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-wrapsyscall.obj `if test -f 'wrapsyscall.c'; then $(CYGPATH_W) 'wrapsyscall.c'; else $(CYGPATH_W) '$(srcdir)/wrapsyscall.c'; fi`
+
+libpthread_a-ptfork.o: ptfork.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-ptfork.o `test -f 'ptfork.c' || echo '$(srcdir)/'`ptfork.c
+
+libpthread_a-ptfork.obj: ptfork.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-ptfork.obj `if test -f 'ptfork.c'; then $(CYGPATH_W) 'ptfork.c'; else $(CYGPATH_W) '$(srcdir)/ptfork.c'; fi`
+
+libpthread_a-reqsyscalls.o: reqsyscalls.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-reqsyscalls.o `test -f 'reqsyscalls.c' || echo '$(srcdir)/'`reqsyscalls.c
+
+libpthread_a-reqsyscalls.obj: reqsyscalls.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-reqsyscalls.obj `if test -f 'reqsyscalls.c'; then $(CYGPATH_W) 'reqsyscalls.c'; else $(CYGPATH_W) '$(srcdir)/reqsyscalls.c'; fi`
 
 libthread_db_a-td_init.o: td_init.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_init.o `test -f 'td_init.c' || echo '$(srcdir)/'`td_init.c
@@ -1254,19 +1276,19 @@ defs.h: pt-initfini.s
 crti.o: crti.S defs.h
 	$(CC) -g0 $(ASFLAGS) -o $@
 
-mutex.$(oext): $(srcdir)/mutex.c
+$(lpfx)mutex.$(oext): $(srcdir)/mutex.c
 	$(LIB_COMPILE) $(CFLAGS_noweak) -c $< -o $@
 
-specific.$(oext): $(srcdir)/specific.c
+$(lpfx)specific.$(oext): $(srcdir)/specific.c
 	$(LIB_COMPILE) $(CFLAGS_noweak) -c $< -o $@
 
-pthread.$(oext): $(srcdir)/pthread.c
+$(lpfx)pthread.$(oext): $(srcdir)/pthread.c
 	$(LIB_COMPILE) $(CFLAGS_pthread) -c $< -o $@
 
-ptfork.$(oext): $(srcdir)/ptfork.c
+$(lpfx)ptfork.$(oext): $(srcdir)/ptfork.c
 	$(LIB_COMPILE) $(CFLAGS_noweak) -c $< -o $@
 
-cancel.$(oext): $(srcdir)/cancel.c
+$(lpfx)cancel.$(oext): $(srcdir)/cancel.c
 	$(LIB_COMPILE) $(CFLAGS_cancel) -c $< -o $@
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

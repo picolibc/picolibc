@@ -87,38 +87,40 @@ GENERAL_SOURCES = \
 
 ## The following are EL/IX level 2 interfaces
 if ELIX_LEVEL_1
-LIB_OBJS =
+ELIX_SOURCES =
 else
-LIB_OBJS = \
-	asiprintf.$(oext)		\
-	asprintf.$(oext)		\
-	fcloseall.$(oext)		\
-	fseeko.$(oext) 			\
-	ftello.$(oext) 			\
-	getw.$(oext)			\
-	mktemp.$(oext) 			\
-	putw.$(oext) 			\
-	vasiprintf.$(oext)		\
-	vasprintf.$(oext)
+ELIX_SOURCES = \
+	asiprintf.c		\
+	asprintf.c		\
+	fcloseall.c		\
+	fseeko.c 		\
+	ftello.c 		\
+	getw.c			\
+	mktemp.c 		\
+	putw.c 			\
+	vasiprintf.c		\
+	vasprintf.c
 endif
 
-LIBADD_OBJS = vfiprintf.$(oext) vfprintf.$(oext) vfscanf.$(oext) vfiscanf.$(oext)
+LIBADD_OBJS = \
+	$(lpfx)vfiprintf.$(oext) $(lpfx)vfprintf.$(oext) \
+	$(lpfx)vfscanf.$(oext) $(lpfx)vfiscanf.$(oext)
 
 libstdio_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libstdio.la
-libstdio_la_SOURCES = $(GENERAL_SOURCES)
-libstdio_la_LIBADD = $(LIBADD_OBJS) $(LIB_OBJS)
-libstdio_la_DEPENDENCIES = $(LIBADD_OBJS) $(LIB_OBJS)
+libstdio_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
+libstdio_la_LIBADD = $(LIBADD_OBJS)
+libstdio_la_DEPENDENCIES = $(LIBADD_OBJS)
 LIB_COMPILE = $(LTCOMPILE)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(GENERAL_SOURCES)
-lib_a_LIBADD = $(LIBADD_OBJS) $(LIB_OBJS)
+lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
+lib_a_LIBADD = $(LIBADD_OBJS)
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_DEPENDENCIES = $(LIBADD_OBJS) $(LIB_OBJS)
+lib_a_DEPENDENCIES = $(LIBADD_OBJS)
 LIB_COMPILE = $(COMPILE)
 noinst_DATA =
 endif # USE_LIBTOOL
@@ -128,16 +130,16 @@ include $(srcdir)/../../Makefile.shared
 # This rule is needed so that libtool compiles vfiprintf before vfprintf. Otherwise
 # libtool moves vfprintf.o and subsequently can't find it.
 
-vfprintf.$(oext): vfprintf.c
-	$(LIB_COMPILE) -fshort-enums -c $(srcdir)/vfprintf.c
+$(lpfx)vfprintf.$(oext): vfprintf.c
+	$(LIB_COMPILE) -fshort-enums -c $(srcdir)/vfprintf.c -o $@
 
-vfiprintf.$(oext): vfprintf.c
+$(lpfx)vfiprintf.$(oext): vfprintf.c
 	$(LIB_COMPILE) -fshort-enums -DINTEGER_ONLY -c $(srcdir)/vfprintf.c -o $@
 
-vfscanf.$(oext): vfscanf.c
-	$(LIB_COMPILE) -c $(srcdir)/vfscanf.c
+$(lpfx)vfscanf.$(oext): vfscanf.c
+	$(LIB_COMPILE) -c $(srcdir)/vfscanf.c -o $@
 
-vfiscanf.$(oext): vfscanf.c
+$(lpfx)vfiscanf.$(oext): vfscanf.c
 	$(LIB_COMPILE) -DINTEGER_ONLY -c $(srcdir)/vfscanf.c -o $@
 
 CHEWOUT_FILES = \
@@ -212,41 +214,41 @@ doc: $(CHEWOUT_FILES)
 
 CLEANFILES = $(CHEWOUT_FILES) *.ref
 
-fclose.$(oext): local.h
-fdopen.$(oext): local.h
-fflush.$(oext): local.h
-findfp.$(oext): local.h
-fopen.$(oext): local.h
-fputs.$(oext): fvwrite.h
-fread.$(oext): local.h
-freopen.$(oext): local.h
-fseek.$(oext): local.h
-ftell.$(oext): local.h
-fvwrite.$(oext): local.h fvwrite.h
-fwalk.$(oext): local.h
-fwrite.$(oext): local.h fvwrite.h
-iscanf.$(oext): local.h
-makebuf.$(oext): local.h
-puts.$(oext): fvwrite.h
-refill.$(oext): local.h
-scanf.$(oext): local.h
-setbuf.$(oext): local.h
-setvbuf.$(oext): local.h
-siprintf.$(oext): local.h
-sniprintf.$(oext): local.h
-sprintf.$(oext): local.h
-siscanf.$(oext): local.h
-sscanf.$(oext): local.h
-stdio.$(oext): local.h
-ungetc.$(oext): local.h
-vfiprintf.$(oext): local.h
-vfprintf.$(oext): local.h
-vfiscanf.$(oext): local.h floatio.h
-vfscanf.$(oext): local.h floatio.h
-viscanf.$(oext): local.h
-vscanf.$(oext): local.h
-vsniprintf.$(oext): local.h
-vsiscanf.$(oext): local.h
-vsscanf.$(oext): local.h
-wbuf.$(oext): local.h fvwrite.h
-wsetup.$(oext): local.h
+$(lpfx)fclose.$(oext): local.h
+$(lpfx)fdopen.$(oext): local.h
+$(lpfx)fflush.$(oext): local.h
+$(lpfx)findfp.$(oext): local.h
+$(lpfx)fopen.$(oext): local.h
+$(lpfx)fputs.$(oext): fvwrite.h
+$(lpfx)fread.$(oext): local.h
+$(lpfx)freopen.$(oext): local.h
+$(lpfx)fseek.$(oext): local.h
+$(lpfx)ftell.$(oext): local.h
+$(lpfx)fvwrite.$(oext): local.h fvwrite.h
+$(lpfx)fwalk.$(oext): local.h
+$(lpfx)fwrite.$(oext): local.h fvwrite.h
+$(lpfx)iscanf.$(oext): local.h
+$(lpfx)makebuf.$(oext): local.h
+$(lpfx)puts.$(oext): fvwrite.h
+$(lpfx)refill.$(oext): local.h
+$(lpfx)scanf.$(oext): local.h
+$(lpfx)setbuf.$(oext): local.h
+$(lpfx)setvbuf.$(oext): local.h
+$(lpfx)siprintf.$(oext): local.h
+$(lpfx)sniprintf.$(oext): local.h
+$(lpfx)sprintf.$(oext): local.h
+$(lpfx)siscanf.$(oext): local.h
+$(lpfx)sscanf.$(oext): local.h
+$(lpfx)stdio.$(oext): local.h
+$(lpfx)ungetc.$(oext): local.h
+$(lpfx)vfiprintf.$(oext): local.h
+$(lpfx)vfprintf.$(oext): local.h
+$(lpfx)vfiscanf.$(oext): local.h floatio.h
+$(lpfx)vfscanf.$(oext): local.h floatio.h
+$(lpfx)viscanf.$(oext): local.h
+$(lpfx)vscanf.$(oext): local.h
+$(lpfx)vsniprintf.$(oext): local.h
+$(lpfx)vsiscanf.$(oext): local.h
+$(lpfx)vsscanf.$(oext): local.h
+$(lpfx)wbuf.$(oext): local.h fvwrite.h
+$(lpfx)wsetup.$(oext): local.h

@@ -8,32 +8,28 @@ GENERAL_SOURCES = timelocal.h ldpart.h locale.c lnumeric.h lmonetary.h lmessages
 
 ## The following interfaces are EL/IX level 2
 if ELIX_LEVEL_1
-LIB_OBJS =
+ELIX_SOURCES =
 else
-LIB_OBJS = \
-	fix_grouping.$(oext) \
-	ldpart.$(oext) \
-	lmessages.$(oext) \
-	lnumeric.$(oext) \
-	lmonetary.$(oext) \
-	nl_langinfo.$(oext) \
-	timelocal.$(oext)
+ELIX_SOURCES = \
+	fix_grouping.c \
+	ldpart.c \
+	lmessages.c \
+	lnumeric.c \
+	lmonetary.c \
+	nl_langinfo.c \
+	timelocal.c
 endif
 
 liblocale_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = liblocale.la
-liblocale_la_SOURCES = $(GENERAL_SOURCES)
-liblocale_la_LIBADD = $(LIB_OBJS)
-liblocale_la_DEPENDENCIES = $(LIB_OBJS)
+liblocale_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(GENERAL_SOURCES)
-lib_a_LIBADD = $(LIB_OBJS)
+lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA =
 endif # USE_LIBTOOL
 

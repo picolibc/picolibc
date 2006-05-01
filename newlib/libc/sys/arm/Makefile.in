@@ -41,7 +41,9 @@ host_triplet = @host@
 DIST_COMMON = $(srcdir)/../../../../config.guess \
 	$(srcdir)/../../../../config.sub $(srcdir)/Makefile.in \
 	$(srcdir)/Makefile.am $(top_srcdir)/configure \
-	$(am__configure_deps) $(srcdir)/../../../../mkinstalldirs
+	$(am__configure_deps) $(srcdir)/../../../../mkinstalldirs \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../../acinclude.m4 \
@@ -55,9 +57,9 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-@MAY_SUPPLY_SYSCALLS_TRUE@am__DEPENDENCIES_1 = libcfunc.o trap.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	syscalls.o
-am_lib_a_OBJECTS = aeabi_atexit.$(OBJEXT)
+@MAY_SUPPLY_SYSCALLS_TRUE@am__DEPENDENCIES_1 = $(lpfx)libcfunc.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)trap.o $(lpfx)syscalls.o
+am_lib_a_OBJECTS = lib_a-aeabi_atexit.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -181,11 +183,13 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
 @MAY_SUPPLY_SYSCALLS_FALSE@extra_objs = 
-@MAY_SUPPLY_SYSCALLS_TRUE@extra_objs = libcfunc.o trap.o syscalls.o
+@MAY_SUPPLY_SYSCALLS_TRUE@extra_objs = $(lpfx)libcfunc.o $(lpfx)trap.o $(lpfx)syscalls.o
 lib_a_SOURCES = aeabi_atexit.c
 lib_a_LIBADD = $(extra_objs)
 EXTRA_lib_a_SOURCES = trap.S syscalls.c libcfunc.c
 lib_a_DEPENDENCIES = $(extra_objs)
+lib_a_CCASFLAGS = $(AM_CCASFLAGS)
+lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
@@ -245,11 +249,35 @@ distclean-compile:
 .S.obj:
 	$(CCASCOMPILE) -c `$(CYGPATH_W) '$<'`
 
+lib_a-trap.o: trap.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-trap.o `test -f 'trap.S' || echo '$(srcdir)/'`trap.S
+
+lib_a-trap.obj: trap.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-trap.obj `if test -f 'trap.S'; then $(CYGPATH_W) 'trap.S'; else $(CYGPATH_W) '$(srcdir)/trap.S'; fi`
+
 .c.o:
 	$(COMPILE) -c $<
 
 .c.obj:
 	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+lib_a-aeabi_atexit.o: aeabi_atexit.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-aeabi_atexit.o `test -f 'aeabi_atexit.c' || echo '$(srcdir)/'`aeabi_atexit.c
+
+lib_a-aeabi_atexit.obj: aeabi_atexit.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-aeabi_atexit.obj `if test -f 'aeabi_atexit.c'; then $(CYGPATH_W) 'aeabi_atexit.c'; else $(CYGPATH_W) '$(srcdir)/aeabi_atexit.c'; fi`
+
+lib_a-syscalls.o: syscalls.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-syscalls.o `test -f 'syscalls.c' || echo '$(srcdir)/'`syscalls.c
+
+lib_a-syscalls.obj: syscalls.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-syscalls.obj `if test -f 'syscalls.c'; then $(CYGPATH_W) 'syscalls.c'; else $(CYGPATH_W) '$(srcdir)/syscalls.c'; fi`
+
+lib_a-libcfunc.o: libcfunc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-libcfunc.o `test -f 'libcfunc.c' || echo '$(srcdir)/'`libcfunc.c
+
+lib_a-libcfunc.obj: libcfunc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-libcfunc.obj `if test -f 'libcfunc.c'; then $(CYGPATH_W) 'libcfunc.c'; else $(CYGPATH_W) '$(srcdir)/libcfunc.c'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

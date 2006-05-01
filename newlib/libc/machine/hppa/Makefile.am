@@ -11,6 +11,8 @@ noinst_LIBRARIES = lib.a
 lib_a_SOURCES = \
 	memchr.S memcmp.S memcpy.S memset.S setjmp.S strcat.S strcmp.S \
 	strcpy.S strlen.S strncat.S strncmp.S strncpy.S
+lib_a_CCASFLAGS=$(AM_CCASFLAGS)
+lib_a_CFLAGS=$(AM_CFLAGS)
 
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

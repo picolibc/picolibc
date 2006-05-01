@@ -53,9 +53,7 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-@ELIX_LEVEL_1_FALSE@am__DEPENDENCIES_1 = bcmp.$(oext) memccpy.$(oext) \
-@ELIX_LEVEL_1_FALSE@	mempcpy.$(oext) strndup.$(oext) \
-@ELIX_LEVEL_1_FALSE@	strndup_r.$(oext)
+lib_a_LIBADD =
 am__objects_1 = lib_a-bcopy.$(OBJEXT) lib_a-bzero.$(OBJEXT) \
 	lib_a-index.$(OBJEXT) lib_a-memchr.$(OBJEXT) \
 	lib_a-memcmp.$(OBJEXT) lib_a-memcpy.$(OBJEXT) \
@@ -88,10 +86,17 @@ am__objects_1 = lib_a-bcopy.$(OBJEXT) lib_a-bzero.$(OBJEXT) \
 	lib_a-wcwidth.$(OBJEXT) lib_a-wmemchr.$(OBJEXT) \
 	lib_a-wmemcmp.$(OBJEXT) lib_a-wmemcpy.$(OBJEXT) \
 	lib_a-wmemmove.$(OBJEXT) lib_a-wmemset.$(OBJEXT)
-@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1)
+@ELIX_LEVEL_1_FALSE@am__objects_2 = lib_a-bcmp.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-memccpy.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-mempcpy.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-strndup.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-strndup_r.$(OBJEXT)
+@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
+@USE_LIBTOOL_FALSE@	$(am__objects_2)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-am__objects_2 = bcopy.lo bzero.lo index.lo memchr.lo memcmp.lo \
+libstring_la_LIBADD =
+am__objects_3 = bcopy.lo bzero.lo index.lo memchr.lo memcmp.lo \
 	memcpy.lo memmove.lo memset.lo rindex.lo strcasecmp.lo \
 	strcat.lo strchr.lo strcmp.lo strcoll.lo strcpy.lo strcspn.lo \
 	strdup.lo strdup_r.lo strerror.lo strerror_r.lo strlcat.lo \
@@ -104,7 +109,10 @@ am__objects_2 = bcopy.lo bzero.lo index.lo memchr.lo memcmp.lo \
 	wcspbrk.lo wcsrchr.lo wcsspn.lo wcsstr.lo wcswidth.lo \
 	wcwidth.lo wmemchr.lo wmemcmp.lo wmemcpy.lo wmemmove.lo \
 	wmemset.lo
-@USE_LIBTOOL_TRUE@am_libstring_la_OBJECTS = $(am__objects_2)
+@ELIX_LEVEL_1_FALSE@am__objects_4 = bcmp.lo memccpy.lo mempcpy.lo \
+@ELIX_LEVEL_1_FALSE@	strndup.lo strndup_r.lo
+@USE_LIBTOOL_TRUE@am_libstring_la_OBJECTS = $(am__objects_3) \
+@USE_LIBTOOL_TRUE@	$(am__objects_4)
 libstring_la_OBJECTS = $(am_libstring_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libstring_la_rpath =
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -328,26 +336,22 @@ GENERAL_SOURCES = \
 	wmemmove.c \
 	wmemset.c
 
-@ELIX_LEVEL_1_FALSE@LIB_OBJS = \
-@ELIX_LEVEL_1_FALSE@	bcmp.$(oext) \
-@ELIX_LEVEL_1_FALSE@	memccpy.$(oext) \
-@ELIX_LEVEL_1_FALSE@	mempcpy.$(oext) \
-@ELIX_LEVEL_1_FALSE@	strndup.$(oext) \
-@ELIX_LEVEL_1_FALSE@	strndup_r.$(oext)
+@ELIX_LEVEL_1_FALSE@ELIX_SOURCES = \
+@ELIX_LEVEL_1_FALSE@	bcmp.c \
+@ELIX_LEVEL_1_FALSE@	memccpy.c \
+@ELIX_LEVEL_1_FALSE@	mempcpy.c \
+@ELIX_LEVEL_1_FALSE@	strndup.c \
+@ELIX_LEVEL_1_FALSE@	strndup_r.c
 
-@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
+@ELIX_LEVEL_1_TRUE@ELIX_SOURCES = 
 libstring_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libstring.la
-@USE_LIBTOOL_TRUE@libstring_la_SOURCES = $(GENERAL_SOURCES)
-@USE_LIBTOOL_TRUE@libstring_la_LIBADD = $(LIB_OBJS)
-@USE_LIBTOOL_TRUE@libstring_la_DEPENDENCIES = $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@libstring_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIB_OBJS)
 CHEWOUT_FILES = \
 bcmp.def	memcpy.def	strcmp.def	strncat.def strstr.def \
 bcopy.def	memmove.def	strcoll.def	strncmp.def strtok.def \
@@ -819,6 +823,36 @@ lib_a-wmemset.o: wmemset.c
 
 lib_a-wmemset.obj: wmemset.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wmemset.obj `if test -f 'wmemset.c'; then $(CYGPATH_W) 'wmemset.c'; else $(CYGPATH_W) '$(srcdir)/wmemset.c'; fi`
+
+lib_a-bcmp.o: bcmp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-bcmp.o `test -f 'bcmp.c' || echo '$(srcdir)/'`bcmp.c
+
+lib_a-bcmp.obj: bcmp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-bcmp.obj `if test -f 'bcmp.c'; then $(CYGPATH_W) 'bcmp.c'; else $(CYGPATH_W) '$(srcdir)/bcmp.c'; fi`
+
+lib_a-memccpy.o: memccpy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memccpy.o `test -f 'memccpy.c' || echo '$(srcdir)/'`memccpy.c
+
+lib_a-memccpy.obj: memccpy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memccpy.obj `if test -f 'memccpy.c'; then $(CYGPATH_W) 'memccpy.c'; else $(CYGPATH_W) '$(srcdir)/memccpy.c'; fi`
+
+lib_a-mempcpy.o: mempcpy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mempcpy.o `test -f 'mempcpy.c' || echo '$(srcdir)/'`mempcpy.c
+
+lib_a-mempcpy.obj: mempcpy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mempcpy.obj `if test -f 'mempcpy.c'; then $(CYGPATH_W) 'mempcpy.c'; else $(CYGPATH_W) '$(srcdir)/mempcpy.c'; fi`
+
+lib_a-strndup.o: strndup.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strndup.o `test -f 'strndup.c' || echo '$(srcdir)/'`strndup.c
+
+lib_a-strndup.obj: strndup.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strndup.obj `if test -f 'strndup.c'; then $(CYGPATH_W) 'strndup.c'; else $(CYGPATH_W) '$(srcdir)/strndup.c'; fi`
+
+lib_a-strndup_r.o: strndup_r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strndup_r.o `test -f 'strndup_r.c' || echo '$(srcdir)/'`strndup_r.c
+
+lib_a-strndup_r.obj: strndup_r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strndup_r.obj `if test -f 'strndup_r.c'; then $(CYGPATH_W) 'strndup_r.c'; else $(CYGPATH_W) '$(srcdir)/strndup_r.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

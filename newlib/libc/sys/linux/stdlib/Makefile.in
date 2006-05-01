@@ -53,20 +53,27 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-am__DEPENDENCIES_1 = wordexp.$(oext) wordfree.$(oext)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@am__DEPENDENCIES_2 =  \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	$(am__DEPENDENCIES_1)
+lib_a_LIBADD =
 am__objects_1 = lib_a-fnmatch.$(OBJEXT) lib_a-glob.$(OBJEXT) \
 	lib_a-regcomp.$(OBJEXT) lib_a-regerror.$(OBJEXT) \
 	lib_a-regexec.$(OBJEXT) lib_a-regfree.$(OBJEXT) \
 	lib_a-collate.$(OBJEXT) lib_a-collcmp.$(OBJEXT) \
 	lib_a-reallocf.$(OBJEXT)
-@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1)
+am__objects_2 = lib_a-wordexp.$(OBJEXT) lib_a-wordfree.$(OBJEXT)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@am__objects_3 =  \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	$(am__objects_2)
+@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
+@USE_LIBTOOL_FALSE@	$(am__objects_3)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-am__objects_2 = fnmatch.lo glob.lo regcomp.lo regerror.lo regexec.lo \
+libstdlib_la_LIBADD =
+am__objects_4 = fnmatch.lo glob.lo regcomp.lo regerror.lo regexec.lo \
 	regfree.lo collate.lo collcmp.lo reallocf.lo
-@USE_LIBTOOL_TRUE@am_libstdlib_la_OBJECTS = $(am__objects_2)
+am__objects_5 = wordexp.lo wordfree.lo
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@am__objects_6 =  \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	$(am__objects_5)
+@USE_LIBTOOL_TRUE@am_libstdlib_la_OBJECTS = $(am__objects_4) \
+@USE_LIBTOOL_TRUE@	$(am__objects_6)
 libstdlib_la_OBJECTS = $(am_libstdlib_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libstdlib_la_rpath =
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -207,25 +214,21 @@ GENERAL_SOURCES = \
 	regexec.c regfree.c collate.h collate.c collcmp.c \
 	reallocf.c
 
-ELIX_3_OBJS = \
-	wordexp.$(oext) \
-	wordfree.$(oext)
+ELIX_3_SOURCES = \
+	wordexp.c \
+	wordfree.c
 
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@LIB_OBJS = $(ELIX_3_OBJS)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@LIB_OBJS = 
-@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@ELIX_SOURCES = $(ELIX_3_SOURCES)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@ELIX_SOURCES = 
+@ELIX_LEVEL_1_TRUE@ELIX_SOURCES = 
 libstdlib_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libstdlib.la
-@USE_LIBTOOL_TRUE@libstdlib_la_SOURCES = $(GENERAL_SOURCES)
-@USE_LIBTOOL_TRUE@libstdlib_la_LIBADD = $(LIB_OBJS) 
-@USE_LIBTOOL_TRUE@libstdlib_la_DEPENDENCIES = $(LIB_OBJS) 
+@USE_LIBTOOL_TRUE@libstdlib_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIB_OBJS) 
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIB_OBJS) 
 AM_CFLAGS = -D_GNU_SOURCE
 all: all-am
 
@@ -347,6 +350,18 @@ lib_a-reallocf.o: reallocf.c
 
 lib_a-reallocf.obj: reallocf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-reallocf.obj `if test -f 'reallocf.c'; then $(CYGPATH_W) 'reallocf.c'; else $(CYGPATH_W) '$(srcdir)/reallocf.c'; fi`
+
+lib_a-wordexp.o: wordexp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wordexp.o `test -f 'wordexp.c' || echo '$(srcdir)/'`wordexp.c
+
+lib_a-wordexp.obj: wordexp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wordexp.obj `if test -f 'wordexp.c'; then $(CYGPATH_W) 'wordexp.c'; else $(CYGPATH_W) '$(srcdir)/wordexp.c'; fi`
+
+lib_a-wordfree.o: wordfree.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wordfree.o `test -f 'wordfree.c' || echo '$(srcdir)/'`wordfree.c
+
+lib_a-wordfree.obj: wordfree.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wordfree.obj `if test -f 'wordfree.c'; then $(CYGPATH_W) 'wordfree.c'; else $(CYGPATH_W) '$(srcdir)/wordfree.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

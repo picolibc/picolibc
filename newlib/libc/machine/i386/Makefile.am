@@ -7,9 +7,9 @@ INCLUDES = -I $(newlib_basedir)/libm/common $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(T
 AM_CCASFLAGS = $(INCLUDES)
 
 if MACH_ADD_SETJMP
-mach_add_obj=setjmp.$(oext)
+ADDED_SOURCES = setjmp.S
 else
-mach_add_obj=
+ADDED_SOURCES =
 endif
 
 LIB_SOURCES = \
@@ -20,18 +20,13 @@ libi386_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libi386.la
-libi386_la_SOURCES = $(LIB_SOURCES)
-EXTRA_libi386_la_SOURCES = setjmp.S
-libi386_la_LIBADD = $(mach_add_obj)
-libi386_la_DEPENDENCIES = $(mach_add_obj)
+libi386_la_SOURCES = $(LIB_SOURCES) $(ADDED_SOURCES)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(LIB_SOURCES)
-lib_a_LIBADD = $(mach_add_obj)
+lib_a_SOURCES = $(LIB_SOURCES) $(ADDED_SOURCES)
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
-lib_a_DEPENDENCIES = $(mach_add_obj)
-EXTRA_lib_a_SOURCES = setjmp.S
+lib_a_CFLAGS=$(AM_CFLAGS)
 noinst_DATA =
 endif # USE_LIBTOOL
 

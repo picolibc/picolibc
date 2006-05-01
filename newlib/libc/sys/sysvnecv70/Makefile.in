@@ -41,7 +41,8 @@ host_triplet = @host@
 DIST_COMMON = $(srcdir)/../../../../config.guess \
 	$(srcdir)/../../../../config.sub $(srcdir)/Makefile.in \
 	$(srcdir)/Makefile.am $(top_srcdir)/configure \
-	$(am__configure_deps) $(srcdir)/../../../../mkinstalldirs
+	$(am__configure_deps) $(srcdir)/../../../../mkinstalldirs \
+	$(srcdir)/../../../../compile
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../../acinclude.m4 \
@@ -56,19 +57,22 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am_lib_a_OBJECTS = ioctl.$(OBJEXT) isatty.$(OBJEXT) read.$(OBJEXT) \
-	lseek.$(OBJEXT) close.$(OBJEXT) sbrk.$(OBJEXT) fstat.$(OBJEXT) \
-	cerror.$(OBJEXT) exit.$(OBJEXT) write.$(OBJEXT) \
-	sysv60.$(OBJEXT) fpx.$(OBJEXT) fps.$(OBJEXT) open.$(OBJEXT)
+am_lib_a_OBJECTS = lib_a-ioctl.$(OBJEXT) lib_a-isatty.$(OBJEXT) \
+	lib_a-read.$(OBJEXT) lib_a-lseek.$(OBJEXT) \
+	lib_a-close.$(OBJEXT) lib_a-sbrk.$(OBJEXT) \
+	lib_a-fstat.$(OBJEXT) lib_a-cerror.$(OBJEXT) \
+	lib_a-exit.$(OBJEXT) lib_a-write.$(OBJEXT) \
+	lib_a-sysv60.$(OBJEXT) lib_a-fpx.$(OBJEXT) lib_a-fps.$(OBJEXT) \
+	lib_a-open.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
 am__depfiles_maybe =
+CCASCOMPILE = $(CCAS) $(AM_CCASFLAGS) $(CCASFLAGS)
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-CCASCOMPILE = $(CCAS) $(AM_CCASFLAGS) $(CCASFLAGS)
 SOURCES = $(lib_a_SOURCES)
 ETAGS = etags
 CTAGS = ctags
@@ -182,15 +186,17 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = ioctl.s isatty.s read.s lseek.s close.s sbrk.s fstat.s \
-	cerror.s exit.s write.s sysv60.s fpx.c fps.s open.s
+lib_a_SOURCES = ioctl.S isatty.S read.S lseek.S close.S sbrk.S fstat.S \
+	cerror.S exit.S write.S sysv60.S fpx.c fps.S open.S
 
+lib_a_CCASFLAGS = $(AM_CCASFLAGS)
+lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .o .obj .s
+.SUFFIXES: .S .c .o .obj
 am--refresh:
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -238,17 +244,101 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+.S.o:
+	$(CCASCOMPILE) -c $<
+
+.S.obj:
+	$(CCASCOMPILE) -c `$(CYGPATH_W) '$<'`
+
+lib_a-ioctl.o: ioctl.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-ioctl.o `test -f 'ioctl.S' || echo '$(srcdir)/'`ioctl.S
+
+lib_a-ioctl.obj: ioctl.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-ioctl.obj `if test -f 'ioctl.S'; then $(CYGPATH_W) 'ioctl.S'; else $(CYGPATH_W) '$(srcdir)/ioctl.S'; fi`
+
+lib_a-isatty.o: isatty.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-isatty.o `test -f 'isatty.S' || echo '$(srcdir)/'`isatty.S
+
+lib_a-isatty.obj: isatty.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-isatty.obj `if test -f 'isatty.S'; then $(CYGPATH_W) 'isatty.S'; else $(CYGPATH_W) '$(srcdir)/isatty.S'; fi`
+
+lib_a-read.o: read.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-read.o `test -f 'read.S' || echo '$(srcdir)/'`read.S
+
+lib_a-read.obj: read.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-read.obj `if test -f 'read.S'; then $(CYGPATH_W) 'read.S'; else $(CYGPATH_W) '$(srcdir)/read.S'; fi`
+
+lib_a-lseek.o: lseek.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-lseek.o `test -f 'lseek.S' || echo '$(srcdir)/'`lseek.S
+
+lib_a-lseek.obj: lseek.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-lseek.obj `if test -f 'lseek.S'; then $(CYGPATH_W) 'lseek.S'; else $(CYGPATH_W) '$(srcdir)/lseek.S'; fi`
+
+lib_a-close.o: close.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-close.o `test -f 'close.S' || echo '$(srcdir)/'`close.S
+
+lib_a-close.obj: close.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-close.obj `if test -f 'close.S'; then $(CYGPATH_W) 'close.S'; else $(CYGPATH_W) '$(srcdir)/close.S'; fi`
+
+lib_a-sbrk.o: sbrk.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sbrk.o `test -f 'sbrk.S' || echo '$(srcdir)/'`sbrk.S
+
+lib_a-sbrk.obj: sbrk.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sbrk.obj `if test -f 'sbrk.S'; then $(CYGPATH_W) 'sbrk.S'; else $(CYGPATH_W) '$(srcdir)/sbrk.S'; fi`
+
+lib_a-fstat.o: fstat.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fstat.o `test -f 'fstat.S' || echo '$(srcdir)/'`fstat.S
+
+lib_a-fstat.obj: fstat.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fstat.obj `if test -f 'fstat.S'; then $(CYGPATH_W) 'fstat.S'; else $(CYGPATH_W) '$(srcdir)/fstat.S'; fi`
+
+lib_a-cerror.o: cerror.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-cerror.o `test -f 'cerror.S' || echo '$(srcdir)/'`cerror.S
+
+lib_a-cerror.obj: cerror.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-cerror.obj `if test -f 'cerror.S'; then $(CYGPATH_W) 'cerror.S'; else $(CYGPATH_W) '$(srcdir)/cerror.S'; fi`
+
+lib_a-exit.o: exit.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-exit.o `test -f 'exit.S' || echo '$(srcdir)/'`exit.S
+
+lib_a-exit.obj: exit.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-exit.obj `if test -f 'exit.S'; then $(CYGPATH_W) 'exit.S'; else $(CYGPATH_W) '$(srcdir)/exit.S'; fi`
+
+lib_a-write.o: write.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-write.o `test -f 'write.S' || echo '$(srcdir)/'`write.S
+
+lib_a-write.obj: write.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-write.obj `if test -f 'write.S'; then $(CYGPATH_W) 'write.S'; else $(CYGPATH_W) '$(srcdir)/write.S'; fi`
+
+lib_a-sysv60.o: sysv60.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sysv60.o `test -f 'sysv60.S' || echo '$(srcdir)/'`sysv60.S
+
+lib_a-sysv60.obj: sysv60.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sysv60.obj `if test -f 'sysv60.S'; then $(CYGPATH_W) 'sysv60.S'; else $(CYGPATH_W) '$(srcdir)/sysv60.S'; fi`
+
+lib_a-fps.o: fps.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fps.o `test -f 'fps.S' || echo '$(srcdir)/'`fps.S
+
+lib_a-fps.obj: fps.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fps.obj `if test -f 'fps.S'; then $(CYGPATH_W) 'fps.S'; else $(CYGPATH_W) '$(srcdir)/fps.S'; fi`
+
+lib_a-open.o: open.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-open.o `test -f 'open.S' || echo '$(srcdir)/'`open.S
+
+lib_a-open.obj: open.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-open.obj `if test -f 'open.S'; then $(CYGPATH_W) 'open.S'; else $(CYGPATH_W) '$(srcdir)/open.S'; fi`
+
 .c.o:
 	$(COMPILE) -c $<
 
 .c.obj:
 	$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
-.s.o:
-	$(CCASCOMPILE) -c $<
+lib_a-fpx.o: fpx.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fpx.o `test -f 'fpx.c' || echo '$(srcdir)/'`fpx.c
 
-.s.obj:
-	$(CCASCOMPILE) -c `$(CYGPATH_W) '$<'`
+lib_a-fpx.obj: fpx.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fpx.obj `if test -f 'fpx.c'; then $(CYGPATH_W) 'fpx.c'; else $(CYGPATH_W) '$(srcdir)/fpx.c'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

@@ -40,6 +40,7 @@ GENERAL_SOURCES = \
 	funlockfile.c \
 	getdate.c \
 	getdate_err.c \
+	gethostid.c \
 	gethostname.c \
 	getreent.c \
 	ids.c \
@@ -48,6 +49,7 @@ GENERAL_SOURCES = \
 	ipc.c \
 	linux.c \
 	mallinfor.c \
+	malloc.c \
 	mallocr.c \
 	mallstatsr.c \
 	mmap.c \
@@ -79,6 +81,7 @@ GENERAL_SOURCES = \
 	sched.c \
 	select.c \
 	seteuid.c \
+	sethostid.c \
 	sethostname.c \
 	shm_open.c \
 	shm_unlink.c \
@@ -103,62 +106,62 @@ GENERAL_SOURCES = \
 	usleep.c \
 	versionsort.c 
 
-ELIX_2_OBJS = \
-	aio64.$(oext) \
-	confstr.$(oext) \
-	ctermid.$(oext) \
-	fclean.$(oext) \
-	fpathconf.$(oext) \
-	fstab.$(oext) \
-	fstatvfs.$(oext) \
-	fstatvfs64.$(oext) \
-	ftw.$(oext) \
-	ftw64.$(oext) \
-	getopt.$(oext) \
-	getopt1.$(oext) \
-	getrlimit64.$(oext) \
-	getwd.$(oext) \
-	io64.$(oext) \
-	malign.$(oext) \
-	malignr.$(oext) \
-	malloptr.$(oext) \
-	mcheck.$(oext) \
-	mntent.$(oext) \
-	mntent_r.$(oext) \
-	pathconf.$(oext) \
-	pread64.$(oext) \
-	pvallocr.$(oext) \
-	pwrite64.$(oext) \
-	readdir64.$(oext) \
-	realpath.$(oext) \
-	scandir64.$(oext) \
-	setrlimit64.$(oext) \
-	statvfs.$(oext) \
-	statvfs64.$(oext) \
-	ttyname_r.$(oext) \
-	utimes.$(oext) \
-	vallocr.$(oext) \
-	versionsort64.$(oext)
+ELIX_2_SOURCES = \
+	aio64.c \
+	confstr.c \
+	ctermid.c \
+	fclean.c \
+	fpathconf.c \
+	fstab.c \
+	fstatvfs.c \
+	fstatvfs64.c \
+	ftw.c \
+	ftw64.c \
+	getopt.c \
+	getopt1.c \
+	getrlimit64.c \
+	getwd.c \
+	io64.c \
+	malign.c \
+	malignr.c \
+	malloptr.c \
+	mcheck.c \
+	mntent.c \
+	mntent_r.c \
+	pathconf.c \
+	pread64.c \
+	pvallocr.c \
+	pwrite64.c \
+	readdir64.c \
+	realpath.c \
+	scandir64.c \
+	setrlimit64.c \
+	statvfs.c \
+	statvfs64.c \
+	ttyname_r.c \
+	utimes.c \
+	vallocr.c \
+	versionsort64.c
 
-ELIX_3_OBJS = \
-	system.$(oext) \
-	wait.$(oext)
+ELIX_3_SOURCES = \
+	system.c \
+	wait.c
 
-ELIX_4_OBJS = \
-	getlogin.$(oext) \
-	getpwent.$(oext) \
-	stack.$(oext)
+ELIX_4_SOURCES = \
+	getlogin.c \
+	getpwent.c \
+	stack.c
 
 if ELIX_LEVEL_1
-LIB_OBJS =
+ELIX_SOURCES =
 else
 if ELIX_LEVEL_2
-LIB_OBJS = $(ELIX_2_OBJS)
+ELIX_SOURCES = $(ELIX_2_SOURCES)
 else
 if ELIX_LEVEL_3
-LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS)
+ELIX_SOURCES = $(ELIX_2_SOURCES) $(ELIX_3_SOURCES)
 else
-LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS) $(ELIX_4_OBJS)
+ELIX_SOURCES = $(ELIX_2_SOURCES) $(ELIX_3_SOURCES) $(ELIX_4_SOURCES)
 endif
 endif
 endif
@@ -170,28 +173,25 @@ SIGNAL_H = /usr/include/asm/signal.h
 liblinux_la_LDFLAGS = -Xcompiler -nostdlib
 
 ADD_OBJS = \
-	malloc.$(oext) \
-	gethostid.$(oext) \
-	sethostid.$(oext) \
 	$(LINUX_MACH_LIB)
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = liblinux.la
-liblinux_la_SOURCES = $(GENERAL_SOURCES)
-liblinux_la_LIBADD = $(ADD_OBJS) $(LIB_OBJS)
-liblinux_la_DEPENDENCIES = $(ADD_OBJS) $(LIB_OBJS)
+liblinux_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
+liblinux_la_LIBADD = $(ADD_OBJS)
+liblinux_la_DEPENDENCIES = $(ADD_OBJS)
 LIBC_COMPILE = $(LTCOMPILE)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(GENERAL_SOURCES)
-lib_a_LIBADD = $(ADD_OBJS) $(LIB_OBJS)
+lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
+lib_a_LIBADD = $(ADD_OBJS)
+lib_a_DEPENDENCIES = $(ADD_OBJS)
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_DEPENDENCIES = $(ADD_OBJS) $(LIB_OBJS)
 LIBC_COMPILE = $(COMPILE)
 noinst_DATA =
 
-lib.a:  $(ADD_OBJS) $(LIB_OBJS) $(lib_a_OBJECTS)
+lib.a:  $(lib_a_OBJECTS)
 	rm -f $@
 	rm -rf tmp
 	mkdir tmp
@@ -227,7 +227,7 @@ crt0.o: machine/crt0.o
 
 machine/crt0.o: ; @true
 
-sig.$(oext):	siglist.inc
+$(lpfx)sig.$(oext):	siglist.inc
 
 siglist.inc:
 		$(AWK) '{ max = 32 } \

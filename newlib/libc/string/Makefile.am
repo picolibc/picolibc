@@ -71,30 +71,26 @@ GENERAL_SOURCES = \
 	wmemset.c
 
 if ELIX_LEVEL_1
-LIB_OBJS =
+ELIX_SOURCES =
 else
-LIB_OBJS = \
-	bcmp.$(oext) \
-	memccpy.$(oext) \
-	mempcpy.$(oext) \
-	strndup.$(oext) \
-	strndup_r.$(oext)
+ELIX_SOURCES = \
+	bcmp.c \
+	memccpy.c \
+	mempcpy.c \
+	strndup.c \
+	strndup_r.c
 endif
 
 libstring_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libstring.la
-libstring_la_SOURCES = $(GENERAL_SOURCES)
-libstring_la_LIBADD = $(LIB_OBJS)
-libstring_la_DEPENDENCIES = $(LIB_OBJS)
+libstring_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(GENERAL_SOURCES)
-lib_a_LIBADD = $(LIB_OBJS)
+lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA =
 endif # USE_LIBTOOL
 

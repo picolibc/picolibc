@@ -56,9 +56,11 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am_lib_a_OBJECTS = setjmp.$(OBJEXT) memchr.$(OBJEXT) memcmp.$(OBJEXT) \
-	memcpy.$(OBJEXT) memset.$(OBJEXT) strchr.$(OBJEXT) \
-	strcmp.$(OBJEXT) strcpy.$(OBJEXT) strlen.$(OBJEXT)
+am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-memchr.$(OBJEXT) \
+	lib_a-memcmp.$(OBJEXT) lib_a-memcpy.$(OBJEXT) \
+	lib_a-memset.$(OBJEXT) lib_a-strchr.$(OBJEXT) \
+	lib_a-strcmp.$(OBJEXT) lib_a-strcpy.$(OBJEXT) \
+	lib_a-strlen.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -184,6 +186,8 @@ noinst_LIBRARIES = lib.a
 lib_a_SOURCES = setjmp.S memchr.S memcmp.S memcpy.S memset.S strchr.S \
 	strcmp.S strcpy.S strlen.S
 
+lib_a_CFLAGS = $(AM_CFLAGS)
+lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
@@ -242,6 +246,60 @@ distclean-compile:
 
 .S.obj:
 	$(CCASCOMPILE) -c `$(CYGPATH_W) '$<'`
+
+lib_a-setjmp.o: setjmp.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.o `test -f 'setjmp.S' || echo '$(srcdir)/'`setjmp.S
+
+lib_a-setjmp.obj: setjmp.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.obj `if test -f 'setjmp.S'; then $(CYGPATH_W) 'setjmp.S'; else $(CYGPATH_W) '$(srcdir)/setjmp.S'; fi`
+
+lib_a-memchr.o: memchr.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memchr.o `test -f 'memchr.S' || echo '$(srcdir)/'`memchr.S
+
+lib_a-memchr.obj: memchr.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memchr.obj `if test -f 'memchr.S'; then $(CYGPATH_W) 'memchr.S'; else $(CYGPATH_W) '$(srcdir)/memchr.S'; fi`
+
+lib_a-memcmp.o: memcmp.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcmp.o `test -f 'memcmp.S' || echo '$(srcdir)/'`memcmp.S
+
+lib_a-memcmp.obj: memcmp.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcmp.obj `if test -f 'memcmp.S'; then $(CYGPATH_W) 'memcmp.S'; else $(CYGPATH_W) '$(srcdir)/memcmp.S'; fi`
+
+lib_a-memcpy.o: memcpy.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcpy.o `test -f 'memcpy.S' || echo '$(srcdir)/'`memcpy.S
+
+lib_a-memcpy.obj: memcpy.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcpy.obj `if test -f 'memcpy.S'; then $(CYGPATH_W) 'memcpy.S'; else $(CYGPATH_W) '$(srcdir)/memcpy.S'; fi`
+
+lib_a-memset.o: memset.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memset.o `test -f 'memset.S' || echo '$(srcdir)/'`memset.S
+
+lib_a-memset.obj: memset.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memset.obj `if test -f 'memset.S'; then $(CYGPATH_W) 'memset.S'; else $(CYGPATH_W) '$(srcdir)/memset.S'; fi`
+
+lib_a-strchr.o: strchr.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strchr.o `test -f 'strchr.S' || echo '$(srcdir)/'`strchr.S
+
+lib_a-strchr.obj: strchr.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strchr.obj `if test -f 'strchr.S'; then $(CYGPATH_W) 'strchr.S'; else $(CYGPATH_W) '$(srcdir)/strchr.S'; fi`
+
+lib_a-strcmp.o: strcmp.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strcmp.o `test -f 'strcmp.S' || echo '$(srcdir)/'`strcmp.S
+
+lib_a-strcmp.obj: strcmp.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strcmp.obj `if test -f 'strcmp.S'; then $(CYGPATH_W) 'strcmp.S'; else $(CYGPATH_W) '$(srcdir)/strcmp.S'; fi`
+
+lib_a-strcpy.o: strcpy.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strcpy.o `test -f 'strcpy.S' || echo '$(srcdir)/'`strcpy.S
+
+lib_a-strcpy.obj: strcpy.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strcpy.obj `if test -f 'strcpy.S'; then $(CYGPATH_W) 'strcpy.S'; else $(CYGPATH_W) '$(srcdir)/strcpy.S'; fi`
+
+lib_a-strlen.o: strlen.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strlen.o `test -f 'strlen.S' || echo '$(srcdir)/'`strlen.S
+
+lib_a-strlen.obj: strlen.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strlen.obj `if test -f 'strlen.S'; then $(CYGPATH_W) 'strlen.S'; else $(CYGPATH_W) '$(srcdir)/strlen.S'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

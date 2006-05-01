@@ -41,7 +41,9 @@ host_triplet = @host@
 DIST_COMMON = $(srcdir)/../../../../config.guess \
 	$(srcdir)/../../../../config.sub $(srcdir)/Makefile.in \
 	$(srcdir)/Makefile.am $(top_srcdir)/configure \
-	$(am__configure_deps) $(srcdir)/../../../../mkinstalldirs
+	$(am__configure_deps) $(srcdir)/../../../../mkinstalldirs \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../../acinclude.m4 \
@@ -56,18 +58,19 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am_lib_a_OBJECTS = udivhi3.$(OBJEXT) umodhi3.$(OBJEXT) \
-	smulhi3.$(OBJEXT) lshrhi.$(OBJEXT) sdivhi3.$(OBJEXT) \
-	mulsi3.$(OBJEXT) divsi3.$(OBJEXT) cmpsi.$(OBJEXT)
+am_lib_a_OBJECTS = lib_a-udivhi3.$(OBJEXT) lib_a-umodhi3.$(OBJEXT) \
+	lib_a-smulhi3.$(OBJEXT) lib_a-lshrhi.$(OBJEXT) \
+	lib_a-sdivhi3.$(OBJEXT) lib_a-mulsi3.$(OBJEXT) \
+	lib_a-divsi3.$(OBJEXT) lib_a-cmpsi.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
 am__depfiles_maybe =
+CCASCOMPILE = $(CCAS) $(AM_CCASFLAGS) $(CCASFLAGS)
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-CCASCOMPILE = $(CCAS) $(AM_CCASFLAGS) $(CCASFLAGS)
 SOURCES = $(lib_a_SOURCES)
 ETAGS = etags
 CTAGS = ctags
@@ -181,15 +184,17 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = udivhi3.s umodhi3.s smulhi3.s lshrhi.s sdivhi3.s mulsi3.c \
+lib_a_SOURCES = udivhi3.S umodhi3.S smulhi3.S lshrhi.S sdivhi3.S mulsi3.c \
 	divsi3.c cmpsi.c
 
+lib_a_CCASFLAGS = $(AM_CCASFLAGS)
+lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .o .obj .s
+.SUFFIXES: .S .c .o .obj
 am--refresh:
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -237,17 +242,65 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+.S.o:
+	$(CCASCOMPILE) -c $<
+
+.S.obj:
+	$(CCASCOMPILE) -c `$(CYGPATH_W) '$<'`
+
+lib_a-udivhi3.o: udivhi3.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-udivhi3.o `test -f 'udivhi3.S' || echo '$(srcdir)/'`udivhi3.S
+
+lib_a-udivhi3.obj: udivhi3.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-udivhi3.obj `if test -f 'udivhi3.S'; then $(CYGPATH_W) 'udivhi3.S'; else $(CYGPATH_W) '$(srcdir)/udivhi3.S'; fi`
+
+lib_a-umodhi3.o: umodhi3.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-umodhi3.o `test -f 'umodhi3.S' || echo '$(srcdir)/'`umodhi3.S
+
+lib_a-umodhi3.obj: umodhi3.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-umodhi3.obj `if test -f 'umodhi3.S'; then $(CYGPATH_W) 'umodhi3.S'; else $(CYGPATH_W) '$(srcdir)/umodhi3.S'; fi`
+
+lib_a-smulhi3.o: smulhi3.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-smulhi3.o `test -f 'smulhi3.S' || echo '$(srcdir)/'`smulhi3.S
+
+lib_a-smulhi3.obj: smulhi3.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-smulhi3.obj `if test -f 'smulhi3.S'; then $(CYGPATH_W) 'smulhi3.S'; else $(CYGPATH_W) '$(srcdir)/smulhi3.S'; fi`
+
+lib_a-lshrhi.o: lshrhi.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-lshrhi.o `test -f 'lshrhi.S' || echo '$(srcdir)/'`lshrhi.S
+
+lib_a-lshrhi.obj: lshrhi.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-lshrhi.obj `if test -f 'lshrhi.S'; then $(CYGPATH_W) 'lshrhi.S'; else $(CYGPATH_W) '$(srcdir)/lshrhi.S'; fi`
+
+lib_a-sdivhi3.o: sdivhi3.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sdivhi3.o `test -f 'sdivhi3.S' || echo '$(srcdir)/'`sdivhi3.S
+
+lib_a-sdivhi3.obj: sdivhi3.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sdivhi3.obj `if test -f 'sdivhi3.S'; then $(CYGPATH_W) 'sdivhi3.S'; else $(CYGPATH_W) '$(srcdir)/sdivhi3.S'; fi`
+
 .c.o:
 	$(COMPILE) -c $<
 
 .c.obj:
 	$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
-.s.o:
-	$(CCASCOMPILE) -c $<
+lib_a-mulsi3.o: mulsi3.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mulsi3.o `test -f 'mulsi3.c' || echo '$(srcdir)/'`mulsi3.c
 
-.s.obj:
-	$(CCASCOMPILE) -c `$(CYGPATH_W) '$<'`
+lib_a-mulsi3.obj: mulsi3.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mulsi3.obj `if test -f 'mulsi3.c'; then $(CYGPATH_W) 'mulsi3.c'; else $(CYGPATH_W) '$(srcdir)/mulsi3.c'; fi`
+
+lib_a-divsi3.o: divsi3.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-divsi3.o `test -f 'divsi3.c' || echo '$(srcdir)/'`divsi3.c
+
+lib_a-divsi3.obj: divsi3.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-divsi3.obj `if test -f 'divsi3.c'; then $(CYGPATH_W) 'divsi3.c'; else $(CYGPATH_W) '$(srcdir)/divsi3.c'; fi`
+
+lib_a-cmpsi.o: cmpsi.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cmpsi.o `test -f 'cmpsi.c' || echo '$(srcdir)/'`cmpsi.c
+
+lib_a-cmpsi.obj: cmpsi.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cmpsi.obj `if test -f 'cmpsi.c'; then $(CYGPATH_W) 'cmpsi.c'; else $(CYGPATH_W) '$(srcdir)/cmpsi.c'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

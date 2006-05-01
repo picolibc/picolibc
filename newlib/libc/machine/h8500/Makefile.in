@@ -41,7 +41,9 @@ host_triplet = @host@
 DIST_COMMON = $(srcdir)/../../../../config.guess \
 	$(srcdir)/../../../../config.sub $(srcdir)/Makefile.in \
 	$(srcdir)/Makefile.am $(top_srcdir)/configure \
-	$(am__configure_deps) $(srcdir)/../../../../mkinstalldirs
+	$(am__configure_deps) $(srcdir)/../../../../mkinstalldirs \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../../acinclude.m4 \
@@ -56,9 +58,10 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am_lib_a_OBJECTS = divsi3.$(OBJEXT) mulsi3.$(OBJEXT) divhi3.$(OBJEXT) \
-	shifts.$(OBJEXT) cmpsi.$(OBJEXT) psi.$(OBJEXT) \
-	setjmp.$(OBJEXT)
+am_lib_a_OBJECTS = lib_a-divsi3.$(OBJEXT) lib_a-mulsi3.$(OBJEXT) \
+	lib_a-divhi3.$(OBJEXT) lib_a-shifts.$(OBJEXT) \
+	lib_a-cmpsi.$(OBJEXT) lib_a-psi.$(OBJEXT) \
+	lib_a-setjmp.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -182,6 +185,8 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = divsi3.c mulsi3.c divhi3.S shifts.c cmpsi.c psi.S setjmp.S
+lib_a_CCASFLAGS = $(AM_CCASFLAGS)
+lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
@@ -241,11 +246,53 @@ distclean-compile:
 .S.obj:
 	$(CCASCOMPILE) -c `$(CYGPATH_W) '$<'`
 
+lib_a-divhi3.o: divhi3.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-divhi3.o `test -f 'divhi3.S' || echo '$(srcdir)/'`divhi3.S
+
+lib_a-divhi3.obj: divhi3.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-divhi3.obj `if test -f 'divhi3.S'; then $(CYGPATH_W) 'divhi3.S'; else $(CYGPATH_W) '$(srcdir)/divhi3.S'; fi`
+
+lib_a-psi.o: psi.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-psi.o `test -f 'psi.S' || echo '$(srcdir)/'`psi.S
+
+lib_a-psi.obj: psi.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-psi.obj `if test -f 'psi.S'; then $(CYGPATH_W) 'psi.S'; else $(CYGPATH_W) '$(srcdir)/psi.S'; fi`
+
+lib_a-setjmp.o: setjmp.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.o `test -f 'setjmp.S' || echo '$(srcdir)/'`setjmp.S
+
+lib_a-setjmp.obj: setjmp.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.obj `if test -f 'setjmp.S'; then $(CYGPATH_W) 'setjmp.S'; else $(CYGPATH_W) '$(srcdir)/setjmp.S'; fi`
+
 .c.o:
 	$(COMPILE) -c $<
 
 .c.obj:
 	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+lib_a-divsi3.o: divsi3.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-divsi3.o `test -f 'divsi3.c' || echo '$(srcdir)/'`divsi3.c
+
+lib_a-divsi3.obj: divsi3.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-divsi3.obj `if test -f 'divsi3.c'; then $(CYGPATH_W) 'divsi3.c'; else $(CYGPATH_W) '$(srcdir)/divsi3.c'; fi`
+
+lib_a-mulsi3.o: mulsi3.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mulsi3.o `test -f 'mulsi3.c' || echo '$(srcdir)/'`mulsi3.c
+
+lib_a-mulsi3.obj: mulsi3.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mulsi3.obj `if test -f 'mulsi3.c'; then $(CYGPATH_W) 'mulsi3.c'; else $(CYGPATH_W) '$(srcdir)/mulsi3.c'; fi`
+
+lib_a-shifts.o: shifts.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-shifts.o `test -f 'shifts.c' || echo '$(srcdir)/'`shifts.c
+
+lib_a-shifts.obj: shifts.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-shifts.obj `if test -f 'shifts.c'; then $(CYGPATH_W) 'shifts.c'; else $(CYGPATH_W) '$(srcdir)/shifts.c'; fi`
+
+lib_a-cmpsi.o: cmpsi.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cmpsi.o `test -f 'cmpsi.c' || echo '$(srcdir)/'`cmpsi.c
+
+lib_a-cmpsi.obj: cmpsi.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cmpsi.obj `if test -f 'cmpsi.c'; then $(CYGPATH_W) 'cmpsi.c'; else $(CYGPATH_W) '$(srcdir)/cmpsi.c'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

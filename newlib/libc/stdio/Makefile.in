@@ -53,13 +53,8 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-am__DEPENDENCIES_1 = vfiprintf.$(oext) vfprintf.$(oext) \
-	vfscanf.$(oext) vfiscanf.$(oext)
-@ELIX_LEVEL_1_FALSE@am__DEPENDENCIES_2 = asiprintf.$(oext) \
-@ELIX_LEVEL_1_FALSE@	asprintf.$(oext) fcloseall.$(oext) \
-@ELIX_LEVEL_1_FALSE@	fseeko.$(oext) ftello.$(oext) getw.$(oext) \
-@ELIX_LEVEL_1_FALSE@	mktemp.$(oext) putw.$(oext) \
-@ELIX_LEVEL_1_FALSE@	vasiprintf.$(oext) vasprintf.$(oext)
+am__DEPENDENCIES_1 = $(lpfx)vfiprintf.$(oext) $(lpfx)vfprintf.$(oext) \
+	$(lpfx)vfscanf.$(oext) $(lpfx)vfiscanf.$(oext)
 am__objects_1 = lib_a-clearerr.$(OBJEXT) lib_a-dprintf.$(OBJEXT) \
 	lib_a-fclose.$(OBJEXT) lib_a-fdopen.$(OBJEXT) \
 	lib_a-feof.$(OBJEXT) lib_a-ferror.$(OBJEXT) \
@@ -100,10 +95,21 @@ am__objects_1 = lib_a-clearerr.$(OBJEXT) lib_a-dprintf.$(OBJEXT) \
 	lib_a-vsniprintf.$(OBJEXT) lib_a-vsprintf.$(OBJEXT) \
 	lib_a-vsscanf.$(OBJEXT) lib_a-wbuf.$(OBJEXT) \
 	lib_a-wsetup.$(OBJEXT)
-@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1)
+@ELIX_LEVEL_1_FALSE@am__objects_2 = lib_a-asiprintf.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-asprintf.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-fcloseall.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-fseeko.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-ftello.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-getw.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-mktemp.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-putw.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-vasiprintf.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-vasprintf.$(OBJEXT)
+@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
+@USE_LIBTOOL_FALSE@	$(am__objects_2)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-am__objects_2 = clearerr.lo dprintf.lo fclose.lo fdopen.lo feof.lo \
+am__objects_3 = clearerr.lo dprintf.lo fclose.lo fdopen.lo feof.lo \
 	ferror.lo fflush.lo fgetc.lo fgetpos.lo fgets.lo fileno.lo \
 	findfp.lo fiprintf.lo flags.lo fopen.lo fprintf.lo fputc.lo \
 	fputs.lo fread.lo freopen.lo fscanf.lo fiscanf.lo fseek.lo \
@@ -118,7 +124,12 @@ am__objects_2 = clearerr.lo dprintf.lo fclose.lo fdopen.lo feof.lo \
 	viprintf.lo viscanf.lo vprintf.lo vscanf.lo vsiprintf.lo \
 	vsiscanf.lo vsnprintf.lo vsniprintf.lo vsprintf.lo vsscanf.lo \
 	wbuf.lo wsetup.lo
-@USE_LIBTOOL_TRUE@am_libstdio_la_OBJECTS = $(am__objects_2)
+@ELIX_LEVEL_1_FALSE@am__objects_4 = asiprintf.lo asprintf.lo \
+@ELIX_LEVEL_1_FALSE@	fcloseall.lo fseeko.lo ftello.lo getw.lo \
+@ELIX_LEVEL_1_FALSE@	mktemp.lo putw.lo vasiprintf.lo \
+@ELIX_LEVEL_1_FALSE@	vasprintf.lo
+@USE_LIBTOOL_TRUE@am_libstdio_la_OBJECTS = $(am__objects_3) \
+@USE_LIBTOOL_TRUE@	$(am__objects_4)
 libstdio_la_OBJECTS = $(am_libstdio_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libstdio_la_rpath =
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -357,34 +368,37 @@ GENERAL_SOURCES = \
 	wbuf.c 				\
 	wsetup.c 
 
-@ELIX_LEVEL_1_FALSE@LIB_OBJS = \
-@ELIX_LEVEL_1_FALSE@	asiprintf.$(oext)		\
-@ELIX_LEVEL_1_FALSE@	asprintf.$(oext)		\
-@ELIX_LEVEL_1_FALSE@	fcloseall.$(oext)		\
-@ELIX_LEVEL_1_FALSE@	fseeko.$(oext) 			\
-@ELIX_LEVEL_1_FALSE@	ftello.$(oext) 			\
-@ELIX_LEVEL_1_FALSE@	getw.$(oext)			\
-@ELIX_LEVEL_1_FALSE@	mktemp.$(oext) 			\
-@ELIX_LEVEL_1_FALSE@	putw.$(oext) 			\
-@ELIX_LEVEL_1_FALSE@	vasiprintf.$(oext)		\
-@ELIX_LEVEL_1_FALSE@	vasprintf.$(oext)
+@ELIX_LEVEL_1_FALSE@ELIX_SOURCES = \
+@ELIX_LEVEL_1_FALSE@	asiprintf.c		\
+@ELIX_LEVEL_1_FALSE@	asprintf.c		\
+@ELIX_LEVEL_1_FALSE@	fcloseall.c		\
+@ELIX_LEVEL_1_FALSE@	fseeko.c 		\
+@ELIX_LEVEL_1_FALSE@	ftello.c 		\
+@ELIX_LEVEL_1_FALSE@	getw.c			\
+@ELIX_LEVEL_1_FALSE@	mktemp.c 		\
+@ELIX_LEVEL_1_FALSE@	putw.c 			\
+@ELIX_LEVEL_1_FALSE@	vasiprintf.c		\
+@ELIX_LEVEL_1_FALSE@	vasprintf.c
 
-@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
-LIBADD_OBJS = vfiprintf.$(oext) vfprintf.$(oext) vfscanf.$(oext) vfiscanf.$(oext)
+@ELIX_LEVEL_1_TRUE@ELIX_SOURCES = 
+LIBADD_OBJS = \
+	$(lpfx)vfiprintf.$(oext) $(lpfx)vfprintf.$(oext) \
+	$(lpfx)vfscanf.$(oext) $(lpfx)vfiscanf.$(oext)
+
 libstdio_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libstdio.la
-@USE_LIBTOOL_TRUE@libstdio_la_SOURCES = $(GENERAL_SOURCES)
-@USE_LIBTOOL_TRUE@libstdio_la_LIBADD = $(LIBADD_OBJS) $(LIB_OBJS)
-@USE_LIBTOOL_TRUE@libstdio_la_DEPENDENCIES = $(LIBADD_OBJS) $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@libstdio_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
+@USE_LIBTOOL_TRUE@libstdio_la_LIBADD = $(LIBADD_OBJS)
+@USE_LIBTOOL_TRUE@libstdio_la_DEPENDENCIES = $(LIBADD_OBJS)
 @USE_LIBTOOL_FALSE@LIB_COMPILE = $(COMPILE)
 @USE_LIBTOOL_TRUE@LIB_COMPILE = $(LTCOMPILE)
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIBADD_OBJS) $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIBADD_OBJS)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIBADD_OBJS) $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIBADD_OBJS)
 CHEWOUT_FILES = \
 	clearerr.def		\
 	dprintf.def		\
@@ -987,6 +1001,66 @@ lib_a-wsetup.o: wsetup.c
 lib_a-wsetup.obj: wsetup.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wsetup.obj `if test -f 'wsetup.c'; then $(CYGPATH_W) 'wsetup.c'; else $(CYGPATH_W) '$(srcdir)/wsetup.c'; fi`
 
+lib_a-asiprintf.o: asiprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asiprintf.o `test -f 'asiprintf.c' || echo '$(srcdir)/'`asiprintf.c
+
+lib_a-asiprintf.obj: asiprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asiprintf.obj `if test -f 'asiprintf.c'; then $(CYGPATH_W) 'asiprintf.c'; else $(CYGPATH_W) '$(srcdir)/asiprintf.c'; fi`
+
+lib_a-asprintf.o: asprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asprintf.o `test -f 'asprintf.c' || echo '$(srcdir)/'`asprintf.c
+
+lib_a-asprintf.obj: asprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asprintf.obj `if test -f 'asprintf.c'; then $(CYGPATH_W) 'asprintf.c'; else $(CYGPATH_W) '$(srcdir)/asprintf.c'; fi`
+
+lib_a-fcloseall.o: fcloseall.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fcloseall.o `test -f 'fcloseall.c' || echo '$(srcdir)/'`fcloseall.c
+
+lib_a-fcloseall.obj: fcloseall.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fcloseall.obj `if test -f 'fcloseall.c'; then $(CYGPATH_W) 'fcloseall.c'; else $(CYGPATH_W) '$(srcdir)/fcloseall.c'; fi`
+
+lib_a-fseeko.o: fseeko.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fseeko.o `test -f 'fseeko.c' || echo '$(srcdir)/'`fseeko.c
+
+lib_a-fseeko.obj: fseeko.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fseeko.obj `if test -f 'fseeko.c'; then $(CYGPATH_W) 'fseeko.c'; else $(CYGPATH_W) '$(srcdir)/fseeko.c'; fi`
+
+lib_a-ftello.o: ftello.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ftello.o `test -f 'ftello.c' || echo '$(srcdir)/'`ftello.c
+
+lib_a-ftello.obj: ftello.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ftello.obj `if test -f 'ftello.c'; then $(CYGPATH_W) 'ftello.c'; else $(CYGPATH_W) '$(srcdir)/ftello.c'; fi`
+
+lib_a-getw.o: getw.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getw.o `test -f 'getw.c' || echo '$(srcdir)/'`getw.c
+
+lib_a-getw.obj: getw.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getw.obj `if test -f 'getw.c'; then $(CYGPATH_W) 'getw.c'; else $(CYGPATH_W) '$(srcdir)/getw.c'; fi`
+
+lib_a-mktemp.o: mktemp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mktemp.o `test -f 'mktemp.c' || echo '$(srcdir)/'`mktemp.c
+
+lib_a-mktemp.obj: mktemp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mktemp.obj `if test -f 'mktemp.c'; then $(CYGPATH_W) 'mktemp.c'; else $(CYGPATH_W) '$(srcdir)/mktemp.c'; fi`
+
+lib_a-putw.o: putw.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-putw.o `test -f 'putw.c' || echo '$(srcdir)/'`putw.c
+
+lib_a-putw.obj: putw.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-putw.obj `if test -f 'putw.c'; then $(CYGPATH_W) 'putw.c'; else $(CYGPATH_W) '$(srcdir)/putw.c'; fi`
+
+lib_a-vasiprintf.o: vasiprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vasiprintf.o `test -f 'vasiprintf.c' || echo '$(srcdir)/'`vasiprintf.c
+
+lib_a-vasiprintf.obj: vasiprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vasiprintf.obj `if test -f 'vasiprintf.c'; then $(CYGPATH_W) 'vasiprintf.c'; else $(CYGPATH_W) '$(srcdir)/vasiprintf.c'; fi`
+
+lib_a-vasprintf.o: vasprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vasprintf.o `test -f 'vasprintf.c' || echo '$(srcdir)/'`vasprintf.c
+
+lib_a-vasprintf.obj: vasprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vasprintf.obj `if test -f 'vasprintf.c'; then $(CYGPATH_W) 'vasprintf.c'; else $(CYGPATH_W) '$(srcdir)/vasprintf.c'; fi`
+
 mostlyclean-libtool:
 	-rm -f *.lo
 
@@ -1144,16 +1218,16 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 # This rule is needed so that libtool compiles vfiprintf before vfprintf. Otherwise
 # libtool moves vfprintf.o and subsequently can't find it.
 
-vfprintf.$(oext): vfprintf.c
-	$(LIB_COMPILE) -fshort-enums -c $(srcdir)/vfprintf.c
+$(lpfx)vfprintf.$(oext): vfprintf.c
+	$(LIB_COMPILE) -fshort-enums -c $(srcdir)/vfprintf.c -o $@
 
-vfiprintf.$(oext): vfprintf.c
+$(lpfx)vfiprintf.$(oext): vfprintf.c
 	$(LIB_COMPILE) -fshort-enums -DINTEGER_ONLY -c $(srcdir)/vfprintf.c -o $@
 
-vfscanf.$(oext): vfscanf.c
-	$(LIB_COMPILE) -c $(srcdir)/vfscanf.c
+$(lpfx)vfscanf.$(oext): vfscanf.c
+	$(LIB_COMPILE) -c $(srcdir)/vfscanf.c -o $@
 
-vfiscanf.$(oext): vfscanf.c
+$(lpfx)vfiscanf.$(oext): vfscanf.c
 	$(LIB_COMPILE) -DINTEGER_ONLY -c $(srcdir)/vfscanf.c -o $@
 
 .c.def:
@@ -1163,44 +1237,44 @@ vfiscanf.$(oext): vfscanf.c
 doc: $(CHEWOUT_FILES)
 	cat $(srcdir)/stdio.tex >> $(TARGETDOC)
 
-fclose.$(oext): local.h
-fdopen.$(oext): local.h
-fflush.$(oext): local.h
-findfp.$(oext): local.h
-fopen.$(oext): local.h
-fputs.$(oext): fvwrite.h
-fread.$(oext): local.h
-freopen.$(oext): local.h
-fseek.$(oext): local.h
-ftell.$(oext): local.h
-fvwrite.$(oext): local.h fvwrite.h
-fwalk.$(oext): local.h
-fwrite.$(oext): local.h fvwrite.h
-iscanf.$(oext): local.h
-makebuf.$(oext): local.h
-puts.$(oext): fvwrite.h
-refill.$(oext): local.h
-scanf.$(oext): local.h
-setbuf.$(oext): local.h
-setvbuf.$(oext): local.h
-siprintf.$(oext): local.h
-sniprintf.$(oext): local.h
-sprintf.$(oext): local.h
-siscanf.$(oext): local.h
-sscanf.$(oext): local.h
-stdio.$(oext): local.h
-ungetc.$(oext): local.h
-vfiprintf.$(oext): local.h
-vfprintf.$(oext): local.h
-vfiscanf.$(oext): local.h floatio.h
-vfscanf.$(oext): local.h floatio.h
-viscanf.$(oext): local.h
-vscanf.$(oext): local.h
-vsniprintf.$(oext): local.h
-vsiscanf.$(oext): local.h
-vsscanf.$(oext): local.h
-wbuf.$(oext): local.h fvwrite.h
-wsetup.$(oext): local.h
+$(lpfx)fclose.$(oext): local.h
+$(lpfx)fdopen.$(oext): local.h
+$(lpfx)fflush.$(oext): local.h
+$(lpfx)findfp.$(oext): local.h
+$(lpfx)fopen.$(oext): local.h
+$(lpfx)fputs.$(oext): fvwrite.h
+$(lpfx)fread.$(oext): local.h
+$(lpfx)freopen.$(oext): local.h
+$(lpfx)fseek.$(oext): local.h
+$(lpfx)ftell.$(oext): local.h
+$(lpfx)fvwrite.$(oext): local.h fvwrite.h
+$(lpfx)fwalk.$(oext): local.h
+$(lpfx)fwrite.$(oext): local.h fvwrite.h
+$(lpfx)iscanf.$(oext): local.h
+$(lpfx)makebuf.$(oext): local.h
+$(lpfx)puts.$(oext): fvwrite.h
+$(lpfx)refill.$(oext): local.h
+$(lpfx)scanf.$(oext): local.h
+$(lpfx)setbuf.$(oext): local.h
+$(lpfx)setvbuf.$(oext): local.h
+$(lpfx)siprintf.$(oext): local.h
+$(lpfx)sniprintf.$(oext): local.h
+$(lpfx)sprintf.$(oext): local.h
+$(lpfx)siscanf.$(oext): local.h
+$(lpfx)sscanf.$(oext): local.h
+$(lpfx)stdio.$(oext): local.h
+$(lpfx)ungetc.$(oext): local.h
+$(lpfx)vfiprintf.$(oext): local.h
+$(lpfx)vfprintf.$(oext): local.h
+$(lpfx)vfiscanf.$(oext): local.h floatio.h
+$(lpfx)vfscanf.$(oext): local.h floatio.h
+$(lpfx)viscanf.$(oext): local.h
+$(lpfx)vscanf.$(oext): local.h
+$(lpfx)vsniprintf.$(oext): local.h
+$(lpfx)vsiscanf.$(oext): local.h
+$(lpfx)vsscanf.$(oext): local.h
+$(lpfx)wbuf.$(oext): local.h fvwrite.h
+$(lpfx)wsetup.$(oext): local.h
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

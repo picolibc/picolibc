@@ -53,19 +53,7 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-@ELIX_LEVEL_1_FALSE@am__DEPENDENCIES_1 = isascii.$(oext) \
-@ELIX_LEVEL_1_FALSE@	isblank.$(oext) iswalnum.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswalpha.$(oext) iswblank.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswcntrl.$(oext) iswctype.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswdigit.$(oext) iswgraph.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswlower.$(oext) iswprint.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswpunct.$(oext) iswspace.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswupper.$(oext) iswxdigit.$(oext) \
-@ELIX_LEVEL_1_FALSE@	jp2uc.$(oext) toascii.$(oext) \
-@ELIX_LEVEL_1_FALSE@	_tolower.$(oext) _toupper.$(oext) \
-@ELIX_LEVEL_1_FALSE@	towctrans.$(oext) towlower.$(oext) \
-@ELIX_LEVEL_1_FALSE@	towupper.$(oext) wctrans.$(oext) \
-@ELIX_LEVEL_1_FALSE@	wctype.$(oext)
+lib_a_LIBADD =
 am__objects_1 = lib_a-ctype_.$(OBJEXT) lib_a-isalnum.$(OBJEXT) \
 	lib_a-isalpha.$(OBJEXT) lib_a-iscntrl.$(OBJEXT) \
 	lib_a-isdigit.$(OBJEXT) lib_a-islower.$(OBJEXT) \
@@ -76,10 +64,20 @@ am__objects_1 = lib_a-ctype_.$(OBJEXT) lib_a-isalnum.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
+libctype_la_LIBADD =
 am__objects_2 = ctype_.lo isalnum.lo isalpha.lo iscntrl.lo isdigit.lo \
 	islower.lo isupper.lo isprint.lo ispunct.lo isspace.lo \
 	isxdigit.lo tolower.lo toupper.lo
-@USE_LIBTOOL_TRUE@am_libctype_la_OBJECTS = $(am__objects_2)
+@ELIX_LEVEL_1_FALSE@am__objects_3 = isascii.lo isblank.lo iswalnum.lo \
+@ELIX_LEVEL_1_FALSE@	iswalpha.lo iswblank.lo iswcntrl.lo \
+@ELIX_LEVEL_1_FALSE@	iswctype.lo iswdigit.lo iswgraph.lo \
+@ELIX_LEVEL_1_FALSE@	iswlower.lo iswprint.lo iswpunct.lo \
+@ELIX_LEVEL_1_FALSE@	iswspace.lo iswupper.lo iswxdigit.lo \
+@ELIX_LEVEL_1_FALSE@	jp2uc.lo toascii.lo _tolower.lo \
+@ELIX_LEVEL_1_FALSE@	_toupper.lo towctrans.lo towlower.lo \
+@ELIX_LEVEL_1_FALSE@	towupper.lo wctrans.lo wctype.lo
+@USE_LIBTOOL_TRUE@am_libctype_la_OBJECTS = $(am__objects_2) \
+@USE_LIBTOOL_TRUE@	$(am__objects_3)
 libctype_la_OBJECTS = $(am_libctype_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libctype_la_rpath =
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -238,59 +236,55 @@ target_alias = @target_alias@
 AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 GENERAL_SOURCES = \
-	ctype_.c \
-	isalnum.c \
-	isalpha.c \
-	iscntrl.c \
-	isdigit.c \
-	islower.c \
-	isupper.c \
-	isprint.c \
-	ispunct.c \
-	isspace.c \
-	isxdigit.c \
-	tolower.c \
+	ctype_.c 	\
+	isalnum.c 	\
+	isalpha.c 	\
+	iscntrl.c 	\
+	isdigit.c 	\
+	islower.c 	\
+	isupper.c 	\
+	isprint.c 	\
+	ispunct.c 	\
+	isspace.c 	\
+	isxdigit.c 	\
+	tolower.c 	\
 	toupper.c
 
-@ELIX_LEVEL_1_FALSE@LIB_OBJS = \
-@ELIX_LEVEL_1_FALSE@	isascii.$(oext) \
-@ELIX_LEVEL_1_FALSE@	isblank.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswalnum.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswalpha.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswblank.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswcntrl.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswctype.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswdigit.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswgraph.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswlower.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswprint.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswpunct.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswspace.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswupper.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswxdigit.$(oext) \
-@ELIX_LEVEL_1_FALSE@	jp2uc.$(oext) \
-@ELIX_LEVEL_1_FALSE@	toascii.$(oext) \
-@ELIX_LEVEL_1_FALSE@	_tolower.$(oext) \
-@ELIX_LEVEL_1_FALSE@	_toupper.$(oext) \
-@ELIX_LEVEL_1_FALSE@	towctrans.$(oext) \
-@ELIX_LEVEL_1_FALSE@	towlower.$(oext) \
-@ELIX_LEVEL_1_FALSE@	towupper.$(oext) \
-@ELIX_LEVEL_1_FALSE@	wctrans.$(oext)	\
-@ELIX_LEVEL_1_FALSE@	wctype.$(oext)
+@ELIX_LEVEL_1_FALSE@ELIX_SOURCES = \
+@ELIX_LEVEL_1_FALSE@	isascii.c 	\
+@ELIX_LEVEL_1_FALSE@	isblank.c 	\
+@ELIX_LEVEL_1_FALSE@	iswalnum.c 	\
+@ELIX_LEVEL_1_FALSE@	iswalpha.c 	\
+@ELIX_LEVEL_1_FALSE@	iswblank.c 	\
+@ELIX_LEVEL_1_FALSE@	iswcntrl.c 	\
+@ELIX_LEVEL_1_FALSE@	iswctype.c 	\
+@ELIX_LEVEL_1_FALSE@	iswdigit.c 	\
+@ELIX_LEVEL_1_FALSE@	iswgraph.c 	\
+@ELIX_LEVEL_1_FALSE@	iswlower.c 	\
+@ELIX_LEVEL_1_FALSE@	iswprint.c 	\
+@ELIX_LEVEL_1_FALSE@	iswpunct.c 	\
+@ELIX_LEVEL_1_FALSE@	iswspace.c 	\
+@ELIX_LEVEL_1_FALSE@	iswupper.c 	\
+@ELIX_LEVEL_1_FALSE@	iswxdigit.c 	\
+@ELIX_LEVEL_1_FALSE@	jp2uc.c 	\
+@ELIX_LEVEL_1_FALSE@	toascii.c 	\
+@ELIX_LEVEL_1_FALSE@	_tolower.c 	\
+@ELIX_LEVEL_1_FALSE@	_toupper.c 	\
+@ELIX_LEVEL_1_FALSE@	towctrans.c 	\
+@ELIX_LEVEL_1_FALSE@	towlower.c 	\
+@ELIX_LEVEL_1_FALSE@	towupper.c 	\
+@ELIX_LEVEL_1_FALSE@	wctrans.c 	\
+@ELIX_LEVEL_1_FALSE@	wctype.c
 
-@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
+@ELIX_LEVEL_1_TRUE@ELIX_SOURCES = 
 libctype_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libctype.la
-@USE_LIBTOOL_TRUE@libctype_la_SOURCES = $(GENERAL_SOURCES)
-@USE_LIBTOOL_TRUE@libctype_la_LIBADD = $(LIB_OBJS)
-@USE_LIBTOOL_TRUE@libctype_la_DEPENDENCIES = $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@libctype_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
 @USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIB_OBJS)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIB_OBJS)
 CHEWOUT_FILES = \
 	isalnum.def	\
 	isalpha.def	\

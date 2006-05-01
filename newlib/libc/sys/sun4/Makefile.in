@@ -41,7 +41,8 @@ host_triplet = @host@
 DIST_COMMON = $(srcdir)/../../../../config.guess \
 	$(srcdir)/../../../../config.sub $(srcdir)/Makefile.in \
 	$(srcdir)/Makefile.am $(top_srcdir)/configure \
-	$(am__configure_deps) $(srcdir)/../../../../mkinstalldirs
+	$(am__configure_deps) $(srcdir)/../../../../mkinstalldirs \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../../acinclude.m4 \
@@ -69,7 +70,7 @@ am__DEPENDENCIES_2 = ieee_flags.o
 am__DEPENDENCIES_3 = divS.o
 lib_a_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
 	$(am__DEPENDENCIES_3)
-am_lib_a_OBJECTS = _main.$(OBJEXT) ieee.$(OBJEXT)
+am_lib_a_OBJECTS = lib_a-_main.$(OBJEXT) lib_a-ieee.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -259,6 +260,8 @@ COPYRENAMEOFILES = divS.o
 COPYOMFILES = ieee_flags.o
 lib_a_SOURCES = _main.c ieee.c
 lib_a_LIBADD = $(COPYOFILES) $(COPYOMFILES) $(COPYRENAMEOFILES)
+lib_a_CCASFLAGS = $(AM_CCASFLAGS)
+lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
@@ -317,6 +320,18 @@ distclean-compile:
 
 .c.obj:
 	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+lib_a-_main.o: _main.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-_main.o `test -f '_main.c' || echo '$(srcdir)/'`_main.c
+
+lib_a-_main.obj: _main.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-_main.obj `if test -f '_main.c'; then $(CYGPATH_W) '_main.c'; else $(CYGPATH_W) '$(srcdir)/_main.c'; fi`
+
+lib_a-ieee.o: ieee.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ieee.o `test -f 'ieee.c' || echo '$(srcdir)/'`ieee.c
+
+lib_a-ieee.obj: ieee.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ieee.obj `if test -f 'ieee.c'; then $(CYGPATH_W) 'ieee.c'; else $(CYGPATH_W) '$(srcdir)/ieee.c'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

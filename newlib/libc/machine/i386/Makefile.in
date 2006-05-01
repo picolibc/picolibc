@@ -16,7 +16,7 @@
 
 
 
-SOURCES = $(lib_a_SOURCES) $(EXTRA_lib_a_SOURCES) $(libi386_la_SOURCES) $(EXTRA_libi386_la_SOURCES)
+SOURCES = $(lib_a_SOURCES) $(libi386_la_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -61,17 +61,22 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-@MACH_ADD_SETJMP_TRUE@am__DEPENDENCIES_1 = setjmp.$(oext)
+lib_a_LIBADD =
 am__objects_1 = lib_a-memchr.$(OBJEXT) lib_a-memcmp.$(OBJEXT) \
 	lib_a-memcpy.$(OBJEXT) lib_a-memset.$(OBJEXT) \
 	lib_a-strchr.$(OBJEXT) lib_a-memmove.$(OBJEXT) \
 	lib_a-strlen.$(OBJEXT)
-@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1)
+@MACH_ADD_SETJMP_TRUE@am__objects_2 = lib_a-setjmp.$(OBJEXT)
+@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
+@USE_LIBTOOL_FALSE@	$(am__objects_2)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-am__objects_2 = memchr.lo memcmp.lo memcpy.lo memset.lo strchr.lo \
+libi386_la_LIBADD =
+am__objects_3 = memchr.lo memcmp.lo memcpy.lo memset.lo strchr.lo \
 	memmove.lo strlen.lo
-@USE_LIBTOOL_TRUE@am_libi386_la_OBJECTS = $(am__objects_2)
+@MACH_ADD_SETJMP_TRUE@am__objects_4 = setjmp.lo
+@USE_LIBTOOL_TRUE@am_libi386_la_OBJECTS = $(am__objects_3) \
+@USE_LIBTOOL_TRUE@	$(am__objects_4)
 libi386_la_OBJECTS = $(am_libi386_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libi386_la_rpath =
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -88,8 +93,7 @@ LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(lib_a_SOURCES) $(EXTRA_lib_a_SOURCES) \
-	$(libi386_la_SOURCES) $(EXTRA_libi386_la_SOURCES)
+SOURCES = $(lib_a_SOURCES) $(libi386_la_SOURCES)
 DATA = $(noinst_DATA)
 ETAGS = etags
 CTAGS = ctags
@@ -210,26 +214,21 @@ target_alias = @target_alias@
 AUTOMAKE_OPTIONS = cygnus
 INCLUDES = -I $(newlib_basedir)/libm/common $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(INCLUDES)
-@MACH_ADD_SETJMP_FALSE@mach_add_obj = 
-@MACH_ADD_SETJMP_TRUE@mach_add_obj = setjmp.$(oext)
+@MACH_ADD_SETJMP_FALSE@ADDED_SOURCES = 
+@MACH_ADD_SETJMP_TRUE@ADDED_SOURCES = setjmp.S
 LIB_SOURCES = \
 	memchr.S memcmp.S memcpy.S memset.S strchr.S \
 	memmove.S strlen.S i386mach.h
 
 libi386_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libi386.la
-@USE_LIBTOOL_TRUE@libi386_la_SOURCES = $(LIB_SOURCES)
-@USE_LIBTOOL_TRUE@EXTRA_libi386_la_SOURCES = setjmp.S
-@USE_LIBTOOL_TRUE@libi386_la_LIBADD = $(mach_add_obj)
-@USE_LIBTOOL_TRUE@libi386_la_DEPENDENCIES = $(mach_add_obj)
+@USE_LIBTOOL_TRUE@libi386_la_SOURCES = $(LIB_SOURCES) $(ADDED_SOURCES)
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(LIB_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(mach_add_obj)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(LIB_SOURCES) $(ADDED_SOURCES)
 @USE_LIBTOOL_FALSE@lib_a_CCASFLAGS = $(AM_CCASFLAGS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(mach_add_obj)
-@USE_LIBTOOL_FALSE@EXTRA_lib_a_SOURCES = setjmp.S
+@USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am

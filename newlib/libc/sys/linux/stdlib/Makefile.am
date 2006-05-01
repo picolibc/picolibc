@@ -9,17 +9,17 @@ GENERAL_SOURCES = \
 	regexec.c regfree.c collate.h collate.c collcmp.c \
 	reallocf.c
 
-ELIX_3_OBJS = \
-	wordexp.$(oext) \
-	wordfree.$(oext)
+ELIX_3_SOURCES = \
+	wordexp.c \
+	wordfree.c
 
 if ELIX_LEVEL_1
-LIB_OBJS =
+ELIX_SOURCES =
 else
 if ELIX_LEVEL_2
-LIB_OBJS =
+ELIX_SOURCES =
 else
-LIB_OBJS = $(ELIX_3_OBJS)
+ELIX_SOURCES = $(ELIX_3_SOURCES)
 endif
 endif
 
@@ -27,16 +27,12 @@ libstdlib_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libstdlib.la
-libstdlib_la_SOURCES = $(GENERAL_SOURCES)
-libstdlib_la_LIBADD = $(LIB_OBJS) 
-libstdlib_la_DEPENDENCIES = $(LIB_OBJS) 
+libstdlib_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(GENERAL_SOURCES)
-lib_a_LIBADD = $(LIB_OBJS) 
+lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_DEPENDENCIES = $(LIB_OBJS) 
 noinst_DATA =
 endif # USE_LIBTOOL
 

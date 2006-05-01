@@ -52,18 +52,24 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-@ELIX_LEVEL_1_TRUE@am__DEPENDENCIES_1 = utf-8.$(oext) utf-16.$(oext) \
-@ELIX_LEVEL_1_TRUE@	ucs-2.$(oext) us-ascii.$(oext) \
-@ELIX_LEVEL_1_TRUE@	ucs-4.$(oext) ucs-2-internal.$(oext) \
-@ELIX_LEVEL_1_TRUE@	ucs-4-internal.$(oext) cesbi.$(oext) \
-@ELIX_LEVEL_1_TRUE@	table.$(oext) table-pcs.$(oext) euc.$(oext)
+lib_a_LIBADD =
 am__objects_1 = lib_a-utf-8.$(OBJEXT) lib_a-utf-16.$(OBJEXT) \
 	lib_a-ucs-2.$(OBJEXT) lib_a-us-ascii.$(OBJEXT) \
 	lib_a-ucs-4.$(OBJEXT) lib_a-ucs-2-internal.$(OBJEXT) \
 	lib_a-ucs-4-internal.$(OBJEXT) lib_a-cesbi.$(OBJEXT) \
 	lib_a-table.$(OBJEXT) lib_a-table-pcs.$(OBJEXT) \
 	lib_a-euc.$(OBJEXT)
-am_lib_a_OBJECTS = $(am__objects_1)
+@ELIX_LEVEL_1_TRUE@am__objects_2 = lib_a-utf-8.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-utf-16.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-ucs-2.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-us-ascii.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-ucs-4.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-ucs-2-internal.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-ucs-4-internal.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-cesbi.$(OBJEXT) lib_a-table.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-table-pcs.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-euc.$(OBJEXT)
+am_lib_a_OBJECTS = $(am__objects_1) $(am__objects_2)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -233,25 +239,23 @@ GENERAL_SOURCES = \
 	table-pcs.c \
 	euc.c
 
-@ELIX_LEVEL_1_FALSE@LIB_OBJS = 
-@ELIX_LEVEL_1_TRUE@LIB_OBJS = \
-@ELIX_LEVEL_1_TRUE@	utf-8.$(oext) \
-@ELIX_LEVEL_1_TRUE@	utf-16.$(oext) \
-@ELIX_LEVEL_1_TRUE@	ucs-2.$(oext) \
-@ELIX_LEVEL_1_TRUE@	us-ascii.$(oext) \
-@ELIX_LEVEL_1_TRUE@	ucs-4.$(oext) \
-@ELIX_LEVEL_1_TRUE@	ucs-2-internal.$(oext) \
-@ELIX_LEVEL_1_TRUE@	ucs-4-internal.$(oext) \
-@ELIX_LEVEL_1_TRUE@	cesbi.$(oext) \
-@ELIX_LEVEL_1_TRUE@	table.$(oext) \
-@ELIX_LEVEL_1_TRUE@	table-pcs.$(oext) \
-@ELIX_LEVEL_1_TRUE@	euc.$(oext)
+@ELIX_LEVEL_1_FALSE@ELIX_SOURCES = 
+@ELIX_LEVEL_1_TRUE@ELIX_SOURCES = \
+@ELIX_LEVEL_1_TRUE@	utf-8.c \
+@ELIX_LEVEL_1_TRUE@	utf-16.c \
+@ELIX_LEVEL_1_TRUE@	ucs-2.c \
+@ELIX_LEVEL_1_TRUE@	us-ascii.c \
+@ELIX_LEVEL_1_TRUE@	ucs-4.c \
+@ELIX_LEVEL_1_TRUE@	ucs-2-internal.c \
+@ELIX_LEVEL_1_TRUE@	ucs-4-internal.c \
+@ELIX_LEVEL_1_TRUE@	cesbi.c \
+@ELIX_LEVEL_1_TRUE@	table.c \
+@ELIX_LEVEL_1_TRUE@	table-pcs.c \
+@ELIX_LEVEL_1_TRUE@	euc.c
 
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(GENERAL_SOURCES)
-lib_a_LIBADD = $(LIB_OBJS)
+lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA = 
 CHEWOUT_FILES = ces.def
 SUFFIXES = .def

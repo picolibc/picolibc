@@ -52,14 +52,17 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-@ELIX_LEVEL_1_FALSE@am__DEPENDENCIES_1 = aliasesi.$(oext) \
-@ELIX_LEVEL_1_FALSE@	ucsconv.$(oext) nullconv.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iconv.$(oext) aliasesbi.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iconvnls.$(oext)
+lib_a_LIBADD =
 am__objects_1 = lib_a-aliasesi.$(OBJEXT) lib_a-ucsconv.$(OBJEXT) \
 	lib_a-nullconv.$(OBJEXT) lib_a-iconv.$(OBJEXT) \
 	lib_a-aliasesbi.$(OBJEXT) lib_a-iconvnls.$(OBJEXT)
-am_lib_a_OBJECTS = $(am__objects_1)
+@ELIX_LEVEL_1_FALSE@am__objects_2 = lib_a-aliasesi.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-ucsconv.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-nullconv.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-iconv.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-aliasesbi.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-iconvnls.$(OBJEXT)
+am_lib_a_OBJECTS = $(am__objects_1) $(am__objects_2)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -217,27 +220,25 @@ target_alias = @target_alias@
 AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 GENERAL_SOURCES = \
-aliasesi.c \
-ucsconv.c \
-nullconv.c \
-iconv.c \
-aliasesbi.c \
-iconvnls.c
+	aliasesi.c \
+	ucsconv.c \
+	nullconv.c \
+	iconv.c \
+	aliasesbi.c \
+	iconvnls.c
 
-@ELIX_LEVEL_1_FALSE@LIB_OBJS = \
-@ELIX_LEVEL_1_FALSE@aliasesi.$(oext) \
-@ELIX_LEVEL_1_FALSE@ucsconv.$(oext) \
-@ELIX_LEVEL_1_FALSE@nullconv.$(oext) \
-@ELIX_LEVEL_1_FALSE@iconv.$(oext) \
-@ELIX_LEVEL_1_FALSE@aliasesbi.$(oext) \
-@ELIX_LEVEL_1_FALSE@iconvnls.$(oext)
+@ELIX_LEVEL_1_FALSE@ELIX_SOURCES = \
+@ELIX_LEVEL_1_FALSE@	aliasesi.c \
+@ELIX_LEVEL_1_FALSE@	ucsconv.c \
+@ELIX_LEVEL_1_FALSE@	nullconv.c \
+@ELIX_LEVEL_1_FALSE@	iconv.c \
+@ELIX_LEVEL_1_FALSE@	aliasesbi.c \
+@ELIX_LEVEL_1_FALSE@	iconvnls.c
 
-@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
+@ELIX_LEVEL_1_TRUE@ELIX_SOURCES = 
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(GENERAL_SOURCES)
-lib_a_LIBADD = $(LIB_OBJS)
+lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA = 
 CHEWOUT_FILES = iconv.def
 SUFFIXES = .def

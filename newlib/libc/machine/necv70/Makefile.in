@@ -56,7 +56,7 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am_lib_a_OBJECTS = fastmath.$(OBJEXT) setjmp.$(OBJEXT)
+am_lib_a_OBJECTS = lib_a-fastmath.$(OBJEXT) lib_a-setjmp.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -179,13 +179,15 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = fastmath.s setjmp.s
+lib_a_SOURCES = fastmath.S setjmp.S
+lib_a_CCASFLAGS = $(AM_CCASFLAGS)
+lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .o .obj .s
+.SUFFIXES: .S .o .obj
 am--refresh:
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -233,11 +235,23 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-.s.o:
+.S.o:
 	$(CCASCOMPILE) -c $<
 
-.s.obj:
+.S.obj:
 	$(CCASCOMPILE) -c `$(CYGPATH_W) '$<'`
+
+lib_a-fastmath.o: fastmath.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fastmath.o `test -f 'fastmath.S' || echo '$(srcdir)/'`fastmath.S
+
+lib_a-fastmath.obj: fastmath.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fastmath.obj `if test -f 'fastmath.S'; then $(CYGPATH_W) 'fastmath.S'; else $(CYGPATH_W) '$(srcdir)/fastmath.S'; fi`
+
+lib_a-setjmp.o: setjmp.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.o `test -f 'setjmp.S' || echo '$(srcdir)/'`setjmp.S
+
+lib_a-setjmp.obj: setjmp.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.obj `if test -f 'setjmp.S'; then $(CYGPATH_W) 'setjmp.S'; else $(CYGPATH_W) '$(srcdir)/setjmp.S'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

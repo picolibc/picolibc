@@ -52,21 +52,7 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-@ELIX_LEVEL_1_TRUE@am__DEPENDENCIES_1 = ccsbi.$(oext) \
-@ELIX_LEVEL_1_TRUE@	iso_8859_10.$(oext) iso_8859_13.$(oext) \
-@ELIX_LEVEL_1_TRUE@	iso_8859_14.$(oext) iso_8859_15.$(oext) \
-@ELIX_LEVEL_1_TRUE@	iso_8859_1.$(oext) iso_8859_2.$(oext) \
-@ELIX_LEVEL_1_TRUE@	iso_8859_3.$(oext) iso_8859_4.$(oext) \
-@ELIX_LEVEL_1_TRUE@	iso_8859_5.$(oext) iso_8859_6.$(oext) \
-@ELIX_LEVEL_1_TRUE@	iso_8859_7.$(oext) iso_8859_8.$(oext) \
-@ELIX_LEVEL_1_TRUE@	iso_8859_9.$(oext) iso_8859_11.$(oext) \
-@ELIX_LEVEL_1_TRUE@	win_1250.$(oext) win_1252.$(oext) \
-@ELIX_LEVEL_1_TRUE@	win_1254.$(oext) win_1256.$(oext) \
-@ELIX_LEVEL_1_TRUE@	win_1258.$(oext) win_1251.$(oext) \
-@ELIX_LEVEL_1_TRUE@	win_1253.$(oext) win_1255.$(oext) \
-@ELIX_LEVEL_1_TRUE@	win_1257.$(oext) koi8_r.$(oext) \
-@ELIX_LEVEL_1_TRUE@	koi8_u.$(oext) koi8_ru.$(oext) \
-@ELIX_LEVEL_1_TRUE@	koi8_uni.$(oext)
+lib_a_LIBADD =
 am__objects_1 = lib_a-ccsbi.$(OBJEXT) lib_a-iso_8859_10.$(OBJEXT) \
 	lib_a-iso_8859_13.$(OBJEXT) lib_a-iso_8859_14.$(OBJEXT) \
 	lib_a-iso_8859_15.$(OBJEXT) lib_a-iso_8859_1.$(OBJEXT) \
@@ -89,7 +75,35 @@ am__objects_1 = lib_a-ccsbi.$(OBJEXT) lib_a-iso_8859_10.$(OBJEXT) \
 	lib_a-ksx1001.$(OBJEXT) lib_a-cns11643_plane1.$(OBJEXT) \
 	lib_a-cns11643_plane2.$(OBJEXT) \
 	lib_a-cns11643_plane14.$(OBJEXT)
-am_lib_a_OBJECTS = $(am__objects_1)
+@ELIX_LEVEL_1_TRUE@am__objects_2 = lib_a-ccsbi.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-iso_8859_10.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-iso_8859_13.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-iso_8859_14.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-iso_8859_15.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-iso_8859_1.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-iso_8859_2.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-iso_8859_3.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-iso_8859_4.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-iso_8859_5.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-iso_8859_6.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-iso_8859_7.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-iso_8859_8.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-iso_8859_9.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-iso_8859_11.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-win_1250.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-win_1252.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-win_1254.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-win_1256.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-win_1258.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-win_1251.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-win_1253.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-win_1255.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-win_1257.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-koi8_r.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-koi8_u.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-koi8_ru.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-koi8_uni.$(OBJEXT)
+am_lib_a_OBJECTS = $(am__objects_1) $(am__objects_2)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -268,22 +282,20 @@ cp775.c cp850.c cp852.c cp855.c cp866.c \
 jis_x0212_1990.c jis_x0201_1976.c jis_x0208_1990.c ksx1001.c \
 cns11643_plane1.c cns11643_plane2.c cns11643_plane14.c
 
-@ELIX_LEVEL_1_FALSE@LIB_OBJS = 
-@ELIX_LEVEL_1_TRUE@LIB_OBJS = ccsbi.$(oext) \
-@ELIX_LEVEL_1_TRUE@iso_8859_10.$(oext) iso_8859_13.$(oext) iso_8859_14.$(oext) iso_8859_15.$(oext) \
-@ELIX_LEVEL_1_TRUE@iso_8859_1.$(oext) iso_8859_2.$(oext) iso_8859_3.$(oext) iso_8859_4.$(oext) \
-@ELIX_LEVEL_1_TRUE@iso_8859_5.$(oext) iso_8859_6.$(oext) iso_8859_7.$(oext) iso_8859_8.$(oext) \
-@ELIX_LEVEL_1_TRUE@iso_8859_9.$(oext) iso_8859_11.$(oext) \
-@ELIX_LEVEL_1_TRUE@win_1250.$(oext) win_1252.$(oext) win_1254.$(oext) \
-@ELIX_LEVEL_1_TRUE@win_1256.$(oext) win_1258.$(oext) win_1251.$(oext) \
-@ELIX_LEVEL_1_TRUE@win_1253.$(oext) win_1255.$(oext) win_1257.$(oext) \
-@ELIX_LEVEL_1_TRUE@koi8_r.$(oext) koi8_u.$(oext) koi8_ru.$(oext) koi8_uni.$(oext)
+@ELIX_LEVEL_1_FALSE@ELIX_SOURCES = 
+@ELIX_LEVEL_1_TRUE@ELIX_SOURCES = ccsbi.c \
+@ELIX_LEVEL_1_TRUE@iso_8859_10.c iso_8859_13.c iso_8859_14.c iso_8859_15.c \
+@ELIX_LEVEL_1_TRUE@iso_8859_1.c iso_8859_2.c iso_8859_3.c iso_8859_4.c \
+@ELIX_LEVEL_1_TRUE@iso_8859_5.c iso_8859_6.c iso_8859_7.c iso_8859_8.c \
+@ELIX_LEVEL_1_TRUE@iso_8859_9.c iso_8859_11.c \
+@ELIX_LEVEL_1_TRUE@win_1250.c win_1252.c win_1254.c \
+@ELIX_LEVEL_1_TRUE@win_1256.c win_1258.c win_1251.c \
+@ELIX_LEVEL_1_TRUE@win_1253.c win_1255.c win_1257.c \
+@ELIX_LEVEL_1_TRUE@koi8_r.c koi8_u.c koi8_ru.c koi8_uni.c
 
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(GENERAL_SOURCES)
-lib_a_LIBADD = $(LIB_OBJS)
+lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA = 
 SUBDIRS = binary
 CHEWOUT_FILES = ccs.def
@@ -835,11 +847,11 @@ uninstall-info: uninstall-info-recursive
 	mostlyclean-libtool mostlyclean-recursive pdf pdf-am ps ps-am \
 	tags tags-recursive uninstall uninstall-am uninstall-info-am
 
-@ELIX_LEVEL_1_TRUE@iso_ir_111.$(oext) \
-@ELIX_LEVEL_1_TRUE@big5.$(oext) \
-@ELIX_LEVEL_1_TRUE@cp775.$(oext) cp850.$(oext) cp852.$(oext) cp855.$(oext) cp866.$(oext) \
-@ELIX_LEVEL_1_TRUE@jis_x0212_1990.$(oext) jis_x0201_1976.$(oext) jis_x0208_1990.$(oext) ksx1001.$(oext) \
-@ELIX_LEVEL_1_TRUE@cns11643_plane1.$(oext) cns11643_plane2.$(oext) cns11643_plane14.$(oext)
+@ELIX_LEVEL_1_TRUE@iso_ir_111.c \
+@ELIX_LEVEL_1_TRUE@big5.c \
+@ELIX_LEVEL_1_TRUE@cp775.c cp850.c cp852.c cp855.c cp866.c \
+@ELIX_LEVEL_1_TRUE@jis_x0212_1990.c jis_x0201_1976.c jis_x0208_1990.c ksx1001.c \
+@ELIX_LEVEL_1_TRUE@cns11643_plane1.c cns11643_plane2.c cns11643_plane14.c
 
 .c.def:
 	$(CHEW) < $< > $*.def 2> $*.ref

@@ -53,10 +53,7 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@am__DEPENDENCIES_1 =  \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	sysexecve.$(oext) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	sysfork.$(oext) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	syswait.$(oext)
+lib_a_LIBADD =
 am__objects_1 = lib_a-sysclose.$(OBJEXT) lib_a-sysfcntl.$(OBJEXT) \
 	lib_a-sysfstat.$(OBJEXT) lib_a-sysgetpid.$(OBJEXT) \
 	lib_a-sysgettod.$(OBJEXT) lib_a-syskill.$(OBJEXT) \
@@ -65,14 +62,22 @@ am__objects_1 = lib_a-sysclose.$(OBJEXT) lib_a-sysfcntl.$(OBJEXT) \
 	lib_a-syssbrk.$(OBJEXT) lib_a-sysstat.$(OBJEXT) \
 	lib_a-systimes.$(OBJEXT) lib_a-sysunlink.$(OBJEXT) \
 	lib_a-syswrite.$(OBJEXT)
-@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@am__objects_2 = lib_a-sysexecve.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	lib_a-sysfork.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	lib_a-syswait.$(OBJEXT)
+@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
+@USE_LIBTOOL_FALSE@	$(am__objects_2)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-am__objects_2 = sysclose.lo sysfcntl.lo sysfstat.lo sysgetpid.lo \
+libsyscalls_la_LIBADD =
+am__objects_3 = sysclose.lo sysfcntl.lo sysfstat.lo sysgetpid.lo \
 	sysgettod.lo syskill.lo syslink.lo syslseek.lo sysopen.lo \
 	sysread.lo syssbrk.lo sysstat.lo systimes.lo sysunlink.lo \
 	syswrite.lo
-@USE_LIBTOOL_TRUE@am_libsyscalls_la_OBJECTS = $(am__objects_2)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@am__objects_4 = sysexecve.lo \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	sysfork.lo syswait.lo
+@USE_LIBTOOL_TRUE@am_libsyscalls_la_OBJECTS = $(am__objects_3) \
+@USE_LIBTOOL_TRUE@	$(am__objects_4)
 libsyscalls_la_OBJECTS = $(am_libsyscalls_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libsyscalls_la_rpath =
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -247,25 +252,21 @@ GENERAL_SOURCES = \
 	sysunlink.c	\
 	syswrite.c
 
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@LIB_OBJS = \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	sysexecve.$(oext)	\
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	sysfork.$(oext)		\
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	syswait.$(oext)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@ELIX_SOURCES = \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	sysexecve.c	\
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	sysfork.c	\
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	syswait.c
 
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@LIB_OBJS = 
-@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@ELIX_SOURCES = 
+@ELIX_LEVEL_1_TRUE@ELIX_SOURCES = 
 libsyscalls_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libsyscalls.la
-@USE_LIBTOOL_TRUE@libsyscalls_la_SOURCES = $(GENERAL_SOURCES)
-@USE_LIBTOOL_TRUE@libsyscalls_la_LIBADD = $(LIB_OBJS)
-@USE_LIBTOOL_TRUE@libsyscalls_la_DEPENDENCIES = $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@libsyscalls_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIB_OBJS)
 CHEWOUT_FILES = 
 SUFFIXES = .def
 CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
@@ -427,6 +428,24 @@ lib_a-syswrite.o: syswrite.c
 
 lib_a-syswrite.obj: syswrite.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-syswrite.obj `if test -f 'syswrite.c'; then $(CYGPATH_W) 'syswrite.c'; else $(CYGPATH_W) '$(srcdir)/syswrite.c'; fi`
+
+lib_a-sysexecve.o: sysexecve.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sysexecve.o `test -f 'sysexecve.c' || echo '$(srcdir)/'`sysexecve.c
+
+lib_a-sysexecve.obj: sysexecve.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sysexecve.obj `if test -f 'sysexecve.c'; then $(CYGPATH_W) 'sysexecve.c'; else $(CYGPATH_W) '$(srcdir)/sysexecve.c'; fi`
+
+lib_a-sysfork.o: sysfork.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sysfork.o `test -f 'sysfork.c' || echo '$(srcdir)/'`sysfork.c
+
+lib_a-sysfork.obj: sysfork.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sysfork.obj `if test -f 'sysfork.c'; then $(CYGPATH_W) 'sysfork.c'; else $(CYGPATH_W) '$(srcdir)/sysfork.c'; fi`
+
+lib_a-syswait.o: syswait.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-syswait.o `test -f 'syswait.c' || echo '$(srcdir)/'`syswait.c
+
+lib_a-syswait.obj: syswait.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-syswait.obj `if test -f 'syswait.c'; then $(CYGPATH_W) 'syswait.c'; else $(CYGPATH_W) '$(srcdir)/syswait.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

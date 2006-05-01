@@ -41,7 +41,12 @@ host_triplet = @host@
 DIST_COMMON = $(srcdir)/../../../../config.guess \
 	$(srcdir)/../../../../config.sub $(srcdir)/Makefile.in \
 	$(srcdir)/Makefile.am $(top_srcdir)/configure \
-	$(am__configure_deps) $(srcdir)/../../../../mkinstalldirs
+	$(am__configure_deps) $(srcdir)/../../../../mkinstalldirs \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../../acinclude.m4 \
@@ -64,13 +69,15 @@ LIBRARIES = $(noinst_LIBRARIES) $(toollib_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am_lib_a_OBJECTS = setjmp.$(OBJEXT) memcpy.$(OBJEXT) memset.$(OBJEXT) \
-	memmove.$(OBJEXT) libcdtor.$(OBJEXT)
+am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-memcpy.$(OBJEXT) \
+	lib_a-memset.$(OBJEXT) lib_a-memmove.$(OBJEXT) \
+	lib_a-libcdtor.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 libic_a_AR = $(AR) $(ARFLAGS)
 libic_a_LIBADD =
-am_libic_a_OBJECTS = setjmp.$(OBJEXT) memcpy.$(OBJEXT) \
-	memset.$(OBJEXT) memmove.$(OBJEXT) libcdtor.$(OBJEXT)
+am_libic_a_OBJECTS = libic_a-setjmp.$(OBJEXT) libic_a-memcpy.$(OBJEXT) \
+	libic_a-memset.$(OBJEXT) libic_a-memmove.$(OBJEXT) \
+	libic_a-libcdtor.$(OBJEXT)
 libic_a_OBJECTS = $(am_libic_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -198,7 +205,11 @@ noinst_LIBRARIES = lib.a
 # by itself together with e.g. uclibc.
 toollib_LIBRARIES = libic.a
 lib_a_SOURCES = setjmp.c memcpy.c memset.c memmove.c libcdtor.c
+lib_a_CCASFLAGS = $(AM_CCASFLAGS)
+lib_a_CFLAGS = $(AM_CFLAGS)
 libic_a_SOURCES = setjmp.c memcpy.c memset.c memmove.c libcdtor.c
+libic_a_CCASFLAGS = $(AM_CCASFLAGS)
+libic_a_CFLAGS = $(AM_CFLAGS)
 tooldir = $(exec_prefix)/$(host_alias)
 toollibdir = $(tooldir)/lib$(MULTISUBDIR)
 ACLOCAL_AMFLAGS = -I ../../..
@@ -292,6 +303,66 @@ distclean-compile:
 
 .c.obj:
 	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+lib_a-setjmp.o: setjmp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-setjmp.o `test -f 'setjmp.c' || echo '$(srcdir)/'`setjmp.c
+
+lib_a-setjmp.obj: setjmp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-setjmp.obj `if test -f 'setjmp.c'; then $(CYGPATH_W) 'setjmp.c'; else $(CYGPATH_W) '$(srcdir)/setjmp.c'; fi`
+
+lib_a-memcpy.o: memcpy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcpy.o `test -f 'memcpy.c' || echo '$(srcdir)/'`memcpy.c
+
+lib_a-memcpy.obj: memcpy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcpy.obj `if test -f 'memcpy.c'; then $(CYGPATH_W) 'memcpy.c'; else $(CYGPATH_W) '$(srcdir)/memcpy.c'; fi`
+
+lib_a-memset.o: memset.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memset.o `test -f 'memset.c' || echo '$(srcdir)/'`memset.c
+
+lib_a-memset.obj: memset.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memset.obj `if test -f 'memset.c'; then $(CYGPATH_W) 'memset.c'; else $(CYGPATH_W) '$(srcdir)/memset.c'; fi`
+
+lib_a-memmove.o: memmove.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memmove.o `test -f 'memmove.c' || echo '$(srcdir)/'`memmove.c
+
+lib_a-memmove.obj: memmove.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memmove.obj `if test -f 'memmove.c'; then $(CYGPATH_W) 'memmove.c'; else $(CYGPATH_W) '$(srcdir)/memmove.c'; fi`
+
+lib_a-libcdtor.o: libcdtor.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-libcdtor.o `test -f 'libcdtor.c' || echo '$(srcdir)/'`libcdtor.c
+
+lib_a-libcdtor.obj: libcdtor.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-libcdtor.obj `if test -f 'libcdtor.c'; then $(CYGPATH_W) 'libcdtor.c'; else $(CYGPATH_W) '$(srcdir)/libcdtor.c'; fi`
+
+libic_a-setjmp.o: setjmp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libic_a_CFLAGS) $(CFLAGS) -c -o libic_a-setjmp.o `test -f 'setjmp.c' || echo '$(srcdir)/'`setjmp.c
+
+libic_a-setjmp.obj: setjmp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libic_a_CFLAGS) $(CFLAGS) -c -o libic_a-setjmp.obj `if test -f 'setjmp.c'; then $(CYGPATH_W) 'setjmp.c'; else $(CYGPATH_W) '$(srcdir)/setjmp.c'; fi`
+
+libic_a-memcpy.o: memcpy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libic_a_CFLAGS) $(CFLAGS) -c -o libic_a-memcpy.o `test -f 'memcpy.c' || echo '$(srcdir)/'`memcpy.c
+
+libic_a-memcpy.obj: memcpy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libic_a_CFLAGS) $(CFLAGS) -c -o libic_a-memcpy.obj `if test -f 'memcpy.c'; then $(CYGPATH_W) 'memcpy.c'; else $(CYGPATH_W) '$(srcdir)/memcpy.c'; fi`
+
+libic_a-memset.o: memset.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libic_a_CFLAGS) $(CFLAGS) -c -o libic_a-memset.o `test -f 'memset.c' || echo '$(srcdir)/'`memset.c
+
+libic_a-memset.obj: memset.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libic_a_CFLAGS) $(CFLAGS) -c -o libic_a-memset.obj `if test -f 'memset.c'; then $(CYGPATH_W) 'memset.c'; else $(CYGPATH_W) '$(srcdir)/memset.c'; fi`
+
+libic_a-memmove.o: memmove.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libic_a_CFLAGS) $(CFLAGS) -c -o libic_a-memmove.o `test -f 'memmove.c' || echo '$(srcdir)/'`memmove.c
+
+libic_a-memmove.obj: memmove.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libic_a_CFLAGS) $(CFLAGS) -c -o libic_a-memmove.obj `if test -f 'memmove.c'; then $(CYGPATH_W) 'memmove.c'; else $(CYGPATH_W) '$(srcdir)/memmove.c'; fi`
+
+libic_a-libcdtor.o: libcdtor.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libic_a_CFLAGS) $(CFLAGS) -c -o libic_a-libcdtor.o `test -f 'libcdtor.c' || echo '$(srcdir)/'`libcdtor.c
+
+libic_a-libcdtor.obj: libcdtor.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libic_a_CFLAGS) $(CFLAGS) -c -o libic_a-libcdtor.obj `if test -f 'libcdtor.c'; then $(CYGPATH_W) 'libcdtor.c'; else $(CYGPATH_W) '$(srcdir)/libcdtor.c'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

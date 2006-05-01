@@ -9,35 +9,31 @@ GENERAL_SOURCES = dummy.c local64.h
 
 ## All interfaces are EL/IX level 2
 if ELIX_LEVEL_1
-LIB_OBJS =
+ELIX_SOURCES =
 else
-LIB_OBJS = \
-	fdopen64.$(oext) 	\
-	fgetpos64.$(oext)	\
-	fopen64.$(oext) 	\
-	freopen64.$(oext) 	\
-	fseeko64.$(oext) 	\
-	fsetpos64.$(oext) 	\
-	ftello64.$(oext)	\
-	stdio64.$(oext)		\
-	tmpfile64.$(oext)
+ELIX_SOURCES = \
+	fdopen64.c 	\
+	fgetpos64.c	\
+	fopen64.c 	\
+	freopen64.c 	\
+	fseeko64.c 	\
+	fsetpos64.c 	\
+	ftello64.c	\
+	stdio64.c	\
+	tmpfile64.c
 endif
 
 libstdio64_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libstdio64.la
-libstdio64_la_SOURCES = $(GENERAL_SOURCES)
-libstdio64_la_LIBADD = $(LIB_OBJS)
-libstdio64_la_DEPENDENCIES = $(LIB_OBJS)
+libstdio64_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 LIB_COMPILE = $(LTCOMPILE)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(GENERAL_SOURCES)
-lib_a_LIBADD = $(LIB_OBJS)
+lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_DEPENDENCIES = $(LIB_OBJS)
 LIB_COMPILE = $(COMPILE)
 noinst_DATA =
 endif # USE_LIBTOOL

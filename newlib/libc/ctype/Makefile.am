@@ -4,66 +4,62 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-GENERAL_SOURCES = \
-	ctype_.c \
-	isalnum.c \
-	isalpha.c \
-	iscntrl.c \
-	isdigit.c \
-	islower.c \
-	isupper.c \
-	isprint.c \
-	ispunct.c \
-	isspace.c \
-	isxdigit.c \
-	tolower.c \
+GENERAL_SOURCES = 	\
+	ctype_.c 	\
+	isalnum.c 	\
+	isalpha.c 	\
+	iscntrl.c 	\
+	isdigit.c 	\
+	islower.c 	\
+	isupper.c 	\
+	isprint.c 	\
+	ispunct.c 	\
+	isspace.c 	\
+	isxdigit.c 	\
+	tolower.c 	\
 	toupper.c
 
 ## The following handles EL/IX level 2 functions
 if ELIX_LEVEL_1
-LIB_OBJS =
+ELIX_SOURCES =
 else
-LIB_OBJS = \
-	isascii.$(oext) \
-	isblank.$(oext) \
-	iswalnum.$(oext) \
-	iswalpha.$(oext) \
-	iswblank.$(oext) \
-	iswcntrl.$(oext) \
-	iswctype.$(oext) \
-	iswdigit.$(oext) \
-	iswgraph.$(oext) \
-	iswlower.$(oext) \
-	iswprint.$(oext) \
-	iswpunct.$(oext) \
-	iswspace.$(oext) \
-	iswupper.$(oext) \
-	iswxdigit.$(oext) \
-	jp2uc.$(oext) \
-	toascii.$(oext) \
-	_tolower.$(oext) \
-	_toupper.$(oext) \
-	towctrans.$(oext) \
-	towlower.$(oext) \
-	towupper.$(oext) \
-	wctrans.$(oext)	\
-	wctype.$(oext)
+ELIX_SOURCES = \
+	isascii.c 	\
+	isblank.c 	\
+	iswalnum.c 	\
+	iswalpha.c 	\
+	iswblank.c 	\
+	iswcntrl.c 	\
+	iswctype.c 	\
+	iswdigit.c 	\
+	iswgraph.c 	\
+	iswlower.c 	\
+	iswprint.c 	\
+	iswpunct.c 	\
+	iswspace.c 	\
+	iswupper.c 	\
+	iswxdigit.c 	\
+	jp2uc.c 	\
+	toascii.c 	\
+	_tolower.c 	\
+	_toupper.c 	\
+	towctrans.c 	\
+	towlower.c 	\
+	towupper.c 	\
+	wctrans.c 	\
+	wctype.c
 endif
 
 libctype_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libctype.la
-libctype_la_SOURCES = $(GENERAL_SOURCES)
-libctype_la_LIBADD = $(LIB_OBJS)
-libctype_la_DEPENDENCIES = $(LIB_OBJS)
+libctype_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(GENERAL_SOURCES)
-lib_a_LIBADD = $(LIB_OBJS)
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA =
 endif # USE_LIBTOOL
 

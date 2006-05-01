@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = -I$(srcdir)/../include $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = addr2ascii.c ascii2addr.c base64.c bindresvport.c ether_addr.c getaddrinfo.c \
+GENERAL_SOURCES = addr2ascii.c ascii2addr.c base64.c bindresvport.c ether_addr.c getaddrinfo.c \
 	gethostbydns.c gethostbyht.c gethostbynis.c gethostnamadr.c \
 	getifaddrs.c getnameinfo.c \
 	getnetbydns.c getnetbyht.c getnetbynis.c getnetnamadr.c \
@@ -23,20 +23,20 @@ LIB_SOURCES = addr2ascii.c ascii2addr.c base64.c bindresvport.c ether_addr.c get
 	res_init.c res_mkquery.c res_mkupdate.c res_query.c \
 	res_send.c res_update.c rthdr.c vars.c
 
-ELIX_4_OBJS = \
+ELIX_4_SOURCES = \
 	rcmd.$(oext) \
 	rcmdsh.$(oext)
 
 if ELIX_LEVEL_1
-LIB_OBJS =
+ELIX_SOURCES =
 else
 if ELIX_LEVEL_2
-LIB_OBJS =
+ELIX_SOURCES =
 else
 if ELIX_LEVEL_3
-LIB_OBJS =
+ELIX_SOURCES =
 else
-LIB_OBJS = $(ELIX_4_OBJS)
+ELIX_SOURCES = $(ELIX_4_SOURCES)
 endif
 endif
 endif
@@ -46,16 +46,12 @@ libnet_la_CFLAGS = -DINET6
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libnet.la
-libnet_la_SOURCES = $(LIB_SOURCES)
-libnet_la_LIBADD = $(LIB_OBJS)
-libnet_la_DEPENDENCIES = $(LIB_OBJS)
+libnet_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(LIB_SOURCES)
-lib_a_LIBADD = $(LIB_OBJS)
+lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA =
 endif # USE_LIBTOOL
 

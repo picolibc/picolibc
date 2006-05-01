@@ -41,7 +41,9 @@ host_triplet = @host@
 DIST_COMMON = $(srcdir)/../../../../config.guess \
 	$(srcdir)/../../../../config.sub $(srcdir)/Makefile.in \
 	$(srcdir)/Makefile.am $(top_srcdir)/configure \
-	$(am__configure_deps) $(srcdir)/../../../../mkinstalldirs
+	$(am__configure_deps) $(srcdir)/../../../../mkinstalldirs \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../../acinclude.m4 \
@@ -56,8 +58,9 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am_lib_a_OBJECTS = syscalls.$(OBJEXT) trap.$(OBJEXT) creat.$(OBJEXT) \
-	ftruncate.$(OBJEXT) truncate.$(OBJEXT)
+am_lib_a_OBJECTS = lib_a-syscalls.$(OBJEXT) lib_a-trap.$(OBJEXT) \
+	lib_a-creat.$(OBJEXT) lib_a-ftruncate.$(OBJEXT) \
+	lib_a-truncate.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -181,6 +184,8 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = syscalls.c trap.S creat.c ftruncate.c truncate.c
+lib_a_CCASFLAGS = $(AM_CCASFLAGS)
+lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
@@ -240,11 +245,41 @@ distclean-compile:
 .S.obj:
 	$(CCASCOMPILE) -c `$(CYGPATH_W) '$<'`
 
+lib_a-trap.o: trap.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-trap.o `test -f 'trap.S' || echo '$(srcdir)/'`trap.S
+
+lib_a-trap.obj: trap.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-trap.obj `if test -f 'trap.S'; then $(CYGPATH_W) 'trap.S'; else $(CYGPATH_W) '$(srcdir)/trap.S'; fi`
+
 .c.o:
 	$(COMPILE) -c $<
 
 .c.obj:
 	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+lib_a-syscalls.o: syscalls.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-syscalls.o `test -f 'syscalls.c' || echo '$(srcdir)/'`syscalls.c
+
+lib_a-syscalls.obj: syscalls.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-syscalls.obj `if test -f 'syscalls.c'; then $(CYGPATH_W) 'syscalls.c'; else $(CYGPATH_W) '$(srcdir)/syscalls.c'; fi`
+
+lib_a-creat.o: creat.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-creat.o `test -f 'creat.c' || echo '$(srcdir)/'`creat.c
+
+lib_a-creat.obj: creat.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-creat.obj `if test -f 'creat.c'; then $(CYGPATH_W) 'creat.c'; else $(CYGPATH_W) '$(srcdir)/creat.c'; fi`
+
+lib_a-ftruncate.o: ftruncate.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ftruncate.o `test -f 'ftruncate.c' || echo '$(srcdir)/'`ftruncate.c
+
+lib_a-ftruncate.obj: ftruncate.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ftruncate.obj `if test -f 'ftruncate.c'; then $(CYGPATH_W) 'ftruncate.c'; else $(CYGPATH_W) '$(srcdir)/ftruncate.c'; fi`
+
+lib_a-truncate.o: truncate.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-truncate.o `test -f 'truncate.c' || echo '$(srcdir)/'`truncate.c
+
+lib_a-truncate.obj: truncate.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-truncate.obj `if test -f 'truncate.c'; then $(CYGPATH_W) 'truncate.c'; else $(CYGPATH_W) '$(srcdir)/truncate.c'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

@@ -9,6 +9,8 @@ AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
 
 lib_a_SOURCES =
+lib_a_CCASFLAGS = $(AM_CCASFLAGS)
+lib_a_CFLAGS = $(AM_CFLAGS)
 
 # This is a hack to force automake to include a definition for
 # COMPILE.

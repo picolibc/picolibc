@@ -5,10 +5,10 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 if HAVE_STDIO64_DIR
-STDIO64_OBJECTS = \
-	fstat64r.$(oext) \
-	lseek64r.$(oext) \
-	open64r.$(oext)
+STDIO64_SOURCES = \
+	fstat64r.c \
+	lseek64r.c \
+	open64r.c
 
 STDIO64_DEFS = \
 	fstat64r.def \
@@ -16,16 +16,16 @@ STDIO64_DEFS = \
 	open64r.def
 endif
 
-ELIX_2_OBJS = $(STDIO64_OBJECTS)
-ELIX_3_OBJS = execr.$(oext)
+ELIX_2_SOURCES = $(STDIO64_SOURCES)
+ELIX_3_SOURCES = execr.c
 
 if ELIX_LEVEL_1
-LIB_OBJS =
+ELIX_SOURCES =
 else
 if ELIX_LEVEL_2
-LIB_OBJS = $(ELIX_2_OBJS)
+ELIX_SOURCES = $(ELIX_2_SOURCES)
 else
-LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS)
+ELIX_SOURCES = $(ELIX_2_SOURCES) $(ELIX_3_SOURCES)
 endif
 endif
 
@@ -52,16 +52,12 @@ libreent_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libreent.la
-libreent_la_SOURCES = $(GENERAL_SOURCES)
-libreent_la_LIBADD = $(LIB_OBJS)
-libreent_la_DEPENDENCIES = $(LIB_OBJS)
+libreent_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(GENERAL_SOURCES)
-lib_a_LIBADD = $(LIB_OBJS)
+lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA =
 endif # USE_LIBTOOL
 
@@ -98,6 +94,6 @@ TARGETDOC = ../tmp.texi
 doc: $(CHEWOUT_FILES)
 	cat $(srcdir)/reent.tex >> $(TARGETDOC)
 
-impure.$(oext): $(srcdir)/impure.c $(srcdir)/../include/sys/reent.h
+$(lpfx)impure.$(oext): $(srcdir)/impure.c $(srcdir)/../include/sys/reent.h
 
 CLEANFILES = $(CHEWOUT_FILES) *.ref

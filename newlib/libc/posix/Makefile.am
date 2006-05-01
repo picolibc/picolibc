@@ -9,26 +9,26 @@ GENERAL_SOURCES = \
 	opendir.c readdir.c \
 	readdir_r.c rewinddir.c telldir.c
 
-ELIX_2_OBJS = \
-        scandir.$(oext) seekdir.$(oext)
+ELIX_2_SOURCES = \
+        scandir.c seekdir.c
 
-ELIX_3_OBJS = \
-	execl.$(oext) execle.$(oext) execlp.$(oext) execv.$(oext) \
-	execve.$(oext) execvp.$(oext)
+ELIX_3_SOURCES = \
+	execl.c execle.c execlp.c execv.c \
+	execve.c execvp.c
 
-ELIX_4_OBJS = \
-	popen.$(oext) 
+ELIX_4_SOURCES = \
+	popen.c 
 
 if ELIX_LEVEL_1
-LIB_OBJS =
+ELIX_SOURCES =
 else 
 if ELIX_LEVEL_2
-LIB_OBJS = $(ELIX_2_OBJS)
+ELIX_SOURCES = $(ELIX_2_SOURCES)
 else 
 if ELIX_LEVEL_3
-LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS)
+ELIX_SOURCES = $(ELIX_2_SOURCES) $(ELIX_3_SOURCES)
 else
-LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS) $(ELIX_4_OBJS)
+ELIX_SOURCES = $(ELIX_2_SOURCES) $(ELIX_3_SOURCES) $(ELIX_4_SOURCES)
 endif
 endif
 endif
@@ -37,16 +37,12 @@ libposix_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libposix.la
-libposix_la_SOURCES = $(GENERAL_SOURCES)
-libposix_la_LIBADD = $(LIB_OBJS)
-libposix_la_DEPENDENCIES = $(LIB_OBJS)
+libposix_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(GENERAL_SOURCES)
-lib_a_LIBADD = $(LIB_OBJS)
+lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA =
 endif # USE_LIBTOOL
 

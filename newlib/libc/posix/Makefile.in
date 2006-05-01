@@ -53,27 +53,43 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-am__DEPENDENCIES_1 = scandir.$(oext) seekdir.$(oext)
-am__DEPENDENCIES_2 = execl.$(oext) execle.$(oext) execlp.$(oext) \
-	execv.$(oext) execve.$(oext) execvp.$(oext)
-am__DEPENDENCIES_3 = popen.$(oext)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__DEPENDENCIES_4 = $(am__DEPENDENCIES_1) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__DEPENDENCIES_2) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__DEPENDENCIES_3)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@am__DEPENDENCIES_4 = $(am__DEPENDENCIES_1) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@	$(am__DEPENDENCIES_2)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__DEPENDENCIES_4 =  \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@	$(am__DEPENDENCIES_1)
+lib_a_LIBADD =
 am__objects_1 = lib_a-closedir.$(OBJEXT) lib_a-creat.$(OBJEXT) \
 	lib_a-isatty.$(OBJEXT) lib_a-opendir.$(OBJEXT) \
 	lib_a-readdir.$(OBJEXT) lib_a-readdir_r.$(OBJEXT) \
 	lib_a-rewinddir.$(OBJEXT) lib_a-telldir.$(OBJEXT)
-@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1)
+am__objects_2 = lib_a-scandir.$(OBJEXT) lib_a-seekdir.$(OBJEXT)
+am__objects_3 = lib_a-execl.$(OBJEXT) lib_a-execle.$(OBJEXT) \
+	lib_a-execlp.$(OBJEXT) lib_a-execv.$(OBJEXT) \
+	lib_a-execve.$(OBJEXT) lib_a-execvp.$(OBJEXT)
+am__objects_4 = lib_a-popen.$(OBJEXT)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_5 = $(am__objects_2) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_3) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_4)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@am__objects_5 = $(am__objects_2) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@	$(am__objects_3)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__objects_5 =  \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@	$(am__objects_2)
+@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
+@USE_LIBTOOL_FALSE@	$(am__objects_5)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-am__objects_2 = closedir.lo creat.lo isatty.lo opendir.lo readdir.lo \
+libposix_la_LIBADD =
+am__objects_6 = closedir.lo creat.lo isatty.lo opendir.lo readdir.lo \
 	readdir_r.lo rewinddir.lo telldir.lo
-@USE_LIBTOOL_TRUE@am_libposix_la_OBJECTS = $(am__objects_2)
+am__objects_7 = scandir.lo seekdir.lo
+am__objects_8 = execl.lo execle.lo execlp.lo execv.lo execve.lo \
+	execvp.lo
+am__objects_9 = popen.lo
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_10 = $(am__objects_7) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_8) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_9)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@am__objects_10 = $(am__objects_7) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@	$(am__objects_8)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__objects_10 =  \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@	$(am__objects_7)
+@USE_LIBTOOL_TRUE@am_libposix_la_OBJECTS = $(am__objects_6) \
+@USE_LIBTOOL_TRUE@	$(am__objects_10)
 libposix_la_OBJECTS = $(am_libposix_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libposix_la_rpath =
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -236,32 +252,28 @@ GENERAL_SOURCES = \
 	opendir.c readdir.c \
 	readdir_r.c rewinddir.c telldir.c
 
-ELIX_2_OBJS = \
-        scandir.$(oext) seekdir.$(oext)
+ELIX_2_SOURCES = \
+        scandir.c seekdir.c
 
-ELIX_3_OBJS = \
-	execl.$(oext) execle.$(oext) execlp.$(oext) execv.$(oext) \
-	execve.$(oext) execvp.$(oext)
+ELIX_3_SOURCES = \
+	execl.c execle.c execlp.c execv.c \
+	execve.c execvp.c
 
-ELIX_4_OBJS = \
-	popen.$(oext) 
+ELIX_4_SOURCES = \
+	popen.c 
 
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS) $(ELIX_4_OBJS)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@LIB_OBJS = $(ELIX_2_OBJS)
-@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@ELIX_SOURCES = $(ELIX_2_SOURCES) $(ELIX_3_SOURCES) $(ELIX_4_SOURCES)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@ELIX_SOURCES = $(ELIX_2_SOURCES) $(ELIX_3_SOURCES)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@ELIX_SOURCES = $(ELIX_2_SOURCES)
+@ELIX_LEVEL_1_TRUE@ELIX_SOURCES = 
 libposix_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libposix.la
-@USE_LIBTOOL_TRUE@libposix_la_SOURCES = $(GENERAL_SOURCES)
-@USE_LIBTOOL_TRUE@libposix_la_LIBADD = $(LIB_OBJS)
-@USE_LIBTOOL_TRUE@libposix_la_DEPENDENCIES = $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@libposix_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIB_OBJS)
 CHEWOUT_FILES = 
 SUFFIXES = .def
 CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
@@ -381,6 +393,60 @@ lib_a-telldir.o: telldir.c
 
 lib_a-telldir.obj: telldir.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-telldir.obj `if test -f 'telldir.c'; then $(CYGPATH_W) 'telldir.c'; else $(CYGPATH_W) '$(srcdir)/telldir.c'; fi`
+
+lib_a-scandir.o: scandir.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-scandir.o `test -f 'scandir.c' || echo '$(srcdir)/'`scandir.c
+
+lib_a-scandir.obj: scandir.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-scandir.obj `if test -f 'scandir.c'; then $(CYGPATH_W) 'scandir.c'; else $(CYGPATH_W) '$(srcdir)/scandir.c'; fi`
+
+lib_a-seekdir.o: seekdir.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-seekdir.o `test -f 'seekdir.c' || echo '$(srcdir)/'`seekdir.c
+
+lib_a-seekdir.obj: seekdir.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-seekdir.obj `if test -f 'seekdir.c'; then $(CYGPATH_W) 'seekdir.c'; else $(CYGPATH_W) '$(srcdir)/seekdir.c'; fi`
+
+lib_a-execl.o: execl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execl.o `test -f 'execl.c' || echo '$(srcdir)/'`execl.c
+
+lib_a-execl.obj: execl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execl.obj `if test -f 'execl.c'; then $(CYGPATH_W) 'execl.c'; else $(CYGPATH_W) '$(srcdir)/execl.c'; fi`
+
+lib_a-execle.o: execle.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execle.o `test -f 'execle.c' || echo '$(srcdir)/'`execle.c
+
+lib_a-execle.obj: execle.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execle.obj `if test -f 'execle.c'; then $(CYGPATH_W) 'execle.c'; else $(CYGPATH_W) '$(srcdir)/execle.c'; fi`
+
+lib_a-execlp.o: execlp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execlp.o `test -f 'execlp.c' || echo '$(srcdir)/'`execlp.c
+
+lib_a-execlp.obj: execlp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execlp.obj `if test -f 'execlp.c'; then $(CYGPATH_W) 'execlp.c'; else $(CYGPATH_W) '$(srcdir)/execlp.c'; fi`
+
+lib_a-execv.o: execv.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execv.o `test -f 'execv.c' || echo '$(srcdir)/'`execv.c
+
+lib_a-execv.obj: execv.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execv.obj `if test -f 'execv.c'; then $(CYGPATH_W) 'execv.c'; else $(CYGPATH_W) '$(srcdir)/execv.c'; fi`
+
+lib_a-execve.o: execve.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execve.o `test -f 'execve.c' || echo '$(srcdir)/'`execve.c
+
+lib_a-execve.obj: execve.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execve.obj `if test -f 'execve.c'; then $(CYGPATH_W) 'execve.c'; else $(CYGPATH_W) '$(srcdir)/execve.c'; fi`
+
+lib_a-execvp.o: execvp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execvp.o `test -f 'execvp.c' || echo '$(srcdir)/'`execvp.c
+
+lib_a-execvp.obj: execvp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execvp.obj `if test -f 'execvp.c'; then $(CYGPATH_W) 'execvp.c'; else $(CYGPATH_W) '$(srcdir)/execvp.c'; fi`
+
+lib_a-popen.o: popen.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-popen.o `test -f 'popen.c' || echo '$(srcdir)/'`popen.c
+
+lib_a-popen.obj: popen.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-popen.obj `if test -f 'popen.c'; then $(CYGPATH_W) 'popen.c'; else $(CYGPATH_W) '$(srcdir)/popen.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

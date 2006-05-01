@@ -11,27 +11,27 @@ GENERAL_SOURCES = \
 	sigset.c
 
 ## Distinguish different EL/IX level interfaces
-ELIX_2_OBJS = \
-	ttyname.$(oext)
+ELIX_2_SOURCES = \
+	ttyname.c
 
-ELIX_4_OBJS = \
-	basename.$(oext)	\
-	dirname.$(oext)		\
-	getlogin.$(oext)	\
-	getpass.$(oext) 	\
-	getpwent.$(oext) 	\
-	getut.$(oext)
+ELIX_4_SOURCES = \
+	basename.c	\
+	dirname.c	\
+	getlogin.c	\
+	getpass.c 	\
+	getpwent.c 	\
+	getut.c
 
 if ELIX_LEVEL_1
-LIB_OBJS =
+ELIX_SOURCES =
 else
 if ELIX_LEVEL_2
-LIB_OBJS = $(ELIX_2_OBJS)
+ELIX_SOURCES = $(ELIX_2_SOURCES)
 else
 if ELIX_LEVEL_3
-LIB_OBJS = $(ELIX_2_OBJS)
+ELIX_SOURCES = $(ELIX_2_SOURCES)
 else
-LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_4_OBJS)
+ELIX_SOURCES = $(ELIX_2_SOURCES) $(ELIX_4_SOURCES)
 endif
 endif
 endif
@@ -40,16 +40,12 @@ libunix_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libunix.la
-libunix_la_SOURCES = $(GENERAL_SOURCES)
-libunix_la_LIBADD = $(LIB_OBJS)
-libunix_la_DEPENDENCIES = $(LIB_OBJS)
+libunix_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(GENERAL_SOURCES)
-lib_a_LIBADD = $(LIB_OBJS)
+lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA =
 endif # USE_LIBTOOL
 
