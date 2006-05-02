@@ -1,0 +1,11 @@
+LIBRARY MPRAPI.DLL
+EXPORTS
+MprAdminConnectionClearStats@8
+MprAdminConnectionEnum@28
+MprAdminConnectionGetInfo@16
+MprAdminConnectionRemoveQuarantine@12
+MprAdminPortClearStats@8
+MprAdminPortDisconnect@8
+MprAdminPortEnum@32
+MprAdminPortGetInfo@16
+MprAdminPortReset@8

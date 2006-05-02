@@ -1,5 +1,10 @@
 2006-05-02  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/mprapi.h (MprAdminConnection*,MprAdminPort*): Add declaration.
+	* lib/mprapi.def: New file.
+
+2006-05-02  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/mprapi.h (PPP_*INFO*, RAS_CONNECTION_*, RAS_PORT_*,
 	RAS_USER_*): New structures.
 	* include/mprapi.h (RAS_FLAGS_*,PPP_LCP_*,RASCCPCA_* ,PPP_CCP_*,MAX_*,
