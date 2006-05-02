@@ -1,3 +1,11 @@
+2006-05-02  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/mprapi.h: New file.
+	* include/routprot.h: New file.
+	* include/ipxrtdef.h: New file.
+	* include/ipxconst.h: New file.
+	* include/stm.h: New file.
+
 2006-04-28  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/ddk/winddk.h (KAFFINITY): Fix typo.
