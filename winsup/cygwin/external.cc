@@ -351,5 +351,6 @@ cygwin_internal (cygwin_getinfo_types t, ...)
       default:
 	break;
     }
+  set_errno (ENOSYS);
   return (unsigned long) -1;
 }
