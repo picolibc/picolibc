@@ -1,3 +1,13 @@
+2006-05-02  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/sysnec810/Makefile.am: Specify .S files instead of
+	.s.
+	* libc/sys/sysnec810/Makefile.in: Regenerated.
+	* libc/sys/sysnec810/crt0.S: Renamed from .s file.
+	* libc/sys/sysnec810/io.S: Ditto.
+	* libc/sys/sysnec810/crt0.s: Renamed to .S file.
+	* libc/sys/sysnec810/io.s: Ditto.
+
 2006-05-01  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/argz/Makefile.am: Prefix any objects specified with $(lpfx).  If source file can

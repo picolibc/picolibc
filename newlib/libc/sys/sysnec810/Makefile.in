@@ -64,11 +64,11 @@ lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
 am__depfiles_maybe =
+CCASCOMPILE = $(CCAS) $(AM_CCASFLAGS) $(CCASFLAGS)
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-CCASCOMPILE = $(CCAS) $(AM_CCASFLAGS) $(CCASFLAGS)
 SOURCES = $(lib_a_SOURCES)
 ETAGS = etags
 CTAGS = ctags
@@ -182,7 +182,7 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = io.s write.c sbrk.c misc.c
+lib_a_SOURCES = io.S write.c sbrk.c misc.c
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../..
@@ -190,7 +190,7 @@ CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .o .obj .s
+.SUFFIXES: .S .c .o .obj
 am--refresh:
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -238,6 +238,18 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+.S.o:
+	$(CCASCOMPILE) -c $<
+
+.S.obj:
+	$(CCASCOMPILE) -c `$(CYGPATH_W) '$<'`
+
+lib_a-io.o: io.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-io.o `test -f 'io.S' || echo '$(srcdir)/'`io.S
+
+lib_a-io.obj: io.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-io.obj `if test -f 'io.S'; then $(CYGPATH_W) 'io.S'; else $(CYGPATH_W) '$(srcdir)/io.S'; fi`
+
 .c.o:
 	$(COMPILE) -c $<
 
@@ -261,18 +273,6 @@ lib_a-misc.o: misc.c
 
 lib_a-misc.obj: misc.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-misc.obj `if test -f 'misc.c'; then $(CYGPATH_W) 'misc.c'; else $(CYGPATH_W) '$(srcdir)/misc.c'; fi`
-
-.s.o:
-	$(CCASCOMPILE) -c $<
-
-.s.obj:
-	$(CCASCOMPILE) -c `$(CYGPATH_W) '$<'`
-
-lib_a-io.o: io.s
-	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-io.o `test -f 'io.s' || echo '$(srcdir)/'`io.s
-
-lib_a-io.obj: io.s
-	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-io.obj `if test -f 'io.s'; then $(CYGPATH_W) 'io.s'; else $(CYGPATH_W) '$(srcdir)/io.s'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
