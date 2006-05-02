@@ -5,6 +5,7 @@
 #endif
 
 #include <ras.h>
+#include <lmcons.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,6 +18,14 @@ extern "C" {
 #define PID_NBF 0x0000003F
 #define MAX_INTERFACE_NAME_LEN 256
 #define MAX_TRANSPORT_NAME_LEN 40
+#define MAX_PORT_NAME 16
+#define MAX_MEDIA_NAME 16
+#define MAX_DEVICE_NAME 128
+#define MAX_DEVICETYPE_NAME 16
+#define MAX_PHONE_NUMBER_LEN 128
+#define ATADDRESSLEN 32
+#define IPADDRESSLEN 15
+#define IPXADDRESSLEN 22
 #define MPR_INTERFACE_ADMIN_DISABLED 0x00000002
 #define MPR_INTERFACE_CONNECTION_FAILURE 0x00000004
 #define MPR_INTERFACE_DIALOUT_HOURS_RESTRICTION 0x00000010
@@ -82,7 +91,50 @@ extern "C" {
 #define MPR_VS_PptpFirst VS_PptpFirst	
 #define MPR_VS_L2tpOnly VS_L2tpOnly 	
 #define MPR_VS_L2tpFirst VS_L2tpFirst	
+#if (WINVER >= 0x502)
+#define MPR_ENABLE_RAS_ON_DEVICE 0x00000001
+#define MPR_ENABLE_ROUTING_ON_DEVICE 0x00000002
+#endif
+#define RAS_FLAGS_PPP_CONNECTION 0x00000001
+#define RAS_FLAGS_MESSENGER_PRESENT 0x00000002
+#define RAS_FLAGS_RAS_CONNECTION 0x00000004
+#define RAS_FLAGS_QUARANTINE_PRESENT 0x00000008
+#define RASCCPCA_STAC 0x00000005
+#define RASCCPCA_MPPC 0x00000006
+#define PPP_CCP_COMPRESSION 0x00000001
+#define PPP_CCP_ENCRYPTION40BITOLD 0x00000010
+#define PPP_CCP_ENCRYPTION40BIT 0x00000020
+#define PPP_CCP_ENCRYPTION128BIT 0x00000040
+#define PPP_CCP_ENCRYPTION56BIT 0x00000080
+#define PPP_CCP_HISTORYLESS 0x01000000
+#define RASPRIV_NoCallback 0x01
+#define RASPRIV_AdminSetCallback 0x02
+#define RASPRIV_CallerSetCallback 0x04
+#define RASPRIV_DialinPrivilege 0x08
+#define RASPRIV_CallbackType 0x07
+#define RASPRIV2_DialinPolicy 0x01
+#define PPP_LCP_PAP 0x0000C023
+#define PPP_LCP_SPAP 0x0000C027
+#define PPP_LCP_CHAP 0x0000C223
+#define PPP_LCP_EAP 0x0000C227
+#define PPP_LCP_CHAP_MD5 0x00000005
+#define PPP_LCP_CHAP_MS 0x00000080
+#define PPP_LCP_CHAP_MSV2 0x00000081
+#define PPP_LCP_MULTILINK_FRAMING 0x00000001
 
+typedef enum _RAS_HARDWARE_CONDITION {
+	RAS_HARDWARE_OPERATIONAL,
+	RAS_HARDWARE_FAILURE
+} RAS_HARDWARE_CONDITION;
+typedef enum _RAS_PORT_CONDITION {
+	RAS_PORT_NON_OPERATIONAL,
+	RAS_PORT_DISCONNECTED,	
+	RAS_PORT_CALLING_BACK,
+	RAS_PORT_LISTENING,
+	RAS_PORT_AUTHENTICATING,
+	RAS_PORT_AUTHENTICATED,	
+	RAS_PORT_INITIALIZING
+} RAS_PORT_CONDITION;
 typedef struct _MPR_CREDENTIALSEX_0 {
 	DWORD  dwSize;
 	LPBYTE lpbCredentialsInfo;
@@ -244,6 +296,137 @@ typedef struct _MPR_TRANSPORT_0 {
 	HANDLE hTransport;
 	WCHAR wszTransportName[MAX_TRANSPORT_NAME_LEN+1];
 } MPR_TRANSPORT_0,*PMPR_TRANSPORT_0;
+typedef struct _PPP_ATCP_INFO {
+	DWORD dwError;
+	WCHAR wszAddress[ATADDRESSLEN+1];
+} PPP_ATCP_INFO;
+typedef struct _PPP_CCP_INFO {
+	DWORD dwError;
+	DWORD dwCompressionAlgorithm;
+	DWORD dwOptions;
+	DWORD dwRemoteCompressionAlgorithm;
+	DWORD dwRemoteOptions;
+} PPP_CCP_INFO;
+typedef struct _PPP_IPCP_INFO {
+	DWORD dwError;
+	WCHAR wszAddress[IPADDRESSLEN+1];
+	WCHAR wszRemoteAddress[IPADDRESSLEN+1];
+} PPP_IPCP_INFO;
+typedef struct _PPP_IPCP_INFO2 {
+	DWORD dwError;
+	WCHAR wszAddress[IPADDRESSLEN+1];
+	WCHAR wszRemoteAddress[IPADDRESSLEN+1];
+	DWORD dwOptions;
+	DWORD dwRemoteOptons;
+} PPP_IPCP_INFO2;
+typedef struct _PPP_IPXCP_INFO {
+	DWORD dwError;
+	WCHAR wszAddress[IPXADDRESSLEN+1];
+} PPP_IPXCP_INFO;
+typedef struct _PPP_LCP_INFO {
+	DWORD dwError;
+	DWORD dwAuthenticationProtocol;
+	DWORD dwAuthenticationData;
+	DWORD dwRemoteAuthenticationProtocol;
+	DWORD dwRemoteAuthenticationData;
+	DWORD dwTerminateReason;
+	DWORD dwRemoteTerminateReason;
+	DWORD dwOptions;
+	DWORD dwRemoteOptions;
+	DWORD dwEapTypeId;
+	DWORD dwRemoteEapTypeId;
+} PPP_LCP_INFO;
+typedef struct _PPP_NBFCP_INFO {
+	DWORD dwError;
+	WCHAR wszWksta[NETBIOS_NAME_LEN+1];
+} PPP_NBFCP_INFO;
+typedef struct _PPP_INFO {
+	PPP_NBFCP_INFO nbf;
+	PPP_IPCP_INFO ip;
+	PPP_IPXCP_INFO ipx;
+	PPP_ATCP_INFO at;
+} PPP_INFO;
+typedef struct _PPP_INFO_2 {
+	PPP_NBFCP_INFO nbf;
+	PPP_IPCP_INFO2 ip;
+	PPP_IPXCP_INFO ipx;
+	PPP_ATCP_INFO at;
+	PPP_CCP_INFO ccp;
+	PPP_LCP_INFO lcp;
+} PPP_INFO_2;
+typedef struct _RAS_CONNECTION_0 {
+	HANDLE hConnection;
+	HANDLE hInterface;
+	DWORD dwConnectDuration;
+	ROUTER_INTERFACE_TYPE dwInterfaceType;
+	DWORD dwConnectionFlags;
+	WCHAR wszInterfaceName[MAX_INTERFACE_NAME_LEN+1];
+	WCHAR wszUserName[UNLEN+1];
+	WCHAR wszLogonDomain[DNLEN+1];
+	WCHAR wszRemoteComputer[NETBIOS_NAME_LEN+1];
+} RAS_CONNECTION_0,*PRAS_CONNECTION_0;
+typedef struct RAS_CONNECTION_1 {
+	HANDLE hConnection;
+	HANDLE hInterface;
+	PPP_INFO PppInfo;
+	DWORD dwBytesXmited;
+	DWORD dwBytesRcved;
+	DWORD dwFramesXmited;
+	DWORD dwFramesRcved;
+	DWORD dwCrcErr;
+	DWORD dwTimeoutErr;
+	DWORD dwAlignmentErr;
+	DWORD dwHardwareOverrunErr;
+	DWORD dwFramingErr;
+	DWORD dwBufferOverrunErr;
+	DWORD dwCompressionRatioIn;
+	DWORD dwCompressionRatioOut;
+} RAS_CONNECTION_1,*PRAS_CONNECTION_1;
+typedef struct _RAS_CONNECTION_2 {
+	HANDLE hConnection;
+	WCHAR wszUserName[UNLEN+1];
+	ROUTER_INTERFACE_TYPE dwInterfaceType;
+	GUID guid;
+	PPP_INFO_2 PppInfo2;
+} RAS_CONNECTION_2,*PRAS_CONNECTION_2;
+typedef struct _RAS_PORT_0 {
+	HANDLE hPort;
+	HANDLE hConnection;
+	RAS_PORT_CONDITION dwPortCondition;
+	DWORD dwTotalNumberOfCalls;
+	DWORD dwConnectDuration;
+	WCHAR wszPortName[MAX_PORT_NAME+1];
+	WCHAR wszMediaName[MAX_MEDIA_NAME+1];
+	WCHAR wszDeviceName[MAX_DEVICE_NAME+1];
+	WCHAR wszDeviceType[MAX_DEVICETYPE_NAME+1];
+} RAS_PORT_0,*PRAS_PORT_0;
+typedef struct _RAS_PORT_1 {
+	HANDLE hPort;
+	HANDLE hConnection;
+	RAS_HARDWARE_CONDITION dwHardwareCondition;
+	DWORD dwLineSpeed;
+	DWORD dwBytesXmited;
+	DWORD dwBytesRcved;
+	DWORD dwFramesXmited;
+	DWORD dwFramesRcved;
+	DWORD dwCrcErr;
+	DWORD dwTimeoutErr;
+	DWORD dwAlignmentErr;
+	DWORD dwHardwareOverrunErr;
+	DWORD dwFramingErr;
+	DWORD dwBufferOverrunErr;
+	DWORD dwCompressionRatioIn;
+	DWORD dwCompressionRatioOut;
+} RAS_PORT_1,*PRAS_PORT_1;
+typedef struct _RAS_USER_0 {
+	BYTE bfPrivilege;
+	WCHAR wszPhoneNumber[MAX_PHONE_NUMBER_LEN+1];
+} RAS_USER_0,*PRAS_USER_0;
+typedef struct _RAS_USER_1 {
+	BYTE bfPrivilege;
+	WCHAR wszPhoneNumber[MAX_PHONE_NUMBER_LEN+1];
+	BYTE bfPrivilege2;
+} RAS_USER_1,*PRAS_USER_1;
 #endif
 
 #ifdef __cplusplus

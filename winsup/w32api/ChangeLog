@@ -1,5 +1,14 @@
 2006-05-02  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/mprapi.h (PPP_*INFO*, RAS_CONNECTION_*, RAS_PORT_*,
+	RAS_USER_*): New structures.
+	* include/mprapi.h (RAS_FLAGS_*,PPP_LCP_*,RASCCPCA_* ,PPP_CCP_*,MAX_*,
+	RASPRIV_*,*ADDRESSLEN,MPR_ENABLE_*): Define.
+	* include/mprapi.h (RAS_*_CONDITION): Add enums.
+	* include/mprapi.h <lmcons.h>: For NETBIOS_NAME_LEN, UNLEN, DLEN.
+
+2006-05-02  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/mprapi.h: New file.
 	* include/routprot.h: New file.
 	* include/ipxrtdef.h: New file.
