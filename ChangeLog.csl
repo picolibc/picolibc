@@ -1,4 +1,30 @@
 2006-05-03  Paul Brook  <paul@codesourcery.com>
+	Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* gdb/dwarf2read.c (read_subroutine_type): Add armcc workaround.
+
+	* gdb/dwarf2read.c (read_structure_type): Look for ADS vtable
+	pointers.
+
+	* gdb/dwarf2read.c (dwarf_decode_lines): Don't set dir for absolute
+	paths.
+	(dwarf_decode_lines): Ditto.
+	(dwarf2_start_subfile): Split absolute filenames into path+file.
+
+	* gdb/symtab.h (struct symbol): Add is_argument.
+	(SYMBOL_IS_ARGUMENT): Define.
+	* gdb/stack.c (print_frame_args): Use SYMBOL_IS_ARGUMENT.
+	(print_frame_arg_vars): Ditto.
+	* gdb/dwarf2read.c (new_symbol): Set SYMBOL_IS_ARGUMENT.
+	(new_symbol): Mark optimized out arguments.
+
+	* gdb/dwarf2read.c (partial_read_comp_unit_head): Accept version 3.
+
+	* gdb/dwarf2read.c (read_unspecified_type): New function.
+	(read_type_die): Handle DW_TAG_unspecified_type.
+
+2006-05-03  Paul Brook  <paul@codesourcery.com>
+	Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* gdb/dwarf2read.c (field_info): Add baseclasses.
 	(dwarf2_add_field): Check base classes.
