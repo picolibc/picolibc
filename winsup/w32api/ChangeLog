@@ -1,5 +1,10 @@
 2006-05-02  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/errors.h: New file.
+	* include/dshow.h: Include <errors.h>.
+
+2006-05-02  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/dshow.h: New file.
 	* include/evcode.h: New file.
 	* include/audevcod.h: New file.
@@ -17,7 +22,7 @@
 	* include/mprapi.h (RAS_FLAGS_*,PPP_LCP_*,RASCCPCA_* ,PPP_CCP_*,MAX_*,
 	RASPRIV_*,*ADDRESSLEN,MPR_ENABLE_*): Define.
 	* include/mprapi.h (RAS_*_CONDITION): Add enums.
-	* include/mprapi.h <lmcons.h>: For NETBIOS_NAME_LEN, UNLEN, DLEN.
+	* include/mprapi.h: <lmcons.h> for NETBIOS_NAME_LEN, UNLEN, DLEN.
 
 2006-05-02  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 

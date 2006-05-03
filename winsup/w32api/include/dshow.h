@@ -7,5 +7,6 @@
 #include <evcode.h>
 #include <audevcod.h>
 #include <dvdevcod.h>
+#include <errors.h>
 
 #endif
