@@ -1,3 +1,21 @@
+2006-05-03  Paul Brook  <paul@codesourcery.com>
+
+	* gdb/dwarf2read.c (field_info): Add baseclasses.
+	(dwarf2_add_field): Check base classes.
+	(dwarf2_attach_fields_to_type): Ditto.
+	
+	* gdb/gnu-v3-abi.c (gnuv3_rtti_type): Check for NULL base_type.
+	(gnuv3_virtual_fn_field): Handle missing base.
+	(gnuv3_baseclass_offset): Handle missing vptr.
+	* gdb/varobj.c (cplus_class_num_children): Call fill_in_vptr_fieldno.
+	(cplus_name_of_child): Ditto.
+	* gdb/eval.c (evaluate_subexp_standard): Ditto.
+	* gdb/dwarf2read.c (read_structure_type): Search for vtable pointer
+	by name in objects built by ARM compiler.
+	
+	* gdb/dwarf2read.c (dwarf2_add_member_fn): Calculate virtual function
+	offset for classes without DW_AT_containing_type.
+
 2006-04-28  Mark Mitchell  <mark@codesourcery.com>
 
 	* gdb/mt-tdep.c (mt_register_name): Correct out-of-range logic to
