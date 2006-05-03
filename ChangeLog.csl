@@ -1,4 +1,44 @@
 2006-05-03  Paul Brook  <paul@codesourcery.com>
+	Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* gdb/testsuite/gdb.cp/gdb1355.exp: Accept different spellings of
+	integer types.
+	* gdb/testsuite/gdb.cp/gdb1355.cc: Ensure all types are referenced.
+	* gdb/testsuite/gdb.cp/hang2.C: Ditto.
+	* gdb/testsuite/gdb.cp/m-data.cc: Ditto.
+	* gdb/testsuite/gdb.cp/hang3.C: Ditto.
+	* gdb/testsuite/gdb.cp/hang1.C: Ditto.
+
+	* gdb/gdbtypes.c (rank_one_type): Check for plain char -> signed/
+	unsigned char.
+
+	* gdb/testsuite/gdb.base/completion.exp: Accept "long" as a type.
+
+	* gdb/testsuite/gdb.base/volatile.exp: Accept different spellings of
+	integer types.
+	* gdb/testsuite/gdb.base/constvars.c: Ensure all types are referenced.
+
+	* gdb/testsuite/gdb.stabs/weird.exp: Return -1 instead of issuing
+	error.
+
+	* gdb/testsuite/gdb.base/advance.c: Add proper function prototype.
+
+	* gdb/testsuite/gdb.base/ending-run.exp: Add case for ARM runtime.
+
+	* gdb/testsuite/gdb.base/gdb1821.c: Ensure all types are referenced.
+
+	* gdb/testsuite/gdb.base/ptype.exp: Accept different spellings of
+	integer types.
+
+	* gdb/testsuite/gdb.cp/inherit.exp: Cope with armcc vtable pointers.
+
+	* gdb/testsuite/gdb.mi/mi2-var-child.exp: Accept different spellings
+	of integer types.
+	* gdb/testsuite/gdb.mi/mi-var-display.exp: Ditto.
+	* gdb/testsuite/gdb.mi/mi2-var-display.exp: Ditto.
+	* gdb/testsuite/gdb.mi/mi2-var-cmd.exp: Ditto.
+
+2006-05-03  Paul Brook  <paul@codesourcery.com>
 
 	* arm-linux-tdep.c (arm_linux_extract_return_value): Use gdb_byte.
 
