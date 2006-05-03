@@ -1,5 +1,11 @@
 2006-05-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/mprapi.h (MPR_SERVER_HANDLE): New typedef.
+	* include/mprapi.h (MprAdmin*): Declare functions.
+	* lib/mprapi.def (MprAdmin*): Add stubs.
+
+2006-05-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* lib/directx/quartz.def: Move from lib/directx/...
 	* lib/quartz.def: ... to lib/
 
@@ -142,7 +148,7 @@
 
 	* include/wingdi.h (ColorCorrectPalette): Add declaration.
 	(CreateColorSpace): Add UNICODE mappings.
-	* lib/gdi32.def (ColorCorrectPalette): Add stub. 
+	* lib/gdi32.def (ColorCorrectPalette): Add stub.
 	* include/icm.h: New file.
 	* lib/mscms.def: New file.
 	* lib/icmui.def: New file.
@@ -770,7 +776,7 @@
 
 	* lib/shell32.c (CLSID_RecycleBin, CLSID_ControlPanel,
 	CLSID_MyComputer,CLSID_Internet, CLSID_NetworkPlaces,
-	CLSID_MyDocuments, CLSID_FolderShortcut): Add GUIDs. 
+	CLSID_MyDocuments, CLSID_FolderShortcut): Add GUIDs.
 
 005-08-17  Martin Fuchs <martin-fuchs@gmx.net>
 
@@ -819,7 +825,7 @@
 
 	* include/richedit.h (SETTEXTEX): Define structure and
 	associated constants.
-	(GT_SELECTION): Define GETTEXTEX flag constant. 
+	(GT_SELECTION): Define GETTEXTEX flag constant.
 
 2005-07-19  Danny Smith  <dannysmith@users.sourceforge.net>
 
@@ -927,7 +933,7 @@
 
 2005-03-16  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/winnt.h (_LUID): Add structure. Correct LUID typedef. 
+	* include/winnt.h (_LUID): Add structure. Correct LUID typedef.
 	Thanks to:
 	Paul-Christiaan Spruijtenburg <wakarimasu at users dot sf dot net>
 
@@ -964,7 +970,7 @@
 
 2005-01-26  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/winuser.h (SW_SMOOTHSCROLL): Add define. 
+	* include/winuser.h (SW_SMOOTHSCROLL): Add define.
 	Reported by: Christian Ehrlicher  <chehrlic@users.sf.net>
 
 2005-01-21  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
@@ -1228,7 +1234,7 @@
 	ExInterlockedInsertTailList, ExInterlockedRemoveHeadList,
 	ExInterlockedPopEntryList, ExInterlockedPushEntryList): 
 	Add prototypes for DDKFASTAPI versions.
-	Thanks to Vadim Yegor0v <zg at bmg dot lv> for report. 
+	Thanks to Vadim Yegor0v <zg at bmg dot lv> for report.
 	* lib/ntoskrnl.def (ExInterlockedAddUlong,
 	ExInterlockedInsertHeadList, ExInterlockedInsertTailList,
 	ExInterlockedRemoveHeadList, ExInterlockedPopEntryList,
@@ -1651,7 +1657,7 @@
 2004-03-29  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/Makefile.in: Add directx to .PHONY target.
-	* lib/directx/dxerr.c: Remove dependence on mingw runtime. 
+	* lib/directx/dxerr.c: Remove dependence on mingw runtime.
 	Don't include stdio.h or tchar.h.
 	Replace _T() macro with TEXT() macro, throughout.
 	Replace _stprintf with wsprintf, throughout.
@@ -2053,10 +2059,10 @@
 	(SHCOLSTATE): Add enum.
 	(IColumnProvider): Add COM interface.
 	(IQueryInfo): Likewise.
-	(IShellIconOverlayIdentifier): Likewise. 
+	(IShellIconOverlayIdentifier): Likewise.
   	* include/shlguid.h (IID_IColumnProvider) Declare.
 	(IID_IQueryInfo): Likweise.
-	(IID_IShellIconOverlayIdentifier): Likwise. 
+	(IID_IShellIconOverlayIdentifier): Likwise.
 	* lib/shell32.c (IID_IColumnProvider) Define.
 	(IID_IQueryInfo): Likweise.
 	(IID_IShellIconOverlayIdentifier): Likwise.
@@ -3046,7 +3052,7 @@
 
 2003-08-22   Danny Smith <dannysmith@users.sourceforge.net>
 
-        * include/winnt.h (IMAGE_SUBSYSTEM_XBOX): Add define. 
+        * include/winnt.h (IMAGE_SUBSYSTEM_XBOX): Add define.
 
 2003-08-22  Mihai Preda <mihai_preda@users.sourceforge.net>
 
@@ -3069,7 +3075,7 @@
 
 2003-08-18  Danny Smith <dannysmith@users.sourceforge.net>
 
-	* include/commctrl.h (TB_*) Group defines together. 
+	* include/commctrl.h (TB_*) Group defines together.
 
 2003-08-18  Martin Fuchs  <Martin-Fuchs@gmx.net>
 
@@ -3161,7 +3167,7 @@
 2003-07-31  Martin Fuchs  <Martin-Fuchs@gmx.net>
 
 	* include/shlobj.h (SFGAO_COMPRESSED): Add define.
-	(SFGAOF, SHGDNF): Add typedef's. 
+	(SFGAOF, SHGDNF): Add typedef's.
 	(SHCONTF): Extend enum.
 
 2003-07-31  Danny Smith <dannysmith@users.sourceforge.net>
@@ -3210,10 +3216,10 @@
 	* include/winnt.h (COMPRESSION_*, ACCESS_*, SYSTEM_*): Sync with 
 	ddk/ntifs.h defines.
 	(FILE_*): Likewise.
-	(MEM_IMAGE, SEC_*): Likewise. 
+	(MEM_IMAGE, SEC_*): Likewise.
 	(DUPLICATE_CLOSE_SOURCE, DUPLICATE_SAME_ACCESS, 
 	DUPLICATE_SAME_ATTRIBUTES): Sync with ddk/winddk.h defines.
-	(TOKEN_*): Sync with ddk/ntifs.h defines. 
+	(TOKEN_*): Sync with ddk/ntifs.h defines.
 	* include/ddk/ntapi.h: Add comments noting definitions in
 	winbase.h.
 	* include/ddk/ntifs.h: Add comments noting definitions in
@@ -3752,14 +3758,14 @@
 	*lib/ndis.def (NdisAllocateMemory): Correct stdcall suffix.
 	Thanks to: Vladimir Michl <michlv@users.sourceforge.net>
 	(NdisUpdateSharedMemory): Likewise.
-	(NdisMFreeSharedMemory: Likewise. 
+	(NdisMFreeSharedMemory: Likewise.
 	(NdisMMapIoSpace: Likewise.
 
 2003-03-18  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/lmaccess.h (UF_LOCKOUT): Correct name from UF_LOCK.
 	Thanks to: Fabricio D. Rossi  <gurusoda@users.sourceforge.net>
- 	(UF_SETTABLE_BITS): Correct UF_LOCKOUT here too. 
+ 	(UF_SETTABLE_BITS): Correct UF_LOCKOUT here too.
 
 2003-03-17  Bang Jun-Young  <junyoung@netbsd.org>
 
@@ -3965,7 +3971,7 @@
 	* include/winbase.h (CreateFiber): Change first parameter
 	to SIZE_T.
 	(CreateJobObject[AW], CreateHardLink[AW]):Guard with
-	if (_WIN32_WINNT >= 0x0500). 
+	if (_WIN32_WINNT >= 0x0500).
 
 2003-01-31  Bang Jun-Young  <junyoung@netbsd.org>
 
@@ -4325,7 +4331,7 @@
 	(ASFW_ANY, LSFW_LOCK, LSFW_UNLOCK) Add defines.
 	Thanks to:  Pat Thoyts  <patthoyts@users.sourceforge.net>
 	* lib/winuser.def (AllowSetForegroundWindow,
-	LockSetForegroundWindow): Add stubs. 
+	LockSetForegroundWindow): Add stubs.
 
 2002-12-06  Ken Fitlike  <kenfitlike@users.sourceforge.net>
 
@@ -5417,7 +5423,7 @@
 
 2002-03-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* ChangeLog: Fix typo in last entry. 
+	* ChangeLog: Fix typo in last entry.
 	* include/winsock2.h (IPPROTO_*): Add IPv6 defines.
 	* include/ws2tcpip.h: (IP_*): Add new defines.
 	(INET_ADDRSTRLEN, INET6_ADDRSTRLEN): Add defines.
@@ -5609,7 +5615,7 @@
 
 2002-01-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* ChangeLog: correct date in last entry. 
+	* ChangeLog: correct date in last entry.
 
 2002-01-11  Timothy J. Wood  <tjw@omnigroup.com>
 
@@ -5787,7 +5793,7 @@
 	* include/winuser.h (tagALTTABINFO, tagCOMBOBOXINFO, 
 	tagCURSORINFO, tagMENUBARINFO, tagMENUINFO, tagMONITORINFO
 	tagSCROLLBARINFO, tagTITLEBARINFO. tagWINDOWINFO,
-	tagLASTINPUTINFO ): Define new structures. 
+	tagLASTINPUTINFO ): Define new structures.
 	(EndMenu, GetAltTabInfo[AW],GetComboBoxInfo,GetCursorInfo,
 	GetLastInputInfo, GetListBoxInfo, GetMenuBarInfo,
 	GetMonitorInfo[AW], GetScrollBarInfo, GetTitleBarInfo,
@@ -5832,7 +5838,7 @@
 2001-11-05  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/commdlg.h: Include <unknwn.h> rather than local
-	definition of LPUKNOWN. 
+	definition of LPUKNOWN.
 	* include/rpcproxy.h: Don't include if ndef CINTERFACE.
 	Emit warning.
 
@@ -5889,7 +5895,7 @@
 2001-11-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/basetyps.h (DECLARE_INTERFACE): Don't add
-	__attribute__((com_interface)) for __GNUC__ >= 3. 
+	__attribute__((com_interface)) for __GNUC__ >= 3.
 
 2001-11-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
@@ -5919,7 +5925,7 @@
 	* include/oleidl.h (enum tagDROPEFFECT): Mark as __extension__
 	(enum not limited to range of int).
 	* include/oaidl.h (struct tagVARIANT): Mark as __extension__
-	(struct with no named members), ifndef NONAMELESSUNION. 
+	(struct with no named members), ifndef NONAMELESSUNION.
 
 2001-10-30  Danny Smith  <dannysmith@users.sourceforge.net>
 
@@ -5996,12 +6002,12 @@
 
 2001-09-05  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/wininet.h (InternetAutodial): Add prototype. 
+	* include/wininet.h (InternetAutodial): Add prototype.
 	(InternetAutodialHangup): Ditto.
 	(InternetDial): Ditto.
 	(InternetGetConnectedState): Ditto.
 	(InternetGoOnline): Ditto.
-	(InternetHangUp): Ditto. 
+	(InternetHangUp): Ditto.
 	(InternetSetDialState): Ditto.
 	Add associated INTERNET_* auto dial flags.
 	Guard typedefs and prototypes with #ifndef RC_INVOKED.
@@ -6019,7 +6025,7 @@ Tue Sep  4 14:15:59 2001  Christopher Faylor <cgf@cygnus.com>
 2001-09-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/shlobj.h (CFSTR_* ): Add new defines.
-	Thanks to: "Ron" <ron@debian.org> . 
+	Thanks to: "Ron" <ron@debian.org> .
 	Unicode them.
 
 Sat Sep  1 10:40:37 2001  Christopher Faylor <cgf@cygnus.com>
@@ -6110,7 +6116,7 @@ Thu Aug 30 09:35:51 2001  Christopher Faylor <cgf@cygnus.com>
 	* include/winsock2.h (#include <wtypes.h): Don't.
 	(_BLOB): Define instead, if not already done.
 	(__BLOB_T_DEFINED: New define for guarding _BLOB.
-	* include/wtypes.h (_BLOB): Guard against prior definition. 
+	* include/wtypes.h (_BLOB): Guard against prior definition.
 
 2001-08-15  Danny Smith  <dannysmith@users.sourceforge.net>
 
@@ -6122,7 +6128,7 @@ Thu Aug 30 09:35:51 2001  Christopher Faylor <cgf@cygnus.com>
 	(_wireSAFEARR_HAVEIID): Ditto.
 	(_wireSAFEARRAY_UNION.u): Add fields SAFEARR_BRECORD RecordStr,
 	SAFEARR_HAVEIID HaveIidStr.
-	(tagVariant): Add fields _VARIANT_BOOL bool,*pbool. 
+	(tagVariant): Add fields _VARIANT_BOOL bool,*pbool.
 	(_wireVARIANT): Change field parray to type wirePSAFEARRAY,
 	pparray to wirePSAFEARRAY*.
 	(_wireVARIANT): Add field wireBRECORD brecVal.
@@ -6231,7 +6237,7 @@ Thu Aug 30 09:35:51 2001  Christopher Faylor <cgf@cygnus.com>
 2001-06-19  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/kernel32.def: Add LanguageGroup and UILanguage symbols.
-	Thanks to Kevin Chase <kevincha99@hotmail.com>. 
+	Thanks to Kevin Chase <kevincha99@hotmail.com>.
 
 2001.06.11  TAMURA Kent  <tkent@users.sourceforge.net>
 
@@ -6240,9 +6246,9 @@ Thu Aug 30 09:35:51 2001  Christopher Faylor <cgf@cygnus.com>
 
 2001-06-11  Danny Smith <dannysmith@users.sourceforge.net>
 
-	* include/shlobj.h (REGSTR_PATH_EXPLORER): Unicode it. 
+	* include/shlobj.h (REGSTR_PATH_EXPLORER): Unicode it.
 	(REGSTR_PATH_SPECIAL_FOLDERS): Ditto.
-	* include/regstr.h (REGSTR_PATH_EXPLORER): Add #ifndef guard. 
+	* include/regstr.h (REGSTR_PATH_EXPLORER): Add #ifndef guard.
 
 2001-06-11  Mattia Barbon  <mbarbon@dsi.unive.it>
 
@@ -6258,7 +6264,7 @@ Thu Aug 30 09:35:51 2001  Christopher Faylor <cgf@cygnus.com>
 2001.06.06  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* Makefile.in (bindist): Reassign value of exec_prefix on make command
-	line. 
+	line.
 
 Tue May 22 18:58:27 2001  Christopher Faylor <cgf@cygnus.com>
 
@@ -6427,7 +6433,7 @@ Sun Apr  8 20:48:01 2001  Christopher Faylor <cgf@cygnus.com>
 	* include/wingdi.h (struct _DOCINFO[AW]): UNICODE it.
 	(StartDoc[AW]): Use UNICODE'd LPDOCINFO[AW] 
 	* include/winuser.h (struct tagMOUSEKEYS): Define new structure.
-	* include/winerror.h (NTE_*): Add CryptoAPI error codes. 
+	* include/winerror.h (NTE_*): Add CryptoAPI error codes.
 
 2001-02-21  Danny Smith <dannysmith@users.sourceforge.net>
 
@@ -7857,7 +7863,7 @@ Fri Jan 26 15:59:31  2001  Earnie Boyd  <earnie@users.sourceforge.net
 	* Apply Danny Smith patch 102275
 	2000-11-05  Danny Smith  <danny_r_smith_2001@yahoo.co.nz>
 	* include/objbase.h: (COM_RIGHTS): Add definition.
-	(tagSTDMSHLFLAGS): add enumeration. 
+	(tagSTDMSHLFLAGS): add enumeration.
 	(CoInitializeEx): Add prototypes.
 	(CoGetStdMarshalEx): ditto.
 	(CoCreateInstanceEx): ditto.
@@ -7926,25 +7932,25 @@ Mon Dec 11 13:11:36 2000  Christopher Faylor <cgf@cygnus.com>
 
 2000-12-04  Danny Smith  <danny_r_smith_2001@yahoo.co.nz>
 
-	* include/winnls.h: NORM_IGNORE* remove duplicate defines. 
-	SORT_STRINGSORT: ditto. 
-	CMAP*: ditto. 
-	CTRY_*: add new defines. 
-	LGRPID_*: ditto. 
-	LCMAP*: change defines to hex notation. 
-	CALID: change from ULONG to DWORD. 
-	CALTYPE: ditto. 
-	_cpinfoex[AW]: add structure. 
-	FoldString: correct Unicode mappings. 
-	GetCPInfoEx[AW]: add prototypes. 
-	EnumCalendarInfoEx[AW]: ditto. 
-	EnumDateFormatsEx[AW]: ditto. 
-	EnumSystemLanguageGroups[AW]: ditto. 
-	EnumLanguageGroupLocales[AW]: ditto. 
-	EnumUILanguages[AW]: ditto. 
-	GetSystemDefaultUILanguage[AW]: ditto. 
-	GetUserDefaultUILanguage[AW]: ditto. 
-	IsValidLanguageGroup[AW]: ditto. 
+	* include/winnls.h: NORM_IGNORE* remove duplicate defines.
+	SORT_STRINGSORT: ditto.
+	CMAP*: ditto.
+	CTRY_*: add new defines.
+	LGRPID_*: ditto.
+	LCMAP*: change defines to hex notation.
+	CALID: change from ULONG to DWORD.
+	CALTYPE: ditto.
+	_cpinfoex[AW]: add structure.
+	FoldString: correct Unicode mappings.
+	GetCPInfoEx[AW]: add prototypes.
+	EnumCalendarInfoEx[AW]: ditto.
+	EnumDateFormatsEx[AW]: ditto.
+	EnumSystemLanguageGroups[AW]: ditto.
+	EnumLanguageGroupLocales[AW]: ditto.
+	EnumUILanguages[AW]: ditto.
+	GetSystemDefaultUILanguage[AW]: ditto.
+	GetUserDefaultUILanguage[AW]: ditto.
+	IsValidLanguageGroup[AW]: ditto.
 	CALINFO_ENUMPROCEX[AW]: add function pointer typedef 
 	LANGUAGEGROUP_ENUMPROC[AW]: ditto 
 	LANGGROUPLOCALE_ENUMPROC[AW]: ditto 
@@ -7964,7 +7970,7 @@ Mon Oct  9 11:49:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 2000-11-06  Earnie Boyd  <earnie_boyd@yahoo.com>
 
-	* Makefile.in: increment VERSION.  
+	* Makefile.in: increment VERSION.
 	(dist:) Rename to srcdist.  Create new dist target to call
 	srcdist and bindist targets.
 	(srcdist:) New target.
@@ -8027,7 +8033,7 @@ Mon Oct 19 13:55:00 2000  Earnie Boyd <earnie_boyd@yahoo.com>
 	* configure: ditto.
 	* lib/Makefile.in: Change the name of the targets install,
 	install-headers and install-libraries to xinstall, xinstall-headers
-	and xinstall-libraries for system target specified installation.  
+	and xinstall-libraries for system target specified installation.
 	Recreate targets install, install-headers and install-libraries for
 	exec-prefix specified installation.  Ditto for the uninstall targets of
 	the same name.

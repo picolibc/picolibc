@@ -9,3 +9,7 @@ MprAdminPortDisconnect@8
 MprAdminPortEnum@32
 MprAdminPortGetInfo@16
 MprAdminPortReset@8
+MprAdminGetPDCServer@12
+MprAdminSendUserMessage@12
+MprAdminUserGetInfo@16
+MprAdminUserSetInfo@16
