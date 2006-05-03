@@ -1,6 +1,35 @@
 2006-05-03  Paul Brook  <paul@codesourcery.com>
 	Daniel Jacobowitz  <dan@codesourcery.com>
 
+	* gdb/c-valprint.c: Handle class member typedefs.
+
+	* gdb/symtab.c (skip_prologue_using_sal): Treat two consecutive lines
+	at the same address as a prolouge marker.
+	* gdb/arm-tdep.c (arm_skip_prologue): Use skip_prologue_using_sal.
+
+	* gdb/dwarf2expr.c (execute_stack_op): Check for bogus DW_OP_reg.
+
+	* gdb/dwarf2read.c (read_structure_type): Use tag name for C++/Java
+	classes.
+
+	* Makefile.in (eval.o): Update dependencies.
+	* eval.c: Include "ui-out.h" and "exceptions.h".
+	(evaluate_subexp_standard): Use TRY_CATCH around value_of_variable.
+	Use value_zero if an error occurs when avoiding side effects.
+	* varobj.c (varobj_create): Call release_value after evaluate_type.
+	(c_value_of_root): Initialize new_val.  Don't release_value a NULL
+	value.
+
+	* gdb/c-typeprint.c (cp_type_print_method_args): Don't print type
+	details.
+
+	* gdb/dwarf2read.c (dwarf2_debug_line_missing_file_complaint): New
+	function.
+	(dwarf_decode_lines): Check for line info without a file.
+
+2006-05-03  Paul Brook  <paul@codesourcery.com>
+	Daniel Jacobowitz  <dan@codesourcery.com>
+
 	* gdb/dwarf2read.c (read_subroutine_type): Add armcc workaround.
 
 	* gdb/dwarf2read.c (read_structure_type): Look for ADS vtable
