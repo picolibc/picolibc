@@ -1,5 +1,10 @@
 2006-05-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* lib/directx/quartz.def: Move from lib/directx/...
+	* lib/quartz.def: ... to lib/
+
+2006-05-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/amaudio.h: New file.
 	* include/dshow.h: Include <amaudio.h>.
 
