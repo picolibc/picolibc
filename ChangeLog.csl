@@ -1,4 +1,8 @@
 2006-05-03  Paul Brook  <paul@codesourcery.com>
+
+	* arm-linux-tdep.c (arm_linux_extract_return_value): Use gdb_byte.
+
+2006-05-03  Paul Brook  <paul@codesourcery.com>
 	Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* gdb/c-valprint.c: Handle class member typedefs.
