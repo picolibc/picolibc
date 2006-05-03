@@ -1,3 +1,7 @@
+2006-05-03  Julian Brown  <julian@codesourcery.com>
+
+	* gas/doc/c-arm.texi: Add documentation for .dn/.qn directives.
+
 2006-05-03  Paul Brook  <paul@codesourcery.com>
 
 	* bfd/elf32-arm.c (elf32_arm_reloc_map): Add MOVW and MOVT relocs.
