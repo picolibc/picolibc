@@ -1,3 +1,26 @@
+2006-05-03  Paul Brook  <paul@codesourcery.com>
+
+	* bfd/elf32-arm.c (elf32_arm_reloc_map): Add MOVW and MOVT relocs.
+	(elf32_arm_final_link_relocate): Handle MOVW and MOVT relocs.
+	(elf32_arm_gc_sweep_hook, elf32_arm_check_relocs): Ditto.
+	* bfd/reloc.c: Ditto.
+	* bfd/bfd-in2.h: Regenerate.
+	* bfd/libbfd.h: Regenerate.
+	* bfd/libcoff.h: Regenerate.
+	* gas/config/tc-arm.c (parse_half): New function.
+	(operand_parse_code): Remove OP_Iffff.  Add OP_HALF.
+	(parse_operands): Ditto.
+	(do_mov16): Reject invalid relocations.
+	(do_t_mov16): Ditto.  Use Thumb reloc numbers.
+	(insns): Replace Iffff with HALF.
+	(md_apply_fix): Add MOVW and MOVT relocs.
+	(tc_gen_reloc): Ditto.
+	* gas/doc/c-arm.texi: Document relocation operators
+	* ld/testsuite/ld-arm/arm-elf.exp: Add arm-movwt.
+	* ld/testsuite/ld-arm/arm-movwt.d: New test.
+	* ld/testsuite/ld-arm/arm-movwt.s: New test.
+	* ld/testsuite/ld-arm/arm.ld: Add .far.
+
 2006-05-02  Joseph Myers  <joseph@codesourcery.com>
 
 	* gas/config/tc-arm.c (do_iwmmxt_wldstbh): Don't multiply offset
