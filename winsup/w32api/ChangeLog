@@ -1,5 +1,12 @@
 2006-05-02  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/dshow.h: New file.
+	* include/evcode.h: New file.
+	* include/audevcod.h: New file.
+	* include/dvdevcod.h: New file.
+
+2006-05-02  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/mprapi.h (MprAdminConnection*,MprAdminPort*): Add declaration.
 	* lib/mprapi.def: New file.
 
