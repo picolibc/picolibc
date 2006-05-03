@@ -1,3 +1,8 @@
+2006-05-03  J"orn Rennecke <joern.rennecke@st.com>
+
+	* libc/sys/sh/Makefile.am (AM_CCASFLAGS): Add $(CFLAGS).
+	* libc/sys/sh/Makefile.in (AM_CCASFLAGS): Likewise.
+
 2006-05-02  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/sysnec810/Makefile.am: Specify .S files instead of
