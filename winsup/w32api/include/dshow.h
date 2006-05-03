@@ -4,6 +4,7 @@
 #pragma GCC system_header
 #endif
 
+#include <amaudio.h>
 #include <evcode.h>
 #include <audevcod.h>
 #include <dvdevcod.h>

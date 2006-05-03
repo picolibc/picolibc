@@ -1,9 +1,14 @@
-2006-05-02  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+2006-05-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/amaudio.h: New file.
+	* include/dshow.h: Include <amaudio.h>.
+
+2006-05-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/errors.h: New file.
 	* include/dshow.h: Include <errors.h>.
 
-2006-05-02  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+2006-05-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/dshow.h: New file.
 	* include/evcode.h: New file.
