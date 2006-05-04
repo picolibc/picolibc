@@ -5,6 +5,7 @@
 #endif
 
 #include <amaudio.h>
+#include <amvideo.h>
 #include <evcode.h>
 #include <audevcod.h>
 #include <dvdevcod.h>

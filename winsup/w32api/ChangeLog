@@ -1,5 +1,10 @@
 2006-05-04  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/amvideo.h: New file.
+	* include/dshow.h: Include <amvideo.h>.
+
+2006-05-04  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winuser.h (MOUSEEVENTF_*): Cleanup and new define.
 	(HSHELL_*): Cleanup and new define.
 	(SMTO_*): Cleanup and new define.
