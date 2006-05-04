@@ -1,3 +1,15 @@
+2006-05-04  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/winuser.h (MOUSEEVENTF_*): Cleanup and new define.
+	(HSHELL_*): Cleanup and new define.
+	(SMTO_*): Cleanup and new define.
+	(SPI_*): Cleanup and new define.
+	(SPIF_*): Cleanup.
+	(HWND_MESSAGE): Windows 2000 only.
+	(SIF_*): Cleanup.
+	(SWP_*): Cleanup.
+	* include/wingdi.h (ETO_*): Cleanup and new define.
+
 2006-05-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/mprapi.h (MPR_SERVER_HANDLE): New typedef.
