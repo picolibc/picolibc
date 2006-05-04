@@ -91,7 +91,8 @@ noinst_LIBRARIES = lib.a
 @MAY_SUPPLY_SYSCALLS_TRUE@extra_objs = @MAY_SUPPLY_SYSCALLS_TRUE@libcfunc.o trap.o syscalls.o _exit.o _nmi_isr.o _fault_isr.o
 @MAY_SUPPLY_SYSCALLS_FALSE@extra_objs = 
 
-lib_a_SOURCES = aeabi_atexit.c
+lib_a_SOURCES = aeabi_atexit.c aeabi_memclr.c aeabi_memcpy.c 		aeabi_memmove.c aeabi_memset.c
+
 lib_a_LIBADD = $(extra_objs)
 lib_a_DEPENDENCIES = $(extra_objs)
 
@@ -106,7 +107,8 @@ LIBRARIES =  $(noinst_LIBRARIES)
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
-lib_a_OBJECTS =  aeabi_atexit.o
+lib_a_OBJECTS =  aeabi_atexit.o aeabi_memclr.o aeabi_memcpy.o \
+aeabi_memmove.o aeabi_memset.o
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)

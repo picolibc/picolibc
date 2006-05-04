@@ -1,3 +1,14 @@
+2006-05-04  Paul Brook  <paul@codesourcery.com>
+
+	* libc/sys/arm/Makefile.am (lib_a_SOURCES): Add aeabi_memclr.c,
+	aeabi_memcpy.c, aeabi_memmove.c and aeabi_memset.c.
+	* libc/sys/arm/Makefile.in: Regenerate.
+	* libc/sys/arm/aeabi.h: New file.
+	* libc/sys/arm/aeabi_memclr.c: New file.
+	* libc/sys/arm/aeabi_memcpy.c: New file.
+	* libc/sys/arm/aeabi_memmove.c: New file.
+	* libc/sys/arm/aeabi_memset.c: New file.
+
 2006-03-29  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* libgloss/m68k/bdm-isv.c (software_init_hook): Fix trap numbering.

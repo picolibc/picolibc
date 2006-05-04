@@ -12,7 +12,8 @@ else
 extra_objs =
 endif
 
-lib_a_SOURCES = aeabi_atexit.c
+lib_a_SOURCES = aeabi_atexit.c aeabi_memclr.c aeabi_memcpy.c \
+		aeabi_memmove.c aeabi_memset.c
 lib_a_LIBADD = $(extra_objs)
 lib_a_DEPENDENCIES = $(extra_objs)
 
