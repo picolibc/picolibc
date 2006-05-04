@@ -1,7 +1,13 @@
 2006-05-04  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/amvideo.h (IFullScreenVideo): Define.
+	(BIT_MASKS_MATCH,PALETTISED,PALETTE_ENTRIES,RESET_MASKS,RESET_PALETTE,
+	SIZE_EGA_PALETTE,SIZE_MASKS,SIZE_PALETTE): Added Macros.
+
+2006-05-04  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winnls.h (CAL_SYEARMONTH,CAL_ITWODIGITYEARMAX,
-	CAL_NOUSEROVERRIDE, CAL_RETURN_NUMBER,CAL_USE_CP_ACP): Documented
+	CAL_NOUSEROVERRIDE,CAL_RETURN_NUMBER,CAL_USE_CP_ACP): Documented
 	as available on Windows 98 and better.
 	(CAL_UMALQURA,CAL_SSHORTESTDAYNAME*): Define, Windows Vista and better.
 

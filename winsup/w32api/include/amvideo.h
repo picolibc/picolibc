@@ -24,6 +24,14 @@ extern "C" {
 #define AMDDS_YUV (AMDDS_YUVOFF|AMDDS_YUVOVR|AMDDS_YUVFLP)
 #define AMDDS_RGB (AMDDS_RGBOFF|AMDDS_RGBOVR|AMDDS_RGBFLP)
 #define AMDDS_PRIMARY (AMDDS_DCIPS|AMDDS_PS)
+#define BIT_MASKS_MATCH(pbmi1,pbmi2) (!memcmp((pbmi1)->dwBitMasks,(pbmi2)->dwBitMasks,3*sizeof(DWORD)))
+#define PALETTISED(pbmi) ((pbmi)->bmiHeader.biBitCount <= 8)
+#define PALETTE_ENTRIES(pbmi) (1 << (pbmi)->bmiHeader.biBitCount)
+#define RESET_MASKS(pbmi) ((void)memset((pbmi)->dwBitFields,0,3*sizeof(DWORD)))
+#define RESET_PALETTE(pbmi) ((void)memset(((pbmi)->bmiColors,0,256*sizeof(RGBQUAD)));
+#define SIZE_EGA_PALETTE (16*sizeof(RGBQUAD))
+#define SIZE_MASKS (3*sizeof(DWORD))
+#define SIZE_PALETTE (256*sizeof(RGBQUAD))
 typedef enum {
 	AM_PROPERTY_FRAMESTEP_STEP = 1,
 	AM_PROPERTY_FRAMESTEP_CANCEL = 2,
@@ -107,6 +115,31 @@ DECLARE_INTERFACE_(IQualProp, IUnknown)
 	STDMETHOD(get_FramesDrawn)(THIS_ int*) PURE;
 	STDMETHOD(get_FramesDroppedInRenderer)(THIS_ int*) PURE;
 	STDMETHOD(get_Jitter)(THIS_ int*) PURE;
+};
+#undef INTERFACE
+#define INTERFACE IFullScreenVideo
+DECLARE_INTERFACE_(IFullScreenVideo, IUnknown)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,LPVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD(CountModes)(THIS_ long*) PURE;
+	STDMETHOD(GetCaption)(THIS_ BSTR*) PURE;
+	STDMETHOD(GetClipFactor)(THIS_ long*) PURE;
+	STDMETHOD(GetCurrentMode)(THIS_ long*) PURE;
+	STDMETHOD(GetMessageDrain)(THIS_ HWND*) PURE;
+	STDMETHOD(GetModeInfo)(THIS_ long,long*,long*,long*) PURE;
+	STDMETHOD(GetMonitor)(THIS_ long*) PURE;
+	STDMETHOD(HideOnDeactivate)(THIS_ long) PURE;
+	STDMETHOD(IsHideOnDeactivate)(THIS) PURE;
+	STDMETHOD(IsModeAvailable)(THIS_ long) PURE;
+	STDMETHOD(IsModeEnabled)(THIS_ long) PURE;
+	STDMETHOD(SetCaption)(THIS_ BSTR) PURE;
+	STDMETHOD(SetClipFactor)(THIS_ long) PURE;
+	STDMETHOD(SetDefault)(THIS) PURE;
+	STDMETHOD(SetEnabled)(THIS_ long,long) PURE;
+	STDMETHOD(SetMessageDrain)(THIS_ HWND) PURE;
+	STDMETHOD(SetMonitor)(THIS_ long) PURE;
 };
 #undef INTERFACE
 #define INTERFACE IFullScreenVideoEx
