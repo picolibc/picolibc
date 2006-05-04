@@ -485,7 +485,7 @@ struct mips_opcode
 #define INSN_ISA64R2              0x00000100
 
 /* Masks used for MIPS-defined ASEs.  */
-#define INSN_ASE_MASK		  0x0400f000
+#define INSN_ASE_MASK		  0x0c00f000
 
 /* DSP ASE */ 
 #define INSN_DSP                  0x00001000
@@ -518,8 +518,12 @@ struct mips_opcode
 #define INSN_5400		  0x01000000
 /* NEC VR5500 instruction.  */
 #define INSN_5500		  0x02000000
+
 /* MT ASE */
 #define INSN_MT                   0x04000000
+
+/* SmartMIPS ASE.  */
+#define INSN_SMARTMIPS            0x08000000
 
 /* MIPS ISA defines, use instead of hardcoding ISA level.  */
 
