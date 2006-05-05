@@ -1,5 +1,10 @@
 2006-05-04  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winuser.h (SPI_SCREENSAVERRUNNING): Define.
+	It had been removed because it's no documented, but Cygwin needs it.
+
+2006-05-04  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/amvideo.h (IFullScreenVideo): Define.
 	(BIT_MASKS_MATCH,PALETTISED,PALETTE_ENTRIES,RESET_MASKS,RESET_PALETTE,
 	SIZE_EGA_PALETTE,SIZE_MASKS,SIZE_PALETTE): Added Macros.
