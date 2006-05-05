@@ -1,3 +1,9 @@
+2006-05-05  Earnie Boyd  <earnie@users.sf.net>
+
+	* lib/scrnsave.c: Correct misspelled SPI_SCREENSAVERUNNING to
+	SPI_SETSCREENSAVERUNNING.
+	* include winuser.h (SPI_SCREENSAVERRUNNING): Remove again.
+
 2006-05-04  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/winuser.h (SPI_SCREENSAVERRUNNING): Define.

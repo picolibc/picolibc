@@ -182,7 +182,7 @@ static int LaunchScreenSaver(HWND hParent)
 
   /* don't allow other tasks to get into the foreground */
   if (w95 && !fChildPreview)
-    SystemParametersInfo(SPI_SCREENSAVERRUNNING, TRUE, &foo, 0);
+    SystemParametersInfo(SPI_SETSCREENSAVERRUNNING, TRUE, &foo, 0);
 
   msg.wParam = 0;
 
@@ -231,7 +231,7 @@ static int LaunchScreenSaver(HWND hParent)
 restore:
   /* restore system */
   if (w95 && !fChildPreview)
-    SystemParametersInfo(SPI_SCREENSAVERRUNNING, FALSE, &foo, 0);
+    SystemParametersInfo(SPI_SETSCREENSAVERRUNNING, FALSE, &foo, 0);
   FreeLibrary(hPwdLib);
   return msg.wParam;
 }
