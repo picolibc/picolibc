@@ -1,3 +1,110 @@
+2006-05-05  Julian Brown  <julian@codesourcery.com>
+
+	* gas/config/tc-arm.c (stdarg.h): include.
+	(arm_it): Add uncond_value field. Add isvec and issingle to operand
+	array.
+	(arm_reg_type): Add REG_TYPE_VFSD (single or double VFP reg) and
+	REG_TYPE_NSDQ (single, double or quad vector reg).
+	(reg_expected_msgs): Update.
+	(BAD_FPU): Add macro for unsupported FPU instruction error.
+	(parse_neon_type): Support 'd' as an alias for .f64.
+	(parse_typed_reg_or_scalar): Support REG_TYPE_VFSD, REG_TYPE_NSDQ
+	sets of registers.
+	(parse_vfp_reg_list): Don't update first arg on error.
+	(parse_neon_mov): Support extra syntax for VFP moves.
+	(operand_parse_code): Add OP_RVSD, OP_RNSDQ, OP_VRSDLST, OP_RVSD_IO,
+	OP_RNSDQ_RNSC, OP_RVC_PSR, OP_APSR_RR, OP_oRNSDQ.
+	(parse_operands): Support isvec, issingle operands fields, new parse
+	codes above.
+	(do_vfp_nsyn_mrs, do_vfp_nsyn_msr): New functions. Support VFP mrs,
+	msr variants.
+	(do_mrs, do_msr, do_t_mrs, do_t_msr): Add support for above.
+	(NEON_ENC_TAB): Add vnmul, vnmla, vnmls, vcmp, vcmpz, vcmpe, vcmpez.
+	(NEON_ENC_SINGLE, NEON_ENC_DOUBLE): Define macros.
+	(NEON_SHAPE_DEF): New macro. Define table of possible instruction
+	shapes.
+	(neon_shape): Redefine in terms of above.
+	(neon_shape_class): New enumeration, table of shape classes.
+	(neon_shape_el): New enumeration. One element of a shape.
+	(neon_shape_el_size): Register widths of above, where appropriate.
+	(neon_shape_info): New struct. Info for shape table.
+	(neon_shape_tab): New array.
+	(neon_type_mask): Add N_F64, N_VFP. Update N_MAX_NONSPECIAL.
+	(neon_check_shape): Rewrite as...
+	(neon_select_shape): New function to classify instruction shapes,
+	driven by new table neon_shape_tab array.
+	(neon_quad): New function. Return 1 if shape should set Q flag in
+	instructions (or equivalent), 0 otherwise.
+	(type_chk_of_el_type): Support F64.
+	(el_type_of_type_chk): Likewise.
+	(neon_check_type): Add support for VFP type checking (VFP data
+	elements fill their containing registers).
+	(do_vfp_cond_or_thumb): Fill in condition field in ARM mode, or 0xE
+	in thumb mode for VFP instructions.
+	(do_vfp_nsyn_opcode): New function. Look up the opcode in argument,
+	and encode the current instruction as if it were that opcode.
+	(try_vfp_nsyn): New. If this looks like a VFP instruction with ARGS
+	arguments, call function in PFN.
+	(do_vfp_nsyn_add_sub, do_vfp_nsyn_mla_mls, do_vfp_nsyn_mul)
+	(do_vfp_nsyn_abs_neg, do_vfp_nsyn_ldm_stm, do_vfp_nsyn_ldr_str)
+	(do_vfp_nsyn_sqrt, do_vfp_nsyn_div, do_vfp_nsyn_nmul)
+	(do_vfp_nsyn_cmp, nsyn_insert_sp, do_vfp_nsyn_push)
+	(do_vfp_nsyn_pop, do_vfp_nsyn_cvt, do_vfp_nsyn_cvtz): New functions.
+	Redirect Neon-syntax VFP instructions to VFP instruction handlers.
+	(do_neon_dyadic_i_su, do_neon_dyadic_i64_su, do_neon_shl_imm)
+	(do_neon_qshl_imm, do_neon_logic, do_neon_bitfield)
+	(neon_dyadic_misc, neon_compare, do_neon_tst, do_neon_qdmulh)
+	(do_neon_fcmp_absolute, do_neon_step, do_neon_sli, do_neon_sri)
+	(do_neon_qshlu_imm, neon_move_immediate, do_neon_mvn, do_neon_ext)
+	(do_neon_rev, do_neon_dup, do_neon_rshift_round_imm, do_neon_trn)
+	(do_neon_zip_uzp, do_neon_sat_abs_neg, do_neon_pair_long)
+	(do_neon_recip_est, do_neon_cls, do_neon_clz, do_neon_cnt)
+	(do_neon_swp): Use neon_select_shape not neon_check_shape. Use
+	neon_quad.
+	(vfp_or_neon_is_neon): New function. Call if a mnemonic shared
+	between VFP and Neon turns out to belong to Neon. Perform
+	architecture check and fill in condition field if appropriate.
+	(do_neon_addsub_if_i, do_neon_mac_maybe_scalar, do_neon_abs_neg)
+	(do_neon_cvt): Add support for VFP variants of instructions.
+	(neon_cvt_flavour): Extend to cover VFP conversions.
+	(do_neon_mov): Rewrite to use neon_select_shape. Add support for VFP
+	vmov variants.
+	(do_neon_ldr_str): Handle single-precision VFP load/store.
+	(do_neon_ld_st_interleave, do_neon_ld_st_lane, do_neon_ld_dup): Use
+	NS_NULL not NS_IGNORE.
+	(opcode_tag): Add OT_csuffixF for operands which either take a
+	conditional suffix, or have 0xF in the condition field.
+	(md_assemble): Add support for OT_csuffixF.
+	(NCE): Replace macro with...
+	(NCE_tag, NCE, NCEF): New macros.
+	(nCE): Replace macro with...
+	(nCE_tag, nCE, nCEF): New macros.
+	(insns): Add support for VFP insns or VFP versions of insns msr, mrs,
+	vsqrt, vdiv, vnmul, vnmla, vnmls, vcmp, vcmpe, vpush, vpop, vcvtz,
+	vmul, vmla, vmls, vadd, vsub, vabs, vneg, vldm, vldmia, vldbdb, vstm,
+	vstmia, vstmdb, vldr, vstr, vcvt, vmov. Group shared VFP/Neon insns
+	together.
+
+	* gas/testsuite/gas/arm/itblock.s: New file. Helper macro for making
+	all-true IT blocks.
+	* gas/testsuite/gas/arm/neon-cond-bad-inc.s: New test. Make sure
+	unconditional Neon instructions are rejected...
+	* gas/testsuite/gas/arm/neon-cond-bad.s: In ARM mode, and...
+	* gas/testsuite/gas/arm/neon-cond-bad_t2.s: Accepted in Thumb mode
+	(with IT).
+	* gas/testsuite/gas/arm/neon-cond-bad.l: Expected error output in ARM
+	mode.
+	* gas/testsuite/gas/arm/neon-cond-bad.d: Control ARM mode test.
+	* gas/testsuite/gas/arm/neon-cond-bad_t2.d: Expected output in Thumb
+	mode.
+	* gas/testsuite/gas/arm/vfp-neon-syntax-inc.s: Test VFP Neon-style
+	syntax.
+	* gas/testsuite/gas/arm/vfp-neon-syntax.s: ...in ARM mode.
+	* gas/testsuite/gas/arm/vfp-neon-syntax_t2.s: ...and Thumb mode.
+	* gas/testsuite/gas/arm/vfp-neon-syntax.d: Expected output in ARM mode.
+	* gas/testsuite/gas/arm/vfp-neon-syntax_t2.d: Expected output in Thumb
+	mode.
+
 2006-05-05  Mark Shinwell  <shinwell@codesourcery.com>
 
 	* configure: Regenerate.
