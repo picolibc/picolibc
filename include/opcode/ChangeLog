@@ -1,3 +1,8 @@
+2006-05-05  Thiemo Seufer  <ths@mips.com>
+            David Ung  <davidu@mips.com>
+
+	* mips.h (enum): Add macro M_CACHE_AB.
+
 2006-05-04  Thiemo Seufer  <ths@mips.com>
             Nigel Stephens  <nigel@mips.com>
 	    David Ung  <davidu@mips.com>

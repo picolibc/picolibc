@@ -646,6 +646,7 @@ enum
   M_BNE,
   M_BNE_I,
   M_BNEL_I,
+  M_CACHE_AB,
   M_DABS,
   M_DADD_I,
   M_DADDU_I,
