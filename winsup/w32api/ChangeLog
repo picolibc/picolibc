@@ -1,3 +1,7 @@
+2006-05-05  Chris Sutcliffe <ir0nh34d@users.sf.net>
+
+    * lib/directx/Makefile.in: Remove reference to libquartz.a since it was moved.
+
 2006-05-05  Earnie Boyd  <earnie@users.sf.net>
 
 	* lib/scrnsave.c: Correct misspelled SPI_SCREENSAVERUNNING to

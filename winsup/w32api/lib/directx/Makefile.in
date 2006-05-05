@@ -96,7 +96,7 @@ LIBS = libd3d8.a libd3d9.a libd3dim.a libd3drm.a libd3dx8d.a libd3dx9d.a \
        libd3dxof.a libddraw.a libdinput.a libdinput8.a libdmoguids.a \
        libdplayx.a libdpnaddr.a libdpnet.a libdpnlobby.a libdpvoice.a \
        libdsetup.a libdsound.a libdxerr8.a libdxerr9.a libdxguid.a \
-       libksproxy.a libksuser.a libmsdmo.a libquartz.a libstrmiids.a
+       libksproxy.a libksuser.a libmsdmo.a libstrmiids.a
 DINPUT_OBJS = dinput_joy.o dinput_joy2.o dinput_kbd.o dinput_mouse.o \
        dinput_mouse2.o
 
