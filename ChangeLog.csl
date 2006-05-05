@@ -1,3 +1,8 @@
+2006-05-05  Mark Shinwell  <shinwell@codesourcery.com>
+
+	* configure: Regenerate.
+	* configure.in: Enable gprof for cross builds.
+
 2006-05-03  Julian Brown  <julian@codesourcery.com>
 
 	* gas/doc/c-arm.texi: Add documentation for .dn/.qn directives.
