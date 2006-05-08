@@ -1,5 +1,10 @@
 2006-05-08  Daniel Jacobowitz  <dan@codesourcery.com>
 
+	* gdb/remote.c (remote_get_shared_libraries): Check for NULL ops.
+	(remote_wait): Handle ",nop" on DLL packets and "dll:dll" response.
+
+2006-05-08  Daniel Jacobowitz  <dan@codesourcery.com>
+
 	* gdb/solib-target.c (solib_target_remove_one_solib): Correct loop
 	logic.
 
