@@ -1787,7 +1787,7 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
       dir->__flags |= dirent_saw_dot;
       res = 0;
     }
-  else if (!(dir->__flags & dirent_saw_dot))
+  else if (!(dir->__flags & dirent_saw_dot_dot))
     {
       strcpy (de->d_name , "..");
       de->d_ino = readdir_get_ino (dir, pc.normalized_path, true);

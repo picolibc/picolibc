@@ -1,3 +1,8 @@
+2006-05-08  Christian Franke  <Christian.Franke@t-online.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir): Fix typo which
+	caused test for ".." to be skipped.
+
 2006-05-02  Christopher Faylor  <cgf@timesys.com>
 
 	* external.cc (cygwin_internal): Set errno on failure.
