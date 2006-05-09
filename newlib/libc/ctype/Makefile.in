@@ -61,14 +61,39 @@ am__objects_1 = lib_a-ctype_.$(OBJEXT) lib_a-isalnum.$(OBJEXT) \
 	lib_a-ispunct.$(OBJEXT) lib_a-isspace.$(OBJEXT) \
 	lib_a-isxdigit.$(OBJEXT) lib_a-tolower.$(OBJEXT) \
 	lib_a-toupper.$(OBJEXT)
-@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1)
+@ELIX_LEVEL_1_FALSE@am__objects_2 = lib_a-isascii.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-isblank.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-iswalnum.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-iswalpha.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-iswblank.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-iswcntrl.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-iswctype.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-iswdigit.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-iswgraph.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-iswlower.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-iswprint.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-iswpunct.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-iswspace.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-iswupper.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-iswxdigit.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-jp2uc.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-toascii.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-_tolower.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-_toupper.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-towctrans.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-towlower.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-towupper.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-wctrans.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-wctype.$(OBJEXT)
+@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
+@USE_LIBTOOL_FALSE@	$(am__objects_2)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libctype_la_LIBADD =
-am__objects_2 = ctype_.lo isalnum.lo isalpha.lo iscntrl.lo isdigit.lo \
+am__objects_3 = ctype_.lo isalnum.lo isalpha.lo iscntrl.lo isdigit.lo \
 	islower.lo isupper.lo isprint.lo ispunct.lo isspace.lo \
 	isxdigit.lo tolower.lo toupper.lo
-@ELIX_LEVEL_1_FALSE@am__objects_3 = isascii.lo isblank.lo iswalnum.lo \
+@ELIX_LEVEL_1_FALSE@am__objects_4 = isascii.lo isblank.lo iswalnum.lo \
 @ELIX_LEVEL_1_FALSE@	iswalpha.lo iswblank.lo iswcntrl.lo \
 @ELIX_LEVEL_1_FALSE@	iswctype.lo iswdigit.lo iswgraph.lo \
 @ELIX_LEVEL_1_FALSE@	iswlower.lo iswprint.lo iswpunct.lo \
@@ -76,8 +101,8 @@ am__objects_2 = ctype_.lo isalnum.lo isalpha.lo iscntrl.lo isdigit.lo \
 @ELIX_LEVEL_1_FALSE@	jp2uc.lo toascii.lo _tolower.lo \
 @ELIX_LEVEL_1_FALSE@	_toupper.lo towctrans.lo towlower.lo \
 @ELIX_LEVEL_1_FALSE@	towupper.lo wctrans.lo wctype.lo
-@USE_LIBTOOL_TRUE@am_libctype_la_OBJECTS = $(am__objects_2) \
-@USE_LIBTOOL_TRUE@	$(am__objects_3)
+@USE_LIBTOOL_TRUE@am_libctype_la_OBJECTS = $(am__objects_3) \
+@USE_LIBTOOL_TRUE@	$(am__objects_4)
 libctype_la_OBJECTS = $(am_libctype_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libctype_la_rpath =
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -283,7 +308,7 @@ libctype_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
 CHEWOUT_FILES = \
 	isalnum.def	\
@@ -467,6 +492,150 @@ lib_a-toupper.o: toupper.c
 
 lib_a-toupper.obj: toupper.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-toupper.obj `if test -f 'toupper.c'; then $(CYGPATH_W) 'toupper.c'; else $(CYGPATH_W) '$(srcdir)/toupper.c'; fi`
+
+lib_a-isascii.o: isascii.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-isascii.o `test -f 'isascii.c' || echo '$(srcdir)/'`isascii.c
+
+lib_a-isascii.obj: isascii.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-isascii.obj `if test -f 'isascii.c'; then $(CYGPATH_W) 'isascii.c'; else $(CYGPATH_W) '$(srcdir)/isascii.c'; fi`
+
+lib_a-isblank.o: isblank.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-isblank.o `test -f 'isblank.c' || echo '$(srcdir)/'`isblank.c
+
+lib_a-isblank.obj: isblank.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-isblank.obj `if test -f 'isblank.c'; then $(CYGPATH_W) 'isblank.c'; else $(CYGPATH_W) '$(srcdir)/isblank.c'; fi`
+
+lib_a-iswalnum.o: iswalnum.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswalnum.o `test -f 'iswalnum.c' || echo '$(srcdir)/'`iswalnum.c
+
+lib_a-iswalnum.obj: iswalnum.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswalnum.obj `if test -f 'iswalnum.c'; then $(CYGPATH_W) 'iswalnum.c'; else $(CYGPATH_W) '$(srcdir)/iswalnum.c'; fi`
+
+lib_a-iswalpha.o: iswalpha.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswalpha.o `test -f 'iswalpha.c' || echo '$(srcdir)/'`iswalpha.c
+
+lib_a-iswalpha.obj: iswalpha.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswalpha.obj `if test -f 'iswalpha.c'; then $(CYGPATH_W) 'iswalpha.c'; else $(CYGPATH_W) '$(srcdir)/iswalpha.c'; fi`
+
+lib_a-iswblank.o: iswblank.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswblank.o `test -f 'iswblank.c' || echo '$(srcdir)/'`iswblank.c
+
+lib_a-iswblank.obj: iswblank.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswblank.obj `if test -f 'iswblank.c'; then $(CYGPATH_W) 'iswblank.c'; else $(CYGPATH_W) '$(srcdir)/iswblank.c'; fi`
+
+lib_a-iswcntrl.o: iswcntrl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswcntrl.o `test -f 'iswcntrl.c' || echo '$(srcdir)/'`iswcntrl.c
+
+lib_a-iswcntrl.obj: iswcntrl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswcntrl.obj `if test -f 'iswcntrl.c'; then $(CYGPATH_W) 'iswcntrl.c'; else $(CYGPATH_W) '$(srcdir)/iswcntrl.c'; fi`
+
+lib_a-iswctype.o: iswctype.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswctype.o `test -f 'iswctype.c' || echo '$(srcdir)/'`iswctype.c
+
+lib_a-iswctype.obj: iswctype.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswctype.obj `if test -f 'iswctype.c'; then $(CYGPATH_W) 'iswctype.c'; else $(CYGPATH_W) '$(srcdir)/iswctype.c'; fi`
+
+lib_a-iswdigit.o: iswdigit.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswdigit.o `test -f 'iswdigit.c' || echo '$(srcdir)/'`iswdigit.c
+
+lib_a-iswdigit.obj: iswdigit.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswdigit.obj `if test -f 'iswdigit.c'; then $(CYGPATH_W) 'iswdigit.c'; else $(CYGPATH_W) '$(srcdir)/iswdigit.c'; fi`
+
+lib_a-iswgraph.o: iswgraph.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswgraph.o `test -f 'iswgraph.c' || echo '$(srcdir)/'`iswgraph.c
+
+lib_a-iswgraph.obj: iswgraph.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswgraph.obj `if test -f 'iswgraph.c'; then $(CYGPATH_W) 'iswgraph.c'; else $(CYGPATH_W) '$(srcdir)/iswgraph.c'; fi`
+
+lib_a-iswlower.o: iswlower.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswlower.o `test -f 'iswlower.c' || echo '$(srcdir)/'`iswlower.c
+
+lib_a-iswlower.obj: iswlower.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswlower.obj `if test -f 'iswlower.c'; then $(CYGPATH_W) 'iswlower.c'; else $(CYGPATH_W) '$(srcdir)/iswlower.c'; fi`
+
+lib_a-iswprint.o: iswprint.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswprint.o `test -f 'iswprint.c' || echo '$(srcdir)/'`iswprint.c
+
+lib_a-iswprint.obj: iswprint.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswprint.obj `if test -f 'iswprint.c'; then $(CYGPATH_W) 'iswprint.c'; else $(CYGPATH_W) '$(srcdir)/iswprint.c'; fi`
+
+lib_a-iswpunct.o: iswpunct.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswpunct.o `test -f 'iswpunct.c' || echo '$(srcdir)/'`iswpunct.c
+
+lib_a-iswpunct.obj: iswpunct.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswpunct.obj `if test -f 'iswpunct.c'; then $(CYGPATH_W) 'iswpunct.c'; else $(CYGPATH_W) '$(srcdir)/iswpunct.c'; fi`
+
+lib_a-iswspace.o: iswspace.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswspace.o `test -f 'iswspace.c' || echo '$(srcdir)/'`iswspace.c
+
+lib_a-iswspace.obj: iswspace.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswspace.obj `if test -f 'iswspace.c'; then $(CYGPATH_W) 'iswspace.c'; else $(CYGPATH_W) '$(srcdir)/iswspace.c'; fi`
+
+lib_a-iswupper.o: iswupper.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswupper.o `test -f 'iswupper.c' || echo '$(srcdir)/'`iswupper.c
+
+lib_a-iswupper.obj: iswupper.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswupper.obj `if test -f 'iswupper.c'; then $(CYGPATH_W) 'iswupper.c'; else $(CYGPATH_W) '$(srcdir)/iswupper.c'; fi`
+
+lib_a-iswxdigit.o: iswxdigit.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswxdigit.o `test -f 'iswxdigit.c' || echo '$(srcdir)/'`iswxdigit.c
+
+lib_a-iswxdigit.obj: iswxdigit.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iswxdigit.obj `if test -f 'iswxdigit.c'; then $(CYGPATH_W) 'iswxdigit.c'; else $(CYGPATH_W) '$(srcdir)/iswxdigit.c'; fi`
+
+lib_a-jp2uc.o: jp2uc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-jp2uc.o `test -f 'jp2uc.c' || echo '$(srcdir)/'`jp2uc.c
+
+lib_a-jp2uc.obj: jp2uc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-jp2uc.obj `if test -f 'jp2uc.c'; then $(CYGPATH_W) 'jp2uc.c'; else $(CYGPATH_W) '$(srcdir)/jp2uc.c'; fi`
+
+lib_a-toascii.o: toascii.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-toascii.o `test -f 'toascii.c' || echo '$(srcdir)/'`toascii.c
+
+lib_a-toascii.obj: toascii.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-toascii.obj `if test -f 'toascii.c'; then $(CYGPATH_W) 'toascii.c'; else $(CYGPATH_W) '$(srcdir)/toascii.c'; fi`
+
+lib_a-_tolower.o: _tolower.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-_tolower.o `test -f '_tolower.c' || echo '$(srcdir)/'`_tolower.c
+
+lib_a-_tolower.obj: _tolower.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-_tolower.obj `if test -f '_tolower.c'; then $(CYGPATH_W) '_tolower.c'; else $(CYGPATH_W) '$(srcdir)/_tolower.c'; fi`
+
+lib_a-_toupper.o: _toupper.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-_toupper.o `test -f '_toupper.c' || echo '$(srcdir)/'`_toupper.c
+
+lib_a-_toupper.obj: _toupper.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-_toupper.obj `if test -f '_toupper.c'; then $(CYGPATH_W) '_toupper.c'; else $(CYGPATH_W) '$(srcdir)/_toupper.c'; fi`
+
+lib_a-towctrans.o: towctrans.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-towctrans.o `test -f 'towctrans.c' || echo '$(srcdir)/'`towctrans.c
+
+lib_a-towctrans.obj: towctrans.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-towctrans.obj `if test -f 'towctrans.c'; then $(CYGPATH_W) 'towctrans.c'; else $(CYGPATH_W) '$(srcdir)/towctrans.c'; fi`
+
+lib_a-towlower.o: towlower.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-towlower.o `test -f 'towlower.c' || echo '$(srcdir)/'`towlower.c
+
+lib_a-towlower.obj: towlower.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-towlower.obj `if test -f 'towlower.c'; then $(CYGPATH_W) 'towlower.c'; else $(CYGPATH_W) '$(srcdir)/towlower.c'; fi`
+
+lib_a-towupper.o: towupper.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-towupper.o `test -f 'towupper.c' || echo '$(srcdir)/'`towupper.c
+
+lib_a-towupper.obj: towupper.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-towupper.obj `if test -f 'towupper.c'; then $(CYGPATH_W) 'towupper.c'; else $(CYGPATH_W) '$(srcdir)/towupper.c'; fi`
+
+lib_a-wctrans.o: wctrans.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wctrans.o `test -f 'wctrans.c' || echo '$(srcdir)/'`wctrans.c
+
+lib_a-wctrans.obj: wctrans.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wctrans.obj `if test -f 'wctrans.c'; then $(CYGPATH_W) 'wctrans.c'; else $(CYGPATH_W) '$(srcdir)/wctrans.c'; fi`
+
+lib_a-wctype.o: wctype.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wctype.o `test -f 'wctype.c' || echo '$(srcdir)/'`wctype.c
+
+lib_a-wctype.obj: wctype.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wctype.obj `if test -f 'wctype.c'; then $(CYGPATH_W) 'wctype.c'; else $(CYGPATH_W) '$(srcdir)/wctype.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

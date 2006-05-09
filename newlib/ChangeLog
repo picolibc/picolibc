@@ -1,3 +1,9 @@
+2006-05-09  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/ctype/Makefile.am: Add $(ELIX_SOURCES) to
+	lib_a_SOURCES.
+	* libc/ctype/Makefile.in: Regenerated.
+
 2006-05-09  Kazu Hirata  <kazu@codesourcery.com>
 
 	* libc/machine/arm/Makefile.am: Fix a typo.
