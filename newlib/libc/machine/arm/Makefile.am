@@ -10,7 +10,7 @@ noinst_LIBRARIES = lib.a
 
 lib_a_SOURCES = setjmp.S access.c
 lib_a_CCASFLAGS=$(AM_CCASFLAGS)
-lib_a_CFLAGS-$(AM_CFLAGS)
+lib_a_CFLAGS = $(AM_CFLAGS)
 
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
