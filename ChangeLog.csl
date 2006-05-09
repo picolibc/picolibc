@@ -1,3 +1,19 @@
+2006-05-09  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* gdb/bsd-uthread.c (bsd_uthread_solib_loaded): Always pass 0 for
+	from_tty.
+	* gdb/remote.c (remote_get_shared_libraries): Don't call solib_add.
+	* gdb/solib.c: Include "exceptions.h".
+	(solib_map_sections): Throw NOT_FOUND_ERROR if appropriate.
+	(symbol_add_stub): Delete.
+	(solib_read_symbols): Use TRY_CATCH.  Inline symbol_add_stub.
+	Use current from_tty, not a copy from the so_list.  Don't warn
+	a second time for a missing library.
+	(update_solib_list): Don't save from_tty.  Use TRY_CATCH.  Print
+	out a single warning for all missing libraries.
+	* gdb/solist.h (struct so_list): Remove from_tty.
+	* gdb/Makefile.in (solib.o): Update.
+
 2006-05-08  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* gdb/remote.c (remote_get_shared_libraries): Check for NULL ops.
