@@ -1,5 +1,11 @@
 2006-05-10  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/qedit.h (DEXTER_*,SCompFmt0): Add structures.
+	(DEXTERF_TRACK_SEARCH_FLAGS,TIMELINE_MAJOR_TYPE): Add enums.
+	(CONNECTF_DYNAMIC_*,SFN_VALIDATEF_*,RESIZEF_*): Define.
+
+2006-05-10  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/qedit.h: New file.
 	* include/errors.h: Cleanup.
 
