@@ -1,5 +1,19 @@
 2006-05-10  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winnls.h [WINVER >= 0x0500] (LOCALE_IDEFAULTEBCDICCODEPAGE):
+	Documented as defined on Windows 2000 or later.
+	[WINVER >= 0x0600] (LOCALE_SDURATION,LOCALE_SIETFLANGUAGE)
+	(LOCALE_SISO3166CTRYNAME2,LOCALE_SISO639LANGNAME2)
+	(LOCALE_SKEYBOARDSTOINSTALL,LOCALE_SNAME,LOCALE_SNAN)
+	(LOCALE_SNEGINFINITY,LOCALE_SPOSINFINITY,LOCALE_SSCRIPTS): Documented
+	but values unknown, Windows Vista or later.
+	(CAL_UMALQURA): Cleanup.
+	(CAL_SSHORTESTDAYNAME_*): Cleanup.
+	[WINVER >= 0x0410] (CAL_SYEARMONTH,CAL_ITWODIGITYEARMAX)
+	(CAL_NOUSEROVERRIDE,CAL_RETURN_NUMBER,CAL_USE_CP_ACP): Cleanup.
+
+2006-05-10  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/wingdi.h [WINVER >= 0x0500] (DC_*): Define.
 	(GGO_UNHINTED): Define.
 	(DMPAPER_*): Define. Paper size newly added to the documentation.
