@@ -4,6 +4,11 @@
 #pragma GCC system_header
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*--- DirectShow Reference - Constants and GUIDs - Event Notification Codes */
 #define EC_ACTIVATE 0x0013
 #define EC_BUFFERING_DATA 0x0011
 #define EC_BUILT 0x0300
@@ -51,5 +56,13 @@
 #define EC_WMT_EVENT 0x0252
 #define EC_WMT_INDEX_EVENT 0x0251
 #define EC_USER 0x8000
+/*--- DirectShow Reference - DirectShow Structures */
+typedef struct {
+	HRESULT hrStatus;
+	void   *pData;
+} AM_WMT_EVENT_DATA;
 
+#ifdef __cplusplus
+}
+#endif
 #endif

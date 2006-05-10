@@ -1,5 +1,35 @@
 2006-05-10  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/amvideo.h (RESET_MASKS,RESET_PALETTE): Use ZeroMemory instead
+	of memset to avoid <string.h>. Still need a fix for memcmp.
+	* include/dshow.h (AM_ASPECT_RATIO_MODE,AM_WST_DRAWBGMODE,AM_WST_LEVEL)
+	(AMExtendedSeekingCapabilities,AM_WST_SERVICE,AM_WST_STATE)
+	(AM_WST_STYLE): Add enums.
+	(AM_WST_PAGE,AMVABeginFrameInfo,AMVACompBufferInfo,AMVAEndFrameInfo,
+	AMVAInternalMemInfo,AMVAUncompBufferInfo,AMVAUncompDataInfo): New
+	structures.
+	* include/errors.h (VFW_*): Define.
+	* include/evcode.h (AM_WMT_EVENT_DATA): New structure.
+	* include/mmsystem.h (WAVE_FORMAT_EXTENSIBLE): Define.
+	* include/edevdefs.h (ED_FORMAT_SMPTE_30,ED_FORMAT_SMPTE_30DROP)
+	(ED_FORMAT_SMPTE_25,ED_FORMAT_SMPTE_24): Move from here...
+	* include/strmif.h: ... to here. New file.
+	* include/aviriff.h: New file.
+	* include/bdatypes.h: New file.
+	* include/control.h: New file.
+	* include/dvdmedia.h: New file.
+	* include/il21dec.h: New file.
+	* include/ks.h: New file.
+	* include/ksmedia.h: New file.
+	* include/mmreg.h: New file.
+	* include/mpegtype.h: New file.
+	* include/vidcap.h: New file.
+	* include/vmr9.h: New file.
+	* include/vptype.h: New file.
+	* include/xprtdefs.h: New file.
+
+2006-05-10  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winnls.h [WINVER >= 0x0500] (LOCALE_IDEFAULTEBCDICCODEPAGE):
 	Documented as defined on Windows 2000 or later.
 	[WINVER >= 0x0600] (LOCALE_SDURATION,LOCALE_SIETFLANGUAGE)
@@ -82,8 +112,8 @@
 
 2006-05-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
-	* lib/directx/quartz.def: Move from lib/directx/...
-	* lib/quartz.def: ... to lib/
+	* lib/directx/quartz.def: Move from here...
+	* lib/quartz.def: ... to here.
 
 2006-05-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 

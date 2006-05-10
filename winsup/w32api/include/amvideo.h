@@ -5,6 +5,7 @@
 #endif
 
 #include <ddraw.h>
+#include <strmif.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,8 +28,8 @@ extern "C" {
 #define BIT_MASKS_MATCH(pbmi1,pbmi2) (!memcmp((pbmi1)->dwBitMasks,(pbmi2)->dwBitMasks,3*sizeof(DWORD)))
 #define PALETTISED(pbmi) ((pbmi)->bmiHeader.biBitCount <= 8)
 #define PALETTE_ENTRIES(pbmi) (1 << (pbmi)->bmiHeader.biBitCount)
-#define RESET_MASKS(pbmi) ((void)memset((pbmi)->dwBitFields,0,3*sizeof(DWORD)))
-#define RESET_PALETTE(pbmi) ((void)memset(((pbmi)->bmiColors,0,256*sizeof(RGBQUAD)));
+#define RESET_MASKS(pbmi) (ZeroMemory((PVOID)(pbmi)->dwBitFields,3*sizeof(DWORD)))
+#define RESET_PALETTE(pbmi) (ZeroMemory((PVOID)(pbmi)->bmiColors,256*sizeof(RGBQUAD)));
 #define SIZE_EGA_PALETTE (16*sizeof(RGBQUAD))
 #define SIZE_MASKS (3*sizeof(DWORD))
 #define SIZE_PALETTE (256*sizeof(RGBQUAD))
