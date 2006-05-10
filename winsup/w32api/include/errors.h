@@ -8,6 +8,7 @@
 extern "C" {
 #endif
 
+/*--- DirectShow Reference - Constants and GUIDs - Error and Success Codes */
 #define VFW_S_NO_MORE_ITEMS 0x00040103
 #define VFW_S_DUPLICATE_NAME 0x0004022D
 #define VFW_S_STATE_INTERMEDIATE 0x00040237
@@ -151,7 +152,9 @@ extern "C" {
 #define VFW_E_DVD_VMR9_INCOMPATIBLEDEC 0x8004029A
 #define VFW_E_NO_COPP_HW 0x8004029B
 #define VFW_E_BAD_KEY 0x800403F2
+/*--- DirectShow Reference - Functions */
 #define MAX_ERROR_TEXT_LEN 160
+/*--- DirectShow Reference - Functions */
 DWORD WINAPI AMGetErrorTextA(HRESULT,CHAR*,DWORD);
 DWORD WINAPI AMGetErrorTextW(HRESULT,WCHAR*,DWORD);
 #ifdef UNICODE

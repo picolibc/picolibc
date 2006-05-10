@@ -1,5 +1,10 @@
 2006-05-10  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/qedit.h: New file.
+	* include/errors.h: Cleanup.
+
+2006-05-10  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/amvideo.h (BIT_MASKS_MATCH): Don't use memcmp to
 	avoid dependency on <string.h>.
 	There's no Win32 equivalent for memcmp:
