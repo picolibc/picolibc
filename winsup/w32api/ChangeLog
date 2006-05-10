@@ -1,7 +1,14 @@
 2006-05-10  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
-	* include/amvideo.h (RESET_MASKS,RESET_PALETTE): Use ZeroMemory instead
-	of memset to avoid <string.h>. Still need a fix for memcmp.
+	* include/amvideo.h (BIT_MASKS_MATCH): Don't use memcmp to
+	avoid dependency on <string.h>.
+	There's no Win32 equivalent for memcmp:
+	http://support.microsoft.com/default.aspx?scid=kb;EN-US;q99456
+
+2006-05-10  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/amvideo.h (RESET_MASKS,RESET_PALETTE): Use ZeroMemory
+	instead of memset to avoid dependency on <string.h>.
 	* include/dshow.h (AM_ASPECT_RATIO_MODE,AM_WST_DRAWBGMODE,AM_WST_LEVEL)
 	(AMExtendedSeekingCapabilities,AM_WST_SERVICE,AM_WST_STATE)
 	(AM_WST_STYLE): Add enums.

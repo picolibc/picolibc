@@ -25,7 +25,7 @@ extern "C" {
 #define AMDDS_YUV (AMDDS_YUVOFF|AMDDS_YUVOVR|AMDDS_YUVFLP)
 #define AMDDS_RGB (AMDDS_RGBOFF|AMDDS_RGBOVR|AMDDS_RGBFLP)
 #define AMDDS_PRIMARY (AMDDS_DCIPS|AMDDS_PS)
-#define BIT_MASKS_MATCH(pbmi1,pbmi2) (!memcmp((pbmi1)->dwBitMasks,(pbmi2)->dwBitMasks,3*sizeof(DWORD)))
+#define BIT_MASKS_MATCH(pbmi1,pbmi2) ((pbmi1)->dwBitMasks[0] == (pbmi2)->dwBitMasks[0] && (pbmi1)->dwBitMasks[1] == (pbmi2)->dwBitMasks[1] && (pbmi1)->dwBitMasks[2] == (pbmi2)->dwBitMasks[2])
 #define PALETTISED(pbmi) ((pbmi)->bmiHeader.biBitCount <= 8)
 #define PALETTE_ENTRIES(pbmi) (1 << (pbmi)->bmiHeader.biBitCount)
 #define RESET_MASKS(pbmi) (ZeroMemory((PVOID)(pbmi)->dwBitFields,3*sizeof(DWORD)))
