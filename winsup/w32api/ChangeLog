@@ -1,7 +1,19 @@
 2006-05-10  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/wingdi.h [WINVER >= 0x0500] (DC_*): Define.
+	(GGO_UNHINTED): Define.
+	(DMPAPER_*): Define. Paper size newly added to the documentation.
+	(DMPAPER_LAST): Value depends on DMPAPER_* variables actually defined.
+	(DM_*): Cleanup.
+	(DM_PANNINGWIDTH,DM_PANNINGHEIGHT,DM_DISPLAYFIXEDOUTPUT): Define.
+	(DMDO_*,DMDFO_*): Define.
+	(GetDCBrushColor,GetDCPenColor): Declare.
+	* lib/msimg32.def (GetDCBrushColor,GetDCPenColor): Add stubs.
+
+2006-05-10  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winnt.h (LANG_*,SUBLANG_*): Define.
-	Languages newly added to the documentation.
+	A few languages newly added to the documentation.
 
 2006-05-05  Chris Sutcliffe <ir0nh34d@users.sf.net>
 
