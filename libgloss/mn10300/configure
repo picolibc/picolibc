@@ -2540,6 +2540,7 @@ cat >>$CONFIG_STATUS <<_ACEOF
 AMDEP_TRUE="$AMDEP_TRUE" ac_aux_dir="$ac_aux_dir"
 srcdir=${srcdir}
 target=${target}
+with_multisubdir=${with_multisubdir}
 ac_configure_args="${ac_configure_args} --enable-multilib"
 CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
 libgloss_topdir=${libgloss_topdir}
@@ -2922,7 +2923,10 @@ s,@INSTALL@,$ac_INSTALL,;t t
 
   # Run the commands associated with the file.
   case $ac_file in
-    Makefile ) . ${libgloss_topdir}/config-ml.in ;;
+    Makefile ) if test -n "$CONFIG_FILES"; then
+  unset ac_file
+  . ${libgloss_topdir}/config-ml.in
+fi ;;
   esac
 done
 _ACEOF

@@ -148,15 +148,26 @@ host_makefile_frag_path=$host_makefile_frag
 AC_SUBST(host_makefile_frag_path)
 AC_SUBST_FILE(host_makefile_frag)
 
+if test "${multilib}" = "yes"; then
+  multilib_arg="--enable-multilib"
+else
+  multilib_arg=
+fi
+
 # for now, only add multilibs for specific targets
-AC_CONFIG_FILES(Makefile,
-. ${libgloss_topdir}/config-ml.in,
+AC_CONFIG_FILES([Makefile],
+[if test -n "$CONFIG_FILES"; then
+  unset ac_file
+  . ${libgloss_topdir}/config-ml.in
+fi],
 srcdir=${srcdir}
 target=${target}
 with_multisubdir=${with_multisubdir}
 ac_configure_args="--enable-multilib ${ac_configure_args}"
 CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
 libgloss_topdir=${libgloss_topdir}
+CC="${CC}"
+LDFLAGS=${LDFLAGS}
 )
 AC_OUTPUT
 

@@ -1,3 +1,47 @@
+2006-05-10  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* Makefile.in: Pass some additional flags in FLAGS_TO_PASS.
+	* configure.in: Add additional flags when creating Makefile.
+	* configure: Regenerated.
+	* arm/configure
+	* arm/configure.in: Set with_multisubdir when creating Makefile.
+	* cris/configure.in: Ditto.
+	* d30v/configure.in: Ditto.
+	* frv/configure.in: Ditto.
+	* i386/configure.in: Ditto.
+	* iq2000/configure.in: Ditto.
+	* libnosys/configure.in: Ditto.
+	* m32c/configure.in: Ditto.
+	* m32r/configure.in: Ditto.
+	* m68hc11/configure.in: Ditto.
+	* m68k/configure.in: Ditto.
+	* mcore/configure.in: Ditto.
+	* mips/configure.in: Ditto.
+	* mn10200/configure.in: Ditto.
+	* mn10300/configure.in: Ditto.
+	* mt/configure.in: Ditto.
+	* pa/configure.in: Ditto.
+	* rs6000/configure.in: Ditto.
+	* sparc/configure.in: Ditto.
+	* cris/configure: Regenerated.
+	* d30v/configure: Ditto.
+	* frv/configure: Ditto.
+	* i386/configure: Ditto.
+	* iq2000/configure: Ditto.
+	* libnosys/configure: Ditto.
+	* m32c/configure: Ditto.
+	* m32r/configure: Ditto.
+	* m68hc11/configure: Ditto.
+	* m68k/configure: Ditto.
+	* mcore/configure: Ditto.
+	* mips/configure: Ditto.
+	* mn10200/configure: Ditto.
+	* mn10300/configure: Ditto.
+	* mt/configure: Ditto.
+	* pa/configure: Ditto.
+	* rs6000/configure: Ditto.
+	* sparc/configure: Ditto.
+
 2006-04-19  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configure.in: Modified to support autoconf 2.59.
