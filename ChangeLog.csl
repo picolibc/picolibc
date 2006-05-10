@@ -1,3 +1,8 @@
+2006-05-10  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* gdb/frame.c (get_prev_frame): Move check for pc == 0 ...
+	(get_prev_frame_1): ... to here.
+
 2006-05-09  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* gdb/bsd-uthread.c (bsd_uthread_solib_loaded): Always pass 0 for
