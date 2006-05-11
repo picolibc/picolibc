@@ -1,3 +1,19 @@
+2006-05-11  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/strmif.h (IAMAnalogVideoDecoder,IAMAudioInputMixer)
+	(IAMAudioRendererStats,IAMBufferNegotiation,IAMCameraControl)
+	(IAMCertifiedOutputProtection): Add interfaces.
+	* include/adsprop.h: New file.
+	* include/cmnquery.h: New file.
+	* include/dsadmin.h: New file.
+	* include/dsclient.h: New file.
+	* include/dsgetdc.h: New file.
+	* include/dsquery.h: New file.
+	* include/dsrole.h: New file.
+	* include/ntdsapi.h: New file.
+	* include/ntdsbcli.h: New file.
+	* include/objsel.h: New file.
+
 2006-05-10  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/qedit.h (DEXTER_*,SCompFmt0): Add structures.
@@ -79,7 +95,8 @@
 
 2006-05-05  Chris Sutcliffe <ir0nh34d@users.sf.net>
 
-    * lib/directx/Makefile.in: Remove reference to libquartz.a since it was moved.
+    * lib/directx/Makefile.in: Remove reference to libquartz.a since
+    it was moved.
 
 2006-05-05  Earnie Boyd  <earnie@users.sf.net>
 

@@ -1067,6 +1067,91 @@ typedef struct _VMRVIDEOSTREAMINFO {
 	NORMALIZEDRECT rNormal;
 } VMRVIDEOSTREAMINFO;
 **********/
+/*--- DirectShow Reference - Interfaces */
+#define INTERFACE IAMAnalogVideoDecoder
+DECLARE_INTERFACE_(IAMAnalogVideoDecoder, IUnknown)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD_(HRESULT,get_AvailableTVFormats)(THIS_ long*) PURE;
+	STDMETHOD_(HRESULT,get_HorizontalLocked)(THIS_ long*) PURE;
+	STDMETHOD_(HRESULT,get_NumberOfLines)(THIS_ long*) PURE;
+	STDMETHOD_(HRESULT,get_OutputEnable)(THIS_ long*) PURE;
+	STDMETHOD_(HRESULT,get_TVFormat)(THIS_ long*) PURE;
+	STDMETHOD_(HRESULT,get_VCRHorizontalLocking)(THIS_ long*) PURE;
+	STDMETHOD_(HRESULT,put_OutputEnable)(THIS_ long) PURE;
+	STDMETHOD_(HRESULT,put_TVFormat)(THIS_ long) PURE;
+	STDMETHOD_(HRESULT,put_VCRHorizontalLocking)(THIS_ long) PURE;
+};
+#undef INTERFACE
+#define INTERFACE IAMAudioInputMixer
+DECLARE_INTERFACE_(IAMAudioInputMixer, IUnknown)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD_(HRESULT,get_Bass)(THIS_ double*) PURE;
+	STDMETHOD_(HRESULT,get_BassRange)(THIS_ double*) PURE;
+	STDMETHOD_(HRESULT,get_Enable)(THIS_ BOOL*) PURE;
+	STDMETHOD_(HRESULT,get_Loudness)(THIS_ BOOL*) PURE;
+	STDMETHOD_(HRESULT,get_MixLevel)(THIS_ double*) PURE;
+	STDMETHOD_(HRESULT,get_Mono)(THIS_ BOOL*) PURE;
+	STDMETHOD_(HRESULT,get_Pan)(THIS_ double*) PURE;
+	STDMETHOD_(HRESULT,get_Treble)(THIS_ double*) PURE;
+	STDMETHOD_(HRESULT,get_TrebleRange)(THIS_ double*) PURE;
+	STDMETHOD_(HRESULT,put_Bass)(THIS_ double) PURE;
+	STDMETHOD_(HRESULT,put_Enable)(THIS_ BOOL) PURE;
+	STDMETHOD_(HRESULT,put_Loudness)(THIS_ BOOL) PURE;
+	STDMETHOD_(HRESULT,put_MixLevel)(THIS_ double) PURE;
+	STDMETHOD_(HRESULT,put_Mono)(THIS_ BOOL) PURE;
+	STDMETHOD_(HRESULT,put_Pan)(THIS_ double) PURE;
+	STDMETHOD_(HRESULT,put_Treble)(THIS_ double) PURE;
+};
+#undef INTERFACE
+#define INTERFACE IAMAudioRendererStats
+DECLARE_INTERFACE_(IAMAudioRendererStats, IUnknown)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD_(HRESULT,GetStatParam)(THIS_ DWORD,DWORD*,DWORD*) PURE;
+};
+#undef INTERFACE
+#define INTERFACE IAMBufferNegotiation
+DECLARE_INTERFACE_(IAMBufferNegotiation, IUnknown)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD_(HRESULT,GetAllocatorProperties)(THIS_ ALLOCATOR_PROPERTIES*) PURE;
+	STDMETHOD_(HRESULT,SuggestAllocatorProperties)(THIS_ const ALLOCATOR_PROPERTIES*) PURE;
+};
+#undef INTERFACE
+#define INTERFACE IAMCameraControl
+DECLARE_INTERFACE_(IAMCameraControl, IUnknown)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD_(HRESULT,Get)(THIS_ long,long*,long*) PURE;
+	STDMETHOD_(HRESULT,GetRange)(THIS_ long,long*,long*,long*,long*,long*) PURE;
+	STDMETHOD_(HRESULT,Set)(THIS_ long,long,long) PURE;
+};
+#undef INTERFACE
+
+#define INTERFACE IAMCertifiedOutputProtection
+DECLARE_INTERFACE_(IAMCertifiedOutputProtection, IUnknown)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD_(HRESULT,KeyExchange)(THIS_ GUID*,BYTE**,DWORD*) PURE;
+	STDMETHOD_(HRESULT,ProtectionCommand)(THIS_ const AMCOPPCommand*) PURE;
+	STDMETHOD_(HRESULT,ProtectionStatus)(THIS_ const AMCOPPStatusInput*,AMCOPPStatusOutput*) PURE;
+	STDMETHOD_(HRESULT,SessionSequenceStart)(THIS_ const AMCOPPSignature*) PURE;
+};
+#undef INTERFACE
 
 #ifdef __cplusplus
 }
