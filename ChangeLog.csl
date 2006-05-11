@@ -1,3 +1,10 @@
+2006-05-11  Carlos O'Donell  <carlos@codesourcery.com>
+
+	* bfd/doc/bfd.texinfo: Rename "Index" to "BFD Index"
+	* ld/ld.texinfo: Rename "Index" to "LD Index"
+	* gas/doc/as.texinfo: Rename "Index" to "AS Index"
+	Rename "ABORT" to "ABORT (COFF)"
+
 2006-05-06  Joseph S. Myers  <joseph@codesourcery.com>
 
 	Backport:
