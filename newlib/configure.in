@@ -243,7 +243,7 @@ if test "${newlib_iconv_external_ccs}" = "yes"; then
 AC_DEFINE_UNQUOTED(_ICONV_ENABLE_EXTERNAL_CCS)
 fi
 
-AC_DEFINE_UNQUOTED(_NEWLIB_VERSION,"$VERSION")
+AC_DEFINE_UNQUOTED(_NEWLIB_VERSION,"NEWLIB_VERSION")
 
 if test "${multilib}" = "yes"; then
   multilib_arg="--enable-multilib"

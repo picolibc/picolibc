@@ -5148,7 +5148,7 @@ _ACEOF
 fi
 
 cat >>confdefs.h <<_ACEOF
-#define  "$VERSION"
+#define _NEWLIB_VERSION "1.14.0"
 _ACEOF
 
 

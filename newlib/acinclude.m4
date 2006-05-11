@@ -1,7 +1,7 @@
 dnl This provides configure definitions used by all the newlib
 dnl configure.in files.
 
-AC_DEFUN([_NEWLIB_VERSION],
+AC_DEFUN([DEF_NEWLIB_VERSION],
 m4_define([NEWLIB_VERSION],[1.14.0]))
 
 dnl Basic newlib configury.  This calls basic introductory stuff,
@@ -10,7 +10,7 @@ dnl configure.host.  The only argument is the relative path to the top
 dnl newlib directory.
 
 AC_DEFUN([NEWLIB_CONFIGURE],
-[AC_REQUIRE([_NEWLIB_VERSION])
+[AC_REQUIRE([DEF_NEWLIB_VERSION])
 dnl Default to --enable-multilib
 AC_ARG_ENABLE(multilib,
 [  --enable-multilib         build many library versions (default)],

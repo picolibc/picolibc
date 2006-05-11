@@ -1,3 +1,10 @@
+2006-05-11  J"orn Rennecke <joern.rennecke@st.com>
+
+	* acinclude.m4 (_NEWLIB_VERSION): Rename to:
+	(DEF_NEWLIB_VERSION).
+	* configure.in (_NEWLIB_VERSION): Use NEWLIB_VERSION.
+	* configure: Regenerate.
+
 2006-05-09  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/ctype/Makefile.am: Add $(ELIX_SOURCES) to
