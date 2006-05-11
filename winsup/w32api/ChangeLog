@@ -1,5 +1,21 @@
 2006-05-11  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/ipxrtdef.h: Cleanup.
+	(IPX_INTERFACE_INFO_TYPE,IPX_STATIC_ROUTE_INFO_TYPE)
+	(IPX_STATIC_SERVICE_INFO_TYPE,IPX_SERVICE_FILTER_INFO_TYPE)
+	(IPX_ROUTE_FILTER_INFO_TYPE,IPX_IN_TRAFFIC_FILTER_INFO_TYPE)
+	(IPX_ADAPTER_INFO_TYPE,IPXWAN_INTERFACE_INFO_TYPE,IPX_GLOBAL_INFO_TYPE)
+	(IPX_STATIC_NETBIOS_NAME_INFO_TYPE)
+	(IPX_IN_TRAFFIC_FILTER_GLOBAL_INFO_TYPE)
+	(IPX_OUT_TRAFFIC_FILTER_INFO_TYPE)
+	(IPX_OUT_TRAFFIC_FILTER_GLOBAL_INFO_TYPE): Define.
+	* include/routprot.h: Cleanup.
+	(PROTO_IP_*,IPRTRMGR_PID,IPX_PROTOCOL_*): Define.
+	* include/fltdefs.h: New file.
+	* include/ipinfoid.h: New file.
+
+2006-05-11  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/strmif.h (IAMAnalogVideoDecoder,IAMAudioInputMixer)
 	(IAMAudioRendererStats,IAMBufferNegotiation,IAMCameraControl)
 	(IAMCertifiedOutputProtection): Add interfaces.
