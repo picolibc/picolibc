@@ -1,3 +1,17 @@
+/*
+ * mprapi.h - Routing and Remote Access Services
+ *
+ * THIS SOFTWARE IS NOT COPYRIGHTED
+ *
+ * This source code is offered for use in the public domain.  You may use,
+ * modify or distribute it freely.
+ *
+ * This code is distributed in the hope that it will be useful but
+ * WITHOUT ANY WARRANTY.  ALL WARRANTIES, EXPRESS OR IMPLIED ARE HEREBY
+ * DISCLAIMED.  This includes but is not limited to warranties of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ */
 #ifndef _MPRAPI_H
 #define _MPRAPI_H
 #if __GNUC__ >= 3
@@ -12,20 +26,6 @@ extern "C" {
 #endif
 
 #if (_WIN32_WINNT >= 0x0500)
-/*--- Remote Access Service Administration Reference - RAS Administration Enumerated Types */
-typedef enum _RAS_HARDWARE_CONDITION {
-	RAS_HARDWARE_OPERATIONAL,
-	RAS_HARDWARE_FAILURE
-} RAS_HARDWARE_CONDITION;
-typedef enum _RAS_PORT_CONDITION {
-	RAS_PORT_NON_OPERATIONAL,
-	RAS_PORT_DISCONNECTED,	
-	RAS_PORT_CALLING_BACK,
-	RAS_PORT_LISTENING,
-	RAS_PORT_AUTHENTICATING,
-	RAS_PORT_AUTHENTICATED,	
-	RAS_PORT_INITIALIZING
-} RAS_PORT_CONDITION;
 /*--- Router Management Reference - Router Management Enumerated Types */
 typedef enum _ROUTER_CONNECTION_STATE {
 	ROUTER_IF_STATE_UNREACHABLE,
@@ -55,6 +55,20 @@ typedef enum _ROUTER_INTERFACE_TYPE {
 #define PID_IP 0x00000021
 #define PID_IPX 0x0000002B
 #define PID_NBF 0x0000003F
+/*--- Remote Access Service Administration Reference - RAS Administration Enumerated Types */
+typedef enum _RAS_HARDWARE_CONDITION {
+	RAS_HARDWARE_OPERATIONAL,
+	RAS_HARDWARE_FAILURE
+} RAS_HARDWARE_CONDITION;
+typedef enum _RAS_PORT_CONDITION {
+	RAS_PORT_NON_OPERATIONAL,
+	RAS_PORT_DISCONNECTED,	
+	RAS_PORT_CALLING_BACK,
+	RAS_PORT_LISTENING,
+	RAS_PORT_AUTHENTICATING,
+	RAS_PORT_AUTHENTICATED,	
+	RAS_PORT_INITIALIZING
+} RAS_PORT_CONDITION;
 /*--- Remote Access Service Administration Reference - RAS Administration Structures */
 #define ATADDRESSLEN 32
 typedef struct _PPP_ATCP_INFO {

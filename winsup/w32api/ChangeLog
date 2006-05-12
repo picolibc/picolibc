@@ -1,5 +1,16 @@
 2006-05-12  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/mprapi.h: Fix header guard. Cleanup.
+	(MprAdminAcceptNewConnection,MprAdminAcceptNewConnection2)
+	(MprAdminAcceptNewLink,MprAdminAcceptReauthentication)
+	(MprAdminConnectionHangupNotification)
+	(MprAdminConnectionHangupNotification2)
+	(MprAdminGetIpAddressForUser)(MprAdminInitializeDll)
+	(MprAdminTerminateDll,MprAdminLinkHangupNotification)
+	(MprAdminReleaseIpAddress): Declare functions.
+
+2006-05-12  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/ipifcons.h: Cleanup.
 	* include/ipxconst.h: Fix header guard.
 	* include/ipxrtdef.h: include <ipxconst.h>.
