@@ -1,5 +1,18 @@
 2006-05-12  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/mprapi.h (MprAdminMIBBufferFree,MprAdminMIBEntryCreate)
+	(MprAdminMIBEntryDelete,MprAdminMIBEntryGet,MprAdminMIBEntryGetFirst)
+	(MprAdminMIBEntryGetNext,MprAdminMIBEntrySet,MprAdminMIBGetTrapInfo)
+	(MprAdminMIBServerConnect,MprAdminMIBServerDisconnect)
+	(MprAdminMIBSetTrapInfo): Declare functions.
+	Note: MprAdminMIBSetTrapInfo is missing from mprapi.def.
+	(MIB_SERVER_HANDLE): New typedef.
+	(MprConfigTransportSetInfo): Declare function.
+	* lib/mprapi.def (MprSetupIpInIpInterfaceFriendlyNameEnum)
+	(MprSetupIpInIpInterfaceFriendlyNameFree): Fix size.
+
+2006-05-12  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* lib/rtutils.def: New file. Generated on Windows XP.
 	(TracePrintf{AW},TracePrintfEx{AW}): Left out for now.
 	* include/rtutils.h: New file.

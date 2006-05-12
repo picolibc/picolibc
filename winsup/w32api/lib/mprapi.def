@@ -105,8 +105,8 @@ MprInfoRemoveAll@8
 MprPortSetUsage@4
 MprSetupIpInIpInterfaceFriendlyNameCreate@8
 MprSetupIpInIpInterfaceFriendlyNameDelete@8
-MprSetupIpInIpInterfaceFriendlyNameEnum@8
-MprSetupIpInIpInterfaceFriendlyNameFree@8
+MprSetupIpInIpInterfaceFriendlyNameEnum@12
+MprSetupIpInIpInterfaceFriendlyNameFree@4
 RasAdminConnectionClearStats@8
 RasAdminConnectionEnum@28
 RasAdminConnectionGetInfo@16
