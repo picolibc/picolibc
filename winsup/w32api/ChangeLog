@@ -1,5 +1,12 @@
 2006-05-12  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/rtutils.h (TraceDumpA,TraceDumpW,TracePutsA,TracePutsW)
+	(TraceRegisterA,TraceRegisterW,TraceVprintfA,TraceVprintfW): Define
+	as macros.
+	Thanks to:    Bruce M Simpson <bms_spc at sf dot net>
+
+2006-05-12  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/mprapi.h (MprAdminMIBBufferFree,MprAdminMIBEntryCreate)
 	(MprAdminMIBEntryDelete,MprAdminMIBEntryGet,MprAdminMIBEntryGetFirst)
 	(MprAdminMIBEntryGetNext,MprAdminMIBEntrySet,MprAdminMIBGetTrapInfo)
