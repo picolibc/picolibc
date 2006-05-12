@@ -1,5 +1,26 @@
 2006-05-12  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/mprapi.h:(MprAdminBufferFree)
+	(MprAdminDeregisterConnectionNotification,MprAdminGetErrorString)
+	(MprAdminInterfaceConnect,MprAdminInterfaceCreate)
+	(MprAdminInterfaceDelete,MprAdminInterfaceDeviceGetInfo)
+	(MprAdminInterfaceDeviceSetInfo,MprAdminInterfaceDisconnect)
+	(MprAdminInterfaceEnum,MprAdminInterfaceGetCredentials)
+	(MprAdminInterfaceGetCredentialsEx,MprAdminInterfaceGetHandle)
+	(MprAdminInterfaceGetInfo,MprAdminInterfaceQueryUpdateResult)
+	(MprAdminInterfaceSetCredentials,MprAdminInterfaceSetCredentialsEx)
+	(MprAdminInterfaceSetInfo,MprAdminInterfaceTransportAdd)
+	(MprAdminInterfaceTransportGetInfo,MprAdminInterfaceTransportRemove)
+	(MprAdminInterfaceTransportSetInfo)
+	(MprAdminInterfaceUpdatePhonebookInfo,MprAdminInterfaceUpdateRoutes)
+	(MprAdminIsServiceRunning,MprAdminRegisterConnectionNotification)
+	(MprAdminServerConnect,MprAdminServerDisconnect)
+	(MprAdminServerGetCredentials,MprAdminServerGetInfo)
+	(MprAdminServerSetCredentials,MprAdminTransportCreate)
+	(MprAdminTransportGetInfo,MprAdminTransportSetInfo): Declare functions.
+
+2006-05-12  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/ipxtfflt.h: New file.
 
 2006-05-12  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
