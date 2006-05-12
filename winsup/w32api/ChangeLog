@@ -1,3 +1,9 @@
+2006-05-12  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/ipifcons.h: Cleanup.
+	* include/ipxconst.h: Fix header guard.
+	* include/ipxrtdef.h: include <ipxconst.h>.
+
 2006-05-11  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/ipxrtdef.h: Cleanup.

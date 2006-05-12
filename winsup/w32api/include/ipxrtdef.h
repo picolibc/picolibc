@@ -1,12 +1,17 @@
 /*
-	ipxrtdef.h - Routing and Remote Access Services
-
-	This file is part of a free library for the Win32 API.
-
-	This library is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-*/
+ * ipxrtdef.h - Routing and Remote Access Services
+ *
+ * THIS SOFTWARE IS NOT COPYRIGHTED
+ *
+ * This source code is offered for use in the public domain.  You may use,
+ * modify or distribute it freely.
+ *
+ * This code is distributed in the hope that it will be useful but
+ * WITHOUT ANY WARRANTY.  ALL WARRANTIES, EXPRESS OR IMPLIED ARE HEREBY
+ * DISCLAIMED.  This includes but is not limited to warranties of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ */
 #ifndef _IPXRTDEF_H
 #define _IPXRTDEF_H
 #if __GNUC__ >= 3
@@ -14,6 +19,7 @@
 #endif
 
 #include <stm.h>
+#include <ipxconst.h>
 
 #ifdef __cplusplus
 extern "C" {
