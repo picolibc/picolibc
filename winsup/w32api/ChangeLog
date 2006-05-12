@@ -1,15 +1,18 @@
 2006-05-12  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/ipxtfflt.h: New file.
+
+2006-05-12  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/mprapi.h: Fix header guard. Cleanup.
 	(MprAdminAcceptNewConnection,MprAdminAcceptNewConnection2)
 	(MprAdminAcceptNewLink,MprAdminAcceptReauthentication)
 	(MprAdminConnectionHangupNotification)
 	(MprAdminConnectionHangupNotification2)
-	(MprAdminGetIpAddressForUser)(MprAdminInitializeDll)
+	(MprAdminGetIpAddressForUser,MprAdminInitializeDll)
 	(MprAdminTerminateDll,MprAdminLinkHangupNotification)
 	(MprAdminReleaseIpAddress): Declare functions.
 	* lib/mprapi.def: Regenerate on Windows XP.
-	Would need to be regenerated on Windows Server 2003.
 
 2006-05-12  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
