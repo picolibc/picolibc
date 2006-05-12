@@ -8,6 +8,8 @@
 	(MprAdminGetIpAddressForUser)(MprAdminInitializeDll)
 	(MprAdminTerminateDll,MprAdminLinkHangupNotification)
 	(MprAdminReleaseIpAddress): Declare functions.
+	* lib/mprapi.def: Regenerate on Windows XP.
+	Would need to be regenerated on Windows Server 2003.
 
 2006-05-12  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
