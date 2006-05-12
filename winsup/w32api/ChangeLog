@@ -1,5 +1,12 @@
 2006-05-12  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/mprapi.h (MprInfoBlockAdd,MprInfoBlockFind)
+	(MprInfoBlockQuerySize,MprInfoBlockRemove,MprInfoBlockSet)
+	(MprInfoCreate,MprInfoDelete,MprInfoDuplicate)
+	(MprInfoRemoveAll): Declare functions.
+
+2006-05-12  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/mprapi.h (MprConfigBufferFree,MprConfigGetFriendlyName)
 	(MprConfigGetGuidName,MprConfigInterfaceCreate)
 	(MprConfigInterfaceDelete,MprConfigInterfaceEnum)
