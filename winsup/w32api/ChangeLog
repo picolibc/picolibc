@@ -1,5 +1,13 @@
 2006-05-12  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* lib/rtutils.def: New file. Generated on Windows XP.
+	(TracePrintf{AW},TracePrintfEx{AW}): Left out for now.
+	* include/rtutils.h: New file.
+	(TraceDump{AW},TracePuts{AW},TraceRegister{AW},TraceVprintf{AW}):
+	Commented out, they're missing from rtutils.def.
+
+2006-05-12  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/mprapi.h (MprInfoBlockAdd,MprInfoBlockFind)
 	(MprInfoBlockQuerySize,MprInfoBlockRemove,MprInfoBlockSet)
 	(MprInfoCreate,MprInfoDelete,MprInfoDuplicate)
