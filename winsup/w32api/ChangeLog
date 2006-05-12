@@ -1,6 +1,23 @@
 2006-05-12  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
-	* include/mprapi.h:(MprAdminBufferFree)
+	* include/mprapi.h (MprConfigBufferFree,MprConfigGetFriendlyName)
+	(MprConfigGetGuidName,MprConfigInterfaceCreate)
+	(MprConfigInterfaceDelete,MprConfigInterfaceEnum)
+	(MprConfigInterfaceGetHandle,MprConfigInterfaceGetInfo)
+	(MprConfigInterfaceSetInfo,MprConfigInterfaceTransportAdd)
+	(MprConfigInterfaceTransportEnum,MprConfigInterfaceTransportGetHandle)
+	(MprConfigInterfaceTransportGetInfo,MprConfigInterfaceTransportRemove)
+	(MprConfigInterfaceTransportSetInfo,MprConfigServerBackup)
+	(MprConfigServerConnect,MprConfigServerDisconnect)
+	(MprConfigServerGetInfo,MprConfigServerInstall)
+	(MprConfigServerRestore,MprConfigTransportCreate)
+	(MprConfigTransportDelete,MprConfigTransportEnum)
+	(MprConfigTransportGetHandle,MprConfigTransportGetInfo)
+	(MprConfigTransportSetInfo): Declare functions.
+
+2006-05-12  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/mprapi.h (MprAdminBufferFree)
 	(MprAdminDeregisterConnectionNotification,MprAdminGetErrorString)
 	(MprAdminInterfaceConnect,MprAdminInterfaceCreate)
 	(MprAdminInterfaceDelete,MprAdminInterfaceDeviceGetInfo)
