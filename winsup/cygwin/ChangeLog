@@ -1,3 +1,7 @@
+2006-05-13  Christopher Faylor  <cgf@timesys.com>
+
+	* ntdll.h (STATUS_INVALID_INFO_CLASS): Conditionalize.
+
 2006-05-10  Brian Dessent  <brian@dessent.net>
 
 	* Makefile.in (clean): Also delete *.dbg.
