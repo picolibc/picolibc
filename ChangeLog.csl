@@ -1,3 +1,24 @@
+2006-05-15  Paul Brook  <paul@codesourcery.com>
+
+	Backport from mainline.
+	* bfd/cpu-arm.c (bfd_is_arm_mapping_symbol_name): Rename ...
+	(bfd_is_arm_special_symbol_name): ... to this.  Add type argument.
+	Check symbol name is of specified type.
+	* bfd/elf32-arm.c (elf32_arm_is_target_special_symbol,
+	arm_elf_find_function, elf32_arm_output_symbol_hook): Use
+	bfd_is_arm_special_symbol_name.
+	* bfd/bfd-in.h (BFD_ARM_SPECIAL_SYM_TYPE_MAP,
+	BFD_ARM_SPECIAL_SYM_TYPE_TAG, BFD_ARM_SPECIAL_SYM_TYPE_OTHER,
+	BFD_ARM_SPECIAL_SYM_TYPE_ANY): Define.
+	(bfd_is_arm_mapping_symbol_name): Remove prototype.
+	(bfd_is_arm_special_symbol_name): Add prototype.
+	* bfd/bfd-in2.h: Regenerate.
+	* gas/config/tc-arm.c (arm_adjust_symtab): Use
+	bfd_is_arm_special_symbol_name.
+	* ld/testsuite/ld-arm/arm-be8.d: New test.
+	* ld/testsuite/ld-arm/arm-be8.s: New test.
+	* ld/testsuite/ld-arm/arm-elf.exp: Add arm-be8.
+
 2006-05-12  Carlos O'Donell  <carlos@codesourcery.com>
 
 	* binutils/doc/binutils.texi: Rename "Index" to "Binutils Index"
