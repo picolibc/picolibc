@@ -4,7 +4,7 @@
 	INVALID_HANDLE_VALUE.
 	(wait_sig): Set hwait_sig to INVALID_HANDLE_VALUE on __SIGEXIT.
 
-2006-05-14  Christopher Faylor  <cgf@timesys.com>
+2006-05-15  Christopher Faylor  <cgf@timesys.com>
 
 	* cygtls.cc (_cygtls::init_thread): Zero entire _my_tls structure and
 	no more.
