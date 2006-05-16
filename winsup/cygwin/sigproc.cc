@@ -39,7 +39,7 @@ details. */
 #define WSSC		  60000	// Wait for signal completion
 #define WPSP		  40000	// Wait for proc_subproc mutex
 
-#define no_signals_available(x) (!hwait_sig || ((x) && myself->exitcode & EXITCODE_SET) || &_my_tls == _sig_tls || in_dllentry)
+#define no_signals_available(x) (!hwait_sig || hwait_sig == INVALID_HANDLE_VALUE || ((x) && myself->exitcode & EXITCODE_SET) || &_my_tls == _sig_tls || in_dllentry)
 
 #define NPROCS	256
 
@@ -1209,7 +1209,7 @@ wait_sig (VOID *)
 	    }
 	  break;
 	case __SIGEXIT:
-	  hwait_sig = NULL;
+	  hwait_sig = (cygthread *) INVALID_HANDLE_VALUE;
 	  sigproc_printf ("saw __SIGEXIT");
 	  break;	/* handle below */
 	default:

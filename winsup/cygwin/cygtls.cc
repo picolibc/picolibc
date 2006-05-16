@@ -81,7 +81,7 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
 {
   if (x)
     {
-      memset (this, 0, CYGTLS_PADSIZE);
+      memset (this, 0, sizeof (*this));
       stackptr = stack;
       if (_GLOBAL_REENT)
 	{

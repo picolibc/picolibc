@@ -1,3 +1,26 @@
+2006-05-15  Christopher Faylor  <cgf@timesys.com>
+
+	* sigproc.cc (no_signals_available): Detect hwait_sig ==
+	INVALID_HANDLE_VALUE.
+	(wait_sig): Set hwait_sig to INVALID_HANDLE_VALUE on __SIGEXIT.
+
+2006-05-14  Christopher Faylor  <cgf@timesys.com>
+
+	* cygtls.cc (_cygtls::init_thread): Zero entire _my_tls structure and
+	no more.
+	* cygtls.h (_my_tls::padding): Delete.
+	(CYGTLS_PADSIZE): Redefine concept of padding to mean padding at the
+	end of the stack.
+	* dcrt0.cc (initialize_main_tls): Change return to void.
+	* gentls_offsets: Treat const specially, too.  Keep going after a '}'
+	is found.  Change negative offset calculation to use CYGTLS_PADSIZE.
+	* init.cc (_my_oldfunc): New variable.
+	(threadfunc_fe): Use stored tls value for oldfunc rather than blindly
+	writing to the stack.
+	(munge_threadfunc): Set oldfunc in tls.
+	(dll_entry): Initialize tls allocation.
+	* tlsoffsets.h: Regenerate.
+
 2006-05-13  Christopher Faylor  <cgf@timesys.com>
 
 	* ntdll.h (STATUS_INVALID_INFO_CLASS): Conditionalize.

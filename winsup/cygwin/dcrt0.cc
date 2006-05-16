@@ -953,7 +953,7 @@ dll_crt0_1 (char *)
     cygwin_exit (user_data->main (__argc, __argv, *user_data->envptr));
 }
 
-struct _reent *
+static void
 initialize_main_tls (char *padding)
 {
   if (!_main_tls)
@@ -961,7 +961,7 @@ initialize_main_tls (char *padding)
       _main_tls = &_my_tls;
       _main_tls->init_thread (padding, NULL);
     }
-  return &_main_tls->local_clib;
+  return;
 }
 
 /* Wrap the real one, otherwise gdb gets confused about

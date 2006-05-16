@@ -18,6 +18,8 @@ details. */
 #include <ntdef.h>
 #include "ntdll.h"
 
+static DWORD _my_oldfunc;
+
 int NO_COPY dynamically_loaded;
 static char NO_COPY *search_for = (char *) cygthread::stub;
 unsigned threadfunc_ix[8] __attribute__((section (".cygwin_dll_common"), shared));
@@ -30,7 +32,7 @@ threadfunc_fe (VOID *arg)
 {
   (void)__builtin_return_address(1);
   asm volatile ("andl $-16,%%esp" ::: "%esp");
-  _cygtls::call ((DWORD (*)  (void *, void *)) (((char **) _tlsbase)[OLDFUNC_OFFSET]), arg);
+  _cygtls::call ((DWORD (*)  (void *, void *)) TlsGetValue (_my_oldfunc), arg);
 }
 
 /* If possible, redirect the thread entry point to a cygwin routine which
@@ -62,7 +64,7 @@ munge_threadfunc ()
 	  search_for = NULL;
 	  for (i = 0; threadfunc_ix[i]; i++)
 	    ebp[threadfunc_ix[i]] = (char *) threadfunc_fe;
-	  ((char **) _tlsbase)[OLDFUNC_OFFSET] = threadfunc;
+	  TlsSetValue (_my_oldfunc, threadfunc);
 	}
     }
 }
@@ -145,6 +147,7 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
 	respawn_wow64_process ();
 
       dll_crt0_0 ();
+      _my_oldfunc = TlsAlloc ();
       break;
     case DLL_PROCESS_DETACH:
       break;

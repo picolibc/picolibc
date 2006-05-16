@@ -170,7 +170,6 @@ struct _cygtls
   __stack_t *stackptr;
   __stack_t stack[TLS_STACK_SIZE];
   unsigned initialized;
-  unsigned padding[0];
 
   /*gentls_offsets*/
   static CRITICAL_SECTION protect_linked_list;
@@ -235,13 +234,15 @@ struct _cygtls
 };
 #pragma pack(pop)
 
+const int CYGTLS_PADSIZE = 3 * sizeof (_cygtls);
+/*gentls_offsets*/
+
 extern char *_tlsbase __asm__ ("%fs:4");
 extern char *_tlstop __asm__ ("%fs:8");
-#define _my_tls (((_cygtls *) _tlsbase)[-1])
+#define _my_tls (*((_cygtls *) (_tlsbase - CYGTLS_PADSIZE)))
 extern _cygtls *_main_tls;
 extern _cygtls *_sig_tls;
 
-/*gentls_offsets*/
 class myfault
 {
   jmp_buf buf;
@@ -253,9 +254,7 @@ public:
     return _my_tls.setup_fault (buf, sebastian, myerrno);
   }
 };
-/*gentls_offsets*/
 
 #define __getreent() (&_my_tls.local_clib)
 
-const int CYGTLS_PADSIZE  = (((char *) _main_tls->padding) - ((char *) _main_tls));
-#endif /*_CYGTLS_H*/
+#endif /*_CYGTLS_H*/ /*gentls_offsets*/
