@@ -156,7 +156,8 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
 	munge_threadfunc ();
       break;
     case DLL_THREAD_DETACH:
-      if (hwait_sig)
+      if (hwait_sig && (void *) &_my_tls > (void *) &wow64_test_stack_marker
+	  && _my_tls.isinitialized ())
 	_my_tls.remove (0);
       break;
     }

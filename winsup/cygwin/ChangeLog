@@ -1,3 +1,10 @@
+2006-05-16  Christopher Faylor  <cgf@timesys.com>
+
+	* cygtls.cc (_cygtls::remove): Don't test for initialization since
+	this function will always be called when _my_tls is initialized.
+	* init.cc (dll_entry): Don't attempt to remove tls info if _my_tls is
+	obviously not even available.
+
 2006-05-15  Christopher Faylor  <cgf@timesys.com>
 
 	* sigproc.cc (no_signals_available): Detect hwait_sig ==
