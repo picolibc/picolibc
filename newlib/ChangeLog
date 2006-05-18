@@ -1,3 +1,8 @@
+2006-05-18  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/stdio.h: Add prototypes for fiscanf,
+	iscanf, and siscanf.
+
 2006-05-11  J"orn Rennecke <joern.rennecke@st.com>
 
 	* acinclude.m4 (_NEWLIB_VERSION): Rename to:
