@@ -1848,7 +1848,7 @@ fhandler_console::need_invisible ()
 	 station or, strangely, characters will not be displayed in any windows
 	 drawn on the current screen.  We only do this if we have changed to
 	 a new windows station and if we had an existing windows station previously.
-	 We also close the previously opened work station even though AllocConsole
+	 We also close the previously opened workstation even though AllocConsole
 	 is now "using" it.  This doesn't seem to cause any problems.
 
 	 Things to watch out for if you make changes in this code:
@@ -1872,18 +1872,18 @@ fhandler_console::need_invisible ()
 	}
       else
 	{
-	  if (myself->ctty == -1)
+	  if (myself->ctty != TTY_CONSOLE)
 	    {
 	      h = CreateWindowStation (NULL, 0, WINSTA_ACCESS, NULL);
-	      termios_printf ("CreateWindowStation(NULL, %p), %E", h);
+	      termios_printf ("%p = CreateWindowStation(NULL), %E", h);
 	      if (h)
 		{
 		  b = SetProcessWindowStation (h);
 		  termios_printf ("SetProcessWindowStation %d, %E", b);
 		}
 	    }
-	  b = AllocConsole ();	/* will cause flashing if CreateWorkstation
-				       failed */
+	  b = AllocConsole ();	/* will cause flashing if CreateWindowStation
+				   failed */
 	  debug_printf ("h %p, horig %p, flags %p", h, horig, oi.dwFlags);
 	  if (horig && h && h != horig && SetProcessWindowStation (horig))
 	    CloseWindowStation (h);
