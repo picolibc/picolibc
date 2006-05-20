@@ -576,7 +576,9 @@ fhandler_tty_slave::open (int flags, mode_t)
   set_output_handle (to_master_local);
 
   set_open_status ();
-  cygheap->manage_console_count ("fhandler_tty_slave::open", 1);
+  if (cygheap->manage_console_count ("fhandler_tty_slave::open", 1) == 1
+      && !output_done_event)
+    fhandler_console::need_invisible ();
 
   // FIXME: Do this better someday
   arch = (fhandler_tty_slave *) cmalloc (HEAP_ARCHETYPES, sizeof (*this));

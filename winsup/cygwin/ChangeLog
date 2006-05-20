@@ -1,3 +1,8 @@
+2006-05-20  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler_tty.cc (fhandler_tty_slave::open): Reinstate call to
+	need_invisible on first pty open.
+
 2006-05-18  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_console.cc (fhandler_console::need_invisible): Allocate an
