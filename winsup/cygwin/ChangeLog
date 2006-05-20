@@ -1,5 +1,9 @@
 2006-05-20  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler_tty.cc (fhandler_tty::close): Remove problematic hExeced guard.
+
+2006-05-20  Christopher Faylor  <cgf@timesys.com>
+
 	* fhandler_tty.cc (fhandler_tty_slave::open): Reinstate call to
 	need_invisible on first pty open.
 

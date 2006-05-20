@@ -598,22 +598,24 @@ out:
 int
 fhandler_tty_slave::close ()
 {
-  if (!hExeced)
+  /* This used to always call fhandler_tty_common::close when hExeced but that
+     caused multiple closes of the handles associated with this tty.  Since
+     close_all_files is not called until after the cygwin process has synced
+     or before a non-cygwin process has exited, it should be safe to just
+     close this normally.  cgf 2006-05-20 */
+  cygheap->manage_console_count ("fhandler_tty_slave::close", -1);
+
+  archetype->usecount--;
+  report_tty_counts (this, "closed", "");
+
+  if (archetype->usecount)
     {
-      cygheap->manage_console_count ("fhandler_tty_slave::close", -1);
-
-      archetype->usecount--;
-      report_tty_counts (this, "closed", "");
-
-      if (archetype->usecount)
-	{
 #ifdef DEBUGGING
-	  if (archetype->usecount < 0)
-	    system_printf ("error: usecount %d", archetype->usecount);
+      if (archetype->usecount < 0)
+	system_printf ("error: usecount %d", archetype->usecount);
 #endif
-	  termios_printf ("just returning because archetype usecount is != 0");
-	  return 0;
-	}
+      termios_printf ("just returning because archetype usecount is != 0");
+      return 0;
     }
 
   termios_printf ("closing last open %s handle", ttyname ());
