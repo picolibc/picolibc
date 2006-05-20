@@ -494,7 +494,7 @@
 	to avoid annoying pop ups.  Move deimpersonate call within new loop.
 	Move envblock freeing to end.  Loop if process dies prematurely with
 	bad exit code.
-	* syscalls.cc (init_console_handler): Remove hopefully unneeded call to
+	* syscalls.cc (setpgid): Remove hopefully unneeded call to
 	init_console_handler.
 
 2006-03-15  Christopher Faylor  <cgf@timesys.com>
