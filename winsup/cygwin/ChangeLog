@@ -1,3 +1,35 @@
+2006-05-21  Christopher Faylor  <cgf@timesys.com>
+
+	* debug.cc (add_handle): Print handle value when collision detected.
+	* dtable.cc (dtable::stdio_init): Cosmetic change.
+	* fhandler.h (fhandler_base::create_read_state): Protect handle.
+	(fhandler_pipe::create_guard): Ditto.  Always mark the handle as
+	inheritable.
+	(fhandler_pipe::is_slow): Return boolean value rather than numeric 1.
+	* pipe.cc (fhandler_pipe::fhandler_pipe): Always flag that we need fork
+	fixup.
+	(fhandler_pipe::open): Don't pass security attributes to create_guard.
+	(fhandler_pipe::set_close_on_exec): Don't handle guard here.
+	(fhandler_pipe::close): Accommodate now-protected guard handle.
+	(fhandler_pipe::fixup_in_child): Don't proected read_state here.
+	(fhandler_pipe::fixup_after_exec): Close guard handle if close_on_exec.
+	(fhandler_pipe::fixup_after_fork): Don't bother with guard here.
+	(fhandler_pipe::dup): Don't set res to non-error prematurely.  Use
+	boolean values where appropriate.  Protect guard and read_state.
+	(fhandler_pipe::create): Don't call need_fork_fixup since it is now the
+	default.  Don't protect read_state or guard.
+
+	* pipe.cc (fhandler_base::ready_for_read): Use bool values for "avail".
+
+	* spawn.cc (spawn_guts): Set cygheap->pid_handle as inheritable when
+	protecting.
+
+2006-05-15  Lev Bishop  <lev.bishop+cygwin@gmail.com>
+	    Christopher Faylor  <cgf@timesys.com>
+
+	* select.cc (fhandler_pipe::ready_for_read): Actually get the guard
+	mutex for blocking reads.
+
 2006-05-20  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_tty.cc (fhandler_tty::close): Remove problematic hExeced guard.

@@ -1,7 +1,7 @@
 /* pipe.cc: pipe for Cygwin.
 
-   Copyright 1996, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005 Red Hat, Inc.
+   Copyright 1996, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+   2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -31,9 +31,10 @@ static unsigned pipecount;
 static const NO_COPY char pipeid_fmt[] = "stupid_pipe.%u.%u";
 
 fhandler_pipe::fhandler_pipe ()
-  : fhandler_base (), guard (NULL), broken_pipe (false), writepipe_exists(0),
+  : fhandler_base (), guard (NULL), broken_pipe (false), writepipe_exists (NULL),
     orig_pid (0), id (0)
 {
+  need_fork_fixup (true);
 }
 
 extern "C" int sscanf (const char *, const char *, ...);
@@ -99,21 +100,16 @@ fhandler_pipe::open (int flags, mode_t mode)
       goto out;
     }
   if (fh->writepipe_exists
-      && !DuplicateHandle (proc, fh->writepipe_exists,
-			   hMainProc, &nwrp_hdl,
+      && !DuplicateHandle (proc, fh->writepipe_exists, hMainProc, &nwrp_hdl,
 			   0, false, DUPLICATE_SAME_ACCESS))
     {
       __seterrno ();
       goto out;
     }
   if (fh->read_state)
-    {
-      create_read_state (2);
-      need_fork_fixup (true);
-      ProtectHandle1 (read_state, read_state);
-    }
-  if (fh->get_guard ())
-    create_guard ((flags & O_NOINHERIT) ?  &sec_none_nih : &sec_none);
+    create_read_state (2);
+  if (fh->guard)
+    create_guard ();
   init (nio_hdl, fh->get_access (), mode & O_TEXT ?: O_BINARY);
   writepipe_exists = nwrp_hdl;
   if (flags & O_NOINHERIT)
@@ -146,13 +142,12 @@ void
 fhandler_pipe::set_close_on_exec (bool val)
 {
   fhandler_base::set_close_on_exec (val);
-  if (guard)
-    set_no_inheritance (guard, val);
   if (writepipe_exists)
     set_no_inheritance (writepipe_exists, val);
 }
 
-char *fhandler_pipe::get_proc_fd_name (char *buf)
+char *
+fhandler_pipe::get_proc_fd_name (char *buf)
 {
   __small_sprintf (buf, "pipe:[%d]", get_handle ());
   return buf;
@@ -192,7 +187,7 @@ int
 fhandler_pipe::close ()
 {
   if (guard)
-    CloseHandle (guard);
+    ForceCloseHandle (guard);
   if (writepipe_exists)
     CloseHandle (writepipe_exists);
 #ifndef NEWVFORK
@@ -227,25 +222,22 @@ void
 fhandler_pipe::fixup_in_child ()
 {
   if (read_state)
-    {
-      create_read_state (2);
-      ProtectHandle (read_state);
-    }
+    create_read_state (2);
 }
 
 void
 fhandler_pipe::fixup_after_exec ()
 {
   if (!close_on_exec ())
-      fixup_in_child ();
+    fixup_in_child ();
+  else if (guard)
+    ForceCloseHandle (guard);
 }
 
 void
 fhandler_pipe::fixup_after_fork (HANDLE parent)
 {
   fhandler_base::fixup_after_fork (parent);
-  if (guard)
-    fork_fixup (parent, guard, "guard");
   if (writepipe_exists)
     fork_fixup (parent, writepipe_exists, "guard");
   fixup_in_child ();
@@ -258,17 +250,15 @@ fhandler_pipe::dup (fhandler_base *child)
   fhandler_pipe *ftp = (fhandler_pipe *) child;
   ftp->guard = ftp->writepipe_exists = ftp->read_state = NULL;
 
-  if (get_handle ())
-    {
-      res = fhandler_base::dup (child);
-      if (res)
-	goto err;
-    }
+  if (get_handle () && fhandler_base::dup (child))
+    goto err;
 
   if (guard == NULL)
     ftp->guard = NULL;
-  else if (!DuplicateHandle (hMainProc, guard, hMainProc, &ftp->guard, 0, 1,
+  else if (DuplicateHandle (hMainProc, guard, hMainProc, &ftp->guard, 0, true,
 			     DUPLICATE_SAME_ACCESS))
+    ProtectHandle1 (ftp->guard, guard);
+  else
     {
       debug_printf ("couldn't duplicate guard %p, %E", guard);
       goto err;
@@ -277,7 +267,7 @@ fhandler_pipe::dup (fhandler_base *child)
   if (writepipe_exists == NULL)
     ftp->writepipe_exists = NULL;
   else if (!DuplicateHandle (hMainProc, writepipe_exists, hMainProc,
-			     &ftp->writepipe_exists, 0, 1,
+			     &ftp->writepipe_exists, 0, false,
 			     DUPLICATE_SAME_ACCESS))
     {
       debug_printf ("couldn't duplicate writepipe_exists %p, %E", writepipe_exists);
@@ -286,9 +276,11 @@ fhandler_pipe::dup (fhandler_base *child)
 
   if (read_state == NULL)
     ftp->read_state = NULL;
-  else if (!DuplicateHandle (hMainProc, read_state, hMainProc,
+  else if (DuplicateHandle (hMainProc, read_state, hMainProc,
 			     &ftp->read_state, 0, 0,
 			     DUPLICATE_SAME_ACCESS))
+    ProtectHandle1 (ftp->read_state, read_state);
+  else
     {
       debug_printf ("couldn't duplicate read_state %p, %E", read_state);
       goto err;
@@ -299,19 +291,17 @@ fhandler_pipe::dup (fhandler_base *child)
 
 err:
   if (ftp->guard)
-    CloseHandle (ftp->guard);
+    ForceCloseHandle1 (ftp->guard, guard);
   if (ftp->writepipe_exists)
     CloseHandle (ftp->writepipe_exists);
   if (ftp->read_state)
-    CloseHandle (ftp->read_state);
+    ForceCloseHandle1 (ftp->read_state, read_state);
   goto leave;
 
 out:
   ftp->id = id;
   ftp->orig_pid = orig_pid;
-  VerifyHandle (ftp->guard);
   VerifyHandle (ftp->writepipe_exists);
-  VerifyHandle (ftp->read_state);
 
 leave:
   debug_printf ("res %d", res);
@@ -447,17 +437,15 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode, bool fif
        }
 
       fhs[0]->create_read_state (2);
-      fhs[0]->need_fork_fixup (true);
-      ProtectHandle1 (fhs[0]->read_state, read_state);
 
       res = 0;
-      fhs[0]->create_guard (sa);
+      fhs[0]->create_guard ();
       if (wincap.has_unreliable_pipes ())
 	{
 	  char buf[80];
 	  int count = pipecount++;	/* FIXME: Should this be InterlockedIncrement? */
 	  __small_sprintf (buf, pipeid_fmt, myself->pid, count);
-	  fhs[1]->writepipe_exists = CreateEvent (sa, TRUE, FALSE, buf);
+	  fhs[1]->writepipe_exists = CreateEvent (&sec_none_nih, TRUE, FALSE, buf);
 	  fhs[0]->orig_pid = myself->pid;
 	  fhs[0]->id = count;
 	}

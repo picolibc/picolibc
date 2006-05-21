@@ -212,6 +212,7 @@ class fhandler_base
   void create_read_state (LONG n)
   {
     read_state = CreateSemaphore (&sec_none_nih, 0, n, NULL);
+    ProtectHandle (read_state);
   }
 
   void signal_read_state (LONG n)
@@ -512,7 +513,11 @@ public:
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   int open (int flags, mode_t mode = 0);
   int close ();
-  void create_guard (SECURITY_ATTRIBUTES *sa) {guard = CreateMutex (sa, FALSE, NULL);}
+  void create_guard ()
+    {
+      guard = CreateMutex (&sec_none, FALSE, NULL);
+      ProtectHandleINH (guard);
+    }
   int dup (fhandler_base *child);
   int ioctl (unsigned int cmd, void *);
   void fixup_in_child ();
@@ -545,7 +550,7 @@ public:
   void set_output_handle (HANDLE h) { output_handle = h; }
   void set_use ();
   int dup (fhandler_base *child);
-  bool is_slow () {return 1;}
+  bool is_slow () {return true;}
   void close_one_end ();
 };
 

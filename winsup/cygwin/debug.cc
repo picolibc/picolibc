@@ -152,7 +152,7 @@ add_handle (const char *func, int ln, HANDLE h, const char *name, bool inh)
   hl->pid = GetCurrentProcessId ();
   cygheap->debug.endh->next = hl;
   cygheap->debug.endh = hl;
-  debug_printf ("protecting handle '%s', inherited flag %d", hl->name, hl->inherited);
+  debug_printf ("protecting handle '%s'(%p), inherited flag %d", hl->name, hl->h, hl->inherited);
 }
 
 static void __stdcall

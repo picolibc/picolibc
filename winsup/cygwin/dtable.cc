@@ -154,8 +154,8 @@ dtable::stdio_init ()
     {
       /* Since this code is not invoked for forked tasks, we don't have
 	 to worry about the close-on-exec flag here.  */
-      if (!DuplicateHandle (hMainProc, out, hMainProc, &err, 0,
-			     1, DUPLICATE_SAME_ACCESS))
+      if (!DuplicateHandle (hMainProc, out, hMainProc, &err, 0, true,
+			    DUPLICATE_SAME_ACCESS))
 	{
 	  /* If that fails, do this as a fall back.  */
 	  err = out;

@@ -438,7 +438,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	/* already done previously */;
       else if (DuplicateHandle (hMainProc, hMainProc, hMainProc, &cygheap->pid_handle,
 				PROCESS_QUERY_INFORMATION, TRUE, 0))
-	ProtectHandle (cygheap->pid_handle);
+	ProtectHandleINH (cygheap->pid_handle);
       else
 	system_printf ("duplicate to pid_handle failed, %E");
       if (mode != _P_DETACH)
