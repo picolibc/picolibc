@@ -11,7 +11,7 @@
 	(fhandler_pipe::open): Don't pass security attributes to create_guard.
 	(fhandler_pipe::set_close_on_exec): Don't handle guard here.
 	(fhandler_pipe::close): Accommodate now-protected guard handle.
-	(fhandler_pipe::fixup_in_child): Don't proected read_state here.
+	(fhandler_pipe::fixup_in_child): Don't protect read_state here.
 	(fhandler_pipe::fixup_after_exec): Close guard handle if close_on_exec.
 	(fhandler_pipe::fixup_after_fork): Don't bother with guard here.
 	(fhandler_pipe::dup): Don't set res to non-error prematurely.  Use
