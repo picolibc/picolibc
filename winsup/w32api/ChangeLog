@@ -1,3 +1,7 @@
+2006-05-21  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/uuid.c (IID_IRpcProxyBuffer34): Remove definition. 
+
 2006-05-12  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/rtutils.h (TraceDumpA,TraceDumpW,TracePutsA,TracePutsW)
@@ -206,8 +210,8 @@
 
 2006-05-05  Chris Sutcliffe <ir0nh34d@users.sf.net>
 
-    * lib/directx/Makefile.in: Remove reference to libquartz.a since
-    it was moved.
+	* lib/directx/Makefile.in: Remove reference to libquartz.a since
+	it was moved.
 
 2006-05-05  Earnie Boyd  <earnie@users.sf.net>
 
