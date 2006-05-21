@@ -648,7 +648,7 @@ thread_pipe (void *arg)
 	break;
       Sleep (sleep_time >> 3);
       if (sleep_time < 80)
-        ++sleep_time;
+	++sleep_time;
     }
 out:
   return 0;
@@ -690,13 +690,27 @@ int
 fhandler_pipe::ready_for_read (int fd, DWORD howlong)
 {
   int res;
-  if (howlong)
-    res = true;
-  else
+  if (!howlong)
     res = fhandler_base::ready_for_read (fd, howlong);
-
-  if (res)
-    get_guard ();
+  else if (!get_guard ())
+    res = 1;
+  else
+    {
+      const HANDLE w4[2] = {get_guard (), signal_arrived};
+      switch (WaitForMultipleObjects (2, w4, 0, INFINITE))
+	{
+	case WAIT_OBJECT_0:
+	  res = 1;
+	  break;
+	case WAIT_OBJECT_0 + 1:
+	  set_sig_errno (EINTR);
+	  res = 0;
+	  break;
+	default:
+	  __seterrno ();
+	  res = 0;
+	}
+    }
   return res;
 }
 
@@ -1164,7 +1178,7 @@ fhandler_serial::select_except (select_record *s)
 int
 fhandler_base::ready_for_read (int fd, DWORD howlong)
 {
-  int avail = 0;
+  bool avail = false;
   select_record me (this);
   me.fd = fd;
   while (!avail)
@@ -1175,7 +1189,7 @@ fhandler_base::ready_for_read (int fd, DWORD howlong)
       if (fd >= 0 && cygheap->fdtab.not_open (fd))
 	{
 	  set_sig_errno (EBADF);
-	  avail = 0;
+	  avail = false;
 	  break;
 	}
 
@@ -1190,7 +1204,7 @@ fhandler_base::ready_for_read (int fd, DWORD howlong)
 	{
 	  debug_printf ("interrupted");
 	  set_sig_errno (EINTR);
-	  avail = 0;
+	  avail = false;
 	  break;
 	}
     }
@@ -1663,7 +1677,7 @@ thread_mailslot (void *arg)
 	break;
       Sleep (sleep_time >> 3);
       if (sleep_time < 80)
-        ++sleep_time;
+	++sleep_time;
     }
 out:
   return 0;
