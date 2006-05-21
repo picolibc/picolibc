@@ -513,11 +513,11 @@ public:
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   int open (int flags, mode_t mode = 0);
   int close ();
-  void create_guard ()
-    {
-      guard = CreateMutex (&sec_none, FALSE, NULL);
-      ProtectHandleINH (guard);
-    }
+  void create_guard (SECURITY_ATTRIBUTES *sa)
+  {
+    guard = CreateMutex (sa, FALSE, NULL);
+    ProtectHandleINH (guard);
+  }
   int dup (fhandler_base *child);
   int ioctl (unsigned int cmd, void *);
   void fixup_in_child ();

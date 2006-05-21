@@ -1,5 +1,23 @@
 2006-05-21  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandle.h (fhandler_pipe::create_guard): Revert change which
+	eliminated SECURITY_ATTRIBUTES argument.
+	* pipe.cc (fhandler_pipe::open): Duplicate guard from other process and
+	protect it appropriately.  Eliminate unneeded writepipe_exists
+	temporary variable.  Set inheritance appropriately.
+	(fhandler_pipe::set_close_on_exec): Revert change which eliminated
+	handling guard inheritance.
+	(fhandler_pipe::fixup_after_fork): Ditto.  Use correct name of entity
+	being checked by fork_fixup.
+	(fhandler_pipe::fixup_after_exec): Don't bother with guard here.
+	(fhandler_pipe::dup): Cosmetic changes and revert creation of
+	writepipe_exists as noninheritable.
+	(fhandler_pipe::create): Revert change which eliminated
+	SECURITY_ATTRIBUTES argument.  Revert change which always made
+	writepipe_exists noninheritable.
+
+2006-05-21  Christopher Faylor  <cgf@timesys.com>
+
 	* debug.cc (add_handle): Print handle value when collision detected.
 	* dtable.cc (dtable::stdio_init): Cosmetic change.
 	* fhandler.h (fhandler_base::create_read_state): Protect handle.
