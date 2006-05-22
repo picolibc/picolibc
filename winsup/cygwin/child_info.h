@@ -20,8 +20,10 @@ enum child_info_types
 
 enum child_status
 {
-  _CI_STRACED	= 0x01,
-  _CI_ISCYGWIN	= 0x02
+  _CI_STRACED	 = 0x01,
+  _CI_ISCYGWIN	 = 0x02,
+  _CI_SAW_CTRL_C = 0x04
+
 };
 
 #define OPROC_MAGIC_MASK 0xff00ff00
@@ -36,7 +38,7 @@ enum child_status
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
 /* Change this value if you get a message indicating that it is out-of-sync. */
-#define CURR_CHILD_INFO_MAGIC 0x110015eaU
+#define CURR_CHILD_INFO_MAGIC 0x704d1f7eU
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -68,6 +70,8 @@ public:
   DWORD proc_retry (HANDLE) __attribute__ ((regparm (2)));
   bool isstraced () const {return !!(flag & _CI_STRACED);}
   bool iscygwin () const {return !!(flag & _CI_ISCYGWIN);}
+  bool saw_ctrl_c () const {return !!(flag & _CI_SAW_CTRL_C);} 
+  void set_saw_ctrl_c () {flag |= _CI_SAW_CTRL_C;}
 };
 
 class mount_info;

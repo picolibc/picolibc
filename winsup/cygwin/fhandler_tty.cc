@@ -148,6 +148,13 @@ fhandler_tty_common::__release_output_mutex (const char *fn, int ln)
       ostack[osi].ln = -ln;
 #endif
     }
+#ifdef DEBUGGING
+  else if (osi > 0)
+    {
+      system_printf ("couldn't release output mutex but we seem to own it, %E");
+      try_to_debug ();
+    }
+#endif
 }
 
 /* Process tty input. */

@@ -1,5 +1,26 @@
 2006-05-21  Christopher Faylor  <cgf@timesys.com>
 
+	* child_info.h (_CI_SAW_CTRL_C): New enum.
+	(CURR_CHILD_INFO_MAGIC): Reset.
+	(saw_ctrl_c): New function.
+	(set_saw_ctrl_c): Ditto.
+	* sigproc.cc (child_info::proc_retry): Return EXITCODE_OK if we get
+	STATUS_CONTROL_C_EXIT and we actually saw a CTRL-C.
+	* spawn.cc (dwExeced): Delete.
+	(chExeced): New variable.
+	(spawn_guts): Set chExeced;
+	* exceptions.cc (dwExeced): Delete declaration.
+	(chExeced): Declare.
+	(ctrl_c_handler): Detect if we're an exec stub process and set a flag,
+	if so.
+
+	* fhandler_tty.cc (fhandler_tty_common::__release_output_mutex): Add
+	extra DEBUGGING test.
+
+	* pinfo.cc: Fix comment.
+
+2006-05-21  Christopher Faylor  <cgf@timesys.com>
+
 	* fhandle.h (fhandler_pipe::create_guard): Revert change which
 	eliminated SECURITY_ATTRIBUTES argument.
 	* pipe.cc (fhandler_pipe::open): Duplicate guard from other process and

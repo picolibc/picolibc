@@ -41,8 +41,8 @@ pinfo NO_COPY myself ((_pinfo *)&pinfo_dummy);	// Avoid myself != NULL checks
 
 bool is_toplevel_proc;
 
-/* Initialize the process table.
-   This is done once when the dll is first loaded.  */
+/* Setup the pinfo structure for this process.  There may already be a
+   _pinfo for this "pid" if h != NULL. */
 
 void __stdcall
 set_myself (HANDLE h)

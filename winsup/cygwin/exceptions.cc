@@ -31,6 +31,7 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "child_info.h"
 
 #define CALL_HANDLER_RETRY 20
 
@@ -40,7 +41,7 @@ extern "C" {
 extern void sigdelayed ();
 };
 
-extern NO_COPY DWORD dwExeced;
+extern child_info_spawn *chExeced;
 int NO_COPY sigExeced;
 
 static BOOL WINAPI ctrl_c_handler (DWORD);
@@ -944,10 +945,11 @@ ctrl_c_handler (DWORD type)
 	}
     }
 
-  /* If we are a stub and the new process has a pinfo structure, let it
-     handle this signal. */
-  if (dwExeced && pinfo (dwExeced))
-    return TRUE;
+  if (chExeced)
+    {
+      chExeced->set_saw_ctrl_c ();
+      return TRUE;
+    }
 
   /* We're only the process group leader when we have a valid pinfo structure.
      If we don't have one, then the parent "stub" will handle the signal. */

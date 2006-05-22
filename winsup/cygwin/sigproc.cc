@@ -910,6 +910,9 @@ child_info::proc_retry (HANDLE h)
       sigproc_printf ("STILL_ACTIVE?  How'd we get here?");
       break;
     case STATUS_CONTROL_C_EXIT:
+      if (saw_ctrl_c ())
+	return EXITCODE_OK;
+      /* fall through intentionally */
     case STATUS_DLL_INIT_FAILED:
     case STATUS_DLL_INIT_FAILED_LOGOFF:
     case EXITCODE_RETRY:

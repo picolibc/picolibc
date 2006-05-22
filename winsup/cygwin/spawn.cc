@@ -52,7 +52,7 @@ static suffix_info dll_suffixes[] =
 };
 
 HANDLE hExeced;
-DWORD dwExeced;
+child_info_spawn *chExeced;
 
 /* Add .exe to PROG if not already present and see if that exists.
    If not, return PROG (converted from posix to win32 rules if necessary).
@@ -583,7 +583,8 @@ loop:
   pid_t pid;
   if (mode == _P_OVERLAY)
     {
-      myself->dwProcessId = dwExeced = pi.dwProcessId;
+      chExeced = &ch;	/* FIXME: there's a race here if a user sneaks in CTRL-C */
+      myself->dwProcessId = pi.dwProcessId;
       strace.execing = 1;
       myself.hProcess = hExeced = pi.hProcess;
       strcpy (myself->progname, real_path); // FIXME: race?
