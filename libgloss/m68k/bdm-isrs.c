@@ -22,7 +22,7 @@
    interrupt occurs.  All they do is stop the debugger to give the user
    the opportunity to determine where the problem was.
   
-   User trap BDM_TRAP (15) is used for semi hosting support.
+   User trap BDM_TRAPNUM (15) is used for semi hosting support.
    If you replace this one, semihosting will cease to function. */
 
 

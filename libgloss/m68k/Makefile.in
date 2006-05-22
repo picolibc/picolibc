@@ -127,8 +127,13 @@ DBUG_OBJS=	dbug-exit.o dbug-inbyte.o dbug-outbyte.o
 # here's all the BDM semihosting stuff
 #
 BDM_BSP=	libbdm.a
-BDM_OBJS=	bdm-exit.o bdm-inbyte.o bdm-outbyte.o bdm-isv.o \
-		bdm-semihost.o $(patsubst %,bdm-%.o,${BDM_ISRS})
+BDM_OBJS=	bdm-isv.o bdm-semihost.o $(BDM_SYSOBJS) \
+		$(patsubst %,bdm-%.o,${BDM_ISRS})
+BDM_OTHER_OBJS=	getpid.o kill.o sbrk.o print.o putnum.o
+BDM_SYSOBJS= 	bdm-close.o bdm-exit.o bdm-fstat.o bdm-gdb.o \
+		bdm-gettimeofday.o bdm-inbyte.o bdm-isatty.o bdm-lseek.o \
+		bdm-open.o bdm-outbyte.o bdm-read.o bdm-rename.o \
+		bdm-stat.o bdm-system.o bdm-unlink.o bdm-write.o
 BDM_ISRS=	other_interrupt reset access_error address_error \
 	illegal_instruction divide_by_zero privilege_violation \
 	trace unimplemented_line_a_opcode unimplemented_line_f_opcode \
@@ -179,8 +184,8 @@ ${DBUG_BSP}: $(OBJS) ${DBUG_OBJS}
 	${AR} ${ARFLAGS} $@ $(OBJS) ${DBUG_OBJS}
 	${RANLIB} $@
 
-${BDM_BSP}: $(OBJS) ${BDM_OBJS}
-	${AR} ${ARFLAGS} $@ $(OBJS) ${BDM_OBJS}
+${BDM_BSP}: $(BDM_OTHER_OBJS) ${BDM_OBJS}
+	${AR} ${ARFLAGS} $@ $(BDM_OTHER_OBJS) ${BDM_OBJS}
 	${RANLIB} $@
 
 ${MVME135_BSP}: $(OBJS) ${MVME135_OBJS}
@@ -191,9 +196,10 @@ ${MVME162_BSP}: $(OBJS) ${MVME162_OBJS}
 	${AR} ${ARFLAGS} $@ $(OBJS) ${MVME162_OBJS}
 	${RANLIB} $@
 
+
+$(BDM_SYSOBJS): %.o: %.c bdm-semihost.h bdm-gdb.h
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $< -o $@ 
 bdm-isv.o : bdm-isv.c bdm-semihost.h
-bdm-exit.o : bdm-exit.c bdm-semihost.h
-bdm-outbyte.o : bdm-outbyte.c bdm-semihost.h
 bdm-semihost.o : bdm-semihost.c
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $< -o $@ -fomit-frame-pointer
 

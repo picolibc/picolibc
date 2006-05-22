@@ -23,10 +23,5 @@
 void outbyte (char c)
 {
   int code = c & 0xff;
-  
-  __asm__ __volatile__ ("move.l %0,%/" BDM_ARG_REG "\n"
-			"moveq %1,%/" BDM_FUNC_REG "\n"
-			"trap %2"
-			:: "rmi" (code), "n" (BDM_PUTCHAR), "n" (BDM_TRAP)
-			: BDM_FUNC_REG,BDM_ARG_REG,BDM_RESULT_REG,"memory");
+  BDM_TRAP (BDM_OUTBYTE, code);
 }

@@ -15,6 +15,7 @@
  */
 
 #include "bdm-semihost.h"
+#include "bdm-gdb.h"
 
 /* 
  * _exit -- Exit from the application.  
@@ -23,9 +24,7 @@
 void __attribute__ ((noreturn)) _exit (int code)
 {
   while (1)
-    __asm__ __volatile__ ("move.l %0,%/" BDM_ARG_REG "\n"
-			  "moveq %1,%/" BDM_FUNC_REG "\n"
-			  "trap %2"
-			  :: "rmi" (code), "n" (BDM_EXIT), "n" (BDM_TRAP)
-			  : BDM_FUNC_REG,BDM_ARG_REG,BDM_RESULT_REG,"memory");
+    {
+      BDM_TRAP (BDM_EXIT, code);
+    }
 }

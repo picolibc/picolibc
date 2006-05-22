@@ -18,18 +18,41 @@
    instruction.  This wakes the debugger to perform some action.  */
 
 /* This is the semihosting trap hander */
-#define BDM_TRAP 15
+#define BDM_TRAPNUM 15
 
 /* This register holds the function enumeration for a semihosting
    command.  */
 #define BDM_FUNC_REG "d0"
-/* This register holds the argument for the semihosting call.  */
+
+/* This register holds the argument for the semihosting call.  For most
+   functions, this is a pointer to a block of memory that holds the input
+   and output parameters for the remote file i/o operation.  */
 #define BDM_ARG_REG  "d1"
-/* This register holds the result of a semihosting call.  */
-#define BDM_RESULT_REG  "d0"
 
-/* Program exit.  Argument is exit code.  */
+/* Codes for BDM_FUNC_REG.  */
+
 #define BDM_EXIT  0
+#define BDM_OUTBYTE 1
+#define BDM_OPEN 2
+#define BDM_CLOSE 3
+#define BDM_READ 4
+#define BDM_WRITE 5
+#define BDM_LSEEK 6
+#define BDM_RENAME 7
+#define BDM_UNLINK 8
+#define BDM_STAT 9
+#define BDM_FSTAT 10
+#define BDM_GETTIMEOFDAY 11
+#define BDM_ISATTY 12
+#define BDM_SYSTEM 13
 
-/* Output char to console.  Argument is char to print.  */
-#define BDM_PUTCHAR  1
+
+/* Here is the macro that generates the trap. */
+
+#define BDM_TRAP(func, arg) \
+  __asm__ __volatile__ ("move.l %0,%/" BDM_ARG_REG "\n" \
+			"moveq %1,%/" BDM_FUNC_REG "\n" \
+			"trap %2" \
+			:: "rmi" (arg), "n" (func), "n" (BDM_TRAPNUM) \
+			: BDM_FUNC_REG,BDM_ARG_REG,"memory")
+

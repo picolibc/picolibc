@@ -594,6 +594,10 @@ case "${host}" in
   m68hc11-*-*|m6811-*-*|m68hc12-*-*|m6812-*-*)
 	newlib_cflags="${newlib_cflags} -DNO_EXEC -DABORT_PROVIDED -DSMALL_MEMORY -DMISSING_SYSCALL_NAMES"
 	;;
+  m68k-unknown-elf)
+	newlib_cflags="${newlib_cflags} -DHAVE_RENAME -DHAVE_SYSTEM -DMISSING_SYSCALL_NAMES"
+	syscall_dir=
+	;;
   mcore-*-*)
 	syscall_dir=syscalls
 	;;

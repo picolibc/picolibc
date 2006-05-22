@@ -18,7 +18,7 @@
    code for the interrupt vector.  All but one of the interrupts are
    user replaceable.
 
-   User trap BDM_TRAP (15) is used for semi hosting support.
+   User trap BDM_TRAPNUM (15) is used for semi hosting support.
    If you replace this one, semihosting will cease to function. */
 
 #include "bdm-semihost.h"
@@ -144,5 +144,5 @@ void  software_init_hook (void)
   __interrupt_vector[61] = &__unsupported_instruction;
 
   /* Install the special handler. */
-  __interrupt_vector[0x20 + BDM_TRAP] = &__bdm_semihosting;
+  __interrupt_vector[0x20 + BDM_TRAPNUM] = &__bdm_semihosting;
 }

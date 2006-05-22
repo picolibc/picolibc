@@ -1,3 +1,31 @@
+2006-05-22  Sandra Loosemore <sandra@codesourcery.com>
+
+	* libgloss/m68k/bdm-semihost.h: Add new constants for additional
+	semihosting functions.  Add new BDM_TRAP macro to encapsulate
+	inline asm.
+	* libgloss/m68k/bdm-exit.c (_exit): Use new BDM_TRAP macro.
+	* libgloss/m68k/bdm-outbyte.c (outbyte): Ditto.
+	* libgloss/m68k/bdm-isrs.c, libgloss/m68k/bdm-isv.c: Former BDM_TRAP
+	now called BDM_TRAPNUM.
+	* libgloss/m68k/bdm-gdb.h, libgloss/m68k/bdm-gdb.c: New files
+	containing declarations and conversion functions for GDB's fileio
+	protocol.
+	* libgloss/m68k/bdm-close.c: New file to define corresponding function.
+	* libgloss/m68k/bdm-fstat.c: Ditto.
+	* libgloss/m68k/bdm-gettimeofday.c: Ditto.
+	* libgloss/m68k/bdm-isatty.c: Ditto.
+	* libgloss/m68k/bdm-lseek.c: Ditto.
+	* libgloss/m68k/bdm-open.c: Ditto.
+	* libgloss/m68k/bdm-read.c: Ditto.
+	* libgloss/m68k/bdm-rename.c: Ditto.
+	* libgloss/m68k/bdm-stat.c: Ditto.
+	* libgloss/m68k/bdm-system.c: Ditto.
+	* libgloss/m68k/bdm-unlink.c: Ditto.
+	* libgloss/m68k/bdm-write.c Ditto.
+	* libgloss/m68k/Makefile.in: Add dependencies for new files.
+	* newlib/configure.host: Tell it we have _rename and _system when
+	building m68k-unknown-elf.
+
 2006-05-04  Paul Brook  <paul@codesourcery.com>
 
 	* libc/sys/arm/Makefile.am (lib_a_SOURCES): Add aeabi_memclr.c,
