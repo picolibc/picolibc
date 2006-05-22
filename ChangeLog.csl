@@ -1,3 +1,8 @@
+2006-05-22  Richard Sandiford  <richard@codesourcery.com>
+
+	opcodes/
+	* m68k-dis.c (m68k_scan_mask): Add missing return.
+
 2006-05-08  Richard Sandiford  <richard@codesourcery.com>
 
 	include/opcodes/
