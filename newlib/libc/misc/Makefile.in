@@ -54,13 +54,13 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am__objects_1 = lib_a-dprintf.$(OBJEXT) lib_a-unctrl.$(OBJEXT) \
+am__objects_1 = lib_a-__dprintf.$(OBJEXT) lib_a-unctrl.$(OBJEXT) \
 	lib_a-ffs.$(OBJEXT) lib_a-init.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libmisc_la_LIBADD =
-am__objects_2 = dprintf.lo unctrl.lo ffs.lo init.lo
+am__objects_2 = __dprintf.lo unctrl.lo ffs.lo init.lo
 @USE_LIBTOOL_TRUE@am_libmisc_la_OBJECTS = $(am__objects_2)
 libmisc_la_OBJECTS = $(am_libmisc_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libmisc_la_rpath =
@@ -219,7 +219,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
-LIB_SOURCES = dprintf.c unctrl.c ffs.c init.c
+LIB_SOURCES = __dprintf.c unctrl.c ffs.c init.c
 libmisc_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libmisc.la
 @USE_LIBTOOL_TRUE@libmisc_la_SOURCES = $(LIB_SOURCES)
@@ -300,11 +300,11 @@ distclean-compile:
 .c.lo:
 	$(LTCOMPILE) -c -o $@ $<
 
-lib_a-dprintf.o: dprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dprintf.o `test -f 'dprintf.c' || echo '$(srcdir)/'`dprintf.c
+lib_a-__dprintf.o: __dprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-__dprintf.o `test -f '__dprintf.c' || echo '$(srcdir)/'`__dprintf.c
 
-lib_a-dprintf.obj: dprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dprintf.obj `if test -f 'dprintf.c'; then $(CYGPATH_W) 'dprintf.c'; else $(CYGPATH_W) '$(srcdir)/dprintf.c'; fi`
+lib_a-__dprintf.obj: __dprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-__dprintf.obj `if test -f '__dprintf.c'; then $(CYGPATH_W) '__dprintf.c'; else $(CYGPATH_W) '$(srcdir)/__dprintf.c'; fi`
 
 lib_a-unctrl.o: unctrl.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-unctrl.o `test -f 'unctrl.c' || echo '$(srcdir)/'`unctrl.c

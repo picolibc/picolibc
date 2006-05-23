@@ -1,5 +1,12 @@
 2006-05-23  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/misc/dprintf.c: Removed.
+	* libc/misc/__dprintf.c: Renamed from dprintf.c.
+	* libc/misc/Makefile.am: Changed appropriately for rename.
+	* libc/misc/Makefile.in: Regenerated.
+
+2006-05-23  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/stdio.h: Protect dprintf prototype
 	with #ifndef dprintf so as to not interfere with
 	historical code defining their own dprintf macro.
