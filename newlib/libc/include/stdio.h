@@ -229,7 +229,9 @@ off_t	_EXFUN(ftello, ( FILE *));
 #ifndef _REENT_ONLY
 int	_EXFUN(asiprintf, (char **, const char *, ...));
 int	_EXFUN(asprintf, (char **, const char *, ...));
+#ifndef dprintf
 int	_EXFUN(dprintf, (int, const char *, ...));
+#endif
 int	_EXFUN(fcloseall, (_VOID));
 int	_EXFUN(fiprintf, (FILE *, const char *, ...));
 int	_EXFUN(fiscanf, (FILE *, const char *, ...));

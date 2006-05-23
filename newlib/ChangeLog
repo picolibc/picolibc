@@ -1,3 +1,9 @@
+2006-05-23  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/stdio.h: Protect dprintf prototype
+	with #ifndef dprintf so as to not interfere with
+	historical code defining their own dprintf macro.
+
 2006-05-18  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/stdio.h: Add prototypes for fiscanf,
