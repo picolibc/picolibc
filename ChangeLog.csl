@@ -1,3 +1,44 @@
+2006-05-23  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* gdb/remote.c: Include "gdb/fileio.h".
+	(PACKET_Fopen, PACKET_Fread, PACKET_Fwrite, PACKET_Fclose): New
+	enums.
+	(remote_escape_output, remote_unescape_input): New functions.
+	(remote_write_bytes): Use remote_escape_output.
+	(readchar): Do not mask off the high bit.
+	(read_frame): Print binary packets correctly.
+	(getpkt_sane): Likewise.  Return the number of bytes read
+	or -1.
+	(remote_buffer_add_string, remote_buffer_add_bytes)
+	(remote_buffer_add_int, remote_hostio_parse_result)
+	(remote_hostio_send_command, remote_hostio_open)
+	(remote_hostio_write, remote_hostio_read)
+	(remote_hostio_close, remote_fileio_errno_to_host)
+	(remote_hostio_error, fclose_cleanup, remote_download_command)
+	(remote_upload_command): New functions.
+	(_initialize_remote): Register new packets and remote-upload
+	and remote-download commands.
+
+	* gdb/doc/gdb.texinfo (File Transfer): New section.
+	(Remote Configuration): Document Host I/O packet commands.
+	(Host I/O Packets): New section.
+	(Packets): Mention overloading of F prefix.
+
+	* gdb/gdbserver/Makefile.in (OBS): Add hostio.o.
+	(hostio.o): New rule.
+	* gdb/gdbserver/hostio.c: New file.
+	* gdb/gdbserver/remote-utils.c (putpkt_binary): New function,
+	broken out from putpkt.
+	(putpkt): Use it.
+	(readchar): Do not mask the high bits.  Correct the buffer
+	type.
+	* gdb/gdbserver/server.c (main): Leave space for a trailing
+	zero in the packet buffer.  Save the length of the
+	received packet.  Handle Host I/O requests.  Optionally call
+	putpkt_binary.
+	* gdb/gdbserver/server.h (handle_f_hostio, putpkt_binary): New
+	prototypes.
+
 2006-05-10  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* gdb/frame.c (get_prev_frame): Move check for pc == 0 ...
