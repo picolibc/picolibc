@@ -1,3 +1,9 @@
+2006-05-23  Fred Fish  <fnf@specifix.com>
+
+	* mips/configure.in: Change mipsisa64-*-* to
+	mipsisa64*-*-* to catch minor variations like
+	mipsisa64sb1.
+
 2006-05-10  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* Makefile.in: Pass some additional flags in FLAGS_TO_PASS.
