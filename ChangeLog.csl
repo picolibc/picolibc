@@ -1,5 +1,11 @@
 2006-05-23  Daniel Jacobowitz  <dan@codesourcery.com>
 
+	* gdb/remote.c (remote_fileio_errno_to_host)
+	(remote_hostio_error): Rename argument to errnum.
+	(_initialize_remote): Update calls to add_packet_config_cmd.
+
+2006-05-23  Daniel Jacobowitz  <dan@codesourcery.com>
+
 	* gdb/remote.c: Include "gdb/fileio.h".
 	(PACKET_Fopen, PACKET_Fread, PACKET_Fwrite, PACKET_Fclose): New
 	enums.
