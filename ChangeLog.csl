@@ -1,3 +1,9 @@
+2006-05-24  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* gdb/remote-fileio.c (remote_fileio_reset): New.
+	* gdb/remote-fileio.h (remote_fileio_reset): Prototype.
+	* gdb/remote.c (extended_remote_restart, remote_open_1): Call it.
+
 2006-05-22  Richard Sandiford  <richard@codesourcery.com>
 
 	opcodes/
