@@ -1,3 +1,10 @@
+2006-05-24  Paul Brook  <paul@codesourcery.com>
+
+	Backport form mainline.
+	* bfd/elf32-arm.c (put_arm_insn, put_thumb_insn): New functions.
+	(elf32_thumb_to_arm_stub, elf32_arm_to_thumb_stub,
+	elf32_arm_finish_dynamic_symbol): Use them.
+
 2006-05-22  Richard Sandiford  <richard@codesourcery.com>
 
 	opcodes/
