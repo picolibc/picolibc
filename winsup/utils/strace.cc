@@ -588,9 +588,10 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
     fflush (ofile);
 }
 
-static void
+static DWORD
 proc_child (unsigned mask, FILE *ofile, pid_t pid)
 {
+  DWORD res = 0;
   DEBUG_EVENT ev;
   time_t cur_time, last_time;
 
@@ -640,6 +641,7 @@ proc_child (unsigned mask, FILE *ofile, pid_t pid)
 	  break;
 
 	case EXIT_PROCESS_DEBUG_EVENT:
+	  res = ev.u.ExitProcess.dwExitCode >> 8;
 	  remove_child (ev.dwProcessId);
 	  break;
 	case EXCEPTION_DEBUG_EVENT:
@@ -659,6 +661,8 @@ proc_child (unsigned mask, FILE *ofile, pid_t pid)
       if (!processes)
 	break;
     }
+
+  return res;
 }
 
 static void
@@ -676,16 +680,15 @@ dotoggle (pid_t pid)
   return;
 }
 
-static void
+static DWORD
 dostrace (unsigned mask, FILE *ofile, pid_t pid, char **argv)
 {
   if (!pid)
     create_child (argv);
   else
     attach_process (pid);
-  proc_child (mask, ofile, pid);
 
-  return;
+  return proc_child (mask, ofile, pid);
 }
 
 typedef struct tag_mask_mnemonic
@@ -1035,10 +1038,12 @@ character #%d.\n", optarg, (int) (endptr - optarg), endptr);
   if (!ofile)
     ofile = stdout;
 
+  DWORD res = 0;
   if (toggle)
     dotoggle (pid);
   else
-    dostrace (mask, ofile, pid, argv + optind);
+    res = dostrace (mask, ofile, pid, argv + optind);
+  return res;
 }
 
 #undef CloseHandle

@@ -1,3 +1,9 @@
+2006-05-24  Christopher Faylor  <cgf@timesys.com>
+
+	* strace.cc (proc_child): Propagate return code from child process.
+	(dostrace): Ditto.
+	(main): Ditto.
+
 2006-03-03  Christian Franke <franke@computer.org>
 
 	* regtool.cc (options): Add 'binary'.
