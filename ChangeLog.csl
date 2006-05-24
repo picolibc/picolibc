@@ -1,6 +1,28 @@
 2006-05-24  Paul Brook  <paul@codesourcery.com>
 
-	Backport form mainline.
+	Backport from mainline.
+	* bfd/elf-bfd.h (elf_backend_data): Add
+	elf_backend_output_arch_local_syms
+	* bfd/elf32-arm.c (output_arch_syminfo): Define.
+	(elf32_arm_ouput_plt_map_sym, elf32_arm_output_plt_map,
+	elf32_arm_output_arch_local_syms): New functions.
+	(elf_backend_output_arch_local_syms): Define.
+	* bfd/elflink.c (bfd_elf_final_link): Call
+	elf_backend_output_arch_local_syms.
+	* bfd/elfxx-target.h (elf_backend_output_arch_local_syms): Provide
+	default definition.
+	(elfNN_bed): Add elf_backend_output_arch_local_syms.
+	* ld/testsuite/ld-arm/arm-app-abs32.d: Update expected output.
+	* ld/testsuite/ld-arm/arm-app.d: Ditto.
+	* ld/testsuite/ld-arm/arm-lib-plt32.d: Ditto.
+	* ld/testsuite/ld-arm/arm-lib.d: Ditto.
+	* ld/testsuite/ld-arm/mixed-app-v5.d: Ditto.
+	* ld/testsuite/ld-arm/mixed-app.d: Ditto.
+	* ld/testsuite/ld-arm/mixed-lib.d: Ditto.
+
+2006-05-24  Paul Brook  <paul@codesourcery.com>
+
+	Backport from mainline.
 	* bfd/elf32-arm.c (put_arm_insn, put_thumb_insn): New functions.
 	(elf32_thumb_to_arm_stub, elf32_arm_to_thumb_stub,
 	elf32_arm_finish_dynamic_symbol): Use them.
