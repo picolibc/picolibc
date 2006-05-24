@@ -1,3 +1,8 @@
+2006-05-23  Christopher Faylor  <cgf@timesys.com>
+
+	* select.cc (start_thread_socket): Delay setting thread local exitsock
+	until we know it's correct.  Return correct value on error.
+
 2006-05-23  Lev Bishop  <lev.bishop+cygwin@gmail.com>
 	    Christopher Faylor  <cgf@timesys.com>
 

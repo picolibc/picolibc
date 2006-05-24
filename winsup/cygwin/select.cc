@@ -1405,12 +1405,12 @@ start_thread_socket (select_record *me, select_stuff *stuff)
     si->exitsock = _my_tls.locals.exitsock;
   else
     {
-      si->exitsock = _my_tls.locals.exitsock = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+      si->exitsock = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
       if (si->exitsock == INVALID_SOCKET)
 	{
 	  set_winsock_errno ();
 	  select_printf ("cannot create socket, %E");
-	  return -1;
+	  return 0;
 	}
       int sin_len = sizeof (_my_tls.locals.exitsock_sin);
       memset (&_my_tls.locals.exitsock_sin, 0, sin_len);
@@ -1432,6 +1432,7 @@ start_thread_socket (select_record *me, select_stuff *stuff)
       /* else
 	   too bad? */
       select_printf ("opened new socket %p", si->exitsock);
+      _my_tls.locals.exitsock = si->exitsock;
     }
 
   select_printf ("exitsock %p", si->exitsock);
@@ -1446,8 +1447,7 @@ start_thread_socket (select_record *me, select_stuff *stuff)
 err:
   set_winsock_errno ();
   closesocket (si->exitsock);
-  si->exitsock = INVALID_SOCKET;
-  return -1;
+  return 0;
 }
 
 void
