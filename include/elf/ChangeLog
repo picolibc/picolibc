@@ -1,3 +1,7 @@
+2006-05-24  Bjoern Haase  <bjoern.m.haase@web.de> 
+	
+	* avr.h: Add E_AVR_MACH_AVR6, R_AVR_LO8_LDI_GS and R_AVR_HI8_LDI_GS.
+
 2006-03-22  Richard Sandiford  <richard@codesourcery.com>
 	    Daniel Jacobowitz  <dan@codesourcery.com>
 	    Phil Edwards  <phil@codesourcery.com>
