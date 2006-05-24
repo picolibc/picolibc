@@ -1406,7 +1406,7 @@ start_thread_socket (select_record *me, select_stuff *stuff)
   else
     {
       si->exitsock = _my_tls.locals.exitsock = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-      if (_my_tls.locals.exitsock == INVALID_SOCKET)
+      if (si->exitsock == INVALID_SOCKET)
 	{
 	  set_winsock_errno ();
 	  select_printf ("cannot create socket, %E");
@@ -1431,7 +1431,7 @@ start_thread_socket (select_record *me, select_stuff *stuff)
 	SetHandleInformation ((HANDLE) si->exitsock, HANDLE_FLAG_INHERIT, 0);
       /* else
 	   too bad? */
-      select_printf ("opened new socket %p", _my_tls.locals.exitsock);
+      select_printf ("opened new socket %p", si->exitsock);
     }
 
   select_printf ("exitsock %p", si->exitsock);
@@ -1446,6 +1446,7 @@ start_thread_socket (select_record *me, select_stuff *stuff)
 err:
   set_winsock_errno ();
   closesocket (si->exitsock);
+  si->exitsock = INVALID_SOCKET;
   return -1;
 }
 

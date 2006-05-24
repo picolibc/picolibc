@@ -1,3 +1,9 @@
+2006-05-23  Lev Bishop  <lev.bishop+cygwin@gmail.com>
+	    Christopher Faylor  <cgf@timesys.com>
+
+        * select.cc (start_thread_socket): Clean up exitsock in case of
+        error.  Use si->exitcode consistently.
+
 2006-05-21  Christopher Faylor  <cgf@timesys.com>
 
 	* child_info.h (_CI_SAW_CTRL_C): New enum.
