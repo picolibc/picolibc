@@ -1,3 +1,12 @@
+2006-05-24  Christopher Faylor  <cgf@timesys.com>
+
+	* configure.in: Update to newer autoconf.
+	(thanks to Steve Ellcey)
+	* Makefile.in: Ditto.
+	* configure: Regenerate.
+	* acinclude.m4: New file.
+	* aclocal.m4: Ditto.
+
 2006-01-29  Christopher Faylor  <cgf@timesys.com>
 
 	* CYGWIN_LICENSE: Restrict to v2.

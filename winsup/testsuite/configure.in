@@ -9,7 +9,7 @@ dnl details.
 dnl
 dnl Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.12)
+AC_PREREQ(2.59)
 AC_INIT(Makefile.in)
 
 AC_PROG_CC

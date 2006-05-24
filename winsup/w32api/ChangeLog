@@ -1,3 +1,10 @@
+2006-05-24  Christopher Faylor  <cgf@timesys.com>
+
+	* configure.in: Update to newer autoconf.
+	(thanks to Steve Ellcey)
+	* configure: Regenerate.
+	* aclocal.m4: New file.
+
 2006-05-21  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/uuid.c (IID_IRpcProxyBuffer34): Remove definition. 

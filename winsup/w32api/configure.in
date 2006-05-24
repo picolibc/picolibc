@@ -7,7 +7,7 @@ dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
 dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 dnl GNU General Public License for more details.
 
-AC_PREREQ(2.12)
+AC_PREREQ(2.59)
 AC_INIT(lib/scrnsave.c)
 
 AC_CANONICAL_SYSTEM
