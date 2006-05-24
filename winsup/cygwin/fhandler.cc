@@ -966,8 +966,6 @@ fhandler_base::readv (const struct iovec *const iov, const int iovcnt,
       while (iovptr != iov);
     }
 
-  assert (tot >= 0);
-
   if (!len)
     return 0;
 

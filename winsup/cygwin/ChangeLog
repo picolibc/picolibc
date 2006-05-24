@@ -1,3 +1,7 @@
+2006-05-23  Lev Bishop  <lev.bishop+cygwin@gmail.com>
+
+	* fhandler.cc (readv): Remove nonsensical assert.
+
 2006-05-23  Christopher Faylor  <cgf@timesys.com>
 
 	* select.cc (start_thread_socket): Delay setting thread local exitsock
