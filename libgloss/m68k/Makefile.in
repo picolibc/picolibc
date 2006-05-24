@@ -132,7 +132,7 @@ BDM_OBJS=	bdm-isv.o bdm-semihost.o $(BDM_SYSOBJS) \
 BDM_OTHER_OBJS=	getpid.o kill.o sbrk.o print.o putnum.o
 BDM_SYSOBJS= 	bdm-close.o bdm-exit.o bdm-fstat.o bdm-gdb.o \
 		bdm-gettimeofday.o bdm-inbyte.o bdm-isatty.o bdm-lseek.o \
-		bdm-open.o bdm-outbyte.o bdm-read.o bdm-rename.o \
+		bdm-open.o bdm-read.o bdm-rename.o \
 		bdm-stat.o bdm-system.o bdm-unlink.o bdm-write.o
 BDM_ISRS=	other_interrupt reset access_error address_error \
 	illegal_instruction divide_by_zero privilege_violation \

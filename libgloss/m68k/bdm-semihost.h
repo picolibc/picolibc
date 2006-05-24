@@ -32,7 +32,7 @@
 /* Codes for BDM_FUNC_REG.  */
 
 #define BDM_EXIT  0
-#define BDM_OUTBYTE 1
+#define BDM_PUTCHAR 1 /* Obsolete */
 #define BDM_OPEN 2
 #define BDM_CLOSE 3
 #define BDM_READ 4
@@ -45,7 +45,6 @@
 #define BDM_GETTIMEOFDAY 11
 #define BDM_ISATTY 12
 #define BDM_SYSTEM 13
-
 
 /* Here is the macro that generates the trap. */
 

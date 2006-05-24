@@ -1,3 +1,9 @@
+2006-05-24  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* libgloss/m68k/Makefile.in (BDM_SYSOBJS): Remove bdm-outbyte.o
+	* libgloss/m68k/bdm-outbyte.c: Delete.
+	* libgloss/m68k/bdm-semihost.h (BDM_OUTBYTE): Mark as obsolete.
+
 2006-05-22  Sandra Loosemore <sandra@codesourcery.com>
 
 	* libgloss/m68k/bdm-semihost.h: Add new constants for additional
