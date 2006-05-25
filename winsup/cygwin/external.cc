@@ -348,6 +348,8 @@ cygwin_internal (cygwin_getinfo_types t, ...)
       case CW_SYNC_WINENV:
 	sync_winenv ();
 	return 0;
+      case CW_CYGTLS_PADSIZE:
+	return CYGTLS_PADSIZE;
       default:
 	break;
     }

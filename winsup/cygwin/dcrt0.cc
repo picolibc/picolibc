@@ -784,7 +784,7 @@ dll_crt0_0 ()
    opposed to being link-time loaded by Cygwin apps) from a non
    cygwin app via LoadLibrary.  */
 static void
-dll_crt0_1 (char *)
+dll_crt0_1 (void *, void *)
 {
   check_sanity_and_sync (user_data);
   malloc_init ();
@@ -953,37 +953,17 @@ dll_crt0_1 (char *)
     cygwin_exit (user_data->main (__argc, __argv, *user_data->envptr));
 }
 
-static void
-initialize_main_tls (char *padding)
-{
-  if (!_main_tls)
-    {
-      _main_tls = &_my_tls;
-      _main_tls->init_thread (padding, NULL);
-    }
-  return;
-}
-
-/* Wrap the real one, otherwise gdb gets confused about
-   two symbols with the same name, but different addresses.
-
-   UPTR is a pointer to global data that lives on the libc side of the
-   line [if one distinguishes the application from the dll].  */
-
 extern "C" void __stdcall
 _dll_crt0 ()
 {
   main_environ = user_data->envptr;
-
-  char padding[CYGTLS_PADSIZE];
-
   if (in_forkee)
     fork_info->alloc_stack ();
   else
     __sinit (_impure_ptr);
 
-  initialize_main_tls (padding);
-  dll_crt0_1 (padding);
+  _main_tls = &_my_tls;
+  _main_tls->call ((DWORD (*) (void *, void *)) dll_crt0_1, NULL);
 }
 
 void

@@ -64,15 +64,15 @@ void
 _cygtls::call (DWORD (*func) (void *, void *), void *arg)
 {
   char buf[CYGTLS_PADSIZE];
-  call2 (func, arg, buf);
+  _my_tls.call2 (func, arg, buf);
 }
 
 void
 _cygtls::call2 (DWORD (*func) (void *, void *), void *arg, void *buf)
 {
-  _my_tls.init_thread (buf, func);
+  init_thread (buf, func);
   DWORD res = func (arg, buf);
-  _my_tls.remove (INFINITE);
+  remove (INFINITE);
   ExitThread (res);
 }
 
@@ -248,10 +248,7 @@ _cygtls::handle_threadlist_exception (EXCEPTION_RECORD *e, exception_list *frame
   return 0;
 }
 
-/* Set up the exception handler for the current thread.  The PowerPC & Mips
-   use compiler generated tables to set up the exception handlers for each
-   region of code, and the kernel walks the call list until it finds a region
-   of code that handles exceptions.  The x86 on the other hand uses segment
+/* Set up the exception handler for the current thread.  The x86 uses segment
    register fs, offset 0 to point to the current exception handler. */
 
 extern exception_list *_except_list asm ("%fs:0");
@@ -260,9 +257,7 @@ void
 _cygtls::init_exception_handler (exception_handler *eh)
 {
   el.handler = eh;
-  el.prev = _except_list;
-  if (!el.prev->prev && !el.prev->handler)
-    el.prev = &el;
+  el.prev = &el;
   _except_list = &el;
 }
 

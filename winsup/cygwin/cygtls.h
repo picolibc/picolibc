@@ -138,6 +138,7 @@ typedef __uint32_t __stack_t;
 struct _cygtls
 {
   void (*func) /*gentls_offsets*/(int)/*gentls_offsets*/;
+  exception_list el;
   int saved_errno;
   int sa_flags;
   sigset_t oldmask;
@@ -159,7 +160,6 @@ struct _cygtls
   };
   struct _local_storage locals;
   class cygthread *_ctinfo;
-  exception_list el;
   san andreas;
   waitq wq;
   struct _cygtls *prev, *next;
@@ -176,7 +176,7 @@ struct _cygtls
   static void init ();
   void init_thread (void *, DWORD (*) (void *, void *));
   static void call (DWORD (*) (void *, void *), void *);
-  static void call2 (DWORD (*) (void *, void *), void *, void *) __attribute__ ((regparm (3)));
+  void call2 (DWORD (*) (void *, void *), void *, void *) __attribute__ ((regparm (3)));
   static struct _cygtls *find_tls (int sig);
   void remove (DWORD);
   void push (__stack_t) __attribute__ ((regparm (2)));

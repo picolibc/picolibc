@@ -1,5 +1,19 @@
 2006-05-24  Christopher Faylor  <cgf@timesys.com>
 
+	* cygtls.cc (_cygtls::call): Call call2 using _my_tls.
+	(_cygtls::init_exception_handler): Always replace existing exception
+	handler with cygwin exception handler.
+	* cygtls.h (_cygtls::call2): Remove static designation.
+	* dcrto.cc (dll_crt0_1): Define in a way that allows calling via
+	_cygtls::call.
+	(_initialize_main_tls): Delete.
+	(_dll_crt0): Call dll_crt0_1 via cygtls::call.  Set _main_tls here.
+	* external.cc (cygwin_internal): Implement CW_CYGTLS_PADSIZE.
+	* include/sys/cygwin.h (CW_CYGTLS_PADSIZE): Define.
+	* tlsoffsets.h: Regenerate.
+
+2006-05-24  Christopher Faylor  <cgf@timesys.com>
+
 	* configure.in: Update to newer autoconf.
 	(thanks to Steve Ellcey)
 	* configure: Regenerate.
