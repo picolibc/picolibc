@@ -1,3 +1,8 @@
+2006-05-25  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* gas/config/tc-m68k.c (mcf52235_ctrl, mcf5225_ctrl): New.
+	(m68k_cpus): Add 52230, 52233, 52234, 52235, 5224, 5225.
+
 2006-05-24  Paul Brook  <paul@codesourcery.com>
 
 	Backport from mainline.
