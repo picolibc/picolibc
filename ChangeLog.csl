@@ -1,3 +1,11 @@
+2006-05-25  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfd/elf.c (sym_is_global): Return a bfd_boolean.
+	(ignore_section_sym): New function.
+	(elf_map_symbols): Use ignore_section_sym to discard some syms.
+	(_bfd_elf_symbol_from_bfd_symbol): Ensure section belongs to
+	bfd before using elf_section_syms.
+
 2006-05-25  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* gas/config/tc-m68k.c (mcf52235_ctrl, mcf5225_ctrl): New.
