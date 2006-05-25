@@ -263,9 +263,12 @@
 
 2006-05-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
-	* include/mprapi.h (MPR_SERVER_HANDLE): New typedef.
-	* include/mprapi.h (MprAdmin*): Declare functions.
-	* lib/mprapi.def (MprAdmin*): Add stubs.
+	* include/mprapi.h (MPR_SERVER_HANDLE): Add typedef.
+	(MprAdminGetPDCServer): Add prototype.
+	(MprAdminSendUserMessage): Add prototype.
+	(MprAdminUserGetInfo): Add prototype.
+	(MprAdminUserSetInfo): Add prototype.
+	* lib/mprapi.def: Add stubs for above functions.
 
 2006-05-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
