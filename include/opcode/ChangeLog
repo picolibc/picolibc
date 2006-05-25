@@ -1,3 +1,7 @@
+2006-05-25  Richard Sandiford  <richard@codesourcery.com>
+
+	* m68k.h (mcf_mask): Define.
+
 2006-05-05  Thiemo Seufer  <ths@mips.com>
             David Ung  <davidu@mips.com>
 
