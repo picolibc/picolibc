@@ -146,6 +146,7 @@ BDM_ISRS=	other_interrupt reset access_error address_error \
 
 CF_SCRIPTS=   m5208evb-dbug.ld 	m5208evb-bdm.ld \
 	m5213evb-dbug.ld m5213evb-bdm.ld \
+	m52235evb-dbug.ld m52235evb-bdm.ld \
 	m5235evb-dbug.ld m5235evb-bdm.ld \
 	m5272c3-dbug.ld m5272c3-bdm.ld \
 	m5282evb-dbug.ld m5282evb-bdm.ld \
@@ -217,6 +218,12 @@ m5213evb-dbug.ld: cf.sc Makefile
 	IO=dbug RAMSTART=512M RAMSIZE=32K RAMDBUG=8K ${SHELL} $< > $@
 
 m5213evb-bdm.ld: cf.sc Makefile
+	IO=bdm ISV=1 RAMSTART=512M RAMSIZE=32K ${SHELL} $< > $@
+
+m52235evb-dbug.ld: cf.sc Makefile
+	IO=dbug RAMSTART=512M RAMSIZE=32K RAMDBUG=8K ${SHELL} $< > $@
+
+m52235evb-bdm.ld: cf.sc Makefile
 	IO=bdm ISV=1 RAMSTART=512M RAMSIZE=32K ${SHELL} $< > $@
 
 m5235evb-dbug.ld: cf.sc Makefile
