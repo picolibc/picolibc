@@ -51,7 +51,7 @@ DEVO_SUPPORT= README Makefile.in configure configure.in \
 	COPYING COPYING.LIB install-sh config-ml.in symlink-tree \
 	mkinstalldirs ltconfig ltmain.sh missing ylwrap \
 	libtool.m4 gettext.m4 ltcf-c.sh ltcf-cxx.sh ltcf-gcj.sh \
-	Makefile.def Makefile.tpl src-release
+	Makefile.def Makefile.tpl src-release config.rpath
 
 # Files in devo/etc used in any net release.
 # ChangeLog omitted because it may refer to files which are not in this

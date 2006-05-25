@@ -1,3 +1,7 @@
+2006-05-25  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* src-release (DEVO_SUPPORT): Add config.rpath.
+
 2006-05-25  Paolo Bonzini  <bonzini@gnu.org>
 
 	* Makefile.def (bfd, opcodes): Fix lib_path.
