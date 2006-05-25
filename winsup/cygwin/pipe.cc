@@ -155,7 +155,10 @@ fhandler_pipe::set_close_on_exec (bool val)
 {
   fhandler_base::set_close_on_exec (val);
   if (guard)
-    set_no_inheritance (guard, val);
+    {
+      set_no_inheritance (guard, val);
+      ModifyHandle (guard, !val);
+    }
   if (writepipe_exists)
     set_no_inheritance (writepipe_exists, val);
 }
@@ -250,8 +253,8 @@ void
 fhandler_pipe::fixup_after_fork (HANDLE parent)
 {
   fhandler_base::fixup_after_fork (parent);
-  if (guard)
-    fork_fixup (parent, guard, "guard");
+  if (guard && fork_fixup (parent, guard, "guard"))
+    ProtectHandle (guard);
   if (writepipe_exists)
     fork_fixup (parent, writepipe_exists, "writepipe_exists");
   fixup_in_child ();

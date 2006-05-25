@@ -114,6 +114,20 @@ newh ()
   return NULL;
 }
 
+void __stdcall
+modify_handle (const char *func, int ln, HANDLE h, const char *name, bool inh)
+{
+  handle_list *hl = find_handle (h);
+  if (!hl)
+    {
+      system_printf ("%s:%d handle %s<%p> not found", func, ln, name, h);
+      return;
+    }
+  hl->next->inherited = inh;
+  debug_printf ("%s:%d set handle %s<%p> inheritance flag to %d", func, ln,
+		name, h, inh);
+}
+
 /* Add a handle to the linked list of known handles. */
 void __stdcall
 add_handle (const char *func, int ln, HANDLE h, const char *name, bool inh)

@@ -1,3 +1,17 @@
+2006-05-25  Christopher Faylor  <cgf@timesys.com>
+
+	* debug.h (ModifyHandle): Define new macro.
+	(modify_handle): Declare new function.
+	* debug.cc (modify_handle): Define new function.
+	* fhandler.h (fhandler_base::fork_fixup): Change return value from void
+	to bool.
+	* fhandler.cc (fhandler_base::fork_fixup): Return true if fork fixup has
+	been done.
+	* pipe.cc (fhandler_pipe::set_close_on_exec): Set inheritance of
+	protected handle via ModifyHandle if DEBUGGING.
+	(fhandler_pipe::fixup_after_fork): Protect guard handle if fork fixup
+	has been done.
+
 2006-05-24  Christopher Faylor  <cgf@timesys.com>
 
 	* cygtls.cc (_cygtls::call): Call call2 using _my_tls.

@@ -28,6 +28,7 @@ details. */
 # define ForceCloseHandle CloseHandle
 # define ForceCloseHandle1(h, n) CloseHandle (h)
 # define ForceCloseHandle2(h, n) CloseHandle (h)
+# define ModifyHandle(h, n) do {} while (0)
 # define ProtectHandle(h) do {} while (0)
 # define ProtectHandle1(h,n) do {} while (0)
 # define ProtectHandle2(h,n) do {} while (0)
@@ -55,6 +56,8 @@ details. */
 	close_handle (__PRETTY_FUNCTION__, __LINE__, (h), n, TRUE)
 # endif
 
+# define ModifyHandle(h, n) modify_handle (__PRETTY_FUNCTION__, __LINE__, (h), #h, n)
+
 # define ProtectHandle(h) add_handle (__PRETTY_FUNCTION__, __LINE__, (h), #h)
 # define ProtectHandle1(h, n) add_handle (__PRETTY_FUNCTION__, __LINE__, (h), #n)
 # define ProtectHandle2(h, n) add_handle (__PRETTY_FUNCTION__, __LINE__, (h), n)
@@ -70,8 +73,10 @@ void __stdcall verify_handle (const char *, int, HANDLE)
   __attribute__ ((regparm (3)));
 bool __stdcall close_handle (const char *, int, HANDLE, const char *, bool)
   __attribute__ ((regparm (3)));
-void __stdcall cygbench (const char *s) __attribute__ ((regparm (1)));
 extern "C" void console_printf (const char *fmt,...);
+void __stdcall cygbench (const char *s) __attribute__ ((regparm (1)));
+void __stdcall modify_handle (const char *, int, HANDLE, const char *, bool)
+  __attribute__ ((regparm (3)));
 void setclexec (HANDLE, HANDLE, bool);
 void debug_fixup_after_fork_exec ();
 extern int pinger;

@@ -252,7 +252,7 @@ class fhandler_base
   virtual void set_no_inheritance (HANDLE &h, int not_inheriting);
 
   /* fixup fd possibly non-inherited handles after fork */
-  void fork_fixup (HANDLE parent, HANDLE &h, const char *name);
+  bool fork_fixup (HANDLE parent, HANDLE &h, const char *name);
   virtual bool need_fixup_before () const {return false;}
 
   int open_9x (int flags, mode_t mode = 0);
