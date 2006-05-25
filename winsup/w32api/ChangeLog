@@ -291,17 +291,72 @@
 
 2006-05-02  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
-	* include/mprapi.h (MprAdminConnection*,MprAdminPort*): Add declaration.
+	* include/mprapi.h (RAS_SERVER_HANDLE): Add typedef.
+	(MprAdminConnectionClearStats): Add prototype.
+	(MprAdminConnectionEnum): Add  prototype.
+	(MprAdminConnectionGetInfo): Add prototype.
+	(MprAdminConnectionRemoveQuarantine): Add prototype.
+	(MprAdminPortClearStats): Add prototype.
+	(MprAdminPortDisconnect): Add prototype.
+	(MprAdminPortEnum): Add prototype.
+	(MprAdminPortGetInfo): Add prototype.
+	(MprAdminPortReset): Add prototype.
 	* lib/mprapi.def: New file.
 
 2006-05-02  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
-	* include/mprapi.h (PPP_*INFO*, RAS_CONNECTION_*, RAS_PORT_*,
-	RAS_USER_*): New structures.
-	* include/mprapi.h (RAS_FLAGS_*,PPP_LCP_*,RASCCPCA_* ,PPP_CCP_*,MAX_*,
-	RASPRIV_*,*ADDRESSLEN,MPR_ENABLE_*): Define.
-	* include/mprapi.h (RAS_*_CONDITION): Add enums.
-	* include/mprapi.h: <lmcons.h> for NETBIOS_NAME_LEN, UNLEN, DLEN.
+	*  include/mprapi.h: #include <lmcons.h>
+	(MAX_DEVICETYPE_NAME): Add define.
+	(MAX_PHONE_NUMBER_LEN): Add define.
+	(ATADDRESSLEN): Add define.
+	(IPADDRESSLEN): Add define.
+	(IPXADDRESSLEN): Add define.
+	(MPR_ENABLE_RAS_ON_DEVICE): Add define.
+	(MPR_ENABLE_ROUTING_ON_DEVICE): Add define.
+	(RAS_FLAGS_PPP_CONNECTION): Add define.
+	(RAS_FLAGS_MESSENGER_PRESENT): Add define.
+	(RAS_FLAGS_RAS_CONNECTION): Add define.
+	(RAS_FLAGS_QUARANTINE_PRESENT): Add define.
+	(RASCCPCA_STAC): Add define.
+	(RASCCPCA_MPPC): Add define.
+	(PPP_CCP_COMPRESSION): Add define.
+	(PPP_CCP_ENCRYPTION40BITOLD): Add define.
+	(PPP_CCP_ENCRYPTION40BIT): Add define.
+	(PPP_CCP_ENCRYPTION128BIT): Add define.
+	(PPP_CCP_ENCRYPTION56BIT): Add define.
+	(PPP_CCP_HISTORYLESS): Add define.
+	(RASPRIV_NoCallback): Add define.
+	(RASPRIV_AdminSetCallback): Add define.
+	(RASPRIV_CallerSetCallback): Add define.
+	(RASPRIV_DialinPrivilege): Add define.
+	(RASPRIV_CallbackType): Add define.
+	(RASPRIV2_DialinPolicy): Add define.
+	(PPP_LCP_PAP): Add define.
+	(PPP_LCP_SPAP): Add define.
+	(PPP_LCP_CHAP): Add define.
+	(PPP_LCP_EAP): Add define.
+	(PPP_LCP_CHAP_MD5): Add define.
+	(PPP_LCP_CHAP_MS): Add define.
+	(PPP_LCP_CHAP_MSV2): Add define.
+	(PPP_LCP_MULTILINK_FRAMING): Add define.
+ 	(enum _RAS_HARDWARE_CONDITION): Add.
+	(enum _RAS_PORT_CONDITION): Add.
+	(struct _PPP_ATCP_INFO): Add.
+	(struct _PPP_ATCP_INFO): Add.
+	(struct _PPP_IPCP_INFO): Add.
+	(struct _PPP_IPCP_INFO2): Add.
+	(struct _PPP_IPXCP_INFO): Add.
+	(struct _PPP_LCP_INFO): Add.
+	(struct _PPP_NBFCP_INFO): Add.
+	(struct _PPP_INFO): Add.
+	(struct _PPP_INFO_2): Add.
+	(struct _RAS_CONNECTION_0): Add.
+	(struct RAS_CONNECTION_1): Add.
+	(struct _RAS_CONNECTION_2): Add.
+	(struct RAS_PORT_0): Add.
+	(struct _RAS_PORT_1): Add.
+	(struct _RAS_USER_0): Add.
+	(struct _RAS_USER_1): Add.
 
 2006-05-02  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
