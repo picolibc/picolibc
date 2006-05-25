@@ -1,3 +1,10 @@
+2006-05-25  Paolo Bonzini  <bonzini@gnu.org>
+
+	* Makefile.def (bfd, opcodes): Fix lib_path.
+	* Makefile.tpl (POSTSTAGE1_FLAGS_TO_PASS): Replace ADAC with ADAFLAGS.
+	(restrap): Move under "@if gcc-bootstrap".  Fix typo.
+	* Makefile.in: Regenerate.
+
 2006-05-24  Mark Shinwell  <shinwell@codesourcery.com>
 
 	* configure.in: Enable gprof for cross builds.
