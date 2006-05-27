@@ -1,5 +1,11 @@
 2006-05-27  Christopher Faylor  <cgf@timesys.com>
 
+	* dll_init.cc (dll_dllcrt0): Previous change didn't work very well with
+	fork.  Semi-revert it but change name of variable to something that
+	makes better sense.
+
+2006-05-27  Christopher Faylor  <cgf@timesys.com>
+
 	* thread.cc (verifyable_object_isvalid): Check for NULL specifically.
 
 2006-05-27  Christopher Faylor  <cgf@timesys.com>

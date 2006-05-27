@@ -365,6 +365,8 @@ dll_dllcrt0 (HMODULE h, per_process *p)
   else
     *(p->impure_ptr_ptr) = __cygwin_user_data.impure_ptr;
 
+  bool linking = !in_forkee && !cygwin_finished_initializing;
+
   /* Partially initialize Cygwin guts for non-cygwin apps. */
   if (dynamically_loaded && user_data->magic_biscuit == 0)
     dll_crt0 (p);
@@ -377,7 +379,7 @@ dll_dllcrt0 (HMODULE h, per_process *p)
      initializing, then the DLL must be a cygwin-aware DLL
      that was explicitly linked into the program rather than
      a dlopened DLL. */
-  if (cygwin_finished_initializing)
+  if (linking)
     type = DLL_LINK;
   else
     {
@@ -393,7 +395,7 @@ dll_dllcrt0 (HMODULE h, per_process *p)
      initialize the DLL.  If we haven't finished initializing,
      it may not be safe to call the dll's "main" since not
      all of cygwin's internal structures may have been set up. */
-  if (!d || (cygwin_finished_initializing && !d->init ()))
+  if (!d || (!linking && !d->init ()))
     return -1;
 
   return (DWORD) d;
