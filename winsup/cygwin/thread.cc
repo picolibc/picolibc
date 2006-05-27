@@ -113,14 +113,16 @@ __cygwin_lock_unlock (_LOCK_T *lock)
 }
 
 static inline verifyable_object_state
-verifyable_object_isvalid (void const * objectptr, long magic, void *static_ptr1,
+verifyable_object_isvalid (void const *objectptr, long magic, void *static_ptr1,
 			   void *static_ptr2, void *static_ptr3)
 {
-  verifyable_object **object = (verifyable_object **) objectptr;
-
   myfault efault;
-  if (efault.faulted ())
+  /* Check for NULL pointer specifically since it is a cheap test and avoids the
+     overhead of setting up the fault handler.  */
+  if (!objectptr || efault.faulted ())
     return INVALID_OBJECT;
+
+  verifyable_object **object = (verifyable_object **) objectptr;
 
   if ((static_ptr1 && *object == static_ptr1) ||
       (static_ptr2 && *object == static_ptr2) ||
