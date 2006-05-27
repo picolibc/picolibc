@@ -1,3 +1,7 @@
+2006-05-27  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* internal.h (struct elf_segment_map): Add p_align and p_align_valid.
+
 2006-05-24  Carlos O'Donell  <carlos@systemhalted.org>
 	    Randolph Chung  <randolph@tausq.org>
 	* hppa.h (R_PARISC_TLS_GD21L, R_PARISC_TLS_GD14R, R_PARISC_TLS_GDCALL,
