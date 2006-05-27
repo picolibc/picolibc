@@ -351,11 +351,13 @@ dll_list::load_after_fork (HANDLE parent, dll *first)
 extern "C" int
 dll_dllcrt0 (HMODULE h, per_process *p)
 {
+  if (cygwin_finished_initializing)
+    _my_tls.init_exception_handler (_cygtls::handle_exceptions);
+
   if (p == NULL)
     p = &__cygwin_user_data;
   else
     *(p->impure_ptr_ptr) = __cygwin_user_data.impure_ptr;
-  bool initializing = in_forkee || cygwin_finished_initializing;
 
   /* Partially initialize Cygwin guts for non-cygwin apps. */
   if (dynamically_loaded && user_data->magic_biscuit == 0)
@@ -369,7 +371,7 @@ dll_dllcrt0 (HMODULE h, per_process *p)
      initializing, then the DLL must be a cygwin-aware DLL
      that was explicitly linked into the program rather than
      a dlopened DLL. */
-  if (!initializing)
+  if (cygwin_finished_initializing)
     type = DLL_LINK;
   else
     {
@@ -385,7 +387,7 @@ dll_dllcrt0 (HMODULE h, per_process *p)
      initialize the DLL.  If we haven't finished initializing,
      it may not be safe to call the dll's "main" since not
      all of cygwin's internal structures may have been set up. */
-  if (!d || (initializing && !d->init ()))
+  if (!d || (cygwin_finished_initializing && !d->init ()))
     return -1;
 
   return (DWORD) d;

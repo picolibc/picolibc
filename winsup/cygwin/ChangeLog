@@ -1,3 +1,10 @@
+2006-05-27  Christopher Faylor  <cgf@timesys.com>
+
+	* dll_init.cc (dll_dllcrt0): Call _my_tls.init_exception_handler if
+	we've finished initializing (Thanks to Gary Zablackis for noticing this
+	problem).  Just use cygwin_finished_initializing rather than defining a
+	separate variable.
+
 2006-05-25  Christopher Faylor  <cgf@timesys.com>
 
 	* debug.h (ModifyHandle): Define new macro.
