@@ -351,6 +351,12 @@ dll_list::load_after_fork (HANDLE parent, dll *first)
 extern "C" int
 dll_dllcrt0 (HMODULE h, per_process *p)
 {
+  /* Windows apparently installs a bunch of exception handlers prior to
+     this function getting called and one of them may trip before cygwin
+     gets to it.  So, install our own exception handler only.
+     FIXME: It is possible that we may have to save state of the
+     previous exception handler chain and restore it, if problems
+     are noted. */
   if (cygwin_finished_initializing)
     _my_tls.init_exception_handler (_cygtls::handle_exceptions);
 
