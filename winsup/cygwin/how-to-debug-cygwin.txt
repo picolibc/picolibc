@@ -118,7 +118,7 @@ set CYGWIN_DEBUG=cat.exe:gdb.exe
     (gdb) l dll_crt0_1
     (gdb) b <<first line in the function>>
     (gdb) run
-    (gdb) set strace.active=1
+    (gdb) set strace._active=1
     (gdb) continue
 
    The program will then run in "strace mode", calling each strace *_printf,
