@@ -320,8 +320,8 @@ int tcsendbreak (int, int);
 int tcdrain (int);
 int tcflush (int, int);
 int tcflow (int, int);
-int cfsetispeed (struct termios *, speed_t); 
-int cfsetospeed (struct termios *, speed_t); 
+int cfsetispeed (struct termios *, speed_t);
+int cfsetospeed (struct termios *, speed_t);
 
 #ifdef __cplusplus
 }

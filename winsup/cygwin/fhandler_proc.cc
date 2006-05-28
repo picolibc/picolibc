@@ -991,7 +991,7 @@ format_proc_partitions (char *destbuf, size_t maxsize)
 	  || !isdigit (devname[8]))
 	continue;
       /* Construct path name for partition 0, which is the whole disk,
-         and try to open. */
+	 and try to open. */
       wcscpy (wpath, dbi->ObjectName.Buffer);
       wcscpy (wpath + dbi->ObjectName.Length / 2, L"\\Partition0");
       upath.Length = 22 + dbi->ObjectName.Length;

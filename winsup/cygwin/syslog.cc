@@ -256,7 +256,7 @@ try_connect_syslogd (int priority, const char *msg, int len)
 
       ret = writev (syslogd_sock, iv, 2);
       /* If the syslog daemon has been restarted and /dev/log was
-         a stream socket, the connection is broken.  In this case,
+	 a stream socket, the connection is broken.  In this case,
 	 try to reopen the socket and try again. */
       if (ret < 0 && syslogd_inited == inited_stream)
 	{

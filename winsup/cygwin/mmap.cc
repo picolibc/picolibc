@@ -1110,7 +1110,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 	 It neither allows to create reserved pages in the shared memory
 	 area, nor does it allow to create page aligend mappings (in
 	 contrast to granularity aligned mappings).
-	 
+
 	 Note that this isn't done in WOW64 environments since apparently
 	 WOW64 does not support the AT_ROUND_TO_PAGE flag which is required
 	 to get this right.  Too bad. */

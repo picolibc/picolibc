@@ -918,7 +918,7 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext)
       HANDLE hm = CreateFileMapping (h, &sec_none_nih, PAGE_READONLY, 0, 0, NULL);
       CloseHandle (h);
       if (!hm)
-        {
+	{
 	  /* ERROR_FILE_INVALID indicates very likely an empty file. */
 	  if (GetLastError () == ERROR_FILE_INVALID)
 	    {

@@ -72,7 +72,7 @@ public:
   __ino64_t check_mount (const char *name, __ino64_t ino, bool eval = true)
     {
       if (parent_dir_len == 1)	/* root dir */
-        {
+	{
 	  if (strcasematch (name, "proc"))
 	    {
 	      found[__DIR_PROC] = true;
@@ -97,14 +97,14 @@ public:
   __ino64_t check_missing_mount (char *ret_name, bool eval = true)
     {
       for (int i = 0; i < count; ++i)
-        if (!found[i])
+	if (!found[i])
 	  {
 	    found[i] = true;
 	    strcpy (ret_name, mounts[i]);
 	    return eval ? eval_ino (i) : 1;
 	  }
       if (parent_dir_len == 1)  /* root dir */
-        {
+	{
 	  if (!found[__DIR_PROC])
 	    {
 	      found[__DIR_PROC] = true;
@@ -115,7 +115,7 @@ public:
 	    {
 	      found[__DIR_CYGDRIVE] = true;
 	      if (mount_table->cygdrive_len > 1)
-	        {
+		{
 		  strncpy (ret_name, mount_table->cygdrive + 1,
 			   mount_table->cygdrive_len - 2);
 		  ret_name[mount_table->cygdrive_len - 2] = '\0';
@@ -202,7 +202,7 @@ path_conv::isgood_inode (__ino64_t ino) const
   /* We can't trust remote inode numbers of only 32 bit.  That means,
      all remote inode numbers when running under NT4, as well as remote NT4
      NTFS, as well as shares of Samba version < 3.0.
-     The known exception are SFU NFS shares, which return the valid 32 bit 
+     The known exception are SFU NFS shares, which return the valid 32 bit
      inode number from the remote file system unchanged. */
   return hasgood_inode () && (ino > UINT32_MAX || !isremote () || fs_is_nfs ());
 }
@@ -222,7 +222,7 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
       const DWORD fai_size = 2 * CYG_MAX_PATH + sizeof (FILE_ALL_INFORMATION);
 
       PFILE_FS_VOLUME_INFORMATION pfvi = (PFILE_FS_VOLUME_INFORMATION)
-      					 alloca (fvi_size);
+					 alloca (fvi_size);
       PFILE_ALL_INFORMATION pfai = (PFILE_ALL_INFORMATION) alloca (fai_size);
 
       status = NtQueryVolumeInformationFile (get_handle (), &io, pfvi, fvi_size,
@@ -849,17 +849,17 @@ fhandler_disk_file::link (const char *newpath)
 	  newpc.check (newpath, PC_SYM_NOFOLLOW);
 	}
       else if (transparent_exe
-               && !pc.isdir ()
-               && GetBinaryType (pc, &bintype)
-               && (len = strlen (newpc)) > 4
-               && !strcasematch ((const char *) newpc + len - 4, ".exe"))
-        {
-          /* Executable hack. */
-          strcpy (new_buf, newpath);
-          strcat (new_buf, ".exe");
-          newpath = new_buf;
-          newpc.check (newpath, PC_SYM_NOFOLLOW);
-        }
+	       && !pc.isdir ()
+	       && GetBinaryType (pc, &bintype)
+	       && (len = strlen (newpc)) > 4
+	       && !strcasematch ((const char *) newpc + len - 4, ".exe"))
+	{
+	  /* Executable hack. */
+	  strcpy (new_buf, newpath);
+	  strcat (new_buf, ".exe");
+	  newpath = new_buf;
+	  newpc.check (newpath, PC_SYM_NOFOLLOW);
+	}
     }
 
   query_open (query_write_attributes);
@@ -1474,7 +1474,7 @@ fhandler_disk_file::opendir ()
   else if ((dir = (DIR *) malloc (sizeof (DIR))) == NULL)
     set_errno (ENOMEM);
   else if ((dir->__d_dirname = (char *) malloc (wincap.is_winnt ()
-  						? sizeof (struct __DIR_cache)
+						? sizeof (struct __DIR_cache)
 						: len + 3)) == NULL)
     {
       set_errno (ENOMEM);
@@ -1505,7 +1505,7 @@ fhandler_disk_file::opendir ()
 	 teeny little bit faster. */
       len = strlen (d_dirname (dir));
       if (len && !isdirsep (d_dirname (dir)[len - 1]))
-        strcpy (d_dirname (dir) + len, "\\");
+	strcpy (d_dirname (dir) + len, "\\");
       dir->__d_cookie = __DIRENT_COOKIE;
       dir->__handle = INVALID_HANDLE_VALUE;
       dir->__d_position = 0;
@@ -1538,7 +1538,7 @@ fhandler_disk_file::opendir ()
 		}
 
 	      /* FileIdBothDirectoryInformation is apparently unsupported on
-	         XP when accessing directories on UDF.  When trying to use it
+		 XP when accessing directories on UDF.  When trying to use it
 		 so, NtQueryDirectoryFile returns with STATUS_ACCESS_VIOLATION.
 		 It's not clear if the call isn't also unsupported on other
 		 OS/FS combinations (say, Win2K/CDFS or so).  Instead of
@@ -1602,7 +1602,7 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
     {
       bool added = false;
       if ((de->d_ino = d_mounts (dir)->check_missing_mount (fname)))
-        added = true;
+	added = true;
       if (!added)
 	return geterrno_from_win_error (w32_err);
 
@@ -1729,7 +1729,7 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
     {
       buf = (PFILE_ID_BOTH_DIR_INFORMATION) (d_cache (dir) + d_cachepos (dir));
       if (buf->NextEntryOffset == 0)
-        d_cachepos (dir) = 0;
+	d_cachepos (dir) = 0;
       else
 	d_cachepos (dir) += buf->NextEntryOffset;
       if ((dir->__flags & dirent_get_d_ino))
@@ -1737,9 +1737,9 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 	  FileName = buf->FileName;
 	  if ((dir->__flags & dirent_set_d_ino))
 	    de->d_ino = buf->FileId.QuadPart;
-        }
+	}
       else
-        FileName = ((PFILE_BOTH_DIR_INFORMATION) buf)->FileName;
+	FileName = ((PFILE_BOTH_DIR_INFORMATION) buf)->FileName;
       sys_wcstombs (fname, CYG_MAX_PATH - 1, FileName, buf->FileNameLength / 2);
 
       de->d_ino = d_mounts (dir)->check_mount (fname, de->d_ino);
@@ -1975,7 +1975,7 @@ fhandler_cygdrive::readdir (DIR *dir, dirent *de)
   while (true)
     {
       if (!pdrive || !*pdrive)
-        {
+	{
 	  if (!(dir->__flags & dirent_saw_dot))
 	    {
 	      de->d_name[0] = '.';
@@ -1983,9 +1983,9 @@ fhandler_cygdrive::readdir (DIR *dir, dirent *de)
 	      de->d_ino = 2;
 	    }
 	  return ENMFILE;
-        }
+	}
       if (GetFileAttributes (pdrive) != INVALID_FILE_ATTRIBUTES)
-        break;
+	break;
       pdrive = strchr (pdrive, '\0') + 1;
     }
   *de->d_name = cyg_tolower (*pdrive);

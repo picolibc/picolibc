@@ -671,7 +671,7 @@ convert_ws1_ip_optname (int optname)
     IP_DONTFRAGMENT
   };
   return (optname < 1 || optname > _WS1_IP_DONTFRAGMENT)
-  	 ? optname
+	 ? optname
 	 : ws2_optname[optname];
 }
 
@@ -699,9 +699,9 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 	syscall_printf ("setsockopt optval=%x", *(long *) optval);
 
       if (res)
-        {
+	{
 	  /* KB 248611:
-	  
+
 	     Windows 2000 and above don't support setting the IP_TOS field
 	     with setsockopt.  Additionally, TOS was always (also under 9x
 	     and NT) only implemented for UDP and ICMP, never for TCP.
@@ -732,7 +732,7 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 	    set_winsock_errno ();
 	}
       else if (level == SOL_SOCKET && optname == SO_REUSEADDR)
-        fh->saw_reuseaddr (*(int *) optval);
+	fh->saw_reuseaddr (*(int *) optval);
     }
 
   syscall_printf ("%d = setsockopt (%d, %d, %x, %p, %d)",
@@ -1849,8 +1849,8 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
    a problem in Winsock.  The bind(2) call does not fail if a local
    address is still in TIME_WAIT state, and there's no way to get this
    behaviour.  Unfortunately the first time when this is detected is when
-   the calling application tries to connect. 
-   
+   the calling application tries to connect.
+
    One (also not really foolproof) way around this problem would be to use
    the iphlpapi function GetTcpTable and to check if the port in question is
    in TIME_WAIT state and if so, choose another port number.  But this method
@@ -1912,7 +1912,7 @@ cygwin_rresvport (int *port)
 	  res = (int) INVALID_SOCKET;
 	}
       else if (port)
-        *port = myport;
+	*port = myport;
     }
 
   if (res != (int) INVALID_SOCKET)

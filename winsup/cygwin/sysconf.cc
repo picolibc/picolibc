@@ -127,19 +127,19 @@ sysconf (int in)
       case _SC_MEMLOCK_RANGE:
 	return _POSIX_MEMLOCK_RANGE;
       case _SC_SEMAPHORES:
-        return _POSIX_SEMAPHORES;
+	return _POSIX_SEMAPHORES;
       case _SC_THREADS:
-        return _POSIX_THREADS;
+	return _POSIX_THREADS;
       case _SC_THREAD_ATTR_STACKSIZE:
-        return _POSIX_THREAD_ATTR_STACKSIZE;
+	return _POSIX_THREAD_ATTR_STACKSIZE;
       case _SC_THREAD_PRIORITY_SCHEDULING:
-        return _POSIX_THREAD_PRIORITY_SCHEDULING;
+	return _POSIX_THREAD_PRIORITY_SCHEDULING;
       case _SC_THREAD_PROCESS_SHARED:
-        return _POSIX_THREAD_PROCESS_SHARED;
+	return _POSIX_THREAD_PROCESS_SHARED;
       case _SC_THREAD_SAFE_FUNCTIONS:
-        return _POSIX_THREAD_SAFE_FUNCTIONS;
+	return _POSIX_THREAD_SAFE_FUNCTIONS;
       case _SC_TIMERS:
-        return _POSIX_TIMERS;
+	return _POSIX_TIMERS;
     }
 
   /* Invalid input or unimplemented sysconf name */

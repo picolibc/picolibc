@@ -486,7 +486,7 @@ child_info_fork::alloc_stack_hard_way (volatile char *b)
     api_fatal ("fork: can't reserve memory for stack %p - %p, %E",
 		stacktop, stackbottom);
 
-  new_stack_pointer = (void *) ((LPBYTE) stackbottom - stacksize); 
+  new_stack_pointer = (void *) ((LPBYTE) stackbottom - stacksize);
   if (!VirtualAlloc (new_stack_pointer, stacksize, MEM_COMMIT,
 		     PAGE_EXECUTE_READWRITE))
     api_fatal ("fork: can't commit memory for stack %p(%d), %E",

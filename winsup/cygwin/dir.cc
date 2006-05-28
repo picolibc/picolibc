@@ -119,13 +119,13 @@ readdir_worker (DIR *dir, dirent *de)
 	  else if (de->d_name[1] == '.' && de->d_name[2] == '\0')
 	    is_dot_dot = true;
 	}
-	
+
       if (is_dot_dot && !(dir->__flags & dirent_isroot))
 	de->d_ino = readdir_get_ino (dir,
 				     ((fhandler_base *) dir->__fh)->get_name (),
 				     true);
       else
-        {
+	{
 	  /* Compute d_ino by combining filename hash with directory hash. */
 	  de->d_ino = ((fhandler_base *) dir->__fh)->get_namehash ();
 	  if (!is_dot && !is_dot_dot)
@@ -134,7 +134,7 @@ readdir_worker (DIR *dir, dirent *de)
 	      DWORD devn = ((fhandler_base *) dir->__fh)->get_device ();
 	      /* Paths below /proc don't have a Win32 pendant. */
 	      if (devn == FH_PROC || devn == FH_PROCESS || devn == FH_REGISTRY)
-	        de->d_ino = hash_path_name (de->d_ino, "/");
+		de->d_ino = hash_path_name (de->d_ino, "/");
 	      /* A drive's root dir has a trailing backslash already. */
 	      else if (w32name[1] != ':' || w32name[2] != '\\' || w32name[3])
 		de->d_ino = hash_path_name (de->d_ino, "\\");

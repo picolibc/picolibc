@@ -217,7 +217,7 @@ int __stdcall
 sys_wcstombs (char *tgt, int tlen, const WCHAR *src, int slen)
 {
   int ret;
-  
+
   ret = WideCharToMultiByte (get_cp (), 0, src, slen, tgt, tlen, NULL, NULL);
   if (ret)
     tgt[ret < tlen ? ret : tlen - 1] = '\0';

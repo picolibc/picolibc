@@ -143,7 +143,7 @@ unlink (const char *ourname)
   DWORD devn;
 
   path_conv win32_name (ourname, PC_SYM_NOFOLLOW,
-  			transparent_exe ? stat_suffixes : NULL);
+			transparent_exe ? stat_suffixes : NULL);
 
   if (win32_name.error)
     {
@@ -1232,7 +1232,7 @@ rename (const char *oldpath, const char *newpath)
 	       && GetBinaryType (real_old, &bintype)
 	       && (len = strlen (real_new)) > 4
 	       && !strcasematch ((const char *) real_new + len - 4, ".exe"))
-        {
+	{
 	  /* Executable hack. */
 	  strcpy (new_buf, newpath);
 	  strcat (new_buf, ".exe");
@@ -1373,12 +1373,12 @@ done:
 	}
       /* Shortcut hack, No. 3, part 2 */
       /* If a file with the given name exists, it must be deleted after the
-         symlink has been renamed.  Otherwise we end up with two files of
+	 symlink has been renamed.  Otherwise we end up with two files of
 	 the same name in the directory, one file "newpath", which already
 	 exited before rename has been called, and one file "newpath.lnk",
 	 which is the result of the rename operation. */
       else if (no_lnk_file_exists)
-        {
+	{
 	  lnk_suffix = strrchr (real_new.get_win32 (), '.');
 	  *lnk_suffix = '\0';
 	  DeleteFile (real_new);
@@ -1878,9 +1878,9 @@ statvfs (const char *fname, struct statvfs *sfs)
 				       OPEN_EXISTING,
 				       FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	      if (hdl == INVALID_HANDLE_VALUE)
-	        debug_printf ("CreateFile (%s) failed, %E", (char *) full_path);
+		debug_printf ("CreateFile (%s) failed, %E", (char *) full_path);
 	      else
-	        {
+		{
 		  NTFS_VOLUME_DATA_BUFFER nvdb;
 		  DWORD bytes;
 		  if (!DeviceIoControl (hdl, FSCTL_GET_NTFS_VOLUME_DATA, NULL,

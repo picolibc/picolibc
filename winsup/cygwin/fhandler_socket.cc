@@ -592,10 +592,10 @@ address_in_use (struct sockaddr_in *addr)
     {
       tab = (PMIB_TCPTABLE) alloca (size);
       if (!GetTcpTable (tab, &size, FALSE))
-        {
+	{
 	  for (i = tab->dwNumEntries, entry = tab->table; i > 0; --i, ++entry)
 	    if (entry->dwLocalAddr == addr->sin_addr.s_addr
-	    	&& entry->dwLocalPort == addr->sin_port
+		&& entry->dwLocalPort == addr->sin_port
 		&& entry->dwState >= MIB_TCP_STATE_LISTEN
 		&& entry->dwState <= MIB_TCP_STATE_LAST_ACK)
 	      return true;
@@ -688,14 +688,14 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
   else
     {
       /* If the application didn't explicitely call setsockopt (SO_REUSEADDR),
-         enforce exclusive local address use using the SO_EXCLUSIVEADDRUSE
+	 enforce exclusive local address use using the SO_EXCLUSIVEADDRUSE
 	 socket option, to emulate POSIX socket behaviour more closely.
-	 
+
 	 KB 870562: Note that this option is only available since NT4 SP4.
 	 Also note that a bug in Win2K SP1-3 and XP up to SP1 only enables
 	 this option for users in the local administrators group. */
       if (wincap.has_exclusiveaddruse ())
-        {
+	{
 	  if (!saw_reuseaddr ())
 	    {
 	      int on = 1;
@@ -708,7 +708,7 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 	    {
 	      debug_printf ("SO_REUSEADDR set");
 	      /* There's a bug in SO_REUSEADDR handling in WinSock.
-	         Per standards, we must not be able to reuse a complete
+		 Per standards, we must not be able to reuse a complete
 		 duplicate of a local TCP address (same IP, same port),
 		 even if SO_REUSEADDR has been set.  That's unfortunately
 		 possible in WinSock.  So we're testing here if the local
@@ -716,8 +716,8 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 		 only works for OSes with IP Helper support. */
 	      if (get_socket_type () == SOCK_STREAM
 		  && wincap.has_ip_helper_lib ()
-	      	  && address_in_use ((struct sockaddr_in *) name))
-	        {
+		  && address_in_use ((struct sockaddr_in *) name))
+		{
 		  debug_printf ("Local address in use, don't bind");
 		  set_errno (EADDRINUSE);
 		  goto out;
@@ -1015,14 +1015,14 @@ sa_restart:
 	      }
 	    if (evts.lNetworkEvents & FD_ACCEPT)
 	      {
-	        if (evts.iErrorCode[FD_ACCEPT_BIT])
+		if (evts.iErrorCode[FD_ACCEPT_BIT])
 		  wsa_err = evts.iErrorCode[FD_ACCEPT_BIT];
 		else
 		  ret = 0;
 	      }
 	    if (evts.lNetworkEvents & FD_CONNECT)
 	      {
-	        if (evts.iErrorCode[FD_CONNECT_BIT])
+		if (evts.iErrorCode[FD_CONNECT_BIT])
 		  wsa_err = evts.iErrorCode[FD_CONNECT_BIT];
 		else
 		  ret = 0;

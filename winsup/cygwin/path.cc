@@ -219,7 +219,7 @@ has_dot_last_component (const char *dir)
      path following Win32 rules. */
   const char *last_comp = strrchr (dir, '/');
   return last_comp
-  	 && last_comp[1] == '.'
+	 && last_comp[1] == '.'
 	 && (last_comp[2] == '\0'
 	     || (last_comp[2] == '.' && last_comp[3] == '\0'));
 }
@@ -977,14 +977,14 @@ out:
 	      else if (!tail)
 		tail = p;
 	      if (tail && p[1] == '\\')
-	        {
+		{
 		  if (p > tail || *tail != '.')
 		    {
 		      error = ENOENT;
 		      return;
 		    }
 		  tail = NULL;
-	        }
+		}
 	    }
 
 	  if (!tail || tail == path)
@@ -1740,9 +1740,9 @@ mount_info::get_mounts_here (const char *parent_dir, int parent_dir_len,
       mount_item *mi = mount + posix_sorted[i];
       char *last_slash = strrchr (mi->posix_path, '/');
       if (!last_slash)
-        continue;
+	continue;
       if (last_slash == mi->posix_path)
-        {
+	{
 	  if (parent_dir_len == 1 && mi->posix_pathlen > 1)
 	    mount_points[n_mounts++] = last_slash + 1;
 	}
@@ -2813,7 +2813,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 	  if (GetFileAttributes (reloldpath) == INVALID_FILE_ATTRIBUTES)
 	    {
 	      win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW,
-	      			   transparent_exe ? stat_suffixes : NULL);
+				   transparent_exe ? stat_suffixes : NULL);
 	      if (win32_oldpath.error != ENOENT)
 		strcpy (use_winsym ? reloldpath : w32oldpath, win32_oldpath);
 	    }
@@ -2822,7 +2822,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 	  if (use_winsym)
 	    {
 	      win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW,
-	      			   transparent_exe ? stat_suffixes : NULL);
+				   transparent_exe ? stat_suffixes : NULL);
 	      strcpy (w32oldpath, win32_oldpath);
 	    }
 	  if (cp)
@@ -3787,7 +3787,7 @@ realpath (const char *path, char *resolved)
       /* Check for the suffix being tacked on. */
       int tack_on = 0;
       if (!transparent_exe && real_path.known_suffix)
-        {
+	{
 	  char *c = strrchr (real_path.normalized_path, '.');
 	  if (!c || !strcasematch (c, real_path.known_suffix))
 	    tack_on = strlen (real_path.known_suffix);

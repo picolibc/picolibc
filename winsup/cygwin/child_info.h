@@ -70,7 +70,7 @@ public:
   DWORD proc_retry (HANDLE) __attribute__ ((regparm (2)));
   bool isstraced () const {return !!(flag & _CI_STRACED);}
   bool iscygwin () const {return !!(flag & _CI_ISCYGWIN);}
-  bool saw_ctrl_c () const {return !!(flag & _CI_SAW_CTRL_C);} 
+  bool saw_ctrl_c () const {return !!(flag & _CI_SAW_CTRL_C);}
   void set_saw_ctrl_c () {flag |= _CI_SAW_CTRL_C;}
 };
 

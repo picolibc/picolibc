@@ -531,7 +531,7 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
 	  si.si_code = BUS_OBJERR;
 	}
       else
-        {
+	{
 	  MEMORY_BASIC_INFORMATION m;
 	  VirtualQuery ((PVOID) e->ExceptionInformation[1], &m, sizeof m);
 	  si.si_signo = SIGSEGV;
@@ -1052,7 +1052,7 @@ sigset (int sig, _sig_func_ptr func)
   else
     {
       /* No error checking.  The test which could return SIG_ERR has already
-         been made above. */
+	 been made above. */
       signal (sig, func);
       sigdelset (&mask, sig);
     }

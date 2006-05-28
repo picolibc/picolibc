@@ -219,7 +219,7 @@ my_findenv (const char *name, int *offset)
   MALLOC_CHECK;
   return NULL;
 }
-  
+
 /* Primitive getenv before the environment is built.  */
 
 static char __stdcall *

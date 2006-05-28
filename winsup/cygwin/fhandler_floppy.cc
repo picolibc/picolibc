@@ -87,17 +87,17 @@ fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo)
   if (!di)
     {
       /* Up to Win2K, even IOCTL_DISK_GET_DRIVE_GEOMETRY fails when trying
-         it on CD or DVD drives.  In that case fall back to requesting
+	 it on CD or DVD drives.  In that case fall back to requesting
 	 simple file system information. */
       NTSTATUS status;
       IO_STATUS_BLOCK io;
       FILE_FS_SIZE_INFORMATION ffsi;
-      
+
       status = NtQueryVolumeInformationFile (get_handle (), &io, &ffsi,
 					     sizeof ffsi,
 					     FileFsSizeInformation);
       if (!NT_SUCCESS (status))
-        {
+	{
 	  __seterrno_from_nt_status (status);
 	  return -1;
 	}
@@ -108,9 +108,9 @@ fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo)
       bytes_per_sector = ffsi.BytesPerSector;
       drive_size = ffsi.TotalAllocationUnits.QuadPart
 		   * ffsi.SectorsPerAllocationUnit
-      		   * ffsi.BytesPerSector;
+		   * ffsi.BytesPerSector;
       if (geo)
-        {
+	{
 	  geo->heads = 1;
 	  geo->sectors = ffsi.SectorsPerAllocationUnit;
 	  geo->cylinders = ffsi.TotalAllocationUnits.LowPart;
@@ -163,7 +163,7 @@ fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo)
 	}
     }
   debug_printf ("drive size: %D", drive_size);
-   
+
   return 0;
 }
 
