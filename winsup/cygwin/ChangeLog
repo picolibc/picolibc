@@ -1,3 +1,8 @@
+2006-05-28  Christopher Faylor  <cgf@timesys.com>
+
+	* sigproc.cc (child_info::proc_retry): Mask all of the bits we're
+	interested in, which includes bits above and below 0xc0000000.
+
 2006-05-27  Christopher Faylor  <cgf@timesys.com>
 
 	* dll_init.cc (dll_dllcrt0): Previous change didn't work very well with

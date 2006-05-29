@@ -922,7 +922,7 @@ child_info::proc_retry (HANDLE h)
     /* Count down non-recognized exit codes more quickly since they aren't
        due to known conditions.  */
     default:
-      if (!iscygwin () && (exit_code & 0xc0000000) != 0xc0000000)
+      if (!iscygwin () && (exit_code & 0xffff0000) != 0xc0000000)
 	break;
       if ((retry -= 2) < 0)
 	retry = 0;
