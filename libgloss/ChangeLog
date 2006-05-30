@@ -1,3 +1,11 @@
+2006-05-30  Shaun Jackman  <sjackman@gmail.com>
+
+      * arm/Makefile.in: Add Linux syscall interface.
+      * arm/linux-crt0.S: New file.
+      * arm/linux-syscall.h: New file.
+      * arm/linux-syscalls0.S: New file.
+      * arm/linux-syscalls1.c: New file.
+
 2006-05-23  Fred Fish  <fnf@specifix.com>
 
 	* mips/configure.in: Change mipsisa64-*-* to

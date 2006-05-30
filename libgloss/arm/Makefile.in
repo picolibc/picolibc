@@ -53,6 +53,12 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 @BUILD_CRT0_FALSE@CRT0		= 
 @BUILD_CRT0_FALSE@CRT0_INSTALL	= 
 
+LINUX_CRT0    = linux-crt0.o
+LINUX_BSP     = libgloss-linux.a
+LINUX_OBJS    = linux-syscalls0.o linux-syscalls1.o
+LINUX_SCRIPTS = linux.specs
+LINUX_INSTALL = install-linux
+
 REDBOOT_CRT0	= redboot-crt0.o 
 REDBOOT_OBJS	= redboot-syscalls.o
 REDBOOT_SCRIPTS	= redboot.ld redboot.specs
@@ -87,7 +93,7 @@ IQ80310_INSTALL	= install-iq80310
 # build a test program for each target board. Just trying to get
 # it to link is a good test, so we ignore all the errors for now.
 #
-all: ${CRT0} ${REDBOOT_CRT0} ${REDBOOT_OBJS} ${RDPMON_CRT0} ${RDPMON_BSP} ${RDIMON_CRT0} ${RDIMON_BSP}
+all: ${CRT0} ${LINUX_CRT0} ${LINUX_BSP} ${REDBOOT_CRT0} ${REDBOOT_OBJS} ${RDPMON_CRT0} ${RDPMON_BSP} ${RDIMON_CRT0} ${RDIMON_BSP}
 
 #
 # here's where we build the test programs for each target
@@ -115,6 +121,10 @@ rdimon-syscalls.o: syscalls.c
 rdimon-libcfunc.o: libcfunc.c
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
+$(LINUX_BSP): $(LINUX_OBJS)
+	${AR} ${ARFLAGS} $@ $^
+	${RANLIB} $@
+
 $(RDPMON_BSP): $(RDPMON_OBJS)
 	${AR} ${ARFLAGS} $@ $^
 	${RANLIB} $@
@@ -130,10 +140,14 @@ distclean maintainer-clean realclean: clean
 	rm -f Makefile config.status *~
 
 .PHONY: install info install-info clean-info
-install: ${CRT0_INSTALL} ${REDBOOT_INSTALL} ${RDPMON_INSTALL} ${RDIMON_INSTALL} ${IQ80310_INSTALL}  ${PID_INSTALL}
+install: ${CRT0_INSTALL} ${LINUX_INSTALL} ${REDBOOT_INSTALL} ${RDPMON_INSTALL} ${RDIMON_INSTALL} ${IQ80310_INSTALL}  ${PID_INSTALL}
 
 install-crt0:
 	${INSTALL_DATA} ${CRT0} $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x
+
+install-linux:
+	set -e; for x in ${LINUX_CRT0} ${LINUX_BSP}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
+	set -e; for x in ${LINUX_SCRIPTS}; do ${INSTALL_DATA} ${srcdir}/${objtype}$$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 install-redboot:
 	set -e; for x in ${REDBOOT_CRT0} ${REDBOOT_OBJS}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
