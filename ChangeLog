@@ -1,3 +1,13 @@
+2006-05-31  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* Makefile.def: Added dependencies from sim and gdb on intl, and
+	added configure dependencies to everything with an all dependency
+	on intl.
+	* gettext.m4: Removed.
+	* src-release (DEVO_SUPPORT): Don't mention gettext.m4.
+	(GDB_SUPPORT_DIRS): Add intl.
+	* Makefile.in: Regenerated.
+
 2006-05-25  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* src-release (DEVO_SUPPORT): Add config.rpath.
