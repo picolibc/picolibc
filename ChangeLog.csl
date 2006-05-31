@@ -1,3 +1,10 @@
+2006-05-31  Mark Mitchell  <mark@codesourcery.com>
+
+	Issue #667
+	* newlib/libc/sys/arm/syscalls.c (findslot): Call
+	initialise_monitor_handles.
+	(remap_handle): Do not call initialise_monitor_handles.
+
 2006-05-25  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* libgloss/m68k/Makefile.in (m52235-dbug.ld, m52235-bdm.ld): New

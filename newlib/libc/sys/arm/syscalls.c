@@ -73,6 +73,8 @@ static int
 findslot (int fh)
 {
   int i;
+
+  initialise_monitor_handles ();
   for (i = 0; i < MAX_OPEN_FILES; i ++)
     if (openfiles[i].handle == fh)
       break;
@@ -83,8 +85,6 @@ findslot (int fh)
 static int
 remap_handle (int fh)
 {
-  initialise_monitor_handles ();
-
   if (fh == STDIN_FILENO)
     return monitor_stdin;
   if (fh == STDOUT_FILENO)
