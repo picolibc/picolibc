@@ -1,5 +1,8 @@
 2006-05-31  Mark Mitchell  <mark@codesourcery.com>
 
+	* libgloss/arm/elf-lm3s301.ld: New script.
+	* libgloss/arm/elf-lm3s31x.ld: Likewise.
+
 	* libgloss/arm/Makefile.in (LMS_SCRIPTS): New variable.
 	(LMS_INSTALL): Likewise.
 	(install): Depend on LMS_INSTALL.
