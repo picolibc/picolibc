@@ -73,7 +73,10 @@ _cygtls::call2 (DWORD (*func) (void *, void *), void *arg, void *buf)
   init_thread (buf, func);
   DWORD res = func (arg, buf);
   remove (INFINITE);
-  ExitThread (res);
+  /* Don't call ExitThread on the main thread since we may have been
+     dynamically loaded.  */
+  if (this != _main_tls)
+    ExitThread (res);
 }
 
 void

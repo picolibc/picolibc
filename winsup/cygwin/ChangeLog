@@ -1,3 +1,7 @@
+2006-05-30  Christopher Faylor  <cgf@timesys.com>
+
+	* cygtls.cc (_cygtls::call2): Don't call ExitThread on the main thread.
+
 2006-05-29  Christopher Faylor  <cgf@timesys.com>
 
 	* winf.h (MAXCYGWINCMDLEN): Set down size to 30000 or suffer fork
