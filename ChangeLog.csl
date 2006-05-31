@@ -1,5 +1,12 @@
 2006-05-31  Mark Mitchell  <mark@codesourcery.com>
 
+	* libgloss/arm/Makefile.in (LMS_SCRIPTS): New variable.
+	(LMS_INSTALL): Likewise.
+	(install): Depend on LMS_INSTALL.
+	(install-lms): New target.
+	* libgloss/arm/elf-cm3.lmd: New file.
+	* libgloss/arm/elf-lm3s10x.ld: Likewise.
+
 	Issue #667
 	* newlib/libc/sys/arm/syscalls.c (findslot): Call
 	initialise_monitor_handles.

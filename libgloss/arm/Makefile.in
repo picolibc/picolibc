@@ -70,6 +70,9 @@ RDIMON_OBJS	= rdimon-syscalls.o rdimon-libcfunc.o rdimon-trap.o
 RDIMON_SCRIPTS	= rdimon.specs
 RDIMON_INSTALL	= install-rdimon
 
+LMS_SCRIPTS     = cm3.ld lm3s10x.ld
+LMS_INSTALL     = install-lms
+
 CFLAGS		= -g
 
 # Here is all of the eval board stuff
@@ -130,7 +133,7 @@ distclean maintainer-clean realclean: clean
 	rm -f Makefile config.status *~
 
 .PHONY: install info install-info clean-info
-install: ${CRT0_INSTALL} ${REDBOOT_INSTALL} ${RDPMON_INSTALL} ${RDIMON_INSTALL} ${IQ80310_INSTALL}  ${PID_INSTALL}
+install: ${CRT0_INSTALL} ${REDBOOT_INSTALL} ${RDPMON_INSTALL} ${RDIMON_INSTALL} ${IQ80310_INSTALL}  ${PID_INSTALL} ${LMS_INSTALL}
 
 install-crt0:
 	${INSTALL_DATA} ${CRT0} $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x
@@ -154,6 +157,8 @@ install-pid:
 install-iq80310:
 	set -e; for x in ${IQ80310_SCRIPTS}; do ${INSTALL_DATA} ${srcdir}/${objtype}$$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
+install-lms:
+	set -e; for x in ${LMS_SCRIPTS}; do ${INSTALL_DATA} ${srcdir}/${objtype}$$x $(DESTDIR)/${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 doc:
 info:
