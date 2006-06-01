@@ -1,5 +1,16 @@
 2006-06-01  Daniel Jacobowitz  <dan@codesourcery.com>
 
+	* gdb/exec.c (exec_set_section_address): Always update the
+	section's address.
+	* gdb/objfiles.c (objfile_relocate): Also relocate the
+	target sections table.
+	* gdb/Makefile.in (objfiles.o): Update.
+
+	* gdb/remote.c (remote_xfer_partial): Fail if the target is not
+	running.
+
+2006-06-01  Daniel Jacobowitz  <dan@codesourcery.com>
+
 	* gdb/remote.c (remote_download_command): Use FILEIO_O_TRUNC.
 
 2006-06-01  Daniel Jacobowitz  <dan@codesourcery.com>
