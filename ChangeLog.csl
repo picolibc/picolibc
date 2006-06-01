@@ -1,5 +1,9 @@
 2006-06-01  Daniel Jacobowitz  <dan@codesourcery.com>
 
+	* gdb/remote.c (remote_download_command): Use FILEIO_O_TRUNC.
+
+2006-06-01  Daniel Jacobowitz  <dan@codesourcery.com>
+
 	* gdb/remote.c (remote_hostio_parse_result): Check for strtol
 	errors.
 
