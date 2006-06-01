@@ -1,3 +1,10 @@
+2006-05-31  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* internal.h (ELF_SECTION_SIZE): New.
+	(ELF_IS_SECTION_IN_SEGMENT): Likewise.
+	(ELF_IS_SECTION_IN_SEGMENT_FILE): Updated.
+	(ELF_IS_SECTION_IN_SEGMENT_MEMORY): Likewise.
+
 2006-05-27  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* internal.h (struct elf_segment_map): Add p_align and p_align_valid.
