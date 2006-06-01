@@ -1,3 +1,13 @@
+2006-06-01  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* gdb/breakpoint.c (insert_bp_location): Remember the failing
+	watchpoint address and pass to remove_breakpoint.
+	(remove_breakpoints, remove_hw_watchpoints, reattach_breakpoints,
+	detach_breakpoints): Adjust remove_breakpoint call.
+	(remove_breakpoint): Add VAL_FAILED parameter.  Stop removing
+	watchpoint addresses when it is reached.
+	(delete_breakpoint): Adjust remove_breakpoint call.
+
 2006-05-24  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* gdb/remote-fileio.c (remote_fileio_reset): New.
