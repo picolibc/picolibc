@@ -1,3 +1,8 @@
+2006-06-01  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* gdb/doc/gdb.texinfo (Host I/O Packets): Mention explicit negative
+	signs.
+
 2006-05-31  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* gdb/remote.c (remote_download_command): Correct short write
