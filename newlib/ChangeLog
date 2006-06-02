@@ -1,3 +1,8 @@
+2006-06-02  Shaun Jackman  <sjackman@gmail.com>
+
+	* libc/unix/sigset.c: Undefine sigfillset, sigdelset, and
+	sigismember.
+
 2006-05-23  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/misc/dprintf.c: Removed.

@@ -11,6 +11,7 @@ sigemptyset (sigset_t * set)
   return 0;
 }
 
+#undef sigfillset
 int
 sigfillset (sigset_t * set)
 {
@@ -31,6 +32,7 @@ sigaddset (sigset_t * set, int signo)
   return 0;
 }
 
+#undef sigdelset
 int
 sigdelset (sigset_t * set, int signo)
 {
@@ -43,6 +45,7 @@ sigdelset (sigset_t * set, int signo)
   return 0;
 }
 
+#undef sigismember
 int
 sigismember (const sigset_t * set, int signo)
 {
