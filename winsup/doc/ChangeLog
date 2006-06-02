@@ -1,3 +1,7 @@
+2006-06-01  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+        * faq-setup.xml (faq.setup.automated): New FAQ.
+
 2006-05-30  Dave Korn  <dave.korn@artimi.com> 
 
 	* faq-api.xml (faq.api.winsock):  Replace references to depracated

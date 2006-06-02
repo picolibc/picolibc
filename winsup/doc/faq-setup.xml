@@ -23,6 +23,55 @@ see <ulink url="http://cygwin.com/packages/">http://cygwin.com/packages/</ulink>
 </para>
 </answer></qandaentry>
 
+<qandaentry id="faq.setup.automated">
+<question><para>What about an automated Cygwin installation?</para></question>
+<answer>
+
+<para>The Cygwin Setup program is designed to be interactive, but there are
+a few different ways to automate it. If you are deploying to multiple systems,
+the best way is to run through a full installation once, saving the entire 
+downloaded package tree. Then, on target systems, run setup.exe as a "Local
+Install" pointed at your downloaded package tree. You could do this 
+non-interactively with the command line options 
+<literal>setup.exe -q -L -l x:\cygwin-local\</literal>, where your downloaded 
+package tree is in <literal>x:\cygwin-local\</literal> (see the next FAQ for
+an explanation of those options.)
+</para>
+<para>
+For other options, search the mailing lists with terms such as 
+<ulink url="http://www.google.com/search?q=cygwin+automated+setup">cygwin automated setup</ulink> or
+<ulink url="http://www.google.com/search?q=automated+cygwin+install">automated cygwin install</ulink>.
+</para>
+</answer></qandaentry>
+
+<qandaentry id="faq.setup.cli">
+<question><para>Does setup.exe accept command-line arguments?</para></question>
+<answer>
+
+<para>Yes, the full listing is written to the <literal>setup.log</literal> file 
+when you run <literal>setup.exe --help</literal>. The current options are:
+<screen>
+Command Line Options:
+ -D --download                          Download from internet
+ -L --local-install                     Install from local directory
+ -s --site                              Download site
+ -R --root                              Root installation directory
+ -q --quiet-mode                        Unattended setup mode
+ -h --help                              print help
+ -l --local-package-dir                 Local package directory
+ -r --no-replaceonreboot                Disable replacing in-use files on next
+                                        reboot.
+ -n --no-shortcuts                      Disable creation of desktop and start
+                                        menu shortcuts
+ -N --no-startmenu                      Disable creation of start menu shortcut
+ -d --no-desktop                        Disable creation of desktop shortcut
+ -A --disable-buggy-antivirus           Disable known or suspected buggy anti
+                                        virus software packages during
+                                        execution.
+</screen>
+</para>
+</answer></qandaentry>
+
 <qandaentry id="faq.setup.c">
 <question><para>Why not install in C:\?</para></question>
 <answer>
