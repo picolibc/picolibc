@@ -88,21 +88,18 @@ class tty: public tty_min
   HANDLE get_event (const char *fmt, BOOL manual_reset = FALSE)
     __attribute__ ((regparm (3)));
 public:
-  DWORD master_pid;	/* Win32 PID of tty master process */
+  pid_t master_pid;	/* PID of tty master process */
 
-  HANDLE from_master, to_slave;
-  HANDLE from_slave, to_master;
+  HANDLE from_master, to_master;
 
   int read_retval;
   bool was_opened;	/* True if opened at least once. */
 
   void init ();
   HANDLE create_inuse (const char *);
-  bool common_init (fhandler_pty_master *);
   bool alive (const char *fmt);
   bool slave_alive ();
   bool master_alive ();
-  bool make_pipes (fhandler_pty_master *ptym);
   HANDLE open_mutex (const char *mutex);
   HANDLE open_output_mutex ();
   HANDLE open_input_mutex ();
@@ -116,6 +113,7 @@ public:
       }
     return slave_alive ();
   }
+  friend class fhandler_pty_master;
 };
 
 class tty_list

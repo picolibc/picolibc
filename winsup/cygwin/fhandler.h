@@ -208,7 +208,7 @@ class fhandler_base
 
   virtual void fixup_before_fork_exec (DWORD) {}
   virtual void fixup_after_fork (HANDLE);
-  virtual void fixup_after_exec () {}
+  virtual void fixup_after_exec ();
   void create_read_state (LONG n)
   {
     read_state = CreateSemaphore (&sec_none_nih, 0, n, NULL);
@@ -785,8 +785,6 @@ class fhandler_termios: public fhandler_base
   bg_check_types bg_check (int sig);
   virtual DWORD __acquire_output_mutex (const char *fn, int ln, DWORD ms) {return 1;}
   virtual void __release_output_mutex (const char *fn, int ln) {}
-  void fixup_after_fork (HANDLE);
-  void fixup_after_exec ();
   void echo_erase (int force = 0);
   virtual _off64_t lseek (_off64_t, int);
 };
@@ -938,7 +936,7 @@ class fhandler_tty_common: public fhandler_termios
   fhandler_tty_common ()
     : fhandler_termios (), output_done_event (NULL),
     ioctl_request_event (NULL), ioctl_done_event (NULL), output_mutex (NULL),
-    input_mutex (NULL), input_available_event (NULL), inuse (NULL)
+    input_mutex (NULL), input_available_event (NULL)
   {
     // nothing to do
   }
@@ -950,19 +948,15 @@ class fhandler_tty_common: public fhandler_termios
 				// Ioctl() status in tty::ioctl_retval.
   HANDLE output_mutex, input_mutex;
   HANDLE input_available_event;
-  HANDLE inuse;			// used to indicate that a tty is in use
 
   DWORD __acquire_output_mutex (const char *fn, int ln, DWORD ms);
   void __release_output_mutex (const char *fn, int ln);
-
-  virtual int dup (fhandler_base *child);
 
   tty *get_ttyp () { return (tty *) tc; }
 
   int close ();
   _off64_t lseek (_off64_t, int);
   void set_close_on_exec (bool val);
-  void fixup_after_fork (HANDLE parent);
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
@@ -971,6 +965,7 @@ class fhandler_tty_common: public fhandler_termios
 
 class fhandler_tty_slave: public fhandler_tty_common
 {
+  HANDLE inuse;			// used to indicate that a tty is in use
  public:
   /* Constructor */
   fhandler_tty_slave ();
@@ -987,6 +982,7 @@ class fhandler_tty_slave: public fhandler_tty_common
   int close ();
   int dup (fhandler_base *child);
   void fixup_after_fork (HANDLE parent);
+  void fixup_after_exec ();
 
   select_record *select_read (select_record *s);
   int cygserver_attach_tty (HANDLE*, HANDLE*);
@@ -1001,6 +997,7 @@ protected:
   device slave;			// device type of slave
 public:
   int need_nl;			// Next read should start with \n
+  DWORD dwProcessId;		// Owner of master handles
 
   /* Constructor */
   fhandler_pty_master ();
@@ -1020,9 +1017,13 @@ public:
 
   char *ptsname ();
 
-  void set_close_on_exec (bool val);
+  HANDLE from_master, to_master;
   bool hit_eof ();
   int get_unit () const { return slave.minor; }
+  bool setup (tty&);
+  int dup (fhandler_base *);
+  void fixup_after_fork (HANDLE parent);
+  void fixup_after_exec ();
 };
 
 class fhandler_tty_master: public fhandler_pty_master

@@ -28,8 +28,9 @@ details. */
 #include "shared_info.h"
 #include "cygserver.h"
 #include "cygthread.h"
+#include "child_info.h"
 
-/* Tty master stuff */
+/* tty master stuff */
 
 fhandler_tty_master NO_COPY *tty_master;
 
@@ -74,11 +75,11 @@ fhandler_tty_master::init ()
   memset (&ti, 0, sizeof (ti));
   console->tcsetattr (0, &ti);
 
-  cygwin_shared->tty[get_unit ()]->common_init (this);
+  if (!setup (*cygwin_shared->tty[get_unit ()]))
+    return 1;
 
   set_winsize (false);
 
-  inuse = get_ttyp ()->create_inuse (TTY_MASTER_ALIVE);
   set_close_on_exec (true);
 
   cygthread *h;
@@ -446,7 +447,7 @@ process_ioctl (void *)
 /* Tty slave stuff */
 
 fhandler_tty_slave::fhandler_tty_slave ()
-  : fhandler_tty_common ()
+  : fhandler_tty_common (), inuse (NULL)
 {
   uninterruptible_io (true);
 }
@@ -462,7 +463,7 @@ fhandler_tty_slave::open (int flags, mode_t)
   if (arch)
     {
       *this = *(fhandler_tty_slave *) arch;
-      termios_printf ("copied tty fhandler archetype");
+      termios_printf ("copied fhandler_tty_slave archetype");
       set_flags ((flags & ~O_TEXT) | O_BINARY);
       cygheap->manage_console_count ("fhandler_tty_slave::open<arch>", 1);
       goto out;
@@ -521,7 +522,7 @@ fhandler_tty_slave::open (int flags, mode_t)
 
   /* Duplicate tty handles.  */
 
-  if (!get_ttyp ()->from_slave || !get_ttyp ()->to_slave)
+  if (!get_ttyp ()->from_master || !get_ttyp ()->to_master)
     {
       termios_printf ("tty handles have been closed");
       set_errno (EACCES);
@@ -538,12 +539,18 @@ fhandler_tty_slave::open (int flags, mode_t)
       || !cygserver_attach_tty (&from_master_local, &to_master_local))
 #endif
     {
+      pinfo p (get_ttyp ()->master_pid);
+      if (!p)
+	{
+	  set_errno (EAGAIN);
+	  termios_printf ("*** couldn't find tty master");
+	  return 0;
+	}
 #ifdef USE_SERVER
       termios_printf ("cannot dup handles via server. using old method.");
 #endif
       HANDLE tty_owner = OpenProcess (PROCESS_DUP_HANDLE, FALSE,
-				      get_ttyp ()->master_pid);
-      termios_printf ("tty own handle %p",tty_owner);
+				      p->dwProcessId);
       if (tty_owner == NULL)
 	{
 	  termios_printf ("can't open tty (%d) handle process %d",
@@ -595,7 +602,7 @@ fhandler_tty_slave::open (int flags, mode_t)
 
 out:
   usecount = 0;
-  archetype->usecount++;
+  arch->usecount++;
   report_tty_counts (this, "opened", "");
   myself->set_ctty (get_ttyp (), flags, arch);
 
@@ -626,6 +633,8 @@ fhandler_tty_slave::close ()
     }
 
   termios_printf ("closing last open %s handle", ttyname ());
+  if (inuse && !CloseHandle (inuse))
+    termios_printf ("CloseHandle (inuse), %E");
   return fhandler_tty_common::close ();
 }
 
@@ -917,106 +926,18 @@ fhandler_tty_slave::dup (fhandler_base *child)
   arch->usecount++;
   cygheap->manage_console_count ("fhandler_tty_slave::dup", 1);
   report_tty_counts (child, "duped", "");
-#if 0 // CGF: Remove this again as it screws up expect
-  myself->set_ctty (get_ttyp (), openflags, arch);
-#endif
   return 0;
 }
 
 int
-fhandler_tty_common::dup (fhandler_base *child)
+fhandler_pty_master::dup (fhandler_base *child)
 {
-  fhandler_tty_slave *fts = (fhandler_tty_slave *) child;
-  int errind;
-
-  fts->tcinit (get_ttyp ());
-
-  attach_tty (get_unit ());
-
-  HANDLE nh;
-
-  if (output_done_event == NULL)
-    fts->output_done_event = NULL;
-  else if (!DuplicateHandle (hMainProc, output_done_event, hMainProc,
-			     &fts->output_done_event, 0, 1,
-			     DUPLICATE_SAME_ACCESS))
-    {
-      errind = 1;
-      goto err;
-    }
-  if (ioctl_request_event == NULL)
-    fts->ioctl_request_event = NULL;
-  else if (!DuplicateHandle (hMainProc, ioctl_request_event, hMainProc,
-			     &fts->ioctl_request_event, 0, 1,
-			     DUPLICATE_SAME_ACCESS))
-    {
-      errind = 2;
-      goto err;
-    }
-  if (ioctl_done_event == NULL)
-    fts->ioctl_done_event = NULL;
-  else if (!DuplicateHandle (hMainProc, ioctl_done_event, hMainProc,
-			     &fts->ioctl_done_event, 0, 1,
-			     DUPLICATE_SAME_ACCESS))
-    {
-      errind = 3;
-      goto err;
-    }
-  if (!DuplicateHandle (hMainProc, input_available_event, hMainProc,
-			&fts->input_available_event, 0, 1,
-			DUPLICATE_SAME_ACCESS))
-    {
-      errind = 4;
-      goto err;
-    }
-  if (!DuplicateHandle (hMainProc, output_mutex, hMainProc,
-			&fts->output_mutex, 0, 1,
-			DUPLICATE_SAME_ACCESS))
-    {
-      errind = 5;
-      goto err;
-    }
-  if (!DuplicateHandle (hMainProc, input_mutex, hMainProc,
-			&fts->input_mutex, 0, 1,
-			DUPLICATE_SAME_ACCESS))
-    {
-      errind = 6;
-      goto err;
-    }
-  if (!DuplicateHandle (hMainProc, get_handle (), hMainProc,
-			&nh, 0, 1,
-			DUPLICATE_SAME_ACCESS))
-    {
-      errind = 7;
-      goto err;
-    }
-  fts->set_io_handle (nh);
-
-  if (!DuplicateHandle (hMainProc, get_output_handle (), hMainProc,
-			&nh, 0, 1,
-			DUPLICATE_SAME_ACCESS))
-    {
-      errind = 8;
-      goto err;
-    }
-  fts->set_output_handle (nh);
-
-  if (inuse == NULL)
-    fts->inuse = NULL;
-  else if (!DuplicateHandle (hMainProc, inuse, hMainProc,
-			     &fts->inuse, 0, 1,
-			     DUPLICATE_SAME_ACCESS))
-    {
-      errind = 9;
-      goto err;
-    }
-
+  fhandler_tty_master *arch = (fhandler_tty_master *) archetype;
+  *(fhandler_tty_master *) child = *arch;
+  child->usecount = 0;
+  arch->usecount++;
+  report_tty_counts (child, "duped master", "");
   return 0;
-
-err:
-  __seterrno ();
-  termios_printf ("dup %d failed in DuplicateHandle, %E", errind);
-  return -1;
 }
 
 int
@@ -1152,25 +1073,48 @@ out:
  fhandler_pty_master
 */
 fhandler_pty_master::fhandler_pty_master ()
-  : fhandler_tty_common ()
+  : fhandler_tty_common (), pktmode (0), need_nl (0), dwProcessId (0)
 {
 }
 
 int
 fhandler_pty_master::open (int flags, mode_t)
 {
+  fhandler_pty_master *arch = (fhandler_tty_master *) cygheap->fdtab.find_archetype (pc.dev);
+  if (arch)
+    {
+      *this = *(fhandler_pty_master *) arch;
+      termios_printf ("copied fhandler_pty_master archetype");
+      set_flags ((flags & ~O_TEXT) | O_BINARY);
+      goto out;
+    }
+
   int ntty = cygwin_shared->tty.allocate_tty (false);
   if (ntty < 0)
     return 0;
 
   slave = *ttys_dev;
   slave.setunit (ntty);
-  cygwin_shared->tty[ntty]->common_init (this);
+  if (!setup (*cygwin_shared->tty[ntty]))
+    {
+      ReleaseMutex (tty_mutex);	// lock was set in allocate_tty
+      return 0;
+    }
   ReleaseMutex (tty_mutex);	// lock was set in allocate_tty
-  inuse = get_ttyp ()->create_inuse (TTY_MASTER_ALIVE);
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();
+  //
+  // FIXME: Do this better someday
+  arch = (fhandler_tty_master *) cmalloc (HEAP_ARCHETYPES, sizeof (*this));
+  *((fhandler_pty_master **) cygheap->fdtab.add_archetype ()) = arch;
+  archetype = arch;
+  *arch = *this;
+  arch->dwProcessId = GetCurrentProcessId ();
 
+out:
+  usecount = 0;
+  arch->usecount++;
+  report_tty_counts (this, "opened master", "");
   termios_printf ("opened pty master tty%d", get_unit ());
   return 1;
 }
@@ -1192,8 +1136,6 @@ fhandler_tty_common::close ()
     termios_printf ("CloseHandle (ioctl_done_event), %E");
   if (ioctl_request_event && !CloseHandle (ioctl_request_event))
     termios_printf ("CloseHandle (ioctl_request_event), %E");
-  if (inuse && !CloseHandle (inuse))
-    termios_printf ("CloseHandle (inuse), %E");
   if (!ForceCloseHandle (input_mutex))
     termios_printf ("CloseHandle (input_mutex<%p>), %E", input_mutex);
   if (!ForceCloseHandle (output_mutex))
@@ -1203,21 +1145,18 @@ fhandler_tty_common::close ()
   if (!ForceCloseHandle1 (get_output_handle (), to_pty))
     termios_printf ("CloseHandle (get_output_handle ()<%p>), %E", get_output_handle ());
 
+#if 0 // CGF - DELETME
   /* Send EOF to slaves if master side is closed */
   if (!get_ttyp ()->master_alive ())
     {
       termios_printf ("no more masters left. sending EOF");
       SetEvent (input_available_event);
     }
+#endif
 
   if (!ForceCloseHandle (input_available_event))
     termios_printf ("CloseHandle (input_available_event<%p>), %E", input_available_event);
 
-  if (!hExeced)
-    {
-      inuse = NULL;
-      set_io_handle (NULL);
-    }
   return 0;
 }
 
@@ -1228,28 +1167,28 @@ fhandler_pty_master::close ()
   while (accept_input () > 0)
     continue;
 #endif
+  archetype->usecount--;
+  report_tty_counts (this, "closing master", "");
 
-  if (get_ttyp ()->master_alive ())
-    fhandler_tty_common::close ();
-  else
+  if (archetype->usecount)
     {
-      termios_printf ("freeing tty%d (%d)", get_unit (), get_ttyp ()->ntty);
-#if 0
-      if (get_ttyp ()->to_slave)
-	ForceCloseHandle1 (get_ttyp ()->to_slave, to_slave);
-      if (get_ttyp ()->from_slave)
-	ForceCloseHandle1 (get_ttyp ()->from_slave, from_slave);
+#ifdef DEBUGGING
+      if (archetype->usecount < 0)
+	system_printf ("error: usecount %d", archetype->usecount);
 #endif
-      if (get_ttyp ()->from_master)
-	CloseHandle (get_ttyp ()->from_master);
-      if (get_ttyp ()->to_master)
-	CloseHandle (get_ttyp ()->to_master);
-
-      fhandler_tty_common::close ();
-
-      if (!hExeced)
-	get_ttyp ()->init ();
+      termios_printf ("just returning because archetype usecount is != 0");
+      return 0;
     }
+
+  fhandler_tty_master *arch = (fhandler_tty_master *) archetype;
+  if (!ForceCloseHandle (arch->from_master))
+    termios_printf ("error closing from_master %p, %E", arch->from_master);
+  if (!ForceCloseHandle (arch->to_master))
+    termios_printf ("error closing from_master %p, %E", arch->to_master);
+  fhandler_tty_common::close ();
+
+  if (!hExeced && get_ttyp ()->master_pid == myself->pid)
+    get_ttyp ()->init ();
 
   return 0;
 }
@@ -1353,73 +1292,25 @@ fhandler_pty_master::ptsname ()
 void
 fhandler_tty_common::set_close_on_exec (bool val)
 {
-  if (archetype)
-    close_on_exec (val);
-  else
-    {
-      if (output_done_event)
-	set_no_inheritance (output_done_event, val);
-      if (ioctl_request_event)
-	set_no_inheritance (ioctl_request_event, val);
-      if (ioctl_done_event)
-	set_no_inheritance (ioctl_done_event, val);
-      if (inuse)
-	set_no_inheritance (inuse, val);
-      set_no_inheritance (output_mutex, val);
-      set_no_inheritance (input_mutex, val);
-      set_no_inheritance (input_available_event, val);
-      set_no_inheritance (output_handle, val);
-#ifndef DEBUGGING
-      fhandler_base::set_close_on_exec (val);
-#else
-      /* FIXME: This is a duplication from fhandler_base::set_close_on_exec.
-	 It is here because we need to specify the "from_pty" stuff here or
-	 we'll get warnings from ForceCloseHandle when debugging. */
-      set_no_inheritance (get_io_handle (), val);
-      close_on_exec (val);
-#endif
-    }
+  // Cygwin processes will handle this specially on exec.
+  close_on_exec (val);
 }
 
 void
 fhandler_tty_slave::fixup_after_fork (HANDLE parent)
 {
+  // fork_fixup (parent, inuse, "inuse");
   // fhandler_tty_common::fixup_after_fork (parent);
   report_tty_counts (this, "inherited", "");
 }
 
 void
-fhandler_tty_common::fixup_after_fork (HANDLE parent)
+fhandler_tty_slave::fixup_after_exec ()
 {
-  fhandler_termios::fixup_after_fork (parent);
-  if (output_done_event)
-    fork_fixup (parent, output_done_event, "output_done_event");
-  if (ioctl_request_event)
-    fork_fixup (parent, ioctl_request_event, "ioctl_request_event");
-  if (ioctl_done_event)
-    fork_fixup (parent, ioctl_done_event, "ioctl_done_event");
-  if (output_mutex)
-    fork_fixup (parent, output_mutex, "output_mutex");
-  if (input_mutex)
-    fork_fixup (parent, input_mutex, "input_mutex");
-  if (input_available_event)
-    fork_fixup (parent, input_available_event, "input_available_event");
-  fork_fixup (parent, inuse, "inuse");
-}
-
-void
-fhandler_pty_master::set_close_on_exec (bool val)
-{
-  fhandler_tty_common::set_close_on_exec (val);
-
-  /* FIXME: There is a console handle leak here. */
-  if (get_ttyp ()->master_pid == GetCurrentProcessId ())
-    {
-      get_ttyp ()->from_slave = get_handle ();
-      get_ttyp ()->to_slave = get_output_handle ();
-      termios_printf ("from_slave %p, to_slave %p", get_handle (),
-		      get_output_handle ());
-    }
+  if (close_on_exec ())
+    close ();
+  else
+    fixup_after_fork (NULL);
 }
 
 int
@@ -1433,4 +1324,153 @@ fhandler_tty_master::init_console ()
   cygheap->manage_console_count ("fhandler_tty_master::init_console", -1, true);
   console->uninterruptible_io (true);
   return 0;
+}
+
+#define close_maybe(h) \
+  do { \
+    if (h) \
+      CloseHandle (h); \
+  } while (0)
+
+bool
+fhandler_pty_master::setup (tty& t)
+{
+  tcinit (&t, true);		/* Set termios information.  Force initialization. */
+
+  const char *errstr = NULL;
+  DWORD pipe_mode = PIPE_NOWAIT;
+
+  /* Create communication pipes */
+
+#if 0 // CGF: don't think this is needed since it is handled by the constructor
+  input_handle = io_handle = output_done_event = ioctl_done_event =
+    ioctl_request_event = input_available_event = output_mutex = input_mutex NULL;
+#endif
+
+  /* FIXME: should this be sec_none_nih? */
+  if (!CreatePipe (&from_master, &get_output_handle (), &sec_all, 128 * 1024))
+    {
+      errstr = "input pipe";
+      goto err;
+    }
+
+  if (!CreatePipe (&get_io_handle (), &to_master, &sec_all, 128 * 1024))
+    {
+      errstr = "output pipe";
+      goto err;
+    }
+
+  if (!SetNamedPipeHandleState (&get_output_handle (), &pipe_mode, NULL, NULL))
+    termios_printf ("can't set output_handle(%p) to non-blocking mode",
+		    get_output_handle ());
+
+  need_nl = 0;
+
+  /* We do not open allow the others to open us (for handle duplication)
+     but rely on cygheap->inherited_ctty for descendant processes.
+     In the future the cygserver may allow access by others. */
+
+#ifdef USE_SERVER
+  if (wincap.has_security ())
+    {
+      if (cygserver_running == CYGSERVER_UNKNOWN)
+	cygserver_init ();
+    }
+#endif
+
+  /* Create synchronisation events */
+
+  if (get_major () == DEV_TTYM_MAJOR)
+    {
+      if (!(output_done_event = t.get_event (errstr = OUTPUT_DONE_EVENT)))
+	goto err;
+      if (!(ioctl_done_event = t.get_event (errstr = IOCTL_DONE_EVENT)))
+	goto err;
+      if (!(ioctl_request_event = t.get_event (errstr = IOCTL_REQUEST_EVENT)))
+	goto err;
+    }
+
+  if (!(input_available_event = t.get_event (errstr = INPUT_AVAILABLE_EVENT, TRUE)))
+    goto err;
+
+  char buf[CYG_MAX_PATH];
+  errstr = shared_name (buf, OUTPUT_MUTEX, t.ntty);
+  if (!(output_mutex = CreateMutex (&sec_all, FALSE, buf)))
+    goto err;
+
+  errstr = shared_name (buf, INPUT_MUTEX, t.ntty);
+  if (!(input_mutex = CreateMutex (&sec_all, FALSE, buf)))
+    goto err;
+
+  if (!DuplicateHandle (hMainProc, from_master, hMainProc, &from_master, 0, false,
+			DUPLICATE_SAME_ACCESS))
+    {
+      errstr = "non-inheritable from_master";
+      goto err;
+    }
+
+  if (!DuplicateHandle (hMainProc, to_master, hMainProc, &to_master, 0, false,
+			DUPLICATE_SAME_ACCESS))
+    {
+      errstr = "non-inheritable to_master";
+      goto err;
+    }
+
+  t.from_master = from_master;
+  t.to_master = to_master;
+  // /* screws up tty master */ ProtectHandle1INH (output_mutex, output_mutex);
+  // /* screws up tty master */ ProtectHandle1INH (input_mutex, input_mutex);
+  t.winsize.ws_col = 80;
+  t.winsize.ws_row = 25;
+  t.master_pid = myself->pid;
+
+  termios_printf ("tty%d opened - from_slave %p, to_slave %p", t.ntty,
+		  get_io_handle (), get_output_handle ());
+  return true;
+
+err:
+  __seterrno ();
+  close_maybe (get_io_handle ());
+  close_maybe (get_output_handle ());
+  close_maybe (output_done_event);
+  close_maybe (ioctl_done_event);
+  close_maybe (ioctl_request_event);
+  close_maybe (input_available_event);
+  close_maybe (output_mutex);
+  close_maybe (input_mutex);
+  termios_printf ("tty%d open failed - failed to create %s", errstr);
+  return false;
+}
+
+void
+fhandler_pty_master::fixup_after_fork (HANDLE parent)
+{
+  DWORD wpid = GetCurrentProcessId ();
+  fhandler_tty_master *arch = (fhandler_tty_master *) archetype;
+  if (arch->dwProcessId != wpid)
+    {
+      tty& t = *get_ttyp ();
+      if (!DuplicateHandle (parent, arch->from_master, hMainProc,
+			    &arch->from_master, 0, false, DUPLICATE_SAME_ACCESS))
+	system_printf ("couldn't duplicate from_parent(%p), %E", arch->from_master);
+      if (!DuplicateHandle (parent, arch->to_master, hMainProc,
+			    &arch->to_master, 0, false, DUPLICATE_SAME_ACCESS))
+	system_printf ("couldn't duplicate to_parent(%p), %E", arch->from_master);
+      if (myself->pid == t.master_pid)
+	{
+	  t.from_master = arch->from_master;
+	  t.to_master = arch->to_master;
+	}
+      arch->dwProcessId = wpid;
+    }
+  report_tty_counts (this, "inherited master", "");
+}
+
+void
+fhandler_pty_master::fixup_after_exec ()
+{
+  if (close_on_exec ())
+    close ();
+  else
+    fixup_after_fork (spawn_info->parent);
 }

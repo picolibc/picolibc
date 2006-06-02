@@ -355,20 +355,6 @@ fhandler_termios::line_edit (const char *rptr, int nread, termios& ti)
   return ret;
 }
 
-void
-fhandler_termios::fixup_after_exec ()
-{
-  if (!close_on_exec ())
-    fixup_after_fork (NULL);
-}
-
-void
-fhandler_termios::fixup_after_fork (HANDLE parent)
-{
-  fhandler_base::fixup_after_fork (parent);
-  fork_fixup (parent, get_output_handle (), "output_handle");
-}
-
 _off64_t
 fhandler_termios::lseek (_off64_t, int)
 {

@@ -130,11 +130,11 @@ tty_list::terminate ()
   int ttynum = myself->ctty;
 
   /* Keep master running till there are connected clients */
-  if (ttynum != -1 && ttys[ttynum].master_pid == GetCurrentProcessId ())
+  if (ttynum != -1 && ttys[ttynum].master_pid == myself->pid)
     {
       tty *t = ttys + ttynum;
-      CloseHandle (t->from_master);
-      CloseHandle (t->to_master);
+      CloseHandle (tty_master->from_master);
+      CloseHandle (tty_master->to_master);
       /* Wait for children which rely on tty handling in this process to
 	 go away */
       for (int i = 0; ; i++)
@@ -155,9 +155,9 @@ tty_list::terminate ()
 	termios_printf ("WFSO for tty_mutex %p failed, %E", tty_mutex);
 
       termios_printf ("tty %d master about to finish", ttynum);
-      ForceCloseHandle1 (t->to_slave, to_pty);
-      ForceCloseHandle1 (t->from_slave, from_pty);
-      CloseHandle (tty_master->inuse);
+      CloseHandle (tty_master->get_io_handle ());
+      CloseHandle (tty_master->get_output_handle ());
+
       t->init ();
 
       char buf[20];
@@ -313,12 +313,6 @@ tty::slave_alive ()
 }
 
 bool
-tty::master_alive ()
-{
-  return alive (TTY_MASTER_ALIVE);
-}
-
-bool
 tty::alive (const char *fmt)
 {
   HANDLE ev;
@@ -371,8 +365,6 @@ tty::init ()
   setsid (0);
   pgid = 0;
   hwnd = NULL;
-  to_slave = NULL;
-  from_slave = NULL;
   was_opened = 0;
   master_pid = 0;
 }
@@ -393,108 +385,4 @@ tty::get_event (const char *fmt, BOOL manual_reset)
 
   termios_printf ("created event %s", buf);
   return hev;
-}
-
-bool
-tty::make_pipes (fhandler_pty_master *ptym)
-{
-  /* Create communication pipes */
-
-  /* FIXME: should this be sec_none_nih? */
-  if (!CreatePipe (&from_master, &to_slave, &sec_all, 128 * 1024))
-    {
-      termios_printf ("can't create input pipe");
-      set_errno (ENOENT);
-      return false;
-    }
-
-  // ProtectHandle1INH (to_slave, to_pty);
-  if (!CreatePipe (&from_slave, &to_master, &sec_all, 128 * 1024))
-    {
-      termios_printf ("can't create output pipe");
-      set_errno (ENOENT);
-      return false;
-    }
-  // ProtectHandle1INH (from_slave, from_pty);
-  termios_printf ("tty%d from_slave %p, to_slave %p", ntty, from_slave,
-		  to_slave);
-
-  DWORD pipe_mode = PIPE_NOWAIT;
-  if (!SetNamedPipeHandleState (to_slave, &pipe_mode, NULL, NULL))
-    termios_printf ("can't set to_slave to non-blocking mode");
-  ptym->set_io_handle (from_slave);
-  ptym->set_output_handle (to_slave);
-  return true;
-}
-
-bool
-tty::common_init (fhandler_pty_master *ptym)
-{
-  /* Set termios information.  Force initialization. */
-  ptym->tcinit (this, true);
-
-  if (!make_pipes (ptym))
-    return false;
-  ptym->need_nl = 0;
-
-  /* Save our pid  */
-
-  master_pid = GetCurrentProcessId ();
-
-  /* We do not open allow the others to open us (for handle duplication)
-     but rely on cygheap->inherited_ctty for descendant processes.
-     In the future the cygserver may allow access by others. */
-
-#ifdef USE_SERVER
-  if (wincap.has_security ())
-    {
-      if (cygserver_running == CYGSERVER_UNKNOWN)
-	cygserver_init ();
-    }
-#endif
-
-  /* Create synchronisation events */
-
-  if (ptym->get_major () != DEV_TTYM_MAJOR)
-    {
-      ptym->output_done_event = ptym->ioctl_done_event =
-      ptym->ioctl_request_event = NULL;
-    }
-  else
-    {
-      if (!(ptym->output_done_event = get_event (OUTPUT_DONE_EVENT)))
-	return false;
-      if (!(ptym->ioctl_done_event = get_event (IOCTL_DONE_EVENT)))
-	return false;
-      if (!(ptym->ioctl_request_event = get_event (IOCTL_REQUEST_EVENT)))
-	return false;
-    }
-
-  if (!(ptym->input_available_event = get_event (INPUT_AVAILABLE_EVENT, TRUE)))
-    return false;
-
-  char buf[CYG_MAX_PATH];
-  shared_name (buf, OUTPUT_MUTEX, ntty);
-  if (!(ptym->output_mutex = CreateMutex (&sec_all, FALSE, buf)))
-    {
-      termios_printf ("can't create %s", buf);
-      set_errno (ENOENT);
-      return false;
-    }
-
-  shared_name (buf, INPUT_MUTEX, ntty);
-  if (!(ptym->input_mutex = CreateMutex (&sec_all, FALSE, buf)))
-    {
-      termios_printf ("can't create %s", buf);
-      set_errno (ENOENT);
-      return false;
-    }
-
-  // /* screws up tty master */ ProtectHandle1INH (ptym->output_mutex, output_mutex);
-  // /* screws up tty master */ ProtectHandle1INH (ptym->input_mutex, input_mutex);
-  winsize.ws_col = 80;
-  winsize.ws_row = 25;
-
-  termios_printf ("tty%d opened", ntty);
-  return true;
 }

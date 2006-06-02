@@ -1500,6 +1500,12 @@ fhandler_base::fixup_after_fork (HANDLE parent)
     fork_fixup (parent, io_handle, "io_handle");
 }
 
+void
+fhandler_base::fixup_after_exec ()
+{
+  debug_printf ("here for '%s'", get_name ());
+}
+
 bool
 fhandler_base::is_nonblocking ()
 {

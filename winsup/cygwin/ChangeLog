@@ -1,3 +1,62 @@
+2006-06-02  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler.cc (fhandler_base::fixup_after_exec): Declare here.
+	* fhandler.h (fhandler_base::fixup_after_exec): Make non-inline.
+	(fhandler_termios::fixup_after_fork): Delete declaration.
+	(fhandler_termios::fixup_after_exec): Ditto.
+	(fhandler_tty_common::inuse): Remove.
+	(fhandler_tty_common::dup): Delete declaration.
+	(fhandler_tty_common::fixup_after_fork): Ditto.
+	(fhandler_tty_slave::fixup_after_exec): Declare new function.
+	(fhandler_pty_master::dwProcessId): New variable.
+	(fhandler_pty_master::from_master): Ditto.
+	(fhandler_pty_master::to_master): Ditto.
+	(fhandler_pty_master::setup): New function.
+	(fhandler_pty_master::fixup_after_fork): Ditto.
+	(fhandler_pty_master::fixup_after_exec): Ditto.
+	* fhandler_termios.cc (fhandler_termios::fixup_after_exec): Delete
+	definition.
+	(fhandler_termios::fixup_after_fork): Ditto.
+	* fhandler_tty.cc (fhandler_tty_master::init): Use fhandler_pty_master
+	setup function rather than obsolete tty::common_init.  Delete obsolete
+	inuse setting.
+	(fhandler_tty_slave::fhandler_tty_slave): Set inuse to NULL here.
+	(fhandler_tty_slave::open): Change debugging output for clarity.  Check
+	for different things when doing a sanity check on the tty.  Reflect the
+	fact that master_pid now is the cygwin pid rather than the windows pid.
+	Use "arch" rather than "archetype" for consistency.
+	(fhandler_tty_slave::close): Close inuse here.
+	(fhandler_tty_slave::dup): Remove old if 0'ed code.
+	(fhandler_pty_master::dup): New function.  Handles pty master
+	archetype.
+	(fhandler_pty_master::fhandler_pty_master): Zero pty_master specific
+	fields.
+	(fhandler_pty_master::open): Implement using archetypes, similar to
+	slave.  Use fhandler_pty_master setup function rather than obsolete
+	tty::common_init.  Don't set inuse.
+	(fhandler_tty_common::close): Don't deal with inuse.  Delete old if
+	0'ed code.
+	(fhandler_pty_master::close): Implement using archetypes.  Close
+	from_master and to_master.
+	(fhandler_tty_common::set_close_on_exec): Just set close_on_exec flag
+	here since everything uses archetypes now.
+	(fhandler_tty_common::fixup_after_fork): Delete definition.
+	(fhandler_tty_slave::fixup_after_exec): Define new function.
+	(fhandler_pty_master::setup): New function, derived from
+	tty::common_init.
+	(fhandler_pty_master::fixup_after_fork): New function.
+	(shared_info.h): Reset SHARED_INFO_CB to reflect new tty size.
+	* tty.cc (tty_list::terminate): Close individual handles from
+	tty_master.
+	(tty::master_alive): Delete.
+	(tty::make_pipes): Ditto.
+	(tty::common_init): Ditto.
+	* tty.h (tty::from_slave): Delete.
+	(tty::to_slave): Ditto.
+	(tty::common_init): Delete declaration.
+	(tty::make_pipes): Ditto.
+	(tty::master_pid): Define as pid_t since it is now a cygwin pid.
+
 2006-06-01  Christopher Faylor  <cgf@timesys.com>
 
 	* cygheap.cc (cygheap_fixup_in_child): Don't close parent handle here.

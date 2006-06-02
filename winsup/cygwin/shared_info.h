@@ -142,7 +142,7 @@ public:
 				  cygwin_version.api_minor)
 #define SHARED_VERSION_MAGIC CYGWIN_VERSION_MAGIC (SHARED_MAGIC, SHARED_VERSION)
 
-#define SHARED_INFO_CB 21008
+#define SHARED_INFO_CB 19984
 
 #define CURR_SHARED_MAGIC 0x818f75beU
 
