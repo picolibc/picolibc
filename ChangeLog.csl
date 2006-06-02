@@ -1,3 +1,7 @@
+2006-06-02  Joseph Myers  <joseph@codesourcery.com>
+
+	* gas/doc/c-arc.texi: Fix typo.
+
 2006-04-28  Joseph Myers  <joseph@codesourcery.com>
 
 	* gas/config/tc-arm.c (do_iwmmxt_wldstbh): Don't multiply offset
