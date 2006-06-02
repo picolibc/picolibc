@@ -62,15 +62,6 @@ cygheap_fixup_in_child (bool execed)
   child_copy (child_proc_info->parent, false, "cygheap", cygheap, cygheap_max, NULL);
   cygheap_init ();
   debug_fixup_after_fork_exec ();
-
-  /* Need to do this after debug_fixup_after_fork_exec or DEBUGGING handling of
-     handles might get confused. */
-  if (execed)
-    {
-      CloseHandle (child_proc_info->parent);
-      child_proc_info->parent = NULL;
-    }
-
   if (execed)
     {
       cygheap->hooks.next = NULL;

@@ -75,7 +75,8 @@ _cygtls::call2 (DWORD (*func) (void *, void *), void *arg, void *buf)
   remove (INFINITE);
   /* Don't call ExitThread on the main thread since we may have been
      dynamically loaded.  */
-  if (this != _main_tls)
+  if ((void *) func != (void *) dll_crt0_1
+      && (void *) func != (void *) dll_dllcrt0_1)
     ExitThread (res);
 }
 

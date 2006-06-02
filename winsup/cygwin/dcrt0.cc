@@ -692,6 +692,12 @@ child_info_spawn::handle_spawn ()
   envc = moreinfo->envc;
   if (!dynamically_loaded)
     cygheap->fdtab.fixup_after_exec ();
+
+  /* Need to do this after debug_fixup_after_fork_exec or DEBUGGING handling of
+     handles might get confused. */
+  CloseHandle (child_proc_info->parent);
+  child_proc_info->parent = NULL;
+
   signal_fixup_after_exec ();
   if (moreinfo->old_title)
     {
@@ -783,8 +789,8 @@ dll_crt0_0 ()
    various special cases when Cygwin DLL is being runtime loaded (as
    opposed to being link-time loaded by Cygwin apps) from a non
    cygwin app via LoadLibrary.  */
-static void
-dll_crt0_1 (void *, void *)
+void
+dll_crt0_1 (void *)
 {
   check_sanity_and_sync (user_data);
   malloc_init ();

@@ -348,24 +348,47 @@ dll_list::load_after_fork (HANDLE parent, dll *first)
   in_forkee = false;
 }
 
+struct dllcrt0_info
+{
+  HMODULE h;
+  per_process *p;
+  int res;
+  dllcrt0_info (HMODULE h0, per_process *p0): h(h0), p(p0) {}
+};
+
 extern "C" int
 dll_dllcrt0 (HMODULE h, per_process *p)
 {
+  dllcrt0_info x (h, p);
+
+  if (_my_tls.isinitialized ())
+    dll_dllcrt0_1 (&x);
+  else
+    _my_tls.call ((DWORD (*) (void *, void *)) dll_dllcrt0_1, &x);
+  return x.res;
+}
+
+void
+dll_dllcrt0_1 (VOID *x)
+{
+  HMODULE& h = ((dllcrt0_info *)x)->h;
+  per_process*& p = ((dllcrt0_info *)x)->p;
+  int& res = ((dllcrt0_info *)x)->res;
+
   /* Windows apparently installs a bunch of exception handlers prior to
      this function getting called and one of them may trip before cygwin
      gets to it.  So, install our own exception handler only.
      FIXME: It is possible that we may have to save state of the
      previous exception handler chain and restore it, if problems
      are noted. */
-  if (cygwin_finished_initializing)
-    _my_tls.init_exception_handler (_cygtls::handle_exceptions);
+  _my_tls.init_exception_handler (_cygtls::handle_exceptions);
 
   if (p == NULL)
     p = &__cygwin_user_data;
   else
     *(p->impure_ptr_ptr) = __cygwin_user_data.impure_ptr;
 
-  bool linking = !in_forkee && !cygwin_finished_initializing;
+  bool linked = !in_forkee && !cygwin_finished_initializing;
 
   /* Partially initialize Cygwin guts for non-cygwin apps. */
   if (dynamically_loaded && user_data->magic_biscuit == 0)
@@ -379,7 +402,7 @@ dll_dllcrt0 (HMODULE h, per_process *p)
      initializing, then the DLL must be a cygwin-aware DLL
      that was explicitly linked into the program rather than
      a dlopened DLL. */
-  if (linking)
+  if (linked)
     type = DLL_LINK;
   else
     {
@@ -395,10 +418,10 @@ dll_dllcrt0 (HMODULE h, per_process *p)
      initialize the DLL.  If we haven't finished initializing,
      it may not be safe to call the dll's "main" since not
      all of cygwin's internal structures may have been set up. */
-  if (!d || (!linking && !d->init ()))
-    return -1;
-
-  return (DWORD) d;
+  if (!d || (!linked && !d->init ()))
+    res = -1;
+  else
+    res = (DWORD) d;
 }
 
 /* OBSOLETE: This function is obsolescent and will go away in the

@@ -1,3 +1,25 @@
+2006-06-01  Christopher Faylor  <cgf@timesys.com>
+
+	* cygheap.cc (cygheap_fixup_in_child): Don't close parent handle here.
+	Let the caller do that.
+	* dcrt0.cc (child_info_spawn::handle_spawn): Close parent handle here
+	to allow fixup_after_exec functions to use it.
+
+	* cygtls.cc (_cygtls::call2): Avoid calling exit thread if called with
+	*crt0_1 functions.
+	* cygtls.h (_cygtls::isinitialized): Check that we actually have a tls
+	before seeing if it is initialized.
+	* gendef (_sigfe_maybe): Ditto.
+	* dcrt0.cc (dll_crt0_1): Remove static, use just one argument.
+	* dll_init.cc (dllcrt0_info): New structure.
+	(dll_dllcrt0): Change into a front-end to renamed dll_dllcrt0_1 so that
+	we'll always be assured of having something like a tls.
+	(dll_dllcrt0_1): New function, basically renamed from from dll_dllcrt0.
+	Unconditionally call _my_tls.init_exception_handler now that we are
+	assured of having a tls.  Change variable name from "linking" to "linked".
+	* winsup.h (dll_crt0_1): Declare.
+	(dll_dllcrt0_1): Ditto.
+
 2006-05-30  Christopher Faylor  <cgf@timesys.com>
 
 	* cygtls.cc (_cygtls::call2): Don't call ExitThread on the main thread.
