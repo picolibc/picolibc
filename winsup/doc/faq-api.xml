@@ -277,12 +277,17 @@ netdb.  It isn't a good idea to use it in your applications.
 <question><para>I don't want Unix sockets, how do I use normal Win32 winsock?</para></question>
 <answer>
 
-<para><emphasis role='bold'>(Please note: This section has not yet been updated for the latest net release.)</emphasis>
-</para>
-<para>To use the vanilla Win32 winsock, you just need to #define Win32_Winsock
-and #include "windows.h" at the top of your source file(s).  You'll also
-want to add -lwsock32 to the compiler's command line so you link against
-libwsock32.a.
+<para>To use the vanilla Win32 winsock, you just need to #define __USE_W32_WINSOCK
+and #include "windows.h" (or "winsock2.h" at the top of your source file(s).  You may
+find it easier to add "-D__USE_W32_WINSOCK" to the CFLAGS settings in your makefile,
+if you are using one, as this will then apply to all your source files.  It is also
+worth using "#define WIN32_LEAN_AND_MEAN" before you include the windows header file,
+as this will prevent it from pulling in lots of header files for all sorts of unrelated
+windows APIs when all you want is the Winsock definitions; again, this could be set
+for the entire project in your CFLAGS.
+</para><para>
+You'll also need to add -lwsock32 to the compiler's command line (or the makefile's
+list of link libs) so that you link against libwsock32.a.
 </para>
 </answer></qandaentry>
 

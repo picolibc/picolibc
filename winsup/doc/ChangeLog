@@ -1,3 +1,8 @@
+2006-05-30  Dave Korn  <dave.korn@artimi.com> 
+
+	* faq-api.xml (faq.api.winsock):  Replace references to depracated
+	Win32_Winsock macro with __USE_W32_WINSOCK, and enlarge on details.
+
 2006-05-24  Christopher Faylor  <cgf@timesys.com>
 
 	* configure.in: Update to newer autoconf.
