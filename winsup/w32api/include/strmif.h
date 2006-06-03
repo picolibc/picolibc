@@ -129,7 +129,7 @@ typedef enum tagAMTunerModeType {
 	AMTUNER_MODE_DSS = 0x0008
 } AMTunerModeType;
 typedef enum tagAnalogVideoStandard {
-	AnalogVideo_None = 0x00000000
+	AnalogVideo_None = 0x00000000,
 	AnalogVideo_NTSC_M = 0x00000001,
 	AnalogVideo_NTSC_M_J = 0x00000002,
 	AnalogVideo_NTSC_433 = 0x00000004,

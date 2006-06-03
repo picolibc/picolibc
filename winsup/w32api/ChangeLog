@@ -1,5 +1,9 @@
 2006-06-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/strmif.h (enum tagAnalogVideoStandard): Add missing ','.
+
+2006-06-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/winuser.h (DM_BITSPERPEL, DM_PELSWIDTH, DM_PELSHEIGHT,
 	DM_DISPLAYFLAGS, DM_DISPLAYFREQUENCY): Remove.  Duplicates of
 	wingdi.h defines.
