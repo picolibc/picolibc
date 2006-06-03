@@ -793,7 +793,9 @@
 
 2006-04-13  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
-	* include/winbase.h (GET_MODULE_HANDLE_EX_FLAG_*): Define.
+	* include/winbase.h (GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
+	GET_MODULE_HANDLE_EX_FLAG_PIN,
+	GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT): Define.
 	Thanks to:    Brandon Sneed <brandon at redf dot net>
 
 2006-04-08  Danny Smith  <dannysmith@users.sourceforge.net>
