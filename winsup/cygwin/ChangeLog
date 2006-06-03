@@ -1,7 +1,8 @@
 2006-06-03  Christopher Faylor  <cgf@timesys.com>
 
 	* cygthread.cc (cygthread::terminate_thread): In debugging output, use
-	name of thread being terminated rather than thread doing terminating.
+	name of thread being terminated rather than thread doing the
+	terminating.
 
 	* fhandler.h (fhandler_pty_master::slave): Delete.
 	(fhandler_pty_master::get_unit): Ditto.
