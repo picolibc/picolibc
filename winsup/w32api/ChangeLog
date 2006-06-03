@@ -1,3 +1,18 @@
+2006-06-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winuser.h (DM_BITSPERPEL, DM_PELSWIDTH, DM_PELSHEIGHT,
+	DM_DISPLAYFLAGS, DM_DISPLAYFREQUENCY): Remove.  Duplicates of
+	wingdi.h defines.
+
+2006-06-02  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/winuser.h ((SPI_GETMOUSETRAILS,SPI_SETMOUSETRAILS): Remove
+	duplicate defines.
+
+	* include/winnt.h (SUBLANG_ARABIC_SAUDI_ARABIA): Revert accidental
+	removal.
+        (SUBLANG_MARATHI_INDIA): Remove duplicate define.
+
 2006-05-24  Christopher Faylor  <cgf@timesys.com>
 
 	* configure.in: Update to newer autoconf.
