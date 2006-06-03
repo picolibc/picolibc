@@ -62,7 +62,6 @@ fhandler_tty_master::set_winsize (bool sendSIGWINCH)
 int
 fhandler_tty_master::init ()
 {
-  slave = dev ();
   termios_printf ("Creating master for tty%d", get_unit ());
 
   if (init_console ())
@@ -75,7 +74,7 @@ fhandler_tty_master::init ()
   memset (&ti, 0, sizeof (ti));
   console->tcsetattr (0, &ti);
 
-  if (!setup (*cygwin_shared->tty[get_unit ()]))
+  if (!setup (false))
     return 1;
 
   set_winsize (false);
@@ -458,7 +457,7 @@ int
 fhandler_tty_slave::open (int flags, mode_t)
 {
   if (get_device () == FH_TTY)
-    pc.dev.tty_to_real_device ();
+    dev().tty_to_real_device ();
   fhandler_tty_slave *arch = (fhandler_tty_slave *) cygheap->fdtab.find_archetype (pc.dev);
   if (arch)
     {
@@ -1084,23 +1083,13 @@ fhandler_pty_master::fhandler_pty_master ()
 int
 fhandler_pty_master::open (int flags, mode_t)
 {
-  fhandler_pty_master *arch = (fhandler_tty_master *) cygheap->fdtab.find_archetype (pc.dev);
-  if (arch)
-    {
-      *this = *(fhandler_pty_master *) arch;
-      termios_printf ("copied fhandler_pty_master archetype");
-      set_flags ((flags & ~O_TEXT) | O_BINARY);
-      goto out;
-    }
-
   int ntty;
   ntty = cygwin_shared->tty.allocate (false);
   if (ntty < 0)
     return 0;
 
-  slave = *ttys_dev;
-  slave.setunit (ntty);
-  if (!setup (*cygwin_shared->tty[ntty]))
+  dev().devn = FHDEV (DEV_TTYM_MAJOR, ntty);
+  if (!setup (true))
     {
       lock_ttys::release ();
       return 0;
@@ -1110,13 +1099,12 @@ fhandler_pty_master::open (int flags, mode_t)
   set_open_status ();
   //
   // FIXME: Do this better someday
-  arch = (fhandler_tty_master *) cmalloc (HEAP_ARCHETYPES, sizeof (*this));
+  fhandler_pty_master *arch = (fhandler_tty_master *) cmalloc (HEAP_ARCHETYPES, sizeof (*this));
   *((fhandler_pty_master **) cygheap->fdtab.add_archetype ()) = arch;
   archetype = arch;
   *arch = *this;
   arch->dwProcessId = GetCurrentProcessId ();
 
-out:
   usecount = 0;
   arch->usecount++;
   char buf[sizeof ("opened pty master for ttyNNNNNNNNNNN")];
@@ -1338,8 +1326,10 @@ fhandler_tty_master::init_console ()
   } while (0)
 
 bool
-fhandler_pty_master::setup (tty& t)
+fhandler_pty_master::setup (bool ispty)
 {
+  tty& t = *cygwin_shared->tty[get_unit ()];
+
   tcinit (&t, true);		/* Set termios information.  Force initialization. */
 
   const char *errstr = NULL;
@@ -1380,7 +1370,7 @@ fhandler_pty_master::setup (tty& t)
 
   /* Create synchronisation events */
 
-  if (get_major () == DEV_TTYM_MAJOR)
+  if (!ispty)
     {
       if (!(output_done_event = t.get_event (errstr = OUTPUT_DONE_EVENT)))
 	goto err;

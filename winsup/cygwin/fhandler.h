@@ -993,8 +993,6 @@ class fhandler_tty_slave: public fhandler_tty_common
 class fhandler_pty_master: public fhandler_tty_common
 {
   int pktmode;			// non-zero if pty in a packet mode.
-protected:
-  device slave;			// device type of slave
 public:
   int need_nl;			// Next read should start with \n
   DWORD dwProcessId;		// Owner of master handles
@@ -1019,8 +1017,7 @@ public:
 
   HANDLE from_master, to_master;
   bool hit_eof ();
-  int get_unit () const { return slave.minor; }
-  bool setup (tty&);
+  bool setup (bool);
   int dup (fhandler_base *);
   void fixup_after_fork (HANDLE parent);
   void fixup_after_exec ();

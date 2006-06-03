@@ -289,7 +289,7 @@ bool
 cygthread::terminate_thread ()
 {
   bool terminated = true;
-  debug_printf ("thread '%s', id %p, inuse %d, stack_ptr %p", name (), id, inuse, stack_ptr);
+  debug_printf ("thread '%s', id %p, inuse %d, stack_ptr %p", __name, id, inuse, stack_ptr);
   while (inuse && !stack_ptr)
     low_priority_sleep (0);
 

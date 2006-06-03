@@ -1,5 +1,28 @@
 2006-06-03  Christopher Faylor  <cgf@timesys.com>
 
+	* cygthread.cc (cygthread::terminate_thread): In debugging output, use
+	name of thread being terminated rather than thread doing terminating.
+
+	* fhandler.h (fhandler_pty_master::slave): Delete.
+	(fhandler_pty_master::get_unit): Ditto.
+	(fhandler_pty_master::setup): Change argument declaration to
+	accommodate new usage.
+	* fhandler_tty.cc (fhandler_tty_master::init): Remove obsolete slave
+	assignment.  Pass argument to setup indicating that this is a tty.
+	(fhandler_tty_slave::open): Use dev() method rather than referencing
+	pc.dev directly.
+	(fhandler_pty_master::open): Don't create archetype based on ptym
+	device number.  Set device number to use DEV_TTYM_MAJOR and tty number.
+	Pass argument to setup indicating that this is a pty.
+	(fhandler_pty_master::setup): Change single argument to a flag
+	indicating whether we're creating a pty and use appropriately.
+	Calculate 't' variable here rather than in caller.
+
+	* fhandler_dsp.cc (fhandler_dev_dsp::open): Use dev() method rather
+	than referencing pc.dev directly.
+
+2006-06-03  Christopher Faylor  <cgf@timesys.com>
+
 	* dcrt0.cc (dll_crt0_0): Call tty_list::init_session here.
 	(dll_crt0_1): Reflect renaming from tty_init to tty::init_session.
 	(do_exit): Reflect moving of tty_terminate into tty_list.

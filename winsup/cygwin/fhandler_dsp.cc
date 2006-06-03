@@ -945,7 +945,7 @@ fhandler_dev_dsp::fhandler_dev_dsp ():
 int
 fhandler_dev_dsp::open (int flags, mode_t mode)
 {
-  if (cygheap->fdtab.find_archetype (pc.dev))
+  if (cygheap->fdtab.find_archetype (dev ()))
     {
       set_errno (EBUSY);
       return 0;
