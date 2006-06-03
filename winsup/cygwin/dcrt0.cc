@@ -534,13 +534,14 @@ child_info_fork::alloc_stack ()
     }
 }
 
-#ifdef DEBUGGING
-void
+extern "C" void
 break_here ()
 {
+  static int NO_COPY sent_break;
+  if (!sent_break++)
+    DebugBreak ();
   debug_printf ("break here");
 }
-#endif
 
 static void
 initial_env ()
@@ -578,7 +579,6 @@ initial_env ()
 	  error_start_init (p);
 	  try_to_debug ();
 	  console_printf ("*** Sending Break.  gdb may issue spurious SIGTRAP message.\n");
-	  DebugBreak ();
 	  break_here ();
 	}
     }

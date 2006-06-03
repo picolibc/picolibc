@@ -345,7 +345,8 @@ try_to_debug (bool waitloop)
     return 0;
   if (being_debugged ())
     {
-      DebugBreak ();
+      extern void break_here ();
+      break_here ();
       return 0;
     }
 
