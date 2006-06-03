@@ -102,21 +102,8 @@ void
 init_cygheap::close_ctty ()
 {
   debug_printf ("closing cygheap->ctty %p", cygheap->ctty);
-#ifdef NEWVFORK
-  int usecount = cygheap->ctty->usecount;
-#endif
   cygheap->ctty->close ();
-#ifndef NEWVFORK
   cygheap->ctty = NULL;
-#else  // FIXME: This code ain't right
-  if (cygheap->ctty_on_hold == cygheap->ctty)
-    cygheap->ctty_on_hold = NULL;
-  if (usecount == 1)
-    {
-      cygheap->ctty = NULL;
-      debug_printf ("setting cygheap->ctty to NULL");
-    }
-#endif
 }
 
 #define nextpage(x) ((char *) (((DWORD) ((char *) x + granmask)) & ~granmask))

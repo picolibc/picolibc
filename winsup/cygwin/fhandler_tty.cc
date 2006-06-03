@@ -164,8 +164,8 @@ void
 fhandler_pty_master::doecho (const void *str, DWORD len)
 {
   acquire_output_mutex (INFINITE);
-  if (!WriteFile (get_ttyp ()->to_master, str, len, &len, NULL))
-    termios_printf ("Write to %p failed, %E", get_ttyp ()->to_master);
+  if (!WriteFile (to_master, str, len, &len, NULL))
+    termios_printf ("Write to %p failed, %E", to_master);
 //  WaitForSingleObject (output_done_event, INFINITE);
   release_output_mutex ();
 }
@@ -520,8 +520,6 @@ fhandler_tty_slave::open (int flags, mode_t)
     release_output_mutex ();
   }
 
-  /* Duplicate tty handles.  */
-
   if (!get_ttyp ()->from_master || !get_ttyp ()->to_master)
     {
       termios_printf ("tty handles have been closed");
@@ -582,9 +580,9 @@ fhandler_tty_slave::open (int flags, mode_t)
     }
 
   termios_printf ("duplicated from_master %p->%p from tty_owner",
-      get_ttyp ()->from_master, from_master_local);
+		  get_ttyp ()->from_master, from_master_local);
   termios_printf ("duplicated to_master %p->%p from tty_owner",
-      get_ttyp ()->to_master, to_master_local);
+		  get_ttyp ()->to_master, to_master_local);
 
   set_io_handle (from_master_local);
   set_output_handle (to_master_local);
@@ -1145,15 +1143,6 @@ fhandler_tty_common::close ()
   if (!ForceCloseHandle1 (get_output_handle (), to_pty))
     termios_printf ("CloseHandle (get_output_handle ()<%p>), %E", get_output_handle ());
 
-#if 0 // CGF - DELETME
-  /* Send EOF to slaves if master side is closed */
-  if (!get_ttyp ()->master_alive ())
-    {
-      termios_printf ("no more masters left. sending EOF");
-      SetEvent (input_available_event);
-    }
-#endif
-
   if (!ForceCloseHandle (input_available_event))
     termios_printf ("CloseHandle (input_available_event<%p>), %E", input_available_event);
 
@@ -1307,9 +1296,7 @@ fhandler_tty_slave::fixup_after_fork (HANDLE parent)
 void
 fhandler_tty_slave::fixup_after_exec ()
 {
-  if (close_on_exec ())
-    close ();
-  else
+  if (!close_on_exec ())
     fixup_after_fork (NULL);
 }
 
@@ -1438,6 +1425,8 @@ err:
   close_maybe (input_available_event);
   close_maybe (output_mutex);
   close_maybe (input_mutex);
+  close_maybe (from_master);
+  close_maybe (to_master);
   termios_printf ("tty%d open failed - failed to create %s", errstr);
   return false;
 }
@@ -1469,8 +1458,6 @@ fhandler_pty_master::fixup_after_fork (HANDLE parent)
 void
 fhandler_pty_master::fixup_after_exec ()
 {
-  if (close_on_exec ())
-    close ();
-  else
+  if (!close_on_exec ())
     fixup_after_fork (spawn_info->parent);
 }

@@ -693,7 +693,10 @@ dtable::fixup_after_exec ()
 	if (fh->close_on_exec ())
 	  {
 	    if (fh->archetype)
-	      fh->close ();
+	      {
+		debug_printf ("closing fd %d since it is an archetype", i);
+		fh->close ();
+	      }
 	    release (i);
 	  }
 	else if (i == 0)

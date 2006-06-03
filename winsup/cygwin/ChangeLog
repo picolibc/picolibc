@@ -1,3 +1,16 @@
+2006-06-03  Christopher Faylor  <cgf@timesys.com>
+
+	* cygheap.cc (init_cygheap::close_ctty): Remove obsolete code.
+	* dcrt0.cc (child_info_spawn::handle_spawn): Signal ready after we've
+	run fixup_after_exec.
+	* dtable.cc (dtable::fixup_after_exec): Add debugging output.
+	* fhandler_tty.cc (fhandler_pty_master::doecho): Use class version of
+	to_master.
+	(fhandler_tty_common::close): Remove obsolete code.
+	(fhandler_tty_slave::fixup_after_exec): Don't close, since this is done
+	in dtable's fixup_after_exec.  (revisit later?)
+	(fhandler_pty_master::fixup_after_exec): Ditto.
+
 2006-06-02  Christopher Faylor  <cgf@timesys.com>
 
 	* cygtls.h (CYGTLS_PADSIZE): Bump up or suffer a regrettable collision

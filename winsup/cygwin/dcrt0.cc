@@ -685,13 +685,13 @@ child_info_spawn::handle_spawn ()
 			FALSE, DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
     h = NULL;
   set_myself (h);
-  ready (true);
   __argc = moreinfo->argc;
   __argv = moreinfo->argv;
   envp = moreinfo->envp;
   envc = moreinfo->envc;
   if (!dynamically_loaded)
     cygheap->fdtab.fixup_after_exec ();
+  ready (true);
 
   /* Need to do this after debug_fixup_after_fork_exec or DEBUGGING handling of
      handles might get confused. */
