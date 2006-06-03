@@ -1,5 +1,10 @@
 2006-06-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/strmif.h (VMRDeinterlaceTech): Correct typedef for DeinterlaceTech_*
+	enum.
+
+2006-06-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/strmif.h (enum tagAnalogVideoStandard): Add missing ','.
 
 2006-06-02  Danny Smith  <dannysmith@users.sourceforge.net>

@@ -560,7 +560,7 @@ typedef enum {
 	DeinterlaceTech_FieldAdaptive = 0x0020,
 	DeinterlaceTech_PixelAdaptive = 0x0040,
 	DeinterlaceTech_MotionVectorSteered = 0x0080
-} VMRDeinterlacePrefs;
+} VMRDeinterlaceTech;
 typedef enum {
 	MixerPref_NoDecimation = 0x00000001,
 	MixerPref_DecimateOutput = 0x00000002,
