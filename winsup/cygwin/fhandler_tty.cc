@@ -471,7 +471,7 @@ fhandler_tty_slave::open (int flags, mode_t)
 
   tcinit (cygwin_shared->tty[get_unit ()]);
 
-  attach_tty (get_unit ());
+  cygwin_shared->tty.attach (get_unit ());
 
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   /* Create synchronisation events */
@@ -537,6 +537,12 @@ fhandler_tty_slave::open (int flags, mode_t)
       || !cygserver_attach_tty (&from_master_local, &to_master_local))
 #endif
     {
+      if (get_ttyp ()->master_pid < 0)
+	{
+	  set_errno (EAGAIN);
+	  termios_printf ("*** master is closed");
+	  return 0;
+	}
       pinfo p (get_ttyp ()->master_pid);
       if (!p)
 	{
@@ -1087,7 +1093,8 @@ fhandler_pty_master::open (int flags, mode_t)
       goto out;
     }
 
-  int ntty = cygwin_shared->tty.allocate_tty (false);
+  int ntty;
+  ntty = cygwin_shared->tty.allocate (false);
   if (ntty < 0)
     return 0;
 
@@ -1095,10 +1102,10 @@ fhandler_pty_master::open (int flags, mode_t)
   slave.setunit (ntty);
   if (!setup (*cygwin_shared->tty[ntty]))
     {
-      ReleaseMutex (tty_mutex);	// lock was set in allocate_tty
+      lock_ttys::release ();
       return 0;
     }
-  ReleaseMutex (tty_mutex);	// lock was set in allocate_tty
+  lock_ttys::release ();
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();
   //
@@ -1112,8 +1119,9 @@ fhandler_pty_master::open (int flags, mode_t)
 out:
   usecount = 0;
   arch->usecount++;
-  report_tty_counts (this, "opened master", "");
-  termios_printf ("opened pty master tty%d", get_unit ());
+  char buf[sizeof ("opened pty master for ttyNNNNNNNNNNN")];
+  __small_sprintf (buf, "opened pty master for tty%d", get_unit ());
+  report_tty_counts (this, buf, "");
   return 1;
 }
 
@@ -1184,8 +1192,10 @@ fhandler_pty_master::close ()
     }
   fhandler_tty_common::close ();
 
-  if (!hExeced && get_ttyp ()->master_pid == myself->pid)
-    get_ttyp ()->init ();
+  if (hExeced || get_ttyp ()->master_pid != myself->pid)
+    termios_printf ("not clearing: %d, master_pid %d", hExeced, get_ttyp ()->master_pid);
+  else
+    get_ttyp ()->set_master_closed ();
 
   return 0;
 }
@@ -1337,11 +1347,6 @@ fhandler_pty_master::setup (tty& t)
 
   /* Create communication pipes */
 
-#if 0 // CGF: don't think this is needed since it is handled by the constructor
-  input_handle = io_handle = output_done_event = ioctl_done_event =
-    ioctl_request_event = input_available_event = output_mutex = input_mutex NULL;
-#endif
-
   /* FIXME: should this be sec_none_nih? */
   if (!CreatePipe (&from_master, &get_output_handle (), &sec_all, 128 * 1024))
     {
@@ -1355,7 +1360,7 @@ fhandler_pty_master::setup (tty& t)
       goto err;
     }
 
-  if (!SetNamedPipeHandleState (&get_output_handle (), &pipe_mode, NULL, NULL))
+  if (!SetNamedPipeHandleState (get_output_handle (), &pipe_mode, NULL, NULL))
     termios_printf ("can't set output_handle(%p) to non-blocking mode",
 		    get_output_handle ());
 

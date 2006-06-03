@@ -369,7 +369,7 @@ try_to_debug (bool waitloop)
   /* if any of these mutexes is owned, we will fail to start any cygwin app
      until trapped app exits */
 
-  ReleaseMutex (tty_mutex);
+  lock_ttys::release ();
 
   /* prevent recursive exception handling */
   char* rawenv = GetEnvironmentStrings () ;
@@ -1297,22 +1297,9 @@ _cygtls::signal_exit (int rc)
   do_exit (rc);
 }
 
-HANDLE NO_COPY tty_mutex = NULL;
-
 void
 events_init ()
 {
-  char *name;
-  char mutex_name[CYG_MAX_PATH];
-  /* tty_mutex is on while searching for a tty slot. It's necessary
-     while finding console window handle */
-
-  if (!(tty_mutex = CreateMutex (&sec_all_nih, FALSE,
-				   name = shared_name (mutex_name,
-						       "tty_mutex", 0))))
-    api_fatal ("can't create title mutex '%s', %E", name);
-
-  ProtectHandle (tty_mutex);
   mask_sync.init ("mask_sync");
   windows_system_directory[0] = '\0';
   GetSystemDirectory (windows_system_directory, sizeof (windows_system_directory) - 2);
@@ -1393,7 +1380,7 @@ _cygtls::copy_context (CONTEXT *c)
 void
 _cygtls::signal_debugger (int sig)
 {
-  if (being_debugged ())
+  if (isinitialized () && being_debugged ())
     {
       char sigmsg[2 * sizeof (_CYGWIN_SIGNAL_STRING " ffffffff ffffffff")];
       __small_sprintf (sigmsg, _CYGWIN_SIGNAL_STRING " %d %p %p", sig, thread_id, &thread_context);

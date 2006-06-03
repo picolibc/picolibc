@@ -331,14 +331,20 @@ _pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *arch)
   if ((ctty < 0 || ctty == tc->ntty) && !(flags & O_NOCTTY))
     {
       ctty = tc->ntty;
-      syscall_printf ("attached %s sid %d, pid %d, tty->pgid %d, tty->sid %d",
-		      __ctty (), sid, pid, pgid, tc->getsid ());
+      lock_ttys here;
+      syscall_printf ("attaching %s sid %d, pid %d, pgid %d, tty->pgid %d, tty->sid %d",
+		      __ctty (), sid, pid, pgid, tc->getpgid (), tc->getsid ());
 
       pinfo p (tc->getsid ());
       if (sid == pid && (!p || p->pid == pid || !p->exists ()))
 	{
+#ifdef DEBUGGING
+	  debug_printf ("resetting %s sid.  Was %d, now %d.  pgid was %d, now %d.",
+			   __ctty (), tc->getsid (), sid, tc->getpgid (), pgid);
+#else
 	  paranoid_printf ("resetting %s sid.  Was %d, now %d.  pgid was %d, now %d.",
 			   __ctty (), tc->getsid (), sid, tc->getpgid (), pgid);
+#endif
 	  /* We are the session leader */
 	  tc->setsid (sid);
 	  tc->setpgid (pgid);
@@ -346,7 +352,9 @@ _pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *arch)
       else
 	sid = tc->getsid ();
       if (tc->getpgid () == 0)
-	tc->setpgid (pgid);
+{debug_printf ("setting pgid to %d", pgid);
+	  tc->setpgid (pgid);
+}
       if (cygheap->ctty != arch)
 	{
 	  debug_printf ("cygheap->ctty %p, arch %p", cygheap->ctty, arch);

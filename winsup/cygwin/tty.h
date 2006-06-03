@@ -105,6 +105,8 @@ public:
   HANDLE open_input_mutex ();
   bool exists ()
   {
+    if (!master_pid)
+      return false;
     HANDLE h = open_output_mutex ();
     if (h)
       {
@@ -113,24 +115,41 @@ public:
       }
     return slave_alive ();
   }
+  void set_master_closed () {master_pid = -1;}
+  static void __stdcall create_master (int);
+  static void __stdcall init_session ();
   friend class fhandler_pty_master;
 };
 
 class tty_list
 {
   tty ttys[NTTYS];
+  static HANDLE mutex;
 
 public:
   tty * operator [](int n) {return ttys + n;}
-  int allocate_tty (bool); /* true if allocate a tty, pty otherwise */
-  int connect_tty (int);
+  int allocate (bool); /* true if allocate a tty, pty otherwise */
+  int connect (int);
   void terminate ();
   void init ();
   tty_min *get_tty (int n);
+  int __stdcall attach (int);
+  static void __stdcall init_session ();
+  friend class lock_ttys;
 };
 
-void __stdcall tty_init ();
-void __stdcall tty_terminate ();
-int __stdcall attach_tty (int);
-void __stdcall create_tty_master (int);
+class lock_ttys
+{
+  bool release_me;
+public:
+  lock_ttys (DWORD = INFINITE);
+  static void release ();
+  void dont_release () {release_me = false;}
+  ~lock_ttys ()
+  {
+    if (release_me)
+      release ();
+  }
+};
+
 extern "C" int ttyslot (void);

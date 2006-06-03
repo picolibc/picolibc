@@ -1,5 +1,54 @@
 2006-06-03  Christopher Faylor  <cgf@timesys.com>
 
+	* dcrt0.cc (dll_crt0_0): Call tty_list::init_session here.
+	(dll_crt0_1): Reflect renaming from tty_init to tty::init_session.
+	(do_exit): Reflect moving of tty_terminate into tty_list.
+	* exceptions.cc (events_init): Move tty_mutex stuff elsewhere.
+	* fhandler_console.cc (set_console_title): Use lock_ttys class.
+	* fhandler_termios.cc (fhandler_termios::bg_check): Make debug output
+	more accurate.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Reflect move of
+	attach_tty into tty_list class.  Don't attempt to grab master end of
+	pty if master doesn't exist.
+	(fhandler_pty_master::open): Reflect move of allocate_tty into tty_list
+	class.  Use lock_ttys::release to release mutex.  Improve debugging
+	output.
+	(fhandler_pty_master::setup): Remove if 0'ed block.  Fix argument to
+	SetNamedPipeHandleState.
+	* pinfo.cc (_pinfo::set_ctty): Lock ttys before setting sid/pgid.
+	Improve debugging.  Add temporary debugging.
+	* tty.cc (tty_list::init_session): New function.
+	(tty::init_session): Rename from tty_init.  Reflect move of attach_tty
+	to tty_list class.
+	(tty::create_master): Rename from create_tty_master.
+	(tty_list::attach): Rename from attach_tty.  Reflect renaming of
+	connect_tty to connect.  Ditto for allocate_tty.
+	(tty_terminate): Delete.
+	(tty_list::terminate): Subsume tty_terminate.  Use lock_ttys rather
+	than manipulating mutex directly.
+	(tty_list::allocate): Rename from allocate_tty.  Use lock_ttys rather
+	than manipulating mutex directly.  Don't set sid here since linux
+	apparently doesn't do this.  Reflect move of create_tty_master into
+	tty.
+	(lock_ttys::lock_ttys): Define new constructor.
+	(lock_ttys::release): New function.
+	* tty.h (tty::exists): Return false immediately if !master_pid.
+	(tty::set_master_closed): Define new function.
+	(tty::create_master): Ditto.
+	(tty::init_session): Ditto.
+	(tty_list::mutex): New field.
+	(tty_list::allocate): Define new function.
+	(tty_list::connect): Ditto.
+	(tty_list::attach): Ditto.
+	(tty_list::init_session): Ditto.
+	(lock_ttys): New class.
+	(tty_init): Delete declaration.
+	(tty_terminate): Ditto.
+	(attach_tty): Ditto.
+	(create_tty_master): Ditto.
+
+2006-06-03  Christopher Faylor  <cgf@timesys.com>
+
 	* Makefile.in (libdl.a): New library.
 
 2006-06-03  Christopher Faylor  <cgf@timesys.com>

@@ -1781,14 +1781,11 @@ fhandler_console::set_close_on_exec (bool val)
 void __stdcall
 set_console_title (char *title)
 {
-  int rc;
   char buf[257];
   strncpy (buf, title, sizeof (buf) - 1);
   buf[sizeof (buf) - 1] = '\0';
-  if ((rc = WaitForSingleObject (tty_mutex, 15000)) != WAIT_OBJECT_0)
-    sigproc_printf ("wait for title mutex failed rc %d, %E", rc);
+  lock_ttys here (15000);
   SetConsoleTitle (buf);
-  ReleaseMutex (tty_mutex);
   debug_printf ("title '%s'", buf);
 }
 

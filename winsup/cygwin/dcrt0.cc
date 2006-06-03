@@ -768,6 +768,7 @@ dll_crt0_0 ()
 
   /* Initialize events */
   events_init ();
+  tty_list::init_session ();
 
   cygheap->cwd.init ();
 
@@ -867,9 +868,8 @@ dll_crt0_1 (void *)
   if (!threadfunc_ix)
     system_printf ("internal error: couldn't determine location of thread function on stack.  Expect signal problems.");
 
-
   /* Connect to tty. */
-  tty_init ();
+  tty::init_session ();
 
   if (!__argc)
     {
@@ -1110,7 +1110,7 @@ do_exit (int status)
   if (exit_state < ES_TTY_TERMINATE)
     {
       exit_state = ES_TTY_TERMINATE;
-      tty_terminate ();
+      cygwin_shared->tty.terminate ();
     }
 
   myself.exit (n);

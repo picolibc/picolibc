@@ -54,8 +54,23 @@ ttyslot (void)
   return myself->ctty;
 }
 
+HANDLE NO_COPY tty_list::mutex = NULL;
+
 void __stdcall
-tty_init ()
+tty_list::init_session ()
+{
+  char mutex_name[CYG_MAX_PATH];
+  /* tty_list::mutex is used while searching for a tty slot. It's necessary
+     while finding console window handle */
+
+  char *name = shared_name (mutex_name, "tty_list::mutex", 0);
+  if (!(mutex = CreateMutex (&sec_all_nih, FALSE, name)))
+    api_fatal ("can't create tty_list::mutex '%s', %E", name);
+  ProtectHandle (mutex);
+}
+
+void __stdcall
+tty::init_session ()
 {
   if (!myself->cygstarted && NOTSTATE (myself, PID_CYGPARENT))
     cygheap->fdtab.get_debugger_info ();
@@ -64,7 +79,7 @@ tty_init ()
     return;
   if (myself->ctty == -1)
     if (NOTSTATE (myself, PID_CYGPARENT))
-      myself->ctty = attach_tty (myself->ctty);
+      myself->ctty = cygwin_shared->tty.attach (myself->ctty);
     else
       return;
   if (myself->ctty == -1)
@@ -74,7 +89,7 @@ tty_init ()
 /* Create session's master tty */
 
 void __stdcall
-create_tty_master (int ttynum)
+tty::create_master (int ttynum)
 {
   device ttym = *ttym_dev;
   ttym.setunit (ttynum); /* CGF FIXME device */
@@ -104,29 +119,23 @@ create_tty_master (int ttynum)
     }
 }
 
-void __stdcall
-tty_terminate ()
-{
-  if (NOTSTATE (myself, PID_USETTY))
-    return;
-  cygwin_shared->tty.terminate ();
-}
-
 int __stdcall
-attach_tty (int num)
+tty_list::attach (int num)
 {
   if (num != -1)
     {
-      return cygwin_shared->tty.connect_tty (num);
+      return connect (num);
     }
   if (NOTSTATE (myself, PID_USETTY))
     return -1;
-  return cygwin_shared->tty.allocate_tty (true);
+  return allocate (true);
 }
 
 void
 tty_list::terminate ()
 {
+  if (NOTSTATE (myself, PID_USETTY))
+    return;
   int ttynum = myself->ctty;
 
   /* Keep master running till there are connected clients */
@@ -151,8 +160,7 @@ tty_list::terminate ()
 	  low_priority_sleep (200);
 	}
 
-      if (WaitForSingleObject (tty_mutex, INFINITE) == WAIT_FAILED)
-	termios_printf ("WFSO for tty_mutex %p failed, %E", tty_mutex);
+      lock_ttys here ();
 
       termios_printf ("tty %d master about to finish", ttynum);
       CloseHandle (tty_master->get_io_handle ());
@@ -163,13 +171,11 @@ tty_list::terminate ()
       char buf[20];
       __small_sprintf (buf, "tty%d", ttynum);
       logout (buf);
-
-      ReleaseMutex (tty_mutex);
     }
 }
 
 int
-tty_list::connect_tty (int ttynum)
+tty_list::connect (int ttynum)
 {
   if (ttynum < 0 || ttynum >= NTTYS)
     {
@@ -201,7 +207,7 @@ tty_list::init ()
    If flag == 0, just find a free tty.
  */
 int
-tty_list::allocate_tty (bool with_console)
+tty_list::allocate (bool with_console)
 {
   HWND console;
   int freetty = -1;
@@ -209,8 +215,7 @@ tty_list::allocate_tty (bool with_console)
 
   /* FIXME: This whole function needs a protective mutex. */
 
-  if (WaitForSingleObject (tty_mutex, INFINITE) == WAIT_FAILED)
-    termios_printf ("WFSO for tty_mutex %p failed, %E", tty_mutex);
+  lock_ttys here;
 
   if (!with_console)
     console = NULL;
@@ -282,26 +287,21 @@ tty_list::allocate_tty (bool with_console)
   t = ttys + freetty;
   t->init ();
   t->setsid (-1);
-  t->setpgid (myself->pgid);
   t->sethwnd (console);
 
 out:
   if (freetty < 0)
-    {
-      ReleaseMutex (tty_mutex);
-      system_printf ("No tty allocated");
-    }
+    system_printf ("No tty allocated");
   else if (!with_console)
     {
       termios_printf ("tty%d allocated", freetty);
-      /* exit with tty_mutex still held -- caller has more work to do */
+      here.dont_release (); /* exit with mutex still held -- caller has more work to do */
     }
   else
     {
       termios_printf ("console %p associated with tty%d", console, freetty);
       if (!hmaster)
-	create_tty_master (freetty);
-      ReleaseMutex (tty_mutex);
+	tty::create_master (freetty);
     }
   return freetty;
 }
@@ -385,4 +385,19 @@ tty::get_event (const char *fmt, BOOL manual_reset)
 
   termios_printf ("created event %s", buf);
   return hev;
+}
+
+lock_ttys::lock_ttys (DWORD howlong): release_me (true)
+{
+  if (WaitForSingleObject (tty_list::mutex, howlong) == WAIT_FAILED)
+    {
+      termios_printf ("WFSO for mutex %p failed, %E", tty_list::mutex);
+      release_me = false;
+    }
+}
+
+void
+lock_ttys::release ()
+{
+  ReleaseMutex (tty_list::mutex);
 }
