@@ -1,5 +1,16 @@
 2006-06-03  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler_tty.cc (fhandler_pty_master::close): Don't close handles if
+	we don't own them.
+	(fhandler_pty_master::setup): Make sure that original handle is closed
+	when changing inheritance.
+	(fhandler_pty_master::fixup_after_fork): Set from_master/to_master to
+	arch value always.
+	(fhandler_pty_master::fixup_after_exec): Clear from_master/to_master
+	when close_on_exec.
+
+2006-06-03  Christopher Faylor  <cgf@timesys.com>
+
 	* cygheap.cc (init_cygheap::close_ctty): Remove obsolete code.
 	* dcrt0.cc (child_info_spawn::handle_spawn): Signal ready after we've
 	run fixup_after_exec.

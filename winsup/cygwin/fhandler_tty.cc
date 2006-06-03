@@ -1170,10 +1170,18 @@ fhandler_pty_master::close ()
     }
 
   fhandler_tty_master *arch = (fhandler_tty_master *) archetype;
-  if (!ForceCloseHandle (arch->from_master))
-    termios_printf ("error closing from_master %p, %E", arch->from_master);
-  if (!ForceCloseHandle (arch->to_master))
-    termios_printf ("error closing from_master %p, %E", arch->to_master);
+  if (arch->dwProcessId != GetCurrentProcessId ())
+    termios_printf ("not closing from_master(%p)/to_master(%p) since we don't own them(%d)",
+		    arch->from_master, arch->to_master, arch->dwProcessId);
+  else
+    {
+      termios_printf ("closing from_master(%p)/to_master(%p) since we own them(%d)",
+		      arch->from_master, arch->to_master, arch->dwProcessId);
+      if (!ForceCloseHandle (arch->from_master))
+	termios_printf ("error closing from_master %p, %E", arch->from_master);
+      if (!ForceCloseHandle (arch->to_master))
+	termios_printf ("error closing from_master %p, %E", arch->to_master);
+    }
   fhandler_tty_common::close ();
 
   if (!hExeced && get_ttyp ()->master_pid == myself->pid)
@@ -1390,14 +1398,14 @@ fhandler_pty_master::setup (tty& t)
     goto err;
 
   if (!DuplicateHandle (hMainProc, from_master, hMainProc, &from_master, 0, false,
-			DUPLICATE_SAME_ACCESS))
+			DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
     {
       errstr = "non-inheritable from_master";
       goto err;
     }
 
   if (!DuplicateHandle (hMainProc, to_master, hMainProc, &to_master, 0, false,
-			DUPLICATE_SAME_ACCESS))
+			DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
     {
       errstr = "non-inheritable to_master";
       goto err;
@@ -1452,6 +1460,8 @@ fhandler_pty_master::fixup_after_fork (HANDLE parent)
 	}
       arch->dwProcessId = wpid;
     }
+  from_master = arch->from_master;
+  to_master = arch->to_master;
   report_tty_counts (this, "inherited master", "");
 }
 
@@ -1460,4 +1470,6 @@ fhandler_pty_master::fixup_after_exec ()
 {
   if (!close_on_exec ())
     fixup_after_fork (spawn_info->parent);
+  else
+    from_master = to_master = NULL;
 }
