@@ -1,5 +1,9 @@
 2006-06-03  Christopher Faylor  <cgf@timesys.com>
 
+	* Makefile.in (libdl.a): New library.
+
+2006-06-03  Christopher Faylor  <cgf@timesys.com>
+
 	* fhandler_tty.cc (fhandler_pty_master::close): Don't close handles if
 	we don't own them.
 	(fhandler_pty_master::setup): Make sure that original handle is closed
