@@ -728,11 +728,11 @@
 	* winuser.h  [_WIN32_WCE] (DialogBoxParam{A|W}): Conditionally
 	declare as extern function without dllimport attribute on PocketPC.
 
-2006-04-18  Thorsten Dahlheimer (dahlheim@users.sf.net>
+2006-04-18  Thorsten Dahlheimer <dahlheim@users.sf.net>
 
 	* lib/test.c: Include icm.h.
 
-2006-04-18  Thorsten Dahlheimer (dahlheim@users.sf.net>
+2006-04-18  Thorsten Dahlheimer <dahlheim@users.sf.net>
 
 	* include/wingdi.h (ColorCorrectPalette): Add declaration.
 	(CreateColorSpace): Add UNICODE mappings.
@@ -741,25 +741,38 @@
 	* lib/mscms.def: New file.
 	* lib/icmui.def: New file.
 
-2006-04-18  Thorsten Dahlheimer (dahlheim@users.sf.net>
+2006-04-18  Thorsten Dahlheimer <dahlheim@users.sf.net>
 
 	* include/winnt.h (IMAGE_FILE_MACHINE_IA64): New define.
 	(IMAGE_FILE_MACHINE_AMD64): New define.
-	(IMAGE_NT_OPTIONAL_HDR{32|64}_MAGIC. New. Map to IMAGE_NT_OPTIONAL_HDR_MAGIC.
+	(IMAGE_NT_OPTIONAL_HDR32_MAGIC,IMAGE_NT_OPTIONAL_HDR64_MAGIC):
+	New defines.
+	(IMAGE_NT_OPTIONAL_HDR_MAGIC): Map to one of the above.
 	(IMAGE_SUBSYSTEM_NATIVE_WINDOWS): New define.
 	(IMAGE_SUBSYSTEM_WINDOWS_CE_GUI): New define.
 	(IMAGE_DLLCHARACTERISTICS_WDM_DRIVER): New define.
-	(IMAGE_DIRECTORY_ENTRY_*): New defines.
-	(IMAGE_SCN_TYPE_*): New defines.
-	(IMAGE_SCN_ALIGN_*): New defines.
+	(IMAGE_DIRECTORY_ENTRY_ARCHITECTURE,IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT)
+	(IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR): New defines.
+	(IMAGE_SCN_TYPE_REG,IMAGE_SCN_TYPE_DSECT,IMAGE_SCN_TYPE_NOLOAD)
+	(IMAGE_SCN_TYPE_GROUP,IMAGE_SCN_TYPE_COPY,IMAGE_SCN_TYPE_OVER):
+	New defines.
+	(IMAGE_SCN_ALIGN_128BYTES,IMAGE_SCN_ALIGN_256BYTES)
+	(IMAGE_SCN_ALIGN_512BYTES,IMAGE_SCN_ALIGN_1024BYTES)
+	(IMAGE_SCN_ALIGN_2048BYTES,IMAGE_SCN_ALIGN_4096BYTES)
+	(IMAGE_SCN_ALIGN_8192BYTES): New defines.
 	(IMAGE_DEBUG_TYPE_BORLAND): New define.
-	(IMAGE_OPTIONAL_HEADER{32|64}): New structure definitions and typedefs.  Map to
-	IMAGE_OPTIONAL_HEADERS.
-	(IMAGE_NT_HEADERS{32|64}): New structure definitions and typedefs.  Map to
-	IMAGE_NT_HEADERS.
-	(IMAGE_LOAD_CONFIG_DIRECTORY64): New structure definition and typedefs.
-	(IMAGE_CE_RUNTIME_FUNCTION_ENTRY): Likewise.
-	(IMAGE_FUNCTION_ENTRY64): Likewise.
+	(IMAGE_OPTIONAL_HEADER32,PIMAGE_OPTIONAL_HEADER32)
+	(IMAGE_OPTIONAL_HEADER64,PIMAGE_OPTIONAL_HEADER64): New structure
+	definitions and typedefs.
+	(IMAGE_OPTIONAL_HEADER,PIMAGE_OPTIONAL_HEADER): Map to the above.
+	(IMAGE_NT_HEADERS32,PIMAGE_NT_HEADERS32,IMAGE_NT_HEADERS64)
+	(PIMAGE_NT_HEADERS64): New structure definitions and typedefs.
+	(IMAGE_NT_HEADERS,PIMAGE_NT_HEADERS): Map to the above.
+	(IMAGE_LOAD_CONFIG_DIRECTORY64,PIMAGE_LOAD_CONFIG_DIRECTORY64):
+	New structure definition and typedefs.
+	(IMAGE_CE_RUNTIME_FUNCTION_ENTRY,PIMAGE_CE_RUNTIME_FUNCTION_ENTRY):
+	Likewise.
+	(IMAGE_FUNCTION_ENTRY64,PIMAGE_FUNCTION_ENTRY64): Likewise.
 
 2006-04-18  Bart Oldeman  <bartoldeman@users.sf.net>
 
