@@ -238,7 +238,8 @@ struct _cygtls
 };
 #pragma pack(pop)
 
-const int CYGTLS_PADSIZE = 4 * sizeof (_cygtls);
+const int CYGTLS_PADSIZE = 12700;	/* FIXME: Find some way to autogenerate
+					   this value */
 /*gentls_offsets*/
 
 extern char *_tlsbase __asm__ ("%fs:4");
