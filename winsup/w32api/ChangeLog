@@ -1,3 +1,12 @@
+2006-06-04	Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
+
+	* lib/Makefile.in: Add unknwn-uuid and servprov-uuid as sources and
+	objects.
+	* lib/uuid.c (IID_IUnknown, IID_IClassFactory, IID_IServiceProvider):
+	Remove.  Moved to unknwn-uuid and servprov-uuid.
+	* lib/unknwn-uuid.c: New file.
+	* lib/servprov-uuid.c: New file.
+
 2006-06-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/strmif.h (VMRDeinterlaceTech): Correct typedef for DeinterlaceTech_*
