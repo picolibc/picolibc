@@ -1,5 +1,11 @@
 2006-06-04  Christopher Faylor  <cgf@timesys.com>
 
+	* ioctl.cc (ioctl): Accommodate change in reported pty master device
+	number.
+	* select.cc (peek_pipe): Ditto.
+
+2006-06-04  Christopher Faylor  <cgf@timesys.com>
+
 	* cygtls.h (CYGTLS_PADSIZE): Reset to a size that XP SP1 seems to like.
 	* tlsoffsets.h: Regenerate.
 

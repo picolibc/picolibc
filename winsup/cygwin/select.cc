@@ -457,10 +457,9 @@ peek_pipe (select_record *s, bool from_select)
 	  goto out;
 	}
 
-      switch (fh->get_device ())
+      switch (fh->get_major ())
 	{
-	case FH_PTYM:
-	case FH_TTYM:
+	case DEV_TTYM_MAJOR:
 	  if (((fhandler_pty_master *) fh)->need_nl)
 	    {
 	      gotone = s->read_ready = true;

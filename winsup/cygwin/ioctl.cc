@@ -1,6 +1,6 @@
 /* ioctl.cc: ioctl routines.
 
-   Copyright 1996, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 1996, 1998, 1999, 2000, 2001, 2002, 2003, 2006 Red Hat, Inc.
 
    Written by Doug Evans of Cygnus Support
    dje@cygnus.com
@@ -38,7 +38,10 @@ ioctl (int fd, int cmd, ...)
 
   debug_printf ("fd %d, cmd %x", fd, cmd);
   int res;
-  if (cfd->is_tty () && cfd->get_device () != FH_PTYM)
+  /* FIXME: This stinks.  There are collisions between cmd types
+     depending on whether fd is associated with a pty master or not.
+     Something to fix for Cygwin2.  CGF 2006-06-04 */
+  if (cfd->is_tty () && cfd->get_major () != DEV_TTYM_MAJOR)
     switch (cmd)
       {
 	case TCGETA:
