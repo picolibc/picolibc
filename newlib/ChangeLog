@@ -1,3 +1,12 @@
+2006-06-05  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* Makefile.am (AM_MAKEFLAGS): Pass CCASFLAGS.
+	* Makefile.in: Regenerated.
+	* libc/machine/sh/Makefile.am (AM_CCASFLAGS): Remove
+	extraneous CFLAGS reference now that CCASFLAGS are being extended
+	properly via multilib.
+	* libc/machine/sh/Makefile.in: Regenerated.
+
 2006-06-02  Shaun Jackman  <sjackman@gmail.com>
 
 	* libc/unix/sigset.c: Undefine sigfillset, sigdelset, and
