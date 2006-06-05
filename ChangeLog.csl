@@ -1,3 +1,21 @@
+2006-06-05  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* gdb/configure.tgt (gdb_osabi): uclinux is like linux.
+	* gdb/m68k-tdep.c (m68k_svr4_extract_return_value): Return value
+	is never in %a0.
+	(m68k_reg_struct_return_p): Duplicate gcc's struct mode algorithm.
+	(m68k_svr4_return_value) Use VALUE_STRUCT_CONVENTION.  do not rely
+	on %a0.
+	(m68k_push_dummy_call): Force stack alignment.
+	(m68k_svr4_init_abi): Set struct_return convention.
+	(m68k_aout_init_abi): New.
+	(m68k_gdbarch_init): Default to bare elf ABI that gcc provides.
+	* gdb/m68k-tdep.h (m68k_aout_init_abi): Declare.
+	* gdb/m68kbsd-tdep.c (m68kbsd_aout_init_abi): Use m68k_aout_init_abi.
+	(m68kbsd_elf_init_abi): Add comment.
+	* gdb/m68klinux-tdep.c (m68k_linux_init_abi): Just set the struct
+	pointer register here.
+
 2006-06-01  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* gdb/breakpoint.c (insert_bp_location): Remember the failing
