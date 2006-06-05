@@ -1,5 +1,12 @@
 2006-06-05  Nathan Sidwell  <nathan@codesourcery.com>
 
+	* gdb/remote.c (remote_insert_watchpoint): Return -1, rather than
+	fatal error if packet is disabled.
+	(remote_remove_watchpoint, remote_insert_hw_breakpoint,
+	remote_remove_hw_breakpoint): Likewise.
+	Revert my 2006-06-01  Nathan Sidwell  <nathan@codesourcery.com>
+	change to breakpoint.c
+
 	* gdb/testsuite/gdb.asm/m68k.inc (gdbasm_call): Use jsr.
 	* gdb/testsuite/gdb.base/fileio.c (stop): New.  Call it everywhere
 	the debugger should stop.
