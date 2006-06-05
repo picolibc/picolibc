@@ -1,3 +1,7 @@
+2006-06-05  Thiemo Seufer  <ths@mips.com>
+
+	* mips.h: Improve description of MT flags.	
+
 2006-05-25  Richard Sandiford  <richard@codesourcery.com>
 
 	* m68k.h (mcf_mask): Define.

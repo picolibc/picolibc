@@ -353,8 +353,8 @@ struct mips_opcode
    "@" 10 bit signed immediate (OP_*_IMM10)
 
    MT ASE usage:
-   "!" 1 bit immediate at bit 5
-   "$" 1 bit immediate at bit 4
+   "!" 1 bit usermode flag (OP_*_MT_U)
+   "$" 1 bit load high flag (OP_*_MT_H)
    "*" 2 bit dsp/smartmips accumulator register (OP_*_MTACC_T)
    "&" 2 bit dsp/smartmips accumulator register (OP_*_MTACC_D)
    "g" 5 bit coprocessor 1 and 2 destination register (OP_*_RD)
