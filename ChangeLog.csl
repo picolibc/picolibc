@@ -1,5 +1,11 @@
 2006-06-05  Nathan Sidwell  <nathan@codesourcery.com>
 
+	* gdb/testsuite/gdb.asm/m68k.inc (gdbasm_call): Use jsr.
+	* gdb/testsuite/gdb.base/fileio.c (stop): New.  Call it everywhere
+	the debugger should stop.
+	* gdb/testsuite/gdb.base/charset.exp: Add breakpoint to stop
+	routine and adjust.
+
 	* gdb/m68k-tdep.c (M68K_FPREG_SIZE): Remove.
 	(REGISTER_BYTES_FP): Use tdep->fpreg_type.
 	(m68k_register_bytes_ok): adjust.
