@@ -1,5 +1,9 @@
 2006-06-05  Nathan Sidwell  <nathan@codesourcery.com>
 
+	* gdb/m68k-tdep.c (m68k_dwarf_reg_to_regnum): New.
+	(m68k_gdbarch_init): Set it for dwarf & dwarf2 reg number
+	conversion. Use M68K_NUM_REGS for number of regs.
+
 	* gdb/configure.tgt (gdb_osabi): uclinux is like linux.
 	* gdb/m68k-tdep.c (m68k_svr4_extract_return_value): Return value
 	is never in %a0.
