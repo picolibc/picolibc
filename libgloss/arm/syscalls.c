@@ -13,6 +13,7 @@
 #include <sys/times.h>
 #include <errno.h>
 #include <reent.h>
+#include <signal.h>
 #include <unistd.h>
 #include "swi.h"
 
@@ -463,9 +464,15 @@ _kill (int pid, int sig)
 {
   (void)pid; (void)sig;
 #ifdef ARM_RDI_MONITOR
-  /* Note: Both arguments are thrown away.  */
-  return do_AngelSWI (AngelSWI_Reason_ReportException,
-		      (void *) ADP_Stopped_ApplicationExit);
+  /* Note: The pid argument is thrown away.  */
+  switch (sig) {
+	  case SIGABRT:
+		  return do_AngelSWI (AngelSWI_Reason_ReportException,
+				  (void *) ADP_Stopped_RunTimeError);
+	  default:
+		  return do_AngelSWI (AngelSWI_Reason_ReportException,
+				  (void *) ADP_Stopped_ApplicationExit);
+  }
 #else
   asm ("swi %a0" :: "i" (SWI_Exit));
 #endif

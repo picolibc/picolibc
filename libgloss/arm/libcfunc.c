@@ -24,18 +24,6 @@ do_AngelSWI (int reason, void * arg)
 }
 #endif /* ARM_RDI_MONITOR */
 
-void
-abort (void)
-{
-  extern void _exit (int n);
-#ifdef ARM_RDI_MONITOR
-  do_AngelSWI (AngelSWI_Reason_ReportException,
-	      (void *) ADP_Stopped_RunTimeError);
-#else
-  _exit(17);
-#endif
-}
-
 unsigned __attribute__((weak))
 alarm (unsigned seconds)
 {

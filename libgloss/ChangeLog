@@ -1,3 +1,9 @@
+2006-06-05  Shaun Jackman  <sjackman@gmail.com>
+
+	* arm/syscalls.c (kill) [ARM_RDI_MONITOR]: Use the signal
+	argument to choose an ADP exception reason.
+	* arm/libcfunc.c (abort): Remove this function.
+
 2006-05-30  Shaun Jackman  <sjackman@gmail.com>
 
       * arm/Makefile.in: Add Linux syscall interface.
