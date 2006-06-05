@@ -1,3 +1,8 @@
+2006-06-05  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* config-ml.in: Alter CCASFLAGS to include special
+	multilib options the same as is done for CFLAGS.
+
 2006-05-31  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* Makefile.def: Added dependencies from sim and gdb on intl, and

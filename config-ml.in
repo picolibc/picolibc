@@ -546,6 +546,7 @@ multi-do:
 		flags=`echo $$i | sed -e 's/^[^;]*;//' -e 's/@/ -/g'`; \
 		if (cd ../$${dir}/$${lib}; $(MAKE) $(FLAGS_TO_PASS) \
 				CFLAGS="$(CFLAGS) $${flags}" \
+				CCASFLAGS="$(CCASFLAGS) $${flags}" \
 				FCFLAGS="$(FCFLAGS) $${flags}" \
 				FFLAGS="$(FFLAGS) $${flags}" \
 				ADAFLAGS="$(ADAFLAGS) $${flags}" \
