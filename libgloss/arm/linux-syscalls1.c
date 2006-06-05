@@ -62,3 +62,10 @@ pid_t waitpid(pid_t pid, int *status, int options)
 {
 	return wait4(pid, status, options, NULL);
 }
+
+extern int _reboot(int magic, int magic2, int flag, void *arg);
+
+int reboot(int flag)
+{
+	return _reboot(0xfee1dead, 0x28121969, flag, NULL);
+}

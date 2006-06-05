@@ -1,16 +1,21 @@
 2006-06-05  Shaun Jackman  <sjackman@gmail.com>
 
+	* arm/linux-syscalls0.S (reboot): Remove.
+	* arm/linux-syscalls1.c (reboot): New function.
+
+2006-06-05  Shaun Jackman  <sjackman@gmail.com>
+
 	* arm/syscalls.c (kill) [ARM_RDI_MONITOR]: Use the signal
 	argument to choose an ADP exception reason.
 	* arm/libcfunc.c (abort): Remove this function.
 
 2006-05-30  Shaun Jackman  <sjackman@gmail.com>
 
-      * arm/Makefile.in: Add Linux syscall interface.
-      * arm/linux-crt0.S: New file.
-      * arm/linux-syscall.h: New file.
-      * arm/linux-syscalls0.S: New file.
-      * arm/linux-syscalls1.c: New file.
+	* arm/Makefile.in: Add Linux syscall interface.
+	* arm/linux-crt0.S: New file.
+	* arm/linux-syscall.h: New file.
+	* arm/linux-syscalls0.S: New file.
+	* arm/linux-syscalls1.c: New file.
 
 2006-05-23  Fred Fish  <fnf@specifix.com>
 
