@@ -1,5 +1,18 @@
 2006-06-05  Nathan Sidwell  <nathan@codesourcery.com>
 
+	* gdb/m68k-tdep.c (M68K_FPREG_SIZE): Remove.
+	(REGISTER_BYTES_FP): Use tdep->fpreg_type.
+	(m68k_register_bytes_ok): adjust.
+	(m68k_register_type): Use tdep->fpreg_type.
+	(m68k_register_to_value, m68k_value_to_register): Likewise.
+	(m68k_svr4_extract_return_value): Use tdep->float_return &
+	tdep->fpreg_type.
+	(m68k_svr4_store_return_value): Likewise.
+	(m68k_gdbarch_init): Set tdep->float_return & tdep->fpreg_type.
+	* gdb/m68k-tdep.h (struct gdbarch_tdep): Add floar_return &
+	fpreg_type fields.
+	* gdb/m68kbsd-tdep.c (m68kbsd_fpreg_offset): Use tdep->fpreg_type.
+
 	* gdb/m68k-tdep.c (m68k_dwarf_reg_to_regnum): New.
 	(m68k_gdbarch_init): Set it for dwarf & dwarf2 reg number
 	conversion. Use M68K_NUM_REGS for number of regs.
