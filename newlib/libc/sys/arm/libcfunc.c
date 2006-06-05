@@ -24,17 +24,6 @@ do_AngelSWI (int reason, void * arg)
 
 
 void
-abort (void)
-{
-#ifdef ARM_RDI_MONITOR
-  do_AngelSWI (AngelSWI_Reason_ReportException,
-	      (void *) ADP_Stopped_RunTimeError);
-#else
- asm ("mov r0,#17\nswi %a0" :: "i" (SWI_Exit));
-#endif
-}
-
-void
 alarm (void)
 {
 }

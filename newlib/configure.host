@@ -510,11 +510,11 @@ case "${host}" in
 	;;
   arm-*-pe)
 	syscall_dir=syscalls
-	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
+	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY"
 	;;
   arm-*-*)
 	syscall_dir=syscalls
-	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
+	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY"
 # If newlib is supplying syscalls, select which debug protocol is being used.
 # ARM_RDP_MONITOR selects the Demon monitor.
 # ARM_RDI_MONITOR selects the Angel monitor.
@@ -553,7 +553,7 @@ case "${host}" in
 	;;
   ep9312-*-*)
 	syscall_dir=syscalls
-	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
+	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY"
 	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
 	  newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
 	fi
@@ -660,16 +660,16 @@ case "${host}" in
 	;;
   strongarm-*-*)
 	syscall_dir=syscalls
-	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
+	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY"
 	;;
   thumb-*-pe)
 	syscall_dir=syscalls
-	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
+	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY"
 # Don't use the debugging protocols just yet.
 	;;
   thumb-*-*)
 	syscall_dir=syscalls
-	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
+	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY"
 # If newlib is supplying syscalls, select which debug protocol is being used.
 # ARM_RDP_MONITOR selects the Demon monitor.
 # ARM_RDI_MONITOR selects the Angel monitor.
@@ -700,7 +700,7 @@ case "${host}" in
 	;;	
   xscale-*-*)
 	syscall_dir=syscalls
-	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
+	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY"
 	newlib_cflags="${newlib_cflags} -DHAVE_SYSTEM -DHAVE_RENAME"
 	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
 	  newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"

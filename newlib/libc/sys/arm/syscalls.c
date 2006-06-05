@@ -12,6 +12,7 @@
 #include <sys/times.h>
 #include <errno.h>
 #include <reent.h>
+#include <signal.h>
 #include <unistd.h>
 #include "swi.h"
 
@@ -433,30 +434,34 @@ _close (int file)
   return wrap (_swiclose (file));
 }
 
-void
-_exit (int n)
+int
+_kill (int pid, int sig)
 {
-  /* FIXME: return code is thrown away.  */
-  
+  (void)pid; (void)sig;
 #ifdef ARM_RDI_MONITOR
-  do_AngelSWI (AngelSWI_Reason_ReportException,
-	      (void *) ADP_Stopped_ApplicationExit);
+  /* Note: The pid argument is thrown away.  */
+  switch (sig) {
+	  case SIGABRT:
+		  return do_AngelSWI (AngelSWI_Reason_ReportException,
+				  (void *) ADP_Stopped_RunTimeError);
+	  default:
+		  return do_AngelSWI (AngelSWI_Reason_ReportException,
+				  (void *) ADP_Stopped_ApplicationExit);
+  }
 #else
   asm ("swi %a0" :: "i" (SWI_Exit));
 #endif
-  n = n;
 }
 
-int
-_kill (int n, int m)
+void
+_exit (int status)
 {
-#ifdef ARM_RDI_MONITOR
-  return do_AngelSWI (AngelSWI_Reason_ReportException,
-		      (void *) ADP_Stopped_ApplicationExit);
-#else
-  asm ("swi %a0" :: "i" (SWI_Exit));
-#endif
-  n = n; m = m;
+  /* There is only one SWI for both _exit and _kill. For _exit, call
+     the SWI with the second argument set to -1, an invalid value for
+     signum, so that the SWI handler can distinguish the two calls.
+     Note: The RDI implementation of _kill throws away both its
+     arguments.  */
+  _kill(status, -1);
 }
 
 int

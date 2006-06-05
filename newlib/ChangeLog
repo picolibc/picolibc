@@ -1,3 +1,10 @@
+2006-06-05  Shaun Jackman  <sjackman@gmail.com>
+
+	configure.host (newlib_cflags) [arm, thumb, xscale]:  Remove
+	-DABORT_PROVIDED flag.
+	* newlib/libc/sys/arm/syscalls.c (kill, exit): Sync with libgloss.
+	* newlib/libc/sys/arm/libcfunc.c (abort): Ditto.
+
 2006-06-05  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* Makefile.am (AM_MAKEFLAGS): Pass CCASFLAGS.
