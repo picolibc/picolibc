@@ -131,9 +131,9 @@ BDM_OBJS=	bdm-isv.o bdm-semihost.o $(BDM_SYSOBJS) \
 		$(patsubst %,bdm-%.o,${BDM_ISRS})
 BDM_OTHER_OBJS=	getpid.o kill.o sbrk.o print.o putnum.o
 BDM_SYSOBJS= 	bdm-close.o bdm-exit.o bdm-fstat.o bdm-gdb.o \
-		bdm-gettimeofday.o bdm-inbyte.o bdm-isatty.o bdm-lseek.o \
+		bdm-gettimeofday.o bdm-isatty.o bdm-lseek.o \
 		bdm-open.o bdm-read.o bdm-rename.o \
-		bdm-stat.o bdm-system.o bdm-unlink.o bdm-write.o
+		bdm-stat.o bdm-system.o bdm-time.o bdm-unlink.o bdm-write.o
 BDM_ISRS=	other_interrupt reset access_error address_error \
 	illegal_instruction divide_by_zero privilege_violation \
 	trace unimplemented_line_a_opcode unimplemented_line_f_opcode \

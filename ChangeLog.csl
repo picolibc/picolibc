@@ -1,3 +1,23 @@
+2006-06-05  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* libgloss/m68k/Makefile.in (BDM_SYSOBJS): Remove bdm-inbyte.o.
+	Add bdm-time.o.
+	* libgloss/m68k/bdm-close.c: Add copyright notice.
+	* libgloss/m68k/bdm-fstat.c: Add copyright notice.
+	* libgloss/m68k/bdm-gettimeofday.c: Add copyright notice. Fix &/|
+	thinko.
+	* libgloss/m68k/bdm-inbyte.c: Remove.
+	* libgloss/m68k/bdm-isatty.c: Add copyright notice.
+	* libgloss/m68k/bdm-lseek.c: Add copyright notice.
+	* libgloss/m68k/bdm-open.c: Add copyright notice.
+	* libgloss/m68k/bdm-read.c: Add copyright notice.
+	* libgloss/m68k/bdm-rename.c: Add copyright notice.
+	* libgloss/m68k/bdm-stat.c: Add copyright notice.
+	* libgloss/m68k/bdm-system.c: Add copyright notice.
+	* libgloss/m68k/bdm-time.c: New.
+	* libgloss/m68k/bdm-unlink.c: Add copyright notice.
+	* libgloss/m68k/bdm-write.c: Add copyright notice.
+
 2006-05-31  Mark Mitchell  <mark@codesourcery.com>
 
 	* libgloss/arm/elf-lm3s301.ld: New script.
