@@ -4,11 +4,11 @@
 	Add bdm-time.o.
 	* libgloss/m68k/bdm-close.c: Add copyright notice.
 	* libgloss/m68k/bdm-fstat.c: Add copyright notice.
-	* libgloss/m68k/bdm-gettimeofday.c: Add copyright notice. Fix &/|
-	thinko.
+	* libgloss/m68k/bdm-gettimeofday.c: Add copyright notice.
 	* libgloss/m68k/bdm-inbyte.c: Remove.
 	* libgloss/m68k/bdm-isatty.c: Add copyright notice.
-	* libgloss/m68k/bdm-lseek.c: Add copyright notice.
+	* libgloss/m68k/bdm-lseek.c: Add copyright notice. Fix &/|
+	thinko.
 	* libgloss/m68k/bdm-open.c: Add copyright notice.
 	* libgloss/m68k/bdm-read.c: Add copyright notice.
 	* libgloss/m68k/bdm-rename.c: Add copyright notice.
