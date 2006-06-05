@@ -1,5 +1,13 @@
 2006-06-05  Shaun Jackman  <sjackman@gmail.com>
 
+	* libc/posix/Makefile.am (GENERAL_SOURCES): Add sleep.c and
+	usleep.c.
+	* libc/posix/Makefile.in: Regenerate.
+	* libc/posix/sleep.c: New file.
+	* libc/posix/usleep.c: Ditto.
+
+2006-06-05  Shaun Jackman  <sjackman@gmail.com>
+
 	* configure.host (newlib_cflags) [arm, thumb, xscale]:  Remove
 	-DABORT_PROVIDED flag.
 	* newlib/libc/sys/arm/syscalls.c (kill, exit): Sync with libgloss.

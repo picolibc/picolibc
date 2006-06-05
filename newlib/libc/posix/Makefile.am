@@ -7,7 +7,8 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 GENERAL_SOURCES = \
 	closedir.c creat.c isatty.c \
 	opendir.c readdir.c \
-	readdir_r.c rewinddir.c telldir.c
+	readdir_r.c rewinddir.c sleep.c usleep.c \
+	telldir.c
 
 ELIX_2_SOURCES = \
         scandir.c seekdir.c
