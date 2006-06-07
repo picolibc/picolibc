@@ -1,3 +1,47 @@
+2006-06-07  Carlos O'Donell  <carlos@codesourcery.com>
+
+	Sync from gcc:
+	
+	2006-06-06  David Ayers  <d.ayers@inode.at>
+	
+	PR libobjc/13946
+	* Makefile.def: Add dependencies for libobjc which boehm-gc.
+	* Makefile.in: Regenerate.
+	* configure.in: Add --enable-objc-gc at toplevel and have it
+	enable boehm-gc for Objective-C.
+	Remove target-boehm-gc from libgcj.
+	Add target-boehm-gc to target_libraries.
+	Add target-boehm-gc to noconfigdirs where ${libgcj}
+	is specified.
+	Assert that boehm-gc is supported when requested for Objective-C.
+	Only build boehm-gc if needed either for Java or Objective-C.
+	* configure: Regenerate.
+
+	2006-06-05  Paolo Bonzini  <bonzini@gnu.org>
+	
+	PR 27674
+	* Makefile.tpl (configure-[+prefix+][+module+],
+	all-[+prefix+][+module+]): Depend on stage_current if bootstrapping.
+	Remove rule to unstage bootstrapped modules.
+	(stage_current): New.
+	* Makefile.in: Regenerate.
+
+	2006-05-20  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+	Andreas Tobler  <a.tobler@schweiz.ch>
+
+	* configure.in:  Enable libgcj for hppa*-hp-hpux11*.
+	* configure: Rebuilt.
+
+	Revert
+	2006-01-31  Richard Guenther  <rguenther@suse.de>
+	Paolo Bonzini  <bonzini@gnu.org>
+
+	* Makefile.def (target_modules): Add libgcc-math target module.
+	* configure.in (target_libraries): Add libgcc-math target library.
+	(--enable-libgcc-math): New configure switch.
+	* Makefile.in: Re-generate.
+	* configure: Re-generate.
+
 2006-06-05  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* config-ml.in: Alter CCASFLAGS to include special
