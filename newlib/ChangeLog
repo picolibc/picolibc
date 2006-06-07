@@ -1,3 +1,7 @@
+2006-06-07  Fred Fish  <fnf@specifix.com>
+
+	* configure.host: Remove references to HAVE_GETTIMEOFDAY.
+
 2006-06-05  Shaun Jackman  <sjackman@gmail.com>
 
 	* libc/posix/Makefile.am (GENERAL_SOURCES): Add sleep.c and
