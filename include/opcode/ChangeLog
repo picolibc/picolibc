@@ -1,3 +1,9 @@
+2006-06-06  Ben Elliston  <bje@au.ibm.com>
+	    Anton Blanchard  <anton@samba.org>
+
+	* ppc.h (PPC_OPCODE_POWER6): Define.
+	Adjust whitespace.
+
 2006-06-05  Thiemo Seufer  <ths@mips.com>
 
 	* mips.h: Improve description of MT flags.	
