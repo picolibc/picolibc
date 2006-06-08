@@ -1,3 +1,16 @@
+2006-06-08  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* gdb/m68k-tdep.c (m68k_svr4_extract_return_value): Use
+	tdep->ptr_value_regnum for pointer returns.
+	(m68k_svr4_store_return_value): Likewise.
+	(m68k_reg_struct_return_r): New, broken out of ...
+	(m68k_reg_struct_return_p): ... here.  Implement gcc's structure
+	mode algorithm.
+	(m68k_svr4_init_abi, m68k_aout_init_abi): Set ptr_value_regnum.
+	(m68k_gdbarch_init): Likewise.
+	* gdb/m68k-tdep.h (struct gdbarch_tdep): Add ptr_value_regnum
+	field.
+
 2006-06-05  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* gdb/remote.c (remote_insert_watchpoint): Return -1, rather than
