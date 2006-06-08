@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-
+#include <sys/wait.h>
 /*
  * system: execute command on (remote) host
  * input parameters:
@@ -32,10 +32,24 @@
 
 int _system (const char *command)
 {
+  int e;
   gdb_parambuf_t parameters;
+  
   parameters[0] = (uint32_t) command;
   parameters[1] = (uint32_t) strlen (command) + 1;
   BDM_TRAP (BDM_SYSTEM, (uint32_t)parameters);
   errno = convert_from_gdb_errno (parameters[1]);
-  return parameters[0];
+  e = parameters[0];
+  if (e >= 0)
+    {
+      /* We have to convert e, an exit status to the encoded status of
+	 the command.  To avoid hard coding the exit status, we simply
+	 loop until we find the right position.  */
+      int exit_code;
+
+      for (exit_code = e; e && WEXITSTATUS (e) != exit_code; e <<= 1)
+	continue;
+    }
+  
+  return e;
 }
