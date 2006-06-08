@@ -1,5 +1,8 @@
 2006-06-08  Nathan Sidwell  <nathan@codesourcery.com>
 
+	* gdb/remote.c (remote_open_1): Do preopen tasks before
+	irreversably destroying state.
+
 	* gdb/m68k-tdep.c (m68k_svr4_extract_return_value): Use
 	tdep->ptr_value_regnum for pointer returns.
 	(m68k_svr4_store_return_value): Likewise.
