@@ -1,3 +1,35 @@
+2006-06-08  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* lib/Makefile.in: Add objsafe-uuid oaidl-uuid docobj-uuid comcat-uuid
+	exdisp-uuid mlang-uuid objidl-uuid as sources and objects.
+	* lib/uuid.c (CATID_Control, CATID_DocObject, CATID_Insertable,
+	CATID_PersistsToPropertyBag, CATID_PersistsToStorage, CATID_PersistsToStream,
+	CATID_PersistsToStreamInit, CATID_Printable, CATID_Programmable,
+	CLSID_CMultiLanguage, CLSID_StdComponentCategoriesMgr, CLSID_WebBrowser,
+	DIID_DWebBrowserEvents, DIID_DWebBrowserEvents2, IID_IAdviseSink,
+	IID_IAdviseSink2, IID_IBindCtx, IID_ICatInformation, IID_ICatRegister,
+	IID_IClassActivator, IID_IContinueCallback, IID_ICreateErrorInfo,
+	IID_IDataAdviseHolder, IID_IDataObject, IID_IEnumCATEGORYINFO,
+	IID_IEnumGUID, IID_IEnumOleDocumentViews, IID_IErrorInfo,
+	IID_IExternalConnection, IID_IFillLockBytes, IID_ILockBytes, IID_IMalloc,
+	IID_IMarshal, IID_IMessageFilter, IID_IMoniker, IID_IObjectSafety,
+	IID_IOleCommandTarget, IID_IOleDocument, IID_IOleDocumentSite,
+	IID_IOleDocumentView, IID_IPSFactoryBuffer, IID_IPersist,
+	IID_IPersistFile, IID_IPersistStorage, IID_IPersistStream, IID_IPrint,
+	IID_IProgressNotify, IID_IPropertySetStorage, IID_IPropertyStorage,
+	IID_IROTData, IID_IRootStorage, IID_IRpcChannelBuffer,
+	IID_IRpcProxyBuffer, IID_IRpcStubBuffer, IID_IRunnableObject,
+	IID_IRunningObjectTable, IID_ISequentialStream, IID_IStdMarshalInfo,
+	IID_IStorage, IID_IStream, IID_ISupportErrorInfo, IID_IWebBrowser,
+	IID_IWebBrowser2, IID_IWebBrowserApp): Remove. Moved to new files.
+	* lib/comcat-uuid.c: New file.
+	* lib/docobj-uuid.c: New File.
+	* lib/exdisp-uuid.c: New file.
+	* lib/mlang-uuid.c: New file.
+	* lib/oaidl-uuid.c: New file.
+	* lib/objidl-uuid.c: New file.
+	* lib/objsafe-uuid.c: New file.
+
 2006-06-07  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* lib/Makefile.in: Add oleacc-uuid oleidl-uuid ocidl-uuid as sources and
