@@ -1,3 +1,8 @@
+2006-06-09  Nathan Sidwell  <nathan@codesourcery.com>
+
+	libgloss/
+	* m68k/bdm-system.c (_system): Support system(NULL).
+
 2006-06-09  Sandra Loosemore <sandra@codesourcery.com>
 
 	* newlib/libc/sys/arm/syscalls.c (_unlink, isatty, _system, _rename):

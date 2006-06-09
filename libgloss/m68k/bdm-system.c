@@ -36,11 +36,11 @@ int _system (const char *command)
   gdb_parambuf_t parameters;
   
   parameters[0] = (uint32_t) command;
-  parameters[1] = (uint32_t) strlen (command) + 1;
+  parameters[1] = command ? (uint32_t) strlen (command) + 1 : 0;
   BDM_TRAP (BDM_SYSTEM, (uint32_t)parameters);
   errno = convert_from_gdb_errno (parameters[1]);
   e = parameters[0];
-  if (e >= 0)
+  if (e >= 0 && command)
     {
       /* We have to convert e, an exit status to the encoded status of
 	 the command.  To avoid hard coding the exit status, we simply
