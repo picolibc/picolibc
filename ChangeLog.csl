@@ -1,6 +1,13 @@
 2006-06-09  Nathan Sidwell  <nathan@codesourcery.com>
 
 	gdb/testsuite/
+	* gdb.cp/anon-union.cc: Add code at end of function.
+	* gdb.cp/anon-union.exp: Adjust end of function breakpoint.
+	* gdb.mi/var-cmd.c: Add code at end of function.
+	* gdb.mi/mi-var-display.exp: Adjust end of next.
+	* gdb.mi/mi2-var-display.exp: Likewise.
+
+	gdb/testsuite/
 	* gdb.base/break.c: Add breakpoint 10a marker.
 	* gdb.base/break.exp: Check breakpoint on }
 
