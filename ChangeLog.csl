@@ -1,6 +1,11 @@
 2006-06-09  Nathan Sidwell  <nathan@codesourcery.com>
 
 	gdb/testsuite/
+	* gdb.base/recurse.exp: Add gdb,hardware_watchpoint target
+	info.  Adjust testing to cope with a single watchpoint.
+	* gdb.base/watchpoint.exp: Adjust expected string.
+
+	gdb/testsuite/
 	* gdb.base/cursal.exp: Run to main before setting listing
 	size.
 	* gdb.base/dbx.exp: Run to main before testing.
