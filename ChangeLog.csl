@@ -1,5 +1,15 @@
 2006-06-09  Nathan Sidwell  <nathan@codesourcery.com>
 
+	gdb/
+	* remote-file.io.c (remote_fileio_func_system): Treat zero length
+	string as NULL.  Adjust for NULL pointer argument.
+	* doc/gdb.texinfo (system): Document behaviour with zero length
+	string.
+
+	gdb/testsuite/
+	* gdb.base/fileio.c: Add system(NULL) test.
+	* gdb.base/fileio.exp: Check it.
+
 	gdb/testsuite/
 	* gdb.cp/anon-union.cc: Add code at end of function.
 	* gdb.cp/anon-union.exp: Adjust end of function breakpoint.
