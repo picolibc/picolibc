@@ -1,3 +1,10 @@
+2006-06-09  Nathan Sidwell  <nathan@codesourcery.com>
+
+	gdb/
+	* m68k-tdep.c (m68k_frame_align): New.
+	(m68k_push_dummy_call): Don't align here.
+	(m68k_gdbarch_init): Set frame_align here.
+
 2006-06-08  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* gdb/remote.c (remote_open_1): Do preopen tasks before
