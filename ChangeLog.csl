@@ -1,5 +1,9 @@
 2006-06-09  Nathan Sidwell  <nathan@codesourcery.com>
 
+	gdb/testsuite/
+	* gdb.base/break.c: Add breakpoint 10a marker.
+	* gdb.base/break.exp: Check breakpoint on }
+
 	gdb/
 	* m68k-tdep.c (m68k_frame_align): New.
 	(m68k_push_dummy_call): Don't align here.
