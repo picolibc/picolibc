@@ -1,3 +1,23 @@
+2006-06-09  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* lib/Makefile.in: Add cguid-uuid and olectlid-uuid as sources and
+	objects.
+	* lib/uuid.c (CLSID_CColorPropPage, CLSID_CFontPropPage,
+	CLSID_CPicturePropPage, CLSID_Picture_Dib, CLSID_Picture_Metafile,
+	CLSID_StdFont, CLSID_StdPicture, GUID_NULL, IID_ICreateTypeInfo,
+	IID_ICreateTypeInfo2, IID_ICreateTypeLib, IID_ICreateTypeLib2, IID_IDebug,
+	IID_IDebugStream, IID_IDispatch, IID_IEnumFORMATETC,IID_IEnumMoniker,
+	IID_IEnumOLEVERB, IID_IEnumSTATDATA, IID_IEnumSTATSTG, IID_IEnumString,
+	IID_IEnumUnknown, IID_IEnumVARIANT, IID_IOleLink, IID_IPSFactory,
+	IID_IRpcChannel, IID_IRpcProxy, IID_IRpcStub, IID_ITypeInfo,
+	IID_ITypeInfo2, IID_ITypeLib, IID_ITypeLib2): Remove.  Moved to relevant
+	files.
+	* lib/oaidl-uuid.c (IID_ICreateTypeInfo, IID_ICreateTypeInfo2,
+	IID_ICreateTypeLib, IID_ICreateTypeLib2, IID_ITypeInfo, IID_ITypeInfo2,
+	IID_ITypeLib, IID_ITypeLib2, IID_IEnumVARIANT): Define.
+	* lib/cguid-uuid.c: New file.
+	* lib/olectlid-uuid.c: New file.
+
 2006-06-08  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* lib/Makefile.in: Add objsafe-uuid oaidl-uuid docobj-uuid comcat-uuid
