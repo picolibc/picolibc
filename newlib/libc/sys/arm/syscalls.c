@@ -13,6 +13,7 @@
 #include <errno.h>
 #include <reent.h>
 #include <unistd.h>
+#include <sys/wait.h>
 #include "swi.h"
 
 /* Forward prototypes.  */
@@ -22,7 +23,7 @@ int     isatty		_PARAMS ((int));
 clock_t _times		_PARAMS ((struct tms *));
 int     _gettimeofday	_PARAMS ((struct timeval *, struct timezone *));
 void    _raise 		_PARAMS ((void));
-int     _unlink		_PARAMS ((void));
+int     _unlink		_PARAMS ((const char *));
 int     _link 		_PARAMS ((void));
 int     _stat 		_PARAMS ((const char *, struct stat *));
 int     _fstat 		_PARAMS ((int, struct stat *));
@@ -504,9 +505,16 @@ _link (void)
 }
 
 int
-_unlink (void)
+_unlink (const char *path)
 {
+#ifdef ARM_RDI_MONITOR
+  int block[2];
+  block[0] = path;
+  block[1] = strlen(path);
+  return wrap (do_AngelSWI (AngelSWI_Reason_Remove, block)) ? -1 : 0;
+#else  
   return -1;
+#endif
 }
 
 void
@@ -571,22 +579,60 @@ _times (struct tms * tp)
 int
 isatty (int fd)
 {
-  return 1;
-  fd = fd;
+#ifdef ARM_RDI_MONITOR
+  int fh = remap_handle (fd);
+  return wrap (do_AngelSWI (AngelSWI_Reason_IsTTY, &fh));
+#else
+  return (fd <= 2) ? 1 : 0;  /* one of stdin, stdout, stderr */
+#endif
 }
 
 int
 _system (const char *s)
 {
+#ifdef ARM_RDI_MONITOR
+  int block[2];
+  int e;
+
+  /* Hmmm.  The ARM debug interface specification doesn't say whether
+     SYS_SYSTEM does the right thing with a null argument, or assign any
+     meaning to its return value.  Try to do something reasonable....  */
+  if (!s)
+    return 1;  /* maybe there is a shell available? we can hope. :-P */
+  block[0] = s;
+  block[1] = strlen (s);
+  e = wrap (do_AngelSWI (AngelSWI_Reason_System, block));
+  if ((e >= 0) && (e < 256))
+    {
+      /* We have to convert e, an exit status to the encoded status of
+         the command.  To avoid hard coding the exit status, we simply
+	 loop until we find the right position.  */
+      int exit_code;
+
+      for (exit_code = e; e && WEXITSTATUS (e) != exit_code; e <<= 1)
+	continue;
+    }
+  return e;
+#else
   if (s == NULL)
     return 0;
   errno = ENOSYS;
   return -1;
+#endif
 }
 
 int
 _rename (const char * oldpath, const char * newpath)
 {
+#ifdef ARM_RDI_MONITOR
+  int block[4];
+  block[0] = oldpath;
+  block[1] = strlen(oldpath);
+  block[2] = newpath;
+  block[3] = strlen(newpath);
+  return wrap (do_AngelSWI (AngelSWI_Reason_Rename, block)) ? -1 : 0;
+#else  
   errno = ENOSYS;
   return -1;
+#endif
 }

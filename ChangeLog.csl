@@ -1,3 +1,10 @@
+2006-06-09  Sandra Loosemore <sandra@codesourcery.com>
+
+	* newlib/libc/sys/arm/syscalls.c (_unlink, isatty, _system, _rename):
+	Make them do something useful in the ARM_RDI_MONITOR case.
+	* libgloss/arm/syscalls.c (_unlink, isatty, _system, _rename):
+	Likewise.
+
 2006-06-08  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* libgloss/m68k/bdm-system.c (_system): Properly encode non

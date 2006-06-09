@@ -14,6 +14,7 @@
 #include <errno.h>
 #include <reent.h>
 #include <unistd.h>
+#include <sys/wait.h>
 #include "swi.h"
 
 /* Forward prototypes.  */
@@ -560,7 +561,10 @@ int
 _unlink (const char *path)
 {
 #ifdef ARM_RDI_MONITOR
-  return do_AngelSWI (AngelSWI_Reason_Remove, &path);
+  int block[2];
+  block[0] = path;
+  block[1] = strlen(path);
+  return wrap (do_AngelSWI (AngelSWI_Reason_Remove, block)) ? -1 : 0;
 #else
   (void)path;
   asm ("swi %a0" :: "i" (SWI_Remove));
@@ -631,11 +635,14 @@ _times (struct tms * tp)
 int
 _isatty (int fd)
 {
+  int fh = remap_handle (fd);
 #ifdef ARM_RDI_MONITOR
-  return do_AngelSWI (AngelSWI_Reason_IsTTY, &fd);
+  return wrap (do_AngelSWI (AngelSWI_Reason_IsTTY, &fh));
 #else
-  (void)fd;
-  asm ("swi %a0" :: "i" (SWI_IsTTY));
+  asm ("mov r0, %1; swi %a0"
+       : /* No outputs */
+       : "i" (SWI_IsTTY), "r"(fh)
+       : "r0");
 #endif
 }
 
@@ -643,7 +650,28 @@ int
 _system (const char *s)
 {
 #ifdef ARM_RDI_MONITOR
-  return do_AngelSWI (AngelSWI_Reason_System, &s);
+  int block[2];
+  int e;
+
+  /* Hmmm.  The ARM debug interface specification doesn't say whether
+     SYS_SYSTEM does the right thing with a null argument, or assign any
+     meaning to its return value.  Try to do something reasonable....  */
+  if (!s)
+    return 1;  /* maybe there is a shell available? we can hope. :-P */
+  block[0] = s;
+  block[1] = strlen (s);
+  e = wrap (do_AngelSWI (AngelSWI_Reason_System, block));
+  if ((e >= 0) && (e < 256))
+    {
+      /* We have to convert e, an exit status to the encoded status of
+         the command.  To avoid hard coding the exit status, we simply
+	 loop until we find the right position.  */
+      int exit_code;
+
+      for (exit_code = e; e && WEXITSTATUS (e) != exit_code; e <<= 1)
+	continue;
+    }
+  return e;
 #else
   (void)s;
   asm ("swi %a0" :: "i" (SWI_CLI));
@@ -654,8 +682,12 @@ int
 _rename (const char * oldpath, const char * newpath)
 {
 #ifdef ARM_RDI_MONITOR
-  const char *block[2] = {oldpath, newpath};
-  return do_AngelSWI (AngelSWI_Reason_Rename, block);
+  int block[4];
+  block[0] = oldpath;
+  block[1] = strlen(oldpath);
+  block[2] = newpath;
+  block[3] = strlen(newpath);
+  return wrap (do_AngelSWI (AngelSWI_Reason_Rename, block)) ? -1 : 0;
 #else
   (void)oldpath; (void)newpath;
   asm ("swi %a0" :: "i" (SWI_Rename));
