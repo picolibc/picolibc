@@ -1,5 +1,17 @@
 2006-06-09  Nathan Sidwell  <nathan@codesourcery.com>
 
+	gdb/testsuite/
+	* gdb.base/cursal.exp: Run to main before setting listing
+	size.
+	* gdb.base/dbx.exp: Run to main before testing.
+	* gdb.base/ending-run.exp: Add additional expected string.
+	* gdb.base/huge.c: Allow CRASH_GDB to be set from command
+	line.
+	* gdb.base/huge.exp: Loop over compilation to find a size that
+	is acceptable.
+	* gdb.base/remote.exp: Correct expected strings.
+	* gdb.dwarf2/mac-fileno.S: Avoid # comments.
+
 	gdb/
 	* remote-file.io.c (remote_fileio_func_system): Treat zero length
 	string as NULL.  Adjust for NULL pointer argument.
