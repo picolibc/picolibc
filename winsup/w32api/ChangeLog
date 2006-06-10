@@ -1,5 +1,9 @@
 2006-06-10  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* lib/Makefile.in:  Added hlguids-uuid as source and object.
+
+2006-06-10  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* lib/uuid.c (CLSID_StaticDib, CLSID_StaticMetafile, CLSID_StdHlink,
 	CLSID_StdHlinkBrowseContext): Remove.  Moved to relevant files.
 	* lib/cguid-uuid.c (CLSID_StaticDib, CLSID_StaticMetafile): Added.
