@@ -1,3 +1,11 @@
+2006-06-10  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* lib/Makefile.in: Added ativscp-uuid as source and object.
+	* lib/uuid.c (IID_IActiveScript, IID_IActiveScriptError,
+	IID_IActiveScriptParse, IID_IActiveScriptSite,
+	IID_IActiveScriptSiteWindow): Remove.  Moved to ativscp-uuid.c.
+	* lib/ativscp-uuid.c: New file.
+
 2006-06-09  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* lib/uuid.c (IID_IClientSecurity, IID_IMallocSpy, IID_IServerSecurity):
