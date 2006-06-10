@@ -1,5 +1,16 @@
 2006-06-10  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* lib/Makefile.in: Added urlmon-uuid and hlink-uuid as sources and
+	objects.
+	* lib/uuid.c (IID_IAuthenticate, IID_IBindHost, IID_IBindProtocol,
+	IID_IBindStatusCallback, IID_IBindStatusCallbackMsg, IID_IBinding,
+	IID_IHlink, IID_IHlinkBrowseContext, IID_IHlinkFrame, IID_IHlinkSite,
+	IID_IHlinkTarget): Remove.  Moved to new files.
+	* lib/urlmon-uuid.c: New file.
+	* lib/hlink-uuid.c: New file.
+
+2006-06-10  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* lib/Makefile.in: Added ativscp-uuid as source and object.
 	* lib/uuid.c (IID_IActiveScript, IID_IActiveScriptError,
 	IID_IActiveScriptParse, IID_IActiveScriptSite,
