@@ -1,5 +1,12 @@
 2006-06-09  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* lib/uuid.c (IID_IClientSecurity, IID_IMallocSpy, IID_IServerSecurity):
+	Remove.  Moved to objidl-uuid.c
+	* lib/objidl-uuid.c (IID_IClientSecurity, IID_IMallocSpy,
+	IID_IServerSecurity): Defined.
+
+2006-06-09  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* lib/Makefile.in: Add cguid-uuid and olectlid-uuid as sources and
 	objects.
 	* lib/uuid.c (CLSID_CColorPropPage, CLSID_CFontPropPage,
