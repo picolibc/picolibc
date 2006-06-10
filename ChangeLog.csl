@@ -1,3 +1,10 @@
+2006-06-10  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	Issue #669
+	gdb/
+	* remote-fileio.c (remote_fileio_func_read): Limit console
+	reads to 8K.
+
 2006-06-09  Nathan Sidwell  <nathan@codesourcery.com>
 
 	gdb/testsuite/
