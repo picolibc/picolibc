@@ -1,3 +1,7 @@
+2006-06-12  Pierre Humblet  Pierre.Humblet@ieee.org
+
+	* winsup.api/user_malloc.c: New file.
+
 2006-05-30  Christopher Faylor  <cgf@timesys.com>
 
 	* winsup.api/cygload.h: Increase padding to 32768.
