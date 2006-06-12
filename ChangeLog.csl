@@ -1,3 +1,11 @@
+2006-06-12  Nathan Sidwell  <nathan@codesourcery.com>
+
+	gdb/
+	* m68k-tdep.c (m68k_frame_align): Say which archs need alignment.
+
+	gdb/testsuite/
+	* gdb.base/charset.exp: Use ${srcfile}.
+
 2006-06-10  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	Issue #669
@@ -6,6 +14,11 @@
 	reads to 8K.
 
 2006-06-09  Nathan Sidwell  <nathan@codesourcery.com>
+
+	gdb/testsuite/
+	* gdb.base/auxv.exp: Skip if bare_board
+	* gdb.base/gdb1555.exp: Likewise.
+	* gdb.base/start.exp: Skip if use_gdb_stub.
 
 	gdb/testsuite/
 	* gdb.base/recurse.exp: Add gdb,hardware_watchpoint target
