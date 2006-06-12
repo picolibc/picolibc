@@ -149,15 +149,15 @@ typedef struct _VP_SCATTER_GATHER_LIST {
 
 typedef VOID DDKAPI
 (*PEXECUTE_DMA)(
-	IN PVOID  HwDeviceExtension,
-	IN PVP_DMA_ADAPTER  VpDmaAdapter,
-	IN PVP_SCATTER_GATHER_LIST  SGList,
-	IN PVOID  Context);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVP_DMA_ADAPTER  VpDmaAdapter,
+  /*IN*/ PVP_SCATTER_GATHER_LIST  SGList,
+  /*IN*/ PVOID  Context);
 
 typedef PVOID DDKAPI
 (*PVIDEO_PORT_GET_PROC_ADDRESS)(
-  IN PVOID  HwDeviceExtension,
-  IN PUCHAR  FunctionName);
+/*IN*/ PVOID  HwDeviceExtension,
+/*IN*/ PUCHAR  FunctionName);
 
 typedef struct _VIDEO_PORT_CONFIG_INFO {
   ULONG  Length;
@@ -193,17 +193,17 @@ typedef struct _VIDEO_PORT_CONFIG_INFO {
 
 typedef VP_STATUS DDKAPI
 (*PVIDEO_HW_FIND_ADAPTER)(
-	IN PVOID  HwDeviceExtension,
-	IN PVOID  HwContext,
-	IN PWSTR  ArgumentString,
-	IN OUT  PVIDEO_PORT_CONFIG_INFO  ConfigInfo,
-	OUT PUCHAR  Again);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVOID  HwContext,
+  /*IN*/ PWSTR  ArgumentString,
+  /*IN OUT*/  PVIDEO_PORT_CONFIG_INFO  ConfigInfo,
+  /*OUT*/ PUCHAR  Again);
 
 typedef VP_STATUS DDKAPI
 (*PVIDEO_HW_POWER_GET)(
-  IN PVOID  HwDeviceExtension,
-  IN ULONG  HwId,
-  IN OUT  PVIDEO_POWER_MANAGEMENT  VideoPowerControl);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ ULONG  HwId,
+  /*IN OUT*/  PVIDEO_POWER_MANAGEMENT  VideoPowerControl);
 
 /* PVIDEO_HW_GET_CHILD_DESCRIPTOR return values */
 #define VIDEO_ENUM_MORE_DEVICES           ERROR_CONTINUE
@@ -229,20 +229,20 @@ typedef enum _VIDEO_CHILD_TYPE {
 
 typedef VP_STATUS DDKAPI
 (*PVIDEO_HW_GET_CHILD_DESCRIPTOR)(
-  IN PVOID  HwDeviceExtension,
-  IN PVIDEO_CHILD_ENUM_INFO  ChildEnumInfo,
-  OUT  PVIDEO_CHILD_TYPE  VideoChildType,
-  OUT  PUCHAR  pChildDescriptor,
-  OUT  PULONG  UId,
-  OUT  PULONG  pUnused);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVIDEO_CHILD_ENUM_INFO  ChildEnumInfo,
+  /*OUT*/  PVIDEO_CHILD_TYPE  VideoChildType,
+  /*OUT*/  PUCHAR  pChildDescriptor,
+  /*OUT*/  PULONG  UId,
+  /*OUT*/  PULONG  pUnused);
 
 typedef BOOLEAN DDKAPI
 (*PVIDEO_HW_INITIALIZE)(
-  IN PVOID  HwDeviceExtension);
+  /*IN*/ PVOID  HwDeviceExtension);
 
 typedef BOOLEAN DDKAPI
 (*PVIDEO_HW_INTERRUPT)(
-  IN PVOID  HwDeviceExtension);
+  /*IN*/ PVOID  HwDeviceExtension);
 
 /* VIDEO_ACCESS_RANGE.RangePassive */
 #define VIDEO_RANGE_PASSIVE_DECODE        1
@@ -262,22 +262,22 @@ typedef struct _VIDEO_ACCESS_RANGE {
 
 typedef VOID DDKAPI
 (*PVIDEO_HW_LEGACYRESOURCES)(
-  IN ULONG  VendorId,
-  IN ULONG  DeviceId,
-  IN OUT  PVIDEO_ACCESS_RANGE  *LegacyResourceList,
-  IN OUT  PULONG  LegacyResourceCount);
+  /*IN*/ ULONG  VendorId,
+  /*IN*/ ULONG  DeviceId,
+  /*IN OUT*/  PVIDEO_ACCESS_RANGE  *LegacyResourceList,
+  /*IN OUT*/  PULONG  LegacyResourceCount);
 
 typedef VP_STATUS DDKAPI
 (*PMINIPORT_QUERY_DEVICE_ROUTINE)(
-  IN PVOID  HwDeviceExtension,
-  IN PVOID  Context,
-  IN VIDEO_DEVICE_DATA_TYPE  DeviceDataType,
-  IN PVOID  Identifier,
-  IN ULONG  IdentifierLength,
-  IN PVOID  ConfigurationData,
-  IN ULONG  ConfigurationDataLength,
-  IN OUT  PVOID  ComponentInformation,
-  IN ULONG  ComponentInformationLength);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVOID  Context,
+  /*IN*/ VIDEO_DEVICE_DATA_TYPE  DeviceDataType,
+  /*IN*/ PVOID  Identifier,
+  /*IN*/ ULONG  IdentifierLength,
+  /*IN*/ PVOID  ConfigurationData,
+  /*IN*/ ULONG  ConfigurationDataLength,
+  /*IN OUT*/  PVOID  ComponentInformation,
+  /*IN*/ ULONG  ComponentInformationLength);
 
 typedef struct _QUERY_INTERFACE {
   CONST GUID  *InterfaceType;
@@ -289,28 +289,28 @@ typedef struct _QUERY_INTERFACE {
 
 typedef VP_STATUS DDKAPI
 (*PVIDEO_HW_QUERY_INTERFACE)(
-  IN PVOID  HwDeviceExtension,
-  IN OUT  PQUERY_INTERFACE  QueryInterface);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN OUT*/  PQUERY_INTERFACE  QueryInterface);
 
 typedef VP_STATUS DDKAPI
 (*PMINIPORT_GET_REGISTRY_ROUTINE)(
-  IN PVOID  HwDeviceExtension,
-  IN PVOID  Context,
-  IN OUT  PWSTR  ValueName,
-  IN OUT  PVOID  ValueData,
-  IN ULONG  ValueLength);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVOID  Context,
+  /*IN OUT*/  PWSTR  ValueName,
+  /*IN OUT*/  PVOID  ValueData,
+  /*IN*/ ULONG  ValueLength);
 
 typedef BOOLEAN DDKAPI
 (*PVIDEO_HW_RESET_HW)(
-  IN PVOID  HwDeviceExtension,
-  IN ULONG  Columns,
-  IN ULONG  Rows);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ ULONG  Columns,
+  /*IN*/ ULONG  Rows);
 
 typedef VP_STATUS DDKAPI
 (*PVIDEO_HW_POWER_SET)(
-  IN PVOID  HwDeviceExtension,
-  IN ULONG  HwId,
-  IN PVIDEO_POWER_MANAGEMENT  VideoPowerControl);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ ULONG  HwId,
+  /*IN*/ PVIDEO_POWER_MANAGEMENT  VideoPowerControl);
 
 typedef struct _STATUS_BLOCK {
    _ANONYMOUS_UNION union {
@@ -331,66 +331,66 @@ typedef struct _VIDEO_REQUEST_PACKET {
 
 typedef BOOLEAN DDKAPI
 (*PVIDEO_HW_START_IO)(
-  IN PVOID  HwDeviceExtension,
-  IN PVIDEO_REQUEST_PACKET  RequestPacket);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVIDEO_REQUEST_PACKET  RequestPacket);
 
 typedef BOOLEAN DDKAPI
 (*PMINIPORT_SYNCHRONIZE_ROUTINE)(
-  IN PVOID  Context);
+  /*IN*/ PVOID  Context);
 
 typedef VOID DDKAPI
 (*PVIDEO_HW_TIMER)(
-  IN PVOID  HwDeviceExtension);
+  /*IN*/ PVOID  HwDeviceExtension);
 
 typedef VOID DDKAPI
 (*PMINIPORT_DPC_ROUTINE)(
-  IN PVOID  HwDeviceExtension,
-  IN PVOID  Context);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVOID  Context);
 
 typedef VP_STATUS DDKAPI
 (*PDRIVER_IO_PORT_UCHAR)(
-  IN ULONG_PTR  Context,
-  IN ULONG  Port,
-  IN UCHAR  AccessMode,
-  IN PUCHAR  Data);
+  /*IN*/ ULONG_PTR  Context,
+  /*IN*/ ULONG  Port,
+  /*IN*/ UCHAR  AccessMode,
+  /*IN*/ PUCHAR  Data);
 
 typedef VP_STATUS DDKAPI
 (*PDRIVER_IO_PORT_UCHAR_STRING)(
-  IN ULONG_PTR  Context,
-  IN ULONG  Port,
-  IN UCHAR  AccessMode,
-  IN PUCHAR  Data,
-  IN ULONG  DataLength);
+  /*IN*/ ULONG_PTR  Context,
+  /*IN*/ ULONG  Port,
+  /*IN*/ UCHAR  AccessMode,
+  /*IN*/ PUCHAR  Data,
+  /*IN*/ ULONG  DataLength);
 
 typedef VP_STATUS DDKAPI
 (*PDRIVER_IO_PORT_ULONG)(
-  IN ULONG_PTR  Context,
-  IN ULONG  Port,
-  IN UCHAR  AccessMode,
-  IN PULONG  Data);
+  /*IN*/ ULONG_PTR  Context,
+  /*IN*/ ULONG  Port,
+  /*IN*/ UCHAR  AccessMode,
+  /*IN*/ PULONG  Data);
 
 typedef VP_STATUS DDKAPI
 (*PDRIVER_IO_PORT_ULONG_STRING)(
-  IN ULONG_PTR  Context,
-  IN ULONG  Port,
-  IN UCHAR  AccessMode,
-  IN PULONG  Data,
-  IN ULONG  DataLength);
+  /*IN*/ ULONG_PTR  Context,
+  /*IN*/ ULONG  Port,
+  /*IN*/ UCHAR  AccessMode,
+  /*IN*/ PULONG  Data,
+  /*IN*/ ULONG  DataLength);
 
 typedef VP_STATUS DDKAPI
 (*PDRIVER_IO_PORT_USHORT)(
-  IN ULONG_PTR  Context,
-  IN ULONG  Port,
-  IN UCHAR  AccessMode,
-  IN PUSHORT  Data);
+  /*IN*/ ULONG_PTR  Context,
+  /*IN*/ ULONG  Port,
+  /*IN*/ UCHAR  AccessMode,
+  /*IN*/ PUSHORT  Data);
 
 typedef VP_STATUS DDKAPI
 (*PDRIVER_IO_PORT_USHORT_STRING)(
-  IN ULONG_PTR  Context,
-  IN ULONG  Port,
-  IN UCHAR  AccessMode,
-  IN PUSHORT  Data,
-  IN ULONG  DataLength);
+  /*IN*/ ULONG_PTR  Context,
+  /*IN*/ ULONG  Port,
+  /*IN*/ UCHAR  AccessMode,
+  /*IN*/ PUSHORT  Data,
+  /*IN*/ ULONG  DataLength);
 
 
 
@@ -440,7 +440,7 @@ typedef struct _VIDEO_HW_INITIALIZATION_DATA {
   ULONG  Reserved;
 } VIDEO_HW_INITIALIZATION_DATA, *PVIDEO_HW_INITIALIZATION_DATA;
 
-/* VIDEO_PORT_AGP_INTERFACE.Version contants */
+  /* VIDEO_PORT_AGP_INTERFACE.Version contants */
 #define VIDEO_PORT_AGP_INTERFACE_VERSION_1 1
 
 typedef struct _VIDEO_PORT_AGP_INTERFACE {
@@ -460,25 +460,25 @@ typedef struct _VIDEO_PORT_AGP_INTERFACE {
   ULONGLONG  AgpAllocationLimit;
 } VIDEO_PORT_AGP_INTERFACE, *PVIDEO_PORT_AGP_INTERFACE;
 
-/* VIDEO_PORT_AGP_INTERFACE_2.Version constants */
+  /* VIDEO_PORT_AGP_INTERFACE_2.Version constants */
 #define VIDEO_PORT_AGP_INTERFACE_VERSION_2 2
 
 typedef struct _VIDEO_PORT_AGP_INTERFACE_2 {
-  IN USHORT  Size;
-  IN USHORT  Version;
-  OUT PVOID  Context;
-  OUT PINTERFACE_REFERENCE  InterfaceReference;
-  OUT PINTERFACE_DEREFERENCE  InterfaceDereference;
-  OUT PAGP_RESERVE_PHYSICAL  AgpReservePhysical;
-  OUT PAGP_RELEASE_PHYSICAL  AgpReleasePhysical;
-  OUT PAGP_COMMIT_PHYSICAL  AgpCommitPhysical;
-  OUT PAGP_FREE_PHYSICAL  AgpFreePhysical;
-  OUT PAGP_RESERVE_VIRTUAL  AgpReserveVirtual;
-  OUT PAGP_RELEASE_VIRTUAL  AgpReleaseVirtual;
-  OUT PAGP_COMMIT_VIRTUAL  AgpCommitVirtual;
-  OUT PAGP_FREE_VIRTUAL  AgpFreeVirtual;
-  OUT ULONGLONG  AgpAllocationLimit;
-  OUT PAGP_SET_RATE  AgpSetRate;
+  /*IN*/ USHORT  Size;
+  /*IN*/ USHORT  Version;
+  /*OUT*/ PVOID  Context;
+  /*OUT*/ PINTERFACE_REFERENCE  InterfaceReference;
+  /*OUT*/ PINTERFACE_DEREFERENCE  InterfaceDereference;
+  /*OUT*/ PAGP_RESERVE_PHYSICAL  AgpReservePhysical;
+  /*OUT*/ PAGP_RELEASE_PHYSICAL  AgpReleasePhysical;
+  /*OUT*/ PAGP_COMMIT_PHYSICAL  AgpCommitPhysical;
+  /*OUT*/ PAGP_FREE_PHYSICAL  AgpFreePhysical;
+  /*OUT*/ PAGP_RESERVE_VIRTUAL  AgpReserveVirtual;
+  /*OUT*/ PAGP_RELEASE_VIRTUAL  AgpReleaseVirtual;
+  /*OUT*/ PAGP_COMMIT_VIRTUAL  AgpCommitVirtual;
+  /*OUT*/ PAGP_FREE_VIRTUAL  AgpFreeVirtual;
+  /*OUT*/ ULONGLONG  AgpAllocationLimit;
+  /*OUT*/ PAGP_SET_RATE  AgpSetRate;
 } VIDEO_PORT_AGP_INTERFACE_2, *PVIDEO_PORT_AGP_INTERFACE_2;
 
 #define VIDEO_PORT_I2C_INTERFACE_VERSION_1  1
@@ -503,35 +503,35 @@ typedef BOOLEAN DDKAPI
 
 typedef struct _I2C_CALLBACKS
 {
-  IN PVIDEO_WRITE_CLOCK_LINE  WriteClockLine;
-  IN PVIDEO_WRITE_DATA_LINE  WriteDataLine;
-  IN PVIDEO_READ_CLOCK_LINE  ReadClockLine;
-  IN PVIDEO_READ_DATA_LINE  ReadDataLine;
+  /*IN*/ PVIDEO_WRITE_CLOCK_LINE  WriteClockLine;
+  /*IN*/ PVIDEO_WRITE_DATA_LINE  WriteDataLine;
+  /*IN*/ PVIDEO_READ_CLOCK_LINE  ReadClockLine;
+  /*IN*/ PVIDEO_READ_DATA_LINE  ReadDataLine;
 } I2C_CALLBACKS, *PI2C_CALLBACKS;
 
 typedef BOOLEAN DDKAPI
 (*PI2C_START)(
-  IN PVOID  HwDeviceExtension,
-  IN PI2C_CALLBACKS  I2CCallbacks);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PI2C_CALLBACKS  I2CCallbacks);
 
 typedef BOOLEAN DDKAPI
 (*PI2C_STOP)(
-  IN PVOID  HwDeviceExtension,
-  IN PI2C_CALLBACKS  I2CCallbacks);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PI2C_CALLBACKS  I2CCallbacks);
 
 typedef BOOLEAN DDKAPI
 (*PI2C_WRITE)(
-  IN PVOID  HwDeviceExtension,
-  IN PI2C_CALLBACKS  I2CCallbacks,
-  IN PUCHAR  Buffer,
-  IN ULONG  Length);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PI2C_CALLBACKS  I2CCallbacks,
+  /*IN*/ PUCHAR  Buffer,
+  /*IN*/ ULONG  Length);
 
 typedef BOOLEAN DDKAPI
 (*PI2C_READ)(
-  IN PVOID  HwDeviceExtension,
-  IN PI2C_CALLBACKS  I2CCallbacks,
-  OUT PUCHAR  Buffer,
-  IN ULONG  Length);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PI2C_CALLBACKS  I2CCallbacks,
+  /*OUT*/ PUCHAR  Buffer,
+  /*IN*/ ULONG  Length);
 
 typedef struct _VIDEO_PORT_I2C_INTERFACE {
   USHORT  Size;
@@ -545,57 +545,57 @@ typedef struct _VIDEO_PORT_I2C_INTERFACE {
   PI2C_READ  I2CRead;
 } VIDEO_PORT_I2C_INTERFACE, *PVIDEO_PORT_I2C_INTERFACE;
 
-/* VIDEO_PORT_INT10_INTERFACE.Version constants */
+  /* VIDEO_PORT_INT10_INTERFACE.Version constants */
 #define VIDEO_PORT_INT10_INTERFACE_VERSION_1 1
 
 typedef VP_STATUS DDKAPI
 (*PINT10_ALLOCATE_BUFFER)(
-  IN PVOID  Context,
-  OUT PUSHORT  Seg,
-  OUT PUSHORT  Off,
-  IN OUT PULONG  Length);
+  /*IN*/ PVOID  Context,
+  /*OUT*/ PUSHORT  Seg,
+  /*OUT*/ PUSHORT  Off,
+  /*IN OUT*/ PULONG  Length);
 
 typedef VP_STATUS DDKAPI
 (*PINT10_CALL_BIOS)(
-  IN PVOID  Context,
-  IN OUT PINT10_BIOS_ARGUMENTS  BiosArguments);
+  /*IN*/ PVOID  Context,
+  /*IN OUT*/ PINT10_BIOS_ARGUMENTS  BiosArguments);
 
 typedef VP_STATUS DDKAPI
 (*PINT10_FREE_BUFFER)(
-  IN PVOID  Context,
-  IN USHORT  Seg,
-  IN USHORT  Off);
+  /*IN*/ PVOID  Context,
+  /*IN*/ USHORT  Seg,
+  /*IN*/ USHORT  Off);
 
 typedef VP_STATUS DDKAPI
 (*PINT10_READ_MEMORY)(
-  IN PVOID  Context,
-  IN USHORT  Seg,
-  IN USHORT  Off,
-  OUT PVOID  Buffer,
-  IN ULONG  Length);
+  /*IN*/ PVOID  Context,
+  /*IN*/ USHORT  Seg,
+  /*IN*/ USHORT  Off,
+  /*OUT*/ PVOID  Buffer,
+  /*IN*/ ULONG  Length);
 
 typedef VP_STATUS DDKAPI
 (*PINT10_WRITE_MEMORY)(
-  IN PVOID  Context,
-  IN USHORT  Seg,
-  IN USHORT  Off,
-  IN PVOID  Buffer,
-  IN ULONG  Length);
+  /*IN*/ PVOID  Context,
+  /*IN*/ USHORT  Seg,
+  /*IN*/ USHORT  Off,
+  /*IN*/ PVOID  Buffer,
+  /*IN*/ ULONG  Length);
 
 typedef struct _VIDEO_PORT_INT10_INTERFACE {
-  IN USHORT  Size;
-  IN USHORT  Version;
-  OUT PVOID  Context;
-  OUT PINTERFACE_REFERENCE  InterfaceReference;
-  OUT PINTERFACE_DEREFERENCE  InterfaceDereference;
-  OUT PINT10_ALLOCATE_BUFFER  Int10AllocateBuffer;
-  OUT PINT10_FREE_BUFFER  Int10FreeBuffer;
-  OUT PINT10_READ_MEMORY  Int10ReadMemory;
-  OUT PINT10_WRITE_MEMORY  Int10WriteMemory;
-  OUT PINT10_CALL_BIOS  Int10CallBios;
+  /*IN*/ USHORT  Size;
+  /*IN*/ USHORT  Version;
+  /*OUT*/ PVOID  Context;
+  /*OUT*/ PINTERFACE_REFERENCE  InterfaceReference;
+  /*OUT*/ PINTERFACE_DEREFERENCE  InterfaceDereference;
+  /*OUT*/ PINT10_ALLOCATE_BUFFER  Int10AllocateBuffer;
+  /*OUT*/ PINT10_FREE_BUFFER  Int10FreeBuffer;
+  /*OUT*/ PINT10_READ_MEMORY  Int10ReadMemory;
+  /*OUT*/ PINT10_WRITE_MEMORY  Int10WriteMemory;
+  /*OUT*/ PINT10_CALL_BIOS  Int10CallBios;
 } VIDEO_PORT_INT10_INTERFACE, *PVIDEO_PORT_INT10_INTERFACE;
 
-/* Flags for VideoPortGetDeviceBase and VideoPortMapMemory */
+  /* Flags for VideoPortGetDeviceBase and VideoPortMapMemory */
 #define VIDEO_MEMORY_SPACE_MEMORY         0x00
 #define VIDEO_MEMORY_SPACE_IO             0x01
 #define VIDEO_MEMORY_SPACE_USER_MODE      0x02
@@ -620,75 +620,75 @@ typedef struct _VP_DEVICE_DESCRIPTION {
 } VP_DEVICE_DESCRIPTION, *PVP_DEVICE_DESCRIPTION;
 
 typedef struct _VPOSVERSIONINFO {
-  IN ULONG  Size;
-  OUT ULONG  MajorVersion;
-  OUT ULONG  MinorVersion;
-  OUT ULONG  BuildNumber;
-  OUT USHORT  ServicePackMajor;
-  OUT USHORT  ServicePackMinor;
+  /*IN*/ ULONG  Size;
+  /*OUT*/ ULONG  MajorVersion;
+  /*OUT*/ ULONG  MinorVersion;
+  /*OUT*/ ULONG  BuildNumber;
+  /*OUT*/ USHORT  ServicePackMajor;
+  /*OUT*/ USHORT  ServicePackMinor;
 } VPOSVERSIONINFO, *PVPOSVERSIONINFO;
 
 
 
-/* Video port functions for miniports */
+  /* Video port functions for miniports */
 
 VPAPI
 VOID
 DDKAPI
 VideoDebugPrint(
-  IN ULONG  DebugPrintLevel,
-  IN PCHAR  DebugMessage,
-  IN ...);
+  /*IN*/ ULONG  DebugPrintLevel,
+  /*IN*/ PCHAR  DebugMessage,
+  /*IN*/ ...);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortAcquireDeviceLock(
-  IN PVOID  HwDeviceExtension);
+  /*IN*/ PVOID  HwDeviceExtension);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortAcquireSpinLock(
-  IN PVOID  HwDeviceExtension,
-  IN PSPIN_LOCK  SpinLock,
-  OUT PUCHAR  OldIrql);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PSPIN_LOCK  SpinLock,
+  /*OUT*/ PUCHAR  OldIrql);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortAcquireSpinLockAtDpcLevel(
-  IN PVOID  HwDeviceExtension,
-  IN PSPIN_LOCK  SpinLock);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PSPIN_LOCK  SpinLock);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortAllocateBuffer(
-  IN PVOID  HwDeviceExtension,
-  IN ULONG  Size,
-  OUT PVOID  *Buffer);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ ULONG  Size,
+  /*OUT*/ PVOID  *Buffer);
 
 VPAPI
 PVOID
 DDKAPI
 VideoPortAllocateCommonBuffer(
-  IN PVOID  HwDeviceExtension,
-  IN PVP_DMA_ADAPTER  VpDmaAdapter,
-  IN ULONG  DesiredLength,
-  OUT PPHYSICAL_ADDRESS  LogicalAddress,
-  IN BOOLEAN  CacheEnabled,
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVP_DMA_ADAPTER  VpDmaAdapter,
+  /*IN*/ ULONG  DesiredLength,
+  /*OUT*/ PPHYSICAL_ADDRESS  LogicalAddress,
+  /*IN*/ BOOLEAN  CacheEnabled,
   PVOID  Reserved);
 
 VPAPI
 PVOID
 DDKAPI
 VideoPortAllocateContiguousMemory(
-  IN PVOID  HwDeviceExtension,
-  IN ULONG  NumberOfBytes,
-  IN PHYSICAL_ADDRESS  HighestAcceptableAddress);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ ULONG  NumberOfBytes,
+  /*IN*/ PHYSICAL_ADDRESS  HighestAcceptableAddress);
 
-/* VideoPortAllocatePool.PoolType constants */
+  /* VideoPortAllocatePool.PoolType constants */
 typedef enum _VP_POOL_TYPE {
   VpNonPagedPool = 0,
   VpPagedPool,
@@ -700,21 +700,21 @@ VPAPI
 PVOID
 DDKAPI
 VideoPortAllocatePool(
-  IN PVOID  HwDeviceExtension,
-  IN VP_POOL_TYPE  PoolType,
-  IN SIZE_T  NumberOfBytes,
-  IN ULONG  Tag);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ VP_POOL_TYPE  PoolType,
+  /*IN*/ SIZE_T  NumberOfBytes,
+  /*IN*/ ULONG  Tag);
 
 VPAPI
 PDMA
 DDKAPI
 VideoPortAssociateEventsWithDmaHandle(
-  IN PVOID  HwDeviceExtension,
-  IN OUT PVIDEO_REQUEST_PACKET  pVrp,
-  IN PVOID  MappedUserEvent,
-  IN PVOID  DisplayDriverEvent);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN OUT*/ PVIDEO_REQUEST_PACKET  pVrp,
+  /*IN*/ PVOID  MappedUserEvent,
+  /*IN*/ PVOID  DisplayDriverEvent);
 
-/* VideoPortCheckForDeviceExistence.Flags constants */
+  /* VideoPortCheckForDeviceExistence.Flags constants */
 #define CDE_USE_SUBSYSTEM_IDS             0x00000001
 #define CDE_USE_REVISION                  0x00000002
 
@@ -722,203 +722,203 @@ VPAPI
 BOOLEAN
 DDKAPI
 VideoPortCheckForDeviceExistence(
-  IN PVOID  HwDeviceExtension,
-  IN USHORT  VendorId,
-  IN USHORT  DeviceId,
-  IN UCHAR  RevisionId,
-  IN USHORT  SubVendorId,
-  IN USHORT  SubSystemId,
-  IN ULONG  Flags);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ USHORT  VendorId,
+  /*IN*/ USHORT  DeviceId,
+  /*IN*/ UCHAR  RevisionId,
+  /*IN*/ USHORT  SubVendorId,
+  /*IN*/ USHORT  SubSystemId,
+  /*IN*/ ULONG  Flags);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortClearEvent(
-  IN PVOID  HwDeviceExtension,
-  IN PEVENT  pEvent);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PEVENT  pEvent);
 
 VPAPI
 ULONG
 DDKAPI
 VideoPortCompareMemory(
-  IN PVOID  Source1,
-  IN PVOID  Source2,
-  IN ULONG  Length);
+  /*IN*/ PVOID  Source1,
+  /*IN*/ PVOID  Source2,
+  /*IN*/ ULONG  Length);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortCompleteDma(
-  IN PVOID  HwDeviceExtension,
-  IN PVP_DMA_ADAPTER  VpDmaAdapter,
-  IN PVP_SCATTER_GATHER_LIST  VpScatterGather,
-  IN BOOLEAN  WriteToDevice);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVP_DMA_ADAPTER  VpDmaAdapter,
+  /*IN*/ PVP_SCATTER_GATHER_LIST  VpScatterGather,
+  /*IN*/ BOOLEAN  WriteToDevice);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortCreateEvent(
-  IN PVOID  HwDeviceExtension,
-  IN ULONG  EventFlag,
-  IN PVOID  Unused,
-  OUT PEVENT  *ppEvent);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ ULONG  EventFlag,
+  /*IN*/ PVOID  Unused,
+  /*OUT*/ PEVENT  *ppEvent);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortCreateSecondaryDisplay(
-  IN PVOID  HwDeviceExtension,
-  IN OUT PVOID  *SecondaryDeviceExtension,
-  IN ULONG  ulFlag);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN OUT*/ PVOID  *SecondaryDeviceExtension,
+  /*IN*/ ULONG  ulFlag);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortCreateSpinLock(
-  IN PVOID  HwDeviceExtension,
-  OUT PSPIN_LOCK  *SpinLock);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*OUT*/ PSPIN_LOCK  *SpinLock);
 
 typedef struct _DDC_CONTROL {
-  IN ULONG  Size;
-  IN I2C_CALLBACKS  I2CCallbacks;
-  IN UCHAR  EdidSegment;
+  /*IN*/ ULONG  Size;
+  /*IN*/ I2C_CALLBACKS  I2CCallbacks;
+  /*IN*/ UCHAR  EdidSegment;
 } DDC_CONTROL, *PDDC_CONTROL;
 
 VPAPI
 BOOLEAN
 DDKAPI
 VideoPortDDCMonitorHelper(
-  IN PVOID  HwDeviceExtension,
-  IN PVOID  DDCControl,
-  IN OUT PUCHAR  EdidBuffer,
-  IN ULONG  EdidBufferSize);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVOID  DDCControl,
+  /*IN OUT*/ PUCHAR  EdidBuffer,
+  /*IN*/ ULONG  EdidBufferSize);
 
 VPAPI
 VOID
 DDKCDECLAPI
 VideoPortDebugPrint(
-  IN VIDEO_DEBUG_LEVEL  DebugPrintLevel,
-  IN PCHAR  DebugMessage,
-  IN ...);
+  /*IN*/ VIDEO_DEBUG_LEVEL  DebugPrintLevel,
+  /*IN*/ PCHAR  DebugMessage,
+  /*IN*/ ...);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortDeleteEvent(
-  IN PVOID  HwDeviceExtension,
-  IN PEVENT  pEvent);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PEVENT  pEvent);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortDeleteSpinLock(
-  IN PVOID  HwDeviceExtension,
-  IN PSPIN_LOCK  SpinLock);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PSPIN_LOCK  SpinLock);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortDisableInterrupt(
-  IN PVOID  HwDeviceExtension);
+  /*IN*/ PVOID  HwDeviceExtension);
 
 VPAPI
 PDMA
 DDKAPI
 VideoPortDoDma(
-  IN PVOID  HwDeviceExtension,
-  IN PDMA  pDma,
-  IN DMA_FLAGS  DmaFlags);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PDMA  pDma,
+  /*IN*/ DMA_FLAGS  DmaFlags);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortEnableInterrupt(
-  IN PVOID  HwDeviceExtension);
+  /*IN*/ PVOID  HwDeviceExtension);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortEnumerateChildren(
-  IN PVOID  HwDeviceExtension,
-  IN PVOID  Reserved);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVOID  Reserved);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortFreeCommonBuffer(
-  IN PVOID  HwDeviceExtension,
-  IN ULONG  Length,
-  IN PVOID  VirtualAddress,
-  IN PHYSICAL_ADDRESS  LogicalAddress,
-  IN BOOLEAN  CacheEnabled);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ ULONG  Length,
+  /*IN*/ PVOID  VirtualAddress,
+  /*IN*/ PHYSICAL_ADDRESS  LogicalAddress,
+  /*IN*/ BOOLEAN  CacheEnabled);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortFreeDeviceBase(
-  IN PVOID  HwDeviceExtension,
-  IN PVOID  MappedAddress);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVOID  MappedAddress);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortFreePool(
-  IN PVOID  HwDeviceExtension,
-  IN PVOID  Ptr);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVOID  Ptr);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortGetAccessRanges(
-  IN PVOID  HwDeviceExtension,
-  IN ULONG  NumRequestedResources,
-  IN PIO_RESOURCE_DESCRIPTOR  RequestedResources  OPTIONAL,
-  IN ULONG  NumAccessRanges,
-  OUT PVIDEO_ACCESS_RANGE  AccessRanges,
-  IN PVOID  VendorId,
-  IN PVOID  DeviceId,
-  OUT PULONG  Slot);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ ULONG  NumRequestedResources,
+  /*IN*/ PIO_RESOURCE_DESCRIPTOR  RequestedResources  /*OPTIONAL*/,
+  /*IN*/ ULONG  NumAccessRanges,
+  /*OUT*/ PVIDEO_ACCESS_RANGE  AccessRanges,
+  /*IN*/ PVOID  VendorId,
+  /*IN*/ PVOID  DeviceId,
+  /*OUT*/ PULONG  Slot);
 
 VPAPI
 PVOID
 DDKAPI
 VideoPortGetAssociatedDeviceExtension(
-  IN PVOID  DeviceObject);
+  /*IN*/ PVOID  DeviceObject);
 
 VPAPI
 ULONG
 DDKAPI
 VideoPortGetAssociatedDeviceID(
-  IN PVOID DeviceObject);
+  /*IN*/ PVOID DeviceObject);
 
 VPAPI
 ULONG
 DDKAPI
 VideoPortGetBusData(
-  IN PVOID  HwDeviceExtension,
-  IN BUS_DATA_TYPE  BusDataType,
-  IN ULONG  SlotNumber,
-  IN OUT PVOID  Buffer,
-  IN ULONG  Offset,
-  IN ULONG  Length);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ BUS_DATA_TYPE  BusDataType,
+  /*IN*/ ULONG  SlotNumber,
+  /*IN OUT*/ PVOID  Buffer,
+  /*IN*/ ULONG  Offset,
+  /*IN*/ ULONG  Length);
 
 VPAPI
 ULONG
 DDKAPI
 VideoPortGetBytesUsed(
-  IN PVOID  HwDeviceExtension,
-  IN PDMA  pDma);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PDMA  pDma);
 
 VPAPI
 PVOID
 DDKAPI
 VideoPortGetCommonBuffer(
-  IN PVOID  HwDeviceExtension,
-  IN ULONG  DesiredLength,
-  IN ULONG  Alignment,
-  OUT PPHYSICAL_ADDRESS  LogicalAddress,
-  OUT PULONG  pActualLength,
-  IN BOOLEAN  CacheEnabled);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ ULONG  DesiredLength,
+  /*IN*/ ULONG  Alignment,
+  /*OUT*/ PPHYSICAL_ADDRESS  LogicalAddress,
+  /*OUT*/ PULONG  pActualLength,
+  /*IN*/ BOOLEAN  CacheEnabled);
 
 VPAPI
 UCHAR
@@ -930,108 +930,108 @@ VPAPI
 PVOID
 DDKAPI
 VideoPortGetDeviceBase(
-  IN PVOID  HwDeviceExtension,
-  IN PHYSICAL_ADDRESS  IoAddress,
-  IN ULONG  NumberOfUchars,
-  IN UCHAR  InIoSpace);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PHYSICAL_ADDRESS  IoAddress,
+  /*IN*/ ULONG  NumberOfUchars,
+  /*IN*/ UCHAR  InIoSpace);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortGetDeviceData(
-  IN PVOID  HwDeviceExtension,
-  IN VIDEO_DEVICE_DATA_TYPE  DeviceDataType,
-  IN PMINIPORT_QUERY_DEVICE_ROUTINE  CallbackRoutine,
-  IN PVOID  Context);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ VIDEO_DEVICE_DATA_TYPE  DeviceDataType,
+  /*IN*/ PMINIPORT_QUERY_DEVICE_ROUTINE  CallbackRoutine,
+  /*IN*/ PVOID  Context);
 
 VPAPI
 PVP_DMA_ADAPTER
 DDKAPI
 VideoPortGetDmaAdapter(
-  IN PVOID  HwDeviceExtension,
-  IN PVP_DEVICE_DESCRIPTION  VpDeviceDescription);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVP_DEVICE_DESCRIPTION  VpDeviceDescription);
 
 VPAPI
 PVOID
 DDKAPI
 VideoPortGetDmaContext(
-  IN PVOID  HwDeviceExtension,
-  IN PDMA  pDma);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PDMA  pDma);
 
 VPAPI
 PVOID
 DDKAPI
 VideoPortGetMdl(
-  IN PVOID  HwDeviceExtension,
-  IN PDMA  pDma);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PDMA  pDma);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortGetRegistryParameters(
-  IN PVOID  HwDeviceExtension,
-  IN PWSTR  ParameterName,
-  IN UCHAR  IsParameterFileName,
-  IN PMINIPORT_GET_REGISTRY_ROUTINE  CallbackRoutine,
-  IN PVOID  Context);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PWSTR  ParameterName,
+  /*IN*/ UCHAR  IsParameterFileName,
+  /*IN*/ PMINIPORT_GET_REGISTRY_ROUTINE  CallbackRoutine,
+  /*IN*/ PVOID  Context);
 
 VPAPI
 PVOID
 DDKAPI
 VideoPortGetRomImage(
-  IN PVOID  HwDeviceExtension,
-  IN PVOID  Unused1,
-  IN ULONG  Unused2,
-  IN ULONG  Length);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVOID  Unused1,
+  /*IN*/ ULONG  Unused2,
+  /*IN*/ ULONG  Length);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortGetVersion(
-  IN PVOID  HwDeviceExtension,
-  IN OUT PVPOSVERSIONINFO  pVpOsVersionInfo);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN OUT*/ PVPOSVERSIONINFO  pVpOsVersionInfo);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortGetVgaStatus(
-  IN PVOID  HwDeviceExtension,
-  OUT PULONG  VgaStatus);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*OUT*/ PULONG  VgaStatus);
 
 VPAPI
 ULONG
 DDKAPI
 VideoPortInitialize(
-  IN PVOID  Argument1,
-  IN PVOID  Argument2,
-  IN PVIDEO_HW_INITIALIZATION_DATA  HwInitializationData,
-  IN PVOID  HwContext);
+  /*IN*/ PVOID  Argument1,
+  /*IN*/ PVOID  Argument2,
+  /*IN*/ PVIDEO_HW_INITIALIZATION_DATA  HwInitializationData,
+  /*IN*/ PVOID  HwContext);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortInt10(
-  IN PVOID  HwDeviceExtension,
-  IN PVIDEO_X86_BIOS_ARGUMENTS  BiosArguments);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVIDEO_X86_BIOS_ARGUMENTS  BiosArguments);
 
 VPAPI
 LONG
 DDKFASTAPI
 VideoPortInterlockedDecrement(
-  IN PLONG  Addend);
+  /*IN*/ PLONG  Addend);
 
 VPAPI
 LONG
 DDKFASTAPI
 VideoPortInterlockedExchange(
-  IN OUT PLONG  Target,
-  IN LONG  Value);
+  /*IN OUT*/ PLONG  Target,
+  /*IN*/ LONG  Value);
 
 VPAPI
 LONG
 DDKFASTAPI
 VideoPortInterlockedIncrement(
-  IN PLONG  Addend);
+  /*IN*/ PLONG  Addend);
 
 typedef enum _VP_LOCK_OPERATION {
   VpReadAccess = 0,
@@ -1043,37 +1043,37 @@ VPAPI
 PVOID
 DDKAPI
 VideoPortLockBuffer(
-  IN PVOID  HwDeviceExtension,
-  IN PVOID  BaseAddress,
-  IN ULONG  Length,
-  IN VP_LOCK_OPERATION  Operation);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVOID  BaseAddress,
+  /*IN*/ ULONG  Length,
+  /*IN*/ VP_LOCK_OPERATION  Operation);
 
 VPAPI
 BOOLEAN
 DDKAPI
 VideoPortLockPages(
-  IN PVOID  HwDeviceExtension,
-  IN OUT PVIDEO_REQUEST_PACKET  pVrp,
-  IN OUT PEVENT  pUEvent,
-  IN PEVENT  pDisplayEvent,
-  IN DMA_FLAGS  DmaFlags);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN OUT*/ PVIDEO_REQUEST_PACKET  pVrp,
+  /*IN OUT*/ PEVENT  pUEvent,
+  /*IN*/ PEVENT  pDisplayEvent,
+  /*IN*/ DMA_FLAGS  DmaFlags);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortLogError(
-  IN PVOID  HwDeviceExtension,
-  IN PVIDEO_REQUEST_PACKET  Vrp  OPTIONAL,
-  IN VP_STATUS  ErrorCode,
-  IN ULONG  UniqueId);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVIDEO_REQUEST_PACKET  Vrp  /*OPTIONAL*/,
+  /*IN*/ VP_STATUS  ErrorCode,
+  /*IN*/ ULONG  UniqueId);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortMapBankedMemory(
-  IN PVOID  HwDeviceExtension,
-  IN PHYSICAL_ADDRESS  PhysicalAddress,
-  IN OUT PULONG  Length,
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PHYSICAL_ADDRESS  PhysicalAddress,
+  /*IN OUT*/ PULONG  Length,
   PULONG  InIoSpace,
   PVOID  *VirtualAddress,
   ULONG  BankLength,
@@ -1085,48 +1085,48 @@ VPAPI
 PDMA
 DDKAPI
 VideoPortMapDmaMemory(
-  IN PVOID  HwDeviceExtension,
-  IN PVIDEO_REQUEST_PACKET  pVrp,
-  IN PHYSICAL_ADDRESS  BoardAddress,
-  IN PULONG  Length,
-  IN PULONG  InIoSpace,
-  IN PVOID  MappedUserEvent,
-  IN PVOID  DisplayDriverEvent,
-  IN OUT PVOID  *VirtualAddress);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVIDEO_REQUEST_PACKET  pVrp,
+  /*IN*/ PHYSICAL_ADDRESS  BoardAddress,
+  /*IN*/ PULONG  Length,
+  /*IN*/ PULONG  InIoSpace,
+  /*IN*/ PVOID  MappedUserEvent,
+  /*IN*/ PVOID  DisplayDriverEvent,
+  /*IN OUT*/ PVOID  *VirtualAddress);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortMapMemory(
-  IN PVOID  HwDeviceExtension,
-  IN PHYSICAL_ADDRESS  PhysicalAddress,
-  IN OUT PULONG  Length,
-  IN PULONG  InIoSpace,
-  IN OUT PVOID  *VirtualAddress);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PHYSICAL_ADDRESS  PhysicalAddress,
+  /*IN OUT*/ PULONG  Length,
+  /*IN*/ PULONG  InIoSpace,
+  /*IN OUT*/ PVOID  *VirtualAddress);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortMoveMemory(
-  IN PVOID  Destination,
-  IN PVOID  Source,
-  IN ULONG  Length);
+  /*IN*/ PVOID  Destination,
+  /*IN*/ PVOID  Source,
+  /*IN*/ ULONG  Length);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortPutDmaAdapter(
-  IN PVOID  HwDeviceExtension,
-  IN PVP_DMA_ADAPTER  VpDmaAdapter);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVP_DMA_ADAPTER  VpDmaAdapter);
 
 VPAPI
 LONGLONG
 DDKAPI
 VideoPortQueryPerformanceCounter(
-  IN PVOID  HwDeviceExtension,
-  OUT PLONGLONG  PerformanceFrequency  OPTIONAL);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*OUT*/ PLONGLONG  PerformanceFrequency  /*OPTIONAL*/);
 
-/* VideoPortQueryServices.ServicesType constants */
+  /* VideoPortQueryServices.ServicesType constants */
 typedef enum _VIDEO_PORT_SERVICES {
   VideoPortServicesAGP = 1,
   VideoPortServicesI2C,
@@ -1138,153 +1138,153 @@ VPAPI
 VP_STATUS
 DDKAPI
 VideoPortQueryServices(
-  IN PVOID HwDeviceExtension,
-  IN VIDEO_PORT_SERVICES ServicesType,
-  IN OUT PINTERFACE Interface);
+  /*IN*/ PVOID HwDeviceExtension,
+  /*IN*/ VIDEO_PORT_SERVICES ServicesType,
+  /*IN OUT*/ PINTERFACE Interface);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortQuerySystemTime(
-  OUT PLARGE_INTEGER  CurrentTime);
+  /*OUT*/ PLARGE_INTEGER  CurrentTime);
 
 VPAPI
 BOOLEAN
 DDKAPI
 VideoPortQueueDpc(
-  IN PVOID  HwDeviceExtension,
-  IN PMINIPORT_DPC_ROUTINE  CallbackRoutine,
-  IN PVOID  Context);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PMINIPORT_DPC_ROUTINE  CallbackRoutine,
+  /*IN*/ PVOID  Context);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortReadPortBufferUchar(
-  IN PUCHAR  Port,
-  OUT PUCHAR  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PUCHAR  Port,
+  /*OUT*/ PUCHAR  Buffer,
+  /*IN*/ ULONG  Count);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortReadPortBufferUlong(
-  IN PULONG  Port,
-  OUT PULONG  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PULONG  Port,
+  /*OUT*/ PULONG  Buffer,
+  /*IN*/ ULONG  Count);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortReadPortBufferUshort(
-  IN PUSHORT  Port,
-  OUT PUSHORT  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PUSHORT  Port,
+  /*OUT*/ PUSHORT  Buffer,
+  /*IN*/ ULONG  Count);
 
 VPAPI
 UCHAR
 DDKAPI
 VideoPortReadPortUchar(
-  IN PUCHAR  Port);
+  /*IN*/ PUCHAR  Port);
 
 VPAPI
 ULONG
 DDKAPI
 VideoPortReadPortUlong(
-  IN PULONG  Port);
+  /*IN*/ PULONG  Port);
 
 VPAPI
 USHORT
 DDKAPI
 VideoPortReadPortUshort(
-  IN PUSHORT  Port);
+  /*IN*/ PUSHORT  Port);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortReadRegisterBufferUchar(
-  IN PUCHAR  Register,
-  OUT PUCHAR  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PUCHAR  Register,
+  /*OUT*/ PUCHAR  Buffer,
+  /*IN*/ ULONG  Count);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortReadRegisterBufferUlong(
-  IN PULONG  Register,
-  OUT PULONG  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PULONG  Register,
+  /*OUT*/ PULONG  Buffer,
+  /*IN*/ ULONG  Count);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortReadRegisterBufferUshort(
-  IN PUSHORT  Register,
-  OUT PUSHORT  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PUSHORT  Register,
+  /*OUT*/ PUSHORT  Buffer,
+  /*IN*/ ULONG  Count);
 
 VPAPI
 UCHAR
 DDKAPI
 VideoPortReadRegisterUchar(
-  IN PUCHAR  Register);
+  /*IN*/ PUCHAR  Register);
 
 VPAPI
 ULONG
 DDKAPI
 VideoPortReadRegisterUlong(
-  IN PULONG  Register);
+  /*IN*/ PULONG  Register);
 
 VPAPI
 USHORT
 DDKAPI
 VideoPortReadRegisterUshort(
-  IN PUSHORT  Register);
+  /*IN*/ PUSHORT  Register);
 
 VPAPI
 LONG
 DDKAPI
 VideoPortReadStateEvent(
-  IN PVOID  HwDeviceExtension,
-  IN PEVENT  pEvent);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PEVENT  pEvent);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortReleaseBuffer(
-  IN PVOID  HwDeviceExtension,
-  IN PVOID  Buffer);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVOID  Buffer);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortReleaseCommonBuffer(
-  IN PVOID  HwDeviceExtension,
-  IN PVP_DMA_ADAPTER  VpDmaAdapter,
-  IN ULONG  Length,
-  IN PHYSICAL_ADDRESS  LogicalAddress,
-  IN PVOID  VirtualAddress,
-  IN BOOLEAN  CacheEnabled);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVP_DMA_ADAPTER  VpDmaAdapter,
+  /*IN*/ ULONG  Length,
+  /*IN*/ PHYSICAL_ADDRESS  LogicalAddress,
+  /*IN*/ PVOID  VirtualAddress,
+  /*IN*/ BOOLEAN  CacheEnabled);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortReleaseDeviceLock(
-  IN PVOID  HwDeviceExtension);
+  /*IN*/ PVOID  HwDeviceExtension);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortReleaseSpinLock(
-  IN PVOID  HwDeviceExtension,
-  IN PSPIN_LOCK  SpinLock,
-  IN UCHAR  NewIrql);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PSPIN_LOCK  SpinLock,
+  /*IN*/ UCHAR  NewIrql);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortReleaseSpinLockFromDpcLevel(
-  IN PVOID  HwDeviceExtension,
-  IN PSPIN_LOCK  SpinLock);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PSPIN_LOCK  SpinLock);
 
 VPAPI
 BOOLEAN
@@ -1299,92 +1299,92 @@ VPAPI
 ULONG
 DDKAPI
 VideoPortSetBusData(
-  IN PVOID  HwDeviceExtension,
-  IN BUS_DATA_TYPE  BusDataType,
-  IN ULONG  SlotNumber,
-  IN PVOID  Buffer,
-  IN ULONG  Offset,
-  IN ULONG  Length);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ BUS_DATA_TYPE  BusDataType,
+  /*IN*/ ULONG  SlotNumber,
+  /*IN*/ PVOID  Buffer,
+  /*IN*/ ULONG  Offset,
+  /*IN*/ ULONG  Length);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortSetBytesUsed(
-  IN PVOID  HwDeviceExtension,
-  IN OUT PDMA  pDma,
-  IN ULONG  BytesUsed);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN OUT*/ PDMA  pDma,
+  /*IN*/ ULONG  BytesUsed);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortSetDmaContext(
-  IN PVOID  HwDeviceExtension,
-  OUT PDMA  pDma,
-  IN PVOID  InstanceContext);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*OUT*/ PDMA  pDma,
+  /*IN*/ PVOID  InstanceContext);
 
 VPAPI
 LONG
 DDKAPI
 VideoPortSetEvent(
-  IN PVOID  HwDeviceExtension,
-  IN PEVENT  pEvent);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PEVENT  pEvent);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortSetRegistryParameters(
-  IN PVOID  HwDeviceExtension,
-  IN PWSTR  ValueName,
-  IN PVOID  ValueData,
-  IN ULONG  ValueLength);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PWSTR  ValueName,
+  /*IN*/ PVOID  ValueData,
+  /*IN*/ ULONG  ValueLength);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortSetTrappedEmulatorPorts(
-  IN PVOID  HwDeviceExtension,
-  IN ULONG  NumAccessRanges,
-  IN PVIDEO_ACCESS_RANGE  AccessRange);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ ULONG  NumAccessRanges,
+  /*IN*/ PVIDEO_ACCESS_RANGE  AccessRange);
 
 VPAPI
 BOOLEAN
 DDKAPI
 VideoPortSignalDmaComplete(
-  IN PVOID  HwDeviceExtension,
-  IN PVOID  pDmaHandle);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVOID  pDmaHandle);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortStallExecution(
-  IN ULONG  Microseconds);
+  /*IN*/ ULONG  Microseconds);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortStartDma(
-  IN PVOID  HwDeviceExtension,
-  IN PVP_DMA_ADAPTER  VpDmaAdapter,
-  IN PVOID  Mdl,
-  IN ULONG  Offset,
-  IN OUT PULONG  pLength,
-  IN PEXECUTE_DMA  ExecuteDmaRoutine,
-  IN PVOID  Context,
-  IN BOOLEAN  WriteToDevice);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVP_DMA_ADAPTER  VpDmaAdapter,
+  /*IN*/ PVOID  Mdl,
+  /*IN*/ ULONG  Offset,
+  /*IN OUT*/ PULONG  pLength,
+  /*IN*/ PEXECUTE_DMA  ExecuteDmaRoutine,
+  /*IN*/ PVOID  Context,
+  /*IN*/ BOOLEAN  WriteToDevice);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortStartTimer(
-  IN PVOID  HwDeviceExtension);
+  /*IN*/ PVOID  HwDeviceExtension);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortStopTimer(
-  IN PVOID  HwDeviceExtension);
+  /*IN*/ PVOID  HwDeviceExtension);
 
-/* VideoPortSynchronizeExecution.Priority constants */
+  /* VideoPortSynchronizeExecution.Priority constants */
 typedef enum VIDEO_SYNCHRONIZE_PRIORITY {
   VpLowPriority = 0,
   VpMediumPriority,
@@ -1395,161 +1395,161 @@ VPAPI
 BOOLEAN
 DDKAPI
 VideoPortSynchronizeExecution(
-  IN PVOID  HwDeviceExtension,
-  IN VIDEO_SYNCHRONIZE_PRIORITY  Priority,
-  IN PMINIPORT_SYNCHRONIZE_ROUTINE  SynchronizeRoutine,
-  IN PVOID  Context);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ VIDEO_SYNCHRONIZE_PRIORITY  Priority,
+  /*IN*/ PMINIPORT_SYNCHRONIZE_ROUTINE  SynchronizeRoutine,
+  /*IN*/ PVOID  Context);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortUnLockBuffer(
-  IN PVOID  HwDeviceExtension,
-  IN PVOID  Mdl);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVOID  Mdl);
 
 VPAPI
 BOOLEAN
 DDKAPI
 VideoPortUnlockPages(
-  IN PVOID  hwDeviceExtension,
-  IN OUT PDMA  pDma);
+  /*IN*/ PVOID  hwDeviceExtension,
+  /*IN OUT*/ PDMA  pDma);
 
 VPAPI
 BOOLEAN
 DDKAPI
 VideoPortUnmapDmaMemory(
-  IN PVOID  HwDeviceExtension,
-  IN PVOID  VirtualAddress,
-  IN HANDLE  ProcessHandle,
-  IN PDMA  BoardMemoryHandle);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVOID  VirtualAddress,
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN*/ PDMA  BoardMemoryHandle);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortUnmapMemory(
-  IN PVOID  HwDeviceExtension,
-  IN OUT PVOID  VirtualAddress,
-  IN HANDLE  ProcessHandle);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN OUT*/ PVOID  VirtualAddress,
+  /*IN*/ HANDLE  ProcessHandle);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortVerifyAccessRanges(
-  IN PVOID  HwDeviceExtension,
-  IN ULONG  NumAccessRanges,
-  IN PVIDEO_ACCESS_RANGE  AccessRanges);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ ULONG  NumAccessRanges,
+  /*IN*/ PVIDEO_ACCESS_RANGE  AccessRanges);
 
 VPAPI
 VP_STATUS
 DDKAPI
 VideoPortWaitForSingleObject(
-  IN PVOID  HwDeviceExtension,
-  IN PVOID  Object,
-  IN PLARGE_INTEGER  Timeout  OPTIONAL);
+  /*IN*/ PVOID  HwDeviceExtension,
+  /*IN*/ PVOID  Object,
+  /*IN*/ PLARGE_INTEGER  Timeout /*OPTIONAL*/);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortWritePortBufferUchar(
-  IN PUCHAR  Port,
-  IN PUCHAR  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PUCHAR  Port,
+  /*IN*/ PUCHAR  Buffer,
+  /*IN*/ ULONG  Count);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortWritePortBufferUlong(
-  IN PULONG  Port,
-  IN PULONG  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PULONG  Port,
+  /*IN*/ PULONG  Buffer,
+  /*IN*/ ULONG  Count);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortWritePortBufferUshort(
-  IN PUSHORT  Port,
-  IN PUSHORT  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PUSHORT  Port,
+  /*IN*/ PUSHORT  Buffer,
+  /*IN*/ ULONG  Count);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortWritePortUchar(
-  IN PUCHAR  Port,
-  IN UCHAR  Value);
+  /*IN*/ PUCHAR  Port,
+  /*IN*/ UCHAR  Value);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortWritePortUlong(
-  IN PULONG  Port,
-  IN ULONG  Value);
+  /*IN*/ PULONG  Port,
+  /*IN*/ ULONG  Value);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortWritePortUshort(
-  IN PUSHORT  Port,
-  IN USHORT  Value);
+  /*IN*/ PUSHORT  Port,
+  /*IN*/ USHORT  Value);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortWriteRegisterBufferUchar(
-  IN PUCHAR  Register,
-  IN PUCHAR  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PUCHAR  Register,
+  /*IN*/ PUCHAR  Buffer,
+  /*IN*/ ULONG  Count);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortWriteRegisterBufferUlong(
-  IN PULONG  Register,
-  IN PULONG  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PULONG  Register,
+  /*IN*/ PULONG  Buffer,
+  /*IN*/ ULONG  Count);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortWriteRegisterBufferUshort(
-  IN PUSHORT  Register,
-  IN PUSHORT  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PUSHORT  Register,
+  /*IN*/ PUSHORT  Buffer,
+  /*IN*/ ULONG  Count);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortWriteRegisterUchar(
-  IN PUCHAR  Register,
-  IN UCHAR  Value);
+  /*IN*/ PUCHAR  Register,
+  /*IN*/ UCHAR  Value);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortWriteRegisterUlong(
-  IN PULONG  Register,
-  IN ULONG  Value);
+  /*IN*/ PULONG  Register,
+  /*IN*/ ULONG  Value);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortWriteRegisterUshort(
-  IN PUSHORT  Register,
-  IN USHORT  Value);
+  /*IN*/ PUSHORT  Register,
+  /*IN*/ USHORT  Value);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortZeroDeviceMemory(
-  IN PVOID  Destination,
-  IN ULONG  Length);
+  /*IN*/ PVOID  Destination,
+  /*IN*/ ULONG  Length);
 
 VPAPI
 VOID
 DDKAPI
 VideoPortZeroMemory(
-  IN PVOID  Destination,
-  IN ULONG  Length);
+  /*IN*/ PVOID  Destination,
+  /*2IN*/ ULONG  Length);
 
 #ifdef DBG
 #define VideoDebugPrint(x) VideoPortDebugPrint x

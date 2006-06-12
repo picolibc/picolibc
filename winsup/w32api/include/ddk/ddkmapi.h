@@ -43,11 +43,11 @@ DXAPI
 DWORD
 FAR PASCAL
 DxApi(
-  IN DWORD  dwFunctionNum,
-  IN LPVOID  lpvInBuffer,
-  IN DWORD  cbInBuffer,
-  OUT LPVOID  lpvOutBuffer,
-  OUT DWORD  cbOutBuffer);
+  /*IN*/ DWORD  dwFunctionNum,
+  /*IN*/ LPVOID  lpvInBuffer,
+  /*IN*/ DWORD  cbInBuffer,
+  /*OUT*/ LPVOID  lpvOutBuffer,
+  /*OUT*/ DWORD  cbOutBuffer);
 
 typedef DWORD (FAR PASCAL *LPDXAPI)(
   DWORD  dwFunctionNum,

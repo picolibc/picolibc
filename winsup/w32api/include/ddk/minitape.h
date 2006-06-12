@@ -158,30 +158,30 @@ typedef struct _MODE_CAPABILITIES_PAGE {
 
 typedef BOOLEAN DDKAPI
 (*TAPE_VERIFY_INQUIRY_ROUTINE)(
-	IN PINQUIRYDATA  InquiryData,
-	IN PMODE_CAPABILITIES_PAGE ModeCapabilitiesPage);
+  /*IN*/ PINQUIRYDATA  InquiryData,
+  /*IN*/ PMODE_CAPABILITIES_PAGE ModeCapabilitiesPage);
 
 typedef VOID DDKAPI
 (*TAPE_EXTENSION_INIT_ROUTINE)(
-  IN PVOID  MinitapeExtension,
-  IN PINQUIRYDATA  InquiryData,
-  IN PMODE_CAPABILITIES_PAGE  ModeCapabilitiesPage);
+  /*IN*/ PVOID  MinitapeExtension,
+  /*IN*/ PINQUIRYDATA  InquiryData,
+  /*IN*/ PMODE_CAPABILITIES_PAGE  ModeCapabilitiesPage);
 
 typedef VOID DDKAPI
 (*TAPE_ERROR_ROUTINE)(
-    IN PVOID  MinitapeExtension,
-    IN PSCSI_REQUEST_BLOCK  Srb,
-    IN OUT PTAPE_STATUS  TapeStatus);
+  /*IN*/ PVOID  MinitapeExtension,
+  /*IN*/ PSCSI_REQUEST_BLOCK  Srb,
+  /*IN OUT*/ PTAPE_STATUS  TapeStatus);
 
 typedef TAPE_STATUS DDKAPI
 (*TAPE_PROCESS_COMMAND_ROUTINE)(
-  IN OUT PVOID  MinitapeExtension,
-  IN OUT PVOID  CommandExtension,
-  IN OUT PVOID  CommandParameters,
-  IN OUT PSCSI_REQUEST_BLOCK  Srb,
-  IN ULONG  CallNumber,
-  IN TAPE_STATUS  StatusOfLastCommand,
-  IN OUT PULONG  RetryFlags);
+  /*IN OUT*/ PVOID  MinitapeExtension,
+  /*IN OUT*/ PVOID  CommandExtension,
+  /*IN OUT*/ PVOID  CommandParameters,
+  /*IN OUT*/ PSCSI_REQUEST_BLOCK  Srb,
+  /*IN*/ ULONG  CallNumber,
+  /*IN*/ TAPE_STATUS  StatusOfLastCommand,
+  /*IN OUT*/ PULONG  RetryFlags);
 
 #define TAPE_RETRY_MASK                   0x0000FFFF
 #define IGNORE_ERRORS                     0x00010000
@@ -206,7 +206,7 @@ typedef struct _TAPE_INIT_DATA {
   TAPE_PROCESS_COMMAND_ROUTINE  SetMediaParameters; 
   TAPE_PROCESS_COMMAND_ROUTINE  SetPosition; 
   TAPE_PROCESS_COMMAND_ROUTINE  WriteMarks; 
-  TAPE_PROCESS_COMMAND_ROUTINE  PreProcessReadWrite; /* optional */
+  TAPE_PROCESS_COMMAND_ROUTINE  PreProcessReadWrite /* OPTIONAL */;
 } TAPE_INIT_DATA, *PTAPE_INIT_DATA; 
 
 typedef struct _TAPE_PHYS_POSITION {

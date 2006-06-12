@@ -66,9 +66,9 @@ typedef struct _VIDEO_ACCESS_RANGE {
 
 typedef VOID DDKAPI
 (*PBANKED_SECTION_ROUTINE)(
-  IN ULONG  ReadBank,
-  IN ULONG  WriteBank,
-  IN PVOID  Context);
+  /*IN*/ ULONG  ReadBank,
+  /*IN*/ ULONG  WriteBank,
+  /*IN*/ PVOID  Context);
 
 #ifdef __cplusplus
 }

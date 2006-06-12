@@ -52,11 +52,16 @@ extern "C" {
 #define DECLARE_INTERNAL_OBJECT2(x,y) struct _##x; typedef struct _##x *P##y;
 #endif
 
-/* Pseudo modifiers for parameters */
+/* Pseudo modifiers for parameters 
+   We don't use these unnecessary defines in the w32api headers. Define
+   them by default since that is what people expect, but allow users
+   to avoid the pollution.  */
+#ifndef _NO_W32_PSEUDO_MODIFIERS
 #define IN
 #define OUT
 #define OPTIONAL
 #define UNALLIGNED
+#endif
 
 #define CONST const
 #define VOLATILE volatile
@@ -444,56 +449,56 @@ typedef enum _IO_ALLOCATION_ACTION {
 
 typedef IO_ALLOCATION_ACTION
 (DDKAPI *PDRIVER_CONTROL)(
-  IN struct _DEVICE_OBJECT  *DeviceObject,
-  IN struct _IRP  *Irp,
-  IN PVOID  MapRegisterBase,
-  IN PVOID  Context);
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject,
+  /*IN*/ struct _IRP  *Irp,
+  /*IN*/ PVOID  MapRegisterBase,
+  /*IN*/ PVOID  Context);
 
 typedef VOID
 (DDKAPI *PDRIVER_LIST_CONTROL)(
-  IN struct _DEVICE_OBJECT  *DeviceObject,
-  IN struct _IRP  *Irp,
-  IN struct _SCATTER_GATHER_LIST  *ScatterGather,
-  IN PVOID  Context);
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject,
+  /*IN*/ struct _IRP  *Irp,
+  /*IN*/ struct _SCATTER_GATHER_LIST  *ScatterGather,
+  /*IN*/ PVOID  Context);
 
 typedef NTSTATUS
 (DDKAPI *PDRIVER_ADD_DEVICE)(
-  IN struct _DRIVER_OBJECT  *DriverObject,
-  IN struct _DEVICE_OBJECT  *PhysicalDeviceObject);
+  /*IN*/ struct _DRIVER_OBJECT  *DriverObject,
+  /*IN*/ struct _DEVICE_OBJECT  *PhysicalDeviceObject);
 
 typedef NTSTATUS
 (DDKAPI *PIO_COMPLETION_ROUTINE)(
-  IN struct _DEVICE_OBJECT  *DeviceObject,
-  IN struct _IRP  *Irp,
-  IN PVOID  Context);
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject,
+  /*IN*/ struct _IRP  *Irp,
+  /*IN*/ PVOID  Context);
 
 typedef VOID
 (DDKAPI *PDRIVER_CANCEL)(
-  IN struct _DEVICE_OBJECT  *DeviceObject,
-  IN struct _IRP  *Irp);
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject,
+  /*IN*/ struct _IRP  *Irp);
 
 typedef VOID
 (DDKAPI *PKDEFERRED_ROUTINE)(
-  IN struct _KDPC  *Dpc,
-  IN PVOID  DeferredContext,
-  IN PVOID  SystemArgument1,
-  IN PVOID  SystemArgument2);
+  /*IN*/ struct _KDPC  *Dpc,
+  /*IN*/ PVOID  DeferredContext,
+  /*IN*/ PVOID  SystemArgument1,
+  /*IN*/ PVOID  SystemArgument2);
 
 typedef NTSTATUS
 (DDKAPI *PDRIVER_DISPATCH)(
-  IN struct _DEVICE_OBJECT  *DeviceObject,
-  IN struct _IRP  *Irp);
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject,
+  /*IN*/ struct _IRP  *Irp);
 
 typedef VOID
 (DDKAPI *PIO_DPC_ROUTINE)(
-  IN struct _KDPC  *Dpc,
-  IN struct _DEVICE_OBJECT  *DeviceObject,
-  IN struct _IRP  *Irp,
-  IN PVOID  Context);
+  /*IN*/ struct _KDPC  *Dpc,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject,
+  /*IN*/ struct _IRP  *Irp,
+  /*IN*/ PVOID  Context);
 
 typedef NTSTATUS
 (DDKAPI *PMM_DLL_INITIALIZE)(
-  IN PUNICODE_STRING  RegistryPath);
+  /*IN*/ PUNICODE_STRING  RegistryPath);
 
 typedef NTSTATUS
 (DDKAPI *PMM_DLL_UNLOAD)(
@@ -501,42 +506,42 @@ typedef NTSTATUS
 
 typedef NTSTATUS
 (DDKAPI *PDRIVER_ENTRY)( 
-  IN struct _DRIVER_OBJECT  *DriverObject, 
-  IN PUNICODE_STRING  RegistryPath); 
+  /*IN*/ struct _DRIVER_OBJECT  *DriverObject, 
+  /*IN*/ PUNICODE_STRING  RegistryPath); 
 
 typedef NTSTATUS
 (DDKAPI *PDRIVER_INITIALIZE)(
-  IN struct _DRIVER_OBJECT  *DriverObject, 
-  IN PUNICODE_STRING  RegistryPath);
+  /*IN*/ struct _DRIVER_OBJECT  *DriverObject, 
+  /*IN*/ PUNICODE_STRING  RegistryPath);
 
 typedef BOOLEAN
 (DDKAPI *PKSERVICE_ROUTINE)(
-  IN struct _KINTERRUPT  *Interrupt,
-  IN PVOID  ServiceContext);
+  /*IN*/ struct _KINTERRUPT  *Interrupt,
+  /*IN*/ PVOID  ServiceContext);
 
 typedef VOID
 (DDKAPI *PIO_TIMER_ROUTINE)(
-  IN struct _DEVICE_OBJECT  *DeviceObject,
-  IN PVOID  Context);
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject,
+  /*IN*/ PVOID  Context);
 
 typedef VOID
 (DDKAPI *PDRIVER_REINITIALIZE)( 
-  IN struct _DRIVER_OBJECT  *DriverObject, 
-  IN PVOID  Context, 
-  IN ULONG  Count); 
+  /*IN*/ struct _DRIVER_OBJECT  *DriverObject, 
+  /*IN*/ PVOID  Context, 
+  /*IN*/ ULONG  Count); 
 
 typedef NTSTATUS
 (DDKAPI *PDRIVER_STARTIO)(
-  IN struct _DEVICE_OBJECT  *DeviceObject,
-  IN struct _IRP  *Irp);
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject,
+  /*IN*/ struct _IRP  *Irp);
 
 typedef BOOLEAN
 (DDKAPI *PKSYNCHRONIZE_ROUTINE)(
-  IN PVOID  SynchronizeContext);
+  /*IN*/ PVOID  SynchronizeContext);
 
 typedef VOID
 (DDKAPI *PDRIVER_UNLOAD)( 
-  IN struct _DRIVER_OBJECT  *DriverObject); 
+  /*IN*/ struct _DRIVER_OBJECT  *DriverObject); 
 
 
 
@@ -554,25 +559,25 @@ typedef VOID DDKAPI
 
 typedef BOOLEAN DDKAPI
 (*PTRANSLATE_BUS_ADDRESS)(
-  IN PVOID  Context,
-  IN PHYSICAL_ADDRESS  BusAddress,
-  IN ULONG  Length,
-  IN OUT PULONG  AddressSpace,
-  OUT PPHYSICAL_ADDRESS  TranslatedAddress);
+  /*IN*/ PVOID  Context,
+  /*IN*/ PHYSICAL_ADDRESS  BusAddress,
+  /*IN*/ ULONG  Length,
+  /*IN OUT*/ PULONG  AddressSpace,
+  /*OUT*/ PPHYSICAL_ADDRESS  TranslatedAddress);
 
 typedef struct _DMA_ADAPTER* DDKAPI
 (*PGET_DMA_ADAPTER)(
-  IN PVOID  Context,
-  IN struct _DEVICE_DESCRIPTION  *DeviceDescriptor,
-  OUT PULONG  NumberOfMapRegisters);
+  /*IN*/ PVOID  Context,
+  /*IN*/ struct _DEVICE_DESCRIPTION  *DeviceDescriptor,
+  /*OUT*/ PULONG  NumberOfMapRegisters);
 
 typedef ULONG DDKAPI
 (*PGET_SET_DEVICE_DATA)(
-  IN PVOID  Context,
-  IN ULONG  DataType,
-  IN PVOID  Buffer,
-  IN ULONG  Offset,
-  IN ULONG  Length);
+  /*IN*/ PVOID  Context,
+  /*IN*/ ULONG  DataType,
+  /*IN*/ PVOID  Buffer,
+  /*IN*/ ULONG  Offset,
+  /*IN*/ ULONG  Length);
 
 typedef union _POWER_STATE {
   SYSTEM_POWER_STATE  SystemState;
@@ -745,12 +750,12 @@ typedef enum _IO_NOTIFICATION_EVENT_CATEGORY {
 
 typedef NTSTATUS DDKAPI
 (*PDRIVER_NOTIFICATION_CALLBACK_ROUTINE)(
-  IN PVOID NotificationStructure,
-  IN PVOID Context);
+  /*IN*/ PVOID NotificationStructure,
+  /*IN*/ PVOID Context);
 
 typedef VOID DDKAPI
 (*PDEVICE_CHANGE_COMPLETE_CALLBACK)(
-  IN PVOID Context);
+  /*IN*/ PVOID Context);
 
 
 
@@ -773,9 +778,9 @@ typedef struct _OBJECT_NAME_INFORMATION {
 
 typedef VOID DDKAPI
 (*PIO_APC_ROUTINE)(
-  IN PVOID ApcContext,
-  IN PIO_STATUS_BLOCK IoStatusBlock,
-  IN ULONG Reserved);
+  /*IN*/ PVOID ApcContext,
+  /*IN*/ PIO_STATUS_BLOCK IoStatusBlock,
+  /*IN*/ ULONG Reserved);
 
 typedef struct _IO_STATUS_BLOCK {
   _ANONYMOUS_UNION union {
@@ -787,21 +792,21 @@ typedef struct _IO_STATUS_BLOCK {
 
 typedef VOID DDKAPI
 (*PKNORMAL_ROUTINE)(
-  IN PVOID  NormalContext,
-  IN PVOID  SystemArgument1,
-  IN PVOID  SystemArgument2);
+  /*IN*/ PVOID  NormalContext,
+  /*IN*/ PVOID  SystemArgument1,
+  /*IN*/ PVOID  SystemArgument2);
 
 typedef VOID DDKAPI
 (*PKKERNEL_ROUTINE)(
-  IN struct _KAPC  *Apc,
-  IN OUT PKNORMAL_ROUTINE  *NormalRoutine,
-  IN OUT PVOID  *NormalContext,
-  IN OUT PVOID  *SystemArgument1,
-  IN OUT PVOID  *SystemArgument2);
+  /*IN*/ struct _KAPC  *Apc,
+  /*IN OUT*/ PKNORMAL_ROUTINE  *NormalRoutine,
+  /*IN OUT*/ PVOID  *NormalContext,
+  /*IN OUT*/ PVOID  *SystemArgument1,
+  /*IN OUT*/ PVOID  *SystemArgument2);
 
 typedef VOID DDKAPI
 (*PKRUNDOWN_ROUTINE)(
-  IN struct _KAPC  *Apc);
+  /*IN*/ struct _KAPC  *Apc);
 
 typedef BOOLEAN DDKAPI
 (*PKTRANSFER_ROUTINE)(
@@ -1797,112 +1802,112 @@ typedef struct _MDL {
 
 typedef VOID DDKAPI
 (*PPUT_DMA_ADAPTER)(
-  IN PDMA_ADAPTER  DmaAdapter);
+  /*IN*/ PDMA_ADAPTER  DmaAdapter);
 
 typedef PVOID DDKAPI
 (*PALLOCATE_COMMON_BUFFER)(
-  IN PDMA_ADAPTER  DmaAdapter,
-  IN ULONG  Length,
-  OUT PPHYSICAL_ADDRESS  LogicalAddress,
-  IN BOOLEAN  CacheEnabled);
+  /*IN*/ PDMA_ADAPTER  DmaAdapter,
+  /*IN*/ ULONG  Length,
+  /*OUT*/ PPHYSICAL_ADDRESS  LogicalAddress,
+  /*IN*/ BOOLEAN  CacheEnabled);
 
 typedef VOID DDKAPI
 (*PFREE_COMMON_BUFFER)(
-  IN PDMA_ADAPTER  DmaAdapter,
-  IN ULONG  Length,
-  IN PHYSICAL_ADDRESS  LogicalAddress,
-  IN PVOID  VirtualAddress,
-  IN BOOLEAN  CacheEnabled);
+  /*IN*/ PDMA_ADAPTER  DmaAdapter,
+  /*IN*/ ULONG  Length,
+  /*IN*/ PHYSICAL_ADDRESS  LogicalAddress,
+  /*IN*/ PVOID  VirtualAddress,
+  /*IN*/ BOOLEAN  CacheEnabled);
 
 typedef NTSTATUS DDKAPI
 (*PALLOCATE_ADAPTER_CHANNEL)(
-  IN PDMA_ADAPTER  DmaAdapter,
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN ULONG  NumberOfMapRegisters,
-  IN PDRIVER_CONTROL  ExecutionRoutine,
-  IN PVOID  Context);
+  /*IN*/ PDMA_ADAPTER  DmaAdapter,
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ ULONG  NumberOfMapRegisters,
+  /*IN*/ PDRIVER_CONTROL  ExecutionRoutine,
+  /*IN*/ PVOID  Context);
 
 typedef BOOLEAN DDKAPI
 (*PFLUSH_ADAPTER_BUFFERS)(
-  IN PDMA_ADAPTER  DmaAdapter,
-  IN PMDL  Mdl,
-  IN PVOID  MapRegisterBase,
-  IN PVOID  CurrentVa,
-  IN ULONG  Length,
-  IN BOOLEAN  WriteToDevice);
+  /*IN*/ PDMA_ADAPTER  DmaAdapter,
+  /*IN*/ PMDL  Mdl,
+  /*IN*/ PVOID  MapRegisterBase,
+  /*IN*/ PVOID  CurrentVa,
+  /*IN*/ ULONG  Length,
+  /*IN*/ BOOLEAN  WriteToDevice);
 
 typedef VOID DDKAPI
 (*PFREE_ADAPTER_CHANNEL)(
-  IN PDMA_ADAPTER  DmaAdapter);
+  /*IN*/ PDMA_ADAPTER  DmaAdapter);
 
 typedef VOID DDKAPI
 (*PFREE_MAP_REGISTERS)(
-  IN PDMA_ADAPTER  DmaAdapter,
+  /*IN*/ PDMA_ADAPTER  DmaAdapter,
   PVOID  MapRegisterBase,
   ULONG  NumberOfMapRegisters);
 
 typedef PHYSICAL_ADDRESS DDKAPI
 (*PMAP_TRANSFER)(
-  IN PDMA_ADAPTER  DmaAdapter,
-  IN PMDL  Mdl,
-  IN PVOID  MapRegisterBase,
-  IN PVOID  CurrentVa,
-  IN OUT PULONG  Length,
-  IN BOOLEAN  WriteToDevice);
+  /*IN*/ PDMA_ADAPTER  DmaAdapter,
+  /*IN*/ PMDL  Mdl,
+  /*IN*/ PVOID  MapRegisterBase,
+  /*IN*/ PVOID  CurrentVa,
+  /*IN OUT*/ PULONG  Length,
+  /*IN*/ BOOLEAN  WriteToDevice);
 
 typedef ULONG DDKAPI
 (*PGET_DMA_ALIGNMENT)(
-  IN PDMA_ADAPTER  DmaAdapter);
+  /*IN*/ PDMA_ADAPTER  DmaAdapter);
 
 typedef ULONG DDKAPI
 (*PREAD_DMA_COUNTER)(
-  IN PDMA_ADAPTER  DmaAdapter);
+  /*IN*/ PDMA_ADAPTER  DmaAdapter);
 
 typedef NTSTATUS DDKAPI
 (*PGET_SCATTER_GATHER_LIST)(
-  IN PDMA_ADAPTER  DmaAdapter,
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN PMDL  Mdl,
-  IN PVOID  CurrentVa,
-  IN ULONG  Length,
-  IN PDRIVER_LIST_CONTROL  ExecutionRoutine,
-  IN PVOID  Context,
-  IN BOOLEAN  WriteToDevice);
+  /*IN*/ PDMA_ADAPTER  DmaAdapter,
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ PMDL  Mdl,
+  /*IN*/ PVOID  CurrentVa,
+  /*IN*/ ULONG  Length,
+  /*IN*/ PDRIVER_LIST_CONTROL  ExecutionRoutine,
+  /*IN*/ PVOID  Context,
+  /*IN*/ BOOLEAN  WriteToDevice);
 
 typedef VOID DDKAPI
 (*PPUT_SCATTER_GATHER_LIST)(
-  IN PDMA_ADAPTER  DmaAdapter,
-  IN PSCATTER_GATHER_LIST  ScatterGather,
-  IN BOOLEAN  WriteToDevice);
+  /*IN*/ PDMA_ADAPTER  DmaAdapter,
+  /*IN*/ PSCATTER_GATHER_LIST  ScatterGather,
+  /*IN*/ BOOLEAN  WriteToDevice);
 
 typedef NTSTATUS DDKAPI
 (*PCALCULATE_SCATTER_GATHER_LIST_SIZE)(
-  IN PDMA_ADAPTER  DmaAdapter,
-  IN PMDL  Mdl  OPTIONAL,
-  IN PVOID  CurrentVa,
-  IN ULONG  Length,
-  OUT PULONG  ScatterGatherListSize,
-  OUT PULONG  pNumberOfMapRegisters  OPTIONAL);
+  /*IN*/ PDMA_ADAPTER  DmaAdapter,
+  /*IN*/ PMDL  Mdl  /*OPTIONAL*/,
+  /*IN*/ PVOID  CurrentVa,
+  /*IN*/ ULONG  Length,
+  /*OUT*/ PULONG  ScatterGatherListSize,
+  /*OUT*/ PULONG  pNumberOfMapRegisters  /*OPTIONAL*/);
 
 typedef NTSTATUS DDKAPI
 (*PBUILD_SCATTER_GATHER_LIST)(
-  IN PDMA_ADAPTER  DmaAdapter,
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN PMDL  Mdl,
-  IN PVOID  CurrentVa,
-  IN ULONG  Length,
-  IN PDRIVER_LIST_CONTROL  ExecutionRoutine,
-  IN PVOID  Context,
-  IN BOOLEAN  WriteToDevice,
-  IN PVOID  ScatterGatherBuffer,
-  IN ULONG  ScatterGatherLength);
+  /*IN*/ PDMA_ADAPTER  DmaAdapter,
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ PMDL  Mdl,
+  /*IN*/ PVOID  CurrentVa,
+  /*IN*/ ULONG  Length,
+  /*IN*/ PDRIVER_LIST_CONTROL  ExecutionRoutine,
+  /*IN*/ PVOID  Context,
+  /*IN*/ BOOLEAN  WriteToDevice,
+  /*IN*/ PVOID  ScatterGatherBuffer,
+  /*IN*/ ULONG  ScatterGatherLength);
 
 typedef NTSTATUS DDKAPI
 (*PBUILD_MDL_FROM_SCATTER_GATHER_LIST)(
-  IN PDMA_ADAPTER  DmaAdapter,
-  IN PSCATTER_GATHER_LIST  ScatterGather,
-  IN PMDL  OriginalMdl,
-  OUT PMDL  *TargetMdl);
+  /*IN*/ PDMA_ADAPTER  DmaAdapter,
+  /*IN*/ PSCATTER_GATHER_LIST  ScatterGather,
+  /*IN*/ PMDL  OriginalMdl,
+  /*OUT*/ PMDL  *TargetMdl);
 
 typedef struct _DMA_OPERATIONS {
   ULONG  Size;
@@ -2102,223 +2107,223 @@ typedef struct _DRIVER_EXTENSION {
 
 typedef BOOLEAN DDKAPI
 (*PFAST_IO_CHECK_IF_POSSIBLE)(
-  IN struct _FILE_OBJECT  *FileObject,
-  IN PLARGE_INTEGER  FileOffset,
-  IN ULONG  Length,
-  IN BOOLEAN  Wait,
-  IN ULONG  LockKey,
-  IN BOOLEAN  CheckForReadOperation,
-  OUT PIO_STATUS_BLOCK  IoStatus,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*IN*/ struct _FILE_OBJECT  *FileObject,
+  /*IN*/ PLARGE_INTEGER  FileOffset,
+  /*IN*/ ULONG  Length,
+  /*IN*/ BOOLEAN  Wait,
+  /*IN*/ ULONG  LockKey,
+  /*IN*/ BOOLEAN  CheckForReadOperation,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatus,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef BOOLEAN DDKAPI
 (*PFAST_IO_READ)(
-  IN struct _FILE_OBJECT  *FileObject,
-  IN PLARGE_INTEGER  FileOffset,
-  IN ULONG  Length,
-  IN BOOLEAN  Wait,
-  IN ULONG  LockKey,
-  OUT PVOID  Buffer,
-  OUT PIO_STATUS_BLOCK  IoStatus,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*IN*/ struct _FILE_OBJECT  *FileObject,
+  /*IN*/ PLARGE_INTEGER  FileOffset,
+  /*IN*/ ULONG  Length,
+  /*IN*/ BOOLEAN  Wait,
+  /*IN*/ ULONG  LockKey,
+  /*OUT*/ PVOID  Buffer,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatus,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef BOOLEAN DDKAPI
 (*PFAST_IO_WRITE)(
-  IN struct _FILE_OBJECT  *FileObject,
-  IN PLARGE_INTEGER  FileOffset,
-  IN ULONG  Length,
-  IN BOOLEAN  Wait,
-  IN ULONG  LockKey,
-  IN PVOID  Buffer,
-  OUT PIO_STATUS_BLOCK  IoStatus,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*IN*/ struct _FILE_OBJECT  *FileObject,
+  /*IN*/ PLARGE_INTEGER  FileOffset,
+  /*IN*/ ULONG  Length,
+  /*IN*/ BOOLEAN  Wait,
+  /*IN*/ ULONG  LockKey,
+  /*IN*/ PVOID  Buffer,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatus,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef BOOLEAN DDKAPI
 (*PFAST_IO_QUERY_BASIC_INFO)(
-  IN struct _FILE_OBJECT  *FileObject,
-  IN BOOLEAN  Wait,
-  OUT PFILE_BASIC_INFORMATION  Buffer,
-  OUT PIO_STATUS_BLOCK  IoStatus,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*IN*/ struct _FILE_OBJECT  *FileObject,
+  /*IN*/ BOOLEAN  Wait,
+  /*OUT*/ PFILE_BASIC_INFORMATION  Buffer,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatus,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef BOOLEAN DDKAPI
 (*PFAST_IO_QUERY_STANDARD_INFO)(
-  IN struct _FILE_OBJECT  *FileObject,
-  IN BOOLEAN  Wait,
-  OUT PFILE_STANDARD_INFORMATION  Buffer,
-  OUT PIO_STATUS_BLOCK  IoStatus,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*IN*/ struct _FILE_OBJECT  *FileObject,
+  /*IN*/ BOOLEAN  Wait,
+  /*OUT*/ PFILE_STANDARD_INFORMATION  Buffer,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatus,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef BOOLEAN DDKAPI
 (*PFAST_IO_LOCK)(
-  IN struct _FILE_OBJECT  *FileObject,
-  IN PLARGE_INTEGER  FileOffset,
-  IN PLARGE_INTEGER  Length,
+  /*IN*/ struct _FILE_OBJECT  *FileObject,
+  /*IN*/ PLARGE_INTEGER  FileOffset,
+  /*IN*/ PLARGE_INTEGER  Length,
   PEPROCESS  ProcessId,
   ULONG  Key,
   BOOLEAN  FailImmediately,
   BOOLEAN  ExclusiveLock,
-  OUT PIO_STATUS_BLOCK  IoStatus,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatus,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef BOOLEAN DDKAPI
 (*PFAST_IO_UNLOCK_SINGLE)(
-  IN struct _FILE_OBJECT  *FileObject,
-  IN PLARGE_INTEGER  FileOffset,
-  IN PLARGE_INTEGER  Length,
+  /*IN*/ struct _FILE_OBJECT  *FileObject,
+  /*IN*/ PLARGE_INTEGER  FileOffset,
+  /*IN*/ PLARGE_INTEGER  Length,
   PEPROCESS  ProcessId,
   ULONG  Key,
-  OUT PIO_STATUS_BLOCK  IoStatus,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatus,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef BOOLEAN DDKAPI
 (*PFAST_IO_UNLOCK_ALL)(
-  IN struct _FILE_OBJECT  *FileObject,
+  /*IN*/ struct _FILE_OBJECT  *FileObject,
   PEPROCESS  ProcessId,
-  OUT PIO_STATUS_BLOCK  IoStatus,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatus,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef BOOLEAN DDKAPI
 (*PFAST_IO_UNLOCK_ALL_BY_KEY)(
-  IN struct _FILE_OBJECT  *FileObject,
+  /*IN*/ struct _FILE_OBJECT  *FileObject,
   PVOID  ProcessId,
   ULONG  Key,
-  OUT PIO_STATUS_BLOCK  IoStatus,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatus,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef BOOLEAN DDKAPI
 (*PFAST_IO_DEVICE_CONTROL)(
-  IN struct _FILE_OBJECT  *FileObject,
-  IN BOOLEAN  Wait,
-  IN PVOID  InputBuffer  OPTIONAL,
-  IN ULONG  InputBufferLength,
-  OUT PVOID  OutputBuffer  OPTIONAL,
-  IN ULONG  OutputBufferLength,
-  IN ULONG  IoControlCode,
-  OUT PIO_STATUS_BLOCK  IoStatus,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*IN*/ struct _FILE_OBJECT  *FileObject,
+  /*IN*/ BOOLEAN  Wait,
+  /*IN*/ PVOID  InputBuffer  /*OPTIONAL*/,
+  /*IN*/ ULONG  InputBufferLength,
+  /*OUT*/ PVOID  OutputBuffer  /*OPTIONAL*/,
+  /*IN*/ ULONG  OutputBufferLength,
+  /*IN*/ ULONG  IoControlCode,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatus,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef VOID DDKAPI
 (*PFAST_IO_ACQUIRE_FILE)(
-  IN struct _FILE_OBJECT  *FileObject);
+  /*IN*/ struct _FILE_OBJECT  *FileObject);
 
 typedef VOID DDKAPI
 (*PFAST_IO_RELEASE_FILE)(
-  IN struct _FILE_OBJECT  *FileObject);
+  /*IN*/ struct _FILE_OBJECT  *FileObject);
 
 typedef VOID DDKAPI
 (*PFAST_IO_DETACH_DEVICE)(
-  IN struct _DEVICE_OBJECT  *SourceDevice,
-  IN struct _DEVICE_OBJECT  *TargetDevice);
+  /*IN*/ struct _DEVICE_OBJECT  *SourceDevice,
+  /*IN*/ struct _DEVICE_OBJECT  *TargetDevice);
 
 typedef BOOLEAN DDKAPI
 (*PFAST_IO_QUERY_NETWORK_OPEN_INFO)(
-  IN struct _FILE_OBJECT  *FileObject,
-  IN BOOLEAN  Wait,
-  OUT struct _FILE_NETWORK_OPEN_INFORMATION  *Buffer,
-  OUT struct _IO_STATUS_BLOCK  *IoStatus,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*IN*/ struct _FILE_OBJECT  *FileObject,
+  /*IN*/ BOOLEAN  Wait,
+  /*OUT*/ struct _FILE_NETWORK_OPEN_INFORMATION  *Buffer,
+  /*OUT*/ struct _IO_STATUS_BLOCK  *IoStatus,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef NTSTATUS DDKAPI
 (*PFAST_IO_ACQUIRE_FOR_MOD_WRITE)(
-  IN struct _FILE_OBJECT  *FileObject,
-  IN PLARGE_INTEGER  EndingOffset,
-  OUT struct _ERESOURCE  **ResourceToRelease,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*IN*/ struct _FILE_OBJECT  *FileObject,
+  /*IN*/ PLARGE_INTEGER  EndingOffset,
+  /*OUT*/ struct _ERESOURCE  **ResourceToRelease,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef BOOLEAN DDKAPI
 (*PFAST_IO_MDL_READ)(
-  IN struct _FILE_OBJECT  *FileObject,
-  IN PLARGE_INTEGER  FileOffset,
-  IN ULONG  Length,
-  IN ULONG  LockKey,
-  OUT PMDL  *MdlChain,
-  OUT PIO_STATUS_BLOCK  IoStatus,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*IN*/ struct _FILE_OBJECT  *FileObject,
+  /*IN*/ PLARGE_INTEGER  FileOffset,
+  /*IN*/ ULONG  Length,
+  /*IN*/ ULONG  LockKey,
+  /*OUT*/ PMDL  *MdlChain,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatus,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef BOOLEAN DDKAPI
 (*PFAST_IO_MDL_READ_COMPLETE)(
-  IN struct _FILE_OBJECT *FileObject,
-  IN PMDL MdlChain,
-  IN struct _DEVICE_OBJECT *DeviceObject);
+  /*IN*/ struct _FILE_OBJECT *FileObject,
+  /*IN*/ PMDL MdlChain,
+  /*IN*/ struct _DEVICE_OBJECT *DeviceObject);
 
 typedef BOOLEAN DDKAPI
 (*PFAST_IO_PREPARE_MDL_WRITE)(
-  IN struct _FILE_OBJECT  *FileObject,
-  IN PLARGE_INTEGER  FileOffset,
-  IN ULONG  Length,
-  IN ULONG  LockKey,
-  OUT PMDL  *MdlChain,
-  OUT PIO_STATUS_BLOCK  IoStatus,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*IN*/ struct _FILE_OBJECT  *FileObject,
+  /*IN*/ PLARGE_INTEGER  FileOffset,
+  /*IN*/ ULONG  Length,
+  /*IN*/ ULONG  LockKey,
+  /*OUT*/ PMDL  *MdlChain,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatus,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef BOOLEAN DDKAPI
 (*PFAST_IO_MDL_WRITE_COMPLETE)(
-  IN struct _FILE_OBJECT  *FileObject,
-  IN PLARGE_INTEGER  FileOffset,
-  IN PMDL  MdlChain,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*IN*/ struct _FILE_OBJECT  *FileObject,
+  /*IN*/ PLARGE_INTEGER  FileOffset,
+  /*IN*/ PMDL  MdlChain,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef BOOLEAN DDKAPI
 (*PFAST_IO_READ_COMPRESSED)(
-  IN struct _FILE_OBJECT  *FileObject,
-  IN PLARGE_INTEGER  FileOffset,
-  IN ULONG  Length,
-  IN ULONG  LockKey,
-  OUT PVOID  Buffer,
-  OUT PMDL  *MdlChain,
-  OUT PIO_STATUS_BLOCK  IoStatus,
-  OUT struct _COMPRESSED_DATA_INFO  *CompressedDataInfo,
-  IN ULONG  CompressedDataInfoLength,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*IN*/ struct _FILE_OBJECT  *FileObject,
+  /*IN*/ PLARGE_INTEGER  FileOffset,
+  /*IN*/ ULONG  Length,
+  /*IN*/ ULONG  LockKey,
+  /*OUT*/ PVOID  Buffer,
+  /*OUT*/ PMDL  *MdlChain,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatus,
+  /*OUT*/ struct _COMPRESSED_DATA_INFO  *CompressedDataInfo,
+  /*IN*/ ULONG  CompressedDataInfoLength,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef BOOLEAN DDKAPI
 (*PFAST_IO_WRITE_COMPRESSED)(
-  IN struct _FILE_OBJECT  *FileObject,
-  IN PLARGE_INTEGER  FileOffset,
-  IN ULONG  Length,
-  IN ULONG  LockKey,
-  IN PVOID  Buffer,
-  OUT PMDL  *MdlChain,
-  OUT PIO_STATUS_BLOCK  IoStatus,
-  IN struct _COMPRESSED_DATA_INFO  *CompressedDataInfo,
-  IN ULONG  CompressedDataInfoLength,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*IN*/ struct _FILE_OBJECT  *FileObject,
+  /*IN*/ PLARGE_INTEGER  FileOffset,
+  /*IN*/ ULONG  Length,
+  /*IN*/ ULONG  LockKey,
+  /*IN*/ PVOID  Buffer,
+  /*OUT*/ PMDL  *MdlChain,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatus,
+  /*IN*/ struct _COMPRESSED_DATA_INFO  *CompressedDataInfo,
+  /*IN*/ ULONG  CompressedDataInfoLength,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef BOOLEAN DDKAPI
 (*PFAST_IO_MDL_READ_COMPLETE_COMPRESSED)(
-  IN struct _FILE_OBJECT  *FileObject,
-  IN PMDL  MdlChain,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*IN*/ struct _FILE_OBJECT  *FileObject,
+  /*IN*/ PMDL  MdlChain,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef BOOLEAN DDKAPI
 (*PFAST_IO_MDL_WRITE_COMPLETE_COMPRESSED)(
-  IN struct _FILE_OBJECT  *FileObject,
-  IN PLARGE_INTEGER  FileOffset,
-  IN PMDL  MdlChain,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*IN*/ struct _FILE_OBJECT  *FileObject,
+  /*IN*/ PLARGE_INTEGER  FileOffset,
+  /*IN*/ PMDL  MdlChain,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef BOOLEAN DDKAPI
 (*PFAST_IO_QUERY_OPEN)(
-  IN struct _IRP  *Irp,
-  OUT PFILE_NETWORK_OPEN_INFORMATION  NetworkInformation,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*IN*/ struct _IRP  *Irp,
+  /*OUT*/ PFILE_NETWORK_OPEN_INFORMATION  NetworkInformation,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef NTSTATUS DDKAPI
 (*PFAST_IO_RELEASE_FOR_MOD_WRITE)(
-  IN struct _FILE_OBJECT  *FileObject,
-  IN struct _ERESOURCE  *ResourceToRelease,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*IN*/ struct _FILE_OBJECT  *FileObject,
+  /*IN*/ struct _ERESOURCE  *ResourceToRelease,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef NTSTATUS DDKAPI
 (*PFAST_IO_ACQUIRE_FOR_CCFLUSH)(
-  IN struct _FILE_OBJECT  *FileObject,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*IN*/ struct _FILE_OBJECT  *FileObject,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef NTSTATUS DDKAPI
 (*PFAST_IO_RELEASE_FOR_CCFLUSH) (
-  IN struct _FILE_OBJECT  *FileObject,
-  IN struct _DEVICE_OBJECT  *DeviceObject);
+  /*IN*/ struct _FILE_OBJECT  *FileObject,
+  /*IN*/ struct _DEVICE_OBJECT  *DeviceObject);
 
 typedef struct _FAST_IO_DISPATCH {
   ULONG  SizeOfFastIoDispatch;
@@ -2504,34 +2509,34 @@ typedef struct _IO_CSQ_IRP_CONTEXT {
 
 typedef VOID DDKAPI
 (*PIO_CSQ_INSERT_IRP)(
-  IN struct _IO_CSQ  *Csq,
-  IN PIRP  Irp);
+  /*IN*/ struct _IO_CSQ  *Csq,
+  /*IN*/ PIRP  Irp);
 
 typedef VOID DDKAPI
 (*PIO_CSQ_REMOVE_IRP)(
-  IN struct _IO_CSQ  *Csq,
-  IN PIRP  Irp);
+  /*IN*/ struct _IO_CSQ  *Csq,
+  /*IN*/ PIRP  Irp);
 
 typedef PIRP DDKAPI
 (*PIO_CSQ_PEEK_NEXT_IRP)(
-  IN struct _IO_CSQ  *Csq,
-  IN PIRP  Irp,
-  IN PVOID  PeekContext);
+  /*IN*/ struct _IO_CSQ  *Csq,
+  /*IN*/ PIRP  Irp,
+  /*IN*/ PVOID  PeekContext);
 
 typedef VOID DDKAPI
 (*PIO_CSQ_ACQUIRE_LOCK)(
-  IN  struct _IO_CSQ  *Csq,
-  OUT PKIRQL  Irql);
+  /*IN*/ struct _IO_CSQ  *Csq,
+  /*OUT*/ PKIRQL  Irql);
 
 typedef VOID DDKAPI
 (*PIO_CSQ_RELEASE_LOCK)(
-  IN struct _IO_CSQ  *Csq,
-  IN KIRQL  Irql);
+  /*IN*/ struct _IO_CSQ  *Csq,
+  /*IN*/ KIRQL  Irql);
 
 typedef VOID DDKAPI
 (*PIO_CSQ_COMPLETE_CANCELED_IRP)(
-  IN  struct _IO_CSQ  *Csq,
-  IN  PIRP  Irp);
+  /*IN*/ struct _IO_CSQ  *Csq,
+  /*IN*/ PIRP  Irp);
 
 typedef struct _IO_CSQ {
   ULONG  Type;
@@ -2983,9 +2988,9 @@ NTOSAPI
 ULONGLONG
 DDKAPI
 VerSetConditionMask(
-  IN ULONGLONG  ConditionMask,
-  IN ULONG  TypeMask,
-  IN UCHAR  Condition);
+  /*IN*/ ULONGLONG  ConditionMask,
+  /*IN*/ ULONG  TypeMask,
+  /*IN*/ UCHAR  Condition);
 
 #define VER_SET_CONDITION(ConditionMask, TypeBitMask, ComparisonType)  \
         ((ConditionMask) = VerSetConditionMask((ConditionMask), \
@@ -3027,12 +3032,12 @@ typedef struct _RTL_BITMAP_RUN {
 
 typedef NTSTATUS DDKAPI
 (*PRTL_QUERY_REGISTRY_ROUTINE)(
-  IN PWSTR  ValueName,
-  IN ULONG  ValueType,
-  IN PVOID  ValueData,
-  IN ULONG  ValueLength,
-  IN PVOID  Context,
-  IN PVOID  EntryContext);
+  /*IN*/ PWSTR  ValueName,
+  /*IN*/ ULONG  ValueType,
+  /*IN*/ PVOID  ValueData,
+  /*IN*/ ULONG  ValueLength,
+  /*IN*/ PVOID  Context,
+  /*IN*/ PVOID  EntryContext);
 
 #define RTL_REGISTRY_ABSOLUTE             0
 #define RTL_REGISTRY_SERVICES             1
@@ -3073,13 +3078,13 @@ typedef struct _TIME_FIELDS {
 
 typedef PVOID DDKAPI
 (*PALLOCATE_FUNCTION)(
-  IN POOL_TYPE  PoolType,
-  IN SIZE_T  NumberOfBytes,
-  IN ULONG  Tag);
+  /*IN*/ POOL_TYPE  PoolType,
+  /*IN*/ SIZE_T  NumberOfBytes,
+  /*IN*/ ULONG  Tag);
 
 typedef VOID DDKAPI
 (*PFREE_FUNCTION)(
-  IN PVOID  Buffer);
+  /*IN*/ PVOID  Buffer);
 
 #define GENERAL_LOOKASIDE_S \
   SLIST_HEADER  ListHead; \
@@ -3125,9 +3130,9 @@ typedef struct _PAGED_LOOKASIDE_LIST {
 typedef struct _CALLBACK_OBJECT *PCALLBACK_OBJECT;
 
 typedef VOID DDKAPI (*PCALLBACK_FUNCTION)(
-  IN PVOID  CallbackContext,
-  IN PVOID  Argument1,
-  IN PVOID  Argument2);
+  /*IN*/ PVOID  CallbackContext,
+  /*IN*/ PVOID  Argument1,
+  /*IN*/ PVOID  Argument2);
 
 typedef enum _EVENT_TYPE {
   NotificationEvent,
@@ -3207,8 +3212,8 @@ typedef struct _IO_WORKITEM *PIO_WORKITEM;
 
 typedef VOID DDKAPI
 (*PIO_WORKITEM_ROUTINE)(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN PVOID  Context);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ PVOID  Context);
 
 typedef struct _SHARE_ACCESS {
   ULONG  OpenCount;
@@ -3322,17 +3327,17 @@ typedef enum _CONFIGURATION_TYPE {
 } CONFIGURATION_TYPE, *PCONFIGURATION_TYPE;
 
 typedef NTSTATUS (*PIO_QUERY_DEVICE_ROUTINE)(
-  IN PVOID  Context,
-  IN PUNICODE_STRING  PathName,
-  IN INTERFACE_TYPE  BusType,
-  IN ULONG  BusNumber,
-  IN PKEY_VALUE_FULL_INFORMATION  *BusInformation,
-  IN CONFIGURATION_TYPE  ControllerType,
-  IN ULONG  ControllerNumber,
-  IN PKEY_VALUE_FULL_INFORMATION  *ControllerInformation,
-  IN CONFIGURATION_TYPE  PeripheralType,
-  IN ULONG  PeripheralNumber,
-  IN PKEY_VALUE_FULL_INFORMATION  *PeripheralInformation);
+  /*IN*/ PVOID  Context,
+  /*IN*/ PUNICODE_STRING  PathName,
+  /*IN*/ INTERFACE_TYPE  BusType,
+  /*IN*/ ULONG  BusNumber,
+  /*IN*/ PKEY_VALUE_FULL_INFORMATION  *BusInformation,
+  /*IN*/ CONFIGURATION_TYPE  ControllerType,
+  /*IN*/ ULONG  ControllerNumber,
+  /*IN*/ PKEY_VALUE_FULL_INFORMATION  *ControllerInformation,
+  /*IN*/ CONFIGURATION_TYPE  PeripheralType,
+  /*IN*/ ULONG  PeripheralNumber,
+  /*IN*/ PKEY_VALUE_FULL_INFORMATION  *PeripheralInformation);
 
 typedef enum _WORK_QUEUE_TYPE {
   CriticalWorkQueue,
@@ -3343,7 +3348,7 @@ typedef enum _WORK_QUEUE_TYPE {
 
 typedef VOID DDKAPI
 (*PWORKER_THREAD_ROUTINE)(
-  IN PVOID Parameter);
+  /*IN*/ PVOID Parameter);
 
 typedef struct _WORK_QUEUE_ITEM {
   LIST_ENTRY  List;
@@ -3361,8 +3366,8 @@ typedef enum _KBUGCHECK_BUFFER_DUMP_STATE {
 
 typedef VOID DDKAPI
 (*PKBUGCHECK_CALLBACK_ROUTINE)(
-  IN PVOID  Buffer,
-  IN ULONG  Length);
+  /*IN*/ PVOID  Buffer,
+  /*IN*/ ULONG  Length);
 
 typedef struct _KBUGCHECK_CALLBACK_RECORD {
   LIST_ENTRY  Entry;
@@ -3377,7 +3382,7 @@ typedef struct _KBUGCHECK_CALLBACK_RECORD {
 /*
  * VOID
  * KeInitializeCallbackRecord(
- *   IN PKBUGCHECK_CALLBACK_RECORD  CallbackRecord)
+ * IN PKBUGCHECK_CALLBACK_RECORD  CallbackRecord)
  */
 #define KeInitializeCallbackRecord(CallbackRecord) \
   CallbackRecord->State = BufferEmpty;
@@ -3432,19 +3437,19 @@ typedef struct _CLIENT_ID {
 
 typedef VOID DDKAPI
 (*PKSTART_ROUTINE)(
-  IN PVOID  StartContext);
+  /*IN*/ PVOID  StartContext);
 
 typedef VOID DDKAPI
 (*PCREATE_PROCESS_NOTIFY_ROUTINE)(
-  IN HANDLE  ParentId,
-  IN HANDLE  ProcessId,
-  IN BOOLEAN  Create);
+  /*IN*/ HANDLE  ParentId,
+  /*IN*/ HANDLE  ProcessId,
+  /*IN*/ BOOLEAN  Create);
 
 typedef VOID DDKAPI
 (*PCREATE_THREAD_NOTIFY_ROUTINE)(
-  IN HANDLE  ProcessId,
-  IN HANDLE  ThreadId,
-  IN BOOLEAN  Create);
+  /*IN*/ HANDLE  ProcessId,
+  /*IN*/ HANDLE  ThreadId,
+  /*IN*/ BOOLEAN  Create);
 
 typedef struct _IMAGE_INFO {
   _ANONYMOUS_UNION union {
@@ -3466,9 +3471,9 @@ typedef struct _IMAGE_INFO {
 
 typedef VOID DDKAPI
 (*PLOAD_IMAGE_NOTIFY_ROUTINE)(
-  IN PUNICODE_STRING  FullImageName,
-  IN HANDLE  ProcessId,
-  IN PIMAGE_INFO  ImageInfo);
+  /*IN*/ PUNICODE_STRING  FullImageName,
+  /*IN*/ HANDLE  ProcessId,
+  /*IN*/ PIMAGE_INFO  ImageInfo);
 
 typedef enum _PROCESSINFOCLASS {
   ProcessBasicInformation,
@@ -3539,11 +3544,11 @@ typedef ULONG EXECUTION_STATE;
 
 typedef VOID DDKAPI
 (*PREQUEST_POWER_COMPLETE)(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN UCHAR  MinorFunction,
-  IN POWER_STATE  PowerState,
-  IN PVOID  Context,
-  IN PIO_STATUS_BLOCK  IoStatus);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ UCHAR  MinorFunction,
+  /*IN*/ POWER_STATE  PowerState,
+  /*IN*/ PVOID  Context,
+  /*IN*/ PIO_STATUS_BLOCK  IoStatus);
 
 typedef enum _TRACE_INFORMATION_CLASS {
   TraceIdClass,
@@ -3558,9 +3563,9 @@ typedef enum _TRACE_INFORMATION_CLASS {
 
 typedef NTSTATUS DDKAPI
 (*PEX_CALLBACK_FUNCTION)(
-  IN PVOID  CallbackContext,
-  IN PVOID  Argument1,
-  IN PVOID  Argument2);
+  /*IN*/ PVOID  CallbackContext,
+  /*IN*/ PVOID  Argument1,
+  /*IN*/ PVOID  Argument2);
 
 
 
@@ -3604,8 +3609,8 @@ typedef struct _DISK_SIGNATURE {
 
 typedef VOID DDKFASTAPI
 (*PTIME_UPDATE_NOTIFY_ROUTINE)(
-  IN HANDLE  ThreadId,
-  IN KPROCESSOR_MODE  Mode);
+  /*IN*/ HANDLE  ThreadId,
+  /*IN*/ KPROCESSOR_MODE  Mode);
 
 #define DBG_STATUS_CONTROL_C              1
 #define DBG_STATUS_SYSRQ                  2
@@ -3622,7 +3627,7 @@ typedef struct _PHYSICAL_MEMORY_RANGE {
 
 typedef ULONG_PTR
 (*PDRIVER_VERIFIER_THUNK_ROUTINE)(
-  IN PVOID  Context);
+  /*IN*/ PVOID  Context);
 
 typedef struct _DRIVER_VERIFIER_THUNK_PAIRS {
   PDRIVER_VERIFIER_THUNK_ROUTINE  PristineRoutine;
@@ -3674,8 +3679,8 @@ typedef struct _RANGE_LIST_ITERATOR {
 
 typedef BOOLEAN
 (*PRTL_CONFLICT_RANGE_CALLBACK)(
-  IN PVOID  Context,
-  IN PRTL_RANGE  Range);
+  /*IN*/ PVOID  Context,
+  /*IN*/ PRTL_RANGE  Range);
 
 #define HASH_STRING_ALGORITHM_DEFAULT     0
 #define HASH_STRING_ALGORITHM_X65599      1
@@ -3698,9 +3703,9 @@ typedef enum _SUITE_TYPE {
 
 typedef VOID DDKAPI
 (*PTIMER_APC_ROUTINE)(
-  IN PVOID  TimerContext,
-  IN ULONG  TimerLowValue,
-  IN LONG  TimerHighValue);
+  /*IN*/ PVOID  TimerContext,
+  /*IN*/ ULONG  TimerLowValue,
+  /*IN*/ LONG  TimerHighValue);
 
 
 
@@ -3837,41 +3842,41 @@ NTOSAPI
 LONG
 DDKFASTAPI
 InterlockedIncrement(
-  IN PLONG  VOLATILE  Addend);
+  /*IN*/ PLONG  VOLATILE  Addend);
 
 NTOSAPI
 LONG
 DDKFASTAPI
 InterlockedDecrement(
-  IN PLONG  VOLATILE  Addend);
+  /*IN*/ PLONG  VOLATILE  Addend);
 
 NTOSAPI
 LONG
 DDKFASTAPI
 InterlockedCompareExchange(
-  IN OUT PLONG  VOLATILE  Destination,
-  IN LONG  Exchange,
-  IN LONG  Comparand);
+  /*IN OUT*/ PLONG  VOLATILE  Destination,
+  /*IN*/ LONG  Exchange,
+  /*IN*/ LONG  Comparand);
 
 NTOSAPI
 LONG
 DDKFASTAPI
 InterlockedExchange(
-  IN OUT PLONG  VOLATILE  Target,
-  IN LONG Value);
+  /*IN OUT*/ PLONG  VOLATILE  Target,
+  /*IN*/ LONG Value);
 
 NTOSAPI
 LONG
 DDKFASTAPI
 InterlockedExchangeAdd(
-  IN OUT PLONG VOLATILE  Addend,
-  IN LONG  Value);
+  /*IN OUT*/ PLONG VOLATILE  Addend,
+  /*IN*/ LONG  Value);
 
 /*
  * PVOID
  * InterlockedExchangePointer(
- *   IN OUT PVOID VOLATILE  *Target,
- *   IN PVOID  Value)
+ * IN OUT PVOID VOLATILE  *Target,
+ * IN PVOID  Value)
  */
 #define InterlockedExchangePointer(Target, Value) \
   ((PVOID) InterlockedExchange((PLONG) Target, (LONG) Value))
@@ -3879,9 +3884,9 @@ InterlockedExchangeAdd(
 /*
  * PVOID
  * InterlockedCompareExchangePointer(
- *   IN OUT PVOID  *Destination,
- *   IN PVOID  Exchange,
- *   IN PVOID  Comparand)
+ * IN OUT PVOID  *Destination,
+ * IN PVOID  Exchange,
+ * IN PVOID  Comparand)
  */
 #define InterlockedCompareExchangePointer(Destination, Exchange, Comparand) \
   ((PVOID) InterlockedCompareExchange((PLONG) Destination, (LONG) Exchange, (LONG) Comparand))
@@ -3890,14 +3895,14 @@ InterlockedExchangeAdd(
 PSLIST_ENTRY
 DDKFASTAPI
 InterlockedPopEntrySList(
-  IN PSLIST_HEADER  ListHead);
+  /*IN*/ PSLIST_HEADER  ListHead);
 
 NTOSAPI
 PSLIST_ENTRY
 DDKFASTAPI
 InterlockedPushEntrySList(
-  IN PSLIST_HEADER  ListHead,
-  IN PSLIST_ENTRY  ListEntry);
+  /*IN*/ PSLIST_HEADER  ListHead,
+  /*IN*/ PSLIST_ENTRY  ListEntry);
 #endif /* _WIN32_WINNT >= 0x0501 */
 
 #endif /* !__INTERLOCKED_DECLARED */
@@ -3907,13 +3912,13 @@ NTOSAPI
 VOID
 DDKFASTAPI
 KefAcquireSpinLockAtDpcLevel(
-  IN PKSPIN_LOCK  SpinLock);
+  /*IN*/ PKSPIN_LOCK  SpinLock);
 
 NTOSAPI
 VOID
 DDKFASTAPI
 KefReleaseSpinLockFromDpcLevel(
-  IN PKSPIN_LOCK  SpinLock);
+  /*IN*/ PKSPIN_LOCK  SpinLock);
 
 #define KeAcquireSpinLockAtDpcLevel(SpinLock) KefAcquireSpinLockAtDpcLevel(SpinLock)
 #define KeReleaseSpinLockFromDpcLevel(SpinLock) KefReleaseSpinLockFromDpcLevel(SpinLock)
@@ -3936,7 +3941,7 @@ KefReleaseSpinLockFromDpcLevel(
 /*
  * ULONG
  * BYTE_OFFSET(
- *   IN PVOID  Va)
+ * IN PVOID  Va)
  */
 #define BYTE_OFFSET(Va) \
   ((ULONG) ((ULONG_PTR) (Va) & (PAGE_SIZE - 1)))
@@ -3944,7 +3949,7 @@ KefReleaseSpinLockFromDpcLevel(
 /*
  * ULONG
  * BYTES_TO_PAGES(
- *   IN ULONG  Size)
+ * IN ULONG  Size)
  */
 #define BYTES_TO_PAGES(Size) \
   ((ULONG) ((ULONG_PTR) (Size) >> PAGE_SHIFT) + (((ULONG) (Size) & (PAGE_SIZE - 1)) != 0))
@@ -3952,9 +3957,9 @@ KefReleaseSpinLockFromDpcLevel(
 /*
  * PCHAR
  * CONTAINING_RECORD(
- *   IN PCHAR  Address,
- *   IN TYPE  Type,
- *   IN PCHAR  Field);
+ * IN PCHAR  Address,
+ * IN TYPE  Type,
+ * IN PCHAR  Field);
  */
 #ifndef CONTAINING_RECORD
 #define CONTAINING_RECORD(Address, Type, Field) \
@@ -3963,8 +3968,8 @@ KefReleaseSpinLockFromDpcLevel(
 
 /* LONG
  * FIELD_OFFSET(
- *   IN TYPE  Type,
- *   IN PCHAR  Field);
+ * IN TYPE  Type,
+ * IN PCHAR  Field);
  */
 #ifndef FIELD_OFFSET
 #define FIELD_OFFSET(Type, Field) \
@@ -3974,7 +3979,7 @@ KefReleaseSpinLockFromDpcLevel(
 /*
  * PVOID
  * PAGE_ALIGN(
- *   IN PVOID  Va)
+ * IN PVOID  Va)
  */
 #define PAGE_ALIGN(Va) \
   ((PVOID) ((ULONG_PTR)(Va) & ~(PAGE_SIZE - 1)))
@@ -3982,7 +3987,7 @@ KefReleaseSpinLockFromDpcLevel(
 /*
  * ULONG_PTR
  * ROUND_TO_PAGES(
- *   IN ULONG_PTR  Size)
+ * IN ULONG_PTR  Size)
  */
 #define ROUND_TO_PAGES(Size) \
   ((ULONG_PTR) (((ULONG_PTR) Size + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1)))
@@ -3991,10 +3996,10 @@ NTOSAPI
 VOID
 DDKAPI
 RtlAssert(
-  IN PVOID  FailedAssertion,
-  IN PVOID  FileName,
-  IN ULONG  LineNumber,
-  IN PCHAR  Message);
+  /*IN*/ PVOID  FailedAssertion,
+  /*IN*/ PVOID  FileName,
+  /*IN*/ ULONG  LineNumber,
+  /*IN*/ PCHAR  Message);
 
 #ifdef DBG
 
@@ -4046,7 +4051,7 @@ RtlAssert(
 /*
  * VOID
  * InitializeListHead(
- *   IN PLIST_ENTRY  ListHead)
+ * IN PLIST_ENTRY  ListHead)
  */
 #define InitializeListHead(_ListHead) \
 { \
@@ -4057,8 +4062,8 @@ RtlAssert(
 /*
  * VOID
  * InsertHeadList(
- *   IN PLIST_ENTRY  ListHead,
- *   IN PLIST_ENTRY  Entry)
+ * IN PLIST_ENTRY  ListHead,
+ * IN PLIST_ENTRY  Entry)
  */
 #define InsertHeadList(_ListHead, \
                        _Entry) \
@@ -4074,8 +4079,8 @@ RtlAssert(
 /*
  * VOID
  * InsertTailList(
- *   IN PLIST_ENTRY  ListHead,
- *   IN PLIST_ENTRY  Entry)
+ * IN PLIST_ENTRY  ListHead,
+ * IN PLIST_ENTRY  Entry)
  */
 #define InsertTailList(_ListHead, \
                        _Entry) \
@@ -4091,14 +4096,14 @@ RtlAssert(
 /*
  * BOOLEAN
  * IsListEmpty(
- *   IN PLIST_ENTRY  ListHead)
+ * IN PLIST_ENTRY  ListHead)
  */
 #define IsListEmpty(_ListHead) \
   ((_ListHead)->Flink == (_ListHead))
 
 static __inline PSINGLE_LIST_ENTRY 
 PopEntryList(
-  IN PSINGLE_LIST_ENTRY  ListHead)
+  /*IN*/ PSINGLE_LIST_ENTRY  ListHead)
 {
 	PSINGLE_LIST_ENTRY Entry;
 
@@ -4113,8 +4118,8 @@ PopEntryList(
 /*
  * VOID
  * PushEntryList(
- *   IN PSINGLE_LIST_ENTRY  ListHead,
- *   IN PSINGLE_LIST_ENTRY  Entry)
+ * IN PSINGLE_LIST_ENTRY  ListHead,
+ * IN PSINGLE_LIST_ENTRY  Entry)
  */
 #define PushEntryList(_ListHead, \
                       _Entry) \
@@ -4126,7 +4131,7 @@ PopEntryList(
 /*
  * VOID
  * RemoveEntryList(
- *   IN PLIST_ENTRY  Entry)
+ * IN PLIST_ENTRY  Entry)
  */
 #define RemoveEntryList(_Entry) \
 { \
@@ -4142,7 +4147,7 @@ PopEntryList(
 
 static __inline PLIST_ENTRY 
 RemoveHeadList(
-  IN PLIST_ENTRY  ListHead)
+  /*IN*/ PLIST_ENTRY  ListHead)
 {
 	PLIST_ENTRY OldFlink;
 	PLIST_ENTRY OldBlink;
@@ -4165,7 +4170,7 @@ RemoveHeadList(
 
 static __inline PLIST_ENTRY
 RemoveTailList(
-  IN PLIST_ENTRY  ListHead)
+  /*IN*/ PLIST_ENTRY  ListHead)
 {
 	PLIST_ENTRY OldFlink;
 	PLIST_ENTRY OldBlink;
@@ -4189,7 +4194,7 @@ RemoveTailList(
 /*
  * USHORT
  * QueryDepthSList(
- *   IN PSLIST_HEADER  SListHead)
+ * IN PSLIST_HEADER  SListHead)
  */
 #define QueryDepthSList(_SListHead) \
   ((USHORT) ((_SListHead)->Alignment & 0xffff))
@@ -4200,85 +4205,85 @@ NTOSAPI
 ULONG
 DDKAPI
 RtlAnsiStringToUnicodeSize(
-  IN PANSI_STRING  AnsiString);
+  /*IN*/ PANSI_STRING  AnsiString);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlAddRange(
-  IN OUT PRTL_RANGE_LIST  RangeList,
-  IN ULONGLONG  Start,
-  IN ULONGLONG  End,
-  IN UCHAR  Attributes,
-  IN ULONG  Flags,
-  IN PVOID  UserData  OPTIONAL,
-  IN PVOID  Owner  OPTIONAL);
+  /*IN OUT*/ PRTL_RANGE_LIST  RangeList,
+  /*IN*/ ULONGLONG  Start,
+  /*IN*/ ULONGLONG  End,
+  /*IN*/ UCHAR  Attributes,
+  /*IN*/ ULONG  Flags,
+  /*IN*/ PVOID  UserData  /*OPTIONAL*/,
+  /*IN*/ PVOID  Owner  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlAnsiStringToUnicodeString(
-  IN OUT PUNICODE_STRING  DestinationString,
-  IN PANSI_STRING  SourceString,
-  IN BOOLEAN  AllocateDestinationString);
+  /*IN OUT*/ PUNICODE_STRING  DestinationString,
+  /*IN*/ PANSI_STRING  SourceString,
+  /*IN*/ BOOLEAN  AllocateDestinationString);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlAppendUnicodeStringToString(
-  IN OUT PUNICODE_STRING  Destination,
-  IN PUNICODE_STRING  Source);
+  /*IN OUT*/ PUNICODE_STRING  Destination,
+  /*IN*/ PUNICODE_STRING  Source);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlAppendUnicodeToString(
-  IN OUT PUNICODE_STRING  Destination,
-  IN PCWSTR  Source);
+  /*IN OUT*/ PUNICODE_STRING  Destination,
+  /*IN*/ PCWSTR  Source);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 RtlAreBitsClear(
-  IN PRTL_BITMAP  BitMapHeader,
-  IN ULONG  StartingIndex,
-  IN ULONG  Length); 
+  /*IN*/ PRTL_BITMAP  BitMapHeader,
+  /*IN*/ ULONG  StartingIndex,
+  /*IN*/ ULONG  Length); 
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 RtlAreBitsSet(
-  IN PRTL_BITMAP  BitMapHeader,
-  IN ULONG  StartingIndex,
-  IN ULONG  Length); 
+  /*IN*/ PRTL_BITMAP  BitMapHeader,
+  /*IN*/ ULONG  StartingIndex,
+  /*IN*/ ULONG  Length); 
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlCharToInteger(
-  IN PCSZ  String,
-  IN ULONG  Base  OPTIONAL,
-  IN OUT PULONG  Value);
+  /*IN*/ PCSZ  String,
+  /*IN*/ ULONG  Base  /*OPTIONAL*/,
+  /*IN OUT*/ PULONG  Value);
 
 NTOSAPI
 ULONG
 DDKAPI
 RtlCheckBit(
-  IN PRTL_BITMAP  BitMapHeader,
-  IN ULONG  BitPosition); 
+  /*IN*/ PRTL_BITMAP  BitMapHeader,
+  /*IN*/ ULONG  BitPosition); 
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlCheckRegistryKey(
-  IN ULONG  RelativeTo,
-  IN PWSTR  Path);
+  /*IN*/ ULONG  RelativeTo,
+  /*IN*/ PWSTR  Path);
 
 NTOSAPI
 VOID
 DDKAPI
 RtlClearAllBits(
-  IN PRTL_BITMAP  BitMapHeader); 
+  /*IN*/ PRTL_BITMAP  BitMapHeader); 
 
 NTOSAPI
 VOID
@@ -4291,51 +4296,51 @@ NTOSAPI
 VOID
 DDKAPI
 RtlClearBits(
-  IN PRTL_BITMAP  BitMapHeader,
-  IN ULONG  StartingIndex,
-  IN ULONG  NumberToClear); 
+  /*IN*/ PRTL_BITMAP  BitMapHeader,
+  /*IN*/ ULONG  StartingIndex,
+  /*IN*/ ULONG  NumberToClear); 
 
 NTOSAPI
 SIZE_T
 DDKAPI
 RtlCompareMemory(
-  IN CONST VOID  *Source1,
-  IN CONST VOID  *Source2,
-  IN SIZE_T  Length);
+  /*IN*/ CONST VOID  *Source1,
+  /*IN*/ CONST VOID  *Source2,
+  /*IN*/ SIZE_T  Length);
 
 NTOSAPI
 LONG
 DDKAPI
 RtlCompareString(
-  IN PSTRING  String1,
-  IN PSTRING  String2,
+  /*IN*/ PSTRING  String1,
+  /*IN*/ PSTRING  String2,
   BOOLEAN  CaseInSensitive);
 
 NTOSAPI
 LONG
 DDKAPI
 RtlCompareUnicodeString(
-  IN PUNICODE_STRING  String1,
-  IN PUNICODE_STRING  String2,
-  IN BOOLEAN  CaseInSensitive);
+  /*IN*/ PUNICODE_STRING  String1,
+  /*IN*/ PUNICODE_STRING  String2,
+  /*IN*/ BOOLEAN  CaseInSensitive);
 
 NTOSAPI
 LARGE_INTEGER
 DDKAPI
 RtlConvertLongToLargeInteger(
-  IN LONG  SignedInteger);
+  /*IN*/ LONG  SignedInteger);
 
 NTOSAPI
 LUID
 DDKAPI
 RtlConvertLongToLuid(
-  IN LONG  Long);
+  /*IN*/ LONG  Long);
 
 NTOSAPI
 LARGE_INTEGER
 DDKAPI
 RtlConvertUlongToLargeInteger(
-  IN ULONG  UnsignedInteger);
+  /*IN*/ ULONG  UnsignedInteger);
 
 NTOSAPI
 LUID
@@ -4346,9 +4351,9 @@ RtlConvertUlongToLuid(
 /*
  * VOID
  * RtlCopyMemory(
- *   IN VOID UNALIGNED  *Destination,
- *   IN CONST VOID UNALIGNED  *Source,
- *   IN SIZE_T  Length)
+ * IN VOID UNALIGNED  *Destination,
+ * IN CONST VOID UNALIGNED  *Source,
+ * IN SIZE_T  Length)
  */
 #ifndef RtlCopyMemory
 #define RtlCopyMemory(Destination, Source, Length) \
@@ -4363,83 +4368,83 @@ NTOSAPI
 VOID
 DDKAPI
 RtlCopyMemory32(
-  IN VOID UNALIGNED  *Destination,
-  IN CONST VOID UNALIGNED  *Source,
-  IN ULONG  Length);
+  /*IN*/ VOID UNALIGNED  *Destination,
+  /*IN*/ CONST VOID UNALIGNED  *Source,
+  /*IN*/ ULONG  Length);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlCopyRangeList(
-  OUT PRTL_RANGE_LIST  CopyRangeList,
-  IN PRTL_RANGE_LIST  RangeList);
+  /*OUT*/ PRTL_RANGE_LIST  CopyRangeList,
+  /*IN*/ PRTL_RANGE_LIST  RangeList);
 
 NTOSAPI
 VOID
 DDKAPI
 RtlCopyString(
-  IN OUT PSTRING  DestinationString,
-  IN PSTRING  SourceString  OPTIONAL);
+  /*IN OUT*/ PSTRING  DestinationString,
+  /*IN*/ PSTRING  SourceString  /*OPTIONAL*/);
 
 NTOSAPI
 VOID
 DDKAPI
 RtlCopyUnicodeString(
-  IN OUT PUNICODE_STRING  DestinationString,
-  IN PUNICODE_STRING  SourceString);
+  /*IN OUT*/ PUNICODE_STRING  DestinationString,
+  /*IN*/ PUNICODE_STRING  SourceString);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlCreateRegistryKey(
-  IN ULONG  RelativeTo,
-  IN PWSTR  Path);
+  /*IN*/ ULONG  RelativeTo,
+  /*IN*/ PWSTR  Path);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlCreateSecurityDescriptor(
-  IN OUT PSECURITY_DESCRIPTOR  SecurityDescriptor,
-  IN ULONG  Revision);
+  /*IN OUT*/ PSECURITY_DESCRIPTOR  SecurityDescriptor,
+  /*IN*/ ULONG  Revision);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlDeleteOwnersRanges(
-  IN OUT PRTL_RANGE_LIST  RangeList,
-  IN PVOID  Owner);
+  /*IN OUT*/ PRTL_RANGE_LIST  RangeList,
+  /*IN*/ PVOID  Owner);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlDeleteRange(
-  IN OUT PRTL_RANGE_LIST  RangeList,
-  IN ULONGLONG  Start,
-  IN ULONGLONG  End,
-  IN PVOID  Owner);
+  /*IN OUT*/ PRTL_RANGE_LIST  RangeList,
+  /*IN*/ ULONGLONG  Start,
+  /*IN*/ ULONGLONG  End,
+  /*IN*/ PVOID  Owner);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlDeleteRegistryValue(
-  IN ULONG  RelativeTo,
-  IN PCWSTR  Path,
-  IN PCWSTR  ValueName);
+  /*IN*/ ULONG  RelativeTo,
+  /*IN*/ PCWSTR  Path,
+  /*IN*/ PCWSTR  ValueName);
 
 NTOSAPI
 BOOL
 DDKAPI
 RtlDosPathNameToNtPathName_U(
-  IN PCWSTR  DosPathName,
-  OUT PUNICODE_STRING  NtPathName,
-  OUT PCWSTR  *NtFileNamePart,
-  OUT VOID  *DirectoryInfo);
+  /*IN*/ PCWSTR  DosPathName,
+  /*OUT*/ PUNICODE_STRING  NtPathName,
+  /*OUT*/ PCWSTR  *NtFileNamePart,
+  /*OUT*/ VOID  *DirectoryInfo);
 
 /*
  * BOOLEAN
  * RtlEqualLuid( 
- *   IN LUID  Luid1,
- *   IN LUID  Luid2)
+ * IN LUID  Luid1,
+ * IN LUID  Luid2)
  */
 #define RtlEqualLuid(_Luid1, \
                      _Luid2) \
@@ -4448,9 +4453,9 @@ RtlDosPathNameToNtPathName_U(
 /*
  * ULONG
  * RtlEqualMemory(
- *   IN VOID UNALIGNED  *Destination,
- *   IN CONST VOID UNALIGNED  *Source,
- *   IN SIZE_T  Length)
+ * IN VOID UNALIGNED  *Destination,
+ * IN CONST VOID UNALIGNED  *Source,
+ * IN SIZE_T  Length)
  */
 #define RtlEqualMemory(Destination, Source, Length) (!memcmp(Destination, Source, Length))
 
@@ -4458,24 +4463,24 @@ NTOSAPI
 BOOLEAN
 DDKAPI
 RtlEqualString(
-  IN PSTRING  String1,
-  IN PSTRING  String2,
-  IN BOOLEAN  CaseInSensitive);
+  /*IN*/ PSTRING  String1,
+  /*IN*/ PSTRING  String2,
+  /*IN*/ BOOLEAN  CaseInSensitive);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 RtlEqualUnicodeString(
-  IN CONST UNICODE_STRING  *String1,
-  IN CONST UNICODE_STRING  *String2,
-  IN BOOLEAN  CaseInSensitive);
+  /*IN*/ CONST UNICODE_STRING  *String1,
+  /*IN*/ CONST UNICODE_STRING  *String2,
+  /*IN*/ BOOLEAN  CaseInSensitive);
 
 /*
  * VOID
  * RtlFillMemory(
- *   IN VOID UNALIGNED  *Destination,
- *   IN SIZE_T  Length,
- *   IN UCHAR  Fill)
+ * IN VOID UNALIGNED  *Destination,
+ * IN SIZE_T  Length,
+ * IN UCHAR  Fill)
  */
 #ifndef RtlFillMemory
 #define RtlFillMemory(Destination, Length, Fill) \
@@ -4490,146 +4495,146 @@ NTOSAPI
 ULONG
 DDKAPI
 RtlFindClearBits(
-  IN PRTL_BITMAP  BitMapHeader,
-  IN ULONG  NumberToFind,
-  IN ULONG  HintIndex); 
+  /*IN*/ PRTL_BITMAP  BitMapHeader,
+  /*IN*/ ULONG  NumberToFind,
+  /*IN*/ ULONG  HintIndex); 
 
 NTOSAPI
 ULONG
 DDKAPI
 RtlFindClearBitsAndSet(
-  IN PRTL_BITMAP  BitMapHeader,
-  IN ULONG  NumberToFind,
-  IN ULONG  HintIndex); 
+  /*IN*/ PRTL_BITMAP  BitMapHeader,
+  /*IN*/ ULONG  NumberToFind,
+  /*IN*/ ULONG  HintIndex); 
 
 NTOSAPI
 ULONG
 DDKAPI
 RtlFindClearRuns( 
-  IN PRTL_BITMAP  BitMapHeader, 
-  OUT PRTL_BITMAP_RUN  RunArray, 
-  IN ULONG  SizeOfRunArray, 
-  IN BOOLEAN  LocateLongestRuns);
+  /*IN*/ PRTL_BITMAP  BitMapHeader, 
+  /*OUT*/ PRTL_BITMAP_RUN  RunArray, 
+  /*IN*/ ULONG  SizeOfRunArray, 
+  /*IN*/ BOOLEAN  LocateLongestRuns);
 
 NTOSAPI
 ULONG
 DDKAPI
 RtlFindFirstRunClear(
-  IN PRTL_BITMAP  BitMapHeader,
-  OUT PULONG  StartingIndex);
+  /*IN*/ PRTL_BITMAP  BitMapHeader,
+  /*OUT*/ PULONG  StartingIndex);
 
 NTOSAPI
 ULONG
 DDKAPI
 RtlFindLastBackwardRunClear(
-  IN PRTL_BITMAP  BitMapHeader, 
-  IN ULONG  FromIndex, 
-  OUT PULONG  StartingRunIndex); 
+  /*IN*/ PRTL_BITMAP  BitMapHeader, 
+  /*IN*/ ULONG  FromIndex, 
+  /*OUT*/ PULONG  StartingRunIndex); 
 
 NTOSAPI
 CCHAR
 DDKAPI
 RtlFindLeastSignificantBit(
-  IN ULONGLONG  Set);
+  /*IN*/ ULONGLONG  Set);
 
 NTOSAPI
 ULONG
 DDKAPI
 RtlFindLongestRunClear(
-  IN PRTL_BITMAP  BitMapHeader,
-  OUT PULONG  StartingIndex); 
+  /*IN*/ PRTL_BITMAP  BitMapHeader,
+  /*OUT*/ PULONG  StartingIndex); 
 
 NTOSAPI
 CCHAR
 DDKAPI
 RtlFindMostSignificantBit(
-  IN ULONGLONG  Set);
+  /*IN*/ ULONGLONG  Set);
 
 NTOSAPI
 ULONG
 DDKAPI
 RtlFindNextForwardRunClear(
-  IN PRTL_BITMAP  BitMapHeader, 
-  IN ULONG  FromIndex, 
-  OUT PULONG  StartingRunIndex);
+  /*IN*/ PRTL_BITMAP  BitMapHeader, 
+  /*IN*/ ULONG  FromIndex, 
+  /*OUT*/ PULONG  StartingRunIndex);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlFindRange(
-  IN PRTL_RANGE_LIST  RangeList,
-  IN ULONGLONG  Minimum,
-  IN ULONGLONG  Maximum,
-  IN ULONG  Length,
-  IN ULONG  Alignment,
-  IN ULONG  Flags,
-  IN UCHAR  AttributeAvailableMask,
-  IN PVOID  Context  OPTIONAL,
-  IN PRTL_CONFLICT_RANGE_CALLBACK  Callback  OPTIONAL,
-  OUT PULONGLONG  Start);
+  /*IN*/ PRTL_RANGE_LIST  RangeList,
+  /*IN*/ ULONGLONG  Minimum,
+  /*IN*/ ULONGLONG  Maximum,
+  /*IN*/ ULONG  Length,
+  /*IN*/ ULONG  Alignment,
+  /*IN*/ ULONG  Flags,
+  /*IN*/ UCHAR  AttributeAvailableMask,
+  /*IN*/ PVOID  Context  /*OPTIONAL*/,
+  /*IN*/ PRTL_CONFLICT_RANGE_CALLBACK  Callback  /*OPTIONAL*/,
+  /*OUT*/ PULONGLONG  Start);
 
 NTOSAPI
 ULONG
 DDKAPI
 RtlFindSetBits(
-  IN PRTL_BITMAP  BitMapHeader,
-  IN ULONG  NumberToFind,
-  IN ULONG  HintIndex); 
+  /*IN*/ PRTL_BITMAP  BitMapHeader,
+  /*IN*/ ULONG  NumberToFind,
+  /*IN*/ ULONG  HintIndex); 
 
 NTOSAPI
 ULONG
 DDKAPI
 RtlFindSetBitsAndClear(
-  IN PRTL_BITMAP  BitMapHeader,
-  IN ULONG  NumberToFind,
-  IN ULONG  HintIndex); 
+  /*IN*/ PRTL_BITMAP  BitMapHeader,
+  /*IN*/ ULONG  NumberToFind,
+  /*IN*/ ULONG  HintIndex); 
 
 NTOSAPI
 VOID
 DDKAPI
 RtlFreeAnsiString(
-  IN PANSI_STRING  AnsiString);
+  /*IN*/ PANSI_STRING  AnsiString);
 
 NTOSAPI
 VOID
 DDKAPI
 RtlFreeRangeList(
-  IN PRTL_RANGE_LIST  RangeList);
+  /*IN*/ PRTL_RANGE_LIST  RangeList);
 
 NTOSAPI
 VOID
 DDKAPI
 RtlFreeUnicodeString(
-  IN PUNICODE_STRING  UnicodeString);
+  /*IN*/ PUNICODE_STRING  UnicodeString);
 
 NTOSAPI
 VOID
 DDKAPI
 RtlGetCallersAddress(
-  OUT PVOID  *CallersAddress,
-  OUT PVOID  *CallersCaller);
+  /*OUT*/ PVOID  *CallersAddress,
+  /*OUT*/ PVOID  *CallersCaller);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlGetVersion(
-  IN OUT PRTL_OSVERSIONINFOW  lpVersionInformation);
+  /*IN OUT*/ PRTL_OSVERSIONINFOW  lpVersionInformation);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlGetFirstRange(
-  IN PRTL_RANGE_LIST  RangeList,
-  OUT PRTL_RANGE_LIST_ITERATOR  Iterator,
-  OUT PRTL_RANGE  *Range);
+  /*IN*/ PRTL_RANGE_LIST  RangeList,
+  /*OUT*/ PRTL_RANGE_LIST_ITERATOR  Iterator,
+  /*OUT*/ PRTL_RANGE  *Range);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlGetNextRange(
-  IN OUT  PRTL_RANGE_LIST_ITERATOR  Iterator,
-  OUT PRTL_RANGE  *Range,
-  IN BOOLEAN  MoveForwards);
+  /*IN OUT*/  PRTL_RANGE_LIST_ITERATOR  Iterator,
+  /*OUT*/ PRTL_RANGE  *Range,
+  /*IN*/ BOOLEAN  MoveForwards);
 
 #define FOR_ALL_RANGES(RangeList, Iterator, Current)          \
   for (RtlGetFirstRange((RangeList), (Iterator), &(Current)); \
@@ -4645,101 +4650,101 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 RtlGUIDFromString( 
-  IN PUNICODE_STRING  GuidString, 
-  OUT GUID  *Guid);
+  /*IN*/ PUNICODE_STRING  GuidString, 
+  /*OUT*/ GUID  *Guid);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlHashUnicodeString(
-  IN CONST UNICODE_STRING  *String,
-  IN BOOLEAN  CaseInSensitive,
-  IN ULONG  HashAlgorithm,
-  OUT PULONG  HashValue);
+  /*IN*/ CONST UNICODE_STRING  *String,
+  /*IN*/ BOOLEAN  CaseInSensitive,
+  /*IN*/ ULONG  HashAlgorithm,
+  /*OUT*/ PULONG  HashValue);
 
 NTOSAPI
 VOID
 DDKAPI
 RtlInitAnsiString(
-  IN OUT PANSI_STRING  DestinationString,
-  IN PCSZ  SourceString);
+  /*IN OUT*/ PANSI_STRING  DestinationString,
+  /*IN*/ PCSZ  SourceString);
 
 NTOSAPI
 VOID
 DDKAPI
 RtlInitializeBitMap(
-  IN PRTL_BITMAP  BitMapHeader,
-  IN PULONG  BitMapBuffer,
-  IN ULONG  SizeOfBitMap); 
+  /*IN*/ PRTL_BITMAP  BitMapHeader,
+  /*IN*/ PULONG  BitMapBuffer,
+  /*IN*/ ULONG  SizeOfBitMap); 
 
 NTOSAPI
 VOID
 DDKAPI
 RtlInitializeRangeList(
-  IN OUT PRTL_RANGE_LIST  RangeList);
+  /*IN OUT*/ PRTL_RANGE_LIST  RangeList);
 
 NTOSAPI
 VOID
 DDKAPI
 RtlInitString(
-  IN OUT PSTRING  DestinationString,
-  IN PCSZ  SourceString);
+  /*IN OUT*/ PSTRING  DestinationString,
+  /*IN*/ PCSZ  SourceString);
 
 NTOSAPI
 VOID
 DDKAPI
 RtlInitUnicodeString(
-  IN OUT PUNICODE_STRING  DestinationString,
-  IN PCWSTR  SourceString);
+  /*IN OUT*/ PUNICODE_STRING  DestinationString,
+  /*IN*/ PCWSTR  SourceString);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlInt64ToUnicodeString(
-  IN ULONGLONG  Value,
-  IN ULONG  Base OPTIONAL,
-  IN OUT PUNICODE_STRING  String);
+  /*IN*/ ULONGLONG  Value,
+  /*IN*/ ULONG  Base /*OPTIONAL*/,
+  /*IN OUT*/ PUNICODE_STRING  String);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlIntegerToUnicodeString(
-  IN ULONG  Value,
-  IN ULONG  Base  OPTIONAL,
-  IN OUT PUNICODE_STRING  String);
+  /*IN*/ ULONG  Value,
+  /*IN*/ ULONG  Base  /*OPTIONAL*/,
+  /*IN OUT*/ PUNICODE_STRING  String);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlIntPtrToUnicodeString(
   PLONG  Value,
-  ULONG  Base  OPTIONAL,
+  ULONG  Base  /*OPTIONAL*/,
   PUNICODE_STRING  String);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlInvertRangeList(
-  OUT PRTL_RANGE_LIST  InvertedRangeList,
-  IN PRTL_RANGE_LIST  RangeList);
+  /*OUT*/ PRTL_RANGE_LIST  InvertedRangeList,
+  /*IN*/ PRTL_RANGE_LIST  RangeList);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlIsRangeAvailable(
-  IN PRTL_RANGE_LIST  RangeList,
-  IN ULONGLONG  Start,
-  IN ULONGLONG  End,
-  IN ULONG  Flags,
-  IN UCHAR  AttributeAvailableMask,
-  IN PVOID  Context  OPTIONAL,
-  IN PRTL_CONFLICT_RANGE_CALLBACK  Callback  OPTIONAL,
-  OUT PBOOLEAN  Available);
+  /*IN*/ PRTL_RANGE_LIST  RangeList,
+  /*IN*/ ULONGLONG  Start,
+  /*IN*/ ULONGLONG  End,
+  /*IN*/ ULONG  Flags,
+  /*IN*/ UCHAR  AttributeAvailableMask,
+  /*IN*/ PVOID  Context  /*OPTIONAL*/,
+  /*IN*/ PRTL_CONFLICT_RANGE_CALLBACK  Callback  /*OPTIONAL*/,
+  /*OUT*/ PBOOLEAN  Available);
 
 /*
  * BOOLEAN
  * RtlIsZeroLuid(
- *   IN PLUID  L1)
+ * IN PLUID  L1)
  */
 #define RtlIsZeroLuid(_L1) \
   ((BOOLEAN) ((!(_L1)->LowPart) && (!(_L1)->HighPart)))
@@ -4748,30 +4753,30 @@ NTOSAPI
 ULONG
 DDKAPI
 RtlLengthSecurityDescriptor(
-  IN PSECURITY_DESCRIPTOR  SecurityDescriptor);
+  /*IN*/ PSECURITY_DESCRIPTOR  SecurityDescriptor);
 
 NTOSAPI
 VOID
 DDKAPI
 RtlMapGenericMask(
-  IN OUT PACCESS_MASK  AccessMask,
-  IN PGENERIC_MAPPING  GenericMapping);
+  /*IN OUT*/ PACCESS_MASK  AccessMask,
+  /*IN*/ PGENERIC_MAPPING  GenericMapping);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlMergeRangeLists(
-  OUT PRTL_RANGE_LIST  MergedRangeList,
-  IN PRTL_RANGE_LIST  RangeList1,
-  IN PRTL_RANGE_LIST  RangeList2,
-  IN ULONG  Flags);
+  /*OUT*/ PRTL_RANGE_LIST  MergedRangeList,
+  /*IN*/ PRTL_RANGE_LIST  RangeList1,
+  /*IN*/ PRTL_RANGE_LIST  RangeList2,
+  /*IN*/ ULONG  Flags);
 
 /*
  * VOID
  * RtlMoveMemory(
- *  IN VOID UNALIGNED  *Destination,
- *  IN CONST VOID UNALIGNED  *Source,
- *  IN SIZE_T  Length)
+ * IN VOID UNALIGNED  *Destination,
+ * IN CONST VOID UNALIGNED  *Source,
+ * IN SIZE_T  Length)
  */
 #define RtlMoveMemory memmove
 
@@ -4779,58 +4784,58 @@ NTOSAPI
 ULONG
 DDKAPI
 RtlNumberOfClearBits(
-  IN PRTL_BITMAP  BitMapHeader);
+  /*IN*/ PRTL_BITMAP  BitMapHeader);
 
 NTOSAPI
 ULONG
 DDKAPI
 RtlNumberOfSetBits(
-  IN PRTL_BITMAP  BitMapHeader); 
+  /*IN*/ PRTL_BITMAP  BitMapHeader); 
 
 NTOSAPI
 VOID
 DDKFASTAPI
 RtlPrefetchMemoryNonTemporal(
-  IN PVOID  Source,
-  IN SIZE_T  Length);
+  /*IN*/ PVOID  Source,
+  /*IN*/ SIZE_T  Length);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 RtlPrefixUnicodeString( 
-  IN PUNICODE_STRING  String1, 
-  IN PUNICODE_STRING  String2, 
-  IN BOOLEAN  CaseInSensitive);
+  /*IN*/ PUNICODE_STRING  String1, 
+  /*IN*/ PUNICODE_STRING  String2, 
+  /*IN*/ BOOLEAN  CaseInSensitive);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlQueryRegistryValues(
-  IN ULONG  RelativeTo,
-  IN PCWSTR  Path,
-  IN PRTL_QUERY_REGISTRY_TABLE  QueryTable,
-  IN PVOID  Context,
-  IN PVOID  Environment  OPTIONAL);
+  /*IN*/ ULONG  RelativeTo,
+  /*IN*/ PCWSTR  Path,
+  /*IN*/ PRTL_QUERY_REGISTRY_TABLE  QueryTable,
+  /*IN*/ PVOID  Context,
+  /*IN*/ PVOID  Environment  /*OPTIONAL*/);
 
 NTOSAPI
 VOID
 DDKAPI
 RtlRetrieveUlong(
-  IN OUT PULONG  DestinationAddress,
-  IN PULONG  SourceAddress);
+  /*IN OUT*/ PULONG  DestinationAddress,
+  /*IN*/ PULONG  SourceAddress);
 
 NTOSAPI
 VOID
 DDKAPI
 RtlRetrieveUshort(
-  IN OUT PUSHORT  DestinationAddress,
-  IN PUSHORT  SourceAddress);
+  /*IN OUT*/ PUSHORT  DestinationAddress,
+  /*IN*/ PUSHORT  SourceAddress);
 
 NTOSAPI
 VOID
 DDKAPI
 RtlSetAllBits(
-  IN PRTL_BITMAP  BitMapHeader); 
+  /*IN*/ PRTL_BITMAP  BitMapHeader); 
 
 NTOSAPI
 VOID
@@ -4843,201 +4848,201 @@ NTOSAPI
 VOID
 DDKAPI
 RtlSetBits(
-  IN PRTL_BITMAP  BitMapHeader,
-  IN ULONG  StartingIndex,
-  IN ULONG  NumberToSet); 
+  /*IN*/ PRTL_BITMAP  BitMapHeader,
+  /*IN*/ ULONG  StartingIndex,
+  /*IN*/ ULONG  NumberToSet); 
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlSetDaclSecurityDescriptor(
-  IN OUT PSECURITY_DESCRIPTOR  SecurityDescriptor,
-  IN BOOLEAN  DaclPresent,
-  IN PACL  Dacl  OPTIONAL,
-  IN BOOLEAN  DaclDefaulted  OPTIONAL);
+  /*IN OUT*/ PSECURITY_DESCRIPTOR  SecurityDescriptor,
+  /*IN*/ BOOLEAN  DaclPresent,
+  /*IN*/ PACL  Dacl  /*OPTIONAL*/,
+  /*IN*/ BOOLEAN  DaclDefaulted  /*OPTIONAL*/);
 
 NTOSAPI
 VOID
 DDKAPI
 RtlStoreUlong(
-  IN PULONG  Address,
-  IN ULONG  Value);
+  /*IN*/ PULONG  Address,
+  /*IN*/ ULONG  Value);
 
 NTOSAPI
 VOID
 DDKAPI
 RtlStoreUlonglong(
-  IN OUT PULONGLONG  Address,
+  /*IN OUT*/ PULONGLONG  Address,
   ULONGLONG  Value);
 
 NTOSAPI
 VOID
 DDKAPI
 RtlStoreUlongPtr(
-  IN OUT PULONG_PTR  Address,
-  IN ULONG_PTR  Value);
+  /*IN OUT*/ PULONG_PTR  Address,
+  /*IN*/ ULONG_PTR  Value);
 
 NTOSAPI
 VOID
 DDKAPI
 RtlStoreUshort(
-  IN PUSHORT  Address,
-  IN USHORT  Value);
+  /*IN*/ PUSHORT  Address,
+  /*IN*/ USHORT  Value);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlStringFromGUID( 
-  IN REFGUID  Guid, 
-  OUT PUNICODE_STRING  GuidString);
+  /*IN*/ REFGUID  Guid, 
+  /*OUT*/ PUNICODE_STRING  GuidString);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 RtlTestBit(
-  IN PRTL_BITMAP  BitMapHeader,
-  IN ULONG  BitNumber);
+  /*IN*/ PRTL_BITMAP  BitMapHeader,
+  /*IN*/ ULONG  BitNumber);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 RtlTimeFieldsToTime(
-  IN PTIME_FIELDS  TimeFields,
-  IN PLARGE_INTEGER  Time);
+  /*IN*/ PTIME_FIELDS  TimeFields,
+  /*IN*/ PLARGE_INTEGER  Time);
 
 NTOSAPI
 VOID
 DDKAPI
 RtlTimeToTimeFields(
-  IN PLARGE_INTEGER  Time,
-  IN PTIME_FIELDS  TimeFields);
+  /*IN*/ PLARGE_INTEGER  Time,
+  /*IN*/ PTIME_FIELDS  TimeFields);
 
 NTOSAPI
 ULONG
 DDKFASTAPI
 RtlUlongByteSwap(
-  IN ULONG  Source);
+  /*IN*/ ULONG  Source);
 
 NTOSAPI
 ULONGLONG
 DDKFASTAPI
 RtlUlonglongByteSwap(
-  IN ULONGLONG  Source);
+  /*IN*/ ULONGLONG  Source);
 
 NTOSAPI
 ULONG
 DDKAPI
 RtlUnicodeStringToAnsiSize(
-  IN PUNICODE_STRING  UnicodeString);
+  /*IN*/ PUNICODE_STRING  UnicodeString);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlUnicodeStringToAnsiString(
-  IN OUT PANSI_STRING  DestinationString,
-  IN PUNICODE_STRING  SourceString,
-  IN BOOLEAN  AllocateDestinationString);
+  /*IN OUT*/ PANSI_STRING  DestinationString,
+  /*IN*/ PUNICODE_STRING  SourceString,
+  /*IN*/ BOOLEAN  AllocateDestinationString);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlUnicodeStringToInteger(
-  IN PUNICODE_STRING  String,
-  IN ULONG  Base  OPTIONAL,
-  OUT PULONG  Value);
+  /*IN*/ PUNICODE_STRING  String,
+  /*IN*/ ULONG  Base  /*OPTIONAL*/,
+  /*OUT*/ PULONG  Value);
 
 NTOSAPI
 WCHAR
 DDKAPI
 RtlUpcaseUnicodeChar( 
-  IN WCHAR  SourceCharacter);
+  /*IN*/ WCHAR  SourceCharacter);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlUpcaseUnicodeString(
-  IN OUT PUNICODE_STRING  DestinationString  OPTIONAL,
-  IN PCUNICODE_STRING  SourceString,
-  IN BOOLEAN  AllocateDestinationString);
+  /*IN OUT*/ PUNICODE_STRING  DestinationString  /*OPTIONAL*/,
+  /*IN*/ PCUNICODE_STRING  SourceString,
+  /*IN*/ BOOLEAN  AllocateDestinationString);
 
 NTOSAPI
 CHAR
 DDKAPI
 RtlUpperChar( 
-  IN CHAR Character);
+  /*IN*/ CHAR Character);
 
 NTOSAPI
 VOID
 DDKAPI
 RtlUpperString(
-  IN OUT PSTRING  DestinationString,
-  IN PSTRING  SourceString);
+  /*IN OUT*/ PSTRING  DestinationString,
+  /*IN*/ PSTRING  SourceString);
 
 NTOSAPI
 USHORT
 DDKFASTAPI
 RtlUshortByteSwap(
-  IN USHORT  Source);
+  /*IN*/ USHORT  Source);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 RtlValidRelativeSecurityDescriptor(
-  IN PSECURITY_DESCRIPTOR  SecurityDescriptorInput,
-  IN ULONG  SecurityDescriptorLength,
-  IN SECURITY_INFORMATION  RequiredInformation);
+  /*IN*/ PSECURITY_DESCRIPTOR  SecurityDescriptorInput,
+  /*IN*/ ULONG  SecurityDescriptorLength,
+  /*IN*/ SECURITY_INFORMATION  RequiredInformation);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 RtlValidSecurityDescriptor(
-  IN PSECURITY_DESCRIPTOR  SecurityDescriptor);
+  /*IN*/ PSECURITY_DESCRIPTOR  SecurityDescriptor);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlVerifyVersionInfo(
-  IN PRTL_OSVERSIONINFOEXW  VersionInfo,
-  IN ULONG  TypeMask,
-  IN ULONGLONG  ConditionMask);
+  /*IN*/ PRTL_OSVERSIONINFOEXW  VersionInfo,
+  /*IN*/ ULONG  TypeMask,
+  /*IN*/ ULONGLONG  ConditionMask);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlVolumeDeviceToDosName(
-  IN PVOID  VolumeDeviceObject,
-  OUT PUNICODE_STRING  DosName);
+  /*IN*/ PVOID  VolumeDeviceObject,
+  /*OUT*/ PUNICODE_STRING  DosName);
 
 NTOSAPI
 ULONG
 DDKAPI
 RtlWalkFrameChain(
-  OUT PVOID  *Callers,
-  IN ULONG  Count,
-  IN ULONG  Flags);
+  /*OUT*/ PVOID  *Callers,
+  /*IN*/ ULONG  Count,
+  /*IN*/ ULONG  Flags);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 RtlWriteRegistryValue(
-  IN ULONG  RelativeTo,
-  IN PCWSTR  Path,
-  IN PCWSTR  ValueName,
-  IN ULONG  ValueType,
-  IN PVOID  ValueData,
-  IN ULONG  ValueLength);
+  /*IN*/ ULONG  RelativeTo,
+  /*IN*/ PCWSTR  Path,
+  /*IN*/ PCWSTR  ValueName,
+  /*IN*/ ULONG  ValueType,
+  /*IN*/ PVOID  ValueData,
+  /*IN*/ ULONG  ValueLength);
 
 NTOSAPI
 ULONG
 DDKAPI
 RtlxUnicodeStringToAnsiSize(
-  IN PUNICODE_STRING  UnicodeString);
+  /*IN*/ PUNICODE_STRING  UnicodeString);
 
 /*
  * VOID
  * RtlZeroMemory(
- *   IN VOID UNALIGNED  *Destination,
- *   IN SIZE_T  Length)
+ * IN VOID UNALIGNED  *Destination,
+ * IN SIZE_T  Length)
  */
 #ifndef RtlZeroMemory
 #define RtlZeroMemory(Destination, Length) \
@@ -5055,58 +5060,58 @@ NTOSAPI
 VOID
 DDKFASTAPI
 ExAcquireFastMutex(
-  IN PFAST_MUTEX  FastMutex);
+  /*IN*/ PFAST_MUTEX  FastMutex);
 
 NTOSAPI
 VOID
 DDKFASTAPI
 ExAcquireFastMutexUnsafe(
-  IN PFAST_MUTEX  FastMutex);
+  /*IN*/ PFAST_MUTEX  FastMutex);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 ExAcquireResourceExclusiveLite(
-  IN PERESOURCE  Resource,
-  IN BOOLEAN  Wait);
+  /*IN*/ PERESOURCE  Resource,
+  /*IN*/ BOOLEAN  Wait);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 ExAcquireResourceSharedLite(
-  IN PERESOURCE  Resource,
-  IN BOOLEAN  Wait);
+  /*IN*/ PERESOURCE  Resource,
+  /*IN*/ BOOLEAN  Wait);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 ExAcquireSharedStarveExclusive(
-  IN PERESOURCE  Resource,
-  IN BOOLEAN  Wait);
+  /*IN*/ PERESOURCE  Resource,
+  /*IN*/ BOOLEAN  Wait);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 ExAcquireSharedWaitForExclusive(
-  IN PERESOURCE  Resource,
-  IN BOOLEAN  Wait);
+  /*IN*/ PERESOURCE  Resource,
+  /*IN*/ BOOLEAN  Wait);
 
 
 NTOSAPI
 PSINGLE_LIST_ENTRY
 DDKFASTAPI
 ExInterlockedPopEntrySList(
-  IN PSLIST_HEADER  ListHead,
-  IN PKSPIN_LOCK  Lock);
+  /*IN*/ PSLIST_HEADER  ListHead,
+  /*IN*/ PKSPIN_LOCK  Lock);
 
 
 NTOSAPI
 PSINGLE_LIST_ENTRY
 DDKFASTAPI
 ExInterlockedPushEntrySList(
-  IN PSLIST_HEADER  ListHead,
-  IN PSINGLE_LIST_ENTRY  ListEntry,
-  IN PKSPIN_LOCK  Lock);
+  /*IN*/ PSLIST_HEADER  ListHead,
+  /*IN*/ PSINGLE_LIST_ENTRY  ListEntry,
+  /*IN*/ PKSPIN_LOCK  Lock);
 
 
 #if (__USE_NTOSKRNL__) && (_WIN32_WINNT >= 0x0501)
@@ -5124,7 +5129,7 @@ ExInterlockedPushEntrySList(
 
 static __inline PVOID
 ExAllocateFromNPagedLookasideList(
-  IN PNPAGED_LOOKASIDE_LIST  Lookaside)
+  /*IN*/ PNPAGED_LOOKASIDE_LIST  Lookaside)
 {
   PVOID Entry;
 
@@ -5142,8 +5147,8 @@ ExAllocateFromNPagedLookasideList(
 
 static __inline VOID
 ExFreeToNPagedLookasideList(
-  IN PNPAGED_LOOKASIDE_LIST  Lookaside,
-  IN PVOID  Entry)
+  /*IN*/ PNPAGED_LOOKASIDE_LIST  Lookaside,
+  /*IN*/ PVOID  Entry)
 {
   Lookaside->TotalFrees++;
   if (ExQueryDepthSList(&Lookaside->ListHead) >= Lookaside->Depth) {
@@ -5160,7 +5165,7 @@ ExFreeToNPagedLookasideList(
 
 static __inline PVOID
 ExAllocateFromPagedLookasideList(
-  IN PPAGED_LOOKASIDE_LIST  Lookaside)
+  /*IN*/ PPAGED_LOOKASIDE_LIST  Lookaside)
 {
   PVOID Entry;
 
@@ -5177,8 +5182,8 @@ ExAllocateFromPagedLookasideList(
 
 static __inline VOID
 ExFreeToPagedLookasideList(
-  IN PPAGED_LOOKASIDE_LIST  Lookaside,
-  IN PVOID  Entry)
+  /*IN*/ PPAGED_LOOKASIDE_LIST  Lookaside,
+  /*IN*/ PVOID  Entry)
 {
   Lookaside->TotalFrees++;
   if (ExQueryDepthSList(&Lookaside->ListHead) >= Lookaside->Depth) {
@@ -5196,14 +5201,14 @@ NTOSAPI
 PVOID
 DDKAPI
 ExAllocateFromPagedLookasideList(
-  IN PPAGED_LOOKASIDE_LIST  Lookaside);
+  /*IN*/ PPAGED_LOOKASIDE_LIST  Lookaside);
 
 NTOSAPI
 VOID
 DDKAPI
 ExFreeToPagedLookasideList(
-  IN PPAGED_LOOKASIDE_LIST  Lookaside,
-  IN PVOID  Entry);
+  /*IN*/ PPAGED_LOOKASIDE_LIST  Lookaside,
+  /*IN*/ PVOID  Entry);
 
 #endif /* (__USE_NTOSKRNL__) && (_WIN32_WINNT >= 0x0501) */
 
@@ -5211,17 +5216,17 @@ NTOSAPI
 PVOID
 DDKAPI
 ExAllocatePoolWithQuotaTag(
-  IN POOL_TYPE  PoolType,
-  IN SIZE_T  NumberOfBytes,
-  IN ULONG  Tag);
+  /*IN*/ POOL_TYPE  PoolType,
+  /*IN*/ SIZE_T  NumberOfBytes,
+  /*IN*/ ULONG  Tag);
 
 NTOSAPI
 PVOID
 DDKAPI
 ExAllocatePoolWithTag(
-  IN POOL_TYPE  PoolType,
-  IN SIZE_T  NumberOfBytes,
-  IN ULONG  Tag);
+  /*IN*/ POOL_TYPE  PoolType,
+  /*IN*/ SIZE_T  NumberOfBytes,
+  /*IN*/ ULONG  Tag);
 
 #ifdef POOL_TAGGING
 
@@ -5234,15 +5239,15 @@ NTOSAPI
 PVOID
 DDKAPI
 ExAllocatePool(
-  IN POOL_TYPE  PoolType,
-  IN SIZE_T  NumberOfBytes);
+  /*IN*/ POOL_TYPE  PoolType,
+  /*IN*/ SIZE_T  NumberOfBytes);
 
 NTOSAPI
 PVOID
 DDKAPI
 ExAllocatePoolWithQuota(
-  IN POOL_TYPE  PoolType,
-  IN SIZE_T  NumberOfBytes);
+  /*IN*/ POOL_TYPE  PoolType,
+  /*IN*/ SIZE_T  NumberOfBytes);
 
 #endif /* POOL_TAGGING */
 
@@ -5250,49 +5255,49 @@ NTOSAPI
 PVOID
 DDKAPI
 ExAllocatePoolWithTagPriority(
-  IN POOL_TYPE  PoolType,
-  IN SIZE_T  NumberOfBytes,
-  IN ULONG  Tag,
-  IN EX_POOL_PRIORITY  Priority);
+  /*IN*/ POOL_TYPE  PoolType,
+  /*IN*/ SIZE_T  NumberOfBytes,
+  /*IN*/ ULONG  Tag,
+  /*IN*/ EX_POOL_PRIORITY  Priority);
 
 NTOSAPI
 VOID
 DDKAPI
 ExConvertExclusiveToSharedLite(
-  IN PERESOURCE  Resource);
+  /*IN*/ PERESOURCE  Resource);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ExCreateCallback(
-  OUT PCALLBACK_OBJECT  *CallbackObject,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes,
-  IN BOOLEAN  Create,
-  IN BOOLEAN  AllowMultipleCallbacks);
+  /*OUT*/ PCALLBACK_OBJECT  *CallbackObject,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*IN*/ BOOLEAN  Create,
+  /*IN*/ BOOLEAN  AllowMultipleCallbacks);
 
 NTOSAPI
 VOID
 DDKAPI
 ExDeleteNPagedLookasideList(
-  IN PNPAGED_LOOKASIDE_LIST  Lookaside);
+  /*IN*/ PNPAGED_LOOKASIDE_LIST  Lookaside);
 
 NTOSAPI
 VOID
 DDKAPI
 ExDeletePagedLookasideList(
-  IN PPAGED_LOOKASIDE_LIST  Lookaside);
+  /*IN*/ PPAGED_LOOKASIDE_LIST  Lookaside);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ExDeleteResourceLite(
-  IN PERESOURCE  Resource);
+  /*IN*/ PERESOURCE  Resource);
 
 NTOSAPI
 VOID
 DDKAPI
 ExFreePool(
-  IN PVOID  P);
+  /*IN*/ PVOID  P);
 
 #define PROTECTED_POOL                    0x80000000
 
@@ -5304,8 +5309,8 @@ NTOSAPI
 VOID
 DDKAPI
 ExFreePoolWithTag(
-  IN PVOID  P,
-  IN ULONG  Tag);
+  /*IN*/ PVOID  P,
+  /*IN*/ ULONG  Tag);
 
 /*
  * ERESOURCE_THREAD
@@ -5318,7 +5323,7 @@ NTOSAPI
 ULONG
 DDKAPI
 ExGetExclusiveWaiterCount(
-  IN PERESOURCE  Resource);
+  /*IN*/ PERESOURCE  Resource);
 
 NTOSAPI
 KPROCESSOR_MODE
@@ -5330,20 +5335,20 @@ NTOSAPI
 ULONG
 DDKAPI
 ExGetSharedWaiterCount(
-  IN PERESOURCE  Resource);
+  /*IN*/ PERESOURCE  Resource);
 
 NTOSAPI
 VOID
 DDKAPI
 KeInitializeEvent(
-  IN PRKEVENT  Event,
-  IN EVENT_TYPE  Type,
-  IN BOOLEAN  State);
+  /*IN*/ PRKEVENT  Event,
+  /*IN*/ EVENT_TYPE  Type,
+  /*IN*/ BOOLEAN  State);
 
 /*
  * VOID DDKAPI
  * ExInitializeFastMutex(
- *   IN PFAST_MUTEX  FastMutex)
+ * IN PFAST_MUTEX  FastMutex)
  */
 #define ExInitializeFastMutex(_FastMutex) \
 { \
@@ -5357,36 +5362,36 @@ NTOSAPI
 VOID
 DDKAPI
 ExInitializeNPagedLookasideList(
-  IN PNPAGED_LOOKASIDE_LIST  Lookaside,
-  IN PALLOCATE_FUNCTION  Allocate  OPTIONAL,
-  IN PFREE_FUNCTION  Free  OPTIONAL,
-  IN ULONG  Flags,
-  IN SIZE_T  Size,
-  IN ULONG  Tag,
-  IN USHORT  Depth);
+  /*IN*/ PNPAGED_LOOKASIDE_LIST  Lookaside,
+  /*IN*/ PALLOCATE_FUNCTION  Allocate  /*OPTIONAL*/,
+  /*IN*/ PFREE_FUNCTION  Free  /*OPTIONAL*/,
+  /*IN*/ ULONG  Flags,
+  /*IN*/ SIZE_T  Size,
+  /*IN*/ ULONG  Tag,
+  /*IN*/ USHORT  Depth);
 
 NTOSAPI
 VOID
 DDKAPI
 ExInitializePagedLookasideList(
-  IN PPAGED_LOOKASIDE_LIST  Lookaside,
-  IN PALLOCATE_FUNCTION  Allocate  OPTIONAL,
-  IN PFREE_FUNCTION  Free  OPTIONAL,
-  IN ULONG  Flags,
-  IN SIZE_T  Size,
-  IN ULONG  Tag,
-  IN USHORT  Depth);
+  /*IN*/ PPAGED_LOOKASIDE_LIST  Lookaside,
+  /*IN*/ PALLOCATE_FUNCTION  Allocate  /*OPTIONAL*/,
+  /*IN*/ PFREE_FUNCTION  Free  /*OPTIONAL*/,
+  /*IN*/ ULONG  Flags,
+  /*IN*/ SIZE_T  Size,
+  /*IN*/ ULONG  Tag,
+  /*IN*/ USHORT  Depth);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ExInitializeResourceLite(
-  IN PERESOURCE  Resource);
+  /*IN*/ PERESOURCE  Resource);
 
 /*
  * VOID
  * InitializeSListHead(
- *   IN PSLIST_HEADER  SListHead)
+ * IN PSLIST_HEADER  SListHead)
  */
 #define InitializeSListHead(_SListHead) \
 	(_SListHead)->Alignment = 0
@@ -5397,31 +5402,31 @@ NTOSAPI
 LARGE_INTEGER
 DDKAPI
 ExInterlockedAddLargeInteger(
-  IN PLARGE_INTEGER  Addend,
-  IN LARGE_INTEGER  Increment,
-  IN PKSPIN_LOCK  Lock);
+  /*IN*/ PLARGE_INTEGER  Addend,
+  /*IN*/ LARGE_INTEGER  Increment,
+  /*IN*/ PKSPIN_LOCK  Lock);
 
 NTOSAPI
 VOID
 DDKFASTAPI
 ExInterlockedAddLargeStatistic(
-  IN PLARGE_INTEGER  Addend,
-  IN ULONG  Increment);
+  /*IN*/ PLARGE_INTEGER  Addend,
+  /*IN*/ ULONG  Increment);
 
 NTOSAPI
 ULONG
 DDKAPI
 ExInterlockedAddUlong(
-  IN PULONG  Addend,
-  IN ULONG  Increment,
+  /*IN*/ PULONG  Addend,
+  /*IN*/ ULONG  Increment,
   PKSPIN_LOCK  Lock);
 
 NTOSAPI
 ULONG
 DDKFASTAPI
 ExfInterlockedAddUlong(
-  IN PULONG  Addend,
-  IN ULONG  Increment,
+  /*IN*/ PULONG  Addend,
+  /*IN*/ ULONG  Increment,
   PKSPIN_LOCK  Lock);
 
 
@@ -5429,134 +5434,134 @@ NTOSAPI
 LONGLONG
 DDKFASTAPI
 ExInterlockedCompareExchange64(
-  IN OUT PLONGLONG  Destination,
-  IN PLONGLONG  Exchange,
-  IN PLONGLONG  Comparand,
-  IN PKSPIN_LOCK  Lock); 
+  /*IN OUT*/ PLONGLONG  Destination,
+  /*IN*/ PLONGLONG  Exchange,
+  /*IN*/ PLONGLONG  Comparand,
+  /*IN*/ PKSPIN_LOCK  Lock); 
 
 NTOSAPI
 PSINGLE_LIST_ENTRY
 DDKFASTAPI
 ExInterlockedFlushSList(
-  IN PSLIST_HEADER  ListHead);
+  /*IN*/ PSLIST_HEADER  ListHead);
 
 NTOSAPI
 PLIST_ENTRY
 DDKAPI
 ExInterlockedInsertHeadList(
-  IN PLIST_ENTRY  ListHead,
-  IN PLIST_ENTRY  ListEntry,
-  IN PKSPIN_LOCK  Lock);
+  /*IN*/ PLIST_ENTRY  ListHead,
+  /*IN*/ PLIST_ENTRY  ListEntry,
+  /*IN*/ PKSPIN_LOCK  Lock);
 
 NTOSAPI
 PLIST_ENTRY
 DDKFASTAPI
 ExfInterlockedInsertHeadList(
-  IN PLIST_ENTRY  ListHead,
-  IN PLIST_ENTRY  ListEntry,
-  IN PKSPIN_LOCK  Lock);
+  /*IN*/ PLIST_ENTRY  ListHead,
+  /*IN*/ PLIST_ENTRY  ListEntry,
+  /*IN*/ PKSPIN_LOCK  Lock);
 
 NTOSAPI
 PLIST_ENTRY
 DDKAPI
 ExInterlockedInsertTailList(
-  IN PLIST_ENTRY  ListHead,
-  IN PLIST_ENTRY  ListEntry,
-  IN PKSPIN_LOCK  Lock);
+  /*IN*/ PLIST_ENTRY  ListHead,
+  /*IN*/ PLIST_ENTRY  ListEntry,
+  /*IN*/ PKSPIN_LOCK  Lock);
 
 NTOSAPI
 PLIST_ENTRY
 DDKFASTAPI
 ExfInterlockedInsertTailList(
-  IN PLIST_ENTRY  ListHead,
-  IN PLIST_ENTRY  ListEntry,
-  IN PKSPIN_LOCK  Lock);
+  /*IN*/ PLIST_ENTRY  ListHead,
+  /*IN*/ PLIST_ENTRY  ListEntry,
+  /*IN*/ PKSPIN_LOCK  Lock);
 
 NTOSAPI
 PSINGLE_LIST_ENTRY
 DDKAPI
 ExInterlockedPopEntryList(
-  IN PSINGLE_LIST_ENTRY  ListHead,
-  IN PKSPIN_LOCK  Lock);
+  /*IN*/ PSINGLE_LIST_ENTRY  ListHead,
+  /*IN*/ PKSPIN_LOCK  Lock);
 
 NTOSAPI
 PSINGLE_LIST_ENTRY
 DDKFASTAPI
 ExfInterlockedPopEntryList(
-  IN PSINGLE_LIST_ENTRY  ListHead,
-  IN PKSPIN_LOCK  Lock);
+  /*IN*/ PSINGLE_LIST_ENTRY  ListHead,
+  /*IN*/ PKSPIN_LOCK  Lock);
 
 
 NTOSAPI
 PSINGLE_LIST_ENTRY
 DDKAPI
 ExInterlockedPushEntryList(
-  IN PSINGLE_LIST_ENTRY  ListHead,
-  IN PSINGLE_LIST_ENTRY  ListEntry,
-  IN PKSPIN_LOCK  Lock);
+  /*IN*/ PSINGLE_LIST_ENTRY  ListHead,
+  /*IN*/ PSINGLE_LIST_ENTRY  ListEntry,
+  /*IN*/ PKSPIN_LOCK  Lock);
 
 NTOSAPI
 PSINGLE_LIST_ENTRY
 DDKFASTAPI
 ExfInterlockedPushEntryList(
-  IN PSINGLE_LIST_ENTRY  ListHead,
-  IN PSINGLE_LIST_ENTRY  ListEntry,
-  IN PKSPIN_LOCK  Lock);
+  /*IN*/ PSINGLE_LIST_ENTRY  ListHead,
+  /*IN*/ PSINGLE_LIST_ENTRY  ListEntry,
+  /*IN*/ PKSPIN_LOCK  Lock);
 
 
 NTOSAPI
 PLIST_ENTRY
 DDKAPI
 ExInterlockedRemoveHeadList(
-  IN PLIST_ENTRY  ListHead,
-  IN PKSPIN_LOCK  Lock);
+  /*IN*/ PLIST_ENTRY  ListHead,
+  /*IN*/ PKSPIN_LOCK  Lock);
 
 NTOSAPI
 PLIST_ENTRY
 DDKFASTAPI
 ExfInterlockedRemoveHeadList(
-  IN PLIST_ENTRY  ListHead,
-  IN PKSPIN_LOCK  Lock);
+  /*IN*/ PLIST_ENTRY  ListHead,
+  /*IN*/ PKSPIN_LOCK  Lock);
 
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 ExIsProcessorFeaturePresent(
-  IN ULONG  ProcessorFeature);
+  /*IN*/ ULONG  ProcessorFeature);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 ExIsResourceAcquiredExclusiveLite(
-  IN PERESOURCE  Resource);
+  /*IN*/ PERESOURCE  Resource);
 
 NTOSAPI
 USHORT
 DDKAPI
 ExIsResourceAcquiredLite(
-  IN PERESOURCE  Resource);
+  /*IN*/ PERESOURCE  Resource);
 
 NTOSAPI
 USHORT
 DDKAPI
 ExIsResourceAcquiredSharedLite(
-  IN PERESOURCE  Resource);
+  /*IN*/ PERESOURCE  Resource);
 
 NTOSAPI
 VOID
 DDKAPI
 ExLocalTimeToSystemTime(
-  IN PLARGE_INTEGER  LocalTime,
-  OUT PLARGE_INTEGER  SystemTime);
+  /*IN*/ PLARGE_INTEGER  LocalTime,
+  /*OUT*/ PLARGE_INTEGER  SystemTime);
 
 NTOSAPI
 VOID
 DDKAPI
 ExNotifyCallback(
-  IN PCALLBACK_OBJECT  CallbackObject,
-  IN PVOID  Argument1,
-  IN PVOID  Argument2);
+  /*IN*/ PCALLBACK_OBJECT  CallbackObject,
+  /*IN*/ PVOID  Argument1,
+  /*IN*/ PVOID  Argument2);
 
 NTOSAPI
 VOID
@@ -5574,97 +5579,97 @@ NTOSAPI
 VOID
 DDKAPI
 ExRaiseStatus(
-  IN NTSTATUS  Status);
+  /*IN*/ NTSTATUS  Status);
 
 NTOSAPI
 PVOID
 DDKAPI
 ExRegisterCallback(
-  IN PCALLBACK_OBJECT  CallbackObject,
-  IN PCALLBACK_FUNCTION  CallbackFunction,
-  IN PVOID  CallbackContext);
+  /*IN*/ PCALLBACK_OBJECT  CallbackObject,
+  /*IN*/ PCALLBACK_FUNCTION  CallbackFunction,
+  /*IN*/ PVOID  CallbackContext);
 
 NTOSAPI
 VOID
 DDKAPI
 ExReinitializeResourceLite(
-  IN PERESOURCE  Resource);
+  /*IN*/ PERESOURCE  Resource);
 
 NTOSAPI
 VOID
 DDKFASTAPI
 ExReleaseFastMutex(
-  IN PFAST_MUTEX  FastMutex);
+  /*IN*/ PFAST_MUTEX  FastMutex);
 
 NTOSAPI
 VOID
 DDKFASTAPI
 ExReleaseFastMutexUnsafe(
-  IN PFAST_MUTEX  FastMutex);
+  /*IN*/ PFAST_MUTEX  FastMutex);
 
 NTOSAPI
 VOID
 DDKAPI
 ExReleaseResourceForThreadLite(
-  IN PERESOURCE  Resource,
-  IN ERESOURCE_THREAD  ResourceThreadId);
+  /*IN*/ PERESOURCE  Resource,
+  /*IN*/ ERESOURCE_THREAD  ResourceThreadId);
 
 NTOSAPI
 VOID
 DDKFASTAPI
 ExReleaseResourceLite(
-  IN PERESOURCE  Resource);
+  /*IN*/ PERESOURCE  Resource);
 
 NTOSAPI
 VOID
 DDKAPI
 ExSetResourceOwnerPointer( 
-  IN PERESOURCE  Resource,
-  IN PVOID  OwnerPointer);
+  /*IN*/ PERESOURCE  Resource,
+  /*IN*/ PVOID  OwnerPointer);
 
 NTOSAPI
 ULONG
 DDKAPI
 ExSetTimerResolution(
-  IN ULONG  DesiredTime,
-  IN BOOLEAN  SetResolution);
+  /*IN*/ ULONG  DesiredTime,
+  /*IN*/ BOOLEAN  SetResolution);
 
 NTOSAPI
 VOID
 DDKAPI
 ExSystemTimeToLocalTime(
-  IN PLARGE_INTEGER  SystemTime,
-  OUT PLARGE_INTEGER  LocalTime);
+  /*IN*/ PLARGE_INTEGER  SystemTime,
+  /*OUT*/ PLARGE_INTEGER  LocalTime);
 
 NTOSAPI
 BOOLEAN
 DDKFASTAPI
 ExTryToAcquireFastMutex(
-  IN PFAST_MUTEX  FastMutex);
+  /*IN*/ PFAST_MUTEX  FastMutex);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 ExTryToAcquireResourceExclusiveLite(
-  IN PERESOURCE  Resource);
+  /*IN*/ PERESOURCE  Resource);
 
 NTOSAPI
 VOID
 DDKAPI
 ExUnregisterCallback(
-  IN PVOID  CbRegistration);
+  /*IN*/ PVOID  CbRegistration);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ExUuidCreate(
-  OUT UUID  *Uuid);
+  /*OUT*/ UUID  *Uuid);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 ExVerifySuite(
-  IN SUITE_TYPE  SuiteType);
+  /*IN*/ SUITE_TYPE  SuiteType);
 
 #ifdef DBG
 
@@ -5685,17 +5690,17 @@ NTOSAPI
 VOID
 DDKAPI
 ProbeForRead(
-  IN CONST VOID  *Address,
-  IN ULONG  Length,
-  IN ULONG  Alignment);
+  /*IN*/ CONST VOID  *Address,
+  /*IN*/ ULONG  Length,
+  /*IN*/ ULONG  Alignment);
 
 NTOSAPI
 VOID
 DDKAPI
 ProbeForWrite(
-  IN CONST VOID  *Address,
-  IN ULONG  Length,
-  IN ULONG  Alignment);
+  /*IN*/ CONST VOID  *Address,
+  /*IN*/ ULONG  Length,
+  /*IN*/ ULONG  Alignment);
 
 
 
@@ -5705,15 +5710,15 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 CmRegisterCallback(
-  IN PEX_CALLBACK_FUNCTION  Function,
-  IN PVOID  Context,
-  IN OUT PLARGE_INTEGER  Cookie);
+  /*IN*/ PEX_CALLBACK_FUNCTION  Function,
+  /*IN*/ PVOID  Context,
+  /*IN OUT*/ PLARGE_INTEGER  Cookie);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 CmUnRegisterCallback(
-  IN LARGE_INTEGER  Cookie);
+  /*IN*/ LARGE_INTEGER  Cookie);
 
 
 
@@ -5723,7 +5728,7 @@ NTOSAPI
 BOOLEAN
 DDKAPI
 FsRtlIsTotalDeviceFailure(
-  IN NTSTATUS  Status);
+  /*IN*/ NTSTATUS  Status);
 
 
 
@@ -5733,184 +5738,184 @@ NTOSAPI
 VOID
 DDKFASTAPI
 HalExamineMBR(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN ULONG  SectorSize,
-  IN ULONG  MBRTypeIdentifier,
-  OUT PVOID  Buffer);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ ULONG  SectorSize,
+  /*IN*/ ULONG  MBRTypeIdentifier,
+  /*OUT*/ PVOID  Buffer);
 
 NTOSAPI
 VOID
 DDKAPI
 READ_PORT_BUFFER_UCHAR(
-  IN PUCHAR  Port,
-  IN PUCHAR  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PUCHAR  Port,
+  /*IN*/ PUCHAR  Buffer,
+  /*IN*/ ULONG  Count);
 
 NTOSAPI
 VOID
 DDKAPI
 READ_PORT_BUFFER_ULONG(
-  IN PULONG  Port,
-  IN PULONG  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PULONG  Port,
+  /*IN*/ PULONG  Buffer,
+  /*IN*/ ULONG  Count);
 
 NTOSAPI
 VOID
 DDKAPI
 READ_PORT_BUFFER_USHORT(
-  IN PUSHORT  Port,
-  IN PUSHORT  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PUSHORT  Port,
+  /*IN*/ PUSHORT  Buffer,
+  /*IN*/ ULONG  Count);
 
 NTOSAPI
 UCHAR
 DDKAPI
 READ_PORT_UCHAR(
-  IN PUCHAR  Port);
+  /*IN*/ PUCHAR  Port);
 
 NTOSAPI
 ULONG
 DDKAPI
 READ_PORT_ULONG(
-  IN PULONG  Port);
+  /*IN*/ PULONG  Port);
 
 NTOSAPI
 USHORT
 DDKAPI
 READ_PORT_USHORT(
-  IN PUSHORT  Port);
+  /*IN*/ PUSHORT  Port);
 
 NTOSAPI
 VOID
 DDKAPI
 READ_REGISTER_BUFFER_UCHAR(
-  IN PUCHAR  Register,
-  IN PUCHAR  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PUCHAR  Register,
+  /*IN*/ PUCHAR  Buffer,
+  /*IN*/ ULONG  Count);
 
 NTOSAPI
 VOID
 DDKAPI
 READ_REGISTER_BUFFER_ULONG(
-  IN PULONG  Register,
-  IN PULONG  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PULONG  Register,
+  /*IN*/ PULONG  Buffer,
+  /*IN*/ ULONG  Count);
 
 NTOSAPI
 VOID
 DDKAPI
 READ_REGISTER_BUFFER_USHORT(
-  IN PUSHORT  Register,
-  IN PUSHORT  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PUSHORT  Register,
+  /*IN*/ PUSHORT  Buffer,
+  /*IN*/ ULONG  Count);
 
 NTOSAPI
 UCHAR
 DDKAPI
 READ_REGISTER_UCHAR(
-  IN PUCHAR  Register);
+  /*IN*/ PUCHAR  Register);
 
 NTOSAPI
 ULONG
 DDKAPI
 READ_REGISTER_ULONG(
-  IN PULONG  Register);
+  /*IN*/ PULONG  Register);
 
 NTOSAPI
 USHORT
 DDKAPI
 READ_REGISTER_USHORT(
-  IN PUSHORT  Register);
+  /*IN*/ PUSHORT  Register);
 
 NTOSAPI
 VOID
 DDKAPI
 WRITE_PORT_BUFFER_UCHAR(
-  IN PUCHAR  Port,
-  IN PUCHAR  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PUCHAR  Port,
+  /*IN*/ PUCHAR  Buffer,
+  /*IN*/ ULONG  Count);
 
 NTOSAPI
 VOID
 DDKAPI
 WRITE_PORT_BUFFER_ULONG(
-  IN PULONG  Port,
-  IN PULONG  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PULONG  Port,
+  /*IN*/ PULONG  Buffer,
+  /*IN*/ ULONG  Count);
 
 NTOSAPI
 VOID
 DDKAPI
 WRITE_PORT_BUFFER_USHORT(
-  IN PUSHORT  Port,
-  IN PUSHORT  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PUSHORT  Port,
+  /*IN*/ PUSHORT  Buffer,
+  /*IN*/ ULONG  Count);
 
 NTOSAPI
 VOID
 DDKAPI
 WRITE_PORT_UCHAR(
-  IN PUCHAR  Port,
-  IN UCHAR  Value);
+  /*IN*/ PUCHAR  Port,
+  /*IN*/ UCHAR  Value);
 
 NTOSAPI
 VOID
 DDKAPI
 WRITE_PORT_ULONG(
-  IN PULONG  Port,
-  IN ULONG  Value);
+  /*IN*/ PULONG  Port,
+  /*IN*/ ULONG  Value);
 
 NTOSAPI
 VOID
 DDKAPI
 WRITE_PORT_USHORT(
-  IN PUSHORT  Port,
-  IN USHORT  Value);
+  /*IN*/ PUSHORT  Port,
+  /*IN*/ USHORT  Value);
 
 NTOSAPI
 VOID
 DDKAPI
 WRITE_REGISTER_BUFFER_UCHAR(
-  IN PUCHAR  Register,
-  IN PUCHAR  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PUCHAR  Register,
+  /*IN*/ PUCHAR  Buffer,
+  /*IN*/ ULONG  Count);
 
 NTOSAPI
 VOID
 DDKAPI
 WRITE_REGISTER_BUFFER_ULONG(
-  IN PULONG  Register,
-  IN PULONG  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PULONG  Register,
+  /*IN*/ PULONG  Buffer,
+  /*IN*/ ULONG  Count);
 
 NTOSAPI
 VOID
 DDKAPI
 WRITE_REGISTER_BUFFER_USHORT(
-  IN PUSHORT  Register,
-  IN PUSHORT  Buffer,
-  IN ULONG  Count);
+  /*IN*/ PUSHORT  Register,
+  /*IN*/ PUSHORT  Buffer,
+  /*IN*/ ULONG  Count);
 
 NTOSAPI
 VOID
 DDKAPI
 WRITE_REGISTER_UCHAR(
-  IN PUCHAR  Register,
-  IN UCHAR  Value);
+  /*IN*/ PUCHAR  Register,
+  /*IN*/ UCHAR  Value);
 
 NTOSAPI
 VOID
 DDKAPI
 WRITE_REGISTER_ULONG(
-  IN PULONG  Register,
-  IN ULONG  Value);
+  /*IN*/ PULONG  Register,
+  /*IN*/ ULONG  Value);
 
 NTOSAPI
 VOID
 DDKAPI
 WRITE_REGISTER_USHORT(
-  IN PUSHORT  Register,
-  IN USHORT  Value);
+  /*IN*/ PUSHORT  Register,
+  /*IN*/ USHORT  Value);
 
 /** I/O manager routines **/
 
@@ -5918,23 +5923,23 @@ NTOSAPI
 VOID
 DDKAPI
 IoAcquireCancelSpinLock(
-  OUT PKIRQL  Irql);
+  /*OUT*/ PKIRQL  Irql);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoAcquireRemoveLockEx(
-  IN PIO_REMOVE_LOCK  RemoveLock,
-  IN OPTIONAL PVOID  Tag  OPTIONAL,
-  IN PCSTR  File,
-  IN ULONG  Line,
-  IN ULONG  RemlockSize);
+  /*IN*/ PIO_REMOVE_LOCK  RemoveLock,
+  /*IN*/ PVOID  Tag  /*OPTIONAL*/,
+  /*IN*/ PCSTR  File,
+  /*IN*/ ULONG  Line,
+  /*IN*/ ULONG  RemlockSize);
 
 /*
  * NTSTATUS
  * IoAcquireRemoveLock(
- *   IN PIO_REMOVE_LOCK  RemoveLock,
- *   IN OPTIONAL PVOID  Tag)
+ * IN PIO_REMOVE_LOCK  RemoveLock,
+ * IN PVOID  Tag OPTIONAL)
  */
 #define IoAcquireRemoveLock(_RemoveLock, \
                             _Tag) \
@@ -5943,8 +5948,8 @@ IoAcquireRemoveLockEx(
 /*
  * VOID
  * IoAdjustPagingPathCount(
- *   IN PLONG  Count,
- *   IN BOOLEAN  Increment)
+ * IN PLONG  Count,
+ * IN BOOLEAN  Increment)
  */
 #define IoAdjustPagingPathCount(_Count, \
                                 _Increment) \
@@ -5963,19 +5968,19 @@ NTOSAPI
 VOID
 DDKAPI
 IoAllocateController(
-  IN PCONTROLLER_OBJECT  ControllerObject,
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN PDRIVER_CONTROL  ExecutionRoutine,
-  IN PVOID  Context);
+  /*IN*/ PCONTROLLER_OBJECT  ControllerObject,
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ PDRIVER_CONTROL  ExecutionRoutine,
+  /*IN*/ PVOID  Context);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoAllocateDriverObjectExtension(
-  IN PDRIVER_OBJECT  DriverObject,
-  IN PVOID  ClientIdentificationAddress,
-  IN ULONG  DriverObjectExtensionSize,
-  OUT PVOID  *DriverObjectExtension);
+  /*IN*/ PDRIVER_OBJECT  DriverObject,
+  /*IN*/ PVOID  ClientIdentificationAddress,
+  /*IN*/ ULONG  DriverObjectExtensionSize,
+  /*OUT*/ PVOID  *DriverObjectExtension);
 
 typedef struct _IO_ERROR_LOG_PACKET { 
 	UCHAR  MajorFunctionCode; 
@@ -5997,36 +6002,36 @@ NTOSAPI
 PVOID
 DDKAPI
 IoAllocateErrorLogEntry(
-  IN PVOID  IoObject,
-  IN UCHAR  EntrySize);
+  /*IN*/ PVOID  IoObject,
+  /*IN*/ UCHAR  EntrySize);
 
 NTOSAPI
 PIRP
 DDKAPI
 IoAllocateIrp(
-  IN CCHAR  StackSize,
-  IN BOOLEAN  ChargeQuota);
+  /*IN*/ CCHAR  StackSize,
+  /*IN*/ BOOLEAN  ChargeQuota);
 
 NTOSAPI
 PMDL
 DDKAPI
 IoAllocateMdl(
-  IN PVOID  VirtualAddress,
-  IN ULONG  Length,
-  IN BOOLEAN  SecondaryBuffer,
-  IN BOOLEAN  ChargeQuota,
-  IN OUT PIRP  Irp  OPTIONAL);
+  /*IN*/ PVOID  VirtualAddress,
+  /*IN*/ ULONG  Length,
+  /*IN*/ BOOLEAN  SecondaryBuffer,
+  /*IN*/ BOOLEAN  ChargeQuota,
+  /*IN OUT*/ PIRP  Irp  /*OPTIONAL*/);
 
 NTOSAPI
 PIO_WORKITEM
 DDKAPI
 IoAllocateWorkItem(
-  IN PDEVICE_OBJECT  DeviceObject);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject);
 
 /*
  * VOID IoAssignArcName(
- *   IN PUNICODE_STRING  ArcName,
- *   IN PUNICODE_STRING  DeviceName);
+ * IN PUNICODE_STRING  ArcName,
+ * IN PUNICODE_STRING  DeviceName);
  */
 #define IoAssignArcName(_ArcName, _DeviceName) ( \
   IoCreateSymbolicLink((_ArcName), (_DeviceName)))
@@ -6035,75 +6040,75 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 IoAttachDevice(
-  IN PDEVICE_OBJECT  SourceDevice,
-  IN PUNICODE_STRING  TargetDevice,
-  OUT PDEVICE_OBJECT  *AttachedDevice);
+  /*IN*/ PDEVICE_OBJECT  SourceDevice,
+  /*IN*/ PUNICODE_STRING  TargetDevice,
+  /*OUT*/ PDEVICE_OBJECT  *AttachedDevice);
 
 NTOSAPI
 PDEVICE_OBJECT
 DDKAPI
 IoAttachDeviceToDeviceStack(
-  IN PDEVICE_OBJECT  SourceDevice,
-  IN PDEVICE_OBJECT  TargetDevice);
+  /*IN*/ PDEVICE_OBJECT  SourceDevice,
+  /*IN*/ PDEVICE_OBJECT  TargetDevice);
 
 NTOSAPI
 PIRP
 DDKAPI
 IoBuildAsynchronousFsdRequest(
-  IN ULONG  MajorFunction,
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN OUT PVOID  Buffer  OPTIONAL,
-  IN ULONG  Length  OPTIONAL,
-  IN PLARGE_INTEGER  StartingOffset  OPTIONAL,
-  IN PIO_STATUS_BLOCK  IoStatusBlock  OPTIONAL);
+  /*IN*/ ULONG  MajorFunction,
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN OUT*/ PVOID  Buffer  /*OPTIONAL*/,
+  /*IN*/ ULONG  Length  /*OPTIONAL*/,
+  /*IN*/ PLARGE_INTEGER  StartingOffset  /*OPTIONAL*/,
+  /*IN*/ PIO_STATUS_BLOCK  IoStatusBlock  /*OPTIONAL*/);
 
 NTOSAPI
 PIRP
 DDKAPI
 IoBuildDeviceIoControlRequest(
-  IN ULONG  IoControlCode,
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN PVOID  InputBuffer  OPTIONAL,
-  IN ULONG  InputBufferLength,
-  OUT PVOID  OutputBuffer  OPTIONAL,
-  IN ULONG  OutputBufferLength,
-  IN BOOLEAN  InternalDeviceIoControl,
-  IN PKEVENT  Event,
-  OUT PIO_STATUS_BLOCK  IoStatusBlock);
+  /*IN*/ ULONG  IoControlCode,
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ PVOID  InputBuffer  /*OPTIONAL*/,
+  /*IN*/ ULONG  InputBufferLength,
+  /*OUT*/ PVOID  OutputBuffer  /*OPTIONAL*/,
+  /*IN*/ ULONG  OutputBufferLength,
+  /*IN*/ BOOLEAN  InternalDeviceIoControl,
+  /*IN*/ PKEVENT  Event,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock);
 
 NTOSAPI
 VOID
 DDKAPI
 IoBuildPartialMdl(
-  IN PMDL  SourceMdl,
-  IN OUT PMDL  TargetMdl,
-  IN PVOID  VirtualAddress,
-  IN ULONG  Length);
+  /*IN*/ PMDL  SourceMdl,
+  /*IN OUT*/ PMDL  TargetMdl,
+  /*IN*/ PVOID  VirtualAddress,
+  /*IN*/ ULONG  Length);
 
 NTOSAPI
 PIRP
 DDKAPI
 IoBuildSynchronousFsdRequest(
-  IN ULONG  MajorFunction,
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN OUT PVOID  Buffer  OPTIONAL,
-  IN ULONG  Length  OPTIONAL,
-  IN PLARGE_INTEGER  StartingOffset  OPTIONAL,
-  IN PKEVENT  Event,
-  OUT PIO_STATUS_BLOCK  IoStatusBlock);
+  /*IN*/ ULONG  MajorFunction,
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN OUT*/ PVOID  Buffer  /*OPTIONAL*/,
+  /*IN*/ ULONG  Length  /*OPTIONAL*/,
+  /*IN*/ PLARGE_INTEGER  StartingOffset  /*OPTIONAL*/,
+  /*IN*/ PKEVENT  Event,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock);
 
 NTOSAPI
 NTSTATUS
 DDKFASTAPI
 IofCallDriver(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN OUT PIRP  Irp);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN OUT*/ PIRP  Irp);
 
 /*
  * NTSTATUS
  * IoCallDriver(
- *   IN PDEVICE_OBJECT  DeviceObject,
- *   IN OUT PIRP  Irp)
+ * IN PDEVICE_OBJECT  DeviceObject,
+ * IN OUT PIRP  Irp)
  */
 #define IoCallDriver IofCallDriver
 
@@ -6111,37 +6116,37 @@ NTOSAPI
 VOID
 DDKAPI
 IoCancelFileOpen(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN PFILE_OBJECT  FileObject);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ PFILE_OBJECT  FileObject);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 IoCancelIrp(
-  IN PIRP  Irp);
+  /*IN*/ PIRP  Irp);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoCheckShareAccess(
-  IN ACCESS_MASK  DesiredAccess,
-  IN ULONG  DesiredShareAccess,
-  IN OUT PFILE_OBJECT  FileObject,
-  IN OUT PSHARE_ACCESS  ShareAccess,
-  IN BOOLEAN  Update);
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ ULONG  DesiredShareAccess,
+  /*IN OUT*/ PFILE_OBJECT  FileObject,
+  /*IN OUT*/ PSHARE_ACCESS  ShareAccess,
+  /*IN*/ BOOLEAN  Update);
 
 NTOSAPI
 VOID
 DDKFASTAPI
 IofCompleteRequest(
-  IN PIRP  Irp,
-  IN CCHAR  PriorityBoost);
+  /*IN*/ PIRP  Irp,
+  /*IN*/ CCHAR  PriorityBoost);
 
 /*
  * VOID
  * IoCompleteRequest(
- *  IN PIRP  Irp,
- *  IN CCHAR  PriorityBoost)
+ * IN PIRP  Irp,
+ * IN CCHAR  PriorityBoost)
  */
 #define IoCompleteRequest IofCompleteRequest
 
@@ -6149,22 +6154,22 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 IoConnectInterrupt(
-  OUT PKINTERRUPT  *InterruptObject,
-  IN PKSERVICE_ROUTINE  ServiceRoutine,
-  IN PVOID  ServiceContext,
-  IN PKSPIN_LOCK  SpinLock  OPTIONAL,
-  IN ULONG  Vector,
-  IN KIRQL  Irql,
-  IN KIRQL  SynchronizeIrql,
-  IN KINTERRUPT_MODE    InterruptMode,
-  IN BOOLEAN  ShareVector,
-  IN KAFFINITY  ProcessorEnableMask,
-  IN BOOLEAN  FloatingSave);
+  /*OUT*/ PKINTERRUPT  *InterruptObject,
+  /*IN*/ PKSERVICE_ROUTINE  ServiceRoutine,
+  /*IN*/ PVOID  ServiceContext,
+  /*IN*/ PKSPIN_LOCK  SpinLock  /*OPTIONAL*/,
+  /*IN*/ ULONG  Vector,
+  /*IN*/ KIRQL  Irql,
+  /*IN*/ KIRQL  SynchronizeIrql,
+  /*IN*/ KINTERRUPT_MODE    InterruptMode,
+  /*IN*/ BOOLEAN  ShareVector,
+  /*IN*/ KAFFINITY  ProcessorEnableMask,
+  /*IN*/ BOOLEAN  FloatingSave);
 
 /*
  * PIO_STACK_LOCATION
  * IoGetCurrentIrpStackLocation(
- *   IN PIRP  Irp)
+ * IN PIRP  Irp)
  */
 #define IoGetCurrentIrpStackLocation(_Irp) \
   ((_Irp)->Tail.Overlay.CurrentStackLocation)
@@ -6172,7 +6177,7 @@ IoConnectInterrupt(
 /*
  * PIO_STACK_LOCATION
  * IoGetNextIrpStackLocation(
- *   IN PIRP  Irp)
+ * IN PIRP  Irp)
  */
 #define IoGetNextIrpStackLocation(_Irp) \
   ((_Irp)->Tail.Overlay.CurrentStackLocation - 1)
@@ -6180,7 +6185,7 @@ IoConnectInterrupt(
 /*
  * VOID
  * IoCopyCurrentIrpStackLocationToNext(
- *   IN PIRP  Irp)
+ * IN PIRP  Irp)
  */
 #define IoCopyCurrentIrpStackLocationToNext(_Irp) \
 { \
@@ -6197,130 +6202,130 @@ NTOSAPI
 PCONTROLLER_OBJECT
 DDKAPI
 IoCreateController(
-  IN ULONG  Size);
+  /*IN*/ ULONG  Size);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoCreateDevice(
-  IN PDRIVER_OBJECT  DriverObject,
-  IN ULONG  DeviceExtensionSize,
-  IN PUNICODE_STRING  DeviceName  OPTIONAL,
-  IN DEVICE_TYPE  DeviceType,
-  IN ULONG  DeviceCharacteristics,
-  IN BOOLEAN  Exclusive,
-  OUT PDEVICE_OBJECT  *DeviceObject);
+  /*IN*/ PDRIVER_OBJECT  DriverObject,
+  /*IN*/ ULONG  DeviceExtensionSize,
+  /*IN*/ PUNICODE_STRING  DeviceName  /*OPTIONAL*/,
+  /*IN*/ DEVICE_TYPE  DeviceType,
+  /*IN*/ ULONG  DeviceCharacteristics,
+  /*IN*/ BOOLEAN  Exclusive,
+  /*OUT*/ PDEVICE_OBJECT  *DeviceObject);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoCreateDisk(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN PCREATE_DISK  Disk);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ PCREATE_DISK  Disk);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoCreateFile(
-  OUT PHANDLE FileHandle,
-  IN ACCESS_MASK DesiredAccess,
-  IN POBJECT_ATTRIBUTES ObjectAttributes,
-  OUT PIO_STATUS_BLOCK IoStatusBlock,
-  IN PLARGE_INTEGER AllocationSize OPTIONAL,
-  IN ULONG FileAttributes,
-  IN ULONG ShareAccess,
-  IN ULONG Disposition,
-  IN ULONG CreateOptions,
-  IN PVOID EaBuffer OPTIONAL,
-  IN ULONG EaLength,
-  IN CREATE_FILE_TYPE CreateFileType,
-  IN PVOID ExtraCreateParameters OPTIONAL,
-  IN ULONG Options);
+  /*OUT*/ PHANDLE FileHandle,
+  /*IN*/ ACCESS_MASK DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES ObjectAttributes,
+  /*OUT*/ PIO_STATUS_BLOCK IoStatusBlock,
+  /*IN*/ PLARGE_INTEGER AllocationSize /*OPTIONAL*/,
+  /*IN*/ ULONG FileAttributes,
+  /*IN*/ ULONG ShareAccess,
+  /*IN*/ ULONG Disposition,
+  /*IN*/ ULONG CreateOptions,
+  /*IN*/ PVOID EaBuffer /*OPTIONAL*/,
+  /*IN*/ ULONG EaLength,
+  /*IN*/ CREATE_FILE_TYPE CreateFileType,
+  /*IN*/ PVOID ExtraCreateParameters /*OPTIONAL*/,
+  /*IN*/ ULONG Options);
 
 NTOSAPI
 PKEVENT
 DDKAPI
 IoCreateNotificationEvent(
-  IN PUNICODE_STRING  EventName,
-  OUT PHANDLE  EventHandle);
+  /*IN*/ PUNICODE_STRING  EventName,
+  /*OUT*/ PHANDLE  EventHandle);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoCreateSymbolicLink(
-  IN PUNICODE_STRING  SymbolicLinkName,
-  IN PUNICODE_STRING  DeviceName);
+  /*IN*/ PUNICODE_STRING  SymbolicLinkName,
+  /*IN*/ PUNICODE_STRING  DeviceName);
 
 NTOSAPI
 PKEVENT
 DDKAPI
 IoCreateSynchronizationEvent(
-  IN PUNICODE_STRING  EventName,
-  OUT PHANDLE  EventHandle);
+  /*IN*/ PUNICODE_STRING  EventName,
+  /*OUT*/ PHANDLE  EventHandle);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoCreateUnprotectedSymbolicLink(
-  IN PUNICODE_STRING  SymbolicLinkName,
-  IN PUNICODE_STRING  DeviceName);
+  /*IN*/ PUNICODE_STRING  SymbolicLinkName,
+  /*IN*/ PUNICODE_STRING  DeviceName);
 
 NTOSAPI
 VOID
 DDKAPI
 IoCsqInitialize(
   PIO_CSQ  Csq,
-  IN PIO_CSQ_INSERT_IRP  CsqInsertIrp,
-  IN PIO_CSQ_REMOVE_IRP  CsqRemoveIrp,
-  IN PIO_CSQ_PEEK_NEXT_IRP  CsqPeekNextIrp,
-  IN PIO_CSQ_ACQUIRE_LOCK  CsqAcquireLock,
-  IN PIO_CSQ_RELEASE_LOCK  CsqReleaseLock,
-  IN PIO_CSQ_COMPLETE_CANCELED_IRP  CsqCompleteCanceledIrp);
+  /*IN*/ PIO_CSQ_INSERT_IRP  CsqInsertIrp,
+  /*IN*/ PIO_CSQ_REMOVE_IRP  CsqRemoveIrp,
+  /*IN*/ PIO_CSQ_PEEK_NEXT_IRP  CsqPeekNextIrp,
+  /*IN*/ PIO_CSQ_ACQUIRE_LOCK  CsqAcquireLock,
+  /*IN*/ PIO_CSQ_RELEASE_LOCK  CsqReleaseLock,
+  /*IN*/ PIO_CSQ_COMPLETE_CANCELED_IRP  CsqCompleteCanceledIrp);
 
 NTOSAPI
 VOID
 DDKAPI
 IoCsqInsertIrp(
-  IN  PIO_CSQ  Csq,
-  IN  PIRP  Irp,
-  IN  PIO_CSQ_IRP_CONTEXT  Context);
+  /*IN*/ PIO_CSQ  Csq,
+  /*IN*/ PIRP  Irp,
+  /*IN*/ PIO_CSQ_IRP_CONTEXT  Context);
 
 NTOSAPI
 PIRP
 DDKAPI
 IoCsqRemoveIrp(
-  IN  PIO_CSQ  Csq,
-  IN  PIO_CSQ_IRP_CONTEXT  Context);
+  /*IN*/ PIO_CSQ  Csq,
+  /*IN*/ PIO_CSQ_IRP_CONTEXT  Context);
 
 NTOSAPI
 PIRP
 DDKAPI
 IoCsqRemoveNextIrp(
-  IN PIO_CSQ  Csq,
-  IN PVOID  PeekContext);
+  /*IN*/ PIO_CSQ  Csq,
+  /*IN*/ PVOID  PeekContext);
 
 NTOSAPI
 VOID
 DDKAPI
 IoDeleteController(
-  IN PCONTROLLER_OBJECT  ControllerObject);
+  /*IN*/ PCONTROLLER_OBJECT  ControllerObject);
 
 NTOSAPI
 VOID
 DDKAPI
 IoDeleteDevice(
-  IN PDEVICE_OBJECT  DeviceObject);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoDeleteSymbolicLink(
-  IN PUNICODE_STRING  SymbolicLinkName);
+  /*IN*/ PUNICODE_STRING  SymbolicLinkName);
 
 /*
  * VOID
  * IoDeassignArcName(
- *   IN PUNICODE_STRING  ArcName)
+ * IN PUNICODE_STRING  ArcName)
  */
 #define IoDeassignArcName IoDeleteSymbolicLink
 
@@ -6328,20 +6333,20 @@ NTOSAPI
 VOID
 DDKAPI
 IoDetachDevice(
-  IN OUT PDEVICE_OBJECT  TargetDevice);
+  /*IN OUT*/ PDEVICE_OBJECT  TargetDevice);
 
 NTOSAPI
 VOID
 DDKAPI
 IoDisconnectInterrupt(
-  IN PKINTERRUPT  InterruptObject);
+  /*IN*/ PKINTERRUPT  InterruptObject);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 IoForwardIrpSynchronously(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN PIRP  Irp);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ PIRP  Irp);
 
 #define IoForwardAndCatchIrp IoForwardIrpSynchronously
 
@@ -6349,7 +6354,7 @@ NTOSAPI
 VOID
 DDKAPI
 IoFreeController(
-  IN PCONTROLLER_OBJECT  ControllerObject);
+  /*IN*/ PCONTROLLER_OBJECT  ControllerObject);
 
 NTOSAPI
 VOID
@@ -6361,38 +6366,38 @@ NTOSAPI
 VOID
 DDKAPI
 IoFreeIrp(
-  IN PIRP  Irp);
+  /*IN*/ PIRP  Irp);
 
 NTOSAPI
 VOID
 DDKAPI
 IoFreeMdl(
-  IN PMDL  Mdl);
+  /*IN*/ PMDL  Mdl);
 
 NTOSAPI
 VOID
 DDKAPI
 IoFreeWorkItem(
-  IN PIO_WORKITEM  pIOWorkItem);
+  /*IN*/ PIO_WORKITEM  pIOWorkItem);
 
 NTOSAPI
 PDEVICE_OBJECT
 DDKAPI
 IoGetAttachedDevice(
-  IN PDEVICE_OBJECT  DeviceObject);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject);
 
 NTOSAPI
 PDEVICE_OBJECT
 DDKAPI
 IoGetAttachedDeviceReference(
-  IN PDEVICE_OBJECT  DeviceObject);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoGetBootDiskInformation(
-  IN OUT PBOOTDISK_INFORMATION  BootDiskInformation,
-  IN ULONG  Size);
+  /*IN OUT*/ PBOOTDISK_INFORMATION  BootDiskInformation,
+  /*IN*/ ULONG  Size);
 
 NTOSAPI
 PCONFIGURATION_INFORMATION
@@ -6410,58 +6415,58 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 IoGetDeviceInterfaceAlias(
-  IN PUNICODE_STRING  SymbolicLinkName,
-  IN CONST GUID  *AliasInterfaceClassGuid,
-  OUT PUNICODE_STRING  AliasSymbolicLinkName);
+  /*IN*/ PUNICODE_STRING  SymbolicLinkName,
+  /*IN*/ CONST GUID  *AliasInterfaceClassGuid,
+  /*OUT*/ PUNICODE_STRING  AliasSymbolicLinkName);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoGetDeviceInterfaces(
-  IN CONST GUID  *InterfaceClassGuid,
-  IN PDEVICE_OBJECT  PhysicalDeviceObject  OPTIONAL,
-  IN ULONG  Flags,
-  OUT PWSTR  *SymbolicLinkList);
+  /*IN*/ CONST GUID  *InterfaceClassGuid,
+  /*IN*/ PDEVICE_OBJECT  PhysicalDeviceObject  /*OPTIONAL*/,
+  /*IN*/ ULONG  Flags,
+  /*OUT*/ PWSTR  *SymbolicLinkList);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoGetDeviceObjectPointer(
-  IN PUNICODE_STRING  ObjectName,
-  IN ACCESS_MASK  DesiredAccess,
-  OUT PFILE_OBJECT  *FileObject,
-  OUT PDEVICE_OBJECT  *DeviceObject);
+  /*IN*/ PUNICODE_STRING  ObjectName,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*OUT*/ PFILE_OBJECT  *FileObject,
+  /*OUT*/ PDEVICE_OBJECT  *DeviceObject);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoGetDeviceProperty(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN DEVICE_REGISTRY_PROPERTY  DeviceProperty,
-  IN ULONG  BufferLength,
-  OUT PVOID  PropertyBuffer,
-  OUT PULONG  ResultLength);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ DEVICE_REGISTRY_PROPERTY  DeviceProperty,
+  /*IN*/ ULONG  BufferLength,
+  /*OUT*/ PVOID  PropertyBuffer,
+  /*OUT*/ PULONG  ResultLength);
 
 NTOSAPI
 PDEVICE_OBJECT
 DDKAPI
 IoGetDeviceToVerify(
-  IN PETHREAD  Thread);
+  /*IN*/ PETHREAD  Thread);
 
 NTOSAPI
 PDMA_ADAPTER
 DDKAPI
 IoGetDmaAdapter(
-  IN PDEVICE_OBJECT  PhysicalDeviceObject,
-  IN PDEVICE_DESCRIPTION  DeviceDescription,
-  IN OUT PULONG  NumberOfMapRegisters);
+  /*IN*/ PDEVICE_OBJECT  PhysicalDeviceObject,
+  /*IN*/ PDEVICE_DESCRIPTION  DeviceDescription,
+  /*IN OUT*/ PULONG  NumberOfMapRegisters);
 
 NTOSAPI
 PVOID
 DDKAPI
 IoGetDriverObjectExtension(
-  IN PDRIVER_OBJECT  DriverObject,
-  IN PVOID  ClientIdentificationAddress);
+  /*IN*/ PDRIVER_OBJECT  DriverObject,
+  /*IN*/ PVOID  ClientIdentificationAddress);
 
 NTOSAPI
 PGENERIC_MAPPING
@@ -6472,7 +6477,7 @@ IoGetFileObjectGenericMapping(
 /*
  * ULONG
  * IoGetFunctionCodeFromCtlCode(
- *   IN ULONG  ControlCode)
+ * IN ULONG  ControlCode)
  */
 #define IoGetFunctionCodeFromCtlCode(_ControlCode) \
   (((_ControlCode) >> 2) & 0x00000FFF)
@@ -6487,7 +6492,7 @@ NTOSAPI
 PDEVICE_OBJECT
 DDKAPI
 IoGetRelatedDeviceObject(
-  IN PFILE_OBJECT  FileObject);
+  /*IN*/ PFILE_OBJECT  FileObject);
 
 NTOSAPI
 ULONG
@@ -6499,22 +6504,22 @@ NTOSAPI
 VOID
 DDKAPI
 IoGetStackLimits(
-  OUT PULONG_PTR  LowLimit,
-  OUT PULONG_PTR  HighLimit);
+  /*OUT*/ PULONG_PTR  LowLimit,
+  /*OUT*/ PULONG_PTR  HighLimit);
 
 NTOSAPI
 VOID
 DDKAPI
 KeInitializeDpc(
-  IN PRKDPC  Dpc,
-  IN PKDEFERRED_ROUTINE  DeferredRoutine,
-  IN PVOID  DeferredContext);
+  /*IN*/ PRKDPC  Dpc,
+  /*IN*/ PKDEFERRED_ROUTINE  DeferredRoutine,
+  /*IN*/ PVOID  DeferredContext);
 
 /*
  * VOID
  * IoInitializeDpcRequest(
- *   IN PDEVICE_OBJECT DeviceObject,
- *   IN PIO_DPC_ROUTINE DpcRoutine)
+ * IN PDEVICE_OBJECT DeviceObject,
+ * IN PIO_DPC_ROUTINE DpcRoutine)
  */
 #define IoInitializeDpcRequest(_DeviceObject, \
                                _DpcRoutine) \
@@ -6526,26 +6531,26 @@ NTOSAPI
 VOID
 DDKAPI
 IoInitializeIrp(
-  IN OUT PIRP  Irp,
-  IN USHORT  PacketSize,
-  IN CCHAR  StackSize);
+  /*IN OUT*/ PIRP  Irp,
+  /*IN*/ USHORT  PacketSize,
+  /*IN*/ CCHAR  StackSize);
 
 NTOSAPI
 VOID
 DDKAPI
 IoInitializeRemoveLockEx(
-  IN  PIO_REMOVE_LOCK Lock,
-  IN  ULONG   AllocateTag,
-  IN  ULONG   MaxLockedMinutes,
-  IN  ULONG   HighWatermark,
-  IN  ULONG   RemlockSize);
+  /*IN*/ PIO_REMOVE_LOCK Lock,
+  /*IN*/ ULONG   AllocateTag,
+  /*IN*/ ULONG   MaxLockedMinutes,
+  /*IN*/ ULONG   HighWatermark,
+  /*IN*/ ULONG   RemlockSize);
 
 /* VOID
  * IoInitializeRemoveLock(
- *   IN PIO_REMOVE_LOCK  Lock,
- *   IN ULONG  AllocateTag,
- *   IN ULONG  MaxLockedMinutes,
- *   IN ULONG  HighWatermark)
+ * IN PIO_REMOVE_LOCK  Lock,
+ * IN ULONG  AllocateTag,
+ * IN ULONG  MaxLockedMinutes,
+ * IN ULONG  HighWatermark)
  */
 #define IoInitializeRemoveLock( \
   Lock, AllocateTag, MaxLockedMinutes, HighWatermark) \
@@ -6556,33 +6561,33 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 IoInitializeTimer(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN PIO_TIMER_ROUTINE  TimerRoutine,
-  IN PVOID  Context);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ PIO_TIMER_ROUTINE  TimerRoutine,
+  /*IN*/ PVOID  Context);
 
 NTOSAPI
 VOID
 DDKAPI
 IoInvalidateDeviceRelations(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN DEVICE_RELATION_TYPE  Type);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ DEVICE_RELATION_TYPE  Type);
 
 NTOSAPI
 VOID
 DDKAPI
 IoInvalidateDeviceState(
-  IN PDEVICE_OBJECT  PhysicalDeviceObject);
+  /*IN*/ PDEVICE_OBJECT  PhysicalDeviceObject);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 IoIs32bitProcess(
-  IN PIRP  Irp  OPTIONAL);
+  /*IN*/ PIRP  Irp  /*OPTIONAL*/);
 
 /*
  * BOOLEAN
  * IoIsErrorUserInduced(
- *   IN NTSTATUS  Status);
+ * IN NTSTATUS  Status);
  */
 #define IoIsErrorUserInduced(Status) \
 	((BOOLEAN)(((Status) == STATUS_DEVICE_NOT_READY) || \
@@ -6597,20 +6602,20 @@ NTOSAPI
 BOOLEAN
 DDKAPI
 IoIsWdmVersionAvailable(
-  IN UCHAR  MajorVersion,
-  IN UCHAR  MinorVersion);
+  /*IN*/ UCHAR  MajorVersion,
+  /*IN*/ UCHAR  MinorVersion);
 
 NTOSAPI
 PIRP
 DDKAPI
 IoMakeAssociatedIrp(
-  IN PIRP  Irp,
-  IN CCHAR  StackSize);
+  /*IN*/ PIRP  Irp,
+  /*IN*/ CCHAR  StackSize);
 
 /*
  * VOID
  * IoMarkIrpPending(
- *   IN OUT PIRP  Irp)
+ * IN OUT PIRP  Irp)
  */
 #define IoMarkIrpPending(_Irp) \
   (IoGetCurrentIrpStackLocation(_Irp)->Control |= SL_PENDING_RETURNED)
@@ -6619,142 +6624,142 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 IoOpenDeviceInterfaceRegistryKey(
-  IN PUNICODE_STRING  SymbolicLinkName,
-  IN ACCESS_MASK  DesiredAccess,
-  OUT PHANDLE  DeviceInterfaceKey);
+  /*IN*/ PUNICODE_STRING  SymbolicLinkName,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*OUT*/ PHANDLE  DeviceInterfaceKey);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoOpenDeviceRegistryKey(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN ULONG  DevInstKeyType,
-  IN ACCESS_MASK  DesiredAccess,
-  OUT PHANDLE  DevInstRegKey);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ ULONG  DevInstKeyType,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*OUT*/ PHANDLE  DevInstRegKey);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoQueryDeviceDescription(
-  IN PINTERFACE_TYPE  BusType  OPTIONAL,
-  IN PULONG  BusNumber  OPTIONAL,
-  IN PCONFIGURATION_TYPE  ControllerType  OPTIONAL,
-  IN PULONG  ControllerNumber  OPTIONAL,
-  IN PCONFIGURATION_TYPE  PeripheralType  OPTIONAL,
-  IN PULONG  PeripheralNumber  OPTIONAL,
-  IN PIO_QUERY_DEVICE_ROUTINE  CalloutRoutine,
-  IN PVOID  Context);
+  /*IN*/ PINTERFACE_TYPE  BusType  /*OPTIONAL*/,
+  /*IN*/ PULONG  BusNumber  /*OPTIONAL*/,
+  /*IN*/ PCONFIGURATION_TYPE  ControllerType  /*OPTIONAL*/,
+  /*IN*/ PULONG  ControllerNumber  /*OPTIONAL*/,
+  /*IN*/ PCONFIGURATION_TYPE  PeripheralType  /*OPTIONAL*/,
+  /*IN*/ PULONG  PeripheralNumber  /*OPTIONAL*/,
+  /*IN*/ PIO_QUERY_DEVICE_ROUTINE  CalloutRoutine,
+  /*IN*/ PVOID  Context);
 
 NTOSAPI
 VOID
 DDKAPI
 IoQueueWorkItem(
-  IN PIO_WORKITEM  pIOWorkItem,
-  IN PIO_WORKITEM_ROUTINE  Routine,
-  IN WORK_QUEUE_TYPE  QueueType,
-  IN PVOID  Context);
+  /*IN*/ PIO_WORKITEM  pIOWorkItem,
+  /*IN*/ PIO_WORKITEM_ROUTINE  Routine,
+  /*IN*/ WORK_QUEUE_TYPE  QueueType,
+  /*IN*/ PVOID  Context);
 
 NTOSAPI
 VOID
 DDKAPI
 IoRaiseHardError(
-  IN PIRP  Irp,
-  IN PVPB  Vpb  OPTIONAL,
-  IN PDEVICE_OBJECT  RealDeviceObject);
+  /*IN*/ PIRP  Irp,
+  /*IN*/ PVPB  Vpb  /*OPTIONAL*/,
+  /*IN*/ PDEVICE_OBJECT  RealDeviceObject);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 IoRaiseInformationalHardError(
-  IN NTSTATUS  ErrorStatus,
-  IN PUNICODE_STRING  String  OPTIONAL,
-  IN PKTHREAD  Thread  OPTIONAL);
+  /*IN*/ NTSTATUS  ErrorStatus,
+  /*IN*/ PUNICODE_STRING  String  /*OPTIONAL*/,
+  /*IN*/ PKTHREAD  Thread  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoReadDiskSignature(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN ULONG  BytesPerSector,
-  OUT PDISK_SIGNATURE  Signature);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ ULONG  BytesPerSector,
+  /*OUT*/ PDISK_SIGNATURE  Signature);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoReadPartitionTableEx(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN struct _DRIVE_LAYOUT_INFORMATION_EX  **PartitionBuffer);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ struct _DRIVE_LAYOUT_INFORMATION_EX  **PartitionBuffer);
 
 NTOSAPI
 VOID
 DDKAPI
 IoRegisterBootDriverReinitialization(
-  IN PDRIVER_OBJECT  DriverObject,
-  IN PDRIVER_REINITIALIZE  DriverReinitializationRoutine,
-  IN PVOID  Context);
+  /*IN*/ PDRIVER_OBJECT  DriverObject,
+  /*IN*/ PDRIVER_REINITIALIZE  DriverReinitializationRoutine,
+  /*IN*/ PVOID  Context);
 
 NTOSAPI
 VOID
 DDKAPI
 IoRegisterBootDriverReinitialization(
-  IN PDRIVER_OBJECT  DriverObject,
-  IN PDRIVER_REINITIALIZE  DriverReinitializationRoutine,
-  IN PVOID  Context);
+  /*IN*/ PDRIVER_OBJECT  DriverObject,
+  /*IN*/ PDRIVER_REINITIALIZE  DriverReinitializationRoutine,
+  /*IN*/ PVOID  Context);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoRegisterDeviceInterface(
-  IN PDEVICE_OBJECT  PhysicalDeviceObject,
-  IN CONST GUID  *InterfaceClassGuid,
-  IN PUNICODE_STRING  ReferenceString  OPTIONAL,
-  OUT PUNICODE_STRING  SymbolicLinkName);
+  /*IN*/ PDEVICE_OBJECT  PhysicalDeviceObject,
+  /*IN*/ CONST GUID  *InterfaceClassGuid,
+  /*IN*/ PUNICODE_STRING  ReferenceString  /*OPTIONAL*/,
+  /*OUT*/ PUNICODE_STRING  SymbolicLinkName);
 
 NTOSAPI
 VOID
 DDKAPI
 IoRegisterDriverReinitialization(
-  IN PDRIVER_OBJECT  DriverObject,
-  IN PDRIVER_REINITIALIZE  DriverReinitializationRoutine,
-  IN PVOID  Context);
+  /*IN*/ PDRIVER_OBJECT  DriverObject,
+  /*IN*/ PDRIVER_REINITIALIZE  DriverReinitializationRoutine,
+  /*IN*/ PVOID  Context);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoRegisterPlugPlayNotification(
-  IN IO_NOTIFICATION_EVENT_CATEGORY  EventCategory,
-  IN ULONG  EventCategoryFlags,
-  IN PVOID  EventCategoryData  OPTIONAL,
-  IN PDRIVER_OBJECT  DriverObject,
-  IN PDRIVER_NOTIFICATION_CALLBACK_ROUTINE  CallbackRoutine,
-  IN PVOID  Context,
-  OUT PVOID  *NotificationEntry);
+  /*IN*/ IO_NOTIFICATION_EVENT_CATEGORY  EventCategory,
+  /*IN*/ ULONG  EventCategoryFlags,
+  /*IN*/ PVOID  EventCategoryData  /*OPTIONAL*/,
+  /*IN*/ PDRIVER_OBJECT  DriverObject,
+  /*IN*/ PDRIVER_NOTIFICATION_CALLBACK_ROUTINE  CallbackRoutine,
+  /*IN*/ PVOID  Context,
+  /*OUT*/ PVOID  *NotificationEntry);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoRegisterShutdownNotification(
-  IN PDEVICE_OBJECT  DeviceObject);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject);
 
 NTOSAPI
 VOID
 DDKAPI
 IoReleaseCancelSpinLock(
-  IN KIRQL  Irql);
+  /*IN*/ KIRQL  Irql);
 
 NTOSAPI
 VOID
 DDKAPI
 IoReleaseRemoveLockAndWaitEx(
-  IN PIO_REMOVE_LOCK  RemoveLock,
-  IN PVOID  Tag,
-  IN ULONG  RemlockSize);
+  /*IN*/ PIO_REMOVE_LOCK  RemoveLock,
+  /*IN*/ PVOID  Tag,
+  /*IN*/ ULONG  RemlockSize);
 
 /*
  * VOID
  * IoReleaseRemoveLockAndWait(
- *   IN PIO_REMOVE_LOCK  RemoveLock,
- *   IN PVOID  Tag)
+ * IN PIO_REMOVE_LOCK  RemoveLock,
+ * IN PVOID  Tag)
  */
 #define IoReleaseRemoveLockAndWait(_RemoveLock, \
                                    _Tag) \
@@ -6764,15 +6769,15 @@ NTOSAPI
 VOID
 DDKAPI
 IoReleaseRemoveLockEx(
-  IN PIO_REMOVE_LOCK  RemoveLock,
-  IN PVOID  Tag,
-  IN ULONG  RemlockSize);
+  /*IN*/ PIO_REMOVE_LOCK  RemoveLock,
+  /*IN*/ PVOID  Tag,
+  /*IN*/ ULONG  RemlockSize);
 
 /*
  * VOID
  * IoReleaseRemoveLock(
- *   IN PIO_REMOVE_LOCK  RemoveLock,
- *   IN PVOID  Tag)
+ * IN PIO_REMOVE_LOCK  RemoveLock,
+ * IN PVOID  Tag)
  */
 #define IoReleaseRemoveLock(_RemoveLock, \
                                    _Tag) \
@@ -6782,76 +6787,76 @@ NTOSAPI
 VOID
 DDKAPI
 IoRemoveShareAccess(
-  IN PFILE_OBJECT  FileObject,
-  IN OUT PSHARE_ACCESS  ShareAccess);
+  /*IN*/ PFILE_OBJECT  FileObject,
+  /*IN OUT*/ PSHARE_ACCESS  ShareAccess);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoReportDetectedDevice(
-  IN PDRIVER_OBJECT  DriverObject,
-  IN INTERFACE_TYPE  LegacyBusType,
-  IN ULONG  BusNumber,
-  IN ULONG  SlotNumber,
-  IN PCM_RESOURCE_LIST  ResourceList,
-  IN PIO_RESOURCE_REQUIREMENTS_LIST  ResourceRequirements  OPTIONAL,
-  IN BOOLEAN  ResourceAssigned,
-  IN OUT PDEVICE_OBJECT  *DeviceObject);
+  /*IN*/ PDRIVER_OBJECT  DriverObject,
+  /*IN*/ INTERFACE_TYPE  LegacyBusType,
+  /*IN*/ ULONG  BusNumber,
+  /*IN*/ ULONG  SlotNumber,
+  /*IN*/ PCM_RESOURCE_LIST  ResourceList,
+  /*IN*/ PIO_RESOURCE_REQUIREMENTS_LIST  ResourceRequirements  /*OPTIONAL*/,
+  /*IN*/ BOOLEAN  ResourceAssigned,
+  /*IN OUT*/ PDEVICE_OBJECT  *DeviceObject);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoReportResourceForDetection(
-  IN PDRIVER_OBJECT  DriverObject,
-  IN PCM_RESOURCE_LIST  DriverList  OPTIONAL,
-  IN ULONG  DriverListSize  OPTIONAL,
-  IN PDEVICE_OBJECT  DeviceObject  OPTIONAL,
-  IN PCM_RESOURCE_LIST  DeviceList  OPTIONAL,
-  IN ULONG  DeviceListSize  OPTIONAL,
-  OUT PBOOLEAN  ConflictDetected);
+  /*IN*/ PDRIVER_OBJECT  DriverObject,
+  /*IN*/ PCM_RESOURCE_LIST  DriverList  /*OPTIONAL*/,
+  /*IN*/ ULONG  DriverListSize  /*OPTIONAL*/,
+  /*IN*/ PDEVICE_OBJECT  DeviceObject  /*OPTIONAL*/,
+  /*IN*/ PCM_RESOURCE_LIST  DeviceList  /*OPTIONAL*/,
+  /*IN*/ ULONG  DeviceListSize  /*OPTIONAL*/,
+  /*OUT*/ PBOOLEAN  ConflictDetected);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoReportResourceUsage(
-  IN PUNICODE_STRING  DriverClassName  OPTIONAL,
-  IN PDRIVER_OBJECT  DriverObject,
-  IN PCM_RESOURCE_LIST  DriverList  OPTIONAL,
-  IN ULONG  DriverListSize  OPTIONAL,
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN PCM_RESOURCE_LIST  DeviceList  OPTIONAL,
-  IN ULONG  DeviceListSize  OPTIONAL,
-  IN BOOLEAN  OverrideConflict,
-  OUT PBOOLEAN  ConflictDetected);
+  /*IN*/ PUNICODE_STRING  DriverClassName  /*OPTIONAL*/,
+  /*IN*/ PDRIVER_OBJECT  DriverObject,
+  /*IN*/ PCM_RESOURCE_LIST  DriverList  /*OPTIONAL*/,
+  /*IN*/ ULONG  DriverListSize  /*OPTIONAL*/,
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ PCM_RESOURCE_LIST  DeviceList  /*OPTIONAL*/,
+  /*IN*/ ULONG  DeviceListSize  /*OPTIONAL*/,
+  /*IN*/ BOOLEAN  OverrideConflict,
+  /*OUT*/ PBOOLEAN  ConflictDetected);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoReportTargetDeviceChange(
-  IN PDEVICE_OBJECT  PhysicalDeviceObject,
-  IN PVOID  NotificationStructure);
+  /*IN*/ PDEVICE_OBJECT  PhysicalDeviceObject,
+  /*IN*/ PVOID  NotificationStructure);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoReportTargetDeviceChangeAsynchronous(
-  IN PDEVICE_OBJECT  PhysicalDeviceObject,
-  IN PVOID  NotificationStructure,
-  IN PDEVICE_CHANGE_COMPLETE_CALLBACK  Callback  OPTIONAL,
-  IN PVOID  Context  OPTIONAL);
+  /*IN*/ PDEVICE_OBJECT  PhysicalDeviceObject,
+  /*IN*/ PVOID  NotificationStructure,
+  /*IN*/ PDEVICE_CHANGE_COMPLETE_CALLBACK  Callback  /*OPTIONAL*/,
+  /*IN*/ PVOID  Context  /*OPTIONAL*/);
 
 NTOSAPI
 VOID
 DDKAPI
 IoRequestDeviceEject(
-  IN PDEVICE_OBJECT  PhysicalDeviceObject);
+  /*IN*/ PDEVICE_OBJECT  PhysicalDeviceObject);
 
 /*
  * VOID
  * IoRequestDpc(
- *   IN PDEVICE_OBJECT  DeviceObject,
- *   IN PIRP  Irp,
- *   IN PVOID  Context);
+ * IN PDEVICE_OBJECT  DeviceObject,
+ * IN PIRP  Irp,
+ * IN PVOID  Context);
  */
 #define IoRequestDpc(DeviceObject, Irp, Context)( \
   KeInsertQueueDpc(&(DeviceObject)->Dpc, (Irp), (Context)))
@@ -6860,14 +6865,14 @@ NTOSAPI
 VOID
 DDKAPI
 IoReuseIrp(
-  IN OUT PIRP  Irp,
-  IN NTSTATUS  Status);
+  /*IN OUT*/ PIRP  Irp,
+  /*IN*/ NTSTATUS  Status);
 
 /*
  * PDRIVER_CANCEL
  * IoSetCancelRoutine(
- *   IN PIRP  Irp,
- *   IN PDRIVER_CANCEL  CancelRoutine)
+ * IN PIRP  Irp,
+ * IN PDRIVER_CANCEL  CancelRoutine)
  */
 #define IoSetCancelRoutine(_Irp, \
                            _CancelRoutine) \
@@ -6877,12 +6882,12 @@ IoReuseIrp(
 /*
  * VOID
  * IoSetCompletionRoutine(
- *   IN PIRP  Irp,
- *   IN PIO_COMPLETION_ROUTINE  CompletionRoutine,
- *   IN PVOID  Context,
- *   IN BOOLEAN  InvokeOnSuccess,
- *   IN BOOLEAN  InvokeOnError,
- *   IN BOOLEAN  InvokeOnCancel)
+ * IN PIRP  Irp,
+ * IN PIO_COMPLETION_ROUTINE  CompletionRoutine,
+ * IN PVOID  Context,
+ * IN BOOLEAN  InvokeOnSuccess,
+ * IN BOOLEAN  InvokeOnError,
+ * IN BOOLEAN  InvokeOnCancel)
  */
 #define IoSetCompletionRoutine(_Irp, \
                                _CompletionRoutine, \
@@ -6907,32 +6912,32 @@ NTOSAPI
 VOID
 DDKAPI
 IoSetCompletionRoutineEx(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN PIRP  Irp,
-  IN PIO_COMPLETION_ROUTINE  CompletionRoutine,
-  IN PVOID  Context,
-  IN BOOLEAN    InvokeOnSuccess,
-  IN BOOLEAN  InvokeOnError,
-  IN BOOLEAN  InvokeOnCancel);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ PIRP  Irp,
+  /*IN*/ PIO_COMPLETION_ROUTINE  CompletionRoutine,
+  /*IN*/ PVOID  Context,
+  /*IN*/ BOOLEAN    InvokeOnSuccess,
+  /*IN*/ BOOLEAN  InvokeOnError,
+  /*IN*/ BOOLEAN  InvokeOnCancel);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoSetDeviceInterfaceState(
-  IN PUNICODE_STRING  SymbolicLinkName,
-  IN BOOLEAN  Enable);
+  /*IN*/ PUNICODE_STRING  SymbolicLinkName,
+  /*IN*/ BOOLEAN  Enable);
 
 NTOSAPI
 VOID
 DDKAPI
 IoSetHardErrorOrVerifyDevice(
-  IN PIRP  Irp,
-  IN PDEVICE_OBJECT  DeviceObject);
+  /*IN*/ PIRP  Irp,
+  /*IN*/ PDEVICE_OBJECT  DeviceObject);
 
 /*
  * VOID
  * IoSetNextIrpStackLocation(
- *   IN OUT PIRP  Irp)
+ * IN OUT PIRP  Irp)
  */
 #define IoSetNextIrpStackLocation(_Irp) \
 { \
@@ -6944,43 +6949,43 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 IoSetPartitionInformationEx(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN ULONG  PartitionNumber,
-  IN struct _SET_PARTITION_INFORMATION_EX  *PartitionInfo);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ ULONG  PartitionNumber,
+  /*IN*/ struct _SET_PARTITION_INFORMATION_EX  *PartitionInfo);
 
 NTOSAPI
 VOID
 DDKAPI
 IoSetShareAccess(
-  IN ACCESS_MASK  DesiredAccess,
-  IN ULONG  DesiredShareAccess,
-  IN OUT PFILE_OBJECT  FileObject,
-  OUT PSHARE_ACCESS  ShareAccess);
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ ULONG  DesiredShareAccess,
+  /*IN OUT*/ PFILE_OBJECT  FileObject,
+  /*OUT*/ PSHARE_ACCESS  ShareAccess);
 
 NTOSAPI
 VOID
 DDKAPI
 IoSetStartIoAttributes(
-  IN PDEVICE_OBJECT  DeviceObject, 
-  IN BOOLEAN  DeferredStartIo, 
-  IN BOOLEAN  NonCancelable); 
+  /*IN*/ PDEVICE_OBJECT  DeviceObject, 
+  /*IN*/ BOOLEAN  DeferredStartIo, 
+  /*IN*/ BOOLEAN  NonCancelable); 
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoSetSystemPartition(
-  IN PUNICODE_STRING  VolumeNameString);
+  /*IN*/ PUNICODE_STRING  VolumeNameString);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 IoSetThreadHardErrorMode(
-  IN BOOLEAN  EnableHardErrors);
+  /*IN*/ BOOLEAN  EnableHardErrors);
 
 /*
  * USHORT
  * IoSizeOfIrp(
- *   IN CCHAR  StackSize)
+ * IN CCHAR  StackSize)
  */
 #define IoSizeOfIrp(_StackSize) \
   ((USHORT) (sizeof(IRP) + ((_StackSize) * (sizeof(IO_STACK_LOCATION)))))
@@ -6988,7 +6993,7 @@ IoSetThreadHardErrorMode(
 /*
  * VOID
  * IoSkipCurrentIrpStackLocation(
- *   IN PIRP  Irp)
+ * IN PIRP  Irp)
  */
 #define IoSkipCurrentIrpStackLocation(_Irp) \
 { \
@@ -7000,219 +7005,219 @@ NTOSAPI
 VOID
 DDKAPI
 IoStartNextPacket(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN BOOLEAN  Cancelable);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ BOOLEAN  Cancelable);
 
 NTOSAPI
 VOID
 DDKAPI
 IoStartNextPacketByKey(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN BOOLEAN  Cancelable,
-  IN ULONG  Key);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ BOOLEAN  Cancelable,
+  /*IN*/ ULONG  Key);
 
 NTOSAPI
 VOID
 DDKAPI
 IoStartPacket(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN PIRP  Irp,
-  IN PULONG  Key  OPTIONAL,
-  IN PDRIVER_CANCEL  CancelFunction  OPTIONAL);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ PIRP  Irp,
+  /*IN*/ PULONG  Key  /*OPTIONAL*/,
+  /*IN*/ PDRIVER_CANCEL  CancelFunction  /*OPTIONAL*/);
 
 NTOSAPI
 VOID
 DDKAPI
 IoStartTimer(
-  IN PDEVICE_OBJECT  DeviceObject);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject);
 
 NTOSAPI
 VOID
 DDKAPI
 IoStopTimer(
-  IN PDEVICE_OBJECT  DeviceObject);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoUnregisterPlugPlayNotification(
-  IN PVOID  NotificationEntry);
+  /*IN*/ PVOID  NotificationEntry);
 
 NTOSAPI
 VOID
 DDKAPI
 IoUnregisterShutdownNotification(
-  IN PDEVICE_OBJECT  DeviceObject);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject);
 
 NTOSAPI
 VOID
 DDKAPI
 IoUpdateShareAccess(
-  IN PFILE_OBJECT  FileObject,
-  IN OUT PSHARE_ACCESS  ShareAccess);
+  /*IN*/ PFILE_OBJECT  FileObject,
+  /*IN OUT*/ PSHARE_ACCESS  ShareAccess);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoVerifyPartitionTable(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN BOOLEAN  FixErrors);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ BOOLEAN  FixErrors);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoVolumeDeviceToDosName(
-  IN  PVOID  VolumeDeviceObject,
-  OUT PUNICODE_STRING  DosName);
+  /*IN*/ PVOID  VolumeDeviceObject,
+  /*OUT*/ PUNICODE_STRING  DosName);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoWMIAllocateInstanceIds(
-  IN GUID  *Guid,
-  IN ULONG  InstanceCount,
-  OUT ULONG  *FirstInstanceId);
+  /*IN*/ GUID  *Guid,
+  /*IN*/ ULONG  InstanceCount,
+  /*OUT*/ ULONG  *FirstInstanceId);
 
 NTOSAPI
 ULONG
 DDKAPI
 IoWMIDeviceObjectToProviderId(
-  IN PDEVICE_OBJECT  DeviceObject);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoWMIDeviceObjectToInstanceName(
-  IN PVOID  DataBlockObject,
-  IN PDEVICE_OBJECT  DeviceObject,
-  OUT PUNICODE_STRING  InstanceName);
+  /*IN*/ PVOID  DataBlockObject,
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*OUT*/ PUNICODE_STRING  InstanceName);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoWMIExecuteMethod(
-  IN PVOID  DataBlockObject,
-  IN PUNICODE_STRING  InstanceName,
-  IN ULONG  MethodId,
-  IN ULONG  InBufferSize,
-  IN OUT PULONG  OutBufferSize,
-  IN OUT  PUCHAR  InOutBuffer);
+  /*IN*/ PVOID  DataBlockObject,
+  /*IN*/ PUNICODE_STRING  InstanceName,
+  /*IN*/ ULONG  MethodId,
+  /*IN*/ ULONG  InBufferSize,
+  /*IN OUT*/ PULONG  OutBufferSize,
+  /*IN OUT*/  PUCHAR  InOutBuffer);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoWMIHandleToInstanceName(
-  IN PVOID  DataBlockObject,
-  IN HANDLE  FileHandle,
-  OUT PUNICODE_STRING  InstanceName);
+  /*IN*/ PVOID  DataBlockObject,
+  /*IN*/ HANDLE  FileHandle,
+  /*OUT*/ PUNICODE_STRING  InstanceName);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoWMIOpenBlock(
-  IN GUID  *DataBlockGuid,
-  IN ULONG  DesiredAccess,
-  OUT PVOID  *DataBlockObject);
+  /*IN*/ GUID  *DataBlockGuid,
+  /*IN*/ ULONG  DesiredAccess,
+  /*OUT*/ PVOID  *DataBlockObject);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoWMIQueryAllData(
-  IN PVOID  DataBlockObject,
-  IN OUT ULONG  *InOutBufferSize,
-  OUT PVOID  OutBuffer);
+  /*IN*/ PVOID  DataBlockObject,
+  /*IN OUT*/ ULONG  *InOutBufferSize,
+  /*OUT*/ PVOID  OutBuffer);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoWMIQueryAllDataMultiple(
-  IN PVOID  *DataBlockObjectList,
-  IN ULONG  ObjectCount,
-  IN OUT ULONG  *InOutBufferSize,
-  OUT PVOID  OutBuffer);
+  /*IN*/ PVOID  *DataBlockObjectList,
+  /*IN*/ ULONG  ObjectCount,
+  /*IN OUT*/ ULONG  *InOutBufferSize,
+  /*OUT*/ PVOID  OutBuffer);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoWMIQuerySingleInstance(
-  IN PVOID  DataBlockObject,
-  IN PUNICODE_STRING  InstanceName,
-  IN OUT ULONG  *InOutBufferSize,
-  OUT PVOID OutBuffer);
+  /*IN*/ PVOID  DataBlockObject,
+  /*IN*/ PUNICODE_STRING  InstanceName,
+  /*IN OUT*/ ULONG  *InOutBufferSize,
+  /*OUT*/ PVOID OutBuffer);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoWMIQuerySingleInstanceMultiple(
-  IN PVOID  *DataBlockObjectList,
-  IN PUNICODE_STRING  InstanceNames,
-  IN ULONG  ObjectCount,
-  IN OUT ULONG  *InOutBufferSize,
-  OUT PVOID  OutBuffer);
+  /*IN*/ PVOID  *DataBlockObjectList,
+  /*IN*/ PUNICODE_STRING  InstanceNames,
+  /*IN*/ ULONG  ObjectCount,
+  /*IN OUT*/ ULONG  *InOutBufferSize,
+  /*OUT*/ PVOID  OutBuffer);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoWMIRegistrationControl(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN ULONG  Action);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ ULONG  Action);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoWMISetNotificationCallback(
-  IN PVOID  Object,
-  IN WMI_NOTIFICATION_CALLBACK  Callback,
-  IN PVOID  Context);
+  /*IN*/ PVOID  Object,
+  /*IN*/ WMI_NOTIFICATION_CALLBACK  Callback,
+  /*IN*/ PVOID  Context);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoWMISetSingleInstance(
-  IN PVOID  DataBlockObject,
-  IN PUNICODE_STRING  InstanceName,
-  IN ULONG  Version,
-  IN ULONG  ValueBufferSize,
-  IN PVOID  ValueBuffer);
+  /*IN*/ PVOID  DataBlockObject,
+  /*IN*/ PUNICODE_STRING  InstanceName,
+  /*IN*/ ULONG  Version,
+  /*IN*/ ULONG  ValueBufferSize,
+  /*IN*/ PVOID  ValueBuffer);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoWMISetSingleItem(
-  IN PVOID  DataBlockObject,
-  IN PUNICODE_STRING  InstanceName,
-  IN ULONG  DataItemId,
-  IN ULONG  Version,
-  IN ULONG  ValueBufferSize,
-  IN PVOID  ValueBuffer);
+  /*IN*/ PVOID  DataBlockObject,
+  /*IN*/ PUNICODE_STRING  InstanceName,
+  /*IN*/ ULONG  DataItemId,
+  /*IN*/ ULONG  Version,
+  /*IN*/ ULONG  ValueBufferSize,
+  /*IN*/ PVOID  ValueBuffer);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoWMISuggestInstanceName(
-  IN PDEVICE_OBJECT  PhysicalDeviceObject OPTIONAL,
-  IN PUNICODE_STRING  SymbolicLinkName OPTIONAL,
-  IN BOOLEAN  CombineNames,
-  OUT PUNICODE_STRING  SuggestedInstanceName);
+  /*IN*/ PDEVICE_OBJECT  PhysicalDeviceObject /*OPTIONAL*/,
+  /*IN*/ PUNICODE_STRING  SymbolicLinkName /*OPTIONAL*/,
+  /*IN*/ BOOLEAN  CombineNames,
+  /*OUT*/ PUNICODE_STRING  SuggestedInstanceName);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoWMIWriteEvent(
-  IN PVOID  WnodeEventItem);
+  /*IN*/ PVOID  WnodeEventItem);
 
 NTOSAPI
 VOID
 DDKAPI
 IoWriteErrorLogEntry(
-  IN PVOID  ElEntry);
+  /*IN*/ PVOID  ElEntry);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoWritePartitionTableEx(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN struct _DRIVE_LAYOUT_INFORMATION_EX  *PartitionBuffer);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ struct _DRIVE_LAYOUT_INFORMATION_EX  *PartitionBuffer);
 
 
 
@@ -7222,28 +7227,28 @@ NTOSAPI
 VOID
 DDKFASTAPI
 KeAcquireInStackQueuedSpinLock(
-  IN PKSPIN_LOCK  SpinLock,
-  IN PKLOCK_QUEUE_HANDLE  LockHandle);
+  /*IN*/ PKSPIN_LOCK  SpinLock,
+  /*IN*/ PKLOCK_QUEUE_HANDLE  LockHandle);
 
 NTOSAPI
 VOID
 DDKFASTAPI
 KeAcquireInStackQueuedSpinLockAtDpcLevel(
-  IN PKSPIN_LOCK  SpinLock,
-  IN PKLOCK_QUEUE_HANDLE  LockHandle);
+  /*IN*/ PKSPIN_LOCK  SpinLock,
+  /*IN*/ PKLOCK_QUEUE_HANDLE  LockHandle);
 
 NTOSAPI
 KIRQL
 DDKAPI
 KeAcquireInterruptSpinLock(
-  IN PKINTERRUPT  Interrupt);
+  /*IN*/ PKINTERRUPT  Interrupt);
 
 NTOSAPI
 VOID
 DDKAPI
 KeAcquireSpinLock(
-  IN PKSPIN_LOCK  SpinLock,
-  OUT PKIRQL  OldIrql);
+  /*IN*/ PKSPIN_LOCK  SpinLock,
+  /*OUT*/ PKIRQL  OldIrql);
 
 /* System Service Dispatch Table */
 typedef PVOID (NTAPI * SSDT)(VOID);
@@ -7263,11 +7268,11 @@ NTOSAPI
 BOOLEAN
 DDKAPI
 KeAddSystemServiceTable(
-  IN PSSDT  SSDT,
-  IN PULONG  ServiceCounterTable,
-  IN ULONG  NumberOfServices,
-  IN PSSPT  SSPT,
-  IN ULONG  TableIndex);
+  /*IN*/ PSSDT  SSDT,
+  /*IN*/ PULONG  ServiceCounterTable,
+  /*IN*/ ULONG  NumberOfServices,
+  /*IN*/ PSSPT  SSPT,
+  /*IN*/ ULONG  TableIndex);
 
 NTOSAPI
 BOOLEAN
@@ -7279,49 +7284,49 @@ NTOSAPI
 VOID
 DDKAPI
 KeAttachProcess(
-  IN PEPROCESS  Process);
+  /*IN*/ PEPROCESS  Process);
 
 NTOSAPI
 VOID
 DDKAPI
 KeBugCheck(
-  IN ULONG  BugCheckCode);
+  /*IN*/ ULONG  BugCheckCode);
 
 NTOSAPI
 VOID
 DDKAPI
 KeBugCheckEx(
-  IN ULONG  BugCheckCode,
-  IN ULONG_PTR  BugCheckParameter1,
-  IN ULONG_PTR  BugCheckParameter2,
-  IN ULONG_PTR  BugCheckParameter3,
-  IN ULONG_PTR  BugCheckParameter4);
+  /*IN*/ ULONG  BugCheckCode,
+  /*IN*/ ULONG_PTR  BugCheckParameter1,
+  /*IN*/ ULONG_PTR  BugCheckParameter2,
+  /*IN*/ ULONG_PTR  BugCheckParameter3,
+  /*IN*/ ULONG_PTR  BugCheckParameter4);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 KeCancelTimer(
-  IN PKTIMER  Timer);
+  /*IN*/ PKTIMER  Timer);
 
 NTOSAPI
 VOID
 DDKAPI
 KeClearEvent(
-  IN PRKEVENT  Event);
+  /*IN*/ PRKEVENT  Event);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 KeDelayExecutionThread(
-  IN KPROCESSOR_MODE  WaitMode,
-  IN BOOLEAN  Alertable,
-  IN PLARGE_INTEGER  Interval);
+  /*IN*/ KPROCESSOR_MODE  WaitMode,
+  /*IN*/ BOOLEAN  Alertable,
+  /*IN*/ PLARGE_INTEGER  Interval);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 KeDeregisterBugCheckCallback(
-  IN PKBUGCHECK_CALLBACK_RECORD  CallbackRecord);
+  /*IN*/ PKBUGCHECK_CALLBACK_RECORD  CallbackRecord);
 
 NTOSAPI
 VOID
@@ -7338,9 +7343,9 @@ KeEnterCriticalRegion(
 /*
  * VOID
  * KeFlushIoBuffers(
- *   IN PMDL  Mdl,
- *   IN BOOLEAN  ReadOperation,
- *   IN BOOLEAN  DmaOperation)
+ * IN PMDL  Mdl,
+ * IN BOOLEAN  ReadOperation,
+ * IN BOOLEAN  DmaOperation)
  */
 #define KeFlushIoBuffers(_Mdl, _ReadOperation, _DmaOperation)
 
@@ -7366,77 +7371,77 @@ NTOSAPI
 VOID
 DDKAPI
 KeInitializeApc(
-  IN PKAPC  Apc,
-	IN PKTHREAD  Thread,
-	IN UCHAR  StateIndex,
-	IN PKKERNEL_ROUTINE  KernelRoutine,
-	IN PKRUNDOWN_ROUTINE  RundownRoutine,
-	IN PKNORMAL_ROUTINE  NormalRoutine,
-	IN UCHAR  Mode,
-	IN PVOID  Context);
+  /*IN*/ PKAPC  Apc,
+  /*IN*/ PKTHREAD  Thread,
+  /*IN*/ UCHAR  StateIndex,
+  /*IN*/ PKKERNEL_ROUTINE  KernelRoutine,
+  /*IN*/ PKRUNDOWN_ROUTINE  RundownRoutine,
+  /*IN*/ PKNORMAL_ROUTINE  NormalRoutine,
+  /*IN*/ UCHAR  Mode,
+  /*IN*/ PVOID  Context);
 
 NTOSAPI
 VOID
 DDKAPI
 KeInitializeDeviceQueue(
-  IN PKDEVICE_QUEUE  DeviceQueue);
+  /*IN*/ PKDEVICE_QUEUE  DeviceQueue);
 
 NTOSAPI
 VOID
 DDKAPI
 KeInitializeMutex(
-  IN PRKMUTEX  Mutex,
-  IN ULONG  Level);
+  /*IN*/ PRKMUTEX  Mutex,
+  /*IN*/ ULONG  Level);
 
 NTOSAPI
 VOID
 DDKAPI
 KeInitializeSemaphore(
-  IN PRKSEMAPHORE  Semaphore,
-  IN LONG  Count,
-  IN LONG  Limit);
+  /*IN*/ PRKSEMAPHORE  Semaphore,
+  /*IN*/ LONG  Count,
+  /*IN*/ LONG  Limit);
 
 NTOSAPI
 VOID
 DDKAPI
 KeInitializeSpinLock(
-  IN PKSPIN_LOCK  SpinLock);
+  /*IN*/ PKSPIN_LOCK  SpinLock);
 
 NTOSAPI
 VOID
 DDKAPI
 KeInitializeTimer(
-  IN PKTIMER  Timer);
+  /*IN*/ PKTIMER  Timer);
 
 NTOSAPI
 VOID
 DDKAPI
 KeInitializeTimerEx(
-  IN PKTIMER  Timer,
-  IN TIMER_TYPE  Type);
+  /*IN*/ PKTIMER  Timer,
+  /*IN*/ TIMER_TYPE  Type);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 KeInsertByKeyDeviceQueue(
-  IN PKDEVICE_QUEUE  DeviceQueue,
-  IN PKDEVICE_QUEUE_ENTRY  DeviceQueueEntry,
-  IN ULONG  SortKey);
+  /*IN*/ PKDEVICE_QUEUE  DeviceQueue,
+  /*IN*/ PKDEVICE_QUEUE_ENTRY  DeviceQueueEntry,
+  /*IN*/ ULONG  SortKey);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 KeInsertDeviceQueue(
-  IN PKDEVICE_QUEUE  DeviceQueue,
-  IN PKDEVICE_QUEUE_ENTRY  DeviceQueueEntry);
+  /*IN*/ PKDEVICE_QUEUE  DeviceQueue,
+  /*IN*/ PKDEVICE_QUEUE_ENTRY  DeviceQueueEntry);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 KeInsertQueueDpc(
-  IN PRKDPC  Dpc,
-  IN PVOID  SystemArgument1,
-  IN PVOID  SystemArgument2);
+  /*IN*/ PRKDPC  Dpc,
+  /*IN*/ PVOID  SystemArgument1,
+  /*IN*/ PVOID  SystemArgument2);
 
 NTOSAPI
 VOID
@@ -7448,9 +7453,9 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 KePulseEvent(
-  IN PRKEVENT  Event,
-  IN KPRIORITY  Increment,
-  IN BOOLEAN  Wait);
+  /*IN*/ PRKEVENT  Event,
+  /*IN*/ KPRIORITY  Increment,
+  /*IN*/ BOOLEAN  Wait);
 
 NTOSAPI
 ULONGLONG
@@ -7462,25 +7467,25 @@ NTOSAPI
 LARGE_INTEGER
 DDKAPI
 KeQueryPerformanceCounter(
-  OUT PLARGE_INTEGER  PerformanceFrequency  OPTIONAL);
+  /*OUT*/ PLARGE_INTEGER  PerformanceFrequency  /*OPTIONAL*/);
 
 NTOSAPI
 KPRIORITY
 DDKAPI
 KeQueryPriorityThread(
-  IN PRKTHREAD  Thread);
+  /*IN*/ PRKTHREAD  Thread);
 
 NTOSAPI
 VOID
 DDKAPI
 KeQuerySystemTime(
-  OUT PLARGE_INTEGER  CurrentTime);
+  /*OUT*/ PLARGE_INTEGER  CurrentTime);
 
 NTOSAPI
 VOID
 DDKAPI
 KeQueryTickCount(
-  OUT PLARGE_INTEGER  TickCount);
+  /*OUT*/ PLARGE_INTEGER  TickCount);
 
 NTOSAPI
 ULONG
@@ -7492,227 +7497,227 @@ NTOSAPI
 LONG
 DDKAPI
 KeReadStateEvent(
-  IN PRKEVENT  Event);
+  /*IN*/ PRKEVENT  Event);
 
 NTOSAPI
 LONG
 DDKAPI
 KeReadStateMutex(
-  IN PRKMUTEX  Mutex);
+  /*IN*/ PRKMUTEX  Mutex);
 
 NTOSAPI
 LONG
 DDKAPI
 KeReadStateSemaphore(
-  IN PRKSEMAPHORE  Semaphore);
+  /*IN*/ PRKSEMAPHORE  Semaphore);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 KeReadStateTimer(
-  IN PKTIMER  Timer);
+  /*IN*/ PKTIMER  Timer);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 KeRegisterBugCheckCallback(
-  IN PKBUGCHECK_CALLBACK_RECORD  CallbackRecord,
-  IN PKBUGCHECK_CALLBACK_ROUTINE  CallbackRoutine,
-  IN PVOID  Buffer,
-  IN ULONG  Length,
-  IN PUCHAR  Component);
+  /*IN*/ PKBUGCHECK_CALLBACK_RECORD  CallbackRecord,
+  /*IN*/ PKBUGCHECK_CALLBACK_ROUTINE  CallbackRoutine,
+  /*IN*/ PVOID  Buffer,
+  /*IN*/ ULONG  Length,
+  /*IN*/ PUCHAR  Component);
 
 NTOSAPI
 VOID
 DDKFASTAPI
 KeReleaseInStackQueuedSpinLock(
-  IN PKLOCK_QUEUE_HANDLE  LockHandle);
+  /*IN*/ PKLOCK_QUEUE_HANDLE  LockHandle);
 
 NTOSAPI
 VOID
 DDKFASTAPI
 KeReleaseInStackQueuedSpinLockFromDpcLevel(
-  IN PKLOCK_QUEUE_HANDLE  LockHandle);
+  /*IN*/ PKLOCK_QUEUE_HANDLE  LockHandle);
 
 NTOSAPI
 VOID
 DDKAPI
 KeReleaseInterruptSpinLock(
-  IN PKINTERRUPT  Interrupt,
-  IN KIRQL  OldIrql);
+  /*IN*/ PKINTERRUPT  Interrupt,
+  /*IN*/ KIRQL  OldIrql);
 
 NTOSAPI
 LONG
 DDKAPI
 KeReleaseMutex(
-  IN PRKMUTEX  Mutex,
-  IN BOOLEAN  Wait);
+  /*IN*/ PRKMUTEX  Mutex,
+  /*IN*/ BOOLEAN  Wait);
 
 NTOSAPI
 LONG
 DDKAPI
 KeReleaseSemaphore(
-  IN PRKSEMAPHORE  Semaphore,
-  IN KPRIORITY  Increment,
-  IN LONG  Adjustment,
-  IN BOOLEAN  Wait);
+  /*IN*/ PRKSEMAPHORE  Semaphore,
+  /*IN*/ KPRIORITY  Increment,
+  /*IN*/ LONG  Adjustment,
+  /*IN*/ BOOLEAN  Wait);
 
 NTOSAPI
 VOID
 DDKAPI
 KeReleaseSpinLock(
-  IN PKSPIN_LOCK  SpinLock,
-  IN KIRQL  NewIrql);
+  /*IN*/ PKSPIN_LOCK  SpinLock,
+  /*IN*/ KIRQL  NewIrql);
 
 NTOSAPI
 PKDEVICE_QUEUE_ENTRY
 DDKAPI 
 KeRemoveByKeyDeviceQueue(
-  IN PKDEVICE_QUEUE  DeviceQueue,
-  IN ULONG  SortKey);
+  /*IN*/ PKDEVICE_QUEUE  DeviceQueue,
+  /*IN*/ ULONG  SortKey);
 
 NTOSAPI
 PKDEVICE_QUEUE_ENTRY
 DDKAPI
 KeRemoveDeviceQueue(
-  IN PKDEVICE_QUEUE  DeviceQueue);
+  /*IN*/ PKDEVICE_QUEUE  DeviceQueue);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 KeRemoveEntryDeviceQueue(
-  IN PKDEVICE_QUEUE  DeviceQueue,
-  IN PKDEVICE_QUEUE_ENTRY  DeviceQueueEntry);
+  /*IN*/ PKDEVICE_QUEUE  DeviceQueue,
+  /*IN*/ PKDEVICE_QUEUE_ENTRY  DeviceQueueEntry);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 KeRemoveQueueDpc(
-  IN PRKDPC  Dpc);
+  /*IN*/ PRKDPC  Dpc);
 
 NTOSAPI
 LONG
 DDKAPI
 KeResetEvent(
-  IN PRKEVENT  Event);
+  /*IN*/ PRKEVENT  Event);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 KeRestoreFloatingPointState(
-  IN PKFLOATING_SAVE  FloatSave);
+  /*IN*/ PKFLOATING_SAVE  FloatSave);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 KeSaveFloatingPointState(
-  OUT PKFLOATING_SAVE  FloatSave);
+  /*OUT*/ PKFLOATING_SAVE  FloatSave);
 
 NTOSAPI
 LONG
 DDKAPI
 KeSetBasePriorityThread(
-  IN PRKTHREAD  Thread,
-  IN LONG  Increment);
+  /*IN*/ PRKTHREAD  Thread,
+  /*IN*/ LONG  Increment);
 
 NTOSAPI
 LONG
 DDKAPI
 KeSetEvent(
-  IN PRKEVENT  Event,
-  IN KPRIORITY  Increment,
-  IN BOOLEAN  Wait);
+  /*IN*/ PRKEVENT  Event,
+  /*IN*/ KPRIORITY  Increment,
+  /*IN*/ BOOLEAN  Wait);
 
 NTOSAPI
 VOID
 DDKAPI
 KeSetImportanceDpc(
-  IN PRKDPC  Dpc,
-  IN KDPC_IMPORTANCE  Importance);
+  /*IN*/ PRKDPC  Dpc,
+  /*IN*/ KDPC_IMPORTANCE  Importance);
 
 NTOSAPI
 KPRIORITY
 DDKAPI
 KeSetPriorityThread(
-  IN PKTHREAD  Thread,
-  IN KPRIORITY  Priority);
+  /*IN*/ PKTHREAD  Thread,
+  /*IN*/ KPRIORITY  Priority);
 
 NTOSAPI
 VOID
 DDKAPI
 KeSetTargetProcessorDpc(
-  IN PRKDPC  Dpc,
-  IN CCHAR  Number);
+  /*IN*/ PRKDPC  Dpc,
+  /*IN*/ CCHAR  Number);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 KeSetTimer(
-  IN PKTIMER  Timer,
-  IN LARGE_INTEGER  DueTime,
-  IN PKDPC  Dpc  OPTIONAL);
+  /*IN*/ PKTIMER  Timer,
+  /*IN*/ LARGE_INTEGER  DueTime,
+  /*IN*/ PKDPC  Dpc  /*OPTIONAL*/);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 KeSetTimerEx(
-  IN PKTIMER  Timer,
-  IN LARGE_INTEGER  DueTime,
-  IN LONG  Period  OPTIONAL,
-  IN PKDPC  Dpc  OPTIONAL);
+  /*IN*/ PKTIMER  Timer,
+  /*IN*/ LARGE_INTEGER  DueTime,
+  /*IN*/ LONG  Period  /*OPTIONAL*/,
+  /*IN*/ PKDPC  Dpc  /*OPTIONAL*/);
 
 NTOSAPI
 VOID
 DDKFASTAPI
 KeSetTimeUpdateNotifyRoutine(
-  IN PTIME_UPDATE_NOTIFY_ROUTINE  NotifyRoutine);
+  /*IN*/ PTIME_UPDATE_NOTIFY_ROUTINE  NotifyRoutine);
 
 NTOSAPI
 VOID
 DDKAPI
 KeStallExecutionProcessor(
-  IN ULONG  MicroSeconds);
+  /*IN*/ ULONG  MicroSeconds);
 
 NTOSAPI
 BOOLEAN
 DDKAPI
 KeSynchronizeExecution(
-  IN PKINTERRUPT    Interrupt,
-  IN PKSYNCHRONIZE_ROUTINE  SynchronizeRoutine,
-  IN PVOID  SynchronizeContext);
+  /*IN*/ PKINTERRUPT    Interrupt,
+  /*IN*/ PKSYNCHRONIZE_ROUTINE  SynchronizeRoutine,
+  /*IN*/ PVOID  SynchronizeContext);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 KeWaitForMultipleObjects(
-  IN ULONG  Count,
-  IN PVOID  Object[],
-  IN WAIT_TYPE  WaitType,
-  IN KWAIT_REASON  WaitReason,
-  IN KPROCESSOR_MODE  WaitMode,
-  IN BOOLEAN  Alertable,
-  IN PLARGE_INTEGER  Timeout  OPTIONAL,
-  IN PKWAIT_BLOCK  WaitBlockArray  OPTIONAL);
+  /*IN*/ ULONG  Count,
+  /*IN*/ PVOID  Object[],
+  /*IN*/ WAIT_TYPE  WaitType,
+  /*IN*/ KWAIT_REASON  WaitReason,
+  /*IN*/ KPROCESSOR_MODE  WaitMode,
+  /*IN*/ BOOLEAN  Alertable,
+  /*IN*/ PLARGE_INTEGER  Timeout  /*OPTIONAL */,
+  /*IN*/ PKWAIT_BLOCK  WaitBlockArray  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 KeWaitForMutexObject(
-  IN PRKMUTEX  Mutex,
-  IN KWAIT_REASON  WaitReason,
-  IN KPROCESSOR_MODE  WaitMode,
-  IN BOOLEAN  Alertable,
-  IN PLARGE_INTEGER  Timeout  OPTIONAL);
+  /*IN*/ PRKMUTEX  Mutex,
+  /*IN*/ KWAIT_REASON  WaitReason,
+  /*IN*/ KPROCESSOR_MODE  WaitMode,
+  /*IN*/ BOOLEAN  Alertable,
+  /*IN*/ PLARGE_INTEGER  Timeout  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 KeWaitForSingleObject(
-  IN PVOID  Object,
-  IN KWAIT_REASON  WaitReason,
-  IN KPROCESSOR_MODE  WaitMode,
-  IN BOOLEAN  Alertable,
-  IN PLARGE_INTEGER  Timeout  OPTIONAL);
+  /*IN*/ PVOID  Object,
+  /*IN*/ KWAIT_REASON  WaitReason,
+  /*IN*/ KPROCESSOR_MODE  WaitMode,
+  /*IN*/ BOOLEAN  Alertable,
+  /*IN*/ PLARGE_INTEGER  Timeout  /*OPTIONAL*/);
 
 #if defined(_X86_)
 
@@ -7720,13 +7725,13 @@ NTOSAPI
 VOID
 FASTCALL
 KfLowerIrql(
-  IN KIRQL  NewIrql);
+  /*IN*/ KIRQL  NewIrql);
 
 NTOSAPI
 KIRQL
 FASTCALL
 KfRaiseIrql(
-  IN KIRQL  NewIrql);
+  /*IN*/ KIRQL  NewIrql);
 
 #define KeLowerIrql(a) KfLowerIrql(a)
 #define KeRaiseIrql(a,b) *(b) = KfRaiseIrql(a)
@@ -7737,13 +7742,13 @@ NTOSAPI
 VOID
 DDKAPI
 KeLowerIrql(
-  IN KIRQL  NewIrql);
+  /*IN*/ KIRQL  NewIrql);
 
 NTOSAPI
 KIRQL
 DDKAPI
 KeRaiseIrql(
-  IN KIRQL  NewIrql);
+  /*IN*/ KIRQL  NewIrql);
 
 #endif
 
@@ -7759,66 +7764,66 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 MmAdvanceMdl(
-  IN PMDL  Mdl,
-  IN ULONG  NumberOfBytes);
+  /*IN*/ PMDL  Mdl,
+  /*IN*/ ULONG  NumberOfBytes);
 
 NTOSAPI
 PVOID
 DDKAPI
 MmAllocateContiguousMemory(
-  IN ULONG  NumberOfBytes,
-  IN PHYSICAL_ADDRESS  HighestAcceptableAddress);
+  /*IN*/ ULONG  NumberOfBytes,
+  /*IN*/ PHYSICAL_ADDRESS  HighestAcceptableAddress);
 
 NTOSAPI
 PVOID
 DDKAPI
 MmAllocateContiguousMemorySpecifyCache(
-  IN SIZE_T  NumberOfBytes,
-  IN PHYSICAL_ADDRESS  LowestAcceptableAddress,
-  IN PHYSICAL_ADDRESS  HighestAcceptableAddress,
-  IN PHYSICAL_ADDRESS  BoundaryAddressMultiple  OPTIONAL,
-  IN MEMORY_CACHING_TYPE  CacheType);
+  /*IN*/ SIZE_T  NumberOfBytes,
+  /*IN*/ PHYSICAL_ADDRESS  LowestAcceptableAddress,
+  /*IN*/ PHYSICAL_ADDRESS  HighestAcceptableAddress,
+  /*IN*/ PHYSICAL_ADDRESS  BoundaryAddressMultiple  /*OPTIONAL*/,
+  /*IN*/ MEMORY_CACHING_TYPE  CacheType);
 
 NTOSAPI
 PVOID
 DDKAPI
 MmAllocateMappingAddress(
-  IN SIZE_T  NumberOfBytes,
-  IN ULONG  PoolTag);
+  /*IN*/ SIZE_T  NumberOfBytes,
+  /*IN*/ ULONG  PoolTag);
 
 NTOSAPI
 PVOID
 DDKAPI
 MmAllocateNonCachedMemory(
-  IN ULONG  NumberOfBytes);
+  /*IN*/ ULONG  NumberOfBytes);
 
 NTOSAPI
 PMDL
 DDKAPI
 MmAllocatePagesForMdl(
-  IN PHYSICAL_ADDRESS  LowAddress,
-  IN PHYSICAL_ADDRESS  HighAddress,
-  IN PHYSICAL_ADDRESS  SkipBytes,
-  IN SIZE_T  TotalBytes);
+  /*IN*/ PHYSICAL_ADDRESS  LowAddress,
+  /*IN*/ PHYSICAL_ADDRESS  HighAddress,
+  /*IN*/ PHYSICAL_ADDRESS  SkipBytes,
+  /*IN*/ SIZE_T  TotalBytes);
 
 NTOSAPI
 VOID
 DDKAPI
 MmBuildMdlForNonPagedPool(
-  IN OUT PMDL  MemoryDescriptorList);
+  /*IN OUT*/ PMDL  MemoryDescriptorList);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 MmCreateSection(
-  OUT PSECTION_OBJECT  *SectionObject,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes  OPTIONAL,
-  IN PLARGE_INTEGER  MaximumSize,
-  IN ULONG  SectionPageProtection,
-  IN ULONG  AllocationAttributes,
-  IN HANDLE  FileHandle  OPTIONAL,
-  IN PFILE_OBJECT  File  OPTIONAL);
+  /*OUT*/ PSECTION_OBJECT  *SectionObject,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes  /*OPTIONAL*/,
+  /*IN*/ PLARGE_INTEGER  MaximumSize,
+  /*IN*/ ULONG  SectionPageProtection,
+  /*IN*/ ULONG  AllocationAttributes,
+  /*IN*/ HANDLE  FileHandle  /*OPTIONAL*/,
+  /*IN*/ PFILE_OBJECT  File  /*OPTIONAL*/);
 
 typedef enum _MMFLUSH_TYPE {
   MmFlushForDelete,
@@ -7829,47 +7834,47 @@ NTOSAPI
 BOOLEAN
 DDKAPI
 MmFlushImageSection(
-  IN PSECTION_OBJECT_POINTERS  SectionObjectPointer,
-  IN MMFLUSH_TYPE  FlushType);
+  /*IN*/ PSECTION_OBJECT_POINTERS  SectionObjectPointer,
+  /*IN*/ MMFLUSH_TYPE  FlushType);
 
 NTOSAPI
 VOID
 DDKAPI
 MmFreeContiguousMemory(
-  IN PVOID  BaseAddress);
+  /*IN*/ PVOID  BaseAddress);
 
 NTOSAPI
 VOID
 DDKAPI
 MmFreeContiguousMemorySpecifyCache(
-  IN PVOID  BaseAddress,
-  IN SIZE_T  NumberOfBytes,
-  IN MEMORY_CACHING_TYPE  CacheType);
+  /*IN*/ PVOID  BaseAddress,
+  /*IN*/ SIZE_T  NumberOfBytes,
+  /*IN*/ MEMORY_CACHING_TYPE  CacheType);
 
 NTOSAPI
 VOID
 DDKAPI
 MmFreeMappingAddress(
-  IN PVOID  BaseAddress,
-  IN ULONG  PoolTag);
+  /*IN*/ PVOID  BaseAddress,
+  /*IN*/ ULONG  PoolTag);
 
 NTOSAPI
 VOID
 DDKAPI
 MmFreeNonCachedMemory(
-  IN PVOID  BaseAddress,
-  IN SIZE_T  NumberOfBytes);
+  /*IN*/ PVOID  BaseAddress,
+  /*IN*/ SIZE_T  NumberOfBytes);
 
 NTOSAPI
 VOID
 DDKAPI
 MmFreePagesFromMdl(
-  IN PMDL  MemoryDescriptorList);
+  /*IN*/ PMDL  MemoryDescriptorList);
 
 /*
  * ULONG
  * MmGetMdlByteCount(
- *   IN PMDL  Mdl)
+ * IN PMDL  Mdl)
  */
 #define MmGetMdlByteCount(_Mdl) \
   ((_Mdl)->ByteCount)
@@ -7877,7 +7882,7 @@ MmFreePagesFromMdl(
 /*
  * ULONG
  * MmGetMdlByteOffset(
- *   IN PMDL  Mdl)
+ * IN PMDL  Mdl)
  */
 #define MmGetMdlByteOffset(_Mdl) \
   ((_Mdl)->ByteOffset)
@@ -7885,7 +7890,7 @@ MmFreePagesFromMdl(
 /*
  * PPFN_NUMBER
  * MmGetMdlPfnArray(
- *   IN PMDL  Mdl)
+ * IN PMDL  Mdl)
  */
 #define MmGetMdlPfnArray(_Mdl) \
   ((PPFN_NUMBER) ((_Mdl) + 1))
@@ -7893,7 +7898,7 @@ MmFreePagesFromMdl(
 /*
  * PVOID
  * MmGetMdlVirtualAddress(
- *   IN PMDL  Mdl)
+ * IN PMDL  Mdl)
  */
 #define MmGetMdlVirtualAddress(_Mdl) \
   ((PVOID) ((PCHAR) ((_Mdl)->StartVa) + (_Mdl)->ByteOffset))
@@ -7902,7 +7907,7 @@ NTOSAPI
 PHYSICAL_ADDRESS
 DDKAPI
 MmGetPhysicalAddress(
-  IN PVOID  BaseAddress);
+  /*IN*/ PVOID  BaseAddress);
 
 NTOSAPI
 PPHYSICAL_MEMORY_RANGE
@@ -7914,79 +7919,79 @@ NTOSAPI
 PVOID
 DDKAPI
 MmGetVirtualForPhysical(
-  IN PHYSICAL_ADDRESS  PhysicalAddress);
+  /*IN*/ PHYSICAL_ADDRESS  PhysicalAddress);
 
 NTOSAPI
 PVOID
 DDKAPI
 MmMapLockedPagesSpecifyCache(
-  IN PMDL  MemoryDescriptorList,
-  IN KPROCESSOR_MODE  AccessMode,
-  IN MEMORY_CACHING_TYPE  CacheType,
-  IN PVOID  BaseAddress,
-  IN ULONG  BugCheckOnFailure,
-  IN MM_PAGE_PRIORITY  Priority);
+  /*IN*/ PMDL  MemoryDescriptorList,
+  /*IN*/ KPROCESSOR_MODE  AccessMode,
+  /*IN*/ MEMORY_CACHING_TYPE  CacheType,
+  /*IN*/ PVOID  BaseAddress,
+  /*IN*/ ULONG  BugCheckOnFailure,
+  /*IN*/ MM_PAGE_PRIORITY  Priority);
 
 NTOSAPI
 PVOID
 DDKAPI
 MmMapLockedPagesWithReservedMapping(
-  IN PVOID  MappingAddress,
-  IN ULONG  PoolTag,
-  IN PMDL  MemoryDescriptorList,
-  IN MEMORY_CACHING_TYPE  CacheType);
+  /*IN*/ PVOID  MappingAddress,
+  /*IN*/ ULONG  PoolTag,
+  /*IN*/ PMDL  MemoryDescriptorList,
+  /*IN*/ MEMORY_CACHING_TYPE  CacheType);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 MmMapUserAddressesToPage(
-  IN PVOID  BaseAddress,
-  IN SIZE_T  NumberOfBytes,
-  IN PVOID  PageAddress);
+  /*IN*/ PVOID  BaseAddress,
+  /*IN*/ SIZE_T  NumberOfBytes,
+  /*IN*/ PVOID  PageAddress);
 
 NTOSAPI
 PVOID
 DDKAPI
 MmMapVideoDisplay(
-  IN PHYSICAL_ADDRESS  PhysicalAddress,
-  IN SIZE_T  NumberOfBytes,
-  IN MEMORY_CACHING_TYPE  CacheType);
+  /*IN*/ PHYSICAL_ADDRESS  PhysicalAddress,
+  /*IN*/ SIZE_T  NumberOfBytes,
+  /*IN*/ MEMORY_CACHING_TYPE  CacheType);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 MmMapViewInSessionSpace(
-  IN PVOID  Section,
-  OUT PVOID  *MappedBase,
-  IN OUT PSIZE_T  ViewSize);
+  /*IN*/ PVOID  Section,
+  /*OUT*/ PVOID  *MappedBase,
+  /*IN OUT*/ PSIZE_T  ViewSize);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 MmMapViewInSystemSpace(
-  IN PVOID  Section,
-  OUT PVOID  *MappedBase,
-  IN PSIZE_T  ViewSize);
+  /*IN*/ PVOID  Section,
+  /*OUT*/ PVOID  *MappedBase,
+  /*IN*/ PSIZE_T  ViewSize);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 MmMarkPhysicalMemoryAsBad(
-  IN PPHYSICAL_ADDRESS  StartAddress,
-  IN OUT PLARGE_INTEGER  NumberOfBytes);
+  /*IN*/ PPHYSICAL_ADDRESS  StartAddress,
+  /*IN OUT*/ PLARGE_INTEGER  NumberOfBytes);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 MmMarkPhysicalMemoryAsGood(
-  IN PPHYSICAL_ADDRESS  StartAddress,
-  IN OUT PLARGE_INTEGER  NumberOfBytes);
+  /*IN*/ PPHYSICAL_ADDRESS  StartAddress,
+  /*IN OUT*/ PLARGE_INTEGER  NumberOfBytes);
 
 /*
  * PVOID
  * MmGetSystemAddressForMdlSafe(
- *   IN PMDL  Mdl,
- *   IN MM_PAGE_PRIORITY  Priority)
+ * IN PMDL  Mdl,
+ * IN MM_PAGE_PRIORITY  Priority)
  */
 #define MmGetSystemAddressForMdlSafe(_Mdl, _Priority) \
   ((_Mdl)->MdlFlags & (MDL_MAPPED_TO_SYSTEM_VA \
@@ -7999,13 +8004,13 @@ NTOSAPI
 PVOID
 DDKAPI
 MmGetSystemRoutineAddress(
-  IN PUNICODE_STRING  SystemRoutineName);
+  /*IN*/ PUNICODE_STRING  SystemRoutineName);
 
 /*
  * ULONG
  * ADDRESS_AND_SIZE_TO_SPAN_PAGES(
- *   IN PVOID  Va,
- *   IN ULONG  Size)
+ * IN PVOID  Va,
+ * IN ULONG  Size)
  */
 #define ADDRESS_AND_SIZE_TO_SPAN_PAGES(_Va, \
                                        _Size) \
@@ -8015,9 +8020,9 @@ MmGetSystemRoutineAddress(
 /*
  * VOID
  * MmInitializeMdl(
- *   IN PMDL  MemoryDescriptorList,
- *   IN PVOID  BaseVa,
- *   IN SIZE_T  Length)
+ * IN PMDL  MemoryDescriptorList,
+ * IN PVOID  BaseVa,
+ * IN SIZE_T  Length)
  */
 #define MmInitializeMdl(_MemoryDescriptorList, \
                         _BaseVa, \
@@ -8036,13 +8041,13 @@ NTOSAPI
 BOOLEAN
 DDKAPI
 MmIsAddressValid(
-  IN PVOID  VirtualAddress);
+  /*IN*/ PVOID  VirtualAddress);
 
 NTOSAPI
 LOGICAL
 DDKAPI
 MmIsDriverVerifying(
-  IN PDRIVER_OBJECT  DriverObject);
+  /*IN*/ PDRIVER_OBJECT  DriverObject);
 
 NTOSAPI
 BOOLEAN
@@ -8054,24 +8059,24 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 MmIsVerifierEnabled(
-  OUT PULONG  VerifierFlags);
+  /*OUT*/ PULONG  VerifierFlags);
 
 NTOSAPI
 PVOID
 DDKAPI
 MmLockPagableDataSection(
-  IN PVOID  AddressWithinSection);
+  /*IN*/ PVOID  AddressWithinSection);
 
 NTOSAPI
 PVOID
 DDKAPI
 MmLockPagableImageSection(
-  IN PVOID  AddressWithinSection);
+  /*IN*/ PVOID  AddressWithinSection);
 
 /*
  * PVOID
  * MmLockPagableCodeSection(
- *   IN PVOID  AddressWithinSection)
+ * IN PVOID  AddressWithinSection)
  */
 #define MmLockPagableCodeSection MmLockPagableDataSection
 
@@ -8079,74 +8084,74 @@ NTOSAPI
 VOID
 DDKAPI
 MmLockPagableSectionByHandle(
-  IN PVOID  ImageSectionHandle);
+  /*IN*/ PVOID  ImageSectionHandle);
 
 NTOSAPI
 PVOID
 DDKAPI
 MmMapIoSpace(
-  IN PHYSICAL_ADDRESS  PhysicalAddress,
-  IN ULONG  NumberOfBytes,
-  IN MEMORY_CACHING_TYPE  CacheEnable);
+  /*IN*/ PHYSICAL_ADDRESS  PhysicalAddress,
+  /*IN*/ ULONG  NumberOfBytes,
+  /*IN*/ MEMORY_CACHING_TYPE  CacheEnable);
 
 NTOSAPI
 PVOID
 DDKAPI
 MmMapLockedPages(
-  IN PMDL  MemoryDescriptorList,
-  IN KPROCESSOR_MODE  AccessMode);
+  /*IN*/ PMDL  MemoryDescriptorList,
+  /*IN*/ KPROCESSOR_MODE  AccessMode);
 
 NTOSAPI
 VOID
 DDKAPI
 MmPageEntireDriver(
-  IN PVOID  AddressWithinSection);
+  /*IN*/ PVOID  AddressWithinSection);
 
 NTOSAPI
 VOID
 DDKAPI
 MmProbeAndLockProcessPages(
-  IN OUT PMDL  MemoryDescriptorList,
-  IN PEPROCESS  Process,
-  IN KPROCESSOR_MODE  AccessMode,
-  IN LOCK_OPERATION  Operation);
+  /*IN OUT*/ PMDL  MemoryDescriptorList,
+  /*IN*/ PEPROCESS  Process,
+  /*IN*/ KPROCESSOR_MODE  AccessMode,
+  /*IN*/ LOCK_OPERATION  Operation);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 MmProtectMdlSystemAddress(
-  IN PMDL  MemoryDescriptorList,
-  IN ULONG  NewProtect);
+  /*IN*/ PMDL  MemoryDescriptorList,
+  /*IN*/ ULONG  NewProtect);
 
 NTOSAPI
 VOID
 DDKAPI
 MmUnmapLockedPages(
-  IN PVOID  BaseAddress,
-  IN PMDL  MemoryDescriptorList);
+  /*IN*/ PVOID  BaseAddress,
+  /*IN*/ PMDL  MemoryDescriptorList);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 MmUnmapViewInSessionSpace(
-  IN PVOID  MappedBase);
+  /*IN*/ PVOID  MappedBase);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 MmUnmapViewInSystemSpace(
-  IN PVOID MappedBase);
+  /*IN*/ PVOID MappedBase);
 
 NTOSAPI
 VOID
 DDKAPI
 MmUnsecureVirtualMemory(
-  IN HANDLE  SecureHandle);
+  /*IN*/ HANDLE  SecureHandle);
 
 /*
  * VOID
  * MmPrepareMdlForReuse(
- *   IN PMDL  Mdl)
+ * IN PMDL  Mdl)
  */
 #define MmPrepareMdlForReuse(_Mdl) \
 { \
@@ -8162,9 +8167,9 @@ NTOSAPI
 VOID
 DDKAPI
 MmProbeAndLockPages(
-  IN OUT PMDL  MemoryDescriptorList,
-  IN KPROCESSOR_MODE  AccessMode,
-  IN LOCK_OPERATION  Operation);
+  /*IN OUT*/ PMDL  MemoryDescriptorList,
+  /*IN*/ KPROCESSOR_MODE  AccessMode,
+  /*IN*/ LOCK_OPERATION  Operation);
 
 NTOSAPI
 MM_SYSTEM_SIZE
@@ -8176,63 +8181,63 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 MmRemovePhysicalMemory(
-  IN PPHYSICAL_ADDRESS  StartAddress,
-  IN OUT PLARGE_INTEGER  NumberOfBytes);
+  /*IN*/ PPHYSICAL_ADDRESS  StartAddress,
+  /*IN OUT*/ PLARGE_INTEGER  NumberOfBytes);
 
 NTOSAPI
 VOID
 DDKAPI
 MmResetDriverPaging(
-  IN PVOID  AddressWithinSection);
+  /*IN*/ PVOID  AddressWithinSection);
 
 NTOSAPI
 HANDLE
 DDKAPI
 MmSecureVirtualMemory(
-  IN PVOID  Address,
-  IN SIZE_T  Size,
-  IN ULONG  ProbeMode);
+  /*IN*/ PVOID  Address,
+  /*IN*/ SIZE_T  Size,
+  /*IN*/ ULONG  ProbeMode);
 
 NTOSAPI
 ULONG
 DDKAPI
 MmSizeOfMdl(
-  IN PVOID  Base,
-  IN SIZE_T  Length);
+  /*IN*/ PVOID  Base,
+  /*IN*/ SIZE_T  Length);
 
 NTOSAPI
 VOID
 DDKAPI
 MmUnlockPagableImageSection(
-  IN PVOID  ImageSectionHandle);
+  /*IN*/ PVOID  ImageSectionHandle);
 
 NTOSAPI
 VOID
 DDKAPI
 MmUnlockPages(
-  IN PMDL  MemoryDescriptorList);
+  /*IN*/ PMDL  MemoryDescriptorList);
 
 NTOSAPI
 VOID
 DDKAPI
 MmUnmapIoSpace(
-  IN PVOID  BaseAddress,
-  IN SIZE_T  NumberOfBytes);
+  /*IN*/ PVOID  BaseAddress,
+  /*IN*/ SIZE_T  NumberOfBytes);
 
 NTOSAPI
 VOID
 DDKAPI
 MmUnmapReservedMapping(
-  IN PVOID  BaseAddress,
-  IN ULONG  PoolTag,
-  IN PMDL  MemoryDescriptorList);
+  /*IN*/ PVOID  BaseAddress,
+  /*IN*/ ULONG  PoolTag,
+  /*IN*/ PMDL  MemoryDescriptorList);
 
 NTOSAPI
 VOID
 DDKAPI
 MmUnmapVideoDisplay(
-  IN PVOID  BaseAddress,
-  IN SIZE_T  NumberOfBytes);
+  /*IN*/ PVOID  BaseAddress,
+  /*IN*/ SIZE_T  NumberOfBytes);
 
 
 
@@ -8242,10 +8247,10 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 ObAssignSecurity(
-  IN PACCESS_STATE  AccessState,
-  IN PSECURITY_DESCRIPTOR  SecurityDescriptor,
-  IN PVOID  Object,
-  IN POBJECT_TYPE  Type);
+  /*IN*/ PACCESS_STATE  AccessState,
+  /*IN*/ PSECURITY_DESCRIPTOR  SecurityDescriptor,
+  /*IN*/ PVOID  Object,
+  /*IN*/ POBJECT_TYPE  Type);
 
 NTOSAPI
 VOID
@@ -8258,12 +8263,12 @@ NTOSAPI
 VOID
 DDKFASTAPI
 ObfDereferenceObject(
-  IN PVOID  Object);
+  /*IN*/ PVOID  Object);
 
 /*
  * VOID
  * ObDereferenceObject(
- *   IN PVOID  Object)
+ * IN PVOID  Object)
  */
 #define ObDereferenceObject ObfDereferenceObject
 
@@ -8271,38 +8276,38 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 ObGetObjectSecurity(
-  IN PVOID  Object,
-  OUT PSECURITY_DESCRIPTOR  *SecurityDescriptor,
-  OUT PBOOLEAN  MemoryAllocated); 
+  /*IN*/ PVOID  Object,
+  /*OUT*/ PSECURITY_DESCRIPTOR  *SecurityDescriptor,
+  /*OUT*/ PBOOLEAN  MemoryAllocated); 
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ObInsertObject(
-  IN PVOID  Object,
-  IN PACCESS_STATE  PassedAccessState  OPTIONAL,
-  IN ACCESS_MASK  DesiredAccess,
-  IN ULONG  AdditionalReferences,
-  OUT PVOID*  ReferencedObject  OPTIONAL,
-  OUT PHANDLE  Handle);
+  /*IN*/ PVOID  Object,
+  /*IN*/ PACCESS_STATE  PassedAccessState  /*OPTIONAL*/,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ ULONG  AdditionalReferences,
+  /*OUT*/ PVOID*  ReferencedObject  /*OPTIONAL*/,
+  /*OUT*/ PHANDLE  Handle);
 
 NTOSAPI
 VOID
 DDKFASTAPI
 ObfReferenceObject(
-  IN PVOID  Object);
+  /*IN*/ PVOID  Object);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ObLogSecurityDescriptor(
-  IN PSECURITY_DESCRIPTOR  InputSecurityDescriptor,
-  OUT PSECURITY_DESCRIPTOR  *OutputSecurityDescriptor,
-  IN ULONG RefBias);
+  /*IN*/ PSECURITY_DESCRIPTOR  InputSecurityDescriptor,
+  /*OUT*/ PSECURITY_DESCRIPTOR  *OutputSecurityDescriptor,
+  /*IN*/ ULONG RefBias);
 /*
  * VOID
  * ObReferenceObject(
- *   IN PVOID  Object)
+ * IN PVOID  Object)
  */
 #define ObReferenceObject ObfReferenceObject
 
@@ -8310,85 +8315,85 @@ NTOSAPI
 VOID
 DDKAPI
 ObMakeTemporaryObject(
-  IN PVOID  Object);
+  /*IN*/ PVOID  Object);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ObOpenObjectByName(
-  IN POBJECT_ATTRIBUTES  ObjectAttributes,
-  IN POBJECT_TYPE  ObjectType,
-  IN OUT PVOID  ParseContext  OPTIONAL,
-  IN KPROCESSOR_MODE  AccessMode,
-  IN ACCESS_MASK  DesiredAccess,
-  IN PACCESS_STATE  PassedAccessState,
-  OUT PHANDLE  Handle);
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*IN*/ POBJECT_TYPE  ObjectType,
+  /*IN OUT*/ PVOID  ParseContext  /*OPTIONAL*/,
+  /*IN*/ KPROCESSOR_MODE  AccessMode,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ PACCESS_STATE  PassedAccessState,
+  /*OUT*/ PHANDLE  Handle);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ObOpenObjectByPointer(
-  IN PVOID  Object,
-  IN ULONG  HandleAttributes,
-  IN PACCESS_STATE  PassedAccessState  OPTIONAL,
-  IN ACCESS_MASK  DesiredAccess  OPTIONAL,
-  IN POBJECT_TYPE  ObjectType  OPTIONAL,
-  IN KPROCESSOR_MODE  AccessMode,
-  OUT PHANDLE  Handle);
+  /*IN*/ PVOID  Object,
+  /*IN*/ ULONG  HandleAttributes,
+  /*IN*/ PACCESS_STATE  PassedAccessState  /*OPTIONAL*/,
+  /*IN*/ ACCESS_MASK  DesiredAccess  /*OPTIONAL*/,
+  /*IN*/ POBJECT_TYPE  ObjectType  /*OPTIONAL*/,
+  /*IN*/ KPROCESSOR_MODE  AccessMode,
+  /*OUT*/ PHANDLE  Handle);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ObQueryObjectAuditingByHandle(
-  IN HANDLE  Handle,
-  OUT PBOOLEAN  GenerateOnClose);
+  /*IN*/ HANDLE  Handle,
+  /*OUT*/ PBOOLEAN  GenerateOnClose);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ObReferenceObjectByHandle(
-  IN HANDLE  Handle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_TYPE  ObjectType  OPTIONAL,
-  IN KPROCESSOR_MODE  AccessMode,
-  OUT PVOID  *Object,
-  OUT POBJECT_HANDLE_INFORMATION  HandleInformation  OPTIONAL);
+  /*IN*/ HANDLE  Handle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_TYPE  ObjectType  /*OPTIONAL*/,
+  /*IN*/ KPROCESSOR_MODE  AccessMode,
+  /*OUT*/ PVOID  *Object,
+  /*OUT*/ POBJECT_HANDLE_INFORMATION  HandleInformation  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ObReferenceObjectByName(
-  IN PUNICODE_STRING  ObjectPath,
-  IN ULONG  Attributes,
-  IN PACCESS_STATE  PassedAccessState  OPTIONAL,
-  IN ACCESS_MASK  DesiredAccess  OPTIONAL,
-  IN POBJECT_TYPE  ObjectType,
-  IN KPROCESSOR_MODE  AccessMode,
-  IN OUT PVOID  ParseContext  OPTIONAL,
-  OUT PVOID  *Object);
+  /*IN*/ PUNICODE_STRING  ObjectPath,
+  /*IN*/ ULONG  Attributes,
+  /*IN*/ PACCESS_STATE  PassedAccessState  /*OPTIONAL*/,
+  /*IN*/ ACCESS_MASK  DesiredAccess  /*OPTIONAL*/,
+  /*IN*/ POBJECT_TYPE  ObjectType,
+  /*IN*/ KPROCESSOR_MODE  AccessMode,
+  /*IN OUT*/ PVOID  ParseContext  /*OPTIONAL*/,
+  /*OUT*/ PVOID  *Object);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ObReferenceObjectByPointer(
-  IN PVOID  Object,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_TYPE  ObjectType,
-  IN KPROCESSOR_MODE  AccessMode);
+  /*IN*/ PVOID  Object,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_TYPE  ObjectType,
+  /*IN*/ KPROCESSOR_MODE  AccessMode);
 
 NTOSAPI
 VOID
 DDKAPI
 ObReferenceSecurityDescriptor(
-  IN PSECURITY_DESCRIPTOR  SecurityDescriptor,
-  IN ULONG  Count);
+  /*IN*/ PSECURITY_DESCRIPTOR  SecurityDescriptor,
+  /*IN*/ ULONG  Count);
 
 NTOSAPI
 VOID
 DDKAPI
 ObReleaseObjectSecurity(
-  IN PSECURITY_DESCRIPTOR  SecurityDescriptor,
-  IN BOOLEAN  MemoryAllocated);
+  /*IN*/ PSECURITY_DESCRIPTOR  SecurityDescriptor,
+  /*IN*/ BOOLEAN  MemoryAllocated);
 
 
 
@@ -8398,21 +8403,21 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 PsCreateSystemProcess(
-  IN PHANDLE  ProcessHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes);
+  /*IN*/ PHANDLE  ProcessHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 PsCreateSystemThread(
-  OUT PHANDLE  ThreadHandle,
-  IN ULONG  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes  OPTIONAL,
-  IN HANDLE  ProcessHandle  OPTIONAL,
-  OUT PCLIENT_ID  ClientId  OPTIONAL,
-  IN PKSTART_ROUTINE  StartRoutine,
-  IN PVOID  StartContext);
+  /*OUT*/ PHANDLE  ThreadHandle,
+  /*IN*/ ULONG  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes  /*OPTIONAL*/,
+  /*IN*/ HANDLE  ProcessHandle  /*OPTIONAL*/,
+  /*OUT*/ PCLIENT_ID  ClientId  /*OPTIONAL*/,
+  /*IN*/ PKSTART_ROUTINE  StartRoutine,
+  /*IN*/ PVOID  StartContext);
 
 /*
  * PEPROCESS
@@ -8443,47 +8448,47 @@ NTOSAPI
 BOOLEAN
 DDKAPI
 PsGetVersion(
-  PULONG  MajorVersion  OPTIONAL,
-  PULONG  MinorVersion  OPTIONAL,
-  PULONG  BuildNumber  OPTIONAL,
-  PUNICODE_STRING  CSDVersion  OPTIONAL);
+  PULONG  MajorVersion  /*OPTIONAL*/,
+  PULONG  MinorVersion  /*OPTIONAL*/,
+  PULONG  BuildNumber  /*OPTIONAL*/,
+  PUNICODE_STRING  CSDVersion  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 PsRemoveCreateThreadNotifyRoutine(
-  IN PCREATE_THREAD_NOTIFY_ROUTINE  NotifyRoutine);
+  /*IN*/ PCREATE_THREAD_NOTIFY_ROUTINE  NotifyRoutine);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 PsRemoveLoadImageNotifyRoutine(
-  IN PLOAD_IMAGE_NOTIFY_ROUTINE  NotifyRoutine);
+  /*IN*/ PLOAD_IMAGE_NOTIFY_ROUTINE  NotifyRoutine);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 PsSetCreateProcessNotifyRoutine(
-  IN PCREATE_PROCESS_NOTIFY_ROUTINE  NotifyRoutine,
-  IN BOOLEAN  Remove);
+  /*IN*/ PCREATE_PROCESS_NOTIFY_ROUTINE  NotifyRoutine,
+  /*IN*/ BOOLEAN  Remove);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 PsSetCreateThreadNotifyRoutine(
-  IN PCREATE_THREAD_NOTIFY_ROUTINE  NotifyRoutine);
+  /*IN*/ PCREATE_THREAD_NOTIFY_ROUTINE  NotifyRoutine);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 PsSetLoadImageNotifyRoutine(
-  IN PLOAD_IMAGE_NOTIFY_ROUTINE  NotifyRoutine);
+  /*IN*/ PLOAD_IMAGE_NOTIFY_ROUTINE  NotifyRoutine);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 PsTerminateSystemThread(
-  IN NTSTATUS  ExitStatus);
+  /*IN*/ NTSTATUS  ExitStatus);
 
 
 
@@ -8493,48 +8498,48 @@ NTOSAPI
 BOOLEAN
 DDKAPI
 SeAccessCheck(
-  IN PSECURITY_DESCRIPTOR  SecurityDescriptor,
-  IN PSECURITY_SUBJECT_CONTEXT  SubjectSecurityContext,
-  IN BOOLEAN  SubjectContextLocked,
-  IN ACCESS_MASK  DesiredAccess,
-  IN ACCESS_MASK  PreviouslyGrantedAccess,
-  OUT PPRIVILEGE_SET  *Privileges  OPTIONAL,
-  IN PGENERIC_MAPPING  GenericMapping,
-  IN KPROCESSOR_MODE  AccessMode,
-  OUT PACCESS_MASK  GrantedAccess,
-  OUT PNTSTATUS  AccessStatus);
+  /*IN*/ PSECURITY_DESCRIPTOR  SecurityDescriptor,
+  /*IN*/ PSECURITY_SUBJECT_CONTEXT  SubjectSecurityContext,
+  /*IN*/ BOOLEAN  SubjectContextLocked,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ ACCESS_MASK  PreviouslyGrantedAccess,
+  /*OUT*/ PPRIVILEGE_SET  *Privileges  /*OPTIONAL*/,
+  /*IN*/ PGENERIC_MAPPING  GenericMapping,
+  /*IN*/ KPROCESSOR_MODE  AccessMode,
+  /*OUT*/ PACCESS_MASK  GrantedAccess,
+  /*OUT*/ PNTSTATUS  AccessStatus);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 SeAssignSecurity(
-  IN PSECURITY_DESCRIPTOR  ParentDescriptor  OPTIONAL,
-  IN PSECURITY_DESCRIPTOR  ExplicitDescriptor  OPTIONAL,
-  OUT PSECURITY_DESCRIPTOR  *NewDescriptor,
-  IN BOOLEAN  IsDirectoryObject,
-  IN PSECURITY_SUBJECT_CONTEXT  SubjectContext,
-  IN PGENERIC_MAPPING  GenericMapping,
-  IN POOL_TYPE  PoolType);
+  /*IN*/ PSECURITY_DESCRIPTOR  ParentDescriptor  /*OPTIONAL*/,
+  /*IN*/ PSECURITY_DESCRIPTOR  ExplicitDescriptor  /*OPTIONAL*/,
+  /*OUT*/ PSECURITY_DESCRIPTOR  *NewDescriptor,
+  /*IN*/ BOOLEAN  IsDirectoryObject,
+  /*IN*/ PSECURITY_SUBJECT_CONTEXT  SubjectContext,
+  /*IN*/ PGENERIC_MAPPING  GenericMapping,
+  /*IN*/ POOL_TYPE  PoolType);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 SeAssignSecurityEx(
-  IN PSECURITY_DESCRIPTOR  ParentDescriptor  OPTIONAL,
-  IN PSECURITY_DESCRIPTOR  ExplicitDescriptor  OPTIONAL,
-  OUT PSECURITY_DESCRIPTOR  *NewDescriptor,
-  IN GUID  *ObjectType  OPTIONAL,
-  IN BOOLEAN  IsDirectoryObject,
-  IN ULONG  AutoInheritFlags,
-  IN PSECURITY_SUBJECT_CONTEXT  SubjectContext,
-  IN PGENERIC_MAPPING  GenericMapping,
-  IN POOL_TYPE  PoolType);
+  /*IN*/ PSECURITY_DESCRIPTOR  ParentDescriptor  /*OPTIONAL*/,
+  /*IN*/ PSECURITY_DESCRIPTOR  ExplicitDescriptor  /*OPTIONAL*/,
+  /*OUT*/ PSECURITY_DESCRIPTOR  *NewDescriptor,
+  /*IN*/ GUID  *ObjectType  /*OPTIONAL*/,
+  /*IN*/ BOOLEAN  IsDirectoryObject,
+  /*IN*/ ULONG  AutoInheritFlags,
+  /*IN*/ PSECURITY_SUBJECT_CONTEXT  SubjectContext,
+  /*IN*/ PGENERIC_MAPPING  GenericMapping,
+  /*IN*/ POOL_TYPE  PoolType);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 SeDeassignSecurity(
-  IN OUT PSECURITY_DESCRIPTOR  *SecurityDescriptor);
+  /*IN OUT*/ PSECURITY_DESCRIPTOR  *SecurityDescriptor);
 
 NTOSAPI
 BOOLEAN
@@ -8547,8 +8552,8 @@ NTOSAPI
 BOOLEAN
 DDKAPI
 SeValidSecurityDescriptor(
-  IN ULONG  Length,
-  IN PSECURITY_DESCRIPTOR  SecurityDescriptor);
+  /*IN*/ ULONG  Length,
+  /*IN*/ PSECURITY_DESCRIPTOR  SecurityDescriptor);
 
 
 
@@ -8558,20 +8563,20 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 NtOpenProcess(
-  OUT PHANDLE  ProcessHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes,
-  IN PCLIENT_ID  ClientId  OPTIONAL);
+  /*OUT*/ PHANDLE  ProcessHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*IN*/ PCLIENT_ID  ClientId  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 NtQueryInformationProcess(
-  IN HANDLE  ProcessHandle,
-  IN PROCESSINFOCLASS  ProcessInformationClass,
-  OUT PVOID  ProcessInformation,
-  IN ULONG  ProcessInformationLength,
-  OUT PULONG  ReturnLength OPTIONAL);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN*/ PROCESSINFOCLASS  ProcessInformationClass,
+  /*OUT*/ PVOID  ProcessInformation,
+  /*IN*/ ULONG  ProcessInformationLength,
+  /*OUT*/ PULONG  ReturnLength /*OPTIONAL*/);
 
 
 
@@ -8581,369 +8586,369 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 ZwCancelTimer(
-  IN HANDLE  TimerHandle,
-  OUT PBOOLEAN  CurrentState  OPTIONAL);
+  /*IN*/ HANDLE  TimerHandle,
+  /*OUT*/ PBOOLEAN  CurrentState  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 NtClose(
-  IN HANDLE  Handle);
+  /*IN*/ HANDLE  Handle);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwClose(
-  IN HANDLE  Handle);
+  /*IN*/ HANDLE  Handle);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwCreateDirectoryObject(
-  OUT PHANDLE  DirectoryHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes);
+  /*OUT*/ PHANDLE  DirectoryHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 NtCreateEvent(
-  OUT PHANDLE  EventHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes,
-  IN BOOLEAN  ManualReset,
-  IN BOOLEAN  InitialState);
+  /*OUT*/ PHANDLE  EventHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*IN*/ BOOLEAN  ManualReset,
+  /*IN*/ BOOLEAN  InitialState);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwCreateEvent(
-  OUT PHANDLE  EventHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes,
-  IN BOOLEAN  ManualReset,
-  IN BOOLEAN  InitialState);
+  /*OUT*/ PHANDLE  EventHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*IN*/ BOOLEAN  ManualReset,
+  /*IN*/ BOOLEAN  InitialState);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwCreateFile(
-  OUT PHANDLE  FileHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes,
-  OUT PIO_STATUS_BLOCK  IoStatusBlock,
-  IN PLARGE_INTEGER  AllocationSize  OPTIONAL,
-  IN ULONG  FileAttributes,
-  IN ULONG  ShareAccess,
-  IN ULONG  CreateDisposition,
-  IN ULONG  CreateOptions,
-  IN PVOID  EaBuffer  OPTIONAL,
-  IN ULONG  EaLength);
+  /*OUT*/ PHANDLE  FileHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock,
+  /*IN*/ PLARGE_INTEGER  AllocationSize  /*OPTIONAL*/,
+  /*IN*/ ULONG  FileAttributes,
+  /*IN*/ ULONG  ShareAccess,
+  /*IN*/ ULONG  CreateDisposition,
+  /*IN*/ ULONG  CreateOptions,
+  /*IN*/ PVOID  EaBuffer  /*OPTIONAL*/,
+  /*IN*/ ULONG  EaLength);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwCreateKey(
-  OUT PHANDLE  KeyHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes,
-  IN ULONG  TitleIndex,
-  IN PUNICODE_STRING  Class  OPTIONAL,
-  IN ULONG  CreateOptions,
-  OUT PULONG  Disposition  OPTIONAL);
+  /*OUT*/ PHANDLE  KeyHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*IN*/ ULONG  TitleIndex,
+  /*IN*/ PUNICODE_STRING  Class  /*OPTIONAL*/,
+  /*IN*/ ULONG  CreateOptions,
+  /*OUT*/ PULONG  Disposition  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwCreateTimer(
-  OUT PHANDLE  TimerHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes  OPTIONAL,
-  IN TIMER_TYPE  TimerType);
+  /*OUT*/ PHANDLE  TimerHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes  /*OPTIONAL*/,
+  /*IN*/ TIMER_TYPE  TimerType);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwDeleteKey(
-  IN HANDLE  KeyHandle);
+  /*IN*/ HANDLE  KeyHandle);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwDeleteValueKey(
-  IN HANDLE  KeyHandle,
-  IN PUNICODE_STRING  ValueName);
+  /*IN*/ HANDLE  KeyHandle,
+  /*IN*/ PUNICODE_STRING  ValueName);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 NtDeviceIoControlFile(
-  IN HANDLE  DeviceHandle,
-  IN HANDLE  Event  OPTIONAL, 
-  IN PIO_APC_ROUTINE  UserApcRoutine  OPTIONAL, 
-  IN PVOID  UserApcContext  OPTIONAL, 
-  OUT PIO_STATUS_BLOCK  IoStatusBlock, 
-  IN ULONG  IoControlCode,
-  IN PVOID  InputBuffer, 
-  IN ULONG  InputBufferSize,
-  OUT PVOID  OutputBuffer,
-  IN ULONG  OutputBufferSize);
+  /*IN*/ HANDLE  DeviceHandle,
+  /*IN*/ HANDLE  Event  /*OPTIONAL*/, 
+  /*IN*/ PIO_APC_ROUTINE  UserApcRoutine  /*OPTIONAL*/, 
+  /*IN*/ PVOID  UserApcContext  /*OPTIONAL*/, 
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock, 
+  /*IN*/ ULONG  IoControlCode,
+  /*IN*/ PVOID  InputBuffer, 
+  /*IN*/ ULONG  InputBufferSize,
+  /*OUT*/ PVOID  OutputBuffer,
+  /*IN*/ ULONG  OutputBufferSize);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwDeviceIoControlFile(
-  IN HANDLE  DeviceHandle,
-  IN HANDLE  Event  OPTIONAL, 
-  IN PIO_APC_ROUTINE  UserApcRoutine  OPTIONAL, 
-  IN PVOID  UserApcContext  OPTIONAL, 
-  OUT PIO_STATUS_BLOCK  IoStatusBlock, 
-  IN ULONG  IoControlCode,
-  IN PVOID  InputBuffer, 
-  IN ULONG  InputBufferSize,
-  OUT PVOID  OutputBuffer,
-  IN ULONG  OutputBufferSize);
+  /*IN*/ HANDLE  DeviceHandle,
+  /*IN*/ HANDLE  Event  /*OPTIONAL*/, 
+  /*IN*/ PIO_APC_ROUTINE  UserApcRoutine  /*OPTIONAL*/, 
+  /*IN*/ PVOID  UserApcContext  /*OPTIONAL*/, 
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock, 
+  /*IN*/ ULONG  IoControlCode,
+  /*IN*/ PVOID  InputBuffer, 
+  /*IN*/ ULONG  InputBufferSize,
+  /*OUT*/ PVOID  OutputBuffer,
+  /*IN*/ ULONG  OutputBufferSize);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwEnumerateKey(
-  IN HANDLE  KeyHandle,
-  IN ULONG  Index,
-  IN KEY_INFORMATION_CLASS  KeyInformationClass,
-  OUT PVOID  KeyInformation,
-  IN ULONG  Length,
-  OUT PULONG  ResultLength);
+  /*IN*/ HANDLE  KeyHandle,
+  /*IN*/ ULONG  Index,
+  /*IN*/ KEY_INFORMATION_CLASS  KeyInformationClass,
+  /*OUT*/ PVOID  KeyInformation,
+  /*IN*/ ULONG  Length,
+  /*OUT*/ PULONG  ResultLength);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwEnumerateValueKey(
-  IN HANDLE  KeyHandle,
-  IN ULONG  Index,
-  IN KEY_VALUE_INFORMATION_CLASS  KeyValueInformationClass,
-  OUT PVOID  KeyValueInformation,
-  IN ULONG  Length,
-  OUT PULONG  ResultLength);
+  /*IN*/ HANDLE  KeyHandle,
+  /*IN*/ ULONG  Index,
+  /*IN*/ KEY_VALUE_INFORMATION_CLASS  KeyValueInformationClass,
+  /*OUT*/ PVOID  KeyValueInformation,
+  /*IN*/ ULONG  Length,
+  /*OUT*/ PULONG  ResultLength);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwFlushKey(
-  IN HANDLE  KeyHandle);
+  /*IN*/ HANDLE  KeyHandle);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwMakeTemporaryObject(
-  IN HANDLE  Handle);
+  /*IN*/ HANDLE  Handle);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 NtMapViewOfSection(
-  IN HANDLE  SectionHandle,
-  IN HANDLE  ProcessHandle,
-  IN OUT PVOID  *BaseAddress,
-  IN ULONG  ZeroBits,
-  IN ULONG  CommitSize,
-  IN OUT PLARGE_INTEGER  SectionOffset  OPTIONAL,
-  IN OUT PSIZE_T  ViewSize,
-  IN SECTION_INHERIT  InheritDisposition,
-  IN ULONG  AllocationType,
-  IN ULONG  Protect);
+  /*IN*/ HANDLE  SectionHandle,
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN OUT*/ PVOID  *BaseAddress,
+  /*IN*/ ULONG  ZeroBits,
+  /*IN*/ ULONG  CommitSize,
+  /*IN OUT*/ PLARGE_INTEGER  SectionOffset  /*OPTIONAL*/,
+  /*IN OUT*/ PSIZE_T  ViewSize,
+  /*IN*/ SECTION_INHERIT  InheritDisposition,
+  /*IN*/ ULONG  AllocationType,
+  /*IN*/ ULONG  Protect);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwMapViewOfSection(
-  IN HANDLE  SectionHandle,
-  IN HANDLE  ProcessHandle,
-  IN OUT PVOID  *BaseAddress,
-  IN ULONG  ZeroBits,
-  IN ULONG  CommitSize,
-  IN OUT PLARGE_INTEGER  SectionOffset  OPTIONAL,
-  IN OUT PSIZE_T  ViewSize,
-  IN SECTION_INHERIT  InheritDisposition,
-  IN ULONG  AllocationType,
-  IN ULONG  Protect);
+  /*IN*/ HANDLE  SectionHandle,
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN OUT*/ PVOID  *BaseAddress,
+  /*IN*/ ULONG  ZeroBits,
+  /*IN*/ ULONG  CommitSize,
+  /*IN OUT*/ PLARGE_INTEGER  SectionOffset  /*OPTIONAL*/,
+  /*IN OUT*/ PSIZE_T  ViewSize,
+  /*IN*/ SECTION_INHERIT  InheritDisposition,
+  /*IN*/ ULONG  AllocationType,
+  /*IN*/ ULONG  Protect);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 NtOpenFile(
-  OUT PHANDLE  FileHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes,
-  OUT PIO_STATUS_BLOCK  IoStatusBlock,
-  IN ULONG  ShareAccess,
-  IN ULONG  OpenOptions);
+  /*OUT*/ PHANDLE  FileHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock,
+  /*IN*/ ULONG  ShareAccess,
+  /*IN*/ ULONG  OpenOptions);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwOpenFile(
-  OUT PHANDLE  FileHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes,
-  OUT PIO_STATUS_BLOCK  IoStatusBlock,
-  IN ULONG  ShareAccess,
-  IN ULONG  OpenOptions);
+  /*OUT*/ PHANDLE  FileHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock,
+  /*IN*/ ULONG  ShareAccess,
+  /*IN*/ ULONG  OpenOptions);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwOpenKey(
-  OUT PHANDLE  KeyHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes);
+  /*OUT*/ PHANDLE  KeyHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwOpenSection(
-  OUT PHANDLE  SectionHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes);
+  /*OUT*/ PHANDLE  SectionHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwOpenSymbolicLinkObject(
-  OUT PHANDLE  LinkHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes);
+  /*OUT*/ PHANDLE  LinkHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwOpenTimer(
-  OUT PHANDLE  TimerHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes);
+  /*OUT*/ PHANDLE  TimerHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwQueryInformationFile(
-  IN HANDLE  FileHandle,
-  OUT PIO_STATUS_BLOCK  IoStatusBlock,
-  OUT PVOID  FileInformation,
-  IN ULONG  Length,
-  IN FILE_INFORMATION_CLASS  FileInformationClass);
+  /*IN*/ HANDLE  FileHandle,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock,
+  /*OUT*/ PVOID  FileInformation,
+  /*IN*/ ULONG  Length,
+  /*IN*/ FILE_INFORMATION_CLASS  FileInformationClass);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwQueryKey(
-  IN HANDLE  KeyHandle,
-  IN KEY_INFORMATION_CLASS  KeyInformationClass,
-  OUT PVOID  KeyInformation,
-  IN ULONG  Length,
-  OUT PULONG  ResultLength);
+  /*IN*/ HANDLE  KeyHandle,
+  /*IN*/ KEY_INFORMATION_CLASS  KeyInformationClass,
+  /*OUT*/ PVOID  KeyInformation,
+  /*IN*/ ULONG  Length,
+  /*OUT*/ PULONG  ResultLength);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwQuerySymbolicLinkObject(
-  IN HANDLE  LinkHandle,
-  IN OUT PUNICODE_STRING  LinkTarget,
-  OUT PULONG  ReturnedLength  OPTIONAL);
+  /*IN*/ HANDLE  LinkHandle,
+  /*IN OUT*/ PUNICODE_STRING  LinkTarget,
+  /*OUT*/ PULONG  ReturnedLength  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwQueryValueKey(
-  IN HANDLE  KeyHandle,
-  IN PUNICODE_STRING  ValueName,
-  IN KEY_VALUE_INFORMATION_CLASS  KeyValueInformationClass,
-  OUT PVOID  KeyValueInformation,
-  IN ULONG  Length,
-  OUT PULONG  ResultLength);
+  /*IN*/ HANDLE  KeyHandle,
+  /*IN*/ PUNICODE_STRING  ValueName,
+  /*IN*/ KEY_VALUE_INFORMATION_CLASS  KeyValueInformationClass,
+  /*OUT*/ PVOID  KeyValueInformation,
+  /*IN*/ ULONG  Length,
+  /*OUT*/ PULONG  ResultLength);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 NtReadFile(
-  IN HANDLE  FileHandle,
-  IN HANDLE  Event  OPTIONAL,
-  IN PIO_APC_ROUTINE  ApcRoutine  OPTIONAL,
-  IN PVOID  ApcContext  OPTIONAL,
-  OUT PIO_STATUS_BLOCK  IoStatusBlock,
-  OUT PVOID  Buffer,
-  IN ULONG  Length,
-  IN PLARGE_INTEGER  ByteOffset  OPTIONAL,
-  IN PULONG  Key  OPTIONAL);
+  /*IN*/ HANDLE  FileHandle,
+  /*IN*/ HANDLE  Event  /*OPTIONAL*/,
+  /*IN*/ PIO_APC_ROUTINE  ApcRoutine  /*OPTIONAL*/,
+  /*IN*/ PVOID  ApcContext  /*OPTIONAL*/,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock,
+  /*OUT*/ PVOID  Buffer,
+  /*IN*/ ULONG  Length,
+  /*IN*/ PLARGE_INTEGER  ByteOffset  /*OPTIONAL*/,
+  /*IN*/ PULONG  Key  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwReadFile(
-  IN HANDLE  FileHandle,
-  IN HANDLE  Event  OPTIONAL,
-  IN PIO_APC_ROUTINE  ApcRoutine  OPTIONAL,
-  IN PVOID  ApcContext  OPTIONAL,
-  OUT PIO_STATUS_BLOCK  IoStatusBlock,
-  OUT PVOID  Buffer,
-  IN ULONG  Length,
-  IN PLARGE_INTEGER  ByteOffset  OPTIONAL,
-  IN PULONG  Key  OPTIONAL);
+  /*IN*/ HANDLE  FileHandle,
+  /*IN*/ HANDLE  Event  /*OPTIONAL*/,
+  /*IN*/ PIO_APC_ROUTINE  ApcRoutine  /*OPTIONAL*/,
+  /*IN*/ PVOID  ApcContext  /*OPTIONAL*/,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock,
+  /*OUT*/ PVOID  Buffer,
+  /*IN*/ ULONG  Length,
+  /*IN*/ PLARGE_INTEGER  ByteOffset  /*OPTIONAL*/,
+  /*IN*/ PULONG  Key  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 NtSetEvent(
-  IN HANDLE  EventHandle,
-  IN PULONG  NumberOfThreadsReleased);
+  /*IN*/ HANDLE  EventHandle,
+  /*IN*/ PULONG  NumberOfThreadsReleased);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwSetEvent(
-  IN HANDLE  EventHandle,
-  IN PULONG  NumberOfThreadsReleased);
+  /*IN*/ HANDLE  EventHandle,
+  /*IN*/ PULONG  NumberOfThreadsReleased);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwSetInformationFile(
-  IN HANDLE  FileHandle,
-  OUT PIO_STATUS_BLOCK  IoStatusBlock,
-  IN PVOID  FileInformation,
-  IN ULONG  Length,
-  IN FILE_INFORMATION_CLASS  FileInformationClass);
+  /*IN*/ HANDLE  FileHandle,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock,
+  /*IN*/ PVOID  FileInformation,
+  /*IN*/ ULONG  Length,
+  /*IN*/ FILE_INFORMATION_CLASS  FileInformationClass);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwSetInformationThread(
-  IN HANDLE  ThreadHandle,
-  IN THREADINFOCLASS  ThreadInformationClass,
-  IN PVOID  ThreadInformation,
-  IN ULONG  ThreadInformationLength);
+  /*IN*/ HANDLE  ThreadHandle,
+  /*IN*/ THREADINFOCLASS  ThreadInformationClass,
+  /*IN*/ PVOID  ThreadInformation,
+  /*IN*/ ULONG  ThreadInformationLength);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwSetTimer(
-  IN HANDLE  TimerHandle,
-  IN PLARGE_INTEGER  DueTime,
-  IN PTIMER_APC_ROUTINE  TimerApcRoutine  OPTIONAL,
-  IN PVOID  TimerContext  OPTIONAL,
-  IN BOOLEAN  WakeTimer,
-  IN LONG  Period  OPTIONAL,
-  OUT PBOOLEAN  PreviousState  OPTIONAL);
+  /*IN*/ HANDLE  TimerHandle,
+  /*IN*/ PLARGE_INTEGER  DueTime,
+  /*IN*/ PTIMER_APC_ROUTINE  TimerApcRoutine  /*OPTIONAL*/,
+  /*IN*/ PVOID  TimerContext  /*OPTIONAL*/,
+  /*IN*/ BOOLEAN  WakeTimer,
+  /*IN*/ LONG  Period  /*OPTIONAL*/,
+  /*OUT*/ PBOOLEAN  PreviousState  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwSetValueKey(
-  IN HANDLE  KeyHandle,
-  IN PUNICODE_STRING  ValueName,
-  IN ULONG  TitleIndex  OPTIONAL,
-  IN ULONG  Type,
-  IN PVOID  Data,
-  IN ULONG  DataSize);
+  /*IN*/ HANDLE  KeyHandle,
+  /*IN*/ PUNICODE_STRING  ValueName,
+  /*IN*/ ULONG  TitleIndex  /*OPTIONAL*/,
+  /*IN*/ ULONG  Type,
+  /*IN*/ PVOID  Data,
+  /*IN*/ ULONG  DataSize);
 
 /* [Nt|Zw]MapViewOfSection.InheritDisposition constants */
 #define AT_EXTENDABLE_FILE                0x00002000
@@ -8955,59 +8960,59 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 NtUnmapViewOfSection(
-  IN HANDLE  ProcessHandle,
-  IN PVOID  BaseAddress);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN*/ PVOID  BaseAddress);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwUnmapViewOfSection(
-  IN HANDLE  ProcessHandle,
-  IN PVOID  BaseAddress);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN*/ PVOID  BaseAddress);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 NtWaitForSingleObject(
-  IN HANDLE  Object,
-  IN BOOLEAN  Alertable,
-  IN PLARGE_INTEGER  Time);
+  /*IN*/ HANDLE  Object,
+  /*IN*/ BOOLEAN  Alertable,
+  /*IN*/ PLARGE_INTEGER  Time);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwWaitForSingleObject(
-  IN HANDLE  Object,
-  IN BOOLEAN  Alertable,
-  IN PLARGE_INTEGER  Time);
+  /*IN*/ HANDLE  Object,
+  /*IN*/ BOOLEAN  Alertable,
+  /*IN*/ PLARGE_INTEGER  Time);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 NtWriteFile(
-  IN HANDLE  FileHandle,
-  IN HANDLE  Event  OPTIONAL,
-  IN PIO_APC_ROUTINE  ApcRoutine  OPTIONAL,
-  IN PVOID  ApcContext  OPTIONAL,
-  OUT PIO_STATUS_BLOCK  IoStatusBlock,
-  IN PVOID  Buffer,
-  IN ULONG  Length,
-  IN PLARGE_INTEGER  ByteOffset  OPTIONAL,
-  IN PULONG  Key  OPTIONAL);
+  /*IN*/ HANDLE  FileHandle,
+  /*IN*/ HANDLE  Event  /*OPTIONAL*/,
+  /*IN*/ PIO_APC_ROUTINE  ApcRoutine  /*OPTIONAL*/,
+  /*IN*/ PVOID  ApcContext  /*OPTIONAL*/,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock,
+  /*IN*/ PVOID  Buffer,
+  /*IN*/ ULONG  Length,
+  /*IN*/ PLARGE_INTEGER  ByteOffset  /*OPTIONAL*/,
+  /*IN*/ PULONG  Key  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 ZwWriteFile(
-  IN HANDLE  FileHandle,
-  IN HANDLE  Event  OPTIONAL,
-  IN PIO_APC_ROUTINE  ApcRoutine  OPTIONAL,
-  IN PVOID  ApcContext  OPTIONAL,
-  OUT PIO_STATUS_BLOCK  IoStatusBlock,
-  IN PVOID  Buffer,
-  IN ULONG  Length,
-  IN PLARGE_INTEGER  ByteOffset  OPTIONAL,
-  IN PULONG  Key  OPTIONAL);
+  /*IN*/ HANDLE  FileHandle,
+  /*IN*/ HANDLE  Event  /*OPTIONAL*/,
+  /*IN*/ PIO_APC_ROUTINE  ApcRoutine  /*OPTIONAL*/,
+  /*IN*/ PVOID  ApcContext  /*OPTIONAL*/,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock,
+  /*IN*/ PVOID  Buffer,
+  /*IN*/ ULONG  Length,
+  /*IN*/ PLARGE_INTEGER  ByteOffset  /*OPTIONAL*/,
+  /*IN*/ PULONG  Key  /*OPTIONAL*/);
 
 
 
@@ -9017,41 +9022,41 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 PoCallDriver(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN OUT PIRP  Irp);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN OUT*/ PIRP  Irp);
 
 NTOSAPI
 PULONG
 DDKAPI
 PoRegisterDeviceForIdleDetection(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN ULONG  ConservationIdleTime,
-  IN ULONG  PerformanceIdleTime,
-  IN DEVICE_POWER_STATE  State);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ ULONG  ConservationIdleTime,
+  /*IN*/ ULONG  PerformanceIdleTime,
+  /*IN*/ DEVICE_POWER_STATE  State);
 
 NTOSAPI
 PVOID
 DDKAPI
 PoRegisterSystemState(
-  IN PVOID  StateHandle,
-  IN EXECUTION_STATE  Flags);
+  /*IN*/ PVOID  StateHandle,
+  /*IN*/ EXECUTION_STATE  Flags);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 PoRequestPowerIrp(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN UCHAR  MinorFunction,  
-  IN POWER_STATE  PowerState,
-  IN PREQUEST_POWER_COMPLETE  CompletionFunction,
-  IN PVOID  Context,
-  OUT PIRP  *Irp OPTIONAL);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ UCHAR  MinorFunction,  
+  /*IN*/ POWER_STATE  PowerState,
+  /*IN*/ PREQUEST_POWER_COMPLETE  CompletionFunction,
+  /*IN*/ PVOID  Context,
+  /*OUT*/ PIRP  *Irp /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 PoRequestShutdownEvent(
-  OUT PVOID  *Event);
+  /*OUT*/ PVOID  *Event);
 
 NTOSAPI
 VOID
@@ -9063,27 +9068,27 @@ NTOSAPI
 POWER_STATE
 DDKAPI
 PoSetPowerState(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN POWER_STATE_TYPE  Type,
-  IN POWER_STATE  State);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ POWER_STATE_TYPE  Type,
+  /*IN*/ POWER_STATE  State);
 
 NTOSAPI
 VOID
 DDKAPI
 PoSetSystemState(
-  IN EXECUTION_STATE  Flags);
+  /*IN*/ EXECUTION_STATE  Flags);
 
 NTOSAPI
 VOID
 DDKAPI
 PoStartNextPowerIrp(
-  IN PIRP  Irp);
+  /*IN*/ PIRP  Irp);
 
 NTOSAPI
 VOID
 DDKAPI
 PoUnregisterSystemState(
-  IN PVOID  StateHandle);
+  /*IN*/ PVOID  StateHandle);
 
 
 
@@ -9093,50 +9098,50 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 WmiCompleteRequest(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN PIRP  Irp,
-  IN NTSTATUS  Status,
-  IN ULONG  BufferUsed,
-  IN CCHAR  PriorityBoost);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ PIRP  Irp,
+  /*IN*/ NTSTATUS  Status,
+  /*IN*/ ULONG  BufferUsed,
+  /*IN*/ CCHAR  PriorityBoost);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 WmiFireEvent(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN LPGUID  Guid, 
-  IN ULONG  InstanceIndex,
-  IN ULONG  EventDataSize,
-  IN PVOID  EventData); 
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ LPGUID  Guid, 
+  /*IN*/ ULONG  InstanceIndex,
+  /*IN*/ ULONG  EventDataSize,
+  /*IN*/ PVOID  EventData); 
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 WmiQueryTraceInformation(
-  IN TRACE_INFORMATION_CLASS  TraceInformationClass,
-  OUT PVOID  TraceInformation,
-  IN ULONG  TraceInformationLength,
-  OUT PULONG  RequiredLength OPTIONAL,
-  IN PVOID  Buffer OPTIONAL);
+  /*IN*/ TRACE_INFORMATION_CLASS  TraceInformationClass,
+  /*OUT*/ PVOID  TraceInformation,
+  /*IN*/ ULONG  TraceInformationLength,
+  /*OUT*/ PULONG  RequiredLength /*OPTIONAL*/,
+  /*IN*/ PVOID  Buffer /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 WmiSystemControl(
-  IN PWMILIB_CONTEXT  WmiLibInfo,
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN PIRP  Irp,
-  OUT PSYSCTL_IRP_DISPOSITION  IrpDisposition);
+  /*IN*/ PWMILIB_CONTEXT  WmiLibInfo,
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ PIRP  Irp,
+  /*OUT*/ PSYSCTL_IRP_DISPOSITION  IrpDisposition);
 
 NTOSAPI
 NTSTATUS
 DDKCDECLAPI
 WmiTraceMessage(
-  IN TRACEHANDLE  LoggerHandle,
-  IN ULONG  MessageFlags,
-  IN LPGUID  MessageGuid,
-  IN USHORT  MessageNumber,
-  IN ...);
+  /*IN*/ TRACEHANDLE  LoggerHandle,
+  /*IN*/ ULONG  MessageFlags,
+  /*IN*/ LPGUID  MessageGuid,
+  /*IN*/ USHORT  MessageNumber,
+  /*IN*/ ...);
 
 #if 0
 /* FIXME: Get va_list from where? */
@@ -9144,11 +9149,11 @@ NTOSAPI
 NTSTATUS
 DDKCDECLAPI
 WmiTraceMessageVa(
-  IN TRACEHANDLE  LoggerHandle,
-  IN ULONG  MessageFlags,
-  IN LPGUID  MessageGuid,
-  IN USHORT  MessageNumber,
-  IN va_list  MessageArgList);
+  /*IN*/ TRACEHANDLE  LoggerHandle,
+  /*IN*/ ULONG  MessageFlags,
+  /*IN*/ LPGUID  MessageGuid,
+  /*IN*/ USHORT  MessageNumber,
+  /*IN*/ va_list  MessageArgList);
 #endif
 
 
@@ -9176,45 +9181,45 @@ NTOSAPI
 VOID
 DDKAPI
 DbgBreakPointWithStatus(
-  IN ULONG  Status);
+  /*IN*/ ULONG  Status);
 
 NTOSAPI
 ULONG
 DDKCDECLAPI
 DbgPrint(
-  IN PCH  Format,
-  IN ...);
+  /*IN*/ PCH  Format,
+  /*IN*/ ...);
 
 NTOSAPI
 ULONG
 DDKCDECLAPI
 DbgPrintEx(
-  IN ULONG  ComponentId,
-  IN ULONG  Level,
-  IN PCH  Format,
-  IN ...);
+  /*IN*/ ULONG  ComponentId,
+  /*IN*/ ULONG  Level,
+  /*IN*/ PCH  Format,
+  /*IN*/ ...);
 
 NTOSAPI
 ULONG
 DDKCDECLAPI
 DbgPrintReturnControlC(
-  IN PCH  Format,
-  IN ...);
+  /*IN*/ PCH  Format,
+  /*IN*/ ...);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 DbgQueryDebugFilterState(
-  IN ULONG  ComponentId,
-  IN ULONG  Level);
+  /*IN*/ ULONG  ComponentId,
+  /*IN*/ ULONG  Level);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 DbgSetDebugFilterState(
-  IN ULONG  ComponentId,
-  IN ULONG  Level,
-  IN BOOLEAN  State);
+  /*IN*/ ULONG  ComponentId,
+  /*IN*/ ULONG  Level,
+  /*IN*/ BOOLEAN  State);
 
 #ifdef DBG
 

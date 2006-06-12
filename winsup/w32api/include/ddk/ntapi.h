@@ -656,57 +656,57 @@ NTOSAPI
 NTSTATUS
 NTAPI
 NtQuerySystemInformation(
-  IN SYSTEM_INFORMATION_CLASS  SystemInformationClass,
-  IN OUT PVOID  SystemInformation,
-  IN ULONG  SystemInformationLength,
-  OUT PULONG  ReturnLength  OPTIONAL);
+  /*IN*/ SYSTEM_INFORMATION_CLASS  SystemInformationClass,
+  /*IN OUT*/ PVOID  SystemInformation,
+  /*IN*/ ULONG  SystemInformationLength,
+  /*OUT*/ PULONG  ReturnLength  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwQuerySystemInformation(
-  IN SYSTEM_INFORMATION_CLASS  SystemInformationClass,
-  IN OUT PVOID  SystemInformation,
-  IN ULONG  SystemInformationLength,
-  OUT PULONG  ReturnLength  OPTIONAL);
+  /*IN*/ SYSTEM_INFORMATION_CLASS  SystemInformationClass,
+  /*IN OUT*/ PVOID  SystemInformation,
+  /*IN*/ ULONG  SystemInformationLength,
+  /*OUT*/ PULONG  ReturnLength  /*OPTIONAL*/);
 
 NTOSAPI
 NTAPI
 NTSTATUS
 NtQueryFullAttributesFile(
-	IN POBJECT_ATTRIBUTES ObjectAttributes,
-	OUT PFILE_NETWORK_OPEN_INFORMATION FileInformation);
+  /*IN*/ POBJECT_ATTRIBUTES ObjectAttributes,
+  /*OUT*/ PFILE_NETWORK_OPEN_INFORMATION FileInformation);
 
 NTOSAPI
 NTAPI
 NTSTATUS
 ZwQueryFullAttributesFile(
-	IN POBJECT_ATTRIBUTES ObjectAttributes,
- 	OUT PFILE_NETWORK_OPEN_INFORMATION FileInformation);
+  /*IN*/ POBJECT_ATTRIBUTES ObjectAttributes,
+  /*OUT*/ PFILE_NETWORK_OPEN_INFORMATION FileInformation);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwSetSystemInformation(
-	IN SYSTEM_INFORMATION_CLASS  SystemInformationClass,
-	IN OUT PVOID  SystemInformation,
-	IN ULONG  SystemInformationLength);
+  /*IN*/ SYSTEM_INFORMATION_CLASS  SystemInformationClass,
+  /*IN OUT*/ PVOID  SystemInformation,
+  /*IN*/ ULONG  SystemInformationLength);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwQuerySystemEnvironmentValue(
-	IN PUNICODE_STRING  Name,
-	OUT PVOID  Value,
-	IN ULONG  ValueLength,
-	OUT PULONG  ReturnLength  OPTIONAL);
+  /*IN*/ PUNICODE_STRING  Name,
+  /*OUT*/ PVOID  Value,
+  /*IN*/ ULONG  ValueLength,
+  /*OUT*/ PULONG  ReturnLength  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwSetSystemEnvironmentValue(
-	IN PUNICODE_STRING  Name,
-	IN PUNICODE_STRING  Value);
+  /*IN*/ PUNICODE_STRING  Name,
+  /*IN*/ PUNICODE_STRING  Value);
 
 typedef enum _SHUTDOWN_ACTION {
 	ShutdownNoReboot,
@@ -718,7 +718,7 @@ NTOSAPI
 NTSTATUS
 NTAPI
 NtShutdownSystem(
-  IN SHUTDOWN_ACTION  Action);
+  /*IN*/ SHUTDOWN_ACTION  Action);
 
 typedef enum _DEBUG_CONTROL_CODE {
   DebugGetTraceInformation = 1,
@@ -735,12 +735,12 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwSystemDebugControl(
-	IN DEBUG_CONTROL_CODE  ControlCode,
-	IN PVOID  InputBuffer  OPTIONAL,
-	IN ULONG  InputBufferLength,
-	OUT PVOID  OutputBuffer  OPTIONAL,
-	IN ULONG  OutputBufferLength,
-	OUT PULONG  ReturnLength  OPTIONAL);
+  /*IN*/ DEBUG_CONTROL_CODE  ControlCode,
+  /*IN*/ PVOID  InputBuffer  /*OPTIONAL*/,
+  /*IN*/ ULONG  InputBufferLength,
+  /*OUT*/ PVOID  OutputBuffer  /*OPTIONAL*/,
+  /*IN*/ ULONG  OutputBufferLength,
+  /*OUT*/ PULONG  ReturnLength  /*OPTIONAL*/);
 
 
 
@@ -758,20 +758,20 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwQueryObject(
-	IN HANDLE  ObjectHandle,
-	IN OBJECT_INFORMATION_CLASS  ObjectInformationClass,
-	OUT PVOID  ObjectInformation,
-	IN ULONG  ObjectInformationLength,
-	OUT PULONG  ReturnLength  OPTIONAL);
+  /*IN*/ HANDLE  ObjectHandle,
+  /*IN*/ OBJECT_INFORMATION_CLASS  ObjectInformationClass,
+  /*OUT*/ PVOID  ObjectInformation,
+  /*IN*/ ULONG  ObjectInformationLength,
+  /*OUT*/ PULONG  ReturnLength  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwSetInformationObject(
-	IN HANDLE  ObjectHandle,
-	IN OBJECT_INFORMATION_CLASS  ObjectInformationClass,
-	IN PVOID  ObjectInformation,
-	IN ULONG  ObjectInformationLength);
+  /*IN*/ HANDLE  ObjectHandle,
+  /*IN*/ OBJECT_INFORMATION_CLASS  ObjectInformationClass,
+  /*IN*/ PVOID  ObjectInformation,
+  /*IN*/ ULONG  ObjectInformationLength);
 
 /* OBJECT_BASIC_INFORMATION.Attributes constants */
 /* also in winbase.h */
@@ -828,81 +828,81 @@ NTOSAPI
 NTSTATUS
 NTAPI
 NtDuplicateObject(
-  IN HANDLE  SourceProcessHandle,
-  IN HANDLE  SourceHandle,
-  IN HANDLE  TargetProcessHandle,
-  OUT PHANDLE  TargetHandle  OPTIONAL,
-  IN ACCESS_MASK  DesiredAccess,
-  IN ULONG  Attributes,
-  IN ULONG  Options);
+  /*IN*/ HANDLE  SourceProcessHandle,
+  /*IN*/ HANDLE  SourceHandle,
+  /*IN*/ HANDLE  TargetProcessHandle,
+  /*OUT*/ PHANDLE  TargetHandle  /*OPTIONAL*/,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ ULONG  Attributes,
+  /*IN*/ ULONG  Options);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwDuplicateObject(
-  IN HANDLE  SourceProcessHandle,
-  IN HANDLE  SourceHandle,
-  IN HANDLE  TargetProcessHandle,
-  OUT PHANDLE  TargetHandle  OPTIONAL,
-  IN ACCESS_MASK  DesiredAccess,
-  IN ULONG  Attributes,
-  IN ULONG  Options);
+  /*IN*/ HANDLE  SourceProcessHandle,
+  /*IN*/ HANDLE  SourceHandle,
+  /*IN*/ HANDLE  TargetProcessHandle,
+  /*OUT*/ PHANDLE  TargetHandle  /*OPTIONAL*/,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ ULONG  Attributes,
+  /*IN*/ ULONG  Options);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 NtQuerySecurityObject(
-  IN HANDLE Handle,
-  IN SECURITY_INFORMATION  SecurityInformation,
-  OUT PSECURITY_DESCRIPTOR  SecurityDescriptor,
-  IN ULONG  SecurityDescriptorLength,
-  OUT PULONG  ReturnLength);
+  /*IN*/ HANDLE Handle,
+  /*IN*/ SECURITY_INFORMATION  SecurityInformation,
+  /*OUT*/ PSECURITY_DESCRIPTOR  SecurityDescriptor,
+  /*IN*/ ULONG  SecurityDescriptorLength,
+  /*OUT*/ PULONG  ReturnLength);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwQuerySecurityObject(
-  IN HANDLE Handle,
-  IN SECURITY_INFORMATION  SecurityInformation,
-  OUT PSECURITY_DESCRIPTOR  SecurityDescriptor,
-  IN ULONG  SecurityDescriptorLength,
-  OUT PULONG  ReturnLength);
+  /*IN*/ HANDLE Handle,
+  /*IN*/ SECURITY_INFORMATION  SecurityInformation,
+  /*OUT*/ PSECURITY_DESCRIPTOR  SecurityDescriptor,
+  /*IN*/ ULONG  SecurityDescriptorLength,
+  /*OUT*/ PULONG  ReturnLength);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 NtSetSecurityObject(
-  IN HANDLE  Handle,
-  IN SECURITY_INFORMATION  SecurityInformation,
-  IN PSECURITY_DESCRIPTOR  SecurityDescriptor);
+  /*IN*/ HANDLE  Handle,
+  /*IN*/ SECURITY_INFORMATION  SecurityInformation,
+  /*IN*/ PSECURITY_DESCRIPTOR  SecurityDescriptor);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwSetSecurityObject(
-  IN HANDLE  Handle,
-  IN SECURITY_INFORMATION  SecurityInformation,
-  IN PSECURITY_DESCRIPTOR  SecurityDescriptor);
+  /*IN*/ HANDLE  Handle,
+  /*IN*/ SECURITY_INFORMATION  SecurityInformation,
+  /*IN*/ PSECURITY_DESCRIPTOR  SecurityDescriptor);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwOpenDirectoryObject(
-  OUT PHANDLE  DirectoryHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes);
+  /*OUT*/ PHANDLE  DirectoryHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwQueryDirectoryObject(
-  IN HANDLE  DirectoryHandle,
-  OUT PVOID  Buffer,
-  IN ULONG  BufferLength,
-  IN BOOLEAN  ReturnSingleEntry,
-  IN BOOLEAN  RestartScan,
-  IN OUT PULONG  Context,
-  OUT PULONG  ReturnLength  OPTIONAL);
+  /*IN*/ HANDLE  DirectoryHandle,
+  /*OUT*/ PVOID  Buffer,
+  /*IN*/ ULONG  BufferLength,
+  /*IN*/ BOOLEAN  ReturnSingleEntry,
+  /*IN*/ BOOLEAN  RestartScan,
+  /*IN OUT*/ PULONG  Context,
+  /*OUT*/ PULONG  ReturnLength  /*OPTIONAL*/);
 
 typedef struct _DIRECTORY_BASIC_INFORMATION {
   UNICODE_STRING  ObjectName;
@@ -913,10 +913,10 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwCreateSymbolicLinkObject(
-  OUT PHANDLE  SymbolicLinkHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes,
-  IN PUNICODE_STRING  TargetName);
+  /*OUT*/ PHANDLE  SymbolicLinkHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*IN*/ PUNICODE_STRING  TargetName);
 
 
 
@@ -934,52 +934,52 @@ NTOSAPI
 NTSTATUS
 NTAPI
 NtAllocateVirtualMemory(
-  IN HANDLE  ProcessHandle,
-  IN OUT PVOID  *BaseAddress,
-  IN ULONG  ZeroBits,
-  IN OUT PULONG  AllocationSize,
-  IN ULONG  AllocationType,
-  IN ULONG  Protect);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN OUT*/ PVOID  *BaseAddress,
+  /*IN*/ ULONG  ZeroBits,
+  /*IN OUT*/ PULONG  AllocationSize,
+  /*IN*/ ULONG  AllocationType,
+  /*IN*/ ULONG  Protect);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwAllocateVirtualMemory(
-  IN HANDLE  ProcessHandle,
-  IN OUT PVOID  *BaseAddress,
-  IN ULONG  ZeroBits,
-  IN OUT PULONG  AllocationSize,
-  IN ULONG  AllocationType,
-  IN ULONG  Protect);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN OUT*/ PVOID  *BaseAddress,
+  /*IN*/ ULONG  ZeroBits,
+  /*IN OUT*/ PULONG  AllocationSize,
+  /*IN*/ ULONG  AllocationType,
+  /*IN*/ ULONG  Protect);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 NtFreeVirtualMemory(
-  IN HANDLE  ProcessHandle,
-  IN OUT PVOID  *BaseAddress,
-  IN OUT PULONG  FreeSize,
-  IN ULONG  FreeType);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN OUT*/ PVOID  *BaseAddress,
+  /*IN OUT*/ PULONG  FreeSize,
+  /*IN*/ ULONG  FreeType);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwFreeVirtualMemory(
-  IN HANDLE  ProcessHandle,
-  IN OUT PVOID  *BaseAddress,
-  IN OUT PULONG  FreeSize,
-  IN ULONG  FreeType);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN OUT*/ PVOID  *BaseAddress,
+  /*IN OUT*/ PULONG  FreeSize,
+  /*IN*/ ULONG  FreeType);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwQueryVirtualMemory(
-	IN HANDLE  ProcessHandle,
-	IN PVOID  BaseAddress,
-	IN MEMORY_INFORMATION_CLASS  MemoryInformationClass,
-	OUT PVOID  MemoryInformation,
-	IN ULONG  MemoryInformationLength,
-	OUT PULONG  ReturnLength  OPTIONAL);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN*/ PVOID  BaseAddress,
+  /*IN*/ MEMORY_INFORMATION_CLASS  MemoryInformationClass,
+  /*OUT*/ PVOID  MemoryInformation,
+  /*IN*/ ULONG  MemoryInformationLength,
+  /*OUT*/ PULONG  ReturnLength  /*OPTIONAL*/);
 
 /* MEMORY_WORKING_SET_LIST.WorkingSetList constants */
 #define WSLE_PAGE_READONLY                0x001
@@ -1009,110 +1009,110 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwLockVirtualMemory(
-	IN HANDLE  ProcessHandle,
-	IN OUT PVOID  *BaseAddress,
-	IN OUT PULONG  LockSize,
-	IN ULONG  LockType);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN OUT*/ PVOID  *BaseAddress,
+  /*IN OUT*/ PULONG  LockSize,
+  /*IN*/ ULONG  LockType);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwUnlockVirtualMemory(
-	IN HANDLE  ProcessHandle,
-	IN OUT PVOID  *BaseAddress,
-	IN OUT PULONG  LockSize,
-	IN ULONG  LockType);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN OUT*/ PVOID  *BaseAddress,
+  /*IN OUT*/ PULONG  LockSize,
+  /*IN*/ ULONG  LockType);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwReadVirtualMemory(
-	IN HANDLE  ProcessHandle,
-	IN PVOID  BaseAddress,
-	OUT PVOID  Buffer,
-	IN ULONG  BufferLength,
-	OUT PULONG  ReturnLength  OPTIONAL);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN*/ PVOID  BaseAddress,
+  /*OUT*/ PVOID  Buffer,
+  /*IN*/ ULONG  BufferLength,
+  /*OUT*/ PULONG  ReturnLength  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwWriteVirtualMemory(
-	IN HANDLE  ProcessHandle,
-	IN PVOID  BaseAddress,
-	IN PVOID  Buffer,
-	IN ULONG  BufferLength,
-	OUT PULONG  ReturnLength  OPTIONAL);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN*/ PVOID  BaseAddress,
+  /*IN*/ PVOID  Buffer,
+  /*IN*/ ULONG  BufferLength,
+  /*OUT*/ PULONG  ReturnLength  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwProtectVirtualMemory(
-	IN HANDLE  ProcessHandle,
-	IN OUT PVOID  *BaseAddress,
-	IN OUT PULONG  ProtectSize,
-	IN ULONG  NewProtect,
-	OUT PULONG  OldProtect);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN OUT*/ PVOID  *BaseAddress,
+  /*IN OUT*/ PULONG  ProtectSize,
+  /*IN*/ ULONG  NewProtect,
+  /*OUT*/ PULONG  OldProtect);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwFlushVirtualMemory(
-	IN HANDLE  ProcessHandle,
-	IN OUT PVOID  *BaseAddress,
-	IN OUT PULONG  FlushSize,
-	OUT PIO_STATUS_BLOCK  IoStatusBlock);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN OUT*/ PVOID  *BaseAddress,
+  /*IN OUT*/ PULONG  FlushSize,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwAllocateUserPhysicalPages(
-	IN HANDLE  ProcessHandle,
-	IN PULONG  NumberOfPages,
-	OUT PULONG  PageFrameNumbers);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN*/ PULONG  NumberOfPages,
+  /*OUT*/ PULONG  PageFrameNumbers);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwFreeUserPhysicalPages(
-	IN HANDLE  ProcessHandle,
-	IN OUT PULONG  NumberOfPages,
-	IN PULONG  PageFrameNumbers);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN OUT*/ PULONG  NumberOfPages,
+  /*IN*/ PULONG  PageFrameNumbers);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwMapUserPhysicalPages(
-	IN PVOID  BaseAddress,
-	IN PULONG  NumberOfPages,
-	IN PULONG  PageFrameNumbers);
+  /*IN*/ PVOID  BaseAddress,
+  /*IN*/ PULONG  NumberOfPages,
+  /*IN*/ PULONG  PageFrameNumbers);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwMapUserPhysicalPagesScatter(
-	IN PVOID  *BaseAddresses,
-	IN PULONG  NumberOfPages,
-	IN PULONG  PageFrameNumbers);
+  /*IN*/ PVOID  *BaseAddresses,
+  /*IN*/ PULONG  NumberOfPages,
+  /*IN*/ PULONG  PageFrameNumbers);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwGetWriteWatch(
-	IN HANDLE  ProcessHandle,
-	IN ULONG  Flags,
-	IN PVOID  BaseAddress,
-	IN ULONG  RegionSize,
-	OUT PULONG  Buffer,
-	IN OUT PULONG  BufferEntries,
-	OUT PULONG  Granularity);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN*/ ULONG  Flags,
+  /*IN*/ PVOID  BaseAddress,
+  /*IN*/ ULONG  RegionSize,
+  /*OUT*/ PULONG  Buffer,
+  /*IN OUT*/ PULONG  BufferEntries,
+  /*OUT*/ PULONG  Granularity);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwResetWriteWatch(
-	IN HANDLE  ProcessHandle,
-	IN PVOID  BaseAddress,
-	IN ULONG  RegionSize);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN*/ PVOID  BaseAddress,
+  /*IN*/ ULONG  RegionSize);
 
 
 
@@ -1128,49 +1128,49 @@ NTOSAPI
 NTSTATUS
 NTAPI
 NtCreateSection(
-  OUT PHANDLE  SectionHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes,
-  IN PLARGE_INTEGER  SectionSize  OPTIONAL,
-  IN ULONG  Protect,
-  IN ULONG  Attributes,
-  IN HANDLE  FileHandle);
+  /*OUT*/ PHANDLE  SectionHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*IN*/ PLARGE_INTEGER  SectionSize  /*OPTIONAL*/,
+  /*IN*/ ULONG  Protect,
+  /*IN*/ ULONG  Attributes,
+  /*IN*/ HANDLE  FileHandle);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwCreateSection(
-  OUT PHANDLE  SectionHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes,
-  IN PLARGE_INTEGER  SectionSize  OPTIONAL,
-  IN ULONG  Protect,
-  IN ULONG  Attributes,
-  IN HANDLE  FileHandle);
+  /*OUT*/ PHANDLE  SectionHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*IN*/ PLARGE_INTEGER  SectionSize  /*OPTIONAL*/,
+  /*IN*/ ULONG  Protect,
+  /*IN*/ ULONG  Attributes,
+  /*IN*/ HANDLE  FileHandle);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwQuerySection(
-	IN HANDLE  SectionHandle,
-	IN SECTION_INFORMATION_CLASS  SectionInformationClass,
-	OUT PVOID  SectionInformation,
-	IN ULONG  SectionInformationLength,
-  OUT PULONG  ResultLength  OPTIONAL);
+  /*IN*/ HANDLE  SectionHandle,
+  /*IN*/ SECTION_INFORMATION_CLASS  SectionInformationClass,
+  /*OUT*/ PVOID  SectionInformation,
+  /*IN*/ ULONG  SectionInformationLength,
+  /*OUT*/ PULONG  ResultLength  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwExtendSection(
-	IN HANDLE  SectionHandle,
-	IN PLARGE_INTEGER  SectionSize);
+  /*IN*/ HANDLE  SectionHandle,
+  /*IN*/ PLARGE_INTEGER  SectionSize);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwAreMappedFilesTheSame(
-	IN PVOID  Address1,
-	IN PVOID  Address2);
+  /*IN*/ PVOID  Address1,
+  /*IN*/ PVOID  Address2);
 
 
 
@@ -1189,68 +1189,68 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwCreateThread(
-	OUT PHANDLE  ThreadHandle,
-	IN ACCESS_MASK  DesiredAccess,
-	IN POBJECT_ATTRIBUTES  ObjectAttributes,
-	IN HANDLE  ProcessHandle,
-	OUT PCLIENT_ID  ClientId,
-	IN PCONTEXT  ThreadContext,
-	IN PUSER_STACK  UserStack,
-	IN BOOLEAN  CreateSuspended);
+  /*OUT*/ PHANDLE  ThreadHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*IN*/ HANDLE  ProcessHandle,
+  /*OUT*/ PCLIENT_ID  ClientId,
+  /*IN*/ PCONTEXT  ThreadContext,
+  /*IN*/ PUSER_STACK  UserStack,
+  /*IN*/ BOOLEAN  CreateSuspended);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 NtOpenThread(
-  OUT PHANDLE  ThreadHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes,
-  IN PCLIENT_ID  ClientId);
+  /*OUT*/ PHANDLE  ThreadHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*IN*/ PCLIENT_ID  ClientId);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwOpenThread(
-  OUT PHANDLE  ThreadHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes,
-  IN PCLIENT_ID  ClientId);
+  /*OUT*/ PHANDLE  ThreadHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*IN*/ PCLIENT_ID  ClientId);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwTerminateThread(
-	IN HANDLE  ThreadHandle  OPTIONAL,
-	IN NTSTATUS  ExitStatus);
+  /*IN*/ HANDLE  ThreadHandle  /*OPTIONAL*/,
+  /*IN*/ NTSTATUS  ExitStatus);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 NtQueryInformationThread(
-  IN HANDLE  ThreadHandle,
-  IN THREADINFOCLASS  ThreadInformationClass,
-  OUT PVOID  ThreadInformation,
-  IN ULONG  ThreadInformationLength,
-  OUT PULONG  ReturnLength  OPTIONAL);
+  /*IN*/ HANDLE  ThreadHandle,
+  /*IN*/ THREADINFOCLASS  ThreadInformationClass,
+  /*OUT*/ PVOID  ThreadInformation,
+  /*IN*/ ULONG  ThreadInformationLength,
+  /*OUT*/ PULONG  ReturnLength  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwQueryInformationThread(
-  IN HANDLE  ThreadHandle,
-  IN THREADINFOCLASS  ThreadInformationClass,
-  OUT PVOID  ThreadInformation,
-  IN ULONG  ThreadInformationLength,
-  OUT PULONG  ReturnLength  OPTIONAL);
+  /*IN*/ HANDLE  ThreadHandle,
+  /*IN*/ THREADINFOCLASS  ThreadInformationClass,
+  /*OUT*/ PVOID  ThreadInformation,
+  /*IN*/ ULONG  ThreadInformationLength,
+  /*OUT*/ PULONG  ReturnLength  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 NtSetInformationThread(
-  IN HANDLE  ThreadHandle,
-  IN THREADINFOCLASS  ThreadInformationClass,
-  IN PVOID  ThreadInformation,
-  IN ULONG  ThreadInformationLength);
+  /*IN*/ HANDLE  ThreadHandle,
+  /*IN*/ THREADINFOCLASS  ThreadInformationClass,
+  /*IN*/ PVOID  ThreadInformation,
+  /*IN*/ ULONG  ThreadInformationLength);
 
 typedef struct _THREAD_BASIC_INFORMATION {
 	NTSTATUS  ExitStatus;
@@ -1272,39 +1272,39 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwSuspendThread(
-  IN HANDLE  ThreadHandle,
-  OUT PULONG  PreviousSuspendCount  OPTIONAL);
+  /*IN*/ HANDLE  ThreadHandle,
+  /*OUT*/ PULONG  PreviousSuspendCount  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwResumeThread(
-  IN HANDLE  ThreadHandle,
-  OUT PULONG  PreviousSuspendCount  OPTIONAL);
+  /*IN*/ HANDLE  ThreadHandle,
+  /*OUT*/ PULONG  PreviousSuspendCount  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwGetContextThread(
-  IN HANDLE  ThreadHandle,
-  OUT PCONTEXT  Context);
+  /*IN*/ HANDLE  ThreadHandle,
+  /*OUT*/ PCONTEXT  Context);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwSetContextThread(
-	IN HANDLE  ThreadHandle,
-	IN PCONTEXT  Context);
+  /*IN*/ HANDLE  ThreadHandle,
+  /*IN*/ PCONTEXT  Context);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwQueueApcThread(
-	IN HANDLE  ThreadHandle,
-	IN PKNORMAL_ROUTINE  ApcRoutine,
-	IN PVOID  ApcContext  OPTIONAL,
-	IN PVOID  Argument1  OPTIONAL,
-	IN PVOID  Argument2  OPTIONAL);
+  /*IN*/ HANDLE  ThreadHandle,
+  /*IN*/ PKNORMAL_ROUTINE  ApcRoutine,
+  /*IN*/ PVOID  ApcContext  /*OPTIONAL*/,
+  /*IN*/ PVOID  Argument1  /*OPTIONAL*/,
+  /*IN*/ PVOID  Argument2  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
@@ -1316,34 +1316,34 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwAlertThread(
-  IN HANDLE  ThreadHandle);
+  /*IN*/ HANDLE  ThreadHandle);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwAlertResumeThread(
-  IN HANDLE  ThreadHandle,
-  OUT PULONG  PreviousSuspendCount  OPTIONAL);
+  /*IN*/ HANDLE  ThreadHandle,
+  /*OUT*/ PULONG  PreviousSuspendCount  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwRegisterThreadTerminatePort(
-  IN HANDLE  PortHandle);
+  /*IN*/ HANDLE  PortHandle);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwImpersonateThread(
-	IN HANDLE  ThreadHandle,
-	IN HANDLE  TargetThreadHandle,
-	IN PSECURITY_QUALITY_OF_SERVICE  SecurityQos);
+  /*IN*/ HANDLE  ThreadHandle,
+  /*IN*/ HANDLE  TargetThreadHandle,
+  /*IN*/ PSECURITY_QUALITY_OF_SERVICE  SecurityQos);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwImpersonateAnonymousToken(
-  IN HANDLE  ThreadHandle);
+  /*IN*/ HANDLE  ThreadHandle);
 
 
 
@@ -1354,62 +1354,62 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwCreateProcess(
-	OUT PHANDLE  ProcessHandle,
-	IN ACCESS_MASK  DesiredAccess,
-	IN POBJECT_ATTRIBUTES  ObjectAttributes,
-	IN HANDLE  InheritFromProcessHandle,
-	IN BOOLEAN  InheritHandles,
-	IN HANDLE  SectionHandle  OPTIONAL,
-	IN HANDLE  DebugPort  OPTIONAL,
-	IN HANDLE  ExceptionPort  OPTIONAL);
+  /*OUT*/ PHANDLE  ProcessHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*IN*/ HANDLE  InheritFromProcessHandle,
+  /*IN*/ BOOLEAN  InheritHandles,
+  /*IN*/ HANDLE  SectionHandle  /*OPTIONAL*/,
+  /*IN*/ HANDLE  DebugPort  /*OPTIONAL*/,
+  /*IN*/ HANDLE  ExceptionPort  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwCreateProcess(
-	OUT PHANDLE  ProcessHandle,
-	IN ACCESS_MASK  DesiredAccess,
-	IN POBJECT_ATTRIBUTES  ObjectAttributes,
-	IN HANDLE  InheritFromProcessHandle,
-	IN BOOLEAN  InheritHandles,
-	IN HANDLE  SectionHandle  OPTIONAL,
-	IN HANDLE  DebugPort  OPTIONAL,
-	IN HANDLE  ExceptionPort  OPTIONAL);
+  /*OUT*/ PHANDLE  ProcessHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*IN*/ HANDLE  InheritFromProcessHandle,
+  /*IN*/ BOOLEAN  InheritHandles,
+  /*IN*/ HANDLE  SectionHandle  /*OPTIONAL*/,
+  /*IN*/ HANDLE  DebugPort  /*OPTIONAL*/,
+  /*IN*/ HANDLE  ExceptionPort  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwTerminateProcess(
-	IN HANDLE  ProcessHandle  OPTIONAL,
-	IN NTSTATUS  ExitStatus);
+  /*IN*/ HANDLE  ProcessHandle  /*OPTIONAL*/,
+  /*IN*/ NTSTATUS  ExitStatus);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwQueryInformationProcess(
-  IN HANDLE  ProcessHandle,
-  IN PROCESSINFOCLASS  ProcessInformationClass,
-  OUT PVOID  ProcessInformation,
-  IN ULONG  ProcessInformationLength,
-  OUT PULONG  ReturnLength  OPTIONAL);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN*/ PROCESSINFOCLASS  ProcessInformationClass,
+  /*OUT*/ PVOID  ProcessInformation,
+  /*IN*/ ULONG  ProcessInformationLength,
+  /*OUT*/ PULONG  ReturnLength  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 NtSetInformationProcess(
-  IN HANDLE  ProcessHandle,
-  IN PROCESSINFOCLASS  ProcessInformationClass,
-  IN PVOID  ProcessInformation,
-  IN ULONG  ProcessInformationLength);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN*/ PROCESSINFOCLASS  ProcessInformationClass,
+  /*IN*/ PVOID  ProcessInformation,
+  /*IN*/ ULONG  ProcessInformationLength);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwSetInformationProcess(
-  IN HANDLE  ProcessHandle,
-  IN PROCESSINFOCLASS  ProcessInformationClass,
-  IN PVOID  ProcessInformation,
-  IN ULONG  ProcessInformationLength);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN*/ PROCESSINFOCLASS  ProcessInformationClass,
+  /*IN*/ PVOID  ProcessInformation,
+  /*IN*/ ULONG  ProcessInformationLength);
 
 typedef struct _PROCESS_BASIC_INFORMATION {
 	NTSTATUS  ExitStatus;
@@ -1521,21 +1521,21 @@ typedef struct _RTL_USER_PROCESS_PARAMETERS {
 NTSTATUS
 NTAPI
 RtlCreateProcessParameters(
-	OUT PRTL_USER_PROCESS_PARAMETERS  *ProcessParameters,
-	IN PUNICODE_STRING  ImageFile,
-	IN PUNICODE_STRING  DllPath  OPTIONAL,
-	IN PUNICODE_STRING  CurrentDirectory  OPTIONAL,
-	IN PUNICODE_STRING  CommandLine  OPTIONAL,
-	IN PWSTR  Environment OPTIONAL,
-	IN PUNICODE_STRING  WindowTitle  OPTIONAL,
-	IN PUNICODE_STRING  DesktopInfo  OPTIONAL,
-	IN PUNICODE_STRING  ShellInfo  OPTIONAL,
-	IN PUNICODE_STRING  RuntimeInfo  OPTIONAL);
+  /*OUT*/ PRTL_USER_PROCESS_PARAMETERS  *ProcessParameters,
+  /*IN*/ PUNICODE_STRING  ImageFile,
+  /*IN*/ PUNICODE_STRING  DllPath  /*OPTIONAL*/,
+  /*IN*/ PUNICODE_STRING  CurrentDirectory  /*OPTIONAL*/,
+  /*IN*/ PUNICODE_STRING  CommandLine  /*OPTIONAL*/,
+  /*IN*/ PWSTR  Environment /*OPTIONAL*/,
+  /*IN*/ PUNICODE_STRING  WindowTitle  /*OPTIONAL*/,
+  /*IN*/ PUNICODE_STRING  DesktopInfo  /*OPTIONAL*/,
+  /*IN*/ PUNICODE_STRING  ShellInfo  /*OPTIONAL*/,
+  /*IN*/ PUNICODE_STRING  RuntimeInfo  /*OPTIONAL*/);
 
 NTSTATUS
 NTAPI
 RtlDestroyProcessParameters(
-  IN PRTL_USER_PROCESS_PARAMETERS  ProcessParameters);
+  /*IN*/ PRTL_USER_PROCESS_PARAMETERS  ProcessParameters);
 
 typedef struct _DEBUG_BUFFER {
 	HANDLE  SectionHandle;
@@ -1559,8 +1559,8 @@ typedef struct _DEBUG_BUFFER {
 PDEBUG_BUFFER
 NTAPI
 RtlCreateQueryDebugBuffer(
-	IN ULONG  Size,
-	IN BOOLEAN  EventPair);
+  /*IN*/ ULONG  Size,
+  /*IN*/ BOOLEAN  EventPair);
 
 /* RtlQueryProcessDebugInformation.DebugInfoClassMask constants */
 #define PDI_MODULES                       0x01
@@ -1573,14 +1573,14 @@ RtlCreateQueryDebugBuffer(
 NTSTATUS
 NTAPI
 RtlQueryProcessDebugInformation(
-	IN ULONG  ProcessId,
-	IN ULONG  DebugInfoClassMask,
-	IN OUT PDEBUG_BUFFER  DebugBuffer);
+  /*IN*/ ULONG  ProcessId,
+  /*IN*/ ULONG  DebugInfoClassMask,
+  /*IN OUT*/ PDEBUG_BUFFER  DebugBuffer);
 
 NTSTATUS
 NTAPI
 RtlDestroyQueryDebugBuffer(
-  IN PDEBUG_BUFFER  DebugBuffer);
+  /*IN*/ PDEBUG_BUFFER  DebugBuffer);
 
 /* DEBUG_MODULE_INFORMATION.Flags constants */
 #define LDRP_STATIC_LINK                  0x00000002
@@ -1644,50 +1644,50 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwCreateJobObject(
-	OUT PHANDLE  JobHandle,
-	IN ACCESS_MASK  DesiredAccess,
-	IN POBJECT_ATTRIBUTES  ObjectAttributes);
+  /*OUT*/ PHANDLE  JobHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwOpenJobObject(
-	OUT PHANDLE  JobHandle,
-	IN ACCESS_MASK  DesiredAccess,
-	IN POBJECT_ATTRIBUTES  ObjectAttributes);
+  /*OUT*/ PHANDLE  JobHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwTerminateJobObject(
-	IN HANDLE  JobHandle,
-	IN NTSTATUS  ExitStatus);
+  /*IN*/ HANDLE  JobHandle,
+  /*IN*/ NTSTATUS  ExitStatus);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwAssignProcessToJobObject(
-	IN HANDLE  JobHandle,
-	IN HANDLE  ProcessHandle);
+  /*IN*/ HANDLE  JobHandle,
+  /*IN*/ HANDLE  ProcessHandle);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwQueryInformationJobObject(
-	IN HANDLE  JobHandle,
-	IN JOBOBJECTINFOCLASS  JobInformationClass,
-	OUT PVOID  JobInformation,
-	IN ULONG  JobInformationLength,
-	OUT PULONG  ReturnLength  OPTIONAL);
+  /*IN*/ HANDLE  JobHandle,
+  /*IN*/ JOBOBJECTINFOCLASS  JobInformationClass,
+  /*OUT*/ PVOID  JobInformation,
+  /*IN*/ ULONG  JobInformationLength,
+  /*OUT*/ PULONG  ReturnLength  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwSetInformationJobObject(
-	IN HANDLE  JobHandle,
-	IN JOBOBJECTINFOCLASS  JobInformationClass,
-	IN PVOID  JobInformation,
-	IN ULONG  JobInformationLength);
+  /*IN*/ HANDLE  JobHandle,
+  /*IN*/ JOBOBJECTINFOCLASS  JobInformationClass,
+  /*IN*/ PVOID  JobInformation,
+  /*IN*/ ULONG  JobInformationLength);
 
 
 /* Tokens */
@@ -1696,149 +1696,149 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwCreateToken(
-OUT PHANDLE TokenHandle,
-IN ACCESS_MASK DesiredAccess,
-IN POBJECT_ATTRIBUTES ObjectAttributes,
-IN TOKEN_TYPE Type,
-IN PLUID AuthenticationId,
-IN PLARGE_INTEGER ExpirationTime,
-IN PTOKEN_USER User,
-IN PTOKEN_GROUPS Groups,
-IN PTOKEN_PRIVILEGES Privileges,
-IN PTOKEN_OWNER Owner,
-IN PTOKEN_PRIMARY_GROUP PrimaryGroup,
-IN PTOKEN_DEFAULT_DACL DefaultDacl,
-IN PTOKEN_SOURCE Source
+  /*OUT*/ PHANDLE TokenHandle,
+  /*IN*/ ACCESS_MASK DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES ObjectAttributes,
+  /*IN*/ TOKEN_TYPE Type,
+  /*IN*/ PLUID AuthenticationId,
+  /*IN*/ PLARGE_INTEGER ExpirationTime,
+  /*IN*/ PTOKEN_USER User,
+  /*IN*/ PTOKEN_GROUPS Groups,
+  /*IN*/ PTOKEN_PRIVILEGES Privileges,
+  /*IN*/ PTOKEN_OWNER Owner,
+  /*IN*/ PTOKEN_PRIMARY_GROUP PrimaryGroup,
+  /*IN*/ PTOKEN_DEFAULT_DACL DefaultDacl,
+  /*IN*/ PTOKEN_SOURCE Source
 );
 
 NTOSAPI
 NTSTATUS
 NTAPI
 NtOpenProcessToken(
-  IN HANDLE  ProcessHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  OUT PHANDLE  TokenHandle);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*OUT*/ PHANDLE  TokenHandle);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwOpenProcessToken(
-  IN HANDLE  ProcessHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  OUT PHANDLE  TokenHandle);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*OUT*/ PHANDLE  TokenHandle);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 NtOpenThreadToken(
-  IN HANDLE  ThreadHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN BOOLEAN  OpenAsSelf,
-  OUT PHANDLE  TokenHandle);
+  /*IN*/ HANDLE  ThreadHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ BOOLEAN  OpenAsSelf,
+  /*OUT*/ PHANDLE  TokenHandle);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwOpenThreadToken(
-  IN HANDLE  ThreadHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN BOOLEAN  OpenAsSelf,
-  OUT PHANDLE  TokenHandle);
+  /*IN*/ HANDLE  ThreadHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ BOOLEAN  OpenAsSelf,
+  /*OUT*/ PHANDLE  TokenHandle);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 NtDuplicateToken(
-  IN HANDLE  ExistingTokenHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes,
-  IN BOOLEAN  EffectiveOnly,
-  IN TOKEN_TYPE  TokenType,
-  OUT PHANDLE  NewTokenHandle);
+  /*IN*/ HANDLE  ExistingTokenHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*IN*/ BOOLEAN  EffectiveOnly,
+  /*IN*/ TOKEN_TYPE  TokenType,
+  /*OUT*/ PHANDLE  NewTokenHandle);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwDuplicateToken(
-  IN HANDLE  ExistingTokenHandle,
-  IN ACCESS_MASK  DesiredAccess,
-  IN POBJECT_ATTRIBUTES  ObjectAttributes,
-  IN BOOLEAN  EffectiveOnly,
-  IN TOKEN_TYPE  TokenType,
-  OUT PHANDLE  NewTokenHandle);
+  /*IN*/ HANDLE  ExistingTokenHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*IN*/ BOOLEAN  EffectiveOnly,
+  /*IN*/ TOKEN_TYPE  TokenType,
+  /*OUT*/ PHANDLE  NewTokenHandle);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwFilterToken(
-	IN HANDLE  ExistingTokenHandle,
-	IN ULONG  Flags,
-	IN PTOKEN_GROUPS  SidsToDisable,
-	IN PTOKEN_PRIVILEGES  PrivilegesToDelete,
-	IN PTOKEN_GROUPS  SidsToRestricted,
-	OUT PHANDLE  NewTokenHandle);
+  /*IN*/ HANDLE  ExistingTokenHandle,
+  /*IN*/ ULONG  Flags,
+  /*IN*/ PTOKEN_GROUPS  SidsToDisable,
+  /*IN*/ PTOKEN_PRIVILEGES  PrivilegesToDelete,
+  /*IN*/ PTOKEN_GROUPS  SidsToRestricted,
+  /*OUT*/ PHANDLE  NewTokenHandle);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 NtAdjustPrivilegesToken(
-  IN HANDLE  TokenHandle,
-  IN BOOLEAN  DisableAllPrivileges,
-  IN PTOKEN_PRIVILEGES  NewState,
-  IN ULONG  BufferLength,
-  OUT PTOKEN_PRIVILEGES  PreviousState  OPTIONAL,
-  OUT PULONG  ReturnLength);
+  /*IN*/ HANDLE  TokenHandle,
+  /*IN*/ BOOLEAN  DisableAllPrivileges,
+  /*IN*/ PTOKEN_PRIVILEGES  NewState,
+  /*IN*/ ULONG  BufferLength,
+  /*OUT*/ PTOKEN_PRIVILEGES  PreviousState  /*OPTIONAL*/,
+  /*OUT*/ PULONG  ReturnLength);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwAdjustPrivilegesToken(
-  IN HANDLE  TokenHandle,
-  IN BOOLEAN  DisableAllPrivileges,
-  IN PTOKEN_PRIVILEGES  NewState,
-  IN ULONG  BufferLength,
-  OUT PTOKEN_PRIVILEGES  PreviousState  OPTIONAL,
-  OUT PULONG  ReturnLength);
+  /*IN*/ HANDLE  TokenHandle,
+  /*IN*/ BOOLEAN  DisableAllPrivileges,
+  /*IN*/ PTOKEN_PRIVILEGES  NewState,
+  /*IN*/ ULONG  BufferLength,
+  /*OUT*/ PTOKEN_PRIVILEGES  PreviousState  /*OPTIONAL*/,
+  /*OUT*/ PULONG  ReturnLength);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwAdjustGroupsToken(
-	IN HANDLE  TokenHandle,
-	IN BOOLEAN  ResetToDefault,
-	IN PTOKEN_GROUPS  NewState,
-	IN ULONG  BufferLength,
-	OUT PTOKEN_GROUPS  PreviousState  OPTIONAL,
-	OUT PULONG  ReturnLength);
+  /*IN*/ HANDLE  TokenHandle,
+  /*IN*/ BOOLEAN  ResetToDefault,
+  /*IN*/ PTOKEN_GROUPS  NewState,
+  /*IN*/ ULONG  BufferLength,
+  /*OUT*/ PTOKEN_GROUPS  PreviousState  /*OPTIONAL*/,
+  /*OUT*/ PULONG  ReturnLength);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 NtQueryInformationToken(
-  IN HANDLE  TokenHandle,
-  IN TOKEN_INFORMATION_CLASS  TokenInformationClass,
-  OUT PVOID  TokenInformation,
-  IN ULONG  TokenInformationLength,
-  OUT PULONG  ReturnLength);
+  /*IN*/ HANDLE  TokenHandle,
+  /*IN*/ TOKEN_INFORMATION_CLASS  TokenInformationClass,
+  /*OUT*/ PVOID  TokenInformation,
+  /*IN*/ ULONG  TokenInformationLength,
+  /*OUT*/ PULONG  ReturnLength);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwQueryInformationToken(
-  IN HANDLE  TokenHandle,
-  IN TOKEN_INFORMATION_CLASS  TokenInformationClass,
-  OUT PVOID  TokenInformation,
-  IN ULONG  TokenInformationLength,
-  OUT PULONG  ReturnLength);
+  /*IN*/ HANDLE  TokenHandle,
+  /*IN*/ TOKEN_INFORMATION_CLASS  TokenInformationClass,
+  /*OUT*/ PVOID  TokenInformation,
+  /*IN*/ ULONG  TokenInformationLength,
+  /*OUT*/ PULONG  ReturnLength);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwSetInformationToken(
-	IN HANDLE  TokenHandle,
-	IN TOKEN_INFORMATION_CLASS  TokenInformationClass,
-	IN PVOID  TokenInformation,
-  IN ULONG  TokenInformationLength);
+  /*IN*/ HANDLE  TokenHandle,
+  /*IN*/ TOKEN_INFORMATION_CLASS  TokenInformationClass,
+  /*IN*/ PVOID  TokenInformation,
+  /*IN*/ ULONG  TokenInformationLength);
 
 
 
@@ -1849,43 +1849,43 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwQuerySystemTime(
-  OUT PLARGE_INTEGER  CurrentTime);
+  /*OUT*/ PLARGE_INTEGER  CurrentTime);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwSetSystemTime(
-  IN PLARGE_INTEGER  NewTime,
-  OUT PLARGE_INTEGER  OldTime  OPTIONAL);
+  /*IN*/ PLARGE_INTEGER  NewTime,
+  /*OUT*/ PLARGE_INTEGER  OldTime  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwQueryPerformanceCounter(
-  OUT PLARGE_INTEGER  PerformanceCount,
-  OUT PLARGE_INTEGER  PerformanceFrequency  OPTIONAL);
+  /*OUT*/ PLARGE_INTEGER  PerformanceCount,
+  /*OUT*/ PLARGE_INTEGER  PerformanceFrequency  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwQueryPerformanceCounter(
-  OUT PLARGE_INTEGER  PerformanceCount,
-  OUT PLARGE_INTEGER  PerformanceFrequency  OPTIONAL);
+  /*OUT*/ PLARGE_INTEGER  PerformanceCount,
+  /*OUT*/ PLARGE_INTEGER  PerformanceFrequency  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwQueryTimerResolution(
-	OUT PULONG  CoarsestResolution,
-	OUT PULONG  FinestResolution,
-	OUT PULONG  ActualResolution);
+  /*OUT*/ PULONG  CoarsestResolution,
+  /*OUT*/ PULONG  FinestResolution,
+  /*OUT*/ PULONG  ActualResolution);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwDelayExecution(
-  IN BOOLEAN  Alertable,
-  IN PLARGE_INTEGER  Interval);
+  /*IN*/ BOOLEAN  Alertable,
+  /*IN*/ PLARGE_INTEGER  Interval);
 
 NTOSAPI
 NTSTATUS
@@ -1908,41 +1908,41 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwCreateProfile(
-	OUT PHANDLE  ProfileHandle,
-	IN HANDLE  ProcessHandle,
-	IN PVOID  Base,
-	IN ULONG  Size,
-	IN ULONG  BucketShift,
-	IN PULONG  Buffer,
-	IN ULONG  BufferLength,
-	IN KPROFILE_SOURCE  Source,
-	IN ULONG  ProcessorMask);
+  /*OUT*/ PHANDLE  ProfileHandle,
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN*/ PVOID  Base,
+  /*IN*/ ULONG  Size,
+  /*IN*/ ULONG  BucketShift,
+  /*IN*/ PULONG  Buffer,
+  /*IN*/ ULONG  BufferLength,
+  /*IN*/ KPROFILE_SOURCE  Source,
+  /*IN*/ ULONG  ProcessorMask);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwSetIntervalProfile(
-  IN ULONG  Interval,
-  IN KPROFILE_SOURCE  Source);
+  /*IN*/ ULONG  Interval,
+  /*IN*/ KPROFILE_SOURCE  Source);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwQueryIntervalProfile(
-	IN KPROFILE_SOURCE  Source,
-	OUT PULONG  Interval);
+  /*IN*/ KPROFILE_SOURCE  Source,
+  /*OUT*/ PULONG  Interval);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwStartProfile(
-  IN HANDLE  ProfileHandle);
+  /*IN*/ HANDLE  ProfileHandle);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwStopProfile(
-  IN HANDLE  ProfileHandle);
+  /*IN*/ HANDLE  ProfileHandle);
 
 /* Local Procedure Call (LPC) */
 
@@ -1994,162 +1994,162 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwCreatePort(
-	OUT PHANDLE  PortHandle,
-	IN POBJECT_ATTRIBUTES  ObjectAttributes,
-	IN ULONG  MaxDataSize,
-	IN ULONG  MaxMessageSize,
-	IN ULONG  Reserved);
+  /*OUT*/ PHANDLE  PortHandle,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*IN*/ ULONG  MaxDataSize,
+  /*IN*/ ULONG  MaxMessageSize,
+  /*IN*/ ULONG  Reserved);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwCreateWaitablePort(
-	OUT PHANDLE  PortHandle,
-	IN POBJECT_ATTRIBUTES  ObjectAttributes,
-	IN ULONG  MaxDataSize,
-	IN ULONG  MaxMessageSize,
-	IN ULONG  Reserved);
+  /*OUT*/ PHANDLE  PortHandle,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*IN*/ ULONG  MaxDataSize,
+  /*IN*/ ULONG  MaxMessageSize,
+  /*IN*/ ULONG  Reserved);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 NtConnectPort(
-  OUT PHANDLE  PortHandle,
-  IN PUNICODE_STRING  PortName,
-  IN PSECURITY_QUALITY_OF_SERVICE  SecurityQos,
-  IN OUT PLPC_SECTION_WRITE  WriteSection  OPTIONAL,
-  IN OUT PLPC_SECTION_READ  ReadSection  OPTIONAL,
-  OUT PULONG  MaxMessageSize  OPTIONAL,
-  IN OUT PVOID  ConnectData  OPTIONAL,
-  IN OUT PULONG  ConnectDataLength  OPTIONAL);
+  /*OUT*/ PHANDLE  PortHandle,
+  /*IN*/ PUNICODE_STRING  PortName,
+  /*IN*/ PSECURITY_QUALITY_OF_SERVICE  SecurityQos,
+  /*IN OUT*/ PLPC_SECTION_WRITE  WriteSection  /*OPTIONAL*/,
+  /*IN OUT*/ PLPC_SECTION_READ  ReadSection  /*OPTIONAL*/,
+  /*OUT*/ PULONG  MaxMessageSize  /*OPTIONAL*/,
+  /*IN OUT*/ PVOID  ConnectData  /*OPTIONAL*/,
+  /*IN OUT*/ PULONG  ConnectDataLength  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwConnectPort(
-  OUT PHANDLE  PortHandle,
-  IN PUNICODE_STRING  PortName,
-  IN PSECURITY_QUALITY_OF_SERVICE  SecurityQos,
-  IN OUT PLPC_SECTION_WRITE  WriteSection  OPTIONAL,
-  IN OUT PLPC_SECTION_READ  ReadSection  OPTIONAL,
-  OUT PULONG  MaxMessageSize  OPTIONAL,
-  IN OUT PVOID  ConnectData  OPTIONAL,
-  IN OUT PULONG  ConnectDataLength  OPTIONAL);
+  /*OUT*/ PHANDLE  PortHandle,
+  /*IN*/ PUNICODE_STRING  PortName,
+  /*IN*/ PSECURITY_QUALITY_OF_SERVICE  SecurityQos,
+  /*IN OUT*/ PLPC_SECTION_WRITE  WriteSection  /*OPTIONAL*/,
+  /*IN OUT*/ PLPC_SECTION_READ  ReadSection  /*OPTIONAL*/,
+  /*OUT*/ PULONG  MaxMessageSize  /*OPTIONAL*/,
+  /*IN OUT*/ PVOID  ConnectData  /*OPTIONAL*/,
+  /*IN OUT*/ PULONG  ConnectDataLength  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwConnectPort(
-	OUT PHANDLE  PortHandle,
-	IN PUNICODE_STRING  PortName,
-	IN PSECURITY_QUALITY_OF_SERVICE  SecurityQos,
-	IN OUT PLPC_SECTION_WRITE  WriteSection  OPTIONAL,
-	IN OUT PLPC_SECTION_READ  ReadSection  OPTIONAL,
-	OUT PULONG  MaxMessageSize  OPTIONAL,
-	IN OUT PVOID  ConnectData  OPTIONAL,
-	IN OUT PULONG  ConnectDataLength  OPTIONAL);
+  /*OUT*/ PHANDLE  PortHandle,
+  /*IN*/ PUNICODE_STRING  PortName,
+  /*IN*/ PSECURITY_QUALITY_OF_SERVICE  SecurityQos,
+  /*IN OUT*/ PLPC_SECTION_WRITE  WriteSection  /*OPTIONAL*/,
+  /*IN OUT*/ PLPC_SECTION_READ  ReadSection  /*OPTIONAL*/,
+  /*OUT*/ PULONG  MaxMessageSize  /*OPTIONAL*/,
+  /*IN OUT*/ PVOID  ConnectData  /*OPTIONAL*/,
+  /*IN OUT*/ PULONG  ConnectDataLength  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwListenPort(
-  IN HANDLE  PortHandle,
-  OUT PLPC_MESSAGE  Message);
+  /*IN*/ HANDLE  PortHandle,
+  /*OUT*/ PLPC_MESSAGE  Message);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwAcceptConnectPort(
-	OUT PHANDLE  PortHandle,
-	IN ULONG  PortIdentifier,
-	IN PLPC_MESSAGE  Message,
-	IN BOOLEAN  Accept,
-	IN OUT PLPC_SECTION_WRITE  WriteSection  OPTIONAL,
-	IN OUT PLPC_SECTION_READ  ReadSection  OPTIONAL);
+  /*OUT*/ PHANDLE  PortHandle,
+  /*IN*/ ULONG  PortIdentifier,
+  /*IN*/ PLPC_MESSAGE  Message,
+  /*IN*/ BOOLEAN  Accept,
+  /*IN OUT*/ PLPC_SECTION_WRITE  WriteSection  /*OPTIONAL*/,
+  /*IN OUT*/ PLPC_SECTION_READ  ReadSection  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwCompleteConnectPort(
-  IN HANDLE  PortHandle);
+  /*IN*/ HANDLE  PortHandle);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 NtRequestPort(
-  IN HANDLE  PortHandle,
-  IN PLPC_MESSAGE  RequestMessage);
+  /*IN*/ HANDLE  PortHandle,
+  /*IN*/ PLPC_MESSAGE  RequestMessage);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 NtRequestWaitReplyPort(
-  IN HANDLE  PortHandle,
-  IN PLPC_MESSAGE  RequestMessage,
-  OUT PLPC_MESSAGE  ReplyMessage);
+  /*IN*/ HANDLE  PortHandle,
+  /*IN*/ PLPC_MESSAGE  RequestMessage,
+  /*OUT*/ PLPC_MESSAGE  ReplyMessage);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwRequestWaitReplyPort(
-  IN HANDLE  PortHandle,
-  IN PLPC_MESSAGE  RequestMessage,
-  OUT PLPC_MESSAGE  ReplyMessage);
+  /*IN*/ HANDLE  PortHandle,
+  /*IN*/ PLPC_MESSAGE  RequestMessage,
+  /*OUT*/ PLPC_MESSAGE  ReplyMessage);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwReplyPort(
-	IN HANDLE  PortHandle,
-	IN PLPC_MESSAGE  ReplyMessage);
+  /*IN*/ HANDLE  PortHandle,
+  /*IN*/ PLPC_MESSAGE  ReplyMessage);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwReplyWaitReplyPort(
-	IN HANDLE  PortHandle,
-	IN OUT PLPC_MESSAGE  ReplyMessage);
+  /*IN*/ HANDLE  PortHandle,
+  /*IN OUT*/ PLPC_MESSAGE  ReplyMessage);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwReplyWaitReceivePort(
-	IN HANDLE  PortHandle,
-	OUT PULONG  PortIdentifier  OPTIONAL,
-	IN PLPC_MESSAGE  ReplyMessage  OPTIONAL,
-	OUT PLPC_MESSAGE  Message);
+  /*IN*/ HANDLE  PortHandle,
+  /*OUT*/ PULONG  PortIdentifier  /*OPTIONAL*/,
+  /*IN*/ PLPC_MESSAGE  ReplyMessage  /*OPTIONAL*/,
+  /*OUT*/ PLPC_MESSAGE  Message);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwReplyWaitReceivePortEx(
-	IN HANDLE  PortHandle,
-	OUT PULONG  PortIdentifier  OPTIONAL,
-	IN PLPC_MESSAGE  ReplyMessage  OPTIONAL,
-	OUT PLPC_MESSAGE  Message,
-	IN PLARGE_INTEGER  Timeout);
+  /*IN*/ HANDLE  PortHandle,
+  /*OUT*/ PULONG  PortIdentifier  /*OPTIONAL*/,
+  /*IN*/ PLPC_MESSAGE  ReplyMessage  /*OPTIONAL*/,
+  /*OUT*/ PLPC_MESSAGE  Message,
+  /*IN*/ PLARGE_INTEGER  Timeout);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwReadRequestData(
-	IN HANDLE  PortHandle,
-	IN PLPC_MESSAGE  Message,
-	IN ULONG  Index,
-	OUT PVOID  Buffer,
-	IN ULONG  BufferLength,
-	OUT PULONG  ReturnLength  OPTIONAL);
+  /*IN*/ HANDLE  PortHandle,
+  /*IN*/ PLPC_MESSAGE  Message,
+  /*IN*/ ULONG  Index,
+  /*OUT*/ PVOID  Buffer,
+  /*IN*/ ULONG  BufferLength,
+  /*OUT*/ PULONG  ReturnLength  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwWriteRequestData(
-	IN HANDLE  PortHandle,
-	IN PLPC_MESSAGE  Message,
-	IN ULONG  Index,
-	IN PVOID  Buffer,
-	IN ULONG  BufferLength,
-	OUT PULONG  ReturnLength  OPTIONAL);
+  /*IN*/ HANDLE  PortHandle,
+  /*IN*/ PLPC_MESSAGE  Message,
+  /*IN*/ ULONG  Index,
+  /*IN*/ PVOID  Buffer,
+  /*IN*/ ULONG  BufferLength,
+  /*OUT*/ PULONG  ReturnLength  /*OPTIONAL*/);
 
 typedef enum _PORT_INFORMATION_CLASS {
   PortBasicInformation
@@ -2159,18 +2159,18 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwQueryInformationPort(
-	IN HANDLE  PortHandle,
-	IN PORT_INFORMATION_CLASS  PortInformationClass,
-	OUT PVOID  PortInformation,
-	IN ULONG  PortInformationLength,
-  OUT PULONG  ReturnLength  OPTIONAL);
+  /*IN*/ HANDLE  PortHandle,
+  /*IN*/ PORT_INFORMATION_CLASS  PortInformationClass,
+  /*OUT*/ PVOID  PortInformation,
+  /*IN*/ ULONG  PortInformationLength,
+  /*OUT*/ PULONG  ReturnLength  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwImpersonateClientOfPort(
-  IN HANDLE  PortHandle,
-  IN PLPC_MESSAGE  Message);
+  /*IN*/ HANDLE  PortHandle,
+  /*IN*/ PLPC_MESSAGE  Message);
 
 
 
@@ -2181,55 +2181,55 @@ NTOSAPI
 NTSTATUS
 NTAPI
 NtDeleteFile(
-  IN POBJECT_ATTRIBUTES  ObjectAttributes);
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwDeleteFile(
-  IN POBJECT_ATTRIBUTES  ObjectAttributes);
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwFlushBuffersFile(
-	IN HANDLE  FileHandle,
-	OUT PIO_STATUS_BLOCK  IoStatusBlock);
+  /*IN*/ HANDLE  FileHandle,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwCancelIoFile(
-	IN HANDLE  FileHandle,
-	OUT PIO_STATUS_BLOCK  IoStatusBlock);
+  /*IN*/ HANDLE  FileHandle,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwReadFileScatter(
-	IN HANDLE  FileHandle,
-	IN HANDLE  Event OPTIONAL,
-	IN PIO_APC_ROUTINE  ApcRoutine  OPTIONAL,
-	IN PVOID  ApcContext  OPTIONAL,
-	OUT PIO_STATUS_BLOCK  IoStatusBlock,
-	IN PFILE_SEGMENT_ELEMENT  Buffer,
-	IN ULONG  Length,
-	IN PLARGE_INTEGER  ByteOffset  OPTIONAL,
-	IN PULONG  Key  OPTIONAL);
+  /*IN*/ HANDLE  FileHandle,
+  /*IN*/ HANDLE  Event /*OPTIONAL*/,
+  /*IN*/ PIO_APC_ROUTINE  ApcRoutine  /*OPTIONAL*/,
+  /*IN*/ PVOID  ApcContext  /*OPTIONAL*/,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock,
+  /*IN*/ PFILE_SEGMENT_ELEMENT  Buffer,
+  /*IN*/ ULONG  Length,
+  /*IN*/ PLARGE_INTEGER  ByteOffset  /*OPTIONAL*/,
+  /*IN*/ PULONG  Key  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwWriteFileGather(
-	IN HANDLE  FileHandle,
-	IN HANDLE  Event  OPTIONAL,
-	IN PIO_APC_ROUTINE  ApcRoutine  OPTIONAL,
-	IN PVOID  ApcContext  OPTIONAL,
-	OUT PIO_STATUS_BLOCK  IoStatusBlock,
-	IN PFILE_SEGMENT_ELEMENT  Buffer,
-	IN ULONG  Length,
-	IN PLARGE_INTEGER  ByteOffset  OPTIONAL,
-	IN PULONG  Key  OPTIONAL);
+  /*IN*/ HANDLE  FileHandle,
+  /*IN*/ HANDLE  Event  /*OPTIONAL*/,
+  /*IN*/ PIO_APC_ROUTINE  ApcRoutine  /*OPTIONAL*/,
+  /*IN*/ PVOID  ApcContext  /*OPTIONAL*/,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock,
+  /*IN*/ PFILE_SEGMENT_ELEMENT  Buffer,
+  /*IN*/ ULONG  Length,
+  /*IN*/ PLARGE_INTEGER  ByteOffset  /*OPTIONAL*/,
+  /*IN*/ PULONG  Key  /*OPTIONAL*/);
 
 
 
@@ -2240,60 +2240,60 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwSaveKey(
-	IN HANDLE  KeyHandle,
-	IN HANDLE  FileHandle);
+  /*IN*/ HANDLE  KeyHandle,
+  /*IN*/ HANDLE  FileHandle);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwSaveMergedKeys(
-	IN HANDLE  KeyHandle1,
-	IN HANDLE  KeyHandle2,
-	IN HANDLE  FileHandle);
+  /*IN*/ HANDLE  KeyHandle1,
+  /*IN*/ HANDLE  KeyHandle2,
+  /*IN*/ HANDLE  FileHandle);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwRestoreKey(
-  IN HANDLE  KeyHandle,
-  IN HANDLE  FileHandle,
-  IN ULONG  Flags);
+  /*IN*/ HANDLE  KeyHandle,
+  /*IN*/ HANDLE  FileHandle,
+  /*IN*/ ULONG  Flags);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwLoadKey(
-  IN POBJECT_ATTRIBUTES  KeyObjectAttributes,
-  IN POBJECT_ATTRIBUTES  FileObjectAttributes);
+  /*IN*/ POBJECT_ATTRIBUTES  KeyObjectAttributes,
+  /*IN*/ POBJECT_ATTRIBUTES  FileObjectAttributes);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwLoadKey2(
-	IN POBJECT_ATTRIBUTES  KeyObjectAttributes,
-	IN POBJECT_ATTRIBUTES  FileObjectAttributes,
-	IN ULONG  Flags);
+  /*IN*/ POBJECT_ATTRIBUTES  KeyObjectAttributes,
+  /*IN*/ POBJECT_ATTRIBUTES  FileObjectAttributes,
+  /*IN*/ ULONG  Flags);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwUnloadKey(
-  IN POBJECT_ATTRIBUTES  KeyObjectAttributes);
+  /*IN*/ POBJECT_ATTRIBUTES  KeyObjectAttributes);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwQueryOpenSubKeys(
-	IN POBJECT_ATTRIBUTES  KeyObjectAttributes,
-	OUT PULONG  NumberOfKeys);
+  /*IN*/ POBJECT_ATTRIBUTES  KeyObjectAttributes,
+  /*OUT*/ PULONG  NumberOfKeys);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwReplaceKey(
-	IN POBJECT_ATTRIBUTES  NewFileObjectAttributes,
-	IN HANDLE  KeyHandle,
-	IN POBJECT_ATTRIBUTES  OldFileObjectAttributes);
+  /*IN*/ POBJECT_ATTRIBUTES  NewFileObjectAttributes,
+  /*IN*/ HANDLE  KeyHandle,
+  /*IN*/ POBJECT_ATTRIBUTES  OldFileObjectAttributes);
 
 typedef enum _KEY_SET_INFORMATION_CLASS {
   KeyLastWriteTimeInformation
@@ -2303,10 +2303,10 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwSetInformationKey(
-	IN HANDLE  KeyHandle,
-	IN KEY_SET_INFORMATION_CLASS  KeyInformationClass,
-	IN PVOID  KeyInformation,
-	IN ULONG  KeyInformationLength);
+  /*IN*/ HANDLE  KeyHandle,
+  /*IN*/ KEY_SET_INFORMATION_CLASS  KeyInformationClass,
+  /*IN*/ PVOID  KeyInformation,
+  /*IN*/ ULONG  KeyInformationLength);
 
 typedef struct _KEY_LAST_WRITE_TIME_INFORMATION {
   LARGE_INTEGER LastWriteTime;
@@ -2321,16 +2321,16 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwNotifyChangeKey(
-	IN HANDLE  KeyHandle,
-	IN HANDLE  EventHandle  OPTIONAL,
-	IN PIO_APC_ROUTINE  ApcRoutine  OPTIONAL,
-	IN PVOID  ApcContext  OPTIONAL,
-	OUT PIO_STATUS_BLOCK  IoStatusBlock,
-	IN ULONG  NotifyFilter,
-	IN BOOLEAN  WatchSubtree,
-	IN PVOID  Buffer,
-	IN ULONG  BufferLength,
-	IN BOOLEAN  Asynchronous);
+  /*IN*/ HANDLE  KeyHandle,
+  /*IN*/ HANDLE  EventHandle  /*OPTIONAL*/,
+  /*IN*/ PIO_APC_ROUTINE  ApcRoutine  /*OPTIONAL*/,
+  /*IN*/ PVOID  ApcContext  /*OPTIONAL*/,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock,
+  /*IN*/ ULONG  NotifyFilter,
+  /*IN*/ BOOLEAN  WatchSubtree,
+  /*IN*/ PVOID  Buffer,
+  /*IN*/ ULONG  BufferLength,
+  /*IN*/ BOOLEAN  Asynchronous);
 
 /* ZwNotifyChangeMultipleKeys.Flags constants */
 #define REG_MONITOR_SINGLE_KEY            0x00
@@ -2340,35 +2340,35 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwNotifyChangeMultipleKeys(
-	IN HANDLE  KeyHandle,
-	IN ULONG  Flags,
-	IN POBJECT_ATTRIBUTES  KeyObjectAttributes,
-	IN HANDLE  EventHandle  OPTIONAL,
-	IN PIO_APC_ROUTINE  ApcRoutine  OPTIONAL,
-	IN PVOID  ApcContext  OPTIONAL,
-	OUT PIO_STATUS_BLOCK  IoStatusBlock,
-	IN ULONG  NotifyFilter,
-	IN BOOLEAN  WatchSubtree,
-	IN PVOID  Buffer,
-	IN ULONG  BufferLength,
-	IN BOOLEAN  Asynchronous);
+  /*IN*/ HANDLE  KeyHandle,
+  /*IN*/ ULONG  Flags,
+  /*IN*/ POBJECT_ATTRIBUTES  KeyObjectAttributes,
+  /*IN*/ HANDLE  EventHandle  /*OPTIONAL*/,
+  /*IN*/ PIO_APC_ROUTINE  ApcRoutine  /*OPTIONAL*/,
+  /*IN*/ PVOID  ApcContext  /*OPTIONAL*/,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock,
+  /*IN*/ ULONG  NotifyFilter,
+  /*IN*/ BOOLEAN  WatchSubtree,
+  /*IN*/ PVOID  Buffer,
+  /*IN*/ ULONG  BufferLength,
+  /*IN*/ BOOLEAN  Asynchronous);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwQueryMultipleValueKey(
-	IN HANDLE  KeyHandle,
-	IN OUT  PKEY_VALUE_ENTRY  ValueList,
-	IN ULONG  NumberOfValues,
-	OUT PVOID  Buffer,
-	IN OUT PULONG  Length,
-	OUT PULONG  ReturnLength);
+  /*IN*/ HANDLE  KeyHandle,
+  /*IN OUT*/  PKEY_VALUE_ENTRY  ValueList,
+  /*IN*/ ULONG  NumberOfValues,
+  /*OUT*/ PVOID  Buffer,
+  /*IN OUT*/ PULONG  Length,
+  /*OUT*/ PULONG  ReturnLength);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwInitializeRegistry(
-  IN BOOLEAN  Setup);
+  /*IN*/ BOOLEAN  Setup);
 
 
 
@@ -2379,76 +2379,76 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwPrivilegeCheck(
-	IN HANDLE  TokenHandle,
-	IN PPRIVILEGE_SET  RequiredPrivileges,
-	OUT PBOOLEAN  Result);
+  /*IN*/ HANDLE  TokenHandle,
+  /*IN*/ PPRIVILEGE_SET  RequiredPrivileges,
+  /*OUT*/ PBOOLEAN  Result);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwPrivilegeObjectAuditAlarm(
-	IN PUNICODE_STRING  SubsystemName,
-	IN PVOID  HandleId,
-	IN HANDLE  TokenHandle,
-	IN ACCESS_MASK  DesiredAccess,
-	IN PPRIVILEGE_SET  Privileges,
-	IN BOOLEAN  AccessGranted);
+  /*IN*/ PUNICODE_STRING  SubsystemName,
+  /*IN*/ PVOID  HandleId,
+  /*IN*/ HANDLE  TokenHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ PPRIVILEGE_SET  Privileges,
+  /*IN*/ BOOLEAN  AccessGranted);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwPrivilegeObjectAuditAlarm(
-	IN PUNICODE_STRING  SubsystemName,
-	IN PVOID  HandleId,
-	IN HANDLE  TokenHandle,
-	IN ACCESS_MASK  DesiredAccess,
-	IN PPRIVILEGE_SET  Privileges,
-	IN BOOLEAN  AccessGranted);
+  /*IN*/ PUNICODE_STRING  SubsystemName,
+  /*IN*/ PVOID  HandleId,
+  /*IN*/ HANDLE  TokenHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ PPRIVILEGE_SET  Privileges,
+  /*IN*/ BOOLEAN  AccessGranted);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwAccessCheck(
-	IN PSECURITY_DESCRIPTOR  SecurityDescriptor,
-	IN HANDLE  TokenHandle,
-	IN ACCESS_MASK  DesiredAccess,
-	IN PGENERIC_MAPPING  GenericMapping,
-	IN PPRIVILEGE_SET  PrivilegeSet,
-	IN PULONG  PrivilegeSetLength,
-	OUT PACCESS_MASK  GrantedAccess,
-	OUT PBOOLEAN  AccessStatus);
+  /*IN*/ PSECURITY_DESCRIPTOR  SecurityDescriptor,
+  /*IN*/ HANDLE  TokenHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ PGENERIC_MAPPING  GenericMapping,
+  /*IN*/ PPRIVILEGE_SET  PrivilegeSet,
+  /*IN*/ PULONG  PrivilegeSetLength,
+  /*OUT*/ PACCESS_MASK  GrantedAccess,
+  /*OUT*/ PBOOLEAN  AccessStatus);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwAccessCheckAndAuditAlarm(
-	IN PUNICODE_STRING  SubsystemName,
-	IN PVOID  HandleId,
-	IN PUNICODE_STRING  ObjectTypeName,
-	IN PUNICODE_STRING  ObjectName,
-	IN PSECURITY_DESCRIPTOR  SecurityDescriptor,
-	IN ACCESS_MASK  DesiredAccess,
-	IN PGENERIC_MAPPING  GenericMapping,
-	IN BOOLEAN  ObjectCreation,
-	OUT PACCESS_MASK  GrantedAccess,
-	OUT PBOOLEAN  AccessStatus,
-	OUT PBOOLEAN  GenerateOnClose);
+  /*IN*/ PUNICODE_STRING  SubsystemName,
+  /*IN*/ PVOID  HandleId,
+  /*IN*/ PUNICODE_STRING  ObjectTypeName,
+  /*IN*/ PUNICODE_STRING  ObjectName,
+  /*IN*/ PSECURITY_DESCRIPTOR  SecurityDescriptor,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ PGENERIC_MAPPING  GenericMapping,
+  /*IN*/ BOOLEAN  ObjectCreation,
+  /*OUT*/ PACCESS_MASK  GrantedAccess,
+  /*OUT*/ PBOOLEAN  AccessStatus,
+  /*OUT*/ PBOOLEAN  GenerateOnClose);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwAccessCheckByType(
-	IN PSECURITY_DESCRIPTOR  SecurityDescriptor,
-	IN PSID  PrincipalSelfSid,
-	IN HANDLE  TokenHandle,
-	IN ULONG  DesiredAccess,
-	IN POBJECT_TYPE_LIST  ObjectTypeList,
-	IN ULONG  ObjectTypeListLength,
-	IN PGENERIC_MAPPING  GenericMapping,
-	IN PPRIVILEGE_SET  PrivilegeSet,
-	IN PULONG  PrivilegeSetLength,
-	OUT PACCESS_MASK  GrantedAccess,
-	OUT PULONG  AccessStatus);
+  /*IN*/ PSECURITY_DESCRIPTOR  SecurityDescriptor,
+  /*IN*/ PSID  PrincipalSelfSid,
+  /*IN*/ HANDLE  TokenHandle,
+  /*IN*/ ULONG  DesiredAccess,
+  /*IN*/ POBJECT_TYPE_LIST  ObjectTypeList,
+  /*IN*/ ULONG  ObjectTypeListLength,
+  /*IN*/ PGENERIC_MAPPING  GenericMapping,
+  /*IN*/ PPRIVILEGE_SET  PrivilegeSet,
+  /*IN*/ PULONG  PrivilegeSetLength,
+  /*OUT*/ PACCESS_MASK  GrantedAccess,
+  /*OUT*/ PULONG  AccessStatus);
 
 typedef enum _AUDIT_EVENT_TYPE {
 	AuditEventObjectAccess,
@@ -2459,114 +2459,114 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwAccessCheckByTypeAndAuditAlarm(
-	IN PUNICODE_STRING  SubsystemName,
-	IN PVOID  HandleId,
-	IN PUNICODE_STRING  ObjectTypeName,
-	IN PUNICODE_STRING  ObjectName,
-	IN PSECURITY_DESCRIPTOR  SecurityDescriptor,
-	IN PSID  PrincipalSelfSid,
-	IN ACCESS_MASK  DesiredAccess,
-	IN AUDIT_EVENT_TYPE  AuditType,
-	IN ULONG  Flags,
-	IN POBJECT_TYPE_LIST  ObjectTypeList,
-	IN ULONG  ObjectTypeListLength,
-	IN PGENERIC_MAPPING  GenericMapping,
-	IN BOOLEAN  ObjectCreation,
-	OUT PACCESS_MASK  GrantedAccess,
-	OUT PULONG  AccessStatus,
-	OUT PBOOLEAN  GenerateOnClose);
+  /*IN*/ PUNICODE_STRING  SubsystemName,
+  /*IN*/ PVOID  HandleId,
+  /*IN*/ PUNICODE_STRING  ObjectTypeName,
+  /*IN*/ PUNICODE_STRING  ObjectName,
+  /*IN*/ PSECURITY_DESCRIPTOR  SecurityDescriptor,
+  /*IN*/ PSID  PrincipalSelfSid,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ AUDIT_EVENT_TYPE  AuditType,
+  /*IN*/ ULONG  Flags,
+  /*IN*/ POBJECT_TYPE_LIST  ObjectTypeList,
+  /*IN*/ ULONG  ObjectTypeListLength,
+  /*IN*/ PGENERIC_MAPPING  GenericMapping,
+  /*IN*/ BOOLEAN  ObjectCreation,
+  /*OUT*/ PACCESS_MASK  GrantedAccess,
+  /*OUT*/ PULONG  AccessStatus,
+  /*OUT*/ PBOOLEAN  GenerateOnClose);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwAccessCheckByTypeResultList(
-	IN PSECURITY_DESCRIPTOR  SecurityDescriptor,
-	IN PSID  PrincipalSelfSid,
-	IN HANDLE  TokenHandle,
-	IN ACCESS_MASK  DesiredAccess,
-	IN POBJECT_TYPE_LIST  ObjectTypeList,
-	IN ULONG  ObjectTypeListLength,
-	IN PGENERIC_MAPPING  GenericMapping,
-	IN PPRIVILEGE_SET  PrivilegeSet,
-	IN PULONG  PrivilegeSetLength,
-	OUT PACCESS_MASK  GrantedAccessList,
-	OUT PULONG  AccessStatusList);
+  /*IN*/ PSECURITY_DESCRIPTOR  SecurityDescriptor,
+  /*IN*/ PSID  PrincipalSelfSid,
+  /*IN*/ HANDLE  TokenHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_TYPE_LIST  ObjectTypeList,
+  /*IN*/ ULONG  ObjectTypeListLength,
+  /*IN*/ PGENERIC_MAPPING  GenericMapping,
+  /*IN*/ PPRIVILEGE_SET  PrivilegeSet,
+  /*IN*/ PULONG  PrivilegeSetLength,
+  /*OUT*/ PACCESS_MASK  GrantedAccessList,
+  /*OUT*/ PULONG  AccessStatusList);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwAccessCheckByTypeResultListAndAuditAlarm(
-	IN PUNICODE_STRING  SubsystemName,
-	IN PVOID  HandleId,
-	IN PUNICODE_STRING  ObjectTypeName,
-	IN PUNICODE_STRING  ObjectName,
-	IN PSECURITY_DESCRIPTOR  SecurityDescriptor,
-	IN PSID  PrincipalSelfSid,
-	IN ACCESS_MASK  DesiredAccess,
-	IN AUDIT_EVENT_TYPE  AuditType,
-	IN ULONG  Flags,
-	IN POBJECT_TYPE_LIST  ObjectTypeList,
-	IN ULONG  ObjectTypeListLength,
-	IN PGENERIC_MAPPING  GenericMapping,
-	IN BOOLEAN  ObjectCreation,
-	OUT PACCESS_MASK  GrantedAccessList,
-	OUT PULONG  AccessStatusList,
-	OUT PULONG  GenerateOnClose);
+  /*IN*/ PUNICODE_STRING  SubsystemName,
+  /*IN*/ PVOID  HandleId,
+  /*IN*/ PUNICODE_STRING  ObjectTypeName,
+  /*IN*/ PUNICODE_STRING  ObjectName,
+  /*IN*/ PSECURITY_DESCRIPTOR  SecurityDescriptor,
+  /*IN*/ PSID  PrincipalSelfSid,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ AUDIT_EVENT_TYPE  AuditType,
+  /*IN*/ ULONG  Flags,
+  /*IN*/ POBJECT_TYPE_LIST  ObjectTypeList,
+  /*IN*/ ULONG  ObjectTypeListLength,
+  /*IN*/ PGENERIC_MAPPING  GenericMapping,
+  /*IN*/ BOOLEAN  ObjectCreation,
+  /*OUT*/ PACCESS_MASK  GrantedAccessList,
+  /*OUT*/ PULONG  AccessStatusList,
+  /*OUT*/ PULONG  GenerateOnClose);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwAccessCheckByTypeResultListAndAuditAlarmByHandle(
-	IN PUNICODE_STRING  SubsystemName,
-	IN PVOID  HandleId,
-	IN HANDLE  TokenHandle,
-	IN PUNICODE_STRING  ObjectTypeName,
-	IN PUNICODE_STRING  ObjectName,
-	IN PSECURITY_DESCRIPTOR  SecurityDescriptor,
-	IN PSID  PrincipalSelfSid,
-	IN ACCESS_MASK  DesiredAccess,
-	IN AUDIT_EVENT_TYPE  AuditType,
-	IN ULONG  Flags,
-	IN POBJECT_TYPE_LIST  ObjectTypeList,
-	IN ULONG  ObjectTypeListLength,
-	IN PGENERIC_MAPPING  GenericMapping,
-	IN BOOLEAN  ObjectCreation,
-	OUT PACCESS_MASK  GrantedAccessList,
-	OUT PULONG  AccessStatusList,
-	OUT PULONG  GenerateOnClose);
+  /*IN*/ PUNICODE_STRING  SubsystemName,
+  /*IN*/ PVOID  HandleId,
+  /*IN*/ HANDLE  TokenHandle,
+  /*IN*/ PUNICODE_STRING  ObjectTypeName,
+  /*IN*/ PUNICODE_STRING  ObjectName,
+  /*IN*/ PSECURITY_DESCRIPTOR  SecurityDescriptor,
+  /*IN*/ PSID  PrincipalSelfSid,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ AUDIT_EVENT_TYPE  AuditType,
+  /*IN*/ ULONG  Flags,
+  /*IN*/ POBJECT_TYPE_LIST  ObjectTypeList,
+  /*IN*/ ULONG  ObjectTypeListLength,
+  /*IN*/ PGENERIC_MAPPING  GenericMapping,
+  /*IN*/ BOOLEAN  ObjectCreation,
+  /*OUT*/ PACCESS_MASK  GrantedAccessList,
+  /*OUT*/ PULONG  AccessStatusList,
+  /*OUT*/ PULONG  GenerateOnClose);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwOpenObjectAuditAlarm(
-	IN PUNICODE_STRING  SubsystemName,
-	IN PVOID  *HandleId,
-	IN PUNICODE_STRING  ObjectTypeName,
-	IN PUNICODE_STRING  ObjectName,
-	IN PSECURITY_DESCRIPTOR  SecurityDescriptor,
-	IN HANDLE  TokenHandle,
-	IN ACCESS_MASK  DesiredAccess,
-	IN ACCESS_MASK  GrantedAccess,
-	IN PPRIVILEGE_SET  Privileges  OPTIONAL,
-	IN BOOLEAN  ObjectCreation,
-	IN BOOLEAN  AccessGranted,
-	OUT PBOOLEAN  GenerateOnClose);
+  /*IN*/ PUNICODE_STRING  SubsystemName,
+  /*IN*/ PVOID  *HandleId,
+  /*IN*/ PUNICODE_STRING  ObjectTypeName,
+  /*IN*/ PUNICODE_STRING  ObjectName,
+  /*IN*/ PSECURITY_DESCRIPTOR  SecurityDescriptor,
+  /*IN*/ HANDLE  TokenHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ ACCESS_MASK  GrantedAccess,
+  /*IN*/ PPRIVILEGE_SET  Privileges  /*OPTIONAL*/,
+  /*IN*/ BOOLEAN  ObjectCreation,
+  /*IN*/ BOOLEAN  AccessGranted,
+  /*OUT*/ PBOOLEAN  GenerateOnClose);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwCloseObjectAuditAlarm(
-  IN PUNICODE_STRING  SubsystemName,
-  IN PVOID  HandleId,
-  IN BOOLEAN  GenerateOnClose);
+  /*IN*/ PUNICODE_STRING  SubsystemName,
+  /*IN*/ PVOID  HandleId,
+  /*IN*/ BOOLEAN  GenerateOnClose);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwDeleteObjectAuditAlarm(
-  IN PUNICODE_STRING  SubsystemName,
-  IN PVOID  HandleId,
-  IN BOOLEAN  GenerateOnClose);
+  /*IN*/ PUNICODE_STRING  SubsystemName,
+  /*IN*/ PVOID  HandleId,
+  /*IN*/ BOOLEAN  GenerateOnClose);
 
 
 
@@ -2577,19 +2577,19 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwRequestWakeupLatency(
-  IN LATENCY_TIME  Latency);
+  /*IN*/ LATENCY_TIME  Latency);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwRequestDeviceWakeup(
-  IN HANDLE  DeviceHandle);
+  /*IN*/ HANDLE  DeviceHandle);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwCancelDeviceWakeupRequest(
-  IN HANDLE  DeviceHandle);
+  /*IN*/ HANDLE  DeviceHandle);
 
 NTOSAPI
 BOOLEAN
@@ -2601,59 +2601,59 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwSetThreadExecutionState(
-	IN EXECUTION_STATE  ExecutionState,
-	OUT PEXECUTION_STATE  PreviousExecutionState);
+  /*IN*/ EXECUTION_STATE  ExecutionState,
+  /*OUT*/ PEXECUTION_STATE  PreviousExecutionState);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwGetDevicePowerState(
-  IN HANDLE  DeviceHandle,
-  OUT PDEVICE_POWER_STATE  DevicePowerState);
+  /*IN*/ HANDLE  DeviceHandle,
+  /*OUT*/ PDEVICE_POWER_STATE  DevicePowerState);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwSetSystemPowerState(
-	IN POWER_ACTION  SystemAction,
-	IN SYSTEM_POWER_STATE  MinSystemState,
-	IN ULONG  Flags);
+  /*IN*/ POWER_ACTION  SystemAction,
+  /*IN*/ SYSTEM_POWER_STATE  MinSystemState,
+  /*IN*/ ULONG  Flags);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwInitiatePowerAction(
-	IN POWER_ACTION  SystemAction,
-	IN SYSTEM_POWER_STATE  MinSystemState,
-	IN ULONG  Flags,
-	IN BOOLEAN  Asynchronous);
+  /*IN*/ POWER_ACTION  SystemAction,
+  /*IN*/ SYSTEM_POWER_STATE  MinSystemState,
+  /*IN*/ ULONG  Flags,
+  /*IN*/ BOOLEAN  Asynchronous);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwPowerInformation(
-	IN POWER_INFORMATION_LEVEL  PowerInformationLevel,
-	IN PVOID  InputBuffer  OPTIONAL,
-	IN ULONG  InputBufferLength,
-	OUT PVOID  OutputBuffer  OPTIONAL,
-	IN ULONG  OutputBufferLength);
+  /*IN*/ POWER_INFORMATION_LEVEL  PowerInformationLevel,
+  /*IN*/ PVOID  InputBuffer  /*OPTIONAL*/,
+  /*IN*/ ULONG  InputBufferLength,
+  /*OUT*/ PVOID  OutputBuffer  /*OPTIONAL*/,
+  /*IN*/ ULONG  OutputBufferLength);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwPlugPlayControl(
-  IN ULONG  ControlCode,
-  IN OUT PVOID  Buffer,
-  IN ULONG  BufferLength);
+  /*IN*/ ULONG  ControlCode,
+  /*IN OUT*/ PVOID  Buffer,
+  /*IN*/ ULONG  BufferLength);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwGetPlugPlayEvent(
-	IN ULONG  Reserved1,
-	IN ULONG  Reserved2,
-	OUT PVOID  Buffer,
-	IN ULONG  BufferLength);
+  /*IN*/ ULONG  Reserved1,
+  /*IN*/ ULONG  Reserved2,
+  /*OUT*/ PVOID  Buffer,
+  /*IN*/ ULONG  BufferLength);
 
 
 
@@ -2664,26 +2664,26 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwRaiseException(
-  IN PEXCEPTION_RECORD  ExceptionRecord,
-  IN PCONTEXT  Context,
-  IN BOOLEAN  SearchFrames);
+  /*IN*/ PEXCEPTION_RECORD  ExceptionRecord,
+  /*IN*/ PCONTEXT  Context,
+  /*IN*/ BOOLEAN  SearchFrames);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwContinue(
-  IN PCONTEXT  Context,
-  IN BOOLEAN  TestAlert);
+  /*IN*/ PCONTEXT  Context,
+  /*IN*/ BOOLEAN  TestAlert);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwW32Call(
-	IN ULONG  RoutineIndex,
-	IN PVOID  Argument,
-	IN ULONG  ArgumentLength,
-	OUT PVOID  *Result  OPTIONAL,
-	OUT PULONG  ResultLength  OPTIONAL);
+  /*IN*/ ULONG  RoutineIndex,
+  /*IN*/ PVOID  Argument,
+  /*IN*/ ULONG  ArgumentLength,
+  /*OUT*/ PVOID  *Result  /*OPTIONAL*/,
+  /*OUT*/ PULONG  ResultLength  /*OPTIONAL*/);
 
 NTOSAPI
 NTSTATUS
@@ -2701,21 +2701,21 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwLoadDriver(
-  IN PUNICODE_STRING  DriverServiceName);
+  /*IN*/ PUNICODE_STRING  DriverServiceName);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwUnloadDriver(
-  IN PUNICODE_STRING  DriverServiceName);
+  /*IN*/ PUNICODE_STRING  DriverServiceName);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwFlushInstructionCache(
-	IN HANDLE  ProcessHandle,
-	IN PVOID  BaseAddress  OPTIONAL,
-	IN ULONG  FlushSize);
+  /*IN*/ HANDLE  ProcessHandle,
+  /*IN*/ PVOID  BaseAddress  /*OPTIONAL*/,
+  /*IN*/ ULONG  FlushSize);
 
 NTOSAPI
 NTSTATUS
@@ -2727,54 +2727,54 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwQueryDefaultLocale(
-	IN BOOLEAN  ThreadOrSystem,
-	OUT PLCID  Locale);
+  /*IN*/ BOOLEAN  ThreadOrSystem,
+  /*OUT*/ PLCID  Locale);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwSetDefaultLocale(
-  IN BOOLEAN  ThreadOrSystem,
-  IN LCID  Locale);
+  /*IN*/ BOOLEAN  ThreadOrSystem,
+  /*IN*/ LCID  Locale);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwQueryDefaultUILanguage(
-  OUT PLANGID  LanguageId);
+  /*OUT*/ PLANGID  LanguageId);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwSetDefaultUILanguage(
-  IN LANGID  LanguageId);
+  /*IN*/ LANGID  LanguageId);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwQueryInstallUILanguage(
-  OUT PLANGID  LanguageId);
+  /*OUT*/ PLANGID  LanguageId);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 NtAllocateLocallyUniqueId(
-  OUT PLUID  Luid);
+  /*OUT*/ PLUID  Luid);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 NtAllocateUuids(
-  OUT PLARGE_INTEGER  UuidLastTimeAllocated,
-  OUT PULONG  UuidDeltaTime,
-  OUT PULONG  UuidSequenceNumber,
-  OUT PUCHAR  UuidSeed);
+  /*OUT*/ PLARGE_INTEGER  UuidLastTimeAllocated,
+  /*OUT*/ PULONG  UuidDeltaTime,
+  /*OUT*/ PULONG  UuidSequenceNumber,
+  /*OUT*/ PUCHAR  UuidSeed);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwSetUuidSeed(
-  IN PUCHAR  UuidSeed);
+  /*IN*/ PUCHAR  UuidSeed);
 
 typedef enum _HARDERROR_RESPONSE_OPTION {
 	OptionAbortRetryIgnore,
@@ -2802,33 +2802,33 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwRaiseHardError(
-	IN NTSTATUS  Status,
-	IN ULONG  NumberOfArguments,
-	IN ULONG  StringArgumentsMask,
-	IN PULONG  Arguments,
-	IN HARDERROR_RESPONSE_OPTION  ResponseOption,
-	OUT PHARDERROR_RESPONSE  Response);
+  /*IN*/ NTSTATUS  Status,
+  /*IN*/ ULONG  NumberOfArguments,
+  /*IN*/ ULONG  StringArgumentsMask,
+  /*IN*/ PULONG  Arguments,
+  /*IN*/ HARDERROR_RESPONSE_OPTION  ResponseOption,
+  /*OUT*/ PHARDERROR_RESPONSE  Response);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwSetDefaultHardErrorPort(
-  IN HANDLE  PortHandle);
+  /*IN*/ HANDLE  PortHandle);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwDisplayString(
-  IN PUNICODE_STRING  String);
+  /*IN*/ PUNICODE_STRING  String);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 ZwCreatePagingFile(
-  IN PUNICODE_STRING  FileName,
-  IN PULARGE_INTEGER  InitialSize,
-  IN PULARGE_INTEGER  MaximumSize,
-  IN ULONG  Reserved);
+  /*IN*/ PUNICODE_STRING  FileName,
+  /*IN*/ PULARGE_INTEGER  InitialSize,
+  /*IN*/ PULARGE_INTEGER  MaximumSize,
+  /*IN*/ ULONG  Reserved);
 
 typedef USHORT RTL_ATOM, *PRTL_ATOM;
 
@@ -2836,23 +2836,23 @@ NTOSAPI
 NTSTATUS
 NTAPI
 NtAddAtom(
-  IN PWSTR  AtomName,
-  IN ULONG  AtomNameLength,
-  OUT PRTL_ATOM  Atom);
+  /*IN*/ PWSTR  AtomName,
+  /*IN*/ ULONG  AtomNameLength,
+  /*OUT*/ PRTL_ATOM  Atom);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 NtFindAtom(
-  IN PWSTR  AtomName,
-  IN ULONG  AtomNameLength,
-  OUT PRTL_ATOM  Atom);
+  /*IN*/ PWSTR  AtomName,
+  /*IN*/ ULONG  AtomNameLength,
+  /*OUT*/ PRTL_ATOM  Atom);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 NtDeleteAtom(
-  IN RTL_ATOM  Atom);
+  /*IN*/ RTL_ATOM  Atom);
 
 typedef enum _ATOM_INFORMATION_CLASS {
 	AtomBasicInformation,
@@ -2863,11 +2863,11 @@ NTOSAPI
 NTSTATUS
 NTAPI
 NtQueryInformationAtom(
-  IN RTL_ATOM  Atom,
-  IN ATOM_INFORMATION_CLASS  AtomInformationClass,
-  OUT PVOID  AtomInformation,
-  IN ULONG  AtomInformationLength,
-  OUT PULONG  ReturnLength  OPTIONAL);
+  /*IN*/ RTL_ATOM  Atom,
+  /*IN*/ ATOM_INFORMATION_CLASS  AtomInformationClass,
+  /*OUT*/ PVOID  AtomInformation,
+  /*IN*/ ULONG  AtomInformationLength,
+  /*OUT*/ PULONG  ReturnLength  /*OPTIONAL*/);
 
 typedef struct _ATOM_BASIC_INFORMATION {
 	USHORT  ReferenceCount;
@@ -2885,17 +2885,17 @@ NTOSAPI
 NTSTATUS
 NTAPI
 ZwSetLdtEntries(
-	IN ULONG  Selector1,
-	IN LDT_ENTRY  LdtEntry1,
-	IN ULONG  Selector2,
-	IN LDT_ENTRY  LdtEntry2);
+  /*IN*/ ULONG  Selector1,
+  /*IN*/ LDT_ENTRY  LdtEntry1,
+  /*IN*/ ULONG  Selector2,
+  /*IN*/ LDT_ENTRY  LdtEntry2);
 
 NTOSAPI
 NTSTATUS
 NTAPI
 NtVdmControl(
-  IN ULONG  ControlCode,
-  IN PVOID  ControlData);
+  /*IN*/ ULONG  ControlCode,
+  /*IN*/ PVOID  ControlData);
 
 #pragma pack(pop)
 

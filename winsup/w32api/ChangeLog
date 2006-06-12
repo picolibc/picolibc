@@ -1,3 +1,54 @@
+2006-06-12  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	[mingw-Bugs-1424461]
+	*include/imagehlp.h: Comment out IN, OUT and OPTIONAL,
+	throughout.
+	*include/rpcdce.h: Don't define IN, OUT or OPTIONAL if
+	_NO_W32_PSEUDO_MODIFIERS.
+	*include/rpcnsi.h: Comment out IN, OUT and OPTIONAL,
+	throughout.
+	*include/rpcnsip.h: Likewise.
+	*include/windef.h: Don't define IN, OUT or OPTIONAL
+	if _NO_W32_PSEUDO_MODIFIERS.
+	*include/ddk/batclass.h: Comment out IN, OUT and OPTIONAL,
+	throughout.
+	*include/ddk/cfgmgr32.h: Likewise.
+	*include/ddk/ddkmapi.h: Likewise.
+	*include/ddk/hidclass.h: Likewise.
+	*include/ddk/hidpi.h: Likewise.
+	*include/ddk/kbdmou.h: Likewise.
+	*include/ddk/mcd.h: Likewise.
+	*include/ddk/miniport.h: Likewise.
+	*include/ddk/minitape.h: Likewise.
+	*include/ddk/ndis.h: Likewise.
+	*include/ddk/ndistapi.h: Likewise.
+	*include/ddk/ndiswan.h: Likewise.
+	*include/ddk/ntapi.h: Likewise.
+	*include/ddk/ntdd8042.h: Likewise.
+	*include/ddk/ntddpcm.h: Likewise.
+	*include/ddk/ntifs.h: Likewise.
+	*include/ddk/ntpoapi.h: Likewise.
+	*include/ddk/parallel.h: Likewise.
+	*include/ddk/pfhook.h: Likewise.
+	*include/ddk/scsiwmi.h: Likewise.
+	*include/ddk/smbus.h: Likewise.
+	*include/ddk/srb.h: Likewise.
+	*include/ddk/storport.h: Likewise.
+	*include/ddk/tdikrnl.h: Likewise.
+	*include/ddk/upssvc.h: Likewise.
+	*include/ddk/usbcamdi.h: Likewise.
+	*include/ddk/usbscan.h: Likewise.
+	*include/ddk/video.h: Likewise.
+	*include/ddk/videoagp.h: Likewise.
+	*include/ddk/win2k.h: Likewise.
+	*include/ddk/winddi.h: Likewise.
+	*include/ddk/winddk.h: Don't define IN, OUT or OPTIONAL
+	if _NO_W32_PSEUDO_MODIFIERS.
+	Comment out IN, OUT and OPTIONAL, throughout.
+	*include/ddk/winnt4.h: Comment out IN, OUT and OPTIONAL,
+	throughout.
+	*include/ddk/ws2san.h: Likewise.
+
 2006-06-10  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* lib/Makefile.in:  Added hlguids-uuid as source and object.

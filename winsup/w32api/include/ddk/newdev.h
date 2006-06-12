@@ -43,7 +43,7 @@ UpdateDriverForPlugAndPlayDevicesA(
   LPCSTR  HardwareId,
   LPCSTR  FullInfPath,
   DWORD  InstallFlags,
-  PBOOL  bRebootRequired  OPTIONAL);
+  PBOOL  bRebootRequired  /*OPTIONAL*/);
 
 BOOL WINAPI
 UpdateDriverForPlugAndPlayDevicesW(
@@ -51,7 +51,7 @@ UpdateDriverForPlugAndPlayDevicesW(
   LPCWSTR  HardwareId,
   LPCWSTR  FullInfPath,
   DWORD  InstallFlags,
-  PBOOL  bRebootRequired  OPTIONAL);
+  PBOOL  bRebootRequired  /*OPTIONAL*/);
 
 #ifdef UNICODE
 #define UpdateDriverForPlugAndPlayDevices UpdateDriverForPlugAndPlayDevicesW

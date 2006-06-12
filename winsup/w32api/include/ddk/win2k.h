@@ -56,40 +56,40 @@ NTOSAPI
 VOID
 DDKAPI
 ExReleaseResourceForThreadLite(
-  IN PERESOURCE  Resource,
-  IN ERESOURCE_THREAD  ResourceThreadId);
+  /*IN*/ PERESOURCE  Resource,
+  /*IN*/ ERESOURCE_THREAD  ResourceThreadId);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoReadPartitionTable(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN ULONG  SectorSize,
-  IN BOOLEAN  ReturnRecognizedPartitions,
-  OUT struct _DRIVE_LAYOUT_INFORMATION  **PartitionBuffer);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ ULONG  SectorSize,
+  /*IN*/ BOOLEAN  ReturnRecognizedPartitions,
+  /*OUT*/ struct _DRIVE_LAYOUT_INFORMATION  **PartitionBuffer);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoSetPartitionInformation(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN ULONG  SectorSize,
-  IN ULONG  PartitionNumber,
-  IN ULONG  PartitionType);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ ULONG  SectorSize,
+  /*IN*/ ULONG  PartitionNumber,
+  /*IN*/ ULONG  PartitionType);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 IoWritePartitionTable(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN ULONG  SectorSize,
-  IN ULONG  SectorsPerTrack,
-  IN ULONG  NumberOfHeads,
-  IN struct _DRIVE_LAYOUT_INFORMATION  *PartitionBuffer);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ ULONG  SectorSize,
+  /*IN*/ ULONG  SectorsPerTrack,
+  /*IN*/ ULONG  NumberOfHeads,
+  /*IN*/ struct _DRIVE_LAYOUT_INFORMATION  *PartitionBuffer);
 
 /*
  * PVOID MmGetSystemAddressForMdl(
- *   IN PMDL  Mdl); 
+ * IN PMDL  Mdl); 
  */
 #define MmGetSystemAddressForMdl(Mdl) \
   (((Mdl)->MdlFlags & (MDL_MAPPED_TO_SYSTEM_VA | \

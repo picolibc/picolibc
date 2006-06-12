@@ -187,41 +187,41 @@ typedef struct _BATTERY_WAIT_STATUS {
 
 typedef NTSTATUS DDKAPI
 (*BCLASS_DISABLE_STATUS_NOTIFY)(
-  IN PVOID  Context);
+  /*IN*/ PVOID  Context);
 
 typedef NTSTATUS DDKAPI
 (*BCLASS_QUERY_INFORMATION)(
-  IN PVOID  Context,
-  IN ULONG  BatteryTag,
-  IN BATTERY_QUERY_INFORMATION_LEVEL  Level,
-  IN LONG  AtRate  OPTIONAL,
-  OUT PVOID  Buffer,
-  IN ULONG  BufferLength,
-  OUT PULONG  ReturnedLength);
+  /*IN*/ PVOID  Context,
+  /*IN*/ ULONG  BatteryTag,
+  /*IN*/ BATTERY_QUERY_INFORMATION_LEVEL  Level,
+  /*IN*/ LONG  AtRate  /*OPTIONAL*/,
+  /*OUT*/ PVOID  Buffer,
+  /*IN*/ ULONG  BufferLength,
+  /*OUT*/ PULONG  ReturnedLength);
 
 typedef NTSTATUS DDKAPI
 (*BCLASS_QUERY_STATUS)(
-  IN PVOID  Context,
-  IN ULONG  BatteryTag,
-  OUT PBATTERY_STATUS  BatteryStatus);
+  /*IN*/ PVOID  Context,
+  /*IN*/ ULONG  BatteryTag,
+  /*OUT*/ PBATTERY_STATUS  BatteryStatus);
 
 typedef NTSTATUS DDKAPI
 (*BCLASS_QUERY_TAG)(
-  IN PVOID  Context,
-  OUT PULONG  BatteryTag);
+  /*IN*/ PVOID  Context,
+  /*OUT*/ PULONG  BatteryTag);
 
 typedef NTSTATUS DDKAPI
 (*BCLASS_SET_INFORMATION)(
-  IN PVOID  Context,
-  IN ULONG  BatteryTag,
-  IN BATTERY_SET_INFORMATION_LEVEL  Level,
-  IN PVOID  Buffer  OPTIONAL);
+  /*IN*/ PVOID  Context,
+  /*IN*/ ULONG  BatteryTag,
+  /*IN*/ BATTERY_SET_INFORMATION_LEVEL  Level,
+  /*IN*/ PVOID  Buffer  /*OPTIONAL*/);
 
 typedef NTSTATUS DDKAPI
 (*BCLASS_SET_STATUS_NOTIFY)(
-  IN PVOID  Context,
-  IN ULONG  BatteryTag,
-  IN PBATTERY_NOTIFY  BatteryNotify);
+  /*IN*/ PVOID  Context,
+  /*IN*/ ULONG  BatteryTag,
+  /*IN*/ PBATTERY_NOTIFY  BatteryNotify);
 
 
 typedef struct _BATTERY_MINIPORT_INFO {
@@ -247,49 +247,49 @@ BCLASSAPI
 NTSTATUS
 DDKAPI
 BatteryClassInitializeDevice(
-  IN PBATTERY_MINIPORT_INFO  MiniportInfo,
-  IN PVOID  *ClassData);
+  /*IN*/ PBATTERY_MINIPORT_INFO  MiniportInfo,
+  /*IN*/ PVOID  *ClassData);
 
 BCLASSAPI
 NTSTATUS
 DDKAPI
 BatteryClassIoctl(
-  IN PVOID  ClassData,
-  IN PIRP  Irp);
+  /*IN*/ PVOID  ClassData,
+  /*IN*/ PIRP  Irp);
 
 BCLASSAPI
 NTSTATUS
 DDKAPI
 BatteryClassQueryWmiDataBlock(
-  IN PVOID  ClassData,
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN PIRP  Irp,
-  IN ULONG  GuidIndex,
-  IN OUT PULONG  InstanceLengthArray,
-  IN ULONG  OutBufferSize,
-  OUT PUCHAR  Buffer);
+  /*IN*/ PVOID  ClassData,
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ PIRP  Irp,
+  /*IN*/ ULONG  GuidIndex,
+  /*IN OUT*/ PULONG  InstanceLengthArray,
+  /*IN*/ ULONG  OutBufferSize,
+  /*OUT*/ PUCHAR  Buffer);
 
 BCLASSAPI
 NTSTATUS
 DDKAPI
 BatteryClassStatusNotify(
-  IN PVOID  ClassData);
+  /*IN*/ PVOID  ClassData);
 
 BCLASSAPI
 NTSTATUS
 DDKAPI
 BatteryClassSystemControl(
-  IN  PVOID  ClassData,
-  IN  PWMILIB_CONTEXT  WmiLibContext,
-  IN  PDEVICE_OBJECT  DeviceObject,
-  IN  PIRP  Irp,
-  OUT PSYSCTL_IRP_DISPOSITION  Disposition);
+  /*IN*/ PVOID  ClassData,
+  /*IN*/ PWMILIB_CONTEXT  WmiLibContext,
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ PIRP  Irp,
+  /*OUT*/ PSYSCTL_IRP_DISPOSITION  Disposition);
 
 BCLASSAPI
 NTSTATUS
 DDKAPI
 BatteryClassUnload(
-  IN PVOID  ClassData);
+  /*IN*/ PVOID  ClassData);
 
 #ifdef __cplusplus
 }

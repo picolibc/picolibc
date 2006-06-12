@@ -76,38 +76,38 @@ typedef struct _PARALLEL_1284_COMMAND {
 #define PAR_HAVE_PORT_KEEP_PORT           0x00000002
 
 typedef struct _MORE_PARALLEL_PORT_INFORMATION {
-	INTERFACE_TYPE  InterfaceType;
-	ULONG  BusNumber;
-	ULONG  InterruptLevel;
-	ULONG  InterruptVector;
-	KAFFINITY  InterruptAffinity;
-	KINTERRUPT_MODE  InterruptMode;
+  INTERFACE_TYPE  InterfaceType;
+  ULONG  BusNumber;
+  ULONG  InterruptLevel;
+  ULONG  InterruptVector;
+  KAFFINITY  InterruptAffinity;
+  KINTERRUPT_MODE  InterruptMode;
 } MORE_PARALLEL_PORT_INFORMATION, *PMORE_PARALLEL_PORT_INFORMATION;
 
 typedef NTSTATUS DDKAPI
 (*PPARALLEL_SET_CHIP_MODE)(
-	IN  PVOID  SetChipContext,
-	IN  UCHAR  ChipMode);
+  /*IN*/  PVOID  SetChipContext,
+  /*IN*/  UCHAR  ChipMode);
 
 typedef NTSTATUS DDKAPI
 (*PPARALLEL_CLEAR_CHIP_MODE)(
-	IN  PVOID  ClearChipContext,
-	IN  UCHAR  ChipMode);
+  /*IN*/  PVOID  ClearChipContext,
+  /*IN*/  UCHAR  ChipMode);
 
 typedef NTSTATUS DDKAPI
 (*PPARCHIP_CLEAR_CHIP_MODE)(
-	IN  PVOID  ClearChipContext,
-	IN  UCHAR  ChipMode);
+  /*IN*/  PVOID  ClearChipContext,
+  /*IN*/  UCHAR  ChipMode);
 
 typedef NTSTATUS DDKAPI
 (*PPARALLEL_TRY_SELECT_ROUTINE)(
-	IN  PVOID  TrySelectContext,
-	IN  PVOID  TrySelectCommand);
+  /*IN*/  PVOID  TrySelectContext,
+  /*IN*/  PVOID  TrySelectCommand);
 
 typedef NTSTATUS DDKAPI
 (*PPARALLEL_DESELECT_ROUTINE)(
-	IN PVOID  DeselectContext,
-	IN PVOID  DeselectCommand);
+  /*IN*/ PVOID  DeselectContext,
+  /*IN*/ PVOID  DeselectCommand);
 
 /* PARALLEL_PNP_INFORMATION.HardwareCapabilities */
 #define PPT_NO_HARDWARE_PRESENT           0x00000000
@@ -140,15 +140,15 @@ typedef struct _PARALLEL_PNP_INFORMATION {
 
 typedef BOOLEAN DDKAPI
 (*PPARALLEL_TRY_ALLOCATE_ROUTINE)(
-  IN  PVOID  TryAllocateContext);
+  /*IN*/ PVOID  TryAllocateContext);
 
 typedef VOID DDKAPI
 (*PPARALLEL_FREE_ROUTINE)(
-  IN  PVOID  FreeContext);
+  /*IN*/ PVOID  FreeContext);
 
 typedef ULONG DDKAPI
 (*PPARALLEL_QUERY_WAITERS_ROUTINE)(
-	IN  PVOID  QueryAllocsContext);
+  /*IN*/  PVOID  QueryAllocsContext);
 
 typedef struct _PARALLEL_PORT_INFORMATION {
   PHYSICAL_ADDRESS  OriginalController;
@@ -171,7 +171,7 @@ typedef struct _PARALLEL_CHIP_MODE {
 
 typedef VOID DDKAPI
 (*PPARALLEL_DEFERRED_ROUTINE)(
-	IN  PVOID  DeferredContext);
+  /*IN*/  PVOID  DeferredContext);
 
 typedef struct _PARALLEL_INTERRUPT_SERVICE_ROUTINE {
   PKSERVICE_ROUTINE  InterruptServiceRoutine;
@@ -198,7 +198,7 @@ typedef struct _PARALLEL_INTERRUPT_SERVICE_ROUTINE {
 
 typedef USHORT DDKAPI
 (*PDETERMINE_IEEE_MODES)(
-  IN PVOID  Context);
+  /*IN*/ PVOID  Context);
 
 typedef enum _PARALLEL_SAFETY {
 	SAFE_MODE,
@@ -207,49 +207,49 @@ typedef enum _PARALLEL_SAFETY {
 
 typedef NTSTATUS DDKAPI
 (*PNEGOTIATE_IEEE_MODE)(
-  IN PVOID  Context,
-  IN USHORT  ModeMaskFwd,
-  IN USHORT  ModeMaskRev,
-  IN PARALLEL_SAFETY  ModeSafety,
-  IN BOOLEAN  IsForward);
+  /*IN*/ PVOID  Context,
+  /*IN*/ USHORT  ModeMaskFwd,
+  /*IN*/ USHORT  ModeMaskRev,
+  /*IN*/ PARALLEL_SAFETY  ModeSafety,
+  /*IN*/ BOOLEAN  IsForward);
 
 typedef NTSTATUS DDKAPI
 (*PTERMINATE_IEEE_MODE)(
-	IN  PVOID  Context);
+  /*IN*/  PVOID  Context);
 	
 typedef NTSTATUS DDKAPI
 (*PPARALLEL_IEEE_FWD_TO_REV)(
-  IN  PVOID  Context);
+  /*IN*/ PVOID  Context);
 
 typedef NTSTATUS DDKAPI
 (*PPARALLEL_IEEE_REV_TO_FWD)(
-  IN  PVOID  Context);
+  /*IN*/ PVOID  Context);
 
 typedef NTSTATUS DDKAPI
 (*PPARALLEL_READ)(
-	IN  PVOID  Context,
-	OUT PVOID  Buffer,
-	IN  ULONG  NumBytesToRead,
-	OUT PULONG  NumBytesRead,
-	IN  UCHAR  Channel);
+  /*IN*/  PVOID  Context,
+  /*OUT*/ PVOID  Buffer,
+  /*IN*/  ULONG  NumBytesToRead,
+  /*OUT*/ PULONG  NumBytesRead,
+  /*IN*/  UCHAR  Channel);
 	
 typedef NTSTATUS DDKAPI
 (*PPARALLEL_WRITE)(
-	IN  PVOID  Context,
-	OUT PVOID  Buffer,
-	IN  ULONG  NumBytesToWrite,
-	OUT PULONG  NumBytesWritten,
-	IN  UCHAR   Channel);
+  /*IN*/  PVOID  Context,
+  /*OUT*/ PVOID  Buffer,
+  /*IN*/  ULONG  NumBytesToWrite,
+  /*OUT*/ PULONG  NumBytesWritten,
+  /*IN*/  UCHAR   Channel);
 
 typedef NTSTATUS DDKAPI
 (*PPARALLEL_TRYSELECT_DEVICE)(
-  IN  PVOID  Context,
-  IN  PARALLEL_1284_COMMAND  Command);
+  /*IN*/ PVOID  Context,
+  /*IN*/ PARALLEL_1284_COMMAND  Command);
 
 typedef NTSTATUS DDKAPI
 (*PPARALLEL_DESELECT_DEVICE)(
-  IN  PVOID  Context,
-  IN  PARALLEL_1284_COMMAND  Command);
+  /*IN*/ PVOID  Context,
+  /*IN*/ PARALLEL_1284_COMMAND  Command);
 
 typedef struct _PARCLASS_INFORMATION {
   PUCHAR  Controller;

@@ -83,9 +83,9 @@ typedef struct _CONNECT_DATA {
 
 typedef VOID
 (STDAPICALLTYPE *PSERVICE_CALLBACK_ROUTINE)(
-	IN PVOID NormalContext,
-	IN PVOID SystemArgument1,
-	IN PVOID SystemArgument2,
-	IN OUT PVOID SystemArgument3);
+  /*IN*/ PVOID NormalContext,
+  /*IN*/ PVOID SystemArgument1,
+  /*IN*/ PVOID SystemArgument2,
+  /*IN OUT*/ PVOID SystemArgument3);
 
 #endif /* __KBDMOU_H */

@@ -58,8 +58,8 @@ CHANGERAPI
 PVOID
 DDKAPI
 ChangerClassAllocatePool(
-  IN POOL_TYPE  PoolType,
-  IN ULONG  NumberOfBytes);
+  /*IN*/ POOL_TYPE  PoolType,
+  /*IN*/ ULONG  NumberOfBytes);
 
 VOID
 ChangerClassDebugPrint(
@@ -71,22 +71,22 @@ CHANGERAPI
 PVOID
 DDKAPI
 ChangerClassFreePool(
-  IN PVOID  PoolToFree);
+  /*IN*/ PVOID  PoolToFree);
 
 CHANGERAPI
 NTSTATUS
 DDKAPI
 ChangerClassSendSrbSynchronous(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN PSCSI_REQUEST_BLOCK  Srb,
-  IN PVOID  Buffer,
-  IN ULONG  BufferSize,
-  IN BOOLEAN  WriteToDevice);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ PSCSI_REQUEST_BLOCK  Srb,
+  /*IN*/ PVOID  Buffer,
+  /*IN*/ ULONG  BufferSize,
+  /*IN*/ BOOLEAN  WriteToDevice);
 
 
 typedef NTSTATUS DDKAPI
 (*CHANGER_INITIALIZE)(
-  IN PDEVICE_OBJECT  DeviceObject);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject);
 
 typedef ULONG DDKAPI
 (*CHANGER_EXTENSION_SIZE)(
@@ -101,13 +101,13 @@ typedef VOID DDKAPI
 
 typedef NTSTATUS DDKAPI
 (*CHANGER_COMMAND_ROUTINE)(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN PIRP  Irp);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ PIRP  Irp);
 
 typedef NTSTATUS DDKAPI
 (*CHANGER_PERFORM_DIAGNOSTICS)(
-  IN PDEVICE_OBJECT  DeviceObject,
-  OUT PWMI_CHANGER_PROBLEM_DEVICE_ERROR  ChangerDeviceError);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*OUT*/ PWMI_CHANGER_PROBLEM_DEVICE_ERROR  ChangerDeviceError);
 
 typedef struct _MCD_INIT_DATA {
   ULONG  InitDataSize;
@@ -132,9 +132,9 @@ CHANGERAPI
 NTSTATUS
 DDKAPI
 ChangerClassInitialize(
-  IN PDRIVER_OBJECT  DriverObject,
-  IN PUNICODE_STRING  RegistryPath,
-  IN PMCD_INIT_DATA  MCDInitData);
+  /*IN*/ PDRIVER_OBJECT  DriverObject,
+  /*IN*/ PUNICODE_STRING  RegistryPath,
+  /*IN*/ PMCD_INIT_DATA  MCDInitData);
 
 #ifdef __cplusplus
 }

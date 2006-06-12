@@ -49,13 +49,13 @@ typedef enum _PF_FORWARD_ACTION {
 
 typedef PF_FORWARD_ACTION STDCALL
 (*PacketFilterExtensionPtr)(
-  IN unsigned char  *PacketHeader,
-  IN unsigned char  *Packet, 
-  IN unsigned int  PacketLength, 
-  IN unsigned int  RecvInterfaceIndex, 
-  IN unsigned int  SendInterfaceIndex, 
-  IN IPAddr  RecvLinkNextHop, 
-  IN IPAddr  SendLinkNextHop); 
+  /*IN*/ unsigned char  *PacketHeader,
+  /*IN*/ unsigned char  *Packet, 
+  /*IN*/ unsigned int  PacketLength, 
+  /*IN*/ unsigned int  RecvInterfaceIndex, 
+  /*IN*/ unsigned int  SendInterfaceIndex, 
+  /*IN*/ IPAddr  RecvLinkNextHop, 
+  /*IN*/ IPAddr  SendLinkNextHop); 
 
 typedef struct _PF_SET_EXTENSION_HOOK_INFO {
   PacketFilterExtensionPtr  ExtensionPointer; 

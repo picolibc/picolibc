@@ -163,236 +163,236 @@ typedef struct _TDI_REQUEST_KERNEL_SET_INFO {
 
 typedef NTSTATUS DDKAPI
 (*PTDI_IND_CONNECT)(
-  IN PVOID  TdiEventContext,
-  IN LONG  RemoteAddressLength,
-  IN PVOID  RemoteAddress,
-  IN LONG  UserDataLength,
-  IN PVOID  UserData,
-  IN LONG  OptionsLength,
-  IN PVOID  Options,
-  OUT CONNECTION_CONTEXT  *ConnectionContext,
-  OUT PIRP  *AcceptIrp);
+  /*IN*/ PVOID  TdiEventContext,
+  /*IN*/ LONG  RemoteAddressLength,
+  /*IN*/ PVOID  RemoteAddress,
+  /*IN*/ LONG  UserDataLength,
+  /*IN*/ PVOID  UserData,
+  /*IN*/ LONG  OptionsLength,
+  /*IN*/ PVOID  Options,
+  /*OUT*/ CONNECTION_CONTEXT  *ConnectionContext,
+  /*OUT*/ PIRP  *AcceptIrp);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiDefaultConnectHandler(
-  IN PVOID  TdiEventContext,
-  IN LONG  RemoteAddressLength,
-  IN PVOID  RemoteAddress,
-  IN LONG  UserDataLength,
-  IN PVOID  UserData,
-  IN LONG  OptionsLength,
-  IN PVOID  Options,
-  OUT CONNECTION_CONTEXT *ConnectionContext,
-  OUT PIRP  *AcceptIrp);
+  /*IN*/ PVOID  TdiEventContext,
+  /*IN*/ LONG  RemoteAddressLength,
+  /*IN*/ PVOID  RemoteAddress,
+  /*IN*/ LONG  UserDataLength,
+  /*IN*/ PVOID  UserData,
+  /*IN*/ LONG  OptionsLength,
+  /*IN*/ PVOID  Options,
+  /*OUT*/ CONNECTION_CONTEXT *ConnectionContext,
+  /*OUT*/ PIRP  *AcceptIrp);
 
 typedef NTSTATUS DDKAPI
 (*PTDI_IND_DISCONNECT)(
-  IN PVOID  TdiEventContext,
-  IN CONNECTION_CONTEXT  ConnectionContext,
-  IN LONG  DisconnectDataLength,
-  IN PVOID  DisconnectData,
-  IN LONG  DisconnectInformationLength,
-  IN PVOID  DisconnectInformation,
-  IN ULONG  DisconnectFlags);
+  /*IN*/ PVOID  TdiEventContext,
+  /*IN*/ CONNECTION_CONTEXT  ConnectionContext,
+  /*IN*/ LONG  DisconnectDataLength,
+  /*IN*/ PVOID  DisconnectData,
+  /*IN*/ LONG  DisconnectInformationLength,
+  /*IN*/ PVOID  DisconnectInformation,
+  /*IN*/ ULONG  DisconnectFlags);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiDefaultDisconnectHandler(
-  IN PVOID  TdiEventContext,
-  IN CONNECTION_CONTEXT  ConnectionContext,
-  IN LONG  DisconnectDataLength,
-  IN PVOID  DisconnectData,
-  IN LONG  DisconnectInformationLength,
-  IN PVOID  DisconnectInformation,
-  IN ULONG  DisconnectFlags);
+  /*IN*/ PVOID  TdiEventContext,
+  /*IN*/ CONNECTION_CONTEXT  ConnectionContext,
+  /*IN*/ LONG  DisconnectDataLength,
+  /*IN*/ PVOID  DisconnectData,
+  /*IN*/ LONG  DisconnectInformationLength,
+  /*IN*/ PVOID  DisconnectInformation,
+  /*IN*/ ULONG  DisconnectFlags);
 
 typedef NTSTATUS DDKAPI
 (*PTDI_IND_ERROR)(
-  IN PVOID  TdiEventContext,
-  IN NTSTATUS  Status);
+  /*IN*/ PVOID  TdiEventContext,
+  /*IN*/ NTSTATUS  Status);
 
 typedef NTSTATUS DDKAPI
 (*PTDI_IND_ERROR_EX)(
-  IN PVOID  TdiEventContext,
-  IN NTSTATUS  Status,
-  IN PVOID  Buffer);
+  /*IN*/ PVOID  TdiEventContext,
+  /*IN*/ NTSTATUS  Status,
+  /*IN*/ PVOID  Buffer);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiDefaultErrorHandler(
-  IN PVOID  TdiEventContext,
-  IN NTSTATUS  Status);
+  /*IN*/ PVOID  TdiEventContext,
+  /*IN*/ NTSTATUS  Status);
 
 typedef NTSTATUS DDKAPI
 (*PTDI_IND_RECEIVE)(
-  IN PVOID  TdiEventContext,
-  IN CONNECTION_CONTEXT  ConnectionContext,
-  IN ULONG  ReceiveFlags,
-  IN ULONG  BytesIndicated,
-  IN ULONG  BytesAvailable,
-  OUT ULONG  *BytesTaken,
-  IN PVOID  Tsdu,
-  OUT PIRP  *IoRequestPacket);
+  /*IN*/ PVOID  TdiEventContext,
+  /*IN*/ CONNECTION_CONTEXT  ConnectionContext,
+  /*IN*/ ULONG  ReceiveFlags,
+  /*IN*/ ULONG  BytesIndicated,
+  /*IN*/ ULONG  BytesAvailable,
+  /*OUT*/ ULONG  *BytesTaken,
+  /*IN*/ PVOID  Tsdu,
+  /*OUT*/ PIRP  *IoRequestPacket);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiDefaultReceiveHandler(
-  IN PVOID  TdiEventContext,
-  IN CONNECTION_CONTEXT  ConnectionContext,
-  IN ULONG  ReceiveFlags,
-  IN ULONG  BytesIndicated,
-  IN ULONG  BytesAvailable,
-  OUT ULONG  *BytesTaken,
-  IN PVOID  Tsdu,
-  OUT PIRP  *IoRequestPacket);
+  /*IN*/ PVOID  TdiEventContext,
+  /*IN*/ CONNECTION_CONTEXT  ConnectionContext,
+  /*IN*/ ULONG  ReceiveFlags,
+  /*IN*/ ULONG  BytesIndicated,
+  /*IN*/ ULONG  BytesAvailable,
+  /*OUT*/ ULONG  *BytesTaken,
+  /*IN*/ PVOID  Tsdu,
+  /*OUT*/ PIRP  *IoRequestPacket);
 
 typedef NTSTATUS DDKAPI
 (*PTDI_IND_RECEIVE_DATAGRAM)(
-  IN PVOID  TdiEventContext,
-  IN LONG  SourceAddressLength,
-  IN PVOID  SourceAddress,
-  IN LONG  OptionsLength,
-  IN PVOID  Options,
-  IN ULONG  ReceiveDatagramFlags,
-  IN ULONG  BytesIndicated,
-  IN ULONG  BytesAvailable,
-  OUT ULONG  *BytesTaken,
-  IN PVOID  Tsdu,
-  OUT PIRP  *IoRequestPacket);
+  /*IN*/ PVOID  TdiEventContext,
+  /*IN*/ LONG  SourceAddressLength,
+  /*IN*/ PVOID  SourceAddress,
+  /*IN*/ LONG  OptionsLength,
+  /*IN*/ PVOID  Options,
+  /*IN*/ ULONG  ReceiveDatagramFlags,
+  /*IN*/ ULONG  BytesIndicated,
+  /*IN*/ ULONG  BytesAvailable,
+  /*OUT*/ ULONG  *BytesTaken,
+  /*IN*/ PVOID  Tsdu,
+  /*OUT*/ PIRP  *IoRequestPacket);
 
 TDIKRNLAPI
 NTSTATUS DDKAPI
 TdiDefaultRcvDatagramHandler(
-  IN PVOID  TdiEventContext,
-  IN LONG  SourceAddressLength,
-  IN PVOID  SourceAddress,
-  IN LONG  OptionsLength,
-  IN PVOID  Options,
-  IN ULONG  ReceiveDatagramFlags,
-  IN ULONG  BytesIndicated,
-  IN ULONG  BytesAvailable,
-  OUT ULONG  *BytesTaken,
-  IN PVOID  Tsdu,
-  OUT PIRP  *IoRequestPacket);
+  /*IN*/ PVOID  TdiEventContext,
+  /*IN*/ LONG  SourceAddressLength,
+  /*IN*/ PVOID  SourceAddress,
+  /*IN*/ LONG  OptionsLength,
+  /*IN*/ PVOID  Options,
+  /*IN*/ ULONG  ReceiveDatagramFlags,
+  /*IN*/ ULONG  BytesIndicated,
+  /*IN*/ ULONG  BytesAvailable,
+  /*OUT*/ ULONG  *BytesTaken,
+  /*IN*/ PVOID  Tsdu,
+  /*OUT*/ PIRP  *IoRequestPacket);
 
 typedef NTSTATUS DDKAPI
 (*PTDI_IND_RECEIVE_EXPEDITED)(
-  IN PVOID  TdiEventContext,
-  IN CONNECTION_CONTEXT  ConnectionContext,
-  IN ULONG  ReceiveFlags,
-  IN ULONG  BytesIndicated,
-  IN ULONG  BytesAvailable,
-  OUT ULONG  *BytesTaken,
-  IN PVOID  Tsdu,
-  OUT PIRP  *IoRequestPacket);
+  /*IN*/ PVOID  TdiEventContext,
+  /*IN*/ CONNECTION_CONTEXT  ConnectionContext,
+  /*IN*/ ULONG  ReceiveFlags,
+  /*IN*/ ULONG  BytesIndicated,
+  /*IN*/ ULONG  BytesAvailable,
+  /*OUT*/ ULONG  *BytesTaken,
+  /*IN*/ PVOID  Tsdu,
+  /*OUT*/ PIRP  *IoRequestPacket);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiDefaultRcvExpeditedHandler(
-  IN PVOID  TdiEventContext,
-  IN CONNECTION_CONTEXT  ConnectionContext,
-  IN ULONG  ReceiveFlags,
-  IN ULONG  BytesIndicated,
-  IN ULONG  BytesAvailable,
-  OUT ULONG  *BytesTaken,
-  IN PVOID  Tsdu,
-  OUT PIRP  *IoRequestPacket);
+  /*IN*/ PVOID  TdiEventContext,
+  /*IN*/ CONNECTION_CONTEXT  ConnectionContext,
+  /*IN*/ ULONG  ReceiveFlags,
+  /*IN*/ ULONG  BytesIndicated,
+  /*IN*/ ULONG  BytesAvailable,
+  /*OUT*/ ULONG  *BytesTaken,
+  /*IN*/ PVOID  Tsdu,
+  /*OUT*/ PIRP  *IoRequestPacket);
 
 typedef NTSTATUS DDKAPI
 (*PTDI_IND_CHAINED_RECEIVE)(
-  IN PVOID  TdiEventContext,
-  IN CONNECTION_CONTEXT  ConnectionContext,
-  IN ULONG  ReceiveFlags,
-  IN ULONG  ReceiveLength,
-  IN ULONG  StartingOffset,
-  IN PMDL  Tsdu,
-  IN PVOID  TsduDescriptor);
+  /*IN*/ PVOID  TdiEventContext,
+  /*IN*/ CONNECTION_CONTEXT  ConnectionContext,
+  /*IN*/ ULONG  ReceiveFlags,
+  /*IN*/ ULONG  ReceiveLength,
+  /*IN*/ ULONG  StartingOffset,
+  /*IN*/ PMDL  Tsdu,
+  /*IN*/ PVOID  TsduDescriptor);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiDefaultChainedReceiveHandler(
-  IN PVOID  TdiEventContext,
-  IN CONNECTION_CONTEXT  ConnectionContext,
-  IN ULONG  ReceiveFlags,
-  IN ULONG  ReceiveLength,
-  IN ULONG  StartingOffset,
-  IN PMDL  Tsdu,
-  IN PVOID  TsduDescriptor);
+  /*IN*/ PVOID  TdiEventContext,
+  /*IN*/ CONNECTION_CONTEXT  ConnectionContext,
+  /*IN*/ ULONG  ReceiveFlags,
+  /*IN*/ ULONG  ReceiveLength,
+  /*IN*/ ULONG  StartingOffset,
+  /*IN*/ PMDL  Tsdu,
+  /*IN*/ PVOID  TsduDescriptor);
 
 typedef NTSTATUS DDKAPI
 (*PTDI_IND_CHAINED_RECEIVE_DATAGRAM)(
-  IN PVOID  TdiEventContext,
-  IN LONG  SourceAddressLength,
-  IN PVOID  SourceAddress,
-  IN LONG  OptionsLength,
-  IN PVOID  Options,
-  IN ULONG  ReceiveDatagramFlags,
-  IN ULONG  ReceiveDatagramLength,
-  IN ULONG  StartingOffset,
-  IN PMDL  Tsdu,
-  IN PVOID  TsduDescriptor);
+  /*IN*/ PVOID  TdiEventContext,
+  /*IN*/ LONG  SourceAddressLength,
+  /*IN*/ PVOID  SourceAddress,
+  /*IN*/ LONG  OptionsLength,
+  /*IN*/ PVOID  Options,
+  /*IN*/ ULONG  ReceiveDatagramFlags,
+  /*IN*/ ULONG  ReceiveDatagramLength,
+  /*IN*/ ULONG  StartingOffset,
+  /*IN*/ PMDL  Tsdu,
+  /*IN*/ PVOID  TsduDescriptor);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiDefaultChainedRcvDatagramHandler(
-  IN PVOID  TdiEventContext,
-  IN LONG  SourceAddressLength,
-  IN PVOID  SourceAddress,
-  IN LONG  OptionsLength,
-  IN PVOID  Options,
-  IN ULONG  ReceiveDatagramFlags,
-  IN ULONG  ReceiveDatagramLength,
-  IN ULONG  StartingOffset,
-  IN PMDL  Tsdu,
-  IN PVOID  TsduDescriptor);
+  /*IN*/ PVOID  TdiEventContext,
+  /*IN*/ LONG  SourceAddressLength,
+  /*IN*/ PVOID  SourceAddress,
+  /*IN*/ LONG  OptionsLength,
+  /*IN*/ PVOID  Options,
+  /*IN*/ ULONG  ReceiveDatagramFlags,
+  /*IN*/ ULONG  ReceiveDatagramLength,
+  /*IN*/ ULONG  StartingOffset,
+  /*IN*/ PMDL  Tsdu,
+  /*IN*/ PVOID  TsduDescriptor);
 
 typedef NTSTATUS DDKAPI
 (*PTDI_IND_CHAINED_RECEIVE_EXPEDITED)(
-  IN PVOID  TdiEventContext,
-  IN CONNECTION_CONTEXT  ConnectionContext,
-  IN ULONG  ReceiveFlags,
-  IN ULONG  ReceiveLength,
-  IN ULONG  StartingOffset,
-  IN PMDL  Tsdu,
-  IN PVOID  TsduDescriptor);
+  /*IN*/ PVOID  TdiEventContext,
+  /*IN*/ CONNECTION_CONTEXT  ConnectionContext,
+  /*IN*/ ULONG  ReceiveFlags,
+  /*IN*/ ULONG  ReceiveLength,
+  /*IN*/ ULONG  StartingOffset,
+  /*IN*/ PMDL  Tsdu,
+  /*IN*/ PVOID  TsduDescriptor);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiDefaultChainedRcvExpeditedHandler(
-  IN PVOID  TdiEventContext,
-  IN CONNECTION_CONTEXT  ConnectionContext,
-  IN ULONG  ReceiveFlags,
-  IN ULONG  ReceiveLength,
-  IN ULONG  StartingOffset,
-  IN PMDL  Tsdu,
-  IN PVOID  TsduDescriptor);
+  /*IN*/ PVOID  TdiEventContext,
+  /*IN*/ CONNECTION_CONTEXT  ConnectionContext,
+  /*IN*/ ULONG  ReceiveFlags,
+  /*IN*/ ULONG  ReceiveLength,
+  /*IN*/ ULONG  StartingOffset,
+  /*IN*/ PMDL  Tsdu,
+  /*IN*/ PVOID  TsduDescriptor);
 
 typedef NTSTATUS DDKAPI
 (*PTDI_IND_SEND_POSSIBLE)(
-  IN PVOID  TdiEventContext,
-  IN PVOID  ConnectionContext,
-  IN ULONG  BytesAvailable);
+  /*IN*/ PVOID  TdiEventContext,
+  /*IN*/ PVOID  ConnectionContext,
+  /*IN*/ ULONG  BytesAvailable);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiDefaultSendPossibleHandler(
-  IN PVOID  TdiEventContext,
-  IN PVOID  ConnectionContext,
-  IN ULONG  BytesAvailable);
+  /*IN*/ PVOID  TdiEventContext,
+  /*IN*/ PVOID  ConnectionContext,
+  /*IN*/ ULONG  BytesAvailable);
 
 
 
-/* Macros and functions to build IRPs */
+  /* Macros and functions to build IRPs */
 
 #define TdiBuildBaseIrp(                                                  \
   bIrp, bDevObj, bFileObj, bCompRoutine, bContxt, bIrpSp, bMinor)         \
@@ -407,16 +407,16 @@ TdiDefaultSendPossibleHandler(
     IoSetCompletionRoutine(bIrp, NULL, NULL, FALSE, FALSE, FALSE);        \
 }
 
-/*
+  /*
  * VOID
  * TdiBuildAccept(
- *   IN PIRP  Irp,
- *   IN PDEVICE_OBJECT  DevObj,
- *   IN PFILE_OBJECT  FileObj,
- *   IN PVOID  CompRoutine,
- *   IN PVOID  Contxt,
- *   IN PTDI_CONNECTION_INFORMATION  RequestConnectionInfo,
- *   OUT PTDI_CONNECTION_INFORMATION  ReturnConnectionInfo);
+ * IN PIRP  Irp,
+ * IN PDEVICE_OBJECT  DevObj,
+ * IN PFILE_OBJECT  FileObj,
+ * IN PVOID  CompRoutine,
+ * IN PVOID  Contxt,
+ * IN PTDI_CONNECTION_INFORMATION  RequestConnectionInfo,
+ * OUT PTDI_CONNECTION_INFORMATION  ReturnConnectionInfo);
  */
 #define TdiBuildAccept(                                             \
   Irp, DevObj, FileObj, CompRoutine, Contxt,                        \
@@ -435,15 +435,15 @@ TdiDefaultSendPossibleHandler(
   _Request->ReturnConnectionInformation  = (ReturnConnectionInfo);  \
 }
 
-/*
+  /*
  * VOID
  * TdiBuildAction(
- *   IN PIRP  Irp,
- *   IN PDEVICE_OBJECT  DevObj,
- *   IN PFILE_OBJECT  FileObj,
- *   IN PVOID  CompRoutine,
- *   IN PVOID  Contxt,
- *   IN PMDL  MdlAddr);
+ * IN PIRP  Irp,
+ * IN PDEVICE_OBJECT  DevObj,
+ * IN PFILE_OBJECT  FileObj,
+ * IN PVOID  CompRoutine,
+ * IN PVOID  Contxt,
+ * IN PMDL  MdlAddr);
  */
 #define TdiBuildAction(                               \
   Irp, DevObj, FileObj, CompRoutine, Contxt, MdlAddr) \
@@ -458,15 +458,15 @@ TdiDefaultSendPossibleHandler(
   (Irp)->MdlAddress = (MdlAddr);                      \
 }
 
-/*
+  /*
  * VOID
  * TdiBuildAssociateAddress(
- *   IN PIRP  Irp,
- *   IN PDEVICE_OBJECT  DevObj,
- *   IN PFILE_OBJECT  FileObj,
- *   IN PVOID  CompRoutine,
- *   IN PVOID  Contxt,
- *   IN HANDLE  AddrHandle);
+ * IN PIRP  Irp,
+ * IN PDEVICE_OBJECT  DevObj,
+ * IN PFILE_OBJECT  FileObj,
+ * IN PVOID  CompRoutine,
+ * IN PVOID  Contxt,
+ * IN HANDLE  AddrHandle);
  */
 #define TdiBuildAssociateAddress(                                \
   Irp, DevObj, FileObj, CompRoutine, Contxt, AddrHandle)         \
@@ -483,17 +483,17 @@ TdiDefaultSendPossibleHandler(
   _Request->AddressHandle = (HANDLE)(AddrHandle);                \
 }
 
-/*
+  /*
  * VOID
  * TdiBuildConnect(
- *   IN PIRP  Irp,
- *   IN PDEVICE_OBJECT  DevObj,
- *   IN PFILE_OBJECT  FileObj,
- *   IN PVOID  CompRoutine,
- *   IN PVOID  Contxt,
- *   IN PLARGE_INTEGER  Time,
- *   IN PTDI_CONNECTION_INFORMATION  RequestConnectionInfo,
- *   OUT PTDI_CONNECTION_INFORMATION  ReturnConnectionInfo); 
+ * IN PIRP  Irp,
+ * IN PDEVICE_OBJECT  DevObj,
+ * IN PFILE_OBJECT  FileObj,
+ * IN PVOID  CompRoutine,
+ * IN PVOID  Contxt,
+ * IN PLARGE_INTEGER  Time,
+ * IN PTDI_CONNECTION_INFORMATION  RequestConnectionInfo,
+ * OUT PTDI_CONNECTION_INFORMATION  ReturnConnectionInfo); 
  */
 #define TdiBuildConnect(                                            \
   Irp, DevObj, FileObj, CompRoutine, Contxt,                        \
@@ -513,14 +513,14 @@ TdiDefaultSendPossibleHandler(
   _Request->RequestSpecific              = (PVOID)(Time);           \
 }
 
-/*
+  /*
  * VOID
  * TdiBuildDisassociateAddress(
- *   IN PIRP  Irp,
- *   IN PDEVICE_OBJECT  DevObj,
- *   IN PFILE_OBJECT  FileObj,
- *   IN PVOID  CompRoutine,
- *   IN PVOID  Contxt);
+ * IN PIRP  Irp,
+ * IN PDEVICE_OBJECT  DevObj,
+ * IN PFILE_OBJECT  FileObj,
+ * IN PVOID  CompRoutine,
+ * IN PVOID  Contxt);
  */
 #define TdiBuildDisassociateAddress(                                \
   Irp, DevObj, FileObj, CompRoutine, Contxt)                        \
@@ -533,18 +533,18 @@ TdiDefaultSendPossibleHandler(
                   Contxt, _IrpSp, TDI_DISASSOCIATE_ADDRESS);        \
 }
 
-/*
+  /*
  * VOID
  * TdiBuildDisconnect(
- *   IN PIRP  Irp,
- *   IN PDEVICE_OBJECT  DevObj,
- *   IN PFILE_OBJECT  FileObj,
- *   IN PVOID  CompRoutine,
- *   IN PVOID  Contxt,
- *   IN PLARGE_INTEGER  Time,
- *   IN PULONG  Flags,
- *   IN PTDI_CONNECTION_INFORMATION  RequestConnectionInfo,
- *   OUT PTDI_CONNECTION_INFORMATION  ReturnConnectionInfo); 
+ * IN PIRP  Irp,
+ * IN PDEVICE_OBJECT  DevObj,
+ * IN PFILE_OBJECT  FileObj,
+ * IN PVOID  CompRoutine,
+ * IN PVOID  Contxt,
+ * IN PLARGE_INTEGER  Time,
+ * IN PULONG  Flags,
+ * IN PTDI_CONNECTION_INFORMATION  RequestConnectionInfo,
+ * OUT PTDI_CONNECTION_INFORMATION  ReturnConnectionInfo); 
  */
 #define TdiBuildDisconnect(                                         \
   Irp, DevObj, FileObj, CompRoutine, Contxt, Time,                  \
@@ -565,14 +565,14 @@ TdiDefaultSendPossibleHandler(
   _Request->RequestFlags    = (Flags);                              \
 }
 
-/*
+  /*
  * PIRP
  * TdiBuildInternalDeviceControlIrp(
- *   IN CCHAR IrpSubFunction,
- *   IN PDEVICE_OBJECT DeviceObject,
- *   IN PFILE_OBJECT FileObject,
- *   IN PKEVENT Event,
- *   IN PIO_STATUS_BLOCK IoStatusBlock);
+ * IN CCHAR IrpSubFunction,
+ * IN PDEVICE_OBJECT DeviceObject,
+ * IN PFILE_OBJECT FileObject,
+ * IN PKEVENT Event,
+ * IN PIO_STATUS_BLOCK IoStatusBlock);
  */
 #define TdiBuildInternalDeviceControlIrp( \
   IrpSubFunction, DeviceObject,           \
@@ -582,17 +582,17 @@ TdiDefaultSendPossibleHandler(
 		NULL, 0, NULL, 0,                     \
 		TRUE, Event, IoStatusBlock)
 
-/*
+  /*
  * VOID
  * TdiBuildListen(
- *   IN PIRP  Irp,
- *   IN PDEVICE_OBJECT  DevObj,
- *   IN PFILE_OBJECT  FileObj,
- *   IN PVOID  CompRoutine,
- *   IN PVOID  Contxt,
- *   IN ULONG  Flags,
- *   IN PTDI_CONNECTION_INFORMATION  RequestConnectionInfo,
- *   OUT PTDI_CONNECTION_INFORMATION  ReturnConnectionInfo); 
+ * IN PIRP  Irp,
+ * IN PDEVICE_OBJECT  DevObj,
+ * IN PFILE_OBJECT  FileObj,
+ * IN PVOID  CompRoutine,
+ * IN PVOID  Contxt,
+ * IN ULONG  Flags,
+ * IN PTDI_CONNECTION_INFORMATION  RequestConnectionInfo,
+ * OUT PTDI_CONNECTION_INFORMATION  ReturnConnectionInfo); 
  */
 #define TdiBuildListen(                                             \
   Irp, DevObj, FileObj, CompRoutine, Contxt,                        \
@@ -616,28 +616,28 @@ TDIKRNLAPI
 VOID
 DDKAPI
 TdiBuildNetbiosAddress(
-	IN PUCHAR  NetbiosName,
-	IN BOOLEAN  IsGroupName,
-	IN OUT PTA_NETBIOS_ADDRESS  NetworkName);
+  /*IN*/ PUCHAR  NetbiosName,
+  /*IN*/ BOOLEAN  IsGroupName,
+  /*IN OUT*/ PTA_NETBIOS_ADDRESS  NetworkName);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiBuildNetbiosAddressEa(
-  IN PUCHAR  Buffer,
-  IN BOOLEAN  IsGroupName,
-  IN PUCHAR  NetbiosName);
+  /*IN*/ PUCHAR  Buffer,
+  /*IN*/ BOOLEAN  IsGroupName,
+  /*IN*/ PUCHAR  NetbiosName);
 
-/*
+  /*
  * VOID
  * TdiBuildQueryInformation(
- *   IN PIRP  Irp,
- *   IN PDEVICE_OBJECT  DevObj,
- *   IN PFILE_OBJECT  FileObj,
- *   IN PVOID  CompRoutine,
- *   IN PVOID  Contxt,
- *   IN UINT  QType,
- *   IN PMDL  MdlAddr);
+ * IN PIRP  Irp,
+ * IN PDEVICE_OBJECT  DevObj,
+ * IN PFILE_OBJECT  FileObj,
+ * IN PVOID  CompRoutine,
+ * IN PVOID  Contxt,
+ * IN UINT  QType,
+ * IN PMDL  MdlAddr);
  */
 #define TdiBuildQueryInformation(                                        \
   Irp, DevObj, FileObj, CompRoutine, Contxt, QType, MdlAddr)             \
@@ -656,17 +656,17 @@ TdiBuildNetbiosAddressEa(
   (Irp)->MdlAddress   = (MdlAddr);                                       \
 }
 
-/*
+  /*
  * VOID
  * TdiBuildReceive(
- *   IN PIRP  Irp,
- *   IN PDEVICE_OBJECT  DevObj,
- *   IN PFILE_OBJECT  FileObj,
- *   IN PVOID  CompRoutine,
- *   IN PVOID  Contxt,
- *   IN PMDL  MdlAddr,
- *   IN ULONG  InFlags, 
- *   IN ULONG  ReceiveLen); 
+ * IN PIRP  Irp,
+ * IN PDEVICE_OBJECT  DevObj,
+ * IN PFILE_OBJECT  FileObj,
+ * IN PVOID  CompRoutine,
+ * IN PVOID  Contxt,
+ * IN PMDL  MdlAddr,
+ * IN ULONG  InFlags, 
+ * IN ULONG  ReceiveLen); 
  */
 #define TdiBuildReceive(                                       \
   Irp, DevObj, FileObj, CompRoutine, Contxt,                   \
@@ -686,18 +686,18 @@ TdiBuildNetbiosAddressEa(
   (Irp)->MdlAddress       = (MdlAddr);                         \
 }
 
-/*
+  /*
  * VOID
  * TdiBuildReceiveDatagram(
- *   IN PIRP  Irp,
- *   IN PDEVICE_OBJECT  DevObj,
- *   IN PFILE_OBJECT  FileObj,
- *   IN PVOID  CompRoutine,
- *   IN PVOID  Contxt,
- *   IN PMDL  MdlAddr,
- *   IN ULONG  ReceiveLen,
- *   IN PTDI_CONNECTION_INFORMATION  ReceiveDatagramInfo,
- *   OUT PTDI_CONNECTION_INFORMATION  ReturnInfo,
+ * IN PIRP  Irp,
+ * IN PDEVICE_OBJECT  DevObj,
+ * IN PFILE_OBJECT  FileObj,
+ * IN PVOID  CompRoutine,
+ * IN PVOID  Contxt,
+ * IN PMDL  MdlAddr,
+ * IN ULONG  ReceiveLen,
+ * IN PTDI_CONNECTION_INFORMATION  ReceiveDatagramInfo,
+ * OUT PTDI_CONNECTION_INFORMATION  ReturnInfo,
  *   ULONG InFlags); 
  */
 #define TdiBuildReceiveDatagram(                                 \
@@ -720,17 +720,17 @@ TdiBuildNetbiosAddressEa(
   (Irp)->MdlAddress       = (MdlAddr);                           \
 }
 
-/*
+  /*
  * VOID
  * TdiBuildSend(
- *   IN PIRP  Irp,
- *   IN PDEVICE_OBJECT  DevObj,
- *   IN PFILE_OBJECT  FileObj,
- *   IN PVOID  CompRoutine,
- *   IN PVOID  Contxt,
- *   IN PMDL  MdlAddr,
- *   IN ULONG  InFlags,
- *   IN ULONG  SendLen);
+ * IN PIRP  Irp,
+ * IN PDEVICE_OBJECT  DevObj,
+ * IN PFILE_OBJECT  FileObj,
+ * IN PVOID  CompRoutine,
+ * IN PVOID  Contxt,
+ * IN PMDL  MdlAddr,
+ * IN ULONG  InFlags,
+ * IN ULONG  SendLen);
  */
 #define TdiBuildSend(                                       \
   Irp, DevObj, FileObj, CompRoutine, Contxt,                \
@@ -750,17 +750,17 @@ TdiBuildNetbiosAddressEa(
   (Irp)->MdlAddress    = (MdlAddr);                         \
 }
 
-/*
+  /*
  * VOID
  * TdiBuildSendDatagram(
- *   IN PIRP  Irp,
- *   IN PDEVICE_OBJECT  DevObj,
- *   IN PFILE_OBJECT  FileObj,
- *   IN PVOID  CompRoutine,
- *   IN PVOID  Contxt,
- *   IN PMDL  MdlAddr,
- *   IN ULONG  SendLen,
- *   IN PTDI_CONNECTION_INFORMATION  SendDatagramInfo); 
+ * IN PIRP  Irp,
+ * IN PDEVICE_OBJECT  DevObj,
+ * IN PFILE_OBJECT  FileObj,
+ * IN PVOID  CompRoutine,
+ * IN PVOID  Contxt,
+ * IN PMDL  MdlAddr,
+ * IN ULONG  SendLen,
+ * IN PTDI_CONNECTION_INFORMATION  SendDatagramInfo); 
  */
 #define TdiBuildSendDatagram(                                 \
   Irp, DevObj, FileObj, CompRoutine, Contxt,                  \
@@ -780,17 +780,17 @@ TdiBuildNetbiosAddressEa(
   (Irp)->MdlAddress    = (MdlAddr);                           \
 }
 
-/*
+  /*
  * VOID
  * TdiBuildSetEventHandler(
- *   IN PIRP  Irp,
- *   IN PDEVICE_OBJECT  DevObj,
- *   IN PFILE_OBJECT  FileObj,
- *   IN PVOID  CompRoutine,
- *   IN PVOID  Contxt,
- *   IN INT  InEventType,
- *   IN PVOID  InEventHandler,
- *   IN PVOID  InEventContext);
+ * IN PIRP  Irp,
+ * IN PDEVICE_OBJECT  DevObj,
+ * IN PFILE_OBJECT  FileObj,
+ * IN PVOID  CompRoutine,
+ * IN PVOID  Contxt,
+ * IN INT  InEventType,
+ * IN PVOID  InEventHandler,
+ * IN PVOID  InEventContext);
  */
 #define TdiBuildSetEventHandler(                                 \
   Irp, DevObj, FileObj, CompRoutine, Contxt,                     \
@@ -810,16 +810,16 @@ TdiBuildNetbiosAddressEa(
   _Request->EventContext = (PVOID)(InEventContext);              \
 }
 
-/*
+  /*
  * VOID
  * TdiBuildSetInformation(
- *   IN PIRP  Irp,
- *   IN PDEVICE_OBJECT  DevObj,
- *   IN PFILE_OBJECT  FileObj,
- *   IN PVOID  CompRoutine,
- *   IN PVOID  Contxt,
- *   IN UINT  SType,
- *   IN PMDL  MdlAddr);
+ * IN PIRP  Irp,
+ * IN PDEVICE_OBJECT  DevObj,
+ * IN PFILE_OBJECT  FileObj,
+ * IN PVOID  CompRoutine,
+ * IN PVOID  Contxt,
+ * IN UINT  SType,
+ * IN PMDL  MdlAddr);
  */
 #define TdiBuildSetInformation(                                        \
   Irp, DevObj, FileObj, CompRoutine, Contxt, SType, MdlAddr)           \
@@ -838,7 +838,7 @@ TdiBuildNetbiosAddressEa(
   (Irp)->MdlAddress = (MdlAddr);                                       \
 }
 
-/* TDI20_CLIENT_INTERFACE_INFO.TdiVersion constants */
+  /* TDI20_CLIENT_INTERFACE_INFO.TdiVersion constants */
 #define TDI_CURRENT_MAJOR_VERSION         2
 #define TDI_CURRENT_MINOR_VERSION         0
 
@@ -859,7 +859,7 @@ typedef enum _TDI_PNP_OPCODE {
   TDI_PNP_OP_MAX
 } TDI_PNP_OPCODE;
 
-/* TDI_PNP_CONTEXT.ContextType */
+  /* TDI_PNP_CONTEXT.ContextType */
 #define TDI_PNP_CONTEXT_TYPE_IF_NAME            0x1
 #define TDI_PNP_CONTEXT_TYPE_IF_ADDR            0x2
 #define TDI_PNP_CONTEXT_TYPE_PDO                0x3
@@ -873,49 +873,49 @@ typedef struct _TDI_PNP_CONTEXT {
 
 typedef VOID DDKAPI
 (*TDI_ADD_ADDRESS_HANDLER)(
-  IN PTA_ADDRESS  Address);
+  /*IN*/ PTA_ADDRESS  Address);
 
 typedef VOID DDKAPI
 (*TDI_ADD_ADDRESS_HANDLER_V2)(
-  IN PTA_ADDRESS  Address,
-  IN PUNICODE_STRING  DeviceName,
-  IN PTDI_PNP_CONTEXT  Context);
+  /*IN*/ PTA_ADDRESS  Address,
+  /*IN*/ PUNICODE_STRING  DeviceName,
+  /*IN*/ PTDI_PNP_CONTEXT  Context);
 
 typedef VOID DDKAPI
 (*TDI_BINDING_HANDLER)(
-  IN TDI_PNP_OPCODE  PnPOpcode,
-  IN PUNICODE_STRING  DeviceName,
-  IN PWSTR  MultiSZBindList);
+  /*IN*/ TDI_PNP_OPCODE  PnPOpcode,
+  /*IN*/ PUNICODE_STRING  DeviceName,
+  /*IN*/ PWSTR  MultiSZBindList);
 
 typedef VOID DDKAPI
 (*TDI_BIND_HANDLER)(
-  IN PUNICODE_STRING  DeviceName);
+  /*IN*/ PUNICODE_STRING  DeviceName);
 
 typedef VOID DDKAPI
 (*TDI_DEL_ADDRESS_HANDLER)(
-  IN PTA_ADDRESS  Address);
+  /*IN*/ PTA_ADDRESS  Address);
 
 typedef VOID DDKAPI
 (*TDI_DEL_ADDRESS_HANDLER_V2)(
-  IN PTA_ADDRESS  Address,
-  IN PUNICODE_STRING  DeviceName,
-  IN PTDI_PNP_CONTEXT  Context);
+  /*IN*/ PTA_ADDRESS  Address,
+  /*IN*/ PUNICODE_STRING  DeviceName,
+  /*IN*/ PTDI_PNP_CONTEXT  Context);
 
 typedef NTSTATUS DDKAPI
 (*TDI_PNP_POWER_HANDLER)(
-  IN PUNICODE_STRING  DeviceName,
-  IN PNET_PNP_EVENT  PowerEvent,
-  IN PTDI_PNP_CONTEXT  Context1,
-  IN PTDI_PNP_CONTEXT  Context2);
+  /*IN*/ PUNICODE_STRING  DeviceName,
+  /*IN*/ PNET_PNP_EVENT  PowerEvent,
+  /*IN*/ PTDI_PNP_CONTEXT  Context1,
+  /*IN*/ PTDI_PNP_CONTEXT  Context2);
 
 typedef VOID DDKAPI
 (*TDI_UNBIND_HANDLER)(
-  IN PUNICODE_STRING  DeviceName);
+  /*IN*/ PUNICODE_STRING  DeviceName);
 
 typedef VOID DDKAPI
 (*ProviderPnPPowerComplete)(
-  IN PNET_PNP_EVENT  NetEvent,
-  IN NTSTATUS  ProviderStatus);
+  /*IN*/ PNET_PNP_EVENT  NetEvent,
+  /*IN*/ NTSTATUS  ProviderStatus);
 
 typedef struct _TDI20_CLIENT_INTERFACE_INFO {
   _ANONYMOUS_UNION union {
@@ -951,13 +951,13 @@ typedef TDI20_CLIENT_INTERFACE_INFO TDI_CLIENT_INTERFACE_INFO;
 typedef TDI_CLIENT_INTERFACE_INFO *PTDI_CLIENT_INTERFACE_INFO;
 
 
-/* TDI functions */
+  /* TDI functions */
 
-/*
+  /*
  * VOID
  * TdiCompleteRequest(
- *   IN PIRP Irp,
- *   IN NTSTATUS Status);
+ * IN PIRP Irp,
+ * IN NTSTATUS Status);
  */
 #define TdiCompleteRequest(Irp, Status)           \
 {                                                 \
@@ -969,20 +969,20 @@ TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiCopyBufferToMdl(
-  IN PVOID  SourceBuffer,
-  IN ULONG  SourceOffset,
-  IN ULONG  SourceBytesToCopy,
-  IN PMDL  DestinationMdlChain,
-  IN ULONG  DestinationOffset,
-  IN PULONG  BytesCopied);
+  /*IN*/ PVOID  SourceBuffer,
+  /*IN*/ ULONG  SourceOffset,
+  /*IN*/ ULONG  SourceBytesToCopy,
+  /*IN*/ PMDL  DestinationMdlChain,
+  /*IN*/ ULONG  DestinationOffset,
+  /*IN*/ PULONG  BytesCopied);
 
-/*
+  /*
  * VOID
  * TdiCopyLookaheadData(
- *   IN PVOID  Destination,
- *   IN PVOID  Source,
- *   IN ULONG  Length,
- *   IN ULONG  ReceiveFlags);
+ * IN PVOID  Destination,
+ * IN PVOID  Source,
+ * IN ULONG  Length,
+ * IN ULONG  ReceiveFlags);
  */
 #define TdiCopyLookaheadData(Destination, Source, Length, ReceiveFlags) \
   RtlCopyMemory(Destination, Source, Length)
@@ -991,58 +991,58 @@ TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiCopyMdlChainToMdlChain (
-  IN PMDL  SourceMdlChain,
-  IN ULONG  SourceOffset,
-  IN PMDL  DestinationMdlChain,
-  IN ULONG  DestinationOffset,
-  OUT PULONG  BytesCopied);
+  /*IN*/ PMDL  SourceMdlChain,
+  /*IN*/ ULONG  SourceOffset,
+  /*IN*/ PMDL  DestinationMdlChain,
+  /*IN*/ ULONG  DestinationOffset,
+  /*OUT*/ PULONG  BytesCopied);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiCopyMdlToBuffer(
-  IN PMDL  SourceMdlChain,
-  IN ULONG  SourceOffset,
-  IN PVOID  DestinationBuffer,
-  IN ULONG  DestinationOffset,
-  IN ULONG  DestinationBufferSize,
-  OUT PULONG  BytesCopied);
+  /*IN*/ PMDL  SourceMdlChain,
+  /*IN*/ ULONG  SourceOffset,
+  /*IN*/ PVOID  DestinationBuffer,
+  /*IN*/ ULONG  DestinationOffset,
+  /*IN*/ ULONG  DestinationBufferSize,
+  /*OUT*/ PULONG  BytesCopied);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiDeregisterAddressChangeHandler(
-  IN HANDLE  BindingHandle);
+  /*IN*/ HANDLE  BindingHandle);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiDeregisterDeviceObject(
-  IN HANDLE  DevRegistrationHandle);
+  /*IN*/ HANDLE  DevRegistrationHandle);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiDeregisterNetAddress(
-  IN HANDLE  AddrRegistrationHandle);
+  /*IN*/ HANDLE  AddrRegistrationHandle);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiDeregisterPnPHandlers(
-  IN HANDLE  BindingHandle);
+  /*IN*/ HANDLE  BindingHandle);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiDeregisterProvider(
-  IN HANDLE  ProviderHandle);
+  /*IN*/ HANDLE  ProviderHandle);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiEnumerateAddresses(
-  IN HANDLE  BindingHandle);
+  /*IN*/ HANDLE  BindingHandle);
 
 TDIKRNLAPI
 VOID
@@ -1054,106 +1054,106 @@ TDIKRNLAPI
 VOID
 DDKAPI
 TdiMapBuffer(
-  IN PMDL  MdlChain);
+  /*IN*/ PMDL  MdlChain);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiMapUserRequest(
-  IN PDEVICE_OBJECT  DeviceObject,
-  IN PIRP  Irp,
-  IN PIO_STACK_LOCATION  IrpSp);
+  /*IN*/ PDEVICE_OBJECT  DeviceObject,
+  /*IN*/ PIRP  Irp,
+  /*IN*/ PIO_STACK_LOCATION  IrpSp);
 
 TDIKRNLAPI
 BOOLEAN
 DDKAPI
 TdiMatchPdoWithChainedReceiveContext(
-  IN PVOID TsduDescriptor,
-  IN PVOID PDO);
+  /*IN*/ PVOID TsduDescriptor,
+  /*IN*/ PVOID PDO);
 
 TDIKRNLAPI
 VOID
 DDKAPI
 TdiPnPPowerComplete(
-  IN HANDLE  BindingHandle,
-  IN PNET_PNP_EVENT  PowerEvent,
-  IN NTSTATUS  Status);
+  /*IN*/ HANDLE  BindingHandle,
+  /*IN*/ PNET_PNP_EVENT  PowerEvent,
+  /*IN*/ NTSTATUS  Status);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiPnPPowerRequest(
-  IN PUNICODE_STRING  DeviceName,
-  IN PNET_PNP_EVENT  PowerEvent,
-  IN PTDI_PNP_CONTEXT  Context1,
-  IN PTDI_PNP_CONTEXT  Context2,
-  IN ProviderPnPPowerComplete  ProtocolCompletionHandler);
+  /*IN*/ PUNICODE_STRING  DeviceName,
+  /*IN*/ PNET_PNP_EVENT  PowerEvent,
+  /*IN*/ PTDI_PNP_CONTEXT  Context1,
+  /*IN*/ PTDI_PNP_CONTEXT  Context2,
+  /*IN*/ ProviderPnPPowerComplete  ProtocolCompletionHandler);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiProviderReady(
-  IN HANDLE  ProviderHandle);
+  /*IN*/ HANDLE  ProviderHandle);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiRegisterAddressChangeHandler(
-  IN TDI_ADD_ADDRESS_HANDLER  AddHandler,
-  IN TDI_DEL_ADDRESS_HANDLER  DeleteHandler,
-  OUT HANDLE  *BindingHandle);
+  /*IN*/ TDI_ADD_ADDRESS_HANDLER  AddHandler,
+  /*IN*/ TDI_DEL_ADDRESS_HANDLER  DeleteHandler,
+  /*OUT*/ HANDLE  *BindingHandle);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiRegisterDeviceObject(
-  IN PUNICODE_STRING  DeviceName,
-  OUT HANDLE  *DevRegistrationHandle);
+  /*IN*/ PUNICODE_STRING  DeviceName,
+  /*OUT*/ HANDLE  *DevRegistrationHandle);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiRegisterNetAddress(
-  IN PTA_ADDRESS  Address,
-  IN PUNICODE_STRING  DeviceName,
-  IN PTDI_PNP_CONTEXT  Context,
-  OUT HANDLE  *AddrRegistrationHandle);
+  /*IN*/ PTA_ADDRESS  Address,
+  /*IN*/ PUNICODE_STRING  DeviceName,
+  /*IN*/ PTDI_PNP_CONTEXT  Context,
+  /*OUT*/ HANDLE  *AddrRegistrationHandle);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiRegisterNotificationHandler(
-  IN TDI_BIND_HANDLER  BindHandler,
-  IN TDI_UNBIND_HANDLER  UnbindHandler,
-  OUT HANDLE  *BindingHandle);
+  /*IN*/ TDI_BIND_HANDLER  BindHandler,
+  /*IN*/ TDI_UNBIND_HANDLER  UnbindHandler,
+  /*OUT*/ HANDLE  *BindingHandle);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiRegisterPnPHandlers(
-  IN PTDI_CLIENT_INTERFACE_INFO  ClientInterfaceInfo,
-  IN ULONG  InterfaceInfoSize,
-  OUT HANDLE  *BindingHandle);
+  /*IN*/ PTDI_CLIENT_INTERFACE_INFO  ClientInterfaceInfo,
+  /*IN*/ ULONG  InterfaceInfoSize,
+  /*OUT*/ HANDLE  *BindingHandle);
 
 TDIKRNLAPI
 NTSTATUS
 DDKAPI
 TdiRegisterProvider(
-  IN PUNICODE_STRING  ProviderName,
-  OUT HANDLE  *ProviderHandle);
+  /*IN*/ PUNICODE_STRING  ProviderName,
+  /*OUT*/ HANDLE  *ProviderHandle);
 
 TDIKRNLAPI
 VOID
 DDKAPI
 TdiReturnChainedReceives(
-  IN PVOID  *TsduDescriptors,
-  IN ULONG   NumberOfTsdus);
+  /*IN*/ PVOID  *TsduDescriptors,
+  /*IN*/ ULONG   NumberOfTsdus);
 
 TDIKRNLAPI
 VOID
 DDKAPI
 TdiUnmapBuffer(
-  IN PMDL  MdlChain);
+  /*IN*/ PMDL  MdlChain);
 
 #ifdef __cplusplus
 }

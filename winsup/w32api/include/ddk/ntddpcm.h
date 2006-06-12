@@ -98,11 +98,11 @@ typedef ULONG MEMORY_SPACE;
 
 typedef ULONG STDCALL
 (*PPCMCIA_READ_WRITE_CONFIG)(
-  IN PVOID  Context,
-  IN ULONG  WhichSpace,
-  IN PUCHAR  Buffer,
-  IN ULONG  Offset,
-  IN ULONG  Length);
+  /*IN*/ PVOID  Context,
+  /*IN*/ ULONG  WhichSpace,
+  /*IN*/ PUCHAR  Buffer,
+  /*IN*/ ULONG  Offset,
+  /*IN*/ ULONG  Length);
 
 #define PCCARD_PCI_CONFIGURATION_SPACE    0
 #define PCCARD_ATTRIBUTE_MEMORY           1
@@ -125,14 +125,14 @@ typedef struct _PCMCIA_BUS_INTERFACE_STANDARD {
 
 typedef BOOLEAN STDCALL
 (*PPCMCIA_MODIFY_MEMORY_WINDOW)(
-  IN PVOID  Context,
-  IN ULONGLONG  HostBase,
-  IN ULONGLONG  CardBase,
-  IN BOOLEAN  Enable,
-  IN ULONG  WindowSize  OPTIONAL,
-  IN UCHAR  AccessSpeed  OPTIONAL,
-  IN UCHAR  BusWidth  OPTIONAL,
-  IN BOOLEAN  IsAttributeMemory  OPTIONAL);
+  /*IN*/ PVOID  Context,
+  /*IN*/ ULONGLONG  HostBase,
+  /*IN*/ ULONGLONG  CardBase,
+  /*IN*/ BOOLEAN  Enable,
+  /*IN*/ ULONG  WindowSize  /*OPTIONAL*/,
+  /*IN*/ UCHAR  AccessSpeed  /*OPTIONAL*/,
+  /*IN*/ UCHAR  BusWidth  /*OPTIONAL*/,
+  /*IN*/ BOOLEAN  IsAttributeMemory  /*OPTIONAL*/);
 
 #define PCMCIA_VPP_0V                     0
 #define PCMCIA_VPP_12V                    1
@@ -140,12 +140,12 @@ typedef BOOLEAN STDCALL
 
 typedef BOOLEAN STDCALL
 (*PPCMCIA_SET_VPP)(
-  IN PVOID  Context,
-  IN UCHAR  VppLevel);
+  /*IN*/ PVOID  Context,
+  /*IN*/ UCHAR  VppLevel);
 
 typedef BOOLEAN STDCALL
 (*PPCMCIA_IS_WRITE_PROTECTED)(
-  IN PVOID  Context);
+  /*IN*/ PVOID  Context);
 
 typedef struct _PCMCIA_INTERFACE_STANDARD {
 	USHORT  Size;

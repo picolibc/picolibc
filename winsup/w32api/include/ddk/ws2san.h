@@ -69,47 +69,47 @@ typedef WSPUPCALLTABLEEX *LPWSPUPCALLTABLEEX;
   {0xE5DA4AF8, 0xD824, 0x48CD, {0xA7, 0x99, 0x63, 0x37, 0xA9, 0x8E, 0xD2, 0xAF}}
 
 typedef struct _WSABUFEX {
-	u_long  len; 
-	char FAR  *buf; 
-	HANDLE  handle; 
+  u_long  len; 
+  char FAR  *buf; 
+  HANDLE  handle; 
 } WSABUFEX, FAR * LPWSABUFEX;
 
 #if 0
 typedef struct _WSPUPCALLTABLEEX {
-	LPWPUCLOSEEVENT  lpWPUCloseEvent;
-	LPWPUCLOSESOCKETHANDLE  lpWPUCloseSocketHandle;
-	LPWPUCREATEEVENT  lpWPUCreateEvent;
-	LPWPUCREATESOCKETHANDLE  lpWPUCreateSocketHandle;
-	LPWPUFDISSET  lpWPUFDIsSet;
-	LPWPUGETPROVIDERPATH  lpWPUGetProviderPath;
-	LPWPUMODIFYIFSHANDLE  lpWPUModifyIFSHandle;
-	LPWPUPOSTMESSAGE  lpWPUPostMessage;
-	LPWPUQUERYBLOCKINGCALLBACK  lpWPUQueryBlockingCallback;
-	LPWPUQUERYSOCKETHANDLECONTEXT  lpWPUQuerySocketHandleContext;
-	LPWPUQUEUEAPC  lpWPUQueueApc;
-	LPWPURESETEVENT  lpWPUResetEvent;
-	LPWPUSETEVENT  lpWPUSetEvent;
-	LPWPUOPENCURRENTTHREAD  lpWPUOpenCurrentThread;
-	LPWPUCLOSETHREAD  lpWPUCloseThread;
-	LPWPUCOMPLETEOVERLAPPEDREQUEST lpWPUCompleteOverlappedRequest;
+  LPWPUCLOSEEVENT  lpWPUCloseEvent;
+  LPWPUCLOSESOCKETHANDLE  lpWPUCloseSocketHandle;
+  LPWPUCREATEEVENT  lpWPUCreateEvent;
+  LPWPUCREATESOCKETHANDLE  lpWPUCreateSocketHandle;
+  LPWPUFDISSET  lpWPUFDIsSet;
+  LPWPUGETPROVIDERPATH  lpWPUGetProviderPath;
+  LPWPUMODIFYIFSHANDLE  lpWPUModifyIFSHandle;
+  LPWPUPOSTMESSAGE  lpWPUPostMessage;
+  LPWPUQUERYBLOCKINGCALLBACK  lpWPUQueryBlockingCallback;
+  LPWPUQUERYSOCKETHANDLECONTEXT  lpWPUQuerySocketHandleContext;
+  LPWPUQUEUEAPC  lpWPUQueueApc;
+  LPWPURESETEVENT  lpWPUResetEvent;
+  LPWPUSETEVENT  lpWPUSetEvent;
+  LPWPUOPENCURRENTTHREAD  lpWPUOpenCurrentThread;
+  LPWPUCLOSETHREAD  lpWPUCloseThread;
+  LPWPUCOMPLETEOVERLAPPEDREQUEST lpWPUCompleteOverlappedRequest;
 } WSPUPCALLTABLEEX, FAR * LPWSPUPCALLTABLEEX;
 #endif
 
 int WSPAPI
 WSPStartupEx(
-  IN WORD  wVersionRequested,
-  OUT LPWSPDATA  lpWSPData,
-  IN LPWSAPROTOCOL_INFOW  lpProtocolInfo,
-  IN LPWSPUPCALLTABLEEX  lpUpcallTable,
-  OUT LPWSPPROC_TABLE  lpProcTable);
+  /*IN*/ WORD  wVersionRequested,
+  /*OUT*/ LPWSPDATA  lpWSPData,
+  /*IN*/ LPWSAPROTOCOL_INFOW  lpProtocolInfo,
+  /*IN*/ LPWSPUPCALLTABLEEX  lpUpcallTable,
+  /*OUT*/ LPWSPPROC_TABLE  lpProcTable);
 
 typedef int WSPAPI
 (*LPWSPSTARTUPEX)(
-  IN WORD  wVersionRequested,
-  OUT LPWSPDATA  lpWSPData,
-  IN LPWSAPROTOCOL_INFOW  lpProtocolInfo,
-  IN LPWSPUPCALLTABLEEX  lpUpcallTable,
-  OUT LPWSPPROC_TABLE  lpProcTable);
+  /*IN*/ WORD  wVersionRequested,
+  /*OUT*/ LPWSPDATA  lpWSPData,
+  /*IN*/ LPWSAPROTOCOL_INFOW  lpProtocolInfo,
+  /*IN*/ LPWSPUPCALLTABLEEX  lpUpcallTable,
+  /*OUT*/ LPWSPPROC_TABLE  lpProcTable);
 
 #define MEM_READ                          1
 #define MEM_WRITE                         2
@@ -117,129 +117,129 @@ typedef int WSPAPI
 
 int WSPAPI
 WSPDeregisterMemory(
-  IN SOCKET  s,
-  IN HANDLE  Handle,
-  OUT LPINT  lpErrno);
+  /*IN*/ SOCKET  s,
+  /*IN*/ HANDLE  Handle,
+  /*OUT*/ LPINT  lpErrno);
 
 typedef int WSPAPI
 (*LPFN_WSPDEREGISTERMEMORY)(
-  IN SOCKET  s,
-  IN HANDLE  Handle,
-  OUT LPINT  lpErrno);
+  /*IN*/ SOCKET  s,
+  /*IN*/ HANDLE  Handle,
+  /*OUT*/ LPINT  lpErrno);
 
 int WSPAPI
 WSPDeregisterRdmaMemory(
-  IN SOCKET  s,
-  IN LPVOID  lpRdmaBufferDescriptor,
-  IN DWORD  dwDescriptorLength,
-  OUT LPINT  lpErrno);
+  /*IN*/ SOCKET  s,
+  /*IN*/ LPVOID  lpRdmaBufferDescriptor,
+  /*IN*/ DWORD  dwDescriptorLength,
+  /*OUT*/ LPINT  lpErrno);
 
 typedef int WSPAPI
 (*LPFN_WSPDEREGISTERRDMAMEMORY)(
-  IN SOCKET  s,
-  IN LPVOID  lpRdmaBufferDescriptor,
-  IN DWORD  dwDescriptorLength,
-  OUT LPINT  lpErrno);
+  /*IN*/ SOCKET  s,
+  /*IN*/ LPVOID  lpRdmaBufferDescriptor,
+  /*IN*/ DWORD  dwDescriptorLength,
+  /*OUT*/ LPINT  lpErrno);
 
 int WSPAPI
 WSPMemoryRegistrationCacheCallback(
-  IN PVOID  lpvAddress,
-  IN SIZE_T  Size,
-  OUT LPINT  lpErrno);
+  /*IN*/ PVOID  lpvAddress,
+  /*IN*/ SIZE_T  Size,
+  /*OUT*/ LPINT  lpErrno);
 
 typedef int WSPAPI
 (*LPFN_WSPMEMORYREGISTRATIONCACHECALLBACK)(
-  IN PVOID  lpvAddress,
-  IN SIZE_T  Size,
-  OUT LPINT  lpErrno);
+  /*IN*/ PVOID  lpvAddress,
+  /*IN*/ SIZE_T  Size,
+  /*OUT*/ LPINT  lpErrno);
 
 int WSPAPI
 WSPRdmaRead(
-  IN SOCKET  s,
-  IN LPWSABUFEX  lpBuffers,
-  IN DWORD  dwBufferCount,
-  IN LPVOID  lpTargetBufferDescriptor,
-  IN DWORD  dwTargetDescriptorLength,
-  IN DWORD  dwTargetBufferOffset,
-  OUT LPDWORD  lpdwNumberOfBytesRead,
-  IN DWORD  dwFlags,
-  IN LPWSAOVERLAPPED  lpOverlapped,
-  IN LPWSAOVERLAPPED_COMPLETION_ROUTINE  lpCompletionRoutine,
-  IN LPWSATHREADID  lpThreadId,
-  OUT LPINT  lpErrno);
+  /*IN*/ SOCKET  s,
+  /*IN*/ LPWSABUFEX  lpBuffers,
+  /*IN*/ DWORD  dwBufferCount,
+  /*IN*/ LPVOID  lpTargetBufferDescriptor,
+  /*IN*/ DWORD  dwTargetDescriptorLength,
+  /*IN*/ DWORD  dwTargetBufferOffset,
+  /*OUT*/ LPDWORD  lpdwNumberOfBytesRead,
+  /*IN*/ DWORD  dwFlags,
+  /*IN*/ LPWSAOVERLAPPED  lpOverlapped,
+  /*IN*/ LPWSAOVERLAPPED_COMPLETION_ROUTINE  lpCompletionRoutine,
+  /*IN*/ LPWSATHREADID  lpThreadId,
+  /*OUT*/ LPINT  lpErrno);
 
 typedef int WSPAPI
 (*LPFN_WSPRDMAREAD)(
-  IN SOCKET  s,
-  IN LPWSABUFEX  lpBuffers,
-  IN DWORD  dwBufferCount,
-  IN LPVOID  lpTargetBufferDescriptor,
-  IN DWORD  dwTargetDescriptorLength,
-  IN DWORD  dwTargetBufferOffset,
-  OUT LPDWORD  lpdwNumberOfBytesRead,
-  IN DWORD  dwFlags,
-  IN LPWSAOVERLAPPED  lpOverlapped,
-  IN LPWSAOVERLAPPED_COMPLETION_ROUTINE  lpCompletionRoutine,
-  IN LPWSATHREADID  lpThreadId,
-  OUT LPINT  lpErrno);
+  /*IN*/ SOCKET  s,
+  /*IN*/ LPWSABUFEX  lpBuffers,
+  /*IN*/ DWORD  dwBufferCount,
+  /*IN*/ LPVOID  lpTargetBufferDescriptor,
+  /*IN*/ DWORD  dwTargetDescriptorLength,
+  /*IN*/ DWORD  dwTargetBufferOffset,
+  /*OUT*/ LPDWORD  lpdwNumberOfBytesRead,
+  /*IN*/ DWORD  dwFlags,
+  /*IN*/ LPWSAOVERLAPPED  lpOverlapped,
+  /*IN*/ LPWSAOVERLAPPED_COMPLETION_ROUTINE  lpCompletionRoutine,
+  /*IN*/ LPWSATHREADID  lpThreadId,
+  /*OUT*/ LPINT  lpErrno);
 
 int WSPAPI
 WSPRdmaWrite(
-  IN SOCKET  s,
-  IN LPWSABUFEX  lpBuffers,
-  IN DWORD  dwBufferCount,
-  IN LPVOID  lpTargetBufferDescriptor,
-  IN DWORD  dwTargetDescriptorLength,
-  IN DWORD  dwTargetBufferOffset,
-  OUT LPDWORD  lpdwNumberOfBytesWritten,
-  IN DWORD  dwFlags,
-  IN LPWSAOVERLAPPED  lpOverlapped,
-  IN LPWSAOVERLAPPED_COMPLETION_ROUTINE  lpCompletionRoutine,
-  IN LPWSATHREADID  lpThreadId,
-  OUT LPINT  lpErrno);
+  /*IN*/ SOCKET  s,
+  /*IN*/ LPWSABUFEX  lpBuffers,
+  /*IN*/ DWORD  dwBufferCount,
+  /*IN*/ LPVOID  lpTargetBufferDescriptor,
+  /*IN*/ DWORD  dwTargetDescriptorLength,
+  /*IN*/ DWORD  dwTargetBufferOffset,
+  /*OUT*/ LPDWORD  lpdwNumberOfBytesWritten,
+  /*IN*/ DWORD  dwFlags,
+  /*IN*/ LPWSAOVERLAPPED  lpOverlapped,
+  /*IN*/ LPWSAOVERLAPPED_COMPLETION_ROUTINE  lpCompletionRoutine,
+  /*IN*/ LPWSATHREADID  lpThreadId,
+  /*OUT*/ LPINT  lpErrno);
 
 typedef int WSPAPI
 (*LPFN_WSPRDMAWRITE)(
-  IN SOCKET  s,
-  IN LPWSABUFEX  lpBuffers,
-  IN DWORD  dwBufferCount,
-  IN LPVOID  lpTargetBufferDescriptor,
-  IN DWORD  dwTargetDescriptorLength,
-  IN DWORD  dwTargetBufferOffset,
-  OUT LPDWORD  lpdwNumberOfBytesWritten,
-  IN DWORD  dwFlags,
-  IN LPWSAOVERLAPPED  lpOverlapped,
-  IN LPWSAOVERLAPPED_COMPLETION_ROUTINE  lpCompletionRoutine,
-  IN LPWSATHREADID  lpThreadId,
-  OUT LPINT  lpErrno);
+  /*IN*/ SOCKET  s,
+  /*IN*/ LPWSABUFEX  lpBuffers,
+  /*IN*/ DWORD  dwBufferCount,
+  /*IN*/ LPVOID  lpTargetBufferDescriptor,
+  /*IN*/ DWORD  dwTargetDescriptorLength,
+  /*IN*/ DWORD  dwTargetBufferOffset,
+  /*OUT*/ LPDWORD  lpdwNumberOfBytesWritten,
+  /*IN*/ DWORD  dwFlags,
+  /*IN*/ LPWSAOVERLAPPED  lpOverlapped,
+  /*IN*/ LPWSAOVERLAPPED_COMPLETION_ROUTINE  lpCompletionRoutine,
+  /*IN*/ LPWSATHREADID  lpThreadId,
+  /*OUT*/ LPINT  lpErrno);
 
 HANDLE WSPAPI
 WSPRegisterMemory(
-  IN SOCKET  s,
-  IN PVOID  lpBuffer,
-  IN DWORD  dwBufferLength,
-  IN DWORD  dwFlags,
-  OUT LPINT  lpErrno);
+  /*IN*/ SOCKET  s,
+  /*IN*/ PVOID  lpBuffer,
+  /*IN*/ DWORD  dwBufferLength,
+  /*IN*/ DWORD  dwFlags,
+  /*OUT*/ LPINT  lpErrno);
 
 int WSPAPI
 WSPRegisterRdmaMemory(
-  IN SOCKET  s,
-  IN PVOID  lpBuffer,
-  IN DWORD  dwBufferLength,
-  IN DWORD  dwFlags,
-  OUT LPVOID  lpRdmaBufferDescriptor,
-  IN OUT LPDWORD  lpdwDescriptorLength,
-  OUT LPINT  lpErrno);
+  /*IN*/ SOCKET  s,
+  /*IN*/ PVOID  lpBuffer,
+  /*IN*/ DWORD  dwBufferLength,
+  /*IN*/ DWORD  dwFlags,
+  /*OUT*/ LPVOID  lpRdmaBufferDescriptor,
+  /*IN OUT*/ LPDWORD  lpdwDescriptorLength,
+  /*OUT*/ LPINT  lpErrno);
 
 typedef int WSPAPI
 (*LPFN_WSPREGISTERRDMAMEMORY)(
-  IN SOCKET  s,
-  IN PVOID  lpBuffer,
-  IN DWORD  dwBufferLength,
-  IN DWORD  dwFlags,
-  OUT LPVOID  lpRdmaBufferDescriptor,
-  IN OUT LPDWORD  lpdwDescriptorLength,
-  OUT LPINT  lpErrno);
+  /*IN*/ SOCKET  s,
+  /*IN*/ PVOID  lpBuffer,
+  /*IN*/ DWORD  dwBufferLength,
+  /*IN*/ DWORD  dwFlags,
+  /*OUT*/ LPVOID  lpRdmaBufferDescriptor,
+  /*IN OUT*/ LPDWORD  lpdwDescriptorLength,
+  /*OUT*/ LPINT  lpErrno);
 
 #ifdef __cplusplus
 }

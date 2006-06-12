@@ -1,6 +1,6 @@
 #ifndef _RPCDCE_H
 #define _RPCDCE_H
-#if __GNUC__ >=3
+#if __GNUC__ >= 3
 #pragma GCC system_header
 #endif
 
@@ -9,11 +9,14 @@ extern "C" {
 #endif
 #include <basetyps.h>
 
+#ifndef _NO_W32_PSEUDO_MODIFIERS
 #define IN
 #define OUT
 #ifndef OPTIONAL
 #define OPTIONAL
 #endif
+#endif
+
 #define uuid_t UUID
 #define rpc_binding_handle_t RPC_BINDING_HANDLE
 #define rpc_binding_vector_t RPC_BINDING_VECTOR

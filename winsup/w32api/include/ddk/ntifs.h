@@ -1095,13 +1095,13 @@ typedef struct _FILE_EXCLUSIVE_LOCK_ENTRY {
 } FILE_EXCLUSIVE_LOCK_ENTRY, *PFILE_EXCLUSIVE_LOCK_ENTRY;
 
 typedef NTSTATUS (*PCOMPLETE_LOCK_IRP_ROUTINE) (
-    IN PVOID    Context,
-    IN PIRP     Irp
+  /*IN*/ PVOID    Context,
+  /*IN*/ PIRP     Irp
 );
 
 typedef VOID (NTAPI *PUNLOCK_ROUTINE) (
-    IN PVOID            Context,
-    IN PFILE_LOCK_INFO  FileLockInfo
+  /*IN*/ PVOID            Context,
+  /*IN*/ PFILE_LOCK_INFO  FileLockInfo
 );
 
 typedef struct _FILE_LOCK {
@@ -1731,118 +1731,118 @@ NTKERNELAPI
 BOOLEAN
 NTAPI
 CcCanIWrite (
-    IN PFILE_OBJECT FileObject,
-    IN ULONG        BytesToWrite,
-    IN BOOLEAN      Wait,
-    IN BOOLEAN      Retrying
+  /*IN*/ PFILE_OBJECT FileObject,
+  /*IN*/ ULONG        BytesToWrite,
+  /*IN*/ BOOLEAN      Wait,
+  /*IN*/ BOOLEAN      Retrying
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 CcCopyRead (
-    IN PFILE_OBJECT         FileObject,
-    IN PLARGE_INTEGER       FileOffset,
-    IN ULONG                Length,
-    IN BOOLEAN              Wait,
-    OUT PVOID               Buffer,
-    OUT PIO_STATUS_BLOCK    IoStatus
+  /*IN*/ PFILE_OBJECT         FileObject,
+  /*IN*/ PLARGE_INTEGER       FileOffset,
+  /*IN*/ ULONG                Length,
+  /*IN*/ BOOLEAN              Wait,
+  /*OUT*/ PVOID               Buffer,
+  /*OUT*/ PIO_STATUS_BLOCK    IoStatus
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 CcCopyWrite (
-    IN PFILE_OBJECT     FileObject,
-    IN PLARGE_INTEGER   FileOffset,
-    IN ULONG            Length,
-    IN BOOLEAN          Wait,
-    IN PVOID            Buffer
+  /*IN*/ PFILE_OBJECT     FileObject,
+  /*IN*/ PLARGE_INTEGER   FileOffset,
+  /*IN*/ ULONG            Length,
+  /*IN*/ BOOLEAN          Wait,
+  /*IN*/ PVOID            Buffer
 );
 
 #define CcCopyWriteWontFlush(FO, FOFF, LEN) ((LEN) <= 0x10000)
 
 typedef VOID (NTAPI *PCC_POST_DEFERRED_WRITE) (
-    IN PVOID Context1,
-    IN PVOID Context2
+  /*IN*/ PVOID Context1,
+  /*IN*/ PVOID Context2
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 CcDeferWrite (
-    IN PFILE_OBJECT             FileObject,
-    IN PCC_POST_DEFERRED_WRITE  PostRoutine,
-    IN PVOID                    Context1,
-    IN PVOID                    Context2,
-    IN ULONG                    BytesToWrite,
-    IN BOOLEAN                  Retrying
+  /*IN*/ PFILE_OBJECT             FileObject,
+  /*IN*/ PCC_POST_DEFERRED_WRITE  PostRoutine,
+  /*IN*/ PVOID                    Context1,
+  /*IN*/ PVOID                    Context2,
+  /*IN*/ ULONG                    BytesToWrite,
+  /*IN*/ BOOLEAN                  Retrying
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 CcFastCopyRead (
-    IN PFILE_OBJECT         FileObject,
-    IN ULONG                FileOffset,
-    IN ULONG                Length,
-    IN ULONG                PageCount,
-    OUT PVOID               Buffer,
-    OUT PIO_STATUS_BLOCK    IoStatus
+  /*IN*/ PFILE_OBJECT         FileObject,
+  /*IN*/ ULONG                FileOffset,
+  /*IN*/ ULONG                Length,
+  /*IN*/ ULONG                PageCount,
+  /*OUT*/ PVOID               Buffer,
+  /*OUT*/ PIO_STATUS_BLOCK    IoStatus
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 CcFastCopyWrite (
-    IN PFILE_OBJECT FileObject,
-    IN ULONG        FileOffset,
-    IN ULONG        Length,
-    IN PVOID        Buffer
+  /*IN*/ PFILE_OBJECT FileObject,
+  /*IN*/ ULONG        FileOffset,
+  /*IN*/ ULONG        Length,
+  /*IN*/ PVOID        Buffer
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 CcFlushCache (
-    IN PSECTION_OBJECT_POINTERS SectionObjectPointer,
-    IN PLARGE_INTEGER           FileOffset OPTIONAL,
-    IN ULONG                    Length,
-    OUT PIO_STATUS_BLOCK        IoStatus OPTIONAL
+  /*IN*/ PSECTION_OBJECT_POINTERS SectionObjectPointer,
+  /*IN*/ PLARGE_INTEGER           FileOffset /*OPTIONAL*/,
+  /*IN*/ ULONG                    Length,
+  /*OUT*/ PIO_STATUS_BLOCK        IoStatus /*OPTIONAL*/
 );
 
 typedef VOID (*PDIRTY_PAGE_ROUTINE) (
-    IN PFILE_OBJECT     FileObject,
-    IN PLARGE_INTEGER   FileOffset,
-    IN ULONG            Length,
-    IN PLARGE_INTEGER   OldestLsn,
-    IN PLARGE_INTEGER   NewestLsn,
-    IN PVOID            Context1,
-    IN PVOID            Context2
+  /*IN*/ PFILE_OBJECT     FileObject,
+  /*IN*/ PLARGE_INTEGER   FileOffset,
+  /*IN*/ ULONG            Length,
+  /*IN*/ PLARGE_INTEGER   OldestLsn,
+  /*IN*/ PLARGE_INTEGER   NewestLsn,
+  /*IN*/ PVOID            Context1,
+  /*IN*/ PVOID            Context2
 );
 
 NTKERNELAPI
 LARGE_INTEGER
 NTAPI
 CcGetDirtyPages (
-    IN PVOID                LogHandle,
-    IN PDIRTY_PAGE_ROUTINE  DirtyPageRoutine,
-    IN PVOID                Context1,
-    IN PVOID                Context2
+  /*IN*/ PVOID                LogHandle,
+  /*IN*/ PDIRTY_PAGE_ROUTINE  DirtyPageRoutine,
+  /*IN*/ PVOID                Context1,
+  /*IN*/ PVOID                Context2
 );
 
 NTKERNELAPI
 PFILE_OBJECT
 NTAPI
 CcGetFileObjectFromBcb (
-    IN PVOID Bcb
+  /*IN*/ PVOID Bcb
 );
 
 NTKERNELAPI
 PFILE_OBJECT
 NTAPI
 CcGetFileObjectFromSectionPtrs (
-    IN PSECTION_OBJECT_POINTERS SectionObjectPointer
+  /*IN*/ PSECTION_OBJECT_POINTERS SectionObjectPointer
 );
 
 #define CcGetFileSizePointer(FO) (                                     \
@@ -1855,8 +1855,8 @@ NTKERNELAPI
 LARGE_INTEGER
 NTAPI
 CcGetFlushedValidData (
-    IN PSECTION_OBJECT_POINTERS SectionObjectPointer,
-    IN BOOLEAN                  BcbListHeld
+  /*IN*/ PSECTION_OBJECT_POINTERS SectionObjectPointer,
+  /*IN*/ BOOLEAN                  BcbListHeld
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -1864,26 +1864,26 @@ CcGetFlushedValidData (
 NTKERNELAPI
 LARGE_INTEGER
 CcGetLsnForFileObject (
-    IN PFILE_OBJECT     FileObject,
-    OUT PLARGE_INTEGER  OldestLsn OPTIONAL
+  /*IN*/ PFILE_OBJECT     FileObject,
+  /*OUT*/ PLARGE_INTEGER  OldestLsn /*OPTIONAL*/
 );
 
 typedef BOOLEAN (NTAPI *PACQUIRE_FOR_LAZY_WRITE) (
-    IN PVOID    Context,
-    IN BOOLEAN  Wait
+  /*IN*/ PVOID    Context,
+  /*IN*/ BOOLEAN  Wait
 );
 
 typedef VOID (NTAPI *PRELEASE_FROM_LAZY_WRITE) (
-    IN PVOID Context
+  /*IN*/ PVOID Context
 );
 
 typedef BOOLEAN (NTAPI *PACQUIRE_FOR_READ_AHEAD) (
-    IN PVOID    Context,
-    IN BOOLEAN  Wait
+  /*IN*/ PVOID    Context,
+  /*IN*/ BOOLEAN  Wait
 );
 
 typedef VOID (NTAPI *PRELEASE_FROM_READ_AHEAD) (
-    IN PVOID Context
+  /*IN*/ PVOID Context
 );
 
 typedef struct _CACHE_MANAGER_CALLBACKS {
@@ -1897,11 +1897,11 @@ NTKERNELAPI
 VOID
 NTAPI
 CcInitializeCacheMap (
-    IN PFILE_OBJECT             FileObject,
-    IN PCC_FILE_SIZES           FileSizes,
-    IN BOOLEAN                  PinAccess,
-    IN PCACHE_MANAGER_CALLBACKS Callbacks,
-    IN PVOID                    LazyWriteContext
+  /*IN*/ PFILE_OBJECT             FileObject,
+  /*IN*/ PCC_FILE_SIZES           FileSizes,
+  /*IN*/ BOOLEAN                  PinAccess,
+  /*IN*/ PCACHE_MANAGER_CALLBACKS Callbacks,
+  /*IN*/ PVOID                    LazyWriteContext
 );
 
 #define CcIsFileCached(FO) (                                                         \
@@ -1913,116 +1913,116 @@ NTKERNELAPI
 BOOLEAN
 NTAPI
 CcIsThereDirtyData (
-    IN PVPB Vpb
+  /*IN*/ PVPB Vpb
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 CcMapData (
-    IN PFILE_OBJECT     FileObject,
-    IN PLARGE_INTEGER   FileOffset,
-    IN ULONG            Length,
-    IN BOOLEAN          Wait,
-    OUT PVOID           *Bcb,
-    OUT PVOID           *Buffer
+  /*IN*/ PFILE_OBJECT     FileObject,
+  /*IN*/ PLARGE_INTEGER   FileOffset,
+  /*IN*/ ULONG            Length,
+  /*IN*/ BOOLEAN          Wait,
+  /*OUT*/ PVOID           *Bcb,
+  /*OUT*/ PVOID           *Buffer
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 CcMdlRead (
-    IN PFILE_OBJECT         FileObject,
-    IN PLARGE_INTEGER       FileOffset,
-    IN ULONG                Length,
-    OUT PMDL                *MdlChain,
-    OUT PIO_STATUS_BLOCK    IoStatus
+  /*IN*/ PFILE_OBJECT         FileObject,
+  /*IN*/ PLARGE_INTEGER       FileOffset,
+  /*IN*/ ULONG                Length,
+  /*OUT*/ PMDL                *MdlChain,
+  /*OUT*/ PIO_STATUS_BLOCK    IoStatus
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 CcMdlReadComplete (
-    IN PFILE_OBJECT FileObject,
-    IN PMDL         MdlChain
+  /*IN*/ PFILE_OBJECT FileObject,
+  /*IN*/ PMDL         MdlChain
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 CcMdlWriteComplete (
-    IN PFILE_OBJECT     FileObject,
-    IN PLARGE_INTEGER   FileOffset,
-    IN PMDL             MdlChain
+  /*IN*/ PFILE_OBJECT     FileObject,
+  /*IN*/ PLARGE_INTEGER   FileOffset,
+  /*IN*/ PMDL             MdlChain
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 CcPinMappedData (
-    IN PFILE_OBJECT     FileObject,
-    IN PLARGE_INTEGER   FileOffset,
-    IN ULONG            Length,
+  /*IN*/ PFILE_OBJECT     FileObject,
+  /*IN*/ PLARGE_INTEGER   FileOffset,
+  /*IN*/ ULONG            Length,
 #if (VER_PRODUCTBUILD >= 2195)
-    IN ULONG            Flags,
+  /*IN*/ ULONG            Flags,
 #else
-    IN BOOLEAN          Wait,
+  /*IN*/ BOOLEAN          Wait,
 #endif
-    IN OUT PVOID        *Bcb
+  /*IN OUT*/ PVOID        *Bcb
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 CcPinRead (
-    IN PFILE_OBJECT     FileObject,
-    IN PLARGE_INTEGER   FileOffset,
-    IN ULONG            Length,
+  /*IN*/ PFILE_OBJECT     FileObject,
+  /*IN*/ PLARGE_INTEGER   FileOffset,
+  /*IN*/ ULONG            Length,
 #if (VER_PRODUCTBUILD >= 2195)
-    IN ULONG            Flags,
+  /*IN*/ ULONG            Flags,
 #else
-    IN BOOLEAN          Wait,
+  /*IN*/ BOOLEAN          Wait,
 #endif
-    OUT PVOID           *Bcb,
-    OUT PVOID           *Buffer
+  /*OUT*/ PVOID           *Bcb,
+  /*OUT*/ PVOID           *Buffer
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 CcPrepareMdlWrite (
-    IN PFILE_OBJECT         FileObject,
-    IN PLARGE_INTEGER       FileOffset,
-    IN ULONG                Length,
-    OUT PMDL                *MdlChain,
-    OUT PIO_STATUS_BLOCK    IoStatus
+  /*IN*/ PFILE_OBJECT         FileObject,
+  /*IN*/ PLARGE_INTEGER       FileOffset,
+  /*IN*/ ULONG                Length,
+  /*OUT*/ PMDL                *MdlChain,
+  /*OUT*/ PIO_STATUS_BLOCK    IoStatus
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 CcPreparePinWrite (
-    IN PFILE_OBJECT     FileObject,
-    IN PLARGE_INTEGER   FileOffset,
-    IN ULONG            Length,
-    IN BOOLEAN          Zero,
+  /*IN*/ PFILE_OBJECT     FileObject,
+  /*IN*/ PLARGE_INTEGER   FileOffset,
+  /*IN*/ ULONG            Length,
+  /*IN*/ BOOLEAN          Zero,
 #if (VER_PRODUCTBUILD >= 2195)
-    IN ULONG            Flags,
+  /*IN*/ ULONG            Flags,
 #else
-    IN BOOLEAN          Wait,
+  /*IN*/ BOOLEAN          Wait,
 #endif
-    OUT PVOID           *Bcb,
-    OUT PVOID           *Buffer
+  /*OUT*/ PVOID           *Bcb,
+  /*OUT*/ PVOID           *Buffer
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 CcPurgeCacheSection (
-    IN PSECTION_OBJECT_POINTERS SectionObjectPointer,
-    IN PLARGE_INTEGER           FileOffset OPTIONAL,
-    IN ULONG                    Length,
-    IN BOOLEAN                  UninitializeCacheMaps
+  /*IN*/ PSECTION_OBJECT_POINTERS SectionObjectPointer,
+  /*IN*/ PLARGE_INTEGER           FileOffset /*OPTIONAL*/,
+  /*IN*/ ULONG                    Length,
+  /*IN*/ BOOLEAN                  UninitializeCacheMaps
 );
 
 #define CcReadAhead(FO, FOFF, LEN) (                \
@@ -2037,7 +2037,7 @@ NTKERNELAPI
 PVOID
 NTAPI
 CcRemapBcb (
-    IN PVOID Bcb
+  /*IN*/ PVOID Bcb
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -2046,79 +2046,79 @@ NTKERNELAPI
 VOID
 NTAPI
 CcRepinBcb (
-    IN PVOID Bcb
+  /*IN*/ PVOID Bcb
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 CcScheduleReadAhead (
-    IN PFILE_OBJECT     FileObject,
-    IN PLARGE_INTEGER   FileOffset,
-    IN ULONG            Length
+  /*IN*/ PFILE_OBJECT     FileObject,
+  /*IN*/ PLARGE_INTEGER   FileOffset,
+  /*IN*/ ULONG            Length
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 CcSetAdditionalCacheAttributes (
-    IN PFILE_OBJECT FileObject,
-    IN BOOLEAN      DisableReadAhead,
-    IN BOOLEAN      DisableWriteBehind
+  /*IN*/ PFILE_OBJECT FileObject,
+  /*IN*/ BOOLEAN      DisableReadAhead,
+  /*IN*/ BOOLEAN      DisableWriteBehind
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 CcSetBcbOwnerPointer (
-    IN PVOID Bcb,
-    IN PVOID OwnerPointer
+  /*IN*/ PVOID Bcb,
+  /*IN*/ PVOID OwnerPointer
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 CcSetDirtyPageThreshold (
-    IN PFILE_OBJECT FileObject,
-    IN ULONG        DirtyPageThreshold
+  /*IN*/ PFILE_OBJECT FileObject,
+  /*IN*/ ULONG        DirtyPageThreshold
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 CcSetDirtyPinnedData (
-    IN PVOID            BcbVoid,
-    IN PLARGE_INTEGER   Lsn OPTIONAL
+  /*IN*/ PVOID            BcbVoid,
+  /*IN*/ PLARGE_INTEGER   Lsn /*OPTIONAL*/
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 CcSetFileSizes (
-    IN PFILE_OBJECT     FileObject,
-    IN PCC_FILE_SIZES   FileSizes
+  /*IN*/ PFILE_OBJECT     FileObject,
+  /*IN*/ PCC_FILE_SIZES   FileSizes
 );
 
 typedef VOID (NTAPI *PFLUSH_TO_LSN) (
-    IN PVOID            LogHandle,
-    IN PLARGE_INTEGER   Lsn
+  /*IN*/ PVOID            LogHandle,
+  /*IN*/ PLARGE_INTEGER   Lsn
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 CcSetLogHandleForFile (
-    IN PFILE_OBJECT     FileObject,
-    IN PVOID            LogHandle,
-    IN PFLUSH_TO_LSN    FlushToLsnRoutine
+  /*IN*/ PFILE_OBJECT     FileObject,
+  /*IN*/ PVOID            LogHandle,
+  /*IN*/ PFLUSH_TO_LSN    FlushToLsnRoutine
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 CcSetReadAheadGranularity (
-    IN PFILE_OBJECT FileObject,
-    IN ULONG        Granularity     /* default: PAGE_SIZE */
+  /*IN*/ PFILE_OBJECT FileObject,
+  /*IN*/ ULONG        Granularity     /* default: PAGE_SIZE */
                                     /* allowed: 2^n * PAGE_SIZE */
 );
 
@@ -2126,33 +2126,33 @@ NTKERNELAPI
 BOOLEAN
 NTAPI
 CcUninitializeCacheMap (
-    IN PFILE_OBJECT                 FileObject,
-    IN PLARGE_INTEGER               TruncateSize OPTIONAL,
-    IN PCACHE_UNINITIALIZE_EVENT    UninitializeCompleteEvent OPTIONAL
+  /*IN*/ PFILE_OBJECT                 FileObject,
+  /*IN*/ PLARGE_INTEGER               TruncateSize /*OPTIONAL*/,
+  /*IN*/ PCACHE_UNINITIALIZE_EVENT    UninitializeCompleteEvent /*OPTIONAL*/
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 CcUnpinData (
-    IN PVOID Bcb
+  /*IN*/ PVOID Bcb
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 CcUnpinDataForThread (
-    IN PVOID            Bcb,
-    IN ERESOURCE_THREAD ResourceThreadId
+  /*IN*/ PVOID            Bcb,
+  /*IN*/ ERESOURCE_THREAD ResourceThreadId
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 CcUnpinRepinnedBcb (
-    IN PVOID                Bcb,
-    IN BOOLEAN              WriteThrough,
-    OUT PIO_STATUS_BLOCK    IoStatus
+  /*IN*/ PVOID                Bcb,
+  /*IN*/ BOOLEAN              WriteThrough,
+  /*OUT*/ PIO_STATUS_BLOCK    IoStatus
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -2170,25 +2170,25 @@ NTKERNELAPI
 BOOLEAN
 NTAPI
 CcZeroData (
-    IN PFILE_OBJECT     FileObject,
-    IN PLARGE_INTEGER   StartOffset,
-    IN PLARGE_INTEGER   EndOffset,
-    IN BOOLEAN          Wait
+  /*IN*/ PFILE_OBJECT     FileObject,
+  /*IN*/ PLARGE_INTEGER   StartOffset,
+  /*IN*/ PLARGE_INTEGER   EndOffset,
+  /*IN*/ BOOLEAN          Wait
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 ExDisableResourceBoostLite (
-    IN PERESOURCE Resource
+  /*IN*/ PERESOURCE Resource
 );
 
 NTKERNELAPI
 ULONG
 NTAPI
 ExQueryPoolBlockSize (
-    IN PVOID        PoolBlock,
-    OUT PBOOLEAN    QuotaCharged
+  /*IN*/ PVOID        PoolBlock,
+  /*OUT*/ PBOOLEAN    QuotaCharged
 );
 
 #define FlagOn(x, f) ((x) & (f))
@@ -2197,13 +2197,13 @@ NTKERNELAPI
 VOID
 NTAPI
 FsRtlAddToTunnelCache (
-    IN PTUNNEL          Cache,
-    IN ULONGLONG        DirectoryKey,
-    IN PUNICODE_STRING  ShortName,
-    IN PUNICODE_STRING  LongName,
-    IN BOOLEAN          KeyByShortName,
-    IN ULONG            DataLength,
-    IN PVOID            Data
+  /*IN*/ PTUNNEL          Cache,
+  /*IN*/ ULONGLONG        DirectoryKey,
+  /*IN*/ PUNICODE_STRING  ShortName,
+  /*IN*/ PUNICODE_STRING  LongName,
+  /*IN*/ BOOLEAN          KeyByShortName,
+  /*IN*/ ULONG            DataLength,
+  /*IN*/ PVOID            Data
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -2211,8 +2211,8 @@ FsRtlAddToTunnelCache (
 PFILE_LOCK
 NTAPI
 FsRtlAllocateFileLock (
-    IN PCOMPLETE_LOCK_IRP_ROUTINE   CompleteLockIrpRoutine OPTIONAL,
-    IN PUNLOCK_ROUTINE              UnlockRoutine OPTIONAL
+  /*IN*/ PCOMPLETE_LOCK_IRP_ROUTINE   CompleteLockIrpRoutine /*OPTIONAL*/,
+  /*IN*/ PUNLOCK_ROUTINE              UnlockRoutine /*OPTIONAL*/
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -2221,44 +2221,44 @@ NTKERNELAPI
 PVOID
 NTAPI
 FsRtlAllocatePool (
-    IN POOL_TYPE    PoolType,
-    IN ULONG        NumberOfBytes
+  /*IN*/ POOL_TYPE    PoolType,
+  /*IN*/ ULONG        NumberOfBytes
 );
 
 NTKERNELAPI
 PVOID
 NTAPI
 FsRtlAllocatePoolWithQuota (
-    IN POOL_TYPE    PoolType,
-    IN ULONG        NumberOfBytes
+  /*IN*/ POOL_TYPE    PoolType,
+  /*IN*/ ULONG        NumberOfBytes
 );
 
 NTKERNELAPI
 PVOID
 NTAPI
 FsRtlAllocatePoolWithQuotaTag (
-    IN POOL_TYPE    PoolType,
-    IN ULONG        NumberOfBytes,
-    IN ULONG        Tag
+  /*IN*/ POOL_TYPE    PoolType,
+  /*IN*/ ULONG        NumberOfBytes,
+  /*IN*/ ULONG        Tag
 );
 
 NTKERNELAPI
 PVOID
 NTAPI
 FsRtlAllocatePoolWithTag (
-    IN POOL_TYPE    PoolType,
-    IN ULONG        NumberOfBytes,
-    IN ULONG        Tag
+  /*IN*/ POOL_TYPE    PoolType,
+  /*IN*/ ULONG        NumberOfBytes,
+  /*IN*/ ULONG        Tag
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 FsRtlAreNamesEqual (
-    IN PUNICODE_STRING  Name1,
-    IN PUNICODE_STRING  Name2,
-    IN BOOLEAN          IgnoreCase,
-    IN PWCHAR           UpcaseTable OPTIONAL
+  /*IN*/ PUNICODE_STRING  Name1,
+  /*IN*/ PUNICODE_STRING  Name2,
+  /*IN*/ BOOLEAN          IgnoreCase,
+  /*IN*/ PWCHAR           UpcaseTable /*OPTIONAL*/
 );
 
 #define FsRtlAreThereCurrentFileLocks(FL) ( \
@@ -2276,8 +2276,8 @@ NTKERNELAPI
 BOOLEAN
 NTAPI
 FsRtlCheckLockForReadAccess (
-    IN PFILE_LOCK   FileLock,
-    IN PIRP         Irp
+  /*IN*/ PFILE_LOCK   FileLock,
+  /*IN*/ PIRP         Irp
 );
 
 /*
@@ -2291,97 +2291,97 @@ NTKERNELAPI
 BOOLEAN
 NTAPI
 FsRtlCheckLockForWriteAccess (
-    IN PFILE_LOCK   FileLock,
-    IN PIRP         Irp
+  /*IN*/ PFILE_LOCK   FileLock,
+  /*IN*/ PIRP         Irp
 );
 
 typedef
 VOID NTAPI
 (*POPLOCK_WAIT_COMPLETE_ROUTINE) (
-    IN PVOID    Context,
-    IN PIRP     Irp
+  /*IN*/ PVOID    Context,
+  /*IN*/ PIRP     Irp
 );
 
 typedef
 VOID NTAPI
 (*POPLOCK_FS_PREPOST_IRP) (
-    IN PVOID    Context,
-    IN PIRP     Irp
+  /*IN*/ PVOID    Context,
+  /*IN*/ PIRP     Irp
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 FsRtlCheckOplock (
-    IN POPLOCK                          Oplock,
-    IN PIRP                             Irp,
-    IN PVOID                            Context,
-    IN POPLOCK_WAIT_COMPLETE_ROUTINE    CompletionRoutine OPTIONAL,
-    IN POPLOCK_FS_PREPOST_IRP           PostIrpRoutine OPTIONAL
+  /*IN*/ POPLOCK                          Oplock,
+  /*IN*/ PIRP                             Irp,
+  /*IN*/ PVOID                            Context,
+  /*IN*/ POPLOCK_WAIT_COMPLETE_ROUTINE    CompletionRoutine /*OPTIONAL*/,
+  /*IN*/ POPLOCK_FS_PREPOST_IRP           PostIrpRoutine /*OPTIONAL*/
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 FsRtlCopyRead (
-    IN PFILE_OBJECT         FileObject,
-    IN PLARGE_INTEGER       FileOffset,
-    IN ULONG                Length,
-    IN BOOLEAN              Wait,
-    IN ULONG                LockKey,
-    OUT PVOID               Buffer,
-    OUT PIO_STATUS_BLOCK    IoStatus,
-    IN PDEVICE_OBJECT       DeviceObject
+  /*IN*/ PFILE_OBJECT         FileObject,
+  /*IN*/ PLARGE_INTEGER       FileOffset,
+  /*IN*/ ULONG                Length,
+  /*IN*/ BOOLEAN              Wait,
+  /*IN*/ ULONG                LockKey,
+  /*OUT*/ PVOID               Buffer,
+  /*OUT*/ PIO_STATUS_BLOCK    IoStatus,
+  /*IN*/ PDEVICE_OBJECT       DeviceObject
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 FsRtlCopyWrite (
-    IN PFILE_OBJECT         FileObject,
-    IN PLARGE_INTEGER       FileOffset,
-    IN ULONG                Length,
-    IN BOOLEAN              Wait,
-    IN ULONG                LockKey,
-    IN PVOID                Buffer,
-    OUT PIO_STATUS_BLOCK    IoStatus,
-    IN PDEVICE_OBJECT       DeviceObject
+  /*IN*/ PFILE_OBJECT         FileObject,
+  /*IN*/ PLARGE_INTEGER       FileOffset,
+  /*IN*/ ULONG                Length,
+  /*IN*/ BOOLEAN              Wait,
+  /*IN*/ ULONG                LockKey,
+  /*IN*/ PVOID                Buffer,
+  /*OUT*/ PIO_STATUS_BLOCK    IoStatus,
+  /*IN*/ PDEVICE_OBJECT       DeviceObject
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 FsRtlCurrentBatchOplock (
-    IN POPLOCK Oplock
+  /*IN*/ POPLOCK Oplock
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 FsRtlDeleteKeyFromTunnelCache (
-    IN PTUNNEL      Cache,
-    IN ULONGLONG    DirectoryKey
+  /*IN*/ PTUNNEL      Cache,
+  /*IN*/ ULONGLONG    DirectoryKey
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 FsRtlDeleteTunnelCache (
-    IN PTUNNEL Cache
+  /*IN*/ PTUNNEL Cache
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 FsRtlDeregisterUncProvider (
-    IN HANDLE Handle
+  /*IN*/ HANDLE Handle
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 FsRtlDoesNameContainWildCards (
-    IN PUNICODE_STRING Name
+  /*IN*/ PUNICODE_STRING Name
 );
 
 #define FsRtlEnterFileSystem    KeEnterCriticalRegion
@@ -2392,24 +2392,24 @@ NTKERNELAPI
 BOOLEAN
 NTAPI
 FsRtlFastCheckLockForRead (
-    IN PFILE_LOCK           FileLock,
-    IN PLARGE_INTEGER       FileOffset,
-    IN PLARGE_INTEGER       Length,
-    IN ULONG                Key,
-    IN PFILE_OBJECT         FileObject,
-    IN PEPROCESS            Process
+  /*IN*/ PFILE_LOCK           FileLock,
+  /*IN*/ PLARGE_INTEGER       FileOffset,
+  /*IN*/ PLARGE_INTEGER       Length,
+  /*IN*/ ULONG                Key,
+  /*IN*/ PFILE_OBJECT         FileObject,
+  /*IN*/ PEPROCESS            Process
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 FsRtlFastCheckLockForWrite (
-    IN PFILE_LOCK           FileLock,
-    IN PLARGE_INTEGER       FileOffset,
-    IN PLARGE_INTEGER       Length,
-    IN ULONG                Key,
-    IN PFILE_OBJECT         FileObject,
-    IN PEPROCESS            Process
+  /*IN*/ PFILE_LOCK           FileLock,
+  /*IN*/ PLARGE_INTEGER       FileOffset,
+  /*IN*/ PLARGE_INTEGER       Length,
+  /*IN*/ ULONG                Key,
+  /*IN*/ PFILE_OBJECT         FileObject,
+  /*IN*/ PEPROCESS            Process
 );
 
 #define FsRtlFastLock(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11) (       \
@@ -2420,10 +2420,10 @@ NTKERNELAPI
 NTSTATUS
 NTAPI
 FsRtlFastUnlockAll (
-    IN PFILE_LOCK           FileLock,
-    IN PFILE_OBJECT         FileObject,
-    IN PEPROCESS            Process,
-    IN PVOID                Context OPTIONAL
+  /*IN*/ PFILE_LOCK           FileLock,
+  /*IN*/ PFILE_OBJECT         FileObject,
+  /*IN*/ PEPROCESS            Process,
+  /*IN*/ PVOID                Context /*OPTIONAL*/
 );
 /* ret: STATUS_RANGE_NOT_LOCKED */
 
@@ -2431,11 +2431,11 @@ NTKERNELAPI
 NTSTATUS
 NTAPI
 FsRtlFastUnlockAllByKey (
-    IN PFILE_LOCK           FileLock,
-    IN PFILE_OBJECT         FileObject,
-    IN PEPROCESS            Process,
-    IN ULONG                Key,
-    IN PVOID                Context OPTIONAL
+  /*IN*/ PFILE_LOCK           FileLock,
+  /*IN*/ PFILE_OBJECT         FileObject,
+  /*IN*/ PEPROCESS            Process,
+  /*IN*/ ULONG                Key,
+  /*IN*/ PVOID                Context /*OPTIONAL*/
 );  
 /* ret: STATUS_RANGE_NOT_LOCKED */
 
@@ -2443,14 +2443,14 @@ NTKERNELAPI
 NTSTATUS
 NTAPI
 FsRtlFastUnlockSingle (
-    IN PFILE_LOCK           FileLock,
-    IN PFILE_OBJECT         FileObject,
-    IN PLARGE_INTEGER       FileOffset,
-    IN PLARGE_INTEGER       Length,
-    IN PEPROCESS            Process,
-    IN ULONG                Key,
-    IN PVOID                Context OPTIONAL,
-    IN BOOLEAN              AlreadySynchronized
+  /*IN*/ PFILE_LOCK           FileLock,
+  /*IN*/ PFILE_OBJECT         FileObject,
+  /*IN*/ PLARGE_INTEGER       FileOffset,
+  /*IN*/ PLARGE_INTEGER       Length,
+  /*IN*/ PEPROCESS            Process,
+  /*IN*/ ULONG                Key,
+  /*IN*/ PVOID                Context /*OPTIONAL*/,
+  /*IN*/ BOOLEAN              AlreadySynchronized
 );                      
 /* ret:  STATUS_RANGE_NOT_LOCKED */
 
@@ -2458,13 +2458,13 @@ NTKERNELAPI
 BOOLEAN
 NTAPI
 FsRtlFindInTunnelCache (
-    IN PTUNNEL          Cache,
-    IN ULONGLONG        DirectoryKey,
-    IN PUNICODE_STRING  Name,
-    OUT PUNICODE_STRING ShortName,
-    OUT PUNICODE_STRING LongName,
-    IN OUT PULONG       DataLength,
-    OUT PVOID           Data
+  /*IN*/ PTUNNEL          Cache,
+  /*IN*/ ULONGLONG        DirectoryKey,
+  /*IN*/ PUNICODE_STRING  Name,
+  /*OUT*/ PUNICODE_STRING ShortName,
+  /*OUT*/ PUNICODE_STRING LongName,
+  /*IN OUT*/ PULONG       DataLength,
+  /*OUT*/ PVOID           Data
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -2473,7 +2473,7 @@ NTKERNELAPI
 VOID
 NTAPI
 FsRtlFreeFileLock (
-    IN PFILE_LOCK FileLock
+  /*IN*/ PFILE_LOCK FileLock
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -2482,8 +2482,8 @@ NTKERNELAPI
 NTSTATUS
 NTAPI
 FsRtlGetFileSize (
-    IN PFILE_OBJECT         FileObject,
-    IN OUT PLARGE_INTEGER   FileSize
+  /*IN*/ PFILE_OBJECT         FileObject,
+  /*IN OUT*/ PLARGE_INTEGER   FileSize
 );
 
 /*
@@ -2502,48 +2502,48 @@ NTKERNELAPI
 PFILE_LOCK_INFO
 NTAPI
 FsRtlGetNextFileLock (
-    IN PFILE_LOCK   FileLock,
-    IN BOOLEAN      Restart
+  /*IN*/ PFILE_LOCK   FileLock,
+  /*IN*/ BOOLEAN      Restart
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 FsRtlInitializeFileLock (
-    IN PFILE_LOCK                   FileLock,
-    IN PCOMPLETE_LOCK_IRP_ROUTINE   CompleteLockIrpRoutine OPTIONAL,
-    IN PUNLOCK_ROUTINE              UnlockRoutine OPTIONAL
+  /*IN*/ PFILE_LOCK                   FileLock,
+  /*IN*/ PCOMPLETE_LOCK_IRP_ROUTINE   CompleteLockIrpRoutine /*OPTIONAL*/,
+  /*IN*/ PUNLOCK_ROUTINE              UnlockRoutine /*OPTIONAL*/
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 FsRtlInitializeOplock (
-    IN OUT POPLOCK Oplock
+  /*IN OUT*/ POPLOCK Oplock
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 FsRtlInitializeTunnelCache (
-    IN PTUNNEL Cache
+  /*IN*/ PTUNNEL Cache
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 FsRtlIsNameInExpression (
-    IN PUNICODE_STRING  Expression,
-    IN PUNICODE_STRING  Name,
-    IN BOOLEAN          IgnoreCase,
-    IN PWCHAR           UpcaseTable OPTIONAL
+  /*IN*/ PUNICODE_STRING  Expression,
+  /*IN*/ PUNICODE_STRING  Name,
+  /*IN*/ BOOLEAN          IgnoreCase,
+  /*IN*/ PWCHAR           UpcaseTable /*OPTIONAL*/
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 FsRtlIsNtstatusExpected (
-    IN NTSTATUS Ntstatus
+  /*IN*/ NTSTATUS Ntstatus
 );
 
 #define FsRtlIsUnicodeCharacterWild(C) (                                    \
@@ -2556,128 +2556,128 @@ NTKERNELAPI
 BOOLEAN
 NTAPI
 FsRtlMdlReadComplete (
-    IN PFILE_OBJECT     FileObject,
-    IN PMDL             MdlChain
+  /*IN*/ PFILE_OBJECT     FileObject,
+  /*IN*/ PMDL             MdlChain
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 FsRtlMdlReadCompleteDev (
-    IN PFILE_OBJECT     FileObject,
-    IN PMDL             MdlChain,
-    IN PDEVICE_OBJECT   DeviceObject
+  /*IN*/ PFILE_OBJECT     FileObject,
+  /*IN*/ PMDL             MdlChain,
+  /*IN*/ PDEVICE_OBJECT   DeviceObject
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 FsRtlMdlWriteComplete (
-    IN PFILE_OBJECT     FileObject,
-    IN PLARGE_INTEGER   FileOffset,
-    IN PMDL             MdlChain
+  /*IN*/ PFILE_OBJECT     FileObject,
+  /*IN*/ PLARGE_INTEGER   FileOffset,
+  /*IN*/ PMDL             MdlChain
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 FsRtlMdlWriteCompleteDev (
-    IN PFILE_OBJECT     FileObject,
-    IN PLARGE_INTEGER   FileOffset,
-    IN PMDL             MdlChain,
-    IN PDEVICE_OBJECT   DeviceObject
+  /*IN*/ PFILE_OBJECT     FileObject,
+  /*IN*/ PLARGE_INTEGER   FileOffset,
+  /*IN*/ PMDL             MdlChain,
+  /*IN*/ PDEVICE_OBJECT   DeviceObject
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 FsRtlNormalizeNtstatus (
-    IN NTSTATUS Exception,
-    IN NTSTATUS GenericException
+  /*IN*/ NTSTATUS Exception,
+  /*IN*/ NTSTATUS GenericException
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 FsRtlNotifyChangeDirectory (
-    IN PNOTIFY_SYNC NotifySync,
-    IN PVOID        FsContext,
-    IN PSTRING      FullDirectoryName,
-    IN PLIST_ENTRY  NotifyList,
-    IN BOOLEAN      WatchTree,
-    IN ULONG        CompletionFilter,
-    IN PIRP         NotifyIrp
+  /*IN*/ PNOTIFY_SYNC NotifySync,
+  /*IN*/ PVOID        FsContext,
+  /*IN*/ PSTRING      FullDirectoryName,
+  /*IN*/ PLIST_ENTRY  NotifyList,
+  /*IN*/ BOOLEAN      WatchTree,
+  /*IN*/ ULONG        CompletionFilter,
+  /*IN*/ PIRP         NotifyIrp
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 FsRtlNotifyCleanup (
-    IN PNOTIFY_SYNC NotifySync,
-    IN PLIST_ENTRY  NotifyList,
-    IN PVOID        FsContext
+  /*IN*/ PNOTIFY_SYNC NotifySync,
+  /*IN*/ PLIST_ENTRY  NotifyList,
+  /*IN*/ PVOID        FsContext
 );
 
 typedef BOOLEAN (*PCHECK_FOR_TRAVERSE_ACCESS) (
-    IN PVOID                        NotifyContext,
-    IN PVOID                        TargetContext,
-    IN PSECURITY_SUBJECT_CONTEXT    SubjectContext
+  /*IN*/ PVOID                        NotifyContext,
+  /*IN*/ PVOID                        TargetContext,
+  /*IN*/ PSECURITY_SUBJECT_CONTEXT    SubjectContext
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 FsRtlNotifyFullChangeDirectory (
-    IN PNOTIFY_SYNC                 NotifySync,
-    IN PLIST_ENTRY                  NotifyList,
-    IN PVOID                        FsContext,
-    IN PSTRING                      FullDirectoryName,
-    IN BOOLEAN                      WatchTree,
-    IN BOOLEAN                      IgnoreBuffer,
-    IN ULONG                        CompletionFilter,
-    IN PIRP                         NotifyIrp,
-    IN PCHECK_FOR_TRAVERSE_ACCESS   TraverseCallback OPTIONAL,
-    IN PSECURITY_SUBJECT_CONTEXT    SubjectContext OPTIONAL
+  /*IN*/ PNOTIFY_SYNC                 NotifySync,
+  /*IN*/ PLIST_ENTRY                  NotifyList,
+  /*IN*/ PVOID                        FsContext,
+  /*IN*/ PSTRING                      FullDirectoryName,
+  /*IN*/ BOOLEAN                      WatchTree,
+  /*IN*/ BOOLEAN                      IgnoreBuffer,
+  /*IN*/ ULONG                        CompletionFilter,
+  /*IN*/ PIRP                         NotifyIrp,
+  /*IN*/ PCHECK_FOR_TRAVERSE_ACCESS   TraverseCallback /*OPTIONAL*/,
+  /*IN*/ PSECURITY_SUBJECT_CONTEXT    SubjectContext /*OPTIONAL*/
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 FsRtlNotifyFullReportChange (
-    IN PNOTIFY_SYNC NotifySync,
-    IN PLIST_ENTRY  NotifyList,
-    IN PSTRING      FullTargetName,
-    IN USHORT       TargetNameOffset,
-    IN PSTRING      StreamName OPTIONAL,
-    IN PSTRING      NormalizedParentName OPTIONAL,
-    IN ULONG        FilterMatch,
-    IN ULONG        Action,
-    IN PVOID        TargetContext
+  /*IN*/ PNOTIFY_SYNC NotifySync,
+  /*IN*/ PLIST_ENTRY  NotifyList,
+  /*IN*/ PSTRING      FullTargetName,
+  /*IN*/ USHORT       TargetNameOffset,
+  /*IN*/ PSTRING      StreamName /*OPTIONAL*/,
+  /*IN*/ PSTRING      NormalizedParentName /*OPTIONAL*/,
+  /*IN*/ ULONG        FilterMatch,
+  /*IN*/ ULONG        Action,
+  /*IN*/ PVOID        TargetContext
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 FsRtlNotifyInitializeSync (
-    IN PNOTIFY_SYNC NotifySync
+  /*IN*/ PNOTIFY_SYNC NotifySync
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 FsRtlNotifyReportChange (
-    IN PNOTIFY_SYNC NotifySync,
-    IN PLIST_ENTRY  NotifyList,
-    IN PSTRING      FullTargetName,
-    IN PUSHORT      FileNamePartLength,
-    IN ULONG        FilterMatch
+  /*IN*/ PNOTIFY_SYNC NotifySync,
+  /*IN*/ PLIST_ENTRY  NotifyList,
+  /*IN*/ PSTRING      FullTargetName,
+  /*IN*/ PUSHORT      FileNamePartLength,
+  /*IN*/ ULONG        FilterMatch
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 FsRtlNotifyUninitializeSync (
-    IN PNOTIFY_SYNC NotifySync
+  /*IN*/ PNOTIFY_SYNC NotifySync
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -2686,8 +2686,8 @@ NTKERNELAPI
 NTSTATUS
 NTAPI
 FsRtlNotifyVolumeEvent (
-    IN PFILE_OBJECT FileObject,
-    IN ULONG        EventCode
+  /*IN*/ PFILE_OBJECT FileObject,
+  /*IN*/ ULONG        EventCode
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -2696,16 +2696,16 @@ NTKERNELAPI
 NTSTATUS
 NTAPI
 FsRtlOplockFsctrl (
-    IN POPLOCK  Oplock,
-    IN PIRP     Irp,
-    IN ULONG    OpenCount
+  /*IN*/ POPLOCK  Oplock,
+  /*IN*/ PIRP     Irp,
+  /*IN*/ ULONG    OpenCount
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 FsRtlOplockIsFastIoPossible (
-    IN POPLOCK Oplock
+  /*IN*/ POPLOCK Oplock
 );
 
 /*
@@ -2721,18 +2721,18 @@ NTKERNELAPI
 BOOLEAN
 NTAPI
 FsRtlPrivateLock (
-    IN PFILE_LOCK           FileLock,
-    IN PFILE_OBJECT         FileObject,
-    IN PLARGE_INTEGER       FileOffset,
-    IN PLARGE_INTEGER       Length,
-    IN PEPROCESS            Process,
-    IN ULONG                Key,
-    IN BOOLEAN              FailImmediately, 
-    IN BOOLEAN              ExclusiveLock,
-    OUT PIO_STATUS_BLOCK    IoStatus, 
-    IN PIRP                 Irp OPTIONAL,
-    IN PVOID                Context,
-    IN BOOLEAN              AlreadySynchronized
+  /*IN*/ PFILE_LOCK           FileLock,
+  /*IN*/ PFILE_OBJECT         FileObject,
+  /*IN*/ PLARGE_INTEGER       FileOffset,
+  /*IN*/ PLARGE_INTEGER       Length,
+  /*IN*/ PEPROCESS            Process,
+  /*IN*/ ULONG                Key,
+  /*IN*/ BOOLEAN              FailImmediately, 
+  /*IN*/ BOOLEAN              ExclusiveLock,
+  /*OUT*/ PIO_STATUS_BLOCK    IoStatus, 
+  /*IN*/ PIRP                 Irp /*OPTIONAL*/,
+  /*IN*/ PVOID                Context,
+  /*IN*/ BOOLEAN              AlreadySynchronized
 );
 
 /*
@@ -2760,53 +2760,53 @@ NTKERNELAPI
 NTSTATUS
 NTAPI
 FsRtlProcessFileLock (
-    IN PFILE_LOCK   FileLock,
-    IN PIRP         Irp,
-    IN PVOID        Context OPTIONAL
+  /*IN*/ PFILE_LOCK   FileLock,
+  /*IN*/ PIRP         Irp,
+  /*IN*/ PVOID        Context /*OPTIONAL*/
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 FsRtlRegisterUncProvider (
-    IN OUT PHANDLE      MupHandle,
-    IN PUNICODE_STRING  RedirectorDeviceName,
-    IN BOOLEAN          MailslotsSupported
+  /*IN OUT*/ PHANDLE      MupHandle,
+  /*IN*/ PUNICODE_STRING  RedirectorDeviceName,
+  /*IN*/ BOOLEAN          MailslotsSupported
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 FsRtlUninitializeFileLock (
-    IN PFILE_LOCK FileLock
+  /*IN*/ PFILE_LOCK FileLock
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 FsRtlUninitializeOplock (
-    IN OUT POPLOCK Oplock
+  /*IN OUT*/ POPLOCK Oplock
 );
 
 NTSYSAPI
 VOID
 NTAPI
 HalDisplayString (
-    IN PCHAR String
+  /*IN*/ PCHAR String
 );
 
 NTSYSAPI
 VOID
 NTAPI
 HalQueryRealTimeClock (
-    IN OUT PTIME_FIELDS TimeFields
+  /*IN OUT*/ PTIME_FIELDS TimeFields
 );
 
 NTSYSAPI
 VOID
 NTAPI
 HalSetRealTimeClock (
-    IN PTIME_FIELDS TimeFields
+  /*IN*/ PTIME_FIELDS TimeFields
 );
 
 #define InitializeMessageHeader(m, l, t) {                  \
@@ -2820,36 +2820,36 @@ NTKERNELAPI
 VOID
 NTAPI
 IoAcquireVpbSpinLock (
-    OUT PKIRQL Irql
+  /*OUT*/ PKIRQL Irql
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 IoCheckDesiredAccess (
-    IN OUT PACCESS_MASK DesiredAccess,
-    IN ACCESS_MASK      GrantedAccess
+  /*IN OUT*/ PACCESS_MASK DesiredAccess,
+  /*IN*/ ACCESS_MASK      GrantedAccess
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 IoCheckEaBufferValidity (
-    IN PFILE_FULL_EA_INFORMATION    EaBuffer,
-    IN ULONG                        EaLength,
-    OUT PULONG                      ErrorOffset
+  /*IN*/ PFILE_FULL_EA_INFORMATION    EaBuffer,
+  /*IN*/ ULONG                        EaLength,
+  /*OUT*/ PULONG                      ErrorOffset
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 IoCheckFunctionAccess (
-    IN ACCESS_MASK              GrantedAccess,
-    IN UCHAR                    MajorFunction,
-    IN UCHAR                    MinorFunction,
-    IN ULONG                    IoControlCode,
-    IN PFILE_INFORMATION_CLASS  FileInformationClass OPTIONAL,
-    IN PFS_INFORMATION_CLASS    FsInformationClass OPTIONAL
+  /*IN*/ ACCESS_MASK              GrantedAccess,
+  /*IN*/ UCHAR                    MajorFunction,
+  /*IN*/ UCHAR                    MinorFunction,
+  /*IN*/ ULONG                    IoControlCode,
+  /*IN*/ PFILE_INFORMATION_CLASS  FileInformationClass /*OPTIONAL*/,
+  /*IN*/ PFS_INFORMATION_CLASS    FsInformationClass /*OPTIONAL*/
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -2858,9 +2858,9 @@ NTKERNELAPI
 NTSTATUS
 NTAPI
 IoCheckQuotaBufferValidity (
-    IN PFILE_QUOTA_INFORMATION  QuotaBuffer,
-    IN ULONG                    QuotaLength,
-    OUT PULONG                  ErrorOffset
+  /*IN*/ PFILE_QUOTA_INFORMATION  QuotaBuffer,
+  /*IN*/ ULONG                    QuotaLength,
+  /*OUT*/ PULONG                  ErrorOffset
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -2869,8 +2869,8 @@ NTKERNELAPI
 PFILE_OBJECT
 NTAPI
 IoCreateStreamFileObject (
-    IN PFILE_OBJECT     FileObject OPTIONAL,
-    IN PDEVICE_OBJECT   DeviceObject OPTIONAL
+  /*IN*/ PFILE_OBJECT     FileObject /*OPTIONAL*/,
+  /*IN*/ PDEVICE_OBJECT   DeviceObject /*OPTIONAL*/
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -2879,8 +2879,8 @@ NTKERNELAPI
 PFILE_OBJECT
 NTAPI
 IoCreateStreamFileObjectLite (
-    IN PFILE_OBJECT     FileObject OPTIONAL,
-    IN PDEVICE_OBJECT   DeviceObject OPTIONAL
+  /*IN*/ PFILE_OBJECT     FileObject /*OPTIONAL*/,
+  /*IN*/ PDEVICE_OBJECT   DeviceObject /*OPTIONAL*/
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -2889,32 +2889,32 @@ NTKERNELAPI
 BOOLEAN
 NTAPI
 IoFastQueryNetworkAttributes (
-    IN POBJECT_ATTRIBUTES               ObjectAttributes,
-    IN ACCESS_MASK                      DesiredAccess,
-    IN ULONG                            OpenOptions,
-    OUT PIO_STATUS_BLOCK                IoStatus,
-    OUT PFILE_NETWORK_OPEN_INFORMATION  Buffer
+  /*IN*/ POBJECT_ATTRIBUTES               ObjectAttributes,
+  /*IN*/ ACCESS_MASK                      DesiredAccess,
+  /*IN*/ ULONG                            OpenOptions,
+  /*OUT*/ PIO_STATUS_BLOCK                IoStatus,
+  /*OUT*/ PFILE_NETWORK_OPEN_INFORMATION  Buffer
 );
 
 NTKERNELAPI
 PDEVICE_OBJECT
 NTAPI
 IoGetAttachedDevice (
-    IN PDEVICE_OBJECT DeviceObject
+  /*IN*/ PDEVICE_OBJECT DeviceObject
 );
 
 NTKERNELAPI
 PDEVICE_OBJECT
 NTAPI
 IoGetBaseFileSystemDeviceObject (
-    IN PFILE_OBJECT FileObject
+  /*IN*/ PFILE_OBJECT FileObject
 );
 
 NTKERNELAPI
 PEPROCESS
 NTAPI
 IoGetRequestorProcess (
-    IN PIRP Irp
+  /*IN*/ PIRP Irp
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -2923,7 +2923,7 @@ NTKERNELAPI
 ULONG
 NTAPI
 IoGetRequestorProcessId (
-    IN PIRP Irp
+  /*IN*/ PIRP Irp
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -2947,14 +2947,14 @@ NTKERNELAPI
 BOOLEAN
 NTAPI
 IoIsOperationSynchronous (
-    IN PIRP Irp
+  /*IN*/ PIRP Irp
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 IoIsSystemThread (
-    IN PETHREAD Thread
+  /*IN*/ PETHREAD Thread
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -2963,8 +2963,8 @@ NTKERNELAPI
 BOOLEAN
 NTAPI
 IoIsValidNameGraftingBuffer (
-    IN PIRP                 Irp,
-    IN PREPARSE_DATA_BUFFER ReparseBuffer
+  /*IN*/ PIRP                 Irp,
+  /*IN*/ PREPARSE_DATA_BUFFER ReparseBuffer
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -2973,55 +2973,55 @@ NTKERNELAPI
 NTSTATUS
 NTAPI
 IoPageRead (
-    IN PFILE_OBJECT         FileObject,
-    IN PMDL                 Mdl,
-    IN PLARGE_INTEGER       Offset,
-    IN PKEVENT              Event,
-    OUT PIO_STATUS_BLOCK    IoStatusBlock
+  /*IN*/ PFILE_OBJECT         FileObject,
+  /*IN*/ PMDL                 Mdl,
+  /*IN*/ PLARGE_INTEGER       Offset,
+  /*IN*/ PKEVENT              Event,
+  /*OUT*/ PIO_STATUS_BLOCK    IoStatusBlock
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 IoQueryFileInformation (
-    IN PFILE_OBJECT             FileObject,
-    IN FILE_INFORMATION_CLASS   FileInformationClass,
-    IN ULONG                    Length,
-    OUT PVOID                   FileInformation,
-    OUT PULONG                  ReturnedLength
+  /*IN*/ PFILE_OBJECT             FileObject,
+  /*IN*/ FILE_INFORMATION_CLASS   FileInformationClass,
+  /*IN*/ ULONG                    Length,
+  /*OUT*/ PVOID                   FileInformation,
+  /*OUT*/ PULONG                  ReturnedLength
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 IoQueryVolumeInformation (
-    IN PFILE_OBJECT         FileObject,
-    IN FS_INFORMATION_CLASS FsInformationClass,
-    IN ULONG                Length,
-    OUT PVOID               FsInformation,
-    OUT PULONG              ReturnedLength
+  /*IN*/ PFILE_OBJECT         FileObject,
+  /*IN*/ FS_INFORMATION_CLASS FsInformationClass,
+  /*IN*/ ULONG                Length,
+  /*OUT*/ PVOID               FsInformation,
+  /*OUT*/ PULONG              ReturnedLength
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 IoRegisterFileSystem (
-    IN OUT PDEVICE_OBJECT DeviceObject
+  /*IN OUT*/ PDEVICE_OBJECT DeviceObject
 );
 
 #if (VER_PRODUCTBUILD >= 1381)
 
 typedef VOID (NTAPI *PDRIVER_FS_NOTIFICATION) (
-    IN PDEVICE_OBJECT DeviceObject,
-    IN BOOLEAN        DriverActive
+  /*IN*/ PDEVICE_OBJECT DeviceObject,
+  /*IN*/ BOOLEAN        DriverActive
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 IoRegisterFsRegistrationChange (
-    IN PDRIVER_OBJECT           DriverObject,
-    IN PDRIVER_FS_NOTIFICATION  DriverNotificationRoutine
+  /*IN*/ PDRIVER_OBJECT           DriverObject,
+  /*IN*/ PDRIVER_FS_NOTIFICATION  DriverNotificationRoutine
 );
 
 #endif /* (VER_PRODUCTBUILD >= 1381) */
@@ -3030,57 +3030,57 @@ NTKERNELAPI
 VOID
 NTAPI
 IoReleaseVpbSpinLock (
-    IN KIRQL Irql
+  /*IN*/ KIRQL Irql
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 IoSetDeviceToVerify (
-    IN PETHREAD         Thread,
-    IN PDEVICE_OBJECT   DeviceObject
+  /*IN*/ PETHREAD         Thread,
+  /*IN*/ PDEVICE_OBJECT   DeviceObject
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 IoSetInformation (
-    IN PFILE_OBJECT             FileObject,
-    IN FILE_INFORMATION_CLASS   FileInformationClass,
-    IN ULONG                    Length,
-    IN PVOID                    FileInformation
+  /*IN*/ PFILE_OBJECT             FileObject,
+  /*IN*/ FILE_INFORMATION_CLASS   FileInformationClass,
+  /*IN*/ ULONG                    Length,
+  /*IN*/ PVOID                    FileInformation
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 IoSetTopLevelIrp (
-    IN PIRP Irp
+  /*IN*/ PIRP Irp
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 IoSynchronousPageWrite (
-    IN PFILE_OBJECT         FileObject,
-    IN PMDL                 Mdl,
-    IN PLARGE_INTEGER       FileOffset,
-    IN PKEVENT              Event,
-    OUT PIO_STATUS_BLOCK    IoStatusBlock
+  /*IN*/ PFILE_OBJECT         FileObject,
+  /*IN*/ PMDL                 Mdl,
+  /*IN*/ PLARGE_INTEGER       FileOffset,
+  /*IN*/ PKEVENT              Event,
+  /*OUT*/ PIO_STATUS_BLOCK    IoStatusBlock
 );
 
 NTKERNELAPI
 PEPROCESS
 NTAPI
 IoThreadToProcess (
-    IN PETHREAD Thread
+  /*IN*/ PETHREAD Thread
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 IoUnregisterFileSystem (
-    IN OUT PDEVICE_OBJECT DeviceObject
+  /*IN OUT*/ PDEVICE_OBJECT DeviceObject
 );
 
 #if (VER_PRODUCTBUILD >= 1381)
@@ -3089,8 +3089,8 @@ NTKERNELAPI
 NTSTATUS
 NTAPI
 IoUnregisterFsRegistrationChange (
-    IN PDRIVER_OBJECT           DriverObject,
-    IN PDRIVER_FS_NOTIFICATION  DriverNotificationRoutine
+  /*IN*/ PDRIVER_OBJECT           DriverObject,
+  /*IN*/ PDRIVER_FS_NOTIFICATION  DriverNotificationRoutine
 );
 
 #endif /* (VER_PRODUCTBUILD >= 1381) */
@@ -3099,15 +3099,15 @@ NTKERNELAPI
 NTSTATUS
 NTAPI
 IoVerifyVolume (
-    IN PDEVICE_OBJECT   DeviceObject,
-    IN BOOLEAN          AllowRawMount
+  /*IN*/ PDEVICE_OBJECT   DeviceObject,
+  /*IN*/ BOOLEAN          AllowRawMount
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 KeAttachProcess (
-    IN PEPROCESS Process
+  /*IN*/ PEPROCESS Process
 );
 
 NTKERNELAPI
@@ -3121,57 +3121,57 @@ NTKERNELAPI
 VOID
 NTAPI
 KeInitializeQueue (
-    IN PRKQUEUE Queue,
-    IN ULONG    Count OPTIONAL
+  /*IN*/ PRKQUEUE Queue,
+  /*IN*/ ULONG    Count /*OPTIONAL*/
 );
 
 NTKERNELAPI
 LONG
 NTAPI
 KeInsertHeadQueue (
-    IN PRKQUEUE     Queue,
-    IN PLIST_ENTRY  Entry
+  /*IN*/ PRKQUEUE     Queue,
+  /*IN*/ PLIST_ENTRY  Entry
 );
 
 NTKERNELAPI
 LONG
 NTAPI
 KeInsertQueue (
-    IN PRKQUEUE     Queue,
-    IN PLIST_ENTRY  Entry
+  /*IN*/ PRKQUEUE     Queue,
+  /*IN*/ PLIST_ENTRY  Entry
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 KeInsertQueueApc (
-    IN PKAPC      Apc,
-    IN PVOID      SystemArgument1,
-    IN PVOID      SystemArgument2,
-    IN KPRIORITY  PriorityBoost
+  /*IN*/ PKAPC      Apc,
+  /*IN*/ PVOID      SystemArgument1,
+  /*IN*/ PVOID      SystemArgument2,
+  /*IN*/ KPRIORITY  PriorityBoost
 );
 
 NTKERNELAPI
 LONG
 NTAPI
 KeReadStateQueue (
-    IN PRKQUEUE Queue
+  /*IN*/ PRKQUEUE Queue
 );
 
 NTKERNELAPI
 PLIST_ENTRY
 NTAPI
 KeRemoveQueue (
-    IN PRKQUEUE         Queue,
-    IN KPROCESSOR_MODE  WaitMode,
-    IN PLARGE_INTEGER   Timeout OPTIONAL
+  /*IN*/ PRKQUEUE         Queue,
+  /*IN*/ KPROCESSOR_MODE  WaitMode,
+  /*IN*/ PLARGE_INTEGER   Timeout /*OPTIONAL*/
 );
 
 NTKERNELAPI
 PLIST_ENTRY
 NTAPI
 KeRundownQueue (
-    IN PRKQUEUE Queue
+  /*IN*/ PRKQUEUE Queue
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -3180,15 +3180,15 @@ NTKERNELAPI
 VOID
 NTAPI
 KeStackAttachProcess (
-    IN PKPROCESS    Process,
-    OUT PKAPC_STATE ApcState
+  /*IN*/ PKPROCESS    Process,
+  /*OUT*/ PKAPC_STATE ApcState
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 KeUnstackDetachProcess (
-    IN PKAPC_STATE ApcState
+  /*IN*/ PKAPC_STATE ApcState
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -3197,24 +3197,24 @@ NTKERNELAPI
 BOOLEAN
 NTAPI
 MmCanFileBeTruncated (
-    IN PSECTION_OBJECT_POINTERS     SectionObjectPointer,
-    IN PLARGE_INTEGER               NewFileSize
+  /*IN*/ PSECTION_OBJECT_POINTERS     SectionObjectPointer,
+  /*IN*/ PLARGE_INTEGER               NewFileSize
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 MmFlushImageSection (
-    IN PSECTION_OBJECT_POINTERS     SectionObjectPointer,
-    IN MMFLUSH_TYPE                 FlushType
+  /*IN*/ PSECTION_OBJECT_POINTERS     SectionObjectPointer,
+  /*IN*/ MMFLUSH_TYPE                 FlushType
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 MmForceSectionClosed (
-    IN PSECTION_OBJECT_POINTERS SectionObjectPointer,
-    IN BOOLEAN                  DelayClose
+  /*IN*/ PSECTION_OBJECT_POINTERS SectionObjectPointer,
+  /*IN*/ BOOLEAN                  DelayClose
 );
 
 #if (VER_PRODUCTBUILD >= 1381)
@@ -3239,119 +3239,119 @@ NTKERNELAPI
 NTSTATUS
 NTAPI
 MmMapViewOfSection (
-    IN PVOID                SectionObject,
-    IN PEPROCESS            Process,
-    IN OUT PVOID            *BaseAddress,
-    IN ULONG                ZeroBits,
-    IN ULONG                CommitSize,
-    IN OUT PLARGE_INTEGER   SectionOffset OPTIONAL,
-    IN OUT PULONG           ViewSize,
-    IN SECTION_INHERIT      InheritDisposition,
-    IN ULONG                AllocationType,
-    IN ULONG                Protect
+  /*IN*/ PVOID                SectionObject,
+  /*IN*/ PEPROCESS            Process,
+  /*IN OUT*/ PVOID            *BaseAddress,
+  /*IN*/ ULONG                ZeroBits,
+  /*IN*/ ULONG                CommitSize,
+  /*IN OUT*/ PLARGE_INTEGER   SectionOffset /*OPTIONAL*/,
+  /*IN OUT*/ PULONG           ViewSize,
+  /*IN*/ SECTION_INHERIT      InheritDisposition,
+  /*IN*/ ULONG                AllocationType,
+  /*IN*/ ULONG                Protect
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 MmSetAddressRangeModified (
-    IN PVOID    Address,
-    IN ULONG    Length
+  /*IN*/ PVOID    Address,
+  /*IN*/ ULONG    Length
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 ObCreateObject (
-    IN KPROCESSOR_MODE      ObjectAttributesAccessMode OPTIONAL,
-    IN POBJECT_TYPE         ObjectType,
-    IN POBJECT_ATTRIBUTES   ObjectAttributes OPTIONAL,
-    IN KPROCESSOR_MODE      AccessMode,
-    IN OUT PVOID            ParseContext OPTIONAL,
-    IN ULONG                ObjectSize,
-    IN ULONG                PagedPoolCharge OPTIONAL,
-    IN ULONG                NonPagedPoolCharge OPTIONAL,
-    OUT PVOID               *Object
+  /*IN*/ KPROCESSOR_MODE      ObjectAttributesAccessMode /*OPTIONAL*/,
+  /*IN*/ POBJECT_TYPE         ObjectType,
+  /*IN*/ POBJECT_ATTRIBUTES   ObjectAttributes /*OPTIONAL*/,
+  /*IN*/ KPROCESSOR_MODE      AccessMode,
+  /*IN OUT*/ PVOID            ParseContext /*OPTIONAL*/,
+  /*IN*/ ULONG                ObjectSize,
+  /*IN*/ ULONG                PagedPoolCharge /*OPTIONAL*/,
+  /*IN*/ ULONG                NonPagedPoolCharge /*OPTIONAL*/,
+  /*OUT*/ PVOID               *Object
 );
 
 NTKERNELAPI
 ULONG
 NTAPI
 ObGetObjectPointerCount (
-    IN PVOID Object
+  /*IN*/ PVOID Object
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 ObInsertObject (
-    IN PVOID            Object,
-    IN PACCESS_STATE    PassedAccessState OPTIONAL,
-    IN ACCESS_MASK      DesiredAccess,
-    IN ULONG            AdditionalReferences,
-    OUT PVOID           *ReferencedObject OPTIONAL,
-    OUT PHANDLE         Handle
+  /*IN*/ PVOID            Object,
+  /*IN*/ PACCESS_STATE    PassedAccessState /*OPTIONAL*/,
+  /*IN*/ ACCESS_MASK      DesiredAccess,
+  /*IN*/ ULONG            AdditionalReferences,
+  /*OUT*/ PVOID           *ReferencedObject /*OPTIONAL*/,
+  /*OUT*/ PHANDLE         Handle
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 ObMakeTemporaryObject (
-    IN PVOID Object
+  /*IN*/ PVOID Object
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 ObOpenObjectByPointer (
-    IN PVOID            Object,
-    IN ULONG            HandleAttributes,
-    IN PACCESS_STATE    PassedAccessState OPTIONAL,
-    IN ACCESS_MASK      DesiredAccess OPTIONAL,
-    IN POBJECT_TYPE     ObjectType OPTIONAL,
-    IN KPROCESSOR_MODE  AccessMode,
-    OUT PHANDLE         Handle
+  /*IN*/ PVOID            Object,
+  /*IN*/ ULONG            HandleAttributes,
+  /*IN*/ PACCESS_STATE    PassedAccessState /*OPTIONAL*/,
+  /*IN*/ ACCESS_MASK      DesiredAccess /*OPTIONAL*/,
+  /*IN*/ POBJECT_TYPE     ObjectType /*OPTIONAL*/,
+  /*IN*/ KPROCESSOR_MODE  AccessMode,
+  /*OUT*/ PHANDLE         Handle
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 ObQueryNameString (
-    IN PVOID                        Object,
-    OUT POBJECT_NAME_INFORMATION    ObjectNameInfo,
-    IN ULONG                        Length,
-    OUT PULONG                      ReturnLength
+  /*IN*/ PVOID                        Object,
+  /*OUT*/ POBJECT_NAME_INFORMATION    ObjectNameInfo,
+  /*IN*/ ULONG                        Length,
+  /*OUT*/ PULONG                      ReturnLength
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 ObQueryObjectAuditingByHandle (
-    IN HANDLE       Handle,
-    OUT PBOOLEAN    GenerateOnClose
+  /*IN*/ HANDLE       Handle,
+  /*OUT*/ PBOOLEAN    GenerateOnClose
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 ObReferenceObjectByName (
-    IN PUNICODE_STRING  ObjectName,
-    IN ULONG            Attributes,
-    IN PACCESS_STATE    PassedAccessState OPTIONAL,
-    IN ACCESS_MASK      DesiredAccess OPTIONAL,
-    IN POBJECT_TYPE     ObjectType,
-    IN KPROCESSOR_MODE  AccessMode,
-    IN OUT PVOID        ParseContext OPTIONAL,
-    OUT PVOID           *Object
+  /*IN*/ PUNICODE_STRING  ObjectName,
+  /*IN*/ ULONG            Attributes,
+  /*IN*/ PACCESS_STATE    PassedAccessState /*OPTIONAL*/,
+  /*IN*/ ACCESS_MASK      DesiredAccess /*OPTIONAL*/,
+  /*IN*/ POBJECT_TYPE     ObjectType,
+  /*IN*/ KPROCESSOR_MODE  AccessMode,
+  /*IN OUT*/ PVOID        ParseContext /*OPTIONAL*/,
+  /*OUT*/ PVOID           *Object
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 PsChargePoolQuota (
-    IN PEPROCESS    Process,
-    IN POOL_TYPE    PoolType,
-    IN ULONG        Amount
+  /*IN*/ PEPROCESS    Process,
+  /*IN*/ POOL_TYPE    PoolType,
+  /*IN*/ ULONG        Amount
 );
 
 #define PsDereferenceImpersonationToken(T)  \
@@ -3375,58 +3375,58 @@ NTKERNELAPI
 BOOLEAN
 NTAPI
 PsIsThreadTerminating (
-    IN PETHREAD Thread
+  /*IN*/ PETHREAD Thread
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 PsLookupProcessByProcessId (
-    IN PVOID        ProcessId,
-    OUT PEPROCESS   *Process
+  /*IN*/ PVOID        ProcessId,
+  /*OUT*/ PEPROCESS   *Process
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 PsLookupProcessThreadByCid (
-    IN PCLIENT_ID   Cid,
-    OUT PEPROCESS   *Process OPTIONAL,
-    OUT PETHREAD    *Thread
+  /*IN*/ PCLIENT_ID   Cid,
+  /*OUT*/ PEPROCESS   *Process /*OPTIONAL*/,
+  /*OUT*/ PETHREAD    *Thread
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 PsLookupThreadByThreadId (
-    IN PVOID        UniqueThreadId,
-    OUT PETHREAD    *Thread
+  /*IN*/ PVOID        UniqueThreadId,
+  /*OUT*/ PETHREAD    *Thread
 );
 
 NTKERNELAPI
 PACCESS_TOKEN
 NTAPI
 PsReferenceImpersonationToken (
-    IN PETHREAD                         Thread,
-    OUT PBOOLEAN                        CopyOnUse,
-    OUT PBOOLEAN                        EffectiveOnly,
-    OUT PSECURITY_IMPERSONATION_LEVEL   Level
+  /*IN*/ PETHREAD                         Thread,
+  /*OUT*/ PBOOLEAN                        CopyOnUse,
+  /*OUT*/ PBOOLEAN                        EffectiveOnly,
+  /*OUT*/ PSECURITY_IMPERSONATION_LEVEL   Level
 );
 
 NTKERNELAPI
 HANDLE
 NTAPI
 PsReferencePrimaryToken (
-    IN PEPROCESS Process
+  /*IN*/ PEPROCESS Process
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 PsReturnPoolQuota (
-    IN PEPROCESS    Process,
-    IN POOL_TYPE    PoolType,
-    IN ULONG        Amount
+  /*IN*/ PEPROCESS    Process,
+  /*IN*/ POOL_TYPE    PoolType,
+  /*IN*/ ULONG        Amount
 );
 
 NTKERNELAPI
@@ -3440,203 +3440,203 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 RtlAbsoluteToSelfRelativeSD (
-    IN PSECURITY_DESCRIPTOR     AbsoluteSecurityDescriptor,
-    IN OUT PSECURITY_DESCRIPTOR SelfRelativeSecurityDescriptor,
-    IN PULONG                   BufferLength
+  /*IN*/ PSECURITY_DESCRIPTOR     AbsoluteSecurityDescriptor,
+  /*IN OUT*/ PSECURITY_DESCRIPTOR SelfRelativeSecurityDescriptor,
+  /*IN*/ PULONG                   BufferLength
 );
 
 NTSYSAPI
 PVOID
 NTAPI
 RtlAllocateHeap (
-    IN HANDLE  HeapHandle,
-    IN ULONG   Flags,
-    IN ULONG   Size
+  /*IN*/ HANDLE  HeapHandle,
+  /*IN*/ ULONG   Flags,
+  /*IN*/ ULONG   Size
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 RtlCompressBuffer (
-    IN USHORT   CompressionFormatAndEngine,
-    IN PUCHAR   UncompressedBuffer,
-    IN ULONG    UncompressedBufferSize,
-    OUT PUCHAR  CompressedBuffer,
-    IN ULONG    CompressedBufferSize,
-    IN ULONG    UncompressedChunkSize,
-    OUT PULONG  FinalCompressedSize,
-    IN PVOID    WorkSpace
+  /*IN*/ USHORT   CompressionFormatAndEngine,
+  /*IN*/ PUCHAR   UncompressedBuffer,
+  /*IN*/ ULONG    UncompressedBufferSize,
+  /*OUT*/ PUCHAR  CompressedBuffer,
+  /*IN*/ ULONG    CompressedBufferSize,
+  /*IN*/ ULONG    UncompressedChunkSize,
+  /*OUT*/ PULONG  FinalCompressedSize,
+  /*IN*/ PVOID    WorkSpace
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 RtlCompressChunks (
-    IN PUCHAR                       UncompressedBuffer,
-    IN ULONG                        UncompressedBufferSize,
-    OUT PUCHAR                      CompressedBuffer,
-    IN ULONG                        CompressedBufferSize,
-    IN OUT PCOMPRESSED_DATA_INFO    CompressedDataInfo,
-    IN ULONG                        CompressedDataInfoLength,
-    IN PVOID                        WorkSpace
+  /*IN*/ PUCHAR                       UncompressedBuffer,
+  /*IN*/ ULONG                        UncompressedBufferSize,
+  /*OUT*/ PUCHAR                      CompressedBuffer,
+  /*IN*/ ULONG                        CompressedBufferSize,
+  /*IN OUT*/ PCOMPRESSED_DATA_INFO    CompressedDataInfo,
+  /*IN*/ ULONG                        CompressedDataInfoLength,
+  /*IN*/ PVOID                        WorkSpace
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 RtlConvertSidToUnicodeString (
-    OUT PUNICODE_STRING DestinationString,
-    IN PSID             Sid,
-    IN BOOLEAN          AllocateDestinationString
+  /*OUT*/ PUNICODE_STRING DestinationString,
+  /*IN*/ PSID             Sid,
+  /*IN*/ BOOLEAN          AllocateDestinationString
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 RtlCopySid (
-    IN ULONG   Length,
-    IN PSID    Destination,
-    IN PSID    Source
+  /*IN*/ ULONG   Length,
+  /*IN*/ PSID    Destination,
+  /*IN*/ PSID    Source
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 RtlDecompressBuffer (
-    IN USHORT   CompressionFormat,
-    OUT PUCHAR  UncompressedBuffer,
-    IN ULONG    UncompressedBufferSize,
-    IN PUCHAR   CompressedBuffer,
-    IN ULONG    CompressedBufferSize,
-    OUT PULONG  FinalUncompressedSize
+  /*IN*/ USHORT   CompressionFormat,
+  /*OUT*/ PUCHAR  UncompressedBuffer,
+  /*IN*/ ULONG    UncompressedBufferSize,
+  /*IN*/ PUCHAR   CompressedBuffer,
+  /*IN*/ ULONG    CompressedBufferSize,
+  /*OUT*/ PULONG  FinalUncompressedSize
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 RtlDecompressChunks (
-    OUT PUCHAR                  UncompressedBuffer,
-    IN ULONG                    UncompressedBufferSize,
-    IN PUCHAR                   CompressedBuffer,
-    IN ULONG                    CompressedBufferSize,
-    IN PUCHAR                   CompressedTail,
-    IN ULONG                    CompressedTailSize,
-    IN PCOMPRESSED_DATA_INFO    CompressedDataInfo
+  /*OUT*/ PUCHAR                  UncompressedBuffer,
+  /*IN*/ ULONG                    UncompressedBufferSize,
+  /*IN*/ PUCHAR                   CompressedBuffer,
+  /*IN*/ ULONG                    CompressedBufferSize,
+  /*IN*/ PUCHAR                   CompressedTail,
+  /*IN*/ ULONG                    CompressedTailSize,
+  /*IN*/ PCOMPRESSED_DATA_INFO    CompressedDataInfo
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 RtlDecompressFragment (
-    IN USHORT   CompressionFormat,
-    OUT PUCHAR  UncompressedFragment,
-    IN ULONG    UncompressedFragmentSize,
-    IN PUCHAR   CompressedBuffer,
-    IN ULONG    CompressedBufferSize,
-    IN ULONG    FragmentOffset,
-    OUT PULONG  FinalUncompressedSize,
-    IN PVOID    WorkSpace
+  /*IN*/ USHORT   CompressionFormat,
+  /*OUT*/ PUCHAR  UncompressedFragment,
+  /*IN*/ ULONG    UncompressedFragmentSize,
+  /*IN*/ PUCHAR   CompressedBuffer,
+  /*IN*/ ULONG    CompressedBufferSize,
+  /*IN*/ ULONG    FragmentOffset,
+  /*OUT*/ PULONG  FinalUncompressedSize,
+  /*IN*/ PVOID    WorkSpace
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 RtlDescribeChunk (
-    IN USHORT       CompressionFormat,
-    IN OUT PUCHAR   *CompressedBuffer,
-    IN PUCHAR       EndOfCompressedBufferPlus1,
-    OUT PUCHAR      *ChunkBuffer,
-    OUT PULONG      ChunkSize
+  /*IN*/ USHORT       CompressionFormat,
+  /*IN OUT*/ PUCHAR   *CompressedBuffer,
+  /*IN*/ PUCHAR       EndOfCompressedBufferPlus1,
+  /*OUT*/ PUCHAR      *ChunkBuffer,
+  /*OUT*/ PULONG      ChunkSize
 );
 
 NTSYSAPI
 BOOLEAN
 NTAPI
 RtlEqualSid (
-    IN PSID Sid1,
-    IN PSID Sid2
+  /*IN*/ PSID Sid1,
+  /*IN*/ PSID Sid2
 );
 
 NTSYSAPI
 VOID
 NTAPI
 RtlFillMemoryUlong (
-    IN PVOID    Destination,
-    IN ULONG    Length,
-    IN ULONG    Fill
+  /*IN*/ PVOID    Destination,
+  /*IN*/ ULONG    Length,
+  /*IN*/ ULONG    Fill
 );
 
 NTSYSAPI
 BOOLEAN
 NTAPI
 RtlFreeHeap (
-    IN HANDLE  HeapHandle,
-    IN ULONG   Flags,
-    IN PVOID   P
+  /*IN*/ HANDLE  HeapHandle,
+  /*IN*/ ULONG   Flags,
+  /*IN*/ PVOID   P
 );
 
 NTSYSAPI
 VOID
 NTAPI
 RtlGenerate8dot3Name (
-    IN PUNICODE_STRING              Name,
-    IN BOOLEAN                      AllowExtendedCharacters,
-    IN OUT PGENERATE_NAME_CONTEXT   Context,
-    OUT PUNICODE_STRING             Name8dot3
+  /*IN*/ PUNICODE_STRING              Name,
+  /*IN*/ BOOLEAN                      AllowExtendedCharacters,
+  /*IN OUT*/ PGENERATE_NAME_CONTEXT   Context,
+  /*OUT*/ PUNICODE_STRING             Name8dot3
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 RtlGetCompressionWorkSpaceSize (
-    IN USHORT   CompressionFormatAndEngine,
-    OUT PULONG  CompressBufferWorkSpaceSize,
-    OUT PULONG  CompressFragmentWorkSpaceSize
+  /*IN*/ USHORT   CompressionFormatAndEngine,
+  /*OUT*/ PULONG  CompressBufferWorkSpaceSize,
+  /*OUT*/ PULONG  CompressFragmentWorkSpaceSize
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 RtlGetDaclSecurityDescriptor (
-    IN PSECURITY_DESCRIPTOR SecurityDescriptor,
-    OUT PBOOLEAN            DaclPresent,
-    OUT PACL                *Dacl,
-    OUT PBOOLEAN            DaclDefaulted
+  /*IN*/ PSECURITY_DESCRIPTOR SecurityDescriptor,
+  /*OUT*/ PBOOLEAN            DaclPresent,
+  /*OUT*/ PACL                *Dacl,
+  /*OUT*/ PBOOLEAN            DaclDefaulted
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 RtlGetGroupSecurityDescriptor (
-    IN PSECURITY_DESCRIPTOR SecurityDescriptor,
-    OUT PSID                *Group,
-    OUT PBOOLEAN            GroupDefaulted
+  /*IN*/ PSECURITY_DESCRIPTOR SecurityDescriptor,
+  /*OUT*/ PSID                *Group,
+  /*OUT*/ PBOOLEAN            GroupDefaulted
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 RtlGetOwnerSecurityDescriptor (
-    IN PSECURITY_DESCRIPTOR SecurityDescriptor,
-    OUT PSID                *Owner,
-    OUT PBOOLEAN            OwnerDefaulted
+  /*IN*/ PSECURITY_DESCRIPTOR SecurityDescriptor,
+  /*OUT*/ PSID                *Owner,
+  /*OUT*/ PBOOLEAN            OwnerDefaulted
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 RtlInitializeSid (
-    IN OUT PSID                     Sid,
-    IN PSID_IDENTIFIER_AUTHORITY    IdentifierAuthority,
-    IN UCHAR                        SubAuthorityCount
+  /*IN OUT*/ PSID                     Sid,
+  /*IN*/ PSID_IDENTIFIER_AUTHORITY    IdentifierAuthority,
+  /*IN*/ UCHAR                        SubAuthorityCount
 );
 
 NTSYSAPI
 BOOLEAN
 NTAPI
 RtlIsNameLegalDOS8Dot3 (
-    IN PUNICODE_STRING UnicodeName,
-    IN PANSI_STRING    AnsiName,
+  /*IN*/ PUNICODE_STRING UnicodeName,
+  /*IN*/ PANSI_STRING    AnsiName,
     PBOOLEAN           Unknown
 );
 
@@ -3644,40 +3644,40 @@ NTSYSAPI
 ULONG
 NTAPI
 RtlLengthRequiredSid (
-    IN UCHAR SubAuthorityCount
+  /*IN*/ UCHAR SubAuthorityCount
 );
 
 NTSYSAPI
 ULONG
 NTAPI
 RtlLengthSid (
-    IN PSID Sid
+  /*IN*/ PSID Sid
 );
 
 NTSYSAPI
 ULONG
 NTAPI
 RtlNtStatusToDosError (
-    IN NTSTATUS Status
+  /*IN*/ NTSTATUS Status
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 RtlReserveChunk (
-    IN USHORT       CompressionFormat,
-    IN OUT PUCHAR   *CompressedBuffer,
-    IN PUCHAR       EndOfCompressedBufferPlus1,
-    OUT PUCHAR      *ChunkBuffer,
-    IN ULONG        ChunkSize
+  /*IN*/ USHORT       CompressionFormat,
+  /*IN OUT*/ PUCHAR   *CompressedBuffer,
+  /*IN*/ PUCHAR       EndOfCompressedBufferPlus1,
+  /*OUT*/ PUCHAR      *ChunkBuffer,
+  /*IN*/ ULONG        ChunkSize
 );
 
 NTSYSAPI
 VOID
 NTAPI
 RtlSecondsSince1970ToTime (
-    IN ULONG            SecondsSince1970,
-    OUT PLARGE_INTEGER  Time
+  /*IN*/ ULONG            SecondsSince1970,
+  /*OUT*/ PLARGE_INTEGER  Time
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -3686,17 +3686,17 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 RtlSelfRelativeToAbsoluteSD (
-    IN PSECURITY_DESCRIPTOR     SelfRelativeSD,
-    OUT PSECURITY_DESCRIPTOR    AbsoluteSD,
-    IN PULONG                   AbsoluteSDSize,
-    IN PACL                     Dacl,
-    IN PULONG                   DaclSize,
-    IN PACL                     Sacl,
-    IN PULONG                   SaclSize,
-    IN PSID                     Owner,
-    IN PULONG                   OwnerSize,
-    IN PSID                     PrimaryGroup,
-    IN PULONG                   PrimaryGroupSize
+  /*IN*/ PSECURITY_DESCRIPTOR     SelfRelativeSD,
+  /*OUT*/ PSECURITY_DESCRIPTOR    AbsoluteSD,
+  /*IN*/ PULONG                   AbsoluteSDSize,
+  /*IN*/ PACL                     Dacl,
+  /*IN*/ PULONG                   DaclSize,
+  /*IN*/ PACL                     Sacl,
+  /*IN*/ PULONG                   SaclSize,
+  /*IN*/ PSID                     Owner,
+  /*IN*/ PULONG                   OwnerSize,
+  /*IN*/ PSID                     PrimaryGroup,
+  /*IN*/ PULONG                   PrimaryGroupSize
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -3705,50 +3705,50 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 RtlSetGroupSecurityDescriptor (
-    IN OUT PSECURITY_DESCRIPTOR SecurityDescriptor,
-    IN PSID                     Group,
-    IN BOOLEAN                  GroupDefaulted
+  /*IN OUT*/ PSECURITY_DESCRIPTOR SecurityDescriptor,
+  /*IN*/ PSID                     Group,
+  /*IN*/ BOOLEAN                  GroupDefaulted
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 RtlSetOwnerSecurityDescriptor (
-    IN OUT PSECURITY_DESCRIPTOR SecurityDescriptor,
-    IN PSID                     Owner,
-    IN BOOLEAN                  OwnerDefaulted
+  /*IN OUT*/ PSECURITY_DESCRIPTOR SecurityDescriptor,
+  /*IN*/ PSID                     Owner,
+  /*IN*/ BOOLEAN                  OwnerDefaulted
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 RtlSetSaclSecurityDescriptor (
-    IN OUT PSECURITY_DESCRIPTOR SecurityDescriptor,
-    IN BOOLEAN                  SaclPresent,
-    IN PACL                     Sacl,
-    IN BOOLEAN                  SaclDefaulted
+  /*IN OUT*/ PSECURITY_DESCRIPTOR SecurityDescriptor,
+  /*IN*/ BOOLEAN                  SaclPresent,
+  /*IN*/ PACL                     Sacl,
+  /*IN*/ BOOLEAN                  SaclDefaulted
 );
 
 NTSYSAPI
 PUCHAR
 NTAPI
 RtlSubAuthorityCountSid (
-    IN PSID Sid
+  /*IN*/ PSID Sid
 );
 
 NTSYSAPI
 PULONG
 NTAPI
 RtlSubAuthoritySid (
-    IN PSID    Sid,
-    IN ULONG   SubAuthority
+  /*IN*/ PSID    Sid,
+  /*IN*/ ULONG   SubAuthority
 );
 
 NTSYSAPI
 BOOLEAN
 NTAPI
 RtlValidSid (
-    IN PSID Sid
+  /*IN*/ PSID Sid
 );
 
 NTKERNELAPI
@@ -3763,44 +3763,44 @@ NTKERNELAPI
 BOOLEAN
 NTAPI
 SeAuditingFileEvents (
-    IN BOOLEAN              AccessGranted,
-    IN PSECURITY_DESCRIPTOR SecurityDescriptor
+  /*IN*/ BOOLEAN              AccessGranted,
+  /*IN*/ PSECURITY_DESCRIPTOR SecurityDescriptor
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 SeAuditingFileOrGlobalEvents (
-    IN BOOLEAN                      AccessGranted,
-    IN PSECURITY_DESCRIPTOR         SecurityDescriptor,
-    IN PSECURITY_SUBJECT_CONTEXT    SubjectContext
+  /*IN*/ BOOLEAN                      AccessGranted,
+  /*IN*/ PSECURITY_DESCRIPTOR         SecurityDescriptor,
+  /*IN*/ PSECURITY_SUBJECT_CONTEXT    SubjectContext
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 SeCaptureSubjectContext (
-    OUT PSECURITY_SUBJECT_CONTEXT SubjectContext
+  /*OUT*/ PSECURITY_SUBJECT_CONTEXT SubjectContext
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 SeCreateAccessState (
-    OUT PACCESS_STATE   AccessState,
-    IN PVOID            AuxData,
-    IN ACCESS_MASK      AccessMask,
-    IN PGENERIC_MAPPING Mapping
+  /*OUT*/ PACCESS_STATE   AccessState,
+  /*IN*/ PVOID            AuxData,
+  /*IN*/ ACCESS_MASK      AccessMask,
+  /*IN*/ PGENERIC_MAPPING Mapping
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 SeCreateClientSecurity (
-    IN PETHREAD                     Thread,
-    IN PSECURITY_QUALITY_OF_SERVICE QualityOfService,
-    IN BOOLEAN                      RemoteClient,
-    OUT PSECURITY_CLIENT_CONTEXT    ClientContext
+  /*IN*/ PETHREAD                     Thread,
+  /*IN*/ PSECURITY_QUALITY_OF_SERVICE QualityOfService,
+  /*IN*/ BOOLEAN                      RemoteClient,
+  /*OUT*/ PSECURITY_CLIENT_CONTEXT    ClientContext
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -3809,10 +3809,10 @@ NTKERNELAPI
 NTSTATUS
 NTAPI
 SeCreateClientSecurityFromSubjectContext (
-    IN PSECURITY_SUBJECT_CONTEXT    SubjectContext,
-    IN PSECURITY_QUALITY_OF_SERVICE QualityOfService,
-    IN BOOLEAN                      ServerIsRemote,
-    OUT PSECURITY_CLIENT_CONTEXT    ClientContext
+  /*IN*/ PSECURITY_SUBJECT_CONTEXT    SubjectContext,
+  /*IN*/ PSECURITY_QUALITY_OF_SERVICE QualityOfService,
+  /*IN*/ BOOLEAN                      ServerIsRemote,
+  /*OUT*/ PSECURITY_CLIENT_CONTEXT    ClientContext
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -3829,8 +3829,8 @@ NTKERNELAPI
 VOID
 NTAPI
 SeDeleteObjectAuditAlarm (
-    IN PVOID    Object,
-    IN HANDLE   Handle
+  /*IN*/ PVOID    Object,
+  /*IN*/ HANDLE   Handle
 );
 
 #define SeEnableAccessToExports() SeExports = *(PSE_EXPORTS *)SeExports;
@@ -3839,15 +3839,15 @@ NTKERNELAPI
 VOID
 NTAPI
 SeFreePrivileges (
-    IN PPRIVILEGE_SET Privileges
+  /*IN*/ PPRIVILEGE_SET Privileges
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 SeImpersonateClient (
-    IN PSECURITY_CLIENT_CONTEXT ClientContext,
-    IN PETHREAD                 ServerThread OPTIONAL
+  /*IN*/ PSECURITY_CLIENT_CONTEXT ClientContext,
+  /*IN*/ PETHREAD                 ServerThread /*OPTIONAL*/
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -3856,8 +3856,8 @@ NTKERNELAPI
 NTSTATUS
 NTAPI
 SeImpersonateClientEx (
-    IN PSECURITY_CLIENT_CONTEXT ClientContext,
-    IN PETHREAD                 ServerThread OPTIONAL
+  /*IN*/ PSECURITY_CLIENT_CONTEXT ClientContext,
+  /*IN*/ PETHREAD                 ServerThread /*OPTIONAL*/
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -3866,61 +3866,61 @@ NTKERNELAPI
 VOID
 NTAPI
 SeLockSubjectContext (
-    IN PSECURITY_SUBJECT_CONTEXT SubjectContext
+  /*IN*/ PSECURITY_SUBJECT_CONTEXT SubjectContext
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 SeMarkLogonSessionForTerminationNotification (
-    IN PLUID LogonId
+  /*IN*/ PLUID LogonId
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 SeOpenObjectAuditAlarm (
-    IN PUNICODE_STRING      ObjectTypeName,
-    IN PVOID                Object OPTIONAL,
-    IN PUNICODE_STRING      AbsoluteObjectName OPTIONAL,
-    IN PSECURITY_DESCRIPTOR SecurityDescriptor,
-    IN PACCESS_STATE        AccessState,
-    IN BOOLEAN              ObjectCreated,
-    IN BOOLEAN              AccessGranted,
-    IN KPROCESSOR_MODE      AccessMode,
-    OUT PBOOLEAN            GenerateOnClose
+  /*IN*/ PUNICODE_STRING      ObjectTypeName,
+  /*IN*/ PVOID                Object /*OPTIONAL*/,
+  /*IN*/ PUNICODE_STRING      AbsoluteObjectName /*OPTIONAL*/,
+  /*IN*/ PSECURITY_DESCRIPTOR SecurityDescriptor,
+  /*IN*/ PACCESS_STATE        AccessState,
+  /*IN*/ BOOLEAN              ObjectCreated,
+  /*IN*/ BOOLEAN              AccessGranted,
+  /*IN*/ KPROCESSOR_MODE      AccessMode,
+  /*OUT*/ PBOOLEAN            GenerateOnClose
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 SeOpenObjectForDeleteAuditAlarm (
-    IN PUNICODE_STRING      ObjectTypeName,
-    IN PVOID                Object OPTIONAL,
-    IN PUNICODE_STRING      AbsoluteObjectName OPTIONAL,
-    IN PSECURITY_DESCRIPTOR SecurityDescriptor,
-    IN PACCESS_STATE        AccessState,
-    IN BOOLEAN              ObjectCreated,
-    IN BOOLEAN              AccessGranted,
-    IN KPROCESSOR_MODE      AccessMode,
-    OUT PBOOLEAN            GenerateOnClose
+  /*IN*/ PUNICODE_STRING      ObjectTypeName,
+  /*IN*/ PVOID                Object /*OPTIONAL*/,
+  /*IN*/ PUNICODE_STRING      AbsoluteObjectName /*OPTIONAL*/,
+  /*IN*/ PSECURITY_DESCRIPTOR SecurityDescriptor,
+  /*IN*/ PACCESS_STATE        AccessState,
+  /*IN*/ BOOLEAN              ObjectCreated,
+  /*IN*/ BOOLEAN              AccessGranted,
+  /*IN*/ KPROCESSOR_MODE      AccessMode,
+  /*OUT*/ PBOOLEAN            GenerateOnClose
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 SePrivilegeCheck (
-    IN OUT PPRIVILEGE_SET           RequiredPrivileges,
-    IN PSECURITY_SUBJECT_CONTEXT    SubjectContext,
-    IN KPROCESSOR_MODE              AccessMode
+  /*IN OUT*/ PPRIVILEGE_SET           RequiredPrivileges,
+  /*IN*/ PSECURITY_SUBJECT_CONTEXT    SubjectContext,
+  /*IN*/ KPROCESSOR_MODE              AccessMode
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 SeQueryAuthenticationIdToken (
-    IN PACCESS_TOKEN    Token,
-    OUT PLUID           LogonId
+  /*IN*/ PACCESS_TOKEN    Token,
+  /*OUT*/ PLUID           LogonId
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -3929,9 +3929,9 @@ NTKERNELAPI
 NTSTATUS
 NTAPI
 SeQueryInformationToken (
-    IN PACCESS_TOKEN           Token,
-    IN TOKEN_INFORMATION_CLASS TokenInformationClass,
-    OUT PVOID                  *TokenInformation
+  /*IN*/ PACCESS_TOKEN           Token,
+  /*IN*/ TOKEN_INFORMATION_CLASS TokenInformationClass,
+  /*OUT*/ PVOID                  *TokenInformation
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -3940,10 +3940,10 @@ NTKERNELAPI
 NTSTATUS
 NTAPI
 SeQuerySecurityDescriptorInfo (
-    IN PSECURITY_INFORMATION    SecurityInformation,
-    OUT PSECURITY_DESCRIPTOR    SecurityDescriptor,
-    IN OUT PULONG               Length,
-    IN PSECURITY_DESCRIPTOR     *ObjectsSecurityDescriptor
+  /*IN*/ PSECURITY_INFORMATION    SecurityInformation,
+  /*OUT*/ PSECURITY_DESCRIPTOR    SecurityDescriptor,
+  /*IN OUT*/ PULONG               Length,
+  /*IN*/ PSECURITY_DESCRIPTOR     *ObjectsSecurityDescriptor
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -3952,8 +3952,8 @@ NTKERNELAPI
 NTSTATUS
 NTAPI
 SeQuerySessionIdToken (
-    IN PACCESS_TOKEN    Token,
-    IN PULONG           SessionId
+  /*IN*/ PACCESS_TOKEN    Token,
+  /*IN*/ PULONG           SessionId
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -3966,21 +3966,21 @@ SeQuerySessionIdToken (
     ((PSECURITY_SUBJECT_CONTEXT) SubjectContext)->PrimaryToken )
 
 typedef NTSTATUS (*PSE_LOGON_SESSION_TERMINATED_ROUTINE) (
-    IN PLUID LogonId
+  /*IN*/ PLUID LogonId
 );
 
 NTKERNELAPI
 NTSTATUS
 NTAPI
 SeRegisterLogonSessionTerminatedRoutine (
-    IN PSE_LOGON_SESSION_TERMINATED_ROUTINE CallbackRoutine
+  /*IN*/ PSE_LOGON_SESSION_TERMINATED_ROUTINE CallbackRoutine
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 SeReleaseSubjectContext (
-    IN PSECURITY_SUBJECT_CONTEXT SubjectContext
+  /*IN*/ PSECURITY_SUBJECT_CONTEXT SubjectContext
 );
 
 NTKERNELAPI
@@ -3995,12 +3995,12 @@ NTKERNELAPI
 NTSTATUS
 NTAPI
 SeSetSecurityDescriptorInfo (
-    IN PVOID                    Object OPTIONAL,
-    IN PSECURITY_INFORMATION    SecurityInformation,
-    IN PSECURITY_DESCRIPTOR     SecurityDescriptor,
-    IN OUT PSECURITY_DESCRIPTOR *ObjectsSecurityDescriptor,
-    IN POOL_TYPE                PoolType,
-    IN PGENERIC_MAPPING         GenericMapping
+  /*IN*/ PVOID                    Object /*OPTIONAL*/,
+  /*IN*/ PSECURITY_INFORMATION    SecurityInformation,
+  /*IN*/ PSECURITY_DESCRIPTOR     SecurityDescriptor,
+  /*IN OUT*/ PSECURITY_DESCRIPTOR *ObjectsSecurityDescriptor,
+  /*IN*/ POOL_TYPE                PoolType,
+  /*IN*/ PGENERIC_MAPPING         GenericMapping
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -4009,27 +4009,27 @@ NTKERNELAPI
 NTSTATUS
 NTAPI
 SeSetSecurityDescriptorInfoEx (
-    IN PVOID                    Object OPTIONAL,
-    IN PSECURITY_INFORMATION    SecurityInformation,
-    IN PSECURITY_DESCRIPTOR     ModificationDescriptor,
-    IN OUT PSECURITY_DESCRIPTOR *ObjectsSecurityDescriptor,
-    IN ULONG                    AutoInheritFlags,
-    IN POOL_TYPE                PoolType,
-    IN PGENERIC_MAPPING         GenericMapping
+  /*IN*/ PVOID                    Object /*OPTIONAL*/,
+  /*IN*/ PSECURITY_INFORMATION    SecurityInformation,
+  /*IN*/ PSECURITY_DESCRIPTOR     ModificationDescriptor,
+  /*IN OUT*/ PSECURITY_DESCRIPTOR *ObjectsSecurityDescriptor,
+  /*IN*/ ULONG                    AutoInheritFlags,
+  /*IN*/ POOL_TYPE                PoolType,
+  /*IN*/ PGENERIC_MAPPING         GenericMapping
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 SeTokenIsAdmin (
-    IN PACCESS_TOKEN Token
+  /*IN*/ PACCESS_TOKEN Token
 );
 
 NTKERNELAPI
 BOOLEAN
 NTAPI
 SeTokenIsRestricted (
-    IN PACCESS_TOKEN Token
+  /*IN*/ PACCESS_TOKEN Token
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -4038,20 +4038,20 @@ NTKERNELAPI
 TOKEN_TYPE
 NTAPI
 SeTokenType (
-    IN PACCESS_TOKEN Token
+  /*IN*/ PACCESS_TOKEN Token
 );
 
 NTKERNELAPI
 VOID
 NTAPI
 SeUnlockSubjectContext (
-    IN PSECURITY_SUBJECT_CONTEXT SubjectContext
+  /*IN*/ PSECURITY_SUBJECT_CONTEXT SubjectContext
 );
 
 NTKERNELAPI
 NTSTATUS
 SeUnregisterLogonSessionTerminatedRoutine (
-    IN PSE_LOGON_SESSION_TERMINATED_ROUTINE CallbackRoutine
+  /*IN*/ PSE_LOGON_SESSION_TERMINATED_ROUTINE CallbackRoutine
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -4060,12 +4060,12 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 ZwAdjustPrivilegesToken (
-    IN HANDLE               TokenHandle,
-    IN BOOLEAN              DisableAllPrivileges,
-    IN PTOKEN_PRIVILEGES    NewState,
-    IN ULONG                BufferLength,
-    OUT PTOKEN_PRIVILEGES   PreviousState OPTIONAL,
-    OUT PULONG              ReturnLength
+  /*IN*/ HANDLE               TokenHandle,
+  /*IN*/ BOOLEAN              DisableAllPrivileges,
+  /*IN*/ PTOKEN_PRIVILEGES    NewState,
+  /*IN*/ ULONG                BufferLength,
+  /*OUT*/ PTOKEN_PRIVILEGES   PreviousState /*OPTIONAL*/,
+  /*OUT*/ PULONG              ReturnLength
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -4074,36 +4074,36 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 ZwAlertThread (
-    IN HANDLE ThreadHandle
+  /*IN*/ HANDLE ThreadHandle
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwAllocateVirtualMemory (
-    IN HANDLE       ProcessHandle,
-    IN OUT PVOID    *BaseAddress,
-    IN ULONG        ZeroBits,
-    IN OUT PULONG   RegionSize,
-    IN ULONG        AllocationType,
-    IN ULONG        Protect
+  /*IN*/ HANDLE       ProcessHandle,
+  /*IN OUT*/ PVOID    *BaseAddress,
+  /*IN*/ ULONG        ZeroBits,
+  /*IN OUT*/ PULONG   RegionSize,
+  /*IN*/ ULONG        AllocationType,
+  /*IN*/ ULONG        Protect
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwAccessCheckAndAuditAlarm (
-    IN PUNICODE_STRING      SubsystemName,
-    IN PVOID                HandleId,
-    IN PUNICODE_STRING      ObjectTypeName,
-    IN PUNICODE_STRING      ObjectName,
-    IN PSECURITY_DESCRIPTOR SecurityDescriptor,
-    IN ACCESS_MASK          DesiredAccess,
-    IN PGENERIC_MAPPING     GenericMapping,
-    IN BOOLEAN              ObjectCreation,
-    OUT PACCESS_MASK        GrantedAccess,
-    OUT PBOOLEAN            AccessStatus,
-    OUT PBOOLEAN            GenerateOnClose
+  /*IN*/ PUNICODE_STRING      SubsystemName,
+  /*IN*/ PVOID                HandleId,
+  /*IN*/ PUNICODE_STRING      ObjectTypeName,
+  /*IN*/ PUNICODE_STRING      ObjectName,
+  /*IN*/ PSECURITY_DESCRIPTOR SecurityDescriptor,
+  /*IN*/ ACCESS_MASK          DesiredAccess,
+  /*IN*/ PGENERIC_MAPPING     GenericMapping,
+  /*IN*/ BOOLEAN              ObjectCreation,
+  /*OUT*/ PACCESS_MASK        GrantedAccess,
+  /*OUT*/ PBOOLEAN            AccessStatus,
+  /*OUT*/ PBOOLEAN            GenerateOnClose
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -4112,8 +4112,8 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 ZwCancelIoFile (
-    IN HANDLE               FileHandle,
-    OUT PIO_STATUS_BLOCK    IoStatusBlock
+  /*IN*/ HANDLE               FileHandle,
+  /*OUT*/ PIO_STATUS_BLOCK    IoStatusBlock
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -4122,111 +4122,111 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 ZwClearEvent (
-    IN HANDLE EventHandle
+  /*IN*/ HANDLE EventHandle
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwCloseObjectAuditAlarm (
-    IN PUNICODE_STRING  SubsystemName,
-    IN PVOID            HandleId,
-    IN BOOLEAN          GenerateOnClose
+  /*IN*/ PUNICODE_STRING  SubsystemName,
+  /*IN*/ PVOID            HandleId,
+  /*IN*/ BOOLEAN          GenerateOnClose
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwCreateSection (
-    OUT PHANDLE             SectionHandle,
-    IN ACCESS_MASK          DesiredAccess,
-    IN POBJECT_ATTRIBUTES   ObjectAttributes OPTIONAL,
-    IN PLARGE_INTEGER       MaximumSize OPTIONAL,
-    IN ULONG                SectionPageProtection,
-    IN ULONG                AllocationAttributes,
-    IN HANDLE               FileHandle OPTIONAL
+  /*OUT*/ PHANDLE             SectionHandle,
+  /*IN*/ ACCESS_MASK          DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES   ObjectAttributes /*OPTIONAL*/,
+  /*IN*/ PLARGE_INTEGER       MaximumSize /*OPTIONAL*/,
+  /*IN*/ ULONG                SectionPageProtection,
+  /*IN*/ ULONG                AllocationAttributes,
+  /*IN*/ HANDLE               FileHandle /*OPTIONAL*/
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwCreateSymbolicLinkObject (
-    OUT PHANDLE             SymbolicLinkHandle,
-    IN ACCESS_MASK          DesiredAccess,
-    IN POBJECT_ATTRIBUTES   ObjectAttributes,
-    IN PUNICODE_STRING      TargetName
+  /*OUT*/ PHANDLE             SymbolicLinkHandle,
+  /*IN*/ ACCESS_MASK          DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES   ObjectAttributes,
+  /*IN*/ PUNICODE_STRING      TargetName
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwDeleteFile (
-    IN POBJECT_ATTRIBUTES ObjectAttributes
+  /*IN*/ POBJECT_ATTRIBUTES ObjectAttributes
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwDeleteValueKey (
-    IN HANDLE           Handle,
-    IN PUNICODE_STRING  Name
+  /*IN*/ HANDLE           Handle,
+  /*IN*/ PUNICODE_STRING  Name
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwDeviceIoControlFile (
-    IN HANDLE               FileHandle,
-    IN HANDLE               Event OPTIONAL,
-    IN PIO_APC_ROUTINE      ApcRoutine OPTIONAL,
-    IN PVOID                ApcContext OPTIONAL,
-    OUT PIO_STATUS_BLOCK    IoStatusBlock,
-    IN ULONG                IoControlCode,
-    IN PVOID                InputBuffer OPTIONAL,
-    IN ULONG                InputBufferLength,
-    OUT PVOID               OutputBuffer OPTIONAL,
-    IN ULONG                OutputBufferLength
+  /*IN*/ HANDLE               FileHandle,
+  /*IN*/ HANDLE               Event /*OPTIONAL*/,
+  /*IN*/ PIO_APC_ROUTINE      ApcRoutine /*OPTIONAL*/,
+  /*IN*/ PVOID                ApcContext /*OPTIONAL*/,
+  /*OUT*/ PIO_STATUS_BLOCK    IoStatusBlock,
+  /*IN*/ ULONG                IoControlCode,
+  /*IN*/ PVOID                InputBuffer /*OPTIONAL*/,
+  /*IN*/ ULONG                InputBufferLength,
+  /*OUT*/ PVOID               OutputBuffer /*OPTIONAL*/,
+  /*IN*/ ULONG                OutputBufferLength
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwDisplayString (
-    IN PUNICODE_STRING String
+  /*IN*/ PUNICODE_STRING String
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwDuplicateObject (
-    IN HANDLE       SourceProcessHandle,
-    IN HANDLE       SourceHandle,
-    IN HANDLE       TargetProcessHandle OPTIONAL,
-    OUT PHANDLE     TargetHandle OPTIONAL,
-    IN ACCESS_MASK  DesiredAccess,
-    IN ULONG        HandleAttributes,
-    IN ULONG        Options
+  /*IN*/ HANDLE       SourceProcessHandle,
+  /*IN*/ HANDLE       SourceHandle,
+  /*IN*/ HANDLE       TargetProcessHandle /*OPTIONAL*/,
+  /*OUT*/ PHANDLE     TargetHandle /*OPTIONAL*/,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ ULONG        HandleAttributes,
+  /*IN*/ ULONG        Options
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwDuplicateToken (
-    IN HANDLE               ExistingTokenHandle,
-    IN ACCESS_MASK          DesiredAccess,
-    IN POBJECT_ATTRIBUTES   ObjectAttributes,
-    IN BOOLEAN              EffectiveOnly,
-    IN TOKEN_TYPE           TokenType,
-    OUT PHANDLE             NewTokenHandle
+  /*IN*/ HANDLE               ExistingTokenHandle,
+  /*IN*/ ACCESS_MASK          DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES   ObjectAttributes,
+  /*IN*/ BOOLEAN              EffectiveOnly,
+  /*IN*/ TOKEN_TYPE           TokenType,
+  /*OUT*/ PHANDLE             NewTokenHandle
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwFlushInstructionCache (
-    IN HANDLE   ProcessHandle,
-    IN PVOID    BaseAddress OPTIONAL,
-    IN ULONG    FlushSize
+  /*IN*/ HANDLE   ProcessHandle,
+  /*IN*/ PVOID    BaseAddress /*OPTIONAL*/,
+  /*IN*/ ULONG    FlushSize
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -4235,10 +4235,10 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 ZwFlushVirtualMemory (
-    IN HANDLE               ProcessHandle,
-    IN OUT PVOID            *BaseAddress,
-    IN OUT PULONG           FlushSize,
-    OUT PIO_STATUS_BLOCK    IoStatusBlock
+  /*IN*/ HANDLE               ProcessHandle,
+  /*IN OUT*/ PVOID            *BaseAddress,
+  /*IN OUT*/ PULONG           FlushSize,
+  /*OUT*/ PIO_STATUS_BLOCK    IoStatusBlock
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -4247,26 +4247,26 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 ZwFreeVirtualMemory (
-    IN HANDLE       ProcessHandle,
-    IN OUT PVOID    *BaseAddress,
-    IN OUT PULONG   RegionSize,
-    IN ULONG        FreeType
+  /*IN*/ HANDLE       ProcessHandle,
+  /*IN OUT*/ PVOID    *BaseAddress,
+  /*IN OUT*/ PULONG   RegionSize,
+  /*IN*/ ULONG        FreeType
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwFsControlFile (
-    IN HANDLE               FileHandle,
-    IN HANDLE               Event OPTIONAL,
-    IN PIO_APC_ROUTINE      ApcRoutine OPTIONAL,
-    IN PVOID                ApcContext OPTIONAL,
-    OUT PIO_STATUS_BLOCK    IoStatusBlock,
-    IN ULONG                FsControlCode,
-    IN PVOID                InputBuffer OPTIONAL,
-    IN ULONG                InputBufferLength,
-    OUT PVOID               OutputBuffer OPTIONAL,
-    IN ULONG                OutputBufferLength
+  /*IN*/ HANDLE               FileHandle,
+  /*IN*/ HANDLE               Event /*OPTIONAL*/,
+  /*IN*/ PIO_APC_ROUTINE      ApcRoutine /*OPTIONAL*/,
+  /*IN*/ PVOID                ApcContext /*OPTIONAL*/,
+  /*OUT*/ PIO_STATUS_BLOCK    IoStatusBlock,
+  /*IN*/ ULONG                FsControlCode,
+  /*IN*/ PVOID                InputBuffer /*OPTIONAL*/,
+  /*IN*/ ULONG                InputBufferLength,
+  /*OUT*/ PVOID               OutputBuffer /*OPTIONAL*/,
+  /*IN*/ ULONG                OutputBufferLength
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -4275,10 +4275,10 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 ZwInitiatePowerAction (
-    IN POWER_ACTION         SystemAction,
-    IN SYSTEM_POWER_STATE   MinSystemState,
-    IN ULONG                Flags,
-    IN BOOLEAN              Asynchronous
+  /*IN*/ POWER_ACTION         SystemAction,
+  /*IN*/ SYSTEM_POWER_STATE   MinSystemState,
+  /*IN*/ ULONG                Flags,
+  /*IN*/ BOOLEAN              Asynchronous
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -4288,88 +4288,88 @@ NTSTATUS
 NTAPI
 ZwLoadDriver (
     /* "\\Registry\\Machine\\System\\CurrentControlSet\\Services\\<DriverName>" */
-    IN PUNICODE_STRING RegistryPath
+  /*IN*/ PUNICODE_STRING RegistryPath
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwLoadKey (
-    IN POBJECT_ATTRIBUTES KeyObjectAttributes,
-    IN POBJECT_ATTRIBUTES FileObjectAttributes
+  /*IN*/ POBJECT_ATTRIBUTES KeyObjectAttributes,
+  /*IN*/ POBJECT_ATTRIBUTES FileObjectAttributes
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwNotifyChangeKey (
-    IN HANDLE               KeyHandle,
-    IN HANDLE               EventHandle OPTIONAL,
-    IN PIO_APC_ROUTINE      ApcRoutine OPTIONAL,
-    IN PVOID                ApcContext OPTIONAL,
-    OUT PIO_STATUS_BLOCK    IoStatusBlock,
-    IN ULONG                NotifyFilter,
-    IN BOOLEAN              WatchSubtree,
-    IN PVOID                Buffer,
-    IN ULONG                BufferLength,
-    IN BOOLEAN              Asynchronous
+  /*IN*/ HANDLE               KeyHandle,
+  /*IN*/ HANDLE               EventHandle /*OPTIONAL*/,
+  /*IN*/ PIO_APC_ROUTINE      ApcRoutine /*OPTIONAL*/,
+  /*IN*/ PVOID                ApcContext /*OPTIONAL*/,
+  /*OUT*/ PIO_STATUS_BLOCK    IoStatusBlock,
+  /*IN*/ ULONG                NotifyFilter,
+  /*IN*/ BOOLEAN              WatchSubtree,
+  /*IN*/ PVOID                Buffer,
+  /*IN*/ ULONG                BufferLength,
+  /*IN*/ BOOLEAN              Asynchronous
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwOpenDirectoryObject (
-    OUT PHANDLE             DirectoryHandle,
-    IN ACCESS_MASK          DesiredAccess,
-    IN POBJECT_ATTRIBUTES   ObjectAttributes
+  /*OUT*/ PHANDLE             DirectoryHandle,
+  /*IN*/ ACCESS_MASK          DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES   ObjectAttributes
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwOpenEvent (
-    OUT PHANDLE             EventHandle,
-    IN ACCESS_MASK          DesiredAccess,
-    IN POBJECT_ATTRIBUTES   ObjectAttributes
+  /*OUT*/ PHANDLE             EventHandle,
+  /*IN*/ ACCESS_MASK          DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES   ObjectAttributes
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwOpenProcess (
-    OUT PHANDLE             ProcessHandle,
-    IN ACCESS_MASK          DesiredAccess,
-    IN POBJECT_ATTRIBUTES   ObjectAttributes,
-    IN PCLIENT_ID           ClientId OPTIONAL
+  /*OUT*/ PHANDLE             ProcessHandle,
+  /*IN*/ ACCESS_MASK          DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES   ObjectAttributes,
+  /*IN*/ PCLIENT_ID           ClientId /*OPTIONAL*/
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwOpenProcessToken (
-    IN HANDLE       ProcessHandle,
-    IN ACCESS_MASK  DesiredAccess,
-    OUT PHANDLE     TokenHandle
+  /*IN*/ HANDLE       ProcessHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*OUT*/ PHANDLE     TokenHandle
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwOpenThread (
-    OUT PHANDLE             ThreadHandle,
-    IN ACCESS_MASK          DesiredAccess,
-    IN POBJECT_ATTRIBUTES   ObjectAttributes,
-    IN PCLIENT_ID           ClientId
+  /*OUT*/ PHANDLE             ThreadHandle,
+  /*IN*/ ACCESS_MASK          DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES   ObjectAttributes,
+  /*IN*/ PCLIENT_ID           ClientId
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwOpenThreadToken (
-    IN HANDLE       ThreadHandle,
-    IN ACCESS_MASK  DesiredAccess,
-    IN BOOLEAN      OpenAsSelf,
-    OUT PHANDLE     TokenHandle
+  /*IN*/ HANDLE       ThreadHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ BOOLEAN      OpenAsSelf,
+  /*OUT*/ PHANDLE     TokenHandle
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -4378,11 +4378,11 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 ZwPowerInformation (
-    IN POWER_INFORMATION_LEVEL  PowerInformationLevel,
-    IN PVOID                    InputBuffer OPTIONAL,
-    IN ULONG                    InputBufferLength,
-    OUT PVOID                   OutputBuffer OPTIONAL,
-    IN ULONG                    OutputBufferLength
+  /*IN*/ POWER_INFORMATION_LEVEL  PowerInformationLevel,
+  /*IN*/ PVOID                    InputBuffer /*OPTIONAL*/,
+  /*IN*/ ULONG                    InputBufferLength,
+  /*OUT*/ PVOID                   OutputBuffer /*OPTIONAL*/,
+  /*IN*/ ULONG                    OutputBufferLength
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -4391,33 +4391,33 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 ZwPulseEvent (
-    IN HANDLE   EventHandle,
-    OUT PULONG  PreviousState OPTIONAL
+  /*IN*/ HANDLE   EventHandle,
+  /*OUT*/ PULONG  PreviousState /*OPTIONAL*/
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwQueryDefaultLocale (
-    IN BOOLEAN  ThreadOrSystem,
-    OUT PLCID   Locale
+  /*IN*/ BOOLEAN  ThreadOrSystem,
+  /*OUT*/ PLCID   Locale
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwQueryDirectoryFile (
-    IN HANDLE                   FileHandle,
-    IN HANDLE                   Event OPTIONAL,
-    IN PIO_APC_ROUTINE          ApcRoutine OPTIONAL,
-    IN PVOID                    ApcContext OPTIONAL,
-    OUT PIO_STATUS_BLOCK        IoStatusBlock,
-    OUT PVOID                   FileInformation,
-    IN ULONG                    Length,
-    IN FILE_INFORMATION_CLASS   FileInformationClass,
-    IN BOOLEAN                  ReturnSingleEntry,
-    IN PUNICODE_STRING          FileName OPTIONAL,
-    IN BOOLEAN                  RestartScan
+  /*IN*/ HANDLE                   FileHandle,
+  /*IN*/ HANDLE                   Event /*OPTIONAL*/,
+  /*IN*/ PIO_APC_ROUTINE          ApcRoutine /*OPTIONAL*/,
+  /*IN*/ PVOID                    ApcContext /*OPTIONAL*/,
+  /*OUT*/ PIO_STATUS_BLOCK        IoStatusBlock,
+  /*OUT*/ PVOID                   FileInformation,
+  /*IN*/ ULONG                    Length,
+  /*IN*/ FILE_INFORMATION_CLASS   FileInformationClass,
+  /*IN*/ BOOLEAN                  ReturnSingleEntry,
+  /*IN*/ PUNICODE_STRING          FileName /*OPTIONAL*/,
+  /*IN*/ BOOLEAN                  RestartScan
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -4426,28 +4426,28 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 ZwQueryDirectoryObject (
-    IN HANDLE       DirectoryHandle,
-    OUT PVOID       Buffer,
-    IN ULONG        Length,
-    IN BOOLEAN      ReturnSingleEntry,
-    IN BOOLEAN      RestartScan,
-    IN OUT PULONG   Context,
-    OUT PULONG      ReturnLength OPTIONAL
+  /*IN*/ HANDLE       DirectoryHandle,
+  /*OUT*/ PVOID       Buffer,
+  /*IN*/ ULONG        Length,
+  /*IN*/ BOOLEAN      ReturnSingleEntry,
+  /*IN*/ BOOLEAN      RestartScan,
+  /*IN OUT*/ PULONG   Context,
+  /*OUT*/ PULONG      ReturnLength /*OPTIONAL*/
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwQueryEaFile (
-    IN HANDLE               FileHandle,
-    OUT PIO_STATUS_BLOCK    IoStatusBlock,
-    OUT PVOID               Buffer,
-    IN ULONG                Length,
-    IN BOOLEAN              ReturnSingleEntry,
-    IN PVOID                EaList OPTIONAL,
-    IN ULONG                EaListLength,
-    IN PULONG               EaIndex OPTIONAL,
-    IN BOOLEAN              RestartScan
+  /*IN*/ HANDLE               FileHandle,
+  /*OUT*/ PIO_STATUS_BLOCK    IoStatusBlock,
+  /*OUT*/ PVOID               Buffer,
+  /*IN*/ ULONG                Length,
+  /*IN*/ BOOLEAN              ReturnSingleEntry,
+  /*IN*/ PVOID                EaList /*OPTIONAL*/,
+  /*IN*/ ULONG                EaListLength,
+  /*IN*/ PULONG               EaIndex /*OPTIONAL*/,
+  /*IN*/ BOOLEAN              RestartScan
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -4456,93 +4456,93 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 ZwQueryInformationProcess (
-    IN HANDLE           ProcessHandle,
-    IN PROCESSINFOCLASS ProcessInformationClass,
-    OUT PVOID           ProcessInformation,
-    IN ULONG            ProcessInformationLength,
-    OUT PULONG          ReturnLength OPTIONAL
+  /*IN*/ HANDLE           ProcessHandle,
+  /*IN*/ PROCESSINFOCLASS ProcessInformationClass,
+  /*OUT*/ PVOID           ProcessInformation,
+  /*IN*/ ULONG            ProcessInformationLength,
+  /*OUT*/ PULONG          ReturnLength /*OPTIONAL*/
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwQueryInformationToken (
-    IN HANDLE                   TokenHandle,
-    IN TOKEN_INFORMATION_CLASS  TokenInformationClass,
-    OUT PVOID                   TokenInformation,
-    IN ULONG                    Length,
-    OUT PULONG                  ResultLength
+  /*IN*/ HANDLE                   TokenHandle,
+  /*IN*/ TOKEN_INFORMATION_CLASS  TokenInformationClass,
+  /*OUT*/ PVOID                   TokenInformation,
+  /*IN*/ ULONG                    Length,
+  /*OUT*/ PULONG                  ResultLength
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwQueryObject (
-    IN HANDLE                      ObjectHandle,
-    IN OBJECT_INFORMATION_CLASS    ObjectInformationClass,
-    OUT PVOID                      ObjectInformation,
-    IN ULONG                       Length,
-    OUT PULONG                     ResultLength
+  /*IN*/ HANDLE                      ObjectHandle,
+  /*IN*/ OBJECT_INFORMATION_CLASS    ObjectInformationClass,
+  /*OUT*/ PVOID                      ObjectInformation,
+  /*IN*/ ULONG                       Length,
+  /*OUT*/ PULONG                     ResultLength
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwQuerySection (
-    IN HANDLE                       SectionHandle,
-    IN SECTION_INFORMATION_CLASS    SectionInformationClass,
-    OUT PVOID                       SectionInformation,
-    IN ULONG                        SectionInformationLength,
-    OUT PULONG                      ResultLength OPTIONAL
+  /*IN*/ HANDLE                       SectionHandle,
+  /*IN*/ SECTION_INFORMATION_CLASS    SectionInformationClass,
+  /*OUT*/ PVOID                       SectionInformation,
+  /*IN*/ ULONG                        SectionInformationLength,
+  /*OUT*/ PULONG                      ResultLength /*OPTIONAL*/
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwQuerySecurityObject (
-    IN HANDLE                   FileHandle,
-    IN SECURITY_INFORMATION     SecurityInformation,
-    OUT PSECURITY_DESCRIPTOR    SecurityDescriptor,
-    IN ULONG                    Length,
-    OUT PULONG                  ResultLength
+  /*IN*/ HANDLE                   FileHandle,
+  /*IN*/ SECURITY_INFORMATION     SecurityInformation,
+  /*OUT*/ PSECURITY_DESCRIPTOR    SecurityDescriptor,
+  /*IN*/ ULONG                    Length,
+  /*OUT*/ PULONG                  ResultLength
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwQuerySystemInformation (
-    IN SYSTEM_INFORMATION_CLASS SystemInformationClass,
-    OUT PVOID                   SystemInformation,
-    IN ULONG                    Length,
-    OUT PULONG                  ReturnLength
+  /*IN*/ SYSTEM_INFORMATION_CLASS SystemInformationClass,
+  /*OUT*/ PVOID                   SystemInformation,
+  /*IN*/ ULONG                    Length,
+  /*OUT*/ PULONG                  ReturnLength
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwQueryVolumeInformationFile (
-    IN HANDLE               FileHandle,
-    OUT PIO_STATUS_BLOCK    IoStatusBlock,
-    OUT PVOID               FsInformation,
-    IN ULONG                Length,
-    IN FS_INFORMATION_CLASS FsInformationClass
+  /*IN*/ HANDLE               FileHandle,
+  /*OUT*/ PIO_STATUS_BLOCK    IoStatusBlock,
+  /*OUT*/ PVOID               FsInformation,
+  /*IN*/ ULONG                Length,
+  /*IN*/ FS_INFORMATION_CLASS FsInformationClass
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwReplaceKey (
-    IN POBJECT_ATTRIBUTES   NewFileObjectAttributes,
-    IN HANDLE               KeyHandle,
-    IN POBJECT_ATTRIBUTES   OldFileObjectAttributes
+  /*IN*/ POBJECT_ATTRIBUTES   NewFileObjectAttributes,
+  /*IN*/ HANDLE               KeyHandle,
+  /*IN*/ POBJECT_ATTRIBUTES   OldFileObjectAttributes
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwResetEvent (
-    IN HANDLE   EventHandle,
-    OUT PULONG  PreviousState OPTIONAL
+  /*IN*/ HANDLE   EventHandle,
+  /*OUT*/ PULONG  PreviousState /*OPTIONAL*/
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -4551,9 +4551,9 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 ZwRestoreKey (
-    IN HANDLE   KeyHandle,
-    IN HANDLE   FileHandle,
-    IN ULONG    Flags
+  /*IN*/ HANDLE   KeyHandle,
+  /*IN*/ HANDLE   FileHandle,
+  /*IN*/ ULONG    Flags
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -4562,16 +4562,16 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 ZwSaveKey (
-    IN HANDLE KeyHandle,
-    IN HANDLE FileHandle
+  /*IN*/ HANDLE KeyHandle,
+  /*IN*/ HANDLE FileHandle
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwSetDefaultLocale (
-    IN BOOLEAN  ThreadOrSystem,
-    IN LCID     Locale
+  /*IN*/ BOOLEAN  ThreadOrSystem,
+  /*IN*/ LCID     Locale
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -4580,17 +4580,17 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 ZwSetDefaultUILanguage (
-    IN LANGID LanguageId
+  /*IN*/ LANGID LanguageId
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwSetEaFile (
-    IN HANDLE               FileHandle,
-    OUT PIO_STATUS_BLOCK    IoStatusBlock,
-    OUT PVOID               Buffer,
-    IN ULONG                Length
+  /*IN*/ HANDLE               FileHandle,
+  /*OUT*/ PIO_STATUS_BLOCK    IoStatusBlock,
+  /*OUT*/ PVOID               Buffer,
+  /*IN*/ ULONG                Length
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -4599,28 +4599,28 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 ZwSetEvent (
-    IN HANDLE   EventHandle,
-    OUT PULONG  PreviousState OPTIONAL
+  /*IN*/ HANDLE   EventHandle,
+  /*OUT*/ PULONG  PreviousState /*OPTIONAL*/
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwSetInformationObject (
-    IN HANDLE                       ObjectHandle,
-    IN OBJECT_INFORMATION_CLASS    ObjectInformationClass,
-    IN PVOID                        ObjectInformation,
-    IN ULONG                        ObjectInformationLength
+  /*IN*/ HANDLE                       ObjectHandle,
+  /*IN*/ OBJECT_INFORMATION_CLASS    ObjectInformationClass,
+  /*IN*/ PVOID                        ObjectInformation,
+  /*IN*/ ULONG                        ObjectInformationLength
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwSetInformationProcess (
-    IN HANDLE           ProcessHandle,
-    IN PROCESSINFOCLASS ProcessInformationClass,
-    IN PVOID            ProcessInformation,
-    IN ULONG            ProcessInformationLength
+  /*IN*/ HANDLE           ProcessHandle,
+  /*IN*/ PROCESSINFOCLASS ProcessInformationClass,
+  /*IN*/ PVOID            ProcessInformation,
+  /*IN*/ ULONG            ProcessInformationLength
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -4629,9 +4629,9 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 ZwSetSecurityObject (
-    IN HANDLE               Handle,
-    IN SECURITY_INFORMATION SecurityInformation,
-    IN PSECURITY_DESCRIPTOR SecurityDescriptor
+  /*IN*/ HANDLE               Handle,
+  /*IN*/ SECURITY_INFORMATION SecurityInformation,
+  /*IN*/ PSECURITY_DESCRIPTOR SecurityDescriptor
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -4640,17 +4640,17 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 ZwSetSystemInformation (
-    IN SYSTEM_INFORMATION_CLASS SystemInformationClass,
-    IN PVOID                    SystemInformation,
-    IN ULONG                    Length
+  /*IN*/ SYSTEM_INFORMATION_CLASS SystemInformationClass,
+  /*IN*/ PVOID                    SystemInformation,
+  /*IN*/ ULONG                    Length
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwSetSystemTime (
-    IN PLARGE_INTEGER   NewTime,
-    OUT PLARGE_INTEGER  OldTime OPTIONAL
+  /*IN*/ PLARGE_INTEGER   NewTime,
+  /*OUT*/ PLARGE_INTEGER  OldTime /*OPTIONAL*/
 );
 
 #if (VER_PRODUCTBUILD >= 2195)
@@ -4659,11 +4659,11 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 ZwSetVolumeInformationFile (
-    IN HANDLE               FileHandle,
-    OUT PIO_STATUS_BLOCK    IoStatusBlock,
-    IN PVOID                FsInformation,
-    IN ULONG                Length,
-    IN FS_INFORMATION_CLASS FsInformationClass
+  /*IN*/ HANDLE               FileHandle,
+  /*OUT*/ PIO_STATUS_BLOCK    IoStatusBlock,
+  /*IN*/ PVOID                FsInformation,
+  /*IN*/ ULONG                Length,
+  /*IN*/ FS_INFORMATION_CLASS FsInformationClass
 );
 
 #endif /* (VER_PRODUCTBUILD >= 2195) */
@@ -4672,8 +4672,8 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 ZwTerminateProcess (
-    IN HANDLE   ProcessHandle OPTIONAL,
-    IN NTSTATUS ExitStatus
+  /*IN*/ HANDLE   ProcessHandle /*OPTIONAL*/,
+  /*IN*/ NTSTATUS ExitStatus
 );
 
 NTSYSAPI
@@ -4681,34 +4681,34 @@ NTSTATUS
 NTAPI
 ZwUnloadDriver (
     /* "\\Registry\\Machine\\System\\CurrentControlSet\\Services\\<DriverName>" */
-    IN PUNICODE_STRING RegistryPath
+  /*IN*/ PUNICODE_STRING RegistryPath
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwUnloadKey (
-    IN POBJECT_ATTRIBUTES KeyObjectAttributes
+  /*IN*/ POBJECT_ATTRIBUTES KeyObjectAttributes
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwWaitForSingleObject (
-    IN HANDLE           Handle,
-    IN BOOLEAN          Alertable,
-    IN PLARGE_INTEGER   Timeout OPTIONAL
+  /*IN*/ HANDLE           Handle,
+  /*IN*/ BOOLEAN          Alertable,
+  /*IN*/ PLARGE_INTEGER   Timeout /*OPTIONAL*/
 );
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwWaitForMultipleObjects (
-    IN ULONG            HandleCount,
-    IN PHANDLE          Handles,
-    IN WAIT_TYPE        WaitType,
-    IN BOOLEAN          Alertable,
-    IN PLARGE_INTEGER   Timeout OPTIONAL
+  /*IN*/ ULONG            HandleCount,
+  /*IN*/ PHANDLE          Handles,
+  /*IN*/ WAIT_TYPE        WaitType,
+  /*IN*/ BOOLEAN          Alertable,
+  /*IN*/ PLARGE_INTEGER   Timeout /*OPTIONAL*/
 );
 
 NTSYSAPI

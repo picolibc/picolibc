@@ -46,7 +46,7 @@ typedef struct _PROCESSOR_IDLE_TIMES {
 
 typedef BOOLEAN DDKFASTAPI
 (*PPROCESSOR_IDLE_HANDLER)(
-  IN OUT PPROCESSOR_IDLE_TIMES IdleTimes);
+  /*IN OUT*/ PPROCESSOR_IDLE_TIMES IdleTimes);
 
 typedef struct _PROCESSOR_IDLE_HANDLER_INFO {
   ULONG  HardwareLatency;
@@ -55,11 +55,11 @@ typedef struct _PROCESSOR_IDLE_HANDLER_INFO {
 
 typedef VOID DDKFASTAPI
 (*PSET_PROCESSOR_THROTTLE)(
-  IN UCHAR  Throttle);
+  /*IN*/ UCHAR  Throttle);
 
 typedef NTSTATUS DDKFASTAPI
 (*PSET_PROCESSOR_THROTTLE2)(
-  IN UCHAR  Throttle);
+  /*IN*/ UCHAR  Throttle);
 
 #define MAX_IDLE_HANDLERS                 3
 
@@ -84,15 +84,15 @@ typedef enum _POWER_STATE_HANDLER_TYPE {
 
 typedef NTSTATUS DDKAPI
 (*PENTER_STATE_SYSTEM_HANDLER)(
-  IN PVOID  SystemContext);
+  /*IN*/ PVOID  SystemContext);
 
 typedef NTSTATUS DDKAPI
 (*PENTER_STATE_HANDLER)(
-  IN PVOID  Context,
-  IN PENTER_STATE_SYSTEM_HANDLER  SystemHandler  OPTIONAL,
-  IN PVOID  SystemContext,
-  IN LONG  NumberProcessors,
-  IN VOLATILE PLONG  Number);
+  /*IN*/ PVOID  Context,
+  /*IN*/ PENTER_STATE_SYSTEM_HANDLER  SystemHandler  /*OPTIONAL*/,
+  /*IN*/ PVOID  SystemContext,
+  /*IN*/ LONG  NumberProcessors,
+  /*IN*/ VOLATILE PLONG  Number);
 
 typedef struct _POWER_STATE_HANDLER {
 	POWER_STATE_HANDLER_TYPE  Type;
@@ -104,9 +104,9 @@ typedef struct _POWER_STATE_HANDLER {
 
 typedef NTSTATUS STDCALL
 (*PENTER_STATE_NOTIFY_HANDLER)(
-  IN POWER_STATE_HANDLER_TYPE  State,
-  IN PVOID  Context,
-  IN BOOLEAN  Entering);
+  /*IN*/ POWER_STATE_HANDLER_TYPE  State,
+  /*IN*/ PVOID  Context,
+  /*IN*/ BOOLEAN  Entering);
 
 typedef struct _POWER_STATE_NOTIFY_HANDLER {
 	PENTER_STATE_NOTIFY_HANDLER  Handler;
@@ -117,11 +117,11 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 NtPowerInformation(
-  IN POWER_INFORMATION_LEVEL  InformationLevel,
-  IN PVOID  InputBuffer OPTIONAL,
-  IN ULONG  InputBufferLength,
-  OUT PVOID  OutputBuffer OPTIONAL,
-  IN ULONG  OutputBufferLength);
+  /*IN*/ POWER_INFORMATION_LEVEL  InformationLevel,
+  /*IN*/ PVOID  InputBuffer /*OPTIONAL*/,
+  /*IN*/ ULONG  InputBufferLength,
+  /*OUT*/ PVOID  OutputBuffer /*OPTIONAL*/,
+  /*IN*/ ULONG  OutputBufferLength);
 
 #define PROCESSOR_STATE_TYPE_PERFORMANCE  1
 #define PROCESSOR_STATE_TYPE_THROTTLE     2
@@ -160,44 +160,44 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 NtSetThreadExecutionState(
-  IN EXECUTION_STATE  esFlags,
-  OUT EXECUTION_STATE  *PreviousFlags);
+  /*IN*/ EXECUTION_STATE  esFlags,
+  /*OUT*/ EXECUTION_STATE  *PreviousFlags);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 NtRequestWakeupLatency(
-  IN LATENCY_TIME  latency);
+  /*IN*/ LATENCY_TIME  latency);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 NtInitiatePowerAction(
-  IN POWER_ACTION  SystemAction,
-  IN SYSTEM_POWER_STATE  MinSystemState,
-  IN ULONG  Flags,
-  IN BOOLEAN  Asynchronous);
+  /*IN*/ POWER_ACTION  SystemAction,
+  /*IN*/ SYSTEM_POWER_STATE  MinSystemState,
+  /*IN*/ ULONG  Flags,
+  /*IN*/ BOOLEAN  Asynchronous);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 NtSetSystemPowerState(
-  IN POWER_ACTION SystemAction,
-  IN SYSTEM_POWER_STATE MinSystemState,
-  IN ULONG Flags);
+  /*IN*/ POWER_ACTION SystemAction,
+  /*IN*/ SYSTEM_POWER_STATE MinSystemState,
+  /*IN*/ ULONG Flags);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 NtGetDevicePowerState(
-  IN HANDLE  Device,
-  OUT DEVICE_POWER_STATE  *State);
+  /*IN*/ HANDLE  Device,
+  /*OUT*/ DEVICE_POWER_STATE  *State);
 
 NTOSAPI
 NTSTATUS
 DDKAPI
 NtCancelDeviceWakeupRequest(
-  IN HANDLE  Device);
+  /*IN*/ HANDLE  Device);
 
 NTOSAPI
 BOOLEAN
@@ -209,7 +209,7 @@ NTOSAPI
 NTSTATUS
 DDKAPI
 NtRequestDeviceWakeup(
-  IN HANDLE  Device);
+  /*IN*/ HANDLE  Device);
 
 #define WINLOGON_LOCK_ON_SLEEP            0x00000001
 

@@ -256,10 +256,10 @@ USBCAMAPI
 ULONG
 DDKAPI
 USBCAMD_InitializeNewInterface(
-  IN PVOID  DeviceContext,
-  IN PVOID  DeviceData,
-  IN ULONG  Version,
-  IN ULONG  CamControlFlag);
+  /*IN*/ PVOID  DeviceContext,
+  /*IN*/ PVOID  DeviceData,
+  /*IN*/ ULONG  Version,
+  /*IN*/ ULONG  CamControlFlag);
 
 typedef VOID DDKAPI
 (*PCOMMAND_COMPLETE_FUNCTION)(
@@ -269,64 +269,64 @@ typedef VOID DDKAPI
 
 typedef NTSTATUS DDKAPI
 (*PFNUSBCAMD_BulkReadWrite)(
-  IN PVOID  DeviceContext,
-  IN USHORT  PipeIndex,
-  IN PVOID  Buffer,
-  IN ULONG  BufferLength,
-  IN PCOMMAND_COMPLETE_FUNCTION  CommandComplete,
-  IN PVOID  CommandContext);
+  /*IN*/ PVOID  DeviceContext,
+  /*IN*/ USHORT  PipeIndex,
+  /*IN*/ PVOID  Buffer,
+  /*IN*/ ULONG  BufferLength,
+  /*IN*/ PCOMMAND_COMPLETE_FUNCTION  CommandComplete,
+  /*IN*/ PVOID  CommandContext);
 
 typedef NTSTATUS DDKAPI
 (*PFNUSBCAMD_SetIsoPipeState)(
-  IN PVOID  DeviceContext,
-  IN ULONG  PipeStateFlags);
+  /*IN*/ PVOID  DeviceContext,
+  /*IN*/ ULONG  PipeStateFlags);
 
 typedef NTSTATUS DDKAPI
 (*PFNUSBCAMD_CancelBulkReadWrite)(
-  IN PVOID  DeviceContext,
-  IN ULONG  PipeIndex);
+  /*IN*/ PVOID  DeviceContext,
+  /*IN*/ ULONG  PipeIndex);
 
 typedef NTSTATUS DDKAPI
 (*PFNUSBCAMD_SetVideoFormat)( 
-  IN PVOID  DeviceContext,
-  IN PHW_STREAM_REQUEST_BLOCK  pSrb);
+  /*IN*/ PVOID  DeviceContext,
+  /*IN*/ PHW_STREAM_REQUEST_BLOCK  pSrb);
 
 typedef NTSTATUS DDKAPI
 (*PFNUSBCAMD_WaitOnDeviceEvent)(
-  IN PVOID  DeviceContext,
-  IN ULONG  PipeIndex,
-  IN PVOID  Buffer,
-  IN ULONG  BufferLength,
-  IN PCOMMAND_COMPLETE_FUNCTION  EventComplete,
-  IN PVOID  EventContext,
-  IN BOOLEAN  LoopBack);
+  /*IN*/ PVOID  DeviceContext,
+  /*IN*/ ULONG  PipeIndex,
+  /*IN*/ PVOID  Buffer,
+  /*IN*/ ULONG  BufferLength,
+  /*IN*/ PCOMMAND_COMPLETE_FUNCTION  EventComplete,
+  /*IN*/ PVOID  EventContext,
+  /*IN*/ BOOLEAN  LoopBack);
 
 USBCAMAPI
 PVOID
 DDKAPI
 USBCAMD_AdapterReceivePacket(
-  IN PHW_STREAM_REQUEST_BLOCK  Srb,
-  IN PUSBCAMD_DEVICE_DATA  DeviceData,
-  IN PDEVICE_OBJECT  *DeviceObject,
-  IN BOOLEAN  NeedsCompletion);
+  /*IN*/ PHW_STREAM_REQUEST_BLOCK  Srb,
+  /*IN*/ PUSBCAMD_DEVICE_DATA  DeviceData,
+  /*IN*/ PDEVICE_OBJECT  *DeviceObject,
+  /*IN*/ BOOLEAN  NeedsCompletion);
 
 USBCAMAPI
 NTSTATUS
 DDKAPI
 USBCAMD_ControlVendorCommand(
-  IN PVOID  DeviceContext,
-  IN UCHAR  Request,
-  IN USHORT  Value,
-  IN USHORT  Index,
-  IN PVOID  Buffer,
-  IN OUT PULONG  BufferLength,
-  IN BOOLEAN  GetData,
-  IN PCOMMAND_COMPLETE_FUNCTION  CommandComplete,
-  IN PVOID  CommandContext);
+  /*IN*/ PVOID  DeviceContext,
+  /*IN*/ UCHAR  Request,
+  /*IN*/ USHORT  Value,
+  /*IN*/ USHORT  Index,
+  /*IN*/ PVOID  Buffer,
+  /*IN OUT*/ PULONG  BufferLength,
+  /*IN*/ BOOLEAN  GetData,
+  /*IN*/ PCOMMAND_COMPLETE_FUNCTION  CommandComplete,
+  /*IN*/ PVOID  CommandContext);
 
 typedef VOID DDKAPI
 (*PADAPTER_RECEIVE_PACKET_ROUTINE)(
-  IN PHW_STREAM_REQUEST_BLOCK  Srb);
+  /*IN*/ PHW_STREAM_REQUEST_BLOCK  Srb);
 
 USBCAMAPI
 ULONG
@@ -342,18 +342,18 @@ USBCAMAPI
 NTSTATUS
 DDKAPI
 USBCAMD_GetRegistryKeyValue(
-  IN HANDLE  Handle,
-  IN PWCHAR  KeyNameString,
-  IN ULONG  KeyNameStringLength,
-  IN PVOID  Data,
-  IN ULONG  DataLength);
+  /*IN*/ HANDLE  Handle,
+  /*IN*/ PWCHAR  KeyNameString,
+  /*IN*/ ULONG  KeyNameStringLength,
+  /*IN*/ PVOID  Data,
+  /*IN*/ ULONG  DataLength);
 
 USBCAMAPI
 NTSTATUS
 DDKAPI
 USBCAMD_SelectAlternateInterface(
-  IN PVOID  DeviceContext,
-  IN OUT PUSBD_INTERFACE_INFORMATION  RequestInterface);
+  /*IN*/ PVOID  DeviceContext,
+  /*IN OUT*/ PUSBD_INTERFACE_INFORMATION  RequestInterface);
 
 #define USBCAMD_VERSION_200               0x200
 
@@ -368,9 +368,9 @@ typedef struct _USBCAMD_INTERFACE {
 
 typedef VOID DDKAPI
 (*PSTREAM_RECEIVE_PACKET)(
-  IN PVOID  Srb,
-  IN PVOID  DeviceContext,
-  IN PBOOLEAN  Completed);
+  /*IN*/ PVOID  Srb,
+  /*IN*/ PVOID  DeviceContext,
+  /*IN*/ PBOOLEAN  Completed);
 
 #if defined(DEBUG_LOG)
 
@@ -378,10 +378,10 @@ USBCAMAPI
 VOID
 DDKAPI
 USBCAMD_Debug_LogEntry(
-	IN CHAR  *Name,
-	IN ULONG  Info1,
-	IN ULONG  Info2,
-	IN ULONG  Info3);
+  /*IN*/ CHAR  *Name,
+  /*IN*/ ULONG  Info1,
+  /*IN*/ ULONG  Info2,
+  /*IN*/ ULONG  Info3);
 
 #define ILOGENTRY(sig, info1, info2, info3) \
   USBCAMD_Debug_LogEntry(sig, (ULONG)info1, (ULONG)info2, (ULONG)info3)

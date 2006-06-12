@@ -105,18 +105,18 @@ typedef struct _SMB_REGISTER_ALARM {
 
 typedef NTSTATUS DDKAPI
 (*SMB_RESET_DEVICE)(
-  IN struct _SMB_CLASS  *SmbClass,
-  IN PVOID  SmbMiniport);
+  /*IN*/ struct _SMB_CLASS  *SmbClass,
+  /*IN*/ PVOID  SmbMiniport);
 
 typedef VOID DDKAPI
 (*SMB_START_IO)(
-  IN struct _SMB_CLASS  *SmbClass,
-  IN PVOID  SmbMiniport);
+  /*IN*/ struct _SMB_CLASS  *SmbClass,
+  /*IN*/ PVOID  SmbMiniport);
 
 typedef NTSTATUS DDKAPI
 (*SMB_STOP_DEVICE)(
-  IN struct _SMB_CLASS  *SmbClass,
-  IN PVOID  SmbMiniport);
+  /*IN*/ struct _SMB_CLASS  *SmbClass,
+  /*IN*/ PVOID  SmbMiniport);
 
 typedef struct _SMB_CLASS {
   USHORT  MajorVersion;
@@ -136,52 +136,52 @@ SMBCLASSAPI
 VOID
 DDKAPI
 SmbClassAlarm(
-  IN PSMB_CLASS  SmbClass,
-  IN UCHAR  Address,
-  IN USHORT  Data);
+  /*IN*/ PSMB_CLASS  SmbClass,
+  /*IN*/ UCHAR  Address,
+  /*IN*/ USHORT  Data);
 
 SMBCLASSAPI
 VOID
 DDKAPI
 SmbClassCompleteRequest(
-  IN PSMB_CLASS  SmbClass);
+  /*IN*/ PSMB_CLASS  SmbClass);
 
 typedef NTSTATUS DDKAPI
 (*PSMB_INITIALIZE_MINIPORT)(
-  IN PSMB_CLASS  SmbClass,
-  IN PVOID  MiniportExtension,
-  IN PVOID  MiniportContext);
+  /*IN*/ PSMB_CLASS  SmbClass,
+  /*IN*/ PVOID  MiniportExtension,
+  /*IN*/ PVOID  MiniportContext);
 
 SMBCLASSAPI
 NTSTATUS
 DDKAPI
 SmbClassCreateFdo(
-  IN PDRIVER_OBJECT  DriverObject,
-  IN PDEVICE_OBJECT  PDO,
-  IN ULONG  MiniportExtensionSize,
-  IN PSMB_INITIALIZE_MINIPORT  MiniportInitialize,
-  IN PVOID  MiniportContext,
-  OUT PDEVICE_OBJECT  *FDO);
+  /*IN*/ PDRIVER_OBJECT  DriverObject,
+  /*IN*/ PDEVICE_OBJECT  PDO,
+  /*IN*/ ULONG  MiniportExtensionSize,
+  /*IN*/ PSMB_INITIALIZE_MINIPORT  MiniportInitialize,
+  /*IN*/ PVOID  MiniportContext,
+  /*OUT*/ PDEVICE_OBJECT  *FDO);
 
 SMBCLASSAPI
 NTSTATUS
 DDKAPI
 SmbClassInitializeDevice(
-  IN ULONG  MajorVersion,
-  IN ULONG  MinorVersion,
-  IN PDRIVER_OBJECT  DriverObject);
+  /*IN*/ ULONG  MajorVersion,
+  /*IN*/ ULONG  MinorVersion,
+  /*IN*/ PDRIVER_OBJECT  DriverObject);
 
 SMBCLASSAPI
 VOID
 DDKAPI
 SmbClassLockDevice(
-  IN PSMB_CLASS  SmbClass);
+  /*IN*/ PSMB_CLASS  SmbClass);
 
 SMBCLASSAPI
 VOID
 DDKAPI
 SmbClassUnlockDevice(
-  IN PSMB_CLASS  SmbClass);
+  /*IN*/ PSMB_CLASS  SmbClass);
 
 #ifdef __cplusplus
 }

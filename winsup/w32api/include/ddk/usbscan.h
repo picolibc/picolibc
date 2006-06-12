@@ -78,45 +78,45 @@ extern "C" {
 #define BULKIN_FLAG                       0x80
 
 typedef struct _CHANNEL_INFO {
-  OUT ULONG  EventChannelSize;
-  OUT ULONG  uReadDataAlignment;
-  OUT ULONG  uWriteDataAlignment;
+  /*OUT*/ ULONG  EventChannelSize;
+  /*OUT*/ ULONG  uReadDataAlignment;
+  /*OUT*/ ULONG  uWriteDataAlignment;
 }CHANNEL_INFO, *PCHANNEL_INFO;
 
 typedef struct _DEVICE_DESCRIPTOR {
-  OUT USHORT  usVendorId; 
-  OUT USHORT  usProductId; 
-  OUT USHORT  usBcdDevice; 
-  OUT USHORT  usLanguageId; 
+  /*OUT*/ USHORT  usVendorId; 
+  /*OUT*/ USHORT  usProductId; 
+  /*OUT*/ USHORT  usBcdDevice; 
+  /*OUT*/ USHORT  usLanguageId; 
 } DEVICE_DESCRIPTOR, *PDEVICE_DESCRIPTOR;
 
 typedef struct _DRV_VERSION {
-  OUT ULONG  major;
-  OUT ULONG  minor;
-  OUT ULONG  internal; 
+  /*OUT*/ ULONG  major;
+  /*OUT*/ ULONG  minor;
+  /*OUT*/ ULONG  internal; 
 } DRV_VERSION, *PDRV_VERSION;
 
 typedef struct _IO_BLOCK {
-  IN ULONG  uOffset;
-  IN ULONG  uLength;
-  IN OUT PUCHAR  pbyData;
-  IN ULONG  uIndex;
+  /*IN*/ ULONG  uOffset;
+  /*IN*/ ULONG  uLength;
+  /*IN OUT*/ PUCHAR  pbyData;
+  /*IN*/ ULONG  uIndex;
 } IO_BLOCK, *PIO_BLOCK;
 
 typedef struct _IO_BLOCK_EX {
-  IN  ULONG  uOffset;
-  IN  ULONG  uLength;
-  IN OUT PUCHAR  pbyData;
-  IN  ULONG  uIndex;
-  IN  UCHAR  bRequest;
-  IN  UCHAR  bmRequestType;
-  IN  UCHAR  fTransferDirectionIn;
+  /*IN*/ ULONG  uOffset;
+  /*IN*/ ULONG  uLength;
+  /*IN OUT*/ PUCHAR  pbyData;
+  /*IN*/ ULONG  uIndex;
+  /*IN*/ UCHAR  bRequest;
+  /*IN*/ UCHAR  bmRequestType;
+  /*IN*/ UCHAR  fTransferDirectionIn;
 } IO_BLOCK_EX, *PIO_BLOCK_EX;
 
 typedef struct _USBSCAN_GET_DESCRIPTOR {
-  IN UCHAR  DescriptorType;
-  IN UCHAR  Index;
-  IN USHORT  LanguageId;
+  /*IN*/ UCHAR  DescriptorType;
+  /*IN*/ UCHAR  Index;
+  /*IN*/ USHORT  LanguageId;
 } USBSCAN_GET_DESCRIPTOR, *PUSBSCAN_GET_DESCRIPTOR;
 
 typedef enum _RAW_PIPE_TYPE {
@@ -134,14 +134,14 @@ typedef struct _USBSCAN_PIPE_INFORMATION {
 } USBSCAN_PIPE_INFORMATION, *PUSBSCAN_PIPE_INFORMATION;
 
 typedef struct _USBSCAN_PIPE_CONFIGURATION {
-  OUT ULONG  NumberOfPipes;
-  OUT USBSCAN_PIPE_INFORMATION  PipeInfo[MAX_NUM_PIPES];
+  /*OUT*/ ULONG  NumberOfPipes;
+  /*OUT*/ USBSCAN_PIPE_INFORMATION  PipeInfo[MAX_NUM_PIPES];
 } USBSCAN_PIPE_CONFIGURATION, *PUSBSCAN_PIPE_CONFIGURATION;
 
 typedef struct _USBSCAN_TIMEOUT {
-  IN ULONG  TimeoutRead;
-  IN ULONG  TimeoutWrite;
-  IN ULONG  TimeoutEvent;
+  /*IN*/ ULONG  TimeoutRead;
+  /*IN*/ ULONG  TimeoutWrite;
+  /*IN*/ ULONG  TimeoutEvent;
 } USBSCAN_TIMEOUT, *PUSBSCAN_TIMEOUT;
 
 typedef enum _PIPE_TYPE {

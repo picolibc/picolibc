@@ -23,7 +23,7 @@
 #ifndef __UPSSVC_H
 #define __UPSSVC_H
 
-#if __GNUC__ >=3
+#if __GNUC__ >= 3
 #pragma GCC system_header
 #endif
 
@@ -78,14 +78,14 @@ UPSAPI
 VOID
 DDKAPI
 UPSTurnOff(
-  IN DWORD  aTurnOffDelay);
+  /*IN*/ DWORD  aTurnOffDelay);
 
 UPSAPI
 VOID
 DDKAPI
 UPSWaitForStateChange(
-  IN DWORD  aCurrentState,
-  IN DWORD  anInterval);
+  /*IN*/ DWORD  aCurrentState,
+  /*IN*/ DWORD  anInterval);
 
 #ifdef __cplusplus
 }

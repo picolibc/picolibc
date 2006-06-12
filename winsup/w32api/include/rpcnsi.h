@@ -34,8 +34,8 @@ RPC_STATUS RPC_ENTRY RpcNsProfileEltRemoveA(unsigned long,unsigned char*,RPC_IF_
 RPC_STATUS RPC_ENTRY RpcNsProfileEltInqBeginA(unsigned long,unsigned char*,unsigned long,RPC_IF_ID*,unsigned long,unsigned long,unsigned char*,RPC_NS_HANDLE*);
 RPC_STATUS RPC_ENTRY RpcNsProfileEltInqNextA(RPC_NS_HANDLE,RPC_IF_ID*,unsigned char**,unsigned long*,unsigned char**);
 RPC_STATUS RPC_ENTRY RpcNsProfileEltInqDone(RPC_NS_HANDLE*);
-RPC_STATUS RPC_ENTRY RpcNsEntryObjectInqNext(IN  RPC_NS_HANDLE,OUT UUID*);
-RPC_STATUS RPC_ENTRY RpcNsEntryObjectInqDone(IN OUT RPC_NS_HANDLE*);
+RPC_STATUS RPC_ENTRY RpcNsEntryObjectInqNext(/*IN*/ RPC_NS_HANDLE,/*OUT*/ UUID*);
+RPC_STATUS RPC_ENTRY RpcNsEntryObjectInqDone(/*IN OUT*/ RPC_NS_HANDLE*);
 RPC_STATUS RPC_ENTRY RpcNsEntryExpandNameA(unsigned long,unsigned char*,unsigned char**);
 RPC_STATUS RPC_ENTRY RpcNsMgmtBindingUnexportA(unsigned long,unsigned char*,RPC_IF_ID*,unsigned long,UUID_VECTOR*);
 RPC_STATUS RPC_ENTRY RpcNsMgmtEntryCreateA(unsigned long,unsigned char*);

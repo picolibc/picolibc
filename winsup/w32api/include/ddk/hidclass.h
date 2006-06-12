@@ -92,8 +92,8 @@ typedef VOID DDKAPI (*PHID_STATUS_CHANGE)(
   enum DeviceObjectState  State);
 
 typedef NTSTATUS DDKAPI (*PHIDP_GETCAPS)(
-  IN PHIDP_PREPARSED_DATA  PreparsedData,
-  OUT PHIDP_CAPS  Capabilities);
+  /*IN*/ PHIDP_PREPARSED_DATA  PreparsedData,
+  /*OUT*/ PHIDP_CAPS  Capabilities);
 
 typedef struct _HID_COLLECTION_INFORMATION {
   ULONG  DescriptorSize;
