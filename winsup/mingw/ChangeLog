@@ -1,3 +1,7 @@
+2006-06-13  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* Makefile.in (SUBDIRS): Change to lowercase for autoconf 2.59.
+
 2006-05-24  Christopher Faylor  <cgf@timesys.com>
 
 	* configure.in: Update to newer autoconf.

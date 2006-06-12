@@ -123,7 +123,7 @@ TAR = tar
 TARFLAGS = z
 TARFILEEXT = .tar.gz
 
-SUBDIRS := @SUBDIRS@
+SUBDIRS := @subdirs@
 
 FLAGS_TO_PASS:=\
 	AS="$(AS)" \
