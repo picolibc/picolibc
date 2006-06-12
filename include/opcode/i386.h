@@ -555,7 +555,11 @@ static const template i386_optab[] =
 {"bound",  2,	0x62, X, Cpu186|CpuNo64, wl_Suf|Modrm,		{ WordReg, WordMem, 0} },
 
 {"hlt",	   0,	0xf4, X, 0,	 NoSuf,			{ 0, 0, 0} },
-/* nop is actually 'xchgl %eax, %eax'.  */
+
+{"nop",    1, 0x0f1f, X, Cpu686, wl_Suf|Modrm,		{ WordMem, 0, 0} },
+
+/* nop is actually "xchg %ax,%ax" in 16bit mode, "xchg %eax,%eax" in
+   32bit mode and "xchg %rax,%rax" in 64bit mode.  */
 {"nop",	   0,	0x90, X, 0,	 NoSuf,			{ 0, 0, 0} },
 
 /* Protection control.  */
