@@ -557,15 +557,26 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
   fd->uninterruptible_io (true);
   cygheap->fdtab.inc_need_fixup_before ();
   debug_printf ("fd %d, name '%s', soc %p", (int) fd, dev->name, soc);
+#if 0
+  /* Same default buffer sizes as on Linux (instead of WinSock default 8K).
 
-  /* Same default buffer sizes as on Linux (instead of WinSock default 8K). */
+     NOT.  If the SO_RCVBUF size exceeds 65535(*), and if the socket is
+     connected to a remote machine, then duplicating the socket on
+     fork/exec fails with WinSock error 10022, WSAEINVAL.  Given that,
+     there's not any good reason to set the buffer sizes at all.  So we
+     stick with the defaults.  However, an explanation for this weird
+     behaviour would be nice.  I keep this stuff in the code for later
+     generations.  Archeological programmers might find it useful.
+
+     (*) Maximum normal TCP window size.  Coincidence?  */
+
   int rmem = dev == tcp_dev ? 87380 : 120832;
   int wmem = dev == tcp_dev ? 16384 : 120832;
   if (::setsockopt (soc, SOL_SOCKET, SO_RCVBUF, (char *) &rmem, sizeof (int)))
     debug_printf ("setsockopt(SO_RCVBUF) failed, %lu", WSAGetLastError ());
   if (::setsockopt (soc, SOL_SOCKET, SO_SNDBUF, (char *) &wmem, sizeof (int)))
     debug_printf ("setsockopt(SO_SNDBUF) failed, %lu", WSAGetLastError ());
-
+#endif
   return true;
 }
 
