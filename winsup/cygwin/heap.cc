@@ -83,7 +83,7 @@ heap_init ()
 		   reserve_size, allocsize, page_const);
       if (p != cygheap->user_heap.base)
 	api_fatal ("heap allocated at wrong address %p (mapped) != %p (expected)", p, cygheap->user_heap.base);
-      if (!VirtualAlloc (cygheap->user_heap.base, allocsize, MEM_COMMIT, PAGE_READWRITE))
+      if (allocsize && !VirtualAlloc (cygheap->user_heap.base, allocsize, MEM_COMMIT, PAGE_READWRITE))
 	api_fatal ("MEM_COMMIT failed, %E");
     }
 

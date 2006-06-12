@@ -1,3 +1,7 @@
+2006-06-12  Pierre Humblet  Pierre.Humblet@ieee.org
+
+	* heap.cc (heap_init): Only commit if allocsize is not zero.
+
 2006-06-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (fdsock): Disable raising buffer sizes.  Add comment to
