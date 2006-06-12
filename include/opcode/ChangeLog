@@ -1,3 +1,7 @@
+2006-06-12  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* i386.h (i386_optab): Update comment for 64bit NOP.
+
 2006-06-06  Ben Elliston  <bje@au.ibm.com>
 	    Anton Blanchard  <anton@samba.org>
 

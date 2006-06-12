@@ -179,19 +179,11 @@ static const template i386_optab[] =
 /* Exchange instructions.
    xchg commutes:  we allow both operand orders.
  
-   In the 64bit code, xchg eax, eax is reused for new nop instruction.  */
-#if 0 /* While the two entries that are disabled generate shorter code
-         for xchg eax, reg (on x86_64), the special case xchg eax, eax
-         does not get handled correctly - it degenerates into nop, but
-         that way the side effect of zero-extending eax to rax is lost.  */
-{"xchg",   2,	0x90, X, 0,	 wlq_Suf|ShortForm,	{ WordReg, Acc, 0 } },
-{"xchg",   2,	0x90, X, 0,	 wlq_Suf|ShortForm,	{ Acc, WordReg, 0 } },
-#else
+   In the 64bit code, xchg rax, rax is reused for new nop instruction.  */
 {"xchg",   2,	0x90, X, CpuNo64, wl_Suf|ShortForm,	{ WordReg, Acc, 0 } },
 {"xchg",   2,	0x90, X, CpuNo64, wl_Suf|ShortForm,	{ Acc, WordReg, 0 } },
 {"xchg",   2,	0x90, X, Cpu64, wq_Suf|ShortForm,	{ Reg16|Reg64, Acc, 0 } },
 {"xchg",   2,	0x90, X, Cpu64, wq_Suf|ShortForm,	{ Acc, Reg16|Reg64, 0 } },
-#endif
 {"xchg",   2,	0x86, X, 0,	 bwlq_Suf|W|Modrm,	{ Reg, Reg|AnyMem, 0 } },
 {"xchg",   2,	0x86, X, 0,	 bwlq_Suf|W|Modrm,	{ Reg|AnyMem, Reg, 0 } },
 
