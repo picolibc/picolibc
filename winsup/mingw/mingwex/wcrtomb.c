@@ -68,7 +68,7 @@ size_t wcsrtombs (char *dst, const wchar_t **src, size_t len,
    	  dst += ret;
           if (*(dst - 1) == '\0')
 	    {
-	      *saved_src = (wchar_t) NULL;;
+	      *saved_src = (wchar_t*) NULL;;
 	      return (n  - 1);
 	    }
 	  *src++;
