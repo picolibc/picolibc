@@ -1,6 +1,6 @@
 /* stdlib.h
 
-   Copyright 2005 Red Hat Inc.
+   Copyright 2005, 2006 Red Hat Inc.
 
 This file is part of Cygwin.
 
@@ -10,6 +10,9 @@ details. */
 
 #ifndef _CYGWIN_STDLIB_H
 #define _CYGWIN_STDLIB_H
+
+#include <cygwin/wait.h>
+
 #ifdef __cplusplus
 extern "C"
 {

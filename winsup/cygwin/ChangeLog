@@ -1,3 +1,9 @@
+2006-06-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/sys/wait.h: Move definition of wait constants from here...
+	* include/cygwin/wait.h: ...to here.  New file.
+	* include/cygwin/stdlib.h: Include cygwin/wait.h to conform with SUSv3.
+
 2006-06-12  Pierre Humblet  Pierre.Humblet@ieee.org
 
 	* heap.cc (heap_init): Only commit if allocsize is not zero.
