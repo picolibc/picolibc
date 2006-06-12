@@ -101,6 +101,10 @@ extern "C" {
  * NOTE: The CRTDLL version uses _HUGE_dll instead.
  */
 
+#if __MINGW_GNUC_PREREQ(3, 3)
+#define	HUGE_VAL __builtin_huge_val()
+#else
+
 #ifndef __DECLSPEC_SUPPORTED
 
 #ifdef __MSVCRT__
@@ -124,6 +128,8 @@ __MINGW_IMPORT double	_HUGE_dll;
 #endif
 
 #endif /* __DECLSPEC_SUPPORTED */
+#endif /* __MINGW_GNUC_PREREQ(3, 3) */
+
 
 struct _exception
 {
@@ -283,10 +289,20 @@ _CRTIMP int __cdecl _set_SSE2_enable (int);
 #if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) \
 	|| !defined __STRICT_ANSI__ || defined __cplusplus
 
-#define HUGE_VALF	0x1.0p255f
-#define HUGE_VALL	0x1.0p32767L
+#if __MINGW_GNUC_PREREQ(3, 3)
+#define HUGE_VALF	__builtin_huge_valf()
+#define HUGE_VALL	__builtin_huge_vall()
+#define INFINITY	__builtin_inf()
+#define NAN		__builtin_nan("")
+#else
+#extern const float __INFF;
+#define HUGE_VALF __INFF
+#extern const long double  __INFL;
+#define HUGE_VALL __INFL
 #define INFINITY	HUGE_VALF
-#define NAN (HUGE_VALF - HUGE_VALF)
+extern const double __QNAN;
+#define NAN __QNAN
+#endif /* __MINGW_GNUC_PREREQ(3, 3) */
 
 /* 7.12.3.1 */
 /*

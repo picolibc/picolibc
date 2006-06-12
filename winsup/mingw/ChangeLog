@@ -1,5 +1,14 @@
 2006-06-13  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/math.h (HUGE_VAL): Define as builtin if __GNUC__ >= 3.3,
+	else global library variable.
+        (HUGEVALF): Likewise;
+	(HUGEVALL): Likewise.
+	(INFINITY): Likewise.
+	(NAN): LiKewise.
+
+2006-06-13  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* mingwex/wcrtomb.c (wcrtomb_cp): Correct typo.
 
 2006-06-13  Danny Smith  <dannysmith@users.sourceforge.net>
