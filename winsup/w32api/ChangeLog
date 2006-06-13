@@ -1,3 +1,15 @@
+2006-06-13  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* lib/Makefile.in: Added extras-uuid as an object and source.
+	* lib/uuid.c (IID_IClientSiteHandler, IID_IContinue, IID_IHttpNegotiate,
+	IID_IPersistMoniker, IID_IServerHandler, IID_ITargetEmbedding,
+	IID_ITargetFrame, IID_ITypeComp, IID_IUrlHistoryStg, IID_IWinInetHttpInfo,
+	IID_IWinInetInfo, IID_IEnumSTATPROPSETSTG, IID_IEnumSTATPROPSTG,
+	IID_IEnumSTATURL): Remove.  Moved to extras-uuid.c.
+	* lib/extras-uuid.c: New file.
+	Thank you to Julien Lecomte (julienlecomte at users dot sourceforge dot
+	net).
+
 2006-06-12  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	[mingw-Bugs-1424461]
