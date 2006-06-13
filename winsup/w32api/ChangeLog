@@ -1,5 +1,16 @@
 2006-06-13  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* lib/uuid.c (CLSID_FileProtocol, CLSID_FtpProtocol, CLSID_GopherProtocol,
+	CLSID_HttpProtocol, CLSID_HttpSProtocol, CLSID_MkProtocol,
+	CLSID_PSUrlMonProxy, CLSID_StdURLMoniker): Remove.  Moved to
+	extras-uuid.c.
+	* lib/extras-uuid.c (CLSID_FileProtocol, CLSID_FtpProtocol, CLSID_GopherProtocol,
+	CLSID_HttpProtocol, CLSID_HttpSProtocol, CLSID_MkProtocol,
+	CLSID_PSUrlMonProxy, CLSID_StdURLMoniker): Added.
+	* lib/hlguids-uuid.c: State source of CLSIDs.
+
+2006-06-13  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* lib/Makefile.in: Added extras-uuid as an object and source.
 	* lib/uuid.c (IID_IClientSiteHandler, IID_IContinue, IID_IHttpNegotiate,
 	IID_IPersistMoniker, IID_IServerHandler, IID_ITargetEmbedding,
