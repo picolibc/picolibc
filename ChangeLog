@@ -1,3 +1,11 @@
+2006-06-13  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	Sync from gcc:
+
+	2006-06-12  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+	* configure.in: Don't enable libgomp on hpux10.
+	* configure: Rebuilt.
+
 2006-06-13  David Ayers  <d.ayers@inode.at>
 
 	Sync from gcc:
