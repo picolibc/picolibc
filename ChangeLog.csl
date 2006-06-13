@@ -1,3 +1,9 @@
+2006-06-13  Mark Mitchell  <mark@codesourcery.com>
+
+	Issue #733
+	libgloss/
+	* arm/Makefile.in (LMS_SCRIPTS): Add lm3s301.ld and lm3s31x.ld. 
+
 2006-06-09  Nathan Sidwell  <nathan@codesourcery.com>
 
 	libgloss/

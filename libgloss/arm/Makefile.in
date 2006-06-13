@@ -70,7 +70,7 @@ RDIMON_OBJS	= rdimon-syscalls.o rdimon-libcfunc.o rdimon-trap.o
 RDIMON_SCRIPTS	= rdimon.specs
 RDIMON_INSTALL	= install-rdimon
 
-LMS_SCRIPTS     = cm3.ld lm3s10x.ld
+LMS_SCRIPTS     = cm3.ld lm3s10x.ld lm3s301.ld lm3s31x.ld
 LMS_INSTALL     = install-lms
 
 CFLAGS		= -g
