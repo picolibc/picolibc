@@ -1,3 +1,8 @@
+2006-06-13  Sandra Loosemore <sandra@codesourcery.com>
+
+	* /libc/sys/arm/syscalls.c (_unlink, isatty, _system, _rename):
+	Make them do something useful in the ARM_RDI_MONITOR case.
+
 2006-06-07  Fred Fish  <fnf@specifix.com>
 
 	* libc/search/hash_bigkey.c (MIN,MAX): Remove
