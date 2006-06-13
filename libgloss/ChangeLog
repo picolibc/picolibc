@@ -1,3 +1,8 @@
+2006-06-13  Sandra Loosemore <sandra@codesourcery.com>
+
+        * arm/syscalls.c (_unlink, isatty, _system, _rename):
+        Make them do something useful in the ARM_RDI_MONITOR case.
+
 2006-06-08  Fred Fish  <fnf@specifix.com>
 
 	* mips/idt.ld, mips/idt32.ld, mips/idt64.ld, mips/nullmon.ld,
