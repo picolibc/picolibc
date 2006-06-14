@@ -1,3 +1,16 @@
+2006-06-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_socket): Add private mutex handle
+	accept_mtx.
+	* fhandler_socket.cc (fhandler_socket::fhandler_socket): Initialize
+	accept_mtx to NULL.
+	(fhandler_socket::dup): Duplicate accept_mtx, if available.
+	(fhandler_socket::listen): Create accept_mtx before trying to listen.
+	(fhandler_socket::prepare): Wait for accept_mtx if available to
+	serialize accepts on the same socket.
+	(fhandler_socket::release): Release accept_mtx.
+	(fhandler_socket::close): Close accept_mtx on successful closesocket.
+
 2006-06-12  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_tty.cc (fhandler_pty_master::close): Always close

@@ -127,6 +127,7 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 
 fhandler_socket::fhandler_socket () :
   fhandler_base (),
+  accept_mtx (NULL),
   sun_path (NULL),
   status ()
 {
@@ -453,6 +454,7 @@ fhandler_socket::dup (fhandler_base *child)
 
   debug_printf ("here");
   fhandler_socket *fhs = (fhandler_socket *) child;
+  fhs->accept_mtx = NULL;
   fhs->addr_family = addr_family;
   fhs->set_socket_type (get_socket_type ());
   if (get_addr_family () == AF_LOCAL)
@@ -469,6 +471,17 @@ fhandler_socket::dup (fhandler_base *child)
 	}
     }
   fhs->connect_state (connect_state ());
+  if (accept_mtx)
+    {
+      if (!DuplicateHandle (hMainProc, accept_mtx, hMainProc, &nh, 0,
+			    TRUE, DUPLICATE_SAME_ACCESS))
+	{
+	  system_printf ("DuplicateHandle(%x) failed, %E", accept_mtx);
+	  __seterrno ();
+	  return -1;
+	}
+      fhs->accept_mtx = nh;
+    }
 
   /* Since WSADuplicateSocket() fails on NT systems when the process
      is currently impersonating a non-privileged account, we revert
@@ -499,8 +512,10 @@ fhandler_socket::dup (fhandler_base *child)
   if (!DuplicateHandle (hMainProc, get_io_handle (), hMainProc, &nh, 0,
 			FALSE, DUPLICATE_SAME_ACCESS))
     {
-      system_printf ("!DuplicateHandle(%x) failed, %E", get_io_handle ());
+      system_printf ("DuplicateHandle(%x) failed, %E", get_io_handle ());
       __seterrno ();
+      if (fhs->accept_mtx)
+        CloseHandle (fhs->accept_mtx);
       return -1;
     }
   VerifyHandle (nh);
@@ -816,6 +831,11 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 int
 fhandler_socket::listen (int backlog)
 {
+  if (!accept_mtx && !(accept_mtx = CreateMutex (&sec_all, FALSE, NULL)))
+    {
+      set_errno (ENOBUFS);
+      return -1;
+    }
   int res = ::listen (get_socket (), backlog);
   if (res)
     set_winsock_errno ();
@@ -960,6 +980,16 @@ fhandler_socket::getpeername (struct sockaddr *name, int *namelen)
 bool
 fhandler_socket::prepare (HANDLE &event, long event_mask)
 {
+  if (event_mask == FD_ACCEPT && accept_mtx)
+    {
+      HANDLE obj[2] = { accept_mtx, signal_arrived };
+      if (WaitForMultipleObjects (2, obj, FALSE, INFINITE) != WAIT_OBJECT_0)
+	{
+	  debug_printf ("signal_arrived");
+	  WSASetLastError (WSAEINTR);
+	  return false;
+	}
+    }
   WSASetLastError (0);
   closed (false);
   if ((event = WSACreateEvent ()) == WSA_INVALID_EVENT)
@@ -1084,6 +1114,8 @@ fhandler_socket::release (HANDLE event)
     debug_printf ("return to blocking failed: %d", WSAGetLastError ());
   else
     WSASetLastError (last_err);
+  if (accept_mtx)
+    ReleaseMutex (accept_mtx);
 }
 
 int
@@ -1456,6 +1488,8 @@ fhandler_socket::close ()
 	}
       WSASetLastError (0);
     }
+  if (!res && accept_mtx)
+    CloseHandle (accept_mtx);
 
   debug_printf ("%d = fhandler_socket::close()", res);
   return res;
