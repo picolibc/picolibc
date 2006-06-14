@@ -22,6 +22,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 #include <_ansi.h>
 #include <stdio.h>
+#include <errno.h>
 #include "local.h"
 #include "fvwrite.h"
 
@@ -32,7 +33,8 @@ static char sccsid[] = "%W% (Berkeley) %G%";
  */
 
 int
-_DEFUN(__swbuf, (c, fp),
+_DEFUN(__swbuf_r, (ptr, c, fp),
+       struct _reent *ptr _AND
        register int c _AND
        register FILE *fp)
 {
@@ -40,7 +42,7 @@ _DEFUN(__swbuf, (c, fp),
 
   /* Ensure stdio has been initialized.  */
 
-  CHECK_INIT (_REENT);
+  CHECK_INIT (ptr);
 
   /*
    * In case we cannot write, or longjmp takes us out early,
@@ -52,7 +54,11 @@ _DEFUN(__swbuf, (c, fp),
 
   fp->_w = fp->_lbfsize;
   if (cantwrite (fp))
-    return EOF;
+    {
+      fp->_flags |= __SERR;
+      ptr->_errno = EBADF;
+      return EOF;
+    }
   c = (unsigned char) c;
 
   /*

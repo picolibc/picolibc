@@ -21,10 +21,15 @@ FUNCTION
 
 INDEX
 	putc_unlocked
+INDEX
+	_putc_unlocked_r
 
 POSIX_SYNOPSIS
 	#include <stdio.h>
 	int putc_unlocked(int <[ch]>, FILE *<[fp]>);
+
+	#include <stdio.h>
+	int _putc_unlocked_r(struct _reent *<[ptr]>, int <[ch]>, FILE *<[fp]>);
 
 DESCRIPTION
 <<putc_unlocked>> is a non-thread-safe version of <<putc>> declared in
@@ -35,6 +40,10 @@ if they are called while the invoking thread owns the ( FILE *)
 object, as is the case after a successful call to the flockfile() or
 ftrylockfile() functions.  If threads are disabled, then
 <<putc_unlocked>> is equivalent to <<putc>>.
+
+The function <<_putc_unlocked_r>> is simply the reentrant version of
+<<putc_unlocked>> that takes an additional reentrant structure pointer
+argument: <[ptr]>.
 
 RETURNS
 See <<putc>>.
@@ -61,11 +70,24 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #undef putc_unlocked
 
 int
+_DEFUN(_putc_unlocked_r, (ptr, c, fp),
+       struct _reent *ptr _AND
+       int c _AND
+       register FILE *fp)
+{
+  /* CHECK_INIT is (eventually) called by __swbuf.  */
+
+  return __sputc_r (ptr, c, fp);
+}
+
+#ifndef _REENT_ONLY
+int
 _DEFUN(putc_unlocked, (c, fp),
        int c _AND
        register FILE *fp)
 {
   /* CHECK_INIT is (eventually) called by __swbuf.  */
 
-  return __sputc (c, fp);
+  return __sputc_r (_REENT, c, fp);
 }
+#endif /* !_REENT_ONLY */

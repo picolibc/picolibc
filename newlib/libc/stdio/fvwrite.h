@@ -19,7 +19,7 @@
 #include <_ansi.h>
 
 /*
- * I/O descriptors for __sfvwrite().
+ * I/O descriptors for __sfvwrite_r().
  */
 struct __siov {
 	_CONST _PTR     iov_base;
@@ -32,7 +32,7 @@ struct __suio {
 };
 
 
-extern int _EXFUN(__sfvwrite,(FILE *, struct __suio *));
+extern int _EXFUN(__sfvwrite_r,(struct _reent *, FILE *, struct __suio *));
 extern int _EXFUN(__swsetup,(FILE *));
 
 

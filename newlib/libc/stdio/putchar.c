@@ -81,7 +81,7 @@ _DEFUN(_putchar_r, (ptr, c),
        int c)
 {
   _REENT_SMALL_CHECK_INIT (ptr);
-  return putc (c, _stdout_r (ptr));
+  return _putc_r (ptr, c, _stdout_r (ptr));
 }
 
 #ifndef _REENT_ONLY
@@ -90,9 +90,8 @@ int
 _DEFUN(putchar, (c),
        int c)
 {
-  /* CHECK_INIT is (eventually) called by __swbuf.  */
-
-  return _putchar_r (_REENT, c);
+  _REENT_SMALL_CHECK_INIT (_REENT);
+  return _putc_r (_REENT, c, _stdout_r (_REENT));
 }
 
 #endif

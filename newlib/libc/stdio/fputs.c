@@ -21,10 +21,15 @@ FUNCTION
 
 INDEX
 	fputs
+INDEX
+	_fputs_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	int fputs(const char *<[s]>, FILE *<[fp]>);
+
+	#include <stdio.h>
+	int _fputs_r(struct _reent *<[ptr]>, const char *<[s]>, FILE *<[fp]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -32,9 +37,18 @@ TRAD_SYNOPSIS
 	char *<[s]>;
 	FILE *<[fp]>;
 
+	#include <stdio.h>
+	int _fputs_r(<[ptr]>, <[s]>, <[fp]>)
+	struct _reent *<[ptr]>;
+	char *<[s]>;
+	FILE *<[fp]>;
+
 DESCRIPTION
 <<fputs>> writes the string at <[s]> (but without the trailing null)
 to the file or stream identified by <[fp]>.
+
+<<_fputs_r>> is simply the reentrant version of <<fputs>> that takes
+an additional reentrant struct pointer argument: <[ptr]>.
 
 RETURNS
 If successful, the result is <<0>>; otherwise, the result is <<EOF>>.
@@ -58,7 +72,8 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
  */
 
 int
-_DEFUN(fputs, (s, fp),
+_DEFUN(_fputs_r, (ptr, s, fp),
+       struct _reent * ptr _AND
        char _CONST * s _AND
        FILE * fp)
 {
@@ -71,10 +86,20 @@ _DEFUN(fputs, (s, fp),
   uio.uio_iov = &iov;
   uio.uio_iovcnt = 1;
 
-  CHECK_INIT(_REENT);
+  CHECK_INIT(ptr);
 
   _flockfile (fp);
-  result = __sfvwrite (fp, &uio);
+  result = __sfvwrite_r (ptr, fp, &uio);
   _funlockfile (fp);
   return result;
 }
+
+#ifndef _REENT_ONLY
+int
+_DEFUN(fputs, (s, fp),
+       char _CONST * s _AND
+       FILE * fp)
+{
+  return _fputs_r (_REENT, s, fp);
+}
+#endif /* !_REENT_ONLY */

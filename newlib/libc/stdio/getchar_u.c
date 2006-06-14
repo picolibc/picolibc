@@ -21,10 +21,15 @@ FUNCTION
 
 INDEX
 	getchar_unlocked
+INDEX
+	_getchar_unlocked_r
 
 POSIX_SYNOPSIS
 	#include <stdio.h>
 	int getchar_unlocked();
+
+	#include <stdio.h>
+	int _getchar_unlocked_r(struct _reent *<[ptr]>);
 
 DESCRIPTION
 <<getchar_unlocked>> is a non-thread-safe version of <<getchar>>
@@ -35,6 +40,10 @@ program if and only if they are called while the invoking thread owns
 the ( FILE *) object, as is the case after a successful call to the
 flockfile() or ftrylockfile() functions.  If threads are disabled,
 then <<getchar_unlocked>> is equivalent to <<getchar>>.
+
+The <<_getchar_unlocked_r>> function is simply the reentrant version of
+<<getchar_unlocked>> which passes an addtional reentrancy structure pointer
+argument: <[ptr]>.
 
 RETURNS
 See <<getchar>>.
@@ -61,10 +70,10 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #undef getchar_unlocked
 
 int
-_DEFUN(_getchar_unlocked_r, (f),
-       struct _reent *f)
+_DEFUN(_getchar_unlocked_r, (ptr),
+       struct _reent *ptr)
 {
-  return getc_unlocked (_stdin_r (f));
+  return _getc_unlocked_r (ptr, _stdin_r (ptr));
 }
 
 #ifndef _REENT_ONLY
@@ -72,9 +81,9 @@ _DEFUN(_getchar_unlocked_r, (f),
 int
 _DEFUN_VOID(getchar_unlocked)
 {
-  /* CHECK_INIT is called (eventually) by __srefill.  */
+  /* CHECK_INIT is called (eventually) by __srefill_r.  */
 
-  return _getchar_unlocked_r (_REENT);
+  return _getc_unlocked_r (_REENT, _stdin_r (_REENT));
 }
 
 #endif

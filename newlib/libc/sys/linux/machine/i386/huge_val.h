@@ -1,3 +1,5 @@
+#if 0 /* We don't need this file because math.h defines these values.  */
+
 /* `HUGE_VAL' constants for ix86 (where it is infinity).
    Used by <stdlib.h> and <math.h> functions for overflow.
    Copyright (C) 1992, 1995, 1996, 1997, 1999, 2000 Free Software Foundation, Inc.
@@ -54,3 +56,4 @@ static __huge_vall_t __huge_vall = { __HUGE_VALL_bytes };
 
 # endif /* GCC 2.95 */
 
+#endif /* if 0 */

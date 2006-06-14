@@ -293,11 +293,19 @@ int	_EXFUN(_fcloseall_r, (struct _reent *));
 FILE *	_EXFUN(_fdopen_r, (struct _reent *, int, const char *));
 FILE *	_EXFUN(_fopen_r, (struct _reent *, const char *, const char *));
 int	_EXFUN(_fclose_r, (struct _reent *, FILE *));
+char *  _EXFUN(_fgets_r, (struct _reent *, char *, int, FILE *));
 int	_EXFUN(_fiscanf_r, (struct _reent *, FILE *, const char *, ...));
+int	_EXFUN(_fputc_r, (struct _reent *, int, FILE *));
+int	_EXFUN(_fputs_r, (struct _reent *, const char *, FILE *));
+size_t	_EXFUN(_fread_r, (struct _reent *, _PTR, size_t _size, size_t _n, FILE *));
 int	_EXFUN(_fscanf_r, (struct _reent *, FILE *, const char *, ...));
 int	_EXFUN(_fseek_r, (struct _reent *, FILE *, long, int));
 long	_EXFUN(_ftell_r, (struct _reent *, FILE *));
+size_t	_EXFUN(_fwrite_r, (struct _reent *, const _PTR , size_t _size, size_t _n, FILE *));
+int	_EXFUN(_getc_r, (struct _reent *, FILE *));
+int	_EXFUN(_getc_unlocked_r, (struct _reent *, FILE *));
 int	_EXFUN(_getchar_r, (struct _reent *));
+int	_EXFUN(_getchar_unlocked_r, (struct _reent *));
 char *	_EXFUN(_gets_r, (struct _reent *, char *));
 int	_EXFUN(_iprintf_r, (struct _reent *, const char *, ...));
 int	_EXFUN(_iscanf_r, (struct _reent *, const char *, ...));
@@ -305,6 +313,9 @@ int	_EXFUN(_mkstemp_r, (struct _reent *, char *));
 char *	_EXFUN(_mktemp_r, (struct _reent *, char *));
 void	_EXFUN(_perror_r, (struct _reent *, const char *));
 int	_EXFUN(_printf_r, (struct _reent *, const char *, ...));
+int	_EXFUN(_putc_r, (struct _reent *, int, FILE *));
+int	_EXFUN(_putc_unlocked_r, (struct _reent *, int, FILE *));
+int	_EXFUN(_putchar_unlocked_r, (struct _reent *, int));
 int	_EXFUN(_putchar_r, (struct _reent *, int));
 int	_EXFUN(_puts_r, (struct _reent *, const char *));
 int	_EXFUN(_remove_r, (struct _reent *, const char *));
@@ -366,8 +377,8 @@ FILE *  _EXFUN(_tmpfile64_r, (struct _reent *));
  * Routines internal to the implementation.
  */
 
-int	_EXFUN(__srget, (FILE *));
-int	_EXFUN(__swbuf, (int, FILE *));
+int	_EXFUN(__srget_r, (struct _reent *, FILE *));
+int	_EXFUN(__swbuf_r, (struct _reent *, int, FILE *));
 
 /*
  * Stdio function-access interface.
@@ -388,15 +399,15 @@ FILE	*_EXFUN(funopen,(const _PTR _cookie,
  * The __sfoo macros are here so that we can 
  * define function versions in the C library.
  */
-#define       __sgetc_raw(p) (--(p)->_r < 0 ? __srget(p) : (int)(*(p)->_p++))
+#define       __sgetc_raw_r(__ptr, __f) (--(__f)->_r < 0 ? __srget_r(__ptr, __f) : (int)(*(__f)->_p++))
 
 #ifdef __SCLE
-static __inline__ int __sgetc(FILE *__p)
+static __inline__ int __sgetc_r(struct _REENT *__ptr, FILE *__p)
   {
-    int __c = __sgetc_raw(__p);
+    int __c = __sgetc_raw_r(__ptr, __p);
     if ((__p->_flags & __SCLE) && (__c == '\r'))
       {
-      int __c2 = __sgetc_raw(__p);
+      int __c2 = __sgetc_raw_r(__ptr, __p);
       if (__c2 == '\n')
         __c = __c2;
       else
@@ -405,37 +416,37 @@ static __inline__ int __sgetc(FILE *__p)
     return __c;
   }
 #else
-#define __sgetc(p) __sgetc_raw(p)
+#define __sgetc_r(__ptr, __p) __sgetc_raw_r(__ptr, __p)
 #endif
 
 #ifdef _never /* __GNUC__ */
 /* If this inline is actually used, then systems using coff debugging
    info get hopelessly confused.  21sept93 rich@cygnus.com.  */
-static __inline int __sputc(int _c, FILE *_p) {
+static __inline int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
 	if (--_p->_w >= 0 || (_p->_w >= _p->_lbfsize && (char)_c != '\n'))
 		return (*_p->_p++ = _c);
 	else
-		return (__swbuf(_c, _p));
+		return (__swbuf_r(_ptr, _c, _p));
 }
 #else
 /*
  * This has been tuned to generate reasonable code on the vax using pcc
  */
-#define       __sputc_raw(c, p) \
-	(--(p)->_w < 0 ? \
-		(p)->_w >= (p)->_lbfsize ? \
-			(*(p)->_p = (c)), *(p)->_p != '\n' ? \
-				(int)*(p)->_p++ : \
-				__swbuf('\n', p) : \
-			__swbuf((int)(c), p) : \
-		(*(p)->_p = (c), (int)*(p)->_p++))
+#define       __sputc_raw_r(__ptr, __c, __p) \
+	(--(__p)->_w < 0 ? \
+		(__p)->_w >= (__p)->_lbfsize ? \
+			(*(__p)->_p = (__c)), *(__p)->_p != '\n' ? \
+				(int)*(__p)->_p++ : \
+				__swbuf_r(__ptr, '\n', __p) : \
+			__swbuf_r(__ptr, (int)(__c), __p) : \
+		(*(__p)->_p = (__c), (int)*(__p)->_p++))
 #ifdef __SCLE
-#define __sputc(c, p) \
-        ((((p)->_flags & __SCLE) && ((c) == '\n')) \
-          ? __sputc_raw('\r', (p)) : 0 , \
-        __sputc_raw((c), (p)))
+#define __sputc_r(__ptr, __c, __p) \
+        ((((__p)->_flags & __SCLE) && ((__c) == '\n')) \
+          ? __sputc_raw_r(__ptr, '\r', (__p)) : 0 , \
+        __sputc_raw_r((__ptr), (__c), (__p)))
 #else
-#define __sputc(c, p) __sputc_raw(c, p)
+#define __sputc_r(__ptr, __c, __p) __sputc_raw_r(__ptr, __c, __p)
 #endif
 #endif
 
@@ -454,8 +465,8 @@ static __inline int __sputc(int _c, FILE *_p) {
 
 #ifndef __CYGWIN__
 #ifndef lint
-#define	getc(fp)	__sgetc(fp)
-#define putc(x, fp)	__sputc(x, fp)
+#define	getc(fp)	__sgetc_r(_REENT, fp)
+#define putc(x, fp)	__sputc_r(_REENT, x, fp)
 #endif /* lint */
 #endif /* __CYGWIN__ */
 
@@ -465,7 +476,7 @@ static __inline int __sputc(int _c, FILE *_p) {
 #ifndef __STRICT_ANSI__
 /* fast always-buffered version, true iff error */
 #define	fast_putc(x,p) (--(p)->_w < 0 ? \
-	__swbuf((int)(x), p) == EOF : (*(p)->_p = (x), (p)->_p++, 0))
+	__swbuf_r(_REENT, (int)(x), p) == EOF : (*(p)->_p = (x), (p)->_p++, 0))
 
 #define	L_cuserid	9		/* posix says it goes in stdio.h :( */
 #ifdef __CYGWIN__

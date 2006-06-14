@@ -79,11 +79,11 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #undef getchar
 
 int
-_DEFUN(_getchar_r, (f),
-       struct _reent *f)
+_DEFUN(_getchar_r, (reent),
+       struct _reent *reent)
 {
-  _REENT_SMALL_CHECK_INIT (f);
-  return getc (_stdin_r (f));
+  _REENT_SMALL_CHECK_INIT (reent);
+  return _getc_r (reent, _stdin_r (reent));
 }
 
 #ifndef _REENT_ONLY
@@ -91,9 +91,9 @@ _DEFUN(_getchar_r, (f),
 int
 _DEFUN_VOID(getchar)
 {
-  /* CHECK_INIT is called (eventually) by __srefill.  */
-
-  return _getchar_r (_REENT);
+  /* CHECK_INIT is called (eventually) by __srefill_r.  */
+  _REENT_SMALL_CHECK_INIT (_REENT);
+  return _getc_r (_REENT, _stdin_r (_REENT));
 }
 
 #endif

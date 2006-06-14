@@ -21,14 +21,24 @@ FUNCTION
 
 INDEX
 	fgetc
+INDEX
+	_fgetc_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	int fgetc(FILE *<[fp]>);
 
+	#include <stdio.h>
+	int _fgetc_r(struct _reent *<[ptr]>, FILE *<[fp]>);
+
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	int fgetc(<[fp]>)
+	FILE *<[fp]>;
+
+	#include <stdio.h>
+	int _fgetc_r(<[ptr]>, <[fp]>)
+	struct _reent *<[ptr]>;
 	FILE *<[fp]>;
 
 DESCRIPTION
@@ -37,6 +47,10 @@ identified by <[fp]>.  As a side effect, <<fgetc>> advances the file's
 current position indicator.
 
 For a macro version of this function, see <<getc>>.
+
+The function <<_fgetc_r>> is simply a reentrant version of
+<<fgetc>> that is passed the additional reentrant structure
+pointer argument: <[ptr]>.
 
 RETURNS
 The next character (read as an <<unsigned char>>, and cast to
@@ -58,13 +72,35 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include "local.h"
 
 int
-_DEFUN(fgetc, (fp),
+_DEFUN(_fgetc_r, (ptr, fp),
+       struct _reent * ptr _AND
        FILE * fp)
 {
   int result;
-  CHECK_INIT(_REENT);
+  CHECK_INIT(ptr);
   _flockfile (fp);
-  result = __sgetc (fp);
+  result = __sgetc_r (ptr, fp);
   _funlockfile (fp);
   return result;
 }
+
+#ifndef _REENT_ONLY
+
+int
+_DEFUN(fgetc, (fp),
+       FILE * fp)
+{
+#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
+  int result;
+  CHECK_INIT(_REENT);
+  _flockfile (fp);
+  result = __sgetc_r (_REENT, fp);
+  _funlockfile (fp);
+  return result;
+#else
+  return _fgetc_r (_REENT, fp);
+#endif
+}
+
+#endif /* !_REENT_ONLY */
+

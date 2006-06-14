@@ -33,7 +33,7 @@ extern int    _EXFUN(__svfscanf_r,(struct _reent *,FILE *, _CONST char *,va_list
 extern int    _EXFUN(__svfiscanf_r,(struct _reent *,FILE *, _CONST char *,va_list));
 extern FILE  *_EXFUN(__sfp,(struct _reent *));
 extern int    _EXFUN(__sflags,(struct _reent *,_CONST char*, int*));
-extern int    _EXFUN(__srefill,(FILE *));
+extern int    _EXFUN(__srefill_r,(struct _reent *,FILE *));
 extern _READ_WRITE_RETURN_TYPE _EXFUN(__sread,(_PTR, char *, int));
 extern _READ_WRITE_RETURN_TYPE _EXFUN(__swrite,(_PTR, char _CONST *, int));
 extern _fpos_t _EXFUN(__sseek,(_PTR, _fpos_t, int));
@@ -45,7 +45,6 @@ extern _VOID   _EXFUN(__smakebuf,(FILE *));
 extern int    _EXFUN(_fwalk,(struct _reent *, int (*)(FILE *)));
 extern int    _EXFUN(_fwalk_reent,(struct _reent *, int (*)(struct _reent *, FILE *)));
 struct _glue * _EXFUN(__sfmoreglue,(struct _reent *,int n));
-extern int   _EXFUN(__srefill,(FILE *fp));
 
 /* Called by the main entry point fns to ensure stdio has been initialized.  */
 

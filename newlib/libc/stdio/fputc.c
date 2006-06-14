@@ -21,14 +21,25 @@ FUNCTION
 
 INDEX
 	fputc
+INDEX
+	_fputc_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	int fputc(int <[ch]>, FILE *<[fp]>);
 
+	#include <stdio.h>
+	int _fputc_r(struct _rent *<[ptr]>, int <[ch]>, FILE *<[fp]>);
+
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	int fputc(<[ch]>, <[fp]>)
+	int <[ch]>;
+	FILE *<[fp]>;
+
+	#include <stdio.h>
+	int _fputc_r(<[ptr]>, <[ch]>, <[fp]>)
+	struct _reent *<[ptr]>;
 	int <[ch]>;
 	FILE *<[fp]>;
 
@@ -44,6 +55,9 @@ current value of the position indicator, and the position indicator
 oadvances by one.
 
 For a macro version of this function, see <<putc>>.
+
+The <<_fputc_r>> function is simply a reentrant version of <<fputc>>
+that takes an additional reentrant structure argument: <[ptr]>.
 
 RETURNS
 If successful, <<fputc>> returns its argument <[ch]>.  If an error
@@ -62,14 +76,34 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include "local.h"
 
 int
-_DEFUN(fputc, (ch, file),
+_DEFUN(_fputc_r, (ptr, ch, file),
+       struct _reent *ptr _AND
        int ch _AND
        FILE * file)
 {
   int result;
-  CHECK_INIT(_REENT);
+  CHECK_INIT(ptr);
    _flockfile (file);
-  result = putc (ch, file);
+  result = _putc_r (ptr, ch, file);
   _funlockfile (file);
   return result;
 }
+
+#ifndef _REENT_ONLY
+int
+_DEFUN(fputc, (ch, file),
+       int ch _AND
+       FILE * file)
+{
+#if !defined(__OPTIMIZE_SIZE__) && !defined(PREFER_SIZE_OVER_SPEED)
+  int result;
+  CHECK_INIT(_REENT);
+   _flockfile (file);
+  result = _putc_r (_REENT, ch, file);
+  _funlockfile (file);
+  return result;
+#else
+  return _fputc_r (_REENT, ch, file);
+#endif
+}
+#endif /* !_REENT_ONLY */

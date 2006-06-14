@@ -221,7 +221,7 @@ typedef unsigned long long u_long_long;
  * vfscanf
  */
 
-#define BufferEmpty (fp->_r <= 0 && __srefill(fp))
+#define BufferEmpty (fp->_r <= 0 && __srefill_r(rptr, fp))
 
 #ifndef _REENT_ONLY
 
@@ -547,7 +547,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	      if (--fp->_r > 0)
 		fp->_p++;
 	      else
-	      if (__srefill (fp))
+	      if (__srefill_r (rptr, fp))
 		goto input_failure;
 	    }
 	  /*
@@ -615,7 +615,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		      sum += n;
 		      width -= n;
 		      fp->_p += n;
-		      if (__srefill (fp))
+		      if (__srefill_r (rptr, fp))
 			{
 			  if (sum == 0)
 			    goto input_failure;
@@ -910,7 +910,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	      if (--fp->_r > 0)
 		fp->_p++;
 	      else
-	      if (__srefill (fp))
+	      if (__srefill_r (rptr, fp))
 		break;		/* EOF */
 	    }
 	  /*
@@ -1107,7 +1107,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	      if (--fp->_r > 0)
 		fp->_p++;
 	      else
-	      if (__srefill (fp))
+	      if (__srefill_r (rptr, fp))
 		break;		/* EOF */
 	    }
 	  if (zeroes)

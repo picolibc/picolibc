@@ -21,14 +21,24 @@ FUNCTION
 
 INDEX
 	getc
+INDEX
+	_getc_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	int getc(FILE *<[fp]>);
 
+	#include <stdio.h>
+	int _getc_r(struct _reent *<[ptr]>, FILE *<[fp]>);
+
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	int getc(<[fp]>)
+	FILE *<[fp]>;
+
+	#include <stdio.h>
+	int _getc_r(<[ptr]>, <[fp]>)
+	struct _reent *<[ptr]>;
 	FILE *<[fp]>;
 
 DESCRIPTION
@@ -38,6 +48,9 @@ identified by <[fp]>.  As a side effect, <<getc>> advances the file's
 current position indicator.
 
 For a subroutine version of this macro, see <<fgetc>>.
+
+The <<_getc_r>> function is simply the reentrant version of <<getc>>
+which passes an additional reentrancy structure pointer argument: <[ptr]>.
 
 RETURNS
 The next character (read as an <<unsigned char>>, and cast to
@@ -73,13 +86,30 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #undef getc
 
 int
+_DEFUN(_getc_r, (ptr, fp),
+       struct _reent *ptr _AND
+       register FILE *fp)
+{
+  int result;
+  CHECK_INIT (ptr);
+  _flockfile (fp);
+  result = __sgetc_r (ptr, fp);
+  _funlockfile (fp);
+  return result;
+}
+
+#ifndef _REENT_ONLY
+
+int
 _DEFUN(getc, (fp),
        register FILE *fp)
 {
   int result;
   CHECK_INIT (_REENT);
   _flockfile (fp);
-  result = __sgetc (fp);
+  result = __sgetc_r (_REENT, fp);
   _funlockfile (fp);
   return result;
 }
+
+#endif /* !_REENT_ONLY */

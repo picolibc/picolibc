@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 #include "local.h"
 #include "fvwrite.h"
 
@@ -43,7 +44,8 @@
  */
 
 int
-_DEFUN(__sfvwrite, (fp, uio),
+_DEFUN(__sfvwrite_r, (ptr, fp, uio),
+       struct _reent *ptr _AND
        register FILE *fp _AND
        register struct __suio *uio)
 {
@@ -59,7 +61,11 @@ _DEFUN(__sfvwrite, (fp, uio),
 
   /* make sure we can write */
   if (cantwrite (fp))
-    return EOF;
+    {
+      fp->_flags |= __SERR;
+      ptr->_errno = EBADF;
+      return EOF;
+    }
 
   iov = uio->uio_iov;
   len = 0;

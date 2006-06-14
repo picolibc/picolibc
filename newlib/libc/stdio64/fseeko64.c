@@ -309,7 +309,7 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
   n = target - curoff;
   if (n)
     {
-      if (__srefill (fp) || fp->_r < n)
+      if (__srefill_r (ptr, fp) || fp->_r < n)
 	goto dumb;
       fp->_p += n;
       fp->_r -= n;

@@ -212,7 +212,8 @@ static char *rcsid = "$Id$";
  * then reset it so that it can be reused.
  */
 static int
-_DEFUN(__sprint, (fp, uio),
+_DEFUN(__sprint_r, (ptr, fp, uio),
+       struct _reent *ptr _AND
        FILE *fp _AND
        register struct __suio *uio)
 {
@@ -222,7 +223,7 @@ _DEFUN(__sprint, (fp, uio),
 		uio->uio_iovcnt = 0;
 		return (0);
 	}
-	err = __sfvwrite(fp, uio);
+	err = __sfvwrite_r(ptr, fp, uio);
 	uio->uio_resid = 0;
 	uio->uio_iovcnt = 0;
 	return (err);
@@ -469,7 +470,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	uio.uio_resid += (len); \
 	iovp++; \
 	if (++uio.uio_iovcnt >= NIOV) { \
-		if (__sprint(fp, &uio)) \
+		if (__sprint_r(data, fp, &uio)) \
 			goto error; \
 		iovp = iov; \
 	} \
@@ -484,7 +485,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	} \
 }
 #define	FLUSH() { \
-	if (uio.uio_resid && __sprint(fp, &uio)) \
+	if (uio.uio_resid && __sprint_r(data, fp, &uio)) \
 		goto error; \
 	uio.uio_iovcnt = 0; \
 	iovp = iov; \

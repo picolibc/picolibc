@@ -1,3 +1,42 @@
+2006-06-14  Jeff Johnston  <jjohnstn@redhat.com>	
+
+	* libc/include/stdio.h: Add new reentrant I/O prototypes for
+	read/write functions.  Change getc/putc macros to have reentrant underlying 
+	macros/functions.  This includes __sgetc_raw_r, __sgetc_r, and __sputc_r.
+	* libc/stdio/fgetc.c: Fix and/or add reentrant version to call
+	new reentrant I/O functions/macros for reading/writing.
+	* libc/stdio/fgets.c: Ditto.
+	* libc/stdio/fputc.c: Ditto.
+	* libc/stdio/fputs.c: Ditto.
+	* libc/stdio/fread.c: Ditto.
+	* libc/stdio/fseek.c: Ditto.
+	* libc/stdio64/fseeko64.c: Ditto.
+	* libc/stdio/fwrite.c: Ditto.
+	* libc/stdio/getc.c: Ditto.
+	* libc/stdio/getc_u.c: Ditto.
+	* libc/stdio/getchar.c: Ditto.
+	* libc/stdio/getchar_u.c: Ditto.
+	* libc/stdio/putc.c: Ditto.
+	* libc/stdio/putc_u.c: Ditto.
+	* libc/stdio/putchar.c: Ditto.
+	* libc/stdio/puts.c: Ditto.
+	* libc/stdio/vfprintf.c: Ditto.
+	* libc/stdio/vfscanf.c: Ditto.
+	* libc/stdio/fvwrite.c: Change __sfvwrite into reentrant __sfvwrite_r.
+	Change all previous callers of __sfvwrite.  Set errno to EBADF and
+	set error flag on if attempt is made to write to file that does not
+	allow writing.
+	* libc/stdio/fvwrite.h: Fix new reentrant prototypes.
+	* libc/stdio/local.h: Ditto.
+	* libc/stdio/refill.c: Turn __srefill into reentrant __srefill_r.
+	Set errno to EBADF and the error flag on if attempt is made to
+	read unreadable file.  Change all previous callers of __srefill.
+	* libc/stdio/rget.c
+	* libc/stdio/wbuf.c: Turn __swbuf into reentrant __swbuf_r.  Change
+	all previous callers of __swbuf.
+	* libc/sys/linux/machine/i386/huge_val.h: Ifdef out file contents since
+	huge value macros are already defined correctly for i386 by <math.h>.
+
 2006-06-13  Sandra Loosemore <sandra@codesourcery.com>
 
 	* /libc/sys/arm/syscalls.c (_unlink, isatty, _system, _rename):

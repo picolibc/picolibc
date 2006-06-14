@@ -21,10 +21,15 @@ FUNCTION
 
 INDEX
 	getc_unlocked
+INDEX
+	_getc_unlocked_r
 
 POSIX_SYNOPSIS
 	#include <stdio.h>
 	int getc_unlocked(FILE *<[fp]>);
+
+	#include <stdio.h>
+	int _getc_unlocked_r(FILE *<[fp]>);
 
 DESCRIPTION
 <<getc_unlocked>> is a non-thread-safe version of <<getc>> declared in
@@ -35,6 +40,10 @@ if they are called while the invoking thread owns the ( FILE *)
 object, as is the case after a successful call to the flockfile() or
 ftrylockfile() functions.  If threads are disabled, then
 <<getc_unlocked>> is equivalent to <<getc>>.
+
+The <<_getc_unlocked_r>> function is simply the reentrant version of
+<<get_unlocked>> which passes an additional reentrancy structure pointer
+argument: <[ptr]>.
 
 RETURNS
 See <<getc>>.
@@ -60,10 +69,22 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #undef getc_unlocked
 
 int
+_DEFUN(_getc_unlocked_r, (ptr, fp),
+       struct _reent *ptr _AND
+       register FILE *fp)
+{
+  /* CHECK_INIT is called (eventually) by __srefill_r.  */
+
+  return __sgetc_r (ptr, fp);
+}
+
+#ifndef _REENT_ONLY
+
+int
 _DEFUN(getc_unlocked, (fp),
        register FILE *fp)
 {
-  /* CHECK_INIT is called (eventually) by __srefill.  */
-
-  return __sgetc (fp);
+  return __sgetc_r (_REENT, fp);
 }
+
+#endif /* !_REENT_ONLY */
