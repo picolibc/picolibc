@@ -1,3 +1,105 @@
+2006-06-15  Mark Shinwell  <shinwell@codesourcery.com>
+
+	* include/elf/arm.h: Correct names of R_ARM_LDC_G{0,1,2}
+	to R_ARM_LDC_SB_G{0,1,2} respectively.
+
+	bfd/
+	* bfd-in2.h: Regenerate.
+	* elf32-arm.c (R_ARM_ALU_PC_G0_NC, R_ARM_ALU_PC_G0,
+	R_ARM_ALU_PC_G1_NC, R_ARM_ALU_PC_G1, R_ARM_ALU_PC_G2,
+	R_ARM_LDR_PC_G1, R_ARM_LDR_PC_G2, R_ARM_LDRS_PC_G0,
+	R_ARM_LDRS_PC_G1, R_ARM_LDRS_PC_G2, R_ARM_LDC_PC_G0,
+	R_ARM_LDC_PC_G1, R_ARM_LDC_PC_G2, R_ARM_ALU_SB_G0_NC,
+	R_ARM_ALU_SB_G0, R_ARM_ALU_SB_G1_NC, R_ARM_ALU_SB_G1,
+	R_ARM_ALU_SB_G2, R_ARM_LDR_SB_G0, R_ARM_LDR_SB_G1,
+	R_ARM_LDR_SB_G2, R_ARM_LDRS_SB_G0, R_ARM_LDRS_SB_G1,
+	R_ARM_LDRS_SB_G2, R_ARM_LDC_SB_G0, R_ARM_LDC_SB_G1,
+	R_ARM_LDC_SB_G2): New relocation types.
+	(R_ARM_PC13): Rename to AAELF name R_ARM_LDR_PC_G0 and
+	adjust HOWTO entry to be consistent with R_ARM_LDR_PC_G1
+	and friends.
+	(elf32_arm_howto_table_3): Delete; contents merged into
+	elf32_arm_howto_table_2.
+	(elf32_arm_howto_from_type): Adjust correspondingly.
+	(elf32_arm_reloc_map): Extend with the above relocations.
+	(calculate_group_reloc_mask): New function.
+	(identify_add_or_sub): New function.
+	(elf32_arm_final_link_relocate): Support for the above
+	relocations.
+	* reloc.c: Add enumeration entries for BFD_RELOC_ARM_...
+	codes to correspond to the above relocations.
+
+	gas/
+	* config/tc-arm.c (enum parse_operand_result): New.
+	(struct group_reloc_table_entry): New.
+	(enum group_reloc_type): New.
+	(group_reloc_table): New array.
+	(find_group_reloc_table_entry): New function.
+	(parse_shifter_operand_group_reloc): New function.
+	(parse_address_main): New function, incorporating code
+	from the old parse_address function.  To be used via...
+	(parse_address): wrapper for parse_address_main; and
+	(parse_address_group_reloc): new function, likewise.
+	(enum operand_parse_code): New codes OP_SHG, OP_ADDRGLDR,
+	OP_ADDRGLDRS, OP_ADDRGLDC.
+	(parse_operands): Support for these new operand codes.
+	New macro po_misc_or_fail_no_backtrack.
+	(encode_arm_cp_address): Preserve group relocations.
+	(insns): Modify to use the above operand codes where group
+	relocations are permitted.
+	(md_apply_fix): Handle the group relocations
+	ALU_PC_G0_NC through LDC_SB_G2.
+	(tc_gen_reloc): Likewise.
+	(arm_force_relocation): Leave group relocations for the linker.
+	(arm_fix_adjustable): Likewise.
+
+	gas/testsuite/
+	* gas/arm/group-reloc-alu.d: New test.
+	* gas/arm/group-reloc-alu-encoding-bad.d: New test.
+	* gas/arm/group-reloc-alu-encoding-bad.l: New test.
+	* gas/arm/group-reloc-alu-encoding-bad.s: New test.
+	* gas/arm/group-reloc-alu-parsing-bad.d: New test.
+	* gas/arm/group-reloc-alu-parsing-bad.l: New test.
+	* gas/arm/group-reloc-alu-parsing-bad.s: New test.
+	* gas/arm/group-reloc-alu.s: New test.
+	* gas/arm/group-reloc-ldc.d: New test.
+	* gas/arm/group-reloc-ldc-encoding-bad.d: New test.
+	* gas/arm/group-reloc-ldc-encoding-bad.l: New test.
+	* gas/arm/group-reloc-ldc-encoding-bad.s: New test.
+	* gas/arm/group-reloc-ldc-parsing-bad.d: New test.
+	* gas/arm/group-reloc-ldc-parsing-bad.l: New test.
+	* gas/arm/group-reloc-ldc-parsing-bad.s: New test.
+	* gas/arm/group-reloc-ldc.s: New test.
+	* gas/arm/group-reloc-ldr.d: New test.
+	* gas/arm/group-reloc-ldr-encoding-bad.d: New test.
+	* gas/arm/group-reloc-ldr-encoding-bad.l: New test.
+	* gas/arm/group-reloc-ldr-encoding-bad.s: New test.
+	* gas/arm/group-reloc-ldr-parsing-bad.d: New test.
+	* gas/arm/group-reloc-ldr-parsing-bad.l: New test.
+	* gas/arm/group-reloc-ldr-parsing-bad.s: New test.
+	* gas/arm/group-reloc-ldr.s: New test.
+	* gas/arm/group-reloc-ldrs.d: New test.
+	* gas/arm/group-reloc-ldrs-encoding-bad.d: New test.
+	* gas/arm/group-reloc-ldrs-encoding-bad.l: New test.
+	* gas/arm/group-reloc-ldrs-encoding-bad.s: New test.
+	* gas/arm/group-reloc-ldrs-parsing-bad.d: New test.
+	* gas/arm/group-reloc-ldrs-parsing-bad.l: New test.
+	* gas/arm/group-reloc-ldrs-parsing-bad.s: New test.
+	* gas/arm/group-reloc-ldrs.s: New test.
+
+	ld/testsuite/
+	* ld-arm/group-relocs-alu-bad.d: New test.
+	* ld-arm/group-relocs-alu-bad.s: New test.
+	* ld-arm/group-relocs.d: New test.
+	* ld-arm/group-relocs-ldc-bad.d: New test.
+	* ld-arm/group-relocs-ldc-bad.s: New test.
+	* ld-arm/group-relocs-ldr-bad.d: New test.
+	* ld-arm/group-relocs-ldr-bad.s: New test.
+	* ld-arm/group-relocs-ldrs-bad.d: New test.
+	* ld-arm/group-relocs-ldrs-bad.s: New test.
+	* ld-arm/group-relocs.s: New test.
+	* ld-arm/arm-elf.exp: Wire in new tests.
+
 2006-06-15  Julian Brown  <julian@codesourcery.com>
 
 	gas/
