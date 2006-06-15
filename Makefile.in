@@ -2581,7 +2581,7 @@ configure-build-fixincludes:
 	libsrcdir="$$s/fixincludes"; \
 	rm -f no-such-file || : ; \
 	CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
-	  $(BUILD_CONFIGARGS) $${srcdiroption}  \
+	  $(BUILD_CONFIGARGS) $${srcdiroption} --target=$(target) \
 	  || exit 1
 @endif build-fixincludes
 
@@ -8392,7 +8392,7 @@ configure-expat:
 	srcdiroption="--srcdir=$${topdir}/expat"; \
 	libsrcdir="$$s/expat"; \
 	$(SHELL) $${libsrcdir}/configure \
-	  $(HOST_CONFIGARGS) $${srcdiroption}  \
+	  $(HOST_CONFIGARGS) $${srcdiroption} --disable-shared \
 	  || exit 1
 @endif expat
 
@@ -8437,13 +8437,7 @@ maybe-install-expat:
 @if expat
 maybe-install-expat: install-expat
 
-install-expat: installdirs
-	@: $(MAKE); $(unstage)
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	$(HOST_EXPORTS) \
-	(cd $(HOST_SUBDIR)/expat && \
-	  $(MAKE) $(FLAGS_TO_PASS)  install)
+install-expat:
 
 @endif expat
 

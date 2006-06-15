@@ -1,3 +1,10 @@
+2006-06-15  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* Makefile.def (fixincludes): Correct extra_configure_flags
+	typo.
+	(expat): Don't install.  Don't build shared libraries.
+	* Makefile.in: Regenerated.
+
 2006-06-13  Nathan Sidwell  <nathan@codesourcery.com>
 
 	gdb/testsuite/
