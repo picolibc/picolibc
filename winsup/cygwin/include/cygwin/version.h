@@ -288,12 +288,13 @@ details. */
       153: Export updwtmpx, Implement CW_SETUP_WINENV.
       154: Export sigset, sigignore.
       155: Export __isinff, __isinfd, __isnanf, __isnand.
+      156: Export __srbuf_r, __swget_r.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 155
+#define CYGWIN_VERSION_API_MINOR 156
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

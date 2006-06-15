@@ -46,7 +46,9 @@ __signbitd NOSIGFE
 __signbitf NOSIGFE
 __signgam NOSIGFE
 __srget SIGFE
+__srget_r SIGFE
 __swbuf SIGFE
+__swbuf_r SIGFE
 _asprintf_r SIGFE
 asprintf_r = _asprintf_r SIGFE
 _dll_crt0@0 NOSIGFE
