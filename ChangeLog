@@ -83,7 +83,6 @@
 	* config-ml.in: Alter CCASFLAGS to include special
 	multilib options the same as is done for CFLAGS.
 
->>>>>>> 1.659
 2006-05-31  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* Makefile.def: Added dependencies from sim and gdb on intl, and
