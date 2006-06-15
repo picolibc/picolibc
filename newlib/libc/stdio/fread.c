@@ -196,7 +196,7 @@ _DEFUN(_fread_r, (ptr, buf, size, count, fp),
               if (fp->_flags & __SCLE)
 	        {
 	          _funlockfile (fp);
-	          return crlf (fp, buf, total-resid, 1) / size;
+	          return crlf_r (ptr, fp, buf, total-resid, 1) / size;
 	        }
 #endif
 	      _funlockfile (fp);
@@ -221,7 +221,7 @@ _DEFUN(_fread_r, (ptr, buf, size, count, fp),
 	      if (fp->_flags & __SCLE)
 		{
 		  _funlockfile (fp);
-		  return crlf (fp, buf, total-resid, 1) / size;
+		  return crlf_r (ptr, fp, buf, total-resid, 1) / size;
 		}
 #endif
 	      _funlockfile (fp);
@@ -238,7 +238,7 @@ _DEFUN(_fread_r, (ptr, buf, size, count, fp),
   if (fp->_flags & __SCLE)
     {
       _funlockfile (fp);
-      return crlf(fp, buf, total, 0) / size;
+      return crlf_r(ptr, fp, buf, total, 0) / size;
     }
 #endif
   _funlockfile (fp);

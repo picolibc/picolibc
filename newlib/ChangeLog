@@ -1,3 +1,10 @@
+2006-06-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/stdio.h (__sgetc_r): Fix typo.
+	* libc/stdio/fread.c (_fread_r): Convert crlf calls to crlf_r.
+	* libc/stdio/rget.c (__srbuf): Reinstantiate.
+	* libc/stdio/wbuf.c (__swbuf): Ditto.
+
 2006-06-14  Jeff Johnston  <jjohnstn@redhat.com>	
 
 	* libc/include/stdio.h: Add new reentrant I/O prototypes for

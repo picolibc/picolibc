@@ -85,3 +85,14 @@ _DEFUN(__swbuf_r, (ptr, c, fp),
       return EOF;
   return c;
 }
+
+/* This function isn't any longer declared in stdio.h, but it's
+   required for backward compatibility with applications built against
+   earlier dynamically built newlib libraries. */
+int
+_DEFUN(__swbuf, (c, fp),
+       register int c _AND
+       register FILE *fp)
+{
+  return __swbuf_r (_REENT, c, fp);
+}

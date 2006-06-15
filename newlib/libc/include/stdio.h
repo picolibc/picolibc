@@ -402,7 +402,7 @@ FILE	*_EXFUN(funopen,(const _PTR _cookie,
 #define       __sgetc_raw_r(__ptr, __f) (--(__f)->_r < 0 ? __srget_r(__ptr, __f) : (int)(*(__f)->_p++))
 
 #ifdef __SCLE
-static __inline__ int __sgetc_r(struct _REENT *__ptr, FILE *__p)
+static __inline__ int __sgetc_r(struct _reent *__ptr, FILE *__p)
   {
     int __c = __sgetc_raw_r(__ptr, __p);
     if ((__p->_flags & __SCLE) && (__c == '\r'))

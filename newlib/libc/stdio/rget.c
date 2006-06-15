@@ -43,3 +43,13 @@ _DEFUN(__srget_r, (ptr, fp),
     }
   return EOF;
 }
+
+/* This function isn't any longer declared in stdio.h, but it's
+   required for backward compatibility with applications built against
+   earlier dynamically built newlib libraries. */
+int
+_DEFUN(__srget, (fp),
+       register FILE *fp)
+{
+  return __srget_r (_REENT, fp);
+}
