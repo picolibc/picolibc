@@ -1,3 +1,7 @@
+2006-06-18  Chris Sutcliffe  <ir0n3h4d@users.sourceforge.net>
+
+	* configure: add srcdir as a possible location for install-sh.
+
 2006-06-18  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/dirent.c (_tGetFileAttributes): New helper function.
