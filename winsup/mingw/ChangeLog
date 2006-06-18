@@ -1,5 +1,10 @@
 2006-06-18  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* mingwex/dirent.c (_tGetFileAttributes): New helper function.
+	(_topendir): Use it.
+
+2006-06-18  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/sys/time.h: Add header guard.  Add extern "C" bracketing
 	for __cplusplus.
 	(gettimeofday): Add prototype.
