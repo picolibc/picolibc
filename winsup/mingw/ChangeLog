@@ -1,3 +1,11 @@
+2006-06-18  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/sys/time.h: Add header guard.  Add extern "C" bracketing
+	for __cplusplus.
+	(gettimeofday): Add prototype.
+	* mingwex/gettimeofday.c: New file.
+	* mingwex/makefile.in: Add gettimeofday source and object.
+
 2006-06-13  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/math.h (HUGE_VAL): Define as builtin if __GNUC__ >= 3.3,

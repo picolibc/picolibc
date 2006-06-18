@@ -35,7 +35,8 @@ DISTFILES = Makefile.in configure configure.in \
 	testwmem.c tst-aligned-malloc.c ulltoa.c ulltow.c wcstof.c \
 	wcstoimax.c wcstold.c wcstoumax.c wctrans.c wctype.c \
 	wdirent.c wmemchr.c wmemcmp.c wmemcpy.c wmemmove.c wmemset.c wtoll.c \
-	wcrtomb.c wctob.c mbrtowc.c btowc.c mb_wc_common.h
+	wcrtomb.c wctob.c mbrtowc.c btowc.c mb_wc_common.h \
+	gettimeofday.c
 MATH_DISTFILES = \
 	acosf.c acosl.c asinf.c asinl.c atan2f.c atan2l.c \
 	atanf.c atanl.c cbrt.c cbrtf.c cbrtl.c ceilf.S ceill.S \
@@ -163,7 +164,7 @@ FENV_OBJS = fesetround.o  fegetround.o \
 	feclearexcept.o feholdexcept.o fegetexceptflag.o \
 	feraiseexcept.o fetestexcept.o fesetexceptflag.o
 POSIX_OBJS = \
-	dirent.o wdirent.o getopt.o ftruncate.o
+	dirent.o wdirent.o getopt.o ftruncate.o gettimeofday.o
 REPLACE_OBJS = \
 	mingw-aligned-malloc.o mingw-fseek.o
 COMPLEX_OBJS = \
