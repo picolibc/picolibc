@@ -1,3 +1,14 @@
+2006-06-19  Vladimir Prus  <vladimir@codesourcery.com>
+
+	bfd/
+	* elf32-arm.c (elf32_arm_swap_symbol_out): Don't set low
+	bit for undefined symbols.
+
+	ld/testsuite
+	* ld-arm/arm-elf.exp: New test.
+	* ld-arm/use-thumb-lib.s: New file.
+	* ld-arm/use-thumb-lib.sym: New file.
+
 2006-06-15  Mark Shinwell  <shinwell@codesourcery.com>
 
 	* include/elf/arm.h: Correct names of R_ARM_LDC_G{0,1,2}
