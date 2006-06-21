@@ -1,3 +1,10 @@
+2006-06-21  Mark Shinwell  <shinwell@codesourcery.com>
+
+	ld/
+	* ldlang.c (lang_insert_orphan): Correctly handle the case where
+	the section is to end up after the section currently at the end
+	of the list in output_bfd.
+
 2006-06-19  Vladimir Prus  <vladimir@codesourcery.com>
 
 	bfd/
