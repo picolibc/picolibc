@@ -1,5 +1,25 @@
 2006-06-22  Richard Sandiford  <richard@codesourcery.com>
 
+	binutils/
+	* objcopy.c (localize_hidden): New variable.
+	(OPTION_LOCALIZE_HIDDEN): New command_line_switch value.
+	(copy_options): Add --localize-hidden.
+	(copy_usage): Mention --localize-hidden.
+	(is_hidden_symbol): New function.
+	(filter_symbols): Handle localize_hidden.
+	(copy_object): Call filter_symbols if localize_hidden.
+	(copy_main): Handle OPTION_LOCALIZE_HIDDEN.
+	* doc/binutils.texi (--localize-hidden): Document new option.
+
+	binutils/testsuite/
+	* binutils-all/localize-hidden-1.s,
+	* binutils-all/localize-hidden-1.d,
+	* binutils-all/localize-hidden-2.s,
+	* binutils-all/localize-hidden-2.d: New tests.
+	* binutils-all/objcopy.exp: Run them.
+
+2006-06-22  Richard Sandiford  <richard@codesourcery.com>
+
 	Backport from mainline:
 
 	binutils/testsuite/
