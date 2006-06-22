@@ -1,3 +1,14 @@
+2006-06-22  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	gdb/testsuite/:
+	* gdb.base/store.exp: Don't use gdb_suppress_entire_file.
+	* gdb.base/gdb1555.exp: Use gdb_compile_shlib.  Skip if not
+	native.
+	* gdb.stabs/exclfwd.exp: Skip the test if configure did not
+	enable stabs testing.
+	* gdb.base/auxv.exp: Intercept undefined command messages before
+	gdb_test_multiple does.
+
 2006-06-19  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* gdb/testsuite/
