@@ -1,3 +1,16 @@
+2006-06-22  Richard Sandiford  <richard@codesourcery.com>
+
+	Backport from mainline:
+
+	binutils/testsuite/
+	2006-04-26  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* lib/utils-lib.exp (run_dump_test): New.
+	(slurp_options): Likewise.
+	(regexp_diff): Likewise.
+	(file_contents): Likewise.
+	(verbose_eval): Likewise.
+
 2006-06-21  Mark Shinwell  <shinwell@codesourcery.com>
 
 	ld/
