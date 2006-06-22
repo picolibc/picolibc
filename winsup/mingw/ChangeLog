@@ -1,3 +1,8 @@
+2006-06-23 Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/sys/time.h (struct timezone): Define.
+	* include/time.h: Correct comment about timezone.
+
 2006-06-18  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* configure.in (AC_CONFIG_AUX_DIR): Remove.

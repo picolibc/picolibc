@@ -181,7 +181,8 @@ __MINGW_IMPORT char 	*tzname[2];
    of macros.  */
 
 #define daylight        _daylight
-/* NOTE: timezone not defined because it would conflict with sys/timeb.h.
+/* NOTE: timezone not defined as macro because it would conflict with
+   struct timezone in sys/time.h.
    Also, tzname used to a be macro, but now it's in moldname. */
 __MINGW_IMPORT char 	*tzname[2];
 

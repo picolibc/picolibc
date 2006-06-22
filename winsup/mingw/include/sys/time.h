@@ -20,6 +20,15 @@ struct timeval {
 #define timerclear(tvp)	 (tvp)->tv_sec = (tvp)->tv_usec = 0
 #endif /* _TIMEVAL_DEFINED */
 
+/* Provided for compatibility with code that assumes that
+   the presence of gettimeofday function implies a definition
+   of struct timezone. */
+struct timezone
+{
+  int tz_minuteswest; /* of Greenwich */
+  int tz_dsttime;     /* type of dst correction to apply */
+};
+
 /*
    Implementation as per:
    The Open Group Base Specifications, Issue 6
