@@ -1,3 +1,19 @@
+2006-06-22  Jeff Johnston  <jjohnstn@redhat.com>	
+
+	* libc/stdlib/Makefile.am: Add new gdtoa routines.
+	* libc/stdlib/Makefile.in: Regenerated.
+	* libc/stdlib/gd_qnan.h: New file.
+	* libc/stdlib/gdtoa-gethex.c: Ditto.
+	* libc/stdlib/gdtoa-hexnan.c: Ditto.
+	* libc/stdlib/gdtoa.h: Ditto.
+	* libc/stdlib/mprec.c: Add new helper routines needed by
+	the new gdtoa code.
+	* libc/stdlib/mprec.h: Integrate some defines and prototypes
+	used by gdtoa routines here.
+	* libc/stdlib/strtod.c: Rebased on David M. Gay's gdtoa-strtod.c
+	which adds C99 support such as nan, inf, and hexadecimal input
+	format.
+
 2006-06-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/stdio.h (__sgetc_r): Fix typo.

@@ -78,6 +78,39 @@ union double_union
 #define word1(x) (x.i[1])
 #endif
 
+
+/* The following is taken from gdtoaimp.h for use with new strtod.  */
+typedef __int32_t Long;
+typedef union { double d; __ULong L[2]; } U;
+
+#ifdef YES_ALIAS
+#define dval(x) x
+#ifdef IEEE_8087
+#define dword0(x) ((__ULong *)&x)[1]
+#define dword1(x) ((__ULong *)&x)[0]
+#else
+#define dword0(x) ((__ULong *)&x)[0]
+#define dword1(x) ((__ULong *)&x)[1]
+#endif
+#else /* !YES_ALIAS */
+#ifdef IEEE_8087
+#define dword0(x) ((U*)&x)->L[1]
+#define dword1(x) ((U*)&x)->L[0]
+#else
+#define dword0(x) ((U*)&x)->L[0]
+#define dword1(x) ((U*)&x)->L[1]
+#endif
+#define dval(x) ((U*)&x)->d
+#endif /* YES_ALIAS */
+
+
+#undef SI
+#ifdef Sudden_Underflow
+#define SI 1
+#else
+#define SI 0
+#endif
+
 /* The following definition of Storeinc is appropriate for MIPS processors.
  * An alternative that might be better on some machines is
  * #define Storeinc(a,b,c) (*a++ = b << 16 | c & 0xffff)
@@ -161,12 +194,22 @@ union double_union
 #define Quick_max 14
 #define Int_max 14
 #define Infinite(x) (word0(x) == ((__uint32_t)0x7ff00000L)) /* sufficient test for here */
+
+#ifndef Flt_Rounds
+#ifdef FLT_ROUNDS
+#define Flt_Rounds FLT_ROUNDS
+#else
+#define Flt_Rounds 1
+#endif
+#endif /*Flt_Rounds*/
+
 #endif
 
 #else
 #undef  Sudden_Underflow
 #define Sudden_Underflow
 #ifdef IBM
+#define Flt_Rounds 0
 #define Exp_shift  24
 #define Exp_shift1 24
 #define Exp_msk1   ((__uint32_t)0x1000000L)
@@ -191,6 +234,7 @@ union double_union
 #define Quick_max 14
 #define Int_max 15
 #else /* VAX */
+#define Flt_Rounds 1
 #define Exp_shift  23
 #define Exp_shift1 7
 #define Exp_msk1    0x80
@@ -219,6 +263,58 @@ union double_union
 
 #ifndef IEEE_Arith
 #define ROUND_BIASED
+#else
+#define Scale_Bit 0x10
+#if defined(_DOUBLE_IS_32BITS) && defined(__v800)
+#define n_bigtens 2
+#else
+#define n_bigtens 5
+#endif
+#endif
+
+#ifdef IBM
+#define n_bigtens 3
+#endif
+
+#ifdef VAX
+#define n_bigtens 2
+#endif
+
+#ifndef __NO_INFNAN_CHECK
+#define INFNAN_CHECK
+#endif
+
+/*
+ * NAN_WORD0 and NAN_WORD1 are only referenced in strtod.c.  Prior to
+ * 20050115, they used to be hard-wired here (to 0x7ff80000 and 0,
+ * respectively), but now are determined by compiling and running
+ * qnan.c to generate gd_qnan.h, which specifies d_QNAN0 and d_QNAN1.
+ * Formerly gdtoaimp.h recommended supplying suitable -DNAN_WORD0=...
+ * and -DNAN_WORD1=...  values if necessary.  This should still work.
+ * (On HP Series 700/800 machines, -DNAN_WORD0=0x7ff40000 works.)
+ */
+#ifdef IEEE_Arith
+#ifdef IEEE_MC68k
+#define _0 0
+#define _1 1
+#ifndef NAN_WORD0
+#define NAN_WORD0 d_QNAN0
+#endif
+#ifndef NAN_WORD1
+#define NAN_WORD1 d_QNAN1
+#endif
+#else
+#define _0 1
+#define _1 0
+#ifndef NAN_WORD0
+#define NAN_WORD0 d_QNAN1
+#endif
+#ifndef NAN_WORD1
+#define NAN_WORD1 d_QNAN0
+#endif
+#endif
+#else
+#undef INFNAN_CHECK
 #endif
 
 #ifdef RND_PRODQUOT
@@ -249,6 +345,17 @@ extern double rnd_prod(double, double), rnd_quot(double, double);
 #endif
 #endif
 
+#ifdef Pack_32
+#define ULbits 32
+#define kshift 5
+#define kmask 31
+#define ALL_ON 0xffffffff
+#else
+#define ULbits 16
+#define kshift 4
+#define kmask 15
+#define ALL_ON 0xffff
+#endif
 
 #ifdef __cplusplus
 extern "C" double strtod(const char *s00, char **se);
@@ -261,26 +368,34 @@ typedef struct _Bigint _Bigint;
 
 #define Balloc	_Balloc
 #define Bfree	_Bfree
-#define multadd _multadd
-#define s2b	_s2b
-#define lo0bits _lo0bits
-#define hi0bits _hi0bits
-#define i2b	_i2b
-#define mult	_multiply
-#define pow5mult	_pow5mult
-#define lshift	_lshift
+#define multadd __multadd
+#define s2b	__s2b
+#define lo0bits __lo0bits
+#define hi0bits __hi0bits
+#define i2b	__i2b
+#define mult	__multiply
+#define pow5mult	__pow5mult
+#define lshift	__lshift
 #define cmp	__mcmp
 #define diff	__mdiff
-#define ulp 	_ulp
-#define b2d	_b2d
-#define d2b	_d2b
-#define ratio	_ratio
+#define ulp 	__ulp
+#define b2d	__b2d
+#define d2b	__d2b
+#define ratio	__ratio
+#define any_on	__any_on
+#define gethex  __gethex
+#define copybits 	__copybits
+#define hexnan	__hexnan
+#define hexdig_init 	__hexdig_init
+
+#define hexdig  __hexdig
 
 #define tens __mprec_tens
 #define bigtens __mprec_bigtens
 #define tinytens __mprec_tinytens
 
 struct _reent ;
+struct FPI;
 double 		_EXFUN(ulp,(double x));
 double		_EXFUN(b2d,(_Bigint *a , int *e));
 _Bigint *	_EXFUN(Balloc,(struct _reent *p, int k));
@@ -292,23 +407,25 @@ _Bigint *	_EXFUN(mult, (struct _reent *, _Bigint *, _Bigint *));
 _Bigint *	_EXFUN(pow5mult, (struct _reent *, _Bigint *, int k));
 int 		_EXFUN(hi0bits,(__ULong));
 int 		_EXFUN(lo0bits,(__ULong *));
-_Bigint *        _EXFUN(d2b,(struct _reent *p, double d, int *e, int *bits));
-_Bigint *        _EXFUN(lshift,(struct _reent *p, _Bigint *b, int k));
-_Bigint *        _EXFUN(diff,(struct _reent *p, _Bigint *a, _Bigint *b));
-int             _EXFUN(cmp,(_Bigint *a, _Bigint *b));
-
+_Bigint *	_EXFUN(d2b,(struct _reent *p, double d, int *e, int *bits));
+_Bigint *	_EXFUN(lshift,(struct _reent *p, _Bigint *b, int k));
+_Bigint *	_EXFUN(diff,(struct _reent *p, _Bigint *a, _Bigint *b));
+int		_EXFUN(cmp,(_Bigint *a, _Bigint *b));
+int		_EXFUN(gethex,(struct _reent *p, _CONST char **sp, struct FPI *fpi, Long *exp, _Bigint **bp, int sign));     
 double		_EXFUN(ratio,(_Bigint *a, _Bigint *b));
-#define Bcopy(x,y) memcpy((char *)&x->_sign, (char *)&y->_sign, y->_wds*sizeof(__Long) + 2*sizeof(int))
-
-#if defined(_DOUBLE_IS_32BITS) && defined(__v800)
-#define n_bigtens 2
-#else
-#define n_bigtens 5
+__ULong		_EXFUN(any_on,(_Bigint *b, int k));
+void		_EXFUN(copybits,(__ULong *c, int n, _Bigint *b));
+void		_EXFUN(hexdig_init,(void));
+#ifdef INFNAN_CHECK
+int		_EXFUN(hexnan,(_CONST char **sp, struct FPI *fpi, __ULong *x0));
 #endif
+
+#define Bcopy(x,y) memcpy((char *)&x->_sign, (char *)&y->_sign, y->_wds*sizeof(__Long) + 2*sizeof(int))
 
 extern _CONST double tinytens[];
 extern _CONST double bigtens[];
 extern _CONST double tens[];
+extern unsigned char hexdig[];
 
 
 double _EXFUN(_mprec_log10,(int));

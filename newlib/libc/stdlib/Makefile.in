@@ -74,6 +74,7 @@ am__objects_1 = lib_a-__adjust.$(OBJEXT) lib_a-__atexit.$(OBJEXT) \
 	lib_a-dtoa.$(OBJEXT) lib_a-dtoastub.$(OBJEXT) \
 	lib_a-environ.$(OBJEXT) lib_a-envlock.$(OBJEXT) \
 	lib_a-eprintf.$(OBJEXT) lib_a-exit.$(OBJEXT) \
+	lib_a-gdtoa-gethex.$(OBJEXT) lib_a-gdtoa-hexnan.$(OBJEXT) \
 	lib_a-getenv.$(OBJEXT) lib_a-getenv_r.$(OBJEXT) \
 	lib_a-labs.$(OBJEXT) lib_a-ldiv.$(OBJEXT) \
 	lib_a-ldtoa.$(OBJEXT) lib_a-malloc.$(OBJEXT) \
@@ -124,12 +125,12 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 am__objects_7 = __adjust.lo __atexit.lo __call_atexit.lo __exp10.lo \
 	__ten_mu.lo _Exit.lo abort.lo abs.lo assert.lo atexit.lo \
 	atof.lo atoff.lo atoi.lo atol.lo calloc.lo div.lo dtoa.lo \
-	dtoastub.lo environ.lo envlock.lo eprintf.lo exit.lo getenv.lo \
-	getenv_r.lo labs.lo ldiv.lo ldtoa.lo malloc.lo mblen.lo \
-	mblen_r.lo mbstowcs.lo mbstowcs_r.lo mbtowc.lo mbtowc_r.lo \
-	mlock.lo mprec.lo mstats.lo rand.lo rand_r.lo realloc.lo \
-	strtod.lo strtol.lo strtoul.lo wcstombs.lo wcstombs_r.lo \
-	wctomb.lo wctomb_r.lo
+	dtoastub.lo environ.lo envlock.lo eprintf.lo exit.lo \
+	gdtoa-gethex.lo gdtoa-hexnan.lo getenv.lo getenv_r.lo labs.lo \
+	ldiv.lo ldtoa.lo malloc.lo mblen.lo mblen_r.lo mbstowcs.lo \
+	mbstowcs_r.lo mbtowc.lo mbtowc_r.lo mlock.lo mprec.lo \
+	mstats.lo rand.lo rand_r.lo realloc.lo strtod.lo strtol.lo \
+	strtoul.lo wcstombs.lo wcstombs_r.lo wctomb.lo wctomb_r.lo
 am__objects_8 = cxa_atexit.lo cxa_finalize.lo drand48.lo ecvtbuf.lo \
 	efgcvt.lo erand48.lo jrand48.lo lcong48.lo lrand48.lo \
 	mrand48.lo msize.lo mtrim.lo nrand48.lo rand48.lo seed48.lo \
@@ -249,6 +250,7 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
+READELF = @READELF@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -259,6 +261,7 @@ ac_ct_AR = @ac_ct_AR@
 ac_ct_AS = @ac_ct_AS@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_RANLIB = @ac_ct_RANLIB@
+ac_ct_READELF = @ac_ct_READELF@
 ac_ct_STRIP = @ac_ct_STRIP@
 aext = @aext@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
@@ -329,6 +332,8 @@ GENERAL_SOURCES = \
 	envlock.c	\
 	eprintf.c	\
 	exit.c 		\
+	gdtoa-gethex.c	\
+	gdtoa-hexnan.c	\
 	getenv.c  	\
 	getenv_r.c	\
 	labs.c 		\
@@ -684,6 +689,18 @@ lib_a-exit.o: exit.c
 
 lib_a-exit.obj: exit.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-exit.obj `if test -f 'exit.c'; then $(CYGPATH_W) 'exit.c'; else $(CYGPATH_W) '$(srcdir)/exit.c'; fi`
+
+lib_a-gdtoa-gethex.o: gdtoa-gethex.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gdtoa-gethex.o `test -f 'gdtoa-gethex.c' || echo '$(srcdir)/'`gdtoa-gethex.c
+
+lib_a-gdtoa-gethex.obj: gdtoa-gethex.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gdtoa-gethex.obj `if test -f 'gdtoa-gethex.c'; then $(CYGPATH_W) 'gdtoa-gethex.c'; else $(CYGPATH_W) '$(srcdir)/gdtoa-gethex.c'; fi`
+
+lib_a-gdtoa-hexnan.o: gdtoa-hexnan.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gdtoa-hexnan.o `test -f 'gdtoa-hexnan.c' || echo '$(srcdir)/'`gdtoa-hexnan.c
+
+lib_a-gdtoa-hexnan.obj: gdtoa-hexnan.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gdtoa-hexnan.obj `if test -f 'gdtoa-hexnan.c'; then $(CYGPATH_W) 'gdtoa-hexnan.c'; else $(CYGPATH_W) '$(srcdir)/gdtoa-hexnan.c'; fi`
 
 lib_a-getenv.o: getenv.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getenv.o `test -f 'getenv.c' || echo '$(srcdir)/'`getenv.c
@@ -1298,6 +1315,8 @@ $(lpfx)mbtowc_r.$(oext): mbtowc_r.c mbctype.h
 
 $(lpfx)mprec.$(oext): mprec.c mprec.h
 $(lpfx)strtod.$(oext): strtod.c mprec.h
+$(lpfx)gdtoa-gethex.$(oext): gdtoa-gethex.c mprec.h
+$(lpfx)gdtoa-hexnan.$(oext): gdtoa-hexnan.c mprec.h
 $(lpfx)wctomb_r.$(oext): wctomb_r.c mbctype.h
 $(lpfx)drand48.$(oext): drand48.c rand48.h
 $(lpfx)erand48.$(oext): erand48.c rand48.h

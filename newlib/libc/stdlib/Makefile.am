@@ -27,6 +27,8 @@ GENERAL_SOURCES = \
 	envlock.c	\
 	eprintf.c	\
 	exit.c 		\
+	gdtoa-gethex.c	\
+	gdtoa-hexnan.c	\
 	getenv.c  	\
 	getenv_r.c	\
 	labs.c 		\
@@ -256,6 +258,8 @@ $(lpfx)mbtowc_r.$(oext): mbtowc_r.c mbctype.h
 
 $(lpfx)mprec.$(oext): mprec.c mprec.h
 $(lpfx)strtod.$(oext): strtod.c mprec.h
+$(lpfx)gdtoa-gethex.$(oext): gdtoa-gethex.c mprec.h
+$(lpfx)gdtoa-hexnan.$(oext): gdtoa-hexnan.c mprec.h
 $(lpfx)wctomb_r.$(oext): wctomb_r.c mbctype.h
 $(lpfx)drand48.$(oext): drand48.c rand48.h
 $(lpfx)erand48.$(oext): erand48.c rand48.h

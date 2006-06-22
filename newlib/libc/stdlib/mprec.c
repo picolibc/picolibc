@@ -985,3 +985,61 @@ _DEFUN (_mprec_log10, (dig),
     }
   return v;
 }
+
+void
+_DEFUN (copybits, (c, n, b),
+	__ULong *c _AND
+	int n _AND
+	_Bigint *b)
+{
+	__ULong *ce, *x, *xe;
+#ifdef Pack_16
+	int nw, nw1;
+#endif
+
+	ce = c + ((n-1) >> kshift) + 1;
+	x = b->_x;
+#ifdef Pack_32
+	xe = x + b->_wds;
+	while(x < xe)
+		*c++ = *x++;
+#else
+	nw = b->_wds;
+	nw1 = nw & 1;
+	for(xe = x + (nw - nw1); x < xe; x += 2)
+		Storeinc(c, x[1], x[0]);
+	if (nw1)
+		*c++ = *x;
+#endif
+	while(c < ce)
+		*c++ = 0;
+}
+
+__ULong
+_DEFUN (any_on, (b, k),
+	_Bigint *b _AND
+	int k)
+{
+	int n, nwds;
+	__ULong *x, *x0, x1, x2;
+
+	x = b->_x;
+	nwds = b->_wds;
+	n = k >> kshift;
+	if (n > nwds)
+		n = nwds;
+	else if (n < nwds && (k &= kmask)) {
+		x1 = x2 = x[n];
+		x1 >>= k;
+		x1 <<= k;
+		if (x1 != x2)
+			return 1;
+		}
+	x0 = x;
+	x += n;
+	while(x > x0)
+		if (*--x)
+			return 1;
+	return 0;
+}
+
