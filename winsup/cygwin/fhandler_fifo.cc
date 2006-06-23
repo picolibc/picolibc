@@ -1,6 +1,6 @@
 /* fhandler_fifo.cc - See fhandler.h for a description of the fhandler classes.
 
-   Copyright 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -141,10 +141,48 @@ out:
   return res;
 }
 
+#define FIFO_PREFIX "_cygfifo_"
+
 int
 fhandler_fifo::open (int flags, mode_t)
 {
   int res = 1;
+  char mutex[CYG_MAX_PATH];
+  char *emutex = mutex + CYG_MAX_PATH;
+  char *p, *p1;
+
+  /* Generate a semi-unique name to associate with this fifo but try to ensure
+     that it is no larger than CYG_MAX_PATH */
+  for (p = mutex, p1 = strchr (get_name (), '\0');
+       --p1 >= get_name () && p < emutex ; p++)
+    *p = (*p1 == '/') ? '_' : *p1;
+  strncpy (p, FIFO_PREFIX, emutex - p);
+  mutex[CYG_MAX_PATH - 1] = '\0';
+
+  /* Create a mutex lock access to this fifo to prevent a race by two processes
+     trying to figure out if they own the fifo or if they should create it. */
+  HANDLE h = CreateMutex (&sec_none_nih, false, mutex);
+  if (!h)
+    {
+      __seterrno ();
+      system_printf ("couldn't open fifo mutex '%s', %E", mutex);
+      res = 0;
+      goto out;
+    }
+
+  lock_process::locker.release ();	/* Since we may be a while, release the
+					   process lock that is held when we
+					   open an fd. */
+  /* FIXME? Need to wait for signal here?
+     This shouldn't block for long, but... */
+  DWORD resw = WaitForSingleObject (h, INFINITE);
+  lock_process::locker.acquire ();	/* Restore the lock */
+  if (resw != WAIT_OBJECT_0 && resw != WAIT_ABANDONED_0)
+    {
+      __seterrno ();
+      system_printf ("Wait for fifo mutex '%s' failed, %E", mutex);
+      goto out;
+    }
 
   set_io_handle (NULL);
   set_output_handle (NULL);
@@ -174,6 +212,11 @@ fhandler_fifo::open (int flags, mode_t)
     }
 
 out:
+  if (h)
+    {
+      ReleaseMutex (h);
+      CloseHandle (h);
+    }
   debug_printf ("returning %d, errno %d", res, get_errno ());
   return res;
 }

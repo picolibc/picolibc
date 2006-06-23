@@ -1,6 +1,6 @@
 /* sync.h: Header file for cygwin synchronization primitives.
 
-   Copyright 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
 
    Written by Christopher Faylor <cgf@cygnus.com>
 
@@ -66,6 +66,7 @@ public:
       locker.release ();
   }
   friend class dtable;
+  friend class fhandler_fifo;
 };
 
 #endif /*_SYNC_H*/

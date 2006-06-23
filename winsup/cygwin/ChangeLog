@@ -1,3 +1,11 @@
+2006-06-22  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler_fifo.cc (fhandler_fifo::open): Release process lock and grab
+	a system-wide mutex to prevent a deadlock and a race.
+	* sync.h (lock_process): Make fhandler_fifo a friend.
+
+	* smallprint.c (__small_vsprintf): Cosmetic change.
+
 2006-06-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din: Export __srget_r, __swbuf_r.

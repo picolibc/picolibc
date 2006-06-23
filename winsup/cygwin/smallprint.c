@@ -1,6 +1,6 @@
 /* smallprint.c: small print routines for WIN32
 
-   Copyright 1996, 1998, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1996, 1998, 2000, 2001, 2002, 2003, 2005, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -159,7 +159,7 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		    s = tmp;
 		  goto fillin;
 		case '.':
-		  n = strtol (fmt, (char **)&fmt, 10);
+		  n = strtol (fmt, (char **) &fmt, 10);
 		  if (*fmt++ != 's')
 		    goto endfor;
 		case 's':
