@@ -1,3 +1,10 @@
+2006-06-23  Mark Mitchell  <mark@codesourcery.com>
+
+	Issue #754
+	libgloss/
+	* arm/elf-lm3s301.ld: Include cm3.ld.
+	* arm/elf-lm3s31x.ld: Likewise.
+
 2006-06-13  Mark Mitchell  <mark@codesourcery.com>
 
 	Issue #733

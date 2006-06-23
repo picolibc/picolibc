@@ -9,4 +9,5 @@ SECTIONS {
   _stack = 0x20000000 + 2K;
 }
 
+INCLUDE cm3.ld
 INCLUDE ldscripts/armelf.xc
