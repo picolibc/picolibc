@@ -1,3 +1,10 @@
+2006-06-23  Nathan Sidwell  <nathan@codesourcery.com>
+
+	gdb/testsuite/
+	* lib/gdb.exp (gdb_load_cmd): Fix variable name typo
+	* config/unknown.exp: Check gdb_board_support before claiming it
+	is not supported.
+
 2006-06-22  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	gdb/testsuite/:
@@ -11,8 +18,8 @@
 
 2006-06-19  Nathan Sidwell  <nathan@codesourcery.com>
 
-	* gdb/testsuite/
-	gdb.base/recurse.exp: Revert my 2006-06-09 patch.  Rely on test
+	gdb/testsuite/
+	* gdb.base/recurse.exp: Revert my 2006-06-09 patch.  Rely on test
 	harness to set number of hardware watchpoints.
 
 2006-06-15  Daniel Jacobowitz  <dan@codesourcery.com>
