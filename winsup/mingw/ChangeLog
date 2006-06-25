@@ -29,7 +29,7 @@
 
 	* include/math.h (HUGE_VAL): Define as builtin if __GNUC__ >= 3.3,
 	else global library variable.
-        (HUGEVALF): Likewise;
+	(HUGEVALF): Likewise.
 	(HUGEVALL): Likewise.
 	(INFINITY): Likewise.
 	(NAN): LiKewise.
