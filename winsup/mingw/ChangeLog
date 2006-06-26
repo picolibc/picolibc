@@ -1,5 +1,9 @@
 2006-06-26 Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* mingwex/math/tgamma.c (SQTPI): Add braces.
+
+2006-06-26 Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* mingwex/wcrtomb.c (wcsrtombs): Fix src end-pointer thinko.
 	* mingwex/math/lgamma.c: (LOGPI) Avoid type punning.
 	(LS2PI): Likewise.
