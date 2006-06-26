@@ -1,3 +1,12 @@
+2006-06-26 Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/wcrtomb.c (wcsrtombs): Fix src end-pointer thinko.
+	* mingwex/math/lgamma.c: (LOGPI) Avoid type punning.
+	(LS2PI): Likewise.
+        * mingwex/math/sf_erf.c (erff): Initialize z.
+        (erfcf): Likewise.
+	* mingwex/math/tgamma.c (SQTPI): Avoid type punning.
+
 2006-06-23 Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/sys/time.h (struct timezone): Define.

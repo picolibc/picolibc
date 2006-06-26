@@ -190,6 +190,8 @@ sb7  = -2.2440952301e+01; /* 0xc1b38712 */
 	    S=one+s*(sb1+s*(sb2+s*(sb3+s*(sb4+s*(
 				sb5+s*(sb6+s*sb7))))));
 	}
+
+	z = x;
 	__trunc_float_word (&z);
 	r  =  __ieee754_expf(-z*z-(float)0.5625)*__ieee754_expf((z-x)*(z+x)+R/S);
 	if(hx>=0) return one-r/x; else return  r/x-one;
@@ -252,6 +254,7 @@ sb7  = -2.2440952301e+01; /* 0xc1b38712 */
 	        S=one+s*(sb1+s*(sb2+s*(sb3+s*(sb4+s*(
 				sb5+s*(sb6+s*sb7))))));
 	    }
+            z = x;   
 	    __trunc_float_word (&z);
 	    r  =  __ieee754_expf(-z*z-(float)0.5625)*
 			__ieee754_expf((z-x)*(z+x)+R/S);

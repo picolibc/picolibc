@@ -189,15 +189,20 @@ static const unsigned short C[] = {
 0xe14a,0x6a11,0xce4b,0xc13e
 };
 /* log( sqrt( 2*pi ) ) */
-static const unsigned short LS2P[] = {
-0xbeb5,0xc864,0x67f1,0x3fed
-};
-#define LS2PI *(double *)LS2P
+static const union
+{
+  unsigned short  s[4];
+  double d;
+} ls2p  =  {{0xbeb5,0xc864,0x67f1,0x3fed}};
+#define LS2PI   (ls2p.d)
 #define MAXLGM 2.556348e305
-static const unsigned short LPI[4] = {
-0xa1bd,0x48e7,0x50d0,0x3ff2,
-};
-#define LOGPI *(double *)LPI
+/* log (pi) */
+static const union
+{
+  unsigned short s[4];
+  double d;
+} lpi  =  {{0xa1bd,0x48e7,0x50d0,0x3ff2}};
+#define LOGPI (lpi.d)
 #endif
 
 #ifdef MIEEE
@@ -225,15 +230,20 @@ static const unsigned short C[] = {
 0xc13e,0xce4b,0x6a11,0xe14a
 };
 /* log( sqrt( 2*pi ) ) */
-static const unsigned short LS2P[] = {
-0x3fed,0x67f1,0xc864,0xbeb5
-};
-#define LS2PI *(double *)LS2P
+static const union
+{
+  unsigned short  s[4];
+  double d;
+} ls2p  =  {{0x3fed,0x67f1,0xc864,0xbeb5}};
+#define LS2PI  ls2p.d
 #define MAXLGM 2.556348e305
-static unsigned short LPI[4] = {
-0x3ff2,0x50d0,0x48e7,0xa1bd,
-};
-#define LOGPI *(double *)LPI
+/* log (pi) */
+static const union
+{
+  unsigned short s[4];
+  double d;
+} lpi  =  {{0x3ff2, 0x50d0, 0x48e7, 0xa1bd}};
+#define LOGPI (lpi.d)
 #endif
 
 

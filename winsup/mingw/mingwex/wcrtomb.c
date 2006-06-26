@@ -53,40 +53,42 @@ size_t wcsrtombs (char *dst, const wchar_t **src, size_t len,
   size_t n = 0;
   const unsigned int cp = get_cp_from_locale();
   const unsigned int mb_max = MB_CUR_MAX;
-
+  const wchar_t *pwc = *src;
+  
   if (src == NULL || *src == NULL) /* undefined behavior */
      return 0;
 
   if (dst != NULL)
     {
-      const wchar_t ** saved_src = src;
-      while (n < len)
+       while (n < len)
         {
-          if ((ret = __wcrtomb_cp (dst, **src, cp, mb_max)) <= 0)
+          if ((ret = __wcrtomb_cp (dst, *pwc, cp, mb_max)) <= 0)
 	     return (size_t) -1;
   	  n += ret;
    	  dst += ret;
           if (*(dst - 1) == '\0')
 	    {
-	      *saved_src = (wchar_t*) NULL;;
+	      *src = (wchar_t*) NULL;;
 	      return (n  - 1);
 	    }
-	  *src++;
+	  pwc++;
         }
+      *src = pwc;
     }
   else
     {
       char byte_bucket [MB_LEN_MAX];
       while (n < len)
         {
-	  if ((ret = __wcrtomb_cp (byte_bucket, **src, cp, mb_max))
+	  if ((ret = __wcrtomb_cp (byte_bucket, *pwc, cp, mb_max))
 		 <= 0)
  	    return (size_t) -1;    
 	  n += ret;
 	  if (byte_bucket [ret - 1] == '\0')
 	    return (n - 1);
-          *src++;
+          pwc++;
         }
     }
+ 
   return n;
 }
