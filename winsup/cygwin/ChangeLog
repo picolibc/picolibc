@@ -1,3 +1,21 @@
+2006-06-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	Revert patches from 2005-10-22 and 2006-06-14 to use event driven
+	accept and connect back to using select:
+	* fhandler.h (class fhandler_socket): Remove accept_mtx.
+	* fhandler_socket.cc (fhandler_socket::fhandler_socket): Drop
+	initializing accept_mtx.
+	(fhandler_socket::accept): Drop event handling.
+	(fhandler_socket.cc (fhandler_socket::connect): Ditto.
+	(fhandler_socket::dup): Drop accept_mtx handling.
+	(fhandler_socket::listen): Ditto.
+	(fhandler_socket::prepare): Ditto.
+	(fhandler_socket::release): Ditto.
+	(fhandler_socket::close): Ditto.
+	* net.cc (cygwin_accept): Revert to calling cygwin_select to
+	implement interuptible accept.
+	(cygwin_connect): Ditto for connect.
+
 2006-06-22  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_fifo.cc (fhandler_fifo::open): Release process lock and grab

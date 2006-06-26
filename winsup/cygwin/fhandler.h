@@ -381,7 +381,6 @@ class fhandler_mailslot : public fhandler_base
 class fhandler_socket: public fhandler_base
 {
  private:
-  HANDLE accept_mtx;
   int addr_family;
   int type;
   int connect_secret[4];
