@@ -1,7 +1,7 @@
 /*
  * _mingw.h
  *
- * Mingw specific macros included by ALL include files. 
+ * Mingw specific macros included by ALL include files.
  *
  * This file is part of the Mingw32 package.
  *
@@ -28,23 +28,23 @@
 
    __DECLSPEC_SUPPORTED    Defined if dllimport attribute is supported.
    __MINGW_IMPORT          The attribute definition to specify imported
-                           variables/functions. 
-   _CRTIMP                 As above.  For MS compatibility.  
+                           variables/functions.
+   _CRTIMP                 As above.  For MS compatibility.
    __MINGW32_VERSION       Runtime version.
    __MINGW32_MAJOR_VERSION Runtime major version.
    __MINGW32_MINOR_VERSION Runtime minor version.
    __MINGW32_BUILD_DATE    Runtime build date.
-   
+
    Other macros:
 
    __int64                 define to be long long. Using a typedef doesn't
                            work for "unsigned __int64"
-  
+
    All headers should include this first, and then use __DECLSPEC_SUPPORTED
    to choose between the old ``__imp__name'' style or __MINGW_IMPORT
    style declarations.  */
 
-/* Try to avoid problems with outdated checks for GCC __attribute__ support.  */ 
+/* Try to avoid problems with outdated checks for GCC __attribute__ support.  */
 #undef __attribute__
 
 #ifndef __GNUC__
@@ -66,7 +66,7 @@
 #  ifndef _CRTIMP
 #   ifdef __USE_CRTIMP
 #    define _CRTIMP  __attribute__ ((dllimport))
-#   else  
+#   else
 #    define _CRTIMP
 #   endif
 #  endif
@@ -119,8 +119,8 @@
 #endif
 
 #ifdef __cplusplus
-# define __UNUSED_PARAM(x) 
-#else 
+# define __UNUSED_PARAM(x)
+#else
 # ifdef __GNUC__
 #  define __UNUSED_PARAM(x) x __attribute__ ((__unused__))
 # else
@@ -158,8 +158,8 @@
 # define __MSVCRT_VERSION__ 0x0600
 #endif
 
-#define __MINGW32_VERSION 3.9
+#define __MINGW32_VERSION 3.10
 #define __MINGW32_MAJOR_VERSION 3
-#define __MINGW32_MINOR_VERSION 9
+#define __MINGW32_MINOR_VERSION 10
 
 #endif /* __MINGW_H */

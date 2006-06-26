@@ -18,8 +18,8 @@
 # This makefile requires GNU make.
 
 PACKAGE = mingw-runtime
-VERSION = 3.9
-CYGRELEASE = 2
+VERSION = 3.10
+CYGRELEASE = 1
 
 VPATH = @srcdir@
 srcdir = @srcdir@
@@ -59,7 +59,7 @@ inst_libdir:=$(libdir)
 inst_docdir:=$(prefix)/doc/mingw-runtime
 endif
 
-# The Mingw headers are installed under a subdirectory of 
+# The Mingw headers are installed under a subdirectory of
 # $(tooldir)/include when configuring in Cygwin.
 HEADER_SUBDIR = @HEADER_SUBDIR@
 
@@ -112,7 +112,7 @@ LD = @LD@
 AR_FLAGS = rcv
 RANLIB = @RANLIB@
 DLLTOOL = @DLLTOOL@
-DLLTOOLFLAGS = 
+DLLTOOLFLAGS =
 DLLTOOL_FOR_TARGET = $(DLLTOOL)
 DLLTOOL_FLAGS = --as $(AS_FOR_TARGET)
 DLLWRAP = @DLLWRAP@
@@ -214,7 +214,7 @@ libm.a: _libm_dummy.o
 	$(AR) rc $@ _libm_dummy.o
 	$(RANLIB) $@
 
-libmingwthrd.a: crtmt.o mingwthrd.def 
+libmingwthrd.a: crtmt.o mingwthrd.def
 	$(DLLTOOL) $(DLLTOOL_FLAGS) --dllname $(THREAD_DLL_NAME) \
 	  --def mingwthrd.def --output-lib $@
 	$(AR) $(ARFLAGS) $@ crtmt.o
@@ -243,7 +243,7 @@ $(THREAD_DLL_NAME) mingwthrd.def: $(DLL_OFILES) Makefile $(SUBDIRS)
 	$(DLLTOOL) $(DLL_DLLTOOL_STUFF)
 	$(CC) -Wl,--base-file=mingwthrd.base mingwthrd.exp $(DLL_CC_STUFF) \
 		-o mingwthrd_dummy.exe
-	$(DLLTOOL) $(DLL_DLLTOOL_STUFF) 
+	$(DLLTOOL) $(DLL_DLLTOOL_STUFF)
 	$(CC) mingwthrd.exp -o $(THREAD_DLL_NAME) $(DLL_CC_STUFF)
 	rm -f mingwthrd_dummy.exe
 
@@ -332,7 +332,7 @@ clean:
 
 distclean: clean
 	@$(MAKE) subdirs DO=$@ $(FLAGS_TO_PASS)
-	-rm -f config.cache config.status config.log 
+	-rm -f config.cache config.status config.log
 	-rm -f Makefile
 
 ifdef SNAPDATE
@@ -387,7 +387,7 @@ bindist:
 	cd $(distdir); \
 	$(TAR) $(TARFLAGS)cf ../$(distdir)$(TARFILEEXT) *
 
-snapshot: 
+snapshot:
 	make dist SNAPDATE=$(shell date '+%Y%m%d')
 
 info:
@@ -453,8 +453,8 @@ crt2.o: crt1.c init.c
 crtmt.o: crtmt.c
 crtst.o: crtst.c
 ctype_old.o: ctype_old.c
-dllcrt1.o: dllcrt1.c 
-dllcrt2.o: dllcrt1.c 
+dllcrt1.o: dllcrt1.c
+dllcrt2.o: dllcrt1.c
 dllmain.o: dllmain.c
 main.o: main.c
 oldnames.o: oldnames.c
