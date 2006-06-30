@@ -34,13 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define A16
 #define A(n,w) n
 #define W w
-#define ADDR .2byte
 #define ALIGN 1
 #else
 #define A24
 #define A(n,w) w
 #define W l
-#define ADDR .4byte
 #define ALIGN 2
 #endif
 
@@ -166,8 +164,8 @@ __m32c_fini:
 	.4byte	.LEFDE0-.LASFDE0	; FDE Length
 .LASFDE0:
 	.4byte	.Lframe0	; FDE CIE offset
-	ADDR	.LFB2		; FDE initial location
-	ADDR	.LFE2-.LFB2	; FDE address range
+	.4byte	.LFB2		; FDE initial location
+	.4byte	.LFE2-.LFB2	; FDE address range
 	.byte   0xf     	; DW_CFA_def_cfa_expression
 	.uleb128 1		; length of expression
 	.byte 	0x30		; DW_OP_lit0

@@ -1,3 +1,7 @@
+2006-06-30  DJ Delorie  <dj@redhat.com>
+
+	* m32c/crt0.S (done_inilist): Fix dwarf2 address sizes.
+
 2006-06-23  Shaun Jackman  <sjackman@gmail.com>
 
 	* arm/elf-linux.specs: New file.
