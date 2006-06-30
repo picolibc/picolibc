@@ -634,7 +634,7 @@ cygwin_sendto (int fd, const void *buf, int len, int flags,
   myfault efault;
   if (efault.faulted (EFAULT) || !fh)
     res = -1;
-  else if ((res = len) != 0)
+  else
     res = fh->sendto (buf, len, flags, to, tolen);
 
   syscall_printf ("%d = sendto (%d, %p, %d, %x, %p, %d)",
@@ -2295,8 +2295,7 @@ cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
   else
     {
       res = check_iovec_for_write (msg->msg_iov, msg->msg_iovlen);
-      if (res > 0)
-	res = fh->sendmsg (msg, flags, res); // res == iovec tot
+      res = fh->sendmsg (msg, flags, res); // res == iovec tot
     }
 
   syscall_printf ("%d = sendmsg (%d, %p, %x)", res, fd, msg, flags);
