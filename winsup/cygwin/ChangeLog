@@ -1,3 +1,17 @@
+2006-07-03  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+
+	* fhandler.h (class dev_console): Add `metabit' indicating the
+	current meta key mode.
+	* fhandler_console.cc (fhandler_console::read): Set the top bit of
+	the character if metabit is true.
+	* fhandler_console.cc (fhandler_console::ioctl): Implement
+	KDGKBMETA and KDSKBMETA commands.
+	* fhandler_tty.cc (process_ioctl): Support KDSKBMETA.
+	(fhandler_tty_slave::ioctl): Send KDGKBMETA and KDSKBMETA to the
+	master.
+	* include/cygwin/kd.h: New file for the meta key mode.
+	* include/sys/kd.h: New file.
+
 2006-07-03  Eric Blake  <ebb9@byu.net>
 
 	* include/stdint.h (UINT8_C, UINT16_C): Unsigned types smaller

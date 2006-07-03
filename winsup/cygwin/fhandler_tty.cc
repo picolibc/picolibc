@@ -17,6 +17,7 @@ details. */
 #include <stdlib.h>
 #include <ctype.h>
 #include <limits.h>
+#include <cygwin/kd.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -435,9 +436,12 @@ process_ioctl (void *)
     {
       WaitForSingleObject (tty_master->ioctl_request_event, INFINITE);
       termios_printf ("ioctl() request");
-      tty_master->get_ttyp ()->ioctl_retval =
-      tty_master->console->ioctl (tty_master->get_ttyp ()->cmd,
-			     (void *) &tty_master->get_ttyp ()->arg);
+      tty *ttyp = tty_master->get_ttyp ();
+      ttyp->ioctl_retval =
+      tty_master->console->ioctl (ttyp->cmd,
+				  (ttyp->cmd == KDSKBMETA)
+				  ? (void *) ttyp->arg.value
+				  : (void *) &ttyp->arg);
       SetEvent (tty_master->ioctl_done_event);
     }
 }
@@ -1001,6 +1005,8 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
     case TIOCGWINSZ:
     case TIOCSWINSZ:
     case TIOCLINUX:
+    case KDGKBMETA:
+    case KDSKBMETA:
       break;
     case FIONBIO:
       set_nonblocking (*(int *) arg);
@@ -1056,6 +1062,28 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
 	  WaitForSingleObject (ioctl_done_event, INFINITE);
 	  *(unsigned char *) arg = get_ttyp ()->arg.value & 0xFF;
 	}
+      break;
+    case KDGKBMETA:
+      if (ioctl_request_event)
+	{
+	  SetEvent (ioctl_request_event);
+	  if (ioctl_done_event)
+	    WaitForSingleObject (ioctl_done_event, INFINITE);
+	  *(int *) arg = get_ttyp ()->arg.value;
+	}
+      else
+	get_ttyp ()->ioctl_retval = -EINVAL;
+      break;
+    case KDSKBMETA:
+      if (ioctl_request_event)
+	{
+	  get_ttyp ()->arg.value = (int) arg;
+	  SetEvent (ioctl_request_event);
+	  if (ioctl_done_event)
+	    WaitForSingleObject (ioctl_done_event, INFINITE);
+	}
+      else
+	get_ttyp ()->ioctl_retval = -EINVAL;
       break;
     }
 

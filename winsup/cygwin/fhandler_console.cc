@@ -20,6 +20,7 @@ details. */
 #include <winnls.h>
 #include <ctype.h>
 #include <sys/cygwin.h>
+#include <cygwin/kd.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -397,6 +398,11 @@ fhandler_console::read (void *pv, size_t& buflen)
 		meta = (control_key_state & dev_state->meta_mask) != 0;
 	      if (!meta)
 		toadd = tmp + 1;
+	      else if (dev_state->metabit)
+		{
+		  tmp[1] |= 0x80; 
+		  toadd = tmp + 1;
+		}
 	      else
 		{
 		  tmp[0] = '\033';
@@ -744,6 +750,20 @@ fhandler_console::ioctl (unsigned int cmd, void *buf)
 	return 0;
       case TIOCSWINSZ:
 	bg_check (SIGTTOU);
+	return 0;
+      case KDGKBMETA:
+	*(int *) buf = (dev_state->metabit) ? K_METABIT : K_ESCPREFIX;
+	return 0;
+      case KDSKBMETA:
+	if ((int) buf == K_METABIT)
+	  dev_state->metabit = TRUE;
+	else if ((int) buf == K_ESCPREFIX)
+	  dev_state->metabit = FALSE;
+	else
+	  {
+	    set_errno (EINVAL);
+	    return -1;
+	  }
 	return 0;
       case TIOCLINUX:
 	if (* (int *) buf == 6)

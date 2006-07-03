@@ -821,6 +821,7 @@ class dev_console
   unsigned rarg;
   bool saw_question_mark;
   bool alternate_charset_active;
+  bool metabit;
 
   char my_title_buf [TITLESIZE + 1];
 
