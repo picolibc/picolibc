@@ -1405,7 +1405,8 @@ get_file_attribute (int use_ntsec, HANDLE handle, const char *file,
   if (allow_ntea)
     {
       int oatt = *attribute;
-      res = NTReadEA (file, ".UNIXATTR", (char *)attribute, sizeof (*attribute));
+      res = read_ea (handle, file, ".UNIXATTR", (char *)attribute,
+		     sizeof (*attribute));
       *attribute |= oatt;
     }
   else
@@ -1801,8 +1802,8 @@ set_file_attribute (bool use_ntsec, HANDLE handle, const char *file,
 
   if (use_ntsec && allow_ntsec)
     ret = set_nt_attribute (handle, file, uid, gid, attribute);
-  else if (allow_ntea && !NTWriteEA (file, ".UNIXATTR", (char *) &attribute,
-				     sizeof (attribute)))
+  else if (allow_ntea && !write_ea (handle, file, ".UNIXATTR",
+				    (char *) &attribute, sizeof (attribute)))
     {
       __seterrno ();
       ret = -1;

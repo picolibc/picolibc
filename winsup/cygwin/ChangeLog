@@ -1,3 +1,27 @@
+2006-07-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (NtQueryEaFile): Define.
+	(NtSetEaFile): Define.
+	* fhandler.cc (fhandler_base::open): Use appropriate open flags
+	in query case when allow_ntea is set.
+	* ntdll.h (struct _FILE_GET_EA_INFORMATION): Define.
+	(struct _FILE_FULL_EA_INFORMATION): Define.
+	(NtQueryEaFile): Declare.
+	(NtSetEaFile): Declare.
+	* ntea.cc (read_ea): Rename from NTReadEA and rewrite using
+	NtQueryEaFile.
+	(write_ea): Rename from NTWriteEA and rewrite using NtSetEaFile.
+	* path.cc (get_symlink_ea): Make static.  Add handle parameter to
+	accomodate new read_ea call.
+	(set_symlink_ea): Make static.  Add handle parameter to accomodate new
+	write_ea call.
+	(symlink_worker): Call set_symlink_ea while file is still open.
+	(symlink_info::check): Call get_symlink_ea after file has been opened.
+	* security.cc (get_file_attribute): Accomodate new read_ea call.
+	(set_file_attribute): Accomodate new write_ea call.
+	* security.h (read_ea): Change declaration accordingly.
+	(write_ea): Ditto.
+
 2006-07-03  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
 	* fhandler.h (class dev_console): Add `metabit' indicating the

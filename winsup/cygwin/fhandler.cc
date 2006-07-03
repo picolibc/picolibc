@@ -590,11 +590,13 @@ fhandler_base::open (int flags, mode_t mode)
 	create_options = FILE_OPEN_FOR_BACKUP_INTENT;
 	break;
       case query_stat_control:
-	access = READ_CONTROL | FILE_READ_ATTRIBUTES | FILE_READ_DATA;
+	access = READ_CONTROL | FILE_READ_ATTRIBUTES
+		 | (allow_ntea ? FILE_READ_EA : 0);
 	create_options = FILE_OPEN_FOR_BACKUP_INTENT;
 	break;
       case query_write_control:
-	access = READ_CONTROL | WRITE_OWNER | WRITE_DAC | FILE_WRITE_ATTRIBUTES;
+	access = READ_CONTROL | WRITE_OWNER | WRITE_DAC | FILE_WRITE_ATTRIBUTES
+		 | (allow_ntea ? FILE_WRITE_EA : 0);
 	create_options = FILE_OPEN_FOR_BACKUP_INTENT | FILE_OPEN_FOR_RECOVERY;
 	break;
       case query_write_attributes:

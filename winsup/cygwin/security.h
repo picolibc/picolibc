@@ -378,8 +378,10 @@ extern SECURITY_ATTRIBUTES *__stdcall __sec_user (PVOID sa_buf, PSID sid1, PSID 
 extern bool sec_acl (PACL acl, bool original, bool admins, PSID sid1 = NO_SID,
 		     PSID sid2 = NO_SID, DWORD access2 = 0);
 
-int __stdcall NTReadEA (const char *file, const char *attrname, char *buf, int len);
-BOOL __stdcall NTWriteEA (const char *file, const char *attrname, const char *buf, int len);
+int __stdcall read_ea (HANDLE hdl, const char *file, const char *attrname,
+		       char *buf, int len);
+BOOL __stdcall write_ea (HANDLE hdl, const char *file, const char *attrname,
+			 const char *buf, int len);
 
 /* Note: sid1 is usually (read: currently always) the current user's
    effective sid (cygheap->user.sid ()). */

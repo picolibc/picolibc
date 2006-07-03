@@ -2694,20 +2694,20 @@ endmntent (FILE *)
 /********************** Symbolic Link Support **************************/
 
 /* Read symlink from Extended Attribute */
-int
-get_symlink_ea (const char* frompath, char* buf, int buf_size)
+static int
+get_symlink_ea (HANDLE hdl, const char* frompath, char* buf, int buf_size)
 {
-  int res = NTReadEA (frompath, SYMLINK_EA_NAME, buf, buf_size);
+  int res = read_ea (hdl, frompath, SYMLINK_EA_NAME, buf, buf_size);
   if (res == 0)
     debug_printf ("Cannot read symlink from EA");
   return (res - 1);
 }
 
 /* Save symlink to Extended Attribute */
-bool
-set_symlink_ea (const char* frompath, const char* topath)
+static bool
+set_symlink_ea (HANDLE hdl, const char* frompath, const char* topath)
 {
-  if (!NTWriteEA (frompath, SYMLINK_EA_NAME, topath, strlen (topath) + 1))
+  if (!write_ea (hdl, frompath, SYMLINK_EA_NAME, topath, strlen (topath) + 1))
     {
       debug_printf ("Cannot save symlink in EA");
       return false;
@@ -2926,6 +2926,8 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 	}
       if (success)
 	{
+	  if (!isdevice && win32_path.fs_has_ea ())
+	    set_symlink_ea (h, win32_path, oldpath);
 	  CloseHandle (h);
 	  if (!allow_ntsec && allow_ntea)
 	    set_file_attribute (false, NULL, win32_path.get_win32 (),
@@ -2940,8 +2942,6 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 #endif
 	  SetFileAttributes (win32_path, attr);
 
-	  if (!isdevice && win32_path.fs_has_ea ())
-	    set_symlink_ea (win32_path, oldpath);
 	  res = 0;
 	}
       else
@@ -3340,16 +3340,6 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
       if (!sym_check)
 	goto file_not_symlink;
 
-      if (sym_check > 0 && opt & PC_CHECK_EA &&
-	  (res = get_symlink_ea (suffix.path, contents, sizeof (contents))) > 0)
-	{
-	  pflags = PATH_SYMLINK | pflags_or;
-	  if (sym_check == 1)
-	    pflags |= PATH_LNK;
-	  debug_printf ("Got symlink from EA: %s", contents);
-	  break;
-	}
-
       /* Open the file.  */
 
       h = CreateFile (suffix.path, GENERIC_READ, FILE_SHARE_READ,
@@ -3358,8 +3348,17 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
       if (h == INVALID_HANDLE_VALUE)
 	goto file_not_symlink;
 
-      /* FIXME: if symlink isn't present in EA, but EAs are supported,
-	 should we write it there?  */
+      if (sym_check > 0 && opt & PC_CHECK_EA
+	  && (res = get_symlink_ea (h, suffix.path, contents,
+				    sizeof (contents))) > 0)
+	{
+	  pflags = PATH_SYMLINK | pflags_or;
+	  if (sym_check == 1)
+	    pflags |= PATH_LNK;
+	  debug_printf ("Got symlink from EA: %s", contents);
+	  break;
+	}
+
       switch (sym_check)
 	{
 	case 1:
