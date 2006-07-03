@@ -1,5 +1,10 @@
 2006-07-03  Paolo Bonzini  <bonzini@gnu.org>
 
+	* configure.in: Fix thinko in previous check-in.
+	* configure: Regenerate.
+
+2006-07-03  Paolo Bonzini  <bonzini@gnu.org>
+
 	Sync from gcc:
 
 	2007-07-03  Paolo Bonzini  <bonzini@gnu.org>
