@@ -1,3 +1,20 @@
+2006-07-03  Paolo Bonzini  <bonzini@gnu.org>
+
+	Sync from gcc:
+
+	2007-07-03  Paolo Bonzini  <bonzini@gnu.org>
+
+	PR other/27063
+	* configure.in: Test subdir_requires and give an appropriate
+	error message.
+	* configure: Regenerate.
+
+	2006-06-16  Rainer Orth  <ro@TechFak.Uni-Bielefeld.DE>
+
+	PR target/27540
+	* configure.in: Only enable libgomp on IRIX 6.
+	* configure: Regenerate.
+
 2006-06-20  David Ayers  <d.ayers@inode.at>
 
 	PR bootstrap/28072
