@@ -1,4 +1,5 @@
-#include <fenv.h> 
+#include <fenv.h>
+#include "cpu_features.h"
 /* 7.6.2.5 
    The fetestexcept function determines which of a specified subset of
    the exception flags are currently set. The excepts argument
@@ -9,7 +10,18 @@
 
 int fetestexcept (int excepts)
 {
-  unsigned short _sw;
-  __asm__ ("fnstsw %%ax" : "=a" (_sw));
-  return _sw & excepts & FE_ALL_EXCEPT;
+  
+  unsigned int _res;
+  __asm__ ("fnstsw %%ax" : "=a" (_res));
+
+
+  /* If SSE supported, return the union of the FPU and SSE flags.  */
+  if (__HAS_SSE)
+    {     
+        unsigned int _csr; 	
+      __asm__ volatile("stmxcsr %0" : "=m" (_csr));
+      _res |= _csr;    
+    }
+
+  return (_res & excepts & FE_ALL_EXCEPT);
 }

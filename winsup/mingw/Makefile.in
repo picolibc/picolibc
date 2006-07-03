@@ -156,7 +156,7 @@ CRT0S = crt1.o dllcrt1.o crt2.o dllcrt2.o CRT_noglob.o crtmt.o crtst.o \
 	CRT_fp8.o CRT_fp10.o txtmode.o binmode.o
 MINGW_OBJS = CRTglob.o CRTfmode.o CRTinit.o  dllmain.o gccmain.o \
 	     main.o crtst.o mthr_stub.o CRT_fp10.o txtmode.o \
-	     pseudo-reloc.o pseudo-reloc-list.o
+	     pseudo-reloc.o pseudo-reloc-list.o cpu_features.o
 
 MOLD_OBJS = isascii.o iscsym.o iscsymf.o toascii.o \
 	strcasecmp.o strncasecmp.o wcscmpi.o
@@ -187,7 +187,7 @@ mthr.c mthr_init.c mthr_stub.c readme.txt \
 isascii.c iscsym.c iscsymf.c toascii.c \
 strcasecmp.c strncasecmp.c wcscmpi.c \
 CRT_fp8.c CRT_fp10.c test_headers.c txtmode.c binmode.c pseudo-reloc.c \
-pseudo-reloc-list.c \
+pseudo-reloc-list.c cpu_features.c cpu_features.h\
 DISCLAIMER CONTRIBUTORS
 
 

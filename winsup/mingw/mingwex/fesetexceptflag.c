@@ -1,4 +1,5 @@
 #include <fenv.h> 
+#include "cpu_features.h"
 
 /* 7.6.2.4
    The fesetexceptflag function sets the complete status for those
@@ -18,5 +19,15 @@ int fesetexceptflag (const fexcept_t * flagp, int excepts)
   _env.__status_word &= ~excepts;
   _env.__status_word |= (*flagp & excepts);
   __asm__ volatile ("fldenv %0;" : : "m" (_env));
+
+  if (__HAS_SSE)
+   {
+      unsigned int _csr;
+      __asm__ __volatile__("stmxcsr %0" : "=m" (_csr));
+      _csr &= ~excepts;
+      _csr |= *flagp & excepts;
+      __asm__ volatile ("ldmxcsr %0" : : "m" (_csr));
+   }
+
   return 0;
 }

@@ -1,5 +1,6 @@
 #include <fenv.h>
 #include <float.h>
+#include "cpu_features.h"
 
 /* 7.6.4.3
    The fesetenv function establishes the floating-point environment
@@ -15,6 +16,11 @@ extern void (*_imp___fpreset)( void ) ;
 
 int fesetenv (const fenv_t * envp)
 {
+  /* Default mxcsr status is to mask all exceptions.  All other bits
+     are zero.  */
+     
+  unsigned int _csr = FE_ALL_EXCEPT << __MXCSR_EXCEPT_MASK_SHIFT /*= 0x1f80 */; 
+  
   if (envp == FE_PC64_ENV)
    /*
     *  fninit initializes the control register to 0x37f,
@@ -37,7 +43,15 @@ int fesetenv (const fenv_t * envp)
     _fpreset();
 
   else
-    __asm__ ("fldenv %0;" : : "m" (*envp));
+    {
+      __asm__ ("fldenv %0;" : : "m" (*envp));
+       /* Setting the reserved high order bits of MXCSR causes a segfault */
+       _csr = envp ->__mxcsr & 0xffff;
+    }
 
+  /* Set MXCSR */   
+   if (__HAS_SSE)
+     __asm__ volatile ("ldmxcsr %0" : : "m" (_csr));
+ 
   return 0;
 }

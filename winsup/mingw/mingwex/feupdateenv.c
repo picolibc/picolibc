@@ -1,4 +1,5 @@
 #include <fenv.h>
+#include "cpu_features.h"
 
 /* 7.6.4.4
    The feupdateenv function saves the currently raised exceptions in
@@ -8,13 +9,18 @@
    set by a call to feholdexcept or fegetenv, or equal the macro
    FE_DFL_ENV or an implementation-defined environment macro. */
 
-/* FIXME: this works but surely there must be a better way.  */
 
 int feupdateenv (const fenv_t * envp)
 {
-  unsigned int _fexcept = fetestexcept (FE_ALL_EXCEPT); /*save excepts */
+  unsigned int _fexcept;
+  __asm__ ("fnstsw %%ax" : "=a" (_fexcept)); /*save excepts */
+  if (__HAS_SSE)
+    {
+      unsigned int  _csr;
+      __asm__ ("stmxcsr %0" : "=m" (_csr));
+      _fexcept |= _csr;
+    }
   fesetenv (envp); /* install the env  */
-  feraiseexcept (_fexcept); /* raise the execept */
+  feraiseexcept (_fexcept & FE_ALL_EXCEPT); /* raise the execeptions */
   return 0;
 }
-

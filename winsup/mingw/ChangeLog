@@ -1,3 +1,6 @@
+2006-07-03  Danny Smith  <dannysmith@users.sourceforge.net>
+
+
 2006-06-25  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* Include/_mingw.h: Increment version to 3.10.

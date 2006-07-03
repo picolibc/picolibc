@@ -1,7 +1,6 @@
 #ifndef _FENV_H_
 #define _FENV_H_
 
-
 /* FPU status word exception flags */
 #define FE_INVALID	0x01
 #define FE_DENORMAL	0x02
@@ -18,6 +17,18 @@
 #define FE_UPWARD	0x0800
 #define FE_TOWARDZERO	0x0c00
 
+/* The MXCSR exception flags are the same as the
+   FE flags. */
+#define __MXCSR_EXCEPT_FLAG_SHIFT 0
+
+/* How much to shift FE status word exception flags
+   to get the MXCSR exeptions masks,  */
+#define __MXCSR_EXCEPT_MASK_SHIFT 7
+
+/* How much to shift FE control word rounding flags
+   to get MXCSR rounding flags,  */
+#define __MXCSR_ROUND_FLAG_SHIFT 3
+
 #ifndef RC_INVOKED
 /*
   For now, support only for the basic abstraction of flags that are
@@ -26,8 +37,10 @@
 */
 typedef unsigned short fexcept_t;
 
-/* This 28-byte struct represents the entire floating point
-   environment as stored by fnstenv or fstenv */
+/* This 32-byte struct represents the entire floating point
+   environment as stored by fnstenv or fstenv, augmented by
+   the  contents of the MXCSR register, as stored by stmxcsr
+   (if CPU supports it). */
 typedef struct
 {
   unsigned short __control_word;
@@ -40,8 +53,9 @@ typedef struct
   unsigned short __ip_selector;  
   unsigned short __opcode;
   unsigned int	 __data_offset;
-  unsigned short __data_selector;  
-  unsigned short __unused3;
+  unsigned short __data_selector;
+  unsigned short  __unused3;
+  unsigned int __mxcsr; /* contents of the MXCSR register  */
 } fenv_t;
 
 

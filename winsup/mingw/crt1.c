@@ -27,6 +27,7 @@
  *       be manually synchronized, but it does lead to this not-generally-
  *       a-good-idea use of include. */
 #include "init.c"
+#include "cpu_features.h"
 
 extern void _pei386_runtime_relocator (void);
 
@@ -195,6 +196,7 @@ __mingw_CRTStartup (void)
   /*
    * Initialize floating point unit.
    */
+  __cpu_features_init ();	/* Do we have SSE, etc.*/
   _fpreset ();			/* Supplied by the runtime library. */
 
   /*
