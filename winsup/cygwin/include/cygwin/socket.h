@@ -17,8 +17,11 @@ extern "C" {
 
 #include <stdint.h>
 
+/* Not unsigned for backward compatibility.  Keep #define for backward
+   compatibility. */
 #ifndef socklen_t
-#define socklen_t int			/* Not unsigned for backward compat. */
+typedef int socklen_t;
+#define socklen_t socklen_t
 #endif
 
 typedef uint16_t sa_family_t;

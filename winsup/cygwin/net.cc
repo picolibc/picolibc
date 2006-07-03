@@ -623,8 +623,8 @@ done:
 
 /* exported as sendto: standards? */
 extern "C" int
-cygwin_sendto (int fd, const void *buf, int len, int flags,
-	       const struct sockaddr *to, int tolen)
+cygwin_sendto (int fd, const void *buf, size_t len, int flags,
+	       const struct sockaddr *to, socklen_t tolen)
 {
   int res;
   sig_dispatch_pending ();
@@ -645,8 +645,8 @@ cygwin_sendto (int fd, const void *buf, int len, int flags,
 
 /* exported as recvfrom: standards? */
 extern "C" int
-cygwin_recvfrom (int fd, void *buf, int len, int flags,
-		 struct sockaddr *from, int *fromlen)
+cygwin_recvfrom (int fd, void *buf, size_t len, int flags,
+		 struct sockaddr *from, socklen_t *fromlen)
 {
   int res;
   sig_dispatch_pending ();
@@ -689,7 +689,7 @@ convert_ws1_ip_optname (int optname)
 /* exported as setsockopt: standards? */
 extern "C" int
 cygwin_setsockopt (int fd, int level, int optname, const void *optval,
-		   int optlen)
+		   socklen_t optlen)
 {
   int res;
   fhandler_socket *fh = get (fd);
@@ -753,7 +753,8 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 
 /* exported as getsockopt: standards? */
 extern "C" int
-cygwin_getsockopt (int fd, int level, int optname, void *optval, int *optlen)
+cygwin_getsockopt (int fd, int level, int optname, void *optval,
+		   socklen_t *optlen)
 {
   int res;
   fhandler_socket *fh = get (fd);
@@ -803,7 +804,7 @@ getpeereid (int fd, __uid32_t *euid, __gid32_t *egid)
 
 /* exported as connect: standards? */
 extern "C" int
-cygwin_connect (int fd, const struct sockaddr *name, int namelen)
+cygwin_connect (int fd, const struct sockaddr *name, socklen_t namelen)
 {
   int res;
   sig_dispatch_pending ();
@@ -986,7 +987,7 @@ cygwin_gethostbyaddr (const char *addr, int len, int type)
 
 /* exported as accept: standards? */
 extern "C" int
-cygwin_accept (int fd, struct sockaddr *peer, int *len)
+cygwin_accept (int fd, struct sockaddr *peer, socklen_t *len)
 {
   int res;
   sig_dispatch_pending ();
@@ -1017,7 +1018,7 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
 
 /* exported as bind: standards? */
 extern "C" int
-cygwin_bind (int fd, const struct sockaddr *my_addr, int addrlen)
+cygwin_bind (int fd, const struct sockaddr *my_addr, socklen_t addrlen)
 {
   int res;
   sig_dispatch_pending ();
@@ -1035,7 +1036,7 @@ cygwin_bind (int fd, const struct sockaddr *my_addr, int addrlen)
 
 /* exported as getsockname: standards? */
 extern "C" int
-cygwin_getsockname (int fd, struct sockaddr *addr, int *namelen)
+cygwin_getsockname (int fd, struct sockaddr *addr, socklen_t *namelen)
 {
   int res;
   sig_dispatch_pending ();
@@ -1137,7 +1138,7 @@ cygwin_herror (const char *s)
 
 /* exported as getpeername: standards? */
 extern "C" int
-cygwin_getpeername (int fd, struct sockaddr *name, int *len)
+cygwin_getpeername (int fd, struct sockaddr *name, socklen_t *len)
 {
   int res;
   sig_dispatch_pending ();
@@ -1156,14 +1157,14 @@ cygwin_getpeername (int fd, struct sockaddr *name, int *len)
 
 /* exported as recv: standards? */
 extern "C" int
-cygwin_recv (int fd, void *buf, int len, int flags)
+cygwin_recv (int fd, void *buf, size_t len, int flags)
 {
   return cygwin_recvfrom (fd, buf, len, flags, NULL, NULL);
 }
 
 /* exported as send: standards? */
 extern "C" int
-cygwin_send (int fd, const void *buf, int len, int flags)
+cygwin_send (int fd, const void *buf, size_t len, int flags)
 {
   return cygwin_sendto (fd, buf, len, flags, NULL, 0);
 }

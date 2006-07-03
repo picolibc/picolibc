@@ -26,22 +26,24 @@ extern "C"
 #define SHUT_RDWR 2		/* == Win32 SD_BOTH    */
 
 #ifndef __INSIDE_CYGWIN_NET__
-  int accept (int, struct sockaddr *__peer, int *);
-  int bind (int, const struct sockaddr *__my_addr, int __addrlen);
-  int connect (int, const struct sockaddr *, int);
-  int getpeername (int, struct sockaddr *__peer, int *);
-  int getsockname (int, struct sockaddr *__addr, int *);
+  int accept (int, struct sockaddr *__peer, socklen_t *);
+  int bind (int, const struct sockaddr *__my_addr, socklen_t __addrlen);
+  int connect (int, const struct sockaddr *, socklen_t);
+  int getpeername (int, struct sockaddr *__peer, socklen_t *);
+  int getsockname (int, struct sockaddr *__addr, socklen_t *);
   int listen (int, int __n);
-  int recv (int, void *__buff, int __len, int __flags);
-  int recvfrom (int, void *__buff, int __len, int __flags,
-		struct sockaddr *__from, int *__fromlen);
+  int recv (int, void *__buff, size_t __len, int __flags);
+  int recvfrom (int, void *__buff, size_t __len, int __flags,
+		struct sockaddr *__from, socklen_t *__fromlen);
   int recvmsg(int s, struct msghdr *msg, int flags);
-  int send (int, const void *__buff, int __len, int __flags);
+  int send (int, const void *__buff, size_t __len, int __flags);
   int sendmsg(int s, const struct msghdr *msg, int flags);
-  int sendto (int, const void *, int __len, int __flags,
-	      const struct sockaddr *__to, int __tolen);
-  int setsockopt (int __s, int __level, int __optname, const void *optval, int __optlen);
-  int getsockopt (int __s, int __level, int __optname, void *__optval, int *__optlen);
+  int sendto (int, const void *, size_t __len, int __flags,
+	      const struct sockaddr *__to, socklen_t __tolen);
+  int setsockopt (int __s, int __level, int __optname, const void *optval,
+		  socklen_t __optlen);
+  int getsockopt (int __s, int __level, int __optname, void *__optval,
+		  socklen_t *__optlen);
   int shutdown (int, int);
   int socket (int __family, int __type, int __protocol);
   int socketpair (int __domain, int __type, int __protocol, int *__socket_vec);

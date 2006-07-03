@@ -1,3 +1,20 @@
+2006-07-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_sendto): Define appropriate parameters using
+	socklen_t type according to SUSv3.
+	(cygwin_recvfrom): Ditto.
+	(cygwin_setsockopt): Ditto.
+	(cygwin_getsockopt): Ditto.
+	(cygwin_connect): Ditto.
+	(cygwin_accept): Ditto.
+	(cygwin_bind): Ditto.
+	(cygwin_getsockname): Ditto.
+	(cygwin_getpeername): Ditto.
+	(cygwin_recv): Ditto.
+	(cygwin_send): Ditto.
+	* include/cygwin/socket.h (socklen_t): Typedef and define.
+	* include/sys/socket.h: Declare socket functions using socklen_t type.
+
 2006-07-02  Christopher Faylor  <cgf@timesys.com>
 
 	* include/cygwin/version.h: Bump DLL minor version number to 21.
