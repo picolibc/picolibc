@@ -1,3 +1,54 @@
+2006-07-03  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	gdb/
+	* remote.c (remote_query_packet_info): Update for backported patch.
+	(fetch_registers_using_g, store_registers_using_G)
+	(remote_read_qpart): Likewise.
+
+	Backport:
+	2006-03-30  Daniel Jacobowitz  <dan@codesourcery.com>
+	* remote.c (struct remote_state): Add BUF and BUF_SIZE.
+	(init_remote_state): Initialize the new fields.
+	(get_memory_packet_size): Update BUF and BUF_SIZE if necessary.
+	(set_thread, remote_thread_alive, remote_unpack_thread_info_response)
+	(remote_get_threadinfo, parse_threadlist_response)
+	(remote_get_threadlist, remote_current_thread, remote_threads_info)
+	(remote_threads_extra_info, extended_remote_restart, get_offsets)
+	(remote_check_symbols, remote_open_1, remote_detach)
+	(remove_vcont_probe, remote_vcont_resume, remote_resume)
+	(remote_wait, remote_async_wait, fetch_register_using_p)
+	(remote_fetch_registers, store_register_using_P)
+	(remote_store_registers, check_binary_download, remote_write_bytes)
+	(remote_read_bytes, remote_insert_breakpoint)
+	(remote_remove_breakpoint, remote_insert_watchpoint)
+	(remote_remove_watchpoint, remote_insert_hw_breakpoint)
+	(remote_remove_hw_breakpoint, compare_sections_command)
+	(remote_xfer_partial, remote_rcmd, packet_command)
+	(remote_get_thread_local_address): Use the global incoming buffer
+	instead of alloca or xmalloc.  Limit outgoing packets to
+	rs->remote_packet_size and incoming packets to rs->buf_size.
+	Update calls to getpkt and remote_send.
+	(remote_send): Take arguments by reference.
+	(putpkt_binary): Eliminate junkbuf.  Use skip_frame.
+	(skip_frame): New function.
+	(read_frame): Take arguments by reference.  Expand the packet
+	buffer instead of issuing an error.
+	(getpkt, getpkt_sane): Take arguments by reference.
+	* remote.h (getpkt): Update prototype and doc.
+	* tracepoint.c (remote_get_noisy_reply): Take arguments by
+	reference.
+	(target_buf): Change from array to pointer.
+	(target_buf_size): New variable.
+	(remote_set_transparent_ranges): Update call to getpkt.
+	(trace_start_command, trace_stop_command, trace_status_command):
+	Update calls to remote_get_noisy_reply.
+	(finish_tfind_command): Take arguments by reference.
+	(trace_find_command, trace_find_pc_command)
+	(trace_find_tracepoint_command, trace_find_line_command):
+	(trace_find_range_command, trace_find_outside_command): Update
+	calls to finish_tfind_command.
+	(_initialize_tracepoint): Initialize target_buf_size and target_buf.
+
 2006-06-23  Nathan Sidwell  <nathan@codesourcery.com>
 
 	gdb/testsuite/
