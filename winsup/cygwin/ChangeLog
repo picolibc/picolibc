@@ -1,3 +1,8 @@
+2006-07-03  Eric Blake  <ebb9@byu.net>
+
+	* include/stdint.h (UINT8_C, UINT16_C): Unsigned types smaller
+	than int promote to signed int.
+
 2006-07-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (cygwin_sendto): Define appropriate parameters using

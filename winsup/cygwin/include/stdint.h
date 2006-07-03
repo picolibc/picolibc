@@ -1,6 +1,6 @@
 /* stdint.h - integer types
 
-   Copyright 2003 Red Hat, Inc.
+   Copyright 2003, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -169,8 +169,8 @@ typedef unsigned long long uintmax_t;
 #define INT32_C(x) x ## L
 #define INT64_C(x) x ## LL
 
-#define UINT8_C(x) x ## U
-#define UINT16_C(x) x ## U
+#define UINT8_C(x) x
+#define UINT16_C(x) x
 #define UINT32_C(x) x ## UL
 #define UINT64_C(x) x ## ULL
 
