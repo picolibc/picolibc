@@ -1,5 +1,9 @@
+2006-07-04  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/Makefile.in: Add -I$(srcdir)/.. to INCLUDES.
+
 2006-07-03  Danny Smith  <dannysmith@users.sourceforge.net>
- 
+
 	Support SSE float environment in fenv.h functions.  
 	* cpu_features.c: New file.
 	* cpu_features.h: New file.
