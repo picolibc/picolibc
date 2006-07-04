@@ -1,3 +1,10 @@
+2006-07-04  Shaun Jackman  <sjackman@gmail.com>
+
+	* arm/linux-syscalls0.S (ftruncate, getegid, geteuid, getgid,
+	getgroups, getpgid, getpgrp, getuid, lchown, pause, pipe,
+	setpgid, setgid, setsid, setuid, sigprocmask, sync, uname): New
+	system call.
+
 2006-06-30  DJ Delorie  <dj@redhat.com>
 
 	* m32c/crt0.S (done_inilist): Fix dwarf2 address sizes.
