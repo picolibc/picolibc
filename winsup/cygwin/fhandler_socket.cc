@@ -804,14 +804,28 @@ int
 fhandler_socket::listen (int backlog)
 {
   int res = ::listen (get_socket (), backlog);
-  if (res)
-    set_winsock_errno ();
-  else
+  if (res && WSAGetLastError () == WSAEINVAL && get_addr_family () == AF_INET)
+    {
+      /* It's perfectly valid to call listen on an unbound INET socket.
+	 In this case the socket is automatically bound to an unused
+	 port number, listening on all interfaces.  On Winsock, listen
+	 fails with WSAEINVAL when it's called on an unbound socket.
+	 So we have to bind manually here to have POSIX semantics. */
+      struct sockaddr_in sa;
+      sa.sin_family = AF_INET;
+      sa.sin_port = 0;
+      sa.sin_addr.s_addr = INADDR_ANY;
+      if (!::bind (get_socket (), (struct sockaddr *) &sa, sizeof sa))
+	res = ::listen (get_socket (), backlog);
+    }
+  if (!res)
     {
       if (get_addr_family () == AF_LOCAL && get_socket_type () == SOCK_STREAM)
 	af_local_set_cred ();
       connect_state (connected);
     }
+  else
+    set_winsock_errno ();
   return res;
 }
 
