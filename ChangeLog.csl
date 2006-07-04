@@ -1,3 +1,34 @@
+2006-07-04  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	gdb/
+	* remote.c (struct remote_state): Add explicit_packet_size.
+	(remote_arch_state): Remove explicit_packet_size.
+	(get_remote_packet_size): Check explicit_packet_size.
+	(get_memory_packet_size): Likewise.
+	(remote_query_packet_info): Update.
+	(remote_open_1): Reset explicit_packet_size.
+
+	Backport:
+	2006-07-04  Daniel Jacobowitz  <dan@codesourcery.com>
+	* remote.c (init_remote_state): Use xrealloc instead of xmalloc.
+
+	2006-06-08  Daniel Jacobowitz  <dan@codesourcery.com>
+	* (struct remote_state): New type, only containing
+	buf and buf_size.
+	(remote_state): New variable.
+	(get_remote_state): New function.
+	(struct remote_arch_state): Renamed from struct remote_state.
+	Removed buf and buf_size.
+	(get_remote_arch_state): Renamed from get_remote_state.  All
+	necessary callers updated to call this function.
+	(init_remote_state): Initialize the architecture-specific state.
+	Update the target-specific state if necessary.
+	(get_remote_packet_size): New function.  All previous references
+	changed to use this accessor function.
+	(packet_reg_from_regnum, packet_reg_from_pnum): Take a
+	remote_arch_state instead of a remote_state.  All callers changed.
+	(_initialize_remote): Initialize the packet buffer here.
+
 2006-07-03  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	gdb/
