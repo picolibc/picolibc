@@ -47,8 +47,6 @@ extern "C"
 
   int __stdcall rcmd (char **ahost, unsigned short inport, char *locuser,
 		      char *remuser, char *cmd, SOCKET * fd2p);
-  int __stdcall rexec (char **ahost, unsigned short inport, char *locuser,
-		       char *password, char *cmd, SOCKET * fd2p);
   int sscanf (const char *, const char *, ...);
 }				/* End of "C" section */
 
@@ -147,18 +145,13 @@ cygwin_inet_aton (const char *cp, struct in_addr *inp)
   return 1;
 }
 
-/* undocumented in wsock32.dll */
-extern "C" unsigned int WINAPI inet_network (const char *);
-
 extern "C" unsigned int
 cygwin_inet_network (const char *cp)
 {
   myfault efault;
   if (efault.faulted (EFAULT))
     return INADDR_NONE;
-  unsigned int res = inet_network (cp);
-
-  return res;
+  return ntohl (inet_addr (cp));
 }
 
 /* inet_netof is in the standard BSD sockets library.  It is useless
@@ -1999,58 +1992,6 @@ cygwin_rresvport (int *port)
     }
 
   syscall_printf ("%d = rresvport (%d)", res, port ? *port : 0);
-  return res;
-}
-
-/* exported as rexec: standards? */
-extern "C" int
-cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
-	      char *password, char *cmd, int *fd2p)
-{
-  int res = -1;
-  SOCKET fd2s;
-  sig_dispatch_pending ();
-
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return (int) INVALID_SOCKET;
-
-  res = rexec (ahost, inport, locuser, password, cmd, fd2p ? &fd2s : NULL);
-  if (res != (int) INVALID_SOCKET)
-    {
-      cygheap_fdnew res_fd;
-
-      if (res_fd >= 0 && fdsock (res_fd, tcp_dev, res))
-	{
-	  ((fhandler_socket *) res_fd)->connect_state (connected);
-	  res = res_fd;
-	}
-      else
-	{
-	  closesocket (res);
-	  res = -1;
-	}
-
-      if (res >= 0 && fd2p)
-	{
-	  cygheap_fdnew newfd (res_fd, false);
-	  cygheap_fdget fd (*fd2p);
-
-	  if (newfd >= 0 && fdsock (newfd, tcp_dev, fd2s))
-	    {
-	      ((fhandler_socket *) fd2p)->connect_state (connected);
-	      *fd2p = newfd;
-	    }
-	  else
-	    {
-	      closesocket (res);
-	      closesocket (fd2s);
-	      res = -1;
-	    }
-	}
-    }
-
-  syscall_printf ("%d = rexec (...)", res);
   return res;
 }
 
