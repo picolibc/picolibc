@@ -1,3 +1,7 @@
+2006-07-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_socket::wait): Set default timeout to INFINITE.
+
 2006-07-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (NtQueryEaFile): Define.

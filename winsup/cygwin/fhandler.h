@@ -425,7 +425,7 @@ class fhandler_socket: public fhandler_base
   } status;
 
   bool prepare (HANDLE &event, long event_mask);
-  int wait (HANDLE event, int flags, DWORD timeout = 10);
+  int wait (HANDLE event, int flags, DWORD timeout = INFINITE);
   void release (HANDLE event);
 
  public:
