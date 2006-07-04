@@ -74,7 +74,7 @@ signal (int sig, _sig_func_ptr func)
   else
     gs.sa_flags |= SA_RESTART;
 
-  gs.sa_mask = 0;
+  gs.sa_mask = SIGTOMASK (sig);
   gs.sa_handler = func;
   gs.sa_flags &= ~SA_SIGINFO;
 
