@@ -1,5 +1,10 @@
 2006-07-05  Christopher Faylor  <cgf@timesys.com>
 
+	* sortdin: Ignore all leading underscores when deriving a sort key.
+	* cygwin.din: Resort.
+
+2006-07-05  Christopher Faylor  <cgf@timesys.com>
+
 	* sortdin: New program.
 	* cygwin.din: Sort.
 

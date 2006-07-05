@@ -3,22 +3,22 @@ LIBRARY "cygwin1.dll" BASE=0x61000000
 EXPORTS
 __argc DATA
 __argv DATA
+_check_for_executable DATA
 __check_rhosts_file DATA
+_ctype_ DATA
 __cygwin_environ DATA
 __cygwin_user_data DATA
-__mb_cur_max DATA
-__progname DATA
-__rcmd_errstr DATA
-_check_for_executable DATA
-_ctype_ DATA
 _daylight DATA
 h_errno DATA
 _impure_ptr DATA
+__mb_cur_max DATA
 optarg DATA
 opterr DATA
 optind DATA
 optopt DATA
 optreset DATA
+__progname DATA
+__rcmd_errstr DATA
 reent_data DATA
 sys_errlist = _sys_errlist DATA
 _sys_errlist DATA
@@ -26,64 +26,6 @@ sys_nerr = _sys_nerr DATA
 _sys_nerr DATA
 _timezone DATA
 _tzname DATA
-__argz_add = argz_add SIGFE
-__argz_add_sep = argz_add_sep SIGFE
-__argz_append = argz_append SIGFE
-__argz_count = argz_count NOSIGFE
-__argz_create = argz_create SIGFE
-__argz_create_sep = argz_create_sep SIGFE
-__argz_delete = argz_delete SIGFE
-__argz_extract = argz_extract NOSIGFE
-__argz_insert = argz_insert SIGFE
-__argz_next = argz_next NOSIGFE
-__argz_replace = argz_replace SIGFE
-__argz_stringify = argz_stringify NOSIGFE
-__assert SIGFE
-__assertfail SIGFE
-__envz_add = envz_add SIGFE
-__envz_entry = envz_entry NOSIGFE
-__envz_get = envz_get NOSIGFE
-__envz_merge = envz_merge SIGFE
-__envz_remove = envz_remove SIGFE
-__envz_strip = envz_strip SIGFE
-__eprintf SIGFE
-__errno NOSIGFE
-__f_atan2 = _f_atan2 NOSIGFE
-__f_atan2f = _f_atan2f NOSIGFE
-__f_exp = _f_exp NOSIGFE
-__f_expf = _f_expf NOSIGFE
-__f_frexp = _f_frexp NOSIGFE
-__f_frexpf = _f_frexpf NOSIGFE
-__f_ldexp = _f_ldexp NOSIGFE
-__f_ldexpf = _f_ldexpf NOSIGFE
-__f_log = _f_log NOSIGFE
-__f_log10 = _f_log10 NOSIGFE
-__f_log10f = _f_log10f NOSIGFE
-__f_logf = _f_logf NOSIGFE
-__f_pow = _f_pow NOSIGFE
-__f_powf = _f_powf NOSIGFE
-__f_tan = _f_tan NOSIGFE
-__f_tanf = _f_tanf NOSIGFE
-__fpclassifyd NOSIGFE
-__fpclassifyf NOSIGFE
-__getdelim SIGFE
-__getline SIGFE
-__getreent NOSIGFE
-__infinity NOSIGFE
-__isinfd NOSIGFE
-__isinff NOSIGFE
-__isnand NOSIGFE
-__isnanf NOSIGFE
-__main NOSIGFE
-__mempcpy = mempcpy NOSIGFE
-__opendir_with_d_ino SIGFE
-__signbitd NOSIGFE
-__signbitf NOSIGFE
-__signgam NOSIGFE
-__srget SIGFE
-__srget_r SIGFE
-__swbuf SIGFE
-__swbuf_r SIGFE
 a64l NOSIGFE
 abort NOSIGFE
 _abort = abort SIGFE
@@ -133,17 +75,29 @@ _alloca NOSIGFE
 alphasort NOSIGFE
 _alphasort = alphasort NOSIGFE
 argz_add SIGFE
+__argz_add = argz_add SIGFE
 argz_add_sep SIGFE
+__argz_add_sep = argz_add_sep SIGFE
 argz_append SIGFE
+__argz_append = argz_append SIGFE
 argz_count NOSIGFE
+__argz_count = argz_count NOSIGFE
 argz_create SIGFE
+__argz_create = argz_create SIGFE
 argz_create_sep SIGFE
+__argz_create_sep = argz_create_sep SIGFE
 argz_delete SIGFE
+__argz_delete = argz_delete SIGFE
 argz_extract NOSIGFE
+__argz_extract = argz_extract NOSIGFE
 argz_insert SIGFE
+__argz_insert = argz_insert SIGFE
 argz_next NOSIGFE
+__argz_next = argz_next NOSIGFE
 argz_replace SIGFE
+__argz_replace = argz_replace SIGFE
 argz_stringify NOSIGFE
+__argz_stringify = argz_stringify NOSIGFE
 asctime SIGFE
 _asctime = asctime SIGFE
 asctime_r SIGFE
@@ -160,6 +114,8 @@ asprintf SIGFE
 _asprintf = asprintf SIGFE
 asprintf_r = _asprintf_r SIGFE
 _asprintf_r SIGFE
+__assert SIGFE
+__assertfail SIGFE
 atan NOSIGFE
 _atan = atan NOSIGFE
 atan2 NOSIGFE
@@ -339,11 +295,18 @@ endutent SIGFE
 _endutent = endutent SIGFE
 endutxent SIGFE
 envz_add SIGFE
+__envz_add = envz_add SIGFE
 envz_entry NOSIGFE
+__envz_entry = envz_entry NOSIGFE
 envz_get NOSIGFE
+__envz_get = envz_get NOSIGFE
 envz_merge SIGFE
+__envz_merge = envz_merge SIGFE
 envz_remove SIGFE
+__envz_remove = envz_remove SIGFE
 envz_strip SIGFE
+__envz_strip = envz_strip SIGFE
+__eprintf SIGFE
 erand48 NOSIGFE
 _erand48 = erand48 NOSIGFE
 erf NOSIGFE
@@ -355,6 +318,7 @@ _erfcf = erfcf NOSIGFE
 erff NOSIGFE
 _erff = erff NOSIGFE
 err SIGFE
+__errno NOSIGFE
 errx SIGFE
 execl SIGFE
 _execl = execl SIGFE
@@ -381,21 +345,37 @@ _expm1 = expm1 NOSIGFE
 expm1f NOSIGFE
 _expm1f = expm1f NOSIGFE
 _f_atan2 NOSIGFE
+__f_atan2 = _f_atan2 NOSIGFE
 _f_atan2f NOSIGFE
+__f_atan2f = _f_atan2f NOSIGFE
 _f_exp NOSIGFE
+__f_exp = _f_exp NOSIGFE
 _f_expf NOSIGFE
+__f_expf = _f_expf NOSIGFE
 _f_frexp NOSIGFE
+__f_frexp = _f_frexp NOSIGFE
 _f_frexpf NOSIGFE
+__f_frexpf = _f_frexpf NOSIGFE
 _f_ldexp NOSIGFE
+__f_ldexp = _f_ldexp NOSIGFE
 _f_ldexpf NOSIGFE
+__f_ldexpf = _f_ldexpf NOSIGFE
 _f_log NOSIGFE
+__f_log = _f_log NOSIGFE
 _f_log10 NOSIGFE
+__f_log10 = _f_log10 NOSIGFE
 _f_log10f NOSIGFE
+__f_log10f = _f_log10f NOSIGFE
 _f_logf NOSIGFE
+__f_logf = _f_logf NOSIGFE
 _f_pow NOSIGFE
+__f_pow = _f_pow NOSIGFE
 _f_powf NOSIGFE
+__f_powf = _f_powf NOSIGFE
 _f_tan NOSIGFE
+__f_tan = _f_tan NOSIGFE
 _f_tanf NOSIGFE
+__f_tanf = _f_tanf NOSIGFE
 fabs NOSIGFE
 _fabs = fabs NOSIGFE
 fabsf NOSIGFE
@@ -479,6 +459,8 @@ fork SIGFE
 _fork = fork SIGFE
 forkpty SIGFE
 fpathconf SIGFE
+__fpclassifyd NOSIGFE
+__fpclassifyf NOSIGFE
 fprintf SIGFE
 _fprintf = fprintf SIGFE
 fputc SIGFE
@@ -567,6 +549,7 @@ _getchar_unlocked = getchar_unlocked SIGFE
 getcwd SIGFE
 _getcwd = getcwd SIGFE
 getdelim = __getdelim SIGFE
+__getdelim SIGFE
 getdomainname SIGFE
 _getdomainname = getdomainname SIGFE
 getdtablesize NOSIGFE
@@ -603,6 +586,7 @@ gethostname = cygwin_gethostname SIGFE
 _gethostname = cygwin_gethostname SIGFE
 getitimer SIGFE
 getline = __getline SIGFE
+__getline SIGFE
 getlogin NOSIGFE
 _getlogin = getlogin NOSIGFE
 getlogin_r NOSIGFE
@@ -643,6 +627,7 @@ _getpwuid = getpwuid SIGFE
 _getpwuid32 = getpwuid32 SIGFE
 getpwuid_r SIGFE
 _getpwuid_r32 = getpwuid_r32 SIGFE
+__getreent NOSIGFE
 getrlimit SIGFE
 _getrlimit = getrlimit SIGFE
 getrusage SIGFE
@@ -718,6 +703,7 @@ inet_ntop = cygwin_inet_ntop SIGFE
 inet_pton = cygwin_inet_pton SIGFE
 infinity NOSIGFE
 _infinity = infinity NOSIGFE
+__infinity NOSIGFE
 infinityf NOSIGFE
 _infinityf = infinityf NOSIGFE
 initgroups SIGFE
@@ -745,14 +731,18 @@ isgraph NOSIGFE
 _isgraph = isgraph NOSIGFE
 isinf NOSIGFE
 _isinf = isinf NOSIGFE
+__isinfd NOSIGFE
 isinff NOSIGFE
 _isinff = isinff NOSIGFE
+__isinff NOSIGFE
 islower NOSIGFE
 _islower = islower NOSIGFE
 isnan NOSIGFE
 _isnan = isnan NOSIGFE
+__isnand NOSIGFE
 isnanf NOSIGFE
 _isnanf = isnanf NOSIGFE
+__isnanf NOSIGFE
 isprint NOSIGFE
 _isprint = isprint NOSIGFE
 ispunct NOSIGFE
@@ -865,6 +855,7 @@ lstat SIGFE
 _lstat = lstat SIGFE
 _lstat64 = lstat64 SIGFE
 lutimes SIGFE
+__main NOSIGFE
 mallinfo SIGFE
 malloc SIGFE
 _malloc = malloc SIGFE
@@ -897,6 +888,7 @@ memmem NOSIGFE
 memmove NOSIGFE
 _memmove = memmove NOSIGFE
 mempcpy NOSIGFE
+__mempcpy = mempcpy NOSIGFE
 memset NOSIGFE
 _memset = memset NOSIGFE
 mkdir SIGFE
@@ -958,6 +950,7 @@ open SIGFE
 _open = open SIGFE
 _open64
 opendir SIGFE
+__opendir_with_d_ino SIGFE
 openlog SIGFE
 _openlog = openlog SIGFE
 openpty SIGFE
@@ -1277,6 +1270,9 @@ sigignore SIGFE
 siginterrupt SIGFE
 sigismember SIGFE
 signal SIGFE
+__signbitd NOSIGFE
+__signbitf NOSIGFE
+__signgam NOSIGFE
 significand NOSIGFE
 significandf NOSIGFE
 sigpause SIGFE
@@ -1333,6 +1329,8 @@ _srand = srand NOSIGFE
 srand48 NOSIGFE
 _srand48 = srand48 NOSIGFE
 srandom NOSIGFE
+__srget SIGFE
+__srget_r SIGFE
 sscanf SIGFE
 _sscanf = sscanf SIGFE
 sscanf_r = _sscanf_r SIGFE
@@ -1423,6 +1421,8 @@ strxfrm NOSIGFE
 _strxfrm = strxfrm NOSIGFE
 swab NOSIGFE
 _swab = swab NOSIGFE
+__swbuf SIGFE
+__swbuf_r SIGFE
 symlink SIGFE
 _symlink = symlink SIGFE
 sync SIGFE

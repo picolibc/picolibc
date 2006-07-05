@@ -17,7 +17,7 @@ while (<>) {
     $arr = /\sDATA\s*$/o ? \%data : \%code;
     $_ =~ s/^\s+//;
     my $key = (split(' ', $_))[0];
-    substr($key, 0, 1) = '' if /^_/o;
+    substr($key, 0, 1) = '' while $key =~ /^_/o;
     chomp $key;
     $arr->{$key}->{$_} = 1;
 }
