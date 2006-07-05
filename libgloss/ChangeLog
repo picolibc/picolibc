@@ -1,3 +1,8 @@
+2006-07-05  Shaun Jackman  <sjackman@gmail.com>
+
+	* arm/linux-crt0.S: Remove file.
+	* arm/linux-crt0.c: New file. Supports PIC code.
+
 2006-07-04  Shaun Jackman  <sjackman@gmail.com>
 
 	* arm/linux-syscalls0.S (ftruncate, getegid, geteuid, getgid,
