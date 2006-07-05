@@ -1,3 +1,11 @@
+2006-07-05  Jeff Johnston  <jjohnstn@redhat.com>	
+
+	* libc/stdlib/mprec.h [_DOUBLE_IS_32BITS]: Turn off C99 hex 
+	floating-point format support.  Also redefine
+	dword0 and dword1 macros.
+	* libc/stdlib/strtod.c: Add checks for _DOUBLE_IS_32BITS
+	to prevent setting dword1 which is an rvalue only.
+
 2006-06-22  Jeff Johnston  <jjohnstn@redhat.com>	
 
 	* libc/stdlib/Makefile.am: Add new gdtoa routines.

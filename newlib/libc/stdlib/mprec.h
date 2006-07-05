@@ -138,8 +138,15 @@ typedef union { double d; __ULong L[2]; } U;
 #define Exp_mask    ((__uint32_t)0x7f800000L)
 #define P    	    24
 #define Bias 	    127
+#define NO_HEX_FP   /* not supported in this case */
 #if 0
 #define IEEE_Arith  /* it is, but the code doesn't handle IEEE singles yet */
+#endif
+/* Following is needed due to IEEE_Arith not being set on above.  */
+#if defined(__v800)
+#define n_bigtens 2
+#else
+#define n_bigtens 5
 #endif
 #define Emin        (-126)
 #define Exp_1       ((__uint32_t)0x3f800000L)
@@ -163,9 +170,13 @@ typedef union { double d; __ULong L[2]; } U;
 #define Infinite(x) (word0(x) == ((__uint32_t)0x7f800000L))
 #undef word0
 #undef word1
+#undef dword0
+#undef dword1
 
 #define word0(x) (x.i[0])
 #define word1(x) 0
+#define dword0(x) ((__ULong *)&x)[0]
+#define dword1(x) 0
 #else
 
 #define Exp_shift  20
@@ -195,6 +206,8 @@ typedef union { double d; __ULong L[2]; } U;
 #define Int_max 14
 #define Infinite(x) (word0(x) == ((__uint32_t)0x7ff00000L)) /* sufficient test for here */
 
+#endif /* !_DOUBLE_IS_32BITS */
+
 #ifndef Flt_Rounds
 #ifdef FLT_ROUNDS
 #define Flt_Rounds FLT_ROUNDS
@@ -203,9 +216,7 @@ typedef union { double d; __ULong L[2]; } U;
 #endif
 #endif /*Flt_Rounds*/
 
-#endif
-
-#else
+#else /* !IEEE_8087 && !IEEE_MC68k */
 #undef  Sudden_Underflow
 #define Sudden_Underflow
 #ifdef IBM

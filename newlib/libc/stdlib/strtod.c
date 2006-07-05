@@ -137,6 +137,8 @@ static _CONST double tinytens[] = { 1e-16, 1e-32, 1e-64, 1e-128,
 #define Rounding Flt_Rounds
 #endif
 
+#ifndef NO_HEX_FP
+
 static void
 _DEFUN (ULtod, (L, bits, exp, k),
 	__ULong *L _AND
@@ -173,7 +175,8 @@ _DEFUN (ULtod, (L, bits, exp, k),
 	if (k & STRTOG_Neg)
 		L[_0] |= 0x80000000L;
 }
-
+#endif /* !NO_HEX_FP */
+ 
 #ifdef INFNAN_CHECK
 static int
 _DEFUN (match, (sp, t),
@@ -543,15 +546,21 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 				  case 0: /* toward 0 */
 				  case 3: /* toward -infinity */
 					dword0(rv) = Big0;
+#ifndef _DOUBLE_IS_32BITS
 					dword1(rv) = Big1;
+#endif /*!_DOUBLE_IS_32BITS*/
 					break;
 				  default:
 					dword0(rv) = Exp_mask;
+#ifndef _DOUBLE_IS_32BITS
 					dword1(rv) = 0;
+#endif /*!_DOUBLE_IS_32BITS*/
 				  }
 #else /*Honor_FLT_ROUNDS*/
 				dword0(rv) = Exp_mask;
+#ifndef _DOUBLE_IS_32BITS
 				dword1(rv) = 0;
+#endif /*!_DOUBLE_IS_32BITS*/
 #endif /*Honor_FLT_ROUNDS*/
 #ifdef SET_INEXACT
 				/* set overflow bit */
@@ -560,7 +569,9 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 #endif
 #else /*IEEE_Arith*/
 				dword0(rv) = Big0;
+#ifndef _DOUBLE_IS_32BITS
 				dword1(rv) = Big1;
+#endif /*!_DOUBLE_IS_32BITS*/
 #endif /*IEEE_Arith*/
 				if (bd0)
 					goto retfree;
@@ -580,7 +591,9 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 				/* set to largest number */
 				/* (Can't trust DBL_MAX) */
 				dword0(rv) = Big0;
+#ifndef _DOUBLE_IS_32BITS
 				dword1(rv) = Big1;
+#endif /*!_DOUBLE_IS_32BITS*/
 				}
 			else
 				dword0(rv) += P*Exp_msk1;
@@ -603,15 +616,19 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 						>> Exp_shift)) > 0) {
 				/* scaled rv is denormal; zap j low bits */
 				if (j >= 32) {
+#ifndef _DOUBLE_IS_32BITS
 					dword1(rv) = 0;
+#endif /*!_DOUBLE_IS_32BITS*/
 					if (j >= 53)
 					 dword0(rv) = (P+2)*Exp_msk1;
 					else
 					 dword0(rv) &= 0xffffffff << (j-32);
 					}
+#ifndef _DOUBLE_IS_32BITS
 				else
 					dword1(rv) &= 0xffffffff << j;
 				}
+#endif /*!_DOUBLE_IS_32BITS*/
 #else
 			for(j = 0; e1 > 1; j++, e1 >>= 1)
 				if (e1 & 1)
@@ -634,8 +651,12 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 					goto ret;
 					}
 #ifndef Avoid_Underflow
+#ifndef _DOUBLE_IS_32BITS
 				dword0(rv) = Tiny0;
 				dword1(rv) = Tiny1;
+#else
+				dword0(rv) = Tiny1;
+#endif /*_DOUBLE_IS_32BITS*/
 				/* The refinement below will clean
 				 * this approximation up.
 				 */
@@ -866,7 +887,9 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 						| Exp_msk1 >> 4
 #endif
 						;
+#ifndef _DOUBLE_IS_32BITS
 					dword1(rv) = 0;
+#endif /*!_DOUBLE_IS_32BITS*/
 #ifdef Avoid_Underflow
 					dsign = 0;
 #endif
@@ -906,7 +929,9 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 				L = (dword0(rv) & Exp_mask) - Exp_msk1;
 #endif /*Sudden_Underflow}*/
 				dword0(rv) = L | Bndry_mask1;
+#ifndef _DOUBLE_IS_32BITS
 				dword1(rv) = 0xffffffff;
+#endif /*!_DOUBLE_IS_32BITS*/
 #ifdef IBM
 				goto cont;
 #else
@@ -986,7 +1011,9 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 				if (dword0(rv0) == Big0 && dword1(rv0) == Big1)
 					goto ovfl;
 				dword0(rv) = Big0;
+#ifndef _DOUBLE_IS_32BITS
 				dword1(rv) = Big1;
+#endif /*!_DOUBLE_IS_32BITS*/
 				goto cont;
 				}
 			else
@@ -1021,8 +1048,12 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 					if (dword0(rv0) == Tiny0
 					 && dword1(rv0) == Tiny1)
 						goto undfl;
+#ifndef _DOUBLE_IS_32BITS
 					dword0(rv) = Tiny0;
 					dword1(rv) = Tiny1;
+#else
+					dword0(rv) = Tiny1;
+#endif /*_DOUBLE_IS_32BITS*/
 					goto cont;
 					}
 				else
