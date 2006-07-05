@@ -1,3 +1,8 @@
+2006-07-04  Christopher Faylor  <cgf@timesys.com>
+
+	* libc/rexec.cc (cygwin_rexec): Obvious (?) fix to correct a gcc
+	warning - set port to zero first thing in the function.
+
 2006-07-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* signal.cc (signal): Set sa_mask to sig.

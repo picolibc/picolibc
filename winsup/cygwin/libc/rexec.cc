@@ -317,7 +317,7 @@ cygwin_rexec (char **ahost, unsigned short rport, char *name, char *pass,
 {
 	struct sockaddr_in sin, sin2, from;
 	struct hostent *hp;
-	u_short port;
+	u_short port = 0;
 	int s, timo = 1, s3;
 	char c;
 	char ahostbuf[INTERNET_MAX_HOST_NAME_LENGTH + 1];
@@ -359,7 +359,6 @@ retry:
 	}
 	if (fd2p == 0) {
 		(void) write(s, "", 1);
-		port = 0;
 	} else {
 		char num[8];
 		int s2, sin2len;
