@@ -1,3 +1,13 @@
+2006-07-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (path_conv::check): Ignore has_ea setting, it's always unset
+	at this point anyway.
+	(get_symlink_ea): Remove.
+	(set_symlink_ea): Remove.
+	(symlink_worker): Drop writing symlink into NTFS extended attributes.
+	(symlink_info::check): Drop reading symlinks from NTFS extended
+	attributes.
+
 2006-07-04  Christopher Faylor  <cgf@timesys.com>
 
 	* libc/rexec.cc (cygwin_rexec): Obvious (?) fix to correct a gcc

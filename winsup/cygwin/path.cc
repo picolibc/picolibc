@@ -757,7 +757,7 @@ path_conv::check (const char *src, unsigned opt,
 	      full_path[3] = '\0';
 	    }
 
-	  symlen = sym.check (full_path, suff, opt | fs.has_ea ());
+	  symlen = sym.check (full_path, suff, opt);
 
 is_virtual_symlink:
 
@@ -2693,28 +2693,6 @@ endmntent (FILE *)
 
 /********************** Symbolic Link Support **************************/
 
-/* Read symlink from Extended Attribute */
-static int
-get_symlink_ea (HANDLE hdl, const char* frompath, char* buf, int buf_size)
-{
-  int res = read_ea (hdl, frompath, SYMLINK_EA_NAME, buf, buf_size);
-  if (res == 0)
-    debug_printf ("Cannot read symlink from EA");
-  return (res - 1);
-}
-
-/* Save symlink to Extended Attribute */
-static bool
-set_symlink_ea (HANDLE hdl, const char* frompath, const char* topath)
-{
-  if (!write_ea (hdl, frompath, SYMLINK_EA_NAME, topath, strlen (topath) + 1))
-    {
-      debug_printf ("Cannot save symlink in EA");
-      return false;
-    }
-  return true;
-}
-
 /* Create a symlink from FROMPATH to TOPATH. */
 
 /* If TRUE create symlinks as Windows shortcuts, if false create symlinks
@@ -2926,8 +2904,6 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 	}
       if (success)
 	{
-	  if (!isdevice && win32_path.fs_has_ea ())
-	    set_symlink_ea (h, win32_path, oldpath);
 	  CloseHandle (h);
 	  if (!allow_ntsec && allow_ntea)
 	    set_file_attribute (false, NULL, win32_path.get_win32 (),
@@ -3277,10 +3253,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
   major = 0;
   minor = 0;
   mode = 0;
-
   pflags &= ~(PATH_SYMLINK | PATH_LNK);
-  unsigned pflags_or = pflags & PATH_NO_ACCESS_CHECK;
-
   case_clash = false;
 
   while (suffix.next ())
@@ -3347,17 +3320,6 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
       res = -1;
       if (h == INVALID_HANDLE_VALUE)
 	goto file_not_symlink;
-
-      if (sym_check > 0 && opt & PC_CHECK_EA
-	  && (res = get_symlink_ea (h, suffix.path, contents,
-				    sizeof (contents))) > 0)
-	{
-	  pflags = PATH_SYMLINK | pflags_or;
-	  if (sym_check == 1)
-	    pflags |= PATH_LNK;
-	  debug_printf ("Got symlink from EA: %s", contents);
-	  break;
-	}
 
       switch (sym_check)
 	{
