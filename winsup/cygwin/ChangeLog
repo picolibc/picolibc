@@ -1,3 +1,8 @@
+2006-07-05  Christopher Faylor  <cgf@timesys.com>
+
+	* sortdin: New program.
+	* cygwin.din: Sort.
+
 2006-07-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_socket::wait): Reset default timeout to 10ms.
