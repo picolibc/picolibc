@@ -1,5 +1,9 @@
 2006-07-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (fhandler_socket::wait): Reset default timeout to 10ms.
+
+2006-07-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (path_conv::check): Ignore has_ea setting, it's always unset
 	at this point anyway.
 	(get_symlink_ea): Remove.
