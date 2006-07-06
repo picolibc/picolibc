@@ -11,6 +11,8 @@ __cygwin_user_data DATA
 _daylight DATA
 h_errno DATA
 _impure_ptr DATA
+in6addr_any DATA
+in6addr_loopback DATA
 __mb_cur_max DATA
 optarg DATA
 opterr DATA
@@ -471,6 +473,7 @@ fread SIGFE
 _fread = fread SIGFE
 free SIGFE
 _free = free SIGFE
+freeaddrinfo = cygwin_freeaddrinfo SIGFE
 freopen SIGFE
 _freopen = freopen SIGFE
 _freopen64 = freopen64 SIGFE
@@ -524,6 +527,7 @@ funlockfile SIGFE
 futimes SIGFE
 fwrite SIGFE
 _fwrite = fwrite SIGFE
+gai_strerror = cygwin_gai_strerror NOSIGFE
 gamma NOSIGFE
 _gamma = gamma NOSIGFE
 gamma_r NOSIGFE
@@ -538,6 +542,7 @@ gcvtf SIGFE
 _gcvtf = gcvtf SIGFE
 get_osfhandle SIGFE
 _get_osfhandle = get_osfhandle SIGFE
+getaddrinfo = cygwin_getaddrinfo SIGFE
 getc SIGFE
 _getc = getc SIGFE
 getc_unlocked SIGFE
@@ -594,6 +599,7 @@ getmntent SIGFE
 _getmntent = getmntent SIGFE
 getmode SIGFE
 _getmode = getmode SIGFE
+getnameinfo = cygwin_getnameinfo SIGFE
 getopt SIGFE
 getopt_long SIGFE
 getopt_long_only SIGFE

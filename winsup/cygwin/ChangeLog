@@ -1,5 +1,55 @@
 2006-07-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin.din: Export in6addr_any, in6addr_loopback, freeaddrinfo,
+	gai_strerror, getaddrinfo, getnameinfo.
+	* fhandler_socket.cc: Include cygwin/in6.h.
+	(get_inet_addr): Accomodate AF_INET6 usage.
+	(fhandler_socket::connect): Ditto.
+	(fhandler_socket::listen): Ditto.
+	(fhandler_socket::sendto): Ditto.
+	* net.cc: Include cygwin/in6.h.
+	(in6addr_any): Define.
+	(in6addr_loopback): Define.
+	(cygwin_socket): Accomodate AF_INET6 usage.
+	(socketpair): Bind socketpairs only to loopback for security.
+	(inet_pton4): New static function.
+	(inet_pton6): Ditto.
+	(cygwin_inet_pton): New AF_INET6 aware inet_pton implementation.
+	(inet_ntop4): New static function.
+	(inet_ntop6): Ditto.
+	(cygwin_inet_ntop): New AF_INET6 aware inet_ntop implementation.
+	(ga_aistruct): New static function.
+	(ga_clone): Ditto.
+	(ga_echeck): Ditto.
+	(ga_nsearch): Ditto.
+	(ga_port): Ditto.
+	(ga_serv): Ditto.
+	(ga_unix): Ditto.
+	(gn_ipv46): Ditto.
+	(ipv4_freeaddrinfo): Ditto.
+	(ipv4_getaddrinfo): Ditto.
+	(ipv4_getnameinfo): Ditto.
+	(gai_errmap_t): New structure holding error code - error string mapping.
+	(cygwin_gai_strerror): New function implementing gai_strerror.
+	(w32_to_gai_err): New static function.
+	(get_ipv6_funcs): Ditto.
+	(load_ipv6_funcs): Ditto.
+	(cygwin_freeaddrinfo): New function implementing freeaddrinfo.
+	(cygwin_getaddrinfo): New function implementing getaddrinfo.
+	(cygwin_getnameinfo): New function implementing getnameinfo.
+	* include/netdb.h: Include stdint.h and cygwin/socket.h.  Define
+	data types and macros used by getaddrinfo and friends.  Declare
+	freeaddrinfo, gai_strerror, getaddrinfo and getnameinfo.
+	* include/cygwin/in.h: Add IPv6 related IPPROTOs. Remove definition
+	of struct sockaddr_in6.  Include cygwin/in6.h instead.
+	* include/cygwin/in6.h: New header file defining IPv6 releated
+	data types and macros.
+	* include/cygwin/socket.h: Enable AF_INET6 and PF_INET6.  Add
+	IPv6 related socket options.
+	* include/cygwin/version.h: Bump API minor number.
+
+2006-07-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (DsGetDcNameA): Define.
 	(NetGetAnyDCName): Define.
 	* security.cc: Include dsgetdc.h.

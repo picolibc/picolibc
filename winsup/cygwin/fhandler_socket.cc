@@ -37,6 +37,7 @@
 #include <unistd.h>
 #include <sys/acl.h>
 #include "cygtls.h"
+#include "cygwin/in6.h"
 
 #define ASYNC_MASK (FD_READ|FD_WRITE|FD_OOB|FD_ACCEPT|FD_CONNECT)
 
@@ -50,15 +51,15 @@ fhandler_dev_random* entropy_source;
 /* cygwin internal: map sockaddr into internet domain address */
 static int
 get_inet_addr (const struct sockaddr *in, int inlen,
-	       struct sockaddr_in *out, int *outlen,
+	       struct sockaddr_storage *out, int *outlen,
 	       int *type = NULL, int *secret = NULL)
 {
   int secret_buf [4];
   int* secret_ptr = (secret ? : secret_buf);
 
-  if (in->sa_family == AF_INET)
+  if (in->sa_family == AF_INET || in->sa_family == AF_INET6)
     {
-      *out = * (struct sockaddr_in *)in;
+      memcpy (out, in, inlen);
       *outlen = inlen;
       return 1;
     }
@@ -102,7 +103,7 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 		  secret_ptr, secret_ptr + 1, secret_ptr + 2, secret_ptr + 3);
 	  sin.sin_port = htons (sin.sin_port);
 	  sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-	  *out = sin;
+	  memcpy (out, &sin, sizeof sin);
 	  *outlen = sizeof sin;
 	  if (type)
 	    *type = (ctype == 's' ? SOCK_STREAM :
@@ -739,11 +740,11 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 {
   int res = -1;
   bool in_progress = false;
-  struct sockaddr_in sin;
+  struct sockaddr_storage sst;
   DWORD err;
   int type;
 
-  if (!get_inet_addr (name, namelen, &sin, &namelen, &type, connect_secret))
+  if (!get_inet_addr (name, namelen, &sst, &namelen, &type, connect_secret))
     return -1;
 
   if (get_addr_family () == AF_LOCAL && get_socket_type () != type)
@@ -753,7 +754,7 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
       return -1;
     }
 
-  res = ::connect (get_socket (), (struct sockaddr *) &sin, namelen);
+  res = ::connect (get_socket (), (struct sockaddr *) &sst, namelen);
 
   if (!res)
     err = 0;
@@ -804,19 +805,35 @@ int
 fhandler_socket::listen (int backlog)
 {
   int res = ::listen (get_socket (), backlog);
-  if (res && WSAGetLastError () == WSAEINVAL && get_addr_family () == AF_INET)
+  if (res && WSAGetLastError () == WSAEINVAL)
     {
       /* It's perfectly valid to call listen on an unbound INET socket.
 	 In this case the socket is automatically bound to an unused
 	 port number, listening on all interfaces.  On Winsock, listen
 	 fails with WSAEINVAL when it's called on an unbound socket.
 	 So we have to bind manually here to have POSIX semantics. */
-      struct sockaddr_in sa;
-      sa.sin_family = AF_INET;
-      sa.sin_port = 0;
-      sa.sin_addr.s_addr = INADDR_ANY;
-      if (!::bind (get_socket (), (struct sockaddr *) &sa, sizeof sa))
-	res = ::listen (get_socket (), backlog);
+      if (get_addr_family () == AF_INET)
+        {
+	  struct sockaddr_in sin;
+	  sin.sin_family = AF_INET;
+	  sin.sin_port = 0;
+	  sin.sin_addr.s_addr = INADDR_ANY;
+	  if (!::bind (get_socket (), (struct sockaddr *) &sin, sizeof sin))
+	    res = ::listen (get_socket (), backlog);
+	}
+      else if (get_addr_family () == AF_INET6)
+        {
+	  struct sockaddr_in6 sin6 = 
+	    {
+	      sin6_family: AF_INET6,
+	      sin6_port: 0,
+	      sin6_flowinfo: 0,
+	      sin6_addr: IN6ADDR_ANY_INIT,
+	      sin6_scope_id: 0
+	    };
+	  if (!::bind (get_socket (), (struct sockaddr *) &sin6, sizeof sin6))
+	    res = ::listen (get_socket (), backlog);
+	}
     }
   if (!res)
     {
@@ -1256,9 +1273,9 @@ int
 fhandler_socket::sendto (const void *ptr, size_t len, int flags,
 			 const struct sockaddr *to, int tolen)
 {
-  struct sockaddr_in sin;
+  struct sockaddr_storage sst;
 
-  if (to && !get_inet_addr (to, tolen, &sin, &tolen))
+  if (to && !get_inet_addr (to, tolen, &sst, &tolen))
     return SOCKET_ERROR;
 
   int res = SOCKET_ERROR;
@@ -1269,7 +1286,7 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
   if (is_nonblocking () || closed () || async_io ())
     res = WSASendTo (get_socket (), &wsabuf, 1, &ret,
 		     flags & MSG_WINMASK,
-		     (to ? (const struct sockaddr *) &sin : NULL), tolen,
+		     (to ? (const struct sockaddr *) &sst : NULL), tolen,
 		     NULL, NULL);
   else
     {
@@ -1280,7 +1297,7 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
 	    {
 	      res = WSASendTo (get_socket (), &wsabuf, 1, &ret,
 			       flags & MSG_WINMASK,
-			       (to ? (const struct sockaddr *) &sin : NULL),
+			       (to ? (const struct sockaddr *) &sst : NULL),
 			       tolen, NULL, NULL);
 	    }
 	  while (res == SOCKET_ERROR
