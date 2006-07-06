@@ -1,3 +1,14 @@
+2006-07-06  Christopher Faylor  <cgf@timesys.com>
+
+	* hookapi.cc: Add comment header
+	(putmem): Make static.
+	(get_export): Ditto.
+	(rvadelta): Ditto.  Don't assume that a section which ends where the
+	import_rva begins is the import list.
+
+	* child_info.h: Update copyright.
+	* fork.cc: Ditto.
+
 2006-07-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/in6.h (struct in6_addr): Fix typo.

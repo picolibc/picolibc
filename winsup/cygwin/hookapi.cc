@@ -1,3 +1,13 @@
+/* hookapi.cc
+
+   Copyright 2005, 2006 Red Hat, Inc.
+
+This file is part of Cygwin.
+
+This software is a copyrighted work licensed under the terms of the
+Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+details. */
+
 #include "winsup.h"
 #include "cygerrno.h"
 #include "security.h"
@@ -38,19 +48,19 @@ PEHeaderFromHModule (HMODULE hModule)
   return pNTHeader;
 }
 
-long
+static long
 rvadelta (PIMAGE_NT_HEADERS pnt, DWORD import_rva)
 {
   PIMAGE_SECTION_HEADER section = (PIMAGE_SECTION_HEADER) (pnt + 1);
   for (int i = 0; i < pnt->FileHeader.NumberOfSections; i++)
     if (section[i].VirtualAddress <= import_rva
-	&& (section[i].VirtualAddress + section[i].Misc.VirtualSize) >= import_rva)
+	&& (section[i].VirtualAddress + section[i].Misc.VirtualSize) > import_rva)
     // if (strncasematch ((char *) section[i].Name, ".idata", IMAGE_SIZEOF_SHORT_NAME))
       return section[i].VirtualAddress - section[i].PointerToRawData;
   return -1;
 }
 
-void *
+static void *
 putmem (PIMAGE_THUNK_DATA pi, const void *hookfn)
 {
   DWORD ofl;
@@ -108,7 +118,7 @@ RedirectIAT (function_hook& fh, PIMAGE_IMPORT_DESCRIPTOR pImportDesc,
   return true;
 }
 
-void
+static void
 get_export (function_hook& fh)
 {
   PIMAGE_DOS_HEADER pdh = (PIMAGE_DOS_HEADER) cygwin_hmodule;
