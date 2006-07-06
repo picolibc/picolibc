@@ -28,6 +28,7 @@ details. */
 #include <ntsecapi.h>
 #include <subauth.h>
 #include <aclapi.h>
+#include <dsgetdc.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -208,13 +209,21 @@ close_local_policy (LSA_HANDLE &lsa)
   lsa = INVALID_HANDLE_VALUE;
 }
 
+/* CV, 2006-07-06: Missing in w32api. */
+extern "C" DWORD WINAPI DsGetDcNameA (LPCSTR, LPCSTR, GUID *, LPCSTR, ULONG,
+				      PDOMAIN_CONTROLLER_INFOA *);
+#define DS_FORCE_REDISCOVERY	1
+
 bool
-get_logon_server (const char *domain, char *server, WCHAR *wserver)
+get_logon_server (const char *domain, char *server, WCHAR *wserver,
+		  bool rediscovery)
 {
-  WCHAR wdomain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-  NET_API_STATUS ret;
+  DWORD dret;
+  PDOMAIN_CONTROLLER_INFOA pci;
+  NET_API_STATUS nret;
   WCHAR *buf;
   DWORD size = INTERNET_MAX_HOST_NAME_LENGTH + 1;
+  WCHAR wdomain[size];
 
   /* Empty domain is interpreted as local system */
   if ((GetComputerName (server + 2, &size)) &&
@@ -226,18 +235,37 @@ get_logon_server (const char *domain, char *server, WCHAR *wserver)
       return true;
     }
 
-  /* Try to get the primary domain controller for the domain */
-  sys_mbstowcs (wdomain, domain, INTERNET_MAX_HOST_NAME_LENGTH + 1);
-  if ((ret = NetGetDCName (NULL, wdomain, (LPBYTE *) &buf)) == STATUS_SUCCESS)
+  /* Try to get any available domain controller for this domain */
+  dret = DsGetDcNameA (NULL, domain, NULL, NULL,
+		       rediscovery ? DS_FORCE_REDISCOVERY : 0, &pci);
+  if (dret == ERROR_SUCCESS)
     {
-      sys_wcstombs (server, INTERNET_MAX_HOST_NAME_LENGTH + 1, buf);
-      if (wserver)
-	for (WCHAR *ptr1 = buf; (*wserver++ = *ptr1++);)
-	  ;
-      NetApiBufferFree (buf);
+      strcpy (server, pci->DomainControllerName);
+      sys_mbstowcs (wserver, server, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+      NetApiBufferFree (pci);
+      debug_printf ("DC: rediscovery: %d, server: %s", rediscovery, server);
       return true;
     }
-  __seterrno_from_win_error (ret);
+  else if (dret == ERROR_PROC_NOT_FOUND)
+    {
+      /* NT4 w/o DSClient */
+      sys_mbstowcs (wdomain, domain, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+      if (rediscovery)
+        nret = NetGetAnyDCName (NULL, wdomain, (LPBYTE *) &buf);
+      else
+	nret = NetGetDCName (NULL, wdomain, (LPBYTE *) &buf);
+      if (nret == NERR_Success)
+	{
+	  sys_wcstombs (server, INTERNET_MAX_HOST_NAME_LENGTH + 1, buf);
+	  if (wserver)
+	    for (WCHAR *ptr1 = buf; (*wserver++ = *ptr1++);)
+	      ;
+	  NetApiBufferFree (buf);
+	  debug_printf ("NT: rediscovery: %d, server: %s", rediscovery, server);
+	  return true;
+	}
+    }
+  __seterrno_from_win_error (nret);
   return false;
 }
 
@@ -511,7 +539,9 @@ get_server_groups (cygsidlist &grp_list, PSID usersid, struct passwd *pw)
   grp_list += well_known_world_sid;
   grp_list += well_known_authenticated_users_sid;
   extract_nt_dom_user (pw, domain, user);
-  if (get_logon_server (domain, server, wserver))
+  if (get_logon_server (domain, server, wserver, false)
+      && !get_user_groups (wserver, grp_list, user, domain)
+      && get_logon_server (domain, server, wserver, true))
     get_user_groups (wserver, grp_list, user, domain);
   get_unix_group_sidlist (pw, grp_list);
   return get_user_local_groups (grp_list, usersid);
@@ -1299,7 +1329,7 @@ get_reg_security (HANDLE handle, security_descriptor &sd_ret)
 				 | OWNER_SECURITY_INFORMATION,
 				 sd_ret, &len);
     }
-  if (ret != STATUS_SUCCESS)
+  if (ret != ERROR_SUCCESS)
     {
       __seterrno ();
       return -1;

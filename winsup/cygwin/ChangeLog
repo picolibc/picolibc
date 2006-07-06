@@ -1,3 +1,22 @@
+2006-07-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (DsGetDcNameA): Define.
+	(NetGetAnyDCName): Define.
+	* security.cc: Include dsgetdc.h.
+	(DsGetDcNameA): Declare.
+	(DS_FORCE_REDISCOVERY): Define.
+	(get_logon_server): Add bool parameter to control rediscovery of DC.
+	Use DsGetDcNameA function if supported, NetGetDCName/NetGetAnyDCName
+	otherwise.
+	(get_server_groups): Rediscover DC if get_user_groups fails and
+	try again.
+	(get_reg_security): Use correct error code macro when testing
+	RegGetKeySecurity return value.
+	* security.h (get_logon_server): Remove default vaue from wserver
+	parameter.  Add rediscovery parameter.
+	* uinfo.cc (cygheap_user::env_logsrv): Accomodate rediscovery parameter
+	in call to get_logon_server.
+
 2006-07-05  Christopher Faylor  <cgf@timesys.com>
 
 	* sortdin: Ignore all leading underscores when deriving a sort key.
