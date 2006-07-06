@@ -1,5 +1,9 @@
 2006-07-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/in6.h (struct in6_addr): Fix typo.
+
+2006-07-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin.din: Export in6addr_any, in6addr_loopback, freeaddrinfo,
 	gai_strerror, getaddrinfo, getnameinfo.
 	* fhandler_socket.cc: Include cygwin/in6.h.
