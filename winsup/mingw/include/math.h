@@ -295,11 +295,11 @@ _CRTIMP int __cdecl _set_SSE2_enable (int);
 #define INFINITY	__builtin_inf()
 #define NAN		__builtin_nan("")
 #else
-#extern const float __INFF;
+extern const float __INFF;
 #define HUGE_VALF __INFF
-#extern const long double  __INFL;
+extern const long double  __INFL;
 #define HUGE_VALL __INFL
-#define INFINITY	HUGE_VALF
+#define INFINITY HUGE_VALF
 extern const double __QNAN;
 #define NAN __QNAN
 #endif /* __MINGW_GNUC_PREREQ(3, 3) */
