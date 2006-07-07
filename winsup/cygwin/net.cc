@@ -2559,7 +2559,7 @@ inet_ntop6 (const u_char *src, char *dst, size_t size)
  *	Paul Vixie, 1996.
  */
 extern "C" const char *
-cygwin_inet_ntop (int af, const void *src, char *dst, size_t size)
+cygwin_inet_ntop (int af, const void *src, char *dst, socklen_t size)
 {
   switch (af)
     {

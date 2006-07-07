@@ -1,5 +1,9 @@
 2006-07-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* net.cc (cygwin_inet_ntop): Fix data type of forth parameter.
+
+2006-07-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (DLL_OFILES): Add inet_addr.o and inet_network.o.
 	* autoload.cc (inet_addr): Drop definition.
 	(inet_ntoa): Ditto.
