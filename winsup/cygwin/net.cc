@@ -49,6 +49,8 @@ extern "C"
   int __stdcall rcmd (char **ahost, unsigned short inport, char *locuser,
 		      char *remuser, char *cmd, SOCKET * fd2p);
   int sscanf (const char *, const char *, ...);
+  int cygwin_inet_aton(const char *, struct in_addr *);
+  const char *cygwin_inet_ntop (int, const void *, char *, socklen_t);
 }				/* End of "C" section */
 
 const struct in6_addr in6addr_any = IN6ADDR_ANY_INIT;
@@ -106,7 +108,8 @@ ntohs (unsigned short x)
 extern "C" char *
 cygwin_inet_ntoa (struct in_addr in)
 {
-  char *res = inet_ntoa (in);
+  char buf[20];
+  const char *res = cygwin_inet_ntop (AF_INET, &in, buf, sizeof buf);
 
   if (_my_tls.locals.ntoa_buf)
     {
@@ -116,46 +119,6 @@ cygwin_inet_ntoa (struct in_addr in)
   if (res)
     _my_tls.locals.ntoa_buf = strdup (res);
   return _my_tls.locals.ntoa_buf;
-}
-
-/* exported as inet_addr: BSD 4.3 */
-extern "C" unsigned long
-cygwin_inet_addr (const char *cp)
-{
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return INADDR_NONE;
-  unsigned long res = inet_addr (cp);
-
-  return res;
-}
-
-/* exported as inet_aton: BSD 4.3
-   inet_aton is not exported by wsock32 and ws2_32,
-   so it has to be implemented here. */
-extern "C" int
-cygwin_inet_aton (const char *cp, struct in_addr *inp)
-{
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return 0;
-
-  unsigned long res = inet_addr (cp);
-
-  if (res == INADDR_NONE && strcmp (cp, "255.255.255.255"))
-    return 0;
-  if (inp)
-    inp->s_addr = res;
-  return 1;
-}
-
-extern "C" unsigned int
-cygwin_inet_network (const char *cp)
-{
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return INADDR_NONE;
-  return ntohl (inet_addr (cp));
 }
 
 /* inet_netof is in the standard BSD sockets library.  It is useless

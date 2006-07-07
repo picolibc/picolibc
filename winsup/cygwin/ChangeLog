@@ -1,3 +1,17 @@
+2006-07-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Add inet_addr.o and inet_network.o.
+	* autoload.cc (inet_addr): Drop definition.
+	(inet_ntoa): Ditto.
+	* net.cc: Forward declare cygwin_inet_aton and cygwin_inet_ntop.
+	(cygwin_inet_ntoa): Call cygwin_inet_ntop instead of Winsock inet_ntoa.
+	(cygwin_inet_addr): Remove here.
+	(cygwin_inet_aton): Ditto.
+	(cygwin_inet_network): Ditto.
+	* libc/inet_addr.c: New file implementing cygwin_inet_aton and
+	cygwin_inet_addr.
+	* libc/inet_network.c: New file implementing cygwin_inet_network.
+
 2006-07-06  Christopher Faylor  <cgf@timesys.com>
 
 	* hookapi.cc: Add comment header
