@@ -970,9 +970,11 @@ fhandler_socket::wait (HANDLE event, int flags, DWORD timeout)
   WSAEVENT ev[2] = { event, signal_arrived };
   WSANETWORKEVENTS evts;
 
+#if 0	/* Not yet.  Not this way. */
 /* If WSAWaitForMultipleEvents is interrupted by a signal, and the signal
    has the SA_RESTART flag set, return to this label and... restart. */
 sa_restart:
+#endif
 
   switch (WSAWaitForMultipleEvents (2, ev, FALSE, timeout, FALSE))
     {
@@ -1044,11 +1046,13 @@ sa_restart:
 	  }
 	break;
       case WSA_WAIT_EVENT_0 + 1:
+#if 0	/* Not yet.  Not this way. */
 	if (_my_tls.call_signal_handler ())
 	  {
 	    sig_dispatch_pending ();
 	    goto sa_restart;
 	  }
+#endif
 	WSASetLastError (WSAEINTR);
 	break;
       default:

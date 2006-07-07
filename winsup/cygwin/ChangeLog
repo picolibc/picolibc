@@ -1,5 +1,10 @@
 2006-07-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::wait): Disable SA_RESTART
+	handling for now.
+
+2006-07-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (DLL_OFILES): Add inet_addr.o and inet_network.o.
 	* autoload.cc (inet_addr): Drop definition.
 	(inet_ntoa): Ditto.
