@@ -1,3 +1,7 @@
+2006-07-10  Jakub Jelinek  <jakub@redhat.com>
+
+	* common.h (SHT_GNU_HASH, DT_GNU_HASH): Define.
+
 2006-05-31  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* internal.h (ELF_SECTION_SIZE): New.
