@@ -77,6 +77,7 @@ static const char rcsid[] = "$Id$";
 __FBSDID("$FreeBSD$");
 #else
 #define __INSIDE_CYGWIN__
+#define  __INSIDE_CYGWIN_NET__
 #endif
 
 #ifndef __CYGWIN__
