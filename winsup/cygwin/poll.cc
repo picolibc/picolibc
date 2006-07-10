@@ -97,6 +97,10 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
 		    sock = cygheap->fdtab[fds[i].fd]->is_socket ();
 		    if (!sock)
 		      fds[i].revents |= POLLIN;
+		    else if (sock->listener ())
+		      {
+			fds[i].revents |= POLLIN;
+		      }
 		    else
 		      {
 			/* The following action can change errno.  We have to
@@ -105,18 +109,8 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
 			switch (sock->recvfrom (peek, sizeof (peek), MSG_PEEK,
 						NULL, NULL))
 			  {
-			    case -1: /* Something weird happened */
-			      /* When select returns that data is available,
-				 that could mean that the socket is in
-				 listen mode and a client tries to connect.
-				 Unfortunately, recvfrom() doesn't make much
-				 sense then.  It returns WSAENOTCONN in that
-				 case.  Since that's not actually an error,
-				 we must not set POLLERR but POLLIN. */
-			      if (WSAGetLastError () != WSAENOTCONN)
-				fds[i].revents |= POLLERR;
-			      else
-				fds[i].revents |= POLLIN;
+			    case -1:
+			      fds[i].revents |= POLLERR;
 			      break;
 			    case 0:  /* Closed on the read side... */
 			      /* ...or shutdown(SHUT_WR) on the write side.

@@ -513,6 +513,8 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
   if (!fd.isopen ())
     return false;
   fd->set_io_handle ((HANDLE) soc);
+  if (!((fhandler_socket *) fd)->prepare ())
+    return false;
   fd->set_flags (O_RDWR | O_BINARY);
   fd->uninterruptible_io (true);
   cygheap->fdtab.inc_need_fixup_before ();
@@ -776,56 +778,7 @@ cygwin_connect (int fd, const struct sockaddr *name, socklen_t namelen)
   if (efault.faulted (EFAULT) || !fh)
     res = -1;
   else
-    {
-      bool was_blocking = false;
-      if (!fh->is_nonblocking ())
-	{
-	  int nonblocking = 1;
-	  fh->ioctl (FIONBIO, &nonblocking);
-	  was_blocking = true;
-	}
-      res = fh->connect (name, namelen);
-      if (was_blocking)
-	{
-	  if (res == -1 && get_errno () == EINPROGRESS)
-	    {
-	      size_t fds_size = howmany (fd + 1, NFDBITS) * sizeof (fd_mask);
-	      fd_set *write_fds = (fd_set *) alloca (fds_size);
-	      fd_set *except_fds = (fd_set *) alloca (fds_size);
-	      memset (write_fds, 0, fds_size);
-	      memset (except_fds, 0, fds_size);
-	      FD_SET (fd, write_fds);
-	      FD_SET (fd, except_fds);
-	      res = cygwin_select (fd + 1, NULL, write_fds, except_fds, NULL);
-	      if (res > 0 && FD_ISSET (fd, except_fds))
-		{
-		  res = -1;
-		  for (;;)
-		    {
-		      int err;
-		      int len = sizeof err;
-		      cygwin_getsockopt (fd, SOL_SOCKET, SO_ERROR,
-					 (void *) &err, &len);
-		      if (err)
-			{
-			  set_errno (err);
-			  break;
-			}
-		      low_priority_sleep (0);
-		    }
-		}
-	      else if (res > 0)
-		res = 0;
-	      else
-		{
-		  WSASetLastError (WSAEINPROGRESS);
-		  set_winsock_errno ();
-		}
-	    }
-	  int nonblocking = 0;
-	  fh->ioctl (FIONBIO, &nonblocking);
-	}
-    }
+    res = fh->connect (name, namelen);
 
   syscall_printf ("%d = connect (%d, %p, %d)", res, fd, name, namelen);
 
@@ -959,19 +912,7 @@ cygwin_accept (int fd, struct sockaddr *peer, socklen_t *len)
   if (efault.faulted (EFAULT) || !fh)
     res = -1;
   else
-    {
-      if (!fh->is_nonblocking ())
-	{
-	  size_t fds_size = howmany (fd + 1, NFDBITS) * sizeof (fd_mask);
-	  fd_set *read_fds = (fd_set *) alloca (fds_size);
-	  memset (read_fds, 0, fds_size);
-	  FD_SET (fd, read_fds);
-	  res = cygwin_select (fd + 1, read_fds, NULL, NULL, NULL);
-	  if (res == -1)
-	    return -1;
-	}
-      res = fh->accept (peer, len);
-    }
+    res = fh->accept (peer, len);
 
   syscall_printf ("%d = accept (%d, %p, %p)", res, fd, peer, len);
   return res;

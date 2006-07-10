@@ -1,3 +1,69 @@
+2006-07-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_socket): Add wsock_mtx, wsock_evt
+	and wsock_events members.  Remove closed status flag, add listener
+	status flag.  Accomodate new implementation of socket event handling
+	methods.  Declare recv* and send* functions ssize_t as the POSIX
+	equivalents.
+	(fhandler_socket::recv_internal): Declare.
+	(fhandler_socket::send_internal): Ditto.
+	* fhandler_socket.cc (EVENT_MASK): Define mask of selected events.
+	(fhandler_socket::fhandler_socket): Initialize new members.
+	(fhandler_socket::af_local_setblocking): Don't actually set the
+	socket to blocking mode.  Keep sane event selection.
+	(fhandler_socket::af_local_unsetblocking): Don't actually set the
+	socket to previous blocking setting, just remember it.
+	(struct wsa_event): New structure to keep event data per shared
+	socket.
+	(NUM_SOCKS): Define number of shared sockets concurrently handled by
+	all active Cygwin processes.
+	(wsa_events): New shared datastructure keeping all wsa_event records.
+	(socket_serial_number): New shared variable to identify shared sockets.
+	(wsa_slot_mtx): Global mutex to serialize wsa_events access.
+	(search_wsa_event_slot): New static function to select a new wsa_event
+	slot for a new socket.
+	(fhandler_socket::prepare): Rewrite.  Prepare event selection
+	per new socket.
+	(fhandler_socket::wait): Rewrite.  Wait for socket events in thread
+	safe and multiple process safe.
+	(fhandler_socket::release): Rewrite.  Close per-socket descriptor
+	mutex handle and event handle.
+	(fhandler_socket::dup): Duplicate wsock_mtx and wsock_evt.  Fix
+	copy-paste error in debug output.
+	(fhandler_socket::connect): Accomodate new event handling.
+	(fhandler_socket::listen): Set listener flag on successful listen.
+	(fhandler_socket::accept): Accomodate new event handling.
+	(fhandler_socket::recv_internal): New inline method centralizing
+	common recv code.
+	(fhandler_socket::recvfrom): Call recv_internal now.
+	(fhandler_socket::recvmsg): Ditto.  Streamline copying from iovec
+	to WSABUF.
+	(fhandler_socket::send_internal): New inline method centralizing
+	common send code.
+	(fhandler_socket::sendto): Call send_internal now.
+	(fhandler_socket::sendmsg): Ditto.  Streamline copying from iovec
+	to WSABUF.
+	(fhandler_socket::close): Call release now.
+	(fhandler_socket::ioctl): Never actually switch to blocking mode.
+	Just keep track of the setting.
+	* net.cc (fdsock): Call prepare now.
+	(cygwin_connect): Revert again to event driven technique.
+	(cygwin_accept): Ditto.
+	* poll.cc (poll): Don't call recvfrom on a listening socket.
+	Remove special case for failing recvfrom.
+	* include/sys/socket.h: Declare recv* and send* functions ssize_t as 
+	requested by POSIX.
+
+2006-07-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/inet_addr.c: Define __INSIDE_CYGWIN_NET__.
+	* libc/inet_network.c: Ditto.
+
+2006-07-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::wait): Disable SA_RESTART
+	handling for now.
+
 2006-07-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (cygwin_inet_ntop): Fix data type of forth parameter.
