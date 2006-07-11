@@ -1,3 +1,13 @@
+2006-07-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::fixup_after_fork): Handle
+	wsock_mtx and wsock_evt on fork, thus handling close_on_exec correctly.
+	(fhandler_socket::fixup_after_exec): Drop misguided attempt to handle
+	close_on_exec here.
+	(fhandler_socket::dup): Call fixup_after_fork with NULL parent.
+	Add comment.
+	(fhandler_socket::set_close_on_exec): Handle wsock_mtx and wsock_evt.
+
 2006-07-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (class fhandler_socket): Add wsock_mtx, wsock_evt

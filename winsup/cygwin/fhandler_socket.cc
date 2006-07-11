@@ -654,6 +654,11 @@ fhandler_socket::fixup_after_fork (HANDLE parent)
 
       set_io_handle ((HANDLE) new_sock);
     }
+  if (parent)	/* fork, not exec or dup */
+    {
+      fork_fixup (parent, wsock_mtx, "wsock_mtx");
+      fork_fixup (parent, wsock_evt, "wsock_evt");
+    }
 }
 
 void
@@ -661,11 +666,6 @@ fhandler_socket::fixup_after_exec ()
 {
   if (!close_on_exec ())
     fixup_after_fork (NULL);
-  else
-    {
-      CloseHandle (wsock_evt);
-      CloseHandle (wsock_mtx);
-    }
 }
 
 int
@@ -723,7 +723,9 @@ fhandler_socket::dup (fhandler_base *child)
   cygheap->user.reimpersonate ();
   if (!WSAGetLastError ())
     {
-      fhs->fixup_after_fork (hMainProc);
+      /* Call with NULL parent, otherwise wsock_mtx and wsock_evt are
+         duplicated again with wrong close_on_exec settings. */
+      fhs->fixup_after_fork (NULL);
       if (fhs->get_io_handle() != (HANDLE) INVALID_SOCKET)
 	{
 	  cygheap->fdtab.inc_need_fixup_before ();
@@ -1637,6 +1639,8 @@ fhandler_socket::fcntl (int cmd, void *arg)
 void
 fhandler_socket::set_close_on_exec (bool val)
 {
+  set_no_inheritance (wsock_mtx, val);
+  set_no_inheritance (wsock_evt, val);
   close_on_exec (val);
   debug_printf ("set close_on_exec for %s to %d", get_name (), val);
 }
