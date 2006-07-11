@@ -1,6 +1,14 @@
 2006-07-11  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	gdb/
+	* symfile.c (symfile_section_offset_from_segment): Correct
+	last change.
+
+	* solib.c (solib_open): Always set errno.
+
+2006-07-11  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	gdb/
 	* symfile.c (symfile_map_offsets_to_segments): Don't warn
 	for empty sections.
 	(symfile_section_offset_from_segment): Likewise.
