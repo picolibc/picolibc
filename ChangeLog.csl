@@ -1,3 +1,10 @@
+2006-07-11  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	gdb/
+	* symfile.c (symfile_map_offsets_to_segments): Don't warn
+	for empty sections.
+	(symfile_section_offset_from_segment): Likewise.
+
 2006-06-02  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* gdb/remote.c (remote_hostio_write): Correct buffer length
