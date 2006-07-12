@@ -1,3 +1,8 @@
+2006-07-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::getsockname): Return valid
+	result for unbound sockets.
+
 2006-07-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::fixup_after_fork): Handle

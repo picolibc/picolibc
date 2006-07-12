@@ -1195,7 +1195,36 @@ fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
     {
       res = ::getsockname (get_socket (), name, namelen);
       if (res)
-	set_winsock_errno ();
+        {
+	  if (WSAGetLastError () == WSAEINVAL)
+	    {
+	      /* Winsock returns WSAEINVAL if the socket is locally
+		 unbound.  Per SUSv3 this is not an error condition.
+		 We're faking a valid return value here by creating the
+		 same content in the sockaddr structure as on Linux. */
+	      switch (get_addr_family ())
+	        {
+		case AF_INET:
+		  res = 0;
+		  *namelen = sizeof (struct sockaddr_in);
+		  break;
+		case AF_INET6:
+		  res = 0;
+		  *namelen = sizeof (struct sockaddr_in6);
+		  break;
+		default:
+		  WSASetLastError (WSAEOPNOTSUPP);
+		  break;
+		}
+	      if (!res)
+	        {
+		  memset (name, 0, *namelen);
+		  name->sa_family = get_addr_family ();
+		}
+	    }
+	  if (res)
+	    set_winsock_errno ();
+	}
     }
 
   return res;
