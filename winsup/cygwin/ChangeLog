@@ -1,5 +1,10 @@
 2006-07-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/netdb.h: Declare rcmd, rcmd_af, rexec, rresvport,
+	rresvport_af, iruserok, iruserok_sa, ruserok.
+
+2006-07-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (DLL_OFILES): Drop iruserok.o.  Add rcmd.o.
 	* autoload.cc (rcmd): Drop definition.
 	* cygwin.din: Export bindresvport, bindresvport_sa, iruserok_sa,

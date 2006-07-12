@@ -217,6 +217,18 @@ int		getaddrinfo (const char *, const char *,
 			     const struct addrinfo *, struct addrinfo **);
 int		getnameinfo (const struct sockaddr *, socklen_t, char *,
 			     socklen_t, char *, socklen_t, int);
+
+int		rcmd (char **, uint16_t, const char *, const char *,
+		      const char *, int *);
+int		rcmd_af (char **, uint16_t, const char *, const char *,
+			 const char *, int *, int);
+int		rexec (char **, uint16_t rport, char *, char *, char *, int *);
+int		rresvport (int *);
+int		rresvport_af (int *, int);
+int		iruserok (unsigned long, int, const char *, const char *);
+int		iruserok_sa (const void *, int, int, const char *,
+			     const char *);
+int		ruserok (const char *, int, const char *, const char *);
 #endif
 
 #ifdef __cplusplus
