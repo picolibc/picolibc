@@ -1,5 +1,10 @@
 2006-07-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/pthread.h: Define PTHREAD_PRIO_NONE, PTHREAD_PRIO_INHERIT and
+	PTHREAD_PRIO_PROTECT only if _POSIX_THREAD_PRIO_INHERIT is defined.
+
+2006-07-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::getsockname): Return valid
 	result for unbound sockets.
 
