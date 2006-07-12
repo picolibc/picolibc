@@ -574,7 +574,7 @@ mmap_record::alloc_page_map ()
 
   DWORD start_protect = gen_create_protect ();
   DWORD real_protect = gen_protect ();
-  if (real_protect != start_protect
+  if (real_protect != start_protect && !noreserve ()
       && !VirtualProtect (get_address (), get_len (),
 			  real_protect, &start_protect))
     system_printf ("Warning: VirtualProtect (addr: %p, len: 0x%x, "
