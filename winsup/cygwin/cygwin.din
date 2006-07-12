@@ -147,6 +147,8 @@ _bcmp = bcmp NOSIGFE
 bcopy NOSIGFE
 _bcopy = bcopy NOSIGFE
 bind = cygwin_bind SIGFE
+bindresvport = cygwin_bindresvport SIGFE
+bindresvport_sa = cygwin_bindresvport_sa SIGFE
 bsearch NOSIGFE
 _bsearch = bsearch NOSIGFE
 btowc NOSIGFE
@@ -720,6 +722,7 @@ _ioctl = ioctl SIGFE
 iprintf SIGFE
 _iprintf = iprintf SIGFE
 iruserok SIGFE
+iruserok_sa SIGFE
 isalnum NOSIGFE
 _isalnum = isalnum NOSIGFE
 isalpha NOSIGFE
@@ -1092,6 +1095,7 @@ _rand = rand NOSIGFE
 rand_r NOSIGFE
 random NOSIGFE
 rcmd = cygwin_rcmd SIGFE
+rcmd_af = cygwin_rcmd_af SIGFE
 read SIGFE
 _read = read SIGFE
 readdir SIGFE
@@ -1134,6 +1138,7 @@ _rmdir = rmdir SIGFE
 round NOSIGFE
 roundf NOSIGFE
 rresvport = cygwin_rresvport SIGFE
+rresvport_af = cygwin_rresvport_af SIGFE
 ruserok SIGFE
 sbrk SIGFE
 _sbrk = sbrk SIGFE

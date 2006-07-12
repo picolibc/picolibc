@@ -1,5 +1,22 @@
 2006-07-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (DLL_OFILES): Drop iruserok.o.  Add rcmd.o.
+	* autoload.cc (rcmd): Drop definition.
+	* cygwin.din: Export bindresvport, bindresvport_sa, iruserok_sa,
+	rcmd_af, rresvport_af.
+	* net.cc (cygwin_rcmd): Remove.
+	(last_used_bindresvport): Rename from last_used_rrecvport.
+	(cygwin_bindresvport_sa): New function implementing bindresvport_sa.
+	(cygwin_bindresvport): New function implementing bindresvport.
+	(cygwin_rresvport): Remove.
+	* include/cygwin/version.h: Bump API minor number.
+	* include/netinet/in.h: Declare bindresvport and bindresvport_sa.
+	* libc/iruserok.c: Remove file.
+	* libc/rcmd.cc: New file implementing rcmd, rcmd_af, rresvport,
+	rresvport_af, iruserok_sa, iruserok and ruserok.
+
+2006-07-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/pthread.h: Define PTHREAD_PRIO_NONE, PTHREAD_PRIO_INHERIT and
 	PTHREAD_PRIO_PROTECT only if _POSIX_THREAD_PRIO_INHERIT is defined.
 

@@ -1762,146 +1762,92 @@ get_ifconf (struct ifconf *ifc, int what)
   return 0;
 }
 
-/* exported as rcmd: standards? */
-extern "C" int
-cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
-	     char *remuser, char *cmd, int *fd2p)
-{
-  int res = -1;
-  SOCKET fd2s;
-
-  sig_dispatch_pending ();
-
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return (int) INVALID_SOCKET;
-  if (!*locuser)
-    {
-      set_errno (EINVAL);
-      return (int) INVALID_SOCKET;
-    }
-
-  res = rcmd (ahost, inport, locuser, remuser, cmd, fd2p ? &fd2s : NULL);
-  if (res != (int) INVALID_SOCKET)
-    {
-      cygheap_fdnew res_fd;
-
-      if (res_fd >= 0 && fdsock (res_fd, tcp_dev, res))
-	{
-	  ((fhandler_socket *) res_fd)->connect_state (connected);
-	  res = res_fd;
-	}
-      else
-	{
-	  closesocket (res);
-	  res = -1;
-	}
-
-      if (res >= 0 && fd2p)
-	{
-	  cygheap_fdnew newfd (res_fd, false);
-	  cygheap_fdget fd (*fd2p);
-
-	  if (newfd >= 0 && fdsock (newfd, tcp_dev, fd2s))
-	    {
-	      *fd2p = newfd;
-	      ((fhandler_socket *) fd2p)->connect_state (connected);
-	    }
-	  else
-	    {
-	      closesocket (res);
-	      closesocket (fd2s);
-	      res = -1;
-	    }
-	}
-    }
-
-  syscall_printf ("%d = rcmd (...)", res);
-  return res;
-}
-
-/* The below implementation of rresvport looks pretty ugly, but there's
-   a problem in Winsock.  The bind(2) call does not fail if a local
-   address is still in TIME_WAIT state, and there's no way to get this
-   behaviour.  Unfortunately the first time when this is detected is when
-   the calling application tries to connect.
-
-   One (also not really foolproof) way around this problem would be to use
-   the iphlpapi function GetTcpTable and to check if the port in question is
-   in TIME_WAIT state and if so, choose another port number.  But this method
-   is as prone to races as the below one, or any other method using random
-   port numbers, etc.  The below method at least tries to avoid races between
-   multiple applications using rrecvport.
-
-   As for the question "why don't you just use the Winsock rresvport?"...
-   For some reason I do NOT understand, the call to WinSocks rresvport
-   corrupts the stack when Cygwin is built using -fomit-frame-pointers.
-   And then again, the Winsock rresvport function has the exact same
-   problem with reusing ports in the TIME_WAIT state as the socket/bind
-   method has.  So there's no gain in using that function. */
-
 #define PORT_LOW	(IPPORT_EFSSERVER + 1)
 #define PORT_HIGH	(IPPORT_RESERVED - 1)
 #define NUM_PORTS	(PORT_HIGH - PORT_LOW + 1)
 
-LONG last_used_rrecvport __attribute__((section (".cygwin_dll_common"), shared)) = IPPORT_RESERVED;
+LONG last_used_bindresvport __attribute__((section (".cygwin_dll_common"), shared)) = IPPORT_RESERVED;
 
-/* exported as rresvport: standards? */
 extern "C" int
-cygwin_rresvport (int *port)
+cygwin_bindresvport_sa (int fd, struct sockaddr *sa)
 {
-  int res;
+  struct sockaddr_storage sst;
+  struct sockaddr_in *sin = NULL;
+  struct sockaddr_in6 *sin6 = NULL;
+  in_port_t port;
+  socklen_t salen;
+  int ret;
+
   sig_dispatch_pending ();
 
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
 
-  res = socket (AF_INET, SOCK_STREAM, 0);
-  if (res != (int) INVALID_SOCKET)
+  fhandler_socket *fh = get (fd);
+  if (!fh)
+    return -1;
+
+  if (!sa)
     {
-      LONG myport;
-      int ret = SOCKET_ERROR;
-      struct sockaddr_in sin;
-      sin.sin_family = AF_INET;
-      sin.sin_addr.s_addr = INADDR_ANY;
-
-      for (int i = 0; i < NUM_PORTS; i++)
-	{
-	  while ((myport = InterlockedExchange (&last_used_rrecvport, 0)) == 0)
-	    low_priority_sleep (0);
-	  if (--myport < PORT_LOW)
-	    myport = PORT_HIGH;
-	  InterlockedExchange (&last_used_rrecvport, myport);
-
-	  sin.sin_port = htons (myport);
-	  if (!(ret = bind (res, (struct sockaddr *) &sin, sizeof sin)))
-	    break;
-	  int err = WSAGetLastError ();
-	  if (err != WSAEADDRINUSE && err != WSAEINVAL)
-	    break;
-	}
-      if (ret == SOCKET_ERROR)
-	{
-	  closesocket (res);
-	  res = (int) INVALID_SOCKET;
-	}
-      else if (port)
-	*port = myport;
+      sa = (struct sockaddr *) &sst;
+      memset (&sst, 0, sizeof sst);
+      sa->sa_family = fh->get_addr_family ();
     }
 
-  if (res != (int) INVALID_SOCKET)
+  switch (sa->sa_family)
     {
-      cygheap_fdnew res_fd;
+    case AF_INET:
+      salen = sizeof (struct sockaddr_in);
+      sin = (struct sockaddr_in *) sa;
+      port = sin->sin_port;
+      break;
+    case AF_INET6:
+      salen = sizeof (struct sockaddr_in6);
+      sin6 = (struct sockaddr_in6 *) sa;
+      port = sin6->sin6_port;
+      break;
+    default:
+      set_errno (EPFNOSUPPORT);
+      return -1;
+    }
 
-      if (res_fd >= 0 && fdsock (res_fd, tcp_dev, res))
-	res = res_fd;
+  /* If a non-zero port number is given, try this first.  If that succeeds,
+     or if the error message is serious, return. */
+  if (port)
+    {
+      ret = fh->bind (sa, salen);
+      if (!ret || (get_errno () != EADDRINUSE && get_errno () != EINVAL))
+        return ret;
+    }
+
+  LONG myport;
+
+  for (int i = 0; i < NUM_PORTS; i++)
+    {
+      while ((myport = InterlockedExchange (&last_used_bindresvport, 0)) == 0)
+	low_priority_sleep (0);
+      if (--myport < PORT_LOW)
+	myport = PORT_HIGH;
+      InterlockedExchange (&last_used_bindresvport, myport);
+
+      if (sa->sa_family == AF_INET6)
+	sin6->sin6_port = htons (myport);
       else
-	res = -1;
+	sin->sin_port = htons (myport);
+      if (!(ret = fh->bind (sa, salen)))
+	break;
+      if (get_errno () != EADDRINUSE && get_errno () != EINVAL)
+	break;
     }
 
-  syscall_printf ("%d = rresvport (%d)", res, port ? *port : 0);
-  return res;
+  return ret;
+}
+
+extern "C" int
+cygwin_bindresvport (int fd, struct sockaddr_in *sin)
+{
+  return cygwin_bindresvport_sa (fd, (struct sockaddr *) sin);
 }
 
 /* socketpair: standards? */

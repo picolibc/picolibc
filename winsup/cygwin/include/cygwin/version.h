@@ -291,12 +291,14 @@ details. */
       156: Export __srbuf_r, __swget_r.
       157: Export gai_strerror, getaddrinfo, getnameinfo, freeaddrinfo,
 	   in6addr_any, in6addr_loopback.
+      158: Export bindresvport, bindresvport_sa, iruserok_sa, rcmd_af,
+	   rresvport_af.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 157
+#define CYGWIN_VERSION_API_MINOR 158
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

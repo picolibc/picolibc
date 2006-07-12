@@ -459,8 +459,6 @@ LoadDLLfunc (SetProcessWindowStation, 4, user32)
 LoadDLLfunc (SetTimer, 16, user32)
 LoadDLLfunc (SetUserObjectSecurity, 12, user32)
 
-LoadDLLfunc (rcmd, 24, wsock32)
-
 LoadDLLfunc (accept, 12, ws2_32)
 LoadDLLfunc (bind, 12, ws2_32)
 LoadDLLfunc (closesocket, 4, ws2_32)
