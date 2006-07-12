@@ -1,3 +1,18 @@
+2006-07-12  Richard Sandiford  <richard@codesourcery.com>
+
+	Backport from mainline:
+
+	bfd/
+	2006-07-12  Matthew R. Dempsky  <mrd@alkemio.org>
+
+	* cpu-m68k.c (bfd_m68k_compatible): Handle CPU32.
+
+	ld/testsuite/
+	2006-07-12  Richard Sandiford  <richard@codesourcery.com>
+
+	* ld-m68k/merge-ok-1c.d: New test.
+	* ld-m68k/m68k.exp: Run it.
+
 2006-06-22  Richard Sandiford  <richard@codesourcery.com>
 
 	binutils/
