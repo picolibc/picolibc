@@ -1,5 +1,14 @@
 2006-07-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/netinet/in.h: Update copyright.
+
+2006-07-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc: Update copyright.
+	* include/pthread.h: Ditto.
+
+2006-07-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::wait): Rework function so that
 	WaitForMultipleObjects is really only called when necessary.
 
