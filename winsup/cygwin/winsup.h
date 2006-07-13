@@ -299,7 +299,7 @@ size_t getsystempagesize ();
 
 /* mmap functions. */
 void mmap_init ();
-bool mmap_is_attached_page (ULONG_PTR);
+int mmap_is_attached_or_noreserve_page (ULONG_PTR addr);
 
 int winprio_to_nice (DWORD) __attribute__ ((regparm (1)));
 DWORD nice_to_winprio (int &) __attribute__ ((regparm (1)));

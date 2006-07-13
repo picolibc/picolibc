@@ -1,3 +1,19 @@
+2006-07-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (_cygtls::handle_exceptions): Call new
+	mmap_is_attached_or_noreserve_page function in case of access violation
+	and allow application to retry access on noreserve pages.
+	* mmap.cc (mmap_is_attached_or_noreserve_page): Changed from
+	mmap_is_attached_page.  Handle also noreserve pages now.  Change
+	comment accordingly.
+	* winsup.h (mmap_is_attached_or_noreserve_page): Declare instead of
+	mmap_is_attached_page.
+
+2006-07-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (mmap_record::alloc_page_map): Don't call VirtualProtect
+	on maps created with MAP_NORESERVE.
+
 2006-07-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/netdb.h: Declare rcmd, rcmd_af, rexec, rresvport,
