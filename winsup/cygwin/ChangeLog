@@ -1,5 +1,19 @@
 2006-07-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mmap.cc (mmap64): Drop MAP_NORESERVE flag for non-anonymous,
+	non-private mappings.
+	(mmap_record::unmap_pages): Only check noreserve flag which now implies
+	anonymous and private.
+	(mprotect): Ditto.
+	(fixup_mmaps_after_fork): Ditto.
+
+2006-07-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (mmap64): Drop MAP_RESERVED flag for all non-anonymous,
+	non-private mappings.
+
+2006-07-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exceptions.cc (_cygtls::handle_exceptions): Call new
 	mmap_is_attached_or_noreserve_page function in case of access violation
 	and allow application to retry access on noreserve pages.

@@ -647,7 +647,7 @@ mmap_record::unmap_pages (caddr_t addr, DWORD len)
   DWORD off = addr - get_address ();
   off /= getpagesize ();
   len = PAGE_CNT (len);
-  if (anonymous () && priv () && noreserve ()
+  if (noreserve ()
       && !VirtualFree (get_address () + off * getpagesize (),
 		       len * getpagesize (), MEM_DECOMMIT))
     debug_printf ("VirtualFree in unmap_pages () failed, %E");
@@ -1027,6 +1027,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
       if (fh->get_device () == FH_ZERO)
 	flags |= MAP_ANONYMOUS;
     }
+
   if (anonymous (flags) || fd == -1)
     {
       fh = &fh_anonymous;
@@ -1160,6 +1161,12 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
     }
 
 go_ahead:
+
+  /* MAP_NORESERVE is only supported on private anonymous mappings.
+     Remove that bit from flags so that later code doesn't have to
+     test all bits. */
+  if (noreserve (flags) && (!anonymous (flags) || !priv (flags)))
+    flags &= ~MAP_NORESERVE;
 
   map_list = mmapped_areas.get_list_by_fd (fd);
 
@@ -1427,7 +1434,7 @@ mprotect (void *addr, size_t len, int prot)
 	 if (rec->attached ())
 	   continue;
 	 new_prot = gen_protect (prot, rec->get_flags ());
-	 if (rec->anonymous () && rec->priv () && rec->noreserve ())
+	 if (rec->noreserve ())
 	   {
 	     if (new_prot == PAGE_NOACCESS)
 	       ret = VirtualFree (u_addr, u_len, MEM_DECOMMIT);
@@ -1969,7 +1976,7 @@ fixup_mmaps_after_fork (HANDLE parent)
 		 a strange notion how copy-on-write is supposed to work. */
 	      if (rec->priv ())
 		{
-		  if (rec->anonymous () && rec->noreserve ()
+		  if (rec->noreserve ()
 		      && !VirtualAlloc (address, mbi.RegionSize,
 					MEM_COMMIT, PAGE_READWRITE))
 		    {
