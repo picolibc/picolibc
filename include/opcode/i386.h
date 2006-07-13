@@ -1462,6 +1462,20 @@ static const template i386_optab[] =
 {"vmsave",   0, 0x0f01, 0xdb, CpuSVME,	NoSuf|ImmExt,		{ 0, 0, 0 } },
 {"vmsave",   1, 0x0f01, 0xdb, CpuSVME,	NoSuf|ImmExt,		{ AnyMem, 0, 0 } },
 
+
+/* SSE4a instructions */
+{"movntsd",  2, 0xf20f2b,  X, CpuSSE4a, NoSuf|IgnoreSize|Modrm, { RegXMM, LongMem, 0 } },
+{"movntss",  2, 0xf30f2b,  X, CpuSSE4a, NoSuf|IgnoreSize|Modrm, { RegXMM, WordMem, 0 } },
+{"extrq",    3, 0x660f78,  0, CpuSSE4a, NoSuf|IgnoreSize|Modrm, { Imm8, Imm8, RegXMM } },
+{"extrq",    2, 0x660f79,  X, CpuSSE4a, NoSuf|IgnoreSize|Modrm, { RegXMM, RegXMM} },
+{"insertq",  2, 0xf20f79,  X, CpuSSE4a, NoSuf|IgnoreSize|Modrm, { RegXMM, RegXMM} },
+{"insertq",  4, 0xf20f78,  X, CpuSSE4a, NoSuf|IgnoreSize|Modrm, { Imm8, Imm8, RegXMM, RegXMM} },
+
+/* ABM instructions */
+{"popcnt",   2,   0x0fb8,  X, CpuABM, wlq_Suf|Modrm,          { WordReg|WordMem, WordReg, 0} },
+{"lzcnt",    2, 0xf30fbd,  X, CpuABM, wlq_Suf|Modrm,          { WordReg|WordMem, WordReg, 0} },
+
+
 /* VIA PadLock extensions.  */
 {"xstore-rng",0, 0x000fa7, 0xc0, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },
 {"xcrypt-ecb",0, 0xf30fa7, 0xc8, Cpu686|CpuPadLock, NoSuf|IsString|ImmExt, { 0, 0, 0} },

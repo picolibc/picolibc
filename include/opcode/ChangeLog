@@ -1,3 +1,8 @@
+2006-07-10 Dwarakanath Rajagopal	<dwarak.rajagopal@amd.com>
+	   Michael Meissner		<michael.meissner@amd.com>
+
+	* i386.h: Add amdfam10 new instructions (SSE4a and ABM instructions).
+
 2006-06-12  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* i386.h (i386_optab): Add "nop" with memory reference.
