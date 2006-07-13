@@ -61,10 +61,10 @@ HANDLE NO_COPY signal_arrived;		// Event signaled when a signal has
 
 HANDLE NO_COPY sigCONT;			// Used to "STOP" a process
 
-cygthread *hwait_sig;
+cygthread NO_COPY *hwait_sig;
 Static HANDLE wait_sig_inited;		// Control synchronization of
 					//  message queue startup
-static NO_COPY bool sigheld;		// True if holding signals
+Static bool sigheld;			// True if holding signals
 
 Static int nprocs;			// Number of deceased children
 Static char cprocs[(NPROCS + 1) * sizeof (pinfo)];// All my children info
@@ -72,7 +72,7 @@ Static char cprocs[(NPROCS + 1) * sizeof (pinfo)];// All my children info
 					// constructor operation  at DLL startup
 Static waitq waitq_head = {0, 0, 0, 0, 0, 0, 0};// Start of queue for wait'ing threads
 
-static muto NO_COPY sync_proc_subproc;	// Control access to subproc stuff
+Static muto sync_proc_subproc;	// Control access to subproc stuff
 
 _cygtls NO_COPY *_sig_tls;
 
@@ -106,7 +106,7 @@ public:
   friend DWORD WINAPI wait_sig (VOID *arg);
 };
 
-static pending_signals sigq;
+Static pending_signals sigq;
 
 /* Functions */
 void __stdcall

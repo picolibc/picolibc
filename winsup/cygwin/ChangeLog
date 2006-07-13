@@ -1,3 +1,10 @@
+2006-07-13  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler.cc (fhandler_base::raw_read): Only return EISDIR when we're
+	really trying to read a directory.
+
+	* sigproc.cc: Use "Static" where appropriate.
+
 2006-07-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc: Update copyright.
