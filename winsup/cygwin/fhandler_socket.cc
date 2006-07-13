@@ -506,99 +506,94 @@ fhandler_socket::prepare ()
 int
 fhandler_socket::wait (long event_mask)
 {
-  int ret = SOCKET_ERROR;
-  int wsa_err = 0;
-  DWORD timeout = (is_nonblocking () ? 0 : INFINITE); 
-  long events;
-
   if (async_io ())
     return 0;
 
-  WaitForSingleObject (wsock_mtx, INFINITE);
-  WSAEVENT ev[2] = { wsock_evt, signal_arrived };
-
-sa_rerun:
-
-  if ((events = (wsock_events->events & event_mask)) != 0)
-    {
-      if (events & FD_CONNECT)
-	{
-	  wsa_err = wsock_events->connect_errorcode;
-	  wsock_events->connect_errorcode = 0;
-	}
-      wsock_events->events &= ~(events & ~FD_CLOSE);
-      if (!wsa_err)
-	ret = 0;
-      else
-	WSASetLastError (wsa_err);
-      ReleaseMutex (wsock_mtx);
-      return ret;
-    }
-  ReleaseMutex (wsock_mtx);
+  int ret = SOCKET_ERROR;
+  long events;
 
 /* If WSAWaitForMultipleEvents is interrupted by a signal, and the signal
    has the SA_RESTART flag set, return to this label and... restart. */
 sa_restart:
 
   WSANETWORKEVENTS evts = { 0 };
-  switch (WSAWaitForMultipleEvents (2, ev, FALSE, timeout, FALSE))
+  if (!(WSAEnumNetworkEvents (get_socket (), wsock_evt, &evts)))
     {
-      case WSA_WAIT_TIMEOUT:
+      if (evts.lNetworkEvents)
+        {
+	  WaitForSingleObject (wsock_mtx, INFINITE);
+	  wsock_events->events |= evts.lNetworkEvents;
+	  if (evts.lNetworkEvents & FD_CONNECT)
+	    wsock_events->connect_errorcode = evts.iErrorCode[FD_CONNECT_BIT];
+	  events = (wsock_events->events & event_mask);
+	  ReleaseMutex (wsock_mtx);
+	  if ((evts.lNetworkEvents & FD_OOB)
+	      && !evts.iErrorCode[FD_OOB_BIT]
+	      && owner ())
+	    {
+	      siginfo_t si = {0};
+	      si.si_signo = SIGURG;
+	      si.si_code = SI_KERNEL;
+	      sig_send (myself_nowait, si);
+	      if (!_my_tls.call_signal_handler () && !events)
+	        {
+		  WSASetLastError (WSAEINTR);
+		  return SOCKET_ERROR;
+		}
+	      sig_dispatch_pending ();
+	      WaitForSingleObject (wsock_mtx, INFINITE);
+	    }
+	}
+    }
+
+  WaitForSingleObject (wsock_mtx, INFINITE);
+  if ((events = (wsock_events->events & event_mask)) != 0)
+    {
+      ret = 0;
+      if (events & FD_CONNECT)
+	{
+	  int wsa_err = 0;
+	  if ((wsa_err = wsock_events->connect_errorcode) != 0)
+	    {
+	      WSASetLastError (wsa_err);
+	      ret = SOCKET_ERROR;
+	    }
+	  wsock_events->connect_errorcode = 0;
+	}
+      wsock_events->events &= ~(events & ~FD_CLOSE);
+    }
+  ReleaseMutex (wsock_mtx);
+
+  if (!events)
+    {
+      if (is_nonblocking ())
 	WSASetLastError (WSAEINPROGRESS);
-	break;
-      case WSA_WAIT_EVENT_0:
-	WaitForSingleObject (wsock_mtx, INFINITE);
-	if (!WSAEnumNetworkEvents (get_socket (), wsock_evt, &evts))
-	  {
-	    if (!evts.lNetworkEvents)
-	      {
-		if (timeout == INFINITE)
-		  goto sa_rerun;
-		ReleaseMutex (wsock_mtx);
+      else
+	{
+	  WSAEVENT ev[2] = { wsock_evt, signal_arrived };
+	  switch (WSAWaitForMultipleEvents (2, ev, FALSE, INFINITE, FALSE))
+	    {
+	      case WSA_WAIT_TIMEOUT:
 		WSASetLastError (WSAEINPROGRESS);
 		break;
-	      }
-	    wsock_events->events |= evts.lNetworkEvents;
-	    if (evts.lNetworkEvents & FD_CONNECT)
-	      wsock_events->connect_errorcode = evts.iErrorCode[FD_CONNECT_BIT];
-	    if ((evts.lNetworkEvents & FD_OOB)
-	    	&& !evts.iErrorCode[FD_OOB_BIT]
-	    	&& owner ())
-	      {
-		siginfo_t si = {0};
-		si.si_signo = SIGURG;
-		si.si_code = SI_KERNEL;
-		sig_send (myself_nowait, si);
+	      case WSA_WAIT_EVENT_0:
+		goto sa_restart;
+		break;
+	      case WSA_WAIT_EVENT_0 + 1:
 		if (_my_tls.call_signal_handler ())
 		  {
 		    sig_dispatch_pending ();
-		    goto sa_rerun;
+		    goto sa_restart;
 		  }
-		if (evts.lNetworkEvents & event_mask)
-		  goto sa_rerun;
 		WSASetLastError (WSAEINTR);
-	      }
-	    else
-	      {
-		if (timeout == INFINITE || (evts.lNetworkEvents & event_mask))
-		  goto sa_rerun;
-		WSASetLastError (WSAEINPROGRESS);
-	      }
-	  }
-	ReleaseMutex (wsock_mtx);
-	break;
-      case WSA_WAIT_EVENT_0 + 1:
-	if (_my_tls.call_signal_handler ())
-	  {
-	    sig_dispatch_pending ();
-	    goto sa_restart;
-	  }
-	WSASetLastError (WSAEINTR);
-	break;
-      default:
-	WSASetLastError (WSAEFAULT);
-	break;
+		break;
+	      default:
+		WSASetLastError (WSAEFAULT);
+		break;
+	    }
+	}
     }
+
   return ret;
 }
 

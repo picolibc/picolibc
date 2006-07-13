@@ -1,5 +1,10 @@
 2006-07-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::wait): Rework function so that
+	WaitForMultipleObjects is really only called when necessary.
+
+2006-07-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mmap.cc (mmap64): Drop MAP_NORESERVE flag for non-anonymous,
 	non-private mappings.
 	(mmap_record::unmap_pages): Only check noreserve flag which now implies
