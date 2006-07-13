@@ -526,17 +526,21 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
       break;
 
     case STATUS_ACCESS_VIOLATION:
-      if (mmap_is_attached_page (e->ExceptionInformation[1]))
-	{
+      switch (mmap_is_attached_or_noreserve_page (e->ExceptionInformation[1]))
+        {
+	case 2:		/* MAP_NORESERVE page, now commited. */
+	  return 0;
+	case 1:		/* MAP_NORESERVE page, commit failed, or
+			   access to mmap page beyond EOF. */
 	  si.si_signo = SIGBUS;
 	  si.si_code = BUS_OBJERR;
-	}
-      else
-	{
+	  break;
+	default:
 	  MEMORY_BASIC_INFORMATION m;
 	  VirtualQuery ((PVOID) e->ExceptionInformation[1], &m, sizeof m);
 	  si.si_signo = SIGSEGV;
 	  si.si_code = m.State == MEM_FREE ? SEGV_MAPERR : SEGV_ACCERR;
+	  break;
 	}
       break;
 

@@ -900,13 +900,25 @@ map::del_list (unsigned i)
 }
 
 /* This function is called from exception_handler when a segmentation
-   violation has happened.  The function should return true, if the
-   faulting address (the parameter) is within attached pages.  In this
-   case the exception_handler raises SIGBUS, as demanded by the memory
-   protection extension described in SUSv3 (see the mmap man page).
-   If false is returned, a normal SIGSEGV is raised. */
-bool
-mmap_is_attached_page (ULONG_PTR addr)
+   violation has happened.  We have two cases to check here.
+   
+   First, is it an address within "attached" mmap pages (indicated by
+   the __PROT_ATTACH protection, see there)?  In this case the function
+   returns 1 and the exception_handler raises SIGBUS, as demanded by the
+   memory protection extension described in SUSv3 (see the mmap man
+   page).
+   
+   Second, check if the address is within "noreserve" mmap pages
+   (indicated by MAP_NORESERVE flag).  If so, the function calls
+   VirtualAlloc to commit the page and returns 2.  The exception handler
+   then just returns with 0 and the affected application retries the
+   failing memory access.  If VirtualAlloc fails, the function returns
+   1, so that the exception handler raises a SIGBUS, as described in the
+   MAP_NORESERVE man pages for Linux and Solaris.
+   
+   In any other case 0 is returned and a normal SIGSEGV is raised. */
+int
+mmap_is_attached_or_noreserve_page (ULONG_PTR addr)
 {
   list *map_list;
   long record_idx;
@@ -916,13 +928,16 @@ mmap_is_attached_page (ULONG_PTR addr)
 
   addr = rounddown (addr, pagesize);
   if (!(map_list = mmapped_areas.get_list_by_fd (-1)))
-    return false;
+    return 0;
   if ((record_idx = map_list->search_record ((caddr_t)addr, pagesize,
 					     u_addr, u_len, -1)) < 0)
-    return false;
-  if (!map_list->get_record (record_idx)->attached ())
-    return false;
-  return true;
+    return 0;
+  if (map_list->get_record (record_idx)->attached ())
+    return 1;
+  if (!map_list->get_record (record_idx)->noreserve ())
+    return 0;
+  DWORD new_prot = map_list->get_record (record_idx)->gen_protect ();
+  return VirtualAlloc ((void *)addr, pagesize, MEM_COMMIT, new_prot) ? 2 : 1;
 }
 
 static caddr_t
