@@ -1,3 +1,9 @@
+2006-07-14  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* i386.h (i386_optab): Remove InvMem from maskmovq, movhlps,
+	movlhps, movmskps, pextrw, pmovmskb, movmskpd, maskmovdqu,
+	movdq2q and movq2dq.
+
 2006-07-10 Dwarakanath Rajagopal	<dwarak.rajagopal@amd.com>
 	   Michael Meissner		<michael.meissner@amd.com>
 
