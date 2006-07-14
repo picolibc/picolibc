@@ -322,7 +322,8 @@ void __stdcall str2uni_cat (_UNICODE_STRING &, const char *) __attribute__ ((reg
 /* Try a subauthentication. */
 HANDLE subauth (struct passwd *pw);
 /* Try creating a token directly. */
-HANDLE create_token (cygsid &usersid, user_groups &groups, struct passwd * pw);
+HANDLE create_token (cygsid &usersid, user_groups &groups, struct passwd * pw,
+		     HANDLE subauth_token);
 /* Verify an existing token */
 bool verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern = NULL);
 /* Get groups of a user */

@@ -501,7 +501,11 @@ get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps,
 	grp_list += well_known_network_sid;
       if (sid_in_token_groups (my_grps, well_known_batch_sid))
 	grp_list += well_known_batch_sid;
-      if (sid_in_token_groups (my_grps, well_known_interactive_sid))
+      /* This is a problem on 2K3 (only domain controllers?!?) which only
+         enables tools for selected special groups.  A subauth token is
+	 only NETWORK, but NETWORK has no access to these tools.  Therefore
+	 we always add INTERACTIVE here. */
+      /*if (sid_in_token_groups (my_grps, well_known_interactive_sid))*/
 	grp_list += well_known_interactive_sid;
       if (sid_in_token_groups (my_grps, well_known_service_sid))
 	grp_list += well_known_service_sid;
@@ -513,11 +517,13 @@ get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps,
     }
   if (get_ll (auth_luid) != 999LL) /* != SYSTEM_LUID */
     {
-      char buf[64];
-      __small_sprintf (buf, "S-1-5-5-%u-%u", auth_luid.HighPart,
-		       auth_luid.LowPart);
-      grp_list += buf;
-      auth_pos = grp_list.count - 1;
+      for (DWORD i = 0; i < my_grps->GroupCount; ++i)
+	if (my_grps->Groups[i].Attributes & SE_GROUP_LOGON_ID)
+	  {
+	    grp_list += my_grps->Groups[i].Sid;
+	    auth_pos = grp_list.count - 1;
+	    break;
+	  }
     }
 }
 
@@ -810,7 +816,8 @@ done:
 }
 
 HANDLE
-create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
+create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw,
+	      HANDLE subauth_token)
 {
   NTSTATUS ret;
   LSA_HANDLE lsa = INVALID_HANDLE_VALUE;
@@ -833,7 +840,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   TOKEN_STATISTICS stats;
   memcpy (source.SourceName, "Cygwin.1", 8);
   source.SourceIdentifier.HighPart = 0;
-  source.SourceIdentifier.LowPart = 0x0101;
+  source.SourceIdentifier.LowPart = (subauth_token ? 0x0102 : 0x0101);
 
   HANDLE token = INVALID_HANDLE_VALUE;
   HANDLE primary_token = INVALID_HANDLE_VALUE;
@@ -854,33 +861,60 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   owner.Owner = usersid;
 
   /* Retrieve authentication id and group list from own process. */
-  if (hProcToken)
+  HANDLE get_token;
+  if (subauth_token)
+    {
+      debug_printf ("get_token = subauth_token");
+      get_token = subauth_token;
+    }
+  else
+    {
+      debug_printf ("get_token = hProcToken");
+      get_token = hProcToken;
+    }
+  if (get_token)
     {
       /* Switching user context to SYSTEM doesn't inherit the authentication
 	 id of the user account running current process. */
       if (usersid != well_known_system_sid)
-	if (!GetTokenInformation (hProcToken, TokenStatistics,
+	if (!GetTokenInformation (get_token, TokenStatistics,
 				  &stats, sizeof stats, &size))
 	  debug_printf
-	    ("GetTokenInformation(hProcToken, TokenStatistics), %E");
+	    ("GetTokenInformation(get_token, TokenStatistics), %E");
 	else
 	  auth_luid = stats.AuthenticationId;
 
       /* Retrieving current processes group list to be able to inherit
 	 some important well known group sids. */
-      if (!GetTokenInformation (hProcToken, TokenGroups, NULL, 0, &size) &&
-	  GetLastError () != ERROR_INSUFFICIENT_BUFFER)
-	debug_printf ("GetTokenInformation(hProcToken, TokenGroups), %E");
+      if (!GetTokenInformation (get_token, TokenGroups, NULL, 0, &size)
+	  && GetLastError () != ERROR_INSUFFICIENT_BUFFER)
+	debug_printf ("GetTokenInformation(get_token, TokenGroups), %E");
       else if (!(my_tok_gsids = (PTOKEN_GROUPS) malloc (size)))
 	debug_printf ("malloc (my_tok_gsids) failed.");
-      else if (!GetTokenInformation (hProcToken, TokenGroups, my_tok_gsids,
+      else if (!GetTokenInformation (get_token, TokenGroups, my_tok_gsids,
 				     size, &size))
 	{
-	  debug_printf ("GetTokenInformation(hProcToken, TokenGroups), %E");
+	  debug_printf ("GetTokenInformation(get_token, TokenGroups), %E");
 	  free (my_tok_gsids);
 	  my_tok_gsids = NULL;
 	}
     }
+  if (subauth_token)
+    {
+      if (!GetTokenInformation (subauth_token, TokenPrivileges, NULL, 0, &size)
+	  && GetLastError () != ERROR_INSUFFICIENT_BUFFER)
+	debug_printf ("GetTokenInformation(subauth_token, TokenPrivileges), %E");
+      else if (!(privs = (PTOKEN_PRIVILEGES) malloc (size)))
+	debug_printf ("malloc (privs) failed.");
+      else if (!GetTokenInformation (subauth_token, TokenPrivileges, privs,
+				     size, &size))
+	{
+	  debug_printf ("GetTokenInformation(subauth_token, TokenPrivileges), %E");
+	  free (privs);
+	  privs = NULL;
+	}
+    }
+    
 
   /* Create list of groups, the user is member in. */
   int auth_pos;
@@ -908,7 +942,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
     new_tok_gsids->Groups[auth_pos].Attributes |= SE_GROUP_LOGON_ID;
 
   /* Retrieve list of privileges of that user. */
-  if (!(privs = get_priv_list (lsa, usersid, tmp_gsids)))
+  if (!privs && !(privs = get_priv_list (lsa, usersid, tmp_gsids)))
     goto out;
 
   /* Let's be heroic... */

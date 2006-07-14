@@ -2172,16 +2172,27 @@ seteuid32 (__uid32_t uid)
      authenticate using NtCreateToken () or subauthentication. */
   if (new_token == INVALID_HANDLE_VALUE)
     {
-      new_token = create_token (usersid, groups, pw_new);
+      new_token = subauth (pw_new);
       if (new_token == INVALID_HANDLE_VALUE)
 	{
-	  /* create_token failed. Try subauthentication. */
-	  debug_printf ("create token failed, try subauthentication.");
-	  new_token = subauth (pw_new);
+	  debug_printf ("subauthentication failed, try create token.");
+	  new_token = create_token (usersid, groups, pw_new, NULL);
 	  if (new_token == INVALID_HANDLE_VALUE)
 	    {
 	      cygheap->user.reimpersonate ();
 	      return -1;
+	    }
+	}
+      else
+        {
+	  debug_printf ("subauthentication succeeded, try create token.");
+	  HANDLE new_token2 = create_token (usersid, groups, pw_new, new_token);
+	  if (new_token2 == INVALID_HANDLE_VALUE)
+	    debug_printf ("create token failed, use original token");
+	  else
+	    {
+	      CloseHandle (new_token);
+	      new_token = new_token2;
 	    }
 	}
       /* Keep at most one internal token */

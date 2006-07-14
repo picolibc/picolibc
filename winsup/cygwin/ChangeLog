@@ -1,3 +1,16 @@
+2006-07-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (get_token_group_sidlist): Always add the interactive
+	group to the token.  Add comment.  Create logon_id group SID by
+	copying it from incoming group list.
+	(create_token): Add subauth_token parameter.  Use information in
+	subauth_token if present.  Tweak SourceIdentifier if subauth_token
+	is present for debugging purposes.
+	* security.h (create_token): Add subauth_token parameter in declaration.
+	* syscalls.cc (seteuid32): Call subauth first.  Call create_token
+	regardless.  Use subauth token in call to create_token if subauth
+	succeeded.
+
 2006-07-13  Christopher Faylor  <cgf@timesys.com>
 
 	* sigproc.cc (waitq_head): Don't initialize to zero.
