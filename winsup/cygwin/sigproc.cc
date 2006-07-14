@@ -70,7 +70,7 @@ Static int nprocs;			// Number of deceased children
 Static char cprocs[(NPROCS + 1) * sizeof (pinfo)];// All my children info
 #define procs ((pinfo *) cprocs)	// All this just to avoid expensive
 					// constructor operation  at DLL startup
-Static waitq waitq_head = {0, 0, 0, 0, 0, 0, 0};// Start of queue for wait'ing threads
+Static waitq waitq_head;		// Start of queue for wait'ing threads
 
 Static muto sync_proc_subproc;	// Control access to subproc stuff
 
