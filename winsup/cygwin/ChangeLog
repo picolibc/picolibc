@@ -1,5 +1,9 @@
 2006-07-14  Christopher Faylor  <cgf@timesys.com>
 
+	* include/cygwin/types.h: Update copyright.
+
+2006-07-14  Christopher Faylor  <cgf@timesys.com>
+
 	* cygwin.sc: Make sure there's something in the cygheap.
 	* dllfixdbg: Accommodate newer binutils which put the gnu_debuglink at
 	the end rather than at the beginning.
