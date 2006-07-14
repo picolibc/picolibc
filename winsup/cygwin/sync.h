@@ -50,6 +50,7 @@ class lock_process
   static muto locker;
 public:
   static void init () {locker.init ("lock_process");}
+  void dont_bother () {skip_unlock = true;}
   lock_process (bool exiting = false)
   {
     locker.acquire ();

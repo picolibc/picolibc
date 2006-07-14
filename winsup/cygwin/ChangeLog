@@ -1,5 +1,11 @@
 2006-07-14  Christopher Faylor  <cgf@timesys.com>
 
+	* fork.cc (fork): Lock the process before forking to prevent things
+	like new fds from being opened, etc.
+	* sync.h (lock_process::dont_bother): New function.
+
+2006-07-14  Christopher Faylor  <cgf@timesys.com>
+
 	* include/cygwin/types.h: Update copyright.
 
 2006-07-14  Christopher Faylor  <cgf@timesys.com>

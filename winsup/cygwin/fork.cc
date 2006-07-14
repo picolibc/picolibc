@@ -533,6 +533,7 @@ fork ()
       return -1;
     }
 
+  lock_process now;
   if (sig_send (NULL, __SIGHOLD))
     {
       if (exit_state)
@@ -547,7 +548,10 @@ fork ()
   __asm__ volatile ("movl %%esp,%0": "=r" (esp));
 
   if (ischild)
-    res = grouped.child (esp);
+    {
+      res = grouped.child (esp);
+      now.dont_bother ();
+    }
   else
     {
       res = grouped.parent (esp);
