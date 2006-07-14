@@ -1,3 +1,15 @@
+2006-07-13  Christopher Faylor  <cgf@timesys.com>
+
+	* sigproc.cc (waitq_head): Don't initialize to zero.
+	* sigproc.h: Update copyright, fix whitespace.
+
+2006-07-13  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler.cc (fhandler_base::raw_read): Only return EISDIR when we're
+	really trying to read a directory.
+
+	* sigproc.cc: Use "Static" where appropriate.
+
 2006-07-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/netinet/in.h: Update copyright.

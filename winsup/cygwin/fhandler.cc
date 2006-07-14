@@ -262,7 +262,7 @@ fhandler_base::raw_read (void *ptr, size_t& ulen)
 	case ERROR_INVALID_FUNCTION:
 	case ERROR_INVALID_PARAMETER:
 	case ERROR_INVALID_HANDLE:
-	  if (openflags & O_DIROPEN)
+	  if (pc.isdir ())
 	    {
 	      set_errno (EISDIR);
 	      bytes_read = (size_t) -1;

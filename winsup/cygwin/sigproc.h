@@ -1,6 +1,6 @@
 /* sigproc.h
 
-   Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -94,5 +94,5 @@ extern struct sigaction *global_sigs;
 
 #define WAIT_SIG_PRIORITY THREAD_PRIORITY_NORMAL
 
-#define myself_nowait ((_pinfo *)myself_nowait_dummy)
+#define myself_nowait ((_pinfo *) myself_nowait_dummy)
 #endif /*_SIGPROC_H*/
