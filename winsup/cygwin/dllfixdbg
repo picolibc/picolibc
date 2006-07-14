@@ -24,9 +24,10 @@ while (<OBJDUMP>) {
     my ($idx, $name, $size, $vma, $lma, $fileoff, $algn) = /^\s*(\d+)\s+(\.\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s*$/;
     if ($name eq '.gnu_debuglink') {
 	push(@objcopy, '--set-section-flag', '.gnu_debuglink=contents,readonly,debug,noload');
+	$idx = $section{'.gnu_debuglink'}{-idx} if defined($section{'.gnu_debuglink'}{-idx});
     } elsif ($name eq '.gnu_debuglink_overlay') {
 	push (@objcopy, '-R', '.gnu_debuglink_overlay');
-	$section{'.gnu_debuglink'}{-idx} = $idx if $section{'.gnu_debuglink'};
+	$section{'.gnu_debuglink'}{-idx} = $idx;
 	next;
     }
     defined($idx) and
@@ -53,6 +54,7 @@ for my $k (sort {$section{$a}{-idx} <=> $section{$b}{-idx}} keys %section) {
     }
     $vma = align($vma + $section{$k}{-size}, $section{$k}{-algn});
 }
+
 warn "$0: ERROR final VMA (" . sprintf("0x%08x", $vma) . ") not on 64K boundary\n" if $vma != align($vma, 64 * 1024);
 push(@objcopy, $dll, @ARGV);
 xit 1, @objcopy;

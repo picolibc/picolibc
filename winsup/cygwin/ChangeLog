@@ -1,3 +1,9 @@
+2006-07-14  Christopher Faylor  <cgf@timesys.com>
+
+	* cygwin.sc: Make sure there's something in the cygheap.
+	* dllfixdbg: Accommodate newer binutils which put the gnu_debuglink at
+	the end rather than at the beginning.
+
 2006-07-13  Christopher Faylor  <cgf@timesys.com>
 
 	* sigproc.cc (waitq_head): Don't initialize to zero.
