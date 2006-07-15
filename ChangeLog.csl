@@ -1,3 +1,11 @@
+2006-07-15  Vladimir Prus  <vladimir@codesourcery.com>
+
+	* configure.ac: Accept --with-versuffix and --with-bugurl.
+	* configure: Regenerate.
+	* Makefile.in: (VERSUFFIX_s, BUGURL_s): New.
+	(GDB_FLAGS): Add -DVERSUFFIX and -DBUGURL.
+	* top.c (print_gdb_version): Print VERSUFFIX and BUGURL.
+
 2006-07-04  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	gdb/
