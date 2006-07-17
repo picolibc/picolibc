@@ -977,6 +977,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
   caddr_t base = NULL;
 
   DWORD pagesize = getpagesize ();
+  DWORD checkpagesize;
 
   fh_anonymous.set_io_handle (INVALID_HANDLE_VALUE);
   fh_anonymous.set_access (GENERIC_READ | GENERIC_WRITE | GENERIC_EXECUTE);
@@ -1006,8 +1007,8 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
      at least most of the time is, allow 4K aligned addresses in 98,
      to enable remapping of formerly mapped pages.  If no matching
      free pages exist, check addr again, this time for the real alignment. */
-  DWORD checkpagesize = wincap.has_mmap_alignment_bug () ?
-			getsystempagesize () : pagesize;
+  checkpagesize = wincap.has_mmap_alignment_bug () ?
+    		  getsystempagesize () : pagesize;
   if (fixed (flags) && ((uintptr_t) addr % checkpagesize))
     {
       set_errno (EINVAL);

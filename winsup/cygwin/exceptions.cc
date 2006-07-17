@@ -1118,6 +1118,8 @@ int __stdcall
 sigpacket::process ()
 {
   DWORD continue_now;
+  struct sigaction dummy = global_sigs[SIGSTOP];
+
   if (si.si_signo != SIGCONT)
     continue_now = false;
   else
@@ -1235,7 +1237,6 @@ stop:
   if (ISSTATE (myself, PID_STOPPED))
     goto done;
   handler = (void *) sig_handle_tty_stop;
-  struct sigaction dummy = global_sigs[SIGSTOP];
   thissig = dummy;
 
 dosig:

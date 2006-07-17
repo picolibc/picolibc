@@ -216,7 +216,7 @@ public:
       return strcpy (buf, name ());
   }
 
-  const char *cygheap_user::test_uid (char *&, const char *, size_t)
+  const char *test_uid (char *&, const char *, size_t)
     __attribute__ ((regparm (3)));
 };
 

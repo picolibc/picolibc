@@ -506,8 +506,7 @@ fhandler_dev_floppy::ioctl (unsigned int cmd, void *buf)
       /* Just check the restriction that blocksize must be a multiple
 	 of the sector size of the underlying volume sector size,
 	 then fall through to fhandler_dev_raw::ioctl. */
-      struct rdop *op = (struct rdop *) buf;
-      if (op->rd_parm % bytes_per_sector)
+      if (((struct rdop *) buf)->rd_parm % bytes_per_sector)
 	{
 	  SetLastError (ERROR_INVALID_PARAMETER);
 	  __seterrno ();

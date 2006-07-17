@@ -304,6 +304,11 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   path_conv real_path;
   bool reset_sendsig = false;
 
+  const char *runpath;
+  int c_flags;
+  bool wascygexec;
+  cygheap_exec_info *moreinfo;
+
   bool null_app_name = false;
   STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
   int looped = 0;
@@ -326,7 +331,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   else
     chtype = PROC_EXEC;
 
-  cygheap_exec_info *moreinfo = (cygheap_exec_info *) ccalloc (HEAP_1_EXEC, 1, sizeof (cygheap_exec_info));
+  moreinfo = (cygheap_exec_info *) ccalloc (HEAP_1_EXEC, 1, sizeof (cygheap_exec_info));
   moreinfo->old_title = NULL;
 
   /* CreateProcess takes one long string that is the command line (sigh).
@@ -347,7 +352,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       goto out;
     }
 
-  bool wascygexec = real_path.iscygexec ();
+
+  wascygexec = real_path.iscygexec ();
   res = newargv.fixup (prog_arg, real_path, ext);
 
   if (res)
@@ -410,7 +416,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       si.wShowWindow = SW_HIDE;
     }
 
-  int c_flags = GetPriorityClass (hMainProc);
+  c_flags = GetPriorityClass (hMainProc);
   sigproc_printf ("priority class %d", c_flags);
   c_flags |= CREATE_SEPARATE_WOW_VDM;
 
@@ -454,7 +460,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	  || cygheap->fdtab.need_fixup_before ()))
     c_flags |= CREATE_SUSPENDED;
 
-  const char *runpath = null_app_name ? NULL : (const char *) real_path;
+  runpath = null_app_name ? NULL : (const char *) real_path;
 
   syscall_printf ("null_app_name %d (%s, %.9500s)", null_app_name, runpath, one_line.buf);
 
@@ -907,6 +913,7 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext)
     {
       char *pgm = NULL;
       char *arg1 = NULL;
+      char *ptr, *buf;
 
       HANDLE h = CreateFile (real_path, GENERIC_READ,
 			       FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -927,7 +934,7 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext)
 	    }
 	  goto err;
 	}
-      char *buf = (char *) MapViewOfFile(hm, FILE_MAP_READ, 0, 0, 0);
+      buf = (char *) MapViewOfFile(hm, FILE_MAP_READ, 0, 0, 0);
       CloseHandle (hm);
       if (!buf)
 	goto err;
@@ -957,7 +964,7 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext)
 
       debug_printf ("%s is possibly a script", (char *) real_path);
 
-      char *ptr = buf;
+      ptr = buf;
       if (*ptr++ == '#' && *ptr++ == '!')
 	{
 	  ptr += strspn (ptr, " \t");

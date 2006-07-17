@@ -443,19 +443,17 @@ set_cygwin_privileges (HANDLE token)
   set_privilege (token, SE_CHANGE_NOTIFY_PRIV, !allow_traverse);
 }
 
-/*
- * Function to return a common SECURITY_DESCRIPTOR * that
- * allows all access.
- */
+/* Function to return a common SECURITY_DESCRIPTOR that
+   allows all access.  */
 
-static NO_COPY SECURITY_DESCRIPTOR *null_sdp = 0;
 
 SECURITY_DESCRIPTOR *__stdcall
 get_null_sd ()
 {
   static NO_COPY SECURITY_DESCRIPTOR sd;
+  static NO_COPY SECURITY_DESCRIPTOR *null_sdp;
 
-  if (null_sdp == 0)
+  if (!null_sdp)
     {
       InitializeSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
       SetSecurityDescriptorDacl (&sd, TRUE, 0, FALSE);
@@ -464,11 +462,8 @@ get_null_sd ()
   return null_sdp;
 }
 
-/*
- * Initialize global security attributes.
- *
- * Called from dcrt0.cc (_dll_crt0).
- */
+/* Initialize global security attributes.
+   Called from dcrt0.cc (_dll_crt0).  */
 
 void
 init_global_security ()
