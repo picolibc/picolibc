@@ -145,7 +145,7 @@ tty_list::terminate ()
   int ttynum = myself->ctty;
 
   /* Keep master running till there are connected clients */
-  if (ttynum != -1 && ttys[ttynum].master_pid == myself->pid)
+  if (ttynum != -1 && tty_master && ttys[ttynum].master_pid == myself->pid)
     {
       tty *t = ttys + ttynum;
       CloseHandle (tty_master->from_master);
