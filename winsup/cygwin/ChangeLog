@@ -1,3 +1,8 @@
+2006-07-18  Silvio Laguzzi  <slaguzzi@data-al.de>
+
+	* sec_acl.cc (acltotext32): Add missing handling of default ACL entry
+	types.
+
 2006-07-18  Brian Ford  <Brian.Ford@FlightSafety.com>
 	    Corinna Vinschen  <corinna@vinschen.de>
 
