@@ -46,6 +46,7 @@ fhandler_pipe::open (int flags, mode_t mode)
   fhandler_pipe *fh = NULL;
   size_t size;
   int pid, rwflags = (flags & O_ACCMODE);
+  bool inh;
 
   sscanf (get_name (), "/proc/%d/fd/pipe:[%d]", &pid, (int *) &pipe_hdl);
   if (pid == myself->pid)
@@ -93,7 +94,7 @@ fhandler_pipe::open (int flags, mode_t mode)
       set_errno (EACCES);
       goto out;
     }
-  bool inh = !(flags & O_NOINHERIT);
+  inh = !(flags & O_NOINHERIT);
   if (!DuplicateHandle (proc, pipe_hdl, hMainProc, &nio_hdl,
 			0, inh, DUPLICATE_SAME_ACCESS))
     {

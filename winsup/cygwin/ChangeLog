@@ -1,3 +1,41 @@
+2006-07-17  Christopher Faylor  <cgf@timesys.com>
+
+	GCC 4.1 fixes.
+	* cygheap.h (cygheap_user): Remove unneeded class names from function
+	declaration.
+	* fhandler.h (fhandler_base): Ditto.
+	(fhandler_dev_floppy): Ditto.
+	(fhandler_console): Ditto.
+	* wininfo.h (wininfo): Ditto.
+	* exceptions.cc (sigpacket::process): Avoid compiler errors about gotos
+	and initialization.
+	* fhandler_fifo.cc (fhandler_fifo::open): Ditto.
+	* fhandler_floppy.cc (fhandler_dev_floppy::ioctl): Ditto.
+	* fhandler_tty.cc (fhandler_tty_slave::ioctl): Ditto.
+	* mmap.cc (mmap64): Ditto.
+	* pipe.cc (fhandler_pipe::open): Ditto.
+	* spawn.cc (spawn_guts): Ditto.
+
+	* sec_helper.cc: Fix some comments.
+	(get_null_sd): Move file-scope static to only function where it is
+	used.
+
+2006-07-14  Christopher Faylor  <cgf@timesys.com>
+
+	* fork.cc (fork): Lock the process before forking to prevent things
+	like new fds from being opened, etc.
+	* sync.h (lock_process::dont_bother): New function.
+
+2006-07-14  Christopher Faylor  <cgf@timesys.com>
+
+	* include/cygwin/types.h: Update copyright.
+
+2006-07-14  Christopher Faylor  <cgf@timesys.com>
+
+	* cygwin.sc: Make sure there's something in the cygheap.
+	* dllfixdbg: Accommodate newer binutils which put the gnu_debuglink at
+	the end rather than at the beginning.
+
 2006-07-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.cc (get_token_group_sidlist): Always add the interactive

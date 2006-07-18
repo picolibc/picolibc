@@ -15,7 +15,7 @@ class wininfo
   static muto _lock;
 public:
   operator HWND ();
-  int __stdcall wininfo::process (HWND, UINT, WPARAM, LPARAM)
+  int __stdcall process (HWND, UINT, WPARAM, LPARAM)
     __attribute__ ((regparm (3)));
   void lock ();
   void release ();

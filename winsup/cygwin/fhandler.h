@@ -275,7 +275,7 @@ class fhandler_base
     __attribute__ ((regparm (3)));
   int __stdcall fstat_by_handle (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_by_name (struct __stat64 *buf) __attribute__ ((regparm (2)));
-  int fhandler_base::utimes_fs (const struct timeval *) __attribute__ ((regparm (2)));
+  int utimes_fs (const struct timeval *) __attribute__ ((regparm (2)));
   virtual int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   virtual int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
   virtual int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
@@ -614,7 +614,7 @@ class fhandler_dev_floppy: public fhandler_dev_raw
   IMPLEMENT_STATUS_FLAG (bool, eom_detected)
 
   inline _off64_t get_current_position ();
-  int fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo);
+  int get_drive_info (struct hd_geometry *geo);
 
   BOOL write_file (const void *buf, DWORD to_write, DWORD *written, int *err);
   BOOL read_file (void *buf, DWORD to_read, DWORD *read, int *err);
@@ -941,7 +941,7 @@ class fhandler_console: public fhandler_termios
   static tty_min *get_tty_stuff (int);
   bool is_slow () {return 1;}
   static bool need_invisible ();
-  static bool fhandler_console::has_a () {return !invisible_console;}
+  static bool has_a () {return !invisible_console;}
 };
 
 class fhandler_tty_common: public fhandler_termios

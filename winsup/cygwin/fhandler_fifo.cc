@@ -150,6 +150,7 @@ fhandler_fifo::open (int flags, mode_t)
   char mutex[CYG_MAX_PATH];
   char *emutex = mutex + CYG_MAX_PATH;
   char *p, *p1;
+  DWORD resw;
 
   /* Generate a semi-unique name to associate with this fifo but try to ensure
      that it is no larger than CYG_MAX_PATH */
@@ -175,7 +176,7 @@ fhandler_fifo::open (int flags, mode_t)
 					   open an fd. */
   /* FIXME? Need to wait for signal here?
      This shouldn't block for long, but... */
-  DWORD resw = WaitForSingleObject (h, INFINITE);
+  resw = WaitForSingleObject (h, INFINITE);
   lock_process::locker.acquire ();	/* Restore the lock */
   if (resw != WAIT_OBJECT_0 && resw != WAIT_ABANDONED_0)
     {

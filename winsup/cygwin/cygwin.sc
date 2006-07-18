@@ -106,6 +106,7 @@ SECTIONS
   {
     __cygheap_mid = .;
     *(.cygheap)
+    . = . + 1;
     . = ALIGN(512 * 1024);
   }
   __cygheap_end = ABSOLUTE(.);

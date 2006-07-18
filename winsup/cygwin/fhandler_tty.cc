@@ -1021,6 +1021,7 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
 
   get_ttyp ()->cmd = cmd;
   get_ttyp ()->ioctl_retval = 0;
+  int val;
   switch (cmd)
     {
     case TIOCGWINSZ:
@@ -1052,7 +1053,7 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
 	}
       break;
     case TIOCLINUX:
-      int val = *(unsigned char *) arg;
+      val = *(unsigned char *) arg;
       if (val != 6 || !ioctl_request_event || !ioctl_done_event)
 	  get_ttyp ()->ioctl_retval = -EINVAL;
       else
