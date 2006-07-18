@@ -526,12 +526,13 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
       break;
 
     case STATUS_ACCESS_VIOLATION:
-      switch (mmap_is_attached_or_noreserve_page (e->ExceptionInformation[1]))
+      switch (mmap_is_attached_or_noreserve ((void *)e->ExceptionInformation[1],
+					     1))
         {
-	case 2:		/* MAP_NORESERVE page, now commited. */
+	case MMAP_NORESERVE_COMMITED:
 	  return 0;
-	case 1:		/* MAP_NORESERVE page, commit failed, or
-			   access to mmap page beyond EOF. */
+	case MMAP_RAISE_SIGBUS:	/* MAP_NORESERVE page, commit failed, or
+				   access to mmap page beyond EOF. */
 	  si.si_signo = SIGBUS;
 	  si.si_code = BUS_OBJERR;
 	  break;

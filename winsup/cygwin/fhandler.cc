@@ -223,8 +223,10 @@ fhandler_base::raw_read (void *ptr, size_t& ulen)
 
   HANDLE h = NULL;	/* grumble */
   int prio = 0;		/* ditto */
+  int try_noreserve = 1;
   DWORD len = ulen;
 
+retry:
   ulen = (size_t) -1;
   if (read_state)
     {
@@ -259,6 +261,20 @@ fhandler_base::raw_read (void *ptr, size_t& ulen)
 	      bytes_read = 0;
 	      break;
 	    }
+	  if (try_noreserve)
+	    {
+	      try_noreserve = 0;
+	      switch (mmap_is_attached_or_noreserve (ptr, len))
+		{
+		case MMAP_NORESERVE_COMMITED:
+		  goto retry;
+		case MMAP_RAISE_SIGBUS:
+		  raise(SIGBUS);
+		case MMAP_NONE:
+		  break;
+		}
+	    }
+	  /*FALLTHRU*/
 	case ERROR_INVALID_FUNCTION:
 	case ERROR_INVALID_PARAMETER:
 	case ERROR_INVALID_HANDLE:

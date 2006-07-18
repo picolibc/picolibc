@@ -1,3 +1,17 @@
+2006-07-18  Brian Ford  <Brian.Ford@FlightSafety.com>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* winsup.h (mmap_region_status): New enum.
+	(mmap_is_attached_or_noreserve_page): Adjust prototype and rename
+	as below.
+	* mmap.cc (mmap_is_attached_or_noreserve_page):  Rename
+	mmap_is_attached_or_noreserve.  Add region length parameter.
+	Return enum above.
+	* exceptions.cc (_cygtls::handle_exceptions): Accomodate above.
+	* fhandler.cc (fhandler_base::raw_read): Call above for NOACCESS
+	errors and retry on success to allow reads into untouched
+	MAP_NORESERVE buffers.
+
 2006-07-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_floppy.cc (fhandler_dev_floppy::ioctl): Fix typo in lint
