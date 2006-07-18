@@ -976,6 +976,7 @@ poll SIGFE
 _poll = poll SIGFE
 popen SIGFE
 _popen = popen SIGFE
+posix_openpt SIGFE
 posix_regcomp SIGFE
 posix_regerror SIGFE
 posix_regexec SIGFE
