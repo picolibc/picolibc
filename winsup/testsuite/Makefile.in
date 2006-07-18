@@ -75,14 +75,6 @@ export CC
 
 INSTALL_DATA:=$(SHELL) $(updir1)/install-sh -c
 
-# Setup the testing framework, if you have one
-EXPECT = `if [ -f $${rootme}/../../expect/expect$(EXEEXT) ] ; then \
-            echo $${rootme}/../../expect/expect$(EXEEXT) ; \
-          else echo expect ; fi`
-
-RUNTEST = `if [ -f ${srcdir}/../../dejagnu/runtest ] ; then \
-	       echo ${srcdir}/../../dejagnu/runtest ; \
-	    else echo runtest; fi`
 RUNTESTFLAGS =
 
 ifdef VERBOSE
@@ -181,12 +173,12 @@ testsuite/site.exp: site.exp
 
 check: $(TESTSUP_LIB_NAME) $(RUNTIME) cygrun.exe testsuite/site.exp
 	cd testsuite; \
-	EXPECT=${EXPECT} ; export EXPECT ; \
+	export EXPECT=expect ; \
 	if [ -f $(bupdir2)/expect/expect ] ; then  \
 	   TCL_LIBRARY=`cd .. ; cd ${srcdir}/../../tcl/library ; pwd` ; \
 	    export TCL_LIBRARY ; fi ; \
 	PATH=$(bupdir)/cygwin:$${PATH} ;\
-	$(RUNTEST) --tool winsup $(RUNTESTFLAGS) ;\
+	runtest --tool winsup $(RUNTESTFLAGS) ;\
 
 cygrun.o: cygrun.c
 	$(CC) $(MINGW_CFLAGS) -o $@ -c $<
