@@ -512,7 +512,7 @@ fhandler_dev_floppy::ioctl (unsigned int cmd, void *buf)
 	  __seterrno ();
 	  return -1;
 	}
-      /*FALLTHRUGH*/
+      /*FALLTHRU*/
     default:
       return fhandler_dev_raw::ioctl (cmd, buf);
     }
