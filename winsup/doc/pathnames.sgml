@@ -308,9 +308,11 @@ a      a.exe     b.exe
 432961010 b       432961010 b.exe
 </screen>
 If a shell script <filename>myprog</filename> and a program
-<filename>myprog.exe</filename> coexist in a directory, the program
-has precedence and is selected for execution of
-<command>myprog</command>.</para>
+<filename>myprog.exe</filename> coexist in a directory, the shell
+script has precedence and is selected for execution of
+<command>myprog</command>.  Note that this was quite the reverse up to
+Cygwin 1.5.19.  It has been changed for consistency with the rest of Cygwin.
+</para>
 
 <para>The <command>gcc</command> compiler produces an executable named
 <filename>filename.exe</filename> when asked to produce
