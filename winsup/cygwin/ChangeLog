@@ -1,3 +1,8 @@
+2006-07-18  Silvio Laguzzi  <slaguzzi@data-al.de>
+
+	* sec_acl.cc (acltotext32): Add missing handling of default ACL entry
+	types.
+
 2006-07-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_floppy.cc (fhandler_dev_floppy::ioctl): Fix typo in lint

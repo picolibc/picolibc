@@ -728,7 +728,7 @@ acltotext32 (__aclent32_t *aclbufp, int aclcnt)
       first = false;
       if (aclbufp[pos].a_type & ACL_DEFAULT)
 	strcat (buf, "default");
-      switch (aclbufp[pos].a_type)
+      switch (aclbufp[pos].a_type & ~ACL_DEFAULT)
 	{
 	case USER_OBJ:
 	  __small_sprintf (buf + strlen (buf), "user::%s",
