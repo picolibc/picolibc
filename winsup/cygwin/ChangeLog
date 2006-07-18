@@ -1,5 +1,10 @@
 2006-07-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_floppy.cc (fhandler_dev_floppy::ioctl): Fix typo in lint
+	directive.
+
+2006-07-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin.din (posix_openpt): Export.
 	* tty.cc (posix_openpt): New function.
 	* include/cygwin/stdlib.h (posix_openpt): Declare.
