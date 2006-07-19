@@ -1,6 +1,16 @@
+2006-07-19  Paul Brook  <paul@codesourcery.com>
+
+	Backport from mainline.
+	gas/
+	* config/tc-arm.c (insns): Fix rbit Arm opcode.
+	gas/testsuite/
+	* gas/arm/archv6t2.d: Adjust expected output for rbit.
+	opcodes/
+	* armd-dis.c (arm_opcodes): Fix rbit opcode.
+
 2006-07-18  Paul Brook  <paul@codesourcery.com>
 
-	Merge from mainline.
+	Backport from mainline.
 	bfd/
 	* bfd-in2.h: Regenerate.
 	* libbfd.h: Regenerate.
