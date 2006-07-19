@@ -1,3 +1,8 @@
+2006-07-18  Paolo Bonzini  <bonzini@gnu.org>
+
+        * acx.m4: Support --with-build-libsubdir and AC_SUBST
+        build_libsubdir.
+
 2006-06-13  Richard Earnshaw  <rearnsha@arm.com>
 	    Alexandre Oliva <aoliva@redhat.com>
 
