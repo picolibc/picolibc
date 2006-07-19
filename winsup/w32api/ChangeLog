@@ -1,3 +1,10 @@
+2006-07-19  Elias Naur  <elias_naur@users.sourceforge.net>
+
+	* include/winuser.h (WM_INPUT): Add missing Raw	Input
+	notification define.
+	(RID_DEVICE_INFO_MOUSE, RID_DEVICE_INFO_KEYBOARD,
+	RID_DEVICE_INFO_HID, RID_DEVICE_INFO): Define Raw Input structs
+
 2006-07-19  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	[mingw-Bugs-1525021]

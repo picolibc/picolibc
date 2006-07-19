@@ -1398,6 +1398,9 @@ extern "C" {
 #define WM_INITDIALOG 272
 #define WM_INITMENU 278
 #define WM_INITMENUPOPUP 279
+#if (_WIN32_WINNT >= 0x0501)
+#define WM_INPUT 0x00FF
+#endif
 #define WM_INPUTLANGCHANGE 81
 #define WM_INPUTLANGCHANGEREQUEST 80
 #define WM_KEYDOWN 256
@@ -3275,6 +3278,36 @@ typedef struct tagRAWINPUTDEVICELIST {
 	HANDLE hDevice;
 	DWORD dwType;
 } RAWINPUTDEVICELIST,*PRAWINPUTDEVICELIST;
+typedef struct tagRID_DEVICE_INFO_MOUSE {
+	DWORD dwId;
+	DWORD dwNumberOfButtons;
+	DWORD dwSampleRate;
+	BOOL fHasHorizontalWheel;
+} RID_DEVICE_INFO_MOUSE, *PRID_DEVICE_INFO_MOUSE;
+typedef struct tagRID_DEVICE_INFO_KEYBOARD {
+	DWORD dwType;
+	DWORD dwSubType;
+	DWORD dwKeyboardMode;
+	DWORD dwNumberOfFunctionKeys;
+	DWORD dwNumberOfIndicators;
+	DWORD dwNumberOfKeysTotal;
+} RID_DEVICE_INFO_KEYBOARD, *PRID_DEVICE_INFO_KEYBOARD;
+typedef struct tagRID_DEVICE_INFO_HID {
+	DWORD dwVendorId;
+	DWORD dwProductId;
+	DWORD dwVersionNumber;
+	USHORT usUsagePage;
+	USHORT usUsage;
+} RID_DEVICE_INFO_HID, *PRID_DEVICE_INFO_HID;
+typedef struct tagRID_DEVICE_INFO { 
+	DWORD    cbSize; 
+	DWORD    dwType; 
+	_ANONYMOUS_UNION union { 
+		RID_DEVICE_INFO_MOUSE     mouse; 
+		RID_DEVICE_INFO_KEYBOARD  keyboard; 
+		RID_DEVICE_INFO_HID       hid; 
+	} DUMMYUNIONNAME;
+} RID_DEVICE_INFO, *PRID_DEVICE_INFO, *LPRID_DEVICE_INFO;
 #endif /* (_WIN32_WINNT >= 0x0501) */
 
 typedef struct {
