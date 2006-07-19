@@ -1,3 +1,12 @@
+2006-07-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (msync): Disable rounding up len.  Fix bug in access check
+	loop.
+
+2006-07-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_worker): Return EEXIST if newpath exists.
+
 2006-07-18  Christopher Faylor  <cgf@timesys.com>
 
 	* tty.cc (tty_list::terminate): Don't enter the busy loop if we don't

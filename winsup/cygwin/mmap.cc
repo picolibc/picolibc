@@ -900,64 +900,44 @@ map::del_list (unsigned i)
 }
 
 /* This function is called from exception_handler when a segmentation
-   violation has occurred.  It should also be called from all Cygwin
-   functions that want to support passing noreserve mmap page addresses
-   to Windows system calls.  In that case, it should be called only after
-   a system call indicates that the application buffer passed had an
-   invalid virtual address to avoid any performance impact in non-noreserve
-   cases.
+   violation has happened.  We have two cases to check here.
    
-   Check if the address range is all within noreserve mmap regions.  If so,
-   call VirtualAlloc to commit the pages and return MMAP_NORESERVE_COMMITED
-   on success.  If the page has __PROT_ATTACH (SUSv3 memory protection
-   extension), or if VirutalAlloc fails, return MMAP_RAISE_SIGBUS.
-   Otherwise, return MMAP_NONE if the address range is not covered by an
-   attached or noreserve map.
-
-   On MAP_NORESERVE_COMMITED, the exeception handler should return 0 to
-   allow the application to retry the memory access, or the calling Cygwin
-   function should retry the Windows system call. */
-mmap_region_status
-mmap_is_attached_or_noreserve (void *addr, size_t len)
+   First, is it an address within "attached" mmap pages (indicated by
+   the __PROT_ATTACH protection, see there)?  In this case the function
+   returns 1 and the exception_handler raises SIGBUS, as demanded by the
+   memory protection extension described in SUSv3 (see the mmap man
+   page).
+   
+   Second, check if the address is within "noreserve" mmap pages
+   (indicated by MAP_NORESERVE flag).  If so, the function calls
+   VirtualAlloc to commit the page and returns 2.  The exception handler
+   then just returns with 0 and the affected application retries the
+   failing memory access.  If VirtualAlloc fails, the function returns
+   1, so that the exception handler raises a SIGBUS, as described in the
+   MAP_NORESERVE man pages for Linux and Solaris.
+   
+   In any other case 0 is returned and a normal SIGSEGV is raised. */
+int
+mmap_is_attached_or_noreserve_page (ULONG_PTR addr)
 {
-  list *map_list = mmapped_areas.get_list_by_fd (-1);
+  list *map_list;
+  long record_idx;
+  caddr_t u_addr;
+  DWORD u_len;
+  DWORD pagesize = getsystempagesize ();
 
-  size_t pagesize = getpagesize ();
-  caddr_t start_addr = (caddr_t) rounddown ((uintptr_t) addr, pagesize);
-  len += ((caddr_t) addr - start_addr);
-  len = roundup2 (len, pagesize);
-
-  if (map_list == NULL)
-    return MMAP_NONE;
-
-  while (len > 0) 
-    {
-      caddr_t u_addr;
-      DWORD u_len;
-      long record_idx = map_list->search_record (start_addr, len,
-						 u_addr, u_len, -1);
-      if (record_idx < 0)
-	return MMAP_NONE;
-
-      mmap_record *rec = map_list->get_record (record_idx);
-      if (rec->attached ())
-	return MMAP_RAISE_SIGBUS;
-      if (!rec->noreserve ())
-	return MMAP_NONE;
-
-      size_t commit_len = u_len - (start_addr - u_addr);
-      if (commit_len > len)
-	commit_len = len;
-
-      if (!VirtualAlloc (start_addr, commit_len, MEM_COMMIT,
-			 rec->gen_protect ()))
-	return MMAP_RAISE_SIGBUS;
-
-      start_addr += commit_len;
-      len -= commit_len;
-    }
-
-    return MMAP_NORESERVE_COMMITED;
+  addr = rounddown (addr, pagesize);
+  if (!(map_list = mmapped_areas.get_list_by_fd (-1)))
+    return 0;
+  if ((record_idx = map_list->search_record ((caddr_t)addr, pagesize,
+					     u_addr, u_len, -1)) < 0)
+    return 0;
+  if (map_list->get_record (record_idx)->attached ())
+    return 1;
+  if (!map_list->get_record (record_idx)->noreserve ())
+    return 0;
+  DWORD new_prot = map_list->get_record (record_idx)->gen_protect ();
+  return VirtualAlloc ((void *)addr, pagesize, MEM_COMMIT, new_prot) ? 2 : 1;
 }
 
 static caddr_t
@@ -1372,7 +1352,9 @@ msync (void *addr, size_t len, int flags)
       set_errno (EINVAL);
       goto out;
     }
+#if 0 /* If I only knew why I did that... */
   len = roundup2 (len, pagesize);
+#endif
 
   /* Iterate through the map, looking for the mmapped area.
      Error if not found. */
@@ -1388,7 +1370,7 @@ msync (void *addr, size_t len, int flags)
 	  if (rec->access ((caddr_t)addr))
 	    {
 	      /* Check whole area given by len. */
-	      for (DWORD i = getpagesize (); i < len; ++i)
+	      for (DWORD i = getpagesize (); i < len; i += getpagesize ())
 		if (!rec->access ((caddr_t)addr + i))
 		  {
 		    set_errno (ENOMEM);
