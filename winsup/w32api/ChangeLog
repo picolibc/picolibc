@@ -1,3 +1,13 @@
+2006-07-19  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	[mingw-Bugs-1525021]
+	* iptypes.h (IP_ADAPTER_ANYCAST_ADDRESS): Fix NONAMELESSUNION warnings.
+	(IP_ADAPTER_MULTICAST_ADDRESS): Likewise.	
+	(IP_ADAPTER_UNICAST_ADDRESS): Likewise.
+	(IP_ADAPTER_DNS_SERVER_ADDRESS): Likewise.
+	(IP_ADAPTER_ADAPTER_PREFIX): Likewise.
+	(IP_ADAPTER_ADDRESSES): Likewise.
+
 2006-06-13  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* lib/uuid.c (CLSID_FileProtocol, CLSID_FtpProtocol, CLSID_GopherProtocol,

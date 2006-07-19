@@ -1,6 +1,6 @@
 #ifndef _IPTYPES_H
 #define _IPTYPES_H
-#if __GNUC__ >=3
+#if __GNUC__ >= 3
 #pragma GCC system_header
 #endif
 
@@ -133,34 +133,35 @@ typedef struct {
   GUID InterfaceGuid;
 } IP_INTERFACE_NAME_INFO,*PIP_INTERFACE_NAME_INFO;
 typedef struct _IP_ADAPTER_ANYCAST_ADDRESS {
-  union {
+  _ANONYMOUS_UNION union {
     ULONGLONG Alignment;
-    struct {
+    _ANONYMOUS_STRUCT struct {
       ULONG Length;
       DWORD Flags;
-    };
-  };
+    } DUMMYSTRUCTNAME;
+  } DUMMYUNIONNAME;
   struct _IP_ADAPTER_ANYCAST_ADDRESS* Next;
   SOCKET_ADDRESS Address;
 } IP_ADAPTER_ANYCAST_ADDRESS,*PIP_ADAPTER_ANYCAST_ADDRESS;
 typedef struct _IP_ADAPTER_MULTICAST_ADDRESS {
-  union {
+  _ANONYMOUS_UNION union {
     ULONGLONG Alignment;
-    struct {
+    _ANONYMOUS_STRUCT struct {
       ULONG Length;
       DWORD Flags;
-    };
-  };
+    } DUMMYSTRUCTNAME;
+  } DUMMYUNIONNAME;
   struct _IP_ADAPTER_MULTICAST_ADDRESS* Next;
   SOCKET_ADDRESS Address;
 } IP_ADAPTER_MULTICAST_ADDRESS,*PIP_ADAPTER_MULTICAST_ADDRESS;
 typedef struct _IP_ADAPTER_UNICAST_ADDRESS {
-  union {
-    struct {
+  _ANONYMOUS_UNION union {
+    ULONGLONG Alignment;
+    _ANONYMOUS_STRUCT struct {
       ULONG Length;
       DWORD Flags;
-    };
-  };
+    }  DUMMYSTRUCTNAME;
+  } DUMMYUNIONNAME;
   struct _IP_ADAPTER_UNICAST_ADDRESS* Next;
   SOCKET_ADDRESS Address;
   IP_PREFIX_ORIGIN PrefixOrigin;
@@ -171,36 +172,36 @@ typedef struct _IP_ADAPTER_UNICAST_ADDRESS {
   ULONG LeaseLifetime;
 } IP_ADAPTER_UNICAST_ADDRESS,*PIP_ADAPTER_UNICAST_ADDRESS;
 typedef struct _IP_ADAPTER_DNS_SERVER_ADDRESS {
-  union {
+  _ANONYMOUS_UNION union {
     ULONGLONG Alignment;
-    struct {
+    _ANONYMOUS_STRUCT struct {
       ULONG Length;
       DWORD Reserved;
-    };
-  };
+    } DUMMYSTRUCTNAME;
+  } DUMMYUNIONNAME;
   struct _IP_ADAPTER_DNS_SERVER_ADDRESS* Next;
   SOCKET_ADDRESS Address;
 } IP_ADAPTER_DNS_SERVER_ADDRESS,*PIP_ADAPTER_DNS_SERVER_ADDRESS;
 typedef struct _IP_ADAPTER_PREFIX {
-  union {
-    ULONGLONG  Alignment;
-    struct {
+  _ANONYMOUS_UNION union {
+    ULONGLONG Alignment;
+    _ANONYMOUS_STRUCT struct {
       ULONG Length;
       DWORD Flags;
-    };
-  };
+    } DUMMYSTRUCTNAME;
+  } DUMMYUNIONNAME;
   struct _IP_ADAPTER_PREFIX* Next;
   SOCKET_ADDRESS Address;
   ULONG PrefixLength;
 } IP_ADAPTER_PREFIX,*PIP_ADAPTER_PREFIX;
 typedef struct _IP_ADAPTER_ADDRESSES {
-  union {
+  _ANONYMOUS_UNION union {
     ULONGLONG Alignment;
-    struct {
+    _ANONYMOUS_STRUCT struct {
       ULONG Length;
       DWORD IfIndex;
-    };
-  };
+    } DUMMYSTRUCTNAME;
+  } DUMMYUNIONNAME;
   struct _IP_ADAPTER_ADDRESSES* Next;
   PCHAR AdapterName;
   PIP_ADAPTER_UNICAST_ADDRESS FirstUnicastAddress;
