@@ -1,5 +1,10 @@
 2006-07-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* pinfo.cc (commune_process): Don't add extra \0 to cmdline.
+	(_pinfo::cmdline): Ditto process internal.
+
+2006-07-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mmap.cc (msync): Disable rounding up len.  Fix bug in access check
 	loop.
 
