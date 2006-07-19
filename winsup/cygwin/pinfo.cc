@@ -418,7 +418,7 @@ commune_process (void *arg)
     case PICOM_CMDLINE:
       {
 	sigproc_printf ("processing PICOM_CMDLINE");
-	unsigned n = 1;
+	unsigned n = 0;
 	extern int __argc_safe;
 	const char *argv[__argc_safe + 1];
 
@@ -443,11 +443,6 @@ commune_process (void *arg)
 		sigproc_printf ("WriteFile arg %d failed, %E", a - argv);
 		break;
 	      }
-	if (!WriteFile (tothem, "", 1, &nr, NULL))
-	  {
-	    sigproc_printf ("WriteFile null failed, %E");
-	    break;
-	  }
 	break;
       }
     case PICOM_CWD:
@@ -819,7 +814,7 @@ _pinfo::cmdline (size_t& n)
     }
   else
     {
-      n = 1;
+      n = 0;
       for (char **a = __argv; *a; a++)
 	n += strlen (*a) + 1;
       char *p;
@@ -829,7 +824,6 @@ _pinfo::cmdline (size_t& n)
 	  strcpy (p, *a);
 	  p = strchr (p, '\0') + 1;
 	}
-      *p = '\0';
     }
   return s;
 }
