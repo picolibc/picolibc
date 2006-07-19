@@ -1352,7 +1352,9 @@ msync (void *addr, size_t len, int flags)
       set_errno (EINVAL);
       goto out;
     }
+#if 0 /* If I only knew why I did that... */
   len = roundup2 (len, pagesize);
+#endif
 
   /* Iterate through the map, looking for the mmapped area.
      Error if not found. */
@@ -1368,7 +1370,7 @@ msync (void *addr, size_t len, int flags)
 	  if (rec->access ((caddr_t)addr))
 	    {
 	      /* Check whole area given by len. */
-	      for (DWORD i = getpagesize (); i < len; ++i)
+	      for (DWORD i = getpagesize (); i < len; i += getpagesize ())
 		if (!rec->access ((caddr_t)addr + i))
 		  {
 		    set_errno (ENOMEM);
