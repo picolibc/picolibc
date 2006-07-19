@@ -2757,7 +2757,8 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 
   syscall_printf ("symlink (%s, %s)", oldpath, win32_path.get_win32 ());
 
-  if (win32_path.is_auto_device ())
+  if ((!isdevice && win32_path.exists ())
+      || win32_path.is_auto_device ())
     {
       set_errno (EEXIST);
       goto done;
