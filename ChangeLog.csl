@@ -1,3 +1,16 @@
+2006-07-20  Julian Brown  <julian@codesourcery.com>
+
+	Backport from mainline.
+
+	opcodes/
+	* arm-dis.c (coprocessor): Alter fmsrr disassembly syntax.
+
+	gas/testsuite/
+	* gas/arm/vfp-neon-syntax.d: Tweak expected fmsrr syntax.
+	* gas/arm/vfp-neon-syntax_t2.d: Likewise.
+	* gas/arm/vfp2.d: Likewise.
+	* gas/arm/vfp2_t2.d: Likewise.
+
 2006-07-19  Paul Brook  <paul@codesourcery.com>
 
 	Backport from mainline.
