@@ -400,12 +400,16 @@ struct wsa_event
   LONG serial_number;
   long events;
   int  connect_errorcode;
+  pid_t owner;
 };
 
 /* Maximum number of concurrently opened sockets from all Cygwin processes
    on a machine.  Note that shared sockets (through dup/fork/exec) are
    counted as one socket. */
 #define NUM_SOCKS	(65536 / sizeof (wsa_event))
+
+#define LOCK_EVENTS	WaitForSingleObject (wsock_mtx, INFINITE)
+#define UNLOCK_EVENTS	ReleaseMutex (wsock_mtx)
 
 static wsa_event wsa_events[NUM_SOCKS] __attribute__((section (".cygwin_dll_common"), shared)) = { 0 };
 
@@ -458,7 +462,7 @@ search_wsa_event_slot (LONG new_serial_number)
 }
 
 bool
-fhandler_socket::prepare ()
+fhandler_socket::init_events ()
 {
   LONG new_serial_number;
   char name[CYG_MAX_PATH];
@@ -504,52 +508,29 @@ fhandler_socket::prepare ()
 }
 
 int
-fhandler_socket::wait (long event_mask)
+fhandler_socket::evaluate_events (const long event_mask, long &events,
+				  bool erase)
 {
-  if (async_io ())
-    return 0;
-
-  int ret = SOCKET_ERROR;
-  long events;
-
-/* If WSAWaitForMultipleEvents is interrupted by a signal, and the signal
-   has the SA_RESTART flag set, return to this label and... restart. */
-sa_restart:
+  int ret = 0;
 
   WSANETWORKEVENTS evts = { 0 };
   if (!(WSAEnumNetworkEvents (get_socket (), wsock_evt, &evts)))
     {
       if (evts.lNetworkEvents)
         {
-	  WaitForSingleObject (wsock_mtx, INFINITE);
+	  LOCK_EVENTS;
 	  wsock_events->events |= evts.lNetworkEvents;
 	  if (evts.lNetworkEvents & FD_CONNECT)
 	    wsock_events->connect_errorcode = evts.iErrorCode[FD_CONNECT_BIT];
-	  events = (wsock_events->events & event_mask);
-	  ReleaseMutex (wsock_mtx);
-	  if ((evts.lNetworkEvents & FD_OOB)
-	      && !evts.iErrorCode[FD_OOB_BIT]
-	      && owner ())
-	    {
-	      siginfo_t si = {0};
-	      si.si_signo = SIGURG;
-	      si.si_code = SI_KERNEL;
-	      sig_send (myself_nowait, si);
-	      if (!_my_tls.call_signal_handler () && !events)
-	        {
-		  WSASetLastError (WSAEINTR);
-		  return SOCKET_ERROR;
-		}
-	      sig_dispatch_pending ();
-	      WaitForSingleObject (wsock_mtx, INFINITE);
-	    }
+	  UNLOCK_EVENTS;
+	  if ((evts.lNetworkEvents & FD_OOB) && wsock_events->owner)
+	    kill (wsock_events->owner, SIGURG);
 	}
     }
 
-  WaitForSingleObject (wsock_mtx, INFINITE);
+  LOCK_EVENTS;
   if ((events = (wsock_events->events & event_mask)) != 0)
     {
-      ret = 0;
       if (events & FD_CONNECT)
 	{
 	  int wsa_err = 0;
@@ -560,37 +541,50 @@ sa_restart:
 	    }
 	  wsock_events->connect_errorcode = 0;
 	}
-      wsock_events->events &= ~(events & ~FD_CLOSE);
+      if (erase)
+	wsock_events->events &= ~(events & ~FD_CLOSE);
     }
-  ReleaseMutex (wsock_mtx);
+  UNLOCK_EVENTS;
 
-  if (!events)
+  return ret;
+}
+
+int
+fhandler_socket::wait_for_events (const long event_mask)
+{
+  if (async_io ())
+    return 0;
+
+  int ret;
+  long events;
+
+  while (!(ret = evaluate_events (event_mask, events, true)) && !events)
     {
       if (is_nonblocking ())
-	WSASetLastError (WSAEWOULDBLOCK);
-      else
 	{
-	  WSAEVENT ev[2] = { wsock_evt, signal_arrived };
-	  switch (WSAWaitForMultipleEvents (2, ev, FALSE, INFINITE, FALSE))
-	    {
-	      case WSA_WAIT_TIMEOUT:
-		WSASetLastError (WSAEWOULDBLOCK);
+	  WSASetLastError (WSAEWOULDBLOCK);
+	  return SOCKET_ERROR;
+	}
+
+      WSAEVENT ev[2] = { wsock_evt, signal_arrived };
+      switch (WSAWaitForMultipleEvents (2, ev, FALSE, INFINITE, FALSE))
+	{
+	  case WSA_WAIT_TIMEOUT:
+	  case WSA_WAIT_EVENT_0:
+	    break;
+
+	  case WSA_WAIT_EVENT_0 + 1:
+	    if (_my_tls.call_signal_handler ())
+	      {
+		sig_dispatch_pending ();
 		break;
-	      case WSA_WAIT_EVENT_0:
-		goto sa_restart;
-		break;
-	      case WSA_WAIT_EVENT_0 + 1:
-		if (_my_tls.call_signal_handler ())
-		  {
-		    sig_dispatch_pending ();
-		    goto sa_restart;
-		  }
-		WSASetLastError (WSAEINTR);
-		break;
-	      default:
-		WSASetLastError (WSAEFAULT);
-		break;
-	    }
+	      }
+	    WSASetLastError (WSAEINTR);
+	    return SOCKET_ERROR;
+
+	  default:
+	    WSASetLastError (WSAEFAULT);
+	    return SOCKET_ERROR;
 	}
     }
 
@@ -598,7 +592,7 @@ sa_restart:
 }
 
 void
-fhandler_socket::release ()
+fhandler_socket::release_events ()
 {
   CloseHandle (wsock_evt);
   CloseHandle (wsock_mtx);
@@ -996,7 +990,7 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
   if (!is_nonblocking ()
       && res == SOCKET_ERROR
       && WSAGetLastError () == WSAEWOULDBLOCK)
-    res = wait (FD_CONNECT | FD_CLOSE);
+    res = wait_for_events (FD_CONNECT | FD_CLOSE);
 
   if (!res)
     err = 0;
@@ -1112,7 +1106,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 
 
   int res = 0;
-  while (!(res = wait (FD_ACCEPT | FD_CLOSE))
+  while (!(res = wait_for_events (FD_ACCEPT | FD_CLOSE))
 	 && (res = ::accept (get_socket (), peer, len)) == WSAEWOULDBLOCK)
     ;
 
@@ -1271,7 +1265,7 @@ fhandler_socket::recv_internal (WSABUF *wsabuf, DWORD wsacnt, DWORD flags,
       while ((res = WSARecvFrom (get_socket (), wsabuf, wsacnt, &ret,
 				    &flags, from, fromlen, NULL, NULL)) == -1
 	     && WSAGetLastError () == WSAEWOULDBLOCK
-	     && !(res = wait (evt_mask)))
+	     && !(res = wait_for_events (evt_mask)))
 	;
     }
 
@@ -1365,7 +1359,7 @@ fhandler_socket::send_internal (struct _WSABUF *wsabuf, DWORD wsacnt, int flags,
   while ((res = WSASendTo (get_socket (), wsabuf, wsacnt, &ret,
 			   flags & MSG_WINMASK, to, tolen, NULL, NULL)) == -1
 	 && WSAGetLastError () == WSAEWOULDBLOCK
-	 && !(res = wait (FD_WRITE | FD_CLOSE)))
+	 && !(res = wait_for_events (FD_WRITE | FD_CLOSE)))
     ;
 
   if (res == SOCKET_ERROR)
@@ -1466,7 +1460,7 @@ fhandler_socket::close ()
   setsockopt (get_socket (), SOL_SOCKET, SO_LINGER,
 	      (const char *)&linger, sizeof linger);
 
-  release ();
+  release_events ();
   while ((res = closesocket (get_socket ())) != 0)
     {
       if (WSAGetLastError () != WSAEWOULDBLOCK)
@@ -1632,11 +1626,15 @@ fhandler_socket::fcntl (int cmd, void *arg)
     {
     case F_SETOWN:
       {
-	/* Urgh!  Bad hack! */
 	pid_t pid = (pid_t) arg;
-	owner (pid == getpid ());
-	debug_printf ("owner set to %d", owner ());
+	LOCK_EVENTS;
+	wsock_events->owner = pid;
+	UNLOCK_EVENTS;
+	debug_printf ("owner set to %d", pid);
       }
+      break;
+    case F_GETOWN:
+      res = wsock_events->owner;
       break;
     case F_SETFL:
       {

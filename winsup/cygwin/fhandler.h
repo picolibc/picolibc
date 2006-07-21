@@ -390,6 +390,12 @@ class fhandler_socket: public fhandler_base
   HANDLE wsock_mtx;
   HANDLE wsock_evt;
   wsa_event *wsock_events;
+ public:
+  bool init_events ();
+ private:
+  int evaluate_events (const long event_mask, long &events, bool erase);
+  int wait_for_events (const long event_mask);
+  void release_events ();
 
   pid_t     sec_pid;
   __uid32_t sec_uid;
@@ -420,21 +426,14 @@ class fhandler_socket: public fhandler_base
     unsigned saw_shutdown_read     : 1; /* Socket saw a SHUT_RD */
     unsigned saw_shutdown_write    : 1; /* Socket saw a SHUT_WR */
     unsigned saw_reuseaddr         : 1; /* Socket saw SO_REUSEADDR call */
-    unsigned owner                 : 1; /* fcntl(F_SETOWN) called */
     unsigned listener              : 1; /* listen called */
     unsigned connect_state         : 2;
    public:
     status_flags () :
       async_io (0), saw_shutdown_read (0), saw_shutdown_write (0),
-      owner (0), listener (0), connect_state (unconnected)
+      listener (0), connect_state (unconnected)
       {}
   } status;
-
- public:
-  bool prepare ();
- private:
-  int wait (long event_mask);
-  void release ();
 
  public:
   fhandler_socket ();
@@ -446,7 +445,6 @@ class fhandler_socket: public fhandler_base
   IMPLEMENT_STATUS_FLAG (bool, saw_shutdown_read)
   IMPLEMENT_STATUS_FLAG (bool, saw_shutdown_write)
   IMPLEMENT_STATUS_FLAG (bool, saw_reuseaddr)
-  IMPLEMENT_STATUS_FLAG (bool, owner)
   IMPLEMENT_STATUS_FLAG (bool, listener)
   IMPLEMENT_STATUS_FLAG (conn_state, connect_state)
 

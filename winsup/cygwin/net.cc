@@ -513,7 +513,7 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
   if (!fd.isopen ())
     return false;
   fd->set_io_handle ((HANDLE) soc);
-  if (!((fhandler_socket *) fd)->prepare ())
+  if (!((fhandler_socket *) fd)->init_events ())
     return false;
   fd->set_flags (O_RDWR | O_BINARY);
   fd->uninterruptible_io (true);

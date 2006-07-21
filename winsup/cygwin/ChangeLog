@@ -1,5 +1,30 @@
 2006-07-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (class fhandler_socket): Rearrange slightly to keep
+	event handling methods and members together.  Drop owner status flag.
+	Split wait method.  Rename event handling methods for readability.
+	* fhandler_socket.cc (struct wsa_event): Add owner field.
+	(LOCK_EVENTS): New macro.
+	(UNLOCK_EVENTS): Ditto.
+	(fhandler_socket::init_events): rename from prepare.
+	(fhandler_socket::evaluate_events): First half of former wait method.
+	Do everything but wait.  Allow specifiying whether or not events from
+	event_mask should be erased from wsock_events->events.  Simplify
+	OOB handling.  Allow sending SIGURG to any process (group).
+	(fhandler_socket::wait_for_events): Second half of former wait method.
+	Call evaluate_events and wait in a loop if socket is blocking.
+	(fhandler_socket::release_events): Rename from release.
+	(fhandler_socket::connect): Accomodate above name changes.
+	(fhandler_socket::accept): Ditto.
+	(fhandler_socket::recv_internal): Ditto.
+	(fhandler_socket::send_internal): Ditto.
+	(fhandler_socket::close): Ditto.
+	(fhandler_socket::fcntl): Always set owner to given input value on
+	F_SETOWN.  Handle F_GETOWN.
+	* net.cc (fdsock): Accomodate above name changes.
+
+2006-07-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::wait): Set Winsock errno to
 	WSAEWOULDBLOCK instead of WSAEINPROGRESS.
 
