@@ -567,14 +567,14 @@ sa_restart:
   if (!events)
     {
       if (is_nonblocking ())
-	WSASetLastError (WSAEINPROGRESS);
+	WSASetLastError (WSAEWOULDBLOCK);
       else
 	{
 	  WSAEVENT ev[2] = { wsock_evt, signal_arrived };
 	  switch (WSAWaitForMultipleEvents (2, ev, FALSE, INFINITE, FALSE))
 	    {
 	      case WSA_WAIT_TIMEOUT:
-		WSASetLastError (WSAEINPROGRESS);
+		WSASetLastError (WSAEWOULDBLOCK);
 		break;
 	      case WSA_WAIT_EVENT_0:
 		goto sa_restart;

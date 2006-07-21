@@ -1,3 +1,8 @@
+2006-07-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::wait): Set Winsock errno to
+	WSAEWOULDBLOCK instead of WSAEINPROGRESS.
+
 2006-07-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pinfo.cc (commune_process): Don't add extra \0 to cmdline.
