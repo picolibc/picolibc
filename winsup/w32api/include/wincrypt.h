@@ -372,6 +372,158 @@ extern "C" {
 #define SCHANNEL_ENC_KEY    0x00000001
 #define INTERNATIONAL_USAGE 0x00000001
 
+#define szOID_RSA 	"1.2.840.113549"
+#define szOID_PKCS 	"1.2.840.113549.1"
+#define szOID_RSA_HASH 	"1.2.840.113549.2"
+#define szOID_RSA_ENCRYPT 	"1.2.840.113549.3"
+#define szOID_PKCS_1 	"1.2.840.113549.1.1"
+#define szOID_PKCS_2 	"1.2.840.113549.1.2"
+#define szOID_PKCS_3 	"1.2.840.113549.1.3"
+#define szOID_PKCS_4 	"1.2.840.113549.1.4"
+#define szOID_PKCS_5 	"1.2.840.113549.1.5"
+#define szOID_PKCS_6 	"1.2.840.113549.1.6"
+#define szOID_PKCS_7 	"1.2.840.113549.1.7"
+#define szOID_PKCS_8 	"1.2.840.113549.1.8"
+#define szOID_PKCS_9 	"1.2.840.113549.1.9"
+#define szOID_PKCS_10 	"1.2.840.113549.1.10"
+#define szOID_PKCS_12 	"1.2.840.113549.1.12"
+#define szOID_RSA_MD2 	"1.2.840.113549.1.1.2"
+#define szOID_RSA_MD4 	"1.2.840.113549.1.1.3"
+#define szOID_RSA_MD5 	"1.2.840.113549.2.5"
+#define szOID_RSA_RSA 	"1.2.840.113549.1.1.1"
+#define szOID_RSA_MD2RSA 	"1.2.840.113549.1.1.2"
+#define szOID_RSA_MD4RSA 	"1.2.840.113549.1.1.3"
+#define szOID_RSA_MD5RSA 	"1.2.840.113549.1.1.4"
+#define szOID_RSA_SHA1RSA 	"1.2.840.113549.1.1.5"
+#define szOID_RSA_SETOAEP_RSA 	"1.2.840.113549.1.1.5"
+#define szOID_RSA_DH 	"1.2.840.113549.1.3.1"
+#define szOID_RSA_data 	"1.2.840.113549.1.7.1"
+#define szOID_RSA_signedData 	"1.2.840.113549.1.7.2"
+#define szOID_RSA_envelopedData 	"1.2.840.113549.1.7.3"
+#define szOID_RSA_signEnvData 	"1.2.840.113549.1.7.4"
+#define szOID_RSA_digestedData 	"1.2.840.113549.1.7.5"
+#define szOID_RSA_hashedData 	"1.2.840.113549.1.7.5"
+#define szOID_RSA_encryptedData 	"1.2.840.113549.1.7.6"
+#define szOID_RSA_emailAddr 	"1.2.840.113549.1.9.1"
+#define szOID_RSA_unstructName 	"1.2.840.113549.1.9.2"
+#define szOID_RSA_contentType 	"1.2.840.113549.1.9.3"
+#define szOID_RSA_messageDigest 	"1.2.840.113549.1.9.4"
+#define szOID_RSA_signingTime 	"1.2.840.113549.1.9.5"
+#define szOID_RSA_counterSign 	"1.2.840.113549.1.9.6"
+#define szOID_RSA_challengePwd 	"1.2.840.113549.1.9.7"
+#define szOID_RSA_unstructAddr 	"1.2.840.113549.1.9.8"
+#define szOID_RSA_extCertAttrs 	"1.2.840.113549.1.9.9"
+#define szOID_RSA_SMIMECapabilities 	"1.2.840.113549.1.9.15"
+#define szOID_RSA_preferSignedData 	"1.2.840.113549.1.9.15.1"
+#define szOID_RSA_RC2CBC 	"1.2.840.113549.3.2"
+#define szOID_RSA_RC4 	"1.2.840.113549.3.4"
+#define szOID_RSA_DES_EDE3_CBC 	"1.2.840.113549.3.7"
+#define szOID_RSA_RC5_CBCPad 	"1.2.840.113549.3.9"
+#define szOID_ANSI_x942 	"1.2.840.10046"
+#define szOID_ANSI_x942_DH 	"1.2.840.10046.2.1"
+#define szOID_X957 	"1.2.840.10040"
+#define szOID_X957_DSA 	"1.2.840.10040.4.1"
+#define szOID_DATA STRUCTURE 	"1.2.840.10040.4.3"
+#define szOID_DS 	"2.5"
+#define szOID_DSALG 	"2.5.8"
+#define szOID_DSALG_CRPT 	"2.5.8.1"
+#define szOID_DSALG_HASH 	"2.5.8.2"
+#define szOID_DSALG_SIGN 	"2.5.8.3"
+#define szOID_DSALG_RSA 	"2.5.8.1.1"
+#define szOID_OIW 	"1.3.14"
+#define szOID_OIWSEC 	"1.3.14.3.2"
+#define szOID_OIWSEC_md4RSA 	"1.3.14.3.2.2"
+#define szOID_OIWSEC_md5RSA 	"1.3.14.3.2.3"
+#define szOID_OIWSEC_md4RSA2 	"1.3.14.3.2.4"
+#define szOID_OIWSEC_desECB 	"1.3.14.3.2.6"
+#define szOID_OIWSEC_desCBC 	"1.3.14.3.2.7"
+#define szOID_OIWSEC_desOFB 	"1.3.14.3.2.8"
+#define szOID_OIWSEC_desCFB 	"1.3.14.3.2.9"
+#define szOID_OIWSEC_desMAC 	"1.3.14.3.2.10"
+#define szOID_OIWSEC_rsaSign 	"1.3.14.3.2.11"
+#define szOID_OIWSEC_dsa 	"1.3.14.3.2.12"
+#define szOID_OIWSEC_shaDSA 	"1.3.14.3.2.13"
+#define szOID_OIWSEC_mdc2RSA 	"1.3.14.3.2.14"
+#define szOID_OIWSEC_shaRSA 	"1.3.14.3.2.15"
+#define szOID_OIWSEC_dhCommMod 	"1.3.14.3.2.16"
+#define szOID_OIWSEC_desEDE 	"1.3.14.3.2.17"
+#define szOID_OIWSEC_sha 	"1.3.14.3.2.18"
+#define szOID_OIWSEC_mdc2 	"1.3.14.3.2.19"
+#define szOID_OIWSEC_dsaComm 	"1.3.14.3.2.20"
+#define szOID_OIWSEC_dsaCommSHA 	"1.3.14.3.2.21"
+#define szOID_OIWSEC_rsaXchg 	"1.3.14.3.2.22"
+#define szOID_OIWSEC_keyHashSeal 	"1.3.14.3.2.23"
+#define szOID_OIWSEC_md2RSASign 	"1.3.14.3.2.24"
+#define szOID_OIWSEC_md5RSASign 	"1.3.14.3.2.25"
+#define szOID_OIWSEC_sha1 	"1.3.14.3.2.26"
+#define szOID_OIWSEC_dsaSHA1 	"1.3.14.3.2.27"
+#define szOID_OIWSEC_dsaCommSHA1 	"1.3.14.3.2.28"
+#define szOID_OIWSEC_sha1RSASign 	"1.3.14.3.2.29"
+#define szOID_OIWDIR 	"1.3.14.7.2"
+#define szOID_OIWDIR_CRPT 	"1.3.14.7.2.1"
+#define szOID_OIWDIR_HASH 	"1.3.14.7.2.2"
+#define szOID_OIWDIR_SIGN 	"1.3.14.7.2.3"
+#define szOID_OIWDIR_md2 	"1.3.14.7.2.2.1"
+#define szOID_OIWDIR_md2RSA 	"1.3.14.7.2.3.1"
+#define szOID_INFOSEC 	"2.16.840.1.101.2.1"
+#define szOID_INFOSEC_sdnsSignature 	"2.16.840.1.101.2.1.1.1"
+#define szOID_INFOSEC_mosaicSignature 	"2.16.840.1.101.2.1.1.2"
+#define szOID_INFOSEC_sdnsConfidentiality 	"2.16.840.1.101.2.1.1.3"
+#define szOID_INFOSEC_mosaicConfidentiality 	"2.16.840.1.101.2.1.1.4"
+#define szOID_INFOSEC_sdnsIntegrity 	"2.16.840.1.101.2.1.1.5"
+#define szOID_INFOSEC_mosaicIntegrity 	"2.16.840.1.101.2.1.1.6"
+#define szOID_INFOSEC_sdnsTokenProtection 	"2.16.840.1.101.2.1.1.7"
+#define szOID_INFOSEC_mosaicTokenProtection 	"2.16.840.1.101.2.1.1.8"
+#define szOID_INFOSEC_sdnsKeyManagement 	"2.16.840.1.101.2.1.1.9"
+#define szOID_INFOSEC_mosaicKeyManagement 	"2.16.840.1.101.2.1.1.10"
+#define szOID_INFOSEC_sdnsKMandSig 	"2.16.840.1.101.2.1.1.11"
+#define szOID_INFOSEC_mosaicKMandSig 	"2.16.840.1.101.2.1.1.12"
+#define szOID_INFOSEC_SuiteASignature 	"2.16.840.1.101.2.1.1.13"
+#define szOID_INFOSEC_SuiteAConfidentiality 	"2.16.840.1.101.2.1.1.14"
+#define szOID_INFOSEC_SuiteAIntegrity 	"2.16.840.1.101.2.1.1.15"
+#define szOID_INFOSEC_SuiteATokenProtection 	"2.16.840.1.101.2.1.1.16"
+#define szOID_INFOSEC_SuiteAKeyManagement 	"2.16.840.1.101.2.1.1.17"
+#define szOID_INFOSEC_SuiteAKMandSig 	"2.16.840.1.101.2.1.1.18"
+#define szOID_INFOSEC_mosaicUpdatedSig 	"2.16.840.1.101.2.1.1.19"
+#define szOID_INFOSEC_mosaicKMandUpdSig 	"2.16.840.1.101.2.1.1.20"
+#define szOID_INFOSEC_mosaicUpdatedInteg 	"2.16.840.1.101.2.1.1.21"
+#define szOID_PKIX_NO_SIGNATURE 	"1.3.6.1.5.5.7.6.2"
+
+#define szOID_COMMON_NAME "2.5.4.3"
+#define szOID_COUNTRY_NAME "2.5.4.6"
+#define szOID_DEVICE_SERIAL_NUMBER "2.5.4.5"
+#define szOID_DOMAIN_COMPONENT "0.9.2342.19200300.100.1.25"
+#define szOID_RSA_emailAddr "1.2.840.113549.1.9.1"
+#define szOID_GIVEN_NAME "2.5.4.42"
+#define szOID_INITIALS "2.5.4.43"
+#define szOID_LOCALITY_NAME "2.5.4.7"
+#define szOID_ORGANIZATION_NAME "2.5.4.10"
+#define szOID_ORGANIZATIONAL_UNIT_NAME "2.5.4.11"
+#define szOID_STATE_OR_PROVINCE_NAME "2.5.4.8"
+#define szOID_STREET_ADDRESS "2.5.4.9"
+#define szOID_SUR_NAME "2.5.4.4"
+#define szOID_TITLE "2.5.4.12"
+#define szOID_RSA_unstructAddr "1.2.840.113549.1.9.8"
+#define szOID_RSA_unstructName "1.2.840.113549.1.9.2"
+#define szOID_BASIC_CONSTRAINTS2 	"2.5.29.19"
+
+typedef struct _CERT_BASIC_CONSTRAINTS2_INFO {
+  BOOL fCA;
+  BOOL fPathLenConstraint;
+  DWORD dwPathLenConstraint;
+} CERT_BASIC_CONSTRAINTS2_INFO, 
+ *PCERT_BASIC_CONSTRAINTS2_INFO;
+
+typedef VOID (WINAPI *PFN_CRYPT_FREE)(LPVOID pv);
+typedef LPVOID (WINAPI *PFN_CRYPT_ALLOC)(size_t cbsize);
+typedef struct _CRYPT_ENCODE_PARA {
+  DWORD cbSize;
+  PFN_CRYPT_ALLOC pfnAlloc;
+  PFN_CRYPT_FREE pfnFree;
+} CRYPT_ENCODE_PARA, 
+ *PCRYPT_ENCODE_PARA;
+
+
 typedef UINT ALG_ID;
 typedef struct _VTableProvStruc {FARPROC FuncVerifyImage;} VTableProvStruc,*PVTableProvStruc;
 typedef ULONG HCRYPTPROV;
@@ -648,6 +800,20 @@ BOOL WINAPI CertFreeCertificateContext(PCCERT_CONTEXT);
 PCCERT_CONTEXT WINAPI CertGetIssuerCertificateFromStore(HCERTSTORE,PCCERT_CONTEXT,PCCERT_CONTEXT,DWORD*);
 PCCERT_CHAIN_CONTEXT WINAPI CertFindChainInStore(HCERTSTORE,DWORD,DWORD,DWORD,const void*,PCCERT_CHAIN_CONTEXT);
 
+HCERTSTORE WINAPI CertDuplicateStore(HCERTSTORE);
+PCCERT_CONTEXT WINAPI CertEnumCertificatesInStore(HCERTSTORE,PCCERT_CONTEXT);
+PCCERT_CONTEXT WINAPI CertDuplicateCertificateContext(PCCERT_CONTEXT);
+DWORD WINAPI CertGetNameStringA(PCCERT_CONTEXT,DWORD,DWORD,void*,LPSTR,DWORD);
+DWORD WINAPI CertGetNameStringW(PCCERT_CONTEXT,DWORD,DWORD,void*,LPWSTR,DWORD);
+BOOL WINAPI PFXIsPFXBlob(CRYPT_DATA_BLOB*);
+PCERT_EXTENSION WINAPI CertFindExtension(LPCSTR,DWORD,CERT_EXTENSION*);
+BOOL WINAPI CryptDecodeObject(DWORD,LPCSTR,const BYTE*,DWORD,DWORD,void*,DWORD*);
+BOOL WINAPI CertAddCertificateContextToStore(HCERTSTORE,PCCERT_CONTEXT,DWORD,PCCERT_CONTEXT*);
+BOOL WINAPI CertCompareCertificate(DWORD,PCERT_INFO,PCERT_INFO);
+BOOL WINAPI PFXVerifyPassword(CRYPT_DATA_BLOB*,LPCWSTR,DWORD);
+HCERTSTORE WINAPI PFXImportCertStore(CRYPT_DATA_BLOB*,LPCWSTR,DWORD);
+BOOL WINAPI CertDeleteCertificateFromStore(PCCERT_CONTEXT);
+
 WINADVAPI BOOL WINAPI CryptAcquireContextA(HCRYPTPROV*,LPCSTR,LPCSTR,DWORD,DWORD);
 WINADVAPI BOOL WINAPI CryptAcquireContextW(HCRYPTPROV*,LPCWSTR,LPCWSTR,DWORD,DWORD);
 WINADVAPI  BOOL WINAPI CryptContextAddRef(HCRYPTPROV,DWORD*,DWORD);
@@ -682,6 +848,12 @@ WINADVAPI BOOL WINAPI CryptVerifySignatureA(HCRYPTHASH,PBYTE,DWORD,HCRYPTKEY,LPC
 WINADVAPI BOOL WINAPI CryptVerifySignatureW(HCRYPTHASH,PBYTE,DWORD,HCRYPTKEY,LPCWSTR,DWORD);
 WINADVAPI BOOL WINAPI CryptSetProviderA(LPCSTR,DWORD);
 WINADVAPI BOOL WINAPI CryptSetProviderW(LPCWSTR,DWORD);
+
+#ifdef UNICODE
+#define CertGetNameString CertGetNameStringW
+#else
+#define CertGetNameString CertGetNameStringA
+#endif
 
 #ifdef UNICODE
 #define CertNameToStr CertNameToStrW
