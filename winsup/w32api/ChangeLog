@@ -2,6 +2,14 @@
 
     * lib/uuid.c: Remove.
 
+2006-07-20  Elias Naur  <elias_naur@users.sourceforge.net>
+
+	* include/devguid.h: Add new file with missing GUID_DEVCLASS_*
+	declarations. They were extracted from the registry with a script.
+	* lib/devguid.c: Add new file with the implementation of the
+	missing GUIDs.
+	* lib/Makefile.in: Add devguid.c to UUID_SOURCES and UUID_OBJS.
+
 2006-07-19  Elias Naur  <elias_naur@users.sourceforge.net>
 
 	* include/winuser.h (WM_INPUT): Add missing Raw	Input
