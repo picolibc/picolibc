@@ -1,3 +1,7 @@
+2006-07-22  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+    * lib/uuid.c: Remove.
+
 2006-07-19  Elias Naur  <elias_naur@users.sourceforge.net>
 
 	* include/winuser.h (WM_INPUT): Add missing Raw	Input
