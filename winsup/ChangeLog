@@ -1,3 +1,9 @@
+2006-07-23  Christopher Faylor  <cgf@timesys.com>
+
+	* Makefile.in: Update copyright.  Fix 'check' target so that it will
+	once-again create a working testsuite directory.  Add a comment this
+	time to explain the unusual behavior.
+
 2006-05-24  Christopher Faylor  <cgf@timesys.com>
 
 	* configure.in: Update to newer autoconf.
@@ -53,7 +59,7 @@
 	gcc won't be able to find .exp files on other hosts.
 
 2003-07-18  Vaclav Haisman  <V.Haisman@sh.cvut.cz>
-  
+
 	* Makefile.common (CFLAGS_COMMON): Remove -march=i386.
 
 2003-07-01  Christopher Faylor  <cgf@redhat.com>
