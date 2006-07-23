@@ -1,3 +1,10 @@
+2006-07-23  Kazu Hirata  <kazu@codesourcery.com>
+
+	readline/
+	Backport from mainline:
+	* emacs_keymap.c: Add a MINGW32 hack.
+	* readline.c: Use _rl_bind_if_unbound to avoid macro bugs.
+
 2006-07-18  Nathan Sidwell  <nathan@codesourcery.com>
 
 	gdb/
