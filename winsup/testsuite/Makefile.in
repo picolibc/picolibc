@@ -1,5 +1,5 @@
 # Makefile.in for Cygwin's testsuite.
-# Copyright 2000, 2001, 2002, 2003 Red Hat, Inc.
+# Copyright 2000, 2001, 2002, 2003, 2005, 2006 Red Hat, Inc.
 #
 # This file is part of Cygwin.
 #
@@ -40,9 +40,6 @@ includedir:=@includedir@
 
 TESTSUP_INCLUDES:=-I$(libltp_srcdir)/include
 
-INSTALL:=@INSTALL@
-INSTALL_PROGRAM:=@INSTALL_PROGRAM@
-
 #
 # --enable options from configure
 #
@@ -55,15 +52,9 @@ ifneq (,$(CFLAGS))
 else
   CFLAGS:=@CFLAGS@ -MD $(TESTSUP_INCLUDES)
 endif
-CXXFLAGS:=@CXXFLAGS@
 
 AR:=@AR@
 AR_FLAGS:=qv
-RANLIB:=@RANLIB@
-LD:=@LD@
-DLLTOOL:=@DLLTOOL@
-WINDRES:=@WINDRES@
-AS:=@AS@
 
 #
 # Include common definitions for winsup directory
@@ -72,8 +63,6 @@ include $(srcdir)/../Makefile.common
 
 override CC:=$(CC) $(GCC_INCLUDE)
 export CC
-
-INSTALL_DATA:=$(SHELL) $(updir1)/install-sh -c
 
 RUNTESTFLAGS =
 
@@ -91,13 +80,10 @@ override COMPILE_CC:=${filter-out -O%,$(COMPILE_CC)}
 override CFLAGS:=${filter-out -O%,$(CFLAGS)}
 export CFLAGS
 
-.PHONY: all force dll_ofiles install all_target install_target all_host install_host
+.PHONY: all force dll_ofiles install all_target install_target install_host
 
 .SUFFIXES:
 .SUFFIXES: .c .cc .def .a .o .d
-
-all_host=@all_host@
-install_host=@install_host@
 
 all: $(TESTSUP_LIB_NAME)
 

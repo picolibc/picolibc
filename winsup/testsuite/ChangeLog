@@ -1,3 +1,7 @@
+2006-07-23  Christopher Faylor  <cgf@timesys.com>
+
+	* Makefile.in: Update copyrigh.  Remove unused stuff.
+
 2006-07-17  Christopher Faylor  <cgf@timesys.com>
 
 	* Makefile.in: Simplify a little.
