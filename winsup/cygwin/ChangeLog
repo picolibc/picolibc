@@ -1,3 +1,7 @@
+2006-07-23  Christopher Faylor  <cgf@timesys.com>
+
+	* include/cygwin/version.h: Bump DLL minor version number to 22.
+
 2006-07-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (class fhandler_socket): Rearrange slightly to keep

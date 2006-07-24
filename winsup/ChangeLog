@@ -1,4 +1,10 @@
-2006-06-14  Corinna Vinschen  <corinna@vinschen.de>
+2006-07-23  Christopher Faylor  <cgf@timesys.com>
+
+	* Makefile.in: Update copyright.  Fix 'check' target so that it will
+	once-again create a working testsuite directory.  Add a comment this
+	time to explain the unusual behavior.
+
+2006-07-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* configure.in: Reenable building the subauth subdir.
 	* configure: Regenerate.
@@ -58,7 +64,7 @@
 	gcc won't be able to find .exp files on other hosts.
 
 2003-07-18  Vaclav Haisman  <V.Haisman@sh.cvut.cz>
-  
+
 	* Makefile.common (CFLAGS_COMMON): Remove -march=i386.
 
 2003-07-01  Christopher Faylor  <cgf@redhat.com>

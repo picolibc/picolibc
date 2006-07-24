@@ -1,5 +1,6 @@
 # Makefile.in for windows stuff
-# Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
+# Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2006
+# Red Hat, Inc.
 #
 # This file is part of Cygwin.
 #
@@ -95,13 +96,17 @@ Makefile: Makefile.in $(srcdir)/configure.in config.status
 config.status: configure
 	$(SHELL) config.status --recheck
 
+# The below rule is intended to run configure only when "make check" is
+# actually specified, i.e., not in a cross-compilation environment.  The
+# cygwin configuration is copied and modified to ensure that the same configuration
+# parameters are passed when the testsuite is configured as when cygwin was configured.
 check: cygwin
 	@if [ -f testsuite/config.status ]; then \
 	    cd testsuite; \
 	else \
 	    (mkdir testsuite 2>/dev/null || exit 0); \
 	    cd testsuite; \
-	    sed -n -e '1,/^done/{' -e 's%winsup/cygwin\([ /]\)%winsup/testsuite\1%g; ' -e 'p; }'  ../cygwin/config.status > config.status; \
+	    sed -e 's%winsup/cygwin\>%winsup/testsuite%g' ../cygwin/config.status > config.status; \
 	    chmod a+x config.status; \
 	    sh ./config.status --recheck; \
 	    sh ./config.status; \
