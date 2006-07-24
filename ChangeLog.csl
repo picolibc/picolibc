@@ -1,5 +1,6 @@
 2006-07-24  Nathan Sidwell  <nathan@codesourcery.com>
 
+	Bug 844
 	libgloss/
 	* m68k/cf.sc: Set entry point to _start.
 	* m68k/crt0.X (_start): New name for entrypoint
