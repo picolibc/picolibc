@@ -1,3 +1,11 @@
+2006-07-24  Nathan Sidwell  <nathan@codesourcery.com>
+
+	gdb/testsuite/
+	* gdb.base/auxv.exp: Skip on non-linux, non-solaris targets.
+	* gdb.base/cursal.exp: Revert my 2006-06-09 change.  Use
+	gdb_file_cmd followed by gdb_load.
+	* gdb.base/dbx.exp: Revert my 2006-06-09 change.
+
 2006-07-23  Kazu Hirata  <kazu@codesourcery.com>
 
 	readline/
