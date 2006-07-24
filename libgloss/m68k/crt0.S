@@ -52,11 +52,17 @@ SYM (environ):
 	.extern _end
 
 /*
- * set things up so the application will run. This *must* be called start.
+ * Set things up so the application will run. For historical reasons
+ * this is called 'start'.  We set things up to provide '_start'
+ * as with other systems, but also provide a weak alias called
+ * 'start' for compatibility with existing linker scripts.
  */
 	.global SYM (start)
+	.weak SYM (start)
+	.set SYM (start),SYM(_start)
 
-SYM (start):
+	.global SYM (_start)
+SYM (_start):
 	/*
 	 * put any hardware init code here
 	 */

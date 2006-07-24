@@ -8,7 +8,7 @@
 cat <<EOF
 STARTUP(crt0.o)
 OUTPUT_ARCH(m68k)
-ENTRY(start)
+ENTRY(_start)
 SEARCH_DIR(.)
 GROUP(-lc -l${IO})
 __DYNAMIC  =  0;

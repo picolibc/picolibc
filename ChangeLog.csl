@@ -1,3 +1,10 @@
+2006-07-24  Nathan Sidwell  <nathan@codesourcery.com>
+
+	libgloss/
+	* m68k/cf.sc: Set entry point to _start.
+	* m68k/crt0.X (_start): New name for entrypoint
+	(start): Weak alias for start.
+
 2006-06-23  Mark Mitchell  <mark@codesourcery.com>
 
 	Issue #754
