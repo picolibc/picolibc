@@ -42,8 +42,8 @@ details. */
 	 the Cygwin shared library".  This version is used to track important
 	 changes to the DLL and is mainly informative in nature. */
 
-#define CYGWIN_VERSION_DLL_MAJOR 1005
-#define CYGWIN_VERSION_DLL_MINOR 22
+#define CYGWIN_VERSION_DLL_MAJOR 1007
+#define CYGWIN_VERSION_DLL_MINOR 0
 
       /* Major numbers before CYGWIN_VERSION_DLL_EPOCH are
 	 incompatible. */
@@ -289,12 +289,17 @@ details. */
       154: Export sigset, sigignore.
       155: Export __isinff, __isinfd, __isnanf, __isnand.
       156: Export __srbuf_r, __swget_r.
+      157: Export gai_strerror, getaddrinfo, getnameinfo, freeaddrinfo,
+	   in6addr_any, in6addr_loopback.
+      158: Export bindresvport, bindresvport_sa, iruserok_sa, rcmd_af,
+	   rresvport_af.
+      159: Export posix_openpt.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 156
+#define CYGWIN_VERSION_API_MINOR 159
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

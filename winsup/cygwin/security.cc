@@ -28,6 +28,7 @@ details. */
 #include <ntsecapi.h>
 #include <subauth.h>
 #include <aclapi.h>
+#include <dsgetdc.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -208,13 +209,21 @@ close_local_policy (LSA_HANDLE &lsa)
   lsa = INVALID_HANDLE_VALUE;
 }
 
+/* CV, 2006-07-06: Missing in w32api. */
+extern "C" DWORD WINAPI DsGetDcNameA (LPCSTR, LPCSTR, GUID *, LPCSTR, ULONG,
+				      PDOMAIN_CONTROLLER_INFOA *);
+#define DS_FORCE_REDISCOVERY	1
+
 bool
-get_logon_server (const char *domain, char *server, WCHAR *wserver)
+get_logon_server (const char *domain, char *server, WCHAR *wserver,
+		  bool rediscovery)
 {
-  WCHAR wdomain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-  NET_API_STATUS ret;
+  DWORD dret;
+  PDOMAIN_CONTROLLER_INFOA pci;
+  NET_API_STATUS nret;
   WCHAR *buf;
   DWORD size = INTERNET_MAX_HOST_NAME_LENGTH + 1;
+  WCHAR wdomain[size];
 
   /* Empty domain is interpreted as local system */
   if ((GetComputerName (server + 2, &size)) &&
@@ -226,18 +235,37 @@ get_logon_server (const char *domain, char *server, WCHAR *wserver)
       return true;
     }
 
-  /* Try to get the primary domain controller for the domain */
-  sys_mbstowcs (wdomain, domain, INTERNET_MAX_HOST_NAME_LENGTH + 1);
-  if ((ret = NetGetDCName (NULL, wdomain, (LPBYTE *) &buf)) == STATUS_SUCCESS)
+  /* Try to get any available domain controller for this domain */
+  dret = DsGetDcNameA (NULL, domain, NULL, NULL,
+		       rediscovery ? DS_FORCE_REDISCOVERY : 0, &pci);
+  if (dret == ERROR_SUCCESS)
     {
-      sys_wcstombs (server, INTERNET_MAX_HOST_NAME_LENGTH + 1, buf);
-      if (wserver)
-	for (WCHAR *ptr1 = buf; (*wserver++ = *ptr1++);)
-	  ;
-      NetApiBufferFree (buf);
+      strcpy (server, pci->DomainControllerName);
+      sys_mbstowcs (wserver, server, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+      NetApiBufferFree (pci);
+      debug_printf ("DC: rediscovery: %d, server: %s", rediscovery, server);
       return true;
     }
-  __seterrno_from_win_error (ret);
+  else if (dret == ERROR_PROC_NOT_FOUND)
+    {
+      /* NT4 w/o DSClient */
+      sys_mbstowcs (wdomain, domain, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+      if (rediscovery)
+        nret = NetGetAnyDCName (NULL, wdomain, (LPBYTE *) &buf);
+      else
+	nret = NetGetDCName (NULL, wdomain, (LPBYTE *) &buf);
+      if (nret == NERR_Success)
+	{
+	  sys_wcstombs (server, INTERNET_MAX_HOST_NAME_LENGTH + 1, buf);
+	  if (wserver)
+	    for (WCHAR *ptr1 = buf; (*wserver++ = *ptr1++);)
+	      ;
+	  NetApiBufferFree (buf);
+	  debug_printf ("NT: rediscovery: %d, server: %s", rediscovery, server);
+	  return true;
+	}
+    }
+  __seterrno_from_win_error (nret);
   return false;
 }
 
@@ -473,7 +501,11 @@ get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps,
 	grp_list += well_known_network_sid;
       if (sid_in_token_groups (my_grps, well_known_batch_sid))
 	grp_list += well_known_batch_sid;
-      if (sid_in_token_groups (my_grps, well_known_interactive_sid))
+      /* This is a problem on 2K3 (only domain controllers?!?) which only
+         enables tools for selected special groups.  A subauth token is
+	 only NETWORK, but NETWORK has no access to these tools.  Therefore
+	 we always add INTERACTIVE here. */
+      /*if (sid_in_token_groups (my_grps, well_known_interactive_sid))*/
 	grp_list += well_known_interactive_sid;
       if (sid_in_token_groups (my_grps, well_known_service_sid))
 	grp_list += well_known_service_sid;
@@ -485,11 +517,13 @@ get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps,
     }
   if (get_ll (auth_luid) != 999LL) /* != SYSTEM_LUID */
     {
-      char buf[64];
-      __small_sprintf (buf, "S-1-5-5-%u-%u", auth_luid.HighPart,
-		       auth_luid.LowPart);
-      grp_list += buf;
-      auth_pos = grp_list.count - 1;
+      for (DWORD i = 0; i < my_grps->GroupCount; ++i)
+	if (my_grps->Groups[i].Attributes & SE_GROUP_LOGON_ID)
+	  {
+	    grp_list += my_grps->Groups[i].Sid;
+	    auth_pos = grp_list.count - 1;
+	    break;
+	  }
     }
 }
 
@@ -511,7 +545,9 @@ get_server_groups (cygsidlist &grp_list, PSID usersid, struct passwd *pw)
   grp_list += well_known_world_sid;
   grp_list += well_known_authenticated_users_sid;
   extract_nt_dom_user (pw, domain, user);
-  if (get_logon_server (domain, server, wserver))
+  if (get_logon_server (domain, server, wserver, false)
+      && !get_user_groups (wserver, grp_list, user, domain)
+      && get_logon_server (domain, server, wserver, true))
     get_user_groups (wserver, grp_list, user, domain);
   get_unix_group_sidlist (pw, grp_list);
   return get_user_local_groups (grp_list, usersid);
@@ -780,7 +816,8 @@ done:
 }
 
 HANDLE
-create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
+create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw,
+	      HANDLE subauth_token)
 {
   NTSTATUS ret;
   LSA_HANDLE lsa = INVALID_HANDLE_VALUE;
@@ -803,7 +840,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   TOKEN_STATISTICS stats;
   memcpy (source.SourceName, "Cygwin.1", 8);
   source.SourceIdentifier.HighPart = 0;
-  source.SourceIdentifier.LowPart = 0x0101;
+  source.SourceIdentifier.LowPart = (subauth_token ? 0x0102 : 0x0101);
 
   HANDLE token = INVALID_HANDLE_VALUE;
   HANDLE primary_token = INVALID_HANDLE_VALUE;
@@ -824,33 +861,60 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   owner.Owner = usersid;
 
   /* Retrieve authentication id and group list from own process. */
-  if (hProcToken)
+  HANDLE get_token;
+  if (subauth_token)
+    {
+      debug_printf ("get_token = subauth_token");
+      get_token = subauth_token;
+    }
+  else
+    {
+      debug_printf ("get_token = hProcToken");
+      get_token = hProcToken;
+    }
+  if (get_token)
     {
       /* Switching user context to SYSTEM doesn't inherit the authentication
 	 id of the user account running current process. */
       if (usersid != well_known_system_sid)
-	if (!GetTokenInformation (hProcToken, TokenStatistics,
+	if (!GetTokenInformation (get_token, TokenStatistics,
 				  &stats, sizeof stats, &size))
 	  debug_printf
-	    ("GetTokenInformation(hProcToken, TokenStatistics), %E");
+	    ("GetTokenInformation(get_token, TokenStatistics), %E");
 	else
 	  auth_luid = stats.AuthenticationId;
 
       /* Retrieving current processes group list to be able to inherit
 	 some important well known group sids. */
-      if (!GetTokenInformation (hProcToken, TokenGroups, NULL, 0, &size) &&
-	  GetLastError () != ERROR_INSUFFICIENT_BUFFER)
-	debug_printf ("GetTokenInformation(hProcToken, TokenGroups), %E");
+      if (!GetTokenInformation (get_token, TokenGroups, NULL, 0, &size)
+	  && GetLastError () != ERROR_INSUFFICIENT_BUFFER)
+	debug_printf ("GetTokenInformation(get_token, TokenGroups), %E");
       else if (!(my_tok_gsids = (PTOKEN_GROUPS) malloc (size)))
 	debug_printf ("malloc (my_tok_gsids) failed.");
-      else if (!GetTokenInformation (hProcToken, TokenGroups, my_tok_gsids,
+      else if (!GetTokenInformation (get_token, TokenGroups, my_tok_gsids,
 				     size, &size))
 	{
-	  debug_printf ("GetTokenInformation(hProcToken, TokenGroups), %E");
+	  debug_printf ("GetTokenInformation(get_token, TokenGroups), %E");
 	  free (my_tok_gsids);
 	  my_tok_gsids = NULL;
 	}
     }
+  if (subauth_token)
+    {
+      if (!GetTokenInformation (subauth_token, TokenPrivileges, NULL, 0, &size)
+	  && GetLastError () != ERROR_INSUFFICIENT_BUFFER)
+	debug_printf ("GetTokenInformation(subauth_token, TokenPrivileges), %E");
+      else if (!(privs = (PTOKEN_PRIVILEGES) malloc (size)))
+	debug_printf ("malloc (privs) failed.");
+      else if (!GetTokenInformation (subauth_token, TokenPrivileges, privs,
+				     size, &size))
+	{
+	  debug_printf ("GetTokenInformation(subauth_token, TokenPrivileges), %E");
+	  free (privs);
+	  privs = NULL;
+	}
+    }
+    
 
   /* Create list of groups, the user is member in. */
   int auth_pos;
@@ -878,7 +942,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
     new_tok_gsids->Groups[auth_pos].Attributes |= SE_GROUP_LOGON_ID;
 
   /* Retrieve list of privileges of that user. */
-  if (!(privs = get_priv_list (lsa, usersid, tmp_gsids)))
+  if (!privs && !(privs = get_priv_list (lsa, usersid, tmp_gsids)))
     goto out;
 
   /* Let's be heroic... */
@@ -1299,7 +1363,7 @@ get_reg_security (HANDLE handle, security_descriptor &sd_ret)
 				 | OWNER_SECURITY_INFORMATION,
 				 sd_ret, &len);
     }
-  if (ret != STATUS_SUCCESS)
+  if (ret != ERROR_SUCCESS)
     {
       __seterrno ();
       return -1;

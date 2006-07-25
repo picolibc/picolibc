@@ -11,6 +11,8 @@ __cygwin_user_data DATA
 _daylight DATA
 h_errno DATA
 _impure_ptr DATA
+in6addr_any DATA
+in6addr_loopback DATA
 __mb_cur_max DATA
 optarg DATA
 opterr DATA
@@ -145,6 +147,8 @@ _bcmp = bcmp NOSIGFE
 bcopy NOSIGFE
 _bcopy = bcopy NOSIGFE
 bind = cygwin_bind SIGFE
+bindresvport = cygwin_bindresvport SIGFE
+bindresvport_sa = cygwin_bindresvport_sa SIGFE
 bsearch NOSIGFE
 _bsearch = bsearch NOSIGFE
 btowc NOSIGFE
@@ -471,6 +475,7 @@ fread SIGFE
 _fread = fread SIGFE
 free SIGFE
 _free = free SIGFE
+freeaddrinfo = cygwin_freeaddrinfo SIGFE
 freopen SIGFE
 _freopen = freopen SIGFE
 _freopen64 = freopen64 SIGFE
@@ -524,6 +529,7 @@ funlockfile SIGFE
 futimes SIGFE
 fwrite SIGFE
 _fwrite = fwrite SIGFE
+gai_strerror = cygwin_gai_strerror NOSIGFE
 gamma NOSIGFE
 _gamma = gamma NOSIGFE
 gamma_r NOSIGFE
@@ -538,6 +544,7 @@ gcvtf SIGFE
 _gcvtf = gcvtf SIGFE
 get_osfhandle SIGFE
 _get_osfhandle = get_osfhandle SIGFE
+getaddrinfo = cygwin_getaddrinfo SIGFE
 getc SIGFE
 _getc = getc SIGFE
 getc_unlocked SIGFE
@@ -594,6 +601,7 @@ getmntent SIGFE
 _getmntent = getmntent SIGFE
 getmode SIGFE
 _getmode = getmode SIGFE
+getnameinfo = cygwin_getnameinfo SIGFE
 getopt SIGFE
 getopt_long SIGFE
 getopt_long_only SIGFE
@@ -714,6 +722,7 @@ _ioctl = ioctl SIGFE
 iprintf SIGFE
 _iprintf = iprintf SIGFE
 iruserok SIGFE
+iruserok_sa SIGFE
 isalnum NOSIGFE
 _isalnum = isalnum NOSIGFE
 isalpha NOSIGFE
@@ -967,6 +976,7 @@ poll SIGFE
 _poll = poll SIGFE
 popen SIGFE
 _popen = popen SIGFE
+posix_openpt SIGFE
 posix_regcomp SIGFE
 posix_regerror SIGFE
 posix_regexec SIGFE
@@ -1086,6 +1096,7 @@ _rand = rand NOSIGFE
 rand_r NOSIGFE
 random NOSIGFE
 rcmd = cygwin_rcmd SIGFE
+rcmd_af = cygwin_rcmd_af SIGFE
 read SIGFE
 _read = read SIGFE
 readdir SIGFE
@@ -1128,6 +1139,7 @@ _rmdir = rmdir SIGFE
 round NOSIGFE
 roundf NOSIGFE
 rresvport = cygwin_rresvport SIGFE
+rresvport_af = cygwin_rresvport_af SIGFE
 ruserok SIGFE
 sbrk SIGFE
 _sbrk = sbrk SIGFE

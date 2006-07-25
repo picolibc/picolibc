@@ -133,11 +133,11 @@ DLL_OFILES:=assert.o autoload.o bsdlib.o ctype.o cxx.o cygheap.o cygthread.o \
 	fhandler_serial.o fhandler_socket.o fhandler_tape.o fhandler_termios.o \
 	fhandler_tty.o fhandler_virtual.o fhandler_windows.o fhandler_zero.o \
 	flock.o fnmatch.o fork.o fts.o ftw.o getopt.o glob.o grp.o heap.o \
-	hookapi.o inet_addr.o inet_network.o init.o ioctl.o ipc.o iruserok.o \
-	localtime.o lsearch.o malloc_wrapper.o memmem.o miscfuncs.o mktemp.o \
-	mmap.o msg.o net.o netdb.o nftw.o ntea.o passwd.o path.o pinfo.o pipe.o \
-	poll.o pthread.o regcomp.o regerror.o regexec.o regfree.o registry.o \
-	resource.o rexec.o scandir.o sched.o sec_acl.o sec_helper.o security.o \
+	hookapi.o inet_addr.o inet_network.o init.o ioctl.o ipc.o localtime.o \
+	lsearch.o malloc_wrapper.o memmem.o miscfuncs.o mktemp.o mmap.o msg.o \
+	net.o netdb.o nftw.o ntea.o passwd.o path.o pinfo.o pipe.o poll.o \
+	pthread.o regcomp.o regerror.o regexec.o regfree.o registry.o resource.o \
+	rexec.o rcmd.o scandir.o sched.o sec_acl.o sec_helper.o security.o \
 	select.o sem.o shared.o shm.o sigfe.o signal.o sigproc.o smallprint.o \
 	spawn.o strace.o strptime.o strsep.o strsig.o sync.o syscalls.o \
 	sysconf.o syslog.o termios.o thread.o timelocal.o timer.o times.o tty.o \

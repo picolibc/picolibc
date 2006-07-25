@@ -30,7 +30,6 @@ details. */
 #define USE_SYS_TYPES_FD_SET
 #include <winsock.h>
 #include "cygerrno.h"
-#include "select.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
@@ -1260,105 +1259,69 @@ fhandler_base::select_except (select_record *s)
   return s;
 }
 
-struct socketinf
-  {
-    cygthread *thread;
-    winsock_fd_set readfds, writefds, exceptfds;
-    SOCKET exitsock;
-    select_record *start;
-  };
-
 static int
 peek_socket (select_record *me, bool)
 {
-  winsock_fd_set ws_readfds, ws_writefds, ws_exceptfds;
-  struct timeval tv = {0, 0};
-  WINSOCK_FD_ZERO (&ws_readfds);
-  WINSOCK_FD_ZERO (&ws_writefds);
-  WINSOCK_FD_ZERO (&ws_exceptfds);
-
-  HANDLE h;
-  set_handle_or_return_if_not_open (h, me);
-  select_printf ("considering handle %p", h);
-
-  if (me->read_selected && !me->read_ready)
+  fhandler_socket *fh = (fhandler_socket *) me->fh;
+  long events;
+  long evt_mask = (FD_CLOSE
+		   | (me->read_selected ? (FD_READ | FD_ACCEPT) : 0)
+		   | (me->write_selected ? (FD_WRITE | FD_CONNECT) : 0)
+		   | (me->except_selected ? (FD_OOB | FD_CONNECT) : 0));
+  int ret = fh->evaluate_events (evt_mask, events, false);
+  if (me->read_selected)
+    me->read_ready |= !!(events & (FD_READ | FD_ACCEPT | FD_CLOSE));
+  if (me->write_selected)
     {
-      select_printf ("adding read fd_set %s, fd %d", me->fh->get_name (),
-		     me->fd);
-      WINSOCK_FD_SET (h, &ws_readfds);
-    }
-  if (me->write_selected && !me->write_ready)
-    {
-      select_printf ("adding write fd_set %s, fd %d", me->fh->get_name (),
-		     me->fd);
-      WINSOCK_FD_SET (h, &ws_writefds);
-    }
-  if ((me->except_selected || me->except_on_write) && !me->except_ready)
-    {
-      select_printf ("adding except fd_set %s, fd %d", me->fh->get_name (),
-		     me->fd);
-      WINSOCK_FD_SET (h, &ws_exceptfds);
-    }
-  int r;
-  if ((me->read_selected && !me->read_ready)
-      || (me->write_selected && !me->write_ready)
-      || ((me->except_selected || me->except_on_write) && !me->except_ready))
-    {
-      r = WINSOCK_SELECT (0, &ws_readfds, &ws_writefds, &ws_exceptfds, &tv);
-      select_printf ("WINSOCK_SELECT returned %d", r);
-      if (r == -1)
-	{
-	  select_printf ("error %d", WSAGetLastError ());
-	  set_winsock_errno ();
-	  return 0;
-	}
-      if (WINSOCK_FD_ISSET (h, &ws_readfds))
-	me->read_ready = true;
-      if (WINSOCK_FD_ISSET (h, &ws_writefds))
+      if ((events & FD_CONNECT) && !ret)
 	me->write_ready = true;
-      if (WINSOCK_FD_ISSET (h, &ws_exceptfds))
-	me->except_ready = true;
+      else
+	me->write_ready |= !!(events & (FD_WRITE | FD_CLOSE));
     }
+  if (me->except_selected)
+    me->except_ready |= ret || !!(events & (FD_OOB | FD_CLOSE));
+
   return me->read_ready || me->write_ready || me->except_ready;
 }
 
 static int start_thread_socket (select_record *, select_stuff *);
 
+struct socketinf
+  {
+    cygthread *thread;
+    int num_w4;
+    HANDLE w4[MAXIMUM_WAIT_OBJECTS];
+    select_record *start;
+  };
+
 static DWORD WINAPI
 thread_socket (void *arg)
 {
   socketinf *si = (socketinf *) arg;
+  bool event = false;
 
-  select_printf ("stuff_start %p", &si->start);
-  int r = WINSOCK_SELECT (0, &si->readfds, &si->writefds, &si->exceptfds, NULL);
-  select_printf ("Win32 select returned %d", r);
-  if (r == -1)
-    select_printf ("error %d", WSAGetLastError ());
-  select_record *s = si->start;
-  while ((s = s->next))
-    if (s->startup == start_thread_socket)
-	{
-	  HANDLE h = s->fh->get_handle ();
-	  select_printf ("s %p, testing fd %d (%s)", s, s->fd, s->fh->get_name ());
-	  if (WINSOCK_FD_ISSET (h, &si->readfds))
+  select_printf ("stuff_start %p", si->start);
+  while (!event)
+    {
+      for (select_record *s = si->start; (s = s->next); )
+	if (s->startup == start_thread_socket)
+	  if (peek_socket (s, false))
+	    event = true;
+      if (!event)
+        {
+	  switch (WaitForMultipleObjects (si->num_w4, si->w4, FALSE, 50))
 	    {
-	      select_printf ("read_ready");
-	      s->read_ready = true;
-	    }
-	  if (WINSOCK_FD_ISSET (h, &si->writefds))
-	    {
-	      select_printf ("write_ready");
-	      s->write_ready = true;
-	    }
-	  if (WINSOCK_FD_ISSET (h, &si->exceptfds))
-	    {
-	      select_printf ("except_ready");
-	      s->except_ready = true;
+	    case WAIT_OBJECT_0:
+	    case WAIT_FAILED:
+	      goto out;
+	    case WAIT_TIMEOUT:
+	    default:
+	      break;
 	    }
 	}
-
-  if (WINSOCK_FD_ISSET (si->exitsock, &si->readfds))
-    select_printf ("saw exitsock read");
+    }
+out:
+  select_printf ("leaving thread_socket");
   return 0;
 }
 
@@ -1374,68 +1337,29 @@ start_thread_socket (select_record *me, select_stuff *stuff)
     }
 
   si = new socketinf;
-  WINSOCK_FD_ZERO (&si->readfds);
-  WINSOCK_FD_ZERO (&si->writefds);
-  WINSOCK_FD_ZERO (&si->exceptfds);
   select_record *s = &stuff->start;
+  if (_my_tls.locals.select_sockevt != INVALID_HANDLE_VALUE)
+    si->w4[0] = _my_tls.locals.select_sockevt;
+  else if (!(si->w4[0] = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL)))
+    return 1;
+  else
+    _my_tls.locals.select_sockevt = si->w4[0];
+  si->num_w4 = 1;
   while ((s = s->next))
     if (s->startup == start_thread_socket)
       {
-	HANDLE h = s->fh->get_handle ();
-	select_printf ("Handle %p", h);
-	if (s->read_selected && !s->read_ready)
-	  {
-	    WINSOCK_FD_SET (h, &si->readfds);
-	    select_printf ("Added to readfds");
-	  }
-	if (s->write_selected && !s->write_ready)
-	  {
-	    WINSOCK_FD_SET (h, &si->writefds);
-	    select_printf ("Added to writefds");
-	  }
-	if ((s->except_selected || s->except_on_write) && !s->except_ready)
-	  {
-	    WINSOCK_FD_SET (h, &si->exceptfds);
-	    select_printf ("Added to exceptfds");
-	  }
+	HANDLE evt = ((fhandler_socket *) me->fh)->wsock_evt;
+	/* No event/socket should show up multiple times. */
+	for (int i = 1; i < si->num_w4; ++i)
+	  if (si->w4[i] == evt)
+	    goto continue_outer_loop;
+	if (si->num_w4 < MAXIMUM_WAIT_OBJECTS)
+	  si->w4[si->num_w4++] = evt;
+	else /* for now */
+	  goto err;
+      continue_outer_loop:
+	;
       }
-
-  if (_my_tls.locals.exitsock != INVALID_SOCKET)
-    si->exitsock = _my_tls.locals.exitsock;
-  else
-    {
-      si->exitsock = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-      if (si->exitsock == INVALID_SOCKET)
-	{
-	  set_winsock_errno ();
-	  select_printf ("cannot create socket, %E");
-	  return 0;
-	}
-      int sin_len = sizeof (_my_tls.locals.exitsock_sin);
-      memset (&_my_tls.locals.exitsock_sin, 0, sin_len);
-      _my_tls.locals.exitsock_sin.sin_family = AF_INET;
-      _my_tls.locals.exitsock_sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-      if (bind (si->exitsock, (struct sockaddr *) &_my_tls.locals.exitsock_sin, sin_len) < 0)
-	{
-	  select_printf ("cannot bind socket %p, %E", si->exitsock);
-	  goto err;
-	}
-
-      if (getsockname (si->exitsock, (struct sockaddr *) &_my_tls.locals.exitsock_sin, &sin_len) < 0)
-	{
-	  select_printf ("getsockname error");
-	  goto err;
-	}
-      if (wincap.has_set_handle_information ())
-	SetHandleInformation ((HANDLE) si->exitsock, HANDLE_FLAG_INHERIT, 0);
-      /* else
-	   too bad? */
-      select_printf ("opened new socket %p", si->exitsock);
-      _my_tls.locals.exitsock = si->exitsock;
-    }
-
-  select_printf ("exitsock %p", si->exitsock);
-  WINSOCK_FD_SET ((HANDLE) si->exitsock, &si->readfds);
   stuff->device_specific_socket = (void *) si;
   si->start = &stuff->start;
   select_printf ("stuff_start %p", &stuff->start);
@@ -1444,8 +1368,7 @@ start_thread_socket (select_record *me, select_stuff *stuff)
   return 1;
 
 err:
-  set_winsock_errno ();
-  closesocket (si->exitsock);
+  CloseHandle (si->w4[0]);
   return 0;
 }
 
@@ -1456,17 +1379,10 @@ socket_cleanup (select_record *, select_stuff *stuff)
   select_printf ("si %p si->thread %p", si, si ? si->thread : NULL);
   if (si && si->thread)
     {
-      char buf[] = "";
-      int res = sendto (_my_tls.locals.exitsock, buf, 1, 0,
-			(sockaddr *) &_my_tls.locals.exitsock_sin,
-			sizeof (_my_tls.locals.exitsock_sin));
-      select_printf ("sent a byte to exitsock %p, res %d", _my_tls.locals.exitsock, res);
+      SetEvent (si->w4[0]);
       /* Wait for thread to go away */
       si->thread->detach ();
-      /* empty the socket */
-      select_printf ("reading a byte from exitsock %p", si->exitsock);
-      res = recv (si->exitsock, buf, 1, 0);
-      select_printf ("recv returned %d", res);
+      ResetEvent (si->w4[0]);
       stuff->device_specific_socket = NULL;
       delete si;
     }

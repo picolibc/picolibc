@@ -378,12 +378,24 @@ class fhandler_mailslot : public fhandler_base
   select_record *select_read (select_record *s);
 };
 
+struct wsa_event;
+
 class fhandler_socket: public fhandler_base
 {
  private:
   int addr_family;
   int type;
   int connect_secret[4];
+
+  wsa_event *wsock_events;
+  HANDLE wsock_mtx;
+ public:
+  HANDLE wsock_evt;
+  bool init_events ();
+  int evaluate_events (const long event_mask, long &events, bool erase);
+ private:
+  int wait_for_events (const long event_mask);
+  void release_events ();
 
   pid_t     sec_pid;
   __uid32_t sec_uid;
@@ -414,19 +426,14 @@ class fhandler_socket: public fhandler_base
     unsigned saw_shutdown_read     : 1; /* Socket saw a SHUT_RD */
     unsigned saw_shutdown_write    : 1; /* Socket saw a SHUT_WR */
     unsigned saw_reuseaddr         : 1; /* Socket saw SO_REUSEADDR call */
-    unsigned closed		   : 1;
-    unsigned owner		   : 1;
+    unsigned listener              : 1; /* listen called */
     unsigned connect_state         : 2;
    public:
     status_flags () :
       async_io (0), saw_shutdown_read (0), saw_shutdown_write (0),
-      closed (0), owner (0), connect_state (unconnected)
+      listener (0), connect_state (unconnected)
       {}
   } status;
-
-  bool prepare (HANDLE &event, long event_mask);
-  int wait (HANDLE event, int flags, DWORD timeout = 10);
-  void release (HANDLE event);
 
  public:
   fhandler_socket ();
@@ -438,8 +445,7 @@ class fhandler_socket: public fhandler_base
   IMPLEMENT_STATUS_FLAG (bool, saw_shutdown_read)
   IMPLEMENT_STATUS_FLAG (bool, saw_shutdown_write)
   IMPLEMENT_STATUS_FLAG (bool, saw_reuseaddr)
-  IMPLEMENT_STATUS_FLAG (bool, closed)
-  IMPLEMENT_STATUS_FLAG (bool, owner)
+  IMPLEMENT_STATUS_FLAG (bool, listener)
   IMPLEMENT_STATUS_FLAG (conn_state, connect_state)
 
   int bind (const struct sockaddr *name, int namelen);
@@ -452,14 +458,19 @@ class fhandler_socket: public fhandler_base
 
   int open (int flags, mode_t mode = 0);
   ssize_t readv (const struct iovec *, int iovcnt, ssize_t tot = -1);
-  int recvfrom (void *ptr, size_t len, int flags,
-		struct sockaddr *from, int *fromlen);
-  int recvmsg (struct msghdr *msg, int flags, ssize_t tot = -1);
+  inline ssize_t recv_internal (struct _WSABUF *wsabuf, DWORD wsacnt,
+  				DWORD flags,
+				struct sockaddr *from, int *fromlen);
+  ssize_t recvfrom (void *ptr, size_t len, int flags,
+		    struct sockaddr *from, int *fromlen);
+  ssize_t recvmsg (struct msghdr *msg, int flags, ssize_t tot = -1);
 
   ssize_t writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
-  int sendto (const void *ptr, size_t len, int flags,
+  inline ssize_t send_internal (struct _WSABUF *wsabuf, DWORD wsacnt, int flags,
+				const struct sockaddr *to, int tolen);
+  ssize_t sendto (const void *ptr, size_t len, int flags,
 	      const struct sockaddr *to, int tolen);
-  int sendmsg (const struct msghdr *msg, int flags, ssize_t tot = -1);
+  ssize_t sendmsg (const struct msghdr *msg, int flags, ssize_t tot = -1);
 
   int ioctl (unsigned int cmd, void *);
   int fcntl (int cmd, void *);

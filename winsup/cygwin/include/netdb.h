@@ -63,6 +63,9 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
+#include <cygwin/socket.h>
+
 /*
  * Structures returned by network data base library.  All addresses are
  * supplied in host order, and returned in network order (suitable for
@@ -88,7 +91,7 @@ struct	netent {
 	char		*n_name;	/* official name of net */
 	char		**n_aliases;	/* alias list */
 	short		n_addrtype;	/* net address type */
-	unsigned long	n_net;		/* network # */
+	uint32_t	n_net;		/* network # */
 };
 
 struct	servent {
@@ -111,6 +114,17 @@ struct rpcent {
 	int	r_number;	/* rpc program number */
 };
 
+struct addrinfo {
+  int             ai_flags;		/* input flags */
+  int             ai_family;		/* address family of socket */
+  int             ai_socktype;		/* socket type */
+  int             ai_protocol;		/* ai_protocol */
+  socklen_t       ai_addrlen;		/* length of socket address */
+  char            *ai_canonname;	/* canonical name of service location */
+  struct sockaddr *ai_addr;		/* socket address of socket */
+  struct addrinfo *ai_next;		/* pointer to next in list */
+};
+
 /*
  * Error return codes from gethostbyname() and gethostbyaddr()
  * (left in extern int h_errno).
@@ -129,6 +143,45 @@ extern __declspec(dllimport) int h_errno;
 #define	NO_RECOVERY	3 /* Non recoverable errors, FORMERR, REFUSED, NOTIMP */
 #define	NO_DATA		4 /* Valid name, no data record of requested type */
 #define	NO_ADDRESS	NO_DATA		/* no address, look for MX record */
+
+#define AI_PASSIVE      1
+#define AI_CANONNAME    2
+#define AI_NUMERICHOST  4
+/*
+ * These are not available in the WinSock implementation.  It wouldn't make
+ * sense to support them in the ipv4 only case, so we drop them entirely.
+ * We can define them if we run into problems but they are non-functional, so...
+ */
+#if 0
+#define AI_V4MAPPED     16
+#define AI_ALL          32
+#define AI_ADDRCONFIG   64
+#endif
+
+#define NI_NOFQDN       1
+#define NI_NUMERICHOST  2
+#define NI_NAMEREQD     4
+#define NI_NUMERICSERV  8
+#define NI_DGRAM        16
+
+#define NI_MAXHOST      1025
+#define NI_MAXSERV      32
+
+#define EAI_ADDRFAMILY  1
+#define EAI_AGAIN       2
+#define EAI_BADFLAGS    3
+#define EAI_FAIL        4
+#define EAI_FAMILY      5
+#define EAI_MEMORY      6
+#define EAI_NODATA      7
+#define EAI_NONAME      8
+#define EAI_SERVICE     9
+#define EAI_SOCKTYPE    10
+#define EAI_SYSTEM      11
+#define EAI_BADHINTS    12
+#define EAI_PROTOCOL    13
+
+#define EAI_MAX		14
 
 #ifndef __INSIDE_CYGWIN_NET__
 void		endhostent (void);
@@ -158,6 +211,24 @@ void		setnetent (int);
 void		setprotoent (int);
 void		setservent (int);
 void		setrpcent (int);
+void		freeaddrinfo (struct addrinfo *);
+const char	*gai_strerror (int);
+int		getaddrinfo (const char *, const char *,
+			     const struct addrinfo *, struct addrinfo **);
+int		getnameinfo (const struct sockaddr *, socklen_t, char *,
+			     socklen_t, char *, socklen_t, int);
+
+int		rcmd (char **, uint16_t, const char *, const char *,
+		      const char *, int *);
+int		rcmd_af (char **, uint16_t, const char *, const char *,
+			 const char *, int *, int);
+int		rexec (char **, uint16_t rport, char *, char *, char *, int *);
+int		rresvport (int *);
+int		rresvport_af (int *, int);
+int		iruserok (unsigned long, int, const char *, const char *);
+int		iruserok_sa (const void *, int, int, const char *,
+			     const char *);
+int		ruserok (const char *, int, const char *, const char *);
 #endif
 
 #ifdef __cplusplus

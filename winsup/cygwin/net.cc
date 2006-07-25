@@ -40,6 +40,7 @@ details. */
 #include "pinfo.h"
 #include "registry.h"
 #include "cygtls.h"
+#include "cygwin/in6.h"
 
 extern "C"
 {
@@ -51,6 +52,9 @@ extern "C"
   int cygwin_inet_aton(const char *, struct in_addr *);
   const char *cygwin_inet_ntop (int, const void *, char *, socklen_t);
 }				/* End of "C" section */
+
+const struct in6_addr in6addr_any = IN6ADDR_ANY_INIT;
+const struct in6_addr in6addr_loopback = IN6ADDR_LOOPBACK_INIT;
 
 static fhandler_socket *
 get (const int fd)
@@ -509,6 +513,8 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
   if (!fd.isopen ())
     return false;
   fd->set_io_handle ((HANDLE) soc);
+  if (!((fhandler_socket *) fd)->init_events ())
+    return false;
   fd->set_flags (O_RDWR | O_BINARY);
   fd->uninterruptible_io (true);
   cygheap->fdtab.inc_need_fixup_before ();
@@ -545,7 +551,8 @@ cygwin_socket (int af, int type, int protocol)
 
   debug_printf ("socket (%d, %d, %d)", af, type, protocol);
 
-  soc = socket (AF_INET, type, af == AF_LOCAL ? 0 : protocol);
+  soc = socket (af == AF_LOCAL ? AF_INET : af, type,
+  		af == AF_LOCAL ? 0 : protocol);
 
   if (soc == INVALID_SOCKET)
     {
@@ -555,10 +562,10 @@ cygwin_socket (int af, int type, int protocol)
 
   const device *dev;
 
-  if (af == AF_INET)
-    dev = type == SOCK_STREAM ? tcp_dev : udp_dev;
-  else
+  if (af == AF_LOCAL)
     dev = type == SOCK_STREAM ? stream_dev : dgram_dev;
+  else
+    dev = type == SOCK_STREAM ? tcp_dev : udp_dev;
 
   {
     cygheap_fdnew fd;
@@ -771,56 +778,7 @@ cygwin_connect (int fd, const struct sockaddr *name, socklen_t namelen)
   if (efault.faulted (EFAULT) || !fh)
     res = -1;
   else
-    {
-      bool was_blocking = false;
-      if (!fh->is_nonblocking ())
-	{
-	  int nonblocking = 1;
-	  fh->ioctl (FIONBIO, &nonblocking);
-	  was_blocking = true;
-	}
-      res = fh->connect (name, namelen);
-      if (was_blocking)
-	{
-	  if (res == -1 && get_errno () == EINPROGRESS)
-	    {
-	      size_t fds_size = howmany (fd + 1, NFDBITS) * sizeof (fd_mask);
-	      fd_set *write_fds = (fd_set *) alloca (fds_size);
-	      fd_set *except_fds = (fd_set *) alloca (fds_size);
-	      memset (write_fds, 0, fds_size);
-	      memset (except_fds, 0, fds_size);
-	      FD_SET (fd, write_fds);
-	      FD_SET (fd, except_fds);
-	      res = cygwin_select (fd + 1, NULL, write_fds, except_fds, NULL);
-	      if (res > 0 && FD_ISSET (fd, except_fds))
-		{
-		  res = -1;
-		  for (;;)
-		    {
-		      int err;
-		      int len = sizeof err;
-		      cygwin_getsockopt (fd, SOL_SOCKET, SO_ERROR,
-					 (void *) &err, &len);
-		      if (err)
-			{
-			  set_errno (err);
-			  break;
-			}
-		      low_priority_sleep (0);
-		    }
-		}
-	      else if (res > 0)
-		res = 0;
-	      else
-		{
-		  WSASetLastError (WSAEINPROGRESS);
-		  set_winsock_errno ();
-		}
-	    }
-	  int nonblocking = 0;
-	  fh->ioctl (FIONBIO, &nonblocking);
-	}
-    }
+    res = fh->connect (name, namelen);
 
   syscall_printf ("%d = connect (%d, %p, %d)", res, fd, name, namelen);
 
@@ -954,19 +912,7 @@ cygwin_accept (int fd, struct sockaddr *peer, socklen_t *len)
   if (efault.faulted (EFAULT) || !fh)
     res = -1;
   else
-    {
-      if (!fh->is_nonblocking ())
-	{
-	  size_t fds_size = howmany (fd + 1, NFDBITS) * sizeof (fd_mask);
-	  fd_set *read_fds = (fd_set *) alloca (fds_size);
-	  memset (read_fds, 0, fds_size);
-	  FD_SET (fd, read_fds);
-	  res = cygwin_select (fd + 1, read_fds, NULL, NULL, NULL);
-	  if (res == -1)
-	    return -1;
-	}
-      res = fh->accept (peer, len);
-    }
+    res = fh->accept (peer, len);
 
   syscall_printf ("%d = accept (%d, %p, %p)", res, fd, peer, len);
   return res;
@@ -1816,146 +1762,92 @@ get_ifconf (struct ifconf *ifc, int what)
   return 0;
 }
 
-/* exported as rcmd: standards? */
-extern "C" int
-cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
-	     char *remuser, char *cmd, int *fd2p)
-{
-  int res = -1;
-  SOCKET fd2s;
-
-  sig_dispatch_pending ();
-
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return (int) INVALID_SOCKET;
-  if (!*locuser)
-    {
-      set_errno (EINVAL);
-      return (int) INVALID_SOCKET;
-    }
-
-  res = rcmd (ahost, inport, locuser, remuser, cmd, fd2p ? &fd2s : NULL);
-  if (res != (int) INVALID_SOCKET)
-    {
-      cygheap_fdnew res_fd;
-
-      if (res_fd >= 0 && fdsock (res_fd, tcp_dev, res))
-	{
-	  ((fhandler_socket *) res_fd)->connect_state (connected);
-	  res = res_fd;
-	}
-      else
-	{
-	  closesocket (res);
-	  res = -1;
-	}
-
-      if (res >= 0 && fd2p)
-	{
-	  cygheap_fdnew newfd (res_fd, false);
-	  cygheap_fdget fd (*fd2p);
-
-	  if (newfd >= 0 && fdsock (newfd, tcp_dev, fd2s))
-	    {
-	      *fd2p = newfd;
-	      ((fhandler_socket *) fd2p)->connect_state (connected);
-	    }
-	  else
-	    {
-	      closesocket (res);
-	      closesocket (fd2s);
-	      res = -1;
-	    }
-	}
-    }
-
-  syscall_printf ("%d = rcmd (...)", res);
-  return res;
-}
-
-/* The below implementation of rresvport looks pretty ugly, but there's
-   a problem in Winsock.  The bind(2) call does not fail if a local
-   address is still in TIME_WAIT state, and there's no way to get this
-   behaviour.  Unfortunately the first time when this is detected is when
-   the calling application tries to connect.
-
-   One (also not really foolproof) way around this problem would be to use
-   the iphlpapi function GetTcpTable and to check if the port in question is
-   in TIME_WAIT state and if so, choose another port number.  But this method
-   is as prone to races as the below one, or any other method using random
-   port numbers, etc.  The below method at least tries to avoid races between
-   multiple applications using rrecvport.
-
-   As for the question "why don't you just use the Winsock rresvport?"...
-   For some reason I do NOT understand, the call to WinSocks rresvport
-   corrupts the stack when Cygwin is built using -fomit-frame-pointers.
-   And then again, the Winsock rresvport function has the exact same
-   problem with reusing ports in the TIME_WAIT state as the socket/bind
-   method has.  So there's no gain in using that function. */
-
 #define PORT_LOW	(IPPORT_EFSSERVER + 1)
 #define PORT_HIGH	(IPPORT_RESERVED - 1)
 #define NUM_PORTS	(PORT_HIGH - PORT_LOW + 1)
 
-LONG last_used_rrecvport __attribute__((section (".cygwin_dll_common"), shared)) = IPPORT_RESERVED;
+LONG last_used_bindresvport __attribute__((section (".cygwin_dll_common"), shared)) = IPPORT_RESERVED;
 
-/* exported as rresvport: standards? */
 extern "C" int
-cygwin_rresvport (int *port)
+cygwin_bindresvport_sa (int fd, struct sockaddr *sa)
 {
-  int res;
+  struct sockaddr_storage sst;
+  struct sockaddr_in *sin = NULL;
+  struct sockaddr_in6 *sin6 = NULL;
+  in_port_t port;
+  socklen_t salen;
+  int ret;
+
   sig_dispatch_pending ();
 
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
 
-  res = socket (AF_INET, SOCK_STREAM, 0);
-  if (res != (int) INVALID_SOCKET)
+  fhandler_socket *fh = get (fd);
+  if (!fh)
+    return -1;
+
+  if (!sa)
     {
-      LONG myport;
-      int ret = SOCKET_ERROR;
-      struct sockaddr_in sin;
-      sin.sin_family = AF_INET;
-      sin.sin_addr.s_addr = INADDR_ANY;
-
-      for (int i = 0; i < NUM_PORTS; i++)
-	{
-	  while ((myport = InterlockedExchange (&last_used_rrecvport, 0)) == 0)
-	    low_priority_sleep (0);
-	  if (--myport < PORT_LOW)
-	    myport = PORT_HIGH;
-	  InterlockedExchange (&last_used_rrecvport, myport);
-
-	  sin.sin_port = htons (myport);
-	  if (!(ret = bind (res, (struct sockaddr *) &sin, sizeof sin)))
-	    break;
-	  int err = WSAGetLastError ();
-	  if (err != WSAEADDRINUSE && err != WSAEINVAL)
-	    break;
-	}
-      if (ret == SOCKET_ERROR)
-	{
-	  closesocket (res);
-	  res = (int) INVALID_SOCKET;
-	}
-      else if (port)
-	*port = myport;
+      sa = (struct sockaddr *) &sst;
+      memset (&sst, 0, sizeof sst);
+      sa->sa_family = fh->get_addr_family ();
     }
 
-  if (res != (int) INVALID_SOCKET)
+  switch (sa->sa_family)
     {
-      cygheap_fdnew res_fd;
+    case AF_INET:
+      salen = sizeof (struct sockaddr_in);
+      sin = (struct sockaddr_in *) sa;
+      port = sin->sin_port;
+      break;
+    case AF_INET6:
+      salen = sizeof (struct sockaddr_in6);
+      sin6 = (struct sockaddr_in6 *) sa;
+      port = sin6->sin6_port;
+      break;
+    default:
+      set_errno (EPFNOSUPPORT);
+      return -1;
+    }
 
-      if (res_fd >= 0 && fdsock (res_fd, tcp_dev, res))
-	res = res_fd;
+  /* If a non-zero port number is given, try this first.  If that succeeds,
+     or if the error message is serious, return. */
+  if (port)
+    {
+      ret = fh->bind (sa, salen);
+      if (!ret || (get_errno () != EADDRINUSE && get_errno () != EINVAL))
+        return ret;
+    }
+
+  LONG myport;
+
+  for (int i = 0; i < NUM_PORTS; i++)
+    {
+      while ((myport = InterlockedExchange (&last_used_bindresvport, 0)) == 0)
+	low_priority_sleep (0);
+      if (--myport < PORT_LOW)
+	myport = PORT_HIGH;
+      InterlockedExchange (&last_used_bindresvport, myport);
+
+      if (sa->sa_family == AF_INET6)
+	sin6->sin6_port = htons (myport);
       else
-	res = -1;
+	sin->sin_port = htons (myport);
+      if (!(ret = fh->bind (sa, salen)))
+	break;
+      if (get_errno () != EADDRINUSE && get_errno () != EINVAL)
+	break;
     }
 
-  syscall_printf ("%d = rresvport (%d)", res, port ? *port : 0);
-  return res;
+  return ret;
+}
+
+extern "C" int
+cygwin_bindresvport (int fd, struct sockaddr_in *sin)
+{
+  return cygwin_bindresvport_sa (fd, (struct sockaddr *) sin);
 }
 
 /* socketpair: standards? */
@@ -2038,7 +1930,7 @@ socketpair (int family, int type, int protocol, int *sb)
     {
       sock_out.sin_family = AF_INET;
       sock_out.sin_port = 0;
-      sock_out.sin_addr.s_addr = INADDR_ANY;
+      sock_out.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
       if (bind (outsock, (struct sockaddr *) &sock_out, sizeof (sock_out)) < 0)
 	{
 	  debug_printf ("bind failed");
@@ -2207,49 +2099,1381 @@ cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
   return res;
 }
 
-/* See "UNIX Network Programming, Networing APIs: Sockets and XTI",
-   W. Richard Stevens, Prentice Hall PTR, 1998. */
-extern "C" int
-cygwin_inet_pton (int family, const char *strptr, void *addrptr)
-{
-  if (family == AF_INET)
-    {
-      struct in_addr in_val;
+/* This is from the BIND 4.9.4 release, modified to compile by itself */
 
-      if (cygwin_inet_aton (strptr, &in_val))
-	{
-	  memcpy (addrptr, &in_val, sizeof (struct in_addr));
-	  return 1;
+/* Copyright (c) 1996 by Internet Software Consortium.
+ *
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND INTERNET SOFTWARE CONSORTIUM DISCLAIMS
+ * ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL INTERNET SOFTWARE
+ * CONSORTIUM BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
+ * ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
+ * SOFTWARE.
+ */
+
+#define	IN6ADDRSZ	16
+#define	INADDRSZ	 4
+#define	INT16SZ		 2
+
+/* int
+ * inet_pton4(src, dst)
+ *	like inet_aton() but without all the hexadecimal and shorthand.
+ * return:
+ *	1 if `src' is a valid dotted quad, else 0.
+ * notice:
+ *	does not touch `dst' unless it's returning 1.
+ * author:
+ *	Paul Vixie, 1996.
+ */
+static int
+inet_pton4 (const char *src, u_char *dst)
+{
+  static const char digits[] = "0123456789";
+  int saw_digit, octets, ch;
+  u_char tmp[INADDRSZ], *tp;
+
+  saw_digit = 0;
+  octets = 0;
+  *(tp = tmp) = 0;
+  while ((ch = *src++) != '\0')
+    {
+      const char *pch;
+
+      if ((pch = strchr(digits, ch)) != NULL)
+        {
+	  u_int ret = *tp * 10 + (pch - digits);
+
+	  if (ret > 255)
+	    return (0);
+	  *tp = ret;
+	  if (! saw_digit)
+	    {
+	      if (++octets > 4)
+		return (0);
+	      saw_digit = 1;
+	    }
 	}
-      return 0;
+      else if (ch == '.' && saw_digit)
+        {
+	  if (octets == 4)
+	    return (0);
+	  *++tp = 0;
+	  saw_digit = 0;
+	}
+      else
+	return (0);
     }
-  set_errno (EAFNOSUPPORT);
-  return -1;
+  if (octets < 4)
+    return (0);
+
+  memcpy(dst, tmp, INADDRSZ);
+  return (1);
 }
 
-/* See "UNIX Network Programming, Networing APIs: Sockets and XTI",
-   W. Richard Stevens, Prentice Hall PTR, 1998. */
-extern "C" const char *
-cygwin_inet_ntop (int family, const void *addrptr, char *strptr, socklen_t len)
+/* int
+ * inet_pton6(src, dst)
+ *	convert presentation level address to network order binary form.
+ * return:
+ *	1 if `src' is a valid [RFC1884 2.2] address, else 0.
+ * notice:
+ *	(1) does not touch `dst' unless it's returning 1.
+ *	(2) :: in a full address is silently ignored.
+ * credit:
+ *	inspired by Mark Andrews.
+ * author:
+ *	Paul Vixie, 1996.
+ */
+static int
+inet_pton6 (const char *src, u_char *dst)
 {
-  const u_char *p = (const u_char *) addrptr;
+  static const char xdigits_l[] = "0123456789abcdef",
+		    xdigits_u[] = "0123456789ABCDEF";
+  u_char tmp[IN6ADDRSZ], *tp, *endp, *colonp;
+  const char *xdigits, *curtok;
+  int ch, saw_xdigit;
+  u_int val;
 
+  memset((tp = tmp), 0, IN6ADDRSZ);
+  endp = tp + IN6ADDRSZ;
+  colonp = NULL;
+  /* Leading :: requires some special handling. */
+  if (*src == ':')
+    if (*++src != ':')
+      return (0);
+  curtok = src;
+  saw_xdigit = 0;
+  val = 0;
+  while ((ch = *src++) != '\0')
+    {
+      const char *pch;
+
+      if ((pch = strchr((xdigits = xdigits_l), ch)) == NULL)
+	pch = strchr((xdigits = xdigits_u), ch);
+      if (pch != NULL)
+        {
+	  val <<= 4;
+	  val |= (pch - xdigits);
+	  if (val > 0xffff)
+	    return (0);
+	  saw_xdigit = 1;
+	  continue;
+	}
+      if (ch == ':')
+        {
+	  curtok = src;
+	  if (!saw_xdigit)
+	    {
+	      if (colonp)
+		return (0);
+	      colonp = tp;
+	      continue;
+	    }
+	  if (tp + INT16SZ > endp)
+	    return (0);
+	  *tp++ = (u_char) (val >> 8) & 0xff;
+	  *tp++ = (u_char) val & 0xff;
+	  saw_xdigit = 0;
+	  val = 0;
+	  continue;
+	}
+      if (ch == '.' && ((tp + INADDRSZ) <= endp) && inet_pton4(curtok, tp) > 0)
+        {
+	  tp += INADDRSZ;
+	  saw_xdigit = 0;
+	  break;	/* '\0' was seen by inet_pton4(). */
+	}
+      return (0);
+    }
+  if (saw_xdigit)
+    {
+      if (tp + INT16SZ > endp)
+	return (0);
+      *tp++ = (u_char) (val >> 8) & 0xff;
+      *tp++ = (u_char) val & 0xff;
+    }
+  if (colonp != NULL)
+    {
+      /*
+       * Since some memmove()'s erroneously fail to handle
+       * overlapping regions, we'll do the shift by hand.
+       */
+      const int n = tp - colonp;
+      int i;
+
+      for (i = 1; i <= n; i++)
+        {
+	  endp[- i] = colonp[n - i];
+	  colonp[n - i] = 0;
+	}
+      tp = endp;
+    }
+  if (tp != endp)
+    return (0);
+
+  memcpy(dst, tmp, IN6ADDRSZ);
+  return (1);
+}
+
+/* int
+ * inet_pton(af, src, dst)
+ *	convert from presentation format (which usually means ASCII printable)
+ *	to network format (which is usually some kind of binary format).
+ * return:
+ *	1 if the address was valid for the specified address family
+ *	0 if the address wasn't valid (`dst' is untouched in this case)
+ *	-1 if some other error occurred (`dst' is untouched in this case, too)
+ * author:
+ *	Paul Vixie, 1996.
+ */
+extern "C" int
+cygwin_inet_pton (int af, const char *src, void *dst)
+{
+  switch (af)
+    {
+    case AF_INET:
+      return (inet_pton4(src, (u_char *) dst));
+    case AF_INET6:
+      return (inet_pton6(src, (u_char *) dst));
+    default:
+      errno = EAFNOSUPPORT;
+      return (-1);
+    }
+  /* NOTREACHED */
+}
+
+/* const char *
+ * inet_ntop4(src, dst, size)
+ *	format an IPv4 address, more or less like inet_ntoa()
+ * return:
+ *	`dst' (as a const)
+ * notes:
+ *	(1) uses no statics
+ *	(2) takes a u_char* not an in_addr as input
+ * author:
+ *	Paul Vixie, 1996.
+ */
+static const char *
+inet_ntop4 (const u_char *src, char *dst, size_t size)
+{
+  static const char fmt[] = "%u.%u.%u.%u";
+  char tmp[sizeof "255.255.255.255"];
+
+  __small_sprintf(tmp, fmt, src[0], src[1], src[2], src[3]);
+  if (strlen(tmp) > size)
+    {
+      errno = ENOSPC;
+      return (NULL);
+    }
+  strcpy(dst, tmp);
+  return (dst);
+}
+
+/* const char *
+ * inet_ntop6(src, dst, size)
+ *	convert IPv6 binary address into presentation (printable) format
+ * author:
+ *	Paul Vixie, 1996.
+ */
+static const char *
+inet_ntop6 (const u_char *src, char *dst, size_t size)
+{
+  /*
+   * Note that int32_t and int16_t need only be "at least" large enough
+   * to contain a value of the specified size.  On some systems, like
+   * Crays, there is no such thing as an integer variable with 16 bits.
+   * Keep this in mind if you think this function should have been coded
+   * to use pointer overlays.  All the world's not a VAX.
+   */
+  char tmp[sizeof "ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255"], *tp;
+  struct { int base, len; } best, cur;
+  u_int words[IN6ADDRSZ / INT16SZ];
+  int i;
+
+  /*
+   * Preprocess:
+   *	Copy the input (bytewise) array into a wordwise array.
+   *	Find the longest run of 0x00's in src[] for :: shorthanding.
+   */
+  memset(words, 0, sizeof words);
+  for (i = 0; i < IN6ADDRSZ; i++)
+    words[i / 2] |= (src[i] << ((1 - (i % 2)) << 3));
+  best.base = -1;
+  cur.base = -1;
+  for (i = 0; i < (IN6ADDRSZ / INT16SZ); i++)
+    {
+      if (words[i] == 0)
+        {
+	  if (cur.base == -1)
+	    cur.base = i, cur.len = 1;
+	  else
+	    cur.len++;
+	}
+      else
+        {
+	  if (cur.base != -1)
+	    {
+	      if (best.base == -1 || cur.len > best.len)
+		best = cur;
+	      cur.base = -1;
+	    }
+	}
+    }
+  if (cur.base != -1)
+    {
+      if (best.base == -1 || cur.len > best.len)
+	best = cur;
+    }
+  if (best.base != -1 && best.len < 2)
+    best.base = -1;
+
+  /*
+   * Format the result.
+   */
+  tp = tmp;
+  for (i = 0; i < (IN6ADDRSZ / INT16SZ); i++)
+    {
+      /* Are we inside the best run of 0x00's? */
+      if (best.base != -1 && i >= best.base && i < (best.base + best.len))
+        {
+	  if (i == best.base)
+	    *tp++ = ':';
+	  continue;
+	}
+      /* Are we following an initial run of 0x00s or any real hex? */
+      if (i != 0)
+	*tp++ = ':';
+      /* Is this address an encapsulated IPv4? */
+      if (i == 6 && best.base == 0 &&
+	  (best.len == 6 || (best.len == 5 && words[5] == 0xffff)))
+	{
+	  if (!inet_ntop4(src+12, tp, sizeof tmp - (tp - tmp)))
+	    return (NULL);
+	  tp += strlen(tp);
+	  break;
+	}
+      __small_sprintf(tp, "%x", words[i]);
+      tp += strlen(tp);
+    }
+  /* Was it a trailing run of 0x00's? */
+  if (best.base != -1 && (best.base + best.len) == (IN6ADDRSZ / INT16SZ))
+    *tp++ = ':';
+  *tp++ = '\0';
+
+  /*
+   * Check for overflow, copy, and we're done.
+   */
+  if ((size_t) (tp - tmp) > size)
+    {
+      errno = ENOSPC;
+      return (NULL);
+    }
+  strcpy(dst, tmp);
+  return (dst);
+}
+
+/* char *
+ * inet_ntop(af, src, dst, size)
+ *	convert a network format address to presentation format.
+ * return:
+ *	pointer to presentation format address (`dst'), or NULL (see errno).
+ * author:
+ *	Paul Vixie, 1996.
+ */
+extern "C" const char *
+cygwin_inet_ntop (int af, const void *src, char *dst, socklen_t size)
+{
+  switch (af)
+    {
+    case AF_INET:
+      return (inet_ntop4((const u_char *) src, dst, size));
+    case AF_INET6:
+      return (inet_ntop6((const u_char *) src, dst, size));
+    default:
+      errno = EAFNOSUPPORT;
+      return (NULL);
+    }
+  /* NOTREACHED */
+}
+
+/* W. Richard STEVENS libgai implementation, slightly tweaked for inclusion
+   into Cygwin as pure IPv4 replacement.  Please note that the code is
+   kept intact as much as possible.  Especially the IPv6 and AF_UNIX code
+   is kept in, even though we can support neither of them.  Please don't
+   activate them, they won't work correctly. */
+
+#define IPv4
+#undef IPv6
+#undef UNIXdomain
+
+#undef HAVE_SOCKADDR_SA_LEN
+#define gethostbyname2(host,family) cygwin_gethostbyname((host))
+
+#define AI_CLONE 0x8000		/* Avoid collision with AI_ values in netdb.h */
+
+/*
+ * Create and fill in an addrinfo{}.
+ */
+
+/* include ga_aistruct1 */
+static int
+ga_aistruct (struct addrinfo ***paipnext, const struct addrinfo *hintsp,
+	     const void *addr, int family)
+{
+  struct addrinfo *ai;
+
+  if ((ai = (struct addrinfo *) calloc (1, sizeof (struct addrinfo))) == NULL)
+    return (EAI_MEMORY);
+  ai->ai_next = NULL;
+  ai->ai_canonname = NULL;
+  **paipnext = ai;
+  *paipnext = &ai->ai_next;
+
+  if ((ai->ai_socktype = hintsp->ai_socktype) == 0)
+    ai->ai_flags |= AI_CLONE;
+
+  ai->ai_protocol = hintsp->ai_protocol;
+/* end ga_aistruct1 */
+
+/* include ga_aistruct2 */
+  switch ((ai->ai_family = family))
+    {
+#ifdef	IPv4
+    case AF_INET:
+      {
+	struct sockaddr_in *sinptr;
+
+	/* 4allocate sockaddr_in{} and fill in all but port */
+	if ((sinptr = (struct sockaddr_in *)
+		      calloc (1, sizeof (struct sockaddr_in))) == NULL)
+	  return (EAI_MEMORY);
+#ifdef	HAVE_SOCKADDR_SA_LEN
+	sinptr->sin_len = sizeof (struct sockaddr_in);
+#endif
+	sinptr->sin_family = AF_INET;
+	memcpy (&sinptr->sin_addr, addr, sizeof (struct in_addr));
+	ai->ai_addr = (struct sockaddr *) sinptr;
+	ai->ai_addrlen = sizeof (struct sockaddr_in);
+	break;
+      }
+#endif /* IPV4 */
+#ifdef	IPv6
+    case AF_INET6:
+      {
+	struct sockaddr_in6 *sin6ptr;
+
+	/* 4allocate sockaddr_in6{} and fill in all but port */
+	if ((sin6ptr = calloc (1, sizeof (struct sockaddr_in6))) == NULL)
+	  return (EAI_MEMORY);
+#ifdef	HAVE_SOCKADDR_SA_LEN
+	sin6ptr->sin6_len = sizeof (struct sockaddr_in6);
+#endif
+	sin6ptr->sin6_family = AF_INET6;
+	memcpy (&sin6ptr->sin6_addr, addr, sizeof (struct in6_addr));
+	ai->ai_addr = (struct sockaddr *) sin6ptr;
+	ai->ai_addrlen = sizeof (struct sockaddr_in6);
+	break;
+      }
+#endif /* IPV6 */
+#ifdef	UNIXdomain
+    case AF_LOCAL:
+      {
+	struct sockaddr_un *unp;
+
+	/* 4allocate sockaddr_un{} and fill in */
+/* *INDENT-OFF* */
+			if (strlen(addr) >= sizeof(unp->sun_path))
+				return(EAI_SERVICE);
+			if ( (unp = calloc(1, sizeof(struct sockaddr_un))) == NULL)
+				return(EAI_MEMORY);
+/* *INDENT-ON* */
+	unp->sun_family = AF_LOCAL;
+	strcpy (unp->sun_path, addr);
+#ifdef	HAVE_SOCKADDR_SA_LEN
+	unp->sun_len = SUN_LEN (unp);
+#endif
+	ai->ai_addr = (struct sockaddr *) unp;
+	ai->ai_addrlen = sizeof (struct sockaddr_un);
+	if (hintsp->ai_flags & AI_PASSIVE)
+	  unlink (unp->sun_path);	/* OK if this fails */
+	break;
+      }
+#endif /* UNIXDOMAIN */
+    }
+  return (0);
+}
+
+/* end ga_aistruct2 */
+
+/*
+ * Clone a new addrinfo structure from an existing one.
+ */
+
+/* include ga_clone */
+static struct addrinfo *
+ga_clone (struct addrinfo *ai)
+{
+  struct addrinfo *nai;
+
+  if ((nai = (struct addrinfo *) calloc (1, sizeof (struct addrinfo))) == NULL)
+    return (NULL);
+
+  nai->ai_next = ai->ai_next;
+  ai->ai_next = nai;
+
+  nai->ai_flags = 0;		/* make sure AI_CLONE is off */
+  nai->ai_family = ai->ai_family;
+  nai->ai_socktype = ai->ai_socktype;
+  nai->ai_protocol = ai->ai_protocol;
+  nai->ai_canonname = NULL;
+  nai->ai_addrlen = ai->ai_addrlen;
+  if ((nai->ai_addr = (struct sockaddr *) malloc (ai->ai_addrlen)) == NULL)
+    return (NULL);
+  memcpy (nai->ai_addr, ai->ai_addr, ai->ai_addrlen);
+
+  return (nai);
+}
+
+/* end ga_clone */
+
+/*
+ * Basic error checking of flags, family, socket type, and protocol.
+ */
+
+/* include ga_echeck */
+static int
+ga_echeck (const char *hostname, const char *servname,
+	   int flags, int family, int socktype, int protocol)
+{
+  if (flags & ~(AI_PASSIVE | AI_CANONNAME))
+    return (EAI_BADFLAGS);	/* unknown flag bits */
+
+  if (hostname == NULL || hostname[0] == '\0')
+    {
+      if (servname == NULL || servname[0] == '\0')
+	return (EAI_NONAME);	/* host or service must be specified */
+    }
+
+  switch (family)
+    {
+    case AF_UNSPEC:
+      break;
+#ifdef	IPv4
+    case AF_INET:
+      if (socktype != 0 &&
+	  (socktype != SOCK_STREAM &&
+	   socktype != SOCK_DGRAM && socktype != SOCK_RAW))
+	return (EAI_SOCKTYPE);	/* invalid socket type */
+      break;
+#endif
+#ifdef	IPv6
+    case AF_INET6:
+      if (socktype != 0 &&
+	  (socktype != SOCK_STREAM &&
+	   socktype != SOCK_DGRAM && socktype != SOCK_RAW))
+	return (EAI_SOCKTYPE);	/* invalid socket type */
+      break;
+#endif
+#ifdef	UNIXdomain
+    case AF_LOCAL:
+      if (socktype != 0 &&
+	  (socktype != SOCK_STREAM && socktype != SOCK_DGRAM))
+	return (EAI_SOCKTYPE);	/* invalid socket type */
+      break;
+#endif
+    default:
+      return (EAI_FAMILY);	/* unknown protocol family */
+    }
+  return (0);
+}
+
+/* end ga_echeck */
+
+struct search {
+  const char *host;  /* hostname or address string */
+  int        family; /* AF_xxx */
+};
+
+/*
+ * Set up the search[] array with the hostnames and address families
+ * that we are to look up.
+ */
+
+/* include ga_nsearch1 */
+static int
+ga_nsearch (const char *hostname, const struct addrinfo *hintsp,
+	    struct search *search)
+{
+  int nsearch = 0;
+
+  if (hostname == NULL || hostname[0] == '\0')
+    {
+      if (hintsp->ai_flags & AI_PASSIVE)
+	{
+	  /* 4no hostname and AI_PASSIVE: implies wildcard bind */
+	  switch (hintsp->ai_family)
+	    {
+#ifdef	IPv4
+	    case AF_INET:
+	      search[nsearch].host = "0.0.0.0";
+	      search[nsearch].family = AF_INET;
+	      nsearch++;
+	      break;
+#endif
+#ifdef	IPv6
+	    case AF_INET6:
+	      search[nsearch].host = "0::0";
+	      search[nsearch].family = AF_INET6;
+	      nsearch++;
+	      break;
+#endif
+	    case AF_UNSPEC:
+#ifdef	IPv6
+	      search[nsearch].host = "0::0";	/* IPv6 first, then IPv4 */
+	      search[nsearch].family = AF_INET6;
+	      nsearch++;
+#endif
+#ifdef	IPv4
+	      search[nsearch].host = "0.0.0.0";
+	      search[nsearch].family = AF_INET;
+	      nsearch++;
+#endif
+	      break;
+	    }
+/* end ga_nsearch1 */
+/* include ga_nsearch2 */
+	}
+      else
+	{
+	  /* 4no host and not AI_PASSIVE: connect to local host */
+	  switch (hintsp->ai_family)
+	    {
+#ifdef	IPv4
+	    case AF_INET:
+	      search[nsearch].host = "localhost";	/* 127.0.0.1 */
+	      search[nsearch].family = AF_INET;
+	      nsearch++;
+	      break;
+#endif
+#ifdef	IPv6
+	    case AF_INET6:
+	      search[nsearch].host = "0::1";
+	      search[nsearch].family = AF_INET6;
+	      nsearch++;
+	      break;
+#endif
+	    case AF_UNSPEC:
+#ifdef	IPv6
+	      search[nsearch].host = "0::1";	/* IPv6 first, then IPv4 */
+	      search[nsearch].family = AF_INET6;
+	      nsearch++;
+#endif
+#ifdef	IPv4
+	      search[nsearch].host = "localhost";
+	      search[nsearch].family = AF_INET;
+	      nsearch++;
+#endif
+	      break;
+	    }
+	}
+/* end ga_nsearch2 */
+/* include ga_nsearch3 */
+    }
+  else
+    {				/* host is specified */
+      switch (hintsp->ai_family)
+	{
+#ifdef	IPv4
+	case AF_INET:
+	  search[nsearch].host = hostname;
+	  search[nsearch].family = AF_INET;
+	  nsearch++;
+	  break;
+#endif
+#ifdef	IPv6
+	case AF_INET6:
+	  search[nsearch].host = hostname;
+	  search[nsearch].family = AF_INET6;
+	  nsearch++;
+	  break;
+#endif
+	case AF_UNSPEC:
+#ifdef	IPv6
+	  search[nsearch].host = hostname;
+	  search[nsearch].family = AF_INET6;	/* IPv6 first */
+	  nsearch++;
+#endif
+#ifdef	IPv4
+	  search[nsearch].host = hostname;
+	  search[nsearch].family = AF_INET;	/* then IPv4 */
+	  nsearch++;
+#endif
+	  break;
+	}
+    }
+  if (nsearch < 1 || nsearch > 2)
+    return -1;
+  return (nsearch);
+}
+
+/* end ga_nsearch3 */
+
+/*
+ * Go through all the addrinfo structures, checking for a match of the
+ * socket type and filling in the socket type, and then the port number
+ * in the corresponding socket address structures.
+ *
+ * The AI_CLONE flag works as follows.  Consider a multihomed host with
+ * two IP addresses and no socket type specified by the caller.  After
+ * the "host" search there are two addrinfo structures, one per IP address.
+ * Assuming a service supported by both TCP and UDP (say the daytime
+ * service) we need to return *four* addrinfo structures:
+ *		IP#1, SOCK_STREAM, TCP port,
+ *		IP#1, SOCK_DGRAM, UDP port,
+ *		IP#2, SOCK_STREAM, TCP port,
+ *		IP#2, SOCK_DGRAM, UDP port.
+ * To do this, when the "host" loop creates an addrinfo structure, if the
+ * caller has not specified a socket type (hintsp->ai_socktype == 0), the
+ * AI_CLONE flag is set.  When the following function finds an entry like
+ * this it is handled as follows: If the entry's ai_socktype is still 0,
+ * this is the first use of the structure, and the ai_socktype field is set.
+ * But, if the entry's ai_socktype is nonzero, then we clone a new addrinfo
+ * structure and set it's ai_socktype to the new value.  Although we only
+ * need two socket types today (SOCK_STREAM and SOCK_DGRAM) this algorithm
+ * will handle any number.  Also notice that Posix.1g requires all socket
+ * types to be nonzero.
+ */
+
+/* include ga_port */
+static int
+ga_port (struct addrinfo *aihead, int port, int socktype)
+		/* port must be in network byte order */
+{
+  int nfound = 0;
+  struct addrinfo *ai;
+
+  for (ai = aihead; ai != NULL; ai = ai->ai_next)
+    {
+      if (ai->ai_flags & AI_CLONE)
+	{
+	  if (ai->ai_socktype != 0)
+	    {
+	      if ((ai = ga_clone (ai)) == NULL)
+		return (-1);	/* memory allocation error */
+	      /* ai points to newly cloned entry, which is what we want */
+	    }
+	}
+      else if (ai->ai_socktype != socktype)
+	continue;		/* ignore if mismatch on socket type */
+
+      ai->ai_socktype = socktype;
+
+      switch (ai->ai_family)
+	{
+#ifdef	IPv4
+	case AF_INET:
+	  ((struct sockaddr_in *) ai->ai_addr)->sin_port = port;
+	  nfound++;
+	  break;
+#endif
+#ifdef	IPv6
+	case AF_INET6:
+	  ((struct sockaddr_in6 *) ai->ai_addr)->sin6_port = port;
+	  nfound++;
+	  break;
+#endif
+	}
+    }
+  return (nfound);
+}
+
+/* end ga_port */
+
+/*
+ * This function handles the service string.
+ */
+
+/* include ga_serv */
+static int
+ga_serv (struct addrinfo *aihead, const struct addrinfo *hintsp,
+	 const char *serv)
+{
+  int port, rc, nfound;
+  struct servent *sptr;
+
+  nfound = 0;
+  if (isdigit (serv[0]))
+    {				/* check for port number string first */
+      port = htons (atoi (serv));
+      if (hintsp->ai_socktype)
+	{
+	  /* 4caller specifies socket type */
+	  if ((rc = ga_port (aihead, port, hintsp->ai_socktype)) < 0)
+	    return (EAI_MEMORY);
+	  nfound += rc;
+	}
+      else
+	{
+	  /* 4caller does not specify socket type */
+	  if ((rc = ga_port (aihead, port, SOCK_STREAM)) < 0)
+	    return (EAI_MEMORY);
+	  nfound += rc;
+	  if ((rc = ga_port (aihead, port, SOCK_DGRAM)) < 0)
+	    return (EAI_MEMORY);
+	  nfound += rc;
+	}
+    }
+  else
+    {
+      /* 4try service name, TCP then UDP */
+      if (hintsp->ai_socktype == 0 || hintsp->ai_socktype == SOCK_STREAM)
+	{
+	  if ((sptr = cygwin_getservbyname (serv, "tcp")) != NULL)
+	    {
+	      if ((rc = ga_port (aihead, sptr->s_port, SOCK_STREAM)) < 0)
+		return (EAI_MEMORY);
+	      nfound += rc;
+	    }
+	}
+      if (hintsp->ai_socktype == 0 || hintsp->ai_socktype == SOCK_DGRAM)
+	{
+	  if ((sptr = cygwin_getservbyname (serv, "udp")) != NULL)
+	    {
+	      if ((rc = ga_port (aihead, sptr->s_port, SOCK_DGRAM)) < 0)
+		return (EAI_MEMORY);
+	      nfound += rc;
+	    }
+	}
+    }
+
+  if (nfound == 0)
+    {
+      if (hintsp->ai_socktype == 0)
+	return (EAI_NONAME);	/* all calls to getservbyname() failed */
+      else
+	return (EAI_SERVICE);	/* service not supported for socket type */
+    }
+  return (0);
+}
+
+/* end ga_serv */
+
+#ifdef	UNIXdomain
+/* include ga_unix */
+static int
+ga_unix (const char *path, struct addrinfo *hintsp, struct addrinfo **result)
+{
+  int rc;
+  struct addrinfo *aihead, **aipnext;
+
+  aihead = NULL;
+  aipnext = &aihead;
+
+  if (hintsp->ai_family != AF_UNSPEC && hintsp->ai_family != AF_LOCAL)
+    return (EAI_ADDRFAMILY);
+
+  if (hintsp->ai_socktype == 0)
+    {
+      /* 4no socket type specified: return stream then dgram */
+      hintsp->ai_socktype = SOCK_STREAM;
+      if ((rc = ga_aistruct (&aipnext, hintsp, path, AF_LOCAL)) != 0)
+	return (rc);
+      hintsp->ai_socktype = SOCK_DGRAM;
+    }
+
+  if ((rc = ga_aistruct (&aipnext, hintsp, path, AF_LOCAL)) != 0)
+    return (rc);
+
+  if (hintsp->ai_flags & AI_CANONNAME)
+    {
+      struct utsname myname;
+
+      if (uname (&myname) < 0)
+	return (EAI_SYSTEM);
+      if ((aihead->ai_canonname = strdup (myname.nodename)) == NULL)
+	return (EAI_MEMORY);
+    }
+
+  *result = aihead;		/* pointer to first structure in linked list */
+  return (0);
+}
+
+/* end ga_unix */
+#endif /* UNIXdomain */
+
+/* include gn_ipv46 */
+static int
+gn_ipv46 (char *host, size_t hostlen, char *serv, size_t servlen,
+	  void *aptr, size_t alen, int family, int port, int flags)
+{
+  char *ptr;
+  struct hostent *hptr;
+  struct servent *sptr;
+
+  if (host && hostlen > 0)
+    {
+      if (flags & NI_NUMERICHOST)
+	{
+	  if (cygwin_inet_ntop (family, aptr, host, hostlen) == NULL)
+	    return (1);
+	}
+      else
+	{
+	  hptr = cygwin_gethostbyaddr ((const char *) aptr, alen, family);
+	  if (hptr != NULL && hptr->h_name != NULL)
+	    {
+	      if (flags & NI_NOFQDN)
+		{
+		  if ((ptr = strchr (hptr->h_name, '.')) != NULL)
+		    *ptr = 0;	/* overwrite first dot */
+		}
+	      //snprintf (host, hostlen, "%s", hptr->h_name);
+	      *host = '\0';
+	      strncat (host, hptr->h_name, hostlen - 1);
+	    }
+	  else
+	    {
+	      if (flags & NI_NAMEREQD)
+		return (1);
+	      if (cygwin_inet_ntop (family, aptr, host, hostlen) == NULL)
+		return (1);
+	    }
+	}
+    }
+
+  if (serv && servlen > 0)
+    {
+      if (flags & NI_NUMERICSERV)
+	{
+	  //snprintf (serv, servlen, "%d", ntohs (port));
+	  char buf[32];
+	  __small_sprintf (buf, "%d", ntohs (port));
+	  *serv = '\0';
+	  strncat (serv, buf, servlen - 1);
+	}
+      else
+	{
+	  sptr = cygwin_getservbyport (port, (flags & NI_DGRAM) ? "udp" : NULL);
+	  if (sptr != NULL && sptr->s_name != NULL)
+	    {
+	      //snprintf (serv, servlen, "%s", sptr->s_name);
+	      *serv = '\0';
+	      strncat (serv, sptr->s_name, servlen - 1);
+	    }
+	  else
+	    {
+	      //snprintf (serv, servlen, "%d", ntohs (port));
+	      char buf[32];
+	      __small_sprintf (buf, "%d", ntohs (port));
+	      *serv = '\0';
+	      strncat (serv, buf, servlen - 1);
+	    }
+	}
+    }
+  return (0);
+}
+
+/* end gn_ipv46 */
+
+/* include freeaddrinfo */
+void
+ipv4_freeaddrinfo (struct addrinfo *aihead)
+{
+  struct addrinfo *ai, *ainext;
+
+  for (ai = aihead; ai != NULL; ai = ainext)
+    {
+      if (ai->ai_addr != NULL)
+	free (ai->ai_addr);	/* socket address structure */
+
+      if (ai->ai_canonname != NULL)
+	free (ai->ai_canonname);
+
+      ainext = ai->ai_next;	/* can't fetch ai_next after free() */
+      free (ai);		/* the addrinfo{} itself */
+    }
+}
+
+/* end freeaddrinfo */
+
+/* include ga1 */
+
+int
+ipv4_getaddrinfo (const char *hostname, const char *servname,
+		  const struct addrinfo *hintsp, struct addrinfo **result)
+{
+  int rc, error, nsearch;
+  char **ap, *canon;
+  struct hostent *hptr;
+  struct search search[3], *sptr;
+  struct addrinfo hints, *aihead, **aipnext;
+
+  /*
+   * If we encounter an error we want to free() any dynamic memory
+   * that we've allocated.  This is our hack to simplify the code.
+   */
+#define	error(e) { error = (e); goto bad; }
+
+  aihead = NULL;		/* initialize automatic variables */
+  aipnext = &aihead;
+  canon = NULL;
+
+  if (hintsp == NULL)
+    {
+      bzero (&hints, sizeof (hints));
+      hints.ai_family = AF_UNSPEC;
+    }
+  else
+    hints = *hintsp;		/* struct copy */
+
+  /* 4first some basic error checking */
+  if ((rc = ga_echeck (hostname, servname, hints.ai_flags, hints.ai_family,
+		       hints.ai_socktype, hints.ai_protocol)) != 0)
+    error (rc);
+
+#ifdef	UNIXdomain
+  /* 4special case Unix domain first */
+  if (hostname != NULL &&
+      (strcmp (hostname, "/local") == 0 || strcmp (hostname, "/unix") == 0) &&
+      (servname != NULL && servname[0] == '/'))
+    return (ga_unix (servname, &hints, result));
+#endif
+/* end ga1 */
+
+/* include ga3 */
+  /* 4remainder of function for IPv4/IPv6 */
+  nsearch = ga_nsearch (hostname, &hints, &search[0]);
+  if (nsearch == -1)
+    error (EAI_FAMILY);
+  for (sptr = &search[0]; sptr < &search[nsearch]; sptr++)
+    {
+#ifdef	IPv4
+      /* 4check for an IPv4 dotted-decimal string */
+      if (isdigit (sptr->host[0]))
+	{
+	  struct in_addr inaddr;
+
+	  if (inet_pton4 (sptr->host, (u_char *) &inaddr) == 1)
+	    {
+	      if (hints.ai_family != AF_UNSPEC && hints.ai_family != AF_INET)
+		error (EAI_ADDRFAMILY);
+	      if (sptr->family != AF_INET)
+		continue;	/* ignore */
+	      rc = ga_aistruct (&aipnext, &hints, &inaddr, AF_INET);
+	      if (rc != 0)
+		error (rc);
+	      continue;
+	    }
+	}
+#endif
+
+#ifdef	IPv6
+      /* 4check for an IPv6 hex string */
+      if ((isxdigit (sptr->host[0]) || sptr->host[0] == ':') &&
+	  (strchr (sptr->host, ':') != NULL))
+	{
+	  struct in6_addr in6addr;
+
+	  if (inet_pton6 (sptr->host, &in6addr) == 1)
+	    {
+	      if (hints.ai_family != AF_UNSPEC && hints.ai_family != AF_INET6)
+		error (EAI_ADDRFAMILY);
+	      if (sptr->family != AF_INET6)
+		continue;	/* ignore */
+	      rc = ga_aistruct (&aipnext, &hints, &in6addr, AF_INET6);
+	      if (rc != 0)
+		error (rc);
+	      continue;
+	    }
+	}
+#endif
+/* end ga3 */
+/* include ga4 */
+#ifdef	IPv6
+      /* 4remainder of for() to look up hostname */
+      if ((_res.options & RES_INIT) == 0)
+	res_init ();		/* need this to set _res.options */
+#endif
+
+      if (nsearch == 2)
+	{
+#ifdef	IPv6
+	  _res.options &= ~RES_USE_INET6;
+#endif
+	  hptr = gethostbyname2 (sptr->host, sptr->family);
+	}
+      else
+	{
+#ifdef  IPv6
+	  if (sptr->family == AF_INET6)
+	    _res.options |= RES_USE_INET6;
+	  else
+	    _res.options &= ~RES_USE_INET6;
+#endif
+	  hptr = gethostbyname (sptr->host);
+	}
+      if (hptr == NULL)
+	{
+	  if (nsearch == 2)
+	    continue;		/* failure OK if multiple searches */
+
+	  switch (h_errno)
+	    {
+	    case HOST_NOT_FOUND:
+	      error (EAI_NONAME);
+	    case TRY_AGAIN:
+	      error (EAI_AGAIN);
+	    case NO_RECOVERY:
+	      error (EAI_FAIL);
+	    case NO_DATA:
+	      error (EAI_NODATA);
+	    default:
+	      error (EAI_NONAME);
+	    }
+	}
+
+      /* 4check for address family mismatch if one specified */
+      if (hints.ai_family != AF_UNSPEC && hints.ai_family != hptr->h_addrtype)
+	error (EAI_ADDRFAMILY);
+
+      /* 4save canonical name first time */
+      if (hostname != NULL && hostname[0] != '\0' &&
+	  (hints.ai_flags & AI_CANONNAME) && canon == NULL)
+	{
+	  if ((canon = strdup (hptr->h_name)) == NULL)
+	    error (EAI_MEMORY);
+	}
+
+      /* 4create one addrinfo{} for each returned address */
+      for (ap = hptr->h_addr_list; *ap != NULL; ap++)
+	{
+	  rc = ga_aistruct (&aipnext, &hints, *ap, hptr->h_addrtype);
+	  if (rc != 0)
+	    error (rc);
+	}
+    }
+  if (aihead == NULL)
+    error (EAI_NONAME);		/* nothing found */
+/* end ga4 */
+
+/* include ga5 */
+  /* 4return canonical name */
+  if (hostname != NULL && hostname[0] != '\0' &&
+      hints.ai_flags & AI_CANONNAME)
+    {
+      if (canon != NULL)
+	aihead->ai_canonname = canon;	/* strdup'ed earlier */
+      else
+	{
+	  if ((aihead->ai_canonname = strdup (search[0].host)) == NULL)
+	    error (EAI_MEMORY);
+	}
+    }
+
+  /* 4now process the service name */
+  if (servname != NULL && servname[0] != '\0')
+    {
+      if ((rc = ga_serv (aihead, &hints, servname)) != 0)
+	error (rc);
+    }
+
+  *result = aihead;		/* pointer to first structure in linked list */
+  return (0);
+
+bad:
+  ipv4_freeaddrinfo (aihead);	/* free any alloc'ed memory */
+  return (error);
+}
+
+/* end ga5 */
+
+/* include getnameinfo */
+int
+ipv4_getnameinfo (const struct sockaddr *sa, socklen_t salen,
+		  char *host, size_t hostlen,
+		  char *serv, size_t servlen, int flags)
+{
+
+  switch (sa->sa_family)
+    {
+#ifdef	IPv4
+    case AF_INET:
+      {
+	struct sockaddr_in *sain = (struct sockaddr_in *) sa;
+
+	return (gn_ipv46 (host, hostlen, serv, servlen,
+			  &sain->sin_addr, sizeof (struct in_addr),
+			  AF_INET, sain->sin_port, flags));
+      }
+#endif
+
+#ifdef	IPv6
+    case AF_INET6:
+      {
+	struct sockaddr_in6 *sain = (struct sockaddr_in6 *) sa;
+
+	return (gn_ipv46 (host, hostlen, serv, servlen,
+			  &sain->sin6_addr, sizeof (struct in6_addr),
+			  AF_INET6, sain->sin6_port, flags));
+      }
+#endif
+
+#ifdef	UNIXdomain
+    case AF_LOCAL:
+      {
+	struct sockaddr_un *un = (struct sockaddr_un *) sa;
+
+	if (hostlen > 0)
+	  snprintf (host, hostlen, "%s", "/local");
+	if (servlen > 0)
+	  snprintf (serv, servlen, "%s", un->sun_path);
+	return (0);
+      }
+#endif
+
+    default:
+      return (1);
+    }
+}
+
+/* end getnameinfo */
+
+/* Start of cygwin specific wrappers around the gai functions. */
+
+struct gai_errmap_t
+{
+  int w32_errval;
+  const char *errtxt;
+};
+
+static gai_errmap_t gai_errmap[] =
+{
+  {0,			"Success"},
+  {0,			"Address family for hostname not supported"},
+  {WSATRY_AGAIN,	"Temporary failure in name resolution"},
+  {WSAEINVAL,		"Invalid value for ai_flags"},
+  {WSANO_RECOVERY,	"Non-recoverable failure in name resolution"},
+  {WSAEAFNOSUPPORT,	"ai_family not supported"},
+  {WSA_NOT_ENOUGH_MEMORY, "Memory allocation failure"},
+  {WSANO_DATA,		"No address associated with hostname"},
+  {WSAHOST_NOT_FOUND,	"hostname nor servname provided, or not known"},
+  {WSATYPE_NOT_FOUND,	"servname not supported for ai_socktype"},
+  {WSAESOCKTNOSUPPORT,	"ai_socktype not supported"},
+  {0,			"System error returned in errno"},
+  {0,			"Invalid value for hints"},
+  {0,			"Resolved protocol is unknown"}
+};
+
+extern "C" const char *
+cygwin_gai_strerror (int err)
+{
+  if (err >= 0 && err < EAI_MAX)
+    return gai_errmap[err].errtxt;
+  return "Unknown error";
+}
+
+static int
+w32_to_gai_err (int w32_err)
+{
+  if (w32_err >= WSABASEERR)
+    for (int i = 0; i < EAI_MAX; ++i)
+      if (gai_errmap[i].w32_errval == w32_err)
+	return i;
+  return w32_err;
+}
+
+/* We can't use autoload here because we don't know where the functions
+   are loaded from.  On Win2K, the functions are available in the
+   ipv6 technology preview lib called wship6.dll, in XP and above they
+   are implemented in ws2_32.dll.  For older systems we use the ipv4-only
+   version above. */
+
+static void (WINAPI *freeaddrinfo)(const struct addrinfo *);
+static int (WINAPI *getaddrinfo)(const char *, const char *,
+				  const struct addrinfo *,
+				  struct addrinfo **);
+static int (WINAPI *getnameinfo)(const struct sockaddr *, socklen_t,
+				  char *, size_t, char *, size_t, int);
+static bool
+get_ipv6_funcs (HMODULE lib)
+{
+  return ((freeaddrinfo = (void (WINAPI *)(const struct addrinfo *))
+			  GetProcAddress(lib, "freeaddrinfo"))
+	  && (getaddrinfo = (int (WINAPI *)(const char *, const char *,
+					    const struct addrinfo *,
+					    struct addrinfo **))
+			    GetProcAddress(lib, "getaddrinfo"))
+	  && (getnameinfo = (int (WINAPI *)(const struct sockaddr *,
+					    socklen_t, char *, size_t,
+					    char *, size_t, int))
+			    GetProcAddress(lib, "getnameinfo")));
+}
+
+static NO_COPY muto load_ipv6_guard;
+static bool ipv6_inited = false;
+#define load_ipv6()	if (!ipv6_inited) load_ipv6_funcs ();
+
+static void
+load_ipv6_funcs ()
+{
+
+  char lib_name[CYG_MAX_PATH];
+  size_t len;
+  HMODULE lib;
+
+  load_ipv6_guard.init ("klog_guard")->acquire ();
+  if (ipv6_inited)
+    goto out;
+  WSAGetLastError ();	/* Kludge.  Enforce WSAStartup call. */
+  if (GetSystemDirectory (lib_name, CYG_MAX_PATH))
+    {
+      len = strlen (lib_name);
+      strcpy (lib_name + len, "\\ws2_32.dll");
+      if ((lib = LoadLibrary (lib_name)))
+        {
+	  if (get_ipv6_funcs (lib))
+	    goto out;
+	  FreeLibrary (lib);
+	}
+      strcpy (lib_name + len, "\\wship6.dll");
+      if ((lib = LoadLibrary (lib_name)))
+        {
+	  if (get_ipv6_funcs (lib))
+	    goto out;
+	  FreeLibrary (lib);
+	}
+      freeaddrinfo = NULL;
+      getaddrinfo = NULL;
+      getnameinfo = NULL;
+    }
+out:
+  ipv6_inited = true;
+  load_ipv6_guard.release ();
+}
+
+extern "C" void
+cygwin_freeaddrinfo (struct addrinfo *addr)
+{
   myfault efault;
   if (efault.faulted (EFAULT))
-    return NULL;
-  if (family == AF_INET)
-    {
-      char temp[64]; /* Big enough for 4 ints ... */
-
-      __small_sprintf (temp, "%u.%u.%u.%u", p[0], p[1], p[2], p[3]);
-      if (strlen (temp) >= (size_t) len)
-	{
-	  set_errno (ENOSPC);
-	  return NULL;
-	}
-      strcpy (strptr, temp);
-      return strptr;
-    }
-  set_errno (EAFNOSUPPORT);
-  return NULL;
+    return;
+  load_ipv6 ();
+  if (freeaddrinfo)
+    freeaddrinfo (addr);
+  else
+    ipv4_freeaddrinfo (addr);
 }
+
+extern "C" int
+cygwin_getaddrinfo (const char *hostname, const char *servname,
+		    const struct addrinfo *hints, struct addrinfo **res)
+{
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return EAI_SYSTEM;
+  load_ipv6 ();
+  if (getaddrinfo)
+    return w32_to_gai_err (getaddrinfo (hostname, servname, hints, res));
+  return ipv4_getaddrinfo (hostname, servname, hints, res);
+}
+
+extern "C" int
+cygwin_getnameinfo (const struct sockaddr *sa, socklen_t salen,
+		    char *host, size_t hostlen, char *serv,
+		    size_t servlen, int flags)
+{
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return EAI_SYSTEM;
+  load_ipv6 ();
+  if (getnameinfo)
+    {
+      /* When the incoming port number is set to 0, Winsock's getnameinfo
+	 returns with error WSAENO_DATA instead of simply ignoring the port.
+	 To avoid this strange behaviour, we check manually, if the port number
+	 is 0.  If so, set the NI_NUMERICSERV flag to avoid this problem. */
+      switch (sa->sa_family)
+        {
+	case AF_INET:
+	  if (((struct sockaddr_in *) sa)->sin_port == 0)
+	    flags |= NI_NUMERICSERV;
+	  break;
+	case AF_INET6:
+	  if (((struct sockaddr_in6 *) sa)->sin6_port == 0)
+	    flags |= NI_NUMERICSERV;
+	  break;
+	}
+      int ret = w32_to_gai_err (getnameinfo (sa, salen, host, hostlen, serv,
+					     servlen, flags));
+      if (ret)
+        set_winsock_errno ();
+      return ret;
+    }
+  return ipv4_getnameinfo (sa, salen, host, hostlen, serv, servlen, flags);
+}
+

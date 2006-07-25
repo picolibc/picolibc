@@ -31,6 +31,8 @@ int grantpt (int);
 int unlockpt (int);
 #endif /*__STRICT_ANSI__*/
 
+int posix_openpt (int);
+
 #ifdef _COMPILING_NEWLIB
 #define unsetenv UNUSED_unsetenv
 #define _unsetenv_r UNUSED__unsetenv_r

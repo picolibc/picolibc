@@ -370,7 +370,10 @@ LoadDLLfunc (SetSecurityDescriptorOwner, 12, advapi32)
 LoadDLLfunc (SetTokenInformation, 16, advapi32)
 LoadDLLfunc (RegGetKeySecurity, 16, advapi32)
 
+/* 127 == ERROR_PROC_NOT_FOUND */
+LoadDLLfuncEx2 (DsGetDcNameA, 24, netapi32, 1, 127)
 LoadDLLfunc (NetApiBufferFree, 4, netapi32)
+LoadDLLfuncEx (NetGetAnyDCName, 12, netapi32, 1)
 LoadDLLfuncEx (NetGetDCName, 12, netapi32, 1)
 LoadDLLfunc (NetLocalGroupEnum, 28, netapi32)
 LoadDLLfunc (NetLocalGroupGetMembers, 32, netapi32)
@@ -455,8 +458,6 @@ LoadDLLfunc (SetClipboardData, 8, user32)
 LoadDLLfunc (SetProcessWindowStation, 4, user32)
 LoadDLLfunc (SetTimer, 16, user32)
 LoadDLLfunc (SetUserObjectSecurity, 12, user32)
-
-LoadDLLfunc (rcmd, 24, wsock32)
 
 LoadDLLfunc (accept, 12, ws2_32)
 LoadDLLfunc (bind, 12, ws2_32)

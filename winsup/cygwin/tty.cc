@@ -28,6 +28,12 @@ details. */
 extern fhandler_tty_master *tty_master;
 
 extern "C" int
+posix_openpt (int oflags)
+{
+  return open ("/dev/ptmx", oflags);
+}
+
+extern "C" int
 grantpt (int fd)
 {
   return 0;

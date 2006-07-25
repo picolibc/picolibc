@@ -1,6 +1,6 @@
 /* netinet/in.h
 
-   Copyright 1998, 2001 Red Hat, Inc.
+   Copyright 1998, 2001, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -12,5 +12,17 @@ details. */
 #define _NETINET_IN_H
 
 #include <cygwin/in.h>
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+extern int bindresvport (int, struct sockaddr_in *);
+extern int bindresvport_sa (int, struct sockaddr *);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif /* _NETINET_IN_H */

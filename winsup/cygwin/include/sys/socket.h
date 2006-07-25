@@ -32,14 +32,14 @@ extern "C"
   int getpeername (int, struct sockaddr *__peer, socklen_t *);
   int getsockname (int, struct sockaddr *__addr, socklen_t *);
   int listen (int, int __n);
-  int recv (int, void *__buff, size_t __len, int __flags);
-  int recvfrom (int, void *__buff, size_t __len, int __flags,
-		struct sockaddr *__from, socklen_t *__fromlen);
-  int recvmsg(int s, struct msghdr *msg, int flags);
-  int send (int, const void *__buff, size_t __len, int __flags);
-  int sendmsg(int s, const struct msghdr *msg, int flags);
-  int sendto (int, const void *, size_t __len, int __flags,
-	      const struct sockaddr *__to, socklen_t __tolen);
+  ssize_t recv (int, void *__buff, size_t __len, int __flags);
+  ssize_t recvfrom (int, void *__buff, size_t __len, int __flags,
+		    struct sockaddr *__from, socklen_t *__fromlen);
+  ssize_t recvmsg(int s, struct msghdr *msg, int flags);
+  ssize_t send (int, const void *__buff, size_t __len, int __flags);
+  ssize_t sendmsg(int s, const struct msghdr *msg, int flags);
+  ssize_t sendto (int, const void *, size_t __len, int __flags,
+		  const struct sockaddr *__to, socklen_t __tolen);
   int setsockopt (int __s, int __level, int __optname, const void *optval,
 		  socklen_t __optlen);
   int getsockopt (int __s, int __level, int __optname, void *__optval,

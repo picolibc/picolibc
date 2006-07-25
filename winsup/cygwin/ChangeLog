@@ -1,6 +1,74 @@
+2006-07-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h: Bump DLL version to 1.7.0.
+
+2006-07-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* select.h: Remove.
+	* fhandler_socket.cc: Don't include select.h.
+	* select.cc: Ditto.
+
+2006-07-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.h: Drop socket related includes.
+	(struct _local_storage): Remove exitsock and exitsock_sin. Add
+	select_sockevt.
+	* cygtls.cc: Accomodate above change throughout.
+	* fhandler.h (class fhandler_socket): Make wsock_evt public.
+	* fhandler_socket.cc (fhandler_socket::fhandler_socket): Accomodate
+	reordering members.
+	(fhandler_socket::evaluate_events): Drop FD_CONNECT event as soon as
+	it gets read once.  Never remove FD_WRITE event here.
+	(fhandler_socket::wait_for_events): Wait 50 ms instead of INFINITE for
+	socket events.
+	(fhandler_socket::accept): Fix conditional.  Set wsock_events members
+	of accepted socket to useful start values.
+	(fhandler_socket::recv_internal): Always drop FD_READ/FD_OOB events from
+	wsock_events after the call to WSARecvFrom.
+	(fhandler_socket::send_internal): Drop FD_WRITE event from wsock_events
+	if the call to WSASendTo fails with WSAEWOULDBLOCK.  Fix return value
+	condition.
+	* select.cc (struct socketinf): Change to accomodate using socket event
+	handling.
+	(peek_socket): Use event handling for peeking socket.
+	(thread_socket): Ditto.
+	(start_thread_socket): Ditto.
+	(socket_cleanup): Same here.
+	* tlsoffsets.h: Regenerate.
+
 2006-07-23  Christopher Faylor  <cgf@timesys.com>
 
 	* include/cygwin/version.h: Bump DLL minor version number to 22.
+
+2006-07-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_socket): Rearrange slightly to keep
+	event handling methods and members together.  Drop owner status flag.
+	Split wait method.  Rename event handling methods for readability.
+	* fhandler_socket.cc (struct wsa_event): Add owner field.
+	(LOCK_EVENTS): New macro.
+	(UNLOCK_EVENTS): Ditto.
+	(fhandler_socket::init_events): rename from prepare.
+	(fhandler_socket::evaluate_events): First half of former wait method.
+	Do everything but wait.  Allow specifiying whether or not events from
+	event_mask should be erased from wsock_events->events.  Simplify
+	OOB handling.  Allow sending SIGURG to any process (group).
+	(fhandler_socket::wait_for_events): Second half of former wait method.
+	Call evaluate_events and wait in a loop if socket is blocking.
+	(fhandler_socket::release_events): Rename from release.
+	(fhandler_socket::connect): Accomodate above name changes.
+	(fhandler_socket::accept): Ditto.
+	(fhandler_socket::recv_internal): Ditto.
+	(fhandler_socket::send_internal): Ditto.
+	(fhandler_socket::close): Ditto.
+	(fhandler_socket::fcntl): Always set owner to given input value on
+	F_SETOWN.  Handle F_GETOWN.
+	* net.cc (fdsock): Accomodate above name changes.
+
+2006-07-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::wait): Set Winsock errno to
+	WSAEWOULDBLOCK instead of WSAEINPROGRESS.
 
 2006-07-19  Corinna Vinschen  <corinna@vinschen.de>
 
@@ -26,10 +94,31 @@
 	* sec_acl.cc (acltotext32): Add missing handling of default ACL entry
 	types.
 
+2006-07-18  Brian Ford  <Brian.Ford@FlightSafety.com>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* winsup.h (mmap_region_status): New enum.
+	(mmap_is_attached_or_noreserve_page): Adjust prototype and rename
+	as below.
+	* mmap.cc (mmap_is_attached_or_noreserve_page):  Rename
+	mmap_is_attached_or_noreserve.  Add region length parameter.
+	Return enum above.
+	* exceptions.cc (_cygtls::handle_exceptions): Accomodate above.
+	* fhandler.cc (fhandler_base::raw_read): Call above for NOACCESS
+	errors and retry on success to allow reads into untouched
+	MAP_NORESERVE buffers.
+
 2006-07-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_floppy.cc (fhandler_dev_floppy::ioctl): Fix typo in lint
 	directive.
+
+2006-07-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din (posix_openpt): Export.
+	* tty.cc (posix_openpt): New function.
+	* include/cygwin/stdlib.h (posix_openpt): Declare.
+	* include/cygwin/version.h: Bump API minor number.
 
 2006-07-17  Christopher Faylor  <cgf@timesys.com>
 
@@ -69,6 +158,19 @@
 	* dllfixdbg: Accommodate newer binutils which put the gnu_debuglink at
 	the end rather than at the beginning.
 
+2006-07-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (get_token_group_sidlist): Always add the interactive
+	group to the token.  Add comment.  Create logon_id group SID by
+	copying it from incoming group list.
+	(create_token): Add subauth_token parameter.  Use information in
+	subauth_token if present.  Tweak SourceIdentifier if subauth_token
+	is present for debugging purposes.
+	* security.h (create_token): Add subauth_token parameter in declaration.
+	* syscalls.cc (seteuid32): Call subauth first.  Call create_token
+	regardless.  Use subauth token in call to create_token if subauth
+	succeeded.
+
 2006-07-13  Christopher Faylor  <cgf@timesys.com>
 
 	* sigproc.cc (waitq_head): Don't initialize to zero.
@@ -83,8 +185,17 @@
 
 2006-07-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/netinet/in.h: Update copyright.
+
+2006-07-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc: Update copyright.
 	* include/pthread.h: Ditto.
+
+2006-07-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::wait): Rework function so that
+	WaitForMultipleObjects is really only called when necessary.
 
 2006-07-13  Corinna Vinschen  <corinna@vinschen.de>
 
@@ -118,8 +229,101 @@
 
 2006-07-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/netdb.h: Declare rcmd, rcmd_af, rexec, rresvport,
+	rresvport_af, iruserok, iruserok_sa, ruserok.
+
+2006-07-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Drop iruserok.o.  Add rcmd.o.
+	* autoload.cc (rcmd): Drop definition.
+	* cygwin.din: Export bindresvport, bindresvport_sa, iruserok_sa,
+	rcmd_af, rresvport_af.
+	* net.cc (cygwin_rcmd): Remove.
+	(last_used_bindresvport): Rename from last_used_rrecvport.
+	(cygwin_bindresvport_sa): New function implementing bindresvport_sa.
+	(cygwin_bindresvport): New function implementing bindresvport.
+	(cygwin_rresvport): Remove.
+	* include/cygwin/version.h: Bump API minor number.
+	* include/netinet/in.h: Declare bindresvport and bindresvport_sa.
+	* libc/iruserok.c: Remove file.
+	* libc/rcmd.cc: New file implementing rcmd, rcmd_af, rresvport,
+	rresvport_af, iruserok_sa, iruserok and ruserok.
+
+2006-07-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/pthread.h: Define PTHREAD_PRIO_NONE, PTHREAD_PRIO_INHERIT and
 	PTHREAD_PRIO_PROTECT only if _POSIX_THREAD_PRIO_INHERIT is defined.
+
+2006-07-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::getsockname): Return valid
+	result for unbound sockets.
+
+2006-07-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::fixup_after_fork): Handle
+	wsock_mtx and wsock_evt on fork, thus handling close_on_exec correctly.
+	(fhandler_socket::fixup_after_exec): Drop misguided attempt to handle
+	close_on_exec here.
+	(fhandler_socket::dup): Call fixup_after_fork with NULL parent.
+	Add comment.
+	(fhandler_socket::set_close_on_exec): Handle wsock_mtx and wsock_evt.
+
+2006-07-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_socket): Add wsock_mtx, wsock_evt
+	and wsock_events members.  Remove closed status flag, add listener
+	status flag.  Accomodate new implementation of socket event handling
+	methods.  Declare recv* and send* functions ssize_t as the POSIX
+	equivalents.
+	(fhandler_socket::recv_internal): Declare.
+	(fhandler_socket::send_internal): Ditto.
+	* fhandler_socket.cc (EVENT_MASK): Define mask of selected events.
+	(fhandler_socket::fhandler_socket): Initialize new members.
+	(fhandler_socket::af_local_setblocking): Don't actually set the
+	socket to blocking mode.  Keep sane event selection.
+	(fhandler_socket::af_local_unsetblocking): Don't actually set the
+	socket to previous blocking setting, just remember it.
+	(struct wsa_event): New structure to keep event data per shared
+	socket.
+	(NUM_SOCKS): Define number of shared sockets concurrently handled by
+	all active Cygwin processes.
+	(wsa_events): New shared datastructure keeping all wsa_event records.
+	(socket_serial_number): New shared variable to identify shared sockets.
+	(wsa_slot_mtx): Global mutex to serialize wsa_events access.
+	(search_wsa_event_slot): New static function to select a new wsa_event
+	slot for a new socket.
+	(fhandler_socket::prepare): Rewrite.  Prepare event selection
+	per new socket.
+	(fhandler_socket::wait): Rewrite.  Wait for socket events in thread
+	safe and multiple process safe.
+	(fhandler_socket::release): Rewrite.  Close per-socket descriptor
+	mutex handle and event handle.
+	(fhandler_socket::dup): Duplicate wsock_mtx and wsock_evt.  Fix
+	copy-paste error in debug output.
+	(fhandler_socket::connect): Accomodate new event handling.
+	(fhandler_socket::listen): Set listener flag on successful listen.
+	(fhandler_socket::accept): Accomodate new event handling.
+	(fhandler_socket::recv_internal): New inline method centralizing
+	common recv code.
+	(fhandler_socket::recvfrom): Call recv_internal now.
+	(fhandler_socket::recvmsg): Ditto.  Streamline copying from iovec
+	to WSABUF.
+	(fhandler_socket::send_internal): New inline method centralizing
+	common send code.
+	(fhandler_socket::sendto): Call send_internal now.
+	(fhandler_socket::sendmsg): Ditto.  Streamline copying from iovec
+	to WSABUF.
+	(fhandler_socket::close): Call release now.
+	(fhandler_socket::ioctl): Never actually switch to blocking mode.
+	Just keep track of the setting.
+	* net.cc (fdsock): Call prepare now.
+	(cygwin_connect): Revert again to event driven technique.
+	(cygwin_accept): Ditto.
+	* poll.cc (poll): Don't call recvfrom on a listening socket.
+	Remove special case for failing recvfrom.
+	* include/sys/socket.h: Declare recv* and send* functions ssize_t as 
+	requested by POSIX.
 
 2006-07-10  Corinna Vinschen  <corinna@vinschen.de>
 
@@ -130,6 +334,10 @@
 
 	* fhandler_socket.cc (fhandler_socket::wait): Disable SA_RESTART
 	handling for now.
+
+2006-07-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_inet_ntop): Fix data type of forth parameter.
 
 2006-07-07  Corinna Vinschen  <corinna@vinschen.de>
 
@@ -155,6 +363,79 @@
 
 	* child_info.h: Update copyright.
 	* fork.cc: Ditto.
+
+2006-07-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/in6.h (struct in6_addr): Fix typo.
+
+2006-07-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Export in6addr_any, in6addr_loopback, freeaddrinfo,
+	gai_strerror, getaddrinfo, getnameinfo.
+	* fhandler_socket.cc: Include cygwin/in6.h.
+	(get_inet_addr): Accomodate AF_INET6 usage.
+	(fhandler_socket::connect): Ditto.
+	(fhandler_socket::listen): Ditto.
+	(fhandler_socket::sendto): Ditto.
+	* net.cc: Include cygwin/in6.h.
+	(in6addr_any): Define.
+	(in6addr_loopback): Define.
+	(cygwin_socket): Accomodate AF_INET6 usage.
+	(socketpair): Bind socketpairs only to loopback for security.
+	(inet_pton4): New static function.
+	(inet_pton6): Ditto.
+	(cygwin_inet_pton): New AF_INET6 aware inet_pton implementation.
+	(inet_ntop4): New static function.
+	(inet_ntop6): Ditto.
+	(cygwin_inet_ntop): New AF_INET6 aware inet_ntop implementation.
+	(ga_aistruct): New static function.
+	(ga_clone): Ditto.
+	(ga_echeck): Ditto.
+	(ga_nsearch): Ditto.
+	(ga_port): Ditto.
+	(ga_serv): Ditto.
+	(ga_unix): Ditto.
+	(gn_ipv46): Ditto.
+	(ipv4_freeaddrinfo): Ditto.
+	(ipv4_getaddrinfo): Ditto.
+	(ipv4_getnameinfo): Ditto.
+	(gai_errmap_t): New structure holding error code - error string mapping.
+	(cygwin_gai_strerror): New function implementing gai_strerror.
+	(w32_to_gai_err): New static function.
+	(get_ipv6_funcs): Ditto.
+	(load_ipv6_funcs): Ditto.
+	(cygwin_freeaddrinfo): New function implementing freeaddrinfo.
+	(cygwin_getaddrinfo): New function implementing getaddrinfo.
+	(cygwin_getnameinfo): New function implementing getnameinfo.
+	* include/netdb.h: Include stdint.h and cygwin/socket.h.  Define
+	data types and macros used by getaddrinfo and friends.  Declare
+	freeaddrinfo, gai_strerror, getaddrinfo and getnameinfo.
+	* include/cygwin/in.h: Add IPv6 related IPPROTOs. Remove definition
+	of struct sockaddr_in6.  Include cygwin/in6.h instead.
+	* include/cygwin/in6.h: New header file defining IPv6 releated
+	data types and macros.
+	* include/cygwin/socket.h: Enable AF_INET6 and PF_INET6.  Add
+	IPv6 related socket options.
+	* include/cygwin/version.h: Bump API minor number.
+
+2006-07-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (DsGetDcNameA): Define.
+	(NetGetAnyDCName): Define.
+	* security.cc: Include dsgetdc.h.
+	(DsGetDcNameA): Declare.
+	(DS_FORCE_REDISCOVERY): Define.
+	(get_logon_server): Add bool parameter to control rediscovery of DC.
+	Use DsGetDcNameA function if supported, NetGetDCName/NetGetAnyDCName
+	otherwise.
+	(get_server_groups): Rediscover DC if get_user_groups fails and
+	try again.
+	(get_reg_security): Use correct error code macro when testing
+	RegGetKeySecurity return value.
+	* security.h (get_logon_server): Remove default vaue from wserver
+	parameter.  Add rediscovery parameter.
+	* uinfo.cc (cygheap_user::env_logsrv): Accomodate rediscovery parameter
+	in call to get_logon_server.
 
 2006-07-05  Christopher Faylor  <cgf@timesys.com>
 

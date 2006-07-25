@@ -28,6 +28,7 @@ typedef uint32_t in_addr_t;
 enum
 {
   IPPROTO_IP = 0,		/* Dummy protocol for TCP		*/
+  IPPROTO_HOPOPTS = 0,		/* IPv6 Hop-by-Hop options		*/
   IPPROTO_ICMP = 1,		/* Internet Control Message Protocol	*/
   IPPROTO_IGMP = 2,		/* Internet Gateway Management Protocol */
   IPPROTO_IPIP = 4,		/* IPIP tunnels (older KA9Q tunnels use 94) */
@@ -36,12 +37,21 @@ enum
   IPPROTO_PUP = 12,		/* PUP protocol				*/
   IPPROTO_UDP = 17,		/* User Datagram Protocol		*/
   IPPROTO_IDP = 22,		/* XNS IDP protocol			*/
+  IPPROTO_IPV6 = 41,		/* IPv6 header				*/
+  IPPROTO_ROUTING = 43,		/* IPv6 Routing header			*/
+  IPPROTO_FRAGMENT = 44,	/* IPv6 fragmentation header		*/
+  IPPROTO_ESP = 50,		/* encapsulating security payload	*/
+  IPPROTO_AH = 51,		/* authentication header		*/
+  IPPROTO_ICMPV6 = 58,		/* ICMPv6				*/
+  IPPROTO_NONE = 59,		/* IPv6 no next header			*/
+  IPPROTO_DSTOPTS = 60,		/* IPv6 Destination options		*/
   IPPROTO_RAW = 255,		/* Raw IP packets			*/
   IPPROTO_MAX
 };
 
 /* Define IPPROTO_xxx values to accomodate SUSv3 */
 #define IPPROTO_IP IPPROTO_IP
+#define IPPROTO_HOPOPTS IPPROTO_HOPOPTS
 #define IPPROTO_ICMP IPPROTO_ICMP
 #define IPPROTO_IGMP IPPROTO_IGMP
 #define IPPROTO_IPIP IPPROTO_IPIP
@@ -51,6 +61,14 @@ enum
 #define IPPROTO_UDP IPPROTO_UDP
 #define IPPROTO_IDP IPPROTO_IDP
 #define IPPROTO_RAW IPPROTO_RAW
+#define IPPROTO_IPV6 IPPROTO_IPV6
+#define IPPROTO_ROUTING IPPROTO_ROUTING
+#define IPPROTO_FRAGMENT IPPROTO_FRAGMENT
+#define IPPROTO_ESP IPPROTO_ESP
+#define IPPROTO_AH IPPROTO_AH
+#define IPPROTO_ICMPV6 IPPROTO_ICMPV6
+#define IPPROTO_NONE IPPROTO_NONE
+#define IPPROTO_DSTOPTS IPPROTO_DSTOPTS
 
 /* Standard well-known ports.  *//* from winsup/include/netinet/in.h */
 enum
@@ -185,21 +203,7 @@ struct sockaddr_in
 
 #endif
 
-#ifdef USE_IPV6
-/* IPv6 definitions as we start to include them. This is just
-   a beginning dont get excited 8) */
-struct in6_addr
-{
-  uint8_t 	  s6_addr[16];
-};
-
-struct sockaddr_in6
-{
-  sa_family_t	  sin6_family;		/* AF_INET6 */
-  in_port_t	  sin6_port;		/* Port number. */
-  uint32_t	  sin6_flowinfo;	/* Traffic class and flow inf. */
-  struct in6_addr sin6_addr;		/* IPv6 address. */
-  uint32_t	  sin6_scope_id;	/* Set of interfaces for a scope. */
-};
+#ifdef AF_INET6
+#include <cygwin/in6.h>
 #endif
 #endif	/* _CYGWIN_IN_H */
