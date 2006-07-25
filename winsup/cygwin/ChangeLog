@@ -1,3 +1,31 @@
+2006-07-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.h: Drop socket related includes.
+	(struct _local_storage): Remove exitsock and exitsock_sin. Add
+	select_sockevt.
+	* cygtls.cc: Accomodate above change throughout.
+	* fhandler.h (class fhandler_socket): Make wsock_evt public.
+	* fhandler_socket.cc (fhandler_socket::fhandler_socket): Accomodate
+	reordering members.
+	(fhandler_socket::evaluate_events): Drop FD_CONNECT event as soon as
+	it gets read once.  Never remove FD_WRITE event here.
+	(fhandler_socket::wait_for_events): Wait 50 ms instead of INFINITE for
+	socket events.
+	(fhandler_socket::accept): Fix conditional.  Set wsock_events members
+	of accepted socket to useful start values.
+	(fhandler_socket::recv_internal): Always drop FD_READ/FD_OOB events from
+	wsock_events after the call to WSARecvFrom.
+	(fhandler_socket::send_internal): Drop FD_WRITE event from wsock_events
+	if the call to WSASendTo fails with WSAEWOULDBLOCK.  Fix return value
+	condition.
+	* select.cc (struct socketinf): Change to accomodate using socket event
+	handling.
+	(peek_socket): Use event handling for peeking socket.
+	(thread_socket): Ditto.
+	(start_thread_socket): Ditto.
+	(socket_cleanup): Same here.
+	* tlsoffsets.h: Regenerate.
+
 2006-07-23  Christopher Faylor  <cgf@timesys.com>
 
 	* include/cygwin/version.h: Bump DLL minor version number to 22.

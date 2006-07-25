@@ -387,13 +387,13 @@ class fhandler_socket: public fhandler_base
   int type;
   int connect_secret[4];
 
-  HANDLE wsock_mtx;
-  HANDLE wsock_evt;
   wsa_event *wsock_events;
+  HANDLE wsock_mtx;
  public:
+  HANDLE wsock_evt;
   bool init_events ();
- private:
   int evaluate_events (const long event_mask, long &events, bool erase);
+ private:
   int wait_for_events (const long event_mask);
   void release_events ();
 

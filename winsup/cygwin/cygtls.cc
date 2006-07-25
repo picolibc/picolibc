@@ -106,7 +106,7 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
 
   thread_id = GetCurrentThreadId ();
   initialized = CYGTLS_INITIALIZED;
-  locals.exitsock = INVALID_SOCKET;
+  locals.select_sockevt = INVALID_HANDLE_VALUE;
   errno_addr = &(local_clib._errno);
 
   if ((void *) func == (void *) cygthread::stub
@@ -137,7 +137,7 @@ _cygtls::fixup_after_fork ()
       sig = 0;
     }
   stacklock = spinning = 0;
-  locals.exitsock = INVALID_SOCKET;
+  locals.select_sockevt = INVALID_HANDLE_VALUE;
   wq.thread_ev = NULL;
 }
 
@@ -152,7 +152,7 @@ void
 _cygtls::remove (DWORD wait)
 {
   initialized = 0;
-  if (!locals.exitsock || exit_state >= ES_FINAL)
+  if (!locals.select_sockevt || exit_state >= ES_FINAL)
     return;
 
   debug_printf ("wait %p", wait);
@@ -160,10 +160,10 @@ _cygtls::remove (DWORD wait)
     {
       /* FIXME: Need some sort of atthreadexit function to allow things like
 	 select to control this themselves. */
-      if (locals.exitsock != INVALID_SOCKET)
+      if (locals.select_sockevt != INVALID_HANDLE_VALUE)
 	{
-	  closesocket (locals.exitsock);
-	  locals.exitsock = (SOCKET) NULL;
+	  CloseHandle (locals.select_sockevt);
+	  locals.select_sockevt = (HANDLE) NULL;
 	}
       free_local (process_ident);
       free_local (ntoa_buf);

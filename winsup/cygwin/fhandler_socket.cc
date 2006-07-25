@@ -130,9 +130,9 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 
 fhandler_socket::fhandler_socket () :
   fhandler_base (),
+  wsock_events (NULL),
   wsock_mtx (NULL),
   wsock_evt (NULL),
-  wsock_events (NULL),
   sun_path (NULL),
   status ()
 {
@@ -540,9 +540,10 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
 	      ret = SOCKET_ERROR;
 	    }
 	  wsock_events->connect_errorcode = 0;
+	  wsock_events->events &= ~FD_CONNECT;
 	}
       if (erase)
-	wsock_events->events &= ~(events & ~FD_CLOSE);
+	wsock_events->events &= ~(events & ~(FD_WRITE | FD_CLOSE));
     }
   UNLOCK_EVENTS;
 
@@ -567,7 +568,7 @@ fhandler_socket::wait_for_events (const long event_mask)
 	}
 
       WSAEVENT ev[2] = { wsock_evt, signal_arrived };
-      switch (WSAWaitForMultipleEvents (2, ev, FALSE, INFINITE, FALSE))
+      switch (WSAWaitForMultipleEvents (2, ev, FALSE, 50, FALSE))
 	{
 	  case WSA_WAIT_TIMEOUT:
 	  case WSA_WAIT_EVENT_0:
@@ -1107,9 +1108,9 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 
   int res = 0;
   while (!(res = wait_for_events (FD_ACCEPT | FD_CLOSE))
-	 && (res = ::accept (get_socket (), peer, len)) == WSAEWOULDBLOCK)
+	 && (res = ::accept (get_socket (), peer, len)) == SOCKET_ERROR
+	 && WSAGetLastError () == WSAEWOULDBLOCK)
     ;
-
   if (res == (int) INVALID_SOCKET)
     set_winsock_errno ();
   else
@@ -1140,6 +1141,9 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 		    }
 		}
 	    }
+	  /* No locking necessary at this point. */
+	  sock->wsock_events->events = wsock_events->events | FD_WRITE;
+	  sock->wsock_events->owner = wsock_events->owner;
 	  sock->connect_state (connected);
 	  res = res_fd;
 	}
@@ -1253,19 +1257,29 @@ fhandler_socket::recv_internal (WSABUF *wsabuf, DWORD wsacnt, DWORD flags,
 {
   ssize_t res = 0;
   DWORD ret = 0;
+  int evt_mask = FD_READ | ((flags & MSG_OOB) ? FD_OOB : 0);
 
   flags &= MSG_WINMASK;
   if (flags & MSG_PEEK)
-    res = WSARecvFrom (get_socket (), wsabuf, wsacnt, &ret,
-		       &flags, from, fromlen, NULL, NULL);
+    {
+      LOCK_EVENTS;
+      res = WSARecvFrom (get_socket (), wsabuf, wsacnt, &ret,
+			 &flags, from, fromlen, NULL, NULL);
+      wsock_events->events &= ~evt_mask;
+      UNLOCK_EVENTS;
+    }
   else
     {
-      int evt_mask = FD_READ | FD_CLOSE
-		     | ((flags & MSG_OOB) ? FD_OOB : 0);
-      while ((res = WSARecvFrom (get_socket (), wsabuf, wsacnt, &ret,
-				    &flags, from, fromlen, NULL, NULL)) == -1
-	     && WSAGetLastError () == WSAEWOULDBLOCK
-	     && !(res = wait_for_events (evt_mask)))
+      do
+        {
+	  LOCK_EVENTS;
+	  res = WSARecvFrom (get_socket (), wsabuf, wsacnt, &ret,
+			     &flags, from, fromlen, NULL, NULL);
+	  wsock_events->events &= ~evt_mask;
+	  UNLOCK_EVENTS;
+	}
+      while (res && WSAGetLastError () == WSAEWOULDBLOCK
+	     && !(res = wait_for_events (evt_mask | FD_CLOSE)))
 	;
     }
 
@@ -1355,15 +1369,23 @@ fhandler_socket::send_internal (struct _WSABUF *wsabuf, DWORD wsacnt, int flags,
 				const struct sockaddr *to, int tolen)
 {
   int res = 0;
-  DWORD ret = 0;
-  while ((res = WSASendTo (get_socket (), wsabuf, wsacnt, &ret,
-			   flags & MSG_WINMASK, to, tolen, NULL, NULL)) == -1
-	 && WSAGetLastError () == WSAEWOULDBLOCK
-	 && !(res = wait_for_events (FD_WRITE | FD_CLOSE)))
-    ;
+  DWORD ret = 0, err = 0;
+
+  do
+    {
+      LOCK_EVENTS;
+      if ((res = WSASendTo (get_socket (), wsabuf, wsacnt, &ret,
+			    flags & MSG_WINMASK, to, tolen, NULL, NULL))
+	  && (err = WSAGetLastError ()) == WSAEWOULDBLOCK)
+        wsock_events->events &= ~FD_WRITE;
+      UNLOCK_EVENTS;
+    }
+  while (res && err && !(res = wait_for_events (FD_WRITE | FD_CLOSE)));
 
   if (res == SOCKET_ERROR)
     set_winsock_errno ();
+  else
+    res = ret;
 
   /* Special handling for EPIPE and SIGPIPE.
 
@@ -1377,8 +1399,6 @@ fhandler_socket::send_internal (struct _WSABUF *wsabuf, DWORD wsacnt, int flags,
       if (! (flags & MSG_NOSIGNAL))
 	raise (SIGPIPE);
     }
-  else
-    res = ret;
 
   return res;
 }

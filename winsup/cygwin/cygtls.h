@@ -18,10 +18,6 @@ details. */
 #undef _NOMNTENT_FUNCS
 #include <setjmp.h>
 #include <exceptions.h>
-#ifndef _WINSOCK_H
-#include <netinet/in.h>
-typedef unsigned int SOCKET;
-#endif
 
 #define CYGTLS_INITIALIZED 0xc763173f
 
@@ -69,8 +65,7 @@ struct _local_storage
   char mnt_dir[CYG_MAX_PATH];
 
   /* select.cc */
-  SOCKET exitsock;
-  struct sockaddr_in exitsock_sin;
+  HANDLE select_sockevt;
 
   /* strerror */
   char strerror_buf[sizeof ("Unknown error 4294967295")];
