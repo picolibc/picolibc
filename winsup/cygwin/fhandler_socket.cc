@@ -33,7 +33,6 @@
 #include "shared_info.h"
 #include "sigproc.h"
 #include "cygthread.h"
-#include "select.h"
 #include "wininfo.h"
 #include <unistd.h>
 #include <sys/acl.h>

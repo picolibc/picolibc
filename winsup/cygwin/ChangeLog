@@ -1,5 +1,11 @@
 2006-07-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* select.h: Remove.
+	* fhandler_socket.cc: Don't include select.h.
+	* select.cc: Ditto.
+
+2006-07-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygtls.h: Drop socket related includes.
 	(struct _local_storage): Remove exitsock and exitsock_sin. Add
 	select_sockevt.
