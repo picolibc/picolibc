@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-#ifndef __OBJC__
+#ifndef _OBJC_NO_COM
 #include <objbase.h>
 #include <shlobj.h>
 #endif
@@ -166,7 +166,7 @@ WINSHLWAPI LPSTR WINAPI StrRChrA(LPCSTR,LPCSTR,WORD);
 WINSHLWAPI LPWSTR WINAPI StrRChrW(LPCWSTR,LPCWSTR,WCHAR);
 WINSHLWAPI LPSTR WINAPI StrRChrIA(LPCSTR,LPCSTR,WORD);
 WINSHLWAPI LPWSTR WINAPI StrRChrIW(LPCWSTR,LPCWSTR,WCHAR);
-#ifndef __OBJC__
+#ifndef _OBJC_NO_COM
 WINSHLWAPI HRESULT WINAPI StrRetToBufA(LPSTRRET,LPCITEMIDLIST,LPSTR,UINT);
 WINSHLWAPI HRESULT WINAPI StrRetToBufW(LPSTRRET,LPCITEMIDLIST,LPWSTR,UINT);
 WINSHLWAPI HRESULT WINAPI StrRetToStrA(LPSTRRET,LPCITEMIDLIST,LPSTR*);
@@ -297,7 +297,7 @@ WINSHLWAPI BOOL WINAPI PathUnmakeSystemFolderW(LPWSTR);
 WINSHLWAPI void WINAPI PathUnquoteSpacesA(LPSTR);
 WINSHLWAPI void WINAPI PathUnquoteSpacesW(LPWSTR);
 WINSHLWAPI HRESULT WINAPI SHAutoComplete(HWND,DWORD);
-#ifndef __OBJC__
+#ifndef _OBJC_NO_COM
 WINSHLWAPI HRESULT WINAPI SHCreateStreamOnFileA(LPCSTR,DWORD,struct IStream**);
 WINSHLWAPI HRESULT WINAPI SHCreateStreamOnFileW(LPCWSTR,DWORD,struct IStream**);
 WINSHLWAPI struct IStream* WINAPI SHOpenRegStream2A(HKEY,LPCSTR,LPCSTR,DWORD);
@@ -318,7 +318,7 @@ WINSHLWAPI DWORD WINAPI SHQueryInfoKeyA(HKEY,LPDWORD,LPDWORD,LPDWORD,LPDWORD);
 WINSHLWAPI DWORD WINAPI SHQueryInfoKeyW(HKEY,LPDWORD,LPDWORD,LPDWORD,LPDWORD);
 WINSHLWAPI DWORD WINAPI SHQueryValueExA(HKEY,LPCSTR,LPDWORD,LPDWORD,LPVOID,LPDWORD);
 WINSHLWAPI DWORD WINAPI SHQueryValueExW(HKEY,LPCWSTR,LPDWORD,LPDWORD,LPVOID,LPDWORD);
-#ifndef __OBJC__
+#ifndef _OBJC_NO_COM
 WINSHLWAPI HRESULT WINAPI SHGetThreadRef(IUnknown**);
 WINSHLWAPI HRESULT WINAPI SHSetThreadRef(IUnknown*);
 WINSHLWAPI BOOL WINAPI SHSkipJunction(IBindCtx*,const CLSID*);
@@ -443,7 +443,7 @@ HRESULT WINAPI DllInstall(BOOL,LPCWSTR);
 #define StrPBrk StrPBrkW
 #define StrRChr StrRChrW
 #define StrRChrI StrRChrIW
-#ifndef __OBJC__
+#ifndef _OBJC_NO_COM
 #define StrRetToBuf StrRetToBufW
 #define StrRetToStr StrRetToStrW
 #endif
@@ -509,7 +509,7 @@ HRESULT WINAPI DllInstall(BOOL,LPCWSTR);
 #define PathUnExpandEnvStrings PathUnExpandEnvStringsW
 #define PathUnmakeSystemFolder PathUnmakeSystemFolderW
 #define PathUnquoteSpaces PathUnquoteSpacesW
-#ifndef __OBJC__
+#ifndef _OBJC_NO_COM
 #define SHCreateStreamOnFile SHCreateStreamOnFileW
 #define SHOpenRegStream SHOpenRegStreamW
 #define SHOpenRegStream2 SHOpenRegStream2W
@@ -585,7 +585,7 @@ HRESULT WINAPI DllInstall(BOOL,LPCWSTR);
 #define StrPBrk StrPBrkA
 #define StrRChr StrRChrA
 #define StrRChrI StrRChrIA
-#ifndef __OBJC__
+#ifndef _OBJC_NO_COM
 #define StrRetToBuf StrRetToBufA
 #define StrRetToStr StrRetToStrA
 #endif
@@ -651,7 +651,7 @@ HRESULT WINAPI DllInstall(BOOL,LPCWSTR);
 #define PathUnExpandEnvStrings PathUnExpandEnvStringsA
 #define PathUnmakeSystemFolder PathUnmakeSystemFolderA
 #define PathUnquoteSpaces PathUnquoteSpacesA
-#ifndef __OBJC__
+#ifndef _OBJC_NO_COM
 #define SHCreateStreamOnFile SHCreateStreamOnFileA
 #define SHOpenRegStream SHOpenRegStreamA
 #define SHOpenRegStream2 SHOpenRegStream2A

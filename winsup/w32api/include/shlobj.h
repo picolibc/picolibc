@@ -1102,8 +1102,8 @@ typedef IPersistFolder3 *LPPERSISTFOLDER3;
 
 #endif /* _WIN32_IE >= 0x0500 */
 
-typedef interface IShellBrowser *LPSHELLBROWSER;
-typedef interface IShellView *LPSHELLVIEW;
+typedef _COM_interface IShellBrowser *LPSHELLBROWSER;
+typedef _COM_interface IShellView *LPSHELLVIEW;
 
 #define INTERFACE IShellBrowser
 DECLARE_INTERFACE_(IShellBrowser,IOleWindow)

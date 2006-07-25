@@ -1,7 +1,7 @@
 /*
  * ws2spi.h
  *
- * Winsock 2 Service Provider interface.
+ * Winsock 2 Service Provider Interface.
  *
  *
  * THIS SOFTWARE IS NOT COPYRIGHTED

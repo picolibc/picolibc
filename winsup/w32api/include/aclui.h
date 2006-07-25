@@ -4,7 +4,7 @@
 #pragma GCC system_header
 #endif
 
-#ifndef __OBJC__
+#ifndef _OBJC_NO_COM
 #include <objbase.h>
 #include <commctrl.h>
 #include <accctrl.h>

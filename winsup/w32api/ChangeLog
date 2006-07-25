@@ -1,3 +1,31 @@
+2006-07-25  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/aclui.h: Replace __OBJC__ guard with _OBJC_NO_COM.
+	* include/basetyps.h:  Likewise.
+ 	(_COM_interface): New define.
+	(interface): Define to _COM_interface, conditional on !__OBJC__.
+	Replace 'interface' with '_COM_interface', throughout.
+  	* include/comcat.h: Replace 'interface' with '_COM_interface', throughout.
+	* include/commdlg.h: Replace __OBJC__ guard with _OBJC_NO_COM.
+	* include/docobj.h: Replace 'interface' with '_COM_interface', throughout.
+	* include/mshtml.h: Likewise.
+	* include/oaidl.h: Likewise.
+	* include/objfwd.h: Likewise.
+	* include/objidl.h: Likewise.
+	* include/ocidl.h: Likwise.
+	* include/olectl.h: Likewise.
+	* include/oleidl.h: Likewise.
+	* include/shlobj.h: Likewise.
+	* include/shlwapi.h: Replace __OBJC__ guard with _OBJC_NO_COM.
+	* include/vfw.h: Likewise.
+	* include/windows.h. Likewise. Add comment.
+	* include/directx/d3d9.h: Replace 'interface' with '_COM_interface',
+	throughout.
+
+	* lib/test.c: Replace __OBJC__ guard with _OBJC_NO_COM.
+	Add test for conflict with '@interface'
+ 
+
 2006-07-22  ipsoner  <ipsoner@users.sourceforge.net>
 
     * include/wincrypt.h (szOID_RSA, szOID_PKCS, szOID_RSA_HASH,
@@ -61,7 +89,7 @@
 
 2006-07-22  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
-    * lib/uuid.c: Remove.
+	* lib/uuid.c: Remove.
 
 2006-07-20  Elias Naur  <elias_naur@users.sourceforge.net>
 

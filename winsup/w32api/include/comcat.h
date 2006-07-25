@@ -16,7 +16,7 @@ extern "C"{
 #endif
 
 EXTERN_C const IID IID_IEnumGUID;
-typedef interface IEnumGUID *LPENUMGUID;
+typedef _COM_interface IEnumGUID *LPENUMGUID;
 
 #define INTERFACE IEnumGUID
 DECLARE_INTERFACE_(IEnumGUID,IUnknown)
@@ -79,13 +79,13 @@ EXTERN_C const CATID CATID_DesignTimeUIActivatableControl;
 #define IID_IEnumCLSID IID_IEnumGUID
 
 EXTERN_C const IID IID_ICatInformation;
-typedef interface ICatInformation *LPCATINFORMATION;
+typedef _COM_interface ICatInformation *LPCATINFORMATION;
 
 EXTERN_C const IID IID_ICatRegister;
-typedef interface ICatRegister *LPCATREGISTER;
+typedef _COM_interface ICatRegister *LPCATREGISTER;
 
 EXTERN_C const IID IID_IEnumCATEGORYINFO;
-typedef interface IEnumCATEGORYINFO *LPENUMCATEGORYINFO;
+typedef _COM_interface IEnumCATEGORYINFO *LPENUMCATEGORYINFO;
 
 EXTERN_C const CLSID CLSID_StdComponentCategoriesMgr;
 

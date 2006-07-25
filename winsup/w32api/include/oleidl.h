@@ -12,24 +12,24 @@ extern "C" {
 
 #define MK_ALT	32
 
-typedef interface IParseDisplayName *LPPARSEDISPLAYNAME;
-typedef interface IOleContainer *LPOLECONTAINER;
-typedef interface IOleClientSite *LPOLECLIENTSITE;
-typedef interface IOleObject *LPOLEOBJECT;
-typedef interface IDropTarget *LPDROPTARGET;
-typedef interface IDropSource *LPDROPSOURCE;
-typedef interface IEnumOleUndoUnits *LPENUMOLEUNDOUNITS;
-typedef interface IEnumOLEVERB *LPENUMOLEVERB;
-typedef interface IOleWindow *LPOLEWINDOW;
-typedef interface IOleInPlaceUIWindow *LPOLEINPLACEUIWINDOW;
-typedef interface IOleInPlaceActiveObject *LPOLEINPLACEACTIVEOBJECT;
-typedef interface IOleInPlaceFrame *LPOLEINPLACEFRAME;
-typedef interface IOleAdviseHolder *LPOLEADVISEHOLDER;
-typedef interface IViewObject *LPVIEWOBJECT;
-typedef interface IViewObject2 *LPVIEWOBJECT2;
-typedef interface IOleCache *LPOLECACHE;
-typedef interface IOleCache2 *LPOLECACHE2;
-typedef interface IOleCacheControl *LPOLECACHECONTROL;
+typedef _COM_interface IParseDisplayName *LPPARSEDISPLAYNAME;
+typedef _COM_interface IOleContainer *LPOLECONTAINER;
+typedef _COM_interface IOleClientSite *LPOLECLIENTSITE;
+typedef _COM_interface IOleObject *LPOLEOBJECT;
+typedef _COM_interface IDropTarget *LPDROPTARGET;
+typedef _COM_interface IDropSource *LPDROPSOURCE;
+typedef _COM_interface IEnumOleUndoUnits *LPENUMOLEUNDOUNITS;
+typedef _COM_interface IEnumOLEVERB *LPENUMOLEVERB;
+typedef _COM_interface IOleWindow *LPOLEWINDOW;
+typedef _COM_interface IOleInPlaceUIWindow *LPOLEINPLACEUIWINDOW;
+typedef _COM_interface IOleInPlaceActiveObject *LPOLEINPLACEACTIVEOBJECT;
+typedef _COM_interface IOleInPlaceFrame *LPOLEINPLACEFRAME;
+typedef _COM_interface IOleAdviseHolder *LPOLEADVISEHOLDER;
+typedef _COM_interface IViewObject *LPVIEWOBJECT;
+typedef _COM_interface IViewObject2 *LPVIEWOBJECT2;
+typedef _COM_interface IOleCache *LPOLECACHE;
+typedef _COM_interface IOleCache2 *LPOLECACHE2;
+typedef _COM_interface IOleCacheControl *LPOLECACHECONTROL;
 
 typedef enum tagBINDSPEED
 {

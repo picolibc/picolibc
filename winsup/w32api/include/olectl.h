@@ -225,24 +225,24 @@ extern "C" {
 #define DISPID_PICT_HEIGHT 5
 #define DISPID_PICT_RENDER 6
 
-typedef interface IOleControl *LPOLECONTROL;
-typedef interface IOleControlSite *LPOLECONTROLSITE;
-typedef interface ISimpleFrameSite *LPSIMPLEFRAMESITE;
-typedef interface IPersistPropertyBag *LPPERSISTPROPERTYBAG;
-typedef interface IPersistStreamInit *LPPERSISTSTREAMINIT;
-typedef interface IPersistMemory *LPPERSISTMEMORY;
-typedef interface IPropertyNotifySink* LPPROPERTYNOTIFYSINK;
-typedef interface IProvideClassInfo *LPPROVIDECLASSINFO;
-typedef interface IProvideClassInfo2 *LPPROVIDECLASSINFO2;
-typedef interface IConnectionPointContainer *LPCONNECTIONPOINTCONTAINER;
-typedef interface IClassFactory2 *LPCLASSFACTORY2;
-typedef interface ISpecifyPropertyPages *LPSPECIFYPROPERTYPAGES;
-typedef interface IPerPropertyBrowsing *LPPERPROPERTYBROWSING;
-typedef interface IPropertyPage *LPPROPERTYPAGE;
-typedef interface IPropertyPage2 *LPPROPERTYPAGE2;
+typedef _COM_interface IOleControl *LPOLECONTROL;
+typedef _COM_interface IOleControlSite *LPOLECONTROLSITE;
+typedef _COM_interface ISimpleFrameSite *LPSIMPLEFRAMESITE;
+typedef _COM_interface IPersistPropertyBag *LPPERSISTPROPERTYBAG;
+typedef _COM_interface IPersistStreamInit *LPPERSISTSTREAMINIT;
+typedef _COM_interface IPersistMemory *LPPERSISTMEMORY;
+typedef _COM_interface IPropertyNotifySink* LPPROPERTYNOTIFYSINK;
+typedef _COM_interface IProvideClassInfo *LPPROVIDECLASSINFO;
+typedef _COM_interface IProvideClassInfo2 *LPPROVIDECLASSINFO2;
+typedef _COM_interface IConnectionPointContainer *LPCONNECTIONPOINTCONTAINER;
+typedef _COM_interface IClassFactory2 *LPCLASSFACTORY2;
+typedef _COM_interface ISpecifyPropertyPages *LPSPECIFYPROPERTYPAGES;
+typedef _COM_interface IPerPropertyBrowsing *LPPERPROPERTYBROWSING;
+typedef _COM_interface IPropertyPage *LPPROPERTYPAGE;
+typedef _COM_interface IPropertyPage2 *LPPROPERTYPAGE2;
 
-typedef interface IPicture *LPPICTURE;
-typedef interface IPictureDisp *LPPICTUREDISP;
+typedef _COM_interface IPicture *LPPICTURE;
+typedef _COM_interface IPictureDisp *LPPICTUREDISP;
 typedef long OLE_XPOS_PIXELS;
 typedef long OLE_YPOS_PIXELS;
 typedef long OLE_XSIZE_PIXELS;

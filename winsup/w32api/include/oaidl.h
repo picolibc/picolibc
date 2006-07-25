@@ -58,21 +58,21 @@ extern "C" {
 #define IMPLTYPEFLAG_FRESTRICTED 4
 #define IMPLTYPEFLAG_FDEFAULTVTABLE 8
 
-typedef interface ITypeLib *LPTYPELIB;
-typedef interface ITypeLib2 *LPTYPELIB2;
-typedef interface ICreateTypeInfo *LPCREATETYPEINFO;
-typedef interface ICreateTypeInfo2 *LPCREATETYPEINFO2;
-typedef interface ICreateTypeLib *LPCREATETYPELIB;
-typedef interface ICreateTypeLib2 *LPCREATETYPELIB2;
-typedef interface ITypeComp *LPTYPECOMP;
-typedef interface ITypeInfo *LPTYPEINFO;
-typedef interface ITypeInfo2 *LPTYPEINFO2;
-typedef interface IErrorInfo *LPERRORINFO;
-typedef interface IDispatch *LPDISPATCH;
-typedef interface IEnumVARIANT *LPENUMVARIANT;
-typedef interface ICreateErrorInfo *LPCREATEERRORINFO;
-typedef interface ISupportErrorInfo *LPSUPPORTERRORINFO;
-typedef interface IRecordInfo *LPRECORDINFO;
+typedef _COM_interface ITypeLib *LPTYPELIB;
+typedef _COM_interface ITypeLib2 *LPTYPELIB2;
+typedef _COM_interface ICreateTypeInfo *LPCREATETYPEINFO;
+typedef _COM_interface ICreateTypeInfo2 *LPCREATETYPEINFO2;
+typedef _COM_interface ICreateTypeLib *LPCREATETYPELIB;
+typedef _COM_interface ICreateTypeLib2 *LPCREATETYPELIB2;
+typedef _COM_interface ITypeComp *LPTYPECOMP;
+typedef _COM_interface ITypeInfo *LPTYPEINFO;
+typedef _COM_interface ITypeInfo2 *LPTYPEINFO2;
+typedef _COM_interface IErrorInfo *LPERRORINFO;
+typedef _COM_interface IDispatch *LPDISPATCH;
+typedef _COM_interface IEnumVARIANT *LPENUMVARIANT;
+typedef _COM_interface ICreateErrorInfo *LPCREATEERRORINFO;
+typedef _COM_interface ISupportErrorInfo *LPSUPPORTERRORINFO;
+typedef _COM_interface IRecordInfo *LPRECORDINFO;
 
 extern const IID IID_ITypeLib;
 extern const IID IID_ITypeLib2;

@@ -4,7 +4,7 @@
 #pragma GCC system_header
 #endif
 
-#ifndef __OBJC__
+#ifndef _OBJC_NO_COM_
 # ifdef __cplusplus
 #  define EXTERN_C extern "C"
 # else
@@ -40,7 +40,14 @@
 # define STDAPIV_(t)	EXTERN_C t STDAPIVCALLTYPE
 # define STDMETHODIMPV	HRESULT STDMETHODVCALLTYPE
 # define STDMETHODIMPV_(t)	t STDMETHODVCALLTYPE
-# define interface	struct
+/* Newer MS compilers support the __interface keyword, but
+   that has a specific meaning that is enforced by the compiler.
+   For now, just get 'interface' out of the global namespace
+   for __OBJC__ */
+# define _COM_interface	struct
+# ifndef __OBJC__
+#  define interface	_COM_interface
+# endif
 # if defined(__cplusplus) && !defined(CINTERFACE)
 #  define STDMETHOD(m)	virtual HRESULT STDMETHODCALLTYPE m
 #  define STDMETHOD_(t,m)	virtual t STDMETHODCALLTYPE m
@@ -52,11 +59,11 @@
   g++ vtables are now COM-compatible by default
 */
 #  if defined(__GNUC__) &&  __GNUC__ < 3 && !defined(NOCOMATTRIBUTE)
-#   define DECLARE_INTERFACE(i) interface __attribute__((com_interface)) i
-#   define DECLARE_INTERFACE_(i,b) interface __attribute__((com_interface)) i : public b
+#   define DECLARE_INTERFACE(i) _COM_interface __attribute__((com_interface)) i
+#   define DECLARE_INTERFACE_(i,b) _COM_interface __attribute__((com_interface)) i : public b
 #  else
-#   define DECLARE_INTERFACE(i) interface i
-#   define DECLARE_INTERFACE_(i,b) interface i : public b
+#   define DECLARE_INTERFACE(i) _COM_interface i
+#   define DECLARE_INTERFACE_(i,b) _COM_interface i : public b
 #  endif
 # else
 #  define STDMETHOD(m)	HRESULT(STDMETHODCALLTYPE *m)
@@ -68,7 +75,7 @@
 #   define CONST_VTABLE
 #  endif
 #  define DECLARE_INTERFACE(i) \
-   typedef interface i { CONST_VTABLE struct i##Vtbl *lpVtbl; } i; \
+   typedef _COM_interface i { CONST_VTABLE struct i##Vtbl *lpVtbl; } i; \
    typedef CONST_VTABLE struct i##Vtbl i##Vtbl; \
    CONST_VTABLE struct i##Vtbl
 #  define DECLARE_INTERFACE_(i,b) DECLARE_INTERFACE(i)
@@ -76,7 +83,7 @@
 # define BEGIN_INTERFACE
 # define END_INTERFACE
 
-# define FWD_DECL(i) typedef interface i i
+# define FWD_DECL(i) typedef _COM_interface i i
 # if defined(__cplusplus) && !defined(CINTERFACE)
 #  define IENUM_THIS(T)
 #  define IENUM_THIS_(T)
@@ -97,7 +104,7 @@
          }
 # define DECLARE_ENUMERATOR(T) DECLARE_ENUMERATOR_(IEnum##T,T)
 
-#endif /* __OBJC__ */
+#endif /* _OBJC_NO_COM_ */
 
 #ifdef _GUID_DEFINED
 # warning _GUID_DEFINED is deprecated, use GUID_DEFINED instead
@@ -169,4 +176,4 @@ typedef unsigned long PROPID;
 #define DEFINE_GUID(n,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8) GUID_EXT const GUID n
 #define DEFINE_OLEGUID(n,l,w1,w2) DEFINE_GUID(n,l,w1,w2,0xC0,0,0,0,0,0,0,0x46)
 #endif
-#endif
+#endif 

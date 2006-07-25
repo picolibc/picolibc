@@ -8,24 +8,24 @@
 extern "C" {
 #endif
 
-typedef interface IHTMLElementCollection *LPHTMLELEMENTCOLLECTION;
-typedef interface IHTMLElement *LPHTMLELEMENT;
-typedef interface IHTMLSelectionObject *LPHTMLSELECTIONOBJECT;
-typedef interface IHTMLFramesCollection *LPHTMLFRAMESCOLLECTION;
-typedef interface IHTMLLocation *LPHTMLLOCATION;
-typedef interface IHTMLWindow2 *LPHTMLWINDOW2;
-typedef interface IHTMLStyleSheetsCollection *LPHTMLSTYLESHEETSCOLLECTION;
-typedef interface IHTMLStyleSheet *LPHTMLSTYLESHEET;
-typedef interface IHTMLStyle *LPHTMLSTYLE;
-typedef interface IHTMLFiltersCollection *LPHTMLFILTERSCOLLECTION;
-typedef interface IHTMLLinkElement *LPHTMLLINKELEMENT;
-typedef interface IHTMLImgElement *LPHTMLIMGELEMENT;
-typedef interface IHTMLImageElementFactory *LPHTMLIMAGEELEMENTFACTORY;
-typedef interface IHTMLEventObj *LPHTMLEVENTOBJ;
-typedef interface IHTMLScreen *LPHTMLSCREEN;
-typedef interface IHTMLOptionElementFactory *LPHTMLOPTIONELEMENTFACTORY;
-typedef interface IOmHistory *LPOMHISTORY;
-typedef interface IOmNavigator *LPOMNAVIGATOR;
+typedef _COM_interface IHTMLElementCollection *LPHTMLELEMENTCOLLECTION;
+typedef _COM_interface IHTMLElement *LPHTMLELEMENT;
+typedef _COM_interface IHTMLSelectionObject *LPHTMLSELECTIONOBJECT;
+typedef _COM_interface IHTMLFramesCollection *LPHTMLFRAMESCOLLECTION;
+typedef _COM_interface IHTMLLocation *LPHTMLLOCATION;
+typedef _COM_interface IHTMLWindow2 *LPHTMLWINDOW2;
+typedef _COM_interface IHTMLStyleSheetsCollection *LPHTMLSTYLESHEETSCOLLECTION;
+typedef _COM_interface IHTMLStyleSheet *LPHTMLSTYLESHEET;
+typedef _COM_interface IHTMLStyle *LPHTMLSTYLE;
+typedef _COM_interface IHTMLFiltersCollection *LPHTMLFILTERSCOLLECTION;
+typedef _COM_interface IHTMLLinkElement *LPHTMLLINKELEMENT;
+typedef _COM_interface IHTMLImgElement *LPHTMLIMGELEMENT;
+typedef _COM_interface IHTMLImageElementFactory *LPHTMLIMAGEELEMENTFACTORY;
+typedef _COM_interface IHTMLEventObj *LPHTMLEVENTOBJ;
+typedef _COM_interface IHTMLScreen *LPHTMLSCREEN;
+typedef _COM_interface IHTMLOptionElementFactory *LPHTMLOPTIONELEMENTFACTORY;
+typedef _COM_interface IOmHistory *LPOMHISTORY;
+typedef _COM_interface IOmNavigator *LPOMNAVIGATOR;
 
 EXTERN_C const IID IID_IHTMLLinkElement;
 #define INTERFACE IHTMLLinkElement

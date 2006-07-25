@@ -10,16 +10,16 @@ extern "C" {
 
 #include <ole2.h>
 
-typedef interface IErrorLog *LPERRORLOG;
-typedef interface IPropertyBag *LPPROPERTYBAG;
-typedef interface IPropertyBag2 *LPPROPERTYBAG2;
-typedef interface IEnumConnections *LPENUMCONNECTIONS;
-typedef interface IConnectionPoint *LPCONNECTIONPOINT;
-typedef interface IEnumConnectionPoints *LPENUMCONNECTIONPOINTS;
-typedef interface IPropertyPageSite *LPPROPERTYPAGESITE;
-typedef interface IFont *LPFONT;
-typedef interface IFontDisp *LPFONTDISP;
-typedef interface IOleUndoManager *LPOLEUNDOMANAGER;
+typedef _COM_interface IErrorLog *LPERRORLOG;
+typedef _COM_interface IPropertyBag *LPPROPERTYBAG;
+typedef _COM_interface IPropertyBag2 *LPPROPERTYBAG2;
+typedef _COM_interface IEnumConnections *LPENUMCONNECTIONS;
+typedef _COM_interface IConnectionPoint *LPCONNECTIONPOINT;
+typedef _COM_interface IEnumConnectionPoints *LPENUMCONNECTIONPOINTS;
+typedef _COM_interface IPropertyPageSite *LPPROPERTYPAGESITE;
+typedef _COM_interface IFont *LPFONT;
+typedef _COM_interface IFontDisp *LPFONTDISP;
+typedef _COM_interface IOleUndoManager *LPOLEUNDOMANAGER;
 
 #ifndef OLE2ANSI
 typedef TEXTMETRICW TEXTMETRICOLE;
@@ -73,21 +73,21 @@ typedef enum tagQACONTAINERFLAGS
 typedef struct tagQACONTAINER
 {
 	ULONG cbSize;
-	interface IOleClientSite *pClientSite;
-	interface IAdviseSinkEx *pAdviseSink;
-	interface IPropertyNotifySink *pPropertyNotifySink;
+	_COM_interface IOleClientSite *pClientSite;
+	_COM_interface IAdviseSinkEx *pAdviseSink;
+	_COM_interface IPropertyNotifySink *pPropertyNotifySink;
 	IUnknown *pUnkEventSink;
 	DWORD dwAmbientFlags;
 	OLE_COLOR colorFore;
 	OLE_COLOR colorBack;
-	interface IFont *pFont;
-	interface IOleUndoManager *pUndoMgr;
+	_COM_interface IFont *pFont;
+	_COM_interface IOleUndoManager *pUndoMgr;
 	DWORD dwAppearance;
 	LONG lcid;
 	HPALETTE hpal;
-	interface IBindHost *pBindHost;
-	interface IOleControlSite *pOleControlSite;
-	interface IServiceProvider *pServiceProvider;
+	_COM_interface IBindHost *pBindHost;
+	_COM_interface IOleControlSite *pOleControlSite;
+	_COM_interface IServiceProvider *pServiceProvider;
 } QACONTAINER;
 typedef struct tagQACONTROL
 {

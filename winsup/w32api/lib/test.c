@@ -31,7 +31,6 @@
 #include <httpext.h>
 #include <icm.h>
 #include <imagehlp.h>
-#include <initguid.h>
 #include <ipexport.h>
 #include <iphlpapi.h>
 #include <ipifcons.h>
@@ -86,7 +85,8 @@
 #include <windns.h>
 #include <usp10.h>
 
-#ifndef __OBJC__  /* problems with BOOL */
+#ifndef _OBJC_NO_COM
+#include <initguid.h>
 #include <ole2.h>
 #include <comcat.h>
 #include <shlobj.h>
@@ -107,11 +107,19 @@
 #include <servprov.h>
 #include <aclui.h>
 #include <mlang.h>
-#else
-#undef BOOL
 #endif
 
-#include <stdio.h>
+#ifdef __OBJC__
+#undef BOOL
+
+@interface class1 {
+   int e;
+}
+@end
+
+@implementation class1
+@end
+#endif
 
 int main()
 {

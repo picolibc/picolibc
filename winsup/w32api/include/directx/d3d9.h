@@ -98,23 +98,23 @@ extern const GUID IID_IDirect3DQuery9;
 };
 #endif
 
-typedef interface IDirect3D9 IDirect3D9;
-typedef interface IDirect3DDevice9 IDirect3DDevice9;
-typedef interface IDirect3DVolume9 IDirect3DVolume9;
-typedef interface IDirect3DSwapChain9 IDirect3DSwapChain9;
-typedef interface IDirect3DResource9 IDirect3DResource9;
-typedef interface IDirect3DSurface9 IDirect3DSurface9;
-typedef interface IDirect3DVertexBuffer9 IDirect3DVertexBuffer9;
-typedef interface IDirect3DIndexBuffer9 IDirect3DIndexBuffer9;
-typedef interface IDirect3DBaseTexture9 IDirect3DBaseTexture9;
-typedef interface IDirect3DCubeTexture9 IDirect3DCubeTexture9;
-typedef interface IDirect3DTexture9 IDirect3DTexture9;
-typedef interface IDirect3DVolumeTexture9 IDirect3DVolumeTexture9;
-typedef interface IDirect3DVertexDeclaration9 IDirect3DVertexDeclaration9;
-typedef interface IDirect3DVertexShader9 IDirect3DVertexShader9;
-typedef interface IDirect3DPixelShader9 IDirect3DPixelShader9;
-typedef interface IDirect3DStateBlock9 IDirect3DStateBlock9;
-typedef interface IDirect3DQuery9 IDirect3DQuery9;
+typedef _COM_interface IDirect3D9 IDirect3D9;
+typedef _COM_interface IDirect3DDevice9 IDirect3DDevice9;
+typedef _COM_interface IDirect3DVolume9 IDirect3DVolume9;
+typedef _COM_interface IDirect3DSwapChain9 IDirect3DSwapChain9;
+typedef _COM_interface IDirect3DResource9 IDirect3DResource9;
+typedef _COM_interface IDirect3DSurface9 IDirect3DSurface9;
+typedef _COM_interface IDirect3DVertexBuffer9 IDirect3DVertexBuffer9;
+typedef _COM_interface IDirect3DIndexBuffer9 IDirect3DIndexBuffer9;
+typedef _COM_interface IDirect3DBaseTexture9 IDirect3DBaseTexture9;
+typedef _COM_interface IDirect3DCubeTexture9 IDirect3DCubeTexture9;
+typedef _COM_interface IDirect3DTexture9 IDirect3DTexture9;
+typedef _COM_interface IDirect3DVolumeTexture9 IDirect3DVolumeTexture9;
+typedef _COM_interface IDirect3DVertexDeclaration9 IDirect3DVertexDeclaration9;
+typedef _COM_interface IDirect3DVertexShader9 IDirect3DVertexShader9;
+typedef _COM_interface IDirect3DPixelShader9 IDirect3DPixelShader9;
+typedef _COM_interface IDirect3DStateBlock9 IDirect3DStateBlock9;
+typedef _COM_interface IDirect3DQuery9 IDirect3DQuery9;
 
 #undef INTERFACE
 #define INTERFACE IDirect3D9

@@ -106,11 +106,14 @@
 #endif /*  (_WIN32_WINNT >= 0x0400) */
 #endif
 #ifndef NOGDI
-#if !defined (__OBJC__)
+/* In older versions we disallowed COM declarations in __OBJC__
+   because of conflicts with @interface directive.  Define _OBJC_NO_COM
+   to keep this behaviour.  */ 
+#if !defined (_OBJC_NO_COM) 
 #if (__GNUC__ >= 3) || defined (__WATCOMC__)
 #include <ole2.h>
 #endif
-#endif /* __OBJC__ */
+#endif /* _OBJC_NO_COM */
 #endif
 
 #endif /* WIN32_LEAN_AND_MEAN */

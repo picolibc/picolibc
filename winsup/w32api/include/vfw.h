@@ -10,7 +10,7 @@
 #ifndef _MMSYSTEM_H
 #include <mmsystem.h>
 #endif
-#if !defined  (_OLE2_H) && !defined (__OBJC__)
+#if !defined  (_OLE2_H) && !defined (_OBJC_NO_COM)
 #include <ole2.h>
 #endif
 
@@ -633,7 +633,7 @@ typedef struct _AVICOMPRESSOPTIONS {
 	DWORD dwInterleaveEvery;
 } AVICOMPRESSOPTIONS, *LPAVICOMPRESSOPTIONS,*PAVICOMPRESSOPTIONS;
 
-#if !defined (__OBJC__)
+#if !defined (_OBJC_NO_COM)
 #define DEFINE_AVIGUID(name,l,w1,w2) DEFINE_GUID(name,l,w1,w2,0xC0,0,0,0,0,0,0,0x46)
 DEFINE_AVIGUID(IID_IAVIFile,0x00020020,0,0);
 DEFINE_AVIGUID(IID_IAVIStream,0x00020021,0,0);
@@ -720,7 +720,7 @@ DECLARE_INTERFACE_(IGetFrame, IUnknown)
 };
 #undef INTERFACE
 typedef IGetFrame *PGETFRAME;
-#endif /* !defined (__OBJC__) */
+#endif /* !defined (_OBJC_NO_COM) */
 
 DWORD VFWAPI VideoForWindowsVersion(VOID);
 LONG VFWAPI InitVFW(VOID);
@@ -746,7 +746,7 @@ BOOL VFWAPI ICSeqCompressFrameStart(PCOMPVARS,LPBITMAPINFO);
 void VFWAPI ICSeqCompressFrameEnd(PCOMPVARS);
 LPVOID VFWAPI ICSeqCompressFrame(PCOMPVARS,UINT,LPVOID,BOOL*,LONG*);
 void VFWAPI ICCompressorFree(PCOMPVARS);
-#if !defined (__OBJC__)
+#if !defined (_OBJC_NO_COM)
 ULONG WINAPI AVIStreamAddRef(PAVISTREAM);
 ULONG WINAPI AVIStreamRelease(PAVISTREAM);
 HRESULT WINAPI AVIStreamCreate(PAVISTREAM*,LONG,LONG,CLSID*);
@@ -811,7 +811,7 @@ HRESULT WINAPI AVIFileEndRecord(PAVIFILE);
 HRESULT WINAPI AVIClearClipboard(VOID);
 HRESULT WINAPI AVIGetFromClipboard(PAVIFILE*);
 HRESULT WINAPI AVIPutFileOnClipboard(PAVIFILE);
-#endif /* __OBJC__ */
+#endif /* _OBJC_NO_COM */
 #ifdef OFN_READONLY
 BOOL WINAPI GetOpenFileNamePreviewA(LPOPENFILENAMEA);
 BOOL WINAPI GetOpenFileNamePreviewW(LPOPENFILENAMEW);

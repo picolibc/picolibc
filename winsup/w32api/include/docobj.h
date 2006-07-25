@@ -70,8 +70,8 @@ typedef struct _tagOLECMD {
 	DWORD cmdf;
 } OLECMD;
 
-typedef interface IOleInPlaceSite *LPOLEINPLACESITE;
-typedef interface IEnumOleDocumentViews *LPENUMOLEDOCUMENTVIEWS;
+typedef _COM_interface IOleInPlaceSite *LPOLEINPLACESITE;
+typedef _COM_interface IEnumOleDocumentViews *LPENUMOLEDOCUMENTVIEWS;
 
 EXTERN_C const IID IID_IContinueCallback;
 EXTERN_C const IID IID_IEnumOleDocumentViews;
