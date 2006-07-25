@@ -1,3 +1,8 @@
+2006-07-25  Christopher Faylor  <cgf@timesys.com>
+
+	* security.cc (get_logon_server): Remove nret and use dret for
+	everything to avoid a g++ warning.
+
 2006-07-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h: Bump DLL version to 1.7.0.

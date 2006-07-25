@@ -220,7 +220,6 @@ get_logon_server (const char *domain, char *server, WCHAR *wserver,
 {
   DWORD dret;
   PDOMAIN_CONTROLLER_INFOA pci;
-  NET_API_STATUS nret;
   WCHAR *buf;
   DWORD size = INTERNET_MAX_HOST_NAME_LENGTH + 1;
   WCHAR wdomain[size];
@@ -251,10 +250,10 @@ get_logon_server (const char *domain, char *server, WCHAR *wserver,
       /* NT4 w/o DSClient */
       sys_mbstowcs (wdomain, domain, INTERNET_MAX_HOST_NAME_LENGTH + 1);
       if (rediscovery)
-        nret = NetGetAnyDCName (NULL, wdomain, (LPBYTE *) &buf);
+        dret = NetGetAnyDCName (NULL, wdomain, (LPBYTE *) &buf);
       else
-	nret = NetGetDCName (NULL, wdomain, (LPBYTE *) &buf);
-      if (nret == NERR_Success)
+	dret = NetGetDCName (NULL, wdomain, (LPBYTE *) &buf);
+      if (dret == NERR_Success)
 	{
 	  sys_wcstombs (server, INTERNET_MAX_HOST_NAME_LENGTH + 1, buf);
 	  if (wserver)
@@ -265,7 +264,7 @@ get_logon_server (const char *domain, char *server, WCHAR *wserver,
 	  return true;
 	}
     }
-  __seterrno_from_win_error (nret);
+  __seterrno_from_win_error (dret);
   return false;
 }
 
