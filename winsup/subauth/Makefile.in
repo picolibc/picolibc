@@ -41,7 +41,7 @@ WIN32_CFLAGS    := $(CFLAGS) $(WIN32_COMMON) $(WIN32_INCLUDES)
 WIN32_LDFLAGS	:= $(CFLAGS) $(WIN32_COMMON) -L$(mingw_build) -nostdlib -Wl,-shared
 
 STARTFILE	:= $(mingw_build)/dllcrt2.o
-LIBS		:= -lmingw32 -lkernel32
+LIBS		:= -lmingw32 -lmsvcrt -lkernel32
 
 DLL	:=	cygsuba.dll
 DEF_FILE:=	cygsuba.def
