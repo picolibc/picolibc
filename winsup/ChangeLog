@@ -4,6 +4,11 @@
 	once-again create a working testsuite directory.  Add a comment this
 	time to explain the unusual behavior.
 
+2006-07-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure.in: Reenable building the subauth subdir.
+	* configure: Regenerate.
+
 2006-05-24  Christopher Faylor  <cgf@timesys.com>
 
 	* configure.in: Update to newer autoconf.
