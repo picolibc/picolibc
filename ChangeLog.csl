@@ -1,3 +1,13 @@
+2006-07-26  Richard Sandiford  <richard@codesourcery.com>
+
+	opcodes/
+	* m68k-opc.c (m68k_opcodes): Fix operand specificer in the Coldfire
+	"fdaddl" entry.
+
+	gas/testsuite/
+	* gas/m68k/mcf-fpu.s: Add tests for all addressing modes.
+	* gas/m68k/mcf-fpu.d: Update accordingly.
+
 2006-07-20  Julian Brown  <julian@codesourcery.com>
 
 	Backport from mainline.
