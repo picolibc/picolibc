@@ -184,8 +184,6 @@ void __stdcall memory_init ();
 	     (((DWORD) ((p) + 1) + system_info.dwAllocationGranularity - 1) / \
 	      system_info.dwAllocationGranularity)))
 
-#define cygwin_shared_address	((void *) 0x61000000)
-
 #ifdef _FHANDLER_H_
 struct console_state
 {

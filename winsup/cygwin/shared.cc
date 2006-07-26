@@ -49,19 +49,18 @@ shared_name (char *ret_buf, const char *str, int num)
 #define page_const (65535)
 #define pround(n) (((size_t) (n) + page_const) & ~page_const)
 
-static char *offsets[] =
+static ptrdiff_t offsets[] =
 {
-  (char *) cygwin_shared_address
-    - pround (sizeof (user_info))
-    - pround (sizeof (console_state))
-    - pround (sizeof (_pinfo)),
-  (char *) cygwin_shared_address
-    - pround (sizeof (console_state))
-    - pround (sizeof (_pinfo)),
-  (char *) cygwin_shared_address
-    - pround (sizeof (_pinfo)),
-  (char *) cygwin_shared_address
+  - pround (sizeof (user_info))
+  - pround (sizeof (console_state))
+  - pround (sizeof (_pinfo)),
+  - pround (sizeof (console_state))
+  - pround (sizeof (_pinfo)),
+  - pround (sizeof (_pinfo)),
+  0
 };
+
+#define off_addr(x)	((void *)((caddr_t) cygwin_hmodule + offsets[x]))
 
 void * __stdcall
 open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
@@ -75,7 +74,7 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
     addr = NULL;
   else
     {
-      addr = offsets[m];
+      addr = off_addr (m);
       VirtualFree (addr, 0, MEM_RELEASE);
     }
 
@@ -118,7 +117,7 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
       if (wincap.is_winnt ())
 	system_printf ("relocating shared object %s(%d) from %p to %p on Windows NT", name, n, addr, shared);
 #endif
-      offsets[0] = NULL;
+      offsets[0] = 0;
     }
 
   if (!shared)
@@ -126,22 +125,16 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
 
   if (m == SH_USER_SHARED && offsets[0] && wincap.needs_memory_protection ())
     {
-      unsigned delta = (char *) shared - offsets[0];
-      offsets[0] = (char *) shared;
+      ptrdiff_t delta = (caddr_t) shared - (caddr_t) off_addr (0);
+      offsets[0] = (caddr_t) shared - (caddr_t) cygwin_hmodule;
       for (int i = SH_USER_SHARED + 1; i < SH_TOTAL_SIZE; i++)
 	{
 	  unsigned size = offsets[i + 1] - offsets[i];
 	  offsets[i] += delta;
-	  if (!VirtualAlloc (offsets[i], size, MEM_RESERVE, PAGE_NOACCESS))
+	  if (!VirtualAlloc (off_addr (i), size, MEM_RESERVE, PAGE_NOACCESS))
 	    continue;  /* oh well */
 	}
       offsets[SH_TOTAL_SIZE] += delta;
-
-#if 0
-      if (!child_proc_info && wincap.needs_memory_protection ())
-	for (DWORD s = 0x950000; s <= 0xa40000; s += 0x1000)
-	  VirtualAlloc ((void *) s, 4, MEM_RESERVE, PAGE_NOACCESS);
-#endif
     }
 
   debug_printf ("name %s, n %d, shared %p (wanted %p), h %p", mapname, n, shared, addr, shared_h);

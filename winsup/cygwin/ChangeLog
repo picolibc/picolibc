@@ -1,5 +1,13 @@
 2006-07-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* shared.cc (offsets): Define as offsets relative to cygwin_hmodule
+	instead of addresses.
+	(off_addr): New macro.
+	(open_shared): Use offsets array accordingly.  Remove unused code.
+	* shared_info.h (cygwin_shared_address): Remove.
+
+2006-07-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.h (struct init_cygheap): Remove shared_h and mt_h members.
 	* fhandler_tape.cc (mt): Define as DLL shared area in
 	.cygwin_dll_common instead of as dynamically allocated area.
