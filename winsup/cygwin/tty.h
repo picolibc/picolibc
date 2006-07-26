@@ -1,6 +1,6 @@
 /* tty.h: shared tty info for cygwin
 
-   Copyright 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -70,7 +70,6 @@ public:
   int ioctl_retval;
   int write_error;
 
-  tty_min (int t = -1, pid_t s = -1) : sid (s), ntty (t) {}
   void setntty (int n) {ntty = n;}
   pid_t getpgid () {return pgid;}
   void setpgid (int pid) {pgid = pid;}

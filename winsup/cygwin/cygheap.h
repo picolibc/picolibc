@@ -1,6 +1,6 @@
 /* cygheap.h: Cygwin heap manager.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -279,9 +279,7 @@ struct init_cygheap
   cygheap_user user;
   user_heap_info user_heap;
   mode_t umask;
-  HANDLE shared_h;
   HANDLE console_h;
-  HANDLE mt_h;
   cwdstuff cwd;
   dtable fdtab;
   LUID luid[SE_NUM_PRIVS];

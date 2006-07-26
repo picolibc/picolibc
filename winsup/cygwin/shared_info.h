@@ -1,6 +1,6 @@
 /* shared_info.h: shared info for cygwin
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -169,11 +169,9 @@ extern HANDLE cygwin_user_h;
 
 enum shared_locations
 {
-  SH_CYGWIN_SHARED,
   SH_USER_SHARED,
   SH_SHARED_CONSOLE,
   SH_MYSELF,
-  SH_MTINFO,
   SH_TOTAL_SIZE,
   SH_JUSTCREATE,
   SH_JUSTOPEN
@@ -186,7 +184,7 @@ void __stdcall memory_init ();
 	     (((DWORD) ((p) + 1) + system_info.dwAllocationGranularity - 1) / \
 	      system_info.dwAllocationGranularity)))
 
-#define cygwin_shared_address	((void *) 0x60000000)
+#define cygwin_shared_address	((void *) 0x61000000)
 
 #ifdef _FHANDLER_H_
 struct console_state

@@ -1,7 +1,7 @@
 /* fhandler_tape.cc.  See fhandler.h for a description of the fhandler
    classes.
 
-   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1159,15 +1159,12 @@ mtinfo::initialize ()
     }
 }
 
-mtinfo *mt;
+static mtinfo mt __attribute__((section (".cygwin_dll_common"), shared));
 
 void __stdcall
 mtinfo_init ()
 {
-  shared_locations sh_mtinfo = SH_MTINFO;
-  mt = (mtinfo *) open_shared ("mtinfo", MTINFO_VERSION, cygheap->mt_h, sizeof (mtinfo), sh_mtinfo);
-  ProtectHandleINH (cygheap->mt_h);
-  mt->initialize ();
+  mt.initialize ();
 }
 
 /**********************************************************************/
@@ -1223,22 +1220,22 @@ fhandler_dev_tape::open (int flags, mode_t)
      into O_SYNC, which controls the FILE_WRITE_THROUGH flag in the
      NtCreateFile call in fhandler_base::open. */
   flags &= ~O_SYNC;
-  if (!mt->drive (driveno ())->buffer_writes ())
+  if (!mt.drive (driveno ())->buffer_writes ())
     flags |= O_SYNC;
 
   ret = fhandler_dev_raw::open (flags);
   if (ret)
     {
-      mt->drive (driveno ())->open (get_handle ());
+      mt.drive (driveno ())->open (get_handle ());
 
       /* In append mode, seek to beginning of next filemark */
       if (flags & O_APPEND)
-	mt->drive (driveno ())->set_pos (get_handle (),
+	mt.drive (driveno ())->set_pos (get_handle (),
 					 TAPE_SPACE_FILEMARKS, 1, true);
 
       if (!(flags & O_DIRECT))
 	{
-	  devbufsiz = mt->drive (driveno ())->dp ()->MaximumBlockSize;
+	  devbufsiz = mt.drive (driveno ())->dp ()->MaximumBlockSize;
 	  devbuf = new char [devbufsiz];
 	}
       devbufstart = devbufend = 0;
@@ -1257,7 +1254,7 @@ fhandler_dev_tape::close ()
   if (!hExeced)
     {
       lock (-1);
-      ret = mt->drive (driveno ())->close (get_handle (), is_rewind_device ());
+      ret = mt.drive (driveno ())->close (get_handle (), is_rewind_device ());
       if (ret)
 	__seterrno_from_win_error (ret);
       cret = fhandler_dev_raw::close ();
@@ -1290,7 +1287,7 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
       ulen = (size_t) -1;
       return;
     }
-  block_size = mt->drive (driveno ())->mp ()->BlockSize;
+  block_size = mt.drive (driveno ())->mp ()->BlockSize;
   if (devbuf)
     {
       if (devbufend > devbufstart)
@@ -1320,7 +1317,7 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
 	    {
 	      debug_printf ("read %d bytes from tape (rest %d)",
 			    block_fit, len - block_fit);
-	      ret = mt->drive (driveno ())->read (get_handle (), mt_evt, buf,
+	      ret = mt.drive (driveno ())->read (get_handle (), mt_evt, buf,
 						  block_fit);
 	      if (ret)
 		__seterrno_from_win_error (ret);
@@ -1342,7 +1339,7 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
 	  if (!ret && len > 0)
 	    {
 	      debug_printf ("read %d bytes from tape (one block)", block_size);
-	      ret = mt->drive (driveno ())->read (get_handle (), mt_evt, devbuf,
+	      ret = mt.drive (driveno ())->read (get_handle (), mt_evt, devbuf,
 						  block_size);
 	      if (ret)
 		__seterrno_from_win_error (ret);
@@ -1363,7 +1360,7 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
       if (!mt_evt && !(mt_evt = CreateEvent (&sec_none, TRUE, FALSE, NULL)))
 	debug_printf ("Creating event failed, %E");
       bytes_read = ulen;
-      ret = mt->drive (driveno ())->read (get_handle (), mt_evt, ptr,
+      ret = mt.drive (driveno ())->read (get_handle (), mt_evt, ptr,
 					  bytes_read);
     }
   ulen = (ret ? (size_t) -1 : bytes_read);
@@ -1376,7 +1373,7 @@ fhandler_dev_tape::raw_write (const void *ptr, size_t len)
   lock (-1);
   if (!mt_evt && !(mt_evt = CreateEvent (&sec_none, TRUE, FALSE, NULL)))
     debug_printf ("Creating event failed, %E");
-  int ret = mt->drive (driveno ())->write (get_handle (), mt_evt, ptr, len);
+  int ret = mt.drive (driveno ())->write (get_handle (), mt_evt, ptr, len);
   if (ret)
     __seterrno_from_win_error (ret);
   return unlock (ret ? -1 : (int) len);
@@ -1394,7 +1391,7 @@ fhandler_dev_tape::lseek (_off64_t offset, int whence)
 
   debug_printf ("lseek (%s, %d, %d)", get_name (), offset, whence);
 
-  block_size = mt->drive (driveno ())->mp ()->BlockSize;
+  block_size = mt.drive (driveno ())->mp ()->BlockSize;
   if (block_size == 0)
     {
       set_errno (EIO);
@@ -1511,7 +1508,7 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
   lock (-1);
   if (cmd == MTIOCTOP || cmd == MTIOCGET || cmd == MTIOCPOS)
     {
-      ret = mt->drive (driveno ())->ioctl (get_handle (), cmd, buf);
+      ret = mt.drive (driveno ())->ioctl (get_handle (), cmd, buf);
       if (ret)
 	__seterrno_from_win_error (ret);
       return unlock (ret ? -1 : 0);

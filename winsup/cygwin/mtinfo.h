@@ -1,6 +1,6 @@
 /* mtinfo.h: Defininitions for the Cygwin tape driver class.
 
-   Copyright 2004 Red Hat, Inc.
+   Copyright 2004, 2005, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -140,8 +140,5 @@ public:
   void initialize ();
   mtinfo_drive *drive (int num) { return &_drive[num]; }
 };
-
-extern HANDLE mt_h;
-extern mtinfo *mt;
 
 extern void __stdcall mtinfo_init ();

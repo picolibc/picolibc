@@ -1,3 +1,22 @@
+2006-07-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (struct init_cygheap): Remove shared_h and mt_h members.
+	* fhandler_tape.cc (mt): Define as DLL shared area in
+	.cygwin_dll_common instead of as dynamically allocated area.
+	Change referencing throughout.
+	* mtinfo.h (mt_h): Remove entirely.
+	(mt): Remove extern declaration.
+	* shared.cc (cygwin_shared_area): New global cygwin_shared
+	variable located in .cygwin_dll_common.
+	(offsets): Define shared region addresses descending from
+	cygwin_shared_address.
+	(open_shared): Replace usage of SH_CYGWIN_SHARED by SH_USER_SHARED.
+	(memory_init): Set cygwin_shared just by pointing to cygwin_shared_area.
+	* shared_info.h (shared_locations): Remove SH_CYGWIN_SHARED and
+	SH_MTINFO.
+	(cygwin_shared_address): Define as DLL start address.
+	* tty.h (tty_min::tty_min): Remove constructor.
+
 2006-07-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/in6.h: Guard in_port_t typedef more restrictive to
