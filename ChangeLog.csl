@@ -1,7 +1,47 @@
+2006-07-26  Vladimir Prus  <vladimir@codesourcery.com>
+	
+	bfd/
+	* Makefile.am: (VERSUFFIX_s): New. Pass it to compiler
+	via -D.
+	* Makefile.in: Regenerated.
+	* configure: Regenerated.
+	* configure.in: Add --with-versuffix option.
+	* version.h: Add BFD_VERSION_SUFFIX, use it 
+	in BFD_VERSION_STRING.
+	
+	binutils/
+	* Makefile.am: (REPORT_BUGS_TO_s): New. Pass it to compiler
+	via -D.
+	* Makefile.in: Regenerated.
+	* configure: Regenerated.
+	* configure.in: Add --with-bugurl option.
+
+	gas/
+	* Makefile.am: (REPORT_BUGS_TO_s): New. Pass it to compiler
+	via -D.
+	* Makefile.in: Regenerated.
+	* configure: Regenerated.
+	* configure.in: Add --with-bugurl option.
+
+	gprof/
+	* Makefile.am: (VERSUFFIX_s, REPORT_BUGS_TO_s): New. Pass 
+	them to compiler via -D.
+	* Makefile.in: Regenerated.
+	* configure: Regenerated.
+	* configure.in: Add --with-versuffix and --with-bugurl option.
+	* gprof.c: Print version suffix.
+
+	ld/
+	* Makefile.am: (REPORT_BUGS_TO_s): New. Pass it to compiler
+	via -D.
+	* Makefile.in: Regenerated.
+	* configure: Regenerated.
+	* configure.in: Add --with-bugurl option.
+
 2006-07-26  Richard Sandiford  <richard@codesourcery.com>
 
 	opcodes/
-	* m68k-opc.c (m68k_opcodes): Fix operand specificer in the Coldfire
+	* m68k-opc.c (m68k_opcodes): Fix operand specifier in the Coldfire
 	"fdaddl" entry.
 
 	gas/testsuite/
