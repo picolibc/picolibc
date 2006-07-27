@@ -418,7 +418,6 @@ class fhandler_socket: public fhandler_base
   void af_local_set_sockpair_cred ();
 
  private:
-  struct _WSAPROTOCOL_INFOA *prot_info_ptr;
   char *sun_path;
   struct status_flags
   {
@@ -481,10 +480,7 @@ class fhandler_socket: public fhandler_base
   int dup (fhandler_base *child);
 
   void set_close_on_exec (bool val);
-  virtual void fixup_before_fork_exec (DWORD);
   void fixup_after_fork (HANDLE);
-  void fixup_after_exec ();
-  bool need_fixup_before () const {return true;}
   char *get_proc_fd_name (char *buf);
 
   select_record *select_read (select_record *s);

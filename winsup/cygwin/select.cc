@@ -1279,7 +1279,7 @@ peek_socket (select_record *me, bool)
 	me->write_ready |= !!(events & (FD_WRITE | FD_CLOSE));
     }
   if (me->except_selected)
-    me->except_ready |= ret || !!(events & (FD_OOB | FD_CLOSE));
+    me->except_ready |= ret || !!(events & FD_OOB);
 
   return me->read_ready || me->write_ready || me->except_ready;
 }

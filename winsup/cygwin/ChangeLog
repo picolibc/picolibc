@@ -1,3 +1,29 @@
+2006-07-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_socket): Remove prot_info_ptr.
+	(fhandler_socket::fixup_before_fork_exec): Remove.
+	(fhandler_socket::fixup_after_exec): Remove.
+	(fhandler_socket::need_fixup_before): Remove.
+	* fhandler_socket.cc (fhandler_socket::fhandler_socket): Drop
+	initializing prot_info_ptr.  Remove unused code.
+	(fhandler_socket::~fhandler_socket): Drop free'ing prot_info_ptr.
+	(struct wsa_event): Rename connect_errorcode to errorcode.
+	(fhandler_socket::evaluate_events): Handle FD_CLOSE error condition
+	as FD_CONNECT error condition, except, never reset an FD_CLOSE error
+	condition.  Always set FD_WRITE after successfully recorded FD_CONNECT.
+	(fhandler_socket::fixup_before_fork_exec): Remove.
+	(fhandler_socket::fixup_after_fork): Revert to using handle duplication.
+	(fhandler_socket::fixup_after_exec): Remove.
+	(fhandler_socket::dup): Revert to using handle duplication.
+	(fhandler_socket::send_internal): Only call wait_for_events in case
+	of WSAEWOULDBLOCK condition.
+	(fhandler_socket::set_close_on_exec): Call
+	fhandler_base::set_close_on_exec.
+	* net.cc (fdsock): Just set socket to inheritable on non-NT.  Don't
+	call inc_need_fixup_before.
+	* select.cc (peek_socket): Don't set except_ready on every FD_CLOSE,
+	just on error.
+
 2006-07-26  Brian ford  <Brian.Ford@FlightSafety.com>
 
 	* fhandler.cc (fhandler_base::read): Call get_readahead_into_buffer

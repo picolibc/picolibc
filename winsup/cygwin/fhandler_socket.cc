@@ -136,22 +136,10 @@ fhandler_socket::fhandler_socket () :
   status ()
 {
   need_fork_fixup (true);
-  prot_info_ptr = (LPWSAPROTOCOL_INFOA) cmalloc (HEAP_BUF,
-						 sizeof (WSAPROTOCOL_INFOA));
-#if 0
-  if (pc.is_fs_special ())
-    {
-      fhandler_socket * fhs = (fhandler_socket *) fh;
-      fhs->set_addr_family (AF_LOCAL);
-      fhs->set_sun_path (posix_path);
-    }
-#endif
 }
 
 fhandler_socket::~fhandler_socket ()
 {
-  if (prot_info_ptr)
-    cfree (prot_info_ptr);
   if (sun_path)
     cfree (sun_path);
 }
@@ -398,7 +386,7 @@ struct wsa_event
 {
   LONG serial_number;
   long events;
-  int  connect_errorcode;
+  int  errorcode;
   pid_t owner;
 };
 
@@ -520,7 +508,9 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
 	  LOCK_EVENTS;
 	  wsock_events->events |= evts.lNetworkEvents;
 	  if (evts.lNetworkEvents & FD_CONNECT)
-	    wsock_events->connect_errorcode = evts.iErrorCode[FD_CONNECT_BIT];
+	    wsock_events->errorcode = evts.iErrorCode[FD_CONNECT_BIT];
+	  else if (evts.lNetworkEvents & FD_CLOSE)
+	    wsock_events->errorcode = evts.iErrorCode[FD_CLOSE_BIT];
 	  UNLOCK_EVENTS;
 	  if ((evts.lNetworkEvents & FD_OOB) && wsock_events->owner)
 	    kill (wsock_events->owner, SIGURG);
@@ -530,16 +520,22 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
   LOCK_EVENTS;
   if ((events = (wsock_events->events & event_mask)) != 0)
     {
-      if (events & FD_CONNECT)
+      if (events & (FD_CONNECT | FD_CLOSE))
 	{
 	  int wsa_err = 0;
-	  if ((wsa_err = wsock_events->connect_errorcode) != 0)
+	  if ((wsa_err = wsock_events->errorcode) != 0)
 	    {
 	      WSASetLastError (wsa_err);
 	      ret = SOCKET_ERROR;
 	    }
-	  wsock_events->connect_errorcode = 0;
-	  wsock_events->events &= ~FD_CONNECT;
+	  if (events & FD_CONNECT)
+	    {
+	      if (!wsock_events->errorcode)
+	        wsock_events->events |= FD_WRITE;
+	      wsock_events->events &= ~FD_CONNECT;
+	    }
+	  if (!(events & FD_CLOSE))
+	    wsock_events->errorcode = 0;
 	}
       if (erase)
 	wsock_events->events &= ~(events & ~(FD_WRITE | FD_CLOSE));
@@ -599,83 +595,28 @@ fhandler_socket::release_events ()
 }
 
 void
-fhandler_socket::fixup_before_fork_exec (DWORD win_proc_id)
-{
-  if (!WSADuplicateSocketA (get_socket (), win_proc_id, prot_info_ptr))
-    debug_printf ("WSADuplicateSocket went fine, sock %p, win_proc_id %d, prot_info_ptr %p",
-		  get_socket (), win_proc_id, prot_info_ptr);
-  else
-    {
-      debug_printf ("WSADuplicateSocket error, sock %p, win_proc_id %d, prot_info_ptr %p",
-		    get_socket (), win_proc_id, prot_info_ptr);
-      set_winsock_errno ();
-    }
-}
-
-void
 fhandler_socket::fixup_after_fork (HANDLE parent)
 {
-  SOCKET new_sock;
-
-  debug_printf ("WSASocket begin, dwServiceFlags1=%d",
-		prot_info_ptr->dwServiceFlags1);
-
-  if ((new_sock = WSASocketA (FROM_PROTOCOL_INFO,
-				   FROM_PROTOCOL_INFO,
-				   FROM_PROTOCOL_INFO,
-				   prot_info_ptr, 0, 0)) == INVALID_SOCKET)
-    {
-      debug_printf ("WSASocket error");
-      set_io_handle ((HANDLE)INVALID_SOCKET);
-      set_winsock_errno ();
-    }
-  else
-    {
-      debug_printf ("WSASocket went fine new_sock %p, old_sock %p", new_sock, get_socket ());
-
-      /* Go figure!  Even though the original socket was not inheritable,
-	 the duplicated socket is inheritable again.  This can lead to all
-	 sorts of trouble, apparently.  Note that there's no way to prevent
-	 this on 9x, not even by trying to reset socket inheritance using
-	 DuplicateHandle and closing the original socket. */
-      if (wincap.has_set_handle_information ())
-	SetHandleInformation ((HANDLE) new_sock, HANDLE_FLAG_INHERIT, 0);
-
-      set_io_handle ((HANDLE) new_sock);
-    }
-  if (parent)	/* fork, not exec or dup */
-    {
-      fork_fixup (parent, wsock_mtx, "wsock_mtx");
-      fork_fixup (parent, wsock_evt, "wsock_evt");
-    }
-}
-
-void
-fhandler_socket::fixup_after_exec ()
-{
-  if (!close_on_exec ())
-    fixup_after_fork (NULL);
+  fork_fixup (parent, wsock_mtx, "wsock_mtx");
+  fork_fixup (parent, wsock_evt, "wsock_evt");
+  fhandler_base::fixup_after_fork (parent);
 }
 
 int
 fhandler_socket::dup (fhandler_base *child)
 {
-  HANDLE nh;
-
   debug_printf ("here");
   fhandler_socket *fhs = (fhandler_socket *) child;
 
   if (!DuplicateHandle (hMainProc, wsock_mtx, hMainProc, &fhs->wsock_mtx, 0,
 			TRUE, DUPLICATE_SAME_ACCESS))
     {
-      system_printf ("DuplicateHandle(%x) failed, %E", wsock_mtx);
       __seterrno ();
       return -1;
     }
   if (!DuplicateHandle (hMainProc, wsock_evt, hMainProc, &fhs->wsock_evt, 0,
 			TRUE, DUPLICATE_SAME_ACCESS))
     {
-      system_printf ("DuplicateHandle(%x) failed, %E", wsock_evt);
       __seterrno ();
       CloseHandle (fhs->wsock_mtx);
       return -1;
@@ -698,48 +639,13 @@ fhandler_socket::dup (fhandler_base *child)
 	}
     }
   fhs->connect_state (connect_state ());
-
-  /* Since WSADuplicateSocket() fails on NT systems when the process
-     is currently impersonating a non-privileged account, we revert
-     to the original account before calling WSADuplicateSocket() and
-     switch back afterwards as it's also in fork().
-     If WSADuplicateSocket() still fails for some reason, we fall back
-     to DuplicateHandle(). */
-  WSASetLastError (0);
-  cygheap->user.deimpersonate ();
-  fhs->set_io_handle (get_io_handle ());
-  fhs->fixup_before_fork_exec (GetCurrentProcessId ());
-  cygheap->user.reimpersonate ();
-  if (!WSAGetLastError ())
+  int ret = fhandler_base::dup (child);
+  if (ret)
     {
-      /* Call with NULL parent, otherwise wsock_mtx and wsock_evt are
-         duplicated again with wrong close_on_exec settings. */
-      fhs->fixup_after_fork (NULL);
-      if (fhs->get_io_handle() != (HANDLE) INVALID_SOCKET)
-	{
-	  cygheap->fdtab.inc_need_fixup_before ();
-	  return 0;
-	}
-    }
-  debug_printf ("WSADuplicateSocket failed, trying DuplicateHandle");
-
-  /* We don't call fhandler_base::dup here since that requires
-     having winsock called from fhandler_base and it creates only
-     inheritable sockets which is wrong for winsock2. */
-
-  if (!DuplicateHandle (hMainProc, get_io_handle (), hMainProc, &nh, 0,
-			FALSE, DUPLICATE_SAME_ACCESS))
-    {
-      system_printf ("DuplicateHandle(%x) failed, %E", get_io_handle ());
-      __seterrno ();
       CloseHandle (fhs->wsock_evt);
       CloseHandle (fhs->wsock_mtx);
-      return -1;
     }
-  VerifyHandle (nh);
-  fhs->set_io_handle (nh);
-  cygheap->fdtab.inc_need_fixup_before ();
-  return 0;
+  return ret;
 }
 
 int __stdcall
@@ -1379,7 +1285,8 @@ fhandler_socket::send_internal (struct _WSABUF *wsabuf, DWORD wsacnt, int flags,
         wsock_events->events &= ~FD_WRITE;
       UNLOCK_EVENTS;
     }
-  while (res && err && !(res = wait_for_events (FD_WRITE | FD_CLOSE)));
+  while (res && err == WSAEWOULDBLOCK
+	 && !(res = wait_for_events (FD_WRITE | FD_CLOSE)));
 
   if (res == SOCKET_ERROR)
     set_winsock_errno ();
@@ -1682,7 +1589,7 @@ fhandler_socket::set_close_on_exec (bool val)
 {
   set_no_inheritance (wsock_mtx, val);
   set_no_inheritance (wsock_evt, val);
-  close_on_exec (val);
+  fhandler_base::set_close_on_exec (val);
   debug_printf ("set close_on_exec for %s to %d", get_name (), val);
 }
 

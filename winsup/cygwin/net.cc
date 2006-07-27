@@ -501,14 +501,16 @@ cygwin_getprotobynumber (int number)
 bool
 fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
 {
-  if (wincap.has_set_handle_information ())
+  /* NT systems apparently set sockets to inheritable by default */
+  if (!wincap.has_set_handle_information ()
+      && !DuplicateHandle (hMainProc, (HANDLE) soc,
+			   hMainProc, (HANDLE *) &soc,
+			   0, TRUE,
+			   DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
     {
-      /* NT systems apparently set sockets to inheritable by default */
-      SetHandleInformation ((HANDLE) soc, HANDLE_FLAG_INHERIT, 0);
-      debug_printf ("reset socket inheritance");
+      debug_printf ("set socket inheritance failed, %E");
+      return false;
     }
-  else
-    debug_printf ("not setting socket inheritance");
   fd = build_fh_dev (*dev);
   if (!fd.isopen ())
     return false;
@@ -517,7 +519,6 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
     return false;
   fd->set_flags (O_RDWR | O_BINARY);
   fd->uninterruptible_io (true);
-  cygheap->fdtab.inc_need_fixup_before ();
   debug_printf ("fd %d, name '%s', soc %p", (int) fd, dev->name, soc);
 #if 0
   /* Same default buffer sizes as on Linux (instead of WinSock default 8K).
