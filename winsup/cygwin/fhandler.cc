@@ -716,17 +716,7 @@ void
 fhandler_base::read (void *in_ptr, size_t& len)
 {
   char *ptr = (char *) in_ptr;
-  ssize_t copied_chars = 0;
-  int c;
-
-  while (len)
-    if ((c = get_readahead ()) < 0)
-      break;
-    else
-      {
-	ptr[copied_chars++] = (unsigned char) (c & 0xff);
-	len--;
-      }
+  ssize_t copied_chars = get_readahead_into_buffer (ptr, len);
 
   if (copied_chars && is_slow ())
     {
@@ -734,6 +724,7 @@ fhandler_base::read (void *in_ptr, size_t& len)
       goto out;
     }
 
+  len -= copied_chars;
   if (!len)
     {
       len = (size_t) copied_chars;
