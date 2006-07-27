@@ -364,22 +364,20 @@ set_bits (select_record *me, fd_set *readfds, fd_set *writefds,
 	{
 	  /* Special AF_LOCAL handling. */
 	  if (!me->read_ready && sock->connect_state () == connect_pending
-	      && sock->af_local_connect () && me->read_selected)
-	    UNIX_FD_SET (me->fd, readfds);
-	  sock->connect_state (connected);
+	      && sock->af_local_connect ())
+	    {
+	      if (me->read_selected)
+		UNIX_FD_SET (me->fd, readfds);
+	      sock->connect_state (connect_failed);
+	    }
+	  else
+	    sock->connect_state (connected);
 	}
       ready++;
     }
-  if ((me->except_selected || me->except_on_write) && me->except_ready)
+  if (me->except_selected && me->except_ready)
     {
-      if (me->except_on_write) /* Only on sockets */
-	{
-	  UNIX_FD_SET (me->fd, writefds);
-	  if ((sock = me->fh->is_socket ()))
-	    sock->connect_state (connect_failed);
-	}
-      if (me->except_selected)
-	UNIX_FD_SET (me->fd, exceptfds);
+      UNIX_FD_SET (me->fd, exceptfds);
       ready++;
     }
   select_printf ("ready %d", ready);
@@ -1264,23 +1262,21 @@ peek_socket (select_record *me, bool)
 {
   fhandler_socket *fh = (fhandler_socket *) me->fh;
   long events;
-  long evt_mask = (FD_CLOSE
-		   | (me->read_selected ? (FD_READ | FD_ACCEPT) : 0)
-		   | (me->write_selected ? (FD_WRITE | FD_CONNECT) : 0)
-		   | (me->except_selected ? (FD_OOB | FD_CONNECT) : 0));
+  /* Don't play with the settings again, unless having taken a deep look into
+     Richard W. Stevens Network Programming book.  Thank you. */
+  long evt_mask = (me->read_selected ? (FD_READ | FD_ACCEPT | FD_CLOSE) : 0)
+		| (me->write_selected ? (FD_WRITE | FD_CONNECT | FD_CLOSE) : 0)
+		| (me->except_selected ? FD_OOB : 0);
   int ret = fh->evaluate_events (evt_mask, events, false);
   if (me->read_selected)
-    me->read_ready |= !!(events & (FD_READ | FD_ACCEPT | FD_CLOSE));
+    me->read_ready |= ret || !!(events & (FD_READ | FD_ACCEPT | FD_CLOSE));
   if (me->write_selected)
-    {
-      if ((events & FD_CONNECT) && !ret)
-	me->write_ready = true;
-      else
-	me->write_ready |= !!(events & (FD_WRITE | FD_CLOSE));
-    }
+    me->write_ready |= ret || !!(events & (FD_WRITE | FD_CONNECT | FD_CLOSE));
   if (me->except_selected)
-    me->except_ready |= ret || !!(events & FD_OOB);
+    me->except_ready |= !!(events & FD_OOB);
 
+  select_printf ("read_ready: %d, write_ready: %d, except_ready: %d",
+		 me->read_ready, me->write_ready, me->except_ready);
   return me->read_ready || me->write_ready || me->except_ready;
 }
 

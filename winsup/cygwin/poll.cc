@@ -1,6 +1,6 @@
 /* poll.cc. Implements poll(2) via usage of select(2) call.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -63,9 +63,7 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
 	    FD_SET(fds[i].fd, read_fds);
 	  if (fds[i].events & POLLOUT)
 	    FD_SET(fds[i].fd, write_fds);
-	  /* On sockets, except_fds is needed to catch failed connects. */
-	  if ((fds[i].events & POLLPRI)
-	      || cygheap->fdtab[fds[i].fd]->is_socket ())
+	  if (fds[i].events & POLLPRI)
 	    FD_SET(fds[i].fd, except_fds);
 	}
       else if (fds[i].fd >= 0)
@@ -127,7 +125,6 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
 		  }
 		/* Handle failed connect. */
 		if (FD_ISSET(fds[i].fd, write_fds)
-		    && FD_ISSET(fds[i].fd, except_fds)
 		    && (sock = cygheap->fdtab[fds[i].fd]->is_socket ())
 		    && sock->connect_state () == connect_failed)
 		  fds[i].revents |= (POLLIN | POLLERR);

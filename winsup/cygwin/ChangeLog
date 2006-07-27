@@ -1,3 +1,19 @@
+2006-07-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc: Revert misguided attempt to handle FD_CLOSE error
+	conditions in evaluate_events.
+	(search_wsa_event_slot): Move wrongly placed memset in
+	fhandler_socket::init_events here.
+	(fhandler_socket::init_events): Initially set FD_WRITE event for
+	connectionless sockets.
+	* poll.cc (poll): Don't add sockets always to except_fds since select
+	is now supposed to do it right.
+	* select.cc (set_bits): Set connection state correctly for failed
+	af_local_connect on local sockets.  Remove socket special handling
+	for except_selected descriptors.
+	(peek_socket): Try to set the read/write/exception bits actually
+	correctly.
+
 2006-07-27  Brian Ford  <Brian.Ford@FlightSafety.com>
 
 	* fhandler_socket.cc (fhandler_socket::recvmsg): Remove unused tot

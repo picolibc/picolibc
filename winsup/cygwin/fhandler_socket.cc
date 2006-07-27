@@ -386,7 +386,7 @@ struct wsa_event
 {
   LONG serial_number;
   long events;
-  int  errorcode;
+  int  connect_errorcode;
   pid_t owner;
 };
 
@@ -443,6 +443,7 @@ search_wsa_event_slot (LONG new_serial_number)
 	  return NULL;
 	}
     }
+  memset (&wsa_events[slot], 0, sizeof (wsa_event));
   wsa_events[slot].serial_number = new_serial_number;
   ReleaseMutex (wsa_slot_mtx);
   return wsa_events + slot;
@@ -490,7 +491,9 @@ fhandler_socket::init_events ()
       return false;
     }
   wsock_events = search_wsa_event_slot (new_serial_number);
-  memset (wsock_events, 0, sizeof *wsock_events);
+  /* sock type not yet set here. */
+  if (pc.dev == FH_UDP || pc.dev == FH_DGRAM)
+    wsock_events->events = FD_WRITE;
   return true;
 }
 
@@ -508,9 +511,7 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
 	  LOCK_EVENTS;
 	  wsock_events->events |= evts.lNetworkEvents;
 	  if (evts.lNetworkEvents & FD_CONNECT)
-	    wsock_events->errorcode = evts.iErrorCode[FD_CONNECT_BIT];
-	  else if (evts.lNetworkEvents & FD_CLOSE)
-	    wsock_events->errorcode = evts.iErrorCode[FD_CLOSE_BIT];
+	    wsock_events->connect_errorcode = evts.iErrorCode[FD_CONNECT_BIT];
 	  UNLOCK_EVENTS;
 	  if ((evts.lNetworkEvents & FD_OOB) && wsock_events->owner)
 	    kill (wsock_events->owner, SIGURG);
@@ -520,22 +521,18 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
   LOCK_EVENTS;
   if ((events = (wsock_events->events & event_mask)) != 0)
     {
-      if (events & (FD_CONNECT | FD_CLOSE))
+      if (events & FD_CONNECT)
 	{
 	  int wsa_err = 0;
-	  if ((wsa_err = wsock_events->errorcode) != 0)
+	  if ((wsa_err = wsock_events->connect_errorcode) != 0)
 	    {
 	      WSASetLastError (wsa_err);
 	      ret = SOCKET_ERROR;
 	    }
-	  if (events & FD_CONNECT)
-	    {
-	      if (!wsock_events->errorcode)
-	        wsock_events->events |= FD_WRITE;
-	      wsock_events->events &= ~FD_CONNECT;
-	    }
-	  if (!(events & FD_CLOSE))
-	    wsock_events->errorcode = 0;
+	  else
+	    wsock_events->events |= FD_WRITE;
+	  wsock_events->events &= ~FD_CONNECT;
+	  wsock_events->connect_errorcode = 0;
 	}
       if (erase)
 	wsock_events->events &= ~(events & ~(FD_WRITE | FD_CLOSE));
