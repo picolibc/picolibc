@@ -1,3 +1,9 @@
+2006-07-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygpath.c (get_long_name): Cover the case that GetLongPathName
+	doesn't return valid information for non-existant files.  Just return
+	incoming filename in that case.
+
 2006-07-03  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
 	* Makefile.in: Build setmetamode.exe.
