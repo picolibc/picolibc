@@ -1,3 +1,14 @@
+2006-07-27  Brian Ford  <Brian.Ford@FlightSafety.com>
+
+	* fhandler_socket.cc (fhandler_socket::recvmsg): Remove unused tot
+	argument.  All callers changed.
+	(fhandler_socket::sendmsg): Likewise.
+	* net.cc (cygwin_recvmsg): Likewise.
+	(cygwin_sendmsg): Likewise, and prevent calling sendmsg whith an
+	invalid iovec.
+	* fhandler.h (fhandler_socket::recvmsg): Adjust prototype.
+	(fhandler_socket::sendmsg): Likewise.
+
 2006-07-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (class fhandler_socket): Remove prot_info_ptr.

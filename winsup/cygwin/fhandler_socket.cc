@@ -1153,7 +1153,7 @@ fhandler_socket::readv (const struct iovec *const iov, const int iovcnt,
       msg_flags:	0
     };
 
-  return recvmsg (&msg, 0, tot);
+  return recvmsg (&msg, 0);
 }
 
 inline ssize_t
@@ -1217,7 +1217,7 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
 }
 
 int
-fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
+fhandler_socket::recvmsg (struct msghdr *msg, int flags)
 {
   if (CYGWIN_VERSION_CHECK_FOR_USING_ANCIENT_MSGHDR)
     ((struct OLD_msghdr *) msg)->msg_accrightslen = 0;
@@ -1266,7 +1266,7 @@ fhandler_socket::writev (const struct iovec *const iov, const int iovcnt,
       msg_flags:	0
     };
 
-  return sendmsg (&msg, 0, tot);
+  return sendmsg (&msg, 0);
 }
 
 inline ssize_t
@@ -1324,7 +1324,7 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
 }
 
 int
-fhandler_socket::sendmsg (const struct msghdr *msg, int flags, ssize_t tot)
+fhandler_socket::sendmsg (const struct msghdr *msg, int flags)
 {
   if (get_addr_family () == AF_LOCAL)
     {

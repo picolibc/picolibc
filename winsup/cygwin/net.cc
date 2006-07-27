@@ -2071,7 +2071,7 @@ cygwin_recvmsg (int fd, struct msghdr *msg, int flags)
     {
       res = check_iovec_for_read (msg->msg_iov, msg->msg_iovlen);
       if (res > 0)
-	res = fh->recvmsg (msg, flags, res); // res == iovec tot
+	res = fh->recvmsg (msg, flags);
     }
 
   syscall_printf ("%d = recvmsg (%d, %p, %x)", res, fd, msg, flags);
@@ -2093,7 +2093,8 @@ cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
   else
     {
       res = check_iovec_for_write (msg->msg_iov, msg->msg_iovlen);
-      res = fh->sendmsg (msg, flags, res); // res == iovec tot
+      if (res >= 0)
+	res = fh->sendmsg (msg, flags);
     }
 
   syscall_printf ("%d = sendmsg (%d, %p, %x)", res, fd, msg, flags);

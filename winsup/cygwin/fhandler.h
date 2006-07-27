@@ -462,14 +462,14 @@ class fhandler_socket: public fhandler_base
 				struct sockaddr *from, int *fromlen);
   ssize_t recvfrom (void *ptr, size_t len, int flags,
 		    struct sockaddr *from, int *fromlen);
-  ssize_t recvmsg (struct msghdr *msg, int flags, ssize_t tot = -1);
+  ssize_t recvmsg (struct msghdr *msg, int flags);
 
   ssize_t writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
   inline ssize_t send_internal (struct _WSABUF *wsabuf, DWORD wsacnt, int flags,
 				const struct sockaddr *to, int tolen);
   ssize_t sendto (const void *ptr, size_t len, int flags,
 	      const struct sockaddr *to, int tolen);
-  ssize_t sendmsg (const struct msghdr *msg, int flags, ssize_t tot = -1);
+  ssize_t sendmsg (const struct msghdr *msg, int flags);
 
   int ioctl (unsigned int cmd, void *);
   int fcntl (int cmd, void *);
