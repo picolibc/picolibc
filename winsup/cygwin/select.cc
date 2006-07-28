@@ -1286,6 +1286,7 @@ struct socketinf
   {
     cygthread *thread;
     int num_w4;
+    LONG ser_num[MAXIMUM_WAIT_OBJECTS];
     HANDLE w4[MAXIMUM_WAIT_OBJECTS];
     select_record *start;
   };
@@ -1344,13 +1345,18 @@ start_thread_socket (select_record *me, select_stuff *stuff)
   while ((s = s->next))
     if (s->startup == start_thread_socket)
       {
-	HANDLE evt = ((fhandler_socket *) me->fh)->wsock_evt;
-	/* No event/socket should show up multiple times. */
+	/* No event/socket should show up multiple times.  Every socket
+	   is uniquely identified by its serial number in the global
+	   wsock_events record. */
+	const LONG ser_num = ((fhandler_socket *) me->fh)->serial_number ();
 	for (int i = 1; i < si->num_w4; ++i)
-	  if (si->w4[i] == evt)
+	  if (si->ser_num[i] == ser_num)
 	    goto continue_outer_loop;
 	if (si->num_w4 < MAXIMUM_WAIT_OBJECTS)
-	  si->w4[si->num_w4++] = evt;
+	  {
+	    si->ser_num[si->num_w4] = ser_num;
+	    si->w4[si->num_w4++] = ((fhandler_socket *) me->fh)->wsock_event ();
+	  }
 	else /* for now */
 	  goto err;
       continue_outer_loop:

@@ -378,7 +378,13 @@ class fhandler_mailslot : public fhandler_base
   select_record *select_read (select_record *s);
 };
 
-struct wsa_event;
+struct wsa_event
+{
+  LONG serial_number;
+  long events;
+  int  connect_errorcode;
+  pid_t owner;
+};
 
 class fhandler_socket: public fhandler_base
 {
@@ -389,10 +395,12 @@ class fhandler_socket: public fhandler_base
 
   wsa_event *wsock_events;
   HANDLE wsock_mtx;
- public:
   HANDLE wsock_evt;
+ public:
   bool init_events ();
-  int evaluate_events (const long event_mask, long &events, bool erase);
+  int evaluate_events (const long event_mask, long &events, const bool erase);
+  const HANDLE wsock_event () const { return wsock_evt; }
+  const LONG serial_number () const { return wsock_events->serial_number; }
  private:
   int wait_for_events (const long event_mask);
   void release_events ();
@@ -486,6 +494,7 @@ class fhandler_socket: public fhandler_base
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
+  int ready_for_read (int, DWORD) { return true; }
   void set_addr_family (int af) {addr_family = af;}
   int get_addr_family () {return addr_family;}
   void set_socket_type (int st) { type = st;}

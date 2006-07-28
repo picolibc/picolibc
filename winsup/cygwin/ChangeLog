@@ -1,3 +1,16 @@
+2006-07-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (struct wsa_event): Define here.
+	(class fhandler_socket): Make wsock_evt private again.
+	(fhandler_socket::wsock_event): New read accessor for wsock_evt.
+	(fhandler_socket::serial_number): New read accessor to get the
+	socket's serial number.
+	(fhandler_socket::ready_for_read): Just return true.
+	* fhandler_socket.cc (struct wsa_event): Move definition to fhandler.h.
+	* select.cc (struct socketinf): Add serial number vector.
+	(start_thread_socket): Identify duplicate sockets by their serial
+	number, not (wrongly) by their wsock_evt.
+
 2006-07-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc: Revert misguided attempt to handle FD_CLOSE error

@@ -382,14 +382,6 @@ fhandler_socket::af_local_set_secret (char *buf)
 		   connect_secret [2], connect_secret [3]);
 }
 
-struct wsa_event
-{
-  LONG serial_number;
-  long events;
-  int  connect_errorcode;
-  pid_t owner;
-};
-
 /* Maximum number of concurrently opened sockets from all Cygwin processes
    on a machine.  Note that shared sockets (through dup/fork/exec) are
    counted as one socket. */
