@@ -1,3 +1,10 @@
+2006-07-27  Carlos O'Donell  <carlos@codesourcery.com>
+
+	bfd/
+	* elfxx-mips.c (_bfd_mips_elf_print_private_bfd_data):
+	Print EF_MIPS_NOREORDER, EF_MIPS_PIC, EF_MIPS_CPIC, EF_MIPS_XGOT
+	and EF_MIPS_UCODE.
+
 2006-07-26  Vladimir Prus  <vladimir@codesourcery.com>
 	
 	bfd/
