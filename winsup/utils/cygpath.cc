@@ -241,15 +241,22 @@ get_long_name (const char *filename, DWORD& len)
   len = GetLongPathName (filename, buf, MAX_PATH);
   if (len == 0)
     {
-      if (GetLastError () == ERROR_INVALID_PARAMETER)
+      DWORD err = GetLastError ();
+
+      if (err == ERROR_INVALID_PARAMETER)
 	{
 	  fprintf (stderr, "%s: cannot create long name of %s\n", prog_name,
 		   filename);
 	  exit (2);
 	}
-      buf[0] = '\0';
-      strncat (buf, filename, MAX_PATH - 1);
-      len = strlen (buf);
+      else if (err == ERROR_FILE_NOT_FOUND)
+	len = get_long_path_name_w32impl (filename, buf, MAX_PATH);
+      else
+        {
+	  buf[0] = '\0';
+	  strncat (buf, filename, MAX_PATH - 1);
+	  len = strlen (buf);
+	}
     }
   sbuf = (char *) malloc (len + 1);
   if (!sbuf)
