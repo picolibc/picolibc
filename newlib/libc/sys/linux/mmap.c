@@ -2,7 +2,6 @@
 
 /* Copyright 2002, Red Hat Inc. */
 
-#include <sys/mman.h>
 #include <machine/syscall.h>
 
 _syscall6(void *,mmap,void *,addr,size_t,len,int,prot,int,flags,int,fd,off_t,off);

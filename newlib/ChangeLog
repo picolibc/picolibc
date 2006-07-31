@@ -1,3 +1,8 @@
+2006-07-31  Jeff Johnston  <jjohnstn@redhat.com>	
+
+	* libc/sys/linux/mmap.c: Remove include of sys/mman.h
+	to avoid conflict with newer glibc's revision of mremap.
+
 2006-07-05  Jeff Johnston  <jjohnstn@redhat.com>	
 
 	* libc/stdlib/mprec.h [_DOUBLE_IS_32BITS]: Turn off C99 hex 
