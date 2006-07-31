@@ -1,3 +1,9 @@
+2006-07-31  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* acinclude.m4: Check for readelf tool.
+	* configure.in: Use ${READELF} instead of hard-coding.
+	* Regenerate all aclocal.m4, Makefile.in, and configure files.
+
 2006-07-31  Jeff Johnston  <jjohnstn@redhat.com>	
 
 	* libc/sys/linux/mmap.c: Remove include of sys/mman.h

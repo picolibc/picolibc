@@ -272,7 +272,7 @@ PACKAGE_STRING='newlib 1.14.0'
 PACKAGE_BUGREPORT=''
 
 ac_unique_file="args.h"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS MAY_SUPPLY_SYSCALLS_TRUE MAY_SUPPLY_SYSCALLS_FALSE newlib_basedir build build_cpu build_vendor build_os host host_cpu host_vendor host_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar CC DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE AS ac_ct_AS AR ac_ct_AR RANLIB ac_ct_RANLIB MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CCAS CCASFLAGS NEWLIB_CFLAGS LDFLAGS ELIX_LEVEL_0_TRUE ELIX_LEVEL_0_FALSE ELIX_LEVEL_1_TRUE ELIX_LEVEL_1_FALSE ELIX_LEVEL_2_TRUE ELIX_LEVEL_2_FALSE ELIX_LEVEL_3_TRUE ELIX_LEVEL_3_FALSE ELIX_LEVEL_4_TRUE ELIX_LEVEL_4_FALSE USE_LIBTOOL_TRUE USE_LIBTOOL_FALSE OBJEXT oext aext lpfx libm_machine_dir machine_dir sys_dir LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS MAY_SUPPLY_SYSCALLS_TRUE MAY_SUPPLY_SYSCALLS_FALSE newlib_basedir build build_cpu build_vendor build_os host host_cpu host_vendor host_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar CC DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE AS ac_ct_AS AR ac_ct_AR RANLIB ac_ct_RANLIB READELF ac_ct_READELF MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CCAS CCASFLAGS NEWLIB_CFLAGS LDFLAGS ELIX_LEVEL_0_TRUE ELIX_LEVEL_0_FALSE ELIX_LEVEL_1_TRUE ELIX_LEVEL_1_FALSE ELIX_LEVEL_2_TRUE ELIX_LEVEL_2_FALSE ELIX_LEVEL_3_TRUE ELIX_LEVEL_3_FALSE ELIX_LEVEL_4_TRUE ELIX_LEVEL_4_FALSE USE_LIBTOOL_TRUE USE_LIBTOOL_FALSE OBJEXT oext aext lpfx libm_machine_dir machine_dir sys_dir LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -2521,6 +2521,86 @@ else
   RANLIB="$ac_cv_prog_RANLIB"
 fi
 
+if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}readelf", so it can be a program name with args.
+set dummy ${ac_tool_prefix}readelf; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_READELF+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$READELF"; then
+  ac_cv_prog_READELF="$READELF" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_READELF="${ac_tool_prefix}readelf"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+READELF=$ac_cv_prog_READELF
+if test -n "$READELF"; then
+  echo "$as_me:$LINENO: result: $READELF" >&5
+echo "${ECHO_T}$READELF" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+fi
+if test -z "$ac_cv_prog_READELF"; then
+  ac_ct_READELF=$READELF
+  # Extract the first word of "readelf", so it can be a program name with args.
+set dummy readelf; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_ac_ct_READELF+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$ac_ct_READELF"; then
+  ac_cv_prog_ac_ct_READELF="$ac_ct_READELF" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_ac_ct_READELF="readelf"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_prog_ac_ct_READELF" && ac_cv_prog_ac_ct_READELF=":"
+fi
+fi
+ac_ct_READELF=$ac_cv_prog_ac_ct_READELF
+if test -n "$ac_ct_READELF"; then
+  echo "$as_me:$LINENO: result: $ac_ct_READELF" >&5
+echo "${ECHO_T}$ac_ct_READELF" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  READELF=$ac_ct_READELF
+else
+  READELF="$ac_cv_prog_READELF"
+fi
+
 
 # Find a good install program.  We prefer a C program (faster),
 # so one script is as good as another.  But avoid the broken or
@@ -3503,6 +3583,8 @@ s,@AR@,$AR,;t t
 s,@ac_ct_AR@,$ac_ct_AR,;t t
 s,@RANLIB@,$RANLIB,;t t
 s,@ac_ct_RANLIB@,$ac_ct_RANLIB,;t t
+s,@READELF@,$READELF,;t t
+s,@ac_ct_READELF@,$ac_ct_READELF,;t t
 s,@MAINTAINER_MODE_TRUE@,$MAINTAINER_MODE_TRUE,;t t
 s,@MAINTAINER_MODE_FALSE@,$MAINTAINER_MODE_FALSE,;t t
 s,@MAINT@,$MAINT,;t t

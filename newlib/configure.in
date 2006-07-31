@@ -354,7 +354,7 @@ EOF
 if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS $LDFLAGS -o conftest conftest.c
 		   -static -nostartfiles -nostdlib 1>&AS_MESSAGE_LOG_FD])
 then
-  if readelf -S conftest | grep -e INIT_ARRAY > /dev/null; then
+  if ${READELF} -S conftest | grep -e INIT_ARRAY > /dev/null; then
     libc_cv_initfinit_array=yes
   else
     libc_cv_initfinit_array=no
