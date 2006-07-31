@@ -1,5 +1,13 @@
 2006-07-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::evaluate_events): Circumvent
+	potential race condition.
+	(fhandler_socket::recv_internal): Fix MSG_PEEK bug on blocking sockets
+	and simplify recv loop.
+	(fhandler_socket::send_internal): Only lock when changing wsock_events.
+
+2006-07-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc: Drop LoadDLLprime for wsock32 since no wsock32 function
 	is used anymore.  Drop all unused ws2_32.dll functions.  
 

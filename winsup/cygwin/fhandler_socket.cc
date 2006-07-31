@@ -494,6 +494,7 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
 				  bool erase)
 {
   int ret = 0;
+  long events_now = 0;
 
   WSANETWORKEVENTS evts = { 0 };
   if (!(WSAEnumNetworkEvents (get_socket (), wsock_evt, &evts)))
@@ -502,6 +503,7 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
         {
 	  LOCK_EVENTS;
 	  wsock_events->events |= evts.lNetworkEvents;
+	  events_now = (wsock_events->events & event_mask);
 	  if (evts.lNetworkEvents & FD_CONNECT)
 	    wsock_events->connect_errorcode = evts.iErrorCode[FD_CONNECT_BIT];
 	  UNLOCK_EVENTS;
@@ -511,7 +513,8 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
     }
 
   LOCK_EVENTS;
-  if ((events = (wsock_events->events & event_mask)) != 0)
+  if ((events = events_now) != 0
+      || (events = (wsock_events->events & event_mask)) != 0)
     {
       if (events & FD_CONNECT)
 	{
@@ -1154,27 +1157,15 @@ fhandler_socket::recv_internal (WSABUF *wsabuf, DWORD wsacnt, DWORD flags,
   int evt_mask = FD_READ | ((flags & MSG_OOB) ? FD_OOB : 0);
 
   flags &= MSG_WINMASK;
-  if (flags & MSG_PEEK)
+  /* Note: Don't call WSARecvFrom(MSG_PEEK) without actually having data
+     waiting in the buffers, otherwise the event handling gets messed up
+     for some reason. */
+  while (!(res = wait_for_events (evt_mask | FD_CLOSE)))
     {
-      LOCK_EVENTS;
       res = WSARecvFrom (get_socket (), wsabuf, wsacnt, &ret,
 			 &flags, from, fromlen, NULL, NULL);
-      wsock_events->events &= ~evt_mask;
-      UNLOCK_EVENTS;
-    }
-  else
-    {
-      do
-        {
-	  LOCK_EVENTS;
-	  res = WSARecvFrom (get_socket (), wsabuf, wsacnt, &ret,
-			     &flags, from, fromlen, NULL, NULL);
-	  wsock_events->events &= ~evt_mask;
-	  UNLOCK_EVENTS;
-	}
-      while (res && WSAGetLastError () == WSAEWOULDBLOCK
-	     && !(res = wait_for_events (evt_mask | FD_CLOSE)))
-	;
+      if (!res || WSAGetLastError () != WSAEWOULDBLOCK)
+	break;
     }
 
   if (res == SOCKET_ERROR)
@@ -1267,12 +1258,14 @@ fhandler_socket::send_internal (struct _WSABUF *wsabuf, DWORD wsacnt, int flags,
 
   do
     {
-      LOCK_EVENTS;
       if ((res = WSASendTo (get_socket (), wsabuf, wsacnt, &ret,
 			    flags & MSG_WINMASK, to, tolen, NULL, NULL))
 	  && (err = WSAGetLastError ()) == WSAEWOULDBLOCK)
-        wsock_events->events &= ~FD_WRITE;
-      UNLOCK_EVENTS;
+        {
+	  LOCK_EVENTS;
+	  wsock_events->events &= ~FD_WRITE;
+	  UNLOCK_EVENTS;
+	}
     }
   while (res && err == WSAEWOULDBLOCK
 	 && !(res = wait_for_events (FD_WRITE | FD_CLOSE)));
