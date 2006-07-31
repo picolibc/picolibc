@@ -1,5 +1,14 @@
 2006-07-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::recv_internal): Fix a problem
+	with poll(2) after shutdown(SHUT_RD) has been called on the local side.
+	* poll.cc (poll): Use POSIX type nfds_t for second parameter.  Drop
+	special socket handling for POLLIN.  Add comment to explain why.
+	* include/sys/poll.h: Declare nfds_t.  Use as type for second parameter
+	in poll(2) declaration.
+
+2006-07-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::evaluate_events): Circumvent
 	potential race condition.
 	(fhandler_socket::recv_internal): Fix MSG_PEEK bug on blocking sockets

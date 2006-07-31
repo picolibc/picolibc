@@ -1160,7 +1160,8 @@ fhandler_socket::recv_internal (WSABUF *wsabuf, DWORD wsacnt, DWORD flags,
   /* Note: Don't call WSARecvFrom(MSG_PEEK) without actually having data
      waiting in the buffers, otherwise the event handling gets messed up
      for some reason. */
-  while (!(res = wait_for_events (evt_mask | FD_CLOSE)))
+  while (!(res = wait_for_events (evt_mask | FD_CLOSE))
+	 || saw_shutdown_read ())
     {
       res = WSARecvFrom (get_socket (), wsabuf, wsacnt, &ret,
 			 &flags, from, fromlen, NULL, NULL);

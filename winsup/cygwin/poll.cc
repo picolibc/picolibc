@@ -27,7 +27,7 @@
 #include "sigproc.h"
 
 extern "C" int
-poll (struct pollfd *fds, unsigned int nfds, int timeout)
+poll (struct pollfd *fds, nfds_t nfds, int timeout)
 {
   int max_fd = 0;
   fd_set *read_fds, *write_fds, *except_fds;
@@ -90,39 +90,15 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
 		fhandler_socket *sock;
 
 		if (FD_ISSET(fds[i].fd, read_fds))
-		  {
-		    char peek[1];
-		    sock = cygheap->fdtab[fds[i].fd]->is_socket ();
-		    if (!sock)
-		      fds[i].revents |= POLLIN;
-		    else if (sock->listener ())
-		      {
-			fds[i].revents |= POLLIN;
-		      }
-		    else
-		      {
-			/* The following action can change errno.  We have to
-			   reset it to it's old value. */
-			int old_errno = get_errno ();
-			switch (sock->recvfrom (peek, sizeof (peek), MSG_PEEK,
-						NULL, NULL))
-			  {
-			    case -1:
-			      fds[i].revents |= POLLERR;
-			      break;
-			    case 0:  /* Closed on the read side... */
-			      /* ...or shutdown(SHUT_WR) on the write side.
-			         We set revents to POLLHUP until 1.5.18, but
-				 this is semantically borderline. */
-			      fds[i].revents |= POLLIN;
-			      break;
-			    default:
-			      fds[i].revents |= POLLIN;
-			      break;
-			  }
-			set_errno (old_errno);
-		      }
-		  }
+		  /* This should be sufficient for sockets, too.  Using
+		     MSG_PEEK, as before, can be considered dangerous at
+		     best.  Quote from W. Richard Stevens: "The presence
+		     of an error can be considered either normal data or
+		     an error (POLLERR).  In either case, a subsequent read
+		     will return -1 with errno set to the appropriate value."
+		     So it looks like there's actually no good reason to
+		     return POLLERR. */
+		  fds[i].revents |= POLLIN;
 		/* Handle failed connect. */
 		if (FD_ISSET(fds[i].fd, write_fds)
 		    && (sock = cygheap->fdtab[fds[i].fd]->is_socket ())
