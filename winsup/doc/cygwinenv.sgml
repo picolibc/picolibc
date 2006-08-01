@@ -70,6 +70,12 @@ Cygwin, you can use this option to select an appropriate codepage.
 </listitem>
 
 <listitem>
+<para><envar>(no)dosfilewarning</envar> - If set, Cygwin will warn the
+first time a user uses an "MS-DOS" style path name rather than a POSIX-style
+path name.  Defaults to set.</para>
+</listitem>
+
+<listitem>
 <para><envar>(no)envcache</envar> - If set, environment variable
 conversions (between Win32 and POSIX) are cached.  Note that this is may
 cause problems if the mount table changes, as the cache is not invalidated
@@ -77,7 +83,7 @@ and may contain values that depend on the previous mount table
 contents. Defaults to set.</para>
 </listitem>
 <listitem>
-<para><envar>(no)export</envar> - if set, the final values of these
+<para><envar>(no)export</envar> - If set, the final values of these
 settings are re-exported to the environment as <envar>CYGWIN</envar> again.
 Defaults to off.</para>
 </listitem>
