@@ -1,3 +1,11 @@
+2006-08-01  Vladimir Prus  <vladimir@codesourcery.com>
+
+	gdb/
+	Backport from mainline:
+	2006-06-24  Eli Zaretskii  <eliz@gnu.org>
+	* defs.h (DIRNAME_SEPARATOR) [!__CYGWIN__ && _WIN32]:
+	Define to `;'.
+	
 2006-07-27  Nathan Sidwell  <nathan@codesourcery.com>
 
 	gdb/testsuite/
