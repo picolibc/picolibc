@@ -44,7 +44,8 @@ DIST_COMMON = $(srcdir)/../../config.guess $(srcdir)/../../config.sub \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) \
 	$(srcdir)/../../mkinstalldirs $(srcdir)/../../ltmain.sh \
-	$(srcdir)/../../config.guess $(srcdir)/../../config.sub
+	$(srcdir)/../../config.guess $(srcdir)/../../config.sub \
+	$(libc_TEXINFOS)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../acinclude.m4 \
@@ -340,7 +341,6 @@ libc_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@libc_la_SOURCES = 
 @USE_LIBTOOL_TRUE@libc_la_LIBADD = $(SUBLIBS)
 @USE_LIBTOOL_TRUE@libc_la_DEPENDENCIES = $(SUBLIBS)
-info_TEXINFOS = libc.texinfo
 
 # This is a list of the stmp-def files in each subdirectory which
 # builds .def files.  We don't list subdirectories which don't build
@@ -358,6 +358,10 @@ SUBDEFS = \
 	reent/stmp-def \
 	$(LIBC_EXTRA_DEF) \
 	misc/stmp-def
+
+info_TEXINFOS = libc.texinfo
+libc_TEXINFOS = sigset.texi extra.texi stdio64.texi iconvset.texi \
+	targetdep.tex $(SUBDEFS)
 
 CLEANFILES = $(CRT0) \
 	sigset.texi stmp-sigset extra.texi stmp-extra \
@@ -488,9 +492,9 @@ distclean-libtool:
 	    rm -rf $(@:.html=); else rm -Rf $(@:.html=.htp) $@; fi; \
 	  exit 1; \
 	fi
-$(srcdir)/libc.info: libc.texinfo 
-libc.pdf: libc.texinfo 
-libc.html: libc.texinfo 
+$(srcdir)/libc.info: libc.texinfo $(libc_TEXINFOS)
+libc.pdf: libc.texinfo $(libc_TEXINFOS)
+libc.html: libc.texinfo $(libc_TEXINFOS)
 .dvi.ps:
 	$(DVIPS) -o $@ $<
 

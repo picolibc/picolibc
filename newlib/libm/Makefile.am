@@ -41,7 +41,7 @@ $(SUBLIBS):
 
 info_TEXINFOS = libm.texinfo
 
-libm.info: targetdep.tex math/stmp-def
+libm_TEXINFOS = targetdep.tex
 
 libm.dvi: targetdep.tex math/stmp-def
 

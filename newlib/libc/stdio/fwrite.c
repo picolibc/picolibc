@@ -30,7 +30,7 @@ ANSI_SYNOPSIS
 		      size_t <[count]>, FILE *<[fp]>);
 
 	#include <stdio.h>
-	size_t _fwrite_r(struct _reent *<[ptr[>, const void *<[buf]>, size_t <[size]>,
+	size_t _fwrite_r(struct _reent *<[ptr]>, const void *<[buf]>, size_t <[size]>,
 		      size_t <[count]>, FILE *<[fp]>);
 
 TRAD_SYNOPSIS

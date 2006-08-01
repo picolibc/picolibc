@@ -1,3 +1,12 @@
+2006-08-01  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/Makefile.am: Add libc_TEXINFOS dependency on
+	generated .texi files.
+	* libm/Makefile.am: Add libm_TEXINFOS dependency on
+	generated .texi files.
+	* libc/Makefile.in: Regenerated.
+	* libm/Makefile.in: Ditto.
+
 2006-08-01  Thiemo Seufer  <ths@mips.com>
             Nigel Stephens  <nigel@mips.com>
 

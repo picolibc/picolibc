@@ -112,8 +112,6 @@ crt0.o: sys/crt0.o
 
 sys/crt0.o: ; @true
 
-info_TEXINFOS = libc.texinfo
-
 # This is a list of the stmp-def files in each subdirectory which
 # builds .def files.  We don't list subdirectories which don't build
 # .def files; if the list of subdirectories changes, we must change
@@ -196,6 +194,10 @@ stmp-targetdep: force
 targetdep.tex: stmp-targetdep ; @true
 
 $(SUBDEFS): stmp-targetdep ; @true
+
+info_TEXINFOS = libc.texinfo
+libc_TEXINFOS = sigset.texi extra.texi stdio64.texi iconvset.texi \
+	targetdep.tex $(SUBDEFS)
 
 .PHONY: force
 force:

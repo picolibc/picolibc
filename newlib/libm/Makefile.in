@@ -43,7 +43,8 @@ DIST_COMMON = $(srcdir)/../../config.guess $(srcdir)/../../config.sub \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) \
 	$(srcdir)/../../mkinstalldirs $(srcdir)/../../ltmain.sh \
-	$(srcdir)/../../config.guess $(srcdir)/../../config.sub
+	$(srcdir)/../../config.guess $(srcdir)/../../config.sub \
+	$(libm_TEXINFOS)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../acinclude.m4 \
@@ -243,6 +244,7 @@ libm_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@libm_la_LIBADD = $(SUBLIBS)
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = libm.a
 info_TEXINFOS = libm.texinfo
+libm_TEXINFOS = targetdep.tex
 CLEANFILES = tmp.texi targetdep.tex stmp-targetdep
 ACLOCAL_AMFLAGS = -I ..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
@@ -369,9 +371,9 @@ distclean-libtool:
 	    rm -rf $(@:.html=); else rm -Rf $(@:.html=.htp) $@; fi; \
 	  exit 1; \
 	fi
-$(srcdir)/libm.info: libm.texinfo 
-libm.pdf: libm.texinfo 
-libm.html: libm.texinfo 
+$(srcdir)/libm.info: libm.texinfo $(libm_TEXINFOS)
+libm.pdf: libm.texinfo $(libm_TEXINFOS)
+libm.html: libm.texinfo $(libm_TEXINFOS)
 .dvi.ps:
 	$(DVIPS) -o $@ $<
 
@@ -703,8 +705,6 @@ uninstall-info: uninstall-info-recursive
 @USE_LIBTOOL_FALSE@	rm -rf tmp
 
 $(SUBLIBS):
-
-libm.info: targetdep.tex math/stmp-def
 
 libm.dvi: targetdep.tex math/stmp-def
 
