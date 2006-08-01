@@ -1,3 +1,9 @@
+2006-08-01  Thiemo Seufer  <ths@mips.com>
+            Nigel Stephens  <nigel@mips.com>
+
+	* libc/include/sys/config.h (__ATTRIBUTE_IMPURE_PTR__): For MIPS
+	define this to force _impure_ptr to live in the .sdata section.
+
 2006-07-31  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* acinclude.m4: Check for readelf tool.
