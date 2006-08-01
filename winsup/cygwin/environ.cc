@@ -28,6 +28,7 @@ details. */
 #include "environ.h"
 #include "child_info.h"
 
+extern bool dos_file_warning;
 extern bool allow_glob;
 extern bool ignore_case_with_glob;
 extern bool allow_winsymlinks;
@@ -593,6 +594,7 @@ static struct parse_thing
   {"binmode", {x: &binmode}, justset, NULL, {{O_TEXT}, {O_BINARY}}},
   {"check_case", {func: &check_case_init}, isfunc, NULL, {{0}, {0}}},
   {"codepage", {func: &codepage_init}, isfunc, NULL, {{0}, {0}}},
+  {"dosfilewarning", {&dos_file_warning}, justset, NULL, {{false}, {true}}},
   {"envcache", {&envcache}, justset, NULL, {{true}, {false}}},
   {"error_start", {func: &error_start_init}, isfunc, NULL, {{0}, {0}}},
   {"export", {&export_settings}, justset, NULL, {{false}, {true}}},
@@ -600,7 +602,7 @@ static struct parse_thing
   {"glob", {func: &glob_init}, isfunc, NULL, {{0}, {s: "normal"}}},
   {"ntea", {func: set_ntea}, isfunc, NULL, {{0}, {s: "yes"}}},
   {"ntsec", {func: set_ntsec}, isfunc, NULL, {{0}, {s: "yes"}}},
-  {"traverse", {func: set_traverse}, isfunc, NULL, {{0}, {s: "yes"}}},
+  {"proc_retry", {func: set_proc_retry}, isfunc, NULL, {{0}, {5}}},
   {"reset_com", {&reset_com}, justset, NULL, {{false}, {true}}},
 #ifdef USE_SERVER
   {"server", {&allow_server}, justset, NULL, {{false}, {true}}},
@@ -609,10 +611,10 @@ static struct parse_thing
   {"strip_title", {&strip_title_path}, justset, NULL, {{false}, {true}}},
   {"subauth_id", {func: &subauth_id_init}, isfunc, NULL, {{0}, {0}}},
   {"title", {&display_title}, justset, NULL, {{false}, {true}}},
+  {"traverse", {func: set_traverse}, isfunc, NULL, {{0}, {s: "yes"}}},
   {"tty", {NULL}, set_process_state, NULL, {{0}, {PID_USETTY}}},
   {"winsymlinks", {&allow_winsymlinks}, justset, NULL, {{false}, {true}}},
   {"transparent_exe", {&transparent_exe}, justset, NULL, {{false}, {true}}},
-  {"proc_retry", {func: set_proc_retry}, isfunc, NULL, {{0}, {5}}},
   {NULL, {0}, justset, 0, {{0}, {0}}}
 };
 

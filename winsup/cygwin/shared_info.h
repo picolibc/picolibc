@@ -44,7 +44,7 @@ class mount_item
 
 #define USER_VERSION	1	// increment when mount table changes and
 #define USER_VERSION_MAGIC CYGWIN_VERSION_MAGIC (USER_MAGIC, USER_VERSION)
-#define CURR_USER_MAGIC 0x8dc7b1d5U
+#define CURR_USER_MAGIC 0x38edd704U
 
 class reg_key;
 struct device;
@@ -133,6 +133,7 @@ public:
   DWORD version;
   DWORD cb;
   delqueue_list delqueue;
+  bool warned_msdos;
   mount_info mountinfo;
 };
 /******** Shared Info ********/
@@ -197,4 +198,3 @@ void *__stdcall open_shared (const char *name, int n, HANDLE &shared_h, DWORD si
 			     shared_locations&, PSECURITY_ATTRIBUTES psa = &sec_all,
 			     DWORD access = FILE_MAP_READ | FILE_MAP_WRITE);
 extern void user_shared_initialize (bool reinit);
-

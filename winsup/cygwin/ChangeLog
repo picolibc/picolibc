@@ -1,3 +1,16 @@
+2006-08-01  Christopher Faylor  <cgf@timesys.com>
+
+	* environ.cc (dos_file_warning): Declare.
+	(parse_thing): Add "dosfilewarning".  Alphabetize.
+	* path.cc (normalize_posix_path): Return -1 when MS-DOS path detected.
+	(warn_msdos): New function.
+	(path_conv::check): Call if !PC_NOWARN and MS-DOS path detected.
+	(cygwin_conv_to_win32_path): Set PC_NOWARN when calling path_conv.
+	(cygwin_conv_to_full_win32_path): Ditto.
+	* path.h (pathconv_arg::PC_NOWARN): Define.
+	* shared_info.h (user_info::warned_msdos): New field.
+	(CURR_USER_MAGIC): Reset.
+
 2006-07-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::recv_internal): Fix a problem

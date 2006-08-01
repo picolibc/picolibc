@@ -47,6 +47,7 @@ enum pathconv_arg
   PC_NULLEMPTY		= 0x0020,
   PC_CHECK_EA		= 0x0040,
   PC_POSIX		= 0x0080,
+  PC_NOWARN		= 0x0100,
   PC_NO_ACCESS_CHECK	= 0x00800000
 };
 
