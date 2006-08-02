@@ -1,3 +1,13 @@
+2006-08-02  Richard Sandiford  <richard@codesourcery.com>
+
+	gdb/gdbserver/
+	* server.c (terminal_fd): New variable.
+	(old_foreground_pgrp): Likewise.
+	(restore_old_foreground_pgrp): New function.
+	(start_inferior): Record the terminal file descriptor in terminal_fd
+	and its original foreground group in old_foreground_pgrp.  Register
+	restore_old_foreground_pgrp with atexit().
+
 2006-08-01  Vladimir Prus  <vladimir@codesourcery.com>
 
 	gdb/
