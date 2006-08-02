@@ -21,6 +21,9 @@ details. */
 #include <sys/cygwin.h>
 #include <ctype.h>
 #include <errno.h>
+#include <ddk/ntddk.h>
+#include <ddk/winddk.h>
+#include <ddk/ntifs.h>
 
 static const char version[] = "$Revision$";
 
@@ -107,6 +110,161 @@ Other options:\n\
 ");
     }
   exit (ignore_flag ? 0 : status);
+}
+
+static inline BOOLEAN
+RtlAllocateUnicodeString (PUNICODE_STRING uni, ULONG size)
+{
+  uni->Length = 0;
+  uni->MaximumLength = 512;
+  uni->Buffer = (WCHAR *) malloc (size);
+  return uni->Buffer != NULL;
+}
+
+static char *
+get_device_name (char *path)
+{
+  UNICODE_STRING ntdev, tgtdev, ntdevdir;
+  ANSI_STRING ans;
+  OBJECT_ATTRIBUTES ntobj;
+  NTSTATUS status;
+  HANDLE lnk, dir;
+  char *ret = strdup (path);
+  PDIRECTORY_BASIC_INFORMATION odi = (PDIRECTORY_BASIC_INFORMATION)
+				     alloca (4096);
+  BOOLEAN restart;
+  ULONG cont;
+
+  if (strncasecmp (path, "\\Device\\", 8))
+    return ret;
+
+  if (!RtlAllocateUnicodeString (&ntdev, MAX_PATH * 2))
+    return ret;
+  if (!RtlAllocateUnicodeString (&tgtdev, MAX_PATH * 2))
+    return ret;
+  RtlInitAnsiString (&ans, path);
+  RtlAnsiStringToUnicodeString (&ntdev, &ans, FALSE);
+
+  /* First check if the given device name is a symbolic link itself.  If so,
+     query it and use the new name as actual device name to search for in the
+     DOS device name directory.  If not, just use the incoming device name. */
+  InitializeObjectAttributes (&ntobj, &ntdev, OBJ_CASE_INSENSITIVE, NULL, NULL);
+  status = ZwOpenSymbolicLinkObject (&lnk, SYMBOLIC_LINK_QUERY, &ntobj);
+  if (NT_SUCCESS (status))
+    {
+      status = ZwQuerySymbolicLinkObject (lnk, &tgtdev, NULL);
+      ZwClose (lnk);
+      if (!NT_SUCCESS (status))
+	goto out;
+      RtlCopyUnicodeString (&ntdev, &tgtdev);
+    }
+  else if (status != STATUS_OBJECT_TYPE_MISMATCH)
+    goto out;
+
+  for (int i = 0; i < 2; ++i)
+    {
+      /* There are two DOS device directories, the local and the global dir.
+	 Try both, local first. */
+      RtlInitUnicodeString (&ntdevdir, i ? L"\\GLOBAL??" : L"\\??");
+
+      /* Open the directory... */
+      InitializeObjectAttributes (&ntobj, &ntdevdir, OBJ_CASE_INSENSITIVE,
+				  NULL, NULL);
+      status = ZwOpenDirectoryObject (&dir, DIRECTORY_QUERY, &ntobj);
+      if (!NT_SUCCESS (status))
+	break;
+
+      /* ...and scan it. */
+      for (restart = TRUE, cont = 0;
+	   NT_SUCCESS (ZwQueryDirectoryObject (dir, odi, 4096, TRUE,
+					       restart, &cont, NULL));
+	   restart = FALSE)
+	{
+	  /* For each entry check if it's a symbolic link. */
+	  InitializeObjectAttributes (&ntobj, &odi->ObjectName,
+				      OBJ_CASE_INSENSITIVE, dir, NULL);
+	  status = ZwOpenSymbolicLinkObject (&lnk, SYMBOLIC_LINK_QUERY, &ntobj);
+	  if (!NT_SUCCESS (status))
+	    continue;
+	  tgtdev.Length = 0;
+	  tgtdev.MaximumLength = 512;
+	  /* If so, query it and compare the target of the symlink with the
+	     incoming device name. */
+	  status = ZwQuerySymbolicLinkObject (lnk, &tgtdev, NULL);
+	  ZwClose (lnk);
+	  if (!NT_SUCCESS (status))
+	    continue;
+	  if (RtlEqualUnicodeString (&ntdev, &tgtdev, TRUE))
+	    {
+	      /* If the comparison succeeds, the name of the directory entry is
+		 a valid DOS device name, if prepended with "\\.\".  Return that
+		 valid DOS path. */
+	      ULONG len = RtlUnicodeStringToAnsiSize (&odi->ObjectName);
+	      ret = (char *) malloc (len + 4);
+	      strcpy (ret, "\\\\.\\");
+	      ans.Length = 0;
+	      ans.MaximumLength = len;
+	      ans.Buffer = ret + 4;
+	      RtlUnicodeStringToAnsiString (&ans, &odi->ObjectName, FALSE);
+	      ZwClose (dir);
+	      goto out;
+	    }
+	}
+      ZwClose (dir);
+    }
+
+out:
+  free (tgtdev.Buffer);
+  free (ntdev.Buffer);
+  return ret;
+}
+
+static char *
+get_device_paths (char *path)
+{
+  char *sbuf;
+  char *ptr;
+  int n = 1;
+
+  ptr = path;
+  while ((ptr = strchr (ptr, ';')))
+    {
+      ptr++;
+      n++;
+    }
+
+  char *paths[n];
+  DWORD acc = 0;
+  int i;
+  if (!n)
+    return strdup ("");
+
+  for (i = 0, ptr = path; ptr; i++)
+    {
+      char *next = ptr;
+      ptr = strchr (ptr, ';');
+      if (ptr)
+	*ptr++ = 0;
+      paths[i] = get_device_name (next);
+      acc += strlen (paths[i]) + 1;
+    }
+
+  sbuf = (char *) malloc (acc + 1);
+  if (sbuf == NULL)
+    {
+      fprintf (stderr, "%s: out of memory\n", prog_name);
+      exit (1);
+    }
+
+  sbuf[0] = '\0';
+  for (i = 0; i < n; i++)
+    {
+      strcat (strcat (sbuf, paths[i]), ";");
+      free (paths[i]);
+    }
+
+  strchr (sbuf, '\0')[-1] = '\0';
+  return sbuf;
 }
 
 static char *
@@ -487,6 +645,7 @@ doit (char *filename)
 	  err = cygwin_posix_to_win32_path_list (filename, buf);
 	  if (err)
 	    /* oops */;
+	  buf = get_device_paths (buf);
 	  if (shortname_flag)
 	    buf = get_short_paths (buf);
 	  if (longname_flag)
@@ -518,6 +677,7 @@ doit (char *filename)
 	}
       if (!unix_flag)
 	{
+	  buf = get_device_name (buf);
 	  if (shortname_flag)
 	    buf = get_short_name (buf);
 	  if (longname_flag)

@@ -208,6 +208,14 @@ else
 	$(CXX) -o $@ ${wordlist 1,3,$^} -B$(cygwin_build)/ $(DUMPER_LDFLAGS)
 endif
 
+cygpath.exe: cygpath.o $(ALL_DEP_LDLIBS)
+ifdef VERBOSE
+	$(CXX) -o $@ ${firstword $^} -B$(cygwin_build)/ $(ALL_LDFLAGS) -lntdll
+else
+	@echo $(CXX) -o $@ ${firstword $^} ${filter-out -B%, $(ALL_LDFLAGS) -ntdll};\
+	$(CXX) -o $@ ${firstword $^} -B$(cygwin_build)/ $(ALL_LDFLAGS) -ntdll
+endif
+
 %.exe: %.o $(ALL_DEP_LDLIBS)
 ifdef VERBOSE
 	$(CXX) -o $@ ${firstword $^} -B$(cygwin_build)/ $(ALL_LDFLAGS)
