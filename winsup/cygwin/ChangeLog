@@ -1,3 +1,14 @@
+2006-08-02  Christopher Faylor  <cgf@timesys.com>
+
+	* environ.cc (env_win32_to_posix_path_list): Declare.
+	(conv_envvars): Use env_win32_to_posix_path_list rather than
+	cygwin_win32_to_posix_path_list.
+	(posify): Translate back to win32 path if errno is EIDRM.
+	* environ.h: Update copyright.  Define ENV_CVT.
+	* path.cc (conv_path_list): If converting for the environment and
+	removed an element set errno to ENV_CVT.
+	(env_win32_to_posix_path_list): New function.
+
 2006-08-01  Christopher Faylor  <cgf@timesys.com>
 
 	* environ.cc (dos_file_warning): Declare.

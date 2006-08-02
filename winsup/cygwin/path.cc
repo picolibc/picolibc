@@ -75,6 +75,7 @@ details. */
 #include "shared_info.h"
 #include "registry.h"
 #include "cygtls.h"
+#include "environ.h"
 #include <assert.h>
 
 bool dos_file_warning = true;
@@ -1329,6 +1330,7 @@ conv_path_list (const char *src, char *dst, int to_posix)
 
   int err = 0;
   char *d = dst - 1;
+  bool saw_empty = false;
   do
     {
       char *s = strccpy (srcbuf, &src, src_delim);
@@ -1343,13 +1345,20 @@ conv_path_list (const char *src, char *dst, int to_posix)
       else if (!to_posix)
 	err = conv_fn (".", ++d);
       else
-	continue;
+	{
+	  if (to_posix == ENV_CVT)
+	    saw_empty = true;
+	  continue;
+	}
       if (err)
 	break;
       d = strchr (d, '\0');
       *d = dst_delim;
     }
   while (*src++);
+
+  if (saw_empty)
+    err = EIDRM;
 
   if (d < dst)
     d++;
@@ -3883,6 +3892,12 @@ extern "C" int
 cygwin_posix_to_win32_path_list_buf_size (const char *path_list)
 {
   return conv_path_list_buf_size (path_list, false);
+}
+
+extern "C" int
+env_win32_to_posix_path_list (const char *win32, char *posix)
+{
+  return_with_errno (conv_path_list (win32, posix, ENV_CVT));
 }
 
 extern "C" int

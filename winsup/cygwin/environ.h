@@ -1,6 +1,6 @@
 /* environ.h: Declarations for environ manipulation
 
-   Copyright 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2005, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -48,3 +48,5 @@ extern "C" char __stdcall **cur_environ ();
 char ** __stdcall build_env (const char * const *envp, char *&envblock,
 			     int &envc, bool need_envblock)
   __attribute__ ((regparm (3)));
+
+#define ENV_CVT -1

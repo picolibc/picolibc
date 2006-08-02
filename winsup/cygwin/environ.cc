@@ -43,6 +43,8 @@ extern bool allow_server;
 
 static char **lastenviron;
 
+extern "C" int env_win32_to_posix_path_list (const char *, char *posix);
+
 #define ENVMALLOC \
   (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) \
 	  <= CYGWIN_VERSION_DLL_MALLOC_ENV)
@@ -57,7 +59,7 @@ static char **lastenviron;
 static int return_MAX_PATH (const char *) {return CYG_MAX_PATH;}
 static win_env conv_envvars[] =
   {
-    {NL ("PATH="), NULL, NULL, cygwin_win32_to_posix_path_list,
+    {NL ("PATH="), NULL, NULL, env_win32_to_posix_path_list,
      cygwin_posix_to_win32_path_list,
      cygwin_win32_to_posix_path_list_buf_size,
      cygwin_posix_to_win32_path_list_buf_size, true},
@@ -181,8 +183,17 @@ posify (char **here, const char *value)
 
   char *outenv = (char *) malloc (1 + len + conv->posix_len (value));
   memcpy (outenv, src, len);
-  conv->toposix (value, outenv + len);
-  conv->add_cache (outenv + len, *value != '/' ? value : NULL);
+  char *newvalue = outenv + len;
+  if (!conv->toposix (value, newvalue) || _impure_ptr->_errno != EIDRM)
+    conv->add_cache (newvalue, *value != '/' ? value : NULL);
+  else
+    {
+      /* The conversion routine removed elements from a path list so we have
+	 to recalculate the windows path to remove elements there, too. */
+      char cleanvalue[strlen (value) + 1];
+      conv->towin32 (newvalue, cleanvalue);
+      conv->add_cache (newvalue, cleanvalue);
+    }
 
   debug_printf ("env var converted to %s", outenv);
   *here = outenv;
