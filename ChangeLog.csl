@@ -1,3 +1,25 @@
+2006-08-03  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport from mainline.
+
+	gas/
+	* config/tc-arm.c (parse_operands): Handle invalid register name
+	for OP_RIWR_RIWC. 
+
+	gas/testsuite/
+	* gas/arm/iwmmxt-bad.s: Test invalid register names for wldrw and
+	wstrw.
+	* gas/arm/iwmmxt-bad.l: Update.
+
+	gas/
+	* config/tc-arm.c (enum operand_parse_code): Add OP_RIWC_RIWG.
+	(parse_operands): Handle it.
+	(insns): Use it for tmcr and tmrc.
+
+	gas/testsuite/
+	* gas/arm/iwmmxt.s: Test tmcr and tmrc with wcgr registers.
+	* gas/arm/iwmmxt.d: Update.
+
 2006-07-27  Carlos O'Donell  <carlos@codesourcery.com>
 
 	bfd/
