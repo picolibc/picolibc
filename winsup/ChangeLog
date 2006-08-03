@@ -1,3 +1,7 @@
+2006-08-02  Christopher Faylor  <cgf@timesys.com>
+
+	* Makefile.in (subauth): Add dependency on mingw.
+
 2006-07-23  Christopher Faylor  <cgf@timesys.com>
 
 	* Makefile.in: Update copyright.  Fix 'check' target so that it will
