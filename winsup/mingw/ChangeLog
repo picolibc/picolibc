@@ -1,5 +1,9 @@
 2006-08-03  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/ctype.h: Remove stray ')';
+
+2006-08-03  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/ctype.h (_BLANK): Expand comment.
 	(isblank): Add prototype and inline definition.
 	(iswblank): Add prototype and inline definition.

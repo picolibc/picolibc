@@ -144,7 +144,7 @@ extern unsigned short** _imp___ctype;
 
 #if ! (defined (__NO_INLINE__)  || defined (__NO_CTYPE_INLINES) \
 	|| defined (__STRICT_ANSI__))
-)
+
 /* use  simple lookup if SB locale, else  _isctype()  */
 #define __ISCTYPE(c, mask)  (MB_CUR_MAX == 1 ? (_pctype[c] & mask) : _isctype(c, mask))
 __CRT_INLINE int __cdecl isalnum(int c) {return __ISCTYPE(c, (_ALPHA|_DIGIT));}
