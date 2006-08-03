@@ -1,3 +1,13 @@
+2006-08-03  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/ctype.h (_BLANK): Expand comment.
+	(isblank): Add prototype and inline definition.
+	(iswblank): Add prototype and inline definition.
+	* include/wctype.h (iswblank): Add prototype and inline definition.
+	* mingwex/isblank.c: New file.
+	* mingwex/iswblank.c: New file.
+	* mingwex/Makefile.in: Add isblank, iswblank to libmingwex.a
+
 2006-07-06  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/math.h (__INFF,__INFL): Remove '#'. 
@@ -29,7 +39,6 @@
 	* mingwex/fetestexcept.c: Likewise.
 	* mingwex/feupdateenv.c: Likewise.
 	* mingwex/fegetround.c: Add comment.
-
 
 2006-06-25  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 

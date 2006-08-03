@@ -31,7 +31,9 @@
 #define	_SPACE		0x0008 /* HT  LF  VT  FF  CR  SP */
 #define	_PUNCT		0x0010
 #define	_CONTROL	0x0020
-#define	_BLANK		0x0040 /* this is SP only, not SP and HT as in C99  */
+/* _BLANK is set for SP and non-ASCII horizontal space chars (eg,
+   "no-break space", 0xA0, in CP1250) but not for HT.  */
+#define	_BLANK		0x0040 
 #define	_HEX		0x0080
 #define	_LEADBYTE	0x8000
 
@@ -54,6 +56,11 @@ _CRTIMP int __cdecl ispunct(int);
 _CRTIMP int __cdecl isspace(int);
 _CRTIMP int __cdecl isupper(int);
 _CRTIMP int __cdecl isxdigit(int);
+
+#if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) \
+     || !defined __STRICT_ANSI__
+int __cdecl isblank (int);
+#endif
 
 #ifndef __STRICT_ANSI__
 _CRTIMP int __cdecl _isctype (int, int);
@@ -135,9 +142,9 @@ extern unsigned short** _imp___ctype;
  * optimise away the constant condition.			
  */
 
-
 #if ! (defined (__NO_INLINE__)  || defined (__NO_CTYPE_INLINES) \
-      || defined (__STRICT_ANSI__ ))
+	|| defined (__STRICT_ANSI__))
+)
 /* use  simple lookup if SB locale, else  _isctype()  */
 #define __ISCTYPE(c, mask)  (MB_CUR_MAX == 1 ? (_pctype[c] & mask) : _isctype(c, mask))
 __CRT_INLINE int __cdecl isalnum(int c) {return __ISCTYPE(c, (_ALPHA|_DIGIT));}
@@ -151,6 +158,12 @@ __CRT_INLINE int __cdecl ispunct(int c) {return __ISCTYPE(c, _PUNCT);}
 __CRT_INLINE int __cdecl isspace(int c) {return __ISCTYPE(c, _SPACE);}
 __CRT_INLINE int __cdecl isupper(int c) {return __ISCTYPE(c, _UPPER);}
 __CRT_INLINE int __cdecl isxdigit(int c) {return __ISCTYPE(c, _HEX);}
+
+#if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) \
+     || !defined __STRICT_ANSI__
+__CRT_INLINE int __cdecl isblank (int c)
+  {return (__ISCTYPE(c, _BLANK) || c == '\t');}
+#endif
 
 /* these reproduce behaviour of lib underscored versions  */
 __CRT_INLINE int __cdecl _tolower(int c) {return ( c -'A'+'a');}
@@ -187,6 +200,12 @@ _CRTIMP int __cdecl iswspace(wint_t);
 _CRTIMP int __cdecl iswupper(wint_t);
 _CRTIMP int __cdecl iswxdigit(wint_t);
 
+#if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) \
+     || !defined __STRICT_ANSI__
+int __cdecl iswblank (wint_t);
+#endif
+
+
 /* Older MS docs uses wchar_t for arg and return type, while newer
    online MS docs say arg is wint_t and return is int.
    ISO C uses wint_t for both.  */
@@ -212,6 +231,12 @@ __CRT_INLINE int __cdecl iswspace(wint_t wc) {return (iswctype(wc,_SPACE));}
 __CRT_INLINE int __cdecl iswupper(wint_t wc) {return (iswctype(wc,_UPPER));}
 __CRT_INLINE int __cdecl iswxdigit(wint_t wc) {return (iswctype(wc,_HEX));}
 __CRT_INLINE int __cdecl isleadbyte(int c) {return (_pctype[(unsigned char)(c)] & _LEADBYTE);}
+#if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) \
+     || !defined __STRICT_ANSI__
+__CRT_INLINE int __cdecl iswblank (wint_t wc)
+  {return (iswctype(wc,_BLANK) || wc == L'\t');}
+#endif
+
 #endif /* !(defined(__NO_CTYPE_INLINES) || defined(__WCTYPE_INLINES_DEFINED)) */
 
 #ifndef	__STRICT_ANSI__

@@ -36,7 +36,7 @@ DISTFILES = Makefile.in configure configure.in \
 	wcstoimax.c wcstold.c wcstoumax.c wctrans.c wctype.c \
 	wdirent.c wmemchr.c wmemcmp.c wmemcpy.c wmemmove.c wmemset.c wtoll.c \
 	wcrtomb.c wctob.c mbrtowc.c btowc.c mb_wc_common.h \
-	gettimeofday.c
+	gettimeofday.c isblank.c iswblank.c
 MATH_DISTFILES = \
 	acosf.c acosl.c asinf.c asinl.c atan2f.c atan2l.c \
 	atanf.c atanl.c cbrt.c cbrtf.c cbrtl.c ceilf.S ceill.S \
@@ -118,6 +118,8 @@ Q8_OBJS = \
 	strtoimax.o strtoumax.o wcstoimax.o wcstoumax.o \
 	wmemchr.o wmemcmp.o wmemcpy.o wmemmove.o wmemset.o \
 	wctrans.o wctype.o wcrtomb.o wctob.o mbrtowc.o btowc.o
+CTYPE_OBJS = \
+	isblank.o iswblank.o
 STDLIB_OBJS = \
 	strtold.o wcstold.o
 STDLIB_STUB_OBJS = \
@@ -178,7 +180,7 @@ COMPLEX_OBJS = \
 	csinl.o csinh.o csinhf.o csinhl.o csqrt.o csqrtf.o csqrtl.o \
 	ctan.o ctanf.o ctanl.o ctanh.o ctanhf.o ctanhl.o
 
-LIB_OBJS = $(Q8_OBJS) $(STDLIB_OBJS) $(STDLIB_STUB_OBJS) \
+LIB_OBJS = $(Q8_OBJS)  $(CTYPE_OBJS) $(STDLIB_OBJS) $(STDLIB_STUB_OBJS) \
 	$(STDIO_OBJS) $(MATH_OBJS)  $(FENV_OBJS) \
 	$(POSIX_OBJS) $(REPLACE_OBJS) $(COMPLEX_OBJS)
 
