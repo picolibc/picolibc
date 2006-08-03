@@ -338,15 +338,23 @@ _DEFUN (_dtoa_r,
       /* d is denormalized */
 
       i = bbits + be + (Bias + (P - 1) - 1);
+#if defined (_DOUBLE_IS_32BITS)
+      x = word0 (d) << (32 - i);
+#else
       x = (i > 32) ? (word0 (d) << (64 - i)) | (word1 (d) >> (i - 32))
        : (word1 (d) << (32 - i));
+#endif
       d2.d = x;
       word0 (d2) -= 31 * Exp_msk1;	/* adjust exponent */
       i -= (Bias + (P - 1) - 1) + 1;
       denorm = 1;
     }
 #endif
+#if defined (_DOUBLE_IS_32BITS)
+  ds = (d2.d - 1.5) * 0.289529651 + 0.176091269 + i * 0.30103001;
+#else
   ds = (d2.d - 1.5) * 0.289529654602168 + 0.1760912590558 + i * 0.301029995663981;
+#endif
   k = (int) ds;
   if (ds < 0. && ds != k)
     k--;			/* want k = floor(ds) */
