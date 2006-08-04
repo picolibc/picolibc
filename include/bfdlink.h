@@ -324,6 +324,9 @@ struct bfd_link_info
   /* TRUE if unreferenced sections should be removed.  */
   unsigned int gc_sections: 1;
 
+  /* TRUE if user shoudl be informed of removed unreferenced sections.  */
+  unsigned int print_gc_sections: 1;
+
   /* TRUE if .hash section should be created.  */
   unsigned int emit_hash: 1;
 
