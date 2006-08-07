@@ -762,11 +762,57 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 }
 
 int
-fhandler_disk_file::ftruncate (_off64_t length)
+fhandler_disk_file::fadvise (_off64_t offset, _off64_t length, int advice)
 {
-  int res = -1, res_bug = 0;
+  if (advice < POSIX_FADV_NORMAL || advice > POSIX_FADV_NOREUSE)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
 
-  if (length < 0 || !get_output_handle ())
+  if (!wincap.is_winnt ())
+    return 0;
+
+  /* Windows only supports advice flags for the whole file.  We're using
+     a simplified test here so that we don't have to ask for the actual
+     file size.  Length == 0 means all bytes starting at offset anyway.
+     So we only actually follow the advice, if it's given for offset == 0. */
+  if (offset != 0)
+    return 0;
+
+  /* We only support normal and sequential mode for now.  Everything which
+     is not POSIX_FADV_SEQUENTIAL is treated like POSIX_FADV_NORMAL. */
+  if (advice != POSIX_FADV_SEQUENTIAL)
+    advice = POSIX_FADV_NORMAL;
+
+  IO_STATUS_BLOCK io;
+  FILE_MODE_INFORMATION fmi;
+  NTSTATUS status = NtQueryInformationFile (get_handle (), &io,
+					    &fmi, sizeof fmi,
+					    FileModeInformation);
+  if (!NT_SUCCESS (status))
+    __seterrno_from_nt_status (status);
+  else
+    {
+      fmi.Mode &= ~FILE_SEQUENTIAL_ONLY;
+      if (advice == POSIX_FADV_SEQUENTIAL)
+        fmi.Mode |= FILE_SEQUENTIAL_ONLY;
+      status = NtSetInformationFile (get_handle (), &io, &fmi, sizeof fmi,
+				     FileModeInformation);
+      if (NT_SUCCESS (status))
+	return 0;
+      __seterrno_from_nt_status (status);
+    }
+
+  return -1;
+}
+
+int
+fhandler_disk_file::ftruncate (_off64_t length, bool allow_truncate)
+{
+  int res = -1;
+
+  if (length < 0 || !get_handle ())
     set_errno (EINVAL);
   else if (pc.isdir ())
     set_errno (EISDIR);
@@ -774,33 +820,58 @@ fhandler_disk_file::ftruncate (_off64_t length)
     set_errno (EBADF);
   else
     {
-      _off64_t prev_loc = lseek (0, SEEK_CUR);
-      if (lseek (length, SEEK_SET) >= 0)
-	{
-	  if (get_fs_flags (FILE_SUPPORTS_SPARSE_FILES))
+      _off64_t actual_length;
+      DWORD size_high = 0;
+      actual_length = GetFileSize (get_handle (), &size_high);
+      actual_length += ((_off64_t) size_high) << 32;
+
+      /* If called through posix_fallocate, silently succeed if length
+         is less than the file's actual length. */
+      if (!allow_truncate && length < actual_length)
+	return 0;
+
+      if (wincap.is_winnt ())
+        {
+	  NTSTATUS status;
+	  IO_STATUS_BLOCK io;
+	  FILE_END_OF_FILE_INFORMATION feofi;
+
+	  feofi.EndOfFile.QuadPart = length;
+	  /* Create sparse files only when called through ftruncate, not when
+	     called through posix_fallocate. */
+	  if (allow_truncate
+	      && get_fs_flags (FILE_SUPPORTS_SPARSE_FILES)
+	      && length >= actual_length + (128 * 1024))
 	    {
-	      _off64_t actual_length;
-	      DWORD size_high = 0;
-	      actual_length = GetFileSize (get_output_handle (), &size_high);
-	      actual_length += ((_off64_t) size_high) << 32;
-	      if (length >= actual_length + (128 * 1024))
-		{
-		  DWORD dw;
-		  BOOL r = DeviceIoControl (get_output_handle (),
-					    FSCTL_SET_SPARSE, NULL, 0, NULL,
-					    0, &dw, NULL);
-		  syscall_printf ("%d = DeviceIoControl(%p, FSCTL_SET_SPARSE)",
-				  r, get_output_handle ());
-		}
+	      DWORD dw;
+	      BOOL r = DeviceIoControl (get_handle (),
+					FSCTL_SET_SPARSE, NULL, 0, NULL,
+					0, &dw, NULL);
+	      syscall_printf ("%d = DeviceIoControl(%p, FSCTL_SET_SPARSE)",
+				  r, get_handle ());
 	    }
-	  else if (wincap.has_lseek_bug ())
-	    res_bug = write (&res, 0);
-	  if (!SetEndOfFile (get_output_handle ()))
-	    __seterrno ();
+	  status = NtSetInformationFile (get_handle (), &io,
+					 &feofi, sizeof feofi,
+					 FileEndOfFileInformation);
+	  if (!NT_SUCCESS (status))
+	    __seterrno_from_nt_status (status);
 	  else
-	    res = res_bug;
-	  /* restore original file pointer location */
-	  lseek (prev_loc, SEEK_SET);
+	    res = 0;
+	}
+      else
+        {
+	  _off64_t prev_loc = lseek (0, SEEK_CUR);
+	  if (lseek (length, SEEK_SET) >= 0)
+	    {
+	      int res_bug = write (&res, 0);
+	      if (!SetEndOfFile (get_handle ()))
+		__seterrno ();
+	      else
+		res = res_bug;
+	      /* restore original file pointer location */
+	      lseek (prev_loc, SEEK_SET);
+	    }
+
 	}
     }
   return res;

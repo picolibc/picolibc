@@ -1753,12 +1753,44 @@ cygwin_setmode (int fd, int mode)
 }
 
 extern "C" int
+posix_fadvise (int fd, _off64_t offset, _off64_t len, int advice)
+{
+  int res = -1;
+  cygheap_fdget cfd (fd);
+  if (cfd >= 0)
+    res = cfd->fadvise (offset, len, advice);
+  else
+    set_errno (EBADF);
+  syscall_printf ("%d = posix_fadvice (%d, %D, %D, %d)",
+  		  res, fd, offset, len, advice);
+  return res;
+}
+
+extern "C" int
+posix_fallocate (int fd, _off64_t offset, _off64_t len)
+{
+  int res = -1;
+  if (offset < 0 || len == 0)
+    set_errno (EINVAL);
+  else
+    {
+      cygheap_fdget cfd (fd);
+      if (cfd >= 0)
+	res = cfd->ftruncate (offset + len, false);
+      else
+	set_errno (EBADF);
+    }
+  syscall_printf ("%d = posix_fallocate (%d, %D, %D)", res, fd, offset, len);
+  return res;
+}
+
+extern "C" int
 ftruncate64 (int fd, _off64_t length)
 {
   int res = -1;
   cygheap_fdget cfd (fd);
   if (cfd >= 0)
-    res = cfd->ftruncate (length);
+    res = cfd->ftruncate (length, true);
   else
     set_errno (EBADF);
   syscall_printf ("%d = ftruncate (%d, %D)", res, fd, length);

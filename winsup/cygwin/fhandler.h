@@ -279,7 +279,8 @@ class fhandler_base
   virtual int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   virtual int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
   virtual int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
-  virtual int __stdcall ftruncate (_off64_t) __attribute__ ((regparm (2)));
+  virtual int __stdcall fadvise (_off64_t, _off64_t, int) __attribute__ ((regparm (3)));
+  virtual int __stdcall ftruncate (_off64_t, bool) __attribute__ ((regparm (3)));
   virtual int __stdcall link (const char *) __attribute__ ((regparm (2)));
   virtual int __stdcall utimes (const struct timeval *) __attribute__ ((regparm (2)));
   virtual int __stdcall fsync () __attribute__ ((regparm (1)));
@@ -536,6 +537,8 @@ public:
   }
   int dup (fhandler_base *child);
   int ioctl (unsigned int cmd, void *);
+  int __stdcall fadvise (_off64_t, _off64_t, int) __attribute__ ((regparm (3)));
+  int __stdcall ftruncate (_off64_t, bool) __attribute__ ((regparm (3)));
   void fixup_in_child ();
   virtual void fixup_after_fork (HANDLE);
   void fixup_after_exec ();
@@ -684,7 +687,8 @@ class fhandler_disk_file: public fhandler_base
   int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
   int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
-  int __stdcall ftruncate (_off64_t) __attribute__ ((regparm (2)));
+  int __stdcall fadvise (_off64_t, _off64_t, int) __attribute__ ((regparm (3)));
+  int __stdcall ftruncate (_off64_t, bool) __attribute__ ((regparm (3)));
   int __stdcall link (const char *) __attribute__ ((regparm (2)));
   int __stdcall utimes (const struct timeval *) __attribute__ ((regparm (2)));
 

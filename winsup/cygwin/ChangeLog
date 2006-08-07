@@ -1,3 +1,29 @@
+2006-08-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (NtSetInformationFile): Define.
+	* cygwin.din: Export posix_fadvise and posix_fallocate.
+	* fhandler.cc (fhandler_base::fadvise): New method.
+	(fhandler_base::ftruncate): Add allow_truncate parameter.
+	* fhandler.h (class fhandler_base): Add fadvise method.  Accomodate
+	new parameter to ftruncate.
+	(class fhandler_pipe): Add fadvise and ftruncate methods.
+	(class fhandler_disk_file): Add fadvise method.  Accomodate new
+	parameter to ftruncate.
+	* fhandler_disk_file.cc (fhandler_disk_file::fadvise): New method.
+	(fhandler_disk_file::ftruncate): Accomodate new allow_truncate
+	parameter.  Set EOF using NtSetInformationFile on NT.
+	* ntdll.h (struct _FILE_END_OF_FILE_INFORMATION): Define.
+	(NtSetInformationFile): Declare.
+	* pipe.cc (fhandler_pipe::fadvise): New method.
+	(fhandler_pipe::ftruncate): Ditto.
+	* syscalls.cc (posix_fadvise): New function.
+	(posix_fallocate): Ditto.
+	(ftruncate64): Accomodate second parameter to fhandler's ftruncate
+	method.
+	* include/fcntl.h: Add POSIX_FADV_* flags.  Add declarations of
+	posix_fadvise and posix_fallocate.
+	* include/cygwin/version.h: Bump API minor number. 
+
 2006-08-02  Christopher Faylor  <cgf@timesys.com>
 
 	* environ.cc (env_win32_to_posix_path_list): Declare.

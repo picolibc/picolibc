@@ -151,6 +151,20 @@ fhandler_pipe::lseek (_off64_t offset, int whence)
   return -1;
 }
 
+int
+fhandler_pipe::fadvise (_off64_t offset, _off64_t length, int advice)
+{
+  set_errno (ESPIPE);
+  return -1;
+}
+
+int
+fhandler_pipe::ftruncate (_off64_t length, bool allow_truncate)
+{
+  set_errno (allow_truncate ? EINVAL : ESPIPE);
+  return -1;
+}
+
 void
 fhandler_pipe::set_close_on_exec (bool val)
 {

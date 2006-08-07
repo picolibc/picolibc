@@ -1652,7 +1652,14 @@ fhandler_base::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 }
 
 int
-fhandler_base::ftruncate (_off64_t length)
+fhandler_base::fadvise (_off64_t offset, _off64_t length, int advice)
+{
+  set_errno (EINVAL);
+  return -1;
+}
+
+int
+fhandler_base::ftruncate (_off64_t length, bool allow_truncate)
 {
   set_errno (EINVAL);
   return -1;

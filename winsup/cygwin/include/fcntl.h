@@ -1,6 +1,6 @@
 /* fcntl.h
 
-   Copyright 1996, 1998, 2001, 2005 Red Hat, Inc.
+   Copyright 1996, 1998, 2001, 2005, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -22,5 +22,21 @@ details. */
 #define O_NOFOLLOW	_FNOFOLLOW
 #define O_DSYNC		_FSYNC
 #define O_RSYNC		_FSYNC
+
+#define POSIX_FADV_NORMAL	0
+#define POSIX_FADV_SEQUENTIAL	1
+#define POSIX_FADV_RANDOM	2
+#define POSIX_FADV_WILLNEED	3
+#define POSIX_FADV_DONTNEED	4
+#define POSIX_FADV_NOREUSE	5
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern int posix_fadvise _PARAMS ((int, off_t, off_t, int));
+extern int posix_fallocate _PARAMS ((int, off_t, off_t));
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _FCNTL_H */
