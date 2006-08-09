@@ -267,13 +267,8 @@ class path_conv
 /* Symlink marker */
 #define SYMLINK_COOKIE "!<symlink>"
 
-#define SYMLINK_EA_NAME ".CYGSYMLINK"
-
 /* Socket marker */
 #define SOCKET_COOKIE  "!<socket >"
-
-/* The sizeof header written to a shortcut by Cygwin or U/WIN. */
-#define SHORTCUT_HDR_SIZE       76
 
 /* Maximum depth of symlinks (after which ELOOP is issued).  */
 #define MAX_LINK_DEPTH 10

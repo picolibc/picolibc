@@ -1,3 +1,8 @@
+2006-08-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.h (SYMLINK_EA_NAME): Remove.
+	(SHORTCUT_HDR_SIZE): Ditto.
+
 2006-08-09  Christopher Faylor  <cgf@timesys.com>
 
 	* autoload.cc (GetHandleInformation): Declare new function.
