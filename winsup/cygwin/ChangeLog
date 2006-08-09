@@ -1,3 +1,12 @@
+2006-08-09  Christopher Faylor  <cgf@timesys.com>
+
+	* autoload.cc (GetHandleInformation): Declare new function.
+	(SetHandleInformation): Ditto.
+	* debug.cc (add_handle): Use SetHandleInformation to protect handle.
+	(close_handle): Use SetHandleInformation to unprotect handle.
+
+	* spawn.cc (spawn_guts): Move detached test outside of P_OVERLAY block.
+
 2006-08-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (NtSetInformationFile): Define.
