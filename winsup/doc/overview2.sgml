@@ -37,8 +37,7 @@ Developers coming from a Windows background will find a set of tools capable of
 writing console or GUI executables that rely on the Microsoft Win32 API.  The
 <command>dlltool</command> utility may be used to write Windows Dynamically
 Linked Libraries (DLLs).  The resource compiler <command>windres</command> is
-also provided.  All tools may be used from the Microsoft command prompt,
-with full support for normal Windows pathnames.
+also provided.
 </para>
 </sect1>
 
