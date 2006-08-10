@@ -19,6 +19,9 @@ details. */
 # include "config.h"
 #endif
 
+#undef DEBUGGING
+#define DEBUGGING 1		/* CGF: FIXME: TEMPORARY */
+
 #define __INSIDE_CYGWIN__
 
 #define strlen __builtin_strlen

@@ -38,6 +38,7 @@
 #include <sys/acl.h>
 #include "cygtls.h"
 #include "cygwin/in6.h"
+#include "mmap_helper.h"
 
 #define ASYNC_MASK (FD_READ|FD_WRITE|FD_OOB|FD_ACCEPT|FD_CONNECT)
 #define EVENT_MASK (FD_READ|FD_WRITE|FD_OOB|FD_ACCEPT|FD_CONNECT|FD_CLOSE)
@@ -1163,8 +1164,8 @@ fhandler_socket::recv_internal (WSABUF *wsabuf, DWORD wsacnt, DWORD flags,
   while (!(res = wait_for_events (evt_mask | FD_CLOSE))
 	 || saw_shutdown_read ())
     {
-      res = WSARecvFrom (get_socket (), wsabuf, wsacnt, &ret,
-			 &flags, from, fromlen, NULL, NULL);
+      res = mmWSARecvFrom (get_socket (), wsabuf, wsacnt, &ret,
+			   &flags, from, fromlen, NULL, NULL);
       if (!res || WSAGetLastError () != WSAEWOULDBLOCK)
 	break;
     }
