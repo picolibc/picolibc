@@ -1364,6 +1364,8 @@ fhandler_disk_file::lock (int cmd, struct __flock64 *fl)
       if (fl->l_type == F_UNLCK)
 	{
 	  res = UnlockFileEx (get_handle (), 0, len_low, len_high, &ov);
+	  if (res == 0 && GetLastError () == ERROR_NOT_LOCKED)
+	    res = 1;
 	}
       else
 	{
