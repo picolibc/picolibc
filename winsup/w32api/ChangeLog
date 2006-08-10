@@ -1,3 +1,9 @@
+2006-08-10  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/wtsapi32.def (WTSGetActiveConsoleSessionId). Move from here...
+	* lib/kernel32.def (WTSGetActiveConsoleSessionId). ...to here.
+	Bug reported by: <macleone at users dot sf dot net> 
+
 2006-07-29  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	Update some more IMAGE relocation type indicators

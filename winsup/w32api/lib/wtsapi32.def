@@ -9,7 +9,6 @@ WTSEnumerateServersW@20
 WTSEnumerateSessionsA@20
 WTSEnumerateSessionsW@20
 WTSFreeMemory@4
-WTSGetActiveConsoleSessionId@0
 WTSLogoffSession@12
 WTSOpenServerA@4
 WTSOpenServerW@4

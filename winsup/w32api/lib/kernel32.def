@@ -840,6 +840,8 @@ WriteProfileSectionW@8
 WriteProfileStringA@12
 WriteProfileStringW@12
 WriteTapemark@16
+; yes, this is here and not in wtsapi32.dll 
+WTSGetActiveConsoleSessionId@0
 ZombifyActCtx@4
 _hread@12
 _hwrite@12
