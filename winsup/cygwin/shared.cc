@@ -93,6 +93,30 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
 	{
 	  shared_h = CreateFileMapping (INVALID_HANDLE_VALUE, psa, PAGE_READWRITE,
 					0, size, mapname);
+#ifdef DEBUGGING
+	  if (!shared_h && GetLastError () == NO_ERROR)
+	    {
+	      system_printf ("CreateFileMapping %s, %E.  Retry Open", mapname);
+	      shared_h = OpenFileMapping (access, FALSE, mapname);
+	      if (!shared_h)
+		{
+		  system_printf ("OpenFileMapping %s, %E.  Retry Create "
+				 "after sleep (check timing problem)", mapname);
+		  Sleep (1000L);
+		  shared_h = CreateFileMapping (INVALID_HANDLE_VALUE, psa,
+						PAGE_READWRITE, 0, size,
+						mapname);
+		  if (!shared_h)
+		    system_printf ("Retried CreateFileMapping %s, %E.",
+				   mapname);
+		  else
+		    system_printf ("Retried CreateFileMapping %s succeeded!",
+				   mapname);
+		}
+	      else
+		system_printf ("OpenFileMapping %s succeeded!", mapname);
+	    }
+#endif
 	  if (GetLastError () == ERROR_ALREADY_EXISTS)
 	    m = SH_JUSTOPEN;
 	}

@@ -1,3 +1,8 @@
+2006-08-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shared.cc (open_shared): Desperately try to get shared memory, only
+	when DEBUGGING enabled for now.
+
 2006-08-10  Christopher Faylor  <cgf@timesys.com>
 
 	* pinfo.cc (_onreturn::~onreturn): Don't attempt to close a NULL
