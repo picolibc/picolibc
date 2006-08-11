@@ -238,7 +238,7 @@ close_handle (const char *func, int ln, HANDLE h, const char *name, bool force)
 
 #if 0 /* Uncomment to see CloseHandle failures */
   if (!ret)
-    small_printf ("CloseHandle(%s) failed %s:%d\n", name, func, ln);
+    small_printf ("CloseHandle(%s) %p failed %s:%d\n", name, h, func, ln);
 #endif
   return ret;
 }

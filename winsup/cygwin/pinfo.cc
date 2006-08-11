@@ -1097,10 +1097,11 @@ class _onreturn
 public:
   ~_onreturn ()
   {
-    if (h)
+    if (h && *h)
       {
 	CloseHandle (*h);
 	*h = NULL;
+	h = NULL;
       }
   }
   void no_close_p_handle () {h = NULL;}
