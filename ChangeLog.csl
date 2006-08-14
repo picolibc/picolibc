@@ -154,7 +154,7 @@
 	* libgloss/m68k/bdm-semihost.h: New
 	* libgloss/m68k/bdm-isrs.c: New.
 	* libgloss/m68k/bdm-isv.c: New.
-	* cf-dbug.sc: Renamed to ...
+	* dbug-cf.sc: Renamed to ...
 	* cf.sc: ... here.  Add bdm flexibility. Remove GROUP
 
 2006-03-23  Mark Mitchell  <mark@codesourcery.com>
