@@ -1009,7 +1009,10 @@ subauth (struct passwd *pw)
   QUOTA_LIMITS quota;
   char nt_domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
   char nt_user[UNLEN + 1];
-  HANDLE user_token = INVALID_HANDLE_VALUE;
+  /* Changed from INVALID_HANDLE_VALUE to NULL.  A failed LsaLogonUser
+     sets the token to NULL anyway, so starting with NULL simplifies
+     the below test before calling CloseHandle. */
+  HANDLE user_token = NULL;
   HANDLE primary_token = INVALID_HANDLE_VALUE;
 
   push_self_privilege (SE_TCB_PRIV, true);
@@ -1076,7 +1079,7 @@ subauth (struct passwd *pw)
 
 out:
   pop_self_privilege ();
-  if (user_token != INVALID_HANDLE_VALUE)
+  if (user_token)
     CloseHandle (user_token);
   return primary_token;
 }

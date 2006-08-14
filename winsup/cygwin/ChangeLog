@@ -1,3 +1,7 @@
+2006-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (subauth): Initialize user_token to NULL.  Add comment.
+
 2006-08-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* shared.cc (open_shared): Desperately try to get shared memory, only
