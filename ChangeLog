@@ -1,3 +1,9 @@
+2006-08-15  Thiemo Seufer  <ths@mips.com>
+            Nigel Stephens  <nigel@mips.com>
+            David Ung  <davidu@mips.com>
+
+	* config.sub: Add support for sde as alias of mipsisa32-sde-elf.
+
 2006-07-25  Paolo Bonzini  <bonzini@gnu.org>
 
 	Sync from GCC:
