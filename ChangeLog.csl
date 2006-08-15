@@ -1,3 +1,14 @@
+2006-08-15  Mark Shinwell  <shinwell@codesourcery.com>
+
+	* config/tc-arm.c (s_arm_unwind_save_vfp_armv6): New.  Parse
+	a directive saving VFP registers for ARMv6 or later.
+	(s_arm_unwind_save): Add parameter arch_v6 and call
+	s_arm_unwind_save_vfp or s_arm_unwind_save_vfp_armv6 as
+	appropriate.
+	(md_pseudo_table): Add entry for new "vsave" directive.
+	* doc/c-arm.texi: Correct error in example for "save"
+	directive (fstmdf -> fstmdx).  Also document "vsave" directive.
+
 2006-08-03  Joseph Myers  <joseph@codesourcery.com>
 
 	Backport from mainline.
