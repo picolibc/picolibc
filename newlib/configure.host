@@ -248,6 +248,9 @@ case "${host_cpu}" in
   z8k)
 	machine_dir=z8k
 	;;
+  spu)
+	machine_dir=spu
+	;;
   *)
 	echo '***' "Newlib does not support CPU ${host_cpu}" 1>&2
 	exit 1
@@ -424,6 +427,9 @@ case "${host}" in
   sparc64*)
 	sys_dir=sparc64
 	unix_dir=unix
+	;;
+  spu-*-*)
+	default_newlib_io_long_long="yes"
 	;;
   strongarm-*-*)
 	sys_dir=arm

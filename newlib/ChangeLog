@@ -1,3 +1,19 @@
+2006-08-16  Joel Schopp  <jschopp@austin.ibm.com>
+
+	* configure.host: Add spu support.
+	* libc/include/stdint.h: Ditto.
+	* libc/include/machine/ieeefp.h: Ditto.
+	* libc/include/machine/setjmp.h: Ditto.
+	* libc/include/sys/config.h: Ditto.
+	* libc/include/sys/types.h: Ditto.
+	* libc/machine/spu/Makefile.am: New file.
+	* libc/machine/spu/Makefile.in: Ditto.
+	* libc/machine/spu/aclocal.m4: Ditto.
+	* libc/machine/spu/configure: Ditto.
+	* libc/machine/spu/configure.in: Ditto.
+	* libc/machine/spu/memcpy.c: Ditto.
+	* libc/machine/spu/setjmp.S: Ditto.
+
 2006-08-03  J"orn Rennecke  <joern.rennecke@st.com>
 
 	* dtoa.c (dtoa_r): Handle the denormalized _DOUBLE_IS_32BITS case

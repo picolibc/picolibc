@@ -73,6 +73,11 @@
 #define __IEEE_BIG_ENDIAN
 #endif
 
+#ifdef __SPU__
+#define __IEEE_BIG_ENDIAN
+#endif
+
+
 #ifdef __sparc__
 #ifdef __LITTLE_ENDIAN_DATA__
 #define __IEEE_LITTLE_ENDIAN

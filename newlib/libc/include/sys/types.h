@@ -126,14 +126,11 @@ typedef	long	daddr_t;
 typedef	char *	caddr_t;
 
 #ifndef __CYGWIN__
-#if defined(__MS_types__) || defined(__rtems__)
-typedef	unsigned long	ino_t;
-#else
-#ifdef __sparc__
+#if defined(__MS_types__) || defined(__rtems__) ||
+    defined(__sparc__) || defined(__SPU__)
 typedef	unsigned long	ino_t;
 #else
 typedef	unsigned short	ino_t;
-#endif
 #endif
 #endif /*__CYGWIN__*/
 

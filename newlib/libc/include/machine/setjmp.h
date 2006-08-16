@@ -204,6 +204,11 @@ _BEGIN_STD_C
 #define _JBLEN 16
 #endif
 
+#ifdef __SPU__
+#define _JBLEN 50 
+#define _JBTYPE __attribute__ (( __vector_size__ (16) )) int
+#endif
+
 #ifdef __xstormy16__
 /* 4 GPRs plus SP plus PC. */
 #define _JBLEN 8
