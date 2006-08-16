@@ -64,7 +64,7 @@ GCC_LDFLAGS = `if [ -d ${objroot}/../gcc ] ; \
 
 OUTPUTS = libgloss.a crt0.o
 
-NEWLIB_CFLAGS = `if [ -d ${objroot}/newlib ]; then echo -I${objroot}/newlib/targ-include -I${srcroot}/newlib/libc/include; fi`
+NEWLIB_CFLAGS = `if [ -d ${objroot}/newlib ]; then echo -I${objroot}/newlib/targ-include -I${srcroot}/newlib/libc/include; fi` -ffunction-sections -fdata-sections
 NEWLIB_LDFLAGS = `if [ -d ${objroot}/newlib ]; then echo -B${objroot}/newlib/ -L${objroot}/newlib/; fi`
 
 INCLUDES = -I. -I$(srcdir)/..

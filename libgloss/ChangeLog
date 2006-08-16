@@ -1,5 +1,10 @@
 2006-08-16  Joel Schopp  <jschopp@austin.ibm.com>
 
+	* spu/Makefile.in: Add special compiler
+	options to reduce size.
+
+2006-08-16  Joel Schopp  <jschopp@austin.ibm.com>
+
 	* spu/jsre.h(JSRE_STAT): New define.
 	(syscall_stat_t): New type.
 	* spu/syscalls.c(stat): New syscall.
