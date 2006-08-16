@@ -1,5 +1,20 @@
 2006-08-16  Julian Brown  <julian@codesourcery.com>
 
+	gas/
+	* config/tc-arm.c (md_assemble): Improve diagnostic when attempting
+	to use ARM instructions on non-ARM-supporting cores.
+	(autoselect_thumb_from_cpu_variant): New function. Switch on Thumb
+	mode automatically based on cpu variant.
+	(md_begin): Call above function.
+
+	gas/testsuite/
+	* gas/arm/noarm.s: Add test for disabled ARM insns.
+	* gas/arm/noarm.d: Drive test for above.
+	* gas/arm/noarm.l: Expected error output.
+
+2006-08-16  Julian Brown  <julian@codesourcery.com>
+
+	gas/
 	* config/tc-arm.c (opcode_lookup): Allow Neon type suffixes to be
 	recognized in non-unified syntax mode.
 
