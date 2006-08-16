@@ -57,6 +57,7 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #define JSRE_LSEEK 9
 #define JSRE_OPEN 15
 #define JSRE_READ 16
+#define JSRE_STAT 23
 #define JSRE_UNLINK 24
 #define JSRE_WRITE 27
 
@@ -120,6 +121,13 @@ typedef struct
         unsigned int    pad1[ 3 ];
 } syscall_fstat_t;
 
+typedef struct
+{
+        unsigned int    pathname;
+        unsigned int    pad0[ 3 ];
+        unsigned int    ptr;
+        unsigned int    pad1[ 3 ];
+} syscall_stat_t;
 
 typedef struct
 {

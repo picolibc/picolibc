@@ -1,17 +1,23 @@
 2006-08-16  Joel Schopp  <jschopp@austin.ibm.com>
 
-	*  configure.in: Add spu support.
-	*  configure: Regenerated.
-	*  spu/Makefile.in: New file.
-	*  spu/aclocal.m4: Ditto.
-	*  spu/configure: Ditto.
-	*  spu/configure.in: Ditto.
-	*  spu/crt0.c: Ditto.
-	*  spu/exit.c: Ditto.
-	*  spu/init.c: Ditto.
-	*  spu/jsre.h: Ditto.
-	*  spu/sbrk.c: Ditto.
-	*  spu/syscalls.c: Ditto.
+	* spu/jsre.h(JSRE_STAT): New define.
+	(syscall_stat_t): New type.
+	* spu/syscalls.c(stat): New syscall.
+
+2006-08-16  Joel Schopp  <jschopp@austin.ibm.com>
+
+	* configure.in: Add spu support.
+	* configure: Regenerated.
+	* spu/Makefile.in: New file.
+	* spu/aclocal.m4: Ditto.
+	* spu/configure: Ditto.
+	* spu/configure.in: Ditto.
+	* spu/crt0.c: Ditto.
+	* spu/exit.c: Ditto.
+	* spu/init.c: Ditto.
+	* spu/jsre.h: Ditto.
+	* spu/sbrk.c: Ditto.
+	* spu/syscalls.c: Ditto.
 
 2006-07-05  Shaun Jackman  <sjackman@gmail.com>
 

@@ -243,6 +243,37 @@ fstat (int file, struct stat *pstat)
 }
 
 int
+stat (const char *pathname, struct stat *pstat)
+{
+        syscall_stat_t sys;
+        syscall_out_t   *psys_out = ( syscall_out_t* )&sys;
+        jsre_stat_t pjstat;
+
+        sys.pathname = pathname;
+        sys.ptr = ( unsigned int )&pjstat;
+
+        send_to_ppe_0x2101 (JSRE_STAT, &sys);
+
+        pstat->st_dev = pjstat.dev;
+        pstat->st_ino = pjstat.ino;
+        pstat->st_mode = pjstat.mode;
+        pstat->st_nlink = pjstat.nlink;
+        pstat->st_uid = pjstat.uid;
+        pstat->st_gid = pjstat.gid;
+        pstat->st_rdev = pjstat.rdev;
+        pstat->st_size = pjstat.size;
+        pstat->st_blksize = pjstat.blksize;
+        pstat->st_blocks = pjstat.blocks;
+        pstat->st_atime = pjstat.atime;
+        pstat->st_mtime = pjstat.mtime;
+        pstat->st_ctime = pjstat.ctime;
+
+        errno = psys_out->err;
+        return( psys_out->rc );
+}
+
+
+int
 unlink (const char *pathname)
 {
         int rc;
