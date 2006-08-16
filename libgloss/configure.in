@@ -116,6 +116,10 @@ case "${target}" in
 	AC_CONFIG_SUBDIRS(arm)
 	config_testsuite = true;
 	;;
+  spu-*-elf)
+	AC_CONFIG_SUBDIRS(spu)
+	config_testsuite = false;
+	;;
   iq2000-*-*)
 	AC_CONFIG_SUBDIRS(iq2000)
 	config_testsuite = true;
