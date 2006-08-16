@@ -1,5 +1,10 @@
 2006-08-16  Joel Schopp  <jschopp@austin.ibm.com>
 
+        * configure.host (newlib_cflags) [spu]: Add special compiler
+        options to reduce size.
+
+2006-08-16  Joel Schopp  <jschopp@austin.ibm.com>
+
 	* configure.host: Add spu support.
 	* libc/include/stdint.h: Ditto.
 	* libc/include/machine/ieeefp.h: Ditto.
