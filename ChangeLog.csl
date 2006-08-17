@@ -1,5 +1,10 @@
 2006-08-17  Daniel Jacobowitz  <dan@codesourcery.com>
 
+	gdb/testsuite/
+	* config/symbian.exp: New file.
+
+2006-08-17  Daniel Jacobowitz  <dan@codesourcery.com>
+
 	gdb/
 	* objfiles.c (init_entry_point_info): Handle shared objects
 	with entry points.
