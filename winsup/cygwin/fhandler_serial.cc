@@ -44,7 +44,7 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
   int tot;
   DWORD n;
   HANDLE w4[2];
-  size_t minchars = vmin_ ?: ulen;
+  size_t minchars = vmin_ ? min (vmin_, ulen) : ulen;
 
   w4[0] = io_status.hEvent;
   w4[1] = signal_arrived;
@@ -60,25 +60,18 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
   for (n = 0, tot = 0; ulen; ulen -= n, ptr = (char *) ptr + n)
     {
       COMSTAT st;
-      DWORD inq = 1;
+      DWORD inq = vmin_ ? minchars : vtime_ ? ulen : 1;
 
       n = 0;
 
-      if (!vtime_ && !vmin_)
-	inq = ulen;
-      else if (vtime_)
-	{
-	  inq = ulen;	// non-interruptible -- have to use kernel timeouts
-			// also note that this is not strictly correct.
-			// if vmin > ulen then things won't work right.
-	  overlapped_armed = -1;
-	}
+      if (vtime_) // non-interruptible -- have to use kernel timeouts
+	overlapped_armed = -1;
 
       if (!ClearCommError (get_handle (), &ev, &st))
 	goto err;
       else if (ev)
 	termios_printf ("error detected %x", ev);
-      else if (st.cbInQue)
+      else if (st.cbInQue && !vtime_)
 	inq = st.cbInQue;
       else if (!overlapped_armed)
 	{
@@ -98,7 +91,8 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 	      switch (WaitForMultipleObjects (2, w4, FALSE, INFINITE))
 		{
 		case WAIT_OBJECT_0:
-		  if (!GetOverlappedResult (get_handle (), &io_status, &n, FALSE))
+		  if (!GetOverlappedResult (get_handle (), &io_status, &n,
+					    FALSE))
 		    goto err;
 		  debug_printf ("n %d, ev %x", n, ev);
 		  break;
@@ -119,7 +113,7 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
       if (inq > ulen)
 	inq = ulen;
       debug_printf ("inq %d", inq);
-      if (ReadFile (get_handle (), ptr, min (inq, ulen), &n, &io_status))
+      if (ReadFile (get_handle (), ptr, inq, &n, &io_status))
 	/* Got something */;
       else if (GetLastError () != ERROR_IO_PENDING)
 	goto err;
