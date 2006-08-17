@@ -1,3 +1,10 @@
+2006-08-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_serial.cc (raw_read): Evaluate minchars taking the
+	vmin_ > ulen case into account.  Simplify evaluating the bytes to read.
+	Don't use bytes in Queue value from ClearCommError call in case vtime_
+	is > 0.  Reformat GetOverlappedResult call.  Simplify call to ReadFile.
+
 2006-08-10  Christopher Faylor  <cgf@timesys.com>
 
 	* pinfo.cc (_onreturn::~onreturn): Don't attempt to close a NULL
