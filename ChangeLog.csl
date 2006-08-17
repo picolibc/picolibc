@@ -1,3 +1,9 @@
+2006-08-17  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	gdb/
+	* objfiles.c (init_entry_point_info): Handle shared objects
+	with entry points.
+
 2006-07-11  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	gdb/
