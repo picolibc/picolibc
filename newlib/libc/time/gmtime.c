@@ -29,11 +29,11 @@ TRAD_SYNOPSIS
 	struct tm *<[res]>;
 
 DESCRIPTION
-<<gmtime>> assumes the time at <[clock]> represents a local time.
-<<gmtime>> converts it to UTC (Universal Coordinated Time, also known in some
-countries as GMT, Greenwich Mean time), then converts the
-representation from the arithmetic representation to
-the traditional representation defined by <<struct tm>>.
+<<gmtime>> takes the time at <[clock]> representing the number
+of elapsed seconds since 00:00:00 on January 1, 1970, Universal
+Coordinated Time (UTC, also known in some countries as GMT,
+Greenwich Mean time) and converts it to a <<struct tm>>
+representation.
 
 <<gmtime>> constructs the traditional time representation in static
 storage; each call to <<gmtime>> or <<localtime>> will overwrite the
