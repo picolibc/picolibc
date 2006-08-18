@@ -1,3 +1,9 @@
+2006-08-18  Julian Brown  <julian@codesourcery.com>
+
+	opcodes/
+	* arm-dis.c (print_insn_neon): Disassemble 32-bit immediates as
+	signed on 64-bit hosts.
+
 2006-08-16  Julian Brown  <julian@codesourcery.com>
 
 	gas/
