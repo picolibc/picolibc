@@ -1,5 +1,13 @@
 2006-08-18  Julian Brown  <julian@codesourcery.com>
 
+	libiberty/
+	* floatformat.c (get_field): Fix segfault with little-endian word
+	order on 64-bit hosts.
+	(put_field): Likewise.
+	(min): Move definition.
+
+2006-08-18  Julian Brown  <julian@codesourcery.com>
+
 	opcodes/
 	* arm-dis.c (print_insn_neon): Disassemble 32-bit immediates as
 	signed on 64-bit hosts.
