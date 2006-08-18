@@ -1,3 +1,29 @@
+2006-08-18  Paul Brook  <paul@codesourcery.com>
+
+	Backport from mainline.
+	bfd/
+	* elf32-arm.c (elf32_arm_link_hash_entry): Add export_glue.
+	(elf32_arm_link_hash_newfunc): Initialize export_glue.
+	(record_arm_to_thumb_glue): Return stub symbol.
+	(elf32_arm_create_thumb_stub): New function.
+	(elf32_arm_to_thumb_stub): Use it.
+	(elf32_arm_to_thumb_export_stub): New function.
+	(elf32_arm_begin_write_processing): New function.
+	(allocate_dynrelocs): Allocate Arm stubs.
+	(elf_backend_begin_write_processing): Define.
+	(elf32_arm_symbian_begin_write_processing): Remove ATTRIBUTE_UNUSED.
+	Call elf32_arm_begin_write_processing.
+
+	ld/
+	* emultempl/armelf.em (arm_elf_before_allocation): Call
+	gld${EMULATION_NAME}_before_allocation after setting interworking bfd.
+
+	ld/testsuite/
+	* ld-arm/arm-elf.exp (armelftests): Add armthumb-lib.so.  Add
+	-use-blx to mixed-lib.so
+	* ld-arm/armthumb-lib.d: New file.
+	* ld-arm/armthumb-lib.sym: New file.
+
 2006-08-18  Julian Brown  <julian@codesourcery.com>
 
 	libiberty/
