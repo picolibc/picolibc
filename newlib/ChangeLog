@@ -1,3 +1,8 @@
+2006-08-19  Ramana Radhakrishnan  <ramana.r@gmail.com>
+
+	* sys/types.h: Correct syntax error caused by missing '\' on #ifdef
+	line.
+
 2006-08-17  Brian Ford  <Brian.Ford@FlightSafety.com>
 
  	* libc/time/gmtime.c: Correct man page; clock is not a
