@@ -1,3 +1,14 @@
+2006-08-19  Joseph Myers  <joseph@codesourcery.com>
+
+	gas/
+	* config/tc-arm.c (s_arm_unwind_save_mmxwr): Correct condition for
+	merging with previous long opcode.
+
+	gas/testsuite/
+	* gas/arm/unwind.s: Test not merging iWMMXt register save with
+	previous long opcode.
+	* gas/arm/unwind.d, gas/arm/unwind_vxworks.d: Update.
+
 2006-08-18  Paul Brook  <paul@codesourcery.com>
 
 	Backport from mainline.
