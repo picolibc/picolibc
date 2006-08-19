@@ -1,3 +1,8 @@
+2006-08-20  Hideki Iwamoto  <h-iwamoto@kit.hi-ho.ne.jp>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::pread): Properly check for
+	non-error return from lseek.
+
 2006-08-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_serial.cc (raw_read): Evaluate minchars taking the
@@ -66,7 +71,7 @@
 	method.
 	* include/fcntl.h: Add POSIX_FADV_* flags.  Add declarations of
 	posix_fadvise and posix_fallocate.
-	* include/cygwin/version.h: Bump API minor number. 
+	* include/cygwin/version.h: Bump API minor number.
 
 2006-08-02  Christopher Faylor  <cgf@timesys.com>
 
@@ -112,7 +117,7 @@
 2006-07-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc: Drop LoadDLLprime for wsock32 since no wsock32 function
-	is used anymore.  Drop all unused ws2_32.dll functions.  
+	is used anymore.  Drop all unused ws2_32.dll functions.
 
 2006-07-28  Corinna Vinschen  <corinna@vinschen.de>
 
@@ -546,7 +551,7 @@
 	(cygwin_accept): Ditto.
 	* poll.cc (poll): Don't call recvfrom on a listening socket.
 	Remove special case for failing recvfrom.
-	* include/sys/socket.h: Declare recv* and send* functions ssize_t as 
+	* include/sys/socket.h: Declare recv* and send* functions ssize_t as
 	requested by POSIX.
 
 2006-07-10  Corinna Vinschen  <corinna@vinschen.de>
