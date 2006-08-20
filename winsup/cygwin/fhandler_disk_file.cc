@@ -1468,15 +1468,15 @@ fhandler_disk_file::rmdir ()
 
       /* This kludge detects if we are attempting to remove the current working
 	 directory.  If so, we will move elsewhere to potentially allow the
-	 rmdir to succeed.  This means that cygwin's concept of the current working
-	 directory != Windows concept but, hey, whaddaregonnado?
+	 rmdir to succeed.  This means that cygwin's concept of the current
+	 working directory != Windows concept but, hey, whaddaregonnado?
 	 Note that this will not cause something like the following to work:
 	 $ cd foo
 	 $ rmdir .
-	 since the shell will have foo "open" in the above case and so Windows will
-	 not allow the deletion. (Actually it does on 9X.)
-	 FIXME: A potential workaround for this is for cygwin apps to *never* call
-	 SetCurrentDirectory. */
+	 since the shell will have foo "open" in the above case and so Windows
+	 will not allow the deletion. (Actually it does on 9X.)
+	 FIXME: A potential workaround for this is for cygwin apps to *never*
+	 call SetCurrentDirectory. */
 
       extern char windows_system_directory[];
       if (strcasematch (get_win32_name (), cygheap->cwd.win32)
@@ -1514,7 +1514,7 @@ fhandler_disk_file::rmdir ()
    To tune caching, just tweak this number.  To get a feeling for the size,
    the size of the readdir cache is DIR_NUM_ENTRIES * 632 + 264 bytes.  */
 
-#define DIR_NUM_ENTRIES	25		/* Cache size 16064 bytes */
+#define DIR_NUM_ENTRIES	100		/* Cache size 63464 bytes */
 
 #define DIR_BUF_SIZE	(DIR_NUM_ENTRIES \
 			 * (sizeof (FILE_ID_BOTH_DIR_INFORMATION) \
@@ -1621,23 +1621,7 @@ fhandler_disk_file::opendir ()
 	      if (pc.hasgood_inode ())
 		{
 		  dir->__flags |= dirent_set_d_ino;
-		  /* Something weird happens on Samba up to version 3.0.21c,
-		     which is fixed in 3.0.22.  FileIdBothDirectoryInformation
-		     seems to work nicely, but only up to the 128th entry in
-		     the directory.  After reaching this entry, the next call
-		     to NtQueryDirectoryFile(FileIdBothDirectoryInformation)
-		     returns STATUS_INVALID_LEVEL.  Why should we care, we can
-		     just switch to FileBothDirectoryInformation, isn't it?
-		     Nope!  The next call to
-		     NtQueryDirectoryFile(FileBothDirectoryInformation)
-		     actually returns STATUS_NO_MORE_FILES, regardless how
-		     many files are left unread in the directory.  This does
-		     not happen when using FileBothDirectoryInformation right
-		     from the start.  In that case we can read the whole
-		     directory unmolested.  So we have to excempt Samba from
-		     the usage of FileIdBothDirectoryInformation entirely,
-		     even though Samba returns valid File IDs. */
-		  if (wincap.has_fileid_dirinfo () && !pc.fs_is_samba ())
+		  if (wincap.has_fileid_dirinfo ())
 		    dir->__flags |= dirent_get_d_ino;
 		}
 	    }
@@ -1790,6 +1774,52 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 	      || status == STATUS_INVALID_PARAMETER
 	      || status == STATUS_INVALID_INFO_CLASS)
 	    dir->__flags &= ~dirent_get_d_ino;
+	  /* Something weird happens on Samba up to version 3.0.21c, which is
+	     fixed in 3.0.22.  FileIdBothDirectoryInformation seems to work
+	     nicely, but only up to the 128th entry in the directory.  After
+	     reaching this entry, the next call to NtQueryDirectoryFile
+	     (FileIdBothDirectoryInformation) returns STATUS_INVALID_LEVEL.
+	     Why should we care, we can just switch to
+	     FileBothDirectoryInformation, isn't it?  Nope!  The next call to
+	     NtQueryDirectoryFile(FileBothDirectoryInformation) actually
+	     returns STATUS_NO_MORE_FILES, regardless how many files are left
+	     unread in the directory.  This does not happen when using
+	     FileBothDirectoryInformation right from the start, but since
+	     we can't decide whether the server we're talking with has this
+	     bug or not, we end up serving Samba shares always in the slow
+	     mode using FileBothDirectoryInformation.  So, what we do here is
+	     to implement the solution suggested by Andrew Tridgell,  we just
+	     reread all entries up to dir->d_position using
+	     FileBothDirectoryInformation. 
+	     However, We do *not* mark this server as broken and fall back to
+	     using FileBothDirectoryInformation further on.  This would slow
+	     down every access to such a server, even for directories under
+	     128 entries.  Also, bigger dirs only suffer from one additional
+	     call per full directory scan, which shouldn't be too big a hit.
+	     This can easily be changed if necessary. */
+	  if (status == STATUS_INVALID_LEVEL && dir->__d_position)
+	    {
+	      d_cachepos (dir) = 0;
+	      for (int cnt = 0; cnt < dir->__d_position; ++cnt)
+	        {
+		  if (d_cachepos (dir) == 0)
+		    {
+		      status = NtQueryDirectoryFile (dir->__handle, NULL, NULL,
+					   0, &io, d_cache (dir), DIR_BUF_SIZE,
+					   FileBothDirectoryInformation,
+					   FALSE, NULL, cnt == 0);
+		      if (!NT_SUCCESS (status))
+		        goto go_ahead;
+		    }
+		  buf = (PFILE_ID_BOTH_DIR_INFORMATION) (d_cache (dir)
+		  					 + d_cachepos (dir));
+		  if (buf->NextEntryOffset == 0)
+		    d_cachepos (dir) = 0;
+		  else
+		    d_cachepos (dir) += buf->NextEntryOffset;
+		}
+	      goto go_ahead;
+	    }
 	}
       if (!(dir->__flags & dirent_get_d_ino))
 	status = NtQueryDirectoryFile (dir->__handle, NULL, NULL, 0, &io,
@@ -1797,6 +1827,8 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 				       FileBothDirectoryInformation,
 				       FALSE, NULL, dir->__d_position == 0);
     }
+
+go_ahead:
 
   if (NT_SUCCESS (status))
     {

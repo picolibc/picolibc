@@ -1,3 +1,15 @@
+2006-08-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (DIR_NUM_ENTRIES): Set to 100 to maximize
+	performance on remote shares.
+	(fhandler_disk_file::opendir): Move comment about Samba weirdness into
+	fhandler_disk_file::readdir.  Don't disallow
+	FileIdBothDirectoryInformation on Samba.
+	(fhandler_disk_file::readdir): Workaround Samba problem with
+	FileIdBothDirectoryInformation by rereading already read entries
+	using FileBothDirectoryInformation.  Change comment about Samba
+	weirdness explaining this change.
+
 2006-08-20  Hideki Iwamoto  <h-iwamoto@kit.hi-ho.ne.jp>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::pread): Properly check for
