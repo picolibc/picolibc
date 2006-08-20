@@ -1583,7 +1583,9 @@ fhandler_disk_file::opendir ()
       dir->__handle = INVALID_HANDLE_VALUE;
       dir->__d_position = 0;
 
-      dir->__flags = (pc.normalized_path[0] == '/' && pc.normalized_path[1] == '\0') ? dirent_isroot : 0;
+      dir->__flags = (pc.normalized_path[0] == '/'
+		      && pc.normalized_path[1] == '\0')
+		     ? dirent_isroot : 0;
       dir->__d_internal = (unsigned) new __DIR_mounts (pc.normalized_path);
       if (wincap.is_winnt ())
 	{
@@ -1597,13 +1599,14 @@ fhandler_disk_file::opendir ()
 	      NTSTATUS status;
 	      SECURITY_ATTRIBUTES sa = sec_none;
 	      pc.get_nt_native_path (upath);
-	      InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+	      InitializeObjectAttributes (&attr, &upath,
+	      				  OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
 					  NULL, sa.lpSecurityDescriptor);
-
 	      status = NtOpenFile (&dir->__handle,
 				   SYNCHRONIZE | FILE_LIST_DIRECTORY,
 				   &attr, &io, wincap.shared (),
-				   FILE_SYNCHRONOUS_IO_NONALERT | FILE_DIRECTORY_FILE);
+				   FILE_SYNCHRONOUS_IO_NONALERT
+				   | FILE_DIRECTORY_FILE);
 	      if (!NT_SUCCESS (status))
 		{
 		  __seterrno_from_nt_status (status);

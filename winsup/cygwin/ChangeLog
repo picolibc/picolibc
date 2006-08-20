@@ -1,5 +1,9 @@
 2006-08-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Fix formatting.
+
+2006-08-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (DIR_NUM_ENTRIES): Set to 100 to maximize
 	performance on remote shares.
 	(fhandler_disk_file::opendir): Move comment about Samba weirdness into
