@@ -1145,7 +1145,7 @@ fhandler_disk_file::pread (void *buf, size_t count, _off64_t offset)
     {
       size_t tmp_count = count;
       read (buf, tmp_count);
-      if (lseek (curpos, SEEK_SET) == 0)
+      if (lseek (curpos, SEEK_SET) >= 0)
 	res = (ssize_t) tmp_count;
       else
 	res = -1;
