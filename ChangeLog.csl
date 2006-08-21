@@ -1,3 +1,9 @@
+2006-08-21  Mark Shinwell  <shinwell@codesourcery.com>
+
+	bfd/
+	* elf32-arm.c (elf32_arm_link_hash_table): Correct typo in
+	comment for target1_is_rel.
+
 2006-08-19  Joseph Myers  <joseph@codesourcery.com>
 
 	gas/
