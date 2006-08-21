@@ -243,6 +243,9 @@ cfe_mem.o: ${srcdir}/cfe_mem.c ${srcdir}/cfe_api.h
 cma101.o: ${srcdir}/cma101.c
 	$(CC) -c $(CFLAGS_FOR_TARGET) $(CFLAGS) -mno-mips16 ${srcdir}/cma101.c
 
+# cygmon can not be compiled as mips16 since it uses the syscall instruction
+cygmon.o: ${srcdir}/cygmon.c
+	$(CC) -c $(CFLAGS_FOR_TARGET) $(CFLAGS) -mno-mips16 ${srcdir}/cygmon.c
 
 syscalls.o: ${srcdir}/syscalls.c
 

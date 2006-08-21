@@ -1,3 +1,8 @@
+2006-08-21  David Ung  <davidu@mips.com>
+
+	* mips/Makefile.in: Add rule for cygmon.o and pass the -mno-mips16
+	option since it uses the syscall instruction.
+
 2006-08-16  Joel Schopp  <jschopp@austin.ibm.com>
 
 	* spu/Makefile.in: Add special compiler
