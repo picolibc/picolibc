@@ -1,3 +1,27 @@
+2006-05-17  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* src-release (MAKEINFOFLAGS): Define.
+	(do-proto-toplev): Pass MAKEINFOFLAGS to submakes.
+
+2006-04-10  Ben Elliston  <bje@au.ibm.com>
+
+	* contrib: Remove directory.
+
+2006-04-06  Carlos O'Donell <carlos@codesourcery.com>
+
+	* Makefile.tpl: Add install-html target.
+	* Makefile.def: Add install-html target.
+	* Makefile.in: Regenerate.
+	* configure.in: Add --with-datarootdir, --with-docdir,
+	and --with-htmldir options.
+	* configure: Regenerate.
+
+2006-03-31  Ben Elliston  <bje@au.ibm.com>
+
+	PR binutils/1860
+	* configure.in: Require makeinfo 4.4 or higher.
+	* configure: Regenerate.
+
 2006-03-14  Paolo Bonzini  <bonzini@gnu.org>
 
 	* Makefile.in: Regenerate.

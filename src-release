@@ -31,6 +31,9 @@ SHELL = /bin/sh
 BZIPPROG = bzip2
 MD5PROG = md5sum
 
+# (Default to avoid splitting info files by setting the threshold high.)
+MAKEINFOFLAGS = --split-size=5000000
+
 # pwd command to use.  Allow user to override default by setting PWDCMD in
 # the environment to account for automounters.  The make variable must not
 # be called PWDCMD, otherwise the value set here is passed to make
@@ -146,9 +149,11 @@ do-proto-toplev: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
 	  if [ -d $$d ]; then \
 	    if [ ! -f $$d/Makefile ] ; then true ; \
 	    elif grep '^diststuff:' $$d/Makefile >/dev/null ; then \
-		(cd $$d ; $(MAKE) diststuff ) || exit 1 ; \
+		(cd $$d ; $(MAKE) MAKEINFOFLAGS="$(MAKEINFOFLAGS)" \
+			  diststuff ) || exit 1 ; \
 	    elif grep '^info:' $$d/Makefile >/dev/null ; then \
-	        (cd $$d ; $(MAKE) info ) || exit 1 ; \
+		(cd $$d ; $(MAKE) MAKEINFOFLAGS="$(MAKEINFOFLAGS)" \
+			  info ) || exit 1 ; \
 	    fi ; \
 	    if [ -d $$d/proto-$$d.dir ]; then \
 	      ln -s ../$$d/proto-$$d.dir proto-toplev/$$d ; \
@@ -157,7 +162,7 @@ do-proto-toplev: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
 	    fi ; \
 	  else ln -s ../$$d proto-toplev/$$d ; fi ; \
 	done
-	cd etc && $(MAKE) info
+	cd etc && $(MAKE) MAKEINFOFLAGS="$(MAKEINFOFLAGS)" info
 	$(MAKE) distclean
 	# Kludge for pr gdb/857.  intl/Makefile.in lacks a couple
 	# of files in the distclean rule.  Zack W is planning to make

@@ -54,7 +54,16 @@ START_RELOC_NUMBERS (elf_x86_64_reloc_type)
      RELOC_NUMBER (R_X86_64_GOTOFF64, 25)     /* 64 bit offset to GOT */
      RELOC_NUMBER (R_X86_64_GOTPC32,  26)     /* 32 bit signed pc relative
                                                  offset to GOT */
-     /* 27 .. 33 */
+     RELOC_NUMBER (R_X86_64_GOT64,    27)     /* 64 bit GOT entry offset */
+     RELOC_NUMBER (R_X86_64_GOTPCREL64, 28)   /* 64 bit signed pc relative
+     						 offset to GOT entry */
+     RELOC_NUMBER (R_X86_64_GOTPC64,  29)     /* 64 bit signed pc relative
+     						 offset to GOT */
+     RELOC_NUMBER (R_X86_64_GOTPLT64, 30)     /* like GOT64, but indicates
+     						 that PLT entry is needed */
+     RELOC_NUMBER (R_X86_64_PLTOFF64, 31)     /* 64 bit GOT relative offset
+     						 to PLT entry */
+     /* 32 .. 33 */
      RELOC_NUMBER (R_X86_64_GOTPC32_TLSDESC, 34)
 					      /* 32 bit signed pc relative
 						 offset to TLS descriptor

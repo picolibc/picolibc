@@ -97,6 +97,9 @@ START_RELOC_NUMBERS (elf_mips_reloc_type)
   RELOC_NUMBER (R_MIPS16_HI16, 104)
   RELOC_NUMBER (R_MIPS16_LO16, 105)
   FAKE_RELOC (R_MIPS16_max, 106)
+  /* These relocations are specific to VxWorks.  */
+  RELOC_NUMBER (R_MIPS_COPY, 126)
+  RELOC_NUMBER (R_MIPS_JUMP_SLOT, 127)
   /* This was a GNU extension used by embedded-PIC.  It was co-opted by
      mips-linux for exception-handling data.  It is no longer used, but
      should continue to be supported by the linker for backward
