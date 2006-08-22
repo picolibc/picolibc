@@ -1,3 +1,9 @@
+2006-08-22  Eric Blake  <ebb9@byu.net>
+
+	* libc/posix/popen.c (popen): Don't close output end of pipe in
+	child if stdout was closed on entry.
+	[HAVE_FCNTL]: In parent, mark file as close-on-exec, per POSIX.
+
 2006-08-19  Ramana Radhakrishnan  <ramana.r@gmail.com>
 
 	* sys/types.h: Correct syntax error caused by missing '\' on #ifdef
