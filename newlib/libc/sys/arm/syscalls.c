@@ -112,10 +112,11 @@ initialise_monitor_handles (void)
 
 #ifndef __SINGLE_THREAD__
   __lock_acquire_recursive (__arm_monitor_handles_lock);
-#endif
-  initialized = 1;
-#ifndef __SINGLE_THREAD__
-  __lock_release_recursive (__arm_monitor_handles_lock);
+  if (initialized)
+    {
+      __lock_release_recursive (__arm_monitor_handles_lock);
+      return;
+    }
 #endif
 
 #ifdef ARM_RDI_MONITOR
@@ -156,6 +157,11 @@ initialise_monitor_handles (void)
   openfiles[0].pos = 0;
   openfiles[1].handle = monitor_stdout;
   openfiles[1].pos = 0;
+
+  initialized = 1;
+#ifndef __SINGLE_THREAD__
+  __lock_release_recursive (__arm_monitor_handles_lock);
+#endif
 }
 
 static int

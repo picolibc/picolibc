@@ -1,3 +1,9 @@
+2006-08-22  Paul Brook  <paul@codesourcery.com>
+
+	newlib/
+	* libc/sys/arm/syscalls.c (initialise_monitor_handles): Fix
+	multithreaded locking.
+
 2006-07-24  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Bug 844
