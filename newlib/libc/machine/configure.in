@@ -49,6 +49,7 @@ if test -n "${machine_dir}"; then
 	powerpc) AC_CONFIG_SUBDIRS(powerpc) ;;
 	sh) AC_CONFIG_SUBDIRS(sh) ;;
 	sparc) AC_CONFIG_SUBDIRS(sparc) ;;
+	spu) AC_CONFIG_SUBDIRS(spu) ;;
 	tic4x) AC_CONFIG_SUBDIRS(tic4x) ;;
 	tic80) AC_CONFIG_SUBDIRS(tic80) ;;
 	v850) AC_CONFIG_SUBDIRS(v850) ;;

@@ -30,6 +30,8 @@ POSSIBILITY OF SUCH DAMAGE.
 Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 */
 
+#include <string.h>
+
 void * memcpy (void *dst, const void *src, size_t len)
 {
 	/* TODO: copying byte by byte is far to inefficient */
