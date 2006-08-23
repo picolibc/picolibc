@@ -30,21 +30,23 @@ POSSIBILITY OF SUCH DAMAGE.
 Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 */
 
-void
-_send_to_ppe_0x2101 (int opcode, void *data)
+#include <fcntl.h>
+#include <errno.h>
+#include "jsre.h"
+
+int
+write (int file, const void *ptr, size_t len)
 {
+        syscall_write_t sys;
+	syscall_out_t	*psys_out = ( syscall_out_t* )&sys;
 
-	unsigned int	combined = ( ( opcode<<24 )&0xff000000 ) | ( ( unsigned int )data & 0x00ffffff );
+	sys.file = file;
+	sys.ptr = ( unsigned int )ptr;
+	sys.len = len;
 
-        vector unsigned int stopfunc = {
-                0x00002101,     /* stop 0x2101 */
-                (unsigned int) combined,
-                0x4020007f,     /* nop */
-                0x35000000      /* bi $0 */
-        };
+	_send_to_ppe_0x2101 (JSRE_WRITE, &sys);
 
-        void (*f) (void) = (void *) &stopfunc;
-        asm ("sync");
-        return (f ());
+        errno = psys_out->err;
+        return ( psys_out->rc);
 }
 

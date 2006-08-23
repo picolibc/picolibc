@@ -152,5 +152,6 @@ typedef struct {
     unsigned int ctime;
 } jsre_stat_t;
 
+void _send_to_ppe_0x2101 (int opcode, void *data);
 
 #endif

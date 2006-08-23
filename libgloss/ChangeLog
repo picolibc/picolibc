@@ -1,3 +1,20 @@
+2006-08-23  Kazunori Asayama  <asayama@sm.sony.co.jp>
+
+	* spu/Makefile.in: Add new object files.
+	* spu/syscalls.c: Move each system call to individual file.
+	* spu/jsre.h: Add declaration of _send_to_ppe_0x2101().
+	* spu/close.c: New file. Moved from spu/syscalls.c.
+	* spu/fstat.c: Likewise.
+	* spu/getpid.c: Likewise.
+	* spu/isatty.c: Likewise.
+	* spu/kill.c: Likewise.
+	* spu/lseek.c: Likewise.
+	* spu/open.c: Likewise.
+	* spu/read.c: Likewise.
+	* spu/stat.c: Likewise.
+	* spu/unlink.c: Likewise.
+	* spu/write.c: Likewise.
+
 2006-08-21  David Ung  <davidu@mips.com>
 
 	* mips/Makefile.in: Add rule for cygmon.o and pass the -mno-mips16

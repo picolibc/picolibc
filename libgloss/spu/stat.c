@@ -30,21 +30,38 @@ POSSIBILITY OF SUCH DAMAGE.
 Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 */
 
-void
-_send_to_ppe_0x2101 (int opcode, void *data)
+#include <stdarg.h>
+#include <fcntl.h>
+#include <errno.h>
+#include "jsre.h"
+
+int
+stat (const char *pathname, struct stat *pstat)
 {
+	syscall_stat_t sys;
+	syscall_out_t   *psys_out = ( syscall_out_t* )&sys;
+	jsre_stat_t pjstat;
 
-	unsigned int	combined = ( ( opcode<<24 )&0xff000000 ) | ( ( unsigned int )data & 0x00ffffff );
+	sys.pathname = pathname;
+	sys.ptr = ( unsigned int )&pjstat;
 
-        vector unsigned int stopfunc = {
-                0x00002101,     /* stop 0x2101 */
-                (unsigned int) combined,
-                0x4020007f,     /* nop */
-                0x35000000      /* bi $0 */
-        };
+	_send_to_ppe_0x2101 (JSRE_STAT, &sys);
 
-        void (*f) (void) = (void *) &stopfunc;
-        asm ("sync");
-        return (f ());
+	pstat->st_dev = pjstat.dev;
+	pstat->st_ino = pjstat.ino;
+	pstat->st_mode = pjstat.mode;
+	pstat->st_nlink = pjstat.nlink;
+	pstat->st_uid = pjstat.uid;
+	pstat->st_gid = pjstat.gid;
+	pstat->st_rdev = pjstat.rdev;
+	pstat->st_size = pjstat.size;
+	pstat->st_blksize = pjstat.blksize;
+	pstat->st_blocks = pjstat.blocks;
+	pstat->st_atime = pjstat.atime;
+	pstat->st_mtime = pjstat.mtime;
+	pstat->st_ctime = pjstat.ctime;
+
+	errno = psys_out->err;
+	return( psys_out->rc );
 }
 
