@@ -1,6 +1,26 @@
 2006-08-24  Mark Shinwell  <shinwell@codesourcery.com>
 
 	bfd/
+	* elf32-arm.c (elf32_arm_howto_table_1): Change offset for
+	R_THM_CALL to 25 and remove FIXME comment.
+	(using_thumb2): New function.
+	(elf32_arm_final_link_relocate): Cope with Thumb-2 BL encoding.
+
+	ld/testsuite/
+	* arm-elf.exp: Add thumb1-bl, thumb2-bl, thumb2-bl-as-thumb1-bad
+	and thumb2-bl-bad tests.
+	* thumb1-bl.d: New.
+	* thumb1-bl.s: New.
+	* thumb2-bl-as-thumb1-bad.d: New.
+	* thumb2-bl-as-thumb1-bad.s: New.
+	* thumb2-bl-bad.d: New.
+	* thumb2-bl-bad.s: New.
+	* thumb2-bl.d: New.
+	* thumb2-bl.s: New.
+
+2006-08-24  Mark Shinwell  <shinwell@codesourcery.com>
+
+	bfd/
 	* elf32-arm.c (elf32_arm_final_link_relocate): Add cases
 	for R_ARM_ABS32_NOI and R_ARM_REL32_NOI.
 	(elf32_arm_gc_sweep_hook): Likewise.
