@@ -1,3 +1,12 @@
+2006-08-24  Mark Shinwell  <shinwell@codesourcery.com>
+
+	bfd/
+	* elf32-arm.c (elf32_arm_final_link_relocate): Add cases
+	for R_ARM_ABS32_NOI and R_ARM_REL32_NOI.
+	(elf32_arm_gc_sweep_hook): Likewise.
+	(elf32_arm_check_relocs): Likewise.
+	(allocate_dynrelocs): Likewise.
+
 2006-08-22  Joseph Myers  <joseph@codesourcery.com>
 
 	Merge changes between binutils-csl-2_17-branchpoint and
