@@ -11,7 +11,7 @@
 
 static int _main(int argc, char *argv[]) __attribute__((noreturn));
 
-#if __thumb__
+#if __thumb__ && !__thumb2__
 asm("\n"
 	".code 32\n"
 	".global _start\n"

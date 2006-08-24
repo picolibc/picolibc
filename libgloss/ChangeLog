@@ -1,3 +1,7 @@
+2006-08-24  Paul Brook  <paul@codesourcery.com>
+
+	* arm/linux-crt0.c: Disable Arm stub for Thumb-2.
+
 2006-08-23  Kazunori Asayama  <asayama@sm.sony.co.jp>
 
 	* spu/Makefile.in: Add new object files.
