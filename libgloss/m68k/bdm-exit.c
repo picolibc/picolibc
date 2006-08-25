@@ -17,6 +17,8 @@
 #include "bdm-semihost.h"
 #include "bdm-gdb.h"
 
+extern void __reset (void);
+
 /* 
  * _exit -- Exit from the application.  
  */
@@ -26,5 +28,6 @@ void __attribute__ ((noreturn)) _exit (int code)
   while (1)
     {
       BDM_TRAP (BDM_EXIT, code);
+      __reset ();
     }
 }

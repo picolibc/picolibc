@@ -1,3 +1,28 @@
+2006-08-25  Nathan Sidwell  <nathan@codesourcery.com>
+
+	libgloss/
+	* m68k/Makefile.in (DBUG_BSP, DBUG_OBJS): Remove.
+	(BDM_CRT0): New.
+	(BDM_OBJS): Add bdm-crt1.o.
+	(BDM_OTHER_OBJS): Remove print.o putnum.o
+	(CF_BOARDS): New.
+	(CF_BDM_SCRIPTS): Generated name of ram scripts.
+	(CF_ROM_SCRIPTS): Generated name of rom scripts.
+	(CF_SCRIPTS): Adjust.
+	(all): Add BDM_CRT0.
+	(bdm-crt0.o, bdm-crt1.o): New targets.
+	(bdm-isv.o): Remove.
+	(m5208evb, m5213evb, m52235evb, m5235evb, m5273c3, m5282evb,
+	m5329evb, m5485evb): New.
+	(%-bdm.ld, %-rom.ld): New. Replace individual linker script rules.
+	(install): Remove DBUG installs.
+	* m68k/bdm-crt0.S: New.
+	* m68k/bdm-crt1.c: New.
+	* m68k/bdm-exit.c: Call __reset.
+	* m68k/bdm-isv.c: Remove.
+	* m68k/cf.sc: Adjust to produce either rom or ram images.
+	* m68k/dbug-exit.S, m68k/dbug-inbyte.S, m68k/dbug-outbyte.S: Remove.
+
 2006-08-22  Paul Brook  <paul@codesourcery.com>
 
 	newlib/

@@ -118,18 +118,13 @@ IDPGDB_BSP=	libidpgdb.a
 IDPGDB_OBJS=	leds.o idp-inbyte.o idp-gdb-outbyte.o mc68ec.o
 
 #
-# here's all the DBUG target stuff
-#
-DBUG_BSP=	libdbug.a
-DBUG_OBJS=	dbug-exit.o dbug-inbyte.o dbug-outbyte.o
-
-#
 # here's all the BDM semihosting stuff
 #
+BDM_CRT0=	bdm-crt0.o
 BDM_BSP=	libbdm.a
-BDM_OBJS=	bdm-isv.o bdm-semihost.o $(BDM_SYSOBJS) \
+BDM_OBJS=	bdm-crt1.o bdm-semihost.o $(BDM_SYSOBJS) \
 		$(patsubst %,bdm-%.o,${BDM_ISRS})
-BDM_OTHER_OBJS=	getpid.o kill.o sbrk.o print.o putnum.o
+BDM_OTHER_OBJS=	getpid.o kill.o sbrk.o
 BDM_SYSOBJS= 	bdm-close.o bdm-exit.o bdm-fstat.o bdm-gdb.o \
 		bdm-gettimeofday.o bdm-isatty.o bdm-lseek.o \
 		bdm-open.o bdm-read.o bdm-rename.o \
@@ -144,14 +139,11 @@ BDM_ISRS=	other_interrupt reset access_error address_error \
 	fp_underflow fp_operand_error fp_overflow fp_input_not_a_number \
 	fp_input_denormalized_number unsupported_instruction
 
-CF_SCRIPTS=   m5208evb-dbug.ld 	m5208evb-bdm.ld \
-	m5213evb-dbug.ld m5213evb-bdm.ld \
-	m52235evb-dbug.ld m52235evb-bdm.ld \
-	m5235evb-dbug.ld m5235evb-bdm.ld \
-	m5272c3-dbug.ld m5272c3-bdm.ld \
-	m5282evb-dbug.ld m5282evb-bdm.ld \
-	m5329evb-dbug.ld m5329evb-bdm.ld \
-	m5485evb-dbug.ld m5485evb-bdm.ld
+CF_BOARDS :=  m5208evb m5213evb m52235evb m5235evb m5272c3 m5282evb \
+	m5329evb m5485evb
+CF_BDM_SCRIPTS := $(patsubst %,%-bdm.ld,$(CF_BOARDS))
+CF_ROM_SCRIPTS := $(patsubst %,%-rom.ld,$(CF_BOARDS))
+CF_SCRIPTS=  $(CF_BDM_SCRIPTS) $(CF_ROM_SCRIPTS)
 
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
@@ -160,7 +152,8 @@ CF_SCRIPTS=   m5208evb-dbug.ld 	m5208evb-bdm.ld \
 # build a test program for each target board. Just trying to get
 # it to link is a good test, so we ignore all the errors for now.
 #
-all: ${SIM_CRT0} ${SIM_BSP} ${CRT0} ${BCC_BSP} ${IDP_BSP} ${IDPGDB_BSP} ${MVME135_BSP} ${MVME162_BSP} ${DBUG_BSP} ${BDM_BSP} ${CF_SCRIPTS}
+all: ${SIM_CRT0} ${SIM_BSP} ${CRT0} ${BCC_BSP} ${IDP_BSP} ${IDPGDB_BSP} \
+	${MVME135_BSP} ${MVME162_BSP} ${BDM_CRT0} ${BDM_BSP} ${CF_SCRIPTS}
 
 #
 # here's where we build the board support packages for each target
@@ -181,10 +174,6 @@ ${IDPGDB_BSP}: $(OBJS) ${IDPGDB_OBJS}
 	${AR} ${ARFLAGS} $@ $(OBJS) ${IDPGDB_OBJS}
 	${RANLIB} $@
 
-${DBUG_BSP}: $(OBJS) ${DBUG_OBJS}
-	${AR} ${ARFLAGS} $@ $(OBJS) ${DBUG_OBJS}
-	${RANLIB} $@
-
 ${BDM_BSP}: $(BDM_OTHER_OBJS) ${BDM_OBJS}
 	${AR} ${ARFLAGS} $@ $(BDM_OTHER_OBJS) ${BDM_OBJS}
 	${RANLIB} $@
@@ -197,64 +186,37 @@ ${MVME162_BSP}: $(OBJS) ${MVME162_OBJS}
 	${AR} ${ARFLAGS} $@ $(OBJS) ${MVME162_OBJS}
 	${RANLIB} $@
 
-
 $(BDM_SYSOBJS): %.o: %.c bdm-semihost.h bdm-gdb.h
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $< -o $@ 
-bdm-isv.o : bdm-isv.c bdm-semihost.h
+bdm-crt0.o : bdm-crt0.S
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $< -o $@
+bdm-crt1.o : bdm-crt1.c
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $< -o $@
+#We need to omit the frame pointer to ensure there is no prologue.
 bdm-semihost.o : bdm-semihost.c
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $< -o $@ -fomit-frame-pointer
 
+# We need to keep the frame pointer to make sure there's some
+# prologue.  Otherwise we get confused with the semihosting reoutine.
 $(patsubst %,bdm-%.o,${BDM_ISRS}) : bdm-isrs.c
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $< -o $@ \
 	  -DL_$(patsubst bdm-%.o,%,$@) -fno-omit-frame-pointer
 
-m5208evb-dbug.ld: cf.sc Makefile
-	IO=dbug RAMSTART=1024M RAMSIZE=16M RAMDBUG=128K ${SHELL} $< > $@
+#            RAM       ROM
+m5208evb  := 1024M 16M 0M 2M
+m5213evb  :=  512M 32K 0M 256K
+m52235evb :=  512M 32K 0M 256K
+m5235evb  :=    0M 16M 0xFFE00000 2M
+m5273c3   :=    0M  4M 0xFFE00000 2M
+m5282evb  :=    0M 16M 0xFFE00000 2M
+m5329evb  := 1024M 32M 0M 2M
+m5485evb  :=    0M 64M 1024M 16M
 
-m5208evb-bdm.ld: cf.sc Makefile
-	IO=bdm ISV=1 RAMSTART=1024M RAMSIZE=16M ${SHELL} $< > $@
-
-m5213evb-dbug.ld: cf.sc Makefile
-	IO=dbug RAMSTART=512M RAMSIZE=32K RAMDBUG=8K ${SHELL} $< > $@
-
-m5213evb-bdm.ld: cf.sc Makefile
-	IO=bdm ISV=1 RAMSTART=512M RAMSIZE=32K ${SHELL} $< > $@
-
-m52235evb-dbug.ld: cf.sc Makefile
-	IO=dbug RAMSTART=512M RAMSIZE=32K RAMDBUG=8K ${SHELL} $< > $@
-
-m52235evb-bdm.ld: cf.sc Makefile
-	IO=bdm ISV=1 RAMSTART=512M RAMSIZE=32K ${SHELL} $< > $@
-
-m5235evb-dbug.ld: cf.sc Makefile
-	IO=dbug RAMSTART=0M RAMSIZE=16M RAMDBUG=64K ${SHELL} $< > $@
-
-m5235evb-bdm.ld: cf.sc Makefile
-	IO=bdm ISV=1 RAMSTART=0M RAMSIZE=16M ${SHELL} $< > $@
-
-m5272c3-dbug.ld: cf.sc Makefile
-	IO=dbug RAMSTART=0M RAMSIZE=4M RAMDBUG=128K ${SHELL} $< > $@
-
-m5272c3-bdm.ld: cf.sc Makefile
-	IO=bdm ISV=1 RAMSTART=0M RAMSIZE=4M ${SHELL} $< > $@
-
-m5282evb-dbug.ld: cf.sc Makefile
-	IO=dbug RAMSTART=0M RAMSIZE=16M RAMDBUG=64K ${SHELL} $< > $@
-
-m5282evb-bdm.ld: cf.sc Makefile
-	IO=bdm ISV=1 RAMSTART=0M RAMSIZE=16M ${SHELL} $< > $@
-
-m5329evb-dbug.ld: cf.sc Makefile
-	IO=dbug RAMSTART=1024M RAMSIZE=32M RAMDBUG=128K ${SHELL} $< > $@
-
-m5329evb-bdm.ld: cf.sc Makefile
-	IO=bdm ISV=1 RAMSTART=1024M RAMSIZE=32M RAMDBUG=128K ${SHELL} $< > $@
-
-m5485evb-dbug.ld: cf.sc Makefile
-	IO=dbug RAMSTART=0M RAMSIZE=64M RAMDBUG=128K ${SHELL} $< > $@
-
-m5485evb-bdm.ld: cf.sc Makefile
-	IO=bdm ISV=1 RAMSTART=0M RAMSIZE=64M ${SHELL} $< > $@
+%-bdm.ld : cf.sc Makefile
+	RAM=$(word 1,$($*)) RAM_SIZE=$(word 2,$($*)) ${SHELL} $< >$@
+%-rom.ld : cf.sc Makefile
+	RAM=$(word 1,$($*)) RAM_SIZE=$(word 2,$($*)) \
+	  ROM=$(word 3,$($*)) ROM_SIZE=$(word 4,$($*)) ${SHELL} $< >$@
 
 leds.o: ${srcdir}/leds.c
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $<
@@ -372,9 +334,8 @@ install:
 	# install MVME162lx stuff
 	$(INSTALL_PROGRAM) $(MVME162_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(MVME162_BSP)
 	$(INSTALL_DATA) ${srcdir}/mvme162.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/mvme162.ld
-	# install DBUG stuff
-	$(INSTALL_PROGRAM) $(DBUG_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(DBUG_BSP)
 	# install BDM stuff
+	$(INSTALL_PROGRAM) $(BDM_CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(BDM_CRT0)
 	$(INSTALL_PROGRAM) $(BDM_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(BDM_BSP)
 
 	$(INSTALL_DATA) ${srcdir}/sbc5204.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/sbc5204.ld
