@@ -1,3 +1,8 @@
+2006-08-25  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/ctype.h: Expose iswblank if __cplusplus.
+	* include/wctype.h: Expose iswblank if __cplusplus.
+
 2006-08-03  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/ctype.h: Remove stray ')';

@@ -201,10 +201,9 @@ _CRTIMP int __cdecl iswupper(wint_t);
 _CRTIMP int __cdecl iswxdigit(wint_t);
 
 #if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) \
-     || !defined __STRICT_ANSI__
+     || !defined __STRICT_ANSI__ || defined __cplusplus
 int __cdecl iswblank (wint_t);
 #endif
-
 
 /* Older MS docs uses wchar_t for arg and return type, while newer
    online MS docs say arg is wint_t and return is int.
@@ -232,7 +231,7 @@ __CRT_INLINE int __cdecl iswupper(wint_t wc) {return (iswctype(wc,_UPPER));}
 __CRT_INLINE int __cdecl iswxdigit(wint_t wc) {return (iswctype(wc,_HEX));}
 __CRT_INLINE int __cdecl isleadbyte(int c) {return (_pctype[(unsigned char)(c)] & _LEADBYTE);}
 #if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) \
-     || !defined __STRICT_ANSI__
+     || !defined __STRICT_ANSI__ || __defined __cplusplus
 __CRT_INLINE int __cdecl iswblank (wint_t wc)
   {return (iswctype(wc,_BLANK) || wc == L'\t');}
 #endif
