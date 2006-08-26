@@ -1,3 +1,9 @@
+2006-08-25  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+        * faq-setup.xml (faq.setup.uninstall): Mention Safe Mode
+	requirement for accessing the Security tab in XP Home.
+        * faq-using.xml (faq.using.chmod): Mention FAT32.
+
 2006-08-09  Christopher Faylor  <cgf@timesys.com>
 
 	* overview2.sgml: Remove inaccurate "full support for windows

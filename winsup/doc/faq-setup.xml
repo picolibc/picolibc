@@ -374,27 +374,33 @@ the action reads ``Uninstall''.  Proceed by clicking ``Next''.
 <qandaentry id="faq.setup.uninstall-service">
 <question><para>How do I uninstall a Cygwin service?</para></question>
 <answer>
-<para>If you don't know the name of the service, you can list all
-services you have installed with <literal>cygrunsrv -L</literal>. Before
-removing the service, you should stop it with 
+<orderedlist>
+<listitem><para>List all services you have installed with 
+<literal>cygrunsrv -L</literal>. If you do not have 
+<literal>cygrunsrv</literal> installed, skip this FAQ.
+</para></listitem>
+<listitem><para>Before removing the service, you should stop it with 
 <literal>cygrunsrv --stop <replaceable>service_name</replaceable></literal>. 
 If you have <literal>inetd</literal> configured to run as a standalone
-service, it will not show up in the list, but <literal>cygrunsrv --stop inetd</literal>
-will work to stop it as well. Lastly, remove the service with
+service, it will not show up in the list, but 
+<literal>cygrunsrv --stop inetd</literal> will work to stop it as 
+well.
+</para></listitem> 
+<listitem><para>Lastly, remove the service with
 <literal>cygrunsrv --remove <replaceable>service_name</replaceable></literal>.
-</para>
+</para></listitem>
+</orderedlist>
 </answer></qandaentry>
 
 <qandaentry id="faq.setup.uninstall-all">
 <question><para>How do I uninstall <emphasis role='bold'>all</emphasis> of Cygwin?</para></question>
 <answer>
-
 <para>Setup has no automatic uninstall facility.  The recommended method to remove all 
 of Cygwin is as follows:
 </para>
 <orderedlist>
-<listitem><para>First remove all Cygwin services by repeating the instructions
-in <ulink
+<listitem><para>If you have any Cygwin services running, remove by repeating 
+the instructions in <ulink
 url="http://cygwin.com/faq/faq.setup.html#faq.setup.uninstall-service" /> for
 all services that you installed.  Common services that might have been
 installed are <literal>sshd</literal>, <literal>cron</literal>, 
@@ -420,12 +426,14 @@ services end up owned by the SYSTEM account and not writable by regular users.
 <para>The quickest way to delete the entire tree if you run into this problem is to 
 change the ownership of all files and folders to your account.  To do this in 
 Windows Explorer, right click on the root Cygwin folder, choose Properties, then 
-the Security tab.  Select Advanced, then go to the Owner tab and make sure your 
-account is listed as the owner.  Select the 'Replace owner on subcontainers and 
-objects' checkbox and press Ok.  After Explorer applies the changes you should 
-be able to delete the entire tree in one operation.  Note that you can also 
-achieve this in Cygwin by typing <literal>chown -R user /</literal> or by using other tools 
-such as CACLS.EXE.
+the Security tab.  If you are using Windows XP Home or Simple File Sharing,
+you will need to boot into Safe Mode to access the Security tab.  Select 
+Advanced, then go to the Owner tab and make sure your account is listed as 
+the owner.  Select the 'Replace owner on subcontainers and objects' checkbox 
+and press Ok.  After Explorer applies the changes you should be able to 
+delete the entire tree in one operation.  Note that you can also achieve 
+this in Cygwin by typing <literal>chown -R user /</literal> or by using other 
+tools such as <literal>CACLS.EXE</literal>. 
 </para>
 </listitem>
 <listitem><para>Delete the Cygwin shortcuts on the Desktop and Start Menu, and anything 

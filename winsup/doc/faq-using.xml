@@ -279,7 +279,7 @@ must create the whatis database.  Just run the command
 </answer></qandaentry>
 
 <qandaentry id="faq.using.chmod">
-<question><para>Why doesn't chmod work?</para></question>
+<question><para>Why doesn't <literal>chmod</literal> work?</para></question>
 <answer>
 
 <para>The most common case is that your <literal>/etc/passwd</literal>
@@ -287,6 +287,10 @@ or <literal>/etc/group</literal> files are not properly set up. If
 <literal>ls -l</literal> shows a group of <literal>mkpasswd</literal> 
 or <literal>mkgroup</literal>, you need to run one or both of those
 commands.
+</para>
+<para>If you're using FAT32 instead of NTFS, <literal>chmod</literal> 
+will fail since FAT32 does not provide any security. You might consider 
+converting the drive to NTFS with <literal>CONVERT.EXE</literal>.
 </para>
 <para>For other cases, understand that Cygwin attempts to show UNIX 
 permissions based on the security features of Windows, so the Windows 
@@ -398,7 +402,6 @@ lines to your <literal>~/.inputrc</literal> file and restart <literal>bash</lite
         set output-meta on 
 	set input-meta on
 	set kanji-code sjis
-	set meta-flag on
 </screen>
 
 <para>These are options to the <literal>readline</literal> library, which you can read
