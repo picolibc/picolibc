@@ -38,7 +38,7 @@ enum child_status
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
 /* Change this value if you get a message indicating that it is out-of-sync. */
-#define CURR_CHILD_INFO_MAGIC 0x704d1f7eU
+#define CURR_CHILD_INFO_MAGIC 0x3a24db6aU
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -122,7 +122,8 @@ public:
 	      cfree (*e);
 	    cfree (moreinfo->envp);
 	  }
-	CloseHandle (moreinfo->myself_pinfo);
+	if (type != _PROC_SPAWN)
+	  CloseHandle (moreinfo->myself_pinfo);
 	cfree (moreinfo);
       }
   }
