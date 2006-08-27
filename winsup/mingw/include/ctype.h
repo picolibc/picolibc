@@ -231,7 +231,7 @@ __CRT_INLINE int __cdecl iswupper(wint_t wc) {return (iswctype(wc,_UPPER));}
 __CRT_INLINE int __cdecl iswxdigit(wint_t wc) {return (iswctype(wc,_HEX));}
 __CRT_INLINE int __cdecl isleadbyte(int c) {return (_pctype[(unsigned char)(c)] & _LEADBYTE);}
 #if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) \
-     || !defined __STRICT_ANSI__ || __defined __cplusplus
+     || !defined __STRICT_ANSI__ || defined __cplusplus
 __CRT_INLINE int __cdecl iswblank (wint_t wc)
   {return (iswctype(wc,_BLANK) || wc == L'\t');}
 #endif
