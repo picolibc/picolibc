@@ -1,3 +1,9 @@
+2006-08-27  Joel Sherrill <joel.sherrill@OARcorp.com>
+
+	* libc/sys/rtems/machine/sys/param.h: Conditionalize definition of
+	BLKDEV_IOSIZE and MAXPHYS so it will fit into small memory targets.
+	This is needed to build all AVR and H8300 RTEMS multilib variants.
+
 2006-08-23  Kazunori Asayama  <asayama@sm.sony.co.jp>
 
 	* libc/machine/configure.in: Add configuration for SPU.
