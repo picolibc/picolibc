@@ -1,6 +1,12 @@
 2006-08-29  Paul Brook  <paul@codesourcery.com>
 
 	newlib/
+	* libc/sys/arm/_fault_isr.c (_fault_isr): Compile unconditionally.
+	* libc/sys/arm/_nmi_isr.c (_nmi_isr): Ditto.
+
+2006-08-29  Paul Brook  <paul@codesourcery.com>
+
+	newlib/
 	* acconfig.h (_ATEXIT_DYNAMIC_ALLOC): Remove.
 	* configure.in: Remove --disable-newlib-atexit-dynamic-alloc.
 	* libc/stdlib/__atexit.c (__register_exitproc): Use weak reference to
