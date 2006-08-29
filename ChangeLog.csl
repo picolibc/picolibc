@@ -1,5 +1,9 @@
 2006-08-29  Nathan Sidwell  <nathan@codesourcery.com>
 
+	* ldlang.c (walk_wild): Allow * to glob '/' in wildcarded match.
+
+2006-08-29  Nathan Sidwell  <nathan@codesourcery.com>
+
 	ld/
 	Backport 2006-08-28  Alan Modra  <amodra@bigpond.net.au>
 	* scripttempl/elf.sc: Ensure that crtbegin and crtend entries will
