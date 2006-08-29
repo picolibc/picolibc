@@ -1,6 +1,25 @@
 2006-08-29  Nathan Sidwell  <nathan@codesourcery.com>
 
 	ld/
+	Backport 2006-08-28  Alan Modra  <amodra@bigpond.net.au>
+	* scripttempl/elf.sc: Ensure that crtbegin and crtend entries will
+	not match random object files in a path containing "crtbegin" or
+	"crtend" as part of a directory name.
+	* scripttempl/armbpabi.sc: Likewise.
+	* scripttempl/crisaout.sc: Likewise.
+	* scripttempl/elf32crx.sc: Likewise.
+	* scripttempl/elf32sh-symbian.sc: Likewise.
+	* scripttempl/elf_chaos.sc: Likewise.
+	* scripttempl/elfd10v.sc: Likewise.
+	* scripttempl/elfd30v.sc: Likewise.
+	* scripttempl/elfxtensa.sc: Likewise.
+	* scripttempl/iq2000.sc: Likewise.
+	* scripttempl/mmo.sc: Likewise.
+	* scripttempl/xstormy16.sc: Likewise.
+
+2006-08-29  Nathan Sidwell  <nathan@codesourcery.com>
+
+	ld/
 	* ldexp.c (fold_name): Loadaddrs of sections with an lma_region
 	are absolute.
 
