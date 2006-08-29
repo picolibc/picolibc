@@ -24,6 +24,7 @@
 2006-08-29  Nathan Sidwell  <nathan@codesourcery.com>
 
 	ld/
+	This is fixed differently (and more intrusively) upstream.
 	* ldexp.c (fold_name): Loadaddrs of sections with an lma_region
 	are absolute.
 
