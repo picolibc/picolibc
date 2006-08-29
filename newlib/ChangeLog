@@ -1,3 +1,7 @@
+2006-08-29  Paul Brook  <paul@codesourcery.com>
+
+	* libc/include/sys/config.h: Define _REENT_SMALL for Thumb-2.
+
 2006-08-27  Joel Sherrill <joel.sherrill@OARcorp.com>
 
 	* libc/sys/rtems/machine/sys/param.h: Conditionalize definition of
