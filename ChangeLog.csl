@@ -1,3 +1,14 @@
+2006-08-29  Nathan Sidwell  <nathan@codesourcery.com>
+
+	ld/
+	* ldexp.c (fold_name): Loadaddrs of sections with an lma_region
+	are absolute.
+
+	ld/testsuite/
+	* ld-elf/loadaddr3.t: New.
+	* ld-elf/loadaddr3a.d: New.
+	* ld-elf/loadaddr3b.d: New.
+
 2006-08-24  Mark Shinwell  <shinwell@codesourcery.com>
 
 	bfd/
