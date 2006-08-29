@@ -34,10 +34,6 @@
  * sections.  */
 #undef  HAVE_INITFINI_ARRAY
 
-/* True if atexit() may dynamically allocate space for cleanup
-   functions.  */
-#undef  _ATEXIT_DYNAMIC_ALLOC
-
 /* Define if the compiler supports aliasing an array to an address.  */
 #undef  _HAVE_ARRAY_ALIASING
 /*

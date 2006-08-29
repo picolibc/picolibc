@@ -12,6 +12,9 @@
  * otherwise only the handlers from that DSO are called.
  */
 
+/* Make this a weak reference to avoid pulling in malloc.  */
+void free(void *) __attribute__((weak));
+
 void 
 _DEFUN (__call_exitprocs, (code, d),
 	int code _AND _PTR d)
@@ -61,9 +64,9 @@ _DEFUN (__call_exitprocs, (code, d),
 	    (*((void (*)(_PTR)) fn))(args->_fnargs[n]);
 	}
 
-#ifndef _ATEXIT_DYNAMIC_ALLOC
-      break;
-#else
+      if (!free)
+	break;
+
       /* Move to the next block.  Free empty blocks except the last one,
 	 which is part of _GLOBAL_REENT.  */
       if (p->_ind == 0 && p->_next)
@@ -82,6 +85,5 @@ _DEFUN (__call_exitprocs, (code, d),
 	  lastp = &p->_next;
 	  p = p->_next;
 	}
-#endif
     }
 }

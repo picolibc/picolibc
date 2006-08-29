@@ -1,6 +1,18 @@
 2006-08-29  Paul Brook  <paul@codesourcery.com>
 
 	newlib/
+	* acconfig.h (_ATEXIT_DYNAMIC_ALLOC): Remove.
+	* configure.in: Remove --disable-newlib-atexit-dynamic-alloc.
+	* libc/stdlib/__atexit.c (__register_exitproc): Use weak reference to
+	malloc.  Only allocate dynamically if it is present.
+	* libc/stdlib/__call_atexit.c (__call_exitprocs): Use weak reference
+	to free.
+	* configure: Regenerate.
+	* newlib.hin: Regenerate.
+
+2006-08-29  Paul Brook  <paul@codesourcery.com>
+
+	newlib/
 	* libc/include/sys/config.h: Define _REENT_SMALL for Thumb-2.
 
 2006-08-25  Nathan Sidwell  <nathan@codesourcery.com>

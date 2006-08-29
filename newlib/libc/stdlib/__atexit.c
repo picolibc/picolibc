@@ -8,6 +8,8 @@
 #include <sys/lock.h>
 #include "atexit.h"
 
+/* Make this a weak reference to avoid pulling in malloc.  */
+void * malloc(size_t) __attribute__((weak));
 
 /*
  * Register a function to be performed at exit or on shared library unload.
@@ -35,9 +37,8 @@ _DEFUN (__register_exitproc,
     _GLOBAL_REENT->_atexit = p = &_GLOBAL_REENT->_atexit0;
   if (p->_ind >= _ATEXIT_SIZE)
     {
-#ifndef _ATEXIT_DYNAMIC_ALLOC
-      return -1;
-#else
+      if (!malloc)
+	return -1;
       p = (struct _atexit *) malloc (sizeof *p);
       if (p == NULL)
 	{
@@ -52,7 +53,6 @@ _DEFUN (__register_exitproc,
 #ifndef _REENT_SMALL
       p->_on_exit_args._fntypes = 0;
       p->_on_exit_args._is_cxa = 0;
-#endif
 #endif
     }
 
