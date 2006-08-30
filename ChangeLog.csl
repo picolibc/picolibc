@@ -1,3 +1,11 @@
+2006-08-30  Mark Shinwell  <shinwell@codesourcery.com>
+
+	bfd/
+	* elf32-arm.c (elf32_arm_final_link_relocate): Add support for
+	R_ARM_MOVW_BREL_NC, R_ARM_MOVW_BREL, R_ARM_MOVT_BREL,
+	R_ARM_THM_MOVW_BREL_NC, R_ARM_THM_MOVW_BREL and
+	R_ARM_THM_MOVT_BREL relocations.
+
 2006-08-29  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* ldlang.c (walk_wild): Allow * to glob '/' in wildcarded match.
