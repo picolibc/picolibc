@@ -41,7 +41,7 @@ unlink (const char *pathname)
 
 	sys.pathname = ( unsigned int )pathname;
 
-        _send_to_ppe_0x2101 (JSRE_UNLINK, &sys);
+        _send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_UNLINK, &sys);
 
         errno = psys_out->err;
         return ( psys_out->rc);

@@ -52,6 +52,8 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #define JSRE_O_SYNC 4096
 #define JSRE_O_ASYNC 8192
 
+#define JSRE_POSIX1_SIGNALCODE 0x2101
+
 #define JSRE_CLOSE 2
 #define JSRE_FSTAT 4
 #define JSRE_LSEEK 9
@@ -152,6 +154,6 @@ typedef struct {
     unsigned int ctime;
 } jsre_stat_t;
 
-void _send_to_ppe_0x2101 (int opcode, void *data);
+void _send_to_ppe (unsigned int signalcode, unsigned int opcode, void *data);
 
 #endif

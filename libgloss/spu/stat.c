@@ -45,7 +45,7 @@ stat (const char *pathname, struct stat *pstat)
 	sys.pathname = pathname;
 	sys.ptr = ( unsigned int )&pjstat;
 
-	_send_to_ppe_0x2101 (JSRE_STAT, &sys);
+	_send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_STAT, &sys);
 
 	pstat->st_dev = pjstat.dev;
 	pstat->st_ino = pjstat.ino;

@@ -41,7 +41,7 @@ close (int file)
 
 	sys.file = file;
 
-        _send_to_ppe_0x2101 (JSRE_CLOSE, &sys);
+        _send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_CLOSE, &sys);
 
         errno = psys_out->err;
         return ( psys_out->rc);

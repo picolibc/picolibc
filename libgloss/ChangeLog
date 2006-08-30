@@ -1,5 +1,19 @@
 2006-08-30  Kazunori Asayama  <asayama@sm.sony.co.jp>
 
+	* spu/syscalls.c: Add a new argument to _send_to_ppe() to 
+	specify signal code.
+	* spu/jsre.h: Update declaration of _send_to_ppe().
+	* spu/close.c: Replace _send_to_ppe_0x2101() by _send_to_ppe().
+	* spu/fstat.c: Ditto.
+	* spu/lseek.c: Ditto.
+	* spu/open.c: Ditto.
+	* spu/read.c: Ditto.
+	* spu/stat.c: Ditto.
+	* spu/unlink.c: Ditto.
+	* spu/write.c: Ditto.
+
+2006-08-30  Kazunori Asayama  <asayama@sm.sony.co.jp>
+
 	* spu/Makefile.in: Add dependency.
 
 2006-08-24  Paul Brook  <paul@codesourcery.com>

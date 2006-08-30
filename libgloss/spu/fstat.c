@@ -44,7 +44,7 @@ fstat (int file, struct stat *pstat)
         sys.file = file;
         sys.ptr = ( unsigned int )&pjstat;
 
-        _send_to_ppe_0x2101 (JSRE_FSTAT, &sys);
+        _send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_FSTAT, &sys);
 
         pstat->st_dev = pjstat.dev;
         pstat->st_ino = pjstat.ino;

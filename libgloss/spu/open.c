@@ -81,7 +81,7 @@ open (const char *filename, int flags, ...)
                   sys.mode = 0;
           }
 
-        _send_to_ppe_0x2101 ( JSRE_OPEN, &sys);
+        _send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_OPEN, &sys);
 
         errno = psys_out->err;
         return ( psys_out->rc);

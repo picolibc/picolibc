@@ -55,7 +55,7 @@ lseek (int file, off_t offset, int whence)
 			break;
 	}
 
-	_send_to_ppe_0x2101 (JSRE_LSEEK, &sys);
+	_send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_LSEEK, &sys);
 
         errno = psys_out->err;
         return ( psys_out->rc);
