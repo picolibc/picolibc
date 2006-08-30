@@ -1,3 +1,9 @@
+2006-08-30  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	gdb/
+	* remote.c (remote_start_remote, extended_remote_attach_1)
+	(extended_remote_mourn_1, extended_remote_run): Use only rs->buf.
+
 2006-08-23  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	gdb/testsuite/
