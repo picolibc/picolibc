@@ -19,12 +19,15 @@ dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 AC_PREREQ(2.59)
 AC_INIT(dllmain.c)
 
+AC_CANONICAL_SYSTEM
+GCC_NO_EXECUTABLES
 LIB_AC_PROG_CC
 
 case "$with_cross_host" in
   ""|*cygwin*) all_dlls_host='all_dlls_host'
 	       install_dlls_host='install_dlls_host';;
 esac
+AC_SUBST(with_cross_host)
 AC_SUBST(all_dlls_host)
 AC_SUBST(install_dlls_host)
 
@@ -44,9 +47,12 @@ AC_SUBST(DLLWRAP)
 AC_CHECK_TOOL(WINDRES, windres, windres)
 AC_SUBST(WINDRES)
 
-AC_ALLOCA
+case "$with_cross_host" in
+  ""|*mingw*|*cygwin*)
+    AC_ALLOCA
+    ;;
+esac
 
-AC_CANONICAL_SYSTEM
 AC_CONFIG_SUBDIRS(profile mingwex)
 HEADER_SUBDIR=""
 

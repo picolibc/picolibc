@@ -28,6 +28,7 @@ objdir = .
 host_alias = @host_alias@
 build_alias = @build_alias@
 target_alias = @target_alias@
+with_cross_host = @with_cross_host@
 prefix = @prefix@
 conf_prefix = @prefix@
 
@@ -53,10 +54,17 @@ inst_includedir:=$(tooldir)/include/mingw
 inst_libdir:=$(tooldir)/lib/mingw
 inst_docdir:=$(tooldir)/share/doc/mingw-runtime
 else
+ifneq (,$with_cross_host)
+inst_bindir:=$(tooldir)/bin
+inst_includedir:=$(tooldir)/include
+inst_libdir:=$(tooldir)/lib
+inst_docdir:=$(tooldir)/share/doc/mingw-runtime
+else
 inst_bindir:=$(bindir)
 inst_includedir:=$(includedir)
 inst_libdir:=$(libdir)
 inst_docdir:=$(prefix)/doc/mingw-runtime
+endif
 endif
 
 # The Mingw headers are installed under a subdirectory of
@@ -71,7 +79,9 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 mkinstalldirs = $(SHELL) @MKINSTALLDIRS@
 
 CC := @CC@
+ifneq (,$(findstring cygwin,$(target_alias)))
 override CC := ${filter-out -L% -B%,${shell echo $(CC) | sed -e 's%\(-isystem\|-iwithprefixbefore\)  *[^ ]*\( \|$$\)% %g'}}
+endif
 # FIXME: Which is it, CC or CC_FOR_TARGET?
 CC_FOR_TARGET = $(CC)
 AS_FOR_TARGET = $(AS)

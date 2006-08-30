@@ -1,6 +1,17 @@
+2006-08-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in: Add with_cross_host to allow more granular checks.
+	Set installation directories accordingly.  Override CC setting only
+	if building a Cygwin target.
+	* aclocal.m4: Regenerate.
+	* configure.in: Move AC_CANONICAL_SYSTEM check up.  Add
+	GCC_NO_EXECUTABLES.  Substitute with_cross_host in depending files.
+	Test AC_ALLOCA only if building on a native system.
+	* configure: Regenerate.
+
 2006-08-27  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
-    * include/ctype.h: Fix typo.
+	* include/ctype.h: Fix typo.
 
 2006-08-25  Danny Smith  <dannysmith@users.sourceforge.net>
 
