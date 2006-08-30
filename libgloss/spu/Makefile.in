@@ -134,3 +134,5 @@ Makefile: Makefile.in config.status @host_makefile_frag_path@
 
 config.status: configure
 	$(SHELL) config.status --recheck
+
+syscalls.o close.o fstat.o lseek.o open.o read.o stat.o unlink.o write.o: jsre.h
