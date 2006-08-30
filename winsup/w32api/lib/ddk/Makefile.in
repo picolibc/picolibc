@@ -17,6 +17,7 @@ VPATH = @srcdir@
 host_alias = @host@
 build_alias = @build@
 target_alias = @target@
+with_cross_host = @with_cross_host@
 prefix = @prefix@
 includedir:=@includedir@
 
@@ -39,8 +40,13 @@ ifneq (,$(findstring cygwin,$(target_alias)))
 inst_includedir:=$(tooldir)/include/w32api/ddk
 inst_libdir:=$(tooldir)/lib/w32api
 else
+ifneq (,$with_cross_host)
+inst_includedir:=$(tooldir)/include/w32api/ddk
+inst_libdir:=$(tooldir)/lib
+else
 inst_includedir:=$(includedir)/ddk
 inst_libdir:=$(libdir)
+endif
 endif
 
 INSTALL = @INSTALL@

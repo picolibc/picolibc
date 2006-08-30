@@ -20,6 +20,7 @@ CFLAGS=${CFLAGS-"-O2 -g"}
 AC_CHECK_TOOL(CC, gcc, gcc)
 AC_SUBST(CC)
 AC_SUBST(CFLAGS)
+AC_SUBST(with_cross_host)
 
 dnl check for various tools
 AC_CHECK_TOOL(AR, ar, ar)

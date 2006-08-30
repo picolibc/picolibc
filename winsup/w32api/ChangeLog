@@ -1,3 +1,12 @@
+2006-08-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure.in: Substitute with_cross_host in depending files.
+	* configure: Regenerate.
+	* lib/Makefile.in: Add with_cross_host to allow more granular checks.
+	Set installation directories accordingly.
+	* lib/ddk/Makefile.in: Ditto.
+	* lib/directx/Makefile.in: Ditto.
+
 2006-08-10  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/wtsapi32.def (WTSGetActiveConsoleSessionId). Move from here...
