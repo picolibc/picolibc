@@ -272,12 +272,13 @@ PACKAGE_STRING=
 PACKAGE_BUGREPORT=
 
 ac_unique_file="Makefile.in"
-ac_subdirs_all="$ac_subdirs_all cygwin w32api"
+ac_subdirs_all="$ac_subdirs_all cygwin"
 ac_subdirs_all="$ac_subdirs_all mingw"
+ac_subdirs_all="$ac_subdirs_all w32api"
 ac_subdirs_all="$ac_subdirs_all subauth"
 ac_subdirs_all="$ac_subdirs_all cygserver"
 ac_subdirs_all="$ac_subdirs_all utils doc"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CC ac_ct_CC CFLAGS LDFLAGS CPPFLAGS EXEEXT OBJEXT CXX ac_ct_CXX CXXFLAGS subdirs SET_MAKE LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CC ac_ct_CC CFLAGS LDFLAGS CPPFLAGS EXEEXT OBJEXT CXX ac_ct_CXX CXXFLAGS subdirs INSTALL_LICENSE SET_MAKE LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1457,6 +1458,8 @@ test -n "$target_alias" &&
     NONENONEs,x,x, &&
   program_prefix=${target_alias}-
 
+
+
 if test -n "$ac_tool_prefix"; then
   # Extract the first word of "${ac_tool_prefix}gcc", so it can be a program name with args.
 set dummy ${ac_tool_prefix}gcc; ac_word=$2
@@ -1888,6 +1891,39 @@ main ()
   return 0;
 }
 _ACEOF
+# FIXME: Cleanup?
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; then
+  gcc_no_link=no
+else
+  gcc_no_link=yes
+fi
+
+if test x$gcc_no_link = xyes; then
+  # Setting cross_compile will disable run tests; it will
+  # also disable AC_CHECK_FILE but that's generally
+  # correct if we can't link.
+  cross_compiling=yes
+  EXEEXT=
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
 ac_clean_files_save=$ac_clean_files
 ac_clean_files="$ac_clean_files a.out a.exe b.out"
 # Try to create an executable without -o first, disregard a.out.
@@ -2024,6 +2060,7 @@ echo "${ECHO_T}$ac_cv_exeext" >&6
 rm -f conftest.$ac_ext
 EXEEXT=$ac_cv_exeext
 ac_exeext=$EXEEXT
+fi
 echo "$as_me:$LINENO: checking for suffix of object files" >&5
 echo $ECHO_N "checking for suffix of object files... $ECHO_C" >&6
 if test "${ac_cv_objext+set}" = set; then
@@ -3015,9 +3052,29 @@ esac
 
 fi;
 
+INSTALL_LICENSE=
+
+case "$target" in
+  *cygwin*)
+    if ! test -d $srcdir/cygwin; then
+      { { echo "$as_me:$LINENO: error: \"No cygwin dir.  Can't build Cygwin.  Exiting...\"" >&5
+echo "$as_me: error: \"No cygwin dir.  Can't build Cygwin.  Exiting...\"" >&2;}
+   { (exit 1); exit 1; }; }
+    fi
 
 
-subdirs="$subdirs cygwin w32api"
+subdirs="$subdirs cygwin"
+
+    INSTALL_LICENSE="install-license"
+    ;;
+  *mingw*)
+    if ! test -d $srcdir/mingw; then
+      { { echo "$as_me:$LINENO: error: \"No mingw dir.  Can't build Mingw.  Exiting...\"" >&5
+echo "$as_me: error: \"No mingw dir.  Can't build Mingw.  Exiting...\"" >&2;}
+   { (exit 1); exit 1; }; }
+    fi
+    ;;
+esac
 
 if test -d $srcdir/mingw; then
 
@@ -3025,6 +3082,10 @@ if test -d $srcdir/mingw; then
 subdirs="$subdirs mingw"
 
 fi
+
+
+subdirs="$subdirs w32api"
+
 
 case "$with_cross_host" in
   ""|*cygwin*)
@@ -3052,6 +3113,8 @@ subdirs="$subdirs utils doc"
 
     ;;
 esac
+
+
 
 echo "$as_me:$LINENO: checking whether ${MAKE-make} sets \$(MAKE)" >&5
 echo $ECHO_N "checking whether ${MAKE-make} sets \$(MAKE)... $ECHO_C" >&6
@@ -3197,9 +3260,10 @@ for ac_i in : $LIBOBJS; do test "x$ac_i" = x: && continue
   # 1. Remove the extension, and $U if already installed.
   ac_i=`echo "$ac_i" |
 	 sed 's/\$U\././;s/\.o$//;s/\.obj$//'`
-  # 2. Add them.
-  ac_libobjs="$ac_libobjs $ac_i\$U.$ac_objext"
-  ac_ltlibobjs="$ac_ltlibobjs $ac_i"'$U.lo'
+  # 2. Prepend LIBOBJDIR.  When used with automake>=1.10 LIBOBJDIR
+  #    will be set to the directory where LIBOBJS objects are built.
+  ac_libobjs="$ac_libobjs \${LIBOBJDIR}$ac_i\$U.$ac_objext"
+  ac_ltlibobjs="$ac_ltlibobjs \${LIBOBJDIR}$ac_i"'$U.lo'
 done
 LIBOBJS=$ac_libobjs
 
@@ -3745,6 +3809,7 @@ s,@CXX@,$CXX,;t t
 s,@ac_ct_CXX@,$ac_ct_CXX,;t t
 s,@CXXFLAGS@,$CXXFLAGS,;t t
 s,@subdirs@,$subdirs,;t t
+s,@INSTALL_LICENSE@,$INSTALL_LICENSE,;t t
 s,@SET_MAKE@,$SET_MAKE,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t

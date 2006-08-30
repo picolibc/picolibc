@@ -46,6 +46,8 @@ INSTALL_SUBDIRS=${patsubst %,install_%,$(SUBDIRS)}
 CLEAN_SUBDIRS=${patsubst %,clean_%,$(SUBDIRS)}
 ZLIB=${findstring zlib,$(SUBDIRS)}
 
+INSTALL_LICENSE:=@INSTALL_LICENSE@
+
 .PHONY: all install clean all-info info install-info check \
 	$(SUBDIRS) $(INSTALL_SUBDIRS) $(CLEAN_SUBDIRS)
 
@@ -61,8 +63,10 @@ endif
 
 all: Makefile $(SUBDIRS)
 
-install: Makefile CYGWIN_LICENSE $(INSTALL_SUBDIRS)
+install-license: CYGWIN_LICENSE 
 	$(INSTALL_DATA) $(srcdir)/CYGWIN_LICENSE $(prefix)/share/doc/Cygwin/CYGWIN_LICENSE
+
+install: Makefile $(INSTALL_LICENSE) $(INSTALL_SUBDIRS)
 
 clean: $(CLEAN_SUBDIRS)
 

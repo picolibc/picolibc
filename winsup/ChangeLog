@@ -1,3 +1,12 @@
+2006-08-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in: Make installation of CYGWIN_LICENSE configurable.
+	* aclocal.m4: Regenerate.
+	* configure.in: Add GCC_NO_EXECUTABLES call. Add configuration for
+	INSTALL_LICENSE.  Make cygwin subdirectory optional.  Add sanity
+	check for cygwin resp. mingw subdirectories dependent of the target.
+	* configure: Regenerate.
+
 2006-08-02  Christopher Faylor  <cgf@timesys.com>
 
 	* Makefile.in (subauth): Add dependency on mingw.
