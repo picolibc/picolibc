@@ -5181,7 +5181,7 @@ Thu Apr  3 14:01:16 2003  J"orn Rennecke <joern.rennecke@superh.com>
         * libc/include/limits.h: New file.
         * libc/sys/linux/include/limits.h: Ditto.
         * doc/aclocal.m4 doc/configure libc/aclocal.m4
-          libc/configure libc/include/%redact libc/machine/aclocal.m4
+          libc/configure libc/machine/aclocal.m4
           libc/machine/configure libc/machine/a29k/aclocal.m4
           libc/machine/a29k/configure libc/machine/arm/aclocal.m4
           libc/machine/arm/configure libc/machine/d10v/aclocal.m4
@@ -5223,7 +5223,7 @@ Thu Apr  3 14:01:16 2003  J"orn Rennecke <joern.rennecke@superh.com>
           libc/sys/h8300hms/configure libc/sys/h8500hms/aclocal.m4
           libc/sys/h8500hms/configure libc/sys/idt/aclocal.m4
           libc/sys/idt/configure libc/sys/linux/aclocal.m4
-          libc/sys/linux/configure libc/sys/linux/include/%redact
+          libc/sys/linux/configure
           libc/sys/linux/machine/aclocal.m4
           libc/sys/linux/machine/configure
           libc/sys/linux/machine/i386/aclocal.m4
