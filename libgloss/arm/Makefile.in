@@ -70,9 +70,6 @@ RDIMON_OBJS	= rdimon-syscalls.o rdimon-libcfunc.o rdimon-trap.o
 RDIMON_SCRIPTS	= rdimon.specs
 RDIMON_INSTALL	= install-rdimon
 
-LMS_SCRIPTS     = cm3.ld lm3s10x.ld lm3s301.ld lm3s31x.ld
-LMS_INSTALL     = install-lms
-
 CFLAGS		= -g
 
 # Here is all of the eval board stuff
@@ -82,6 +79,11 @@ PID_INSTALL	= install-pid
 IQ80310_SCRIPTS	= iq80310.specs
 IQ80310_INSTALL	= install-iq80310
 
+ARMV7M_OBJS	= armv7m-crt0.o \
+		  armv7m-rom.ld lm3s10x-rom.ld lm3s301-rom.ld lm3s31x-rom.ld \
+		  armv7m-ram.ld lm3s10x-ram.ld lm3s301-ram.ld lm3s31x-ram.ld
+ARMV7M_SPECS	= armv7m.specs
+ARMV7M_INSTALL	= install-armv7m
 
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
@@ -90,7 +92,7 @@ IQ80310_INSTALL	= install-iq80310
 # build a test program for each target board. Just trying to get
 # it to link is a good test, so we ignore all the errors for now.
 #
-all: ${CRT0} ${REDBOOT_CRT0} ${REDBOOT_OBJS} ${RDPMON_CRT0} ${RDPMON_BSP} ${RDIMON_CRT0} ${RDIMON_BSP}
+all: ${CRT0} ${REDBOOT_CRT0} ${REDBOOT_OBJS} ${RDPMON_CRT0} ${RDPMON_BSP} ${RDIMON_CRT0} ${RDIMON_BSP} ${ARMV7M_OBJS}
 
 #
 # here's where we build the test programs for each target
@@ -100,6 +102,9 @@ test:
 
 #
 crt0.o: crt0.S
+armv7m-crt0.o: crt0.S
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -D_ARM_V7M -o $@ -c $<
+
 redboot-crt0.o: redboot-crt0.S
 redboot-syscalls.o: redboot-syscalls.c $(srcdir)/../syscall.h
 
@@ -126,6 +131,21 @@ $(RDIMON_BSP): $(RDIMON_OBJS)
 	${AR} ${ARFLAGS} $@ $^
 	${RANLIB} $@
 
+# Armv7M board files.
+#        ram rom stack
+armv7m=  32M 32M no
+lm3s10x=  2k  8k yes
+lm3s301=  2k 16k yes
+lm3s31x=  4k 16k yes
+
+%-ram.ld : arm.sc Makefile
+	RAM_SIZE=$(word 1,$($*)) \
+	  ${SHELL} $< $(word 3,$($*)) >$@
+%-rom.ld : arm.sc Makefile
+	RAM_SIZE=$(word 1,$($*)) \
+	  ROM_SIZE=$(word 2,$($*)) \
+	  ${SHELL} $< $(word 3,$($*)) >$@
+
 clean mostlyclean:
 	rm -f a.out core *.i *.o *-test *.srec *.dis *.x $(SIM_BSP) $(IQ80310_BSP)
 
@@ -133,7 +153,7 @@ distclean maintainer-clean realclean: clean
 	rm -f Makefile config.status *~
 
 .PHONY: install info install-info clean-info
-install: ${CRT0_INSTALL} ${REDBOOT_INSTALL} ${RDPMON_INSTALL} ${RDIMON_INSTALL} ${IQ80310_INSTALL}  ${PID_INSTALL} ${LMS_INSTALL}
+install: ${CRT0_INSTALL} ${REDBOOT_INSTALL} ${RDPMON_INSTALL} ${RDIMON_INSTALL} ${IQ80310_INSTALL}  ${PID_INSTALL} ${ARMV7M_INSTALL}
 
 install-crt0:
 	${INSTALL_DATA} ${CRT0} $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x
@@ -157,8 +177,9 @@ install-pid:
 install-iq80310:
 	set -e; for x in ${IQ80310_SCRIPTS}; do ${INSTALL_DATA} ${srcdir}/${objtype}$$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
-install-lms:
-	set -e; for x in ${LMS_SCRIPTS}; do ${INSTALL_DATA} ${srcdir}/${objtype}$$x $(DESTDIR)/${tooldir}/lib${MULTISUBDIR}/$$x; done
+install-armv7m:
+	set -e; for x in ${ARMV7M_OBJS}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
+	set -e; for x in ${ARMV7M_SPECS}; do ${INSTALL_DATA} ${srcdir}/$$x $(DESTDIR)/${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 doc:
 info:

@@ -42,28 +42,16 @@ int     _lseek		_PARAMS ((int, int, int));
 int     _swilseek	_PARAMS ((int, int, int));
 int     _read		_PARAMS ((int, char *, int));
 int     _swiread	_PARAMS ((int, char *, int));
-void    initialise_monitor_handles _PARAMS ((void));
 
+static void    initialise_monitor_handles _PARAMS ((void));
 static int	wrap		_PARAMS ((int));
 static int	error		_PARAMS ((int));
 static int	get_errno	_PARAMS ((void));
 static int	remap_handle	_PARAMS ((int));
-static int	do_AngelSWI	_PARAMS ((int, void *));
 static int 	findslot	_PARAMS ((int));
 
 /* Register name faking - works in collusion with the linker.  */
 register char * stack_ptr asm ("sp");
-
-
-/* following is copied from libc/stdio/local.h to check std streams */
-extern void   _EXFUN(__sinit,(struct _reent *));
-#define CHECK_INIT(ptr) \
-  do						\
-    {						\
-      if ((ptr) && !(ptr)->__sdidinit)		\
-	__sinit (ptr);				\
-    }						\
-  while (0)
 
 /* Adjust our internal handles to stay away from std* handles.  */
 #define FILE_HANDLE_OFFSET (0x20)
@@ -88,6 +76,8 @@ static int
 findslot (int fh)
 {
   int i;
+
+  initialise_monitor_handles ();
   for (i = 0; i < MAX_OPEN_FILES; i ++)
     if (openfiles[i].handle == fh)
       break;
@@ -118,8 +108,6 @@ do_AngelSWI (int reason, void * arg)
 static int
 remap_handle (int fh)
 {
-  CHECK_INIT(_REENT);
-
   if (fh == STDIN_FILENO)
     return monitor_stdin;
   if (fh == STDOUT_FILENO)
@@ -144,6 +132,22 @@ initialise_monitor_handles (void)
    * kernel can differentiate the two using the mode flag and return a
    * different descriptor for standard error.
    */
+
+  static int initialized;
+  int was_initialized;
+
+  /* We need do this only once.  */
+  if (initialized)
+    return;
+
+#ifndef __SINGLE_THREAD__
+  __lock_acquire_recursive (__arm_monitor_handles_lock);
+  if (initialized)
+    {
+      __lock_release_recursive (__arm_monitor_handles_lock);
+      return;
+    }
+#endif
 
 #ifdef ARM_RDI_MONITOR
   int volatile block[3];
@@ -197,6 +201,11 @@ initialise_monitor_handles (void)
   openfiles[1].pos = 0;
   openfiles[2].handle = monitor_stderr;
   openfiles[2].pos = 0;
+
+  initialized = 1;
+#ifndef __SINGLE_THREAD__
+  __lock_release_recursive (__arm_monitor_handles_lock);
+#endif
 }
 
 static int
@@ -562,7 +571,7 @@ _unlink (const char *path)
 {
 #ifdef ARM_RDI_MONITOR
   int block[2];
-  block[0] = path;
+  block[0] = (int)path;
   block[1] = strlen(path);
   return wrap (do_AngelSWI (AngelSWI_Reason_Remove, block)) ? -1 : 0;
 #else
@@ -658,7 +667,7 @@ _system (const char *s)
      meaning to its return value.  Try to do something reasonable....  */
   if (!s)
     return 1;  /* maybe there is a shell available? we can hope. :-P */
-  block[0] = s;
+  block[0] = (int)s;
   block[1] = strlen (s);
   e = wrap (do_AngelSWI (AngelSWI_Reason_System, block));
   if ((e >= 0) && (e < 256))
@@ -683,9 +692,9 @@ _rename (const char * oldpath, const char * newpath)
 {
 #ifdef ARM_RDI_MONITOR
   int block[4];
-  block[0] = oldpath;
+  block[0] = (int)oldpath;
   block[1] = strlen(oldpath);
-  block[2] = newpath;
+  block[2] = (int)newpath;
   block[3] = strlen(newpath);
   return wrap (do_AngelSWI (AngelSWI_Reason_Rename, block)) ? -1 : 0;
 #else

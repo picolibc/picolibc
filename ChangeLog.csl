@@ -1,3 +1,20 @@
+2006-08-30  Paul Brook  <paul@codesourcery.com>
+
+	libgloss/
+	* arm/Makefile.in: Change armv7m linker script generation.  Add
+	armv7m.spec.  Build armv7m-crt0.o.
+	* arm/arm.sc: New file.
+	* arm/armv7m.specs: New file.
+	* arm/crt0.S: Add armv7m code.
+	* arm/elf-lm3s10x.ld: Remove.
+	* arm/elf-lm3s301.ld: Remove.
+	* arm/elf-lm3s31x.ld: Remove.
+	* arm/swi.h (do_AngelSWI): Add definition.
+	* arm/syscalls.c: Merge lazy semihosting initialization from newlib.
+
+	newlib/
+	* libc/sys/arm/crt0.S: Add armv7m rom startup code.
+
 2006-08-29  Paul Brook  <paul@codesourcery.com>
 
 	newlib/

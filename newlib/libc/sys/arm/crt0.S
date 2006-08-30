@@ -45,7 +45,27 @@
 
 	/* Start by setting up a stack */
 #ifdef _ARM_V7M
-	/* On ARM V7M, the stack pointer is set up at CPU reset.  */
+	/* Copy .data into ram.  */
+	ldr	r0, =__data_load
+	ldr	r1, =__data_start
+	cmp	r0, r1 /* If LMA == VMA we are running from ram.  */
+	beq	2f
+	ldr	r2, =_edata
+	/* When running from ROM the stack pointer is set up at CPU reset.  */
+	/* Copy .data into RAM.  */
+1:
+	ldr	r3, [r0], #4
+	str	r3, [r1], #4
+	cmp	r1, r2
+	blt	1b
+	b	3f
+2:
+	/* Set the stack pointer when running from RAM.  */
+	ldr	r0, .Lstack
+	cmp	r0, #0
+	beq	3f
+	mov	sp, r0
+3:
 #else
 # ifdef ARM_RDP_MONITOR
 	/*  Issue Demon SWI to read stack info */
@@ -278,6 +298,10 @@ change_back:
 #  endif
 # endif
 #endif 	
+#ifdef _ARM_V7M
+.Lstack:	
+	.word	__stack
+#endif
 #if defined(__ELF__) && !defined(__USING_SJLJ_EXCEPTIONS__)
 	/* Protect against unhandled exceptions.  */
 	.cantunwind
@@ -317,12 +341,12 @@ CommandLine:	.space	256,0	/*  Maximum length of 255 chars handled.  */
 	   exceptions.  */
 	.section .isr_vector, "a"
 	/* The value for the stack pointer at reset.  */
-	.word	_stack
+	.word	__stack
 	/* The value for the PC at reset.  */
 	.word	_start
 	/* The value for the PC if an NMI occurs.  */
 	.word	_nmi_isr
 	/* The value for the PC if a fault occurs.  */
 	.word	_fault_isr
-#endif _ARM_V7M
+#endif /* _ARM_V7M */
 	 

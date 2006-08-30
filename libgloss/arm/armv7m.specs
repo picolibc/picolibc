@@ -1,0 +1,9 @@
+%rename lib                old_lib
+
+*startfile:
+crti%O%s crtbegin%O%s armv7m-crt0%O%s
+
+# Put the -T here so it comes after -L search patch.
+*lib:
+%(old_lib) %{!T*:-T armv7m-rom.ld%s}
+
