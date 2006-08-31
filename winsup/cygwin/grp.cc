@@ -471,6 +471,7 @@ initgroups32 (const char *name, __gid32_t gid)
   if (wincap.has_security ())
     {
       ret = -1;
+      cygheap->user.deimpersonate ();
       struct passwd *pw = internal_getpwnam (name);
       struct __group32 *gr = internal_getgrgid (gid);
       cygsid usersid, grpsid;
@@ -492,6 +493,8 @@ initgroups32 (const char *name, __gid32_t gid)
   ret = 0;
 
  out:
+  if (wincap.has_security ())
+    cygheap->user.reimpersonate ();
   syscall_printf ( "%d = initgroups (%s, %u)", ret, name, gid);
   return ret;
 }

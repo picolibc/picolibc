@@ -1,3 +1,8 @@
+2006-08-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* grp.cc (initgroups32): Run get_server_groups under original token.
+	* syscalls.cc (seteuid32): Slightly reorganize code creating a token.
+
 2006-08-27  Christopher Faylor  <cgf@timesys.com>
 
 	* child_info.h (child_info_spawn::~child_info_spawn): Don't close

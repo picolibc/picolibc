@@ -2205,27 +2205,25 @@ seteuid32 (__uid32_t uid)
   if (new_token == INVALID_HANDLE_VALUE)
     {
       new_token = subauth (pw_new);
-      if (new_token == INVALID_HANDLE_VALUE)
+      debug_printf ("subauth %s, try create_token.",
+		    new_token == INVALID_HANDLE_VALUE ? "failed" : "succeeded");
+      HANDLE new_token2 = create_token (usersid, groups, pw_new, new_token);
+      if (new_token2 == INVALID_HANDLE_VALUE)
 	{
-	  debug_printf ("subauthentication failed, try create token.");
-	  new_token = create_token (usersid, groups, pw_new, NULL);
 	  if (new_token == INVALID_HANDLE_VALUE)
 	    {
+	      debug_printf ("create_token failed, bail out of here");
 	      cygheap->user.reimpersonate ();
 	      return -1;
 	    }
+	  debug_printf ("create_token failed, use original subauth token");
 	}
       else
         {
-	  debug_printf ("subauthentication succeeded, try create token.");
-	  HANDLE new_token2 = create_token (usersid, groups, pw_new, new_token);
-	  if (new_token2 == INVALID_HANDLE_VALUE)
-	    debug_printf ("create token failed, use original token");
-	  else
-	    {
-	      CloseHandle (new_token);
-	      new_token = new_token2;
-	    }
+	  debug_printf ("create_token succeeded");
+	  if (new_token != INVALID_HANDLE_VALUE)
+	    CloseHandle (new_token);
+	  new_token = new_token2;
 	}
       /* Keep at most one internal token */
       if (cygheap->user.internal_token != NO_IMPERSONATION)
