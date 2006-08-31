@@ -12,7 +12,7 @@ wint_t btowc (int c)
     {
       unsigned char ch = c;
       wchar_t wc = WEOF;
-      MultiByteToWideChar (get_cp_from_locale(), MB_ERR_INVALID_CHARS,
+      MultiByteToWideChar (get_codepage(), MB_ERR_INVALID_CHARS,
 			   (char*)&ch, 1, &wc, 1);
       return wc;
     }

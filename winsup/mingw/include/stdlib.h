@@ -309,10 +309,8 @@ _CRTIMP int __cdecl	_wtoi (const wchar_t *);
 _CRTIMP long __cdecl _wtol (const wchar_t *);
 #endif
 _CRTIMP double __cdecl	strtod	(const char*, char**);
-#if !defined __NO_ISOCEXT  /* extern stub in static libmingwex.a */
-float __cdecl strtof (const char *, char **);
-__CRT_INLINE float __cdecl strtof (const char *__nptr, char **__endptr)
-  { return (strtod (__nptr, __endptr));}
+#if !defined __NO_ISOCEXT  /*  in libmingwex.a */
+float __cdecl strtof (const char * __restrict__, char ** __restrict__);
 long double __cdecl strtold (const char * __restrict__, char ** __restrict__);
 #endif /* __NO_ISOCEXT */
 
@@ -322,10 +320,8 @@ _CRTIMP unsigned long __cdecl	strtoul	(const char*, char**, int);
 #ifndef _WSTDLIB_DEFINED
 /*  also declared in wchar.h */
 _CRTIMP double __cdecl	wcstod	(const wchar_t*, wchar_t**);
-#if !defined __NO_ISOCEXT /* extern stub in static libmingwex.a */
-float __cdecl wcstof( const wchar_t *, wchar_t **);
-__CRT_INLINE float __cdecl wcstof( const wchar_t *__nptr, wchar_t **__endptr)
-{  return (wcstod(__nptr, __endptr)); }
+#if !defined __NO_ISOCEXT /*  in libmingwex.a */
+float __cdecl wcstof( const wchar_t * __restrict__, wchar_t ** __restrict__);
 long double __cdecl wcstold (const wchar_t * __restrict__, wchar_t ** __restrict__);
 #endif /* __NO_ISOCEXT */
 

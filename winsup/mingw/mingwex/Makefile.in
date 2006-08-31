@@ -4,7 +4,7 @@
 # This makefile requires GNU make.
 
 srcdir = @srcdir@
-VPATH = $(srcdir):$(srcdir)/math:$(srcdir)/stdio:$(srcdir)/complex
+VPATH = $(srcdir):$(srcdir)/math:$(srcdir)/stdio:$(srcdir)/complex $(srcdir)/gdtoa
 objdir = .
 
 target_alias = @target_alias@
@@ -30,17 +30,18 @@ DISTFILES = Makefile.in configure configure.in \
 	fegetexceptflag.c fegetround.c feholdexcept.c feraiseexcept.c \
 	fesetenv.c fesetexceptflag.c fesetround.c fetestexcept.c \
 	feupdateenv.c ftruncate.c fwide.c  getopt.c imaxabs.c imaxdiv.c \
-	ldtoa.c lltoa.c lltow.c mbsinit.c mingw-aligned-malloc.c \
-	mingw-fseek.c sitest.c strtof.c strtoimax.c strtold.c strtoumax.c \
+	lltoa.c lltow.c mbsinit.c mingw-aligned-malloc.c \
+	mingw-fseek.c sitest.c strtoimax.c strtoumax.c \
 	testwmem.c tst-aligned-malloc.c ulltoa.c ulltow.c wcstof.c \
 	wcstoimax.c wcstold.c wcstoumax.c wctrans.c wctype.c \
 	wdirent.c wmemchr.c wmemcmp.c wmemcpy.c wmemmove.c wmemset.c wtoll.c \
 	wcrtomb.c wctob.c mbrtowc.c btowc.c mb_wc_common.h \
 	gettimeofday.c isblank.c iswblank.c
+
 MATH_DISTFILES = \
 	acosf.c acosl.c asinf.c asinl.c atan2f.c atan2l.c \
 	atanf.c atanl.c cbrt.c cbrtf.c cbrtl.c ceilf.S ceill.S \
-	cephes_emath.h cephes_emath.c cephes_mconf.h \
+	cephes_mconf.h \
 	copysign.S copysignf.S copysignl.S cosf.S coshf.c coshl.c cosl.S \
 	erfl.c exp2.S exp2f.S exp2l.S expf.c expl.c expm1.c expm1l.c expm1f.c \
 	fabs.c fabsf.c fabsl.c \
@@ -83,13 +84,21 @@ COMPLEX_DISTFILES = \
 	csinl.c csinh.c csinhf.c csinhl.c csqrt.c csqrtf.c csqrtl.c \
 	ctan.c ctanf.c ctanl.c ctanh.c ctanhf.c ctanhl.c
 
+GDTOA_DISTFILES = \
+	arithchk.c dmisc.c dtoa.c  g__fmt.c g_dfmt.c g_ffmt.c g_xfmt.c \
+	gd_arith.h  gd_qnan.h gdtoa.c gdtoa.h gdtoaimp.h gethex.c gmisc.c \
+	hd_init.c hexnan.c  misc.c qnan.c README smisc.c strtodg.c strtodnrp.c \
+	strtof.c strtopx.c sum.c ulp.c
+
 CC = @CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
 CC_FOR_TARGET = $(CC)
 AS_FOR_TARGET = $(AS)
-CFLAGS = @CFLAGS@ -Wall
+CFLAGS = @CFLAGS@
 CXXFLAGS = @CXXFLAGS@
-OPTFLAGS= -fomit-frame-pointer
+OPTFLAGS = -fomit-frame-pointer
+WARNFLAGS = -Wall
+
 
 # compiling with Cygwin?
 MNO_CYGWIN = @MNO_CYGWIN@
@@ -98,8 +107,8 @@ W32API_INCLUDE = @W32API_INCLUDE@
 INCLUDES = -I$(srcdir) -I$(srcdir)/.. -I$(srcdir)/../include \
   -nostdinc \
   -iwithprefixbefore include
-ALL_CFLAGS = $(CFLAGS) $(OPTFLAGS) $(W32API_INCLUDE) $(INCLUDES) $(MNO_CYGWIN)
-ALL_CXXFLAGS = $(CXXFLAGS) $(OPTFLAGS) $(W32API_INCLUDE) $(INCLUDES) -nostdinc++ $(MNO_CYGWIN)
+ALL_CFLAGS = $(CFLAGS) $(WARNFLAGS) $(OPTFLAGS) $(W32API_INCLUDE) $(INCLUDES) $(MNO_CYGWIN)
+ALL_CXXFLAGS = $(CXXFLAGS) $(WARNFLAGS) $(OPTFLAGS) $(W32API_INCLUDE) $(INCLUDES) -nostdinc++ $(MNO_CYGWIN)
 
 AS = @AS@
 AR = @AR@
@@ -117,16 +126,14 @@ Q8_OBJS = \
 	fwide.o imaxabs.o imaxdiv.o mbsinit.o \
 	strtoimax.o strtoumax.o wcstoimax.o wcstoumax.o \
 	wmemchr.o wmemcmp.o wmemcpy.o wmemmove.o wmemset.o \
-	wctrans.o wctype.o wcrtomb.o wctob.o mbrtowc.o btowc.o
+	wctrans.o wctype.o wcrtomb.o wctob.o mbrtowc.o btowc.o \
+	wcstof.o wcstold.o
 CTYPE_OBJS = \
 	isblank.o iswblank.o
-STDLIB_OBJS = \
-	strtold.o wcstold.o
 STDLIB_STUB_OBJS = \
 	lltoa.o ulltoa.o \
 	lltow.o ulltow.o \
 	atoll.o wtoll.o \
-	strtof.o wcstof.o \
 	_Exit.o
 STDIO_OBJS = \
 	fopen64.o fseeko64.o ftello64.o lseek64.o \
@@ -135,7 +142,6 @@ STDIO_OBJS = \
 MATH_OBJS = \
 	acosf.o acosl.o asinf.o asinl.o atan2f.o atan2l.o \
 	atanf.o atanl.o cbrt.o cbrtf.o cbrtl.o ceilf.o ceill.o \
-	cephes_emath.o \
 	copysign.o copysignf.o copysignl.o cosf.o coshf.o coshl.o cosl.o \
 	erfl.o exp2.o exp2f.o exp2l.o expf.o expl.o expm1.o expm1l.o expm1f.o \
 	fabs.o fabsf.o fabsl.o \
@@ -179,10 +185,14 @@ COMPLEX_OBJS = \
 	cprojf.o cprojl.o creal.o crealf.o creall.o csin.o csinf.o \
 	csinl.o csinh.o csinhf.o csinhl.o csqrt.o csqrtf.o csqrtl.o \
 	ctan.o ctanf.o ctanl.o ctanh.o ctanhf.o ctanhl.o
-
-LIB_OBJS = $(Q8_OBJS)  $(CTYPE_OBJS) $(STDLIB_OBJS) $(STDLIB_STUB_OBJS) \
+GDTOA_OBJS = \
+	dmisc.o dtoa.o g__fmt.o g_dfmt.o g_ffmt.o g_xfmt.o gdtoa.o \
+	gethex.o gmisc.o hd_init.o hexnan.o misc.o smisc.o \
+	strtodg.o strtodnrp.o strtof.o strtopx.o sum.o ulp.o
+LIB_OBJS = $(Q8_OBJS)  $(CTYPE_OBJS) $(STDLIB_STUB_OBJS) \
 	$(STDIO_OBJS) $(MATH_OBJS)  $(FENV_OBJS) \
-	$(POSIX_OBJS) $(REPLACE_OBJS) $(COMPLEX_OBJS)
+	$(POSIX_OBJS) $(REPLACE_OBJS) $(COMPLEX_OBJS) \
+	$(GDTOA_OBJS)
 
 LIBS = $(LIBMINGWEX_A)
 DLLS = 
@@ -193,7 +203,6 @@ $(LIBMINGWEX_A): $(LIB_OBJS)
 	rm -f $(LIBMINGWEX_A)
 	$(AR) $(ARFLAGS) $@ $(LIB_OBJS)
 	$(RANLIB) $@
-
 
 Makefile: Makefile.in config.status configure
 	$(SHELL) config.status
@@ -232,13 +241,13 @@ distclean:
 # Dependancies
 #
 wdirent.o: $(srcdir)/dirent.c $(srcdir)/wdirent.c
-strtold.o: $(srcdir)/strtold.c $(srcdir)/math/cephes_emath.h
-wcstold.o: $(srcdir)/wcstold.c $(srcdir)/math/cephes_emath.h
 
 acosh.o acoshf.o acoshl.o \
 asinh.o asinhf.o asinhl.o \
 atanh.o atanhf.o atanhl.o: fastmath.h
-mbrtowc.o wcrtomb.o: mb_wc_common.h  
+mbrtowc.o wcrtomb.o wcstof.o wcstold.o: mb_wc_common.h
+
+$(GDTOA_OBJS): gd_arith.h gdtoa.h gdtoaimp.h gd_qnan.h
 
 dist:
 	mkdir $(distdir)/mingwex
@@ -261,4 +270,8 @@ dist:
 	@for i in $(COMPLEX_DISTFILES); do\
 		cp -p $(srcdir)/complex/$$i $(distdir)/mingwex/complex/$$i ; \
 	done
-
+	mkdir $(distdir)/mingwex/gdtoa
+	chmod 755 $(distdir)/mingwex/gdtoa
+	@for i in $(GDTOA_DISTFILES); do\
+		cp -p $(srcdir)/gdtoa/$$i $(distdir)/mingwex/gdtoa/$$i ; \
+	done

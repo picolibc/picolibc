@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 static inline
-unsigned int get_cp_from_locale (void)
+unsigned int get_codepage (void)
 {
   char* cp_string;
   /*

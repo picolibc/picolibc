@@ -1,6 +1,7 @@
 /*  Wide char wrapper for strtold
  *  Revision history:
  *  6 Nov 2002	Initial version.
+ *  25 Aug 2006  Don't use strtold internal functions.
  *
  *  Contributor:   Danny Smith <dannysmith@users.sourceforege.net>
  */
@@ -13,37 +14,17 @@
 #include <wchar.h>
 #include <stdlib.h>
 #include <string.h>
+#include <mbstring.h>
 
-extern int __asctoe64(const char * __restrict__ ss,
-	       short unsigned int * __restrict__ y);
-
-
-static __inline__ unsigned int get_codepage (void)
-{
-  char* cp;
-
-  /*
-    locale :: "lang[_country[.code_page]]" 
-               | ".code_page"
-  */
-  if ((cp = strchr(setlocale(LC_CTYPE, NULL), '.')))
-    return atoi( cp + 1);
-  else
-    return 0;
-}
+#include "mb_wc_common.h"
 
 long double wcstold (const wchar_t * __restrict__ wcs, wchar_t ** __restrict__ wcse)
 {
   char * cs;
-  int i;
-  int lenldstr;
-  union
-  {
-    unsigned short int us[6];
-    long double ld;
-  } xx;
-
-  unsigned int cp = get_codepage ();   
+  char * cse;
+  unsigned int i;
+  long double ret;
+  const unsigned int cp = get_codepage ();   
   
   /* Allocate enough room for (possibly) mb chars */
   cs = (char *) malloc ((wcslen(wcs)+1) * MB_CUR_MAX);
@@ -68,9 +49,17 @@ long double wcstold (const wchar_t * __restrict__ wcs, wchar_t ** __restrict__ w
 	}
       cs[mb_len] = '\0';
     }
-  lenldstr =  __asctoe64( cs, xx.us);
-  free (cs);
+
+  ret =  strtold (cs, &cse);
+
   if (wcse)
-    *wcse = (wchar_t*) wcs + lenldstr;
-  return xx.ld;
+    {
+      /* Make sure temp mbstring has 0 at cse.  */ 
+      *cse = '\0';
+      i = _mbslen ((unsigned char*) cs); /* Number of chars, not bytes */
+      *wcse = (wchar_t *) wcs + i;
+    }
+  free (cs);
+
+  return ret;
 }

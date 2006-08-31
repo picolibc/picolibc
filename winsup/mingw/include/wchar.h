@@ -157,9 +157,8 @@ int __cdecl vswscanf (const wchar_t * __restrict__,
 _CRTIMP long __cdecl 		wcstol (const wchar_t*, wchar_t**, int);
 _CRTIMP unsigned long __cdecl	wcstoul (const wchar_t*, wchar_t**, int);
 _CRTIMP double __cdecl		wcstod (const wchar_t*, wchar_t**);
-#if !defined __NO_ISOCEXT /* extern stub in static libmingwex.a */
-__CRT_INLINE float __cdecl wcstof( const wchar_t *nptr, wchar_t **endptr)
-{  return (wcstod(nptr, endptr)); }
+#if !defined __NO_ISOCEXT /* in libmingwex.a */
+float __cdecl wcstof (const wchar_t * __restrict__, wchar_t ** __restrict__);
 long double __cdecl wcstold (const wchar_t * __restrict__, wchar_t ** __restrict__);
 #endif /* __NO_ISOCEXT */
 #define  _WSTDLIB_DEFINED
