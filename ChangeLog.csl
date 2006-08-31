@@ -108,94 +108,106 @@
 
 2006-06-09  Sandra Loosemore <sandra@codesourcery.com>
 
-	* newlib/libc/sys/arm/syscalls.c (_unlink, isatty, _system, _rename):
+	newlib/
+	* libc/sys/arm/syscalls.c (_unlink, isatty, _system, _rename):
 	Make them do something useful in the ARM_RDI_MONITOR case.
-	* libgloss/arm/syscalls.c (_unlink, isatty, _system, _rename):
-	Likewise.
+
+	libgloss/
+	* arm/syscalls.c (_unlink, isatty, _system, _rename): Make
+	them do something useful in the ARM_RDI_MONITOR case.
 
 2006-06-08  Nathan Sidwell  <nathan@codesourcery.com>
 
-	* libgloss/m68k/bdm-system.c (_system): Properly encode non
-	failure exit code.
+	libgloss/
+	* m68k/bdm-system.c (_system): Properly encode non failure exit
+	code.
 
 2006-06-05  Nathan Sidwell  <nathan@codesourcery.com>
 
-	* libgloss/m68k/Makefile.in (BDM_SYSOBJS): Remove bdm-inbyte.o.
+	libgloss/
+	* m68k/Makefile.in (BDM_SYSOBJS): Remove bdm-inbyte.o.
 	Add bdm-time.o.
-	* libgloss/m68k/bdm-close.c: Add copyright notice.
-	* libgloss/m68k/bdm-fstat.c: Add copyright notice.
-	* libgloss/m68k/bdm-gettimeofday.c: Add copyright notice.
-	* libgloss/m68k/bdm-inbyte.c: Remove.
-	* libgloss/m68k/bdm-isatty.c: Add copyright notice.
-	* libgloss/m68k/bdm-lseek.c: Add copyright notice. Fix &/|
-	thinko.
-	* libgloss/m68k/bdm-open.c: Add copyright notice.
-	* libgloss/m68k/bdm-read.c: Add copyright notice.
-	* libgloss/m68k/bdm-rename.c: Add copyright notice.
-	* libgloss/m68k/bdm-stat.c: Add copyright notice.
-	* libgloss/m68k/bdm-system.c: Add copyright notice.
-	* libgloss/m68k/bdm-time.c: New.
-	* libgloss/m68k/bdm-unlink.c: Add copyright notice.
-	* libgloss/m68k/bdm-write.c: Add copyright notice.
+	* m68k/bdm-close.c: Add copyright notice.
+	* m68k/bdm-fstat.c: Add copyright notice.
+	* m68k/bdm-gettimeofday.c: Add copyright notice.
+	* m68k/bdm-inbyte.c: Remove.
+	* m68k/bdm-isatty.c: Add copyright notice.
+	* m68k/bdm-lseek.c: Add copyright notice. Fix &/| thinko.
+	* m68k/bdm-open.c: Add copyright notice.
+	* m68k/bdm-read.c: Add copyright notice.
+	* m68k/bdm-rename.c: Add copyright notice.
+	* m68k/bdm-stat.c: Add copyright notice.
+	* m68k/bdm-system.c: Add copyright notice.
+	* m68k/bdm-time.c: New.
+	* m68k/bdm-unlink.c: Add copyright notice.
+	* m68k/bdm-write.c: Add copyright notice.
 
 2006-05-31  Mark Mitchell  <mark@codesourcery.com>
 
-	* libgloss/arm/elf-lm3s301.ld: New script.
-	* libgloss/arm/elf-lm3s31x.ld: Likewise.
+	libgloss/
+	* arm/elf-lm3s301.ld: New script.
+	* arm/elf-lm3s31x.ld: Likewise.
 
-	* libgloss/arm/Makefile.in (LMS_SCRIPTS): New variable.
+	* arm/Makefile.in (LMS_SCRIPTS): New variable.
 	(LMS_INSTALL): Likewise.
 	(install): Depend on LMS_INSTALL.
 	(install-lms): New target.
-	* libgloss/arm/elf-cm3.lmd: New file.
-	* libgloss/arm/elf-lm3s10x.ld: Likewise.
+	* arm/elf-cm3.lmd: New file.
+	* arm/elf-lm3s10x.ld: Likewise.
 
 	Issue #667
-	* newlib/libc/sys/arm/syscalls.c (findslot): Call
+	newlib/
+	* libc/sys/arm/syscalls.c (findslot): Call
 	initialise_monitor_handles.
 	(remap_handle): Do not call initialise_monitor_handles.
 
 2006-05-25  Nathan Sidwell  <nathan@codesourcery.com>
 
-	* libgloss/m68k/Makefile.in (m52235-dbug.ld, m52235-bdm.ld): New
+	libgloss/
+	* m68k/Makefile.in (m52235-dbug.ld, m52235-bdm.ld): New
 	scripts.
 
 2006-05-24  Nathan Sidwell  <nathan@codesourcery.com>
 
-	* libgloss/m68k/Makefile.in (BDM_SYSOBJS): Remove bdm-outbyte.o
-	* libgloss/m68k/bdm-outbyte.c: Delete.
-	* libgloss/m68k/bdm-semihost.h (BDM_OUTBYTE): Mark as obsolete.
+	libgloss/
+	* m68k/Makefile.in (BDM_SYSOBJS): Remove bdm-outbyte.o.
+	* m68k/bdm-outbyte.c: Delete.
+	* m68k/bdm-semihost.h (BDM_OUTBYTE): Mark as obsolete.
 
 2006-05-22  Sandra Loosemore <sandra@codesourcery.com>
 
-	* libgloss/m68k/bdm-semihost.h: Add new constants for additional
+	libgloss/
+	* m68k/bdm-semihost.h: Add new constants for additional
 	semihosting functions.  Add new BDM_TRAP macro to encapsulate
 	inline asm.
-	* libgloss/m68k/bdm-exit.c (_exit): Use new BDM_TRAP macro.
-	* libgloss/m68k/bdm-outbyte.c (outbyte): Ditto.
-	* libgloss/m68k/bdm-isrs.c, libgloss/m68k/bdm-isv.c: Former BDM_TRAP
+	* m68k/bdm-exit.c (_exit): Use new BDM_TRAP macro.
+	* m68k/bdm-outbyte.c (outbyte): Ditto.
+	* m68k/bdm-isrs.c, m68k/bdm-isv.c: Former BDM_TRAP
 	now called BDM_TRAPNUM.
-	* libgloss/m68k/bdm-gdb.h, libgloss/m68k/bdm-gdb.c: New files
+	* m68k/bdm-gdb.h, m68k/bdm-gdb.c: New files
 	containing declarations and conversion functions for GDB's fileio
 	protocol.
-	* libgloss/m68k/bdm-close.c: New file to define corresponding function.
-	* libgloss/m68k/bdm-fstat.c: Ditto.
-	* libgloss/m68k/bdm-gettimeofday.c: Ditto.
-	* libgloss/m68k/bdm-isatty.c: Ditto.
-	* libgloss/m68k/bdm-lseek.c: Ditto.
-	* libgloss/m68k/bdm-open.c: Ditto.
-	* libgloss/m68k/bdm-read.c: Ditto.
-	* libgloss/m68k/bdm-rename.c: Ditto.
-	* libgloss/m68k/bdm-stat.c: Ditto.
-	* libgloss/m68k/bdm-system.c: Ditto.
-	* libgloss/m68k/bdm-unlink.c: Ditto.
-	* libgloss/m68k/bdm-write.c Ditto.
-	* libgloss/m68k/Makefile.in: Add dependencies for new files.
-	* newlib/configure.host: Tell it we have _rename and _system when
+	* m68k/bdm-close.c: New file to define corresponding function.
+	* m68k/bdm-fstat.c: Ditto.
+	* m68k/bdm-gettimeofday.c: Ditto.
+	* m68k/bdm-isatty.c: Ditto.
+	* m68k/bdm-lseek.c: Ditto.
+	* m68k/bdm-open.c: Ditto.
+	* m68k/bdm-read.c: Ditto.
+	* m68k/bdm-rename.c: Ditto.
+	* m68k/bdm-stat.c: Ditto.
+	* m68k/bdm-system.c: Ditto.
+	* m68k/bdm-unlink.c: Ditto.
+	* m68k/bdm-write.c Ditto.
+	* m68k/Makefile.in: Add dependencies for new files.
+
+	newlib/
+	* configure.host: Tell it we have _rename and _system when
 	building m68k-unknown-elf.
 
 2006-05-04  Paul Brook  <paul@codesourcery.com>
 
+	newlib/
 	* libc/sys/arm/Makefile.am (lib_a_SOURCES): Add aeabi_memclr.c,
 	aeabi_memcpy.c, aeabi_memmove.c and aeabi_memset.c.
 	* libc/sys/arm/Makefile.in: Regenerate.
@@ -207,15 +219,16 @@
 
 2006-03-29  Nathan Sidwell  <nathan@codesourcery.com>
 
-	* libgloss/m68k/bdm-isv.c (software_init_hook): Fix trap numbering.
+	libgloss/
+	* m68k/bdm-isv.c (software_init_hook): Fix trap numbering.
 
-	* libgloss/m68k/Makefile.in (CF_SCRIPTS): Add m5329 board.
+	* m68k/Makefile.in (CF_SCRIPTS): Add m5329 board.
 	Reorder.
 	(*-dbug.ld, *-bdm.ld): Add appropriate IO definition.
 	(m5329evb-dbug.ld, m5329evb-bdm.ld): New.
 	* cf.sc (GROUP): Revert previous change.  Add IO library.
 
-	* libgloss/m68k/Makefile.in (BDM_BSP, BDM_OBJS, BDM_ISRS): New.
+	* m68k/Makefile.in (BDM_BSP, BDM_OBJS, BDM_ISRS): New.
 	(CF_SCRIPTS): Rename dbug scripts.  Add bdm scripts. Add m5485
 	scripts.
 	(all): Add new targets.
@@ -229,18 +242,19 @@
 	(m5208evb-bdm.ld, m5213evb-bdm.ld, m5235evb-bdm.ld,
 	m5272c3-bdm.ld, m5282evb-bdm.ld, m5485evb-bdm.ld): New.
 	(install): Add BDM_BSP.
-	* libgloss/m68k/bdm-exit.c: New
-	* libgloss/m68k/bdm-inbyte.c: New
-	* libgloss/m68k/bdm-outbyte.c: New
-	* libgloss/m68k/bdm-semihost.c: New
-	* libgloss/m68k/bdm-semihost.h: New
-	* libgloss/m68k/bdm-isrs.c: New.
-	* libgloss/m68k/bdm-isv.c: New.
+	* m68k/bdm-exit.c: New
+	* m68k/bdm-inbyte.c: New
+	* m68k/bdm-outbyte.c: New
+	* m68k/bdm-semihost.c: New
+	* m68k/bdm-semihost.h: New
+	* m68k/bdm-isrs.c: New.
+	* m68k/bdm-isv.c: New.
 	* dbug-cf.sc: Renamed to ...
 	* cf.sc: ... here.  Add bdm flexibility. Remove GROUP
 
 2006-03-23  Mark Mitchell  <mark@codesourcery.com>
 
+	newlib/
 	* libc/sys/arm/Makefile.am (extra_objs): Add _exit.o _nmi_isr.o
 	_fault_isr.o.
 	* libc/sys/arm/Makefile.in: Regenerated.
