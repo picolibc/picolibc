@@ -141,9 +141,9 @@ BDM_ISRS=	other_interrupt reset access_error address_error \
 
 CF_BOARDS :=  m5208evb m5213evb m52235evb m5235evb m5272c3 m5282evb \
 	m5329evb m5485evb
-CF_BDM_SCRIPTS := $(patsubst %,%-bdm.ld,$(CF_BOARDS))
+CF_RAM_SCRIPTS := $(patsubst %,%-ram.ld,$(CF_BOARDS))
 CF_ROM_SCRIPTS := $(patsubst %,%-rom.ld,$(CF_BOARDS))
-CF_SCRIPTS=  $(CF_BDM_SCRIPTS) $(CF_ROM_SCRIPTS)
+CF_SCRIPTS=  $(CF_RAM_SCRIPTS) $(CF_ROM_SCRIPTS)
 
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
@@ -212,7 +212,7 @@ m5282evb  :=    0M 16M 0xFFE00000 2M
 m5329evb  := 1024M 32M 0M 2M
 m5485evb  :=    0M 64M 1024M 16M
 
-%-bdm.ld : cf.sc Makefile
+%-ram.ld : cf.sc Makefile
 	RAM=$(word 1,$($*)) RAM_SIZE=$(word 2,$($*)) ${SHELL} $< >$@
 %-rom.ld : cf.sc Makefile
 	RAM=$(word 1,$($*)) RAM_SIZE=$(word 2,$($*)) \
