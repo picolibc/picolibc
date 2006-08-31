@@ -1,6 +1,10 @@
 2006-08-31  Nathan Sidwell  <nathan@codesourcery.com>
 
 	libgloss/
+	* m68k/bdm-crt1.c: Call hardware_init_hook before copying
+	initialized data.
+
+	libgloss/
 	* m68k/Makefile.in (CF_BDM_SCRIPTS): Rename to CF_RAM_SCRIPTS.
 	(CF_SCRIPTS): Update.
 	(%-bdm.ld): Rename to %-ram.ld.

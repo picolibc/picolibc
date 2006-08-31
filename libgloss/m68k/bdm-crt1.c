@@ -36,6 +36,9 @@ void __start1 (void)
 {
   unsigned ix;
   
+  if (hardware_init_hook)
+    hardware_init_hook ();
+  
   /* Set the VBR. */
   __asm__ __volatile__ ("movec.l %0,%/vbr" :: "r" (__interrupt_vector));
 
@@ -44,8 +47,6 @@ void __start1 (void)
     memcpy (__data_start, __data_load, __bss_start - __data_start);
   memset (__bss_start, 0, __end - __bss_start);
 
-  if (hardware_init_hook)
-    hardware_init_hook ();
   if (software_init_hook)
     software_init_hook ();
 
