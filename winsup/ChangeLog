@@ -1,3 +1,8 @@
+2006-08-30  Christopher Faylor  <cgf@timesys.com>
+
+	* Makefile.in: Make install-license .PHONY.  Make sure that doc
+	directory is created before copying to it.
+
 2006-08-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in: Make installation of CYGWIN_LICENSE configurable.

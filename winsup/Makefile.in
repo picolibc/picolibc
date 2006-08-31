@@ -48,7 +48,7 @@ ZLIB=${findstring zlib,$(SUBDIRS)}
 
 INSTALL_LICENSE:=@INSTALL_LICENSE@
 
-.PHONY: all install clean all-info info install-info check \
+.PHONY: all install clean all-info info install-info install-license check \
 	$(SUBDIRS) $(INSTALL_SUBDIRS) $(CLEAN_SUBDIRS)
 
 .SUFFIXES:
@@ -64,7 +64,8 @@ endif
 all: Makefile $(SUBDIRS)
 
 install-license: CYGWIN_LICENSE 
-	$(INSTALL_DATA) $(srcdir)/CYGWIN_LICENSE $(prefix)/share/doc/Cygwin/CYGWIN_LICENSE
+	${INSTALL} -d $(prefix)/share/doc/Cygwin
+	${INSTALL} $^ $(prefix)/share/doc/Cygwin
 
 install: Makefile $(INSTALL_LICENSE) $(INSTALL_SUBDIRS)
 
