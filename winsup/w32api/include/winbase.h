@@ -437,6 +437,7 @@ extern "C" {
 #define EV_RXFLAG 2
 #define EV_TXEMPTY 4
 /* also in ddk/ntapi.h */
+/* To restore default error mode, call SetErrorMode (0).  */ 
 #define SEM_FAILCRITICALERRORS		0x0001
 #define SEM_NOGPFAULTERRORBOX		0x0002
 #define SEM_NOALIGNMENTFAULTEXCEPT	0x0004

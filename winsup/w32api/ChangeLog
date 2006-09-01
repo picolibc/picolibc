@@ -1,3 +1,7 @@
+2006-09-01  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winbase.h: Add comment about 'missing' SEM flag.
+
 2006-08-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* configure.in: Substitute with_cross_host in depending files.
@@ -126,64 +130,64 @@
  
 2006-07-22  ipsoner  <ipsoner@users.sourceforge.net>
 
-    * include/wincrypt.h (szOID_RSA, szOID_PKCS, szOID_RSA_HASH,
-    szOID_RSA_ENCRYPT, szOID_PKCS_1, szOID_PKCS_2, szOID_PKCS_3,
-    szOID_PKCS_4, szOID_PKCS_5, szOID_PKCS_6, szOID_PKCS_7,
-    szOID_PKCS_8, szOID_PKCS_9, szOID_PKCS_10, szOID_PKCS_12,
-    szOID_RSA_MD2, szOID_RSA_MD4, szOID_RSA_MD5, szOID_RSA_RSA,
-    szOID_RSA_MD2RSA, szOID_RSA_MD4RSA, szOID_RSA_MD5RSA,
-    szOID_RSA_SHA1RSA, szOID_RSA_SETOAEP_RSA, szOID_RSA_DH,
-    szOID_RSA_data, szOID_RSA_signedData, szOID_RSA_envelopedData,
-    szOID_RSA_signEnvData, szOID_RSA_digestedData, szOID_RSA_hashedData,
-    szOID_RSA_encryptedData, szOID_RSA_emailAddr, szOID_RSA_unstructName,
-    szOID_RSA_contentType, szOID_RSA_messageDigest, szOID_RSA_signingTime,
-    szOID_RSA_counterSign, szOID_RSA_challengePwd, szOID_RSA_unstructAddr,
-    szOID_RSA_extCertAttrs, szOID_RSA_SMIMECapabilities,
-    szOID_RSA_preferSignedData, szOID_RSA_RC2CBC, szOID_RSA_RC4,
-    szOID_RSA_DES_EDE3_CBC, szOID_RSA_RC5_CBCPad, szOID_ANSI_x942,
-    szOID_ANSI_x942_DH, szOID_X957, szOID_X957_DSA, szOID_DATA STRUCTURE,
-    szOID_DS, szOID_DSALG, szOID_DSALG_CRPT, szOID_DSALG_HASH,
-    szOID_DSALG_SIGN, szOID_DSALG_RSA, szOID_OIW, szOID_OIWSEC,
-    szOID_OIWSEC_md4RSA, szOID_OIWSEC_md5RSA, szOID_OIWSEC_md4RSA2,
-    szOID_OIWSEC_desECB, szOID_OIWSEC_desCBC, szOID_OIWSEC_desOFB,
-    szOID_OIWSEC_desCFB, szOID_OIWSEC_desMAC, szOID_OIWSEC_rsaSign,
-    szOID_OIWSEC_dsa, szOID_OIWSEC_shaDSA, szOID_OIWSEC_mdc2RSA,
-    szOID_OIWSEC_shaRSA, szOID_OIWSEC_dhCommMod, szOID_OIWSEC_desEDE,
-    szOID_OIWSEC_sha, szOID_OIWSEC_mdc2, szOID_OIWSEC_dsaComm,
-    szOID_OIWSEC_dsaCommSHA, szOID_OIWSEC_rsaXchg, szOID_OIWSEC_keyHashSeal,
-    szOID_OIWSEC_md2RSASign, szOID_OIWSEC_md5RSASign, szOID_OIWSEC_sha1,
-    szOID_OIWSEC_dsaSHA1, szOID_OIWSEC_dsaCommSHA1, szOID_OIWSEC_sha1RSASign,
-    szOID_OIWDIR, szOID_OIWDIR_CRPT, szOID_OIWDIR_HASH, szOID_OIWDIR_SIGN,
-    szOID_OIWDIR_md2, szOID_OIWDIR_md2RSA, szOID_INFOSEC,
-    szOID_INFOSEC_sdnsSignature, szOID_INFOSEC_mosaicSignature,
-    szOID_INFOSEC_sdnsConfidentiality, szOID_INFOSEC_mosaicConfidentiality,
-    szOID_INFOSEC_sdnsIntegrity, szOID_INFOSEC_mosaicIntegrity,
-    szOID_INFOSEC_sdnsTokenProtection, szOID_INFOSEC_mosaicTokenProtection,
-    szOID_INFOSEC_sdnsKeyManagement, szOID_INFOSEC_mosaicKeyManagement,
-    szOID_INFOSEC_sdnsKMandSig, szOID_INFOSEC_mosaicKMandSig,
-    szOID_INFOSEC_SuiteASignature, szOID_INFOSEC_SuiteAConfidentiality,
-    szOID_INFOSEC_SuiteAIntegrity, szOID_INFOSEC_SuiteATokenProtection,
-    szOID_INFOSEC_SuiteAKeyManagement, szOID_INFOSEC_SuiteAKMandSig,
-    szOID_INFOSEC_mosaicUpdatedSig, szOID_INFOSEC_mosaicKMandUpdSig,
-    szOID_INFOSEC_mosaicUpdatedInteg, szOID_PKIX_NO_SIGNATURE,
-    szOID_COMMON_NAME, szOID_COUNTRY_NAME, szOID_DEVICE_SERIAL_NUMBER,
-    szOID_DOMAIN_COMPONENT, szOID_RSA_emailAddr, szOID_GIVEN_NAME,
-    szOID_INITIALS, szOID_LOCALITY_NAME, szOID_ORGANIZATION_NAME,
-    szOID_ORGANIZATIONAL_UNIT_NAME, szOID_STATE_OR_PROVINCE_NAME,
-    szOID_STREET_ADDRESS, szOID_SUR_NAME, szOID_TITLE, szOID_RSA_unstructAddr,
-    szOID_RSA_unstructName, szOID_BASIC_CONSTRAINTS2,
-    CERT_BASIC_CONSTRAINTS2_INFO, CRYPT_ENCODE_PARA,CertDuplicateStore,
-    CertEnumCertificatesInStore, CertDuplicateCertificateContext,
-    CertGetNameStringA, CertGetNameStringW, CertGetNameString, PFXIsPFXBlob,
-    CertFindExtension, CryptDecodeObject, CertAddCertificateContextToStore,
-    CertCompareCertificate, PFXVerifyPassword, PFXImportCertStore,
-    CertDeleteCertificateFromStore): Define.
-    * lib/crypt32.def (CertDuplicateStore, CertEnumCertificatesInStore,
-    CertDuplicateCertificateContext, CertGetNameStringA, CertGetNameStringW,
-    CertGetNameString, PFXIsPFXBlob, CertFindExtension, CryptDecodeObject,
-    CertAddCertificateContextToStore, CertCompareCertificate,
-    PFXVerifyPassword, PFXImportCertStore, CertDeleteCertificateFromStore):
-    Define.
+	* include/wincrypt.h (szOID_RSA, szOID_PKCS, szOID_RSA_HASH,
+	szOID_RSA_ENCRYPT, szOID_PKCS_1, szOID_PKCS_2, szOID_PKCS_3,
+	szOID_PKCS_4, szOID_PKCS_5, szOID_PKCS_6, szOID_PKCS_7,
+	szOID_PKCS_8, szOID_PKCS_9, szOID_PKCS_10, szOID_PKCS_12,
+	szOID_RSA_MD2, szOID_RSA_MD4, szOID_RSA_MD5, szOID_RSA_RSA,
+	szOID_RSA_MD2RSA, szOID_RSA_MD4RSA, szOID_RSA_MD5RSA,
+	szOID_RSA_SHA1RSA, szOID_RSA_SETOAEP_RSA, szOID_RSA_DH,
+	szOID_RSA_data, szOID_RSA_signedData, szOID_RSA_envelopedData,
+	szOID_RSA_signEnvData, szOID_RSA_digestedData, szOID_RSA_hashedData,
+	szOID_RSA_encryptedData, szOID_RSA_emailAddr, szOID_RSA_unstructName,
+	szOID_RSA_contentType, szOID_RSA_messageDigest, szOID_RSA_signingTime,
+	szOID_RSA_counterSign, szOID_RSA_challengePwd, szOID_RSA_unstructAddr,
+	szOID_RSA_extCertAttrs, szOID_RSA_SMIMECapabilities,
+	szOID_RSA_preferSignedData, szOID_RSA_RC2CBC, szOID_RSA_RC4,
+	szOID_RSA_DES_EDE3_CBC, szOID_RSA_RC5_CBCPad, szOID_ANSI_x942,
+	szOID_ANSI_x942_DH, szOID_X957, szOID_X957_DSA, szOID_DATA STRUCTURE,
+	szOID_DS, szOID_DSALG, szOID_DSALG_CRPT, szOID_DSALG_HASH,
+	szOID_DSALG_SIGN, szOID_DSALG_RSA, szOID_OIW, szOID_OIWSEC,
+	szOID_OIWSEC_md4RSA, szOID_OIWSEC_md5RSA, szOID_OIWSEC_md4RSA2,
+	szOID_OIWSEC_desECB, szOID_OIWSEC_desCBC, szOID_OIWSEC_desOFB,
+	szOID_OIWSEC_desCFB, szOID_OIWSEC_desMAC, szOID_OIWSEC_rsaSign,
+	szOID_OIWSEC_dsa, szOID_OIWSEC_shaDSA, szOID_OIWSEC_mdc2RSA,
+	szOID_OIWSEC_shaRSA, szOID_OIWSEC_dhCommMod, szOID_OIWSEC_desEDE,
+	szOID_OIWSEC_sha, szOID_OIWSEC_mdc2, szOID_OIWSEC_dsaComm,
+	szOID_OIWSEC_dsaCommSHA, szOID_OIWSEC_rsaXchg, szOID_OIWSEC_keyHashSeal,
+	szOID_OIWSEC_md2RSASign, szOID_OIWSEC_md5RSASign, szOID_OIWSEC_sha1,
+	szOID_OIWSEC_dsaSHA1, szOID_OIWSEC_dsaCommSHA1, szOID_OIWSEC_sha1RSASign,
+	szOID_OIWDIR, szOID_OIWDIR_CRPT, szOID_OIWDIR_HASH, szOID_OIWDIR_SIGN,
+	szOID_OIWDIR_md2, szOID_OIWDIR_md2RSA, szOID_INFOSEC,
+	szOID_INFOSEC_sdnsSignature, szOID_INFOSEC_mosaicSignature,
+	szOID_INFOSEC_sdnsConfidentiality, szOID_INFOSEC_mosaicConfidentiality,
+	szOID_INFOSEC_sdnsIntegrity, szOID_INFOSEC_mosaicIntegrity,
+	szOID_INFOSEC_sdnsTokenProtection, szOID_INFOSEC_mosaicTokenProtection,
+	szOID_INFOSEC_sdnsKeyManagement, szOID_INFOSEC_mosaicKeyManagement,
+	szOID_INFOSEC_sdnsKMandSig, szOID_INFOSEC_mosaicKMandSig,
+	szOID_INFOSEC_SuiteASignature, szOID_INFOSEC_SuiteAConfidentiality,
+	szOID_INFOSEC_SuiteAIntegrity, szOID_INFOSEC_SuiteATokenProtection,
+	szOID_INFOSEC_SuiteAKeyManagement, szOID_INFOSEC_SuiteAKMandSig,
+	szOID_INFOSEC_mosaicUpdatedSig, szOID_INFOSEC_mosaicKMandUpdSig,
+	szOID_INFOSEC_mosaicUpdatedInteg, szOID_PKIX_NO_SIGNATURE,
+	szOID_COMMON_NAME, szOID_COUNTRY_NAME, szOID_DEVICE_SERIAL_NUMBER,
+	szOID_DOMAIN_COMPONENT, szOID_RSA_emailAddr, szOID_GIVEN_NAME,
+	szOID_INITIALS, szOID_LOCALITY_NAME, szOID_ORGANIZATION_NAME,
+	szOID_ORGANIZATIONAL_UNIT_NAME, szOID_STATE_OR_PROVINCE_NAME,
+	szOID_STREET_ADDRESS, szOID_SUR_NAME, szOID_TITLE, szOID_RSA_unstructAddr,
+	szOID_RSA_unstructName, szOID_BASIC_CONSTRAINTS2,
+	CERT_BASIC_CONSTRAINTS2_INFO, CRYPT_ENCODE_PARA,CertDuplicateStore,
+	CertEnumCertificatesInStore, CertDuplicateCertificateContext,
+	CertGetNameStringA, CertGetNameStringW, CertGetNameString, PFXIsPFXBlob,
+	CertFindExtension, CryptDecodeObject, CertAddCertificateContextToStore,
+	CertCompareCertificate, PFXVerifyPassword, PFXImportCertStore,
+	CertDeleteCertificateFromStore): Define.
+	* lib/crypt32.def (CertDuplicateStore, CertEnumCertificatesInStore,
+	CertDuplicateCertificateContext, CertGetNameStringA, CertGetNameStringW,
+	CertGetNameString, PFXIsPFXBlob, CertFindExtension, CryptDecodeObject,
+	CertAddCertificateContextToStore, CertCompareCertificate,
+	PFXVerifyPassword, PFXImportCertStore, CertDeleteCertificateFromStore):
+	Define.
 
 2006-07-22  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
@@ -434,7 +438,7 @@
 
 	* include/winnt.h (SUBLANG_ARABIC_SAUDI_ARABIA): Revert accidental
 	removal.
-        (SUBLANG_MARATHI_INDIA): Remove duplicate define.
+	(SUBLANG_MARATHI_INDIA): Remove duplicate define.
 
 2006-05-24  Christopher Faylor  <cgf@timesys.com>
 
