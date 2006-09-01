@@ -1,46 +1,34 @@
 # a linker script template.
-# RAMSTART - start of board's ram
-# RAMSIZE - size of board's ram
-# RAMDBUG - bytes at start of RAM for DBUG use
+# RAM - start of board's ram
+# RAM_SIZE - size of board's ram
+# ROM - start of board's rom
+# ROM_SIZE - size of board's rom
+
+test -z "${ROM:+1}" && NOROM=1
 
 cat <<EOF
-STARTUP(crt0.o)
+STARTUP(bdm-crt0.o)
 OUTPUT_ARCH(m68k)
-/* DBUG loads SREC files */
-/*OUTPUT_FORMAT(srec)*/
-ENTRY(start)
+ENTRY(__start)
 SEARCH_DIR(.)
-GROUP(-ldbug -lc -lgcc -ldbug)
+GROUP(-lc -lbdm)
 __DYNAMIC  =  0;
 
 MEMORY
 {
-  ram (rwx) : ORIGIN = ${RAMSTART} + ${RAMDBUG:-0},
-		 LENGTH = ${RAMSIZE} - ${RAMDBUG:-0}
+  ${ROM:+rom (rx) : ORIGIN = ${ROM}, LENGTH = ${ROM_SIZE}}
+  ram (rwx) : ORIGIN = ${RAM}, LENGTH = ${RAM_SIZE}
 }
 
-PROVIDE (__stack = ${RAMSTART} + ${RAMSIZE});
+/* Place the stack at the end of memory, unless specified otherwise. */
+PROVIDE (__stack = ${RAM} + ${RAM_SIZE});
 
-/*
- * Initalize some symbols to be zero so we can reference them in the
- * crt0 without core dumping. These functions are all optional, but
- * we do this so we can have our crt0 always use them if they exist. 
- * This is so BSPs work better when using the crt0 installed gcc.
- * We have to initalize them twice, so we cover a.out (which prepends
- * an underscore) and coff object file formats.
- */
-PROVIDE (hardware_init_hook = 0);
-PROVIDE (_hardware_init_hook = 0);
-PROVIDE (software_init_hook = 0);
-PROVIDE (_software_init_hook = 0);
-/*
- * stick everything in ram (of course)
- */
 SECTIONS
 {
   .text :
   {
     CREATE_OBJECT_SYMBOLS
+    bdm-crt0.o(.text)
     *(.text .text.*)
 
     . = ALIGN(0x4);
@@ -48,11 +36,11 @@ SECTIONS
     KEEP (*crtbegin.o(.ctors))
     KEEP (*(EXCLUDE_FILE (*crtend.o) .ctors))
     KEEP (*(SORT(.ctors.*)))
-    KEEP (*(.ctors))
+    KEEP (*crtend.o(.ctors))
     KEEP (*crtbegin.o(.dtors))
     KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
     KEEP (*(SORT(.dtors.*)))
-    KEEP (*(.dtors))
+    KEEP (*crtend.o(.dtors))
 
     *(.rodata .rodata.*)
 
@@ -76,28 +64,33 @@ SECTIONS
     SHORT (0x4e5e)	/* unlk %fp */
     SHORT (0x4e75)	/* rts */
 
-    _etext = .;
     *(.lit)
-  } > ram
+
+    . = ALIGN(4);
+    _etext = .;
+  } >${ROM:+rom}${NOROM:+ram}
 
   .data :
   {
+    __data_load = LOADADDR (.data);
+    __data_start = .;
     *(.got.plt) *(.got)
     *(.shdata)
     *(.data .data.*)
+    . = ALIGN (4);
     _edata = .;
-  } > ram
+  } >ram ${ROM:+AT>rom}
 
   .bss :
   {
-    . = ALIGN(0x4);
     __bss_start = . ;
     *(.shbss)
     *(.bss .bss.*)
     *(COMMON)
-    _end =  ALIGN (0x8);
+    . = ALIGN (8);
+    _end = .;
     __end = _end;
-  } > ram
+  } >ram ${ROM:+AT>rom}
 
   .stab 0 (NOLOAD) :
   {

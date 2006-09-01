@@ -1,7 +1,7 @@
 /*
- * dbug-exit.S -- 
+ * bdm-unlink.c -- 
  *
- * Copyright (c) 1996 Cygnus Support
+ * Copyright (c) 2006 CodeSourcery Inc
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -14,16 +14,28 @@
  * they apply.
  */
 
-#include "asm.h"
+#include "bdm-semihost.h"
+#include "bdm-gdb.h"
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
 
-	.text
-	.global SYM (_exit)
 /*
- * _exit -- Exit from the application. Normally we cause a user trap
- *          to return to the ROM monitor for another run.
+ * unlink -- unlink (delete) a file
+ * input parameters:
+ *   0 : filename ptr
+ *   1 : filename length
+ * output parameters:
+ *   0 : result
+ *   1 : errno
  */
-	.text
-	.align	2
-SYM (_exit):
-	moveql	IMM(0),d0
-        trap	IMM(15)
+
+int unlink (const char *path)
+{
+  gdb_parambuf_t parameters;
+  parameters[0] = (uint32_t) path;
+  parameters[1] = (uint32_t) strlen (path) + 1;
+  BDM_TRAP (BDM_UNLINK, (uint32_t)parameters);
+  errno = convert_from_gdb_errno (parameters[1]);
+  return parameters[0];
+}

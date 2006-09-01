@@ -1,7 +1,7 @@
 /*
- * dbug-inbyte.S -- 
+ * bdm-write.c -- 
  *
- * Copyright (c) 1996 Cygnus Support
+ * Copyright (c) 2006 CodeSourcery Inc
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -14,21 +14,29 @@
  * they apply.
  */
 
-#include "asm.h"
-
-	.text
-	.global SYM (inbyte)
-	.global SYM (getDebugChar)
+#include "bdm-semihost.h"
+#include "bdm-gdb.h"
+#include <unistd.h>
+#include <errno.h>
 
 /*
- * inbyte -- get a byte from the serial port
- *	d0 - contains the byte read in
+ * write -- write to a file descriptor
+ * input parameters:
+ *   0 : file descriptor
+ *   1 : buf ptr
+ *   2 : count
+ * output parameters:
+ *   0 : result
+ *   1 : errno
  */
-	.text
-	.align	2
-SYM (getDebugChar):		/* symbol name used by m68k-stub */
-SYM (inbyte):
-	movel	IMM(0x10),d0
-	trap	IMM(15)
-	movel	d1,d0
-	rts
+
+ssize_t write (int fd, const void *buf, size_t count)
+{
+  gdb_parambuf_t parameters;
+  parameters[0] = (uint32_t) fd;
+  parameters[1] = (uint32_t) buf;
+  parameters[2] = (uint32_t) count;
+  BDM_TRAP (BDM_WRITE, (uint32_t)parameters);
+  errno = convert_from_gdb_errno (parameters[1]);
+  return parameters[0];
+}

@@ -1,7 +1,7 @@
 /*
- * dbug-outbyte.S -- 
+ * bdm-isatty.c -- 
  *
- * Copyright (c) 1996 Cygnus Support
+ * Copyright (c) 2006 CodeSourcery Inc
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -14,21 +14,25 @@
  * they apply.
  */
 
-#include "asm.h"
-
-	.text
-	.global SYM (outbyte)
-	.global SYM (putDebugChar)
+#include "bdm-semihost.h"
+#include "bdm-gdb.h"
+#include <unistd.h>
+#include <errno.h>
 
 /*
- * outbyte -- sends a byte out the serial port
- *	d0 - contains the byte to be sent
+ * isatty -- check if fd is a terminal
+ * input parameters:
+ *   0 : file descriptor
+ * output parameters:
+ *   0 : result
+ *   1 : errno
  */
-	.text
-	.align	2
-SYM (putDebugChar):		/* symbol name used by m68k-stub */
-SYM (outbyte):
-	movel	sp@(4),d1
-	movl	IMM(0x13),d0
-	trap	IMM(15)
-	rts
+
+int isatty (int fd)
+{
+  gdb_parambuf_t parameters;
+  parameters[0] = (uint32_t) fd;
+  BDM_TRAP (BDM_ISATTY, (uint32_t)parameters);
+  errno = convert_from_gdb_errno (parameters[1]);
+  return parameters[0];
+}

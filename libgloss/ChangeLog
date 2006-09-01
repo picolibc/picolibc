@@ -1,3 +1,171 @@
+2006-09-01  Kazu Hirata  <kazu@codesourcery.com>
+
+	Merge from newlib-csl-20060320-branch:
+	2006-08-31  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* m68k/bdm-crt1.c: Call hardware_init_hook before copying
+	initialized data.
+
+	* m68k/Makefile.in (CF_BDM_SCRIPTS): Rename to CF_RAM_SCRIPTS.
+	(CF_SCRIPTS): Update.
+	(%-bdm.ld): Rename to %-ram.ld.
+
+	2006-08-25  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* m68k/Makefile.in (DBUG_BSP, DBUG_OBJS): Remove.
+	(BDM_CRT0): New.
+	(BDM_OBJS): Add bdm-crt1.o.
+	(BDM_OTHER_OBJS): Remove print.o putnum.o
+	(CF_BOARDS): New.
+	(CF_BDM_SCRIPTS): Generated name of ram scripts.
+	(CF_ROM_SCRIPTS): Generated name of rom scripts.
+	(CF_SCRIPTS): Adjust.
+	(all): Add BDM_CRT0.
+	(bdm-crt0.o, bdm-crt1.o): New targets.
+	(bdm-isv.o): Remove.
+	(m5208evb, m5213evb, m52235evb, m5235evb, m5273c3, m5282evb,
+	m5329evb, m5485evb): New.
+	(%-bdm.ld, %-rom.ld): New. Replace individual linker script rules.
+	(install): Remove DBUG installs.
+	* m68k/bdm-crt0.S: New.
+	* m68k/bdm-crt1.c: New.
+	* m68k/bdm-exit.c: Call __reset.
+	* m68k/bdm-isv.c: Remove.
+	* m68k/cf.sc: Adjust to produce either rom or ram images.
+	* m68k/dbug-exit.S, m68k/dbug-inbyte.S, m68k/dbug-outbyte.S: Remove.
+
+	2006-07-24  Nathan Sidwell  <nathan@codesourcery.com>
+
+	Bug 844
+	* m68k/cf.sc: Set entry point to _start.
+	* m68k/crt0.X (_start): New name for entrypoint
+	(start): Weak alias for start.
+
+	2006-06-09  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* m68k/bdm-system.c (_system): Support system(NULL).
+
+	2006-06-08  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* m68k/bdm-system.c (_system): Properly encode non failure exit
+	code.
+
+	2006-06-05  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* m68k/Makefile.in (BDM_SYSOBJS): Remove bdm-inbyte.o.
+	Add bdm-time.o.
+	* m68k/bdm-close.c: Add copyright notice.
+	* m68k/bdm-fstat.c: Add copyright notice.
+	* m68k/bdm-gettimeofday.c: Add copyright notice.
+	* m68k/bdm-inbyte.c: Remove.
+	* m68k/bdm-isatty.c: Add copyright notice.
+	* m68k/bdm-lseek.c: Add copyright notice. Fix &/| thinko.
+	* m68k/bdm-open.c: Add copyright notice.
+	* m68k/bdm-read.c: Add copyright notice.
+	* m68k/bdm-rename.c: Add copyright notice.
+	* m68k/bdm-stat.c: Add copyright notice.
+	* m68k/bdm-system.c: Add copyright notice.
+	* m68k/bdm-time.c: New.
+	* m68k/bdm-unlink.c: Add copyright notice.
+	* m68k/bdm-write.c: Add copyright notice.
+
+	2006-05-25  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* m68k/Makefile.in (m52235-dbug.ld, m52235-bdm.ld): New
+	scripts.
+
+	2006-05-24  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* m68k/Makefile.in (BDM_SYSOBJS): Remove bdm-outbyte.o.
+	* m68k/bdm-outbyte.c: Delete.
+	* m68k/bdm-semihost.h (BDM_OUTBYTE): Mark as obsolete.
+
+	2006-05-22  Sandra Loosemore <sandra@codesourcery.com>
+
+	* m68k/bdm-semihost.h: Add new constants for additional
+	semihosting functions.  Add new BDM_TRAP macro to encapsulate
+	inline asm.
+	* m68k/bdm-exit.c (_exit): Use new BDM_TRAP macro.
+	* m68k/bdm-outbyte.c (outbyte): Ditto.
+	* m68k/bdm-isrs.c, m68k/bdm-isv.c: Former BDM_TRAP
+	now called BDM_TRAPNUM.
+	* m68k/bdm-gdb.h, m68k/bdm-gdb.c: New files
+	containing declarations and conversion functions for GDB's fileio
+	protocol.
+	* m68k/bdm-close.c: New file to define corresponding function.
+	* m68k/bdm-fstat.c: Ditto.
+	* m68k/bdm-gettimeofday.c: Ditto.
+	* m68k/bdm-isatty.c: Ditto.
+	* m68k/bdm-lseek.c: Ditto.
+	* m68k/bdm-open.c: Ditto.
+	* m68k/bdm-read.c: Ditto.
+	* m68k/bdm-rename.c: Ditto.
+	* m68k/bdm-stat.c: Ditto.
+	* m68k/bdm-system.c: Ditto.
+	* m68k/bdm-unlink.c: Ditto.
+	* m68k/bdm-write.c Ditto.
+	* m68k/Makefile.in: Add dependencies for new files.
+
+	2006-03-29  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* m68k/bdm-isv.c (software_init_hook): Fix trap numbering.
+
+	* m68k/Makefile.in (CF_SCRIPTS): Add m5329 board.
+	Reorder.
+	(*-dbug.ld, *-bdm.ld): Add appropriate IO definition.
+	(m5329evb-dbug.ld, m5329evb-bdm.ld): New.
+	* cf.sc (GROUP): Revert previous change.  Add IO library.
+
+	* m68k/Makefile.in (BDM_BSP, BDM_OBJS, BDM_ISRS): New.
+	(CF_SCRIPTS): Rename dbug scripts.  Add bdm scripts. Add m5485
+	scripts.
+	(all): Add new targets.
+	(BDM_BSP): New target.
+	(bdm-isv.o, bdm-exit.o, bdm-outbyte.o, bdm-semihost.o): New
+	targets.
+	(BDM_ISRS): New targets.
+	(m5208evb.ld, m5213evb.ld, m5235evb.ld, m5272c3.ld, m5282evb.ld):
+	Rename and adjust.
+	(m5485evb-dbug): New.
+	(m5208evb-bdm.ld, m5213evb-bdm.ld, m5235evb-bdm.ld,
+	m5272c3-bdm.ld, m5282evb-bdm.ld, m5485evb-bdm.ld): New.
+	(install): Add BDM_BSP.
+	* m68k/bdm-exit.c: New
+	* m68k/bdm-inbyte.c: New
+	* m68k/bdm-outbyte.c: New
+	* m68k/bdm-semihost.c: New
+	* m68k/bdm-semihost.h: New
+	* m68k/bdm-isrs.c: New.
+	* m68k/bdm-isv.c: New.
+	* dbug-cf.sc: Renamed to ...
+	* cf.sc: ... here.  Add bdm flexibility. Remove GROUP
+
+	2006-05-22  Sandra Loosemore <sandra@codesourcery.com>
+
+	* m68k/bdm-semihost.h: Add new constants for additional
+	semihosting functions.  Add new BDM_TRAP macro to encapsulate
+	inline asm.
+	* m68k/bdm-exit.c (_exit): Use new BDM_TRAP macro.
+	* m68k/bdm-outbyte.c (outbyte): Ditto.
+	* m68k/bdm-isrs.c, m68k/bdm-isv.c: Former BDM_TRAP
+	now called BDM_TRAPNUM.
+	* m68k/bdm-gdb.h, m68k/bdm-gdb.c: New files
+	containing declarations and conversion functions for GDB's fileio
+	protocol.
+	* m68k/bdm-close.c: New file to define corresponding function.
+	* m68k/bdm-fstat.c: Ditto.
+	* m68k/bdm-gettimeofday.c: Ditto.
+	* m68k/bdm-isatty.c: Ditto.
+	* m68k/bdm-lseek.c: Ditto.
+	* m68k/bdm-open.c: Ditto.
+	* m68k/bdm-read.c: Ditto.
+	* m68k/bdm-rename.c: Ditto.
+	* m68k/bdm-stat.c: Ditto.
+	* m68k/bdm-system.c: Ditto.
+	* m68k/bdm-unlink.c: Ditto.
+	* m68k/bdm-write.c Ditto.
+	* m68k/Makefile.in: Add dependencies for new files.
+
 2006-08-30  Kazunori Asayama  <asayama@sm.sony.co.jp>
 
 	* spu/syscalls.c: Add a new argument to _send_to_ppe() to 

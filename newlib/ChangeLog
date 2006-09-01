@@ -1,3 +1,11 @@
+2006-09-01  Kazu Hirata  <kazu@codesourcery.com>
+
+	Merge from newlib-csl-20060320-branch:
+	2006-05-22  Sandra Loosemore <sandra@codesourcery.com>
+
+	* configure.host: Tell it we have _rename and _system when
+	building m68k-unknown-elf.
+
 2006-08-29  Paul Brook  <paul@codesourcery.com>
 
 	* libc/include/sys/config.h: Define _REENT_SMALL for Thumb-2.
