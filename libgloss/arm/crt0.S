@@ -24,6 +24,7 @@
 .macro FUNC_START name
 	.global \name
 	.thumb_func
+	.type \name, %function
 \name:
 .endm
 #else
@@ -105,6 +106,12 @@
 
 	ldr	r3, .Lstack
 	cmp	r3, #0
+#   ifdef __thumb2__
+	/* Skip the mode initialization for Thumb-2.  We don't know whether
+	we're on an "M" variant or not.  */
+	it	eq
+	ldreq	r3, .LC0
+#   else
 	ldreq	r3, .LC0
 	/* Note: This 'mov' is essential when starting in User, and ensures we
 		 always get *some* sp value for the initial mode, even if we 
@@ -151,6 +158,7 @@
 	   However, it ensures that this simple crt0 world will not
 	   immediately cause an overflow event:  */
 	sub	sl, sp, #64 << 10	/* Still assumes 256bytes below sl */
+#   endif
 #  endif
 # endif
 #endif
@@ -431,6 +439,17 @@ CommandLine:	.space	256,0	/*  Maximum length of 255 chars handled.  */
 #endif
 
 #ifdef _ARM_V7M
+	.text
+	/* Default handler routines for exception handlers. Can be
+	   overriden by the user.  */
+	.weak _nmi_isr
+	FUNC_START _nmi_isr
+	b .
+
+	.weak _fault_isr
+	FUNC_START _fault_isr
+	b .
+
 	/* The hardware uses this vector to handle hardware resets and 
 	   exceptions.  */
 	.section .isr_vector, "a"

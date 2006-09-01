@@ -6,18 +6,16 @@
 # $1 whether to set _stack
 
 test "x$1" = "xyes" && SETSTACK=1
-test -z "${RAM}" && RAM=0x20000000
-if test -z "${ROM_SIZE:+1}" ; then
-  NOROM=1
-else
-  test -z "${ROM}" && ROM=0
-fi
+test -z "${ROM_SIZE:+1}" && NOROM=1
 
 cat <<EOF
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm",
 	      "elf32-littlearm")
+STARTUP(${CRT0})
+GROUP(-lc ${BSP} -lgcc)
 OUTPUT_ARCH(arm)
 ENTRY(_start)
+SEARCH_DIR(.)
 __DYNAMIC  =  0;
 
 MEMORY
@@ -144,3 +142,5 @@ SECTIONS
   /DISCARD/ : { *(.note.GNU-stack) ${NOROM:+*(.isr_vector)} }
 }
 EOF
+
+exit 0

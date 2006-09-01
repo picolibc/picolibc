@@ -1,3 +1,21 @@
+2006-09-01  Paul Brook  <paul@codesourcery.com>
+
+	libgloss/
+	* arm/Makefile.in: Include _exit.c in BSPs.  Add rdimon-ram.ld.
+	Build linker scripts instead of spec files for rdimon and rdpmon.
+	Pass CRT0 ad BSP to arm.sc.
+	* arm/_exit.c: New file.
+	* arm/arm.sc: Add STARTUP, GROUP and SEARCH_DIR.  Remove defaults
+	for ROM and RAM.
+	* arm/crt0.S: Give Thumb-2 symbols function type.
+	Skip generic Arm init code for Thumb-2.
+	Add _nmi_isr and _fault_isr.
+	* arm/libcfunc.c (do_AngelSWI): Remove.
+	* arm/swi.h (do_AngelSWI): New function.
+	* arm/syscalls.c (do_AngelSWI): Remove.
+	(_exit): Remove.
+	(isatty): New function.
+
 2006-08-31  Nathan Sidwell  <nathan@codesourcery.com>
 
 	libgloss/

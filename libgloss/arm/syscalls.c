@@ -20,6 +20,7 @@
 /* Forward prototypes.  */
 int     _system     _PARAMS ((const char *));
 int     _rename     _PARAMS ((const char *, const char *));
+int     isatty		_PARAMS ((int));
 int     _isatty		_PARAMS ((int));
 clock_t _times		_PARAMS ((struct tms *));
 int     _gettimeofday	_PARAMS ((struct timeval *, struct timezone *));
@@ -30,7 +31,6 @@ int     _fstat 		_PARAMS ((int, struct stat *));
 caddr_t _sbrk		_PARAMS ((int));
 int     _getpid		_PARAMS ((int));
 int     _kill		_PARAMS ((int, int));
-void    _exit		_PARAMS ((int));
 int     _close		_PARAMS ((int));
 clock_t _clock		_PARAMS ((void));
 int     _swiclose	_PARAMS ((int));
@@ -83,26 +83,6 @@ findslot (int fh)
       break;
   return i;
 }
-
-#ifdef ARM_RDI_MONITOR
-
-static inline int
-do_AngelSWI (int reason, void * arg)
-{
-  int value;
-  asm volatile ("mov r0, %1; mov r1, %2; " AngelSWIInsn " %a3; mov %0, r0"
-       : "=r" (value) /* Outputs */
-       : "r" (reason), "r" (arg), "i" (AngelSWI) /* Inputs */
-       : "r0", "r1", "r2", "r3", "ip", "lr", "memory", "cc"
-		/* Clobbers r0 and r1, and lr if in supervisor mode */);
-                /* Accordingly to page 13-77 of ARM DUI 0040D other registers
-                   can also be clobbered.  Some memory positions may also be
-                   changed by a system call, so they should not be kept in
-                   registers. Note: we are assuming the manual is right and
-                   Angel is respecting the APCS.  */
-  return value;
-}
-#endif /* ARM_RDI_MONITOR */
 
 /* Function to convert std(in|out|err) handles to internal versions.  */
 static int
@@ -481,17 +461,6 @@ _kill (int pid, int sig)
 #endif
 }
 
-void
-_exit (int status)
-{
-  /* There is only one SWI for both _exit and _kill. For _exit, call
-     the SWI with the second argument set to -1, an invalid value for
-     signum, so that the SWI handler can distinguish the two calls.
-     Note: The RDI implementation of _kill throws away both its
-     arguments.  */
-  _kill(status, -1);
-}
-
 int __attribute__((weak))
 _getpid (int n)
 {
@@ -653,6 +622,11 @@ _isatty (int fd)
        : "i" (SWI_IsTTY), "r"(fh)
        : "r0");
 #endif
+}
+
+int isatty(int fd)
+{
+  return _isatty(fd);
 }
 
 int

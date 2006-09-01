@@ -58,16 +58,15 @@ REDBOOT_OBJS	= redboot-syscalls.o
 REDBOOT_SCRIPTS	= redboot.ld redboot.specs
 REDBOOT_INSTALL	= install-redboot
 
-RDPMON_CRT0	= rdpmon-crt0.o
+RDPMON_CRT0	= rdpmon-crt0.o rdpmon-ram.ld
 RDPMON_BSP	= librdpmon.a
-RDPMON_OBJS	= syscalls.o libcfunc.o trap.o
-RDPMON_SCRIPTS	= rdpmon.specs
+RDPMON_OBJS	= syscalls.o libcfunc.o trap.o _exit.o
 RDPMON_INSTALL	= install-rdpmon
 
-RDIMON_CRT0	= rdimon-crt0.o
+RDIMON_CRT0	= rdimon-crt0.o rdimon-ram.ld
 RDIMON_BSP	= librdimon.a
-RDIMON_OBJS	= rdimon-syscalls.o rdimon-libcfunc.o rdimon-trap.o
-RDIMON_SCRIPTS	= rdimon.specs
+RDIMON_OBJS	= rdimon-syscalls.o rdimon-libcfunc.o rdimon-trap.o \
+		  rdimon-_exit.o
 RDIMON_INSTALL	= install-rdimon
 
 CFLAGS		= -g
@@ -79,7 +78,7 @@ PID_INSTALL	= install-pid
 IQ80310_SCRIPTS	= iq80310.specs
 IQ80310_INSTALL	= install-iq80310
 
-ARMV7M_OBJS	= armv7m-crt0.o \
+ARMV7M_OBJS	= armv7m-crt0.o rdimon-ram.ld \
 		  armv7m-rom.ld lm3s10x-rom.ld lm3s301-rom.ld lm3s31x-rom.ld \
 		  armv7m-ram.ld lm3s10x-ram.ld lm3s301-ram.ld lm3s31x-ram.ld
 ARMV7M_SPECS	= armv7m.specs
@@ -117,6 +116,9 @@ rdimon-crt0.o: crt0.S
 rdimon-trap.o: trap.S
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
+rdimon-_exit.o: _exit.c
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+
 rdimon-syscalls.o: syscalls.c
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
@@ -132,19 +134,24 @@ $(RDIMON_BSP): $(RDIMON_OBJS)
 	${RANLIB} $@
 
 # Armv7M board files.
-#        ram rom stack
-armv7m=  32M 32M no
-lm3s10x=  2k  8k yes
-lm3s301=  2k 16k yes
-lm3s31x=  4k 16k yes
+#        ram           rom             stack crt0          bsp
+#        position size position   size
+rdimon=  0      4096M           0   0   no   rdimon-crt0.o -lrdimon
+rdpmon=  0      4096M           0   0   no   rdpmon-crt0.o -lrdpmon
+armv7m=  0        32M  0x20000000 32M   no   armv7m-crt0.o -lrdimon
+lm3s10x= 0         2k  0x20000000  8k  yes   armv7m-crt0.o -lrdimon
+lm3s301= 0         2k  0x20000000 16k  yes   armv7m-crt0.o -lrdimon
+lm3s31x= 0         4k  0x20000000 16k  yes   armv7m-crt0.o -lrdimon
 
 %-ram.ld : arm.sc Makefile
-	RAM_SIZE=$(word 1,$($*)) \
-	  ${SHELL} $< $(word 3,$($*)) >$@
+	RAM=$(word 1,$($*)) RAM_SIZE=$(word 2,$($*)) \
+	  CRT0=$(word 6,$($*)) BSP=$(word 7,$($*)) \
+	  ${SHELL} $< $(word 5,$($*)) >$@
 %-rom.ld : arm.sc Makefile
-	RAM_SIZE=$(word 1,$($*)) \
-	  ROM_SIZE=$(word 2,$($*)) \
-	  ${SHELL} $< $(word 3,$($*)) >$@
+	RAM=$(word 1,$($*)) RAM_SIZE=$(word 2,$($*)) \
+	  ROM=$(word 3,$($*)) ROM_SIZE=$(word 4,$($*)) \
+	  CRT0=$(word 6,$($*)) BSP=$(word 7,$($*)) \
+	  ${SHELL} $< $(word 5,$($*)) >$@
 
 clean mostlyclean:
 	rm -f a.out core *.i *.o *-test *.srec *.dis *.x $(SIM_BSP) $(IQ80310_BSP)
@@ -164,11 +171,9 @@ install-redboot:
 
 install-rdpmon:
 	set -e; for x in ${RDPMON_CRT0} ${RDPMON_BSP}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
-	set -e; for x in ${RDPMON_SCRIPTS}; do ${INSTALL_DATA} ${srcdir}/${objtype}$$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 install-rdimon:
 	set -e; for x in ${RDIMON_CRT0} ${RDIMON_BSP}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
-	set -e; for x in ${RDIMON_SCRIPTS}; do ${INSTALL_DATA} ${srcdir}/${objtype}$$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 
 install-pid:
