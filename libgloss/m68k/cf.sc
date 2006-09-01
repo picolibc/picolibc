@@ -42,6 +42,11 @@ SECTIONS
     KEEP (*(SORT(.dtors.*)))
     KEEP (*crtend.o(.dtors))
 
+    . = ALIGN(0x4);
+    KEEP (*crtbegin.o(.jcr))
+    KEEP (*(EXCLUDE_FILE (*crtend.o) .jcr))
+    KEEP (*crtend.o(.jcr))
+
     *(.rodata .rodata.*)
 
     . = ALIGN(0x4);
