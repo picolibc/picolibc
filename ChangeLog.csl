@@ -1,3 +1,8 @@
+2006-09-01  Nathan Sidwell  <nathan@codesourcery.com>
+
+	ld/testsuite/
+	* ld-elf/loadaddr.s: Copy from mainline.
+
 2006-08-31  Mark Shinwell  <shinwell@codesourcery.com>
 
 	bfd/
@@ -21,6 +26,7 @@
 
 2006-08-29  Nathan Sidwell  <nathan@codesourcery.com>
 
+	ld/
 	* ldlang.c (walk_wild): Allow * to glob '/' in wildcarded match.
 
 2006-08-29  Nathan Sidwell  <nathan@codesourcery.com>
