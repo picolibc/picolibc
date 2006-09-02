@@ -1,3 +1,10 @@
+2006-09-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	[mingw-Bugs-1550139]
+	* include/oleauto.h (GetRecordInfoFromTypeInfo): Add prototype.
+	Tanks to:  Samit Basu <samitbasu at sf dot net>
+	(GetRecordInfoFromGuids): Add prototype.
+
 2006-09-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winbase.h: Add comment about 'missing' SEM flag.
