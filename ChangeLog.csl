@@ -1,3 +1,19 @@
+2006-09-04  Paul Brook  <paul@codesourcery.com>
+
+	gas/
+	* config/tc-arm.c (do_neon_dyadic_if_i): Remove.
+	(do_neon_dyadic_if_i_d): Avoid setting U bit.
+	(do_neon_mac_maybe_scalar): Ditto.
+	(do_neon_dyadic_narrow): Force operand type to NT_integer.
+	(insns): Remove out of date comments.
+
+	gas/testsuite/
+	* gas/arm/neon-cov.s: Test .u and .s aliases for .i suffixes.
+	* gas/arm/neon-cov.d: Adjust expected output.
+
+	opcodes/
+	* arm-dis.c (neon_opcode): Fix suffix on VMOVN.
+
 2006-09-01  Mark Shinwell  <shinwell@codesourcery.com>
 
 	bfd/
