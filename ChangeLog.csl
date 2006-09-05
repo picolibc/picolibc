@@ -1,3 +1,9 @@
+2006-09-05  Julian Brown  <julian@codesourcery.com>
+
+	gas/
+	* config/tc-arm.c (parse_qfloat_immediate): Disallow integer syntax for
+	floating-point immediates.
+
 2006-09-04  Paul Brook  <paul@codesourcery.com>
 
 	gas/
