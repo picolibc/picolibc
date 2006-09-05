@@ -1,3 +1,13 @@
+2006-09-05  Julian Brown  <julian@codesourcery.com>
+
+	gas/
+	* config/tc-arm.c (parse_qfloat_immediate): Fix hex immediates,
+	handle 0.0 and -0.0 specially.
+
+	gas/testsuite/
+	* gas/arm/neon-const.s: Use FP syntax for 0/-0.
+	* gas/arm/vfp-neon-syntax-inc.s: Likewise, for 1.
+
 2006-09-05  Vladimir Prus  <vladimir@codesourcery.com>
 
 	bfd/
