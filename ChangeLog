@@ -1,3 +1,15 @@
+2006-09-05  Paul Brook  <paul@codesourcery.com>
+
+	gas/
+	* config/tc-arm.c (NEON_ENC_TAB): Fix encoding of vclt, vcle, vaclt
+	and vacle.
+
+	gas/testsuite/
+	* gas/arm/neon-cov.d: Adjust expected output.
+	* gas/arm/neon-omit.s: Add tests for vcgt and vcle.  Reorder vacle
+	and vacle.
+	* gas/arm/neon-omit.d: Adjust expected output.
+
 2006-05-17  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* src-release (MAKEINFOFLAGS): Define.
