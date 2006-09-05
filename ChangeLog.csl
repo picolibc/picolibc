@@ -1,3 +1,15 @@
+2006-09-05  Vladimir Prus  <vladimir@codesourcery.com>
+
+	bfd/
+	* elf32-arm.c (elf32_arm_swap_symbol_out): Remove
+	unconditionall setting of low bit for Thumb symbol
+	mistakenly left behind after check for external
+	symbols was added.
+
+	ld/testsuite/
+	* ld-arm/use-thumb-lib.sym: Use regexps instead of
+	absolute addresses, for robustness.
+
 2006-09-05  Julian Brown  <julian@codesourcery.com>
 
 	gas/
