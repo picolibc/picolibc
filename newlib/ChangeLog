@@ -1,3 +1,8 @@
+2006-09-06  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/vfprintf.c (_vfprintf_r, get_arg): Add 'hh', 'j',
+	't', and 'z' modifiers.
+
 2006-09-01  Kazu Hirata  <kazu@codesourcery.com>
 
 	Merge from newlib-csl-20060320-branch:
