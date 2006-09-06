@@ -29,6 +29,9 @@ THIS SOFTWARE.
 /* Please send bug reports to David M. Gay (dmg at acm dot org,
  * with " at " changed at "@" and " dot " changed to ".").	*/
 
+/* Modified by Danny Smith for inclusion in libmingwex.a
+   Aug 2006  */
+
 #ifndef GDTOA_H_INCLUDED
 #define GDTOA_H_INCLUDED
 
@@ -107,7 +110,6 @@ extern char* __dtoa  ANSI((double d, int mode, int ndigits, int *decpt,
 extern char* __gdtoa ANSI((FPI *fpi, int be, ULong *bits, int *kindp,
 			 int mode, int ndigits, int *decpt, char **rve));
 extern void __freedtoa ANSI((char*));
-
 
 extern int __strtodg ANSI((CONST char*, char**, FPI*, Long*, ULong*));
 extern float  __strtof ANSI((CONST char *, char **));

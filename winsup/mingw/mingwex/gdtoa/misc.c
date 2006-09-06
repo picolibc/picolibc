@@ -36,7 +36,7 @@ THIS SOFTWARE.
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-#define NLOCKS 1
+#define NLOCKS 2
 
 #ifdef USE_WIN32_SL
 /* Use spin locks. */ 
@@ -111,14 +111,11 @@ static void dtoa_unlock(int n)
 
 #endif /* __MINGW32__ */
 
-
 #include "gdtoaimp.h"
-
 
 #ifndef MULTIPLE_THREADS
  char *dtoa_result;
 #endif
-
 
  static Bigint *freelist[Kmax+1];
 #ifndef Omit_Private_Memory
@@ -460,25 +457,6 @@ mult
 	return c;
 	}
 
-#if 1
-/* Returns (*b) * (5**k).  b is modified. */
-/* Re-written by Per Bothner to not need a static list. */
-
-Bigint *
-pow5mult(Bigint *b, int k)
-{
-  static int p05[6] = { 5, 25, 125, 625, 3125, 15625 };
-
-  for (; k > 6; k -= 6)
-    multadd(b, 15625, 0); /* b *= 5**6 */
-  if (k != 0)
-    multadd(b, p05[k-1], 0);
-  return b;
-}
-
-
-#else  /* Original code */
-
  static Bigint *p5s;
 
  Bigint *
@@ -537,7 +515,6 @@ pow5mult
 		}
 	return b;
 	}
-#endif /* Original code */
 
 
  Bigint *

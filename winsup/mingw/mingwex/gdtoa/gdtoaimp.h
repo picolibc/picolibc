@@ -172,9 +172,9 @@ THIS SOFTWARE.
 
 #define INFNAN_CHECK 1
 #define MULTIPLE_THREADS 1
- 
+
 #ifdef DEBUG
-#include "stdio.h"
+#include <stdio.h>
 #define Bug(x) {fprintf(stderr, "%s\n", x); exit(1);}
 #endif
 
@@ -235,7 +235,7 @@ extern Char *MALLOC ANSI((size_t));
 #endif
 
 #else /* ifndef Bad_float_h */
-#include "float.h"
+#include <float.h>
 #endif /* Bad_float_h */
 
 #ifdef IEEE_Arith
@@ -252,7 +252,7 @@ extern Char *MALLOC ANSI((size_t));
 #endif
 
 #ifndef __MATH_H__
-#include "math.h"
+#include <math.h>
 #endif
 
 #ifdef __cplusplus
@@ -479,7 +479,6 @@ extern void memcpy_D2A ANSI((void*, const void*, size_t));
 #define Bcopy(x,y) memcpy(&x->sign,&y->sign,y->wds*sizeof(ULong) + 2*sizeof(int))
 #endif /* NO_STRING_H */
 
-
 #ifdef __GNUC__
 static inline int
 __lo0bits_D2A (ULong *y)
@@ -513,7 +512,6 @@ __hi0bits_D2A (ULong y)
 #define decrement __decrement_D2A
 #define diff __diff_D2A
 #define dtoa_result __dtoa_result_D2A
-#define g__fmt __g__fmt_D2A
 #define gethex __gethex_D2A
 #define hexdig __hexdig_D2A
 #define hexnan __hexnan_D2A

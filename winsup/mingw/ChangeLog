@@ -1,3 +1,9 @@
+2006-09-06  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/gdtoa/misc.c (pow5mult): Restore original code.
+	* mingwex/gdtoa/gdtoa.h. Add comment that files have been modified.
+	* mingwex/gdtoa/gdtoaimp.h: Include system headers with <> brackets.
+
 2006-09-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/gdtoa/(arithchk.c, dmisc.c, dtoa.c, g__fmt.c, g_dfmt.c,
