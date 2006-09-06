@@ -1,3 +1,9 @@
+2006-09-06  Nathan Sidwell  <nathan@codesourcery.com>
+
+	libgloss/
+	* m68k/Makefile.in (CF_SOURCES): New.
+	(install): Install them.
+
 2006-09-01  Paul Brook  <paul@codesourcery.com>
 
 	libgloss/

@@ -143,7 +143,8 @@ CF_BOARDS :=  m5208evb m5213evb m52235evb m5235evb m5272c3 m5282evb \
 	m5329evb m5485evb
 CF_RAM_SCRIPTS := $(patsubst %,%-ram.ld,$(CF_BOARDS))
 CF_ROM_SCRIPTS := $(patsubst %,%-rom.ld,$(CF_BOARDS))
-CF_SCRIPTS=  $(CF_RAM_SCRIPTS) $(CF_ROM_SCRIPTS)
+CF_SCRIPTS = $(CF_RAM_SCRIPTS) $(CF_ROM_SCRIPTS)
+CF_SOURCES = bdm-crt0.S bdm-crt1.c asm.h
 
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
@@ -335,9 +336,11 @@ install:
 	$(INSTALL_PROGRAM) $(MVME162_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(MVME162_BSP)
 	$(INSTALL_DATA) ${srcdir}/mvme162.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/mvme162.ld
 	# install BDM stuff
-	$(INSTALL_PROGRAM) $(BDM_CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(BDM_CRT0)
-	$(INSTALL_PROGRAM) $(BDM_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(BDM_BSP)
-
+	$(INSTALL_DATA) $(BDM_CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(BDM_CRT0)
+	$(INSTALL_DATA) $(BDM_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(BDM_BSP)
+	for src in $(CF_SOURCES) ; \
+	do $(INSTALL_DATA) ${srcdir}/$$src $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$src ; \
+	done
 	$(INSTALL_DATA) ${srcdir}/sbc5204.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/sbc5204.ld
 	$(INSTALL_DATA) ${srcdir}/sbc5206.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/sbc5206.ld
 	for script in $(CF_SCRIPTS) ; \
