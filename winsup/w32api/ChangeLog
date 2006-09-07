@@ -1,3 +1,9 @@
+2006-09-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	[mingw-Bugs-1553275]
+	* include/wingdi.h (SetLayout): Add prototype.
+	(GetLayout): Likewise.
+
 2006-09-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	[mingw-Bugs-1550139]
