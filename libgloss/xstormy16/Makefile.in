@@ -104,7 +104,7 @@ test:
 	${CC} ${CFLAGS_FOR_TARGET} -c $<
 
 clean mostlyclean:
-	rm -f a.out core *.i *.o *-test *.srec *.dis *.x *.hex $(SIM_BSP) $(EVA_APP_BSP) $(EVA_STUB} 
+	rm -f a.out core *.i *.o *-test *.srec *.dis *.x *.hex $(SIM_BSP) $(EVA_APP_BSP) $(EVA_STUB) 
 
 distclean maintainer-clean realclean: clean
 	rm -f Makefile config.status *~

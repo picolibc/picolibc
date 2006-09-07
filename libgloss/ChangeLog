@@ -1,3 +1,7 @@
+2006-09-07  Masaki Muranaka  <monaka@monami-software.com>
+
+	* xstormy16/Makefile.in (clean): Fix a mismatched parenthesis.
+
 2006-09-01  Kazu Hirata  <kazu@codesourcery.com>
 
 	Merge from newlib-csl-20060320-branch:
