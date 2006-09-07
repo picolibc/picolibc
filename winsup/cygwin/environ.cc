@@ -1064,30 +1064,31 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 	  const char *p;
 	  win_env *conv;
 	  len = strcspn (*srcp, "=") + 1;
+	  const char *rest = *srcp + len;
 
 	  /* Check for a bad entry.  This is necessary to get rid of empty
 	     strings, induced by putenv and changing the string afterwards.
 	     Note that this doesn't stop invalid strings without '=' in it
 	     etc., but we're opting for speed here for now.  Adding complete
 	     checking would be pretty expensive. */
-	  if (len == 1)
+	  if (len == 1 || !*rest)
 	    continue;
 
 	  /* See if this entry requires posix->win32 conversion. */
-	  conv = getwinenv (*srcp, *srcp + len, &temp);
+	  conv = getwinenv (*srcp, rest, &temp);
 	  if (conv)
 	    p = conv->native;	/* Use win32 path */
 	  else
 	    p = *srcp;		/* Don't worry about it */
 
-	  len = strlen (p);
+	  len = strlen (p) + 1;
 	  if (len >= 32 * 1024)
 	    {
 	      free (envblock);
 	      envblock = NULL;
 	      goto out;
 	    }
-	  new_tl += len + 1;	/* Keep running total of block length so far */
+	  new_tl += len;	/* Keep running total of block length so far */
 
 	  /* See if we need to increase the size of the block. */
 	  if (new_tl > tl)
@@ -1103,7 +1104,7 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 		}
 	    }
 
-	  memcpy (s, p, len + 1);
+	  memcpy (s, p, len);
 
 	  /* See if environment variable is "special" in a Windows sense.
 	     Under NT, the current directories for visited drives are stored
@@ -1112,7 +1113,7 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 	  if (s[0] == '!' && (isdrive (s + 1) || (s[1] == ':' && s[2] == ':'))
 	      && s[3] == '=')
 	    *s = '=';
-	  s += len + 1;
+	  s += len;
 	}
       *s = '\0';			/* Two null bytes at the end */
       assert ((s - envblock) <= tl);	/* Detect if we somehow ran over end

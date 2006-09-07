@@ -1,3 +1,9 @@
+2006-09-07  Christopher Faylor  <cgf@timesys.com>
+
+	* environ.cc (build_env): Don't put an empty environment variable into
+	the environment.  Optimize use of "len".
+	* errno.cc (ERROR_MORE_DATA): Translate to EMSGSIZE rather than EAGAIN.
+
 2006-08-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* grp.cc (initgroups32): Run get_server_groups under original token.
