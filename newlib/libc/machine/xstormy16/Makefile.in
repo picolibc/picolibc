@@ -55,9 +55,6 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-lib_a_DEPENDENCIES = malloc.o free.o realloc.o calloc.o cfree.o \
-	malign.o valloc.o pvalloc.o mallinfo.o mallstats.o msize.o \
-	mallopt.o mallocr.o freer.o reallocr.o callocr.o
 am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -191,10 +188,24 @@ lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
-lib_a_LIBADD = malloc.o free.o realloc.o calloc.o cfree.o malign.o \
-	valloc.o pvalloc.o mallinfo.o mallstats.o msize.o mallopt.o \
-	mallocr.o freer.o reallocr.o callocr.o
+lib_a_LIBADD = $(lpfx)malloc.o \
+	$(lpfx)free.o \
+	$(lpfx)realloc.o \
+	$(lpfx)calloc.o \
+	$(lpfx)cfree.o \
+	$(lpfx)malign.o \
+	$(lpfx)valloc.o \
+	$(lpfx)pvalloc.o \
+	$(lpfx)mallinfo.o \
+	$(lpfx)mallstats.o \
+	$(lpfx)msize.o \
+	$(lpfx)mallopt.o \
+	$(lpfx)mallocr.o \
+	$(lpfx)freer.o \
+	$(lpfx)reallocr.o \
+	$(lpfx)callocr.o
 
+lib_a_DEPENDENCIES = $(lib_a_LIBADD)
 MALLOC_COMPILE = $(COMPILE)
 all: all-am
 

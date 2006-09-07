@@ -1,3 +1,10 @@
+2006-09-07  Masaki Muranaka  <monaka@monami-software.com>
+
+	* libc/machine/xstormy16/Makefile.am:
+	Add $(lpfx) prefix to LIBADD objects.
+	lib_a_DEPENDENCIES uses the value of lib_a_LIBADD.
+	* libc/machine/xstormy16/Makefile.in: Regenerated.
+
 2006-09-06  Eric Blake  <ebb9@byu.net>
 
 	* libc/stdio/vfprintf.c (_vfprintf_r, get_arg): Add 'hh', 'j',
