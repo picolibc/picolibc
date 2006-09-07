@@ -1,3 +1,12 @@
+2006-09-07  Paul Brook  <paul@codesourcery.com>
+
+	gas/
+	* config/tc-arm.c (insns): Allow ARM IT pseudo-insn on all cores.
+
+	gas/testsuite/
+	* gas/arm/arm-it.s: New test.
+	* gas/arm/arm-it.d: New test.
+
 2006-09-06  Paul Brook  <paul@codesourcery.com>
 
 	gas/
