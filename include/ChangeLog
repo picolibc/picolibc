@@ -1,3 +1,8 @@
+2006-09-07  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* bfdlink.h (bfd_elf_dynamic_list): New.
+	(bfd_link_info): Add a dynamic field.
+
 2006-08-04  Marcelo Tosatti  <marcelo@kvack.org>
 
 	* bfdlink.h (struct bfd_link_info): New field: print_gc_sections.
