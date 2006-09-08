@@ -1,3 +1,11 @@
+2006-09-08  Kazu Hirata  <kazu@codesourcery.com>
+
+	gas/testsuite/
+	Backport
+	2006-09-08  Kazu Hirata  <kazu@codesourcery.com>
+
+	* lib/gas-dg.exp (gas-dg-test): Treat $dir as a literal.
+
 2006-09-07  Paul Brook  <paul@codesourcery.com>
 
 	gas/
