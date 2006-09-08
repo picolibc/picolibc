@@ -6,6 +6,14 @@
 
 	* lib/gas-dg.exp (gas-dg-test): Treat $dir as a literal.
 
+2006-09-07  Mark Mitchell  <mark@codesourcery.com>
+            Nathan Sidwell  <nathan@codesourcery.com>
+	    Vladimir Prus  <vladimir@codesourcery.com>
+
+        * configure.in (TOPLEVEL_CONFIGURE_ARGUMENTS, baseargs): Fix
+        quoting.
+        * configure: Regenerated.
+
 2006-09-07  Paul Brook  <paul@codesourcery.com>
 
 	gas/
