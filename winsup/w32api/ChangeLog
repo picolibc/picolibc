@@ -1,3 +1,11 @@
+2006-09-08  Michael Gerdau  <mgdde@users.sourceforge.net>
+
+	* include/uxtheme.h: (TMT_GRADIENTCOLOR4, TMT_GRADIENTCOLOR5,
+	TMT_SHADOWCOLOR, TMT_GLOWCOLOR, TMT_TEXTBORDERCOLOR,
+	TMT_TEXTSHADOWCOLOR, TMT_GLYPHTEXTCOLOR, TMT_GLYPHTRANSPARENTCOLOR,
+	TMT_FILLCOLORHINT, TMT_BORDERCOLORHINT, TMT_ACCENTCOLORHINT):
+	Increase each constant by 1.
+
 2006-09-07  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	[mingw-Bugs-1553275]
