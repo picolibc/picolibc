@@ -1,3 +1,7 @@
+2006-09-10  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/winuser.h (CS_DROPSHADOW): Define.
+
 2006-09-08  Michael Gerdau  <mgdde@users.sourceforge.net>
 
 	* include/uxtheme.h: (TMT_GRADIENTCOLOR4, TMT_GRADIENTCOLOR5,
