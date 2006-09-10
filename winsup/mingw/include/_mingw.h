@@ -61,7 +61,7 @@
 #  ifndef __MINGW_IMPORT
    /* Note the extern. This is needed to work around GCC's
       limitations in handling dllimport attribute.  */
-#   define __MINGW_IMPORT  extern __attribute__ ((dllimport))
+#   define __MINGW_IMPORT  extern __attribute__ ((__dllimport__))
 #  endif
 #  ifndef _CRTIMP
 #   ifdef __USE_CRTIMP
@@ -152,6 +152,12 @@
 #else
 #define __MINGW_ATTRIB_NONNULL(arg)
 #endif /* GNUC >= 3.3 */
+
+#if  __MINGW_GNUC_PREREQ (3, 1)
+#define __MINGW_ATTRIB_DEPRECATED __attribute__ ((__deprecated__))
+#else
+#define __MINGW_ATTRIB_DEPRECATED
+#endif /* GNUC >= 3.1 */
 
 #ifndef __MSVCRT_VERSION__
 /*  High byte is the major version, low byte is the minor. */

@@ -1,3 +1,10 @@
+2006-09-10  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/_mingw.h (__MINGW_ATTRIB_DEPRECATED): Define.
+	(__MINGW_IMPORT): Ansify.
+	* include/stdlib.h (_sleep, _beep, _seterrormode): Add
+	__MINGW_ATTRIB_DEPRECATED.
+
 2006-09-10  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	* aclocal.m4 (LIB_AC_PROG_CC, LIB_AC_PROG_CC_GNU, LIB_AC_PROG_CXX):

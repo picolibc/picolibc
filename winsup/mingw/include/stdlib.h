@@ -14,7 +14,6 @@
 /* All the headers include this file. */
 #include <_mingw.h>
 
-
 #define __need_size_t
 #define __need_wchar_t
 #define __need_NULL
@@ -383,9 +382,10 @@ _CRTIMP ldiv_t __cdecl	ldiv	(long, long) __MINGW_ATTRIB_CONST;
  * NOTE: Officially the three following functions are obsolete. The Win32 API
  *       functions SetErrorMode, Beep and Sleep are their replacements.
  */
-_CRTIMP void __cdecl	_beep (unsigned int, unsigned int);
-_CRTIMP void __cdecl	_seterrormode (int);
-_CRTIMP void __cdecl	_sleep (unsigned long);
+_CRTIMP void __cdecl	_beep (unsigned int, unsigned int) __MINGW_ATTRIB_DEPRECATED;
+/* Not to be confused with  _set_error_mode (int).  */
+_CRTIMP void __cdecl	_seterrormode (int) __MINGW_ATTRIB_DEPRECATED;
+_CRTIMP void __cdecl	_sleep (unsigned long) __MINGW_ATTRIB_DEPRECATED;
 
 _CRTIMP void __cdecl	_exit	(int) __MINGW_ATTRIB_NORETURN;
 
