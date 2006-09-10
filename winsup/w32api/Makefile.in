@@ -150,8 +150,10 @@ maintainer-clean-top:
 mostlyclean: mostlyclean-top mostlyclean-subdirs
 clean: mostlyclean-top clean-subdirs
 distclean: clean-top
-	rm -f Makefile config.status config.log config.cache TAGS *~
+	$(MAKE) -C lib/directx distclean
+	$(MAKE) -C lib/ddk distclean
 	$(MAKE) -C lib distclean
+	rm -f Makefile config.status config.log config.cache TAGS *~
 maintainer-clean: maintainer-clean-subdirs
 
 .PHONY: lib test 
