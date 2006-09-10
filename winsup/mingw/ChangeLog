@@ -1,3 +1,13 @@
+2006-09-10  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	* aclocal.m4 (LIB_AC_PROG_CC, LIB_AC_PROG_CC_GNU, LIB_AC_PROG_CXX):
+	Redundant macros; deleted.
+
+	* configure.in (LIB_AC_PROG_CC): Replaced by...
+	(AC_PROG_CC): ...this.
+
+	* configure: Regenerated.
+
 2006-09-06  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/gdtoa/misc.c (pow5mult): Restore original code.

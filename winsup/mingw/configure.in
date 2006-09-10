@@ -21,7 +21,7 @@ AC_INIT(dllmain.c)
 
 AC_CANONICAL_SYSTEM
 GCC_NO_EXECUTABLES
-LIB_AC_PROG_CC
+AC_PROG_CC
 
 case "$with_cross_host" in
   ""|*cygwin*) all_dlls_host='all_dlls_host'
@@ -93,3 +93,4 @@ AC_SUBST(W32API_INCLUDE)
 AC_PROG_INSTALL
 AC_OUTPUT(Makefile)
 
+# $RCSfile$: end of file
