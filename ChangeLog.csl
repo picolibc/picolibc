@@ -1,3 +1,10 @@
+2006-09-11  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	libgloss/
+	* arm/Makefile.in (armv7m, lm3s10x, lm3s301, lm3s31x): Swap
+	RAM and ROM.
+	(rdimon, rdpmon): Skip 8k.
+
 2006-09-06  Nathan Sidwell  <nathan@codesourcery.com>
 
 	libgloss/
