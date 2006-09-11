@@ -1,3 +1,9 @@
+2006-09-11  Nathan Sidwell  <nathan@codesourcery.com>
+
+	gas/
+	* config/tc-m68k.c (m68k_register_mcf5210a_ctrl): New.
+	(m68k_cpus): Add 5210a & 5211a.
+
 2006-09-10  Nathan Sidwell  <nathan@codesourcery.com>
 
 	bfd/
