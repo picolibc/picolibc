@@ -83,6 +83,7 @@ SECTIONS
   {
     __data_load = LOADADDR (.data);
     __data_start = .;
+    KEEP(*(.jcr))
     *(.got.plt) *(.got)
     *(.shdata)
     *(.data .data.*)
