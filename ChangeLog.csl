@@ -1,3 +1,41 @@
+2006-09-10  Nathan Sidwell  <nathan@codesourcery.com>
+
+	bfd/
+	* Makefile.am (VERSUFFIX_s): Remove.
+	(bfdver.h): Replace bfd_version_suffix with bfd_version_package.
+	* configure.in: Replace --with-versuffix with --with-pkgversion.
+	* version.h: Remove BFD_VERSION_SUFFIX. Update BFD_VERSION_STRING.
+	* Makefile.in: Rebuilt.
+	* configure: Rebuilt.
+
+	binutils/
+	* Makefile.am (REPORT_BUGS_TO_s): Replace with ...
+	(REPORT_BUGS_TO): ... this.
+	(INCLUDES): Update.
+	* Makefile.in: Rebuilt.
+
+	gas/
+	* Makefile.am (REPORT_BUGS_TO_s): Replace with ...
+	(REPORT_BUGS_TO): ... this.
+	(INCLUDES, DEP_INCLUDES): Update.
+	* Makefile.in: Rebuilt.
+
+	gprof/
+	* Makefile.am (REPORT_BUGS_TO_s): Replace with ...
+	(REPORT_BUGS_TO): ... this.
+	(VERSUFFIX_s): Remove.
+	(INCLUDES): Update.
+	* configure.in: Replace --with-versuffix with --with-pkgversion.
+	* gprof.c (main): Update version printing.
+	* Makefile.in: Rebuilt.
+	* configure: Rebuilt.
+
+	ld/
+	* Makefile.am (REPORT_BUGS_TO_s): Replace with ...
+	(REPORT_BUGS_TO): ... this.
+	(INCLUDES): Update.
+	* Makefile.in: Rebuilt.
+
 2006-09-08  Paul Brook  <paul@codesourcery.com>
 
 	gas/
