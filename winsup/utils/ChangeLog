@@ -1,3 +1,12 @@
+2006-09-12  Christopher Faylor  <cgf@timesys.com>
+
+	* Makefile.in: Fix -ntdll typo.
+
+2006-09-11  Eric Blake  <ebb9@byu.net>
+
+	* cygcheck.cc (main): Restore POSIXLY_CORRECT before displaying user's
+	environment.
+
 2006-08-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (vconcat): Don't convert backslahes to slashes.
@@ -249,7 +258,7 @@
 	* mount.cc (longopts): Fix typo which disallows --options option.
 
 2005-07-19  Christopher Faylor  <cgf@timesys.com>
-            Eric Blake  <ebb9@byu.net>
+	    Eric Blake  <ebb9@byu.net>
 
 	* cygcheck.cc (find_on_path): Perform .exe magic on non-PATH search.
 

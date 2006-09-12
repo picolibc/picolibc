@@ -212,8 +212,8 @@ cygpath.exe: cygpath.o $(ALL_DEP_LDLIBS)
 ifdef VERBOSE
 	$(CXX) -o $@ ${firstword $^} -B$(cygwin_build)/ $(ALL_LDFLAGS) -lntdll
 else
-	@echo $(CXX) -o $@ ${firstword $^} ${filter-out -B%, $(ALL_LDFLAGS) -ntdll};\
-	$(CXX) -o $@ ${firstword $^} -B$(cygwin_build)/ $(ALL_LDFLAGS) -ntdll
+	@echo $(CXX) -o $@ ${firstword $^} ${filter-out -B%, $(ALL_LDFLAGS) -lntdll};\
+	$(CXX) -o $@ ${firstword $^} -B$(cygwin_build)/ $(ALL_LDFLAGS) -lntdll
 endif
 
 %.exe: %.o $(ALL_DEP_LDLIBS)
