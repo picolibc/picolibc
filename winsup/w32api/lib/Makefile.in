@@ -44,7 +44,7 @@ ifneq (,$(findstring cygwin,$(target_alias)))
 inst_includedir:=$(tooldir)/include/w32api
 inst_libdir:=$(tooldir)/lib/w32api
 else
-ifneq (,$with_cross_host)
+ifneq (,$(with_cross_host))
 inst_includedir:=$(tooldir)/include/w32api
 inst_libdir:=$(tooldir)/lib
 else
