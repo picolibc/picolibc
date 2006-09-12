@@ -1,3 +1,12 @@
+2006-09-11  Chris Sutcliffe  <ir0n3h4d@users.sourceforge.net>
+
+	* lib/Makefile.in: fix typo.
+	* lib/ddk/Makefile.in: fix typo.
+	* lib/directx/Makefile.in: fix typo.
+
+	Thanks to Keith Marshall (keithmarshall at users dot sourceforge dot net)
+	for pointing it out.
+
 2006-09-10  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* Makefile.in: Remove files from lib directory with distclean target
