@@ -1,4 +1,9 @@
+2006-09-12  Paul Brook  <paul@codesourcery.com>
+
+	* libc/stdlib/rand.c (srand): Add _REENT_CHECK_RAND48.
+
 2006-09-07  Masaki Muranaka  <monaka@monami-software.com>
+
 
 	* libc/machine/xstormy16/Makefile.am:
 	Add $(lpfx) prefix to LIBADD objects.
