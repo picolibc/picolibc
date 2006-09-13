@@ -1,3 +1,9 @@
+2006-09-13  Patrick Mansfield <patmans@us.ibm.com>
+
+	* libc/include/math.h: Remove _CONST from _LIB_VERSION, as it is
+	supposed to be writable.
+	* libm/common/s_lib_ver.c: Ditto.
+
 2006-09-12  Paul Brook  <paul@codesourcery.com>
 
 	* libc/stdlib/rand.c (srand): Add _REENT_CHECK_RAND48.
