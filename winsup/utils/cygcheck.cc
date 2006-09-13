@@ -1839,7 +1839,7 @@ main (int argc, char **argv)
      user's original environment.  */
   char *posixly = getenv ("POSIXLY_CORRECT");
   if (posixly == NULL)
-  (void) putenv("POSIXLY_CORRECT=1");
+    (void) putenv("POSIXLY_CORRECT=1");
   while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (i)
       {
