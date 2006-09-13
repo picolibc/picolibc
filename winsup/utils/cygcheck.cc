@@ -1835,6 +1835,10 @@ main (int argc, char **argv)
   bool ok = true;
   load_cygwin (argc, argv);
 
+  /* Need POSIX sorting while parsing args, but don't forget the
+     user's original environment.  */
+  char *posixly = getenv ("POSIXLY_CORRECT");
+  if (posixly == NULL)
   (void) putenv("POSIXLY_CORRECT=1");
   while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (i)
@@ -1877,6 +1881,8 @@ main (int argc, char **argv)
        /*NOTREACHED*/}
   argc -= optind;
   argv += optind;
+  if (posixly == NULL)
+    putenv ("POSIXLY_CORRECT=");
 
   if (argc == 0 && !sysinfo && !keycheck && !check_setup && !list_package)
     if (givehelp)
