@@ -45,6 +45,9 @@ extern "C" {
 #define _POSIX_SHARED_MEMORY_OBJECTS	1
 #define _POSIX_SYNCHRONIZED_IO		1
 #define _POSIX_TIMERS			1
+#define _POSIX_BARRIERS                 200112L
+#define _POSIX_READER_WRITER_LOCKS      200112L
+#define _POSIX_SPIN_LOCKS               200112L
 
 
 /* In P1003.1b but defined by drafts at least as early as P1003.1c/D10  */

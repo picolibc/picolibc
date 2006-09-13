@@ -371,6 +371,36 @@ typedef struct {
 #endif
 #endif /* defined(_POSIX_THREADS) */
 
+/* POSIX Barrier Types */
+
+#if defined(_POSIX_BARRIERS)
+typedef __uint32_t pthread_barrier_t;        /* POSIX Barrier Object */
+typedef struct {
+  int   is_initialized;  /* is this structure initialized? */
+#if defined(_POSIX_THREAD_PROCESS_SHARED)
+  int   process_shared;       /* allow this to be shared amongst processes */
+#endif
+} pthread_barrierattr_t;
+#endif /* defined(_POSIX_BARRIERS) */
+
+/* POSIX Spin Lock Types */
+
+#if defined(_POSIX_SPIN_LOCKS)
+typedef __uint32_t pthread_spinlock_t;        /* POSIX Spin Lock Object */
+#endif /* defined(_POSIX_SPIN_LOCKS) */
+
+/* POSIX Reader/Writer Lock Types */
+
+#if defined(_POSIX_READER_WRITER_LOCKS)
+typedef __uint32_t pthread_rwlock_t;         /* POSIX RWLock Object */
+typedef struct {
+  int   is_initialized;       /* is this structure initialized? */
+#if defined(_POSIX_THREAD_PROCESS_SHARED)
+  int   process_shared;       /* allow this to be shared amongst processes */
+#endif
+} pthread_rwlockattr_t;
+#endif /* defined(_POSIX_READER_WRITER_LOCKS) */
+
 #endif  /* !__need_inttypes */
 
 #undef __need_inttypes

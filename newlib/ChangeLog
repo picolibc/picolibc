@@ -1,3 +1,14 @@
+2006-09-13  Joel Sherrill <joel@oarcorp.com>
+
+	* libc/include/pthread.h: Add pthread barriers,
+	rwlocks, and spinlocks.  Change const to
+	_CONST and prefix parameter names with
+	an underscore.
+	* libc/include/sys/types.h: Add id and attribute
+	types for barriers, wrlocks, and spinlocks.
+	* libc/include/sys/features.h: Enable barriers,
+	wrlocks, and spinlocks for RTEMS.
+
 2006-09-13  Patrick Mansfield <patmans@us.ibm.com>
 
 	* libc/include/math.h: Remove _CONST from _LIB_VERSION, as it is
