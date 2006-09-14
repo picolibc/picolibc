@@ -1,3 +1,8 @@
+2006-09-14  Paul Brook  <paul@codesourcery.com>
+
+	* config/tc-arm.c (thumb32_negate_data_op): Consistently use
+	unsigned int to avoid 64-bit host problems.
+
 2006-09-14  Julian Brown  <julian@codesourcery.com>
 
 	gas/
