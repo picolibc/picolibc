@@ -1,3 +1,22 @@
+2006-09-14  Julian Brown  <julian@codesourcery.com>
+
+	gas/
+	* config/tc-arm.c (parse_immediate): Add BOUNDED parameter, rename
+	to...
+	(parse_immediate_maybe_bounded): This. Only bounds-check if BOUNDED
+	is true.
+	(parse_immediate_bounded): New function, with same arguments and
+	semantics as previous parse_immediate.
+	(parse_immediate_unbounded): New function. Parse an unbounded
+	integer (with sizeof (exp.X_add_number)).
+	(parse_big_immediate): Allow for 64-bit exp.X_add_number when
+	parsing 64-bit immediates.
+	(parse_address_main): Use parse_immediate_bounded not
+	parse_immediate.
+	(parse_ror): Likewise.
+	(parse_operands): Likewise. For Neon immediates, use
+	parse_immediate_unbounded. Add new local po_imm_unb_or_fail macro.
+
 2006-09-14  Paul Brook  <paul@codesourcery.com>
 
 	ld/
