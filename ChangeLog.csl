@@ -1,5 +1,11 @@
 2006-09-14  Paul Brook  <paul@codesourcery.com>
 
+	gas/
+	* config/tc-arm.c (s_arm_unwind_movsp): Add offset argument.
+	* doc/c-arm.texi (movsp): Document offset argument.
+
+2006-09-14  Paul Brook  <paul@codesourcery.com>
+
 	* config/tc-arm.c (thumb32_negate_data_op): Consistently use
 	unsigned int to avoid 64-bit host problems.
 
