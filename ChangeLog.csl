@@ -1,3 +1,12 @@
+2006-09-15  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	gdb/testsuite/
+	* gdb.base/args.c (main): Add breakpoint marker.
+	* gdb.base/args.exp: Use args_test for tests.  Add new tests which
+	really test empty arguments.
+	(args_load): Delete.
+	(args_test): New.
+
 2006-08-30  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	gdb/
