@@ -1,3 +1,8 @@
+2006-09-16  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/gdtoa/strtopx.c (strtopx): Fix long double representation
+	of infinity.
+
 2006-09-11  Christopher Faylor  <cgf@timesys.com>
 
 	* Makefile.in: Semi-revert 2006-08-30 change.
