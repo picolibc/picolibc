@@ -1,3 +1,10 @@
+2006-09-16  Paul Brook  <paul@codesourcery.com>
+
+	gas/testsuite/
+	* gas/arm/unwind.s: Test two argument form of .movsp.
+	* gas/arm/unwind.d: Update expected output.
+	* gas/arm/unwind_vxworks.d: Ditto.
+
 2006-09-14  Paul Brook  <paul@codesourcery.com>
 
 	gas/
