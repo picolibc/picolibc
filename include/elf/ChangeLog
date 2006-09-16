@@ -1,3 +1,8 @@
+2006-09-17  Mei Ligang  <ligang@sunnorth.com.cn>
+
+	* score.h: New file.
+	* common.h: Add Score machine number.
+
 2006-07-10  Jakub Jelinek  <jakub@redhat.com>
 
 	* common.h (SHT_GNU_HASH, DT_GNU_HASH): Define.
