@@ -1,5 +1,9 @@
 2006-09-17  Danny Smith  <dannysmith@clear.net.nz>
 
+	* byteorder.h: Correct typo.
+
+2006-09-17  Danny Smith  <dannysmith@clear.net.nz>
+
 	* byteorder.h: Don't #define n* macros if -fnoinline is specified.
 
 2006-09-07  Christopher Faylor  <cgf@timesys.com>
