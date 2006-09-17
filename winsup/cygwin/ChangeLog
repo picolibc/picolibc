@@ -1,3 +1,7 @@
+2006-09-17  Danny Smith  <dannysmith@clear.net.nz>
+
+	* byteorder.h: Don't #define n* macros if -fnoinline is specified.
+
 2006-09-07  Christopher Faylor  <cgf@timesys.com>
 
 	* environ.cc (build_env): Don't put an empty environment variable into

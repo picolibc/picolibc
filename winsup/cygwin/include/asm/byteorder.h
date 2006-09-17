@@ -70,7 +70,7 @@ __ntohs(uint16_t x)
 #define __constant_htonl(x) __constant_ntohl(x)
 #define __constant_htons(x) __constant_ntohs(x)
 
-#ifdef  __OPTIMIZE__
+#if defined (__OPTIMIZE__) && !defined (__NO_NOINLINE__)
 #  define ntohl(x) \
 (__builtin_constant_p((long)(x)) ? \
  __constant_ntohl((x)) : \
