@@ -116,7 +116,7 @@ extern float  __strtof ANSI((CONST char *, char **));
 extern double  __strtod ANSI((CONST char *, char **));
 extern long double strtold ANSI((CONST char *, char **));
 
-extern char*	__g__fmt(char *, char *, char *e, int, ULong);
+extern char*	__g__fmt   ANSI((char *, char *, char *e, int, ULong));
 extern char*	__g_dfmt   ANSI((char*, double*, int, unsigned));
 extern char*	__g_ffmt   ANSI((char*, float*,  int, unsigned));
 extern char*	__g_xfmt   ANSI((char*, void*,   int, unsigned));

@@ -53,9 +53,9 @@ THIS SOFTWARE.
 
 static int
 #ifdef KR_headers
-__strtopx(s, sp, V) CONST char *s; char **sp; void *V;
+__strtopx(s, sp, V) CONST char *s; char **sp; long double *V;
 #else
-__strtopx(CONST char *s, char **sp, void *V)
+__strtopx(CONST char *s, char **sp, long double *V)
 #endif
 {
 	static FPI fpi = { 64, 1-16383-64+1, 32766 - 16383 - 64 + 1, 1, SI };
@@ -108,7 +108,7 @@ __cdecl
 __strtold (const char * __restrict__ src, char ** __restrict__ endptr)
 {
    long double ret;
-   __strtopx(src, endptr, (void*) &ret);
+   __strtopx(src, endptr,  &ret);
    return ret;
 }
 

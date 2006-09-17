@@ -1,3 +1,12 @@
+2006-09-18  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/gdtoa/g_xfmt.c (g_xfmt): Fix representation of infinity.
+	Use fpclassify.
+	* mingwex/gdtoa/strtopx (__strtopx): Avoid cast of long double* to
+	void*.
+	* mingwex/gdtoa/gdtoa.h (__g_fmt): Make declaration consistent with
+	others.
+
 2006-09-16  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/gdtoa/strtopx.c (strtopx): Fix long double representation
