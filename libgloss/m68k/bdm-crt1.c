@@ -39,9 +39,6 @@ void __start1 (void)
   if (hardware_init_hook)
     hardware_init_hook ();
   
-  /* Set the VBR. */
-  __asm__ __volatile__ ("movec.l %0,%/vbr" :: "r" (__interrupt_vector));
-
   /* Initialize memory */
   if (__data_load != __data_start)
     memcpy (__data_start, __data_load, __bss_start - __data_start);
@@ -61,4 +58,19 @@ void __start1 (void)
   
   while (1)
     __reset ();
+}
+
+/* A default hardware init hook.  */
+
+void __attribute__ ((weak)) hardware_init_hook (void)
+{
+  /* Set the VBR. */
+  __asm__ __volatile__ ("movec.l %0,%/vbr" :: "r" (__interrupt_vector));
+
+#ifndef __mcf_family_5213
+  /* Flush & enable the caches */
+  __asm__ __volatile__ ("movec.l %0,%/cacr" :: "r" ((1l << 31) | (1<<24)));
+#endif
+
+  /* Should we drop into user mode here? */
 }

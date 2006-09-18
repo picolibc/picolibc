@@ -196,11 +196,9 @@ bdm-crt1.o : bdm-crt1.c
 bdm-semihost.o : bdm-semihost.S
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $< -o $@
 
-# We need to keep the frame pointer to make sure there's some
-# prologue.  Otherwise we get confused with the semihosting reoutine.
 $(patsubst %,bdm-%.o,${BDM_ISRS}) : bdm-isrs.c
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $< -o $@ \
-	  -DL_$(patsubst bdm-%.o,%,$@) -fno-omit-frame-pointer
+	  -DL_$(patsubst bdm-%.o,%,$@)
 
 #            RAM       ROM
 m5208evb  := 1024M 16M 0M 2M

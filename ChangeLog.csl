@@ -1,6 +1,12 @@
 2006-09-18  Nathan Sidwell  <nathan@codesourcery.com>
 
 	libgloss/
+	* m68k/Makefile.in: Don't force a frame pointer on the ISRs.
+	* m68k/bdm-crt1.c (__start1): Don't set the VBR here.
+	(hardeare_init_hook): Define weakly.  Set VBR here, enable caching
+	if supported.
+
+	libgloss/
 	* m68k/Makefile.in (bdm-semihost.o): Build from bdm-semihost.S.
 	* m68k/bdm-semihost.c: Remove.
 	* m68k/bdm-semihost.S: New.
