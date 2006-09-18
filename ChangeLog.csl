@@ -1,3 +1,22 @@
+2006-09-18  Paul Brook  <paul@codesourcery.com>
+
+	gas/
+	* config/tc-arm.c (parse_immediate_maybe_bounded): Rename back...
+	(parse_immediate): ... to this.  Revert earlier changes.
+	(parse_immediate_bounded): Remove.
+	(parse_immediate_unbounded): Remove.
+	(parse_address_main): Revert earlier changes.
+	(parse_ror): Ditto.
+	(po_imm_unb_or_fail): Remove.
+	(neon_cmode_for_logic_imm): Try smaller element sizes.
+	(neon_cmode_for_move_imm): Ditto.
+	(do_neon_logic): Handle .i64 pseudo-op.
+
+	gas/testsuite/
+	* testsuite/gas/arm/neon-cov.s: Test pseudo-instruction forms of
+	vmov, vmvn and logic immediate instructions.
+	* testsuite/gas/arm/neon-cov.d: ditto.
+
 2006-09-16  Paul Brook  <paul@codesourcery.com>
 
 	gas/testsuite/
