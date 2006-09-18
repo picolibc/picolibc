@@ -40,7 +40,7 @@ int gettimeofday (struct timeval *tv, struct timezone *tz)
       return -1;
     }
   parameters[0] = (uint32_t) &gtv;
-  BDM_TRAP (BDM_GETTIMEOFDAY, (uint32_t)parameters);
+  __bdm_semihost (BDM_GETTIMEOFDAY, parameters);
   convert_from_gdb_timeval (&gtv, tv);
   errno = convert_from_gdb_errno (parameters[1]);
   return parameters[0];

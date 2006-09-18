@@ -39,7 +39,7 @@ int _rename (const char *oldpath, const char *newpath)
   parameters[1] = (uint32_t) strlen (oldpath) + 1;
   parameters[2] = (uint32_t) newpath;
   parameters[3] = (uint32_t) strlen (newpath) + 1;
-  BDM_TRAP (BDM_RENAME, (uint32_t)parameters);
+  __bdm_semihost (BDM_RENAME, parameters);
   errno = convert_from_gdb_errno (parameters[1]);
   return parameters[0];
 }

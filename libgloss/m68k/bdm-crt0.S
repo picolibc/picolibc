@@ -55,7 +55,7 @@ __interrupt_vector:
 	.long __trap12				/* 44 */
 	.long __trap13				/* 45 */
 	.long __trap14				/* 46 */
-	.long __bdm_semihosting			/* 47 */
+	.long __trap15				/* 47 */
 	.long __fp_branch_unordered		/* 48 */
 	.long __fp_inexact_result		/* 49 */
 	.long __fp_divide_by_zero		/* 50 */

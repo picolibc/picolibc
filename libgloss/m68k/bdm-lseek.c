@@ -40,7 +40,7 @@ off_t lseek (int fd, off_t offset, int whence)
   parameters[1] = (uint32_t) ((offset >> 32) & 0xffffffff);
   parameters[2] = (uint32_t) (offset & 0xffffffff);
   parameters[3] = convert_to_gdb_lseek_flags (whence);
-  BDM_TRAP (BDM_LSEEK, (uint32_t)parameters);
+  __bdm_semihost (BDM_LSEEK, parameters);
   errno = convert_from_gdb_errno (parameters[2]);
   return ((uint64_t)parameters[0] << 32) | ((uint64_t)parameters[1]);
 }

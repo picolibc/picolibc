@@ -35,7 +35,7 @@ int unlink (const char *path)
   gdb_parambuf_t parameters;
   parameters[0] = (uint32_t) path;
   parameters[1] = (uint32_t) strlen (path) + 1;
-  BDM_TRAP (BDM_UNLINK, (uint32_t)parameters);
+  __bdm_semihost (BDM_UNLINK, parameters);
   errno = convert_from_gdb_errno (parameters[1]);
   return parameters[0];
 }

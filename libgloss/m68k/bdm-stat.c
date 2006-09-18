@@ -41,7 +41,7 @@ int stat (const char *filename, struct stat *buf)
   parameters[0] = (uint32_t) filename;
   parameters[1] = (uint32_t) strlen (filename) + 1;
   parameters[2] = (uint32_t) &gbuf;
-  BDM_TRAP (BDM_STAT, (uint32_t)parameters);
+  __bdm_semihost (BDM_STAT, parameters);
   convert_from_gdb_stat (&gbuf, buf);
   errno = convert_from_gdb_errno (parameters[1]);
   return parameters[0];

@@ -37,7 +37,7 @@ int _system (const char *command)
   
   parameters[0] = (uint32_t) command;
   parameters[1] = command ? (uint32_t) strlen (command) + 1 : 0;
-  BDM_TRAP (BDM_SYSTEM, (uint32_t)parameters);
+  __bdm_semihost (BDM_SYSTEM, parameters);
   errno = convert_from_gdb_errno (parameters[1]);
   e = parameters[0];
   if (e >= 0 && command)

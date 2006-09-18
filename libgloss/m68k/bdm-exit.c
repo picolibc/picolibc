@@ -27,7 +27,7 @@ void __attribute__ ((noreturn)) _exit (int code)
 {
   while (1)
     {
-      BDM_TRAP (BDM_EXIT, code);
+      __bdm_semihost (BDM_EXIT, (void *)code);
       __reset ();
     }
 }

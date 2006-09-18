@@ -1,3 +1,18 @@
+2006-09-18  Nathan Sidwell  <nathan@codesourcery.com>
+
+	libgloss/
+	* m68k/Makefile.in (bdm-semihost.o): Build from bdm-semihost.S.
+	* m68k/bdm-semihost.c: Remove.
+	* m68k/bdm-semihost.S: New.
+	* m68k/bdm-crt0.S: Don't install semihosting trap handler.
+	* m68k/bdm-close.c, bdm-exit.c, bdm-fstat.c, bdm-gettimeofday.c,
+	bdm-isatty.c, bdm-lseek.c, bdm-open.c, bdm-read.c, bdm-rename.c,
+	bdm-stat.c, bdm-system.c, bdm-unlink.c, bdm-write.c): Update.
+	* m68k/bdm-isrs.c: Update comment.
+	* m68k/bdm-semihost.h (BDM_TRAPNUM, BDM_FUNC_REG, BDM_ARG_REG,
+	BDM_TRAP): Remove.
+	(__bdm_semihost): Declare.
+
 2006-09-15  Nathan Sidwell  <nathan@codesourcery.com>
 
 	libgloss/

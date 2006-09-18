@@ -14,21 +14,6 @@
  * they apply.
  */
 
-/* Semihosting uses a user trap handler containing a HALT
-   instruction.  This wakes the debugger to perform some action.  */
-
-/* This is the semihosting trap hander */
-#define BDM_TRAPNUM 15
-
-/* This register holds the function enumeration for a semihosting
-   command.  */
-#define BDM_FUNC_REG "d0"
-
-/* This register holds the argument for the semihosting call.  For most
-   functions, this is a pointer to a block of memory that holds the input
-   and output parameters for the remote file i/o operation.  */
-#define BDM_ARG_REG  "d1"
-
 /* Codes for BDM_FUNC_REG.  */
 
 #define BDM_EXIT  0
@@ -46,12 +31,4 @@
 #define BDM_ISATTY 12
 #define BDM_SYSTEM 13
 
-/* Here is the macro that generates the trap. */
-
-#define BDM_TRAP(func, arg) \
-  __asm__ __volatile__ ("move.l %0,%/" BDM_ARG_REG "\n" \
-			"moveq %1,%/" BDM_FUNC_REG "\n" \
-			"trap %2" \
-			:: "rmi" (arg), "n" (func), "n" (BDM_TRAPNUM) \
-			: BDM_FUNC_REG,BDM_ARG_REG,"memory")
-
+extern int __bdm_semihost (int func, void *args);

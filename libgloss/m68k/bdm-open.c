@@ -50,7 +50,7 @@ int open (const char *fname, int flags, ...)
     }
   else
     parameters[3] = 0;
-  BDM_TRAP (BDM_OPEN, (uint32_t)parameters);
+  __bdm_semihost (BDM_OPEN, parameters);
   errno = convert_from_gdb_errno (parameters[1]);
   return parameters[0];
 }

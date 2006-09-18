@@ -36,7 +36,7 @@ ssize_t write (int fd, const void *buf, size_t count)
   parameters[0] = (uint32_t) fd;
   parameters[1] = (uint32_t) buf;
   parameters[2] = (uint32_t) count;
-  BDM_TRAP (BDM_WRITE, (uint32_t)parameters);
+  __bdm_semihost (BDM_WRITE, parameters);
   errno = convert_from_gdb_errno (parameters[1]);
   return parameters[0];
 }

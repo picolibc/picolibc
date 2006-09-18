@@ -1,5 +1,5 @@
 /*
- * bdm-semihost.c -- 
+ * bdm-semihost.S -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,12 +14,22 @@
  * they apply.
  */
 
-/* Semihosting trap.  The debugger intercepts this and
-   performs the semihosting action.  Then the program resumes as
-   usual.  This function must be compiled without a frame pointer, so
-   we know the halt instruction is the very first instuction.  */
+/* Semihosting function.  The debugger intercepts the halt, and
+   determines that it is followed by the magic movec pattern. */
+
+	.globl __bdm_semihost
+__bdm_semihost:
+	linkw %fp,#0
+	movel %fp@(8),%d0
+	movel %fp@(12),%d1
+	.align 4
+	nop
+	halt
 	
-void __attribute__ ((interrupt_handler)) __bdm_semihosting (void) 
-{
-  __asm__ __volatile__ ("halt" ::: "memory");
-}
+	/* This sentinel instruction value must be aligned to a 4 byte
+	 * boundary and be immediately after the halt instruction.  The
+	 * debugger will adjust the pc, so that it is never executed.  */
+	
+	.long 0x4e7b0000
+	unlk %fp
+	rts

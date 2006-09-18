@@ -20,10 +20,7 @@
 
    These interrupt handlers are entered whenever the associated
    interrupt occurs.  All they do is stop the debugger to give the user
-   the opportunity to determine where the problem was.
-  
-   User trap BDM_TRAPNUM (15) is used for semi hosting support.
-   If you replace this one, semihosting will cease to function. */
+   the opportunity to determine where the problem was.  */
 
 
 /* Each ISR is a loop containing a halt instruction  */
