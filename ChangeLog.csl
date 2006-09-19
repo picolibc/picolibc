@@ -1,3 +1,47 @@
+2006-09-19  Mark Shinwell  <shinwell@codesourcery.com>
+            Joseph Myers  <joseph@codesourcery.com>
+            Ian Lance Taylor  <ian@wasabisystems.com>
+            Ben Elliston  <bje@wasabisystems.com>
+
+	bfd/
+	* archures.c: Add definition for bfd_mach_arm_iWMMXt2.
+	* cpu-arm.c (processors): Add bfd_mach_arm_iWMMXt2.
+	(arch_info_struct, bfd_arm_update_notes): Likewise.
+	(architectures): Likewise.
+	(bfd_arm_merge_machines): Check for iWMMXt2.
+	* bfd-in2.h: Rebuild.
+
+	gas/
+	* config/tc-arm.c (enum operand_parse_code): New code OP_RIWR_I32z.
+	(parse_operands): Handle OP_RIWR_I32z.
+	(do_iwmmxt_wmerge): New function.
+	(do_iwmmxt_wldstd): Handle iwmmxt2 case where second operand is
+	a register.
+	(do_iwmmxt_wrwrwr_or_imm5): New function.
+	(insns): Mark instructions as RIWR_I32z as appropriate.
+	Also add torvsc<b,h,w>, wabs<b,h,w>, wabsdiff<b,h,w>,
+	waddbhus<l,m>, waddhc, waddwc, waddsubhx, wavg4{r}, wmaddu{x,n},
+	wmadds{x,n}, wmerge, wmiaxy{n}, wmiawxy{n}, wmul<sm,um>{r},
+	wmulw<um,sm,l>{r}, wqmiaxy{n}, wqmulm{r}, wqmulwm{r}, wsubaddhx.
+	(md_begin): Handle IWMMXT2.
+	(arm_cpus): Add iwmmxt2.
+	(arm_extensions): Likewise.
+	(arm_archs): Likewise.
+
+	gas/testsuite/
+	* gas/arm/iwmmxt2.s: New file.
+	* gas/arm/iwmmxt2.d: New file.
+
+	opcodes/
+	* arm-dis.c (coprocessor_opcodes): The X-qualifier to WMADD may
+	only be used with the default multiply-add operation, so if N is
+	set, don't bother printing X.  Add new iwmmxt instructions.
+	(IWMMXT_INSN_COUNT): Update.
+	(iwmmxt_wwssnames): Qualify "wwss" names at index 2, 6, 10 and 14
+	with a 'c' suffix.
+	(print_insn_coprocessor): Check for iWMMXt2.  Handle format
+	specifiers 'r', 'i'.
+
 2006-09-18  Paul Brook  <paul@codesourcery.com>
 
 	gas/
