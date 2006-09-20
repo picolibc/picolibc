@@ -181,6 +181,31 @@ LD=${LD-ld}
 AC_SUBST(LD)
 AC_PROG_RANLIB
 
+AC_CACHE_CHECK(for .preinit_array/.init_array/.fini_array support,
+	       libc_cv_initfinit_array, [dnl
+cat > conftest.c <<EOF
+int _start (void) { return 0; }
+int __start (void) { return 0; }
+int foo (void) { return 1; }
+int (*fp) (void) __attribute__ ((section (".init_array"))) = foo;
+EOF
+if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS $LDFLAGS -o conftest conftest.c
+		   -static -nostartfiles -nostdlib 1>&AS_MESSAGE_LOG_FD])
+then
+  if readelf -S conftest | grep -e INIT_ARRAY > /dev/null; then
+    libc_cv_initfinit_array=yes
+  else
+    libc_cv_initfinit_array=no
+  fi
+else
+  libc_cv_initfinit_array=no
+fi
+rm -f conftest*])
+AC_SUBST(libc_cv_initfinit_array)
+if test $libc_cv_initfinit_array = yes; then
+  AC_DEFINE_UNQUOTED(HAVE_INITFINI_ARRAY)
+fi
+
 host_makefile_frag=${srcdir}/config/default.mh
 
 dnl We have to assign the same value to other variables because autoconf

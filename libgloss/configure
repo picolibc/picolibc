@@ -1031,6 +1031,40 @@ else
 fi
 
 
+echo $ac_n "checking for .preinit_array/.init_array/.fini_array support""... $ac_c" 1>&6
+echo "configure:1036: checking for .preinit_array/.init_array/.fini_array support" >&5
+if eval "test \"`echo '$''{'libc_cv_initfinit_array'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  cat > conftest.c <<EOF
+int _start (void) { return 0; }
+int __start (void) { return 0; }
+int foo (void) { return 1; }
+int (*fp) (void) __attribute__ ((section (".init_array"))) = foo;
+EOF
+if { ac_try='${CC} $CFLAGS $CPPFLAGS $LDFLAGS -o conftest conftest.c
+		   -static -nostartfiles -nostdlib 1>&AS_MESSAGE_LOG_FD'; { (eval echo configure:1047: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; }
+then
+  if readelf -S conftest | grep -e INIT_ARRAY > /dev/null; then
+    libc_cv_initfinit_array=yes
+  else
+    libc_cv_initfinit_array=no
+  fi
+else
+  libc_cv_initfinit_array=no
+fi
+rm -f conftest*
+fi
+
+echo "$ac_t""$libc_cv_initfinit_array" 1>&6
+
+if test $libc_cv_initfinit_array = yes; then
+  cat >> confdefs.h <<EOF
+#define HAVE_INITFINI_ARRAY 1
+EOF
+
+fi
+
 host_makefile_frag=${srcdir}/config/default.mh
 
 host_makefile_frag_path=$host_makefile_frag
@@ -1207,6 +1241,7 @@ s%@AS@%$AS%g
 s%@AR@%$AR%g
 s%@LD@%$LD%g
 s%@RANLIB@%$RANLIB%g
+s%@libc_cv_initfinit_array@%$libc_cv_initfinit_array%g
 s%@host_makefile_frag_path@%$host_makefile_frag_path%g
 /@host_makefile_frag@/r $host_makefile_frag
 s%@host_makefile_frag@%%g

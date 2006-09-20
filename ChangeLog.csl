@@ -1,5 +1,11 @@
 2006-09-20  Paul Brook  <paul@codesourcery.com>
 
+	libgloss/
+	* configure.in: Add check for .init_array.
+	* configure: Regenerate.
+
+2006-09-20  Paul Brook  <paul@codesourcery.com>
+
 	newlib/
 	* libc/stdlib/rand.c (srand): Add _REENT_CHECK_RAND48.
 
