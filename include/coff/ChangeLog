@@ -1,3 +1,15 @@
+2006-09-20  Kai Tietz  <Kai.Tietz@onevision.com>
+
+	* external.h: Add proper external_aouthdr64 structure (without
+	data_start member).
+	(AOUTHDRSZ64): Set according structure size.
+	(AOUTHDR64): As typedef of external_aouthdr64 structure.
+	* internal.h: Add relocation identifiers for coff.
+	* pe.h:	Add define IMAGE_FILE_MACHINE_AMD64 the coff signature.
+	(PEPAOUTHDR): Adjust structure to have proper size (using AOUTHDR64).
+	(PEPAOUTSZ): Calculated size of 240.
+	* x86_64.h: Coff information for x86_64 (AMD64).
+
 2006-02-05  Arnold Metselaar  <arnold.metselaar@planet.nl>
 
 	* internal.h: Add relocation number R_IMM24 for Z80.
