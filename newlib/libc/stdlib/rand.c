@@ -72,7 +72,8 @@ on two different systems.
 void
 _DEFUN (srand, (seed), unsigned int seed)
 {
-        _REENT_RAND_NEXT(_REENT) = seed;
+  _REENT_CHECK_RAND48(_REENT);
+  _REENT_RAND_NEXT(_REENT) = seed;
 }
 
 int
