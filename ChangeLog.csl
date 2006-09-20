@@ -1,5 +1,10 @@
 2006-09-20  Paul Brook  <paul@codesourcery.com>
 
+	newlib/
+	* libc/include/sys/reent.h: Define and use __reent_assert.
+
+2006-09-20  Paul Brook  <paul@codesourcery.com>
+
 	libgloss/
 	* arm/arm.sc: Add .gnu.linkonce and .ARM.extab sections.
 
