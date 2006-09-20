@@ -33,7 +33,7 @@ SECTIONS
   {
     CREATE_OBJECT_SYMBOLS
     ${ROM:+*(.isr_vector)}
-    *(.text .text.*)
+    *(.text .text.* .gnu.linkonce.t.*)
     *(.plt)
     *(.gnu.warning)
     *(.glue_7t) *(.glue_7)
@@ -49,8 +49,9 @@ SECTIONS
     KEEP (*(SORT(.dtors.*)))
     KEEP (*crtend.o(.dtors))
 
-    *(.rodata .rodata.*)
+    *(.rodata .rodata.* .gnu.linkonce.r.*)
 
+    *(.ARM.extab .gnu.linkonce.armextab.*)
     *(.gcc_except_table) 
     *(.eh_frame_hdr)
     *(.eh_frame)
@@ -86,7 +87,7 @@ SECTIONS
     KEEP(*(.jcr))
     *(.got.plt) *(.got)
     *(.shdata)
-    *(.data .data.*)
+    *(.data .data.* .gnu.linkonce.d.*)
     . = ALIGN (4);
     _edata = .;
   } >ram ${ROM:+AT>rom}
@@ -95,7 +96,7 @@ SECTIONS
   {
     __bss_start__ = . ;
     *(.shbss)
-    *(.bss .bss.*)
+    *(.bss .bss.* .gnu.linkonce.b.*)
     *(COMMON)
     . = ALIGN (8);
     __bss_end__ = .;
