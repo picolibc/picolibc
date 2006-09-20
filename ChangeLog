@@ -1,3 +1,9 @@
+2006-09-20  Thiemo Seufer  <ths@mips.com>
+
+	* configure.in: Remove redundant handling of mips*-dec-bsd*. Likewise
+	for mipstx39-*-*. Disable libgloss for mips64*-*-linux*.
+	* configure: Regenerate.
+
 2006-08-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* configure.in: Never build newlib for a Mingw host.
