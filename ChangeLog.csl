@@ -1,3 +1,9 @@
+2006-09-21  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	gdb/
+	* infrun.c (handle_inferior_event): Always clear stop_stack_dummy.
+	Don't check it for load events.
+
 2006-09-15  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	gdb/testsuite/
