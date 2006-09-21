@@ -1,3 +1,9 @@
+2006-09-21  Paul Brook  <paul@codesourcery.com>
+
+	newlib/
+	* libc/include/sys/reent.h (_reent): Adjust _REENT_SMALL to be binary
+	compatible with normal layout
+
 2006-09-20  Paul Brook  <paul@codesourcery.com>
 
 	newlib/
