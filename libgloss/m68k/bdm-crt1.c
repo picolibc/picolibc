@@ -69,7 +69,9 @@ void __attribute__ ((weak)) hardware_init_hook (void)
 
 #ifndef __mcf_family_5213
   /* Flush & enable the caches */
-  __asm__ __volatile__ ("movec.l %0,%/cacr" :: "r" ((1l << 31) | (1<<24)));
+#define CACR_CINV (1 << 24)
+#define CACR_CENB (1 << 31)
+  __asm__ __volatile__ ("movec.l %0,%/cacr" :: "r" (CACR_CINV | CACR_CENB));
 #endif
 
   /* Should we drop into user mode here? */

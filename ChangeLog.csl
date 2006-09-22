@@ -1,3 +1,8 @@
+2006-09-22  Nathan Sidwell  <nathan@codesourcery.com>
+
+	libgloss/
+	* m68k/bdm-crt1.c (hardware_init_hook): Use #defines for CACR bits.
+
 2006-09-21  Paul Brook  <paul@codesourcery.com>
 
 	newlib/
