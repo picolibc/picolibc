@@ -459,8 +459,9 @@ struct _reent
 /* Only built the assert() calls if we are built with debugging.  */
 #if DEBUG 
 #include <assert.h>
+#define __reent_assert(x) assert(x)
 #else
-#define assert(x) ((void)0)
+#define __reent_assert(x) ((void)0)
 #endif
 
 /* Generic _REENT check macro.  */
@@ -468,7 +469,7 @@ struct _reent
   struct _reent *_r = (var); \
   if (_r->what == NULL) { \
     _r->what = (type)malloc(size); \
-    assert(_r->what); \
+    __reent_assert(_r->what); \
     init; \
   } \
 } while (0)

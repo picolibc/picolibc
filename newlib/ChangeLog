@@ -1,3 +1,7 @@
+2006-09-22  Paul Brook  <paul@codesourcery.com>
+
+	* libc/include/sys/reent.h: Define and use __reent_assert.
+
 2006-09-13  Joel Sherrill <joel@oarcorp.com>
 
 	* libc/include/pthread.h: Add pthread barriers,
