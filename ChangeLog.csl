@@ -1,3 +1,10 @@
+2006-09-25  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	gdb/testsuite/
+	* gdb.arch/thumb-prologue.c: Update breakpoint mechanism.  Restore
+	lr before returning for completeness.
+	* gdb.arch/thumb-prologue.exp: Update to set a breakpoint.
+
 2006-09-21  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	gdb/
