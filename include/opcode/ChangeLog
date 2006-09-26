@@ -1,3 +1,10 @@
+2006-09-26  Mark Shinwell  <shinwell@codesourcery.com>
+            Joseph Myers  <joseph@codesourcery.com>
+            Ian Lance Taylor  <ian@wasabisystems.com>
+            Ben Elliston  <bje@wasabisystems.com>
+
+	* arm.h (ARM_CEXT_IWMMXT2, ARM_ARCH_IWMMXT2): Define.
+
 2006-09-17  Mei Ligang  <ligang@sunnorth.com.cn>
 
 	* score-datadep.h: New file.
