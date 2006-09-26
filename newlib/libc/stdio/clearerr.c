@@ -64,7 +64,7 @@ _VOID
 _DEFUN(clearerr, (fp),
        FILE * fp)
 {
-  CHECK_INIT(_REENT);
+  CHECK_INIT(_REENT, fp);
   _flockfile (fp);
   __sclearerr (fp);
   _funlockfile (fp);

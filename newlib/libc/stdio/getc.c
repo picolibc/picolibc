@@ -91,7 +91,7 @@ _DEFUN(_getc_r, (ptr, fp),
        register FILE *fp)
 {
   int result;
-  CHECK_INIT (ptr);
+  CHECK_INIT (ptr, fp);
   _flockfile (fp);
   result = __sgetc_r (ptr, fp);
   _funlockfile (fp);
@@ -105,7 +105,7 @@ _DEFUN(getc, (fp),
        register FILE *fp)
 {
   int result;
-  CHECK_INIT (_REENT);
+  CHECK_INIT (_REENT, fp);
   _flockfile (fp);
   result = __sgetc_r (_REENT, fp);
   _funlockfile (fp);

@@ -131,7 +131,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
 
   /* Make sure stdio is set up.  */
 
-  CHECK_INIT (ptr);
+  CHECK_INIT (ptr, fp);
 
   _flockfile (fp);
 

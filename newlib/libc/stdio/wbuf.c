@@ -42,7 +42,7 @@ _DEFUN(__swbuf_r, (ptr, c, fp),
 
   /* Ensure stdio has been initialized.  */
 
-  CHECK_INIT (ptr);
+  CHECK_INIT (ptr, fp);
 
   /*
    * In case we cannot write, or longjmp takes us out early,

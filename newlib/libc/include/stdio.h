@@ -455,9 +455,11 @@ static __inline int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
 #define	__sclearerr(p)	((void)((p)->_flags &= ~(__SERR|__SEOF)))
 #define	__sfileno(p)	((p)->_file)
 
+#ifndef _REENT_SMALL
 #define	feof(p)		__sfeof(p)
 #define	ferror(p)	__sferror(p)
 #define	clearerr(p)	__sclearerr(p)
+#endif
 
 #if 0 /*ndef __STRICT_ANSI__ - FIXME: must initialize stdio first, use fn */
 #define	fileno(p)	__sfileno(p)

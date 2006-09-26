@@ -76,7 +76,7 @@ _DEFUN(_fclose_r, (rptr, fp),
 
   __sfp_lock_acquire ();
 
-  CHECK_INIT (rptr);
+  CHECK_INIT (rptr, fp);
 
   _flockfile (fp);
   

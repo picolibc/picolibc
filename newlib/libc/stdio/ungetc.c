@@ -81,7 +81,7 @@ _DEFUN(_ungetc_r, (rptr, c, fp),
      ??? Might be able to remove this as some other stdio routine should
      have already been called to get the char we are un-getting.  */
 
-  CHECK_INIT (rptr);
+  CHECK_INIT (rptr, fp);
 
   _flockfile (fp);
   

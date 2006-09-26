@@ -79,7 +79,7 @@ _DEFUN(__getdelim, (bufptr, n, delim, fp),
       *n = DEFAULT_LINE_SIZE;
     }
 
-  CHECK_INIT (_REENT);
+  CHECK_INIT (_REENT, fp);
 
   _flockfile (fp);
 

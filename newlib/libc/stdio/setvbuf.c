@@ -104,7 +104,7 @@ _DEFUN(setvbuf, (fp, buf, mode, size),
 {
   int ret = 0;
 
-  CHECK_INIT (_REENT);
+  CHECK_INIT (_REENT, fp);
 
   _flockfile (fp);
 

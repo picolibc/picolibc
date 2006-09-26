@@ -67,7 +67,7 @@ _DEFUN(fflush, (fp),
   if (fp == NULL)
     return _fwalk (_GLOBAL_REENT, fflush);
 
-  CHECK_INIT (_REENT);
+  CHECK_INIT (_REENT, fp);
 
   _flockfile (fp);
 

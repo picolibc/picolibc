@@ -34,7 +34,7 @@ _DEFUN(__swsetup, (fp),
 {
   /* Make sure stdio is set up.  */
 
-  CHECK_INIT (_REENT);
+  CHECK_INIT (_REENT, fp);
 
   /*
    * If we are not writing, we had better be reading and writing.

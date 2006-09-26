@@ -96,7 +96,7 @@ _DEFUN(_fgets_r, (ptr, buf, n, fp),
 
   s = buf;
 
-  CHECK_INIT(ptr);
+  CHECK_INIT(ptr, fp);
 
   _flockfile (fp);
 #ifdef __SCLE

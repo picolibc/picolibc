@@ -86,7 +86,7 @@ _DEFUN(_fputs_r, (ptr, s, fp),
   uio.uio_iov = &iov;
   uio.uio_iovcnt = 1;
 
-  CHECK_INIT(ptr);
+  CHECK_INIT(ptr, fp);
 
   _flockfile (fp);
   result = __sfvwrite_r (ptr, fp, &uio);

@@ -43,7 +43,7 @@ _DEFUN(__srefill_r, (ptr, fp),
 {
   /* make sure stdio is set up */
 
-  CHECK_INIT (_REENT);
+  CHECK_INIT (_REENT, fp);
 
   fp->_r = 0;			/* largely a convenience for callers */
 
