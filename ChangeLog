@@ -1,3 +1,7 @@
+2006-09-26  Ben Elliston  <bje@au.ibm.com>
+
+	* config.sub, config.guess: Update from upstream sources.
+
 2006-09-20  Thiemo Seufer  <ths@mips.com>
 
 	* configure.in: Remove redundant handling of mips*-dec-bsd*. Likewise
