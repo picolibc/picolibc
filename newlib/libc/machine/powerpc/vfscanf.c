@@ -224,7 +224,7 @@ _DEFUN (vfscanf, (fp, fmt, ap),
     _CONST char *fmt _AND 
     va_list ap)
 {
-  CHECK_INIT(_REENT);
+  CHECK_INIT(_REENT, fp);
   return __svfscanf_r (_REENT, fp, fmt, ap);
 }
 

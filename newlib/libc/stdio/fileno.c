@@ -54,7 +54,7 @@ _DEFUN(fileno, (f),
        FILE * f)
 {
   int result;
-  CHECK_INIT (_REENT);
+  CHECK_INIT (_REENT, f);
   _flockfile (f);
   result = __sfileno (f);
   _funlockfile (f);

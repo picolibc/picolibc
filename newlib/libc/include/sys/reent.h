@@ -13,6 +13,8 @@ extern "C" {
 #include <_ansi.h>
 #include <sys/_types.h>
 
+#define _NULL 0
+
 #ifndef __Long
 #if __LONG_MAX__ == 2147483647L
 #define __Long long
@@ -157,8 +159,8 @@ struct __sFILE_fake {
 
   struct _reent *_data;
 };
-/* CHECK_INIT() comes from stdio/local.h; be sure to include that.  */
-# define _REENT_SMALL_CHECK_INIT(ptr) CHECK_INIT(ptr)
+/* CHECK_STD_INIT() comes from stdio/local.h; be sure to include that.  */
+# define _REENT_SMALL_CHECK_INIT(ptr) CHECK_STD_INIT(ptr)
 #else
 # define _REENT_SMALL_CHECK_INIT(ptr) /* nothing */
 #endif
@@ -383,16 +385,19 @@ struct _reent
 
   struct _glue __sglue;			/* root of glue chain */
   __FILE *__sf;			        /* file descriptors */
-  struct __sFILE_fake __sf_fake;	/* fake initial stdin/out/err */
   struct _misc_reent *_misc;            /* strtok, multibyte states */
   char *_signal_buf;                    /* strsignal */
 };
 
+extern const struct __sFILE_fake __sf_fake_stdin;
+extern const struct __sFILE_fake __sf_fake_stdout;
+extern const struct __sFILE_fake __sf_fake_stderr;
+
 #define _REENT_INIT(var) \
-  { (__FILE *)&var.__sf_fake, \
-    (__FILE *)&var.__sf_fake, \
-    (__FILE *)&var.__sf_fake, \
-    0, \
+  { 0, \
+    (__FILE *)&__sf_fake_stdin, \
+    (__FILE *)&__sf_fake_stdout, \
+    (__FILE *)&__sf_fake_stderr, \
     0, \
     _NULL, \
     0, \
@@ -411,15 +416,14 @@ struct _reent
     {_NULL, 0, {_NULL}, _NULL}, \
     {_NULL, 0, _NULL}, \
     _NULL, \
-    {_NULL, 0, 0, 0, 0, {_NULL, 0}, 0, _NULL}, \
     _NULL, \
     _NULL \
   }
 
 #define _REENT_INIT_PTR(var) \
-  { var->_stdin = (__FILE *)&var->__sf_fake; \
-    var->_stdout = (__FILE *)&var->__sf_fake; \
-    var->_stderr = (__FILE *)&var->__sf_fake; \
+  { var->_stdin = (__FILE *)&__sf_fake_stdin; \
+    var->_stdout = (__FILE *)&__sf_fake_stdout; \
+    var->_stderr = (__FILE *)&__sf_fake_stderr; \
     var->_errno = 0; \
     var->_inc = 0; \
     var->_emergency = _NULL; \
@@ -444,15 +448,6 @@ struct _reent
     var->__sglue._niobs = 0; \
     var->__sglue._iobs = _NULL; \
     var->__sf = 0; \
-    var->__sf_fake._p = _NULL; \
-    var->__sf_fake._r = 0; \
-    var->__sf_fake._w = 0; \
-    var->__sf_fake._flags = 0; \
-    var->__sf_fake._file = 0; \
-    var->__sf_fake._bf._base = _NULL; \
-    var->__sf_fake._bf._size = 0; \
-    var->__sf_fake._lbfsize = 0; \
-    var->__sf_fake._data = _NULL; \
     var->_misc = _NULL; \
     var->_signal_buf = _NULL; \
   }
@@ -786,8 +781,6 @@ struct _reent
 #define _REENT_GETDATE_ERR_P(ptr) (&((ptr)->_new._reent._getdate_err))
 
 #endif /* !_REENT_SMALL */
-
-#define _NULL 0
 
 /*
  * All references to struct _reent are via this pointer.

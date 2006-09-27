@@ -66,7 +66,7 @@ _DEFUN(ferror, (fp),
        FILE * fp)
 {
   int result;
-  CHECK_INIT(_REENT);
+  CHECK_INIT(_REENT, fp);
   _flockfile (fp);
   result = __sferror (fp);
   _funlockfile (fp);

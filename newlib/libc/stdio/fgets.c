@@ -80,7 +80,7 @@ _DEFUN(fgets, (buf, n, fp),
 
   s = buf;
 
-  CHECK_INIT(_REENT);
+  CHECK_INIT(_REENT, fp);
 
   _flockfile (fp);
 #ifdef __SCLE

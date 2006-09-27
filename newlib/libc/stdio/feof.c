@@ -57,7 +57,7 @@ _DEFUN(feof, (fp),
        FILE * fp)
 {
   int result;
-  CHECK_INIT(_REENT);
+  CHECK_INIT(_REENT, fp);
   _flockfile (fp);
   result = __sfeof (fp);
   _funlockfile (fp);

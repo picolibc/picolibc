@@ -49,7 +49,31 @@ extern int   _EXFUN(__srefill,(FILE *fp));
 
 /* Called by the main entry point fns to ensure stdio has been initialized.  */
 
-#define CHECK_INIT(ptr) \
+#ifdef _REENT_SMALL
+#define CHECK_INIT(ptr, fp) \
+  do						\
+    {						\
+      if ((ptr) && !(ptr)->__sdidinit)		\
+	__sinit (ptr);				\
+      if ((fp) == (FILE *)&__sf_fake_stdin)	\
+	(fp) = stdin;				\
+      else if ((fp) == (FILE *)&__sf_fake_stdout) \
+	(fp) = stdout;				\
+      else if ((fp) == (FILE *)&__sf_fake_stderr) \
+	(fp) = stderr;				\
+    }						\
+  while (0)
+#else /* !_REENT_SMALL   */
+#define CHECK_INIT(ptr, fp) \
+  do						\
+    {						\
+      if ((ptr) && !(ptr)->__sdidinit)		\
+	__sinit (ptr);				\
+    }						\
+  while (0)
+#endif /* !_REENT_SMALL  */
+
+#define CHECK_STD_INIT(ptr) \
   do						\
     {						\
       if ((ptr) && !(ptr)->__sdidinit)		\

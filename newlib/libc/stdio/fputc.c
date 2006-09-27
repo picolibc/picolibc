@@ -67,7 +67,7 @@ _DEFUN(fputc, (ch, file),
        FILE * file)
 {
   int result;
-  CHECK_INIT(_REENT);
+  CHECK_INIT(_REENT, file);
    _flockfile (file);
   result = putc (ch, file);
   _funlockfile (file);

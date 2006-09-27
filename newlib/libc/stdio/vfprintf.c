@@ -533,7 +533,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	    (u_long)GET_ARG (N, ap, u_int))
 #endif
 
-	CHECK_INIT (data);
+	CHECK_INIT (data, fp);
 	_flockfile (fp);
 
 	/* sorry, fprintf(read_only_file, "") returns EOF, not 0 */

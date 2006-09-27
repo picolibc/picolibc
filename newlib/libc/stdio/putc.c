@@ -81,7 +81,7 @@ _DEFUN(putc, (c, fp),
        register FILE *fp)
 {
   int result;
-  CHECK_INIT (_REENT);
+  CHECK_INIT (_REENT, fp);
   _flockfile (fp);
   result = __sputc (c, fp);
   _funlockfile (fp);

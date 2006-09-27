@@ -107,7 +107,7 @@ _DEFUN(_ftell_r, (ptr, fp),
 
   /* Ensure stdio is set up.  */
 
-  CHECK_INIT (ptr);
+  CHECK_INIT (ptr, fp);
 
   _flockfile (fp);
 

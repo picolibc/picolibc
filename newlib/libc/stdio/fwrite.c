@@ -99,7 +99,7 @@ _DEFUN(fwrite, (buf, size, count, fp),
    * generally slow and since this occurs whenever size==0.
    */
 
-  CHECK_INIT(_REENT);
+  CHECK_INIT(_REENT, fp);
 
   _flockfile (fp);
   if (__sfvwrite (fp, &uio) == 0)

@@ -439,9 +439,6 @@ static __inline int __sputc(int _c, FILE *_p) {
 #define	__sclearerr(p)	((void)((p)->_flags &= ~(__SERR|__SEOF)))
 #define	__sfileno(p)	((p)->_file)
 
-#define	feof(p)		__sfeof(p)
-#define	ferror(p)	__sferror(p)
-#define	clearerr(p)	__sclearerr(p)
 
 #if 0 /*ndef __STRICT_ANSI__ - FIXME: must initialize stdio first, use fn */
 #define	fileno(p)	__sfileno(p)

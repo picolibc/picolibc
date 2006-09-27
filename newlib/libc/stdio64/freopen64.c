@@ -99,7 +99,7 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
 
   __sfp_lock_acquire ();
 
-  CHECK_INIT (ptr);
+  CHECK_INIT (ptr, fp);
 
   _flockfile(fp);
 

@@ -1,3 +1,49 @@
+2006-09-17  Paul Brook  <paul@codesourcery.com>
+
+	newlib/
+	Backport form mainline
+	2006-09-26  Jeff Johnston  <jjohnstn@redhat.com>
+	* libc/include/stdio.h: Do not allow macros
+	for clearerr, feof, or fileno.
+	* libc/include/sys/reent.h[_REENT_SMALL](struct _reent): Change 
+	the dummy std stream scheme to use pointers to const external 
+	fake files, one for each standard stream.
+	* libc/stdio/local.h (CHECK_INIT): Change to take a file pointer
+	argument.  For _REENT_SMALL, reset the file pointer if it
+	matches one of the fake std stream pointers.
+	* libc/stdio/clearerr.c: Fix CHECK_INIT macro to add file pointer
+	argument.
+	* libc/stdio/fclose.c: Ditto.
+	* libc/stdio/feof.c: Ditto.
+	* libc/stdio/ferror.c: Ditto.
+	* libc/stdio/fflush.c: Ditto.
+	* libc/stdio/fgetc.c: Ditto.
+	* libc/stdio/fgets.c: Ditto.
+	* libc/stdio/fileno.c: Ditto.
+	* libc/stdio/findfp.c: Ditto.
+	* libc/stdio/fputc.c: Ditto.
+	* libc/stdio/fputs.c: Ditto.
+	* libc/stdio/fread.c: Ditto.
+	* libc/stdio/freopen.c: Ditto.
+	* libc/stdio/fseek.c: Ditto.
+	* libc/stdio/ftell.c: Ditto.
+	* libc/stdio/fwrite.c: Ditto.
+	* libc/stdio/getc.c: Ditto.
+	* libc/stdio/getdelim.c: Ditto.
+	* libc/stdio/putc.c: Ditto.
+	* libc/stdio/refill.c: Ditto.
+	* libc/stdio/setvbuf.c: Ditto.
+	* libc/stdio/ungetc.c: Ditto.
+	* libc/stdio/vfprintf.c: Ditto.
+	* libc/stdio/vfscanf.c: Ditto.
+	* libc/stdio/wbuf.c: Ditto.: Ditto.
+	* libc/stdio/wsetup.c: Ditto.
+	* libc/stdio64/freopen64.c: Ditto.
+	* libc/stdio64/fseeko64.c: Ditto.
+	* libc/stdio64/ftello64.c: Ditto.
+	* libc/machine/powerpc/vfprintf.c: Ditto.
+	* libc/machine/powerpc/vfscanf.c: Ditto.
+
 2006-09-22  Nathan Sidwell  <nathan@codesourcery.com>
 
 	libgloss/
