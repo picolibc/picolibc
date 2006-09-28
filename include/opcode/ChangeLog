@@ -1,3 +1,7 @@
+2006-09-28  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* i386.h: Replace CpuMNI with CpuSSSE3.
+
 2006-09-26  Mark Shinwell  <shinwell@codesourcery.com>
             Joseph Myers  <joseph@codesourcery.com>
             Ian Lance Taylor  <ian@wasabisystems.com>
