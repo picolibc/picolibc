@@ -1,3 +1,52 @@
+2006-09-28  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	gdb/
+	* buildsym.c, symtab.c: Add local hack for FILENAME_CMP testing.
+	* utils.c (cygwin_filename_cmp): New.
+
+	Backport:
+	2006-04-21  Frederic Riss  <frederic.riss@st.com>
+	* dwarf2read.c (dwarf2_start_subfile): Change prototype to accept
+	compilation directory as last argument. 
+	Always pass comp_dir as second argument to start_subfile and prepend
+	dirname to the filename when necessary. 
+	Remove now superfluous search for pre-existing subfile.
+	(dwarf_decode_lines): Pass the compilation directory to
+	dwarf2_start_subfile.
+
+	gdb/testsuite/
+	* config/symbian.exp (gdb_target_symbian): Handle a running target.
+	(gdb_load): Add return value.
+
+	* gdb.base/completion.exp: Test arg rather than a.  Handle
+	very small lists of symbols.
+
+	* gdb.base/list.exp: Differentiate run behavior based on
+	use_gdb_stub.
+
+	* gdb.base/maint.exp: Accept local symbols.  Accept missing .data.
+
+	* gdb.base/remote.exp: Update packet limits.
+
+	* gdb.base/varargs.exp: Don't pass an empty list item.
+
+	* lib/gdb.exp (fullname_syntax): Recognize forward slashes in DOS
+	paths.
+
+	Backport:
+	2006-06-22  Daniel Jacobowitz  <dan@codesourcery.com>
+	* gdb.base/gdb1555.exp: Use gdb_compile_shlib.  Skip if not
+	native.
+
+	2006-06-22  Daniel Jacobowitz  <dan@codesourcery.com>
+	* gdb.stabs/exclfwd.exp: Skip the test if configure did not
+	enable stabs testing.
+
+	2006-05-06  Ulrich Weigand  <Ulrich.Weigand@de.ibm.com>
+	* gdb.mi/mi-basics.exp: Add missing serial number to 
+	expected output in some mi_gdb_test statements.
+	* gdb.mi/mi2-basics.exp: Likewise.
+
 2006-09-25  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	gdb/testsuite/
