@@ -1,3 +1,9 @@
+2006-09-29  Nathan Sidwell  <nathan@codesourcery.com>
+
+	binutils/
+	* ar.c (usage): Pass s to list_supported_targets.
+	* cxxfilt.c (usage): Print bug url when giving help.
+
 2006-09-28  Mark Shinwell  <shinwell@codesourcery.com>
 
 	include/
