@@ -15,7 +15,7 @@
  */
 
 /* Semihosting function.  The debugger intercepts the halt, and
-   determines that it is followed by the magic movec pattern. */
+   determines that it is followed by the sentinel pattern. */
 
 	.globl __bdm_semihost
 __bdm_semihost:
@@ -23,13 +23,16 @@ __bdm_semihost:
 	movel %fp@(8),%d0
 	movel %fp@(12),%d1
 	.align 4
+
+	/* The halt sequence must be 'nop; halt' and aligned to a 4 byte
+	    boundary.  */
 	nop
 	halt
 	
-	/* This sentinel instruction value must be aligned to a 4 byte
-	 * boundary and be immediately after the halt instruction.  The
-	 * debugger will adjust the pc, so that it is never executed.  */
-	
-	.long 0x4e7b0000
+	/* This sentinel instruction value must be immediately after
+	   the halt instruction.  The debugger will adjust the pc, so
+	   that it is never executed.  This instruction is
+	   'movec %sp,0'.  */
+	.long 0x4e7bf000
 	unlk %fp
 	rts
