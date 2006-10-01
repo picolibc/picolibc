@@ -51,7 +51,7 @@ SECTIONS
 
     *(.rodata .rodata.* .gnu.linkonce.r.*)
 
-    *(.ARM.extab .gnu.linkonce.armextab.*)
+    *(.ARM.extab* .gnu.linkonce.armextab.*)
     *(.gcc_except_table) 
     *(.eh_frame_hdr)
     *(.eh_frame)
