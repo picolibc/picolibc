@@ -1,3 +1,12 @@
+2006-10-02  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	Backport:
+	2006-06-15  Daniel Jacobowitz  <dan@codesourcery.com>
+	* Makefile.def (fixincludes): Correct extra_configure_flags
+	typo.
+	(expat): Don't install.  Don't build shared libraries.
+	* Makefile.in: Regenerated.
+
 2006-09-28  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	gdb/
