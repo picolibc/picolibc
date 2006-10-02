@@ -203,7 +203,11 @@ FUNC(_socketcall_tail)
 	bl _socketcall
 	pop { r3 }
 	add sp, #16
+#if (__ARM_ARCH__ > 4) || defined(__ARM_ARCH_4T__)
 	bx r3
+#else
+	mov pc, r3
+#endif
 	SIZE(_socketcall_tail)
 
 #define SOCKETCALL2(name, NAME) SOCKETCALL(name, NAME)

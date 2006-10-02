@@ -1,3 +1,8 @@
+2006-10-02  Nick Clifton  <nickc@redhat.com>
+
+	* arm/linux-syscalls0.c: Add arm architecture flag
+	checks around bx insn.
+
 2006-09-07  Masaki Muranaka  <monaka@monami-software.com>
 
 	* xstormy16/Makefile.in (clean): Fix a mismatched parenthesis.
