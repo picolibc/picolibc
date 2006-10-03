@@ -1,3 +1,11 @@
+2006-10-03  Joseph Myers  <joseph@codesourcery.com>
+
+	ld/
+	* configure.tgt (i[3-7]86-*-linux-*): Also define
+	targ_extra_libpath in want64 case.
+	* emulparams/elf_x86_64.sh: Handle i[3-7]86-*-linux-* the same as
+	x86_64*-linux*.
+
 2006-09-29  Nathan Sidwell  <nathan@codesourcery.com>
 
 	binutils/
