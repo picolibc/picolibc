@@ -27,7 +27,6 @@ I_RpcDeleteMutex@4
 I_RpcFree@4
 I_RpcFreeBuffer@4
 I_RpcGetAssociationContext@4
-_imp__I_RpcGetAssociationContext@4
 I_RpcGetBuffer@4
 I_RpcGetCurrentCallHandle@0
 I_RpcIOAlerted@4
@@ -41,9 +40,7 @@ I_RpcRequestMutex@4
 I_RpcSendReceive@4
 I_RpcServerRegisterForwardFunction@4
 I_RpcSetAssociationContext@4
-_imp__I_RpcSetAssociationContext@4
 I_RpcSsDontSerializeContext@0
-_imp__I_RpcSsDontSerializeContext@0
 I_RpcStopMonitorAssociation@4
 I_RpcTransClientMaxFrag@4
 I_RpcTransClientReallocBuffer@16
@@ -68,15 +65,10 @@ MesHandleFree@4
 MesIncrementalHandleReset@24
 MesInqProcEncodingId@12
 NDRCContextBinding@4
-_imp__NDRCContextBinding@4
 NDRCContextMarshall@8
-_imp__NDRCContextMarshall@8
 NDRCContextUnmarshall@16
-_imp__NDRCContextUnmarshall@16
 NDRSContextMarshall@12
-_imp__NDRSContextMarshall@12
 NDRSContextUnmarshall@8
-_imp__NDRSContextUnmarshall@8
 NDRcopy@12
 NdrAllocate@8
 NdrByteCountPointerBufferSize@12
@@ -88,9 +80,7 @@ NdrCStdStubBuffer_Release@8
 NdrClearOutParameters@12
 NdrClientCall
 NdrClientContextMarshall@12
-_imp__NdrClientContextMarshall@12
 NdrClientContextUnmarshall@12
-_imp__NdrClientContextUnmarshall@12
 NdrClientInitialize@16
 NdrClientInitializeNew@16
 NdrComplexArrayBufferSize@12
@@ -128,7 +118,6 @@ NdrConformantVaryingStructMarshall@12
 NdrConformantVaryingStructMemorySize@8
 NdrConformantVaryingStructUnmarshall@16
 NdrContextHandleSize@12
-_imp__NdrContextHandleSize@12
 NdrConvert@8
 NdrDllCanUnloadNow@4
 NdrDllGetClassObject@24
@@ -203,9 +192,7 @@ NdrRpcSsEnableAllocate@4
 NdrSendReceive@8
 NdrServerCall@4
 NdrServerContextMarshall@12
-_imp__NdrServerContextMarshall@12
 NdrServerContextUnmarshall@4
-_imp__NdrServerContextUnmarshall@4
 NdrServerInitialize@12
 NdrServerInitializeMarshall@8
 NdrServerInitializeNew@12
@@ -314,7 +301,6 @@ RpcServerUseProtseqW@12
 RpcSmAllocate@8
 RpcSmClientFree@4
 RpcSmDestroyClientContext@4
-_imp__RpcSmDestroyClientContext@4
 RpcSmDisableAllocate@0
 RpcSmEnableAllocate@0
 RpcSmFree@4
@@ -324,7 +310,6 @@ RpcSmSetThreadHandle@4
 RpcSmSwapClientAllocFree@16
 RpcSsAllocate@4
 RpcSsDestroyClientContext@4
-_imp__RpcSsDestroyClientContext@4
 RpcSsDisableAllocate@0
 RpcSsEnableAllocate@0
 RpcSsFree@4

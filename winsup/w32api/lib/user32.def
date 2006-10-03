@@ -338,7 +338,6 @@ GetUserObjectInformationW@20
 GetUserObjectSecurity@20
 GetWindow@8
 GetWindowContextHelpId@4
-_imp__GetWindowContextHelpId@4
 GetWindowDC@4
 GetWindowInfo@8
 GetWindowLongA@8
@@ -535,7 +534,6 @@ SetLastErrorEx@8
 SetLayeredWindowAttributes@16
 SetMenu@8
 SetMenuContextHelpId@8
-_imp__SetMenuContextHelpId@8
 SetMenuDefaultItem@12
 SetMenuInfo@8
 SetMenuItemBitmaps@20
@@ -565,7 +563,6 @@ SetUserObjectInformationW@16
 SetUserObjectSecurity@12
 SetWinEventHook@28
 SetWindowContextHelpId@8
-_imp__SetWindowContextHelpId@8
 SetWindowLongA@12
 SetWindowLongW@12
 SetWindowPlacement@8
