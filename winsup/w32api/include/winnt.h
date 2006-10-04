@@ -67,6 +67,9 @@ extern "C" {
 #endif
 #endif
 
+#ifndef C_ASSERT
+#define C_ASSERT(expr) typedef char __C_ASSERT__[(expr)?1:-1]
+#endif
 
 #ifndef VOID
 #define VOID void

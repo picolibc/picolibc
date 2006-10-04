@@ -1,3 +1,14 @@
+2006-10-04  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/rpc.h: Add whitespace.
+	* include/winnt.h (C_ASSERT): Define.
+
+2006-10-04  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	[mingw-Bugs-1568067]
+	* include/winuser.h: (DISP_CHANGE_BADDUALVIEW): Define.
+	* include/wingdi.h: (DM_POSITION): Define.
+
 2006-10-03  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/rpcrt4.def: Remove "_imp__"-prefixed export symbols.
@@ -26,6 +37,7 @@
 	TMT_SHADOWCOLOR, TMT_GLOWCOLOR, TMT_TEXTBORDERCOLOR,
 	TMT_TEXTSHADOWCOLOR, TMT_GLYPHTEXTCOLOR, TMT_GLYPHTRANSPARENTCOLOR,
 	TMT_FILLCOLORHINT, TMT_BORDERCOLORHINT, TMT_ACCENTCOLORHINT):
+
 	Increase each constant by 1.
 
 2006-09-07  Danny Smith  <dannysmith@users.sourceforge.net>

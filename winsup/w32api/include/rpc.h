@@ -4,7 +4,7 @@
 
 #ifndef _RPC_H
 #define _RPC_H
-#if __GNUC__ >=3
+#if __GNUC__ >= 3
 #pragma GCC system_header
 #endif
 
