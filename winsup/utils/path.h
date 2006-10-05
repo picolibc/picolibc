@@ -9,3 +9,9 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 char *cygpath (const char *s, ...);
+bool is_exe (HANDLE);
+bool is_symlink (HANDLE);
+bool readlink (HANDLE, char *, int);
+int get_word (HANDLE, int);
+int get_dword (HANDLE, int);
+

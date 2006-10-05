@@ -249,9 +249,41 @@ init_paths ()
     }
 }
 
+#define LINK_EXTENSION ".lnk"
+
+static bool
+check_existence (char *file, int showall, int foundone, char *first)
+{
+  if (GetFileAttributes (file) != (DWORD) - 1)
+    {
+      char *lastdot = strrchr (file, '.');
+      bool is_link = lastdot && !strcmp (lastdot, LINK_EXTENSION);
+      // If file is a link, fix up the extension before printing
+      if (is_link)
+	*lastdot = '\0';
+      if (showall)
+	printf ("Found: %s\n", file);
+      if (foundone)
+	{
+	  char *flastdot = strrchr (first, '.');
+	  bool f_is_link = flastdot && !strcmp (flastdot, LINK_EXTENSION);
+	  // if first is a link, fix up the extension before printing
+	  if (f_is_link)
+	    *flastdot = '\0';
+	  printf ("Warning: %s hides %s\n", first, file);
+	  if (f_is_link)
+	    *flastdot = '.';
+	}
+      if (is_link)
+	*lastdot = '.';
+      return true;
+    }
+  return false;
+}
+
 static char *
 find_on_path (char *file, char *default_extension,
-	      int showall = 0, int search_sysdirs = 0)
+	      int showall = 0, int search_sysdirs = 0, int checklinks = 0)
 {
   static char rv[4000];
   char tmp[4000], *ptr = rv;
@@ -270,11 +302,21 @@ find_on_path (char *file, char *default_extension,
 
   if (strchr (file, ':') || strchr (file, '\\') || strchr (file, '/'))
     {
+      // FIXME: this will find "foo" before "foo.exe" -- contrary to Windows
       char *fn = cygpath (file, NULL);
       if (access (fn, F_OK) == 0)
 	return fn;
       strcpy (rv, fn);
       strcat (rv, default_extension);
+      if (access (rv, F_OK) == 0)
+	return rv;
+      if (!checklinks)
+	return fn;
+      strcat (rv, LINK_EXTENSION);
+      if (access (rv, F_OK) == 0)
+	return rv;
+      strcpy (rv, fn);
+      strcat (rv, LINK_EXTENSION);
       return access (rv, F_OK) == 0 ? strdup (rv) : fn;
     }
 
@@ -286,14 +328,25 @@ find_on_path (char *file, char *default_extension,
       if (i == 0 || !search_sysdirs || strcasecmp (paths[i], paths[0]))
 	{
 	  sprintf (ptr, "%s\\%s%s", paths[i], file, default_extension);
-	  if (GetFileAttributes (ptr) != (DWORD) - 1)
-	    {
-	      if (showall)
-		printf ("Found: %s\n", ptr);
-	      if (ptr == tmp && verbose)
-		printf ("Warning: %s hides %s\n", rv, ptr);
-	      ptr = tmp;
-	    }
+	  if (check_existence (ptr, showall, ptr == tmp && verbose, rv))
+	    ptr = tmp;
+
+	  if (!checklinks)
+	    continue;
+
+	  sprintf (ptr, "%s\\%s%s%s", paths[i], file, default_extension, LINK_EXTENSION);
+	  if (check_existence (ptr, showall, ptr == tmp && verbose, rv))
+	    ptr = tmp;
+
+	  if (!*default_extension)
+	    continue;
+
+	  sprintf (ptr, "%s\\%s", paths[i], file);
+	  if (check_existence (ptr, showall, ptr == tmp && verbose, rv))
+	    ptr = tmp;
+	  sprintf (ptr, "%s\\%s%s", paths[i], file, LINK_EXTENSION);
+	  if (check_existence (ptr, showall, ptr == tmp && verbose, rv))
+	    ptr = tmp;
 	}
     }
 
@@ -328,38 +381,6 @@ already_did (char *file)
   d->state = DID_NEW;
   did = d;
   return d;
-}
-
-static int
-get_word (HANDLE fh, int offset)
-{
-  short rv;
-  unsigned r;
-
-  if (SetFilePointer (fh, offset, 0, FILE_BEGIN) == INVALID_SET_FILE_POINTER
-      && GetLastError () != NO_ERROR)
-    display_error ("get_word: SetFilePointer()");
-
-  if (!ReadFile (fh, &rv, 2, (DWORD *) &r, 0))
-    display_error ("get_word: Readfile()");
-
-  return rv;
-}
-
-static int
-get_dword (HANDLE fh, int offset)
-{
-  int rv;
-  unsigned r;
-
-  if (SetFilePointer (fh, offset, 0, FILE_BEGIN) == INVALID_SET_FILE_POINTER
-      && GetLastError () != NO_ERROR)
-    display_error ("get_dword: SetFilePointer()");
-
-  if (!ReadFile (fh, &rv, 4, (DWORD *) &r, 0))
-    display_error ("get_dword: Readfile()");
-
-  return rv;
 }
 
 struct Section
@@ -505,6 +526,8 @@ dll_info (const char *path, HANDLE fh, int lvl, int recurse)
   DWORD junk;
   int i;
   int pe_header_offset = get_dword (fh, 0x3c);
+  if (GetLastError () != NO_ERROR)
+    display_error ("get_dword");
   int opthdr_ofs = pe_header_offset + 4 + 20;
   unsigned short v[6];
 
@@ -528,12 +551,24 @@ dll_info (const char *path, HANDLE fh, int lvl, int recurse)
     printf ("\n");
 
   int num_entries = get_dword (fh, opthdr_ofs + 92);
+  if (GetLastError () != NO_ERROR)
+    display_error ("get_dword");
   int export_rva = get_dword (fh, opthdr_ofs + 96);
+  if (GetLastError () != NO_ERROR)
+    display_error ("get_dword");
   int export_size = get_dword (fh, opthdr_ofs + 100);
+  if (GetLastError () != NO_ERROR)
+    display_error ("get_dword");
   int import_rva = get_dword (fh, opthdr_ofs + 104);
+  if (GetLastError () != NO_ERROR)
+    display_error ("get_dword");
   int import_size = get_dword (fh, opthdr_ofs + 108);
+  if (GetLastError () != NO_ERROR)
+    display_error ("get_dword");
 
   int nsections = get_word (fh, pe_header_offset + 4 + 2);
+  if (nsections == -1)
+    display_error ("get_word");
   char *sections = (char *) malloc (nsections * 40);
 
   if (SetFilePointer (fh, pe_header_offset + 4 + 20 +
@@ -682,7 +717,20 @@ track_down (char *file, char *suffix, int lvl)
 
   d->state = DID_ACTIVE;
 
-  dll_info (path, fh, lvl, 1);
+  if (is_exe (fh))
+    dll_info (path, fh, lvl, 1);
+  else if (is_symlink (fh))
+    printf (" - Found a symlink instead of a DLL\n");
+  else
+    {
+      int magic = get_word (fh, 0x0);
+      if (magic == -1)
+        display_error ("get_word");
+      magic &= 0x00FFFFFF;
+      printf (" - Not a DLL: magic number %x (%d) '%s'\n",
+              magic, magic, (char *)&magic);
+    }
+
   d->state = DID_INACTIVE;
   if (!CloseHandle (fh))
     display_error ("track_down: CloseHandle()");
@@ -711,11 +759,56 @@ ls (char *f)
     display_error ("ls: CloseHandle()");
 }
 
+// Find a real application on the path (possibly following symlinks)
+static char *
+find_app_on_path (char *app, int showall = 0)
+{
+  char *papp = find_on_path (app, (char *) ".exe", showall, 0, 1);
+
+  HANDLE fh =
+    CreateFile (papp, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+		NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  if (fh == INVALID_HANDLE_VALUE)
+    {
+      printf (" - Cannot open\n");
+      return NULL;
+    }
+
+  if (is_symlink (fh))
+    {
+      static char tmp[4000] = "";
+      char *ptr;
+      if (!readlink (fh, tmp, 3999))
+	display_error("readlink failed");
+      ptr = cygpath (tmp, NULL);
+      for (char *p = ptr; (p = strchr (p, '/')); p++)
+	*p = '\\';
+      printf (" -> %s\n", ptr);
+      if (!strchr (ptr, '\\'))
+	{
+	  char *lastsep;
+	  strncpy (tmp, cygpath (papp, NULL), 3999);
+	  for (char *p = tmp; (p = strchr (p, '/')); p++)
+	    *p = '\\';
+	  lastsep = strrchr (tmp, '\\');
+	  strncpy (lastsep+1, ptr, 3999-(lastsep-tmp));
+	  ptr = tmp;
+	}
+      if (!CloseHandle (fh))
+	display_error ("find_app_on_path: CloseHandle()");
+      return find_app_on_path (ptr, showall);
+    }
+
+  if (!CloseHandle (fh))
+    display_error ("find_app_on_path: CloseHandle()");
+  return papp;
+}
+
 // Return true on success, false if error printed
 static bool
 cygcheck (char *app)
 {
-  char *papp = find_on_path (app, (char *) ".exe", 1, 0);
+  char *papp = find_app_on_path (app, 1);
   if (!papp)
     {
       printf ("Error: could not find %s\n", app);
@@ -1441,7 +1534,7 @@ dump_sysinfo ()
     printf
       ("Looking to see where common programs can be found, if at all...\n");
   for (i = 0; common_apps[i].name; i++)
-    if (!find_on_path ((char *) common_apps[i].name, (char *) ".exe", 1, 0))
+    if (!find_app_on_path ((char *) common_apps[i].name, 1))
       {
 	if (common_apps[i].missing_is_good)
 	  printf ("Not Found: %s (good!)\n", common_apps[i].name);

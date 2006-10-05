@@ -1,3 +1,23 @@
+2006-10-05  Igor Peshansky  <pechtcha@cs.nyu.edu>
+
+	* cygcheck.cc (get_word, get_dword): Move to path.cc.
+	(LINK_EXTENSION): New macro.
+	(check_existence): New static function.
+	(find_on_path): Check for symbolic links if asked.
+	(dll_info): New error handling.
+	(track_down): Only call dll_info() for executables, display
+	an error for symlinks, and print magic number for others.
+	(find_app_on_path): New static function.
+	(cygcheck, dump_sysinfo): Call find_app_on_path() instead of
+	find_on_path().
+	* path.cc (cmp_shortcut_header): New static function.
+	(get_word, get_dword): Moved from cygcheck.cc.
+	(EXE_MAGIC, SHORTCUT_MAGIC, SYMLINK_COOKIE, SYMLINK_MAGIC): New
+	macros.
+	(is_exe, is_symlink, readlink): New functions.
+	* path.h (is_exe, is_symlink, readlink): Declare.
+	(get_word, get_dword): Ditto.
+
 2006-09-12  Christopher Faylor  <cgf@timesys.com>
 
 	* Makefile.in: Fix -ntdll typo.
