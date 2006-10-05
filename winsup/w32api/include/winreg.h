@@ -41,6 +41,11 @@ extern "C" {
 #define REG_NOTIFY_CHANGE_LAST_SET 4
 #define REG_NOTIFY_CHANGE_SECURITY 8
 
+#if (WINVER >= 0x0502)
+#define KEY_WOW64_32KEY 0x0200
+#define KEY_WOW64_64KEY 0x0100
+#endif
+
 #ifndef RC_INVOKED
 typedef ACCESS_MASK REGSAM;
 typedef struct value_entA {
@@ -68,6 +73,10 @@ WINADVAPI LONG WINAPI RegCreateKeyExW(HKEY,LPCWSTR,DWORD,LPWSTR,DWORD,REGSAM,LPS
 WINADVAPI LONG WINAPI RegCreateKeyW(HKEY,LPCWSTR,PHKEY);
 WINADVAPI LONG WINAPI RegDeleteKeyA(HKEY,LPCSTR);
 WINADVAPI LONG WINAPI RegDeleteKeyW(HKEY,LPCWSTR);
+#if (WINVER >= 0x0502)
+WINADVAPI LONG WINAPI RegDeleteKeyExA(HKEY,LPCSTR,REGSAM,DWORD);
+WINADVAPI LONG WINAPI RegDeleteKeyExW(HKEY,LPCWSTR,REGSAM,DWORD);
+#endif
 WINADVAPI LONG WINAPI RegDeleteValueA(HKEY,LPCSTR);
 WINADVAPI LONG WINAPI RegDeleteValueW(HKEY,LPCWSTR);
 WINADVAPI LONG WINAPI RegEnumKeyA(HKEY,DWORD,LPSTR,DWORD);
@@ -115,6 +124,9 @@ typedef VALENTW VALENT,*PVALENT;
 #define RegCreateKey RegCreateKeyW
 #define RegCreateKeyEx RegCreateKeyExW
 #define RegDeleteKey RegDeleteKeyW
+#if (WINVER >= 0x0502)
+#define RegDeleteKeyEx RegDeleteKeyExW
+#endif
 #define RegDeleteValue RegDeleteValueW
 #define RegEnumKey RegEnumKeyW
 #define RegEnumKeyEx RegEnumKeyExW
@@ -140,6 +152,9 @@ typedef VALENTA VALENT,*PVALENT;
 #define RegCreateKey RegCreateKeyA
 #define RegCreateKeyEx RegCreateKeyExA
 #define RegDeleteKey RegDeleteKeyA
+#if (WINVER >= 0x0502)
+#define RegDeleteKeyEx RegDeleteKeyExA
+#endif
 #define RegDeleteValue RegDeleteValueA
 #define RegEnumKey RegEnumKeyA
 #define RegEnumKeyEx RegEnumKeyExA

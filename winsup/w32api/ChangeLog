@@ -1,3 +1,10 @@
+2006-10-05  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winreg.h (RegDeleteKeyEx{A|W}): Add prototype and UNICODE
+	mappings.
+	(KEY_WOW64_32KEY, KEY_WOW64_64KEY): Define. 
+	* lib/advapi.def (RegDeleteKeyEx{A|W}): Export.
+
 2006-10-04  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/rpc.h: Add whitespace.
