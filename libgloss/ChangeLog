@@ -1,3 +1,8 @@
+2006-10-06  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* Makefile.in: Add CFLAGS_FOR_TARGET and CCASFLAGS to
+	FLAGS_TO_PASS.
+
 2006-10-03  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* arm/linux-syscalls0.c: Rewrite bx insn architecture flag check 
