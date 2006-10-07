@@ -1,5 +1,5 @@
 /*
- * bdm-open.c -- 
+ * cf-sbrk.c -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *

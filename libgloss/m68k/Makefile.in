@@ -1,4 +1,4 @@
-# Copyright (c) 1995, 1996, 2001 Cygnus Support
+# Copyright (c) 1995, 1996, 2001 Cygnus Support  -*- mode:makefile -*-
 #
 # The authors hereby grant permission to use, copy, modify, distribute,
 # and license this software and its documentation for any purpose, provided
@@ -118,18 +118,29 @@ IDPGDB_BSP=	libidpgdb.a
 IDPGDB_OBJS=	leds.o idp-inbyte.o idp-gdb-outbyte.o mc68ec.o
 
 #
-# here's all the BDM semihosting stuff
+# here's all the unhosted stuff
 #
-BDM_CRT0=	bdm-crt0.o
-BDM_BSP=	libbdm.a
-BDM_OBJS=	bdm-crt1.o bdm-semihost.o $(BDM_SYSOBJS) \
-		$(patsubst %,bdm-%.o,${BDM_ISRS})
-BDM_OTHER_OBJS=	getpid.o kill.o
-BDM_SYSOBJS= 	bdm-close.o bdm-exit.o bdm-fstat.o bdm-gdb.o \
-		bdm-gettimeofday.o bdm-isatty.o bdm-lseek.o \
-		bdm-open.o bdm-read.o bdm-rename.o bdm-sbrk.o \
-		bdm-stat.o bdm-system.o bdm-time.o bdm-unlink.o bdm-write.o
-BDM_ISRS=	other_interrupt reset access_error address_error \
+UNHOSTED_BSP=	libunhosted.a
+UNHOSTED_OBJS=	unhosted-close.o unhosted-fstat.o \
+		unhosted-gettimeofday.o unhosted-isatty.o unhosted-lseek.o \
+		unhosted-open.o unhosted-read.o unhosted-rename.o \
+		unhosted-stat.o unhosted-system.o unhosted-time.o \
+		unhosted-unlink.o unhosted-write.o
+
+#
+# here's all the hosted stuff
+#
+HOSTED_BSP=	libhosted.a
+HOSTED_OBJS=	hosted-gdb.o hosted-exit.o $(patsubst un%,%,$(UNHOSTED_OBJS))
+
+#
+# here's all the ColdFire boards
+#
+CF_CRT0=	cf-crt0.o
+CF_BSP=		libcf.a
+CF_OBJS=	cf-crt1.o cf-hosted.o getpid.o kill.o cf-sbrk.o cf-exit.o \
+		$(patsubst %,cf-%.o,${CF_ISRS})
+CF_ISRS=	other_interrupt reset access_error address_error \
 	illegal_instruction divide_by_zero privilege_violation \
 	trace unimplemented_line_a_opcode unimplemented_line_f_opcode \
 	non_pc_breakpoint_debug_interrupt pc_breakpoint_debug_interrupt \
@@ -143,8 +154,9 @@ CF_BOARDS :=  m5208evb m5213evb m52235evb m5235evb m5272c3 m5282evb \
 	m5329evb m5485evb
 CF_RAM_SCRIPTS := $(patsubst %,%-ram.ld,$(CF_BOARDS))
 CF_ROM_SCRIPTS := $(patsubst %,%-rom.ld,$(CF_BOARDS))
-CF_SCRIPTS = $(CF_RAM_SCRIPTS) $(CF_ROM_SCRIPTS)
-CF_SOURCES = bdm-crt0.S bdm-crt1.c asm.h
+CF_HOSTED_SCRIPTS := $(patsubst %.ld,%-hosted.ld,$(CF_RAM_SCRIPTS) $(CF_ROM_SCRIPTS))
+CF_SCRIPTS = $(CF_RAM_SCRIPTS) $(CF_ROM_SCRIPTS) $(CF_HOSTED_SCRIPTS)
+CF_SOURCES = cf-crt0.S cf-crt1.c asm.h
 
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
@@ -154,7 +166,8 @@ CF_SOURCES = bdm-crt0.S bdm-crt1.c asm.h
 # it to link is a good test, so we ignore all the errors for now.
 #
 all: ${SIM_CRT0} ${SIM_BSP} ${CRT0} ${BCC_BSP} ${IDP_BSP} ${IDPGDB_BSP} \
-	${MVME135_BSP} ${MVME162_BSP} ${BDM_CRT0} ${BDM_BSP} ${CF_SCRIPTS}
+	${MVME135_BSP} ${MVME162_BSP} ${HOSTED_BSP} ${UNHOSTED_BSP} \
+	${CF_CRT0} ${CF_BSP} ${CF_SCRIPTS}
 
 #
 # here's where we build the board support packages for each target
@@ -175,10 +188,6 @@ ${IDPGDB_BSP}: $(OBJS) ${IDPGDB_OBJS}
 	${AR} ${ARFLAGS} $@ $(OBJS) ${IDPGDB_OBJS}
 	${RANLIB} $@
 
-${BDM_BSP}: $(BDM_OTHER_OBJS) ${BDM_OBJS}
-	${AR} ${ARFLAGS} $@ $(BDM_OTHER_OBJS) ${BDM_OBJS}
-	${RANLIB} $@
-
 ${MVME135_BSP}: $(OBJS) ${MVME135_OBJS}
 	${AR} ${ARFLAGS} $@ $(OBJS) ${MVME135_OBJS}
 	${RANLIB} $@
@@ -187,18 +196,27 @@ ${MVME162_BSP}: $(OBJS) ${MVME162_OBJS}
 	${AR} ${ARFLAGS} $@ $(OBJS) ${MVME162_OBJS}
 	${RANLIB} $@
 
-$(BDM_SYSOBJS): %.o: %.c bdm-semihost.h bdm-gdb.h
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $< -o $@ 
-bdm-crt0.o : bdm-crt0.S
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $< -o $@
-bdm-crt1.o : bdm-crt1.c
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $< -o $@
-bdm-semihost.o : bdm-semihost.S
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $< -o $@
+# build hosted library
+$(HOSTED_OBJS): hosted%.o: io%.c io.h
+	$(CC) $(CFLAGS_FOR_TARGET) -DHOSTED=1 $(INCLUDES) -c $< -o $@
+$(HOSTED_BSP): $(HOSTED_OBJS)
+	${AR} ${ARFLAGS} $@ $^
+	${RANLIB} $@
 
-$(patsubst %,bdm-%.o,${BDM_ISRS}) : bdm-isrs.c
+# build unhosted library
+$(UNHOSTED_OBJS): unhosted%.o: io%.c io.h
+	$(CC) $(CFLAGS_FOR_TARGET) -DHOSTED=0 $(INCLUDES) -c $< -o $@
+$(UNHOSTED_BSP): $(UNHOSTED_OBJS)
+	${AR} ${ARFLAGS} $@ $^
+	${RANLIB} $@
+
+# build coldfire library
+$(patsubst %,cf-%.o,${CF_ISRS}) : cf-isrs.c
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $< -o $@ \
-	  -DL_$(patsubst bdm-%.o,%,$@)
+	  -DL_$(patsubst cf-%.o,%,$@)
+$(CF_BSP): $(CF_OBJS)
+	${AR} ${ARFLAGS} $@ $^
+	${RANLIB} $@
 
 #            RAM       ROM
 m5208evb  := 1024M 16M 0M 2M
@@ -211,9 +229,16 @@ m5329evb  := 1024M 32M 0M 2M
 m5485evb  :=    0M 64M 1024M 16M
 
 %-ram.ld : cf.sc Makefile
-	RAM=$(word 1,$($*)) RAM_SIZE=$(word 2,$($*)) ${SHELL} $< >$@
+	IO=unhosted RAM=$(word 1,$($*)) RAM_SIZE=$(word 2,$($*)) \
+	  ${SHELL} $< >$@
 %-rom.ld : cf.sc Makefile
-	RAM=$(word 1,$($*)) RAM_SIZE=$(word 2,$($*)) \
+	IO=unhosted RAM=$(word 1,$($*)) RAM_SIZE=$(word 2,$($*)) \
+	  ROM=$(word 3,$($*)) ROM_SIZE=$(word 4,$($*)) ${SHELL} $< >$@
+%-ram-hosted.ld : cf.sc Makefile
+	IO=hosted RAM=$(word 1,$($*)) RAM_SIZE=$(word 2,$($*)) \
+	  ${SHELL} $< >$@
+%-rom-hosted.ld : cf.sc Makefile
+	IO=hosted RAM=$(word 1,$($*)) RAM_SIZE=$(word 2,$($*)) \
 	  ROM=$(word 3,$($*)) ROM_SIZE=$(word 4,$($*)) ${SHELL} $< >$@
 
 leds.o: ${srcdir}/leds.c
@@ -332,16 +357,19 @@ install:
 	# install MVME162lx stuff
 	$(INSTALL_PROGRAM) $(MVME162_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(MVME162_BSP)
 	$(INSTALL_DATA) ${srcdir}/mvme162.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/mvme162.ld
-	# install BDM stuff
-	$(INSTALL_DATA) $(BDM_CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(BDM_CRT0)
-	$(INSTALL_DATA) $(BDM_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(BDM_BSP)
-	for src in $(CF_SOURCES) ; \
-	do $(INSTALL_DATA) ${srcdir}/$$src $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$src ; \
-	done
 	$(INSTALL_DATA) ${srcdir}/sbc5204.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/sbc5204.ld
 	$(INSTALL_DATA) ${srcdir}/sbc5206.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/sbc5206.ld
+	# install IO stuff
+	$(INSTALL_DATA) $(HOSTED_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(HOSTED_BSP)
+	$(INSTALL_DATA) $(UNHOSTED_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(UNHOSTED_BSP)
+	# install CF stuff
+	$(INSTALL_DATA) $(CF_CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(CF_CRT0)
+	$(INSTALL_DATA) $(CF_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(CF_BSP)
 	for script in $(CF_SCRIPTS) ; \
 	do $(INSTALL_DATA) $$script $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$script ; \
+	done
+	for src in $(CF_SOURCES) ; \
+	do $(INSTALL_DATA) ${srcdir}/$$src $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$src ; \
 	done
 
 # target specific makefile fragment comes in here.

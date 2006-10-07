@@ -1,5 +1,5 @@
 /*
- * bdm-system.c -- 
+ * io-system.c -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,12 +14,13 @@
  * they apply.
  */
 
-#include "bdm-semihost.h"
-#include "bdm-gdb.h"
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <sys/wait.h>
+#define IO _system
+#include "io.h"
+
 /*
  * system: execute command on (remote) host
  * input parameters:
@@ -32,13 +33,14 @@
 
 int _system (const char *command)
 {
+#if HOSTED
   int e;
   gdb_parambuf_t parameters;
   
   parameters[0] = (uint32_t) command;
   parameters[1] = command ? (uint32_t) strlen (command) + 1 : 0;
-  __bdm_semihost (BDM_SYSTEM, parameters);
-  errno = convert_from_gdb_errno (parameters[1]);
+  __hosted (HOSTED_SYSTEM, parameters);
+  errno = __hosted_from_gdb_errno (parameters[1]);
   e = parameters[0];
   if (e >= 0 && command)
     {
@@ -52,4 +54,10 @@ int _system (const char *command)
     }
   
   return e;
+#else
+  if (!command)
+    return 0;
+  errno = ENOSYS;
+  return -1;
+#endif
 }

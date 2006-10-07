@@ -1,5 +1,5 @@
 /*
- * bdm-isatty.c -- 
+ * io-time.c -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,25 +14,32 @@
  * they apply.
  */
 
-#include "bdm-semihost.h"
-#include "bdm-gdb.h"
-#include <unistd.h>
+#include <sys/time.h>
 #include <errno.h>
+#define IO time
+#include "io.h"
 
 /*
- * isatty -- check if fd is a terminal
+ * time -- get the current time
  * input parameters:
- *   0 : file descriptor
+ *   0 : timeval ptr
  * output parameters:
  *   0 : result
  *   1 : errno
  */
 
-int isatty (int fd)
+time_t time (time_t *t)
 {
-  gdb_parambuf_t parameters;
-  parameters[0] = (uint32_t) fd;
-  __bdm_semihost (BDM_ISATTY, parameters);
-  errno = convert_from_gdb_errno (parameters[1]);
-  return parameters[0];
+#if HOSTED
+  struct timeval tv;
+
+  if (gettimeofday (&tv, NULL))
+    return -1;
+  if (t)
+    *t = tv.tv_sec;
+  return tv.tv_sec;
+#else
+  errno = ENOSYS;
+  return -1;
+#endif
 }

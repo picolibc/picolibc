@@ -1,5 +1,5 @@
 /*
- * bdm-write.c -- 
+ * cf-hosted.S -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,29 +14,25 @@
  * they apply.
  */
 
-#include "bdm-semihost.h"
-#include "bdm-gdb.h"
-#include <unistd.h>
-#include <errno.h>
+/* Semihosting function.  The debugger intercepts the halt, and
+   determines that it is followed by the sentinel pattern. */
 
-/*
- * write -- write to a file descriptor
- * input parameters:
- *   0 : file descriptor
- *   1 : buf ptr
- *   2 : count
- * output parameters:
- *   0 : result
- *   1 : errno
- */
+	.globl __hosted
+__hosted:
+	linkw %fp,#0
+	movel %fp@(8),%d0
+	movel %fp@(12),%d1
+	.align 4
 
-ssize_t write (int fd, const void *buf, size_t count)
-{
-  gdb_parambuf_t parameters;
-  parameters[0] = (uint32_t) fd;
-  parameters[1] = (uint32_t) buf;
-  parameters[2] = (uint32_t) count;
-  __bdm_semihost (BDM_WRITE, parameters);
-  errno = convert_from_gdb_errno (parameters[1]);
-  return parameters[0];
-}
+	/* The halt sequence must be 'nop; halt' and aligned to a 4 byte
+	    boundary.  */
+	nop
+	halt
+	
+	/* This sentinel instruction value must be immediately after
+	   the halt instruction.  The debugger will adjust the pc, so
+	   that it is never executed.  This instruction is
+	   'movec %sp,0'.  */
+	.long 0x4e7bf000
+	unlk %fp
+	rts

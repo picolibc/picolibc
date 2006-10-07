@@ -3,15 +3,16 @@
 # RAM_SIZE - size of board's ram
 # ROM - start of board's rom
 # ROM_SIZE - size of board's rom
+# IO - io library name
 
 test -z "${ROM:+1}" && NOROM=1
 
 cat <<EOF
-STARTUP(bdm-crt0.o)
+STARTUP(cf-crt0.o)
 OUTPUT_ARCH(m68k)
 ENTRY(__start)
 SEARCH_DIR(.)
-GROUP(-lc -lbdm)
+GROUP(-lc -l${IO} -lcf)
 __DYNAMIC  =  0;
 
 MEMORY
@@ -28,7 +29,7 @@ SECTIONS
   .text :
   {
     CREATE_OBJECT_SYMBOLS
-    bdm-crt0.o(.text)
+    cf-crt0.o(.text)
     *(.text .text.*)
 
     . = ALIGN(0x4);

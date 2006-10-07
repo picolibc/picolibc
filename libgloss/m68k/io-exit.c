@@ -1,5 +1,5 @@
 /*
- * bdm-unlink.c -- 
+ * io-exit.c -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,28 +14,16 @@
  * they apply.
  */
 
-#include "bdm-semihost.h"
-#include "bdm-gdb.h"
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
+#if HOSTED
+#include "io.h"
 
-/*
- * unlink -- unlink (delete) a file
- * input parameters:
- *   0 : filename ptr
- *   1 : filename length
- * output parameters:
- *   0 : result
- *   1 : errno
+/* 
+ * _exit -- Exit from the application.  
  */
 
-int unlink (const char *path)
+void __attribute__ ((noreturn)) _exit (int code)
 {
-  gdb_parambuf_t parameters;
-  parameters[0] = (uint32_t) path;
-  parameters[1] = (uint32_t) strlen (path) + 1;
-  __bdm_semihost (BDM_UNLINK, parameters);
-  errno = convert_from_gdb_errno (parameters[1]);
-  return parameters[0];
+  while (1)
+    __hosted (HOSTED_EXIT, (void *)code);
 }
+#endif

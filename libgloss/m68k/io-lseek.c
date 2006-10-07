@@ -1,5 +1,5 @@
 /*
- * bdm-lseek.c -- 
+ * io-lseek.c -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,11 +14,11 @@
  * they apply.
  */
 
-#include "bdm-semihost.h"
-#include "bdm-gdb.h"
 #include <sys/types.h>
 #include <unistd.h>
 #include <errno.h>
+#define IO lseek
+#include "io.h"
 
 /*
  * lseek -- reposition a file descriptor
@@ -35,12 +35,17 @@
 
 off_t lseek (int fd, off_t offset, int whence)
 {
+#if HOSTED
   gdb_parambuf_t parameters;
   parameters[0] = (uint32_t) fd;
   parameters[1] = (uint32_t) ((offset >> 32) & 0xffffffff);
   parameters[2] = (uint32_t) (offset & 0xffffffff);
-  parameters[3] = convert_to_gdb_lseek_flags (whence);
-  __bdm_semihost (BDM_LSEEK, parameters);
-  errno = convert_from_gdb_errno (parameters[2]);
+  parameters[3] = __hosted_to_gdb_lseek_flags (whence);
+  __hosted (HOSTED_LSEEK, parameters);
+  errno = __hosted_from_gdb_errno (parameters[2]);
   return ((uint64_t)parameters[0] << 32) | ((uint64_t)parameters[1]);
+#else
+  errno = ENOSYS;
+  return -1;
+#endif
 }

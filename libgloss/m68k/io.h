@@ -1,5 +1,5 @@
 /*
- * bdm support for GDB's remote fileio protocol
+ * hosted & unhosted io support.
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,10 +14,30 @@
  * they apply.
  */
 
+#if HOSTED
 #include <stdint.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/stat.h>
+
+#define HOSTED_EXIT  0
+#define HOSTED_PUTCHAR 1 /* Obsolete */
+#define HOSTED_OPEN 2
+#define HOSTED_CLOSE 3
+#define HOSTED_READ 4
+#define HOSTED_WRITE 5
+#define HOSTED_LSEEK 6
+#define HOSTED_RENAME 7
+#define HOSTED_UNLINK 8
+#define HOSTED_STAT 9
+#define HOSTED_FSTAT 10
+#define HOSTED_GETTIMEOFDAY 11
+#define HOSTED_ISATTY 12
+#define HOSTED_SYSTEM 13
+
+/* This function is provided by the board's BSP, because the precise
+   mechanism of informing gdb is board specific.  */
+extern int __io_hosted (int func, void *args);
 
 /* Protocol specific representation of datatypes, as specified in D.9.11
  * of the GDB manual.
@@ -54,7 +74,6 @@ struct gdb_timeval {
  */
 
 typedef uint32_t gdb_parambuf_t[4];
-
 
 /* open flags */
 
@@ -112,17 +131,25 @@ typedef uint32_t gdb_parambuf_t[4];
 
 /* conversion functions */
 
-extern gdb_mode_t convert_to_gdb_mode_t (mode_t m);
-extern int32_t convert_to_gdb_open_flags (int f);
-extern int32_t convert_to_gdb_lseek_flags (int f);
+extern gdb_mode_t __hosted_to_gdb_mode_t (mode_t m);
+extern int32_t __hosted_to_gdb_open_flags (int f);
+extern int32_t __hosted_to_gdb_lseek_flags (int f);
 
-extern void convert_from_gdb_stat (const struct gdb_stat *gs,
-				   struct stat *s);
-extern void convert_from_gdb_timeval (const struct gdb_timeval *gt,
-				      struct timeval *t);
-extern int convert_from_gdb_errno (int32_t err);
+extern void __hosted_from_gdb_stat (const struct gdb_stat *gs,
+				    struct stat *s);
+extern void __hosted_from_gdb_timeval (const struct gdb_timeval *gt,
+				       struct timeval *t);
+extern int __hosted_from_gdb_errno (int32_t err);
 
-
-
-
-
+#else
+#ifdef IO
+#define IO_NAME_(IO) __hosted_##IO
+#define IO_NAME(IO) IO_NAME_(IO)
+#define IO_STRING_(IO) #IO
+#define IO_STRING(IO) IO_STRING_(IO)
+/* Emit an object that causes a gnu linker warning.  */
+static const char IO_NAME (IO) []
+__attribute__ ((section (".gnu.warning"), used)) =
+"IO function '" IO_STRING (IO) "' used";
+#endif
+#endif

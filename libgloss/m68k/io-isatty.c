@@ -1,5 +1,5 @@
 /*
- * bdm-rename.c -- 
+ * io-isatty.c -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,32 +14,29 @@
  * they apply.
  */
 
-#include "bdm-semihost.h"
-#include "bdm-gdb.h"
-#include <stdio.h>
-#include <string.h>
+#include <unistd.h>
 #include <errno.h>
+#define IO isatty
+#include "io.h"
 
 /*
- * rename -- rename a file
+ * isatty -- check if fd is a terminal
  * input parameters:
- *   0 : oldname ptr
- *   1 : oldname length
- *   2 : newname ptr
- *   3 : newname length
+ *   0 : file descriptor
  * output parameters:
  *   0 : result
  *   1 : errno
  */
 
-int _rename (const char *oldpath, const char *newpath)
+int isatty (int fd)
 {
+#if HOSTED
   gdb_parambuf_t parameters;
-  parameters[0] = (uint32_t) oldpath;
-  parameters[1] = (uint32_t) strlen (oldpath) + 1;
-  parameters[2] = (uint32_t) newpath;
-  parameters[3] = (uint32_t) strlen (newpath) + 1;
-  __bdm_semihost (BDM_RENAME, parameters);
-  errno = convert_from_gdb_errno (parameters[1]);
+  parameters[0] = (uint32_t) fd;
+  __hosted (HOSTED_ISATTY, parameters);
+  errno = __hosted_from_gdb_errno (parameters[1]);
   return parameters[0];
+#else
+  return 1;
+#endif
 }

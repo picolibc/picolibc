@@ -1,5 +1,5 @@
 /*
- * bdm-close.c -- 
+ * io-stat.c -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,25 +14,40 @@
  * they apply.
  */
 
-#include "bdm-semihost.h"
-#include "bdm-gdb.h"
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <errno.h>
+#define IO stat
+#include "io.h"
 
 /*
- * close -- close a file descriptor.
+ * stat -- get file information
  * input parameters:
- *   0 : file descriptor
+ *   0 : filename ptr
+ *   1 : filename length
+ *   2 : stat buf ptr
  * output parameters:
  *   0 : result
  *   1 : errno
  */
 
-int close (int fd)
+
+int stat (const char *filename, struct stat *buf)
 {
+#if HOSTED
   gdb_parambuf_t parameters;
-  parameters[0] = (uint32_t) fd;
-  __bdm_semihost (BDM_CLOSE, parameters);
-  errno = convert_from_gdb_errno (parameters[1]);
+  struct gdb_stat gbuf;
+  parameters[0] = (uint32_t) filename;
+  parameters[1] = (uint32_t) strlen (filename) + 1;
+  parameters[2] = (uint32_t) &gbuf;
+  __hosted (HOSTED_STAT, parameters);
+  __hosted_from_gdb_stat (&gbuf, buf);
+  errno = __hosted_from_gdb_errno (parameters[1]);
   return parameters[0];
+#else
+  errno = ENOSYS;
+  return -1;
+#endif
 }

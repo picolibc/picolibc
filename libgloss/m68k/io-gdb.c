@@ -1,5 +1,5 @@
 /*
- * bdm support for GDB's remote fileio protocol
+ * hosted io support for GDB's remote fileio protocol
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,13 +14,13 @@
  * they apply.
  */
 
-#include "bdm-gdb.h"
+#include "io.h"
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
 
 gdb_mode_t
-convert_to_gdb_mode_t (mode_t m)
+__hosted_to_gdb_mode_t (mode_t m)
 {
   gdb_mode_t result = 0;
   if (m & S_IFREG)
@@ -49,7 +49,7 @@ convert_to_gdb_mode_t (mode_t m)
 }
 
 int32_t
-convert_to_gdb_open_flags (int f)
+__hosted_to_gdb_open_flags (int f)
 {
   int32_t result = 0;
   if (f & O_RDONLY)
@@ -70,7 +70,7 @@ convert_to_gdb_open_flags (int f)
 }
 
 int32_t
-convert_to_gdb_lseek_flags (int f)
+__hosted_to_gdb_lseek_flags (int f)
 {
   if (f == SEEK_CUR)
     return GDB_SEEK_CUR;
@@ -81,8 +81,8 @@ convert_to_gdb_lseek_flags (int f)
 }
 
 void
-convert_from_gdb_stat (const struct gdb_stat *gs,
-		       struct stat *s)
+__hosted_from_gdb_stat (const struct gdb_stat *gs,
+			struct stat *s)
 {
   s->st_dev = gs->st_dev;
   s->st_ino = gs->st_ino;
@@ -100,15 +100,15 @@ convert_from_gdb_stat (const struct gdb_stat *gs,
 }
 
 void
-convert_from_gdb_timeval (const struct gdb_timeval *gt,
-			  struct timeval *t)
+__hosted_from_gdb_timeval (const struct gdb_timeval *gt,
+			   struct timeval *t)
 {
   t->tv_sec = gt->tv_sec;
   t->tv_usec = gt->tv_usec;
 }
 
 int
-convert_from_gdb_errno (int32_t err)
+__hosted_from_gdb_errno (int32_t err)
 {
   switch (err)
     {

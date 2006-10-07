@@ -1,5 +1,5 @@
 /*
- * bdm-semihost.S -- 
+ * cf-exit.c -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,25 +14,17 @@
  * they apply.
  */
 
-/* Semihosting function.  The debugger intercepts the halt, and
-   determines that it is followed by the sentinel pattern. */
+extern void __reset (void);
 
-	.globl __bdm_semihost
-__bdm_semihost:
-	linkw %fp,#0
-	movel %fp@(8),%d0
-	movel %fp@(12),%d1
-	.align 4
+/* 
+ * _exit -- Exit from the application.  
+ */
 
-	/* The halt sequence must be 'nop; halt' and aligned to a 4 byte
-	    boundary.  */
-	nop
-	halt
-	
-	/* This sentinel instruction value must be immediately after
-	   the halt instruction.  The debugger will adjust the pc, so
-	   that it is never executed.  This instruction is
-	   'movec %sp,0'.  */
-	.long 0x4e7bf000
-	unlk %fp
-	rts
+void __attribute__ ((noreturn)) _exit (int code)
+{
+  while (1)
+    {
+      __asm__ __volatile__ ("halt" ::: "memory");
+      __reset ();
+    }
+}

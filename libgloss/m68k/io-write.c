@@ -1,5 +1,5 @@
 /*
- * bdm semihosting support.
+ * io-write.c -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,21 +14,34 @@
  * they apply.
  */
 
-/* Codes for BDM_FUNC_REG.  */
+#include <unistd.h>
+#include <errno.h>
+#define IO write
+#include "io.h"
 
-#define BDM_EXIT  0
-#define BDM_PUTCHAR 1 /* Obsolete */
-#define BDM_OPEN 2
-#define BDM_CLOSE 3
-#define BDM_READ 4
-#define BDM_WRITE 5
-#define BDM_LSEEK 6
-#define BDM_RENAME 7
-#define BDM_UNLINK 8
-#define BDM_STAT 9
-#define BDM_FSTAT 10
-#define BDM_GETTIMEOFDAY 11
-#define BDM_ISATTY 12
-#define BDM_SYSTEM 13
+/*
+ * write -- write to a file descriptor
+ * input parameters:
+ *   0 : file descriptor
+ *   1 : buf ptr
+ *   2 : count
+ * output parameters:
+ *   0 : result
+ *   1 : errno
+ */
 
-extern int __bdm_semihost (int func, void *args);
+ssize_t write (int fd, const void *buf, size_t count)
+{
+#if HOSTED
+  gdb_parambuf_t parameters;
+  parameters[0] = (uint32_t) fd;
+  parameters[1] = (uint32_t) buf;
+  parameters[2] = (uint32_t) count;
+  __hosted (HOSTED_WRITE, parameters);
+  errno = __hosted_from_gdb_errno (parameters[1]);
+  return parameters[0];
+#else
+  errno = ENOSYS;
+  return -1;
+#endif
+}

@@ -1,5 +1,5 @@
 /*
- * bdm-read.c -- 
+ * io-fstat.c -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,29 +14,36 @@
  * they apply.
  */
 
-#include "bdm-semihost.h"
-#include "bdm-gdb.h"
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <errno.h>
+#define IO fstat
+#include "io.h"
 
 /*
- * read -- read from a file descriptor
+ * fstat -- get file information
  * input parameters:
  *   0 : file descriptor
- *   1 : buf ptr
- *   2 : count
+ *   1 : stat buf ptr
  * output parameters:
  *   0 : result
  *   1 : errno
  */
 
-ssize_t read (int fd, void *buf, size_t count)
+int fstat (int fd, struct stat *buf)
 {
+#if HOSTED
   gdb_parambuf_t parameters;
+  struct gdb_stat gbuf;
   parameters[0] = (uint32_t) fd;
-  parameters[1] = (uint32_t) buf;
-  parameters[2] = (uint32_t) count;
-  __bdm_semihost (BDM_READ, parameters);
-  errno = convert_from_gdb_errno (parameters[1]);
+  parameters[1] = (uint32_t) &gbuf;
+  __hosted (HOSTED_FSTAT, parameters);
+  __hosted_from_gdb_stat (&gbuf, buf);
+  errno = __hosted_from_gdb_errno (parameters[1]);
   return parameters[0];
+#else
+  errno = ENOSYS;
+  return -1;
+#endif
 }

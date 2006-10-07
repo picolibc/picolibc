@@ -1,5 +1,5 @@
 /*
- * bdm-stat.c -- 
+ * io-gettimeofday.c -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,35 +14,39 @@
  * they apply.
  */
 
-#include "bdm-semihost.h"
-#include "bdm-gdb.h"
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#include <sys/time.h>
 #include <errno.h>
+#define IO gettimeofday
+#include "io.h"
 
 /*
- * stat -- get file information
+ * gettimeofday -- get the current time
  * input parameters:
- *   0 : filename ptr
- *   1 : filename length
- *   2 : stat buf ptr
+ *   0 : timeval ptr
  * output parameters:
  *   0 : result
  *   1 : errno
  */
 
-
-int stat (const char *filename, struct stat *buf)
+int gettimeofday (struct timeval *tv, struct timezone *tz)
 {
+#if HOSTED
   gdb_parambuf_t parameters;
-  struct gdb_stat gbuf;
-  parameters[0] = (uint32_t) filename;
-  parameters[1] = (uint32_t) strlen (filename) + 1;
-  parameters[2] = (uint32_t) &gbuf;
-  __bdm_semihost (BDM_STAT, parameters);
-  convert_from_gdb_stat (&gbuf, buf);
-  errno = convert_from_gdb_errno (parameters[1]);
+  struct gdb_timeval gtv;
+  if (!tv)
+    return 0;
+  if (tz)
+    {
+      errno = EINVAL;
+      return -1;
+    }
+  parameters[0] = (uint32_t) &gtv;
+  __hosted (HOSTED_GETTIMEOFDAY, parameters);
+  __hosted_from_gdb_timeval (&gtv, tv);
+  errno = __hosted_from_gdb_errno (parameters[1]);
   return parameters[0];
+#else
+  errno = ENOSYS;
+  return -1;
+#endif
 }
