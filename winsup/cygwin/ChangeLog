@@ -1,3 +1,10 @@
+2006-10-06  David Jade  <d3@mutable.net>
+
+	* path.cc (path_conv::get_nt_native_path): Properly detect \\?\ paths.
+	(mount_info::conv_to_win32_path): Update comment.
+	* fhandler_disk_file.cc (path_conv::ndisk_links): Use backslashes
+	to make NT kernel functions work for \\?\GLOBALROOT paths.
+
 2006-10-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* devices.in: Raise number of handled serial ports to 64.

@@ -526,13 +526,13 @@ path_conv::get_nt_native_path (UNICODE_STRING &upath)
     }
   else if (path[1] != '\\')		/* \Device\... */
     str2uni_cat (upath, path);
-  else if (path[2] != '.'
+  else if ((path[2] != '.' && path[2] != '?')
 	   || path[3] != '\\')		/* \\server\share\... */
     {
       str2uni_cat (upath, "\\??\\UNC\\");
       str2uni_cat (upath, path + 2);
     }
-  else					/* \\.\device */
+  else					/* \\.\device or \\?\foo */
     {
       str2uni_cat (upath, "\\??\\");
       str2uni_cat (upath, path + 4);
@@ -1661,8 +1661,9 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
     }
 
   MALLOC_CHECK;
-  /* If the path is on a network drive, bypass the mount table.
-     If it's // or //MACHINE, use the netdrive device. */
+  /* If the path is on a network drive or a //./ resp.//?/ path prefix,
+     bypass the mount table.  If it's // or //MACHINE, use the netdrive
+     device. */
   if (src_path[1] == '/')
     {
       if (!strchr (src_path + 2, '/'))

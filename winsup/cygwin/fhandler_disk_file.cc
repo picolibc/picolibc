@@ -143,12 +143,12 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
   __DIR_mounts *dir = new __DIR_mounts (normalized_path);
   if (nNumberOfLinks <= 1)
     {
-      s = "/*";
+      s = "\\*";
       count = 0;
     }
   else
     {
-      s = "/..";
+      s = "\\..";
       count = nNumberOfLinks;
     }
 
