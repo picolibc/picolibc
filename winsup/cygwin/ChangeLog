@@ -1,3 +1,8 @@
+2006-10-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* devices.in: Raise number of handled serial ports to 64.
+	* devices.cc: Regenerate.
+
 2006-09-17  Danny Smith  <dannysmith@clear.net.nz>
 
 	* byteorder.h: Correct typo.
