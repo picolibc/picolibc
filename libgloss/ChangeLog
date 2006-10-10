@@ -1,3 +1,7 @@
+2006-10-10  Thiemo Seufer  <ths@mips.com>
+
+	* mips/Makefile.in: Add INCLUDES to local compile rules.
+
 2006-10-06  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* Makefile.in: Add CFLAGS_FOR_TARGET and CCASFLAGS to
