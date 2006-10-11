@@ -1,3 +1,13 @@
+2006-10-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* select.cc (struct socketinf): Convert ser_num and w4 to dynamically
+	allocated arrays.  Add max_w4 member to keep track.
+	(thread_socket): Make timeout depending on number of sockets to wait
+	for.  Loop WFMO over all sockets.
+	(start_thread_socket): Handle any number of sockets.  Fix typo.  Don't
+	close socket event in out of memory condition.
+	(socket_cleanup): Free ser_num and w4.
+
 2006-10-06  David Jade  <d3@mutable.net>
 
 	* path.cc (path_conv::get_nt_native_path): Properly detect \\?\ paths.

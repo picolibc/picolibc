@@ -1285,9 +1285,10 @@ static int start_thread_socket (select_record *, select_stuff *);
 struct socketinf
   {
     cygthread *thread;
+    int max_w4;
     int num_w4;
-    LONG ser_num[MAXIMUM_WAIT_OBJECTS];
-    HANDLE w4[MAXIMUM_WAIT_OBJECTS];
+    LONG *ser_num;
+    HANDLE *w4;
     select_record *start;
   };
 
@@ -1295,6 +1296,7 @@ static DWORD WINAPI
 thread_socket (void *arg)
 {
   socketinf *si = (socketinf *) arg;
+  DWORD timeout = 64 / (si->max_w4 / MAXIMUM_WAIT_OBJECTS);
   bool event = false;
 
   select_printf ("stuff_start %p", si->start);
@@ -1305,17 +1307,21 @@ thread_socket (void *arg)
 	  if (peek_socket (s, false))
 	    event = true;
       if (!event)
-        {
-	  switch (WaitForMultipleObjects (si->num_w4, si->w4, FALSE, 50))
+	for (int i = 0; i < si->max_w4; i += MAXIMUM_WAIT_OBJECTS)
+	  switch (WaitForMultipleObjects (min (si->num_w4 - i,
+					       MAXIMUM_WAIT_OBJECTS),
+					  si->w4 + i, FALSE, timeout))
 	    {
-	    case WAIT_OBJECT_0:
 	    case WAIT_FAILED:
 	      goto out;
+	    case WAIT_OBJECT_0:
+	      if (!i)	/* Socket event set. */
+	        goto out;
+	      break;
 	    case WAIT_TIMEOUT:
 	    default:
 	      break;
 	    }
-	}
     }
 out:
   select_printf ("leaving thread_socket");
@@ -1334,6 +1340,11 @@ start_thread_socket (select_record *me, select_stuff *stuff)
     }
 
   si = new socketinf;
+  si->ser_num = (LONG *) malloc (MAXIMUM_WAIT_OBJECTS * sizeof (LONG));
+  si->w4 = (HANDLE *) malloc (MAXIMUM_WAIT_OBJECTS * sizeof (HANDLE));
+  if (!si->ser_num || !si->w4)
+    return 0;
+  si->max_w4 = MAXIMUM_WAIT_OBJECTS;
   select_record *s = &stuff->start;
   if (_my_tls.locals.select_sockevt != INVALID_HANDLE_VALUE)
     si->w4[0] = _my_tls.locals.select_sockevt;
@@ -1348,17 +1359,28 @@ start_thread_socket (select_record *me, select_stuff *stuff)
 	/* No event/socket should show up multiple times.  Every socket
 	   is uniquely identified by its serial number in the global
 	   wsock_events record. */
-	const LONG ser_num = ((fhandler_socket *) me->fh)->serial_number ();
+	const LONG ser_num = ((fhandler_socket *) s->fh)->serial_number ();
 	for (int i = 1; i < si->num_w4; ++i)
 	  if (si->ser_num[i] == ser_num)
 	    goto continue_outer_loop;
-	if (si->num_w4 < MAXIMUM_WAIT_OBJECTS)
+	if (si->num_w4 >= si->max_w4)
 	  {
-	    si->ser_num[si->num_w4] = ser_num;
-	    si->w4[si->num_w4++] = ((fhandler_socket *) me->fh)->wsock_event ();
+	    LONG *nser = (LONG *) realloc (si->ser_num,
+					   (si->max_w4 + MAXIMUM_WAIT_OBJECTS)
+					   * sizeof (LONG));
+	    if (!nser)
+	      return 0;
+	    si->ser_num = nser;
+	    HANDLE *nw4 = (HANDLE *) realloc (si->w4,
+					   (si->max_w4 + MAXIMUM_WAIT_OBJECTS)
+					   * sizeof (HANDLE));
+	    if (!nw4)
+	      return 0;
+	    si->w4 = nw4;
+	    si->max_w4 += MAXIMUM_WAIT_OBJECTS;
 	  }
-	else /* for now */
-	  goto err;
+	si->ser_num[si->num_w4] = ser_num;
+	si->w4[si->num_w4++] = ((fhandler_socket *) s->fh)->wsock_event ();
       continue_outer_loop:
 	;
       }
@@ -1368,10 +1390,6 @@ start_thread_socket (select_record *me, select_stuff *stuff)
   si->thread = new cygthread (thread_socket, 0,  si, "select_socket");
   me->h = *si->thread;
   return 1;
-
-err:
-  CloseHandle (si->w4[0]);
-  return 0;
 }
 
 void
@@ -1386,6 +1404,10 @@ socket_cleanup (select_record *, select_stuff *stuff)
       si->thread->detach ();
       ResetEvent (si->w4[0]);
       stuff->device_specific_socket = NULL;
+      if (si->ser_num)
+        free (si->ser_num);
+      if (si->w4)
+        free (si->w4);
       delete si;
     }
   select_printf ("returning");
