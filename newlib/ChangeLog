@@ -1,3 +1,7 @@
+2006-10-11  Yang Tse  <yangsita@gmail.com>
+
+	* setjmp.h: Use __extension__ keyword for gcc's braced-groups.
+
 2006-10-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/reent/reeent.c (_reclaim_reent): Free _REENT_MP_RESULT.

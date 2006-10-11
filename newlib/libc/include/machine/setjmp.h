@@ -257,6 +257,7 @@ typedef int sigjmp_buf[_JBLEN+2];
 #if defined(__GNUC__)
 
 #define sigsetjmp(env, savemask) \
+            __extension__ \
             ({ \
               sigjmp_buf *_sjbuf = &(env); \
               ((*_sjbuf)[_SAVEMASK] = savemask,\
@@ -265,6 +266,7 @@ typedef int sigjmp_buf[_JBLEN+2];
             })
 
 #define siglongjmp(env, val) \
+            __extension__ \
             ({ \
               sigjmp_buf *_sjbuf = &(env); \
               ((((*_sjbuf)[_SAVEMASK]) ? \
