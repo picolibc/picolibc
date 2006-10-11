@@ -1,3 +1,7 @@
+2006-10-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/reent/reeent.c (_reclaim_reent): Free _REENT_MP_RESULT.
+
 2006-09-26  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/stdio.h[_REENT_SMALL]: Do not allow macros
