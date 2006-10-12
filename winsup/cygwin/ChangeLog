@@ -1,3 +1,7 @@
+2006-10-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (create_token): Fix condition for source identifier.
+
 2006-10-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* select.cc (struct socketinf): Convert ser_num and w4 to dynamically

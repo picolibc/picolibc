@@ -839,7 +839,8 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw,
   TOKEN_STATISTICS stats;
   memcpy (source.SourceName, "Cygwin.1", 8);
   source.SourceIdentifier.HighPart = 0;
-  source.SourceIdentifier.LowPart = (subauth_token ? 0x0102 : 0x0101);
+  source.SourceIdentifier.LowPart = (subauth_token != INVALID_HANDLE_VALUE
+				     ? 0x0102 : 0x0101);
 
   HANDLE token = INVALID_HANDLE_VALUE;
   HANDLE primary_token = INVALID_HANDLE_VALUE;
