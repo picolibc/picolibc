@@ -1,3 +1,7 @@
+2006-10-12  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winuser.h (LR_DEFAULTSIZE, LR_VGACOLOR): Define.
+
 2006-10-05  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winreg.h (RegDeleteKeyEx{A|W}): Add prototype and UNICODE
