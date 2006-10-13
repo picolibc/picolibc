@@ -31,7 +31,7 @@ INSTALL_DATA    := @INSTALL_DATA@
 CC              := @CC@
 CC_FOR_TARGET   := $(CC)
 
-CFLAGS          := @CFLAGS@ -nostdinc
+CFLAGS          := @CFLAGS@
 
 include $(srcdir)/../Makefile.common
 

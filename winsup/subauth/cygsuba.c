@@ -1,7 +1,7 @@
 /* cygsuba.c: Minimal subauthentication functionality to support
               logon without password.
 
-   Copyright 2001 Red Hat, Inc.
+   Copyright 2001, 2006 Red Hat, Inc.
 
 Written by Corinna Vinschen <vinschen@redhat.com>
 
@@ -12,8 +12,8 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include <windows.h>
-#include <subauth.h>
 #include <ntsecapi.h>
+#include <subauth.h>
 
 NTSTATUS NTAPI
 Msv1_0SubAuthenticationRoutine (NETLOGON_LOGON_INFO_CLASS logon_level,

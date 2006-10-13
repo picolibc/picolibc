@@ -1,3 +1,9 @@
+2006-10-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (CFLAGS): Drop -nostdinc.
+	* cygsuba.c: Reorder includes to allow building with VC++.
+	* make-64bit-version-with-visual-c.bat: New file.
+
 2006-07-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (LIBS): Link against msvcrt.dll, too.
