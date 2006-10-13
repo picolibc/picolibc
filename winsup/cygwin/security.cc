@@ -982,6 +982,20 @@ out:
   return primary_token;
 }
 
+extern "C"
+{
+  BOOL WINAPI Wow64DisableWow64FsRedirection (PVOID *);
+  BOOL WINAPI Wow64RevertWow64FsRedirection (PVOID);
+};
+
+static enum
+{
+  not_tested,
+  not_installed,
+  installed
+} cygsuba_installed __attribute__((section (".cygwin_dll_common"), shared))
+  = not_tested;
+
 int subauth_id = 255;
 
 HANDLE
@@ -1015,6 +1029,48 @@ subauth (struct passwd *pw)
      the below test before calling CloseHandle. */
   HANDLE user_token = NULL;
   HANDLE primary_token = INVALID_HANDLE_VALUE;
+
+  /* Check to see if cygsuba.dll has been registered and is present.  The
+     idea here is to avoid authentication failure messages in the security
+     event log for each logon attempt if cygsuba.dll hasn't been installed.
+     The test is only made once per DLL life time, since installing and
+     registering the subauthentication DLL requires reboot anyway. */
+  if (cygsuba_installed == not_installed)
+    {
+      debug_printf ("subauth not installed, exit subauth");
+      return INVALID_HANDLE_VALUE;
+    }
+  else if (cygsuba_installed == not_tested)
+    {
+      char auth_path[CYG_MAX_PATH];
+
+      cygsuba_installed = not_installed;
+      __small_sprintf (auth_path, "/proc/registry/HKEY_LOCAL_MACHINE/SYSTEM/"
+				  "CurrentControlSet/Control/Lsa/MSV1_0/Auth%d",
+				  subauth_id);
+      if (access (auth_path, F_OK))
+	{
+	  debug_printf ("%s doesn't exist, exit subauth", auth_path);
+	  return INVALID_HANDLE_VALUE;
+	}
+      /* On 64 bit systems the dll must be installed into the *real* system32
+	 directory so we have to switch off file system redirection. */
+      PVOID old_fsredir;
+      DWORD attr = INVALID_FILE_ATTRIBUTES;
+      Wow64DisableWow64FsRedirection (&old_fsredir);
+      if (GetSystemDirectory (auth_path, CYG_MAX_PATH))
+	{
+	  strcat (auth_path, "\\cygsuba.dll");
+	  attr = GetFileAttributes (auth_path);
+	}
+      Wow64RevertWow64FsRedirection (old_fsredir);
+      if (attr == INVALID_FILE_ATTRIBUTES)
+	{
+	  debug_printf ("%s doesn't exist, exit subauth", auth_path);
+	  return INVALID_HANDLE_VALUE;
+	}
+      cygsuba_installed = installed;
+    }
 
   push_self_privilege (SE_TCB_PRIV, true);
 

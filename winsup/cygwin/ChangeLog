@@ -1,3 +1,12 @@
+2006-10-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (Wow64DisableWow64FsRedirection): Define.
+	(Wow64RevertWow64FsRedirection): Define.
+	* security.cc (cygsuba_installed): New shared variable to store result
+	of cygsuba.dll installation test.
+	(subauth): Check if cygsuba.dll has been installed and registered
+	before issuing the (sub)authentication.
+
 2006-10-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.cc (create_token): Fix condition for source identifier.

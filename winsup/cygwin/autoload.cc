@@ -521,6 +521,8 @@ LoadDLLfuncEx (SetHandleInformation, 12, kernel32, 1)
 LoadDLLfuncEx (SetProcessWorkingSetSize, 12, kernel32, 1)
 LoadDLLfuncEx (SignalObjectAndWait, 16, kernel32, 1)
 LoadDLLfuncEx (SwitchToThread, 0, kernel32, 1)
+LoadDLLfuncEx (Wow64DisableWow64FsRedirection, 4, kernel32, 1)
+LoadDLLfuncEx (Wow64RevertWow64FsRedirection, 4, kernel32, 1)
 
 LoadDLLfunc (SHGetDesktopFolder, 4, shell32)
 
