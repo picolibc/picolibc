@@ -1,3 +1,61 @@
+2006-10-16  Nathan Sidwell  <nathan@codesourcery.com>
+
+	binutils/
+	* Makefile.am: Rebuild dependencies.
+	(REPORT_BUGS_TO): Always defined.
+	(INCLUDES): Adjust.
+	* Makefile.in: Rebuilt.
+	* configure.in (REPORT_BUGS_TO): Provide default value.
+	* configure: Rebuilt.
+	* bucomm.h: Remove bin-bugs.h.
+	* addr2line.c (usage): Don't print empty REPORT_BUGS_TO.
+	* coffdump.c (show_usage): Likewise.
+	* cxxfilt.c (usage): Likewise.
+	* nlmconv.c (show_usage): Likewise.
+	* nm.c (usage): Likewise.
+	* objcopy.c (copy_usage, strip_usage): Likewise.
+	* objdump.c (usage): Likewise.
+	* size.c (usage): Likewise.
+	* srconv.c (show_usage): Likewise.
+	* string.c (usage): Likewise.
+	* sysdymp.c (show_usage): Likewise.
+	* windres.c (usage): Likewise.
+	* readelf (usage): Likewise. Add STREAM argument.  Adjust callers.
+
+	gas/
+	* Makefile.am: Rebuild dependencies.
+	(REPORT_BUGS_TO): Always defined.
+	(INCLUDES): Adjust.
+	* Makefile.in: Rebuilt.
+	* configure.in (REPORT_BUGS_TO): Provide default value.
+	* configure: Rebuilt.
+	* as.c (show_usage): Don't print empty REPORT_BUGS_TO.
+	* as.h: Remove bin-bugs.h.
+
+	ld/
+	* Makefile.am: Rebuild dependencies.
+	(REPORT_BUGS_TO): Always defined.
+	(INCLUDES): Adjust.
+	* Makefile.in: Rebuilt.
+	* configure.in (REPORT_BUGS_TO): Provide default value.
+	* configure: Rebuilt.
+	* ld.h: Remove bin-bugs.h
+	* lexsup.c (help):  Don't print empty REPORT_BUGS_TO.
+
+	gprof/
+	* Makefile.am: Rebuild dependencies.
+	(REPORT_BUGS_TO): Always defined.
+	(PKGVERSION): Define.
+	(INCLUDES): Adjust.
+	* Makefile.in: Rebuilt.
+	* configure.in (REPORT_BUGS_TO): Provide default value.
+	* configure: Rebuilt.
+	* gprof.c (usage): Don't print empty REPORT_BUGS_TO.
+	* gprof.h: Remove bin-bugs.h
+
+	include/
+	* bin-bugs.h: Remove.
+
 2006-10-16  Mark Shinwell  <shinwell@codesourcery.com>
 
 	bfd/
