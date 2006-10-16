@@ -1,3 +1,17 @@
+2006-10-13  Corinn6 Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (PrivilegeCheck): Define.
+	* fhandler.cc (fhandler_base::open): Always try opening with backup
+	resp. restore intent.
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Always try
+	opening with backup intent.
+	(fhandler_disk_file::readdir): Ditto when trying to retrieve file id
+	explicitely.
+	* security.cc (check_file_access): Replace pbuf with correctly 
+	PPRIVILEGE_SET typed pset.  Check explicitely for backup and/or restore
+	privileges when AccessCheck fails, to circumvent AccessCheck
+	shortcoming.  Add comment to explain.
+
 2006-10-13  Christopher Faylor  <cgf@timesys.com>
 
 	* winsup.h: Turn off DEBUGGING.

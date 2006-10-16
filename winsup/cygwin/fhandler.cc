@@ -620,13 +620,22 @@ fhandler_base::open (int flags, mode_t mode)
 	create_options = FILE_OPEN_FOR_BACKUP_INTENT | FILE_OPEN_FOR_RECOVERY;
 	break;
       default:
-	create_options = 0;
 	if ((flags & O_ACCMODE) == O_RDONLY)
-	  access = GENERIC_READ;
+	  {
+	    access = GENERIC_READ;
+	    create_options = FILE_OPEN_FOR_BACKUP_INTENT;
+	  }
 	else if ((flags & O_ACCMODE) == O_WRONLY)
-	  access = GENERIC_WRITE | FILE_READ_ATTRIBUTES;
+	  {
+	    access = GENERIC_WRITE | FILE_READ_ATTRIBUTES;
+	    create_options = FILE_OPEN_FOR_RECOVERY;
+	  }
 	else
-	  access = GENERIC_READ | GENERIC_WRITE;
+	  {
+	    access = GENERIC_READ | GENERIC_WRITE;
+	    create_options = FILE_OPEN_FOR_BACKUP_INTENT
+			     | FILE_OPEN_FOR_RECOVERY;
+	  }
 	if (flags & O_SYNC)
 	  create_options |= FILE_WRITE_THROUGH;
 	if (flags & O_DIRECT)

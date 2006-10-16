@@ -1953,8 +1953,9 @@ check_file_access (const char *fn, int flags)
 
   HANDLE hToken;
   BOOL status;
-  char pbuf[sizeof (PRIVILEGE_SET) + 3 * sizeof (LUID_AND_ATTRIBUTES)];
-  DWORD desired = 0, granted, plength = sizeof pbuf;
+  DWORD desired = 0, granted;
+  DWORD plength = sizeof (PRIVILEGE_SET) + 3 * sizeof (LUID_AND_ATTRIBUTES);
+  PPRIVILEGE_SET pset = (PPRIVILEGE_SET) alloca (plength);
   static GENERIC_MAPPING NO_COPY mapping = { FILE_GENERIC_READ,
 					     FILE_GENERIC_WRITE,
 					     FILE_GENERIC_EXECUTE,
@@ -1974,10 +1975,46 @@ check_file_access (const char *fn, int flags)
   if (flags & X_OK)
     desired |= FILE_EXECUTE;
   if (!AccessCheck (sd, hToken, desired, &mapping,
-		    (PPRIVILEGE_SET) pbuf, &plength, &granted, &status))
+		    pset, &plength, &granted, &status))
     __seterrno ();
   else if (!status)
-    set_errno (EACCES);
+    {
+      /* CV, 2006-10-16: Now, that's really weird.  Imagine a user who has no
+	 standard access to a file, but who has backup and restore privileges
+	 and these privileges are enabled in the access token.  One would
+	 expect that the AccessCheck function takes this into consideration
+	 when returning the access status.  Otherwise, why bother with the
+	 pset parameter, right?
+	 But not so.  AccessCheck actually returns a status of "false" here,
+	 even though opening a file with backup resp.  restore intent
+	 naturally succeeds for this user.  This definitely spoils the results
+	 of access(2) for administrative users or the SYSTEM account.  So, in
+	 case the access check fails, another check against the user's
+	 backup/restore privileges has to be made.  Sigh. */
+      int granted_flags = 0;
+      if (flags & R_OK)
+        {
+	  pset->PrivilegeCount = 1;
+	  pset->Control = 0;
+	  pset->Privilege[0].Luid = *privilege_luid (SE_BACKUP_PRIV);
+	  pset->Privilege[0].Attributes = 0;
+	  if (PrivilegeCheck (hToken, pset, &status) && status)
+	    granted_flags |= R_OK;
+	}
+      if (flags & W_OK)
+        {
+	  pset->PrivilegeCount = 1;
+	  pset->Control = 0;
+	  pset->Privilege[0].Luid = *privilege_luid (SE_RESTORE_PRIV);
+	  pset->Privilege[0].Attributes = 0;
+	  if (PrivilegeCheck (hToken, pset, &status) && status)
+	    granted_flags |= W_OK;
+	}
+      if (granted_flags == flags)
+        ret = 0;
+      else
+	set_errno (EACCES);
+    }
   else
     ret = 0;
  done:
