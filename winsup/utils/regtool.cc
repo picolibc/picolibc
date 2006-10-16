@@ -18,6 +18,10 @@ details. */
 
 #define DEFAULT_KEY_SEPARATOR '\\'
 
+#ifndef KEY_WOW64_64KEY
+#define KEY_WOW64_64KEY 0x100
+#endif
+
 enum
 {
   KT_AUTO, KT_BINARY, KT_INT, KT_STRING, KT_EXPAND, KT_MULTI
@@ -46,16 +50,18 @@ static struct option longopts[] =
   {"string", no_argument, NULL, 's'},
   {"verbose", no_argument, NULL, 'v'},
   {"version", no_argument, NULL, 'V'},
+  {"wow64", no_argument, NULL, 'w'},
   {"key-separator", required_argument, NULL, 'K'},
   {NULL, 0, NULL, 0}
 };
 
-static char opts[] = "behiklmpqsvVK:";
+static char opts[] = "behiklmpqsvVwK:";
 
 int listwhat = 0;
 int postfix = 0;
 int verbose = 0;
 int quiet = 0;
+DWORD wow64 = 0;
 char **argv;
 
 HKEY key;
@@ -106,6 +112,7 @@ usage (FILE *where = stderr)
   " -h, --help     output usage information and exit\n"
   " -q, --quiet    no error output, just nonzero return if KEY/VALUE missing\n"
   " -v, --verbose  verbose output, including VALUE contents when applicable\n"
+  " -w, --wow64    access 64 bit registry view (ignored on 32 bit Windows)\n"
   " -V, --version  output version information and exit\n"
   "\n");
   if (where == stdout)
@@ -148,7 +155,7 @@ print_version ()
   printf ("\
 %s (cygwin) %.*s\n\
 Registry Tool\n\
-Copyright 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.\n\
+Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.\n\
 Compiled on %s\n\
 ", prog_name, len, v, __DATE__);
 }
@@ -360,13 +367,13 @@ find_key (int howmanyparts, REGSAM access, int option = 0)
     {
       if (access)
 	{
-	  rv = RegOpenKeyEx (base, n, 0, access, &key);
+	  rv = RegOpenKeyEx (base, n, 0, access | wow64, &key);
 	  if (option && (rv == ERROR_SUCCESS || rv == ERROR_ACCESS_DENIED))
 	    {
 	      /* reopen with desired option due to missing option support in RegOpenKeyE */
 	      /* FIXME: may create the key in rare cases (e.g. access denied in parent) */
 	      HKEY key2;
-	      if (RegCreateKeyEx (base, n, 0, NULL, option, access, NULL, &key2, NULL)
+	      if (RegCreateKeyEx (base, n, 0, NULL, option, access | wow64, NULL, &key2, NULL)
 		  == ERROR_SUCCESS)
 	        {
 		  if (rv == ERROR_SUCCESS)
@@ -496,7 +503,7 @@ cmd_add ()
   HKEY newkey;
   DWORD newtype;
   int rv = RegCreateKeyEx (key, value, 0, (char *) "", REG_OPTION_NON_VOLATILE,
-			   KEY_ALL_ACCESS, 0, &newkey, &newtype);
+			   KEY_ALL_ACCESS | wow64, 0, &newkey, &newtype);
   if (rv != ERROR_SUCCESS)
     Fail (rv);
 
@@ -510,11 +517,26 @@ cmd_add ()
   return 0;
 }
 
+extern "C" {
+WINADVAPI LONG WINAPI (*regDeleteKeyEx)(HKEY, LPCSTR, REGSAM, DWORD);
+}
+
 int
 cmd_remove ()
 {
+  DWORD rv;
+
   find_key (2, KEY_ALL_ACCESS);
-  DWORD rv = RegDeleteKey (key, value);
+  if (wow64)
+    {
+      HMODULE mod = LoadLibrary ("advapi32.dll");
+      if (mod)
+        regDeleteKeyEx = (WINADVAPI LONG WINAPI (*)(HKEY, LPCSTR, REGSAM, DWORD)) GetProcAddress (mod, "RegDeleteKeyExA");
+    }
+  if (regDeleteKeyEx)
+    rv = (*regDeleteKeyEx) (key, value, wow64, 0);
+  else
+    rv = RegDeleteKey (key, value);
   if (rv != ERROR_SUCCESS)
     Fail (rv);
   if (verbose)
@@ -838,6 +860,9 @@ main (int argc, char **_argv)
 	case 'V':
 	  print_version ();
 	  exit (0);
+	case 'w':
+	  wow64 = KEY_WOW64_64KEY;
+	  break;
 	case 'K':
 	  key_sep = *optarg;
 	  break;
