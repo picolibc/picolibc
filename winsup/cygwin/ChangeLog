@@ -1,5 +1,10 @@
 2006-10-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Drop redundant
+	access check.
+
+2006-10-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/asm/byteorder.h: Fix copyright dates.
 
 2006-10-16  Corinna Vinschen  <corinna@vinschen.de>
