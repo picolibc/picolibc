@@ -84,6 +84,19 @@
 #define PF_ARM_PI          0x20000000   /* Segment is position-independent.  */
 #define PF_ARM_ABS         0x40000000   /* Segment must be loaded at its base address.  */
 
+/* Values for the Tag_CPU_arch EABI attribute.  */
+#define TAG_CPU_ARCH_PRE_V4	0
+#define TAG_CPU_ARCH_V4		1
+#define TAG_CPU_ARCH_V4T	2
+#define TAG_CPU_ARCH_V5T	3
+#define TAG_CPU_ARCH_V5TE	4
+#define TAG_CPU_ARCH_V5TEJ	5
+#define TAG_CPU_ARCH_V6		6
+#define TAG_CPU_ARCH_V6KZ	7
+#define TAG_CPU_ARCH_V6T2	8
+#define TAG_CPU_ARCH_V6K	9
+#define TAG_CPU_ARCH_V7		10
+
 /* Relocation types.  */
 
 START_RELOC_NUMBERS (elf_arm_reloc_type)
