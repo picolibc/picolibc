@@ -1,5 +1,10 @@
 2006-10-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* regtool.cc (KEY_WOW64_64KEY): Drop definition.  Instead define 
+	WINVER to 0x0502 before including windows.h.
+
+2006-10-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* regtool.cc (KEY_WOW64_64KEY): Define.
 	(longopts): Add --wow64 option.
 	(opts): Add -w option.

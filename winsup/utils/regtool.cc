@@ -13,14 +13,11 @@ details. */
 #include <errno.h>
 #include <ctype.h>
 #include <getopt.h>
+#define WINVER 0x0502
 #include <windows.h>
 #include <sys/cygwin.h>
 
 #define DEFAULT_KEY_SEPARATOR '\\'
-
-#ifndef KEY_WOW64_64KEY
-#define KEY_WOW64_64KEY 0x100
-#endif
 
 enum
 {
