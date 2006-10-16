@@ -1,3 +1,36 @@
+2006-10-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/asm/byteorder.h: Fix copyright dates.
+
+2006-10-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (PrivilegeCheck): Define.
+	* fhandler.cc (fhandler_base::open): Always try opening with backup
+	resp. restore intent.
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Always try
+	opening with backup intent.
+	(fhandler_disk_file::readdir): Ditto when trying to retrieve file id
+	explicitely.
+	* security.cc (check_file_access): Replace pbuf with correctly
+	PPRIVILEGE_SET typed pset.  Check explicitely for backup and/or restore
+	privileges when AccessCheck fails, to circumvent AccessCheck
+	shortcoming.  Add comment to explain.
+
+2006-09-17  Danny Smith  <dannysmith@clear.net.nz>
+
+	* include/asm/byteorder.h: Correct typo.
+
+2006-09-17  Danny Smith  <dannysmith@clear.net.nz>
+
+	* include/asm/byteorder.h: Don't #define n* macros if -fnoinline is
+	specified.
+
+2006-09-07  Christopher Faylor  <cgf@timesys.com>
+
+	* environ.cc (build_env): Don't put an empty environment variable into
+	the environment.  Optimize use of "len".
+	* errno.cc (ERROR_MORE_DATA): Translate to EMSGSIZE rather than EAGAIN.
+
 2006-08-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* grp.cc (initgroups32): Run get_server_groups under original token.

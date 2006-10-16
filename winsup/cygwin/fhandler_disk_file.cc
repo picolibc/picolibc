@@ -1532,7 +1532,9 @@ fhandler_disk_file::opendir ()
 	      status = NtOpenFile (&dir->__handle,
 				   SYNCHRONIZE | FILE_LIST_DIRECTORY,
 				   &attr, &io, wincap.shared (),
-				   FILE_SYNCHRONOUS_IO_NONALERT | FILE_DIRECTORY_FILE);
+				   FILE_SYNCHRONOUS_IO_NONALERT
+				   | FILE_OPEN_FOR_BACKUP_INTENT
+				   | FILE_DIRECTORY_FILE);
 	      if (!NT_SUCCESS (status))
 		{
 		  __seterrno_from_nt_status (status);
@@ -1763,7 +1765,7 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 	      InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
 					  dir->__handle , NULL);
 	      if (!NtOpenFile (&hdl, READ_CONTROL, &attr, &io,
-			       wincap.shared (), 0))
+			       wincap.shared (), FILE_OPEN_FOR_BACKUP_INTENT))
 		{
 		  de->d_ino = readdir_get_ino_by_handle (hdl);
 		  CloseHandle (hdl);
