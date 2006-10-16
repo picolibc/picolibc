@@ -1488,8 +1488,6 @@ fhandler_disk_file::opendir ()
       set_errno (ENOMEM);
       goto free_dirname;
     }
-  else if (!pc.iscygdrive () && fhaccess (R_OK) != 0)
-    goto free_dirent;
   else
     {
       strcpy (d_dirname (dir), get_win32_name ());
