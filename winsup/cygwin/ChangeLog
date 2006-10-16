@@ -1,4 +1,8 @@
-2006-10-13  Corinn6 Vinschen  <corinna@vinschen.de>
+2006-10-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/asm/byteorder.h: Fix copyright dates.
+
+2006-10-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (PrivilegeCheck): Define.
 	* fhandler.cc (fhandler_base::open): Always try opening with backup

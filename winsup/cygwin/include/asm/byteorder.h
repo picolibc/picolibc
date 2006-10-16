@@ -1,6 +1,6 @@
 /* asm/byteorder.h
 
-   Copyright 1996, 1998, 2001 Red Hat, Inc.
+   Copyright 1996, 1998, 2001, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
