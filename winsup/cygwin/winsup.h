@@ -35,9 +35,8 @@ details. */
 
 #define EXPORT_ALIAS(sym,symalias) extern "C" __typeof (sym) symalias __attribute__ ((alias(#sym)));
 
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0501
-#endif
+#define WINVER 0x0502
+#define _NO_W32_PSEUDO_MODIFIERS
 
 #include <sys/types.h>
 #include <sys/strace.h>

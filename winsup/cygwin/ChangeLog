@@ -1,3 +1,8 @@
+2006-10-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winsup.h (WINVER): Define instead of _WIN32_WINNT.  Set to 0x0502.
+	(_NO_W32_PSEUDO_MODIFIERS): Define.
+
 2006-10-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Drop redundant
