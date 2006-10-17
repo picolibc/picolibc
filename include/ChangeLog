@@ -1,3 +1,7 @@
+2006-10-17  Mark Shinwell  <shinwell@codesourcery.com>
+
+	* elf/arm.h: Define TAG_CPU_ARCH_* constants.
+
 2006-09-17  Mei Ligang  <ligang@sunnorth.com.cn>
 
 	* dis-asm.h: Add prototypes for Score disassembler routines.
