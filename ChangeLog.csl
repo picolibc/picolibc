@@ -1,3 +1,9 @@
+2006-10-19  Joseph S. Myers  <joseph@codesourcery.com>
+            Mark Mitchell  <mark@codesourcery.com>
+
+	ld/
+	* configure.tgt (arm*linux*): Support both big- and little-endian.
+
 2006-10-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	binutils/
