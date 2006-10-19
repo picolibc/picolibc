@@ -1,3 +1,13 @@
+2006-10-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* glob.c: Remove.
+	* glob.cc: New file.  Latest glob version from FreeBSD plus Cygwin
+	specific changes (__stat64/__stat32, ignore_case_with_glob,
+	drop collate functions).
+	(glob3): Return GLOB_ABORTED in case directory is unreadable and
+	GLOB_ERR is set, as demanded by SUSv3.
+	* glob.h: Import latest version from FreeBSD.
+
 2006-10-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Drop redundant
