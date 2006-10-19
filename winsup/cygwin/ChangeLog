@@ -1,5 +1,24 @@
 2006-10-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (fhandler_base::set_name): Make virtual.
+	(class fhandler_registry): Add wow64 and prefix_len members.
+	Declare set_name method.
+	* fhandler_proc.cc (PROC_REGISTRY32): Define.
+	(PROC_REGISTRY64): Define.
+	(proc_listing): Add "registry32" and "registry64" elements.
+	(proc_fhandlers): Add corresponding FH_REGISTRY values.
+	* fhandler_registry.cc (registry_len): Drop static value in favor of
+	class member prefix_len.  Use preifx_len instead of registry_len
+	throughout.
+	(fhandler_registry::set_name): Define.  Set wow64 and prefix_len
+	according to directory prefix.
+	(fhandler_registry::fhandler_registry): Set wow64 and prefix_len to
+	default values.
+	(open_key): Add wow64 argument.  Handle wow64 in call to RegOpenKeyEx.
+	Use fhandler_registry member wow64 in this place throughout.
+
+2006-10-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_proc.cc: Drop superfluous definition of _WIN32_WINNT.
 	* miscfuncs.cc: Ditto.
 	* sched.cc: Ditto.

@@ -139,7 +139,7 @@ class fhandler_base
   class fhandler_base *archetype;
   int usecount;
 
-  void set_name (path_conv &pc);
+  virtual void set_name (path_conv &pc);
   int error () const {return pc.error;}
   void set_error (int error) {pc.error = error;}
   bool exists () const {return pc.exists ();}
@@ -1266,8 +1266,11 @@ class fhandler_registry: public fhandler_proc
 {
  private:
   char *value_name;
+  DWORD wow64;
+  int prefix_len;
  public:
   fhandler_registry ();
+  void set_name (path_conv &pc);
   int exists();
   int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   _off64_t telldir (DIR *);

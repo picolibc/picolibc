@@ -33,15 +33,17 @@ details. */
 #include <dirent.h>
 
 /* offsets in proc_listing */
-static const int PROC_LOADAVG  = 2;     // /proc/loadavg
-static const int PROC_MEMINFO  = 3;     // /proc/meminfo
-static const int PROC_REGISTRY = 4;     // /proc/registry
-static const int PROC_STAT     = 5;     // /proc/stat
-static const int PROC_VERSION  = 6;     // /proc/version
-static const int PROC_UPTIME   = 7;     // /proc/uptime
-static const int PROC_CPUINFO  = 8;     // /proc/cpuinfo
-static const int PROC_PARTITIONS = 9;   // /proc/partitions
-static const int PROC_SELF     = 10;    // /proc/self
+static const int PROC_LOADAVG    =  2;   // /proc/loadavg
+static const int PROC_MEMINFO    =  3;   // /proc/meminfo
+static const int PROC_REGISTRY   =  4;   // /proc/registry
+static const int PROC_STAT       =  5;   // /proc/stat
+static const int PROC_VERSION    =  6;   // /proc/version
+static const int PROC_UPTIME     =  7;   // /proc/uptime
+static const int PROC_CPUINFO    =  8;   // /proc/cpuinfo
+static const int PROC_PARTITIONS =  9;   // /proc/partitions
+static const int PROC_SELF       = 10;   // /proc/self
+static const int PROC_REGISTRY32 = 11;   // /proc/registry32
+static const int PROC_REGISTRY64 = 12;   // /proc/registry64
 
 /* names of objects in /proc */
 static const char *proc_listing[] = {
@@ -56,6 +58,8 @@ static const char *proc_listing[] = {
   "cpuinfo",
   "partitions",
   "self",
+  "registry32",
+  "registry64",
   NULL
 };
 
@@ -76,6 +80,8 @@ static const DWORD proc_fhandlers[PROC_LINK_COUNT] = {
   FH_PROC,
   FH_PROC,
   FH_PROC,
+  FH_REGISTRY,
+  FH_REGISTRY,
 };
 
 /* name of the /proc filesystem */

@@ -25,7 +25,6 @@ details. */
 #define _COMPILING_NEWLIB
 #include <dirent.h>
 
-static const int registry_len = sizeof ("registry") - 1;
 /* If this bit is set in __d_position then we are enumerating values,
  * else sub-keys. keeping track of where we are is horribly messy
  * the bottom 16 bits are the absolute position and the top 15 bits
@@ -84,7 +83,7 @@ static const int SPECIAL_DOT_FILE_COUNT =
 /* Name given to default values */
 static const char *DEFAULT_VALUE_NAME = "@";
 
-static HKEY open_key (const char *name, REGSAM access, bool isValue);
+static HKEY open_key (const char *name, REGSAM access, DWORD wow64, bool isValue);
 
 /* Returns 0 if path doesn't exist, >0 if path is a directory,
  * <0 if path is a file.
@@ -105,7 +104,7 @@ fhandler_registry::exists ()
 
   const char *path = get_name ();
   debug_printf ("exists (%s)", path);
-  path += proc_len + registry_len + 1;
+  path += proc_len + prefix_len + 1;
   if (*path)
     path++;
   else
@@ -133,12 +132,12 @@ fhandler_registry::exists ()
       goto out;
     }
 
-  hKey = open_key (path, KEY_READ, false);
+  hKey = open_key (path, KEY_READ, wow64, false);
   if (hKey != (HKEY) INVALID_HANDLE_VALUE)
     file_type = 1;
   else
     {
-      hKey = open_key (path, KEY_READ, true);
+      hKey = open_key (path, KEY_READ, wow64, true);
       if (hKey == (HKEY) INVALID_HANDLE_VALUE)
 	return 0;
 
@@ -186,9 +185,27 @@ out:
   return file_type;
 }
 
+void
+fhandler_registry::set_name (path_conv &in_pc)
+{   
+  if (strncasematch (in_pc.normalized_path, "/proc/registry32", 16))
+    {
+      wow64 = KEY_WOW64_32KEY;
+      prefix_len += 2;
+    }
+  else if (strncasematch (in_pc.normalized_path, "/proc/registry64", 16))
+    {
+      wow64 = KEY_WOW64_64KEY;
+      prefix_len += 2;
+    }
+  fhandler_base::set_name (in_pc);
+}
+
 fhandler_registry::fhandler_registry ():
 fhandler_proc ()
 {
+  wow64 = 0;
+  prefix_len = sizeof ("registry") - 1;
 }
 
 int
@@ -218,9 +235,9 @@ fhandler_registry::fstat (struct __stat64 *buf)
   if (file_type != 0 && file_type != 2)
     {
       HKEY hKey;
-      const char *path = get_name () + proc_len + registry_len + 2;
+      const char *path = get_name () + proc_len + prefix_len + 2;
       hKey =
-	open_key (path, STANDARD_RIGHTS_READ | KEY_QUERY_VALUE,
+	open_key (path, STANDARD_RIGHTS_READ | KEY_QUERY_VALUE, wow64,
 		  (file_type < 0) ? true : false);
 
       if (hKey != (HKEY) INVALID_HANDLE_VALUE)
@@ -279,7 +296,7 @@ fhandler_registry::readdir (DIR *dir, dirent *de)
   DWORD buf_size = CYG_MAX_PATH;
   char buf[buf_size];
   HANDLE handle;
-  const char *path = dir->__d_dirname + proc_len + 1 + registry_len;
+  const char *path = dir->__d_dirname + proc_len + 1 + prefix_len;
   LONG error;
   int res = ENMFILE;
 
@@ -294,7 +311,7 @@ fhandler_registry::readdir (DIR *dir, dirent *de)
     }
   if (dir->__handle == INVALID_HANDLE_VALUE && dir->__d_position == 0)
     {
-      handle = open_key (path + 1, KEY_READ, false);
+      handle = open_key (path + 1, KEY_READ, wow64, false);
       dir->__handle = handle;
     }
   if (dir->__handle == INVALID_HANDLE_VALUE)
@@ -406,7 +423,7 @@ fhandler_registry::open (int flags, mode_t mode)
     goto out;
 
   const char *path;
-  path = get_name () + proc_len + 1 + registry_len;
+  path = get_name () + proc_len + 1 + prefix_len;
   if (!*path)
     {
       if ((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
@@ -482,10 +499,10 @@ fhandler_registry::open (int flags, mode_t mode)
       goto out;
     }
 
-  handle = open_key (path, KEY_READ, false);
+  handle = open_key (path, KEY_READ, wow64, false);
   if (handle == (HKEY) INVALID_HANDLE_VALUE)
     {
-      handle = open_key (path, KEY_READ, true);
+      handle = open_key (path, KEY_READ, wow64, true);
       if (handle == (HKEY) INVALID_HANDLE_VALUE)
 	{
 	  res = 0;
@@ -626,7 +643,7 @@ value_not_found:
 
 /* Auxillary member function to open registry keys.  */
 static HKEY
-open_key (const char *name, REGSAM access, bool isValue)
+open_key (const char *name, REGSAM access, DWORD wow64, bool isValue)
 {
   HKEY hKey = (HKEY) INVALID_HANDLE_VALUE;
   HKEY hParentKey = (HKEY) INVALID_HANDLE_VALUE;
@@ -652,7 +669,8 @@ open_key (const char *name, REGSAM access, bool isValue)
 	    effective_access = access;
 	  LONG
 	    error =
-	    RegOpenKeyEx (hParentKey, component, 0, effective_access, &hKey);
+	    RegOpenKeyEx (hParentKey, component, 0, effective_access | wow64,
+	    		  &hKey);
 	  if (error != ERROR_SUCCESS)
 	    {
 	      hKey = (HKEY) INVALID_HANDLE_VALUE;
