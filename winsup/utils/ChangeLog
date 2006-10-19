@@ -1,3 +1,11 @@
+2006-10-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* regtool.cc (longopts): Add --wow32 option.
+	(opts): Add -W option.
+	(usage): Add text for --wow32/-W option.
+	(main): Handle --wow32/-W option.
+	* utils.sgml: Document the new -W option.
+
 2006-10-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* regtool.cc (KEY_WOW64_64KEY): Drop definition.  Instead define 

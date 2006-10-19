@@ -48,6 +48,7 @@ static struct option longopts[] =
   {"verbose", no_argument, NULL, 'v'},
   {"version", no_argument, NULL, 'V'},
   {"wow64", no_argument, NULL, 'w'},
+  {"wow32", no_argument, NULL, 'W'},
   {"key-separator", required_argument, NULL, 'K'},
   {NULL, 0, NULL, 0}
 };
@@ -110,6 +111,7 @@ usage (FILE *where = stderr)
   " -q, --quiet    no error output, just nonzero return if KEY/VALUE missing\n"
   " -v, --verbose  verbose output, including VALUE contents when applicable\n"
   " -w, --wow64    access 64 bit registry view (ignored on 32 bit Windows)\n"
+  " -W, --wow32    access 32 bit registry view (ignored on 32 bit Windows)\n"
   " -V, --version  output version information and exit\n"
   "\n");
   if (where == stdout)
@@ -859,6 +861,9 @@ main (int argc, char **_argv)
 	  exit (0);
 	case 'w':
 	  wow64 = KEY_WOW64_64KEY;
+	  break;
+	case 'W':
+	  wow64 = KEY_WOW64_32KEY;
 	  break;
 	case 'K':
 	  key_sep = *optarg;
