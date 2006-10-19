@@ -1,3 +1,9 @@
+2006-10-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_proc.cc: Drop superfluous definition of _WIN32_WINNT.
+	* miscfuncs.cc: Ditto.
+	* sched.cc: Ditto.
+
 2006-10-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* glob.c: Remove.

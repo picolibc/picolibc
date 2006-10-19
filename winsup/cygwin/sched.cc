@@ -1,6 +1,6 @@
 /* sched.cc: scheduler interface for Cygwin
 
-   Copyright 2001, 2002  Red Hat, Inc.
+   Copyright 2001, 2002, 2006  Red Hat, Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -14,7 +14,6 @@
 # include "config.h"
 #endif
 
-#define _WIN32_WINNT 0x300
 #include "winsup.h"
 #include <limits.h>
 #include "cygerrno.h"

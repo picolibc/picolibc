@@ -1,7 +1,7 @@
 /* miscfuncs.cc: misc funcs that don't belong anywhere else
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005 Red Hat, Inc.
+   2005, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,7 +9,6 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#define _WIN32_WINNT 0x400
 #include "winsup.h"
 #include "cygerrno.h"
 #include <sys/errno.h>
