@@ -1,3 +1,9 @@
+2006-10-19  Mei Ligang  <ligang@sunnorth.com.cn>
+
+	* score.h (EF_SCORE_PIC): Redefine EF_SCORE_PIC as 0x80000000.
+	(EF_SCORE_FIXDEP): Redefine EF_SCORE_FIXDEP as 0x40000000.
+	(EF_SCORE_HASENTRY): Delete.
+
 2006-09-17  Mei Ligang  <ligang@sunnorth.com.cn>
 
 	* score.h: New file.

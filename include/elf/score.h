@@ -26,22 +26,21 @@
 #include "elf/reloc-macros.h"
 
 #define SCORE_SIMULATOR_ACTIVE  1
-#define OPC_PTMASK              0xc0000000      /* Parity-bit Mask */
+#define OPC_PTMASK              0xc0000000      /* Parity-bit Mask.  */
 #define OPC16_PTMASK		0x00008000
 /* The parity-bit denotes.  */
-#define OPC_32                  0xc0000000      /* denotes 32b instruction, (default) */
-#define OPC_16                  0x00000000      /* denotes 16b instruction  */
-#define OPC_PE                  0x8000          /* denotes parallel-execution instructions  */
-#define EF_SCORE_HASENTRY       0x02
+#define OPC_32                  0xc0000000      /* Denotes 32b instruction, (default).  */
+#define OPC_16                  0x00000000      /* Denotes 16b instruction.  */
+#define OPC_PE                  0x8000          /* Denotes parallel-execution instructions.  */
 #define GP_DISP_LABEL           "_gp_disp"
 
-/* Processor specific flags for the ELF header e_flags field.  */
-
-/* Fix data dependency.  */
-#define EF_SCORE_FIXDEP         0x00000001
+/* Processor specific flags for the ELF header e_flags field:  */
 
 /* File contains position independent code.  */
-#define EF_SCORE_PIC		0x00000002
+#define EF_SCORE_PIC            0x80000000
+
+/* Fix data dependency.  */
+#define EF_SCORE_FIXDEP         0x40000000 
 
 /* Defined and allocated common symbol.  Value is virtual address.  If
    relocated, alignment must be preserved.  */
