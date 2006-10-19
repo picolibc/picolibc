@@ -1,7 +1,7 @@
 /*	$NetBSD: popen.c,v 1.11 1995/06/16 07:05:33 jtc Exp $	*/
 
 /*
- * Copyright (c) 1988, 1993
+ * Copyright (c) 1988, 1993, 2006
  *	The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software written by Ken Arnold and
@@ -55,6 +55,7 @@ static char rcsid[] = "$NetBSD: popen.c,v 1.11 1995/06/16 07:05:33 jtc Exp $";
 #include <stdlib.h>
 #include <string.h>
 #include <paths.h>
+#include <fcntl.h>
 
 static struct pid {
 	struct pid *next;
@@ -102,7 +103,9 @@ _DEFUN(popen, (program, type),
 				(void)dup2(pdes[1], STDOUT_FILENO);
 				(void)close(pdes[1]);
 			}
-			(void) close(pdes[0]);
+			if (pdes[0] != STDOUT_FILENO) {
+				(void) close(pdes[0]);
+			}
 		} else {
 			if (pdes[0] != STDIN_FILENO) {
 				(void)dup2(pdes[0], STDIN_FILENO);
@@ -128,6 +131,12 @@ _DEFUN(popen, (program, type),
 		iop = fdopen(pdes[1], type);
 		(void)close(pdes[0]);
 	}
+
+#ifdef HAVE_FCNTL
+	/* Hide pipe from future popens; assume fcntl can't fail.  */
+	fcntl (fileno (iop), F_SETFD,
+	       fcntl (fileno (iop), F_GETFD, 0) | FD_CLOEXEC);
+#endif /* HAVE_FCNTL */
 
 	/* Link into list of file descriptors. */
 	cur->fp = iop;

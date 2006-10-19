@@ -69,6 +69,8 @@ _DEFUN (_reclaim_reent, (ptr),
 
 	  _free_r (ptr, _REENT_MP_FREELIST(ptr));
 	}
+      if (_REENT_MP_RESULT(ptr))
+	_free_r (ptr, _REENT_MP_RESULT(ptr));
 
 #ifdef _REENT_SMALL
       if (ptr->_emergency)

@@ -1,3 +1,34 @@
+2006-10-11  Yang Tse  <yangsita@gmail.com>
+
+	* libc/include/machine/setjmp.h: Use __extension__ keyword for gcc's
+	braced-groups.
+
+2006-10-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/reent/reeent.c (_reclaim_reent): Free _REENT_MP_RESULT.
+
+2006-09-13  Patrick Mansfield <patmans@us.ibm.com>
+
+	* libc/include/math.h: Remove _CONST from _LIB_VERSION, as it is
+	supposed to be writable.
+	* libm/common/s_lib_ver.c: Ditto.
+
+2006-09-06  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/vfprintf.c (_vfprintf_r, get_arg): Add 'hh', 'j',
+	't', and 'z' modifiers.
+
+2006-08-22  Eric Blake  <ebb9@byu.net>
+
+	* libc/posix/popen.c (popen): Don't close output end of pipe in
+	child if stdout was closed on entry.
+	[HAVE_FCNTL]: In parent, mark file as close-on-exec, per POSIX.
+
+2006-08-17  Brian Ford  <Brian.Ford@FlightSafety.com>
+
+	* libc/time/gmtime.c: Correct man page; clock is not a
+	local time and no conversion occurs.
+
 2006-07-05  Jeff Johnston  <jjohnstn@redhat.com>	
 
 	* libc/stdlib/mprec.h [_DOUBLE_IS_32BITS]: Turn off C99 hex 

@@ -406,7 +406,7 @@ enum __fdlibm_version
 #define _LIB_VERSION_TYPE enum __fdlibm_version
 #define _LIB_VERSION __fdlib_version
 
-extern __IMPORT _CONST _LIB_VERSION_TYPE _LIB_VERSION;
+extern __IMPORT _LIB_VERSION_TYPE _LIB_VERSION;
 
 #define _IEEE_  __fdlibm_ieee
 #define _SVID_  __fdlibm_svid
