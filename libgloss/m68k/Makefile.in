@@ -150,8 +150,8 @@ CF_ISRS=	other_interrupt reset access_error address_error \
 	fp_underflow fp_operand_error fp_overflow fp_input_not_a_number \
 	fp_input_denormalized_number unsupported_instruction
 
-CF_BOARDS :=  m5208evb m5213evb m52235evb m5235evb m5272c3 m5282evb \
-	m5329evb m5485evb
+CF_BOARDS :=  m5208evb m5213evb m52235evb m5235evb m5272c3 m5275evb \
+	m5282evb m5329evb m5485evb
 CF_RAM_SCRIPTS := $(patsubst %,%-ram.ld,$(CF_BOARDS))
 CF_ROM_SCRIPTS := $(patsubst %,%-rom.ld,$(CF_BOARDS))
 CF_HOSTED_SCRIPTS := $(patsubst %.ld,%-hosted.ld,$(CF_RAM_SCRIPTS) $(CF_ROM_SCRIPTS))
@@ -224,6 +224,7 @@ m5213evb  :=  512M 32K 0M 256K
 m52235evb :=  512M 32K 0M 256K
 m5235evb  :=    0M 16M 0xFFE00000 2M
 m5273c3   :=    0M  4M 0xFFE00000 2M
+m5275evb  :=    0M 16M 0xFFE00000 2M
 m5282evb  :=    0M 16M 0xFFE00000 2M
 m5329evb  := 1024M 32M 0M 2M
 m5485evb  :=    0M 64M 1024M 16M
