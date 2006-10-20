@@ -3456,7 +3456,7 @@ cygwin_getnameinfo (const struct sockaddr *sa, socklen_t salen,
   if (getnameinfo)
     {
       /* When the incoming port number is set to 0, Winsock's getnameinfo
-	 returns with error WSAENO_DATA instead of simply ignoring the port.
+	 returns with error WSANO_DATA instead of simply ignoring the port.
 	 To avoid this strange behaviour, we check manually, if the port number
 	 is 0.  If so, set the NI_NUMERICSERV flag to avoid this problem. */
       switch (sa->sa_family)
