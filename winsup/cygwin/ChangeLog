@@ -1,3 +1,9 @@
+2006-10-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_registry.cc (fhandler_registry::fstat): Set restrictive
+	permission and ownership if key can't be opened for reading security.
+	(open_key): If opening key fails, retry opening with backup intent.
+
 2006-10-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (cygwin_getnameinfo): Fix typo in comment.

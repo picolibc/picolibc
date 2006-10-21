@@ -286,6 +286,19 @@ fhandler_registry::fstat (struct __stat64 *buf)
 	    }
 	  RegCloseKey (hKey);
 	}
+      else
+        {
+	  /* Here's the problem:  If we can't open the key, we don't know
+	     nothing at all about the key/value.  It's only clear that
+	     the current user has no read access.  At this point it's
+	     rather unlikely that the user has write or execute access
+	     and it's also rather unlikely that the user is the owner.
+	     Therefore it's probably most safe to assume unknown ownership
+	     and no permissions for nobody. */
+	  buf->st_uid = UNKNOWN_UID;
+	  buf->st_gid = UNKNOWN_GID;
+	  buf->st_mode &= ~0777;
+	}
     }
   return 0;
 }
@@ -667,10 +680,13 @@ open_key (const char *name, REGSAM access, DWORD wow64, bool isValue)
 	  REGSAM effective_access = KEY_READ;
 	  if ((strchr (name, '/') == NULL && isValue == true) || *name == 0)
 	    effective_access = access;
-	  LONG
-	    error =
-	    RegOpenKeyEx (hParentKey, component, 0, effective_access | wow64,
-	    		  &hKey);
+	  LONG error = RegOpenKeyEx (hParentKey, component, 0,
+				     effective_access | wow64, &hKey);
+	  if (error == ERROR_ACCESS_DENIED) /* Try opening with backup intent */
+	    error = RegCreateKeyEx (hParentKey, component, 0, NULL,
+				    REG_OPTION_BACKUP_RESTORE,
+				    effective_access | wow64, NULL,
+				    &hKey, NULL);
 	  if (error != ERROR_SUCCESS)
 	    {
 	      hKey = (HKEY) INVALID_HANDLE_VALUE;
