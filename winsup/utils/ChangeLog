@@ -1,3 +1,24 @@
+2006-10-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* regtool.cc (key_type): Drop.
+	(REG_AUTO): Define.
+	(value_type): Replace key_type.  Use REG_xxx values directly.
+	Accomodate change throughout.
+	(longopts): Add --dword, --dword-le, --none, --qword and --hex options.
+	(opts): Add -d, -D, -n, -Q and -x options.
+	(types): Array to convert REG_xxx into strings.
+	(hex): New variable to keep value of --hex option.
+	(usage): Accomodate new options.  Print only the necessary by default.
+	Only be verbose in case of -h/--help option.
+	(cmd_list): Use key separator from -K option when printing.
+	Print value type when verbose option is given.  Handle so far not
+	handled REG_xxx types.
+	(cmd_set): Avoid SEGV due to missing argument.  Handle so far not
+	handled REG_xxx types.
+	(cmd_get): Handle --binary option type agnostic.  Handle so far not
+	handled REG_xxx types.
+	(main): Handle new options.
+
 2006-10-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* regtool.cc (longopts): Add --wow32 option.
