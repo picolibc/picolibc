@@ -1944,38 +1944,19 @@ set_file_attribute (bool use_ntsec, HANDLE handle, const char *file,
 			     myself->uid, myself->gid, attribute);
 }
 
-int
-check_file_access (const char *fn, int flags)
+static int
+check_access (security_descriptor &sd, GENERIC_MAPPING &mapping,
+	      DWORD desired, int flags)
 {
   int ret = -1;
-
-  security_descriptor sd;
-
-  HANDLE hToken;
   BOOL status;
-  DWORD desired = 0, granted;
-  DWORD plength = sizeof (PRIVILEGE_SET) + 3 * sizeof (LUID_AND_ATTRIBUTES);
-  PPRIVILEGE_SET pset = (PPRIVILEGE_SET) alloca (plength);
-  static GENERIC_MAPPING NO_COPY mapping = { FILE_GENERIC_READ,
-					     FILE_GENERIC_WRITE,
-					     FILE_GENERIC_EXECUTE,
-					     FILE_ALL_ACCESS };
-  if (read_sd (fn, sd) <= 0)
-    goto done;
+  DWORD granted;
+  DWORD plen = sizeof (PRIVILEGE_SET) + 3 * sizeof (LUID_AND_ATTRIBUTES);
+  PPRIVILEGE_SET pset = (PPRIVILEGE_SET) alloca (plen);
+  HANDLE tok = cygheap->user.issetuid () ? cygheap->user.token ()
+					 : hProcImpToken;
 
-  if (cygheap->user.issetuid ())
-    hToken = cygheap->user.token ();
-  else
-    hToken = hProcImpToken;
-
-  if (flags & R_OK)
-    desired |= FILE_READ_DATA;
-  if (flags & W_OK)
-    desired |= FILE_WRITE_DATA;
-  if (flags & X_OK)
-    desired |= FILE_EXECUTE;
-  if (!AccessCheck (sd, hToken, desired, &mapping,
-		    pset, &plength, &granted, &status))
+  if (!AccessCheck (sd, tok, desired, &mapping, pset, &plen, &granted, &status))
     __seterrno ();
   else if (!status)
     {
@@ -1993,31 +1974,73 @@ check_file_access (const char *fn, int flags)
 	 backup/restore privileges has to be made.  Sigh. */
       int granted_flags = 0;
       if (flags & R_OK)
-        {
+	{
 	  pset->PrivilegeCount = 1;
 	  pset->Control = 0;
 	  pset->Privilege[0].Luid = *privilege_luid (SE_BACKUP_PRIV);
 	  pset->Privilege[0].Attributes = 0;
-	  if (PrivilegeCheck (hToken, pset, &status) && status)
+	  if (PrivilegeCheck (tok, pset, &status) && status)
 	    granted_flags |= R_OK;
 	}
       if (flags & W_OK)
-        {
+	{
 	  pset->PrivilegeCount = 1;
 	  pset->Control = 0;
 	  pset->Privilege[0].Luid = *privilege_luid (SE_RESTORE_PRIV);
 	  pset->Privilege[0].Attributes = 0;
-	  if (PrivilegeCheck (hToken, pset, &status) && status)
+	  if (PrivilegeCheck (tok, pset, &status) && status)
 	    granted_flags |= W_OK;
 	}
       if (granted_flags == flags)
-        ret = 0;
+	ret = 0;
       else
 	set_errno (EACCES);
     }
   else
     ret = 0;
- done:
+  return ret;
+}
+
+int
+check_file_access (const char *fn, int flags)
+{
+  security_descriptor sd;
+  int ret = -1;
+  static GENERIC_MAPPING NO_COPY mapping = { FILE_GENERIC_READ,
+					     FILE_GENERIC_WRITE,
+					     FILE_GENERIC_EXECUTE,
+					     FILE_ALL_ACCESS };
+  DWORD desired = 0;
+  if (flags & R_OK)
+    desired |= FILE_READ_DATA;
+  if (flags & W_OK)
+    desired |= FILE_WRITE_DATA;
+  if (flags & X_OK)
+    desired |= FILE_EXECUTE;
+  if (read_sd (fn, sd) > 0)
+    ret = check_access (sd, mapping, desired, flags);
+  debug_printf ("flags %x, ret %d", flags, ret);
+  return ret;
+}
+
+int
+check_registry_access (HANDLE hdl, int flags)
+{
+  security_descriptor sd;
+  int ret = -1;
+  static GENERIC_MAPPING NO_COPY mapping = { KEY_READ,
+					     KEY_WRITE,
+					     KEY_EXECUTE,
+					     KEY_ALL_ACCESS };
+  DWORD desired = 0;
+  if (flags & R_OK)
+    desired |= KEY_ENUMERATE_SUB_KEYS;
+  if (flags & W_OK)
+    desired |= KEY_SET_VALUE;
+  if (flags & X_OK)
+    desired |= KEY_QUERY_VALUE;
+  if (!get_reg_security (hdl, sd))
+    ret = check_access (sd, mapping, desired, flags);
   debug_printf ("flags %x, ret %d", flags, ret);
   return ret;
 }

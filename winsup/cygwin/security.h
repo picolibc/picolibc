@@ -302,6 +302,7 @@ LONG __stdcall write_sd (HANDLE fh, const char *file, security_descriptor &sd);
 bool __stdcall add_access_allowed_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
 bool __stdcall add_access_denied_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
 int __stdcall check_file_access (const char *, int);
+int __stdcall check_registry_access (HANDLE, int);
 
 void set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
 			     security_descriptor &sd_buf);

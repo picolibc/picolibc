@@ -388,6 +388,12 @@ fhandler_base::fhaccess (int flags)
       res = check_file_access (get_win32_name (), flags);
       goto done;
     }
+  else if (get_device () == FH_REGISTRY && allow_ntsec && open (O_RDONLY, 0))
+    {
+      res = check_registry_access (get_handle (), flags);
+      close ();
+      return res;
+    }
 
   struct __stat64 st;
   if (fstat (&st))

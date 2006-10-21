@@ -1,5 +1,16 @@
 2006-10-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::fhaccess): Call check_registry_access
+	for registry keys/values if ntsec is on.
+	* security.cc (check_access): New static function derived from
+	check_file_access, but object type agnostic.
+	(check_file_access): Only do file specific stuff.  Call check_access.
+	(check_registry_access): New access check function for registry keys/
+	values.
+	* security.h (check_registry_access): Declare.
+
+2006-10-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_registry.cc (fhandler_registry::fstat): Set restrictive
 	permission and ownership if key can't be opened for reading security.
 	(open_key): If opening key fails, retry opening with backup intent.
