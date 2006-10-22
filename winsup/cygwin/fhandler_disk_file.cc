@@ -689,7 +689,7 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 	    break;
 	  case GETACL:
 	    if (!aclbufp)
-	      set_errno(EFAULT);
+	      set_errno (EFAULT);
 	    else if (nentries < MIN_ACL_ENTRIES)
 	      set_errno (ENOSPC);
 	    else

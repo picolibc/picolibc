@@ -1,6 +1,7 @@
 /* security.cc: NT security functions
 
-   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+   2006 Red Hat, Inc.
 
    Originaly written by Gunther Ebert, gunther.ebert@ixos-leipzig.de
    Completely rewritten by Corinna Vinschen <corinna@vinschen.de>
@@ -1973,6 +1974,9 @@ check_registry_access (HANDLE hdl, int flags)
     desired |= KEY_QUERY_VALUE;
   if (!get_nt_object_security (hdl, SE_REGISTRY_KEY, sd))
     ret = check_access (sd, mapping, desired, flags);
+  /* As long as we can't write the registry... */
+  if (flags & W_OK)
+    ret = -1;
   debug_printf ("flags %x, ret %d", flags, ret);
   return ret;
 }

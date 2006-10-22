@@ -1,5 +1,15 @@
 2006-10-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::facl): Fix whitespace.
+	* external.cc: Update copyright.
+	* fhandler.cc: Ditto.
+	* sec_helper.cc: Ditto.
+	* security.h: Ditto.
+	* security.cc: Ditto.
+	(check_registry_access): Return -1 if W_OK is requested.
+
+2006-10-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* external.cc (cygwin_internal): Use security_descriptor::copy method.
 	* sec_helper.cc (security_descriptor::malloc): Use own free method.
 	Set type.
