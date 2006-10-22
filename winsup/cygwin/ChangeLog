@@ -1,3 +1,10 @@
+2006-10-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::fhaccess): Check if opening registry
+	actually created a handle.  This handles the registry root dir.
+	* fhandler_registry.cc (fhandler_registry::open): Set io_handle in
+	case of opening one of the predefined registry keys.
+
 2006-10-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::fhaccess): Call check_registry_access

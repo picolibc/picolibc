@@ -486,6 +486,7 @@ fhandler_registry::open (int flags, mode_t mode)
 	      }
 	    else
 	      {
+		set_io_handle (registry_keys[i]);
 		flags |= O_DIROPEN;
 		goto success;
 	      }
