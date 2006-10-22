@@ -1,5 +1,29 @@
 2006-10-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* external.cc (cygwin_internal): Use security_descriptor::copy method.
+	* sec_helper.cc (security_descriptor::malloc): Use own free method.
+	Set type.
+	(security_descriptor::realloc): Handle the case that psd has been
+	allocated using LocalAlloc.  Set type.
+	(security_descriptor::free): Ditto.
+	* security.cc (get_nt_attribute): Remove.
+	(get_reg_security): Remove.
+	(get_nt_object_security): Use GetSecurityInfo which handles all
+	securable objects.
+	(get_nt_object_attribute): Remove.
+	(get_object_attribute): Call get_nt_object_security instead of
+	get_nt_object_attribute.
+	(get_file_attribute): Ditto.
+	(check_registry_access): Call get_nt_object_security instead of
+	get_reg_security.
+	* security.h (cygpsid::operator PSID): Make method const, not the
+	result.
+	(class security_descriptor): Add type member.  Accomodate throughout.
+	(security_descriptor::copy): New method.
+	(security_descriptor::operator PSECURITY_DESCRIPTOR *): New operator.
+
+2006-10-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (fhandler_base::fhaccess): Check if opening registry
 	actually created a handle.  This handles the registry root dir.
 	* fhandler_registry.cc (fhandler_registry::open): Set io_handle in

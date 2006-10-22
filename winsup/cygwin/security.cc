@@ -1389,103 +1389,23 @@ get_info_from_sd (PSECURITY_DESCRIPTOR psd, mode_t *attribute,
 		  (!acl_exists || !acl)?"NO ":"", *attribute, uid, gid);
 }
 
-static void
-get_nt_attribute (const char *file, mode_t *attribute,
-		  __uid32_t *uidret, __gid32_t *gidret)
-{
-  security_descriptor sd;
-
-  if (read_sd (file, sd) <= 0)
-    debug_printf ("read_sd %E");
-  get_info_from_sd (sd, attribute, uidret, gidret);
-}
-
-static int
-get_reg_security (HANDLE handle, security_descriptor &sd_ret)
-{
-  LONG ret;
-  DWORD len = 0;
-
-  ret = RegGetKeySecurity ((HKEY) handle,
-			   DACL_SECURITY_INFORMATION
-			   | GROUP_SECURITY_INFORMATION
-			   | OWNER_SECURITY_INFORMATION,
-			   sd_ret, &len);
-  if (ret == ERROR_INSUFFICIENT_BUFFER)
-    {
-      if (!sd_ret.malloc (len))
-	set_errno (ENOMEM);
-      else
-	ret = RegGetKeySecurity ((HKEY) handle,
-				 DACL_SECURITY_INFORMATION
-				 | GROUP_SECURITY_INFORMATION
-				 | OWNER_SECURITY_INFORMATION,
-				 sd_ret, &len);
-    }
-  if (ret != ERROR_SUCCESS)
-    {
-      __seterrno ();
-      return -1;
-    }
-  return 0;
-}
-
 int
 get_nt_object_security (HANDLE handle, SE_OBJECT_TYPE object_type,
 			security_descriptor &sd_ret)
 {
-  NTSTATUS ret;
-  ULONG len = 0;
-
-  /* Unfortunately, NtQuerySecurityObject doesn't work on predefined registry
-     keys like HKEY_LOCAL_MACHINE.  It fails with "Invalid Handle".  So we
-     have to retreat to the Win32 registry functions for registry keys.
-     What bugs me is that RegGetKeySecurity is obviously just a wrapper
-     around NtQuerySecurityObject, but there seems to be no function to
-     convert pseudo HKEY values to real handles. */
-  if (object_type == SE_REGISTRY_KEY)
-    return get_reg_security (handle, sd_ret);
-
-  ret = NtQuerySecurityObject (handle,
+  sd_ret.free ();
+  /* Don't use NtQuerySecurityObject.  It doesn't recognize predefined
+     registry keys. */
+  DWORD ret = GetSecurityInfo (handle, object_type,
 			       DACL_SECURITY_INFORMATION
 			       | GROUP_SECURITY_INFORMATION
 			       | OWNER_SECURITY_INFORMATION,
-			       sd_ret, len, &len);
-  if (ret == STATUS_BUFFER_TOO_SMALL)
+			       NULL, NULL, NULL, NULL, sd_ret);
+  if (ret != ERROR_SUCCESS)
     {
-      if (!sd_ret.malloc (len))
-	set_errno (ENOMEM);
-      else
-	ret = NtQuerySecurityObject (handle,
-				     DACL_SECURITY_INFORMATION
-				     | GROUP_SECURITY_INFORMATION
-				     | OWNER_SECURITY_INFORMATION,
-				     sd_ret, len, &len);
-    }
-  if (ret != STATUS_SUCCESS)
-    {
-      __seterrno_from_nt_status (ret);
+      __seterrno_from_win_error (ret);
       return -1;
     }
-  return 0;
-}
-
-static int
-get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
-			 mode_t *attribute, __uid32_t *uidret,
-			 __gid32_t *gidret)
-{
-  security_descriptor sd;
-  PSECURITY_DESCRIPTOR psd = NULL;
-
-  if (get_nt_object_security (handle, object_type, sd))
-    {
-      if (object_type == SE_FILE_OBJECT)
-	return -1;
-    }
-  else
-    psd = sd;
-  get_info_from_sd (psd, attribute, uidret, gidret);
   return 0;
 }
 
@@ -1495,7 +1415,17 @@ get_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
 {
   if (allow_ntsec)
     {
-      get_nt_object_attribute (handle, object_type, attribute, uidret, gidret);
+      security_descriptor sd;
+      PSECURITY_DESCRIPTOR psd = NULL;
+
+      if (get_nt_object_security (handle, object_type, sd))
+	{
+	  if (object_type == SE_FILE_OBJECT)
+	    return -1;
+	}
+      else
+	psd = sd;
+      get_info_from_sd (psd, attribute, uidret, gidret);
       return 0;
     }
   /* The entries are already set to default values */
@@ -1511,9 +1441,11 @@ get_file_attribute (int use_ntsec, HANDLE handle, const char *file,
 
   if (use_ntsec && allow_ntsec)
     {
-      if (!handle || get_nt_object_attribute (handle, SE_FILE_OBJECT,
-					      attribute, uidret, gidret))
-	get_nt_attribute (file, attribute, uidret, gidret);
+      security_descriptor sd;
+
+      if (!handle || get_nt_object_security (handle, SE_FILE_OBJECT, sd))
+	read_sd (file, sd);
+      get_info_from_sd (sd, attribute, uidret, gidret);
       return 0;
     }
 
@@ -2039,7 +1971,7 @@ check_registry_access (HANDLE hdl, int flags)
     desired |= KEY_SET_VALUE;
   if (flags & X_OK)
     desired |= KEY_QUERY_VALUE;
-  if (!get_reg_security (hdl, sd))
+  if (!get_nt_object_security (hdl, SE_REGISTRY_KEY, sd))
     ret = check_access (sd, mapping, desired, flags);
   debug_printf ("flags %x, ret %d", flags, ret);
   return ret;

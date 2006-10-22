@@ -43,7 +43,7 @@ protected:
 public:
   cygpsid () {}
   cygpsid (PSID nsid) { psid = nsid; }
-  operator const PSID () { return psid; }
+  operator PSID () const { return psid; }
   const PSID operator= (PSID nsid) { return psid = nsid;}
   __uid32_t get_id (BOOL search_grp, int *type = NULL);
   int get_uid () { return get_id (FALSE); }
@@ -182,16 +182,28 @@ class security_descriptor {
 protected:
   PSECURITY_DESCRIPTOR psd;
   DWORD sd_size;
+  enum { local_alloced, malloced } type;
 public:
-  security_descriptor () : psd (NULL), sd_size (0) {}
+  security_descriptor () : psd (NULL), sd_size (0), type (local_alloced) {}
   ~security_descriptor () { free (); }
 
   PSECURITY_DESCRIPTOR malloc (size_t nsize);
   PSECURITY_DESCRIPTOR realloc (size_t nsize);
   void free ();
 
-  inline DWORD size () const { return sd_size; }
+  inline DWORD size () {
+    if (!sd_size && psd && type == local_alloced)
+      sd_size = LocalSize (psd);
+    return sd_size;
+  }
+  inline DWORD copy (void *buf, DWORD buf_size) {
+    if (buf_size < size ())
+      return sd_size;
+    memcpy (buf, psd, sd_size);
+    return 0;
+  }
   inline operator const PSECURITY_DESCRIPTOR () { return psd; }
+  inline operator PSECURITY_DESCRIPTOR *() { return &psd; }
 };
 
 class user_groups {

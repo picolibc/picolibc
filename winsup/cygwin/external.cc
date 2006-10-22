@@ -293,11 +293,10 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  void *sd_buf = va_arg (arg, void *);
 	  DWORD sd_buf_size = va_arg (arg, DWORD);
 	  set_security_attribute (attribute, psa, sd);
-	  if (!psa->lpSecurityDescriptor || sd.size () > sd_buf_size)
+	  if (!psa->lpSecurityDescriptor)
 	    return sd.size ();
-	  memcpy (sd_buf, sd, sd.size ());
 	  psa->lpSecurityDescriptor = sd_buf;
-	  return 0;
+	  return sd.copy (sd_buf, sd_buf_size);
 	}
       case CW_GET_SHMLBA:
 	{

@@ -224,20 +224,37 @@ get_sids_info (cygpsid owner_sid, cygpsid group_sid, __uid32_t * uidret, __gid32
 PSECURITY_DESCRIPTOR
 security_descriptor::malloc (size_t nsize)
 {
-  if (psd)
-    ::free (psd);
-  psd = (PSECURITY_DESCRIPTOR) ::malloc (nsize);
-  sd_size = psd ? nsize : 0;
+  free ();
+  if ((psd = (PSECURITY_DESCRIPTOR) ::malloc (nsize)))
+    {
+      sd_size = nsize;
+      type = malloced;
+    }
   return psd;
 }
 
 PSECURITY_DESCRIPTOR
 security_descriptor::realloc (size_t nsize)
 {
-  PSECURITY_DESCRIPTOR tmp = (PSECURITY_DESCRIPTOR) ::realloc (psd, nsize);
-  if (!tmp)
-    return NULL;
+  PSECURITY_DESCRIPTOR tmp;
+  
+  if (type == malloced)
+    {
+      if (!(tmp = (PSECURITY_DESCRIPTOR) ::realloc (psd, nsize)))
+	return NULL;
+    }
+  else
+    {
+      if (!(tmp = (PSECURITY_DESCRIPTOR) ::malloc (nsize)))
+	return NULL;
+      if (psd)
+	{
+	  memcpy (tmp, psd, LocalSize (psd));
+	  LocalFree (psd);
+	}
+    }
   sd_size = nsize;
+  type = malloced;
   return psd = tmp;
 }
 
@@ -245,9 +262,15 @@ void
 security_descriptor::free ()
 {
   if (psd)
-    ::free (psd);
+    {
+      if (type == local_alloced)
+	LocalFree (psd);
+      else
+	::free (psd);
+    }
   psd = NULL;
   sd_size = 0;
+  type = local_alloced;
 }
 
 #if 0 // unused
