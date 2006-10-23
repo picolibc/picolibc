@@ -1,3 +1,8 @@
+2006-10-23  Dwarakanath Rajagopal  <dwarak.rajagopal@amd.com>
+
+	* i386.h :  Modify opcode to support for the change in POPCNT opcode 
+	in amdfam10 architecture.
+
 2006-09-28  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* i386.h: Replace CpuMNI with CpuSSSE3.

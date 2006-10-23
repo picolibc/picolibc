@@ -1472,7 +1472,7 @@ static const template i386_optab[] =
 {"insertq",  4, 0xf20f78,  X, CpuSSE4a, NoSuf|IgnoreSize|Modrm, { Imm8, Imm8, RegXMM, RegXMM} },
 
 /* ABM instructions */
-{"popcnt",   2,   0x0fb8,  X, CpuABM, wlq_Suf|Modrm,          { WordReg|WordMem, WordReg, 0} },
+{"popcnt",   2, 0xf30fb8,  X, CpuABM, wlq_Suf|Modrm,          { WordReg|WordMem, WordReg, 0} },
 {"lzcnt",    2, 0xf30fbd,  X, CpuABM, wlq_Suf|Modrm,          { WordReg|WordMem, WordReg, 0} },
 
 
