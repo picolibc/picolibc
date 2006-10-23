@@ -1875,9 +1875,9 @@ fhandler_disk_file::rewinddir (DIR *dir)
       if (wincap.has_buggy_restart_scan () && isremote ())
         {
 	  /* This works around a W2K bug.  The RestartScan parameter in calls
-	     to NtQueryDiretoryFile on remote shares is ignored, thus resulting
-	     in not being able to rewind on remote shares.  By reopening the
-	     directory, we get a fresh new directory pointers. w*/
+	     to NtQueryDirectoryFile on remote shares is ignored, thus
+	     resulting in not being able to rewind on remote shares.  By
+	     reopening the directory, we get a fresh new directory pointer. */
 	  UNICODE_STRING fname = {0, CYG_MAX_PATH * 2, (WCHAR *) L""};
 	  OBJECT_ATTRIBUTES attr;
 	  NTSTATUS status;
