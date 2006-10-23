@@ -8,7 +8,7 @@
 test -z "${ROM:+1}" && NOROM=1
 
 cat <<EOF
-STARTUP(cf-crt0.o)
+STARTUP(cf-${IO}-crt0.o)
 OUTPUT_ARCH(m68k)
 ENTRY(__start)
 SEARCH_DIR(.)
@@ -29,7 +29,8 @@ SECTIONS
   .text :
   {
     CREATE_OBJECT_SYMBOLS
-    cf-crt0.o(.text)
+    KEEP (*cf-isv.o(.text))
+    cf-${IO}-crt0.o(.text)
     *(.text .text.*)
     *(.gnu.linkonce.t.*)
 

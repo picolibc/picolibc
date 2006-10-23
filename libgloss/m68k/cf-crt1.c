@@ -22,7 +22,7 @@ extern const char __data_load[] __attribute__ ((aligned (4)));
 extern char __data_start[] __attribute__ ((aligned (4)));
 extern char __bss_start[] __attribute__ ((aligned (4)));
 extern char __end[] __attribute__ ((aligned (4)));
-
+void *__heap_limit;
 extern void software_init_hook (void) __attribute__ ((weak));
 extern void hardware_init_hook (void) __attribute__ ((weak));
 extern void __INIT_SECTION__ (void);
@@ -30,9 +30,8 @@ extern void __FINI_SECTION__ (void);
 
 extern int main (int, char **, char **);
 
-/* This is called from a tiny assembly stub that just initializes the
-   stack pointer.  */
-void __start1 (void)
+/* This is called from a tiny assembly stub.  */
+void __start1 (void *heap_limit)
 {
   unsigned ix;
   
@@ -43,7 +42,9 @@ void __start1 (void)
   if (__data_load != __data_start)
     memcpy (__data_start, __data_load, __bss_start - __data_start);
   memset (__bss_start, 0, __end - __bss_start);
-
+  
+  __heap_limit = heap_limit;
+  
   if (software_init_hook)
     software_init_hook ();
 

@@ -136,10 +136,10 @@ HOSTED_OBJS=	hosted-gdb.o hosted-exit.o $(patsubst un%,%,$(UNHOSTED_OBJS))
 #
 # here's all the ColdFire boards
 #
-CF_CRT0=	cf-crt0.o
+CF_CRT0S=	cf-hosted-crt0.o cf-unhosted-crt0.o
 CF_BSP=		libcf.a
-CF_OBJS=	cf-crt1.o cf-hosted.o getpid.o kill.o cf-sbrk.o cf-exit.o \
-		$(patsubst %,cf-%.o,${CF_ISRS})
+CF_OBJS=	cf-isv.o cf-crt1.o cf-hosted.o getpid.o kill.o cf-sbrk.o \
+		cf-exit.o $(patsubst %,cf-%.o,${CF_ISRS})
 CF_ISRS=	other_interrupt reset access_error address_error \
 	illegal_instruction divide_by_zero privilege_violation \
 	trace unimplemented_line_a_opcode unimplemented_line_f_opcode \
@@ -156,7 +156,7 @@ CF_RAM_SCRIPTS := $(patsubst %,%-ram.ld,$(CF_BOARDS))
 CF_ROM_SCRIPTS := $(patsubst %,%-rom.ld,$(CF_BOARDS))
 CF_HOSTED_SCRIPTS := $(patsubst %.ld,%-hosted.ld,$(CF_RAM_SCRIPTS) $(CF_ROM_SCRIPTS))
 CF_SCRIPTS = $(CF_RAM_SCRIPTS) $(CF_ROM_SCRIPTS) $(CF_HOSTED_SCRIPTS)
-CF_SOURCES = cf-crt0.S cf-crt1.c asm.h
+CF_SOURCES = cf-isv.S cf-crt0.S cf-crt1.c asm.h
 
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
@@ -167,7 +167,7 @@ CF_SOURCES = cf-crt0.S cf-crt1.c asm.h
 #
 all: ${SIM_CRT0} ${SIM_BSP} ${CRT0} ${BCC_BSP} ${IDP_BSP} ${IDPGDB_BSP} \
 	${MVME135_BSP} ${MVME162_BSP} ${HOSTED_BSP} ${UNHOSTED_BSP} \
-	${CF_CRT0} ${CF_BSP} ${CF_SCRIPTS}
+	${CF_CRT0S} ${CF_BSP} ${CF_SCRIPTS}
 
 #
 # here's where we build the board support packages for each target
@@ -202,6 +202,8 @@ $(HOSTED_OBJS): hosted%.o: io%.c io.h
 $(HOSTED_BSP): $(HOSTED_OBJS)
 	${AR} ${ARFLAGS} $@ $^
 	${RANLIB} $@
+cf-hosted-crt0.o: cf-crt0.S
+	$(CC) $(CFLAGS_FOR_TARGET) -DHOSTED=1 $(INCLUDES) -c $< -o $@
 
 # build unhosted library
 $(UNHOSTED_OBJS): unhosted%.o: io%.c io.h
@@ -209,6 +211,8 @@ $(UNHOSTED_OBJS): unhosted%.o: io%.c io.h
 $(UNHOSTED_BSP): $(UNHOSTED_OBJS)
 	${AR} ${ARFLAGS} $@ $^
 	${RANLIB} $@
+cf-unhosted-crt0.o: cf-crt0.S
+	$(CC) $(CFLAGS_FOR_TARGET) -DHOSTED=0 $(INCLUDES) -c $< -o $@
 
 # build coldfire library
 $(patsubst %,cf-%.o,${CF_ISRS}) : cf-isrs.c
@@ -364,7 +368,9 @@ install:
 	$(INSTALL_DATA) $(HOSTED_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(HOSTED_BSP)
 	$(INSTALL_DATA) $(UNHOSTED_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(UNHOSTED_BSP)
 	# install CF stuff
-	$(INSTALL_DATA) $(CF_CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(CF_CRT0)
+	for crt in $(CF_CRT0S) ; \
+	do $(INSTALL_DATA) $$crt $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$crt ; \
+	done
 	$(INSTALL_DATA) $(CF_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(CF_BSP)
 	for script in $(CF_SCRIPTS) ; \
 	do $(INSTALL_DATA) $$script $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$script ; \

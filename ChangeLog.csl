@@ -1,3 +1,22 @@
+2006-10-23  Nathan Sidwell  <nathan@codesourcery.com>
+
+	libgloss/
+	* m68k/Makefile.in (CF_CRT0): Rename to CF_CRT0S, separate hosted
+	& unhosted versions.
+	(CF_OBJS): Add cf-isv.o.
+	(CF_SOURCES): Add cf-isv.S.
+	(cf-hosted-crt0.o, cf-unhosted-crt0.o): New targets.
+	* m68k/cf-isv.S: New, broken out of ...
+	* m68k/cf-crt0.S: ... here.  Add HOSTED & UNHOSTED differences.
+	* m68k/cf-crt1.c (__start1): Add heap_limit argument.
+	(__heap_limit): Define.
+	* m68k/cf-sbrk.c (__heap_limit): Declare.
+	(sbrk): Adjust for __heap_limit.
+	* m68k/cf.sc: Use different crt0's for hosted & unhosted.
+	Install a separate isv.o file.
+	* m68k/io.h (HOSTED_PUTCHAR): Replace with ...
+	(HOSTED_INIT_SIM): ... this.
+
 2006-10-20  Nathan Sidwell  <nathan@codesourcery.com>
 
 	libgloss/

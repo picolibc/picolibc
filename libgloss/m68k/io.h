@@ -21,7 +21,7 @@
 #include <sys/stat.h>
 
 #define HOSTED_EXIT  0
-#define HOSTED_PUTCHAR 1 /* Obsolete */
+#define HOSTED_INIT_SIM 1
 #define HOSTED_OPEN 2
 #define HOSTED_CLOSE 3
 #define HOSTED_READ 4
