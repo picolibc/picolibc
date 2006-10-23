@@ -80,7 +80,9 @@ IQ80310_INSTALL	= install-iq80310
 
 ARMV7M_OBJS	= armv7m-crt0.o rdimon-ram.ld \
 		  armv7m-rom.ld lm3s10x-rom.ld lm3s301-rom.ld lm3s31x-rom.ld \
-		  armv7m-ram.ld lm3s10x-ram.ld lm3s301-ram.ld lm3s31x-ram.ld
+		  lm3s6xx-rom.ld lm3s8xx-rom.ld \
+		  armv7m-ram.ld lm3s10x-ram.ld lm3s301-ram.ld lm3s31x-ram.ld \
+		  lm3s6xx-ram.ld lm3s8xx-ram.ld
 ARMV7M_SPECS	= armv7m.specs
 ARMV7M_INSTALL	= install-armv7m
 
@@ -145,6 +147,8 @@ armv7m=  0x20000000 32M        0   32M   no   armv7m-crt0.o -lrdimon
 lm3s10x= 0x20000000  2k        0    8k  yes   armv7m-crt0.o -lrdimon
 lm3s301= 0x20000000  2k        0   16k  yes   armv7m-crt0.o -lrdimon
 lm3s31x= 0x20000000  4k        0   16k  yes   armv7m-crt0.o -lrdimon
+lm3s6xx= 0x20000000  8k        0   32k  yes   armv7m-crt0.o -lrdimon
+lm3s8xx= 0x20000000  8k        0   64k  yes   armv7m-crt0.o -lrdimon
 
 %-ram.ld : arm.sc Makefile
 	RAM=$(word 1,$($*)) RAM_SIZE=$(word 2,$($*)) \
