@@ -1,3 +1,10 @@
+2006-10-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::rewinddir): Accomodate
+	buggy RestartScan behaviour of Windows 2000.
+	* wincap.h: Define has_buggy_restart_scan throughout.
+	* wincap.cc: Ditto.
+
 2006-10-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* glob.c: Remove.

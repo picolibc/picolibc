@@ -1870,7 +1870,38 @@ void
 fhandler_disk_file::rewinddir (DIR *dir)
 {
   if (wincap.is_winnt ())
-    d_cachepos (dir) = 0;
+    {
+      d_cachepos (dir) = 0;
+      if (wincap.has_buggy_restart_scan () && isremote ())
+        {
+	  /* This works around a W2K bug.  The RestartScan parameter in calls
+	     to NtQueryDiretoryFile on remote shares is ignored, thus resulting
+	     in not being able to rewind on remote shares.  By reopening the
+	     directory, we get a fresh new directory pointers. w*/
+	  UNICODE_STRING fname = {0, CYG_MAX_PATH * 2, (WCHAR *) L""};
+	  OBJECT_ATTRIBUTES attr;
+	  NTSTATUS status;
+	  IO_STATUS_BLOCK io;
+	  HANDLE new_dir;
+
+	  InitializeObjectAttributes (&attr, &fname, OBJ_CASE_INSENSITIVE,
+				      dir->__handle, NULL);
+	  status = NtOpenFile (&new_dir, SYNCHRONIZE | FILE_LIST_DIRECTORY,
+			       &attr, &io, wincap.shared (),
+			       FILE_SYNCHRONOUS_IO_NONALERT
+			       | FILE_OPEN_FOR_BACKUP_INTENT
+			       | FILE_DIRECTORY_FILE);
+	  if (!NT_SUCCESS (stat))
+	    debug_printf ("Unable to reopen dir %s, NT error: 0x%08x, "
+			  "win32: %lu", get_name (), status,
+			  RtlNtStatusToDosError (status));
+	  else
+	    {
+	      CloseHandle (dir->__handle);
+	      dir->__handle = new_dir;
+	    }
+	}
+    }
   else if (dir->__handle != INVALID_HANDLE_VALUE)
     {
       if (dir->__handle)
