@@ -143,6 +143,8 @@ extern const int powerpc_num_opcodes;
 /* Opcode is only supported by Power6 architecture.  */
 #define PPC_OPCODE_POWER6	 0x4000000
 
+/* Opcode is only supported by PowerPC Cell family.  */
+#define PPC_OPCODE_CELL		 0x8000000
 
 /* A macro to extract the major opcode from an instruction.  */
 #define PPC_OP(i) (((i) >> 26) & 0x3f)
