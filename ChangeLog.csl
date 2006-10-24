@@ -1,3 +1,9 @@
+2006-10-24  Mark Shinwell  <shinwell@codesourcery.com>
+
+	gas/
+	* config/tc-arm.c (md_apply_fix): Turn CZB instructions that
+	attempt to jump to the next instruction into NOPs.
+
 2006-10-19  Joseph S. Myers  <joseph@codesourcery.com>
             Mark Mitchell  <mark@codesourcery.com>
 
