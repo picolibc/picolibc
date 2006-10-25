@@ -1,3 +1,12 @@
+2006-10-25  Trevor Smigiel  <Trevor_Smigiel@playstation.sony.com>
+	    Yukishige Shibata  <shibata@rd.scei.sony.co.jp>
+	    Nobuhisa Fujinami  <fnami@rd.scei.sony.co.jp>
+	    Takeaki Fukuoka  <fukuoka@rd.scei.sony.co.jp>
+	    Alan Modra  <amodra@bigpond.net.au>
+
+	* common.h (EM_SPU): Define.
+	* spu.h: New file.
+
 2006-10-19  Mei Ligang  <ligang@sunnorth.com.cn>
 
 	* score.h (EF_SCORE_PIC): Redefine EF_SCORE_PIC as 0x80000000.

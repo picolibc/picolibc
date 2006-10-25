@@ -1,3 +1,12 @@
+2006-10-25  Trevor Smigiel  <Trevor_Smigiel@playstation.sony.com>
+	    Yukishige Shibata  <shibata@rd.scei.sony.co.jp>
+	    Nobuhisa Fujinami  <fnami@rd.scei.sony.co.jp>
+	    Takeaki Fukuoka  <fukuoka@rd.scei.sony.co.jp>
+	    Alan Modra  <amodra@bigpond.net.au>
+
+	* spu-insns.h: New file.
+	* spu.h: New file.
+
 2006-10-24  Andrew Pinski  <andrew_pinski@playstation.sony.com>
 
 	* ppc.h (PPC_OPCODE_CELL): Define.
