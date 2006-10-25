@@ -1,3 +1,8 @@
+2006-10-25  Vladimir Prus  <vladimir@codesourcery.com>
+
+	* libc/include/math.h: (exception): Add a comment
+	telling fixincludes that we handle C vs. C++ issue.
+
 2006-10-11  Yang Tse  <yangsita@gmail.com>
 
 	* libc/include/machine/setjmp.h: Use __extension__ keyword for gcc's
