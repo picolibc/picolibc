@@ -1,3 +1,18 @@
+2006-10-25  Paul Brook  <paul@codesourcery.com>
+
+	gas/
+	* config/tc-arm.c (do_vfp_sp_const, do_vfp_dp_const): Fix operans
+	encoding.
+
+	gas/testsuite/
+	* gas/arm/vfpv3-const-conv.s: Improve test coverage.
+	* gas/arm/vfpv3-const-conv.d: Adjust expected output.
+	* gas/arm/vfp-neon-syntax_t2.d: Ditto.
+	* gas/arm/vfp-neon-syntax.d: Ditto.
+
+	opcodes/
+	* arm-dis.c (coprocessor_opcodes): Fix bitfields for fconstd/fconstd.
+
 2006-10-24  Mark Shinwell  <shinwell@codesourcery.com>
 
 	gas/
