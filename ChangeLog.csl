@@ -1,3 +1,10 @@
+2006-10-25  Vladimir Prus  <vladimir@codesourcery.com>
+	
+	Merge from HEAD:
+	newlib/         
+	* libc/include/math.h: (exception): Add a comment
+	telling fixincludes that we handle C vs. C++ issue.
+
 2006-10-23  Paul Brook  <paul@codesourcery.com>
 
 	libgloss/

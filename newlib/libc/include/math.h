@@ -336,7 +336,8 @@ extern int *__signgam _PARAMS((void));
 #define __signgam_r(ptr) _REENT_SIGNGAM(ptr)
 
 /* The exception structure passed to the matherr routine.  */
-
+/* We have a problem when using C++ since `exception' is a reserved
+   name in C++.  */
 #ifdef __cplusplus
 struct __exception 
 #else
