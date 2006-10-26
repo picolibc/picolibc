@@ -1,5 +1,13 @@
 2006-10-26  Paul Brook  <paul@codesourcery.com>
 
+	gas/
+	* config/tc-arm.c (arm_is_eabi): New function.
+	* config/tc-arm.h (arm_is_eabi): New prototype.
+	(THUMB_IS_FUNC): Use ELF function type for EABI objects.
+	* doc/c-arm.texi (.thumb_func): Update documentation.
+
+2006-10-26  Paul Brook  <paul@codesourcery.com>
+
 	binutils/
 	* objdump.c (disassemble_section): Set info->symtab_pos.
 	(disassemble_data): Set info->symtab and info->symtab_size.
