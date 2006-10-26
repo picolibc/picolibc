@@ -1,5 +1,20 @@
 2006-10-26  Paul Brook  <paul@codesourcery.com>
 
+	binutils/
+	* objdump.c (disassemble_section): Set info->symtab_pos.
+	(disassemble_data): Set info->symtab and info->symtab_size.
+
+	include/
+	* dis-asm.h (disassemble_info): Add symtab, symtab_pos and
+	symtab_size.
+
+	opcodes/
+	* arm-dis.c (last_is_thumb, last_mapping_sym, last_mapping_addr): New.
+	(get_sym_code_type): New function.
+	(print_insn): Search for mapping symbols.
+
+2006-10-26  Paul Brook  <paul@codesourcery.com>
+
 	gas/
 	* config/tc-arm.c (arm_adjust_symtab): Don't use STT_ARM_16BIT
 	for EABIv4.
