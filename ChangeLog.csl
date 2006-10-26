@@ -1,3 +1,13 @@
+2006-10-26  Paul Brook  <paul@codesourcery.com>
+
+	gas/
+	* config/tc-arm.c (do_neon_ext): Enforce immediate range.
+	(insns): Use I15 for vext.
+
+	gas/testsute/
+	* gas/arm/neon-cov.s: Add new vext test.
+	* gas/arm/neon-cov.d: Ditto.
+
 2006-10-25  Paul Brook  <paul@codesourcery.com>
 
 	gas/
