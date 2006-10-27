@@ -1,6 +1,7 @@
 2006-10-27  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* COPYING.NEWLIB: Add spu license.
+	* COPYING.LIBGLOSS: Ditto.
 
 2006-10-17  Brooks Moses  <bmoses@stanford.edu>
 
