@@ -1,3 +1,27 @@
+2006-10-27  Joel Schopp  <jschopp@austin.ibm.com>
+
+	* libc/machine/spu/memcpy.c: Override generic function with vectorized
+	version optimized for the cell spu.
+	* libc/machine/spu/memmove.c: Ditto.
+	* libc/machine/spu/memset.c: Ditto.
+	* libc/machine/spu/strcat.c: Ditto.
+	* libc/machine/spu/strchr.c: Ditto.
+	* libc/machine/spu/strcmp.c: Ditto.
+	* libc/machine/spu/strcpy.c: Ditto.
+	* libc/machine/spu/strcspn.c: Ditto.
+	* libc/machine/spu/strlen.c: Ditto.
+	* libc/machine/spu/strncat.c: Ditto.
+	* libc/machine/spu/strncmp.c: Ditto.
+	* libc/machine/spu/strncpy.c: Ditto.
+	* libc/machine/spu/strpbrk.c: Ditto.
+	* libc/machine/spu/strrchr.c: Ditto.
+	* libc/machine/spu/strspn.c: Ditto.
+	* libc/machine/spu/strxfrm.c: Ditto.
+	* libc/machine/spu/vec_literal.h: Add abstraction of vector literals, 
+	removing altivec style initializers.
+	* libc/machine/spu/Makefile.am: Add new files to list so they build
+	* libc/machine/spu/Makefile.in: Regenerate from new Makefile.am
+
 2006-10-27  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* README: Add a brief section on how to regenerate
