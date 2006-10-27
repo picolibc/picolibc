@@ -71,6 +71,8 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
   char *orig = dst;
   const char *s;
 
+  DWORD err = GetLastError ();
+
   while (*fmt)
     {
       int i, n = 0x7fff;
@@ -125,7 +127,7 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  break;
 		case 'E':
 		  strcpy (dst, "Win32 error ");
-		  dst = __rn (dst + sizeof ("Win32 error"), 10, 0, GetLastError (), len, pad, LMASK);
+		  dst = __rn (dst + sizeof ("Win32 error"), 10, 0, err, len, pad, LMASK);
 		  break;
 		case 'd':
 		  dst = rnarg (dst, 10, addsign, len, pad);
@@ -180,6 +182,7 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 	}
     }
   *dst = 0;
+  SetLastError (err);
   return dst - orig;
 }
 

@@ -154,7 +154,7 @@ extern unsigned int signal_shift_subtract;
 
 extern int __api_fatal_exit_val;
 #define set_api_fatal_return(n) do {extern int __api_fatal_exit_val; __api_fatal_exit_val = (n);} while (0)
-#define api_fatal(fmt, args...) __api_fatal ("%P: *** " fmt,## args)
+#define api_fatal(fmt, args...) __api_fatal (fmt,## args)
 
 #undef issep
 #define issep(ch) (strchr (" \t\n\r", (ch)) != NULL)

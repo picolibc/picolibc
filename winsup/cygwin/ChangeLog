@@ -1,3 +1,9 @@
+2006-10-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (__api_fatal): Drop spare argument to __small_sprintf.
+	* smallprint.c (__small_vsprintf): Preserve GetLastError value.
+	* winsup.h (api_fatal): Simplify.  Drop duplicate filename arg.
+
 2006-10-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::rewinddir): Fix comment.
