@@ -1151,7 +1151,7 @@ __api_fatal (const char *fmt, ...)
   va_list ap;
 
   va_start (ap, fmt);
-  int n = __small_sprintf (buf, "%P: *** fatal error - ", cygwin_pid (GetCurrentProcessId ()));
+  int n = __small_sprintf (buf, "%P: *** fatal error - ");
   __small_vsprintf (buf + n, fmt, ap);
   va_end (ap);
   strace.prntf (_STRACE_SYSTEM, NULL, "%s", buf);
