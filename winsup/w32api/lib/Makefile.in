@@ -143,7 +143,7 @@ DISTFILES = Makefile.in $(DEF_FILES) $(MRI_FILES) $(SOURCES)
 .NOTPARALLEL:
 
 # targets
-all: $(LIBS) $(EXTRA_OBJS) ddk directx
+all: $(EXTRA_OBJS) $(LIBS) ddk directx
 
 %-subdirs:
 	for i in $(SUBDIRS); do \
