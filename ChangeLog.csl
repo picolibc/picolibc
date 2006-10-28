@@ -1,3 +1,10 @@
+2006-10-28  Kazu Hirata  <kazu@codesourcery.com>
+
+	include/opcode/
+	* m68k.h (mcfmac, mcfemac, cfloat, mcfhwdiv, mcfisa_a,
+	mcfisa_aa, mcfisa_b, mcfusp, mcf_mask): Double the defined
+	values.
+
 2006-10-26  Paul Brook  <paul@codesourcery.com>
 
 	gas/

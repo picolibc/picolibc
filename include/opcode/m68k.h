@@ -33,16 +33,16 @@
 #define cpu32	 0x100		/* e.g., 68332 */
 #define m68k_mask  0x1ff
 
-#define mcfmac   0x200		/* ColdFire MAC. */
-#define mcfemac  0x400		/* ColdFire EMAC. */
-#define cfloat   0x800		/* ColdFire FPU.  */
-#define mcfhwdiv 0x1000		/* ColdFire hardware divide.  */
+#define mcfmac   0x400		/* ColdFire MAC. */
+#define mcfemac  0x800		/* ColdFire EMAC. */
+#define cfloat   0x1000		/* ColdFire FPU.  */
+#define mcfhwdiv 0x2000		/* ColdFire hardware divide.  */
 
-#define mcfisa_a 0x2000		/* ColdFire ISA_A.  */
-#define mcfisa_aa 0x4000	/* ColdFire ISA_A+.  */
-#define mcfisa_b 0x8000		/* ColdFire ISA_B.  */
-#define mcfusp   0x10000	/* ColdFire USP instructions.  */
-#define mcf_mask 0x1f200
+#define mcfisa_a 0x4000		/* ColdFire ISA_A.  */
+#define mcfisa_aa 0x8000	/* ColdFire ISA_A+.  */
+#define mcfisa_b 0x10000		/* ColdFire ISA_B.  */
+#define mcfusp   0x20000	/* ColdFire USP instructions.  */
+#define mcf_mask 0x3e400
 
 /* Handy aliases.  */
 #define	m68040up   (m68040 | m68060)
