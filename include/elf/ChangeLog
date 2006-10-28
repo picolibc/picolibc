@@ -1,3 +1,8 @@
+2006-10-28  Richard Sandiford  <richard@codesourcery.com>
+
+	* mips.h (R_MIPS_GLOB_DAT): Define
+	(R_MIPS_max): Bump by 1.
+
 2006-10-25  Trevor Smigiel  <Trevor_Smigiel@playstation.sony.com>
 	    Yukishige Shibata  <shibata@rd.scei.sony.co.jp>
 	    Nobuhisa Fujinami  <fnami@rd.scei.sony.co.jp>
