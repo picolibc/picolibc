@@ -1,3 +1,12 @@
+2006-10-28  Paul Brook  <paul@codesourcery.com>
+	Julian Brown  <julian@codesourcery.com>
+
+	bfd/
+	* elf32-arm.c (copy_eabi_attributes): Correct starting offset.
+	(elf32_arm_merge_eabi_attributes): Mark output as initialized.
+	Only set Tag_CPU_name and Tag_ABI_PCS_R9_use if input attribute
+	is present.
+
 2006-10-28  Kazu Hirata  <kazu@codesourcery.com>
 
 	include/opcode/
