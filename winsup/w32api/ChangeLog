@@ -1,3 +1,7 @@
+2006-10-29  Daniel Atallah  <datallah@users.sourceforge.net>
+
+	* lib/ws2_32.def (WSANSPIoctl): Add to lib.
+
 2006-10-26  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* lib/Makefile.in: Fix order for 'all' rule.

@@ -47,6 +47,7 @@ WSALookupServiceNextA@16
 WSALookupServiceNextW@16
 WSANtohl@12
 WSANtohs@12
+WSANSPIoctl@32
 WSAProviderConfigChange@12
 WSARecv@28
 WSARecvDisconnect@8
