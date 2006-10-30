@@ -1,3 +1,112 @@
+2006-10-30  Kazu Hirata  <kazu@codesourcery.com>
+
+	Merge fido bits:
+	2006-10-25  Kazu Hirata  <kazu@codesourcery.com>
+
+	gprof/
+	* hist.c, hist.h: Fix formatting.
+
+	gprof/
+	* Makefile.in (corefile.o): Depend on hist.h.
+	* corefile.c: Include hist.h.
+
+	2006-10-06  Vladimir Prus  <vladimir@codesourcery.com>
+
+	* hist.h (struct histogram)
+	(histograms, num_histograms): New.
+	* hist.c (find_histogram, find_histogram_for_pc)
+	(read_histogram_header): New.
+	(s_lowpc, s_highpc, lowpc, highpc, hist_num_bins)
+	(hist_sample): Remove.
+	(hist_read_rec): Use the above, and handle multiple
+	histogram records with disjoint address ranges.
+	(hist_write_hist): Support several histogram records.
+	(scale_and_align_entries): Adjust for multiple histograms.
+	(hist_assign_samples_1): New.
+	(hist_assign_samples): Use the above.
+	(hist_clip_symbol_address): New.
+	* hist.h (hist_check_address)
+	(hist_clip_symbol_address): Declare.
+	* gmon_io.c (gmon_out_read, gmon_out_write): Adjust handling
+	of legacy format for multiple histogram changes.
+	* corefile.c (find_call): Check for core_text_space and
+	clip symbol address range here.
+	* vax.c	(vax_find_call): Don't check for
+	core_text_space, or clip the symbol's address range here.
+	Use hist_check_address to check call's target address.	
+	* sparc.c: Likewise.
+	* tahoe.c: Likewise.
+	* i386.c: Likewise.
+	* mips.c: Likewise. Also use core_text_sect->vma as the base
+	address for code accesses, just like other machine-specific
+	routines do.
+
+	2006-08-03  Kazu Hirata  <kazu@codesourcery.com>
+
+	* gas/config/tc-m68k.c (archs): Add -mfido as an alias for
+	-mfido_a.
+
+	2006-06-23  Kazu Hirata  <kazu@codesourcery.com>
+
+	* gas/config/tc-m68k.c (cpu_of_arch): Replace fido with
+	fido_a.
+	(archs): Likewise.
+	(m68k_ip): Likewise.
+	(select_control_regs): Likewise.
+	(md_show_usage): Replace -mfido with -mfidoa.
+	* include/opcode/m68k.h (fido): Rename to fido_a.
+	* opcodes/m68k-opc.c (m68k_opcodes): Replace fido with fido_a.
+
+	2006-06-22  Kazu Hirata  <kazu@codesourcery.com>
+
+	* config.sub: Replace fido with fido.
+	* bfd/config.bfd: Likewise
+	* gas/configure.tgt: Likewise.
+	* gas/config/m68k-parse.h: Likewise.
+	* gas/config/tc-m68k.c: Likewise.
+	* gas/testsuite/gas/m68k/all.exp: Likewise.
+	* gas/testsuite/gas/m68k/fido.d: Rename to fido.d.
+	* gas/testsuite/gas/m68k/fido.s: Rename to fido.s.
+	* include/opcode/m68k.h: Replace fido with fido.
+	* ld/configure.tgt: Likewise.
+	* opcodes/m68k-dis.c: Likewise.
+	* opcodes/m68k-opc.c: Likewise.
+
+	2005-08-01  Kazu Hirata  <kazu@codesourcery.com>
+
+	* gas/config/m68k-parse.h (m68k_register): Add CAC and MBB.
+	* gas/config/tc-m68k.c (fido_control_regs): New.
+	(cpu_of_arch): Add fido.
+	(archs): Add an entry for fido.
+	(m68k_ip): Add warnings for uses of tbl[su]{n,}[bwl] on
+	fido.  Recognize CAC and MBB.
+	(init_tabl): Add CAC and MBB.
+	(select_control_regs): Choose fido as the current chip
+	when the current architecture is fido or when -mfido
+	is given explicitly.
+	* gas/testsuite/gas/m68k/all.exp: Disable operands, cas, and
+	bitfield on fido-*-*.  Run fido on fido-*-*.
+	* gas/testsuite/gas/m68k/fido.d: New.
+	* gas/testsuite/gas/m68k/fido.s: Likewise.
+	* include/opcode/m68k.h: Document new control registers CAC
+	and MBB.
+	* opcodes/m68k-dis.c (print_insn_arg): Add cac and mbb.
+	* opcodes/m68k-opc.c (m68k_opcodes): Add sleep and trapx.
+
+	2005-07-22  Kazu Hirata  <kazu@codesourcery.com>
+
+	* gas/config/tc-m68k.c (archs): Add fido as an OR of
+	cpu32 and fido.
+	(md_show_usage): Add -mfido.
+	* include/opcode/m68k.h (fido): New.
+
+	2005-07-11  Kazu Hirata  <kazu@codesourcery.com>
+
+	* config.sub: Recognize fido and fido-*.
+	* bfd/config.bfd: Likewise.
+	* gas/configure.tgt: Likewise.
+	* ld/configure.tgt: Likewise.
+
 2006-10-28  Paul Brook  <paul@codesourcery.com>
 	Julian Brown  <julian@codesourcery.com>
 
