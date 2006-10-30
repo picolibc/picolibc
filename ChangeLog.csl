@@ -1,3 +1,11 @@
+2006-10-30  Paul Brook  <paul@codesourcery.com>
+
+	bfd/
+	* elf32-arm.c (elf32_arm_to_thumb_export_stub): Assert that output
+	section is present.
+	(allocate_dynrelocs): Only add export stub for symbols definind in
+	this object.
+
 2006-10-30  Kazu Hirata  <kazu@codesourcery.com>
 
 	Merge fido bits:
