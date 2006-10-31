@@ -1707,6 +1707,7 @@ typedef DWORD FLONG;
 #define IsReparseTagValid(x) (!((x)&~IO_REPARSE_TAG_VALID_VALUES)&&((x)>IO_REPARSE_TAG_RESERVED_RANGE))
 #define IO_REPARSE_TAG_SYMBOLIC_LINK IO_REPARSE_TAG_RESERVED_ZERO
 #define IO_REPARSE_TAG_MOUNT_POINT 0xA0000003
+#define IO_REPARSE_TAG_SYMLINK 0xA000000C
 #define WT_SET_MAX_THREADPOOL_THREADS(Flags,Limit) ((Flags)|=(Limit)<<16)
 #ifndef RC_INVOKED
 typedef DWORD ACCESS_MASK, *PACCESS_MASK;
@@ -3343,6 +3344,7 @@ typedef struct _REPARSE_DATA_BUFFER {
 			WORD   SubstituteNameLength;
 			WORD   PrintNameOffset;
 			WORD   PrintNameLength;
+			ULONG  Flags;
 			WCHAR PathBuffer[1];
 		} SymbolicLinkReparseBuffer;
 		struct {

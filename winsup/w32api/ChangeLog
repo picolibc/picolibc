@@ -1,3 +1,9 @@
+2006-10-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winnt.h (IO_REPARSE_TAG_SYMLINK): Define.
+	(struct _REPARSE_DATA_BUFFER): Add missing Flags field to
+	SymbolicLinkReparseBuffer substructure.
+
 2006-10-29  Daniel Atallah  <datallah@users.sourceforge.net>
 
 	* lib/ws2_32.def (WSANSPIoctl): Add to lib.
