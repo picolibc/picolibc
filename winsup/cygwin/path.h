@@ -76,6 +76,7 @@ enum path_types
   PATH_NO_ACCESS_CHECK	= PC_NO_ACCESS_CHECK,
   PATH_LNK		= 0x01000000,
   PATH_TEXT		= 0x02000000,
+  PATH_REP		= 0x04000000,
   PATH_HAS_SYMLINKS	= 0x10000000,
   PATH_SOCKET		= 0x40000000
 };
@@ -163,6 +164,7 @@ class path_conv
   }
   int issymlink () const {return path_flags & PATH_SYMLINK;}
   int is_lnk_symlink () const {return path_flags & PATH_LNK;}
+  int is_rep_symlink () const {return path_flags & PATH_REP;}
   int isdevice () const {return dev.devn && dev.devn != FH_FS && dev.devn != FH_FIFO;}
   int isfifo () const {return dev == FH_FIFO;}
   int isspecial () const {return dev.devn && dev.devn != FH_FS;}

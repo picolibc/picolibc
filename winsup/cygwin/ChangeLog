@@ -1,3 +1,18 @@
+2006-10-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Drop
+	directory attribute for reparse points to avoid mistreating.
+	(fhandler_base::fstat_by_name): Ditto.
+	* path.cc (symlink_info::check_reparse_point): New method testing
+	reparse points for symbolic links.
+	(symlink_info::check_shortcut): Move file attribute tesat to calling
+	function.
+	(symlink_info::check): Add handling for reparse points.
+	* path.h (enum path_types): Add PATH_REP to denote reparse point based
+	symlinks.
+	(path_conv::is_rep_symlink): New method.
+	* syscalls.cc (unlink): Handle reparse points.
+
 2006-10-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* shared.cc (open_shared): Drop useless attempt from 2006-08-11.

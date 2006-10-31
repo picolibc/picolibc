@@ -240,6 +240,8 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 	  /* If the change time is 0, it's a file system which doesn't
 	     support a change timestamp.  In that case use the LastWriteTime
 	     entry, as in other calls to fstat_helper. */
+	  if (pc.is_rep_symlink ())
+	    pfai->BasicInformation.FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
 	  pc.file_attributes (pfai->BasicInformation.FileAttributes);
 	  return fstat_helper (buf,
 			   pfai->BasicInformation.ChangeTime.QuadPart ?
@@ -275,7 +277,11 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
       local.dwFileAttributes = DWORD (pc);
     }
   else
-    pc.file_attributes (local.dwFileAttributes);
+    {
+      if (pc.is_rep_symlink ())
+	local.dwFileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
+      pc.file_attributes (local.dwFileAttributes);
+    }
   return fstat_helper (buf,
 		       local.ftLastWriteTime, /* see fstat_helper comment */
 		       local.ftLastAccessTime,
@@ -306,6 +312,8 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
   else if ((handle = FindFirstFile (pc, &local)) != INVALID_HANDLE_VALUE)
     {
       FindClose (handle);
+      if (pc.is_rep_symlink ())
+	local.dwFileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
       pc.file_attributes (local.dwFileAttributes);
       res = fstat_helper (buf,
 			  local.ftLastWriteTime, /* see fstat_helper comment */

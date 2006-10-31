@@ -205,8 +205,11 @@ unlink (const char *ourname)
   if (!win32_name.isremote () && wincap.has_delete_on_close ())
     {
       HANDLE h;
+      DWORD flags = FILE_FLAG_DELETE_ON_CLOSE;
+      if (win32_name.is_rep_symlink ())
+        flags |= FILE_FLAG_OPEN_REPARSE_POINT | FILE_FLAG_BACKUP_SEMANTICS;
       h = CreateFile (win32_name, 0, FILE_SHARE_READ, &sec_none_nih,
-		      OPEN_EXISTING, FILE_FLAG_DELETE_ON_CLOSE, 0);
+		      OPEN_EXISTING, flags, 0);
       if (h != INVALID_HANDLE_VALUE)
 	{
 	  if (wincap.has_hard_links () && setattrs)
@@ -229,7 +232,12 @@ unlink (const char *ourname)
     }
 
   /* Try a delete with attributes reset */
-  if (DeleteFile (win32_name))
+  if (win32_name.is_rep_symlink () && RemoveDirectory (win32_name))
+    {
+      syscall_printf ("RemoveDirectory after CreateFile/CloseHandle succeeded");
+      goto ok;
+    }
+  else if (DeleteFile (win32_name))
     {
       syscall_printf ("DeleteFile after CreateFile/CloseHandle succeeded");
       goto ok;

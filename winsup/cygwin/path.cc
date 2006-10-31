@@ -104,6 +104,7 @@ struct symlink_info
   bool case_check (char *path);
   int check_sysfile (const char *path, HANDLE h);
   int check_shortcut (const char *path, HANDLE h);
+  int check_reparse_point (const char *path, HANDLE h);
   bool set_error (int);
 };
 
@@ -2996,10 +2997,6 @@ symlink_info::check_shortcut (const char *path, HANDLE h)
   int res = 0;
   DWORD size, got = 0;
 
-  /* Valid Cygwin & U/WIN shortcuts are R/O. */
-  if (!(fileattr & FILE_ATTRIBUTE_READONLY))
-    goto file_not_symlink;
-
   if ((size = GetFileSize (h, NULL)) > 8192) /* Not a Cygwin symlink. */
     goto file_not_symlink;
   buf = (char *) alloca (size);
@@ -3032,7 +3029,6 @@ close_it:
   CloseHandle (h);
   return res;
 }
-
 
 int
 symlink_info::check_sysfile (const char *path, HANDLE h)
@@ -3089,6 +3085,61 @@ symlink_info::check_sysfile (const char *path, HANDLE h)
   syscall_printf ("%d = symlink.check_sysfile (%s, %s) (%p)",
 		  res, path, contents, pflags);
 
+  CloseHandle (h);
+  return res;
+}
+
+int
+symlink_info::check_reparse_point (const char *path, HANDLE h)
+{
+  int res = 0;
+  PREPARSE_DATA_BUFFER rp = (PREPARSE_DATA_BUFFER)
+			    alloca (MAXIMUM_REPARSE_DATA_BUFFER_SIZE);
+  DWORD size;
+
+  if (!DeviceIoControl (h, FSCTL_GET_REPARSE_POINT, NULL, 0, (LPVOID) rp,
+  			MAXIMUM_REPARSE_DATA_BUFFER_SIZE, &size, NULL))
+    {
+      debug_printf ("DeviceIoControl(FSCTL_GET_REPARSE_POINT) failed, %E");
+      set_error (EIO);
+      goto close_it;
+    }
+  if (rp->ReparseTag == IO_REPARSE_TAG_SYMLINK)
+    {
+      if (rp->SymbolicLinkReparseBuffer.PrintNameLength > 2 * CYG_MAX_PATH)
+	{
+	  debug_printf ("Symlink name too long");
+	  set_error (EIO);
+	  goto close_it;
+	}
+      res = sys_wcstombs (contents, CYG_MAX_PATH,
+		    (WCHAR *)((char *)rp->SymbolicLinkReparseBuffer.PathBuffer
+			      + rp->SymbolicLinkReparseBuffer.PrintNameOffset),
+		    rp->SymbolicLinkReparseBuffer.PrintNameLength / 2);
+      pflags = PATH_SYMLINK | PATH_REP;
+      fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
+    }
+  else if (rp->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT)
+    {
+      if (rp->SymbolicLinkReparseBuffer.PrintNameLength == 0)
+        {
+	  /* Likely a volume mount point.  Not treated as symlink. */
+	  goto close_it;
+	}
+      if (rp->MountPointReparseBuffer.PrintNameLength > 2 * CYG_MAX_PATH)
+        {
+	  debug_printf ("Symlink name too long");
+	  set_error (EIO);
+	  goto close_it;
+	}
+      res = sys_wcstombs (contents, CYG_MAX_PATH,
+		      (WCHAR *)((char *)rp->MountPointReparseBuffer.PathBuffer
+				+ rp->MountPointReparseBuffer.PrintNameOffset),
+		      rp->MountPointReparseBuffer.PrintNameLength / 2);
+      pflags = PATH_SYMLINK | PATH_REP;
+      fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
+    }
+close_it:
   CloseHandle (h);
   return res;
 }
@@ -3337,18 +3388,24 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 
       sym_check = 0;
 
-      if (fileattr & FILE_ATTRIBUTE_DIRECTORY)
+      if ((fileattr & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT))
+	  == FILE_ATTRIBUTE_DIRECTORY)
 	goto file_not_symlink;
 
-      /* Windows shortcuts are treated as symlinks. */
-      if (suffix.lnk_match ())
-	sym_check = 1;
+      /* Reparse points are potentially symlinks. */
+      if (fileattr & FILE_ATTRIBUTE_REPARSE_POINT)
+        sym_check = 3;
 
       /* This is the old Cygwin method creating symlinks: */
       /* A symlink will have the `system' file attribute. */
       /* Only files can be symlinks (which can be symlinks to directories). */
-      if (fileattr & FILE_ATTRIBUTE_SYSTEM)
+      else if (fileattr & FILE_ATTRIBUTE_SYSTEM)
 	sym_check = 2;
+
+      /* Windows shortcuts are potentially treated as symlinks. */
+      /* Valid Cygwin & U/WIN shortcuts are R/O. */
+      else if ((fileattr & FILE_ATTRIBUTE_READONLY) && suffix.lnk_match ())
+	sym_check = 1;
 
       if (!sym_check)
 	goto file_not_symlink;
@@ -3356,7 +3413,10 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
       /* Open the file.  */
 
       h = CreateFile (suffix.path, GENERIC_READ, FILE_SHARE_READ,
-		      &sec_none_nih, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+		      &sec_none_nih, OPEN_EXISTING,
+		      sym_check == 3 ? FILE_FLAG_OPEN_REPARSE_POINT
+				       | FILE_FLAG_BACKUP_SEMANTICS
+				     : FILE_ATTRIBUTE_NORMAL, 0);
       res = -1;
       if (h == INVALID_HANDLE_VALUE)
 	goto file_not_symlink;
@@ -3380,6 +3440,11 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	  continue;		/* in case we're going to tack *another* .lnk on this filename. */
 	case 2:
 	  res = check_sysfile (suffix.path, h);
+	  if (!res)
+	    goto file_not_symlink;
+	  break;
+	case 3:
+	  res = check_reparse_point (suffix.path, h);
 	  if (!res)
 	    goto file_not_symlink;
 	  break;
