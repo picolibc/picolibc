@@ -96,6 +96,12 @@ typedef struct disassemble_info
   /* Number of symbols in array.  */
   int num_symbols;
 
+  /* Symbol table provided for targets that want to look at it.  This is
+     used on Arm to find mapping symbols and determine Arm/Thumb code.  */
+  asymbol **symtab;
+  int symtab_pos;
+  int symtab_size;
+
   /* For use by the disassembler.
      The top 16 bits are reserved for public use (and are documented here).
      The bottom 16 bits are for the internal use of the disassembler.  */

@@ -1,3 +1,8 @@
+2006-10-30  Paul Brook  <paul@codesourcery.com>
+
+	* dis-asm.h (disassemble_info): Add symtab, symtab_pos and
+	symtab_size.
+
 2006-10-30  H.J. Lu  <hongjiu.lu@intel.com>
 
 	PR ld/3111
