@@ -138,6 +138,7 @@ enum score_insn_type
   Insn_Type_SYN,
   Insn_GP,
   Insn_PIC,
+  Insn_internal,
 };
 
 enum score_data_type
