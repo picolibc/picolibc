@@ -350,7 +350,8 @@ MapViewNT (HANDLE h, void *addr, size_t len, DWORD openflags,
   void *base = addr;
   ULONG commitsize = attached (prot) ? 0 : len;
   ULONG viewsize = len;
-  ULONG alloc_type = base && !wincap.is_wow64 () ? AT_ROUND_TO_PAGE : 0;
+  ULONG alloc_type = (base && !wincap.is_wow64 () ? AT_ROUND_TO_PAGE : 0)
+		     | MEM_TOP_DOWN;
 
   /* Try mapping using the given address first, even if it's NULL.
      If it failed, and addr was not NULL and flags is not MAP_FIXED,
@@ -1669,7 +1670,8 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
 	   when using the (non-POSIX, yay-Linux) MAP_NORESERVE flag.
       */
       DWORD protect = gen_protect (prot, flags);
-      DWORD alloc_type = MEM_RESERVE | (noreserve (flags) ? 0 : MEM_COMMIT);
+      DWORD alloc_type = MEM_TOP_DOWN | MEM_RESERVE
+      			 | (noreserve (flags) ? 0 : MEM_COMMIT);
       base = VirtualAlloc (*addr, len, alloc_type, protect);
       if (!base && addr && !fixed (flags))
 	base = VirtualAlloc (NULL, len, alloc_type, protect);

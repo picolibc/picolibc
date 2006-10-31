@@ -14,6 +14,7 @@ details. */
 static NO_COPY wincaps wincap_unknown = {
   lock_file_highword:0x0,
   chunksize:0x0,
+  heapslop:0x0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE,
   is_winnt:false,
   is_server:false,
@@ -72,6 +73,7 @@ static NO_COPY wincaps wincap_unknown = {
 static NO_COPY wincaps wincap_95 = {
   lock_file_highword:0x0,
   chunksize:32 * 1024 * 1024,
+  heapslop:0x0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE,
   is_winnt:false,
   is_server:false,
@@ -130,6 +132,7 @@ static NO_COPY wincaps wincap_95 = {
 static NO_COPY wincaps wincap_95osr2 = {
   lock_file_highword:0x0,
   chunksize:32 * 1024 * 1024,
+  heapslop:0x0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE,
   is_winnt:false,
   is_server:false,
@@ -188,6 +191,7 @@ static NO_COPY wincaps wincap_95osr2 = {
 static NO_COPY wincaps wincap_98 = {
   lock_file_highword:0x0,
   chunksize:32 * 1024 * 1024,
+  heapslop:0x0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE,
   is_winnt:false,
   is_server:false,
@@ -246,6 +250,7 @@ static NO_COPY wincaps wincap_98 = {
 static NO_COPY wincaps wincap_98se = {
   lock_file_highword:0x0,
   chunksize:32 * 1024 * 1024,
+  heapslop:0x0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE,
   is_winnt:false,
   is_server:false,
@@ -304,6 +309,7 @@ static NO_COPY wincaps wincap_98se = {
 static NO_COPY wincaps wincap_me = {
   lock_file_highword:0x0,
   chunksize:32 * 1024 * 1024,
+  heapslop:0x0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE,
   is_winnt:false,
   is_server:false,
@@ -362,6 +368,7 @@ static NO_COPY wincaps wincap_me = {
 static NO_COPY wincaps wincap_nt3 = {
   lock_file_highword:UINT32_MAX,
   chunksize:0,
+  heapslop:0x0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
   is_winnt:true,
   is_server:false,
@@ -420,6 +427,7 @@ static NO_COPY wincaps wincap_nt3 = {
 static NO_COPY wincaps wincap_nt4 = {
   lock_file_highword:UINT32_MAX,
   chunksize:0,
+  heapslop:0x0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
   is_winnt:true,
   is_server:false,
@@ -478,6 +486,7 @@ static NO_COPY wincaps wincap_nt4 = {
 static NO_COPY wincaps wincap_nt4sp4 = {
   lock_file_highword:UINT32_MAX,
   chunksize:0,
+  heapslop:0x0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
   is_winnt:true,
   is_server:false,
@@ -536,6 +545,7 @@ static NO_COPY wincaps wincap_nt4sp4 = {
 static NO_COPY wincaps wincap_2000 = {
   lock_file_highword:UINT32_MAX,
   chunksize:0,
+  heapslop:0x0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
   is_winnt:true,
   is_server:false,
@@ -594,6 +604,7 @@ static NO_COPY wincaps wincap_2000 = {
 static NO_COPY wincaps wincap_xp = {
   lock_file_highword:UINT32_MAX,
   chunksize:0,
+  heapslop:0x0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
   is_winnt:true,
   is_server:false,
@@ -652,6 +663,7 @@ static NO_COPY wincaps wincap_xp = {
 static NO_COPY wincaps wincap_2003 = {
   lock_file_highword:UINT32_MAX,
   chunksize:0,
+  heapslop:0x4,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
   is_winnt:true,
   is_server:true,
@@ -710,6 +722,7 @@ static NO_COPY wincaps wincap_2003 = {
 static NO_COPY wincaps wincap_vista = {
   lock_file_highword:UINT32_MAX,
   chunksize:0,
+  heapslop:0x4,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
   is_winnt:true,
   is_server:true,

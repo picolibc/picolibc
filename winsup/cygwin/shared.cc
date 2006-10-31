@@ -235,6 +235,33 @@ memory_init ()
 }
 
 unsigned
+shared_info::heap_slop_size ()
+{
+  if (!heap_slop)
+    {
+      /* Fetch from registry, first user then local machine.  */
+      for (int i = 0; i < 2; i++)
+	{
+	  reg_key reg (i, KEY_READ, NULL);
+
+	  if ((heap_slop = reg.get_int ("heap_slop_in_mb", 0)))
+	    break;
+	  heap_slop = wincap.heapslop ();
+	}
+
+      if (heap_slop < 0)
+	heap_slop = 0;
+      else
+	heap_slop <<= 20;
+#ifdef DEBUGGING
+      system_printf ("fixed heap slop is %p", heap_slop);
+#endif
+    }
+
+  return heap_slop;
+}
+
+unsigned
 shared_info::heap_chunk_size ()
 {
   if (!heap_chunk)
@@ -260,7 +287,9 @@ shared_info::heap_chunk_size ()
 	heap_chunk <<= 20;
       if (!heap_chunk)
 	heap_chunk = 384 * 1024 * 1024;
-      debug_printf ("fixed heap size is %u", heap_chunk);
+#ifdef DEBUGGING
+      system_printf ("fixed heap size is %u", heap_chunk);
+#endif
     }
 
   return heap_chunk;

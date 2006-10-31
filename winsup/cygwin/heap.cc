@@ -41,21 +41,38 @@ heap_init ()
   if (!cygheap->user_heap.base)
     {
       cygheap->user_heap.chunk = cygwin_shared->heap_chunk_size ();
+      /* For some obscure reason Vista and 2003 sometimes reserve space after
+	 calls to CreateProcess overlapping the spot where the heap has been
+	 allocated.  This apparently spoils fork.  The behaviour looks quite
+	 arbitrary.  Experiments on Vista show a memory size of 0x37e000 or
+	 0x1fd000 overlapping the usual heap by at most 0x1ed000.  So what
+	 we do here is to allocate the heap with an extra slop of (by default)
+	 0x200000 and set the appropriate pointers to the start of the heap
+	 area + slop.  A forking child then creates its heap at the new start
+	 address and without the slop factor.  Since this is not entirely
+	 foolproof we add a registry setting "heap_slop_in_mb" so the slop
+	 factor can be influenced by the user if the need arises. */
+      cygheap->user_heap.slop = cygwin_shared->heap_slop_size ();
       while (cygheap->user_heap.chunk >= MINHEAP_SIZE)
 	{
 	  /* Initialize page mask and default heap size.  Preallocate a heap
 	   * to assure contiguous memory.  */
-	  cygheap->user_heap.ptr = cygheap->user_heap.top =
 	  cygheap->user_heap.base =
-	    VirtualAlloc (NULL, cygheap->user_heap.chunk, alloctype, PAGE_NOACCESS);
+	    VirtualAlloc (NULL, cygheap->user_heap.chunk
+	    			+ cygheap->user_heap.slop,
+			  alloctype, PAGE_NOACCESS);
 	  if (cygheap->user_heap.base)
 	    break;
 	  cygheap->user_heap.chunk -= 1 * 1024 * 1024;
 	}
       if (cygheap->user_heap.base == NULL)
-	api_fatal ("unable to allocate heap, heap_chunk_size %d, %E",
-		   cygheap->user_heap.chunk);
-      cygheap->user_heap.max = (char *) cygheap->user_heap.base + cygheap->user_heap.chunk;
+	api_fatal ("unable to allocate heap, heap_chunk_size %p, slop %p, %E",
+		   cygheap->user_heap.chunk, cygheap->user_heap.slop);
+      cygheap->user_heap.base = (void *) ((char *) cygheap->user_heap.base
+      						   + cygheap->user_heap.slop);
+      cygheap->user_heap.ptr = cygheap->user_heap.top = cygheap->user_heap.base;
+      cygheap->user_heap.max = (char *) cygheap->user_heap.base
+			       + cygheap->user_heap.chunk;
     }
   else
     {

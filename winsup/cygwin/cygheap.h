@@ -262,6 +262,7 @@ struct user_heap_info
   void *top;
   void *max;
   unsigned chunk;
+  unsigned slop;
 };
 
 struct hook_chain

@@ -1,5 +1,20 @@
 2006-10-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygheap.h (struct user_heap_info): Add slop member.
+	* heap.cc (heap_init): Add slop factor to heap allocation.  Add
+	comment.
+	* mmap.cc (MapViewNT): Allocate memory maps top down.
+	(fhandler_dev_zero::mmap): Ditto.
+	* shared.cc (shared_info::heap_slop_size): New method.
+	(shared_info::heap_chunk_size): Don't use debug_printf at early stage.
+	* shared_info.h (SHARED_INFO_CB): Accomodate change to shared_info.
+	(CURR_SHARED_MAGIC): Ditto.
+	(class shared_info): Add heap_slop member.  Declare heap_slop_size.
+	* wincap.h: Define heapslop throughout.
+	* wincap.cc: Ditto.
+
+2006-10-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Drop
 	directory attribute for reparse points to avoid mistreating.
 	(fhandler_base::fstat_by_name): Ditto.
