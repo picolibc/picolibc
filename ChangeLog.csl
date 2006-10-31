@@ -1,3 +1,10 @@
+2006-10-31  Mark Shinwell  <shinwell@codesourcery.com>
+
+	gas/
+	* config/tc-arm.c (do_t_czb): Rename to do_t_cbz.
+	(insns): Adjust accordingly.
+	(md_apply_fix): Alter comments to use CBZ instead of CZB.
+
 2006-10-30  Paul Brook  <paul@codesourcery.com>
 
 	bfd/
