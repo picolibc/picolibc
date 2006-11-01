@@ -82,6 +82,15 @@ LD=${LD-ld}
 AC_SUBST(LD)
 AC_PROG_RANLIB
 
+AC_MSG_CHECKING([target cpu family])
+AC_TRY_COMPILE(,[#ifdef __mcoldfire__
+		we are coldfire
+		#endif],
+		DO=m68k,
+		DO=cf)
+AC_MSG_RESULT($DO)
+AC_SUBST(DO)
+     
 host_makefile_frag=${srcdir}/../config/default.mh
 target_makefile_frag=${srcdir}/../config/default.mt
 

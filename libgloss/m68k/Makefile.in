@@ -69,6 +69,8 @@ OBJS =  close.o fstat.o getpid.o isatty.o kill.o \
 CFLAGS = -g
 # ARFLAGS = rv
 
+# What targets to build for.  This is a list of {m68k,cf}
+DO = @DO@
 
 # Here is all of the simulator stuff
 SIM_SCRIPTS	= sim.ld
@@ -118,22 +120,6 @@ IDPGDB_BSP=	libidpgdb.a
 IDPGDB_OBJS=	leds.o idp-inbyte.o idp-gdb-outbyte.o mc68ec.o
 
 #
-# here's all the unhosted stuff
-#
-UNHOSTED_BSP=	libunhosted.a
-UNHOSTED_OBJS=	unhosted-close.o unhosted-fstat.o \
-		unhosted-gettimeofday.o unhosted-isatty.o unhosted-lseek.o \
-		unhosted-open.o unhosted-read.o unhosted-rename.o \
-		unhosted-stat.o unhosted-system.o unhosted-time.o \
-		unhosted-unlink.o unhosted-write.o
-
-#
-# here's all the hosted stuff
-#
-HOSTED_BSP=	libhosted.a
-HOSTED_OBJS=	hosted-gdb.o hosted-exit.o $(patsubst un%,%,$(UNHOSTED_OBJS))
-
-#
 # here's all the ColdFire boards
 #
 CF_CRT0S=	cf-hosted-crt0.o cf-unhosted-crt0.o
@@ -150,6 +136,17 @@ CF_ISRS=	other_interrupt reset access_error address_error \
 	fp_underflow fp_operand_error fp_overflow fp_input_not_a_number \
 	fp_input_denormalized_number unsupported_instruction
 
+#              RAM       ROM
+m5208evb  := 1024M 16M          0M   2M
+m5213evb  :=  512M 32K          0M 256K
+m52235evb :=  512M 32K          0M 256K
+m5235evb  :=    0M 16M  0xFFE00000   2M
+m5273c3   :=    0M  4M  0xFFE00000   2M
+m5275evb  :=    0M 16M  0xFFE00000   2M
+m5282evb  :=    0M 16M  0xFFE00000   2M
+m5329evb  := 1024M 32M          0M   2M
+m5485evb  :=    0M 64M       1024M  16M
+
 CF_BOARDS :=  m5208evb m5213evb m52235evb m5235evb m5272c3 m5275evb \
 	m5282evb m5329evb m5485evb
 CF_RAM_SCRIPTS := $(patsubst %,%-ram.ld,$(CF_BOARDS))
@@ -158,20 +155,38 @@ CF_HOSTED_SCRIPTS := $(patsubst %.ld,%-hosted.ld,$(CF_RAM_SCRIPTS) $(CF_ROM_SCRI
 CF_SCRIPTS = $(CF_RAM_SCRIPTS) $(CF_ROM_SCRIPTS) $(CF_HOSTED_SCRIPTS)
 CF_SOURCES = cf-isv.S cf-crt0.S cf-crt1.c asm.h
 
+#
+# here's all the unhosted stuff
+#
+UNHOSTED_BSP=	libunhosted.a
+UNHOSTED_OBJS=	unhosted-close.o unhosted-fstat.o \
+		unhosted-gettimeofday.o unhosted-isatty.o unhosted-lseek.o \
+		unhosted-open.o unhosted-read.o unhosted-rename.o \
+		unhosted-stat.o unhosted-system.o unhosted-time.o \
+		unhosted-unlink.o unhosted-write.o
+
+#
+# here's all the hosted stuff
+#
+HOSTED_BSP=	libhosted.a
+HOSTED_OBJS=	hosted-gdb.o hosted-exit.o $(patsubst un%,%,$(UNHOSTED_OBJS))
+
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
 
-#
-# build a test program for each target board. Just trying to get
-# it to link is a good test, so we ignore all the errors for now.
-#
-all: ${SIM_CRT0} ${SIM_BSP} ${CRT0} ${BCC_BSP} ${IDP_BSP} ${IDPGDB_BSP} \
-	${MVME135_BSP} ${MVME162_BSP} ${HOSTED_BSP} ${UNHOSTED_BSP} \
-	${CF_CRT0S} ${CF_BSP} ${CF_SCRIPTS}
+all :: $(DO:%=all_%)
 
 #
 # here's where we build the board support packages for each target
 #
+
+.PHONY: all_m68k
+all_m68k :: ${SIM_CRT0} ${SIM_BSP} ${CRT0} ${BCC_BSP} ${IDP_BSP} \
+	${IDPGDB_BSP} ${MVME135_BSP} ${MVME162_BSP}
+.PHONY: all_cf
+all_cf :: ${CF_CRT0S} ${CF_BSP} ${CF_SCRIPTS} ${HOSTED_BSP} ${UNHOSTED_BSP}
+
+
 ${SIM_BSP}: ${SIM_OBJS}
 	${AR} ${ARFLAGS} $@ ${SIM_OBJS}
 	${RANLIB} $@
@@ -222,29 +237,18 @@ $(CF_BSP): $(CF_OBJS)
 	${AR} ${ARFLAGS} $@ $^
 	${RANLIB} $@
 
-#            RAM       ROM
-m5208evb  := 1024M 16M 0M 2M
-m5213evb  :=  512M 32K 0M 256K
-m52235evb :=  512M 32K 0M 256K
-m5235evb  :=    0M 16M 0xFFE00000 2M
-m5273c3   :=    0M  4M 0xFFE00000 2M
-m5275evb  :=    0M 16M 0xFFE00000 2M
-m5282evb  :=    0M 16M 0xFFE00000 2M
-m5329evb  := 1024M 32M 0M 2M
-m5485evb  :=    0M 64M 1024M 16M
-
-%-ram.ld : cf.sc Makefile
-	IO=unhosted RAM=$(word 1,$($*)) RAM_SIZE=$(word 2,$($*)) \
+m%-ram.ld : cf.sc Makefile
+	IO=unhosted RAM=$(word 1,$(m$*)) RAM_SIZE=$(word 2,$(m$*)) \
 	  ${SHELL} $< >$@
-%-rom.ld : cf.sc Makefile
-	IO=unhosted RAM=$(word 1,$($*)) RAM_SIZE=$(word 2,$($*)) \
-	  ROM=$(word 3,$($*)) ROM_SIZE=$(word 4,$($*)) ${SHELL} $< >$@
-%-ram-hosted.ld : cf.sc Makefile
-	IO=hosted RAM=$(word 1,$($*)) RAM_SIZE=$(word 2,$($*)) \
+m%-rom.ld : cf.sc Makefile
+	IO=unhosted RAM=$(word 1,$(m$*)) RAM_SIZE=$(word 2,$(m$*)) \
+	  ROM=$(word 3,$(m$*)) ROM_SIZE=$(word 4,$(m$*)) ${SHELL} $< >$@
+m%-ram-hosted.ld : cf.sc Makefile
+	IO=hosted RAM=$(word 1,$(m$*)) RAM_SIZE=$(word 2,$(m$*)) \
 	  ${SHELL} $< >$@
-%-rom-hosted.ld : cf.sc Makefile
-	IO=hosted RAM=$(word 1,$($*)) RAM_SIZE=$(word 2,$($*)) \
-	  ROM=$(word 3,$($*)) ROM_SIZE=$(word 4,$($*)) ${SHELL} $< >$@
+m%-rom-hosted.ld : cf.sc Makefile
+	IO=hosted RAM=$(word 1,$(m$*)) RAM_SIZE=$(word 2,$(m$*)) \
+	  ROM=$(word 3,$(m$*)) ROM_SIZE=$(word 4,$(m$*)) ${SHELL} $< >$@
 
 leds.o: ${srcdir}/leds.c
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $<
@@ -340,7 +344,11 @@ dtor.x: dtor.o ${CRT0} ${srcdir}/mvme135.ld Makefile  ${MVME135_BSP}
 unlink.o: $(srcdir)/../unlink.c
 
 .PHONY: install info dvi doc install-info clean-info
-install:
+install:: $(DO:%=install_%)
+
+
+.PHONY:install_m68k
+install_m68k::
 	# install SIM stuff
 	$(INSTALL_PROGRAM) $(SIM_CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(SIM_CRT0)
 	$(INSTALL_PROGRAM) $(SIM_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(SIM_BSP)
@@ -364,9 +372,9 @@ install:
 	$(INSTALL_DATA) ${srcdir}/mvme162.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/mvme162.ld
 	$(INSTALL_DATA) ${srcdir}/sbc5204.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/sbc5204.ld
 	$(INSTALL_DATA) ${srcdir}/sbc5206.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/sbc5206.ld
-	# install IO stuff
-	$(INSTALL_DATA) $(HOSTED_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(HOSTED_BSP)
-	$(INSTALL_DATA) $(UNHOSTED_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(UNHOSTED_BSP)
+
+.PHONY: install_cf
+install_cf:: install_io
 	# install CF stuff
 	for crt in $(CF_CRT0S) ; \
 	do $(INSTALL_DATA) $$crt $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$crt ; \
@@ -378,6 +386,12 @@ install:
 	for src in $(CF_SOURCES) ; \
 	do $(INSTALL_DATA) ${srcdir}/$$src $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$src ; \
 	done
+
+.PHONY: install_io
+install_io::
+	# install IO stuff
+	$(INSTALL_DATA) $(HOSTED_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(HOSTED_BSP)
+	$(INSTALL_DATA) $(UNHOSTED_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(UNHOSTED_BSP)
 
 # target specific makefile fragment comes in here.
 @target_makefile_frag@

@@ -1,3 +1,21 @@
+2006-11-01  Nathan Sidwell  <nathan@codesourcery.com>
+
+	libgloss/
+	* m68k/Makefile.in (IS_GCC, DO_CF, DO_M68K): New.
+	(UNHOSTED_BSP, UNHOSTED_OBJS, HOSTED_BSP, HOSTED_OBJS): Move
+	later.
+	(m5208evb, m5213evb, m52235evb, m5235evb, m5273c3, m5275evb,
+	m5282evb, m5329evb, m5485evb): Move earlier.
+	(all): Add all_cf & all_m68k conditional dependencies.
+	(all_cf, all_m68k): New targets, depend on cf & m68k bsps as
+	appropriate.
+	(m%-ram.ld, m%-rom.ld, m%-ram-hosted.ld, m%-rom-hosted.ld): Add
+	'm' prefix.
+	(install): Add install_cf, install_m68k conditional dependencies.
+	(install_cf, install_m68k): New targets.  Perform cf and m68k
+	installs as appropriate.
+	(install_io): New, install the io libraries.
+
 2006-10-25  Vladimir Prus  <vladimir@codesourcery.com>
 	
 	Merge from HEAD:
