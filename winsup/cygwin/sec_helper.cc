@@ -344,7 +344,7 @@ got_it:
 #undef DOMLEN
 #endif //unused
 
-/* Order must be same as cygperm_idx in winsup.h. */
+/* Order must be same as cygpriv_idx in security.h. */
 static const char *cygpriv[] =
 {
   SE_CREATE_TOKEN_NAME,
@@ -376,7 +376,11 @@ static const char *cygpriv[] =
   SE_MANAGE_VOLUME_NAME,
   SE_IMPERSONATE_NAME,
   SE_ENABLE_DELEGATION_NAME,
-  SE_SYNC_AGENT_NAME
+  SE_SYNC_AGENT_NAME,
+  SE_RELABEL_NAME,
+  SE_INCREASE_WORKING_SET_NAME,
+  SE_TIME_ZONE_NAME,
+  SE_CREATE_SYMBOLIC_LINK_NAME
 };
 
 const LUID *

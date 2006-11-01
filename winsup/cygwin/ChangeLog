@@ -1,3 +1,9 @@
+2006-11-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.h (cygpriv_idx): Add privileges new in Vista.
+	* security.cc (sys_privs): Ditto.
+	* sec_helper.cc (cygpriv): Ditto.  Fix comment.
+
 2006-10-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.h (struct user_heap_info): Add slop member.
