@@ -1,5 +1,12 @@
 2006-10-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/winnt.h (SE_RELABEL_NAME): Define.
+	(SE_INCREASE_WORKING_SET_NAME): Define.
+	(SE_TIME_ZONE_NAME): Define.
+	(SE_CREATE_SYMBOLIC_LINK_NAME): Define.
+
+2006-10-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/winnt.h (IO_REPARSE_TAG_SYMLINK): Define.
 	(struct _REPARSE_DATA_BUFFER): Add missing Flags field to
 	SymbolicLinkReparseBuffer substructure.
