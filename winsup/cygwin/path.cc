@@ -3394,7 +3394,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
   major = 0;
   minor = 0;
   mode = 0;
-  pflags &= ~(PATH_SYMLINK | PATH_LNK);
+  pflags &= ~(PATH_SYMLINK | PATH_LNK | PATH_REP);
   case_clash = false;
 
   while (suffix.next ())

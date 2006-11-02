@@ -1,6 +1,10 @@
 2006-11-02  Corinna Vinschen  <corinna@vinschen.de>
 
-	* path.cc (symlink_info::posixify): New mothod converting NT and DOS
+	* path.cc (symlink_info::check): Eliminate PATH_REP bit from pflags.
+
+2006-11-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_info::posixify): New method converting NT and DOS
 	paths in symlinks to POSIX.
 	(symlink_info::check_shortcut): Allocate buf allowing for a trailing 0.
 	Call posixify on the result.
