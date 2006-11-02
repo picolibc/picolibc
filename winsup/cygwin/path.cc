@@ -105,6 +105,7 @@ struct symlink_info
   int check_sysfile (const char *path, HANDLE h);
   int check_shortcut (const char *path, HANDLE h);
   int check_reparse_point (const char *path, HANDLE h);
+  int posixify (char *srcbuf);
   bool set_error (int);
 };
 
@@ -2999,7 +3000,7 @@ symlink_info::check_shortcut (const char *path, HANDLE h)
 
   if ((size = GetFileSize (h, NULL)) > 8192) /* Not a Cygwin symlink. */
     goto file_not_symlink;
-  buf = (char *) alloca (size);
+  buf = (char *) alloca (size + 1);
   if (!ReadFile (h, buf, size, &got, 0))
     {
       set_error (EIO);
@@ -3013,9 +3014,9 @@ symlink_info::check_shortcut (const char *path, HANDLE h)
     cp += *(unsigned short *) cp + 2;
   if ((len = *(unsigned short *) cp) == 0 || len >= CYG_MAX_PATH)
     goto file_not_symlink;
-  strncpy (contents, cp += 2, len);
-  contents[len] = '\0';
-  res = len;
+  cp += 2;
+  cp[len] = '\0';
+  res = posixify (cp);
   if (res) /* It's a symlink.  */
     pflags = PATH_SYMLINK | PATH_LNK;
   goto close_it;
@@ -3034,6 +3035,7 @@ int
 symlink_info::check_sysfile (const char *path, HANDLE h)
 {
   char cookie_buf[sizeof (SYMLINK_COOKIE) - 1];
+  char srcbuf[CYG_MAX_PATH];
   DWORD got;
   int res = 0;
 
@@ -3048,26 +3050,14 @@ symlink_info::check_sysfile (const char *path, HANDLE h)
       /* It's a symlink.  */
       pflags = PATH_SYMLINK;
 
-      res = ReadFile (h, contents, CYG_MAX_PATH, &got, 0);
+      res = ReadFile (h, srcbuf, CYG_MAX_PATH, &got, 0);
       if (!res)
 	{
 	  debug_printf ("ReadFile2 failed");
 	  set_error (EIO);
 	}
       else
-	{
-	  /* Versions prior to b16 stored several trailing
-	     NULs with the path (to fill the path out to 1024
-	     chars).  Current versions only store one trailing
-	     NUL.  The length returned is the path without
-	     *any* trailing NULs.  We also have to handle (or
-	     at least not die from) corrupted paths.  */
-	  char *end;
-	  if ((end = (char *) memchr (contents, 0, got)) != NULL)
-	    res = end - contents;
-	  else
-	    res = got;
-	}
+	res = posixify (srcbuf);
     }
   else if (got == sizeof (cookie_buf)
 	   && memcmp (cookie_buf, SOCKET_COOKIE, sizeof (cookie_buf)) == 0)
@@ -3096,6 +3086,7 @@ symlink_info::check_reparse_point (const char *path, HANDLE h)
   PREPARSE_DATA_BUFFER rp = (PREPARSE_DATA_BUFFER)
 			    alloca (MAXIMUM_REPARSE_DATA_BUFFER_SIZE);
   DWORD size;
+  char srcbuf[CYG_MAX_PATH + 6];
 
   if (!DeviceIoControl (h, FSCTL_GET_REPARSE_POINT, NULL, 0, (LPVOID) rp,
   			MAXIMUM_REPARSE_DATA_BUFFER_SIZE, &size, NULL))
@@ -3106,16 +3097,17 @@ symlink_info::check_reparse_point (const char *path, HANDLE h)
     }
   if (rp->ReparseTag == IO_REPARSE_TAG_SYMLINK)
     {
-      if (rp->SymbolicLinkReparseBuffer.PrintNameLength > 2 * CYG_MAX_PATH)
+      if (rp->SymbolicLinkReparseBuffer.SubstituteNameLength
+	  > 2 * (CYG_MAX_PATH + 6))
 	{
 	  debug_printf ("Symlink name too long");
 	  set_error (EIO);
 	  goto close_it;
 	}
-      res = sys_wcstombs (contents, CYG_MAX_PATH,
+      sys_wcstombs (srcbuf, CYG_MAX_PATH,
 		    (WCHAR *)((char *)rp->SymbolicLinkReparseBuffer.PathBuffer
-			      + rp->SymbolicLinkReparseBuffer.PrintNameOffset),
-		    rp->SymbolicLinkReparseBuffer.PrintNameLength / 2);
+			  + rp->SymbolicLinkReparseBuffer.SubstituteNameOffset),
+		    rp->SymbolicLinkReparseBuffer.SubstituteNameLength / 2);
       pflags = PATH_SYMLINK | PATH_REP;
       fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
     }
@@ -3126,22 +3118,80 @@ symlink_info::check_reparse_point (const char *path, HANDLE h)
 	  /* Likely a volume mount point.  Not treated as symlink. */
 	  goto close_it;
 	}
-      if (rp->MountPointReparseBuffer.PrintNameLength > 2 * CYG_MAX_PATH)
+      if (rp->MountPointReparseBuffer.SubstituteNameLength
+	  > 2 * (CYG_MAX_PATH + 6))
         {
 	  debug_printf ("Symlink name too long");
 	  set_error (EIO);
 	  goto close_it;
 	}
-      res = sys_wcstombs (contents, CYG_MAX_PATH,
-		      (WCHAR *)((char *)rp->MountPointReparseBuffer.PathBuffer
-				+ rp->MountPointReparseBuffer.PrintNameOffset),
-		      rp->MountPointReparseBuffer.PrintNameLength / 2);
+      sys_wcstombs (srcbuf, CYG_MAX_PATH,
+		    (WCHAR *)((char *)rp->MountPointReparseBuffer.PathBuffer
+			    + rp->MountPointReparseBuffer.SubstituteNameOffset),
+		    rp->MountPointReparseBuffer.SubstituteNameLength / 2);
       pflags = PATH_SYMLINK | PATH_REP;
       fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
     }
+  res = posixify (srcbuf);
 close_it:
   CloseHandle (h);
   return res;
+}
+
+int
+symlink_info::posixify (char *srcbuf)
+{
+  /* The definition for a path in a native symlink is a bit weird.  The Flags
+     value seem to contain 0 for absolute paths (stored as NT native path)
+     and 1 for relative paths.  Relative paths are paths not starting with a
+     drive letter.  These are not converted to NT native, but stored as
+     given.  A path starting with a single backslash is relative to the
+     current drive thus a "relative" value (Flags == 1).
+     Funny enough it's possible to store paths with slashes instead of
+     backslashes, but they are evaluated incorrectly by subsequent Windows
+     calls like CreateFile (ERROR_INVALID_NAME).  So, what we do here is to
+     take paths starting with slashes at face value, evaluating them as
+     Cygwin specific POSIX paths.
+     A path starting with two slashes(!) or backslashes is converted into an
+     NT UNC path.  Unfortunately, in contrast to POSIX rules, paths starting
+     with three or more (back)slashes are also converted into UNC paths,
+     just incorrectly sticking to their redundant backslashes.  We go along
+     with this behaviour to avoid scenarios in which native tools access
+     other files than Cygwin.
+     The above rules are used exactly the same way on Cygwin specific symlinks
+     (sysfiles and shortcuts) to eliminate non-POSIX paths in the output. */
+
+  /* Eliminate native NT prefixes. */
+  if (srcbuf[0] == '\\' && !strncmp (srcbuf + 1, "??\\", 3))
+    {
+      srcbuf += 4;
+      if (!strncmp (srcbuf, "UNC\\", 4))
+	{
+	  srcbuf += 2;
+	  *srcbuf = '\\';
+	}
+    }
+  if (isdrive (srcbuf))
+    mount_table->conv_to_posix_path (srcbuf, contents, 0);
+  else if (srcbuf[0] == '\\')
+    {
+      if (srcbuf[1] == '\\') /* UNC path */
+	slashify (srcbuf, contents, 0);
+      else /* Paths starting with \ are current drive relative. */
+        {
+	  char cvtbuf[CYG_MAX_PATH + 6];
+
+	  if (cygheap->cwd.win32)
+	    strncpy (cvtbuf, cygheap->cwd.win32, 2);
+	  else
+	    GetCurrentDirectory (CYG_MAX_PATH, cvtbuf);
+	  strcpy (cvtbuf + 2, srcbuf);
+	  mount_table->conv_to_posix_path (cvtbuf, contents, 0);
+	}
+    }
+  else /* Everything else is taken as is. */
+    slashify (srcbuf, contents, 0);
+  return strlen (contents);
 }
 
 enum

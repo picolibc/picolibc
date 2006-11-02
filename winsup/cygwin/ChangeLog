@@ -1,3 +1,15 @@
+2006-11-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_info::posixify): New mothod converting NT and DOS
+	paths in symlinks to POSIX.
+	(symlink_info::check_shortcut): Allocate buf allowing for a trailing 0.
+	Call posixify on the result.
+	(symlink_info::check_sysfile): Read from file into local buffer.
+	Eliminate old b16 considerations.  Call posixify on the result.
+	(symlink_info::check_reparse_point): Don't use PrintName but
+	SubstituteName which is relevant for Windows' path handling.
+	Call posixify on the result.
+
 2006-11-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.h (cygpriv_idx): Add privileges new in Vista.
