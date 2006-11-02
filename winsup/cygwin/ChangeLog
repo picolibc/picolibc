@@ -1,5 +1,9 @@
 2006-11-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (symlink_info::posixify): Fix comment.
+
+2006-11-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (symlink_info::check): Eliminate PATH_REP bit from pflags.
 
 2006-11-02  Corinna Vinschen  <corinna@vinschen.de>

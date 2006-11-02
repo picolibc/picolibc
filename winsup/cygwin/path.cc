@@ -3155,8 +3155,8 @@ symlink_info::posixify (char *srcbuf)
      A path starting with two slashes(!) or backslashes is converted into an
      NT UNC path.  Unfortunately, in contrast to POSIX rules, paths starting
      with three or more (back)slashes are also converted into UNC paths,
-     just incorrectly sticking to their redundant backslashes.  We go along
-     with this behaviour to avoid scenarios in which native tools access
+     just incorrectly sticking to one redundant leading backslashe.  We go
+     along with this behaviour to avoid scenarios in which native tools access
      other files than Cygwin.
      The above rules are used exactly the same way on Cygwin specific symlinks
      (sysfiles and shortcuts) to eliminate non-POSIX paths in the output. */
