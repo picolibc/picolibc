@@ -1,3 +1,13 @@
+2006-11-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winuser.h (LR_DEFAULTSIZE): Remove duplicate.
+
+	* include/winnt.h (GetCurrentFiber): Remove extern declaration.  Make
+	inline static.
+	(GetFiberData): Likewise.  
+	* lib/kernel32.c: Remove.
+	* lib/Makefile.in: Remove reference to kernel32.[co].
+
 2006-10-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/winnt.h (SE_RELABEL_NAME): Define.

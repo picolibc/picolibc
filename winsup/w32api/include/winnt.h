@@ -3815,14 +3815,11 @@ ULONGLONG WINAPI VerSetConditionMask(ULONGLONG,DWORD,BYTE);
 	(TypeBitMask), (ComparisonType)))
 #endif
 
-PVOID GetCurrentFiber(void);
-PVOID GetFiberData(void);
-
 #ifdef _X86_
 #if defined(__GNUC__)
 #if (__GNUC__ >= 3)
 /* Support -masm=intel.  */
-extern __inline__ PVOID GetCurrentFiber(void)
+static __inline__ PVOID GetCurrentFiber(void)
 {
     void* ret;
     __asm__ __volatile__ (
@@ -3832,7 +3829,7 @@ extern __inline__ PVOID GetCurrentFiber(void)
     return ret;
 }
 
-extern __inline__ PVOID GetFiberData(void)
+static __inline__ PVOID GetFiberData(void)
 {
     void* ret;
     __asm__ __volatile__ (
@@ -3857,7 +3854,7 @@ static __inline__ struct _TEB * NtCurrentTeb(void)
 }
 
 #else /* __GNUC__ >= 3 */
-extern __inline__ PVOID GetCurrentFiber(void)
+static __inline__ PVOID GetCurrentFiber(void)
 {
     void* ret;
     __asm__ __volatile__ (
@@ -3867,7 +3864,7 @@ extern __inline__ PVOID GetCurrentFiber(void)
     return ret;
 }
 
-extern __inline__ PVOID GetFiberData(void)
+static __inline__ PVOID GetFiberData(void)
 {
     void* ret;
     __asm__ __volatile__ (

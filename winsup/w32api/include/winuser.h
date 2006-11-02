@@ -941,7 +941,6 @@ extern "C" {
 #define SM_CXMAXIMIZED 61
 #define SM_CYMAXIMIZED 62
 #define SM_NETWORK 63
-#define LR_DEFAULTSIZE 64
 #define SM_CLEANBOOT 67
 #define SM_CXDRAG 68
 #define SM_CYDRAG 69
