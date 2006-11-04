@@ -1,3 +1,14 @@
+2006-11-04  Vladimir Prus  <vladimir@codesourcery.com>
+
+	ld/
+	* emultempl/elf32.em (gld${EMULATION_NAME}_before_allocation):
+	Don't prepend "warning" to the message.
+
+	ld/testsuite	
+	* ld-elf/warn2.d: New.
+	* ld-elf/symbol2w.s: New.
+	* ld-elf/symbol2ref.s: New.	
+
 2006-10-31  Mark Shinwell  <shinwell@codesourcery.com>
 
 	gas/
