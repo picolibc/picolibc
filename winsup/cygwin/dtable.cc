@@ -1,7 +1,7 @@
 /* dtable.cc: file descriptor support.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005 Red Hat, Inc.
+   2005, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -383,6 +383,7 @@ build_fh_pc (path_conv& pc)
     case DEV_FLOPPY_MAJOR:
     case DEV_CDROM_MAJOR:
     case DEV_SD_MAJOR:
+    case DEV_SD1_MAJOR:
       fh = cnew (fhandler_dev_floppy) ();
       break;
     case DEV_TAPE_MAJOR:
