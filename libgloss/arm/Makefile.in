@@ -101,31 +101,34 @@ all: ${CRT0} ${REDBOOT_CRT0} ${REDBOOT_OBJS} ${RDPMON_CRT0} ${RDPMON_BSP} ${RDIM
 .PHONY: test
 test:
 
+# Note that when building the library, ${MULTILIB} is not the way multilib
+# options are passed; they're passed in $(CFLAGS).
+ALL_CFLAGS=$(CFLAGS_FOR_TARGET) $(CFLAGS)
 #
 crt0.o: crt0.S
 armv7m-crt0.o: crt0.S
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -D_ARM_V7M -o $@ -c $<
+	$(CC) $(ALL_CFLAGS) $(INCLUDES) -D_ARM_V7M -o $@ -c $<
 
 redboot-crt0.o: redboot-crt0.S
 redboot-syscalls.o: redboot-syscalls.c $(srcdir)/../syscall.h
 
 rdpmon-crt0.o: crt0.S
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDP_MONITOR -o $@ -c $<
+	$(CC) $(ALL_CFLAGS) $(INCLUDES) -DARM_RDP_MONITOR -o $@ -c $<
 
 rdimon-crt0.o: crt0.S
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(ALL_CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-trap.o: trap.S
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(ALL_CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-_exit.o: _exit.c
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(ALL_CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-syscalls.o: syscalls.c
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(ALL_CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-libcfunc.o: libcfunc.c
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(ALL_CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 $(RDPMON_BSP): $(RDPMON_OBJS)
 	${AR} ${ARFLAGS} $@ $^
