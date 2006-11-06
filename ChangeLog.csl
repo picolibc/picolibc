@@ -1,3 +1,8 @@
+2006-11-06  Vladimir Prus  <vladimir@codesourcery.com>
+
+	ld/testsuite	
+	* ld-elf/symbol2ref.s: Use "dc.a" as opposed to ".long".
+
 2006-11-04  Vladimir Prus  <vladimir@codesourcery.com>
 
 	ld/
