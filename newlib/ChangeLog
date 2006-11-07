@@ -1,3 +1,10 @@
+2006-11-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/sys/unistd.h (_SC_STREAM_MAX): Define on Cygwin.
+	(_PC_FILESIZEBITS): Add definition.
+	(_PC_2_SYMLINKS): Ditto.
+	(_PC_SYMLINK_MAX): Ditto.
+
 2006-10-27  Joel Schopp  <jschopp@austin.ibm.com>
 
 	* libc/machine/spu/memcpy.c: Override generic function with vectorized

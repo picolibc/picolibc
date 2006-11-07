@@ -303,8 +303,10 @@ int     _EXFUN(symlink, (const char *__name1, const char *__name2));
 #define _SC_LOGIN_NAME_MAX               52
 #define _SC_THREAD_DESTRUCTOR_ITERATIONS 53
 
-#if !defined(__CYGWIN__) && !defined(__rtems__)
+#if !defined(__rtems__)
 #define _SC_STREAM_MAX			100
+#endif
+#if !defined(__CYGWIN__) && !defined(__rtems__)
 #define _SC_PRIORITY_SCHEDULING		101
 #endif
   
@@ -320,6 +322,9 @@ int     _EXFUN(symlink, (const char *__name1, const char *__name2));
 # define	_PC_ASYNC_IO            9
 # define	_PC_PRIO_IO            10
 # define	_PC_SYNC_IO            11
+# define	_PC_FILESIZEBITS       12
+# define	_PC_2_SYMLINKS         13
+# define	_PC_SYMLINK_MAX        14
 #ifdef __CYGWIN__
 /* Ask for POSIX permission bits support. */
 # define	_PC_POSIX_PERMISSIONS   90
