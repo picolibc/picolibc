@@ -30,9 +30,17 @@ sysconf (int in)
 {
   switch (in)
     {
+      /* Keep order as in sys/unistd.h */
       case _SC_ARG_MAX:
-	/* FIXME: what's the right value?  _POSIX_ARG_MAX is only 4K */
+	/* FIXME: what's the right value?  _POSIX_ARG_MAX is only 4K.
+	   FIXME: Wouldn't it be more correct to return ARG_MAX here? */
 	return 1048576;
+      case _SC_CHILD_MAX:
+	return CHILD_MAX;
+      case _SC_CLK_TCK:
+	return CLOCKS_PER_SEC;
+      case _SC_NGROUPS_MAX:
+	return NGROUPS_MAX;
       case _SC_OPEN_MAX:
 	{
 	  long max = getdtablesize ();
@@ -40,31 +48,14 @@ sysconf (int in)
 	    max = OPEN_MAX;
 	  return max;
 	}
-      case _SC_PAGESIZE:
-	return getpagesize ();
-      case _SC_CLK_TCK:
-	return CLOCKS_PER_SEC;
       case _SC_JOB_CONTROL:
 	return _POSIX_JOB_CONTROL;
-      case _SC_CHILD_MAX:
-	return CHILD_MAX;
-      case _SC_NGROUPS_MAX:
-	return NGROUPS_MAX;
       case _SC_SAVED_IDS:
 	return _POSIX_SAVED_IDS;
-      case _SC_LOGIN_NAME_MAX:
-	return LOGIN_NAME_MAX;
-      case _SC_GETPW_R_SIZE_MAX:
-      case _SC_GETGR_R_SIZE_MAX:
-	return 16*1024;
       case _SC_VERSION:
 	return _POSIX_VERSION;
-#if 0	/* FIXME -- unimplemented */
-      case _SC_TZNAME_MAX:
-	return _POSIX_TZNAME_MAX;
-      case _SC_STREAM_MAX:
-	return _POSIX_STREAM_MAX;
-#endif
+      case _SC_PAGESIZE:
+	return getpagesize ();
       case _SC_NPROCESSORS_CONF:
       case _SC_NPROCESSORS_ONLN:
 	if (!wincap.supports_smp ())
@@ -122,12 +113,20 @@ sysconf (int in)
 	  }
       case _SC_RTSIG_MAX:
 	return RTSIG_MAX;
-      case _SC_TTY_NAME_MAX:
-	return TTY_NAME_MAX;
+      case _SC_TIMER_MAX:
+	return TIMER_MAX;
+#if 0	/* FIXME -- unimplemented */
+      case _SC_TZNAME_MAX:
+        return _POSIX_TZNAME_MAX;
+#endif
       case _SC_MEMLOCK_RANGE:
 	return _POSIX_MEMLOCK_RANGE;
       case _SC_SEMAPHORES:
-	return _POSIX_SEMAPHORES;
+        return _POSIX_SEMAPHORES;
+      case _SC_TIMERS:
+	return _POSIX_TIMERS;
+      case _SC_TTY_NAME_MAX:
+	return TTY_NAME_MAX;
       case _SC_THREADS:
 	return _POSIX_THREADS;
       case _SC_THREAD_ATTR_STACKSIZE:
@@ -138,8 +137,13 @@ sysconf (int in)
 	return _POSIX_THREAD_PROCESS_SHARED;
       case _SC_THREAD_SAFE_FUNCTIONS:
 	return _POSIX_THREAD_SAFE_FUNCTIONS;
-      case _SC_TIMERS:
-	return _POSIX_TIMERS;
+      case _SC_GETPW_R_SIZE_MAX:
+      case _SC_GETGR_R_SIZE_MAX:
+	return 16*1024;
+      case _SC_LOGIN_NAME_MAX:
+	return LOGIN_NAME_MAX;
+      case _SC_STREAM_MAX:
+	return STREAM_MAX;
     }
 
   /* Invalid input or unimplemented sysconf name */

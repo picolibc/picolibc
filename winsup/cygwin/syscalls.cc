@@ -1,7 +1,7 @@
 /* syscalls.cc: syscalls
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005 Red Hat, Inc.
+   2005, 2006 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1460,38 +1460,6 @@ getsystempagesize ()
   return (size_t) system_info.dwPageSize;
 }
 
-static int
-check_posix_perm (const char *fname, int v)
-{
-  /* Windows 95/98/ME don't support file system security at all. */
-  if (!wincap.has_security ())
-    return 0;
-
-  /* ntea is ok for supporting permission bits but it doesn't support
-     full POSIX security settings. */
-  if (v == _PC_POSIX_PERMISSIONS && allow_ntea)
-    return 1;
-
-  if (!allow_ntsec)
-    return 0;
-
-  char *root = rootdir (fname, (char *)alloca (strlen (fname)));
-
-  if (!allow_smbntsec
-      && ((root[0] == '\\' && root[1] == '\\')
-	  || GetDriveType (root) == DRIVE_REMOTE))
-    return 0;
-
-  DWORD vsn, len, flags;
-  if (!GetVolumeInformation (root, NULL, 0, &vsn, &len, &flags, NULL, 16))
-    {
-      __seterrno ();
-      return 0;
-    }
-
-  return (flags & FS_PERSISTENT_ACLS) ? 1 : 0;
-}
-
 /* FIXME: not all values are correct... */
 extern "C" long int
 fpathconf (int fd, int v)
@@ -1499,50 +1467,14 @@ fpathconf (int fd, int v)
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     return -1;
-  switch (v)
-    {
-    case _PC_LINK_MAX:
-      return _POSIX_LINK_MAX;
-    case _PC_MAX_CANON:
-    case _PC_MAX_INPUT:
-      if (isatty (fd))
-	return _POSIX_MAX_CANON;
-      else
-	{
-	  set_errno (EBADF);
-	  return -1;
-	}
-    case _PC_NAME_MAX:
-    case _PC_PATH_MAX:
-      return PATH_MAX;
-    case _PC_PIPE_BUF:
-      return PIPE_BUF;
-    case _PC_CHOWN_RESTRICTED:
-    case _PC_NO_TRUNC:
-      return -1;
-    case _PC_VDISABLE:
-      if (cfd->is_tty ())
-	return -1;
-      else
-	{
-	  set_errno (EBADF);
-	  return -1;
-	}
-    case _PC_POSIX_PERMISSIONS:
-    case _PC_POSIX_SECURITY:
-      if (cfd->get_device () == FH_FS)
-	return check_posix_perm (cfd->get_win32_name (), v);
-      set_errno (EINVAL);
-      return -1;
-    default:
-      set_errno (EINVAL);
-      return -1;
-    }
+  return cfd->fpathconf (v);
 }
 
 extern "C" long int
 pathconf (const char *file, int v)
 {
+  fhandler_base *fh;
+
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
@@ -1551,45 +1483,15 @@ pathconf (const char *file, int v)
       set_errno (ENOENT);
       return -1;
     }
-  switch (v)
+  if (!(fh = build_fh_name (file, NULL, PC_SYM_FOLLOW,
+			    transparent_exe ? stat_suffixes : NULL)))
+    return -1;
+  if (!fh->exists ())
     {
-    case _PC_PATH_MAX:
-      return PATH_MAX - strlen (file);
-    case _PC_NAME_MAX:
-      return PATH_MAX;
-    case _PC_LINK_MAX:
-      return _POSIX_LINK_MAX;
-    case _PC_MAX_CANON:
-    case _PC_MAX_INPUT:
-      return _POSIX_MAX_CANON;
-    case _PC_PIPE_BUF:
-      return PIPE_BUF;
-    case _PC_CHOWN_RESTRICTED:
-    case _PC_NO_TRUNC:
-      return -1;
-    case _PC_VDISABLE:
-      return -1;
-    case _PC_POSIX_PERMISSIONS:
-    case _PC_POSIX_SECURITY:
-      {
-	path_conv full_path (file, PC_SYM_FOLLOW,
-			     transparent_exe ? stat_suffixes : NULL);
-	if (full_path.error)
-	  {
-	    set_errno (full_path.error);
-	    return -1;
-	  }
-	if (full_path.is_auto_device ())
-	  {
-	    set_errno (EINVAL);
-	    return -1;
-	  }
-	return check_posix_perm (full_path, v);
-      }
-    default:
-      set_errno (EINVAL);
+      set_errno (ENOENT);
       return -1;
     }
+  return fh->fpathconf (v);
 }
 
 extern "C" int

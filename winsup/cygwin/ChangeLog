@@ -1,3 +1,20 @@
+2006-11-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (check_posix_perm): Moved here from syscalls.cc.
+	(fhandler_base::fpathconf): New method implementing (f)pathconf.
+	* fhandler.h (class fhandler_base): Declare fpathconf method.
+	* path.cc (path_conv::check): Replace MAX_LINK_DEPTH with SYMLOOP_MAX.
+	* path.h (MAX_LINK_DEPTH): Delete.
+	* syscalls.cc (check_posix_perm): Move to fhandler.cc.
+	(fpathconf): Call fhandler's fpathconf method.
+	(pathconf): Build fhandler and call fhandler's fpathconf method.
+	* sysconf.cc (sysconf): Reorder switch according to order of flags
+	in sys/unistd.h.  Add handling for some missing flags.
+	* include/limits.h: Reorder according to SUSv3 description.  Add some
+	missing definitions.  Add comments.
+	* include/sys/syslimits.h: New file overriding newlib's syslimits.h
+	file.
+
 2006-11-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dtable.cc (build_fh_pc): Add missing DEV_SD1_MAJOR case (Thanks to

@@ -907,7 +907,7 @@ virtual_component_retry:
 	}
 
       /* Arrive here if above loop detected a symlink. */
-      if (++loop > MAX_LINK_DEPTH)
+      if (++loop > SYMLOOP_MAX)
 	{
 	  error = ELOOP;   // Eep.
 	  return;

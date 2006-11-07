@@ -296,6 +296,7 @@ class fhandler_base
   virtual _off64_t lseek (_off64_t offset, int whence);
   virtual int lock (int, struct __flock64 *);
   virtual int dup (fhandler_base *child);
+  virtual int fpathconf (int);
 
   virtual HANDLE mmap (caddr_t *addr, size_t len, int prot,
 		       int flags, _off64_t off);

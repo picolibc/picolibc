@@ -1713,3 +1713,99 @@ fhandler_base::fsync ()
   __seterrno ();
   return -1;
 }
+
+/* Helper function for Cygwin specific pathconf flags _PC_POSIX_PERMISSIONS
+   and _PC_POSIX_SECURITY. */
+static int
+check_posix_perm (const char *fname, int v)
+{
+  /* Windows 95/98/ME don't support file system security at all. */
+  if (!wincap.has_security ())
+    return 0;
+
+  /* ntea is ok for supporting permission bits but it doesn't support
+     full POSIX security settings. */
+  if (v == _PC_POSIX_PERMISSIONS && allow_ntea)
+    return 1;
+
+  if (!allow_ntsec)
+    return 0;
+
+  char *root = rootdir (fname, (char *)alloca (strlen (fname)));
+
+  if (!allow_smbntsec
+      && ((root[0] == '\\' && root[1] == '\\')
+	  || GetDriveType (root) == DRIVE_REMOTE))
+    return 0;
+
+  DWORD vsn, len, flags;
+  if (!GetVolumeInformation (root, NULL, 0, &vsn, &len, &flags, NULL, 16))
+    {
+      __seterrno ();
+      return 0;
+    }
+
+  return (flags & FS_PERSISTENT_ACLS) ? 1 : 0;
+}
+
+int
+fhandler_base::fpathconf (int v)
+{
+  switch (v)
+    {
+    case _PC_LINK_MAX:
+      return pc.fs_is_ntfs () || pc.fs_is_samba () || pc.fs_is_nfs ()
+	     ? LINK_MAX : 1;
+    case _PC_MAX_CANON:
+      if (is_tty ())
+        return MAX_CANON;
+      set_errno (EINVAL);
+      break;
+    case _PC_MAX_INPUT:
+      if (is_tty ())
+        return MAX_INPUT;
+      set_errno (EINVAL);
+      break;
+    case _PC_NAME_MAX:
+      /* NAME_MAX is without trailing \0 */
+      return pc.isdir () ? PATH_MAX - strlen (get_name ()) - 2 : NAME_MAX;
+    case _PC_PATH_MAX:
+      /* PATH_MAX is with trailing \0 */
+      return pc.isdir () ? PATH_MAX - strlen (get_name ()) - 1 : PATH_MAX;
+    case _PC_PIPE_BUF:
+      if (pc.isdir ()
+	  || get_device () == FH_FIFO || get_device () == FH_PIPE
+	  || get_device () == FH_PIPER || get_device () == FH_PIPEW)
+        return PIPE_BUF;
+      set_errno (EINVAL);
+      break;
+    case _PC_CHOWN_RESTRICTED:
+      return 1;
+    case _PC_NO_TRUNC:
+      return 1;
+    case _PC_VDISABLE:
+      if (!is_tty ())
+        set_errno (EINVAL);
+      break;
+    case _PC_ASYNC_IO:
+    case _PC_PRIO_IO:
+    case _PC_SYNC_IO:
+      break;
+    case _PC_FILESIZEBITS:
+      return FILESIZEBITS;
+    case _PC_2_SYMLINKS:
+      return 1;
+    case _PC_SYMLINK_MAX:
+      break;
+    case _PC_POSIX_PERMISSIONS:
+    case _PC_POSIX_SECURITY:
+      if (get_device () == FH_FS)
+        return check_posix_perm (get_win32_name (), v);
+      set_errno (EINVAL);
+      break;
+    default:
+      set_errno (EINVAL);
+      break;
+    }
+  return -1;
+}

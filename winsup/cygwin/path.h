@@ -272,8 +272,6 @@ class path_conv
 /* Socket marker */
 #define SOCKET_COOKIE  "!<socket >"
 
-/* Maximum depth of symlinks (after which ELOOP is issued).  */
-#define MAX_LINK_DEPTH 10
 int __stdcall slash_unc_prefix_p (const char *path) __attribute__ ((regparm(1)));
 
 enum fe_types
