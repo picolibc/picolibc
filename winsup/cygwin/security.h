@@ -245,8 +245,12 @@ extern cygpsid well_known_batch_sid;
 extern cygpsid well_known_interactive_sid;
 extern cygpsid well_known_service_sid;
 extern cygpsid well_known_authenticated_users_sid;
+extern cygpsid well_known_this_org_sid;
 extern cygpsid well_known_system_sid;
 extern cygpsid well_known_admins_sid;
+extern cygpsid mandatory_medium_integrity_sid;
+extern cygpsid mandatory_high_integrity_sid;
+extern cygpsid mandatory_system_integrity_sid;
 
 /* Order must be same as cygpriv in sec_helper.cc. */
 enum cygpriv_idx {

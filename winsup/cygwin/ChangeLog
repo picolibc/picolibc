@@ -1,3 +1,27 @@
+2006-11-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_helper.cc (sid_auth): Remove.
+	(well_known_this_org_sid): New well known sid.
+	(SECURITY_MANDATORY_INTEGRITY_AUTHORITY): Define.
+	(mandatory_medium_integrity_sid): New well known sid.
+	(mandatory_high_integrity_sid): Ditto.
+	(mandatory_system_integrity_sid): Ditto.
+	(cygsid::get_sid): Use local SID_IDENTIFIER_AUTHORITY.  Allow all
+	authorities fitting in a UCHAR.
+	* security.cc (get_token_group_sidlist): Always add the local
+	group to the token.  Add comment.  Add "This Organization" group
+	if available in incoming group list.
+	(get_server_groups): Only add world and authenticated users groups
+	if not already in list.
+	(create_token): Add matching mandatory integrity SID to group list
+	on systems supporting Mandatory Integrity Control.
+	* security.h (well_known_this_org_sid): Define.
+	(mandatory_medium_integrity_sid): Define.
+	(mandatory_high_integrity_sid): Define.
+	(mandatory_system_integrity_sid): Define.
+	* wincap.h: Define has_mandatory_integrity_control throughout.
+	* wincap.cc: Ditto.
+
 2006-11-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (check_posix_perm): Moved here from syscalls.cc.

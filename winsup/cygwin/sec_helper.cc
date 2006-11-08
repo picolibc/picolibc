@@ -38,15 +38,6 @@ SECURITY_ATTRIBUTES NO_COPY sec_none_nih;
 SECURITY_ATTRIBUTES NO_COPY sec_all;
 SECURITY_ATTRIBUTES NO_COPY sec_all_nih;
 
-SID_IDENTIFIER_AUTHORITY NO_COPY sid_auth[] = {
-	{SECURITY_NULL_SID_AUTHORITY},
-	{SECURITY_WORLD_SID_AUTHORITY},
-	{SECURITY_LOCAL_SID_AUTHORITY},
-	{SECURITY_CREATOR_SID_AUTHORITY},
-	{SECURITY_NON_UNIQUE_AUTHORITY},
-	{SECURITY_NT_AUTHORITY}
-};
-
 SID (well_known_null_sid, "S-1-0-0",
      SECURITY_NULL_SID_AUTHORITY, 1, SECURITY_NULL_RID);
 SID (well_known_world_sid, "S-1-1-0",
@@ -69,11 +60,22 @@ SID (well_known_service_sid, "S-1-5-6",
      SECURITY_NT_AUTHORITY, 1, SECURITY_SERVICE_RID);
 SID (well_known_authenticated_users_sid, "S-1-5-11",
      SECURITY_NT_AUTHORITY, 1, SECURITY_AUTHENTICATED_USER_RID);
+SID (well_known_this_org_sid, "S-1-5-15",
+     SECURITY_NT_AUTHORITY, 1, 15);
 SID (well_known_system_sid, "S-1-5-18",
      SECURITY_NT_AUTHORITY, 1, SECURITY_LOCAL_SYSTEM_RID);
 SID (well_known_admins_sid, "S-1-5-32-544",
      SECURITY_NT_AUTHORITY, 2, SECURITY_BUILTIN_DOMAIN_RID,
 			       DOMAIN_ALIAS_RID_ADMINS);
+
+#define SECURITY_MANDATORY_INTEGRITY_AUTHORITY       {0,0,0,0,0,16}
+
+SID (mandatory_medium_integrity_sid, "S-1-64-8192",
+     SECURITY_MANDATORY_INTEGRITY_AUTHORITY, 1, 8192);
+SID (mandatory_high_integrity_sid, "S-1-64-12288",
+     SECURITY_MANDATORY_INTEGRITY_AUTHORITY, 1, 12288);
+SID (mandatory_system_integrity_sid, "S-1-64-16384",
+     SECURITY_MANDATORY_INTEGRITY_AUTHORITY, 1, 16384);
 
 bool
 cygpsid::operator== (const char *nsidstr) const
@@ -136,14 +138,16 @@ PSID
 cygsid::get_sid (DWORD s, DWORD cnt, DWORD *r)
 {
   DWORD i;
+  SID_IDENTIFIER_AUTHORITY sid_auth = {0,0,0,0,0,0};
 
-  if (s > 5 || cnt < 1 || cnt > 8)
+  if (s > 255 || cnt < 1 || cnt > 8)
     {
       psid = NO_SID;
       return NULL;
     }
+  sid_auth.Value[5] = s;
   set ();
-  InitializeSid (psid, &sid_auth[s], cnt);
+  InitializeSid (psid, &sid_auth, cnt);
   for (i = 0; i < cnt; ++i)
     memcpy ((char *) psid + 8 + sizeof (DWORD) * i, &r[i], sizeof (DWORD));
   return psid;

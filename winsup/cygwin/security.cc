@@ -493,7 +493,9 @@ get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps,
   auth_pos = -1;
   if (my_grps)
     {
-      if (sid_in_token_groups (my_grps, well_known_local_sid))
+      /* In Vista the Local SID is missing in a token constructed by
+         subauthentication.  We add the group unconditionally now. */
+      /*if (sid_in_token_groups (my_grps, well_known_local_sid))*/
 	grp_list += well_known_local_sid;
       if (sid_in_token_groups (my_grps, well_known_dialup_sid))
 	grp_list += well_known_dialup_sid;
@@ -509,6 +511,8 @@ get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps,
 	grp_list += well_known_interactive_sid;
       if (sid_in_token_groups (my_grps, well_known_service_sid))
 	grp_list += well_known_service_sid;
+      if (sid_in_token_groups (my_grps, well_known_this_org_sid))
+	grp_list += well_known_this_org_sid;
     }
   else
     {
@@ -542,8 +546,10 @@ get_server_groups (cygsidlist &grp_list, PSID usersid, struct passwd *pw)
       return true;
     }
 
-  grp_list += well_known_world_sid;
-  grp_list += well_known_authenticated_users_sid;
+  if (!grp_list.contains (well_known_world_sid))
+    grp_list += well_known_world_sid;
+  if (!grp_list.contains (well_known_authenticated_users_sid))
+    grp_list += well_known_authenticated_users_sid;
   extract_nt_dom_user (pw, domain, user);
   if (get_logon_server (domain, server, wserver, false)
       && !get_user_groups (wserver, grp_list, user, domain)
@@ -928,6 +934,15 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw,
   else if (!get_initgroups_sidlist (tmp_gsids, usersid, new_groups.pgsid, pw,
 				    my_tok_gsids, auth_luid, auth_pos))
     goto out;
+  if (wincap.has_mandatory_integrity_control ())
+    {
+      if (usersid == well_known_system_sid)
+	tmp_gsids += mandatory_system_integrity_sid;
+      else if (tmp_gsids.contains (well_known_admins_sid))
+	tmp_gsids += mandatory_high_integrity_sid;
+      else
+	tmp_gsids += mandatory_medium_integrity_sid;
+    }
 
   /* Primary group. */
   pgrp.PrimaryGroup = new_groups.pgsid;

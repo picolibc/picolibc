@@ -69,6 +69,7 @@ struct wincaps
   unsigned has_fileid_dirinfo				: 1;
   unsigned has_exclusiveaddruse				: 1;
   unsigned has_buggy_restart_scan			: 1;
+  unsigned has_mandatory_integrity_control		: 1;
 };
 
 class wincapc
@@ -144,6 +145,7 @@ public:
   bool	IMPLEMENT (has_fileid_dirinfo)
   bool	IMPLEMENT (has_exclusiveaddruse)
   bool	IMPLEMENT (has_buggy_restart_scan)
+  bool	IMPLEMENT (has_mandatory_integrity_control)
 
 #undef IMPLEMENT
 };
