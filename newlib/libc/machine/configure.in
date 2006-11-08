@@ -24,6 +24,7 @@ if test -n "${machine_dir}"; then
   case ${machine_dir} in
 	a29k) AC_CONFIG_SUBDIRS(a29k) ;;
 	arm) AC_CONFIG_SUBDIRS(arm) ;;
+	bfin) AC_CONFIG_SUBDIRS(bfin) ;;
 	cris) AC_CONFIG_SUBDIRS(cris) ;;
 	crx) AC_CONFIG_SUBDIRS(crx) ;;
 	d10v) AC_CONFIG_SUBDIRS(d10v) ;;

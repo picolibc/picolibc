@@ -99,6 +99,9 @@ case "${host_cpu}" in
   avr*)
 	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -mcall-prologues"
 	;;
+  bfin)
+	machine_dir=bfin
+	;;
   cris | crisv32)
 	machine_dir=cris
 	;;
@@ -334,6 +337,9 @@ case "${host}" in
 	  have_crt0="no"
 	fi
 	;;
+  bfin-*-*)
+	sys_dir=
+	;;
   crx*)
 	sys_dir=
 	;;
@@ -538,6 +544,9 @@ case "${host}" in
 	;;
   avr*)
 	newlib_cflags="${newlib_cflags} -DNO_EXEC -DSMALL_MEMORY -DMISSING_SYSCALL_NAMES"
+	;;
+  bfin*)
+	syscall_dir=syscalls
 	;;
   cris-*-* | crisv32-*-*)
 	default_newlib_io_long_long="yes"

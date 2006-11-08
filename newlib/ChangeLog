@@ -1,3 +1,18 @@
+2006-11-08  Jie Zhang  <jzhang918@gmail.com>
+
+	* configure.host: Add support for bfin.
+	* libc/include/machine/ieeefp.h: Define __IEEE_LITTLE_ENDIAN for bfin.
+	* libc/include/machine/setjmp.h: Define _JBLEN for bfin.
+	* libc/machine/bfin/aclocal.m4: Generate.
+	* libc/machine/bfin/configure.in: New.
+	* libc/machine/bfin/configure: Generate.
+	* libc/machine/bfin/Makefile.am: New.
+	* libc/machine/bfin/Makefile.in: Generate.
+	* libc/machine/bfin/setjmp.S: New.
+	* libc/machine/bfin/longjmp.S: New.
+	* libc/machine/configure.in: Add bfin support.
+	* libc/machine/configure: Generate.
+
 2006-11-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/unistd.h (_SC_STREAM_MAX): Define on Cygwin.
