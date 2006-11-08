@@ -46,4 +46,9 @@
 #define SYS_gettimeofday 19
 #define SYS_times	 20
 #define SYS_link	 21
+
+/* New ARGV support.  */
+#define SYS_argc	 22
+#define SYS_argnlen	 23
+#define SYS_argn	 24
 #endif

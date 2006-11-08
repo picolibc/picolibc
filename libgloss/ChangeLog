@@ -1,3 +1,17 @@
+2006-11-08  Jie Zhang  <jzhang918@gmail.com>
+
+	* bfin/configure.in: New.
+	* bfin/crt0.S: New.
+	* bfin/Makefile.in: New.
+	* bfin/syscalls.c: New.
+	* bfin/aclocal.m4: Generate.
+	* bfin/configure: Ditto.
+	* configure.in: Add support for bfin-*-*.
+	* configure: Regenerate.
+	* syscall.h (SYS_argc): Define.
+	(SYS_argnlen): Define.
+	(SYS_argn): Define.
+
 2006-10-10  Thiemo Seufer  <ths@mips.com>
 
 	* mips/Makefile.in: Add INCLUDES to local compile rules.
