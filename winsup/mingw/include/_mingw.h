@@ -23,6 +23,7 @@
 #ifndef __MINGW_H
 #define __MINGW_H
 
+
 /* These are defined by the user (or the compiler)
    to specify how identifiers are imported from a DLL.
 
@@ -104,18 +105,22 @@
 # endif
 #endif /* __GNUC__ */
 
-#ifdef __cplusplus
-#define __CRT_INLINE inline
-#else
-#define __CRT_INLINE extern __inline__
-#endif
-
 #if defined (__GNUC__) && defined (__GNUC_MINOR__)
 #define __MINGW_GNUC_PREREQ(major, minor) \
   (__GNUC__ > (major) \
    || (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
 #else
 #define __MINGW_GNUC_PREREQ(major, minor)  0
+#endif
+
+#ifdef __cplusplus
+# define __CRT_INLINE inline
+#else
+# if ( __MINGW_GNUC_PREREQ(4, 3)  &&  __STDC_VERSION__ >= 199901L)
+#  define __CRT_INLINE extern __attribute__((__gnu__inline__)) inline
+# else
+#  define __CRT_INLINE extern __inline__
+# endif
 #endif
 
 #ifdef __cplusplus

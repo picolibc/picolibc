@@ -1,3 +1,9 @@
+2006-11-09  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	[ mingw-Bugs-1590623 ] 
+	* include/_mingw.h (__CRT_INLINE): Use __gnu_inline__ attribute
+	in C99 mode.
+
 2006-10-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in: Semi-revert semi-reversion of 2006-08-30 change, now
