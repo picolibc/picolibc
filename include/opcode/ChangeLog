@@ -1,3 +1,7 @@
+2006-11-08  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* i386.h (i386_optab): Replace CpuPNI with CpuSSE3.
+
 2006-10-31  Mei Ligang  <ligang@sunnorth.com.cn>
 
 	* score-inst.h (enum score_insn_type): Add Insn_internal.
