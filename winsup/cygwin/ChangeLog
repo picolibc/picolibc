@@ -1,3 +1,23 @@
+2006-11-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (build_fh_pc): Add missing DEV_SD1_MAJOR case (Thanks to
+	Joe Loh for noticing).
+
+2006-10-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (struct user_heap_info): Add slop member.
+	* heap.cc (heap_init): Add slop factor to heap allocation.  Add
+	comment.
+	* mmap.cc (MapViewNT): Allocate memory maps top down.
+	(fhandler_dev_zero::mmap): Ditto.
+	* shared.cc (shared_info::heap_slop_size): New method.
+	(shared_info::heap_chunk_size): Don't use debug_printf at early stage.
+	* shared_info.h (SHARED_INFO_CB): Accomodate change to shared_info.
+	(CURR_SHARED_MAGIC): Ditto.
+	(class shared_info): Add heap_slop member.  Declare heap_slop_size.
+	* wincap.h: Define heapslop throughout.
+	* wincap.cc: Ditto.
+
 2006-10-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dcrt0.cc (__api_fatal): Drop spare argument to __small_sprintf.

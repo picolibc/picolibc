@@ -15,6 +15,7 @@ struct wincaps
 {
   DWORD    lock_file_highword;
   DWORD    chunksize;
+  DWORD    heapslop;
   int      shared;
   unsigned is_winnt                                     : 1;
   unsigned is_server                                    : 1;
@@ -89,6 +90,7 @@ public:
 
   DWORD IMPLEMENT (lock_file_highword)
   DWORD IMPLEMENT (chunksize)
+  DWORD IMPLEMENT (heapslop)
   int   IMPLEMENT (shared)
   bool  IMPLEMENT (is_winnt)
   bool  IMPLEMENT (is_server)
