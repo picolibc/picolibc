@@ -934,31 +934,57 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw,
   else if (!get_initgroups_sidlist (tmp_gsids, usersid, new_groups.pgsid, pw,
 				    my_tok_gsids, auth_luid, auth_pos))
     goto out;
-  if (wincap.has_mandatory_integrity_control ())
-    {
-      if (usersid == well_known_system_sid)
-	tmp_gsids += mandatory_system_integrity_sid;
-      else if (tmp_gsids.contains (well_known_admins_sid))
-	tmp_gsids += mandatory_high_integrity_sid;
-      else
-	tmp_gsids += mandatory_medium_integrity_sid;
-    }
 
   /* Primary group. */
   pgrp.PrimaryGroup = new_groups.pgsid;
 
   /* Create a TOKEN_GROUPS list from the above retrieved list of sids. */
-  char grps_buf[sizeof (ULONG) + tmp_gsids.count * sizeof (SID_AND_ATTRIBUTES)];
-  new_tok_gsids = (PTOKEN_GROUPS) grps_buf;
+  new_tok_gsids = (PTOKEN_GROUPS)
+		  alloca (sizeof (ULONG) + (tmp_gsids.count  + 1 )
+					   * sizeof (SID_AND_ATTRIBUTES));
   new_tok_gsids->GroupCount = tmp_gsids.count;
   for (DWORD i = 0; i < new_tok_gsids->GroupCount; ++i)
     {
       new_tok_gsids->Groups[i].Sid = tmp_gsids.sids[i];
-      new_tok_gsids->Groups[i].Attributes = SE_GROUP_MANDATORY |
-	SE_GROUP_ENABLED_BY_DEFAULT | SE_GROUP_ENABLED;
+      new_tok_gsids->Groups[i].Attributes = SE_GROUP_MANDATORY
+					    | SE_GROUP_ENABLED_BY_DEFAULT
+					    | SE_GROUP_ENABLED;
     }
   if (auth_pos >= 0)
     new_tok_gsids->Groups[auth_pos].Attributes |= SE_GROUP_LOGON_ID;
+
+  /* On systems supporting Mandatory Integrity Control, add a MIC SID. */
+  if (wincap.has_mandatory_integrity_control ())
+    {
+      bool add_mic_sid = true;
+      new_tok_gsids->Groups[new_tok_gsids->GroupCount].Attributes = 0;
+
+      /* The subauth token usually contains a MIC SID.  Copy it into our
+	 group SID list. */
+      if (my_tok_gsids)
+	for (DWORD i = 0; i < my_tok_gsids->GroupCount; ++i)
+	  if (EqualPrefixSid (mandatory_medium_integrity_sid,
+			      my_tok_gsids->Groups[i].Sid))
+	    {
+	      new_tok_gsids->Groups[new_tok_gsids->GroupCount++].Sid
+		= my_tok_gsids->Groups[i].Sid;
+	      add_mic_sid = false;
+	      break;
+	    }
+      /* If no MIC SID was available add a matching one for the account type. */
+      if (add_mic_sid)
+        {
+	  if (usersid == well_known_system_sid)
+	    new_tok_gsids->Groups[new_tok_gsids->GroupCount++].Sid
+	      = mandatory_system_integrity_sid;
+	  else if (tmp_gsids.contains (well_known_admins_sid))
+	    new_tok_gsids->Groups[new_tok_gsids->GroupCount++].Sid
+	      = mandatory_high_integrity_sid;
+	  else
+	    new_tok_gsids->Groups[new_tok_gsids->GroupCount++].Sid
+	      = mandatory_medium_integrity_sid;
+	}
+    }
 
   /* Retrieve list of privileges of that user. */
   if (!privs && !(privs = get_priv_list (lsa, usersid, tmp_gsids)))

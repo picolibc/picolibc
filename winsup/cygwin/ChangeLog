@@ -1,3 +1,11 @@
+2006-11-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (EqualPrefixSid): Define.
+	* security.cc (create_token): Drop grps_buf.  Use alloca instead.
+	Only add the MIC SID to the TOKEN_GROUPS list for the NtCreateToken
+	call.  If the subauthentication token exists, use its MIC SID.
+	Set SID Attributes for the MIC SID to 0.
+
 2006-11-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_helper.cc (sid_auth): Remove.
