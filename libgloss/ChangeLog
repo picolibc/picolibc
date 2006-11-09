@@ -1,4 +1,4 @@
-2006-11-08  Jie Zhang  <jzhang918@gmail.com>
+2006-11-08  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/configure.in: New.
 	* bfin/crt0.S: New.
