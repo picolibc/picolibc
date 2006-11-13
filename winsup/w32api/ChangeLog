@@ -1,3 +1,10 @@
+2006-11-13  Daniel Schlyder  <thrug@users.sourceforge.net>
+
+	* include/winnt.h (VER_SUITE_EMBEDDEDNT, VER_SUITE_SINGLEUSERTS,
+	VER_SUITE_STORAGE_SERVER, VER_SUITE_COMPUTE_SERVER): Define.
+
+	* include/winuser.h (SM_STARTER, SM_SERVERR2): Define.
+
 2006-11-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winuser.h (LR_DEFAULTSIZE): Remove duplicate.

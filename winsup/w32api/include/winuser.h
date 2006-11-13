@@ -961,6 +961,8 @@ extern "C" {
 #define SM_CYFOCUSBORDER 84
 #define SM_TABLETPC 86
 #define SM_MEDIACENTER 87
+#define SM_STARTER 88
+#define SM_SERVERR2 89
 #if (_WIN32_WINNT < 0x0400)
 #define SM_CMETRICS 76
 #else
