@@ -1,3 +1,11 @@
+2006-11-14  Phil Lello  <phil.lello@homecall.co.uk>
+
+	* pe.h: Added defines for IMAGE_SUBSYSTEM_EFI_ROM and
+	IMAGE_SUBSYSTEM_XBOX.
+	* internal.h: Added defines for PE directory entry types.
+	NB: in internal.h because IMAGE_NUMBEROF_DIRECTORY_ENTRYIES is in
+	pe.h
+
 2006-09-20  Kai Tietz  <Kai.Tietz@onevision.com>
 
 	* external.h: Add proper external_aouthdr64 structure (without

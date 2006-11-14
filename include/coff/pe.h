@@ -130,6 +130,8 @@
 #define IMAGE_SUBSYSTEM_EFI_APPLICATION		10
 #define IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER	11
 #define IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER	12
+#define IMAGE_SUBSYSTEM_EFI_ROM			13
+#define IMAGE_SUBSYSTEM_XBOX			14
   
 /* Magic values that are true for all dos/nt implementations.  */
 #define DOSMAGIC       0x5a4d  

@@ -103,6 +103,22 @@ typedef struct _IMAGE_DATA_DIRECTORY
   bfd_vma VirtualAddress;
   long    Size;
 }  IMAGE_DATA_DIRECTORY;
+#define PE_EXPORT_TABLE			0
+#define PE_IMPORT_TABLE			1
+#define PE_RESOURCE_TABLE		2
+#define PE_EXCEPTION_TABLE		3
+#define PE_CERTIFICATE_TABLE		4
+#define PE_BASE_RELOCATION_TABLE	5
+#define PE_DEBUG_DATA			6
+#define PE_ARCHITECTURE			7
+#define PE_GLOBAL_PTR			8
+#define PE_TLS_TABLE			9
+#define PE_LOAD_CONFIG_TABLE		10
+#define PE_BOUND_IMPORT_TABLE		11
+#define PE_IMPORT_ADDRESS_TABLE		12
+#define PE_DELAY_IMPORT_DESCRIPTOR	13
+#define PE_CLR_RUNTIME_HEADER		14
+/* DataDirectory[15] is currently reserved, so no define. */
 #define IMAGE_NUMBEROF_DIRECTORY_ENTRIES  16
 
 /* Default image base for NT.  */
