@@ -610,6 +610,12 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 
 rflag:		ch = *fmt++;
 reswitch:	switch (ch) {
+		case '\'':
+		  /* In the C locale, LC_NUMERIC requires
+		     thousands_sep to be the empty string.  And since
+		     no other locales are supported (yet), this flag
+		     is currently a no-op.  */
+		  goto rflag;
 		case ' ':
 			/*
 			 * ``If the space and + flags both appear, the space
@@ -1495,7 +1501,7 @@ _CONST static CH_CLASS chclass[256] = {
   /* 08-0f */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
   /* 10-17 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
   /* 18-1f */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* 20-27 */  FLAG,    OTHER,   OTHER,   FLAG,    DOLLAR,  OTHER,   OTHER,   OTHER,
+  /* 20-27 */  FLAG,    OTHER,   OTHER,   FLAG,    DOLLAR,  OTHER,   OTHER,   FLAG,
   /* 28-2f */  OTHER,   OTHER,   STAR,    FLAG,    OTHER,   FLAG,    DOT,     OTHER,
   /* 30-37 */  ZERO,    DIGIT,   DIGIT,   DIGIT,   DIGIT,   DIGIT,   DIGIT,   DIGIT,
   /* 38-3f */  DIGIT,   DIGIT,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
@@ -1504,9 +1510,9 @@ _CONST static CH_CLASS chclass[256] = {
   /* 50-57 */  OTHER,   OTHER,   OTHER,   SPEC,    OTHER,   SPEC,    OTHER,   SPEC, 
   /* 58-5f */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
   /* 60-67 */  OTHER,   OTHER,   OTHER,   SPEC,    SPEC,    SPEC,    SPEC,    SPEC, 
-  /* 68-6f */  MODFR,   SPEC,    OTHER,   OTHER,   MODFR,   OTHER,   OTHER,   SPEC, 
-  /* 70-77 */  SPEC,    MODFR,   OTHER,   SPEC,    OTHER,   SPEC,    OTHER,   OTHER,
-  /* 78-7f */  SPEC,    OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* 68-6f */  MODFR,   SPEC,    MODFR,   OTHER,   MODFR,   OTHER,   OTHER,   SPEC, 
+  /* 70-77 */  SPEC,    MODFR,   OTHER,   SPEC,    MODFR,   SPEC,    OTHER,   OTHER,
+  /* 78-7f */  SPEC,    OTHER,   MODFR,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
   /* 80-87 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
   /* 88-8f */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
   /* 90-97 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
