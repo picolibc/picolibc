@@ -1,3 +1,7 @@
+2006-10-14  Geoffrey Keating  <geoffk@apple.com>
+
+	* multi.m4: New file, from automake version 2 branch.
+
 2006-09-18  Tom Tromey  <tromey@redhat.com>
 
 	* tls.m4 (GCC_CHECK_TLS): Pass empty argument as "help arg" to
@@ -6,28 +10,27 @@
 2006-07-25  Paolo Bonzini  <bonzini@gnu.org>
 
 	PR build/26188
-        * stdint.m4: Test for uintptr_t even on systems with uint64_t or uint32_t.
+	* stdint.m4: Test for uintptr_t even on systems with uint64_t or uint32_t.
 
-	Sync from GCC
-	2006-07-21  Steve Ellcey  <sje@cup.hp.com>
+2006-07-21  Steve Ellcey  <sje@cup.hp.com>
 
-        PR target/26792
-        * unwind_ipinfo.m4: New.
+	PR target/26792
+	* unwind_ipinfo.m4: New.
 
-	2006-07-21  David Daney  <ddaney@avtrex.com>
+2006-07-21  David Daney  <ddaney@avtrex.com>
 
-        PR libgcj/28426
-        * gxx-include-dir.m4: Use target_alias in path for cross build.
+	PR libgcj/28426
+	* gxx-include-dir.m4: Use target_alias in path for cross build.
 
 2006-07-18  Paolo Bonzini  <bonzini@gnu.org>
 
-        * acx.m4: Support --with-build-libsubdir and AC_SUBST
-        build_libsubdir.
+	* acx.m4: Support --with-build-libsubdir and AC_SUBST
+	build_libsubdir.
 
 2006-06-13  Richard Earnshaw  <rearnsha@arm.com>
 	    Alexandre Oliva <aoliva@redhat.com>
 
-	* (ZW_GNU_GETTEXT_SISTER_DIR): Add optional
+	* gettext-sister.m4 (ZW_GNU_GETTEXT_SISTER_DIR): Add optional
 	argument for where to search for NLS config file.
 
 2006-05-31  Daniel Jacobowitz  <dan@codesourcery.com>
