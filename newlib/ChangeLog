@@ -1,3 +1,8 @@
+2006-11-14  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/vfprintf.c (_vfprintf_r): Support ' flag.
+	(chclass): ' is a flag.  j, t, and z are modifiers.
+
 2006-10-11  Yang Tse  <yangsita@gmail.com>
 
 	* libc/include/machine/setjmp.h: Use __extension__ keyword for gcc's
