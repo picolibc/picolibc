@@ -104,6 +104,7 @@ _DEFUN (_tzset_r, (reent_ptr),
   mm = 0;
   ss = 0;
   
+  n  = 0;
   if (sscanf (tzenv, "%hu%n:%hu%n:%hu%n", &hh, &n, &mm, &n, &ss, &n) <= 0)
     tz->__tzrule[1].offset = tz->__tzrule[0].offset - 3600;
   else
