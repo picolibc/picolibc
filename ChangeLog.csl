@@ -1,3 +1,13 @@
+2006-11-16  Nathan Sidwell  <nathan@codesourcery.com>
+
+	gas/testuite/
+	* gas/m68k/all.exp: Add mcf-trap.
+	* gas/m68k/mcf-trap.[sd]: New.
+
+	opcodes/
+	* m68k-opc.c (m68k_opcodes): Place trap instructions before set
+	conditionals.  Add tpf coldfire instruction as alias for trapf.
+
 2006-11-10  Nathan Sidwell  <nathan@codesourcery.com>
 
 	binutils/
