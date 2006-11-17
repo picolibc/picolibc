@@ -1,3 +1,25 @@
+2006-11-17  Kazu Hirata  <kazu@codesourcery.com>
+
+	bfd/
+	* elf32-m68k.c: Update uses of EF_M68K_*.
+
+	binutils/
+	* readelf.c: Update uses of EF_M68K_*.
+
+	gas/
+	* config/tc-m68k.c: Update uses of EF_M68K_*.
+
+	include/elf
+	* m68k.h (EF_M68K_ISA_MASK, EF_M68K_ISA_A_NODIV,
+	EF_M68K_ISA_A, EF_M68K_ISA_A_PLUS, EF_M68K_ISA_B_NOUSP,
+	EF_M68K_ISA_B, EF_M68K_ISA_C, EF_M68K_MAC_MASK, EF_M68K_MAC,
+	EF_M68K_EMAC, EF_M68K_EMAC_B, EF_M68K_FLOAT): Rename to
+	EF_M68K_CF_ISA_MASK, EF_M68K_CF_ISA_A_NODIV, EF_M68K_CF_ISA_A,
+	EF_M68K_CF_ISA_A_PLUS, EF_M68K_CF_ISA_B_NOUSP,
+	EF_M68K_CF_ISA_B, EF_M68K_CF_ISA_C, EF_M68K_CF_MAC_MASK,
+	EF_M68K_CF_MAC, EF_M68K_CF_EMAC, EF_M68K_CF_EMAC_B,
+	EF_M68K_CF_FLOAT, respectively.
+
 2006-11-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	gas/testuite/
