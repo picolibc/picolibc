@@ -128,13 +128,13 @@ distclean maintainer-clean realclean: clean
 
 .PHONY: install info install-info clean-info
 install:
-	@for crt in ${CRT0}; do\
+	@for crt in ${CRT0}; do \
 	$(INSTALL_PROGRAM) $${crt} $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$${crt}; \
 	done
-	@for bsp in ${BSP}; do\
+	@for bsp in ${BSP}; do \
 	 $(INSTALL_PROGRAM) $${bsp} $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}; \
 	done
-	@for script in ${SCRIPTS}; do\
+	@for script in ${SCRIPTS}; do \
 	 $(INSTALL_DATA) ${srcdir}/$${script}.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$${script}.ld; \
 	done
 
