@@ -1,3 +1,8 @@
+2006-11-18  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* Include/_mingw.h: Increment version to 3.11.
+	* Makefile.in: Ditto.
+
 2006-11-09  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	[ mingw-Bugs-1590623 ] 
