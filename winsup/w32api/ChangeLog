@@ -1,3 +1,8 @@
+2006-11-18  Chris Sutcliffe  <ir0nh34d@users.sf.net>
+
+	* include/w32api.h: Increment version to 3.8.
+	* Makefile.in: Ditto.
+
 2006-11-13  Daniel Schlyder  <thrug@users.sourceforge.net>
 
 	* include/winnt.h (VER_SUITE_EMBEDDEDNT, VER_SUITE_SINGLEUSERTS,
