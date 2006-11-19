@@ -1,3 +1,9 @@
+2006-11-19  Nathan Sidwell  <nathan@codesourcery.com>
+
+	opcodes/
+	* m68k-opc.c (m68k_opcodes):   Add tpf coldfire instruction as
+	alias for trapf. (missed on 2006-11-16 checkin).
+
 2006-11-17  Kazu Hirata  <kazu@codesourcery.com>
 
 	bfd/
@@ -28,7 +34,7 @@
 
 	opcodes/
 	* m68k-opc.c (m68k_opcodes): Place trap instructions before set
-	conditionals.  Add tpf coldfire instruction as alias for trapf.
+	conditionals.
 
 2006-11-10  Nathan Sidwell  <nathan@codesourcery.com>
 
