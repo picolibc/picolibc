@@ -70,7 +70,7 @@ VERSION = 3.8
 CYGRELEASE = 1
 
 DIST_FILES = Makefile.in configure.in configure config.guess config.sub \
-install-sh README.w32api ChangeLog TODO CONTRIBUTIONS
+aclocal.m4 install-sh README.w32api ChangeLog TODO CONTRIBUTIONS
 
 all: lib
 
