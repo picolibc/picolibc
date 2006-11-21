@@ -1,3 +1,9 @@
+2006-11-21  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* Makefile.in:  Add aclocal.m4:to source release.
+	* mingwex/Makefile.in: Ditto.
+	* profile/Makefile.in: Ditto.
+
 2006-11-18  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* Include/_mingw.h: Increment version to 3.11.

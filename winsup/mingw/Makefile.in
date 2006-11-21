@@ -190,14 +190,14 @@ INSTDOCS = CONTRIBUTORS \
 
 SRCDIST_FILES = CRT_noglob.c CRTfmode.c CRTglob.c CRTinit.c ChangeLog \
 Makefile.in README TODO config.guess config.sub configure configure.in \
-crt1.c crtdll.def crtmt.c crtst.c  dllcrt1.c dllmain.c \
+aclocal.m4 crt1.c crtdll.def crtmt.c crtst.c  dllcrt1.c dllmain.c \
 gccmain.c init.c install-sh jamfile main.c mkinstalldirs \
 moldname.def.in msvcrt.def.in \
 mthr.c mthr_init.c mthr_stub.c readme.txt \
 isascii.c iscsym.c iscsymf.c toascii.c \
 strcasecmp.c strncasecmp.c wcscmpi.c \
 CRT_fp8.c CRT_fp10.c test_headers.c txtmode.c binmode.c pseudo-reloc.c \
-pseudo-reloc-list.c cpu_features.c cpu_features.h\
+pseudo-reloc-list.c cpu_features.c cpu_features.h \
 DISCLAIMER CONTRIBUTORS
 
 
