@@ -1,3 +1,7 @@
+2006-11-22  Luca Barbato  <lu_zero@gentoo.org>
+
+	* spu/syscalls.c: Include spu_intrinsics.h to provide vector keyword.
+
 2006-11-17  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* mn10300/Makefile.in: Add spaces after do in "for" loop.

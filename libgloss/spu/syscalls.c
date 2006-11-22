@@ -29,7 +29,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 */
-
+#include <spu_intrinsics.h>
 #include "jsre.h"
 
 void
