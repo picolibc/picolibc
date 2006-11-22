@@ -45,14 +45,14 @@ char * strrchr(const char *s, int c)
   vec_uint4 cmp_c, cmp_0, cmp;
   vec_uint4 res_ptr, res_cmp;
   vec_uint4 mask, result;
-
+  vec_uint4 one = spu_splats((unsigned int)-1);
   /* Scan memory array a quadword at a time. Skip leading
    * mis-aligned bytes.
    */
   ptr = (vec_uchar16 *)s;
 
   nskip = -((unsigned int)(ptr) & 15);
-  mask = spu_rlmask((vec_uint4)(0xFFFF), nskip);
+  mask = spu_rlmask(one, nskip);
 
   vc = spu_splats((unsigned char)(c));
 
@@ -62,8 +62,8 @@ char * strrchr(const char *s, int c)
   cmp_c = spu_and(spu_gather(spu_cmpeq(data, vc)), mask);
   cmp_0 = spu_and(spu_gather(spu_cmpeq(data, 0)), mask);
 
-  res_ptr = VEC_SPLAT_U32(0);
-  res_cmp = VEC_SPLAT_U32(0);
+  res_ptr = spu_splats(0);
+  res_cmp = spu_splats(0);
 
   while (spu_extract(cmp_0, 0) == 0) {
     cmp = spu_cmpeq(cmp_c, 0);
@@ -84,7 +84,7 @@ char * strrchr(const char *s, int c)
    *
    * First mask off compare results following the first termination character.
    */
-  mask = spu_sl(VEC_SPLAT_U32(-1), 31 - spu_extract(spu_cntlz(cmp_0), 0));
+  mask = spu_sl(one, 31 - spu_extract(spu_cntlz(cmp_0), 0));
   cmp_c = spu_and(cmp_c, mask);
 
   /* Conditionally update res_ptr and res_cmd if a match was found in the last

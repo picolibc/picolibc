@@ -44,14 +44,14 @@ char *strchr(const char *s, int c)
   vec_uint4 cmp_c, cmp_0;
   vec_uint4 result;
   vec_uint4 mask;
-
+  vec_uint4 one = spu_splats((unsigned int)-1);
   /* Scan memory array a quadword at a time. Skip leading
    * mis-aligned bytes.
    */
   ptr = (vec_uchar16 *)s;
 
   skip = (unsigned int)(ptr) & 15;
-  mask = spu_rlmask((vec_uint4)(0xFFFF), -skip);
+  mask = spu_rlmask(one, -skip);
 
   vc = spu_splats((unsigned char)(c));
 

@@ -42,8 +42,7 @@
 
 char * strncat(char * __restrict__ dest, const char * __restrict__ src, size_t n)
 {
-  size_t len;
-  unsigned int cmp, skip, mask;
+  unsigned int cmp, skip, mask, len;
   vec_uchar16 *ptr, data;
   vec_uint4 cnt, gt, N;
   char *dst;
@@ -55,7 +54,7 @@ char * strncat(char * __restrict__ dest, const char * __restrict__ src, size_t n
   /* Copy the src image until either the src string terminates
    * or n characters are copied.
    */
-  N = spu_promote(n, 0);
+  N = spu_promote((unsigned int)n, 0);
 
   /* Determine the string length, not including termination character,
    * clamped to n characters.

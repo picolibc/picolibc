@@ -40,7 +40,7 @@ void * memset(void *s, int c, size_t n)
 {
   int skip, cnt, i;
   vec_uchar16 *vs;
-  vec_uchar16 vc, mask;
+  vec_uchar16 vc, mask, one = spu_splats((unsigned int)-1);
 
   vs = (vec_uchar16 *)(s);
   vc = spu_splats((unsigned char)c);
@@ -52,10 +52,10 @@ void * memset(void *s, int c, size_t n)
    */
   skip = (int)(s) & 15;
   if (skip) {
-    mask = spu_rlmaskqwbyte((vec_uchar16)(-1), 0-skip);
+    mask = spu_rlmaskqwbyte(one, -skip);
     cnt -= 16 - skip;
     if (cnt < 0) {
-      mask = spu_and(mask, spu_slqwbyte((vec_uchar16)(-1), (unsigned int)(-cnt)));
+      mask = spu_and(mask, spu_slqwbyte(one, (unsigned int)(-cnt)));
     }
     *vs = spu_sel(*vs, vc, mask);
     vs++;
@@ -82,7 +82,7 @@ void * memset(void *s, int c, size_t n)
   /* Handle any trailing partial quadwords
    */
   if (cnt > 0) {
-    mask = spu_slqwbyte((vec_uchar16)(-1), (unsigned int)(16-cnt));
+    mask = spu_slqwbyte(one, (unsigned int)(16-cnt));
     *vs = spu_sel(*vs, vc, mask);
   }
 

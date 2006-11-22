@@ -48,7 +48,7 @@ void * memmove(void * __restrict__ dest, const void * __restrict__ src, size_t n
   unsigned int soffset1, soffset2, doffset1, doffset2;
   vec_uchar16 *vSrc, *vDst;
   vec_uchar16 sdata1, sdata2, sdata, ddata, shuffle;
-  vec_uchar16 mask, mask1, mask2, mask3;
+  vec_uchar16 mask, mask1, mask2, mask3, one = spu_splats((unsigned char)-1);
 
   soffset1  = (unsigned int)(src) & 15;
   doffset1 = (unsigned int)(dest) & 15;
@@ -62,10 +62,10 @@ void * memmove(void * __restrict__ dest, const void * __restrict__ src, size_t n
    * mask2 = mask for trailing unchange bytes
    * mask3 = mask indicating the more than one qword is being changed.
    */
-  mask  = VEC_SPLAT_U8(-1);
+  mask  = one;
   mask1 = spu_rlmaskqwbyte(mask, -doffset1);
   mask2 = spu_slqwbyte(mask, 16-doffset2);
-  mask3 = (vec_uchar16)spu_cmpgt(spu_splats(doffset1 + n), 15);
+  mask3 = (vec_uchar16)spu_cmpgt(spu_splats((unsigned int)(doffset1 + n)), 15);
 
   vDst = (vec_uchar16 *)(dest);
 
@@ -120,10 +120,10 @@ void * memmove(void * __restrict__ dest, const void * __restrict__ src, size_t n
      * mask2 = mask for trailing unchange bytes
      * mask3 = mask indicating the more than one qword is being changed.
      */
-    mask  = VEC_SPLAT_U8(-1);
+    mask  = one;
     mask1 = spu_rlmaskqwbyte(mask, -doffset1);
     mask2 = spu_slqwbyte(mask, 16-doffset2);
-    mask3 = (vec_uchar16)spu_cmpgt(spu_splats(doffset1 + n), 15);
+    mask3 = (vec_uchar16)spu_cmpgt(spu_splats((unsigned int)(doffset1 + n)), 15);
 
     *vDst++ = spu_sel(ddata, sdata, spu_and(mask1, spu_or(mask2, mask3)));
 
@@ -140,7 +140,7 @@ void * memmove(void * __restrict__ dest, const void * __restrict__ src, size_t n
 
     /* Handle any trailing partial (destination) quadwords
      */
-    mask = spu_and((vec_uchar16)spu_cmpgt(spu_splats(n), 16), mask2);
+    mask = spu_and((vec_uchar16)spu_cmpgt(spu_splats((unsigned int)n), 16), mask2);
     *vDst = spu_sel(*vDst, spu_shuffle(sdata2, *vSrc, shuffle), mask);
 
   } else {
@@ -188,7 +188,7 @@ void * memmove(void * __restrict__ dest, const void * __restrict__ src, size_t n
      * mask2 = mask for trailing unchange bytes
      * mask3 = mask indicating the more than one qword is being changed.
      */
-    mask  = VEC_SPLAT_U8(-1);
+    mask  = one;
     mask1 = spu_rlmaskqwbyte(mask, -doffset1);
     mask2 = spu_slqwbyte(mask, 15-doffset2);
     mask3 = (vec_uchar16)spu_cmpgt(spu_splats((int)(doffset2 - n)), -2);

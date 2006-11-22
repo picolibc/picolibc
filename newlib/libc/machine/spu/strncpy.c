@@ -40,12 +40,12 @@
  */
 char * strncpy(char * __restrict__ dest, const char * __restrict__ src, size_t n)
 {
-  size_t len;
+  unsigned int len;
   unsigned int cmp, skip, mask;
   vec_uchar16 *ptr, data;
   vec_uint4 cnt, gt, N;
 
-  N = spu_promote(n, 0);
+  N = spu_promote((unsigned int)n, 0);
 
   /* Determine the string length, including termination character,
    * clamped to n characters.
@@ -74,7 +74,7 @@ char * strncpy(char * __restrict__ dest, const char * __restrict__ src, size_t n
 
   /* len = MIN(len, n)
    */
-  len = spu_extract(spu_sel(spu_promote(len, 0), N, gt), 0);
+  len = spu_extract(spu_sel(spu_promote((unsigned int)len, 0), N, gt), 0);
 
   /* Perform a memcpy of the resulting length
    */

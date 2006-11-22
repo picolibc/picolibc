@@ -63,7 +63,7 @@ size_t strspn(const char *s1, const char *s2)
   do {
     data1 = spu_shuffle(dataA, dataB, shuffle);
 
-    match = VEC_SPLAT_U8(0);
+    match = spu_splats(0);
 
     ptr2 = (vec_uchar16 *)s2;
     data2 = *ptr2;

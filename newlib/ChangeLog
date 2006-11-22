@@ -1,3 +1,15 @@
+2006-11-22  Luca Barbato  <lu_zero@gentoo.org>
+
+	* libc/machine/spu/memcpy.c: Use spu_splats, explicit cast.
+	* libc/machine/spu/memmove.c: Use spu_splats, explicit cast.
+	* libc/machine/spu/memset.c: Use spu_splats, remove apple-cast.
+	* libc/machine/spu/strchr.c: Use spu_splats, remove apple-cast.
+	* libc/machine/spu/strncat.c: Explicit cast.
+	* libc/machine/spu/strncmp.c: Use spu_splats.
+	* libc/machine/spu/strncpy.c: Explicit cast.
+	* libc/machine/spu/strrchr.c: Use spu_splats.
+	* libc/machine/spu/strspn.c: Use spu_splats.
+
 2006-11-15  Till Straumann  <strauman@slac.stanford.edu>
 
 	* libc/time/tzset_r.c (_tzset_r): Initialize local variable.

@@ -38,7 +38,7 @@
  * The memory areas may not overlap. The memcpy subroutine
  * returns a pointer to dest.
  *
- * Faster implemenation of this function can be implemented
+ * Faster implementation of this function can be implemented
  * either with prior knowledge of the alignment or special
  * casing specific optimal alignments.
  */
@@ -88,10 +88,10 @@ void * memcpy(void * __restrict__ dest, const void * __restrict__ src, size_t n)
    * mask2 = mask for trailing unchange bytes
    * mask3 = mask indicating the more than one qword is being changed.
    */
-  mask  = VEC_SPLAT_U8(-1);
+  mask  = spu_splats((unsigned char)-1);
   mask1 = spu_rlmaskqwbyte(mask, -doffset1);
   mask2 = spu_slqwbyte(mask, 16-doffset2);
-  mask3 = (vec_uchar16)spu_cmpgt(spu_splats(doffset1 + n), 15);
+  mask3 = (vec_uchar16)spu_cmpgt(spu_splats((unsigned int)(doffset1 + n)), 15);
 
   *vDst++ = spu_sel(ddata, sdata, spu_and(mask1, spu_or(mask2, mask3)));
 
@@ -108,7 +108,7 @@ void * memcpy(void * __restrict__ dest, const void * __restrict__ src, size_t n)
 
   /* Handle any trailing partial (destination) quadwords
    */
-  mask = spu_and((vec_uchar16)spu_cmpgt(spu_splats(n), 16), mask2);
+  mask = spu_and((vec_uchar16)spu_cmpgt(spu_splats((unsigned int)n), 16), mask2);
   *vDst = spu_sel(*vDst, spu_shuffle(sdata2, *vSrc, shuffle), mask);
 
   return (dest);
