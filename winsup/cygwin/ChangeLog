@@ -1,3 +1,12 @@
+2006-11-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (fs_info::update): Define GETVOLINFO_VALID_MASK and TEST_GVI.
+	Change FS_IS_SAMBA and FS_IS_SAMBA_WITH_QUOTA and their usage
+	accordingly.  Define FS_IS_NETAPP_DATAONTAP.  Recognize NetApp device
+	and store in is_netapp flag.  Mark NetApp device as having no good
+	inodes.
+	* path.h (struct fs_info): Add is_netapp flag.  Add matching accessors.
+
 2006-11-23  Thomas Wolff  <towo@computer.org>
 
 	* fhandler_console.cc (set_color): Avoid (again) inappropriate

@@ -426,25 +426,43 @@ fs_info::update (const char *win32_path)
       return false;
     }
 
-#define FS_IS_SAMBA (FILE_CASE_SENSITIVE_SEARCH \
-		     | FILE_CASE_PRESERVED_NAMES \
-		     | FILE_PERSISTENT_ACLS)
-#define FS_IS_SAMBA_WITH_QUOTA \
-		    (FILE_CASE_SENSITIVE_SEARCH \
-		     | FILE_CASE_PRESERVED_NAMES \
-		     | FILE_PERSISTENT_ACLS \
-		     | FILE_VOLUME_QUOTAS)
+/* Should be reevaluated for each new OS.  Right now this mask is valid up
+   to Vista.  The important point here is to test only flags indicating
+   capabilities and to ignore flags indicating a specific state of this
+   volume.  At present these flags to ignore are FILE_VOLUME_IS_COMPRESSED
+   and FILE_READ_ONLY_VOLUME. */
+#define GETVOLINFO_VALID_MASK (0x003701ffUL)
+#define TEST_GVI(f,m) (((f) & GETVOLINFO_VALID_MASK) == (m))
+
+#define FS_IS_SAMBA TEST_GVI(flags (), \
+			     FILE_CASE_SENSITIVE_SEARCH \
+			     | FILE_CASE_PRESERVED_NAMES \
+			     | FILE_PERSISTENT_ACLS)
+#define FS_IS_SAMBA_WITH_QUOTA TEST_GVI(flags (), \
+			     FILE_CASE_SENSITIVE_SEARCH \
+			     | FILE_CASE_PRESERVED_NAMES \
+			     | FILE_PERSISTENT_ACLS \
+			     | FILE_VOLUME_QUOTAS)
+#define FS_IS_NETAPP_DATAONTAP TEST_GVI(flags (), \
+			     FILE_CASE_SENSITIVE_SEARCH \
+			     | FILE_CASE_PRESERVED_NAMES \
+			     | FILE_UNICODE_ON_DISK \
+			     | FILE_PERSISTENT_ACLS \
+			     | FILE_NAMED_STREAMS)
   is_fat (strncasematch (fsname, "FAT", 3));
   is_samba (strcmp (fsname, "NTFS") == 0 && is_remote_drive ()
-	    && (flags () == FS_IS_SAMBA || flags () == FS_IS_SAMBA_WITH_QUOTA));
-  is_ntfs (strcmp (fsname, "NTFS") == 0 && !is_samba ());
+	    && (FS_IS_SAMBA || FS_IS_SAMBA_WITH_QUOTA));
+  is_netapp (strcmp (fsname, "NTFS") == 0 && is_remote_drive ()
+	     && FS_IS_NETAPP_DATAONTAP);
+  is_ntfs (strcmp (fsname, "NTFS") == 0 && !is_samba () && !is_netapp ());
   is_nfs (strcmp (fsname, "NFS") == 0);
 
   has_ea (is_ntfs ());
   has_acls ((flags () & FS_PERSISTENT_ACLS)
 	    && (allow_smbntsec || !is_remote_drive ()));
   hasgood_inode (((flags () & FILE_PERSISTENT_ACLS)
-		  && drive_type () != DRIVE_UNKNOWN)
+		  && drive_type () != DRIVE_UNKNOWN
+		  && !is_netapp ())
 		 || is_nfs ());
   /* Known file systems with buggy open calls. Further explanation
      in fhandler.cc (fhandler_disk_file::open). */

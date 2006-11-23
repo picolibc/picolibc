@@ -100,6 +100,7 @@ struct fs_info
     unsigned is_ntfs         : 1;
     unsigned is_samba        : 1;
     unsigned is_nfs          : 1;
+    unsigned is_netapp       : 1;
   } status;
  public:
   void clear ()
@@ -116,6 +117,7 @@ struct fs_info
     is_ntfs (false);
     is_samba (false);
     is_nfs (false);
+    is_netapp (false);
   }
   inline DWORD& flags () {return status.flags;};
   inline DWORD& serial () {return status.serial;};
@@ -130,6 +132,7 @@ struct fs_info
   IMPLEMENT_STATUS_FLAG (bool, is_ntfs)
   IMPLEMENT_STATUS_FLAG (bool, is_samba)
   IMPLEMENT_STATUS_FLAG (bool, is_nfs)
+  IMPLEMENT_STATUS_FLAG (bool, is_netapp)
 
   bool update (const char *);
 };
