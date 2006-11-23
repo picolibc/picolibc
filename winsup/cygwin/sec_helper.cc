@@ -38,44 +38,44 @@ SECURITY_ATTRIBUTES NO_COPY sec_none_nih;
 SECURITY_ATTRIBUTES NO_COPY sec_all;
 SECURITY_ATTRIBUTES NO_COPY sec_all_nih;
 
-SID (well_known_null_sid, "S-1-0-0",
-     SECURITY_NULL_SID_AUTHORITY, 1, SECURITY_NULL_RID);
-SID (well_known_world_sid, "S-1-1-0",
-     SECURITY_WORLD_SID_AUTHORITY, 1, SECURITY_WORLD_RID);
-SID (well_known_local_sid, "S-1-2-0",
-     SECURITY_LOCAL_SID_AUTHORITY, 1, SECURITY_LOCAL_RID);
-SID (well_known_creator_owner_sid, "S-1-3-0",
-     SECURITY_CREATOR_SID_AUTHORITY, 1, SECURITY_CREATOR_OWNER_RID);
-SID (well_known_creator_group_sid, "S-1-3-1",
-     SECURITY_CREATOR_SID_AUTHORITY, 1, SECURITY_CREATOR_GROUP_RID);
-SID (well_known_dialup_sid, "S-1-5-1",
-     SECURITY_NT_AUTHORITY, 1, SECURITY_DIALUP_RID);
-SID (well_known_network_sid, "S-1-5-2",
-     SECURITY_NT_AUTHORITY, 1, SECURITY_NETWORK_RID);
-SID (well_known_batch_sid, "S-1-5-3",
-     SECURITY_NT_AUTHORITY, 1, SECURITY_BATCH_RID);
-SID (well_known_interactive_sid, "S-1-5-4",
-     SECURITY_NT_AUTHORITY, 1, SECURITY_INTERACTIVE_RID);
-SID (well_known_service_sid, "S-1-5-6",
-     SECURITY_NT_AUTHORITY, 1, SECURITY_SERVICE_RID);
-SID (well_known_authenticated_users_sid, "S-1-5-11",
-     SECURITY_NT_AUTHORITY, 1, SECURITY_AUTHENTICATED_USER_RID);
-SID (well_known_this_org_sid, "S-1-5-15",
-     SECURITY_NT_AUTHORITY, 1, 15);
-SID (well_known_system_sid, "S-1-5-18",
-     SECURITY_NT_AUTHORITY, 1, SECURITY_LOCAL_SYSTEM_RID);
-SID (well_known_admins_sid, "S-1-5-32-544",
-     SECURITY_NT_AUTHORITY, 2, SECURITY_BUILTIN_DOMAIN_RID,
-			       DOMAIN_ALIAS_RID_ADMINS);
+MKSID (well_known_null_sid, "S-1-0-0",
+       SECURITY_NULL_SID_AUTHORITY, 1, SECURITY_NULL_RID);
+MKSID (well_known_world_sid, "S-1-1-0",
+       SECURITY_WORLD_SID_AUTHORITY, 1, SECURITY_WORLD_RID);
+MKSID (well_known_local_sid, "S-1-2-0",
+       SECURITY_LOCAL_SID_AUTHORITY, 1, SECURITY_LOCAL_RID);
+MKSID (well_known_creator_owner_sid, "S-1-3-0",
+       SECURITY_CREATOR_SID_AUTHORITY, 1, SECURITY_CREATOR_OWNER_RID);
+MKSID (well_known_creator_group_sid, "S-1-3-1",
+       SECURITY_CREATOR_SID_AUTHORITY, 1, SECURITY_CREATOR_GROUP_RID);
+MKSID (well_known_dialup_sid, "S-1-5-1",
+       SECURITY_NT_AUTHORITY, 1, SECURITY_DIALUP_RID);
+MKSID (well_known_network_sid, "S-1-5-2",
+       SECURITY_NT_AUTHORITY, 1, SECURITY_NETWORK_RID);
+MKSID (well_known_batch_sid, "S-1-5-3",
+       SECURITY_NT_AUTHORITY, 1, SECURITY_BATCH_RID);
+MKSID (well_known_interactive_sid, "S-1-5-4",
+       SECURITY_NT_AUTHORITY, 1, SECURITY_INTERACTIVE_RID);
+MKSID (well_known_service_sid, "S-1-5-6",
+       SECURITY_NT_AUTHORITY, 1, SECURITY_SERVICE_RID);
+MKSID (well_known_authenticated_users_sid, "S-1-5-11",
+       SECURITY_NT_AUTHORITY, 1, SECURITY_AUTHENTICATED_USER_RID);
+MKSID (well_known_this_org_sid, "S-1-5-15",
+       SECURITY_NT_AUTHORITY, 1, 15);
+MKSID (well_known_system_sid, "S-1-5-18",
+       SECURITY_NT_AUTHORITY, 1, SECURITY_LOCAL_SYSTEM_RID);
+MKSID (well_known_admins_sid, "S-1-5-32-544",
+       SECURITY_NT_AUTHORITY, 2, SECURITY_BUILTIN_DOMAIN_RID,
+				 DOMAIN_ALIAS_RID_ADMINS);
 
 #define SECURITY_MANDATORY_INTEGRITY_AUTHORITY       {0,0,0,0,0,16}
 
-SID (mandatory_medium_integrity_sid, "S-1-64-8192",
-     SECURITY_MANDATORY_INTEGRITY_AUTHORITY, 1, 8192);
-SID (mandatory_high_integrity_sid, "S-1-64-12288",
-     SECURITY_MANDATORY_INTEGRITY_AUTHORITY, 1, 12288);
-SID (mandatory_system_integrity_sid, "S-1-64-16384",
-     SECURITY_MANDATORY_INTEGRITY_AUTHORITY, 1, 16384);
+MKSID (mandatory_medium_integrity_sid, "S-1-64-8192",
+       SECURITY_MANDATORY_INTEGRITY_AUTHORITY, 1, 8192);
+MKSID (mandatory_high_integrity_sid, "S-1-64-12288",
+       SECURITY_MANDATORY_INTEGRITY_AUTHORITY, 1, 12288);
+MKSID (mandatory_system_integrity_sid, "S-1-64-16384",
+       SECURITY_MANDATORY_INTEGRITY_AUTHORITY, 1, 16384);
 
 bool
 cygpsid::operator== (const char *nsidstr) const

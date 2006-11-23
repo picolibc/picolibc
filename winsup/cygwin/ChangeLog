@@ -1,5 +1,11 @@
 2006-11-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* security.h (DBGSID): Define for debugging purposes.
+	(MKSID): Rename from SID so as to not hide SID definition from winnt.h.
+	* sec_helper.cc: Change SID to MKSID throughout.
+
+2006-11-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* net.cc (get_ipv6_funcs): Fix formatting.
 
 2006-11-23  Corinna Vinschen  <corinna@vinschen.de>

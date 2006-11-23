@@ -23,8 +23,16 @@ details. */
 #define ACL_DEFAULT_SIZE 3072
 #define NO_SID ((PSID)NULL)
 
+/* Added for debugging purposes. */
+typedef struct {
+  BYTE  Revision;
+  BYTE  SubAuthorityCount;
+  SID_IDENTIFIER_AUTHORITY IdentifierAuthority;
+  DWORD SubAuthority[8];
+} DBGSID, *PDBGSID;
+
 /* Macro to define variable length SID structures */
-#define SID(name, comment, authority, count, rid...) \
+#define MKSID(name, comment, authority, count, rid...) \
 static NO_COPY struct  { \
   BYTE  Revision; \
   BYTE  SubAuthorityCount; \
