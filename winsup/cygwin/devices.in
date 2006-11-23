@@ -85,7 +85,15 @@ const device dev_bad_storage =
 "/dev/scd%(0-15)d", BRACK(FHDEV(DEV_CDROM_MAJOR, {$1})), "\\Device\\CdRom{$1}"
 "/dev/sr%(0-15)d", BRACK(FHDEV(DEV_CDROM_MAJOR, {$1})), "\\Device\\CdRom{$1}"
 "/dev/sd%{a-z}s", BRACK(FH_SD{uc $1}), "\\Device\\Harddisk{ord($1) - ord('a')}\\Partition0"
+"/dev/sda%{a-z}s", BRACK(FH_SDA{uc $1}), "\\Device\\Harddisk{26 + ord($1) - ord('a')}\\Partition0"
+"/dev/sdb%{a-z}s", BRACK(FH_SDB{uc $1}), "\\Device\\Harddisk{52 + ord($1) - ord('a')}\\Partition0"
+"/dev/sdc%{a-z}s", BRACK(FH_SDC{uc $1}), "\\Device\\Harddisk{78 + ord($1) - ord('a')}\\Partition0"
+"/dev/sdd%{a-x}s", BRACK(FH_SDD{uc $1}), "\\Device\\Harddisk{104 + ord($1) - ord('a')}\\Partition0"
 "/dev/sd%{a-z}s%(1-15)d", BRACK(FH_SD{uc $1} | {$2}), "\\Device\\Harddisk{ord($1) - ord('a')}\\Partition{$2 % 16}"
+"/dev/sda%{a-z}s%(1-15)d", BRACK(FH_SDA{uc $1} | {$2}), "\\Device\\Harddisk{26 + ord($1) - ord('a')}\\Partition{$2 % 16}"
+"/dev/sdb%{a-z}s%(1-15)d", BRACK(FH_SDB{uc $1} | {$2}), "\\Device\\Harddisk{52 + ord($1) - ord('a')}\\Partition{$2 % 16}"
+"/dev/sdc%{a-z}s%(1-15)d", BRACK(FH_SDC{uc $1} | {$2}), "\\Device\\Harddisk{78 + ord($1) - ord('a')}\\Partition{$2 % 16}"
+"/dev/sdd%{a-x}s%(1-15)d", BRACK(FH_SDD{uc $1} | {$2}), "\\Device\\Harddisk{104 + ord($1) - ord('a')}\\Partition{$2 % 16}"
 "/dev/kmsg", BRACK(FH_KMSG), "\\\\.\\mailslot\\cygwin\\dev\\kmsg"
 "/dev", BRACK(FH_DEV), "/dev"
 %other	{return	NULL;}
@@ -146,12 +154,44 @@ void
 device::parsedisk (int drive, int part)
 {
   int base;
-  if (drive < ('q' - 'a'))
+  if (drive < ('q' - 'a'))      /* /dev/sda -to- /dev/sdp */
     base = DEV_SD_MAJOR;
-  else
+  else if (drive < 32)          /* /dev/sdq -to- /dev/sdaf */
     {
       base = DEV_SD1_MAJOR;
       drive -= 'q' - 'a';
+    }
+  else if (drive < 48)          /* /dev/sdag -to- /dev/sdav */
+    {
+      base = DEV_SD2_MAJOR;
+      drive -= 32;
+    }
+  else if (drive < 64)          /* /dev/sdaw -to- /dev/sdbl */
+    {
+      base = DEV_SD3_MAJOR;
+      drive -= 48;
+    }
+  else if (drive < 80)          /* /dev/sdbm -to- /dev/sdcb */
+    {
+      base = DEV_SD4_MAJOR;
+      drive -= 64;
+    }
+  else if (drive < 96)          /* /dev/sdcc -to- /dev/sdcr */
+    {
+      base = DEV_SD5_MAJOR;
+      drive -= 80;
+    }
+  else if (drive < 112)          /* /dev/sdcs -to- /dev/sddh */
+    {
+      base = DEV_SD6_MAJOR;
+      drive -= 96;
+    }
+  /* NOTE: This will cause multiple /dev/sddx entries in
+           /proc/partitions if there are more than 128 devices */
+  else                           /* /dev/sddi -to- /dev/sddx */
+    {
+      base = DEV_SD7_MAJOR;
+      drive -= 112;
     }
   parse (base, part + (drive * 16));
 }

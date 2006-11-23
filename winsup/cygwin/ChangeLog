@@ -1,3 +1,14 @@
+2006-11-23  Joe Loh  <joel@pivot3.com>
+
+	* devices.h: Add additional SCSI disk block device numbers per
+	http://www.kernel.org/pub/linux/docs/device-list/devices.txt
+	up to 128 devices.
+	* devices.in: Ditto.
+	(device::parsedisk): Add additonal else-if cases for decoding base
+	and drive indices.
+	* devices.cc: Regenerate.
+	* dtable.cc (build_fh_pc): Add additional DEV_SD{2..7}_MAJOR cases.
+
 2006-11-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (EqualPrefixSid): Define.

@@ -384,6 +384,12 @@ build_fh_pc (path_conv& pc)
     case DEV_CDROM_MAJOR:
     case DEV_SD_MAJOR:
     case DEV_SD1_MAJOR:
+    case DEV_SD2_MAJOR:
+    case DEV_SD3_MAJOR:
+    case DEV_SD4_MAJOR:
+    case DEV_SD5_MAJOR:
+    case DEV_SD6_MAJOR:
+    case DEV_SD7_MAJOR:
       fh = cnew (fhandler_dev_floppy) ();
       break;
     case DEV_TAPE_MAJOR:
