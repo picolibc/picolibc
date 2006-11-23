@@ -948,6 +948,8 @@ dev_console::set_color (HANDLE h)
 	       (save_fg & FOREGROUND_BLUE  ? BACKGROUND_BLUE  : 0) |
 	       (save_fg & FOREGROUND_INTENSITY ? BACKGROUND_INTENSITY : 0);
     }
+
+  /* apply attributes */
   if (underline)
     win_fg = underline_color;
   /* emulate blink with bright background */
@@ -956,7 +958,12 @@ dev_console::set_color (HANDLE h)
   if (intensity == INTENSITY_INVISIBLE)
     win_fg = win_bg;
   else if (intensity == INTENSITY_BOLD)
-    win_fg |= FOREGROUND_INTENSITY;
+    /* apply foreground intensity only in non-reverse mode! */
+    if (reverse) 
+      win_bg |= BACKGROUND_INTENSITY;
+    else
+      win_fg |= FOREGROUND_INTENSITY;
+
   current_win32_attr = win_fg | win_bg;
   if (h)
     SetConsoleTextAttribute (h, current_win32_attr);

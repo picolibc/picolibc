@@ -1,3 +1,10 @@
+2006-11-23  Thomas Wolff  <towo@computer.org>
+
+	* fhandler_console.cc (set_color): Avoid (again) inappropriate
+	intensity interchanging that used to render reverse output unreadable
+	when (non-reversed) text is bright.
+	See http://sourceware.org/bugzilla/show_bug.cgi?id=514
+
 2006-11-23  Joe Loh  <joel@pivot3.com>
 
 	* devices.h: Add additional SCSI disk block device numbers per
