@@ -1,5 +1,9 @@
 2006-11-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* net.cc (get_ipv6_funcs): Fix formatting.
+
+2006-11-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (fs_info::update): Define GETVOLINFO_VALID_MASK and TEST_GVI.
 	Change FS_IS_SAMBA and FS_IS_SAMBA_WITH_QUOTA and their usage
 	accordingly.  Define FS_IS_NETAPP_DATAONTAP.  Recognize NetApp device

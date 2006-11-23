@@ -3365,15 +3365,15 @@ static bool
 get_ipv6_funcs (HMODULE lib)
 {
   return ((freeaddrinfo = (void (WINAPI *)(const struct addrinfo *))
-			  GetProcAddress(lib, "freeaddrinfo"))
+			  GetProcAddress (lib, "freeaddrinfo"))
 	  && (getaddrinfo = (int (WINAPI *)(const char *, const char *,
 					    const struct addrinfo *,
 					    struct addrinfo **))
-			    GetProcAddress(lib, "getaddrinfo"))
+			    GetProcAddress (lib, "getaddrinfo"))
 	  && (getnameinfo = (int (WINAPI *)(const struct sockaddr *,
 					    socklen_t, char *, size_t,
 					    char *, size_t, int))
-			    GetProcAddress(lib, "getnameinfo")));
+			    GetProcAddress (lib, "getnameinfo")));
 }
 
 static NO_COPY muto load_ipv6_guard;
