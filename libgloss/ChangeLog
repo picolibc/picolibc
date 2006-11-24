@@ -1,3 +1,9 @@
+2006-11-24  Thiemo Seufer  <ths@mips.com>
+            Nigel Stephens  <nigel@mips.com>
+
+	* mips/crt0.S (_start): Use all available float registers. Don't touch
+	SR_PE on post-mips2 CPUs, it means soft reset there.
+
 2006-11-22  Luca Barbato  <lu_zero@gentoo.org>
 
 	* spu/syscalls.c: Include spu_intrinsics.h to provide vector keyword.

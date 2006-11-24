@@ -65,11 +65,21 @@ _start:
 	nop
 	move	s0,$31
 #endif
-#if !defined(__mips64) || (__mips_fpr==32)
-#define STATUS_MASK (SR_CU1|SR_PE)
+#if __mips<3
+#  define STATUS_MASK (SR_CU1|SR_PE)
 #else
-# For mips3 or mips4, turn on 64-bit addressing and additional float regs
-#define STATUS_MASK (SR_CU1|SR_PE|SR_FR|SR_KX|SR_SX|SR_UX)
+/* Post-mips2 has no SR_PE bit.  */
+#  ifdef __mips64
+/* Turn on 64-bit addressing and additional float regs.  */
+#    define STATUS_MASK (SR_CU1|SR_FR|SR_KX|SR_SX|SR_UX)
+#  else
+#    ifdef __mips_fpr=32
+#      define STATUS_MASK (SR_CU1)
+#    else
+/* Turn on additional float regs.  */
+#      define STATUS_MASK (SR_CU1|SR_FR)
+#    endif
+#  endif
 #endif
 	li	v0, STATUS_MASK
 	mtc0	v0, C0_SR
