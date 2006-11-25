@@ -1,3 +1,17 @@
+2006-11-25  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	* Makefile.in (VERSION): Let configure define it.
+
+	* aclocal.m4 (MINGW_AC_CONFIG_SRCDIR): New macro.
+	* configure.in: Use it.
+	Correct quoting of autoconf macro arguments throughout.
+	(AC_INIT, AC_OUTPUT): Update to autoconf 2.5x preferred syntax.
+	(AR, AS, RANLIB, LD, DLLTOOL, DLLWRAP): Don't need AC_SUBST.
+	(AC_ALLOCA): Invalid after GCC_NO_EXECUTABLES; removed.
+	(AC_CONFIG_FILES): Add, to generate Makefile.
+
+	* configure: Regenerated.
+
 2006-11-21  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* Makefile.in:  Add aclocal.m4:to source release.

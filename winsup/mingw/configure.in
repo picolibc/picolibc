@@ -16,8 +16,9 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-AC_PREREQ(2.59)
-AC_INIT(dllmain.c)
+AC_PREREQ([2.59])
+AC_INIT([mingw-runtime], [__MINGW32_VERSION])
+MINGW_AC_CONFIG_SRCDIR([$PACKAGE_VERSION], [include/_mingw.h])
 
 AC_CANONICAL_SYSTEM
 GCC_NO_EXECUTABLES
@@ -27,33 +28,19 @@ case "$with_cross_host" in
   ""|*cygwin*) all_dlls_host='all_dlls_host'
 	       install_dlls_host='install_dlls_host';;
 esac
-AC_SUBST(with_cross_host)
-AC_SUBST(all_dlls_host)
-AC_SUBST(install_dlls_host)
+AC_SUBST([with_cross_host])
+AC_SUBST([all_dlls_host])
+AC_SUBST([install_dlls_host])
 
-AC_CHECK_TOOL(AR, ar, ar)
+AC_CHECK_TOOL([AR], [ar], [ar])
+AC_CHECK_TOOL([AS], [as], [as])
+AC_CHECK_TOOL([RANLIB], [ranlib], [ranlib])
+AC_CHECK_TOOL([LD], [ld], [ld])
+AC_CHECK_TOOL([DLLTOOL], [dlltool], [dlltool])
+AC_CHECK_TOOL([DLLWRAP], [dlltool], [dlltool])
+AC_CHECK_TOOL([WINDRES], [windres], [windres])
 
-AC_SUBST(AR)
-AC_CHECK_TOOL(AS, as, as)
-AC_SUBST(AS)
-AC_CHECK_TOOL(RANLIB, ranlib, ranlib)
-AC_SUBST(RANLIB)
-AC_CHECK_TOOL(LD, ld, ld)
-AC_SUBST(LD)
-AC_CHECK_TOOL(DLLTOOL, dlltool, dlltool)
-AC_SUBST(DLLTOOL)
-AC_CHECK_TOOL(DLLWRAP, dlltool, dlltool)
-AC_SUBST(DLLWRAP)
-AC_CHECK_TOOL(WINDRES, windres, windres)
-AC_SUBST(WINDRES)
-
-case "$with_cross_host" in
-  ""|*mingw*|*cygwin*)
-    AC_ALLOCA
-    ;;
-esac
-
-AC_CONFIG_SUBDIRS(profile mingwex)
+AC_CONFIG_SUBDIRS([profile mingwex])
 HEADER_SUBDIR=""
 
 LIBGMON_A=libgmon.a
@@ -79,18 +66,18 @@ esac
 #
 # FIXME: In the future I would like to change the dll name to mingwthrd to
 # to match the libmingwthrd.a name.
-THREAD_DLL=mingwm
+AC_SUBST([THREAD_DLL], [mingwm])
 
-MKINSTALLDIRS=$ac_aux_dir/mkinstalldirs
-AC_SUBST(MKINSTALLDIRS)
-AC_SUBST(MNO_CYGWIN)
-AC_SUBST(THREAD_DLL)
-AC_SUBST(LIBM_A)
-AC_SUBST(LIBGMON_A)
-AC_SUBST(HEADER_SUBDIR)
-AC_SUBST(W32API_INCLUDE)
+AC_SUBST([MKINSTALLDIRS], [$ac_aux_dir/mkinstalldirs])
+AC_SUBST([MNO_CYGWIN])
+AC_SUBST([LIBM_A])
+AC_SUBST([LIBGMON_A])
+AC_SUBST([HEADER_SUBDIR])
+AC_SUBST([W32API_INCLUDE])
 
 AC_PROG_INSTALL
-AC_OUTPUT(Makefile)
+
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
 
 # $RCSfile$: end of file
