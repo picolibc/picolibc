@@ -1,3 +1,7 @@
+2006-11-27  Bob Wilson  <bob.wilson@acm.org>
+
+	* xtensa-isa.h (STATIC_LIBISA): Delete.
+
 2006-10-30  Paul Brook  <paul@codesourcery.com>
 
 	* dis-asm.h (disassemble_info): Add symtab, symtab_pos and
