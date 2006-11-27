@@ -684,6 +684,13 @@ fhandler_base::open (int flags, mode_t mode)
       if ((c && c[1] == '.') || *get_win32_name () == '.')
 	file_attributes |= FILE_ATTRIBUTE_HIDDEN;
 #endif
+      /* Starting with Windows 2000, when trying to overwrite an already
+	 existing file with FILE_ATTRIBUTE_HIDDEN attribute set, CreateFile
+	 fails with "Permission denied".  Per MSDN you have to create the
+	 file with the same attributes as already specified for the file. */
+      if (exists () && has_attribute (FILE_ATTRIBUTE_HIDDEN))
+        file_attributes |= pc.file_attributes ();
+
       /* If the file should actually be created and ntsec is on,
 	 set files attributes. */
       if (allow_ntsec && has_acls ())
