@@ -1,5 +1,10 @@
 2006-11-27  Bob Wilson  <bob.wilson@acm.org>
 
+	* xtensa-config.h (XSHAL_ABI): New.
+	(XTHAL_ABI_WINDOWED, XTHAL_ABI_CALL0): New.
+
+2006-11-27  Bob Wilson  <bob.wilson@acm.org>
+
 	* xtensa-isa.h (STATIC_LIBISA): Delete.
 
 2006-10-30  Paul Brook  <paul@codesourcery.com>
