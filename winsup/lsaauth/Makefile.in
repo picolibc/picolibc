@@ -1,0 +1,85 @@
+# Copyright (c) 2006, Red Hat, Inc.
+#
+#     This program is free software; you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation; either version 2 of the License, or
+#     (at your option) any later version.
+#
+#     A copy of the GNU General Public License can be found at
+#     http://www.gnu.org/
+#
+# Written by Corinna Vinschen <vinschen@redhat.de>
+#
+# Makefile for Cygwin subauthentication DLL.
+
+SHELL := @SHELL@
+
+srcdir          := @srcdir@
+VPATH           := @srcdir@
+prefix          := @prefix@
+exec_prefix     := @exec_prefix@
+
+bindir          := @bindir@
+etcdir          := $(exec_prefix)/etc
+
+INSTALL         := @INSTALL@
+INSTALL_PROGRAM := @INSTALL_PROGRAM@
+INSTALL_DATA    := @INSTALL_DATA@
+
+CC              := @CC@
+CC_FOR_TARGET   := $(CC)
+
+CFLAGS          := @CFLAGS@
+
+include $(srcdir)/../Makefile.common
+
+WIN32_COMMON	:= -mno-cygwin
+WIN32_INCLUDES  := -I. -I$(srcdir) $(w32api_include) $(w32api_include)/ddk
+WIN32_CFLAGS    := $(CFLAGS) $(WIN32_COMMON) $(WIN32_INCLUDES)
+WIN32_LDFLAGS	:= $(CFLAGS) $(WIN32_COMMON) -nostdlib -Wl,-shared
+
+LIBS		:= -ladvapi32 -lkernel32 -lntdll
+
+DLL	:=	cyglsa.dll
+DEF_FILE:=	cyglsa.def
+
+OBJ	=	cyglsa.o
+
+.SUFFIXES:
+.NOEXPORT:
+
+all: Makefile $(DLL)
+
+$(DEF_FILE): cyglsa.din config.status
+	$(SHELL) config.status
+
+$(DLL): $(OBJ) $(DEF_FILE)
+ifdef VERBOSE
+	$(CC) -s $(WIN32_LDFLAGS) -o $@ $(DEF_FILE) $(OBJ) $(LIBS)
+else
+	@echo $(CC) .. -o $@ $(OBJ)
+	@$(CC) -s $(WIN32_LDFLAGS) -o $@ $(DEF_FILE) $(OBJ) $(LIBS)
+endif
+
+.PHONY: all install clean realclean
+
+realclean: clean
+	rm -f  Makefile config.cache
+
+clean:
+	rm -f *.o *.dll
+
+install: all
+	$(SHELL) $(updir1)/mkinstalldirs $(bindir)
+	$(INSTALL_PROGRAM) $(DLL) $(bindir)/$(DLL)
+	$(INSTALL_PROGRAM) $(srcdir)/cyglsa64.dll $(bindir)/cyglsa64.dll
+	$(INSTALL_PROGRAM) $(srcdir)/cyglsa-config $(bindir)/cyglsa-config
+
+%.o: %.c
+ifdef VERBOSE
+	$(CC) $(WIN32_CFLAGS) -c -o $@ $<
+else
+	@echo $(CC) -c $(CFLAGS) ... $(<F)
+	@$(CC) $(WIN32_CFLAGS) -c -o $@ $<
+endif
+

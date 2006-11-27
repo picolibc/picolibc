@@ -1,0 +1,14 @@
+2006-11-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	Initial release of the Cygwin LSA authentication package.
+	* ChangeLog: New file.
+	* Makefile.in: Ditto.
+	* aclocal.m4: Ditto.
+	* configure.in: Ditto.
+	* configure: Ditto. Generated from configure.in.
+	* cyglsa-config: Ditto.
+	* cyglsa.c: Ditto.
+	* cyglsa.din: Ditto.
+	* cyglsa64.dll: Ditto.
+	* make-64bit-version-with-visual-c.bat: Ditto.
+	* mslsa.def: Ditto.
