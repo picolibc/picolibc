@@ -73,7 +73,7 @@ _start:
 /* Turn on 64-bit addressing and additional float regs.  */
 #    define STATUS_MASK (SR_CU1|SR_FR|SR_KX|SR_SX|SR_UX)
 #  else
-#    ifdef __mips_fpr=32
+#    if __mips_fpr==32
 #      define STATUS_MASK (SR_CU1)
 #    else
 /* Turn on additional float regs.  */
