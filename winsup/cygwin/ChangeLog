@@ -1,3 +1,57 @@
+2006-11-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cyglsa.h: New header file.
+	* environ.cc: Disable subauth settings.
+	* grp.cc: Accomodate cygsidlist's count now being a method.
+	* sec_helper.cc (SECURITY_MANDATORY_INTEGRITY_AUTHORITY): Remove.
+	(mandatory_medium_integrity_sid): Remove.
+	(mandatory_high_integrity_sid): Remove.
+	(mandatory_system_integrity_sid): Remove.
+	(fake_logon_sid): Add.
+	(cygsid::get_sid): Add well_known parameter.  Set well_known_sid
+	accordingly.
+	(cygsid::getfromstr): Ditto.
+	(cygsidlist::alloc_sids): Move here from security.cc.
+	(cygsidlist::free_sids): Ditto.
+	(cygsidlist::add): Move here from security.h.  Add well_known parameter.
+	Set well_known_sid accordingly.  Don't allow duplicate SIDs.
+	* security.cc: Include cyglsa.h and cygwin/version.h.  Throughout
+	accomodate cygsidlist's count now being a method.  Throughout drop
+	redundant "contains" tests.
+	(get_user_local_groups): Add local groups as well known SIDs.
+	(get_token_group_sidlist): Add well known groups as well known SIDs.
+	(get_server_groups): Ditto.  Only call get_unix_group_sidlist after
+	get_user_local_groups to maintain "well_known_sid" attribute.
+	(get_initgroups_sidlist): Add well known groups as well known SIDs.
+	(get_setgroups_sidlist): Add usersid and struct passwd parameter to
+	allow calling get_server_groups from here.
+	(get_system_priv_list): Make static.  Return size of TOKEN_PRIVILEGES
+	structure.
+	(get_priv_list): Ditto.
+	(create_token): Accomodate above changes.  Drop misguided attempt to
+	add MIC SIDs to created user token.  Print returned token as hex value.
+	(subauth): Disable.
+	(lsaauth): New function implementing client side of LSA authentication.
+	* security.h (class cygsid): Add well_known_sid attribute.  Accomodate
+	throughout.  Add *= operator to create a well known SID.
+	(class cygsidlist): Rename count to cnt.  Make count a method.
+	(cygsidlist::add): Move to sec_helper.cc.
+	(cygsidlist::operator *=): New method to add well known SID.
+	(cygsidlist::non_well_known_count): New method returning number of
+	non well known SIDs in list.
+	(cygsidlist::next_non_well_known_sid): New method returning next non
+	well known SID by index.
+	(mandatory_medium_integrity_sid): Drop declaration.
+	(mandatory_high_integrity_sid): Drop declaration.
+	(mandatory_system_integrity_sid): Drop declaration.
+	(fake_logon_sid): Add declaration.
+	(subauth): Disable declaration.
+	(lsaauth): Add declaration.
+	* syscalls.cc (seteuid32): Disable subauthentication.  Add LSA
+	authentication.
+	* wincap.h: Define needs_logon_sid_in_sid_list throughout.
+	* wincap.cc: Ditto.
+
 2006-11-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.h (DBGSID): Define for debugging purposes.

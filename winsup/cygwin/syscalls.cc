@@ -2111,30 +2111,46 @@ seteuid32 (__uid32_t uid)
   debug_printf ("Found token %d", new_token);
 
   /* If no impersonation token is available, try to
-     authenticate using NtCreateToken () or subauthentication. */
+     authenticate using NtCreateToken () or LSA authentication. */
   if (new_token == INVALID_HANDLE_VALUE)
     {
-      new_token = subauth (pw_new);
-      debug_printf ("subauth %s, try create_token.",
-		    new_token == INVALID_HANDLE_VALUE ? "failed" : "succeeded");
-      HANDLE new_token2 = create_token (usersid, groups, pw_new, new_token);
-      if (new_token2 == INVALID_HANDLE_VALUE)
-	{
+      if (!(new_token = lsaauth (usersid, groups, pw_new)))
+        {
+#if 0
+	  new_token = subauth (pw_new);
+	  debug_printf ("subauth %s, try create_token.",
+			new_token == INVALID_HANDLE_VALUE ? "failed" : "succeeded");
+	  HANDLE new_token2 = create_token (usersid, groups, pw_new, new_token);
+	  if (new_token2 == INVALID_HANDLE_VALUE)
+	    {
+	      if (new_token == INVALID_HANDLE_VALUE)
+		{
+		  debug_printf ("create_token failed, bail out of here");
+		  cygheap->user.reimpersonate ();
+		  return -1;
+		}
+	      debug_printf ("create_token failed, use original subauth token");
+	    }
+	  else
+	    {
+	      debug_printf ("create_token succeeded");
+	      if (new_token != INVALID_HANDLE_VALUE)
+		CloseHandle (new_token);
+	      new_token = new_token2;
+	    }
+#else
+	  debug_printf ("lsaauth failed, try create_token.");
+	  new_token = create_token (usersid, groups, pw_new,
+				    INVALID_HANDLE_VALUE);
 	  if (new_token == INVALID_HANDLE_VALUE)
 	    {
 	      debug_printf ("create_token failed, bail out of here");
 	      cygheap->user.reimpersonate ();
 	      return -1;
 	    }
-	  debug_printf ("create_token failed, use original subauth token");
+#endif
 	}
-      else
-        {
-	  debug_printf ("create_token succeeded");
-	  if (new_token != INVALID_HANDLE_VALUE)
-	    CloseHandle (new_token);
-	  new_token = new_token2;
-	}
+
       /* Keep at most one internal token */
       if (cygheap->user.internal_token != NO_IMPERSONATION)
 	CloseHandle (cygheap->user.internal_token);

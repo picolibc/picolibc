@@ -41,31 +41,14 @@ details. */
 #include "ntdll.h"
 #include "lm.h"
 #include "pwdgrp.h"
+#include "cyglsa.h"
+#include <cygwin/version.h>
 
 bool allow_ntsec;
 /* allow_smbntsec is handled exclusively in path.cc (path_conv::check).
    It's defined here because of it's strong relationship to allow_ntsec. */
 bool allow_smbntsec;
 bool allow_traverse;
-
-cygsid *
-cygsidlist::alloc_sids (int n)
-{
-  if (n > 0)
-    return (cygsid *) cmalloc (HEAP_STR, n * sizeof (cygsid));
-  else
-    return NULL;
-}
-
-void
-cygsidlist::free_sids ()
-{
-  if (sids)
-    cfree (sids);
-  sids = NULL;
-  count = maxcount = 0;
-  type = cygsidlist_empty;
-}
 
 extern "C" void
 cygwin_set_impersonation_token (const HANDLE hToken)
@@ -346,7 +329,7 @@ is_group_member (WCHAR *wgroup, PSID pusersid, cygsidlist &grp_list)
 	   Note: Allowing those groups in our group list renders external
 	   tokens invalid, so that it becomes impossible to logon with
 	   password and valid logon token. */
-	for (int glidx = 0; glidx < grp_list.count; ++glidx)
+	for (int glidx = 0; glidx < grp_list.count (); ++glidx)
 	  if ((buf[bidx].lgrmi1_sidusage == SidTypeGroup
 	       || buf[bidx].lgrmi1_sidusage == SidTypeWellKnownGroup)
 	      && EqualSid (grp_list.sids[glidx], buf[bidx].lgrmi1_sid))
@@ -409,8 +392,7 @@ get_user_local_groups (cygsidlist &grp_list, PSID pusersid)
 	  }
 	if (!legal_sid_type (use))
 	  debug_printf ("Rejecting local %s. use: %d", bgroup + blen, use);
-	else if (!grp_list.contains (gsid))
-	  grp_list += gsid;
+	grp_list *= gsid;
       }
   NetApiBufferFree (buf);
   return true;
@@ -480,7 +462,7 @@ get_unix_group_sidlist (struct passwd *pw, cygsidlist &grp_list)
 	    goto found;
       continue;
     found:
-      if (gsid.getfromgr (gr) && !grp_list.contains (gsid))
+      if (gsid.getfromgr (gr))
 	grp_list += gsid;
 
     }
@@ -498,26 +480,26 @@ get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps,
       /*if (sid_in_token_groups (my_grps, well_known_local_sid))*/
 	grp_list += well_known_local_sid;
       if (sid_in_token_groups (my_grps, well_known_dialup_sid))
-	grp_list += well_known_dialup_sid;
+	grp_list *= well_known_dialup_sid;
       if (sid_in_token_groups (my_grps, well_known_network_sid))
-	grp_list += well_known_network_sid;
+	grp_list *= well_known_network_sid;
       if (sid_in_token_groups (my_grps, well_known_batch_sid))
-	grp_list += well_known_batch_sid;
+	grp_list *= well_known_batch_sid;
       /* This is a problem on 2K3 (only domain controllers?!?) which only
          enables tools for selected special groups.  A subauth token is
 	 only NETWORK, but NETWORK has no access to these tools.  Therefore
 	 we always add INTERACTIVE here. */
       /*if (sid_in_token_groups (my_grps, well_known_interactive_sid))*/
-	grp_list += well_known_interactive_sid;
+	grp_list *= well_known_interactive_sid;
       if (sid_in_token_groups (my_grps, well_known_service_sid))
-	grp_list += well_known_service_sid;
+	grp_list *= well_known_service_sid;
       if (sid_in_token_groups (my_grps, well_known_this_org_sid))
-	grp_list += well_known_this_org_sid;
+	grp_list *= well_known_this_org_sid;
     }
   else
     {
       grp_list += well_known_local_sid;
-      grp_list += well_known_interactive_sid;
+      grp_list *= well_known_interactive_sid;
     }
   if (get_ll (auth_luid) != 999LL) /* != SYSTEM_LUID */
     {
@@ -525,7 +507,7 @@ get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps,
 	if (my_grps->Groups[i].Attributes & SE_GROUP_LOGON_ID)
 	  {
 	    grp_list += my_grps->Groups[i].Sid;
-	    auth_pos = grp_list.count - 1;
+	    auth_pos = grp_list.count () - 1;
 	    break;
 	  }
     }
@@ -541,22 +523,24 @@ get_server_groups (cygsidlist &grp_list, PSID usersid, struct passwd *pw)
 
   if (well_known_system_sid == usersid)
     {
-      grp_list += well_known_admins_sid;
+      grp_list *= well_known_admins_sid;
       get_unix_group_sidlist (pw, grp_list);
       return true;
     }
 
-  if (!grp_list.contains (well_known_world_sid))
-    grp_list += well_known_world_sid;
-  if (!grp_list.contains (well_known_authenticated_users_sid))
-    grp_list += well_known_authenticated_users_sid;
+  grp_list *= well_known_world_sid;
+  grp_list *= well_known_authenticated_users_sid;
   extract_nt_dom_user (pw, domain, user);
   if (get_logon_server (domain, server, wserver, false)
       && !get_user_groups (wserver, grp_list, user, domain)
       && get_logon_server (domain, server, wserver, true))
     get_user_groups (wserver, grp_list, user, domain);
-  get_unix_group_sidlist (pw, grp_list);
-  return get_user_local_groups (grp_list, usersid);
+  if (get_user_local_groups (grp_list, usersid))
+    {
+      get_unix_group_sidlist (pw, grp_list);
+      return true;
+    }
+  return false;
 }
 
 static bool
@@ -564,8 +548,8 @@ get_initgroups_sidlist (cygsidlist &grp_list,
 			PSID usersid, PSID pgrpsid, struct passwd *pw,
 			PTOKEN_GROUPS my_grps, LUID auth_luid, int &auth_pos)
 {
-  grp_list += well_known_world_sid;
-  grp_list += well_known_authenticated_users_sid;
+  grp_list *= well_known_world_sid;
+  grp_list *= well_known_authenticated_users_sid;
   if (well_known_system_sid == usersid)
     auth_pos = -1;
   else
@@ -574,24 +558,22 @@ get_initgroups_sidlist (cygsidlist &grp_list,
     return false;
 
   /* special_pgrp true if pgrpsid is not in normal groups */
-  if (!grp_list.contains (pgrpsid))
-    grp_list += pgrpsid;
+  grp_list += pgrpsid;
   return true;
 }
 
 static void
-get_setgroups_sidlist (cygsidlist &tmp_list, PTOKEN_GROUPS my_grps,
-		       user_groups &groups, LUID auth_luid, int &auth_pos)
+get_setgroups_sidlist (cygsidlist &tmp_list, PSID usersid, struct passwd *pw,
+		       PTOKEN_GROUPS my_grps, user_groups &groups,
+		       LUID auth_luid, int &auth_pos)
 {
-  PSID pgpsid = groups.pgsid;
-  tmp_list += well_known_world_sid;
-  tmp_list += well_known_authenticated_users_sid;
+  tmp_list *= well_known_world_sid;
+  tmp_list *= well_known_authenticated_users_sid;
   get_token_group_sidlist (tmp_list, my_grps, auth_luid, auth_pos);
-  for (int gidx = 0; gidx < groups.sgsids.count; gidx++)
-    if (!tmp_list.contains (groups.sgsids.sids[gidx]))
-      tmp_list += groups.sgsids.sids[gidx];
-  if (!groups.sgsids.contains (pgpsid))
-    tmp_list += pgpsid;
+  get_server_groups (tmp_list, usersid, pw);
+  for (int gidx = 0; gidx < groups.sgsids.count (); gidx++)
+    tmp_list += groups.sgsids.sids[gidx];
+  tmp_list += groups.pgsid;
 }
 
 static const cygpriv_idx sys_privs[] = {
@@ -628,13 +610,13 @@ static const cygpriv_idx sys_privs[] = {
 
 #define SYSTEM_PRIVILEGES_COUNT (sizeof sys_privs / sizeof *sys_privs)
 
-PTOKEN_PRIVILEGES
-get_system_priv_list (cygsidlist &grp_list)
+static PTOKEN_PRIVILEGES
+get_system_priv_list (cygsidlist &grp_list, size_t &size)
 {
   const LUID *priv;
-  PTOKEN_PRIVILEGES privs = (PTOKEN_PRIVILEGES)
-    malloc (sizeof (ULONG)
-	    + SYSTEM_PRIVILEGES_COUNT * sizeof (LUID_AND_ATTRIBUTES));
+  size = sizeof (ULONG)
+  	 + SYSTEM_PRIVILEGES_COUNT * sizeof (LUID_AND_ATTRIBUTES);
+  PTOKEN_PRIVILEGES privs = (PTOKEN_PRIVILEGES) malloc (size);
   if (!privs)
     {
       debug_printf ("malloc (system_privs) failed.");
@@ -653,8 +635,9 @@ get_system_priv_list (cygsidlist &grp_list)
   return privs;
 }
 
-PTOKEN_PRIVILEGES
-get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list)
+static PTOKEN_PRIVILEGES
+get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list,
+	       size_t &size)
 {
   PLSA_UNICODE_STRING privstrs;
   ULONG cnt;
@@ -663,9 +646,9 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list)
   char buf[INTERNET_MAX_HOST_NAME_LENGTH + 1];
 
   if (usersid == well_known_system_sid)
-    return get_system_priv_list (grp_list);
+    return get_system_priv_list (grp_list, size);
 
-  for (int grp = -1; grp < grp_list.count; ++grp)
+  for (int grp = -1; grp < grp_list.count (); ++grp)
     {
       if (grp == -1)
 	{
@@ -699,9 +682,9 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list)
 	    }
 
 	  tmp_count = privs ? privs->PrivilegeCount : 0;
-	  tmp = (PTOKEN_PRIVILEGES)
-	    realloc (privs, sizeof (ULONG) +
-		     (tmp_count + 1) * sizeof (LUID_AND_ATTRIBUTES));
+	  size = sizeof (DWORD)
+		 + (tmp_count + 1) * sizeof (LUID_AND_ATTRIBUTES);
+	  tmp = (PTOKEN_PRIVILEGES) realloc (privs, size);
 	  if (!tmp)
 	    {
 	      if (privs)
@@ -794,7 +777,7 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
 	{
 	  cygsid gsid;
 	  struct __group32 *gr;
-	  bool saw[groups.sgsids.count];
+	  bool saw[groups.sgsids.count ()];
 	  memset (saw, 0, sizeof(saw));
 
 	  /* token groups found in /etc/group match the user.gsids ? */
@@ -811,7 +794,7 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
 		  goto done;
 	      }
 	  /* user.sgsids groups must be in the token */
-	  for (int gidx = 0; gidx < groups.sgsids.count; gidx++)
+	  for (int gidx = 0; gidx < groups.sgsids.count (); gidx++)
 	    if (!saw[gidx] && !sid_in_token_groups (my_grps, groups.sgsids.sids[gidx]))
 	      goto done;
 	}
@@ -857,6 +840,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw,
 
   PTOKEN_GROUPS my_tok_gsids = NULL;
   DWORD size;
+  size_t psize = 0;
 
   /* SE_CREATE_TOKEN_NAME privilege needed to call NtCreateToken. */
   push_self_privilege (SE_CREATE_TOKEN_PRIV, true);
@@ -929,8 +913,8 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw,
   /* Create list of groups, the user is member in. */
   int auth_pos;
   if (new_groups.issetgroups ())
-    get_setgroups_sidlist (tmp_gsids, my_tok_gsids, new_groups, auth_luid,
-			   auth_pos);
+    get_setgroups_sidlist (tmp_gsids, usersid, pw, my_tok_gsids, new_groups,
+			   auth_luid, auth_pos);
   else if (!get_initgroups_sidlist (tmp_gsids, usersid, new_groups.pgsid, pw,
 				    my_tok_gsids, auth_luid, auth_pos))
     goto out;
@@ -940,9 +924,9 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw,
 
   /* Create a TOKEN_GROUPS list from the above retrieved list of sids. */
   new_tok_gsids = (PTOKEN_GROUPS)
-		  alloca (sizeof (ULONG) + (tmp_gsids.count  + 1 )
+		  alloca (sizeof (DWORD) + tmp_gsids.count ()
 					   * sizeof (SID_AND_ATTRIBUTES));
-  new_tok_gsids->GroupCount = tmp_gsids.count;
+  new_tok_gsids->GroupCount = tmp_gsids.count ();
   for (DWORD i = 0; i < new_tok_gsids->GroupCount; ++i)
     {
       new_tok_gsids->Groups[i].Sid = tmp_gsids.sids[i];
@@ -952,42 +936,8 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw,
     }
   if (auth_pos >= 0)
     new_tok_gsids->Groups[auth_pos].Attributes |= SE_GROUP_LOGON_ID;
-
-  /* On systems supporting Mandatory Integrity Control, add a MIC SID. */
-  if (wincap.has_mandatory_integrity_control ())
-    {
-      bool add_mic_sid = true;
-      new_tok_gsids->Groups[new_tok_gsids->GroupCount].Attributes = 0;
-
-      /* The subauth token usually contains a MIC SID.  Copy it into our
-	 group SID list. */
-      if (my_tok_gsids)
-	for (DWORD i = 0; i < my_tok_gsids->GroupCount; ++i)
-	  if (EqualPrefixSid (mandatory_medium_integrity_sid,
-			      my_tok_gsids->Groups[i].Sid))
-	    {
-	      new_tok_gsids->Groups[new_tok_gsids->GroupCount++].Sid
-		= my_tok_gsids->Groups[i].Sid;
-	      add_mic_sid = false;
-	      break;
-	    }
-      /* If no MIC SID was available add a matching one for the account type. */
-      if (add_mic_sid)
-        {
-	  if (usersid == well_known_system_sid)
-	    new_tok_gsids->Groups[new_tok_gsids->GroupCount++].Sid
-	      = mandatory_system_integrity_sid;
-	  else if (tmp_gsids.contains (well_known_admins_sid))
-	    new_tok_gsids->Groups[new_tok_gsids->GroupCount++].Sid
-	      = mandatory_high_integrity_sid;
-	  else
-	    new_tok_gsids->Groups[new_tok_gsids->GroupCount++].Sid
-	      = mandatory_medium_integrity_sid;
-	}
-    }
-
   /* Retrieve list of privileges of that user. */
-  if (!privs && !(privs = get_priv_list (lsa, usersid, tmp_gsids)))
+  if (!privs && !(privs = get_priv_list (lsa, usersid, tmp_gsids, psize)))
     goto out;
 
   /* Let's be heroic... */
@@ -1023,10 +973,16 @@ out:
     free (my_tok_gsids);
   close_local_policy (lsa);
 
-  debug_printf ("%d = create_token ()", primary_token);
+  debug_printf ("0x%x = create_token ()", primary_token);
   return primary_token;
 }
 
+/* Subauthentication gets useless now that real LSA authentication is
+   available.  The accompanying code in seteuid32 and environ.cc is
+   also disabled.
+   TODO: Deprecate and delete code entirely.
+   TODO: Delete from documentation. */
+#if 0
 extern "C"
 {
   BOOL WINAPI Wow64DisableWow64FsRedirection (PVOID *);
@@ -1047,7 +1003,7 @@ HANDLE
 subauth (struct passwd *pw)
 {
   LSA_STRING name;
-  HANDLE lsa_hdl;
+  HANDLE lsa_hdl = NULL;
   LSA_OPERATIONAL_MODE sec_mode;
   NTSTATUS ret, ret2;
   ULONG package_id, size;
@@ -1141,7 +1097,6 @@ subauth (struct passwd *pw)
     {
       debug_printf ("LsaLookupAuthenticationPackage: %d", ret);
       __seterrno_from_win_error (LsaNtStatusToWinError (ret));
-      LsaDeregisterLogonProcess (lsa_hdl);
       goto out;
     }
   /* Create origin. */
@@ -1170,7 +1125,6 @@ subauth (struct passwd *pw)
     {
       debug_printf ("LsaLogonUser: %d", ret);
       __seterrno_from_win_error (LsaNtStatusToWinError (ret));
-      LsaDeregisterLogonProcess (lsa_hdl);
       goto out;
     }
   LsaFreeReturnBuffer (profile);
@@ -1180,10 +1134,253 @@ subauth (struct passwd *pw)
     __seterrno ();
 
 out:
+  if (lsa_hdl)
+    LsaDeregisterLogonProcess (lsa_hdl);
   pop_self_privilege ();
   if (user_token)
     CloseHandle (user_token);
   return primary_token;
+}
+#endif
+
+HANDLE
+lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
+{
+  cygsidlist tmp_gsids (cygsidlist_auto, 12);
+  cygpsid pgrpsid;
+  LSA_STRING name;
+  HANDLE lsa_hdl = NULL, lsa;
+  LSA_OPERATIONAL_MODE sec_mode;
+  NTSTATUS ret, ret2;
+  ULONG package_id, size;
+  LUID auth_luid = SYSTEM_LUID;
+  struct {
+    LSA_STRING str;
+    CHAR buf[16];
+  } origin;
+  cyglsa_t *authinf = NULL;
+  ULONG authinf_size;
+  TOKEN_SOURCE ts;
+  PCYG_TOKEN_GROUPS gsids = NULL;
+  PTOKEN_PRIVILEGES privs = NULL;
+  PACL dacl = NULL;
+  PVOID profile = NULL;
+  LUID luid;
+  QUOTA_LIMITS quota;
+  size_t psize = 0, gsize = 0, dsize = 0;
+  OFFSET offset, sids_offset;
+  int tmpidx, non_well_known_cnt;
+
+  HANDLE user_token = NULL;
+
+  push_self_privilege (SE_TCB_PRIV, true);
+
+  /* Register as logon process. */
+  str2lsa (name, "Cygwin");
+  SetLastError (0);
+  ret = LsaRegisterLogonProcess (&name, &lsa_hdl, &sec_mode);
+  if (ret != STATUS_SUCCESS)
+    {
+      debug_printf ("LsaRegisterLogonProcess: %p", ret);
+      __seterrno_from_win_error (LsaNtStatusToWinError (ret));
+      goto out;
+    }
+  else if (GetLastError () == ERROR_PROC_NOT_FOUND)
+    {
+      debug_printf ("Couldn't load Secur32.dll");
+      goto out;
+    }
+  /* Get handle to our own LSA package. */
+  str2lsa (name, CYG_LSA_PKGNAME);
+  ret = LsaLookupAuthenticationPackage (lsa_hdl, &name, &package_id);
+  if (ret != STATUS_SUCCESS)
+    {
+      debug_printf ("LsaLookupAuthenticationPackage: %p", ret);
+      __seterrno_from_win_error (LsaNtStatusToWinError (ret));
+      goto out;
+    }
+
+  /* Open policy object. */
+  if ((lsa = open_local_policy ()) == INVALID_HANDLE_VALUE)
+    goto out;
+
+  /* Create origin. */
+  str2buf2lsa (origin.str, origin.buf, "Cygwin");
+  /* Create token source. */
+  memcpy (ts.SourceName, "Cygwin.1", 8);
+  ts.SourceIdentifier.HighPart = 0;
+  ts.SourceIdentifier.LowPart = 0x0103;
+
+  /* Create list of groups, the user is member in. */
+  int auth_pos;
+  if (new_groups.issetgroups ())
+    get_setgroups_sidlist (tmp_gsids, usersid, pw, NULL, new_groups, auth_luid,
+			   auth_pos);
+  else if (!get_initgroups_sidlist (tmp_gsids, usersid, new_groups.pgsid, pw,
+				    NULL, auth_luid, auth_pos))
+    goto out;
+  /* The logon SID entry is not generated automatically on Windows 2000
+     and earlier for some reason.  So add fake logon sid here, which is
+     filled with logon id values in the authentication package. */
+  if (wincap.needs_logon_sid_in_sid_list ())
+    tmp_gsids += fake_logon_sid;
+
+  tmp_gsids.debug_print ("tmp_gsids");
+
+  /* Evaluate size of TOKEN_GROUPS list */
+  non_well_known_cnt =  tmp_gsids.non_well_known_count ();
+  gsize = sizeof (DWORD) + non_well_known_cnt * sizeof (SID_AND_ATTRIBUTES);
+  tmpidx = -1;
+  for (int i = 0; i < non_well_known_cnt; ++i)
+    if ((tmpidx = tmp_gsids.next_non_well_known_sid (tmpidx)) >= 0)
+      gsize += GetLengthSid (tmp_gsids.sids[tmpidx]);
+
+  /* Retrieve list of privileges of that user. */
+  if (!(privs = get_priv_list (lsa, usersid, tmp_gsids, psize)))
+    goto out;
+
+  /* Create DefaultDacl. */
+  dsize = sizeof (ACL) + 3 * sizeof (ACCESS_ALLOWED_ACE)
+	  + GetLengthSid (usersid)
+	  + GetLengthSid (well_known_admins_sid)
+	  + GetLengthSid (well_known_system_sid);
+  dacl = (PACL) alloca (dsize);
+  if (!InitializeAcl (dacl, dsize, ACL_REVISION))
+    goto out;
+  if (!AddAccessAllowedAce (dacl, ACL_REVISION, GENERIC_ALL, usersid))
+    goto out;
+  if (!AddAccessAllowedAce (dacl, ACL_REVISION, GENERIC_ALL,
+			    well_known_admins_sid))
+    goto out;
+  if (!AddAccessAllowedAce (dacl, ACL_REVISION, GENERIC_ALL,
+			    well_known_system_sid))
+    goto out;
+
+  /* Evaluate authinf size and allocate authinf. */
+  authinf_size = (authinf->data - (PBYTE) authinf);
+  authinf_size += GetLengthSid (usersid);	    /* User SID */
+  authinf_size += gsize;			    /* Groups + Group SIDs */
+  /* When trying to define the admins group as primary group on Vista,
+     LsaLogonUser fails with error STATUS_INVALID_OWNER.  As workaround
+     we define "Local" as primary group here.  First, this adds the otherwise
+     missing "Local" group to the group list and second, seteuid32
+     sets the primary group to the group set in /etc/passwd anyway. */
+  pgrpsid = well_known_local_sid;
+  authinf_size += GetLengthSid (pgrpsid);	    /* Primary Group SID */
+
+  authinf_size += psize;			    /* Privileges */
+  authinf_size += 0;				    /* Owner SID */
+  authinf_size += dsize;			    /* Default DACL */
+
+  authinf = (cyglsa_t *) alloca (authinf_size);
+  authinf->inf_size = authinf_size - ((PBYTE) &authinf->inf - (PBYTE) authinf);
+
+  authinf->magic = CYG_LSA_MAGIC;
+
+  extract_nt_dom_user (pw, authinf->domain, authinf->username);
+
+  /* Store stuff in authinf with offset relative to start of "inf" member,
+     instead of using pointers. */
+  offset = authinf->data - (PBYTE) &authinf->inf;
+
+  authinf->inf.ExpirationTime.LowPart = 0xffffffffL;
+  authinf->inf.ExpirationTime.HighPart = 0x7fffffffL;
+  /* User SID */
+  authinf->inf.User.User.Sid = offset;
+  authinf->inf.User.User.Attributes = 0;
+  CopySid (GetLengthSid (usersid), (PSID) ((PBYTE) &authinf->inf + offset),
+	   usersid);
+  offset += GetLengthSid (usersid);
+  /* Groups */
+  authinf->inf.Groups = offset;
+  gsids = (PCYG_TOKEN_GROUPS) ((PBYTE) &authinf->inf + offset);
+  sids_offset = offset + sizeof (ULONG) + non_well_known_cnt
+					  * sizeof (SID_AND_ATTRIBUTES);
+  gsids->GroupCount = non_well_known_cnt;
+  /* Group SIDs */
+  tmpidx = -1;
+  for (int i = 0; i < non_well_known_cnt; ++i)
+    {
+      if ((tmpidx = tmp_gsids.next_non_well_known_sid (tmpidx)) < 0)
+        break;
+      gsids->Groups[i].Sid = sids_offset;
+      gsids->Groups[i].Attributes = SE_GROUP_MANDATORY
+				    | SE_GROUP_ENABLED_BY_DEFAULT
+				    | SE_GROUP_ENABLED;
+      /* Mark logon SID as logon SID :) */
+      if (wincap.needs_logon_sid_in_sid_list ()
+	  && tmp_gsids.sids[tmpidx] == fake_logon_sid)
+        gsids->Groups[i].Attributes += SE_GROUP_LOGON_ID;
+      CopySid (GetLengthSid (tmp_gsids.sids[tmpidx]),
+	       (PSID) ((PBYTE) &authinf->inf + sids_offset),
+	       tmp_gsids.sids[tmpidx]);
+      sids_offset += GetLengthSid (tmp_gsids.sids[tmpidx]);
+    }
+  offset += gsize;
+  /* Primary Group SID */
+  authinf->inf.PrimaryGroup.PrimaryGroup = offset;
+  CopySid (GetLengthSid (pgrpsid), (PSID) ((PBYTE) &authinf->inf + offset),
+	   pgrpsid);
+  offset += GetLengthSid (pgrpsid);
+  /* Privileges */
+  authinf->inf.Privileges = offset;
+  memcpy ((PBYTE) &authinf->inf + offset, privs, psize);
+  offset += psize;
+  /* Owner */
+  authinf->inf.Owner.Owner = 0;
+  /* Default DACL */
+  authinf->inf.DefaultDacl.DefaultDacl = offset;
+  memcpy ((PBYTE) &authinf->inf + offset, dacl, dsize);
+
+  authinf->checksum = CYGWIN_VERSION_MAGIC (CYGWIN_VERSION_DLL_MAJOR,
+					    CYGWIN_VERSION_DLL_MINOR);
+  PDWORD csp = (PDWORD) &authinf->username;
+  PDWORD csp_end = (PDWORD) ((PBYTE) authinf + authinf_size);
+  while (csp < csp_end)
+    authinf->checksum += *csp++;
+
+  /* Try to logon... */
+  ret = LsaLogonUser (lsa_hdl, (PLSA_STRING) &origin, Interactive, package_id,
+		      authinf, authinf_size, NULL, &ts, &profile, &size, &luid,
+		      &user_token, &quota, &ret2);
+  if (ret != STATUS_SUCCESS)
+    {
+      debug_printf ("LsaLogonUser: %p", ret);
+      __seterrno_from_win_error (LsaNtStatusToWinError (ret));
+      goto out;
+    }
+  if (profile)
+    LsaFreeReturnBuffer (profile);
+
+  if (wincap.has_mandatory_integrity_control ())
+    {
+      typedef struct _TOKEN_LINKED_TOKEN
+      {
+	HANDLE LinkedToken;
+      } TOKEN_LINKED_TOKEN, *PTOKEN_LINKED_TOKEN;
+#     define TokenLinkedToken ((TOKEN_INFORMATION_CLASS) 19)
+
+      TOKEN_LINKED_TOKEN linked;
+
+      if (GetTokenInformation (user_token, TokenLinkedToken,
+			       (PVOID) &linked, sizeof linked, &size))
+	{
+	  debug_printf ("Linked Token: %lu", linked.LinkedToken);
+	  if (linked.LinkedToken)
+	    user_token = linked.LinkedToken;
+	}
+    }
+
+out:
+  if (privs)
+    free (privs);
+  close_local_policy (lsa);
+  if (lsa_hdl)
+    LsaDeregisterLogonProcess (lsa_hdl);
+  pop_self_privilege ();
+
+  debug_printf ("0x%x = lsaauth ()", user_token);
+  return user_token;
 }
 
 /* read_sd reads a security descriptor from a file.

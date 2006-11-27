@@ -348,7 +348,7 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
       cygsid sid;
       for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
 	if (sid.getfromgr (gr))
-	  for (int pg = 0; pg < cygheap->user.groups.sgsids.count; ++pg)
+	  for (int pg = 0; pg < cygheap->user.groups.sgsids.count (); ++pg)
 	    if (sid == cygheap->user.groups.sgsids.sids[pg] &&
 		sid != well_known_world_sid)
 	      {
@@ -484,10 +484,10 @@ initgroups32 (const char *name, __gid32_t gid)
       if (!get_server_groups (tmp_gsids, usersid, pw))
 	goto out;
       tmp_gsids += grpsid;
-      cygsidlist new_gsids (cygsidlist_alloc, tmp_gsids.count);
-      for (int i = 0; i < tmp_gsids.count; i++)
+      cygsidlist new_gsids (cygsidlist_alloc, tmp_gsids.count ());
+      for (int i = 0; i < tmp_gsids.count (); i++)
 	new_gsids.sids[i] = tmp_gsids.sids[i];
-      new_gsids.count = tmp_gsids.count;
+      new_gsids.count (tmp_gsids.count ());
       cygheap->user.groups.update_supp (new_gsids);
     }
   ret = 0;

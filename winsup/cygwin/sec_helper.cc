@@ -67,15 +67,8 @@ MKSID (well_known_system_sid, "S-1-5-18",
 MKSID (well_known_admins_sid, "S-1-5-32-544",
        SECURITY_NT_AUTHORITY, 2, SECURITY_BUILTIN_DOMAIN_RID,
 				 DOMAIN_ALIAS_RID_ADMINS);
-
-#define SECURITY_MANDATORY_INTEGRITY_AUTHORITY       {0,0,0,0,0,16}
-
-MKSID (mandatory_medium_integrity_sid, "S-1-64-8192",
-       SECURITY_MANDATORY_INTEGRITY_AUTHORITY, 1, 8192);
-MKSID (mandatory_high_integrity_sid, "S-1-64-12288",
-       SECURITY_MANDATORY_INTEGRITY_AUTHORITY, 1, 12288);
-MKSID (mandatory_system_integrity_sid, "S-1-64-16384",
-       SECURITY_MANDATORY_INTEGRITY_AUTHORITY, 1, 16384);
+MKSID (fake_logon_sid, "S-1-5-5-0-0",
+       SECURITY_NT_AUTHORITY, 3, SECURITY_LOGON_IDS_RID, 0, 0);
 
 bool
 cygpsid::operator== (const char *nsidstr) const
@@ -135,7 +128,7 @@ cygpsid::string (char *nsidstr) const
 }
 
 PSID
-cygsid::get_sid (DWORD s, DWORD cnt, DWORD *r)
+cygsid::get_sid (DWORD s, DWORD cnt, DWORD *r, bool well_known)
 {
   DWORD i;
   SID_IDENTIFIER_AUTHORITY sid_auth = {0,0,0,0,0,0};
@@ -150,11 +143,12 @@ cygsid::get_sid (DWORD s, DWORD cnt, DWORD *r)
   InitializeSid (psid, &sid_auth, cnt);
   for (i = 0; i < cnt; ++i)
     memcpy ((char *) psid + 8 + sizeof (DWORD) * i, &r[i], sizeof (DWORD));
+  well_known_sid = well_known;
   return psid;
 }
 
 const PSID
-cygsid::getfromstr (const char *nsidstr)
+cygsid::getfromstr (const char *nsidstr, bool well_known)
 {
   char *lasts;
   DWORD s, cnt = 0;
@@ -166,7 +160,7 @@ cygsid::getfromstr (const char *nsidstr)
       while (cnt < 8 && *lasts == '-')
 	r[cnt++] = strtoul (lasts + 1, &lasts, 10);
       if (!*lasts)
-	return get_sid (s, cnt, r);
+	return get_sid (s, cnt, r, well_known);
     }
   return psid = NO_SID;
 }
@@ -184,6 +178,48 @@ cygsid::getfromgr (const struct __group32 *gr)
   char *sp = (gr && gr->gr_passwd) ? gr->gr_passwd : NULL;
   return (*this = sp) != NULL;
 }
+
+cygsid *
+cygsidlist::alloc_sids (int n)
+{
+  if (n > 0)
+    return (cygsid *) cmalloc (HEAP_STR, n * sizeof (cygsid));
+  else
+    return NULL;
+}
+
+void
+cygsidlist::free_sids ()
+{
+  if (sids)
+    cfree (sids);
+  sids = NULL;
+  cnt = maxcnt = 0;
+  type = cygsidlist_empty;
+}
+
+BOOL
+cygsidlist::add (const PSID nsi, bool well_known)
+{ 
+  if (contains (nsi)) 
+    return TRUE;
+  if (cnt >= maxcnt)
+    {
+      cygsid *tmp = new cygsid [2 * maxcnt];
+      if (!tmp) 
+	return FALSE;
+      maxcnt *= 2;
+      for (int i = 0; i < cnt; ++i)
+	tmp[i] = sids[i];
+      delete [] sids;
+      sids = tmp;
+    }
+  if (well_known) 
+    sids[cnt++] *= nsi;
+  else
+    sids[cnt++] = nsi;
+  return TRUE;
+} 
 
 bool
 get_sids_info (cygpsid owner_sid, cygpsid group_sid, __uid32_t * uidret, __gid32_t * gidret)

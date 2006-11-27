@@ -70,6 +70,7 @@ struct wincaps
   unsigned has_exclusiveaddruse				: 1;
   unsigned has_buggy_restart_scan			: 1;
   unsigned has_mandatory_integrity_control		: 1;
+  unsigned needs_logon_sid_in_sid_list			: 1;
 };
 
 class wincapc
@@ -146,6 +147,7 @@ public:
   bool	IMPLEMENT (has_exclusiveaddruse)
   bool	IMPLEMENT (has_buggy_restart_scan)
   bool	IMPLEMENT (has_mandatory_integrity_control)
+  bool	IMPLEMENT (needs_logon_sid_in_sid_list)
 
 #undef IMPLEMENT
 };

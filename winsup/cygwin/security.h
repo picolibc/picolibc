@@ -80,11 +80,12 @@ public:
 
 class cygsid : public cygpsid {
   char sbuf[MAX_SID_LEN];
+  bool well_known_sid;
 
-  const PSID getfromstr (const char *nsidstr);
-  PSID get_sid (DWORD s, DWORD cnt, DWORD *r);
+  const PSID getfromstr (const char *nsidstr, bool well_known);
+  PSID get_sid (DWORD s, DWORD cnt, DWORD *r, bool well_known);
 
-  inline const PSID assign (const PSID nsid)
+  inline const PSID assign (const PSID nsid, bool well_known)
     {
       if (!nsid)
 	psid = NO_SID;
@@ -92,21 +93,32 @@ class cygsid : public cygpsid {
 	{
 	  psid = (PSID) sbuf;
 	  CopySid (MAX_SID_LEN, psid, nsid);
+	  well_known_sid = well_known;
 	}
       return psid;
     }
 
 public:
   inline operator const PSID () { return psid; }
+  inline bool is_well_known_sid () { return well_known_sid; }
 
+  /* Both, = and *= are assignment operators.  = creates a "normal" SID,
+     *= marks the SID as being a well-known SID.  This difference is
+     important when creating a SID list for LSA authentication. */
   inline const PSID operator= (cygsid &nsid)
-    { return assign (nsid); }
+    { return assign (nsid, nsid.well_known_sid); }
   inline const PSID operator= (const PSID nsid)
-    { return assign (nsid); }
+    { return assign (nsid, false); }
   inline const PSID operator= (const char *nsidstr)
-    { return getfromstr (nsidstr); }
+    { return getfromstr (nsidstr, false); }
+  inline const PSID operator*= (cygsid &nsid)
+    { return assign (nsid, true); }
+  inline const PSID operator*= (const PSID nsid)
+    { return assign (nsid, true); }
+  inline const PSID operator*= (const char *nsidstr)
+    { return getfromstr (nsidstr, true); }
 
-  inline cygsid () : cygpsid ((PSID) sbuf) {}
+  inline cygsid () : cygpsid ((PSID) sbuf), well_known_sid (false) {}
   inline cygsid (const PSID nsid) { *this = nsid; }
   inline cygsid (const char *nstrsid) { *this = nstrsid; }
 
@@ -114,21 +126,28 @@ public:
 
   BOOL getfrompw (const struct passwd *pw);
   BOOL getfromgr (const struct __group32 *gr);
+
+  void debug_print (const char *prefix = NULL) const
+    {
+      char buf[256] __attribute__ ((unused));
+      debug_printf ("%s %s%s", prefix ?: "", string (buf) ?: "NULL", well_known_sid ? " (*)" : " (+)");
+    }
 };
 
 typedef enum { cygsidlist_empty, cygsidlist_alloc, cygsidlist_auto } cygsidlist_type;
 class cygsidlist {
-  int maxcount;
+  int maxcnt;
+  int cnt;
+
+  BOOL add (const PSID nsi, bool well_known); /* Only with auto for now */
+
 public:
-  int count;
   cygsid *sids;
   cygsidlist_type type;
 
   cygsidlist (cygsidlist_type t, int m)
+  : maxcnt (m), cnt (0), type (t)
     {
-      type = t;
-      count = 0;
-      maxcount = m;
       if (t == cygsidlist_alloc)
 	sids = alloc_sids (m);
       else
@@ -136,49 +155,56 @@ public:
     }
   ~cygsidlist () { if (type == cygsidlist_auto) delete [] sids; }
 
-  BOOL add (const PSID nsi) /* Only with auto for now */
-    {
-      if (count >= maxcount)
-	{
-	  cygsid *tmp = new cygsid [ 2 * maxcount];
-	  if (!tmp)
-	    return FALSE;
-	  maxcount *= 2;
-	  for (int i = 0; i < count; ++i)
-	    tmp[i] = sids[i];
-	  delete [] sids;
-	  sids = tmp;
-	}
-      sids[count++] = nsi;
-      return TRUE;
-    }
-  BOOL add (cygsid &nsi) { return add ((PSID) nsi); }
-  BOOL add (const char *sidstr)
-    { cygsid nsi (sidstr); return add (nsi); }
   BOOL addfromgr (struct __group32 *gr) /* Only with alloc */
-    { return sids[count].getfromgr (gr) && ++count; }
+    { return sids[cnt].getfromgr (gr) && ++cnt; }
 
-  BOOL operator+= (cygsid &si) { return add (si); }
-  BOOL operator+= (const char *sidstr) { return add (sidstr); }
-  BOOL operator+= (const PSID psid) { return add (psid); }
+  /* += adds a "normal" SID, *= adds a well-known SID.  See comment in class
+     cygsid above. */
+  BOOL operator+= (cygsid &si) { return add ((PSID) si, false); }
+  BOOL operator+= (const char *sidstr) { cygsid nsi (sidstr);
+  					 return add ((PSID) nsi, false); }
+  BOOL operator+= (const PSID psid) { return add (psid, false); }
+  BOOL operator*= (cygsid &si) { return add ((PSID) si, true); }
+  BOOL operator*= (const char *sidstr) { cygsid nsi (sidstr);
+  					 return add ((PSID) nsi, true); }
+  BOOL operator*= (const PSID psid) { return add (psid, true); }
+
+  void count (int ncnt)
+    { cnt = ncnt; }
+  int count () const { return cnt; }
+  int non_well_known_count () const
+    {
+      int wcnt = 0;
+      for (int i = 0; i < cnt; ++i)
+        if (!sids[i].is_well_known_sid ())
+	  ++wcnt;
+      return wcnt;
+    }
 
   int position (const PSID sid) const
     {
-      for (int i = 0; i < count; ++i)
+      for (int i = 0; i < cnt; ++i)
 	if (sids[i] == sid)
 	  return i;
       return -1;
     }
 
+  int next_non_well_known_sid (int idx)
+    {
+      while (++idx < cnt)
+        if (!sids[idx].is_well_known_sid ())
+	  return idx;
+      return -1;
+    }
   BOOL contains (const PSID sid) const { return position (sid) >= 0; }
   cygsid *alloc_sids (int n);
   void free_sids ();
   void debug_print (const char *prefix = NULL) const
     {
       debug_printf ("-- begin sidlist ---");
-      if (!count)
+      if (!cnt)
 	debug_printf ("No elements");
-      for (int i = 0; i < count; ++i)
+      for (int i = 0; i < cnt; ++i)
 	sids[i].debug_print (prefix);
       debug_printf ("-- ende sidlist ---");
     }
@@ -256,9 +282,7 @@ extern cygpsid well_known_authenticated_users_sid;
 extern cygpsid well_known_this_org_sid;
 extern cygpsid well_known_system_sid;
 extern cygpsid well_known_admins_sid;
-extern cygpsid mandatory_medium_integrity_sid;
-extern cygpsid mandatory_high_integrity_sid;
-extern cygpsid mandatory_system_integrity_sid;
+extern cygpsid fake_logon_sid;
 
 /* Order must be same as cygpriv in sec_helper.cc. */
 enum cygpriv_idx {
@@ -348,11 +372,15 @@ struct _UNICODE_STRING;
 void __stdcall str2buf2uni (_UNICODE_STRING &, WCHAR *, const char *) __attribute__ ((regparm (3)));
 void __stdcall str2uni_cat (_UNICODE_STRING &, const char *) __attribute__ ((regparm (2)));
 
-/* Try a subauthentication. */
-HANDLE subauth (struct passwd *pw);
-/* Try creating a token directly. */
+/* Function creating a token by calling NtCreateToken. */
 HANDLE create_token (cygsid &usersid, user_groups &groups, struct passwd * pw,
 		     HANDLE subauth_token);
+#if 0
+/* Subauthentication function. */
+HANDLE subauth (struct passwd *pw);
+#endif
+/* LSA authentication function. */
+HANDLE lsaauth (cygsid &, user_groups &, struct passwd *);
 /* Verify an existing token */
 bool verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern = NULL);
 /* Get groups of a user */
