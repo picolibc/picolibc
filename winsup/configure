@@ -275,7 +275,7 @@ ac_unique_file="Makefile.in"
 ac_subdirs_all="$ac_subdirs_all cygwin"
 ac_subdirs_all="$ac_subdirs_all mingw"
 ac_subdirs_all="$ac_subdirs_all w32api"
-ac_subdirs_all="$ac_subdirs_all subauth"
+ac_subdirs_all="$ac_subdirs_all lsaauth"
 ac_subdirs_all="$ac_subdirs_all cygserver"
 ac_subdirs_all="$ac_subdirs_all utils doc"
 ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CC ac_ct_CC CFLAGS LDFLAGS CPPFLAGS EXEEXT OBJEXT CXX ac_ct_CXX CXXFLAGS subdirs INSTALL_LICENSE SET_MAKE LIBOBJS LTLIBOBJS'
@@ -3095,12 +3095,15 @@ case "$with_cross_host" in
     # if test -d $srcdir/zlib; then
     #   AC_CONFIG_SUBDIRS(zlib)
     # fi
-    if test -d $srcdir/subauth; then
+    if test -d $srcdir/lsaauth; then
 
 
-subdirs="$subdirs subauth"
+subdirs="$subdirs lsaauth"
 
     fi
+    # if test -d $srcdir/subauth; then
+    #   AC_CONFIG_SUBDIRS(subauth)
+    # fi
     if test -n "$use_cygserver" -a -d $srcdir/cygserver; then
 
 
@@ -3260,10 +3263,9 @@ for ac_i in : $LIBOBJS; do test "x$ac_i" = x: && continue
   # 1. Remove the extension, and $U if already installed.
   ac_i=`echo "$ac_i" |
 	 sed 's/\$U\././;s/\.o$//;s/\.obj$//'`
-  # 2. Prepend LIBOBJDIR.  When used with automake>=1.10 LIBOBJDIR
-  #    will be set to the directory where LIBOBJS objects are built.
-  ac_libobjs="$ac_libobjs \${LIBOBJDIR}$ac_i\$U.$ac_objext"
-  ac_ltlibobjs="$ac_ltlibobjs \${LIBOBJDIR}$ac_i"'$U.lo'
+  # 2. Add them.
+  ac_libobjs="$ac_libobjs $ac_i\$U.$ac_objext"
+  ac_ltlibobjs="$ac_ltlibobjs $ac_i"'$U.lo'
 done
 LIBOBJS=$ac_libobjs
 
