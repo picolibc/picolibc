@@ -1,3 +1,17 @@
+2006-11-28  Kazu Hirata  <kazu@codesourcery.com>
+
+	bfd/
+	* elf32-m68k.c (elf32_m68k_object_p,
+	elf32_m68k_print_private_bfd_data): Use EF_M68K_ARCH_MASK to
+	extract architecture mask.
+
+	binutils/
+	* readelf.c (get_machine_flags): Use EF_M68K_ARCH_MASK to
+	extract architecture mask.
+
+	include/elf/
+	* m68k.h (EF_M68K_ARCH_MASK): New.
+
 2006-11-19  Nathan Sidwell  <nathan@codesourcery.com>
 
 	opcodes/

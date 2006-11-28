@@ -52,12 +52,16 @@ START_RELOC_NUMBERS (elf_m68k_reloc_type)
   RELOC_NUMBER (R_68K_GNU_VTENTRY, 24)
 END_RELOC_NUMBERS (R_68K_max)
 
+/* We use the top 24 bits to encode information about the
+   architecture variant.  */
 #define EF_M68K_CPU32    0x00810000
 #define EF_M68K_M68000   0x01000000
 #define EF_M68K_CFV4E    0x00008000
+#define EF_M68K_ARCH_MASK (EF_M68K_M68000 | EF_M68K_CPU32 | EF_M68K_CFV4E)
 
 /* We use the bottom 8 bits to encode information about the
-   coldfire variant.  */
+   coldfire variant.  If we use any of these bits, the top 24 bits are
+   either 0 or EF_M68K_CFV4E.  */
 #define EF_M68K_CF_ISA_MASK	0x0F  /* Which ISA */
 #define EF_M68K_CF_ISA_A_NODIV	0x01  /* ISA A except for div */
 #define EF_M68K_CF_ISA_A	0x02
