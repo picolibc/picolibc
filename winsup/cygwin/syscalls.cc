@@ -2140,8 +2140,7 @@ seteuid32 (__uid32_t uid)
 	    }
 #else
 	  debug_printf ("lsaauth failed, try create_token.");
-	  new_token = create_token (usersid, groups, pw_new,
-				    INVALID_HANDLE_VALUE);
+	  new_token = create_token (usersid, groups, pw_new, NULL);
 	  if (new_token == INVALID_HANDLE_VALUE)
 	    {
 	      debug_printf ("create_token failed, bail out of here");
