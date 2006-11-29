@@ -1,4 +1,9 @@
-2006-11-29  Kazunori Asayama  <asayama@sm.sony.co.jp>
+2006-11-29  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/fvwrite.c (__sfvwrite_r): Avoid off-by-one error in
+	asprintf, as well as quadratic realloc behavior.
+
+2006-11-29  Kazunori Asayama  <asayama@sm.sony.co.jpi
 
 	* libc/machine/spu/memset.c: Fix type of explicit cast.
 	* libc/machine/spu/strncmp.c: Add explicit cast.
