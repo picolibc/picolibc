@@ -661,6 +661,14 @@ fhandler_base::open (int flags, mode_t mode)
       if ((c && c[1] == '.') || *get_win32_name () == '.')
 	file_attributes |= FILE_ATTRIBUTE_HIDDEN;
 #endif
+      /* Starting with Windows 2000, when trying to overwrite an already
+	 existing file with FILE_ATTRIBUTE_HIDDEN and/or FILE_ATTRIBUTE_SYSTEM
+	 attribute set, CreateFile fails with ERROR_ACCESS_DENIED.
+	 Per MSDN you have to create the file with the same attributes as
+	 already specified for the file. */
+      if (has_attribute (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM))
+	file_attributes |= pc.file_attributes ();
+
       /* If the file should actually be created and ntsec is on,
 	 set files attributes. */
       if (allow_ntsec && has_acls ())

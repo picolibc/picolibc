@@ -81,7 +81,7 @@ struct _sigcommune
   void *_si_read_handle;
   void *_si_write_handle;
   void *_si_process_handle;
-  union
+  __extension__ union
   {
     int _si_fd;
     void *_si_pipe_fhandler;
@@ -97,7 +97,7 @@ typedef struct
   uid_t si_uid;				/* sender's uid */
   int si_errno;				/* errno associated with signal */
 
-  union
+  __extension__ union
   {
     __uint32_t __pad[32];		/* plan for future growth */
     struct _sigcommune _si_commune;	/* cygwin ipc */
@@ -120,7 +120,7 @@ typedef struct
     };
 
     /* SIGCHLD */
-    struct
+    __extension__ struct
     {
       int si_status;			/* exit code */
       clock_t si_utime;			/* user time */
@@ -194,7 +194,7 @@ typedef void (*_sig_func_ptr)(int);
 
 struct sigaction
 {
-  union
+  __extension__ union
   {
     _sig_func_ptr sa_handler;  		/* SIG_DFL, SIG_IGN, or pointer to a function */
     void  (*sa_sigaction) ( int, siginfo_t *, void * );

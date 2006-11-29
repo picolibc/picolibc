@@ -1,3 +1,20 @@
+2006-11-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (create_token): Revert erroneous change to test
+	subauth_token for INVAILD_HANDLE_VALUE.
+	* syscalls.cc (seteuid32): Set create_token's subauth_token parameter
+	back to NULL.
+
+2006-11-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::open): Fix previous patch to handle the
+	SYSTEM attribute as well.
+
+2006-11-27  Christopher Faylor  <cgf@timesys.com>
+
+	* include/cygwin/signal.h: Add __extension__ to various anonymous
+	unions and structs.  (thanks to V.Haisman)
+
 2006-11-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h: Bump DLL minor version number to 23.
