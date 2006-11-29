@@ -1,3 +1,15 @@
+2006-11-29  Kazu Hirata  <kazu@codesourcery.com>
+
+	bfd/
+	* elf32-m68k.c (elf32_m68k_object_p): Treat the default case
+	as ColdFire.
+	(elf32_m68k_merge_private_bfd_data): Use EF_M68K_ARCH_MASK to
+	extract architecture mask.  Treat the default case as ColdFire.
+
+	binutils/
+	* readelf.c (get_machine_flags): Treat the default case as
+	ColdFire.
+
 2006-11-28  Kazu Hirata  <kazu@codesourcery.com>
 
 	bfd/
