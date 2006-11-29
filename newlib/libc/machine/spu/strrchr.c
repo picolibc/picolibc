@@ -62,8 +62,8 @@ char * strrchr(const char *s, int c)
   cmp_c = spu_and(spu_gather(spu_cmpeq(data, vc)), mask);
   cmp_0 = spu_and(spu_gather(spu_cmpeq(data, 0)), mask);
 
-  res_ptr = spu_splats(0);
-  res_cmp = spu_splats(0);
+  res_ptr = spu_splats(0U);
+  res_cmp = spu_splats(0U);
 
   while (spu_extract(cmp_0, 0) == 0) {
     cmp = spu_cmpeq(cmp_c, 0);

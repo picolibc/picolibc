@@ -1,3 +1,10 @@
+2006-11-29  Kazunori Asayama  <asayama@sm.sony.co.jp>
+
+	* libc/machine/spu/memset.c: Fix type of explicit cast.
+	* libc/machine/spu/strncmp.c: Add explicit cast.
+	* libc/machine/spu/strrchr.c: Ditto.
+	* libc/machine/spu/strspn.c: Ditto.
+
 2006-11-22  Luca Barbato  <lu_zero@gentoo.org>
 
 	* libc/machine/spu/memcpy.c: Use spu_splats, explicit cast.

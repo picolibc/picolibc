@@ -40,7 +40,7 @@ void * memset(void *s, int c, size_t n)
 {
   int skip, cnt, i;
   vec_uchar16 *vs;
-  vec_uchar16 vc, mask, one = spu_splats((unsigned int)-1);
+  vec_uchar16 vc, mask, one = spu_splats((unsigned char)-1);
 
   vs = (vec_uchar16 *)(s);
   vc = spu_splats((unsigned char)c);

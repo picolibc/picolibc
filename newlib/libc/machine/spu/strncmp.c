@@ -50,7 +50,7 @@ int strncmp(const char *s1, const char *s2, size_t n)
   vec_uchar16 data1A, data1B, data1, data2A, data2B, data2;
   vec_uchar16 *ptr1, *ptr2;
 
-  data1 = data2 = spu_splats(0);
+  data1 = data2 = spu_splats((unsigned char)0);
 
   ptr1 = (vec_uchar16 *)s1;
   ptr2 = (vec_uchar16 *)s2;
