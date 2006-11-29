@@ -1,3 +1,117 @@
+2006-11-29  Mark Shinwell  <shinwell@codesourcery.com>
+
+	Backport from mainline:
+
+	2006-07-29  Richard Sandiford  <richard@codesourcery.com>
+
+	ld/
+	* Makefile.am (eelf32b4300.c): Update dependencies.
+	(eelf32bmip.c): Likewise.
+	(eelf32bsmip.c): Likewise.
+	(eelf32btsmip.c): Likewise.
+	(eelf32btsmipn32.c): Likewise.
+	(eelf32ltsmip.c): Likewise.
+	(eelf32ltsmipn32.c): Likewise.
+	(eelf32ebmip.c): Likewise.
+	(eelf32ebmipvxworks.c): Likewise.
+	(eelf32elmip.c): Likewise.
+	(eelf32elmipvxworks.c): Likewise.
+	(eelf32bmipn32.c): Likewise.
+	(eelf32lmip.c): Likewise.
+	(eelf32mipswindiss.c): Likewise.
+	(eelf32lsmip.c): Likewise.
+	(eelf64bmip.c): Likewise.
+	(eelf64btsmip.c): Likewise.
+	(eelf64ltsmip.c): Likewise.
+	(emipsbig.c): Likewise.  Canonicalize ${GENSCRIPTS} line.
+	(emipsbsd.c): Likewise.
+	(emipsidt.c): Update dependencies.
+	(emipsidtl.c): Likewise.
+	(emipslit.c): Likewise.
+	(emipslnews.c): Likewise.
+	(emipspe.c): Likewise.  Fix ${GENSCRIPTS} invocation.
+	* Makefile.in: Regenerate.
+	* emulparams/elf32bmip.sh (EXTRA_EM_FILE): Define.
+	* emulparams/elf32bmipn32-defs.sh (EXTRA_EM_FILE): Likewise.
+	* emultempl/irix.em: Include emultempl/mipself.em.
+	* emultempl/mipself.em: New file.
+
+	ld/testsuite/
+	* ld-mips-elf/hash1.s, ld-mips-elf/hash1a.d,
+	* ld-mips-elf/hash1b.d, ld-mips-elf/hash1c.d: New tests.
+	* ld-mips-elf/mips-elf.exp: Run them.
+
+	2006-07-14  Jakub Jelinek  <jakub@redhat.com>
+
+	* elflink.c (bfd_elf_size_dynsym_hash_dynstr): Fix cinfo.shift2 value.
+
+	2006-07-10  Jakub Jelinek  <jakub@redhat.com>
+
+	include/
+	* bfdlink.h (struct bfd_link_info): Add emit_hash and
+	emit_gnu_hash bitfields.
+
+	include/elf/
+	* common.h (SHT_GNU_HASH, DT_GNU_HASH): Define.
+
+	ld/
+	* scripttempl/elf.sc: Add .gnu.hash section.
+	* emultempl/elf32.em (OPTION_HASH_STYLE): Define.
+	(gld${EMULATION_NAME}_add_options): Register --hash-style option.
+	(gld${EMULATION_NAME}_handle_option): Handle it.
+	(gld${EMULATION_NAME}_list_options): Document it.
+	* ldmain.c (main): Initialize emit_hash and emit_gnu_hash.
+	* ld.texinfo: Document --hash-style option.
+
+	ld/testsuite/
+	* ld-powerpc/tlsso32.r: Adjust.
+	* ld-powerpc/tlsso32.d: Adjust.
+	* ld-powerpc/tlsso32.g: Adjust.
+	* ld-powerpc/tlsso.r: Adjust.
+	* ld-powerpc/tlsso.g: Adjust.
+	* ld-powerpc/tlstocso.g: Adjust.
+
+	bfd/
+	* elf.c (_bfd_elf_print_private_bfd_data): Handle DT_GNU_HASH.
+	(bfd_section_from_shdr, elf_fake_sections, assign_section_numbers):
+	Handle SHT_GNU_HASH.
+	(special_sections_g): Include .gnu.hash section.
+	(bfd_elf_gnu_hash): New function.
+	* elf-bfd.h (bfd_elf_gnu_hash, _bfd_elf_hash_symbol): New prototypes.
+	(struct elf_backend_data): Add elf_hash_symbol method.
+	* elflink.c (_bfd_elf_link_create_dynamic_sections): Create .hash
+	only if info->emit_hash, create .gnu.hash section if
+	info->emit_gnu_hash.
+	(struct collect_gnu_hash_codes): New type.
+	(elf_collect_gnu_hash_codes, elf_renumber_gnu_hash_syms,
+	_bfd_elf_hash_symbol): New functions.
+	(compute_bucket_count): Don't compute HASHCODES array, instead add
+	that and NSYMS as arguments.  Use bed->s->sizeof_hash_entry
+	instead of bed->s->arch_size / 8.  Fix .hash size estimation.
+	When not optimizing, use the number of hashed symbols rather than
+	dynsymcount.
+	(bfd_elf_size_dynamic_sections): Only add DT_HASH if info->emit_hash,
+	and ADD DT_GNU_HASH if info->emit_gnu_hash.
+	(bfd_elf_size_dynsym_hash_dynstr): Size .hash only if info->emit_hash,
+	adjust compute_bucket_count caller.  Create and populate .gnu.hash
+	section if info->emit_gnu_hash.
+	(elf_link_output_extsym): Only populate .hash section if
+	finfo->hash_sec != NULL.
+	(bfd_elf_final_link): Adjust assertion.  Handle DT_GNU_HASH.
+	* elfxx-target.h (elf_backend_hash_symbol): Define if not yet defined.
+	(elfNN_bed): Add elf_backend_hash_symbol.
+	* elf64-x86-64.c (elf64_x86_64_hash_symbol): New function.
+	(elf_backend_hash_symbol): Define.
+	* elf32-i386.c (elf_i386_hash_symbol): New function.
+	(elf_backend_hash_symbol): Define.
+
+	binutils/
+	* readelf.c (get_dynamic_type): Handle DT_GNU_HASH.
+	(get_section_type_name): Handle SHT_GNU_HASH.
+	(dynamic_info_DT_GNU_HASH): New variable.
+	(process_dynamic_section): Handle DT_GNU_HASH.
+	(process_symbol_table): Print also DT_GNU_HASH histogram.
+
 2006-11-29  Kazu Hirata  <kazu@codesourcery.com>
 
 	bfd/

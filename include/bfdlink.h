@@ -324,6 +324,12 @@ struct bfd_link_info
   /* TRUE if unreferenced sections should be removed.  */
   unsigned int gc_sections: 1;
 
+  /* TRUE if .hash section should be created.  */
+  unsigned int emit_hash: 1;
+
+  /* TRUE if .gnu.hash section should be created.  */
+  unsigned int emit_gnu_hash: 1;
+
   /* What to do with unresolved symbols in an object file.
      When producing executables the default is GENERATE_ERROR.
      When producing shared libraries the default is IGNORE.  The
