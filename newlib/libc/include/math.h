@@ -102,7 +102,7 @@ extern double fmod _PARAMS((double, double));
 #endif /* ! defined (__math_68881) */
 #endif /* ! defined (_REENT_ONLY) */
 
-#ifndef __STRICT_ANSI__
+#if !defined(__STRICT_ANSI__) || defined(__cplusplus)
 
 /* ISO C99 types and macros. */
 
@@ -233,7 +233,7 @@ extern double drem _PARAMS((double, double));
 
 #endif /* ! defined (_REENT_ONLY) */
 
-#endif /* ! defined (__STRICT_ANSI__) */
+#endif /* !defined (__STRICT_ANSI__) || defined(__cplusplus)  */
 
 #if !defined(__STRICT_ANSI__) || defined(__cplusplus)
 
