@@ -24,6 +24,8 @@
 #include <sys/unistd.h>
 #include "local.h"
 
+#define _DEFAULT_ASPRINTF_BUFSIZE 64
+
 /*
  * Allocate a file buffer, or switch to unbuffered I/O.
  * Per the ANSI C standard, ALL tty devices default to line buffered.
@@ -53,7 +55,11 @@ _DEFUN(__smakebuf, (fp),
 #endif
     {
       couldbetty = 0;
-      size = BUFSIZ;
+      /* Check if we are be called by asprintf family for initial buffer.  */
+      if (fp->_flags & __SMBF)
+        size = _DEFAULT_ASPRINTF_BUFSIZE;
+      else
+        size = BUFSIZ;
       /* do not try to optimise fseek() */
       fp->_flags |= __SNPT;
     }
