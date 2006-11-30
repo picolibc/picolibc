@@ -1,3 +1,13 @@
+2006-11-29  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/makebuf.c (__smakebuf): If dealing with
+	an asprintf-family buffer, make the default initial size 64.
+
+2006-11-29  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/fvwrite.c (__sfvwrite_r): Avoid off-by-one error in
+	asprintf, as well as quadratic realloc behavior.
+
 2006-11-14  Eric Blake  <ebb9@byu.net>
 
 	* libc/stdio/vfprintf.c (_vfprintf_r): Support ' flag.
