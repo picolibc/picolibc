@@ -1,3 +1,38 @@
+2006-11-30  Kazu Hirata  <kazu@codesourcery.com>
+
+	bfd/
+	* archures.c (bfd_mach_cpu32_fido): New.
+	(bfd_mach_mcf_isa_a_nodiv, bfd_mach_mcf_isa_a,
+	bfd_mach_mcf_isa_a_mac, bfd_mach_mcf_isa_a_emac,
+	bfd_mach_mcf_isa_aplus, bfd_mach_mcf_isa_aplus_mac,
+	bfd_mach_mcf_isa_aplus_emac, bfd_mach_mcf_isa_b_nousp,
+	bfd_mach_mcf_isa_b_nousp_mac, bfd_mach_mcf_isa_b_nousp_emac,
+	bfd_mach_mcf_isa_b, bfd_mach_mcf_isa_b_mac,
+	bfd_mach_mcf_isa_b_emac, bfd_mach_mcf_isa_b_float,
+	bfd_mach_mcf_isa_b_float_mac, bfd_mach_mcf_isa_b_float_emac):
+	Increment the defined values.
+	* cpu-m68k.c (arch_info_struct): Add en entry for
+	bfd_mach_cpu32_fido.
+	(m68k_arch_features): Add an entry corresponding to
+	bfd_mach_cpu32_fido.
+	(bfd_m68k_compatible): Handle bfd_mach_cpu32_fido.
+	* elf32-m68k.c (elf32_m68k_object_p): Handle
+	EF_M68K_CPU32_FIDO_A.
+	(elf32_m68k_merge_private_bfd_data): Use EF_M68K_CPU32_MASK.
+	(elf32_m68k_print_private_bfd_data): Handle
+	EF_M68K_CPU32_FIDO_A.
+
+	binutils/
+	* readelf.c (get_machine_flags): Handle EF_M68K_CPU32_FIDO_A.
+
+	gas/
+	* config/tc-m68k.c (m68k_elf_final_processing): Handle
+	EF_M68K_CPU32_FIDO_A.
+
+	include/
+	* include/elf/m68k.h (EF_M68K_CPU32_FIDO_A,
+	EF_M68K_CPU32_MASK): New.
+
 2006-11-29  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	Backport:
