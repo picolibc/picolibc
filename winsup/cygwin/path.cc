@@ -215,16 +215,28 @@ pathmatch (const char *path1, const char *path2)
    Right now, normalize_posix_path will just normalize
    those components away, which changes the semantics.  */
 bool
-has_dot_last_component (const char *dir)
+has_dot_last_component (const char *dir, bool test_dot_dot)
 {
   /* SUSv3: . and .. are not allowed as last components in various system
      calls.  Don't test for backslash path separator since that's a Win32
      path following Win32 rules. */
   const char *last_comp = strrchr (dir, '/');
-  return last_comp
-	 && last_comp[1] == '.'
-	 && (last_comp[2] == '\0'
-	     || (last_comp[2] == '.' && last_comp[3] == '\0'));
+  if (!last_comp)
+    last_comp = dir;
+  else {
+    /* Check for trailing slash.  If so, hop back to the previous slash. */
+    if (!last_comp[1])
+      while (last_comp > dir)
+	if (*--last_comp == '/')
+	  break;
+    if (*last_comp == '/')
+      ++last_comp;
+  }
+  return last_comp[0] == '.'
+	 && ((last_comp[1] == '\0' || last_comp[1] == '/')
+	     || (test_dot_dot
+		 && last_comp[1] == '.'
+		 && (last_comp[2] == '\0' || last_comp[2] == '/')));
 }
 
 #define isslash(c) ((c) == '/')
@@ -3199,10 +3211,7 @@ symlink_info::posixify (char *srcbuf)
         {
 	  char cvtbuf[CYG_MAX_PATH + 6];
 
-	  if (cygheap->cwd.win32)
-	    strncpy (cvtbuf, cygheap->cwd.win32, 2);
-	  else
-	    GetCurrentDirectory (CYG_MAX_PATH, cvtbuf);
+	  strncpy (cvtbuf, cygheap->cwd.win32, 2);
 	  strcpy (cvtbuf + 2, srcbuf);
 	  mount_table->conv_to_posix_path (cvtbuf, contents, 0);
 	}
@@ -4146,6 +4155,12 @@ void
 cwdstuff::init ()
 {
   cwd_lock.init ("cwd_lock");
+  get_initial ();
+  /* Actually chdir into the syste dir to avoid cwd problems.  See comment
+     in cwdstuff::set below. */
+  extern char windows_system_directory[];
+  SetCurrentDirectory (windows_system_directory);
+  cwd_lock.release ();
 }
 
 /* Get initial cwd.  Should only be called once in a
@@ -4173,17 +4188,42 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
 
   if (win32_cwd)
     {
-       cwd_lock.acquire ();
-       if (doit && !SetCurrentDirectory (win32_cwd))
-	 {
-	    /* When calling SetCurrentDirectory for a non-existant dir on a
-	       Win9x share, it returns ERROR_INVALID_FUNCTION. */
-	    if (GetLastError () == ERROR_INVALID_FUNCTION)
+      cwd_lock.acquire ();
+      if (doit)
+        {
+	  /* Check if we *could* chdir, if we actually would.
+	  
+	     Why don't we actually chdir?  For two reasons:
+	     - A process has always an open handle to the current working
+	       directory which disallows manipulating this directory.
+	       POSIX allows to remove a directory if the permissions are
+	       ok.  The fact that its the cwd of some process doesn't matter.
+	     - SetCurrentDirectory fails for directories with strict
+	       permissions even for processes with the SE_BACKUP_NAME
+	       privilege enabled.  The reason is apparently that
+	       SetCurrentDirectory calls NtOpenFile without the
+	       FILE_OPEN_FOR_BACKUP_INTENT flag set. */
+	  DWORD attr = GetFileAttributes (win32_cwd);
+	  if (attr == INVALID_FILE_ATTRIBUTES)
+	    {
 	      set_errno (ENOENT);
-	    else
+	      goto out;
+	    }
+	  if (!(attr & FILE_ATTRIBUTE_DIRECTORY))
+	    {
+	      set_errno (ENOTDIR);
+	      goto out;
+	    }
+	  HANDLE h = CreateFile (win32_cwd, GENERIC_READ, wincap.shared (),
+				 NULL, OPEN_EXISTING,
+				 FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	  if (h == INVALID_HANDLE_VALUE)
+	    {
 	      __seterrno ();
-	    goto out;
-	 }
+	      goto out;
+	    }
+	  CloseHandle (h);
+        }
     }
   /* If there is no win32 path or it has the form c:xxx, get the value */
   if (!win32_cwd || (isdrive (win32_cwd) && win32_cwd[2] != '\\'))

@@ -305,7 +305,7 @@ has_exec_chars (const char *buf, int len)
 
 int pathmatch (const char *path1, const char *path2) __attribute__ ((regparm (2)));
 int pathnmatch (const char *path1, const char *path2, int len) __attribute__ ((regparm (2)));
-bool has_dot_last_component (const char *dir) __attribute__ ((regparm (1)));
+bool has_dot_last_component (const char *dir, bool test_dot_dot) __attribute__ ((regparm (2)));
 
 bool fnunmunge (char *, const char *) __attribute__ ((regparm (2)));
 

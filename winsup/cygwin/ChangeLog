@@ -1,3 +1,25 @@
+2006-11-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dir.cc (mkdir): Check last path component for "..".
+	(rmdir): Don't check last path component for "..".
+	* fhandler_disk_file.cc (fhandler_disk_file::rmdir): Drop kludge
+	which tries to allow deleting the current working directory.
+	* path.cc (has_dot_last_component): Add parameter to indicate testing
+	for "..".  Take trailing slash into account.
+	(symlink_info::posixify): Rely on cygheap->cwd.win32 having a
+	useful value.
+	(cwdstuff::init): Initialize cygheap->cwd with current working
+	directory.  Change to windows_system_directory afterwards.
+	(cwdstuff::set): Never call SetCurrentDirectory here.  Just check
+	if changing into target directory would be allowed.  Add comment to
+	explain why.
+	* path.h (has_dot_last_component): Declare with second parameter.
+	* pinfo.cc (pinfo::zap_cwd): Remove.
+	(pinfo::exit): Drop call to zap_cwd.
+	* pinfo.h (class pinfo): Remove declaration of zap_cwd.
+	* spawn.cc (spawn_guts): Set current working directory for non-Cygwin
+	child applications.  Drop call to zap_cwd.
+
 2006-11-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.cc (create_token): Revert erroneous change to test

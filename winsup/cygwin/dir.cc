@@ -277,7 +277,7 @@ mkdir (const char *dir, mode_t mode)
       debug_printf ("got %d error from build_fh_name", fh->error ());
       set_errno (fh->error ());
     }
-  else if (has_dot_last_component (dir))
+  else if (has_dot_last_component (dir, true))
     set_errno (fh->exists () ? EEXIST : ENOENT);
   else if (!fh->mkdir (mode))
     res = 0;
@@ -307,7 +307,7 @@ rmdir (const char *dir)
       debug_printf ("got %d error from build_fh_name", fh->error ());
       set_errno (fh->error ());
     }
-  else if (has_dot_last_component (dir))
+  else if (has_dot_last_component (dir, false))
     set_errno (fh->exists () ? EINVAL : ENOENT);
   else if (!fh->rmdir ())
     res = 0;

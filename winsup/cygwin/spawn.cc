@@ -501,7 +501,7 @@ loop:
 			  TRUE,		/* inherit handles from parent */
 			  c_flags,
 			  envblock,	/* environment */
-			  0,		/* use current drive/directory */
+			  real_path.iscygexec () ? NULL : cygheap->cwd.win32,
 			  &si,
 			  &pi);
     }
@@ -536,7 +536,7 @@ loop:
 		       TRUE,		/* inherit handles from parent */
 		       c_flags,
 		       envblock,	/* environment */
-		       0,		/* use current drive/directory */
+		       real_path.iscygexec () ? NULL : cygheap->cwd.win32,
 		       &si,
 		       &pi);
     }
@@ -613,7 +613,6 @@ loop:
 	      myself->sync_proc_pipe ();	/* Make sure that we own wr_proc_pipe
 						   just in case we've been previously
 						   execed. */
-	      myself.zap_cwd ();
 	    }
 	  orig_wr_proc_pipe = myself->dup_proc_pipe (pi.hProcess);
 	}
