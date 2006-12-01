@@ -102,7 +102,7 @@ extern double fmod _PARAMS((double, double));
 #endif /* ! defined (__math_68881) */
 #endif /* ! defined (_REENT_ONLY) */
 
-#ifndef __STRICT_ANSI__
+#if !defined(__STRICT_ANSI__) || defined(__cplusplus)
 
 /* ISO C99 types and macros. */
 
@@ -233,7 +233,7 @@ extern double drem _PARAMS((double, double));
 
 #endif /* ! defined (_REENT_ONLY) */
 
-#endif /* ! defined (__STRICT_ANSI__) */
+#endif /* !defined (__STRICT_ANSI__) || defined(__cplusplus)  */
 
 #if !defined(__STRICT_ANSI__) || defined(__cplusplus)
 
@@ -336,7 +336,8 @@ extern int *__signgam _PARAMS((void));
 #define __signgam_r(ptr) _REENT_SIGNGAM(ptr)
 
 /* The exception structure passed to the matherr routine.  */
-
+/* We have a problem when using C++ since `exception' is a reserved
+   name in C++.  */
 #ifdef __cplusplus
 struct __exception 
 #else
