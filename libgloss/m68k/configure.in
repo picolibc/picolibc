@@ -83,11 +83,15 @@ AC_SUBST(LD)
 AC_PROG_RANLIB
 
 AC_MSG_CHECKING([target cpu family])
-AC_TRY_COMPILE(,[#ifdef __mcoldfire__
-		we are coldfire
+DO=m68k
+AC_TRY_COMPILE(,[#ifndef __mcoldfire__
+		#error we are not coldfire
 		#endif],
-		DO=m68k,
-		DO=cf)
+	       DO="cf")
+AC_TRY_COMPILE(,[#ifndef __mfido__
+		#error we are not fido
+		#endif],
+	       DO="fido")
 AC_MSG_RESULT($DO)
 AC_SUBST(DO)
      

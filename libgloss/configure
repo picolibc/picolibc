@@ -717,6 +717,9 @@ else
 fi
 
 case "${target}" in
+  fido-*-*)
+	configdirs="${configdirs} m68k testsuite"
+	;;
   i[3456]86-*-elf*|i[3456]86-*-coff*)
 	configdirs="${configdirs} i386 testsuite";
 	;;
@@ -834,7 +837,7 @@ subdirs="$configdirs"
 # Extract the first word of "gcc", so it can be a program name with args.
 set dummy gcc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:838: checking for $ac_word" >&5
+echo "configure:841: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -864,7 +867,7 @@ if test -z "$CC"; then
   # Extract the first word of "cc", so it can be a program name with args.
 set dummy cc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:868: checking for $ac_word" >&5
+echo "configure:871: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -913,7 +916,7 @@ fi
 fi
 
 echo $ac_n "checking whether we are using GNU C""... $ac_c" 1>&6
-echo "configure:917: checking whether we are using GNU C" >&5
+echo "configure:920: checking whether we are using GNU C" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_gcc'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -922,7 +925,7 @@ else
   yes;
 #endif
 EOF
-if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:926: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
+if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:929: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
   ac_cv_prog_gcc=yes
 else
   ac_cv_prog_gcc=no
@@ -937,7 +940,7 @@ if test $ac_cv_prog_gcc = yes; then
   ac_save_CFLAGS="$CFLAGS"
   CFLAGS=
   echo $ac_n "checking whether ${CC-cc} accepts -g""... $ac_c" 1>&6
-echo "configure:941: checking whether ${CC-cc} accepts -g" >&5
+echo "configure:944: checking whether ${CC-cc} accepts -g" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_cc_g'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -969,7 +972,7 @@ AS=${AS-as}
 # Extract the first word of "ar", so it can be a program name with args.
 set dummy ar; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:973: checking for $ac_word" >&5
+echo "configure:976: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_AR'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1003,7 +1006,7 @@ LD=${LD-ld}
 # Extract the first word of "ranlib", so it can be a program name with args.
 set dummy ranlib; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:1007: checking for $ac_word" >&5
+echo "configure:1010: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_RANLIB'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1032,7 +1035,7 @@ fi
 
 
 echo $ac_n "checking for .preinit_array/.init_array/.fini_array support""... $ac_c" 1>&6
-echo "configure:1036: checking for .preinit_array/.init_array/.fini_array support" >&5
+echo "configure:1039: checking for .preinit_array/.init_array/.fini_array support" >&5
 if eval "test \"`echo '$''{'libc_cv_initfinit_array'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1043,7 +1046,7 @@ int foo (void) { return 1; }
 int (*fp) (void) __attribute__ ((section (".init_array"))) = foo;
 EOF
 if { ac_try='${CC} $CFLAGS $CPPFLAGS $LDFLAGS -o conftest conftest.c
-		   -static -nostartfiles -nostdlib 1>&AS_MESSAGE_LOG_FD'; { (eval echo configure:1047: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; }
+		   -static -nostartfiles -nostdlib 1>&AS_MESSAGE_LOG_FD'; { (eval echo configure:1050: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; }
 then
   if readelf -S conftest | grep -e INIT_ARRAY > /dev/null; then
     libc_cv_initfinit_array=yes
@@ -1456,7 +1459,7 @@ if test "$no_recursion" != yes; then
       fi
     fi
 
-    cd $ac_popdir
+    cd "$ac_popdir"
   done
 fi
 

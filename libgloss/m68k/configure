@@ -910,24 +910,41 @@ fi
 
 echo $ac_n "checking target cpu family""... $ac_c" 1>&6
 echo "configure:913: checking target cpu family" >&5
+DO=m68k
 cat > conftest.$ac_ext <<EOF
-#line 915 "configure"
+#line 916 "configure"
 #include "confdefs.h"
 
 int main() {
-#ifdef __mcoldfire__
-		we are coldfire
+#ifndef __mcoldfire__
+		#error we are not coldfire
 		#endif
 ; return 0; }
 EOF
-if { (eval echo configure:924: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:925: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
-  DO=m68k
+  DO="cf"
 else
   echo "configure: failed program was:" >&5
   cat conftest.$ac_ext >&5
+fi
+rm -f conftest*
+cat > conftest.$ac_ext <<EOF
+#line 934 "configure"
+#include "confdefs.h"
+
+int main() {
+#ifndef __mfido__
+		#error we are not fido
+		#endif
+; return 0; }
+EOF
+if { (eval echo configure:943: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
-  DO=cf
+  DO="fido"
+else
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
 fi
 rm -f conftest*
 echo "$ac_t""$DO" 1>&6

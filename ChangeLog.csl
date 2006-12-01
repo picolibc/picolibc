@@ -1,3 +1,29 @@
+2006-12-01  Nathan Sidwell  <nathan@codesourcery.com>
+	    Kazu Hirata  <kazu@codesourcery.com>
+
+	/
+	* config.sub: Recognize fido and fido-*.
+
+	libgloss/
+	* configure.in: Recognize fido-*-*.
+	* configure: Regenerate.
+	* m68k/Makefile.in (CF_ISRS): Use addprefix.
+	(FIDO_CRT0, FIDO_BSP, FIDO_OBJS, FIDO_HANDLERS,
+	FIDO_UNHOSTED_SCRIPTS, FIDO_HOSTED_SCRIPTS, FIDO_SCRIPTS,
+	FIDO_SOURCES, all_fido, fido-%-crt0.o, fido-rom.ld,
+	fido-rom-hosted.ld, fido-sram.ld, fido-sram-hosted.ld,
+	fido-sdram.ld, fido-sdram-hosted.ld, fido-redboot.ld,
+	install_fido): New.
+	* m68k/asm.h (mbb): New.
+	* m68k/configure.in (DO): Check for __mfido__.
+	* m68k/configure: Regenerate.
+	* m68k/fido-_exit.c, m68k/fido-crt0.S, m68k/fido-handler.c,
+	m68k/fido-hosted.S, m68k/fido-sbrk.c, m68k/fido.h,
+	m68k/fido.sc, m68k/fido_profiling.h: New.
+
+	newlib/
+	* configure.host: Recognize fido.
+
 2006-11-06  Paul Brook  <paul@codesourcery.com>
 
 	libgloss/

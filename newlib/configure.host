@@ -111,6 +111,10 @@ case "${host_cpu}" in
   ep9312)
 	machine_dir=arm
 	;;
+  fido)
+	machine_dir=m68k
+	newlib_cflags="${newlib_cflags} -DCOMPACT_CTYPE"
+	;;
   fr30)
 	machine_dir=fr30
 	;;
@@ -553,6 +557,10 @@ case "${host}" in
 	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
 	  newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
 	fi
+	;;
+  fido-*-elf)
+	newlib_cflags="${newlib_cflags} -DHAVE_RENAME -DHAVE_SYSTEM -DMISSING_SYSCALL_NAMES"
+	syscall_dir=
 	;;
   fr30-*-*)
 	syscall_dir=syscalls

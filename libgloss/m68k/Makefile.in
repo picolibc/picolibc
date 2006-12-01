@@ -127,11 +127,11 @@ CF_ISRS=	other_interrupt reset access_error address_error \
 	illegal_instruction divide_by_zero privilege_violation \
 	trace unimplemented_line_a_opcode unimplemented_line_f_opcode \
 	non_pc_breakpoint_debug_interrupt pc_breakpoint_debug_interrupt \
-	format_error spurious_interrupt trap0 trap1 trap2 trap3 trap4 \
-	trap5 trap6 trap7 trap8 trap9 trap10 trap11 trap12 trap13 trap14 \
-	trap15 fp_branch_unordered fp_inexact_result fp_divide_by_zero \
-	fp_underflow fp_operand_error fp_overflow fp_input_not_a_number \
-	fp_input_denormalized_number unsupported_instruction
+	format_error spurious_interrupt  fp_branch_unordered \
+	fp_inexact_result fp_divide_by_zero fp_underflow fp_operand_error \
+	fp_overflow fp_input_not_a_number fp_input_denormalized_number \
+	unsupported_instruction \
+	$(addprefix trap,0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)
 
 #              RAM       ROM
 m5208evb  := 1024M 16M          0M   2M
@@ -151,6 +151,36 @@ CF_ROM_SCRIPTS := $(patsubst %,%-rom.ld,$(CF_BOARDS))
 CF_HOSTED_SCRIPTS := $(patsubst %.ld,%-hosted.ld,$(CF_RAM_SCRIPTS) $(CF_ROM_SCRIPTS))
 CF_SCRIPTS = $(CF_RAM_SCRIPTS) $(CF_ROM_SCRIPTS) $(CF_HOSTED_SCRIPTS)
 CF_SOURCES = cf-isv.S cf-crt0.S cf-crt1.c asm.h
+
+# Fido board.
+# Programs built with the ROM linker script are designed to be
+# executed from flash.  Programs built with the RAM linker script are
+# designed to be run via JTAG.  Program built with the RedBoot linker
+# script are designed to be run from the RedBoot boot loader.
+FIDO_CRT0S    = fido-rom-crt0.o fido-ram-crt0.o fido-redboot-crt0.o
+FIDO_BSP      = libfido.a
+FIDO_OBJS     = fido-hosted.o getpid.o kill.o fido-sbrk.o fido-_exit.o \
+		$(patsubst %,fido-%Handler.o,$(FIDO_HANDLERS))
+FIDO_HANDLERS:= BusError AddressError IllegalInstruction DivideByZero Chk \
+	Trapcc PriviligeViolation Trace ALine FLine HwBreakpoint Reserved0 \
+	FormatError UnitializedInt SoftwareInt \
+	$(addprefix Unassigned,0 1 2 3 4 5 6) \
+	$(addprefix Int,0 1 2 3 4 5 6 7) \
+	$(addprefix Trap,00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15) \
+	$(addprefix Reserved,048 049 050 051 052 053 054 055 056 057 058 \
+				059 060 061 062 063) \
+	ContextOvertime MpuError \
+	$(addprefix SystemTimer,0 1 2 3 4) \
+	WatchdogTimer TimerCounter0 TimerCounter1 DMA0 DMA1 AtoDConversion \
+	$(addprefix Pdma,0 1 2 3) \
+	$(addprefix Reserved,081 082 083 084 085 086 087 088 089 \
+				090 091 092 093 094 095) \
+	$(addprefix Trapx,00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15) \
+	Dummy
+FIDO_UNHOSTED_SCRIPTS:= fido-rom.ld fido-sram.ld fido-sdram.ld
+FIDO_HOSTED_SCRIPTS:=$(patsubst %.ld,%-hosted.ld,$(FIDO_UNHOSTED_SCRIPTS))
+FIDO_SCRIPTS  = $(FIDO_UNHOSTED_SCRIPTS) $(FIDO_HOSTED_SCRIPTS) fido-redboot.ld
+FIDO_SOURCES  = fido-crt0.S asm.h fido.h
 
 #
 # here's all the unhosted stuff
@@ -183,6 +213,9 @@ all_m68k :: ${SIM_CRT0} ${SIM_BSP} ${CRT0} ${BCC_BSP} ${IDP_BSP} \
 .PHONY: all_cf
 all_cf :: ${CF_CRT0S} ${CF_BSP} ${CF_SCRIPTS} ${HOSTED_BSP} ${UNHOSTED_BSP}
 
+.PHONY: all_fido
+all_fido :: ${FIDO_CRT0S} ${FIDO_BSP} ${FIDO_SCRIPTS} \
+	${HOSTED_BSP} ${UNHOSTED_BSP}
 
 ${SIM_BSP}: ${SIM_OBJS}
 	${AR} ${ARFLAGS} $@ ${SIM_OBJS}
@@ -246,6 +279,39 @@ m%-ram-hosted.ld : cf.sc Makefile
 m%-rom-hosted.ld : cf.sc Makefile
 	IO=hosted RAM=$(word 1,$(m$*)) RAM_SIZE=$(word 2,$(m$*)) \
 	  ROM=$(word 3,$(m$*)) ROM_SIZE=$(word 4,$(m$*)) ${SHELL} $< >$@
+
+#build fido library
+fido-%-crt0.o : fido-crt0.S asm.h fido.h
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) \
+		-DFIDO_$* -c -o $@ $<
+
+$(patsubst %,fido-%Handler.o,${FIDO_HANDLERS}) : fido-handler.c
+	$(CC) $(CFLAGS_FOR_TARGET) -fomit-frame-pointer $(CFLAGS) $(INCLUDES) \
+		-c $< -o $@ -DHANDLER=$(patsubst fido-%.o,_%,$@)
+${FIDO_BSP}: ${FIDO_OBJS}
+	${AR} ${ARFLAGS} $@ ${FIDO_OBJS}
+	${RANLIB} $@
+
+fido-rom.ld: fido.sc
+	MODE=rom IO=unhosted ${SHELL} $< > $@
+
+fido-rom-hosted.ld: fido.sc
+	MODE=rom IO=hosted ${SHELL} $< > $@
+
+fido-sram.ld: fido.sc
+	MODE=sram IO=unhosted ${SHELL} $< > $@
+
+fido-sram-hosted.ld: fido.sc
+	MODE=sram IO=hosted ${SHELL} $< > $@
+
+fido-sdram.ld: fido.sc
+	MODE=sdram IO=unhosted ${SHELL} $< > $@
+
+fido-sdram-hosted.ld: fido.sc
+	MODE=sdram IO=hosted ${SHELL} $< > $@
+
+fido-redboot.ld: fido.sc
+	MODE=redboot IO=unhosted ${SHELL} $< > $@
 
 leds.o: ${srcdir}/leds.c
 	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -c $<
@@ -382,6 +448,17 @@ install_cf:: install_io
 	done
 	for src in $(CF_SOURCES) ; \
 	do $(INSTALL_DATA) ${srcdir}/$$src $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$src ; \
+	done
+
+.PHONY: install_fido
+install_fido:: install_io
+	$(INSTALL_PROGRAM) $(FIDO_CRT0S) $(FIDO_BSP) $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)
+	for x in $(FIDO_SCRIPTS); do \
+		$(INSTALL_DATA) $$x $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}; \
+	done
+	mkdir -p $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/src
+	for x in $(FIDO_SOURCES); do \
+		$(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/src; \
 	done
 
 .PHONY: install_io

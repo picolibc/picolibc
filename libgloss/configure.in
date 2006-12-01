@@ -28,6 +28,9 @@ else
 fi
 
 case "${target}" in
+  fido-*-*)
+	configdirs="${configdirs} m68k testsuite"
+	;;
   i[[3456]]86-*-elf*|i[[3456]]86-*-coff*)
 	configdirs="${configdirs} i386 testsuite";
 	;;
