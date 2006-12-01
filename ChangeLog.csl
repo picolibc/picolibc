@@ -1,3 +1,14 @@
+2006-12-01  Paul Brook  <paul@codesourcery.com>
+
+	Backport from mainline.
+	gas/
+	* config/tc-arm.c (arm_force_relocation): Return 1 for relocs against
+	function symbols.
+
+	gas/testsuite/
+	* gas/arm/thumbrel.s: New test.
+	* gas/arm/thumbrel.d: New test.
+
 2006-12-01  Kazu Hirata  <kazu@codesourcery.com>
 
 	bfd/
