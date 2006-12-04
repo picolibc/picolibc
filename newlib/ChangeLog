@@ -1,5 +1,9 @@
 2006-12-04  Kazunori Asayama  <asayama@sm.sony.co.jp>
 
+	* libc/machine/spu/strncpy.c: Add padding.
+
+2006-12-04  Kazunori Asayama  <asayama@sm.sony.co.jp>
+
 	* testsuite/newlib.string/tstring.c: 
 
 2006-12-01  Kazunori Asayama  <asayama@sm.sony.co.jp>

@@ -76,6 +76,11 @@ char * strncpy(char * __restrict__ dest, const char * __restrict__ src, size_t n
    */
   len = spu_extract(spu_sel(spu_promote((unsigned int)len, 0), N, gt), 0);
 
+  /* Padding
+   */
+  if (len != n) {
+    memset(dest + len, 0, n - len);
+  }
   /* Perform a memcpy of the resulting length
    */
   return ((char *)memcpy((void *)dest, (const void *)src, len));
