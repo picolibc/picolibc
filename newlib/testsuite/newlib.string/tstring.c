@@ -10,7 +10,11 @@
 #include <stdlib.h>
 
 #ifndef MAX_1
+#ifdef __SPU__
+#define MAX_1 11000
+#else
 #define MAX_1 33000
+#endif
 #endif
 
 #define MAX_2 (2 * MAX_1 + MAX_1 / 10)
