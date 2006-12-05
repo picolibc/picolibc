@@ -4214,15 +4214,18 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
 	      set_errno (ENOTDIR);
 	      goto out;
 	    }
-	  HANDLE h = CreateFile (win32_cwd, GENERIC_READ, wincap.shared (),
-				 NULL, OPEN_EXISTING,
-				 FILE_FLAG_BACKUP_SEMANTICS, NULL);
-	  if (h == INVALID_HANDLE_VALUE)
+	  if (wincap.can_open_directories ())
 	    {
-	      __seterrno ();
-	      goto out;
+	      HANDLE h = CreateFile (win32_cwd, GENERIC_READ, wincap.shared (),
+				     NULL, OPEN_EXISTING,
+				     FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	      if (h == INVALID_HANDLE_VALUE)
+		{
+		  __seterrno ();
+		  goto out;
+		}
+	      CloseHandle (h);
 	    }
-	  CloseHandle (h);
         }
     }
   /* If there is no win32 path or it has the form c:xxx, get the value */
