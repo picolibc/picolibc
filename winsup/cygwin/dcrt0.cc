@@ -590,10 +590,36 @@ child_info *
 get_cygwin_startup_info ()
 {
   STARTUPINFO si;
-  char zeros[sizeof (child_proc_info->zero)] = {0};
+  DWORD zeros[sizeof (child_proc_info->zero)
+	      / sizeof (child_proc_info->zero[0])] = {0};
 
   GetStartupInfo (&si);
   child_info *res = (child_info *) si.lpReserved2;
+
+  /* It appears that when running under WOW64 on Vista 64, the first DWORD
+     value in the datastructure lpReserved2 is pointing to (zero[0] in
+     Cygwin), has to reflect the size of that datastructure as used in the
+     Microsoft C runtime (a count value, counting the number of elements in
+     two subsequent arrays, BYTE[count and HANDLE[count]), even though the C
+     runtime isn't used.  Otherwise, if zero[0] is 0 or too small, the
+     datastructure gets overwritten.
+
+     This seems to be a bug in Vista's WOW64, which apparently copies the
+     lpReserved2 datastructure not using the cbReserved2 size information,
+     but using the information given in the first DWORD within lpReserved2
+     instead.  Funny enough, 32 bit Vista doesn't care if zero[0] is 0 or a
+     non-0 count value, while older versions of Windows might crash if
+     zero[0] is set to a non-zero value, as observed at least on XP 64.
+
+     exec/spawn as well as fork write an appropriate value into zero[0] now,
+     depending on the wincap.needs_count_in_si_lpres2 flag.  The value is
+     sizeof (child_info_*) / 5 which results in a count which covers the
+     full datastructure, plus not more than 4 extra bytes.  This is ok as
+     long as the child_info structure is cosily stored within a bigger
+     datastructure. */
+  if (wincap.needs_count_in_si_lpres2 ())
+    zeros[0] = si.cbReserved2 / 5;
+
   if (si.cbReserved2 < EXEC_MAGIC_SIZE || !res
       || memcmp (res->zero, zeros, sizeof (res->zero)) != 0)
     res = NULL;

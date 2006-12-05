@@ -1,3 +1,15 @@
+2006-12-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (get_cygwin_startup_info): Change zeros to DWORD array.
+	Expect first DWORD in child_info struct being set to non-zero if
+	wincap.needs_count_in_si_lpres2 is set.  Add comment to explain why.
+	* fork.cc (frok::parent): Set ch.zero[0] to a sensible count value
+	if wincap.needs_count_in_si_lpres2 is set.
+	* spawn.cc (spawn_guts): Ditto.  Add filler bytes after ch on stack
+	to accomodate needs_count_in_si_lpres2.
+	* wincap.h: Define needs_count_in_si_lpres2 throughout.
+	* wincap.cc: Ditto.
+
 2006-11-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::open): Fix previous patch to handle the

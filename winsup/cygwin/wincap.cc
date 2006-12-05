@@ -68,6 +68,7 @@ static NO_COPY wincaps wincap_unknown = {
   has_fileid_dirinfo:false,
   has_exclusiveaddruse:false,
   has_buggy_restart_scan:false,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_95 = {
@@ -127,6 +128,7 @@ static NO_COPY wincaps wincap_95 = {
   has_fileid_dirinfo:false,
   has_exclusiveaddruse:false,
   has_buggy_restart_scan:false,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_95osr2 = {
@@ -186,6 +188,7 @@ static NO_COPY wincaps wincap_95osr2 = {
   has_fileid_dirinfo:false,
   has_exclusiveaddruse:false,
   has_buggy_restart_scan:false,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_98 = {
@@ -245,6 +248,7 @@ static NO_COPY wincaps wincap_98 = {
   has_fileid_dirinfo:false,
   has_exclusiveaddruse:false,
   has_buggy_restart_scan:false,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_98se = {
@@ -304,6 +308,7 @@ static NO_COPY wincaps wincap_98se = {
   has_fileid_dirinfo:false,
   has_exclusiveaddruse:false,
   has_buggy_restart_scan:false,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_me = {
@@ -363,6 +368,7 @@ static NO_COPY wincaps wincap_me = {
   has_fileid_dirinfo:false,
   has_exclusiveaddruse:false,
   has_buggy_restart_scan:false,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_nt3 = {
@@ -422,6 +428,7 @@ static NO_COPY wincaps wincap_nt3 = {
   has_fileid_dirinfo:false,
   has_exclusiveaddruse:false,
   has_buggy_restart_scan:false,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_nt4 = {
@@ -481,6 +488,7 @@ static NO_COPY wincaps wincap_nt4 = {
   has_fileid_dirinfo:false,
   has_exclusiveaddruse:false,
   has_buggy_restart_scan:false,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_nt4sp4 = {
@@ -540,6 +548,7 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   has_fileid_dirinfo:false,
   has_exclusiveaddruse:true,
   has_buggy_restart_scan:false,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_2000 = {
@@ -599,6 +608,7 @@ static NO_COPY wincaps wincap_2000 = {
   has_fileid_dirinfo:true,
   has_exclusiveaddruse:true,
   has_buggy_restart_scan:true,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_xp = {
@@ -658,6 +668,7 @@ static NO_COPY wincaps wincap_xp = {
   has_fileid_dirinfo:true,
   has_exclusiveaddruse:true,
   has_buggy_restart_scan:false,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_2003 = {
@@ -717,6 +728,7 @@ static NO_COPY wincaps wincap_2003 = {
   has_fileid_dirinfo:true,
   has_exclusiveaddruse:true,
   has_buggy_restart_scan:false,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_vista = {
@@ -776,6 +788,7 @@ static NO_COPY wincaps wincap_vista = {
   has_fileid_dirinfo:true,
   has_exclusiveaddruse:true,
   has_buggy_restart_scan:false,
+  needs_count_in_si_lpres2:true,
 };
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));
