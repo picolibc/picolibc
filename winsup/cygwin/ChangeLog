@@ -1,5 +1,10 @@
 2006-12-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (cwdstuff::init): Don't change to windows_system_directory
+	if Cygwin DLL has been loaded dynamically.
+
+2006-12-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (cwdstuff::set): Don't try to open directory on systems not
 	supporting that.
 

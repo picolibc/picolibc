@@ -4154,12 +4154,16 @@ cwdstuff::get_hash ()
 void
 cwdstuff::init ()
 {
+  extern int dynamically_loaded;
   cwd_lock.init ("cwd_lock");
   get_initial ();
-  /* Actually chdir into the syste dir to avoid cwd problems.  See comment
-     in cwdstuff::set below. */
-  extern char windows_system_directory[];
-  SetCurrentDirectory (windows_system_directory);
+  if (!dynamically_loaded)
+    {
+      /* Actually chdir into the syste dir to avoid cwd problems.  See comment
+	 in cwdstuff::set below. */
+      extern char windows_system_directory[];
+      SetCurrentDirectory (windows_system_directory);
+    }
   cwd_lock.release ();
 }
 
