@@ -901,6 +901,8 @@ wincapc::init ()
   BOOL is_wow64_proc = FALSE;
   if (IsWow64Process (GetCurrentProcess (), &is_wow64_proc))
     wow64 = is_wow64_proc;
+  else
+    ((wincaps *)this->caps)->needs_count_in_si_lpres2 = false;
 
   __small_sprintf (osnam, "%s-%d.%d", os, version.dwMajorVersion,
 		   version.dwMinorVersion);
