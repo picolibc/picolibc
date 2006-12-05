@@ -607,9 +607,10 @@ get_cygwin_startup_info ()
      This seems to be a bug in Vista's WOW64, which apparently copies the
      lpReserved2 datastructure not using the cbReserved2 size information,
      but using the information given in the first DWORD within lpReserved2
-     instead.  Funny enough, 32 bit Vista doesn't care if zero[0] is 0 or a
-     non-0 count value, while older versions of Windows might crash if
-     zero[0] is set to a non-zero value, as observed at least on XP 64.
+     instead.  32 bit Windows and former WOW64 don't care if zero[0] is 0
+     or a sensible non-0 count value.  However, it's not clear if a non-0
+     count doesn't result in trying to evaluate the content, so we do this
+     really only for Vista 64 for now.
 
      exec/spawn as well as fork write an appropriate value into zero[0] now,
      depending on the wincap.needs_count_in_si_lpres2 flag.  The value is
