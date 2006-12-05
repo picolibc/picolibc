@@ -280,8 +280,13 @@ frok::parent (void *stack_here)
 
   memset (&si, 0, sizeof (si));
   si.cb = sizeof (STARTUPINFO);
+
   si.lpReserved2 = (LPBYTE) &ch;
   si.cbReserved2 = sizeof (ch);
+
+  /* See comment in dcrt0.cc, function get_cygwin_startup_info. */
+  if (wincap.needs_count_in_si_lpres2 ())
+    ch.zero[0] = sizeof (ch) / 5;
 
   syscall_printf ("CreateProcess (%s, %s, 0, 0, 1, %p, 0, 0, %p, %p)",
 		  myself->progname, myself->progname, c_flags, &si, &pi);

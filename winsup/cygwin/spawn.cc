@@ -298,7 +298,13 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   pthread_cleanup_push (do_cleanup, (void *) &cleanup);
   av newargv;
   linebuf one_line;
-  child_info_spawn ch;
+  /* Allocate slightly bigger for call to CreateProcess to accomodate
+     needs_count_in_si_lpres2. */
+  struct {
+    child_info_spawn ch;
+    char filler[4];
+  } _ch;
+#define ch	_ch.ch
 
   char *envblock = NULL;
   path_conv real_path;
@@ -480,6 +486,10 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   si.lpReserved2 = (LPBYTE) &ch;
   si.cbReserved2 = sizeof (ch);
+
+  /* See comment in dcrt0.cc, function get_cygwin_startup_info. */
+  if (wincap.needs_count_in_si_lpres2 ())
+    ch.zero[0] = sizeof (ch) / 5;
 
   /* When ruid != euid we create the new process under the current original
      account and impersonate in child, this way maintaining the different
@@ -724,6 +734,7 @@ out:
     free (envblock);
   pthread_cleanup_pop (1);
   return (int) res;
+#undef ch
 }
 
 extern "C" int

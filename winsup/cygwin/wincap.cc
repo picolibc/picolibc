@@ -70,6 +70,7 @@ static NO_COPY wincaps wincap_unknown = {
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:false,
   needs_logon_sid_in_sid_list:false,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_95 = {
@@ -131,6 +132,7 @@ static NO_COPY wincaps wincap_95 = {
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:false,
   needs_logon_sid_in_sid_list:false,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_95osr2 = {
@@ -192,6 +194,7 @@ static NO_COPY wincaps wincap_95osr2 = {
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:false,
   needs_logon_sid_in_sid_list:false,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_98 = {
@@ -253,6 +256,7 @@ static NO_COPY wincaps wincap_98 = {
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:false,
   needs_logon_sid_in_sid_list:false,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_98se = {
@@ -314,6 +318,7 @@ static NO_COPY wincaps wincap_98se = {
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:false,
   needs_logon_sid_in_sid_list:false,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_me = {
@@ -375,6 +380,7 @@ static NO_COPY wincaps wincap_me = {
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:false,
   needs_logon_sid_in_sid_list:false,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_nt3 = {
@@ -436,6 +442,7 @@ static NO_COPY wincaps wincap_nt3 = {
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:false,
   needs_logon_sid_in_sid_list:true,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_nt4 = {
@@ -497,6 +504,7 @@ static NO_COPY wincaps wincap_nt4 = {
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:false,
   needs_logon_sid_in_sid_list:true,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_nt4sp4 = {
@@ -558,6 +566,7 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:false,
   needs_logon_sid_in_sid_list:true,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_2000 = {
@@ -619,6 +628,7 @@ static NO_COPY wincaps wincap_2000 = {
   has_buggy_restart_scan:true,
   has_mandatory_integrity_control:false,
   needs_logon_sid_in_sid_list:true,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_xp = {
@@ -680,6 +690,7 @@ static NO_COPY wincaps wincap_xp = {
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:false,
   needs_logon_sid_in_sid_list:false,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_2003 = {
@@ -741,6 +752,7 @@ static NO_COPY wincaps wincap_2003 = {
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:false,
   needs_logon_sid_in_sid_list:false,
+  needs_count_in_si_lpres2:false,
 };
 
 static NO_COPY wincaps wincap_vista = {
@@ -802,6 +814,7 @@ static NO_COPY wincaps wincap_vista = {
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:true,
   needs_logon_sid_in_sid_list:false,
+  needs_count_in_si_lpres2:true,
 };
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));
