@@ -12,6 +12,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include "cygwin/version.h"
 #include <signal.h>
 #include <stdlib.h>
 #include "cygerrno.h"
@@ -20,7 +21,6 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "cygwin/version.h"
 #include "perprocess.h"
 #include "sigproc.h"
 #include "cygtls.h"
