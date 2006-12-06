@@ -1463,7 +1463,7 @@ fhandler_disk_file::rmdir ()
 	 directory can't be removed because it's not empty. Checking for
 	 existence afterwards keeps us informed about success. */
       if (!isremote () || att == INVALID_FILE_ATTRIBUTES)
-	return res;
+	return 0;
 
       err = ERROR_DIR_NOT_EMPTY;
     }
