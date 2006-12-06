@@ -1,3 +1,7 @@
+2006-12-06  Eric Blake  <ebb9@byu.net>
+
+	* include/sys/ioctl.h: Pick up termios.h, for TIOCGWINSZ.
+
 2006-12-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winsup.h (WINVER): Set to 0x0600 to cover Vista.
