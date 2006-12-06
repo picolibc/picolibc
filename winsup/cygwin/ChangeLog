@@ -1,3 +1,10 @@
+2006-12-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_mem.cc (fhandler_dev_mem::open): Fix comment.
+	* wincap.cc (has_physical_mem_access): Reflect the fact that physical
+	memory access has been made a protected operation beginning with
+	2003 Server.
+
 2006-12-06  Eric Blake  <ebb9@byu.net>
 
 	* include/sys/ioctl.h: Pick up termios.h, for TIOCGWINSZ.
