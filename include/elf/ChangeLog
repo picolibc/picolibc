@@ -1,3 +1,8 @@
+2006-12-05  Michael Tautschnig  <tautschn@model.in.tum.de>
+	    Nick Clifton  <nickc@redhat.com>
+
+	* external.h (struct Elf_External_Versym): Use ATTRIBUTE_PACKED.
+
 2006-10-28  Richard Sandiford  <richard@codesourcery.com>
 
 	* mips.h (R_MIPS_GLOB_DAT): Define

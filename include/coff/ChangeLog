@@ -1,3 +1,10 @@
+2006-12-05  Michael Tautschnig  <tautschn@model.in.tum.de>
+	    Nick Clifton  <nickc@redhat.com>
+
+	* external.h (struct external_aouthdr): Add ATTRIBUTE_PACKED.
+	(struct external_syment): Likewise.
+	(union external_auxent): Likewise.
+
 2006-11-14  Phil Lello  <phil.lello@homecall.co.uk>
 
 	* pe.h: Added defines for IMAGE_SUBSYSTEM_EFI_ROM and
