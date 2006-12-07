@@ -46,6 +46,8 @@ details. */
 #include <lmcons.h> /* for UNLEN */
 #include <rpc.h>
 #include <shellapi.h>
+#include <ntdef.h>
+#include "ntdll.h"
 
 #undef fstat
 #undef lstat
@@ -173,6 +175,89 @@ try_to_bin (const char *win32_path)
   debug_printf ("SHFileOperation (%s) = %d\n", win32_path, ret);
 }
 
+static DWORD
+unlink_9x (path_conv &win32_name)
+{
+  BOOL ret = DeleteFile (win32_name);
+  syscall_printf ("DeleteFile %s", ret ? "succeeded" : "failed");
+  return GetLastError ();
+}
+
+static DWORD
+unlink_nt (path_conv &win32_name, bool setattrs)
+{
+  WCHAR wpath[CYG_MAX_PATH + 10];
+  UNICODE_STRING upath = {0, sizeof (wpath), wpath};
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+  NTSTATUS status;
+  HANDLE h;
+
+  ULONG flags = FILE_OPEN_FOR_BACKUP_INTENT;
+  /* Don't try "delete on close" if the file is on a remote share.  If two
+     processes have open handles on a file and one of them calls unlink,
+     then it happens that the file is remove from the remote share even
+     though the other process still has an open handle.  This other process
+     than gets Win32 error 59, ERROR_UNEXP_NET_ERR when trying to access the
+     file.
+     That does not happen when using DeleteFile, which nicely succeeds but
+     still, the file is available for the other process.
+     Microsoft KB 837665 describes this problem as a bug in 2K3, but I have
+     reproduced it on shares on Samba 2.2.8, Samba 3.0.2, NT4SP6, XP64SP1 and
+     2K3 and in all cases, DeleteFile works, "delete on close" does not. */
+  if (!win32_name.isremote ())
+    flags |= FILE_DELETE_ON_CLOSE;
+
+  win32_name.get_nt_native_path (upath);
+  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+			      NULL, sec_none_nih.lpSecurityDescriptor);
+  status = NtOpenFile (&h, DELETE, &attr, &io, wincap.shared (), flags);
+  if (!NT_SUCCESS (status))
+    {
+      if (status == STATUS_DELETE_PENDING)
+	{
+	  syscall_printf ("Delete already pending, status = %p", status);
+	  return 0;
+	}
+      syscall_printf ("Opening file for delete failed, status = %p", status);
+      return RtlNtStatusToDosError (status);
+    }
+
+  if (setattrs)
+    SetFileAttributes (win32_name, (DWORD) win32_name);
+
+  if (!win32_name.isremote ())
+    try_to_bin (win32_name.get_win32 ());
+
+  DWORD lasterr = 0;
+
+  if (win32_name.isremote ())
+    {
+      FILE_DISPOSITION_INFORMATION disp = { TRUE };
+      status = NtSetInformationFile (h, &io, &disp, sizeof disp,
+				     FileDispositionInformation);
+      if (!NT_SUCCESS (status))
+	{
+	  syscall_printf ("Setting delete disposition failed, status = %p",
+			  status);
+	  lasterr = RtlNtStatusToDosError (status);
+	}
+    }
+
+  status = NtClose (h);
+  if (!NT_SUCCESS (status))
+    {
+      /* Maybe that's really paranoid, but not being able to close the file
+	 also means that deleting fails. */
+      syscall_printf ("%p = NtClose (%p)", status, h);
+      if (!lasterr)
+        RtlNtStatusToDosError (status);
+    }
+
+  syscall_printf ("Deleting succeeded");
+  return lasterr;
+}
+
 extern "C" int
 unlink (const char *ourname)
 {
@@ -211,7 +296,9 @@ unlink (const char *ourname)
     }
 
   bool setattrs;
-  if (!((DWORD) win32_name & (FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM)))
+  if (!((DWORD) win32_name & (FILE_ATTRIBUTE_READONLY
+			      | FILE_ATTRIBUTE_SYSTEM
+			      | FILE_ATTRIBUTE_HIDDEN)))
     setattrs = false;
   else
     {
@@ -219,100 +306,33 @@ unlink (const char *ourname)
       setattrs = SetFileAttributes (win32_name,
 				    (DWORD) win32_name
 				    & ~(FILE_ATTRIBUTE_READONLY
-					| FILE_ATTRIBUTE_SYSTEM));
-    }
-  /* Attempt to use "delete on close" semantics to handle removing
-     a file which may be open.
-
-     CV 2004-09-17: Not if the file is on a remote share.  If two processes
-     have open handles on a file and one of them calls unlink, then it
-     happens that the file is remove from the remote share even though the
-     other process still has an open handle.  This other process than gets
-     Win32 error 59, ERROR_UNEXP_NET_ERR when trying to access the file.
-
-     For some reason, that does not happen when using DeleteFile, which
-     nicely succeeds but still, the file is available for the other process.
-     To reproduce, mount /tmp on a remote share and call
-
-       bash -c "cat << EOF"
-
-     Microsoft KB 837665 describes this problem as a bug in 2K3, but I have
-     reproduced it on shares on Samba 2.2.8, Samba 3.0.2, NT4SP6, XP64SP1 and
-     2K3 and in all cases, DeleteFile works, "delete on close" does not. */
-  if (!win32_name.isremote () && wincap.has_delete_on_close ())
-    {
-      HANDLE h;
-      DWORD flags = FILE_FLAG_DELETE_ON_CLOSE;
-      if (win32_name.is_rep_symlink ())
-        flags |= FILE_FLAG_OPEN_REPARSE_POINT | FILE_FLAG_BACKUP_SEMANTICS;
-      h = CreateFile (win32_name, DELETE, wincap.shared (), &sec_none_nih,
-		      OPEN_EXISTING, flags, 0);
-      if (h != INVALID_HANDLE_VALUE)
-	{
-	  if (wincap.has_hard_links () && setattrs)
-	    SetFileAttributes (win32_name, (DWORD) win32_name);
-	  try_to_bin (win32_name.get_win32 ());
-	  BOOL res = CloseHandle (h);
-	  syscall_printf ("%d = CloseHandle (%p)", res, h);
-	  if (GetFileAttributes (win32_name) == INVALID_FILE_ATTRIBUTES
-	      || !win32_name.isremote ())
-	    {
-	      syscall_printf ("CreateFile (FILE_FLAG_DELETE_ON_CLOSE) succeeded");
-	      goto ok;
-	    }
-	  else
-	    {
-	      syscall_printf ("CreateFile (FILE_FLAG_DELETE_ON_CLOSE) failed");
-	      if (setattrs)
-		SetFileAttributes (win32_name, (DWORD) win32_name & ~(FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM));
-	    }
-	}
-    }
-
-  /* Try a delete with attributes reset */
-  if (win32_name.is_rep_symlink () && RemoveDirectory (win32_name))
-    {
-      syscall_printf ("RemoveDirectory after CreateFile/CloseHandle succeeded");
-      goto ok;
-    }
-  else if (DeleteFile (win32_name))
-    {
-      syscall_printf ("DeleteFile after CreateFile/CloseHandle succeeded");
-      goto ok;
+					| FILE_ATTRIBUTE_SYSTEM
+					| FILE_ATTRIBUTE_HIDDEN));
     }
 
   DWORD lasterr;
-  lasterr = GetLastError ();
+  lasterr = wincap.is_winnt () ? unlink_nt (win32_name, setattrs)
+			       : unlink_9x (win32_name);
+  if (!lasterr)
+    res = 0;
+  else
+    {
+      SetFileAttributes (win32_name, (DWORD) win32_name);
 
-  SetFileAttributes (win32_name, (DWORD) win32_name);
-
-  /* Windows 9x seems to report ERROR_ACCESS_DENIED rather than sharing
-     violation.  So, set lasterr to ERROR_SHARING_VIOLATION in this case
-     to simplify tests. */
-  if (wincap.access_denied_on_delete () && lasterr == ERROR_ACCESS_DENIED
-      && !win32_name.isremote ())
-    lasterr = ERROR_SHARING_VIOLATION;
-
-  /* FILE_FLAGS_DELETE_ON_CLOSE was a bust.  If this is a sharing
-     violation, then queue the file for deletion when the process
-     exits.  Otherwise, punt. */
-  if (lasterr != ERROR_SHARING_VIOLATION)
-    goto err;
-
-  syscall_printf ("couldn't delete file, err %d", lasterr);
-
-  /* Add file to the "to be deleted" queue. */
-  user_shared->delqueue.queue_file (win32_name);
-
- /* Success condition. */
- ok:
-  res = 0;
-  goto done;
-
- /* Error condition. */
- err:
-  __seterrno ();
-  res = -1;
+      /* Windows 9x seems to report ERROR_ACCESS_DENIED rather than sharing
+	 violation. */
+      if ((wincap.access_denied_on_delete () && lasterr == ERROR_ACCESS_DENIED
+	   && !win32_name.isremote ())
+	  || lasterr == ERROR_SHARING_VIOLATION)
+        {
+	  /* Add file to the "to be deleted" queue. */
+	  syscall_printf ("Sharing violation, couldn't delete file");
+	  user_shared->delqueue.queue_file (win32_name);
+	  res = 0;
+	}
+      else
+	__seterrno_from_win_error (lasterr);
+    }
 
  done:
   syscall_printf ("%d = unlink (%s)", res, ourname);
