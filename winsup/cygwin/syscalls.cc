@@ -207,6 +207,10 @@ unlink_nt (path_conv &win32_name, bool setattrs)
      2K3 and in all cases, DeleteFile works, "delete on close" does not. */
   if (!win32_name.isremote ())
     flags |= FILE_DELETE_ON_CLOSE;
+  /* Add the reparse point flag to native symlinks, otherwise we remove the
+     target, not the symlink. */
+  if (win32_name.is_rep_symlink ())
+    flags |= FILE_OPEN_REPARSE_POINT;
 
   win32_name.get_nt_native_path (upath);
   InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
