@@ -527,6 +527,7 @@ LoadDLLfuncEx (Wow64DisableWow64FsRedirection, 4, kernel32, 1)
 LoadDLLfuncEx (Wow64RevertWow64FsRedirection, 4, kernel32, 1)
 
 LoadDLLfunc (SHGetDesktopFolder, 4, shell32)
+LoadDLLfunc (SHFileOperationA, 4, shell32)
 
 LoadDLLfuncEx (waveOutGetNumDevs, 0, winmm, 1)
 LoadDLLfuncEx (waveOutOpen, 24, winmm, 1)

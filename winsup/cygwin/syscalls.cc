@@ -45,6 +45,7 @@ details. */
 #include <winioctl.h>
 #include <lmcons.h> /* for UNLEN */
 #include <rpc.h>
+#include <shellapi.h>
 
 #undef fstat
 #undef lstat
@@ -136,6 +137,42 @@ dup2 (int oldfd, int newfd)
   return cygheap->fdtab.dup2 (oldfd, newfd);
 }
 
+#ifndef FOF_NORECURSION
+#define FOF_NORECURSION 0x1000
+#endif
+#ifndef FOF_NORECURSEREPARSE
+#define FOF_NORECURSEREPARSE 0x8000
+#endif
+
+static void
+try_to_bin (const char *win32_path)
+{
+  /* The op.pFrom parameter must be double \0 terminated since it's not
+     just a filename, but a list of filenames.  If the double \0 is
+     missing, SHFileOperationA returns with error number 1026 (which is
+     not a valid system error number). */
+  char file[CYG_MAX_PATH + 1] = { 0 };
+  SHFILEOPSTRUCT op;
+  int ret;
+
+  op.hwnd = NULL;
+  op.wFunc = FO_DELETE;
+  op.pFrom = strcpy (file, win32_path);
+  op.pTo = NULL;
+  op.fFlags = FOF_ALLOWUNDO
+              | FOF_NOCONFIRMATION
+              | FOF_NOCONFIRMMKDIR
+              | FOF_NOERRORUI
+              | FOF_NORECURSION
+              | FOF_NORECURSEREPARSE
+              | FOF_SILENT;
+  op.fAnyOperationsAborted = FALSE;
+  op.hNameMappings = NULL;
+  op.lpszProgressTitle = NULL;
+  ret = SHFileOperationA (&op);
+  debug_printf ("SHFileOperation (%s) = %d\n", win32_path, ret);
+}
+
 extern "C" int
 unlink (const char *ourname)
 {
@@ -208,12 +245,13 @@ unlink (const char *ourname)
       DWORD flags = FILE_FLAG_DELETE_ON_CLOSE;
       if (win32_name.is_rep_symlink ())
         flags |= FILE_FLAG_OPEN_REPARSE_POINT | FILE_FLAG_BACKUP_SEMANTICS;
-      h = CreateFile (win32_name, 0, FILE_SHARE_READ, &sec_none_nih,
+      h = CreateFile (win32_name, DELETE, wincap.shared (), &sec_none_nih,
 		      OPEN_EXISTING, flags, 0);
       if (h != INVALID_HANDLE_VALUE)
 	{
 	  if (wincap.has_hard_links () && setattrs)
 	    SetFileAttributes (win32_name, (DWORD) win32_name);
+	  try_to_bin (win32_name.get_win32 ());
 	  BOOL res = CloseHandle (h);
 	  syscall_printf ("%d = CloseHandle (%p)", res, h);
 	  if (GetFileAttributes (win32_name) == INVALID_FILE_ATTRIBUTES
