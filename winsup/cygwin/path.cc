@@ -4150,6 +4150,8 @@ cwdstuff::get_hash ()
   return hashnow;
 }
 
+extern char windows_system_directory[];
+
 /* Initialize cygcwd 'muto' for serializing access to cwd info. */
 void
 cwdstuff::init ()
@@ -4157,14 +4159,20 @@ cwdstuff::init ()
   extern int dynamically_loaded;
   cwd_lock.init ("cwd_lock");
   get_initial ();
-  if (!dynamically_loaded)
+  if (!dynamically_loaded && !keep_in_sync ())
     {
-      /* Actually chdir into the syste dir to avoid cwd problems.  See comment
+      /* Actually chdir into the system dir to avoid cwd problems.  See comment
 	 in cwdstuff::set below. */
-      extern char windows_system_directory[];
       SetCurrentDirectory (windows_system_directory);
     }
   cwd_lock.release ();
+}
+
+void
+cwdstuff::keep_in_sync (bool val)
+{
+  sync = val;
+  SetCurrentDirectory (val ? win32 : windows_system_directory);
 }
 
 /* Get initial cwd.  Should only be called once in a
@@ -4195,40 +4203,55 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
       cwd_lock.acquire ();
       if (doit)
         {
-	  /* Check if we *could* chdir, if we actually would.
-	  
-	     Why don't we actually chdir?  For two reasons:
-	     - A process has always an open handle to the current working
-	       directory which disallows manipulating this directory.
-	       POSIX allows to remove a directory if the permissions are
-	       ok.  The fact that its the cwd of some process doesn't matter.
-	     - SetCurrentDirectory fails for directories with strict
-	       permissions even for processes with the SE_BACKUP_NAME
-	       privilege enabled.  The reason is apparently that
-	       SetCurrentDirectory calls NtOpenFile without the
-	       FILE_OPEN_FOR_BACKUP_INTENT flag set. */
-	  DWORD attr = GetFileAttributes (win32_cwd);
-	  if (attr == INVALID_FILE_ATTRIBUTES)
+	  if (keep_in_sync ())
 	    {
-	      set_errno (ENOENT);
-	      goto out;
-	    }
-	  if (!(attr & FILE_ATTRIBUTE_DIRECTORY))
-	    {
-	      set_errno (ENOTDIR);
-	      goto out;
-	    }
-	  if (wincap.can_open_directories ())
-	    {
-	      HANDLE h = CreateFile (win32_cwd, GENERIC_READ, wincap.shared (),
-				     NULL, OPEN_EXISTING,
-				     FILE_FLAG_BACKUP_SEMANTICS, NULL);
-	      if (h == INVALID_HANDLE_VALUE)
-		{
+	      /* If a Cygwin application called cygwin_internal(CW_SYNC_WINENV),
+	         then it's about to call native Windows functions.  This also
+		 sets the keep_in_sync flag so that we actually chdir into the
+		 native directory to avoid confusion. */
+	      if (!SetCurrentDirectory (win32_cwd))
+	        {
 		  __seterrno ();
 		  goto out;
 		}
-	      CloseHandle (h);
+	    }
+	  else
+	    {
+	      /* Check if we *could* chdir, if we actually would.
+	      
+		 Why don't we actually chdir?  For two reasons:
+		 - A process has always an open handle to the current working
+		   directory which disallows manipulating this directory.
+		   POSIX allows to remove a directory if the permissions are
+		   ok.  The fact that its the cwd of some process doesn't matter.
+		 - SetCurrentDirectory fails for directories with strict
+		   permissions even for processes with the SE_BACKUP_NAME
+		   privilege enabled.  The reason is apparently that
+		   SetCurrentDirectory calls NtOpenFile without the
+		   FILE_OPEN_FOR_BACKUP_INTENT flag set. */
+	      DWORD attr = GetFileAttributes (win32_cwd);
+	      if (attr == INVALID_FILE_ATTRIBUTES)
+		{
+		  set_errno (ENOENT);
+		  goto out;
+		}
+	      if (!(attr & FILE_ATTRIBUTE_DIRECTORY))
+		{
+		  set_errno (ENOTDIR);
+		  goto out;
+		}
+	      if (wincap.can_open_directories ())
+		{
+		  HANDLE h = CreateFile (win32_cwd, GENERIC_READ,
+		  			 wincap.shared (), NULL, OPEN_EXISTING,
+					 FILE_FLAG_BACKUP_SEMANTICS, NULL);
+		  if (h == INVALID_HANDLE_VALUE)
+		    {
+		      __seterrno ();
+		      goto out;
+		    }
+		  CloseHandle (h);
+		}
 	    }
         }
     }
