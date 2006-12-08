@@ -54,7 +54,7 @@ OBJDUMP = `t='$(program_transform_name)'; echo objdump | sed -e $$t`
 OBJCOPY = `t='$(program_transform_name)'; echo objcopy | sed -e $$t`
 
 # object files needed
-OBJS = syscalls.o init.o exit.o sbrk.o close.o fstat.o getpid.o isatty.o \
+OBJS = syscalls.o exit.o sbrk.o close.o fstat.o getpid.o isatty.o \
 	kill.o lseek.o open.o read.o unlink.o write.o stat.o
 
 # Object files specific to particular targets.
@@ -63,7 +63,8 @@ EVALOBJS = ${OBJS}
 GCC_LDFLAGS = `if [ -d ${objroot}/../gcc ] ; \
 	then echo -L${objroot}/../gcc ; fi`
 
-OUTPUTS = libgloss.a crt0.o
+CRTOBJS = crti.o crtn.o crt1.o crt2.o
+OUTPUTS = libgloss.a $(CRTOBJS)
 
 NEWLIB_CFLAGS = `if [ -d ${objroot}/newlib ]; then echo -I${objroot}/newlib/targ-include -I${srcroot}/newlib/libc/include; fi` -ffunction-sections -fdata-sections
 NEWLIB_LDFLAGS = `if [ -d ${objroot}/newlib ]; then echo -B${objroot}/newlib/ -L${objroot}/newlib/; fi`
@@ -110,6 +111,19 @@ all: ${OUTPUTS}
 libgloss.a: $(EVALOBJS)
 	${AR} ${ARFLAGS} $@ $(EVALOBJS)
 	${RANLIB} $@
+
+# C Runtime Library startup code.
+crti.o:
+	$(CC) $(srcdir)/crti.S -c -o crti.o 
+
+crtn.o:
+	$(CC) $(srcdir)/crtn.S -c -o crtn.o 
+
+crt1.o:
+	$(CC) $(srcdir)/crt0.S -c -o crt1.o
+
+crt2.o:
+	$(CC) $(srcdir)/crt0.S -D_STD_MAIN -c -o crt2.o
 
 doc:	
 

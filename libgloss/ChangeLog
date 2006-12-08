@@ -1,4 +1,18 @@
-2006-11-27  Jeff Johnston  <jjohnstn@redhat.com>
+2006-12-08  Sa Liu  <saliu@de.ibm.com>
+
+        * spu/exit.c (libgloss_exit): Rename from this ..
+        (_exit): .. to this. Overhaul.
+        (exit): Remove.
+        * spu/crt0.S, spu/crti.S, spu/crtn.S: New files.
+        * spu/crt0.C, spu/init.c: Remove.
+        * spu/configure.in (AC_INIT): Check for crt0.S, not crt0.C.
+        * spu/configure: Regenerate.
+        * spu/Makefile.in (crti.o, crtn.o, crt1.o, crt2.o): New targets.
+        (OBJS): Remove init.o.
+        (CRTOBJS): New.
+        (OUTPUTS): Add $(CRTOBJS).
+
+I2006-11-27  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* mips/crt0.S: Fix preprocessor statements from previous patch
 	to be ANSI.

@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)dnl
-AC_INIT(crt0.c)
+AC_INIT(crt0.S)
 
 if test "$srcdir" = "." ; then
   if test "${with_target_subdir}" != "." ; then
