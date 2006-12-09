@@ -1,3 +1,8 @@
+2006-12-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (try_to_bin): Add comment that this is not possibly
+	the final version.
+
 2006-12-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (unlink_nt): Open native symlinks with

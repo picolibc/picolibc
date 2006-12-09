@@ -149,6 +149,13 @@ dup2 (int oldfd, int newfd)
 static void
 try_to_bin (const char *win32_path)
 {
+/* TODO: Using SHFileOperation for this functionality is incredibly slow.
+	 Given the fact that we have an open handle to the file at this
+	 point, there must be some quicker way to move the file to the
+	 bin or something bin-like.  I keep this activated to remind me
+	 by its slowness, that this can't go into a release version as
+	 is.  Back to the drawing board. */
+
   /* The op.pFrom parameter must be double \0 terminated since it's not
      just a filename, but a list of filenames.  If the double \0 is
      missing, SHFileOperationA returns with error number 1026 (which is
