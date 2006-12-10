@@ -72,6 +72,7 @@ struct wincaps
   unsigned has_mandatory_integrity_control		: 1;
   unsigned needs_logon_sid_in_sid_list			: 1;
   unsigned needs_count_in_si_lpres2			: 1;
+  unsigned has_recycle_dot_bin				: 1;
 };
 
 class wincapc
@@ -150,6 +151,7 @@ public:
   bool	IMPLEMENT (has_mandatory_integrity_control)
   bool	IMPLEMENT (needs_logon_sid_in_sid_list)
   bool	IMPLEMENT (needs_count_in_si_lpres2)
+  bool	IMPLEMENT (has_recycle_dot_bin)
 
 #undef IMPLEMENT
 };

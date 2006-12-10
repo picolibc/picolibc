@@ -1,5 +1,25 @@
 2006-12-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (SHFileOperationA): Drop definition.
+	* ntdll.h (struct _FILE_RENAME_INFORMATION): Define.
+	* path.cc (fs_info::update): Note length of rootdir prefix in
+	root_len.
+	(get_nt_native_path): New function, taking over functionality of
+	path_conv::get_nt_native_path.
+	(path_conv::get_nt_native_path): Just call get_nt_native_path.
+	* path.h (get_nt_native_path): Declare.
+	(struct fs_info): New member root_len.
+	(fs_info::length): New inline method returning root_len.
+	(path_conv::rootdir): New inline method returning rootdir prefix.
+	* syscalls.cc (try_to_bin): Rewrite using only system calls.
+	(unlink_nt): Call try_to_bin with additional handle to open file
+	parameter.
+	(statvfs): Use path_conv::rootdir method.
+	* wincap.h: Define has_recycle_dot_bin throughout.
+	* wincap.cc: Ditto.
+
+2006-12-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (rootdir): Clarify comment.
 
 2006-12-10  Corinna Vinschen  <corinna@vinschen.de>

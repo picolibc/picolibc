@@ -389,7 +389,7 @@ fs_info::update (const char *win32_path)
   char root_dir [CYG_MAX_PATH];
   bool ret;
 
-  if (!rootdir (win32_path, root_dir))
+  if (!::rootdir (win32_path, root_dir))
     {
       debug_printf ("Cannot get root component of path %s", win32_path);
       clear ();
@@ -411,6 +411,7 @@ fs_info::update (const char *win32_path)
       ++idx;
     }
   name_hash = tmp_name_hash;
+  root_len = strlen (root_dir);
 
   /* I have no idea why, but some machines require SeChangeNotifyPrivilege
      to access volume information. */
@@ -549,7 +550,7 @@ path_conv::set_normalized_path (const char *path_copy, bool strip_tail)
 }
 
 PUNICODE_STRING
-path_conv::get_nt_native_path (UNICODE_STRING &upath)
+get_nt_native_path (const char *path, UNICODE_STRING &upath)
 {
   if (path[0] != '\\')			/* X:\...  or NUL, etc. */
     {
@@ -570,6 +571,12 @@ path_conv::get_nt_native_path (UNICODE_STRING &upath)
       str2uni_cat (upath, path + 4);
     }
   return &upath;
+}
+
+PUNICODE_STRING
+path_conv::get_nt_native_path (UNICODE_STRING &upath)
+{
+  return ::get_nt_native_path (path, upath);
 }
 
 void

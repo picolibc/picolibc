@@ -139,47 +139,92 @@ dup2 (int oldfd, int newfd)
   return cygheap->fdtab.dup2 (oldfd, newfd);
 }
 
-#ifndef FOF_NORECURSION
-#define FOF_NORECURSION 0x1000
-#endif
-#ifndef FOF_NORECURSEREPARSE
-#define FOF_NORECURSEREPARSE 0x8000
-#endif
-
 static void
-try_to_bin (const char *win32_path)
+try_to_bin (path_conv &win32_path, HANDLE h)
 {
-/* TODO: Using SHFileOperation for this functionality is incredibly slow.
-	 Given the fact that we have an open handle to the file at this
-	 point, there must be some quicker way to move the file to the
-	 bin or something bin-like.  I keep this activated to remind me
-	 by its slowness, that this can't go into a release version as
-	 is.  Back to the drawing board. */
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  char recycler[CYG_MAX_PATH + 20];
 
-  /* The op.pFrom parameter must be double \0 terminated since it's not
-     just a filename, but a list of filenames.  If the double \0 is
-     missing, SHFileOperationA returns with error number 1026 (which is
-     not a valid system error number). */
-  char file[CYG_MAX_PATH + 1] = { 0 };
-  SHFILEOPSTRUCT op;
-  int ret;
+  char *c = recycler + win32_path.rootdir (recycler);
+  if (wincap.has_recycle_dot_bin ())
+    {
+      strcpy (c, "$Recycle.Bin");	/* NTFS and FAT since Vista */
+      c += 12;
+    }
+  else if (win32_path.fs_is_ntfs ())
+    {
+      strcpy (c, "RECYCLER");		/* NTFS up to 2K3 */
+      c += 8;
+    }
+  else if (win32_path.fs_is_fat ())
+    {
+      strcpy (c, "Recycled");		/* FAT up to 2K3 */
+      c += 8;
+    }
+  else
+    return;
 
-  op.hwnd = NULL;
-  op.wFunc = FO_DELETE;
-  op.pFrom = strcpy (file, win32_path);
-  op.pTo = NULL;
-  op.fFlags = FOF_ALLOWUNDO
-              | FOF_NOCONFIRMATION
-              | FOF_NOCONFIRMMKDIR
-              | FOF_NOERRORUI
-              | FOF_NORECURSION
-              | FOF_NORECURSEREPARSE
-              | FOF_SILENT;
-  op.fAnyOperationsAborted = FALSE;
-  op.hNameMappings = NULL;
-  op.lpszProgressTitle = NULL;
-  ret = SHFileOperationA (&op);
-  debug_printf ("SHFileOperation (%s) = %d\n", win32_path, ret);
+  /* Yes, we can really do that.  Typically the recycle bin is created
+     by the first user actually using the bin.  The permissions are the
+     default permissions propagated from the root directory. */
+  if (GetFileAttributes (recycler) == INVALID_FILE_ATTRIBUTES)
+    {
+      if (!CreateDirectory (recycler, NULL))
+	{
+	  debug_printf ("Can't create folder %s, %E", recycler);
+	  return;
+	}
+      SetFileAttributes (recycler,
+      			 FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_HIDDEN);
+    }
+
+#if 0
+  /* The default settings for the top level recycle bin are so that
+     everybody has the right to create files in it.  Should that be
+     insufficient at one point, we can enable the following code to
+     move the file into the user's own bin subdir.  At this point,
+     I'm going to opt for speed, though. */
+  if (win32_path.fs_is_ntfs ())
+    {
+      *c++ = '\\';
+      cygheap->user.get_windows_id (c);
+      while (*c)
+       ++c;
+      if (GetFileAttributes (recycler) == INVALID_FILE_ATTRIBUTES)
+        {
+	  if (!CreateDirectory (recycler,
+	  			sec_user ((PSECURITY_ATTRIBUTES) alloca (1024),
+					  cygheap->user.sid ())))
+	    {
+	      debug_printf ("Can't create folder %s, %E", recycler);
+	      return;
+	    }
+	  SetFileAttributes (recycler,
+			     FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_HIDDEN);
+	}
+    }
+#endif
+
+  /* Create hopefully unique filename. */
+  __small_sprintf (c, "\\cyg%016X", hash_path_name (myself->uid,
+						    win32_path.get_win32 ()));
+  c += 20;
+
+  /* Length of thr WCHAR path in bytes. */
+  ULONG len = 2 * (c - recycler);
+  /* Choose size big enough to fit a local native NT path into it. */
+  ULONG size = sizeof (FILE_RENAME_INFORMATION) + len + 10;
+  PFILE_RENAME_INFORMATION pfri = (PFILE_RENAME_INFORMATION) alloca (size);
+
+  pfri->ReplaceIfExists = TRUE;
+  pfri->RootDirectory = NULL;
+  UNICODE_STRING uname = { 0, len + 10, pfri->FileName };
+  get_nt_native_path (recycler, uname);
+  pfri->FileNameLength = uname.Length;
+  status = NtSetInformationFile (h, &io, pfri, size, FileRenameInformation);
+  if (!NT_SUCCESS (status))
+    debug_printf ("Move %s to %s failed, status = %p", status);
 }
 
 static DWORD
@@ -238,7 +283,7 @@ unlink_nt (path_conv &win32_name, bool setattrs)
     SetFileAttributes (win32_name, (DWORD) win32_name);
 
   if (!win32_name.isremote ())
-    try_to_bin (win32_name.get_win32 ());
+    try_to_bin (win32_name, h);
 
   DWORD lasterr = 0;
 
@@ -1848,7 +1893,7 @@ statvfs (const char *fname, struct statvfs *sfs)
     }
 
   path_conv full_path (fname, PC_SYM_FOLLOW);
-  if (!rootdir (full_path, root))
+  if (!full_path.rootdir (root))
     {
       set_errno (ENOTDIR);
       return -1;

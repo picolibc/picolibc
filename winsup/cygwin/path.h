@@ -15,6 +15,8 @@ details. */
 #include <fcntl.h>
 #include <ntdef.h>
 
+extern PUNICODE_STRING get_nt_native_path (const char *, UNICODE_STRING &);
+
 inline bool
 has_attribute (DWORD attributes, DWORD attribs_to_test)
 {
@@ -85,6 +87,7 @@ class symlink_info;
 struct fs_info
 {
  private:
+  int root_len;
   __ino64_t name_hash;
   struct status_flags
   {
@@ -106,6 +109,7 @@ struct fs_info
   void clear ()
   {
     name_hash = 0;
+    root_len = 0;
     flags () = serial () = 0;
     is_remote_drive (false);
     has_buggy_open (false);
@@ -121,6 +125,7 @@ struct fs_info
   }
   inline DWORD& flags () {return status.flags;};
   inline DWORD& serial () {return status.serial;};
+  inline int length () const {return root_len;}
 
   IMPLEMENT_STATUS_FLAG (bool, is_remote_drive)
   IMPLEMENT_STATUS_FLAG (bool, has_buggy_open)
@@ -150,6 +155,17 @@ class path_conv
   device dev;
   bool case_clash;
 
+  int rootdir (char *buf) const
+  {
+    if (!fs.length ())
+      return fs.length ();
+    strncpy (buf, path, fs.length ());
+    /* The length is always stored with trailing backslash.  Make sure the
+       backslash is actually present in the returned path. */
+    buf[fs.length () - 1] = '\\';
+    buf[fs.length ()] = '\0';
+    return fs.length ();
+  }
   bool isremote () const {return fs.is_remote_drive ();}
   bool has_acls () const {return fs.has_acls (); }
   bool hasgood_inode () const {return fs.hasgood_inode (); }
