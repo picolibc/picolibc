@@ -52,12 +52,9 @@ static void
 do_mount (const char *dev, const char *where, int flags)
 {
   struct stat statbuf;
-  char win32_path[MAX_PATH];
   int statres;
 
-  cygwin_conv_to_win32_path (where, win32_path);
-
-  statres = stat (win32_path, &statbuf);
+  statres = stat (where, &statbuf);
 
 #if 0
   if (statres == -1)
