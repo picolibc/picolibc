@@ -1221,7 +1221,7 @@ rootdir (const char *full_path, char *root_path)
 
   if (full_path[1] == ':')
     {
-      *rootp++ = *full_path++;
+      *rootp++ = *full_path;
       *rootp++ = ':';
     }
   else if (full_path[0] == '\\' && full_path[1] == '\\')
@@ -1239,6 +1239,60 @@ rootdir (const char *full_path, char *root_path)
 
   *rootp++ = '\\';
   *rootp = '\0';
+
+  /* This also determines whether reparse points are available. */
+  if (!wincap.has_guid_volumes ())
+    return root_path;
+
+  PREPARSE_DATA_BUFFER rp = (PREPARSE_DATA_BUFFER)
+			    alloca (MAXIMUM_REPARSE_DATA_BUFFER_SIZE);
+
+  char *test_path = (char *) alloca (CYG_MAX_PATH);
+  strcpy (test_path, full_path);
+
+  /* This determines the minimum length of the path we test for mount points.
+     If we're below this value, it's the root dir of the path itself. */
+  char *min_c = test_path + (rootp - root_path);
+  char *c = min_c;
+  while (*c)
+    ++c;
+  while (c > min_c)
+    {
+      *c = '\0';
+
+#     define MOUNTPT_ATTR (FILE_ATTRIBUTE_DIRECTORY \
+			   | FILE_ATTRIBUTE_REPARSE_POINT)
+      DWORD attr = GetFileAttributes (test_path);
+      if (attr != INVALID_FILE_ATTRIBUTES
+	  && (attr & MOUNTPT_ATTR) == MOUNTPT_ATTR)
+	{
+	  HANDLE h = CreateFile (test_path, GENERIC_READ, FILE_SHARE_READ,
+				 &sec_none_nih, OPEN_EXISTING,
+				 FILE_FLAG_OPEN_REPARSE_POINT
+				 | FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	  if (h != INVALID_HANDLE_VALUE)
+	    {
+	      DWORD size;
+	      BOOL ret = DeviceIoControl (h, FSCTL_GET_REPARSE_POINT, NULL,
+					  0, (LPVOID) rp,
+					  MAXIMUM_REPARSE_DATA_BUFFER_SIZE,
+					  &size, NULL);
+	      CloseHandle (h);
+	      if (ret
+		  && rp->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT
+		  && !rp->SymbolicLinkReparseBuffer.PrintNameLength)
+		{
+		  memcpy (root_path, test_path, len = c - test_path);
+		  strcpy (root_path + len, "\\");
+		  CloseHandle (h);
+		  break;
+		}
+	    }
+	}
+      while (--c > min_c && *c != '\\')
+        ;
+    }
+
   return root_path;
 }
 
@@ -1739,7 +1793,7 @@ check_posix_perm (const char *fname, int v)
   if (!allow_ntsec)
     return 0;
 
-  char *root = rootdir (fname, (char *)alloca (strlen (fname)));
+  char *root = rootdir (fname, (char *)alloca (strlen (fname) + 2));
 
   if (!allow_smbntsec
       && ((root[0] == '\\' && root[1] == '\\')
