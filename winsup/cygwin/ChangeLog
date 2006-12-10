@@ -1,5 +1,10 @@
 2006-12-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (rootdir): Don't look for volume mount points on remote
+	shares.
+
+2006-12-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (rootdir): Drop useless post-increment.  Take volume
 	mount points into account.
 	(check_posix_perm): Allocate space for root directory big enough.

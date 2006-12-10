@@ -1240,8 +1240,9 @@ rootdir (const char *full_path, char *root_path)
   *rootp++ = '\\';
   *rootp = '\0';
 
-  /* This also determines whether reparse points are available. */
-  if (!wincap.has_guid_volumes ())
+  /* This determines whether reparse points are available.  Reparse points
+     on remote shares are not recognized by Windows. */
+  if (!wincap.has_guid_volumes () || GetDriveType (root_path) == DRIVE_REMOTE)
     return root_path;
 
   PREPARSE_DATA_BUFFER rp = (PREPARSE_DATA_BUFFER)
