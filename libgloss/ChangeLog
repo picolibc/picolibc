@@ -12,7 +12,7 @@
         (CRTOBJS): New.
         (OUTPUTS): Add $(CRTOBJS).
 
-I2006-11-27  Jeff Johnston  <jjohnstn@redhat.com>
+2006-11-27  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* mips/crt0.S: Fix preprocessor statements from previous patch
 	to be ANSI.
