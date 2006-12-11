@@ -1831,49 +1831,49 @@ case "${target}" in
 
 subdirs="$subdirs i386"
 
-	config_testsuite=true;
+	config_testsuite=true
 	;;
   m32r-*-*)
 
 
 subdirs="$subdirs m32r"
 
-	config_testsuite=true;
+	config_testsuite=true
 	;;
   m68hc11-*-* | m6811-*-* | m68hc12-*-* | m6812-*-*)
 
 
 subdirs="$subdirs m68hc11"
 
-	config_testsuite=true;
+	config_testsuite=true
 	;;
   m68*-*-*)
 
 
 subdirs="$subdirs m68k"
 
-	config_testsuite=true;
+	config_testsuite=true
 	;;
   hppa*-*-pro*)
 
 
 subdirs="$subdirs pa"
 
-	config_testsuite=true;
+	config_testsuite=true
 	;;
   i960-*-coff)
 
 
 subdirs="$subdirs i960"
 
-	config_testsuite=true;
+	config_testsuite=true
 	;;
   sparclet-*-aout* | sparc-*-elf* | sparc64-*-elf* | sparc86x-*-* | sparclite-*-*)
 
 
 subdirs="$subdirs sparc"
 
-	config_testsuite=true;
+	config_testsuite=true
 	;;
   sh*-*-pe | mips*-*-pe | *arm-wince-pe)
 
@@ -1886,42 +1886,42 @@ subdirs="$subdirs wince"
 
 subdirs="$subdirs mips"
 
-	config_testsuite=true;
+	config_testsuite=true
 	;;
   powerpc-*-*|powerpcle-*-*)
 
 
 subdirs="$subdirs rs6000"
 
-	config_testsuite=true;
+	config_testsuite=true
 	;;
   mn10200-*-*)
 
 
 subdirs="$subdirs mn10200"
 
-	config_testsuite=true;
+	config_testsuite=true
 	;;
   mn10300-*-*)
 
 
 subdirs="$subdirs mn10300"
 
-	config_testsuite=true;
+	config_testsuite=true
 	;;
   bfin-*-*)
 
 
 subdirs="$subdirs bfin"
 
-	config_testsuite=true;
+	config_testsuite=true
 	;;
   cris-*-* | crisv32-*-*)
 
 
 subdirs="$subdirs cris"
 
-	config_testsuite=true;
+	config_testsuite=true
 	;;
   crx-*-*)
 
@@ -1934,70 +1934,70 @@ subdirs="$subdirs crx"
 
 subdirs="$subdirs d30v"
 
-	config_testsuite=true;
+	config_testsuite=true
 	;;
   fr30-*-*)
 
 
 subdirs="$subdirs fr30"
 
-	config_testsuite=true;
+	config_testsuite=true
 	;;
   frv*-*-*)
 
 
 subdirs="$subdirs frv"
 
-	config_testsuite=true;
+	config_testsuite=true
 	;;
   mcore-*-*)
 
 
 subdirs="$subdirs mcore"
 
-	config_testsuite=true;
+	config_testsuite=true
 	;;
   mt-*-*)
 
 
 subdirs="$subdirs mt"
 
-	config_testsuite=true;
+	config_testsuite=true
 	;;
   xstormy16-*-*)
 
 
 subdirs="$subdirs xstormy16"
 
-	config_testsuite=true;
+	config_testsuite=true
 	;;
   m32c-*-*)
 
 
 subdirs="$subdirs m32c"
 
-	config_testsuite=true;
+	config_testsuite=true
 	;;
   strongarm-*-elf | strongarm-*-coff | arm*-*-elf | arm*-*-coff | ep9312-*-elf | ep9312-*-coff | xscale-*-elf | xscale-*-coff | *arm-*-*)
 
 
 subdirs="$subdirs arm"
 
-	config_testsuite=true;
+	config_testsuite=true
 	;;
   spu-*-elf)
 
 
 subdirs="$subdirs spu"
 
-	config_testsuite=false;
+	config_testsuite=false
 	;;
   iq2000-*-*)
 
 
 subdirs="$subdirs iq2000"
 
-	config_testsuite=true;
+	config_testsuite=true
 	;;
 esac
 
