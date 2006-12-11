@@ -1,4 +1,4 @@
-2006-12-10  Christopher Faylor  <cgf@timesys.com>
+2006-12-10  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* mount.cc (do_mount): Avoid unnecessary cygwin_conv_to_win32_path and
 	pass POSIX path directly - this avoids a cygwin DLL warning.
