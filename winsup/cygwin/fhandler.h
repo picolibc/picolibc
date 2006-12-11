@@ -167,7 +167,7 @@ class fhandler_base
   void set_flags (int x, int supplied_bin = 0);
 
   bool is_nonblocking ();
-  void set_nonblocking (int yes);
+  void set_nonblocking (int);
 
   bool wbinary () const { return status.wbinset ? status.wbinary : 1; }
   bool rbinary () const { return status.rbinset ? status.rbinary : 1; }
@@ -249,15 +249,15 @@ class fhandler_base
   virtual char *get_proc_fd_name (char *buf);
 
   virtual void hclose (HANDLE h) {CloseHandle (h);}
-  virtual void set_no_inheritance (HANDLE &h, int not_inheriting);
+  virtual void set_no_inheritance (HANDLE &, bool);
 
   /* fixup fd possibly non-inherited handles after fork */
-  bool fork_fixup (HANDLE parent, HANDLE &h, const char *name);
+  bool fork_fixup (HANDLE, HANDLE &, const char *);
   virtual bool need_fixup_before () const {return false;}
 
-  int open_9x (int flags, mode_t mode = 0);
-  virtual int open (int flags, mode_t mode = 0);
-  int open_fs (int flags, mode_t mode = 0);
+  int open_9x (int, mode_t = 0);
+  virtual int open (int, mode_t = 0);
+  int open_fs (int, mode_t = 0);
   virtual int close ();
   int close_fs ();
   virtual int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
@@ -520,8 +520,12 @@ protected:
   HANDLE writepipe_exists;
   DWORD orig_pid;
   unsigned id;
+private:
+  pid_t popen_pid;
 public:
   fhandler_pipe ();
+  void set_popen_pid (pid_t pid) {popen_pid = pid;}
+  pid_t get_popen_pid () const {return popen_pid;}
   _off64_t lseek (_off64_t offset, int whence);
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);

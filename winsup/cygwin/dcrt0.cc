@@ -425,9 +425,7 @@ check_sanity_and_sync (per_process *p)
   /* struct without updating SIZEOF_PER_PROCESS [it makes them think twice */
   /* about changing it].						   */
   if (sizeof (per_process) != SIZEOF_PER_PROCESS)
-    {
-      api_fatal ("per_process sanity check failed");
-    }
+    api_fatal ("per_process sanity check failed");
 
   /* Make sure that the app and the dll are in sync. */
 
@@ -590,48 +588,17 @@ child_info *
 get_cygwin_startup_info ()
 {
   STARTUPINFO si;
-  DWORD zeros[sizeof (child_proc_info->zero)
-	      / sizeof (child_proc_info->zero[0])] = {0};
 
   GetStartupInfo (&si);
   child_info *res = (child_info *) si.lpReserved2;
 
-  /* It appears that when running under WOW64 on Vista 64, the first DWORD
-     value in the datastructure lpReserved2 is pointing to (zero[0] in
-     Cygwin), has to reflect the size of that datastructure as used in the
-     Microsoft C runtime (a count value, counting the number of elements in
-     two subsequent arrays, BYTE[count and HANDLE[count]), even though the C
-     runtime isn't used.  Otherwise, if zero[0] is 0 or too small, the
-     datastructure gets overwritten.
-
-     This seems to be a bug in Vista's WOW64, which apparently copies the
-     lpReserved2 datastructure not using the cbReserved2 size information,
-     but using the information given in the first DWORD within lpReserved2
-     instead.  32 bit Windows and former WOW64 don't care if zero[0] is 0
-     or a sensible non-0 count value.  However, it's not clear if a non-0
-     count doesn't result in trying to evaluate the content, so we do this
-     really only for Vista 64 for now.
-
-     exec/spawn as well as fork write an appropriate value into zero[0] now,
-     depending on the wincap.needs_count_in_si_lpres2 flag.  The value is
-     sizeof (child_info_*) / 5 which results in a count which covers the
-     full datastructure, plus not more than 4 extra bytes.  This is ok as
-     long as the child_info structure is cosily stored within a bigger
-     datastructure. */
-  if (wincap.needs_count_in_si_lpres2 ())
-    zeros[0] = si.cbReserved2 / 5;
-
   if (si.cbReserved2 < EXEC_MAGIC_SIZE || !res
-      || memcmp (res->zero, zeros, sizeof (res->zero)) != 0)
+      || res->intro != PROC_MAGIC_GENERIC || res->magic != CHILD_INFO_MAGIC)
     res = NULL;
   else
     {
       if ((res->intro & OPROC_MAGIC_MASK) == OPROC_MAGIC_GENERIC)
 	multiple_cygwin_problem ("proc intro", res->intro, 0);
-      else if (res->intro == PROC_MAGIC_GENERIC
-	       && res->magic != CHILD_INFO_MAGIC)
-	multiple_cygwin_problem ("proc magic", res->magic,
-				 CHILD_INFO_MAGIC);
       else if (res->cygheap != (void *) &_cygheap_start)
 	multiple_cygwin_problem ("cygheap base", (DWORD) res->cygheap,
 				 (DWORD) &_cygheap_start);
@@ -718,6 +685,11 @@ child_info_spawn::handle_spawn ()
   envc = moreinfo->envc;
   if (!dynamically_loaded)
     cygheap->fdtab.fixup_after_exec ();
+  if (__stdin >= 0)
+    cygheap->fdtab.move_fd (__stdin, 0);
+  if (__stdout >= 0)
+    cygheap->fdtab.move_fd (__stdout, 1);
+
   ready (true);
 
   /* Need to do this after debug_fixup_after_fork_exec or DEBUGGING handling of

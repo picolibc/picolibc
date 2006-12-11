@@ -1,3 +1,41 @@
+2006-12-11  Christopher Faylor  <me@cgf.cx>
+
+	* child_info.h (child_info_spawn::__stdin): New element.
+	(child_info_spawn::__stdin): Ditto.
+	(CURR_CHILD_INFO_MAGIC): Regenerate.
+	* dcrt0.cc (check_sanity_and_sync): Minor cleanup.
+	(child_info_spawn::handle_spawn): Handle new __std* elements by calling
+	move_fd.
+	* dtable.cc (dtable::move_fd): Define new function.
+	* dtable.h (dtable::move_fd): Declare new function.
+	* fhandler.h (fhandler_pipe::popen_pid): Declare new element.
+	* fhandler.h (fhandler_pipe::get_popen_pid): Define new function.
+	* fhandler.h (fhandler_pipe::set_popen_pid): Ditto.
+	* pipe.cc (fhandler_pipe::fhandler_pipe): Zero popen_pid.
+	(fhandler_pipe::dup): Ditto.
+	* spawn.cc (handle): Change second argument to bool.
+	(spawn_guts): Accept __stdin/__stdout arguments and set them
+	appropriately in child_info structure and in STARTUPINFO structure.
+	* syscalls.cc (popen): New cygwin-specific implementation using spawn.
+	(pclose): Ditto.
+	* winsup.h (spawn_guts): Accommodate new arguments for spawn_guts.
+
+	* fhandler.cc (fhandler_base::set_no_inheritance): Make second arg a bool.
+	* fhandler.h (fhandler_base::set_no_inheritance): Ditto for declaration.
+
+	* child_info.h (child_info::msv_count): Rename from the now-inappropriate
+	"zero".
+	(child_info_spawn::filler): Add filler to work around Vista bug.
+	(child_info_fork::filler): Ditto.
+	* dcrt0.cc (get_cygwin_startup_info): Remove "zero" check since it is
+	now always filled out.
+	* fork.cc (frok::parent): Move ch.zero manipulation to constructor.
+	* spawn.cc (spawn_guts): Ditto.  Remove _ch wrapper.
+	* sigproc.cc (child_info::child_info): Initialize starter[].
+
+	* shared.cc (shared_info::heap_slop_size): Remove noisy system_printfs.
+	* shared_info.h (CURR_SHARED_MAGIC): Regenerate.
+
 2006-12-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (rootdir): Fix typo in comment.
@@ -78,7 +116,7 @@
 
 2006-12-06  Corinna Vinschen  <corinna@vinschen.de>
 
-	* termios.cc: Change include order to accomodate change to sys/ioctl.h.
+	* termios.cc: Change include order to accommodate change to sys/ioctl.h.
 
 2006-12-06  Corinna Vinschen  <corinna@vinschen.de>
 
@@ -123,7 +161,7 @@
 	* fork.cc (frok::parent): Set ch.zero[0] to a sensible count value
 	if wincap.needs_count_in_si_lpres2 is set.
 	* spawn.cc (spawn_guts): Ditto.  Add filler bytes after ch on stack
-	to accomodate needs_count_in_si_lpres2.
+	to accommodate needs_count_in_si_lpres2.
 	* wincap.h: Define needs_count_in_si_lpres2 throughout.
 	* wincap.cc: Ditto.
 
@@ -153,7 +191,7 @@
 
 	* security.cc (create_token): Revert erroneous change to test
 	subauth_token for INVAILD_HANDLE_VALUE.
-	* syscalls.cc (seteuid32): Set create_token's subauth_token parameter 
+	* syscalls.cc (seteuid32): Set create_token's subauth_token parameter
 	back to NULL.
 
 2006-11-28  Corinna Vinschen  <corinna@vinschen.de>
@@ -175,7 +213,7 @@
 
 	* cyglsa.h: New header file.
 	* environ.cc: Disable subauth settings.
-	* grp.cc: Accomodate cygsidlist's count now being a method.
+	* grp.cc: Accommodate cygsidlist's count now being a method.
 	* sec_helper.cc (SECURITY_MANDATORY_INTEGRITY_AUTHORITY): Remove.
 	(mandatory_medium_integrity_sid): Remove.
 	(mandatory_high_integrity_sid): Remove.
@@ -189,7 +227,7 @@
 	(cygsidlist::add): Move here from security.h.  Add well_known parameter.
 	Set well_known_sid accordingly.  Don't allow duplicate SIDs.
 	* security.cc: Include cyglsa.h and cygwin/version.h.  Throughout
-	accomodate cygsidlist's count now being a method.  Throughout drop
+	accommodate cygsidlist's count now being a method.  Throughout drop
 	redundant "contains" tests.
 	(get_user_local_groups): Add local groups as well known SIDs.
 	(get_token_group_sidlist): Add well known groups as well known SIDs.
@@ -201,11 +239,11 @@
 	(get_system_priv_list): Make static.  Return size of TOKEN_PRIVILEGES
 	structure.
 	(get_priv_list): Ditto.
-	(create_token): Accomodate above changes.  Drop misguided attempt to
+	(create_token): Accommodate above changes.  Drop misguided attempt to
 	add MIC SIDs to created user token.  Print returned token as hex value.
 	(subauth): Disable.
 	(lsaauth): New function implementing client side of LSA authentication.
-	* security.h (class cygsid): Add well_known_sid attribute.  Accomodate
+	* security.h (class cygsid): Add well_known_sid attribute.  Accommodate
 	throughout.  Add *= operator to create a well known SID.
 	(class cygsidlist): Rename count to cnt.  Make count a method.
 	(cygsidlist::add): Move to sec_helper.cc.
@@ -351,7 +389,7 @@
 	(fhandler_dev_zero::mmap): Ditto.
 	* shared.cc (shared_info::heap_slop_size): New method.
 	(shared_info::heap_chunk_size): Don't use debug_printf at early stage.
-	* shared_info.h (SHARED_INFO_CB): Accomodate change to shared_info.
+	* shared_info.h (SHARED_INFO_CB): Accommodate change to shared_info.
 	(CURR_SHARED_MAGIC): Ditto.
 	(class shared_info): Add heap_slop member.  Declare heap_slop_size.
 	* wincap.h: Define heapslop throughout.
@@ -388,7 +426,7 @@
 
 2006-10-23  Corinna Vinschen  <corinna@vinschen.de>
 
-	* fhandler_disk_file.cc (fhandler_disk_file::rewinddir): Accomodate
+	* fhandler_disk_file.cc (fhandler_disk_file::rewinddir): Accommodate
 	buggy RestartScan behaviour of Windows 2000.
 	* wincap.h: Define has_buggy_restart_scan throughout.
 	* wincap.cc: Ditto.
@@ -423,7 +461,7 @@
 	get_reg_security.
 	* security.h (cygpsid::operator PSID): Make method const, not the
 	result.
-	(class security_descriptor): Add type member.  Accomodate throughout.
+	(class security_descriptor): Add type member.  Accommodate throughout.
 	(security_descriptor::copy): New method.
 	(security_descriptor::operator PSECURITY_DESCRIPTOR *): New operator.
 
@@ -513,7 +551,7 @@
 	opening with backup intent.
 	(fhandler_disk_file::readdir): Ditto when trying to retrieve file id
 	explicitely.
-	* security.cc (check_file_access): Replace pbuf with correctly 
+	* security.cc (check_file_access): Replace pbuf with correctly
 	PPRIVILEGE_SET typed pset.  Check explicitely for backup and/or restore
 	privileges when AccessCheck fails, to circumvent AccessCheck
 	shortcoming.  Add comment to explain.
@@ -653,13 +691,13 @@
 	* cygwin.din: Export posix_fadvise and posix_fallocate.
 	* fhandler.cc (fhandler_base::fadvise): New method.
 	(fhandler_base::ftruncate): Add allow_truncate parameter.
-	* fhandler.h (class fhandler_base): Add fadvise method.  Accomodate
+	* fhandler.h (class fhandler_base): Add fadvise method.  Accommodate
 	new parameter to ftruncate.
 	(class fhandler_pipe): Add fadvise and ftruncate methods.
-	(class fhandler_disk_file): Add fadvise method.  Accomodate new
+	(class fhandler_disk_file): Add fadvise method.  Accommodate new
 	parameter to ftruncate.
 	* fhandler_disk_file.cc (fhandler_disk_file::fadvise): New method.
-	(fhandler_disk_file::ftruncate): Accomodate new allow_truncate
+	(fhandler_disk_file::ftruncate): Accommodate new allow_truncate
 	parameter.  Set EOF using NtSetInformationFile on NT.
 	* ntdll.h (struct _FILE_END_OF_FILE_INFORMATION): Define.
 	(NtSetInformationFile): Declare.
@@ -667,7 +705,7 @@
 	(fhandler_pipe::ftruncate): Ditto.
 	* syscalls.cc (posix_fadvise): New function.
 	(posix_fallocate): Ditto.
-	(ftruncate64): Accomodate second parameter to fhandler's ftruncate
+	(ftruncate64): Accommodate second parameter to fhandler's ftruncate
 	method.
 	* include/fcntl.h: Add POSIX_FADV_* flags.  Add declarations of
 	posix_fadvise and posix_fallocate.
@@ -842,9 +880,9 @@
 	* cygtls.h: Drop socket related includes.
 	(struct _local_storage): Remove exitsock and exitsock_sin. Add
 	select_sockevt.
-	* cygtls.cc: Accomodate above change throughout.
+	* cygtls.cc: Accommodate above change throughout.
 	* fhandler.h (class fhandler_socket): Make wsock_evt public.
-	* fhandler_socket.cc (fhandler_socket::fhandler_socket): Accomodate
+	* fhandler_socket.cc (fhandler_socket::fhandler_socket): Accommodate
 	reordering members.
 	(fhandler_socket::evaluate_events): Drop FD_CONNECT event as soon as
 	it gets read once.  Never remove FD_WRITE event here.
@@ -857,7 +895,7 @@
 	(fhandler_socket::send_internal): Drop FD_WRITE event from wsock_events
 	if the call to WSASendTo fails with WSAEWOULDBLOCK.  Fix return value
 	condition.
-	* select.cc (struct socketinf): Change to accomodate using socket event
+	* select.cc (struct socketinf): Change to accommodate using socket event
 	handling.
 	(peek_socket): Use event handling for peeking socket.
 	(thread_socket): Ditto.
@@ -885,14 +923,14 @@
 	(fhandler_socket::wait_for_events): Second half of former wait method.
 	Call evaluate_events and wait in a loop if socket is blocking.
 	(fhandler_socket::release_events): Rename from release.
-	(fhandler_socket::connect): Accomodate above name changes.
+	(fhandler_socket::connect): Accommodate above name changes.
 	(fhandler_socket::accept): Ditto.
 	(fhandler_socket::recv_internal): Ditto.
 	(fhandler_socket::send_internal): Ditto.
 	(fhandler_socket::close): Ditto.
 	(fhandler_socket::fcntl): Always set owner to given input value on
 	F_SETOWN.  Handle F_GETOWN.
-	* net.cc (fdsock): Accomodate above name changes.
+	* net.cc (fdsock): Accommodate above name changes.
 
 2006-07-20  Corinna Vinschen  <corinna@vinschen.de>
 
@@ -932,7 +970,7 @@
 	* mmap.cc (mmap_is_attached_or_noreserve_page):  Rename
 	mmap_is_attached_or_noreserve.  Add region length parameter.
 	Return enum above.
-	* exceptions.cc (_cygtls::handle_exceptions): Accomodate above.
+	* exceptions.cc (_cygtls::handle_exceptions): Accommodate above.
 	* fhandler.cc (fhandler_base::raw_read): Call above for NOACCESS
 	errors and retry on success to allow reads into untouched
 	MAP_NORESERVE buffers.
@@ -1102,7 +1140,7 @@
 
 	* fhandler.h (class fhandler_socket): Add wsock_mtx, wsock_evt
 	and wsock_events members.  Remove closed status flag, add listener
-	status flag.  Accomodate new implementation of socket event handling
+	status flag.  Accommodate new implementation of socket event handling
 	methods.  Declare recv* and send* functions ssize_t as the POSIX
 	equivalents.
 	(fhandler_socket::recv_internal): Declare.
@@ -1130,9 +1168,9 @@
 	mutex handle and event handle.
 	(fhandler_socket::dup): Duplicate wsock_mtx and wsock_evt.  Fix
 	copy-paste error in debug output.
-	(fhandler_socket::connect): Accomodate new event handling.
+	(fhandler_socket::connect): Accommodate new event handling.
 	(fhandler_socket::listen): Set listener flag on successful listen.
-	(fhandler_socket::accept): Accomodate new event handling.
+	(fhandler_socket::accept): Accommodate new event handling.
 	(fhandler_socket::recv_internal): New inline method centralizing
 	common recv code.
 	(fhandler_socket::recvfrom): Call recv_internal now.
@@ -1202,14 +1240,14 @@
 	* cygwin.din: Export in6addr_any, in6addr_loopback, freeaddrinfo,
 	gai_strerror, getaddrinfo, getnameinfo.
 	* fhandler_socket.cc: Include cygwin/in6.h.
-	(get_inet_addr): Accomodate AF_INET6 usage.
+	(get_inet_addr): Accommodate AF_INET6 usage.
 	(fhandler_socket::connect): Ditto.
 	(fhandler_socket::listen): Ditto.
 	(fhandler_socket::sendto): Ditto.
 	* net.cc: Include cygwin/in6.h.
 	(in6addr_any): Define.
 	(in6addr_loopback): Define.
-	(cygwin_socket): Accomodate AF_INET6 usage.
+	(cygwin_socket): Accommodate AF_INET6 usage.
 	(socketpair): Bind socketpairs only to loopback for security.
 	(inet_pton4): New static function.
 	(inet_pton6): Ditto.
@@ -1263,7 +1301,7 @@
 	RegGetKeySecurity return value.
 	* security.h (get_logon_server): Remove default vaue from wserver
 	parameter.  Add rediscovery parameter.
-	* uinfo.cc (cygheap_user::env_logsrv): Accomodate rediscovery parameter
+	* uinfo.cc (cygheap_user::env_logsrv): Accommodate rediscovery parameter
 	in call to get_logon_server.
 
 2006-07-05  Christopher Faylor  <cgf@timesys.com>
@@ -1333,13 +1371,13 @@
 	NtQueryEaFile.
 	(write_ea): Rename from NTWriteEA and rewrite using NtSetEaFile.
 	* path.cc (get_symlink_ea): Make static.  Add handle parameter to
-	accomodate new read_ea call.
-	(set_symlink_ea): Make static.  Add handle parameter to accomodate new
+	accommodate new read_ea call.
+	(set_symlink_ea): Make static.  Add handle parameter to accommodate new
 	write_ea call.
 	(symlink_worker): Call set_symlink_ea while file is still open.
 	(symlink_info::check): Call get_symlink_ea after file has been opened.
-	* security.cc (get_file_attribute): Accomodate new read_ea call.
-	(set_file_attribute): Accomodate new write_ea call.
+	* security.cc (get_file_attribute): Accommodate new read_ea call.
+	(set_file_attribute): Accommodate new write_ea call.
 	* security.h (read_ea): Change declaration accordingly.
 	(write_ea): Ditto.
 
@@ -1884,9 +1922,9 @@
 	(path_conv::isgood_inode): Centralized function to recognize
 	a good inode number.
 	(fhandler_base::fstat_by_handle): Constify fvi_size and fai_size.
-	Accomodate argument change in fstat_helper.
+	Accommodate argument change in fstat_helper.
 	(fhandler_base::fstat_by_name): Ditto.
-	(fhandler_base::fstat_helper): Accomodate argument change.  Call
+	(fhandler_base::fstat_helper): Accommodate argument change.  Call
 	path_conv::isgood_inode to recognize good inodes.
 	(fhandler_disk_file::opendir): Explain Samba weirdness here.
 	Call path_conv::fs_is_samba instead of path_conv::is_samba.

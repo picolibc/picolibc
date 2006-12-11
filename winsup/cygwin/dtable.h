@@ -45,6 +45,7 @@ public:
   bool need_fixup_before ()
     { return cnt_need_fixup_before > 0; }
 
+  void move_fd (int, int);
   int vfork_child_dup ();
   void vfork_parent_restore ();
   void vfork_child_fixup ();

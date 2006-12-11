@@ -787,6 +787,9 @@ child_info::child_info (unsigned in_cb, child_info_types chtype, bool need_subpr
 {
   memset (this, 0, in_cb);
   cb = in_cb;
+
+  msv_count = in_cb / 5;
+
   intro = PROC_MAGIC_GENERIC;
   magic = CHILD_INFO_MAGIC;
   type = chtype;
