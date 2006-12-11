@@ -1,3 +1,8 @@
+2006-12-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (rootdir): Fix typo in comment.
+	* syscalls.cc (try_to_bin): Ditto.
+
 2006-12-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (SHFileOperationA): Drop definition.

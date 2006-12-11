@@ -211,7 +211,7 @@ try_to_bin (path_conv &win32_path, HANDLE h)
 						    win32_path.get_win32 ()));
   c += 20;
 
-  /* Length of thr WCHAR path in bytes. */
+  /* Length of the WCHAR path in bytes. */
   ULONG len = 2 * (c - recycler);
   /* Choose size big enough to fit a local native NT path into it. */
   ULONG size = sizeof (FILE_RENAME_INFORMATION) + len + 10;
