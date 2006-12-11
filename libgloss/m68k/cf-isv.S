@@ -13,7 +13,6 @@
  * they apply.
  */
 
-	#include "asm.h"	
 	.text
 
 	.globl __interrupt_vector
@@ -55,7 +54,7 @@ __interrupt_vector:
 	.long __trap12				/* 44 */
 	.long __trap13				/* 45 */
 	.long __trap14				/* 46 */
-	.long __bdm_semihosting			/* 47 */
+	.long __trap15				/* 47 */
 	.long __fp_branch_unordered		/* 48 */
 	.long __fp_inexact_result		/* 49 */
 	.long __fp_divide_by_zero		/* 50 */
@@ -74,12 +73,3 @@ __interrupt_vector:
 	.rept 256-64
 	.long __other_interrupt			/* [64,256) */
 	.endr
-
-	.extern __stack
-	.extern __start1
-	.globl __start
-__start:
-	/* Initialize stack */
-	movel IMM(__stack), sp
-	movel IMM(0), fp
-	jmp __start1

@@ -79,6 +79,7 @@
 #define sp REG (sp)
 #define usp REG (usp)
 #define vbr REG (vbr)
+#define mbb REG (mbb)
 #define sr REG (sr)
 #define fpcr REG (fpcr)
 #define fpsr REG (fpsr)

@@ -1,5 +1,5 @@
 /*
- * bdm-write.c -- 
+ * io-unlink.c -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,29 +14,33 @@
  * they apply.
  */
 
-#include "bdm-semihost.h"
-#include "bdm-gdb.h"
-#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
 #include <errno.h>
+#define IO unlink
+#include "io.h"
 
 /*
- * write -- write to a file descriptor
+ * unlink -- unlink (delete) a file
  * input parameters:
- *   0 : file descriptor
- *   1 : buf ptr
- *   2 : count
+ *   0 : filename ptr
+ *   1 : filename length
  * output parameters:
  *   0 : result
  *   1 : errno
  */
 
-ssize_t write (int fd, const void *buf, size_t count)
+int unlink (const char *path)
 {
+#if HOSTED
   gdb_parambuf_t parameters;
-  parameters[0] = (uint32_t) fd;
-  parameters[1] = (uint32_t) buf;
-  parameters[2] = (uint32_t) count;
-  BDM_TRAP (BDM_WRITE, (uint32_t)parameters);
-  errno = convert_from_gdb_errno (parameters[1]);
+  parameters[0] = (uint32_t) path;
+  parameters[1] = (uint32_t) strlen (path) + 1;
+  __hosted (HOSTED_UNLINK, parameters);
+  errno = __hosted_from_gdb_errno (parameters[1]);
   return parameters[0];
+#else
+  errno = ENOSYS;
+  return -1;
+#endif
 }

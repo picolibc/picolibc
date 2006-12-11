@@ -1,5 +1,5 @@
 /*
- * bdm-semihost.c -- 
+ * io-time.c -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,12 +14,32 @@
  * they apply.
  */
 
-/* Semihosting trap.  The debugger intercepts this and
-   performs the semihosting action.  Then the program resumes as
-   usual.  This function must be compiled without a frame pointer, so
-   we know the halt instruction is the very first instuction.  */
-	
-void __attribute__ ((interrupt_handler)) __bdm_semihosting (void) 
+#include <sys/time.h>
+#include <errno.h>
+#define IO time
+#include "io.h"
+
+/*
+ * time -- get the current time
+ * input parameters:
+ *   0 : timeval ptr
+ * output parameters:
+ *   0 : result
+ *   1 : errno
+ */
+
+time_t time (time_t *t)
 {
-  __asm__ __volatile__ ("halt" ::: "memory");
+#if HOSTED
+  struct timeval tv;
+
+  if (gettimeofday (&tv, NULL))
+    return -1;
+  if (t)
+    *t = tv.tv_sec;
+  return tv.tv_sec;
+#else
+  errno = ENOSYS;
+  return -1;
+#endif
 }

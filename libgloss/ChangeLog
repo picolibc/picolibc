@@ -1,3 +1,147 @@
+2006-12-11 Kazu Hirata <kazu@codesourcery.com>
+
+	Merge from newlib-csl-20060320-branch:
+	2006-12-01  Nathan Sidwell  <nathan@codesourcery.com>
+		    Kazu Hirata  <kazu@codesourcery.com>
+
+	* m68k/Makefile.in (CF_ISRS): Use addprefix.
+
+	2006-11-01 Nathan Sidwell <nathan@codesourcery.com>
+
+	* m68k/Makefile.in (CFLAGS): Do not clear.  Add to all compilations.
+	(ARFLAGS): Remove commented out definition.
+
+
+	* m68k/configure.in (DO) Set to list of target cpu families.
+	* m68k/configure: Rebuilt.
+	* m68k/Makefile.in (DO): New.
+	(UNHOSTED_BSP, UNHOSTED_OBJS, HOSTED_BSP, HOSTED_OBJS): Move
+	later.
+	(m5208evb, m5213evb, m52235evb, m5235evb, m5273c3, m5275evb,
+	m5282evb, m5329evb, m5485evb): Move earlier.
+	(all): Add all_$DO dependencies.
+	(all_cf, all_m68k): New targets, depend on cf & m68k bsps as
+	appropriate.
+	(m%-ram.ld, m%-rom.ld, m%-ram-hosted.ld, m%-rom-hosted.ld): Add
+	'm' prefix.
+	(install): Add install_$DO dependencies.
+	(install_cf, install_m68k): New targets.  Perform cf and m68k
+	installs as appropriate.
+	(install_io): New, install the io libraries.
+
+
+	2006-10-23 Nathan Sidwell <nathan@codesourcery.com>
+
+	* m68k/Makefile.in (CF_CRT0): Rename to CF_CRT0S, separate hosted
+	& unhosted versions.
+	(CF_OBJS): Add cf-isv.o.
+	(CF_SOURCES): Add cf-isv.S.
+	(cf-hosted-crt0.o, cf-unhosted-crt0.o): New targets.
+	* m68k/cf-isv.S: New, broken out of ...
+	* m68k/cf-crt0.S: ... here.  Add HOSTED & UNHOSTED differences.
+	* m68k/cf-crt1.c (__start1): Add heap_limit argument.
+	(__heap_limit): Define.
+	* m68k/cf-sbrk.c (__heap_limit): Declare.
+	(sbrk): Adjust for __heap_limit.
+	* m68k/cf.sc: Use different crt0's for hosted & unhosted.
+	Install a separate isv.o file.
+	* m68k/io.h (HOSTED_PUTCHAR): Replace with ...
+	(HOSTED_INIT_SIM): ... this.
+
+
+	2006-10-20 Nathan Sidwell <nathan@codesourcery.com>
+
+	* m68k/Makefile.in (CF_BOARDS): Add m5275evb.
+	(m5275evb): New board.
+
+
+	2006-10-20 Vladimir Prus <vladimir@codesourcery.com>
+
+	* m68k/cf.sc: Add linkonce sections and
+	DWARF sections.
+
+
+	2006-10-07 Nathan Sidwell <nathan@codesourcery.com>
+
+	* m68k/Makefile.in: Adjust Coldfire rules.
+	(BDM_CRT0, BDM_BSP, BDM_OBJS, BDM_ISRS): Rename	to ...
+	(CF_CRT0, CF_BSP, CF_OBJS, CF_ISRS): ... here.  Adjust.
+	(BDM_OTHER_OBJS): Remove.
+	(BDM_SYSOBJS): Rename to ...
+	(UNHOSTED_OBJS): ... here.  Adjust.
+	(UNHOSTED_BSP, HOSTED_OBJS, HOSTED_BSP): New.
+	(CF_HOSTED_SCRIPTS): New.
+	(CF_SCRIPTS, CF_SOURCES): Adjust.
+	* m68k/cf.sc: Add IO library variable.
+	* m68k/bdm-crt0.S, m68k/bdm-crt1.c, m68k/bdm-isrs.c,
+	m68k/bdm-sbrk.c, m68k/bdm-semihost.S: Rename to ...
+	* m68k/cf-crt0.S, m68k/cf-crt1.c, m68k/cf-isrs.c, m68k/cf-sbrk.c,
+	m68k/cf-hosted.S: ... here.
+	* m68k/cf-exit.c: New.
+	* m68k/bdm-gdb.h, m68k/bdm-semihost.h: Merge into ...
+	* m68k/io.h: ... here.  Add unhosted support.  Adjust conversion
+	function names.
+	* m68k/bdm-gdb.c: Rename to ...
+	* m68k/io-gdb.c: ... here.  Adjust names of conversion functions.
+	* m68k/bdm-close.c, m68k/bdm-exit.c, m68k/bdm-fstat.c,
+	m68k/bdm-gettimeofday.c, m68k/bdm-isatty.c, m68k/bdm-lseek.c,
+	m68k/bdm-open.c, m68k/bdm-read.c, m68k/bdm-rename.c,
+	m68k/bdm-stat.c, m68k/bdm-system.c, m68k/bdm-time.c,
+	m68k/bdm-unlink.c, m68k/bdm-write.c: Rename to ...
+	* m68k/io-close.c, m68k/io-exit.c, m68k/io-fstat.c,
+	m68k/io-gettimeofday.c, m68k/io-isatty.c, m68k/io-lseek.c,
+	m68k/io-open.c, m68k/io-read.c, m68k/io-rename.c, m68k/io-stat.c,
+	m68k/io-system.c, m68k/io-time.c, m68k/io-unlink.c,
+	m68k/io-write.c: ... here.  Include io.h. Adjust for hosted &
+	unhosted libraries.  Adjust names of gdb conversion functions.
+
+
+	2006-09-29 Nathan Sidwell <nathan@codesourcery.com>
+
+	* m68k/bdm-semihost.S: Add more comments. Make instruction weirder.
+
+	2006-09-22 Nathan Sidwell <nathan@codesourcery.com>
+
+	* m68k/bdm-crt1.c (hardware_init_hook): Use #defines for CACR bits.
+
+	2006-09-18 Nathan Sidwell <nathan@codesourcery.com>
+
+	* m68k/Makefile.in: Don't force a frame pointer on the ISRs.
+	* m68k/bdm-crt1.c (__start1): Don't set the VBR here.
+	(hardeare_init_hook): Define weakly.  Set VBR here, enable caching
+	if supported.
+
+
+	* m68k/Makefile.in (bdm-semihost.o): Build from bdm-semihost.S.
+	* m68k/bdm-semihost.c: Remove.
+	* m68k/bdm-semihost.S: New.
+	* m68k/bdm-crt0.S: Don't install semihosting trap handler.
+	* m68k/bdm-close.c, bdm-exit.c, bdm-fstat.c, bdm-gettimeofday.c,
+	bdm-isatty.c, bdm-lseek.c, bdm-open.c, bdm-read.c, bdm-rename.c,
+	bdm-stat.c, bdm-system.c, bdm-unlink.c, bdm-write.c): Update.
+	* m68k/bdm-isrs.c: Update comment.
+	* m68k/bdm-semihost.h (BDM_TRAPNUM, BDM_FUNC_REG, BDM_ARG_REG,
+	BDM_TRAP): Remove.
+	(__bdm_semihost): Declare.
+
+
+	2006-09-15 Nathan Sidwell <nathan@codesourcery.com>
+
+	* m68k/Makefile.in (BDM_OTHER_OBJS): Remove sbrk.o.
+	(BDM_SYSOBJS): Add bdm-sbrk.o.
+	* m68k/bdm-sbrk.c: New.
+
+
+	2006-09-06 Nathan Sidwell <nathan@codesourcery.com>
+
+	* m68k/Makefile.in (CF_SOURCES): New.
+	(install): Install them.
+
+
+	2006-09-01 Nathan Sidwell <nathan@codesourcery.com>
+
+	* m68k/cf.sc: Add .jcr section to .text.
+
 2006-12-11  Ben Elliston  <bje@au.ibm.com>
 
         * configure.in: Remove extra whitespace from config_testsuite =

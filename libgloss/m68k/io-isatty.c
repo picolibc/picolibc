@@ -1,5 +1,5 @@
 /*
- * bdm-close.c -- 
+ * io-isatty.c -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,13 +14,13 @@
  * they apply.
  */
 
-#include "bdm-semihost.h"
-#include "bdm-gdb.h"
 #include <unistd.h>
 #include <errno.h>
+#define IO isatty
+#include "io.h"
 
 /*
- * close -- close a file descriptor.
+ * isatty -- check if fd is a terminal
  * input parameters:
  *   0 : file descriptor
  * output parameters:
@@ -28,11 +28,15 @@
  *   1 : errno
  */
 
-int close (int fd)
+int isatty (int fd)
 {
+#if HOSTED
   gdb_parambuf_t parameters;
   parameters[0] = (uint32_t) fd;
-  BDM_TRAP (BDM_CLOSE, (uint32_t)parameters);
-  errno = convert_from_gdb_errno (parameters[1]);
+  __hosted (HOSTED_ISATTY, parameters);
+  errno = __hosted_from_gdb_errno (parameters[1]);
   return parameters[0];
+#else
+  return 1;
+#endif
 }

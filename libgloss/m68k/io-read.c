@@ -1,5 +1,5 @@
 /*
- * bdm-unlink.c -- 
+ * io-read.c -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,28 +14,34 @@
  * they apply.
  */
 
-#include "bdm-semihost.h"
-#include "bdm-gdb.h"
-#include <stdio.h>
-#include <string.h>
+#include <unistd.h>
 #include <errno.h>
+#define IO read
+#include "io.h"
 
 /*
- * unlink -- unlink (delete) a file
+ * read -- read from a file descriptor
  * input parameters:
- *   0 : filename ptr
- *   1 : filename length
+ *   0 : file descriptor
+ *   1 : buf ptr
+ *   2 : count
  * output parameters:
  *   0 : result
  *   1 : errno
  */
 
-int unlink (const char *path)
+ssize_t read (int fd, void *buf, size_t count)
 {
+#if HOSTED
   gdb_parambuf_t parameters;
-  parameters[0] = (uint32_t) path;
-  parameters[1] = (uint32_t) strlen (path) + 1;
-  BDM_TRAP (BDM_UNLINK, (uint32_t)parameters);
-  errno = convert_from_gdb_errno (parameters[1]);
+  parameters[0] = (uint32_t) fd;
+  parameters[1] = (uint32_t) buf;
+  parameters[2] = (uint32_t) count;
+  __hosted (HOSTED_READ, parameters);
+  errno = __hosted_from_gdb_errno (parameters[1]);
   return parameters[0];
+#else
+  errno = ENOSYS;
+  return -1;
+#endif
 }

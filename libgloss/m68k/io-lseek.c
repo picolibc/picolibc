@@ -1,5 +1,5 @@
 /*
- * bdm-read.c -- 
+ * io-lseek.c -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,29 +14,38 @@
  * they apply.
  */
 
-#include "bdm-semihost.h"
-#include "bdm-gdb.h"
+#include <sys/types.h>
 #include <unistd.h>
 #include <errno.h>
+#define IO lseek
+#include "io.h"
 
 /*
- * read -- read from a file descriptor
+ * lseek -- reposition a file descriptor
  * input parameters:
  *   0 : file descriptor
- *   1 : buf ptr
- *   2 : count
+ *   1 : high word of offset
+ *   2 : low word of offset
+ *   3 : seek flag
  * output parameters:
- *   0 : result
- *   1 : errno
+ *   0 : high word of result
+ *   1 : low word of result
+ *   2 : errno
  */
 
-ssize_t read (int fd, void *buf, size_t count)
+off_t lseek (int fd, off_t offset, int whence)
 {
+#if HOSTED
   gdb_parambuf_t parameters;
   parameters[0] = (uint32_t) fd;
-  parameters[1] = (uint32_t) buf;
-  parameters[2] = (uint32_t) count;
-  BDM_TRAP (BDM_READ, (uint32_t)parameters);
-  errno = convert_from_gdb_errno (parameters[1]);
-  return parameters[0];
+  parameters[1] = (uint32_t) ((offset >> 32) & 0xffffffff);
+  parameters[2] = (uint32_t) (offset & 0xffffffff);
+  parameters[3] = __hosted_to_gdb_lseek_flags (whence);
+  __hosted (HOSTED_LSEEK, parameters);
+  errno = __hosted_from_gdb_errno (parameters[2]);
+  return ((uint64_t)parameters[0] << 32) | ((uint64_t)parameters[1]);
+#else
+  errno = ENOSYS;
+  return -1;
+#endif
 }

@@ -1,5 +1,5 @@
 /*
- * bdm-isatty.c -- 
+ * io-exit.c -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,25 +14,16 @@
  * they apply.
  */
 
-#include "bdm-semihost.h"
-#include "bdm-gdb.h"
-#include <unistd.h>
-#include <errno.h>
+#if HOSTED
+#include "io.h"
 
-/*
- * isatty -- check if fd is a terminal
- * input parameters:
- *   0 : file descriptor
- * output parameters:
- *   0 : result
- *   1 : errno
+/* 
+ * _exit -- Exit from the application.  
  */
 
-int isatty (int fd)
+void __attribute__ ((noreturn)) _exit (int code)
 {
-  gdb_parambuf_t parameters;
-  parameters[0] = (uint32_t) fd;
-  BDM_TRAP (BDM_ISATTY, (uint32_t)parameters);
-  errno = convert_from_gdb_errno (parameters[1]);
-  return parameters[0];
+  while (1)
+    __hosted (HOSTED_EXIT, (void *)code);
 }
+#endif

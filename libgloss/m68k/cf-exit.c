@@ -1,5 +1,5 @@
 /*
- * bdm-exit.c -- 
+ * cf-exit.c -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,9 +14,6 @@
  * they apply.
  */
 
-#include "bdm-semihost.h"
-#include "bdm-gdb.h"
-
 extern void __reset (void);
 
 /* 
@@ -27,7 +24,7 @@ void __attribute__ ((noreturn)) _exit (int code)
 {
   while (1)
     {
-      BDM_TRAP (BDM_EXIT, code);
+      __asm__ __volatile__ ("halt" ::: "memory");
       __reset ();
     }
 }

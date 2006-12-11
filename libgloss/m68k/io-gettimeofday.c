@@ -1,5 +1,5 @@
 /*
- * bdm-rename.c -- 
+ * io-gettimeofday.c -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,32 +14,39 @@
  * they apply.
  */
 
-#include "bdm-semihost.h"
-#include "bdm-gdb.h"
-#include <stdio.h>
-#include <string.h>
+#include <sys/time.h>
 #include <errno.h>
+#define IO gettimeofday
+#include "io.h"
 
 /*
- * rename -- rename a file
+ * gettimeofday -- get the current time
  * input parameters:
- *   0 : oldname ptr
- *   1 : oldname length
- *   2 : newname ptr
- *   3 : newname length
+ *   0 : timeval ptr
  * output parameters:
  *   0 : result
  *   1 : errno
  */
 
-int _rename (const char *oldpath, const char *newpath)
+int gettimeofday (struct timeval *tv, struct timezone *tz)
 {
+#if HOSTED
   gdb_parambuf_t parameters;
-  parameters[0] = (uint32_t) oldpath;
-  parameters[1] = (uint32_t) strlen (oldpath) + 1;
-  parameters[2] = (uint32_t) newpath;
-  parameters[3] = (uint32_t) strlen (newpath) + 1;
-  BDM_TRAP (BDM_RENAME, (uint32_t)parameters);
-  errno = convert_from_gdb_errno (parameters[1]);
+  struct gdb_timeval gtv;
+  if (!tv)
+    return 0;
+  if (tz)
+    {
+      errno = EINVAL;
+      return -1;
+    }
+  parameters[0] = (uint32_t) &gtv;
+  __hosted (HOSTED_GETTIMEOFDAY, parameters);
+  __hosted_from_gdb_timeval (&gtv, tv);
+  errno = __hosted_from_gdb_errno (parameters[1]);
   return parameters[0];
+#else
+  errno = ENOSYS;
+  return -1;
+#endif
 }

@@ -1,5 +1,5 @@
 /*
- * bdm-open.c -- 
+ * io-fstat.c -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,43 +14,36 @@
  * they apply.
  */
 
-#include "bdm-semihost.h"
-#include "bdm-gdb.h"
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
-#include <stdarg.h>
-#include <string.h>
+#include <unistd.h>
 #include <errno.h>
+#define IO fstat
+#include "io.h"
 
 /*
- * open -- Open a file.
+ * fstat -- get file information
  * input parameters:
- *   0 : fname ptr
- *   1 : fname length
- *   2 : flags
- *   3 : mode
+ *   0 : file descriptor
+ *   1 : stat buf ptr
  * output parameters:
  *   0 : result
  *   1 : errno
  */
 
-int open (const char *fname, int flags, ...)
+int fstat (int fd, struct stat *buf)
 {
+#if HOSTED
   gdb_parambuf_t parameters;
-  parameters[0] = (uint32_t) fname;
-  parameters[1] = strlen (fname) + 1;
-  parameters[2] = convert_to_gdb_open_flags (flags);
-  if (flags & O_CREAT)
-    {
-      va_list ap;
-      va_start (ap, flags);
-      parameters[3] = convert_to_gdb_mode_t (va_arg (ap, mode_t));
-      va_end (ap);
-    }
-  else
-    parameters[3] = 0;
-  BDM_TRAP (BDM_OPEN, (uint32_t)parameters);
-  errno = convert_from_gdb_errno (parameters[1]);
+  struct gdb_stat gbuf;
+  parameters[0] = (uint32_t) fd;
+  parameters[1] = (uint32_t) &gbuf;
+  __hosted (HOSTED_FSTAT, parameters);
+  __hosted_from_gdb_stat (&gbuf, buf);
+  errno = __hosted_from_gdb_errno (parameters[1]);
   return parameters[0];
+#else
+  errno = ENOSYS;
+  return -1;
+#endif
 }

@@ -1,5 +1,5 @@
 /*
- * bdm-gettimeofday.c -- 
+ * cf-sbrk.c -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,34 +14,37 @@
  * they apply.
  */
 
-#include "bdm-semihost.h"
-#include "bdm-gdb.h"
-#include <sys/time.h>
 #include <errno.h>
-
 /*
- * gettimeofday -- get the current time
- * input parameters:
- *   0 : timeval ptr
- * output parameters:
- *   0 : result
- *   1 : errno
+ * sbrk -- changes heap size size. Get nbytes more
+ *         RAM. We just increment a pointer in what's
+ *         left of memory on the board.
  */
 
-int gettimeofday (struct timeval *tv, struct timezone *tz)
+extern char __end[] __attribute__ ((aligned (4)));
+
+/* End of heap, if non NULL.  */
+extern void *__heap_limit;
+
+void *
+sbrk (int nbytes)
 {
-  gdb_parambuf_t parameters;
-  struct gdb_timeval gtv;
-  if (!tv)
-    return 0;
-  if (tz)
+  static char *heap = __end;
+  char *end = __heap_limit;
+  char *base = heap;
+  char *new_heap = heap + nbytes;
+  
+  if (!end)
     {
-      errno = EINVAL;
-      return -1;
+      /* Use sp - 256 as the heap limit.  */
+      __asm__ __volatile__ ("move.l %/sp,%0" : "=r"(end));
+      end -= 256;
     }
-  parameters[0] = (uint32_t) &gtv;
-  BDM_TRAP (BDM_GETTIMEOFDAY, (uint32_t)parameters);
-  convert_from_gdb_timeval (&gtv, tv);
-  errno = convert_from_gdb_errno (parameters[1]);
-  return parameters[0];
+  if (nbytes < 0 || (long)(end - new_heap) < 0)
+    {
+      errno = ENOMEM;
+      return (void *)-1;
+    }
+  heap = new_heap;
+  return base;
 }
