@@ -32,101 +32,101 @@ AC_CONFIG_SUBDIRS(libnosys)
 case "${target}" in
   i[[3456]]86-*-elf* | i[[3456]]86-*-coff*)
 	AC_CONFIG_SUBDIRS(i386)
-	config_testsuite = true;
+	config_testsuite=true;
 	;;
   m32r-*-*)
 	AC_CONFIG_SUBDIRS(m32r)
-	config_testsuite = true;
+	config_testsuite=true;
 	;;
   m68hc11-*-* | m6811-*-* | m68hc12-*-* | m6812-*-*)
 	AC_CONFIG_SUBDIRS(m68hc11)
-	config_testsuite = true;
+	config_testsuite=true;
 	;;
   m68*-*-*)
 	AC_CONFIG_SUBDIRS(m68k)
-	config_testsuite = true;
+	config_testsuite=true;
 	;;
   hppa*-*-pro*)
 	AC_CONFIG_SUBDIRS(pa)
-	config_testsuite = true;
+	config_testsuite=true;
 	;;
   i960-*-coff)
 	AC_CONFIG_SUBDIRS(i960)
-	config_testsuite = true;
+	config_testsuite=true;
 	;;
   sparclet-*-aout* | sparc-*-elf* | sparc64-*-elf* | sparc86x-*-* | sparclite-*-*)
 	AC_CONFIG_SUBDIRS(sparc)
-	config_testsuite = true;
+	config_testsuite=true;
 	;;
   sh*-*-pe | mips*-*-pe | *arm-wince-pe)
 	AC_CONFIG_SUBDIRS(wince)
 	;;
   mips*-*-*)
 	AC_CONFIG_SUBDIRS(mips)
-	config_testsuite = true;
+	config_testsuite=true;
 	;;
   powerpc-*-*|powerpcle-*-*)
 	AC_CONFIG_SUBDIRS(rs6000)
-	config_testsuite = true;
+	config_testsuite=true;
 	;;
   mn10200-*-*)
 	AC_CONFIG_SUBDIRS(mn10200)
-	config_testsuite = true;
+	config_testsuite=true;
 	;;
   mn10300-*-*)
 	AC_CONFIG_SUBDIRS(mn10300)
-	config_testsuite = true;
+	config_testsuite=true;
 	;;
   bfin-*-*)
 	AC_CONFIG_SUBDIRS(bfin)
-	config_testsuite = true;
+	config_testsuite=true;
 	;;
   cris-*-* | crisv32-*-*)
 	AC_CONFIG_SUBDIRS(cris)
-	config_testsuite = true;
+	config_testsuite=true;
 	;;
   crx-*-*)
 	AC_CONFIG_SUBDIRS(crx)
 	;;
   d30v-*-*)
 	AC_CONFIG_SUBDIRS(d30v)
-	config_testsuite = true;
+	config_testsuite=true;
 	;;
   fr30-*-*)
 	AC_CONFIG_SUBDIRS(fr30)
-	config_testsuite = true;
+	config_testsuite=true;
 	;;
   frv*-*-*)
 	AC_CONFIG_SUBDIRS(frv)
-	config_testsuite = true;
+	config_testsuite=true;
 	;;
   mcore-*-*)
 	AC_CONFIG_SUBDIRS(mcore)
-	config_testsuite = true;
+	config_testsuite=true;
 	;;
   mt-*-*)
         AC_CONFIG_SUBDIRS(mt)
-	config_testsuite = true;
+	config_testsuite=true;
 	;;
   xstormy16-*-*)
 	AC_CONFIG_SUBDIRS(xstormy16)
-	config_testsuite = true;
+	config_testsuite=true;
 	;;
   m32c-*-*)
 	AC_CONFIG_SUBDIRS(m32c)
-	config_testsuite = true;
+	config_testsuite=true;
 	;;
   strongarm-*-elf | strongarm-*-coff | arm*-*-elf | arm*-*-coff | ep9312-*-elf | ep9312-*-coff | xscale-*-elf | xscale-*-coff | *arm-*-*)
 	AC_CONFIG_SUBDIRS(arm)
-	config_testsuite = true;
+	config_testsuite=true;
 	;;
   spu-*-elf)
 	AC_CONFIG_SUBDIRS(spu)
-	config_testsuite = false;
+	config_testsuite=false;
 	;;
   iq2000-*-*)
 	AC_CONFIG_SUBDIRS(iq2000)
-	config_testsuite = true;
+	config_testsuite=true;
 	;;
 esac
 
