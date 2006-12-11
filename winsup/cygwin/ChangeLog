@@ -1,3 +1,21 @@
+2006-12-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Add minires-os-if.o and minires.o.
+	(SUBLIBS): Add libresolv.a.
+	Add rule for libresolv.a.
+	* autoload.cc: Fix return code handling for IP Helper API in case
+	of being unable to load iphlpapi.dll.
+	(DnsQuery_A): Define.
+	(DnsRecordListFree): Define.
+	* cygwin.din: Export resolver functions.
+	* include/resolv.h: New header.
+	* include/arpa/nameser.h: New header.
+	* include/arpa/nameser_compat.h: New header.
+	* include/cygwin/version.h: Bump API minor number.
+	* libc/minires-os-if.c: New file.
+	* libc/minires.c: New file.
+	* libc/minires.h: New file.
+
 2006-12-11  Christopher Faylor  <me@cgf.cx>
 
 	* sigproc.cc (child_info::child_info): Move old comment about msv_count

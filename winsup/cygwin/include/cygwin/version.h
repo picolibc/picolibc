@@ -295,12 +295,13 @@ details. */
 	   rresvport_af.
       159: Export posix_openpt.
       160: Export posix_fadvice, posix_fallocate.
+      161: Export resolver functions.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 160
+#define CYGWIN_VERSION_API_MINOR 161
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

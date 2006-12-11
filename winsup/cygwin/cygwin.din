@@ -269,6 +269,12 @@ dll_entry@12 NOSIGFE
 dll_noncygwin_dllcrt0 NOSIGFE
 dlopen SIGFE
 dlsym SIGFE
+dn_comp = __dn_comp SIGFE
+__dn_comp SIGFE
+dn_expand = __dn_expand SIGFE
+__dn_expand SIGFE
+dn_skipname = __dn_skipname SIGFE
+__dn_skipname SIGFE
 drand48 NOSIGFE
 _drand48 = drand48 NOSIGFE
 drem NOSIGFE
@@ -1124,6 +1130,35 @@ remquo NOSIGFE
 remquof NOSIGFE
 rename SIGFE
 _rename = rename SIGFE
+res_close = __res_close SIGFE
+__res_close SIGFE
+res_init = __res_init SIGFE
+__res_init SIGFE
+res_mkquery = __res_mkquery SIGFE
+__res_mkquery SIGFE
+res_nclose = __res_nclose SIGFE
+__res_nclose SIGFE
+res_ninit = __res_ninit SIGFE
+__res_ninit SIGFE
+res_nmkquery = __res_nmkquery SIGFE
+__res_nmkquery SIGFE
+res_nquery = __res_nquery SIGFE
+__res_nquery SIGFE
+res_nquerydomain = __res_nquerydomain SIGFE
+__res_nquerydomain SIGFE
+res_nsearch = __res_nsearch SIGFE
+__res_nsearch SIGFE
+res_nsend = __res_nsend SIGFE
+__res_nsend SIGFE
+res_query = __res_query SIGFE
+__res_query SIGFE
+res_querydomain = __res_querydomain SIGFE
+__res_querydomain SIGFE
+res_search = __res_search SIGFE
+__res_search SIGFE
+res_send = __res_send SIGFE
+__res_send SIGFE
+__res_state SIGFE
 revoke SIGFE
 rewind SIGFE
 _rewind = rewind SIGFE

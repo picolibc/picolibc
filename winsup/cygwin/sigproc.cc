@@ -515,6 +515,7 @@ sigproc_terminate (exit_states es)
       sigproc_printf ("entering");
       sig_send (myself_nowait, __SIGEXIT);
       proc_terminate ();		// clean up process stuff
+      CloseHandle (my_sendsig);
     }
 }
 
