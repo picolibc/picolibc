@@ -27,18 +27,19 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 POSSIBILITY OF SUCH DAMAGE.
 
-Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 */
 
-void __attribute__ (( destructor )) libgloss_exit( void )
+void _exit(int rc)
 {
-	/* we don't need any cleanup on the SPE ... yet */
-	/* DEBUG HERE */
+  /* Some self modifying code to return 'rc' in the 'stop' insn. */
+  asm volatile (
+    "   ori     $3, %0,0\n"
+    "   lqr     $4, 1f\n"
+    "   cbd     $5, 1f+3($sp)\n"
+    "   shufb   $0, %0, $4, $5\n"
+    "   stqr    $0, 1f\n"
+    "   sync\n"
+    "1:\n"
+    "   stop    0x2000\n"
+    : : "r" (rc) );
 }
-
-void exit( int status )
-{
-	/* handle atexit, etc here */
-	_exit( status );
-}
-
