@@ -11,6 +11,7 @@
    details. */
 
 #include <bfd.h>
+#include <ansidecl.h>
 #include <elf/common.h>
 #include <elf/external.h>
 #include <sys/procfs.h>
