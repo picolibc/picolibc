@@ -1,5 +1,9 @@
 2006-12-11  Ben Elliston  <bje@au.ibm.com>
 
+	* config.sub, config.guess: Update from upstream sources.
+
+2006-12-11  Ben Elliston  <bje@au.ibm.com>
+
 	* configure.in: Sync with GCC (spu-*-*).
 	* configure: Sync with GCC.
 
