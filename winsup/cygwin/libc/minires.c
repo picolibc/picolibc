@@ -257,7 +257,6 @@ struct __res_state *__res_state(void)
 int res_ninit(res_state statp)
 {
   int i;
-  char * ptr;
   
   statp->res_h_errno = NETDB_SUCCESS;
   statp->nscount = 0;
@@ -270,11 +269,6 @@ int res_ninit(res_state statp)
 
   for (i = 0; i < DIM(statp->dnsrch); i++)  statp->dnsrch[i] = 0;
 
-  /* Get search list from LOCALDOMAIN */
-  if ((ptr = getenv("LOCALDOMAIN")) != 0 ) {
-    DPRINTF(statp->options & RES_DEBUG, "LOCALDOMAIN \"%s\"\n", ptr);
-    minires_get_search(ptr, statp); /* domain or dnsrch */
-  }
   /* resolv.conf (dns servers & search list)*/
   get_resolv(statp);
   /* Get dns servers and search list from an os-specific routine, set os_query */
