@@ -1,3 +1,7 @@
+2006-12-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwinenv.sgml: Drop description of "traverse" option.
+
 2006-08-25  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
         * faq-setup.xml (faq.setup.uninstall): Mention Safe Mode

@@ -192,18 +192,6 @@ still the case if the transparent_exe option is not set.  Default is not
 set.</para>
 </listitem>
 <listitem>
-<para><envar>(no)traverse</envar> - This option only affects NT systems.
-If set, Cygwin handles file permissions so that the parent directories'
-permissions are checked, as it's default on POSIX systems.  If not set,
-only the file's own permissions are taken into account.  This is the
-default on Windows and called "bypass traverse checking".  Default was
-"traverse" in version 1.5.13 and 1.5.14.  Beginning with 1.5.15, traverse
-checking is disabled again since it's not correctly implemented by Microsoft
-and it's behaviour is getting worse with each new OS version.  Unprivileged
-terminal server sessions are practically impossible with traverse checking
-switched on.  So, use at your own risk.</para>
-</listitem>
-<listitem>
 <para><envar>(no)tty</envar> - if set, Cygwin enables extra support
 (i.e., termios) for UNIX-like ttys in the Windows console. 
 It is not compatible with some Windows programs.
