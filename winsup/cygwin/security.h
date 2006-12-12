@@ -396,14 +396,14 @@ bool get_logon_server (const char * domain, char * server, WCHAR *wserver,
 int set_privilege (HANDLE token, enum cygpriv_idx privilege, bool enable);
 void set_cygwin_privileges (HANDLE token);
 
-#define set_process_privilege(p,v) set_privilege (hProcImpToken, (p), (v))
+#define set_process_privilege(p,v) set_privilege (hProcToken, (p), (v))
 
 #define _push_thread_privilege(_priv, _val, _check) { \
     HANDLE _token = NULL, _dup_token = NULL; \
     if (wincap.has_security ()) \
       { \
 	_token = (cygheap->user.issetuid () && (_check)) \
-		 ? cygheap->user.token () : hProcImpToken; \
+		 ? cygheap->user.token () : hProcToken; \
 	if (!DuplicateTokenEx (_token, MAXIMUM_ALLOWED, NULL, \
 			       SecurityImpersonation, TokenImpersonation, \
 			       &_dup_token)) \
@@ -419,7 +419,10 @@ void set_cygwin_privileges (HANDLE token);
 #define pop_thread_privilege() \
     if (_dup_token) \
       { \
-	ImpersonateLoggedOnUser (_token); \
+	if (_token == hProcToken) \
+	  RevertToSelf (); \
+	else \
+	  ImpersonateLoggedOnUser (_token); \
 	CloseHandle (_dup_token); \
       } \
   }

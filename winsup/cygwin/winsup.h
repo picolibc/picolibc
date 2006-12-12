@@ -360,6 +360,16 @@ extern HANDLE hMainThread;
 extern HANDLE hMainProc;
 extern HANDLE hProcToken;
 extern HANDLE hProcImpToken;
+
+inline void clear_procimptoken ()
+{
+  if (hProcImpToken)
+    {
+      CloseHandle (hProcImpToken);
+      hProcImpToken = NULL;
+    }
+}
+
 extern HANDLE hExeced;
 extern HMODULE cygwin_hmodule;
 

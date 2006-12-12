@@ -2418,9 +2418,7 @@ setegid32 (__gid32_t gid)
   cygheap->user.deimpersonate ();
   if (!SetTokenInformation (hProcToken, TokenPrimaryGroup, &gsid, sizeof gsid))
     debug_printf ("SetTokenInformation(hProcToken, TokenPrimaryGroup), %E");
-  if (!SetTokenInformation (hProcImpToken, TokenPrimaryGroup, &gsid,
-			    sizeof gsid))
-    debug_printf ("SetTokenInformation(hProcImpToken, TokenPrimaryGroup), %E");
+  clear_procimptoken ();
   cygheap->user.reimpersonate ();
   return 0;
 }

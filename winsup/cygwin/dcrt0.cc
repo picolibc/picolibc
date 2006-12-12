@@ -771,17 +771,6 @@ dll_crt0_0 ()
 
   cygheap->cwd.init ();
 
-  /* Late duplicate simplifies tweaking the process token in uinfo.cc. */
-  if (wincap.has_security ()
-      && !DuplicateTokenEx (hProcToken, MAXIMUM_ALLOWED, NULL,
-			    SecurityImpersonation, TokenImpersonation,
-			    &hProcImpToken))
-#ifdef DEBUGGING
-    system_printf ("DuplicateTokenEx failed, %E");
-#else
-    ;
-#endif
-
   debug_printf ("finished dll_crt0_0 initialization");
 }
 
@@ -852,7 +841,7 @@ dll_crt0_1 (void *)
 
   /* Can be set only after environment has been initialized. */
   if (wincap.has_security ())
-    set_cygwin_privileges (hProcImpToken);
+    set_cygwin_privileges (hProcToken);
 
   if (!old_title && GetConsoleTitle (title_buf, TITLESIZE))
     old_title = title_buf;

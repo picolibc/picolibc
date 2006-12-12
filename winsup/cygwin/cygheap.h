@@ -182,14 +182,13 @@ public:
   void deimpersonate ()
   {
     if (issetuid ())
-      {
-	RevertToSelf ();
-	ImpersonateLoggedOnUser (hProcImpToken);
-      }
+      RevertToSelf ();
   }
   bool reimpersonate ()
   {
-    return ImpersonateLoggedOnUser (issetuid () ? token () : hProcImpToken);
+    if (issetuid ())
+      return ImpersonateLoggedOnUser (token ());
+    return true;
   }
   bool has_impersonation_tokens ()
     { return external_token != NO_IMPERSONATION

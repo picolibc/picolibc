@@ -1,3 +1,24 @@
+2006-12-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	Partially revert change from 2005-04-03, always running under an
+	impersonation token, which collides with Vista UAC.
+	* cygheap.h (deimpersonate): revert to self instead of impersonating
+	hProcImpToken.
+	(reimpersonate): Only impersonate if setuid.
+	* dcrt0.cc (dll_crt0_0): Don't initialize hProcImpToken here.
+	(dll_crt0_1): Set privileges on hProcToken.
+	* fork.cc (frok::child): Set privileges on hProcToken.  Close handle to
+	hProcImpToken.
+	* grp.cc (internal_getgroups): Use hProcToken instead of hProcImpToken.
+	* security.cc (check_access): Create hProcImpToken on demand here.
+	* security.h (set_process_privilege): Set privileges on hProcToken.
+	(_push_thread_privilege): Use hProcToken instead of hProcImpToken.
+	(pop_thread_privilege): If not setuid'ed, revert to self.
+	* syscalls.cc (setegid32): Drop setting primary group on hProcImpToken.
+	Close handle to hProcImpToken.
+	* uinfo.cc (internal_getlogin): Ditto.
+	* winsup.h (clear_procimptoken): New inline function.
+
 2006-12-12  Christopher Faylor  <me@cgf.cx>
 
 	* syscalls.cc (popen): Allow '[rw][bt]'.

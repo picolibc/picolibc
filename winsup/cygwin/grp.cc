@@ -367,7 +367,7 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
   if (cygheap->user.issetuid ())
     hToken = cygheap->user.token ();
   else
-    hToken = hProcImpToken;
+    hToken = hProcToken;
 
   if (hToken)
     {

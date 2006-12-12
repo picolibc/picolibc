@@ -115,11 +115,9 @@ internal_getlogin (cygheap_user &user)
 		  if (!SetTokenInformation (hProcToken, TokenPrimaryGroup,
 					    &gsid, sizeof gsid))
 		    debug_printf ("SetTokenInformation(TokenPrimaryGroup), %E");
-		  if (!SetTokenInformation (hProcImpToken, TokenPrimaryGroup,
-					    &gsid, sizeof gsid))
-		    debug_printf ("SetTokenInformation(TokenPrimaryGroup), %E");
 		  else
 		    user.groups.pgsid = gsid;
+		  clear_procimptoken ();
 		}
 	    }
 	  else

@@ -117,7 +117,8 @@ frok::child (void *)
 
   if (wincap.has_security ())
     {
-      set_cygwin_privileges (hProcImpToken);
+      set_cygwin_privileges (hProcToken);
+      clear_procimptoken ();
       cygheap->user.reimpersonate ();
     }
 
