@@ -1,3 +1,7 @@
+2006-12-12  Christopher Faylor  <me@cgf.cx>
+
+	* syscalls.cc (popen): Allow '[rw][bt]'.
+
 2006-12-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/minires.c (res_ninit): Drop handling for LOCALDOMAIN environment
