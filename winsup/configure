@@ -3101,9 +3101,6 @@ case "$with_cross_host" in
 subdirs="$subdirs lsaauth"
 
     fi
-    # if test -d $srcdir/subauth; then
-    #   AC_CONFIG_SUBDIRS(subauth)
-    # fi
     if test -n "$use_cygserver" -a -d $srcdir/cygserver; then
 
 

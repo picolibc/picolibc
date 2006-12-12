@@ -134,6 +134,4 @@ install_cygwin: w32api
 
 install_cygserver: cygwin
 
-subauth: mingw
-
 lsaauth: mingw cygwin

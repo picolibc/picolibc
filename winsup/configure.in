@@ -66,9 +66,6 @@ case "$with_cross_host" in
     if test -d $srcdir/lsaauth; then
       AC_CONFIG_SUBDIRS(lsaauth)
     fi
-    # if test -d $srcdir/subauth; then
-    #   AC_CONFIG_SUBDIRS(subauth)
-    # fi
     if test -n "$use_cygserver" -a -d $srcdir/cygserver; then
       AC_CONFIG_SUBDIRS(cygserver)
     fi
