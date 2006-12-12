@@ -372,12 +372,7 @@ void __stdcall str2buf2uni (_UNICODE_STRING &, WCHAR *, const char *) __attribut
 void __stdcall str2uni_cat (_UNICODE_STRING &, const char *) __attribute__ ((regparm (2)));
 
 /* Function creating a token by calling NtCreateToken. */
-HANDLE create_token (cygsid &usersid, user_groups &groups, struct passwd * pw,
-		     HANDLE subauth_token);
-#if 0
-/* Subauthentication function. */
-HANDLE subauth (struct passwd *pw);
-#endif
+HANDLE create_token (cygsid &usersid, user_groups &groups, struct passwd * pw);
 /* LSA authentication function. */
 HANDLE lsaauth (cygsid &, user_groups &, struct passwd *);
 /* Verify an existing token */

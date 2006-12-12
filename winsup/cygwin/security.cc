@@ -27,7 +27,6 @@ details. */
 #include <winuser.h>
 #include <wininet.h>
 #include <ntsecapi.h>
-#include <subauth.h>
 #include <aclapi.h>
 #include <dsgetdc.h>
 #include "cygerrno.h"
@@ -474,22 +473,14 @@ get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps,
   auth_pos = -1;
   if (my_grps)
     {
-      /* In Vista the Local SID is missing in a token constructed by
-         subauthentication.  We add the group unconditionally now. */
-      /*if (sid_in_token_groups (my_grps, well_known_local_sid))*/
-	grp_list += well_known_local_sid;
+      grp_list += well_known_local_sid;
       if (sid_in_token_groups (my_grps, well_known_dialup_sid))
 	grp_list *= well_known_dialup_sid;
       if (sid_in_token_groups (my_grps, well_known_network_sid))
 	grp_list *= well_known_network_sid;
       if (sid_in_token_groups (my_grps, well_known_batch_sid))
 	grp_list *= well_known_batch_sid;
-      /* This is a problem on 2K3 (only domain controllers?!?) which only
-         enables tools for selected special groups.  A subauth token is
-	 only NETWORK, but NETWORK has no access to these tools.  Therefore
-	 we always add INTERACTIVE here. */
-      /*if (sid_in_token_groups (my_grps, well_known_interactive_sid))*/
-	grp_list *= well_known_interactive_sid;
+      grp_list *= well_known_interactive_sid;
       if (sid_in_token_groups (my_grps, well_known_service_sid))
 	grp_list *= well_known_service_sid;
       if (sid_in_token_groups (my_grps, well_known_this_org_sid))
@@ -807,8 +798,7 @@ done:
 }
 
 HANDLE
-create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw,
-	      HANDLE subauth_token)
+create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 {
   NTSTATUS ret;
   LSA_HANDLE lsa = INVALID_HANDLE_VALUE;
@@ -831,7 +821,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw,
   TOKEN_STATISTICS stats;
   memcpy (source.SourceName, "Cygwin.1", 8);
   source.SourceIdentifier.HighPart = 0;
-  source.SourceIdentifier.LowPart = (subauth_token ? 0x0102 : 0x0101);
+  source.SourceIdentifier.LowPart = 0x0101;
 
   HANDLE token = INVALID_HANDLE_VALUE;
   HANDLE primary_token = INVALID_HANDLE_VALUE;
@@ -853,60 +843,33 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw,
   owner.Owner = usersid;
 
   /* Retrieve authentication id and group list from own process. */
-  HANDLE get_token;
-  if (subauth_token)
-    {
-      debug_printf ("get_token = subauth_token");
-      get_token = subauth_token;
-    }
-  else
-    {
-      debug_printf ("get_token = hProcToken");
-      get_token = hProcToken;
-    }
-  if (get_token)
+  if (hProcToken)
     {
       /* Switching user context to SYSTEM doesn't inherit the authentication
 	 id of the user account running current process. */
       if (usersid != well_known_system_sid)
-	if (!GetTokenInformation (get_token, TokenStatistics,
+	if (!GetTokenInformation (hProcToken, TokenStatistics,
 				  &stats, sizeof stats, &size))
 	  debug_printf
-	    ("GetTokenInformation(get_token, TokenStatistics), %E");
+	    ("GetTokenInformation(hProcToken, TokenStatistics), %E");
 	else
 	  auth_luid = stats.AuthenticationId;
 
       /* Retrieving current processes group list to be able to inherit
 	 some important well known group sids. */
-      if (!GetTokenInformation (get_token, TokenGroups, NULL, 0, &size)
+      if (!GetTokenInformation (hProcToken, TokenGroups, NULL, 0, &size)
 	  && GetLastError () != ERROR_INSUFFICIENT_BUFFER)
-	debug_printf ("GetTokenInformation(get_token, TokenGroups), %E");
+	debug_printf ("GetTokenInformation(hProcToken, TokenGroups), %E");
       else if (!(my_tok_gsids = (PTOKEN_GROUPS) malloc (size)))
 	debug_printf ("malloc (my_tok_gsids) failed.");
-      else if (!GetTokenInformation (get_token, TokenGroups, my_tok_gsids,
+      else if (!GetTokenInformation (hProcToken, TokenGroups, my_tok_gsids,
 				     size, &size))
 	{
-	  debug_printf ("GetTokenInformation(get_token, TokenGroups), %E");
+	  debug_printf ("GetTokenInformation(hProcToken, TokenGroups), %E");
 	  free (my_tok_gsids);
 	  my_tok_gsids = NULL;
 	}
     }
-  if (subauth_token)
-    {
-      if (!GetTokenInformation (subauth_token, TokenPrivileges, NULL, 0, &size)
-	  && GetLastError () != ERROR_INSUFFICIENT_BUFFER)
-	debug_printf ("GetTokenInformation(subauth_token, TokenPrivileges), %E");
-      else if (!(privs = (PTOKEN_PRIVILEGES) malloc (size)))
-	debug_printf ("malloc (privs) failed.");
-      else if (!GetTokenInformation (subauth_token, TokenPrivileges, privs,
-				     size, &size))
-	{
-	  debug_printf ("GetTokenInformation(subauth_token, TokenPrivileges), %E");
-	  free (privs);
-	  privs = NULL;
-	}
-    }
-    
 
   /* Create list of groups, the user is member in. */
   int auth_pos;
@@ -935,7 +898,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw,
   if (auth_pos >= 0)
     new_tok_gsids->Groups[auth_pos].Attributes |= SE_GROUP_LOGON_ID;
   /* Retrieve list of privileges of that user. */
-  if (!privs && !(privs = get_priv_list (lsa, usersid, tmp_gsids, psize)))
+  if (!(privs = get_priv_list (lsa, usersid, tmp_gsids, psize)))
     goto out;
 
   /* Let's be heroic... */
@@ -974,172 +937,6 @@ out:
   debug_printf ("0x%x = create_token ()", primary_token);
   return primary_token;
 }
-
-/* Subauthentication gets useless now that real LSA authentication is
-   available.  The accompanying code in seteuid32 and environ.cc is
-   also disabled.
-   TODO: Deprecate and delete code entirely.
-   TODO: Delete from documentation. */
-#if 0
-extern "C"
-{
-  BOOL WINAPI Wow64DisableWow64FsRedirection (PVOID *);
-  BOOL WINAPI Wow64RevertWow64FsRedirection (PVOID);
-};
-
-static enum
-{
-  not_tested,
-  not_installed,
-  installed
-} cygsuba_installed __attribute__((section (".cygwin_dll_common"), shared))
-  = not_tested;
-
-int subauth_id = 255;
-
-HANDLE
-subauth (struct passwd *pw)
-{
-  LSA_STRING name;
-  HANDLE lsa_hdl = NULL;
-  LSA_OPERATIONAL_MODE sec_mode;
-  NTSTATUS ret, ret2;
-  ULONG package_id, size;
-  struct {
-    LSA_STRING str;
-    CHAR buf[16];
-  } origin;
-  struct {
-    MSV1_0_LM20_LOGON auth;
-    WCHAR dombuf[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-    WCHAR usrbuf[UNLEN + 1];
-    WCHAR wkstbuf[1];
-    CHAR authinf1[1];
-    CHAR authinf2[1];
-  } subbuf;
-  TOKEN_SOURCE ts;
-  PMSV1_0_LM20_LOGON_PROFILE profile;
-  LUID luid;
-  QUOTA_LIMITS quota;
-  char nt_domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-  char nt_user[UNLEN + 1];
-  /* Changed from INVALID_HANDLE_VALUE to NULL.  A failed LsaLogonUser
-     sets the token to NULL anyway, so starting with NULL simplifies
-     the below test before calling CloseHandle. */
-  HANDLE user_token = NULL;
-  HANDLE primary_token = INVALID_HANDLE_VALUE;
-
-  /* Check to see if cygsuba.dll has been registered and is present.  The
-     idea here is to avoid authentication failure messages in the security
-     event log for each logon attempt if cygsuba.dll hasn't been installed.
-     The test is only made once per DLL life time, since installing and
-     registering the subauthentication DLL requires reboot anyway. */
-  if (cygsuba_installed == not_installed)
-    {
-      debug_printf ("subauth not installed, exit subauth");
-      return INVALID_HANDLE_VALUE;
-    }
-  else if (cygsuba_installed == not_tested)
-    {
-      char auth_path[CYG_MAX_PATH];
-
-      cygsuba_installed = not_installed;
-      __small_sprintf (auth_path, "/proc/registry/HKEY_LOCAL_MACHINE/SYSTEM/"
-				  "CurrentControlSet/Control/Lsa/MSV1_0/Auth%d",
-				  subauth_id);
-      if (access (auth_path, F_OK))
-	{
-	  debug_printf ("%s doesn't exist, exit subauth", auth_path);
-	  return INVALID_HANDLE_VALUE;
-	}
-      /* On 64 bit systems the dll must be installed into the *real* system32
-	 directory so we have to switch off file system redirection. */
-      PVOID old_fsredir;
-      DWORD attr = INVALID_FILE_ATTRIBUTES;
-      Wow64DisableWow64FsRedirection (&old_fsredir);
-      if (GetSystemDirectory (auth_path, CYG_MAX_PATH))
-	{
-	  strcat (auth_path, "\\cygsuba.dll");
-	  attr = GetFileAttributes (auth_path);
-	}
-      Wow64RevertWow64FsRedirection (old_fsredir);
-      if (attr == INVALID_FILE_ATTRIBUTES)
-	{
-	  debug_printf ("%s doesn't exist, exit subauth", auth_path);
-	  return INVALID_HANDLE_VALUE;
-	}
-      cygsuba_installed = installed;
-    }
-
-  push_self_privilege (SE_TCB_PRIV, true);
-
-  /* Register as logon process. */
-  str2lsa (name, "Cygwin");
-  SetLastError (0);
-  ret = LsaRegisterLogonProcess (&name, &lsa_hdl, &sec_mode);
-  if (ret != STATUS_SUCCESS)
-    {
-      debug_printf ("LsaRegisterLogonProcess: %d", ret);
-      __seterrno_from_win_error (LsaNtStatusToWinError (ret));
-      goto out;
-    }
-  else if (GetLastError () == ERROR_PROC_NOT_FOUND)
-    {
-      debug_printf ("Couldn't load Secur32.dll");
-      goto out;
-    }
-  /* Get handle to MSV1_0 package. */
-  str2lsa (name, MSV1_0_PACKAGE_NAME);
-  ret = LsaLookupAuthenticationPackage (lsa_hdl, &name, &package_id);
-  if (ret != STATUS_SUCCESS)
-    {
-      debug_printf ("LsaLookupAuthenticationPackage: %d", ret);
-      __seterrno_from_win_error (LsaNtStatusToWinError (ret));
-      goto out;
-    }
-  /* Create origin. */
-  str2buf2lsa (origin.str, origin.buf, "Cygwin");
-  /* Create token source. */
-  memcpy (ts.SourceName, "Cygwin.1", 8);
-  ts.SourceIdentifier.HighPart = 0;
-  ts.SourceIdentifier.LowPart = 0x0100;
-  /* Get user information. */
-  extract_nt_dom_user (pw, nt_domain, nt_user);
-  /* Fill subauth with values. */
-  subbuf.auth.MessageType = MsV1_0NetworkLogon;
-  str2buf2uni (subbuf.auth.LogonDomainName, subbuf.dombuf, nt_domain);
-  str2buf2uni (subbuf.auth.UserName, subbuf.usrbuf, nt_user);
-  str2buf2uni (subbuf.auth.Workstation, subbuf.wkstbuf, "");
-  memcpy (subbuf.auth.ChallengeToClient, "12345678", MSV1_0_CHALLENGE_LENGTH);
-  str2buf2lsa (subbuf.auth.CaseSensitiveChallengeResponse, subbuf.authinf1, "");
-  str2buf2lsa (subbuf.auth.CaseInsensitiveChallengeResponse,subbuf.authinf2,"");
-  subbuf.auth.ParameterControl = 0 | (subauth_id << 24);
-  /* Try to logon... */
-  ret = LsaLogonUser (lsa_hdl, (PLSA_STRING) &origin, Network,
-		      package_id, &subbuf, sizeof subbuf,
-		      NULL, &ts, (PVOID *) &profile, &size,
-		      &luid, &user_token, &quota, &ret2);
-  if (ret != STATUS_SUCCESS)
-    {
-      debug_printf ("LsaLogonUser: %d", ret);
-      __seterrno_from_win_error (LsaNtStatusToWinError (ret));
-      goto out;
-    }
-  LsaFreeReturnBuffer (profile);
-  /* Convert to primary token. */
-  if (!DuplicateTokenEx (user_token, TOKEN_ALL_ACCESS, &sec_none,
-			 SecurityImpersonation, TokenPrimary, &primary_token))
-    __seterrno ();
-
-out:
-  if (lsa_hdl)
-    LsaDeregisterLogonProcess (lsa_hdl);
-  pop_self_privilege ();
-  if (user_token)
-    CloseHandle (user_token);
-  return primary_token;
-}
-#endif
 
 HANDLE
 lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
