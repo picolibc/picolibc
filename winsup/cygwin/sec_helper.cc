@@ -507,7 +507,6 @@ set_cygwin_privileges (HANDLE token)
 {
   set_privilege (token, SE_RESTORE_PRIV, true);
   set_privilege (token, SE_BACKUP_PRIV, true);
-  set_privilege (token, SE_CHANGE_NOTIFY_PRIV, !allow_traverse);
 }
 
 /* Function to return a common SECURITY_DESCRIPTOR that

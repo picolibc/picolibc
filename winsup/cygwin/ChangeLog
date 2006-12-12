@@ -1,5 +1,17 @@
 2006-12-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* environ.cc (set_traverse): Remove.
+	(parse_thing): Drop "traverse" option.
+	* path.cc (fs_info::update): Don't request SE_CHANGE_NOTIFY_PRIV
+	privilege.
+	* sec_helper.cc (set_cygwin_privileges): Ditto.
+	* security.cc (allow_traverse): Remove.
+	(alloc_sd): Drop special allow_traverse code.
+	* security.h (allow_traverse): Drop declaration.
+	* syscalls.cc (statvfs): Don't request SE_CHANGE_NOTIFY_PRIV privilege.
+
+2006-12-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	Partially revert change from 2005-04-03, always running under an
 	impersonation token, which collides with Vista UAC.
 	* cygheap.h (deimpersonate): revert to self instead of impersonating

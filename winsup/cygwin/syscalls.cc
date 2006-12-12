@@ -1904,8 +1904,6 @@ statvfs (const char *fname, struct statvfs *sfs)
   DWORD spc, bps, availc, freec, totalc, vsn, maxlen, flags;
   BOOL status, statusex;
 
-  push_thread_privilege (SE_CHANGE_NOTIFY_PRIV, true);
-
   /* GetDiskFreeSpaceEx must be called before GetDiskFreeSpace on
      WinME, to avoid the MS KB 314417 bug */
   statusex = GetDiskFreeSpaceEx (root, &availb, &totalb, &freeb);
@@ -1969,8 +1967,6 @@ statvfs (const char *fname, struct statvfs *sfs)
     }
   if (ret)
     __seterrno ();
-
-  pop_thread_privilege ();
 
   return ret;
 }

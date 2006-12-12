@@ -338,7 +338,6 @@ legal_sid_type (SID_NAME_USE type)
 extern bool allow_ntea;
 extern bool allow_ntsec;
 extern bool allow_smbntsec;
-extern bool allow_traverse;
 
 /* File manipulation */
 int __stdcall get_file_attribute (int, HANDLE, const char *, mode_t *,

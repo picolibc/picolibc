@@ -413,10 +413,6 @@ fs_info::update (const char *win32_path)
   name_hash = tmp_name_hash;
   root_len = strlen (root_dir);
 
-  /* I have no idea why, but some machines require SeChangeNotifyPrivilege
-     to access volume information. */
-  push_thread_privilege (SE_CHANGE_NOTIFY_PRIV, true);
-
   drive_type (GetDriveType (root_dir));
   if (drive_type () == DRIVE_REMOTE
       || (drive_type () == DRIVE_UNKNOWN
@@ -427,8 +423,6 @@ fs_info::update (const char *win32_path)
 
   ret = GetVolumeInformation (root_dir, NULL, 0, &status.serial, NULL,
 			      &status.flags, fsname, sizeof (fsname));
-
-  pop_thread_privilege ();
 
   if (!ret && !is_remote_drive ())
     {

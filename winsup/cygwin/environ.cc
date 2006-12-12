@@ -572,12 +572,6 @@ set_ntsec (const char *buf)
 }
 
 static void
-set_traverse (const char *buf)
-{
-  allow_traverse = (buf && strcasematch (buf, "yes") && wincap.has_security ());
-}
-
-static void
 set_smbntsec (const char *buf)
 {
   allow_smbntsec = (buf && strcasematch (buf, "yes") && wincap.has_security ());
@@ -628,7 +622,6 @@ static struct parse_thing
   {"subauth_id", {func: &subauth_id_init}, isfunc, NULL, {{0}, {0}}},
 #endif
   {"title", {&display_title}, justset, NULL, {{false}, {true}}},
-  {"traverse", {func: set_traverse}, isfunc, NULL, {{0}, {s: "yes"}}},
   {"tty", {NULL}, set_process_state, NULL, {{0}, {PID_USETTY}}},
   {"winsymlinks", {&allow_winsymlinks}, justset, NULL, {{false}, {true}}},
   {"transparent_exe", {&transparent_exe}, justset, NULL, {{false}, {true}}},
