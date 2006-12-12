@@ -59,7 +59,7 @@
 	now always filled out.
 	* fork.cc (frok::parent): Move ch.zero manipulation to constructor.
 	* spawn.cc (spawn_guts): Ditto.  Remove _ch wrapper.
-	* sigproc.cc (child_info::child_info): Initialize starter[].
+	* sigproc.cc (child_info::child_info): Initialize msv_count.
 
 	* shared.cc (shared_info::heap_slop_size): Remove noisy system_printfs.
 	* shared_info.h (CURR_SHARED_MAGIC): Regenerate.

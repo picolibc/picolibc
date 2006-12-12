@@ -193,9 +193,9 @@ try_to_bin (path_conv &win32_path, HANDLE h)
       while (*c)
        ++c;
       if (GetFileAttributes (recycler) == INVALID_FILE_ATTRIBUTES)
-        {
+	{
 	  if (!CreateDirectory (recycler,
-	  			sec_user ((PSECURITY_ATTRIBUTES) alloca (1024),
+				sec_user ((PSECURITY_ATTRIBUTES) alloca (1024),
 					  cygheap->user.sid ())))
 	    {
 	      debug_printf ("Can't create folder %s, %E", recycler);
@@ -308,7 +308,7 @@ unlink_nt (path_conv &win32_name, bool setattrs)
 	 also means that deleting fails. */
       syscall_printf ("%p = NtClose (%p)", status, h);
       if (!lasterr)
-        RtlNtStatusToDosError (status);
+	RtlNtStatusToDosError (status);
     }
 
   syscall_printf ("Deleting succeeded");
@@ -381,7 +381,7 @@ unlink (const char *ourname)
       if ((wincap.access_denied_on_delete () && lasterr == ERROR_ACCESS_DENIED
 	   && !win32_name.isremote ())
 	  || lasterr == ERROR_SHARING_VIOLATION)
-        {
+	{
 	  /* Add file to the "to be deleted" queue. */
 	  syscall_printf ("Sharing violation, couldn't delete file");
 	  user_shared->delqueue.queue_file (win32_name);
@@ -1787,7 +1787,7 @@ posix_fadvise (int fd, _off64_t offset, _off64_t len, int advice)
   else
     set_errno (EBADF);
   syscall_printf ("%d = posix_fadvice (%d, %D, %D, %d)",
-  		  res, fd, offset, len, advice);
+		  res, fd, offset, len, advice);
   return res;
 }
 
@@ -2230,7 +2230,7 @@ seteuid32 (__uid32_t uid)
   if (new_token == INVALID_HANDLE_VALUE)
     {
       if (!(new_token = lsaauth (usersid, groups, pw_new)))
-        {
+	{
 #if 0
 	  new_token = subauth (pw_new);
 	  debug_printf ("subauth %s, try create_token.",
@@ -3245,39 +3245,44 @@ funlockfile (FILE *file)
 }
 
 extern "C" FILE *
-popen (const char *command, const char *type)
+popen (const char *command, const char *in_type)
 {
-  int fds[2];
+  const char *type = in_type;
+  char rw = *type++;
 
-  if (pipe (fds) < 0)
-    return NULL;
-  int fd, other_fd, __stdin, __stdout, stdwhat;
-  if (type[1] != '\0')
+  if (*type == 'b' || *type == 't')
+    type++;
+  if ((rw != 'r' && rw != 'w') || (*type != '\0'))
     {
       set_errno (EINVAL);
       return NULL;
     }
-  if (*type == 'r')
+
+  int fd, other_fd, __stdin, __stdout, stdwhat;
+
+  int fds[2];
+  if (pipe (fds) < 0)
+    return NULL;
+
+  switch (rw)
     {
+    case 'r':
       __stdin = -1;
       stdwhat = 1;
       other_fd = __stdout = fds[1];
       fd = fds[0];
-    }
-  else if (*type == 'w')
-    {
+      break;
+    case 'w':
       __stdout = -1;
       stdwhat = 0;
       other_fd = __stdin = fds[0];
       fd = fds[1];
-    }
-  else
-    {
-      set_errno (EINVAL);
-      return NULL;
+      break;
+    default:
+      return NULL;	/* avoid a compiler warning */
     }
 
-  FILE *fp = fdopen (fd, type);
+  FILE *fp = fdopen (fd, in_type);
   fcntl (fd, F_SETFD, fcntl (fd, F_GETFD, 0) | FD_CLOEXEC);
 
   if (!fp)
