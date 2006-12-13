@@ -1,11 +1,16 @@
 2006-12-13  Joel Schopp <jschopp@austin.ibm.com>
 
-        * newlib/include/alloca.h: add undef alloca to work with xlc
+        * libc/machine/spu/setjmp.S: Fix to handle registers past 115
+	correctly.
+
+2006-12-13  Joel Schopp <jschopp@austin.ibm.com>
+
+        * libc/include/alloca.h: Add undef alloca to work with xlc.
 
 2006-12-12  Joel Schopp <jschopp@austin.ibm.com>
 
         * libc/include/machine/setjmp.h[__SPU__]: Redefine _JBTYPE for 
-	cell spu
+	cell spu.
 
 2006-12-04  Kazunori Asayama  <asayama@sm.sony.co.jp>
 
