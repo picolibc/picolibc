@@ -210,7 +210,7 @@ _BEGIN_STD_C
 
 #ifdef __SPU__
 #define _JBLEN 50 
-#define _JBTYPE __attribute__ (( __vector_size__ (16) )) int
+#define _JBTYPE vector signed int
 #endif
 
 #ifdef __xstormy16__
