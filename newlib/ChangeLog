@@ -1,3 +1,7 @@
+2006-12-13  Joel Schopp <jschopp@austin.ibm.com>
+
+        * newlib/include/alloca.h: add undef alloca to work with xlc
+
 2006-12-12  Joel Schopp <jschopp@austin.ibm.com>
 
         * libc/include/machine/setjmp.h[__SPU__]: Redefine _JBTYPE for 

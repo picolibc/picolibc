@@ -10,6 +10,8 @@
 #include "_ansi.h"
 #include <sys/reent.h>
 
+#undef alloca
+
 #ifdef __GNUC__
 #define alloca(size) __builtin_alloca(size)
 #else
