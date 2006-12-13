@@ -62,6 +62,10 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #define JSRE_STAT 23
 #define JSRE_UNLINK 24
 #define JSRE_WRITE 27
+#define JSRE_FTRUNCATE 28
+#define JSRE_ACCESS 29
+#define JSRE_DUP 30
+#define JSRE_TIME 31
 
 typedef struct
 {
@@ -108,6 +112,34 @@ typedef struct
 	unsigned int	whence;
 	unsigned int	pad2[ 3 ];
 } syscall_lseek_t;
+
+typedef struct
+{
+	unsigned int	file;
+	unsigned int	pad0[ 3 ];
+	unsigned int	length;
+	unsigned int	pad1[ 3 ];
+} syscall_ftruncate_t;
+
+typedef struct
+{
+        unsigned int    pathname;
+        unsigned int    pad0[ 3 ];
+        unsigned int    mode;
+        unsigned int    pad1[ 3 ];
+} syscall_access_t;
+
+typedef struct
+{
+	unsigned int	oldfd;
+	unsigned int	pad0[ 3 ];
+} syscall_dup_t;
+
+typedef struct
+{
+	unsigned int	time;
+	unsigned int	pad0[ 3 ];
+} syscall_time_t;
 
 typedef struct
 {

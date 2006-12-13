@@ -1,3 +1,12 @@
+2006-12-13  Sa Liu  <saliu@de.ibm.com>
+
+        * spu/access.c: New file
+        * spu/dup.c: New file
+        * spu/ftruncate.c: New file
+        * spu/jsre.h: add structures for new functions
+        * spu/time.c: New file
+        * spu/Makefile.in (access.o, dup.o, ftruncate.o, time.o): New targets.
+
 2006-12-12  Ben Elliston  <bje@au.ibm.com>
 
 	* configure.in: Remove superfluous semicolons.
