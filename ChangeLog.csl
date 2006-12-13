@@ -1,3 +1,10 @@
+2006-12-13  Paul Brook  <paul@codesourcery.com>
+
+	Backport from mainline.
+	gas/
+	* config/tc-arm.c (arm_arch_option_table): Add v7-{a,r,m}.
+	* doc/c-arm.texi: Fix spelling of ARMv7 profile variants.
+
 2006-12-01  Paul Brook  <paul@codesourcery.com>
 
 	Backport from mainline.
