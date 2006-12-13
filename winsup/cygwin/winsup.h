@@ -365,8 +365,9 @@ inline void clear_procimptoken ()
 {
   if (hProcImpToken)
     {
-      CloseHandle (hProcImpToken);
+      HANDLE old_procimp = hProcImpToken;
       hProcImpToken = NULL;
+      CloseHandle (old_procimp);
     }
 }
 

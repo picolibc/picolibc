@@ -1,5 +1,9 @@
 2006-12-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* winsup.h (clear_procimptoken): Close hProcImpToken in a safer way.
+
+2006-12-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* security.cc (lsaauth): Initialize lsa to INVALID_HANDLE_VALUE to
 	avoid potential access violation.
 
