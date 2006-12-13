@@ -439,33 +439,32 @@ install_m68k::
 .PHONY: install_cf
 install_cf:: install_io
 	# install CF stuff
-	for crt in $(CF_CRT0S) ; \
-	do $(INSTALL_DATA) $$crt $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$crt ; \
-	done
-	$(INSTALL_DATA) $(CF_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(CF_BSP)
-	for script in $(CF_SCRIPTS) ; \
-	do $(INSTALL_DATA) $$script $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$script ; \
-	done
-	for src in $(CF_SOURCES) ; \
-	do $(INSTALL_DATA) ${srcdir}/$$src $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$src ; \
-	done
+	$(INSTALL_DATA) $(CF_CRT0S) $(CF_BSP) \
+		$(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(CF_SCRIPTS) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+ifeq ($(MULTISUBDIR),)
+	# only install sources for the default multilib
+	$(INSTALL_DATA) $(addprefix ${srcdir}/,$(CF_SOURCES)) \
+		$(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+endif
 
 .PHONY: install_fido
 install_fido:: install_io
-	$(INSTALL_PROGRAM) $(FIDO_CRT0S) $(FIDO_BSP) $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)
-	for x in $(FIDO_SCRIPTS); do \
-		$(INSTALL_DATA) $$x $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}; \
-	done
-	mkdir -p $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/src
-	for x in $(FIDO_SOURCES); do \
-		$(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/src; \
-	done
+	$(INSTALL_DATA) $(FIDO_CRT0S) $(FIDO_BSP) \
+		$(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)
+	$(INSTALL_DATA) $(FIDO_SCRIPTS) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+ifeq ($(MULTISUBDIR),)
+	# only install sources for the default multilib
+	$(INSTALL) -d $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/src
+	$(INSTALL_DATA) $(addprefix $(srcdir)/,$(FIDO_SOURCES)) \
+		$(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/src
+endif
 
 .PHONY: install_io
 install_io::
 	# install IO stuff
-	$(INSTALL_DATA) $(HOSTED_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(HOSTED_BSP)
-	$(INSTALL_DATA) $(UNHOSTED_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(UNHOSTED_BSP)
+	$(INSTALL_DATA) $(HOSTED_BSP) $(UNHOSTED_BSP) \
+		$(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
 
 # target specific makefile fragment comes in here.
 @target_makefile_frag@

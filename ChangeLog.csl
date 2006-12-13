@@ -1,3 +1,11 @@
+2006-12-13  Nathan Sidwell  <nathan@codesourcery.com>
+
+	libgloss/
+	* m68k/Makefile (install_cf): Don't loop over files here.  Only
+	install sources for the default multilib.
+	(install_fido): Likewise.
+	(install_io): Install bsps in one go.
+
 2006-12-01  Nathan Sidwell  <nathan@codesourcery.com>
 	    Kazu Hirata  <kazu@codesourcery.com>
 
