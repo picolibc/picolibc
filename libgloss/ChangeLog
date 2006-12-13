@@ -1,3 +1,8 @@
+2006-12-13  Ben Elliston  <bje@au.ibm.com>
+
+        * libnosys/_exit.c (_exit): Finish with an infinite loop to
+        eliminate a warning about this noreturn function returning.
+
 2006-12-13  Sa Liu  <saliu@de.ibm.com>
 
         * spu/access.c: New file
