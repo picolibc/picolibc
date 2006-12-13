@@ -944,7 +944,7 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   cygsidlist tmp_gsids (cygsidlist_auto, 12);
   cygpsid pgrpsid;
   LSA_STRING name;
-  HANDLE lsa_hdl = NULL, lsa;
+  HANDLE lsa_hdl = NULL, lsa = INVALID_HANDLE_VALUE;
   LSA_OPERATIONAL_MODE sec_mode;
   NTSTATUS ret, ret2;
   ULONG package_id, size;
