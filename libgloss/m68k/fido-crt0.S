@@ -239,12 +239,15 @@ SYM (_start):
     bgt     .LdataCopyLoop
 #endif /* ROM */
 
+#ifdef FIDO_ram
+	/* For ROM configs, the linker script ensures that
+	   _vector_table is placed at the proper place.  For RAM
+	   configs, we have to adjust it ourselves.  */
+	movel	IMM (SYM (_vector_table)), FIDO_CTX0_VBR
+#endif
+
 #ifndef FIDO_redboot
-/*
- * Setup interrupt vectors for secondary contexts.  We do not need to
- * worry about _vector_table, since the linker script ensures that
- * _vector_table is placed at the proper place.
- */
+	/* Setup interrupt vectors for secondary contexts.  */
 	movel	IMM (SYM (_vector_table1)), FIDO_CTX1_VBR
 	movel	IMM (SYM (_vector_table2)), FIDO_CTX2_VBR
 	movel	IMM (SYM (_vector_table3)), FIDO_CTX3_VBR

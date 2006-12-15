@@ -1,5 +1,9 @@
-SRAM_ORIGIN=0x3000000
-SRAM_LENGTH=0x100000
+SRAM_ORIGIN=0x03000000
+SRAM_LENGTH=0x00100000
+
+# HEAPEND must be in the same memory region as DATA.  STACK should be
+# above HEAPEND, also in the same region, for configurations which
+# need __stack.
 
 case $MODE in
     rom)
@@ -7,29 +11,33 @@ case $MODE in
 	TEXT=rom
 	DATA=sram
 	DATALOAD="rom"
-	STACK=0x30ffffc
+	STACK=0x030ffffc
 	HEAPEND=0x03080000
 	;;
     sram)
 	CRT0=ram
 	TEXT=sram
 	DATA=sdram
-	STACK=0x30ffffc
-	HEAPEND=0x03080000
+	STACK=0x021ffffc
+	HEAPEND=0x02180000
+	# Leave the rest of SDRAM for manual use.
 	;;
     sdram)
 	CRT0=ram
 	TEXT=sdram
 	DATA=sdram
-	STACK=0x30ffffc
-	HEAPEND=0x03080000
+	STACK=0x021ffffc
+	HEAPEND=0x02180000
+	# Leave the rest of SDRAM for manual use.
 	;;
     redboot)
 	CRT0=redboot
 	# We need to avoid the area used by RedBoot
 	SRAM_ORIGIN=0x3080000
 	SRAM_LENGTH=0x80000
-	TEXT=sdram
+	# Put code for RedBoot apps in SRAM, since the fido1100 has
+	# trouble running code from SDRAM.
+	TEXT=sram
 	DATA=sdram
 	STACK=0
 	HEAPEND=0x027f0000

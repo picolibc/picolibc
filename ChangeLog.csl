@@ -1,3 +1,11 @@
+2006-12-15  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* libgloss/m68k/fido-crt0.S (_start): Set %vbr for context 0 in
+	RAM configs.
+	* libgloss/m68k/fido.sc: Clean up formatting.  Add comments.  Move
+	stack and heap end to SDRAM for SRAM and SDRAM configurations.
+	Put RedBoot application text in SRAM.
+
 2006-12-13  Nathan Sidwell  <nathan@codesourcery.com>
 
 	libgloss/
