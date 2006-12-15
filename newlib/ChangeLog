@@ -1,3 +1,11 @@
+2006-12-14  Jeff Johnston  <jjohnstn@redhat.com>
+            Eric Blake  <ebb9@byu.net>
+
+        * libc/stdio/fflush.c (fflush): On seekable streams, always flush
+        read but unused data.
+        * libc/stdio/fclose.c (_fclose_r): Always flush streams, since
+        even read streams may have side effects that must happen.
+
 2006-11-30  Lev Bishop  <lev.bishop@gmail.com>
 
 	* libc/include/math.h: Allow C99 functions/macros to be

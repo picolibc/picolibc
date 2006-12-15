@@ -86,7 +86,10 @@ _DEFUN(_fclose_r, (rptr, fp),
       __sfp_lock_release ();
       return (0);
     }
-  r = fp->_flags & __SWR ? fflush (fp) : 0;
+  /* Unconditionally flush to allow special handling for seekable read
+     files to reposition file to last byte processed as opposed to
+     last byte read ahead into the buffer.  */
+  r = fflush (fp);
   if (fp->_close != NULL && (*fp->_close) (fp->_cookie) < 0)
     r = EOF;
   if (fp->_flags & __SMBF)

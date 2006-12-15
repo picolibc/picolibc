@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990 The Regents of the University of California.
+ * Copyright (c) 1990, 2006 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -74,10 +74,56 @@ _DEFUN(fflush, (fp),
   t = fp->_flags;
   if ((t & __SWR) == 0)
     {
+      _fpos_t _EXFUN((*seekfn), (_PTR, _fpos_t, int));
+
       /* For a read stream, an fflush causes the next seek to be
          unoptimized (i.e. forces a system-level seek).  This conforms
          to the POSIX and SUSv3 standards.  */
       fp->_flags |= __SNPT;
+
+      /* For a seekable stream with buffered read characters, we will attempt
+         a seek to the current position now.  A subsequent read will then get
+         the next byte from the file rather than the buffer.  This conforms
+         to the POSIX and SUSv3 standards.  Note that the standards allow
+         this seek to be deferred until necessary, but we choose to do it here
+         to make the change simpler, more contained, and less likely
+         to miss a code scenario.  */
+      if ((fp->_r > 0 || fp->_ur > 0) && (seekfn = fp->_seek) != NULL)
+        {
+          _fpos_t curoff;
+
+          /* Get the physical position we are at in the file.  */
+          if (fp->_flags & __SOFF)
+            curoff = fp->_offset;
+          else
+            {
+              /* We don't know current physical offset, so ask for it.  */
+              curoff = (*seekfn) (fp->_cookie, (_fpos_t) 0, SEEK_CUR);
+              if (curoff == -1L)
+                {
+                  _funlockfile (fp);
+                  return 0;
+                }
+            }
+          if (fp->_flags & __SRD)
+            {
+              /* Current offset is at end of buffer.  Compensate for
+                 characters not yet read.  */
+              curoff -= fp->_r;
+              if (HASUB (fp))
+                curoff -= fp->_ur;
+            }
+          /* Now physically seek to after byte last read.  */
+          if ((*seekfn)(fp->_cookie, curoff, SEEK_SET) != -1)
+            {
+              /* Seek successful.  We can clear read buffer now.  */
+              fp->_flags &= ~__SNPT;
+              fp->_r = 0;
+              fp->_p = fp->_bf._base;
+              if (fp->_flags & __SOFF)
+                fp->_offset = curoff;
+            }
+        } 
       _funlockfile (fp);
       return 0;
     }
