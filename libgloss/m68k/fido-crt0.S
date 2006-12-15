@@ -325,7 +325,7 @@ SYM (_vector_table):
         dc.l    _DivideByZeroHandler             /* 005 Divide by Zero             */
         dc.l    _ChkHandler                      /* 006 CHK, CHK2 Instructions     */  
         dc.l    _TrapccHandler                   /* 007 TRAPcc, TRAPV Instructions */
-        dc.l    _PriviligeViolationHandler       /* 008 Privilege Violation        */
+        dc.l    _PrivilegeViolationHandler       /* 008 Privilege Violation        */
         dc.l    _TraceHandler                    /* 009 Trace                      */
         dc.l    _ALineHandler                    /* 010 A-Line Unimplemented Instr */
         dc.l    _FLineHandler                    /* 011 F-Line Unimplemented Instr */

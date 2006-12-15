@@ -160,7 +160,8 @@ CF_SOURCES = cf-isv.S cf-crt0.S cf-crt1.c asm.h
 FIDO_CRT0S    = fido-rom-crt0.o fido-ram-crt0.o fido-redboot-crt0.o
 FIDO_BSP      = libfido.a
 FIDO_OBJS     = fido-hosted.o getpid.o kill.o fido-sbrk.o fido-_exit.o \
-		$(patsubst %,fido-%Handler.o,$(FIDO_HANDLERS))
+		$(patsubst %,fido-%Handler.o,$(FIDO_HANDLERS)) fido-priv.o
+# Note: Do not spell correct Privilige here.  See fido-priv.S.
 FIDO_HANDLERS:= BusError AddressError IllegalInstruction DivideByZero Chk \
 	Trapcc PriviligeViolation Trace ALine FLine HwBreakpoint Reserved0 \
 	FormatError UnitializedInt SoftwareInt \
