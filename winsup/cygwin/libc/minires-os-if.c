@@ -196,10 +196,6 @@ static int cygwin_query(res_state statp, const char * DomName, int Class, int Ty
   DPRINTF(debug, "DnsQuery: %lu (Windows)\n", res);
   if (res) {
     switch (res) {
-    case ERROR_PROC_NOT_FOUND:
-      errno = ENOSYS;
-      statp->res_h_errno = NO_RECOVERY;
-      break;
     case ERROR_INVALID_NAME:
       errno = EINVAL;
       statp->res_h_errno = NETDB_INTERNAL;;
@@ -393,13 +389,12 @@ void get_dns_info(res_state statp)
   DWORD dwRetVal;
   IP_ADDR_STRING * pIPAddr;
   FIXED_INFO * pFixedInfo;
-  HINSTANCE kerneldll;
-  typedef DWORD WINAPI (*GNPType)(PFIXED_INFO, PULONG);
-  GNPType PGetNetworkParams;
   int numAddresses = 0;
 
-  if (statp->use_os) {
-    DPRINTF(debug, "using dnsapi.dll\n");
+  if (statp->use_os
+      && ((dwRetVal = DnsQuery_A(NULL, 0, 0, NULL, NULL, NULL)) != ERROR_PROC_NOT_FOUND))
+  {
+    DPRINTF(debug, "using dnsapi.dll %d\n", dwRetVal);
     statp->os_query = (typeof(statp->os_query)) cygwin_query;
     /* We just need the search list. Avoid loading iphlpapi. */
     statp->nscount = -1;
@@ -408,17 +403,8 @@ void get_dns_info(res_state statp)
   if (statp->nscount != 0)
     goto use_registry;
 
-  if (!(kerneldll = LoadLibrary("IPHLPAPI.DLL"))) {
-    DPRINTF(debug, "LoadLibrary: error %lu (Windows)\n", GetLastError());
-    goto use_registry;
-  }
-  if (!(PGetNetworkParams = (GNPType) GetProcAddress(kerneldll, 
-						     "GetNetworkParams"))) {
-    DPRINTF(debug, "GetProcAddress: error %lu (Windows)\n", GetLastError());
-    goto use_registry;
-  }
   /* First call to get the buffer length we need */
-  dwRetVal = PGetNetworkParams((FIXED_INFO *) 0, &ulOutBufLen);
+  dwRetVal = GetNetworkParams((FIXED_INFO *) 0, &ulOutBufLen);
   if (dwRetVal != ERROR_BUFFER_OVERFLOW) {
     DPRINTF(debug, "GetNetworkParams: error %lu (Windows)\n", dwRetVal);
     goto use_registry;
@@ -427,7 +413,7 @@ void get_dns_info(res_state statp)
     DPRINTF(debug, "alloca: %s\n", strerror(errno));
     goto use_registry;
   }
-  if ((dwRetVal = PGetNetworkParams((FIXED_INFO *) pFixedInfo, & ulOutBufLen))) {
+  if ((dwRetVal = GetNetworkParams(pFixedInfo, & ulOutBufLen))) {
     DPRINTF(debug, "GetNetworkParams: error %lu (Windows)\n", dwRetVal);
     goto use_registry;
   }

@@ -1,3 +1,8 @@
+2006-12-15  Pierre A. Humblet  <Pierre.Humblet@ieee.org>
+
+	* libc/minires-os-if.c (cygwin_query): Remove ERROR_PROC_NOT_FOUND case.
+	(get_dns_info): Verify DnsQuery exists. Use autoloaded GetNetworkParams.
+
 2006-12-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winsup.h (clear_procimptoken): Close hProcImpToken in a safer way.
