@@ -1,5 +1,10 @@
 2006-12-18  Jeff Johnston  <jjohnstn@redhat.com>
 
+        * aclocal.m4 */aclocal.m4: Regenerated using aclocal 1.9.6.
+        * Makefile.in */Makefile.in: Regenerated using automake 1.9.6.
+
+2006-12-18  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/stdlib/mallocr.c (malloc_extend_top): Add patch from
 	2.6.5 version of Doug Lea's malloc which is the basis of
 	this code.
