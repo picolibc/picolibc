@@ -1,3 +1,20 @@
+2005-12-18  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * NEWS: Update with 1.15.0 info.
+        * README: Ditto.
+        * acinclude.m4: Change version number to 1.15.0.
+        * aclocal.m4: Regenerated. 
+        * configure: Ditto.
+        * doc/aclocal.m4: Ditto.
+        * doc/configure: Ditto.
+        * libc/*/aclocal.m4: Ditto.
+        * libc/*/configure: Ditto.
+        * libc/libc.texinfo: Ditto.
+        * libm/*/aclocal.m4: Ditto.
+        * libm/*/configure: Ditto.
+        * libm/libm.texinfo: Ditto.
+        * libc/sys/linux/shared.ld: Add VERS_1.15.
+
 2006-12-18  Kazu Hirata  <kazu@codesourcery.com>
 
 	Merge from newlib-csl-20060320-branch:

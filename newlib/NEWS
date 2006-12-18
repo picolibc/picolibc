@@ -1,3 +1,15 @@
+*** Major changes in newlib version 1.15.0:
+
+* new platforms added (bfin, spu, fido)
+* merge of csl branch changes (e.g. m68k)
+* additional C99 support (printf modifiers, strtod, isnan/isinf)
+* new configuration option to turn off dynamic allocation for atexit
+* reentrancy added for read / write functions
+* Cygwin fixes (e.g. POSIX read file flush behavior)
+* switch to autoconf 2.5.9
+* use of aclocal/automake 1.9.6
+* various bug fixes and doc cleanups
+
 *** Major changes in newlib version 1.14.0:
 
 * new platforms added (cris, mt, m32c)
