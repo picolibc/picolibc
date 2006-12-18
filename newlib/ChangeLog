@@ -1,3 +1,16 @@
+2006-12-18  Joel Schopp <jschopp@austin.ibm.com> 
+
+        * libc/machine/spu/c99ppe.h: New file
+        * libc/machine/spu/perror.c: New file to override libc/stdio version.
+        * libc/machine/spu/printf.c: New file
+        * libc/machine/spu/putchar.c: New file
+        * libc/machine/spu/puts.c: New file
+        * libc/machine/spu/vprintf.c: New file
+        * libc/machine/spu/vsnprintf.c: New file
+        * libc/machine/spu/vsprintf.c: New file
+        * libc/machine/spu/Makefile.am: Add new targets.
+        * libc/machine/spu/Makefile.in: Regenerated.
+
 2006-12-18  Jeff Johnston  <jjohnstn@redhat.com>
 
         * aclocal.m4 */aclocal.m4: Regenerated using aclocal 1.9.6.

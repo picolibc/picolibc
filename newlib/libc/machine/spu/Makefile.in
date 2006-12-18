@@ -47,7 +47,11 @@ DIST_COMMON = $(srcdir)/../../../../config.guess \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
-	$(srcdir)/../../../../compile $(srcdir)/../../../../compile
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../../acinclude.m4 \
@@ -70,7 +74,10 @@ am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-memcpy.$(OBJEXT) \
 	lib_a-strncat.$(OBJEXT) lib_a-strncmp.$(OBJEXT) \
 	lib_a-strncpy.$(OBJEXT) lib_a-strpbrk.$(OBJEXT) \
 	lib_a-strrchr.$(OBJEXT) lib_a-strspn.$(OBJEXT) \
-	lib_a-strxfrm.$(OBJEXT)
+	lib_a-strxfrm.$(OBJEXT) lib_a-printf.$(OBJEXT) \
+	lib_a-perror.$(OBJEXT) lib_a-putchar.$(OBJEXT) \
+	lib_a-puts.$(OBJEXT) lib_a-vsnprintf.$(OBJEXT) \
+	lib_a-vprintf.$(OBJEXT) lib_a-vsprintf.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -195,7 +202,7 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 noinst_LIBRARIES = lib.a
 AM_CCASFLAGS = $(INCLUDES)
-lib_a_SOURCES = setjmp.S memcpy.c memmove.c memset.c strcat.c strchr.c strcmp.c strcpy.c strcspn.c strlen.c strncat.c strncmp.c strncpy.c strpbrk.c strrchr.c strspn.c strxfrm.c
+lib_a_SOURCES = setjmp.S memcpy.c memmove.c memset.c strcat.c strchr.c strcmp.c strcpy.c strcspn.c strlen.c strncat.c strncmp.c strncpy.c strpbrk.c strrchr.c strspn.c strxfrm.c printf.c perror.c putchar.c puts.c vsnprintf.c vprintf.c vsprintf.c
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. 
@@ -365,6 +372,48 @@ lib_a-strxfrm.o: strxfrm.c
 
 lib_a-strxfrm.obj: strxfrm.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strxfrm.obj `if test -f 'strxfrm.c'; then $(CYGPATH_W) 'strxfrm.c'; else $(CYGPATH_W) '$(srcdir)/strxfrm.c'; fi`
+
+lib_a-printf.o: printf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-printf.o `test -f 'printf.c' || echo '$(srcdir)/'`printf.c
+
+lib_a-printf.obj: printf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-printf.obj `if test -f 'printf.c'; then $(CYGPATH_W) 'printf.c'; else $(CYGPATH_W) '$(srcdir)/printf.c'; fi`
+
+lib_a-perror.o: perror.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-perror.o `test -f 'perror.c' || echo '$(srcdir)/'`perror.c
+
+lib_a-perror.obj: perror.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-perror.obj `if test -f 'perror.c'; then $(CYGPATH_W) 'perror.c'; else $(CYGPATH_W) '$(srcdir)/perror.c'; fi`
+
+lib_a-putchar.o: putchar.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-putchar.o `test -f 'putchar.c' || echo '$(srcdir)/'`putchar.c
+
+lib_a-putchar.obj: putchar.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-putchar.obj `if test -f 'putchar.c'; then $(CYGPATH_W) 'putchar.c'; else $(CYGPATH_W) '$(srcdir)/putchar.c'; fi`
+
+lib_a-puts.o: puts.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-puts.o `test -f 'puts.c' || echo '$(srcdir)/'`puts.c
+
+lib_a-puts.obj: puts.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-puts.obj `if test -f 'puts.c'; then $(CYGPATH_W) 'puts.c'; else $(CYGPATH_W) '$(srcdir)/puts.c'; fi`
+
+lib_a-vsnprintf.o: vsnprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsnprintf.o `test -f 'vsnprintf.c' || echo '$(srcdir)/'`vsnprintf.c
+
+lib_a-vsnprintf.obj: vsnprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsnprintf.obj `if test -f 'vsnprintf.c'; then $(CYGPATH_W) 'vsnprintf.c'; else $(CYGPATH_W) '$(srcdir)/vsnprintf.c'; fi`
+
+lib_a-vprintf.o: vprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vprintf.o `test -f 'vprintf.c' || echo '$(srcdir)/'`vprintf.c
+
+lib_a-vprintf.obj: vprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vprintf.obj `if test -f 'vprintf.c'; then $(CYGPATH_W) 'vprintf.c'; else $(CYGPATH_W) '$(srcdir)/vprintf.c'; fi`
+
+lib_a-vsprintf.o: vsprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsprintf.o `test -f 'vsprintf.c' || echo '$(srcdir)/'`vsprintf.c
+
+lib_a-vsprintf.obj: vsprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsprintf.obj `if test -f 'vsprintf.c'; then $(CYGPATH_W) 'vsprintf.c'; else $(CYGPATH_W) '$(srcdir)/vsprintf.c'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
