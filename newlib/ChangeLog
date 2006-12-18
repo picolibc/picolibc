@@ -1,3 +1,7 @@
+2006-12-18  Kazunori Asayama <asayama@sm.sony.co.jp>
+
+	* libc/include/machine/setjmp.h[__SPU__]: Replace vector with __vector.
+
 2006-12-14  Jeff Johnston  <jjohnstn@redhat.com>
             Eric Blake  <ebb9@byu.net>
 
