@@ -2223,11 +2223,11 @@ static void malloc_extend_top(RARG nb) RDECL INTERNAL_SIZE_T nb;
 
       /* Also keep size a multiple of MALLOC_ALIGNMENT */
       old_top_size = (old_top_size - 3*SIZE_SZ) & ~MALLOC_ALIGN_MASK;
-      set_head_size(old_top, old_top_size);
       chunk_at_offset(old_top, old_top_size          )->size =
         SIZE_SZ|PREV_INUSE;
       chunk_at_offset(old_top, old_top_size + SIZE_SZ)->size =
         SIZE_SZ|PREV_INUSE;
+      set_head_size(old_top, old_top_size);
       /* If possible, release the rest. */
       if (old_top_size >= MINSIZE) 
         fREe(RCALL chunk2mem(old_top));
