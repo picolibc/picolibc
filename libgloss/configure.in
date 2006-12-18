@@ -42,7 +42,7 @@ case "${target}" in
 	AC_CONFIG_SUBDIRS(m68hc11)
 	config_testsuite=true
 	;;
-  m68*-*-*)
+  fido-*-* | m68*-*-*)
 	AC_CONFIG_SUBDIRS(m68k)
 	config_testsuite=true
 	;;

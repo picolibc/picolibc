@@ -152,6 +152,36 @@ CF_HOSTED_SCRIPTS := $(patsubst %.ld,%-hosted.ld,$(CF_RAM_SCRIPTS) $(CF_ROM_SCRI
 CF_SCRIPTS = $(CF_RAM_SCRIPTS) $(CF_ROM_SCRIPTS) $(CF_HOSTED_SCRIPTS)
 CF_SOURCES = cf-isv.S cf-crt0.S cf-crt1.c asm.h
 
+# Fido board.
+# Programs built with the ROM linker script are designed to be
+# executed from flash.  Programs built with the RAM linker script are
+# designed to be run via JTAG.  Program built with the RedBoot linker
+# script are designed to be run from the RedBoot boot loader.
+FIDO_CRT0S    = fido-rom-crt0.o fido-ram-crt0.o fido-redboot-crt0.o
+FIDO_BSP      = libfido.a
+FIDO_OBJS     = fido-hosted.o getpid.o kill.o fido-sbrk.o fido-_exit.o \
+		$(patsubst %,fido-%Handler.o,$(FIDO_HANDLERS))
+FIDO_HANDLERS:= BusError AddressError IllegalInstruction DivideByZero Chk \
+	Trapcc PrivilegeViolation Trace ALine FLine HwBreakpoint Reserved0 \
+	FormatError UnitializedInt SoftwareInt \
+	$(addprefix Unassigned,0 1 2 3 4 5 6) \
+	$(addprefix Int,0 1 2 3 4 5 6 7) \
+	$(addprefix Trap,00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15) \
+	$(addprefix Reserved,048 049 050 051 052 053 054 055 056 057 058 \
+				059 060 061 062 063) \
+	ContextOvertime MpuError \
+	$(addprefix SystemTimer,0 1 2 3 4) \
+	WatchdogTimer TimerCounter0 TimerCounter1 DMA0 DMA1 AtoDConversion \
+	$(addprefix Pdma,0 1 2 3) \
+	$(addprefix Reserved,081 082 083 084 085 086 087 088 089 \
+				090 091 092 093 094 095) \
+	$(addprefix Trapx,00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15) \
+	Dummy
+FIDO_UNHOSTED_SCRIPTS:= fido-rom.ld fido-sram.ld fido-sdram.ld
+FIDO_HOSTED_SCRIPTS:=$(patsubst %.ld,%-hosted.ld,$(FIDO_UNHOSTED_SCRIPTS))
+FIDO_SCRIPTS  = $(FIDO_UNHOSTED_SCRIPTS) $(FIDO_HOSTED_SCRIPTS) fido-redboot.ld
+FIDO_SOURCES  = fido-crt0.S asm.h fido.h
+
 #
 # here's all the unhosted stuff
 #
@@ -182,6 +212,10 @@ all_m68k :: ${SIM_CRT0} ${SIM_BSP} ${CRT0} ${BCC_BSP} ${IDP_BSP} \
 	${IDPGDB_BSP} ${MVME135_BSP} ${MVME162_BSP}
 .PHONY: all_cf
 all_cf :: ${CF_CRT0S} ${CF_BSP} ${CF_SCRIPTS} ${HOSTED_BSP} ${UNHOSTED_BSP}
+
+.PHONY: all_fido
+all_fido :: ${FIDO_CRT0S} ${FIDO_BSP} ${FIDO_SCRIPTS} \
+	${HOSTED_BSP} ${UNHOSTED_BSP}
 
 ${SIM_BSP}: ${SIM_OBJS}
 	${AR} ${ARFLAGS} $@ ${SIM_OBJS}
@@ -245,6 +279,39 @@ m%-ram-hosted.ld : cf.sc Makefile
 m%-rom-hosted.ld : cf.sc Makefile
 	IO=hosted RAM=$(word 1,$(m$*)) RAM_SIZE=$(word 2,$(m$*)) \
 	  ROM=$(word 3,$(m$*)) ROM_SIZE=$(word 4,$(m$*)) ${SHELL} $< >$@
+
+#build fido library
+fido-%-crt0.o : fido-crt0.S asm.h fido.h
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) \
+		-DFIDO_$* -c -o $@ $<
+
+$(patsubst %,fido-%Handler.o,${FIDO_HANDLERS}) : fido-handler.c
+	$(CC) $(CFLAGS_FOR_TARGET) -fomit-frame-pointer $(CFLAGS) $(INCLUDES) \
+		-c $< -o $@ -DHANDLER=$(patsubst fido-%.o,_%,$@)
+${FIDO_BSP}: ${FIDO_OBJS}
+	${AR} ${ARFLAGS} $@ ${FIDO_OBJS}
+	${RANLIB} $@
+
+fido-rom.ld: fido.sc
+	MODE=rom IO=unhosted ${SHELL} $< > $@
+
+fido-rom-hosted.ld: fido.sc
+	MODE=rom IO=hosted ${SHELL} $< > $@
+
+fido-sram.ld: fido.sc
+	MODE=sram IO=unhosted ${SHELL} $< > $@
+
+fido-sram-hosted.ld: fido.sc
+	MODE=sram IO=hosted ${SHELL} $< > $@
+
+fido-sdram.ld: fido.sc
+	MODE=sdram IO=unhosted ${SHELL} $< > $@
+
+fido-sdram-hosted.ld: fido.sc
+	MODE=sdram IO=hosted ${SHELL} $< > $@
+
+fido-redboot.ld: fido.sc
+	MODE=redboot IO=unhosted ${SHELL} $< > $@
 
 leds.o: ${srcdir}/leds.c
 	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -c $<
@@ -372,22 +439,32 @@ install_m68k::
 .PHONY: install_cf
 install_cf:: install_io
 	# install CF stuff
-	for crt in $(CF_CRT0S) ; \
-	do $(INSTALL_DATA) $$crt $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$crt ; \
-	done
-	$(INSTALL_DATA) $(CF_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(CF_BSP)
-	for script in $(CF_SCRIPTS) ; \
-	do $(INSTALL_DATA) $$script $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$script ; \
-	done
-	for src in $(CF_SOURCES) ; \
-	do $(INSTALL_DATA) ${srcdir}/$$src $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$src ; \
-	done
+	$(INSTALL_DATA) $(CF_CRT0S) $(CF_BSP) \
+		$(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(CF_SCRIPTS) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+ifeq ($(MULTISUBDIR),)
+	# only install sources for the default multilib
+	$(INSTALL_DATA) $(addprefix ${srcdir}/,$(CF_SOURCES)) \
+		$(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+endif
+
+.PHONY: install_fido
+install_fido:: install_io
+	$(INSTALL_DATA) $(FIDO_CRT0S) $(FIDO_BSP) \
+		$(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)
+	$(INSTALL_DATA) $(FIDO_SCRIPTS) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+ifeq ($(MULTISUBDIR),)
+	# only install sources for the default multilib
+	$(INSTALL) -d $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/src
+	$(INSTALL_DATA) $(addprefix $(srcdir)/,$(FIDO_SOURCES)) \
+		$(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/src
+endif
 
 .PHONY: install_io
 install_io::
 	# install IO stuff
-	$(INSTALL_DATA) $(HOSTED_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(HOSTED_BSP)
-	$(INSTALL_DATA) $(UNHOSTED_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(UNHOSTED_BSP)
+	$(INSTALL_DATA) $(HOSTED_BSP) $(UNHOSTED_BSP) \
+		$(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
 
 # target specific makefile fragment comes in here.
 @target_makefile_frag@
