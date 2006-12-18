@@ -64,7 +64,8 @@ set_myself (HANDLE h)
       myself->exec_sendsig = NULL;
       myself->exec_dwProcessId = 0;
     }
-  else if (!myself->wr_proc_pipe)
+  else if (!child_proc_info)	/* child_proc_info is only set when this process
+				   was started by another cygwin process */
     myself->start_time = time (NULL); /* Register our starting time. */
   else if (cygheap->pid_handle)
     {
