@@ -42,7 +42,7 @@ stat (const char *pathname, struct stat *pstat)
 	syscall_out_t   *psys_out = ( syscall_out_t* )&sys;
 	jsre_stat_t pjstat;
 
-	sys.pathname = pathname;
+	sys.pathname = (unsigned int)pathname;
 	sys.ptr = ( unsigned int )&pjstat;
 
 	_send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_STAT, &sys);
