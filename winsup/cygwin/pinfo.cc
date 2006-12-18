@@ -124,6 +124,16 @@ pinfo::maybe_set_exit_code_from_windows ()
 }
 
 void
+pinfo::zap_cwd ()
+{
+  extern char windows_system_directory[];
+  /* Move to an innocuous location to avoid a race with other processes
+     that may want to manipulate the current directory before this
+     process has completely exited.  */
+  SetCurrentDirectory (windows_system_directory);
+}
+
+void
 pinfo::exit (DWORD n)
 {
   minimal_printf ("winpid %d, exit %d", GetCurrentProcessId (), n);
@@ -139,6 +149,7 @@ pinfo::exit (DWORD n)
     }
 
   sigproc_terminate (ES_FINAL);
+  zap_cwd ();
 
   /* FIXME:  There is a potential race between an execed process and its
      parent here.  I hated to add a mutex just for that, though.  */
