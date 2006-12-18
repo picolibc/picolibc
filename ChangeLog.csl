@@ -52,7 +52,7 @@
 2006-11-06  Paul Brook  <paul@codesourcery.com>
 
 	libgloss/
-	* arm/Makefie.in (ALL_CFLAGS): Define and use.
+	* arm/Makefile.in (ALL_CFLAGS): Define and use.
 
 2006-11-01  Nathan Sidwell  <nathan@codesourcery.com>
 
