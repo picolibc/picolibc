@@ -1,3 +1,7 @@
+2006-12-19  Paolo Bonzini  <bonzini@gnu.org>
+
+	* configure.texi: Fix botched commit.
+
 2006-05-31  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* texi2pod.pl: Correct handling of absolute @include.
