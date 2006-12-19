@@ -300,12 +300,6 @@ machine dependent files such as executables.
 The default for @samp{--prefix} is @file{/usr/local}.  The default for
 @samp{--exec-prefix} is the value used for @samp{--prefix}.
 
-The convention used in Cygnus releases is to use a @samp{--prefix}
-option of @file{/usr/cygnus/@var{release}}, where @var{release} is the
-name of the release, and to use a @samp{--exec-prefix} option of
-@file{/usr/cygnus/@var{release}/H-@var{host}}, where @var{host} is the
-configuration name of the host system (@pxref{Configuration Names}).
-
 Do not use either the source or the object directory as the installation
 directory.  That will just lead to confusion.
 
@@ -1676,12 +1670,9 @@ the autoconf documentation for @samp{AC_ARG_PROGRAM}.
 @section Cross Tools in the Cygnus Tree
 
 The Cygnus tree is used for various packages including gdb, the GNU
-binutils, and egcs.  It is also, of course, used for Cygnus releases.
-
-In the Cygnus tree, the top level @file{configure} script uses the old
-Cygnus configure system, not autoconf.  The top level @file{Makefile.in}
+binutils, and egcs.  In the Cygnus tree, the top level @file{Makefile.in}
 is written to build packages based on what is in the source tree, and
-supports building a large number of tools in a single
+supports building and bootstrapping a large number of tools in a single
 @samp{configure}/@samp{make} step.
 
 The Cygnus tree may be configured with a @samp{--target} option.  The
@@ -2132,27 +2123,26 @@ lines with a trailing backslash as a continuation character).
 @example
 mkdir linux-x-cygwin32
 cd linux-x-cygwin32
-@var{srcdir}/configure --target i386-cygwin32 --prefix=@var{installdir} \
-  --exec-prefix=@var{installdir}/H-i386-linux
+@var{srcdir}/configure --target i386-cygwin32 --prefix=@var{installdir}
 make
 make install
 cd ..
 mkdir linux-x-mips-elf
 cd linux-x-mips-elf
-@var{srcdir}/configure --target mips-elf --prefix=@var{installdir} \
-  --exec-prefix=@var{installdir}/H-i386-linux
+@var{srcdir}/configure --target mips-elf --prefix=@var{installdir}
 make
 make install
 cd ..
 mkdir cygwin32-x-mips-elf
 cd cygwin32-x-mips-elf
 @var{srcdir}/configure --build=i386-linux-gnu --host=i386-cygwin32 \
-  --target=mips-elf --prefix=@var{wininstalldir} \
-  --exec-prefix=@var{wininstalldir}/H-i386-cygwin32
+  --target=mips-elf --prefix=@var{wininstalldir}
 make
 make install
 @end example
 
+Note that we specify a different prefix in the last build, because this
+does not contain Linux executables, but rather Windows executables.
 You would then copy the contents of @var{wininstalldir} over to the
 Windows machine, and run the resulting programs.
 
@@ -2263,152 +2253,63 @@ crucial.
 The gcc @file{Makefile.in} shows a complex situation in which certain
 files, such as @file{rtl.c}, must be compiled into both subsidiary
 programs run on the build system and into the final program.  This
-approach may be of interest for advanced build system hackers.  Note
-that the build system compiler is rather confusingly called
-@samp{HOST_CC}.
+approach may be of interest for advanced build system hackers.
 
-@node Cygnus Configure
-@chapter Cygnus Configure
-@cindex cygnus configure
+@node Top level Configure
+@chapter Top level Configure
+@cindex top level configure
 
-The Cygnus configure script predates autoconf.  All of its interesting
-features have been incorporated into autoconf.  No new programs should
-be written to use the Cygnus configure script.
+The top level configure script detects the tools that are used in the
+Cygnus tree.  This script is a rewrite of the Cygnus configure script,
+which predated autoconf.
 
-However, the Cygnus configure script is still used in a few places: at
-the top of the Cygnus tree and in a few target libraries in the Cygnus
-tree.  Until those uses have been replaced with autoconf, some brief
-notes are appropriate here.  This is not complete documentation, but it
-should be possible to use this as a guide while examining the scripts
-themselves.
+The script includes all the logic to detect the host and target tools,
+and to customize the @file{Makefile} to support the special needs of
+some systems.
 
-@menu
-* Cygnus Configure Basics::		Cygnus Configure Basics.
-* Cygnus Configure in C++ Libraries::	Cygnus Configure in C++ Libraries.
-@end menu
+A particularly delicate point is finding the target tools--these include
+the assembler, the linker, and the other @command{binutils} such as
+@command{nm} or @command{ar}.  Some of these need to be invoked by GCC;
+others, such as @command{objdump}, are necessary during configuration, in
+order to detect the set of features supported by the assembler and linker.
 
-@node Cygnus Configure Basics
-@section Cygnus Configure Basics
+In general, the top level configure tries to follow these lines in order
+to detect the target tools:
 
-Cygnus configure does not use any generated files; there is no program
-corresponding to @samp{autoconf}.  Instead, there is a single shell
-script named @samp{configure} which may be found at the top of the
-Cygnus tree.  This shell script was written by hand; it was not
-generated by autoconf, and it is incorrect, and indeed harmful, to run
-@samp{autoconf} in the top level of a Cygnus tree.
+@table @itemize
+@item try to detect a consistent set of tools
 
-Cygnus configure works in a particular directory by examining the file
-@file{configure.in} in that directory.  That file is broken into four
-separate shell scripts.
+@item try to detect the same tools that the installed GCC will use
+@end table
 
-The first is the contents of @file{configure.in} up to a line that
-starts with @samp{# per-host:}.  This is the common part.
+To achieve the first goal, we use the same search criterion for all tools,
+even those that the compiler never invokes.
 
-The second is the rest of @file{configure.in} up to a line that starts
-with @samp{# per-target:}.  This is the per host part.
+To achieve the second goal when the @samp{build} and @samp{host} systems
+are the same, we search the same directories that the installed compiler
+will search.  This is overridden if the assembler and linker are being
+compiled together with GCC, because after installation GCC
+will find the tools that were just compiled.
 
-The third is the rest of @file{configure.in} up to a line that starts
-with @samp{# post-target:}.  This is the per target part.
+To achieve the second goal when cross compiling (the @samp{build} and
+the @samp{host} systems are different, we ask the installed GCC for the
+name of the tool it uses.  This is because the only good choice for a
+compiler is the same GCC version that is being installed (@pxref{Cross
+Cygnus CCross: Building a Cross Program}), and we assume that on the
+host system we'll have not only the same GCC version, but also the same
+binutils version.
 
-The fourth is the remainder of @file{configure.in}.  This is the post
-target part.
-
-If any of these comment lines are missing, the corresponding shell
-script is empty.
-
-Cygnus configure will first execute the common part.  This must set the
-shell variable @samp{srctrigger} to the name of a source file, to
-confirm that Cygnus configure is looking at the right directory.  This
-may set the shell variables @samp{package_makefile_frag} and
-@samp{package_makefile_rules_frag}.
-
-Cygnus configure will next set the @samp{build} and @samp{host} shell
-variables, and execute the per host part.  This may set the shell
-variable @samp{host_makefile_frag}.
-
-Cygnus configure will next set the @samp{target} variable, and execute
-the per target part.  This may set the shell variable
-@samp{target_makefile_frag}.
-
-Any of these scripts may set the @samp{subdirs} shell variable.  This
-variable is a list of subdirectories where a @file{Makefile.in} file may
-be found.  Cygnus configure will automatically look for a
-@file{Makefile.in} file in the current directory.  The @samp{subdirs}
-shell variable is not normally used, and I believe that the only
-directory which uses it at present is @file{newlib}.
-
-For each @file{Makefile.in}, Cygnus configure will automatically create
-a @file{Makefile} by adding definitions for @samp{make} variables such
-as @samp{host} and @samp{target}, and automatically editing the values
-of @samp{make} variables such as @samp{prefix} if they are present.
-
-Also, if any of the @samp{makefile_frag} shell variables are set, Cygnus
-configure will interpret them as file names relative to either the
-working directory or the source directory, and will read the contents of
-the file into the generated @file{Makefile}.  The file contents will be
-read in after the first line in @file{Makefile.in} which starts with
-@samp{####}.
-
-These @file{Makefile} fragments are used to customize behaviour for a
-particular host or target.  They serve to select particular files to
-compile, and to define particular preprocessor macros by providing
-values for @samp{make} variables which are then used during compilation.
-Cygnus configure, unlike autoconf, normally does not do feature tests,
-and normally requires support to be added manually for each new host.
-
-The @file{Makefile} fragment support is similar to the autoconf
-@samp{AC_SUBST_FILE} macro.
-
-After creating each @file{Makefile}, the post target script will be run
-(i.e., it may be run several times).  This script may further customize
-the @file{Makefile}.  When it is run, the shell variable @samp{Makefile}
-will hold the name of the @file{Makefile}, including the appropriate
-directory component.
-
-Like an autoconf generated @file{configure} script, Cygnus configure
-will create a file named @file{config.status} which, when run, will
-automatically recreate the configuration.  The @file{config.status} file
-will simply execute the Cygnus configure script again with the
-appropriate arguments.
-
-Any of the parts of @file{configure.in} may set the shell variables
-@samp{files} and @samp{links}.  Cygnus configure will set up symlinks
-from the names in @samp{links} to the files named in @samp{files}.  This
-is similar to the autoconf @samp{AC_LINK_FILES} macro.
-
-Finally, any of the parts of @file{configure.in} may set the shell
-variable @samp{configdirs} to a set of subdirectories.  If it is set,
-Cygnus configure will recursively run the configure process in each
-subdirectory.  If the subdirectory uses Cygnus configure, it will
-contain a @file{configure.in} file but no @file{configure} file, in
-which case Cygnus configure will invoke itself recursively.  If the
-subdirectory has a @file{configure} file, Cygnus configure assumes that
-it is an autoconf generated @file{configure} script, and simply invokes
-it directly.
-
-@node Cygnus Configure in C++ Libraries
-@section Cygnus Configure in C++ Libraries
-@cindex @file{libstdc++} configure
-@cindex @file{libio} configure
-@cindex @file{libg++} configure
-
-The C++ library configure system, written by Per Bothner, deserves
-special mention.  It uses Cygnus configure, but it does feature testing
-like that done by autoconf generated @file{configure} scripts.  This
-approach is used in the libraries @file{libio}, @file{libstdc++}, and
-@file{libg++}.
-
-Most of the @file{Makefile} information is written out by the shell
-script @file{libio/config.shared}.  Each @file{configure.in} file sets
-certain shell variables, and then invokes @file{config.shared} to create
-two package @file{Makefile} fragments.  These fragments are then
-incorporated into the resulting @file{Makefile} by the Cygnus configure
+The location of the target tools can also be specified using the
+@option{--with-build-time-tools} option to the top level configure
 script.
 
-The file @file{_G_config.h} is created in the @file{libio} object
-directory by running the shell script @file{libio/gen-params}.  This
-shell script uses feature tests to define macros and typedefs in
-@file{_G_config.h}.
+If no target-specific tools are found, the top level configure script
+will try to use the host tools if suitable.
+
+The script and the accompanying Makefile support building programs
+and libraries for either the build, the host or the target system.
+The target libraries, however, need to help in order to support
+@samp{multilibs}.
 
 @node Multilibs
 @chapter Multilibs
@@ -2428,7 +2329,9 @@ called @dfn{multilibs}.
 
 Multilibs are not really part of the GNU configure and build system, but
 we discuss them here since they require support in the @file{configure}
-scripts and @file{Makefile}s used for target libraries.
+scripts and @file{Makefile}s used for target libraries.  It is expected
+that in the future the toplevel will coordinate the building of the
+various multilibs, but this has not been implemented yet.
 
 @menu
 * Multilibs in gcc::		        Multilibs in gcc.
@@ -2576,17 +2479,16 @@ not defined by @samp{autoconf}.  You may be using an old version of
 newly installled @samp{autoconf} is first on your @samp{PATH}.  Also,
 see the next question.
 
-@cindex @samp{CY_GNU_GETTEXT} in @file{configure}
+@cindex @samp{AM_GNU_GETTEXT} in @file{configure}
 @cindex @samp{AM_PROG_LIBTOOL} in @file{configure}
-@item My @file{configure} script has stuff like @samp{CY_GNU_GETTEXT} in it.
+@item My @file{configure} script has stuff like @samp{AM_GNU_GETTEXT} in it.
 This means that you have macros in your @file{configure.in} which should
 be defined in your @file{aclocal.m4} file, but aren't.  This usually
 means that @samp{aclocal} was not able to appropriate definitions of the
 macros.  Make sure that you have installed all the packages you need.
 In particular, make sure that you have installed libtool (this is where
 @samp{AM_PROG_LIBTOOL} is defined) and gettext (this is where
-@samp{CY_GNU_GETTEXT} is defined, at least in the Cygnus version of
-gettext).
+@samp{AM_GNU_GETTEXT} is defined).
 
 @cindex @file{Makefile}, garbage characters
 @item My @file{Makefile} has @samp{@@} characters in it.
@@ -2611,16 +2513,16 @@ regenerate all files (@file{Makefile}, @file{config.h}, etc.) based on
 the results of the configure script.  The two cases are separate because
 it isn't always necessary to regenerate all the files after running
 @samp{config.status --recheck}.  The @file{Makefile} targets generated
-by automake will use the environment variables @samp{CONFIG_FILES} and
-@samp{CONFIG_HEADERS} to only regenerate files as they are needed.
+by automake will use command-line arguments to only regenerate files
+as they are needed.
 
 @item What is the Cygnus tree?
 The Cygnus tree is used for various packages including gdb, the GNU
-binutils, and egcs.  It is also, of course, used for Cygnus releases.
-It is the build system which was developed at Cygnus, using the Cygnus
-configure script.  It permits building many different packages with a
-single configure and make.  The configure scripts in the tree are being
-converted to autoconf, but the general build structure remains intact.
+binutils, and egcs.  It is a derivative of the build system which was
+developed at Cygnus, using the Cygnus configure script.  It permits
+building and bootstrapping many different packages with a single configure
+and make.  The configure scripts in the tree have been converted to
+autoconf, but the general build structure remains intact.
 
 @item Why do I have to keep rebuilding and reinstalling the tools?
 I know, it's a pain.  Unfortunately, there are bugs in the tools
