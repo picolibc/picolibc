@@ -1,3 +1,7 @@
+2006-12-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h: Bump DLL minor version number to 24.
+
 2006-12-18  Christopher Faylor  <me@cgf.cx>
 
 	* pinfo.cc (set_myself): Use a more foolproof method for determining if
