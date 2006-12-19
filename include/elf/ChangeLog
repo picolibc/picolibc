@@ -1,3 +1,7 @@
+2006-12-19  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* internal.h (struct elf_segment_map): Add p_vaddr_offset field.
+
 2006-12-07  Kazu Hirata  <kazu@codesourcery.com>
 
 	* m68k.h (EF_M68K_ISA_MASK, EF_M68K_ISA_A_NODIV,

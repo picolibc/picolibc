@@ -235,6 +235,8 @@ struct elf_segment_map
   unsigned long p_flags;
   /* Program segment physical address.  */
   bfd_vma p_paddr;
+  /* Program segment virtual address offset from section vma.  */
+  bfd_vma p_vaddr_offset;
   /* Program segment alignment.  */
   bfd_vma p_align;
   /* Whether the p_flags field is valid; if not, the flags are based
