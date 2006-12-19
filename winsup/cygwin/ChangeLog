@@ -26,6 +26,11 @@
 	* fhandler.cc (fhandler_base::open): Fix previous patch to handle the
 	SYSTEM attribute as well.
 
+2006-11-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::open): Fix handling of files with
+	HIDDEN attribute set.
+
 2006-11-27  Christopher Faylor  <cgf@timesys.com>
 
 	* include/cygwin/signal.h: Add __extension__ to various anonymous
