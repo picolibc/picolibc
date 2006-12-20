@@ -1426,21 +1426,76 @@ get_info_from_sd (PSECURITY_DESCRIPTOR psd, mode_t *attribute,
 		  (!acl_exists || !acl)?"NO ":"", *attribute, uid, gid);
 }
 
+static int
+get_reg_security (HANDLE handle, security_descriptor &sd_ret)
+{
+  LONG ret;
+  DWORD len = 0;
+
+  ret = RegGetKeySecurity ((HKEY) handle,
+                           DACL_SECURITY_INFORMATION
+                           | GROUP_SECURITY_INFORMATION
+                           | OWNER_SECURITY_INFORMATION,
+                           sd_ret, &len);
+  if (ret == ERROR_INSUFFICIENT_BUFFER)
+    {       
+      if (!sd_ret.malloc (len))
+        set_errno (ENOMEM);
+      else
+        ret = RegGetKeySecurity ((HKEY) handle,
+                                 DACL_SECURITY_INFORMATION
+                                 | GROUP_SECURITY_INFORMATION
+                                 | OWNER_SECURITY_INFORMATION,
+                                 sd_ret, &len);
+    }
+  if (ret != ERROR_SUCCESS)
+    {
+      __seterrno ();
+      return -1;
+    } 
+  return 0;
+}
+
 int
 get_nt_object_security (HANDLE handle, SE_OBJECT_TYPE object_type,
 			security_descriptor &sd_ret)
 {
-  sd_ret.free ();
-  /* Don't use NtQuerySecurityObject.  It doesn't recognize predefined
-     registry keys. */
-  DWORD ret = GetSecurityInfo (handle, object_type,
-			       DACL_SECURITY_INFORMATION
-			       | GROUP_SECURITY_INFORMATION
-			       | OWNER_SECURITY_INFORMATION,
-			       NULL, NULL, NULL, NULL, sd_ret);
-  if (ret != ERROR_SUCCESS)
+  NTSTATUS ret;
+  ULONG len = 0;
+  
+  /* Do not try to use GetSecurityInfo (again), unless we drop NT4 support.
+     GetSecurityInfo returns the wrong user information when running in
+     a user session using a token created with NtCreateToken under NT4.
+     Works fine in 2K and above, but that doesn't help a lot. */
+
+  /* Unfortunately, NtQuerySecurityObject doesn't work on predefined registry
+     keys like HKEY_LOCAL_MACHINE.  It fails with "Invalid Handle".  So we
+     have to retreat to the Win32 registry functions for registry keys.
+     What bugs me is that RegGetKeySecurity is obviously just a wrapper
+     around NtQuerySecurityObject, but there seems to be no function to
+     convert pseudo HKEY values to real handles. */
+  if (object_type == SE_REGISTRY_KEY)
+    return get_reg_security (handle, sd_ret);
+        
+  ret = NtQuerySecurityObject (handle,
+                               DACL_SECURITY_INFORMATION
+                               | GROUP_SECURITY_INFORMATION
+                               | OWNER_SECURITY_INFORMATION,
+                               sd_ret, len, &len);
+  if (ret == STATUS_BUFFER_TOO_SMALL)
     {
-      __seterrno_from_win_error (ret);
+      if (!sd_ret.malloc (len))
+        set_errno (ENOMEM);
+      else
+        ret = NtQuerySecurityObject (handle,
+                                     DACL_SECURITY_INFORMATION
+                                     | GROUP_SECURITY_INFORMATION
+                                     | OWNER_SECURITY_INFORMATION,
+                                     sd_ret, len, &len);
+    }
+  if (ret != STATUS_SUCCESS)
+    {   
+      __seterrno_from_nt_status (ret);
       return -1;
     }
   return 0;

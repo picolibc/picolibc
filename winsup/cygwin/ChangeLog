@@ -1,3 +1,18 @@
+2006-12-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	Partially revert change from 2006-10-22.  GetSecurityInfo messes up
+	user information on NT4.
+	* sec_helper.cc (security_descriptor::malloc): Drop LocalAlloc
+	considerations.
+	(security_descriptor::realloc): Ditto.
+	(security_descriptor::free): Ditto.
+	* security.cc (get_reg_security): Reinstantiate.
+	(get_nt_object_security): Revert to using NtQuerySecurityObject.
+	* security.h (class security_descriptor): Drop type member.
+	Accommodate throughout.
+	(security_descriptor::size): Constify.
+	(security_descriptor::copy): Ditto.
+
 2006-12-18  Christopher Faylor  <me@cgf.cx>
 
 	* pinfo.cc (set_myself): Use a more foolproof method for determining if

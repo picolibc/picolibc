@@ -216,21 +216,16 @@ class security_descriptor {
 protected:
   PSECURITY_DESCRIPTOR psd;
   DWORD sd_size;
-  enum { local_alloced, malloced } type;
 public:
-  security_descriptor () : psd (NULL), sd_size (0), type (local_alloced) {}
+  security_descriptor () : psd (NULL), sd_size (0) {}
   ~security_descriptor () { free (); }
 
   PSECURITY_DESCRIPTOR malloc (size_t nsize);
   PSECURITY_DESCRIPTOR realloc (size_t nsize);
   void free ();
 
-  inline DWORD size () {
-    if (!sd_size && psd && type == local_alloced)
-      sd_size = LocalSize (psd);
-    return sd_size;
-  }
-  inline DWORD copy (void *buf, DWORD buf_size) {
+  inline DWORD size () const { return sd_size; }
+  inline DWORD copy (void *buf, DWORD buf_size) const {
     if (buf_size < size ())
       return sd_size;
     memcpy (buf, psd, sd_size);

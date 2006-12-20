@@ -266,10 +266,7 @@ security_descriptor::malloc (size_t nsize)
 {
   free ();
   if ((psd = (PSECURITY_DESCRIPTOR) ::malloc (nsize)))
-    {
-      sd_size = nsize;
-      type = malloced;
-    }
+    sd_size = nsize;
   return psd;
 }
 
@@ -278,23 +275,9 @@ security_descriptor::realloc (size_t nsize)
 {
   PSECURITY_DESCRIPTOR tmp;
   
-  if (type == malloced)
-    {
-      if (!(tmp = (PSECURITY_DESCRIPTOR) ::realloc (psd, nsize)))
-	return NULL;
-    }
-  else
-    {
-      if (!(tmp = (PSECURITY_DESCRIPTOR) ::malloc (nsize)))
-	return NULL;
-      if (psd)
-	{
-	  memcpy (tmp, psd, LocalSize (psd));
-	  LocalFree (psd);
-	}
-    }
+  if (!(tmp = (PSECURITY_DESCRIPTOR) ::realloc (psd, nsize)))
+    return NULL;
   sd_size = nsize;
-  type = malloced;
   return psd = tmp;
 }
 
@@ -302,15 +285,9 @@ void
 security_descriptor::free ()
 {
   if (psd)
-    {
-      if (type == local_alloced)
-	LocalFree (psd);
-      else
-	::free (psd);
-    }
+    ::free (psd);
   psd = NULL;
   sd_size = 0;
-  type = local_alloced;
 }
 
 #if 0 // unused
