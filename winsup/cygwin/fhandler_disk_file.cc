@@ -1812,7 +1812,10 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 
 go_ahead:
 
-  if (NT_SUCCESS (status))
+  if (!NT_SUCCESS (status))
+    debug_printf ("NtQueryDirectoryFile failed, status %p, win32 error %lu",
+		  status, RtlNtStatusToDosError (status));
+  else
     {
       buf = (PFILE_ID_BOTH_DIR_INFORMATION) (d_cache (dir) + d_cachepos (dir));
       if (buf->NextEntryOffset == 0)
