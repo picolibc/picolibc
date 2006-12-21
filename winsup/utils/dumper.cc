@@ -1,6 +1,6 @@
 /* dumper.cc
 
-   Copyright 1999, 2001, 2002, 2004 Red Hat Inc.
+   Copyright 1999, 2001, 2002, 2004, 2006 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -10,8 +10,8 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
-#include <bfd.h>
 #include <ansidecl.h>
+#include <bfd.h>
 #include <elf/common.h>
 #include <elf/external.h>
 #include <sys/procfs.h>
