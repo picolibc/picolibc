@@ -123,15 +123,11 @@ CF_CRT0S=	cf-hosted-crt0.o cf-unhosted-crt0.o
 CF_BSP=		libcf.a
 CF_OBJS=	cf-isv.o cf-crt1.o cf-hosted.o getpid.o kill.o cf-sbrk.o \
 		cf-exit.o $(patsubst %,cf-%.o,${CF_ISRS})
-CF_ISRS=	other_interrupt reset access_error address_error \
+CF_ISRS=	other_interrupt access_error address_error \
 	illegal_instruction divide_by_zero privilege_violation \
-	trace unimplemented_line_a_opcode unimplemented_line_f_opcode \
-	non_pc_breakpoint_debug_interrupt pc_breakpoint_debug_interrupt \
-	format_error spurious_interrupt  fp_branch_unordered \
-	fp_inexact_result fp_divide_by_zero fp_underflow fp_operand_error \
-	fp_overflow fp_input_not_a_number fp_input_denormalized_number \
-	unsupported_instruction \
-	$(addprefix trap,0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)
+	trace unimplemented_opcode breakpoint_debug_interrupt \
+	format_error spurious_interrupt fp_interrupt \
+	unsupported_instruction trap_interrupt
 
 #              RAM       ROM
 m5208evb  := 1024M 16M          0M   2M

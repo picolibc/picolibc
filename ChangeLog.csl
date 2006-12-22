@@ -1,6 +1,17 @@
-2006-12-15  Daniel Jacobowitz  <dan@codesourcery.com>
+2006-12-22  Nathan Sidwell  <nathan@codesourcery.com>
 
 	libgloss/
+	* m68k/Makefile.in (CF_ISRS): Remove now shared routines.
+	* m68k/cf-crt0.S (__reset): Define here.
+	(__start): Adjust semihosting.
+	* m68k/cf-hosted.S (__hosted): Adjust semihosting.
+	* m68k/cf-isrs.c: Share some ISRS.  Add aliases for each IRQ slot.
+	* m68k/cf-isv.S: Move to .interrupt_vector section.  Make each
+	slot a unique routine.
+	* m68k/cf.sc: Adjust for .interrupt_vector section.
+
+2006-12-15  Daniel Jacobowitz  <dan@codesourcery.com>
+
 	* m68k/Makefile.in (FIDO_OBJS): Build fido-priv.o.
 	* m68k/fido-crt0.S (_vector_table): Reference
 	_PrivilegeViolationHandler.
