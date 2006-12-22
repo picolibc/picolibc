@@ -1,3 +1,9 @@
+2006-12-22  Kazu Hirata  <kazu@codesourcery.com>
+
+	newlib/
+	* testsuite/lib/flags.exp (newlib_include_flags): Drop
+	-I${newlib_dir}.
+
 2006-12-22  Nathan Sidwell  <nathan@codesourcery.com>
 
 	libgloss/
