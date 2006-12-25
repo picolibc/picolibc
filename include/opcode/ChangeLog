@@ -1,3 +1,7 @@
+2006-12-25  Kazu Hirata  <kazu@codesourcery.com>
+
+	* m68k.h (fido_a): New.
+
 2006-12-24  Kazu Hirata  <kazu@codesourcery.com>
 
 	* m68k.h (mcfmac, mcfemac, cfloat, mcfhwdiv, mcfisa_a,

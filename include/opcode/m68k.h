@@ -31,6 +31,7 @@
 #define	m68881   0x040
 #define	m68851   0x080
 #define cpu32	 0x100		/* e.g., 68332 */
+#define fido_a   0x200
 #define m68k_mask  0x3ff
 
 #define mcfmac   0x400		/* ColdFire MAC. */
