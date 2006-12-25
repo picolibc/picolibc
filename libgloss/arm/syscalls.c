@@ -569,7 +569,7 @@ _unlink (const char *path)
 {
 #ifdef ARM_RDI_MONITOR
   int block[2];
-  block[0] = path;
+  block[0] = (int)path;
   block[1] = strlen(path);
   return wrap (do_AngelSWI (AngelSWI_Reason_Remove, block)) ? -1 : 0;
 #else
@@ -665,7 +665,7 @@ _system (const char *s)
      meaning to its return value.  Try to do something reasonable....  */
   if (!s)
     return 1;  /* maybe there is a shell available? we can hope. :-P */
-  block[0] = s;
+  block[0] = (int)s;
   block[1] = strlen (s);
   e = wrap (do_AngelSWI (AngelSWI_Reason_System, block));
   if ((e >= 0) && (e < 256))
@@ -690,9 +690,9 @@ _rename (const char * oldpath, const char * newpath)
 {
 #ifdef ARM_RDI_MONITOR
   int block[4];
-  block[0] = oldpath;
+  block[0] = (int)oldpath;
   block[1] = strlen(oldpath);
-  block[2] = newpath;
+  block[2] = (int)newpath;
   block[3] = strlen(newpath);
   return wrap (do_AngelSWI (AngelSWI_Reason_Rename, block)) ? -1 : 0;
 #else

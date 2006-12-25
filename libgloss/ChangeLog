@@ -1,3 +1,8 @@
+2006-12-25  Kazu Hirata  <kazu@codesourcery.com>
+
+	* arm/syscalls.c (_unlink, _system, _rename): Cast arguments
+	to do_AngelSWI to int.
+
 2006-12-18  Kazu Hirata  <kazu@codesourcery.com>
 
 	Merge from newlib-csl-20060320-branch:
