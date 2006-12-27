@@ -3171,7 +3171,7 @@ for module in ${build_configdirs} ; do
 done
 for module in ${configdirs} ; do
   if test -z "${no_recursion}"; then
-    for file in stage*-${module}/Makefile ${module}/Makefile; do
+    for file in stage*-${module}/Makefile prev-${module}/Makefile ${module}/Makefile; do
       if test -f ${file}; then
 	echo 1>&2 "*** removing ${file} to force reconfigure"
 	rm -f ${file}
@@ -6740,8 +6740,9 @@ else
     echo "$ac_t""pre-installed" 1>&6
   fi
 fi
+
 echo $ac_n "checking where to find the target as""... $ac_c" 1>&6
-echo "configure:6745: checking where to find the target as" >&5
+echo "configure:6746: checking where to find the target as" >&5
 if test "x${build}" != "x${host}" ; then
   if expr "x$AS_FOR_TARGET" : "x/" > /dev/null; then
     # We already found the complete path
@@ -6773,8 +6774,9 @@ else
     echo "$ac_t""pre-installed" 1>&6
   fi
 fi
+
 echo $ac_n "checking where to find the target cc""... $ac_c" 1>&6
-echo "configure:6778: checking where to find the target cc" >&5
+echo "configure:6780: checking where to find the target cc" >&5
 if test "x${build}" != "x${host}" ; then
   if expr "x$CC_FOR_TARGET" : "x/" > /dev/null; then
     # We already found the complete path
@@ -6806,8 +6808,9 @@ else
     echo "$ac_t""pre-installed" 1>&6
   fi
 fi
+
 echo $ac_n "checking where to find the target c++""... $ac_c" 1>&6
-echo "configure:6811: checking where to find the target c++" >&5
+echo "configure:6814: checking where to find the target c++" >&5
 if test "x${build}" != "x${host}" ; then
   if expr "x$CXX_FOR_TARGET" : "x/" > /dev/null; then
     # We already found the complete path
@@ -6842,8 +6845,9 @@ else
     echo "$ac_t""pre-installed" 1>&6
   fi
 fi
+
 echo $ac_n "checking where to find the target c++ for libstdc++""... $ac_c" 1>&6
-echo "configure:6847: checking where to find the target c++ for libstdc++" >&5
+echo "configure:6851: checking where to find the target c++ for libstdc++" >&5
 if test "x${build}" != "x${host}" ; then
   if expr "x$RAW_CXX_FOR_TARGET" : "x/" > /dev/null; then
     # We already found the complete path
@@ -6878,8 +6882,9 @@ else
     echo "$ac_t""pre-installed" 1>&6
   fi
 fi
+
 echo $ac_n "checking where to find the target dlltool""... $ac_c" 1>&6
-echo "configure:6883: checking where to find the target dlltool" >&5
+echo "configure:6888: checking where to find the target dlltool" >&5
 if test "x${build}" != "x${host}" ; then
   if expr "x$DLLTOOL_FOR_TARGET" : "x/" > /dev/null; then
     # We already found the complete path
@@ -6911,8 +6916,9 @@ else
     echo "$ac_t""pre-installed" 1>&6
   fi
 fi
+
 echo $ac_n "checking where to find the target gcc""... $ac_c" 1>&6
-echo "configure:6916: checking where to find the target gcc" >&5
+echo "configure:6922: checking where to find the target gcc" >&5
 if test "x${build}" != "x${host}" ; then
   if expr "x$GCC_FOR_TARGET" : "x/" > /dev/null; then
     # We already found the complete path
@@ -6944,8 +6950,9 @@ else
     echo "$ac_t""pre-installed" 1>&6
   fi
 fi
+
 echo $ac_n "checking where to find the target gcj""... $ac_c" 1>&6
-echo "configure:6949: checking where to find the target gcj" >&5
+echo "configure:6956: checking where to find the target gcj" >&5
 if test "x${build}" != "x${host}" ; then
   if expr "x$GCJ_FOR_TARGET" : "x/" > /dev/null; then
     # We already found the complete path
@@ -6980,8 +6987,9 @@ else
     echo "$ac_t""pre-installed" 1>&6
   fi
 fi
+
 echo $ac_n "checking where to find the target gfortran""... $ac_c" 1>&6
-echo "configure:6985: checking where to find the target gfortran" >&5
+echo "configure:6993: checking where to find the target gfortran" >&5
 if test "x${build}" != "x${host}" ; then
   if expr "x$GFORTRAN_FOR_TARGET" : "x/" > /dev/null; then
     # We already found the complete path
@@ -7016,8 +7024,9 @@ else
     echo "$ac_t""pre-installed" 1>&6
   fi
 fi
+
 echo $ac_n "checking where to find the target ld""... $ac_c" 1>&6
-echo "configure:7021: checking where to find the target ld" >&5
+echo "configure:7030: checking where to find the target ld" >&5
 if test "x${build}" != "x${host}" ; then
   if expr "x$LD_FOR_TARGET" : "x/" > /dev/null; then
     # We already found the complete path
@@ -7049,8 +7058,9 @@ else
     echo "$ac_t""pre-installed" 1>&6
   fi
 fi
+
 echo $ac_n "checking where to find the target lipo""... $ac_c" 1>&6
-echo "configure:7054: checking where to find the target lipo" >&5
+echo "configure:7064: checking where to find the target lipo" >&5
 if test "x${build}" != "x${host}" ; then
   if expr "x$LIPO_FOR_TARGET" : "x/" > /dev/null; then
     # We already found the complete path
@@ -7072,8 +7082,9 @@ else
     echo "$ac_t""pre-installed" 1>&6
   fi
 fi
+
 echo $ac_n "checking where to find the target nm""... $ac_c" 1>&6
-echo "configure:7077: checking where to find the target nm" >&5
+echo "configure:7088: checking where to find the target nm" >&5
 if test "x${build}" != "x${host}" ; then
   if expr "x$NM_FOR_TARGET" : "x/" > /dev/null; then
     # We already found the complete path
@@ -7105,8 +7116,9 @@ else
     echo "$ac_t""pre-installed" 1>&6
   fi
 fi
+
 echo $ac_n "checking where to find the target objdump""... $ac_c" 1>&6
-echo "configure:7110: checking where to find the target objdump" >&5
+echo "configure:7122: checking where to find the target objdump" >&5
 if test "x${build}" != "x${host}" ; then
   if expr "x$OBJDUMP_FOR_TARGET" : "x/" > /dev/null; then
     # We already found the complete path
@@ -7138,8 +7150,9 @@ else
     echo "$ac_t""pre-installed" 1>&6
   fi
 fi
+
 echo $ac_n "checking where to find the target ranlib""... $ac_c" 1>&6
-echo "configure:7143: checking where to find the target ranlib" >&5
+echo "configure:7156: checking where to find the target ranlib" >&5
 if test "x${build}" != "x${host}" ; then
   if expr "x$RANLIB_FOR_TARGET" : "x/" > /dev/null; then
     # We already found the complete path
@@ -7171,8 +7184,9 @@ else
     echo "$ac_t""pre-installed" 1>&6
   fi
 fi
+
 echo $ac_n "checking where to find the target strip""... $ac_c" 1>&6
-echo "configure:7176: checking where to find the target strip" >&5
+echo "configure:7190: checking where to find the target strip" >&5
 if test "x${build}" != "x${host}" ; then
   if expr "x$STRIP_FOR_TARGET" : "x/" > /dev/null; then
     # We already found the complete path
@@ -7204,8 +7218,9 @@ else
     echo "$ac_t""pre-installed" 1>&6
   fi
 fi
+
 echo $ac_n "checking where to find the target windres""... $ac_c" 1>&6
-echo "configure:7209: checking where to find the target windres" >&5
+echo "configure:7224: checking where to find the target windres" >&5
 if test "x${build}" != "x${host}" ; then
   if expr "x$WINDRES_FOR_TARGET" : "x/" > /dev/null; then
     # We already found the complete path
@@ -7241,6 +7256,7 @@ fi
 
 
 
+
 # Certain tools may need extra flags.
 AR_FOR_TARGET=${AR_FOR_TARGET}${extra_arflags_for_target}
 RANLIB_FOR_TARGET=${RANLIB_FOR_TARGET}${extra_ranlibflags_for_target}
@@ -7266,7 +7282,7 @@ fi
 
 
 echo $ac_n "checking whether to enable maintainer-specific portions of Makefiles""... $ac_c" 1>&6
-echo "configure:7270: checking whether to enable maintainer-specific portions of Makefiles" >&5
+echo "configure:7286: checking whether to enable maintainer-specific portions of Makefiles" >&5
 # Check whether --enable-maintainer-mode or --disable-maintainer-mode was given.
 if test "${enable_maintainer_mode+set}" = set; then
   enableval="$enable_maintainer_mode"
@@ -7308,16 +7324,16 @@ if test "$GCC" = yes; then
   # Pass -fkeep-inline-functions for stage 1 if the GCC version supports it.
   CFLAGS="$CFLAGS -fkeep-inline-functions"
   echo $ac_n "checking whether -fkeep-inline-functions is supported""... $ac_c" 1>&6
-echo "configure:7312: checking whether -fkeep-inline-functions is supported" >&5
+echo "configure:7328: checking whether -fkeep-inline-functions is supported" >&5
   cat > conftest.$ac_ext <<EOF
-#line 7314 "configure"
+#line 7330 "configure"
 #include "confdefs.h"
 
 int main() {
 
 ; return 0; }
 EOF
-if { (eval echo configure:7321: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:7337: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   echo "$ac_t""yes" 1>&6; stage1_cflags="$stage1_cflags -fkeep-inline-functions"
 else
@@ -7462,15 +7478,34 @@ trap 'rm -f $CONFIG_STATUS conftest*; exit 1' 1 2 15
 # Transform confdefs.h into DEFS.
 # Protect against shell expansion while executing Makefile rules.
 # Protect against Makefile macro expansion.
-cat > conftest.defs <<\EOF
-s%#define \([A-Za-z_][A-Za-z0-9_]*\) *\(.*\)%-D\1=\2%g
-s%[ 	`~#$^&*(){}\\|;'"<>?]%\\&%g
-s%\[%\\&%g
-s%\]%\\&%g
-s%\$%$$%g
-EOF
-DEFS=`sed -f conftest.defs confdefs.h | tr '\012' ' '`
-rm -f conftest.defs
+#
+# If the first sed substitution is executed (which looks for macros that
+# take arguments), then we branch to the quote section.  Otherwise,
+# look for a macro that doesn't take arguments.
+cat >confdef2opt.sed <<\_ACEOF
+t clear
+: clear
+s,^[ 	]*#[ 	]*define[ 	][ 	]*\([^ 	(][^ 	(]*([^)]*)\)[ 	]*\(.*\),-D\1=\2,g
+t quote
+s,^[ 	]*#[ 	]*define[ 	][ 	]*\([^ 	][^ 	]*\)[ 	]*\(.*\),-D\1=\2,g
+t quote
+d
+: quote
+s,[ 	`~#$^&*(){}\\|;'"<>?],\\&,g
+s,\[,\\&,g
+s,\],\\&,g
+s,\$,$$,g
+p
+_ACEOF
+# We use echo to avoid assuming a particular line-breaking character.
+# The extra dot is to prevent the shell from consuming trailing
+# line-breaks from the sub-command output.  A line-break within
+# single-quotes doesn't work because, if this script is created in a
+# platform that uses two characters for line-breaks (e.g., DOS), tr
+# would break.
+ac_LF_and_DOT=`echo; echo .`
+DEFS=`sed -n -f confdef2opt.sed confdefs.h | tr "$ac_LF_and_DOT" ' .'`
+rm -f confdef2opt.sed
 
 
 # Without the "./", some shells look in PATH for config.status.
@@ -7632,8 +7667,8 @@ s%@OBJDUMP_FOR_TARGET@%$OBJDUMP_FOR_TARGET%g
 s%@RANLIB_FOR_TARGET@%$RANLIB_FOR_TARGET%g
 s%@STRIP_FOR_TARGET@%$STRIP_FOR_TARGET%g
 s%@WINDRES_FOR_TARGET@%$WINDRES_FOR_TARGET%g
-s%@FLAGS_FOR_TARGET@%$FLAGS_FOR_TARGET%g
 s%@RAW_CXX_FOR_TARGET@%$RAW_CXX_FOR_TARGET%g
+s%@FLAGS_FOR_TARGET@%$FLAGS_FOR_TARGET%g
 s%@COMPILER_AS_FOR_TARGET@%$COMPILER_AS_FOR_TARGET%g
 s%@COMPILER_LD_FOR_TARGET@%$COMPILER_LD_FOR_TARGET%g
 s%@COMPILER_NM_FOR_TARGET@%$COMPILER_NM_FOR_TARGET%g
