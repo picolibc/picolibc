@@ -1,3 +1,7 @@
+2006-12-29  Paolo Bonzini  <bonzini@gnu.org>
+
+	* acx.m4: Sync with gcc.
+
 2006-12-04  Eric Botcazou  <ebotcazou@libertysurf.fr>
 
 	* tls.m4 (GCC_CHECK_TLS): Do not test TLS with static linking
