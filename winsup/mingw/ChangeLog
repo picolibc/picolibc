@@ -1,3 +1,11 @@
+2006-12-31  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	* include/libgen.h: New file; required by...
+	* mingwex/basename.c, mingwex/dirname.c: New files.
+	* mingwex/Makefile.in (DISTFILES): Add them...
+	(POSIX_OBJS): ...with corresponding basename.o, dirname.o
+	(Dependencies): Typo; s/Dependancies/Dependencies/
+
 2006-11-25  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	* Makefile.in (VERSION): Let configure define it.
