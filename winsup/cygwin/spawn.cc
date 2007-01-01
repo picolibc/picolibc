@@ -673,7 +673,10 @@ loop:
 
   sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
 
-  synced = ch.sync (pi.dwProcessId, pi.hProcess, INFINITE);
+  if ((mode == _P_DETACH || mode == _P_NOWAIT) && !ch.iscygwin ())
+    synced = false;
+  else
+    synced = ch.sync (pi.dwProcessId, pi.hProcess, INFINITE);
 
   switch (mode)
     {

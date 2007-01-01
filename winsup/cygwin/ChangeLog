@@ -1,3 +1,8 @@
+2007-01-01  Christopher Faylor  <me@cgf.cx>
+
+	* spawn.cc (spawn_guts): Don't expect synchronization from a non-cygwin
+	_P_NOWAIT process.
+
 2006-12-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::readdir): Improve debug
@@ -21,7 +26,7 @@
 2006-12-18  Christopher Faylor  <me@cgf.cx>
 
 	* pinfo.cc (set_myself): Use a more foolproof method for determining if
-	the current process was started from another cygiwn process.
+	the current process was started from another cygwin process.
 
 2006-12-15  Pierre A. Humblet  <Pierre.Humblet@ieee.org>
 
