@@ -22,17 +22,15 @@ __hosted:
 	linkw %fp,#0
 	movel %fp@(8),%d0
 	movel %fp@(12),%d1
-	.align 4
 
-	/* The halt sequence must be 'nop; halt' and aligned to a 4 byte
-	    boundary.  */
+	/* The semihosting sequence is 'nop; halt;sentinel' aligned to
+	   a 4 byte boundary.  The sentinel is an ill formed instruction
+	   (movec %sp,0).  The debugger will adjust the pc, so it is never
+	    executed.  */
+	.balignw 4,0x4e71
 	nop
 	halt
-	
-	/* This sentinel instruction value must be immediately after
-	   the halt instruction.  The debugger will adjust the pc, so
-	   that it is never executed.  This instruction is
-	   'movec %sp,0'.  */
 	.long 0x4e7bf000
+
 	unlk %fp
 	rts
