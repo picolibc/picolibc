@@ -37,10 +37,8 @@ There is  no
 
 #include "ansidecl.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>
-
-extern PTR malloc();
-extern PTR realloc();
 
 #define DEF_SIZE 5000
 #define STACK 50

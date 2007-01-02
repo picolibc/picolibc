@@ -1,3 +1,8 @@
+2007-01-02  Ben Elliston  <bje@au.ibm.com>
+
+        * doc/makedoc.c: Include <stdlib.h>.
+        (malloc, realloc): Remove extern declarations.
+
 2005-12-18  Jeff Johnston  <jjohnstn@redhat.com>
 
         * NEWS: Update with 1.15.0 info.
