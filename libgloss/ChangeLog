@@ -1,3 +1,7 @@
+2007-01-02  Ben Elliston  <bje@au.ibm.com>
+
+        * spu/time.c (time): Cast new sys.time value to unsigned int.
+
 2006-12-25  Kazu Hirata  <kazu@codesourcery.com>
 
 	* arm/syscalls.c (_unlink, _system, _rename): Cast arguments

@@ -39,7 +39,7 @@ time (time_t *t)
 	syscall_time_t sys;
 	syscall_out_t   *psys_out = ( syscall_out_t* )&sys;
 
-	sys.time = t;
+	sys.time = (unsigned int)t;
 
 	_send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_TIME, &sys);
 
