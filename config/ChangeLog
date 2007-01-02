@@ -1,6 +1,6 @@
-2006-12-29  Paolo Bonzini  <bonzini@gnu.org>
+2007-01-01  Mike Stump  <mrs@apple.com>
 
-	* acx.m4: Sync with gcc.
+	* mh-ppc-darwin: Remove support for building with Apple's gcc-3.1.
 
 2006-12-04  Eric Botcazou  <ebotcazou@libertysurf.fr>
 
