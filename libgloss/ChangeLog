@@ -1,3 +1,11 @@
+2006-01-03  Kazu Hirata  <kazu@codesourcery.com>
+
+	* arm/Makefile (RDPMON_OBJS): Add _exit.o and _kill.o.
+	(RDIMON_OBJS): Define in terms of RDPMON_OBJS.
+	(rdimon-_exit.o, rdimon-_kill.o): New.
+	* arm/_exit.c, arm/_kill.c: New.
+	* arm/syscalls.c (_exit, _kill): Remove.
+
 2007-01-03  Kazu Hirata  <kazu@codesourcery.com>
 
 	Merge from newlib-csl-20060320-branch:

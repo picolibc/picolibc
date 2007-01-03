@@ -13,7 +13,6 @@
 #include <sys/times.h>
 #include <errno.h>
 #include <reent.h>
-#include <signal.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include "swi.h"
@@ -30,8 +29,6 @@ int     _stat 		_PARAMS ((const char *, struct stat *));
 int     _fstat 		_PARAMS ((int, struct stat *));
 caddr_t _sbrk		_PARAMS ((int));
 int     _getpid		_PARAMS ((int));
-int     _kill		_PARAMS ((int, int));
-void    _exit		_PARAMS ((int));
 int     _close		_PARAMS ((int));
 clock_t _clock		_PARAMS ((void));
 int     _swiclose	_PARAMS ((int));
@@ -437,36 +434,6 @@ int
 _close (int file)
 {
   return wrap (_swiclose (file));
-}
-
-int
-_kill (int pid, int sig)
-{
-  (void)pid; (void)sig;
-#ifdef ARM_RDI_MONITOR
-  /* Note: The pid argument is thrown away.  */
-  switch (sig) {
-	  case SIGABRT:
-		  return do_AngelSWI (AngelSWI_Reason_ReportException,
-				  (void *) ADP_Stopped_RunTimeError);
-	  default:
-		  return do_AngelSWI (AngelSWI_Reason_ReportException,
-				  (void *) ADP_Stopped_ApplicationExit);
-  }
-#else
-  asm ("swi %a0" :: "i" (SWI_Exit));
-#endif
-}
-
-void
-_exit (int status)
-{
-  /* There is only one SWI for both _exit and _kill. For _exit, call
-     the SWI with the second argument set to -1, an invalid value for
-     signum, so that the SWI handler can distinguish the two calls.
-     Note: The RDI implementation of _kill throws away both its
-     arguments.  */
-  _kill(status, -1);
 }
 
 int __attribute__((weak))

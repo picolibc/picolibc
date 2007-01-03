@@ -66,13 +66,13 @@ REDBOOT_INSTALL	= install-redboot
 
 RDPMON_CRT0	= rdpmon-crt0.o
 RDPMON_BSP	= librdpmon.a
-RDPMON_OBJS	= syscalls.o libcfunc.o trap.o
+RDPMON_OBJS	= syscalls.o libcfunc.o trap.o _exit.o _kill.o
 RDPMON_SCRIPTS	= rdpmon.specs
 RDPMON_INSTALL	= install-rdpmon
 
 RDIMON_CRT0	= rdimon-crt0.o
 RDIMON_BSP	= librdimon.a
-RDIMON_OBJS	= rdimon-syscalls.o rdimon-libcfunc.o rdimon-trap.o
+RDIMON_OBJS	= $(patsubst %,rdimon-%,$(RDPMON_OBJS))
 RDIMON_SCRIPTS	= rdimon.specs
 RDIMON_INSTALL	= install-rdimon
 
@@ -113,6 +113,12 @@ rdimon-crt0.o: crt0.S
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-trap.o: trap.S
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+
+rdimon-_exit.o: _exit.c
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+
+rdimon-_kill.o: _kill.c
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-syscalls.o: syscalls.c
