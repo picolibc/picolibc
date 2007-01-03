@@ -16,6 +16,12 @@
 	slot a unique routine.
 	* m68k/cf.sc: Adjust for .interrupt_vector section.
 
+	libgloss/
+	* m68k/Makefile.in (m5273c3): Rename to ...
+	(m5272c3): ... here to fix typo.
+	(m5249c3): New.
+	(CF_BOARDS): Add it.
+
 2006-12-15  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* m68k/Makefile.in (FIDO_OBJS): Build fido-priv.o.
