@@ -1744,8 +1744,8 @@ get_ifconf (struct ifconf *ifc, int what)
 	    ifr->ifr_metric = 1;
 	    break;
 	  case SIOCGIFMTU:
-	    /* Default value for loopback on Linux 2.6 kernel. */
-	    ifr->ifr_mtu = 16436;
+	    /* Default value for MS TCP Loopback interface. */
+	    ifr->ifr_mtu = 1520;
 	    break;
 	  default:
 	    set_errno (EINVAL);
