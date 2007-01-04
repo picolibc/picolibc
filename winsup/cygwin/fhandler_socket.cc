@@ -1,6 +1,6 @@
 /* fhandler_socket.cc. See fhandler.h for a description of the fhandler classes.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -1413,21 +1413,6 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	debug_printf ("error in get_ifconf");
       break;
     case SIOCGIFFLAGS:
-      ifr = (struct ifreq *) p;
-      if (ifr == 0)
-	{
-	  set_errno (EINVAL);
-	  return -1;
-	}
-      ifr->ifr_flags = IFF_NOTRAILERS | IFF_UP | IFF_RUNNING;
-      if (!strncmp(ifr->ifr_name, "lo", 2)
-	  || ntohl (((struct sockaddr_in *) &ifr->ifr_addr)->sin_addr.s_addr)
-	  == INADDR_LOOPBACK)
-	ifr->ifr_flags |= IFF_LOOPBACK;
-      else
-	ifr->ifr_flags |= IFF_BROADCAST;
-      res = 0;
-      break;
     case SIOCGIFBRDADDR:
     case SIOCGIFNETMASK:
     case SIOCGIFADDR:
@@ -1463,6 +1448,9 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	      {
 		switch (cmd)
 		  {
+		  case SIOCGIFFLAGS:
+		    ifr->ifr_flags = ifrp->ifr_flags;
+		    break;
 		  case SIOCGIFADDR:
 		    ifr->ifr_addr = ifrp->ifr_addr;
 		    break;

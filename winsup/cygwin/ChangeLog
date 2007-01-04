@@ -1,3 +1,14 @@
+2007-01-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::ioctl): Don't fake results
+	for SIOCGIFFLAGS here.  Call get_ifconf instead.
+	* net.cc (get_2k_ifconf): Clean up code to generate interface name.
+	Handle SIOCGIFFLAGS here.
+	(get_nt_ifconf): Fake SIOCGIFFLAGS here.
+	(get_95_ifconf): Ditto.
+	(get_ifconf): Don't fake loopback on systems with IP Helper Lib.
+	Set MTU for loopback to a more "modern" value.
+
 2007-01-04  Brian Ford  <Brian.Ford@FlightSafety.com>
 	    Corinna Vinschen  <corinna@vinschen.de>
 

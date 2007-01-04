@@ -1,7 +1,7 @@
 /* net.cc: network-related routines.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006 Red Hat, Inc.
+   2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1205,77 +1205,59 @@ get_2k_ifconf (struct ifconf *ifc, int what)
 	    }
 
 	  /* Setup the interface name */
-	  switch (ifrow->dwType)
+	  if (ifrow->dwType == MIB_IF_TYPE_LOOPBACK)
+	    strcpy (ifr->ifr_name, "lo");
+	  else
 	    {
-	      case MIB_IF_TYPE_TOKENRING:
-		if (ifEntry->enumerated == 0)
-		  {
-		    ifEntry->classId = tokId++;
-		    __small_sprintf (ifr->ifr_name, "tok%u",
-				     ifEntry->classId);
-		  }
-		else
-		  {
-		    __small_sprintf (ifr->ifr_name, "tok%u:%u",
-				     ifEntry->classId,
-				     ifEntry->enumerated - 1);
-		  }
-		ifEntry->enumerated++;
-		break;
-	      case MIB_IF_TYPE_ETHERNET:
-		if (ifEntry->enumerated == 0)
-		  {
-		    ifEntry->classId = ethId++;
-		    __small_sprintf (ifr->ifr_name, "eth%u",
-				     ifEntry->classId);
-		  }
-		else
-		  {
-		    __small_sprintf (ifr->ifr_name, "eth%u:%u",
-				     ifEntry->classId,
-				     ifEntry->enumerated - 1);
-		  }
-		ifEntry->enumerated++;
-		break;
-	      case MIB_IF_TYPE_PPP:
-		if (ifEntry->enumerated == 0)
-		  {
-		    ifEntry->classId = pppId++;
-		    __small_sprintf (ifr->ifr_name, "ppp%u",
-				     ifEntry->classId);
-		  }
-		else
-		  {
-		    __small_sprintf (ifr->ifr_name, "ppp%u:%u",
-				     ifEntry->classId,
-				     ifEntry->enumerated - 1);
-		  }
-		ifEntry->enumerated++;
-		break;
-	      case MIB_IF_TYPE_SLIP:
-		if (ifEntry->enumerated == 0)
-		  {
-		    ifEntry->classId = slpId++;
-		    __small_sprintf (ifr->ifr_name, "slp%u",
-				     ifEntry->classId);
-		  }
-		else
-		  {
-		    __small_sprintf (ifr->ifr_name, "slp%u:%u",
-				     ifEntry->classId,
-				     ifEntry->enumerated - 1);
-		  }
-		ifEntry->enumerated++;
-		break;
-	      case MIB_IF_TYPE_LOOPBACK:
-		strcpy (ifr->ifr_name, "lo");
-		break;
-	      default:
-		continue;
+	      const char *name = "";
+	      switch (ifrow->dwType)
+		{
+		  case MIB_IF_TYPE_TOKENRING:
+		    name = "tok";
+		    if (ifEntry->enumerated == 0)
+		      ifEntry->classId = tokId++;
+		    break;
+		  case MIB_IF_TYPE_ETHERNET:
+		    name = "eth";
+		    if (ifEntry->enumerated == 0)
+		      ifEntry->classId = ethId++;
+		    break;
+		  case MIB_IF_TYPE_PPP:
+		    name = "ppp";
+		    if (ifEntry->enumerated == 0)
+		      ifEntry->classId = pppId++;
+		    break;
+		  case MIB_IF_TYPE_SLIP:
+		    name = "slp";
+		    if (ifEntry->enumerated == 0)
+		      ifEntry->classId = slpId++;
+		    break;
+		  default:
+		    continue;
+		}
+	      if (ifEntry->enumerated == 0)
+		__small_sprintf (ifr->ifr_name, "%s%u", name, ifEntry->classId);
+	      else
+		__small_sprintf (ifr->ifr_name, "%s%u:%u", name,
+				 ifEntry->classId, ifEntry->enumerated - 1);
+	      ifEntry->enumerated++;
 	    }
-	  /* setup sockaddr struct */
+
+	      /* setup sockaddr struct */
 	  switch (what)
 	    {
+	      case SIOCGIFFLAGS:
+		if (ifrow->dwType == MIB_IF_TYPE_LOOPBACK)
+		  ifr->ifr_flags = IFF_LOOPBACK;
+		else
+		  ifr->ifr_flags = IFF_BROADCAST | IFF_MULTICAST;
+		if (ifrow->dwAdminStatus == MIB_IF_ADMIN_STATUS_UP)
+		  {
+		    ifr->ifr_flags |= IFF_UP;
+		    if (ifrow->dwOperStatus >= MIB_IF_OPER_STATUS_CONNECTED)
+		      ifr->ifr_flags |= IFF_RUNNING;
+		  }
+	        break;
 	      case SIOCGIFCONF:
 	      case SIOCGIFADDR:
 		sa = (struct sockaddr_in *) &ifr->ifr_addr;
@@ -1441,6 +1423,10 @@ get_nt_ifconf (struct ifconf *ifc, int what)
 		    {
 		      switch (what)
 			{
+			  case SIOCGIFFLAGS:
+			    ifr->ifr_flags = IFF_UP | IFF_RUNNING
+					     | IFF_BROADCAST;
+			    break;
 			  case SIOCGIFCONF:
 			  case SIOCGIFADDR:
 			    sa = (struct sockaddr_in *) &ifr->ifr_addr;
@@ -1481,6 +1467,10 @@ get_nt_ifconf (struct ifconf *ifc, int what)
 		    {
 		      switch (what)
 			{
+			  case SIOCGIFFLAGS:
+			    ifr->ifr_flags = IFF_UP | IFF_RUNNING
+					     | IFF_BROADCAST;
+			    break;
 			  case SIOCGIFCONF:
 			  case SIOCGIFADDR:
 			    sa = (struct sockaddr_in *) &ifr->ifr_addr;
@@ -1613,6 +1603,9 @@ get_95_ifconf (struct ifconf *ifc, int what)
 
 	  switch (what)
 	    {
+	      case SIOCGIFFLAGS:
+		ifr->ifr_flags = IFF_UP | IFF_RUNNING | IFF_BROADCAST;
+		break;
 	      case SIOCGIFCONF:
 	      case SIOCGIFADDR:
 		sa = (struct sockaddr_in *) &ifr->ifr_addr;
@@ -1712,46 +1705,52 @@ get_ifconf (struct ifconf *ifc, int what)
       return -1;
     }
 
-  /* Set up interface lo0 first */
-  strcpy (ifr->ifr_name, "lo");
-  memset (&ifr->ifr_addr, '\0', sizeof (ifr->ifr_addr));
-  switch (what)
+  if (!wincap.has_ip_helper_lib ())
     {
-      case SIOCGIFCONF:
-      case SIOCGIFADDR:
-	sa = (struct sockaddr_in *) &ifr->ifr_addr;
-	sa->sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-	sa->sin_family = AF_INET;
-	sa->sin_port = 0;
-	break;
-      case SIOCGIFBRDADDR:
-	lip = htonl (INADDR_LOOPBACK);
-	lnp = cygwin_inet_addr ("255.0.0.0");
-	sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
-	sa->sin_addr.s_addr = lip & lnp | ~lnp;
-	sa->sin_family = AF_INET;
-	sa->sin_port = 0;
-	break;
-      case SIOCGIFNETMASK:
-	sa = (struct sockaddr_in *) &ifr->ifr_netmask;
-	sa->sin_addr.s_addr = cygwin_inet_addr ("255.0.0.0");
-	sa->sin_family = AF_INET;
-	sa->sin_port = 0;
-	break;
-      case SIOCGIFHWADDR:
-	ifr->ifr_hwaddr.sa_family = AF_INET;
-	memset (ifr->ifr_hwaddr.sa_data, 0, IFHWADDRLEN);
-	break;
-      case SIOCGIFMETRIC:
-	ifr->ifr_metric = 1;
-	break;
-      case SIOCGIFMTU:
-	/* This funny value is returned by `ifconfig lo' on Linux 2.2 kernel. */
-	ifr->ifr_mtu = 3924;
-	break;
-      default:
-	set_errno (EINVAL);
-	return -1;
+      /* Set up interface lo0 first */
+      strcpy (ifr->ifr_name, "lo");
+      memset (&ifr->ifr_addr, '\0', sizeof (ifr->ifr_addr));
+      switch (what)
+	{
+	  case SIOCGIFFLAGS:
+	    ifr->ifr_flags = IFF_UP | IFF_RUNNING | IFF_LOOPBACK;
+	    break;
+	  case SIOCGIFCONF:
+	  case SIOCGIFADDR:
+	    sa = (struct sockaddr_in *) &ifr->ifr_addr;
+	    sa->sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+	    sa->sin_family = AF_INET;
+	    sa->sin_port = 0;
+	    break;
+	  case SIOCGIFBRDADDR:
+	    lip = htonl (INADDR_LOOPBACK);
+	    lnp = cygwin_inet_addr ("255.0.0.0");
+	    sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
+	    sa->sin_addr.s_addr = lip & lnp | ~lnp;
+	    sa->sin_family = AF_INET;
+	    sa->sin_port = 0;
+	    break;
+	  case SIOCGIFNETMASK:
+	    sa = (struct sockaddr_in *) &ifr->ifr_netmask;
+	    sa->sin_addr.s_addr = cygwin_inet_addr ("255.0.0.0");
+	    sa->sin_family = AF_INET;
+	    sa->sin_port = 0;
+	    break;
+	  case SIOCGIFHWADDR:
+	    ifr->ifr_hwaddr.sa_family = AF_INET;
+	    memset (ifr->ifr_hwaddr.sa_data, 0, IFHWADDRLEN);
+	    break;
+	  case SIOCGIFMETRIC:
+	    ifr->ifr_metric = 1;
+	    break;
+	  case SIOCGIFMTU:
+	    /* Default value for loopback on Linux 2.6 kernel. */
+	    ifr->ifr_mtu = 16436;
+	    break;
+	  default:
+	    set_errno (EINVAL);
+	    return -1;
+	}
     }
 
   if (wincap.has_ip_helper_lib ())
