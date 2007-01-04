@@ -1,7 +1,7 @@
 /* fhandler.h
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006 Red Hat, Inc.
+   2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -24,6 +24,11 @@ details. */
 /* Care for the old O_NDELAY flag. If one of the flags is set,
    both flags are set. */
 #define O_NONBLOCK_MASK (O_NONBLOCK | OLD_O_NDELAY)
+
+/* It appears that 64K is the block size used for buffered I/O on NT.
+   Using this blocksize in read/write calls in the application results
+   in a much better performance than using smaller values. */
+#define PREFERRED_IO_BLKSIZE ((blksize_t) 65536)
 
 extern const char *windows_device_names[];
 extern struct __cygwin_perfile *perfile_table;

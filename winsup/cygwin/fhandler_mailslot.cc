@@ -1,6 +1,6 @@
 /* fhandler_mailslot.cc.  See fhandler.h for a description of the fhandler classes.
 
-   Copyright 2005 Red Hat, Inc.
+   Copyright 2005, 2007 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -42,7 +42,7 @@ fhandler_mailslot::fstat (struct __stat64 *buf)
       buf->st_uid = geteuid32 ();
       buf->st_gid = getegid32 ();
       buf->st_nlink = 1;
-      buf->st_blksize = S_BLKSIZE;
+      buf->st_blksize = PREFERRED_IO_BLKSIZE;
       time_as_timestruc_t (&buf->st_ctim);
       buf->st_atim = buf->st_mtim = buf->st_ctim;
     }

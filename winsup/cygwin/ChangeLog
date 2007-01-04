@@ -1,3 +1,13 @@
+2007-01-04  Brian Ford  <Brian.Ford@FlightSafety.com>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (PREFERRED_IO_BLKSIZE): Define as 64K.
+	* fhandler.cc (fhandler_base::fstat): Set st_blksize to
+	PREFERRED_IO_BLKSIZE.
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Ditto.
+	* fhandler_mailslot.cc (fhandler_mailslot::fstat): Ditto.
+	* fhandler_raw.cc (fhandler_dev_raw::fstat): Ditto.
+
 2007-01-01  Christopher Faylor  <me@cgf.cx>
 
 	* spawn.cc (spawn_guts): Don't expect synchronization from a non-cygwin
