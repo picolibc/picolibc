@@ -1,3 +1,22 @@
+2007-01-04  Kazu Hirata  <kazu@codesourcery.com>
+
+	Merge from newlib-csl-20060320-branch:
+	2006-12-22  Nathan Sidwell  <nathan@codesourcery.com>
+
+	libgloss/
+	* m68k/Makefile.in (CF_ISRS): Remove now shared routines.
+	* m68k/cf-crt0.S (__reset): Define here.
+	* m68k/cf-isrs.c: Share some ISRS.  Add aliases for each IRQ slot.
+	* m68k/cf-isv.S: Move to .interrupt_vector section.  Make each
+	slot a unique routine.
+	* m68k/cf.sc: Adjust for .interrupt_vector section.
+
+	libgloss/
+	* m68k/Makefile.in (m5273c3): Rename to ...
+	(m5272c3): ... here to fix typo.
+	(m5249c3): New.
+	(CF_BOARDS): Add it.
+
 2006-01-03  Kazu Hirata  <kazu@codesourcery.com>
 
 	* arm/Makefile (RDPMON_OBJS): Add _exit.o and _kill.o.

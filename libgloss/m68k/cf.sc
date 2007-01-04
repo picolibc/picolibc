@@ -29,7 +29,8 @@ SECTIONS
   .text :
   {
     CREATE_OBJECT_SYMBOLS
-    KEEP (*cf-isv.o(.text))
+    *(.interrupt_vector)
+    
     cf-${IO}-crt0.o(.text)
     *(.text .text.*)
     *(.gnu.linkonce.t.*)
