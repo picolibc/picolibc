@@ -1,3 +1,8 @@
+2007-01-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/strings.h: Don't include string.h.  Only declare functions
+	according to SUSv3.
+
 2007-01-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	(get_ifconf): Set MTU for loopback to more correct value.
