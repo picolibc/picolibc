@@ -1,6 +1,6 @@
 /* sec_acl.cc: Sun compatible ACL functions.
 
-   Copyright 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 
@@ -44,7 +44,8 @@ searchace (__aclent32_t *aclp, int nentries, int type, __uid32_t id = ILLEGAL_UI
 }
 
 int
-setacl (HANDLE handle, const char *file, int nentries, __aclent32_t *aclbufp)
+setacl (HANDLE handle, const char *file, int nentries, __aclent32_t *aclbufp,
+	bool &writable)
 {
   security_descriptor sd_ret;
 
@@ -108,6 +109,9 @@ setacl (HANDLE handle, const char *file, int nentries, __aclent32_t *aclbufp)
       __seterrno ();
       return -1;
     }
+
+  writable = false;
+
   for (int i = 0; i < nentries; ++i)
     {
       DWORD allow;
@@ -119,7 +123,10 @@ setacl (HANDLE handle, const char *file, int nentries, __aclent32_t *aclbufp)
       if (aclbufp[i].a_perm & S_IROTH)
 	allow |= FILE_GENERIC_READ;
       if (aclbufp[i].a_perm & S_IWOTH)
-	allow |= STANDARD_RIGHTS_WRITE | FILE_GENERIC_WRITE;
+	{
+	  allow |= STANDARD_RIGHTS_WRITE | FILE_GENERIC_WRITE;
+	  writable = true;
+	}
       if (aclbufp[i].a_perm & S_IXOTH)
 	allow |= FILE_GENERIC_EXECUTE;
       if ((aclbufp[i].a_perm & (S_IWOTH | S_IXOTH)) == (S_IWOTH | S_IXOTH))

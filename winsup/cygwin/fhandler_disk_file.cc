@@ -746,7 +746,12 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 	{
 	  case SETACL:
 	    if (!aclsort32 (nentries, 0, aclbufp))
-	      res = setacl (get_io_handle (), pc, nentries, aclbufp);
+	      {
+		bool rw = false;
+		res = setacl (get_io_handle (), pc, nentries, aclbufp, rw);
+		if (rw)
+		  SetFileAttributes (pc, (DWORD) pc & ~FILE_ATTRIBUTE_READONLY);
+	      }
 	    break;
 	  case GETACL:
 	    if (!aclbufp)

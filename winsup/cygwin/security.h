@@ -1,6 +1,6 @@
 /* security.h: security declarations
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -360,7 +360,7 @@ struct __acl32;
 extern "C" int aclsort32 (int, int, __acl32 *);
 extern "C" int acl32 (const char *, int, int, __acl32 *);
 int getacl (HANDLE, const char *, DWORD, int, __acl32 *);
-int setacl (HANDLE, const char *, int, __acl32 *);
+int setacl (HANDLE, const char *, int, __acl32 *, bool &);
 
 struct _UNICODE_STRING;
 void __stdcall str2buf2uni (_UNICODE_STRING &, WCHAR *, const char *) __attribute__ ((regparm (3)));

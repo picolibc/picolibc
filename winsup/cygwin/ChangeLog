@@ -1,3 +1,11 @@
+2007-01-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.h (setacl): Add parameter for writability flag.
+	* sec_acl.cc (setacl): Ditto.  Set to true if any ACE with write
+	permissions is created.
+	* fhandler_disk_file.cc (fhandler_disk_file::facl): Reset
+	FILE_ATTRIBUTE_READONLY if ACL contains an ACE with write permissions.
+
 2007-01-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/strings.h: Don't include string.h.  Only declare functions
