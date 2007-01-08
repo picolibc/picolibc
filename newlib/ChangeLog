@@ -1,3 +1,7 @@
+2007-01-05  Brian Ford  <Brian.Ford@FlightSafety.com>
+
+	* configure.host (*-*-cygwin*): Define HAVE_BLKSIZE.
+
 2007-01-02  Ben Elliston  <bje@au.ibm.com>
 
         * doc/makedoc.c: Include <stdlib.h>.
