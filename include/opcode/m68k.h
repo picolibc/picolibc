@@ -49,7 +49,7 @@
 #define	m68040up   (m68040 | m68060)
 #define	m68030up   (m68030 | m68040up)
 #define	m68020up   (m68020 | m68030up)
-#define	m68010up   (m68010 | cpu32 | m68020up)
+#define	m68010up   (m68010 | cpu32 | fido_a | m68020up)
 #define	m68000up   (m68000 | m68010up)
 
 #define	mfloat  (m68881 | m68040 | m68060)

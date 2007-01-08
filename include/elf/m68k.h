@@ -57,7 +57,9 @@ END_RELOC_NUMBERS (R_68K_max)
 #define EF_M68K_CPU32    0x00810000
 #define EF_M68K_M68000   0x01000000
 #define EF_M68K_CFV4E    0x00008000
-#define EF_M68K_ARCH_MASK (EF_M68K_M68000 | EF_M68K_CPU32 | EF_M68K_CFV4E)
+#define EF_M68K_FIDO     0x02000000
+#define EF_M68K_ARCH_MASK						\
+  (EF_M68K_M68000 | EF_M68K_CPU32 | EF_M68K_CFV4E | EF_M68K_FIDO)
 
 /* We use the bottom 8 bits to encode information about the
    coldfire variant.  If we use any of these bits, the top 24 bits are
@@ -76,10 +78,4 @@ END_RELOC_NUMBERS (R_68K_max)
 #define EF_M68K_CF_FLOAT	0x40  /* Has float insns */
 #define EF_M68K_CF_MASK		0xFF
      
-/* We use the bottom 8 bits to encode information about the
-   CPU32 variant.  If we use any of these bits, the top 24 bits must
-   be EF_M68K_CPU32.  */
-#define EF_M68K_CPU32_FIDO_A	0x01
-#define EF_M68K_CPU32_MASK	0xFF
-
 #endif
