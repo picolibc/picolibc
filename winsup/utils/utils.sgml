@@ -191,13 +191,14 @@ for example:</para>
 <screen>
 Usage: cygpath (-d|-m|-u|-w|-t TYPE) [-f FILE] [OPTION]... NAME...
        cygpath [-c HANDLE] 
-       cygpath [-ADHPSW] 
+       cygpath [-ADHOPSW] 
+       cygpath [-F ID] 
 Convert Unix and Windows format paths, or output system path information
 
 Output type options:
   -d, --dos             print DOS (short) form of NAMEs (C:\PROGRA~1\)
   -m, --mixed           like --windows, but with regular slashes (C:/WINNT)
-  -M, --mode		report on mode of file (currently binmode or textmode)
+  -M, --mode            report on mode of file (currently binmode or textmode)
   -u, --unix            (default) print Unix form of NAMEs (/cygdrive/c/winnt)
   -w, --windows         print Windows form of NAMEs (C:\WINNT)
   -t, --type TYPE       print TYPE form: 'dos', 'mixed', 'unix', or 'windows'
@@ -210,9 +211,11 @@ System information:
   -A, --allusers        use `All Users' instead of current user for -D, -P
   -D, --desktop         output `Desktop' directory and exit
   -H, --homeroot        output `Profiles' directory (home root) and exit
+  -O, --mydocs          output `My Documents' directory and exit
   -P, --smprograms      output Start Menu `Programs' directory and exit
   -S, --sysdir          output system directory and exit
   -W, --windir          output `Windows' directory and exit
+  -F, --folder ID       output special folder with numeric ID and exit
 Other options:
   -f, --file FILE       read FILE for input; use - to read from STDIN
   -o, --option          read options from FILE as well (for use with --file)
@@ -290,7 +293,13 @@ by Windows that are not the same on all systems, for example
 The <literal>-H</literal> shows the Windows profiles directory that can 
 be used as root of home.  The <literal>-A</literal> option forces use of 
 the "All Users" directories instead of the current user for the 
-<literal>-D</literal> and <literal>-P</literal> options. 
+<literal>-D</literal>, <literal>-O</literal> and <literal>-P</literal> 
+options.
+The <literal>-F</literal> outputs other special folders specified by
+their internal numeric code (decimal or 0xhex). For valid codes and
+symbolic names, see the CSIDL_* definitions in the include file
+/usr/include/w32api/shlobj.h from package w32api. The current valid
+range of codes for folders is 0 (Desktop) to 59 (CDBurn area).
 On Win9x systems with only a single user, <literal>-A</literal> has no
 effect; <literal>-D</literal> and <literal>-AD</literal> would have the
 same output.  By default the output is in UNIX (POSIX) format; 

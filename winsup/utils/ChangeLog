@@ -1,3 +1,12 @@
+2007-01-09  Christian Franke  <franke@computer.org>
+
+	* cygpath.cc (usage): Add -O and -F, remove tabs.
+	(get_special_folder): New function.
+	(get_user_folder): New function.
+	(dowin): Add -O and -F, better -D, -P error handling.
+	(main): Add -O and -F.
+	* utils.sgml (cygpath): Document -O and -F.
+
 2006-12-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dumper.cc: Include ansidecl.h before including bfd.h to woraround
