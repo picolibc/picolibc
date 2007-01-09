@@ -1,3 +1,8 @@
+2007-01-09  Ben Elliston  <bje@au.ibm.com>
+
+	* spu/exit.c (_exit): Finish with an infinite loop to eliminate a
+	warning about this noreturn function returning.
+
 2007-01-04  Kazu Hirata  <kazu@codesourcery.com>
 
 	Merge from newlib-csl-20060320-branch:

@@ -42,4 +42,7 @@ void _exit(int rc)
     "1:\n"
     "   stop    0x2000\n"
     : : "r" (rc) );
+
+  for (;;)
+    ;
 }
