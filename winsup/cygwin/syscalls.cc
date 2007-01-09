@@ -1562,7 +1562,7 @@ getdtablesize ()
 extern "C" size_t
 getpagesize ()
 {
-  if (!system_info.dwPageSize)
+  if (!system_info.dwAllocationGranularity)
     GetSystemInfo (&system_info);
   return (size_t) system_info.dwAllocationGranularity;
 }
@@ -1570,7 +1570,7 @@ getpagesize ()
 size_t
 getsystempagesize ()
 {
-  if (!system_info.dwAllocationGranularity)
+  if (!system_info.dwPageSize)
     GetSystemInfo (&system_info);
   return (size_t) system_info.dwPageSize;
 }
