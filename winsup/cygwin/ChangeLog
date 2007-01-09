@@ -1,3 +1,7 @@
+2007-01-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc: Do bookkeeping in 4K pages, rather than in 64K chunks.
+
 2007-01-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.h (setacl): Add parameter for writability flag.
