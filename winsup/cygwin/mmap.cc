@@ -1217,6 +1217,28 @@ go_ahead:
       goto out;
     }
 
+  if (orig_len)
+    {
+      /* If the requested length is bigger than the file size, we try to
+	 allocate an area of the full size first.  This area is immediately
+	 deallocated and the address we got is used as base address for the
+	 subsequent real mappings.  This ensures that we have enough space
+	 for the whole thing. */
+      orig_len = roundup2 (orig_len, pagesize);
+      addr = VirtualAlloc (addr, orig_len, MEM_TOP_DOWN | MEM_RESERVE,
+      			   PAGE_READWRITE);
+      if (!addr)
+        {
+	  __seterrno ();
+	  goto out;
+	}
+      if (!VirtualFree (addr, 0, MEM_RELEASE))
+        {
+	  __seterrno ();
+	  goto out;
+	}
+    }
+
   base = mmap_worker (fh, (caddr_t) addr, len, prot, flags, fd, off);
   if (!base)
     goto out;
@@ -1225,7 +1247,7 @@ go_ahead:
     {
       /* If the requested length is bigger than the file size, the
 	 remainder is created as anonymous mapping.  Actually two
-	 mappings are created, first the reminder from the file end to
+	 mappings are created, first the remainder from the file end to
 	 the next 64K boundary as accessible pages with the same
 	 protection as the file's pages, then as much pages as necessary
 	 to accomodate the requested length, but as reserved pages which
@@ -1233,7 +1255,9 @@ go_ahead:
 	 and page protection on shared pages is only supported by 32 bit NT,
 	 so don't even try on 9x and in WOW64.  This is accomplished by not
 	 setting orig_len on 9x and in WOW64 above. */
+#if 0
       orig_len = roundup2 (orig_len, pagesize);
+#endif
       len = roundup2 (len, getsystempagesize ());
       if (orig_len - len)
 	{

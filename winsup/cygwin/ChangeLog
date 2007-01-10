@@ -1,5 +1,11 @@
 2007-01-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mmap.cc (mmap64): Pre-Reserve space for the whole mapping to get a
+	useful, valid address before the actual mappings take place.
+	Fix typo in comment.
+
+2007-01-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (sync): Use b_drive for B: drive (Thanks to Howard Chu).
 
 2007-01-09  Corinna Vinschen  <corinna@vinschen.de>
