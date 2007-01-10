@@ -1124,7 +1124,7 @@ sync ()
       if (is_floppy ("A:"))
 	GetVolumeNameForVolumeMountPointA ("A:\\", a_drive, CYG_MAX_PATH);
       if (is_floppy ("B:"))
-	GetVolumeNameForVolumeMountPointA ("B:\\", a_drive, CYG_MAX_PATH);
+	GetVolumeNameForVolumeMountPointA ("B:\\", b_drive, CYG_MAX_PATH);
 
       HANDLE sh = FindFirstVolumeA (vol, CYG_MAX_PATH);
       if (sh != INVALID_HANDLE_VALUE)
