@@ -1,6 +1,15 @@
+2007-01-11  Gisle Vanem  <giva@users.sourceforge.net>
+
+	* include/winbase.h (struct _OVERLAPPED): Change type of
+	Internal, InternalHigh members to ULONG_PTR.
+	(PAPCFUNC): Change DWORD parameter to ULONG_PTR.
+	(CreateIoCompletionPort): Likewise.
+	(PostQueuedCompletionStatus): Likewise.
+	(QueueUserAPC): Likewise.
+
 2007-01-06  Pierre A. Humblet  <Pierre.Humblet@ieee.org>
 
-	* windns.h (DNS_TYPE_RP, DNS_TYPE_AFSDB, DNS_TYPE_X25,
+	* include/windns.h (DNS_TYPE_RP, DNS_TYPE_AFSDB, DNS_TYPE_X25,
 	DNS_TYPE_ISDN, DNS_TYPE_RT, DNS_TYPE_NSAP, DNS_TYPE_NSAPPTR,
 	DNS_TYPE_SIG, DNS_TYPE_KEY, DNS_TYPE_PX, DNS_TYPE_GPOS,
 	DNS_TYPE_AAAA, DNS_TYPE_LOC, DNS_TYPE_NXT, DNS_TYPE_EID,
