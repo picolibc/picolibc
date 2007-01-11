@@ -1,3 +1,12 @@
+2007-01-11  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libm/configure.in: Always configure machine directory.
+	* libm/Makefile.am: Make machine subdirectory part of SUBDIRS
+	unconditionally.
+	* libm/configure: Regenerated.
+	* libm/Makefile.in: Ditto.
+	* libm/*/Makefile.in: Ditto.
+
 2007-01-05  Brian Ford  <Brian.Ford@FlightSafety.com>
 
 	* configure.host (*-*-cygwin*): Define HAVE_BLKSIZE.

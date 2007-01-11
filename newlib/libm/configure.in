@@ -28,9 +28,10 @@ AC_LIBTOOL_WIN32_DLL
 AM_PROG_LIBTOOL
 fi
 
+AC_CONFIG_SUBDIRS(machine)
+
 LIBM_MACHINE_LIB=
 if test -n "${libm_machine_dir}"; then
-  AC_CONFIG_SUBDIRS(machine)
   if test "${use_libtool}" = "yes"; then
     LIBM_MACHINE_LIB=machine/${libm_machine_dir}/lib${libm_machine_dir}.${aext}
   else
@@ -39,7 +40,6 @@ if test -n "${libm_machine_dir}"; then
 fi
 
 AC_SUBST(LIBM_MACHINE_LIB)
-AM_CONDITIONAL(HAVE_LIBM_MACHINE_DIR, test x${libm_machine_dir} != x)
 
 AC_CONFIG_FILES([Makefile math/Makefile mathfp/Makefile common/Makefile])
 AC_OUTPUT

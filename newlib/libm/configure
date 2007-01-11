@@ -273,7 +273,7 @@ PACKAGE_BUGREPORT=''
 
 ac_unique_file="libm.texinfo"
 ac_subdirs_all="$ac_subdirs_all machine"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS NEWLIB_HW_FP_TRUE NEWLIB_HW_FP_FALSE MAY_SUPPLY_SYSCALLS_TRUE MAY_SUPPLY_SYSCALLS_FALSE newlib_basedir build build_cpu build_vendor build_os host host_cpu host_vendor host_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar CC DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE AS ac_ct_AS AR ac_ct_AR RANLIB ac_ct_RANLIB READELF ac_ct_READELF MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CCAS CCASFLAGS NEWLIB_CFLAGS LDFLAGS ELIX_LEVEL_0_TRUE ELIX_LEVEL_0_FALSE ELIX_LEVEL_1_TRUE ELIX_LEVEL_1_FALSE ELIX_LEVEL_2_TRUE ELIX_LEVEL_2_FALSE ELIX_LEVEL_3_TRUE ELIX_LEVEL_3_FALSE ELIX_LEVEL_4_TRUE ELIX_LEVEL_4_FALSE USE_LIBTOOL_TRUE USE_LIBTOOL_FALSE OBJEXT oext aext lpfx libm_machine_dir machine_dir sys_dir CFLAGS CPPFLAGS ac_ct_CC EXEEXT LN_S LIBTOOL subdirs LIBM_MACHINE_LIB HAVE_LIBM_MACHINE_DIR_TRUE HAVE_LIBM_MACHINE_DIR_FALSE LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS NEWLIB_HW_FP_TRUE NEWLIB_HW_FP_FALSE MAY_SUPPLY_SYSCALLS_TRUE MAY_SUPPLY_SYSCALLS_FALSE newlib_basedir build build_cpu build_vendor build_os host host_cpu host_vendor host_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar CC DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE AS ac_ct_AS AR ac_ct_AR RANLIB ac_ct_RANLIB READELF ac_ct_READELF MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CCAS CCASFLAGS NEWLIB_CFLAGS LDFLAGS ELIX_LEVEL_0_TRUE ELIX_LEVEL_0_FALSE ELIX_LEVEL_1_TRUE ELIX_LEVEL_1_FALSE ELIX_LEVEL_2_TRUE ELIX_LEVEL_2_FALSE ELIX_LEVEL_3_TRUE ELIX_LEVEL_3_FALSE ELIX_LEVEL_4_TRUE ELIX_LEVEL_4_FALSE USE_LIBTOOL_TRUE USE_LIBTOOL_FALSE OBJEXT oext aext lpfx libm_machine_dir machine_dir sys_dir CFLAGS CPPFLAGS ac_ct_CC EXEEXT LN_S LIBTOOL subdirs LIBM_MACHINE_LIB LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -4882,12 +4882,13 @@ exec 5>>./config.log
 
 fi
 
-LIBM_MACHINE_LIB=
-if test -n "${libm_machine_dir}"; then
 
 
 subdirs="$subdirs machine"
 
+
+LIBM_MACHINE_LIB=
+if test -n "${libm_machine_dir}"; then
   if test "${use_libtool}" = "yes"; then
     LIBM_MACHINE_LIB=machine/${libm_machine_dir}/lib${libm_machine_dir}.${aext}
   else
@@ -4895,16 +4896,6 @@ subdirs="$subdirs machine"
   fi
 fi
 
-
-
-
-if test x${libm_machine_dir} != x; then
-  HAVE_LIBM_MACHINE_DIR_TRUE=
-  HAVE_LIBM_MACHINE_DIR_FALSE='#'
-else
-  HAVE_LIBM_MACHINE_DIR_TRUE='#'
-  HAVE_LIBM_MACHINE_DIR_FALSE=
-fi
 
 
                                         ac_config_files="$ac_config_files Makefile math/Makefile mathfp/Makefile common/Makefile"
@@ -5112,13 +5103,6 @@ if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"am__fastdepCC\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"am__fastdepCC\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${HAVE_LIBM_MACHINE_DIR_TRUE}" && test -z "${HAVE_LIBM_MACHINE_DIR_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"HAVE_LIBM_MACHINE_DIR\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"HAVE_LIBM_MACHINE_DIR\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -5737,8 +5721,6 @@ s,@LN_S@,$LN_S,;t t
 s,@LIBTOOL@,$LIBTOOL,;t t
 s,@subdirs@,$subdirs,;t t
 s,@LIBM_MACHINE_LIB@,$LIBM_MACHINE_LIB,;t t
-s,@HAVE_LIBM_MACHINE_DIR_TRUE@,$HAVE_LIBM_MACHINE_DIR_TRUE,;t t
-s,@HAVE_LIBM_MACHINE_DIR_FALSE@,$HAVE_LIBM_MACHINE_DIR_FALSE,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF
