@@ -1,3 +1,8 @@
+2007-01-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (_csbrk): Fix off-by-one error.
+	* cygwin.sc: Give .cygheap a minimum size of 512K.
+
 2007-01-12  Christopher Faylor  <me@cgf.cx>
 
 	* external.cc (sync_winenv): Use cur_environ () rather than
