@@ -142,7 +142,7 @@ sync_winenv ()
 {
   int unused_envc;
   char *envblock = NULL;
-  char **envp = build_env (__cygwin_environ, envblock, unused_envc, false);
+  char **envp = build_env (cur_environ (), envblock, unused_envc, false);
   char *p = envblock;
 
   if (envp)

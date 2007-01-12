@@ -1,3 +1,8 @@
+2007-01-12  Christopher Faylor  <me@cgf.cx>
+
+	* external.cc (sync_winenv): Use cur_environ () rather than
+	__cygwin_environ.
+
 2007-01-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fork.cc (child_copy): Add missing Windows PID in debug output.
