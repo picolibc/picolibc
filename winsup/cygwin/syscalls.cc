@@ -1,7 +1,7 @@
 /* syscalls.cc: syscalls
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005 Red Hat, Inc.
+   2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1001,7 +1001,7 @@ sync ()
       if (is_floppy ("A:"))
 	GetVolumeNameForVolumeMountPointA ("A:\\", a_drive, CYG_MAX_PATH);
       if (is_floppy ("B:"))
-	GetVolumeNameForVolumeMountPointA ("B:\\", a_drive, CYG_MAX_PATH);
+	GetVolumeNameForVolumeMountPointA ("B:\\", b_drive, CYG_MAX_PATH);
 
       HANDLE sh = FindFirstVolumeA (vol, CYG_MAX_PATH);
       if (sh != INVALID_HANDLE_VALUE)

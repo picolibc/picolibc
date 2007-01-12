@@ -1,7 +1,7 @@
 /* spawn.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006 Red Hat, Inc.
+   2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -678,7 +678,10 @@ loop:
 
   sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
 
-  synced = ch.sync (pi.dwProcessId, pi.hProcess, INFINITE);
+  if ((mode == _P_DETACH || mode == _P_NOWAIT) && !ch.iscygwin ())
+    synced = false;
+  else
+    synced = ch.sync (pi.dwProcessId, pi.hProcess, INFINITE);
 
   switch (mode)
     {

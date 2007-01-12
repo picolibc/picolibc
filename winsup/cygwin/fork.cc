@@ -1,7 +1,7 @@
 /* fork.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2004, 2005, 2006
-   Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2004, 2005, 2006,
+   2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -707,7 +707,7 @@ child_copy (HANDLE hp, bool write, ...)
 	      /* If this happens then there is a bug in our fork
 		 implementation somewhere. */
 	      system_printf ("%s %s copy failed, %p..%p, done %d, windows pid %u, %E",
-			    what, huh[write], low, high, done);
+			    what, huh[write], low, high, done, myself->dwProcessId);
 	      goto err;
 	    }
 	}

@@ -1,7 +1,7 @@
 /* mmap.cc
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006 Red Hat, Inc.
+   2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -36,7 +36,9 @@ details. */
    expect to be able to access this part the same way as the file pages. */
 #define __PROT_FILLER   0x4000000
 
-#define PAGE_CNT(bytes) howmany((bytes),getpagesize())
+/* Stick with 4K pages for bookkeeping, otherwise we just get confused
+   when trying to do file mappings with trailing filler pages correctly. */
+#define PAGE_CNT(bytes) howmany((bytes),getsystempagesize())
 
 #define PGBITS		(sizeof (DWORD)*8)
 #define MAPSIZE(pages)	howmany ((pages), PGBITS)
@@ -602,8 +604,9 @@ mmap_record::map_pages (_off64_t off, DWORD len)
   if ((off = find_unused_pages (len)) == (DWORD)-1)
     return 0L;
   if (!noreserve ()
-      && !VirtualProtect (get_address () + off * getpagesize (),
-			  len * getpagesize (), gen_protect (), &old_prot))
+      && !VirtualProtect (get_address () + off * getsystempagesize (),
+			  len * getsystempagesize (), gen_protect (),
+			  &old_prot))
     {
       __seterrno ();
       return (_off64_t)-1;
@@ -611,7 +614,7 @@ mmap_record::map_pages (_off64_t off, DWORD len)
 
   while (len-- > 0)
     MAP_SET (off + len);
-  return off * getpagesize ();
+  return off * getsystempagesize ();
 }
 
 bool
@@ -620,7 +623,7 @@ mmap_record::map_pages (caddr_t addr, DWORD len)
   debug_printf ("map_pages (addr=%x, len=%u)", addr, len);
   DWORD old_prot;
   DWORD off = addr - get_address ();
-  off /= getpagesize ();
+  off /= getsystempagesize ();
   len = PAGE_CNT (len);
   /* First check if the area is unused right now. */
   for (DWORD l = 0; l < len; ++l)
@@ -630,8 +633,9 @@ mmap_record::map_pages (caddr_t addr, DWORD len)
 	return false;
       }
   if (!noreserve ()
-      && !VirtualProtect (get_address () + off * getpagesize (),
-			  len * getpagesize (), gen_protect (), &old_prot))
+      && !VirtualProtect (get_address () + off * getsystempagesize (),
+			  len * getsystempagesize (), gen_protect (),
+			  &old_prot))
     {
       __seterrno ();
       return false;
@@ -646,16 +650,15 @@ mmap_record::unmap_pages (caddr_t addr, DWORD len)
 {
   DWORD old_prot;
   DWORD off = addr - get_address ();
-  off /= getpagesize ();
-  len = PAGE_CNT (len);
   if (noreserve ()
-      && !VirtualFree (get_address () + off * getpagesize (),
-		       len * getpagesize (), MEM_DECOMMIT))
+      && !VirtualFree (get_address () + off, len, MEM_DECOMMIT))
     debug_printf ("VirtualFree in unmap_pages () failed, %E");
-  else if (!VirtualProtect (get_address () + off * getpagesize (),
-			    len * getpagesize (), PAGE_NOACCESS, &old_prot))
+  else if (!VirtualProtect (get_address () + off, len, PAGE_NOACCESS,
+			    &old_prot))
     debug_printf ("VirtualProtect in unmap_pages () failed, %E");
 
+  off /= getsystempagesize ();
+  len = PAGE_CNT (len);
   for (; len-- > 0; ++off)
     MAP_CLR (off);
   /* Return TRUE if all pages are free'd which may result in unmapping
@@ -671,7 +674,7 @@ mmap_record::access (caddr_t address)
 {
   if (address < get_address () || address >= get_address () + get_len ())
     return 0;
-  DWORD off = (address - get_address ()) / getpagesize ();
+  DWORD off = (address - get_address ()) / getsystempagesize ();
   return MAP_ISSET (off);
 }
 
@@ -740,8 +743,9 @@ list::search_record (_off64_t off, DWORD len)
     {
       for (int i = 0; i < nrecs; ++i)
 	if (off >= recs[i].get_offset ()
-	    && off + len <= recs[i].get_offset ()
-			 + (PAGE_CNT (recs[i].get_len ()) * getpagesize ()))
+	    && off + len
+	       <= recs[i].get_offset ()
+		  + (PAGE_CNT (recs[i].get_len ()) * getsystempagesize ()))
 	  return recs + i;
     }
   return NULL;
@@ -761,7 +765,7 @@ list::search_record (caddr_t addr, DWORD len, caddr_t &m_addr, DWORD &m_len,
       if (recs[i].filler ())
 	high += recs[i].get_len ();
       else
-	high += (PAGE_CNT (recs[i].get_len ()) * getpagesize ());
+	high += (PAGE_CNT (recs[i].get_len ()) * getsystempagesize ());
       high = (addr + len < high) ? addr + len : high;
       if (low < high)
 	{
@@ -1193,6 +1197,28 @@ go_ahead:
       goto out;
     }
 
+  if (orig_len)
+    {
+      /* If the requested length is bigger than the file size, we try to
+	 allocate an area of the full size first.  This area is immediately
+	 deallocated and the address we got is used as base address for the
+	 subsequent real mappings.  This ensures that we have enough space
+	 for the whole thing. */
+      orig_len = roundup2 (orig_len, pagesize);
+      addr = VirtualAlloc (addr, orig_len, MEM_TOP_DOWN | MEM_RESERVE,
+      			   PAGE_READWRITE);
+      if (!addr)
+        {
+	  __seterrno ();
+	  goto out;
+	}
+      if (!VirtualFree (addr, 0, MEM_RELEASE))
+        {
+	  __seterrno ();
+	  goto out;
+	}
+    }
+
   base = mmap_worker (fh, (caddr_t) addr, len, prot, flags, fd, off);
   if (!base)
     goto out;
@@ -1201,7 +1227,7 @@ go_ahead:
     {
       /* If the requested length is bigger than the file size, the
 	 remainder is created as anonymous mapping.  Actually two
-	 mappings are created, first the reminder from the file end to
+	 mappings are created, first the remainder from the file end to
 	 the next 64K boundary as accessible pages with the same
 	 protection as the file's pages, then as much pages as necessary
 	 to accomodate the requested length, but as reserved pages which
@@ -1209,7 +1235,9 @@ go_ahead:
 	 and page protection on shared pages is only supported by 32 bit NT,
 	 so don't even try on 9x and in WOW64.  This is accomplished by not
 	 setting orig_len on 9x and in WOW64 above. */
+#if 0
       orig_len = roundup2 (orig_len, pagesize);
+#endif
       len = roundup2 (len, getsystempagesize ());
       if (orig_len - len)
 	{

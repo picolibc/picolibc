@@ -1,6 +1,6 @@
 /* cygheap.cc: Cygwin heap manager.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -121,7 +121,7 @@ _csbrk (int sbs)
   size_t granmask = getpagesize () - 1;
   char *newbase = nextpage (prebrk);
   cygheap_max = (char *) cygheap_max + sbs;
-  if (!sbs || (newbase > cygheap_max) || (cygheap_max < _cygheap_end))
+  if (!sbs || (newbase >= cygheap_max) || (cygheap_max <= _cygheap_end))
     /* nothing to do */;
   else
     {
