@@ -1,5 +1,9 @@
 2007-01-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc: Update copyright.
+
+2007-01-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mmap.cc (mmap64): Pre-Reserve space for the whole mapping to get a
 	useful, valid address before the actual mappings take place.
 	Fix typo in comment.
