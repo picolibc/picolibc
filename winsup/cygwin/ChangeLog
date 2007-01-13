@@ -1,3 +1,9 @@
+2007-01-13  Christopher Faylor  <me@cgf.cx>
+
+	* glob.cc: Update copyright notice with latest from FreeBSD.
+	(glob0): Use correct type for c variable to propagate previously
+	detected protection.
+
 2007-01-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.cc (_csbrk): Fix off-by-one error.
