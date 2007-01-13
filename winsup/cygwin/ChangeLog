@@ -1,3 +1,8 @@
+2007-01-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (unlink_nt): Don't move files to recycle bin which are
+	not in use.
+
 2007-01-13  Christopher Faylor  <me@cgf.cx>
 
 	* glob.cc: Update copyright notice with latest from FreeBSD.

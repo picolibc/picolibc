@@ -253,8 +253,9 @@ unlink_nt (path_conv &win32_name, bool setattrs)
      though the other process still has an open handle.  This other process
      than gets Win32 error 59, ERROR_UNEXP_NET_ERR when trying to access the
      file.
-     That does not happen when using DeleteFile, which nicely succeeds but
-     still, the file is available for the other process.
+     That does not happen when using DeleteFile (NtSetInformationFile, class
+     FileDispositionInformation), which nicely succeeds but still, the file
+     is available for the other process.
      Microsoft KB 837665 describes this problem as a bug in 2K3, but I have
      reproduced it on shares on Samba 2.2.8, Samba 3.0.2, NT4SP6, XP64SP1 and
      2K3 and in all cases, DeleteFile works, "delete on close" does not. */
@@ -268,7 +269,19 @@ unlink_nt (path_conv &win32_name, bool setattrs)
   win32_name.get_nt_native_path (upath);
   InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
 			      NULL, sec_none_nih.lpSecurityDescriptor);
-  status = NtOpenFile (&h, DELETE, &attr, &io, wincap.shared (), flags);
+  /* First try to open the file with sharing not allowed.  If the file
+     has an open handle on it, this will fail.  That indicates that the
+     file has to be moved to the recycle bin so that it actually disappears
+     from its directory even though its in use.  Otherwise, if opening
+     doesn't fail, the file is not in use and by simply closing the handle
+     the file will disappear. */
+  bool move_to_bin = false;
+  status = NtOpenFile (&h, DELETE, &attr, &io, 0, flags);
+  if (status == STATUS_SHARING_VIOLATION)
+    {
+      move_to_bin = true;
+      status = NtOpenFile (&h, DELETE, &attr, &io, wincap.shared (), flags);
+    }
   if (!NT_SUCCESS (status))
     {
       if (status == STATUS_DELETE_PENDING)
@@ -283,7 +296,7 @@ unlink_nt (path_conv &win32_name, bool setattrs)
   if (setattrs)
     SetFileAttributes (win32_name, (DWORD) win32_name);
 
-  if (!win32_name.isremote ())
+  if (move_to_bin && !win32_name.isremote ())
     try_to_bin (win32_name, h);
 
   DWORD lasterr = 0;
