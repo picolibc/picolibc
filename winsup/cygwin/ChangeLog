@@ -1,4 +1,8 @@
-2007-01-12  Corinna Vinschen  <corinna@vinschen.de>
+2007-01-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntdll.h (STATUS_SHARING_VIOLATION): Define.
+
+2007-01-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (unlink_nt): Don't move files to recycle bin which are
 	not in use.
