@@ -278,9 +278,6 @@ shared_info::heap_slop_size ()
 	heap_slop = 0;
       else
 	heap_slop <<= 20;
-#ifdef DEBUGGING
-      system_printf ("fixed heap slop is %p", heap_slop);
-#endif
     }
 
   return heap_slop;
@@ -312,9 +309,6 @@ shared_info::heap_chunk_size ()
 	heap_chunk <<= 20;
       if (!heap_chunk)
 	heap_chunk = 384 * 1024 * 1024;
-#ifdef DEBUGGING
-      system_printf ("fixed heap size is %u", heap_chunk);
-#endif
     }
 
   return heap_chunk;

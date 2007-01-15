@@ -787,6 +787,32 @@ child_info::child_info (unsigned in_cb, child_info_types chtype, bool need_subpr
 {
   memset (this, 0, in_cb);
   cb = in_cb;
+
+  /* It appears that when running under WOW64 on Vista 64, the first DWORD
+     value in the datastructure lpReserved2 is pointing to (msv_count in
+     Cygwin), has to reflect the size of that datastructure as used in the
+     Microsoft C runtime (a count value, counting the number of elements in
+     two subsequent arrays, BYTE[count and HANDLE[count]), even though the C
+     runtime isn't used.  Otherwise, if msv_count is 0 or too small, the
+     datastructure gets overwritten.
+
+     This seems to be a bug in Vista's WOW64, which apparently copies the
+     lpReserved2 datastructure not using the cbReserved2 size information,
+     but using the information given in the first DWORD within lpReserved2
+     instead.  32 bit Windows and former WOW64 don't care if msv_count is 0
+     or a sensible non-0 count value.  However, it's not clear if a non-0
+     count doesn't result in trying to evaluate the content, so we do this
+     really only for Vista 64 for now.
+
+     However, since this doesn't seem to harm normal windows operation we'll
+     just set it unconditionally until we hear complaints.
+
+     The value is sizeof (child_info_*) / 5 which results in a count which
+     covers the full datastructure, plus not more than 4 extra bytes.  This
+     is ok as long as the child_info structure is cosily stored within a bigger
+     datastructure. */
+  msv_count = in_cb / 5;
+
   intro = PROC_MAGIC_GENERIC;
   magic = CHILD_INFO_MAGIC;
   type = chtype;

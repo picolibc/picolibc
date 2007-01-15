@@ -171,6 +171,9 @@ void dll_crt0 (per_process *) __asm__ ("_dll_crt0__FP11per_process");
 extern "C" void __stdcall _dll_crt0 ();
 extern void dll_crt0_1 (void *);
 extern void dll_dllcrt0_1 (void *);
+extern int __stdcall spawn_guts (const char * prog_arg, const char *const *argv,
+				 const char *const envp[], int mode,
+				 int __stdin = -1, int __stdout = -1);
 
 /* dynamically loaded dll initialization */
 extern "C" int dll_dllcrt0 (HMODULE, per_process *);

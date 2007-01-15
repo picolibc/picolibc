@@ -1464,19 +1464,23 @@ fhandler_dev_null::open (int flags, mode_t mode)
 }
 
 void
-fhandler_base::set_no_inheritance (HANDLE &h, int not_inheriting)
+fhandler_base::set_no_inheritance (HANDLE &h, bool not_inheriting)
 {
-  HANDLE oh = h;
-  /* Note that we could use SetHandleInformation here but it is not available
-     on all platforms.  Test cases seem to indicate that using DuplicateHandle
-     in this fashion does not actually close the original handle, which is
-     what we want.  If this changes in the future, we may be forced to use
-     SetHandleInformation on newer OS's */
-  if (!DuplicateHandle (hMainProc, oh, hMainProc, &h, 0, !not_inheriting,
-			     DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
-    debug_printf ("DuplicateHandle failed, %E");
-  if (oh != h)
-    VerifyHandle (h);
+  if (wincap.has_set_handle_information ())
+    {
+      if (!SetHandleInformation (h, HANDLE_FLAG_INHERIT, not_inheriting ? 0 : HANDLE_FLAG_INHERIT))
+	debug_printf ("SetHandleInformation failed, %E");
+    }
+  else
+    {
+      HANDLE oh = h;
+      if (!DuplicateHandle (hMainProc, oh, hMainProc, &h, 0, !not_inheriting,
+			    DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
+	debug_printf ("DuplicateHandle failed, %E");
+
+	if (oh != h)
+	  VerifyHandle (h);
+    }
 #ifdef DEBUGGING_AND_FDS_PROTECTED
   if (h)
     setclexec (oh, h, not_inheriting);

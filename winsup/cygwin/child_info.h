@@ -23,7 +23,6 @@ enum child_status
   _CI_STRACED	 = 0x01,
   _CI_ISCYGWIN	 = 0x02,
   _CI_SAW_CTRL_C = 0x04
-
 };
 
 #define OPROC_MAGIC_MASK 0xff00ff00
@@ -38,7 +37,7 @@ enum child_status
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
 /* Change this value if you get a message indicating that it is out-of-sync. */
-#define CURR_CHILD_INFO_MAGIC 0x704d1f7eU
+#define CURR_CHILD_INFO_MAGIC 0xc3a86a0bU
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -46,7 +45,7 @@ enum child_status
 class child_info
 {
 public:
-  DWORD zero[4];	// must be zeroed
+  DWORD msv_count;	// zeroed on < W2K3, set to pseudo-count on Vista
   DWORD cb;		// size of this record
   DWORD intro;		// improbable string
   unsigned long magic;	// magic number unique to child_info
@@ -85,6 +84,7 @@ public:
   jmp_buf jmp;		// where child will jump to
   void *stacktop;	// location of top of parent stack
   void *stackbottom;	// location of bottom of parent stack
+  char filler[4];
   child_info_fork ();
   void handle_fork () __attribute__ ((regparm (1)));;
   bool handle_failure (DWORD) __attribute__ ((regparm (2)));
@@ -109,6 +109,9 @@ class child_info_spawn: public child_info
 {
 public:
   cygheap_exec_info *moreinfo;
+  int __stdin;
+  int __stdout;
+  char filler[4];
 
   ~child_info_spawn ()
   {

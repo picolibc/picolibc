@@ -210,7 +210,7 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
 /* Utility for spawn_guts.  */
 
 static HANDLE
-handle (int fd, int direction)
+handle (int fd, bool writing)
 {
   HANDLE h;
   cygheap_fdget cfd (fd);
@@ -219,10 +219,11 @@ handle (int fd, int direction)
     h = INVALID_HANDLE_VALUE;
   else if (cfd->close_on_exec ())
     h = INVALID_HANDLE_VALUE;
-  else if (direction == 0)
+  else if (!writing)
     h = cfd->get_handle ();
   else
     h = cfd->get_output_handle ();
+
   return h;
 }
 
@@ -259,9 +260,9 @@ do_cleanup (void *args)
 }
 
 
-static int __stdcall
+int __stdcall
 spawn_guts (const char * prog_arg, const char *const *argv,
-	    const char *const envp[], int mode)
+	    const char *const envp[], int mode, int __stdin, int __stdout)
 {
   bool rc;
   pid_t cygpid;
@@ -298,14 +299,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   pthread_cleanup_push (do_cleanup, (void *) &cleanup);
   av newargv;
   linebuf one_line;
-  /* Allocate slightly bigger for call to CreateProcess to accomodate
-     needs_count_in_si_lpres2. */
-  struct {
-    child_info_spawn ch;
-    char filler[4];
-  } _ch;
-#define ch	_ch.ch
-
+  child_info_spawn ch;
   char *envblock = NULL;
   path_conv real_path;
   bool reset_sendsig = false;
@@ -316,7 +310,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   cygheap_exec_info *moreinfo;
 
   bool null_app_name = false;
-  STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
+  STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
+		    NULL, NULL, NULL};
   int looped = 0;
   HANDLE orig_wr_proc_pipe = NULL;
 
@@ -411,10 +406,13 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   pi.dwProcessId = pi.dwThreadId = 0;
   si.lpReserved = NULL;
   si.lpDesktop = NULL;
+
+  /* Set up needed handles for stdio */
   si.dwFlags = STARTF_USESTDHANDLES;
-  si.hStdInput = handle (0, 0); /* Get input handle */
-  si.hStdOutput = handle (1, 1); /* Get output handle */
-  si.hStdError = handle (2, 1); /* Get output handle */
+  si.hStdInput = handle ((__stdin < 0 ? 0 : __stdin), false);
+  si.hStdOutput = handle ((__stdout < 0 ? 1 : __stdout), true);
+  si.hStdError = handle (2, true);
+
   si.cb = sizeof (si);
   if (!wincap.pty_needs_alloc_console () && newargv.iscui && myself->ctty == -1)
     {
@@ -483,13 +481,11 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     }
   ch.set (chtype, real_path.iscygexec ());
   ch.moreinfo = moreinfo;
+  ch.__stdin = __stdin;
+  ch.__stdout = __stdout;
 
   si.lpReserved2 = (LPBYTE) &ch;
   si.cbReserved2 = sizeof (ch);
-
-  /* See comment in dcrt0.cc, function get_cygwin_startup_info. */
-  if (wincap.needs_count_in_si_lpres2 ())
-    ch.zero[0] = sizeof (ch) / 5;
 
   /* When ruid != euid we create the new process under the current original
      account and impersonate in child, this way maintaining the different

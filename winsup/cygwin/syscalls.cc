@@ -40,6 +40,7 @@ details. */
 #include <limits.h>
 #include <unistd.h>
 #include <setjmp.h>
+#include <sys/wait.h>
 #include <winnls.h>
 #include <wininet.h>
 #include <winioctl.h>
@@ -3161,4 +3162,115 @@ extern "C" void
 funlockfile (FILE *file)
 {
   _funlockfile (file);
+}
+
+extern "C" FILE *
+popen (const char *command, const char *in_type)
+{
+  const char *type = in_type;
+  char rw = *type++;
+
+  if (*type == 'b' || *type == 't')
+    type++;
+  if ((rw != 'r' && rw != 'w') || (*type != '\0'))
+    {
+      set_errno (EINVAL);
+      return NULL;
+    }
+
+  int fd, other_fd, __stdin, __stdout, stdwhat;
+
+  int fds[2];
+  if (pipe (fds) < 0)
+    return NULL;
+
+  switch (rw)
+    {
+    case 'r':
+      __stdin = -1;
+      stdwhat = 1;
+      other_fd = __stdout = fds[1];
+      fd = fds[0];
+      break;
+    case 'w':
+      __stdout = -1;
+      stdwhat = 0;
+      other_fd = __stdin = fds[0];
+      fd = fds[1];
+      break;
+    default:
+      return NULL;	/* avoid a compiler warning */
+    }
+
+  FILE *fp = fdopen (fd, in_type);
+  fcntl (fd, F_SETFD, fcntl (fd, F_GETFD, 0) | FD_CLOEXEC);
+
+  if (!fp)
+    goto err;
+
+  pid_t pid;
+  const char *argv[4];
+
+  argv[0] = "/bin/sh";
+  argv[1] = "-c";
+  argv[2] = command;
+  argv[3] = NULL;
+
+  {
+    lock_process now;
+    int state = fcntl (stdwhat, F_GETFD, 0);
+    fcntl (stdwhat, F_SETFD, state | FD_CLOEXEC);
+    pid = spawn_guts ("/bin/sh", argv, cur_environ (), _P_NOWAIT,
+		      __stdin, __stdout);
+    fcntl (stdwhat, F_SETFD, state);
+  }
+
+  if (pid < 0)
+    goto err;
+  close (other_fd);
+
+  fhandler_pipe *fh = (fhandler_pipe *) cygheap->fdtab[fd];
+  fh->set_popen_pid (pid);
+
+  return fp;
+
+err:
+  int save_errno = get_errno ();
+  close (fds[0]);
+  close (fds[1]);
+  set_errno (save_errno);
+  return NULL;
+}
+
+int
+pclose (FILE *fp)
+{
+  fhandler_pipe *fh = (fhandler_pipe *) cygheap->fdtab[fileno(fp)];
+
+  if (fh->get_device () != FH_PIPEW && fh->get_device () != FH_PIPER)
+    {
+      set_errno (EBADF);
+      return -1;
+    }
+
+  int pid = fh->get_popen_pid ();
+  if (!pid)
+    {
+      set_errno (ECHILD);
+      return -1;
+    }
+
+  if (fclose (fp))
+    return -1;
+
+  int status;
+  while (1)
+    if (waitpid (pid, &status, 0) == pid)
+      break;
+    else if (get_errno () == EINTR)
+      continue;
+    else
+      return -1;
+
+  return status;
 }

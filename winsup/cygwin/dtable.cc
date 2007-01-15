@@ -657,6 +657,14 @@ dtable::fixup_before_fork (DWORD target_proc_id)
 }
 
 void
+dtable::move_fd (int from, int to)
+{
+  // close (to); /* It is assumed that this is close-on-exec */
+  fds[to] = fds[from];
+  fds[from] = NULL;
+}
+
+void
 dtable::fixup_before_exec (DWORD target_proc_id)
 {
   lock ();

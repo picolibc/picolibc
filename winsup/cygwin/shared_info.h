@@ -144,7 +144,7 @@ public:
 
 #define SHARED_INFO_CB 19988
 
-#define CURR_SHARED_MAGIC 0xb632a4cU
+#define CURR_SHARED_MAGIC 0x87c42d1eU
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
