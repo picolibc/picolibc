@@ -1,3 +1,7 @@
+2007-01-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* CYGWIN_LICENSE: Fix web pages and contact information.
+
 2007-01-13  Christopher Faylor  <me@cgf.cx>
 
 	* glob.cc: Update copyright notice with latest from FreeBSD.
