@@ -1,5 +1,9 @@
 2007-01-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygheap.cc (cygheap_init): Add TODO comment.
+
+2007-01-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ntdll.h (STATUS_SHARING_VIOLATION): Define.
 
 2007-01-13  Corinna Vinschen  <corinna@vinschen.de>
