@@ -1,3 +1,9 @@
+2007-01-15  Joseph Myers  <joseph@codesourcery.com>
+	    Kazu Hirata  <kazu@codesourcery.com>
+
+	* libc/machine/powerpc/setjmp.S (setjmp, longjmp): Add support
+	for E500V1 and E500V2.
+
 2007-01-11  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libm/configure.in: Always configure machine directory.
