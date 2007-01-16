@@ -116,7 +116,7 @@ struct in_addr
   in_addr_t s_addr;
 };
 
-/* Request struct for multicast socket ops */
+/* Request struct for IPv4 multicast socket ops */
 
 struct ip_mreq
 {
@@ -124,6 +124,59 @@ struct ip_mreq
   struct in_addr imr_interface;	/* local IP address of interface */
 };
 
+struct ip_mreq_source
+{
+  struct in_addr imr_multiaddr;
+  struct in_addr imr_sourceaddr;
+  struct in_addr imr_interface;
+};
+
+struct ip_msfilter
+{
+  struct in_addr imsf_multiaddr;
+  struct in_addr imsf_interface;
+  uint32_t       imsf_fmode;
+  uint32_t       imsf_numsrc;
+  struct in_addr imsf_slist[1];
+};
+
+#define IP_MSFILTER_SIZE(numsrc) (sizeof (struct ip_msfilter) \
+				  - sizeof (struct in_addr) \
+				  + (numsrc) * sizeof (struct in_addr))
+
+struct in_pktinfo
+{
+  struct in_addr ipi_addr;
+  uint32_t       ipi_ifindex;
+};
+
+/* Request struct for IP agnostic multicast socket ops */
+
+struct group_req
+{
+  uint32_t                gr_interface;
+  struct sockaddr_storage gr_group;
+};
+
+struct group_source_req
+{
+  uint32_t                gsr_interface;
+  struct sockaddr_storage gsr_group;
+  struct sockaddr_storage gsr_source;
+};
+
+struct group_filter
+{
+  uint32_t                gf_interface;
+  struct sockaddr_storage gf_group;
+  uint32_t                gf_fmode;
+  uint32_t                gf_numsrc;
+  struct sockaddr_storage gf_slist[1];
+};
+
+#define GROUP_FILTER_SIZE(numsrc) (sizeof (struct group_filter) \
+				   - sizeof (struct sockaddr_storage) \
+				   + (numsrc) * sizeof (struct sockaddr_storage))
 
 /* Structure describing an Internet (IP) socket address. */
 #define __SOCK_SIZE__	16		/* sizeof(struct sockaddr)	*/
@@ -187,6 +240,7 @@ struct sockaddr_in
 /* Defines for Multicast INADDR */
 #define INADDR_UNSPEC_GROUP	0xe0000000      /* 224.0.0.0   */
 #define INADDR_ALLHOSTS_GROUP	0xe0000001      /* 224.0.0.1   */
+#define INADDR_ALLRTRS_GROUP	0xe0000002	/* 224.0.0.2   */
 #define INADDR_MAX_LOCAL_GROUP  0xe00000ff      /* 224.0.0.255 */
 
 #define INET_ADDRSTRLEN 16

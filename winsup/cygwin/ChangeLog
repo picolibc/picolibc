@@ -1,3 +1,16 @@
+2007-01-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/in.h (struct ip_mreq_source): Define.
+	(struct ip_msfilter): Define.
+	(IP_MSFILTER_SIZE): Define.
+	(struct in_pktinfo): Define.
+	(struct group_req): Define.
+	(struct group_source_req): Define.
+	(struct group_filter): Define.
+	(GROUP_FILTER_SIZE): Define.
+	(INADDR_ALLRTRS_GROUP): Define.
+	* include/cygwin/socket.h: Define protocol agnostic multicast options.
+
 2007-01-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* CYGWIN_LICENSE: Fix web pages and contact information.

@@ -1,6 +1,6 @@
 /* cygwin/socket.h
 
-   Copyright 1999, 2000, 2001, 2005 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -242,6 +242,17 @@ struct OLD_msghdr
 #define IPV6_JOIN_GROUP                 IPV6_ADD_MEMBERSHIP
 #define IPV6_LEAVE_GROUP                IPV6_DROP_MEMBERSHIP
 #define IPV6_PKTINFO                    19
+
+/* IP agnostic options for use with getsockopt/setsockopt */
+#define MCAST_JOIN_GROUP                41
+#define MCAST_LEAVE_GROUP               42
+#define MCAST_BLOCK_SOURCE              43
+#define MCAST_UNBLOCK_SOURCE            44
+#define MCAST_JOIN_SOURCE_GROUP         45
+#define MCAST_LEAVE_SOURCE_GROUP        46
+
+#define MCAST_EXCLUDE                    0
+#define MCAST_INCLUDE                    1
 
 /* Old WinSock1 values, needed internally */
 #ifdef __INSIDE_CYGWIN__
