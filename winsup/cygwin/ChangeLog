@@ -1,5 +1,27 @@
 2007-01-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (RtlAnsiStringToUnicodeString): Define.
+	(RtlOemStringToUnicodeString): Define.
+	* ntdll.h (struct _RTL_USER_PROCESS_PARAMETERS): Define.
+	(struct _PEB): Redefine with a bit of content.
+	(RtlAnsiStringToUnicodeString): Declare.
+	(RtlOemStringToUnicodeString): Declare.
+	* path.cc: Include ntdll.h.
+	(_upp): New global variable pointing to user process parameter block.
+	(get_user_proc_parms): New static function to retrieve user process
+	parameter block.
+	(close_user_proc_parms_cwd_handle): New function to close handle to
+	current working directory in user process parameter block.
+	(cwdstuff::init): Drop redundant declaration of dynamically_loaded.
+	Set current dir only on 9x.  Call close_user_proc_parms_cwd_handle
+	on NT instead.
+	(cwdstuff::keep_in_sync): Only on 9x.
+	(cwdstuff::set): Keep behaviour on 9x.  On NT write cwd path into user
+	process parameter block and set cwd handle to NULL.  Fix comments to
+	reflect new behaviour.
+
+2007-01-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::ioctl): Handle SIOCGIFINDEX.
 	* net.cc (get_2k_ifconf): Ditto.
 	(get_nt_ifconf): Fake SIOCGIFINDEX.

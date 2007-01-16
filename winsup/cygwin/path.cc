@@ -77,6 +77,7 @@ details. */
 #include "cygtls.h"
 #include "environ.h"
 #include <assert.h>
+#include <ntdll.h>
 
 bool dos_file_warning = true;
 static int normalize_win32_path (const char *, char *, char *&);
@@ -4153,18 +4154,50 @@ cwdstuff::get_hash ()
 
 extern char windows_system_directory[];
 
+static PRTL_USER_PROCESS_PARAMETERS _upp NO_COPY;
+
+static PRTL_USER_PROCESS_PARAMETERS
+get_user_proc_parms ()
+{
+  if (!_upp)
+    {
+      NTSTATUS stat;
+      PROCESS_BASIC_INFORMATION pbi;
+      stat = NtQueryInformationProcess (GetCurrentProcess (),
+					ProcessBasicInformation,
+					&pbi, sizeof pbi, NULL);
+      if (!NT_SUCCESS (stat))
+	api_fatal ("Can't retrieve process parameters, status %p", stat);
+      _upp = pbi.PebBaseAddress->ProcessParameters;
+    }
+  return _upp;
+}
+
+static void
+close_user_proc_parms_cwd_handle ()
+{
+  PHANDLE phdl = &get_user_proc_parms ()->CurrentDirectoryHandle;
+  if (*phdl)
+    {
+      NtClose (*phdl);
+      *phdl = NULL;
+    }
+}
+
 /* Initialize cygcwd 'muto' for serializing access to cwd info. */
 void
 cwdstuff::init ()
 {
-  extern int dynamically_loaded;
   cwd_lock.init ("cwd_lock");
   get_initial ();
   if (!dynamically_loaded && !keep_in_sync ())
     {
-      /* Actually chdir into the system dir to avoid cwd problems.  See comment
-	 in cwdstuff::set below. */
-      SetCurrentDirectory (windows_system_directory);
+      /* Actually chdir into the system dir to avoid cwd problems on 9x.
+	 See comment in cwdstuff::set below. */
+      if (!wincap.can_open_directories ())
+	SetCurrentDirectory (windows_system_directory);
+      else
+	close_user_proc_parms_cwd_handle ();
     }
   cwd_lock.release ();
 }
@@ -4172,12 +4205,14 @@ cwdstuff::init ()
 void
 cwdstuff::keep_in_sync (bool val)
 {
-  sync = val;
-  SetCurrentDirectory (val ? win32 : windows_system_directory);
+  if (!wincap.can_open_directories ())
+    {
+      sync = val;
+      SetCurrentDirectory (val ? win32 : windows_system_directory);
+    }
 }
 
-/* Get initial cwd.  Should only be called once in a
-   process tree. */
+/* Get initial cwd.  Should only be called once in a process tree. */
 bool
 cwdstuff::get_initial ()
 {
@@ -4209,7 +4244,7 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
 	      /* If a Cygwin application called cygwin_internal(CW_SYNC_WINENV),
 	         then it's about to call native Windows functions.  This also
 		 sets the keep_in_sync flag so that we actually chdir into the
-		 native directory to avoid confusion. */
+		 native directory on 9x to avoid confusion. */
 	      if (!SetCurrentDirectory (win32_cwd))
 	        {
 		  __seterrno ();
@@ -4218,13 +4253,20 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
 	    }
 	  else
 	    {
-	      /* Check if we *could* chdir, if we actually would.
-	      
-		 Why don't we actually chdir?  For two reasons:
+	      /* We don't actually chdir on 9x but stay in the system dir.
+
+		 On NT we utilize the user parameter block.  The directory is
+		 stored manually, but the handle to the directory is always
+		 closed and set to NULL.  This way the directory isn't blocked
+		 even if it's the cwd of a Cygwin process.
+
+		 Why the hassle?
+
 		 - A process has always an open handle to the current working
 		   directory which disallows manipulating this directory.
-		   POSIX allows to remove a directory if the permissions are
-		   ok.  The fact that its the cwd of some process doesn't matter.
+		   POSIX allows to remove a directory if the permissions are ok.
+		   The fact that its the cwd of some process doesn't matter.
+
 		 - SetCurrentDirectory fails for directories with strict
 		   permissions even for processes with the SE_BACKUP_NAME
 		   privilege enabled.  The reason is apparently that
@@ -4243,7 +4285,7 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
 		}
 	      if (wincap.can_open_directories ())
 		{
-		  HANDLE h = CreateFile (win32_cwd, GENERIC_READ,
+		  HANDLE h = CreateFile (win32_cwd, FILE_TRAVERSE,
 		  			 wincap.shared (), NULL, OPEN_EXISTING,
 					 FILE_FLAG_BACKUP_SEMANTICS, NULL);
 		  if (h == INVALID_HANDLE_VALUE)
@@ -4251,6 +4293,23 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
 		      __seterrno ();
 		      goto out;
 		    }
+		  ULONG len = strlen (win32_cwd);
+		  ANSI_STRING as = {len, len + 2, (PCHAR) alloca (len + 2)};
+		  strcpy (as.Buffer, win32_cwd);
+		  if (as.Buffer[len - 1] != '\\')
+		    {
+		      strcpy (as.Buffer + len, "\\");
+		      ++as.Length;
+		    }
+		  if (current_codepage == ansi_cp)
+		    RtlAnsiStringToUnicodeString (
+				&get_user_proc_parms ()->CurrentDirectoryName,
+				&as, FALSE);
+		  else
+		    RtlOemStringToUnicodeString (
+				&get_user_proc_parms ()->CurrentDirectoryName,
+				&as, FALSE);
+		  close_user_proc_parms_cwd_handle ();
 		  CloseHandle (h);
 		}
 	    }

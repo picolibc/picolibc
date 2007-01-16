@@ -428,7 +428,48 @@ typedef struct _KERNEL_USER_TIMES
   LARGE_INTEGER UserTime;
 } KERNEL_USER_TIMES, *PKERNEL_USER_TIMES;
 
-typedef void *PPEB;
+typedef struct _RTL_USER_PROCESS_PARAMETERS
+{
+  ULONG AllocationSize;
+  ULONG Size;
+  ULONG Flags;
+  ULONG DebugFlags;
+  HANDLE hConsole;
+  ULONG ProcessGroup;
+  HANDLE hStdInput;
+  HANDLE hStdOutput;
+  HANDLE hStdError;
+  UNICODE_STRING CurrentDirectoryName;
+  HANDLE CurrentDirectoryHandle;
+  UNICODE_STRING DllPath;
+  UNICODE_STRING ImagePathName;
+  UNICODE_STRING CommandLine;
+  PWSTR Environment;
+  ULONG dwX;
+  ULONG dwY;
+  ULONG dwXSize;
+  ULONG dwYSize;
+  ULONG dwXCountChars;
+  ULONG dwYCountChars;
+  ULONG dwFillAttribute;
+  ULONG dwFlags;
+  ULONG wShowWindow;
+  UNICODE_STRING WindowTitle;
+  UNICODE_STRING DesktopInfo;
+  UNICODE_STRING ShellInfo;
+  UNICODE_STRING RuntimeInfo;
+} RTL_USER_PROCESS_PARAMETERS, *PRTL_USER_PROCESS_PARAMETERS;
+
+typedef struct _PEB
+{
+  BYTE Reserved1[2];
+  BYTE BeingDebugged;
+  BYTE Reserved2[9];
+  PVOID LoaderData;
+  PRTL_USER_PROCESS_PARAMETERS ProcessParameters;
+  BYTE Reserved3[448];
+  ULONG SessionId;
+} PEB, *PPEB;
 
 typedef struct _PROCESS_BASIC_INFORMATION
 {
@@ -669,7 +710,11 @@ extern "C"
 				      PSECURITY_DESCRIPTOR);
   NTSTATUS NTAPI NtUnlockVirtualMemory (HANDLE, PVOID *, ULONG *, ULONG);
   NTSTATUS NTAPI NtUnmapViewOfSection (HANDLE, PVOID);
+  NTSTATUS NTAPI RtlAnsiStringToUnicodeString (PUNICODE_STRING, PANSI_STRING,
+					       BOOLEAN);
   VOID NTAPI RtlInitUnicodeString (PUNICODE_STRING, PCWSTR);
   ULONG NTAPI RtlIsDosDeviceName_U (PCWSTR);
   ULONG NTAPI RtlNtStatusToDosError (NTSTATUS);
+  NTSTATUS NTAPI RtlOemStringToUnicodeString (PUNICODE_STRING, POEM_STRING,
+					       BOOLEAN);
 }
