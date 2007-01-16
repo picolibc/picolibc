@@ -1,5 +1,17 @@
 2007-01-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::ioctl): Handle SIOCGIFINDEX.
+	* net.cc (get_2k_ifconf): Ditto.
+	(get_nt_ifconf): Fake SIOCGIFINDEX.
+	(get_95_ifconf): Ditto.
+	(get_ifconf): Handle SIOCGIFINDEX.  Fake it for loopback on systems
+	not supporting IP Helper Lib.
+	* include/asm/socket.h (SIOCGIFINDEX): Define.
+	* include/cygwin/if.h (struct ifreq): Add member for interface index.
+	(ifr_ifindex): Define.
+
+2007-01-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/in6.h (struct ipv6_mreq): Change type of interface
 	member to uint32_t.
 	(struct in6_pktinfo): Ditto.

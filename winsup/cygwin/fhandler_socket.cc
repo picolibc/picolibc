@@ -1419,6 +1419,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
     case SIOCGIFHWADDR:
     case SIOCGIFMETRIC:
     case SIOCGIFMTU:
+    case SIOCGIFINDEX:
       {
 	ifc.ifc_len = 2048;
 	ifc.ifc_buf = (char *) alloca (2048);
@@ -1468,6 +1469,9 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 		    break;
 		  case SIOCGIFMTU:
 		    ifr->ifr_mtu = ifrp->ifr_mtu;
+		    break;
+		  case SIOCGIFINDEX:
+		    ifr->ifr_ifindex = ifrp->ifr_ifindex;
 		    break;
 		  }
 		break;

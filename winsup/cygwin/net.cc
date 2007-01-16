@@ -1299,6 +1299,9 @@ get_2k_ifconf (struct ifconf *ifc, int what)
 	      case SIOCGIFMTU:
 		ifr->ifr_mtu = ifrow->dwMtu;
 		break;
+	      case SIOCGIFINDEX:
+		ifr->ifr_ifindex = ifrow->dwIndex;
+		break;
 	    }
 	  ++cnt;
 	  if ((caddr_t)++ ifr >
@@ -1461,6 +1464,9 @@ get_nt_ifconf (struct ifconf *ifc, int what)
 			  case SIOCGIFMTU:
 			    ifr->ifr_mtu = 1500;
 			    break;
+			  case SIOCGIFINDEX:
+			    ifr->ifr_ifindex = -1;
+			    break;
 			}
 		    }
 		  else
@@ -1502,6 +1508,9 @@ get_nt_ifconf (struct ifconf *ifc, int what)
 			    break;
 			  case SIOCGIFMTU:
 			    ifr->ifr_mtu = 1500;
+			    break;
+			  case SIOCGIFINDEX:
+			    ifr->ifr_ifindex = -1;
 			    break;
 			}
 		    }
@@ -1638,6 +1647,9 @@ get_95_ifconf (struct ifconf *ifc, int what)
 	      case SIOCGIFMTU:
 		ifr->ifr_mtu = 1500;
 		break;
+	      case SIOCGIFINDEX:
+		ifr->ifr_ifindex = -1;
+		break;
 	    }
 	}
 
@@ -1746,6 +1758,9 @@ get_ifconf (struct ifconf *ifc, int what)
 	  case SIOCGIFMTU:
 	    /* Default value for MS TCP Loopback interface. */
 	    ifr->ifr_mtu = 1520;
+	    break;
+	  case SIOCGIFINDEX:
+	    ifr->ifr_ifindex = -1;
 	    break;
 	  default:
 	    set_errno (EINVAL);

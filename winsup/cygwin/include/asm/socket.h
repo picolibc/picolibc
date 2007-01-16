@@ -1,6 +1,6 @@
 /* asm/socket.h
 
-   Copyright 1996, 1997, 1998, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2001, 2005, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -41,6 +41,7 @@ details. */
 #define SIOCGIFHWADDR   _IOW('s', 105, struct ifreq) /* Get hw addr */
 #define SIOCGIFMETRIC   _IOW('s', 106, struct ifreq) /* get metric */
 #define SIOCGIFMTU      _IOW('s', 107, struct ifreq) /* get MTU size */
+#define SIOCGIFINDEX    _IOW('s', 108, struct ifreq) /* get if index */
 
 #define SOL_SOCKET      0xffff          /* options for socket level */
 

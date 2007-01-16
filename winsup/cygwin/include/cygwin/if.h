@@ -1,6 +1,6 @@
 /* cygwin/if.h
 
-   Copyright 1996, 2001 Red Hat, Inc.
+   Copyright 1996, 2001, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -51,6 +51,7 @@ struct ifreq
 		short   ifru_flags;
 		int     ifru_metric;
 		int     ifru_mtu;
+		int	ifru_ifindex;
 	} ifr_ifru;
 };
 
@@ -62,7 +63,7 @@ struct ifreq
 #define ifr_hwaddr      ifr_ifru.ifru_hwaddr    /* MAC address          */
 #define ifr_metric      ifr_ifru.ifru_metric    /* metric               */
 #define ifr_mtu         ifr_ifru.ifru_mtu       /* mtu                  */
-
+#define ifr_ifindex     ifr_ifru.ifru_ifindex   /* interface index      */
 
 /*
  * Structure used in SIOCGIFCONF request.
