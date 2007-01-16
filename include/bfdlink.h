@@ -340,6 +340,13 @@ struct bfd_link_info
      caching ELF symbol buffer.  */
   unsigned int reduce_memory_overheads: 1;
 
+  /* TRUE if all data symbols should be dynamic.  */
+   unsigned int dynamic_data: 1;
+
+  /* TRUE if some symbols have to be dynamic, controlled by
+     --dynamic-list command line options.  */
+  unsigned int dynamic: 1;
+
   /* What to do with unresolved symbols in an object file.
      When producing executables the default is GENERATE_ERROR.
      When producing shared libraries the default is IGNORE.  The
@@ -440,7 +447,7 @@ struct bfd_link_info
   bfd_vma relro_start, relro_end;
 
   /* List of symbols should be dynamic.  */
-  struct bfd_elf_dynamic_list *dynamic;
+  struct bfd_elf_dynamic_list *dynamic_list;
 };
 
 /* This structures holds a set of callback functions.  These are
