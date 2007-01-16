@@ -1,6 +1,6 @@
 /* cygwin/in6.h
 
-   Copyright 2006 Red Hat, Inc.
+   Copyright 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -88,13 +88,13 @@ struct in6_addr
 struct ipv6_mreq
 {
   struct in6_addr ipv6mr_multiaddr;
-  unsigned int    ipv6mr_interface;
+  uint32_t        ipv6mr_interface;
 };
 
 struct in6_pktinfo
 {
   struct in6_addr ipi6_addr;
-  unsigned int    ipi6_ifindex;
+  uint32_t        ipi6_ifindex;
 };
 
 #if defined (__INSIDE_CYGWIN__) && !defined (_CYGWIN_IN_H)
