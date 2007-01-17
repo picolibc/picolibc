@@ -1,6 +1,6 @@
 /* autoload.cc: all dynamic load stuff.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -495,6 +495,7 @@ LoadDLLfunc (WSASetLastError, 4, ws2_32)
 LoadDLLfunc (WSAWaitForMultipleEvents, 20, ws2_32)
 
 // 50 = ERROR_NOT_SUPPORTED.  Returned if OS doesn't supprot iphlpapi funcs
+LoadDLLfuncEx2 (GetAdaptersAddresses, 20, iphlpapi, 1, 50)
 LoadDLLfuncEx2 (GetIfEntry, 4, iphlpapi, 1, 50)
 LoadDLLfuncEx2 (GetIpAddrTable, 12, iphlpapi, 1, 50)
 LoadDLLfuncEx2 (GetNetworkParams, 8, iphlpapi, 1, 50)

@@ -1,7 +1,7 @@
 /* path.h: path data structures
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006 Red Hat, Inc.
+   2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -14,6 +14,13 @@ details. */
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <ntdef.h>
+
+#define isproc_dev(devn) \
+  (devn == FH_PROC || devn == FH_REGISTRY || devn == FH_PROCESS || \
+   devn == FH_PROCNET)
+
+#define isvirtual_dev(devn) \
+  (isproc_dev (devn) || devn == FH_CYGDRIVE || devn == FH_NETDRIVE)
 
 extern PUNICODE_STRING get_nt_native_path (const char *, UNICODE_STRING &);
 

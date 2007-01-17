@@ -1,6 +1,6 @@
 /* wincap.h: Header for OS capability class.
 
-   Copyright 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -73,6 +73,8 @@ struct wincaps
   unsigned needs_logon_sid_in_sid_list			: 1;
   unsigned needs_count_in_si_lpres2			: 1;
   unsigned has_recycle_dot_bin				: 1;
+  unsigned has_gaa_prefixes				: 1;
+  unsigned has_gaa_on_link_prefix			: 1;
 };
 
 class wincapc
@@ -152,6 +154,8 @@ public:
   bool	IMPLEMENT (needs_logon_sid_in_sid_list)
   bool	IMPLEMENT (needs_count_in_si_lpres2)
   bool	IMPLEMENT (has_recycle_dot_bin)
+  bool	IMPLEMENT (has_gaa_prefixes)
+  bool	IMPLEMENT (has_gaa_on_link_prefix)
 
 #undef IMPLEMENT
 };

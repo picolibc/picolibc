@@ -1,6 +1,6 @@
 /* dir.cc: Posix directory-related routines
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2006 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -133,7 +133,7 @@ readdir_worker (DIR *dir, dirent *de)
 	      const char *w32name = ((fhandler_base *) dir->__fh)->get_win32_name ();
 	      DWORD devn = ((fhandler_base *) dir->__fh)->get_device ();
 	      /* Paths below /proc don't have a Win32 pendant. */
-	      if (devn == FH_PROC || devn == FH_PROCESS || devn == FH_REGISTRY)
+	      if (isproc_dev (devn))
 		de->d_ino = hash_path_name (de->d_ino, "/");
 	      /* A drive's root dir has a trailing backslash already. */
 	      else if (w32name[1] != ':' || w32name[2] != '\\' || w32name[3])

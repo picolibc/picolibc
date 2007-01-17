@@ -51,6 +51,7 @@ enum fh_devices
 
   FH_NETDRIVE= FHDEV (0, 246),
   FH_DEV     = FHDEV (0, 245),
+  FH_PROCNET = FHDEV (0, 244),
 
   DEV_FLOPPY_MAJOR = 2,
   FH_FLOPPY  = FHDEV (DEV_FLOPPY_MAJOR, 0),

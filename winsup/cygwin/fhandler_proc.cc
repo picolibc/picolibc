@@ -1,6 +1,6 @@
 /* fhandler_proc.cc: fhandler for /proc virtual filesystem
 
-   Copyright 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -44,6 +44,7 @@ static const int PROC_PARTITIONS =  9;   // /proc/partitions
 static const int PROC_SELF       = 10;   // /proc/self
 static const int PROC_REGISTRY32 = 11;   // /proc/registry32
 static const int PROC_REGISTRY64 = 12;   // /proc/registry64
+static const int PROC_NET        = 13;   // /proc/net
 
 /* names of objects in /proc */
 static const char *proc_listing[] = {
@@ -60,6 +61,7 @@ static const char *proc_listing[] = {
   "self",
   "registry32",
   "registry64",
+  "net",
   NULL
 };
 
@@ -82,6 +84,7 @@ static const DWORD proc_fhandlers[PROC_LINK_COUNT] = {
   FH_PROC,
   FH_REGISTRY,
   FH_REGISTRY,
+  FH_PROCNET,
 };
 
 /* name of the /proc filesystem */

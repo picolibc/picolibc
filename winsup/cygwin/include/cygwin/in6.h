@@ -13,6 +13,8 @@ details. */
 #ifndef _CYGWIN_IN6_H
 #define _CYGWIN_IN6_H
 
+#include <asm/byteorder.h>
+
 #define INET6_ADDRSTRLEN 46
 
 #define IN6_ARE_ADDR_EQUAL(a, b) \

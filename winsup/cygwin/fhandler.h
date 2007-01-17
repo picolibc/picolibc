@@ -1308,6 +1308,19 @@ class fhandler_process: public fhandler_proc
   bool fill_filebuf ();
 };
 
+class fhandler_procnet: public fhandler_proc
+{
+  pid_t pid;
+ public:
+  fhandler_procnet ();
+  int exists();
+  DIR *opendir ();
+  int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
+  int open (int flags, mode_t mode = 0);
+  int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
+  bool fill_filebuf ();
+};
+
 struct fhandler_nodevice: public fhandler_base
 {
   fhandler_nodevice ();

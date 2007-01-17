@@ -1,7 +1,7 @@
 /* wincap.cc -- figure out on which OS we're running. Set the
 		capability class to the appropriate values.
 
-   Copyright 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -72,6 +72,8 @@ static NO_COPY wincaps wincap_unknown = {
   needs_logon_sid_in_sid_list:false,
   needs_count_in_si_lpres2:false,
   has_recycle_dot_bin:false,
+  has_gaa_prefixes:false,
+  has_gaa_on_link_prefix:false,
 };
 
 static NO_COPY wincaps wincap_95 = {
@@ -135,6 +137,8 @@ static NO_COPY wincaps wincap_95 = {
   needs_logon_sid_in_sid_list:false,
   needs_count_in_si_lpres2:false,
   has_recycle_dot_bin:false,
+  has_gaa_prefixes:false,
+  has_gaa_on_link_prefix:false,
 };
 
 static NO_COPY wincaps wincap_95osr2 = {
@@ -198,6 +202,8 @@ static NO_COPY wincaps wincap_95osr2 = {
   needs_logon_sid_in_sid_list:false,
   needs_count_in_si_lpres2:false,
   has_recycle_dot_bin:false,
+  has_gaa_prefixes:false,
+  has_gaa_on_link_prefix:false,
 };
 
 static NO_COPY wincaps wincap_98 = {
@@ -261,6 +267,8 @@ static NO_COPY wincaps wincap_98 = {
   needs_logon_sid_in_sid_list:false,
   needs_count_in_si_lpres2:false,
   has_recycle_dot_bin:false,
+  has_gaa_prefixes:false,
+  has_gaa_on_link_prefix:false,
 };
 
 static NO_COPY wincaps wincap_98se = {
@@ -324,6 +332,8 @@ static NO_COPY wincaps wincap_98se = {
   needs_logon_sid_in_sid_list:false,
   needs_count_in_si_lpres2:false,
   has_recycle_dot_bin:false,
+  has_gaa_prefixes:false,
+  has_gaa_on_link_prefix:false,
 };
 
 static NO_COPY wincaps wincap_me = {
@@ -387,6 +397,8 @@ static NO_COPY wincaps wincap_me = {
   needs_logon_sid_in_sid_list:false,
   needs_count_in_si_lpres2:false,
   has_recycle_dot_bin:false,
+  has_gaa_prefixes:false,
+  has_gaa_on_link_prefix:false,
 };
 
 static NO_COPY wincaps wincap_nt3 = {
@@ -450,6 +462,8 @@ static NO_COPY wincaps wincap_nt3 = {
   needs_logon_sid_in_sid_list:true,
   needs_count_in_si_lpres2:false,
   has_recycle_dot_bin:false,
+  has_gaa_prefixes:false,
+  has_gaa_on_link_prefix:false,
 };
 
 static NO_COPY wincaps wincap_nt4 = {
@@ -513,6 +527,8 @@ static NO_COPY wincaps wincap_nt4 = {
   needs_logon_sid_in_sid_list:true,
   needs_count_in_si_lpres2:false,
   has_recycle_dot_bin:false,
+  has_gaa_prefixes:false,
+  has_gaa_on_link_prefix:false,
 };
 
 static NO_COPY wincaps wincap_nt4sp4 = {
@@ -576,6 +592,8 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   needs_logon_sid_in_sid_list:true,
   needs_count_in_si_lpres2:false,
   has_recycle_dot_bin:false,
+  has_gaa_prefixes:false,
+  has_gaa_on_link_prefix:false,
 };
 
 static NO_COPY wincaps wincap_2000 = {
@@ -639,6 +657,8 @@ static NO_COPY wincaps wincap_2000 = {
   needs_logon_sid_in_sid_list:true,
   needs_count_in_si_lpres2:false,
   has_recycle_dot_bin:false,
+  has_gaa_prefixes:false,
+  has_gaa_on_link_prefix:false,
 };
 
 static NO_COPY wincaps wincap_xp = {
@@ -702,6 +722,8 @@ static NO_COPY wincaps wincap_xp = {
   needs_logon_sid_in_sid_list:false,
   needs_count_in_si_lpres2:false,
   has_recycle_dot_bin:false,
+  has_gaa_prefixes:false,
+  has_gaa_on_link_prefix:false,
 };
 
 static NO_COPY wincaps wincap_2003 = {
@@ -765,6 +787,8 @@ static NO_COPY wincaps wincap_2003 = {
   needs_logon_sid_in_sid_list:false,
   needs_count_in_si_lpres2:false,
   has_recycle_dot_bin:false,
+  has_gaa_prefixes:true,
+  has_gaa_on_link_prefix:false,
 };
 
 static NO_COPY wincaps wincap_vista = {
@@ -773,7 +797,7 @@ static NO_COPY wincaps wincap_vista = {
   heapslop:0x4,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
   is_winnt:true,
-  is_server:true,
+  is_server:false,
   access_denied_on_delete:false,
   has_delete_on_close:true,
   has_page_guard:true,
@@ -828,6 +852,8 @@ static NO_COPY wincaps wincap_vista = {
   needs_logon_sid_in_sid_list:false,
   needs_count_in_si_lpres2:true,
   has_recycle_dot_bin:true,
+  has_gaa_prefixes:true,
+  has_gaa_on_link_prefix:true,
 };
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));
@@ -877,6 +903,8 @@ wincapc::init ()
 
 		  case 1:
 		    caps = &wincap_xp;
+		    if (strcmp (version.szCSDVersion, "Service Pack 1") >= 0)
+		      ((wincaps *)this->caps)->has_gaa_prefixes = true;
 		    break;
 
 		  default:

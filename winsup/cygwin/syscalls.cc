@@ -343,8 +343,8 @@ unlink (const char *ourname)
       goto done;
     }
 
-  if ((devn = win32_name.get_devn ()) == FH_PROC || devn == FH_REGISTRY
-      || devn == FH_PROCESS)
+  devn = win32_name.get_devn ();
+  if (isproc_dev (devn))
     {
       set_errno (EROFS);
       goto done;

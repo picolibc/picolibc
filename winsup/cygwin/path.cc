@@ -1,6 +1,7 @@
 /* path.cc: path support.
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+   2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -158,10 +159,6 @@ struct win_shortcut_hdr
 
 #define isproc(path) \
   (path_prefix_p (proc, (path), proc_len))
-
-#define isvirtual_dev(devn) \
-  (devn == FH_CYGDRIVE || devn == FH_PROC || devn == FH_REGISTRY \
-   || devn == FH_PROCESS || devn == FH_NETDRIVE )
 
 /* Return non-zero if PATH1 is a prefix of PATH2.
    Both are assumed to be of the same path style and / vs \ usage.

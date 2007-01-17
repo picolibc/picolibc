@@ -1,7 +1,7 @@
 /* dtable.cc: file descriptor support.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006 Red Hat, Inc.
+   2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -460,6 +460,9 @@ build_fh_pc (path_conv& pc)
 	  break;
 	case FH_PROCESS:
 	  fh = cnew (fhandler_process) ();
+	  break;
+	case FH_PROCNET:
+	  fh = cnew (fhandler_procnet) ();
 	  break;
 	case FH_NETDRIVE:
 	  fh = cnew (fhandler_netdrive) ();
