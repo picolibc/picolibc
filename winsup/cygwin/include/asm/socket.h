@@ -42,6 +42,7 @@ details. */
 #define SIOCGIFMETRIC   _IOW('s', 106, struct ifreq) /* get metric */
 #define SIOCGIFMTU      _IOW('s', 107, struct ifreq) /* get MTU size */
 #define SIOCGIFINDEX    _IOW('s', 108, struct ifreq) /* get if index */
+#define SIOGIFINDEX SIOCGIFINDEX /* backward compatibility w/ Linux typo. */
 
 #define SOL_SOCKET      0xffff          /* options for socket level */
 
