@@ -328,7 +328,10 @@ MapView9x (HANDLE h, void *addr, size_t len, DWORD openflags,
 
   /* Try mapping using the given address first, even if it's NULL.
      If it failed, and addr was not NULL and flags is not MAP_FIXED,
-     try again with NULL address. */
+     try again with NULL address.
+     
+     Note: Retrying the mapping might be unnecessary, now that mmap64 checks
+	   for a valid memory area first. */
   if (!addr)
     base = MapViewOfFile (h, access, high, low, len);
   else
@@ -357,7 +360,10 @@ MapViewNT (HANDLE h, void *addr, size_t len, DWORD openflags,
 
   /* Try mapping using the given address first, even if it's NULL.
      If it failed, and addr was not NULL and flags is not MAP_FIXED,
-     try again with NULL address. */
+     try again with NULL address.
+     
+     Note: Retrying the mapping might be unnecessary, now that mmap64 checks
+	   for a valid memory area first. */
   ret = NtMapViewOfSection (h, GetCurrentProcess (), &base, 0, commitsize,
 			    &offset, &viewsize, ViewShare, alloc_type, protect);
   if (!NT_SUCCESS (ret) && addr && !fixed (flags))
@@ -1205,18 +1211,27 @@ go_ahead:
 	 subsequent real mappings.  This ensures that we have enough space
 	 for the whole thing. */
       orig_len = roundup2 (orig_len, pagesize);
-      addr = VirtualAlloc (addr, orig_len, MEM_TOP_DOWN | MEM_RESERVE,
-      			   PAGE_READWRITE);
-      if (!addr)
+      PVOID newaddr = VirtualAlloc (addr, orig_len, MEM_TOP_DOWN | MEM_RESERVE,
+				    PAGE_READWRITE);
+      if (!newaddr)
+        {
+	  /* If addr is not NULL, but MAP_FIXED isn't given, allow the OS
+	     to choose. */
+	  if (addr && !fixed (flags))
+	    newaddr = VirtualAlloc (NULL, orig_len, MEM_TOP_DOWN | MEM_RESERVE,
+				    PAGE_READWRITE);
+	  if (!newaddr)
+	    {
+	      __seterrno ();
+	      goto out;
+	    }
+	}
+      if (!VirtualFree (newaddr, 0, MEM_RELEASE))
         {
 	  __seterrno ();
 	  goto out;
 	}
-      if (!VirtualFree (addr, 0, MEM_RELEASE))
-        {
-	  __seterrno ();
-	  goto out;
-	}
+      addr = newaddr;
     }
 
   base = mmap_worker (fh, (caddr_t) addr, len, prot, flags, fd, off);
