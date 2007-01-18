@@ -34,6 +34,9 @@ details. */
 #define GAA_FLAG_INCLUDE_ALL_INTERFACES 0x0100
 #endif
 
+extern "C" unsigned long int htonl (unsigned long int);
+extern "C" unsigned short ntohs (unsigned short);
+
 static const int PROCNET_IFINET6 = 2;
 
 static const char * const process_listing[] =
