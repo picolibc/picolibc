@@ -1,5 +1,10 @@
 2007-01-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* spawn.cc (spawn_guts): Don't set cwd for non-Cygwin child processes
+	on NT to allow starting them in virtual directories.
+
+2007-01-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mmap.cc (list::hash): Fix type to __ino64_t.
 	(list::get_hash): Ditto.
 	(list::set): Add struct stat parameter.  Use that instead of calling
