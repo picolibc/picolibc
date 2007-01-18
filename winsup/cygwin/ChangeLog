@@ -1,3 +1,8 @@
+2007-01-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (list::hash): Fix type to __ino64_t.
+	(list::get_hash): Ditto.
+
 2007-01-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (MapView9x): Note possible uselessness of retrying.

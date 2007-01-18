@@ -510,11 +510,11 @@ class list
     mmap_record *recs;
     int nrecs, maxrecs;
     int fd;
-    DWORD hash;
+    __ino64_t hash;
 
   public:
     int get_fd () const { return fd; }
-    DWORD get_hash () const { return hash; }
+    __ino64_t get_hash () const { return hash; }
     mmap_record *get_record (int i) { return i >= nrecs ? NULL : recs + i; }
 
     bool anonymous () const { return fd == -1; }
