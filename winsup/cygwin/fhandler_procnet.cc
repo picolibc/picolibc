@@ -22,7 +22,8 @@ details. */
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
 #include <iphlpapi.h>
-#include "cygwin/in6.h"
+#include <asm/byteorder.h>
+#include <cygwin/in6.h>
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
@@ -33,9 +34,6 @@ details. */
 #ifndef GAA_FLAG_INCLUDE_ALL_INTERFACES
 #define GAA_FLAG_INCLUDE_ALL_INTERFACES 0x0100
 #endif
-
-extern "C" unsigned long int htonl (unsigned long int);
-extern "C" unsigned short ntohs (unsigned short);
 
 static const int PROCNET_IFINET6 = 2;
 
