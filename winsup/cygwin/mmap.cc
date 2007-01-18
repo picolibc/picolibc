@@ -510,15 +510,15 @@ class list
     mmap_record *recs;
     int nrecs, maxrecs;
     int fd;
-    DWORD hash;
+    __ino64_t hash;
 
   public:
     int get_fd () const { return fd; }
-    DWORD get_hash () const { return hash; }
+    __ino64_t get_hash () const { return hash; }
     mmap_record *get_record (int i) { return i >= nrecs ? NULL : recs + i; }
 
     bool anonymous () const { return fd == -1; }
-    void set (int nfd);
+    void set (int nfd, struct __stat64 *st);
     mmap_record *add_record (mmap_record r);
     bool del_record (int i);
     void free_recs () { if (recs) cfree (recs); }
@@ -536,8 +536,8 @@ class map
 
   public:
     list *get_list (unsigned i) { return i >= nlists ? NULL : lists + i; }
-    list *get_list_by_fd (int fd);
-    list *add_list (int fd);
+    list *get_list_by_fd (int fd, struct __stat64 *st);
+    list *add_list (int fd, struct __stat64 *st);
     void del_list (unsigned i);
 };
 
@@ -784,7 +784,7 @@ list::search_record (caddr_t addr, DWORD len, caddr_t &m_addr, DWORD &m_len,
 }
 
 void
-list::set (int nfd)
+list::set (int nfd, struct __stat64 *st)
 {
   fd = nfd;
   if (!anonymous ())
@@ -792,9 +792,7 @@ list::set (int nfd)
       /* The fd isn't sufficient since it could already be the fd of another
 	 file.  So we use the inode number as evaluated by fstat to identify
 	 the file. */
-      struct stat st;
-      fstat (nfd, &st);
-      hash = st.st_ino;
+      hash = st ? st->st_ino : (__ino64_t) 0;
     }
   nrecs = maxrecs = 0;
   recs = NULL;
@@ -862,7 +860,7 @@ list::try_map (void *addr, size_t len, int flags, _off64_t off)
 }
 
 list *
-map::get_list_by_fd (int fd)
+map::get_list_by_fd (int fd, struct __stat64 *st)
 {
   unsigned i;
   for (i = 0; i < nlists; i++)
@@ -872,15 +870,14 @@ map::get_list_by_fd (int fd)
       /* The fd isn't sufficient since it could already be the fd of another
 	 file.  So we use the inode number as evaluated by fstat to identify
 	 the file. */
-      struct stat st;
-      if (fd != -1 && !fstat (fd, &st) && lists[i].get_hash () == st.st_ino)
+      if (fd != -1 && st && lists[i].get_hash () == st->st_ino)
 	return lists + i;
     }
   return 0;
 }
 
 list *
-map::add_list (int fd)
+map::add_list (int fd, struct __stat64 *st)
 {
   if (nlists == maxlists)
     {
@@ -894,7 +891,7 @@ map::add_list (int fd)
       maxlists += 5;
       lists = new_lists;
     }
-  lists[nlists].set (fd);
+  lists[nlists].set (fd, st);
   return lists + nlists++;
 }
 
@@ -931,7 +928,7 @@ map::del_list (unsigned i)
 mmap_region_status
 mmap_is_attached_or_noreserve (void *addr, size_t len)
 {
-  list *map_list = mmapped_areas.get_list_by_fd (-1);
+  list *map_list = mmapped_areas.get_list_by_fd (-1, NULL);
 
   size_t pagesize = getpagesize ();
   caddr_t start_addr = (caddr_t) rounddown ((uintptr_t) addr, pagesize);
@@ -972,15 +969,15 @@ mmap_is_attached_or_noreserve (void *addr, size_t len)
 }
 
 static caddr_t
-mmap_worker (fhandler_base *fh, caddr_t base, size_t len, int prot, int flags,
-	     int fd, _off64_t off)
+mmap_worker (list *map_list, fhandler_base *fh, caddr_t base, size_t len,
+	     int prot, int flags, int fd, _off64_t off, struct __stat64 *st)
 {
-  list *map_list;
   HANDLE h = fh->mmap (&base, len, prot, flags, off);
   if (h == INVALID_HANDLE_VALUE)
     return NULL;
-  if (!(map_list = mmapped_areas.get_list_by_fd (fd))
-      && !(map_list = mmapped_areas.add_list (fd)))
+  if (!map_list
+      && !(map_list = mmapped_areas.get_list_by_fd (fd, st))
+      && !(map_list = mmapped_areas.add_list (fd, st)))
     {
       fh->munmap (h, base, len);
       return NULL;
@@ -1006,6 +1003,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
   list *map_list = NULL;
   size_t orig_len = 0;
   caddr_t base = NULL;
+  struct __stat64 st;
 
   DWORD pagesize = getpagesize ();
   DWORD checkpagesize;
@@ -1130,9 +1128,12 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 	    }
 	}
 
-      DWORD high;
-      DWORD low = GetFileSize (fh->get_handle (), &high);
-      _off64_t fsiz = ((_off64_t)high << 32) + low;
+      if (fh->fstat (&st))
+        {
+	  __seterrno ();
+	  goto out;
+	}
+      _off64_t fsiz = st.st_size;
 
       /* Don't allow file mappings beginning beyond EOF since Windows can't
 	 handle that POSIX like, unless MAP_AUTOGROW flag is set, which
@@ -1200,7 +1201,7 @@ go_ahead:
   if (noreserve (flags) && (!anonymous (flags) || !priv (flags)))
     flags &= ~MAP_NORESERVE;
 
-  map_list = mmapped_areas.get_list_by_fd (fd);
+  map_list = mmapped_areas.get_list_by_fd (fd, &st);
 
   /* Test if an existing anonymous mapping can be recycled. */
   if (map_list && anonymous (flags))
@@ -1254,7 +1255,8 @@ go_ahead:
       addr = newaddr;
     }
 
-  base = mmap_worker (fh, (caddr_t) addr, len, prot, flags, fd, off);
+  base = mmap_worker (map_list, fh, (caddr_t) addr, len, prot, flags, fd, off,
+		      &st);
   if (!base)
     goto out;
 
@@ -1286,8 +1288,8 @@ go_ahead:
 	      prot |= __PROT_FILLER;
 	      flags &= MAP_SHARED | MAP_PRIVATE;
 	      flags |= MAP_ANONYMOUS | MAP_FIXED;
-	      at_base = mmap_worker (&fh_anonymous, at_base, valid_page_len,
-				     prot, flags, -1, 0);
+	      at_base = mmap_worker (NULL, &fh_anonymous, at_base,
+				     valid_page_len, prot, flags, -1, 0, NULL);
 	      if (!at_base)
 		{
 		  fh->munmap (fh->get_handle (), base, len);
@@ -1300,8 +1302,8 @@ go_ahead:
 	    {
 	      prot = PROT_READ | PROT_WRITE | __PROT_ATTACH;
 	      flags = MAP_ANONYMOUS | MAP_NORESERVE | MAP_FIXED;
-	      at_base = mmap_worker (&fh_anonymous, at_base, sigbus_page_len,
-				     prot, flags, -1, 0);
+	      at_base = mmap_worker (NULL, &fh_anonymous, at_base,
+				     sigbus_page_len, prot, flags, -1, 0, NULL);
 	      if (!at_base)
 		debug_printf ("Warning: Mapping beyond EOF failed, %E");
 	    }
