@@ -1,3 +1,7 @@
+2007-01-19  Kazunori Asayama <asayama@sm.sony.co.jp>
+
+	* spu/syscalls.c: Replace vector with __vector.
+
 2007-01-09  Ben Elliston  <bje@au.ibm.com>
 
 	* spu/exit.c (_exit): Finish with an infinite loop to eliminate a

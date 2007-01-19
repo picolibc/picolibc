@@ -29,7 +29,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 */
-#include <spu_intrinsics.h>
 #include "jsre.h"
 
 void
@@ -38,7 +37,7 @@ _send_to_ppe (unsigned int signalcode, unsigned int opcode, void *data)
 
 	unsigned int	combined = ( ( opcode<<24 )&0xff000000 ) | ( ( unsigned int )data & 0x00ffffff );
 
-        vector unsigned int stopfunc = {
+        __vector unsigned int stopfunc = {
                 signalcode,     /* stop */
                 (unsigned int) combined,
                 0x4020007f,     /* nop */
