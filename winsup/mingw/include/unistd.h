@@ -14,9 +14,23 @@
 #include <getopt.h>
 #undef __UNISTD_GETOPT__
 
+/* These are also defined in stdio.h. */
+#ifndef	SEEK_SET
+#define SEEK_SET 0
+#endif
+
+#ifndef	SEEK_CUR
+#define SEEK_CUR 1
+#endif
+
+#ifndef SEEK_END
+#define SEEK_END 2
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 /* This is defined as a real library function to allow autoconf
    to verify its existence. */

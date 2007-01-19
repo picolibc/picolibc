@@ -1,3 +1,12 @@
+2007-01-19  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdio.h (SEEK_SET, SEEK_CUR, SEEK_END): Define
+	unconditionally.  Change comment.
+	* include/unistd.h (SEEK_SET, SEEK_CUR, SEEK_END): Define
+	here too.
+	* include/io.h (rename): Declare.
+	(remove): Declare.
+
 2006-12-31  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	* include/libgen.h: New file; required by...
@@ -22,7 +31,7 @@
 
 2006-11-21  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* Makefile.in:  Add aclocal.m4:to source release.
+	* Makefile.in: Add aclocal.m4 to source release.
 	* mingwex/Makefile.in: Ditto.
 	* profile/Makefile.in: Ditto.
 

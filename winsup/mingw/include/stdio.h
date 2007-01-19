@@ -101,20 +101,11 @@
 #define	BUFSIZ	512
 
 /* Constants for nOrigin indicating the position relative to which fseek
- * sets the file position. Enclosed in ifdefs because io.h could also
- * define them. (Though not anymore since io.h includes this file now.) */
-#ifndef	SEEK_SET
-#define SEEK_SET	(0)
-#endif
-
-#ifndef	SEEK_CUR
-#define	SEEK_CUR	(1)
-#endif
-
-#ifndef	SEEK_END
-#define SEEK_END	(2)
-#endif
-
+ * sets the file position.  Defined unconditionally since ISO and POSIX
+ * say they are defined here.  */
+#define SEEK_SET 0
+#define SEEK_CUR 1
+#define SEEK_END 2
 
 #ifndef	RC_INVOKED
 
