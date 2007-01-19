@@ -31,7 +31,6 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 */
 
 #include <errno.h>
-#include <spu_intrinsics.h>
 
 #define SPE_C99_SIGNALCODE 0x2100
 
@@ -102,7 +101,7 @@ send_to_ppe(int signalcode, int opcode, void *data)
 	unsigned int	combined = ( ( opcode<<24 )&0xff000000 ) | ( ( unsigned int )data & 0x00ffffff );
 	struct spe_reg128* ret = data;
 
-        vector unsigned int stopfunc = {
+        __vector unsigned int stopfunc = {
                 signalcode,     /* stop 0x210x*/
                 (unsigned int) combined,
                 0x4020007f,     /* nop */

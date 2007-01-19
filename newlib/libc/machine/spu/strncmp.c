@@ -106,7 +106,7 @@ int strncmp(const char *s1, const char *s2, size_t n)
 
   mask_v = spu_splats((unsigned int)0xFFFF);
 
-  shift_n_v = spu_andc((vector unsigned int)spu_sub(0, n_v), spu_cmpgt(n_v, -1));
+  shift_n_v = spu_andc((__vector unsigned int)spu_sub(0, n_v), spu_cmpgt(n_v, -1));
   shift_eos_v = spu_sub(32, max_cnt_v);
 
   max_shift_v = spu_sel(shift_n_v, shift_eos_v, spu_cmpgt(shift_eos_v, shift_n_v));

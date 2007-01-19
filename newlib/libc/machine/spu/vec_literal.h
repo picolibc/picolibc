@@ -49,27 +49,22 @@
  * construction when all the elements of the vector contain the same value.
  */
 
-#ifdef __SPU__
-#include <spu_intrinsics.h>
-#endif
-
-
 /* Use curly brace style.
  */
 #define VEC_LITERAL(_type, ...)	((_type){__VA_ARGS__})
 
-#define VEC_SPLAT_U8(_val)	((vector unsigned char){_val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val})
-#define VEC_SPLAT_S8(_val)	((vector signed char){_val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val})
+#define VEC_SPLAT_U8(_val)	((__vector unsigned char){_val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val})
+#define VEC_SPLAT_S8(_val)	((__vector signed char){_val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val, _val})
 
-#define VEC_SPLAT_U16(_val)	((vector unsigned short){_val, _val, _val, _val, _val, _val, _val, _val})
-#define VEC_SPLAT_S16(_val)	((vector signed short){_val, _val, _val, _val, _val, _val, _val, _val})
+#define VEC_SPLAT_U16(_val)	((__vector unsigned short){_val, _val, _val, _val, _val, _val, _val, _val})
+#define VEC_SPLAT_S16(_val)	((__vector signed short){_val, _val, _val, _val, _val, _val, _val, _val})
 
-#define VEC_SPLAT_U32(_val)	((vector unsigned int){_val, _val, _val, _val})
-#define VEC_SPLAT_S32(_val)	((vector signed int){_val, _val, _val, _val})
-#define VEC_SPLAT_F32(_val)	((vector float){_val, _val, _val, _val})
+#define VEC_SPLAT_U32(_val)	((__vector unsigned int){_val, _val, _val, _val})
+#define VEC_SPLAT_S32(_val)	((__vector signed int){_val, _val, _val, _val})
+#define VEC_SPLAT_F32(_val)	((__vector float){_val, _val, _val, _val})
 
-#define VEC_SPLAT_U64(_val)	((vector unsigned long long){_val, _val})
-#define VEC_SPLAT_S64(_val)	((vector signed long long){_val, _val})
-#define VEC_SPLAT_F64(_val)	((vector double){_val, _val})
+#define VEC_SPLAT_U64(_val)	((__vector unsigned long long){_val, _val})
+#define VEC_SPLAT_S64(_val)	((__vector signed long long){_val, _val})
+#define VEC_SPLAT_F64(_val)	((__vector double){_val, _val})
 
 #endif /* _VEC_LITERAL_H_ */

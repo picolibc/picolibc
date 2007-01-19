@@ -1,3 +1,9 @@
+2007-01-19  Kazunori Asayama <asayama@sm.sony.co.jp>
+
+	* libc/machine/spu/c99ppe.h: Replace vector with __vector.
+	* libc/machine/spu/vec_literal.h: Ditto.
+	* libc/machine/spu/strncmp.c: Ditto.
+
 2007-01-15  Joseph Myers  <joseph@codesourcery.com>
 	    Kazu Hirata  <kazu@codesourcery.com>
 
