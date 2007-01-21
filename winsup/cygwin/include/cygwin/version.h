@@ -94,6 +94,9 @@ details. */
 #define CYGWIN_VERSION_CHECK_FOR_USING_WINSOCK1_VALUES \
   (CYGWIN_VERSION_USER_API_VERSION_COMBINED <= 138)
 
+#define CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ \
+  (CYGWIN_VERSION_USER_API_VERSION_COMBINED <= 161)
+
      /* API_MAJOR 0.0: Initial version.  API_MINOR changes:
 	1: Export cygwin32_ calls as cygwin_ as well.
 	2: Export j1, jn, y1, yn.
@@ -296,12 +299,14 @@ details. */
       159: Export posix_openpt.
       160: Export posix_fadvice, posix_fallocate.
       161: Export resolver functions.
+      162: New struct ifreq.  Export if_nametoindex, if_indextoname,
+	   if_nameindex, if_freenameindex.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 161
+#define CYGWIN_VERSION_API_MINOR 162
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

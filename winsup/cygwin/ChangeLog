@@ -1,3 +1,79 @@
+2007-01-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (WSAIoctl): Define.
+	(SendARP): Define.
+	* cygwin.din: Export if_freenameindex, if_indextoname, if_nameindex and
+	if_nametoindex.
+	* fhandler_procnet.cc: Drop including wchar.h.  Drop definitions of
+	GAA_FLAG_INCLUDE_ALL_INTERFACES, IP_ADAPTER_UNICAST_ADDRESS_VISTA.
+	(fhandler_procnet::exists): Check for has_gaa_prefixes.  Call
+	get_adapters_addresses here.
+	(fhandler_procnet::readdir): Ditto.
+	(prefix): Move to net.cc.
+	(fhandler_procnet::fill_filebuf): Call get_adapters_addresses here.
+	Simplify allocation.  Use AdapterName rather than FriendlyName as
+	interface name.  Use IfIndex if available, Ipv6IfIndex otherwise.
+	(in6_are_prefix_equal): Move to net.cc.
+	* fhandler_socket.cc: Define old SIOCGxxx values.
+	(CONV_OLD_TO_NEW_SIO): Convert old SIOCGxxx value to new one.
+	(struct __old_ifreq): Define old struct ifreq.
+	(fhandler_socket::ioctl): Handle old SIOCGxxx values.  Handle new
+	SIOCGIFFRNDLYNAM command.  Simplify copying ifreq data to user space.
+	Call get_ifconf with additional SOCKET parameter.
+	* net.cc (IP_ADAPTER_UNICAST_ADDRESS_LH): Define.
+	(IP_ADAPTER_ADDRESSES_LH): Define.
+	(SIO_GET_INTERFACE_LIST): Define.
+	(sockaddr_in6_old): Define.
+	(sockaddr_gen): Define.
+	(INTERFACE_INFO): Define.
+	(IN_LOOPBACK): Define.
+	(in_are_prefix_equal): New static function.
+	(ip_addr_prefix): New function, replaces prefix function, add AF_INET
+	handling.
+	(GAA_FLAG_INCLUDE_ALL_INTERFACES): Define.
+	(get_adapters_addresses): New function.
+	(WS_IFF_xxx): Define Winsock interface flag values.
+	(convert_ifr_flags): New function to convert Winsock interface flag
+	values to Cygwin interface flag values.
+	(get_xp_ifconf): New get_ifconf implementation for XP SP1 and above.
+	(get_2k_ifconf): Fix interface index.  Fix formatting.
+	(get_nt_ifconf): Fix formatting.
+	(get_95_ifconf): Ditto.
+	(get_ifconf): Take additional SOCKET parameter.  Call get_xp_ifconf
+	on XP SP1 and above.
+	(if_nametoindex): New function.
+	(if_indextoname): New function.
+	(if_nameindex): New function.
+	(if_freenameindex): New function.
+	(in6_are_prefix_equal): Moved here from fhandler_procnet.cc.
+	* wincap.cc (wincap_xp): Define has_gaa_prefixes as true by default.
+	(wincapc::init): Assume has_osversioninfoex by default.  Call
+	GetVersionEx with OSVERSIONINFOEX first.  Call with OSVERSIONINFO only
+	if that fails.  Simplify NT4 case and try to avoid strcmp.  Check XP
+	Service Pack using version.wServicePackMajor to avoid strcmp.
+	* include/asm/socket.h (SIOCGIFFRNDLYNAM): Define.
+	* include/cygwin/if.h: Fix formatting.
+	(IFF_POINTTOPOINT): Define.
+	(IFF_NOARP): Define.
+	(IFF_LOWER_UP): Define.
+	(IFF_DORMANT): Define.
+	(struct if_nameindex): Define.
+	(IFRF_FRIENDLYNAMESIZ): Define.
+	(struct ifreq_frndlyname): Define.
+	(IFNAMSIZ): Redefine as 44.
+	(IF_NAMESIZE): Define.
+	(struct ifreq): Redefine ifru_flags as int.  Define ifru_data.  Pad size
+	to sizeof sockaddr_in6 for further extensions.
+	(ifr_data): Define.
+	(ifr_frndlyname): Define.
+	(if_nametoindex): Declare.
+	(if_indextoname): Declare.
+	(if_nameindex): Declare.
+	(if_freenameindex): Declare.
+	* include/cygwin/version.h: Bump API minor number.
+	(CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ): Define check for old vs. new
+	ifreq structure.
+
 2007-01-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* spawn.cc (spawn_guts): Don't set cwd for non-Cygwin child processes

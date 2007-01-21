@@ -722,7 +722,7 @@ static NO_COPY wincaps wincap_xp = {
   needs_logon_sid_in_sid_list:false,
   needs_count_in_si_lpres2:false,
   has_recycle_dot_bin:false,
-  has_gaa_prefixes:false,
+  has_gaa_prefixes:true,
   has_gaa_on_link_prefix:false,
 };
 
@@ -862,15 +862,21 @@ void
 wincapc::init ()
 {
   const char *os;
-  bool has_osversioninfoex = false;
+  bool has_osversioninfoex = true;
 
   if (caps)
     return;		// already initialized
 
   memset (&version, 0, sizeof version);
-  /* Request simple version info first. */
-  version.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-  GetVersionEx (reinterpret_cast<LPOSVERSIONINFO>(&version));
+  /* Request versionex info first, which is available on all systems since
+     NT4 SP6 anyway.  If that fails, call the simple version. */
+  version.dwOSVersionInfoSize = sizeof (OSVERSIONINFOEX);
+  if (!GetVersionEx (reinterpret_cast<LPOSVERSIONINFO>(&version)))
+    {
+      has_osversioninfoex = false;
+      version.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
+      GetVersionEx (reinterpret_cast<LPOSVERSIONINFO>(&version));
+    }
 
   switch (version.dwPlatformId)
     {
@@ -883,18 +889,14 @@ wincapc::init ()
 	      break;
 	    case 4:
 	      os = "NT";
-	      if (strcmp (version.szCSDVersion, "Service Pack 4") < 0)
+	      if (!has_osversioninfoex
+		  && strcmp (version.szCSDVersion, "Service Pack 4") < 0)
 		caps = &wincap_nt4;
 	      else
-		{
-		  caps = &wincap_nt4sp4;
-		  if (strcmp (version.szCSDVersion, "Service Pack 6") >= 0)
-		    has_osversioninfoex = true;
-		}
+		caps = &wincap_nt4sp4;
 	      break;
 	    case 5:
 	      os = "NT";
-	      has_osversioninfoex = true;
 	      switch (version.dwMinorVersion)
 		{
 		  case 0:
@@ -903,8 +905,8 @@ wincapc::init ()
 
 		  case 1:
 		    caps = &wincap_xp;
-		    if (strcmp (version.szCSDVersion, "Service Pack 1") >= 0)
-		      ((wincaps *)this->caps)->has_gaa_prefixes = true;
+		    if (version.wServicePackMajor < 1)
+		      ((wincaps *)this->caps)->has_gaa_prefixes = false;
 		    break;
 
 		  default:
@@ -913,7 +915,6 @@ wincapc::init ()
 	      break;
 	    case 6:
 	      os = "NT";
-	      has_osversioninfoex = true;
 	      caps = &wincap_vista;
 	      break;
 	    default:
@@ -955,15 +956,8 @@ wincapc::init ()
 	break;
     }
 
-  if (has_osversioninfoex)
-    {
-      /* Request extended version to get server info.
-	 Available since NT4 SP6. */
-      version.dwOSVersionInfoSize = sizeof (OSVERSIONINFOEX);
-      GetVersionEx (reinterpret_cast<LPOSVERSIONINFO>(&version));
-      if (version.wProductType != VER_NT_WORKSTATION)
-	((wincaps *)this->caps)->is_server = true;
-    }
+  if (has_osversioninfoex && version.wProductType != VER_NT_WORKSTATION)
+    ((wincaps *)this->caps)->is_server = true;
 
   BOOL is_wow64_proc = FALSE;
   if (IsWow64Process (GetCurrentProcess (), &is_wow64_proc))

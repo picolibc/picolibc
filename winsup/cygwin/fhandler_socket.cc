@@ -1391,13 +1391,43 @@ fhandler_socket::close ()
   return res;
 }
 
+/* Definitions of old ifreq stuff used prior to Cygwin 1.7.0. */
+#define OLD_SIOCGIFFLAGS    _IOW('s', 101, struct __old_ifreq)
+#define OLD_SIOCGIFADDR     _IOW('s', 102, struct __old_ifreq)
+#define OLD_SIOCGIFBRDADDR  _IOW('s', 103, struct __old_ifreq)
+#define OLD_SIOCGIFNETMASK  _IOW('s', 104, struct __old_ifreq)
+#define OLD_SIOCGIFHWADDR   _IOW('s', 105, struct __old_ifreq)
+#define OLD_SIOCGIFMETRIC   _IOW('s', 106, struct __old_ifreq)
+#define OLD_SIOCGIFMTU      _IOW('s', 107, struct __old_ifreq)
+#define OLD_SIOCGIFINDEX    _IOW('s', 108, struct __old_ifreq)
+
+#define CONV_OLD_TO_NEW_SIO(old) (((old)&0xff00ffff)|(((long)sizeof(struct ifreq)&IOCPARM_MASK)<<16))
+
+struct __old_ifreq {
+#define __OLD_IFNAMSIZ        16
+  union {
+    char    ifrn_name[__OLD_IFNAMSIZ];   /* if name, e.g. "en0" */
+  } ifr_ifrn;
+
+  union {
+    struct  sockaddr ifru_addr;
+    struct  sockaddr ifru_broadaddr;
+    struct  sockaddr ifru_netmask;
+    struct  sockaddr ifru_hwaddr;
+    short   ifru_flags;
+    int     ifru_metric;
+    int     ifru_mtu;
+    int     ifru_ifindex;
+  } ifr_ifru;
+};
+
 int
 fhandler_socket::ioctl (unsigned int cmd, void *p)
 {
-  extern int get_ifconf (struct ifconf *ifc, int what); /* net.cc */
+  extern int get_ifconf (SOCKET s, struct ifconf *ifc, int what); /* net.cc */
   int res;
   struct ifconf ifc, *ifcp;
-  struct ifreq *ifr, *ifrp;
+  struct ifreq *ifrp;
 
   switch (cmd)
     {
@@ -1408,10 +1438,47 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	  set_errno (EINVAL);
 	  return -1;
 	}
-      res = get_ifconf (ifcp, cmd);
+      if (CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ)
+	{
+	  ifc.ifc_len = ifcp->ifc_len / sizeof (struct __old_ifreq)
+	  		* sizeof (struct ifreq);
+	  ifc.ifc_buf = (caddr_t) alloca (ifc.ifc_len);
+	}
+      else
+        {
+	  ifc.ifc_len = ifcp->ifc_len;
+	  ifc.ifc_buf = ifcp->ifc_buf;
+	}
+      res = get_ifconf (get_socket (), &ifc, cmd);
       if (res)
 	debug_printf ("error in get_ifconf");
+      if (CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ)
+        {
+	  struct __old_ifreq *ifr = (struct __old_ifreq *) ifcp->ifc_buf;
+	  for (ifrp = ifc.ifc_req;
+	       (caddr_t) ifrp < ifc.ifc_buf + ifc.ifc_len;
+	       ++ifrp, ++ifr)
+	    {
+	      memcpy (&ifr->ifr_ifrn, &ifrp->ifr_ifrn, sizeof ifr->ifr_ifrn);
+	      ifr->ifr_name[__OLD_IFNAMSIZ - 1] = '\0';
+	      memcpy (&ifr->ifr_ifru, &ifrp->ifr_ifru, sizeof ifr->ifr_ifru);
+	    }
+	  ifcp->ifc_len = ifc.ifc_len / sizeof (struct ifreq)
+			  * sizeof (struct __old_ifreq);
+	}
+      else
+        ifcp->ifc_len = ifc.ifc_len;
       break;
+    case OLD_SIOCGIFFLAGS:
+    case OLD_SIOCGIFADDR:
+    case OLD_SIOCGIFBRDADDR:
+    case OLD_SIOCGIFNETMASK:
+    case OLD_SIOCGIFHWADDR:
+    case OLD_SIOCGIFMETRIC:
+    case OLD_SIOCGIFMTU:
+    case OLD_SIOCGIFINDEX:
+      cmd = CONV_OLD_TO_NEW_SIO (cmd);
+      /*FALLTHRU*/
     case SIOCGIFFLAGS:
     case SIOCGIFBRDADDR:
     case SIOCGIFNETMASK:
@@ -1420,61 +1487,75 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
     case SIOCGIFMETRIC:
     case SIOCGIFMTU:
     case SIOCGIFINDEX:
+    case SIOCGIFFRNDLYNAM:
       {
-	ifc.ifc_len = 2048;
-	ifc.ifc_buf = (char *) alloca (2048);
-
-	ifr = (struct ifreq *) p;
-	if (ifr == 0)
+	if (!p)
 	  {
 	    debug_printf ("ifr == NULL");
 	    set_errno (EINVAL);
 	    return -1;
 	  }
 
-	res = get_ifconf (&ifc, cmd);
+	if (cmd > SIOCGIFINDEX && CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ)
+	  {
+	    debug_printf ("cmd not supported on this platform");
+	    set_errno (EINVAL);
+	    return -1;
+	  }
+	ifc.ifc_len = 64 * sizeof (struct ifreq);
+	ifc.ifc_buf = (caddr_t) alloca (ifc.ifc_len);
+	if (cmd == SIOCGIFFRNDLYNAM)
+	  {
+	    struct ifreq_frndlyname *iff = (struct ifreq_frndlyname *)
+	    			alloca (64 * sizeof (struct ifreq_frndlyname));
+	    for (int i = 0; i < 64; ++i)
+	      ifc.ifc_req[i].ifr_frndlyname = &iff[i];
+	  }
+
+	res = get_ifconf (get_socket (), &ifc, cmd);
 	if (res)
 	  {
 	    debug_printf ("error in get_ifconf");
 	    break;
 	  }
 
-	debug_printf ("    name: %s", ifr->ifr_name);
-	for (ifrp = ifc.ifc_req;
-	     (caddr_t) ifrp < ifc.ifc_buf + ifc.ifc_len;
-	     ++ifrp)
+	if (CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ)
 	  {
-	    debug_printf ("testname: %s", ifrp->ifr_name);
-	    if (! strcmp (ifrp->ifr_name, ifr->ifr_name))
+	    struct __old_ifreq *ifr = (struct __old_ifreq *) p;
+	    debug_printf ("    name: %s", ifr->ifr_name);
+	    for (ifrp = ifc.ifc_req;
+		 (caddr_t) ifrp < ifc.ifc_buf + ifc.ifc_len;
+		 ++ifrp)
 	      {
-		switch (cmd)
+		debug_printf ("testname: %s", ifrp->ifr_name);
+		if (! strcmp (ifrp->ifr_name, ifr->ifr_name))
 		  {
-		  case SIOCGIFFLAGS:
-		    ifr->ifr_flags = ifrp->ifr_flags;
-		    break;
-		  case SIOCGIFADDR:
-		    ifr->ifr_addr = ifrp->ifr_addr;
-		    break;
-		  case SIOCGIFBRDADDR:
-		    ifr->ifr_broadaddr = ifrp->ifr_broadaddr;
-		    break;
-		  case SIOCGIFNETMASK:
-		    ifr->ifr_netmask = ifrp->ifr_netmask;
-		    break;
-		  case SIOCGIFHWADDR:
-		    ifr->ifr_hwaddr = ifrp->ifr_hwaddr;
-		    break;
-		  case SIOCGIFMETRIC:
-		    ifr->ifr_metric = ifrp->ifr_metric;
-		    break;
-		  case SIOCGIFMTU:
-		    ifr->ifr_mtu = ifrp->ifr_mtu;
-		    break;
-		  case SIOCGIFINDEX:
-		    ifr->ifr_ifindex = ifrp->ifr_ifindex;
+		    memcpy (&ifr->ifr_ifru, &ifrp->ifr_ifru,
+			    sizeof ifr->ifr_ifru);
 		    break;
 		  }
-		break;
+	      }
+	  }
+	else
+	  {
+	    struct ifreq *ifr = (struct ifreq *) p;
+	    debug_printf ("    name: %s", ifr->ifr_name);
+	    for (ifrp = ifc.ifc_req;
+		 (caddr_t) ifrp < ifc.ifc_buf + ifc.ifc_len;
+		 ++ifrp)
+	      {
+		debug_printf ("testname: %s", ifrp->ifr_name);
+		if (! strcmp (ifrp->ifr_name, ifr->ifr_name))
+		  {
+		    if (cmd == SIOCGIFFRNDLYNAM)
+		      /* The application has to care for the space. */
+		      memcpy (ifr->ifr_frndlyname, ifrp->ifr_frndlyname,
+			      sizeof (struct ifreq_frndlyname));
+		    else
+		      memcpy (&ifr->ifr_ifru, &ifrp->ifr_ifru,
+			      sizeof ifr->ifr_ifru);
+		    break;
+		  }
 	      }
 	  }
 	if ((caddr_t) ifrp >= ifc.ifc_buf + ifc.ifc_len)

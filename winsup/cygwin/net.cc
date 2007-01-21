@@ -1125,6 +1125,315 @@ getdomainname (char *domain, size_t len)
 
 /* Fill out an ifconf struct. */
 
+/* Vista/Longhorn: unicast address has additional OnLinkPrefixLength member. */
+typedef struct _IP_ADAPTER_UNICAST_ADDRESS_LH {
+    _ANONYMOUS_UNION union {
+        ULONGLONG Alignment;
+        _ANONYMOUS_UNION struct {
+            ULONG Length;
+            DWORD Flags;
+        } DUMMYSTRUCTNAME;
+    } DUMMYUNIONNAME;
+    struct _IP_ADAPTER_UNICAST_ADDRESS_VISTA *Next;
+    SOCKET_ADDRESS Address;
+    IP_PREFIX_ORIGIN PrefixOrigin;
+    IP_SUFFIX_ORIGIN SuffixOrigin;
+    IP_DAD_STATE DadState;
+    ULONG ValidLifetime;
+    ULONG PreferredLifetime;
+    ULONG LeaseLifetime;
+    unsigned char OnLinkPrefixLength;
+} IP_ADAPTER_UNICAST_ADDRESS_LH, *PIP_ADAPTER_UNICAST_ADDRESS_LH;
+
+/* Vista/Longhorn: IP_ADAPTER_ADDRESSES has a lot more info.  We pick only
+   what we need for now. */
+typedef struct _IP_ADAPTER_ADDRESSES_LH {
+  _ANONYMOUS_UNION union {
+    ULONGLONG Alignment;
+    _ANONYMOUS_STRUCT struct {
+      ULONG Length;
+      DWORD IfIndex;
+    } DUMMYSTRUCTNAME;
+  } DUMMYUNIONNAME;
+  struct _IP_ADAPTER_ADDRESSES* Next;
+  PCHAR AdapterName;
+  PIP_ADAPTER_UNICAST_ADDRESS FirstUnicastAddress;
+  PIP_ADAPTER_ANYCAST_ADDRESS FirstAnycastAddress;
+  PIP_ADAPTER_MULTICAST_ADDRESS FirstMulticastAddress;
+  PIP_ADAPTER_DNS_SERVER_ADDRESS FirstDnsServerAddress;
+  PWCHAR DnsSuffix;
+  PWCHAR Description;
+  PWCHAR FriendlyName;
+  BYTE PhysicalAddress[MAX_ADAPTER_ADDRESS_LENGTH];
+  DWORD PhysicalAddressLength;
+  DWORD Flags;
+  DWORD Mtu;
+  DWORD IfType;
+  IF_OPER_STATUS OperStatus;
+  DWORD Ipv6IfIndex;
+  DWORD ZoneIndices[16];
+  PIP_ADAPTER_PREFIX FirstPrefix;
+
+  ULONG64 TransmitLinkSpeed;
+  ULONG64 ReceiveLinkSpeed;
+  PVOID FirstWinsServerAddress;
+  PVOID FirstGatewayAddress;
+  ULONG Ipv4Metric;
+  ULONG Ipv6Metric;
+} IP_ADAPTER_ADDRESSES_LH,*PIP_ADAPTER_ADDRESSES_LH;
+
+/* We can't include ws2tcpip.h. */
+
+#define SIO_GET_INTERFACE_LIST  _IOR('t', 127, u_long)
+
+struct sockaddr_in6_old {
+  short   sin6_family;
+  u_short sin6_port;
+  u_long  sin6_flowinfo;
+  struct in6_addr sin6_addr;
+};
+
+typedef union sockaddr_gen{
+  struct sockaddr         Address;
+  struct sockaddr_in      AddressIn;
+  struct sockaddr_in6_old AddressIn6;
+} sockaddr_gen;
+
+typedef struct _INTERFACE_INFO {
+  u_long          iiFlags;
+  sockaddr_gen    iiAddress;
+  sockaddr_gen    iiBroadcastAddress;
+  sockaddr_gen    iiNetmask;
+} INTERFACE_INFO, *LPINTERFACE_INFO;
+
+#ifndef IN_LOOPBACK
+#define IN_LOOPBACK(a)          ((((long int) (a)) & 0xff000000) == 0x7f000000)
+#endif
+
+static int in6_are_prefix_equal (struct in6_addr *, struct in6_addr *, int);
+
+static int in_are_prefix_equal (struct in_addr *p1, struct in_addr *p2, int len)
+{
+  if (0 > len || len > 32)
+    return 0;
+  uint32_t pfxmask = 0xffffffff << (32 - len);
+  return (p1->s_addr & pfxmask) == (p2->s_addr & pfxmask);
+}
+
+extern "C" int
+ip_addr_prefix (PIP_ADAPTER_UNICAST_ADDRESS pua, PIP_ADAPTER_PREFIX pap)
+{
+  if (wincap.has_gaa_on_link_prefix ())
+    return (int) ((PIP_ADAPTER_UNICAST_ADDRESS_LH) pua)->OnLinkPrefixLength;
+  switch (pua->Address.lpSockaddr->sa_family)
+    {
+    case AF_INET:
+      /* Prior to Vista, the loopback prefix is not available. */
+      if (IN_LOOPBACK (((struct sockaddr_in *)
+			pua->Address.lpSockaddr)->sin_addr.s_addr))
+        return 8;
+      for ( ; pap; pap = pap->Next)
+	if (in_are_prefix_equal (
+	      &((struct sockaddr_in *) pua->Address.lpSockaddr)->sin_addr,
+	      &((struct sockaddr_in *) pap->Address.lpSockaddr)->sin_addr,
+	      pap->PrefixLength))
+	  return pap->PrefixLength;
+      break;
+    case AF_INET6:
+      /* Prior to Vista, the loopback prefix is not available. */
+      if (IN6_IS_ADDR_LOOPBACK (&((struct sockaddr_in6 *)
+				  pua->Address.lpSockaddr)->sin6_addr))
+	return 128;
+      for ( ; pap; pap = pap->Next)
+	if (in6_are_prefix_equal (
+	      &((struct sockaddr_in6 *) pua->Address.lpSockaddr)->sin6_addr,
+	      &((struct sockaddr_in6 *) pap->Address.lpSockaddr)->sin6_addr,
+	      pap->PrefixLength))
+	  return pap->PrefixLength;
+      break;
+    default:
+      break;
+    }
+  return 0;
+}
+
+#ifndef GAA_FLAG_INCLUDE_ALL_INTERFACES
+#define GAA_FLAG_INCLUDE_ALL_INTERFACES 0x0100
+#endif
+
+bool
+get_adapters_addresses (PIP_ADAPTER_ADDRESSES *pa_ret, ULONG family)
+{
+  DWORD ret, size = 0;
+  PIP_ADAPTER_ADDRESSES pa0 = NULL;
+
+  if (!pa_ret)
+    return ERROR_BUFFER_OVERFLOW
+	   == GetAdaptersAddresses (family, GAA_FLAG_INCLUDE_PREFIX
+					    | GAA_FLAG_INCLUDE_ALL_INTERFACES,
+				    NULL, NULL, &size);
+  do
+    {
+      ret = GetAdaptersAddresses (family, GAA_FLAG_INCLUDE_PREFIX
+					  | GAA_FLAG_INCLUDE_ALL_INTERFACES,
+				  NULL, pa0, &size);
+      if (ret == ERROR_BUFFER_OVERFLOW
+	  && !(pa0 = (PIP_ADAPTER_ADDRESSES) realloc (pa0, size)))
+	break;
+    }
+  while (ret == ERROR_BUFFER_OVERFLOW);
+  if (ret != ERROR_SUCCESS)
+    {
+      if (pa0)
+        free (pa0);
+      *pa_ret = NULL;
+      return false;
+    }
+  *pa_ret = pa0;
+  return true;
+}
+
+#define WS_IFF_UP	     1
+#define WS_IFF_BROADCAST     2
+#define WS_IFF_LOOPBACK	     4
+#define WS_IFF_POINTTOPOINT  8
+#define WS_IFF_MULTICAST    16
+
+static inline short
+convert_ifr_flags (u_long ws_flags)
+{
+  return (ws_flags & (WS_IFF_UP | WS_IFF_BROADCAST))
+  	 | ((ws_flags & (WS_IFF_LOOPBACK | WS_IFF_POINTTOPOINT)) << 1)
+	 | ((ws_flags & WS_IFF_MULTICAST) << 8);
+}
+
+/*
+ * IFCONF XP SP1 and above.
+ * Use IP Helpper function GetAdaptersAddresses.
+ */
+
+static void
+get_xp_ifconf (SOCKET s, struct ifconf *ifc, int what)
+{
+  PIP_ADAPTER_ADDRESSES pa0 = NULL, pap;
+  PIP_ADAPTER_UNICAST_ADDRESS pua;
+  LPINTERFACE_INFO iie;
+  int cnt = 0;
+  DWORD size = 0;
+
+  if (!get_adapters_addresses (&pa0, AF_INET))
+    goto done;
+  
+  for (pap = pa0; pap; pap = pap->Next)
+    for (pua = pap->FirstUnicastAddress; pua; pua = pua->Next)
+      ++cnt;
+  /* If the size matches exactly the number of interfaces, WSAIoctl fails
+     with WSAError set to WSAEFAULT, for no apparent reason.  So we allocate
+     space for one more INTERFACE_INFO structure here. */
+  iie = (LPINTERFACE_INFO) alloca ((cnt + 1) * sizeof (INTERFACE_INFO));
+  if (WSAIoctl (s, SIO_GET_INTERFACE_LIST, NULL, 0, iie,
+  		(cnt + 1) * sizeof (INTERFACE_INFO), &size, NULL, NULL))
+    {
+      set_winsock_errno ();
+      cnt = 0;
+      goto done;
+    }
+      
+  struct ifreq *ifr = ifc->ifc_req;
+  for (pap = pa0; pap; pap = pap->Next)
+    {
+      int idx = 0;
+      for (pua = pap->FirstUnicastAddress; pua; pua = pua->Next)
+        {
+	  int iinf_idx;
+	  for (iinf_idx = 0; iinf_idx < cnt; ++iinf_idx)
+	    if (iie[iinf_idx].iiAddress.AddressIn.sin_addr.s_addr
+		==  ((sockaddr_in *) pua->Address.lpSockaddr)->sin_addr.s_addr)
+	      break;
+	  if (iinf_idx >= cnt)
+	    continue;
+	  if (!idx)
+	    strcpy (ifr->ifr_name, pap->AdapterName);
+	  else
+	    __small_sprintf (ifr->ifr_name, "%s:%u", pap->AdapterName, idx);
+	  ++idx;
+	  switch (what)
+	    {
+	    case SIOCGIFFLAGS:
+	      {
+		ifr->ifr_flags = convert_ifr_flags (iie[iinf_idx].iiFlags);
+		if (pap->OperStatus == IfOperStatusUp
+		    || pap->OperStatus == IfOperStatusUnknown)
+		  ifr->ifr_flags |= IFF_RUNNING;
+		if (pap->OperStatus != IfOperStatusLowerLayerDown)
+		  ifr->ifr_flags |= IFF_LOWER_UP;
+		if (pap->OperStatus == IfOperStatusDormant)
+		  ifr->ifr_flags |= IFF_DORMANT;
+		ULONG hwaddr[2], hwlen = 6;
+		if (SendARP (iie[iinf_idx].iiAddress.AddressIn.sin_addr.s_addr,
+			     0, hwaddr, &hwlen))
+		  ifr->ifr_flags |= IFF_NOARP;
+	      }
+	      break;
+	    case SIOCGIFCONF:
+	    case SIOCGIFADDR:
+	      memcpy (&ifr->ifr_addr,
+		      &iie[iinf_idx].iiAddress.AddressIn,
+		      sizeof (struct sockaddr_in));
+	      break;
+	    case SIOCGIFBRDADDR:
+	      memcpy (&ifr->ifr_broadaddr,
+		      &iie[iinf_idx].iiBroadcastAddress.AddressIn,
+		      sizeof (struct sockaddr_in));
+	      break;
+	    case SIOCGIFNETMASK:
+	      memcpy (&ifr->ifr_netmask,
+		      &iie[iinf_idx].iiNetmask.AddressIn,
+		      sizeof (struct sockaddr_in));
+	      break;
+	    case SIOCGIFHWADDR:
+	      for (UINT i = 0; i < IFHWADDRLEN; ++i)
+		if (i >= pap->PhysicalAddressLength)
+		  ifr->ifr_hwaddr.sa_data[i] = '\0';
+		else
+		  ifr->ifr_hwaddr.sa_data[i] = pap->PhysicalAddress[i];
+	      ifr->ifr_hwaddr.sa_family = AF_INET;
+	      break;
+	    case SIOCGIFMETRIC:
+	      if (wincap.has_gaa_on_link_prefix ())
+	        ifr->ifr_metric = ((PIP_ADAPTER_ADDRESSES_LH) pap)->Ipv4Metric;
+	      else
+		ifr->ifr_metric = 1;
+	      break;
+	    case SIOCGIFMTU:
+	      ifr->ifr_mtu = pap->Mtu;
+	      break;
+	    case SIOCGIFINDEX:
+	      ifr->ifr_ifindex = pap->IfIndex;
+	      break;
+	    case SIOCGIFFRNDLYNAM:
+	      {
+		struct ifreq_frndlyname *iff = (struct ifreq_frndlyname *)
+					       ifr->ifr_frndlyname;
+		iff->ifrf_len = sys_wcstombs (iff->ifrf_friendlyname,
+					      IFRF_FRIENDLYNAMESIZ,
+					      pap->FriendlyName);
+	      }
+	      break;
+	    }
+	  if ((caddr_t) ++ifr >
+	      ifc->ifc_buf + ifc->ifc_len - sizeof (struct ifreq))
+	    goto done;
+	}
+    }
+
+done:
+  if (pa0)
+    free (pa0);
+  /* Set the correct length */
+  ifc->ifc_len = cnt * sizeof (struct ifreq);
+}
+
 /*
  * IFCONF 98/ME, NTSP4, W2K:
  * Use IP Helper Library
@@ -1239,7 +1548,7 @@ get_2k_ifconf (struct ifconf *ifc, int what)
 		__small_sprintf (ifr->ifr_name, "%s%u", name, ifEntry->classId);
 	      else
 		__small_sprintf (ifr->ifr_name, "%s%u:%u", name,
-				 ifEntry->classId, ifEntry->enumerated - 1);
+				 ifEntry->classId, ifEntry->enumerated);
 	      ifEntry->enumerated++;
 	    }
 
@@ -1304,7 +1613,7 @@ get_2k_ifconf (struct ifconf *ifc, int what)
 		break;
 	    }
 	  ++cnt;
-	  if ((caddr_t)++ ifr >
+	  if ((caddr_t) ++ifr >
 	      ifc->ifc_buf + ifc->ifc_len - sizeof (struct ifreq))
 	    goto done;
 	}
@@ -1396,7 +1705,7 @@ get_nt_ifconf (struct ifconf *ifc, int what)
 		   *ip && *np;
 		   ip += strlen (ip) + 1, np += strlen (np) + 1)
 		{
-		  if ((caddr_t)++ ifr > ifc->ifc_buf
+		  if ((caddr_t) ++ifr > ifc->ifc_buf
 		      + ifc->ifc_len - sizeof (struct ifreq))
 		    break;
 
@@ -1606,7 +1915,7 @@ get_95_ifconf (struct ifconf *ifc, int what)
 			      NULL, (unsigned char *) np,
 			      (size = sizeof np, &size)) == ERROR_SUCCESS)
 	{
-	  if ((caddr_t)++ ifr > ifc->ifc_buf
+	  if ((caddr_t) ++ifr > ifc->ifc_buf
 	      + ifc->ifc_len - sizeof (struct ifreq))
 	    goto out;
 
@@ -1697,7 +2006,7 @@ out:
 }
 
 int
-get_ifconf (struct ifconf *ifc, int what)
+get_ifconf (SOCKET s, struct ifconf *ifc, int what)
 {
   unsigned long lip, lnp;
   struct sockaddr_in *sa;
@@ -1768,13 +2077,111 @@ get_ifconf (struct ifconf *ifc, int what)
 	}
     }
 
-  if (wincap.has_ip_helper_lib ())
+  if (wincap.has_gaa_prefixes () && !CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ)
+    get_xp_ifconf (s, ifc, what);
+  else if (wincap.has_ip_helper_lib ())
     get_2k_ifconf (ifc, what);
   else if (wincap.is_winnt ())
     get_nt_ifconf (ifc, what);
   else
     get_95_ifconf (ifc, what);
   return 0;
+}
+
+extern "C" unsigned
+if_nametoindex (const char *name)
+{
+  PIP_ADAPTER_ADDRESSES pap = NULL;
+
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return 0;
+
+  if (wincap.has_gaa_prefixes ()
+      && get_adapters_addresses (&pap, AF_UNSPEC))
+    {
+      char lname[IF_NAMESIZE], *c;
+
+      lname[0] = '\0';
+      strncat (lname, name, IF_NAMESIZE - 1);
+      if (lname[0] == '{' && (c = strchr (lname, ':')))
+	*c = '\0';
+      for (; pap; pap = pap->Next)
+	if (strcasematch (lname, pap->AdapterName))
+	  return pap->IfIndex;
+    }
+  return 0;
+}
+
+extern "C" char *
+if_indextoname (unsigned ifindex, char *ifname)
+{
+  PIP_ADAPTER_ADDRESSES pap = NULL;
+
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return NULL;
+
+  if (wincap.has_gaa_prefixes ()
+      && get_adapters_addresses (&pap, AF_UNSPEC))
+    {
+      for (; pap; pap = pap->Next)
+        if (ifindex == pap->IfIndex)
+	  {
+	    strcpy (ifname, pap->AdapterName);
+	    return ifname;
+	  }
+    }
+  set_errno (ENXIO);
+  return NULL;
+}
+
+extern "C" struct if_nameindex *
+if_nameindex (void)
+{
+  PIP_ADAPTER_ADDRESSES pa0 = NULL, pap;
+  struct if_nameindex *iflist = NULL;
+  char (*ifnamelist)[IF_NAMESIZE];
+
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return NULL;
+
+  if (wincap.has_gaa_prefixes ()
+      && get_adapters_addresses (&pa0, AF_UNSPEC))
+    {
+      int cnt = 0;
+      for (pap = pa0; pap; pap = pap->Next)
+        ++cnt;
+      iflist = (struct if_nameindex *)
+	       malloc ((cnt + 1) * sizeof (struct if_nameindex)
+		       + cnt * IF_NAMESIZE);
+      if (!iflist)
+        {
+	  set_errno (ENOBUFS);
+	  return NULL;
+	}
+      ifnamelist = (char (*)[IF_NAMESIZE]) (iflist + cnt + 1);
+      for (pap = pa0, cnt = 0; pap; pap = pap->Next, ++cnt)
+        {
+	  iflist[cnt].if_index = pap->IfIndex ?: pap->Ipv6IfIndex;
+	  strcpy (iflist[cnt].if_name = ifnamelist[cnt], pap->AdapterName);
+	}
+      iflist[cnt].if_index = 0;
+      iflist[cnt].if_name = NULL;
+      return iflist;
+    }
+  set_errno (ENXIO);
+  return NULL;
+}
+
+extern "C" void
+if_freenameindex (struct if_nameindex *ptr)
+{
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return;
+  free (ptr);
 }
 
 #define PORT_LOW	(IPPORT_EFSSERVER + 1)
@@ -3493,3 +3900,87 @@ cygwin_getnameinfo (const struct sockaddr *sa, socklen_t salen,
   return ipv4_getnameinfo (sa, salen, host, hostlen, serv, servlen, flags);
 }
 
+/* The below function has been taken from OpenBSD's src/sys/netinet6/in6.c. */
+
+/*
+ * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the project nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE PROJECT AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE PROJECT OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+/*
+ * Copyright (c) 1982, 1986, 1991, 1993
+ *      The Regents of the University of California.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ *      @(#)in.c        8.2 (Berkeley) 11/15/93
+ */
+
+static int
+in6_are_prefix_equal (struct in6_addr *p1, struct in6_addr *p2, int len)
+{
+  int bytelen, bitlen;
+
+  /* sanity check */
+  if (0 > len || len > 128)
+    return 0;
+  
+  bytelen = len / 8;
+  bitlen = len % 8;
+
+  if (memcmp (&p1->s6_addr, &p2->s6_addr, bytelen))
+    return 0;
+  /* len == 128 is ok because bitlen == 0 then */
+  if (bitlen != 0 &&
+      p1->s6_addr[bytelen] >> (8 - bitlen) !=
+      p2->s6_addr[bytelen] >> (8 - bitlen))
+    return 0;
+
+  return 1;
+}

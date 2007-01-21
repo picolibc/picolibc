@@ -699,6 +699,10 @@ hypot NOSIGFE
 _hypot = hypot NOSIGFE
 hypotf NOSIGFE
 _hypotf = hypotf NOSIGFE
+if_freenameindex SIGFE
+if_indextoname SIGFE
+if_nameindex SIGFE
+if_nametoindex SIGFE
 ilogb NOSIGFE
 _ilogb = ilogb NOSIGFE
 ilogbf NOSIGFE
