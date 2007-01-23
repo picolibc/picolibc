@@ -147,16 +147,10 @@ extern __declspec(dllimport) int h_errno;
 #define AI_PASSIVE      1
 #define AI_CANONNAME    2
 #define AI_NUMERICHOST  4
-/*
- * These are not available in the WinSock implementation.  It wouldn't make
- * sense to support them in the ipv4 only case, so we drop them entirely.
- * We can define them if we run into problems but they are non-functional, so...
- */
-#if 0
-#define AI_V4MAPPED     16
-#define AI_ALL          32
-#define AI_ADDRCONFIG   64
-#endif
+/* Only available since Vista. Ignored on older systems. */
+#define AI_ALL          256
+#define AI_ADDRCONFIG   1024
+#define AI_V4MAPPED     2048
 
 #define NI_NOFQDN       1
 #define NI_NUMERICHOST  2
