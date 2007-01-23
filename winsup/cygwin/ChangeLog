@@ -1,3 +1,9 @@
+2007-01-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (if_nametoindex): Free IP_ADAPTER_ADDRESSES memory.
+	(if_indextoname): Ditto.
+	(if_nameindex): Ditto.  Remove duplicate indexed entries in result.
+
 2007-01-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (WSAIoctl): Define.

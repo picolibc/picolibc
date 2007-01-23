@@ -2092,6 +2092,7 @@ extern "C" unsigned
 if_nametoindex (const char *name)
 {
   PIP_ADAPTER_ADDRESSES pap = NULL;
+  unsigned index = 0;
 
   myfault efault;
   if (efault.faulted (EFAULT))
@@ -2108,15 +2109,20 @@ if_nametoindex (const char *name)
 	*c = '\0';
       for (; pap; pap = pap->Next)
 	if (strcasematch (lname, pap->AdapterName))
-	  return pap->IfIndex;
+	  {
+	    index = pap->IfIndex;
+	    break;
+	  }
+      free (pap);
     }
-  return 0;
+  return index;
 }
 
 extern "C" char *
 if_indextoname (unsigned ifindex, char *ifname)
 {
   PIP_ADAPTER_ADDRESSES pap = NULL;
+  char *name = NULL;
 
   myfault efault;
   if (efault.faulted (EFAULT))
@@ -2128,12 +2134,14 @@ if_indextoname (unsigned ifindex, char *ifname)
       for (; pap; pap = pap->Next)
         if (ifindex == pap->IfIndex)
 	  {
-	    strcpy (ifname, pap->AdapterName);
-	    return ifname;
+	    name = strcpy (ifname, pap->AdapterName);
+	    break;
 	  }
+      free (pap);
     }
-  set_errno (ENXIO);
-  return NULL;
+  else
+    set_errno (ENXIO);
+  return name;
 }
 
 extern "C" struct if_nameindex *
@@ -2157,22 +2165,29 @@ if_nameindex (void)
 	       malloc ((cnt + 1) * sizeof (struct if_nameindex)
 		       + cnt * IF_NAMESIZE);
       if (!iflist)
+	set_errno (ENOBUFS);
+      else
         {
-	  set_errno (ENOBUFS);
-	  return NULL;
+	  ifnamelist = (char (*)[IF_NAMESIZE]) (iflist + cnt + 1);
+	  for (pap = pa0, cnt = 0; pap; pap = pap->Next)
+	    {
+	      for (int i = 0; i < cnt; ++i)
+	        if (iflist[i].if_index == (pap->IfIndex ?: pap->Ipv6IfIndex))
+		  goto outer_loop;
+	      iflist[cnt].if_index = pap->IfIndex ?: pap->Ipv6IfIndex;
+	      strcpy (iflist[cnt].if_name = ifnamelist[cnt], pap->AdapterName);
+	      ++cnt;
+	    outer_loop:
+	      ;
+	    }
+	  iflist[cnt].if_index = 0;
+	  iflist[cnt].if_name = NULL;
 	}
-      ifnamelist = (char (*)[IF_NAMESIZE]) (iflist + cnt + 1);
-      for (pap = pa0, cnt = 0; pap; pap = pap->Next, ++cnt)
-        {
-	  iflist[cnt].if_index = pap->IfIndex ?: pap->Ipv6IfIndex;
-	  strcpy (iflist[cnt].if_name = ifnamelist[cnt], pap->AdapterName);
-	}
-      iflist[cnt].if_index = 0;
-      iflist[cnt].if_name = NULL;
-      return iflist;
+      free (pa0);
     }
-  set_errno (ENXIO);
-  return NULL;
+  else
+    set_errno (ENXIO);
+  return iflist;
 }
 
 extern "C" void
