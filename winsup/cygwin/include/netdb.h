@@ -174,8 +174,7 @@ extern __declspec(dllimport) int h_errno;
 #define EAI_SYSTEM      11
 #define EAI_BADHINTS    12
 #define EAI_PROTOCOL    13
-
-#define EAI_MAX		14
+#define EAI_OVERFLOW    14
 
 #ifndef __INSIDE_CYGWIN_NET__
 void		endhostent (void);

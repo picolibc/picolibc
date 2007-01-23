@@ -1,5 +1,12 @@
 2007-01-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* net.cc (gai_errmap): Add EAI_OVERFLOW entry.  Fix formatting.
+	(cygwin_gai_strerror): Drop using EAI_MAX.
+	(w32_to_gai_err): Ditto.
+	* include/netdb.h: Define EAI_OVERFLOW. Remove EAI_MAX.
+
+2007-01-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/netdb.h: Add AI_xxx flags available since Vista.
 
 2007-01-23  Corinna Vinschen  <corinna@vinschen.de>

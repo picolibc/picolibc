@@ -3751,26 +3751,27 @@ struct gai_errmap_t
 
 static gai_errmap_t gai_errmap[] =
 {
-  {0,			"Success"},
-  {0,			"Address family for hostname not supported"},
-  {WSATRY_AGAIN,	"Temporary failure in name resolution"},
-  {WSAEINVAL,		"Invalid value for ai_flags"},
-  {WSANO_RECOVERY,	"Non-recoverable failure in name resolution"},
-  {WSAEAFNOSUPPORT,	"ai_family not supported"},
+  {0,			  "Success"},
+  {0,			  "Address family for hostname not supported"},
+  {WSATRY_AGAIN,	  "Temporary failure in name resolution"},
+  {WSAEINVAL,		  "Invalid value for ai_flags"},
+  {WSANO_RECOVERY,	  "Non-recoverable failure in name resolution"},
+  {WSAEAFNOSUPPORT,	  "ai_family not supported"},
   {WSA_NOT_ENOUGH_MEMORY, "Memory allocation failure"},
-  {WSANO_DATA,		"No address associated with hostname"},
-  {WSAHOST_NOT_FOUND,	"hostname nor servname provided, or not known"},
-  {WSATYPE_NOT_FOUND,	"servname not supported for ai_socktype"},
-  {WSAESOCKTNOSUPPORT,	"ai_socktype not supported"},
-  {0,			"System error returned in errno"},
-  {0,			"Invalid value for hints"},
-  {0,			"Resolved protocol is unknown"}
+  {WSANO_DATA,		  "No address associated with hostname"},
+  {WSAHOST_NOT_FOUND,	  "hostname nor servname provided, or not known"},
+  {WSATYPE_NOT_FOUND,	  "servname not supported for ai_socktype"},
+  {WSAESOCKTNOSUPPORT,	  "ai_socktype not supported"},
+  {0,			  "System error returned in errno"},
+  {0,			  "Invalid value for hints"},
+  {0,			  "Resolved protocol is unknown"},
+  {WSAEFAULT,		  "An argument buffer overflowed"}
 };
 
 extern "C" const char *
 cygwin_gai_strerror (int err)
 {
-  if (err >= 0 && err < EAI_MAX)
+  if (err >= 0 && err < (int) (sizeof gai_errmap / sizeof *gai_errmap))
     return gai_errmap[err].errtxt;
   return "Unknown error";
 }
@@ -3779,7 +3780,7 @@ static int
 w32_to_gai_err (int w32_err)
 {
   if (w32_err >= WSABASEERR)
-    for (int i = 0; i < EAI_MAX; ++i)
+    for (unsigned i = 0; i < sizeof gai_errmap / sizeof *gai_errmap; ++i)
       if (gai_errmap[i].w32_errval == w32_err)
 	return i;
   return w32_err;
