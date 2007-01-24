@@ -408,10 +408,10 @@ void set_cygwin_privileges (HANDLE token);
 #define pop_thread_privilege() \
     if (_dup_token) \
       { \
-	if (_token == hProcToken) \
+	if (!cygheap->user.issetuid ()) \
 	  RevertToSelf (); \
 	else \
-	  ImpersonateLoggedOnUser (_token); \
+	  cygheap->user.reimpersonate (); \
 	CloseHandle (_dup_token); \
       } \
   }

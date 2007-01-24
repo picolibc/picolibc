@@ -1,5 +1,10 @@
 2007-01-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* security.h (pop_thread_privilege): Revert to previous state, not
+	to token used for impersonation.
+
+2007-01-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.h (cygheap_user::deimpersonate): Always RevertToSelf.
 
 2007-01-23  Corinna Vinschen  <corinna@vinschen.de>
