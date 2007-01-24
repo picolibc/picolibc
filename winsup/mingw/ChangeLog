@@ -1,3 +1,7 @@
+2007-01-24  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/io.h (X_OK):  Define to F_OK.
+
 2007-01-19  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/stdio.h (SEEK_SET, SEEK_CUR, SEEK_END): Define

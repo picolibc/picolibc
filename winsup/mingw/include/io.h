@@ -180,7 +180,9 @@ _CRTIMP int __cdecl chmod (const char*, int);
 /* Some defines for _access nAccessMode (MS doesn't define them, but
  * it doesn't seem to hurt to add them). */
 #define	F_OK	0	/* Check for file existence */
-#define	X_OK	1	/* Check for execute permission. */
+/* Well maybe it does hurt.  On newer versions of MSVCRT, an access mode
+   of 1 causes invalid parameter error. */   
+#define	X_OK	F_OK	/* MS access() doesn't check for execute permission. */
 #define	W_OK	2	/* Check for write permission */
 #define	R_OK	4	/* Check for read permission */
 
