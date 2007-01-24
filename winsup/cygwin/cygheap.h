@@ -181,8 +181,7 @@ public:
   HANDLE token () { return current_token; }
   void deimpersonate ()
   {
-    if (issetuid ())
-      RevertToSelf ();
+    RevertToSelf ();
   }
   bool reimpersonate ()
   {
