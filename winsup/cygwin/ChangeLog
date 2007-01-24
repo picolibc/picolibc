@@ -1,5 +1,11 @@
 2007-01-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* net.cc (if_nametoindex): This time, really free IP_ADAPTER_ADDRESSES
+	memory.
+	(if_indextoname): Ditto.
+
+2007-01-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* security.h (pop_thread_privilege): Revert to previous state, not
 	to token used for impersonation.
 

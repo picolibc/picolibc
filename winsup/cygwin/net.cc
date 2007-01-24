@@ -2091,7 +2091,7 @@ get_ifconf (SOCKET s, struct ifconf *ifc, int what)
 extern "C" unsigned
 if_nametoindex (const char *name)
 {
-  PIP_ADAPTER_ADDRESSES pap = NULL;
+  PIP_ADAPTER_ADDRESSES pa0 = NULL, pap;
   unsigned index = 0;
 
   myfault efault;
@@ -2107,13 +2107,13 @@ if_nametoindex (const char *name)
       strncat (lname, name, IF_NAMESIZE - 1);
       if (lname[0] == '{' && (c = strchr (lname, ':')))
 	*c = '\0';
-      for (; pap; pap = pap->Next)
+      for (pap = pa0; pap; pap = pap->Next)
 	if (strcasematch (lname, pap->AdapterName))
 	  {
 	    index = pap->IfIndex;
 	    break;
 	  }
-      free (pap);
+      free (pa0);
     }
   return index;
 }
@@ -2121,7 +2121,7 @@ if_nametoindex (const char *name)
 extern "C" char *
 if_indextoname (unsigned ifindex, char *ifname)
 {
-  PIP_ADAPTER_ADDRESSES pap = NULL;
+  PIP_ADAPTER_ADDRESSES pa0 = NULL, pap;
   char *name = NULL;
 
   myfault efault;
@@ -2129,15 +2129,15 @@ if_indextoname (unsigned ifindex, char *ifname)
     return NULL;
 
   if (wincap.has_gaa_prefixes ()
-      && get_adapters_addresses (&pap, AF_UNSPEC))
+      && get_adapters_addresses (&pa0, AF_UNSPEC))
     {
-      for (; pap; pap = pap->Next)
+      for (pap = pa0; pap; pap = pap->Next)
         if (ifindex == pap->IfIndex)
 	  {
 	    name = strcpy (ifname, pap->AdapterName);
 	    break;
 	  }
-      free (pap);
+      free (pa0);
     }
   else
     set_errno (ENXIO);
