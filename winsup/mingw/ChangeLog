@@ -1,3 +1,7 @@
+2007-01-26  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/_mingw.h (CRT_INLINE):  Correct typo.
+
 2007-01-24  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/io.h (X_OK):  Define to F_OK.
