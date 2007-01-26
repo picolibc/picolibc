@@ -4,7 +4,7 @@
 	on NT by calling unlink_nt.  Check for directory here.
 	* syscalls.cc (try_to_bin): Fix buggy debug_printf statement.
 	(unlink_nt): Make non-static.  Don't use delete-on-close semantics on
-	directoires.  Explain why.
+	directories.  Explain why.
 
 2007-01-24  Corinna Vinschen  <corinna@vinschen.de>
 
