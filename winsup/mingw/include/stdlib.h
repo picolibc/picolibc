@@ -21,6 +21,8 @@
 #include <stddef.h>
 #endif /* RC_INVOKED */
 
+#include <stdint.h> /* For uintptr_t */
+
 /*
  * RAND_MAX is the maximum value that may be returned by rand.
  * The minimum is zero.
@@ -343,7 +345,6 @@ _CRTIMP void* __cdecl	calloc	(size_t, size_t) __MINGW_ATTRIB_MALLOC;
 _CRTIMP void* __cdecl	malloc	(size_t) __MINGW_ATTRIB_MALLOC;
 _CRTIMP void* __cdecl	realloc	(void*, size_t);
 _CRTIMP void __cdecl	free	(void*);
-
 _CRTIMP void __cdecl	abort	(void) __MINGW_ATTRIB_NORETURN;
 _CRTIMP void __cdecl	exit	(int) __MINGW_ATTRIB_NORETURN;
 
@@ -439,7 +440,20 @@ _CRTIMP int __cdecl _set_error_mode (int);
 #define _OUT_TO_MSGBOX	2
 #define _REPORT_ERRMODE	3
 
-#endif
+#if __MSVCRT_VERSION__ >= 0x800
+_CRTIMP unsigned int __cdecl _set_abort_behavior (unsigned int, unsigned int);
+/* These masks work with msvcr80.dll version 8.0.50215.44 (a beta release).  */
+#define _WRITE_ABORT_MSG 1
+#define _CALL_REPORTFAULT 2
+
+typedef void (* _invalid_parameter_handler) (const wchar_t *,
+					     const wchar_t *,
+					     const wchar_t *,
+					     unsigned int,
+					     uintptr_t);
+_invalid_parameter_handler _set_invalid_parameter_handler (_invalid_parameter_handler);
+#endif /* __MSVCRT_VERSION__ >= 0x800 */
+#endif /* __MSVCRT__ */
 
 #ifndef	_NO_OLDNAMES
 

@@ -1,5 +1,19 @@
 2007-01-26  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	Expose some msvcr80.dll functions.
+	* include/stdlib.h (_set_abort_behavior): Add prototype.
+	(_WRITE_ABORT_MSG, _CALL_REPORTFAULT): Add defines for
+	_set_abort_behavior mask argument.
+	(_invalid_parameter_handler): Add typedef.
+	(_set_invalid_parameter_handler): Add prototype.
+	* include/stdio.h (_get_printf_count_output): Add prototype.
+	(_set_printf_count_output): Add prototype.
+	* msvcrt.def.in (_get_printf_count_output,_set_printf_count_output,
+	_set_abort_behavior, _set_invalid_parameter_handler): Add stubs.
+
+
+2007-01-26  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/_mingw.h (CRT_INLINE):  Correct typo.
 
 2007-01-24  Danny Smith  <dannysmith@users.sourceforge.net>

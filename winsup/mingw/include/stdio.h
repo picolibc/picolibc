@@ -374,6 +374,11 @@ _CRTIMP int __cdecl	_getmaxstdio(void);
 _CRTIMP int __cdecl	_setmaxstdio(int);
 #endif
 
+#if __MSVCRT_VERSION__ >= 0x800
+_CRTIMP int __cdecl _set_printf_count_output(int);
+_CRTIMP int __cdecl _get_printf_count_output(void);
+#endif
+
 #ifndef _NO_OLDNAMES
 _CRTIMP int __cdecl	fgetchar (void);
 _CRTIMP int __cdecl	fputchar (int);

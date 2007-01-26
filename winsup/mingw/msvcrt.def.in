@@ -741,7 +741,7 @@ _wfindfirst64
 _wfindnext64
 _wstat64
 _wutime64
-#if ( __msvcr70__ || __msvcr70d__ ||  __msvcr71__ || __msvcr71d__)
+#if ( __msvcr70__ || __msvcr70d__ ||  __msvcr71__ || __msvcr71d__ || __msvcr80__ || __msvcr80d__)
 ; msvcr70.dll amd later
 __buffer_overrun
 __CxxDetectRethrow
@@ -785,7 +785,7 @@ _wcstoui64
 _wctype
 _wtof
 #endif  /* 7.0 */
-#if  (__msvcr71__ || __msvcr71d__)
+#if  (__msvcr71__ || __msvcr71d__ || __msvcr80__ || __msvcr80d__)
 ; msvcr71.dll
 ___lc_codepage_func
 ___lc_collate_cp_func
@@ -806,4 +806,10 @@ _get_heap_handle
 _set_purecall_handler
 _set_SSE2_enable
 #endif /* 7.1  */
-
+#if ( __msvcr80__ || __msvcr80d__)
+; msvcr80.dll
+_get_printf_count_output
+_set_printf_count_output
+_set_abort_behavior
+_set_invalid_parameter_handler
+#endif /* 8.0 */
