@@ -225,7 +225,8 @@ try_to_bin (path_conv &win32_path, HANDLE h)
   pfri->FileNameLength = uname.Length;
   status = NtSetInformationFile (h, &io, pfri, size, FileRenameInformation);
   if (!NT_SUCCESS (status))
-    debug_printf ("Move %s to %s failed, status = %p", status);
+    debug_printf ("Move %s to %s failed, status = %p", win32_path.get_win32 (),
+		  recycler, status);
 }
 
 static DWORD
@@ -236,7 +237,7 @@ unlink_9x (path_conv &win32_name)
   return GetLastError ();
 }
 
-static DWORD
+DWORD
 unlink_nt (path_conv &win32_name, bool setattrs)
 {
   WCHAR wpath[CYG_MAX_PATH + 10];
@@ -247,19 +248,24 @@ unlink_nt (path_conv &win32_name, bool setattrs)
   HANDLE h;
 
   ULONG flags = FILE_OPEN_FOR_BACKUP_INTENT;
-  /* Don't try "delete on close" if the file is on a remote share.  If two
-     processes have open handles on a file and one of them calls unlink,
-     then it happens that the file is remove from the remote share even
-     though the other process still has an open handle.  This other process
-     than gets Win32 error 59, ERROR_UNEXP_NET_ERR when trying to access the
-     file.
-     That does not happen when using DeleteFile (NtSetInformationFile, class
-     FileDispositionInformation), which nicely succeeds but still, the file
-     is available for the other process.
-     Microsoft KB 837665 describes this problem as a bug in 2K3, but I have
-     reproduced it on shares on Samba 2.2.8, Samba 3.0.2, NT4SP6, XP64SP1 and
-     2K3 and in all cases, DeleteFile works, "delete on close" does not. */
-  if (!win32_name.isremote ())
+  /* Don't open directories with "delete on close", because the NT internal
+     semantic is apparently different from the file semantic.  If a directory
+     is opened "delete on close", the rename operation in try_to_bin fails
+     with STATUS_ACCESS_DENIED.  So directories must be deleted using
+     NtSetInformationFile, class FileDispositionInformation, which works fine.
+
+     Don't try "delete on close" if the file is on a remote share.  If two
+     processes have open handles on a file and one of them calls unlink, then
+     it happens that the file is removed from the remote share even though the
+     other process still has an open handle.  This other process than gets
+     Win32 error 59, ERROR_UNEXP_NET_ERR when trying to access the file.  That
+     does not happen when using NtSetInformationFile, class
+     FileDispositionInformation, which nicely succeeds but still, the file is
+     available for the other process.  Microsoft KB 837665 describes this
+     problem as a bug in 2K3, but I have reproduced it on shares on Samba
+     2.2.8, Samba 3.0.2, NT4SP6, XP64SP1 and 2K3 and in all cases, DeleteFile
+     works, "delete on close" does not. */
+  if (!win32_name.isdir () && !win32_name.isremote ())
     flags |= FILE_DELETE_ON_CLOSE;
   /* Add the reparse point flag to native symlinks, otherwise we remove the
      target, not the symlink. */
@@ -301,7 +307,7 @@ unlink_nt (path_conv &win32_name, bool setattrs)
 
   DWORD lasterr = 0;
 
-  if (win32_name.isremote ())
+  if (win32_name.isdir () || win32_name.isremote ())
     {
       FILE_DISPOSITION_INFORMATION disp = { TRUE };
       status = NtSetInformationFile (h, &io, &disp, sizeof disp,

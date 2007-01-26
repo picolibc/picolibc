@@ -1447,15 +1447,31 @@ fhandler_disk_file::mkdir (mode_t mode)
 int
 fhandler_disk_file::rmdir ()
 {
+  extern DWORD unlink_nt (path_conv &win32_name, bool setattrs);
+
   int res = -1;
 
+  if (!pc.isdir ())
+    {
+      set_errno (ENOTDIR);
+      return -1;
+    }
   /* Even own directories can't be removed if R/O attribute is set. */
   if (pc.has_attribute (FILE_ATTRIBUTE_READONLY))
     SetFileAttributes (get_win32_name (),
 		       (DWORD) pc & ~FILE_ATTRIBUTE_READONLY);
 
   DWORD err, att = 0;
-  int rc = RemoveDirectory (get_win32_name ());
+  int rc;
+
+  if (wincap.is_winnt ())
+    {
+      rc = !(err = unlink_nt (pc, pc.has_attribute (FILE_ATTRIBUTE_READONLY)));
+      if (err)
+        SetLastError (err);
+    }
+  else
+    rc = RemoveDirectory (get_win32_name ());
 
   if (isremote () && exists ())
     att = GetFileAttributes (get_win32_name ());
@@ -1488,7 +1504,7 @@ fhandler_disk_file::rmdir ()
   __seterrno_from_win_error (err);
 
   /* Directory still exists, restore its characteristics. */
-  if (pc.has_attribute (FILE_ATTRIBUTE_READONLY))
+  if (!wincap.is_winnt () && pc.has_attribute (FILE_ATTRIBUTE_READONLY))
     SetFileAttributes (get_win32_name (), (DWORD) pc);
 
   return res;
