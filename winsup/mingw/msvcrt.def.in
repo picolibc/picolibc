@@ -812,4 +812,10 @@ _get_printf_count_output
 _set_printf_count_output
 _set_abort_behavior
 _set_invalid_parameter_handler
+_fseek_nolock
+_ftell_nolock
+_fseeki64
+_ftelli64
+_fseeki64_nolock
+_ftelli64_nolock
 #endif /* 8.0 */

@@ -296,6 +296,16 @@ _CRTIMP int __cdecl	fseek (FILE*, long, int);
 _CRTIMP long __cdecl	ftell (FILE*);
 _CRTIMP void __cdecl	rewind (FILE*);
 
+#if __MSVCRT_VERSION__ >= 0x800
+_CRTIMP int __cdecl	_fseek_nolock (FILE*, long, int);
+_CRTIMP long __cdecl	_ftell_nolock (FILE*);
+
+_CRTIMP int __cdecl	_fseeki64 (FILE*, __int64, int);
+_CRTIMP __int64 __cdecl	_ftelli64 (FILE*);
+_CRTIMP int __cdecl	_fseeki64_nolock (FILE*, __int64, int);
+_CRTIMP __int64 __cdecl	_ftelli64_nolock (FILE*);
+#endif
+
 #ifdef __USE_MINGW_FSEEK  /* These are in libmingwex.a */
 /*
  * Workaround for limitations on win9x where a file contents are
