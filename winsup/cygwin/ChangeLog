@@ -1,3 +1,7 @@
+2007-01-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/ftw.h: Include sys/cdefs.h.
+
 2007-01-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::rmdir): Implement rmdir
