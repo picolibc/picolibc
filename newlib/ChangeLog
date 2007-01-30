@@ -1,3 +1,7 @@
+2007-01-30  Ben Elliston  <bje@au.ibm.com>
+
+	* libc/search/hash.c (init_hash): Make `info' parameter const.
+
 2007-01-19  Kazunori Asayama <asayama@sm.sony.co.jp>
 
 	* libc/machine/spu/c99ppe.h: Replace vector with __vector.
