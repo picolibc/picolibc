@@ -1,3 +1,8 @@
+2007-01-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sigproc.cc (child_info::child_info): Set msv_count to non-zero
+	value only on systems requiring it.
+
 2007-01-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (list::hash): Fix type to __ino64_t.

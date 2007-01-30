@@ -804,14 +804,14 @@ child_info::child_info (unsigned in_cb, child_info_types chtype, bool need_subpr
      count doesn't result in trying to evaluate the content, so we do this
      really only for Vista 64 for now.
 
-     However, since this doesn't seem to harm normal windows operation we'll
-     just set it unconditionally until we hear complaints.
+     Note: It turns out that a non-zero value *does* harm operation on
+     XP 64 and 2K3 64.
 
      The value is sizeof (child_info_*) / 5 which results in a count which
      covers the full datastructure, plus not more than 4 extra bytes.  This
      is ok as long as the child_info structure is cosily stored within a bigger
      datastructure. */
-  msv_count = in_cb / 5;
+  msv_count = wincap.needs_count_in_si_lpres2 () ? in_cb / 5 : 0;
 
   intro = PROC_MAGIC_GENERIC;
   magic = CHILD_INFO_MAGIC;
