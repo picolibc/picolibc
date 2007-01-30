@@ -1,4 +1,3 @@
-
 #include <_ansi.h>
 #include <stdio.h>
 
@@ -16,7 +15,7 @@ typedef struct
   unsigned int pad0[ 3 ];
   size_t size;
   unsigned int pad1[ 3 ];
-  char* fmt;
+  _CONST char* fmt;
   unsigned int pad2[ 3 ];
   va_list ap;
 } c99_vsnprintf_t;

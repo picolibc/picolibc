@@ -1,5 +1,10 @@
 2007-01-30  Ben Elliston  <bje@au.ibm.com>
 
+	* libc/machine/spu/vsnprintf.c (c99_vsnprintf_t): Const-qualify
+	fmt member.
+	* libc/machine/spu/printf.c (c99_printf_t): Likewise.
+	(printf): Pass fmt to va_start to suppress a warning.
+
 	* libc/search/hash.c (init_hash): Make `info' parameter const.
 
 2007-01-19  Kazunori Asayama <asayama@sm.sony.co.jp>

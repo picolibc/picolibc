@@ -1,4 +1,3 @@
-
 #include <_ansi.h>
 #include <stdio.h>
 
@@ -28,7 +27,7 @@ _DEFUN (printf, (fmt,ap),
 int
 #error
 printf (fmt, va_alist)
-     char *fmt;
+     _CONST char *fmt;
      va_dcl
 #endif
 {
@@ -38,13 +37,11 @@ printf (fmt, va_alist)
 
   args.fmt = fmt;
 #ifdef _HAVE_STDC
-  va_start (args.ap, args.fmt);
+  va_start (args.ap, fmt);
 #else
   va_start (args.ap);
 #endif
 
-
-  /*  ret = vfprintf (_stdout_r (_REENT), fmt, ap);*/
   send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VPRINTF, &args);
 
   va_end (args.ap);
