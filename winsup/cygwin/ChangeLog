@@ -1,5 +1,14 @@
 2007-01-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::closedir): Add dir name
+	to debug output.
+	* syscalls.cc (try_to_bin): Enable code to move file to user specific
+	recycler dir to eliminate Vista problem.
+	(unlink_nt): Add comment that rename after opening for delete on close
+	only fails on XP.
+
+2007-01-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sigproc.cc (child_info::child_info): Set msv_count to non-zero
 	value only on systems requiring it.
 

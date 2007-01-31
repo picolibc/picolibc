@@ -2046,7 +2046,7 @@ fhandler_disk_file::closedir (DIR *dir)
 	  res = -1;
 	}
     }
-  syscall_printf ("%d = closedir (%p)", res, dir);
+  syscall_printf ("%d = closedir (%p, %s)", res, dir, get_name ());
   return res;
 }
 

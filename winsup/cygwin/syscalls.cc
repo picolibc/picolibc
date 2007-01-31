@@ -180,12 +180,13 @@ try_to_bin (path_conv &win32_path, HANDLE h)
       			 FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_HIDDEN);
     }
 
-#if 0
-  /* The default settings for the top level recycle bin are so that
-     everybody has the right to create files in it.  Should that be
-     insufficient at one point, we can enable the following code to
-     move the file into the user's own bin subdir.  At this point,
-     I'm going to opt for speed, though. */
+  /* Up to Windows 2003 Server, the default settings for the top level recycle
+     bin are so that everybody has the right to create files in it.  Starting
+     with Vista, users are by default not allowed to create files in that
+     directory, only subdirectories.  Too bad, but that requires to move
+     files to the user's own recycler subdir.  Instead of adding yet another
+     special case, we just move the stuff to the user's recycler, especially
+     since only shared files are moved at all. */
   if (win32_path.fs_is_ntfs ())
     {
       *c++ = '\\';
@@ -205,7 +206,6 @@ try_to_bin (path_conv &win32_path, HANDLE h)
 			     FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_HIDDEN);
 	}
     }
-#endif
 
   /* Create hopefully unique filename. */
   __small_sprintf (c, "\\cyg%016X", hash_path_name (myself->uid,
@@ -253,7 +253,10 @@ unlink_nt (path_conv &win32_name, bool setattrs)
      is opened "delete on close", the rename operation in try_to_bin fails
      with STATUS_ACCESS_DENIED.  So directories must be deleted using
      NtSetInformationFile, class FileDispositionInformation, which works fine.
-
+     
+     Correction, moving a directory opened with delete-on-close fails ONLY
+     on XP.  Note to myself: Never take anything for granted on Windows!
+     
      Don't try "delete on close" if the file is on a remote share.  If two
      processes have open handles on a file and one of them calls unlink, then
      it happens that the file is removed from the remote share even though the
