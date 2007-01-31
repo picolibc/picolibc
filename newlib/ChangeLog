@@ -1,3 +1,33 @@
+2007-01-31  Kazunori Asayama <asayama@sm.sony.co.jp>
+
+	* configure.host: Define stdio directory as a variable.
+	* libc/Makefile.am: Define stdio related names
+	as macros.
+	* libc/configure.in: Add detection routine of stdio directory.
+	* libc/Makefile.in: Regenerated.
+	* libc/configure: Ditto.
+	* libc/argz/Makefile.in: Ditto.
+	* libc/ctype/Makefile.in: Ditto.
+	* libc/errno/Makefile.in: Ditto.
+	* libc/iconv/Makefile.in: Ditto.
+	* libc/iconv/ccs/Makefile.in: Ditto.
+	* libc/iconv/ccs/binary/Makefile.in: Ditto.
+	* libc/iconv/ces/Makefile.in: Ditto.
+	* libc/iconv/lib/Makefile.in: Ditto.
+	* libc/locale/Makefile.in: Ditto.
+	* libc/misc/Makefile.in: Ditto.
+	* libc/posix/Makefile.in: Ditto.
+	* libc/reent/Makefile.in: Ditto.
+	* libc/search/Makefile.in: Ditto.
+	* libc/signal/Makefile.in: Ditto.
+	* libc/stdio/Makefile.in: Ditto.
+	* libc/stdio64/Makefile.in: Ditto.
+	* libc/stdlib/Makefile.in: Ditto.
+	* libc/string/Makefile.in: Ditto.
+	* libc/syscalls/Makefile.in: Ditto.
+	* libc/time/Makefile.in: Ditto.
+	* libc/unix/Makefile.in: Ditto.
+
 2007-01-30  Ben Elliston  <bje@au.ibm.com>
 
 	* libc/machine/spu/vsnprintf.c (c99_vsnprintf_t): Const-qualify

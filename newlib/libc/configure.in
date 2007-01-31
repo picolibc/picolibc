@@ -65,6 +65,20 @@ AC_SUBST(LIBC_SIGNAL_LIB)
 AC_SUBST(LIBC_SIGNAL_DEF)
 AM_CONDITIONAL(HAVE_SIGNAL_DIR, test x${signal_dir} != x)
 
+LIBC_STDIO_LIB=
+LIBC_STDIO_DEF=
+if test -n "${stdio_dir}"; then
+  if test "${use_libtool}" = "yes"; then
+    LIBC_STDIO_LIB=${stdio_dir}/lib${stdio_dir}.${aext}
+  else
+    LIBC_STDIO_LIB=${stdio_dir}/lib.${aext}
+  fi
+  LIBC_STDIO_DEF=${stdio_dir}/stmp-def
+fi
+AC_SUBST(LIBC_STDIO_LIB)
+AC_SUBST(LIBC_STDIO_DEF)
+AM_CONDITIONAL(HAVE_STDIO_DIR, test x${stdio_dir} != x)
+
 LIBC_STDIO64_LIB=
 LIBC_STDIO64_DEF=
 if test -n "${stdio64_dir}"; then

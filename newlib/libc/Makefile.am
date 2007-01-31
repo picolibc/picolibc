@@ -18,6 +18,10 @@ if HAVE_UNIX_DIR
 UNIX_SUBDIR = unix
 endif
 
+if HAVE_STDIO_DIR
+STDIO_SUBDIR = stdio
+endif
+
 if HAVE_STDIO64_DIR
 STDIO64_SUBDIR = stdio64
 endif
@@ -32,7 +36,7 @@ endif
 
 # The order of SUBDIRS is important for the integrated documentation.
 # Do not change the order without considering the doc impact.
-SUBDIRS = argz stdlib ctype search stdio $(STDIO64_SUBDIR) string $(SIGNAL_SUBDIR) time locale sys reent \
+SUBDIRS = argz stdlib ctype search $(STDIO_SUBDIR) $(STDIO64_SUBDIR) string $(SIGNAL_SUBDIR) time locale sys reent \
 	$(extra_dir) errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) $(NEWLIB_ICONV_DIRS) .
 
 noinst_DATA = $(CRT0)
@@ -44,7 +48,7 @@ SUBLIBS = \
 	stdlib/libstdlib.$(aext) \
 	ctype/libctype.$(aext) \
 	search/libsearch.$(aext) \
-	stdio/libstdio.$(aext) \
+	$(LIBC_STDIO_LIB) \
 	$(LIBC_STDIO64_LIB) \
 	string/libstring.$(aext) \
 	$(LIBC_SIGNAL_LIB) \
@@ -66,7 +70,7 @@ SUBLIBS = \
 	stdlib/lib.$(aext) \
 	ctype/lib.$(aext) \
 	search/lib.$(aext) \
-	stdio/lib.$(aext) \
+	$(LIBC_STDIO_LIB) \
 	$(LIBC_STDIO64_LIB) \
 	string/lib.$(aext) \
 	$(LIBC_SIGNAL_LIB) \
@@ -119,7 +123,7 @@ sys/crt0.o: ; @true
 SUBDEFS = \
 	stdlib/stmp-def \
 	ctype/stmp-def \
-	stdio/stmp-def \
+	$(LIBC_STDIO_DEF) \
 	$(LIBC_STDIO64_DEF) \
 	string/stmp-def \
 	$(LIBC_SIGNAL_DEF) \

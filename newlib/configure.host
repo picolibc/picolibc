@@ -52,6 +52,7 @@ machine_dir=
 sys_dir=
 posix_dir=
 signal_dir=signal
+stdio_dir=stdio
 stdio64_dir=
 syscall_dir=
 unix_dir=
