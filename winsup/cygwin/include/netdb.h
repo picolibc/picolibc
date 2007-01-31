@@ -147,6 +147,7 @@ extern __declspec(dllimport) int h_errno;
 #define AI_PASSIVE      1
 #define AI_CANONNAME    2
 #define AI_NUMERICHOST  4
+#define AI_NUMERICSERV  8
 /* Only available since Vista. Ignored on older systems. */
 #define AI_ALL          256
 #define AI_ADDRCONFIG   1024

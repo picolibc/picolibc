@@ -3875,9 +3875,42 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
   myfault efault;
   if (efault.faulted (EFAULT))
     return EAI_SYSTEM;
+  /* Both subsequent getaddrinfo implementations let all possible values
+     in ai_flags slip through and just ignore unknowen values.  So we have
+     to check manually here. */
+  if (hints && (hints->ai_flags
+  		& ~(AI_PASSIVE | AI_CANONNAME | AI_NUMERICHOST | AI_ALL
+		    | AI_NUMERICSERV | AI_ADDRCONFIG | AI_V4MAPPED)))
+    return EAI_BADFLAGS;
+  /* AI_NUMERICSERV is not supported in our replacement getaddrinfo, nor
+     is it supported by Winsock prior to Vista.  We just check the servname
+     parameter by ourselves here. */
+  if (hints && (hints->ai_flags & AI_NUMERICSERV))
+    {
+      char *p;
+      if (servname && *servname && (strtoul (servname, &p, 10), *p))
+	return EAI_NONAME;
+    }
   load_ipv6 ();
   if (getaddrinfo)
-    return w32_to_gai_err (getaddrinfo (hostname, servname, hints, res));
+    {
+      struct addrinfo nhints;
+
+      /* AI_ADDRCONFIG is not supported prior to Vista.  Rather it's
+	 the default and only possible setting.
+	 On Vista, the default behaviour is as if AI_ADDRCONFIG is set,
+	 apparently for performance reasons.  To get the POSIX default
+	 behaviour, the AI_ALL flag has to be set. */
+      if (wincap.has_gaa_on_link_prefix ()
+	  && hints && (hints->ai_flags & AI_ADDRCONFIG)
+	  && hints->ai_family == PF_UNSPEC)
+        {
+	  nhints = *hints;
+	  hints = &nhints;
+	  nhints.ai_flags |= AI_ALL;
+	}
+      return w32_to_gai_err (getaddrinfo (hostname, servname, hints, res));
+    }
   return ipv4_getaddrinfo (hostname, servname, hints, res);
 }
 

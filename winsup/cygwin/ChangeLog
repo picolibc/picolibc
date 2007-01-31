@@ -1,3 +1,9 @@
+2007-01-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_getaddrinfo): Check ai_flags for valid values.
+	Handle AI_NUMERICSERV.  Handle AI_ADDRCONFIG behaviour on Vista.
+	* include/netdb.h (AI_NUMERICSERV): Add missing flag.
+
 2007-01-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::closedir): Add dir name
