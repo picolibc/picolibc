@@ -3902,8 +3902,7 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
 	 apparently for performance reasons.  To get the POSIX default
 	 behaviour, the AI_ALL flag has to be set. */
       if (wincap.has_gaa_on_link_prefix ()
-	  && hints && (hints->ai_flags & AI_ADDRCONFIG)
-	  && hints->ai_family == PF_UNSPEC)
+	  && hints && hints->ai_family == PF_UNSPEC)
         {
 	  nhints = *hints;
 	  hints = &nhints;
