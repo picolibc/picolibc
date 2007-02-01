@@ -1,6 +1,23 @@
 2007-02-01  Joel Schopp <jschopp@austin.ibm.com>
             Kazunori Asayama <asayama@sm.sony.co.jp>
 
+	* libc/machine/spu/Makefile.am: Add objects.
+	* libc/machine/spu/Makefile.in: Regenerated.
+	* libc/machine/spu/vsscanf.c: New file. Add a stdio function
+	implementation.
+	* libc/machine/spu/snprintf.c: Ditto.
+	* libc/machine/spu/sprintf.c: Ditto.
+	* libc/machine/spu/sscanf.c: Ditto.
+	* libc/machine/spu/remove.c: Ditto.
+	* libc/machine/spu/rename.c: Ditto.
+	* libc/machine/spu/tmpnam.c: Ditto.
+	* libc/machine/spu/vsnprintf.c: Add initialization routine of
+	stdio stuffs.
+	* libc/machine/spu/vsprintf.c: Ditto.
+
+2007-02-01  Joel Schopp <jschopp@austin.ibm.com>
+            Kazunori Asayama <asayama@sm.sony.co.jp>
+
 	* configure.host: Enable SPU specific stdio directory.
 	* libc/machine/spu/Makefile.am: Add objects.
 	* libc/machine/spu/Makefile.in: Regenerated.

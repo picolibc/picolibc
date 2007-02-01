@@ -68,7 +68,10 @@ DIST_COMMON = $(srcdir)/../../../../config.guess \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
-	$(srcdir)/../../../../compile
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../../acinclude.m4 \
@@ -111,7 +114,11 @@ am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-memcpy.$(OBJEXT) \
 	lib_a-scanf.$(OBJEXT) lib_a-vprintf.$(OBJEXT) \
 	lib_a-vscanf.$(OBJEXT) lib_a-setbuf.$(OBJEXT) \
 	lib_a-setvbuf.$(OBJEXT) lib_a-tmpfile.$(OBJEXT) \
-	lib_a-vsnprintf.$(OBJEXT) lib_a-vsprintf.$(OBJEXT)
+	lib_a-sprintf.$(OBJEXT) lib_a-sscanf.$(OBJEXT) \
+	lib_a-snprintf.$(OBJEXT) lib_a-vsscanf.$(OBJEXT) \
+	lib_a-vsnprintf.$(OBJEXT) lib_a-vsprintf.$(OBJEXT) \
+	lib_a-remove.$(OBJEXT) lib_a-rename.$(OBJEXT) \
+	lib_a-tmpnam.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -244,7 +251,8 @@ lib_a_SOURCES = setjmp.S memcpy.c memmove.c memset.c strcat.c strchr.c strcmp.c 
 	perror.c gets.c getchar.c putchar.c puts.c \
 	printf.c scanf.c vprintf.c vscanf.c \
 	setbuf.c setvbuf.c tmpfile.c \
-	vsnprintf.c vsprintf.c
+	sprintf.c sscanf.c snprintf.c vsscanf.c vsnprintf.c vsprintf.c \
+	remove.c rename.c tmpnam.c
 
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
@@ -649,6 +657,30 @@ lib_a-tmpfile.o: tmpfile.c
 lib_a-tmpfile.obj: tmpfile.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tmpfile.obj `if test -f 'tmpfile.c'; then $(CYGPATH_W) 'tmpfile.c'; else $(CYGPATH_W) '$(srcdir)/tmpfile.c'; fi`
 
+lib_a-sprintf.o: sprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sprintf.o `test -f 'sprintf.c' || echo '$(srcdir)/'`sprintf.c
+
+lib_a-sprintf.obj: sprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sprintf.obj `if test -f 'sprintf.c'; then $(CYGPATH_W) 'sprintf.c'; else $(CYGPATH_W) '$(srcdir)/sprintf.c'; fi`
+
+lib_a-sscanf.o: sscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sscanf.o `test -f 'sscanf.c' || echo '$(srcdir)/'`sscanf.c
+
+lib_a-sscanf.obj: sscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sscanf.obj `if test -f 'sscanf.c'; then $(CYGPATH_W) 'sscanf.c'; else $(CYGPATH_W) '$(srcdir)/sscanf.c'; fi`
+
+lib_a-snprintf.o: snprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-snprintf.o `test -f 'snprintf.c' || echo '$(srcdir)/'`snprintf.c
+
+lib_a-snprintf.obj: snprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-snprintf.obj `if test -f 'snprintf.c'; then $(CYGPATH_W) 'snprintf.c'; else $(CYGPATH_W) '$(srcdir)/snprintf.c'; fi`
+
+lib_a-vsscanf.o: vsscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsscanf.o `test -f 'vsscanf.c' || echo '$(srcdir)/'`vsscanf.c
+
+lib_a-vsscanf.obj: vsscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsscanf.obj `if test -f 'vsscanf.c'; then $(CYGPATH_W) 'vsscanf.c'; else $(CYGPATH_W) '$(srcdir)/vsscanf.c'; fi`
+
 lib_a-vsnprintf.o: vsnprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsnprintf.o `test -f 'vsnprintf.c' || echo '$(srcdir)/'`vsnprintf.c
 
@@ -660,6 +692,24 @@ lib_a-vsprintf.o: vsprintf.c
 
 lib_a-vsprintf.obj: vsprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsprintf.obj `if test -f 'vsprintf.c'; then $(CYGPATH_W) 'vsprintf.c'; else $(CYGPATH_W) '$(srcdir)/vsprintf.c'; fi`
+
+lib_a-remove.o: remove.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-remove.o `test -f 'remove.c' || echo '$(srcdir)/'`remove.c
+
+lib_a-remove.obj: remove.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-remove.obj `if test -f 'remove.c'; then $(CYGPATH_W) 'remove.c'; else $(CYGPATH_W) '$(srcdir)/remove.c'; fi`
+
+lib_a-rename.o: rename.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-rename.o `test -f 'rename.c' || echo '$(srcdir)/'`rename.c
+
+lib_a-rename.obj: rename.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-rename.obj `if test -f 'rename.c'; then $(CYGPATH_W) 'rename.c'; else $(CYGPATH_W) '$(srcdir)/rename.c'; fi`
+
+lib_a-tmpnam.o: tmpnam.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tmpnam.o `test -f 'tmpnam.c' || echo '$(srcdir)/'`tmpnam.c
+
+lib_a-tmpnam.obj: tmpnam.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tmpnam.obj `if test -f 'tmpnam.c'; then $(CYGPATH_W) 'tmpnam.c'; else $(CYGPATH_W) '$(srcdir)/tmpnam.c'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

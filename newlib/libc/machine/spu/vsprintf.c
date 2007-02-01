@@ -19,6 +19,8 @@ typedef struct
   va_list ap;
 } c99_vsprintf_t;
 
+#ifndef _REENT_ONLY
+
 int
 _DEFUN (vsprintf, (str, fmt, ap),
      char *str _AND
@@ -27,6 +29,9 @@ _DEFUN (vsprintf, (str, fmt, ap),
 {
   int* ret;
   c99_vsprintf_t args;
+
+  CHECK_STR_INIT(_REENT);
+
   ret = (int*) &args;
 
   args.str = str;
@@ -37,3 +42,5 @@ _DEFUN (vsprintf, (str, fmt, ap),
 
   return *ret;
 }
+
+#endif /* ! _REENT_ONLY */

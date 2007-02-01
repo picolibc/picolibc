@@ -31,6 +31,9 @@ _DEFUN (vsnprintf, (str, size, fmt, ap),
 {
   int* ret;
   c99_vsnprintf_t args;
+
+  CHECK_STR_INIT(_REENT);
+
   ret = (int*) &args;
 
   args.str = str;
