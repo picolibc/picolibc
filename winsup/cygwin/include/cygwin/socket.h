@@ -233,6 +233,7 @@ struct OLD_msghdr
 #define IP_PKTINFO                      19
 
 /* IPv6 options for use with getsockopt/setsockopt */
+#define IPV6_HOPOPTS                     1
 #define IPV6_UNICAST_HOPS                4
 #define IPV6_MULTICAST_IF                9
 #define IPV6_MULTICAST_HOPS             10
@@ -241,7 +242,13 @@ struct OLD_msghdr
 #define IPV6_DROP_MEMBERSHIP            13
 #define IPV6_JOIN_GROUP                 IPV6_ADD_MEMBERSHIP
 #define IPV6_LEAVE_GROUP                IPV6_DROP_MEMBERSHIP
+#define IPV6_DONTFRAG                   14
 #define IPV6_PKTINFO                    19
+#define IPV6_HOPLIMIT                   21
+#define IPV6_CHECKSUM                   26
+#define IPV6_V6ONLY                     27
+#define IPV6_RTHDR                      32
+#define IPV6_RECVRTHDR                  38
 
 /* IP agnostic options for use with getsockopt/setsockopt */
 #define MCAST_JOIN_GROUP                41
