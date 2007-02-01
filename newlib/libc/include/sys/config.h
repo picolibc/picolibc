@@ -132,6 +132,7 @@
 
 #ifdef __SPU__
 #define MALLOC_ALIGNMENT 16
+#define __CUSTOM_FILE_IO__
 #endif
 
 /* This block should be kept in sync with GCC's limits.h.  The point

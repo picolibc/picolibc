@@ -1,4 +1,3 @@
-
 #include <_ansi.h>
 #include <stdio.h>
 
@@ -12,7 +11,7 @@
 
 typedef struct
 {
-  char* fmt;
+  _CONST char* fmt;
   unsigned int pad0[ 3 ];
   va_list ap;
 } c99_vprintf_t;
@@ -26,9 +25,12 @@ _DEFUN (vprintf, (fmt, ap),
 {
   int* ret;
   c99_vprintf_t args;
+
+  CHECK_STD_INIT(_REENT);
+
   ret = (int*) &args;
 
-  args.fmt = (char*) fmt;
+  args.fmt = fmt;
   va_copy(args.ap,ap);
 
   send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VPRINTF, &args);

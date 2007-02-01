@@ -212,6 +212,12 @@ struct __sFILE {
 #endif
 };
 
+#ifdef __CUSTOM_FILE_IO__
+
+/* Get custom _FILE definition.  */
+#include <sys/custom_file.h>
+
+#else /* !__CUSTOM_FILE_IO__ */
 #ifdef __LARGE64_FILES
 struct __sFILE64 {
   unsigned char *_p;	/* current position in (some) buffer */
@@ -260,6 +266,7 @@ typedef struct __sFILE64 __FILE;
 #else
 typedef struct __sFILE   __FILE;
 #endif /* __LARGE64_FILES */
+#endif /* !__CUSTOM_FILE_IO__ */
 
 struct _glue 
 {
@@ -457,6 +464,10 @@ extern const struct __sFILE_fake __sf_fake_stderr;
 #define __reent_assert(x) assert(x)
 #else
 #define __reent_assert(x) ((void)0)
+#endif
+
+#ifdef __CUSTOM_FILE_IO__
+#error Custom FILE I/O and _REENT_SMALL not currently supported.
 #endif
 
 /* Generic _REENT check macro.  */

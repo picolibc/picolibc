@@ -1,3 +1,66 @@
+2007-02-01  Joel Schopp <jschopp@austin.ibm.com>
+            Kazunori Asayama <asayama@sm.sony.co.jp>
+
+	* configure.host: Enable SPU specific stdio directory.
+	* libc/machine/spu/Makefile.am: Add objects.
+	* libc/machine/spu/Makefile.in: Regenerated.
+	* libc/machine/spu/c99ppe.h: Add macros and function
+	declarations to initialize SPU specific stdio stuffs.
+	* libc/machine/spu/stdio.c: Add functions to manage Cell SPU
+	specific FILE structures.
+	* libc/machine/spu/perror.c: Add initialization routine of
+	stdio stuffs.
+	* libc/machine/spu/printf.c: Ditto.
+	* libc/machine/spu/putchar.c: Ditto.
+	* libc/machine/spu/puts.c: Ditto.
+	* libc/machine/spu/vprintf.c: Ditto.
+	* libc/machine/spu/clearerr.c: New file. Add a stdio function
+	implementation.
+	* libc/machine/spu/feof.c: Ditto.
+	* libc/machine/spu/ferror.c: Ditto.
+	* libc/machine/spu/fileno.c: Ditto.
+	* libc/machine/spu/fopen.c: Ditto.
+	* libc/machine/spu/fclose.c: Ditto.
+	* libc/machine/spu/freopen.c: Ditto.
+	* libc/machine/spu/fflush.c: Ditto.
+	* libc/machine/spu/fseek.c: Ditto.
+	* libc/machine/spu/ftell.c: Ditto.
+	* libc/machine/spu/rewind.c: Ditto.
+	* libc/machine/spu/fgetpos.c: Ditto.
+	* libc/machine/spu/fsetpos.c: Ditto.
+	* libc/machine/spu/fread.c: Ditto.
+	* libc/machine/spu/fwrite.c: Ditto.
+	* libc/machine/spu/getc.c: Ditto.
+	* libc/machine/spu/getchar.c: Ditto.
+	* libc/machine/spu/gets.c: Ditto.
+	* libc/machine/spu/fgetc.c: Ditto.
+	* libc/machine/spu/fgets.c: Ditto.
+	* libc/machine/spu/ungetc.c: Ditto.
+	* libc/machine/spu/putc.c: Ditto.
+	* libc/machine/spu/fputc.c: Ditto.
+	* libc/machine/spu/fputs.c: Ditto.
+	* libc/machine/spu/vfprintf.c: Ditto.
+	* libc/machine/spu/vfscanf.c: Ditto.
+	* libc/machine/spu/fprintf.c: Ditto.
+	* libc/machine/spu/fscanf.c: Ditto.
+	* libc/machine/spu/scanf.c: Ditto.
+	* libc/machine/spu/vscanf.c: Ditto.
+	* libc/machine/spu/setbuf.c: Ditto.
+	* libc/machine/spu/setvbuf.c: Ditto.
+	* libc/machine/spu/tmpfile.c: Ditto.
+
+2007-02-01  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/config.h[__SPU__]: Define __CUSTOM_FILE_IO__.
+	* libc/include/stdio.h[!__CUSTOM_FILE_IO__]: Add flag check
+	around stdio macros that manipulate fields in the normal file 
+	structure.
+	* libc/include/sys/reent.h[__CUSTOM_FILE_IO__]: Include
+	<sys/custom_file.h> to define custom FILE structure.
+	* libc/include/sys/custom_file.h: New default header file
+	that generates error if not overridden when __CUSTOM_FILE_IO__ set.
+	* libc/machine/spu/sys/custom_file.h: New file.
+
 2007-01-31  Kazunori Asayama <asayama@sm.sony.co.jp>
 
 	* configure.host: Define stdio directory as a variable.

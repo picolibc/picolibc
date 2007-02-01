@@ -4,10 +4,14 @@
 
 #undef putchar
 
+#ifndef _REENT_ONLY
+
 int
 putchar (c)
      int c;
 {
+  CHECK_STD_INIT(_REENT);
+
   /* c gets overwritten before return */
 
   send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_PUTCHAR, &c);
@@ -15,3 +19,4 @@ putchar (c)
   return c;
 }
 
+#endif /* ! _REENT_ONLY */

@@ -11,7 +11,7 @@
 
 typedef struct
 {
-  char* fmt;
+  _CONST char* fmt;
   unsigned int pad0[ 3 ];
   va_list ap;
 } c99_printf_t;
@@ -33,6 +33,9 @@ printf (fmt, va_alist)
 {
   int* ret;
   c99_printf_t args;
+
+  CHECK_STD_INIT(_REENT);
+
   ret = (int*) &args;
 
   args.fmt = fmt;

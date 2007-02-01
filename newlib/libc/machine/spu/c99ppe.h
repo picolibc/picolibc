@@ -87,8 +87,7 @@ enum {
 #define SPE_STDIN                   1
 #define SPE_STDOUT                  2
 #define SPE_STDERR                  3
-#define SPE_FOPEN_MAX               (FOPEN_MAX+1)
-#define SPE_FOPEN_MIN               4
+#define SPE_FOPEN_MAX               FOPEN_MAX
 
 struct spe_reg128{
   unsigned int slot[4];
@@ -114,3 +113,12 @@ send_to_ppe(int signalcode, int opcode, void *data)
 	errno = ret->slot[3];
 	return;
 }
+
+void _EXFUN(__sinit,(struct _reent *));
+FILE  *_EXFUN(__sfp,(struct _reent *));
+#define __sfp_free(fp) ( (fp)->_fp = 0 )
+
+#define CHECK_INIT(ptr) \
+  do { if ((ptr) && !(ptr)->__sdidinit) __sinit (ptr); } while (0)
+#define CHECK_STD_INIT(ptr) /* currently, do nothing */
+#define CHECK_STR_INIT(ptr) /* currently, do nothing */

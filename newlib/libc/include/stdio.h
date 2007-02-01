@@ -395,6 +395,7 @@ FILE	*_EXFUN(funopen,(const _PTR _cookie,
 #define	fwopen(cookie, fn) funopen(cookie, (int (*)())0, fn, (fpos_t (*)())0, (int (*)())0)
 #endif
 
+#ifndef __CUSTOM_FILE_IO__
 /*
  * The __sfoo macros are here so that we can 
  * define function versions in the C library.
@@ -472,9 +473,6 @@ static __inline int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
 #endif /* lint */
 #endif /* __CYGWIN__ */
 
-#define	getchar()	getc(stdin)
-#define	putchar(x)	putc(x, stdout)
-
 #ifndef __STRICT_ANSI__
 /* fast always-buffered version, true iff error */
 #define	fast_putc(x,p) (--(p)->_w < 0 ? \
@@ -485,6 +483,11 @@ static __inline int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
 #define L_ctermid       16
 #endif
 #endif
+
+#endif /* !__CUSTOM_FILE_IO__ */
+
+#define	getchar()	getc(stdin)
+#define	putchar(x)	putc(x, stdout)
 
 _END_STD_C
 

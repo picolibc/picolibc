@@ -2,10 +2,13 @@
 
 #include "c99ppe.h"
 
+#ifndef _REENT_ONLY
+
 int
 _DEFUN (puts, (s),
 	char _CONST * s)
 {
+  CHECK_STD_INIT(_REENT);
 
   /* The return value gets written over s
    */
@@ -14,3 +17,4 @@ _DEFUN (puts, (s),
   return (int)s;
 }
 
+#endif /* ! _REENT_ONLY */
