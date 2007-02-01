@@ -4,7 +4,7 @@
 	mapping addition.
 	(ga_clone): Just call ga_dup from here.
 	(ga_duplist): New function to duplicate list of struct addrinfo.
-	(ga_echeck): Don't check a_flags, it already happened in
+	(ga_echeck): Don't check ai_flags, it already happened in
 	cygwin_getaddrinfo.
 	(cygwin_freeaddrinfo): Always call ipv4_freeaddrinfo.
 	(cygwin_getaddrinfo): Use new wincap.supports_all_posix_ai_flags
