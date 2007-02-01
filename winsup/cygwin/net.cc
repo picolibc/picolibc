@@ -3013,28 +3013,92 @@ ga_aistruct (struct addrinfo ***paipnext, const struct addrinfo *hintsp,
  */
 
 /* include ga_clone */
+
+/* Cygwin specific: The ga_clone function is split up to allow an easy
+   duplication of addrinfo structs.  This is used to duplicate the
+   structures from Winsock, so that we have the allocation of the structs
+   returned to the application under control.  This is especially helpful
+   for the AI_V4MAPPED case prior to Vista. */
 static struct addrinfo *
-ga_clone (struct addrinfo *ai)
+ga_dup (struct addrinfo *ai, bool v4mapped)
 {
   struct addrinfo *nai;
 
   if ((nai = (struct addrinfo *) calloc (1, sizeof (struct addrinfo))) == NULL)
     return (NULL);
 
-  nai->ai_next = ai->ai_next;
-  ai->ai_next = nai;
-
   nai->ai_flags = 0;		/* make sure AI_CLONE is off */
-  nai->ai_family = ai->ai_family;
+  nai->ai_family = v4mapped ? AF_INET6 : ai->ai_family;
   nai->ai_socktype = ai->ai_socktype;
   nai->ai_protocol = ai->ai_protocol;
   nai->ai_canonname = NULL;
-  nai->ai_addrlen = ai->ai_addrlen;
-  if ((nai->ai_addr = (struct sockaddr *) malloc (ai->ai_addrlen)) == NULL)
-    return (NULL);
-  memcpy (nai->ai_addr, ai->ai_addr, ai->ai_addrlen);
+  if (!(ai->ai_flags & AI_CLONE) && ai->ai_canonname
+      && !(nai->ai_canonname = strdup (ai->ai_canonname)))
+    {
+      free (nai);
+      return NULL;
+    }
+  nai->ai_addrlen = v4mapped ? sizeof (struct sockaddr_in6) : ai->ai_addrlen;
+  if ((nai->ai_addr = (struct sockaddr *) malloc (v4mapped
+  						  ? sizeof (struct sockaddr_in6)
+						  : ai->ai_addrlen)) == NULL)
+    {
+      if (nai->ai_canonname)
+        free (nai->ai_canonname);
+      free (nai);
+      return NULL;
+    }
+  if (v4mapped)
+    {
+      struct sockaddr_in6 *in = (struct sockaddr_in6 *) nai->ai_addr;
+      in->sin6_family = AF_INET6;
+      in->sin6_port = ((struct sockaddr_in *) ai->ai_addr)->sin_port;
+      in->sin6_flowinfo = 0;
+      in->sin6_addr.s6_addr32[0] = 0;
+      in->sin6_addr.s6_addr32[1] = 0;
+      in->sin6_addr.s6_addr32[2] = htonl (0xffff);
+      in->sin6_addr.s6_addr32[3] = ((struct sockaddr_in *) ai->ai_addr)->sin_addr.s_addr;
+      in->sin6_scope_id = 0;
+    }
+  else
+    memcpy (nai->ai_addr, ai->ai_addr, ai->ai_addrlen);
 
-  return (nai);
+  return nai;
+}
+
+static struct addrinfo *
+ga_clone (struct addrinfo *ai)
+{
+  struct addrinfo *nai;
+
+  if ((nai = ga_dup (ai, false)))
+    {
+      nai->ai_next = ai->ai_next;
+      ai->ai_next = nai;
+    }
+  return nai;
+}
+
+static struct addrinfo *
+ga_duplist (struct addrinfo *ai, bool v4mapped)
+{
+  void ipv4_freeaddrinfo (struct addrinfo *aihead);
+  struct addrinfo *tmp, *nai = NULL, *nai0 = NULL;
+
+  for (; ai; ai = ai->ai_next, nai = tmp)
+    {
+      if (!(tmp = ga_dup (ai, v4mapped)))
+        goto bad;
+      if (!nai0)
+        nai0 = tmp;
+      if (nai)
+        nai->ai_next = tmp;
+    }
+  return nai0;
+
+bad:
+  ipv4_freeaddrinfo (nai0);
+  return NULL;
 }
 
 /* end ga_clone */
@@ -3048,9 +3112,10 @@ static int
 ga_echeck (const char *hostname, const char *servname,
 	   int flags, int family, int socktype, int protocol)
 {
+#if 0
   if (flags & ~(AI_PASSIVE | AI_CANONNAME))
     return (EAI_BADFLAGS);	/* unknown flag bits */
-
+#endif
   if (hostname == NULL || hostname[0] == '\0')
     {
       if (servname == NULL || servname[0] == '\0')
@@ -3861,11 +3926,7 @@ cygwin_freeaddrinfo (struct addrinfo *addr)
   myfault efault;
   if (efault.faulted (EFAULT))
     return;
-  load_ipv6 ();
-  if (freeaddrinfo)
-    freeaddrinfo (addr);
-  else
-    ipv4_freeaddrinfo (addr);
+  ipv4_freeaddrinfo (addr);
 }
 
 extern "C" int
@@ -3894,21 +3955,71 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
   load_ipv6 ();
   if (getaddrinfo)
     {
-      struct addrinfo nhints;
+      struct addrinfo nhints, *dupres;
 
       /* AI_ADDRCONFIG is not supported prior to Vista.  Rather it's
 	 the default and only possible setting.
 	 On Vista, the default behaviour is as if AI_ADDRCONFIG is set,
 	 apparently for performance reasons.  To get the POSIX default
 	 behaviour, the AI_ALL flag has to be set. */
-      if (wincap.has_gaa_on_link_prefix ()
+      if (wincap.supports_all_posix_ai_flags ()
 	  && hints && hints->ai_family == PF_UNSPEC)
         {
 	  nhints = *hints;
 	  hints = &nhints;
 	  nhints.ai_flags |= AI_ALL;
 	}
-      return w32_to_gai_err (getaddrinfo (hostname, servname, hints, res));
+      int ret = w32_to_gai_err (getaddrinfo (hostname, servname, hints, res));
+      /* Always copy over to self-allocated memory. */
+      if (!ret)
+        {
+	  dupres = ga_duplist (*res, false);
+	  freeaddrinfo (*res);
+	  *res = dupres;
+	  if (!dupres)
+	    return EAI_MEMORY;
+	}
+      /* AI_V4MAPPED and AI_ALL are not supported prior to Vista.  So, what
+         we do here is to emulate AI_V4MAPPED.  If no IPv6 addresses are
+	 returned, or the AI_ALL flag is set, we try with AF_INET again, and
+	 convert the returned IPv4 addresses into v4-in-v6 entries.  This
+	 is done in ga_dup if the v4mapped flag is set. */
+      if (!wincap.supports_all_posix_ai_flags ()
+	  && hints->ai_family == AF_INET6
+	  && (hints->ai_flags & AI_V4MAPPED)
+	  && (ret == EAI_NODATA || ret == EAI_NONAME
+	      || (hints->ai_flags & AI_ALL)))
+	{
+	  struct addrinfo *v4res;
+	  nhints = *hints;
+	  nhints.ai_family = AF_INET;
+	  int ret2 = w32_to_gai_err (getaddrinfo (hostname, servname,
+						  &nhints, &v4res));
+	  if (!ret2)
+	    {
+	      dupres = ga_duplist (v4res, true);
+	      freeaddrinfo (v4res);
+	      if (!dupres)
+		{
+		  if (!ret)
+		    ipv4_freeaddrinfo (*res);
+		  return EAI_MEMORY;
+		}
+	      /* If a list of v6 addresses exists, append the v4-in-v6 address
+	         list.  Otherwise just return the v4-in-v6 address list. */
+	      if (!ret)
+		{
+		  struct addrinfo *ptr;
+		  for (ptr = *res; ptr->ai_next; ptr = ptr->ai_next)
+		    ;
+		  ptr->ai_next = dupres;
+		}
+	      else
+		*res = dupres;
+	      ret = 0;
+	    }
+	}
+      return ret;
     }
   return ipv4_getaddrinfo (hostname, servname, hints, res);
 }

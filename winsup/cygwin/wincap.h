@@ -75,6 +75,7 @@ struct wincaps
   unsigned has_recycle_dot_bin				: 1;
   unsigned has_gaa_prefixes				: 1;
   unsigned has_gaa_on_link_prefix			: 1;
+  unsigned supports_all_posix_ai_flags			: 1;
 };
 
 class wincapc
@@ -156,6 +157,7 @@ public:
   bool	IMPLEMENT (has_recycle_dot_bin)
   bool	IMPLEMENT (has_gaa_prefixes)
   bool	IMPLEMENT (has_gaa_on_link_prefix)
+  bool	IMPLEMENT (supports_all_posix_ai_flags)
 
 #undef IMPLEMENT
 };

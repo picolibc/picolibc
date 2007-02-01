@@ -1,5 +1,23 @@
 2007-02-01  Corinna Vinschen  <corinna@vinschen.de>
 
+	* net.cc (ga_dup): New function, taken from ga_clone with v4-in-v6
+	mapping addition.
+	(ga_clone): Just call ga_dup from here.
+	(ga_duplist): New function to duplicate list of struct addrinfo.
+	(ga_echeck): Don't check a_flags, it already happened in
+	cygwin_getaddrinfo.
+	(cygwin_freeaddrinfo): Always call ipv4_freeaddrinfo.
+	(cygwin_getaddrinfo): Use new wincap.supports_all_posix_ai_flags
+	flag rather than wincap.has_gaa_on_link_prefix.  Always duplicate
+	WinSock's addrinfo list to a self-allocated list.  Handle AI_V4MAPPED
+	for pre-Vista platforms supporting getaddrinfo.
+	* wincap.h (wincapc::supports_all_posix_ai_flags): New element.
+	* wincap.cc: Implement above element throughout.
+	* include/netdb.h: Note how AI_ADDRCONFIG is not supported pre-Vista.
+	Remove superfluous comment.
+
+2007-02-01  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/socket.h: Add IPv6 socket options.
 
 2007-01-31  Corinna Vinschen  <corinna@vinschen.de>

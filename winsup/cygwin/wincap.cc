@@ -74,6 +74,7 @@ static NO_COPY wincaps wincap_unknown = {
   has_recycle_dot_bin:false,
   has_gaa_prefixes:false,
   has_gaa_on_link_prefix:false,
+  supports_all_posix_ai_flags:false,
 };
 
 static NO_COPY wincaps wincap_95 = {
@@ -139,6 +140,7 @@ static NO_COPY wincaps wincap_95 = {
   has_recycle_dot_bin:false,
   has_gaa_prefixes:false,
   has_gaa_on_link_prefix:false,
+  supports_all_posix_ai_flags:false,
 };
 
 static NO_COPY wincaps wincap_95osr2 = {
@@ -204,6 +206,7 @@ static NO_COPY wincaps wincap_95osr2 = {
   has_recycle_dot_bin:false,
   has_gaa_prefixes:false,
   has_gaa_on_link_prefix:false,
+  supports_all_posix_ai_flags:false,
 };
 
 static NO_COPY wincaps wincap_98 = {
@@ -269,6 +272,7 @@ static NO_COPY wincaps wincap_98 = {
   has_recycle_dot_bin:false,
   has_gaa_prefixes:false,
   has_gaa_on_link_prefix:false,
+  supports_all_posix_ai_flags:false,
 };
 
 static NO_COPY wincaps wincap_98se = {
@@ -334,6 +338,7 @@ static NO_COPY wincaps wincap_98se = {
   has_recycle_dot_bin:false,
   has_gaa_prefixes:false,
   has_gaa_on_link_prefix:false,
+  supports_all_posix_ai_flags:false,
 };
 
 static NO_COPY wincaps wincap_me = {
@@ -399,6 +404,7 @@ static NO_COPY wincaps wincap_me = {
   has_recycle_dot_bin:false,
   has_gaa_prefixes:false,
   has_gaa_on_link_prefix:false,
+  supports_all_posix_ai_flags:false,
 };
 
 static NO_COPY wincaps wincap_nt3 = {
@@ -464,6 +470,7 @@ static NO_COPY wincaps wincap_nt3 = {
   has_recycle_dot_bin:false,
   has_gaa_prefixes:false,
   has_gaa_on_link_prefix:false,
+  supports_all_posix_ai_flags:false,
 };
 
 static NO_COPY wincaps wincap_nt4 = {
@@ -529,6 +536,7 @@ static NO_COPY wincaps wincap_nt4 = {
   has_recycle_dot_bin:false,
   has_gaa_prefixes:false,
   has_gaa_on_link_prefix:false,
+  supports_all_posix_ai_flags:false,
 };
 
 static NO_COPY wincaps wincap_nt4sp4 = {
@@ -594,6 +602,7 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   has_recycle_dot_bin:false,
   has_gaa_prefixes:false,
   has_gaa_on_link_prefix:false,
+  supports_all_posix_ai_flags:false,
 };
 
 static NO_COPY wincaps wincap_2000 = {
@@ -659,6 +668,7 @@ static NO_COPY wincaps wincap_2000 = {
   has_recycle_dot_bin:false,
   has_gaa_prefixes:false,
   has_gaa_on_link_prefix:false,
+  supports_all_posix_ai_flags:false,
 };
 
 static NO_COPY wincaps wincap_xp = {
@@ -724,6 +734,7 @@ static NO_COPY wincaps wincap_xp = {
   has_recycle_dot_bin:false,
   has_gaa_prefixes:true,
   has_gaa_on_link_prefix:false,
+  supports_all_posix_ai_flags:false,
 };
 
 static NO_COPY wincaps wincap_2003 = {
@@ -789,6 +800,7 @@ static NO_COPY wincaps wincap_2003 = {
   has_recycle_dot_bin:false,
   has_gaa_prefixes:true,
   has_gaa_on_link_prefix:false,
+  supports_all_posix_ai_flags:false,
 };
 
 static NO_COPY wincaps wincap_vista = {
@@ -854,6 +866,7 @@ static NO_COPY wincaps wincap_vista = {
   has_recycle_dot_bin:true,
   has_gaa_prefixes:true,
   has_gaa_on_link_prefix:true,
+  supports_all_posix_ai_flags:true,
 };
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));
