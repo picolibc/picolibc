@@ -330,7 +330,7 @@ unlink_nt (path_conv &win32_name, bool setattrs)
 	 also means that deleting fails. */
       syscall_printf ("%p = NtClose (%p)", status, h);
       if (!lasterr)
-	RtlNtStatusToDosError (status);
+	lasterr = RtlNtStatusToDosError (status);
     }
 
   syscall_printf ("Deleting succeeded");

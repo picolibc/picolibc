@@ -1,3 +1,7 @@
+2007-02-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (unlink_nt): Add missing assignment in case NtClose fails.
+
 2007-02-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (ga_dup): New function, taken from ga_clone with v4-in-v6
