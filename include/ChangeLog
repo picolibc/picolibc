@@ -1,3 +1,7 @@
+2076-02-02  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* dis-asm.h (print_i386_disassembler_options): New.
+
 2007-01-31  Vladimir Prus  <vladimir@codesourcery.com>
 	
 	* libiberty.h (PEX_STDERR_TO_PIPE): New define.
