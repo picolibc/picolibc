@@ -1,3 +1,11 @@
+2007-02-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_serial.cc (fhandler_serial::tcsetattr): Add support for
+	baud rates up to 3000000 baud.  Add missing 128K and 256K cases.
+	(fhandler_serial::tcgetattr): Ditto.
+	* include/sys/termios.h: Add baud rate definitions from B460800 up to
+	B3000000.
+
 2007-02-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (unlink_nt): Add missing assignment in case NtClose fails.
