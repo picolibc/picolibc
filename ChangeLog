@@ -1,3 +1,36 @@
+2007-02-05  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following changes:
+	2006-11-28  DJ Delorie  <dj@redhat.com>
+
+	* configure.in: Fix typo for mep's target_makefile_frag.
+	* configure: Regenerated.
+
+	2005-04-22  Richard Sandiford  <rsandifo@redhat.com>
+
+	* configure.in (mep*): Add -mlibrary to FLAGS_FOR_TARGET.
+	* configure: Regenerate.
+
+	2001-09-19  DJ Delorie  <dj@redhat.com>
+
+	* configure.in (target_makefile_frag): use mt-mep
+
+	2001-06-12  Don Howard  <dhoward@redhat.com>
+
+	* configure.in: Remove gdb from MeP skip list.
+
+	2001-04-05  DJ Delorie  <dj@redhat.com>
+
+	* configure.in (noconfigdirs): Remove gcc from MeP skip list.
+
+	2001-03-20  Ben Elliston  <bje@redhat.com>
+
+	* configure.in (noconfigdirs): Add gcc and gdb for MeP.
+
+	2001-03-19  Ben Elliston  <bje@redhat.com>
+
+	* config.sub (mep, mep-*): Add.
+
 2007-01-31  Andreas Schwab  <schwab@suse.de>
 
 	* Makefile.tpl (LDFLAGS): Substitute it.
