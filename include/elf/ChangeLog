@@ -1,3 +1,56 @@
+2007-02-05  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following Changes:	
+	2005-08-22  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (EF_MEP_CPU_C4): New macro.
+	(EF_MEP_CPU_H1): Change to 0x10000000.
+
+	2005-04-22  Richard Sandiford  <rsandifo@redhat.com>
+
+	* mep.h (EF_MEP_LIBRARY): New flag.
+	(EF_MEP_ALL_FLAGS): Update accordingly.
+
+	2004-06-21  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (EF_MEP_CPU_MASK, EF_MEP_CPU_MEP, EF_MEP_CPU_C2) 
+	(EF_MEP_CPU_C3, EF_MEP_CPU_H1, EF_MEP_INDEX_MASK) 
+	(EF_MEP_ALL_FLAGS): New macros.
+
+	2001-09-28  Richard Henderson  <rth@redhat.com>
+
+	* mep.h (SHF_MEP_VLIW, SEC_MEP_VLIW): New.
+
+	2001-07-12  DJ Delorie  <dj@redhat.com>
+
+	* mep.h (R_MEP_GNU_VTINHERIT, R_MEP_GNU_VTENTRY): Mark as no-overflow.
+
+	2001-06-25  DJ Delorie  <dj@redhat.com>
+
+	* mep.h: Add vtable relocs.
+
+	2001-05-10  DJ Delorie  <dj@redhat.com>
+
+	* mep.h: Fix bit offsets for HI16*, make them no-overflow.  Add
+	comment about mep-relocs.pl.
+
+	2001-05-01  DJ Delorie  <dj@redhat.com>
+
+	* mep.h: Add MeP-specific relocs.
+
+	2001-03-22  Ben Elliston  <bje@redhat.com>
+
+	* mep.h: New file.
+
+	2001-03-20  Ben Elliston  <bje@redhat.com>
+
+	* common.h (EM_CYGNUS_MEP): Define.
+
+2007-02-15  Dave Brolley  <brolley@redhat.com>
+
+	From Graydon Hoare  <graydon@redhat.com>:
+	* common.h (STT_RELC, STT_SRELC, R_RELC): New macros.
+
 2007-01-08  Kazu Hirata  <kazu@codesourcery.com>
 
 	* m68k.h (EF_M68K_FIDO): New.

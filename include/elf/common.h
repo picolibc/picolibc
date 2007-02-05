@@ -280,6 +280,8 @@
 /* NIOS magic number - no EABI available.  */
 #define EM_NIOS32		0xFEBB
 
+#define EM_CYGNUS_MEP		0xF00D  /* Toshiba MeP */
+
 /* See the above comment before you add a new EM_* value here.  */
 
 /* Values for e_version.  */
@@ -475,6 +477,8 @@
 #define STT_FILE	4		/* Symbol gives a file name */
 #define STT_COMMON	5		/* An uninitialised common block */
 #define STT_TLS		6		/* Thread local data object */
+#define STT_RELC        8               /* Complex relocation expression */
+#define STT_SRELC       9               /* Signed Complex relocation expression */
 #define STT_LOOS	10		/* OS-specific semantics */
 #define STT_HIOS	12		/* OS-specific semantics */
 #define STT_LOPROC	13		/* Application-specific semantics */
