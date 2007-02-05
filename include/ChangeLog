@@ -1,3 +1,10 @@
+2007-02-05  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following changes:
+	2001-03-26  Ben Elliston  <bje@redhat.com>
+
+	* dis-asm.h (print_insn_mep): Declare.
+
 2007-02-02  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* dis-asm.h (print_i386_disassembler_options): New.
