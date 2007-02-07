@@ -1,3 +1,37 @@
+2007-02-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygmalloc.h (MALLOC_FAILURE_ACTION): Define empty.
+	* cygwin.din (posix_madvise): Export.
+	(posix_memalign): Export.
+	* fhandler.cc (fhandler_base::fpathconf): Return useful values in
+	_PC_VDISABLE, _PC_SYNC_IO and _PC_SYMLINK_MAX cases.
+	* malloc_wrapper.cc (malloc): Set errno here since it's not set in
+	dlmalloc.c anymore.
+	(realloc): Ditto.
+	(calloc): Ditto.
+	(memalign): Ditto.
+	(valloc): Ditto.
+	(posix_memalign): New function.
+	* mmap.cc (posix_madvise): New function.
+	* sysconf.cc (get_open_max): New function.
+	(get_page_size): Ditto.
+	(get_nproc_values): Ditto.
+	(get_avphys): Ditto.
+	(sc_type): New type.
+	(sca): New array to map _SC_xxx options to sysconf return values.
+	(sysconf): Reimplement using sca array.
+	* include/limits.h: Add all missing values as defined by SUSv3.
+	* include/pthread.h (PTHREAD_DESTRUCTOR_ITERATIONS): Move definition
+	to sys/limits.h.
+	(PTHREAD_KEYS_MAX): Ditto.
+	* include/semaphore.h (SEM_VALUE_MAX): Ditto.
+	* include/cygwin/stdlib.h (posix_memalign): Declare.
+	* include/cygwin/version.h: Bump API minor number.
+	* include/sys/mman.h: Add posix_madvise flags.
+	(posix_madvise): Declare.
+	* include/sys/termios.h (_POSIX_VDISABLE): Move definition to
+	sys/limits.h.
+
 2007-02-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_serial.cc (fhandler_serial::tcsetattr): Add support for

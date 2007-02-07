@@ -1,7 +1,7 @@
 /* version.h -- Cygwin version numbers and accompanying documentation.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006 Red Hat, Inc.
+   2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -301,12 +301,13 @@ details. */
       161: Export resolver functions.
       162: New struct ifreq.  Export if_nametoindex, if_indextoname,
 	   if_nameindex, if_freenameindex.
+      163: Export posix_madvise, posix_memalign.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 162
+#define CYGWIN_VERSION_API_MINOR 163
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

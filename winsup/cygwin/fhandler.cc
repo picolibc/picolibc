@@ -1852,19 +1852,21 @@ fhandler_base::fpathconf (int v)
     case _PC_NO_TRUNC:
       return 1;
     case _PC_VDISABLE:
-      if (!is_tty ())
-        set_errno (EINVAL);
+      if (is_tty ())
+        return _POSIX_VDISABLE;
+      set_errno (EINVAL);
       break;
     case _PC_ASYNC_IO:
     case _PC_PRIO_IO:
-    case _PC_SYNC_IO:
       break;
+    case _PC_SYNC_IO:
+      return 1;
     case _PC_FILESIZEBITS:
       return FILESIZEBITS;
     case _PC_2_SYMLINKS:
       return 1;
     case _PC_SYMLINK_MAX:
-      break;
+      return SYMLINK_MAX;
     case _PC_POSIX_PERMISSIONS:
     case _PC_POSIX_SECURITY:
       if (get_device () == FH_FS)

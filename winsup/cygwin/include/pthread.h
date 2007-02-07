@@ -1,6 +1,7 @@
 /* pthread.h: POSIX pthread interface
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2006 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2006,
+   2007 Red Hat, Inc.
 
    Written by Marco Fuykschot <marco@ddi.nl>
 
@@ -30,11 +31,6 @@ extern "C"
  would normally be written to the passed parameter of pthread_cond_init(lvalue, NULL); */
 /* #define PTHREAD_COND_INITIALIZER 0 */
 
-#define PTHREAD_DESTRUCTOR_ITERATIONS 1
-/* Tls has 64 items for pre win2000 - and we don't want to use them all :]
- * Before committing discuss this with the list
- */
-#define PTHREAD_KEYS_MAX 32
 /* the default : joinable */
 
 #define PTHREAD_CANCEL_ASYNCHRONOUS 1

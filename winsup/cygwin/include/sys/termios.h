@@ -1,6 +1,7 @@
 /* sys/termios.h
 
-   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006 Red Hat, Inc.
+   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006,
+   2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -232,10 +233,6 @@ POSIX commands */
 #define VWERASE	17
 
 #define NCCS		18
-
-/* `c_cc' member of 'struct termios' structure can be disabled by
-   using the value _POSIX_VDISABLE.  */
-#define	_POSIX_VDISABLE	'\0'
 
 /* Compare a character C to a value VAL from the `c_cc' array in a
    `struct termios'.  If VAL is _POSIX_VDISABLE, no character can match it.  */

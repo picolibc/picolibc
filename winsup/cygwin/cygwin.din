@@ -988,6 +988,8 @@ popen SIGFE
 _popen = popen SIGFE
 posix_fadvise SIGFE
 posix_fallocate SIGFE
+posix_madvise SIGFE
+posix_memalign SIGFE
 posix_openpt SIGFE
 posix_regcomp SIGFE
 posix_regerror SIGFE

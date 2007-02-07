@@ -1,6 +1,6 @@
 /* cygmalloc.h: cygwin DLL malloc stuff
 
-   Copyright 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -25,6 +25,7 @@ void dlmalloc_stats ();
 #ifndef __INSIDE_CYGWIN__
 # define USE_DL_PREFIX 1
 #else
+#define MALLOC_FAILURE_ACTION
 # define __malloc_lock() mallock.acquire ()
 # define __malloc_unlock() mallock.release ()
 extern muto mallock;

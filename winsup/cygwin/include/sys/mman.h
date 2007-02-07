@@ -1,6 +1,6 @@
 /* sys/mman.h
 
-   Copyright 1996, 1997, 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2000, 2001, 2003, 2005, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -47,6 +47,15 @@ extern "C" {
 #define MS_SYNC 2
 #define MS_INVALIDATE 4
 
+/*
+ * Flags for posix_madvise.
+ */
+#define POSIX_MADV_NORMAL 0
+#define POSIX_MADV_SEQUENTIAL 1
+#define POSIX_MADV_RANDOM 2
+#define POSIX_MADV_WILLNEED 3
+#define POSIX_MADV_DONTNEED 4
+
 #ifndef __INSIDE_CYGWIN__
 extern void *mmap (void *__addr, size_t __len, int __prot, int __flags, int __fd, off_t __off);
 #endif
@@ -55,6 +64,8 @@ extern int mprotect (void *__addr, size_t __len, int __prot);
 extern int msync (void *__addr, size_t __len, int __flags);
 extern int mlock (const void *__addr, size_t __len);
 extern int munlock (const void *__addr, size_t __len);
+
+extern int posix_madvise (void *__addr, size_t __len, int __advice);
 
 #ifdef __cplusplus
 };

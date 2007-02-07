@@ -1,6 +1,6 @@
 /* stdlib.h
 
-   Copyright 2005, 2006 Red Hat Inc.
+   Copyright 2005, 2006, 2007 Red Hat Inc.
 
 This file is part of Cygwin.
 
@@ -32,6 +32,7 @@ int unlockpt (int);
 #endif /*__STRICT_ANSI__*/
 
 int posix_openpt (int);
+int posix_memalign (void **, size_t, size_t);
 
 #ifdef _COMPILING_NEWLIB
 #define unsetenv UNUSED_unsetenv

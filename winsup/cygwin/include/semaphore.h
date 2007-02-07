@@ -1,6 +1,6 @@
 /* semaphore.h: POSIX semaphore interface
 
-   Copyright 2001, 2003 Red Hat, Inc.
+   Copyright 2001, 2003, 2007 Red Hat, Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -25,7 +25,6 @@ extern "C"
 #endif
 
 #define SEM_FAILED 0
-#define SEM_VALUE_MAX 1147483648
 
 /* Semaphores */
   int sem_init (sem_t * sem, int pshared, unsigned int value);

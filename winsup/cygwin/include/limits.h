@@ -1,6 +1,6 @@
 /* limits.h
 
-   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -127,15 +127,45 @@ details. */
 
 /* Runtime Invariant Values */
 
+/* Please note that symbolic names shall be ommited, on specific
+   implementations where the corresponding value is equal to or greater
+   than the stated minimum, but is unspecified.  This indetermination
+   might depend on the amount of available memory space on a specific
+   instance of a specific implementation. The actual value supported by
+   a specific instance shall be provided by the sysconf() function. */
+
+/* Maximum number of I/O operations in a single list I/O call supported by
+   the implementation.  Not yet implemented. */
+#undef AIO_LISTIO_MAX
+/* #define AIO_LISTIO_MAX >= _POSIX_AIO_LISTIO_MAX */
+
+/* Maximum number of outstanding asynchronous I/O operations supported by
+   the implementation.  Not yet implemented. */
+#undef AIO_MAX
+/*  #define AIO_MAX >= _POSIX_AIO_MAX */
+
+/* The maximum amount by which a process can decrease its asynchronous I/O
+   priority level from its own scheduling priority. */
+#undef AIO_PRIO_DELTA_MAX
+/* #define AIO_PRIO_DELTA_MAX >= 0 */
+
 /* Maximum number of bytes in arguments and environment passed in an exec
    call.  32000 is the safe value used for Windows processes when called
    from Cygwin processes. */
 #undef ARG_MAX
 #define ARG_MAX 32000
 
+/* Maximum number of functions that may be registered with atexit(). */
+#undef ATEXIT_MAX
+#define ATEXIT_MAX 32
+
 /* Maximum number of simultaneous processes per real user ID. */
 #undef CHILD_MAX
 #define CHILD_MAX 256
+
+/* Maximum number of timer expiration overruns.  Not yet implemented. */
+#undef DELAYTIMER_MAX
+/* #define DELAYTIMER_MAX >= _POSIX_DELAYTIMER_MAX */
 
 /* Maximum length of a host name. */
 #undef HOST_NAME_MAX
@@ -148,6 +178,16 @@ details. */
 /* Maximum number of characters in a login name. */
 #undef LOGIN_NAME_MAX
 #define LOGIN_NAME_MAX 256	/* equal to UNLEN defined in w32api/lmcons.h */
+
+/* The maximum number of open message queue descriptors a process may hold.
+   Not yet implemented. */
+#undef MQ_OPEN_MAX
+/* #define MQ_OPEN_MAX >= _POSIX_MQ_OPEN_MAX */
+
+/* The maximum number of message priorities supported by the implementation.
+   Not yet implemented. */
+#undef MQ_PRIO_MAX
+/* #define MQ_PRIO_MAX >= _POSIX_MQ_PRIO_MAX */
 
 /* # of open files per process. Actually it can be more since Cygwin
    grows the dtable as necessary. We define a reasonable limit here
@@ -162,10 +202,60 @@ details. */
 #define PAGESIZE 65536
 #define PAGE_SIZE PAGESIZE
 
+/* Maximum number of attempts made to destroy a thread's thread-specific
+   data values on thread exit. */
+/* FIXME: I really don't understand this value.  Why should multiple
+   attempts be necessary to destroy thread-specific data?!?  Anyway, the
+   current value here is 1, taken originally from our pthread.h file,
+   where it was mistakenly defined first.  Unfortunately this value is
+   lower than the POSIX defined minimum value, which is 4. */
+#undef PTHREAD_DESTRUCTOR_ITERATIONS
+#define PTHREAD_DESTRUCTOR_ITERATIONS 1
+
+/* Maximum number of data keys that can be created by a process. */
+/* Tls has 64 items for pre win2000 - and we don't want to use them all :] */
+#undef PTHREAD_KEYS_MAX
+#define PTHREAD_KEYS_MAX 32
+
+/* Minimum size in bytes of thread stack storage. */
+/* Actually the minimum stack size is somewhat of a split personality.
+   The size parameter in a CreateThread call is the size of the initially
+   commited stack size, which can be specified as low as 4K.  However, the
+   default *reserved* stack size is 1 Meg, unless the .def file specifies
+   another STACKSIZE value.  And even if you specify a stack size below 64K,
+   the allocation granularity is in the way.  You can never squeeze multiple
+   threads in the same allocation granularity slot.  Oh well. */
+#undef PTHREAD_STACK_MIN
+#define PTHREAD_STACK_MIN 65536
+
+/* Maximum number of threads that can be created per process. */
+/* Windows allows any arbitrary number of threads per process. */
+#undef PTHREAD_THREADS_MAX
+/* #define PTHREAD_THREADS_MAX unspecified */
+
 /* Maximum number of realtime signals reserved for application use. */
 /* FIXME: We only support one realtime signal but _POSIX_RTSIG_MAX is 8. */
 #undef RTSIG_MAX
 #define RTSIG_MAX 1
+
+/* Maximum number of semaphores that a process may have. */
+/* Windows allows any arbitrary number of semaphores per process. */
+#undef SEM_NSEMS_MAX
+/* #define SEM_NSEMS_MAX unspecified */
+
+/* The maximum value a semaphore may have. */
+#undef SEM_VALUE_MAX
+#define SEM_VALUE_MAX 1147483648
+
+/* Maximum number of queued signals that a process may send and have pending
+   at the receiver(s) at any time. */
+#undef SIGQUEUE_MAX
+#define SIGQUEUE_MAX 32
+
+/* The maximum number of replenishment operations that may be simultaneously
+   pending for a particular sporadic server scheduler.  Not implemented. */
+#undef SS_REPL_MAX
+/* #define SS_REPL_MAX >= _POSIX_SS_REPL_MAX */
 
 /* Number of streams that one process can have open at one time. */
 #undef STREAM_MAX
@@ -179,9 +269,33 @@ details. */
 #undef TIMER_MAX
 #define TIMER_MAX 32
 
+/* Maximum length of the trace event name.  Not implemented. */
+#undef TRACE_EVENT_NAME_MAX
+/* #define TRACE_EVENT_NAME_MAX >= _POSIX_TRACE_EVENT_NAME_MAX */
+
+/* Maximum length of the trace generation version string or of the trace
+   stream name.  Not implemented. */
+#undef TRACE_NAME_MAX
+/* #define TRACE_NAME_MAX >= _POSIX_TRACE_NAME_MAX */
+
+/* Maximum number of trace streams that may simultaneously exist in the
+   system.  Not implemented. */
+#undef TRACE_SYS_MAX
+/* #define TRACE_SYS_MAX >= _POSIX_TRACE_SYS_MAX */
+
+/* Maximum number of user trace event type identifiers that may simultaneously
+   exist in a traced process, including the predefined user trace event
+   POSIX_TRACE_UNNAMED_USER_EVENT.  Not implemented. */
+#undef TRACE_USER_EVENT_MAX
+/* #define TRACE_USER_EVENT_MAX >= _POSIX_TRACE_USER_EVENT_MAX */
+
 /* Maximum number of characters in a tty name. */
 #undef TTY_NAME_MAX
 #define TTY_NAME_MAX 12
+
+/* Maximum number of bytes supported for the name of a timezone (not of the TZ variable).  Not implemented. */
+#undef TZNAME_MAX
+/* #define TZNAME_MAX >= _POSIX_TZNAME_MAX */
 
 
 /* Pathname Variable Values */
@@ -215,6 +329,33 @@ details. */
 #undef PIPE_BUF
 #define PIPE_BUF 4096
 
+/* Minimum number of bytes of storage actually allocated for any portion
+   of a file.  Not implemented. */
+#undef POSIX_ALLOC_SIZE_MIN
+/* #define POSIX_ALLOC_SIZE_MIN unspecifed */
+
+/* Recommended increment for file transfer sizes between the
+   {POSIX_REC_MIN_XFER_SIZE} and {POSIX_REC_MAX_XFER_SIZE} values.
+   Not implemented. */
+#undef POSIX_REC_INCR_XFER_SIZE
+/* #define POSIX_REC_INCR_XFER_SIZE unspecifed */
+
+/* Maximum recommended file transfer size.  Not implemented. */
+#undef POSIX_REC_MAX_XFER_SIZE
+/* #define POSIX_REC_MAX_XFER_SIZE unspecifed */
+
+/* Minimum recommended file transfer size.  Not implemented. */
+#undef POSIX_REC_MIN_XFER_SIZE
+/* #define POSIX_REC_MIN_XFER_SIZE unspecifed */
+
+/* Recommended file transfer buffer alignment.  Not implemented. */
+#undef POSIX_REC_XFER_ALIGN
+/* #define POSIX_REC_XFER_ALIGN unspecifed */
+
+/* Maximum number of bytes in a symbolic link. */
+#undef SYMLINK_MAX
+#define SYMLINK_MAX PATH_MAX
+
 
 /* Runtime Increasable Values */
 
@@ -234,16 +375,18 @@ details. */
 #undef BC_STRING_MAX
 #define BC_STRING_MAX 1000
 
+/* Maximum number of bytes in a character class name.  Not implemented. */
+#undef CHARCLASS_NAME_MAX
+/* #define CHARCLASS_NAME_MAX >= _POSIX2_CHARCLASS_NAME_MAX */
+
 /* Maximum number of weights that can be assigned to an entry of the
    LC_COLLATE order keyword in the locale definition file. */
 /* FIXME: We don't support this at all right now, so this value is
    misleading at best.  It's also lower than _POSIX2_COLL_WEIGHTS_MAX
    which is not good.  So, for now we deliberately not define it even
    though it was defined in the former syslimits.h file. */
-#if 0
 #undef COLL_WEIGHTS_MAX
-#define COLL_WEIGHTS_MAX 0
-#endif
+/* #define COLL_WEIGHTS_MAX >= _POSIX2_COLL_WEIGHTS_MAX */
 
 /* Maximum number of expressions that can be nested within parentheses
    by the expr utility. */
@@ -265,51 +408,80 @@ details. */
 #define RE_DUP_MAX 255
 
 
-/* Minimum Values */
-
 /* POSIX values */
 /* These should never vary from one system type to another */
 /* They represent the minimum values that POSIX systems must support.
    POSIX-conforming apps must not require larger values. */
-#define	_POSIX_ARG_MAX		4096
-#define _POSIX_CHILD_MAX	6
-#define _POSIX_HOST_NAME_MAX	255
-#define _POSIX_LINK_MAX		8
-#define _POSIX_LOGIN_NAME_MAX	9
-#define _POSIX_MAX_CANON	255
-#define _POSIX_MAX_INPUT	255
-#define _POSIX_NAME_MAX		14
-#define _POSIX_NGROUPS_MAX	0
-#define _POSIX_OPEN_MAX		16
-#define _POSIX_PATH_MAX		255
-#define _POSIX_PIPE_BUF		512
-#define _POSIX_RE_DUP_MAX	255
-#define _POSIX_RTSIG_MAX	8
-#define _POSIX_SSIZE_MAX	32767
-#define _POSIX_STREAM_MAX	8
-#define _POSIX_SYMLINK_MAX	255
-#define _POSIX_SYMLOOP_MAX	8
-#define _POSIX_TIMER_MAX	32
-#define _POSIX_TTY_NAME_MAX	9
-#define _POSIX_TZNAME_MAX       3
 
-#define _POSIX2_BC_BASE_MAX	99
-#define _POSIX2_BC_DIM_MAX	2048
-#define _POSIX2_BC_SCALE_MAX	99
-#define _POSIX2_BC_STRING_MAX	1000
-#if 0	/* See comment about COLL_WEIGHTS_MAX above. */
-#define _POSIX2_COLL_WEIGHTS_MAX	2
-#endif
-#define _POSIX2_EXPR_NEST_MAX	32
-#define _POSIX2_LINE_MAX	2048
-#define _POSIX2_RE_DUP_MAX	255
+/* Maximum Values */
 
+#define _POSIX_CLOCKRES_MIN                 20000000
+
+/* Minimum Values */
+
+#define _POSIX_AIO_LISTIO_MAX                      2
+#define _POSIX_AIO_MAX                             1
+#define	_POSIX_ARG_MAX		                4096
+#define _POSIX_CHILD_MAX	                  25
+#define _POSIX_DELAYTIMER_MAX                     32
+#define _POSIX_HOST_NAME_MAX	                 255
+#define _POSIX_LINK_MAX		                   8
+#define _POSIX_LOGIN_NAME_MAX	                   9
+#define _POSIX_MAX_CANON	                 255
+#define _POSIX_MAX_INPUT	                 255
+#define _POSIX_MQ_OPEN_MAX                         8
+#define _POSIX_MQ_PRIO_MAX                        32
+#define _POSIX_NAME_MAX		                  14
+#define _POSIX_NGROUPS_MAX	                   8
+#define _POSIX_OPEN_MAX		                  20
+#define _POSIX_PATH_MAX		                 256
+#define _POSIX_PIPE_BUF		                 512
+#define _POSIX_RE_DUP_MAX	                 255
+#define _POSIX_RTSIG_MAX	                   8
+#define _POSIX_SEM_NSEMS_MAX                     256
+#define _POSIX_SEM_VALUE_MAX                   32767
+#define _POSIX_SIGQUEUE_MAX                       32
+#define _POSIX_SSIZE_MAX	               32767
+#define _POSIX_STREAM_MAX	                   8
+#define _POSIX_SS_REPL_MAX                         4
+#define _POSIX_SYMLINK_MAX	                 255
+#define _POSIX_SYMLOOP_MAX	                   8
+#define _POSIX_THREAD_DESTRUCTOR_ITERATIONS        4
+#define _POSIX_THREAD_KEYS_MAX                   128
+#define _POSIX_THREAD_THREADS_MAX                 64
+#define _POSIX_TIMER_MAX	                  32
+#define _POSIX_TRACE_EVENT_NAME_MAX               30
+#define _POSIX_TRACE_NAME_MAX                      8
+#define _POSIX_TRACE_SYS_MAX                       8
+#define _POSIX_TRACE_USER_EVENT_MAX               32
+#define _POSIX_TTY_NAME_MAX	                   9
+#define _POSIX_TZNAME_MAX                          6
+
+#define _POSIX2_BC_BASE_MAX	                  99
+#define _POSIX2_BC_DIM_MAX	                2048
+#define _POSIX2_BC_SCALE_MAX	                  99
+#define _POSIX2_BC_STRING_MAX	                1000
+#define _POSIX2_COLL_WEIGHTS_MAX                   2
+#define _POSIX2_EXPR_NEST_MAX	                  32
+#define _POSIX2_LINE_MAX	                2048
+#define _POSIX2_RE_DUP_MAX	                 255
+
+#define _XOPEN_IOV_MAX                            16
+#define _XOPEN_NAME_MAX                          255
+#define _XOPEN_PATH_MAX                         1024
 
 /* Other Invariant Values */
 
+#define NL_ARGMAX                                  9
+#define NL_LANGMAX                                14
+#define NL_MSGMAX                              32767
+#define NL_NMAX                              INT_MAX
+#define NL_SETMAX                                255
+#define NL_TEXTMAX                  _POSIX2_LINE_MAX
+
 /* Default process priority. */
 #undef NZERO
-#define NZERO			20
+#define NZERO			                  20
 
 #endif /* _MACH_MACHLIMITS_H_ */
 #endif /* _LIMITS_H___ */

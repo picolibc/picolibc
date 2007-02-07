@@ -1,7 +1,7 @@
 /* malloc_wrapper.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
-   Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+   2006, 2007 Red Hat, Inc.
 
    Originally written by Steve Chamberlain of Cygnus Support
    sac@cygnus.com
@@ -70,6 +70,8 @@ malloc (size_t size)
       __malloc_unlock ();
     }
   malloc_printf ("(%d) = %x, called by %p", size, res, __builtin_return_address (0));
+  if (!res)
+    set_errno (ENOMEM);
   return res;
 }
 
@@ -86,6 +88,8 @@ realloc (void *p, size_t size)
       __malloc_unlock ();
     }
   malloc_printf ("(%x, %d) = %x, called by %x", p, size, res, __builtin_return_address (0));
+  if (!res)
+    set_errno (ENOMEM);
   return res;
 }
 
@@ -102,7 +106,27 @@ calloc (size_t nmemb, size_t size)
       __malloc_unlock ();
     }
   malloc_printf ("(%d, %d) = %x, called by %x", nmemb, size, res, __builtin_return_address (0));
+  if (!res)
+    set_errno (ENOMEM);
   return res;
+}
+
+extern "C" int
+posix_memalign (void **memptr, size_t alignment, size_t bytes)
+{
+  void *res;
+  if (!use_internal_malloc)
+    return ENOSYS;
+  if ((alignment & (alignment - 1)) != 0)
+    return EINVAL;
+  __malloc_lock ();
+  res = dlmemalign (alignment, bytes);
+  __malloc_unlock ();
+  if (!res)
+    return ENOMEM;
+  if (memptr)
+    *memptr = res;
+  return 0;
 }
 
 extern "C" void *
@@ -119,6 +143,8 @@ memalign (size_t alignment, size_t bytes)
       __malloc_lock ();
       res = dlmemalign (alignment, bytes);
       __malloc_unlock ();
+      if (!res)
+	set_errno (ENOMEM);
     }
 
   return res;
@@ -138,6 +164,8 @@ valloc (size_t bytes)
       __malloc_lock ();
       res = dlvalloc (bytes);
       __malloc_unlock ();
+      if (!res)
+	set_errno (ENOMEM);
     }
 
   return res;

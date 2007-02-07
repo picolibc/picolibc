@@ -1650,6 +1650,29 @@ munlock (const void *addr, size_t len)
   return ret;
 }
 
+extern "C" int
+posix_madvise (void *addr, size_t len, int advice)
+{
+  /* Check parameters. */
+  if (advice < POSIX_MADV_NORMAL || advice > POSIX_MADV_DONTNEED
+      || !len)
+    return EINVAL;
+
+  /* Check requested memory area. */
+  MEMORY_BASIC_INFORMATION m;
+  char *p = (char *) addr;
+  char *endp = p + len;
+  while (p < endp)
+    {
+      if (!VirtualQuery (p, &m, sizeof m) || m.State == MEM_FREE)
+	return ENOMEM;
+      p = (char *) m.BaseAddress + m.RegionSize;
+    }
+
+  /* Eventually do nothing. */
+  return 0;
+}
+
 /*
  * Base implementation:
  *
