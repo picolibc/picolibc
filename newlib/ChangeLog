@@ -1,3 +1,13 @@
+2007-02-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/sys/features.h: Add definition of all supported
+	_POSIX_xxx values for Cygwin.
+	* libc/include/sys/types.h (pthread_rwlock_t): Omit definition
+	on Cygwin.
+	(pthread_rwlockattr_t): Ditto.
+	* libc/include/sys/unistd.h: Define all _SC_xxx values as
+	required by SUSv3.  Unify formatting.
+
 2007-02-02  Ralf Corsépius <ralf.corsepius@rtems.org>
 
 	* libc/include/sys/errno.h: Add ECANCELED.
