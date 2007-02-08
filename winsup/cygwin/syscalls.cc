@@ -3349,17 +3349,47 @@ pclose (FILE *fp)
 
 #define SHM_STORAGE "/dev/shm"
 
-extern "C" int
-shm_open (const char *name, int oflag, mode_t mode)
+static bool
+check_shm (const char *name)
 {
+  /* Note that we require the existance of /dev/shm for shared memory
+     object support, same as on Linux.  We don't create this directory
+     here, that's the task of the installer.  But we check for existance
+     and give ample warning. */
+  path_conv dev_shm (SHM_STORAGE, PC_SYM_NOFOLLOW);
+  if (dev_shm.error || !dev_shm.exists () || !dev_shm.isdir ())
+    {
+      small_printf (
+	"Warning: '%s' does not exists or is not a directory.\n\n"
+	"Shared memory objects require the existance of this directory.\n"
+	"Create the directory '%s' and set the permissions to 01777.\n"
+	"For instance on the command line: mkdir -m 01777 %s\n",
+	SHM_STORAGE, SHM_STORAGE, SHM_STORAGE);
+      set_errno (EINVAL);
+      return false;
+    }
   /* Name must start with a single slash. */
-  if (!name || name[0] != '/' || name[1] == '/'
-      || strlen (name) > CYG_MAX_PATH - sizeof (SHM_STORAGE))
+  if (!name || name[0] != '/' || name[1] == '/')
     {
       debug_printf ("Invalid shared memory object name '%s'", name);
       set_errno (EINVAL);
-      return -1;
+      return false;
     }
+  if (strlen (name) > CYG_MAX_PATH - sizeof (SHM_STORAGE))
+    {
+      debug_printf ("shared memory object name '%s' too long", name);
+      set_errno (ENAMETOOLONG);
+      return false;
+    }
+  return true;
+}
+
+extern "C" int
+shm_open (const char *name, int oflag, mode_t mode)
+{
+  if (!check_shm (name))
+    return -1;
+
   /* Check for valid flags. */
   if (((oflag & O_ACCMODE) != O_RDONLY && (oflag & O_ACCMODE) != O_RDWR)
       || (oflag & ~(O_ACCMODE | O_CREAT | O_EXCL | O_TRUNC)))
@@ -3368,8 +3398,7 @@ shm_open (const char *name, int oflag, mode_t mode)
       set_errno (EINVAL);
       return -1;
     }
-  /* Note that we require the existance of /dev/shm here.  We don't
-     create this directory from here.  That's the task of the installer. */
+
   char shmname[CYG_MAX_PATH];
   strcpy (shmname, SHM_STORAGE);
   strcat (shmname, name);
@@ -3379,14 +3408,9 @@ shm_open (const char *name, int oflag, mode_t mode)
 extern "C" int
 shm_unlink (const char *name)
 {
-  /* Name must start with a single slash. */
-  if (!name || name[0] != '/' || name[1] == '/'
-      || strlen (name) > CYG_MAX_PATH - sizeof (SHM_STORAGE))
-    {
-      debug_printf ("Invalid shared memory object name '%s'", name);
-      set_errno (EINVAL);
-      return -1;
-    }
+  if (!check_shm (name))
+    return -1;
+
   char shmname[CYG_MAX_PATH];
   strcpy (shmname, SHM_STORAGE);
   strcat (shmname, name);
