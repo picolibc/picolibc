@@ -23,7 +23,8 @@ int dlmallopt (int p, int v) __attribute__ ((regparm (2)));
 void dlmalloc_stats ();
 
 #ifndef __INSIDE_CYGWIN__
-# define MALLOC_FAILURE_ACTION
+extern "C" void __set_ENOMEM ();
+# define MALLOC_FAILURE_ACTION	__set_ENOMEM ()
 # define USE_DL_PREFIX 1
 #else
 # define __malloc_lock() mallock.acquire ()

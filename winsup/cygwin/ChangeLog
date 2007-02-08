@@ -1,3 +1,15 @@
+2007-02-08  Christopher Faylor <me@cgf.cx>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygmalloc.h (__set_ENOMEM): Declare.
+	(MALLOC_FAILURE_ACTION): Call __set_ENOMEM.
+	* malloc_wrapper.cc (malloc) Remove setting errno here.
+	(realloc): Ditto.
+	(calloc): Ditto.
+	(memalign): Ditto.
+	(valloc): Ditto.
+	(posix_memalign): Save and restore errno.
+
 2007-02-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygmalloc.h (MALLOC_FAILURE_ACTION): Move to correct #if branch.
