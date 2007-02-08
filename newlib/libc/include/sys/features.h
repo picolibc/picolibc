@@ -108,15 +108,15 @@ extern "C" {
 #define _POSIX_REALTIME_SIGNALS			200112L
 #define _POSIX_REGEXP				     1
 #define _POSIX_SAVED_IDS			     1
-#define _POSIX_SEMAPHORES			     1
-/* #define _POSIX_SHARED_MEMORY_OBJECTS		    -1 */
+#define _POSIX_SEMAPHORES			200112L
+#define _POSIX_SHARED_MEMORY_OBJECTS		200112L 
 #define _POSIX_SHELL				     1
 /* #define _POSIX_SPAWN				    -1 */
 /* #define _POSIX_SPIN_LOCKS			    -1 */
 /* #define _POSIX_SPORADIC_SERVER		    -1 */
 #define _POSIX_SYNCHRONIZED_IO			200112L
 /* #define _POSIX_THREAD_ATTR_STACKADDR		    -1 */
-#define _POSIX_THREAD_ATTR_STACKSIZE	200112L
+#define _POSIX_THREAD_ATTR_STACKSIZE		200112L
 /* #define _POSIX_THREAD_CPUTIME		    -1 */
 /* #define _POSIX_THREAD_PRIO_INHERIT		    -1 */
 /* #define _POSIX_THREAD_PRIO_PROTECT		    -1 */
