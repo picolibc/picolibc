@@ -104,6 +104,10 @@ case "${target}" in
 	AC_CONFIG_SUBDIRS(mcore)
 	config_testsuite=true
 	;;
+  mep-*-*)
+	AC_CONFIG_SUBDIRS(mep)
+	config_testsuite = true;
+	;;
   mt-*-*)
         AC_CONFIG_SUBDIRS(mt)
 	config_testsuite=true

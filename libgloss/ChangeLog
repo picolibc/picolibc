@@ -1,3 +1,36 @@
+2007-02-08  Dave Brolley  <brolley@redhat.com>
+
+	* mep: New target directory.
+	* README: Add MeP.
+	* configure.in: Add support for MeP.
+	* configure: Regenerated.
+	* mep/configure.in: New file.
+	* mep/configure: Ditto.
+	* mep/Makefile.in: Ditto.
+	* mep/aclocal.m4: Ditto.
+	* mep/crt0.S: Ditto.
+	* mep/crtn.S: Ditto.
+	* mep/sim-crt0.S: Ditto.
+	* mep/sim-crtn.S: Ditto.
+	* mep/fmax.ld: Ditto.
+	* mep/gcov-io.h: Ditto.
+	* mep/gmap_default.ld: Ditto.
+	* mep/handlers.c: Ditto.
+	* mep/h_reset.c: Ditto.
+	* mep/isatty.c: Ditto.
+	* mep/mep-bb.c: Ditto.
+	* mep/mep-gmon.c: Ditto.
+	* mep/min.ld: Ditto.
+	* mep/read.c: Ditto.
+	* mep/sbrk.c: Ditto.
+	* mep/sdram-crt0.S: Ditto.
+	* mep/sdram-crtn.S: Ditto.
+	* mep/simnovec-crt0.S: Ditto.
+	* mep/simple.ld: Ditto.
+	* mep/simsdran-crt0.S: Ditto.
+	* mep/syscalls.S: Ditto.
+	* mep/write.c: Ditto.
+
 2007-01-19  Kazunori Asayama <asayama@sm.sony.co.jp>
 
 	* spu/syscalls.c: Replace vector with __vector.
