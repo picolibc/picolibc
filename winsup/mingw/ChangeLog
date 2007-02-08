@@ -1,3 +1,7 @@
+2007-02-08  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/io.h (X_OK):  Revert 2007-01-24 change, but leave comment.
+
 2007-01-27  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	Expose some more msvcr80.dll functions.
