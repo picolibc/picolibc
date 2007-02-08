@@ -149,7 +149,7 @@ static struct
   {cons, {c:-1L}},			/*  28, _SC_PRIORITIZED_IO */
   {cons, {c:_POSIX_REALTIME_SIGNALS}},	/*  29, _SC_REALTIME_SIGNALS */
   {cons, {c:_POSIX_SEMAPHORES}},	/*  30, _SC_SEMAPHORES */
-  {cons, {c:-1L}},			/*  31, _SC_SHARED_MEMORY_OBJECTS */
+  {cons, {c:_POSIX_SHARED_MEMORY_OBJECTS}},	/*  31, _SC_SHARED_MEMORY_OBJECTS */
   {cons, {c:_POSIX_SYNCHRONIZED_IO}},	/*  32, _SC_SYNCHRONIZED_IO */
   {cons, {c:_POSIX_TIMERS}},		/*  33, _SC_TIMERS */
   {nsup, {c:0}},			/*  34, _SC_AIO_LISTIO_MAX */

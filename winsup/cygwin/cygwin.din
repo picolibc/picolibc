@@ -1314,6 +1314,8 @@ shmat SIGFE
 shmctl SIGFE
 shmdt SIGFE
 shmget SIGFE
+shm_open SIGFE
+shm_unlink SIGFE
 shutdown = cygwin_shutdown SIGFE
 sigaction SIGFE
 sigaddset SIGFE

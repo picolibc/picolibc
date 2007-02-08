@@ -3346,3 +3346,49 @@ pclose (FILE *fp)
 
   return status;
 }
+
+#define SHM_STORAGE "/dev/shm"
+
+extern "C" int
+shm_open (const char *name, int oflag, mode_t mode)
+{
+  /* Name must start with a single slash. */
+  if (!name || name[0] != '/' || name[1] == '/'
+      || strlen (name) > CYG_MAX_PATH - sizeof (SHM_STORAGE))
+    {
+      debug_printf ("Invalid shared memory object name '%s'", name);
+      set_errno (EINVAL);
+      return -1;
+    }
+  /* Check for valid flags. */
+  if (((oflag & O_ACCMODE) != O_RDONLY && (oflag & O_ACCMODE) != O_RDWR)
+      || (oflag & ~(O_ACCMODE | O_CREAT | O_EXCL | O_TRUNC)))
+    {
+      debug_printf ("Invalid oflag 0%o", oflag);
+      set_errno (EINVAL);
+      return -1;
+    }
+  /* Note that we require the existance of /dev/shm here.  We don't
+     create this directory from here.  That's the task of the installer. */
+  char shmname[CYG_MAX_PATH];
+  strcpy (shmname, SHM_STORAGE);
+  strcat (shmname, name);
+  return open (shmname, oflag, mode & 0777);
+}
+
+extern "C" int
+shm_unlink (const char *name)
+{
+  /* Name must start with a single slash. */
+  if (!name || name[0] != '/' || name[1] == '/'
+      || strlen (name) > CYG_MAX_PATH - sizeof (SHM_STORAGE))
+    {
+      debug_printf ("Invalid shared memory object name '%s'", name);
+      set_errno (EINVAL);
+      return -1;
+    }
+  char shmname[CYG_MAX_PATH];
+  strcpy (shmname, SHM_STORAGE);
+  strcat (shmname, name);
+  return unlink (shmname);
+}

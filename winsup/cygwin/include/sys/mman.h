@@ -67,6 +67,9 @@ extern int munlock (const void *__addr, size_t __len);
 
 extern int posix_madvise (void *__addr, size_t __len, int __advice);
 
+extern int shm_open (const char *__name, int __oflag, mode_t __mode);
+extern int shm_unlink (const char *__name);
+
 #ifdef __cplusplus
 };
 #endif /* __cplusplus */
