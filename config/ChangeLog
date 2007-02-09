@@ -3,9 +3,27 @@
 	* acx.m4 (ACX_CHECK_INSTALLED_TARGET_TOOL): Avoid AC_PATH_PROG
 	with an empty path.
 
-2007-02-05  Dave Brolley  <brolley@redhat.com>
+2007-02-07  Bruno Haible  <bruno@clisp.org>
 
-	* mt-mep: New.
+	PR libgomp/28468
+	* config/tls.m4 (GCC_CHECK_TLS): Also check whether the libc supports
+	TLS via __thread.
+
+2007-01-31  Daniel Franke <franke.daniel@gmail.com>
+
+	PR libgomp/30546
+	* acx.m4 (ACX_PROG_CHECK_VER): Locate a program and check that its
+	version is acceptable.
+
+2007-01-27  Paolo Bonzini  <bonzini@gnu.org>
+
+	* depstand.m4 (ZW_CREATE_DEPDIR): Use mkinstalldirs to make
+	directory.
+
+2007-01-23  Richard Guenther  <rguenther@suse.de>
+
+	PR bootstrap/30541
+	* config/acx.m4 (ACX_PROG_GNAT): Check for gnatmake.
 
 2007-01-14  H.J. Lu  <hongjiu.lu@intel.com>
 

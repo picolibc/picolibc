@@ -330,11 +330,12 @@ ac_c_preproc_warn_flag=yes])# AC_PROG_CPP_WERROR
 # understands Ada.  We use the user's CC setting, already found.
 #
 # Sets the shell variable have_gnat to yes or no as appropriate, and
-# substitutes GNATBIND.
+# substitutes GNATBIND and GNATMAKE.
 AC_DEFUN([ACX_PROG_GNAT],
 [AC_REQUIRE([AC_CHECK_TOOL_PREFIX])
 AC_REQUIRE([AC_PROG_CC])
 AC_CHECK_TOOL(GNATBIND, gnatbind, no)
+AC_CHECK_TOOL(GNATMAKE, gnatmake, no)
 AC_CACHE_CHECK([whether compiler driver understands Ada],
 		 acx_cv_cc_gcc_supports_ada,
 [cat >conftest.adb <<EOF
@@ -355,7 +356,7 @@ if test x"$errors" = x && test -f conftest.$ac_objext; then
 fi
 rm -f conftest.*])
 
-if test x$GNATBIND != xno && test x$acx_cv_cc_gcc_supports_ada != xno; then
+if test x$GNATBIND != xno && test x$GNATMAKE != xno && test x$acx_cv_cc_gcc_supports_ada != xno; then
   have_gnat=yes
 else
   have_gnat=no
@@ -490,3 +491,34 @@ else
   fi
 fi
 AC_SUBST($2)])
+
+
+dnl Locate a program and check that its version is acceptable.
+dnl ACX_PROG_CHECK_VER(var, name, version-switch,
+dnl                    version-extract-regexp, version-glob)
+AC_DEFUN([ACX_CHECK_PROG_VER],[
+  AC_CHECK_PROG([$1], [$2], [$2])
+  if test -n "[$]$1"; then
+    # Found it, now check the version.
+    AC_CACHE_CHECK([for modern $2],
+                   [gcc_cv_prog_$2_modern],
+                   [ac_prog_version=`eval [$]$1 $3 2>&1 |
+                                     sed -n 's/^.*patsubst([[$4]],/,\/).*$/\1/p'`
+
+                    [case $ac_prog_version in
+                      '')  gcc_cv_prog_$2_modern=no;;
+                      $5)  gcc_cv_prog_$2_modern=yes;;
+                      *)   gcc_cv_prog_$2_modern=no;;
+                    esac]
+
+                    if test $gcc_cv_prog_$2_modern = no; then
+                      $1="${CONFIG_SHELL-/bin/sh} $ac_aux_dir/missing $2"
+                    fi
+                   ])
+  else
+    gcc_cv_prog_$2_modern=no
+  fi
+  if test $gcc_cv_prog_$2_modern = no; then
+    $1="${CONFIG_SHELL-/bin/sh} $ac_aux_dir/missing $2"
+  fi
+])
