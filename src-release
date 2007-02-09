@@ -46,7 +46,7 @@ PWD = $${PWDCMD-pwd}
 # Files in devo used in any net release.
 # ChangeLog omitted because it may refer to files which are not in this
 # distribution (perhaps it would be better to include it anyway).
-DEVO_SUPPORT= README Makefile.in configure configure.in \
+DEVO_SUPPORT= README Makefile.in configure configure.ac \
 	config.guess config.sub config move-if-change \
 	COPYING COPYING.LIB install-sh config-ml.in symlink-tree \
 	mkinstalldirs ltconfig ltmain.sh missing ylwrap \
@@ -184,9 +184,9 @@ do-proto-toplev: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
 	 done)
 	#
 	# Take out texinfo from configurable dirs
-	rm proto-toplev/configure.in
+	rm proto-toplev/configure.ac
 	sed -e '/^host_tools=/s/texinfo //' \
-	    <configure.in >proto-toplev/configure.in
+	    <configure.ac >proto-toplev/configure.ac
 	#
 	mkdir proto-toplev/texinfo
 	ln -s ../../texinfo/texinfo.tex		proto-toplev/texinfo/
