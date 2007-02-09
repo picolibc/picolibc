@@ -120,10 +120,13 @@ static u_char * write_record(unsigned char * ptr, PDNS_RECORD rr, unsigned char 
     }
     break;
   case DNS_TYPE_MINFO:
+  case DNS_TYPE_RP:
     PUTDOMAIN(rr->Data.MINFO.pNameMailbox, ptr);
     PUTDOMAIN(rr->Data.MINFO.pNameErrorsMailbox, ptr);
     break;
   case DNS_TYPE_MX:
+  case DNS_TYPE_AFSDB:
+  case DNS_TYPE_RT:
     if (ptr + 2 > EndPtr)
       ptr += 2;
     else
@@ -131,7 +134,9 @@ static u_char * write_record(unsigned char * ptr, PDNS_RECORD rr, unsigned char 
     PUTDOMAIN(rr->Data.MX.pNameExchange, ptr);
     break;
   case DNS_TYPE_HINFO:
-  case DNS_TYPE_TEXT: 
+  case DNS_TYPE_ISDN:
+  case DNS_TYPE_TEXT:
+  case DNS_TYPE_X25:
   {
     unsigned int i, len;
     for (i = 0; i < rr->Data.TXT.dwStringCount; i++) {
@@ -146,6 +151,16 @@ static u_char * write_record(unsigned char * ptr, PDNS_RECORD rr, unsigned char 
     }
     break;
   }
+  case DNS_TYPE_SRV:
+    if (ptr + 6 > EndPtr)
+      ptr += 6;
+    else {
+      PUTSHORT(rr->Data.SRV.wPriority, ptr);
+      PUTSHORT(rr->Data.SRV.wWeight, ptr);
+      PUTSHORT(rr->Data.SRV.wPort, ptr);
+    }
+    PUTDOMAIN(rr->Data.SRV.pNameTarget, ptr);
+    break;
   default:
   {
     unsigned int len = rr->wDataLength;
