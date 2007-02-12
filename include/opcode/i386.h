@@ -251,8 +251,8 @@ static const template i386_optab[] =
 {"cmp",	   2,	0x3c, X, 0,	 bwlq_Suf|W,		{ EncImm, Acc, 0} },
 {"cmp",	   2,	0x80, 7, 0,	 bwlq_Suf|W|Modrm,	{ EncImm, Reg|AnyMem, 0} },
 
-{"test",   2,	0x84, X, 0,	 bwlq_Suf|W|Modrm,	{ Reg|AnyMem, Reg, 0} },
 {"test",   2,	0x84, X, 0,	 bwlq_Suf|W|Modrm,	{ Reg, Reg|AnyMem, 0} },
+{"test",   2,	0x84, X, 0,	 bwlq_Suf|W|Modrm,	{ AnyMem, Reg, 0} },
 {"test",   2,	0xa8, X, 0,	 bwlq_Suf|W,		{ EncImm, Acc, 0} },
 {"test",   2,	0xf6, 0, 0,	 bwlq_Suf|W|Modrm,	{ EncImm, Reg|AnyMem, 0} },
 
