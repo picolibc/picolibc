@@ -1,3 +1,7 @@
+2007-02-13  Paolo Bonzini  <bonzini@gnu.org>
+
+	* configure: Reapply PR30748 fix which was lost in the previous commit.
+
 2007-02-13  Daniel Jacobowitz  <dan@codesourcery.com>
 	    Paolo Bonzini  <bonzini@gnu.org>
 
