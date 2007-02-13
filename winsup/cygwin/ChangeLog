@@ -1,3 +1,8 @@
+2007-02-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/stdlib.h (valloc): Declare.
+	(memalign): Declare.
+
 2007-02-09  Pierre A. Humblet  <Pierre.Humblet@ieee.org>
 
 	* libc/minires-os-if.c (write_record): Handle DNS_TYPE_SRV and

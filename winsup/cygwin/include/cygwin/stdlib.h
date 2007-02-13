@@ -39,6 +39,9 @@ int posix_memalign (void **, size_t, size_t);
 #define _unsetenv_r UNUSED__unsetenv_r
 #endif
 
+extern _PTR memalign _PARAMS ((size_t, size_t));
+extern _PTR valloc _PARAMS ((size_t));
+
 #undef _malloc_r
 #define _malloc_r(r, s) malloc (s)
 #undef _free_r
