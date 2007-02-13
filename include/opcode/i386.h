@@ -1,6 +1,6 @@
 /* opcode/i386.h -- Intel 80386 opcode table
    Copyright 1989, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
-   2000, 2001, 2002, 2003, 2004, 2005
+   2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007
    Free Software Foundation, Inc.
 
    This file is part of GAS, the GNU Assembler, and GDB, the GNU Debugger.
@@ -152,14 +152,14 @@ static const template i386_optab[] =
 {"push",   1,	0xff, 6, CpuNo64, wl_Suf|Modrm|DefaultSize,	{ WordReg|WordMem, 0, 0 } },
 {"push",   1,	0x6a, X, Cpu186|CpuNo64, wl_Suf|DefaultSize,	{ Imm8S, 0, 0} },
 {"push",   1,	0x68, X, Cpu186|CpuNo64, wl_Suf|DefaultSize,	{ Imm16|Imm32, 0, 0} },
-{"push",   1,	0x06, X, CpuNo64, wl_Suf|Seg2ShortForm|DefaultSize, { SReg2, 0, 0 } },
-{"push",   1, 0x0fa0, X, Cpu386|CpuNo64, wl_Suf|Seg3ShortForm|DefaultSize, { SReg3, 0, 0 } },
+{"push",   1,	0x06, X, CpuNo64, wl_Suf|ShortForm|DefaultSize, { SReg2, 0, 0 } },
+{"push",   1, 0x0fa0, X, Cpu386|CpuNo64, wl_Suf|ShortForm|DefaultSize, { SReg3, 0, 0 } },
 /* In 64bit mode, the operand size is implicitly 64bit.  */
 {"push",   1,	0x50, X, Cpu64,	wq_Suf|ShortForm|DefaultSize|NoRex64, { Reg16|Reg64, 0, 0 } },
 {"push",   1,	0xff, 6, Cpu64,	wq_Suf|Modrm|DefaultSize|NoRex64, { Reg16|Reg64|WordMem, 0, 0 } },
 {"push",   1,	0x6a, X, Cpu64,	wq_Suf|DefaultSize|NoRex64, { Imm8S, 0, 0} },
 {"push",   1,	0x68, X, Cpu64,	wq_Suf|DefaultSize|NoRex64, { Imm32S|Imm16, 0, 0} },
-{"push",   1, 0x0fa0, X, Cpu64,	wq_Suf|Seg3ShortForm|DefaultSize|NoRex64, { SReg3, 0, 0 } },
+{"push",   1, 0x0fa0, X, Cpu64,	wq_Suf|ShortForm|DefaultSize|NoRex64, { SReg3, 0, 0 } },
 
 {"pusha",  0,	0x60, X, Cpu186|CpuNo64, wl_Suf|DefaultSize,	{ 0, 0, 0 } },
 
@@ -167,12 +167,12 @@ static const template i386_optab[] =
 {"pop",	   1,	0x58, X, CpuNo64,	 wl_Suf|ShortForm|DefaultSize,	{ WordReg, 0, 0 } },
 {"pop",	   1,	0x8f, 0, CpuNo64,	 wl_Suf|Modrm|DefaultSize,	{ WordReg|WordMem, 0, 0 } },
 #define POP_SEG_SHORT 0x07
-{"pop",	   1,	0x07, X, CpuNo64,	 wl_Suf|Seg2ShortForm|DefaultSize, { SReg2, 0, 0 } },
-{"pop",	   1, 0x0fa1, X, Cpu386|CpuNo64, wl_Suf|Seg3ShortForm|DefaultSize, { SReg3, 0, 0 } },
+{"pop",	   1,	0x07, X, CpuNo64,	 wl_Suf|ShortForm|DefaultSize,	{ SReg2, 0, 0 } },
+{"pop",	   1, 0x0fa1, X, Cpu386|CpuNo64, wl_Suf|ShortForm|DefaultSize,	{ SReg3, 0, 0 } },
 /* In 64bit mode, the operand size is implicitly 64bit.  */
 {"pop",	   1,	0x58, X, Cpu64,	 wq_Suf|ShortForm|DefaultSize|NoRex64,	{ Reg16|Reg64, 0, 0 } },
 {"pop",	   1,	0x8f, 0, Cpu64,	 wq_Suf|Modrm|DefaultSize|NoRex64,	{ Reg16|Reg64|WordMem, 0, 0 } },
-{"pop",	   1, 0x0fa1, X, Cpu64,  wq_Suf|Seg3ShortForm|DefaultSize|NoRex64, { SReg3, 0, 0 } },
+{"pop",	   1, 0x0fa1, X, Cpu64,  wq_Suf|ShortForm|DefaultSize|NoRex64,	{ SReg3, 0, 0 } },
 
 {"popa",   0,	0x61, X, Cpu186|CpuNo64, wl_Suf|DefaultSize,		{ 0, 0, 0 } },
 

@@ -1,3 +1,8 @@
+2007-02-14  Alan Modra  <amodra@bigpond.net.au>
+
+	* i386.h (i386_optab): Replace all occurrences of Seg2ShortForm
+	and Seg3ShortFrom with Shortform.
+
 2007-02-11  H.J. Lu  <hongjiu.lu@intel.com>
 
 	PR gas/4027
