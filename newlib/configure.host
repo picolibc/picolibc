@@ -258,6 +258,7 @@ case "${host_cpu}" in
 	;;
   spu)
 	stdio_dir=
+	libm_machine_dir=spu
 	machine_dir=spu
 	newlib_cflags="${newlib_cflags} -ffunction-sections -fdata-sections "
 	;;

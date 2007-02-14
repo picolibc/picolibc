@@ -1,3 +1,42 @@
+2007-02-14  Patrick Mansfield <patmans@us.ibm.com>
+
+	Add a floating point environment for SPU (cell):
+
+	* configure.host: add libm_machine_dir=spu.
+	* libm/machine/configure: Add spu.
+	* libm/machine/configure.in: regenerated with spu added.
+	* libc/machine/spu/include/fenv.h: New file.
+	* libc/machine/spu/sys/fenv.h: Ditto.
+	* libm/machine/spu/Makefile.am: Ditto.
+	* libm/machine/spu/Makefile.in: Ditto.
+	* libm/machine/spu/aclocal.m4: Ditto.
+	* libm/machine/spu/configure: Ditto.
+	* libm/machine/spu/configure.in: Ditto.
+	* libm/machine/spu/fe_dfl_env.c: Ditto.
+	* libm/machine/spu/feclearexcept.c: Ditto.
+	* libm/machine/spu/fegetenv.c: Ditto.
+	* libm/machine/spu/fegetexceptflag.c: Ditto.
+	* libm/machine/spu/fegetround.c: Ditto.
+	* libm/machine/spu/feholdexcept.c: Ditto.
+	* libm/machine/spu/feraiseexcept.c: Ditto.
+	* libm/machine/spu/fesetenv.c: Ditto.
+	* libm/machine/spu/fesetexceptflag.c: Ditto.
+	* libm/machine/spu/fesetround.c: Ditto.
+	* libm/machine/spu/fetestexcept.c: Ditto.
+	* libm/machine/spu/feupdateenv.c: Ditto.
+	* libm/machine/spu/headers/feclearexcept.h: Ditto.
+	* libm/machine/spu/headers/fefpscr.h: Ditto.
+	* libm/machine/spu/headers/fegetenv.h: Ditto.
+	* libm/machine/spu/headers/fegetexceptflag.h: Ditto.
+	* libm/machine/spu/headers/fegetround.h: Ditto.
+	* libm/machine/spu/headers/feholdexcept.h: Ditto.
+	* libm/machine/spu/headers/feraiseexcept.h: Ditto.
+	* libm/machine/spu/headers/fesetenv.h: Ditto.
+	* libm/machine/spu/headers/fesetexceptflag.h: Ditto.
+	* libm/machine/spu/headers/fesetround.h: Ditto.
+	* libm/machine/spu/headers/fetestexcept.h: Ditto.
+	* libm/machine/spu/headers/feupdateenv.h: Ditto.
+
 2007-02-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/features.h: Add _POSIX_MESSAGE_PASSING for
