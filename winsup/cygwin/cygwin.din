@@ -933,6 +933,16 @@ _modff = modff NOSIGFE
 mount SIGFE
 _mount = mount SIGFE
 mprotect SIGFE
+mq_close SIGFE
+mq_getattr SIGFE
+mq_notify SIGFE
+mq_open SIGFE
+mq_receive SIGFE
+mq_send SIGFE
+mq_setattr SIGFE
+mq_timedreceive SIGFE
+mq_timedsend SIGFE
+mq_unlink SIGFE
 mrand48 NOSIGFE
 msgctl SIGFE
 msgget SIGFE

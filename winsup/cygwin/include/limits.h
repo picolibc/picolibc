@@ -179,15 +179,13 @@ details. */
 #undef LOGIN_NAME_MAX
 #define LOGIN_NAME_MAX 256	/* equal to UNLEN defined in w32api/lmcons.h */
 
-/* The maximum number of open message queue descriptors a process may hold.
-   Not yet implemented. */
+/* The maximum number of open message queue descriptors a process may hold. */
 #undef MQ_OPEN_MAX
-/* #define MQ_OPEN_MAX >= _POSIX_MQ_OPEN_MAX */
+#define MQ_OPEN_MAX OPEN_MAX
 
-/* The maximum number of message priorities supported by the implementation.
-   Not yet implemented. */
+/* The maximum number of message priorities supported by the implementation. */
 #undef MQ_PRIO_MAX
-/* #define MQ_PRIO_MAX >= _POSIX_MQ_PRIO_MAX */
+#define MQ_PRIO_MAX INT_MAX
 
 /* # of open files per process. Actually it can be more since Cygwin
    grows the dtable as necessary. We define a reasonable limit here

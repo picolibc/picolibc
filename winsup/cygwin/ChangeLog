@@ -1,3 +1,26 @@
+2007-02-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Add posix_ipc.o.
+	* cygwin.din (mq_close): Export.
+	(mq_getattr): Export.
+	(mq_notify): Export.
+	(mq_open): Export.
+	(mq_receive): Export.
+	(mq_send): Export.
+	(mq_setattr): Export.
+	(mq_timedreceive): Export.
+	(mq_timedsend): Export.
+	(mq_unlink): Export.
+	* posix_ipc.cc: New file implementing the above functions.  Move
+	shm_open and shm_unlink from syscalls.cc here.
+	* sysconf.cc (sca): Set value of _SC_MQ_OPEN_MAX to MQ_OPEN_MAX,
+	_SC_MQ_PRIO_MAX to MQ_PRIO_MAX, _SC_MESSAGE_PASSING to
+	_POSIX_MESSAGE_PASSING.
+	* include/limits.h (MQ_OPEN_MAX): Define.
+	(MQ_PRIO_MAX): Define.
+	* include/mqueue.h: New file.
+	* include/cygwin/version.h: Bump API minor number.
+
 2007-02-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/stdlib.h (valloc): Declare.

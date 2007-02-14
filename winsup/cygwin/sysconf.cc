@@ -131,8 +131,8 @@ static struct
   {func, {f:get_nproc_values}},		/*  10, _SC_NPROCESSORS_ONLN */
   {func, {f:get_nproc_values}},		/*  11, _SC_PHYS_PAGES */
   {func, {f:get_avphys}},		/*  12, _SC_AVPHYS_PAGES */
-  {nsup, {c:0}},			/*  13, _SC_MQ_OPEN_MAX */
-  {nsup, {c:0}},			/*  14, _SC_MQ_PRIO_MAX */
+  {cons, {c:MQ_OPEN_MAX}},		/*  13, _SC_MQ_OPEN_MAX */
+  {cons, {c:MQ_PRIO_MAX}},		/*  14, _SC_MQ_PRIO_MAX */
   {cons, {c:RTSIG_MAX}},		/*  15, _SC_RTSIG_MAX */
   {cons, {c:-1L}},			/*  16, _SC_SEM_NSEMS_MAX */
   {cons, {c:SEM_VALUE_MAX}},		/*  17, _SC_SEM_VALUE_MAX */
@@ -145,7 +145,7 @@ static struct
   {cons, {c:-1L}},			/*  24, _SC_MEMLOCK */
   {cons, {c:_POSIX_MEMLOCK_RANGE}},	/*  25, _SC_MEMLOCK_RANGE */
   {cons, {c:_POSIX_MEMORY_PROTECTION}},	/*  26, _SC_MEMORY_PROTECTION */
-  {cons, {c:-1L}},			/*  27, _SC_MESSAGE_PASSING */
+  {cons, {c:_POSIX_MESSAGE_PASSING}},	/*  27, _SC_MESSAGE_PASSING */
   {cons, {c:-1L}},			/*  28, _SC_PRIORITIZED_IO */
   {cons, {c:_POSIX_REALTIME_SIGNALS}},	/*  29, _SC_REALTIME_SIGNALS */
   {cons, {c:_POSIX_SEMAPHORES}},	/*  30, _SC_SEMAPHORES */

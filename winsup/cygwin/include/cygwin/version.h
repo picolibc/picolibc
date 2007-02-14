@@ -303,12 +303,14 @@ details. */
 	   if_nameindex, if_freenameindex.
       163: Export posix_madvise, posix_memalign.
       164: Export shm_open, shm_unlink.
+      165: Export mq_close, mq_getattr, mq_notify, mq_open, mq_receive,
+	   mq_send, mq_setattr, mq_timedreceive, mq_timedsend, mq_unlink.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 164
+#define CYGWIN_VERSION_API_MINOR 165
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
