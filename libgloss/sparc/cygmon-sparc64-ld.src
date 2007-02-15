@@ -87,6 +87,7 @@ SECTIONS
     *(.init)
     *(.lit)
     *(.rodata)
+    *(.rodata.*)
     *(.shdata)
     *(.eh_frame)
     *(.gnu.linkonce.t*)
