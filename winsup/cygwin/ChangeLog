@@ -1,3 +1,13 @@
+2007-02-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* posix_ipc.cc (ipc_mutex_init): Create global object name.
+	(ipc_cond_init): Ditto.
+	(struct mq_hdr): Add mqh_uname member to store synchronization object
+	name.
+	(mq_open): Create unique synchronization object name and store in
+	mq_hdr->mqh_uname.  Use this name in calls to ipc_mutex_init and
+	ipc_cond_init.
+
 2007-02-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (DLL_OFILES): Add posix_ipc.o.

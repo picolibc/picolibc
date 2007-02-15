@@ -90,10 +90,8 @@ static int
 ipc_mutex_init (HANDLE *pmtx, const char *name)
 {
   char buf[CYG_MAX_PATH];
-  strcpy (buf, "cyg_pmtx");
-  strcat (buf, name);
-  for (char *c = buf; c = strchr (c + 1, '\\'); ++c)
-    *c = '/';
+  __small_sprintf (buf, "%scyg_pmtx/%s",
+		   wincap.has_terminal_services () ? "Global\\" : "", name);
   *pmtx = CreateMutex (&sec_all, FALSE, buf);
   if (!*pmtx)
     debug_printf ("failed: %E\n");
@@ -135,10 +133,9 @@ static int
 ipc_cond_init (HANDLE *pevt, const char *name)
 {
   char buf[CYG_MAX_PATH];
-  strcpy (buf, "cyg_pevt");
-  strcat (buf, name);
-  for (char *c = buf; c = strchr (c + 1, '\\'); ++c)
-    *c = '/';
+  strcpy (buf, wincap.has_terminal_services () ? "Global\\" : "");
+  __small_sprintf (buf, "%scyg_pevt/%s",
+		   wincap.has_terminal_services () ? "Global\\" : "", name);
   *pevt = CreateEvent (&sec_all, TRUE, FALSE, buf);
   if (!*pevt)
     debug_printf ("failed: %E\n");
@@ -240,28 +237,30 @@ shm_unlink (const char *name)
 
 struct mq_hdr
 {
-  struct mq_attr  mqh_attr;	/* the queue's attributes */
-  long            mqh_head;	/* index of first message */
-  long            mqh_free;	/* index of first free message */
-  long            mqh_nwait;	/* #threads blocked in mq_receive() */
-  pid_t           mqh_pid;	/* nonzero PID if mqh_event set */
-  struct sigevent mqh_event;	/* for mq_notify() */
+  struct mq_attr  mqh_attr;	 /* the queue's attributes */
+  long            mqh_head;	 /* index of first message */
+  long            mqh_free;	 /* index of first free message */
+  long            mqh_nwait;	 /* #threads blocked in mq_receive() */
+  pid_t           mqh_pid;	 /* nonzero PID if mqh_event set */
+  char            mqh_uname[20]; /* unique name used to identify synchronization
+  				    objects connected to this queue */
+  struct sigevent mqh_event;	 /* for mq_notify() */
 };
 
 struct msg_hdr
 {
-  long            msg_next;	/* index of next on linked list */
-  ssize_t         msg_len;	/* actual length */
-  unsigned int    msg_prio;	/* priority */
+  long            msg_next;	 /* index of next on linked list */
+  ssize_t         msg_len;	 /* actual length */
+  unsigned int    msg_prio;	 /* priority */
 };
 
 struct mq_info
 {
-  struct mq_hdr  *mqi_hdr;	/* start of mmap'ed region */
-  unsigned long   mqi_magic;	/* magic number if open */
-  int             mqi_flags;	/* flags for this process */
-  HANDLE          mqi_lock;	/* mutex lock */
-  HANDLE          mqi_wait;	/* and condition variable */
+  struct mq_hdr  *mqi_hdr;	 /* start of mmap'ed region */
+  unsigned long   mqi_magic;	 /* magic number if open */
+  int             mqi_flags;	 /* flags for this process */
+  HANDLE          mqi_lock;	 /* mutex lock */
+  HANDLE          mqi_wait;	 /* and condition variable */
 };
 
 #define MQI_MAGIC	0x98765432UL
@@ -359,6 +358,7 @@ again:
       mqhdr->mqh_attr.mq_curmsgs = 0;
       mqhdr->mqh_nwait = 0;
       mqhdr->mqh_pid = 0;
+      __small_sprintf (mqhdr->mqh_uname, "cyg%016X", hash_path_name (0,mqname));
       mqhdr->mqh_head = 0;
       index = sizeof (struct mq_hdr);
       mqhdr->mqh_free = index;
@@ -372,11 +372,11 @@ again:
       msghdr->msg_next = 0;		/* end of free list */
 
       /* Initialize mutex & condition variable */
-      i = ipc_mutex_init (&mqinfo->mqi_lock, mqname);
+      i = ipc_mutex_init (&mqinfo->mqi_lock, mqhdr->mqh_uname);
       if (i != 0)
 	goto pthreaderr;
 
-      i = ipc_cond_init (&mqinfo->mqi_wait, mqname);
+      i = ipc_cond_init (&mqinfo->mqi_wait, mqhdr->mqh_uname);
       if (i != 0)
 	goto pthreaderr;
 
@@ -432,11 +432,11 @@ exists:
   mqinfo->mqi_flags = nonblock;
 
   /* Initialize mutex & condition variable */
-  i = ipc_mutex_init (&mqinfo->mqi_lock, mqname);
+  i = ipc_mutex_init (&mqinfo->mqi_lock, mqhdr->mqh_uname);
   if (i != 0)
     goto pthreaderr;
 
-  i = ipc_cond_init (&mqinfo->mqi_wait, mqname);
+  i = ipc_cond_init (&mqinfo->mqi_wait, mqhdr->mqh_uname);
   if (i != 0)
     goto pthreaderr;
 
