@@ -279,7 +279,7 @@ mq_open (const char *name, int oflag, ...)
 {
   int i, fd, nonblock, created;
   long msgsize, index;
-  _off64_t filesize;
+  _off64_t filesize = 0;
   va_list ap;
   mode_t mode;
   int8_t *mptr;
@@ -427,7 +427,7 @@ exists:
   /* Allocate one mq_info{} for each open */
   if (!(mqinfo = (struct mq_info *) malloc (sizeof (struct mq_info))))
     goto err;
-  mqinfo->mqi_hdr = (struct mq_hdr *) mptr;
+  mqinfo->mqi_hdr = mqhdr = (struct mq_hdr *) mptr;
   mqinfo->mqi_magic = MQI_MAGIC;
   mqinfo->mqi_flags = nonblock;
 

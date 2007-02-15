@@ -18,7 +18,7 @@
 
 __BEGIN_DECLS
 
-typedef void *mqd_t;
+typedef intptr_t mqd_t;
 
 struct mq_attr {
   long  mq_flags;	/* Message queue flags */
