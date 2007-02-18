@@ -1,3 +1,14 @@
+2007-02-18  Jiri Malak  <jiri.malak@iol.cz>
+
+	* include/windef.h [WATCOM]: Fix !NONAMELESSUNION defines.
+	* include/winnt.h [WATCOM] (GetCurrentFiber, GetFiberData):
+	Add prototypes.
+	[WATCOM] (NtCurrentTeb): Add protype and inline asm definition.
+
+2007-02-18  Vesa Jskelinen  <chaac@users.sourveforge.net>
+
+	* lib/user32.def (InternalGetWindowText): Add stub.
+
 2007-02-11  Daniel Atallah  <datallah@users.sourceforge.net>
 
 	* include/winnt.h (LANG_SERBIAN_NEUTRAL, LANG_BOSNIAN,

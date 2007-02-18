@@ -3897,14 +3897,22 @@ static __inline__ struct _TEB * NtCurrentTeb(void)
 
 #else
 
+PVOID GetCurrentFiber(void);
 #pragma aux GetCurrentFiber = \
         "mov	eax, dword ptr fs:0x10" \
         value [eax] \
         modify [eax];
 
+PVOID GetFiberData(void);
 #pragma aux GetFiberData = \
 	"mov	eax, dword ptr fs:0x10" \
 	"mov	eax, [eax]" \
+        value [eax] \
+        modify [eax];
+           
+struct _TEB * NtCurrentTeb(void);
+#pragma aux NtCurrentTeb = \
+        "mov	eax, dword ptr fs:0x18" \
         value [eax] \
         modify [eax];
         
