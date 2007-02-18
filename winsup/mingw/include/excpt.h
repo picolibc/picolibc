@@ -50,14 +50,14 @@ extern "C" {
 
 /*
  * The type of function that is expected as an exception handler to be
- * installed with _try1.
+ * installed with __try1.
  */
 typedef EXCEPTION_DISPOSITION (*PEXCEPTION_HANDLER)
 		(struct _EXCEPTION_RECORD*, void*, struct _CONTEXT*, void*);
 
 /*
  * This is not entirely necessary, but it is the structure installed by
- * the _try1 primitive below.
+ * the __try1 primitive below.
  */
 typedef struct _EXCEPTION_REGISTRATION
 {
@@ -87,7 +87,7 @@ typedef PEXCEPTION_REGISTRATION PEXCEPTION_REGISTRATION_RECORD;
  * then add 8 to the stack pointer to get rid of the space we
  * used when we pushed on our new reg. struct above. Notice that
  * the stack must be in the exact state at this point that it was
- * after we did _try1 or this will smash things.
+ * after we did __try1 or this will smash things.
  */
 #define	__except1	\
 	__asm__ ("movl (%%esp),%%eax;movl %%eax,%%fs:0;addl $8,%%esp;" \
