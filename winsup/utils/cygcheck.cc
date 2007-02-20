@@ -1,7 +1,7 @@
 /* cygcheck.cc
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006 Red Hat, Inc.
+   2006, 2007 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -1148,29 +1148,23 @@ dump_sysinfo ()
       switch (osversion.dwMinorVersion)
 	{
 	case 0:
-	  if (strchr (osversion.szCSDVersion, 'C'))
-	    osname = "95 OSR2";
-	  else
-	    osname = "95";
+	  osname = "95 (not supported)";
 	  break;
 	case 10:
-	  if (strchr (osversion.szCSDVersion, 'A'))
-	    osname = "98 SE";
-	  else
-	    osname = "98";
+	  osname = "98 (not supported)";
 	  break;
 	case 90:
-	  osname = "ME";
+	  osname = "ME (not supported)";
 	  break;
 	default:
-	  osname = "9X";
+	  osname = "9X (not supported)";
 	  break;
 	}
       break;
     case VER_PLATFORM_WIN32_NT:
       is_nt = true;
       if (osversion.dwMajorVersion == 6)
-	osname = "Longhorn/Vista (not yet supported!)";
+	osname = "Vista";
       else if (osversion.dwMajorVersion == 5)
 	{
 	  BOOL more_info = FALSE;
