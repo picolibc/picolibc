@@ -756,13 +756,13 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
       sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
       if (::bind (get_socket (), (sockaddr *) &sin, len))
 	{
-	  syscall_printf ("AF_LOCAL: bind failed %d", get_errno ());
+	  syscall_printf ("AF_LOCAL: bind failed");
 	  set_winsock_errno ();
 	  goto out;
 	}
       if (::getsockname (get_socket (), (sockaddr *) &sin, &len))
 	{
-	  syscall_printf ("AF_LOCAL: getsockname failed %d", get_errno ());
+	  syscall_printf ("AF_LOCAL: getsockname failed");
 	  set_winsock_errno ();
 	  goto out;
 	}
