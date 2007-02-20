@@ -1,3 +1,7 @@
+2007-02-20  Kazunori Asayama <asayama@sm.sony.co.jp>
+
+	* libc/include/stdio.h: Add declaration for vsiprintf.
+
 2007-02-14  Patrick Mansfield <patmans@us.ibm.com>
 
 	Add a floating point environment for SPU (cell):
