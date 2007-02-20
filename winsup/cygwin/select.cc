@@ -3,9 +3,6 @@
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
    2005, 2006 Red Hat, Inc.
 
-   Written by Christopher Faylor of Cygnus Solutions
-   cgf@cygnus.com
-
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the
@@ -1316,7 +1313,7 @@ thread_socket (void *arg)
 	      goto out;
 	    case WAIT_OBJECT_0:
 	      if (!i)	/* Socket event set. */
-	        goto out;
+		goto out;
 	      break;
 	    case WAIT_TIMEOUT:
 	    default:
@@ -1405,9 +1402,9 @@ socket_cleanup (select_record *, select_stuff *stuff)
       ResetEvent (si->w4[0]);
       stuff->device_specific_socket = NULL;
       if (si->ser_num)
-        free (si->ser_num);
+	free (si->ser_num);
       if (si->w4)
-        free (si->w4);
+	free (si->w4);
       delete si;
     }
   select_printf ("returning");

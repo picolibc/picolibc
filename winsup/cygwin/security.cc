@@ -232,7 +232,7 @@ get_logon_server (const char *domain, char *server, WCHAR *wserver,
       /* NT4 w/o DSClient */
       sys_mbstowcs (wdomain, domain, INTERNET_MAX_HOST_NAME_LENGTH + 1);
       if (rediscovery)
-        dret = NetGetAnyDCName (NULL, wdomain, (LPBYTE *) &buf);
+	dret = NetGetAnyDCName (NULL, wdomain, (LPBYTE *) &buf);
       else
 	dret = NetGetDCName (NULL, wdomain, (LPBYTE *) &buf);
       if (dret == NERR_Success)
@@ -605,7 +605,7 @@ get_system_priv_list (cygsidlist &grp_list, size_t &size)
 {
   const LUID *priv;
   size = sizeof (ULONG)
-  	 + SYSTEM_PRIVILEGES_COUNT * sizeof (LUID_AND_ATTRIBUTES);
+	 + SYSTEM_PRIVILEGES_COUNT * sizeof (LUID_AND_ATTRIBUTES);
   PTOKEN_PRIVILEGES privs = (PTOKEN_PRIVILEGES) malloc (size);
   if (!privs)
     {
@@ -657,7 +657,7 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list,
 	  DWORD tmp_count;
 
 	  sys_wcstombs (buf, sizeof (buf),
-	  		privstrs[i].Buffer, privstrs[i].Length / 2);
+			privstrs[i].Buffer, privstrs[i].Length / 2);
 	  if (!(priv = privilege_luid_by_name (buf)))
 	    continue;
 
@@ -1097,7 +1097,7 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   for (int i = 0; i < non_well_known_cnt; ++i)
     {
       if ((tmpidx = tmp_gsids.next_non_well_known_sid (tmpidx)) < 0)
-        break;
+	break;
       gsids->Groups[i].Sid = sids_offset;
       gsids->Groups[i].Attributes = SE_GROUP_MANDATORY
 				    | SE_GROUP_ENABLED_BY_DEFAULT
@@ -1105,7 +1105,7 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
       /* Mark logon SID as logon SID :) */
       if (wincap.needs_logon_sid_in_sid_list ()
 	  && tmp_gsids.sids[tmpidx] == fake_logon_sid)
-        gsids->Groups[i].Attributes += SE_GROUP_LOGON_ID;
+	gsids->Groups[i].Attributes += SE_GROUP_LOGON_ID;
       CopySid (GetLengthSid (tmp_gsids.sids[tmpidx]),
 	       (PSID) ((PBYTE) &authinf->inf + sids_offset),
 	       tmp_gsids.sids[tmpidx]);
@@ -1433,26 +1433,26 @@ get_reg_security (HANDLE handle, security_descriptor &sd_ret)
   DWORD len = 0;
 
   ret = RegGetKeySecurity ((HKEY) handle,
-                           DACL_SECURITY_INFORMATION
-                           | GROUP_SECURITY_INFORMATION
-                           | OWNER_SECURITY_INFORMATION,
-                           sd_ret, &len);
+			   DACL_SECURITY_INFORMATION
+			   | GROUP_SECURITY_INFORMATION
+			   | OWNER_SECURITY_INFORMATION,
+			   sd_ret, &len);
   if (ret == ERROR_INSUFFICIENT_BUFFER)
-    {       
+    {
       if (!sd_ret.malloc (len))
-        set_errno (ENOMEM);
+	set_errno (ENOMEM);
       else
-        ret = RegGetKeySecurity ((HKEY) handle,
-                                 DACL_SECURITY_INFORMATION
-                                 | GROUP_SECURITY_INFORMATION
-                                 | OWNER_SECURITY_INFORMATION,
-                                 sd_ret, &len);
+	ret = RegGetKeySecurity ((HKEY) handle,
+				 DACL_SECURITY_INFORMATION
+				 | GROUP_SECURITY_INFORMATION
+				 | OWNER_SECURITY_INFORMATION,
+				 sd_ret, &len);
     }
   if (ret != ERROR_SUCCESS)
     {
       __seterrno ();
       return -1;
-    } 
+    }
   return 0;
 }
 
@@ -1462,7 +1462,7 @@ get_nt_object_security (HANDLE handle, SE_OBJECT_TYPE object_type,
 {
   NTSTATUS ret;
   ULONG len = 0;
-  
+
   /* Do not try to use GetSecurityInfo (again), unless we drop NT4 support.
      GetSecurityInfo returns the wrong user information when running in
      a user session using a token created with NtCreateToken under NT4.
@@ -1476,25 +1476,25 @@ get_nt_object_security (HANDLE handle, SE_OBJECT_TYPE object_type,
      convert pseudo HKEY values to real handles. */
   if (object_type == SE_REGISTRY_KEY)
     return get_reg_security (handle, sd_ret);
-        
+
   ret = NtQuerySecurityObject (handle,
-                               DACL_SECURITY_INFORMATION
-                               | GROUP_SECURITY_INFORMATION
-                               | OWNER_SECURITY_INFORMATION,
-                               sd_ret, len, &len);
+			       DACL_SECURITY_INFORMATION
+			       | GROUP_SECURITY_INFORMATION
+			       | OWNER_SECURITY_INFORMATION,
+			       sd_ret, len, &len);
   if (ret == STATUS_BUFFER_TOO_SMALL)
     {
       if (!sd_ret.malloc (len))
-        set_errno (ENOMEM);
+	set_errno (ENOMEM);
       else
-        ret = NtQuerySecurityObject (handle,
-                                     DACL_SECURITY_INFORMATION
-                                     | GROUP_SECURITY_INFORMATION
-                                     | OWNER_SECURITY_INFORMATION,
-                                     sd_ret, len, &len);
+	ret = NtQuerySecurityObject (handle,
+				     DACL_SECURITY_INFORMATION
+				     | GROUP_SECURITY_INFORMATION
+				     | OWNER_SECURITY_INFORMATION,
+				     sd_ret, len, &len);
     }
   if (ret != STATUS_SUCCESS)
-    {   
+    {
       __seterrno_from_nt_status (ret);
       return -1;
     }

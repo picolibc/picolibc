@@ -553,7 +553,7 @@ cygwin_socket (int af, int type, int protocol)
   debug_printf ("socket (%d, %d, %d)", af, type, protocol);
 
   soc = socket (af == AF_LOCAL ? AF_INET : af, type,
-  		af == AF_LOCAL ? 0 : protocol);
+		af == AF_LOCAL ? 0 : protocol);
 
   if (soc == INVALID_SOCKET)
     {
@@ -1128,11 +1128,11 @@ getdomainname (char *domain, size_t len)
 /* Vista/Longhorn: unicast address has additional OnLinkPrefixLength member. */
 typedef struct _IP_ADAPTER_UNICAST_ADDRESS_LH {
     _ANONYMOUS_UNION union {
-        ULONGLONG Alignment;
-        _ANONYMOUS_UNION struct {
-            ULONG Length;
-            DWORD Flags;
-        } DUMMYSTRUCTNAME;
+	ULONGLONG Alignment;
+	_ANONYMOUS_UNION struct {
+	    ULONG Length;
+	    DWORD Flags;
+	} DUMMYSTRUCTNAME;
     } DUMMYUNIONNAME;
     struct _IP_ADAPTER_UNICAST_ADDRESS_VISTA *Next;
     SOCKET_ADDRESS Address;
@@ -1231,7 +1231,7 @@ ip_addr_prefix (PIP_ADAPTER_UNICAST_ADDRESS pua, PIP_ADAPTER_PREFIX pap)
       /* Prior to Vista, the loopback prefix is not available. */
       if (IN_LOOPBACK (((struct sockaddr_in *)
 			pua->Address.lpSockaddr)->sin_addr.s_addr))
-        return 8;
+	return 8;
       for ( ; pap; pap = pap->Next)
 	if (in_are_prefix_equal (
 	      &((struct sockaddr_in *) pua->Address.lpSockaddr)->sin_addr,
@@ -1285,7 +1285,7 @@ get_adapters_addresses (PIP_ADAPTER_ADDRESSES *pa_ret, ULONG family)
   if (ret != ERROR_SUCCESS)
     {
       if (pa0)
-        free (pa0);
+	free (pa0);
       *pa_ret = NULL;
       return false;
     }
@@ -1303,7 +1303,7 @@ static inline short
 convert_ifr_flags (u_long ws_flags)
 {
   return (ws_flags & (WS_IFF_UP | WS_IFF_BROADCAST))
-  	 | ((ws_flags & (WS_IFF_LOOPBACK | WS_IFF_POINTTOPOINT)) << 1)
+	 | ((ws_flags & (WS_IFF_LOOPBACK | WS_IFF_POINTTOPOINT)) << 1)
 	 | ((ws_flags & WS_IFF_MULTICAST) << 8);
 }
 
@@ -1323,7 +1323,7 @@ get_xp_ifconf (SOCKET s, struct ifconf *ifc, int what)
 
   if (!get_adapters_addresses (&pa0, AF_INET))
     goto done;
-  
+
   for (pap = pa0; pap; pap = pap->Next)
     for (pua = pap->FirstUnicastAddress; pua; pua = pua->Next)
       ++cnt;
@@ -1332,19 +1332,19 @@ get_xp_ifconf (SOCKET s, struct ifconf *ifc, int what)
      space for one more INTERFACE_INFO structure here. */
   iie = (LPINTERFACE_INFO) alloca ((cnt + 1) * sizeof (INTERFACE_INFO));
   if (WSAIoctl (s, SIO_GET_INTERFACE_LIST, NULL, 0, iie,
-  		(cnt + 1) * sizeof (INTERFACE_INFO), &size, NULL, NULL))
+		(cnt + 1) * sizeof (INTERFACE_INFO), &size, NULL, NULL))
     {
       set_winsock_errno ();
       cnt = 0;
       goto done;
     }
-      
+
   struct ifreq *ifr = ifc->ifc_req;
   for (pap = pa0; pap; pap = pap->Next)
     {
       int idx = 0;
       for (pua = pap->FirstUnicastAddress; pua; pua = pua->Next)
-        {
+	{
 	  int iinf_idx;
 	  for (iinf_idx = 0; iinf_idx < cnt; ++iinf_idx)
 	    if (iie[iinf_idx].iiAddress.AddressIn.sin_addr.s_addr
@@ -1401,7 +1401,7 @@ get_xp_ifconf (SOCKET s, struct ifconf *ifc, int what)
 	      break;
 	    case SIOCGIFMETRIC:
 	      if (wincap.has_gaa_on_link_prefix ())
-	        ifr->ifr_metric = ((PIP_ADAPTER_ADDRESSES_LH) pap)->Ipv4Metric;
+		ifr->ifr_metric = ((PIP_ADAPTER_ADDRESSES_LH) pap)->Ipv4Metric;
 	      else
 		ifr->ifr_metric = 1;
 	      break;
@@ -1566,7 +1566,7 @@ get_2k_ifconf (struct ifconf *ifc, int what)
 		    if (ifrow->dwOperStatus >= MIB_IF_OPER_STATUS_CONNECTED)
 		      ifr->ifr_flags |= IFF_RUNNING;
 		  }
-	        break;
+		break;
 	      case SIOCGIFCONF:
 	      case SIOCGIFADDR:
 		sa = (struct sockaddr_in *) &ifr->ifr_addr;
@@ -2132,7 +2132,7 @@ if_indextoname (unsigned ifindex, char *ifname)
       && get_adapters_addresses (&pa0, AF_UNSPEC))
     {
       for (pap = pa0; pap; pap = pap->Next)
-        if (ifindex == pap->IfIndex)
+	if (ifindex == pap->IfIndex)
 	  {
 	    name = strcpy (ifname, pap->AdapterName);
 	    break;
@@ -2160,19 +2160,19 @@ if_nameindex (void)
     {
       int cnt = 0;
       for (pap = pa0; pap; pap = pap->Next)
-        ++cnt;
+	++cnt;
       iflist = (struct if_nameindex *)
 	       malloc ((cnt + 1) * sizeof (struct if_nameindex)
 		       + cnt * IF_NAMESIZE);
       if (!iflist)
 	set_errno (ENOBUFS);
       else
-        {
+	{
 	  ifnamelist = (char (*)[IF_NAMESIZE]) (iflist + cnt + 1);
 	  for (pap = pa0, cnt = 0; pap; pap = pap->Next)
 	    {
 	      for (int i = 0; i < cnt; ++i)
-	        if (iflist[i].if_index == (pap->IfIndex ?: pap->Ipv6IfIndex))
+		if (iflist[i].if_index == (pap->IfIndex ?: pap->Ipv6IfIndex))
 		  goto outer_loop;
 	      iflist[cnt].if_index = pap->IfIndex ?: pap->Ipv6IfIndex;
 	      strcpy (iflist[cnt].if_name = ifnamelist[cnt], pap->AdapterName);
@@ -2255,7 +2255,7 @@ cygwin_bindresvport_sa (int fd, struct sockaddr *sa)
     {
       ret = fh->bind (sa, salen);
       if (!ret || (get_errno () != EADDRINUSE && get_errno () != EINVAL))
-        return ret;
+	return ret;
     }
 
   LONG myport;
@@ -2584,7 +2584,7 @@ inet_pton4 (const char *src, u_char *dst)
       const char *pch;
 
       if ((pch = strchr(digits, ch)) != NULL)
-        {
+	{
 	  u_int ret = *tp * 10 + (pch - digits);
 
 	  if (ret > 255)
@@ -2598,7 +2598,7 @@ inet_pton4 (const char *src, u_char *dst)
 	    }
 	}
       else if (ch == '.' && saw_digit)
-        {
+	{
 	  if (octets == 4)
 	    return (0);
 	  *++tp = 0;
@@ -2654,7 +2654,7 @@ inet_pton6 (const char *src, u_char *dst)
       if ((pch = strchr((xdigits = xdigits_l), ch)) == NULL)
 	pch = strchr((xdigits = xdigits_u), ch);
       if (pch != NULL)
-        {
+	{
 	  val <<= 4;
 	  val |= (pch - xdigits);
 	  if (val > 0xffff)
@@ -2663,7 +2663,7 @@ inet_pton6 (const char *src, u_char *dst)
 	  continue;
 	}
       if (ch == ':')
-        {
+	{
 	  curtok = src;
 	  if (!saw_xdigit)
 	    {
@@ -2681,7 +2681,7 @@ inet_pton6 (const char *src, u_char *dst)
 	  continue;
 	}
       if (ch == '.' && ((tp + INADDRSZ) <= endp) && inet_pton4(curtok, tp) > 0)
-        {
+	{
 	  tp += INADDRSZ;
 	  saw_xdigit = 0;
 	  break;	/* '\0' was seen by inet_pton4(). */
@@ -2705,7 +2705,7 @@ inet_pton6 (const char *src, u_char *dst)
       int i;
 
       for (i = 1; i <= n; i++)
-        {
+	{
 	  endp[- i] = colonp[n - i];
 	  colonp[n - i] = 0;
 	}
@@ -2806,14 +2806,14 @@ inet_ntop6 (const u_char *src, char *dst, size_t size)
   for (i = 0; i < (IN6ADDRSZ / INT16SZ); i++)
     {
       if (words[i] == 0)
-        {
+	{
 	  if (cur.base == -1)
 	    cur.base = i, cur.len = 1;
 	  else
 	    cur.len++;
 	}
       else
-        {
+	{
 	  if (cur.base != -1)
 	    {
 	      if (best.base == -1 || cur.len > best.len)
@@ -2838,7 +2838,7 @@ inet_ntop6 (const u_char *src, char *dst, size_t size)
     {
       /* Are we inside the best run of 0x00's? */
       if (best.base != -1 && i >= best.base && i < (best.base + best.len))
-        {
+	{
 	  if (i == best.base)
 	    *tp++ = ':';
 	  continue;
@@ -3040,11 +3040,11 @@ ga_dup (struct addrinfo *ai, bool v4mapped)
     }
   nai->ai_addrlen = v4mapped ? sizeof (struct sockaddr_in6) : ai->ai_addrlen;
   if ((nai->ai_addr = (struct sockaddr *) malloc (v4mapped
-  						  ? sizeof (struct sockaddr_in6)
+						  ? sizeof (struct sockaddr_in6)
 						  : ai->ai_addrlen)) == NULL)
     {
       if (nai->ai_canonname)
-        free (nai->ai_canonname);
+	free (nai->ai_canonname);
       free (nai);
       return NULL;
     }
@@ -3088,11 +3088,11 @@ ga_duplist (struct addrinfo *ai, bool v4mapped)
   for (; ai; ai = ai->ai_next, nai = tmp)
     {
       if (!(tmp = ga_dup (ai, v4mapped)))
-        goto bad;
+	goto bad;
       if (!nai0)
-        nai0 = tmp;
+	nai0 = tmp;
       if (nai)
-        nai->ai_next = tmp;
+	nai->ai_next = tmp;
     }
   return nai0;
 
@@ -3899,14 +3899,14 @@ load_ipv6_funcs ()
       len = strlen (lib_name);
       strcpy (lib_name + len, "\\ws2_32.dll");
       if ((lib = LoadLibrary (lib_name)))
-        {
+	{
 	  if (get_ipv6_funcs (lib))
 	    goto out;
 	  FreeLibrary (lib);
 	}
       strcpy (lib_name + len, "\\wship6.dll");
       if ((lib = LoadLibrary (lib_name)))
-        {
+	{
 	  if (get_ipv6_funcs (lib))
 	    goto out;
 	  FreeLibrary (lib);
@@ -3940,7 +3940,7 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
      in ai_flags slip through and just ignore unknowen values.  So we have
      to check manually here. */
   if (hints && (hints->ai_flags
-  		& ~(AI_PASSIVE | AI_CANONNAME | AI_NUMERICHOST | AI_ALL
+		& ~(AI_PASSIVE | AI_CANONNAME | AI_NUMERICHOST | AI_ALL
 		    | AI_NUMERICSERV | AI_ADDRCONFIG | AI_V4MAPPED)))
     return EAI_BADFLAGS;
   /* AI_NUMERICSERV is not supported in our replacement getaddrinfo, nor
@@ -3964,7 +3964,7 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
 	 behaviour, the AI_ALL flag has to be set. */
       if (wincap.supports_all_posix_ai_flags ()
 	  && hints && hints->ai_family == PF_UNSPEC)
-        {
+	{
 	  nhints = *hints;
 	  hints = &nhints;
 	  nhints.ai_flags |= AI_ALL;
@@ -3972,7 +3972,7 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
       int ret = w32_to_gai_err (getaddrinfo (hostname, servname, hints, res));
       /* Always copy over to self-allocated memory. */
       if (!ret)
-        {
+	{
 	  dupres = ga_duplist (*res, false);
 	  freeaddrinfo (*res);
 	  *res = dupres;
@@ -3980,7 +3980,7 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
 	    return EAI_MEMORY;
 	}
       /* AI_V4MAPPED and AI_ALL are not supported prior to Vista.  So, what
-         we do here is to emulate AI_V4MAPPED.  If no IPv6 addresses are
+	 we do here is to emulate AI_V4MAPPED.  If no IPv6 addresses are
 	 returned, or the AI_ALL flag is set, we try with AF_INET again, and
 	 convert the returned IPv4 addresses into v4-in-v6 entries.  This
 	 is done in ga_dup if the v4mapped flag is set. */
@@ -4006,7 +4006,7 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
 		  return EAI_MEMORY;
 		}
 	      /* If a list of v6 addresses exists, append the v4-in-v6 address
-	         list.  Otherwise just return the v4-in-v6 address list. */
+		 list.  Otherwise just return the v4-in-v6 address list. */
 	      if (!ret)
 		{
 		  struct addrinfo *ptr;
@@ -4040,7 +4040,7 @@ cygwin_getnameinfo (const struct sockaddr *sa, socklen_t salen,
 	 To avoid this strange behaviour, we check manually, if the port number
 	 is 0.  If so, set the NI_NUMERICSERV flag to avoid this problem. */
       switch (sa->sa_family)
-        {
+	{
 	case AF_INET:
 	  if (((struct sockaddr_in *) sa)->sin_port == 0)
 	    flags |= NI_NUMERICSERV;
@@ -4053,7 +4053,7 @@ cygwin_getnameinfo (const struct sockaddr *sa, socklen_t salen,
       int ret = w32_to_gai_err (getnameinfo (sa, salen, host, hostlen, serv,
 					     servlen, flags));
       if (ret)
-        set_winsock_errno ();
+	set_winsock_errno ();
       return ret;
     }
   return ipv4_getnameinfo (sa, salen, host, hostlen, serv, servlen, flags);
@@ -4129,7 +4129,7 @@ in6_are_prefix_equal (struct in6_addr *p1, struct in6_addr *p2, int len)
   /* sanity check */
   if (0 > len || len > 128)
     return 0;
-  
+
   bytelen = len / 8;
   bitlen = len % 8;
 

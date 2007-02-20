@@ -528,7 +528,7 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
     case STATUS_ACCESS_VIOLATION:
       switch (mmap_is_attached_or_noreserve ((void *)e->ExceptionInformation[1],
 					     1))
-        {
+	{
 	case MMAP_NORESERVE_COMMITED:
 	  return 0;
 	case MMAP_RAISE_SIGBUS:	/* MAP_NORESERVE page, commit failed, or

@@ -809,7 +809,7 @@ fhandler_disk_file::fadvise (_off64_t offset, _off64_t length, int advice)
     {
       fmi.Mode &= ~FILE_SEQUENTIAL_ONLY;
       if (advice == POSIX_FADV_SEQUENTIAL)
-        fmi.Mode |= FILE_SEQUENTIAL_ONLY;
+	fmi.Mode |= FILE_SEQUENTIAL_ONLY;
       status = NtSetInformationFile (get_handle (), &io, &fmi, sizeof fmi,
 				     FileModeInformation);
       if (NT_SUCCESS (status))
@@ -839,12 +839,12 @@ fhandler_disk_file::ftruncate (_off64_t length, bool allow_truncate)
       actual_length += ((_off64_t) size_high) << 32;
 
       /* If called through posix_fallocate, silently succeed if length
-         is less than the file's actual length. */
+	 is less than the file's actual length. */
       if (!allow_truncate && length < actual_length)
 	return 0;
 
       if (wincap.is_winnt ())
-        {
+	{
 	  NTSTATUS status;
 	  IO_STATUS_BLOCK io;
 	  FILE_END_OF_FILE_INFORMATION feofi;
@@ -872,7 +872,7 @@ fhandler_disk_file::ftruncate (_off64_t length, bool allow_truncate)
 	    res = 0;
 	}
       else
-        {
+	{
 	  _off64_t prev_loc = lseek (0, SEEK_CUR);
 	  if (lseek (length, SEEK_SET) >= 0)
 	    {
@@ -1468,7 +1468,7 @@ fhandler_disk_file::rmdir ()
     {
       rc = !(err = unlink_nt (pc, pc.has_attribute (FILE_ATTRIBUTE_READONLY)));
       if (err)
-        SetLastError (err);
+	SetLastError (err);
     }
   else
     rc = RemoveDirectory (get_win32_name ());
@@ -1599,7 +1599,7 @@ fhandler_disk_file::opendir ()
 	      SECURITY_ATTRIBUTES sa = sec_none;
 	      pc.get_nt_native_path (upath);
 	      InitializeObjectAttributes (&attr, &upath,
-	      				  OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+					  OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
 					  NULL, sa.lpSecurityDescriptor);
 	      status = NtOpenFile (&dir->__handle,
 				   SYNCHRONIZE | FILE_LIST_DIRECTORY,
@@ -1793,7 +1793,7 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 	     mode using FileBothDirectoryInformation.  So, what we do here is
 	     to implement the solution suggested by Andrew Tridgell,  we just
 	     reread all entries up to dir->d_position using
-	     FileBothDirectoryInformation. 
+	     FileBothDirectoryInformation.
 	     However, We do *not* mark this server as broken and fall back to
 	     using FileBothDirectoryInformation further on.  This would slow
 	     down every access to such a server, even for directories under
@@ -1804,7 +1804,7 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 	    {
 	      d_cachepos (dir) = 0;
 	      for (int cnt = 0; cnt < dir->__d_position; ++cnt)
-	        {
+		{
 		  if (d_cachepos (dir) == 0)
 		    {
 		      status = NtQueryDirectoryFile (dir->__handle, NULL, NULL,
@@ -1812,10 +1812,10 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 					   FileBothDirectoryInformation,
 					   FALSE, NULL, cnt == 0);
 		      if (!NT_SUCCESS (status))
-		        goto go_ahead;
+			goto go_ahead;
 		    }
 		  buf = (PFILE_ID_BOTH_DIR_INFORMATION) (d_cache (dir)
-		  					 + d_cachepos (dir));
+							 + d_cachepos (dir));
 		  if (buf->NextEntryOffset == 0)
 		    d_cachepos (dir) = 0;
 		  else
@@ -1982,7 +1982,7 @@ fhandler_disk_file::rewinddir (DIR *dir)
     {
       d_cachepos (dir) = 0;
       if (wincap.has_buggy_restart_scan () && isremote ())
-        {
+	{
 	  /* This works around a W2K bug.  The RestartScan parameter in calls
 	     to NtQueryDirectoryFile on remote shares is ignored, thus
 	     resulting in not being able to rewind on remote shares.  By

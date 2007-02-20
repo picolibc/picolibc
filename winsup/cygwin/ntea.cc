@@ -67,12 +67,12 @@ read_ea (HANDLE hdl, const char *file, const char *attrname, char *attrbuf,
 		  == INVALID_HANDLE_VALUE)
 	{
 	  debug_printf ("Opening %s for querying EA %s failed, %E",
-	  		file, attrname);
+			file, attrname);
 	  goto out;
 	}
       status = NtQueryEaFile (h, &io, fea, flen, FALSE, gea, glen, NULL, TRUE);
       if (NT_SUCCESS (status) || !hdl)
-        break;
+	break;
       debug_printf ("1. chance, %x = NtQueryEaFile (%s, %s), Win32 error %d",
 		    status, file, attrname, RtlNtStatusToDosError (status));
       hdl = NULL;
@@ -96,7 +96,7 @@ read_ea (HANDLE hdl, const char *file, const char *attrname, char *attrbuf,
 
 out:
   debug_printf ("%d = read_ea (%x, %s, %s, %x, %d)", ret, hdl, file, attrname,
-  		attrbuf, len);
+		attrbuf, len);
   return ret;
 }
 
@@ -147,12 +147,12 @@ write_ea (HANDLE hdl, const char *file, const char *attrname,
 		  == INVALID_HANDLE_VALUE)
 	{
 	  debug_printf ("Opening %s for setting EA %s failed, %E",
-	  		file, attrname);
+			file, attrname);
 	  goto out;
 	}
       status = NtSetEaFile (h, &io, fea, flen);
       if (NT_SUCCESS (status) || !hdl)
-        break;
+	break;
       debug_printf ("1. chance, %x = NtQueryEaFile (%s, %s), Win32 error %d",
 		    status, file, attrname, RtlNtStatusToDosError (status));
       hdl = NULL;
@@ -167,6 +167,6 @@ write_ea (HANDLE hdl, const char *file, const char *attrname,
 
 out:
   debug_printf ("%d = write_ea (%x, %s, %s, %x, %d)", ret, hdl, file, attrname,
-  		attrbuf, len);
+		attrbuf, len);
   return ret;
 }

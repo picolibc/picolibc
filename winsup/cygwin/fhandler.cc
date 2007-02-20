@@ -690,7 +690,7 @@ fhandler_base::open (int flags, mode_t mode)
 	 Per MSDN you have to create the file with the same attributes as
 	 already specified for the file. */
       if (has_attribute (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM))
-        file_attributes |= pc.file_attributes ();
+	file_attributes |= pc.file_attributes ();
 
       /* If the file should actually be created and ntsec is on,
 	 set files attributes. */
@@ -1292,7 +1292,7 @@ rootdir (const char *full_path, char *root_path)
 	    }
 	}
       while (--c > min_c && *c != '\\')
-        ;
+	;
     }
 
   return root_path;
@@ -1826,12 +1826,12 @@ fhandler_base::fpathconf (int v)
 	     ? LINK_MAX : 1;
     case _PC_MAX_CANON:
       if (is_tty ())
-        return MAX_CANON;
+	return MAX_CANON;
       set_errno (EINVAL);
       break;
     case _PC_MAX_INPUT:
       if (is_tty ())
-        return MAX_INPUT;
+	return MAX_INPUT;
       set_errno (EINVAL);
       break;
     case _PC_NAME_MAX:
@@ -1844,7 +1844,7 @@ fhandler_base::fpathconf (int v)
       if (pc.isdir ()
 	  || get_device () == FH_FIFO || get_device () == FH_PIPE
 	  || get_device () == FH_PIPER || get_device () == FH_PIPEW)
-        return PIPE_BUF;
+	return PIPE_BUF;
       set_errno (EINVAL);
       break;
     case _PC_CHOWN_RESTRICTED:
@@ -1853,7 +1853,7 @@ fhandler_base::fpathconf (int v)
       return 1;
     case _PC_VDISABLE:
       if (is_tty ())
-        return _POSIX_VDISABLE;
+	return _POSIX_VDISABLE;
       set_errno (EINVAL);
       break;
     case _PC_ASYNC_IO:
@@ -1870,7 +1870,7 @@ fhandler_base::fpathconf (int v)
     case _PC_POSIX_PERMISSIONS:
     case _PC_POSIX_SECURITY:
       if (get_device () == FH_FS)
-        return check_posix_perm (get_win32_name (), v);
+	return check_posix_perm (get_win32_name (), v);
       set_errno (EINVAL);
       break;
     default:

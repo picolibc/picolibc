@@ -3118,7 +3118,7 @@ symlink_info::check_reparse_point (const char *path, HANDLE h)
   char srcbuf[CYG_MAX_PATH + 6];
 
   if (!DeviceIoControl (h, FSCTL_GET_REPARSE_POINT, NULL, 0, (LPVOID) rp,
-  			MAXIMUM_REPARSE_DATA_BUFFER_SIZE, &size, NULL))
+			MAXIMUM_REPARSE_DATA_BUFFER_SIZE, &size, NULL))
     {
       debug_printf ("DeviceIoControl(FSCTL_GET_REPARSE_POINT) failed, %E");
       set_error (EIO);
@@ -3143,13 +3143,13 @@ symlink_info::check_reparse_point (const char *path, HANDLE h)
   else if (rp->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT)
     {
       if (rp->SymbolicLinkReparseBuffer.PrintNameLength == 0)
-        {
+	{
 	  /* Likely a volume mount point.  Not treated as symlink. */
 	  goto close_it;
 	}
       if (rp->MountPointReparseBuffer.SubstituteNameLength
 	  > 2 * (CYG_MAX_PATH + 6))
-        {
+	{
 	  debug_printf ("Symlink name too long");
 	  set_error (EIO);
 	  goto close_it;
@@ -3207,7 +3207,7 @@ symlink_info::posixify (char *srcbuf)
       if (srcbuf[1] == '\\') /* UNC path */
 	slashify (srcbuf, contents, 0);
       else /* Paths starting with \ are current drive relative. */
-        {
+	{
 	  char cvtbuf[CYG_MAX_PATH + 6];
 
 	  strncpy (cvtbuf, cygheap->cwd.win32, 2);
@@ -3470,7 +3470,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 
       /* Reparse points are potentially symlinks. */
       if (fileattr & FILE_ATTRIBUTE_REPARSE_POINT)
-        sym_check = 3;
+	sym_check = 3;
 
       /* This is the old Cygwin method creating symlinks: */
       /* A symlink will have the `system' file attribute. */
@@ -4235,15 +4235,15 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
     {
       cwd_lock.acquire ();
       if (doit)
-        {
+	{
 	  if (keep_in_sync ())
 	    {
 	      /* If a Cygwin application called cygwin_internal(CW_SYNC_WINENV),
-	         then it's about to call native Windows functions.  This also
+		 then it's about to call native Windows functions.  This also
 		 sets the keep_in_sync flag so that we actually chdir into the
 		 native directory on 9x to avoid confusion. */
 	      if (!SetCurrentDirectory (win32_cwd))
-	        {
+		{
 		  __seterrno ();
 		  goto out;
 		}
@@ -4283,7 +4283,7 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
 	      if (wincap.can_open_directories ())
 		{
 		  HANDLE h = CreateFile (win32_cwd, FILE_TRAVERSE,
-		  			 wincap.shared (), NULL, OPEN_EXISTING,
+					 wincap.shared (), NULL, OPEN_EXISTING,
 					 FILE_FLAG_BACKUP_SEMANTICS, NULL);
 		  if (h == INVALID_HANDLE_VALUE)
 		    {
@@ -4310,7 +4310,7 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
 		  CloseHandle (h);
 		}
 	    }
-        }
+	}
     }
   /* If there is no win32 path or it has the form c:xxx, get the value */
   if (!win32_cwd || (isdrive (win32_cwd) && win32_cwd[2] != '\\'))

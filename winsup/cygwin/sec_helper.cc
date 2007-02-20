@@ -200,13 +200,13 @@ cygsidlist::free_sids ()
 
 BOOL
 cygsidlist::add (const PSID nsi, bool well_known)
-{ 
-  if (contains (nsi)) 
+{
+  if (contains (nsi))
     return TRUE;
   if (cnt >= maxcnt)
     {
       cygsid *tmp = new cygsid [2 * maxcnt];
-      if (!tmp) 
+      if (!tmp)
 	return FALSE;
       maxcnt *= 2;
       for (int i = 0; i < cnt; ++i)
@@ -214,12 +214,12 @@ cygsidlist::add (const PSID nsi, bool well_known)
       delete [] sids;
       sids = tmp;
     }
-  if (well_known) 
+  if (well_known)
     sids[cnt++] *= nsi;
   else
     sids[cnt++] = nsi;
   return TRUE;
-} 
+}
 
 bool
 get_sids_info (cygpsid owner_sid, cygpsid group_sid, __uid32_t * uidret, __gid32_t * gidret)
@@ -274,7 +274,7 @@ PSECURITY_DESCRIPTOR
 security_descriptor::realloc (size_t nsize)
 {
   PSECURITY_DESCRIPTOR tmp;
-  
+
   if (!(tmp = (PSECURITY_DESCRIPTOR) ::realloc (psd, nsize)))
     return NULL;
   sd_size = nsize;

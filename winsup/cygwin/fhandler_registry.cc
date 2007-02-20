@@ -187,7 +187,7 @@ out:
 
 void
 fhandler_registry::set_name (path_conv &in_pc)
-{   
+{
   if (strncasematch (in_pc.normalized_path, "/proc/registry32", 16))
     {
       wow64 = KEY_WOW64_32KEY;
@@ -287,7 +287,7 @@ fhandler_registry::fstat (struct __stat64 *buf)
 	  RegCloseKey (hKey);
 	}
       else
-        {
+	{
 	  /* Here's the problem:  If we can't open the key, we don't know
 	     nothing at all about the key/value.  It's only clear that
 	     the current user has no read access.  At this point it's

@@ -1,3 +1,10 @@
+2007-02-19  Christopher Faylor  <me@cgf.cx>
+
+	Remove extraneous whitespace.
+	* pinfo.cc (commune_process): Use default argument to lock_process.
+	* sigproc.cc: Update copyright.
+	* select.cc: Ditto.
+
 2007-02-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix_ipc.cc (mq_open): Avoid compiler warning.  Initialize mqhdr

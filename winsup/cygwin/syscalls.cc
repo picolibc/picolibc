@@ -253,10 +253,10 @@ unlink_nt (path_conv &win32_name, bool setattrs)
      is opened "delete on close", the rename operation in try_to_bin fails
      with STATUS_ACCESS_DENIED.  So directories must be deleted using
      NtSetInformationFile, class FileDispositionInformation, which works fine.
-     
+
      Correction, moving a directory opened with delete-on-close fails ONLY
      on XP.  Note to myself: Never take anything for granted on Windows!
-     
+
      Don't try "delete on close" if the file is on a remote share.  If two
      processes have open handles on a file and one of them calls unlink, then
      it happens that the file is removed from the remote share even though the

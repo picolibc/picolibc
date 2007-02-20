@@ -329,7 +329,7 @@ MapView9x (HANDLE h, void *addr, size_t len, DWORD openflags,
   /* Try mapping using the given address first, even if it's NULL.
      If it failed, and addr was not NULL and flags is not MAP_FIXED,
      try again with NULL address.
-     
+
      Note: Retrying the mapping might be unnecessary, now that mmap64 checks
 	   for a valid memory area first. */
   if (!addr)
@@ -361,7 +361,7 @@ MapViewNT (HANDLE h, void *addr, size_t len, DWORD openflags,
   /* Try mapping using the given address first, even if it's NULL.
      If it failed, and addr was not NULL and flags is not MAP_FIXED,
      try again with NULL address.
-     
+
      Note: Retrying the mapping might be unnecessary, now that mmap64 checks
 	   for a valid memory area first. */
   ret = NtMapViewOfSection (h, GetCurrentProcess (), &base, 0, commitsize,
@@ -914,7 +914,7 @@ map::del_list (unsigned i)
    a system call indicates that the application buffer passed had an
    invalid virtual address to avoid any performance impact in non-noreserve
    cases.
-   
+
    Check if the address range is all within noreserve mmap regions.  If so,
    call VirtualAlloc to commit the pages and return MMAP_NORESERVE_COMMITED
    on success.  If the page has __PROT_ATTACH (SUSv3 memory protection
@@ -938,7 +938,7 @@ mmap_is_attached_or_noreserve (void *addr, size_t len)
   if (map_list == NULL)
     return MMAP_NONE;
 
-  while (len > 0) 
+  while (len > 0)
     {
       caddr_t u_addr;
       DWORD u_len;
@@ -1037,7 +1037,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
      to enable remapping of formerly mapped pages.  If no matching
      free pages exist, check addr again, this time for the real alignment. */
   checkpagesize = wincap.has_mmap_alignment_bug () ?
-    		  getsystempagesize () : pagesize;
+		  getsystempagesize () : pagesize;
   if (fixed (flags) && ((uintptr_t) addr % checkpagesize))
     {
       set_errno (EINVAL);
@@ -1129,7 +1129,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 	}
 
       if (fh->fstat (&st))
-        {
+	{
 	  __seterrno ();
 	  goto out;
 	}
@@ -1235,7 +1235,7 @@ go_ahead:
       PVOID newaddr = VirtualAlloc (addr, orig_len, MEM_TOP_DOWN | MEM_RESERVE,
 				    PAGE_READWRITE);
       if (!newaddr)
-        {
+	{
 	  /* If addr is not NULL, but MAP_FIXED isn't given, allow the OS
 	     to choose. */
 	  if (addr && !fixed (flags))
@@ -1248,7 +1248,7 @@ go_ahead:
 	    }
 	}
       if (!VirtualFree (newaddr, 0, MEM_RELEASE))
-        {
+	{
 	  __seterrno ();
 	  goto out;
 	}
@@ -1739,7 +1739,7 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
       */
       DWORD protect = gen_protect (prot, flags);
       DWORD alloc_type = MEM_TOP_DOWN | MEM_RESERVE
-      			 | (noreserve (flags) ? 0 : MEM_COMMIT);
+			 | (noreserve (flags) ? 0 : MEM_COMMIT);
       base = VirtualAlloc (*addr, len, alloc_type, protect);
       if (!base && addr && !fixed (flags))
 	base = VirtualAlloc (NULL, len, alloc_type, protect);

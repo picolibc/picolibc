@@ -400,7 +400,7 @@ fhandler_console::read (void *pv, size_t& buflen)
 		toadd = tmp + 1;
 	      else if (dev_state->metabit)
 		{
-		  tmp[1] |= 0x80; 
+		  tmp[1] |= 0x80;
 		  toadd = tmp + 1;
 		}
 	      else
@@ -959,7 +959,7 @@ dev_console::set_color (HANDLE h)
     win_fg = win_bg;
   else if (intensity == INTENSITY_BOLD)
     /* apply foreground intensity only in non-reverse mode! */
-    if (reverse) 
+    if (reverse)
       win_bg |= BACKGROUND_INTENSITY;
     else
       win_fg |= FOREGROUND_INTENSITY;

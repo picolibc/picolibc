@@ -423,12 +423,12 @@ search_wsa_event_slot (LONG new_serial_number)
       HANDLE searchmtx = OpenMutex (STANDARD_RIGHTS_READ, FALSE,
 	    shared_name (searchname, "sock", wsa_events[slot].serial_number));
       if (!searchmtx)
-        break;
+	break;
       /* Mutex still exists, attached socket is active, try next slot. */
       CloseHandle (searchmtx);
       slot = (slot + 1) % NUM_SOCKS;
       if (slot == (new_serial_number % NUM_SOCKS))
-        {
+	{
 	  /* Did the whole array once.   Too bad. */
 	  debug_printf ("No free socket slot");
 	  ReleaseMutex (wsa_slot_mtx);
@@ -463,7 +463,7 @@ fhandler_socket::init_events ()
 	}
       err = GetLastError ();
       if (err == ERROR_ALREADY_EXISTS)
-        CloseHandle (wsock_mtx);
+	CloseHandle (wsock_mtx);
     }
   while (err == ERROR_ALREADY_EXISTS);
   if ((wsock_evt = CreateEvent (&sec_all, TRUE, FALSE, NULL))
@@ -500,7 +500,7 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
   if (!(WSAEnumNetworkEvents (get_socket (), wsock_evt, &evts)))
     {
       if (evts.lNetworkEvents)
-        {
+	{
 	  LOCK_EVENTS;
 	  wsock_events->events |= evts.lNetworkEvents;
 	  events_now = (wsock_events->events & event_mask);
@@ -947,7 +947,7 @@ fhandler_socket::listen (int backlog)
 	 fails with WSAEINVAL when it's called on an unbound socket.
 	 So we have to bind manually here to have POSIX semantics. */
       if (get_addr_family () == AF_INET)
-        {
+	{
 	  struct sockaddr_in sin;
 	  sin.sin_family = AF_INET;
 	  sin.sin_port = 0;
@@ -956,8 +956,8 @@ fhandler_socket::listen (int backlog)
 	    res = ::listen (get_socket (), backlog);
 	}
       else if (get_addr_family () == AF_INET6)
-        {
-	  struct sockaddr_in6 sin6 = 
+	{
+	  struct sockaddr_in6 sin6 =
 	    {
 	      sin6_family: AF_INET6,
 	      sin6_port: 0,
@@ -1085,7 +1085,7 @@ fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
     {
       res = ::getsockname (get_socket (), name, namelen);
       if (res)
-        {
+	{
 	  if (WSAGetLastError () == WSAEINVAL)
 	    {
 	      /* Winsock returns WSAEINVAL if the socket is locally
@@ -1093,7 +1093,7 @@ fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
 		 We're faking a valid return value here by creating the
 		 same content in the sockaddr structure as on Linux. */
 	      switch (get_addr_family ())
-	        {
+		{
 		case AF_INET:
 		  res = 0;
 		  *namelen = sizeof (struct sockaddr_in);
@@ -1107,7 +1107,7 @@ fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
 		  break;
 		}
 	      if (!res)
-	        {
+		{
 		  memset (name, 0, *namelen);
 		  name->sa_family = get_addr_family ();
 		}
@@ -1262,7 +1262,7 @@ fhandler_socket::send_internal (struct _WSABUF *wsabuf, DWORD wsacnt, int flags,
       if ((res = WSASendTo (get_socket (), wsabuf, wsacnt, &ret,
 			    flags & MSG_WINMASK, to, tolen, NULL, NULL))
 	  && (err = WSAGetLastError ()) == WSAEWOULDBLOCK)
-        {
+	{
 	  LOCK_EVENTS;
 	  wsock_events->events &= ~FD_WRITE;
 	  UNLOCK_EVENTS;
@@ -1303,7 +1303,7 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
 
   WSABUF wsabuf = { len, (char *) ptr };
   return send_internal (&wsabuf, 1, flags,
-  			(to ? (const struct sockaddr *) &sst : NULL), tolen);
+			(to ? (const struct sockaddr *) &sst : NULL), tolen);
 }
 
 int
@@ -1328,7 +1328,7 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags)
     }
 
   return send_internal (wsabuf, msg->msg_iovlen, flags,
-  			(struct sockaddr *) msg->msg_name, msg->msg_namelen);
+			(struct sockaddr *) msg->msg_name, msg->msg_namelen);
 }
 
 int
@@ -1441,11 +1441,11 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
       if (CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ)
 	{
 	  ifc.ifc_len = ifcp->ifc_len / sizeof (struct __old_ifreq)
-	  		* sizeof (struct ifreq);
+			* sizeof (struct ifreq);
 	  ifc.ifc_buf = (caddr_t) alloca (ifc.ifc_len);
 	}
       else
-        {
+	{
 	  ifc.ifc_len = ifcp->ifc_len;
 	  ifc.ifc_buf = ifcp->ifc_buf;
 	}
@@ -1453,7 +1453,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
       if (res)
 	debug_printf ("error in get_ifconf");
       if (CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ)
-        {
+	{
 	  struct __old_ifreq *ifr = (struct __old_ifreq *) ifcp->ifc_buf;
 	  for (ifrp = ifc.ifc_req;
 	       (caddr_t) ifrp < ifc.ifc_buf + ifc.ifc_len;
@@ -1467,7 +1467,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 			  * sizeof (struct __old_ifreq);
 	}
       else
-        ifcp->ifc_len = ifc.ifc_len;
+	ifcp->ifc_len = ifc.ifc_len;
       break;
     case OLD_SIOCGIFFLAGS:
     case OLD_SIOCGIFADDR:
@@ -1507,7 +1507,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	if (cmd == SIOCGIFFRNDLYNAM)
 	  {
 	    struct ifreq_frndlyname *iff = (struct ifreq_frndlyname *)
-	    			alloca (64 * sizeof (struct ifreq_frndlyname));
+				alloca (64 * sizeof (struct ifreq_frndlyname));
 	    for (int i = 0; i < 64; ++i)
 	      ifc.ifc_req[i].ifr_frndlyname = &iff[i];
 	  }
@@ -1573,7 +1573,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
       async_io (*(int *) p != 0);
       /* If async_io is switched off, revert the event handling. */
       if (*(int *) p == 0)
-        WSAEventSelect (get_socket (), wsock_evt, EVENT_MASK);
+	WSAEventSelect (get_socket (), wsock_evt, EVENT_MASK);
       break;
     case FIONREAD:
       res = ioctlsocket (get_socket (), FIONREAD, (unsigned long *) p);
@@ -1582,14 +1582,14 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
       break;
     default:
       /* Sockets are always non-blocking internally.  So we just note the
-         state here. */
+	 state here. */
       if (cmd == FIONBIO)
 	{
 	  syscall_printf ("socket is now %sblocking",
 			    *(int *) p ? "non" : "");
 	  set_nonblocking (*(int *) p);
 	  res = 0;
-        }
+	}
       else
 	res = ioctlsocket (get_socket (), cmd, (unsigned long *) p);
       break;
