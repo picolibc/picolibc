@@ -17,7 +17,9 @@ lib_a_SOURCES = setjmp.S memcpy.c memmove.c memset.c strcat.c strchr.c strcmp.c 
 	printf.c scanf.c vprintf.c vscanf.c \
 	setbuf.c setvbuf.c tmpfile.c \
 	sprintf.c sscanf.c snprintf.c vsscanf.c vsnprintf.c vsprintf.c \
-	remove.c rename.c tmpnam.c
+	remove.c rename.c tmpnam.c \
+	iprintf.c fiprintf.c siprintf.c sniprintf.c viprintf.c vfiprintf.c vsiprintf.c vsniprintf.c \
+	iscanf.c fiscanf.c siscanf.c viscanf.c vfiscanf.c vsiscanf.c
 
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)

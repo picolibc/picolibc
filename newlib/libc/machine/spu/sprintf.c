@@ -41,6 +41,10 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 #include <varargs.h>
 #endif
 
+#ifdef INTEGER_ONLY
+#  define sprintf siprintf
+#endif
+
 typedef struct
 {
   char* str;

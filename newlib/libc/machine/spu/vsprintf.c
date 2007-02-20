@@ -10,6 +10,10 @@
 #include <varargs.h>
 #endif
 
+#ifdef INTEGER_ONLY
+#  define vsprintf vsiprintf
+#endif
+
 typedef struct
 {
   char *str;

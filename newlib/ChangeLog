@@ -1,5 +1,40 @@
 2007-02-20  Kazunori Asayama <asayama@sm.sony.co.jp>
 
+	* libc/machine/spu/Makefile.am: Add new objects.
+	* libc/machine/spu/Makefile.in: Regenerated.
+	* libc/machine/spu/fiprintf.c: New file. Add implementation of
+	integer-only version.
+	* libc/machine/spu/fiscanf.c: Ditto.
+	* libc/machine/spu/iprintf.c: Ditto.
+	* libc/machine/spu/iscanf.c: Ditto.
+	* libc/machine/spu/siprintf.c: Ditto.
+	* libc/machine/spu/siscanf.c: Ditto.
+	* libc/machine/spu/sniprintf.c: Ditto.
+	* libc/machine/spu/vfiprintf.c: Ditto.
+	* libc/machine/spu/vfiscanf.c: Ditto.
+	* libc/machine/spu/viprintf.c: Ditto.
+	* libc/machine/spu/viscanf.c: Ditto.
+	* libc/machine/spu/vsiprintf.c: Ditto.
+	* libc/machine/spu/vsiscanf.c: Ditto.
+	* libc/machine/spu/vsniprintf.c: Ditto.
+	* libc/machine/spu/fprintf.c: Add support for integer-only
+	version.
+	* libc/machine/spu/fscanf.c: Ditto.
+	* libc/machine/spu/printf.c: Ditto.
+	* libc/machine/spu/scanf.c: Ditto.
+	* libc/machine/spu/snprintf.c: Ditto.
+	* libc/machine/spu/sprintf.c: Ditto.
+	* libc/machine/spu/sscanf.c: Ditto.
+	* libc/machine/spu/vfprintf.c: Ditto.
+	* libc/machine/spu/vfscanf.c: Ditto.
+	* libc/machine/spu/vprintf.c: Ditto.
+	* libc/machine/spu/vscanf.c: Ditto.
+	* libc/machine/spu/vsnprintf.c: Ditto.
+	* libc/machine/spu/vsprintf.c: Ditto.
+	* libc/machine/spu/vsscanf.c: Ditto.
+
+2007-02-20  Kazunori Asayama <asayama@sm.sony.co.jp>
+
 	* libc/include/stdio.h: Add declaration for vsiprintf.
 
 2007-02-14  Patrick Mansfield <patmans@us.ibm.com>

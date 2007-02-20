@@ -71,6 +71,13 @@ DIST_COMMON = $(srcdir)/../../../../config.guess \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -118,7 +125,14 @@ am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-memcpy.$(OBJEXT) \
 	lib_a-snprintf.$(OBJEXT) lib_a-vsscanf.$(OBJEXT) \
 	lib_a-vsnprintf.$(OBJEXT) lib_a-vsprintf.$(OBJEXT) \
 	lib_a-remove.$(OBJEXT) lib_a-rename.$(OBJEXT) \
-	lib_a-tmpnam.$(OBJEXT)
+	lib_a-tmpnam.$(OBJEXT) lib_a-iprintf.$(OBJEXT) \
+	lib_a-fiprintf.$(OBJEXT) lib_a-siprintf.$(OBJEXT) \
+	lib_a-sniprintf.$(OBJEXT) lib_a-viprintf.$(OBJEXT) \
+	lib_a-vfiprintf.$(OBJEXT) lib_a-vsiprintf.$(OBJEXT) \
+	lib_a-vsniprintf.$(OBJEXT) lib_a-iscanf.$(OBJEXT) \
+	lib_a-fiscanf.$(OBJEXT) lib_a-siscanf.$(OBJEXT) \
+	lib_a-viscanf.$(OBJEXT) lib_a-vfiscanf.$(OBJEXT) \
+	lib_a-vsiscanf.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -252,7 +266,9 @@ lib_a_SOURCES = setjmp.S memcpy.c memmove.c memset.c strcat.c strchr.c strcmp.c 
 	printf.c scanf.c vprintf.c vscanf.c \
 	setbuf.c setvbuf.c tmpfile.c \
 	sprintf.c sscanf.c snprintf.c vsscanf.c vsnprintf.c vsprintf.c \
-	remove.c rename.c tmpnam.c
+	remove.c rename.c tmpnam.c \
+	iprintf.c fiprintf.c siprintf.c sniprintf.c viprintf.c vfiprintf.c vsiprintf.c vsniprintf.c \
+	iscanf.c fiscanf.c siscanf.c viscanf.c vfiscanf.c vsiscanf.c
 
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
@@ -710,6 +726,90 @@ lib_a-tmpnam.o: tmpnam.c
 
 lib_a-tmpnam.obj: tmpnam.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tmpnam.obj `if test -f 'tmpnam.c'; then $(CYGPATH_W) 'tmpnam.c'; else $(CYGPATH_W) '$(srcdir)/tmpnam.c'; fi`
+
+lib_a-iprintf.o: iprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iprintf.o `test -f 'iprintf.c' || echo '$(srcdir)/'`iprintf.c
+
+lib_a-iprintf.obj: iprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iprintf.obj `if test -f 'iprintf.c'; then $(CYGPATH_W) 'iprintf.c'; else $(CYGPATH_W) '$(srcdir)/iprintf.c'; fi`
+
+lib_a-fiprintf.o: fiprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fiprintf.o `test -f 'fiprintf.c' || echo '$(srcdir)/'`fiprintf.c
+
+lib_a-fiprintf.obj: fiprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fiprintf.obj `if test -f 'fiprintf.c'; then $(CYGPATH_W) 'fiprintf.c'; else $(CYGPATH_W) '$(srcdir)/fiprintf.c'; fi`
+
+lib_a-siprintf.o: siprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-siprintf.o `test -f 'siprintf.c' || echo '$(srcdir)/'`siprintf.c
+
+lib_a-siprintf.obj: siprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-siprintf.obj `if test -f 'siprintf.c'; then $(CYGPATH_W) 'siprintf.c'; else $(CYGPATH_W) '$(srcdir)/siprintf.c'; fi`
+
+lib_a-sniprintf.o: sniprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sniprintf.o `test -f 'sniprintf.c' || echo '$(srcdir)/'`sniprintf.c
+
+lib_a-sniprintf.obj: sniprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sniprintf.obj `if test -f 'sniprintf.c'; then $(CYGPATH_W) 'sniprintf.c'; else $(CYGPATH_W) '$(srcdir)/sniprintf.c'; fi`
+
+lib_a-viprintf.o: viprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-viprintf.o `test -f 'viprintf.c' || echo '$(srcdir)/'`viprintf.c
+
+lib_a-viprintf.obj: viprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-viprintf.obj `if test -f 'viprintf.c'; then $(CYGPATH_W) 'viprintf.c'; else $(CYGPATH_W) '$(srcdir)/viprintf.c'; fi`
+
+lib_a-vfiprintf.o: vfiprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vfiprintf.o `test -f 'vfiprintf.c' || echo '$(srcdir)/'`vfiprintf.c
+
+lib_a-vfiprintf.obj: vfiprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vfiprintf.obj `if test -f 'vfiprintf.c'; then $(CYGPATH_W) 'vfiprintf.c'; else $(CYGPATH_W) '$(srcdir)/vfiprintf.c'; fi`
+
+lib_a-vsiprintf.o: vsiprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsiprintf.o `test -f 'vsiprintf.c' || echo '$(srcdir)/'`vsiprintf.c
+
+lib_a-vsiprintf.obj: vsiprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsiprintf.obj `if test -f 'vsiprintf.c'; then $(CYGPATH_W) 'vsiprintf.c'; else $(CYGPATH_W) '$(srcdir)/vsiprintf.c'; fi`
+
+lib_a-vsniprintf.o: vsniprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsniprintf.o `test -f 'vsniprintf.c' || echo '$(srcdir)/'`vsniprintf.c
+
+lib_a-vsniprintf.obj: vsniprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsniprintf.obj `if test -f 'vsniprintf.c'; then $(CYGPATH_W) 'vsniprintf.c'; else $(CYGPATH_W) '$(srcdir)/vsniprintf.c'; fi`
+
+lib_a-iscanf.o: iscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iscanf.o `test -f 'iscanf.c' || echo '$(srcdir)/'`iscanf.c
+
+lib_a-iscanf.obj: iscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iscanf.obj `if test -f 'iscanf.c'; then $(CYGPATH_W) 'iscanf.c'; else $(CYGPATH_W) '$(srcdir)/iscanf.c'; fi`
+
+lib_a-fiscanf.o: fiscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fiscanf.o `test -f 'fiscanf.c' || echo '$(srcdir)/'`fiscanf.c
+
+lib_a-fiscanf.obj: fiscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fiscanf.obj `if test -f 'fiscanf.c'; then $(CYGPATH_W) 'fiscanf.c'; else $(CYGPATH_W) '$(srcdir)/fiscanf.c'; fi`
+
+lib_a-siscanf.o: siscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-siscanf.o `test -f 'siscanf.c' || echo '$(srcdir)/'`siscanf.c
+
+lib_a-siscanf.obj: siscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-siscanf.obj `if test -f 'siscanf.c'; then $(CYGPATH_W) 'siscanf.c'; else $(CYGPATH_W) '$(srcdir)/siscanf.c'; fi`
+
+lib_a-viscanf.o: viscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-viscanf.o `test -f 'viscanf.c' || echo '$(srcdir)/'`viscanf.c
+
+lib_a-viscanf.obj: viscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-viscanf.obj `if test -f 'viscanf.c'; then $(CYGPATH_W) 'viscanf.c'; else $(CYGPATH_W) '$(srcdir)/viscanf.c'; fi`
+
+lib_a-vfiscanf.o: vfiscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vfiscanf.o `test -f 'vfiscanf.c' || echo '$(srcdir)/'`vfiscanf.c
+
+lib_a-vfiscanf.obj: vfiscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vfiscanf.obj `if test -f 'vfiscanf.c'; then $(CYGPATH_W) 'vfiscanf.c'; else $(CYGPATH_W) '$(srcdir)/vfiscanf.c'; fi`
+
+lib_a-vsiscanf.o: vsiscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsiscanf.o `test -f 'vsiscanf.c' || echo '$(srcdir)/'`vsiscanf.c
+
+lib_a-vsiscanf.obj: vsiscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsiscanf.obj `if test -f 'vsiscanf.c'; then $(CYGPATH_W) 'vsiscanf.c'; else $(CYGPATH_W) '$(srcdir)/vsiscanf.c'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

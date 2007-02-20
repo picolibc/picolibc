@@ -9,6 +9,10 @@
 #include <varargs.h>
 #endif
 
+#ifdef INTEGER_ONLY
+#  define vsnprintf vsniprintf
+#endif
+
 typedef struct
 {
   char* str;

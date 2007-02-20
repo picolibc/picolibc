@@ -41,6 +41,10 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 #include <varargs.h>
 #endif
 
+#ifdef INTEGER_ONLY
+#  define scanf iscanf
+#endif
+
 typedef struct
 {
   _CONST char* fmt;

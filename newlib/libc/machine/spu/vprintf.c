@@ -9,6 +9,10 @@
 #include <varargs.h>
 #endif
 
+#ifdef INTEGER_ONLY
+#  define vprintf viprintf
+#endif
+
 typedef struct
 {
   _CONST char* fmt;
