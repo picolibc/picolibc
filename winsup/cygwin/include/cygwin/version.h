@@ -305,12 +305,13 @@ details. */
       164: Export shm_open, shm_unlink.
       165: Export mq_close, mq_getattr, mq_notify, mq_open, mq_receive,
 	   mq_send, mq_setattr, mq_timedreceive, mq_timedsend, mq_unlink.
+      166: Export sem_unlink.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 165
+#define CYGWIN_VERSION_API_MINOR 166
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

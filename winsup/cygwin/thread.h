@@ -1,6 +1,6 @@
 /* thread.h: Locking and threading module definitions
 
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2007 Red Hat, Inc.
 
    Written by Marco Fuykschot <marco@ddi.nl>
    Major update 2001 Robert Collins <rbtcollins@hotmail.com>
@@ -208,15 +208,15 @@ template <class list_node> class List
     mx.unlock ();
   }
 
+  fast_mutex mx;
+  list_node *head;
+
 protected:
   void mx_init ()
   {
     if (!mx.init ())
       api_fatal ("Could not create mutex for list synchronisation.");
   }
-
-  fast_mutex mx;
-  list_node *head;
 };
 
 class pthread_key: public verifyable_object
@@ -633,23 +633,30 @@ class semaphore: public verifyable_object
 public:
   static bool is_good_object(sem_t const *);
   /* API calls */
-  static int init (sem_t * sem, int pshared, unsigned int value);
-  static int destroy (sem_t * sem);
-  static sem_t *open (const char *name, int oflag, mode_t mode,
-		      unsigned int value);
-  static int wait (sem_t * sem);
-  static int post (sem_t * sem);
-  static int getvalue (sem_t * sem, int *sval);
-  static int trywait (sem_t * sem);
-  static int timedwait (sem_t * sem, const struct timespec *abstime);
+  static int init (sem_t *sem, int pshared, unsigned int value);
+  static int destroy (sem_t *sem);
+  static sem_t *open (unsigned long long hash, LUID luid, int fd, int oflag,
+		      mode_t mode, unsigned int value, bool &wasopen);
+  static int close (sem_t *sem);
+  static int wait (sem_t *sem);
+  static int post (sem_t *sem);
+  static int getvalue (sem_t *sem, int *sval);
+  static int trywait (sem_t *sem);
+  static int timedwait (sem_t *sem, const struct timespec *abstime);
+
+  static int getinternal (sem_t *sem, int *sfd, unsigned long long *shash,
+			  LUID *sluid, unsigned int *sval);
 
   HANDLE win32_obj_id;
   int shared;
   long currentvalue;
-  char *name;
+  int fd;
+  unsigned long long hash;
+  LUID luid;
+  sem_t *sem;
 
   semaphore (int, unsigned int);
-  semaphore (const char *name, int oflag, mode_t mode, unsigned int value);
+  semaphore (unsigned long long, LUID, int, sem_t *, int, mode_t, unsigned int);
   ~semaphore ();
 
   class semaphore * next;
@@ -657,6 +664,10 @@ public:
   {
     semaphores.fixup_after_fork ();
     semaphores.for_each (&semaphore::_fixup_after_fork);
+  }
+  static void terminate ()
+  {
+    semaphores.for_each (&semaphore::_terminate);
   }
 
 private:
@@ -667,6 +678,7 @@ private:
   int _timedwait (const struct timespec *abstime);
 
   void _fixup_after_fork ();
+  void _terminate ();
 
   static List<semaphore> semaphores;
 };

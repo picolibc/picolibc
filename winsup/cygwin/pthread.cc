@@ -1,6 +1,6 @@
 /* pthread.cc: posix pthread interface for Cygwin
 
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2007 Red Hat, Inc.
 
    Originally written by Marco Fuykschot <marco@ddi.nl>
 
@@ -160,60 +160,6 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
 
 int
 sem_destroy (sem_t * sem)
-{
-  return semaphore::destroy (sem);
-}
-
-/* Mangle semaphore name to follow windows naming rules.  Prepend "Global\"
-   if running on terminal service aware machine.  Substitute invalid backslash
-   by forward slash characters, hoping not to collide. */
-static bool
-mangle_sem_name (char *mangled, const char *name)
-{
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return false;
-  if (!*name)
-    {
-      set_errno (ENOENT);
-      return false;
-    }
-  size_t len = strlen (cygheap->shared_prefix);
-  if (strlen (name) >= CYG_MAX_PATH - len)
-    {
-      set_errno (EINVAL);
-      return false;
-    }
-  strcpy (mangled, cygheap->shared_prefix);
-  char *d = mangled + len;
-  const char *s = name;
-  while (*s)
-    *d++ = (*s == '\\') ? '/' : *s++;
-  *d = '\0';
-  return true;
-}
-
-sem_t *
-sem_open (const char *name, int oflag, ...)
-{
-  mode_t mode = 0;
-  unsigned int value = 0;
-  if (oflag & O_CREAT)
-    {
-      va_list ap;
-      va_start (ap, oflag);
-      mode = va_arg (ap, mode_t);
-      value = va_arg (ap, unsigned int);
-      va_end (ap);
-    }
-  char mangled_name[CYG_MAX_PATH];
-  if (!mangle_sem_name (mangled_name, name))
-    return NULL;
-  return semaphore::open (mangled_name, oflag, mode, value);
-}
-
-int
-sem_close (sem_t * sem)
 {
   return semaphore::destroy (sem);
 }

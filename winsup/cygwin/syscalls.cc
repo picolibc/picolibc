@@ -109,6 +109,8 @@ close_all_files (bool norelease)
 {
   cygheap->fdtab.lock ();
 
+  semaphore::terminate ();
+
   fhandler_base *fh;
   for (int i = 0; i < (int) cygheap->fdtab.size; i++)
     if ((fh = cygheap->fdtab[i]) != NULL)

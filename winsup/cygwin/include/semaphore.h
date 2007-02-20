@@ -24,18 +24,19 @@ extern "C"
   typedef struct __sem_t {char __dummy;} *sem_t;
 #endif
 
-#define SEM_FAILED 0
+#define SEM_FAILED ((sem_t *) 0)
 
 /* Semaphores */
-  int sem_init (sem_t * sem, int pshared, unsigned int value);
-  int sem_destroy (sem_t * sem);
+  int sem_init (sem_t *sem, int pshared, unsigned int value);
+  int sem_destroy (sem_t *sem);
   sem_t *sem_open (const char *name, int oflag, ...);
   int sem_close (sem_t *sem);
-  int sem_wait (sem_t * sem);
-  int sem_trywait (sem_t * sem);
-  int sem_timedwait (sem_t * sem, const struct timespec *abstime);
-  int sem_post (sem_t * sem);
-  int sem_getvalue (sem_t * sem, int *sval);
+  int sem_unlink (const char *name);
+  int sem_wait (sem_t *sem);
+  int sem_trywait (sem_t *sem);
+  int sem_timedwait (sem_t *sem, const struct timespec *abstime);
+  int sem_post (sem_t *sem);
+  int sem_getvalue (sem_t *sem, int *sval);
 
 #ifdef __cplusplus
 }

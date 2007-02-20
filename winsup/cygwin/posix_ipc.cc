@@ -8,12 +8,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-/* TODO: POSIX semaphores are implemented in thread.cc right now.  The
-	 implementation in thread.cc disallows implementing kernel
-	 persistent semaphores, so in the long run we should move the
-	 implementation here, using file based shared memory instead. */
-
 #include "winsup.h"
+#include "thread.h"
 #include "path.h"
 #include "cygerrno.h"
 #include "cygtls.h"
@@ -29,22 +25,24 @@ details. */
 #include <unistd.h>
 #include <stdarg.h>
 #include <mqueue.h>
+#include <semaphore.h>
 
 struct
 {
   const char *prefix;
+  const size_t max_len;
   const char *description;
 } ipc_names[] = {
-  { "/dev/shm", "POSIX shared memory object" },
-  { "/dev/mqueue", "POSIX message queue" },
-  { "/dev/sem", "POSIX semaphore" }
+  { "/dev/shm", CYG_MAX_PATH - 10, "POSIX shared memory object" },
+  { "/dev/mqueue", CYG_MAX_PATH - 13, "POSIX message queue" },
+  { "/dev/shm", CYG_MAX_PATH - 14, "POSIX semaphore" }
 };
 
 enum ipc_type_t
 {
   shmem,
   mqueue,
-  sem
+  semaphore
 };
 
 static bool
@@ -69,20 +67,21 @@ check_path (char *res_name, ipc_type_t type, const char *name)
       return false;
     }
   /* Name must start with a single slash. */
-  if (!name || name[0] != '/' || name[1] == '/')
+  if (!name || name[0] != '/' || name[1] == '/' || !name[1])
     {
       debug_printf ("Invalid %s name '%s'", ipc_names[type].description, name);
       set_errno (EINVAL);
       return false;
     }
-  if (strlen (name) > CYG_MAX_PATH - sizeof (ipc_names[type].prefix))
+  if (strlen (name) > ipc_names[type].max_len)
     {
       debug_printf ("%s name '%s' too long", ipc_names[type].description, name);
       set_errno (ENAMETOOLONG);
       return false;
     }
-  strcpy (res_name, ipc_names[type].prefix);
-  strcat (res_name, name);
+  __small_sprintf (res_name, "%s/%s%s", ipc_names[type].prefix,
+					type == semaphore ? "sem." : "",
+					name + 1);
   return true;
 }
 
@@ -133,7 +132,6 @@ static int
 ipc_cond_init (HANDLE *pevt, const char *name)
 {
   char buf[CYG_MAX_PATH];
-  strcpy (buf, wincap.has_terminal_services () ? "Global\\" : "");
   __small_sprintf (buf, "%scyg_pevt/%s",
 		   wincap.has_terminal_services () ? "Global\\" : "", name);
   *pevt = CreateEvent (&sec_all, TRUE, FALSE, buf);
@@ -195,6 +193,30 @@ ipc_cond_close (HANDLE evt)
   return CloseHandle (evt) ? 0 : geterrno_from_win_error ();
 }
 
+class ipc_flock
+{
+  struct __flock64 fl;
+
+public:
+  ipc_flock () { memset (&fl, 0, sizeof fl); }
+
+  int lock (int fd, size_t size)
+  {
+    fl.l_type = F_WRLCK;
+    fl.l_whence = SEEK_SET;
+    fl.l_start = 0;
+    fl.l_len = size;
+    return fcntl (fd, F_SETLKW, &fl);
+  }
+  int unlock (int fd)
+  {
+    if (!fl.l_len)
+      return 0;
+    fl.l_type = F_UNLCK;
+    return fcntl (fd, F_SETLKW, &fl);
+  }
+};
+
 /* POSIX shared memory object implementation. */
 
 extern "C" int
@@ -242,7 +264,7 @@ struct mq_hdr
   long            mqh_free;	 /* index of first free message */
   long            mqh_nwait;	 /* #threads blocked in mq_receive() */
   pid_t           mqh_pid;	 /* nonzero PID if mqh_event set */
-  char            mqh_uname[20]; /* unique name used to identify synchronization
+  char            mqh_uname[36]; /* unique name used to identify synchronization
   				    objects connected to this queue */
   struct sigevent mqh_event;	 /* for mq_notify() */
 };
@@ -288,6 +310,7 @@ mq_open (const char *name, int oflag, ...)
   struct msg_hdr *msghdr;
   struct mq_attr *attr;
   struct mq_info *mqinfo;
+  LUID luid;
   char mqname[CYG_MAX_PATH];
 
   if (!check_path (mqname, mqueue, name))
@@ -295,8 +318,9 @@ mq_open (const char *name, int oflag, ...)
 
   myfault efault;
   if (efault.faulted (EFAULT))
-      return (mqd_t) -1;
+    return (mqd_t) -1;
 
+  oflag &= (O_CREAT | O_EXCL | O_NONBLOCK);
   created = 0;
   nonblock = oflag & O_NONBLOCK;
   oflag &= ~O_NONBLOCK;
@@ -358,7 +382,14 @@ again:
       mqhdr->mqh_attr.mq_curmsgs = 0;
       mqhdr->mqh_nwait = 0;
       mqhdr->mqh_pid = 0;
-      __small_sprintf (mqhdr->mqh_uname, "cyg%016X", hash_path_name (0,mqname));
+      if (!AllocateLocallyUniqueId (&luid))
+        {
+	  __seterrno ();
+	  goto err;
+	}
+      __small_sprintf (mqhdr->mqh_uname, "cyg%016X%08x%08x",
+		       hash_path_name (0,mqname),
+		       luid.HighPart, luid.LowPart);
       mqhdr->mqh_head = 0;
       index = sizeof (struct mq_hdr);
       mqhdr->mqh_free = index;
@@ -402,7 +433,7 @@ exists:
 	{
 	  if (errno == ENOENT && (oflag & O_CREAT))
 	    {
-	      close(fd);
+	      close (fd);
 	      goto again;
 	    }
 	  goto err;
@@ -847,3 +878,173 @@ mq_unlink (const char *name)
   return 0;
 }
 
+/* POSIX named semaphore implementation.  Loosely based on Richard W. STEPHENS
+   implementation as far as sem_open is concerned, but under the hood using
+   the already existing semaphore class in thread.cc.  Using a file backed
+   solution allows to implement kernel persistent named semaphores.  */
+
+struct sem_finfo
+{
+  unsigned int       value;
+  unsigned long long hash;
+  LUID               luid;
+};
+
+extern "C" sem_t *
+sem_open (const char *name, int oflag, ...)
+{
+  int i, fd, created;
+  va_list ap;
+  mode_t mode = 0;
+  unsigned int value = 0;
+  struct __stat64 statbuff;
+  sem_t *sem = SEM_FAILED;
+  sem_finfo sf;
+  char semname[CYG_MAX_PATH];
+  bool wasopen = false;
+  ipc_flock file;
+
+  if (!check_path (semname, semaphore, name))
+    return SEM_FAILED;
+
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return SEM_FAILED;
+
+  created = 0;
+  oflag &= (O_CREAT | O_EXCL);
+
+again:
+  if (oflag & O_CREAT)
+    {
+      va_start (ap, oflag);		/* init ap to final named argument */
+      mode = va_arg (ap, mode_t) & ~S_IXUSR;
+      value = va_arg (ap, unsigned int);
+      va_end (ap);
+
+      /* Open and specify O_EXCL and user-execute */
+      fd = open (semname, oflag | O_EXCL | O_RDWR, mode | S_IXUSR);
+      if (fd < 0)
+        {
+	  if (errno == EEXIST && (oflag & O_EXCL) == 0)
+	    goto exists;		/* already exists, OK */
+	  return SEM_FAILED;
+	}
+      created = 1;
+      /* First one to create the file initializes it. */
+      if (!AllocateLocallyUniqueId (&sf.luid))
+        {
+	  __seterrno ();
+	  goto err;
+	}
+      sf.value = value;
+      sf.hash = hash_path_name (0, semname);
+      if (write (fd, &sf, sizeof sf) != sizeof sf)
+        goto err;
+      sem = semaphore::open (sf.hash, sf.luid, fd, oflag, mode, value, wasopen);
+      if (sem == SEM_FAILED)
+        goto err;
+      /* Initialization complete, turn off user-execute bit */
+      if (fchmod (fd, mode) == -1)
+	goto err;
+      /* Don't close (fd); */
+      return sem;
+    }
+
+exists:
+  /* Open the file and fetch the semaphore name. */
+  if ((fd = open (semname, O_RDWR)) < 0)
+    {
+      if (errno == ENOENT && (oflag & O_CREAT))
+	goto again;
+      goto err;
+    }
+  /* Make certain initialization is complete */
+  for (i = 0; i < MAX_TRIES; i++)
+    {
+      if (stat64 (semname, &statbuff) == -1)
+	{
+	  if (errno == ENOENT && (oflag & O_CREAT))
+	    {
+	      close (fd);
+	      goto again;
+	    }
+	  goto err;
+	}
+      if ((statbuff.st_mode & S_IXUSR) == 0)
+	break;
+      sleep (1);
+    }
+  if (i == MAX_TRIES)
+    {
+      set_errno (ETIMEDOUT);
+      goto err;
+    }
+  if (file.lock (fd, sizeof sf))
+    goto err;
+  if (read (fd, &sf, sizeof sf) != sizeof sf)
+    goto err;
+  sem = semaphore::open (sf.hash, sf.luid, fd, oflag, mode, sf.value, wasopen);
+  file.unlock (fd);
+  if (sem == SEM_FAILED)
+    goto err;
+  /* If wasopen is set, the semaphore was already opened and we already have
+     an open file descriptor pointing to the file.  This means, we have to
+     close the file descriptor created in this call.  It won't be stored
+     anywhere anyway. */
+  if (wasopen)
+    close (fd);
+  return sem;
+
+err:
+  /* Don't let following function calls change errno */
+  save_errno save;
+
+  file.unlock (fd);
+  if (created)
+    unlink (semname);
+  if (sem != SEM_FAILED)
+    semaphore::close (sem);
+  close (fd);
+  return SEM_FAILED;
+}
+
+int
+_sem_close (sem_t *sem, bool do_close)
+{
+  sem_finfo sf;
+  int fd, ret = -1;
+  ipc_flock file;
+
+  if (semaphore::getinternal (sem, &fd, &sf.hash, &sf.luid, &sf.value) == -1)
+    return -1;
+  if (!file.lock (fd, sizeof sf)
+      && lseek64 (fd, 0LL, SEEK_SET) != (_off64_t) -1
+      && write (fd, &sf, sizeof sf) == sizeof sf)
+    ret = do_close ? semaphore::close (sem) : 0;
+
+  /* Don't let following function calls change errno */
+  save_errno save;
+  file.unlock (fd);
+  close (fd);
+
+  return ret;
+}
+
+extern "C" int
+sem_close (sem_t *sem)
+{
+  return _sem_close (sem, true);
+}
+
+extern "C" int
+sem_unlink (const char *name)
+{
+  char semname[CYG_MAX_PATH];
+
+  if (!check_path (semname, semaphore, name))
+    return -1;
+  if (unlink (semname) == -1)
+    return -1;
+  return 0;
+}

@@ -1,3 +1,55 @@
+2007-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din (sem_unlink): Export.
+	* posix_ipc.cc: Include thread.h and semaphore.h.  Remove TODO
+	comment.
+	(ipc_names): Add max_len member.  Set to maximum length of the path
+	before tacking on the prefix path.  Set prefix path for named semaphors
+	to /dev/shm, as on Linux.
+	(enum ipc_type_t): Change sem to semaphore to avoid name conflicts.
+	(check_path): Detect empty paths.  Use ipc_names's max_len member.
+	Use __small_sprintf to create full object path name.  Special case
+	semaphores.
+	(ipc_cond_init): Drop superfluous strcpy.
+	(class ipc_flock): New class to simplify file locking in subsequent
+	code.
+	(struct mq_hdr): Raise size of mqh_uname to allow adding a unique
+	LUID to the name.
+	(mq_open): Fix formatting.  Create unique synchronization object names
+	using AllocateLocallyUniqueId.
+	(struct sem_finfo): New structure defining named semaphore file content.
+	(sem_open): Move here.  Rework implementation to allow kernel
+	persistent implementation of POSIX named semaphores.
+	(_sem_close): Implement sem_close.
+	(sem_close): Move here.  Just call _sem_close with do_close parameter
+	set to true.
+	(sem_unlink): New function.
+	* pthread.cc (mangle_sem_name): Remove.
+	(sem_open): Move to posix_ipc.cc.
+	(sem_close): Ditto.
+	* syscalls.cc (close_all_files): Call semaphore::terminate here.
+	* thread.cc: Fix formatting.  Rearrange semaphore functions so that
+	they are close together.
+	(semaphore::semaphore): Rework to play nicely with new named semaphore
+	implementation.
+	(semaphore::_terminate): Call _sem_close if semaphore is a named
+	semaphore.
+	(semaphore::destroy): Don't destroy named semaphores.  Return EINVAL
+	instead.
+	(semaphore::close): Only destroy named semaphores.  Return EINVAL
+	otherwise.
+	(semaphore::open): Rework to play nicely with new named semaphore
+	implementation.  Loop through existing semaphores to be able to
+	return same sem_t pointer as a former call on the same named semaphore.
+	(semaphore::getinternal): New function called from _sem_close.
+	* thread.h (class List): Make mx and head public.
+	(class semaphore): Fix formatting.  Align method declarations with
+	implementation in thread.cc.  Add members used for named semaphores.
+	(semaphore::terminate): New static method.
+	* include/semaphore.h: Redefine SEM_FAILED.  Fix formatting.
+	(sem_unlink): Add declaration.
+	* include/cygwin/version.h: Bump API minor number.
+
 2007-02-20  Christopher Faylor  <me@cgf.cx>
 
 	* exceptions.cc (_cygtls::signal_exit): Only call myself.exit when when

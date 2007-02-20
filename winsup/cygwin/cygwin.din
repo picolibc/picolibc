@@ -1235,6 +1235,7 @@ sem_open SIGFE
 sem_post SIGFE
 sem_timedwait SIGFE
 sem_trywait SIGFE
+sem_unlink SIGFE
 sem_wait SIGFE
 semctl SIGFE
 semget SIGFE

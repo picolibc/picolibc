@@ -1,6 +1,6 @@
 /* thread.cc: Locking and threading module functions
 
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007 Red Hat, Inc.
 
    Originally written by Marco Fuykschot <marco@ddi.nl>
    Substantialy enhanced by Robert Collins <rbtcollins@hotmail.com>
@@ -784,7 +784,8 @@ pthread::static_cancel_self ()
 }
 
 DWORD
-cancelable_wait (HANDLE object, DWORD timeout, const cw_cancel_action cancel_action,
+cancelable_wait (HANDLE object, DWORD timeout,
+		 const cw_cancel_action cancel_action,
 		 const enum cw_sig_wait sig_wait)
 {
   DWORD res;
@@ -1732,197 +1733,6 @@ pshared (PTHREAD_PROCESS_PRIVATE), mutextype (PTHREAD_MUTEX_ERRORCHECK)
 
 pthread_mutexattr::~pthread_mutexattr ()
 {
-}
-
-List<semaphore> semaphore::semaphores;
-
-semaphore::semaphore (int pshared, unsigned int value)
-: verifyable_object (SEM_MAGIC),
-  shared (pshared),
-  currentvalue (value),
-  name (NULL)
-{
-  SECURITY_ATTRIBUTES sa = (pshared != PTHREAD_PROCESS_PRIVATE)
-			   ? sec_all : sec_none_nih;
-  this->win32_obj_id = ::CreateSemaphore (&sa, value, LONG_MAX, NULL);
-  if (!this->win32_obj_id)
-    magic = 0;
-
-  semaphores.insert (this);
-}
-
-semaphore::semaphore (const char *sem_name, int oflag, mode_t mode,
-				  unsigned int value)
-: verifyable_object (SEM_MAGIC),
-  shared (PTHREAD_PROCESS_SHARED),
-  currentvalue (value),		/* Unused for named semaphores. */
-  name (NULL)
-{
-  if (oflag & O_CREAT)
-    {
-      SECURITY_ATTRIBUTES sa = sec_all;
-      security_descriptor sd;
-      if (allow_ntsec)
-	set_security_attribute (mode, &sa, sd);
-      this->win32_obj_id = ::CreateSemaphore (&sa, value, LONG_MAX, sem_name);
-      if (!this->win32_obj_id)
-	magic = 0;
-      if (GetLastError () == ERROR_ALREADY_EXISTS && (oflag & O_EXCL))
-	{
-	  __seterrno ();
-	  CloseHandle (this->win32_obj_id);
-	  magic = 0;
-	}
-    }
-  else
-    {
-      this->win32_obj_id = ::OpenSemaphore (SEMAPHORE_ALL_ACCESS, FALSE,
-					    sem_name);
-      if (!this->win32_obj_id)
-	{
-	  __seterrno ();
-	  magic = 0;
-	}
-    }
-  if (magic)
-    {
-      name = new char [strlen (sem_name + 1)];
-      if (!name)
-	{
-	  set_errno (ENOSPC);
-	  CloseHandle (this->win32_obj_id);
-	  magic = 0;
-	}
-      else
-	strcpy (name, sem_name);
-    }
-
-  semaphores.insert (this);
-}
-
-semaphore::~semaphore ()
-{
-  if (win32_obj_id)
-    CloseHandle (win32_obj_id);
-
-  delete [] name;
-
-  semaphores.remove (this);
-}
-
-void
-semaphore::_post ()
-{
-  if (ReleaseSemaphore (win32_obj_id, 1, &currentvalue))
-    currentvalue++;
-}
-
-int
-semaphore::_getvalue (int *sval)
-{
-  long val;
-
-  switch (WaitForSingleObject (win32_obj_id, 0))
-    {
-      case WAIT_OBJECT_0:
-	ReleaseSemaphore (win32_obj_id, 1, &val);
-	*sval = val + 1;
-	break;
-      case WAIT_TIMEOUT:
-	*sval = 0;
-	break;
-      default:
-	set_errno (EAGAIN);
-	return -1;
-    }
-  return 0;
-}
-
-int
-semaphore::_trywait ()
-{
-  /* FIXME: signals should be able to interrupt semaphores...
-    We probably need WaitForMultipleObjects here.  */
-  if (WaitForSingleObject (win32_obj_id, 0) == WAIT_TIMEOUT)
-    {
-      set_errno (EAGAIN);
-      return -1;
-    }
-  currentvalue--;
-  return 0;
-}
-
-int
-semaphore::_timedwait (const struct timespec *abstime)
-{
-  struct timeval tv;
-  long waitlength;
-
-  myfault efault;
-  if (efault.faulted ())
-    {
-      /* According to SUSv3, abstime need not be checked for validity,
-	 if the semaphore can be locked immediately. */
-      if (!_trywait ())
-	return 0;
-      set_errno (EINVAL);
-      return -1;
-    }
-
-  gettimeofday (&tv, NULL);
-  waitlength = abstime->tv_sec * 1000 + abstime->tv_nsec / (1000 * 1000);
-  waitlength -= tv.tv_sec * 1000 + tv.tv_usec / 1000;
-  if (waitlength < 0)
-    waitlength = 0;
-  switch (cancelable_wait (win32_obj_id, waitlength, cw_cancel_self, cw_sig_eintr))
-    {
-    case WAIT_OBJECT_0:
-      currentvalue--;
-      break;
-    case WAIT_SIGNALED:
-      set_errno (EINTR);
-      return -1;
-    case WAIT_TIMEOUT:
-      set_errno (ETIMEDOUT);
-      return -1;
-    default:
-      debug_printf ("cancelable_wait failed. %E");
-      __seterrno ();
-      return -1;
-    }
-  return 0;
-}
-
-int
-semaphore::_wait ()
-{
-  switch (cancelable_wait (win32_obj_id, INFINITE, cw_cancel_self, cw_sig_eintr))
-    {
-    case WAIT_OBJECT_0:
-      currentvalue--;
-      break;
-    case WAIT_SIGNALED:
-      set_errno (EINTR);
-      return -1;
-    default:
-      debug_printf ("cancelable_wait failed. %E");
-      break;
-    }
-  return 0;
-}
-
-void
-semaphore::_fixup_after_fork ()
-{
-  if (shared == PTHREAD_PROCESS_PRIVATE)
-    {
-      debug_printf ("sem %x in _fixup_after_fork", this);
-      /* FIXME: duplicate code here and in the constructor. */
-      this->win32_obj_id = ::CreateSemaphore (&sec_none_nih, currentvalue,
-					      LONG_MAX, NULL);
-      if (!win32_obj_id)
-	api_fatal ("failed to create new win32 semaphore, error %d");
-    }
 }
 
 verifyable_object::verifyable_object (long verifyer):
@@ -3112,6 +2922,185 @@ pthread_mutexattr_settype (pthread_mutexattr_t *attr, int type)
 
 /* Semaphores */
 
+List<semaphore> semaphore::semaphores;
+
+semaphore::semaphore (int pshared, unsigned int value)
+: verifyable_object (SEM_MAGIC),
+  shared (pshared),
+  currentvalue (value),
+  fd (-1),
+  hash (0ULL),
+  sem (NULL)
+{
+  SECURITY_ATTRIBUTES sa = (pshared != PTHREAD_PROCESS_PRIVATE)
+			   ? sec_all : sec_none_nih;
+  this->win32_obj_id = ::CreateSemaphore (&sa, value, LONG_MAX, NULL);
+  if (!this->win32_obj_id)
+    magic = 0;
+
+  semaphores.insert (this);
+}
+
+semaphore::semaphore (unsigned long long shash, LUID sluid, int sfd,
+		      sem_t *ssem, int oflag, mode_t mode, unsigned int value)
+: verifyable_object (SEM_MAGIC),
+  shared (PTHREAD_PROCESS_SHARED),
+  currentvalue (value),		/* Unused for named semaphores. */
+  fd (sfd),
+  hash (shash),
+  luid (sluid),
+  sem (ssem)
+{
+  char name[CYG_MAX_PATH];
+
+  __small_sprintf (name, "%scyg_psem/cyg%016X%08x%08x",
+		   wincap.has_terminal_services () ? "Global\\" : "",
+		   hash, luid.HighPart, luid.LowPart);
+  this->win32_obj_id = ::CreateSemaphore (&sec_all, value, LONG_MAX, name);
+  if (!this->win32_obj_id)
+    magic = 0;
+  if (GetLastError () == ERROR_ALREADY_EXISTS && (oflag & O_EXCL))
+    {
+      __seterrno ();
+      CloseHandle (this->win32_obj_id);
+      magic = 0;
+    }
+
+  semaphores.insert (this);
+}
+
+semaphore::~semaphore ()
+{
+  if (win32_obj_id)
+    CloseHandle (win32_obj_id);
+
+  semaphores.remove (this);
+}
+
+void
+semaphore::_post ()
+{
+  if (ReleaseSemaphore (win32_obj_id, 1, &currentvalue))
+    currentvalue++;
+}
+
+int
+semaphore::_getvalue (int *sval)
+{
+  long val;
+
+  switch (WaitForSingleObject (win32_obj_id, 0))
+    {
+      case WAIT_OBJECT_0:
+	ReleaseSemaphore (win32_obj_id, 1, &val);
+	*sval = val + 1;
+	break;
+      case WAIT_TIMEOUT:
+	*sval = 0;
+	break;
+      default:
+	set_errno (EAGAIN);
+	return -1;
+    }
+  return 0;
+}
+
+int
+semaphore::_trywait ()
+{
+  /* FIXME: signals should be able to interrupt semaphores...
+    We probably need WaitForMultipleObjects here.  */
+  if (WaitForSingleObject (win32_obj_id, 0) == WAIT_TIMEOUT)
+    {
+      set_errno (EAGAIN);
+      return -1;
+    }
+  currentvalue--;
+  return 0;
+}
+
+int
+semaphore::_timedwait (const struct timespec *abstime)
+{
+  struct timeval tv;
+  long waitlength;
+
+  myfault efault;
+  if (efault.faulted ())
+    {
+      /* According to SUSv3, abstime need not be checked for validity,
+	 if the semaphore can be locked immediately. */
+      if (!_trywait ())
+	return 0;
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  gettimeofday (&tv, NULL);
+  waitlength = abstime->tv_sec * 1000 + abstime->tv_nsec / (1000 * 1000);
+  waitlength -= tv.tv_sec * 1000 + tv.tv_usec / 1000;
+  if (waitlength < 0)
+    waitlength = 0;
+  switch (cancelable_wait (win32_obj_id, waitlength, cw_cancel_self, cw_sig_eintr))
+    {
+    case WAIT_OBJECT_0:
+      currentvalue--;
+      break;
+    case WAIT_SIGNALED:
+      set_errno (EINTR);
+      return -1;
+    case WAIT_TIMEOUT:
+      set_errno (ETIMEDOUT);
+      return -1;
+    default:
+      debug_printf ("cancelable_wait failed. %E");
+      __seterrno ();
+      return -1;
+    }
+  return 0;
+}
+
+int
+semaphore::_wait ()
+{
+  switch (cancelable_wait (win32_obj_id, INFINITE, cw_cancel_self, cw_sig_eintr))
+    {
+    case WAIT_OBJECT_0:
+      currentvalue--;
+      break;
+    case WAIT_SIGNALED:
+      set_errno (EINTR);
+      return -1;
+    default:
+      debug_printf ("cancelable_wait failed. %E");
+      break;
+    }
+  return 0;
+}
+
+void
+semaphore::_fixup_after_fork ()
+{
+  if (shared == PTHREAD_PROCESS_PRIVATE)
+    {
+      debug_printf ("sem %x in _fixup_after_fork", this);
+      /* FIXME: duplicate code here and in the constructor. */
+      this->win32_obj_id = ::CreateSemaphore (&sec_none_nih, currentvalue,
+					      LONG_MAX, NULL);
+      if (!win32_obj_id)
+	api_fatal ("failed to create new win32 semaphore, error %d");
+    }
+}
+
+void
+semaphore::_terminate ()
+{
+  int _sem_close (sem_t *, bool);
+
+  if (sem)
+    _sem_close (sem, false);
+}
+
 /* static members */
 
 int
@@ -3141,6 +3130,10 @@ semaphore::destroy (sem_t *sem)
   if (!is_good_object (sem))
     return EINVAL;
 
+  /* It's invalid to destroy a semaphore not opened with sem_init. */
+  if ((*sem)->fd != -1)
+    return EINVAL;
+
   /* FIXME - new feature - test for busy against threads... */
 
   delete (*sem);
@@ -3148,8 +3141,24 @@ semaphore::destroy (sem_t *sem)
   return 0;
 }
 
+int
+semaphore::close (sem_t *sem)
+{
+  if (!is_good_object (sem))
+    return EINVAL;
+
+  /* It's invalid to close a semaphore not opened with sem_open. */
+  if ((*sem)->fd == -1)
+    return EINVAL;
+
+  delete (*sem);
+  delete sem;
+  return 0;
+}
+
 sem_t *
-semaphore::open (const char *name, int oflag, mode_t mode, unsigned int value)
+semaphore::open (unsigned long long hash, LUID luid, int fd, int oflag,
+		 mode_t mode, unsigned int value, bool &wasopen)
 {
   if (value > SEM_VALUE_MAX)
     {
@@ -3157,6 +3166,22 @@ semaphore::open (const char *name, int oflag, mode_t mode, unsigned int value)
       return NULL;
     }
 
+  /* sem_open is supposed to return the same pointer, if the same named
+     semaphore is opened multiple times in the same process, as long as
+     the semaphore hasn't been closed or unlinked in the meantime. */
+  semaphores.mx.lock ();
+  for (semaphore *sema = semaphores.head; sema; sema = sema->next)
+    if (sema->fd >= 0 && sema->hash == hash
+    	&& sema->luid.HighPart == luid.HighPart
+	&& sema->luid.LowPart == sema->luid.LowPart)
+      {
+	wasopen = true;
+	semaphores.mx.unlock ();
+	return sema->sem;
+      }
+  semaphores.mx.unlock ();
+
+  wasopen = false;
   sem_t *sem = new sem_t;
   if (!sem)
     {
@@ -3164,7 +3189,7 @@ semaphore::open (const char *name, int oflag, mode_t mode, unsigned int value)
       return NULL;
     }
 
-  *sem = new semaphore (name, oflag, mode, value);
+  *sem = new semaphore (hash, luid, fd, sem, oflag, mode, value);
 
   if (!is_good_object (sem))
     {
@@ -3237,6 +3262,28 @@ semaphore::getvalue (sem_t *sem, int *sval)
     }
 
   return (*sem)->_getvalue (sval);
+}
+
+int
+semaphore::getinternal (sem_t *sem, int *sfd, unsigned long long *shash,
+			LUID *sluid, unsigned int *sval)
+{
+  myfault efault;
+  if (efault.faulted () || !is_good_object (sem))
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  if ((*sfd = (*sem)->fd) < 0)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  *shash = (*sem)->hash;
+  *sluid = (*sem)->luid;
+  /* POSIX defines the value in calls to sem_init/sem_open as unsigned, but
+     the sem_getvalue gets a pointer to int to return the value.  Go figure! */
+  return (*sem)->_getvalue ((int *)sval);
 }
 
 /* pthread_null */
