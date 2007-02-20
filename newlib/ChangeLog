@@ -1,3 +1,7 @@
+2007-02-20  Patrick Mansfield <patmans@us.ibm.com>
+
+	* configure.host: Build SPU with default_newlib_atexit_dynamic_alloc="no".
+
 2007-02-20  Kazunori Asayama <asayama@sm.sony.co.jp>
 
 	* libc/machine/spu/Makefile.am: Add new objects.

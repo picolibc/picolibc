@@ -444,6 +444,7 @@ case "${host}" in
 	;;
   spu-*-*)
 	default_newlib_io_long_long="yes"
+	default_newlib_atexit_dynamic_alloc="no"
 	;;
   strongarm-*-*)
 	sys_dir=arm
