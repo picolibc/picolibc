@@ -1,7 +1,7 @@
 /* exceptions.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006 Red Hat, Inc.
+   2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1288,7 +1288,7 @@ _cygtls::signal_exit (int rc)
     stackdump (thread_context.ebp, 1, 1);
 
   lock_process until_exit (true);
-  if (hExeced || exit_state)
+  if (hExeced || exit_state > ES_PROCESS_LOCKED)
     myself.exit (rc);
 
   /* Starve other threads in a vain attempt to stop them from doing something

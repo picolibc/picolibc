@@ -1,3 +1,11 @@
+2007-02-20  Christopher Faylor  <me@cgf.cx>
+
+	* exceptions.cc (_cygtls::signal_exit): Only call myself.exit when when
+	exit_state indicates that we've visited do_exit.
+	* sync.h (lock_process::lock_process): Use renamed exit_state -
+	ES_PROCESS_LOCKED.
+	* winsup.h: Rename ES_MUTO_SET to ES_PROCESS_LOCKED.
+
 2007-02-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::bind): Remove printing wrong
