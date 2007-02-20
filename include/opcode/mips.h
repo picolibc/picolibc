@@ -169,6 +169,8 @@ Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, US
 #define OP_MASK_WRDSP		0x3f
 #define OP_SH_RDDSP		16
 #define OP_MASK_RDDSP		0x3f
+#define OP_SH_BP		11
+#define OP_MASK_BP		0x3
 
 /* MIPS MT ASE */
 #define OP_SH_MT_U		5
@@ -340,6 +342,7 @@ struct mips_opcode
    "Z"	MDMX source register (OP_*_FT)
 
    DSP ASE usage:
+   "2" 2 bit unsigned immediate for byte align (OP_*_BP)
    "3" 3 bit unsigned immediate (OP_*_SA3)
    "4" 4 bit unsigned immediate (OP_*_SA4)
    "5" 8 bit unsigned immediate (OP_*_IMM8)
@@ -374,7 +377,7 @@ struct mips_opcode
    "+"  Start of extension sequence.
 
    Characters used so far, for quick reference when adding more:
-   "34567890"
+   "234567890"
    "%[]<>(),+:'@!$*&"
    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
    "abcdefghijklopqrstuvwxz"
@@ -485,7 +488,7 @@ struct mips_opcode
 #define INSN_ISA64R2              0x00000100
 
 /* Masks used for MIPS-defined ASEs.  */
-#define INSN_ASE_MASK		  0x1c00f000
+#define INSN_ASE_MASK		  0x3c00f000
 
 /* DSP ASE */ 
 #define INSN_DSP                  0x00001000
@@ -522,8 +525,10 @@ struct mips_opcode
 #define INSN_MDMX                 0x04000000
 /* MT ASE */
 #define INSN_MT                   0x08000000
-/* SmartMIPS ASE.  */
+/* SmartMIPS ASE  */
 #define INSN_SMARTMIPS            0x10000000
+/* DSP R2 ASE  */
+#define INSN_DSPR2                0x20000000
 
 /* MIPS ISA defines, use instead of hardcoding ISA level.  */
 
@@ -608,6 +613,7 @@ enum
   M_ADD_I,
   M_ADDU_I,
   M_AND_I,
+  M_BALIGN,
   M_BEQ,
   M_BEQ_I,
   M_BEQL_I,
