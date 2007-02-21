@@ -1,5 +1,5 @@
 /* Generic simplistic start-up-stub for CRIS/CRISv32.
-   Copyright (C) 1993-2005 Axis Communications.
+   Copyright (C) 1993-2005, 2007 Axis Communications.
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -42,25 +42,27 @@
  .global __start
  nop
 __start:
- ba 0f
- nop
+ move.d 0f,$r9
+ jump $r9
+ setf
 
- .rept 256 - 2
- .dword _.int
- .endr
+#ifndef __ELF__
 
-_.int:
-#ifdef __arch_common_v10_v32
- ; This is just to allow the multilib to compile without
- ; hackery: the "common" subset doesn't recognize
- ; interrupt-return insns.
-#elif __CRIS_arch_version >= 32
- rete
- rfe
+; For a.out, everything read-only and code-wise goes into a
+; single section, so we can't separate the interrupt table from
+; the startup code if we want to have files in-between.
+#define IN_CRT0
+#include "irqtable.S"
+
 #else
- reti
- nop
-#endif
+
+; The interrupt table (at offset 12, irq #3) is expected here.
+; The simplest way to make sure we link it in, is to sacrifice
+; some memory and refer to it with a relocation.
+ .text
+ .dword __irqtable_at_irq3
+
+#endif /* __ELF__ */
 
 0:
  move.d __setup,$r9

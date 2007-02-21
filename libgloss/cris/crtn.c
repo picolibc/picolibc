@@ -1,5 +1,5 @@
 /* Executable and DSO init/fini end for cris*-axis-linux-gnu and simulators
-   Copyright (C) 2000, 2001, 2004, 2005 Axis Communications.
+   Copyright (C) 2000, 2001, 2004, 2005, 2007 Axis Communications.
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@ __asm__ (".section .init\n"
 #endif
          "\tmove.d [sp+],r9\n"
          "\tjump r9\n"
-         "\tnop\n"
+         "\tsetf\n"
 
          "\t.section .fini\n"
 #ifdef __PIC__
@@ -44,7 +44,7 @@ __asm__ (".section .init\n"
 #endif
          "\tmove.d [sp+],r9\n"
          "\tjump r9\n"
-         "\tnop\n");
+         "\tsetf\n");
 
 #else
 extern int Dummy;

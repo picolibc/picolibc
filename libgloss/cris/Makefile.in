@@ -86,7 +86,7 @@ BSP_PREFIX	=
 BSP_LDFLAGS	=
 BSP_BSP		= libbsp.a
 BSP_CRT0	= crt0.o
-BSP_OBJS	= ${OBJS} setup.o
+BSP_OBJS	= ${OBJS} setup.o irqtable.o
 BSP_SCRIPTS	=
 BSP_TEST	=
 BSP_INSTALL	= install-bsp
@@ -273,5 +273,6 @@ wait.o: wait.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/
 write.o: write.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
 lcrt0.o: lcrt0.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
 setup.o: setup.S
+irqtable.o: irqtable.S
 crti.o: crti.c
 crtn.o: crtn.c

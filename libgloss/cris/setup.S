@@ -1,5 +1,5 @@
 /* Support for standalone CRIS/CRISv32 code.
-   Copyright (C) 2005 Axis Communications.
+   Copyright (C) 2005, 2007 Axis Communications.
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -32,8 +32,11 @@ __setup:
  /* Make sure to save SRP.  */
 #ifdef __arch_common_v10_v32
  /* Can't do anything if we don't know for which arch.  This file is
-    then only a placeholder.  Oh, and we can't use the "ret" insn in
-    "common" code.  */
+    then only a placeholder.  Oh, and we can't use the "ret" and "nop"
+    insns in "common" code.  */
+ move $srp,$r9
+ jump $r9
+ setf
 #else
  /* Code missing:
     - Initialize RAM circuits.
