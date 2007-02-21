@@ -1,5 +1,5 @@
 /*
-(C) Copyright IBM Corp. 2005, 2006
+(C) Copyright IBM Corp. 2007
 
 All rights reserved.
 
@@ -31,19 +31,20 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <unistd.h>
 #include <errno.h>
+#include <sys/time.h>
 #include "jsre.h"
 
-time_t
-time (time_t *t)
+int
+gettimeofday (struct timeval *tv, struct timezone *tz)
 {
-	syscall_time_t sys;
-	syscall_out_t   *psys_out = ( syscall_out_t* )&sys;
+	syscall_gettimeofday_t sys;
+	syscall_out_t *psys_out = ( syscall_out_t* )&sys;
 
-	sys.time = (unsigned int)t;
+	sys.tv = (unsigned int)tv;
+	sys.tz = (unsigned int)tz;
 
-	_send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_TIME, &sys);
+	_send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_GETTIMEOFDAY, &sys);
 
 	errno = psys_out->err;
-	return ( psys_out->rc);
+	return (psys_out->rc);
 }
-

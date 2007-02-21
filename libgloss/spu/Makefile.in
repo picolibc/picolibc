@@ -56,7 +56,7 @@ OBJCOPY = `t='$(program_transform_name)'; echo objcopy | sed -e $$t`
 # object files needed
 OBJS = syscalls.o exit.o sbrk.o close.o fstat.o getpid.o isatty.o \
 	kill.o lseek.o open.o read.o unlink.o write.o stat.o \
-	ftruncate.o dup.o access.o time.o
+	ftruncate.o dup.o access.o gettimeofday.o
 
 # Object files specific to particular targets.
 EVALOBJS = ${OBJS}

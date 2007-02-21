@@ -56,6 +56,7 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 
 #define JSRE_CLOSE 2
 #define JSRE_FSTAT 4
+#define JSRE_GETTIMEOFDAY 7
 #define JSRE_LSEEK 9
 #define JSRE_OPEN 15
 #define JSRE_READ 16
@@ -65,7 +66,6 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #define JSRE_FTRUNCATE 28
 #define JSRE_ACCESS 29
 #define JSRE_DUP 30
-#define JSRE_TIME 31
 
 typedef struct
 {
@@ -137,9 +137,11 @@ typedef struct
 
 typedef struct
 {
-	unsigned int	time;
+	unsigned int	tv;
 	unsigned int	pad0[ 3 ];
-} syscall_time_t;
+	unsigned int	tz;
+	unsigned int	pad1[ 3 ];
+} syscall_gettimeofday_t;
 
 typedef struct
 {
