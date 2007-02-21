@@ -1,3 +1,15 @@
+2007-02-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* wincap.cc (wincap_unknown): Change settings for unknown to reflect
+	the capabilities of NT4.
+	(wincap_95): Remove.
+	(wincap_95osr2): Remove.
+	(wincap_98): Remove.
+	(wincap_98se): Remove.
+	(wincap_me): Remove.
+	(wincap_nt3): Remove.
+	(wincapc::init): Temporarily bail out on any 9x system.
+
 2007-02-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din (sem_unlink): Export.
