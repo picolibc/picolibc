@@ -1,3 +1,12 @@
+2007-02-21  Patrick Mansfield <patmans@us.ibm.com>
+
+	* libc/reent/timer.c: Removed (split into two new files).
+	* libc/reent/timesr.c: New file for _times_r.
+	* libc/reent/gettimeofdayr.c: New file out _gettimeofday_r.
+	* reent/Makefile.in: Remove timer.c, add timesr.c and
+	gettimeofdayr.c.
+	* libc/reent/Makefile.am: Regenerate.
+
 2007-02-20  Patrick Mansfield <patmans@us.ibm.com>
 
 	* configure.host: Build SPU with default_newlib_atexit_dynamic_alloc="no".

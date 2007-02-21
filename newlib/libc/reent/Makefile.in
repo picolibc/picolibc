@@ -55,12 +55,12 @@ lib_a_LIBADD =
 am__objects_1 = lib_a-closer.$(OBJEXT) lib_a-reent.$(OBJEXT) \
 	lib_a-impure.$(OBJEXT) lib_a-fcntlr.$(OBJEXT) \
 	lib_a-fstatr.$(OBJEXT) lib_a-getreent.$(OBJEXT) \
-	lib_a-linkr.$(OBJEXT) lib_a-lseekr.$(OBJEXT) \
-	lib_a-openr.$(OBJEXT) lib_a-readr.$(OBJEXT) \
-	lib_a-signalr.$(OBJEXT) lib_a-signgam.$(OBJEXT) \
-	lib_a-sbrkr.$(OBJEXT) lib_a-statr.$(OBJEXT) \
-	lib_a-timer.$(OBJEXT) lib_a-unlinkr.$(OBJEXT) \
-	lib_a-writer.$(OBJEXT)
+	lib_a-gettimeofdayr.$(OBJEXT) lib_a-linkr.$(OBJEXT) \
+	lib_a-lseekr.$(OBJEXT) lib_a-openr.$(OBJEXT) \
+	lib_a-readr.$(OBJEXT) lib_a-signalr.$(OBJEXT) \
+	lib_a-signgam.$(OBJEXT) lib_a-sbrkr.$(OBJEXT) \
+	lib_a-statr.$(OBJEXT) lib_a-timesr.$(OBJEXT) \
+	lib_a-unlinkr.$(OBJEXT) lib_a-writer.$(OBJEXT)
 @HAVE_STDIO64_DIR_TRUE@am__objects_2 = lib_a-fstat64r.$(OBJEXT) \
 @HAVE_STDIO64_DIR_TRUE@	lib_a-lseek64r.$(OBJEXT) \
 @HAVE_STDIO64_DIR_TRUE@	lib_a-open64r.$(OBJEXT)
@@ -77,8 +77,9 @@ lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libreent_la_LIBADD =
 am__objects_6 = closer.lo reent.lo impure.lo fcntlr.lo fstatr.lo \
-	getreent.lo linkr.lo lseekr.lo openr.lo readr.lo signalr.lo \
-	signgam.lo sbrkr.lo statr.lo timer.lo unlinkr.lo writer.lo
+	getreent.lo gettimeofdayr.lo linkr.lo lseekr.lo openr.lo \
+	readr.lo signalr.lo signgam.lo sbrkr.lo statr.lo timesr.lo \
+	unlinkr.lo writer.lo
 @HAVE_STDIO64_DIR_TRUE@am__objects_7 = fstat64r.lo lseek64r.lo \
 @HAVE_STDIO64_DIR_TRUE@	open64r.lo
 am__objects_8 = $(am__objects_7)
@@ -275,6 +276,7 @@ GENERAL_SOURCES = \
 	fcntlr.c \
 	fstatr.c \
 	getreent.c \
+	gettimeofdayr.c \
 	linkr.c \
 	lseekr.c \
 	openr.c \
@@ -283,7 +285,7 @@ GENERAL_SOURCES = \
 	signgam.c \
 	sbrkr.c \
 	statr.c \
-	timer.c \
+	timesr.c \
 	unlinkr.c \
 	writer.c
 
@@ -301,6 +303,7 @@ CHEWOUT_FILES = \
 	execr.def \
 	fcntlr.def \
 	fstatr.def \
+	gettimeofdayr.def \
 	linkr.def \
 	lseekr.def \
 	openr.def \
@@ -308,7 +311,7 @@ CHEWOUT_FILES = \
 	signalr.def \
 	sbrkr.def \
 	statr.def \
-	timer.def \
+	timesr.def \
 	unlinkr.def \
 	$(STDIO64_DEFS) \
 	writer.def
@@ -420,6 +423,12 @@ lib_a-getreent.o: getreent.c
 lib_a-getreent.obj: getreent.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getreent.obj `if test -f 'getreent.c'; then $(CYGPATH_W) 'getreent.c'; else $(CYGPATH_W) '$(srcdir)/getreent.c'; fi`
 
+lib_a-gettimeofdayr.o: gettimeofdayr.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gettimeofdayr.o `test -f 'gettimeofdayr.c' || echo '$(srcdir)/'`gettimeofdayr.c
+
+lib_a-gettimeofdayr.obj: gettimeofdayr.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gettimeofdayr.obj `if test -f 'gettimeofdayr.c'; then $(CYGPATH_W) 'gettimeofdayr.c'; else $(CYGPATH_W) '$(srcdir)/gettimeofdayr.c'; fi`
+
 lib_a-linkr.o: linkr.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-linkr.o `test -f 'linkr.c' || echo '$(srcdir)/'`linkr.c
 
@@ -468,11 +477,11 @@ lib_a-statr.o: statr.c
 lib_a-statr.obj: statr.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-statr.obj `if test -f 'statr.c'; then $(CYGPATH_W) 'statr.c'; else $(CYGPATH_W) '$(srcdir)/statr.c'; fi`
 
-lib_a-timer.o: timer.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-timer.o `test -f 'timer.c' || echo '$(srcdir)/'`timer.c
+lib_a-timesr.o: timesr.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-timesr.o `test -f 'timesr.c' || echo '$(srcdir)/'`timesr.c
 
-lib_a-timer.obj: timer.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-timer.obj `if test -f 'timer.c'; then $(CYGPATH_W) 'timer.c'; else $(CYGPATH_W) '$(srcdir)/timer.c'; fi`
+lib_a-timesr.obj: timesr.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-timesr.obj `if test -f 'timesr.c'; then $(CYGPATH_W) 'timesr.c'; else $(CYGPATH_W) '$(srcdir)/timesr.c'; fi`
 
 lib_a-unlinkr.o: unlinkr.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-unlinkr.o `test -f 'unlinkr.c' || echo '$(srcdir)/'`unlinkr.c

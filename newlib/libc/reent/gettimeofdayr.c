@@ -1,5 +1,4 @@
-/* Reentrant versions of times and gettimeofday system calls for the
-   clock and time ANSI C routines.
+/* Reentrant version of gettimeofday system call
    This implementation just calls the times/gettimeofday system calls.
    Gettimeofday may not be available on all targets.  It's presence
    here is dubious.  Consider it for internal use only.  */
@@ -21,7 +20,7 @@
 
 #ifdef REENTRANT_SYSCALLS_PROVIDED
 
-int _dummy_time_syscalls = 1;
+int _dummy_gettimeofday_syscalls = 1;
 
 #else
 
@@ -31,44 +30,8 @@ extern int errno;
 
 /*
 FUNCTION
-	<<_times_r>>---Reentrant version of times
-	
-INDEX
-	_times_r
-
-ANSI_SYNOPSIS
-	#include <reent.h>
-	#include <sys/times.h>
-	clock_t _times_r(struct _reent *<[ptr]>, struct tms *<[ptms]>);
-
-TRAD_SYNOPSIS
-	#include <reent.h>
-	#include <sys/times.h>
-	clock_t _times_r(<[ptr]>, <[ptms]>)
-	struct _reent *<[ptr]>;
-	struct tms *<[ptms]>;
-
-DESCRIPTION
-	This is a reentrant version of <<times>>.  It
-	takes a pointer to the global data block, which holds
-	<<errno>>.
-*/
-
-clock_t
-_DEFUN (_times_r, (ptr, ptms),
-     struct _reent *ptr _AND
-     struct tms *ptms)
-{
-  clock_t ret;
-
-  ret = _times (ptms);
-  return ret;
-}
-
-/*
-FUNCTION
 	<<_gettimeofday_r>>---Reentrant version of gettimeofday
-	
+
 INDEX
 	_gettimeofday_r
 
