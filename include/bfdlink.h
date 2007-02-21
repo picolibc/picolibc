@@ -566,6 +566,13 @@ struct bfd_link_callbacks
   /* General link info message.  */
   void (*einfo)
     (const char *fmt, ...);
+  /* This callback provides a chance for users of the BFD library to
+     override its decision about whether to place two adjacent sections
+     into the same segment.  */
+  bfd_boolean (*override_segment_assignment)
+    (struct bfd_link_info *, bfd * abfd,
+     asection * current_section, asection * previous_section,
+     bfd_boolean new_segment);
 };
 
 /* The linker builds link_order structures which tell the code how to
