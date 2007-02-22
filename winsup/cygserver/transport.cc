@@ -1,6 +1,6 @@
 /* transport.cc
 
-   Copyright 2001, 2002, 2003, 2004 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004, 2007 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -21,16 +21,12 @@ details. */
 
 #include "transport.h"
 #include "transport_pipes.h"
-#include "transport_sockets.h"
 
 /* The factory */
 transport_layer_base *
 create_server_transport ()
 {
-  if (wincap.is_winnt ())
-    return new transport_layer_pipes;
-  else
-    return new transport_layer_sockets;
+  return new transport_layer_pipes;
 }
 
 #ifndef __INSIDE_CYGWIN__

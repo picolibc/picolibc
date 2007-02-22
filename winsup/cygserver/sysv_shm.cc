@@ -729,7 +729,7 @@ shmget_allocate_segment(struct thread *td, struct shmget_args *uap, int mode)
 	if (shm_nused >= shminfo.shmmni) /* Any shmids left? */
 		return (ENOSPC);
 	size = round_page(uap->size);
-	if (shm_committed + btoc(size) > (unsigned long) shminfo.shmall)
+	if (shm_committed + btoc(size) > shminfo.shmall)
 		return (ENOMEM);
 	if (shm_last_free < 0) {
 		shmrealloc();	/* Maybe expand the shmsegs[] array. */
