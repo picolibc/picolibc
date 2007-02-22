@@ -307,10 +307,10 @@ rmdir (const char *dir)
       debug_printf ("got %d error from build_fh_name", fh->error ());
       set_errno (fh->error ());
     }
-  else if (has_dot_last_component (dir, false))
-    set_errno (fh->exists () ? EINVAL : ENOENT);
   else if (!fh->exists ())
     set_errno (ENOENT);
+  else if (has_dot_last_component (dir, false))
+    set_errno (EINVAL);
   else if (!fh->rmdir ())
     res = 0;
 

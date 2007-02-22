@@ -1,5 +1,10 @@
 2007-02-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dir.cc (rmdir): Move existance check in front of
+	has_dot_last_component check.  Simply setting errno in latter case.
+
+2007-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (fhandler_base::write): Remove wincap.has_lseek_bug case.
 	Simplify seek beyond EOF case.
 	* times.cc (times): Remove wincap.has_get_process_times case.
