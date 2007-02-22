@@ -1,3 +1,8 @@
+2007-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::closedir): Fix bug
+	introduced by switching to NtClose.
+
 2007-02-22  Christopher Faylor  <me@cgf.cx>
 
 	* dcrt0.cc (child_info_fork::alloc_stack_hard_way): Change sense of

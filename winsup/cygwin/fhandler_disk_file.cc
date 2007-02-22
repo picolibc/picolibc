@@ -1873,6 +1873,8 @@ int
 fhandler_disk_file::closedir (DIR *dir)
 {
   int res = 0;
+  NTSTATUS status;
+
   delete d_mounts (dir);
   if (!dir->__handle)
     /* ignore */;
@@ -1881,9 +1883,9 @@ fhandler_disk_file::closedir (DIR *dir)
       set_errno (EBADF);
       res = -1;
     }
-  else if (!NtClose (dir->__handle))
+  else if (!NT_SUCCESS (status = NtClose (dir->__handle)))
     {
-      __seterrno ();
+      __seterrno_from_nt_status (status);
       res = -1;
     }
   syscall_printf ("%d = closedir (%p, %s)", res, dir, get_name ());
