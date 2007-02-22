@@ -105,9 +105,7 @@ gen_create_protect (DWORD openflags, int flags)
   else if (openflags & GENERIC_WRITE)
     ret = PAGE_READWRITE;
 
-  /* Ignore EXECUTE permission on 9x. */
-  if ((openflags & GENERIC_EXECUTE)
-      && wincap.virtual_protect_works_on_shared_pages ())
+  if (openflags & GENERIC_EXECUTE)
     ret <<= 4;
 
   return ret;
@@ -130,9 +128,7 @@ gen_protect (int prot, int flags)
   else if (prot & PROT_READ)
     ret = PAGE_READONLY;
 
-  /* Ignore EXECUTE permission on 9x. */
-  if ((prot & PROT_EXEC)
-      && wincap.virtual_protect_works_on_shared_pages ())
+  if (prot & PROT_EXEC)
     ret <<= 4;
 
   return ret;
@@ -833,7 +829,6 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
   struct __stat64 st;
 
   DWORD pagesize = getpagesize ();
-  DWORD checkpagesize;
 
   fh_anonymous.set_io_handle (INVALID_HANDLE_VALUE);
   fh_anonymous.set_access (GENERIC_READ | GENERIC_WRITE | GENERIC_EXECUTE);
@@ -841,31 +836,13 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 
   SetResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
 
-  /* EINVAL error conditions.  Note that the addr%pagesize test is deferred
-     to workaround a serious alignment problem in Windows 98.  */
+  /* EINVAL error conditions. */
   if (off % pagesize
       || ((prot & ~(PROT_READ | PROT_WRITE | PROT_EXEC)))
       || ((flags & MAP_TYPE) != MAP_SHARED
 	  && (flags & MAP_TYPE) != MAP_PRIVATE)
-#if 0
       || (fixed (flags) && ((uintptr_t) addr % pagesize))
-#endif
       || !len)
-    {
-      set_errno (EINVAL);
-      goto out;
-    }
-
-  /* There's a serious alignment problem in Windows 98.  MapViewOfFile
-     sometimes returns addresses which are page aligned instead of
-     granularity aligned.  OTOH, it's not possible to force such an
-     address using MapViewOfFileEx.  So what we do here to let it work
-     at least most of the time is, allow 4K aligned addresses in 98,
-     to enable remapping of formerly mapped pages.  If no matching
-     free pages exist, check addr again, this time for the real alignment. */
-  checkpagesize = wincap.has_mmap_alignment_bug () ?
-		  getsystempagesize () : pagesize;
-  if (fixed (flags) && ((uintptr_t) addr % checkpagesize))
     {
       set_errno (EINVAL);
       goto out;
@@ -956,19 +933,12 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 	  goto go_ahead;
 	}
       fsiz -= off;
-      /* On NT systems we're creating the pages beyond EOF as reserved,
-	 anonymous pages.  That's not possible on 9x for two reasons.
-	 It neither allows to create reserved pages in the shared memory
-	 area, nor does it allow to create page aligend mappings (in
-	 contrast to granularity aligned mappings).
-
+      /* We're creating the pages beyond EOF as reserved, anonymous pages.
 	 Note that this isn't done in WOW64 environments since apparently
 	 WOW64 does not support the AT_ROUND_TO_PAGE flag which is required
 	 to get this right.  Too bad. */
-      if (wincap.virtual_protect_works_on_shared_pages ()
-	  && !wincap.is_wow64 ()
-	  && ((len > fsiz && !autogrow (flags))
-	      || len < pagesize))
+      if (!wincap.is_wow64 ()
+	  && ((len > fsiz && !autogrow (flags)) || len < pagesize))
 	orig_len = len;
       if (len > fsiz)
 	{
@@ -1016,14 +986,6 @@ go_ahead:
 	  ret = tried;
 	  goto out;
 	}
-    }
-
-  /* Deferred alignment test, see above. */
-  if (wincap.has_mmap_alignment_bug ()
-      && fixed (flags) && ((uintptr_t) addr % pagesize))
-    {
-      set_errno (EINVAL);
-      goto out;
     }
 
   if (orig_len)
@@ -1144,9 +1106,7 @@ munmap (void *addr, size_t len)
       set_errno (EINVAL);
       return -1;
     }
-  /* See comment in mmap64 for a description. */
-  size_t pagesize = wincap.has_mmap_alignment_bug () ?
-		    getsystempagesize () : getpagesize ();
+  size_t pagesize = getpagesize ();
   if (((uintptr_t) addr % pagesize) || !len)
     {
       set_errno (EINVAL);
@@ -1210,10 +1170,7 @@ msync (void *addr, size_t len, int flags)
 
   SetResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "msync");
 
-  /* See comment in mmap64 for a description. */
-  size_t pagesize = wincap.has_mmap_alignment_bug () ?
-		    getsystempagesize () : getpagesize ();
-  if (((uintptr_t) addr % pagesize)
+  if (((uintptr_t) addr % getpagesize ())
       || (flags & ~(MS_ASYNC | MS_SYNC | MS_INVALIDATE))
       || (flags & (MS_ASYNC | MS_SYNC) == (MS_ASYNC | MS_SYNC)))
     {
@@ -1221,7 +1178,7 @@ msync (void *addr, size_t len, int flags)
       goto out;
     }
 #if 0 /* If I only knew why I did that... */
-  len = roundup2 (len, pagesize);
+  len = roundup2 (len, getpagesize ());
 #endif
 
   /* Iterate through the map, looking for the mmapped area.
@@ -1274,8 +1231,7 @@ mprotect (void *addr, size_t len, int prot)
   syscall_printf ("mprotect (addr: %p, len %u, prot %x)", addr, len, prot);
 
   /* See comment in mmap64 for a description. */
-  size_t pagesize = wincap.has_mmap_alignment_bug () ?
-		    getsystempagesize () : getpagesize ();
+  size_t pagesize = getpagesize ();
   if ((uintptr_t) addr % pagesize)
     {
       set_errno (EINVAL);
@@ -1361,9 +1317,6 @@ out:
 extern "C" int
 mlock (const void *addr, size_t len)
 {
-  if (!wincap.has_working_virtual_lock ())
-    return 0;
-
   int ret = -1;
 
   /* Instead of using VirtualLock, which does not guarantee that the pages
@@ -1429,9 +1382,6 @@ mlock (const void *addr, size_t len)
 extern "C" int
 munlock (const void *addr, size_t len)
 {
-  if (!wincap.has_working_virtual_lock ())
-    return 0;
-
   int ret = -1;
 
   push_thread_privilege (SE_LOCK_MEMORY_PRIV, true);

@@ -1,5 +1,16 @@
 2007-02-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_console.cc (fhandler_console::read): Drop 9x specific
+	handling of AltGr key.
+	* mmap.cc: Take NT for granted throughout.
+	* wincap.cc: Remove map_view_of_file_ex_sucks, altgr_is_ctrl_alt,
+	has_working_copy_on_write, share_mmaps_only_by_name,
+	virtual_protect_works_on_shared_pages, has_mmap_alignment_bug and
+	has_working_virtual_lock throughout.
+	* wincap.h: Ditto.
+
+2007-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (fhandler_base::set_no_inheritance): Always use
 	SetHandleInformation.
 	* fhandler_disk_file.cc (fhandler_disk_file::lock): Always use

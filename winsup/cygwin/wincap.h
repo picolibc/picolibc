@@ -20,13 +20,7 @@ struct wincaps
   unsigned has_security                                 : 1;
   unsigned has_security_descriptor_control              : 1;
   unsigned has_ip_helper_lib                            : 1;
-  unsigned map_view_of_file_ex_sucks                    : 1;
-  unsigned altgr_is_ctrl_alt                            : 1;
   unsigned has_physical_mem_access                      : 1;
-  unsigned has_working_copy_on_write                    : 1;
-  unsigned share_mmaps_only_by_name                     : 1;
-  unsigned virtual_protect_works_on_shared_pages        : 1;
-  unsigned has_mmap_alignment_bug			: 1;
   unsigned has_hard_links                               : 1;
   unsigned can_open_directories                         : 1;
   unsigned has_move_file_ex                             : 1;
@@ -51,7 +45,6 @@ struct wincaps
   unsigned detect_win16_exe				: 1;
   unsigned has_null_console_handler_routine		: 1;
   unsigned has_disk_ex_ioctls				: 1;
-  unsigned has_working_virtual_lock			: 1;
   unsigned has_disabled_user_tos_setting		: 1;
   unsigned has_fileid_dirinfo				: 1;
   unsigned has_exclusiveaddruse				: 1;
@@ -89,13 +82,7 @@ public:
   bool  IMPLEMENT (has_security)
   bool  IMPLEMENT (has_security_descriptor_control)
   bool  IMPLEMENT (has_ip_helper_lib)
-  bool  IMPLEMENT (map_view_of_file_ex_sucks)
-  bool  IMPLEMENT (altgr_is_ctrl_alt)
   bool  IMPLEMENT (has_physical_mem_access)
-  bool  IMPLEMENT (has_working_copy_on_write)
-  bool  IMPLEMENT (share_mmaps_only_by_name)
-  bool  IMPLEMENT (virtual_protect_works_on_shared_pages)
-  bool	IMPLEMENT (has_mmap_alignment_bug)
   bool  IMPLEMENT (has_hard_links)
   bool  IMPLEMENT (can_open_directories)
   bool  IMPLEMENT (has_move_file_ex)
@@ -120,7 +107,6 @@ public:
   bool	IMPLEMENT (detect_win16_exe)
   bool	IMPLEMENT (has_null_console_handler_routine)
   bool	IMPLEMENT (has_disk_ex_ioctls)
-  bool	IMPLEMENT (has_working_virtual_lock)
   bool	IMPLEMENT (has_disabled_user_tos_setting)
   bool	IMPLEMENT (has_fileid_dirinfo)
   bool	IMPLEMENT (has_exclusiveaddruse)
