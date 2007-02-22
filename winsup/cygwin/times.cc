@@ -75,33 +75,21 @@ times (struct tms *buf)
   /* Ticks is in milliseconds, convert to our ticks. Use long long to prevent
      overflow. */
   clock_t tc = (clock_t) (ticks * CLOCKS_PER_SEC / 1000);
-  if (wincap.has_get_process_times ())
-    {
-      GetProcessTimes (hMainProc, &creation_time, &exit_time,
-		       &kernel_time, &user_time);
 
-      syscall_printf ("ticks %d, CLOCKS_PER_SEC %d", ticks, CLOCKS_PER_SEC);
-      syscall_printf ("user_time %d, kernel_time %d, creation_time %d, exit_time %d",
-		      user_time, kernel_time, creation_time, exit_time);
-      buf->tms_stime = __to_clock_t (&kernel_time, 0);
-      buf->tms_utime = __to_clock_t (&user_time, 0);
-      timeval_to_filetime (&myself->rusage_children.ru_stime, &kernel_time);
-      buf->tms_cstime = __to_clock_t (&kernel_time, 1);
-      timeval_to_filetime (&myself->rusage_children.ru_utime, &user_time);
-      buf->tms_cutime = __to_clock_t (&user_time, 1);
-    }
-  else
-    /* GetProcessTimes() does not work for non-NT versions of Windows.  The
-       return values are undefined, so instead just copy the ticks value
-       into utime so that clock() will work properly on these systems */
-    {
-      buf->tms_utime = tc;
-      buf->tms_stime = 0;
-      buf->tms_cstime = 0;
-      buf->tms_cutime = 0;
-    }
+  GetProcessTimes (hMainProc, &creation_time, &exit_time,
+		   &kernel_time, &user_time);
 
-   return tc;
+  syscall_printf ("ticks %d, CLOCKS_PER_SEC %d", ticks, CLOCKS_PER_SEC);
+  syscall_printf ("user_time %d, kernel_time %d, creation_time %d, exit_time %d",
+		  user_time, kernel_time, creation_time, exit_time);
+  buf->tms_stime = __to_clock_t (&kernel_time, 0);
+  buf->tms_utime = __to_clock_t (&user_time, 0);
+  timeval_to_filetime (&myself->rusage_children.ru_stime, &kernel_time);
+  buf->tms_cstime = __to_clock_t (&kernel_time, 1);
+  timeval_to_filetime (&myself->rusage_children.ru_utime, &user_time);
+  buf->tms_cutime = __to_clock_t (&user_time, 1);
+
+  return tc;
 }
 
 EXPORT_ALIAS (times, _times)

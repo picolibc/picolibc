@@ -1,5 +1,14 @@
 2007-02-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::write): Remove wincap.has_lseek_bug case.
+	Simplify seek beyond EOF case.
+	* times.cc (times): Remove wincap.has_get_process_times case.
+	* wincap.cc: Remove has_delete_on_close, has_page_guard,
+	has_get_process_times and has_lseek_bug throughout.
+	* wincap.h: Ditto.
+
+2007-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	Throughout remove all usage of wincap.access_denied_on_delete.
 	* dir.cc (rmdir): Add existance check to be errno-compatible with Linux.
 	* fhandler_disk_file.cc (fhandler_disk_file::rmdir): Drop test for

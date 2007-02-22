@@ -17,12 +17,8 @@ struct wincaps
   DWORD    chunksize;
   DWORD    heapslop;
   unsigned is_server                                    : 1;
-  unsigned has_delete_on_close                          : 1;
-  unsigned has_page_guard                               : 1;
   unsigned has_security                                 : 1;
   unsigned has_security_descriptor_control              : 1;
-  unsigned has_get_process_times                        : 1;
-  unsigned has_lseek_bug                                : 1;
   unsigned has_lock_file_ex                             : 1;
   unsigned has_signal_object_and_wait                   : 1;
   unsigned has_eventlog                                 : 1;
@@ -96,12 +92,8 @@ public:
   DWORD IMPLEMENT (chunksize)
   DWORD IMPLEMENT (heapslop)
   bool  IMPLEMENT (is_server)
-  bool  IMPLEMENT (has_delete_on_close)
-  bool  IMPLEMENT (has_page_guard)
   bool  IMPLEMENT (has_security)
   bool  IMPLEMENT (has_security_descriptor_control)
-  bool  IMPLEMENT (has_get_process_times)
-  bool  IMPLEMENT (has_lseek_bug)
   bool  IMPLEMENT (has_lock_file_ex)
   bool  IMPLEMENT (has_signal_object_and_wait)
   bool  IMPLEMENT (has_eventlog)

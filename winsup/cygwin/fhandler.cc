@@ -841,66 +841,18 @@ fhandler_base::write (const void *ptr, size_t len)
 					 FILE_CURRENT);
       current_position += ((_off64_t) pos_high) << 32;
 
-      if (current_position > actual_length)
+      if (current_position >= actual_length + (128 * 1024)
+	  && get_fs_flags (FILE_SUPPORTS_SPARSE_FILES))
 	{
-	  if ((get_fs_flags (FILE_SUPPORTS_SPARSE_FILES))
-	      && current_position >= actual_length + (128 * 1024))
-	    {
-	      /* If the file systemn supports sparse files and the application
-		 is writing after a long seek beyond EOF, convert the file to
-		 a sparse file. */
-	      DWORD dw;
-	      HANDLE h = get_output_handle ();
-	      BOOL r = DeviceIoControl (h, FSCTL_SET_SPARSE, NULL, 0, NULL,
-					0, &dw, NULL);
-	      syscall_printf ("%d = DeviceIoControl(%p, FSCTL_SET_SPARSE)",
-			      r, h);
-	    }
-	  else if (wincap.has_lseek_bug ())
-	    {
-	      /* Oops, this is the bug case - Win95 uses whatever is on the
-		 disk instead of some known (safe) value, so we must seek
-		 back and fill in the gap with zeros. - DJ
-		 Note: this bug doesn't happen on NT4, even though the
-		 documentation for WriteFile() says that it *may* happen
-		 on any OS. */
-	      /* Check there is enough space */
-	      if (!SetEndOfFile (get_output_handle ()))
-		{
-		  __seterrno ();
-		  return -1;
-		}
-	      char zeros[512];
-	      int number_of_zeros_to_write = current_position - actual_length;
-	      memset (zeros, 0, 512);
-	      SetFilePointer (get_output_handle (), actual_length, NULL,
-			      FILE_BEGIN);
-	      while (number_of_zeros_to_write > 0)
-		{
-		  DWORD zeros_this_time = (number_of_zeros_to_write > 512
-					 ? 512 : number_of_zeros_to_write);
-		  DWORD written;
-		  DWORD ret = WriteFile (get_output_handle (), zeros,
-					 zeros_this_time, &written, NULL);
-		  if (!ret || written < zeros_this_time)
-		    {
-		      if (!ret)
-			{
-			  __seterrno ();
-			  if (get_errno () == EPIPE)
-			    raise (SIGPIPE);
-			}
-		      else
-			set_errno (ENOSPC);
-		      /* This might fail, but it's the best we can hope for */
-		      SetFilePointer (get_output_handle (), current_position,
-				      NULL, FILE_BEGIN);
-		      return -1;
-
-		    }
-		  number_of_zeros_to_write -= written;
-		}
-	    }
+	  /* If the file system supports sparse files and the application
+	     is writing after a long seek beyond EOF, convert the file to
+	     a sparse file. */
+	  DWORD dw;
+	  HANDLE h = get_output_handle ();
+	  BOOL r = DeviceIoControl (h, FSCTL_SET_SPARSE, NULL, 0, NULL,
+				    0, &dw, NULL);
+	  syscall_printf ("%d = DeviceIoControl(%p, FSCTL_SET_SPARSE)",
+			  r, h);
 	}
     }
 
