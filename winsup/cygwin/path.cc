@@ -4187,26 +4187,9 @@ cwdstuff::init ()
 {
   cwd_lock.init ("cwd_lock");
   get_initial ();
-  if (!dynamically_loaded && !keep_in_sync ())
-    {
-      /* Actually chdir into the system dir to avoid cwd problems on 9x.
-	 See comment in cwdstuff::set below. */
-      if (!wincap.can_open_directories ())
-	SetCurrentDirectory (windows_system_directory);
-      else
-	close_user_proc_parms_cwd_handle ();
-    }
+  if (!dynamically_loaded)
+    close_user_proc_parms_cwd_handle ();
   cwd_lock.release ();
-}
-
-void
-cwdstuff::keep_in_sync (bool val)
-{
-  if (!wincap.can_open_directories ())
-    {
-      sync = val;
-      SetCurrentDirectory (val ? win32 : windows_system_directory);
-    }
 }
 
 /* Get initial cwd.  Should only be called once in a process tree. */
@@ -4236,81 +4219,61 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
       cwd_lock.acquire ();
       if (doit)
 	{
-	  if (keep_in_sync ())
+	  /* We utilize the user parameter block.  The directory is
+	     stored manually, but the handle to the directory is always
+	     closed and set to NULL.  This way the directory isn't blocked
+	     even if it's the cwd of a Cygwin process.
+
+	     Why the hassle?
+
+	     - A process has always an open handle to the current working
+	       directory which disallows manipulating this directory.
+	       POSIX allows to remove a directory if the permissions are ok.
+	       The fact that its the cwd of some process doesn't matter.
+
+	     - SetCurrentDirectory fails for directories with strict
+	       permissions even for processes with the SE_BACKUP_NAME
+	       privilege enabled.  The reason is apparently that
+	       SetCurrentDirectory calls NtOpenFile without the
+	       FILE_OPEN_FOR_BACKUP_INTENT flag set. */
+	  HANDLE h;
+	  DWORD attr = GetFileAttributes (win32_cwd);
+	  if (attr == INVALID_FILE_ATTRIBUTES)
 	    {
-	      /* If a Cygwin application called cygwin_internal(CW_SYNC_WINENV),
-		 then it's about to call native Windows functions.  This also
-		 sets the keep_in_sync flag so that we actually chdir into the
-		 native directory on 9x to avoid confusion. */
-	      if (!SetCurrentDirectory (win32_cwd))
-		{
-		  __seterrno ();
-		  goto out;
-		}
+	      set_errno (ENOENT);
+	      goto out;
 	    }
+	  if (!(attr & FILE_ATTRIBUTE_DIRECTORY))
+	    {
+	      set_errno (ENOTDIR);
+	      goto out;
+	    }
+	  h = CreateFile (win32_cwd, FILE_TRAVERSE, FILE_SHARE_VALID_FLAGS,
+			  NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS,
+			  NULL);
+	  if (h == INVALID_HANDLE_VALUE)
+	    {
+	      __seterrno ();
+	      goto out;
+	    }
+	  ULONG len = strlen (win32_cwd);
+	  ANSI_STRING as = {len, len + 2, (PCHAR) alloca (len + 2)};
+	  strcpy (as.Buffer, win32_cwd);
+	  if (as.Buffer[len - 1] != '\\')
+	    {
+	      strcpy (as.Buffer + len, "\\");
+	      ++as.Length;
+	    }
+	  if (current_codepage == ansi_cp)
+	    RtlAnsiStringToUnicodeString (
+			&get_user_proc_parms ()->CurrentDirectoryName,
+			&as, FALSE);
 	  else
-	    {
-	      /* We don't actually chdir on 9x but stay in the system dir.
-
-		 On NT we utilize the user parameter block.  The directory is
-		 stored manually, but the handle to the directory is always
-		 closed and set to NULL.  This way the directory isn't blocked
-		 even if it's the cwd of a Cygwin process.
-
-		 Why the hassle?
-
-		 - A process has always an open handle to the current working
-		   directory which disallows manipulating this directory.
-		   POSIX allows to remove a directory if the permissions are ok.
-		   The fact that its the cwd of some process doesn't matter.
-
-		 - SetCurrentDirectory fails for directories with strict
-		   permissions even for processes with the SE_BACKUP_NAME
-		   privilege enabled.  The reason is apparently that
-		   SetCurrentDirectory calls NtOpenFile without the
-		   FILE_OPEN_FOR_BACKUP_INTENT flag set. */
-	      DWORD attr = GetFileAttributes (win32_cwd);
-	      if (attr == INVALID_FILE_ATTRIBUTES)
-		{
-		  set_errno (ENOENT);
-		  goto out;
-		}
-	      if (!(attr & FILE_ATTRIBUTE_DIRECTORY))
-		{
-		  set_errno (ENOTDIR);
-		  goto out;
-		}
-	      if (wincap.can_open_directories ())
-		{
-		  HANDLE h = CreateFile (win32_cwd, FILE_TRAVERSE,
-					 FILE_SHARE_VALID_FLAGS, NULL,
-					 OPEN_EXISTING,
-					 FILE_FLAG_BACKUP_SEMANTICS, NULL);
-		  if (h == INVALID_HANDLE_VALUE)
-		    {
-		      __seterrno ();
-		      goto out;
-		    }
-		  ULONG len = strlen (win32_cwd);
-		  ANSI_STRING as = {len, len + 2, (PCHAR) alloca (len + 2)};
-		  strcpy (as.Buffer, win32_cwd);
-		  if (as.Buffer[len - 1] != '\\')
-		    {
-		      strcpy (as.Buffer + len, "\\");
-		      ++as.Length;
-		    }
-		  if (current_codepage == ansi_cp)
-		    RtlAnsiStringToUnicodeString (
-				&get_user_proc_parms ()->CurrentDirectoryName,
-				&as, FALSE);
-		  else
-		    RtlOemStringToUnicodeString (
-				&get_user_proc_parms ()->CurrentDirectoryName,
-				&as, FALSE);
-		  close_user_proc_parms_cwd_handle ();
-		  CloseHandle (h);
-		}
-	    }
+	    RtlOemStringToUnicodeString (
+			&get_user_proc_parms ()->CurrentDirectoryName,
+			&as, FALSE);
+	  close_user_proc_parms_cwd_handle ();
+	  CloseHandle (h);
 	}
     }
   /* If there is no win32 path or it has the form c:xxx, get the value */

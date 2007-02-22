@@ -21,13 +21,8 @@ struct wincaps
   unsigned has_security_descriptor_control              : 1;
   unsigned has_ip_helper_lib                            : 1;
   unsigned has_physical_mem_access                      : 1;
-  unsigned has_hard_links                               : 1;
-  unsigned can_open_directories                         : 1;
   unsigned has_move_file_ex                             : 1;
-  unsigned has_negative_pids                            : 1;
   unsigned has_unreliable_pipes                         : 1;
-  unsigned has_named_pipes                              : 1;
-  unsigned has_try_enter_critical_section		: 1;
   unsigned has_raw_devices				: 1;
   unsigned has_valid_processorlevel			: 1;
   unsigned has_64bit_file_access			: 1;
@@ -37,12 +32,10 @@ struct wincaps
   unsigned pty_needs_alloc_console			: 1;
   unsigned has_terminal_services			: 1;
   unsigned has_switch_to_thread				: 1;
-  unsigned cant_debug_dll_entry				: 1;
   unsigned has_ioctl_storage_get_media_types_ex		: 1;
   unsigned start_proc_suspended				: 1;
   unsigned has_extended_priority_class			: 1;
   unsigned has_guid_volumes				: 1;
-  unsigned detect_win16_exe				: 1;
   unsigned has_null_console_handler_routine		: 1;
   unsigned has_disk_ex_ioctls				: 1;
   unsigned has_disabled_user_tos_setting		: 1;
@@ -83,13 +76,8 @@ public:
   bool  IMPLEMENT (has_security_descriptor_control)
   bool  IMPLEMENT (has_ip_helper_lib)
   bool  IMPLEMENT (has_physical_mem_access)
-  bool  IMPLEMENT (has_hard_links)
-  bool  IMPLEMENT (can_open_directories)
   bool  IMPLEMENT (has_move_file_ex)
-  bool  IMPLEMENT (has_negative_pids)
   bool  IMPLEMENT (has_unreliable_pipes)
-  bool  IMPLEMENT (has_named_pipes)
-  bool  IMPLEMENT (has_try_enter_critical_section)
   bool  IMPLEMENT (has_raw_devices)
   bool  IMPLEMENT (has_valid_processorlevel)
   bool  IMPLEMENT (has_64bit_file_access)
@@ -99,12 +87,10 @@ public:
   bool  IMPLEMENT (pty_needs_alloc_console)
   bool  IMPLEMENT (has_terminal_services)
   bool  IMPLEMENT (has_switch_to_thread)
-  bool	IMPLEMENT (cant_debug_dll_entry)
   bool	IMPLEMENT (has_ioctl_storage_get_media_types_ex)
   bool	IMPLEMENT (start_proc_suspended)
   bool	IMPLEMENT (has_extended_priority_class)
   bool	IMPLEMENT (has_guid_volumes)
-  bool	IMPLEMENT (detect_win16_exe)
   bool	IMPLEMENT (has_null_console_handler_routine)
   bool	IMPLEMENT (has_disk_ex_ioctls)
   bool	IMPLEMENT (has_disabled_user_tos_setting)

@@ -225,7 +225,6 @@ struct cwdstuff
   char *win32;
   DWORD hash;
   DWORD drive_length;
-  bool sync;
   static muto cwd_lock;
   char *get (char *, int = 1, int = 0, unsigned = CYG_MAX_PATH);
   DWORD get_hash ();
@@ -240,8 +239,6 @@ struct cwdstuff
   void fixup_after_exec (char *, char *, DWORD);
   bool get_initial ();
   int set (const char *, const char *, bool);
-  bool keep_in_sync () const { return sync; }
-  void keep_in_sync (bool val);
 };
 
 #ifdef DEBUGGING

@@ -1,5 +1,21 @@
 2007-02-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygheap.h (struct cwdstuff): Remove sync member and keep_in_sync
+	accessors.
+	* external.cc (cygwin_internal): Drop call to cygheap->cwd.keep_in_sync.
+	* fhandler_disk_file.cc (fhandler_disk_file::link): Always presume
+	ability to create hard links.
+	* path.cc (cwdstuff::init): Drop 9x considerations.
+	(cwdstuff::keep_in_sync): Remove.
+	(cwdstuff::set): Take NT for granted.
+	* pinfo.h (cygwin_pid): Just return pid.
+	* wincap.cc: Remove has_hard_links, can_open_directories,
+	has_negative_pids, has_named_pipes, has_try_enter_critical_section,
+	cant_debug_dll_entry and detect_win16_exe throughout.
+	* wincap.h: Ditto.
+
+2007-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_console.cc (fhandler_console::read): Drop 9x specific
 	handling of AltGr key.
 	* mmap.cc: Take NT for granted throughout.

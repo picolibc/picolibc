@@ -346,7 +346,6 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	try_to_debug ();
 	break;
       case CW_SYNC_WINENV:
-	cygheap->cwd.keep_in_sync (true);
 	sync_winenv ();
 	return 0;
       case CW_CYGTLS_PADSIZE:
