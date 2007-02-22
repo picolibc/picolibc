@@ -1,3 +1,28 @@
+2007-02-22  Christopher Faylor  <me@cgf.cx>
+
+	* dcrt0.cc (child_info_fork::alloc_stack_hard_way): Change sense of
+	guard test.  Increase size of stack reserved and increase size before
+	the current stack pointer.  Use pointers when doing arithmetic.
+	(dll_crt0_1): Initialize exception handler when we notice we're the
+	child of a fork from non-main thread.
+	* fork.cc (frok::parent): Make argument volatile.
+	(frok::child): Ditto.
+	(lock_signals): New class.
+	(lock_pthread): Ditto.
+	(hold_everhthing): Ditto.
+	(frok::parent): Move atforkprepare and atforkparent to lock_pthread
+	class.
+	(fork): Make ischild boolean.  Use hold_everything variable within
+	limited scope to set various mutexes in such a way as to avoid
+	deadlocks.
+	* thread.h (pthread_mutex::tid): New variable, active when debugging
+	for tracking thread id of owner.
+	(pthread_mutex::set_owner): Set tid when debugging.
+	* thread.cc (pthread_mutex::pthread_mutex): Clear tid.
+	(pthread_mutex::_unlock): Ditto when unlocking.
+	(pthread_mutex::fixup_after_fork): Set tid to special value after
+	forking since owner is unknown.
+
 2007-02-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	Throughout replace all usage of wincap.shared with the constant

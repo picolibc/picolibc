@@ -1,9 +1,6 @@
 /* thread.h: Locking and threading module definitions
 
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2007 Red Hat, Inc.
-
-   Written by Marco Fuykschot <marco@ddi.nl>
-   Major update 2001 Robert Collins <rbtcollins@hotmail.com>
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -45,7 +42,8 @@ void ReleaseResourceLock (int, int, const char *)
   __attribute__ ((regparm (3)));
 }
 
-DWORD cancelable_wait (HANDLE, DWORD, const cw_cancel_action = cw_cancel_self, const enum cw_sig_wait = cw_sig_nosig)
+DWORD cancelable_wait (HANDLE, DWORD, const cw_cancel_action = cw_cancel_self,
+		       const enum cw_sig_wait = cw_sig_nosig)
   __attribute__ ((regparm (3)));
 
 class fast_mutex
@@ -298,6 +296,9 @@ public:
   unsigned int recursion_counter;
   LONG condwaits;
   pthread_t owner;
+#ifdef DEBUGGING
+  DWORD tid;		/* the thread id of the owner */
+#endif
   int type;
   int pshared;
 
@@ -328,6 +329,9 @@ public:
   {
     recursion_counter = 1;
     owner = self;
+#ifdef DEBUGGING
+    tid = GetCurrentThreadId ();
+#endif
   }
 
   int lock_recursive ()

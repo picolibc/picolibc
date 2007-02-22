@@ -451,8 +451,7 @@ check_sanity_and_sync (per_process *p)
 
 child_info NO_COPY *child_proc_info = NULL;
 
-#define CYGWIN_GUARD ((wincap.has_page_guard ()) ? \
-		     PAGE_EXECUTE_READWRITE|PAGE_GUARD : PAGE_NOACCESS)
+#define CYGWIN_GUARD (PAGE_EXECUTE_READWRITE | PAGE_GUARD)
 
 void
 child_info_fork::alloc_stack_hard_way (volatile char *b)
@@ -461,7 +460,7 @@ child_info_fork::alloc_stack_hard_way (volatile char *b)
   MEMORY_BASIC_INFORMATION m;
   void *newbase;
   int newlen;
-  bool noguard;
+  bool guard;
 
   if (!VirtualQuery ((LPCVOID) &b, &m, sizeof m))
     api_fatal ("fork: couldn't get stack info, %E");
@@ -472,28 +471,29 @@ child_info_fork::alloc_stack_hard_way (volatile char *b)
     {
       newbase = curbot;
       newlen = (LPBYTE) stackbottom - (LPBYTE) curbot;
-      noguard = 1;
+      guard = false;
     }
   else
     {
-      newbase = stacktop;
-      newlen = (DWORD) stackbottom - (DWORD) stacktop;
-      noguard = 0;
+      newbase = (LPBYTE) stacktop - (128 * 1024);
+      newlen = (LPBYTE) stackbottom - (LPBYTE) newbase;
+      guard = true;
     }
+
   if (!VirtualAlloc (newbase, newlen, MEM_RESERVE, PAGE_NOACCESS))
     api_fatal ("fork: can't reserve memory for stack %p - %p, %E",
 		stacktop, stackbottom);
-
-  new_stack_pointer = (void *) ((LPBYTE) stackbottom - stacksize);
+  new_stack_pointer = (void *) ((LPBYTE) stackbottom - (stacksize += 8192));
   if (!VirtualAlloc (new_stack_pointer, stacksize, MEM_COMMIT,
 		     PAGE_EXECUTE_READWRITE))
     api_fatal ("fork: can't commit memory for stack %p(%d), %E",
 	       new_stack_pointer, stacksize);
   if (!VirtualQuery ((LPCVOID) new_stack_pointer, &m, sizeof m))
     api_fatal ("fork: couldn't get new stack info, %E");
-  if (!noguard)
+
+  if (guard)
     {
-      m.BaseAddress = (LPVOID) ((DWORD) m.BaseAddress - 1);
+      m.BaseAddress = (LPBYTE) m.BaseAddress - 1;
       if (!VirtualAlloc ((LPVOID) m.BaseAddress, 1, MEM_COMMIT,
 			 CYGWIN_GUARD))
 	api_fatal ("fork: couldn't allocate new stack guard page %p, %E",
@@ -826,7 +826,9 @@ dll_crt0_1 (void *)
 	{
 	  _tlsbase = (char *) fork_info->stackbottom;
 	  _tlstop = (char *) fork_info->stacktop;
+	  _my_tls.init_exception_handler (_cygtls::handle_exceptions);
 	}
+
       longjmp (fork_info->jmp, true);
     }
 

@@ -1,9 +1,7 @@
 /* thread.cc: Locking and threading module functions
 
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007 Red Hat, Inc.
-
-   Originally written by Marco Fuykschot <marco@ddi.nl>
-   Substantialy enhanced by Robert Collins <rbtcollins@hotmail.com>
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+   2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1599,7 +1597,11 @@ pthread_mutex::pthread_mutex (pthread_mutexattr *attr) :
   verifyable_object (PTHREAD_MUTEX_MAGIC),
   lock_counter (0),
   win32_obj_id (NULL), recursion_counter (0),
-  condwaits (0), owner (NULL), type (PTHREAD_MUTEX_ERRORCHECK),
+  condwaits (0), owner (NULL),
+#ifdef DEBUGGING
+  tid (0),
+#endif
+  type (PTHREAD_MUTEX_ERRORCHECK),
   pshared (PTHREAD_PROCESS_PRIVATE)
 {
   win32_obj_id = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
@@ -1680,6 +1682,9 @@ pthread_mutex::_unlock (pthread_t self)
   if (--recursion_counter == 0)
     {
       owner = NULL;
+#ifdef DEBUGGING
+      tid = 0;
+#endif
       if (InterlockedDecrement ((long *)&lock_counter))
 	// Another thread is waiting
 	::ReleaseSemaphore (win32_obj_id, 1, NULL);
@@ -1713,11 +1718,21 @@ pthread_mutex::_fixup_after_fork ()
     api_fatal ("pthread_mutex::_fixup_after_fork () doesn'tunderstand PROCESS_SHARED mutex's");
 
   if (owner == NULL)
-    /* mutex has no owner, reset to initial */
-    lock_counter = 0;
+    {
+      /* mutex has no owner, reset to initial */
+      lock_counter = 0;
+#ifdef DEBUGGING
+      tid = 0;
+#endif
+    }
   else if (lock_counter != 0)
-    /* All waiting threads are gone after a fork */
-    lock_counter = 1;
+    {
+      /* All waiting threads are gone after a fork */
+      lock_counter = 1;
+#ifdef DEBUGGING
+      tid = 0xffffffff;	/* Don't know the tid after a fork */
+#endif
+    }
 
   win32_obj_id = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
   if (!win32_obj_id)
