@@ -210,90 +210,61 @@ path_conv::isgood_inode (__ino64_t ino) const
 int __stdcall
 fhandler_base::fstat_by_handle (struct __stat64 *buf)
 {
-  BY_HANDLE_FILE_INFORMATION local;
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  /* The entries potentially contain a name of MAX_PATH wide characters. */
+  const DWORD fvi_size = 2 * CYG_MAX_PATH
+			 + sizeof (FILE_FS_VOLUME_INFORMATION);
+  const DWORD fai_size = 2 * CYG_MAX_PATH + sizeof (FILE_ALL_INFORMATION);
 
-  if (wincap.is_winnt ())
+  PFILE_FS_VOLUME_INFORMATION pfvi = (PFILE_FS_VOLUME_INFORMATION)
+				     alloca (fvi_size);
+  PFILE_ALL_INFORMATION pfai = (PFILE_ALL_INFORMATION) alloca (fai_size);
+
+  status = NtQueryVolumeInformationFile (get_handle (), &io, pfvi, fvi_size,
+					 FileFsVolumeInformation);
+  if (!NT_SUCCESS (status))
     {
-      NTSTATUS status;
-      IO_STATUS_BLOCK io;
-      /* The entries potentially contain a name of MAX_PATH wide characters. */
-      const DWORD fvi_size = 2 * CYG_MAX_PATH
-			     + sizeof (FILE_FS_VOLUME_INFORMATION);
-      const DWORD fai_size = 2 * CYG_MAX_PATH + sizeof (FILE_ALL_INFORMATION);
-
-      PFILE_FS_VOLUME_INFORMATION pfvi = (PFILE_FS_VOLUME_INFORMATION)
-					 alloca (fvi_size);
-      PFILE_ALL_INFORMATION pfai = (PFILE_ALL_INFORMATION) alloca (fai_size);
-
-      status = NtQueryVolumeInformationFile (get_handle (), &io, pfvi, fvi_size,
-					     FileFsVolumeInformation);
-      if (!NT_SUCCESS (status))
-	{
-	  debug_printf ("%u = NtQueryVolumeInformationFile)",
-			RtlNtStatusToDosError (status));
-	  pfvi->VolumeSerialNumber = 0; /* Set to pc.volser () in helper. */
-	}
-      status = NtQueryInformationFile (get_handle (), &io, pfai, fai_size,
-				       FileAllInformation);
-      if (NT_SUCCESS (status))
-	{
-	  /* If the change time is 0, it's a file system which doesn't
-	     support a change timestamp.  In that case use the LastWriteTime
-	     entry, as in other calls to fstat_helper. */
-	  if (pc.is_rep_symlink ())
-	    pfai->BasicInformation.FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
-	  pc.file_attributes (pfai->BasicInformation.FileAttributes);
-	  return fstat_helper (buf,
-			   pfai->BasicInformation.ChangeTime.QuadPart ?
-			   *(FILETIME *) &pfai->BasicInformation.ChangeTime :
-			   *(FILETIME *) &pfai->BasicInformation.LastWriteTime,
-			   *(FILETIME *) &pfai->BasicInformation.LastAccessTime,
-			   *(FILETIME *) &pfai->BasicInformation.LastWriteTime,
-			   pfvi->VolumeSerialNumber,
-			   pfai->StandardInformation.EndOfFile.QuadPart,
-			   pfai->StandardInformation.AllocationSize.QuadPart,
-			   pfai->InternalInformation.FileId.QuadPart,
-			   pfai->StandardInformation.NumberOfLinks,
-			   pfai->BasicInformation.FileAttributes);
-	}
-
-      debug_printf ("%u = NtQueryInformationFile)",
+      debug_printf ("%u = NtQueryVolumeInformationFile)",
 		    RtlNtStatusToDosError (status));
+      pfvi->VolumeSerialNumber = 0; /* Set to pc.volser () in helper. */
+    }
+  status = NtQueryInformationFile (get_handle (), &io, pfai, fai_size,
+				   FileAllInformation);
+  if (NT_SUCCESS (status))
+    {
+      /* If the change time is 0, it's a file system which doesn't
+	 support a change timestamp.  In that case use the LastWriteTime
+	 entry, as in other calls to fstat_helper. */
+      if (pc.is_rep_symlink ())
+	pfai->BasicInformation.FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
+      pc.file_attributes (pfai->BasicInformation.FileAttributes);
+      return fstat_helper (buf,
+		       pfai->BasicInformation.ChangeTime.QuadPart ?
+		       *(FILETIME *) &pfai->BasicInformation.ChangeTime :
+		       *(FILETIME *) &pfai->BasicInformation.LastWriteTime,
+		       *(FILETIME *) &pfai->BasicInformation.LastAccessTime,
+		       *(FILETIME *) &pfai->BasicInformation.LastWriteTime,
+		       pfvi->VolumeSerialNumber,
+		       pfai->StandardInformation.EndOfFile.QuadPart,
+		       pfai->StandardInformation.AllocationSize.QuadPart,
+		       pfai->InternalInformation.FileId.QuadPart,
+		       pfai->StandardInformation.NumberOfLinks,
+		       pfai->BasicInformation.FileAttributes);
     }
 
-  BOOL res = GetFileInformationByHandle (get_handle (), &local);
-  debug_printf ("%d = GetFileInformationByHandle (%s, %d)",
-		res, get_win32_name (), get_handle ());
-  /* GetFileInformationByHandle will fail if it's given stdio handle or pipe.
-     It also fails on 9x when trying to access directories on shares. */
-  if (!res)
-    {
-      memset (&local, 0, sizeof (local));
-      local.nFileSizeLow = GetFileSize (get_handle (), &local.nFileSizeHigh);
-      /* Even GetFileSize fails on 9x when trying to access directories
-	 on shares. In this case reset filesize to 0. */
-      if (local.nFileSizeLow == 0xffffffff && GetLastError ())
-	local.nFileSizeLow = 0;
-      local.dwFileAttributes = DWORD (pc);
-    }
-  else
-    {
-      if (pc.is_rep_symlink ())
-	local.dwFileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
-      pc.file_attributes (local.dwFileAttributes);
-    }
-  return fstat_helper (buf,
-		       local.ftLastWriteTime, /* see fstat_helper comment */
-		       local.ftLastAccessTime,
-		       local.ftLastWriteTime,
-		       local.dwVolumeSerialNumber,
-		       (ULONGLONG) local.nFileSizeHigh << 32
-				   | local.nFileSizeLow,
-		       -1LL,
-		       (ULONGLONG) local.nFileIndexHigh << 32
-				   | local.nFileIndexLow,
-		       local.nNumberOfLinks,
-		       local.dwFileAttributes);
+  debug_printf ("%u = NtQueryInformationFile)",
+		RtlNtStatusToDosError (status));
+
+  /* Last resort */
+  FILETIME ft = { 0, 0 };
+  DWORD lowfs, highfs;
+
+  lowfs = GetFileSize (get_handle (), &highfs);
+  if (lowfs == 0xffffffff && GetLastError ())
+    lowfs = highfs = 0;
+  return fstat_helper (buf, ft, ft, ft, 0, (ULONGLONG) highfs << 32 | lowfs,
+		       -1LL, 0ULL, 1, DWORD (pc));
 }
 
 int __stdcall
@@ -556,24 +527,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 int __stdcall
 fhandler_disk_file::fstat (struct __stat64 *buf)
 {
-  /* Changing inode data requires setting ctime (only 9x). */
-  if (has_changed ())
-    touch_ctime ();
   return fstat_fs (buf);
-}
-
-void
-fhandler_disk_file::touch_ctime ()
-{
-  FILETIME ft;
-
-  GetSystemTimeAsFileTime (&ft);
-  /* Modification time is touched if the file data has changed as well.
-     This happens for instance on write() or ftruncate(). */
-  if (!SetFileTime (get_io_handle (), NULL, NULL, &ft))
-    debug_printf ("SetFileTime (%s) failed, %E", get_win32_name ());
-  else
-    has_changed (false);
 }
 
 int __stdcall
@@ -622,10 +576,6 @@ fhandler_disk_file::fchmod (mode_t mode)
   else if (!allow_ntsec || !pc.has_acls ())
     /* Correct NTFS security attributes have higher priority */
     res = 0;
-
-  /* Set ctime on success. */
-  if (!res && !wincap.is_winnt ())
-    has_changed (true);
 
   if (oret)
     close ();
@@ -783,9 +733,6 @@ fhandler_disk_file::fadvise (_off64_t offset, _off64_t length, int advice)
       return -1;
     }
 
-  if (!wincap.is_winnt ())
-    return 0;
-
   /* Windows only supports advice flags for the whole file.  We're using
      a simplified test here so that we don't have to ask for the actual
      file size.  Length == 0 means all bytes starting at offset anyway.
@@ -835,6 +782,10 @@ fhandler_disk_file::ftruncate (_off64_t length, bool allow_truncate)
     {
       _off64_t actual_length;
       DWORD size_high = 0;
+      NTSTATUS status;
+      IO_STATUS_BLOCK io;
+      FILE_END_OF_FILE_INFORMATION feofi;
+
       actual_length = GetFileSize (get_handle (), &size_high);
       actual_length += ((_off64_t) size_high) << 32;
 
@@ -843,49 +794,27 @@ fhandler_disk_file::ftruncate (_off64_t length, bool allow_truncate)
       if (!allow_truncate && length < actual_length)
 	return 0;
 
-      if (wincap.is_winnt ())
+      feofi.EndOfFile.QuadPart = length;
+      /* Create sparse files only when called through ftruncate, not when
+	 called through posix_fallocate. */
+      if (allow_truncate
+	  && get_fs_flags (FILE_SUPPORTS_SPARSE_FILES)
+	  && length >= actual_length + (128 * 1024))
 	{
-	  NTSTATUS status;
-	  IO_STATUS_BLOCK io;
-	  FILE_END_OF_FILE_INFORMATION feofi;
-
-	  feofi.EndOfFile.QuadPart = length;
-	  /* Create sparse files only when called through ftruncate, not when
-	     called through posix_fallocate. */
-	  if (allow_truncate
-	      && get_fs_flags (FILE_SUPPORTS_SPARSE_FILES)
-	      && length >= actual_length + (128 * 1024))
-	    {
-	      DWORD dw;
-	      BOOL r = DeviceIoControl (get_handle (),
-					FSCTL_SET_SPARSE, NULL, 0, NULL,
-					0, &dw, NULL);
-	      syscall_printf ("%d = DeviceIoControl(%p, FSCTL_SET_SPARSE)",
-				  r, get_handle ());
-	    }
-	  status = NtSetInformationFile (get_handle (), &io,
-					 &feofi, sizeof feofi,
-					 FileEndOfFileInformation);
-	  if (!NT_SUCCESS (status))
-	    __seterrno_from_nt_status (status);
-	  else
-	    res = 0;
+	  DWORD dw;
+	  BOOL r = DeviceIoControl (get_handle (),
+				    FSCTL_SET_SPARSE, NULL, 0, NULL,
+				    0, &dw, NULL);
+	  syscall_printf ("%d = DeviceIoControl(%p, FSCTL_SET_SPARSE)",
+			      r, get_handle ());
 	}
+      status = NtSetInformationFile (get_handle (), &io,
+				     &feofi, sizeof feofi,
+				     FileEndOfFileInformation);
+      if (!NT_SUCCESS (status))
+	__seterrno_from_nt_status (status);
       else
-	{
-	  _off64_t prev_loc = lseek (0, SEEK_CUR);
-	  if (lseek (length, SEEK_SET) >= 0)
-	    {
-	      int res_bug = write (&res, 0);
-	      if (!SetEndOfFile (get_handle ()))
-		__seterrno ();
-	      else
-		res = res_bug;
-	      /* restore original file pointer location */
-	      lseek (prev_loc, SEEK_SET);
-	    }
-
-	}
+	res = 0;
     }
   return res;
 }
@@ -1050,9 +979,6 @@ docopy:
       __seterrno ();
       return -1;
     }
-  /* Set ctime on success (copy gets it automatically). */
-  if (!wincap.is_winnt ())
-    has_changed (true);
   close ();
   fhandler_disk_file fh (newpc);
   fh.query_open (query_write_attributes);
@@ -1200,12 +1126,6 @@ out:
 int
 fhandler_disk_file::close ()
 {
-  if (!hExeced)
-    {
-      /* Changing inode data requires setting ctime (only 9x). */
-      if (has_changed ())
-	touch_ctime ();
-    }
   return close_fs ();
 }
 
@@ -1462,16 +1382,10 @@ fhandler_disk_file::rmdir ()
 		       (DWORD) pc & ~FILE_ATTRIBUTE_READONLY);
 
   DWORD err, att = 0;
-  int rc;
 
-  if (wincap.is_winnt ())
-    {
-      rc = !(err = unlink_nt (pc, pc.has_attribute (FILE_ATTRIBUTE_READONLY)));
-      if (err)
-	SetLastError (err);
-    }
-  else
-    rc = RemoveDirectory (get_win32_name ());
+  int rc = !(err = unlink_nt (pc, pc.has_attribute (FILE_ATTRIBUTE_READONLY)));
+  if (err)
+    SetLastError (err);
 
   if (isremote () && exists ())
     att = GetFileAttributes (get_win32_name ());
@@ -1502,10 +1416,6 @@ fhandler_disk_file::rmdir ()
     err = ERROR_FILE_NOT_FOUND;
 
   __seterrno_from_win_error (err);
-
-  /* Directory still exists, restore its characteristics. */
-  if (!wincap.is_winnt () && pc.has_attribute (FILE_ATTRIBUTE_READONLY))
-    SetFileAttributes (get_win32_name (), (DWORD) pc);
 
   return res;
 }
@@ -1547,9 +1457,8 @@ fhandler_disk_file::opendir ()
     set_errno (ENAMETOOLONG);
   else if ((dir = (DIR *) malloc (sizeof (DIR))) == NULL)
     set_errno (ENOMEM);
-  else if ((dir->__d_dirname = (char *) malloc (wincap.is_winnt ()
-						? sizeof (struct __DIR_cache)
-						: len + 3)) == NULL)
+  else if ((dir->__d_dirname = (char *) malloc ( sizeof (struct __DIR_cache)))
+	   == NULL)
     {
       set_errno (ENOMEM);
       goto free_dir;
@@ -1586,47 +1495,45 @@ fhandler_disk_file::opendir ()
 		      && pc.normalized_path[1] == '\0')
 		     ? dirent_isroot : 0;
       dir->__d_internal = (unsigned) new __DIR_mounts (pc.normalized_path);
-      if (wincap.is_winnt ())
-	{
-	  d_cachepos (dir) = 0;
-	  if (!pc.iscygdrive ())
-	    {
-	      OBJECT_ATTRIBUTES attr;
-	      WCHAR wpath[CYG_MAX_PATH + 10];
-	      UNICODE_STRING upath = {0, sizeof (wpath), wpath};
-	      IO_STATUS_BLOCK io;
-	      NTSTATUS status;
-	      SECURITY_ATTRIBUTES sa = sec_none;
-	      pc.get_nt_native_path (upath);
-	      InitializeObjectAttributes (&attr, &upath,
-					  OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
-					  NULL, sa.lpSecurityDescriptor);
-	      status = NtOpenFile (&dir->__handle,
-				   SYNCHRONIZE | FILE_LIST_DIRECTORY,
-				   &attr, &io, wincap.shared (),
-				   FILE_SYNCHRONOUS_IO_NONALERT
-				   | FILE_OPEN_FOR_BACKUP_INTENT
-				   | FILE_DIRECTORY_FILE);
-	      if (!NT_SUCCESS (status))
-		{
-		  __seterrno_from_nt_status (status);
-		  goto free_mounts;
-		}
+      d_cachepos (dir) = 0;
 
-	      /* FileIdBothDirectoryInformation is apparently unsupported on
-		 XP when accessing directories on UDF.  When trying to use it
-		 so, NtQueryDirectoryFile returns with STATUS_ACCESS_VIOLATION.
-		 It's not clear if the call isn't also unsupported on other
-		 OS/FS combinations (say, Win2K/CDFS or so).  Instead of
-		 testing in readdir for yet another error code, let's use
-		 FileIdBothDirectoryInformation only on filesystems supporting
-		 persistent ACLs, FileBothDirectoryInformation otherwise. */
-	      if (pc.hasgood_inode ())
-		{
-		  dir->__flags |= dirent_set_d_ino;
-		  if (wincap.has_fileid_dirinfo ())
-		    dir->__flags |= dirent_get_d_ino;
-		}
+      if (!pc.iscygdrive ())
+	{
+	  OBJECT_ATTRIBUTES attr;
+	  WCHAR wpath[CYG_MAX_PATH + 10];
+	  UNICODE_STRING upath = {0, sizeof (wpath), wpath};
+	  IO_STATUS_BLOCK io;
+	  NTSTATUS status;
+	  SECURITY_ATTRIBUTES sa = sec_none;
+	  pc.get_nt_native_path (upath);
+	  InitializeObjectAttributes (&attr, &upath,
+				      OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+				      NULL, sa.lpSecurityDescriptor);
+	  status = NtOpenFile (&dir->__handle,
+			       SYNCHRONIZE | FILE_LIST_DIRECTORY,
+			       &attr, &io, wincap.shared (),
+			       FILE_SYNCHRONOUS_IO_NONALERT
+			       | FILE_OPEN_FOR_BACKUP_INTENT
+			       | FILE_DIRECTORY_FILE);
+	  if (!NT_SUCCESS (status))
+	    {
+	      __seterrno_from_nt_status (status);
+	      goto free_mounts;
+	    }
+
+	  /* FileIdBothDirectoryInformation is apparently unsupported on
+	     XP when accessing directories on UDF.  When trying to use it
+	     so, NtQueryDirectoryFile returns with STATUS_ACCESS_VIOLATION.
+	     It's not clear if the call isn't also unsupported on other
+	     OS/FS combinations (say, Win2K/CDFS or so).  Instead of
+	     testing in readdir for yet another error code, let's use
+	     FileIdBothDirectoryInformation only on filesystems supporting
+	     persistent ACLs, FileBothDirectoryInformation otherwise. */
+	  if (pc.hasgood_inode ())
+	    {
+	      dir->__flags |= dirent_set_d_ino;
+	      if (wincap.has_fileid_dirinfo ())
+		dir->__flags |= dirent_get_d_ino;
 	    }
 	}
       /* Filling fd with `this' (aka storing this in the file descriptor table
@@ -1754,9 +1661,6 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
   wchar_t *FileName;
   char fname[CYG_MAX_PATH];
   IO_STATUS_BLOCK io;
-
-  if (!wincap.is_winnt ())
-    return readdir_9x (dir, de);
 
   /* d_cachepos always refers to the next cache entry to use.  If it's 0
      we must reload the cache. */
@@ -1911,55 +1815,6 @@ go_ahead:
   return res;
 }
 
-int
-fhandler_disk_file::readdir_9x (DIR *dir, dirent *de)
-{
-  WIN32_FIND_DATA buf;
-  int res = 0;
-
-  if (!dir->__handle)
-    {
-      res = ENMFILE;
-      goto out;
-    }
-  DWORD lasterr;
-  if (dir->__d_position != 0)
-    lasterr = FindNextFileA (dir->__handle, &buf) ? 0 : GetLastError ();
-  else if (dir->__handle != INVALID_HANDLE_VALUE)
-    {
-      res = EBADF;
-      goto out;
-    }
-  else
-    {
-      int len = strlen (dir->__d_dirname);
-      strcpy (dir->__d_dirname + len, "*");
-      dir->__handle = FindFirstFile (dir->__d_dirname, &buf);
-      dir->__d_dirname[len] = '\0';
-      if (dir->__handle != INVALID_HANDLE_VALUE)
-	lasterr = 0;
-      else if ((lasterr = GetLastError ()) != ERROR_NO_MORE_FILES)
-	{
-	  res = geterrno_from_win_error (lasterr);
-	  goto out;
-	}
-    }
-  if (!lasterr)
-    de->d_ino = d_mounts (dir)->check_mount (buf.cFileName, de->d_ino);
-  if (!(res = readdir_helper (dir, de, lasterr, buf.dwFileAttributes,
-			      buf.cFileName)))
-    dir->__d_position++;
-  else
-    {
-      FindClose (dir->__handle);
-      dir->__handle = NULL;
-    }
-
-out:
-  syscall_printf ("%d = readdir (%p, %p) (%s)", res, dir, &de, res ? "***" : de->d_name);
-  return res;
-}
-
 _off64_t
 fhandler_disk_file::telldir (DIR *dir)
 {
@@ -1978,44 +1833,35 @@ fhandler_disk_file::seekdir (DIR *dir, _off64_t loc)
 void
 fhandler_disk_file::rewinddir (DIR *dir)
 {
-  if (wincap.is_winnt ())
+  d_cachepos (dir) = 0;
+  if (wincap.has_buggy_restart_scan () && isremote ())
     {
-      d_cachepos (dir) = 0;
-      if (wincap.has_buggy_restart_scan () && isremote ())
-	{
-	  /* This works around a W2K bug.  The RestartScan parameter in calls
-	     to NtQueryDirectoryFile on remote shares is ignored, thus
-	     resulting in not being able to rewind on remote shares.  By
-	     reopening the directory, we get a fresh new directory pointer. */
-	  UNICODE_STRING fname = {0, CYG_MAX_PATH * 2, (WCHAR *) L""};
-	  OBJECT_ATTRIBUTES attr;
-	  NTSTATUS status;
-	  IO_STATUS_BLOCK io;
-	  HANDLE new_dir;
+      /* This works around a W2K bug.  The RestartScan parameter in calls
+	 to NtQueryDirectoryFile on remote shares is ignored, thus
+	 resulting in not being able to rewind on remote shares.  By
+	 reopening the directory, we get a fresh new directory pointer. */
+      UNICODE_STRING fname = {0, CYG_MAX_PATH * 2, (WCHAR *) L""};
+      OBJECT_ATTRIBUTES attr;
+      NTSTATUS status;
+      IO_STATUS_BLOCK io;
+      HANDLE new_dir;
 
-	  InitializeObjectAttributes (&attr, &fname, OBJ_CASE_INSENSITIVE,
-				      dir->__handle, NULL);
-	  status = NtOpenFile (&new_dir, SYNCHRONIZE | FILE_LIST_DIRECTORY,
-			       &attr, &io, wincap.shared (),
-			       FILE_SYNCHRONOUS_IO_NONALERT
-			       | FILE_OPEN_FOR_BACKUP_INTENT
-			       | FILE_DIRECTORY_FILE);
-	  if (!NT_SUCCESS (stat))
-	    debug_printf ("Unable to reopen dir %s, NT error: 0x%08x, "
-			  "win32: %lu", get_name (), status,
-			  RtlNtStatusToDosError (status));
-	  else
-	    {
-	      CloseHandle (dir->__handle);
-	      dir->__handle = new_dir;
-	    }
+      InitializeObjectAttributes (&attr, &fname, OBJ_CASE_INSENSITIVE,
+				  dir->__handle, NULL);
+      status = NtOpenFile (&new_dir, SYNCHRONIZE | FILE_LIST_DIRECTORY,
+			   &attr, &io, wincap.shared (),
+			   FILE_SYNCHRONOUS_IO_NONALERT
+			   | FILE_OPEN_FOR_BACKUP_INTENT
+			   | FILE_DIRECTORY_FILE);
+      if (!NT_SUCCESS (stat))
+	debug_printf ("Unable to reopen dir %s, NT error: 0x%08x, "
+		      "win32: %lu", get_name (), status,
+		      RtlNtStatusToDosError (status));
+      else
+	{
+	  CloseHandle (dir->__handle);
+	  dir->__handle = new_dir;
 	}
-    }
-  else if (dir->__handle != INVALID_HANDLE_VALUE)
-    {
-      if (dir->__handle)
-	FindClose (dir->__handle);
-      dir->__handle = INVALID_HANDLE_VALUE;
     }
   dir->__d_position = 0;
   d_mounts (dir)->rewind ();
@@ -2033,18 +1879,10 @@ fhandler_disk_file::closedir (DIR *dir)
       set_errno (EBADF);
       res = -1;
     }
-  else
+  else if (!NtClose (dir->__handle))
     {
-      BOOL winres;
-      if (wincap.is_winnt ())
-	winres = CloseHandle (dir->__handle);
-      else
-	winres = FindClose (dir->__handle);
-      if (!winres)
-	{
-	  __seterrno ();
-	  res = -1;
-	}
+      __seterrno ();
+      res = -1;
     }
   syscall_printf ("%d = closedir (%p, %s)", res, dir, get_name ());
   return res;

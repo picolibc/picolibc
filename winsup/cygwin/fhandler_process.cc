@@ -1,6 +1,6 @@
 /* fhandler_process.cc: fhandler for /proc/<pid> virtual filesystem
 
-   Copyright 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -515,9 +515,6 @@ fhandler_process::fill_filebuf ()
 static _off64_t
 format_process_maps (_pinfo *p, char *&destbuf, size_t maxsize)
 {
-  if (!wincap.is_winnt ())
-    return 0;
-
   HANDLE proc = OpenProcess (PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
 			     FALSE,
 			     p->dwProcessId);
@@ -637,86 +634,84 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
     state = 'Z';
   else if (p->process_state & PID_STOPPED)
     state = 'T';
-  else if (wincap.is_winnt ())
+  else
     state = get_process_state (p->dwProcessId);
   start_time = (GetTickCount () / 1000 - time (NULL) + p->start_time) * HZ;
-  if (wincap.is_winnt ())
+
+  NTSTATUS ret;
+  HANDLE hProcess;
+  VM_COUNTERS vmc;
+  KERNEL_USER_TIMES put;
+  PROCESS_BASIC_INFORMATION pbi;
+  QUOTA_LIMITS ql;
+  SYSTEM_TIME_OF_DAY_INFORMATION stodi;
+  SYSTEM_PROCESSOR_TIMES spt;
+  hProcess = OpenProcess (PROCESS_VM_READ | PROCESS_QUERY_INFORMATION,
+			  FALSE, p->dwProcessId);
+  if (hProcess != NULL)
     {
-      NTSTATUS ret;
-      HANDLE hProcess;
-      VM_COUNTERS vmc;
-      KERNEL_USER_TIMES put;
-      PROCESS_BASIC_INFORMATION pbi;
-      QUOTA_LIMITS ql;
-      SYSTEM_TIME_OF_DAY_INFORMATION stodi;
-      SYSTEM_PROCESSOR_TIMES spt;
-      hProcess = OpenProcess (PROCESS_VM_READ | PROCESS_QUERY_INFORMATION,
-			      FALSE, p->dwProcessId);
-      if (hProcess != NULL)
-	{
-	  ret = NtQueryInformationProcess (hProcess,
-					   ProcessVmCounters,
-					   (PVOID) &vmc,
-					   sizeof vmc, NULL);
-	  if (ret == STATUS_SUCCESS)
-	    ret = NtQueryInformationProcess (hProcess,
-					     ProcessTimes,
-					     (PVOID) &put,
-					     sizeof put, NULL);
-	  if (ret == STATUS_SUCCESS)
-	    ret = NtQueryInformationProcess (hProcess,
-					     ProcessBasicInformation,
-					     (PVOID) &pbi,
-					     sizeof pbi, NULL);
-	  if (ret == STATUS_SUCCESS)
-	    ret = NtQueryInformationProcess (hProcess,
-					     ProcessQuotaLimits,
-					     (PVOID) &ql,
-					     sizeof ql, NULL);
-	  CloseHandle (hProcess);
-	}
-      else
-	{
-	  DWORD error = GetLastError ();
-	  __seterrno_from_win_error (error);
-	  debug_printf ("OpenProcess: ret %d", error);
-	  return 0;
-	}
+      ret = NtQueryInformationProcess (hProcess,
+				       ProcessVmCounters,
+				       (PVOID) &vmc,
+				       sizeof vmc, NULL);
       if (ret == STATUS_SUCCESS)
-	ret = NtQuerySystemInformation (SystemTimeOfDayInformation,
-					(PVOID) &stodi,
-					sizeof stodi, NULL);
+	ret = NtQueryInformationProcess (hProcess,
+					 ProcessTimes,
+					 (PVOID) &put,
+					 sizeof put, NULL);
       if (ret == STATUS_SUCCESS)
-	ret = NtQuerySystemInformation (SystemProcessorTimes,
-					(PVOID) &spt,
-					sizeof spt, NULL);
-      if (ret != STATUS_SUCCESS)
-	{
-	  __seterrno_from_nt_status (ret);
-	  debug_printf ("NtQueryInformationProcess: ret %d, Dos(ret) %E", ret);
-	  return 0;
-	}
-      fault_count = vmc.PageFaultCount;
-      utime = put.UserTime.QuadPart * HZ / 10000000ULL;
-      stime = put.KernelTime.QuadPart * HZ / 10000000ULL;
-#if 0
-       if (stodi.CurrentTime.QuadPart > put.CreateTime.QuadPart)
-	 start_time = (spt.KernelTime.QuadPart + spt.UserTime.QuadPart -
-		       stodi.CurrentTime.QuadPart + put.CreateTime.QuadPart) * HZ / 10000000ULL;
-       else
-	 /*
-	  * sometimes stodi.CurrentTime is a bit behind
-	  * Note: some older versions of procps are broken and can't cope
-	  * with process start times > time(NULL).
-	  */
-	 start_time = (spt.KernelTme.QuadPart + spt.UserTime.QuadPart) * HZ / 10000000ULL;
-#endif
-      priority = pbi.BasePriority;
-      unsigned page_size = getsystempagesize ();
-      vmsize = vmc.PagefileUsage;
-      vmrss = vmc.WorkingSetSize / page_size;
-      vmmaxrss = ql.MaximumWorkingSetSize / page_size;
+	ret = NtQueryInformationProcess (hProcess,
+					 ProcessBasicInformation,
+					 (PVOID) &pbi,
+					 sizeof pbi, NULL);
+      if (ret == STATUS_SUCCESS)
+	ret = NtQueryInformationProcess (hProcess,
+					 ProcessQuotaLimits,
+					 (PVOID) &ql,
+					 sizeof ql, NULL);
+      CloseHandle (hProcess);
     }
+  else
+    {
+      DWORD error = GetLastError ();
+      __seterrno_from_win_error (error);
+      debug_printf ("OpenProcess: ret %d", error);
+      return 0;
+    }
+  if (ret == STATUS_SUCCESS)
+    ret = NtQuerySystemInformation (SystemTimeOfDayInformation,
+				    (PVOID) &stodi,
+				    sizeof stodi, NULL);
+  if (ret == STATUS_SUCCESS)
+    ret = NtQuerySystemInformation (SystemProcessorTimes,
+				    (PVOID) &spt,
+				    sizeof spt, NULL);
+  if (ret != STATUS_SUCCESS)
+    {
+      __seterrno_from_nt_status (ret);
+      debug_printf ("NtQueryInformationProcess: ret %d, Dos(ret) %E", ret);
+      return 0;
+    }
+  fault_count = vmc.PageFaultCount;
+  utime = put.UserTime.QuadPart * HZ / 10000000ULL;
+  stime = put.KernelTime.QuadPart * HZ / 10000000ULL;
+#if 0
+   if (stodi.CurrentTime.QuadPart > put.CreateTime.QuadPart)
+     start_time = (spt.KernelTime.QuadPart + spt.UserTime.QuadPart -
+		   stodi.CurrentTime.QuadPart + put.CreateTime.QuadPart) * HZ / 10000000ULL;
+   else
+     /*
+      * sometimes stodi.CurrentTime is a bit behind
+      * Note: some older versions of procps are broken and can't cope
+      * with process start times > time(NULL).
+      */
+     start_time = (spt.KernelTme.QuadPart + spt.UserTime.QuadPart) * HZ / 10000000ULL;
+#endif
+  priority = pbi.BasePriority;
+  unsigned page_size = getsystempagesize ();
+  vmsize = vmc.PagefileUsage;
+  vmrss = vmc.WorkingSetSize / page_size;
+  vmmaxrss = ql.MaximumWorkingSetSize / page_size;
 
   return __small_sprintf (destbuf, "%d (%s) %c "
 				   "%d %d %d %d %d "
@@ -767,7 +762,7 @@ format_process_status (_pinfo *p, char *destbuf, size_t maxsize)
     state = 'Z';
   else if (p->process_state & PID_STOPPED)
     state = 'T';
-  else if (wincap.is_winnt ())
+  else
     state = get_process_state (p->dwProcessId);
   switch (state)
     {
@@ -788,14 +783,12 @@ format_process_status (_pinfo *p, char *destbuf, size_t maxsize)
       state_str = "stopped";
       break;
     }
-  if (wincap.is_winnt ())
-    {
-      if (!get_mem_values (p->dwProcessId, &vmsize, &vmrss, &vmtext, &vmdata, &vmlib, &vmshare))
-	return 0;
-      unsigned page_size = getsystempagesize ();
-      vmsize *= page_size; vmrss *= page_size; vmdata *= page_size;
-      vmtext *= page_size; vmlib *= page_size;
-    }
+  if (!get_mem_values (p->dwProcessId, &vmsize, &vmrss, &vmtext, &vmdata,
+		       &vmlib, &vmshare))
+    return 0;
+  unsigned page_size = getsystempagesize ();
+  vmsize *= page_size; vmrss *= page_size; vmdata *= page_size;
+  vmtext *= page_size; vmlib *= page_size;
   // The real uid value for *this* process is stored at cygheap->user.real_uid
   // but we can't get at the real uid value for any other process, so
   // just fake it as p->uid. Similar for p->gid.
@@ -823,7 +816,8 @@ format_process_status (_pinfo *p, char *destbuf, size_t maxsize)
 			  p->ppid,
 			  p->uid, p->uid, p->uid, p->uid,
 			  p->gid, p->gid, p->gid, p->gid,
-			  vmsize >> 10, 0, vmrss >> 10, vmdata >> 10, 0, vmtext >> 10, vmlib >> 10,
+			  vmsize >> 10, 0, vmrss >> 10, vmdata >> 10, 0,
+			  vmtext >> 10, vmlib >> 10,
 			  0, 0, p->getsigmask ()
 			  );
 }
@@ -833,15 +827,11 @@ format_process_statm (_pinfo *p, char *destbuf, size_t maxsize)
 {
   unsigned long vmsize = 0UL, vmrss = 0UL, vmtext = 0UL, vmdata = 0UL,
 		vmlib = 0UL, vmshare = 0UL;
-  if (wincap.is_winnt ())
-    {
-      if (!get_mem_values (p->dwProcessId, &vmsize, &vmrss, &vmtext, &vmdata,
-			   &vmlib, &vmshare))
-	return 0;
-    }
+  if (!get_mem_values (p->dwProcessId, &vmsize, &vmrss, &vmtext, &vmdata,
+		       &vmlib, &vmshare))
+    return 0;
   return __small_sprintf (destbuf, "%ld %ld %ld %ld %ld %ld %ld",
-			  vmsize, vmrss, vmshare, vmtext, vmlib, vmdata, 0
-			  );
+			  vmsize, vmrss, vmshare, vmtext, vmlib, vmdata, 0);
 }
 
 static int

@@ -479,34 +479,32 @@ format_proc_uptime (char *destbuf, size_t maxsize)
 {
   unsigned long long uptime = 0ULL, idle_time = 0ULL;
 
-  if (wincap.is_winnt ())
+  NTSTATUS ret;
+  SYSTEM_BASIC_INFORMATION sbi;
+
+  ret = NtQuerySystemInformation (SystemBasicInformation, (PVOID) &sbi,
+				  sizeof sbi, NULL);
+  if (!NT_SUCCESS (ret))
     {
-      NTSTATUS ret;
-      SYSTEM_BASIC_INFORMATION sbi;
-
-      ret = NtQuerySystemInformation (SystemBasicInformation, (PVOID) &sbi,
-				      sizeof sbi, NULL);
-      if (!NT_SUCCESS (ret))
-	{
-	  __seterrno_from_nt_status (ret);
-	  debug_printf ("NtQuerySystemInformation: ret %d, Dos(ret) %E", ret);
-	  sbi.NumberProcessors = 1;
-	}
-
-      SYSTEM_PROCESSOR_TIMES spt[sbi.NumberProcessors];
-      ret = NtQuerySystemInformation (SystemProcessorTimes, (PVOID) spt,
-				      sizeof spt[0] * sbi.NumberProcessors,
-				      NULL);
-      if (NT_SUCCESS (ret))
-	for (int i = 0; i < sbi.NumberProcessors; i++)
-	  {
-	    uptime += (spt[i].KernelTime.QuadPart + spt[i].UserTime.QuadPart)
-		      / 100000ULL;
-	    idle_time += spt[i].IdleTime.QuadPart / 100000ULL;
-	  }
-      uptime /= sbi.NumberProcessors;
-      idle_time /= sbi.NumberProcessors;
+      __seterrno_from_nt_status (ret);
+      debug_printf ("NtQuerySystemInformation: ret %d, Dos(ret) %E", ret);
+      sbi.NumberProcessors = 1;
     }
+
+  SYSTEM_PROCESSOR_TIMES spt[sbi.NumberProcessors];
+  ret = NtQuerySystemInformation (SystemProcessorTimes, (PVOID) spt,
+				  sizeof spt[0] * sbi.NumberProcessors,
+				  NULL);
+  if (NT_SUCCESS (ret))
+    for (int i = 0; i < sbi.NumberProcessors; i++)
+      {
+	uptime += (spt[i].KernelTime.QuadPart + spt[i].UserTime.QuadPart)
+		  / 100000ULL;
+	idle_time += spt[i].IdleTime.QuadPart / 100000ULL;
+      }
+  uptime /= sbi.NumberProcessors;
+  idle_time /= sbi.NumberProcessors;
+
   if (!uptime)
     uptime = GetTickCount () / 10;
 
@@ -523,86 +521,75 @@ format_proc_stat (char *destbuf, size_t maxsize)
   time_t boot_time = 0;
 
   char *eobuf = destbuf;
-  if (!wincap.is_winnt ())
-    eobuf += __small_sprintf (destbuf, "cpu %U %U %U %U\n", 0ULL, 0ULL, 0ULL, 0ULL);
-  else
+  NTSTATUS ret;
+  SYSTEM_PERFORMANCE_INFORMATION spi;
+  SYSTEM_TIME_OF_DAY_INFORMATION stodi;
+
+  SYSTEM_BASIC_INFORMATION sbi;
+  if ((ret = NtQuerySystemInformation (SystemBasicInformation,
+				       (PVOID) &sbi, sizeof sbi, NULL))
+      != STATUS_SUCCESS)
     {
-      NTSTATUS ret;
-      SYSTEM_PERFORMANCE_INFORMATION spi;
-      SYSTEM_TIME_OF_DAY_INFORMATION stodi;
-
-      SYSTEM_BASIC_INFORMATION sbi;
-      if ((ret = NtQuerySystemInformation (SystemBasicInformation,
-					   (PVOID) &sbi, sizeof sbi, NULL))
-	  != STATUS_SUCCESS)
-	{
-	  __seterrno_from_nt_status (ret);
-	  debug_printf ("NtQuerySystemInformation: ret %d, Dos(ret) %E", ret);
-	  sbi.NumberProcessors = 1;
-	}
-
-      SYSTEM_PROCESSOR_TIMES spt[sbi.NumberProcessors];
-      ret = NtQuerySystemInformation (SystemProcessorTimes, (PVOID) spt,
-				      sizeof spt[0] * sbi.NumberProcessors, NULL);
-      interrupt_count = 0;
-      if (ret == STATUS_SUCCESS)
-	{
-	  unsigned long long user_time = 0ULL, kernel_time = 0ULL, idle_time = 0ULL;
-	  for (int i = 0; i < sbi.NumberProcessors; i++)
-	    {
-	      kernel_time += (spt[i].KernelTime.QuadPart - spt[i].IdleTime.QuadPart) * HZ / 10000000ULL;
-	      user_time += spt[i].UserTime.QuadPart * HZ / 10000000ULL;
-	      idle_time += spt[i].IdleTime.QuadPart * HZ / 10000000ULL;
-	    }
-
-	  eobuf += __small_sprintf (eobuf, "cpu %U %U %U %U\n",
-				    user_time, 0ULL, kernel_time, idle_time);
-	  user_time = 0ULL, kernel_time = 0ULL, idle_time = 0ULL;
-	  for (int i = 0; i < sbi.NumberProcessors; i++)
-	    {
-	      interrupt_count += spt[i].InterruptCount;
-	      kernel_time = (spt[i].KernelTime.QuadPart - spt[i].IdleTime.QuadPart) * HZ / 10000000ULL;
-	      user_time = spt[i].UserTime.QuadPart * HZ / 10000000ULL;
-	      idle_time = spt[i].IdleTime.QuadPart * HZ / 10000000ULL;
-	      eobuf += __small_sprintf (eobuf, "cpu%d %U %U %U %U\n", i,
-					user_time, 0ULL, kernel_time, idle_time);
-	    }
-
-	  ret = NtQuerySystemInformation (SystemPerformanceInformation,
-					  (PVOID) &spi, sizeof spi, NULL);
-	}
-      if (ret == STATUS_SUCCESS)
-	ret = NtQuerySystemInformation (SystemTimeOfDayInformation,
-					(PVOID) &stodi,
-					sizeof stodi, NULL);
-      if (ret != STATUS_SUCCESS)
-	{
-	  __seterrno_from_nt_status (ret);
-	  debug_printf("NtQuerySystemInformation: ret %d, Dos(ret) %E", ret);
-	  return 0;
-	}
-      pages_in = spi.PagesRead;
-      pages_out = spi.PagefilePagesWritten + spi.MappedFilePagesWritten;
-      /*
-       * Note: there is no distinction made in this structure between pages
-       * read from the page file and pages read from mapped files, but there
-       * is such a distinction made when it comes to writing. Goodness knows
-       * why. The value of swap_in, then, will obviously be wrong but its our
-       * best guess.
-       */
-      swap_in = spi.PagesRead;
-      swap_out = spi.PagefilePagesWritten;
-      context_switches = spi.ContextSwitches;
-      boot_time = to_time_t ((FILETIME *) &stodi.BootTime.QuadPart);
+      __seterrno_from_nt_status (ret);
+      debug_printf ("NtQuerySystemInformation: ret %d, Dos(ret) %E", ret);
+      sbi.NumberProcessors = 1;
     }
+
+  SYSTEM_PROCESSOR_TIMES spt[sbi.NumberProcessors];
+  ret = NtQuerySystemInformation (SystemProcessorTimes, (PVOID) spt,
+				  sizeof spt[0] * sbi.NumberProcessors, NULL);
+  interrupt_count = 0;
+  if (ret == STATUS_SUCCESS)
+    {
+      unsigned long long user_time = 0ULL, kernel_time = 0ULL, idle_time = 0ULL;
+      for (int i = 0; i < sbi.NumberProcessors; i++)
+	{
+	  kernel_time += (spt[i].KernelTime.QuadPart - spt[i].IdleTime.QuadPart)
+			 * HZ / 10000000ULL;
+	  user_time += spt[i].UserTime.QuadPart * HZ / 10000000ULL;
+	  idle_time += spt[i].IdleTime.QuadPart * HZ / 10000000ULL;
+	}
+
+      eobuf += __small_sprintf (eobuf, "cpu %U %U %U %U\n",
+				user_time, 0ULL, kernel_time, idle_time);
+      user_time = 0ULL, kernel_time = 0ULL, idle_time = 0ULL;
+      for (int i = 0; i < sbi.NumberProcessors; i++)
+	{
+	  interrupt_count += spt[i].InterruptCount;
+	  kernel_time = (spt[i].KernelTime.QuadPart - spt[i].IdleTime.QuadPart) * HZ / 10000000ULL;
+	  user_time = spt[i].UserTime.QuadPart * HZ / 10000000ULL;
+	  idle_time = spt[i].IdleTime.QuadPart * HZ / 10000000ULL;
+	  eobuf += __small_sprintf (eobuf, "cpu%d %U %U %U %U\n", i,
+				    user_time, 0ULL, kernel_time, idle_time);
+	}
+
+      ret = NtQuerySystemInformation (SystemPerformanceInformation,
+				      (PVOID) &spi, sizeof spi, NULL);
+    }
+  if (ret == STATUS_SUCCESS)
+    ret = NtQuerySystemInformation (SystemTimeOfDayInformation,
+				    (PVOID) &stodi,
+				    sizeof stodi, NULL);
+  if (ret != STATUS_SUCCESS)
+    {
+      __seterrno_from_nt_status (ret);
+      debug_printf("NtQuerySystemInformation: ret %d, Dos(ret) %E", ret);
+      return 0;
+    }
+  pages_in = spi.PagesRead;
+  pages_out = spi.PagefilePagesWritten + spi.MappedFilePagesWritten;
   /*
-   * else
-   *   {
-   * There are only two relevant performance counters on Windows 95/98/me,
-   * VMM/cPageIns and VMM/cPageOuts. The extra effort needed to read these
-   * counters is by no means worth it.
-   *   }
+   * Note: there is no distinction made in this structure between pages
+   * read from the page file and pages read from mapped files, but there
+   * is such a distinction made when it comes to writing. Goodness knows
+   * why. The value of swap_in, then, will obviously be wrong but its our
+   * best guess.
    */
+  swap_in = spi.PagesRead;
+  swap_out = spi.PagefilePagesWritten;
+  context_switches = spi.ContextSwitches;
+  boot_time = to_time_t ((FILETIME *) &stodi.BootTime.QuadPart);
+
   eobuf += __small_sprintf (eobuf, "page %u %u\n"
 				   "swap %u %u\n"
 				   "intr %u\n"
@@ -697,29 +684,26 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	  bufptr += __small_sprintf (bufptr, "vendor_id       : %s\n", szBuffer);
 	  read_value ("Identifier", REG_SZ);
 	  bufptr += __small_sprintf (bufptr, "identifier      : %s\n", szBuffer);
-	  if (wincap.is_winnt ())
-	    {
-	      read_value ("~Mhz", REG_DWORD);
-	      bufptr += __small_sprintf (bufptr, "cpu MHz         : %u\n", *(DWORD *) szBuffer);
+	  read_value ("~Mhz", REG_DWORD);
+	  bufptr += __small_sprintf (bufptr, "cpu MHz         : %u\n", *(DWORD *) szBuffer);
 
-	      print ("flags           :");
-	      if (IsProcessorFeaturePresent (PF_3DNOW_INSTRUCTIONS_AVAILABLE))
-		print (" 3dnow");
-	      if (IsProcessorFeaturePresent (PF_COMPARE_EXCHANGE_DOUBLE))
-		print (" cx8");
-	      if (!IsProcessorFeaturePresent (PF_FLOATING_POINT_EMULATED))
-		print (" fpu");
-	      if (IsProcessorFeaturePresent (PF_MMX_INSTRUCTIONS_AVAILABLE))
-		print (" mmx");
-	      if (IsProcessorFeaturePresent (PF_PAE_ENABLED))
-		print (" pae");
-	      if (IsProcessorFeaturePresent (PF_RDTSC_INSTRUCTION_AVAILABLE))
-		print (" tsc");
-	      if (IsProcessorFeaturePresent (PF_XMMI_INSTRUCTIONS_AVAILABLE))
-		print (" sse");
-	      if (IsProcessorFeaturePresent (PF_XMMI64_INSTRUCTIONS_AVAILABLE))
-		print (" sse2");
-	    }
+	  print ("flags           :");
+	  if (IsProcessorFeaturePresent (PF_3DNOW_INSTRUCTIONS_AVAILABLE))
+	    print (" 3dnow");
+	  if (IsProcessorFeaturePresent (PF_COMPARE_EXCHANGE_DOUBLE))
+	    print (" cx8");
+	  if (!IsProcessorFeaturePresent (PF_FLOATING_POINT_EMULATED))
+	    print (" fpu");
+	  if (IsProcessorFeaturePresent (PF_MMX_INSTRUCTIONS_AVAILABLE))
+	    print (" mmx");
+	  if (IsProcessorFeaturePresent (PF_PAE_ENABLED))
+	    print (" pae");
+	  if (IsProcessorFeaturePresent (PF_RDTSC_INSTRUCTION_AVAILABLE))
+	    print (" tsc");
+	  if (IsProcessorFeaturePresent (PF_XMMI_INSTRUCTIONS_AVAILABLE))
+	    print (" sse");
+	  if (IsProcessorFeaturePresent (PF_XMMI64_INSTRUCTIONS_AVAILABLE))
+	    print (" sse2");
 	}
       else
 	{
@@ -736,13 +720,10 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	  else if (!strcmp ((char*)vendor_id, "GenuineIntel"))
 	    is_intel = true;
 
-	  bufptr += __small_sprintf (bufptr, "vendor_id       : %s\n", (char *)vendor_id);
-	  unsigned cpu_mhz  = 0;
-	  if (wincap.is_winnt ())
-	    {
-	      read_value ("~Mhz", REG_DWORD);
-	      cpu_mhz = *(DWORD *)szBuffer;
-	    }
+	  bufptr += __small_sprintf (bufptr, "vendor_id       : %s\n",
+				     (char *)vendor_id);
+	  read_value ("~Mhz", REG_DWORD);
+	  unsigned cpu_mhz = *(DWORD *)szBuffer;
 	  if (maxf >= 1)
 	    {
 	      unsigned features2, features1, extra_info, cpuid_sig;
@@ -778,9 +759,12 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	      if (maxe >= 0x80000004)
 		{
 		  unsigned *model_name = (unsigned *) szBuffer;
-		  cpuid (&model_name[0], &model_name[1], &model_name[2], &model_name[3], 0x80000002);
-		  cpuid (&model_name[4], &model_name[5], &model_name[6], &model_name[7], 0x80000003);
-		  cpuid (&model_name[8], &model_name[9], &model_name[10], &model_name[11], 0x80000004);
+		  cpuid (&model_name[0], &model_name[1], &model_name[2],
+			 &model_name[3], 0x80000002);
+		  cpuid (&model_name[4], &model_name[5], &model_name[6],
+			 &model_name[7], 0x80000003);
+		  cpuid (&model_name[8], &model_name[9], &model_name[10],
+			 &model_name[11], 0x80000004);
 		  model_name[12] = 0;
 		}
 	      else
@@ -788,50 +772,26 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 		  // could implement a lookup table here if someone needs it
 		  strcpy (szBuffer, "unknown");
 		}
-	      if (wincap.is_winnt ())
-		{
-		  bufptr += __small_sprintf (bufptr, "type            : %s\n"
-						     "cpu family      : %d\n"
-						     "model           : %d\n"
-						     "model name      : %s\n"
-						     "stepping        : %d\n"
-						     "brand id        : %d\n"
-						     "cpu count       : %d\n"
-						     "apic id         : %d\n"
-						     "cpu MHz         : %d\n"
-						     "fpu             : %s\n",
-					     type_str,
-					     family,
-					     model,
-					     szBuffer + strspn (szBuffer, " 	"),
-					     stepping,
-					     brand_id,
-					     cpu_count,
-					     apic_id,
-					     cpu_mhz,
-					     (features1 & (1 << 0)) ? "yes" : "no");
-		}
-	      else
-		{
-		  bufptr += __small_sprintf (bufptr, "type            : %s\n"
-						     "cpu family      : %d\n"
-						     "model           : %d\n"
-						     "model name      : %s\n"
-						     "stepping        : %d\n"
-						     "brand id        : %d\n"
-						     "cpu count       : %d\n"
-						     "apic id         : %d\n"
-						     "fpu             : %s\n",
-					     type_str,
-					     family,
-					     model,
-					     szBuffer,
-					     stepping,
-					     brand_id,
-					     cpu_count,
-					     apic_id,
-					     (features1 & (1 << 0)) ? "yes" : "no");
-		}
+	      bufptr += __small_sprintf (bufptr, "type            : %s\n"
+						 "cpu family      : %d\n"
+						 "model           : %d\n"
+						 "model name      : %s\n"
+						 "stepping        : %d\n"
+						 "brand id        : %d\n"
+						 "cpu count       : %d\n"
+						 "apic id         : %d\n"
+						 "cpu MHz         : %d\n"
+						 "fpu             : %s\n",
+					 type_str,
+					 family,
+					 model,
+					 szBuffer + strspn (szBuffer, " 	"),
+					 stepping,
+					 brand_id,
+					 cpu_count,
+					 apic_id,
+					 cpu_mhz,
+					 (features1 & (1 << 0)) ? "yes" : "no");
 	      print ("flags           :");
 	      if (features1 & (1 << 0))
 		print (" fpu");
@@ -935,7 +895,7 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 		    }
 		}
 	    }
-	  else if (wincap.is_winnt ())
+	  else
 	    {
 	      bufptr += __small_sprintf (bufptr, "cpu MHz         : %d\n"
 						 "fpu             : %s\n",
@@ -960,9 +920,6 @@ format_proc_partitions (char *destbuf, size_t maxsize)
 {
   char *bufptr = destbuf;
   print ("major minor  #blocks  name\n\n");
-
-  if (!wincap.is_winnt ())
-    return bufptr - destbuf;
 
   char devname[CYG_MAX_PATH];
   OBJECT_ATTRIBUTES attr;

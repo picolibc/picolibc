@@ -1,7 +1,7 @@
 /* registry.cc: registry interface
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006 Red Hat, Inc.
+   2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -215,9 +215,8 @@ get_registry_hive_path (const char *name, char *path)
 
   if (!name || !path)
     return NULL;
-  __small_sprintf (key, "SOFTWARE\\Microsoft\\Windows%s\\CurrentVersion\\ProfileList\\",
-		   wincap.is_winnt ()?" NT":"");
-  strcat (key, name);
+  __small_sprintf (key, "SOFTWARE\\Microsoft\\WindowsNT\\CurrentVersion\\"
+  			"ProfileList\\%s", name);
   if (!RegOpenKeyExA (HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hkey))
     {
       char buf[256];
@@ -253,10 +252,7 @@ load_registry_hive (const char * name)
     }
   if (get_registry_hive_path (name, path))
     {
-      if (wincap.is_winnt ())
-	strcat (path, "\\NTUSER.DAT");
-      else
-	strcat (path, "\\USER.DAT");
+      strcat (path, "\\NTUSER.DAT");
       if ((ret = RegLoadKeyA (HKEY_USERS, name, path)) != ERROR_SUCCESS)
 	debug_printf ("Loading user registry hive for %s failed: %d", name, ret);
     }

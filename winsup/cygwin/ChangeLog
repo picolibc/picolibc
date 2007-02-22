@@ -1,3 +1,50 @@
+2007-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_IMPORTS): Add libntdll.a.
+	* autoload.cc: Remove all symbols from advapi32.dll, kernel32.dll and
+	ntdll.dll available on all platforms since NT4.
+	
+	Throughout remove all usage of wincap.is_winnt.
+	* dcrt0.cc (dll_crt0_0): Remove call to mmap_init.
+	* fhandler.h (class fhandler_base): Remove has_changed flag.
+	(fhandler_disk_file::touch_ctime): Remove declaration.
+	(fhandler_disk_file::readdir_9x): Ditto.
+	(fhandler_disk_file::touch_ctime): Remove.
+	(fhandler_disk_file::readdir_9x): Remove.
+	(fhandler_disk_file::closedir): Call NtClose instead of CloseHandle.
+	* mmap.cc: Throughout call CreateMapping and MapView directly.
+	(VirtualProt9x): Remove.
+	(VirtualProtNT): Remove.
+	(VirtualProtEx9x): Remove.
+	(VirtualProtExNT): Remove.
+	(VirtualProtect): Remove define.
+	(VirtualProtectEx): Remove define.
+	(CreateMapping9x): Remove.
+	(CreateMappingNT): Rename to CreateMapping.
+	(MapView9x): Remove.
+	(MapViewNT): Rename to MapView.
+	(struct mmap_func_t): Remove definition.
+	(mmap_funcs_9x): Remove.
+	(mmap_funcs_nt): Remove.
+	(mmap_func): Remove.
+	(mmap_init): Remove.
+	* net.cc (getdomainname): Drop comment. Use NT4 registry key only.
+	(get_95_ifconf): Remove.
+	* pinfo.cc (winpids::enumNT): Rename to winpids::enum_processes.
+	(winpids::enum9x): Remove.
+	(winpids::set): Just call enum_processes directly.
+	(winpids::enum_init): Ditto.
+	* pinfo.h (class winpids): Drop enum_processes pointer.  Rename
+	enumNT to enum_processes.  Drop enum9x declaration.  Drop initialization
+	of enum_processes throughout.
+	* registry.cc (get_registry_hive_path): Just create NT key.
+	(load_registry_hive): Only load NT specific file.
+	* syscalls.cc (unlink_9x): Remove.
+	(unlink): Just call unlink_nt.
+	* wincap.cc: Remove is_winnt flag throughout.
+	* wincap.h: Ditto.
+	* winsup.h: Remove mmap_init declaration.
+
 2007-02-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* wincap.cc (wincap_unknown): Change settings for unknown to reflect

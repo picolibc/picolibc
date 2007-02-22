@@ -507,8 +507,7 @@ loop:
 			  TRUE,		/* inherit handles from parent */
 			  c_flags,
 			  envblock,	/* environment */
-			  wincap.is_winnt () || real_path.iscygexec () ?
-			  NULL : cygheap->cwd.win32,
+			  NULL,
 			  &si,
 			  &pi);
     }
@@ -543,8 +542,7 @@ loop:
 		       TRUE,		/* inherit handles from parent */
 		       c_flags,
 		       envblock,	/* environment */
-		       wincap.is_winnt () || real_path.iscygexec () ?
-		       NULL : cygheap->cwd.win32,
+		       NULL,
 		       &si,
 		       &pi);
     }

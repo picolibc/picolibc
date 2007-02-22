@@ -1,7 +1,7 @@
 /* pinfo.cc: process table support
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006 Red Hat, Inc.
+   2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1204,7 +1204,7 @@ out:
 }
 
 DWORD
-winpids::enumNT (bool winpid)
+winpids::enum_processes (bool winpid)
 {
   static DWORD szprocs;
   static SYSTEM_PROCESSES *procs;
@@ -1243,38 +1243,11 @@ winpids::enumNT (bool winpid)
   return nelem;
 }
 
-DWORD
-winpids::enum9x (bool winpid)
-{
-  DWORD nelem = 0;
-
-  HANDLE h = CreateToolhelp32Snapshot (TH32CS_SNAPPROCESS, 0);
-  if (!h)
-    {
-      system_printf ("Couldn't create process snapshot, %E");
-      return 0;
-    }
-
-  PROCESSENTRY32 proc;
-  proc.dwSize = sizeof (proc);
-
-  if (Process32First (h, &proc))
-    do
-      {
-	if (proc.th32ProcessID)
-	  add (nelem, winpid, proc.th32ProcessID);
-      }
-    while (Process32Next (h, &proc));
-
-  CloseHandle (h);
-  return nelem;
-}
-
 void
 winpids::set (bool winpid)
 {
   __malloc_lock ();
-  npids = (this->*enum_processes) (winpid);
+  npids = enum_processes (winpid);
   if (pidlist)
     pidlist[npids] = 0;
   __malloc_unlock ();
@@ -1283,12 +1256,7 @@ winpids::set (bool winpid)
 DWORD
 winpids::enum_init (bool winpid)
 {
-  if (wincap.is_winnt ())
-    enum_processes = &winpids::enumNT;
-  else
-    enum_processes = &winpids::enum9x;
-
-  return (this->*enum_processes) (winpid);
+  return enum_processes (winpid);
 }
 
 void

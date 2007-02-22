@@ -152,121 +152,9 @@ gen_access (DWORD openflags, int flags)
   return ret;
 }
 
-/* OS specific wrapper functions for map/section functions. */
-static BOOL
-VirtualProt9x (PVOID addr, SIZE_T len, DWORD prot, PDWORD oldprot)
-{
-  if (addr >= (caddr_t)0x80000000 && addr <= (caddr_t)0xBFFFFFFF)
-    return TRUE; /* FAKEALARM! */
-  return VirtualProtect (addr, len, prot, oldprot);
-}
-
-static BOOL
-VirtualProtNT (PVOID addr, SIZE_T len, DWORD prot, PDWORD oldprot)
-{
-  return VirtualProtect (addr, len, prot, oldprot);
-}
-
-static BOOL
-VirtualProtEx9x (HANDLE parent, PVOID addr, SIZE_T len, DWORD prot,
-		 PDWORD oldprot)
-{
-  if (addr >= (caddr_t)0x80000000 && addr <= (caddr_t)0xBFFFFFFF)
-    return TRUE; /* FAKEALARM! */
-  return VirtualProtectEx (parent, addr, len, prot, oldprot);
-}
-static BOOL
-VirtualProtExNT (HANDLE parent, PVOID addr, SIZE_T len, DWORD prot,
-		 PDWORD oldprot)
-{
-  return VirtualProtectEx (parent, addr, len, prot, oldprot);
-}
-
-/* This allows to stay lazy about VirtualProtect usage in subsequent code. */
-#define VirtualProtect(a,l,p,o) (mmap_func->VirtualProt((a),(l),(p),(o)))
-#define VirtualProtectEx(h,a,l,p,o) (mmap_func->VirtualProtEx((h),(a),(l),(p),(o)))
-
 static HANDLE
-CreateMapping9x (HANDLE fhdl, size_t len, _off64_t off, DWORD openflags,
-		 int prot, int flags, const char *name)
-{
-  HANDLE h;
-  DWORD high, low;
-
-  DWORD protect = gen_create_protect (openflags, flags);
-
-  /* copy-on-write doesn't work properly on 9x with real files.  While the
-     changes are not propagated to the file, they are visible to other
-     processes sharing the same file mapping object.  Workaround: Don't
-     use named file mapping.  That should work since sharing file
-     mappings only works reliable using named file mapping on 9x.
-
-     On 9x/ME try first to open the mapping by name when opening a
-     shared file object. This is needed since 9x/ME only shares objects
-     between processes by name. What a mess... */
-
-  if (fhdl != INVALID_HANDLE_VALUE && !priv (flags))
-    {
-      /* Grrr, the whole stuff is just needed to try to get a reliable
-	 mapping of the same file. Even that uprising isn't bullet
-	 proof but it does it's best... */
-      char namebuf[CYG_MAX_PATH];
-      cygwin_conv_to_full_posix_path (name, namebuf);
-      for (int i = strlen (namebuf) - 1; i >= 0; --i)
-	namebuf[i] = cyg_tolower (namebuf [i]);
-
-      debug_printf ("named sharing");
-      DWORD access = gen_access (openflags, flags);
-      /* Different access modes result in incompatible mappings.  So we
-	 create different maps per access mode by using different names. */
-      switch (access)
-	{
-	  case FILE_MAP_READ:
-	    namebuf[0] = 'R';
-	    break;
-	  case FILE_MAP_WRITE:
-	    namebuf[0] = 'W';
-	    break;
-	  case FILE_MAP_COPY:
-	    namebuf[0] = 'C';
-	    break;
-	}
-      if (!(h = OpenFileMapping (access, TRUE, namebuf)))
-	h = CreateFileMapping (fhdl, &sec_none, protect, 0, 0, namebuf);
-    }
-  else if (fhdl == INVALID_HANDLE_VALUE)
-    {
-      /* Standard anonymous mapping needs non-zero len. */
-      h = CreateFileMapping (fhdl, &sec_none, protect, 0, len, NULL);
-    }
-  else if (autogrow (flags))
-    {
-      high = (off + len) >> 32;
-      low = (off + len) & UINT32_MAX;
-      /* Auto-grow only works if the protection is PAGE_READWRITE.  So,
-	 first we call CreateFileMapping with PAGE_READWRITE, then, if the
-	 requested protection is different, we close the mapping and
-	 reopen it again with the correct protection, if auto-grow worked. */
-      h = CreateFileMapping (fhdl, &sec_none, PAGE_READWRITE,
-			     high, low, NULL);
-      if (h && protect != PAGE_READWRITE)
-	{
-	  CloseHandle (h);
-	  h = CreateFileMapping (fhdl, &sec_none, protect,
-				 high, low, NULL);
-	}
-    }
-  else
-    {
-      /* Zero len creates mapping for whole file. */
-      h = CreateFileMapping (fhdl, &sec_none, protect, 0, 0, NULL);
-    }
-  return h;
-}
-
-static HANDLE
-CreateMappingNT (HANDLE fhdl, size_t len, _off64_t off, DWORD openflags,
-		 int prot, int flags, const char *)
+CreateMapping (HANDLE fhdl, size_t len, _off64_t off, DWORD openflags,
+	       int prot, int flags, const char *)
 {
   HANDLE h;
   NTSTATUS ret;
@@ -318,36 +206,8 @@ CreateMappingNT (HANDLE fhdl, size_t len, _off64_t off, DWORD openflags,
 }
 
 void *
-MapView9x (HANDLE h, void *addr, size_t len, DWORD openflags,
-	   int prot, int flags, _off64_t off)
-{
-  DWORD high = off >> 32;
-  DWORD low = off & UINT32_MAX;
-  DWORD access = gen_access (openflags, flags);
-  void *base;
-
-  /* Try mapping using the given address first, even if it's NULL.
-     If it failed, and addr was not NULL and flags is not MAP_FIXED,
-     try again with NULL address.
-
-     Note: Retrying the mapping might be unnecessary, now that mmap64 checks
-	   for a valid memory area first. */
-  if (!addr)
-    base = MapViewOfFile (h, access, high, low, len);
-  else
-    {
-      base = MapViewOfFileEx (h, access, high, low, len, addr);
-      if (!base && !fixed (flags))
-	base = MapViewOfFile (h, access, high, low, len);
-    }
-  debug_printf ("%x = MapViewOfFileEx (h:%x, access:%x, 0, off:%D, "
-		"len:%u, addr:%x)", base, h, access, off, len, addr);
-  return base;
-}
-
-void *
-MapViewNT (HANDLE h, void *addr, size_t len, DWORD openflags,
-	   int prot, int flags, _off64_t off)
+MapView (HANDLE h, void *addr, size_t len, DWORD openflags,
+	 int prot, int flags, _off64_t off)
 {
   NTSTATUS ret;
   LARGE_INTEGER offset = { QuadPart:off };
@@ -380,39 +240,6 @@ MapViewNT (HANDLE h, void *addr, size_t len, DWORD openflags,
   debug_printf ("%x = NtMapViewOfSection (h:%x, addr:%x, len:%u, off:%D, "
 		"protect:%x, type:%x)", base, h, addr, len, off, protect, 0);
   return base;
-}
-
-struct mmap_func_t
-{
-  HANDLE (*CreateMapping)(HANDLE, size_t, _off64_t, DWORD, int, int,
-			  const char *);
-  void * (*MapView)(HANDLE, void *, size_t, DWORD, int, int, _off64_t);
-  BOOL	 (*VirtualProt)(PVOID, SIZE_T, DWORD, PDWORD);
-  BOOL	 (*VirtualProtEx)(HANDLE, PVOID, SIZE_T, DWORD, PDWORD);
-};
-
-mmap_func_t mmap_funcs_9x =
-{
-  CreateMapping9x,
-  MapView9x,
-  VirtualProt9x,
-  VirtualProtEx9x
-};
-
-mmap_func_t mmap_funcs_nt =
-{
-  CreateMappingNT,
-  MapViewNT,
-  VirtualProtNT,
-  VirtualProtExNT
-};
-
-mmap_func_t *mmap_func;
-
-void
-mmap_init ()
-{
-  mmap_func = wincap.is_winnt () ? &mmap_funcs_nt : &mmap_funcs_9x;
 }
 
 /* Class structure used to keep a record of all current mmap areas
@@ -1082,50 +909,25 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 	  goto out;
 	}
 
-      /* On 9x you can't create mappings with PAGE_WRITECOPY protection if
-	 the file isn't explicitely opened with WRITE access. */
-      if (!wincap.is_winnt () && priv (flags)
-	  && !(fh->get_access () & GENERIC_WRITE))
+      /* You can't create mappings with PAGE_EXECUTE protection if
+	 the file isn't explicitely opened with EXECUTE access. */
+      HANDLE h = CreateFile (fh->get_win32_name (),
+			     fh->get_access () | GENERIC_EXECUTE,
+			     wincap.shared (), &sec_none_nih,
+			     OPEN_EXISTING, 0, NULL);
+      if (h != INVALID_HANDLE_VALUE)
 	{
-	  HANDLE h = CreateFile (fh->get_win32_name (),
-				 fh->get_access () | GENERIC_WRITE,
-				 wincap.shared (), &sec_none_nih,
-				 OPEN_EXISTING, 0, NULL);
-	  if (h == INVALID_HANDLE_VALUE)
-	    {
-	      set_errno (EACCES);
-	      goto out;
-	    }
 	  fh_disk_file.set_io_handle (h);
-	  fh_disk_file.set_access (fh->get_access () | GENERIC_WRITE);
-	  path_conv pc;
-	  pc.set_name (fh->get_win32_name (), "");
-	  fh_disk_file.set_name (pc);
+	  fh_disk_file.set_access (fh->get_access () | GENERIC_EXECUTE);
 	  fh = &fh_disk_file;
 	}
-
-      /* On NT you can't create mappings with PAGE_EXECUTE protection if
-	 the file isn't explicitely opened with EXECUTE access. */
-      if (wincap.is_winnt ())
+      else if (prot & PROT_EXEC)
 	{
-	  HANDLE h = CreateFile (fh->get_win32_name (),
-				 fh->get_access () | GENERIC_EXECUTE,
-				 wincap.shared (), &sec_none_nih,
-				 OPEN_EXISTING, 0, NULL);
-	  if (h != INVALID_HANDLE_VALUE)
-	    {
-	      fh_disk_file.set_io_handle (h);
-	      fh_disk_file.set_access (fh->get_access () | GENERIC_EXECUTE);
-	      fh = &fh_disk_file;
-	    }
-	  else if (prot & PROT_EXEC)
-	    {
-	      /* TODO: To be or not to be... I'm opting for refusing this
-		 mmap request rather than faking it, but that might break
-		 some non-portable code. */
-	      set_errno (EACCES);
-	      goto out;
-	    }
+	  /* TODO: To be or not to be... I'm opting for refusing this
+	     mmap request rather than faking it, but that might break
+	     some non-portable code. */
+	  set_errno (EACCES);
+	  goto out;
 	}
 
       if (fh->fstat (&st))
@@ -1759,8 +1561,8 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
     }
   else
     {
-      h = mmap_func->CreateMapping (get_handle (), len, off, get_access (),
-				    prot, flags, get_win32_name ());
+      h = CreateMapping (get_handle (), len, off, get_access (),
+			 prot, flags, get_win32_name ());
       if (!h)
 	{
 	  __seterrno ();
@@ -1768,7 +1570,7 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
 	  return INVALID_HANDLE_VALUE;
 	}
 
-      base = mmap_func->MapView (h, *addr, len, get_access(), prot, flags, off);
+      base = MapView (h, *addr, len, get_access(), prot, flags, off);
       if (!base || (fixed (flags) && base != *addr))
 	{
 	  if (!base)
@@ -1822,8 +1624,7 @@ fhandler_dev_zero::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
       base = VirtualAlloc (address, size, alloc_type, PAGE_READWRITE);
     }
   else
-    base = mmap_func->MapView (h, address, size, get_access (),
-			       prot, flags, offset);
+    base = MapView (h, address, size, get_access (), prot, flags, offset);
   if (base != address)
     {
       MEMORY_BASIC_INFORMATION m;
@@ -1840,8 +1641,8 @@ HANDLE
 fhandler_disk_file::mmap (caddr_t *addr, size_t len, int prot,
 			  int flags, _off64_t off)
 {
-  HANDLE h = mmap_func->CreateMapping (get_handle (), len, off, get_access (),
-				       prot, flags, get_win32_name ());
+  HANDLE h = CreateMapping (get_handle (), len, off, get_access (),
+			    prot, flags, get_win32_name ());
   if (!h)
     {
       __seterrno ();
@@ -1849,8 +1650,7 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, int prot,
       return INVALID_HANDLE_VALUE;
     }
 
-  void *base = mmap_func->MapView (h, *addr, len, get_access (),
-				   prot, flags, off);
+  void *base = MapView (h, *addr, len, get_access (), prot, flags, off);
   if (!base || (fixed (flags) && base != *addr))
     {
       if (!base)
@@ -1894,8 +1694,7 @@ fhandler_disk_file::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
 					   void *address)
 {
   /* Re-create the map */
-  void *base = mmap_func->MapView (h, address, size, get_access (),
-				   prot, flags, offset);
+  void *base = MapView (h, address, size, get_access (), prot, flags, offset);
   if (base != address)
     {
       MEMORY_BASIC_INFORMATION m;
@@ -1947,8 +1746,8 @@ fhandler_dev_mem::mmap (caddr_t *addr, size_t len, int prot,
       return INVALID_HANDLE_VALUE;
     }
 
-  void *base = MapViewNT (h, *addr, len, get_access (),
-			  prot, flags | MAP_ANONYMOUS, off);
+  void *base = MapView (h, *addr, len, get_access (), prot,
+  			flags | MAP_ANONYMOUS, off);
   if (!base || (fixed (flags) && base != *addr))
     {
       if (!base)
@@ -1991,8 +1790,8 @@ fhandler_dev_mem::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
 					 _off64_t offset, DWORD size,
 					 void *address)
 {
-  void *base = MapViewNT (h, address, size, get_access (), prot,
-			  flags | MAP_ANONYMOUS, offset);
+  void *base = MapView (h, address, size, get_access (), prot,
+			flags | MAP_ANONYMOUS, offset);
   if (base != address)
     {
       MEMORY_BASIC_INFORMATION m;

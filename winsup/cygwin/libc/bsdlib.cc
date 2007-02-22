@@ -53,15 +53,6 @@ daemon (int nochdir, int noclose)
       case -1:
 	return -1;
       case 0:
-	if (!wincap.is_winnt ())
-	  {
-	    /* Register as service under 9x/Me which allows to close
-	       the parent window with the daemon still running.
-	       This function only exists on 9x/Me and is autoloaded
-	       so it fails silently on NT. */
-	    DWORD WINAPI RegisterServiceProcess (DWORD, DWORD);
-	    RegisterServiceProcess (0, 1);
-	  }
 	break;
       default:
 	/* This sleep avoids a race condition which kills the

@@ -1,7 +1,7 @@
 /* shared.cc: shared data area support.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006 Red Hat, Inc.
+   2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -114,8 +114,7 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
 				       FILE_MAP_READ|FILE_MAP_WRITE,
 				       0, 0, 0, NULL);
 #ifdef DEBUGGING
-      if (wincap.is_winnt ())
-	system_printf ("relocating shared object %s(%d) from %p to %p on Windows NT", name, n, addr, shared);
+      system_printf ("relocating shared object %s(%d) from %p to %p on Windows NT", name, n, addr, shared);
 #endif
       offsets[0] = 0;
     }

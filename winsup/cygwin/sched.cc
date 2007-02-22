@@ -1,6 +1,6 @@
 /* sched.cc: scheduler interface for Cygwin
 
-   Copyright 2001, 2002, 2006  Red Hat, Inc.
+   Copyright 2001, 2002, 2006, 2007 Red Hat, Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -269,12 +269,6 @@ sched_rr_get_interval (pid_t pid, struct timespec *interval)
   DWORD forprocid;
   int vfindex, slindex, qindex, prisep;
   long nsec;
-
-  if (!wincap.is_winnt ())
-    {
-      set_errno (ESRCH);
-      return -1;
-    }
 
   forwin = GetForegroundWindow ();
   if (!forwin)

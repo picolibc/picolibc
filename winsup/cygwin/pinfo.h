@@ -1,6 +1,6 @@
 /* pinfo.h: process table info
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -207,21 +207,18 @@ class winpids
   DWORD *pidlist;
   pinfo *pinfolist;
   DWORD pinfo_access;		// access type for pinfo open
-  DWORD (winpids::* enum_processes) (bool winpid);
+  DWORD enum_processes (bool winpid);
   DWORD enum_init (bool winpid);
-  DWORD enumNT (bool winpid);
-  DWORD enum9x (bool winpid);
   void add (DWORD& nelem, bool, DWORD pid);
 public:
   DWORD npids;
   inline void reset () { release (); npids = 0;}
   void set (bool winpid);
-  winpids (): make_copy (true), enum_processes (&winpids::enum_init) {}
-  winpids (int): make_copy (false), npidlist (0), pidlist (NULL), pinfolist (NULL),
-		 pinfo_access (0), enum_processes (&winpids::enum_init), npids (0) {}
-  winpids (DWORD acc): make_copy (false), npidlist (0), pidlist (NULL), pinfolist (NULL),
-		 pinfo_access (acc), enum_processes (&winpids::enum_init),
-		 npids (0)
+  winpids (): make_copy (true) {}
+  winpids (int): make_copy (false), npidlist (0), pidlist (NULL),
+		 pinfolist (NULL), pinfo_access (0), npids (0) {}
+  winpids (DWORD acc): make_copy (false), npidlist (0), pidlist (NULL),
+		       pinfolist (NULL), pinfo_access (acc), npids (0)
   {
     set (0);
   }

@@ -1076,13 +1076,6 @@ cygwin_send (int fd, const void *buf, size_t len, int flags)
 extern "C" int
 getdomainname (char *domain, size_t len)
 {
-  /*
-   * This works for Win95 only if the machine is configured to use MS-TCP.
-   * If a third-party TCP is being used this will fail.
-   * FIXME: On Win95, is there a way to portably check the TCP stack
-   * in use and include paths for the Domain name in each ?
-   * Punt for now and assume MS-TCP on Win95.
-   */
   sig_dispatch_pending ();
   myfault efault;
   if (efault.faulted (EFAULT))
@@ -1099,16 +1092,11 @@ getdomainname (char *domain, size_t len)
       return 0;
     }
 
-  /* This is only used by Win95 and NT <=  4.0.
-     The registry names are language independent.
-     FIXME: Handle DHCP on Win95. The DhcpDomain(s) may be available
-     in ..VxD\DHCP\DhcpInfoXX\OptionInfo, RFC 1533 format */
-
+  /* This is only used by NT4.
+     The registry names are language independent. */
   reg_key r (HKEY_LOCAL_MACHINE, KEY_READ,
-	     (!wincap.is_winnt ()) ? "System" : "SYSTEM",
-	     "CurrentControlSet", "Services",
-	     (!wincap.is_winnt ()) ? "VxD" : "Tcpip",
-	     (!wincap.is_winnt ()) ? "MSTCP" : "Parameters", NULL);
+	     "SYSTEM", "CurrentControlSet", "Services",
+	     "Tcpip", "Parameters", NULL);
 
   if (!r.error ())
     {
@@ -1834,177 +1822,6 @@ get_nt_ifconf (struct ifconf *ifc, int what)
   ifc->ifc_len = cnt * sizeof (struct ifreq);
 }
 
-/*
- * IFCONF Windows 95:
- * HKLM/Enum/Network/MSTCP/"*"
- *	  -> Value "Driver" enthält Subkey relativ zu
- *	    HKLM/System/CurrentControlSet/Class/
- *	  -> In Subkey "Bindings" die Values aufzählen
- *	    -> Enthält Subkeys der Form "VREDIR\*"
- *	       Das * ist ein Subkey relativ zu
- *	       HKLM/System/CurrentControlSet/Class/Net/
- * HKLM/System/CurrentControlSet/Class/"Driver"
- *	  -> Value "IPAddress"
- *	  -> Value "IPMask"
- * HKLM/System/CurrentControlSet/Class/Net/"*"(aus "VREDIR\*")
- *	  -> Wenn Value "AdapterName" == "MS$PPP" -> ppp interface
- *	  -> Value "DriverDesc" enthält den Namen
- *
- */
-static void
-get_95_ifconf (struct ifconf *ifc, int what)
-{
-  HKEY key;
-  unsigned long lip, lnp;
-  struct sockaddr_in *sa = NULL;
-  struct sockaddr *so = NULL;
-  FILETIME update;
-  LONG res;
-  DWORD size;
-  int cnt = 1;
-  char ifname[256];
-  char eth[2] = "/";
-  char ppp[2] = "/";
-
-  /* Union maps buffer to correct struct */
-  struct ifreq *ifr = ifc->ifc_req;
-
-  if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, "Enum\\Network\\MSTCP",
-		    0, KEY_READ, &key) != ERROR_SUCCESS)
-    {
-      /* Set the correct length */
-      ifc->ifc_len = cnt * sizeof (struct ifreq);
-      return;
-    }
-
-  for (int i = 0;
-       (res = RegEnumKeyEx (key, i, ifname,
-			    (size = sizeof ifname, &size),
-			    0, 0, 0, &update)) != ERROR_NO_MORE_ITEMS;
-       ++i)
-    {
-      HKEY ifkey, subkey;
-      char driver[256], classname[256], netname[256];
-      char adapter[256], ip[256], np[256];
-
-      if (res != ERROR_SUCCESS
-	  || RegOpenKeyEx (key, ifname, 0, KEY_READ, &ifkey) != ERROR_SUCCESS)
-	continue;
-
-      if (RegQueryValueEx (ifkey, "Driver", 0,
-			   NULL, (unsigned char *) driver,
-			   (size = sizeof driver, &size)) != ERROR_SUCCESS)
-	{
-	  RegCloseKey (ifkey);
-	  continue;
-	}
-
-      strcpy (classname, "System\\CurrentControlSet\\Services\\Class\\");
-      strcat (classname, driver);
-      if ((res = RegOpenKeyEx (HKEY_LOCAL_MACHINE, classname,
-			       0, KEY_READ, &subkey)) != ERROR_SUCCESS)
-	{
-	  RegCloseKey (ifkey);
-	  continue;
-	}
-
-      if (RegQueryValueEx (subkey, "IPAddress", 0,
-			   NULL, (unsigned char *) ip,
-			   (size = sizeof ip, &size)) == ERROR_SUCCESS
-	  && RegQueryValueEx (subkey, "IPMask", 0,
-			      NULL, (unsigned char *) np,
-			      (size = sizeof np, &size)) == ERROR_SUCCESS)
-	{
-	  if ((caddr_t) ++ifr > ifc->ifc_buf
-	      + ifc->ifc_len - sizeof (struct ifreq))
-	    goto out;
-
-	  switch (what)
-	    {
-	      case SIOCGIFFLAGS:
-		ifr->ifr_flags = IFF_UP | IFF_RUNNING | IFF_BROADCAST;
-		break;
-	      case SIOCGIFCONF:
-	      case SIOCGIFADDR:
-		sa = (struct sockaddr_in *) &ifr->ifr_addr;
-		sa->sin_addr.s_addr = cygwin_inet_addr (ip);
-		sa->sin_family = AF_INET;
-		sa->sin_port = 0;
-		break;
-	      case SIOCGIFBRDADDR:
-		lip = cygwin_inet_addr (ip);
-		lnp = cygwin_inet_addr (np);
-		sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
-		sa->sin_addr.s_addr = lip & lnp | ~lnp;
-		sa->sin_family = AF_INET;
-		sa->sin_port = 0;
-		break;
-	      case SIOCGIFNETMASK:
-		sa = (struct sockaddr_in *) &ifr->ifr_netmask;
-		sa->sin_addr.s_addr = cygwin_inet_addr (np);
-		sa->sin_family = AF_INET;
-		sa->sin_port = 0;
-		break;
-	      case SIOCGIFHWADDR:
-		so = &ifr->ifr_hwaddr;
-		memset (so->sa_data, 0, IFHWADDRLEN);
-		so->sa_family = AF_INET;
-		break;
-	      case SIOCGIFMETRIC:
-		ifr->ifr_metric = 1;
-		break;
-	      case SIOCGIFMTU:
-		ifr->ifr_mtu = 1500;
-		break;
-	      case SIOCGIFINDEX:
-		ifr->ifr_ifindex = -1;
-		break;
-	    }
-	}
-
-      RegCloseKey (subkey);
-
-      strcpy (netname, "System\\CurrentControlSet\\Services\\Class\\Net\\");
-      strcat (netname, ifname);
-
-      if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, netname,
-			0, KEY_READ, &subkey) != ERROR_SUCCESS)
-	{
-	  RegCloseKey (ifkey);
-	  --ifr;
-	  continue;
-	}
-
-      if (RegQueryValueEx (subkey, "AdapterName", 0,
-			   NULL, (unsigned char *) adapter,
-			   (size = sizeof adapter, &size)) == ERROR_SUCCESS
-	  && strcasematch (adapter, "MS$PPP"))
-	{
-	  ++*ppp;
-	  strcpy (ifr->ifr_name, "ppp");
-	  strcat (ifr->ifr_name, ppp);
-	}
-      else
-	{
-	  ++*eth;
-	  strcpy (ifr->ifr_name, "eth");
-	  strcat (ifr->ifr_name, eth);
-	}
-
-      RegCloseKey (subkey);
-      RegCloseKey (ifkey);
-
-      ++cnt;
-    }
-
-out:
-
-  RegCloseKey (key);
-
-  /* Set the correct length */
-  ifc->ifc_len = cnt * sizeof (struct ifreq);
-}
-
 int
 get_ifconf (SOCKET s, struct ifconf *ifc, int what)
 {
@@ -2081,10 +1898,8 @@ get_ifconf (SOCKET s, struct ifconf *ifc, int what)
     get_xp_ifconf (s, ifc, what);
   else if (wincap.has_ip_helper_lib ())
     get_2k_ifconf (ifc, what);
-  else if (wincap.is_winnt ())
-    get_nt_ifconf (ifc, what);
   else
-    get_95_ifconf (ifc, what);
+    get_nt_ifconf (ifc, what);
   return 0;
 }
 

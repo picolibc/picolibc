@@ -1,6 +1,6 @@
 /* cygheap.h: Cygwin heap manager.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -208,10 +208,7 @@ public:
   }
   char * get_windows_id (char * buf)
   {
-    if (wincap.is_winnt ())
-      return effec_cygsid.string (buf);
-    else
-      return strcpy (buf, name ());
+    return effec_cygsid.string (buf);
   }
 
   const char *test_uid (char *&, const char *, size_t)

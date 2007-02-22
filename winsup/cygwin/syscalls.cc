@@ -231,14 +231,6 @@ try_to_bin (path_conv &win32_path, HANDLE h)
 		  recycler, status);
 }
 
-static DWORD
-unlink_9x (path_conv &win32_name)
-{
-  BOOL ret = DeleteFile (win32_name);
-  syscall_printf ("DeleteFile %s", ret ? "succeeded" : "failed");
-  return GetLastError ();
-}
-
 DWORD
 unlink_nt (path_conv &win32_name, bool setattrs)
 {
@@ -344,6 +336,7 @@ unlink (const char *ourname)
 {
   int res = -1;
   DWORD devn;
+  DWORD lasterr;
 
   path_conv win32_name (ourname, PC_SYM_NOFOLLOW,
 			transparent_exe ? stat_suffixes : NULL);
@@ -391,9 +384,7 @@ unlink (const char *ourname)
 					| FILE_ATTRIBUTE_HIDDEN));
     }
 
-  DWORD lasterr;
-  lasterr = wincap.is_winnt () ? unlink_nt (win32_name, setattrs)
-			       : unlink_9x (win32_name);
+  lasterr = unlink_nt (win32_name, setattrs);
   if (!lasterr)
     res = 0;
   else
@@ -1172,7 +1163,7 @@ sync ()
 	  FindVolumeClose (sh);
 	}
     }
-  else if (wincap.is_winnt ())	/* 9x has no concept for opening volumes */
+  else
     {
       DWORD drives = GetLogicalDrives ();
       DWORD mask = 1;

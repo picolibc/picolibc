@@ -579,9 +579,6 @@ done:
 int
 fhandler_base::open (int flags, mode_t mode)
 {
-  if (!wincap.is_winnt ())
-    return fhandler_base::open_9x (flags, mode);
-
   WCHAR wpath[CYG_MAX_PATH + 10];
   UNICODE_STRING upath = {0, sizeof (wpath), wpath};
   pc.get_nt_native_path (upath);
