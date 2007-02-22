@@ -17,7 +17,6 @@ struct wincaps
   DWORD    chunksize;
   DWORD    heapslop;
   unsigned is_server                                    : 1;
-  unsigned access_denied_on_delete                      : 1;
   unsigned has_delete_on_close                          : 1;
   unsigned has_page_guard                               : 1;
   unsigned has_security                                 : 1;
@@ -97,7 +96,6 @@ public:
   DWORD IMPLEMENT (chunksize)
   DWORD IMPLEMENT (heapslop)
   bool  IMPLEMENT (is_server)
-  bool  IMPLEMENT (access_denied_on_delete)
   bool  IMPLEMENT (has_delete_on_close)
   bool  IMPLEMENT (has_page_guard)
   bool  IMPLEMENT (has_security)

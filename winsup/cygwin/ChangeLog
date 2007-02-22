@@ -1,5 +1,15 @@
 2007-02-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	Throughout remove all usage of wincap.access_denied_on_delete.
+	* dir.cc (rmdir): Add existance check to be errno-compatible with Linux.
+	* fhandler_disk_file.cc (fhandler_disk_file::rmdir): Drop test for
+	non-existent dir on 9x share.
+	* syscalls.cc (unlink): Add comment.
+	* wincap.cc: Remove access_denied_on_delete flag throughout.
+	* wincap.h: Ditto.
+
+2007-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::closedir): Fix bug
 	introduced by switching to NtClose.
 

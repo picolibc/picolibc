@@ -309,6 +309,8 @@ rmdir (const char *dir)
     }
   else if (has_dot_last_component (dir, false))
     set_errno (fh->exists () ? EINVAL : ENOENT);
+  else if (!fh->exists ())
+    set_errno (ENOENT);
   else if (!fh->rmdir ())
     res = 0;
 

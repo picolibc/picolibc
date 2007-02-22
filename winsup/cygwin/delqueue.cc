@@ -1,6 +1,6 @@
 /* delqueue.cc
 
-   Copyright 1996, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1998, 1999, 2000, 2001, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -86,9 +86,7 @@ delqueue_list::process_queue ()
 	  {
 	    int res = GetLastError ();
 	    empty = 0;
-	    if (res == ERROR_SHARING_VIOLATION ||
-		(wincap.access_denied_on_delete ()
-		 && res == ERROR_ACCESS_DENIED))
+	    if (res == ERROR_SHARING_VIOLATION)
 	      {
 		/* File still inuse, that's ok */
 		syscall_printf ("Still using %s", name[i]);

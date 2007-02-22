@@ -392,11 +392,8 @@ unlink (const char *ourname)
     {
       SetFileAttributes (win32_name, (DWORD) win32_name);
 
-      /* Windows 9x seems to report ERROR_ACCESS_DENIED rather than sharing
-	 violation. */
-      if ((wincap.access_denied_on_delete () && lasterr == ERROR_ACCESS_DENIED
-	   && !win32_name.isremote ())
-	  || lasterr == ERROR_SHARING_VIOLATION)
+      /* FIXME: Can we get rid of the delqueue now? */
+      if (lasterr == ERROR_SHARING_VIOLATION)
 	{
 	  /* Add file to the "to be deleted" queue. */
 	  syscall_printf ("Sharing violation, couldn't delete file");
@@ -1443,14 +1440,7 @@ rename (const char *oldpath, const char *newpath)
       /* Since neither MoveFileEx(MOVEFILE_REPLACE_EXISTING) nor DeleteFile
 	 allow to remove directories, this case is handled separately. */
       if (!RemoveDirectoryA (real_new))
-	{
-	  syscall_printf ("Can't remove target directory");
-	  /* On 9X ERROR_ACCESS_DENIED is returned if you try to remove
-	     a non-empty directory. */
-	  if (GetLastError () == ERROR_ACCESS_DENIED
-	      && wincap.access_denied_on_delete ())
-	    SetLastError (ERROR_DIR_NOT_EMPTY);
-	}
+	syscall_printf ("Can't remove target directory");
       else if (MoveFile (real_old, real_new))
 	res = 0;
     }
