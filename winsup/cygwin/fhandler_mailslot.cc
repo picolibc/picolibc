@@ -79,7 +79,8 @@ fhandler_mailslot::open (int flags, mode_t mode)
 	      __seterrno ();
 	      break;
 	    }
-	  x = CreateFile (get_win32_name (), GENERIC_READ, wincap.shared (),
+	  x = CreateFile (get_win32_name (), GENERIC_READ,
+			  FILE_SHARE_VALID_FLAGS,
 			  &sec_none, OPEN_EXISTING, 0, 0);
 #endif
 	  if (x == INVALID_HANDLE_VALUE)
@@ -102,7 +103,7 @@ fhandler_mailslot::open (int flags, mode_t mode)
 	  set_errno (EPERM);	/* As on Linux. */
 	  break;
 	}
-      x = CreateFile (get_win32_name (), GENERIC_WRITE, wincap.shared (),
+      x = CreateFile (get_win32_name (), GENERIC_WRITE, FILE_SHARE_VALID_FLAGS,
 		      &sec_none, OPEN_EXISTING, 0, 0);
       if (x == INVALID_HANDLE_VALUE)
 	{

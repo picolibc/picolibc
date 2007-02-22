@@ -1,6 +1,7 @@
 /* uinfo.cc: user info (uid, gid, etc...)
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+   2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -532,7 +533,7 @@ pwdgrp::load (const char *posix_fname)
     }
   else
     {
-      HANDLE fh = CreateFile (pc, GENERIC_READ, wincap.shared (), NULL,
+      HANDLE fh = CreateFile (pc, GENERIC_READ, FILE_SHARE_VALID_FLAGS, NULL,
 			      OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
       if (fh == INVALID_HANDLE_VALUE)
 	{

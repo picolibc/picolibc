@@ -913,7 +913,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 	 the file isn't explicitely opened with EXECUTE access. */
       HANDLE h = CreateFile (fh->get_win32_name (),
 			     fh->get_access () | GENERIC_EXECUTE,
-			     wincap.shared (), &sec_none_nih,
+			     FILE_SHARE_VALID_FLAGS, &sec_none_nih,
 			     OPEN_EXISTING, 0, NULL);
       if (h != INVALID_HANDLE_VALUE)
 	{

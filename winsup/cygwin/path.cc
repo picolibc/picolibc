@@ -4283,7 +4283,8 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
 	      if (wincap.can_open_directories ())
 		{
 		  HANDLE h = CreateFile (win32_cwd, FILE_TRAVERSE,
-					 wincap.shared (), NULL, OPEN_EXISTING,
+					 FILE_SHARE_VALID_FLAGS, NULL,
+					 OPEN_EXISTING,
 					 FILE_FLAG_BACKUP_SEMANTICS, NULL);
 		  if (h == INVALID_HANDLE_VALUE)
 		    {

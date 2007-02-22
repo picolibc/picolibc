@@ -1,5 +1,13 @@
 2007-02-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	Throughout replace all usage of wincap.shared with the constant
+	FILE_SHARE_VALID_FLAGS.
+	* fhandler.cc (fhandler_base::open_9x): Drop local variable shared.
+	* wincap.cc: Remove shared member throughout.
+	* wincap.h: Ditto.
+
+2007-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (DLL_IMPORTS): Add libntdll.a.
 	* autoload.cc: Remove all symbols from advapi32.dll, kernel32.dll and
 	ntdll.dll available on all platforms since NT4.

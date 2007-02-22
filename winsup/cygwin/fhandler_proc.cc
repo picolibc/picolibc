@@ -963,7 +963,7 @@ format_proc_partitions (char *destbuf, size_t maxsize)
       InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
 				  dirhdl, NULL);
       status = NtOpenFile (&devhdl, READ_CONTROL | FILE_READ_DATA, &attr, &io,
-			   wincap.shared (), 0);
+			   FILE_SHARE_VALID_FLAGS, 0);
       if (!NT_SUCCESS (status))
 	{
 	  /* Retry with READ_CONTROL only for non-privileged users.  This
@@ -972,7 +972,7 @@ format_proc_partitions (char *destbuf, size_t maxsize)
 	     a non-privileged user shouldn't get read access to the drive
 	     layout information. */
 	  status = NtOpenFile (&devhdl, READ_CONTROL, &attr, &io,
-			       wincap.shared (), 0);
+			       FILE_SHARE_VALID_FLAGS, 0);
 	  if (!NT_SUCCESS (status))
 	    {
 	      debug_printf ("NtOpenFile(%s) %x", devname, status);

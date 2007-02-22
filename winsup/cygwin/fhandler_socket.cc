@@ -82,8 +82,9 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 	  set_errno (EBADF);
 	  return 0;
 	}
-      HANDLE fh = CreateFile (pc, GENERIC_READ, wincap.shared (), &sec_none,
-			      OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+      HANDLE fh = CreateFile (pc, GENERIC_READ, FILE_SHARE_VALID_FLAGS,
+			      &sec_none, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
+			      0);
       if (fh == INVALID_HANDLE_VALUE)
 	{
 	  __seterrno ();

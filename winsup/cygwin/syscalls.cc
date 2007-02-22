@@ -283,7 +283,8 @@ unlink_nt (path_conv &win32_name, bool setattrs)
   if (status == STATUS_SHARING_VIOLATION)
     {
       move_to_bin = true;
-      status = NtOpenFile (&h, DELETE, &attr, &io, wincap.shared (), flags);
+      status = NtOpenFile (&h, DELETE, &attr, &io, FILE_SHARE_VALID_FLAGS,
+			   flags);
     }
   if (!NT_SUCCESS (status))
     {
@@ -1114,7 +1115,7 @@ EXPORT_ALIAS (fsync, fdatasync)
 static void
 sync_worker (const char *vol)
 {
-  HANDLE fh = CreateFileA (vol, GENERIC_WRITE, wincap.shared (),
+  HANDLE fh = CreateFileA (vol, GENERIC_WRITE, FILE_SHARE_VALID_FLAGS,
 			   &sec_none_nih, OPEN_EXISTING, 0, NULL);
   if (fh != INVALID_HANDLE_VALUE)
     {
@@ -1944,7 +1945,7 @@ statvfs (const char *fname, struct statvfs *sfs)
 	    {
 	      /* Quotas active.  We can't trust totalc. */
 	      HANDLE hdl = CreateFile (full_path, READ_CONTROL,
-				       wincap.shared (), &sec_none_nih,
+				       FILE_SHARE_VALID_FLAGS, &sec_none_nih,
 				       OPEN_EXISTING,
 				       FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	      if (hdl == INVALID_HANDLE_VALUE)

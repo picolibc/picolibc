@@ -1511,7 +1511,7 @@ fhandler_disk_file::opendir ()
 				      NULL, sa.lpSecurityDescriptor);
 	  status = NtOpenFile (&dir->__handle,
 			       SYNCHRONIZE | FILE_LIST_DIRECTORY,
-			       &attr, &io, wincap.shared (),
+			       &attr, &io, FILE_SHARE_VALID_FLAGS,
 			       FILE_SYNCHRONOUS_IO_NONALERT
 			       | FILE_OPEN_FOR_BACKUP_INTENT
 			       | FILE_DIRECTORY_FILE);
@@ -1639,9 +1639,10 @@ readdir_get_ino (DIR *dir, const char *path, bool dot_dot)
 	}
       else if (!pc.hasgood_inode ())
 	ino = hash_path_name (0, pc);
-      else if ((hdl = CreateFile (pc, GENERIC_READ, wincap.shared (), NULL,
-				  OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS,
-				  NULL)) != INVALID_HANDLE_VALUE)
+      else if ((hdl = CreateFile (pc, GENERIC_READ, FILE_SHARE_VALID_FLAGS,
+				  NULL, OPEN_EXISTING,
+				  FILE_FLAG_BACKUP_SEMANTICS, NULL))
+	       != INVALID_HANDLE_VALUE)
 	{
 	  ino = readdir_get_ino_by_handle (hdl);
 	  CloseHandle (hdl);
@@ -1776,7 +1777,8 @@ go_ahead:
 	      InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
 					  dir->__handle , NULL);
 	      if (!NtOpenFile (&hdl, READ_CONTROL, &attr, &io,
-			       wincap.shared (), FILE_OPEN_FOR_BACKUP_INTENT))
+			       FILE_SHARE_VALID_FLAGS,
+			       FILE_OPEN_FOR_BACKUP_INTENT))
 		{
 		  de->d_ino = readdir_get_ino_by_handle (hdl);
 		  CloseHandle (hdl);
@@ -1849,7 +1851,7 @@ fhandler_disk_file::rewinddir (DIR *dir)
       InitializeObjectAttributes (&attr, &fname, OBJ_CASE_INSENSITIVE,
 				  dir->__handle, NULL);
       status = NtOpenFile (&new_dir, SYNCHRONIZE | FILE_LIST_DIRECTORY,
-			   &attr, &io, wincap.shared (),
+			   &attr, &io, FILE_SHARE_VALID_FLAGS,
 			   FILE_SYNCHRONOUS_IO_NONALERT
 			   | FILE_OPEN_FOR_BACKUP_INTENT
 			   | FILE_DIRECTORY_FILE);

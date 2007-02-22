@@ -465,7 +465,6 @@ fhandler_base::open_9x (int flags, mode_t mode)
   int res = 0;
   HANDLE x;
   int file_attributes;
-  int shared;
   int creation_distribution;
   SECURITY_ATTRIBUTES sa = sec_none;
 
@@ -509,9 +508,6 @@ fhandler_base::open_9x (int flags, mode_t mode)
   if (flags & O_APPEND)
     append_mode (true);
 
-  /* These flags are host dependent. */
-  shared = wincap.shared ();
-
   file_attributes = FILE_ATTRIBUTE_NORMAL;
   if (flags & O_DIROPEN)
     file_attributes |= FILE_FLAG_BACKUP_SEMANTICS;
@@ -540,7 +536,7 @@ fhandler_base::open_9x (int flags, mode_t mode)
       pc.file_attributes (file_attributes & FILE_ATTRIBUTE_VALID_SET_FLAGS);
     }
 
-  x = CreateFile (get_win32_name (), access, shared, &sa, creation_distribution,
+  x = CreateFile (get_win32_name (), access, FILE_SHARE_VALID_FLAGS, &sa, creation_distribution,
 		  file_attributes, 0);
 
   if (x == INVALID_HANDLE_VALUE)
@@ -567,7 +563,7 @@ fhandler_base::open_9x (int flags, mode_t mode)
   set_open_status ();
 done:
   debug_printf ("%p = CreateFile (%s, %p, %p, %p, %p, %p, 0)",
-		x, get_win32_name (), access, shared, &sa,
+		x, get_win32_name (), access, FILE_SHARE_VALID_FLAGS, &sa,
 		creation_distribution, file_attributes);
 
   syscall_printf ("%d = fhandler_base::open (%s, %p)", res, get_win32_name (),
@@ -589,7 +585,7 @@ fhandler_base::open (int flags, mode_t mode)
   int res = 0;
   HANDLE x;
   ULONG file_attributes = 0;
-  ULONG shared = (get_major () == DEV_TAPE_MAJOR ? 0 : wincap.shared ());
+  ULONG shared = (get_major () == DEV_TAPE_MAJOR ? 0 : FILE_SHARE_VALID_FLAGS);
   ULONG create_disposition;
   ULONG create_options;
   SECURITY_ATTRIBUTES sa = sec_none;
