@@ -89,7 +89,6 @@ void help() __attribute__ ((noreturn));
 #endif /* __CYGWIN__ */
 
 #ifdef __CYGWIN__
-#define _POSIX2_LINE_MAX 255
 typedef int kvm_t;
 #define kvm_openfiles(a,b,c,d,e) NULL
 #define kvm_nlist(a,b) -1
