@@ -1,8 +1,8 @@
 2007-02-21  Patrick Mansfield <patmans@us.ibm.com>
 
-	* libgloss/spu/gettimeofday.c: New file which adds SPU gettimeofday.
-	* libgloss/spu/jsre.h: Remove time, add gettimeofday.
-	* libgloss/spu/Makefile.in: Ditto.
+	* spu/gettimeofday.c: New file which adds SPU gettimeofday.
+	* spu/jsre.h: Remove time, add gettimeofday.
+	* spu/Makefile.in: Ditto.
 
 2007-02-21  Hans-Peter Nilsson  <hp@axis.com>
 
