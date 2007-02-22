@@ -1281,49 +1281,38 @@ fhandler_disk_file::lock (int cmd, struct __flock64 *fl)
 
   BOOL res;
 
-  if (wincap.has_lock_file_ex ())
+  DWORD lock_flags = (cmd == F_SETLK) ? LOCKFILE_FAIL_IMMEDIATELY : 0;
+  lock_flags |= (fl->l_type == F_WRLCK) ? LOCKFILE_EXCLUSIVE_LOCK : 0;
+
+  OVERLAPPED ov;
+
+  ov.Internal = 0;
+  ov.InternalHigh = 0;
+  ov.Offset = off_low;
+  ov.OffsetHigh = off_high;
+  ov.hEvent = (HANDLE) 0;
+
+  if (fl->l_type == F_UNLCK)
     {
-      DWORD lock_flags = (cmd == F_SETLK) ? LOCKFILE_FAIL_IMMEDIATELY : 0;
-      lock_flags |= (fl->l_type == F_WRLCK) ? LOCKFILE_EXCLUSIVE_LOCK : 0;
-
-      OVERLAPPED ov;
-
-      ov.Internal = 0;
-      ov.InternalHigh = 0;
-      ov.Offset = off_low;
-      ov.OffsetHigh = off_high;
-      ov.hEvent = (HANDLE) 0;
-
-      if (fl->l_type == F_UNLCK)
-	{
-	  res = UnlockFileEx (get_handle (), 0, len_low, len_high, &ov);
-	  if (res == 0 && GetLastError () == ERROR_NOT_LOCKED)
-	    res = 1;
-	}
-      else
-	{
-	  res = LockFileEx (get_handle (), lock_flags, 0,
-			    len_low, len_high, &ov);
-	  /* Deal with the fail immediately case. */
-	  /*
-	   * FIXME !! I think this is the right error to check for
-	   * but I must admit I haven't checked....
-	   */
-	  if ((res == 0) && (lock_flags & LOCKFILE_FAIL_IMMEDIATELY) &&
-			    (GetLastError () == ERROR_LOCK_FAILED))
-	    {
-	      set_errno (EAGAIN);
-	      return -1;
-	    }
-	}
+      res = UnlockFileEx (get_handle (), 0, len_low, len_high, &ov);
+      if (res == 0 && GetLastError () == ERROR_NOT_LOCKED)
+	res = 1;
     }
   else
     {
-      /* Windows 95 -- use primitive lock call */
-      if (fl->l_type == F_UNLCK)
-	res = UnlockFile (get_handle (), off_low, off_high, len_low, len_high);
-      else
-	res = LockFile (get_handle (), off_low, off_high, len_low, len_high);
+      res = LockFileEx (get_handle (), lock_flags, 0,
+			len_low, len_high, &ov);
+      /* Deal with the fail immediately case. */
+      /*
+       * FIXME !! I think this is the right error to check for
+       * but I must admit I haven't checked....
+       */
+      if ((res == 0) && (lock_flags & LOCKFILE_FAIL_IMMEDIATELY) &&
+			(GetLastError () == ERROR_LOCK_FAILED))
+	{
+	  set_errno (EAGAIN);
+	  return -1;
+	}
     }
 
   if (res == 0)

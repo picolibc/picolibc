@@ -1,5 +1,23 @@
 2007-02-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::set_no_inheritance): Always use
+	SetHandleInformation.
+	* fhandler_disk_file.cc (fhandler_disk_file::lock): Always use
+	UnlockFileEx/LockFileEx functions.
+	* net.cc (fdsock): Don't bother to duplicate socket for inheritance.
+	* sysconf.cc (get_nproc_values): Take NT for granted.
+	(get_avphys): Ditto.
+	* syslog.cc (WIN95_EVENT_LOG_PATH): Remove define.
+	(get_win95_event_log_path): Remove.
+	(vsyslog): Fix formatting.  Take NT for granted.
+	* wincap.cc: Remove has_lock_file_ex, has_signal_object_and_wait,
+	has_eventlog, has_set_handle_information,
+	has_set_handle_information_on_console_handles and supports_smp
+	throughout.
+	* wincap.h: Ditto.
+
+2007-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dir.cc (rmdir): Move existance check in front of
 	has_dot_last_component check.  Simplify setting errno in latter case.
 

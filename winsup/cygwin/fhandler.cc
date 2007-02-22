@@ -1481,21 +1481,9 @@ fhandler_dev_null::open (int flags, mode_t mode)
 void
 fhandler_base::set_no_inheritance (HANDLE &h, bool not_inheriting)
 {
-  if (wincap.has_set_handle_information ())
-    {
-      if (!SetHandleInformation (h, HANDLE_FLAG_INHERIT, not_inheriting ? 0 : HANDLE_FLAG_INHERIT))
-	debug_printf ("SetHandleInformation failed, %E");
-    }
-  else
-    {
-      HANDLE oh = h;
-      if (!DuplicateHandle (hMainProc, oh, hMainProc, &h, 0, !not_inheriting,
-			    DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
-	debug_printf ("DuplicateHandle failed, %E");
-
-	if (oh != h)
-	  VerifyHandle (h);
-    }
+  if (!SetHandleInformation (h, HANDLE_FLAG_INHERIT,
+			     not_inheriting ? 0 : HANDLE_FLAG_INHERIT))
+    debug_printf ("SetHandleInformation failed, %E");
 #ifdef DEBUGGING_AND_FDS_PROTECTED
   if (h)
     setclexec (oh, h, not_inheriting);

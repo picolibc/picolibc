@@ -40,46 +40,32 @@ get_page_size (int in)
 static long
 get_nproc_values (int in)
 {
+  NTSTATUS ret;
+  SYSTEM_BASIC_INFORMATION sbi;
+  if ((ret = NtQuerySystemInformation (SystemBasicInformation, (PVOID) &sbi,
+				       sizeof sbi, NULL)) != STATUS_SUCCESS)
+    {
+      __seterrno_from_nt_status (ret);
+      debug_printf ("NtQuerySystemInformation: ret %d, Dos(ret) %E",
+		    ret);
+      return -1;
+    }
   switch (in)
     {
     case _SC_NPROCESSORS_CONF:
+      return sbi.NumberProcessors;
     case _SC_NPROCESSORS_ONLN:
-      if (!wincap.supports_smp ())
-	return 1;
-      /*FALLTHRU*/
+      {
+	int i = 0;
+	do
+	 if (sbi.ActiveProcessors & 1)
+	   i++;
+	while (sbi.ActiveProcessors >>= 1);
+	return i;
+      }
     case _SC_PHYS_PAGES:
-      if (wincap.supports_smp ())
-	{
-	  NTSTATUS ret;
-	  SYSTEM_BASIC_INFORMATION sbi;
-	  if ((ret = NtQuerySystemInformation (SystemBasicInformation,
-						 (PVOID) &sbi,
-					       sizeof sbi, NULL))
-		!= STATUS_SUCCESS)
-	    {
-	      __seterrno_from_nt_status (ret);
-	      debug_printf ("NtQuerySystemInformation: ret %d, Dos(ret) %E",
-			    ret);
-	      return -1;
-	    }
-	  switch (in)
-	    {
-	    case _SC_NPROCESSORS_CONF:
-	     return sbi.NumberProcessors;
-	    case _SC_NPROCESSORS_ONLN:
-	     {
-	       int i = 0;
-	       do
-		 if (sbi.ActiveProcessors & 1)
-		   i++;
-	       while (sbi.ActiveProcessors >>= 1);
-	       return i;
-	     }
-	    case _SC_PHYS_PAGES:
-	      return sbi.NumberOfPhysicalPages
-		     / (getpagesize () / getsystempagesize ());
-	    }
-	}
+      return sbi.NumberOfPhysicalPages
+	     / (getpagesize () / getsystempagesize ());
     }
   return -1;
 }
@@ -87,23 +73,18 @@ get_nproc_values (int in)
 static long
 get_avphys (int in)
 {
-  if (wincap.supports_smp ())
+  NTSTATUS ret;
+  SYSTEM_PERFORMANCE_INFORMATION spi;
+  if ((ret = NtQuerySystemInformation (SystemPerformanceInformation,
+				       (PVOID) &spi, sizeof spi, NULL))
+      != STATUS_SUCCESS)
     {
-      NTSTATUS ret;
-      SYSTEM_PERFORMANCE_INFORMATION spi;
-      if ((ret = NtQuerySystemInformation (SystemPerformanceInformation,
-					     (PVOID) &spi,
-					   sizeof spi, NULL))
-	    != STATUS_SUCCESS)
-	{
-	  __seterrno_from_nt_status (ret);
-	  debug_printf ("NtQuerySystemInformation: ret %d, Dos(ret) %E",
-			ret);
-	  return -1;
-	}
-      return spi.AvailablePages / (getpagesize () / getsystempagesize ());
+      __seterrno_from_nt_status (ret);
+      debug_printf ("NtQuerySystemInformation: ret %d, Dos(ret) %E",
+		    ret);
+      return -1;
     }
-  return -1;
+  return spi.AvailablePages / (getpagesize () / getsystempagesize ());
 }
 
 enum sc_type { nsup, cons, func };

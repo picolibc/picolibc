@@ -19,13 +19,7 @@ struct wincaps
   unsigned is_server                                    : 1;
   unsigned has_security                                 : 1;
   unsigned has_security_descriptor_control              : 1;
-  unsigned has_lock_file_ex                             : 1;
-  unsigned has_signal_object_and_wait                   : 1;
-  unsigned has_eventlog                                 : 1;
   unsigned has_ip_helper_lib                            : 1;
-  unsigned has_set_handle_information                   : 1;
-  unsigned has_set_handle_information_on_console_handles: 1;
-  unsigned supports_smp                                 : 1;
   unsigned map_view_of_file_ex_sucks                    : 1;
   unsigned altgr_is_ctrl_alt                            : 1;
   unsigned has_physical_mem_access                      : 1;
@@ -94,13 +88,7 @@ public:
   bool  IMPLEMENT (is_server)
   bool  IMPLEMENT (has_security)
   bool  IMPLEMENT (has_security_descriptor_control)
-  bool  IMPLEMENT (has_lock_file_ex)
-  bool  IMPLEMENT (has_signal_object_and_wait)
-  bool  IMPLEMENT (has_eventlog)
   bool  IMPLEMENT (has_ip_helper_lib)
-  bool  IMPLEMENT (has_set_handle_information)
-  bool  IMPLEMENT (has_set_handle_information_on_console_handles)
-  bool  IMPLEMENT (supports_smp)
   bool  IMPLEMENT (map_view_of_file_ex_sucks)
   bool  IMPLEMENT (altgr_is_ctrl_alt)
   bool  IMPLEMENT (has_physical_mem_access)

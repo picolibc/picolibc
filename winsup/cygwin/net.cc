@@ -501,16 +501,6 @@ cygwin_getprotobynumber (int number)
 bool
 fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
 {
-  /* NT systems apparently set sockets to inheritable by default */
-  if (!wincap.has_set_handle_information ()
-      && !DuplicateHandle (hMainProc, (HANDLE) soc,
-			   hMainProc, (HANDLE *) &soc,
-			   0, TRUE,
-			   DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
-    {
-      debug_printf ("set socket inheritance failed, %E");
-      return false;
-    }
   fd = build_fh_dev (*dev);
   if (!fd.isopen ())
     return false;
