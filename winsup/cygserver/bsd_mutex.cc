@@ -1,6 +1,6 @@
 /* bsd_mutex.cc
 
-   Copyright 2003, 2004, 2005 Red Hat Inc.
+   Copyright 2003, 2004, 2005, 2007 Red Hat Inc.
 
 This file is part of Cygwin.
 
@@ -83,11 +83,8 @@ _mtx_unlock (mtx *m, const char *file, int line)
      In that case, m->h is NULL. */
   if (m->h && !ReleaseSemaphore (m->h, 1, NULL))
     {
-      /* Check if the semaphore was already on it's max value.  In this case,
-         ReleaseSemaphore returns FALSE with an error code which *sic* depends
-	 on the OS. */
-      if (  (!wincap.is_winnt () && GetLastError () != ERROR_INVALID_PARAMETER)
-          || (wincap.is_winnt () && GetLastError () != ERROR_TOO_MANY_POSTS))
+      /* Check if the semaphore was already on it's max value. */
+      if (GetLastError () != ERROR_TOO_MANY_POSTS)
 	_panic (file, line, "release of mutex %s failed, %E", m->name);
     }
   _log (file, line, LOG_DEBUG, "Unlocked    mutex %s/%u (owner: %u)",
@@ -112,7 +109,7 @@ win_priority (int priority)
 {
   int p = (int)((priority) & PRIO_MASK) - PZERO;
   /* Generating a valid priority value is a bit tricky.  The only valid
-     values on 9x and NT4 are -15, -2, -1, 0, 1, 2, 15. */
+     values on NT4 are -15, -2, -1, 0, 1, 2, 15. */
   switch (p)
     {
       case -15: case -14: case -13: case -12: case -11:

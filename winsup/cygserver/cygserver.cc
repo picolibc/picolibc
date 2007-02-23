@@ -1,6 +1,6 @@
 /* cygserver.cc
 
-   Copyright 2001, 2002, 2003, 2004, 2005 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004, 2005, 2007 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -92,6 +92,12 @@ check_and_dup_handle (HANDLE from_process, HANDLE to_process,
 {
   HANDLE local_handle = NULL;
   int ret_val = EACCES;
+  char sd_buf [1024];
+  PSECURITY_DESCRIPTOR sd = (PSECURITY_DESCRIPTOR) &sd_buf;
+  DWORD bytes_needed;
+  PRIVILEGE_SET ps;
+  DWORD ps_len = sizeof (ps);
+  BOOL status;
 
   if (from_process != GetCurrentProcess ())
     {
@@ -107,42 +113,30 @@ check_and_dup_handle (HANDLE from_process, HANDLE to_process,
     } else
       local_handle = from_handle;
 
-  if (!wincap.has_security ())
-    assert (!from_process_token);
-  else
+  if (!GetKernelObjectSecurity (local_handle,
+				(OWNER_SECURITY_INFORMATION
+				 | GROUP_SECURITY_INFORMATION
+				 | DACL_SECURITY_INFORMATION),
+				sd, sizeof (sd_buf), &bytes_needed))
     {
-      char sd_buf [1024];
-      PSECURITY_DESCRIPTOR sd = (PSECURITY_DESCRIPTOR) &sd_buf;
-      DWORD bytes_needed;
-      PRIVILEGE_SET ps;
-      DWORD ps_len = sizeof (ps);
-      BOOL status;
+      log (LOG_ERR, "error getting handle SD (%lu)", GetLastError ());
+      goto out;
+    }
 
-      if (!GetKernelObjectSecurity (local_handle,
-				    (OWNER_SECURITY_INFORMATION
-				     | GROUP_SECURITY_INFORMATION
-				     | DACL_SECURITY_INFORMATION),
-				    sd, sizeof (sd_buf), &bytes_needed))
-	{
-	  log (LOG_ERR, "error getting handle SD (%lu)", GetLastError ());
-	  goto out;
-	}
+  MapGenericMask (&access, &access_mapping);
 
-      MapGenericMask (&access, &access_mapping);
+  if (!AccessCheck (sd, from_process_token, access, &access_mapping,
+		    &ps, &ps_len, &access, &status))
+    {
+      log (LOG_ERR, "error checking access rights (%lu)",
+		     GetLastError ());
+      goto out;
+    }
 
-      if (!AccessCheck (sd, from_process_token, access, &access_mapping,
-			&ps, &ps_len, &access, &status))
-	{
-	  log (LOG_ERR, "error checking access rights (%lu)",
-			 GetLastError ());
-	  goto out;
-	}
-
-      if (!status)
-	{
-	  log (LOG_ERR, "access to object denied");
-	  goto out;
-	}
+  if (!status)
+    {
+      log (LOG_ERR, "access to object denied");
+      goto out;
     }
 
   if (!DuplicateHandle (from_process, from_handle,
@@ -175,14 +169,6 @@ client_request_attach_tty::serve (transport_layer_base *const conn,
   assert (conn);
 
   assert (!error_code ());
-
-  if (!wincap.has_security ())
-    {
-      log (LOG_NOTICE, "operation only supported on systems with security");
-      error_code (EINVAL);
-      msglen (0);
-      return;
-    }
 
   if (msglen () != sizeof (req))
     {
@@ -382,6 +368,9 @@ server_submission_loop::request_loop ()
    * thread's priority to a level one above that.  This fails on
    * win9x/ME so assume any failure in that call is due to that and
    * simply call again at one priority level lower.
+   * FIXME: This looks weird and is an issue on NT, too.  Per MSDN,
+   * THREAD_PRIORITY_HIGHEST + 1 is only a valid priority level if
+   * the priority class is set to REALTIME_PRIORITY_CLASS.
    */
   if (!SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_HIGHEST + 1))
     if (!SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_HIGHEST))
@@ -570,7 +559,6 @@ main (const int argc, char *argv[])
 
   int opt;
 
-  wincap.init ();
   securityinit ();
 
   opterr = 0;
@@ -719,7 +707,7 @@ main (const int argc, char *argv[])
   if (support_semaphores == TUN_UNDEF)
     support_semaphores = TUN_TRUE;
 
-  if (wincap.has_security () && !setup_privileges ())
+  if (!setup_privileges ())
     panic ("Setting process privileges failed.");
 
   ipcinit ();

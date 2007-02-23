@@ -1,6 +1,6 @@
 /* woutsup.h: for Cygwin code compiled outside the DLL (i.e. cygserver).
 
-   Copyright 2002, 2003 Red Hat, Inc.
+   Copyright 2002, 2003, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -39,8 +39,6 @@ details. */
 #undef _WINVER_H
 #undef _WINNETWK_H
 #undef _WINSVC_H
-
-#include "wincap.h"
 
 #include "bsd_helper.h"
 #include "bsd_log.h"

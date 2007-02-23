@@ -1,6 +1,6 @@
 /* bsd_helper.cc
 
-   Copyright 2003, 2004, 2005 Red Hat Inc.
+   Copyright 2003, 2004, 2005, 2007 Red Hat Inc.
 
 This file is part of Cygwin.
 
@@ -233,14 +233,11 @@ PSID admininstrator_group_sid;
 static void
 init_admin_sid (void)
 {
-  if (wincap.has_security ())
-    {
-      SID_IDENTIFIER_AUTHORITY nt_auth = {SECURITY_NT_AUTHORITY};
-      if (! AllocateAndInitializeSid (&nt_auth, 2, 32, 544, 0, 0, 0, 0, 0, 0,
-				      &admininstrator_group_sid))
-	panic ("failed to create well known sids, error = %lu",
-	       GetLastError ());
-    }
+  SID_IDENTIFIER_AUTHORITY nt_auth = {SECURITY_NT_AUTHORITY};
+  if (! AllocateAndInitializeSid (&nt_auth, 2, 32, 544, 0, 0, 0, 0, 0, 0,
+				  &admininstrator_group_sid))
+    panic ("failed to create well known sids, error = %lu",
+	   GetLastError ());
 }
 
 SECURITY_DESCRIPTOR sec_all_nih_sd;
@@ -367,10 +364,6 @@ ipcperm (struct thread *td, ipc_perm *perm, unsigned int mode)
 int
 suser (struct thread *td)
 {
-  /* Always superuser on 9x. */
-  if (!wincap.has_security ())
-    return 0;
-
   /* This value has been set at ImpersonateNamedPipeClient() time
      using the token information.  See adjust_identity_info() below. */
   return td->ipcblk->is_admin ? 0 : EACCES;
@@ -384,10 +377,6 @@ bool
 adjust_identity_info (struct proc *p)
 {
   HANDLE tok;
-
-  /* No access tokens on 9x. */
-  if (!wincap.has_security ())
-    return true;
 
   if (!OpenThreadToken (GetCurrentThread (), TOKEN_READ, TRUE, &tok))
     {

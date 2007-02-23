@@ -93,9 +93,7 @@ Cygserver command line options:
   -y, --syslog
   
     Force logging to the system log.  This is the default, if stderr is not
-    connected to a tty, e. g. redirected to a file.  Note, that on 9x/Me
-    systems the syslog is faked by a file C:\CYGWIN_SYSLOG.TXT.
-    Configuration file option:  kern.log.syslog
+    connected to a tty, e. g. redirected to a file.
 
   -Y, --no-syslog
   
@@ -150,14 +148,9 @@ How to start Cygserver:
   Due to the wide configurability by changing the configuration file,
   that's typically not necessary.
 
-  On Windows 9x/Me, just start Cygserver in any console window.  It's
-  advisable to redirect stderr to a file of choice (e. g.
-  /var/log/cygserver.log) and to use the -e and -Y options or the
-  set the appropriate settings in the configuration file (see below).
-
-  On Windows NT/2000/XP or 2003, you should always run Cygserver as a
-  service under LocalSystem account.  This is the way it is installed
-  for you by the /usr/bin/cygserver-config script.
+  It's best practice to run Cygserver as a service under LocalSystem
+  account.  This is the way it is installed for you by the
+  /usr/bin/cygserver-config script.
 
 
 How to use the Cygserver services:
