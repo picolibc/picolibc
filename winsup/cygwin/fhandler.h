@@ -518,9 +518,6 @@ class fhandler_pipe: public fhandler_base
 protected:
   HANDLE guard;
   bool broken_pipe;
-  HANDLE writepipe_exists;
-  DWORD orig_pid;
-  unsigned id;
 private:
   pid_t popen_pid;
 public:
@@ -548,7 +545,7 @@ public:
   void fixup_in_child ();
   virtual void fixup_after_fork (HANDLE);
   void fixup_after_exec ();
-  bool hit_eof ();
+  bool hit_eof () {return broken_pipe;}
   void set_eof () {broken_pipe = true;}
   HANDLE get_guard () const {return guard;}
   int ready_for_read (int fd, DWORD howlong);

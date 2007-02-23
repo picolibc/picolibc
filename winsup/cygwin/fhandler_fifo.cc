@@ -203,9 +203,6 @@ fhandler_fifo::open (int flags, mode_t)
       set_output_handle (fhs[1]->get_handle ());
       guard = fhs[0]->guard;
       read_state = fhs[0]->read_state;
-      writepipe_exists = fhs[1]->writepipe_exists;
-      orig_pid = fhs[0]->orig_pid;
-      id = fhs[0]->id;
       delete (fhs[0]);
       delete (fhs[1]);
       set_use (1);

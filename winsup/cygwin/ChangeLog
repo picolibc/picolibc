@@ -1,5 +1,20 @@
 2007-02-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (class fhandler_pipe): Remove members writepipe_exists,
+	orig_pid and id.  Make hit_eof inline.
+	* fhandler_fifo.cc (fhandler_fifo::open): Drop handling of
+	writepipe_exists, orig_pid and id.
+	* pipe.cc: Ditto throughout.
+	(pipecount): Remove.
+	(pipeid_fmt): Remove.
+	(fhandler_pipe::hit_eof): Simplify.  Move to fhandler.h.
+	(fhandler_pipe::dup): Drop leave label.
+	(fhandler_pipe::create): Drop has_unreliable_pipes case.
+	* wincap.cc: Remove has_unreliable_pipes throughout.
+	* wincap.h: Ditto.
+
+2007-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* devices.in: Change native device name to native NT device name for
 	/dev/null, /dev/comX and /dev/ttySx.
 	* devices.cc: Regenerate.
