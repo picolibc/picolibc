@@ -1,6 +1,6 @@
 /* winf.h
 
-   Copyright 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 2006, 2007 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -27,9 +27,8 @@ class av
  public:
   int argc;
   bool win16_exe;
-  bool iscui;
-  av (): argv (NULL), iscui (false) {}
-  av (int ac_in, const char * const *av_in) : calloced (0), argc (ac_in), win16_exe (false), iscui (false)
+  av (): argv (NULL) {}
+  av (int ac_in, const char * const *av_in) : calloced (0), argc (ac_in), win16_exe (false)
   {
     argv = (char **) cmalloc (HEAP_1_ARGV, (argc + 5) * sizeof (char *));
     memcpy (argv, av_in, (argc + 1) * sizeof (char *));

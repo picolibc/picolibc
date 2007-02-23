@@ -1418,20 +1418,12 @@ rename (const char *oldpath, const char *newpath)
      code instead.
 
      The order in the condition is (hopefully) trimmed for doing the least
-     expensive stuff first.  Nevertheless it would be nice if 9x could
-     generate the same error codes as NT.
-     NT generates ERROR_SHARING_VIOLATION in all cases, while 9x generates
-     ERROR_ACCESS_DENIED if the target path doesn't exist,
-     ERROR_ALREADY_EXISTS otherwise */
+     expensive stuff first. */
   int len;
   DWORD lasterr;
   lasterr = GetLastError ();
   if (real_old.isdir ()
-      && ((lasterr == ERROR_SHARING_VIOLATION && wincap.has_move_file_ex ())
-       || (lasterr == ERROR_ACCESS_DENIED && !real_new.exists ()
-	   && !wincap.has_move_file_ex ())
-       || (lasterr == ERROR_ALREADY_EXISTS && real_new.exists ()
-	   && !wincap.has_move_file_ex ()))
+      && lasterr == ERROR_SHARING_VIOLATION
       && (len = strlen (real_old), strncasematch (real_old, real_new, len))
       && real_new[len] == '\\')
     SetLastError (ERROR_INVALID_PARAMETER);
@@ -1444,31 +1436,9 @@ rename (const char *oldpath, const char *newpath)
       else if (MoveFile (real_old, real_new))
 	res = 0;
     }
-  else if (wincap.has_move_file_ex ())
-    {
-      if (MoveFileEx (real_old.get_win32 (), real_new.get_win32 (),
-		      MOVEFILE_REPLACE_EXISTING))
-	res = 0;
-    }
-  else if (lasterr == ERROR_ALREADY_EXISTS || lasterr == ERROR_FILE_EXISTS)
-    {
-      syscall_printf ("try win95 hack");
-      for (int i = 0; i < 2; i++)
-	{
-	  if (!DeleteFileA (real_new) &&
-	      GetLastError () != ERROR_FILE_NOT_FOUND)
-	    {
-	      syscall_printf ("deleting %s to be paranoid",
-			      real_new.get_win32 ());
-	      break;
-	    }
-	  else if (MoveFile (real_old, real_new))
-	    {
-	      res = 0;
-	      break;
-	    }
-	}
-    }
+  else if (MoveFileEx (real_old.get_win32 (), real_new.get_win32 (),
+		       MOVEFILE_REPLACE_EXISTING))
+    res = 0;
 
 done:
   if (res)

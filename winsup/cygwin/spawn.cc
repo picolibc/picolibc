@@ -414,11 +414,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   si.hStdError = handle (2, true);
 
   si.cb = sizeof (si);
-  if (!wincap.pty_needs_alloc_console () && newargv.iscui && myself->ctty == -1)
-    {
-      si.dwFlags |= STARTF_USESHOWWINDOW;
-      si.wShowWindow = SW_HIDE;
-    }
 
   c_flags = GetPriorityClass (hMainProc);
   sigproc_printf ("priority class %d", c_flags);
@@ -965,7 +960,6 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext)
 	    else
 	      real_path.set_cygexec (false);
 	    UnmapViewOfFile (buf);
-	    iscui = subsys == IMAGE_SUBSYSTEM_WINDOWS_CUI;
 	    break;
 	  }
       }

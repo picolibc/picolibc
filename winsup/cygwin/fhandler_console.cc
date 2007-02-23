@@ -1850,7 +1850,7 @@ bool
 fhandler_console::need_invisible ()
 {
   BOOL b = false;
-  if (GetConsoleCP () || !wincap.pty_needs_alloc_console ())
+  if (GetConsoleCP ())
     invisible_console = false;
   else
     {

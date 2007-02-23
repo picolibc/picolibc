@@ -20,10 +20,8 @@ struct wincaps
   unsigned has_security_descriptor_control              : 1;
   unsigned has_ip_helper_lib                            : 1;
   unsigned has_physical_mem_access                      : 1;
-  unsigned has_move_file_ex                             : 1;
   unsigned has_unreliable_pipes                         : 1;
   unsigned has_process_io_counters                      : 1;
-  unsigned pty_needs_alloc_console			: 1;
   unsigned has_terminal_services			: 1;
   unsigned has_ioctl_storage_get_media_types_ex		: 1;
   unsigned has_extended_priority_class			: 1;
@@ -66,10 +64,8 @@ public:
   bool  IMPLEMENT (has_security_descriptor_control)
   bool  IMPLEMENT (has_ip_helper_lib)
   bool  IMPLEMENT (has_physical_mem_access)
-  bool  IMPLEMENT (has_move_file_ex)
   bool  IMPLEMENT (has_unreliable_pipes)
   bool  IMPLEMENT (has_process_io_counters)
-  bool  IMPLEMENT (pty_needs_alloc_console)
   bool  IMPLEMENT (has_terminal_services)
   bool	IMPLEMENT (has_ioctl_storage_get_media_types_ex)
   bool	IMPLEMENT (has_extended_priority_class)
