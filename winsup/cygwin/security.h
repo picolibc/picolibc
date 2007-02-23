@@ -388,20 +388,18 @@ void set_cygwin_privileges (HANDLE token);
 #define set_process_privilege(p,v) set_privilege (hProcToken, (p), (v))
 
 #define _push_thread_privilege(_priv, _val, _check) { \
-    HANDLE _token = NULL, _dup_token = NULL; \
-    if (wincap.has_security ()) \
-      { \
-	_token = (cygheap->user.issetuid () && (_check)) \
-		 ? cygheap->user.token () : hProcToken; \
-	if (!DuplicateTokenEx (_token, MAXIMUM_ALLOWED, NULL, \
-			       SecurityImpersonation, TokenImpersonation, \
-			       &_dup_token)) \
-	  debug_printf ("DuplicateTokenEx: %E"); \
-	else if (!ImpersonateLoggedOnUser (_dup_token)) \
-	  debug_printf ("ImpersonateLoggedOnUser: %E"); \
-	else \
-	  set_privilege (_dup_token, (_priv), (_val)); \
-      }
+    HANDLE _dup_token = NULL; \
+    HANDLE _token = (cygheap->user.issetuid () && (_check)) \
+		    ? cygheap->user.token () : hProcToken; \
+    if (!DuplicateTokenEx (_token, MAXIMUM_ALLOWED, NULL, \
+			   SecurityImpersonation, TokenImpersonation, \
+			   &_dup_token)) \
+      debug_printf ("DuplicateTokenEx: %E"); \
+    else if (!ImpersonateLoggedOnUser (_dup_token)) \
+      debug_printf ("ImpersonateLoggedOnUser: %E"); \
+    else \
+      set_privilege (_dup_token, (_priv), (_val));
+
 #define push_thread_privilege(_priv, _val) _push_thread_privilege(_priv,_val,1)
 #define push_self_privilege(_priv, _val)   _push_thread_privilege(_priv,_val,0)
 
@@ -415,6 +413,7 @@ void set_cygwin_privileges (HANDLE token);
 	CloseHandle (_dup_token); \
       } \
   }
+
 #define pop_self_privilege()		   pop_thread_privilege()
 
 /* shared.cc: */

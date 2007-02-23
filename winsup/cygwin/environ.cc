@@ -2,7 +2,7 @@
    process's environment.
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006 Red Hat, Inc.
+   2006, 2007 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -544,19 +544,19 @@ set_proc_retry (const char *buf)
 static void
 set_ntea (const char *buf)
 {
-  allow_ntea = (buf && strcasematch (buf, "yes") && wincap.has_security ());
+  allow_ntea = (buf && strcasematch (buf, "yes"));
 }
 
 static void
 set_ntsec (const char *buf)
 {
-  allow_ntsec = (buf && strcasematch (buf, "yes") && wincap.has_security ());
+  allow_ntsec = (buf && strcasematch (buf, "yes"));
 }
 
 static void
 set_smbntsec (const char *buf)
 {
-  allow_smbntsec = (buf && strcasematch (buf, "yes") && wincap.has_security ());
+  allow_smbntsec = (buf && strcasematch (buf, "yes"));
 }
 
 /* The structure below is used to set up an array which is used to
@@ -748,10 +748,6 @@ environ_init (char **envp, int envc)
   got_something_from_registry = regopt ("default");
   if (myself->progname[0])
     got_something_from_registry = regopt (myself->progname) || got_something_from_registry;
-
-  /* Set ntsec explicit as default, if NT is running */
-  if (wincap.has_security ())
-    allow_ntsec = true;
 
   if (!envp)
     envp_passed_in = 0;

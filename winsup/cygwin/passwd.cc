@@ -1,6 +1,6 @@
 /* passwd.cc: getpwnam () and friends
 
-   Copyright 1996, 1997, 1998, 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2001, 2002, 2003, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -58,19 +58,14 @@ pwdgrp::read_passwd ()
   char strbuf[128] = "";
   bool searchentry = true;
   struct passwd *pw;
+  /* must be static */
+  static char NO_COPY pretty_ls[] = "????????:*:-1:-1:";
 
-  if (wincap.has_security ())
-    {
-      /* must be static */
-      static char NO_COPY pretty_ls[] = "????????:*:-1:-1:";
-      add_line (pretty_ls);
-      cygsid tu = cygheap->user.sid ();
-      tu.string (strbuf);
-      if (myself->uid == ILLEGAL_UID)
-	searchentry = !internal_getpwsid (tu);
-    }
-  else if (myself->uid == ILLEGAL_UID)
-    searchentry = !internal_getpwuid (DEFAULT_UID);
+  add_line (pretty_ls);
+  cygsid tu = cygheap->user.sid ();
+  tu.string (strbuf);
+  if (myself->uid == ILLEGAL_UID)
+    searchentry = !internal_getpwsid (tu);
   if (searchentry &&
       (!(pw = internal_getpwnam (cygheap->user.name ())) ||
        (myself->uid != ILLEGAL_UID &&

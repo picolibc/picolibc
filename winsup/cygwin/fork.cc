@@ -191,12 +191,9 @@ frok::child (volatile char * volatile here)
       _impure_ptr = &_main_tls->local_clib;
     }
 
-  if (wincap.has_security ())
-    {
-      set_cygwin_privileges (hProcToken);
-      clear_procimptoken ();
-      cygheap->user.reimpersonate ();
-    }
+  set_cygwin_privileges (hProcToken);
+  clear_procimptoken ();
+  cygheap->user.reimpersonate ();
 
 #ifdef DEBUGGING
   char c;

@@ -1,7 +1,7 @@
 /* fhandler_tty.cc
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006 Red Hat, Inc.
+   2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -535,8 +535,7 @@ fhandler_tty_slave::open (int flags, mode_t)
   from_master_local = to_master_local = NULL;
 
 #ifdef USE_SERVER
-  if (!wincap.has_security ()
-      || cygserver_running == CYGSERVER_UNAVAIL
+  if (cygserver_running == CYGSERVER_UNAVAIL
       || !cygserver_attach_tty (&from_master_local, &to_master_local))
 #endif
     {
@@ -1384,11 +1383,8 @@ fhandler_pty_master::setup (bool ispty)
      In the future the cygserver may allow access by others. */
 
 #ifdef USE_SERVER
-  if (wincap.has_security ())
-    {
-      if (cygserver_running == CYGSERVER_UNKNOWN)
-	cygserver_init ();
-    }
+  if (cygserver_running == CYGSERVER_UNKNOWN)
+    cygserver_init ();
 #endif
 
   /* Create synchronisation events */

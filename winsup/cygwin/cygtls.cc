@@ -1,6 +1,6 @@
 /* cygtls.cc
 
-   Copyright 2003, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -113,8 +113,7 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
       || (void *) func == (void *) cygthread::simplestub)
     return;
 
-  if (wincap.has_security ())
-    cygheap->user.reimpersonate ();
+  cygheap->user.reimpersonate ();
 
   sentry here (INFINITE);
   if (nthreads >= cygheap->sthreads)

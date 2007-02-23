@@ -1,6 +1,6 @@
 /* sec_helper.cc: NT security helper functions
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2006 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2006, 2007 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 
@@ -577,8 +577,7 @@ __sec_user (PVOID sa_buf, PSID sid1, PSID sid2, DWORD access2, BOOL inherit)
   if ((unsigned long) sa_buf % 4)
     api_fatal ("Incorrectly aligned incoming SA buffer!");
 #endif
-  if (!wincap.has_security ()
-      || !sec_acl (acl, true, true, sid1, sid2, access2))
+  if (!sec_acl (acl, true, true, sid1, sid2, access2))
     return inherit ? &sec_none : &sec_none_nih;
 
   if (!InitializeSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION))

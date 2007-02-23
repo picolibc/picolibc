@@ -16,7 +16,6 @@ struct wincaps
   DWORD    chunksize;
   DWORD    heapslop;
   unsigned is_server                                    : 1;
-  unsigned has_security                                 : 1;
   unsigned has_security_descriptor_control              : 1;
   unsigned has_ip_helper_lib                            : 1;
   unsigned has_physical_mem_access                      : 1;
@@ -59,7 +58,6 @@ public:
   DWORD IMPLEMENT (chunksize)
   DWORD IMPLEMENT (heapslop)
   bool  IMPLEMENT (is_server)
-  bool  IMPLEMENT (has_security)
   bool  IMPLEMENT (has_security_descriptor_control)
   bool  IMPLEMENT (has_ip_helper_lib)
   bool  IMPLEMENT (has_physical_mem_access)

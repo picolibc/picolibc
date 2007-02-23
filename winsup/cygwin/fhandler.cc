@@ -1575,10 +1575,6 @@ fhandler_base::fsync ()
 static int
 check_posix_perm (const char *fname, int v)
 {
-  /* Windows 95/98/ME don't support file system security at all. */
-  if (!wincap.has_security ())
-    return 0;
-
   /* ntea is ok for supporting permission bits but it doesn't support
      full POSIX security settings. */
   if (v == _PC_POSIX_PERMISSIONS && allow_ntea)

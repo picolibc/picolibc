@@ -889,9 +889,6 @@ link (const char *oldpath, const char *newpath)
 static int
 chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
 {
-  if (!wincap.has_security ())  // real chown only works on NT
-    return 0;			// return zero (and do nothing) under Windows 9x
-
   int res = -1;
   fhandler_base *fh;
 
@@ -942,9 +939,6 @@ lchown (const char * name, __uid16_t uid, __gid16_t gid)
 extern "C" int
 fchown32 (int fd, __uid32_t uid, __gid32_t gid)
 {
-  if (!wincap.has_security ())  // real chown only works on NT
-    return 0;			// return zero (and do nothing) under Windows 9x
-
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     {
@@ -2162,11 +2156,6 @@ seteuid32 (__uid32_t uid)
   bool token_is_internal, issamesid = false;
 
   pw_new = internal_getpwuid (uid);
-  if (!wincap.has_security () && pw_new)
-    {
-      load_registry_hive (pw_new->pw_name);
-      goto success_9x;
-    }
   if (!usersid.getfrompw (pw_new))
     {
       set_errno (EINVAL);
@@ -2271,7 +2260,6 @@ seteuid32 (__uid32_t uid)
       return -1;
     }
 
-success_9x:
   cygheap->user.set_name (pw_new->pw_name);
   myself->uid = uid;
   groups.ischanged = FALSE;
@@ -2334,7 +2322,7 @@ setegid32 (__gid32_t gid)
 {
   debug_printf ("new egid: %u current: %u", gid, myself->gid);
 
-  if (gid == myself->gid || !wincap.has_security ())
+  if (gid == myself->gid)
     {
       myself->gid = gid;
       return 0;

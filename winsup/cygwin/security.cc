@@ -1,7 +1,7 @@
 /* security.cc: NT security functions
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006 Red Hat, Inc.
+   2006, 2007 Red Hat, Inc.
 
    Originaly written by Gunther Ebert, gunther.ebert@ixos-leipzig.de
    Completely rewritten by Corinna Vinschen <corinna@vinschen.de>
@@ -43,7 +43,8 @@ details. */
 #include "cyglsa.h"
 #include <cygwin/version.h>
 
-bool allow_ntsec;
+/* Set ntsec explicit as default. */
+bool allow_ntsec = true;
 /* allow_smbntsec is handled exclusively in path.cc (path_conv::check).
    It's defined here because of it's strong relationship to allow_ntsec. */
 bool allow_smbntsec;
@@ -89,11 +90,6 @@ extract_nt_dom_user (const struct passwd *pw, char *domain, char *user)
 extern "C" HANDLE
 cygwin_logon_user (const struct passwd *pw, const char *password)
 {
-  if (!wincap.has_security ())
-    {
-      set_errno (ENOSYS);
-      return INVALID_HANDLE_VALUE;
-    }
   if (!pw)
     {
       set_errno (EINVAL);
@@ -1915,9 +1911,6 @@ static int
 set_nt_attribute (HANDLE handle, const char *file,
 		  __uid32_t uid, __gid32_t gid, int attribute)
 {
-  if (!wincap.has_security ())
-    return 0;
-
   security_descriptor sd;
 
   if ((!handle || get_nt_object_security (handle, SE_FILE_OBJECT, sd))

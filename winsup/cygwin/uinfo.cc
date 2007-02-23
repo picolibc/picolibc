@@ -42,9 +42,6 @@ cygheap_user::init ()
 
   set_name (GetUserName (user_name, &user_name_len) ? user_name : "unknown");
 
-  if (!wincap.has_security ())
-    return;
-
   DWORD siz;
   PSECURITY_DESCRIPTOR psd;
 
@@ -91,39 +88,34 @@ internal_getlogin (cygheap_user &user)
 {
   struct passwd *pw = NULL;
 
-  if (wincap.has_security ())
-    {
-      cygpsid psid = user.sid ();
-      pw = internal_getpwsid (psid);
-    }
+  cygpsid psid = user.sid ();
+  pw = internal_getpwsid (psid);
 
   if (!pw && !(pw = internal_getpwnam (user.name ()))
       && !(pw = internal_getpwuid (DEFAULT_UID)))
     debug_printf ("user not found in augmented /etc/passwd");
   else
     {
+      cygsid gsid;
+
       myself->uid = pw->pw_uid;
       myself->gid = pw->pw_gid;
       user.set_name (pw->pw_name);
-      if (wincap.has_security ())
+      if (gsid.getfromgr (internal_getgrgid (pw->pw_gid)))
 	{
-	  cygsid gsid;
-	  if (gsid.getfromgr (internal_getgrgid (pw->pw_gid)))
+	  if (gsid != user.groups.pgsid)
 	    {
-	      if (gsid != user.groups.pgsid)
-		{
-		  /* Set primary group to the group in /etc/passwd. */
-		  if (!SetTokenInformation (hProcToken, TokenPrimaryGroup,
-					    &gsid, sizeof gsid))
-		    debug_printf ("SetTokenInformation(TokenPrimaryGroup), %E");
-		  else
-		    user.groups.pgsid = gsid;
-		  clear_procimptoken ();
-		}
+	      /* Set primary group to the group in /etc/passwd. */
+	      if (!SetTokenInformation (hProcToken, TokenPrimaryGroup,
+					&gsid, sizeof gsid))
+		debug_printf ("SetTokenInformation(TokenPrimaryGroup), %E");
+	      else
+		user.groups.pgsid = gsid;
+	      clear_procimptoken ();
 	    }
-	  else
-	    debug_printf ("gsid not found in augmented /etc/group");
 	}
+      else
+	debug_printf ("gsid not found in augmented /etc/group");
     }
   cygheap->user.ontherange (CH_HOME, pw);
 }

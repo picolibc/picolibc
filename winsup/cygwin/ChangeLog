@@ -1,5 +1,15 @@
 2007-02-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	Throughout remove all usage of wincap.has_security.
+	* environ.cc (environ_init): Drop setting allow_ntsec here.
+	* grp.cc (initgroups32): Drop usage of label "out".
+	* security.cc (allow_ntsec): Set to true by default.
+	* syscalls.cc (seteuid32): Remove label success_9x.
+	* wincap.cc: Remove has_security throughout.
+	* wincap.h: Ditto.
+
+2007-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (class fhandler_pipe): Remove members writepipe_exists,
 	orig_pid and id.  Make hit_eof inline.
 	* fhandler_fifo.cc (fhandler_fifo::open): Drop handling of

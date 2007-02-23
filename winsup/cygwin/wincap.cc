@@ -16,7 +16,6 @@ static NO_COPY wincaps wincap_unknown = {
   chunksize:0,
   heapslop:0x0,
   is_server:false,
-  has_security:true,
   has_security_descriptor_control:false,
   has_ip_helper_lib:false,
   has_physical_mem_access:true,
@@ -43,7 +42,6 @@ static NO_COPY wincaps wincap_nt4 = {
   chunksize:0,
   heapslop:0x0,
   is_server:false,
-  has_security:true,
   has_security_descriptor_control:false,
   has_ip_helper_lib:false,
   has_physical_mem_access:true,
@@ -70,7 +68,6 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   chunksize:0,
   heapslop:0x0,
   is_server:false,
-  has_security:true,
   has_security_descriptor_control:false,
   has_ip_helper_lib:true,
   has_physical_mem_access:true,
@@ -97,7 +94,6 @@ static NO_COPY wincaps wincap_2000 = {
   chunksize:0,
   heapslop:0x0,
   is_server:false,
-  has_security:true,
   has_security_descriptor_control:true,
   has_ip_helper_lib:true,
   has_physical_mem_access:true,
@@ -124,7 +120,6 @@ static NO_COPY wincaps wincap_xp = {
   chunksize:0,
   heapslop:0x0,
   is_server:false,
-  has_security:true,
   has_security_descriptor_control:true,
   has_ip_helper_lib:true,
   has_physical_mem_access:true,
@@ -151,7 +146,6 @@ static NO_COPY wincaps wincap_2003 = {
   chunksize:0,
   heapslop:0x4,
   is_server:true,
-  has_security:true,
   has_security_descriptor_control:true,
   has_ip_helper_lib:true,
   has_physical_mem_access:false,
@@ -178,7 +172,6 @@ static NO_COPY wincaps wincap_vista = {
   chunksize:0,
   heapslop:0x4,
   is_server:false,
-  has_security:true,
   has_security_descriptor_control:true,
   has_ip_helper_lib:true,
   has_physical_mem_access:false,
@@ -265,7 +258,8 @@ wincapc::init ()
 	  }
 	break;
       case VER_PLATFORM_WIN32_WINDOWS:
-	/* This is just preliminary. */
+	/* I'd be very surprised if this code is ever hit, but it doesn't
+	   hurt to keep it. */
 	api_fatal ("Windows 95/98/Me are not supported.");
 	break;
       default:

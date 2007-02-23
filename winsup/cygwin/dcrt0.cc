@@ -734,8 +734,7 @@ dll_crt0_0 ()
 
   DuplicateHandle (hMainProc, GetCurrentThread (), hMainProc,
 		   &hMainThread, 0, false, DUPLICATE_SAME_ACCESS);
-  if (wincap.has_security ())
-    OpenProcessToken (hMainProc, MAXIMUM_ALLOWED, &hProcToken);
+  OpenProcessToken (hMainProc, MAXIMUM_ALLOWED, &hProcToken);
 
   device::init ();
   do_global_ctors (&__CTOR_LIST__, 1);
@@ -841,8 +840,7 @@ dll_crt0_1 (void *)
   pinfo_init (envp, envc);
 
   /* Can be set only after environment has been initialized. */
-  if (wincap.has_security ())
-    set_cygwin_privileges (hProcToken);
+  set_cygwin_privileges (hProcToken);
 
   if (!old_title && GetConsoleTitle (title_buf, TITLESIZE))
     old_title = title_buf;

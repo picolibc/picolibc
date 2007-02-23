@@ -1,7 +1,7 @@
 /* grp.cc
 
-   Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005
-   Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
+   2007 Red Hat, Inc.
 
    Original stubs by Jason Molenda of Cygnus Support, crash@cygnus.com
    First implementation by Gunther Ebert, gunther.ebert@ixos-leipzig.de
@@ -84,15 +84,11 @@ pwdgrp::read_group ()
       static char linebuf [200];
       char group_name [UNLEN + 1] = "mkgroup";
       char strbuf[128] = "";
+      struct __group32 *gr;
 
-      if (wincap.has_security ())
-	{
-	  struct __group32 *gr;
-
-	  cygheap->user.groups.pgsid.string (strbuf);
-	  if ((gr = internal_getgrsid (cygheap->user.groups.pgsid)))
-	    strlcpy (group_name, gr->gr_name, sizeof (group_name));
-	}
+      cygheap->user.groups.pgsid.string (strbuf);
+      if ((gr = internal_getgrsid (cygheap->user.groups.pgsid)))
+	strlcpy (group_name, gr->gr_name, sizeof (group_name));
       if (myself->uid == UNKNOWN_UID)
 	strcpy (group_name, "mkpasswd"); /* Feedback... */
       snprintf (linebuf, sizeof (linebuf), "%s:%s:%lu:%s",
@@ -101,8 +97,7 @@ pwdgrp::read_group ()
       add_line (linebuf);
     }
   static char NO_COPY pretty_ls[] = "????????::-1:";
-  if (wincap.has_security ())
-    add_line (pretty_ls);
+  add_line (pretty_ls);
 }
 
 muto NO_COPY pwdgrp::pglock;
@@ -467,34 +462,29 @@ getgroups (int gidsetsize, __gid16_t *grouplist)
 extern "C" int
 initgroups32 (const char *name, __gid32_t gid)
 {
-  int ret;
-  if (wincap.has_security ())
-    {
-      ret = -1;
-      cygheap->user.deimpersonate ();
-      struct passwd *pw = internal_getpwnam (name);
-      struct __group32 *gr = internal_getgrgid (gid);
-      cygsid usersid, grpsid;
-      if (!usersid.getfrompw (pw) || !grpsid.getfromgr (gr))
-	{
-	  set_errno (EINVAL);
-	  goto out;
-	}
-      cygsidlist tmp_gsids (cygsidlist_auto, 12);
-      if (!get_server_groups (tmp_gsids, usersid, pw))
-	goto out;
-      tmp_gsids += grpsid;
-      cygsidlist new_gsids (cygsidlist_alloc, tmp_gsids.count ());
-      for (int i = 0; i < tmp_gsids.count (); i++)
-	new_gsids.sids[i] = tmp_gsids.sids[i];
-      new_gsids.count (tmp_gsids.count ());
-      cygheap->user.groups.update_supp (new_gsids);
-    }
-  ret = 0;
+  int ret = -1;
 
- out:
-  if (wincap.has_security ())
-    cygheap->user.reimpersonate ();
+  cygheap->user.deimpersonate ();
+  struct passwd *pw = internal_getpwnam (name);
+  struct __group32 *gr = internal_getgrgid (gid);
+  cygsid usersid, grpsid;
+  if (!usersid.getfrompw (pw) || !grpsid.getfromgr (gr))
+    set_errno (EINVAL);
+  else
+    {
+      cygsidlist tmp_gsids (cygsidlist_auto, 12);
+      if (get_server_groups (tmp_gsids, usersid, pw))
+	{
+	  tmp_gsids += grpsid;
+	  cygsidlist new_gsids (cygsidlist_alloc, tmp_gsids.count ());
+	  for (int i = 0; i < tmp_gsids.count (); i++)
+	    new_gsids.sids[i] = tmp_gsids.sids[i];
+	  new_gsids.count (tmp_gsids.count ());
+	  cygheap->user.groups.update_supp (new_gsids);
+	  ret = 0;
+	}
+    }
+  cygheap->user.reimpersonate ();
   syscall_printf ( "%d = initgroups (%s, %u)", ret, name, gid);
   return ret;
 }
@@ -515,9 +505,6 @@ setgroups32 (int ngroups, const __gid32_t *grouplist)
       set_errno (EINVAL);
       return -1;
     }
-
-  if (!wincap.has_security ())
-    return 0;
 
   cygsidlist gsids (cygsidlist_alloc, ngroups);
   struct __group32 *gr;
