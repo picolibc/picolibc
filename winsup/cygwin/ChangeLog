@@ -1,3 +1,11 @@
+2007-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::lseek): Drop 9x considerations.
+	* fhandler_disk_file.cc (fhandler_disk_file::lock): Ditto.
+	* wincap.cc: Remove lock_file_highword and has_64bit_file_access
+	throughout.
+	* wincap.h: Ditto.
+
 2007-02-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.h (struct cwdstuff): Remove sync member and keep_in_sync

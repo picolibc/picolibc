@@ -1031,18 +1031,6 @@ fhandler_base::lseek (_off64_t offset, int whence)
 {
   _off64_t res;
 
-  /* 9x/Me doesn't support 64bit offsets.  We trap that here and return
-     EINVAL.  It doesn't make sense to simulate bigger offsets by a
-     SetFilePointer sequence since FAT and FAT32 don't support file
-     size >= 4GB anyway. */
-  if (!wincap.has_64bit_file_access ()
-      && (offset < LONG_MIN || offset > LONG_MAX))
-    {
-      debug_printf ("Win9x, offset not 32 bit.");
-      set_errno (EINVAL);
-      return (_off64_t)-1;
-    }
-
   /* Seeks on text files is tough, we rewind and read till we get to the
      right place.  */
 
@@ -1059,17 +1047,10 @@ fhandler_base::lseek (_off64_t offset, int whence)
 		       : (whence == SEEK_CUR ? FILE_CURRENT : FILE_END);
 
   LONG off_low = ((__uint64_t) offset) & UINT32_MAX;
-  LONG *poff_high, off_high;
-  if (!wincap.has_64bit_file_access ())
-    poff_high = NULL;
-  else
-    {
-      off_high =  ((__uint64_t) offset) >> 32LL;
-      poff_high = &off_high;
-    }
+  LONG off_high = ((__uint64_t) offset) >> 32LL;
 
   debug_printf ("setting file pointer to %u (high), %u (low)", off_high, off_low);
-  res = SetFilePointer (get_handle (), off_low, poff_high, win32_whence);
+  res = SetFilePointer (get_handle (), off_low, &off_high, win32_whence);
   if (res == INVALID_SET_FILE_POINTER && GetLastError ())
     {
       __seterrno ();
@@ -1077,11 +1058,10 @@ fhandler_base::lseek (_off64_t offset, int whence)
     }
   else
     {
-      if (poff_high)
-	res += (_off64_t) *poff_high << 32;
+      res += (_off64_t) off_high << 32;
 
       /* When next we write(), we will check to see if *this* seek went beyond
-	 the end of the file, and back-seek and fill with zeros if so - DJ */
+	 the end of the file and if so, potentially sparsify the file. */
       did_lseek (true);
 
       /* If this was a SEEK_CUR with offset 0, we still might have

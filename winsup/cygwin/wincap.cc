@@ -13,7 +13,6 @@ details. */
 
 /* Minimal set of capabilities which is equivalent to NT4. */
 static NO_COPY wincaps wincap_unknown = {
-  lock_file_highword:UINT32_MAX,
   chunksize:0,
   heapslop:0x0,
   is_server:false,
@@ -25,7 +24,6 @@ static NO_COPY wincaps wincap_unknown = {
   has_unreliable_pipes:false,
   has_raw_devices:true,
   has_valid_processorlevel:true,
-  has_64bit_file_access:true,
   has_process_io_counters:false,
   supports_reading_modem_output_lines:true,
   needs_memory_protection:true,
@@ -52,7 +50,6 @@ static NO_COPY wincaps wincap_unknown = {
 };
 
 static NO_COPY wincaps wincap_nt4 = {
-  lock_file_highword:UINT32_MAX,
   chunksize:0,
   heapslop:0x0,
   is_server:false,
@@ -64,7 +61,6 @@ static NO_COPY wincaps wincap_nt4 = {
   has_unreliable_pipes:false,
   has_raw_devices:true,
   has_valid_processorlevel:true,
-  has_64bit_file_access:true,
   has_process_io_counters:false,
   supports_reading_modem_output_lines:true,
   needs_memory_protection:true,
@@ -91,7 +87,6 @@ static NO_COPY wincaps wincap_nt4 = {
 };
 
 static NO_COPY wincaps wincap_nt4sp4 = {
-  lock_file_highword:UINT32_MAX,
   chunksize:0,
   heapslop:0x0,
   is_server:false,
@@ -103,7 +98,6 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   has_unreliable_pipes:false,
   has_raw_devices:true,
   has_valid_processorlevel:true,
-  has_64bit_file_access:true,
   has_process_io_counters:false,
   supports_reading_modem_output_lines:true,
   needs_memory_protection:true,
@@ -130,7 +124,6 @@ static NO_COPY wincaps wincap_nt4sp4 = {
 };
 
 static NO_COPY wincaps wincap_2000 = {
-  lock_file_highword:UINT32_MAX,
   chunksize:0,
   heapslop:0x0,
   is_server:false,
@@ -142,7 +135,6 @@ static NO_COPY wincaps wincap_2000 = {
   has_unreliable_pipes:false,
   has_raw_devices:true,
   has_valid_processorlevel:true,
-  has_64bit_file_access:true,
   has_process_io_counters:true,
   supports_reading_modem_output_lines:true,
   needs_memory_protection:true,
@@ -169,7 +161,6 @@ static NO_COPY wincaps wincap_2000 = {
 };
 
 static NO_COPY wincaps wincap_xp = {
-  lock_file_highword:UINT32_MAX,
   chunksize:0,
   heapslop:0x0,
   is_server:false,
@@ -181,7 +172,6 @@ static NO_COPY wincaps wincap_xp = {
   has_unreliable_pipes:false,
   has_raw_devices:true,
   has_valid_processorlevel:true,
-  has_64bit_file_access:true,
   has_process_io_counters:true,
   supports_reading_modem_output_lines:true,
   needs_memory_protection:true,
@@ -208,7 +198,6 @@ static NO_COPY wincaps wincap_xp = {
 };
 
 static NO_COPY wincaps wincap_2003 = {
-  lock_file_highword:UINT32_MAX,
   chunksize:0,
   heapslop:0x4,
   is_server:true,
@@ -220,7 +209,6 @@ static NO_COPY wincaps wincap_2003 = {
   has_unreliable_pipes:false,
   has_raw_devices:true,
   has_valid_processorlevel:true,
-  has_64bit_file_access:true,
   has_process_io_counters:true,
   supports_reading_modem_output_lines:true,
   needs_memory_protection:true,
@@ -247,7 +235,6 @@ static NO_COPY wincaps wincap_2003 = {
 };
 
 static NO_COPY wincaps wincap_vista = {
-  lock_file_highword:UINT32_MAX,
   chunksize:0,
   heapslop:0x4,
   is_server:false,
@@ -259,7 +246,6 @@ static NO_COPY wincaps wincap_vista = {
   has_unreliable_pipes:false,
   has_raw_devices:true,
   has_valid_processorlevel:true,
-  has_64bit_file_access:true,
   has_process_io_counters:true,
   supports_reading_modem_output_lines:true,
   needs_memory_protection:true,

@@ -1264,11 +1264,7 @@ fhandler_disk_file::lock (int cmd, struct __flock64 *fl)
     {
       /* Special case if len == 0 for POSIX means lock to the end of
 	 the entire file (and all future extensions).  */
-      /* CV, 2003-12-03: And yet another Win 9x bugginess.  For some reason
-	 offset + length must be <= 0x100000000.  I'm using 0xffffffff as
-	 upper border here, this should be sufficient. */
-      len_low = UINT32_MAX - (wincap.lock_file_highword () ? 0 : off_low);
-      len_high = wincap.lock_file_highword ();
+      len_low = len_high = UINT32_MAX;
     }
   else
     {

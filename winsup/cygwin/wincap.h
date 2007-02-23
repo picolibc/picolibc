@@ -13,7 +13,6 @@ details. */
 
 struct wincaps
 {
-  DWORD    lock_file_highword;
   DWORD    chunksize;
   DWORD    heapslop;
   unsigned is_server                                    : 1;
@@ -25,7 +24,6 @@ struct wincaps
   unsigned has_unreliable_pipes                         : 1;
   unsigned has_raw_devices				: 1;
   unsigned has_valid_processorlevel			: 1;
-  unsigned has_64bit_file_access			: 1;
   unsigned has_process_io_counters                      : 1;
   unsigned supports_reading_modem_output_lines          : 1;
   unsigned needs_memory_protection			: 1;
@@ -68,7 +66,6 @@ public:
 
 #define IMPLEMENT(cap) cap() const { return ((wincaps *) this->caps)->cap; }
 
-  DWORD IMPLEMENT (lock_file_highword)
   DWORD IMPLEMENT (chunksize)
   DWORD IMPLEMENT (heapslop)
   bool  IMPLEMENT (is_server)
@@ -80,7 +77,6 @@ public:
   bool  IMPLEMENT (has_unreliable_pipes)
   bool  IMPLEMENT (has_raw_devices)
   bool  IMPLEMENT (has_valid_processorlevel)
-  bool  IMPLEMENT (has_64bit_file_access)
   bool  IMPLEMENT (has_process_io_counters)
   bool  IMPLEMENT (supports_reading_modem_output_lines)
   bool  IMPLEMENT (needs_memory_protection)
