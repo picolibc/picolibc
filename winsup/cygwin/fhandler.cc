@@ -460,127 +460,11 @@ done:
 
 /* Open system call handler function. */
 int
-fhandler_base::open_9x (int flags, mode_t mode)
-{
-  int res = 0;
-  HANDLE x;
-  int file_attributes;
-  int creation_distribution;
-  SECURITY_ATTRIBUTES sa = sec_none;
-
-  syscall_printf ("(%s, %p)", get_win32_name (), flags);
-
-  switch (query_open ())
-    {
-      case query_read_control:
-      case query_stat_control:
-	access = GENERIC_READ;
-	break;
-      case query_write_control:
-      case query_write_attributes:
-	access = GENERIC_READ | FILE_WRITE_ATTRIBUTES;
-	break;
-      default:
-	if ((flags & O_ACCMODE) == O_RDONLY)
-	  access = GENERIC_READ;
-	else if ((flags & O_ACCMODE) == O_WRONLY)
-	  access = GENERIC_WRITE;
-	else
-	  access = GENERIC_READ | GENERIC_WRITE;
-	break;
-    }
-
-  if ((flags & O_TRUNC) && ((flags & O_ACCMODE) != O_RDONLY))
-    {
-      if (flags & O_CREAT)
-	creation_distribution = CREATE_ALWAYS;
-      else
-	creation_distribution = TRUNCATE_EXISTING;
-    }
-  else if (flags & O_CREAT)
-    creation_distribution = OPEN_ALWAYS;
-  else
-    creation_distribution = OPEN_EXISTING;
-
-  if ((flags & O_EXCL) && (flags & O_CREAT))
-    creation_distribution = CREATE_NEW;
-
-  if (flags & O_APPEND)
-    append_mode (true);
-
-  file_attributes = FILE_ATTRIBUTE_NORMAL;
-  if (flags & O_DIROPEN)
-    file_attributes |= FILE_FLAG_BACKUP_SEMANTICS;
-  if (flags & O_SYNC)
-    file_attributes |= FILE_FLAG_WRITE_THROUGH;
-  if (flags & O_DIRECT)
-    file_attributes |= FILE_FLAG_NO_BUFFERING;
-  if (get_major () == DEV_SERIAL_MAJOR)
-    file_attributes |= FILE_FLAG_OVERLAPPED;
-
-#ifdef HIDDEN_DOT_FILES
-  if (flags & O_CREAT && get_device () == FH_FS)
-    {
-      char *c = strrchr (get_win32_name (), '\\');
-      if ((c && c[1] == '.') || *get_win32_name () == '.')
-	file_attributes |= FILE_ATTRIBUTE_HIDDEN;
-    }
-#endif
-
-  if (flags & O_CREAT && get_device () == FH_FS)
-    {
-      /* If mode has no write bits set, we set the R/O attribute. */
-      if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
-	file_attributes |= FILE_ATTRIBUTE_READONLY;
-      /* The file attributes are needed for later use in, e.g. fchmod. */
-      pc.file_attributes (file_attributes & FILE_ATTRIBUTE_VALID_SET_FLAGS);
-    }
-
-  x = CreateFile (get_win32_name (), access, FILE_SHARE_VALID_FLAGS, &sa, creation_distribution,
-		  file_attributes, 0);
-
-  if (x == INVALID_HANDLE_VALUE)
-    {
-      if (pc.isdir ())
-	{
-	  if ((flags & O_ACCMODE) != O_RDONLY)
-	    set_errno (EISDIR);
-	  else
-	    nohandle (true);
-	}
-      else if (GetLastError () == ERROR_INVALID_HANDLE)
-	set_errno (ENOENT);
-      else
-	__seterrno ();
-      if (!nohandle ())
-	goto done;
-   }
-
-  set_io_handle (x);
-  set_flags (flags, pc.binmode ());
-
-  res = 1;
-  set_open_status ();
-done:
-  debug_printf ("%p = CreateFile (%s, %p, %p, %p, %p, %p, 0)",
-		x, get_win32_name (), access, FILE_SHARE_VALID_FLAGS, &sa,
-		creation_distribution, file_attributes);
-
-  syscall_printf ("%d = fhandler_base::open (%s, %p)", res, get_win32_name (),
-		  flags);
-  return res;
-}
-
-/* Open system call handler function. */
-int
 fhandler_base::open (int flags, mode_t mode)
 {
   WCHAR wpath[CYG_MAX_PATH + 10];
   UNICODE_STRING upath = {0, sizeof (wpath), wpath};
   pc.get_nt_native_path (upath);
-
-  if (RtlIsDosDeviceName_U (upath.Buffer))
-    return fhandler_base::open_9x (flags, mode);
 
   int res = 0;
   HANDLE x;
@@ -1447,15 +1331,6 @@ fhandler_base::~fhandler_base ()
 fhandler_dev_null::fhandler_dev_null () :
 	fhandler_base ()
 {
-}
-
-int
-fhandler_dev_null::open (int flags, mode_t mode)
-{
-  char posix[strlen (get_name ()) + 1];
-  strcpy (posix, get_name ());
-  pc.set_name ("NUL", posix);
-  return fhandler_base::open_9x (flags, mode);
 }
 
 void

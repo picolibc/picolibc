@@ -1,5 +1,17 @@
 2007-02-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* devices.in: Change native device name to native NT device name for
+	/dev/null, /dev/comX and /dev/ttySx.
+	* devices.cc: Regenerate.
+	* fhandler.cc (fhandler_base::open_9x): Remove.
+	(fhandler_base::open): Don't test for DOS device name, don't call
+	open_9x.
+	(fhandler_dev_null::open): Remove.
+	* fhandler.h (class fhandler_base): Drop open_9x declaration.
+	(class fhandler_dev_null): Drop open declaration.
+
+2007-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_console.cc (fhandler_console::need_invisible): Drop
 	pty_needs_alloc_console check.
 	* spawn.cc (spawn_guts): Ditto.

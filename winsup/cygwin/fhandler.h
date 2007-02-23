@@ -257,7 +257,6 @@ class fhandler_base
   bool fork_fixup (HANDLE, HANDLE &, const char *);
   virtual bool need_fixup_before () const {return false;}
 
-  int open_9x (int, mode_t = 0);
   virtual int open (int, mode_t = 0);
   int open_fs (int, mode_t = 0);
   virtual int close ();
@@ -1066,7 +1065,6 @@ class fhandler_dev_null: public fhandler_base
 {
  public:
   fhandler_dev_null ();
-  int open (int, mode_t);
 
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
