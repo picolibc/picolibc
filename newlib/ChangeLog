@@ -1,3 +1,7 @@
+2007-02-23  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libm/math/w_pow.c: Fix typo in documentation comment.
+
 2007-02-21  Patrick Mansfield <patmans@us.ibm.com>
 
 	* libc/reent/timer.c: Removed (split into two new files).
