@@ -460,8 +460,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
      So we have to start the child in suspend state, unfortunately, to avoid
      a race condition. */
   if (!newargv.win16_exe
-      && (wincap.start_proc_suspended () || mode != _P_OVERLAY
-	  || cygheap->fdtab.need_fixup_before ()))
+      && (mode != _P_OVERLAY || cygheap->fdtab.need_fixup_before ()))
     c_flags |= CREATE_SUSPENDED;
 
   runpath = null_app_name ? NULL : (const char *) real_path;

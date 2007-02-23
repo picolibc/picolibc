@@ -1,6 +1,7 @@
 /* uname.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005, 2006, 2007 Red Hat, Inc.
    Written by Steve Chamberlain of Cygnus Support, sac@cygnus.com
    Rewritten by Geoffrey Noer of Cygnus Solutions, noer@cygnus.com
 
@@ -72,23 +73,12 @@ uname (struct utsname *name)
     {
       case PROCESSOR_ARCHITECTURE_INTEL:
 	unsigned int ptype;
-	if (wincap.has_valid_processorlevel ())
-	  {
-	    if (sysinfo.wProcessorLevel < 3) /* Shouldn't happen. */
-	      ptype = 3;
-	    else if (sysinfo.wProcessorLevel > 9) /* P4 */
-	      ptype = 6;
-	    else
-	      ptype = sysinfo.wProcessorLevel;
-	  }
+	if (sysinfo.wProcessorLevel < 3) /* Shouldn't happen. */
+	  ptype = 3;
+	else if (sysinfo.wProcessorLevel > 9) /* P4 */
+	  ptype = 6;
 	else
-	  {
-	    if (sysinfo.dwProcessorType == PROCESSOR_INTEL_386 ||
-		sysinfo.dwProcessorType == PROCESSOR_INTEL_486)
-	      ptype = sysinfo.dwProcessorType / 100;
-	    else
-	      ptype = PROCESSOR_INTEL_PENTIUM / 100;
-	  }
+	  ptype = sysinfo.wProcessorLevel;
 	__small_sprintf (name->machine, "i%d86", ptype);
 	break;
       case PROCESSOR_ARCHITECTURE_IA64:

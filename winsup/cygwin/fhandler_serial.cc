@@ -1,6 +1,7 @@
 /* fhandler_serial.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+   2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -260,23 +261,6 @@ fhandler_serial::open (int flags, mode_t mode)
       state.fAbortOnError = TRUE;
       if (!SetCommState (get_handle (), &state))
 	system_printf ("couldn't set initial state for %s, %E", get_name ());
-    }
-
-  /* setting rts and dtr to known state so that ioctl() function with
-  request TIOCMGET could return correct value of RTS and DTR lines.
-  Important only for Win 9x systems */
-
-  if (!wincap.supports_reading_modem_output_lines ())
-    {
-      if (EscapeCommFunction (get_handle (), SETDTR) == 0)
-	system_printf ("couldn't set initial state of DTR for %s, %E", get_name ());
-      if (EscapeCommFunction (get_handle (), SETRTS) == 0)
-	system_printf ("couldn't set initial state of RTS for %s, %E", get_name ());
-
-      /* even though one of above functions fail I have to set rts and dtr
-      variables to initial value. */
-      rts = TIOCM_RTS;
-      dtr = TIOCM_DTR;
     }
 
   SetCommMask (get_handle (), EV_RXCHAR);

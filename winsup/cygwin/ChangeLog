@@ -1,5 +1,22 @@
 2007-02-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exceptions.cc (dummy_ctrl_c_handler): Remove.
+	(init_console_handler): Drop has_null_console_handler_routine checks.
+	* fhandler_raw.cc (fhandler_dev_raw::open): Drop has_raw_devices check.
+	* fhandler_serial.cc (fhandler_serial::open): Drop
+	.supports_reading_modem_output_lines check.
+	* miscfuncs.cc (low_priority_sleep): Drop has_switch_to_thread check.
+	* shared.cc (open_shared): Drop needs_memory_protection checks.
+	* spawn.cc (spawn_guts): Drop start_proc_suspended check.
+	* uname.cc (uname): Drop has_valid_processorlevel check.
+	* wincap.cc: Remove has_raw_devices, has_valid_processorlevel,
+	supports_reading_modem_output_lines, needs_memory_protection,
+	has_switch_to_thread, start_proc_suspended and
+	has_null_console_handler_routine throughout.
+	* wincap.h: Ditto.
+
+2007-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (fhandler_base::lseek): Drop 9x considerations.
 	* fhandler_disk_file.cc (fhandler_disk_file::lock): Ditto.
 	* wincap.cc: Remove lock_file_highword and has_64bit_file_access

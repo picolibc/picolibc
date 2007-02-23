@@ -22,19 +22,12 @@ struct wincaps
   unsigned has_physical_mem_access                      : 1;
   unsigned has_move_file_ex                             : 1;
   unsigned has_unreliable_pipes                         : 1;
-  unsigned has_raw_devices				: 1;
-  unsigned has_valid_processorlevel			: 1;
   unsigned has_process_io_counters                      : 1;
-  unsigned supports_reading_modem_output_lines          : 1;
-  unsigned needs_memory_protection			: 1;
   unsigned pty_needs_alloc_console			: 1;
   unsigned has_terminal_services			: 1;
-  unsigned has_switch_to_thread				: 1;
   unsigned has_ioctl_storage_get_media_types_ex		: 1;
-  unsigned start_proc_suspended				: 1;
   unsigned has_extended_priority_class			: 1;
   unsigned has_guid_volumes				: 1;
-  unsigned has_null_console_handler_routine		: 1;
   unsigned has_disk_ex_ioctls				: 1;
   unsigned has_disabled_user_tos_setting		: 1;
   unsigned has_fileid_dirinfo				: 1;
@@ -75,19 +68,12 @@ public:
   bool  IMPLEMENT (has_physical_mem_access)
   bool  IMPLEMENT (has_move_file_ex)
   bool  IMPLEMENT (has_unreliable_pipes)
-  bool  IMPLEMENT (has_raw_devices)
-  bool  IMPLEMENT (has_valid_processorlevel)
   bool  IMPLEMENT (has_process_io_counters)
-  bool  IMPLEMENT (supports_reading_modem_output_lines)
-  bool  IMPLEMENT (needs_memory_protection)
   bool  IMPLEMENT (pty_needs_alloc_console)
   bool  IMPLEMENT (has_terminal_services)
-  bool  IMPLEMENT (has_switch_to_thread)
   bool	IMPLEMENT (has_ioctl_storage_get_media_types_ex)
-  bool	IMPLEMENT (start_proc_suspended)
   bool	IMPLEMENT (has_extended_priority_class)
   bool	IMPLEMENT (has_guid_volumes)
-  bool	IMPLEMENT (has_null_console_handler_routine)
   bool	IMPLEMENT (has_disk_ex_ioctls)
   bool	IMPLEMENT (has_disabled_user_tos_setting)
   bool	IMPLEMENT (has_fileid_dirinfo)

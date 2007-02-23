@@ -65,13 +65,6 @@ fhandler_dev_raw::fstat (struct __stat64 *buf)
 int
 fhandler_dev_raw::open (int flags, mode_t)
 {
-  if (!wincap.has_raw_devices ())
-    {
-      set_errno (ENOENT);
-      debug_printf ("%s is accessible under NT/W2K only", get_win32_name ());
-      return 0;
-    }
-
   /* Check for illegal flags. */
   if (get_major () != DEV_TAPE_MAJOR && (flags & (O_APPEND | O_EXCL)))
     {

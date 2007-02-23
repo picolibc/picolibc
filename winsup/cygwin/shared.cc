@@ -69,8 +69,7 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
   void *shared;
 
   void *addr;
-  if ((m == SH_JUSTCREATE || m == SH_JUSTOPEN)
-      || !wincap.needs_memory_protection () && offsets[0])
+  if (m == SH_JUSTCREATE || m == SH_JUSTOPEN)
     addr = NULL;
   else
     {
@@ -122,7 +121,7 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
   if (!shared)
     api_fatal ("MapViewOfFileEx '%s'(%p), %E.  Terminating.", mapname, shared_h);
 
-  if (m == SH_USER_SHARED && offsets[0] && wincap.needs_memory_protection ())
+  if (m == SH_USER_SHARED && offsets[0])
     {
       ptrdiff_t delta = (caddr_t) shared - (caddr_t) off_addr (0);
       offsets[0] = (caddr_t) shared - (caddr_t) cygwin_hmodule;
