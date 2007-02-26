@@ -540,7 +540,6 @@ fhandler_disk_file::fchmod (mode_t mode)
   if (pc.is_fs_special ())
     return chmod_device (pc, mode);
 
-  /* Also open on 9x, otherwise we can't touch ctime. */
   if (!get_io_handle ())
     {
       query_open (query_write_control);

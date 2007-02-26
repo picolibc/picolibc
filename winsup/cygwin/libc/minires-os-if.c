@@ -347,8 +347,7 @@ static void get_registry_dns_items(HKEY hKey, LPCTSTR KeyValue,
  get_registry_dns: 
 
  Read the registry to get dns server addresses in Network Byte Order,
-    and set statp->nscount
-    (for Win9x and NT <= 4.0, but not Win95 with DHCP)
+    and set statp->nscount (for NT <= 4.0)
  Read the registry SearchList
  
 ***********************************************************************/
@@ -357,12 +356,10 @@ static void get_registry_dns(res_state statp)
 {
   HKEY hKey;     
   DWORD  res;
-  const char *keyName[] = {"SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
-			   "System\\CurrentControlSet\\Services\\VxD\\MSTCP"};
-  int is9x = !!(GetVersion() & 0x80000000);
+  const char *keyName = "SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters";
   
-  DPRINTF(statp->options & RES_DEBUG, "key %s\n", keyName[is9x]);
-  if ((res = RegOpenKeyEx( HKEY_LOCAL_MACHINE, keyName[is9x], 0, 
+  DPRINTF(statp->options & RES_DEBUG, "key %s\n", keyName);
+  if ((res = RegOpenKeyEx( HKEY_LOCAL_MACHINE, keyName, 0, 
 			   KEY_QUERY_VALUE | KEY_READ, &hKey)) != ERROR_SUCCESS) {
     DPRINTF(statp->options & RES_DEBUG, "RegOpenKeyEx: error %lu (Windows)\n", res);
     return;
@@ -370,7 +367,7 @@ static void get_registry_dns(res_state statp)
 
   if (statp->nscount == 0)
     get_registry_dns_items(hKey, "NameServer", statp, 0);
-  if (statp->nscount == 0 && !is9x) 
+  if (statp->nscount == 0) 
     get_registry_dns_items(hKey, "DhcpNameServer", statp, 0);
   if (statp->dnsrch[0] == NULL)
     get_registry_dns_items(hKey, "SearchList", statp, 1);

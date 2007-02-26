@@ -134,20 +134,6 @@ gen_protect (int prot, int flags)
   return ret;
 }
 
-/* Generate Windows access flags from mmap prot and flag values.
-   Only used on 9x.  PROT_EXEC not supported here since it's not
-   necessary. */
-static inline DWORD
-gen_access (DWORD openflags, int flags)
-{
-  DWORD ret = FILE_MAP_READ;
-  if (priv (flags))
-    ret = FILE_MAP_COPY;
-  else if (openflags & GENERIC_WRITE)
-    ret = priv (flags) ? FILE_MAP_COPY : FILE_MAP_WRITE;
-  return ret;
-}
-
 static HANDLE
 CreateMapping (HANDLE fhdl, size_t len, _off64_t off, DWORD openflags,
 	       int prot, int flags, const char *)
@@ -322,8 +308,6 @@ class mmap_record
       { return ::gen_create_protect (get_openflags (), get_flags ()); }
     DWORD gen_protect () const
       { return ::gen_protect (get_prot (), get_flags ()); }
-    DWORD gen_access () const
-      { return ::gen_access (get_openflags (), get_flags ()); }
     bool compatible_flags (int fl) const;
 };
 
@@ -1034,8 +1018,8 @@ go_ahead:
 	 to accomodate the requested length, but as reserved pages which
 	 raise a SIGBUS when trying to access them.  AT_ROUND_TO_PAGE
 	 and page protection on shared pages is only supported by 32 bit NT,
-	 so don't even try on 9x and in WOW64.  This is accomplished by not
-	 setting orig_len on 9x and in WOW64 above. */
+	 so don't even try on WOW64.  This is accomplished by not setting
+	 orig_len on WOW64 above. */
 #if 0
       orig_len = roundup2 (orig_len, pagesize);
 #endif

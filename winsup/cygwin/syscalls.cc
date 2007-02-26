@@ -1878,16 +1878,6 @@ statvfs (const char *fname, struct statvfs *sfs)
      WinME, to avoid the MS KB 314417 bug */
   statusex = GetDiskFreeSpaceEx (root, &availb, &totalb, &freeb);
   status = GetDiskFreeSpace (root, &spc, &bps, &freec, &totalc);
-  if (!status && statusex)
-    {
-      /* Grrr, this can happen on 9x when a share isn't attached to
-	 a drive letter.  Fake, fake, hoorah. */
-      status = TRUE;
-      bps = 512;
-      spc = 8;
-      while ((totalb.QuadPart % (spc*bps)) && spc > 1)
-	spc >>= 1;
-    }
   if (status)
     {
       if (statusex)

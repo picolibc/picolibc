@@ -1,3 +1,15 @@
+2007-02-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Drop comment.
+	* mmap.cc (gen_access): Remove.
+	(mmap_record::gen_access): Remove.
+	(mmap64): Don't mention 9x any longer.
+	* syscalls.cc (statvfs): Drop status code consideration for 9x.
+	* libc/minires-os-if.c (get_registry_dns_items): Don't mention 9x any
+	longer.
+	(get_registry_dns): Drop getting registry key on 9x.  Drop is9x
+	variable.
+
 2007-02-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	Throughout remove all usage of wincap.has_security.
