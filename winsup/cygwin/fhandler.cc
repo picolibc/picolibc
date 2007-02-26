@@ -1138,7 +1138,8 @@ fhandler_base::fstat (struct __stat64 *buf)
   buf->st_gid = getegid32 ();
   buf->st_nlink = 1;
   buf->st_blksize = PREFERRED_IO_BLKSIZE;
-  time_as_timestruc_t (&buf->st_ctim);
+  buf->st_ctim.tv_sec = 1164931200L;	/* Arbitrary value: 2006-12-01 */
+  buf->st_ctim.tv_nsec = 0L;
   buf->st_atim = buf->st_mtim = buf->st_ctim;
   return 0;
 }

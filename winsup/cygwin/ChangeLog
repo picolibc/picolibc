@@ -1,5 +1,10 @@
 2007-02-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::fstat): Set all file times to arbitrary
+	fixed value.
+
+2007-02-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_registry.cc (registry_listing): Drop name of HKEY_DYN_DATA.
 	(registry_keys): Drop HKEY_DYN_DATA.
 	* net.cc: Fix comment.
