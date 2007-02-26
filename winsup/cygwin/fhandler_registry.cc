@@ -1,6 +1,6 @@
 /* fhandler_registry.cc: fhandler for /proc/registry virtual filesystem
 
-   Copyright 2002, 2003, 2003, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright 2002, 2003, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -46,7 +46,6 @@ static const char *registry_listing[] =
   "HKEY_CURRENT_USER",
   "HKEY_LOCAL_MACHINE",
   "HKEY_USERS",
-  "HKEY_DYN_DATA",		// 95/98/Me
   "HKEY_PERFORMANCE_DATA",	// NT/2000/XP
   NULL
 };
@@ -60,7 +59,6 @@ static const HKEY registry_keys[] =
   HKEY_CURRENT_USER,
   HKEY_LOCAL_MACHINE,
   HKEY_USERS,
-  HKEY_DYN_DATA,
   HKEY_PERFORMANCE_DATA
 };
 

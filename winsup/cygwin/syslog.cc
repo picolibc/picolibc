@@ -30,8 +30,7 @@ details. */
 
 #define CYGWIN_LOG_NAME "Cygwin"
 
-/* openlog: save the passed args. Don't open the
-   system log (NT) or log file (95) yet.  */
+/* openlog: save the passed args. Don't open the system log or /dev/log yet.  */
 extern "C" void
 openlog (const char *ident, int logopt, int facility)
 {
@@ -259,15 +258,13 @@ try_connect_syslogd (int priority, const char *msg, int len)
   return ret;
 }
 
-/*
- * syslog: creates the log message and writes to system
- * log (NT) or log file (95). FIXME. WinNT log error messages
- * don't look pretty, but in order to fix this we have to
- * embed resources in the code and tell the NT registry
- * where we are, blech (what happens if we move ?).
- * We could, however, add the resources in Cygwin and
- * always point to that.
- */
+/* syslog: creates the log message and writes to /dev/log, or to the
+   NT system log if /dev/log isn't available.
+
+   FIXME. WinNT system log messages don't look pretty, but in order to
+   fix this we have to embed resources in the code and tell the NT
+   registry where we are, blech (what happens if we move ?).  We could,
+   however, add the resources in Cygwin and always point to that. */
 
 extern "C" void
 vsyslog (int priority, const char *message, va_list ap)

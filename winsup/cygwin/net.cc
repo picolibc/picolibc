@@ -1413,7 +1413,7 @@ done:
 }
 
 /*
- * IFCONF 98/ME, NTSP4, W2K:
+ * IFCONF NTSP4, W2K:
  * Use IP Helper Library
  */
 static void

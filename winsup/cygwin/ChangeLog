@@ -1,5 +1,12 @@
 2007-02-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_registry.cc (registry_listing): Drop name of HKEY_DYN_DATA.
+	(registry_keys): Drop HKEY_DYN_DATA.
+	* net.cc: Fix comment.
+	* syslog.cc: Ditto.
+
+2007-02-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Drop comment.
 	* mmap.cc (gen_access): Remove.
 	(mmap_record::gen_access): Remove.
