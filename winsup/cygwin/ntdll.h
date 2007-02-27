@@ -590,6 +590,14 @@ typedef struct _FILE_COMPRESSION_INFORMATION
   UCHAR ClusterSizeShift;
 } FILE_COMPRESSION_INFORMATION, *PFILE_COMPRESSION_INFORMATION;
 
+typedef struct _FILE_FS_ATTRIBUTE_INFORMATION
+{
+  ULONG FileSystemAttributes;
+  ULONG MaximumComponentNameLength;
+  ULONG FileSystemNameLength;
+  WCHAR FileSystemName[1];
+} FILE_FS_ATTRIBUTE_INFORMATION, *PFILE_FS_ATTRIBUTE_INFORMATION;
+
 typedef struct _FILE_FS_VOLUME_INFORMATION
 {
   LARGE_INTEGER VolumeCreationTime;
@@ -606,6 +614,15 @@ typedef struct _FILE_FS_SIZE_INFORMATION
   ULONG SectorsPerAllocationUnit;
   ULONG BytesPerSector;
 } FILE_FS_SIZE_INFORMATION, *PFILE_FS_SIZE_INFORMATION;
+
+typedef struct _FILE_FS_FULL_SIZE_INFORMATION
+{
+  LARGE_INTEGER TotalAllocationUnits;
+  LARGE_INTEGER CallerAvailableAllocationUnits;
+  LARGE_INTEGER ActualAvailableAllocationUnits;
+  ULONG SectorsPerAllocationUnit;
+  ULONG BytesPerSector;
+} FILE_FS_FULL_SIZE_INFORMATION, *PFILE_FS_FULL_SIZE_INFORMATION;
 
 typedef enum _FSINFOCLASS {
   FileFsVolumeInformation = 1,

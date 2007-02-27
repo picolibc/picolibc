@@ -15,6 +15,7 @@ details. */
 #include <sys/cygwin.h>
 #include <sys/uio.h>
 #include <sys/acl.h>
+#include <sys/statvfs.h>
 #include <signal.h>
 #include "cygerrno.h"
 #include "perprocess.h"
@@ -486,6 +487,10 @@ fhandler_base::open (int flags, mode_t mode)
   switch (query_open ())
     {
       case query_read_control:
+	access = READ_CONTROL;
+	create_options = FILE_OPEN_FOR_BACKUP_INTENT;
+	break;
+      case query_read_attributes:
 	access = READ_CONTROL | FILE_READ_ATTRIBUTES;
 	create_options = FILE_OPEN_FOR_BACKUP_INTENT;
 	break;
@@ -1142,6 +1147,16 @@ fhandler_base::fstat (struct __stat64 *buf)
   buf->st_ctim.tv_nsec = 0L;
   buf->st_atim = buf->st_mtim = buf->st_ctim;
   return 0;
+}
+
+int __stdcall
+fhandler_base::fstatvfs (struct statvfs *sfs)
+{
+  /* If we hit this base implementation, it's some device in /dev.
+     Just call statvfs on /dev for simplicity. */
+  path_conv pc ("/dev");
+  fhandler_disk_file fh (pc);
+  return fh.fstatvfs (sfs);
 }
 
 void

@@ -1841,113 +1841,56 @@ get_osfhandle (int fd)
 }
 
 extern "C" int
-statvfs (const char *fname, struct statvfs *sfs)
+fstatvfs (int fd, struct statvfs *sfs)
 {
-  int ret = -1;
-  char root[CYG_MAX_PATH];
-
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
-  if (!*fname)
-    {
-      set_errno (ENOENT);
-      return -1;
-    }
 
-  syscall_printf ("statfs %s", fname);
-
-  if (!sfs)
-    {
-      set_errno (EFAULT);
-      return -1;
-    }
-
-  path_conv full_path (fname, PC_SYM_FOLLOW);
-  if (!full_path.rootdir (root))
-    {
-      set_errno (ENOTDIR);
-      return -1;
-    }
-
-  ULARGE_INTEGER availb, freeb, totalb;
-  DWORD spc, bps, availc, freec, totalc, vsn, maxlen, flags;
-  BOOL status, statusex;
-
-  /* GetDiskFreeSpaceEx must be called before GetDiskFreeSpace on
-     WinME, to avoid the MS KB 314417 bug */
-  statusex = GetDiskFreeSpaceEx (root, &availb, &totalb, &freeb);
-  status = GetDiskFreeSpace (root, &spc, &bps, &freec, &totalc);
-  if (status)
-    {
-      if (statusex)
-	{
-	  availc = availb.QuadPart / (spc*bps);
-	  totalc = totalb.QuadPart / (spc*bps);
-	  freec = freeb.QuadPart / (spc*bps);
-	  if (freec > availc)
-	    {
-	      /* Quotas active.  We can't trust totalc. */
-	      HANDLE hdl = CreateFile (full_path, READ_CONTROL,
-				       FILE_SHARE_VALID_FLAGS, &sec_none_nih,
-				       OPEN_EXISTING,
-				       FILE_FLAG_BACKUP_SEMANTICS, NULL);
-	      if (hdl == INVALID_HANDLE_VALUE)
-		debug_printf ("CreateFile (%s) failed, %E", (char *) full_path);
-	      else
-		{
-		  NTFS_VOLUME_DATA_BUFFER nvdb;
-		  DWORD bytes;
-		  if (!DeviceIoControl (hdl, FSCTL_GET_NTFS_VOLUME_DATA, NULL,
-					0, &nvdb, sizeof nvdb, &bytes, NULL))
-		    debug_printf ("DeviceIoControl (%s) failed, %E", (char *) full_path);
-		  else
-		    totalc = nvdb.TotalClusters.QuadPart;
-		  CloseHandle (hdl);
-		}
-	    }
-	}
-      else
-	availc = freec;
-      if (GetVolumeInformation (root, NULL, 0, &vsn, &maxlen, &flags, NULL, 0))
-	{
-	  sfs->f_bsize = spc*bps;
-	  sfs->f_frsize = spc*bps;
-	  sfs->f_blocks = totalc;
-	  sfs->f_bfree = freec;
-	  sfs->f_bavail = availc;
-	  sfs->f_files = ULONG_MAX;
-	  sfs->f_ffree = ULONG_MAX;
-	  sfs->f_favail = ULONG_MAX;
-	  sfs->f_fsid = vsn;
-	  sfs->f_flag = flags;
-	  sfs->f_namemax = maxlen;
-	  ret = 0;
-	}
-    }
-  if (ret)
-    __seterrno ();
-
-  return ret;
-}
-
-extern "C" int
-fstatvfs (int fd, struct statvfs *sfs)
-{
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     return -1;
-  return statvfs (cfd->get_name (), sfs);
+  return cfd->fstatvfs (sfs);
 }
 
 extern "C" int
-statfs (const char *fname, struct statfs *sfs)
+statvfs (const char *name, struct statvfs *sfs)
 {
+  int res = -1;
+  fhandler_base *fh = NULL;
+
   myfault efault;
   if (efault.faulted (EFAULT))
-    return -1;
+    goto error;
+
+  if (!(fh = build_fh_name (name, NULL, PC_SYM_FOLLOW, stat_suffixes)))
+    goto error;
+
+  if (fh->error ())
+    {
+      debug_printf ("got %d error from build_fh_name", fh->error ());
+      set_errno (fh->error ());
+    }
+  else if (fh->exists ())
+    {
+      debug_printf ("(%s, %p), file_attributes %d", name, sfs, (DWORD) *fh);
+      res = fh->fstatvfs (sfs);
+    }
+  else
+    set_errno (ENOENT);
+
+  delete fh;
+ error:
+  MALLOC_CHECK;
+  syscall_printf ("%d = (%s, %p)", res, name, sfs);
+  return res;
+}
+
+extern "C" int
+fstatfs (int fd, struct statfs *sfs)
+{
   struct statvfs vfs;
-  int ret = statvfs (fname, &vfs);
+  int ret = fstatvfs (fd, &vfs);
   if (!ret)
     {
       sfs->f_type = vfs.f_flag;
@@ -1964,12 +1907,23 @@ statfs (const char *fname, struct statfs *sfs)
 }
 
 extern "C" int
-fstatfs (int fd, struct statfs *sfs)
+statfs (const char *fname, struct statfs *sfs)
 {
-  cygheap_fdget cfd (fd);
-  if (cfd < 0)
-    return -1;
-  return statfs (cfd->get_name (), sfs);
+  struct statvfs vfs;
+  int ret = statvfs (fname, &vfs);
+  if (!ret)
+    {
+      sfs->f_type = vfs.f_flag;
+      sfs->f_bsize = vfs.f_bsize;
+      sfs->f_blocks = vfs.f_blocks;
+      sfs->f_bavail = vfs.f_bavail;
+      sfs->f_bfree = vfs.f_bfree;
+      sfs->f_files = -1;
+      sfs->f_ffree = -1;
+      sfs->f_fsid = vfs.f_fsid;
+      sfs->f_namelen = vfs.f_namemax;
+    }
+  return ret;
 }
 
 /* setpgid: POSIX 4.3.3.1 */

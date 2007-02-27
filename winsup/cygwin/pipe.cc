@@ -451,6 +451,13 @@ fhandler_pipe::ioctl (unsigned int cmd, void *p)
   return 0;
 }
 
+int __stdcall
+fhandler_pipe::fstatvfs (struct statvfs *sfs)
+{
+  set_errno (EBADF);
+  return -1;
+}
+
 #define DEFAULT_PIPEBUFSIZE (16 * PIPE_BUF)
 
 extern "C" int

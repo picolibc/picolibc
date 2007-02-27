@@ -1,3 +1,35 @@
+2007-02-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc(fhandler_base::open): Open with READ_CONTROL only in
+	case of query_open flag set to query_read_control.  Add case for
+	new query_read_attributes flag.
+	(fhandler_base::fstatvfs): New method.
+	* fhandler.h (enum query_state): Add query_read_attributes flag.
+	(class fhandler_base): Declare new virtual fstatvfs method.
+	(class fhandler_socket): Ditto.
+	(class fhandler_pipe): Ditto.
+	(class fhandler_fifo): Ditto.
+	(class fhandler_disk_file): Ditto.
+	(class fhandler_virtual): Ditto.
+	* fhandler_disk_file.cc (fhandler_base::fstat_fs): Open with
+	query_read_attributes instead of query_read_control.
+	(fhandler_disk_file::fstatvfs): New method.
+	(fhandler_disk_file::facl): Open with query_read_attributes instead of
+	query_read_control.
+	* fhandler_fifo.cc (fhandler_fifo::fstatvfs): New method.
+	* fhandler_socket.cc (fhandler_socket::fstatvfs): New method.
+	(fhandler_socket::fchmod): Return with EBADF in the default case.
+	(fhandler_socket::fchown): Ditto.
+	(fhandler_socket::facl): Ditto.
+	* fhandler_virtual.cc (fhandler_virtual::fstatvfs): Ditto.
+	* ntdll.h (struct _FILE_FS_ATTRIBUTE_INFORMATION): Define.
+	(struct _FILE_FS_FULL_SIZE_INFORMATION): Define.
+	* pipe.cc (fhandler_pipe::fstatvfs): New method.
+	* syscalls.cc (fstatvfs): Just call the fhandler's fstatvfs.
+	(statvfs): Ditto.
+	(fstatfs): Call fstatvfs.
+	(statfs): Drop EFAULT handling.
+
 2007-02-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::fstat): Set all file times to arbitrary

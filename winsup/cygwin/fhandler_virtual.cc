@@ -1,6 +1,6 @@
 /* fhandler_virtual.cc: base fhandler class for virtual filesystems
 
-   Copyright 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -13,6 +13,7 @@ details. */
 #include <stdlib.h>
 #include <sys/cygwin.h>
 #include <sys/acl.h>
+#include <sys/statvfs.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -260,4 +261,15 @@ fhandler_virtual::facl (int cmd, int nentries, __aclent32_t *aclbufp)
       aclbufp[2].a_perm = S_IROTH | (pc.isdir () ? S_IXOTH : 0);
     }
   return res;
+}
+
+int __stdcall
+fhandler_virtual::fstatvfs (struct statvfs *sfs)
+{
+  /* Virtual file system.  Just return an empty buffer with a few values
+     set to something useful.  Just as on Linux. */
+  memset (sfs, 0, sizeof (*sfs));
+  sfs->f_bsize = sfs->f_frsize = 4096;
+  sfs->f_namemax = NAME_MAX;
+  return 0;
 }

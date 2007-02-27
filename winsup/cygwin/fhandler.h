@@ -82,9 +82,10 @@ enum bg_check_types
 enum query_state {
   no_query = 0,
   query_read_control = 1,
-  query_stat_control = 2,
-  query_write_control = 3,
-  query_write_attributes = 4
+  query_read_attributes = 2,
+  query_stat_control = 3,
+  query_write_control = 4,
+  query_write_attributes = 5
 };
 
 class fhandler_base
@@ -276,6 +277,7 @@ class fhandler_base
     __attribute__ ((regparm (3)));
   int __stdcall fstat_by_handle (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_by_name (struct __stat64 *buf) __attribute__ ((regparm (2)));
+  virtual int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
   int utimes_fs (const struct timeval *) __attribute__ ((regparm (2)));
   virtual int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   virtual int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
@@ -506,6 +508,7 @@ class fhandler_socket: public fhandler_base
   char *get_sun_path () {return sun_path;}
 
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
+  int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
   int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
   int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
@@ -540,6 +543,7 @@ public:
   }
   int dup (fhandler_base *child);
   int ioctl (unsigned int cmd, void *);
+  int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
   int __stdcall fadvise (_off64_t, _off64_t, int) __attribute__ ((regparm (3)));
   int __stdcall ftruncate (_off64_t, bool) __attribute__ ((regparm (3)));
   void fixup_in_child ();
@@ -572,6 +576,7 @@ public:
   void set_output_handle (HANDLE h) { output_handle = h; }
   void set_use ();
   int dup (fhandler_base *child);
+  int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
   bool is_slow () {return true;}
   void close_one_end ();
 };
@@ -692,6 +697,7 @@ class fhandler_disk_file: public fhandler_base
   int __stdcall ftruncate (_off64_t, bool) __attribute__ ((regparm (3)));
   int __stdcall link (const char *) __attribute__ ((regparm (2)));
   int __stdcall utimes (const struct timeval *) __attribute__ ((regparm (2)));
+  int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
 
   HANDLE mmap (caddr_t *addr, size_t len, int prot, int flags, _off64_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);
@@ -1228,6 +1234,7 @@ class fhandler_virtual : public fhandler_base
   int open (int flags, mode_t mode = 0);
   int close ();
   int __stdcall fstat (struct stat *buf) __attribute__ ((regparm (2)));
+  int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
   int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
   int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));

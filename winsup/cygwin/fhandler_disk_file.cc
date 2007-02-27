@@ -14,6 +14,7 @@ details. */
 #include <stdlib.h>
 #include <sys/cygwin.h>
 #include <sys/acl.h>
+#include <sys/statvfs.h>
 #include <signal.h>
 #include "cygerrno.h"
 #include "perprocess.h"
@@ -340,7 +341,7 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
       /* If we couldn't open the file, try a query open with no permissions.
 	 This allows us to determine *some* things about the file, at least. */
       pc.set_exec (0);
-      query_open (query_read_control);
+      query_open (query_read_attributes);
       oret = open_fs (open_flags, 0);
     }
 
@@ -531,6 +532,111 @@ fhandler_disk_file::fstat (struct __stat64 *buf)
 }
 
 int __stdcall
+fhandler_disk_file::fstatvfs (struct statvfs *sfs)
+{
+  int ret = -1, oret = 0;
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  const size_t fvi_size = sizeof (FILE_FS_VOLUME_INFORMATION)
+			  + 256 * sizeof (WCHAR);
+  PFILE_FS_VOLUME_INFORMATION pfvi = (PFILE_FS_VOLUME_INFORMATION)
+				     alloca (fvi_size);
+  const size_t fai_size = sizeof (FILE_FS_ATTRIBUTE_INFORMATION)
+			  + 256 * sizeof (WCHAR);
+  PFILE_FS_ATTRIBUTE_INFORMATION pfai = (PFILE_FS_ATTRIBUTE_INFORMATION)
+					alloca (fai_size);
+  FILE_FS_FULL_SIZE_INFORMATION full_fsi;
+  FILE_FS_SIZE_INFORMATION fsi;
+
+  if (!get_io_handle ())
+    {
+      query_open (query_read_control);
+      oret = open_fs (O_RDONLY | O_BINARY, 0);
+      if (!oret)
+        {
+          /* Can't open file.  Try again with rootdir. */
+	  char root[CYG_MAX_PATH];
+	  if (!rootdir (get_win32_name (), root))
+	    goto out;
+	  pc.check (root, PC_SYM_NOFOLLOW);
+	  oret = open_fs (O_RDONLY | O_BINARY, 0);
+	  if (!oret)
+	    goto out;
+	}
+    }
+
+  /* Get basic volume information. */
+  status = NtQueryVolumeInformationFile (get_handle (), &io, pfvi, fvi_size,
+					 FileFsVolumeInformation);
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      goto out;
+    }
+  status = NtQueryVolumeInformationFile (get_handle (), &io, pfai, fai_size,
+					 FileFsAttributeInformation);
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      goto out;
+    }
+  sfs->f_files = ULONG_MAX;
+  sfs->f_ffree = ULONG_MAX;
+  sfs->f_favail = ULONG_MAX;
+  sfs->f_fsid = pfvi->VolumeSerialNumber;
+  sfs->f_flag = pfai->FileSystemAttributes;
+  sfs->f_namemax = pfai->MaximumComponentNameLength;
+  /* Get allocation related information.  Try to get "full" information
+     first, which is only available since W2K.  If that fails, try to
+     retrieve normal allocation information. */
+  status = NtQueryVolumeInformationFile (get_handle (), &io, &full_fsi,
+  					 sizeof full_fsi,
+					 FileFsFullSizeInformation);
+  if (NT_SUCCESS (status))
+    {
+      sfs->f_bsize = full_fsi.BytesPerSector * full_fsi.SectorsPerAllocationUnit;
+      sfs->f_frsize = sfs->f_bsize;
+      sfs->f_blocks = full_fsi.TotalAllocationUnits.LowPart;
+      sfs->f_bfree = full_fsi.ActualAvailableAllocationUnits.LowPart;
+      sfs->f_bavail = full_fsi.CallerAvailableAllocationUnits.LowPart;
+      if (sfs->f_bfree > sfs->f_bavail)
+        {
+	  /* Quotas active.  We can't trust TotalAllocationUnits. */
+	  NTFS_VOLUME_DATA_BUFFER nvdb;
+	  DWORD bytes;
+
+	  if (!DeviceIoControl (get_handle (), FSCTL_GET_NTFS_VOLUME_DATA, NULL,
+				0, &nvdb, sizeof nvdb, &bytes, NULL))
+	    debug_printf ("DeviceIoControl (%s) failed, %E", get_name ());
+	  else
+	    sfs->f_blocks = nvdb.TotalClusters.QuadPart;
+	}
+      ret = 0;
+    }
+  else
+    {
+      status = NtQueryVolumeInformationFile (get_handle (), &io, &fsi,
+					     sizeof fsi, FileFsSizeInformation);
+      if (!NT_SUCCESS (status))
+	{
+	  __seterrno_from_nt_status (status);
+	  goto out;
+	}
+      sfs->f_bsize = fsi.BytesPerSector * fsi.SectorsPerAllocationUnit;
+      sfs->f_frsize = sfs->f_bsize;
+      sfs->f_blocks = fsi.TotalAllocationUnits.LowPart;
+      sfs->f_bfree = fsi.AvailableAllocationUnits.LowPart;
+      sfs->f_bavail = sfs->f_bfree;
+      ret = 0;
+    }
+out:
+  if (oret)
+    close_fs ();
+  syscall_printf ("%d = fstatvfs (%s, %p)", ret, get_name (), sfs);
+  return ret;
+}
+
+int __stdcall
 fhandler_disk_file::fchmod (mode_t mode)
 {
   extern int chmod_device (path_conv& pc, mode_t mode);
@@ -653,7 +759,7 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 	      {
 		if (!get_io_handle ())
 		  {
-		    query_open (query_read_control);
+		    query_open (query_read_attributes);
 		    if (!(oret = open (O_BINARY, 0)))
 		      return -1;
 		  }
@@ -687,7 +793,7 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
     {
       if (!get_io_handle ())
 	{
-	  query_open (cmd == SETACL ? query_write_control : query_read_control);
+	  query_open (cmd == SETACL ? query_write_control : query_read_attributes);
 	  if (!(oret = open (O_BINARY, 0)))
 	    return -1;
 	}

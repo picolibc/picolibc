@@ -36,6 +36,7 @@
 #include "wininfo.h"
 #include <unistd.h>
 #include <sys/acl.h>
+#include <sys/statvfs.h>
 #include "cygtls.h"
 #include "cygwin/in6.h"
 
@@ -666,6 +667,19 @@ fhandler_socket::fstat (struct __stat64 *buf)
   return res;
 }
 
+int __stdcall
+fhandler_socket::fstatvfs (struct statvfs *sfs)
+{
+  if (get_device () == FH_UNIX)
+    {
+      fhandler_disk_file fh (pc);
+      fh.get_device () = FH_FS;
+      return fh.fstatvfs (sfs);
+    }
+  set_errno (EBADF);
+  return -1;
+}
+
 int
 fhandler_socket::fchmod (mode_t mode)
 {
@@ -677,7 +691,8 @@ fhandler_socket::fchmod (mode_t mode)
       SetFileAttributes	(pc, GetFileAttributes (pc) | FILE_ATTRIBUTE_SYSTEM);
       return ret;
     }
-  return 0;
+  set_errno (EBADF);
+  return -1;
 }
 
 int
@@ -688,7 +703,8 @@ fhandler_socket::fchown (__uid32_t uid, __gid32_t gid)
       fhandler_disk_file fh (pc);
       return fh.fchown (uid, gid);
     }
-  return 0;
+  set_errno (EBADF);
+  return -1;
 }
 
 int
@@ -699,7 +715,8 @@ fhandler_socket::facl (int cmd, int nentries, __aclent32_t *aclbufp)
       fhandler_disk_file fh (pc);
       return fh.facl (cmd, nentries, aclbufp);
     }
-  return fhandler_base::facl (cmd, nentries, aclbufp);
+  set_errno (EBADF);
+  return -1;
 }
 
 int
