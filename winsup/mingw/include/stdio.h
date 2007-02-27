@@ -178,11 +178,13 @@ _CRTIMP char* __cdecl	tmpnam (char*);
 
 #ifndef __STRICT_ANSI__
 _CRTIMP char* __cdecl	_tempnam (const char*, const char*);
-_CRTIMP int  __cdecl    _rmtmp(void);
+_CRTIMP int __cdecl	_rmtmp(void);
+_CRTIMP int __cdecl	_unlink (const char*);
 
 #ifndef	NO_OLDNAMES
 _CRTIMP char* __cdecl	tempnam (const char*, const char*);
-_CRTIMP int __cdecl     rmtmp(void);
+_CRTIMP int __cdecl	rmtmp(void);
+_CRTIMP int __cdecl	unlink (const char*);
 #endif
 #endif /* __STRICT_ANSI__ */
 
