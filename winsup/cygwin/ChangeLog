@@ -1,5 +1,15 @@
 2007-02-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (close_user_proc_parms_cwd_handle): Remove.
+	(cwdstuff::init): Don't call close_user_proc_parms_cwd_handle.
+	Call set to set cwd with all-sharing handle.
+	(cwdstuff::set): Fix comment.  Don't close cwd handle.  Set in
+	user parameter block instead and close old cwd handle.
+	* syscalls.cc (rename): Call unlink_nt instead of RemoveDirectory or
+	DeleteFile to allow deleting shared files/directories.
+
+2007-02-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc(fhandler_base::open): Open with READ_CONTROL only in
 	case of query_open flag set to query_read_control.  Add case for
 	new query_read_attributes flag.

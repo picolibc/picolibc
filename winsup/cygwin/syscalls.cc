@@ -1421,17 +1421,15 @@ rename (const char *oldpath, const char *newpath)
       && (len = strlen (real_old), strncasematch (real_old, real_new, len))
       && real_new[len] == '\\')
     SetLastError (ERROR_INVALID_PARAMETER);
-  else if (real_new.isdir ())
-    {
-      /* Since neither MoveFileEx(MOVEFILE_REPLACE_EXISTING) nor DeleteFile
-	 allow to remove directories, this case is handled separately. */
-      if (!RemoveDirectoryA (real_new))
-	syscall_printf ("Can't remove target directory");
-      else if (MoveFile (real_old, real_new))
-	res = 0;
-    }
   else if (MoveFileEx (real_old.get_win32 (), real_new.get_win32 (),
 		       MOVEFILE_REPLACE_EXISTING))
+    res = 0;
+  else if ((lasterr = unlink_nt (real_new, false)))
+    {
+      SetLastError (lasterr);
+      syscall_printf ("Can't remove target file/dir, %E");
+    }
+  else if (MoveFile (real_old, real_new))
     res = 0;
 
 done:
@@ -1462,7 +1460,7 @@ done:
       if (lnk_suffix)
 	{
 	  *lnk_suffix = '.';
-	  DeleteFile (real_new);
+	  unlink_nt (real_new, false);
 	}
       /* Shortcut hack, No. 3, part 2 */
       /* If a file with the given name exists, it must be deleted after the
@@ -1474,7 +1472,7 @@ done:
 	{
 	  lnk_suffix = strrchr (real_new.get_win32 (), '.');
 	  *lnk_suffix = '\0';
-	  DeleteFile (real_new);
+	  unlink_nt (real_new, false);
 	}
     }
 

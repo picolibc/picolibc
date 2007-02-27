@@ -4170,25 +4170,14 @@ get_user_proc_parms ()
   return _upp;
 }
 
-static void
-close_user_proc_parms_cwd_handle ()
-{
-  PHANDLE phdl = &get_user_proc_parms ()->CurrentDirectoryHandle;
-  if (*phdl)
-    {
-      NtClose (*phdl);
-      *phdl = NULL;
-    }
-}
-
 /* Initialize cygcwd 'muto' for serializing access to cwd info. */
 void
 cwdstuff::init ()
 {
   cwd_lock.init ("cwd_lock");
   get_initial ();
-  if (!dynamically_loaded)
-    close_user_proc_parms_cwd_handle ();
+  /* Initially re-open the cwd to allow POSIX semantics. */
+  set (win32, posix, true);
   cwd_lock.release ();
 }
 
@@ -4220,22 +4209,17 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
       if (doit)
 	{
 	  /* We utilize the user parameter block.  The directory is
-	     stored manually, but the handle to the directory is always
-	     closed and set to NULL.  This way the directory isn't blocked
-	     even if it's the cwd of a Cygwin process.
-
-	     Why the hassle?
-
-	     - A process has always an open handle to the current working
-	       directory which disallows manipulating this directory.
-	       POSIX allows to remove a directory if the permissions are ok.
-	       The fact that its the cwd of some process doesn't matter.
-
+	     stored manually there.  Why the hassle?
+	     
 	     - SetCurrentDirectory fails for directories with strict
 	       permissions even for processes with the SE_BACKUP_NAME
 	       privilege enabled.  The reason is apparently that
 	       SetCurrentDirectory calls NtOpenFile without the
-	       FILE_OPEN_FOR_BACKUP_INTENT flag set. */
+	       FILE_OPEN_FOR_BACKUP_INTENT flag set.
+	     
+	     - Unlinking a cwd fails because SetCurrentDirectory seems to
+	       open directories so that deleting the directory is disallowed.
+	       The below code opens with *all* sharing flags set. */
 	  HANDLE h;
 	  DWORD attr = GetFileAttributes (win32_cwd);
 	  if (attr == INVALID_FILE_ATTRIBUTES)
@@ -4272,8 +4256,13 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
 	    RtlOemStringToUnicodeString (
 			&get_user_proc_parms ()->CurrentDirectoryName,
 			&as, FALSE);
-	  close_user_proc_parms_cwd_handle ();
-	  CloseHandle (h);
+	  PHANDLE phdl = &get_user_proc_parms ()->CurrentDirectoryHandle;
+	  if (*phdl)
+	    {
+	      HANDLE old_h = *phdl;
+	      *phdl = h;
+	      CloseHandle (old_h);
+	    }
 	}
     }
   /* If there is no win32 path or it has the form c:xxx, get the value */
