@@ -1,6 +1,6 @@
 /* SPU ELF support for BFD.
 
-   Copyright 2006 Free Software Foundation, Inc.
+   Copyright 2006, 2007 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -402,6 +402,13 @@ APUOPFB(M_BITD, 	RR,	0x129,	0x20,	"bitd", 	_A2(A_T,A_A),	00011,	BR)	/* BINF     
 APUOPFB(M_BITE, 	RR,	0x129,	0x10,	"bite", 	_A2(A_T,A_A),	00011,	BR)	/* BINF          IP<-RA_if(RT) */
 APUOPFB(M_BIFD,		RR,	0x128,	0x20,	"bifd",		_A2(A_T,A_A),	00011,	BR)	/* BIZ           IP<-RA_if(RT) */
 APUOPFB(M_BIFE,		RR,	0x128,	0x10,	"bife",		_A2(A_T,A_A),	00011,	BR)	/* BIZ           IP<-RA_if(RT) */
+
+/* New soma double-float insns.  */
+APUOP(M_DFCEQ,		RR,	0x3c3,	"dfceq",	_A3(A_T,A_A,A_B),	00112,	FX2)	/* DFCEQ         RT<-(RA=RB) */
+APUOP(M_DFCMEQ,		RR,	0x3cb,	"dfcmeq",	_A3(A_T,A_A,A_B),	00112,	FX2)	/* DFCMEQ        RT<-(|RA|=|RB|) */
+APUOP(M_DFCGT,		RR,	0x2c3,	"dfcgt",	_A3(A_T,A_A,A_B),	00112,	FX2)	/* DFCGT         RT<-(RA>RB) */
+APUOP(M_DFCMGT,		RR,	0x2cb,	"dfcmgt",	_A3(A_T,A_A,A_B),	00112,	FX2)	/* DFCMGT        RT<-(|RA|>|RB|) */
+APUOP(M_DFTSV,		RI7,	0x3bf,	"dftsv",	_A3(A_T,A_A,A_U7),	00012,	FX2)	/* DFTSV         RT<-testspecial(RA,I7) */
 
 #undef _A0
 #undef _A1
