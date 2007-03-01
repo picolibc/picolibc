@@ -330,7 +330,6 @@ legal_sid_type (SID_NAME_USE type)
       || type == SidTypeAlias || type == SidTypeWellKnownGroup;
 }
 
-extern bool allow_ntea;
 extern bool allow_ntsec;
 extern bool allow_smbntsec;
 

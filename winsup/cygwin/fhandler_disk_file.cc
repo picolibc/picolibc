@@ -653,15 +653,13 @@ fhandler_disk_file::fchmod (mode_t mode)
 	{
 	  /* If the file couldn't be opened, that's really only a problem if
 	     ACLs or EAs should get written. */
-	  if ((allow_ntsec && pc.has_acls ()) || allow_ntea)
+	  if (allow_ntsec && pc.has_acls ())
 	    return -1;
 	}
     }
 
-  if ((allow_ntsec && pc.has_acls ()) || allow_ntea)
+  if (allow_ntsec && pc.has_acls ())
     {
-      if (!allow_ntsec && allow_ntea) /* Not necessary when manipulating SD. */
-	SetFileAttributes (pc, (DWORD) pc & ~FILE_ATTRIBUTE_READONLY);
       if (pc.isdir ())
 	mode |= S_IFDIR;
       if (!set_file_attribute (pc.has_acls (), get_io_handle (), pc,
@@ -1209,14 +1207,6 @@ fhandler_base::open_fs (int flags, mode_t mode)
       return 0;
     }
 
-  /* Attributes may be set only if a file is _really_ created.
-     This code is now only used for ntea here since the files
-     security attributes are set in CreateFile () now. */
-  if (flags & O_CREAT
-      && GetLastError () != ERROR_ALREADY_EXISTS
-      && !allow_ntsec && allow_ntea)
-    set_file_attribute (false, NULL, get_win32_name (), mode);
-
   set_fs_flags (pc.fs_flags ());
 
 out:
@@ -1435,9 +1425,6 @@ fhandler_disk_file::mkdir (mode_t mode)
 
   if (CreateDirectoryA (get_win32_name (), &sa))
     {
-      if (!allow_ntsec && allow_ntea)
-	set_file_attribute (false, NULL, get_win32_name (),
-			    S_IFDIR | ((mode & 07777) & ~cygheap->umask));
 #ifdef HIDDEN_DOT_FILES
       char *c = strrchr (real_dir.get_win32 (), '\\');
       if ((c && c[1] == '.') || *get_win32_name () == '.')

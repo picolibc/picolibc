@@ -2976,10 +2976,6 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
       if (success)
 	{
 	  CloseHandle (h);
-	  if (!allow_ntsec && allow_ntea)
-	    set_file_attribute (false, NULL, win32_path.get_win32 (),
-				S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO);
-
 	  DWORD attr = use_winsym ? FILE_ATTRIBUTE_READONLY
 				  : FILE_ATTRIBUTE_SYSTEM;
 #ifdef HIDDEN_DOT_FILES

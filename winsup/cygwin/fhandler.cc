@@ -495,13 +495,11 @@ fhandler_base::open (int flags, mode_t mode)
 	create_options = FILE_OPEN_FOR_BACKUP_INTENT;
 	break;
       case query_stat_control:
-	access = READ_CONTROL | FILE_READ_ATTRIBUTES
-		 | (allow_ntea ? FILE_READ_EA : 0);
+	access = READ_CONTROL | FILE_READ_ATTRIBUTES;
 	create_options = FILE_OPEN_FOR_BACKUP_INTENT;
 	break;
       case query_write_control:
-	access = READ_CONTROL | WRITE_OWNER | WRITE_DAC | FILE_WRITE_ATTRIBUTES
-		 | (allow_ntea ? FILE_WRITE_EA : 0);
+	access = READ_CONTROL | WRITE_OWNER | WRITE_DAC | FILE_WRITE_ATTRIBUTES;
 	create_options = FILE_OPEN_FOR_BACKUP_INTENT | FILE_OPEN_FOR_RECOVERY;
 	break;
       case query_write_attributes:
@@ -1591,11 +1589,6 @@ fhandler_base::fsync ()
 static int
 check_posix_perm (const char *fname, int v)
 {
-  /* ntea is ok for supporting permission bits but it doesn't support
-     full POSIX security settings. */
-  if (v == _PC_POSIX_PERMISSIONS && allow_ntea)
-    return 1;
-
   if (!allow_ntsec)
     return 0;
 

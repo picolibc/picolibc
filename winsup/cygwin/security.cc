@@ -1542,20 +1542,7 @@ get_file_attribute (int use_ntsec, HANDLE handle, const char *file,
   if (gidret)
     *gidret = myself->gid;
 
-  if (!attribute)
-    return 0;
-
-  if (allow_ntea)
-    {
-      int oatt = *attribute;
-      res = read_ea (handle, file, ".UNIXATTR", (char *)attribute,
-		     sizeof (*attribute));
-      *attribute |= oatt;
-    }
-  else
-    res = 0;
-
-  return res > 0 ? 0 : -1;
+  return -1;
 }
 
 bool
@@ -1930,16 +1917,11 @@ int
 set_file_attribute (bool use_ntsec, HANDLE handle, const char *file,
 		    __uid32_t uid, __gid32_t gid, int attribute)
 {
-  int ret = 0;
-
+  int ret;
   if (use_ntsec && allow_ntsec)
     ret = set_nt_attribute (handle, file, uid, gid, attribute);
-  else if (allow_ntea && !write_ea (handle, file, ".UNIXATTR",
-				    (char *) &attribute, sizeof (attribute)))
-    {
-      __seterrno ();
-      ret = -1;
-    }
+  else
+    ret = 0;
   syscall_printf ("%d = set_file_attribute (%s, %d, %d, %p)",
 		  ret, file, uid, gid, attribute);
   return ret;

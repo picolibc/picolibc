@@ -542,12 +542,6 @@ set_proc_retry (const char *buf)
 }
 
 static void
-set_ntea (const char *buf)
-{
-  allow_ntea = (buf && strcasematch (buf, "yes"));
-}
-
-static void
 set_ntsec (const char *buf)
 {
   allow_ntsec = (buf && strcasematch (buf, "yes"));
@@ -591,7 +585,6 @@ static struct parse_thing
   {"export", {&export_settings}, justset, NULL, {{false}, {true}}},
   {"forkchunk", {func: set_chunksize}, isfunc, NULL, {{0}, {0}}},
   {"glob", {func: &glob_init}, isfunc, NULL, {{0}, {s: "normal"}}},
-  {"ntea", {func: set_ntea}, isfunc, NULL, {{0}, {s: "yes"}}},
   {"ntsec", {func: set_ntsec}, isfunc, NULL, {{0}, {s: "yes"}}},
   {"proc_retry", {func: set_proc_retry}, isfunc, NULL, {{0}, {5}}},
   {"reset_com", {&reset_com}, justset, NULL, {{false}, {true}}},
