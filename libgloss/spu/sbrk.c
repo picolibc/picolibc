@@ -32,6 +32,7 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 
 #include <sys/types.h>
 #include <errno.h>
+#include <spu_intrinsics.h>
 
 extern int errno;
 
@@ -44,20 +45,39 @@ sbrk (ptrdiff_t increment)
 {
 	static caddr_t heap_ptr = NULL;
 	caddr_t base;
+	vector unsigned int sp_reg, sp_delta;
+	vector unsigned int *sp_ptr;
 
+	/* The stack pointer register.  */
+	volatile register vector unsigned int sp_r1 __asm__("1");
+	
 	if (heap_ptr == NULL)
-	  {
-		  heap_ptr = (caddr_t) & _end;
-	  }
+	  heap_ptr = (caddr_t) & _end;
+	
 	if (((RAMSIZE - STACKSIZE) - (int) heap_ptr) >= increment)
 	  {
-		  base = heap_ptr;
-		  heap_ptr += increment;
-		  return (base);
+	    base = heap_ptr;
+	    heap_ptr += increment;
+	    
+	    sp_delta = (vector unsigned int) spu_insert (increment, spu_splats (0), 1);
+
+	    /* Subtract sp_delta from the SP limit (word 1).  */
+	    sp_r1 = spu_sub (sp_r1, sp_delta);
+	    
+	    /* Fix-up backchain.  */
+	    sp_ptr = (vector unsigned int *) spu_extract (sp_r1, 0);
+	    do
+	      {
+		sp_reg = *sp_ptr;
+		*sp_ptr = (vector unsigned int) spu_sub (sp_reg, sp_delta);
+	      }
+	    while ((sp_ptr = (vector unsigned int *) spu_extract (sp_reg, 0)));
+
+	    return (base);
 	  }
 	else
 	  {
-		  errno = ENOMEM;
-		  return ((void *) -1);
+	    errno = ENOMEM;
+	    return ((void *) -1);
 	  }
 }

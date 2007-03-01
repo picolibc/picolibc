@@ -1,3 +1,8 @@
+2007-03-01  Ben Elliston  <bje@au.ibm.com>
+
+	* spu/sbrk.c (sbrk): Adjust the stack pointer vector correctly so
+	that GCC runtime stack checking works.  Handle the backchain, too.
+
 2007-02-21  Patrick Mansfield <patmans@us.ibm.com>
 
 	* spu/gettimeofday.c: New file which adds SPU gettimeofday.
