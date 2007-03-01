@@ -94,6 +94,7 @@ public:
 
 class hold_everything
 {
+public: /* DELETEME*/
   bool& ischild;
   /* Note the order of the locks below.  It is important,
      to avoid races, that the lock order be preserved.
@@ -620,11 +621,13 @@ fork ()
     volatile char * volatile esp;
     __asm__ volatile ("movl %%esp,%0": "=r" (esp));
 
-
     if (!ischild)
       res = grouped.parent (esp);
     else
-      res = grouped.child (esp);
+      {
+	res = grouped.child (esp);
+	ischild = true;	/* might have been reset by fork mem copy */
+      }
   }
 
   MALLOC_CHECK;

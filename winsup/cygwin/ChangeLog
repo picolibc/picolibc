@@ -1,5 +1,10 @@
 2007-03-01  Christopher Faylor  <me@cgf.cx>
 
+	* fork.cc (fork): Reset child to true after fork since it may have been
+	reset by fork memory copies.
+
+2007-03-01  Christopher Faylor  <me@cgf.cx>
+
 	* Makefile (DLL_OFILES): Remove ntea.o
 	* environ.cc (set_ntea): Delete.
 	(parse_thing): Delete "ntea" setting.
