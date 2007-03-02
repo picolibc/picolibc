@@ -1524,7 +1524,6 @@ int
 get_file_attribute (int use_ntsec, HANDLE handle, const char *file,
 		    mode_t *attribute, __uid32_t *uidret, __gid32_t *gidret)
 {
-  int res;
   syscall_printf ("file: %s", file);
 
   if (use_ntsec && allow_ntsec)

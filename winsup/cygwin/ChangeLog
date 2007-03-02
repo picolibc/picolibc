@@ -1,3 +1,7 @@
+2007-03-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (get_file_attribute): Avoid compiler warning.
+
 2007-03-01  Christopher Faylor  <me@cgf.cx>
 
 	* fork.cc (fork): Reset child to true after fork since it may have been
