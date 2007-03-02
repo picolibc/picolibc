@@ -79,6 +79,14 @@ typedef enum _FILE_INFORMATION_CLASS
   FileMaximumInformation
 } FILE_INFORMATION_CLASS, *PFILE_INFORMATION_CLASS;
 
+typedef struct _FILE_NAMES_INFORMATION
+{
+  ULONG  NextEntryOffset;
+  ULONG  FileIndex;
+  ULONG  FileNameLength;
+  WCHAR  FileName[1];
+} FILE_NAMES_INFORMATION, *PFILE_NAMES_INFORMATION;
+
 typedef struct _FILE_BOTH_DIR_INFORMATION
 {
   ULONG  NextEntryOffset;

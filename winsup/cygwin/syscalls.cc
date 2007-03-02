@@ -283,8 +283,57 @@ unlink_nt (path_conv &win32_name, bool setattrs)
   if (status == STATUS_SHARING_VIOLATION)
     {
       move_to_bin = true;
-      status = NtOpenFile (&h, DELETE, &attr, &io, FILE_SHARE_VALID_FLAGS,
-			   flags);
+      if (!win32_name.isdir () || win32_name.isremote ())
+	status = NtOpenFile (&h, DELETE, &attr, &io, FILE_SHARE_VALID_FLAGS,
+			     flags);
+      else
+	{
+	  /* It's getting tricky.  The directory is opened in some process,
+	     so we're supposed to move it to the recycler and mark it for
+	     deletion.  But what if the directory is not empty?  The move
+	     will work, but the subsequent delete will fail.  So we would
+	     have to move it back.  That's bad, because the directory would
+	     be moved around which results in a temporary inconsistent state.
+	     So, what we do here is to test if the directory is empty.  If
+	     not, we bail out with ERROR_DIR_NOT_EMTPY.  The below code
+	     tests for at least three entries in the directory, ".", "..",
+	     and another one.  Three entries means, not empty.  This doesn't
+	     work for the root directory of a drive, but the root dir can
+	     neither be deleted, nor moved anyway. */
+	  status = NtOpenFile (&h, DELETE | SYNCHRONIZE | FILE_LIST_DIRECTORY,
+			       &attr, &io, FILE_SHARE_VALID_FLAGS,
+			       flags | FILE_SYNCHRONOUS_IO_NONALERT);
+	  if (NT_SUCCESS (status))
+	    {
+	      const ULONG bufsiz = 3 * sizeof (FILE_NAMES_INFORMATION)
+				   + 3 * NAME_MAX * sizeof (WCHAR);
+	      PFILE_NAMES_INFORMATION pfni = (PFILE_NAMES_INFORMATION)
+					     alloca (bufsiz);
+	      status = NtQueryDirectoryFile (h, NULL, NULL, 0, &io, pfni,
+					     bufsiz, FileNamesInformation,
+					     FALSE, NULL, TRUE);
+	      if (!NT_SUCCESS (status))
+	        {
+		  NtClose (h);
+		  syscall_printf ("Checking if directory is empty failed, "
+				  "status = %p", status);
+		  return RtlNtStatusToDosError (status);
+		}
+	      int cnt = 1;
+	      while (pfni->NextEntryOffset)
+	        {
+		  pfni = (PFILE_NAMES_INFORMATION)
+			 ((caddr_t) pfni + pfni->NextEntryOffset);
+		  ++cnt;
+		}
+	      if (cnt > 2)
+	        {
+		  NtClose (h);
+		  syscall_printf ("Directory not empty");
+		  return ERROR_DIR_NOT_EMPTY;
+		}
+	    }
+	}
     }
   if (!NT_SUCCESS (status))
     {
