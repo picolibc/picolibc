@@ -1,3 +1,9 @@
+2007-03-05  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/fesetround.c (fesetround): Use unsigned int as operand
+	to  stmxcsr.
+	Thanks to Alexey Kuznetsov  <ring0_mipt at users dot sf dot net>
+
 2007-02-27  Thorsten Dahlheimer  <tdahlheim@gmx.net>
 
 	* include/stdio.h (_unlink, unlink): Add prototypes.

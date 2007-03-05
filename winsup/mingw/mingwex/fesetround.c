@@ -20,10 +20,11 @@ int fesetround (int mode)
 
  if (__HAS_SSE)
     {
-      __asm__ volatile ("stmxcsr %0" : "=m" (_cw));
-      _cw &= ~ 0x6000;
-      _cw |= (mode <<  __MXCSR_ROUND_FLAG_SHIFT);
-      __asm__ volatile ("ldmxcsr %0" : : "m" (_cw));
+      unsigned int _mxcsr;
+      __asm__ volatile ("stmxcsr %0" : "=m" (_mxcsr));
+      _mxcsr &= ~ 0x6000;
+      _mxcsr |= (mode <<  __MXCSR_ROUND_FLAG_SHIFT);
+      __asm__ volatile ("ldmxcsr %0" : : "m" (_mxcsr));
     }
 
   return 0;
