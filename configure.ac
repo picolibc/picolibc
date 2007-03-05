@@ -1163,9 +1163,11 @@ if test -d ${srcdir}/gcc && test "x$have_gmp" = xno; then
     #if MPFR_VERSION < MPFR_VERSION_NUM(2,2,0)
     choke me
     #endif
-    mpfr_t n; mpfr_init(n);
-    mpfr_t x; mpfr_init(x);
+    mpfr_t n;
+    mpfr_t x;
     int t;
+    mpfr_init (n);
+    mpfr_init (x);
     mpfr_atan2 (n, n, x, GMP_RNDN);
     mpfr_erfc (n, x, GMP_RNDN);
     mpfr_subnormalize (x, t, GMP_RNDN);
@@ -2610,6 +2612,11 @@ AC_ARG_WITH(docdir,
 [docdir="\${prefix}/${withval}"],
 [docdir="\${datarootdir}/doc"])
 
+AC_ARG_WITH(pdfdir,
+[  --with-pdfdir	Install pdf in this directory.],
+[pdfdir="\${prefix}/${withval}"],
+[pdfdir="\${docdir}"])
+
 AC_ARG_WITH(htmldir,
 [  --with-htmldir	Install html in this directory.],
 [htmldir="\${prefix}/${withval}"],
@@ -2617,6 +2624,7 @@ AC_ARG_WITH(htmldir,
 
 AC_SUBST(datarootdir)
 AC_SUBST(docdir)
+AC_SUBST(pdfdir)
 AC_SUBST(htmldir)
 
 AC_OUTPUT(Makefile)

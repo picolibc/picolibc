@@ -1,3 +1,31 @@
+2007-03-01  Brooks Moses  <brooks.moses@codesourcery.com>
+
+	* configure.ac: Add "--with-pdfdir" configure option,
+	which defines pdfdir variable.
+	* Makefile.def (target=fixincludes): Add install-pdf to
+	missing targets.
+	(recursive_targets): Add install-pdf target.
+	(flags_to_pass): Add pdfdir.
+	* Makefile.tpl: Add pdfdir handling, add do-install-pdf
+	target.
+	* configure: Regenerate
+	* Makefile.in: Regenerate
+
+2007-02-28  Eric Christopher  <echristo@apple.com>
+
+	Revert:
+	2006-12-07  Mike Stump  <mrs@apple.com>
+
+	* Makefile.def (dependencies): Add dependency for
+	install-target-libssp and install-target-libgomp on
+	install-gcc.
+	* Makefile.in: Regenerate.
+
+2007-02-27  Matt Kraai  <kraai@ftbfs.org>
+
+	* configure: Regenerate.
+	* configure.ac: Move statements after variable declarations.
+
 2007-02-19  Joseph Myers  <joseph@codesourcery.com>
 
 	* configure.ac: Adjust for loop syntax.
