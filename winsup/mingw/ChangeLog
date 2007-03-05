@@ -1,5 +1,11 @@
 2007-03-05  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/io.h (__mingw_access): New static inline wrapper to restore
+	pre-Vista 'access (fname, X_OK)'  behaviour.
+	(__USE_MINGW_ACCESS): Use to map access() to __mingw_access().
+
+2007-03-05  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* mingwex/fesetround.c (fesetround): Use unsigned int as operand
 	to  stmxcsr.
 	Thanks to Alexey Kuznetsov  <ring0_mipt at users dot sf dot net>

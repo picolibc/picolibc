@@ -293,6 +293,15 @@ _CRTIMP int __cdecl unlink (const char*);
 _CRTIMP int __cdecl write (int, const void*, unsigned int);
 #endif /* _UWIN */
 
+#ifdef __USE_MINGW_ACCESS
+/*  Old versions of MSVCRT access() just ignored X_OK, while the version
+    shipped with Vista, returns an error code.  This will restore the
+    old behaviour  */
+static inline int __mingw_access (const char* __fname, int __mode)
+  { return  _access (__fname, __mode & ~X_OK); }
+#define access(__f,__m)  __mingw_access (__f, __m)
+#endif
+
 /* Wide character versions. Also declared in wchar.h. */
 /* Where do these live? Not in libmoldname.a nor in libmsvcrt.a */
 #if 0
