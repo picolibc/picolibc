@@ -248,7 +248,7 @@ fhandler_registry::fstat (struct __stat64 *buf)
 			       &ftLastWriteTime))
 	    {
 	      to_timestruc_t (&ftLastWriteTime, &buf->st_mtim);
-	      buf->st_ctim = buf->st_mtim;
+	      buf->st_ctim = buf->st_birthtim = buf->st_mtim;
 	      time_as_timestruc_t (&buf->st_atim);
 	      if (file_type > 0)
 		buf->st_nlink = subkey_count + 2;

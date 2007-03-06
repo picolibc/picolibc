@@ -57,7 +57,7 @@ fhandler_dev_raw::fstat (struct __stat64 *buf)
       buf->st_nlink = 1;
       buf->st_blksize = PREFERRED_IO_BLKSIZE;
       time_as_timestruc_t (&buf->st_ctim);
-      buf->st_atim = buf->st_mtim = buf->st_ctim;
+      buf->st_atim = buf->st_mtim = buf->st_birthtim = buf->st_ctim;
     }
   return 0;
 }

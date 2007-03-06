@@ -1,3 +1,21 @@
+2007-03-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_mailslot.cc (fhandler_mailslot::fstat): Set new stat member
+	st_birthtim to useful value.
+	* fhandler_process.cc (fhandler_process::fstat): Ditto.
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Take
+	additional parameter for creation time.  Fill st_birthtim with it.
+	Accomodate additional creation time parameter throughout.
+	* fhandler_raw.cc (fhandler_dev_raw::fstat): Set new stat member
+	st_birthtim to useful value.
+	* fhandler.cc (fhandler_base::fstat): Ditto.
+	* fhandler_registry.cc (fhandler_registry::fstat): Ditto.
+	* include/cygwin/version.h: Bump API minor number.
+	* include/cygwin/stat.h (struct __stat64): Replace st_spare4 with
+	timestruc_t st_birthtim.
+	(struct stat): Ditto if __CYGWIN_USE_BIG_TYPES__ is defined.
+	(st_birthtime): Define if __CYGWIN_USE_BIG_TYPES__ is defined.
+
 2007-03-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntdll.h (struct _OBJECT_NAME_INFORMATION): Define.

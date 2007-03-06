@@ -246,6 +246,7 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 		       *(FILETIME *) &pfai->BasicInformation.LastWriteTime,
 		       *(FILETIME *) &pfai->BasicInformation.LastAccessTime,
 		       *(FILETIME *) &pfai->BasicInformation.LastWriteTime,
+		       *(FILETIME *) &pfai->BasicInformation.CreationTime,
 		       pfvi->VolumeSerialNumber,
 		       pfai->StandardInformation.EndOfFile.QuadPart,
 		       pfai->StandardInformation.AllocationSize.QuadPart,
@@ -264,7 +265,7 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
   lowfs = GetFileSize (get_handle (), &highfs);
   if (lowfs == 0xffffffff && GetLastError ())
     lowfs = highfs = 0;
-  return fstat_helper (buf, ft, ft, ft, 0, (ULONGLONG) highfs << 32 | lowfs,
+  return fstat_helper (buf, ft, ft, ft, ft, 0, (ULONGLONG) highfs << 32 | lowfs,
 		       -1LL, 0ULL, 1, DWORD (pc));
 }
 
@@ -291,6 +292,7 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
 			  local.ftLastWriteTime, /* see fstat_helper comment */
 			  local.ftLastAccessTime,
 			  local.ftLastWriteTime,
+			  local.ftCreationTime,
 			  pc.volser (),
 			  (ULONGLONG) local.nFileSizeHigh << 32
 				      | local.nFileSizeLow,
@@ -302,8 +304,8 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
   else if (pc.isdir ())
     {
       FILETIME ft = {};
-      res = fstat_helper (buf, ft, ft, ft, pc.volser (), 0ULL, -1LL, 0ULL, 1,
-			  FILE_ATTRIBUTE_DIRECTORY);
+      res = fstat_helper (buf, ft, ft, ft, ft, pc.volser (), 0ULL, -1LL, 0ULL,
+			  1, FILE_ATTRIBUTE_DIRECTORY);
     }
   else
     {
@@ -379,6 +381,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 			     FILETIME ftChangeTime,
 			     FILETIME ftLastAccessTime,
 			     FILETIME ftLastWriteTime,
+			     FILETIME ftCreationTime,
 			     DWORD dwVolumeSerialNumber,
 			     ULONGLONG nFileSize,
 			     LONGLONG nAllocSize,
@@ -392,6 +395,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
   to_timestruc_t (&ftLastAccessTime, &buf->st_atim);
   to_timestruc_t (&ftLastWriteTime, &buf->st_mtim);
   to_timestruc_t (&ftChangeTime, &buf->st_ctim);
+  to_timestruc_t (&ftCreationTime, &buf->st_birthtim);
   buf->st_dev = dwVolumeSerialNumber ?: pc.volser ();
   buf->st_size = (_off64_t) nFileSize;
   /* The number of links to a directory includes the

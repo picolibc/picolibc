@@ -161,8 +161,9 @@ fhandler_process::fstat (struct __stat64 *buf)
       return -1;
     case 1:
     case 2:
-      buf->st_ctime = buf->st_mtime = p->start_time;
-      buf->st_ctim.tv_nsec = buf->st_mtim.tv_nsec = 0;
+      buf->st_ctime = buf->st_mtime = buf->st_birthtime = p->start_time;
+      buf->st_ctim.tv_nsec = buf->st_mtim.tv_nsec
+	= buf->st_birthtim.tv_nsec = 0;
       time_as_timestruc_t (&buf->st_atim);
       buf->st_uid = p->uid;
       buf->st_gid = p->gid;
