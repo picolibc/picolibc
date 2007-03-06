@@ -1,5 +1,11 @@
 2007-03-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/stat.h (S_TYPEISMQ): Define.
+	(S_TYPEISSEM): Dttio.
+	(S_TYPEISSHM): Ditto.
+
+2007-03-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_mailslot.cc (fhandler_mailslot::fstat): Set new stat member
 	st_birthtim to useful value.
 	* fhandler_process.cc (fhandler_process::fstat): Ditto.
