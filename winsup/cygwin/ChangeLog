@@ -29,7 +29,7 @@
 
 2007-03-02  Corinna Vinschen  <corinna@vinschen.de>
 
-	* ntdll.h (struct _OBJECT_NAME_INFORMATION): Define.
+	* ntdll.h (struct _FILE_NAMES_INFORMATION): Define.
 	* syscalls.cc (unlink_nt): Check shared directory for being empty
 	before trying to move and mark for deletion.
 
