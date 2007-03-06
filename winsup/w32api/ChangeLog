@@ -1,3 +1,8 @@
+2007-03-05  Jan Nijtmans  <nijtmans@users.sourceforge.net>
+
+	* include/ddeml.h (DdeCreateStringHandleA, DdeCreateStringHandleW): Switch
+	argument to constant.
+
 2007-02-18  Jiri Malak  <jiri.malak@iol.cz>
 
 	* include/windef.h [WATCOM]: Fix !NONAMELESSUNION defines.
