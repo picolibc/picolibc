@@ -268,6 +268,7 @@ class fhandler_base
 			      FILETIME ftChangeTime,
 			      FILETIME ftLastAccessTime,
 			      FILETIME ftLastWriteTime,
+			      FILETIME ftCreationTime,
 			      DWORD dwVolumeSerialNumber,
 			      ULONGLONG nFileSize,
 			      LONGLONG nAllocSize,

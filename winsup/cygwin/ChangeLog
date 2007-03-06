@@ -1,5 +1,10 @@
 2007-03-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (fhandler_base::fstat_helper): Add creation time parameter.
+	* glob.cc (stat32_to_stat64): Set st_birthtim to st_mtim.
+
+2007-03-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/stat.h (S_TYPEISMQ): Define.
 	(S_TYPEISSEM): Dttio.
 	(S_TYPEISSHM): Ditto.

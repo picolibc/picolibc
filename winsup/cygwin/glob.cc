@@ -886,6 +886,7 @@ stat32_to_stat64 (struct __stat32 *src, struct __stat64 *dst)
   dst->st_atim = src->st_atim;
   dst->st_mtim = src->st_mtim;
   dst->st_ctim = src->st_ctim;
+  dst->st_birthtim = src->st_mtim;
   dst->st_blksize = src->st_blksize;
   dst->st_blocks = src->st_blocks;
 }
