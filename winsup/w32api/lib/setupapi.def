@@ -155,6 +155,8 @@ SetupCopyErrorA@44
 SetupCopyErrorW@44
 SetupCopyOEMInfA@32
 SetupCopyOEMInfW@32
+SetupConfigureWmiFromInfSectionA@12
+SetupConfigureWmiFromInfSectionW@12
 SetupCreateDiskSpaceListA@12
 SetupCreateDiskSpaceListW@12
 SetupDecompressOrCopyFileA@12

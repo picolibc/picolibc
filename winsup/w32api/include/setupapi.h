@@ -413,6 +413,9 @@ extern "C" {
 #define NDW_INSTALLFLAG_KNOWNCLASS	0x00080000
 #define NDW_INSTALLFLAG_NEEDRESTART	0x00000080
 #define NDW_INSTALLFLAG_NEEDREBOOT	0x00000100
+#if (_SETUPAPI_VER >= 0x0502)
+#define SCWMI_CLOBBER_SECURITY  0x00000001
+#endif
 #define SETDIRID_NOT_FULL_PATH	0x00000001
 #define SP_COPY_DELETESOURCE	0x0000001
 #define SP_COPY_REPLACEONLY	0x0000002
@@ -1049,6 +1052,10 @@ WINSETUPAPI VOID WINAPI SetupCloseInfFile(HINF);
 WINSETUPAPI VOID WINAPI SetupCloseLog(VOID);
 WINSETUPAPI BOOL WINAPI SetupCommitFileQueueA(HWND,HSPFILEQ,PSP_FILE_CALLBACK_A,PVOID);
 WINSETUPAPI BOOL WINAPI SetupCommitFileQueueW(HWND,HSPFILEQ,PSP_FILE_CALLBACK_W,PVOID);
+#if (_SETUPAPI_VER >= 0x502)
+WINSETUPAPI BOOL WINAPI SetupConfigureWmiFromInfSectionA(HINF,PCSTR,DWORD);
+WINSETUPAPI BOOL WINAPI SetupConfigureWmiFromInfSectionW(HINF,PCWSTR,DWORD);
+#endif
 WINSETUPAPI UINT WINAPI SetupCopyErrorA(HWND,PCSTR,PCSTR,PCSTR,PCSTR,PCSTR,UINT,DWORD,PSTR,DWORD,PDWORD);
 WINSETUPAPI UINT WINAPI SetupCopyErrorW(HWND,PCWSTR,PCWSTR,PCWSTR,PCWSTR,PCWSTR,UINT,DWORD,PWSTR,DWORD,PDWORD);
 WINSETUPAPI BOOL WINAPI SetupCopyOEMInfA(PCSTR,PCSTR,DWORD,DWORD,PSTR,DWORD,PDWORD,PSTR*);
@@ -1336,6 +1343,9 @@ WINSETUPAPI BOOL WINAPI SetupTerminateFileLog(HSPFILELOG);
 #define SetupAdjustDiskSpaceList	SetupAdjustDiskSpaceListW
 #define SetupBackupError	SetupBackupErrorW
 #define SetupCommitFileQueue	SetupCommitFileQueueW
+#if (_SETUPAPI_VER >= 0x0502)
+#define SetupConfigureWmiFromInfSection SetupConfigureWmiFromInfSectionW
+#endif
 #define SetupCopyError	SetupCopyErrorW
 #define SetupCopyOEMInf	SetupCopyOEMInfW
 #define SetupCreateDiskSpaceList	SetupCreateDiskSpaceListW
@@ -1455,6 +1465,9 @@ WINSETUPAPI BOOL WINAPI SetupTerminateFileLog(HSPFILELOG);
 #define SetupAdjustDiskSpaceList	SetupAdjustDiskSpaceListA
 #define SetupBackupError	SetupBackupErrorA
 #define SetupCommitFileQueue	SetupCommitFileQueueA
+#if (_SETUPAPI_VER >= 0x0502)
+#define SetupConfigureWmiFromInfSection SetupConfigureWmiFromInfSectionW
+#endif
 #define SetupCopyError	SetupCopyErrorA
 #define SetupCopyOEMInf	SetupCopyOEMInfA
 #define SetupCreateDiskSpaceList	SetupCreateDiskSpaceListA

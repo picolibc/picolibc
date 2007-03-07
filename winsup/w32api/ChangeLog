@@ -1,3 +1,29 @@
+2007-03-06  Brandon Sneed <brandon@oqo.com>
+
+	* include/setupapi.h: Added SetupConfigureWmiFromInfSectionA
+	Added SetupConfigureWmiFromInfSectionW
+	Added SetupConfigureWmiFromInfSection define to unicode and non-unicode sections
+
+	* lib/setupapi.def: Added exports for SetupConfigureWmiFromInfSectionA and W
+
+	* include/winuser.h: Added PBT_APMQUERYSUSPEND
+	Added PBT_APMQUERYSTANDBY
+	Added PBT_APMQUERYSUSPENDFAILED
+	Added PBT_APMQUERYSTANDBYFAILED
+	Added PBT_APMSUSPEND
+	Added PBT_APMSTANDBY
+	Added PBT_APMRESUMECRITICAL
+	Added PBT_APMRESUMESUSPEND
+	Added PBT_APMRESUMESTANDBY
+	Added PBT_APMBATTERYLOW
+	Added PBT_APMPOWERSTATUSCHANGE
+	Added PBT_APMOEMEVENT
+	Added PBT_APMRESUMEAUTOMATIC
+
+	* include/wtsapi32.h: New file
+
+	* include/wingdi.h: Added DM_DISPLAYORIENTATION define for use with DMDO_* defines
+
 2007-03-05  Jan Nijtmans  <nijtmans@users.sourceforge.net>
 
 	* include/ddeml.h (DdeCreateStringHandleA, DdeCreateStringHandleW): Switch
