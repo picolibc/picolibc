@@ -1,6 +1,6 @@
 /* ELF support for BFD.
    Copyright 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
-   2001, 2002, 2003, 2004, 2005, 2006
+   2001, 2002, 2003, 2004, 2005, 2006, 2007
    Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, from information published
@@ -450,7 +450,7 @@
 #define ELF64_ST_INFO  ELF_ST_INFO
 
 /* This macro disassembles and assembles a symbol's visibility into
-   the st_other field.  The STV_ defines specificy the actual visibility.  */
+   the st_other field.  The STV_ defines specify the actual visibility.  */
 
 #define ELF_ST_VISIBILITY(v)		((v) & 0x3)
 /* The remaining bits in the st_other field are not currently used.

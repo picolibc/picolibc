@@ -1,3 +1,7 @@
+2007-03-07  Alan Modra  <amodra@bigpond.net.au>
+
+	* common.h (ELF_ST_VISIBILITY): Comment typo fix.
+
 2007-02-05  Dave Brolley  <brolley@redhat.com>
 	    Richard Sandiford  <rsandifo@redhat.com>
 	    Richard Henderson  <rth@redhat.com>
