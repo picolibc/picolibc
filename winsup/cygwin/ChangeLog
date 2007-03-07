@@ -1,3 +1,11 @@
+2007-03-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_proc.cc: Fix formatting.  Drop setting errno when creating
+	proc file content.
+	(format_proc_uptime): Simplify.
+	(format_proc_cpuinfo): Align more closely to output of Linux 2.6 kernel.
+	Evaluate more data, especially for AMD CPUs.
+
 2007-03-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_base::fstat_helper): Add creation time parameter.

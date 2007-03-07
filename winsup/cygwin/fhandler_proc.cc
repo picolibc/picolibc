@@ -136,8 +136,8 @@ fhandler_proc::get_proc_fhandler (const char *path)
     /* The user is trying to access a non-existent subdirectory of /proc. */
     return FH_BAD;
   else
-    /* Return FH_PROC so that we can return EROFS if the user is trying to create
-       a file. */
+    /* Return FH_PROC so that we can return EROFS if the user is trying to
+       create a file. */
     return FH_PROC;
 }
 
@@ -350,11 +350,13 @@ fhandler_proc::fill_filebuf ()
 	  {
 	    struct utsname uts_name;
 	    uname (&uts_name);
-		bufalloc = strlen (uts_name.sysname) + 1 + strlen (uts_name.release) +
-			  1 + strlen (uts_name.version) + 2;
+	    bufalloc = strlen (uts_name.sysname) + 1
+		       + strlen (uts_name.release) + 1
+		       + strlen (uts_name.version) + 2;
 	    filebuf = (char *) crealloc (filebuf, bufalloc);
-		filesize = __small_sprintf (filebuf, "%s %s %s\n", uts_name.sysname,
-			     uts_name.release, uts_name.version);
+	    filesize = __small_sprintf (filebuf, "%s %s %s\n",
+	    				uts_name.sysname, uts_name.release,
+					uts_name.version);
 	  }
 	break;
       }
@@ -481,32 +483,26 @@ format_proc_uptime (char *destbuf, size_t maxsize)
 
   NTSTATUS ret;
   SYSTEM_BASIC_INFORMATION sbi;
+  SYSTEM_TIME_OF_DAY_INFORMATION stodi;
+  SYSTEM_PERFORMANCE_INFORMATION spi;
 
   ret = NtQuerySystemInformation (SystemBasicInformation, (PVOID) &sbi,
 				  sizeof sbi, NULL);
   if (!NT_SUCCESS (ret))
     {
-      __seterrno_from_nt_status (ret);
-      debug_printf ("NtQuerySystemInformation: ret %d, Dos(ret) %E", ret);
+      debug_printf ("NtQuerySystemInformation: ret %d", ret);
       sbi.NumberProcessors = 1;
     }
 
-  SYSTEM_PROCESSOR_TIMES spt[sbi.NumberProcessors];
-  ret = NtQuerySystemInformation (SystemProcessorTimes, (PVOID) spt,
-				  sizeof spt[0] * sbi.NumberProcessors,
-				  NULL);
+  ret = NtQuerySystemInformation (SystemTimeOfDayInformation, &stodi,
+				  sizeof stodi, NULL);
   if (NT_SUCCESS (ret))
-    for (int i = 0; i < sbi.NumberProcessors; i++)
-      {
-	uptime += (spt[i].KernelTime.QuadPart + spt[i].UserTime.QuadPart)
-		  / 100000ULL;
-	idle_time += spt[i].IdleTime.QuadPart / 100000ULL;
-      }
-  uptime /= sbi.NumberProcessors;
-  idle_time /= sbi.NumberProcessors;
+    uptime = (stodi.CurrentTime.QuadPart - stodi.BootTime.QuadPart) / 100000ULL;
 
-  if (!uptime)
-    uptime = GetTickCount () / 10;
+  ret = NtQuerySystemInformation (SystemPerformanceInformation, &spi,
+				  sizeof spi, NULL);
+  if (NT_SUCCESS (ret))
+    idle_time = (spi.IdleTime.QuadPart / sbi.NumberProcessors) / 100000ULL;
 
   return __small_sprintf (destbuf, "%U.%02u %U.%02u\n",
 			  uptime / 100, long (uptime % 100),
@@ -530,8 +526,7 @@ format_proc_stat (char *destbuf, size_t maxsize)
 				       (PVOID) &sbi, sizeof sbi, NULL))
       != STATUS_SUCCESS)
     {
-      __seterrno_from_nt_status (ret);
-      debug_printf ("NtQuerySystemInformation: ret %d, Dos(ret) %E", ret);
+      debug_printf ("NtQuerySystemInformation: ret %d", ret);
       sbi.NumberProcessors = 1;
     }
 
@@ -572,8 +567,7 @@ format_proc_stat (char *destbuf, size_t maxsize)
 				    sizeof stodi, NULL);
   if (ret != STATUS_SUCCESS)
     {
-      __seterrno_from_nt_status (ret);
-      debug_printf("NtQuerySystemInformation: ret %d, Dos(ret) %E", ret);
+      debug_printf ("NtQuerySystemInformation: ret %d", ret);
       return 0;
     }
   pages_in = spi.PagesRead;
@@ -609,7 +603,6 @@ format_proc_stat (char *destbuf, size_t maxsize)
 	if ((dwError = RegQueryValueEx (hKey, x, NULL, &dwType, (BYTE *) szBuffer, &dwCount)), \
 	    (dwError != ERROR_SUCCESS && dwError != ERROR_MORE_DATA)) \
 	  { \
-	    __seterrno_from_win_error (dwError); \
 	    debug_printf ("RegQueryValueEx failed retcode %d", dwError); \
 	    return 0; \
 	  } \
@@ -642,13 +635,15 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 
   for (cpu_number = 0; ; cpu_number++)
     {
+      if (cpu_number)
+        print ("\n");
+
       __small_sprintf (szBuffer, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\%d", cpu_number);
 
       if ((dwError = RegOpenKeyEx (HKEY_LOCAL_MACHINE, szBuffer, 0, KEY_QUERY_VALUE, &hKey)) != ERROR_SUCCESS)
 	{
 	  if (dwError == ERROR_FILE_NOT_FOUND)
 	    break;
-	  __seterrno_from_win_error (dwError);
 	  debug_printf ("RegOpenKeyEx failed retcode %d", dwError);
 	  return 0;
 	}
@@ -707,7 +702,7 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	}
       else
 	{
-	  bufptr += __small_sprintf (bufptr, "processor       : %d\n", cpu_number);
+	  bufptr += __small_sprintf (bufptr, "processor\t: %d\n", cpu_number);
 	  unsigned maxf, vendor_id[4], unused;
 	  cpuid (&maxf, &vendor_id[0], &vendor_id[2], &vendor_id[1], 0);
 	  maxf &= 0xffff;
@@ -720,7 +715,7 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	  else if (!strcmp ((char*)vendor_id, "GenuineIntel"))
 	    is_intel = true;
 
-	  bufptr += __small_sprintf (bufptr, "vendor_id       : %s\n",
+	  bufptr += __small_sprintf (bufptr, "vendor_id\t: %s\n",
 				     (char *)vendor_id);
 	  read_value ("~Mhz", REG_DWORD);
 	  unsigned cpu_mhz = *(DWORD *)szBuffer;
@@ -729,31 +724,19 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	      unsigned features2, features1, extra_info, cpuid_sig;
 	      cpuid (&cpuid_sig, &extra_info, &features2, &features1, 1);
 	      /* unsigned extended_family = (cpuid_sig & 0x0ff00000) >> 20,
-			  extended_model  = (cpuid_sig & 0x000f0000) >> 16; */
-	      unsigned type		= (cpuid_sig & 0x00003000) >> 12,
-		       family		= (cpuid_sig & 0x00000f00) >> 8,
+			  extended_model  = (cpuid_sig & 0x000f0000) >> 16,
+			  type		  = (cpuid_sig & 0x00003000) >> 12; */
+	      unsigned family		= (cpuid_sig & 0x00000f00) >> 8,
 		       model		= (cpuid_sig & 0x000000f0) >> 4,
 		       stepping		= cpuid_sig & 0x0000000f;
-	      unsigned brand_id		= extra_info & 0x0000000f,
-		       cpu_count	= (extra_info & 0x00ff0000) >> 16,
-		       apic_id		= (extra_info & 0xff000000) >> 24;
-	      const char *type_str;
-	      switch (type)
-		{
-		case 0:
-		  type_str = "primary processor";
-		  break;
-		case 1:
-		  type_str = "overdrive processor";
-		  break;
-		case 2:
-		  type_str = "secondary processor";
-		  break;
-		case 3:
-		default:
-		  type_str = "reserved";
-		  break;
-		}
+	      /* Not printed on Linux */
+	      //unsigned brand_id		= extra_info & 0x0000000f;
+	      //unsigned cpu_count	= (extra_info & 0x00ff0000) >> 16;
+	      unsigned apic_id		= (extra_info & 0xff000000) >> 24;
+	      if (family == 15)
+	      	family += (cpuid_sig >> 20) & 0xff;
+	      if (family >= 6)
+	      	model += ((cpuid_sig >> 16) & 0x0f) << 4;
 	      unsigned maxe = 0;
 	      cpuid (&maxe, &unused, &unused, &unused, 0x80000000);
 	      if (maxe >= 0x80000004)
@@ -772,27 +755,81 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 		  // could implement a lookup table here if someone needs it
 		  strcpy (szBuffer, "unknown");
 		}
-	      bufptr += __small_sprintf (bufptr, "type            : %s\n"
-						 "cpu family      : %d\n"
-						 "model           : %d\n"
-						 "model name      : %s\n"
-						 "stepping        : %d\n"
-						 "brand id        : %d\n"
-						 "cpu count       : %d\n"
-						 "apic id         : %d\n"
-						 "cpu MHz         : %d\n"
-						 "fpu             : %s\n",
-					 type_str,
+	      int cache_size = -1,
+		  tlb_size = -1,
+		  clflush = 64,
+		  cache_alignment = 64;
+	      if (features1 & (1 << 19)) // CLFSH
+	        clflush = ((extra_info >> 8) & 0xff) << 3;
+	      if (is_intel && family == 15)
+	        cache_alignment = clflush * 2;
+	      if (maxe >= 0x80000005) // L1 Cache and TLB Identifiers
+	        {
+		  unsigned data_cache, inst_cache;
+		  cpuid (&unused, &unused, &data_cache, &inst_cache,
+			 0x80000005);
+
+		  cache_size = (inst_cache >> 24) + (data_cache >> 24);
+		  tlb_size = 0;
+		}
+	      if (maxe >= 0x80000006) // L2 Cache and L2 TLB Identifiers
+	        {
+		  unsigned tlb, l2;
+		  cpuid (&unused, &tlb, &l2, &unused, 0x80000006);
+
+		  cache_size = l2 >> 16;
+		  tlb_size = ((tlb >> 16) & 0xfff) + (tlb & 0xfff);
+		}
+	      bufptr += __small_sprintf (bufptr, "cpu family\t: %d\n"
+						 "model\t\t: %d\n"
+						 "model name\t: %s\n"
+						 "stepping\t: %d\n"
+						 "cpu MHz\t\t: %d\n",
 					 family,
 					 model,
 					 szBuffer + strspn (szBuffer, " 	"),
 					 stepping,
-					 brand_id,
-					 cpu_count,
-					 apic_id,
-					 cpu_mhz,
-					 (features1 & (1 << 0)) ? "yes" : "no");
-	      print ("flags           :");
+					 cpu_mhz);
+	      if (cache_size >= 0)
+	        bufptr += __small_sprintf (bufptr, "cache size\t: %d KB\n",
+					   cache_size);
+
+	      // Recognize multi-core CPUs
+	      if (is_amd && maxe >= 0x80000008)
+	        {
+		  unsigned core_info;
+		  cpuid (&unused, &unused, &core_info, &unused, 0x80000008);
+
+		  int max_cores = 1 + (core_info & 0xff);
+		  if (max_cores > 1)
+		    {
+		      int shift = (core_info >> 12) & 0x0f;
+		      if (!shift)
+			while ((1 << shift) < max_cores)
+			  ++shift;
+		      int core_id = apic_id & ((1 << shift) - 1);
+		      apic_id >>= shift;
+
+		      bufptr += __small_sprintf (bufptr, "physical id\t: %d\n"
+							 "core id\t\t: %d\n"
+							 "cpu cores\t: %d\n",
+						 apic_id, core_id, max_cores);
+		    }
+		}
+	      // Recognize Intel Hyper-Transport CPUs
+	      else if (is_intel && (features1 & (1 << 28)) && maxf >= 4)
+	        {
+		  /* TODO */
+		}
+
+	      bufptr += __small_sprintf (bufptr, "fpu\t\t: %s\n"
+	      					 "fpu_exception\t: %s\n"
+						 "cpuid level\t: %d\n"
+						 "wp\t\t: yes\n",
+					 (features1 & (1 << 0)) ? "yes" : "no",
+					 (features1 & (1 << 0)) ? "yes" : "no",
+					 maxf);
+	      print ("flags\t\t:");
 	      if (features1 & (1 << 0))
 		print (" fpu");
 	      if (features1 & (1 << 1))
@@ -828,11 +865,11 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	      if (features1 & (1 << 17))
 		print (" pse36");
 	      if (features1 & (1 << 18))
-		print (" psn");
+		print (" pn");
 	      if (features1 & (1 << 19))
-		print (" clfl");
+		print (" clflush");
 	      if (is_intel && features1 & (1 << 21))
-		print (" dtes");
+		print (" dts");
 	      if (is_intel && features1 & (1 << 22))
 		print (" acpi");
 	      if (features1 & (1 << 23))
@@ -841,23 +878,51 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 		print (" fxsr");
 	      if (features1 & (1 << 25))
 		print (" sse");
+	      if (features1 & (1 << 26))
+		print (" sse2");
+	      if (is_intel && (features1 & (1 << 27)))
+		print (" ss");
+	      if (features1 & (1 << 28))
+		print (" ht");
 	      if (is_intel)
 		{
-		  if (features1 & (1 << 26))
-		    print (" sse2");
-		  if (features1 & (1 << 27))
-		    print (" ss");
-		  if (features1 & (1 << 28))
-		    print (" htt");
 		  if (features1 & (1 << 29))
-		    print (" tmi");
+		    print (" tm");
 		  if (features1 & (1 << 30))
-		    print (" ia-64");
+		    print (" ia64");
 		  if (features1 & (1 << 31))
 		    print (" pbe");
+		}
 
-		  if (features2 & (1 << 0))
-		    print (" pni");
+	      if (is_amd && maxe >= 0x80000001)
+		{
+		  unsigned features;
+		  cpuid (&unused, &unused, &unused, &features, 0x80000001);
+
+		  if (features & (1 << 11))
+		    print (" syscall");
+		  if (features & (1 << 19)) // Huh?  Not in AMD64 specs.
+		    print (" mp");
+		  if (features & (1 << 20))
+		    print (" nx");
+		  if (features & (1 << 22))
+		    print (" mmxext");
+		  if (features & (1 << 25))
+		    print (" fxsr_opt");
+		  if (features & (1 << 27))
+		    print (" rdtscp");
+		  if (features & (1 << 29))
+		    print (" lm");
+		  if (features & (1 << 30)) // 31th bit is on
+		    print (" 3dnowext");
+		  if (features & (1 << 31)) // 32th bit (highest) is on
+		    print (" 3dnow");
+		}
+
+	      if (features2 & (1 << 0))
+		print (" pni");
+	      if (is_intel)
+		{
 		  if (features2 & (1 << 3))
 		    print (" monitor");
 		  if (features2 & (1 << 4))
@@ -866,33 +931,73 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 		    print (" tm2");
 		  if (features2 & (1 << 8))
 		    print (" est");
-		 if (features2 & (1 << 10))
+		  if (features2 & (1 << 10))
 		    print (" cid");
 		}
+	      if (features2 & (1 << 13))
+		print (" cx16");
 
 	      if (is_amd && maxe >= 0x80000001)
 		{
-		  // uses AMD extended calls to check
-		  // for 3dnow and 3dnow extended support
-		  // (source: AMD Athlon Processor Recognition Application Note)
+		  unsigned features;
+		  cpuid (&unused, &unused, &features, &unused, 0x80000001);
 
-		  if (maxe >= 0x80000001)  // has basic capabilities
-		    {
-		      cpuid (&unused, &unused, &unused, &features2, 0x80000001);
+		  if (features & (1 << 0))
+		    print (" lahf_lm");
+		  if (features & (1 << 1))
+		    print (" cmp_legacy");
+		  if (features & (1 << 2))
+		    print (" svm");
+		  if (features & (1 << 4))
+		    print (" cr8_legacy");
+		}
 
-		      if (features2 & (1 << 11))
-			print (" syscall");
-		      if (features2 & (1 << 19))
-			print (" mp");
-		      if (features2 & (1 << 22))
-			print (" mmxext");
-		      if (features2 & (1 << 29))
-			print (" lm");
-		      if (features2 & (1 << 30)) // 31th bit is on
-			print (" 3dnowext");
-		      if (features2 & (1 << 31)) // 32th bit (highest) is on
-			print (" 3dnow");
-		    }
+	      print ("\n");
+
+	      /* TODO: bogomips */
+
+	      if (tlb_size >= 0)
+	        bufptr += __small_sprintf (bufptr,
+					   "TLB size\t: %d 4K pages\n",
+					   tlb_size);
+	      bufptr += __small_sprintf (bufptr, "clflush size\t: %d\n"
+	      					 "cache_alignment\t: %d\n",
+					 clflush,
+					 cache_alignment);
+
+	      if (maxe >= 0x80000008) // Address size
+	        {
+		  unsigned addr_size, phys, virt;
+		  cpuid (&addr_size, &unused, &unused, &unused, 0x80000008);
+
+		  phys = addr_size & 0xff;
+		  virt = (addr_size >> 8) & 0xff;
+		  /* Fix an errata on Intel CPUs */
+		  if (is_intel && family == 15 && model == 3 && stepping == 4)
+		    phys = 36;
+		  bufptr += __small_sprintf (bufptr, "address sizes\t: "
+						     "%u bits physical, "
+						     "%u bits virtual\n",
+					     phys, virt);
+		}
+
+	      if (maxe >= 0x80000007) // advanced power management
+		{
+		  cpuid (&unused, &unused, &unused, &features2, 0x80000007);
+
+		  print ("power management:");
+		  if (features2 & (1 << 0))
+		    print (" ts");
+		  if (features2 & (1 << 1))
+		    print (" fid");
+		  if (features2 & (1 << 2))
+		    print (" vid");
+		  if (features2 & (1 << 3))
+		    print (" ttp");
+		  if (features2 & (1 << 4))
+		    print (" tm");
+		  if (features2 & (1 << 5))
+		    print (" stc");
 		}
 	    }
 	  else
