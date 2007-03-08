@@ -20,8 +20,10 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <libgen.h>
+#include <locale.h>
 
 #ifndef __cdecl  /* If compiling on any non-Win32 platform ... */
 #define __cdecl  /* this may not be defined.                   */
@@ -29,61 +31,114 @@
 
 __cdecl char *basename( char *path )
 {
-  char *retname;
-  static char retfail[] = ".";
+  size_t len;
+  static char *retfail = NULL;
+
+  /* to handle path names for files in multibyte character locales,
+   * we need to set up LC_CTYPE to match the host file system locale
+   */
+
+  char *locale = setlocale( LC_CTYPE, NULL );
+  if( locale != NULL ) locale = strdup( locale );
+  setlocale( LC_CTYPE, "" );
 
   if( path && *path )
   {
-    /* step over the drive designator, if present ...
-     * (FIXME: maybe should confirm *path is a valid drive designator).
+    /* allocate sufficient local storage space,
+     * in which to create a wide character reference copy of path
      */
 
-    if( path[1] == ':' )
-      path += 2;
+    wchar_t refcopy[1 + (len = mbstowcs( NULL, path, 0 ))];
+
+    /* create the wide character reference copy of path,
+     * and step over the drive designator, if present ...
+     */
+
+    wchar_t *refpath = refcopy;
+    if( ((len = mbstowcs( refpath, path, len )) > 1) && (refpath[1] == L':') )
+    {
+      /* FIXME: maybe should confirm *refpath is a valid drive designator */
+
+      refpath += 2;
+    }
+
+    /* ensure that our wide character reference path is NUL terminated */
+
+    refcopy[ len ] = L'\0';
 
     /* check again, just to ensure we still have a non-empty path name ... */
 
-    if( *path )
+    if( *refpath )
     {
-      /* and, when we do ...
-       * scan from left to right, to the char after the final dir separator
+      /* and, when we do, process it in the wide character domain ...
+       * scanning from left to right, to the char after the final dir separator
        */
 
-      for( retname = path ; *path ; ++path )
+      wchar_t *refname;
+      for( refname = refpath ; *refpath ; ++refpath )
       {
-	if( (*path == '/') || (*path == '\\') )
+	if( (*refpath == L'/') || (*refpath == L'\\') )
 	{
 	  /* we found a dir separator ...
 	   * step over it, and any others which immediately follow it
 	   */
 
-	  while( (*path == '/') || (*path == '\\') )
-	    ++path;
+	  while( (*refpath == L'/') || (*refpath == L'\\') )
+	    ++refpath;
 
 	  /* if we didn't reach the end of the path string ... */
 
-	  if( *path )
+	  if( *refpath )
 
 	    /* then we have a new candidate for the base name */
 
-	    retname = path;
+	    refname = refpath;
 
 	  /* otherwise ...
 	   * strip off any trailing dir separators which we found
 	   */
 
-	  else while( (path > retname) && ((*--path == '/') || (*path == '\\')) )
-	    *path = '\0';
+	  else while(  (refpath > refname)
+	  &&          ((*--refpath == L'/') || (*refpath == L'\\'))   )
+	    *refpath = L'\0';
 	}
       }
 
-      /* retname now points at the resolved base name ...
-       * if it's not empty, then we return it as it is, otherwise ...
-       * we must have had only dir separators in the original path name,
-       * so we return "/".
+      /* in the wide character domain ...
+       * refname now points at the resolved base name ...
        */
 
-      return *retname ? retname : strcpy( retfail, "/" );
+      if( *refname )
+      {
+	/* if it's not empty,
+	 * then we transform the full normalised path back into
+	 * the multibyte character domain, and skip over the dirname,
+	 * to return the resolved basename.
+	 */
+	
+	if( (len = wcstombs( path, refcopy, len )) != (size_t)(-1) )
+	  path[ len ] = '\0';
+	*refname = L'\0';
+	if( (len = wcstombs( NULL, refcopy, 0 )) != (size_t)(-1) )
+	  path += len;
+      }
+
+      else
+      {
+	/* the basename is empty, so return the default value of "/",
+	 * transforming from wide char to multibyte char domain, and
+	 * returning it in our own buffer.
+	 */
+
+	retfail = realloc( retfail, len = 1 + wcstombs( NULL, L"/", 0 ));
+	wcstombs( path = retfail, L"/", len );
+      }
+
+      /* restore the caller's locale, clean up, and return the result */
+
+      setlocale( LC_CTYPE, locale );
+      free( locale );
+      return( path );
     }
 
     /* or we had an empty residual path name, after the drive designator,
@@ -93,11 +148,20 @@ __cdecl char *basename( char *path )
 
   /* and, if we get to here ...
    * the path name is either NULL, or it decomposes to an empty string;
-   * in either case, we return the default value of "." in our static buffer,
-   * (but strcpy it, just in case the caller trashed it after a previous call).
+   * in either case, we return the default value of "." in our own buffer,
+   * reloading it with the correct value, transformed from the wide char
+   * to the multibyte char domain, just in case the caller trashed it
+   * after a previous call.
    */
 
-  return strcpy( retfail, "." );
+  retfail = realloc( retfail, len = 1 + wcstombs( NULL, L".", 0 ));
+  wcstombs( retfail, L".", len );
+
+  /* restore the caller's locale, clean up, and return the result */
+
+  setlocale( LC_CTYPE, locale );
+  free( locale );
+  return( retfail );
 }
 
-/* $RCSfile$: end of file */
+/* $RCSfile$$Revision$: end of file */
