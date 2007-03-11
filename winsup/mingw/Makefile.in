@@ -36,6 +36,7 @@ program_transform_name = @program_transform_name@
 exec_prefix = @exec_prefix@
 bindir = @bindir@
 libdir = @libdir@
+mandir = @mandir@
 ifeq ($(target_alias),$(host_alias))
 ifeq ($(build_alias),$(host_alias))
 tooldir:=$(exec_prefix)
@@ -379,10 +380,18 @@ srcdist:
 		(cd $$i; $(MAKE) distdir=../$(distdir) dist); \
 	done
 #FIXME this needs to be done with SUBDIRS and Makefiles.
+#
+#  Maybe, but this is simpler, and adequate for now!
+#  However, as more manpages are added, spanning multiple sections,
+#  we'll probably need a separate Makefile to organise them.
+#
 	mkdir $(distdir)/include
 	mkdir $(distdir)/include/sys
 	cp $(srcdir)/include/*.h $(distdir)/include/
 	cp $(srcdir)/include/sys/*.h $(distdir)/include/sys/
+	mkdir $(distdir)/man
+	cp $(srcdir)/man/* $(distdir)/man/
+#
 #end FIXME
 	rm -f $(distdir)-src.tar.gz
 	$(TAR) $(TARFLAGS)cf $(distdir)-src$(TARFILEEXT) $(distdir)
@@ -411,6 +420,7 @@ install-dirs:
 	$(mkinstalldirs) $(inst_includedir)
 	$(mkinstalldirs) $(inst_libdir)
 	$(mkinstalldirs) $(inst_docdir)
+	$(mkinstalldirs) $(mandir)/man3
 
 install: all install-dirs $(install_dlls_host)
 	for i in $(LIBS); do \
@@ -429,6 +439,15 @@ install: all install-dirs $(install_dlls_host)
 		  $(INSTALL_DATA) $$i $$dstdir/`basename $$i` ; \
 		done ; \
 	done
+#
+# This provisional hack installs the only manpage we have at present...
+# It simply CANNOT suffice, when we have more manpages to ship.
+#
+	$(INSTALL_DATA) $(srcdir)/man/dirname.man $(mandir)/man3
+	cd $(mandir)/man3; mv dirname.man dirname.3; ln dirname.3 basename.3
+#
+# End provisional hack.
+#
 	@$(MAKE) subdirs DO=$@ $(FLAGS_TO_PASS)
 
 subdirs: $(SUBDIRS)

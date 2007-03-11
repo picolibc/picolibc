@@ -1,3 +1,11 @@
+2007-03-10  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Add manpages for dirname and basename functions.
+
+	* man: New directory.
+	* man/dirname.man: New file; it sources both manpages.
+	* Makefile.in: Add provisional rules to distribute them.
+
 2007-03-08  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	* mingwex/basename.c: Make it work with path names containing
