@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990 The Regents of the University of California.
+ * Copyright (c) 1990, 2007 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -57,8 +57,11 @@ _asprintf_r(ptr, strp, fmt, va_alist)
 #endif
   ret = vfprintf (&f, fmt, ap);
   va_end (ap);
-  *f._p = 0;
-  *strp = f._bf._base;
+  if (ret >= 0)
+    {
+      *f._p = 0;
+      *strp = f._bf._base;
+    }
   return (ret);
 }
 
@@ -79,7 +82,7 @@ asprintf(strp, fmt, va_alist)
   int ret;
   va_list ap;
   FILE f;
-  
+
   /* mark a zero-length reallocatable buffer */
   f._flags = __SWR | __SSTR | __SMBF;
   f._bf._base = f._p = NULL;
@@ -92,8 +95,11 @@ asprintf(strp, fmt, va_alist)
 #endif
   ret = vfprintf (&f, fmt, ap);
   va_end (ap);
-  *f._p = 0;
-  *strp = f._bf._base;
+  if (ret >= 0)
+    {
+      *f._p = 0;
+      *strp = f._bf._base;
+    }
   return (ret);
 }
 

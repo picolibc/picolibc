@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990 The Regents of the University of California.
+ * Copyright (c) 1990, 2007 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -46,8 +46,11 @@ _DEFUN(vasprintf, (strp, fmt, ap),
   f._bf._size = f._w = 0;
   f._file = -1;  /* No file. */
   ret = _vfprintf_r (_REENT, &f, fmt, ap);
-  *f._p = 0;
-  *strp = f._bf._base;
+  if (ret >= 0)
+    {
+      *f._p = 0;
+      *strp = f._bf._base;
+    }
   return ret;
 }
 
@@ -68,8 +71,10 @@ _DEFUN(_vasprintf_r, (ptr, strp, fmt, ap),
   f._bf._size = f._w = 0;
   f._file = -1;  /* No file. */
   ret = _vfprintf_r (ptr, &f, fmt, ap);
-  *f._p = 0;
-  *strp = f._bf._base;
+  if (ret >= 0)
+    {
+      *f._p = 0;
+      *strp = f._bf._base;
+    }
   return ret;
 }
-
