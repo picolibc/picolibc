@@ -91,9 +91,9 @@ struct stat
 /* POSIX IPC objects are not implemented as distinct file types, so the
    below macros have to return 0.  The expression is supposed to catch
    illegal usage with non-stat parameters. */
-#define S_TYPEISMQ(buf)  ((buf)->st_mode,0)
-#define S_TYPEISSEM(buf) ((buf)->st_mode,0)
-#define S_TYPEISSHM(buf) ((buf)->st_mode,0)
+#define S_TYPEISMQ(buf)  ((void)(buf)->st_mode,0)
+#define S_TYPEISSEM(buf) ((void)(buf)->st_mode,0)
+#define S_TYPEISSHM(buf) ((void)(buf)->st_mode,0)
 
 #ifdef __cplusplus
 }
