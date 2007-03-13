@@ -1,6 +1,6 @@
 2007-03-13  Eric Blake  <ebb9@byu.net>
 
-	* include/cygwin/stat.h (S_TYPEISSHM, S_TYPEISSEM, S_TYPEISSHM):
+	* include/cygwin/stat.h (S_TYPEISMQ, S_TYPEISSEM, S_TYPEISSHM):
 	Avoid compiler warnings.
 
 2007-03-07  Christopher Faylor  <me@cgf.cx>
