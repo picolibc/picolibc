@@ -1,9 +1,14 @@
+2007-03-13  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* i386.h (FloatDR): Removed.
+	(i386_optab): Use FloatD and FloatD|FloatR instead of FloatDR.
+
 2007-03-01  Alan Modra  <amodra@bigpond.net.au>
 
 	* spu-insns.h: Add soma double-float insns.
 
 2007-02-20  Thiemo Seufer  <ths@mips.com>
-            Chao-Ying Fu  <fu@mips.com>
+	    Chao-Ying Fu  <fu@mips.com>
 
 	* mips.h (OP_SH_BP, OP_MASK_BP): Add support for balign instruction.
 	(INSN_DSPR2): Add flag for DSP R2 instructions.

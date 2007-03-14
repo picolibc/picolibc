@@ -31,7 +31,7 @@
 
    This happens with all the non-commutative arithmetic floating point
    operations with two register operands, where the source register is
-   %st, and destination register is %st(i).  See FloatDR below.
+   %st, and destination register is %st(i).
 
    The affected opcode map is dceX, dcfX, deeX, defX.  */
 
@@ -72,14 +72,6 @@ static const template i386_optab[] =
 #define q_FP (q_Suf|NoRex64)
 #define x_FP (x_Suf|FloatMF)
 #define sl_FP (sl_Suf|FloatMF)
-#if SYSV386_COMPAT
-/* Someone forgot that the FloatR bit reverses the operation when not
-   equal to the FloatD bit.  ie. Changing only FloatD results in the
-   destination being swapped *and* the direction being reversed.  */
-#define FloatDR FloatD
-#else
-#define FloatDR (FloatD|FloatR)
-#endif
 
 /* Move instructions.  */
 #define MOV_AX_DISP32 0xa0
@@ -683,11 +675,13 @@ static const template i386_optab[] =
 {"faddp",  2, 0xdec0, X, 0,	 FP|ShortForm|Ugh,	{ FloatReg, FloatAcc, 0} },
 
 /* subtract */
-{"fsub",   2, 0xd8e0, X, 0,	 FP|ShortForm|FloatDR,	{ FloatReg, FloatAcc, 0} },
 {"fsub",   1, 0xd8e0, X, 0,	 FP|ShortForm,		{ FloatReg, 0, 0} },
 #if SYSV386_COMPAT
+{"fsub",   2, 0xd8e0, X, 0,	 FP|ShortForm|FloatD,	{ FloatReg, FloatAcc, 0} },
 /* alias for fsubp */
 {"fsub",   0, 0xdee1, X, 0,	 FP|Ugh,		{ 0, 0, 0} },
+#else
+{"fsub",   2, 0xd8e0, X, 0,	 FP|ShortForm|FloatD|FloatR, { FloatReg, FloatAcc, 0} },
 #endif
 {"fsub",   1,	0xd8, 4, 0,	 sl_FP|Modrm,		{ LongMem|LLongMem, 0, 0} },
 {"fisub",  1,	0xde, 4, 0,	 sl_FP|Modrm,		{ ShortMem|LongMem, 0, 0} },
@@ -706,11 +700,13 @@ static const template i386_optab[] =
 #endif
 
 /* subtract reverse */
-{"fsubr",  2, 0xd8e8, X, 0,	 FP|ShortForm|FloatDR,	{ FloatReg, FloatAcc, 0} },
 {"fsubr",  1, 0xd8e8, X, 0,	 FP|ShortForm,		{ FloatReg, 0, 0} },
 #if SYSV386_COMPAT
+{"fsubr",  2, 0xd8e8, X, 0,	 FP|ShortForm|FloatD,	{ FloatReg, FloatAcc, 0} },
 /* alias for fsubrp */
 {"fsubr",  0, 0xdee9, X, 0,	 FP|Ugh,		{ 0, 0, 0} },
+#else
+{"fsubr",  2, 0xd8e8, X, 0,	 FP|ShortForm|FloatD|FloatR, { FloatReg, FloatAcc, 0} },
 #endif
 {"fsubr",  1,	0xd8, 5, 0,	 sl_FP|Modrm,		{ LongMem|LLongMem, 0, 0} },
 {"fisubr", 1,	0xde, 5, 0,	 sl_FP|Modrm,		{ ShortMem|LongMem, 0, 0} },
@@ -744,11 +740,13 @@ static const template i386_optab[] =
 {"fmulp",  2, 0xdec8, X, 0,	 FP|ShortForm|Ugh,	{ FloatReg, FloatAcc, 0} },
 
 /* divide */
-{"fdiv",   2, 0xd8f0, X, 0,	 FP|ShortForm|FloatDR,	{ FloatReg, FloatAcc, 0} },
 {"fdiv",   1, 0xd8f0, X, 0,	 FP|ShortForm,		{ FloatReg, 0, 0} },
 #if SYSV386_COMPAT
+{"fdiv",   2, 0xd8f0, X, 0,	 FP|ShortForm|FloatD,	{ FloatReg, FloatAcc, 0} },
 /* alias for fdivp */
 {"fdiv",   0, 0xdef1, X, 0,	 FP|Ugh,		{ 0, 0, 0} },
+#else
+{"fdiv",   2, 0xd8f0, X, 0,	 FP|ShortForm|FloatD|FloatR, { FloatReg, FloatAcc, 0} },
 #endif
 {"fdiv",   1,	0xd8, 6, 0,	 sl_FP|Modrm,		{ LongMem|LLongMem, 0, 0} },
 {"fidiv",  1,	0xde, 6, 0,	 sl_FP|Modrm,		{ ShortMem|LongMem, 0, 0} },
@@ -767,11 +765,13 @@ static const template i386_optab[] =
 #endif
 
 /* divide reverse */
-{"fdivr",  2, 0xd8f8, X, 0,	 FP|ShortForm|FloatDR,	{ FloatReg, FloatAcc, 0} },
 {"fdivr",  1, 0xd8f8, X, 0,	 FP|ShortForm,		{ FloatReg, 0, 0} },
 #if SYSV386_COMPAT
+{"fdivr",  2, 0xd8f8, X, 0,	 FP|ShortForm|FloatD,	{ FloatReg, FloatAcc, 0} },
 /* alias for fdivrp */
 {"fdivr",  0, 0xdef9, X, 0,	 FP|Ugh,		{ 0, 0, 0} },
+#else
+{"fdivr",  2, 0xd8f8, X, 0,	 FP|ShortForm|FloatD|FloatR, { FloatReg, FloatAcc, 0} },
 #endif
 {"fdivr",  1,	0xd8, 7, 0,	 sl_FP|Modrm,		{ LongMem|LLongMem, 0, 0} },
 {"fidivr", 1,	0xde, 7, 0,	 sl_FP|Modrm,		{ ShortMem|LongMem, 0, 0} },
