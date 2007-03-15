@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990 The Regents of the University of California.
+ * Copyright (c) 1990, 2007 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -95,9 +95,9 @@ _DEFUN(_fclose_r, (rptr, fp),
   if (fp->_flags & __SMBF)
     _free_r (rptr, (char *) fp->_bf._base);
   if (HASUB (fp))
-    FREEUB (fp);
+    FREEUB (rptr, fp);
   if (HASLB (fp))
-    FREELB (fp);
+    FREELB (rptr, fp);
   fp->_flags = 0;		/* release this FILE for reuse */
   _funlockfile (fp);
 #ifndef __SINGLE_THREAD__
@@ -119,4 +119,3 @@ _DEFUN(fclose, (fp),
 }
 
 #endif
-

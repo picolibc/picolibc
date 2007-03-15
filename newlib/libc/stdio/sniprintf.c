@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990 The Regents of the University of California.
+ * Copyright (c) 1990, 2007 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -26,6 +26,7 @@
 #include <varargs.h>
 #endif
 #include <limits.h>
+#include <errno.h>
 #include "local.h"
 
 int
@@ -48,6 +49,11 @@ _sniprintf_r (ptr, str, size, fmt, va_alist)
   va_list ap;
   FILE f;
 
+  if (size > INT_MAX)
+    {
+      ptr->_errno = EOVERFLOW;
+      return EOF;
+    }
   f._flags = __SWR | __SSTR;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = (size > 0 ? size - 1 : 0);
@@ -59,6 +65,8 @@ _sniprintf_r (ptr, str, size, fmt, va_alist)
 #endif
   ret = _vfiprintf_r (ptr, &f, fmt, ap);
   va_end (ap);
+  if (ret < EOF)
+    ptr->_errno = EOVERFLOW;
   if (size > 0)
     *f._p = 0;
   return (ret);
@@ -83,7 +91,13 @@ sniprintf (str, size, fmt, va_alist)
   int ret;
   va_list ap;
   FILE f;
+  struct _reent *ptr = _REENT;
 
+  if (size > INT_MAX)
+    {
+      ptr->_errno = EOVERFLOW;
+      return EOF;
+    }
   f._flags = __SWR | __SSTR;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = (size > 0 ? size - 1 : 0);
@@ -93,8 +107,10 @@ sniprintf (str, size, fmt, va_alist)
 #else
   va_start (ap);
 #endif
-  ret = _vfiprintf_r (_REENT, &f, fmt, ap);
+  ret = _vfiprintf_r (ptr, &f, fmt, ap);
   va_end (ap);
+  if (ret < EOF)
+    ptr->_errno = EOVERFLOW;
   if (size > 0)
     *f._p = 0;
   return (ret);

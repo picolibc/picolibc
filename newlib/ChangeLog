@@ -1,3 +1,30 @@
+2007-03-15  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/local.h (cantwrite, FREEUB, FREELB): Make reentrant.
+	(__smakebuf): Rename...
+	(__smakebuf_r): to this.
+	* libc/stdio/fvwrite.h (__swsetup_r): Rename, from __swsetup.
+	* libc/stdio/makebuf.c (__smakebuf): Detect failed asprint
+	allocation, then rename...
+	(__smakebuf_r): ...to this and fix reentrancy.
+	* libc/stdio/wsetup.c (__swsetup): Detect failed asprintf
+	allocation, then rename...
+	(__swsetup_r): ...to this and fix reentrancy.
+	* libc/stdio/fseek.c (_fseek_r): Fix reentrancy.
+	* libc/stdio/refill.c (__srefill_r): Likewise.
+	* libc/stdio/fclose.c (_fclose_r): Likewise.
+	* libc/stdio/fread.c (_fread_r): Likewise.
+	* libc/stdio/freopen.c (_freopen_r): Likewise.
+	* libc/stdio/wbuf.c (__swbuf_r): Likewise.
+	* libc/stdio64/fseeko64.c (_fseeko64_r): Likewise.
+	* libc/stdio/fvwrite.c (__sfvwrite_r): Set errno properly on
+	failed asprintf allocation, and fix reentrancy.
+	* libc/stdio/snprintf.c (snprintf, _snprintf_r): Report overflow,
+	as required by POSIX.
+	* libc/stdio/sniprintf.c (sniprintf, _sniprintf_r): Likewise.
+	* libc/stdio/vsnprintf.c (vsnprintf, _vsnprintf_r): Likewise.
+	* libc/stdio/vsniprintf.c (vsniprintf, _vsniprintf_r): Likewise.
+
 2007-03-12  Eric Blake  <ebb9@byu.net>
 
 	* libc/stdio/fvwrite.c (__sfvwrite_r): Fix reentrancy.

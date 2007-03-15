@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990 The Regents of the University of California.
+ * Copyright (c) 1990, 2007 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -33,6 +33,4 @@ struct __suio {
 
 
 extern int _EXFUN(__sfvwrite_r,(struct _reent *, FILE *, struct __suio *));
-extern int _EXFUN(__swsetup,(FILE *));
-
-
+extern int _EXFUN(__swsetup_r,(struct _reent *, FILE *));

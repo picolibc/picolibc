@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990 The Regents of the University of California.
+ * Copyright (c) 1990, 2007 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -43,7 +43,7 @@ _DEFUN(__srefill_r, (ptr, fp),
 {
   /* make sure stdio is set up */
 
-  CHECK_INIT (_REENT, fp);
+  CHECK_INIT (ptr, fp);
 
   fp->_r = 0;			/* largely a convenience for callers */
 
@@ -83,7 +83,7 @@ _DEFUN(__srefill_r, (ptr, fp),
        */
       if (HASUB (fp))
 	{
-	  FREEUB (fp);
+	  FREEUB (ptr, fp);
 	  if ((fp->_r = fp->_ur) != 0)
 	    {
 	      fp->_p = fp->_up;
@@ -93,7 +93,7 @@ _DEFUN(__srefill_r, (ptr, fp),
     }
 
   if (fp->_bf._base == NULL)
-    __smakebuf (fp);
+    __smakebuf_r (ptr, fp);
 
   /*
    * Before reading from a line buffered or unbuffered file,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990 The Regents of the University of California.
+ * Copyright (c) 1990, 2007 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -53,7 +53,7 @@ _DEFUN(__swbuf_r, (ptr, c, fp),
    */
 
   fp->_w = fp->_lbfsize;
-  if (cantwrite (fp))
+  if (cantwrite (ptr, fp))
     {
       fp->_flags |= __SERR;
       ptr->_errno = EBADF;

@@ -60,7 +60,7 @@ _DEFUN(__sfvwrite_r, (ptr, fp, uio),
     return 0;
 
   /* make sure we can write */
-  if (cantwrite (fp))
+  if (cantwrite (ptr, fp))
     {
       fp->_flags |= __SERR;
       ptr->_errno = EBADF;
@@ -147,6 +147,8 @@ _DEFUN(__sfvwrite_r, (ptr, fp, uio),
 		    {
 		      /* Free buffer which is no longer used.  */
 		      _free_r (ptr, fp->_bf._base);
+                      /* Ensure correct errno, even if free changed it.  */
+                      ptr->_errno = ENOMEM;
 		      goto err;
 		    }
 		  fp->_bf._base = str;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990 The Regents of the University of California.
+ * Copyright (c) 1990, 2007 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -213,7 +213,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
    */
 
   if (fp->_bf._base == NULL)
-    __smakebuf (fp);
+    __smakebuf_r (ptr, fp);
   if (fp->_flags & (__SWR | __SRW | __SNBF | __SNPT))
     goto dumb;
   if ((fp->_flags & __SOPT) == 0)
@@ -307,7 +307,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
       fp->_p = fp->_bf._base + o;
       fp->_r = n - o;
       if (HASUB (fp))
-	FREEUB (fp);
+	FREEUB (ptr, fp);
       fp->_flags &= ~__SEOF;
       _funlockfile (fp);
       return 0;
@@ -328,7 +328,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
   fp->_r = 0;
   fp->_p = fp->_bf._base;
   if (HASUB (fp))
-    FREEUB (fp);
+    FREEUB (ptr, fp);
   fp->_flags &= ~__SEOF;
   n = target - curoff;
   if (n)
@@ -354,7 +354,7 @@ dumb:
     }
   /* success: clear EOF indicator and discard ungetc() data */
   if (HASUB (fp))
-    FREEUB (fp);
+    FREEUB (ptr, fp);
   fp->_p = fp->_bf._base;
   fp->_r = 0;
   /* fp->_w = 0; *//* unnecessary (I think...) */

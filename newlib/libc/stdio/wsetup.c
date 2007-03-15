@@ -1,7 +1,7 @@
 /* No user fns here. Pesch 15apr92. */
 
 /*
- * Copyright (c) 1990 The Regents of the University of California.
+ * Copyright (c) 1990, 2007 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -29,7 +29,8 @@
  */
 
 int
-_DEFUN(__swsetup, (fp),
+_DEFUN(__swsetup_r, (ptr, fp),
+       struct _reent *ptr _AND
        register FILE * fp)
 {
   /* Make sure stdio is set up.  */
@@ -48,7 +49,7 @@ _DEFUN(__swsetup, (fp),
 	{
 	  /* clobber any ungetc data */
 	  if (HASUB (fp))
-	    FREEUB (fp);
+	    FREEUB (ptr, fp);
 	  fp->_flags &= ~(__SRD | __SEOF);
 	  fp->_r = 0;
 	  fp->_p = fp->_bf._base;
@@ -63,7 +64,7 @@ _DEFUN(__swsetup, (fp),
    */
   if (fp->_bf._base == NULL 
         && (!(fp->_flags & __SSTR) || (fp->_flags & __SMBF)))
-    __smakebuf (fp);
+    __smakebuf_r (ptr, fp);
 
   if (fp->_flags & __SLBF)
     {
@@ -78,5 +79,5 @@ _DEFUN(__swsetup, (fp),
   else
     fp->_w = fp->_flags & __SNBF ? 0 : fp->_bf._size;
 
-  return 0;
+  return (!fp->_bf._base && (fp->_flags & __SMBF)) ? EOF : 0;
 }

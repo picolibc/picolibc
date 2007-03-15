@@ -544,7 +544,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	_flockfile (fp);
 
 	/* sorry, fprintf(read_only_file, "") returns EOF, not 0 */
-	if (cantwrite (fp)) {
+	if (cantwrite (data, fp)) {
 		_funlockfile (fp);	
 		return (EOF);
 	}
