@@ -55,11 +55,11 @@ struct _glue * _EXFUN(__sfmoreglue,(struct _reent *,int n));
       if ((ptr) && !(ptr)->__sdidinit)		\
 	__sinit (ptr);				\
       if ((fp) == (FILE *)&__sf_fake_stdin)	\
-	(fp) = stdin;				\
+	(fp) = _stdin_r(ptr);			\
       else if ((fp) == (FILE *)&__sf_fake_stdout) \
-	(fp) = stdout;				\
+	(fp) = _stdout_r(ptr);			\
       else if ((fp) == (FILE *)&__sf_fake_stderr) \
-	(fp) = stderr;				\
+	(fp) = _stderr_r(ptr);			\
     }						\
   while (0)
 #else /* !_REENT_SMALL   */

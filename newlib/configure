@@ -831,6 +831,7 @@ Optional Features:
   --enable-newlib-iconv-to-encodings   enable specific comma-separated list of \"to\" iconv encodings to be built-in
   --enable-newlib-iconv-external-ccs     enable capabilities to load external CCS files for iconv
   --disable-newlib-atexit-alloc    disable dynamic allocation of atexit entries
+  --enable-newlib-reent-small   enable small reentrant struct support
   --enable-multilib         build many library versions (default)
   --enable-target-optspace  optimize for space
   --enable-malloc-debugging indicate malloc debugging requested
@@ -1463,6 +1464,19 @@ echo "$as_me: error: bad value ${enableval} for newlib-atexit-dynamic-alloc opti
  fi
 else
   newlib_atexit_dynamic_alloc=${newlib_atexit_dynamic_alloc}
+fi;
+# Check whether --enable-newlib-reent-small or --disable-newlib-reent-small was given.
+if test "${enable_newlib_reent_small+set}" = set; then
+  enableval="$enable_newlib_reent_small"
+  case "${enableval}" in
+  yes) newlib_reent_small=yes;;
+  no)  newlib_reent_small=no ;;
+  *)   { { echo "$as_me:$LINENO: error: bad value ${enableval} for newlib-reent-small option" >&5
+echo "$as_me: error: bad value ${enableval} for newlib-reent-small option" >&2;}
+   { (exit 1); exit 1; }; } ;;
+ esac
+else
+  newlib_reent_small=
 fi;
 
 # Make sure we can run config.sub.
@@ -4764,7 +4778,7 @@ test x"$pic_mode" = xno && libtool_flags="$libtool_flags --prefer-non-pic"
 case $host in
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4767 "configure"' > conftest.$ac_ext
+  echo '#line 4781 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -5200,6 +5214,13 @@ fi
 if test "${newlib_io_pos_args}" = "yes"; then
 cat >>confdefs.h <<_ACEOF
 #define _WANT_IO_POS_ARGS 1
+_ACEOF
+
+fi
+
+if test "${newlib_reent_small}" = "yes"; then
+cat >>confdefs.h <<_ACEOF
+#define _WANT_REENT_SMALL 1
 _ACEOF
 
 fi

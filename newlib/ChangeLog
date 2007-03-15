@@ -1,3 +1,18 @@
+2007-03-15  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.in: Add new --enable-newlib-reent-small option.
+	* configure: Regenerated.
+	* acconfig.h: Add _WANT_REENT_SMALL.
+	* newlib.hin: Regenerated minus PACKAGE macros to add
+	_WANT_REENT_SMALL macro.
+	* libc/include/sys/config.h[_WANT_REENT_SMALL]: Set _REENT_SMALL
+	if not already set.
+	* libc/stdio/fflush.c[_REENT_SMALL]: Return immediately if
+	there is no buffer.
+	* libc/stdio/local.h[_REENT_SMALL]: Fix CHECK_INIT macro to
+	use reentrant pointer passed in when resetting the file
+	pointer to one of the std streams.
+
 2007-03-15  Eric Blake  <ebb9@byu.net>
 
 	* libc/stdio/local.h (cantwrite, FREEUB, FREELB): Make reentrant.

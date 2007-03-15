@@ -18,6 +18,10 @@
 /* Positional argument support in printf functions enabled.  */
 #undef _WANT_IO_POS_ARGS
 
+/* Optional reentrant struct support.  Used mostly on platforms with
+   very restricted storage.  */
+#undef _WANT_REENT_SMALL
+
 /* Multibyte supported */
 #undef _MB_CAPABLE
 

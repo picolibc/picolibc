@@ -202,4 +202,12 @@
 #endif
 #endif
 
+/* See if small reent asked for at configuration time and
+   is not chosen by the platform by default.  */
+#ifdef _WANT_REENT_SMALL
+#ifndef _REENT_SMALL
+#define _REENT_SMALL
+#endif
+#endif
+
 #endif /* __SYS_CONFIG_H__ */

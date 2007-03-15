@@ -97,6 +97,15 @@ AC_ARG_ENABLE(newlib-atexit-dynamic-alloc,
   esac
  fi], [newlib_atexit_dynamic_alloc=${newlib_atexit_dynamic_alloc}])dnl
 
+dnl Support --enable-newlib-reent-small
+AC_ARG_ENABLE(newlib-reent-small,
+[  --enable-newlib-reent-small   enable small reentrant struct support],
+[case "${enableval}" in
+  yes) newlib_reent_small=yes;;
+  no)  newlib_reent_small=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-reent-small option) ;;
+ esac], [newlib_reent_small=])dnl
+
 NEWLIB_CONFIGURE(.)
 
 dnl We have to enable libtool after NEWLIB_CONFIGURE because if we try and
@@ -230,6 +239,10 @@ fi
 
 if test "${newlib_io_pos_args}" = "yes"; then
 AC_DEFINE_UNQUOTED(_WANT_IO_POS_ARGS)
+fi
+
+if test "${newlib_reent_small}" = "yes"; then
+AC_DEFINE_UNQUOTED(_WANT_REENT_SMALL)
 fi
 
 if test "${newlib_mb}" = "yes"; then
