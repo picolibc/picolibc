@@ -1,3 +1,8 @@
+2007-03-15  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* i386.h: Add entries from config/tc-i386.h and move tables
+	to opcodes/i386-opc.h.
+
 2007-03-13  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* i386.h (FloatDR): Removed.
