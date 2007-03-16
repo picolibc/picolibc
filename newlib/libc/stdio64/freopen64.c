@@ -196,10 +196,10 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
   fp->_bf._size = 0;
   fp->_lbfsize = 0;
   if (HASUB (fp))
-    FREEUB (fp);
+    FREEUB (ptr, fp);
   fp->_ub._size = 0;
   if (HASLB (fp))
-    FREELB (fp);
+    FREELB (ptr, fp);
   fp->_lb._size = 0;
 
   if (f < 0)

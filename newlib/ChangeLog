@@ -1,3 +1,8 @@
+2007-03-16  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio64/fseek064.c (_fseeko64_r): Fix reentrancy.
+	* libc/stdio64/freopen64.c (_freopen64_r): Ditto.
+
 2007-03-15  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configure.in: Add new --enable-newlib-reent-small option.
