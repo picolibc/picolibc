@@ -1,3 +1,10 @@
+2007-03-16  Charles Wilson  <cygwin@...>
+
+	* libc/argz/argz_insert.c: "before" pointer is
+	invalid after *argz realloc.  Compute offset
+	between "before" and *argz, and use it after
+	reallocation instead.
+
 2007-03-16  Eric Blake  <ebb9@byu.net>
 
 	* libc/stdio64/fseek064.c (_fseeko64_r): Fix reentrancy.

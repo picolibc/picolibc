@@ -28,13 +28,16 @@ _DEFUN (argz_insert, (argz, argz_len, before, entry),
   while (before != *argz && before[-1])
     before--;
 
+  /* delta will always be non-negative, and < *argz_len */
+  ptrdiff_t delta = before - *argz;
+
   len = strlen(entry) + 1;
 
   if(!(*argz = (char *)realloc(*argz, *argz_len + len)))
     return ENOMEM;
   
-  memmove(before + len, before, *argz + *argz_len - before);
-  memcpy(before, entry, len);
+  memmove(*argz + delta + len, *argz + delta,  *argz_len - delta);
+  memcpy(*argz + delta, entry, len);
 
   *argz_len += len;
 
