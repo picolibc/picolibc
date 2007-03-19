@@ -138,6 +138,28 @@ typedef struct _IMAGE_DATA_DIRECTORY
 
 struct internal_extra_pe_aouthdr 
 {
+  /* FIXME: The following entries are in AOUTHDR.  But they aren't
+     available internally in bfd.  We add them here so that objdump
+     can dump them.  */
+  /* The state of the image file  */
+  short Magic;
+  /* Linker major version number */
+  char MajorLinkerVersion;
+  /* Linker minor version number  */
+  char MinorLinkerVersion;	
+  /* Total size of all code sections  */
+  long SizeOfCode;
+  /* Total size of all initialized data sections  */
+  long SizeOfInitializedData;
+  /* Total size of all uninitialized data sections  */
+  long SizeOfUninitializedData;
+  /* Address of entry point relative to image base.  */
+  bfd_vma AddressOfEntryPoint;
+  /* Address of the first code section relative to image base.  */
+  bfd_vma BaseOfCode;
+  /* Address of the first data section relative to image base.  */
+  bfd_vma BaseOfData;
+ 
   /* PE stuff  */
   bfd_vma ImageBase;		/* address of specific location in memory that
 				   file is located, NT default 0x10000 */
