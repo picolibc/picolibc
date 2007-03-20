@@ -1,3 +1,11 @@
+2007-03-10  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Add --enable-mingw-manpage-transform configure option.
+
+	* aclocal.m4 (MINGW_AC_MANPAGE_TRANSFORM): New macro.
+	* configure.in, Makefile.in: Use it.
+	* configure: Regenerated.
+
 2007-03-18  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/_mingw.h (__CRT_INLINE): Ue __gnu_inline__ for gcc 4.2.x too.

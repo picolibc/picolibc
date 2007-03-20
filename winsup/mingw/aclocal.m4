@@ -94,4 +94,29 @@ fi)
 m4_divert_pop()dnl
 ])# GCC_NO_EXECUTABLES
 
+
+# MINGW_AC_MANPAGE_TRANSFORM
+# --------------------------
+# Provide support for specifying a manpage name transform.
+# This allows e.g. Cygwin to add a `mingw-' prefix to MinGW specific
+# manpages, when installing as a Cygwin subsystem.
+#
+# Activated by `--enable-mingw-manpage-transform[=SED-SCRIPT]', the
+# default is disabled, (i.e. no transform).  If enabled, without any
+# SED-SCRIPT specification, the default `mingw-' prefix is added.
+#
+AC_DEFUN([MINGW_AC_MANPAGE_TRANSFORM],
+[AC_ARG_ENABLE([mingw-manpage-transform],
+[AS_HELP_STRING([--enable-mingw-manpage-transform@<:@=SED-SCRIPT@:>@],
+ [apply SED-SCRIPT @<:@s/^/mingw-/@:>@ to installed manpage names])]
+[AS_HELP_STRING([--disable-mingw-manpage-transform],
+ [@<:@DEFAULT@:>@ don't transform installed manpage names])],
+ [case ${enableval} in
+    yes) mingw_manpage_transform='s,^,mingw-,' ;;
+     no) mingw_manpage_transform='s,x,x,' ;;
+      *) mingw_manpage_transform=${enableval} ;;
+  esac])
+ AC_SUBST([mingw_manpage_transform],[${mingw_manpage_transform-'s,x,x,'}])dnl
+])# MINGW_AC_MANPAGE_TRANSFORM
+
 # $RCSfile$: end of file: vim: ft=config

@@ -273,7 +273,7 @@ PACKAGE_BUGREPORT=''
 
 ac_unique_file="include/_mingw.h"
 ac_subdirs_all="$ac_subdirs_all profile mingwex"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT with_cross_host all_dlls_host install_dlls_host AR ac_ct_AR AS ac_ct_AS RANLIB ac_ct_RANLIB LD ac_ct_LD DLLTOOL ac_ct_DLLTOOL DLLWRAP ac_ct_DLLWRAP WINDRES ac_ct_WINDRES subdirs THREAD_DLL MKINSTALLDIRS MNO_CYGWIN LIBM_A LIBGMON_A HEADER_SUBDIR W32API_INCLUDE INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT with_cross_host all_dlls_host install_dlls_host AR ac_ct_AR AS ac_ct_AS RANLIB ac_ct_RANLIB LD ac_ct_LD DLLTOOL ac_ct_DLLTOOL DLLWRAP ac_ct_DLLWRAP WINDRES ac_ct_WINDRES subdirs THREAD_DLL MKINSTALLDIRS MNO_CYGWIN LIBM_A LIBGMON_A HEADER_SUBDIR W32API_INCLUDE INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA mingw_manpage_transform LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -803,6 +803,16 @@ if test -n "$ac_init_help"; then
      short | recursive ) echo "Configuration of mingw-runtime __MINGW32_VERSION:";;
    esac
   cat <<\_ACEOF
+
+Optional Features:
+  --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
+  --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --enable-mingw-manpage-transform[=SED-SCRIPT]
+                          apply SED-SCRIPT [s/^/mingw-/] to installed
+                          manpage names
+  --disable-mingw-manpage-transform
+                          [DEFAULT] don't transform installed manpage
+                          names
 
 Some influential environment variables:
   CC          C compiler command
@@ -3029,6 +3039,17 @@ test -z "$INSTALL_SCRIPT" && INSTALL_SCRIPT='${INSTALL}'
 
 test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
 
+# Check whether --enable-mingw-manpage-transform or --disable-mingw-manpage-transform was given.
+if test "${enable_mingw_manpage_transform+set}" = set; then
+  enableval="$enable_mingw_manpage_transform"
+  case ${enableval} in
+    yes) mingw_manpage_transform='s,^,mingw-,' ;;
+     no) mingw_manpage_transform='s,x,x,' ;;
+      *) mingw_manpage_transform=${enableval} ;;
+  esac
+fi;
+ mingw_manpage_transform=${mingw_manpage_transform-'s,x,x,'}
+
 
           ac_config_files="$ac_config_files Makefile"
 
@@ -3714,6 +3735,7 @@ s,@W32API_INCLUDE@,$W32API_INCLUDE,;t t
 s,@INSTALL_PROGRAM@,$INSTALL_PROGRAM,;t t
 s,@INSTALL_SCRIPT@,$INSTALL_SCRIPT,;t t
 s,@INSTALL_DATA@,$INSTALL_DATA,;t t
+s,@mingw_manpage_transform@,$mingw_manpage_transform,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF

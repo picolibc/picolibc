@@ -37,6 +37,7 @@ exec_prefix = @exec_prefix@
 bindir = @bindir@
 libdir = @libdir@
 mandir = @mandir@
+manpage_transform = @mingw_manpage_transform@
 ifeq ($(target_alias),$(host_alias))
 ifeq ($(build_alias),$(host_alias))
 tooldir:=$(exec_prefix)
@@ -443,8 +444,11 @@ install: all install-dirs $(install_dlls_host)
 # This provisional hack installs the only manpage we have at present...
 # It simply CANNOT suffice, when we have more manpages to ship.
 #
-	$(INSTALL_DATA) $(srcdir)/man/dirname.man $(mandir)/man3
-	cd $(mandir)/man3; mv dirname.man dirname.3; ln dirname.3 basename.3
+	$(mkinstalldirs) $(mandir)/man3
+	$(INSTALL_DATA) $(srcdir)/man/dirname.man $(mandir)/man3/`\
+	  echo dirname.man|sed '$(manpage_transform);s,man$$,3,'`
+	$(INSTALL_DATA) $(srcdir)/man/dirname.man $(mandir)/man3/`\
+	  echo basename.man|sed '$(manpage_transform);s,man$$,3,'`
 #
 # End provisional hack.
 #
