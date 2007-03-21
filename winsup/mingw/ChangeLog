@@ -1,4 +1,8 @@
-2007-03-10  Keith Marshall  <keithmarshall@users.sourceforge.net>
+2003-03-20  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* Makefile.in: Tweak srcdist to fix build issue.
+
+2007-03-20  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Add --enable-mingw-manpage-transform configure option.
 

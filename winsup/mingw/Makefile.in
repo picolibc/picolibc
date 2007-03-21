@@ -391,7 +391,7 @@ srcdist:
 	cp $(srcdir)/include/*.h $(distdir)/include/
 	cp $(srcdir)/include/sys/*.h $(distdir)/include/sys/
 	mkdir $(distdir)/man
-	cp $(srcdir)/man/* $(distdir)/man/
+	cp $(srcdir)/man/*.man $(distdir)/man/
 #
 #end FIXME
 	rm -f $(distdir)-src.tar.gz
