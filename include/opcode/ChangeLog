@@ -1,3 +1,14 @@
+2003-03-21  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* i386.h (REX_MODE64): Renamed to ...
+	(REX_W): This.
+	(REX_EXTX): Renamed to ...
+	(REX_R): This.
+	(REX_EXTY): Renamed to ...
+	(REX_X): This.
+	(REX_EXTZ): Renamed to ...
+	(REX_B): This.
+
 2007-03-15  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* i386.h: Add entries from config/tc-i386.h and move tables

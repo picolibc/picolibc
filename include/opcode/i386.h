@@ -91,13 +91,13 @@
 #define REX_OPCODE	0x40
 
 /* Indicates 64 bit operand size.  */
-#define REX_MODE64	8
+#define REX_W	8
 /* High extension to reg field of modrm byte.  */
-#define REX_EXTX	4
+#define REX_R	4
 /* High extension to SIB index field.  */
-#define REX_EXTY	2
+#define REX_X	2
 /* High extension to base field of modrm or SIB, or reg field of opcode.  */
-#define REX_EXTZ	1
+#define REX_B	1
 
 /* max operands per insn */
 #define MAX_OPERANDS 4
