@@ -1,3 +1,7 @@
+2007-03-22   Brian Ripley  <ripleybd@users.sourceforge.net>
+
+	* include/_mingw.h (__CRT_INLINE): Make conditional on __GNUC_STDC_INLINE__.
+
 2003-03-20  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* Makefile.in: Tweak srcdist to fix build issue.
@@ -12,7 +16,7 @@
 
 2007-03-18  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/_mingw.h (__CRT_INLINE): Ue __gnu_inline__ for gcc 4.2.x too.
+	* include/_mingw.h (__CRT_INLINE): Use __gnu_inline__ for gcc 4.2.x too.
 
 2007-03-10  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
