@@ -76,13 +76,13 @@ BOOL WINAPI GetProcessMemoryInfo(HANDLE,PPROCESS_MEMORY_COUNTERS,DWORD);
 #ifdef UNICODE
 #define GetModuleBaseName GetModuleBaseNameW
 #define GetModuleFileNameEx GetModuleFileNameExW
-#define GetMappedFilename GetMappedFilenameW
+#define GetMappedFileName GetMappedFileNameW
 #define GetDeviceDriverBaseName GetDeviceDriverBaseNameW
 #define GetDeviceDriverFileName GetDeviceDriverFileNameW
 #else
 #define GetModuleBaseName GetModuleBaseNameA
 #define GetModuleFileNameEx GetModuleFileNameExA
-#define GetMappedFilename GetMappedFilenameA
+#define GetMappedFileName GetMappedFileNameA
 #define GetDeviceDriverBaseName GetDeviceDriverBaseNameA
 #define GetDeviceDriverFileName GetDeviceDriverFileNameA
 #endif

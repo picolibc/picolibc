@@ -1,3 +1,7 @@
+2007-03-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/psapi.h (GetMappedFileName): Fix messed up checkin.
+
 2007-03-23  Matthew Gregan  <kinetik@flim.org>
 
 	* include/psapi.h (GetMappedFileName): Rename from GetMappedFilenameEx.
