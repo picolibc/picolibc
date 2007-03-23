@@ -1,3 +1,7 @@
+2007-03-23  Matthew Gregan  <kinetik@flim.org>
+
+	* include/psapi.h (GetMappedFileName): Rename from GetMappedFilenameEx.
+
 2007-03-06  Brandon Sneed <brandon@oqo.com>
 
 	* include/setupapi.h: Added SetupConfigureWmiFromInfSectionA
