@@ -1,3 +1,8 @@
+2007-03-25  Chris Sutcliffe  <ir0nh34d@users.sf.net>
+
+	* include/w32api.h: Increment version to 3.9.
+	* Makefile.in: Ditto.
+
 2007-03-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/psapi.h (GetMappedFileName): Fix messed up checkin.

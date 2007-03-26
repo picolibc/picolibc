@@ -5,9 +5,9 @@
 #pragma GCC system_header
 #endif
 
-#define __W32API_VERSION 3.8
+#define __W32API_VERSION 3.9
 #define __W32API_MAJOR_VERSION 3
-#define __W32API_MINOR_VERSION 8
+#define __W32API_MINOR_VERSION 9
 
 /* The following defines are for documentation purposes.  The following defines
  * identify the versions of Windows and Internet Explorer.  They are not to be
