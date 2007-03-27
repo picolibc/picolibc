@@ -1,3 +1,7 @@
+2007-03-27  Brooks Moses  <brooks.moses@codesourcery.com>
+
+	* Makefile.in: Add support for "pdf" and "install-pdf" targets.
+
 2006-12-19  Paolo Bonzini  <bonzini@gnu.org>
 
 	* configure.texi: Fix botched commit.
