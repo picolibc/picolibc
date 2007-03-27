@@ -1,4 +1,4 @@
-2003-03-21  H.J. Lu  <hongjiu.lu@intel.com>
+2007-03-21  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* i386.h (REX_MODE64): Renamed to ...
 	(REX_W): This.

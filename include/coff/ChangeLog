@@ -1,4 +1,4 @@
-2003-03-19  H.J. Lu  <hongjiu.lu@intel.com>
+2007-03-19  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* internal.h (internal_extra_pe_aouthdr): Add Magic,
 	MajorLinkerVersion, MinorLinkerVersion, SizeOfCode,
