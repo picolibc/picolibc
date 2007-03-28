@@ -455,7 +455,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
      So we have to start the child in suspend state, unfortunately, to avoid
      a race condition. */
   if (!newargv.win16_exe
-      && (mode != _P_OVERLAY || cygheap->fdtab.need_fixup_before ()))
+      && (!ch.iscygwin () || mode != _P_OVERLAY || cygheap->fdtab.need_fixup_before ()))
     c_flags |= CREATE_SUSPENDED;
 
   runpath = null_app_name ? NULL : (const char *) real_path;
@@ -609,11 +609,9 @@ loop:
       if (!newargv.win16_exe && myself->wr_proc_pipe)
 	{
 	  if (!looped)
-	    {
-	      myself->sync_proc_pipe ();	/* Make sure that we own wr_proc_pipe
-						   just in case we've been previously
-						   execed. */
-	    }
+	    myself->sync_proc_pipe ();	/* Make sure that we own wr_proc_pipe
+					   just in case we've been previously
+					   execed. */
 	  orig_wr_proc_pipe = myself->dup_proc_pipe (pi.hProcess);
 	}
       pid = myself->pid;

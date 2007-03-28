@@ -1,3 +1,8 @@
+2007-03-28  Christopher Faylor  <me@cgf.cx>
+
+	* spawn.cc (spawn_guts): Start pure-windows processes in a suspended
+	state to avoid potential DuplicateHandle problems.
+
 2007-03-13  Eric Blake  <ebb9@byu.net>
 
 	* include/cygwin/stat.h (S_TYPEISMQ, S_TYPEISSEM, S_TYPEISSHM):
