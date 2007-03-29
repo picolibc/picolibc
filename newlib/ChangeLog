@@ -1,3 +1,23 @@
+2007-03-29  Nick Clifton  <nickc@redhat.com>
+
+	Reflect changes made to generic vfprintf.c:
+	* libc/machine/powerpc/vfprintf.c (__sprint): Rename to __sprint_r
+	and add a "struct reent *" argument.
+	(__sbprintf): Rename to __sbprintf_r, add a "struct reent *"
+	argument and call _VFPRINTF_R instead of VFPRINTF.
+	(_VFPRINTF_R): Add data pointer to call to cantwrite().
+	Fix uses of __sprint() and __sbprintf.
+
+2007-03-20  Nick Clifton  <nickc@redhat.com>
+
+	Reflect changes made to generic vfprintf.c:
+	* libc/machine/powerpc/vfprintf.c (__sprint): Rename to __sprint_r
+	and add a "struct reent *" argument.
+	(__sbprintf): Rename to __sbprintf_r, add a "struct reent *"
+	argument and call _VFPRINTF_R instead of VFPRINTF.
+	(_VFPRINTF_R): Add data pointer to call to cantwrite().
+	Fix uses of __sprint() and __sbprintf.
+
 2007-03-16  Charles Wilson  <cygwin@...>
 
 	* libc/argz/argz_insert.c: "before" pointer is

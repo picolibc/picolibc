@@ -207,7 +207,8 @@ typedef union
  * then reset it so that it can be reused.
  */
 static int
-__sprint(fp, uio)
+__sprint_r(rptr, fp, uio)
+	struct _reent *rptr;
 	FILE *fp;
 	register struct __suio *uio;
 {
@@ -217,7 +218,7 @@ __sprint(fp, uio)
 		uio->uio_iovcnt = 0;
 		return (0);
 	}
-	err = __sfvwrite(fp, uio);
+	err = __sfvwrite_r(rptr, fp, uio);
 	uio->uio_resid = 0;
 	uio->uio_iovcnt = 0;
 	return (err);
@@ -229,7 +230,8 @@ __sprint(fp, uio)
  * worries about ungetc buffers and so forth.
  */
 static int
-__sbprintf(fp, fmt, ap)
+__sbprintf_r(rptr, fp, fmt, ap)
+	struct _reent *rptr;
 	register FILE *fp;
 	const char *fmt;
 	va_list ap;
@@ -250,7 +252,7 @@ __sbprintf(fp, fmt, ap)
 	fake._lbfsize = 0;	/* not actually used, but Just In Case */
 
 	/* do the work, then copy any error status */
-	ret = VFPRINTF(&fake, fmt, ap);
+	ret = _VFPRINTF_R(rptr, &fake, fmt, ap);
 	if (ret >= 0 && fflush(&fake))
 		ret = EOF;
 	if (fake._flags & __SERR)
@@ -410,7 +412,7 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	uio.uio_resid += (len); \
 	iovp++; \
 	if (++uio.uio_iovcnt >= NIOV) { \
-		if (__sprint(fp, &uio)) \
+		if (__sprint_r(data, fp, &uio)) \
 			goto error; \
 		iovp = iov; \
 	} \
@@ -425,7 +427,7 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	} \
 }
 #define	FLUSH() { \
-	if (uio.uio_resid && __sprint(fp, &uio)) \
+	if (uio.uio_resid && __sprint_r(data, fp, &uio)) \
 		goto error; \
 	uio.uio_iovcnt = 0; \
 	iovp = iov; \
@@ -520,13 +522,15 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
         memset (&state, '\0', sizeof (state));
 
 	/* sorry, fprintf(read_only_file, "") returns EOF, not 0 */
-	if (cantwrite(fp))
+	if (cantwrite (data, fp)) {
+		_funlockfile (fp);	
 		return (EOF);
+	}
 
 	/* optimise fprintf(stderr) (and other unbuffered Unix files) */
 	if ((fp->_flags & (__SNBF|__SWR|__SRW)) == (__SNBF|__SWR) &&
 	    fp->_file >= 0)
-		return (__sbprintf(fp, fmt0, ap));
+		return (__sbprintf_r(data, fp, fmt0, ap));
 
 	fmt = (char *)fmt0;
 	uio.uio_iov = iovp = iov;
