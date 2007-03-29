@@ -21,6 +21,7 @@ struct wincaps
   unsigned has_physical_mem_access                      : 1;
   unsigned has_process_io_counters                      : 1;
   unsigned has_terminal_services			: 1;
+  unsigned has_create_global_privilege			: 1;
   unsigned has_ioctl_storage_get_media_types_ex		: 1;
   unsigned has_extended_priority_class			: 1;
   unsigned has_guid_volumes				: 1;
@@ -63,6 +64,7 @@ public:
   bool  IMPLEMENT (has_physical_mem_access)
   bool  IMPLEMENT (has_process_io_counters)
   bool  IMPLEMENT (has_terminal_services)
+  bool  IMPLEMENT (has_create_global_privilege)
   bool	IMPLEMENT (has_ioctl_storage_get_media_types_ex)
   bool	IMPLEMENT (has_extended_priority_class)
   bool	IMPLEMENT (has_guid_volumes)

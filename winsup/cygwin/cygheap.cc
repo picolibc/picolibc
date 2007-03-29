@@ -153,7 +153,8 @@ cygheap_init ()
   cygheap_protect.init ("cygheap_protect");
   if (!cygheap)
     {
-      cygheap = (init_cygheap *) memset (_cygheap_start, 0, _cygheap_mid - _cygheap_start);
+      cygheap = (init_cygheap *) memset (_cygheap_start, 0,
+					 _cygheap_mid - _cygheap_start);
       cygheap_max = cygheap;
       _csbrk (sizeof (*cygheap));
     }
@@ -162,35 +163,9 @@ cygheap_init ()
   if (!cygheap->sigs)
     sigalloc ();
 
-  /* TODO: This is plain wrong.  There's a difference between global shared
-	   memory and every other global object.  It's still allowed to
-	   create any global object from a process not having the
-	   SE_CREATE_GLOBAL_NAME privilege.  It's only disallowed to create
-	   global shared memory objects when not running in session 0 or
-	   when not having the privilege.
-
-	   The end result should look like this:
-	   - All objects shared between multiple processes except shared
-	     memory should always be created as global objects.
-	   - Shared memory only needed locally should stick to being session
-	     local.
-	   - Every process should always try to create resp. open shared
-	     memory as global.
-	   - Only if that fails it should try to create the shared memory
-	     as local shared memory, or ...
-	   - ... the MS suggested workaround is to create a file backed shared
-	     memory if a process has not the privilege to create global shared
-	     memory.
-
-	   However, this has to be planned carefully, especially given that
-	   every single process creates its own (resp. the child's) shared
-	   memory area with the process specific information. */
   if (!cygheap->shared_prefix)
     cygheap->shared_prefix = cstrdup (
-	    wincap.has_terminal_services ()
-	    && (set_privilege (hProcToken, SE_CREATE_GLOBAL_PRIV, true) >= 0
-		|| GetLastError () == ERROR_NO_SUCH_PRIVILEGE)
-	    ? "Global\\" : "");
+	    wincap.has_terminal_services () ? "Global\\" : "");
 }
 
 /* Copyright (C) 1997, 2000 DJ Delorie */

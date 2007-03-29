@@ -84,16 +84,43 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
     m = SH_JUSTOPEN;
   else
     {
+      /* Beginning with Windows 2003 Server, a process doesn't necessarily
+	 have the right to create globally accessible shared memory.  If so,
+	 creating the shared memory will fail with ERROR_ACCESS_DENIED if the
+	 user doesn't have the SeCreateGlobalPrivilege privilege.  If that
+	 happened, we retry to create a shared memory object locally.  This
+	 only allows to see the processes in the current user session, but
+	 that's better than nothing. */
+
       if (name)
 	mapname = shared_name (map_buf, name, n);
       if (m == SH_JUSTOPEN)
-	shared_h = OpenFileMapping (access, FALSE, mapname);
+	{
+	  shared_h = OpenFileMapping (access, FALSE, mapname);
+	  if (!shared_h && wincap.has_create_global_privilege ()
+	      && GetLastError () == ERROR_FILE_NOT_FOUND)
+	    shared_h = OpenFileMapping (access, FALSE, mapname + 7);
+	}
       else
 	{
-	  shared_h = CreateFileMapping (INVALID_HANDLE_VALUE, psa, PAGE_READWRITE,
-					0, size, mapname);
-	  if (GetLastError () == ERROR_ALREADY_EXISTS)
-	    m = SH_JUSTOPEN;
+	  shared_h = CreateFileMapping (INVALID_HANDLE_VALUE, psa,
+	  				PAGE_READWRITE, 0, size, mapname);
+	  switch (GetLastError ())
+	    {
+	    case ERROR_ALREADY_EXISTS:
+	      m = SH_JUSTOPEN;
+	      break;
+	    case ERROR_ACCESS_DENIED:
+	      if (wincap.has_create_global_privilege ())
+	        {
+		  shared_h = CreateFileMapping (INVALID_HANDLE_VALUE, psa,
+						PAGE_READWRITE, 0, size,
+						mapname + 7);
+		  if (GetLastError () == ERROR_ALREADY_EXISTS)
+		    m = SH_JUSTOPEN;
+		}
+	      break;
+	    }
 	}
       if (shared_h)
 	/* ok! */;

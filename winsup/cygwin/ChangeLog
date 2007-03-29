@@ -1,3 +1,30 @@
+2007-03-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (cygheap_init): Fix formatting.  Remove comment.  Set
+	shared_prefix depending only on terminal service capability.
+	* dcrt0.cc (dll_crt0_1): Don't call set_cygwin_privileges here.
+	* fhandler_fifo.cc (fhandler_fifo::open): Create the mutex as global
+	object.
+	* posix_ipc.cc (ipc_mutex_init): Use cygheap->shared_prefix.
+	(ipc_cond_init): Ditto.
+	* sec_helper.cc (privilege_name): Make static.  Use LookupPrivilegeName
+	directly to be independent of the state of cygheap.
+	(set_privilege): Take a LUID as parameter instead of an index value.
+	Only print debug output in case of failure.
+	(set_cygwin_privileges): Add comment.  Use LookupPrivilegeValue to
+	get privilege LUIDs.
+	(init_global_security): Call set_cygwin_privileges here.
+	* security.h (privilege_name): Drop declaration.
+	(set_privilege): Declare according to above change.
+	(set_process_privilege): Call privilege_luid to get LUID.
+	(_push_thread_privilege): Ditto.
+	* shared.cc (open_shared): Add comment.  On systems supporting the
+	SeCreateGlobalPrivilege, try to create/open global shared memory first.
+	Fall back to local shared memory if that fails.
+	* thread.cc (semaphore::semaphore): Use cygheap->shared_prefix.
+	* wincap.h (wincapc::has_create_global_privilege): New element.
+	* wincap.cc: Implement above element throughout.
+
 2007-03-28  Christopher Faylor  <me@cgf.cx>
 
 	* spawn.cc (spawn_guts): Start pure-windows processes in a suspended

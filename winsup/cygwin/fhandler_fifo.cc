@@ -155,7 +155,8 @@ fhandler_fifo::open (int flags, mode_t)
 
   /* Generate a semi-unique name to associate with this fifo but try to ensure
      that it is no larger than CYG_MAX_PATH */
-  for (p = mutex, p1 = strchr (get_name (), '\0');
+  strcpy (mutex, cygheap->shared_prefix);
+  for (p = mutex + strlen (mutex), p1 = strchr (get_name (), '\0');
        --p1 >= get_name () && p < emutex ; p++)
     *p = (*p1 == '/') ? '_' : *p1;
   strncpy (p, FIFO_PREFIX, emutex - p);

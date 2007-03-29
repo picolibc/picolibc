@@ -321,7 +321,6 @@ enum cygpriv_idx {
 
 const LUID *privilege_luid (enum cygpriv_idx idx);
 const LUID *privilege_luid_by_name (const char *pname);
-const char *privilege_name (enum cygpriv_idx idx);
 
 inline BOOL
 legal_sid_type (SID_NAME_USE type)
@@ -381,10 +380,10 @@ bool get_logon_server (const char * domain, char * server, WCHAR *wserver,
 		       bool rediscovery);
 
 /* sec_helper.cc: Security helper functions. */
-int set_privilege (HANDLE token, enum cygpriv_idx privilege, bool enable);
+int set_privilege (HANDLE token, const LUID *priv_luid, bool enable);
 void set_cygwin_privileges (HANDLE token);
 
-#define set_process_privilege(p,v) set_privilege (hProcToken, (p), (v))
+#define set_process_privilege(p,v) set_privilege (hProcToken, privilege_luid (p), (v))
 
 #define _push_thread_privilege(_priv, _val, _check) { \
     HANDLE _dup_token = NULL; \
@@ -397,7 +396,7 @@ void set_cygwin_privileges (HANDLE token);
     else if (!ImpersonateLoggedOnUser (_dup_token)) \
       debug_printf ("ImpersonateLoggedOnUser: %E"); \
     else \
-      set_privilege (_dup_token, (_priv), (_val));
+      set_privilege (_dup_token, privilege_luid (_priv), (_val));
 
 #define push_thread_privilege(_priv, _val) _push_thread_privilege(_priv,_val,1)
 #define push_self_privilege(_priv, _val)   _push_thread_privilege(_priv,_val,0)

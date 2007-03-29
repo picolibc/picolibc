@@ -427,23 +427,22 @@ privilege_luid_by_name (const char *pname)
   return NULL;
 }
 
-const char *
-privilege_name (cygpriv_idx idx)
+static const char *
+privilege_name (const LUID *priv_luid, char *buf, DWORD *size)
 {
-  if (idx < 0 || idx >= SE_NUM_PRIVS)
+  if (!priv_luid || !LookupPrivilegeName (NULL, (LUID *) priv_luid, buf, size))
     return "<unknown privilege>";
-  return cygpriv[idx];
+  return buf;
 }
 
 int
-set_privilege (HANDLE token, cygpriv_idx privilege, bool enable)
+set_privilege (HANDLE token, const LUID *priv_luid, bool enable)
 {
   int ret = -1;
-  const LUID *priv_luid;
   TOKEN_PRIVILEGES new_priv, orig_priv;
   DWORD size;
 
-  if (!(priv_luid = privilege_luid (privilege)))
+  if (!priv_luid)
     {
       __seterrno ();
       goto out;
@@ -474,16 +473,29 @@ set_privilege (HANDLE token, cygpriv_idx privilege, bool enable)
     ret = (orig_priv.Privileges[0].Attributes & SE_PRIVILEGE_ENABLED) ? 1 : 0;
 
 out:
-  syscall_printf ("%d = set_privilege ((token %x) %s, %d)",
-		  ret, token, privilege_name (privilege), enable);
+  if (ret < 0)
+    {
+      DWORD siz = 256;
+      char buf[siz];
+      debug_printf ("%d = set_privilege ((token %x) %s, %d)",
+		    ret, token, privilege_name (priv_luid, buf, &siz), enable);
+    }
   return ret;
 }
 
+/* This is called very early in process initialization.  The code must
+   not depend on anything. */
 void
 set_cygwin_privileges (HANDLE token)
 {
-  set_privilege (token, SE_RESTORE_PRIV, true);
-  set_privilege (token, SE_BACKUP_PRIV, true);
+  LUID priv_luid;
+
+  if (LookupPrivilegeValue (NULL, SE_RESTORE_NAME, &priv_luid))
+    set_privilege (token, &priv_luid, true);
+  if (LookupPrivilegeValue (NULL, SE_BACKUP_NAME, &priv_luid))
+    set_privilege (token, &priv_luid, true);
+  if (LookupPrivilegeValue (NULL, SE_CREATE_GLOBAL_NAME, &priv_luid))
+    set_privilege (token, &priv_luid, true);
 }
 
 /* Function to return a common SECURITY_DESCRIPTOR that
@@ -518,6 +530,8 @@ init_global_security ()
   sec_none.lpSecurityDescriptor = sec_none_nih.lpSecurityDescriptor = NULL;
   sec_all.lpSecurityDescriptor = sec_all_nih.lpSecurityDescriptor =
     get_null_sd ();
+
+  set_cygwin_privileges (hProcToken);
 }
 
 bool

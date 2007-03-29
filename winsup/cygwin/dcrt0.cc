@@ -839,9 +839,6 @@ dll_crt0_1 (void *)
 #endif
   pinfo_init (envp, envc);
 
-  /* Can be set only after environment has been initialized. */
-  set_cygwin_privileges (hProcToken);
-
   if (!old_title && GetConsoleTitle (title_buf, TITLESIZE))
     old_title = title_buf;
 

@@ -29,6 +29,7 @@ details. */
 
 #include "winsup.h"
 #include <limits.h>
+#include "path.h"
 #include "cygerrno.h"
 #include <assert.h>
 #include <stdlib.h>
@@ -37,6 +38,9 @@ details. */
 #include "perprocess.h"
 #include "security.h"
 #include "cygtls.h"
+#include "fhandler.h"
+#include "dtable.h"
+#include "cygheap.h"
 #include <semaphore.h>
 #include <stdio.h>
 #include <sys/timeb.h>
@@ -2968,8 +2972,7 @@ semaphore::semaphore (unsigned long long shash, LUID sluid, int sfd,
 {
   char name[CYG_MAX_PATH];
 
-  __small_sprintf (name, "%scyg_psem/cyg%016X%08x%08x",
-		   wincap.has_terminal_services () ? "Global\\" : "",
+  __small_sprintf (name, "%scyg_psem/cyg%016X%08x%08x", cygheap->shared_prefix,
 		   hash, luid.HighPart, luid.LowPart);
   this->win32_obj_id = ::CreateSemaphore (&sec_all, value, LONG_MAX, name);
   if (!this->win32_obj_id)

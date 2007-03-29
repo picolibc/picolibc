@@ -13,6 +13,9 @@ details. */
 #include "path.h"
 #include "cygerrno.h"
 #include "cygtls.h"
+#include "fhandler.h"
+#include "dtable.h"
+#include "cygheap.h"
 #include "security.h"
 #include "sigproc.h"
 #include <sys/stat.h>
@@ -89,8 +92,7 @@ static int
 ipc_mutex_init (HANDLE *pmtx, const char *name)
 {
   char buf[CYG_MAX_PATH];
-  __small_sprintf (buf, "%scyg_pmtx/%s",
-		   wincap.has_terminal_services () ? "Global\\" : "", name);
+  __small_sprintf (buf, "%scyg_pmtx/%s", cygheap->shared_prefix, name);
   *pmtx = CreateMutex (&sec_all, FALSE, buf);
   if (!*pmtx)
     debug_printf ("failed: %E\n");
@@ -132,8 +134,7 @@ static int
 ipc_cond_init (HANDLE *pevt, const char *name)
 {
   char buf[CYG_MAX_PATH];
-  __small_sprintf (buf, "%scyg_pevt/%s",
-		   wincap.has_terminal_services () ? "Global\\" : "", name);
+  __small_sprintf (buf, "%scyg_pevt/%s", cygheap->shared_prefix, name);
   *pevt = CreateEvent (&sec_all, TRUE, FALSE, buf);
   if (!*pevt)
     debug_printf ("failed: %E\n");
