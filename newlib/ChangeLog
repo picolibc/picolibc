@@ -1,3 +1,11 @@
+2007-03-30  Dave Korn  <dave.korn@artimi.com>
+
+	* libc/include/stdio.h (_ELIDABLE_INLINE):  New macro to conceal
+	conflicting inline semantics between C99 and GNU89.
+	(__sgetc_r):  Replace static inline with _ELIDABLE_INLINE to be
+	compatible with -fkeep-inline-functions usage.
+	(__sputc_r):  Likewise for consistency even though disabled.
+
 2007-03-29  Nick Clifton  <nickc@redhat.com>
 
 	Reflect changes made to generic vfprintf.c:

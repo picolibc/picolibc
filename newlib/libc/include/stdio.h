@@ -404,7 +404,38 @@ FILE	*_EXFUN(funopen,(const _PTR _cookie,
 #define       __sgetc_raw_r(__ptr, __f) (--(__f)->_r < 0 ? __srget_r(__ptr, __f) : (int)(*(__f)->_p++))
 
 #ifdef __SCLE
-static __inline__ int __sgetc_r(struct _reent *__ptr, FILE *__p)
+/*  For a platform with CR/LF, additional logic is required by
+  __sgetc_r which would otherwise simply be a macro; therefore we
+  use an inlined function.  The function is only meant to be inlined
+  in place as used and the function body should never be emitted.  
+
+  There are two possible means to this end when compiling with GCC,
+  one when compiling with a standard C99 compiler, and for other
+  compilers we're just stuck.  At the moment, this issue only
+  affects the Cygwin target, so we'll most likely be using GCC.
+
+  The traditional meaning of 'extern inline' for GCC is not
+  to emit the function body unless the address is explicitly
+  taken.  However this behaviour is changing to match the C99
+  standard, which uses 'extern inline' to indicate that the
+  function body *must* be emitted.  If we are using GCC, but do
+  not have the new behaviour, we need to use extern inline; if
+  we are using a new GCC with the C99-compatible behaviour, or
+  a non-GCC compiler (which we will have to hope is C99, since
+  there is no other way to achieve the effect of omitting the
+  function if it isn't referenced) we just use plain 'inline',
+  which c99 defines to mean more-or-less the same as the Gnu C
+  'extern inline'.  */
+#if defined(__GNUC__) && !defined(__GNUC_STDC_INLINE__)
+/* We're using GCC, but without the new C99-compatible behaviour.  */
+#define _ELIDABLE_INLINE extern __inline__
+#else
+/* We're using GCC in C99 mode, or an unknown compiler which 
+  we just have to hope obeys the C99 semantics of inline.  */
+#define _ELIDABLE_INLINE __inline__
+#endif
+
+_ELIDABLE_INLINE int __sgetc_r(struct _reent *__ptr, FILE *__p)
   {
     int __c = __sgetc_raw_r(__ptr, __p);
     if ((__p->_flags & __SCLE) && (__c == '\r'))
@@ -424,7 +455,7 @@ static __inline__ int __sgetc_r(struct _reent *__ptr, FILE *__p)
 #ifdef _never /* __GNUC__ */
 /* If this inline is actually used, then systems using coff debugging
    info get hopelessly confused.  21sept93 rich@cygnus.com.  */
-static __inline int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
+_ELIDABLE_INLINE int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
 	if (--_p->_w >= 0 || (_p->_w >= _p->_lbfsize && (char)_c != '\n'))
 		return (*_p->_p++ = _c);
 	else
