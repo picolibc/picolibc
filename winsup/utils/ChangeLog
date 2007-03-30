@@ -1,3 +1,8 @@
+2007-03-30  Christopher Faylor  <me@cgf.cx>
+
+	* mount.cc (main): Turn dos file warnings off since we know what we're
+	doing.
+
 2007-02-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ipcs.c (_POSIX2_LINE_MAX): Drop definition.

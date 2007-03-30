@@ -348,6 +348,8 @@ main (int argc, char **argv)
       exit (1);
     }
 
+  cygwin_internal (CW_SET_DOS_FILE_WARNING, false);
+
   argc--;
   switch (do_what)
     {
