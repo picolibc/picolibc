@@ -1,5 +1,6 @@
 /* cygpath.cc -- convert pathnames between Windows and Unix format
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+   2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -375,8 +376,13 @@ get_long_path_name_w32impl (LPCSTR src, LPSTR sbuf, DWORD)
       ptr[len] = 0;
       if (next[1] != ':' && strcmp(next, ".") && strcmp(next, ".."))
 	{
-	  if (FindFirstFile (buf2, &w32_fd) != INVALID_HANDLE_VALUE)
+	  HANDLE h;
+	  h = FindFirstFile (buf2, &w32_fd);
+	  if (h != INVALID_HANDLE_VALUE)
+	    {
 	    strcpy (ptr, w32_fd.cFileName);
+	      FindClose (h);
+	    }
 	}
       ptr += strlen (ptr);
       if (pelem)
@@ -415,7 +421,7 @@ get_long_name (const char *filename, DWORD& len)
       else if (err == ERROR_FILE_NOT_FOUND)
 	len = get_long_path_name_w32impl (filename, buf, MAX_PATH);
       else
-        {
+	{
 	  buf[0] = '\0';
 	  strncat (buf, filename, MAX_PATH - 1);
 	  len = strlen (buf);
@@ -561,7 +567,7 @@ dowin (char option)
 		     prog_name, output_arg);
 	    exit (1);
 	  }
-        get_special_folder (buf, val);
+	get_special_folder (buf, val);
       }
       break;
 

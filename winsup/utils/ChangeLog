@@ -1,3 +1,8 @@
+2007-03-30  Mark Mitchell  <mark@codesourcery.com>
+
+	* utils/cygpath.cc (get_long_path_name_w32impl): Close handles returned
+	by FindFirstFile.
+
 2007-03-30  Christopher Faylor  <me@cgf.cx>
 
 	* mount.cc (main): Turn dos file warnings off since we know what we're
