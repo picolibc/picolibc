@@ -79,6 +79,7 @@ CreateJobObjectA@8
 CreateJobObjectW@8
 CreateMailslotA@16
 CreateMailslotW@16
+CreateMemoryResourceNotification@4
 CreateMutexA@12
 CreateMutexW@12
 CreateNamedPipeA@32

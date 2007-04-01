@@ -1,3 +1,7 @@
+2007-03-30  Brian Dessent  <brian@dessent.net>
+
+	* lib/kernel32.def (CreateMemoryResourceNotification@4): Define.
+
 2007-03-25  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
 	* include/w32api.h: Increment version to 3.9.
