@@ -18,63 +18,39 @@
 #include <_ansi.h>
 #include <reent.h>
 #include <stdio.h>
-#ifdef _HAVE_STDC
 #include <stdarg.h>
-#else
-#include <varargs.h>
-#endif
 #include "local.h"
 
 #ifndef _REENT_ONLY
 
-#ifdef _HAVE_STDC
 int
-iprintf(_CONST char *fmt,...)
-#else
-int
-iprintf(fmt, va_alist)
-        char *fmt;
-        va_dcl
-#endif
+_DEFUN(iprintf, (fmt),
+       const char *fmt _DOTS)
 {
   int ret;
   va_list ap;
+  struct _reent *ptr = _REENT;
 
-  _REENT_SMALL_CHECK_INIT (_REENT);
-#ifdef _HAVE_STDC
+  _REENT_SMALL_CHECK_INIT (ptr);
   va_start (ap, fmt);
-#else
-  va_start (ap);
-#endif
-  ret = vfiprintf (stdout, fmt, ap);
+  ret = _vfiprintf_r (ptr, _stdout_r (ptr), fmt, ap);
   va_end (ap);
   return ret;
 }
 
 #endif /* ! _REENT_ONLY */
 
-#ifdef _HAVE_STDC
 int
-_iprintf_r(struct _reent *ptr, _CONST char *fmt, ...)
-#else
-int
-_iprintf_r(ptr, fmt, va_alist)
-           struct _reent *ptr;
-           char *fmt;
-           va_dcl
-#endif
+_DEFUN(_iprintf_r, (ptr, fmt),
+       struct _reent *ptr _AND
+       const char *fmt _DOTS)
 {
   int ret;
   va_list ap;
 
   _REENT_SMALL_CHECK_INIT (ptr);
-#ifdef _HAVE_STDC
   va_start (ap, fmt);
-#else
-  va_start (ap);
-#endif
   ret = _vfiprintf_r (ptr, _stdout_r (ptr), fmt, ap);
   va_end (ap);
   return ret;
 }
-

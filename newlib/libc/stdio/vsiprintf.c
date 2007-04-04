@@ -24,30 +24,17 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include <reent.h>
 #include <stdio.h>
 #include <limits.h>
-#ifdef _HAVE_STDC
 #include <stdarg.h>
-#else
-#include <varargs.h>
-#endif
 
-#ifndef _REENT_ONLY 
+#ifndef _REENT_ONLY
 
 int
 _DEFUN(vsiprintf, (str, fmt, ap),
        char *str        _AND
-       _CONST char *fmt _AND
+       const char *fmt _AND
        va_list ap)
 {
-  int ret;
-  FILE f;
-
-  f._flags = __SWR | __SSTR;
-  f._bf._base = f._p = (unsigned char *) str;
-  f._bf._size = f._w = INT_MAX;
-  f._file = -1;  /* No file. */
-  ret = _vfiprintf_r (_REENT, &f, fmt, ap);
-  *f._p = 0;
-  return ret;
+  return _vsiprintf_r (_REENT, str, fmt, ap);
 }
 
 #endif /* !_REENT_ONLY */
@@ -56,7 +43,7 @@ int
 _DEFUN(_vsiprintf_r, (ptr, str, fmt, ap),
        struct _reent *ptr _AND
        char *str          _AND
-       _CONST char *fmt   _AND
+       const char *fmt   _AND
        va_list ap)
 {
   int ret;
@@ -70,4 +57,3 @@ _DEFUN(_vsiprintf_r, (ptr, str, fmt, ap),
   *f._p = 0;
   return ret;
 }
-

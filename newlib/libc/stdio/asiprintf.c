@@ -19,27 +19,15 @@
 #include <_ansi.h>
 #include <reent.h>
 #include <stdio.h>
-#ifdef _HAVE_STDC
 #include <stdarg.h>
-#else
-#include <varargs.h>
-#endif
 #include <limits.h>
 #include "local.h"
 
 int
-#ifdef _HAVE_STDC
 _DEFUN(_asiprintf_r, (ptr, strp, fmt),
        struct _reent *ptr _AND
        char **strp        _AND
-       _CONST char *fmt _DOTS)
-#else
-_asiprintf_r(ptr, strp, fmt, va_alist)
-           struct _reent *ptr;
-           char **strp;
-           _CONST char *fmt;
-           va_dcl
-#endif
+       const char *fmt _DOTS)
 {
   int ret;
   va_list ap;
@@ -50,12 +38,8 @@ _asiprintf_r(ptr, strp, fmt, va_alist)
   f._bf._base = f._p = NULL;
   f._bf._size = f._w = 0;
   f._file = -1;  /* No file. */
-#ifdef _HAVE_STDC
   va_start (ap, fmt);
-#else
-  va_start (ap);
-#endif
-  ret = vfiprintf (&f, fmt, ap);
+  ret = _vfiprintf_r (ptr, &f, fmt, ap);
   va_end (ap);
   if (ret >= 0)
     {
@@ -68,16 +52,9 @@ _asiprintf_r(ptr, strp, fmt, va_alist)
 #ifndef _REENT_ONLY
 
 int
-#ifdef _HAVE_STDC
 _DEFUN(asiprintf, (strp, fmt),
        char **strp _AND
-       _CONST char *fmt _DOTS)
-#else
-asiprintf(strp, fmt, va_alist)
-        char **strp;
-        _CONST char *fmt;
-        va_dcl
-#endif
+       const char *fmt _DOTS)
 {
   int ret;
   va_list ap;
@@ -88,12 +65,8 @@ asiprintf(strp, fmt, va_alist)
   f._bf._base = f._p = NULL;
   f._bf._size = f._w = 0;
   f._file = -1;  /* No file. */
-#ifdef _HAVE_STDC
   va_start (ap, fmt);
-#else
-  va_start (ap);
-#endif
-  ret = vfiprintf (&f, fmt, ap);
+  ret = _vfiprintf_r (_REENT, &f, fmt, ap);
   va_end (ap);
   if (ret >= 0)
     {
@@ -103,4 +76,4 @@ asiprintf(strp, fmt, va_alist)
   return (ret);
 }
 
-#endif
+#endif /* ! _REENT_ONLY */

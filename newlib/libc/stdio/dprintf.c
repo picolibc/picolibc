@@ -1,4 +1,4 @@
-/* Copyright 2005 Shaun Jackman
+/* Copyright 2005, 2007 Shaun Jackman
  * Permission to use, copy, modify, and distribute this software
  * is freely granted, provided that this notice is preserved.
  */
@@ -17,9 +17,9 @@ ANSI_SYNOPSIS
 	#include <stdarg.h>
 	int dprintf(int <[fd]>, const char *<[format]>, ...);
 	int vdprintf(int <[fd]>, const char *<[format]>, va_list <[ap]>);
-	int _dprintf_r(struct _reent *<[ptr]>, int <[fd]>, 
+	int _dprintf_r(struct _reent *<[ptr]>, int <[fd]>,
 			const char *<[format]>, ...);
-	int _vdprintf_r(struct _reent *<[ptr]>, int <[fd]>, 
+	int _vdprintf_r(struct _reent *<[ptr]>, int <[fd]>,
 			const char *<[format]>, va_list <[ap]>);
 
 TRAD_SYNOPSIS
@@ -68,32 +68,18 @@ Supporting OS subroutines required: <<sbrk>>, <<write>>.
 #include <reent.h>
 #include <stdio.h>
 #include <unistd.h>
-#ifdef _HAVE_STDC
 #include <stdarg.h>
-#else
-#include <varargs.h>
-#endif
 
-#ifdef _HAVE_STDC
 int
-_dprintf_r(struct _reent *ptr, int fd, _CONST char *format, ...)
-#else
-int
-_dprintf_r(ptr, fd, format, va_alist)
-	struct _reent *ptr;
-	int fd;
-	char *format;
-	va_dcl
-#endif
+_DEFUN(_dprintf_r, (ptr, fd, format),
+       struct _reent *ptr _AND
+       int fd _AND
+       const char *format _DOTS)
 {
 	va_list ap;
 	int n;
 	_REENT_SMALL_CHECK_INIT (ptr);
-#ifdef _HAVE_STDC
-  	va_start (ap, format);
-#else
-  	va_start (ap);
-#endif
+	va_start (ap, format);
 	n = _vdprintf_r (ptr, fd, format, ap);
 	va_end (ap);
 	return n;
@@ -101,29 +87,20 @@ _dprintf_r(ptr, fd, format, va_alist)
 
 #ifndef _REENT_ONLY
 
-#ifdef _HAVE_STDC
 int
-dprintf(int fd, _CONST char *format, ...)
-#else
-int
-dprintf(fd, format, va_alist)
-	struct _reent *ptr;
-	int fd;
-	char *format;
-	va_dcl
-#endif
+_DEFUN(dprintf, (fd, format),
+       int fd _AND
+       const char *format _DOTS)
 {
-	va_list ap;
-	int n;
-	_REENT_SMALL_CHECK_INIT (_REENT);
-#ifdef _HAVE_STDC
-  	va_start (ap, format);
-#else
-  	va_start (ap);
-#endif
-	n = _vdprintf_r (_REENT, fd, format, ap);
-	va_end (ap);
-	return n;
+  va_list ap;
+  int n;
+  struct _reent *ptr = _REENT;
+
+  _REENT_SMALL_CHECK_INIT (ptr);
+  va_start (ap, format);
+  n = _vdprintf_r (ptr, fd, format, ap);
+  va_end (ap);
+  return n;
 }
 
 #endif /* ! _REENT_ONLY */

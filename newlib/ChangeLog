@@ -1,3 +1,32 @@
+2007-04-04  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/asiprintf.c (_asiprintf_r): Fix reentrancy.
+	(asiprintf): Avoid overhead.
+	* libc/stdio/asprintf.c (_asprintf_r): Fix reentrancy.
+	(asprintf): Avoid overhead.
+	* libc/stdio/diprintf.c (_diprintf_r, diprintf): New file.
+	* libc/stdio/dprintf.c (_dprintf_r, dprintf): Use _DEFUN.
+	* libc/stdio/fiprintf.c (_fiprintf_r): Add reentrant version.
+	(fiprintf): Avoid overhead.
+	* libc/stdio/fprintf.c (_fprintf_r): Add reentrant version.
+	(fprintf): Avoid overhead.
+	* libc/stdio/iprintf.c (_iprintf_r): Use _DEFUN.
+	(iprintf): Avoid overhead.
+	* libc/stdio/printf.c (_printf_r): Use _DEFUN.
+	(printf): Avoid overhead.
+	* libc/stdio/vasiprintf.c (vasiprintf): Reduce binary size.
+	* libc/stdio/vasprintf.c (vasprintf): Reduce binary size.
+	* libc/stdio/vdiprintf.c (_vdiprintf_r, vdiprintf): New file.
+	* libc/stdio/vdprintf.c (vdprintf): Avoid overhead.
+	* libc/stdio/vsiprintf.c (vsiprintf): Reduce binary size.
+	* libc/stdio/vsniprintf.c (vsniprintf): Reduce binary size.
+	* libc/stdio/vsnprintf.c (vsnprintf): Reduce binary size.
+	* libc/stdio/vsprintf.c (vsprintf): Reduce binary size.
+	* libc/stdio/Makefile.am (GENERAL_SOURCES): Add diprintf.c,
+	vdiprintf.c.
+	* libc/include/stdio.h (diprintf, _diprintf_r, vdiprintf)
+	(_vdiprintf_r, _fiprintf_r, _vfiprintf_r): Add prototypes.
+
 2007-03-30  Dave Korn  <dave.korn@artimi.com>
 
 	* libc/include/stdio.h (_ELIDABLE_INLINE):  New macro to conceal
