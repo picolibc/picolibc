@@ -1,6 +1,6 @@
 /* stdint.h - integer types
 
-   Copyright 2003, 2006 Red Hat, Inc.
+   Copyright 2003, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -158,8 +158,8 @@ typedef unsigned long long uintmax_t;
 #endif
 
 #ifndef WINT_MIN
-#define WINT_MIN (-2147483647 - 1)
-#define WINT_MAX (2147483647)
+#define WINT_MIN 0
+#define WINT_MAX UINT_MAX
 #endif
 
 /* Macros for minimum-width integer constant expressions */
