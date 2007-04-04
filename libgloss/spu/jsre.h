@@ -188,6 +188,6 @@ typedef struct {
     unsigned int ctime;
 } jsre_stat_t;
 
-void _send_to_ppe (unsigned int signalcode, unsigned int opcode, void *data);
+#include <sys/syscall.h>
 
 #endif

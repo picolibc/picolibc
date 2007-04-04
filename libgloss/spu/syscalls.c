@@ -29,10 +29,11 @@ POSSIBILITY OF SUCH DAMAGE.
 
 Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 */
+#include <errno.h>
 #include "jsre.h"
 
 void
-_send_to_ppe (unsigned int signalcode, unsigned int opcode, void *data)
+__send_to_ppe (unsigned int signalcode, unsigned int opcode, void *data)
 {
 
 	unsigned int	combined = ( ( opcode<<24 )&0xff000000 ) | ( ( unsigned int )data & 0x00ffffff );
@@ -46,6 +47,7 @@ _send_to_ppe (unsigned int signalcode, unsigned int opcode, void *data)
 
         void (*f) (void) = (void *) &stopfunc;
         asm ("sync");
-        return (f ());
+        f ();
+        errno = ((unsigned int *) data)[3];
 }
 

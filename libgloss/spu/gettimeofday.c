@@ -43,8 +43,7 @@ gettimeofday (struct timeval *tv, struct timezone *tz)
 	sys.tv = (unsigned int)tv;
 	sys.tz = (unsigned int)tz;
 
-	_send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_GETTIMEOFDAY, &sys);
+	__send_to_ppe(JSRE_POSIX1_SIGNALCODE, JSRE_GETTIMEOFDAY, &sys);
 
-	errno = psys_out->err;
 	return (psys_out->rc);
 }

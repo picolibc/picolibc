@@ -31,7 +31,6 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 */
 
 #include <fcntl.h>
-#include <errno.h>
 #include "jsre.h"
 
 int
@@ -44,9 +43,8 @@ write (int file, const void *ptr, size_t len)
 	sys.ptr = ( unsigned int )ptr;
 	sys.len = len;
 
-	_send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_WRITE, &sys);
+	__send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_WRITE, &sys);
 
-        errno = psys_out->err;
         return ( psys_out->rc);
 }
 

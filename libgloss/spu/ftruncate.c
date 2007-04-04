@@ -29,7 +29,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 */
 #include <unistd.h>
-#include <errno.h>
 #include "jsre.h"
 
 int
@@ -41,9 +40,8 @@ ftruncate (int file, off_t length)
 	sys.file = file;
 	sys.length = length;
 
-	_send_to_ppe(JSRE_POSIX1_SIGNALCODE, JSRE_FTRUNCATE, &sys);
+	__send_to_ppe(JSRE_POSIX1_SIGNALCODE, JSRE_FTRUNCATE, &sys);
 
-	errno = psys_out->err;
 	return ( psys_out->rc);
 }
 

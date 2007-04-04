@@ -31,7 +31,6 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 */
 
 #include <sys/stat.h>
-#include <errno.h>
 #include "jsre.h"
 
 int
@@ -44,7 +43,7 @@ fstat (int file, struct stat *pstat)
         sys.file = file;
         sys.ptr = ( unsigned int )&pjstat;
 
-        _send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_FSTAT, &sys);
+        __send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_FSTAT, &sys);
 
         pstat->st_dev = pjstat.dev;
         pstat->st_ino = pjstat.ino;
@@ -61,7 +60,6 @@ fstat (int file, struct stat *pstat)
         pstat->st_ctime = pjstat.ctime;
 
 
-        errno = psys_out->err;
         return( psys_out->rc );
 }
 

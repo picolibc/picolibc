@@ -31,7 +31,6 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 */
 
 #include <unistd.h>
-#include <errno.h>
 #include "jsre.h"
 
 off_t
@@ -55,9 +54,8 @@ lseek (int file, off_t offset, int whence)
 			break;
 	}
 
-	_send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_LSEEK, &sys);
+	__send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_LSEEK, &sys);
 
-        errno = psys_out->err;
         return ( psys_out->rc);
 }
 

@@ -1,3 +1,22 @@
+2007-04-04  Patrick Mansfield <patmans@us.ibm.com>
+ 
+	* spu/syscalls.c: Rename _send_to_ppe __send_to_ppe, and set errno
+	on return from the offload call.
+	* spu/jsre.h: Include sys/syscall.h for the send_to_ppe prototype.
+	* spu/access.c: Call __send_to_ppe instead of _send_to_ppe, and
+	remove the setting of errno.
+	* spu/close.c: Ditto.
+	* spu/dup.c: Ditto.
+	* spu/fstat.c: Ditto.
+	* spu/ftruncate.c: Ditto.
+	* spu/gettimeofday.c: Ditto.
+	* spu/lseek.c: Ditto.
+	* spu/open.c: Ditto.
+	* spu/read.c: Ditto.
+	* spu/stat.c: Ditto.
+	* spu/unlink.c: Ditto.
+	* spu/write.c: Ditto.
+
 2007-03-01  Ben Elliston  <bje@au.ibm.com>
 
 	* spu/sbrk.c (sbrk): Adjust the stack pointer vector correctly so

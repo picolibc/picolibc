@@ -30,7 +30,6 @@ POSSIBILITY OF SUCH DAMAGE.
 Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 */
 
-#include <errno.h>
 #include "jsre.h"
 
 int
@@ -41,9 +40,8 @@ close (int file)
 
 	sys.file = file;
 
-        _send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_CLOSE, &sys);
+        __send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_CLOSE, &sys);
 
-        errno = psys_out->err;
         return ( psys_out->rc);
 }
 

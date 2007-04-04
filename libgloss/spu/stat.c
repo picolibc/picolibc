@@ -32,7 +32,6 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 
 #include <stdarg.h>
 #include <fcntl.h>
-#include <errno.h>
 #include "jsre.h"
 
 int
@@ -45,7 +44,7 @@ stat (const char *pathname, struct stat *pstat)
 	sys.pathname = (unsigned int)pathname;
 	sys.ptr = ( unsigned int )&pjstat;
 
-	_send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_STAT, &sys);
+	__send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_STAT, &sys);
 
 	pstat->st_dev = pjstat.dev;
 	pstat->st_ino = pjstat.ino;
@@ -61,7 +60,6 @@ stat (const char *pathname, struct stat *pstat)
 	pstat->st_mtime = pjstat.mtime;
 	pstat->st_ctime = pjstat.ctime;
 
-	errno = psys_out->err;
 	return( psys_out->rc );
 }
 

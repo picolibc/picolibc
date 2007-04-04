@@ -29,7 +29,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <errno.h>
 #include "jsre.h"
 
 int
@@ -41,9 +40,8 @@ access (const char *pathname, int mode)
         sys.pathname = (unsigned int) pathname;
         sys.mode = mode;
 
-        _send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_ACCESS, &sys);
+        __send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_ACCESS, &sys);
 
-        errno = psys_out->err;
         return ( psys_out->rc);
 }
 
