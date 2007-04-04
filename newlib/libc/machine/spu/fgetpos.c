@@ -58,7 +58,7 @@ _DEFUN (fgetpos, (fp, pos),
   arg.fp = fp->_fp;
   arg.pos = pos;
 
-  send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FGETPOS, &arg);
+  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FGETPOS, &arg);
 
 
   return *result;

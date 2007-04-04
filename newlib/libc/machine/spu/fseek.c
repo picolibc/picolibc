@@ -62,7 +62,7 @@ _DEFUN (fseek, (fp, offset, whence),
   args.whence = whence;
   ret = (int*)&args;
 
-  send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FSEEK, &args);
+  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FSEEK, &args);
 
   return *ret;
 }

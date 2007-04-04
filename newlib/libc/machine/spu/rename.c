@@ -54,7 +54,7 @@ rename (old, new)
   args.new = new;
   ret = (int*) &args;
 
-  send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_RENAME, &args);
+  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_RENAME, &args);
 
   return *ret;
 }

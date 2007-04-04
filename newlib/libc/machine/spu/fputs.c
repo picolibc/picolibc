@@ -59,7 +59,7 @@ _DEFUN (fputs, (s, fp),
   args.fp = fp->_fp;
   ret = (int*)&args;
 
-  send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FPUTS, &args);
+  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FPUTS, &args);
 
   return *ret;
 }

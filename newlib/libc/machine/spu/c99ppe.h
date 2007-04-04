@@ -31,6 +31,7 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 */
 
 #include <errno.h>
+#include <sys/syscall.h>
 
 #define SPE_C99_SIGNALCODE 0x2100
 
@@ -92,27 +93,6 @@ enum {
 struct spe_reg128{
   unsigned int slot[4];
 };
-
-static void
-send_to_ppe(int signalcode, int opcode, void *data)
-{
-
-	unsigned int	combined = ( ( opcode<<24 )&0xff000000 ) | ( ( unsigned int )data & 0x00ffffff );
-	struct spe_reg128* ret = data;
-
-        __vector unsigned int stopfunc = {
-                signalcode,     /* stop 0x210x*/
-                (unsigned int) combined,
-                0x4020007f,     /* nop */
-                0x35000000      /* bi $0 */
-        };
-
-        void (*f) (void) = (void *) &stopfunc;
-        asm ("sync":::"memory");
-        f();
-	errno = ret->slot[3];
-	return;
-}
 
 void _EXFUN(__sinit,(struct _reent *));
 FILE  *_EXFUN(__sfp,(struct _reent *));

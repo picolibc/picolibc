@@ -41,7 +41,7 @@ remove (filename)
 
   /* The return value gets written over buf
    */
-  send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_REMOVE, &filename);
+  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_REMOVE, &filename);
 
   return (int)filename;
 }

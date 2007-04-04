@@ -1,3 +1,56 @@
+2007-04-04  Patrick Mansfield <patmans@us.ibm.com>
+  
+	* libc/machine/spu/sys/syscall.h: New file for __send_to_ppe
+	prototype.
+	* libc/machine/spu/c99ppe.h: Remove static version of send_to_ppe.
+	* libc/machine/spu/clearerr.c: Call __send_to_ppe vs send_to_ppe.
+	* libc/machine/spu/fclose.c: Ditto.
+	* libc/machine/spu/feof.c: Ditto.
+	* libc/machine/spu/ferror.c: Ditto.
+	* libc/machine/spu/fflush.c: Ditto.
+	* libc/machine/spu/fgetc.c: Ditto.
+	* libc/machine/spu/fgetpos.c: Ditto.
+	* libc/machine/spu/fgets.c: Ditto.
+	* libc/machine/spu/fileno.c: Ditto.
+	* libc/machine/spu/fopen.c: Ditto.
+	* libc/machine/spu/fprintf.c: Ditto.
+	* libc/machine/spu/fputc.c: Ditto.
+	* libc/machine/spu/fputs.c: Ditto.
+	* libc/machine/spu/fread.c: Ditto.
+	* libc/machine/spu/freopen.c: Ditto.
+	* libc/machine/spu/fscanf.c: Ditto.
+	* libc/machine/spu/fseek.c: Ditto.
+	* libc/machine/spu/fsetpos.c: Ditto.
+	* libc/machine/spu/ftell.c: Ditto.
+	* libc/machine/spu/fwrite.c: Ditto.
+	* libc/machine/spu/getc.c: Ditto.
+	* libc/machine/spu/getchar.c: Ditto.
+	* libc/machine/spu/gets.c: Ditto.
+	* libc/machine/spu/perror.c: Ditto.
+	* libc/machine/spu/printf.c: Ditto.
+	* libc/machine/spu/putc.c: Ditto.
+	* libc/machine/spu/putchar.c: Ditto.
+	* libc/machine/spu/puts.c: Ditto.
+	* libc/machine/spu/remove.c: Ditto.
+	* libc/machine/spu/rename.c: Ditto.
+	* libc/machine/spu/rewind.c: Ditto.
+	* libc/machine/spu/scanf.c: Ditto.
+	* libc/machine/spu/setbuf.c: Ditto.
+	* libc/machine/spu/setvbuf.c: Ditto.
+	* libc/machine/spu/snprintf.c: Ditto.
+	* libc/machine/spu/sprintf.c: Ditto.
+	* libc/machine/spu/sscanf.c: Ditto.
+	* libc/machine/spu/tmpfile.c: Ditto.
+	* libc/machine/spu/tmpnam.c: Ditto.
+	* libc/machine/spu/ungetc.c: Ditto.
+	* libc/machine/spu/vfprintf.c: Ditto.
+	* libc/machine/spu/vfscanf.c: Ditto.
+	* libc/machine/spu/vprintf.c: Ditto.
+	* libc/machine/spu/vscanf.c: Ditto.
+	* libc/machine/spu/vsnprintf.c: Ditto.
+	* libc/machine/spu/vsprintf.c: Ditto.
+	* libc/machine/spu/vsscanf.c: Ditto.
+
 2007-04-04  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/argz/argz_insert.c: Add stddef.h to get ptrdiff_t type.

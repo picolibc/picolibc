@@ -49,7 +49,7 @@ printf (fmt, va_alist)
   va_start (args.ap);
 #endif
 
-  send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VPRINTF, &args);
+  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VPRINTF, &args);
 
   va_end (args.ap);
   return *ret;

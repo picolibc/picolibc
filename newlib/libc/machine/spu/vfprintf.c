@@ -73,7 +73,7 @@ _DEFUN (vfprintf, (fp, fmt0, ap),
   args.fmt = (char*) fmt0;
   va_copy(args.ap,ap);
 
-  send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VFPRINTF, &args);
+  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VFPRINTF, &args);
 
   return *ret;
 }

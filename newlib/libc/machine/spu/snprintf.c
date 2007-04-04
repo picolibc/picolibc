@@ -79,7 +79,7 @@ _DEFUN(snprintf, (str, size, fmt),
   va_start (args.ap);
 #endif
 
-  send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VSNPRINTF, &args);
+  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VSNPRINTF, &args);
 
   va_end (args.ap);
   return *ret;

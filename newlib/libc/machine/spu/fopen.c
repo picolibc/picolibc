@@ -65,7 +65,7 @@ _DEFUN (fopen, (file, mode),
   args.mode = mode;
   ret = (int *) &args;
 
-  send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FOPEN, &args);
+  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FOPEN, &args);
 
   if (*ret) {
     fp->_fp = *ret;

@@ -46,7 +46,7 @@ _DEFUN (feof, (fp),
 
   result = fp->_fp;
 
-  send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FEOF, &result);
+  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FEOF, &result);
 
 
   return result;

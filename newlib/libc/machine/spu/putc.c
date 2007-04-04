@@ -59,7 +59,7 @@ putc (c, fp)
   args.fp = fp->_fp;
   ret = (int*)&args;
 
-  send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_PUTC, &args);
+  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_PUTC, &args);
 
   return *ret;
 }

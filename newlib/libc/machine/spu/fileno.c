@@ -47,7 +47,7 @@ _DEFUN (fileno, (fp),
 
   ret = fp->_fp;
 
-  send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FILENO, &ret);
+  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FILENO, &ret);
 
   return ret;
 }

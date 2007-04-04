@@ -46,7 +46,7 @@ _DEFUN (ferror, (fp),
 
   result = fp->_fp;
 
-  send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FERROR, &result);
+  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FERROR, &result);
 
 
   return result;

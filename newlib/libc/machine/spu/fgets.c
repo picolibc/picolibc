@@ -61,7 +61,7 @@ _DEFUN (fgets, (buf, n, fp),
   args.fp = fp->_fp;
   ret = (char**) &args;
 
-  send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FGETS, &args);
+  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FGETS, &args);
 
   return *ret;
 }

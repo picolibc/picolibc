@@ -45,7 +45,7 @@ getchar ()
 
   CHECK_STD_INIT(_REENT);
 
-  send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_GETCHAR, &ret);
+  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_GETCHAR, &ret);
 
   return ret;
 }

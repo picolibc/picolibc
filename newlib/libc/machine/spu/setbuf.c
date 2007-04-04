@@ -57,7 +57,7 @@ _DEFUN (setbuf, (fp, buf),
   args.fp = fp->_fp;
   args.buf = buf;
 
-  send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_SETBUF, &args);
+  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_SETBUF, &args);
 
   return;
 }

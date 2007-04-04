@@ -62,7 +62,7 @@ _DEFUN (freopen, (file, mode, fp),
   args.fp = fp->_fp;
   ret = (int *) &args;
 
-  send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FREOPEN, &args);
+  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FREOPEN, &args);
 
   if (*ret) {
     fp->_fp = *ret;

@@ -71,7 +71,7 @@ scanf(_CONST char *fmt, ...)
 #endif
 
 
-  send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VSCANF, &args);
+  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VSCANF, &args);
 
   va_end (args.ap);
   return *ret;

@@ -66,7 +66,7 @@ _DEFUN (fwrite, (buf, size, count, fp),
   args.fp = fp->_fp;
   ret = (size_t*) &args;
 
-  send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FWRITE, &args);
+  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FWRITE, &args);
 
   return *ret;
 }
