@@ -1,3 +1,8 @@
+2007-04-05  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* Makefile.in: Added mansection and mansuffix variables.  Changed mandir
+  to support Cygwin man page location.
+
 2007-03-25  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* Include/_mingw.h: Increment version to 3.12.
@@ -142,7 +147,7 @@
 
 2006-11-09  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	[ mingw-Bugs-1590623 ] 
+	[ mingw-Bugs-1590623 ]
 	* include/_mingw.h (__CRT_INLINE): Use __gnu_inline__ attribute
 	in C99 mode.
 
@@ -256,7 +261,7 @@
 
 2006-07-06  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/math.h (__INFF,__INFL): Remove '#'. 
+	* include/math.h (__INFF,__INFL): Remove '#'.
 
 2006-07-04  Danny Smith  <dannysmith@users.sourceforge.net>
 
@@ -264,11 +269,11 @@
 
 2006-07-03  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	Support SSE float environment in fenv.h functions.  
+	Support SSE float environment in fenv.h functions.
 	* cpu_features.c: New file.
 	* cpu_features.h: New file.
 	* crt1.c: Include "cpu_features.h".
-	(__mingw_CRTStartup): Call cpu_features_init().	
+	(__mingw_CRTStartup): Call cpu_features_init().
 	* Makefile.in (MING_OBJS): Add cpu_features.c.
 	(SRCDIST_FILES): Add cpu_features.c, cpu_features.h.
 	* include/fenv,h ( fenv_t;): Append  __mxcsr field.

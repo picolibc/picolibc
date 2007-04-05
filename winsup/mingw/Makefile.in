@@ -19,7 +19,7 @@
 
 PACKAGE = mingw-runtime
 VERSION = @PACKAGE_VERSION@
-CYGRELEASE = 1
+CYGRELEASE = 2
 
 VPATH = @srcdir@
 srcdir = @srcdir@
@@ -36,7 +36,15 @@ program_transform_name = @program_transform_name@
 exec_prefix = @exec_prefix@
 bindir = @bindir@
 libdir = @libdir@
+ifneq (,$(findstring cygwin,$(target_alias)))
+mandir = $(prefix)/share/man
+mansection = mingw
+mansuffix = mingw
+else
 mandir = @mandir@
+mansection = man3
+mansuffix = 3
+endif
 manpage_transform = @mingw_manpage_transform@
 ifeq ($(target_alias),$(host_alias))
 ifeq ($(build_alias),$(host_alias))
@@ -421,7 +429,7 @@ install-dirs:
 	$(mkinstalldirs) $(inst_includedir)
 	$(mkinstalldirs) $(inst_libdir)
 	$(mkinstalldirs) $(inst_docdir)
-	$(mkinstalldirs) $(mandir)/man3
+	$(mkinstalldirs) $(mandir)/$(mansection)
 
 install: all install-dirs $(install_dlls_host)
 	for i in $(LIBS); do \
@@ -444,11 +452,11 @@ install: all install-dirs $(install_dlls_host)
 # This provisional hack installs the only manpage we have at present...
 # It simply CANNOT suffice, when we have more manpages to ship.
 #
-	$(mkinstalldirs) $(mandir)/man3
-	$(INSTALL_DATA) $(srcdir)/man/dirname.man $(mandir)/man3/`\
-	  echo dirname.man|sed '$(manpage_transform);s,man$$,3,'`
-	$(INSTALL_DATA) $(srcdir)/man/dirname.man $(mandir)/man3/`\
-	  echo basename.man|sed '$(manpage_transform);s,man$$,3,'`
+	$(mkinstalldirs) $(mandir)/$(mansection)
+	$(INSTALL_DATA) $(srcdir)/man/dirname.man $(mandir)/$(mansection)/`\
+	  echo dirname.man|sed '$(manpage_transform);s,man$$,$(mansuffix),'`
+	$(INSTALL_DATA) $(srcdir)/man/dirname.man $(mandir)/$(mansection)/`\
+	  echo basename.man|sed '$(manpage_transform);s,man$$,$(mansuffix),'`
 #
 # End provisional hack.
 #
