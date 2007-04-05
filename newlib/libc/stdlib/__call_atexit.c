@@ -23,6 +23,8 @@ _DEFUN (__call_exitprocs, (code, d),
   int i;
   void (*fn) (void);
 
+ restart:
+
   p = _GLOBAL_REENT->_atexit;
   lastp = &_GLOBAL_REENT->_atexit;
   while (p)
@@ -34,6 +36,8 @@ _DEFUN (__call_exitprocs, (code, d),
 #endif
       for (n = p->_ind - 1; n >= 0; n--)
 	{
+	  int ind;
+
 	  i = 1 << n;
 
 	  /* Skip functions not from this dso.  */
@@ -52,6 +56,8 @@ _DEFUN (__call_exitprocs, (code, d),
 	  if (!fn)
 	    continue;
 
+	  ind = p->_ind;
+
 	  /* Call the function.  */
 	  if (!args || (args->_fntypes & i) == 0)
 	    fn ();
@@ -59,6 +65,12 @@ _DEFUN (__call_exitprocs, (code, d),
 	    (*((void (*)(int, _PTR)) fn))(code, args->_fnargs[n]);
 	  else
 	    (*((void (*)(_PTR)) fn))(args->_fnargs[n]);
+
+	  /* The function we called call atexit and registered another
+	     function (or functions).  Call these new functions before
+	     continuing with the already registered functions.  */
+	  if (ind != p->_ind || *lastp != p)
+	    goto restart;
 	}
 
 #ifndef _ATEXIT_DYNAMIC_ALLOC
