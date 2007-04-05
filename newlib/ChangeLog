@@ -3,6 +3,9 @@
 	* libc/stdlib/__call_atexit.c (__call_exitprocs): Handle atexit
 	functions registering additional atexit functions.
 
+	* testsuite/lib/flags.exp (newlib_include_flags): Drop
+	-I${newlib_dir}.
+
 2007-04-04  Patrick Mansfield <patmans@us.ibm.com>
   
 	* libc/machine/spu/sys/syscall.h: New file for __send_to_ppe
