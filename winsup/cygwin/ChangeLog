@@ -1,3 +1,7 @@
+2007-04-06  Eric Blake  <ebb9@byu.net>
+
+	* include/stdint.h (WINT_MIN): Fix sign.
+
 2007-04-04  Eric Blake  <ebb9@byu.net>
 
 	* include/stdint.h (WINT_MIN, WINT_MAX): Fix definition.

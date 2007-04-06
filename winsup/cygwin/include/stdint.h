@@ -158,7 +158,7 @@ typedef unsigned long long uintmax_t;
 #endif
 
 #ifndef WINT_MIN
-#define WINT_MIN 0
+#define WINT_MIN 0U
 #define WINT_MAX UINT_MAX
 #endif
 
