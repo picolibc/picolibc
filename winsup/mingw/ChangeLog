@@ -1,7 +1,12 @@
+2007-04-07  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* Makefile.in: Removed mansuffix variable.  Changed mansection to support
+	Cygwin man page location.
+
 2007-04-05  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
-	* Makefile.in: Added mansection and mansuffix variables.  Changed mandir
-  to support Cygwin man page location.
+	* Makefile.in: Added mansection and mansuffix variables.  Changed mandir to
+	support Cygwin man page location.
 
 2007-03-25  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
