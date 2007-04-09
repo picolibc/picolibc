@@ -1,3 +1,8 @@
+2007-04-09  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* src-release (do-proto-toplev): Process the support directories before
+	the tool directory.
+
 2007-03-21  Richard Sandiford  <richard@codesourcery.com>
 
 	* configure.ac (TOPLEVEL_CONFIGURE_ARGUMENTS): Fix m4 quoting

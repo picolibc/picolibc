@@ -144,7 +144,7 @@ do-proto-toplev: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
 	    CC_FOR_TARGET="$(CC)" CXX_FOR_TARGET="$(CXX)"
 	# Make links, and run "make diststuff" or "make info" when needed.
 	rm -rf proto-toplev ; mkdir proto-toplev
-	set -e ; dirs="$(TOOL) $(DEVO_SUPPORT) $(SUPPORT_FILES)" ; \
+	set -e ; dirs="$(DEVO_SUPPORT) $(SUPPORT_FILES) $(TOOL)" ; \
 	for d in $$dirs ; do \
 	  if [ -d $$d ]; then \
 	    if [ ! -f $$d/Makefile ] ; then true ; \
