@@ -1,3 +1,10 @@
+2007-04-09  Joel Schopp <jschopp@austin.ibm.com>
+  
+	* libc/machine/spu/strxfrm.c: Fix strxfrm so we still copy data
+	even if the passed in length n is shorter than the source string.
+	This matches both the non-spu specific and the glibc strxfrm
+	behaviour.
+
 2007-04-04  Mark Mitchell  <mark@codesourcery.com>
 
 	* libc/stdlib/__call_atexit.c (__call_exitprocs): Handle atexit
