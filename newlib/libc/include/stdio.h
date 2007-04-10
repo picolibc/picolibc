@@ -174,14 +174,22 @@ int	_EXFUN(fflush, (FILE *));
 FILE *	_EXFUN(freopen, (const char *, const char *, FILE *));
 void	_EXFUN(setbuf, (FILE *, char *));
 int	_EXFUN(setvbuf, (FILE *, char *, int, size_t));
-int	_EXFUN(fprintf, (FILE *, const char *, ...));
-int	_EXFUN(fscanf, (FILE *, const char *, ...));
-int	_EXFUN(printf, (const char *, ...));
-int	_EXFUN(scanf, (const char *, ...));
-int	_EXFUN(sscanf, (const char *, const char *, ...));
-int	_EXFUN(vfprintf, (FILE *, const char *, __VALIST));
-int	_EXFUN(vprintf, (const char *, __VALIST));
-int	_EXFUN(vsprintf, (char *, const char *, __VALIST));
+int	_EXFUN(fprintf, (FILE *, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 2, 3))));
+int	_EXFUN(fscanf, (FILE *, const char *, ...)
+               _ATTRIBUTE ((__format__ (__scanf__, 2, 3))));
+int	_EXFUN(printf, (const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 1, 2))));
+int	_EXFUN(scanf, (const char *, ...)
+               _ATTRIBUTE ((__format__ (__scanf__, 1, 2))));
+int	_EXFUN(sscanf, (const char *, const char *, ...)
+               _ATTRIBUTE ((__format__ (__scanf__, 2, 3))));
+int	_EXFUN(vfprintf, (FILE *, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 2, 0))));
+int	_EXFUN(vprintf, (const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 1, 0))));
+int	_EXFUN(vsprintf, (char *, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 2, 0))));
 int	_EXFUN(fgetc, (FILE *));
 char *  _EXFUN(fgets, (char *, int, FILE *));
 int	_EXFUN(fputc, (int, FILE *));
@@ -214,7 +222,8 @@ int	_EXFUN(ferror, (FILE *));
 void    _EXFUN(perror, (const char *));
 #ifndef _REENT_ONLY
 FILE *	_EXFUN(fopen, (const char *_name, const char *_type));
-int	_EXFUN(sprintf, (char *, const char *, ...));
+int	_EXFUN(sprintf, (char *, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 2, 3))));
 int	_EXFUN(remove, (const char *));
 int	_EXFUN(rename, (const char *, const char *));
 #endif
@@ -227,37 +236,64 @@ int	_EXFUN(fseeko, (FILE *, off_t, int));
 off_t	_EXFUN(ftello, ( FILE *));
 #endif
 #ifndef _REENT_ONLY
-int	_EXFUN(asiprintf, (char **, const char *, ...));
-int	_EXFUN(asprintf, (char **, const char *, ...));
+int	_EXFUN(asiprintf, (char **, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 2, 3))));
+int	_EXFUN(asprintf, (char **, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 2, 3))));
 #ifndef dprintf
-int	_EXFUN(diprintf, (int, const char *, ...));
-int	_EXFUN(dprintf, (int, const char *, ...));
+int	_EXFUN(diprintf, (int, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 2, 3))));
+int	_EXFUN(dprintf, (int, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 2, 3))));
 #endif
 int	_EXFUN(fcloseall, (_VOID));
-int	_EXFUN(fiprintf, (FILE *, const char *, ...));
-int	_EXFUN(fiscanf, (FILE *, const char *, ...));
-int	_EXFUN(iprintf, (const char *, ...));
-int	_EXFUN(iscanf, (const char *, ...));
-int	_EXFUN(siprintf, (char *, const char *, ...));
-int	_EXFUN(siscanf, (const char *, const char *, ...));
-int	_EXFUN(snprintf, (char *, size_t, const char *, ...));
-int	_EXFUN(sniprintf, (char *, size_t, const char *, ...));
+int	_EXFUN(fiprintf, (FILE *, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 2, 3))));
+int	_EXFUN(fiscanf, (FILE *, const char *, ...)
+               _ATTRIBUTE ((__format__ (__scanf__, 2, 3))));
+int	_EXFUN(iprintf, (const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 1, 2))));
+int	_EXFUN(iscanf, (const char *, ...)
+               _ATTRIBUTE ((__format__ (__scanf__, 1, 2))));
+int	_EXFUN(siprintf, (char *, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 2, 3))));
+int	_EXFUN(siscanf, (const char *, const char *, ...)
+               _ATTRIBUTE ((__format__ (__scanf__, 2, 3))));
+int	_EXFUN(snprintf, (char *, size_t, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
+int	_EXFUN(sniprintf, (char *, size_t, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
 char *	_EXFUN(tempnam, (const char *, const char *));
-int	_EXFUN(vasiprintf, (char **, const char *, __VALIST));
-int	_EXFUN(vasprintf, (char **, const char *, __VALIST));
-int	_EXFUN(vdiprintf, (int, const char *, __VALIST));
-int	_EXFUN(vdprintf, (int, const char *, __VALIST));
-int	_EXFUN(vsniprintf, (char *, size_t, const char *, __VALIST));
-int	_EXFUN(vsnprintf, (char *, size_t, const char *, __VALIST));
-int	_EXFUN(vfiprintf, (FILE *, const char *, __VALIST));
-int	_EXFUN(vfiscanf, (FILE *, const char *, __VALIST));
-int	_EXFUN(vfscanf, (FILE *, const char *, __VALIST));
-int	_EXFUN(viprintf, (const char *, __VALIST));
-int	_EXFUN(vsiprintf, (char *, const char *, __VALIST));
-int	_EXFUN(viscanf, (const char *, __VALIST));
-int	_EXFUN(vscanf, (const char *, __VALIST));
-int	_EXFUN(vsiscanf, (const char *, const char *, __VALIST));
-int	_EXFUN(vsscanf, (const char *, const char *, __VALIST));
+int	_EXFUN(vasiprintf, (char **, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 2, 0))));
+int	_EXFUN(vasprintf, (char **, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 2, 0))));
+int	_EXFUN(vdiprintf, (int, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 2, 0))));
+int	_EXFUN(vdprintf, (int, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 2, 0))));
+int	_EXFUN(vsniprintf, (char *, size_t, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 3, 0))));
+int	_EXFUN(vsnprintf, (char *, size_t, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 3, 0))));
+int	_EXFUN(vfiprintf, (FILE *, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 2, 0))));
+int	_EXFUN(vfiscanf, (FILE *, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__scanf__, 2, 0))));
+int	_EXFUN(vfscanf, (FILE *, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__scanf__, 2, 0))));
+int	_EXFUN(viprintf, (const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 1, 0))));
+int	_EXFUN(vsiprintf, (char *, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 2, 0))));
+int	_EXFUN(viscanf, (const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__scanf__, 1, 0))));
+int	_EXFUN(vscanf, (const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__scanf__, 1, 0))));
+int	_EXFUN(vsiscanf, (const char *, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__scanf__, 2, 0))));
+int	_EXFUN(vsscanf, (const char *, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__scanf__, 2, 0))));
 #endif
 #endif
 
@@ -289,22 +325,30 @@ int	_EXFUN(putchar_unlocked, (int));
  * Recursive versions of the above.
  */
 
-int	_EXFUN(_asiprintf_r, (struct _reent *, char **, const char *, ...));
-int	_EXFUN(_asprintf_r, (struct _reent *, char **, const char *, ...));
-int	_EXFUN(_diprintf_r, (struct _reent *, int, const char *, ...));
-int	_EXFUN(_dprintf_r, (struct _reent *, int, const char *, ...));
+int	_EXFUN(_asiprintf_r, (struct _reent *, char **, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
+int	_EXFUN(_asprintf_r, (struct _reent *, char **, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
+int	_EXFUN(_diprintf_r, (struct _reent *, int, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
+int	_EXFUN(_dprintf_r, (struct _reent *, int, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
 int	_EXFUN(_fclose_r, (struct _reent *, FILE *));
 int	_EXFUN(_fcloseall_r, (struct _reent *));
 FILE *	_EXFUN(_fdopen_r, (struct _reent *, int, const char *));
 FILE *	_EXFUN(_fopen_r, (struct _reent *, const char *, const char *));
 char *  _EXFUN(_fgets_r, (struct _reent *, char *, int, FILE *));
-int	_EXFUN(_fiprintf_r, (struct _reent *, FILE *, const char *, ...));
-int	_EXFUN(_fiscanf_r, (struct _reent *, FILE *, const char *, ...));
-int	_EXFUN(_fprintf_r, (struct _reent *, FILE *, const char *, ...));
+int	_EXFUN(_fiprintf_r, (struct _reent *, FILE *, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
+int	_EXFUN(_fiscanf_r, (struct _reent *, FILE *, const char *, ...)
+               _ATTRIBUTE ((__format__ (__scanf__, 3, 4))));
+int	_EXFUN(_fprintf_r, (struct _reent *, FILE *, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
 int	_EXFUN(_fputc_r, (struct _reent *, int, FILE *));
 int	_EXFUN(_fputs_r, (struct _reent *, const char *, FILE *));
 size_t	_EXFUN(_fread_r, (struct _reent *, _PTR, size_t _size, size_t _n, FILE *));
-int	_EXFUN(_fscanf_r, (struct _reent *, FILE *, const char *, ...));
+int	_EXFUN(_fscanf_r, (struct _reent *, FILE *, const char *, ...)
+               _ATTRIBUTE ((__format__ (__scanf__, 3, 4))));
 int	_EXFUN(_fseek_r, (struct _reent *, FILE *, long, int));
 long	_EXFUN(_ftell_r, (struct _reent *, FILE *));
 size_t	_EXFUN(_fwrite_r, (struct _reent *, const _PTR , size_t _size, size_t _n, FILE *));
@@ -313,12 +357,15 @@ int	_EXFUN(_getc_unlocked_r, (struct _reent *, FILE *));
 int	_EXFUN(_getchar_r, (struct _reent *));
 int	_EXFUN(_getchar_unlocked_r, (struct _reent *));
 char *	_EXFUN(_gets_r, (struct _reent *, char *));
-int	_EXFUN(_iprintf_r, (struct _reent *, const char *, ...));
-int	_EXFUN(_iscanf_r, (struct _reent *, const char *, ...));
+int	_EXFUN(_iprintf_r, (struct _reent *, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 2, 3))));
+int	_EXFUN(_iscanf_r, (struct _reent *, const char *, ...)
+               _ATTRIBUTE ((__format__ (__scanf__, 2, 3))));
 int	_EXFUN(_mkstemp_r, (struct _reent *, char *));
 char *	_EXFUN(_mktemp_r, (struct _reent *, char *));
 void	_EXFUN(_perror_r, (struct _reent *, const char *));
-int	_EXFUN(_printf_r, (struct _reent *, const char *, ...));
+int	_EXFUN(_printf_r, (struct _reent *, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 2, 3))));
 int	_EXFUN(_putc_r, (struct _reent *, int, FILE *));
 int	_EXFUN(_putc_unlocked_r, (struct _reent *, int, FILE *));
 int	_EXFUN(_putchar_unlocked_r, (struct _reent *, int));
@@ -327,35 +374,60 @@ int	_EXFUN(_puts_r, (struct _reent *, const char *));
 int	_EXFUN(_remove_r, (struct _reent *, const char *));
 int	_EXFUN(_rename_r, (struct _reent *,
 			   const char *_old, const char *_new));
-int	_EXFUN(_scanf_r, (struct _reent *, const char *, ...));
-int	_EXFUN(_siprintf_r, (struct _reent *, char *, const char *, ...));
-int	_EXFUN(_siscanf_r, (struct _reent *, const char *, const char *, ...));
-int	_EXFUN(_sniprintf_r, (struct _reent *, char *, size_t, const char *, ...));
-int	_EXFUN(_snprintf_r, (struct _reent *, char *, size_t, const char *, ...));
-int	_EXFUN(_sprintf_r, (struct _reent *, char *, const char *, ...));
-int	_EXFUN(_sscanf_r, (struct _reent *, const char *, const char *, ...));
+int	_EXFUN(_scanf_r, (struct _reent *, const char *, ...)
+               _ATTRIBUTE ((__format__ (__scanf__, 2, 3))));
+int	_EXFUN(_siprintf_r, (struct _reent *, char *, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
+int	_EXFUN(_siscanf_r, (struct _reent *, const char *, const char *, ...)
+               _ATTRIBUTE ((__format__ (__scanf__, 3, 4))));
+int	_EXFUN(_sniprintf_r, (struct _reent *, char *, size_t, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 4, 5))));
+int	_EXFUN(_snprintf_r, (struct _reent *, char *, size_t, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 4, 5))));
+int	_EXFUN(_sprintf_r, (struct _reent *, char *, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
+int	_EXFUN(_sscanf_r, (struct _reent *, const char *, const char *, ...)
+               _ATTRIBUTE ((__format__ (__scanf__, 3, 4))));
 char *	_EXFUN(_tempnam_r, (struct _reent *, const char *, const char *));
 FILE *	_EXFUN(_tmpfile_r, (struct _reent *));
 char *	_EXFUN(_tmpnam_r, (struct _reent *, char *));
 int	_EXFUN(_ungetc_r, (struct _reent *, int, FILE *));
-int	_EXFUN(_vasiprintf_r, (struct _reent *, char **, const char *, __VALIST));
-int	_EXFUN(_vasprintf_r, (struct _reent *, char **, const char *, __VALIST));
-int	_EXFUN(_vdiprintf_r, (struct _reent *, int, const char *, __VALIST));
-int	_EXFUN(_vdprintf_r, (struct _reent *, int, const char *, __VALIST));
-int	_EXFUN(_vfiprintf_r, (struct _reent *, FILE *, const char *, __VALIST));
-int	_EXFUN(_vfprintf_r, (struct _reent *, FILE *, const char *, __VALIST));
-int	_EXFUN(_viprintf_r, (struct _reent *, const char *, __VALIST));
-int	_EXFUN(_vprintf_r, (struct _reent *, const char *, __VALIST));
-int	_EXFUN(_vsiprintf_r, (struct _reent *, char *, const char *, __VALIST));
-int	_EXFUN(_vsprintf_r, (struct _reent *, char *, const char *, __VALIST));
-int	_EXFUN(_vsniprintf_r, (struct _reent *, char *, size_t, const char *, __VALIST));
-int	_EXFUN(_vsnprintf_r, (struct _reent *, char *, size_t, const char *, __VALIST));
-int	_EXFUN(_vfiscanf_r, (struct _reent *, FILE *, const char *, __VALIST));
-int	_EXFUN(_vfscanf_r, (struct _reent *, FILE *, const char *, __VALIST));
-int	_EXFUN(_viscanf_r, (struct _reent *, const char *, __VALIST));
-int	_EXFUN(_vscanf_r, (struct _reent *, const char *, __VALIST));
-int	_EXFUN(_vsscanf_r, (struct _reent *, const char *, const char *, __VALIST));
-int	_EXFUN(_vsiscanf_r, (struct _reent *, const char *, const char *, __VALIST));
+int	_EXFUN(_vasiprintf_r, (struct _reent *, char **, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 3, 0))));
+int	_EXFUN(_vasprintf_r, (struct _reent *, char **, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 3, 0))));
+int	_EXFUN(_vdiprintf_r, (struct _reent *, int, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 3, 0))));
+int	_EXFUN(_vdprintf_r, (struct _reent *, int, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 3, 0))));
+int	_EXFUN(_vfiprintf_r, (struct _reent *, FILE *, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 3, 0))));
+int	_EXFUN(_vfprintf_r, (struct _reent *, FILE *, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 3, 0))));
+int	_EXFUN(_viprintf_r, (struct _reent *, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 2, 0))));
+int	_EXFUN(_vprintf_r, (struct _reent *, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 2, 0))));
+int	_EXFUN(_vsiprintf_r, (struct _reent *, char *, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 3, 0))));
+int	_EXFUN(_vsprintf_r, (struct _reent *, char *, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 3, 0))));
+int	_EXFUN(_vsniprintf_r, (struct _reent *, char *, size_t, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 4, 0))));
+int	_EXFUN(_vsnprintf_r, (struct _reent *, char *, size_t, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 4, 0))));
+int	_EXFUN(_vfiscanf_r, (struct _reent *, FILE *, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__scanf__, 3, 0))));
+int	_EXFUN(_vfscanf_r, (struct _reent *, FILE *, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__scanf__, 3, 0))));
+int	_EXFUN(_viscanf_r, (struct _reent *, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__scanf__, 2, 0))));
+int	_EXFUN(_vscanf_r, (struct _reent *, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__scanf__, 2, 0))));
+int	_EXFUN(_vsscanf_r, (struct _reent *, const char *, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__scanf__, 3, 0))));
+int	_EXFUN(_vsiscanf_r, (struct _reent *, const char *, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__scanf__, 3, 0))));
 
 ssize_t _EXFUN(__getdelim, (char **, size_t *, int, FILE *));
 ssize_t _EXFUN(__getline, (char **, size_t *, FILE *));

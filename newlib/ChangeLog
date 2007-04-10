@@ -1,5 +1,10 @@
+2007-04-09  Eric Blake  <ebb9@byu.net>
+
+	* libc/include/stdio.h: Add gcc format attributes to printf and
+	scanf families.
+
 2007-04-09  Joel Schopp <jschopp@austin.ibm.com>
-  
+
 	* libc/machine/spu/strxfrm.c: Fix strxfrm so we still copy data
 	even if the passed in length n is shorter than the source string.
 	This matches both the non-spu specific and the glibc strxfrm
@@ -14,7 +19,7 @@
 	-I${newlib_dir}.
 
 2007-04-04  Patrick Mansfield <patmans@us.ibm.com>
-  
+
 	* libc/machine/spu/sys/syscall.h: New file for __send_to_ppe
 	prototype.
 	* libc/machine/spu/c99ppe.h: Remove static version of send_to_ppe.
@@ -381,7 +386,7 @@
 
 	* libc/include/sys/config.h[__SPU__]: Define __CUSTOM_FILE_IO__.
 	* libc/include/stdio.h[!__CUSTOM_FILE_IO__]: Add flag check
-	around stdio macros that manipulate fields in the normal file 
+	around stdio macros that manipulate fields in the normal file
 	structure.
 	* libc/include/sys/reent.h[__CUSTOM_FILE_IO__]: Include
 	<sys/custom_file.h> to define custom FILE structure.
@@ -463,7 +468,7 @@
         * NEWS: Update with 1.15.0 info.
         * README: Ditto.
         * acinclude.m4: Change version number to 1.15.0.
-        * aclocal.m4: Regenerated. 
+        * aclocal.m4: Regenerated.
         * configure: Ditto.
         * doc/aclocal.m4: Ditto.
         * doc/configure: Ditto.
@@ -483,7 +488,7 @@
 
 	* configure.host: Recognize fido.
 
-2006-12-18  Joel Schopp <jschopp@austin.ibm.com> 
+2006-12-18  Joel Schopp <jschopp@austin.ibm.com>
 
         * libc/machine/spu/c99ppe.h: New file
         * libc/machine/spu/perror.c: New file to override libc/stdio version.
@@ -530,7 +535,7 @@
 
 2006-12-12  Joel Schopp <jschopp@austin.ibm.com>
 
-        * libc/include/machine/setjmp.h[__SPU__]: Redefine _JBTYPE for 
+        * libc/include/machine/setjmp.h[__SPU__]: Redefine _JBTYPE for
 	cell spu.
 
 2006-12-04  Kazunori Asayama  <asayama@sm.sony.co.jp>
@@ -539,7 +544,7 @@
 
 2006-12-04  Kazunori Asayama  <asayama@sm.sony.co.jp>
 
-	* testsuite/newlib.string/tstring.c: 
+	* testsuite/newlib.string/tstring.c:
 
 2006-12-01  Kazunori Asayama  <asayama@sm.sony.co.jp>
 
@@ -630,7 +635,7 @@
 	* libc/machine/spu/strrchr.c: Ditto.
 	* libc/machine/spu/strspn.c: Ditto.
 	* libc/machine/spu/strxfrm.c: Ditto.
-	* libc/machine/spu/vec_literal.h: Add abstraction of vector literals, 
+	* libc/machine/spu/vec_literal.h: Add abstraction of vector literals,
 	removing altivec style initializers.
 	* libc/machine/spu/Makefile.am: Add new files to list so they build
 	* libc/machine/spu/Makefile.in: Regenerate from new Makefile.am
@@ -658,8 +663,8 @@
 
 	* libc/include/stdio.h[_REENT_SMALL]: Do not allow macros
 	for clearerr, feof, or fileno.
-	* libc/include/sys/reent.h[_REENT_SMALL](struct _reent): Change 
-	the dummy std stream scheme to use pointers to const external 
+	* libc/include/sys/reent.h[_REENT_SMALL](struct _reent): Change
+	the dummy std stream scheme to use pointers to const external
 	fake files, one for each standard stream.
 	* libc/stdio/local.h (CHECK_INIT): Change to take a file pointer
 	argument.  For _REENT_SMALL, reset the file pointer if it
@@ -772,8 +777,8 @@
 
 2006-08-17  Brian Ford  <Brian.Ford@FlightSafety.com>
 
- 	* libc/time/gmtime.c: Correct man page; clock is not a
- 	local time and no conversion occurs.
+	* libc/time/gmtime.c: Correct man page; clock is not a
+	local time and no conversion occurs.
 
 2006-08-16  Joel Schopp  <jschopp@austin.ibm.com>
 
@@ -822,20 +827,20 @@
 	* configure.in: Use ${READELF} instead of hard-coding.
 	* Regenerate all aclocal.m4, Makefile.in, and configure files.
 
-2006-07-31  Jeff Johnston  <jjohnstn@redhat.com>	
+2006-07-31  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/mmap.c: Remove include of sys/mman.h
 	to avoid conflict with newer glibc's revision of mremap.
 
-2006-07-05  Jeff Johnston  <jjohnstn@redhat.com>	
+2006-07-05  Jeff Johnston  <jjohnstn@redhat.com>
 
-	* libc/stdlib/mprec.h [_DOUBLE_IS_32BITS]: Turn off C99 hex 
+	* libc/stdlib/mprec.h [_DOUBLE_IS_32BITS]: Turn off C99 hex
 	floating-point format support.  Also redefine
 	dword0 and dword1 macros.
 	* libc/stdlib/strtod.c: Add checks for _DOUBLE_IS_32BITS
 	to prevent setting dword1 which is an rvalue only.
 
-2006-06-22  Jeff Johnston  <jjohnstn@redhat.com>	
+2006-06-22  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdlib/Makefile.am: Add new gdtoa routines.
 	* libc/stdlib/Makefile.in: Regenerated.
@@ -858,10 +863,10 @@
 	* libc/stdio/rget.c (__srbuf): Reinstantiate.
 	* libc/stdio/wbuf.c (__swbuf): Ditto.
 
-2006-06-14  Jeff Johnston  <jjohnstn@redhat.com>	
+2006-06-14  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/stdio.h: Add new reentrant I/O prototypes for
-	read/write functions.  Change getc/putc macros to have reentrant underlying 
+	read/write functions.  Change getc/putc macros to have reentrant underlying
 	macros/functions.  This includes __sgetc_raw_r, __sgetc_r, and __sputc_r.
 	* libc/stdio/fgetc.c: Fix and/or add reentrant version to call
 	new reentrant I/O functions/macros for reading/writing.
@@ -1330,7 +1335,7 @@
 
 2006-03-29  Shaun Jackman  <sjackman@gmail.com>
 
-	* libtool.m4: Set lt_cv_deplibs_check_method=pass_all for 
+	* libtool.m4: Set lt_cv_deplibs_check_method=pass_all for
 	linux-newlib libc implementations.
 
 2006-03-29  Eric Blake  <ebb9@byu.net>
@@ -1359,7 +1364,7 @@
 
 	* acconfig.h (_ATEXIT_DYNAMIC_ALLOC): Undef.
 	* configure.in (--disable-newlib-atexit-dynamic-alloc): New
-	option. 
+	option.
 	* configure: Regenerated.
 	* newlib.hin: Regenerated.
 	* libc/stdlib/__atexit.c (__register_exitproc): Don't call malloc
@@ -1397,7 +1402,7 @@
 
 2006-02-27  Jeff Johnston  <jjohnstn@redhat.com>
 
-	* Makefile.am (MATHOBJS_IN_LIBC): Add s_isinfd, sf_isinff, 
+	* Makefile.am (MATHOBJS_IN_LIBC): Add s_isinfd, sf_isinff,
 	s_isnand, and sf_isnanf object files.
 	* Makefile.in: Regenerated.
 	* libc/include/ieeefp.h: Undef isnan and isinf to avoid
@@ -1408,7 +1413,7 @@
 	(__isinfd, __isinff, __isnand, __isnanf): New functions.
 	* libm/common/Makefile.am: Add new s_isinfd, s_isnand, sf_isinff,
 	and sf_isnanf files.  Also support s_isnan, sf_isnan, s_isinf, and
-	sf_isinf files which have been moved from math/mathfp directories. 
+	sf_isinf files which have been moved from math/mathfp directories.
 	* libm/common/Makefile.in: Regenerated.
 	* libm/common/s_isinfd.c: New file.
 	* libm/common/s_isnand.c: Ditto.
@@ -1620,8 +1625,8 @@
 
 	* libc/sys/rtems/crt0.c: Add rtems_gxx_key_create,
 	rtems_gxx_key_delete, rtems_gxx_getspecific,
-	rtems_gxx_setspecific, rtems_gxx_mutex_trylock, 
-	rtems_gxx_recursive_mutex_init, rtems_gxx_recursive_mutex_lock, 
+	rtems_gxx_setspecific, rtems_gxx_mutex_trylock,
+	rtems_gxx_recursive_mutex_init, rtems_gxx_recursive_mutex_lock,
 	rtems_gxx_recursive_mutex_trylock, rtems_gxx_recursive_mutex_unlock.
 
 2005-12-05  Christopher Faylor  <cgf@timesys.com>
@@ -1759,7 +1764,7 @@
 	* libc/string/wmemcmp.c: Likewise.
 	* libc/string/wmemcpy.c: Likewise.
 	* libc/string/wmemmove.c: Likewise.
-	* libc/string/wmemset.c: Likewise. 
+	* libc/string/wmemset.c: Likewise.
 
 2005-10-28  Bob Wilson  <bob.wilson@acm.org>
 
@@ -1817,7 +1822,7 @@
 	* libm/math/w_log.c: Likewise.
 	* libm/mathfp/s_logarithm.c: Likewise.
 	* libm/math/w_j0.c: Add spaces to FUNCTION description.
-	* libm/mathfp/w_jn.c: Likewise. 
+	* libm/mathfp/w_jn.c: Likewise.
 
 2005-10-26  Shaun Jackman  <sjackman@gmail.com>
 
@@ -1911,7 +1916,7 @@
 2005-10-11  David Weatherford  <weath@tensilica.com>
 
 	* libc/stdio/vfprintf.c (_VFPRINTF_R): Recognize 'F' format.
-	Print "inf" and "nan" in lowercase for e/f/g formats and in 
+	Print "inf" and "nan" in lowercase for e/f/g formats and in
 	uppercase for E/F/G formats.
 
 2005-10-07  Bob Wilson  <bob.wilson@acm.org>
@@ -1941,14 +1946,14 @@
 
 2005-10-03  Ralf Corsepius <ralf.corsepius@rtems.org>
 
-	* libc/include/stdint.h: 
+	* libc/include/stdint.h:
 	Use __INTMAX_TYPE__ to derive intmax_t.
 	Use __UINTMAX_TYPE__ to derive uintmax_t.
 	Fix minor typo.
 
 2005-09-27  Ralf Corsepius <ralf.corsepius@rtems.org>
 
-	* libc/include/stdint.h: Correct __STDINT_EXP macro incorrectly 
+	* libc/include/stdint.h: Correct __STDINT_EXP macro incorrectly
 	handling GCC >= 4.
 
 2005-09-20  Jeff Johnston  <jjohnstn@redhat.com>
@@ -2238,7 +2243,7 @@
 2005-03-22  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configure.host: For arc, set -DREENTRANT_SYSCALLS_PROVIDED flag on.
-	* libc/sys/arc/syscalls.c: Change functions to use __errno_r rather 
+	* libc/sys/arc/syscalls.c: Change functions to use __errno_r rather
 	than errno.
 
 2005-03-22  Christopher Faylor  <cgf@timesys.com>
@@ -2512,7 +2517,7 @@
 	_VFPRINTF_R.
 
 2005-01-07  Paul Brook  <paul@codesourcery.com>
-                                                                                
+
 	* configure.in: Add test for .init_array.
 	* configure: Regenerate.
 	* newlib.hin: Add HAVE_INITFINI_ARRAY.
@@ -2521,7 +2526,7 @@
 	* libc/misc/init.c: New file.
 	* libc/sys/arm/crt0.S: Call __libc_{init,fini}_array instead of
 	_init/_fini if they exist.
-                                                                                
+
 2005-01-06  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdlib/strtod.c (_strtod_r): Add NaN support.
@@ -2530,16 +2535,16 @@
 	* Makefile.am (MATHOBJS_IN_LIBC): Add s_nan and sf_nan
 	functions for use by strtod and strtof.
 	* Makefile.in: Regenerated.
-                                                                                
+
 2005-01-06  Hans-Peter Nilsson  <hp@axis.com>
-                                                                                
+
 	* libc/stdio/ftell.c (ftell_r): Add parenthesis for __SWR
 	bit-test in combination with NULL test.
-                                                                                
+
 2005-01-06  Hans-Peter Nilsson  <hp@axis.com>
-                                                                                
+
         * README: Fix typo of LGPL.  Change "license" to "copyright".
-                                                                                
+
 2004-12-17  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* NEWS: Update with 1.13.0 info.
@@ -2620,7 +2625,7 @@
 2004-11-26  Paul Brook  <paul@codesourcery.com>
 
 	* libc/sys/arm/crt0.S (_start): Add .cantunwind annotation.
-                                                                                
+
 2004-11-24  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/stdlib.h (putenv, _putenv_r): Change to remove
@@ -2632,9 +2637,9 @@
 
 	* libc/stdio/Makefile.am: Fix missing vfscanf.
 	* libc/stdio/Makefile.in: Regenerated.
-                                                                                
+
 2004-11-23  Jeff Johnston  <jjohnstn@redhat.com>
-                                                                                
+
 	* libc/include/stdio.h: Add new iprintf and iscanf variants.  Also
 	do some reordering.
 	* libc/machine/powerpc/vfscanf.c: Remove __sccl function.
@@ -2663,13 +2668,13 @@
 	* libc/stdio/vsniprintf.c: Ditto.
 
 2004-11-19  Shaun Jackman  <sjackman@gmail.com>
-                                                                                
+
         * libc/include/stdio.h: Add sniprintf.
         * libc/stdio/Makefile.am: Add sniprintf.c.
         * libc/stdio/Makefile.in: Regenerated.
         * libc/stdio/sniprintf.c: New file.
         * libc/stdio/stdio.tex: Add sniprintf.
-                                                                                
+
 2004-11-17  Christopher Faylor  <cgf@timesys.com>
 
 	* libc/stdio/refill.c (__srefill): Try again after EOF on Cygwin.  Clear
@@ -2692,12 +2697,12 @@
 	* libc/sys/rtems/crt0.S [__AVR__]: Add __stack.
 
 2004-10-08  Jeff Johnston  <jjohnstn@redhat.com>
-                                                                                
+
         * libc/include/sys/signal.h: If <signal.h> didn't include
         this header file, include <signal.h> to account for
         applications that take advantage that the two header
         files are the same in glibc.
-                                                                                
+
 2004-10-05  Tomer Levi  <Tomer.Levi@nsc.com>
 
         * configure.host: Add support for crx.
@@ -2751,7 +2756,7 @@
 
 	* libc/include/sys/lock.h: Replaced empty {} with (0) to conform
 	with locking API.
-	* libc/include/sys/stdio.h: (_flockfile)[!_SINGLE_THREAD]: Add 
+	* libc/include/sys/stdio.h: (_flockfile)[!_SINGLE_THREAD]: Add
 	check for__SSTR in _flags and if set, skip lock request.
 	(_funlockfile)[!SINGLE_THREAD]: Ditto.
 	* libc/stdio/local.h (CHECK_INIT): Added check that _REENT is
@@ -2893,7 +2898,7 @@
 	on linux systems with glibc 2.3.3 installed.
 	* libc/sys/linux/dl/dl-runtime.c: Fix prototypes for fixup and
 	profile_fixup so newlib can build on fc3 system.
- 
+
 2004-07-30  Alexandre Oliva  <aoliva@redhat.com>
 
 	Introduce SH2a support.
@@ -2912,7 +2917,7 @@
 
 2004-07-16  Anil Paranjpe  <anilp1@kpitcummins.com>
 
-	* configure.host (h8300*-*-*): Default long long printing support. 
+	* configure.host (h8300*-*-*): Default long long printing support.
 
 2004-07-16  Jeff Johnston  <jjohnstn@redhat.com>
 
@@ -3230,7 +3235,7 @@
 	* configure.host: Add checks for newlib_may_supply_syscalls to
 	determine whether or not to use sys/arm directory and use
 	special compiler flags: ARM_RDI_MONITOR and ARM_RDP_MONITOR.
-       
+
 2004-06-02  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/vfscanf.c (__svfscanf_r): For CT_INT conversions,
@@ -3472,7 +3477,7 @@
 
 	* libc/stdio/findfp.c (__fp_lock_all): Add call to
 	__sfp_lock_acquire.
-	(__fp_unlock_all): Add call to __sfp_lock_release. 
+	(__fp_unlock_all): Add call to __sfp_lock_release.
 
 2004-03-25  Thomas Pfaff  <tpfaff@gmx.net>
 
@@ -3508,7 +3513,7 @@
 	Add calls to _flockfile/_funlockfile. Remove
 	 __lock_init_recursive call.
 	* libc/stdio/freopen64.c (_freopen64_r): Protect file pointer
-	list. 
+	list.
 
 2004-03-25  Jeff Johnston  <jjohnstn@redhat.com>
 
@@ -3532,7 +3537,7 @@
 	(__fp_lock): New static function.
 	(__fp_unlock): Ditto.
 	(__fp_lock_all): New function.
-	(__fp_unlock_all): Ditto. 
+	(__fp_unlock_all): Ditto.
 
 2004-02-10  Christopher Faylor  <cgf@redhat.com>
 
@@ -3559,7 +3564,7 @@
 
 2004-02-05  Paul Brook  <paul@codesourcery.com>
 
-	* libc/include/machine/ieeefp.h[__arm__][__VFP_FP__]: Set 
+	* libc/include/machine/ieeefp.h[__arm__][__VFP_FP__]: Set
 	IEEE_{BIG,LITTLE} based on __ARMEL__ flag.
 
 2004-02-02  Jeff Johnston  <jjohnstn@redhat.com>
@@ -3817,7 +3822,7 @@
 2004-01-22  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* libc/stdio/findfp.c (__sfp): Protect global FILE pointer list
-	by a lock when newlib is multithreaded. 
+	by a lock when newlib is multithreaded.
 
 2004-01-21  Jeff Johnston  <jjohnstn@redhat.com>
 
@@ -3983,11 +3988,11 @@
 	_strtold routine for processing floats and doubles since it
 	is not as fast as _strtod_r.
 
-2003-11-20 Dhananjay Deshpande <dhananjayd@kpitcummins.com> 
+2003-11-20 Dhananjay Deshpande <dhananjayd@kpitcummins.com>
 
-	* libc/machine/h8300/defines.h : Correct pointer register defines 
+	* libc/machine/h8300/defines.h : Correct pointer register defines
 	for normal mode.
-	* libc/machine/h8300/memcpy.S : Use add/sub instead of adds/subs 
+	* libc/machine/h8300/memcpy.S : Use add/sub instead of adds/subs
 	for normal mode.
 	* libc/machine/h8300/reg_memcpy.S : Likewise.
 	* libc/machine/h8300/reg_memset.S : Likewise.
@@ -4022,7 +4027,7 @@
 
 2003-11-07  Jeff Johnston  <jjohnstn@redhat.com>
 
-	* configure.host: Remove -DLOOSE_KERNEL_NAMES flag for linux 
+	* configure.host: Remove -DLOOSE_KERNEL_NAMES flag for linux
 	x86 build.
 	* iconvdata/Makefile.am: Make dependent on newlib's configure.host
 	and set up default flags to pass to aclocal.
@@ -4346,9 +4351,9 @@
 
 	* libc/stdlib/mallocr.c (mALLOc, rEALLOc, mEMEALIGn): Enhance
 	overflow detection.
-	
+
 2003-08-13  Aldy Hernandez  <aldyh@redhat.com>
-	
+
 	* libc/machine/powerpc/machine/stdlib.h: Wrap SPE functions in
 	extern "C".
 
@@ -4508,7 +4513,7 @@
 
 2003-06-10  Stan Cox  <scox@redhat.com>
             Anthony Green  <green@redhat.com>
-	
+
 	* configure.host: Add iq2000 support.
 	* newlib/libc/include/machine/ieeefp.h: Ditto.
 	* newlib/libc/include/machine/setjmp.h: Ditto.
@@ -4552,7 +4557,7 @@
         * libc/search/twalk.c libc/signal/signal.c: Ditto.
 
 2003-06-05  Nick Clifton  <nickc@redhat.com>
-	
+
 	* libc/include/sys/reent.h (struct _on_exit_args): New
 	structure containing fields used by the on_exit() function.
         (struct _atexit): Include struct _on_exit_args.  For
@@ -4629,7 +4634,7 @@
 
 	* configure.in: Add iconvdata support for x86 linux.
 	* configure: Regenerated.
-	* libc/sys/linux/Makefile.am: Add EL/IX level 3 network, dynamic 
+	* libc/sys/linux/Makefile.am: Add EL/IX level 3 network, dynamic
 	library, iconv, and linuxthreads support.
 	* libc/sys/linux/configure.in: Ditto.
 	* libc/sys/linux/Makefile.in: Regenerated.
@@ -5192,9 +5197,9 @@
 	* libc/sys/linux/sys/socket.h: Ditto.
 	* libc/sys/linux/sys/sockio.h: Ditto.
 
-2003-05-28  Dhananjay Deshpande  <dhananjayd@kpitcummins.com> 
+2003-05-28  Dhananjay Deshpande  <dhananjayd@kpitcummins.com>
 
-	* newlib/libc/machine/h8300/memcpy.S: Use .h8300hn and .h8300sn for 
+	* newlib/libc/machine/h8300/memcpy.S: Use .h8300hn and .h8300sn for
 	normal mode
 	* newlib/libc/machine/h8300/memset.S: Likewise
 	* newlib/lib/machine/h8300/reg_memcpy.S: Likewise
@@ -5278,7 +5283,7 @@
 
 2001-04-09  Corinna Vinschen  <corinna@vinschen.de>
 
-	* libc/include/wchar.h: Add definitions for wcswidth and wcwidth.  
+	* libc/include/wchar.h: Add definitions for wcswidth and wcwidth.
 	* libc/string/Makefile.am: Add wcswidth.c and wcwidth.c
 	* libc/string/Makefile.in: Regenerated.
 	* libc/string/wcswidth.c: New file.
@@ -5301,7 +5306,7 @@ Thu Apr  3 14:01:16 2003  J"orn Rennecke <joern.rennecke@superh.com>
 	* libc/string/Makefile.am: Add wcscoll.c.
 	* libc/string/Makefile.in: Regenerated.
 	* libc/string/wcscoll.c: New file.
-	* libc/string/wcstrings.tex: Add wcscoll.   
+	* libc/string/wcstrings.tex: Add wcscoll.
 
 2003-04-01  Corinna Vinschen  <corinna@vinschen.de>
 
@@ -5330,10 +5335,10 @@ Thu Apr  3 14:01:16 2003  J"orn Rennecke <joern.rennecke@superh.com>
 
 2003-03-17  Bob Cassels  <bcassels@abinitio.com>
 
-        * libc/string/wcschr.c: (wcschr): Look for character first, 
+        * libc/string/wcschr.c: (wcschr): Look for character first,
 	then for end of string, so you can do wcschr(x, '\0').
 
-2003-03-10  Corinna Vinschen  <corinna@vinschen.de>     
+2003-03-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/stdio.h: Declare fgetpos, fsetpos, fseeko and ftello
 	with internal (_fpos_t and _off_t) datatypes when compiling newlib.
@@ -5406,7 +5411,7 @@ Thu Apr  3 14:01:16 2003  J"orn Rennecke <joern.rennecke@superh.com>
 2003-02-20  Nick Clifton  <nickc@redhat.com>
 
 	* Add support for Cirrus Maverick ARM co-processor:
-	
+
 	2000-09-13  Aldy Hernandez  <aldyh@redhat.com>
 
 		* libc/include/machine/ieeefp.h: Set IEEE_BIG_ENDIAN or
@@ -5441,7 +5446,7 @@ Thu Apr  3 14:01:16 2003  J"orn Rennecke <joern.rennecke@superh.com>
 
 2003-02-07  Jeff Johnston  <jjohnstn@redhat.com>
 
-	* acinclude.m4 (--disable-newlib-supplied-syscalls): New configuration 
+	* acinclude.m4 (--disable-newlib-supplied-syscalls): New configuration
 	option to allow disabling of syscalls being supplied in newlib.
 	* aclocal.m4: Regenerated.
 	* configure: Ditto.
@@ -5469,8 +5474,8 @@ Thu Apr  3 14:01:16 2003  J"orn Rennecke <joern.rennecke@superh.com>
 2003-02-03  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdlib/ldtoa.c (_ldtoa_r): Fix code to allocate the format
-	buffer based on the precision, after we have processed the input value 
-	in a local buffer and know its relative magnitude. 
+	buffer based on the precision, after we have processed the input value
+	in a local buffer and know its relative magnitude.
 
 2003-01-31  Michael Snyder  <msnyder@redhat.com>
 
@@ -5503,7 +5508,7 @@ Thu Apr  3 14:01:16 2003  J"orn Rennecke <joern.rennecke@superh.com>
 	for Cygwin.
 
 2003-01-21 Anita Kulkarni  <anitak@kpit.com>
-  
+
 	* libc/time/difftime.c : Typecast the result to double.
 
 2003-01-20  Christopher Faylor  <cgf@redhat.com>
@@ -5518,7 +5523,7 @@ Thu Apr  3 14:01:16 2003  J"orn Rennecke <joern.rennecke@superh.com>
 2003-01-16  Joel Sherrill <joel@OARcorp.com>
 
         * libc/sys/rtems/include/limits.h, libc/sys/rtems/sys/param.h,
-        libc/sys/rtems/sys/syslimits.h: Update to be in sync with what 
+        libc/sys/rtems/sys/syslimits.h: Update to be in sync with what
         constants are defined in each file in the shared versions in
         libc/include.
         * libc/sys/rtems/crt0.c: Define extra symbols on SH and HP-PA to
@@ -5733,7 +5738,7 @@ Thu Apr  3 14:01:16 2003  J"orn Rennecke <joern.rennecke@superh.com>
         might be found on a BSD-ish system.
         * Makefile.in: Regenerate.
         * libc/include/machine/types.h: When on an RTEMS target, define a
-        few BSD flavor types. 
+        few BSD flavor types.
 
 2002-11-06  Sergey Okhapkin  <sos@prospect.com.ru>
 
@@ -6174,7 +6179,7 @@ Thu Apr  3 14:01:16 2003  J"orn Rennecke <joern.rennecke@superh.com>
 	* Makefile.in: Regenerated.
 	* aclocal.m4: Ditto.
 	* configure: Ditto.
-	* configure.in: Add AM_CONFIG_HEADER to generate newlib.h based on 
+	* configure.in: Add AM_CONFIG_HEADER to generate newlib.h based on
 	newlib.hin.  Add AC_DEFINE_UNQUOTED entries for _ELIX_LEVEL
 	and _NEWLIB_VERSION to fill in newlib.h header file entries.
 	In AC_OUTPUT statement, unset ac_file so multilib support does
@@ -6196,7 +6201,7 @@ Thu Apr  3 14:01:16 2003  J"orn Rennecke <joern.rennecke@superh.com>
 	* configure: Ditto.
 	* configure.host: Add code to define _ELIX_LEVEL if
 	--enable-newlib-elix-level option is used.
-	* configure.in: 
+	* configure.in:
 	* libc/aclocal.m4: Regenerated.
 	* libc/configure: Ditto.
 	* libc/argz/Makefile.am: Add EL/IX level checking.
@@ -6343,7 +6348,7 @@ Thu Apr  3 14:01:16 2003  J"orn Rennecke <joern.rennecke@superh.com>
 2002-08-19  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/types.h: Support __need_inttypes macro
-	that only sets the __intxx and __uintxx types.  
+	that only sets the __intxx and __uintxx types.
 	* libc/machine/powerpc/Makefile.am: Add stdlib to include directories
 	to get mprec.h.
 	* libc/machine/powerpc/Makefile.in: Regenerated.
@@ -6396,8 +6401,8 @@ Thu Apr  3 14:01:16 2003  J"orn Rennecke <joern.rennecke@superh.com>
 	*  configure.host: Default -DMB_CAPABLE for x86-linux.
 	*  libc/include/reent.h: Define _sbrk to take signed int argument.
 	*  libc/include/sys/unistd.h: Ditto for _sbrk_r and sbrk.
-	*  libc/locale/locale.c[MB_CAPABLE]: Add LC_MESSAGES support and 
-	make locale name checking more efficient.  Also allow "C-ISO-8859-1" 
+	*  libc/locale/locale.c[MB_CAPABLE]: Add LC_MESSAGES support and
+	make locale name checking more efficient.  Also allow "C-ISO-8859-1"
 	locale for LC_CTYPE and LC_MESSAGES.
 	*  libc/reent/sbrkr.c: Change prototype to take ptrdiff_t.
 	*  libc/sys/linux/brk.c: Change sbrk prototype.
@@ -6480,7 +6485,7 @@ Thu Apr  3 14:01:16 2003  J"orn Rennecke <joern.rennecke@superh.com>
 
 2002-07-29  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * libc/sys/linux/Makefile.am: Add aio64.c. 
+        * libc/sys/linux/Makefile.am: Add aio64.c.
         * libc/sys/linux/Makefile.in: Regenerated.
         * libc/sys/linux/aio.c (aio_init): ENOSYS stub added.
         * libc/sys/linux/aio64.c: New file.
@@ -6714,7 +6719,7 @@ Thu Apr  3 14:01:16 2003  J"orn Rennecke <joern.rennecke@superh.com>
 	* libc/reent/lseek64r.c: Ditto.
 	* libc/reent/open64r.c: Ditto.
 	* libc/reent/reent.tex: Optionally add stdio64 reentrant syscalls
-	based on whether STDIO64 flag is set. 
+	based on whether STDIO64 flag is set.
 	* libc/stdio/stdio.tex: Add blank line.
 	* libc/stdio64/Makefile.am: New file.
 	* libc/stdio64/Makefile.in: Ditto.
@@ -6752,7 +6757,7 @@ Thu Apr  3 14:01:16 2003  J"orn Rennecke <joern.rennecke@superh.com>
 2002-07-15  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/machine/ieeefp.h: Change to only define
-	floating point defines (e.g one of __IEEE_BIG_ENDIAN or 
+	floating point defines (e.g one of __IEEE_BIG_ENDIAN or
 	__IEEE_LITTLE_ENDIAN must be defined for each platform).
 	* libc/include/sys/config.h: Include <machine/ieeefp.h> and
 	remove redundant floating point definitions.
@@ -7361,7 +7366,7 @@ Thu Jun 13 19:23:40 2002  J"orn Rennecke <joern.rennecke@superh.com>
         make siglist.inc dependent on sig.c instead of signal.c.
         * libc/sys/linux/Makefile.in: Regenerated.
         * libc/sys/linux/sig.c: Rename from signal.c and change code to
-        use NSIG instead of _NSIG. 
+        use NSIG instead of _NSIG.
         * libc/sys/linux/sigaction.c: New file.
         * libc/sys/linux/signal.c: Changed to be linux signal() function
         so as to override regular newlib default signal.c.
@@ -7425,7 +7430,7 @@ Thu Jun 13 19:23:40 2002  J"orn Rennecke <joern.rennecke@superh.com>
 	* libc/sys/linux/gethostname.c: New file.
 	* libc/sys/linux/seteuid.c: New file.
 	* libc/sys/linux/sysctl.c: New file.
-	
+
 2002-05-23  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/string/Makefile.am: Add support for strsep.c.
@@ -7497,11 +7502,11 @@ Thu Jun 13 19:23:40 2002  J"orn Rennecke <joern.rennecke@superh.com>
 	* Makefile.am: Copy and install headers from sys/machine/include
 	directory.  Also pass $toollibdir to lower-level directories.
 	* Makefile.in: Regenerated.
-	* libc/include/stdio.h[!_REENT_ONLY]: Change stdin, stdout, and 
+	* libc/include/stdio.h[!_REENT_ONLY]: Change stdin, stdout, and
 	stderr to use _REENT macro instead of _impure_ptr directly.
 	* libc/include/sys/config.h[__i386__][__linux__]: Define
 	__DYNAMIC_REENT__.
-	* libc/include/sys/reent.h[!_REENT_ONLY]: Change _REENT macro to be 
+	* libc/include/sys/reent.h[!_REENT_ONLY]: Change _REENT macro to be
 	call to __getreent() function if !__SINGLE_THREAD__ and
 	__DYNAMIC_REENT__ is set.
 	* libc/reent/Makefile.am: Add support for getreent.c.
@@ -7524,7 +7529,7 @@ Thu Jun 13 19:23:40 2002  J"orn Rennecke <joern.rennecke@superh.com>
 	* libc/sys/linux/sched.c: Weak-alias __libc_sched_getparam,
 	__libc_sched_getscheduler, __libc_sched_get_priority_max,
 	__libc_sched_get_priority_min, and __libc_sched_setschedule to
-	name with __ instead of __libc_. 
+	name with __ instead of __libc_.
 	* libc/sys/linux/siglongjmp.c: Include <machine/weakalias.h>.
 	Rename siglongjmp to __libc_siglongjmp and weak-alias to siglongjmp.
 	Call __libc_longjmp instead of longjmp, from __libc_siglongjmp.
@@ -7794,7 +7799,7 @@ Wed May  8 17:47:35 2002  J"orn Rennecke <joern.rennecke@superh.com>
 	*  libc/sys/linux/Makefile.am: Add io64.c.
 	*  libc/sys/linux/Makefile.in: Regenerated.
 	*  libc/sys/linux/io.c(mkfifo, fsync, fdatasync): Added syscalls.
-	*  libc/sys/linux/signal.c (sigwaitinfo, sigtimedwait): Ditto. 
+	*  libc/sys/linux/signal.c (sigwaitinfo, sigtimedwait): Ditto.
 	*  libc/sys/linux/io64.c: New file.
 
 2002-04-26  Jeff Johnston  <jjohnstn@redhat.com>
@@ -8364,7 +8369,7 @@ Wed Mar  6 10:24:26 2002  J"orn Rennecke <joern.rennecke@superh.com>
 	* aclocal.m4: Regenerated.
 	* configure: Ditto.
 	* doc/aclocal.m4 doc/configure libc/aclocal.m4 libc/configure
-	* libc/*/aclocal.m4 libc/*/configure 
+	* libc/*/aclocal.m4 libc/*/configure
 	* libm/*/aclocal.m4 libm/*/configure: Ditto.
 	* libc/stdio/vfprintf.c [!INTEGER_ONLY]: Only set FLOATING_POINT
 	if NO_FLOATING_POINT flag is not defined.
@@ -9062,7 +9067,7 @@ Mon May  7 20:39:25 2001  Christopher Faylor <cgf@cygnus.com>
         _DEFUN, and call _vfprintf_r, not vfprintf.
 
 2001-04-22  Earnie Boyd  <earnie@users.sourceforge.net>
-  
+
 	* libc/include/sys/unistd.h [X_OK]: Use better protection against
 	Cygwin X_OK definitions in sys/file.h.
 
@@ -9072,7 +9077,7 @@ Fri Apr 20 23:17:51 2001  Christopher Faylor <cgf@cygnus.com>
 	__CYGWIN__, too.
 
 2001-04-20  Jeff Johnston  <jjohnstn@redhat.com>
-	
+
 	* acinclude.m4: Added --enable-malloc-debugging configure flag.
 	* configure.host: For Cygwin specify -DMALLOC_PROVIDED if
 	--enable-malloc-debugging selected.
@@ -9120,7 +9125,7 @@ Fri Apr 20 23:17:51 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* include/time.h[__CYGWIN__]:  Define tzname to _tzname if not defined.
 	Define daylight to _daylight if it is not defined
-	Prepare a variable export of timezone based on timezonevariable. 
+	Prepare a variable export of timezone based on timezonevariable.
 	(Cannot be used with the timezone() function.)
 
 2001-04-17  Stephen L. Moshier  <moshier@moshier.ne.mediaone.net>
@@ -9201,7 +9206,7 @@ Wed Mar 14  9:34:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 Wed Mar  7 16:02:07 2001  Christopher Faylor <cgf@cygnus.com>
 
-	* libc/include/sys/config.h: Use ssize_t for Cygwin read/write 
+	* libc/include/sys/config.h: Use ssize_t for Cygwin read/write
           declarations.
 
 Mon Mar  5 21:48:54 2001  J"orn Rennecke <amylaar@redhat.com>
@@ -9496,8 +9501,8 @@ Wed Dec 13 11:52:00 2000  Corinna Vinschen <vinschen@cygnus.com>
 
 	* libc/stdlib/ldtoa.c (_ldcheck): New routine
 	that categorizes a long double as NaN, Infinity, or other.
-	* libc/stdio/vfprintf.c [WANT_IO_LONG_DBL](_VFPRINTF_R): Removed 
-	isinfl and isnanl static routines which were i386-specific.  Changed 
+	* libc/stdio/vfprintf.c [WANT_IO_LONG_DBL](_VFPRINTF_R): Removed
+	isinfl and isnanl static routines which were i386-specific.  Changed
 	calls to the two removed routines to a single _ldcheck call.
 	* libc/stdio/vfieeefp.h (ldieee): Fixed missing semi-colons.
 
@@ -9538,11 +9543,11 @@ Wed Dec 13 11:52:00 2000  Corinna Vinschen <vinschen@cygnus.com>
         * libc/include/sys/signal.h: Add more complete set of POSIX
         signal functionality including real-time and threaded signals.
         * libc/include/sys/types.h: Add clock_t, time_t, struct
-	timespec, and struct itimerspec.  Centralizing these makes 
+	timespec, and struct itimerspec.  Centralizing these makes
 	things cleaner.  RTEMS uses 64-bit dev_t.
         Added numerous primitive definitions
         for pthreads including macros, pthread_attr_t,
-	pthread_mutexattr_t, pthread_condattr_t, pthread_key_t, 
+	pthread_mutexattr_t, pthread_condattr_t, pthread_key_t,
 	pthread_once_t, and pthread_t.
         * libc/include/sys/unistd.h: Added getlogin_r() prototype.
         If RTEMS follow POSIX on read(), write() and sbrk() prototype.
@@ -9597,7 +9602,7 @@ Wed Dec 13 11:52:00 2000  Corinna Vinschen <vinschen@cygnus.com>
 
 2000-12-08  Ralf Corsepius <corsepiu@faw.uni-ulm.de>
 
-        * Makefile.am: $(INSTALL), $(INSTALL_DATA), and $(INSTALL_PROGRAM)  
+        * Makefile.am: $(INSTALL), $(INSTALL_DATA), and $(INSTALL_PROGRAM)
         can be a relative path to $(top_srcdir)/install.sh so ensure the
         autoconf detected settings are properly passed recursively.
         Similarly, add AM_MAKEFLAGS to FLAGS_TO_PASS so they also get passed
@@ -9660,7 +9665,7 @@ Wed Dec  6 12:01:00 2000  Corinna Vinschen <vinschen@cygnus.com>
 
         * libc/sys/rtems/crt0.c: Add stubs for functions implicitly
         referenced by code generated by gcc 2.8.1.
-        (a29k): Add stubs for V_SPILL, V_FILL, V_BSD_OS, V_EPI_OS to 
+        (a29k): Add stubs for V_SPILL, V_FILL, V_BSD_OS, V_EPI_OS to
 	satisfy gcc.
 
 2000-12-04  Joel Sherrill <joel@OARcorp.com>
@@ -9886,7 +9891,7 @@ Fri Aug 25 13:37:11 2000  Christopher Faylor <cgf@cygnus.com>
 	* libc/unix/getcwd.c (ISDOT): added parentheses to clarify && and ||
 	precedence.
 	* libc/include/sys/unistd.h: added "vfork" prototype (for popen.c).
-	Added "_execve" prototype (for execl.c, execle.c, execv.c, and 
+	Added "_execve" prototype (for execl.c, execle.c, execv.c, and
 	execve.c).
 	* libc/posix/popen.c (popen): added parentheses to clarify && and ||
 	precedence.
@@ -9904,7 +9909,7 @@ Fri Aug 25 13:37:11 2000  Christopher Faylor <cgf@cygnus.com>
 	Also included unistd.h for "_exit" prototype.
 	* libc/stdlib/system.c: included unistd.h for "execve" prototype,
 	reent.h for "_fork_r" and "_wait_r" prototypes.
-	(do_system): changed  extern char *environ[] to POSIX-friendly 
+	(do_system): changed  extern char *environ[] to POSIX-friendly
 	extern char **environ.
 	* libc/stdlib/wctomb_r.c: included string.h for "strlen" and "strcmp"
 	prototypes.
@@ -10101,11 +10106,11 @@ Tue May 30 13:13:01 2000  Christopher Faylor <cgf@cygnus.com>
 	* libc/stdio/freopen.c: ditto
 	* libc/stdio/findfp.c: set up __SCLE for std{in,out,err}
 	* libc/stdio/local.h: declare __stextmode
-	
+
 2000-05-18  DJ Delorie  <dj@cygnus.com>
 
 	* libc/stdio/fgets.c (fgets): perform CRLF conversions if __SCLE
-	
+
 Mon May 15 18:54:00 2000  Jeff Johnston  <jjohnstn@cygnus.com>
 
 	* libc/include/ctype.h: Changed tolower and toupper macros
@@ -10153,12 +10158,12 @@ Mon Apr 17 12:46:00 2000  Marek Michalkiewicz <marekm@linux.org.pl>
 
 	* libc/signal/signal.c (_signal_r) : Removed unused local variable temp.
 	* libc/stdio/findfp.c (std): Added declaration of flags and file.
-	* libc/stdio/mktemp.c (_gettemp, _mkstemp_r, mkstemp): Added int 
+	* libc/stdio/mktemp.c (_gettemp, _mkstemp_r, mkstemp): Added int
 	return type.
 	* libc/stdio/putchar.c (putchar): Added return statement.
 	* libc/stdio/refill.c (lflush): Added correct parentheses.
 	* libc/stdio/vfprintf.c (_VFPRINTF_R): Ditto.
-	* libc/stdio/vfscanf.c (__svfscanf): Changed sprintf call which 
+	* libc/stdio/vfscanf.c (__svfscanf): Changed sprintf call which
 	prints long value to use l qualifier.
 	* libc/stdlib/dtoa.c (_dtoa_r): Added parentheses to remove warning
 	messages and initialized local values: ilim, ilim1, and spec_case.
@@ -10247,7 +10252,7 @@ Fri Mar 24 15:34:00 2000  Jeff Johnston  <jjohnstn@cygnus.com>
 Thu Mar 22 14:57:00 2000  Fernando Nasser <fnasser@redhat.com>
 
 	* libc/sys/arm/syscalls.c (do_AngelSWI): Prevent registers with valid
-	information to be clobbered by an Angel C library support syscall. 
+	information to be clobbered by an Angel C library support syscall.
 
 Tue Mar 21 19:08:00 2000  Jeff Johnston <jjohnstn@cygnus.com>
 
@@ -10275,7 +10280,7 @@ Fri Mar 10 14:53:50 2000  Alexandre Oliva  <oliva@lsd.ic.unicamp.br>
 Thu Mar  9 17:20:41 2000  Jeff Johnston <jjohnstn@cygnus.com>
 
         * libc/include/string.h: Changed last argument back to ssize_t
-	to make it compatible with XPG4 definition which is 
+	to make it compatible with XPG4 definition which is
 	defined in <unistd.h>.  There is a conflict in the SVID 3
 	and XPG4 definitions and newlib will settle with XPG4.
         * libc/string/swab.c: Ditto.
@@ -10356,7 +10361,7 @@ Thu Jan 20 18:57:00 2000  Fernando Nasser <fnasser@redhat.com>
 
 Mon Jan 10 18:43:00 2000  Jeff Johnston <jjohnstn@cygnus.com>
 
-	* acinclude.m4: Changed include directory for winsup headers. 
+	* acinclude.m4: Changed include directory for winsup headers.
 	* aclocal.m4 configure libc/aclocal.m4
 	  libc/configure libc/ctype/Makefile.in libc/errno/Makefile.in
 	  libc/locale/Makefile.in libc/machine/aclocal.m4
@@ -10379,7 +10384,7 @@ Mon Jan 10 18:43:00 2000  Jeff Johnston <jjohnstn@cygnus.com>
 	  libc/machine/mn10200/configure libc/machine/mn10300/aclocal.m4
 	  libc/machine/mn10300/configure libc/machine/necv70/aclocal.m4
 	  libc/machine/necv70/configure libc/machine/powerpc/aclocal.m4
-	  libc/machine/powerpc/configure 
+	  libc/machine/powerpc/configure
 	  libc/machine/sh/aclocal.m4
 	  libc/machine/sh/configure libc/machine/sparc/aclocal.m4
 	  libc/machine/sparc/configure
@@ -10388,7 +10393,7 @@ Mon Jan 10 18:43:00 2000  Jeff Johnston <jjohnstn@cygnus.com>
 	  libc/machine/w65/aclocal.m4 libc/machine/w65/configure
 	  libc/machine/z8k/aclocal.m4 libc/machine/z8k/configure
 	  libc/misc/Makefile.in libc/posix/Makefile.in
-	  libc/reent/Makefile.in 
+	  libc/reent/Makefile.in
 	  libc/signal/Makefile.in
 	  libc/string/Makefile.in libc/sys/aclocal.m4 libc/sys/configure
 	  libc/sys/a29khif/aclocal.m4 libc/sys/a29khif/configure
@@ -10423,11 +10428,11 @@ Mon Jan 10 18:43:46 2000  Jeff Johnston <jjohnstn@cygnus.com>
 	* libc/stdlib/putenv_r.c (_putenv_r): New file.
 	* libc/stdlib/strdup_r.c (_strdup_r): New file.
 	* libc/include/string.h: Added _strdup_r.
-	* libc/stdlib/putenv.c: Added call to reentrant version. 
+	* libc/stdlib/putenv.c: Added call to reentrant version.
 	* libc/stdlib/strdup.c: Ditto.
 	* libc/stdlib/Makefile.am: Added _putenv_r and _unsetenv_r.
 	* libc/include/stdlib.h: Ditto.
-	* libc/stdlib/Makefile.in: Regenerated. 
+	* libc/stdlib/Makefile.in: Regenerated.
 	* libc/string/Makefile.in: Regenerated.
 	* libc/stdlib/setenv.c: Added reentrant version of unsetenv.
 	* libc/stdlib/setenv_r.c: Added unsetenv_r and changed memory
@@ -10436,7 +10441,7 @@ Mon Jan 10 18:43:46 2000  Jeff Johnston <jjohnstn@cygnus.com>
 	* libc/stdlib/wctomb.c: Ditto.
 	* libc/stdlib/mblen.c: Ditto.
 	* libc/stdlib/mbstowcs.c: Ditto.
-	* libc/stdlib/mbtowc.c: Ditto. 
+	* libc/stdlib/mbtowc.c: Ditto.
 	* libc/stdlib/getenv.c: Ditto.
 	* libc/reent/reent.tex: Added references to _putenv_r, _setenv_r,
 	and _strdup_r.
@@ -10488,7 +10493,7 @@ Thu Oct 28 05:30:46 1999  Andrew Cagney  <cagney@makita.cygnus.com>
 Thu Oct 28 15:29:11 1999  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* libc/sys/d10v/crt0.S (_start): Initialize both SPI and SPU
- 	ensuring that there is space between the two.
+	ensuring that there is space between the two.
 
 Thu Oct 14 13:39:21 1999  Christopher Faylor <cgf@cygnus.com>
 
@@ -10581,7 +10586,7 @@ Thu Aug  5 17:37:00 1999  Ranjith Kumaran <ranjith@cygnus.com>
 1999-07-09  Michael Meissner  <meissner@cygnus.com>
 
 	* libc/include/stdlib.h (_findenv{,_r}): Add prototypes.
-	
+
 Tue Jul  6 10:46:24 1999  Jeff Johnston <jjohnstn@cygnus.com>
 
 	* libc/stdio/sprintf.c: Moved snprintf and _snprintf_r to
@@ -10740,12 +10745,12 @@ Wed Apr 07 16:06:04 1999  Jeff Johnston  <jjohnstn@cygnus.com>
 	insert zeroes after significant digits.
 
 Wed Mar 17 22:06:04 1999  Jeff Johnston  <jjohnstn@cygnus.com>
-	
+
 	* libc/stdio/vfprintf.c (cvt): Changed floating point
 	cvt routine to use union used by dtoa to properly determine
 	if the sign bit is on or not.
 	* libc/stdio/vfieeefp.h: New file
-	
+
 Wed Mar 17 17:35:04 1999  Jeff Johnston  <jjohnstn@cygnus.com>
 
 	* aclocal.m4: Regenerated.
@@ -10888,7 +10893,7 @@ Sat Jan 30 02:36:33 1999  Christopher Faylor <cgf@cygnus.com>
 
 	* libc/sys/arm/syscalls.c: Move C library functions into seperate
 	file.
-	
+
 	* libc/sys/arm/libcfunc.c: New file containing C library functions
 	from syscalls.c
 
@@ -11090,7 +11095,7 @@ Tue Dec  1 13:26:07 1998  Christopher Faylor <cgf@cygnus.com>
 	* libc/string/strncasecmp.c (strncasecmp): Ditto.
 
 Mon Nov 30 16:24:19 1998  Jeff Johnston  <jjohnstn@cygnus.com>
-	
+
 	* configure.host: Added using i386 machine directory
 	for all x86 cross-compiler and configuring
 	which added object files to use via new "mach_add_objs" variable.
@@ -11313,7 +11318,7 @@ Fri Oct  9 16:27:36 1998  Jeff Johnston  <jjohnstn@cygnus.com>
 	can be set by defining MALLOC_ALIGNMENT=16.  Also added support
 	for platforms where sizeof(size_t) < sizeof(long) via
 	SIZE_T_SMALLER_THAN_LONG macro.
-	
+
 Wed Oct  7 14:02:40 1998  Jeff Johnston  <jjohnstn@cygnus.com>
 
 	* libc/include/time.h (CLOCKS_PER_SEC): Change CLOCKS_PER_SEC
@@ -11515,7 +11520,7 @@ Thu Aug 27 14:07:53 1998  Christopher Faylor <cgf@cygnus.com>
 Wed Aug 26 15:05:21 1998  Nick Clifton  <nickc@cygnus.com>
 
 	* libc/sys/arm/syscalls.c (_sbrk): Rename '_end' to 'end' to
-	conform to user label naming conventions. 
+	conform to user label naming conventions.
 
 Mon Aug 24 14:46:19 1998  Geoffrey Noer <noer@cygnus.com>
 
@@ -11537,15 +11542,15 @@ Fri Aug 21 14:44:14 1998  Jeff Johnston  <jjohnstn@cygnus.com>
 	for MB_CAPABLE to reduce code size when newlib is not configured
 	with --enable-newlib-mb.
 	* libc/stdlib/Makefile.am: Specified -fshort-enums when building
- 	mbtowc_r.o to minimize size.
+	mbtowc_r.o to minimize size.
 	* libc/stdlib/Makefile.in: Rebuild.
-	
+
 Wed Aug 19 16:20:13 1998  Jim Wilson  <wilson@cygnus.com>
 
 	* libc/sys/sparc64/Makefile.am (.S_r.o, .c_r.o): Change -DREENTRANT
 	to -DREENT.
 	* libc/sys/sparc64/Makefile.in: Rebuild.
-	
+
 Tue Aug 18 22:38:29 1998  Ian Lance Taylor  <ian@cygnus.com>
 
 	* Makefile.am (MAKEOVERRIDES): Define.
@@ -11581,52 +11586,52 @@ Wed Jul 22 18:00:10 1998  Ian Lance Taylor  <ian@cygnus.com>
 Wed Jul 22 17:11:33 1998  Jeff Johnston  <jjohnstn@cygnus.com>
 
 	* libm/math/wrf_lgamma.c (lgammaf_r): Initialize exc.err to 0 and
- 	also set exc.arg1, exc.arg2 appropriately in case matherr is supplied.
-	* libm/math/wrf_gamma.c (gammaf_r): ditto 
-	* libm/math/wr_lgamma.c (lgamma_r): ditto 
-	* libm/math/wr_gamma.c (gamma_r): ditto 
-	* libm/math/wf_sqrt.c (sqrtf): ditto 
-	* libm/math/wf_sinh.c (sinhf): ditto 
-	* libm/math/wf_scalb.c (scalbf): ditto 
-	* libm/math/wf_remainder.c (remainderf): ditto 
-	* libm/math/wf_pow.c (powf): ditto 
-	* libm/math/wf_log10.c (log10f): ditto 
-	* libm/math/wf_log.c (logf): ditto 
-	* libm/math/wf_lgamma.c (lgammaf): ditto 
-	* libm/math/wf_jn.c (jnf, ynf): ditto 
-	* libm/math/wf_j1.c (j1f, y1f): ditto 
-	* libm/math/wf_j0.c (j0f, y0f): ditto 
-	* libm/math/wf_hypot.c (hypotf): ditto 
-	* libm/math/wf_gamma.c (gammaf): ditto 
-	* libm/math/wf_fmod.c (fmodf): ditto 
-	* libm/math/wf_exp.c (expf): ditto 
-	* libm/math/wf_cosh.c (coshf): ditto 
-	* libm/math/wf_atanh.c (atanhf): ditto 
-	* libm/math/wf_atan2f.c (atan2f): ditto 
-	* libm/math/wf_asin.c (asinf): ditto 
-	* libm/math/wf_acosh.c (acoshf): ditto 
-	* libm/math/wf_acos.c (acosf): ditto 
-	* libm/math/w_sqrt.c (sqrt): ditto 
-	* libm/math/w_sinh.c (sinh): ditto 
-	* libm/math/w_scalb.c (scalb): ditto 
-	* libm/math/w_remainder.c (remainder): ditto 
-	* libm/math/w_pow.c (pow): ditto 
-	* libm/math/w_log10.c (log10): ditto 
-	* libm/math/w_log.c (log): ditto 
-	* libm/math/w_lgamma.c (lgamma): ditto 
-	* libm/math/w_jn.c (jn, yn): ditto 
-	* libm/math/w_j1.c (j1, y1): ditto 
-	* libm/math/w_j0.c (j0, y0): ditto 
-	* libm/math/w_hypot.c (hypot): ditto 
-	* libm/math/w_gamma.c (gamma): ditto 
-	* libm/math/w_fmod.c (fmod): ditto 
-	* libm/math/w_exp.c (exp): ditto 
-	* libm/math/w_cosh.c (cosh): ditto 
-	* libm/math/w_atanh.c (atanh): ditto 
-	* libm/math/w_atan2f.c (atan2): ditto 
-	* libm/math/w_asin.c (asin): ditto 
-	* libm/math/w_acosh.c (acosh): ditto 
-	* libm/math/w_acos.c (acos): ditto 
+	also set exc.arg1, exc.arg2 appropriately in case matherr is supplied.
+	* libm/math/wrf_gamma.c (gammaf_r): ditto
+	* libm/math/wr_lgamma.c (lgamma_r): ditto
+	* libm/math/wr_gamma.c (gamma_r): ditto
+	* libm/math/wf_sqrt.c (sqrtf): ditto
+	* libm/math/wf_sinh.c (sinhf): ditto
+	* libm/math/wf_scalb.c (scalbf): ditto
+	* libm/math/wf_remainder.c (remainderf): ditto
+	* libm/math/wf_pow.c (powf): ditto
+	* libm/math/wf_log10.c (log10f): ditto
+	* libm/math/wf_log.c (logf): ditto
+	* libm/math/wf_lgamma.c (lgammaf): ditto
+	* libm/math/wf_jn.c (jnf, ynf): ditto
+	* libm/math/wf_j1.c (j1f, y1f): ditto
+	* libm/math/wf_j0.c (j0f, y0f): ditto
+	* libm/math/wf_hypot.c (hypotf): ditto
+	* libm/math/wf_gamma.c (gammaf): ditto
+	* libm/math/wf_fmod.c (fmodf): ditto
+	* libm/math/wf_exp.c (expf): ditto
+	* libm/math/wf_cosh.c (coshf): ditto
+	* libm/math/wf_atanh.c (atanhf): ditto
+	* libm/math/wf_atan2f.c (atan2f): ditto
+	* libm/math/wf_asin.c (asinf): ditto
+	* libm/math/wf_acosh.c (acoshf): ditto
+	* libm/math/wf_acos.c (acosf): ditto
+	* libm/math/w_sqrt.c (sqrt): ditto
+	* libm/math/w_sinh.c (sinh): ditto
+	* libm/math/w_scalb.c (scalb): ditto
+	* libm/math/w_remainder.c (remainder): ditto
+	* libm/math/w_pow.c (pow): ditto
+	* libm/math/w_log10.c (log10): ditto
+	* libm/math/w_log.c (log): ditto
+	* libm/math/w_lgamma.c (lgamma): ditto
+	* libm/math/w_jn.c (jn, yn): ditto
+	* libm/math/w_j1.c (j1, y1): ditto
+	* libm/math/w_j0.c (j0, y0): ditto
+	* libm/math/w_hypot.c (hypot): ditto
+	* libm/math/w_gamma.c (gamma): ditto
+	* libm/math/w_fmod.c (fmod): ditto
+	* libm/math/w_exp.c (exp): ditto
+	* libm/math/w_cosh.c (cosh): ditto
+	* libm/math/w_atanh.c (atanh): ditto
+	* libm/math/w_atan2f.c (atan2): ditto
+	* libm/math/w_asin.c (asin): ditto
+	* libm/math/w_acosh.c (acosh): ditto
+	* libm/math/w_acos.c (acos): ditto
 
 Tue Jul 21 12:34:54 1998  Ian Lance Taylor  <ian@cygnus.com>
 
@@ -11696,7 +11701,7 @@ Wed Jun 24 13:56:54 1998  Jeff Johnston  <jjohnstn@cygnus.com>
 	removed.
 	* libc/sys/h8300hms/malloc.c: has been removed.  Now malloc.c from
 	libc/stdlib will be used for h8300hms.
-	
+
 Thu Jun 18 16:56:05 1998  Jeff Johnston  <jjohnstn@cygnus.com>
 
 	* libc/machine/mn10300/strlen.S (_strlen): New optimized assembler
@@ -11709,7 +11714,7 @@ Thu Jun 18 16:56:05 1998  Jeff Johnston  <jjohnstn@cygnus.com>
 	* libc/machine/mn10300/strcmp.S (_strcmp): ditto
 	* libc/machine/mn10300/strcpy.S (_strcpy): ditto
 	* libc/machine/mn10300/Makefile.in: Added entries for
- 	memchr.o, memcmp.o, memcpy.o, memset.o, strchr.o, 
+	memchr.o, memcmp.o, memcpy.o, memset.o, strchr.o,
 	strcmp.o, strcpy.o, and strlen.o.
 
 Wed Jun 17 12:50:26 1998  Mark Alexander  <marka@cygnus.com>
@@ -11861,12 +11866,12 @@ Mon May 18 19:01:02 1998  Michael Meissner  <meissner@cygnus.com>
 Sun May 17 18:40:32 1998  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* libc/stdlib/mbtowc_r.c (_mbtowc_r): Accept a NULL
- 	_current_locale as default locale.
+	_current_locale as default locale.
 
 Sat May 16 21:59:59 1998  Bob Manson  <manson@charmed.cygnus.com>
 
 	* libc/stdlib/mallocr.c (mALLOc): Add explicit tests for
- 	insufficient space in a chunk.
+	insufficient space in a chunk.
 
 Tue May 12 14:41:01 1998  Jeff Johnston  <jjohnstn@cygnus.com>
 
@@ -11880,7 +11885,7 @@ Tue May 12 14:41:01 1998  Jeff Johnston  <jjohnstn@cygnus.com>
 	* libc/stdlib/wctomb_r.c (_wctomb_r): New function _wctomb_r that
 	implements wctomb() with multibyte support for JIS, SJIS, and EUC-JP.
 	* libc/stdlib/mbstowcs_r.c (_mbstowcs_r): New function _mbstowcs_r that
- 	implements mbstowcs() with multibyte support for JIS, SJIS, and EUC-JP.
+	implements mbstowcs() with multibyte support for JIS, SJIS, and EUC-JP.
 	* libc/stdlib/wcstombs_r.c (_wcstombs_r): New function _wcstomb_r that implements
 	wcstombs() with multibyte support for JIS, SJIS, and EUC-JP.
 	* libc/stdlib/Makefile.in: Added new multibyte
@@ -11890,7 +11895,7 @@ Tue May 12 14:41:01 1998  Jeff Johnston  <jjohnstn@cygnus.com>
 	* libc/stdlib/mbctype.h: New internal header file that contains macros to test
 	for JIS, SJIS, and EUC-JP characters.
 	* libc/stdlib/mblen.c (mblen): Added code to call _mbtowc_r() if
- 	MB_CAPABLE defined.
+	MB_CAPABLE defined.
 	* libc/stdlib/mbtowc.c (mbtowc): Added code to call _mbtowc_r() if
 	MB_CAPABLE defined.
 	* libc/stdlib/wctomb.c (wctomb): Added code to call _wctomb_r() if
@@ -11967,7 +11972,7 @@ Wed Mar 18 09:45:10 1998  Nick Clifton  <nickc@cygnus.com>
 	builds.
 
 	* libc/sys/arm/syscalls.c (_sbrk): Add "_sbrk: " to error
-	message. 
+	message.
 
 Fri Mar 13 11:24:34 1998  Jeff Johnston  <jjohnstn@cygnus.com>
 
@@ -12021,10 +12026,10 @@ Wed Feb 18 23:51:08 1998  Geoffrey Noer  <noer@cygnus.com>
 
 	* libc/stdio/fdopen.c (fdopen): Make all writes go to the end of
         the file when O_APPEND is set, wherever the EOF happens to be at
-	that time. 
+	that time.
 
 Wed Feb 18 23:25:02 1998  Geoffrey Noer  <noer@cygnus.com>
-	
+
 	patch from cgf@bbc.com (Christopher Faylor):
 	* libc/stdio/freopen.c (freopen): Conform to standard UNIX
 	convention of closing fp prior to attempting to open the file
@@ -12051,7 +12056,7 @@ Wed Feb 11 17:50:45 1998  Jeff Johnston  <jjohnstn@cygnus.com>
 	* libc/machine/powerpc/setjmp.S (setjmp, longjmp): Alignment code
 	altered to not use a branch.  Also added hint that last
 	bclr in longjmp will likely result in branch.
-	
+
 
 Mon Feb  9 03:44:02 1998  Geoffrey Noer  <noer@cygnus.com>
 
@@ -12062,7 +12067,7 @@ Fri Feb  6 16:32:32 1998  Nick Clifton  <nickc@cygnus.com>
 	* libc/sys/sysnecv850/crt0.S (_start): Initialise _ctbp even for
 	v850 builds.
 
-	* configure.in: Add -msmall-sld to target_cflags for v850 builds. 
+	* configure.in: Add -msmall-sld to target_cflags for v850 builds.
 
 Wed Feb  4 16:56:20 1998  Jeff Johnston  <jjohnstn@cygnus.com>
 
@@ -12079,7 +12084,7 @@ Tue Feb  3 18:08:34 1998  Jeff Johnston  <jjohnstn@cygnus.com>
 Mon Feb  2 16:20:39 1998  Nick Clifton  <nickc@cygnus.com>
 
 	* libc/sys/sysnecv850/Makefile.in (OFILES): Add link.o (for
-	PR14730). 
+	PR14730).
 
 Mon Feb  2 15:13:26 1998  Geoffrey Noer  <noer@cygnus.com>
 
@@ -12093,8 +12098,8 @@ Wed Jan 28 13:30:14 1998  Geoffrey Noer  <noer@cygnus.com>
 Wed Jan 28 10:38:34 1998  Jeff Johnston  <jjohnstn@cygnus.com>
 
 	* libc/machine/tic80/setjmp.S: Adding _setjmp to allow
- 	TI Libraries to link to libc.a
-	
+	TI Libraries to link to libc.a
+
 Sat Jan 24 10:15:56 1998  Michael Meissner  <meissner@cygnus.com>
 
 	* libc/include/sys/fcntl.h (_open,_fcntl): Add prototypes.
@@ -12112,10 +12117,10 @@ Fri Jan 23 11:32:10 1998  Michael Meissner  <meissner@cygnus.com>
 
 Thu Jan 22 15:57:14 1998  Fred Fish  <fnf@cygnus.com>
 
-	* libc/sys/d10v/trap.S: Change syscalls to use trap 15. 
+	* libc/sys/d10v/trap.S: Change syscalls to use trap 15.
 	* libc/sys/d10v/crt0.S: Use R6 where we used to use R2.
 	Use R5 where we used to use R3.
-	
+
 Wed Jan 21 14:22:23 1998  Bill Moyer <billm@cygnus.com>
 
 	* libc/stdlib/getopt.c (getopt): replaced __progname
@@ -12142,7 +12147,7 @@ Wed Jan  7 17:02:58 1998  Nick Clifton  <nickc@cygnus.com>
 
 	* libc/sys/arm/syscalls.c: Applied patches for Angel based remote
 	debugging interface from Tony.Thompson@arm.com.
-	
+
 	* libc/sys/arm/crt0.S (_mainCRTStartup): ditto.
 	* libc/sys/arm/swi.h: ditto.
 
@@ -12351,10 +12356,10 @@ Tue Oct 21 18:42:00 1997  Jim Wilson  <wilson@cygnus.com>
 Tue Oct 21 17:23:34 1997  Nick Clifton  <nickc@cygnus.com>
 
 	* configure.in (links): Define PREFER_SIZE_OVER_SPEED for v850
-	targets. 
-	* libc/string/{memchr.c, memcmp.c, memcpy.c}: 	Add space
+	targets.
+	* libc/string/{memchr.c, memcmp.c, memcpy.c}:	Add space
 	optimised version which is selected if PREFER_SIZE_OVER_SPEED is
-	defined.  
+	defined.
 	* libc/string/{memset.c, strcat.c, strchr.c}: Likewise.
 	* libc/string/{strcmp.c, strcpy.c, strlen.c}: Likewise.
 	* libc/string/{strncat.c, strncmp.c, strncpy.c}: Likewise.
@@ -12383,16 +12388,16 @@ Tue Oct  7 14:01:29 1997 Bill Moyer     (billm@cygnus.com)
 Mon Oct  6 14:07:59 1997  Nick Clifton  <nickc@cygnus.com>
 
 	* libc/sys/sysnecv850/Makefile.in (crt0.o trap.o): Explicit
-	rules. 
+	rules.
 
 	* libc/include/sys/config.h: Use __v850 to select v850
-	endianness. 
+	endianness.
 
 	* libc/include/machine/setjmp.h: Use __v850 to select v850 jump
 	buffer size.
 
 	* libc/include/machine/ieeefp.h: Use __v850 to select v850
-	endianness. 
+	endianness.
 
 Thu Sep 25 14:11:37 1997  Geoffrey Noer  <noer@cygnus.com>
 
@@ -12413,14 +12418,14 @@ Thu Sep 18 12:50:15 1997  Angela Marie Thomas (angela@cygnus.com)
 Wed Sep 17 17:42:27 1997  Nick Clifton  <nickc@cygnus.com>
 
 	* libc/sys/sysnecv850/crt0.S: Created V850e version.
-	
+
 Tue Sep  9 10:40:57 1997  Doug Evans  <dje@canuck.cygnus.com>
 
 	* configure.in (target_cpu): Add `arc'.
 
 Tue Sep  9 10:40:42 1997  Joel Sherrill  <joel@OARcorp.com>
 
-	* newlib/configure.in (*-*-rtems*): Add -DSIGNAL_PROVIDED and 
+	* newlib/configure.in (*-*-rtems*): Add -DSIGNAL_PROVIDED and
 	  -DREENTRANT_SYSCALLS_PROVIDED to the target_cflags.
 	* newlib/libc/include/sys/errno.h: Add ENOTSUP.
 	* newlib/libc/reent/reent.c: Add _wrapup_reent.
@@ -12623,7 +12628,7 @@ Fri May 16 15:02:59 1997  Bob Manson  <manson@charmed.cygnus.com>
 Wed May 14 21:16:58 1997  Bob Manson  <manson@charmed.cygnus.com>
 
 	* libm/math/ef_hypot.c: Use long constants where
- 	appropriate.
+	appropriate.
 	* libm/math/ef_sqrt.c: Ditto.
 
 	* libc/sys/sysmec/times.c(_times): Change to times.
@@ -12845,7 +12850,7 @@ Sun Dec 22 23:33:05 1996  Michael Meissner  <meissner@tiktok.cygnus.com>
 	(_impure_ptr): Use __ATTRIBUTRE_IMPURE_PTR__, so a machine can set
 	its attributes.
 
-	* libc/include/sys/config.h (__ATTRIBUTE_IMPURE_PTR__): 
+	* libc/include/sys/config.h (__ATTRIBUTE_IMPURE_PTR__):
 
 Wed Dec 18 10:12:04 1996  Jeffrey A Law  (law@cygnus.com)
 
@@ -12946,7 +12951,7 @@ Mon Nov 11 09:01:39 1996  Jeffrey A Law  (law@cygnus.com)
 	* libc/machine/h8300/memcpy.S: Fix comments to reflect reality.
 	Fix handling of mis-aligned source operand when both the
 	destination & length are properly aligned.
-	
+
 Wed Oct 30 09:41:11 1996  Jeffrey A Law  (law@cygnus.com)
 
 	* libc/sys/sysnecv850/Makefile.in (OFILES): Add
@@ -13022,7 +13027,7 @@ Tue Oct 15 11:51:42 1996  Michael Meissner  <meissner@tiktok.cygnus.com>
 	* libc/stdlib/mallocr.c (_morecore_r): Use _POINTER_INT when
 	aligning pointer.
 	* libc/string/memset.c (memset): Ditto.
-	
+
 	* libc/stdio/vfscanf.c (__svfscanf): When converting to pointer,
 	first convert ints to _POINTER_INT to eliminate GCC warning.
 
@@ -13065,7 +13070,7 @@ Tue Oct  1 16:24:05 1996  Gavin Koch  <gavin@cygnus.com>
 
         * libc/sys/sysnecv850/_exit.c: added _do_dtors to
         do the static destructors.
-        
+
 Mon Sep 30 15:59:05 1996  Stu Grossman  (grossman@critters.cygnus.com)
 
 	* libc/sys/sysnecv850/trap.S:  Change I/O to use trap 31.
@@ -13078,10 +13083,10 @@ Mon Sep 30 12:02:50 1996  Doug Evans  <dje@canuck.cygnus.com>
 Mon Sep 30 00:34:41 1996  James G. Smith  <jsmith@cygnus.co.uk>
 
 	* libc/sys/arm/trap.S (__rt_stkovf_split_big,
- 	__rt_stkovf_split_small): Added default software stack overflow
- 	handlers, which just call SWI_Exit.
+	__rt_stkovf_split_small): Added default software stack overflow
+	handlers, which just call SWI_Exit.
 	* libc/sys/arm/crt0.S (_mainCRTStartup): Simple software stack
- 	limit initialisation.
+	limit initialisation.
 
 Fri Sep 27 13:08:03 1996  Mark Alexander  <marka@cygnus.com>
 
@@ -13090,7 +13095,7 @@ Fri Sep 27 13:08:03 1996  Mark Alexander  <marka@cygnus.com>
 Fri Sep 27 12:32:00 1996  Jeremy Allison <jra@cygnus.com>
 
 	* libc/include/sys/types.h: Added ssize_t definition.
-	
+
 Wed Sep 25 14:52:18 1996  Michael Meissner  <meissner@tiktok.cygnus.com>
 
 	* libc/machine/d10v/setjmp.S: Use ';' for comments.
@@ -13270,22 +13275,22 @@ Wed Aug 14 23:43:28 1996  Geoffrey Noer  <noer@cygnus.com>
 Fri Aug  2 18:28:07 1996  J.T. Conklin  <jtc@rtl.cygnus.com>
 
 	* libc/reent/{closer.c, execr.c, fstatr.c, linkr.c, lseekr.c,
- 	openr.c, readr.c, sbrkr.c, signalr.c, statr.c, timer.c, writer.c}:
- 	Partially revert last changes.  The thread specific errno is set
- 	iff if the underlying syscall fails and the global errno is not
- 	zero.
+	openr.c, readr.c, sbrkr.c, signalr.c, statr.c, timer.c, writer.c}:
+	Partially revert last changes.  The thread specific errno is set
+	iff if the underlying syscall fails and the global errno is not
+	zero.
 
 Fri Jul 19 11:41:52 1996  J.T. Conklin  <jtc@rtl.cygnus.com>
 
 	* libc/reent/filer.c: Removed files, all functions have split out
- 	into their own files.
-	* libc/reent/{closer.c, lseekr.c, openr.c, readr.c, writer.c}: 
+	into their own files.
+	* libc/reent/{closer.c, lseekr.c, openr.c, readr.c, writer.c}:
 	New files containing functions formally in filer.c
 	* libc/reent/Makefile.in: Updated for above change.
 
 	* libc/reent/execr.c (_fork_r, _wait_r): Set errno if underlying
- 	syscall fails, not if errno is changed.
-	* libc/reent/filer.c (_open_r, _close_r, _lseek_r, _read_r, 
+	syscall fails, not if errno is changed.
+	* libc/reent/filer.c (_open_r, _close_r, _lseek_r, _read_r,
 	_write_r): Likewise.
 	* libc/reent/fstatr.c (_fstat_r): Likewise.
 	* libc/reent/linkr.c (_link_r, _unlink_r): Likewise.
@@ -13295,13 +13300,13 @@ Fri Jul 19 11:41:52 1996  J.T. Conklin  <jtc@rtl.cygnus.com>
 	* libc/reent/timer.c (_gettimeofday_r): Likewise.
 
 	* libc/reent/{execr.c, filer.c, fstatr.c, linkr.c, sbrkr.c,
- 	signalr.c, statr.c, timer.c} (errno): declare extern rather
+	signalr.c, statr.c, timer.c} (errno): declare extern rather
 	than as a common.
 
 	* libc/stdio/vfprintf.c (__sbprintf): Use the VFPRINTF macro
- 	instead of calling vfprintf so that i*printf will not require
- 	floating point support code.
-	
+	instead of calling vfprintf so that i*printf will not require
+	floating point support code.
+
 Mon Jul 15 16:50:59 1996  Doug Evans  <dje@canuck.cygnus.com>
 
 	* libc/posix/execvp.c (execvp): Use posix_path_list_p to determine
@@ -13387,17 +13392,17 @@ Thu Jun  6 11:34:20 1996  Michael Meissner  <meissner@tiktok.cygnus.com>
 Mon Jun  3 11:30:00 1996  J.T. Conklin  <jtc@rtl.cygnus.com>
 
 	* libc/include/sys/reent.h (struct _reent): Removed _asctime,
- 	_next, _scanpoint, _signgam fields.
+	_next, _scanpoint, _signgam fields.
 
 	* libc/include/stdlib.h (rand_r): Added new declaration.
 	(_rand_r, _srand_r): Removed declarations.
 	* libc/stdlib/rand.c (_rand_r, _srand_r): Removed, these functions
- 	have been made obsolete by rand_r.
+	have been made obsolete by rand_r.
 	* libc/stdlib/rand_r.c: New file, rand_r function as specified
- 	by POSIX.1c.
-	
+	by POSIX.1c.
+
 	* libc/string/strtok.c: Update documentation to describe
- 	strtok_r().
+	strtok_r().
 
 Sat Jun  1 23:50:39 1996  Michael Meissner  <meissner@cygnus.com>
 
@@ -13412,8 +13417,8 @@ Tue May 28 13:02:42 1996  Doug Evans  <dje@canuck.cygnus.com>
 Fri May 17 10:34:44 1996  Ian Lance Taylor  <ian@cygnus.com>
 
 	* host/any: Use ../.. rather than .. to get to the main build
- 	directory.  This matches the current layout of the build
- 	directory.
+	directory.  This matches the current layout of the build
+	directory.
 
 Wed May 15 15:52:27 1996  Jeffrey A Law  (law@cygnus.com)
 
@@ -13491,7 +13496,7 @@ Mon Mar 25 15:29:14 1996  J.T. Conklin  <jtc@rtl.cygnus.com>
 
 	* libc/machine/sh/asm.h: New file.
 	* libc/machine/sh/setjmp.S: Only save clobbered registers.  Added
- 	support for SH3e's FP registers.  Use asm.h.
+	support for SH3e's FP registers.  Use asm.h.
 
 Mon Mar 25 11:59:23 1996  Jeffrey A Law  (law@cygnus.com)
 
@@ -13552,8 +13557,8 @@ Mon Feb  5 15:17:51 1996  J.T. Conklin  <jtc@rtl.cygnus.com>
 	* libm/math/sf_asinh.c: Fix typo.
 
 	* Makefile.in (MATHOBJS_IN_LIBC): Removed sr_ldexp.o and
- 	srf_ldexp.o.
-	
+	srf_ldexp.o.
+
 	* libm/libm.texinfo: Change documentation to reflect changes
 	in reentrancy model.
 	* libm/math/w_gamma.c: Likewise.
@@ -13616,38 +13621,38 @@ Mon Dec 11 17:35:12 1995  steve chamberlain  <sac@slash.cygnus.com>
 Fri Dec  1 16:48:46 1995  James G. Smith  <jsmith@cygnus.co.uk>
 
 	* libc/sys/vr4300/syscalls.c (sbrk): Fixed memory
- 	addressing. System call returns size, not (last address + 1).
+	addressing. System call returns size, not (last address + 1).
 
 Thu Nov 30 15:05:26 1995  J.T. Conklin  <jtc@rtl.cygnus.com>
 
 	* libm/math/*.c: Removed _foo_r() reentrancy API.
 	* libc/include/math.h: Removed _foo_r prototypes and macros.
 
-	* libm/math/*.c: On systems with IEEE single precision "doubles" 
+	* libm/math/*.c: On systems with IEEE single precision "doubles"
 	move foo() -> foof() wrapper code from the files that implement
-	the standard IEEE double precision functions to the files that 
+	the standard IEEE double precision functions to the files that
 	implement IEEE single precision functions. (ie. On those systems
 	sin is moved from s_sin.c to sf_sin.c).  There should eventually
 	be use of a C extension (like gcc's alias attribute) so that the
 	wrappers are not needed at all.
 
 	* libc/sys/sysnec810/sbrk.c: Cast &end to char * to get around
- 	strict NEC V810 compiler.
+	strict NEC V810 compiler.
 	* libc/misc/dprintf.c (getnumber): Cast char * to unsigned char *
- 	for same reason.
+	for same reason.
 
 Wed Nov 29 14:25:05 1995  J.T. Conklin  <jtc@rtl.cygnus.com>
 
 	* libc/stdlib/strtol.c (_strtol_r): Replaced with implementation
- 	from NetBSD C library.
+	from NetBSD C library.
 	* libc/stdlib/strtoul.c (_strtoul_r): Likewise.
 
-	* libc/stdlib/assert.c (__assert): Renamed from __assertfail 
+	* libc/stdlib/assert.c (__assert): Renamed from __assertfail
 	and adapted from implementation I wrote for NetBSD C library.
 	The difference is __assert doesn't take a format argument,
 	so that there won't be multiple copies of the same string
 	constant in the executable if assertions are enabled in
- 	more than one source module.
+	more than one source module.
 	* libc/include/assert.h (assert): Changed to call __assert.
 
 Tue Nov 28 16:54:26 1995  J.T. Conklin  <jtc@rtl.cygnus.com>
@@ -13657,8 +13662,8 @@ Tue Nov 28 16:54:26 1995  J.T. Conklin  <jtc@rtl.cygnus.com>
 	* libc/stdlib/qsort.c (qsort): Cast some void *'s to char *'s
 	so that	we can do arithmetic on them.
 	* libc/misc/dprintf.c: Changed to support stdarg.h for ANSI
- 	compilers.
-	
+	compilers.
+
 Tue Nov 28 16:03:32 1995  Doug Evans  <dje@canuck.cygnus.com>
 
 	* libc/sys/arm/crt0.S: Zero bss.
@@ -13689,7 +13694,7 @@ Wed Nov  8 01:24:08 1995  James G. Smith  <jsmith@pasanda.cygnus.co.uk>
 
 	* libc/sys/vr4300/syscalls.c: Added clean version of sbrk().
 	* libc/sys/vr4300/crt0.S: Cleaned up. Added check for FPU
- 	presence.
+	presence.
 
 Thu Nov  2 22:25:06 1995  Michael Meissner  <meissner@tiktok.cygnus.com>
 
@@ -13713,16 +13718,16 @@ Wed Nov  1 14:35:52 1995  J.T. Conklin  <jtc@rtl.cygnus.com>
 
 	* libc/string/Makefile.in (OFILES): Add new object.
 	* libc/string/strtok_r.c: New file.  strtok_r function as
- 	specified by POSIX.1c, adapted from strtok implementation 
+	specified by POSIX.1c, adapted from strtok implementation
 	from NetBSD C library.
-	* libc/string/strtok.c (strtok): Reimplemented in terms of 
+	* libc/string/strtok.c (strtok): Reimplemented in terms of
 	strtok_r.
 
 	* libc/time/Makefile.in (OFILES): Add new objects.
 	* libc/time/{asctime_r.c, ctime_r.c, gmtime_r.c, lcltime_r.c}:
 	New files, reentrant time functions specified by POSIX.1c.
 	* libc/time/{asctime.c, ctime.c, gmtime.c, lcltime.c}: Non-
-	reentrant time functions re-written in terms of reentrant 
+	reentrant time functions re-written in terms of reentrant
 	functions.
 	* libc/time/lcltime.c: Renamed from localtime.c
 
@@ -13742,7 +13747,7 @@ Wed Oct 25 15:43:18 1995  Michael Meissner  <meissner@cygnus.com>
 	* libc/include/machine/setjmp.h (PowerPC _JBLEN): Consider it a
 	PowerPC if __PPC__ is defined.  Bump jump_buf length to 62 ints,
 	to give some room in case we need to align the jmp_buf.
-	
+
 	* libc/machine/powerpc/setjmp.S (setjmp, longjmp): Rewrite to use
 	the new ppc-asm.h include file the compiler provides to specify
 	function prologue/epilogue.  Eliminate saves of the xer and ctr
@@ -13752,10 +13757,10 @@ Wed Oct 25 15:43:18 1995  Michael Meissner  <meissner@cygnus.com>
 Mon Oct 23 11:20:51 1995  James G. Smith  <jsmith@pasanda.cygnus.co.uk>
 
 	* libc/sys/vr4300/syscalls.c: Added empty kill() function,
- 	referenced by standard libraries.
+	referenced by standard libraries.
 
 Thu Oct 19 21:39:47 1995  Fred Fish  <fnf@cygnus.com>
-	
+
 	* libc/unix/Makefile.in, libc/string/Makefile.in,
 	libc/stdio/Makefile.in, libc/reent/Makefile.in,
 	libc/posix/Makefile.in:
@@ -13802,16 +13807,16 @@ Sat Oct 14 12:55:08 1995  Jim Wilson  <wilson@chestnut.cygnus.com>
 Thu Oct 12 11:39:42 1995  J.T. Conklin  <jtc@rtl.cygnus.com>
 
 	* libc/stdlib/dtoa.c (_dtoa_r): Set result pointer to the
- 	address of the Bigint instead of the address of its _x field,
- 	as the size the result buffer was calculated accordingly.  
+	address of the Bigint instead of the address of its _x field,
+	as the size the result buffer was calculated accordingly.
 	Fix from Jim Wilson <wilson@chestnut@cygnus.com>.
 
 	* libc/stdlib/{div.c, ldiv.c}: Replaced with implementation
-	from NetBSD C library.  No longer special cases division by 
+	from NetBSD C library.  No longer special cases division by
 	zero (which needs to be done by the application anyway), but
 	it doesn't need to call abs() (or labs()) four times either.
-	
-	* libc/stdlib/qsort.c: Replaced with implementation from 
+
+	* libc/stdlib/qsort.c: Replaced with implementation from
 	NetBSD C library.
 
 Tue Oct 10 14:01:10 1995  J.T. Conklin  <jtc@rtl.cygnus.com>
@@ -13820,7 +13825,7 @@ Tue Oct 10 14:01:10 1995  J.T. Conklin  <jtc@rtl.cygnus.com>
         NetBSD C library (which is derived from the 4.4BSD C library).
 	* libc/stdio/cvt.c: Removed.
 	* libc/stdio/Makefile: Updated.
-	
+
 Tue Oct 10 12:15:23 1995  steve chamberlain  <sac@slash.cygnus.com>
 
 	* libc/sys/win32/syscalls.c (rename): New.
@@ -13840,7 +13845,7 @@ Fri Oct  6 11:19:05 1995  J.T. Conklin  <jtc@rtl.cygnus.com>
 	* libc/stdlib/mprec.c (d2b): Added support for _DOUBLE_IS_32BITS.
 	* libc/stdlib/mprec.h: Fixed constants used for IEEE single float
 	format.  Added #defines to map d2b, i2b, low0bits, lshift, mult,
- 	pow5mult and s2b to identifiers with leading underscores.
+	pow5mult and s2b to identifiers with leading underscores.
 	* libc/stdlib/Makefile.in: Add mprec.h as a dependency to dtoa.o,
 	ecvtbuf.o, mprec.o and strtod.o.  Sort dependencies.
 
@@ -14085,7 +14090,7 @@ Mon Sep 11 23:09:39 1995  Jason Molenda  (crash@phydeaux.cygnus.com)
 	* libc/sys/win32/crt0.c (passover): fix up the state table.
 	* libc/posix/popen.c: Added.
 	* libc/posix/Makefile.in: compile popen.c.
-	
+
 Mon Sep 11 11:43:38 1995  J.T. Conklin  <jtc@cygnus.com>
 
 	* libc/include/machine/ieeefp.h: On the h8/300, h8/300h and
@@ -14124,7 +14129,7 @@ Sat Sep  9 17:55:54 1995  Doug Evans  <dje@canuck.cygnus.com>
 	and `exit_code'.
 	* libc/sys/win32/spawn.c (allocate_spawn_entry): Initialize them.
 	(vfork0): Likewise.  Distinguish children, grandchildren, etc. by
-	adding vfork level to pseudo-pid.  
+	adding vfork level to pseudo-pid.
 	(vfork1): If not root, set state back to FORK_STATE_VFORK_0.
 	(spawnvp, spawnv, _execve): Set handle_valid_p if success.
 	(_exit): If child, set exit code.
@@ -14179,7 +14184,7 @@ Wed Sep  6 16:52:48 1995  steve chamberlain  <sac@slash.cygnus.com>
 	* libc/include/sys/reent.h (__need_MAX_SIGNALS): Removed.
 	* libc/include/machine/setjmp.h: Get win32 _JBLEN right.
 	* libc/signal/signal.c (_signal_r): Changed from using
-	_MAX_SIGNALS to NSIG.  
+	_MAX_SIGNALS to NSIG.
 	* libc/sys/win32/crt0.c (__current_pid, __parent_hmap, __child_hmap,
 	 __hmap): Deleted.
 	(__strace, __vfork_next_pid): New.
@@ -14237,11 +14242,11 @@ Tue Sep  5 13:47:27 1995  J.T. Conklin  <jtc@rtl.cygnus.com>
 	On the sh, define either __IEEE_BIG_ENDIAN or __IEEE_LITTLE_ENDIAN
 	depending on the value of __LITTLE_ENDIAN__.
 	On the sh3e, define _DOUBLE_IS_32BITS.
-	
+
 Fri Sep  1 15:35:18 1995  James G. Smith  <jsmith@beauty.cygnus.com>
 
 	* libc/sys/vr4300/syscalls.c: Added missing support
- 	routines. _raise() and getpid().
+	routines. _raise() and getpid().
 
 Fri Sep  1 14:12:48 1995  James G. Smith  <jsmith@rtl.cygnus.com>
 
@@ -14253,7 +14258,7 @@ Fri Sep  1 08:42:11 1995  James G. Smith  <jsmith@beauty.cygnus.com>
         and VR4300 processor.
 	* libc/sys/vr4300: Add directory.
 	* libc/sys/vr4300/{Makefile.in, crt0.S, syscalls.c}: Add SIM
- 	monitor run-time support.
+	monitor run-time support.
 
 Thu Aug 31 09:16:52 1995  J.T. Conklin  <jtc@rtl.cygnus.com>
 
@@ -14500,7 +14505,7 @@ Sat Aug 12 11:08:00 1995  steve chamberlain  <sac@slash.cygnus.com>
 	* libc/sys/win32/syscalls.c (__sys_printf): Moved into strace.c
 	(open.c): Default file type is text.
 	* libc/sys/win32/uname.c (uname): Use __small_sprintf.
-	* libc/sys/win32/advapi32.def: New	
+	* libc/sys/win32/advapi32.def: New
 
 Fri Aug 11 17:11:52 1995  Doug Evans  <dje@canuck.cygnus.com>
 
@@ -14583,7 +14588,7 @@ Thu Aug 10 12:07:38 1995  J.T. Conklin  <jtc@rtl.cygnus.com>
 	since they were integrated into newlib in early 1992.  Fixes
 	problems with storage leaks and handling of numbers with very
 	negative exponents.
-	
+
 Wed Aug  9 14:18:39 1995  J.T. Conklin  <jtc@rtl.cygnus.com>
 
 	* Makefile.in (all): set rootpre and srcrootpre before calling
@@ -14621,7 +14626,7 @@ Wed Aug  2 16:46:27 1995  J.T. Conklin  <jtc@rtl.cygnus.com>
 
 	* libc/time/localtime.c (localtime): Fix problem with leap year
 	handling.  Stole algorithm from Arthur David Olson's tz code.
-	
+
 Mon Jul 31 10:21:54 1995  steve chamberlain  <sac@slash.cygnus.com>
 
 	* configure.in: (z8k-*sim): Renamed z8k-*-coff.
@@ -14647,7 +14652,7 @@ Mon Jul 24 11:42:07 1995  steve chamberlain  <sac@slash.cygnus.com>
 	* libc/sys/win32/crt0.c (mainCRTStartup):  Look for
 	ptrace with case insensitivity
 	* libc/sys/win32/{user32.def, gdi32.def, exceptions.c, screen.c,
-	sys/winbase.h, 	sys/windows.h, sys/wintypes.h, sys/winuser.h}:
+	sys/winbase.h,	sys/windows.h, sys/wintypes.h, sys/winuser.h}:
 	New files.
 
 Fri Jul 21 11:22:26 1995  Doug Evans  <dje@canuck.cygnus.com>
@@ -15115,7 +15120,7 @@ Wed Aug  3 05:39:41 1994  D. V. Henkel-Wallace  (gumby@cygnus.com)
 	it's only to support ecvt and fcvt, which aren't ANSI anyway.
 	* libc/stdlib/efgcvt.c (fcvt, ecvt) Use new functionality (and
 	therefore become reentrant).
-	
+
 	* libc/stdlib/dtoastub.c: remove spurious inclusion of mprec.h.
 
 Mon Aug  1 16:52:24 1994  Ian Lance Taylor  (ian@sanguine.cygnus.com)
@@ -15317,7 +15322,7 @@ Wed Mar  2 13:55:25 1994  Doug Evans  (dje@canuck.cygnus.com)
 Fri Feb 11 21:52:11 1994  Steve Chamberlain  (sac@sphagnum.cygnus.com)
 
 	* libc/sys/sh/syscalls.c (pipe, execv, wait, fork, utime, chown,
-	stat, chmod): New hooks. 
+	stat, chmod): New hooks.
 	(sbrk): Abort if stack and heap collide.
 	* libc/machine/sh/udivsi3, libc/machine/sh/sdivsi3 Modified to
 	shortcut when given small args.
@@ -15354,7 +15359,7 @@ Thu Jan 20 15:14:37 1994  Doug Evans  (dje@canuck.cygnus.com)
 Wed Jan 19 16:34:18 1994  Rob Savoye  (rob@darkstar.cygnus.com)
 
 	* stub/shared/m68k-crt0.S: Changed so it compiles (and runs) on a
-	stock m68000. 
+	stock m68000.
 
 Mon Jan 17 15:41:53 1994  Doug Evans  (dje@canuck.cygnus.com)
 
@@ -15411,7 +15416,7 @@ Fri Nov 12 20:25:28 1993  Mark Eichin  (eichin@cygnus.com)
 	* libc/sys/a29khif/_tmpnam.s (_tmpnam): renamed function to
 	_khif_tmpnam, because it doesn't comply with ANSI but may be
 	useful anyway. Real tmpnam was already in libc/stdio, and was
-	colliding with this one (pr 2176.) 
+	colliding with this one (pr 2176.)
 	* libc/sys/a29khif/stubs.s (tmpnam): removed tmpnam. This file is
 	the wrong idea anyhow.
 
@@ -15674,9 +15679,9 @@ Mon Jul 26 17:08:11 1993  K. Richard Pixley  (rich@sendai.cygnus.com)
 
 Sun Jul 25 17:51:51 MDT 1993  Jeffrey Wheat  (cassidy@cygnus.com)
 
-	* testsuite/lib/libm.exp: 
-		added code to support compiling and linking of tests for 
-		libm.sac (paranoia to be added next) and processing the 
+	* testsuite/lib/libm.exp:
+		added code to support compiling and linking of tests for
+		libm.sac (paranoia to be added next) and processing the
 		pass or failure of the tests.
 
 	* testsuite/config/unix-libm.exp:
@@ -15684,7 +15689,7 @@ Sun Jul 25 17:51:51 MDT 1993  Jeffrey Wheat  (cassidy@cygnus.com)
 		and the way we execute and process the test results.
 
 	* testsuite/libm.sac/execute.exp:
-		generic framework for the sac tests. the config and lib 
+		generic framework for the sac tests. the config and lib
 		expect code for specific platforms tie it all together.
 
 	* testsuite/libm.sac/test_is.c:
@@ -16017,7 +16022,7 @@ Fri May 21 22:09:32 1993  Roland H. Pesch  (pesch@fowanton.cygnus.com)
 	* default.menu, no-signal.menu: delete.
 
 	* Makefile.in, libc/Makefile.in, configure.in, host/any: simplify
-	method used to adjust doc for missing "signals" chapter when 
+	method used to adjust doc for missing "signals" chapter when
 	signal_dir is empty.
 
 Thu May 20 21:38:37 MDT 1993  Jeffrey Wheat  (cassidy@cygnus.com)
@@ -16144,7 +16149,7 @@ Sat Apr  3 11:06:07 1993  Doug Evans  (dje@canuck.cygnus.com)
 	* libc/include/{errno.h, math.h, stdio.h, stdlib.h}: Use
 	sys/reent.h instead of reent.h.
 	* libc/include/reent.h: Split into two parts: stuff needed by ANSI
-	headers moved to sys/reent.h.  
+	headers moved to sys/reent.h.
 	* libc/include/signal.h: _MAX_SIGNALS moved to sys/signal.h.
 	* libc/include/sys/signal.h: Define _MAX_SIGNALS if
 	__need__MAX_SIGNALS defined.
@@ -16355,7 +16360,7 @@ Tue Mar 16 15:11:08 1993  Ian Lance Taylor  (ian@cygnus.com)
 	(FLAGS_TO_PASS): Don't pass down LD (it's not used).
 	(libc.a, libm.a): Depend on targ-include.
 	* host/any (LD): Don't define.
-	(INCLUDES): Use targ-include.	
+	(INCLUDES): Use targ-include.
 	* stub/Makefile.in (MAKEOVERRIDES): Define to be empty.
 	(FLAGS_TO_PASS): Don't pass down LD (it's not used).
 	* libc/Makefile.in: Use $(MAKE) rather than make.
@@ -16418,7 +16423,7 @@ Fri Mar 12 09:46:54 1993  Ian Lance Taylor  (ian@cygnus.com)
 	libc/reent/execr.c, libc/reent/filer.c, libc/reent/fstatr.c,
 	libc/reent/linkr.c, libc/reent/sbrkr.c, libc/reent/statr.c: New
 	files.
-	
+
 	* Added many new reentrant functions to libm/math/*.
 	libm/math/error.c (__matherror): Added reent_struct pointer
 	argument. Changed all callers.
@@ -16517,8 +16522,8 @@ Fri Feb 12 12:50:06 1993  Ian Lance Taylor  (ian@cygnus.com)
 
 	* Makefile.in (FLAGS_TO_PASS): Put INSTALL back in.
 	(info): Split long shell command in half.
- 	* libc/Makefile.in (info, targetdep.tex): Don't pass everything to
-	sub-makes, just CHEW and TARGETDOC. 
+	* libc/Makefile.in (info, targetdep.tex): Don't pass everything to
+	sub-makes, just CHEW and TARGETDOC.
 	(targetdep.tex): Removed now special handling of sys and machine
 	subdirectories, made obsolete some time ago.
 	* libc/machine/Makefile.in (doc): Don't pass everything to
@@ -16862,7 +16867,7 @@ Tue Sep  1 15:21:14 1992  Ian Lance Taylor  (ian@cygnus.com)
 
 	* libc/configure.in: cleaned up somewhat; switch on ${target}
 	rather than ${target_alias}.
- 	* libm/configure.in: cleaned up somewhat; switch on ${target}
+	* libm/configure.in: cleaned up somewhat; switch on ${target}
 	rather than ${target_alias}.
 
 	* libc/ctype/ctype_.c: marked _ctype_ array _CONST.
@@ -17120,7 +17125,7 @@ Mon Apr 13 09:12:58 1992  Steve Chamberlain  (sac@thepub.cygnus.com)
 	libc/stdlib/labs.c, libc/stdlib/malloc.c: new documentation
 	* libc/stdlib/efgcvt.c: rewritten to use new _dcvt routines rather
 	than sprintf.
-	* libc/stdio/dcvt.c: rewritten to make more useful elsewhere. 
+	* libc/stdio/dcvt.c: rewritten to make more useful elsewhere.
 	* Method of producting float versions of double functions has
 	changed, functions will be modified gradually. So far:
 	libm/math/exp.c, libm/math/pow.c, libm/math/modf.c,
