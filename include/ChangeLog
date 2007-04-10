@@ -1,3 +1,7 @@
+2007-04-10  Richard Henderson  <rth@redhat.com>
+
+	* bfdlink.h (struct bfd_link_info): Add relax_trip.
+
 2007-03-29  Joel Brobecker  <brobecker@adacore.com>
 
 	* filenames.h (FILENAME_CMP): Adjust define to call filename_cmp
