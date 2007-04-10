@@ -1,3 +1,8 @@
+2007-04-10  Eric Blake  <ebb9@byu.net>
+
+	* libc/include/stdio.h (_ELIDABLE_INLINE): Work even when using
+	CFLAGS=-O0.
+
 2007-04-09  Eric Blake  <ebb9@byu.net>
 
 	* libc/include/stdio.h: Add gcc format attributes to printf and

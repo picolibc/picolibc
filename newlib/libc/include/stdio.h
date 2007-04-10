@@ -506,7 +506,7 @@ FILE	*_EXFUN(funopen,(const _PTR _cookie,
   'extern inline'.  */
 #if defined(__GNUC__) && !defined(__GNUC_STDC_INLINE__)
 /* We're using GCC, but without the new C99-compatible behaviour.  */
-#define _ELIDABLE_INLINE extern __inline__
+#define _ELIDABLE_INLINE extern __inline__ _ATTRIBUTE ((__always_inline__))
 #else
 /* We're using GCC in C99 mode, or an unknown compiler which 
   we just have to hope obeys the C99 semantics of inline.  */
