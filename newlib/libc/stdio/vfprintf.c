@@ -876,7 +876,7 @@ reswitch:	switch (ch) {
 			if (isinf (_fpvalue)) {
 				if (_fpvalue < 0)
 					sign = '-';
-				if (ch == 'E' || ch == 'F' || ch == 'G')
+				if (ch <= 'G') /* 'E', 'F', or 'G' */
 					cp = "INF";
 				else
 					cp = "inf";
@@ -884,7 +884,7 @@ reswitch:	switch (ch) {
 				break;
 			}
 			if (isnan (_fpvalue)) {
-				if (ch == 'E' || ch == 'F' || ch == 'G')
+				if (ch <= 'G') /* 'E', 'F', or 'G' */
 					cp = "NAN";
 				else
 					cp = "nan";
@@ -905,7 +905,7 @@ reswitch:	switch (ch) {
 			if (tmp == 2) {
 				if (_fpvalue < 0)
 					sign = '-';
-				if (ch == 'E' || ch == 'F' || ch == 'G')
+				if (ch <= 'G') /* 'E', 'F', or 'G' */
 					cp = "INF";
 				else
 					cp = "inf";
@@ -913,7 +913,7 @@ reswitch:	switch (ch) {
 				break;
 			}
 			if (tmp == 1) {
-				if (ch == 'E' || ch == 'F' || ch == 'G')
+				if (ch <= 'G') /* 'E', 'F', or 'G' */
 					cp = "NAN";
 				else
 					cp = "nan";
@@ -929,10 +929,12 @@ reswitch:	switch (ch) {
 
 			if (ch == 'g' || ch == 'G') {
 				if (expt <= -4 || expt > prec)
-					ch = (ch == 'g') ? 'e' : 'E';
+					ch -= 2; /* 'e' or 'E' */
 				else
 					ch = 'g';
-			} 
+			}
+			else if (ch == 'F')
+				ch = 'f';
 			if (ch <= 'e') {	/* 'e' or 'E' fmt */
 				--expt;
 				expsize = exponent (expstr, expt, ch);
@@ -1187,6 +1189,7 @@ number:			if ((dprec = prec) >= 0)
 		 * required by a decimal [diouxX] precision, then print the
 		 * string proper, then emit zeroes required by any leftover
 		 * floating precision; finally, if LADJUST, pad with blanks.
+		 * If flags&FPT, ch must be in [eEfg].
 		 *
 		 * Compute actual size, so we know how much to pad.
 		 * size excludes decimal prec; realsz includes it.
@@ -1338,7 +1341,7 @@ _DEFUN(cvt, (data, value, ndigits, flags, sign, decpt, ch, length),
 	} ld;
 #endif
 
-	if (ch == 'f') {
+	if (ch == 'f' || ch == 'F') {
 		mode = 3;		/* ndigits after the decimal point */
 	} else {
 		/* To obtain ndigits after the decimal point for the 'e' 
@@ -1374,7 +1377,7 @@ _DEFUN(cvt, (data, value, ndigits, flags, sign, decpt, ch, length),
 
 	if ((ch != 'g' && ch != 'G') || flags & ALT) {	/* Print trailing zeros */
 		bp = digits + ndigits;
-		if (ch == 'f') {
+		if (ch == 'f' || ch == 'F') {
 			if (*digits == '0' && value)
 				*decpt = -ndigits + 1;
 			bp += *decpt;
@@ -1505,12 +1508,12 @@ _CONST static CH_CLASS chclass[256] = {
   /* 28-2f */  OTHER,   OTHER,   STAR,    FLAG,    OTHER,   FLAG,    DOT,     OTHER,
   /* 30-37 */  ZERO,    DIGIT,   DIGIT,   DIGIT,   DIGIT,   DIGIT,   DIGIT,   DIGIT,
   /* 38-3f */  DIGIT,   DIGIT,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* 40-47 */  OTHER,   OTHER,   OTHER,   SPEC,    SPEC,    SPEC,    OTHER,   SPEC, 
+  /* 40-47 */  OTHER,   OTHER,   OTHER,   SPEC,    SPEC,    SPEC,    SPEC,    SPEC,
   /* 48-4f */  OTHER,   OTHER,   OTHER,   OTHER,   MODFR,   OTHER,   OTHER,   SPEC, 
-  /* 50-57 */  OTHER,   OTHER,   OTHER,   SPEC,    OTHER,   SPEC,    OTHER,   SPEC, 
-  /* 58-5f */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* 50-57 */  OTHER,   OTHER,   OTHER,   SPEC,    OTHER,   SPEC,    OTHER,   OTHER,
+  /* 58-5f */  SPEC,    OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
   /* 60-67 */  OTHER,   OTHER,   OTHER,   SPEC,    SPEC,    SPEC,    SPEC,    SPEC, 
-  /* 68-6f */  MODFR,   SPEC,    MODFR,   OTHER,   MODFR,   OTHER,   OTHER,   SPEC, 
+  /* 68-6f */  MODFR,   SPEC,    MODFR,   OTHER,   MODFR,   OTHER,   SPEC,    SPEC,
   /* 70-77 */  SPEC,    MODFR,   OTHER,   SPEC,    MODFR,   SPEC,    OTHER,   OTHER,
   /* 78-7f */  SPEC,    OTHER,   MODFR,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
   /* 80-87 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
@@ -1735,6 +1738,7 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		    spec_type = LONG_INT;
 		    break;
 		  case 'f':
+		  case 'F':
 		  case 'g':
 		  case 'G':
 		  case 'E':
@@ -1749,6 +1753,7 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		  case 's':
 		  case 'S':
 		  case 'p':
+		  case 'n':
 		    spec_type = CHAR_PTR;
 		    break;
 		  case 'c':
