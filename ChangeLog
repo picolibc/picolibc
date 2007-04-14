@@ -1,3 +1,7 @@
+2007-04-14  Steve Ellcey  <sje@cup.hp.com>
+
+	* config-ml.in: Update from GCC.
+
 2007-04-09  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* src-release (do-proto-toplev): Process the support directories before
