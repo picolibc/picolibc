@@ -1,3 +1,8 @@
+2007-04-15  Piotr Wyderski  <piotr.wyderski@wp.pl>
+
+	* include/winbase.h (SetInformationJobObject, QueryInformationJobObject):
+	Define.
+
 2007-03-30  Brian Dessent  <brian@dessent.net>
 
 	* lib/kernel32.def (CreateMemoryResourceNotification@4): Define.
