@@ -109,6 +109,7 @@ Supporting OS subroutines required:
 #include <wctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <limits.h>
 #include <wchar.h>
 #include <string.h>
@@ -379,6 +380,43 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	    }
 	  else
 	    flags |= SHORT;
+	  goto again;
+        case 'j':               /* intmax_t */
+	  if (sizeof (intmax_t) == sizeof (long))
+	    flags |= LONG;
+	  else
+	    flags |= LONGDBL;
+	  goto again;
+        case 't':               /* ptrdiff_t */
+	  if (sizeof (ptrdiff_t) < sizeof (int))
+	    /* POSIX states ptrdiff_t is 16 or more bits, as
+	       is short.  */
+	    flags |= SHORT;
+	  else if (sizeof (ptrdiff_t) == sizeof (int))
+	    /* no flag needed */;
+	  else if (sizeof (ptrdiff_t) <= sizeof (long))
+	    flags |= LONG;
+	  else
+	    /* POSIX states that at least one programming
+	       environment must support ptrdiff_t no wider than
+	       long, but that means other environments can
+	       have ptrdiff_t as wide as long long.  */
+	    flags |= LONGDBL;
+	  goto again;
+        case 'z':               /* size_t */
+	  if (sizeof (size_t) < sizeof (int))
+	    /* POSIX states size_t is 16 or more bits, as is short.  */
+	    flags |= SHORT;
+	  else if (sizeof (size_t) == sizeof (int))
+	    /* no flag needed */;
+	  else if (sizeof (size_t) <= sizeof (long))
+	    flags |= LONG;
+	  else
+	    /* POSIX states that at least one programming
+	       environment must support size_t no wider than
+	       long, but that means other environments can
+	       have size_t as wide as long long.  */
+	    flags |= LONGDBL;
 	  goto again;
 
 	case '0':
