@@ -138,6 +138,5 @@ SECTIONS
   .debug_str      ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_str) }
   .debug_loc      ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_loc) }
   .debug_macinfo  ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_macinfo) }
-  .debug_macinfo  ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_macinfo) }
   .debug_ranges   ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_ranges) }
 }

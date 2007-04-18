@@ -16,7 +16,10 @@ my $objdump = shift;
 my @objcopy = ((shift));
 my $dll = shift;
 my $dbg = shift;
-xit 0, @objcopy, '-j', '.stab', '-j', '.stabstr', $dll, $dbg;
+xit 0, @objcopy, '-j', '.stab', '-j', '.stabstr', '-j', '.debug_aranges',
+       '-j', '.debug_pubnames', '-j', '.debug_info', '-j', '.debug_abbrev',
+       '-j', '.debug_line', '-j', '.debug_frame', '-j', '.debug_str', '-j',
+       '.debug_loc', '-j', '.debug_macinfo', '-j', '.debug_ranges', $dll, $dbg;
 xit 0, @objcopy, '-g', '--add-gnu-debuglink=' . $dbg, $dll;
 open(OBJDUMP, '-|', "$objdump --headers $dll");
 my %section;
