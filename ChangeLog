@@ -1,3 +1,16 @@
+2007-04-20  Mark Shinwell  <shinwell@codesourcery.com>
+
+	* Makefile.in: Adjust dependencies of m68klinux-tdep.c.
+	* m68klinux-tdep.c (m68k_uclinux_sigcontext_reg_offset): New.
+	(m68k_linux_sigcontext_reg_offset): Fix typo.
+	(target_is_uclinux): New.
+	(m68k_linux_inferior_created): New.
+	(m68k_linux_get_sigtramp_info):  Check for uClinux or
+	normal Linux.  Use m68k_uclinux_sigcontext_reg_offset for
+	uClinux.
+	(_initialize_m68k_linux_tdep): Register
+	m68k_linux_inferior_created.
+
 2007-04-14  Steve Ellcey  <sje@cup.hp.com>
 
 	* config-ml.in: Update from GCC.
