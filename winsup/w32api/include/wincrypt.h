@@ -900,6 +900,17 @@ WINADVAPI BOOL WINAPI CryptSetProviderW(LPCWSTR,DWORD);
 #define MS_ENH_RSA_AES_PROV MS_ENH_RSA_AES_PROV_A
 #endif
 #endif
+/* from http://msdn2.microsoft.com/en-us/library/Aa380263.aspx: */
+typedef struct _CRYPTPROTECT_PROMPTSTRUCT {
+   DWORD cbSize;
+   DWORD dwPromptFlags;
+   HWND hwndApp;
+   LPCWSTR szPrompt;
+} CRYPTPROTECT_PROMPTSTRUCT, 
+*PCRYPTPROTECT_PROMPTSTRUCT;
+/* from http://msdn2.microsoft.com/en-us/library/aa302402.aspx: */
+#define CRYPTPROTECT_UI_FORBIDDEN 0x1
+#define CRYPTPROTECT_LOCAL_MACHINE 0x4
 #ifdef __cplusplus
 }
 #endif
