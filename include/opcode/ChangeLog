@@ -1,3 +1,10 @@
+2007-04-20  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h (struct powerpc_operand): Replace "bits" with "bitm".
+	(num_powerpc_operands): Declare.
+	(PPC_OPERAND_SIGNED et al): Redefine as hex.
+	(PPC_OPERAND_PLUS1): Define.
+
 2007-03-21  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* i386.h (REX_MODE64): Renamed to ...
