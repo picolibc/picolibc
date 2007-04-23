@@ -1,3 +1,18 @@
+2007-04-23  Ralf Wildenhues  <Ralf.Wildenhues <at> gmx.de>
+
+	* confsubdir.m4 (AC_CONFIG_SUBDIRS, _AC_OUTPUT_SUBDIRS): New
+	file.  Override Autoconf-2.59's version of these macros with
+	fixed handling of multiple adjacent whitespace in arguments.
+	* aclocal.m4: Regenerated forcefully.
+	* configure: Ditto.
+	* Makefile.in: Ditto.
+	* libc/*Makefile.in: Ditto.
+	* libc/*aclocal.m4: Ditto.
+	* libc/*configure: Ditto.
+	* libm/*Makefile.in: Ditto.
+	* libm/*aclocal.m4: Ditto.
+	* libm/*configure: Ditto.
+
 2007-04-23  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/arc/dummy.S: Dummy file to force .S.o suffix rule.
