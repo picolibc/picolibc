@@ -1235,7 +1235,7 @@ number:			if ((dprec = prec) >= 0)
 					}
 				} else if (expt <= 0) {
 					PRINT ("0", 1);
-					if(expt || ndig) {
+					if(expt || ndig || (flags & ALT)) {
 						PRINT (decimal_point, 1);
 						PAD (-expt, zeroes);
 						PRINT (cp, ndig);
