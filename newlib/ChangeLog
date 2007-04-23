@@ -1,3 +1,10 @@
+2007-04-23  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/arc/dummy.S: Dummy file to force .S.o suffix rule.
+	* libc/sys/arc/Makefile.am: Add dummy.S to EXTRA_lib_a_SOURCES
+	and set lib_a_CCASFLAGS so crto.o will use .S.o default suffix rule.
+	* libc/sys/arc/Makefile.in: Regenerated.
+
 2007-04-17  Brian Dessent  <brian@dessent.net>
 
 	* libc/stdio/sscanf.c: Update documentation comments.

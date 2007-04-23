@@ -9,6 +9,9 @@ AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
 
 lib_a_SOURCES = isatty.c mem-layout.c sbrk.c syscalls.c
+EXTRA_lib_a_SOURCES = dummy.S
+lib_a_CCASFLAGS = $(AM_CCASFLAGS)
+lib_a_CFLAGS = $(AM_CFLAGS)
 
 all: crt0.o
 
