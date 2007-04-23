@@ -41,9 +41,10 @@
 
 #define mcfisa_a 0x4000		/* ColdFire ISA_A.  */
 #define mcfisa_aa 0x8000	/* ColdFire ISA_A+.  */
-#define mcfisa_b 0x10000		/* ColdFire ISA_B.  */
-#define mcfusp   0x20000	/* ColdFire USP instructions.  */
-#define mcf_mask 0x3e400
+#define mcfisa_b 0x10000	/* ColdFire ISA_B.  */
+#define mcfisa_c 0x20000	/* ColdFire ISA_C.  */
+#define mcfusp   0x40000	/* ColdFire USP instructions.  */
+#define mcf_mask 0x7e400
 
 /* Handy aliases.  */
 #define	m68040up   (m68040 | m68060)

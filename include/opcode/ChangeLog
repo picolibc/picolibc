@@ -1,3 +1,8 @@
+2007-04-23  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* m68k.h (mcfisa_c): New.
+	(mcfusp, mcf_mask): Adjust.
+
 2007-04-20  Alan Modra  <amodra@bigpond.net.au>
 
 	* ppc.h (struct powerpc_operand): Replace "bits" with "bitm".
