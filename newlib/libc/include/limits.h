@@ -9,6 +9,11 @@
 #  define MB_LEN_MAX    1
 # endif
 
+/* Maximum number of positional arguments, if _WANT_IO_POS_ARGS.  */
+# ifndef NL_ARGMAX
+#  define NL_ARGMAX 32
+# endif
+
 /* if do not have #include_next support, then we
    have to define the limits here. */
 # if !defined __GNUC__ || __GNUC__ < 2
@@ -124,4 +129,3 @@
 /* `_GCC_LIMITS_H_' is what GCC's file defines.  */
 # include_next <limits.h>
 #endif /* __GNUC__ && !_GCC_LIMITS_H_ */
-

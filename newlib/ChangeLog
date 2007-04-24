@@ -1,3 +1,15 @@
+2007-04-24  Eric Blake  <ebb9@byu.net>
+
+	* libc/include/limits.h (NL_ARGMAX): Define a default value.
+	* libc/stdio/vfprintf.c (MAX_POS_ARGS): Define in terms of
+	NL_ARGMAX, if present.
+
+2007-04-23  Brian Dessent  <brian@dessent.net>
+
+	* libc/stdio/vfprintf.c (_vfprintf_r): When the alternate-form flag
+	has been specified with types 'f', 'F', 'g', or 'G', ensure the
+	trailing decimal is printed.
+
 2007-04-23  Ralf Wildenhues  <Ralf.Wildenhues <at> gmx.de>
 
 	* confsubdir.m4 (AC_CONFIG_SUBDIRS, _AC_OUTPUT_SUBDIRS): New

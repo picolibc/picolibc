@@ -320,7 +320,11 @@ typedef int  *   int_ptr_t;
 typedef short *  short_ptr_t;
 
 #ifndef _NO_POS_ARGS
-#define MAX_POS_ARGS 32
+# ifdef NL_ARGMAX
+#  define MAX_POS_ARGS NL_ARGMAX
+# else
+#  define MAX_POS_ARGS 32
+# endif
 
 union arg_val
 {
