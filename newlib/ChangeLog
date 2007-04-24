@@ -1,5 +1,8 @@
 2007-04-24  Eric Blake  <ebb9@byu.net>
 
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Avoid multibyte when not
+	_MB_CAPABLE.
+
 	* libc/include/limits.h (NL_ARGMAX): Define a default value.
 	* libc/stdio/vfprintf.c (MAX_POS_ARGS): Define in terms of
 	NL_ARGMAX, if present.

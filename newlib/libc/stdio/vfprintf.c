@@ -161,14 +161,14 @@ static char *rcsid = "$Id$";
 #include <newlib.h>
 
 #ifdef INTEGER_ONLY
-#define VFPRINTF vfiprintf
-#define _VFPRINTF_R _vfiprintf_r
+# define VFPRINTF vfiprintf
+# define _VFPRINTF_R _vfiprintf_r
 #else
-#define VFPRINTF vfprintf
-#define _VFPRINTF_R _vfprintf_r
-#ifndef NO_FLOATING_POINT
-#define FLOATING_POINT
-#endif
+# define VFPRINTF vfprintf
+# define _VFPRINTF_R _vfprintf_r
+# ifndef NO_FLOATING_POINT
+#  define FLOATING_POINT
+# endif
 #endif
 
 #define _NO_POS_ARGS 
@@ -821,18 +821,21 @@ reswitch:	switch (ch) {
 		case 'c':
 		case 'C':
 			cp = buf;
+#ifdef _MB_CAPABLE
 			if (ch == 'C' || (flags & LONGINT)) {
 				mbstate_t ps;
 
 				memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
-				if ((size = (int)_wcrtomb_r (data, cp, 
-				    	       (wchar_t)GET_ARG (N, ap, wint_t), 
-					        &ps)) == -1) {
+				if ((size = (int)_wcrtomb_r (data, cp,
+					       (wchar_t)GET_ARG (N, ap, wint_t),
+						&ps)) == -1) {
 					fp->_flags |= __SERR;
 					goto error; 
 				}
 			}
-			else {
+			else
+#endif /* _MB_CAPABLE */
+			{
 				*cp = GET_ARG (N, ap, int);
 				size = 1;
 			}
@@ -1010,18 +1013,19 @@ reswitch:	switch (ch) {
 				cp = "(null)";
 				size = 6;
 			}
+#ifdef _MB_CAPABLE
 			else if (ch == 'S' || (flags & LONGINT)) {
 				mbstate_t ps;
 				_CONST wchar_t *wcp;
- 
+
 				wcp = (_CONST wchar_t *)cp;
 				size = m = 0;
 				memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
- 
+
 				/* Count number of bytes needed for multibyte
 				   string that will be produced from widechar
 				   string.  */
-  				if (prec >= 0) {
+				if (prec >= 0) {
 					while (1) {
 						if (wcp[m] == L'\0')
 							break;
@@ -1066,6 +1070,7 @@ reswitch:	switch (ch) {
 				cp = malloc_buf;
 				cp[size] = '\0';
 			}
+#endif /* _MB_CAPABLE */
 			else if (prec >= 0) {
 				/*
 				 * can't use strlen; can only look for the
