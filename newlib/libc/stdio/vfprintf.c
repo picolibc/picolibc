@@ -879,7 +879,12 @@ reswitch:	switch (ch) {
 				_fpvalue = GET_ARG (N, ap, double);
 			}
 
-			/* do this before tricky precision changes */
+			/* do this before tricky precision changes
+
+			   If the output is infinite or NaN, leading
+			   zeros are not permitted.  Otherwise, scanf
+			   could not read what printf wrote.
+			 */
 			if (isinf (_fpvalue)) {
 				if (_fpvalue < 0)
 					sign = '-';
@@ -888,6 +893,7 @@ reswitch:	switch (ch) {
 				else
 					cp = "inf";
 				size = 3;
+				flags &= ~ZEROPAD;
 				break;
 			}
 			if (isnan (_fpvalue)) {
@@ -896,11 +902,12 @@ reswitch:	switch (ch) {
 				else
 					cp = "nan";
 				size = 3;
+				flags &= ~ZEROPAD;
 				break;
 			}
 
 #else /* !_NO_LONGDBL */
-			
+
 			if (flags & LONGDBL) {
 				_fpvalue = GET_ARG (N, ap, _LONG_DOUBLE);
 			} else {
@@ -917,6 +924,7 @@ reswitch:	switch (ch) {
 				else
 					cp = "inf";
 				size = 3;
+				flags &= ~ZEROPAD;
 				break;
 			}
 			if (tmp == 1) {
@@ -925,6 +933,7 @@ reswitch:	switch (ch) {
 				else
 					cp = "nan";
 				size = 3;
+				flags &= ~ZEROPAD;
 				break;
 			}
 #endif /* !_NO_LONGDBL */

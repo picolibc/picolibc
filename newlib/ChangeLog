@@ -1,5 +1,8 @@
 2007-04-24  Eric Blake  <ebb9@byu.net>
 
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Don't zero pad on infinity
+	or NaN with %05f.
+
 	* libc/stdio/vfprintf.c (_VFPRINTF_R): Avoid multibyte when not
 	_MB_CAPABLE.
 
