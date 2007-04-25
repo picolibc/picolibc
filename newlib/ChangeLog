@@ -1,3 +1,10 @@
+2007-04-25  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libm/common/s_fpclassify.c (__fpclassifyf): Move this to...
+	* libm/common/sf_fpclassify.c: ...here.  New file.
+	* libm/common/Makefile.am: Add sf_fpclassify.c.
+	* libm/common/Makefile.in: Regenerated.
+
 2007-04-25  Patrick Mansfield <patmans@us.ibm.com>
 
 	* libc/machine/spu/sys/errno.h: New file, so spu errno values match

@@ -18,7 +18,7 @@ fsrc =	sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c \
 	sf_infinity.c sf_isinf.c sf_isinff.c sf_isnan.c sf_isnanf.c \
 	sf_log1p.c sf_nan.c sf_nextafter.c \
 	sf_rint.c sf_logb.c \
-	sf_fdim.c sf_fma.c sf_fmax.c sf_fmin.c sf_lrint.c \
+	sf_fdim.c sf_fma.c sf_fmax.c sf_fmin.c sf_fpclassify.c sf_lrint.c \
 	sf_lround.c sf_nearbyint.c sf_remquo.c sf_round.c \
 	sf_scalbln.c sf_trunc.c
 

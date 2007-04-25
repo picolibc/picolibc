@@ -80,10 +80,11 @@ am__objects_2 = lib_a-sf_finite.$(OBJEXT) lib_a-sf_copysign.$(OBJEXT) \
 	lib_a-sf_nextafter.$(OBJEXT) lib_a-sf_rint.$(OBJEXT) \
 	lib_a-sf_logb.$(OBJEXT) lib_a-sf_fdim.$(OBJEXT) \
 	lib_a-sf_fma.$(OBJEXT) lib_a-sf_fmax.$(OBJEXT) \
-	lib_a-sf_fmin.$(OBJEXT) lib_a-sf_lrint.$(OBJEXT) \
-	lib_a-sf_lround.$(OBJEXT) lib_a-sf_nearbyint.$(OBJEXT) \
-	lib_a-sf_remquo.$(OBJEXT) lib_a-sf_round.$(OBJEXT) \
-	lib_a-sf_scalbln.$(OBJEXT) lib_a-sf_trunc.$(OBJEXT)
+	lib_a-sf_fmin.$(OBJEXT) lib_a-sf_fpclassify.$(OBJEXT) \
+	lib_a-sf_lrint.$(OBJEXT) lib_a-sf_lround.$(OBJEXT) \
+	lib_a-sf_nearbyint.$(OBJEXT) lib_a-sf_remquo.$(OBJEXT) \
+	lib_a-sf_round.$(OBJEXT) lib_a-sf_scalbln.$(OBJEXT) \
+	lib_a-sf_trunc.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
 @USE_LIBTOOL_FALSE@	$(am__objects_2)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
@@ -100,8 +101,9 @@ am__objects_4 = sf_finite.lo sf_copysign.lo sf_modf.lo sf_scalbn.lo \
 	sf_cbrt.lo sf_expm1.lo sf_ilogb.lo sf_infinity.lo sf_isinf.lo \
 	sf_isinff.lo sf_isnan.lo sf_isnanf.lo sf_log1p.lo sf_nan.lo \
 	sf_nextafter.lo sf_rint.lo sf_logb.lo sf_fdim.lo sf_fma.lo \
-	sf_fmax.lo sf_fmin.lo sf_lrint.lo sf_lround.lo sf_nearbyint.lo \
-	sf_remquo.lo sf_round.lo sf_scalbln.lo sf_trunc.lo
+	sf_fmax.lo sf_fmin.lo sf_fpclassify.lo sf_lrint.lo \
+	sf_lround.lo sf_nearbyint.lo sf_remquo.lo sf_round.lo \
+	sf_scalbln.lo sf_trunc.lo
 @USE_LIBTOOL_TRUE@am_libcommon_la_OBJECTS = $(am__objects_3) \
 @USE_LIBTOOL_TRUE@	$(am__objects_4)
 libcommon_la_OBJECTS = $(am_libcommon_la_OBJECTS)
@@ -255,7 +257,7 @@ fsrc = sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c \
 	sf_infinity.c sf_isinf.c sf_isinff.c sf_isnan.c sf_isnanf.c \
 	sf_log1p.c sf_nan.c sf_nextafter.c \
 	sf_rint.c sf_logb.c \
-	sf_fdim.c sf_fma.c sf_fmax.c sf_fmin.c sf_lrint.c \
+	sf_fdim.c sf_fma.c sf_fmax.c sf_fmin.c sf_fpclassify.c sf_lrint.c \
 	sf_lround.c sf_nearbyint.c sf_remquo.c sf_round.c \
 	sf_scalbln.c sf_trunc.c
 
@@ -665,6 +667,12 @@ lib_a-sf_fmin.o: sf_fmin.c
 
 lib_a-sf_fmin.obj: sf_fmin.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fmin.obj `if test -f 'sf_fmin.c'; then $(CYGPATH_W) 'sf_fmin.c'; else $(CYGPATH_W) '$(srcdir)/sf_fmin.c'; fi`
+
+lib_a-sf_fpclassify.o: sf_fpclassify.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fpclassify.o `test -f 'sf_fpclassify.c' || echo '$(srcdir)/'`sf_fpclassify.c
+
+lib_a-sf_fpclassify.obj: sf_fpclassify.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fpclassify.obj `if test -f 'sf_fpclassify.c'; then $(CYGPATH_W) 'sf_fpclassify.c'; else $(CYGPATH_W) '$(srcdir)/sf_fpclassify.c'; fi`
 
 lib_a-sf_lrint.o: sf_lrint.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_lrint.o `test -f 'sf_lrint.c' || echo '$(srcdir)/'`sf_lrint.c
