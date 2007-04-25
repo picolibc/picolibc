@@ -44,7 +44,7 @@ static __inline int _feholdexcept(fenv_t *envp)
 
   fpscr = spu_mffpscr();
   *envp = __pack_fpscr(fpscr);
-  env = env & ~FE_ALL_EXCEPT;
+  env = *envp & ~FE_ALL_EXCEPT;
   spu_mtfpscr(__unpack_fpscr(env));
   return (0);
 }
