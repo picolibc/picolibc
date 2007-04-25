@@ -1,3 +1,9 @@
+2007-04-25  Patrick Mansfield <patmans@us.ibm.com>
+
+	* libc/machine/spu/sys/errno.h: New file, so spu errno values match
+	ppu linux values. This file is a copy of the cris/sys/errno.h plus
+	a few changes (see spu errno.h comments).
+
 2007-04-25  Eric Blake  <ebb9@byu.net>
 
 	* libc/stdio/vfprintf.c (get_arg): Support %1$lc.  Simplify types
