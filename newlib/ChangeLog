@@ -1,3 +1,8 @@
+2007-04-25  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/vfprintf.c (get_arg): Support %1$lc.  Simplify types
+	that promote to int.
+
 2007-04-25  Patrick Mansfield <patmans@us.ibm.com>
 
 	* libm/machine/spu/headers/feholdexcept.h: Use *envp not env so 

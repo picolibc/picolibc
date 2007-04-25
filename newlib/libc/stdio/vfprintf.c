@@ -1603,7 +1603,8 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
   ACTION action;
   int pos, last_arg;
   int max_pos_arg = n;
-  enum types { INT, LONG_INT, SHORT_INT, CHAR_INT, QUAD_INT, CHAR, CHAR_PTR, DOUBLE, LONG_DOUBLE, WIDE_CHAR };
+  /* Only need types that can be reached via vararg promotions.  */
+  enum types { INT, LONG_INT, QUAD_INT, CHAR_PTR, DOUBLE, LONG_DOUBLE, WIDE_CHAR };
 #ifdef _MB_CAPABLE
   wchar_t wc;
   mbstate_t wc_state;
@@ -1662,13 +1663,7 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 	      switch (ch)
 		{
 		case 'h':
-		  if (*fmt == 'h')
-		    {
-		      flags |= CHARINT;
-		      ++fmt;
-		    }
-		  else
-		    flags |= SHORTINT;
+                  /* No flag needed, since short and char promote to int.  */
 		  break;
 		case 'L':
 		  flags |= LONGDBL;
@@ -1683,10 +1678,7 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		    flags |= QUADINT;
 		  break;
 		case 'z':
-		  if (sizeof (size_t) < sizeof (int))
-		    /* POSIX states size_t is 16 or more bits, as is short.  */
-		    flags |= SHORTINT;
-		  else if (sizeof (size_t) == sizeof (int))
+		  if (sizeof (size_t) <= sizeof (int))
 		    /* no flag needed */;
 		  else if (sizeof (size_t) <= sizeof (long))
 		    flags |= LONGINT;
@@ -1698,11 +1690,7 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		    flags |= QUADINT;
 		  break;
 		case 't':
-		  if (sizeof (ptrdiff_t) < sizeof (int))
-		    /* POSIX states ptrdiff_t is 16 or more bits, as
-		       is short.  */
-		    flags |= SHORTINT;
-		  else if (sizeof (ptrdiff_t) == sizeof (int))
+		  if (sizeof (ptrdiff_t) <= sizeof (int))
 		    /* no flag needed */;
 		  else if (sizeof (ptrdiff_t) <= sizeof (long))
 		    flags |= LONGINT;
@@ -1739,10 +1727,6 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		  case 'u':
 		    if (flags & LONGINT)
 		      spec_type = LONG_INT;
-		    else if (flags & SHORTINT)
-		      spec_type = SHORT_INT;
-		    else if (flags & CHARINT)
-		      spec_type = CHAR_INT;
 #ifndef _NO_LONGLONG
 		    else if (flags & QUADINT)
 		      spec_type = QUAD_INT;
@@ -1775,7 +1759,10 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		    spec_type = CHAR_PTR;
 		    break;
 		  case 'c':
-		    spec_type = CHAR;
+		    if (flags & LONGINT)
+		      spec_type = WIDE_CHAR;
+		    else
+		      spec_type = INT;
 		    break;
 		  case 'C':
 		    spec_type = WIDE_CHAR;
@@ -1799,9 +1786,6 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		      case WIDE_CHAR:
 			args[numargs++].val_wint_t = va_arg (*ap, wint_t);
 			break;
-		      case CHAR:
-		      case CHAR_INT:
-		      case SHORT_INT:
 		      case INT:
 			args[numargs++].val_int = va_arg (*ap, int);
 			break;
@@ -1886,9 +1870,6 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 	  args[numargs++].val_wint_t = va_arg (*ap, wint_t);
 	  break;
 	case INT:
-	case CHAR_INT:
-	case SHORT_INT:
-	case CHAR:
 	default:
 	  args[numargs++].val_int = va_arg (*ap, int);
 	  break;
