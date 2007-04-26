@@ -75,8 +75,27 @@
 
 #ifdef __SPU__
 #define __IEEE_BIG_ENDIAN
-#endif
 
+#define isfinite(y) \
+          (__extension__ ({__typeof__(y) __y = (y); \
+                           (sizeof (__y) == sizeof (float))  ? (1) : \
+                           fpclassify(__y) != FP_INFINITE && fpclassify(__y) != FP_NAN;}))
+#define isinf(x) \
+          (__extension__ ({__typeof__(x) __x = (x); \
+                           (sizeof (__x) == sizeof (float))  ? (0) : __isinfd(__x);}))
+#define isnan(x) \
+          (__extension__ ({__typeof__(x) __x = (x); \
+                           (sizeof (__x) == sizeof (float))  ? (0) : __isnand(__x);}))
+
+/*
+ * Macros for use in ieeefp.h. We can't just define the real ones here
+ * (like those above) as we have name space issues when this is *not*
+ * included via generic the ieeefp.h.
+ */
+#define __ieeefp_isnanf(x)	0
+#define __ieeefp_isinff(x)	0
+#define __ieeefp_finitef(x)	1
+#endif
 
 #ifdef __sparc__
 #ifdef __LITTLE_ENDIAN_DATA__

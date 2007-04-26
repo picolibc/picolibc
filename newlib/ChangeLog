@@ -1,3 +1,21 @@
+2007-04-26  Patrick Mansfield <patmans@us.ibm.com>
+
+	* libc/include/ieeefp.h: use prefixed __ieeefp_ macros that can be
+	overridden via machine/ieeefp.h.
+	* libc/include/machine/ieeefp.h: Add SPU specific C99 and ieeefp
+	macros for isnan and related macros.
+	* libc/include/math.h: Allow C99 isfinite, isinf, and isnan to be
+	overridden via machine/ieeefp.h.
+	* libm/machine/spu/Makefile.am: Add new files.
+	* libm/machine/spu/Makefile.in: Autogenerate with new files.
+	* libm/machine/spu/sf_fpclassify.c: Add SPU specific __fpclassifyf.
+	* libm/machine/spu/sf_finite.c: Add SPU specific finitef.
+	* libm/machine/spu/sf_isinf.c: Add SPU specific isinff.
+	* libm/machine/spu/sf_isinff.c: Add SPU specific __isinff.
+	* libm/machine/spu/sf_isnan.c: Add SPU specific isnanf.
+	* libm/machine/spu/sf_isnanf.c: Add SPU specific __isnanf.
+	* libm/machine/spu/sf_nan.c: Add SPU specific nanf.
+
 2007-04-25  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libm/common/s_fpclassify.c (__fpclassifyf): Move this to...

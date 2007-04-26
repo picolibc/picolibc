@@ -131,21 +131,29 @@ extern int __signbitd (double x);
           (__extension__ ({__typeof__(x) __x = (x); \
                            (sizeof (__x) == sizeof (float))  ? __fpclassifyf(__x) : __fpclassifyd(__x);}))
 
+#ifndef isfinite
 #define isfinite(y) \
           (__extension__ ({__typeof__(y) __y = (y); \
                            fpclassify(__y) != FP_INFINITE && fpclassify(__y) != FP_NAN;}))
+#endif
 
 /* Note: isinf and isnan were once functions in newlib that took double
  *       arguments.  C99 specifies that these names are reserved for macros
  *       supporting multiple floating point types.  Thus, they are
  *       now defined as macros.  Implementations of the old functions
  *       taking double arguments still exist for compatibility purposes.  */
+#ifndef isinf
 #define isinf(x) \
           (__extension__ ({__typeof__(x) __x = (x); \
                            (sizeof (__x) == sizeof (float))  ? __isinff(__x) : __isinfd(__x);}))
+#endif
+
+#ifndef isnan
 #define isnan(x) \
           (__extension__ ({__typeof__(x) __x = (x); \
                            (sizeof (__x) == sizeof (float))  ? __isnanf(__x) : __isnand(__x);}))
+#endif
+
 #define isnormal(y) (fpclassify(y) == FP_NORMAL)
 #define signbit(x) \
           (__extension__ ({__typeof__(x) __x = (x); \

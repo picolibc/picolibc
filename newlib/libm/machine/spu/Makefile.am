@@ -8,7 +8,9 @@ INCLUDES = -I $(newlib_basedir)/../newlib/libm/common $(NEWLIB_CFLAGS) \
 LIB_SOURCES = \
 	feclearexcept.c fe_dfl_env.c fegetenv.c fegetexceptflag.c \
 	fegetround.c feholdexcept.c feraiseexcept.c fesetenv.c \
-	fesetexceptflag.c fesetround.c fetestexcept.c feupdateenv.c
+	fesetexceptflag.c fesetround.c fetestexcept.c feupdateenv.c \
+	sf_finite.c sf_fpclassify.c sf_isinf.c sf_isinff.c sf_isnanf.c \
+	sf_isnan.c sf_nan.c
 
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)

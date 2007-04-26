@@ -47,7 +47,11 @@ DIST_COMMON = $(srcdir)/../../../Makefile.shared \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
-	$(srcdir)/../../../../compile $(srcdir)/../../../../compile
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../../acinclude.m4 \
@@ -68,7 +72,10 @@ am__objects_1 = lib_a-feclearexcept.$(OBJEXT) \
 	lib_a-feholdexcept.$(OBJEXT) lib_a-feraiseexcept.$(OBJEXT) \
 	lib_a-fesetenv.$(OBJEXT) lib_a-fesetexceptflag.$(OBJEXT) \
 	lib_a-fesetround.$(OBJEXT) lib_a-fetestexcept.$(OBJEXT) \
-	lib_a-feupdateenv.$(OBJEXT)
+	lib_a-feupdateenv.$(OBJEXT) lib_a-sf_finite.$(OBJEXT) \
+	lib_a-sf_fpclassify.$(OBJEXT) lib_a-sf_isinf.$(OBJEXT) \
+	lib_a-sf_isinff.$(OBJEXT) lib_a-sf_isnanf.$(OBJEXT) \
+	lib_a-sf_isnan.$(OBJEXT) lib_a-sf_nan.$(OBJEXT)
 am_lib_a_OBJECTS = $(am__objects_1)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -197,7 +204,9 @@ INCLUDES = -I $(newlib_basedir)/../newlib/libm/common $(NEWLIB_CFLAGS) \
 LIB_SOURCES = \
 	feclearexcept.c fe_dfl_env.c fegetenv.c fegetexceptflag.c \
 	fegetround.c feholdexcept.c feraiseexcept.c fesetenv.c \
-	fesetexceptflag.c fesetround.c fetestexcept.c feupdateenv.c
+	fesetexceptflag.c fesetround.c fetestexcept.c feupdateenv.c \
+	sf_finite.c sf_fpclassify.c sf_isinf.c sf_isinff.c sf_isnanf.c \
+	sf_isnan.c sf_nan.c
 
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
@@ -334,6 +343,48 @@ lib_a-feupdateenv.o: feupdateenv.c
 
 lib_a-feupdateenv.obj: feupdateenv.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-feupdateenv.obj `if test -f 'feupdateenv.c'; then $(CYGPATH_W) 'feupdateenv.c'; else $(CYGPATH_W) '$(srcdir)/feupdateenv.c'; fi`
+
+lib_a-sf_finite.o: sf_finite.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_finite.o `test -f 'sf_finite.c' || echo '$(srcdir)/'`sf_finite.c
+
+lib_a-sf_finite.obj: sf_finite.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_finite.obj `if test -f 'sf_finite.c'; then $(CYGPATH_W) 'sf_finite.c'; else $(CYGPATH_W) '$(srcdir)/sf_finite.c'; fi`
+
+lib_a-sf_fpclassify.o: sf_fpclassify.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fpclassify.o `test -f 'sf_fpclassify.c' || echo '$(srcdir)/'`sf_fpclassify.c
+
+lib_a-sf_fpclassify.obj: sf_fpclassify.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fpclassify.obj `if test -f 'sf_fpclassify.c'; then $(CYGPATH_W) 'sf_fpclassify.c'; else $(CYGPATH_W) '$(srcdir)/sf_fpclassify.c'; fi`
+
+lib_a-sf_isinf.o: sf_isinf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_isinf.o `test -f 'sf_isinf.c' || echo '$(srcdir)/'`sf_isinf.c
+
+lib_a-sf_isinf.obj: sf_isinf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_isinf.obj `if test -f 'sf_isinf.c'; then $(CYGPATH_W) 'sf_isinf.c'; else $(CYGPATH_W) '$(srcdir)/sf_isinf.c'; fi`
+
+lib_a-sf_isinff.o: sf_isinff.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_isinff.o `test -f 'sf_isinff.c' || echo '$(srcdir)/'`sf_isinff.c
+
+lib_a-sf_isinff.obj: sf_isinff.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_isinff.obj `if test -f 'sf_isinff.c'; then $(CYGPATH_W) 'sf_isinff.c'; else $(CYGPATH_W) '$(srcdir)/sf_isinff.c'; fi`
+
+lib_a-sf_isnanf.o: sf_isnanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_isnanf.o `test -f 'sf_isnanf.c' || echo '$(srcdir)/'`sf_isnanf.c
+
+lib_a-sf_isnanf.obj: sf_isnanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_isnanf.obj `if test -f 'sf_isnanf.c'; then $(CYGPATH_W) 'sf_isnanf.c'; else $(CYGPATH_W) '$(srcdir)/sf_isnanf.c'; fi`
+
+lib_a-sf_isnan.o: sf_isnan.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_isnan.o `test -f 'sf_isnan.c' || echo '$(srcdir)/'`sf_isnan.c
+
+lib_a-sf_isnan.obj: sf_isnan.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_isnan.obj `if test -f 'sf_isnan.c'; then $(CYGPATH_W) 'sf_isnan.c'; else $(CYGPATH_W) '$(srcdir)/sf_isnan.c'; fi`
+
+lib_a-sf_nan.o: sf_nan.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_nan.o `test -f 'sf_nan.c' || echo '$(srcdir)/'`sf_nan.c
+
+lib_a-sf_nan.obj: sf_nan.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_nan.obj `if test -f 'sf_nan.c'; then $(CYGPATH_W) 'sf_nan.c'; else $(CYGPATH_W) '$(srcdir)/sf_nan.c'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
