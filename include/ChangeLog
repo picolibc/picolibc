@@ -1,3 +1,7 @@
+2007-04-25  Mark Mitchell  <mark@codesourcery.com>
+
+	* demangle.h: Change license to LGPL + exception.
+
 2007-04-10  Richard Henderson  <rth@redhat.com>
 
 	* bfdlink.h (struct bfd_link_info): Add relax_trip.
