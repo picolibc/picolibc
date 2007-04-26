@@ -1,3 +1,8 @@
+2007-04-26  Jan Beulich  <jbeulich@novell.com>
+
+	* common.h (DT_ENCODING): Correct value (back to spec mandated
+	value).
+
 2007-03-08  Alan Modra  <amodra@bigpond.net.au>
 
 	* v850.h (V850_OTHER_TDA_BYTE): Delete.

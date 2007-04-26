@@ -550,7 +550,7 @@
 #define DT_FINI_ARRAYSZ 28
 #define DT_RUNPATH	29
 #define DT_FLAGS	30
-#define DT_ENCODING	31
+#define DT_ENCODING	32
 #define DT_PREINIT_ARRAY   32
 #define DT_PREINIT_ARRAYSZ 33
 
