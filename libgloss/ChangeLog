@@ -1,3 +1,9 @@
+2007-04-27  Kazu Hirata  <kazu@codesourcery.com>
+
+	* libgloss/m68k/fido.sc: Catch .text.*, .rodata.*, .data.*,
+	.bss.*, .ctor.*, and .dtor.*.  Wrap ctor/dtor-related sections
+	with KEEP.
+
 2007-04-04  Patrick Mansfield <patmans@us.ibm.com>
  
 	* spu/syscalls.c: Rename _send_to_ppe __send_to_ppe, and set errno
