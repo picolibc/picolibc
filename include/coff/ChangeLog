@@ -1,3 +1,7 @@
+2007-04-27  Alan Modra  <amodra@bigpond.net.au>
+
+	* rs6000.h: Write Mimi's name in ASCII.
+
 2007-03-19  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* internal.h (internal_extra_pe_aouthdr): Add Magic,
