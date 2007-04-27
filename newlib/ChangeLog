@@ -1,3 +1,10 @@
+2007-04-27  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/machine/m68k/Makefile.am: Temporarily remove
+	memcpy.S and memset.S until logic can be confirmed for
+	!(__mcoldfile__) case.
+	* libc/machine/m68k/Makefile.in: Regenerated.
+
 2007-04-27  Kazu Hirata  <kazu@codesourcery.com>
 
 	* libc/machine/m68k/Makefile.am (lib_a_SOURCES): Add memcpy.S

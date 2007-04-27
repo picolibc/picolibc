@@ -56,8 +56,7 @@ ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-strcpy.$(OBJEXT) \
-	lib_a-strlen.$(OBJEXT) lib_a-memcpy.$(OBJEXT) \
-	lib_a-memset.$(OBJEXT)
+	lib_a-strlen.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -182,7 +181,7 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = setjmp.S strcpy.c strlen.c memcpy.S memset.S
+lib_a_SOURCES = setjmp.S strcpy.c strlen.c
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../..
@@ -249,18 +248,6 @@ lib_a-setjmp.o: setjmp.S
 
 lib_a-setjmp.obj: setjmp.S
 	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.obj `if test -f 'setjmp.S'; then $(CYGPATH_W) 'setjmp.S'; else $(CYGPATH_W) '$(srcdir)/setjmp.S'; fi`
-
-lib_a-memcpy.o: memcpy.S
-	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcpy.o `test -f 'memcpy.S' || echo '$(srcdir)/'`memcpy.S
-
-lib_a-memcpy.obj: memcpy.S
-	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcpy.obj `if test -f 'memcpy.S'; then $(CYGPATH_W) 'memcpy.S'; else $(CYGPATH_W) '$(srcdir)/memcpy.S'; fi`
-
-lib_a-memset.o: memset.S
-	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memset.o `test -f 'memset.S' || echo '$(srcdir)/'`memset.S
-
-lib_a-memset.obj: memset.S
-	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memset.obj `if test -f 'memset.S'; then $(CYGPATH_W) 'memset.S'; else $(CYGPATH_W) '$(srcdir)/memset.S'; fi`
 
 .c.o:
 	$(COMPILE) -c $<
