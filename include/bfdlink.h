@@ -1,6 +1,6 @@
 /* bfdlink.h -- header file for BFD link routines
    Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-   2003, 2004, 2005 Free Software Foundation, Inc.
+   2003, 2004, 2005, 2006, 2007 Free Software Foundation, Inc.
    Written by Steve Chamberlain and Ian Lance Taylor, Cygnus Support.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -455,8 +455,8 @@ struct bfd_link_info
   struct bfd_elf_dynamic_list *dynamic_list;
 };
 
-/* This structures holds a set of callback functions.  These are
-   called by the BFD linker routines.  Except for einfo, the first
+/* This structures holds a set of callback functions.  These are called
+   by the BFD linker routines.  Except for the info functions, the first
    argument to each callback function is the bfd_link_info structure
    being used and each function returns a boolean value.  If the
    function returns FALSE, then the BFD function which called it should
@@ -568,8 +568,14 @@ struct bfd_link_callbacks
   bfd_boolean (*notice)
     (struct bfd_link_info *, const char *name,
      bfd *abfd, asection *section, bfd_vma address);
-  /* General link info message.  */
+  /* Error or warning link info message.  */
   void (*einfo)
+    (const char *fmt, ...);
+  /* General link info message.  */
+  void (*info)
+    (const char *fmt, ...);
+  /* Message to be printed in linker map file.  */
+  void (*minfo)
     (const char *fmt, ...);
   /* This callback provides a chance for users of the BFD library to
      override its decision about whether to place two adjacent sections
