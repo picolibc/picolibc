@@ -41,7 +41,11 @@ _DEFUN(__smakebuf_r, (ptr, fp),
 {
   register size_t size, couldbetty;
   register _PTR p;
+#ifdef __USE_INTERNAL_STAT64
+  struct stat64 st;
+#else
   struct stat st;
+#endif
 
   if (fp->_flags & __SNBF)
     {

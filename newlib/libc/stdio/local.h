@@ -46,6 +46,14 @@ extern int    _EXFUN(_fwalk,(struct _reent *, int (*)(FILE *)));
 extern int    _EXFUN(_fwalk_reent,(struct _reent *, int (*)(struct _reent *, FILE *)));
 struct _glue * _EXFUN(__sfmoreglue,(struct _reent *,int n));
 
+#ifdef __LARGE64_FILES
+extern _fpos64_t _EXFUN(__sseek64,(void *, _fpos64_t, int));
+extern _fpos64_t _EXFUN(__sseek64_r,(struct _reent *, void *, _fpos64_t, int));
+extern _READ_WRITE_RETURN_TYPE _EXFUN(__swrite64,(void *, char const *, int));
+extern _READ_WRITE_RETURN_TYPE _EXFUN(__swrite64_r,(struct _reent *, void *,
+                                      char const *, int));
+#endif
+
 /* Called by the main entry point fns to ensure stdio has been initialized.  */
 
 #ifdef _REENT_SMALL

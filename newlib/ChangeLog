@@ -1,3 +1,18 @@
+2007-05-01  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio64/local64.h: Delete, move contents to...
+	* libc/stdio/local.h: ...here.
+	* libc/stdio64/fdopen64.c: Update includes.
+	* libc/stdio64/fopen64.c: Likewise.
+	* libc/stdio64/freopen64.c: Likewise.
+	* libc/stdio64/fseeko64.c: Likewise.
+	* libc/stdio64/ftello64.c: Likewise.
+	* libc/stdio/findfp.c (std) [__LARGE64_FILES]: Open stdin, stdout,
+	and stderr with 64-bit offset.
+	* libc/stdio/fseek.c (_fseek_r): Avoid compile warning.
+	* libc/stdio/makebuf.c (__smakebuf_r): Likewise.
+	* libc/stdio/mktemp.c (_gettemp): Likewise.
+
 2007-05-01  Cary R.  <cygcary <at> yahoo.com>
 
 	* libm/math/e_pow.c: Fix to be consistent with glibc with regards
@@ -66,7 +81,7 @@
 
 2007-04-25  Patrick Mansfield <patmans@us.ibm.com>
 
-	* libm/machine/spu/headers/feholdexcept.h: Use *envp not env so 
+	* libm/machine/spu/headers/feholdexcept.h: Use *envp not env so
 	we clear the proper bits in the fpscr, and don't set some random ones.
 
 2007-04-24  Eric Blake  <ebb9@byu.net>

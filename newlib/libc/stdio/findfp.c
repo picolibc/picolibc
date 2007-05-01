@@ -52,7 +52,13 @@ _DEFUN(std, (ptr, flags, file, data),
   ptr->_lbfsize = 0;
   ptr->_cookie = ptr;
   ptr->_read = __sread;
+#ifndef __LARGE64_FILES
   ptr->_write = __swrite;
+#else /* __LARGE64_FILES */
+  ptr->_write = __swrite64;
+  ptr->_seek64 = __sseek64;
+  ptr->_flags |= __SL64;
+#endif /* __LARGE64_FILES */
   ptr->_seek = __sseek;
   ptr->_close = __sclose;
 #if !defined(__SINGLE_THREAD__) && !defined(_REENT_SMALL)
@@ -100,7 +106,7 @@ _DEFUN(__sfp, (d),
   int n;
   struct _glue *g;
 
-  __sfp_lock_acquire (); 
+  __sfp_lock_acquire ();
 
   if (!_GLOBAL_REENT->__sdidinit)
     __sinit (_GLOBAL_REENT);
@@ -113,7 +119,7 @@ _DEFUN(__sfp, (d),
 	  (g->_next = __sfmoreglue (d, NDYNAMIC)) == NULL)
 	break;
     }
-  __sfp_lock_release (); 
+  __sfp_lock_release ();
   d->_errno = ENOMEM;
   return NULL;
 
@@ -123,7 +129,7 @@ found:
 #ifndef __SINGLE_THREAD__
   __lock_init_recursive (fp->_lock);
 #endif
-  __sfp_lock_release (); 
+  __sfp_lock_release ();
 
   fp->_p = NULL;		/* no current pointer */
   fp->_w = 0;			/* nothing to read or write */
@@ -198,7 +204,7 @@ _DEFUN(__sinit, (s),
 
   std (s->_stdin,  __SRD, 0, s);
 
-  /* on platforms that have true file system I/O, we can verify whether stdout 
+  /* on platforms that have true file system I/O, we can verify whether stdout
      is an interactive terminal or not.  For all other platforms, we will
      default to line buffered mode here.  */
 #ifdef HAVE_FCNTL
@@ -220,25 +226,25 @@ __LOCK_INIT_RECURSIVE(static, __sinit_lock);
 _VOID
 _DEFUN_VOID(__sfp_lock_acquire)
 {
-  __lock_acquire_recursive (__sfp_lock); 
+  __lock_acquire_recursive (__sfp_lock);
 }
 
 _VOID
 _DEFUN_VOID(__sfp_lock_release)
 {
-  __lock_release_recursive (__sfp_lock); 
+  __lock_release_recursive (__sfp_lock);
 }
 
 _VOID
 _DEFUN_VOID(__sinit_lock_acquire)
 {
-  __lock_acquire_recursive (__sinit_lock); 
+  __lock_acquire_recursive (__sinit_lock);
 }
 
 _VOID
 _DEFUN_VOID(__sinit_lock_release)
 {
-  __lock_release_recursive (__sinit_lock); 
+  __lock_release_recursive (__sinit_lock);
 }
 
 /* Walkable file locking routine.  */
@@ -264,7 +270,7 @@ _DEFUN(__fp_unlock, (ptr),
 _VOID
 _DEFUN_VOID(__fp_lock_all)
 {
-  __sfp_lock_acquire (); 
+  __sfp_lock_acquire ();
 
   _CAST_VOID _fwalk (_REENT, __fp_lock);
 }

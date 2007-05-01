@@ -32,9 +32,9 @@ ANSI_SYNOPSIS
 	#include <stdio.h>
 	int fseek(FILE *<[fp]>, long <[offset]>, int <[whence]>)
 	int fseeko(FILE *<[fp]>, off_t <[offset]>, int <[whence]>)
-	int _fseek_r(struct _reent *<[ptr]>, FILE *<[fp]>, 
+	int _fseek_r(struct _reent *<[ptr]>, FILE *<[fp]>,
 	             long <[offset]>, int <[whence]>)
-	int _fseeko_r(struct _reent *<[ptr]>, FILE *<[fp]>, 
+	int _fseeko_r(struct _reent *<[ptr]>, FILE *<[fp]>,
 	             off_t <[offset]>, int <[whence]>)
 
 TRAD_SYNOPSIS
@@ -126,7 +126,11 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
   _fpos_t target;
   _fpos_t curoff = 0;
   size_t n;
+#ifdef __USE_INTERNAL_STAT64
+  struct stat64 st;
+#else
   struct stat st;
+#endif
   int havepos;
 
   /* Make sure stdio is set up.  */

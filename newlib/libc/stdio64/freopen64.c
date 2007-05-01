@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990, 2006 The Regents of the University of California.
+ * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -28,7 +28,7 @@ ANSI_SYNOPSIS
 	#include <stdio.h>
 	FILE *freopen64(const char *<[file]>, const char *<[mode]>,
 		        FILE *<[fp]>);
-	FILE *_freopen64_r(struct _reent *<[ptr]>, const char *<[file]>, 
+	FILE *_freopen64_r(struct _reent *<[ptr]>, const char *<[file]>,
 		        const char *<[mode]>, FILE *<[fp]>);
 
 TRAD_SYNOPSIS
@@ -78,7 +78,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <fcntl.h>
 #include <stdlib.h>
 #include <sys/lock.h>
-#include "local64.h"
+#include "local.h"
 
 /*
  * Re-direct an existing, open (probably) file to some other file.

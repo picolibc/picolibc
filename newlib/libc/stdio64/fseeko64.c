@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990, 2007 The Regents of the University of California.
+ * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -27,7 +27,7 @@ INDEX
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	int fseeko64(FILE *<[fp]>, _off64_t <[offset]>, int <[whence]>)
-	int _fseeko64_r (struct _reent *<[ptr]>, FILE *<[fp]>, 
+	int _fseeko64_r (struct _reent *<[ptr]>, FILE *<[fp]>,
                          _off64_t <[offset]>, int <[whence]>)
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -49,8 +49,8 @@ of the file your program has already read.  Many of the <<stdio>> functions
 depend on this position, and many change it as a side effect.
 
 You can use <<fseeko64>> to set the position for the file identified by
-<[fp]> that was opened via <<fopen64>>.  The value of <[offset]> determines 
-the new position, in one of three ways selected by the value of <[whence]> 
+<[fp]> that was opened via <<fopen64>>.  The value of <[offset]> determines
+the new position, in one of three ways selected by the value of <[whence]>
 (defined as macros in `<<stdio.h>>'):
 
 <<SEEK_SET>>---<[offset]> is the absolute file position (an offset
@@ -69,7 +69,7 @@ RETURNS
 <<fseeko64>> returns <<0>> when successful.  On failure, the
 result is <<EOF>>.  The reason for failure is indicated in <<errno>>:
 either <<ESPIPE>> (the stream identified by <[fp]> doesn't support
-repositioning or wasn't opened via <<fopen64>>) or <<EINVAL>> 
+repositioning or wasn't opened via <<fopen64>>) or <<EINVAL>>
 (invalid file position).
 
 PORTABILITY
@@ -86,7 +86,7 @@ Supporting OS subroutines required: <<close>>, <<fstat64>>, <<isatty>>,
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "local64.h"
+#include "local.h"
 
 #define	POS_ERR	(-(_fpos64_t)1)
 

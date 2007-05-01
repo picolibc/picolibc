@@ -28,7 +28,7 @@ File pointer or <<NULL>>, as for <<fopen>>.
 
 #include <stdio.h>
 #include <errno.h>
-#include "local64.h"
+#include "local.h"
 #include <_syslist.h>
 #include <sys/lock.h>
 
