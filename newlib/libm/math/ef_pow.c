@@ -75,10 +75,11 @@ ivln2_l  =  7.0526075433e-06; /* 0x36eca570 =1/ln2 tail*/
     /* y==zero: x**0 = 1 */
 	if(FLT_UWORD_IS_ZERO(iy)) return one; 	
 
-    /* +-NaN return x+y */
+    /* x|y==NaN return NaN unless x==1 then return 1 */
 	if(FLT_UWORD_IS_NAN(ix) ||
 	   FLT_UWORD_IS_NAN(iy))
-		return x+y;	
+	    if(ix==0x3f800000) return one;
+	    else return nanf("");
 
     /* determine if y is an odd int when x < 0
      * yisint = 0	... y is not an integer
@@ -98,7 +99,7 @@ ivln2_l  =  7.0526075433e-06; /* 0x36eca570 =1/ln2 tail*/
     /* special value of y */
 	if (FLT_UWORD_IS_INFINITE(iy)) {	/* y is +-inf */
 	    if (ix==0x3f800000)
-	        return  y - y;	/* inf**+-1 is NaN */
+		return one;		/* +-1**+-inf = 1 */
 	    else if (ix > 0x3f800000)/* (|x|>1)**+-inf = inf,0 */
 	        return (hy>=0)? y: zero;
 	    else			/* (|x|<1)**-,+inf = inf,0 */

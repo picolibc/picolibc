@@ -25,13 +25,14 @@
  * Special cases:
  *	1.  (anything) ** 0  is 1
  *	2.  (anything) ** 1  is itself
- *	3.  (anything) ** NAN is NAN
+ *	3a. (anything) ** NAN is NAN except
+ *	3b. +1         ** NAN is 1
  *	4.  NAN ** (anything except 0) is NAN
  *	5.  +-(|x| > 1) **  +INF is +INF
  *	6.  +-(|x| > 1) **  -INF is +0
  *	7.  +-(|x| < 1) **  +INF is +0
  *	8.  +-(|x| < 1) **  -INF is +INF
- *	9.  +-1         ** +-INF is NAN
+ *	9.  +-1         ** +-INF is 1
  *	10. +0 ** (+anything except 0, NAN)               is +0
  *	11. -0 ** (+anything except 0, NAN, odd integer)  is +0
  *	12. +0 ** (-anything except 0, NAN)               is +INF
@@ -117,10 +118,11 @@ ivln2_l  =  1.92596299112661746887e-08; /* 0x3E54AE0B, 0xF85DDF44 =1/ln2 tail*/
     /* y==zero: x**0 = 1 */
 	if((iy|ly)==0) return one; 	
 
-    /* +-NaN return x+y */
+    /* x|y==NaN return NaN unless x==1 then return 1 */
 	if(ix > 0x7ff00000 || ((ix==0x7ff00000)&&(lx!=0)) ||
 	   iy > 0x7ff00000 || ((iy==0x7ff00000)&&(ly!=0))) 
-		return x+y;	
+	    if(((ix-0x3ff00000)|lx)==0) return one;
+	    else return nan("");	
 
     /* determine if y is an odd int when x < 0
      * yisint = 0	... y is not an integer
@@ -146,7 +148,7 @@ ivln2_l  =  1.92596299112661746887e-08; /* 0x3E54AE0B, 0xF85DDF44 =1/ln2 tail*/
 	if(ly==0) { 	
 	    if (iy==0x7ff00000) {	/* y is +-inf */
 	        if(((ix-0x3ff00000)|lx)==0)
-		    return  y - y;	/* inf**+-1 is NaN */
+		    return one;		/* +-1**+-inf = 1 */
 	        else if (ix >= 0x3ff00000)/* (|x|>1)**+-inf = inf,0 */
 		    return (hy>=0)? y: zero;
 	        else			/* (|x|<1)**-,+inf = inf,0 */

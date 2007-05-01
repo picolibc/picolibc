@@ -43,7 +43,7 @@
 		exc.err = 0;
 		exc.arg1 = (double)x;
 		exc.arg2 = (double)y;
-		exc.retval = x;
+		exc.retval = 1.0;
 		if (_LIB_VERSION == _IEEE_ ||
 		    _LIB_VERSION == _POSIX_) exc.retval = 1.0;
 		else if (!matherr(&exc)) {

@@ -1,3 +1,19 @@
+2007-05-01  Cary R.  <cygcary <at> yahoo.com>
+
+	* libm/math/e_pow.c: Fix to be consistent with glibc with regards
+	to treatment of NaN and +-inf arguments.
+	* libm/math/ef_pow.c: Ditto.
+	* libm/math/w_pow.c: Ditto.
+	* libm/math/wf_pow.c: Ditto.
+	* libm/math/w_acos.c: Fix domain errors to return NaN.
+	* libm/math/w_asin.c: Ditto.
+	* libm/math/wf_acos.c: Ditto.
+	* libm/math/wf_asin.c: Ditto.
+	* libm/math/w_log.c: Fix to return NaN for negative number inputs.
+	* libm/math/wf_log.c: Ditto.
+	* libm/math/wf_log10.c: Ditto.
+	* libm/math/w_log10.c: Ditto.
+
 2007-04-27  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/machine/m68k/Makefile.am: Temporarily remove
