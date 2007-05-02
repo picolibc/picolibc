@@ -294,7 +294,7 @@ extern const unsigned int num_powerpc_operands;
 /* This operand is for the DQ field in a DQ form instruction.  */
 #define PPC_OPERAND_DQ (0x8000)
 
-/* Valid range of operand is 1..n rather than 0..n-1.  */
+/* Valid range of operand is 0..n rather than 0..n-1.  */
 #define PPC_OPERAND_PLUS1 (0x10000)
 
 /* The POWER and PowerPC assemblers use a few macros.  We keep them

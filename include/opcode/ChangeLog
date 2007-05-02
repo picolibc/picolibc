@@ -1,3 +1,7 @@
+2007-05-02  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h (PPC_OPERAND_PLUS1): Update comment.
+
 2007-04-23  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* m68k.h (mcfisa_c): New.
