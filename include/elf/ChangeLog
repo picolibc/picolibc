@@ -1,3 +1,8 @@
+2007-05-02  Alan Modra  <amodra@bigpond.net.au>
+
+	* internal.h (ELF_IS_SECTION_IN_SEGMENT): Check both file offset
+	and vma for appropriate sections.
+
 2007-04-26  Jan Beulich  <jbeulich@novell.com>
 
 	* common.h (DT_ENCODING): Correct value (back to spec mandated
