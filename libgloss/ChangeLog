@@ -1,8 +1,11 @@
+2007-05-03  Kazu Hirata  <kazu@codesourcery.com>
+
+	* m68k/fido-_exit.c (_exit): Use stop #0x700.
+
 2007-04-27  Kazu Hirata  <kazu@codesourcery.com>
 
-	* libgloss/m68k/fido.sc: Catch .text.*, .rodata.*, .data.*,
-	.bss.*, .ctor.*, and .dtor.*.  Wrap ctor/dtor-related sections
-	with KEEP.
+	* m68k/fido.sc: Catch .text.*, .rodata.*, .data.*, .bss.*,
+	.ctor.*, and .dtor.*.  Wrap ctor/dtor-related sections with KEEP.
 
 2007-04-04  Patrick Mansfield <patmans@us.ibm.com>
  

@@ -19,5 +19,5 @@ void
 _exit (int code) 
 {
   while (1)
-    asm volatile ("stop #0");
+    asm volatile ("stop #0x700");
 }
