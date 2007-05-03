@@ -76,10 +76,11 @@ memset:
 .Llset:
 #if !defined (__mcoldfire__)
 	dbra	%d2,1b		| loop until done
+	sub.l	#0x10000,%d2
 #else
 	subq.l	#1,%d2
-	bpl	1b
 #endif
+	bpl	1b
 	and.l	#3,%d1		| residue byte transfers, fixed
 	move.l	(%sp)+,%d2	| restore d2
 	bra	.Lbset

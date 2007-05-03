@@ -1,3 +1,11 @@
+2007-05-03  Kazu Hirata  <kazu@codesourcery.com>
+
+	* libc/machine/m68k/Makefile.am (lib_a_SOURCES): Add memcpy.S
+	and memset.S.
+	* libc/machine/m68k/Makefile.in: Regenerate.
+	* libc/machine/m68k/memcpy.S: Use sub.l followed by dbra.
+	* libc/machine/m68k/memset.S: Likewise.
+
 2007-05-01  Eric Blake  <ebb9@byu.net>
 
 	* libc/stdio64/local64.h: Delete, move contents to...

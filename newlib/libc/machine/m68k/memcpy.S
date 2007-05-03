@@ -73,10 +73,11 @@ memcpy:
 .Lcopy:
 #if !defined (__mcoldfire__)
 	dbra	%d0,1b
+	sub.l	#0x10000,%d0
 #else
 	subq.l	#1,%d0
-	bpl	1b
 #endif
+	bpl	1b
 	bra	.Lresidue
 
 1:
