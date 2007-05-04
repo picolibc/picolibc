@@ -5,104 +5,123 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 GENERAL_SOURCES = \
-	clearerr.c 			\
-	diprintf.c			\
-	dprintf.c			\
-	fclose.c 			\
-	fdopen.c 			\
-	feof.c 				\
-	ferror.c 			\
-	fflush.c 			\
-	fgetc.c 			\
-	fgetpos.c 			\
-	fgets.c 			\
+	clearerr.c			\
+	fclose.c			\
+	fdopen.c			\
+	feof.c				\
+	ferror.c			\
+	fflush.c			\
+	fgetc.c			\
+	fgetpos.c			\
+	fgets.c			\
 	fileno.c			\
-	findfp.c 			\
-	fiprintf.c 			\
-	flags.c 			\
-	fopen.c 			\
-	fprintf.c 			\
-	fputc.c 			\
-	fputs.c 			\
-	fread.c 			\
-	freopen.c 			\
-	fscanf.c 			\
-	fiscanf.c 			\
-	fseek.c 			\
-	fsetpos.c 			\
-	ftell.c 			\
-	fvwrite.c 			\
-	fwalk.c 			\
-	fwrite.c 			\
-	getc.c 				\
-	getchar.c 			\
+	findfp.c			\
+	fiprintf.c			\
+	flags.c			\
+	fopen.c			\
+	fprintf.c			\
+	fputc.c			\
+	fputs.c			\
+	fread.c			\
+	freopen.c			\
+	fscanf.c			\
+	fiscanf.c			\
+	fseek.c			\
+	fsetpos.c			\
+	ftell.c			\
+	fvwrite.c			\
+	fwalk.c			\
+	fwrite.c			\
+	getc.c				\
+	getchar.c			\
 	getc_u.c			\
 	getchar_u.c			\
 	getdelim.c			\
 	getline.c			\
-	gets.c 				\
-	iprintf.c 			\
-	iscanf.c 			\
+	gets.c				\
+	iprintf.c			\
+	iscanf.c			\
 	makebuf.c			\
-	perror.c 			\
-	printf.c 			\
-	putc.c 				\
-	putchar.c 			\
+	perror.c			\
+	printf.c			\
+	putc.c				\
+	putchar.c			\
 	putc_u.c			\
 	putchar_u.c			\
-	puts.c 				\
-	refill.c 			\
-	remove.c 			\
-	rename.c 			\
-	rewind.c 			\
-	rget.c 				\
-	scanf.c 			\
-	sccl.c	 			\
-	setbuf.c 			\
-	setbuffer.c 			\
-	setlinebuf.c 			\
-	setvbuf.c 			\
-	siprintf.c 			\
-	siscanf.c 			\
+	puts.c				\
+	refill.c			\
+	remove.c			\
+	rename.c			\
+	rewind.c			\
+	rget.c				\
+	scanf.c			\
+	sccl.c				\
+	setbuf.c			\
+	setbuffer.c			\
+	setlinebuf.c			\
+	setvbuf.c			\
+	siprintf.c			\
+	siscanf.c			\
 	sniprintf.c			\
 	snprintf.c			\
-	sprintf.c 			\
-	sscanf.c 			\
-	stdio.c 			\
-	tmpfile.c 			\
-	tmpnam.c 			\
-	ungetc.c 			\
+	sprintf.c			\
+	sscanf.c			\
+	stdio.c			\
+	tmpfile.c			\
+	tmpnam.c			\
+	ungetc.c			\
 	vdiprintf.c			\
 	vdprintf.c			\
-	viprintf.c 			\
+	viprintf.c			\
 	viscanf.c			\
-	vprintf.c 			\
+	vprintf.c			\
 	vscanf.c			\
-	vsiprintf.c 			\
+	vsiprintf.c			\
 	vsiscanf.c			\
 	vsnprintf.c			\
 	vsniprintf.c			\
-	vsprintf.c 			\
+	vsprintf.c			\
 	vsscanf.c			\
-	wbuf.c 				\
+	wbuf.c				\
 	wsetup.c
 
 ## The following are EL/IX level 2 interfaces
 if ELIX_LEVEL_1
-ELIX_SOURCES =
+ELIX_2_SOURCES =
 else
-ELIX_SOURCES = \
+ELIX_2_SOURCES = \
 	asiprintf.c		\
 	asprintf.c		\
 	fcloseall.c		\
-	fseeko.c 		\
-	ftello.c 		\
+	fseeko.c		\
+	ftello.c		\
 	getw.c			\
-	mktemp.c 		\
-	putw.c 			\
+	mktemp.c		\
+	putw.c			\
 	vasiprintf.c		\
 	vasprintf.c
 endif
+
+## The following are EL/IX level 2 interfaces
+if ELIX_LEVEL_1
+ELIX_4_SOURCES =
+else
+if ELIX_LEVEL_2
+ELIX_4_SOURCES =
+else
+if ELIX_LEVEL_3
+ELIX_4_SOURCES =
+else
+ELIX_4_SOURCES = \
+	asniprintf.c		\
+	asnprintf.c		\
+	diprintf.c		\
+	dprintf.c		\
+	vasniprintf.c		\
+	vasnprintf.c
+endif !ELIX_LEVEL_3
+endif !ELIX_LEVEL_2
+endif !ELIX_LEVEL_1
 
 LIBADD_OBJS = \
 	$(lpfx)vfiprintf.$(oext) $(lpfx)vfprintf.$(oext) \
@@ -112,14 +131,14 @@ libstdio_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libstdio.la
-libstdio_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
+libstdio_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_2_SOURCES) $(ELIX_4_SOURCES)
 libstdio_la_LIBADD = $(LIBADD_OBJS)
 libstdio_la_DEPENDENCIES = $(LIBADD_OBJS)
 LIB_COMPILE = $(LTCOMPILE)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
+lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_2_SOURCES) $(ELIX_4_SOURCES)
 lib_a_LIBADD = $(LIBADD_OBJS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 lib_a_DEPENDENCIES = $(LIBADD_OBJS)
@@ -146,6 +165,7 @@ $(lpfx)vfiscanf.$(oext): vfscanf.c
 
 CHEWOUT_FILES = \
 	clearerr.def		\
+	diprintf.def		\
 	dprintf.def		\
 	fclose.def		\
 	fcloseall.def		\

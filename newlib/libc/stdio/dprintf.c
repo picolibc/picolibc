@@ -22,30 +22,6 @@ ANSI_SYNOPSIS
 	int _vdprintf_r(struct _reent *<[ptr]>, int <[fd]>,
 			const char *<[format]>, va_list <[ap]>);
 
-TRAD_SYNOPSIS
-        #include <stdio.h>
-        #include <varargs.h>
-
-        int dprintf(<[fd]>, <[format]> [, <[arg]>, ...])
-	int <[fd]>;
-        char *<[format]>;
-
-        int vdprintf(<[fd]>, <[fmt]>, <[list]>)
-	int <[fd]>;
-        char *<[fmt]>;
-        va_list <[list]>;
-
-        int _dprintf_r(<[ptr]>, <[fd]>, <[format]> [, <[arg]>, ...])
-	struct _reent *<[ptr]>;
-	int <[fd]>;
-        char *<[format]>;
-
-        int _vdprintf_r(<[ptr]>, <[fd]>, <[fmt]>, <[list]>)
-	struct _reent *<[ptr]>;
-	int <[fd]>;
-        char *<[fmt]>;
-        va_list <[list]>;
-
 DESCRIPTION
 <<dprintf>> and <<vdprintf>> allow printing a format, similarly to
 <<printf>>, but write to a file descriptor instead of to a <<FILE>>

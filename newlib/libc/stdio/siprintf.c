@@ -17,18 +17,20 @@
 
 /*
 FUNCTION
-        <<iprintf>>, <<fiprintf>>, <<asiprintf>>, <<siprintf>>, <<sniprintf>>---format output
+<<iprintf>>, <<fiprintf>>, <<siprintf>>, <<sniprintf>>, <<asiprintf>>, <<asniprintf>>---format output (integer only)
 
 INDEX
 	fiprintf
 INDEX
 	iprintf
 INDEX
-	asiprintf
-INDEX
 	siprintf
 INDEX
 	sniprintf
+INDEX
+	asiprintf
+INDEX
+	asniprintf
 
 ANSI_SYNOPSIS
         #include <stdio.h>
@@ -36,50 +38,44 @@ ANSI_SYNOPSIS
         int iprintf(const char *<[format]> [, <[arg]>, ...]);
         int fiprintf(FILE *<[fd]>, const char *<[format]> [, <[arg]>, ...]);
         int siprintf(char *<[str]>, const char *<[format]> [, <[arg]>, ...]);
-        int asiprintf(char **<[strp]>, const char *<[format]> [, <[arg]>, ...]);
         int sniprintf(char *<[str]>, size_t <[size]>, const char *<[format]>
                       [, <[arg]>, ...]);
+        int asiprintf(char **<[strp]>, const char *<[format]> [, <[arg]>, ...]);
+        char *asniprintf(char *<[str]>, size_t *<[size]>, const char *<[format]>
+                        [, <[arg]>, ...]);
 
-TRAD_SYNOPSIS
-	#include <stdio.h>
-
-	int iprintf(<[format]> [, <[arg]>, ...])
-	char *<[format]>;
-
-	int fiprintf(<[fd]>, <[format]> [, <[arg]>, ...]);
-	FILE *<[fd]>;
-	char *<[format]>;
-
-	int asiprintf(<[strp]>, <[format]> [, <[arg]>, ...]);
-	char **<[strp]>;
-	char *<[format]>;
-
-	int siprintf(<[str]>, <[format]> [, <[arg]>, ...]);
-	char *<[str]>;
-	char *<[format]>;
-
-	int sniprintf(<[str]>, size_t <[size]>, <[format]> [, <[arg]>, ...]);
-	char *<[str]>;
-        size_t <[size]>;
-	char *<[format]>;
+        int _iprintf_r(struct _reent *<[ptr]>, const char *<[format]>
+                       [, <[arg]>, ...]);
+        int _fiprintf_r(struct _reent *<[ptr]>, FILE *<[fd]>,
+                        const char *<[format]> [, <[arg]>, ...]);
+        int _siprintf_r(struct _reent *<[ptr]>, char *<[str]>,
+                        const char *<[format]> [, <[arg]>, ...]);
+        int _sniprintf_r(struct _reent *<[ptr]>, char *<[str]>, size_t <[size]>,
+                         const char *<[format]> [, <[arg]>, ...]);
+        int _asiprintf_r(struct _reent *<[ptr]>, char **<[strp]>,
+                         const char *<[format]> [, <[arg]>, ...]);
+        char *_asniprintf_r(struct _reent *<[ptr]>, char *<[str]>,
+                            size_t *<[size]>, const char *<[format]>
+                            [, <[arg]>, ...]);
 
 DESCRIPTION
         <<iprintf>>, <<fiprintf>>, <<siprintf>>, <<sniprintf>>,
-        <<asiprintf>>, are the same as <<printf>>, <<fprintf>>,
-	<<sprintf>>, <<snprintf>>, and <<asprintf>>, respectively,
-	only that they restrict usage to non-floating-point format
-	specifiers.
+        <<asiprintf>>, and <<asniprintf>> are the same as <<printf>>,
+        <<fprintf>>, <<sprintf>>, <<snprintf>>, <<asprintf>>, and
+        <<asnprintf>>, respectively, except that they restrict usage
+        to non-floating-point format specifiers.
+
+        <<_iprintf_r>>, <<_fiprintf_r>>, <<_asiprintf_r>>,
+        <<_siprintf_r>>, <<_sniprintf_r>>, <<_asniprintf_r>> are
+        simply reentrant versions of the functions above.
 
 RETURNS
-<<siprintf>> and <<asiprintf>> return the number of bytes in the output string,
-save that the concluding <<NULL>> is not counted.
-<<iprintf>> and <<fiprintf>> return the number of characters transmitted.
-If an error occurs, <<iprintf>> and <<fiprintf>> return <<EOF>> and
-<<asiprintf>> returns -1.  No error returns occur for <<siprintf>>.
+Similar to <<printf>>, <<fprintf>>, <<sprintf>>, <<snprintf>>, <<asprintf>>,
+and <<asnprintf>>.
 
 PORTABILITY
-<<iprintf>>, <<fiprintf>>, <<siprintf>>, <<sniprintf>>, and <<asprintf>>
-are newlib extensions.
+<<iprintf>>, <<fiprintf>>, <<siprintf>>, <<sniprintf>>, <<asiprintf>>,
+and <<asniprintf>> are newlib extensions.
 
 Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.

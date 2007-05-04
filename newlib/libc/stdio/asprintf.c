@@ -15,6 +15,7 @@
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 /* This code was copied from sprintf.c */
+/* doc in sprintf.c */
 
 #include <_ansi.h>
 #include <reent.h>

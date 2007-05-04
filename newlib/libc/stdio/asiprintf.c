@@ -15,6 +15,7 @@
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 /* This code was copied from asprintf.c */
+/* doc in siprintf.c */
 
 #include <_ansi.h>
 #include <reent.h>

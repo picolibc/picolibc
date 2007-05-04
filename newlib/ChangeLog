@@ -1,3 +1,41 @@
+2007-05-03  Eric Blake  <ebb9@byu.net>
+
+	Add support for asnprintf, and improve *printf documentation.
+	* libc/stdio/Makefile.am (ELIX_SOURCES): Rename...
+	(ELIX_2_SOURCES): ...to this.
+	(ELIX_4_SOURCES): Add new variable.  Build asnprintf.
+	(GENERAL_SOURCES): Move dprintf to ELIX_4_SOURCES.
+	(CHEWOUT_FILES): Include diprintf in documentation.
+	* libc/stdio/Makefile.in: Regenerate.
+	* libc/stdio/diprintf.c: Improve documentation.
+	* libc/stdio/dprintf.c: Likewise.
+	* libc/stdio/siprintf.c: Likewise.
+	* libc/stdio/sprintf.c: Likewise.
+	* libc/stdio/vfprintf.c: Likewise.
+	* libc/stdio/viprintf.c: Likewise.
+	* libc/stdio/vsniprintf.c: Consolidate documentation.
+	* libc/stdio/asiprintf.c: Refer to documentation.
+	* libc/stdio/asprintf.c: Likewise.
+	* libc/stdio/fiprintf.c: Likewise.
+	* libc/stdio/fprintf.c: Likewise.
+	* libc/stdio/iprintf.c: Likewise.
+	* libc/stdio/printf.c: Likewise.
+	* libc/stdio/sniprintf.c: Likewise.
+	* libc/stdio/vdiprintf.c: Likewise.
+	* libc/stdio/vdprintf.c: Likewise.
+	* libc/stdio/vsiprintf.c: Likewise.
+	* libc/stdio/fvwrite.c (__sfvwrite_r): Handle asnprintf.
+	* libc/stdio/asniprintf.c (asniprintf, _asniprintf_r): New file.
+	* libc/stdio/asnprintf.c (asnprintf, _asnprintf_r): New file.
+	* libc/stdio/vasniprintf.c (vasniprintf, _vasniprintf_r): New
+	file.
+	* libc/stdio/vasnprintf.c (vasnprintf, _vasnprintf_r): New file.
+	* libc/stdio/vdprintf.c (_vdprintf_r): Rewrite to avoid malloc in
+	typical case.
+	* libc/stdio/vdiprintf.c (_vdiprintf_r): Likewise.
+	* libc/include/stdio.h: Add prototypes for new functions; sort
+	existing functions.
+
 2007-05-03  Kazu Hirata  <kazu@codesourcery.com>
 
 	* libc/machine/m68k/Makefile.am (lib_a_SOURCES): Add memcpy.S

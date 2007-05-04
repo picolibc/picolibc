@@ -14,46 +14,7 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-
-/*
-FUNCTION
-<<vsniprintf>>---write formatted output (integer only)
-
-INDEX
-	vsniprintf
-
-ANSI_SYNOPSIS
-        #include <stdio.h>
-
-        int vsniprintf(char *<[str]>, size_t <[size]>, const char *<[fmt]>, va_list <[list]>);
-
-TRAD_SYNOPSIS
-        #include <stdio.h>
-
-        int vsnprintf(<[str]>, <[size]>, <[fmt]>, <[list]>)
-        char *<[str]>;
-        size_t <[size]>;
-        char *<[fmt]>;
-        va_list <[list]>;
-
-DESCRIPTION
-<<vsniprintf>> is a restricted version of <<vsnprintf>>: it has the same
-arguments and behavior, save that it cannot perform any floating-point
-formatting: the <<f>>, <<g>>, <<G>>, <<e>>, and <<F>> type specifiers
-are not recognized.
-
-RETURNS
-        <<vsniprintf>> returns the number of bytes in the output string,
-        save that the concluding <<NULL>> is not counted.
-        <<vsniprintf>> returns when the end of the format string is
-        encountered.
-
-PORTABILITY
-<<vsniprintf>> is not required by ANSI C.
-
-Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
-<<lseek>>, <<read>>, <<sbrk>>, <<write>>.
-*/
+/* doc in viprintf.c */
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "%W% (Berkeley) %G%";

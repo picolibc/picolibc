@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990, 2006 The Regents of the University of California.
+ * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
@@ -36,7 +36,7 @@
 
 /*
 FUNCTION
-<<vprintf>>, <<vfprintf>>, <<vsprintf>>---format argument list
+<<vprintf>>, <<vfprintf>>, <<vsprintf>>, <<vsnprintf>>, <<vasprintf>>, vasnprintf>>---format argument list
 
 INDEX
 	vprintf
@@ -46,6 +46,10 @@ INDEX
 	vsprintf
 INDEX
 	vsnprintf
+INDEX
+	vasprintf
+INDEX
+	vasnprintf
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
@@ -53,96 +57,46 @@ ANSI_SYNOPSIS
 	int vprintf(const char *<[fmt]>, va_list <[list]>);
 	int vfprintf(FILE *<[fp]>, const char *<[fmt]>, va_list <[list]>);
 	int vsprintf(char *<[str]>, const char *<[fmt]>, va_list <[list]>);
-	int vasprintf(char **<[strp]>, const char *<[fmt]>, va_list <[list]>);
 	int vsnprintf(char *<[str]>, size_t <[size]>, const char *<[fmt]>,
                       va_list <[list]>);
+	int vasprintf(char **<[strp]>, const char *<[fmt]>, va_list <[list]>);
+	char *vasnprintf(char *<[str]>, size_t *<[size]>, const char *<[fmt]>,
+                         va_list <[list]>);
 
 	int _vprintf_r(struct _reent *<[reent]>, const char *<[fmt]>,
                         va_list <[list]>);
-	int _vfprintf_r(struct _reent *<[reent]>, FILE *<[fp]>, const char *<[fmt]>,
-                        va_list <[list]>);
-	int _vasprintf_r(struct _reent *<[reent]>, char **<[str]>,
+	int _vfprintf_r(struct _reent *<[reent]>, FILE *<[fp]>,
                         const char *<[fmt]>, va_list <[list]>);
 	int _vsprintf_r(struct _reent *<[reent]>, char *<[str]>,
                         const char *<[fmt]>, va_list <[list]>);
-	int _vsnprintf_r(struct _reent *<[reent]>, char *<[str]>, size_t <[size]>,
+	int _vasprintf_r(struct _reent *<[reent]>, char **<[str]>,
                          const char *<[fmt]>, va_list <[list]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	#include <varargs.h>
-	int vprintf( <[fmt]>, <[list]>)
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int vfprintf(<[fp]>, <[fmt]>, <[list]>)
-	FILE *<[fp]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int vasprintf(<[strp]>, <[fmt]>, <[list]>)
-	char **<[strp]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int vsprintf(<[str]>, <[fmt]>, <[list]>)
-	char *<[str]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int vsnprintf(<[str]>, <[size]>, <[fmt]>, <[list]>)
-	char *<[str]>;
-        size_t <[size]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int _vprintf_r(<[reent]>, <[fmt]>, <[list]>)
-	struct _reent *<[reent]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int _vfprintf_r(<[reent]>, <[fp]>, <[fmt]>, <[list]>)
-	struct _reent *<[reent]>;
-	FILE *<[fp]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int _vasprintf_r(<[reent]>, <[strp]>, <[fmt]>, <[list]>)
-	struct _reent *<[reent]>;
-	char **<[strp]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int _vsprintf_r(<[reent]>, <[str]>, <[fmt]>, <[list]>)
-	struct _reent *<[reent]>;
-	char *<[str]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int _vsnprintf_r(<[reent]>, <[str]>, <[size]>, <[fmt]>, <[list]>)
-	struct _reent *<[reent]>;
-	char *<[str]>;
-        size_t <[size]>;
-	char *<[fmt]>;
-	va_list <[list]>;
+	int _vsnprintf_r(struct _reent *<[reent]>, char *<[str]>,
+                         size_t <[size]>, const char *<[fmt]>,
+                         va_list <[list]>);
+	char *_vasnprintf_r(struct _reent *<[reent]>, char *<[str]>,
+                            size_t *<[size]>, const char *<[fmt]>,
+                            va_list <[list]>);
 
 DESCRIPTION
-<<vprintf>>, <<vfprintf>>, <<vasprintf>>, <<vsprintf>> and <<vsnprintf>> are 
-(respectively) variants of <<printf>>, <<fprintf>>, <<asprintf>>, <<sprintf>>,
-and <<snprintf>>.  They differ only in allowing their caller to pass the 
-variable argument list as a <<va_list>> object (initialized by <<va_start>>) 
-rather than directly accepting a variable number of arguments.
+<<vprintf>>, <<vfprintf>>, <<vasprintf>>, <<vsprintf>>, <<vsnprintf>>,
+and <<vasnprintf>> are (respectively) variants of <<printf>>,
+<<fprintf>>, <<asprintf>>, <<sprintf>>, <<snprintf>>, and
+<<asnprintf>>.  They differ only in allowing their caller to pass the
+variable argument list as a <<va_list>> object (initialized by
+<<va_start>>) rather than directly accepting a variable number of
+arguments.  The caller is responsible for calling <<va_end>>.
+
+<<_vprintf_r>>, <<_vfprintf_r>>, <<_vasprintf_r>>, <<_vsprintf_r>>,
+<<_vsnprintf_r>>, and <<_vasnprintf_r>> are reentrant versions of the
+above.
 
 RETURNS
-The return values are consistent with the corresponding functions:
-<<vasprintf>>/<<vsprintf>> returns the number of bytes in the output string,
-save that the concluding <<NULL>> is not counted.
-<<vprintf>> and <<vfprintf>> return the number of characters transmitted.
-If an error occurs, <<vprintf>> and <<vfprintf>> return <<EOF>> and
-<<vasprintf>> returns -1.  No error returns occur for <<vsprintf>>.
+The return values are consistent with the corresponding functions.
 
 PORTABILITY
-ANSI C requires all three functions.
+ANSI C requires <<vprintf>>, <<vfprintf>>, <<vsprintf>>, and
+<<vsnprintf>>.  The remaining functions are newlib extensions.
 
 Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
@@ -1247,13 +1201,13 @@ number:			if ((dprec = prec) >= 0)
 				if (_fpvalue == 0) {
 					/* kludge for __dtoa irregularity */
 					PRINT ("0", 1);
-					if (expt < ndig || (flags & ALT) != 0) {
+					if (expt < ndig || flags & ALT) {
 						PRINT (decimal_point, 1);
 						PAD (ndig - 1, zeroes);
 					}
 				} else if (expt <= 0) {
 					PRINT ("0", 1);
-					if(expt || ndig || (flags & ALT)) {
+					if (expt || ndig || flags & ALT) {
 						PRINT (decimal_point, 1);
 						PAD (-expt, zeroes);
 						PRINT (cp, ndig);
@@ -1267,15 +1221,15 @@ number:			if ((dprec = prec) >= 0)
 					PRINT (cp, expt);
 					cp += expt;
 					PRINT (".", 1);
-					PRINT (cp, ndig-expt);
+					PRINT (cp, ndig - expt);
 				}
 			} else {	/* 'e' or 'E' */
 				if (ndig > 1 || flags & ALT) {
 					ox[0] = *cp++;
 					ox[1] = '.';
 					PRINT (ox, 2);
-                                       if (_fpvalue) {
-						PRINT (cp, ndig-1);
+					if (_fpvalue) {
+						PRINT (cp, ndig - 1);
 					} else	/* 0.[0..] */
 						/* __dtoa irregularity */
 						PAD (ndig - 1, zeroes);

@@ -17,7 +17,7 @@
 
 /*
 FUNCTION
-<<viprintf>>, <<vfiprintf>>, <<vsiprintf>>---format argument list
+<<viprintf>>, <<vfiprintf>>, <<vsiprintf>>, <<vsniprintf>>, <<vasiprintf>>, <<vasniprintf>>---format argument list (integer only)
 
 INDEX
 	viprintf
@@ -27,6 +27,10 @@ INDEX
 	vsiprintf
 INDEX
 	vsniprintf
+INDEX
+	vasiprintf
+INDEX
+	vasniprintf
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
@@ -34,96 +38,45 @@ ANSI_SYNOPSIS
 	int viprintf(const char *<[fmt]>, va_list <[list]>);
 	int vfiprintf(FILE *<[fp]>, const char *<[fmt]>, va_list <[list]>);
 	int vsiprintf(char *<[str]>, const char *<[fmt]>, va_list <[list]>);
-	int vasiprintf(char **<[strp]>, const char *<[fmt]>, va_list <[list]>);
 	int vsniprintf(char *<[str]>, size_t <[size]>, const char *<[fmt]>,
                        va_list <[list]>);
+	int vasiprintf(char **<[strp]>, const char *<[fmt]>, va_list <[list]>);
+	char *vasniprintf(char *<[str]>, size_t *<[size]>, const char *<[fmt]>,
+                          va_list <[list]>);
 
 	int _viprintf_r(struct _reent *<[reent]>, const char *<[fmt]>,
                         va_list <[list]>);
 	int _vfiprintf_r(struct _reent *<[reent]>, FILE *<[fp]>,
                         const char *<[fmt]>, va_list <[list]>);
-	int _vasiprintf_r(struct _reent *<[reent]>, char **<[str]>,
-                        const char *<[fmt]>, va_list <[list]>);
 	int _vsiprintf_r(struct _reent *<[reent]>, char *<[str]>,
                         const char *<[fmt]>, va_list <[list]>);
-	int _vsniprintf_r(struct _reent *<[reent]>, char *<[str]>, size_t <[size]>,
-                        const char *<[fmt]>, va_list <[list]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	#include <varargs.h>
-	int viprintf( <[fmt]>, <[list]>)
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int vfiprintf(<[fp]>, <[fmt]>, <[list]>)
-	FILE *<[fp]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int vasiprintf(<[strp]>, <[fmt]>, <[list]>)
-	char **<[strp]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int vsiprintf(<[str]>, <[fmt]>, <[list]>)
-	char *<[str]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int vsniprintf(<[str]>, <[size]>, <[fmt]>, <[list]>)
-	char *<[str]>;
-        size_t <[size]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int _viprintf_r(<[reent]>, <[fmt]>, <[list]>)
-	struct _reent *<[reent]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int _vfiprintf_r(<[reent]>, <[fp]>, <[fmt]>, <[list]>)
-	struct _reent *<[reent]>;
-	FILE *<[fp]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int _vasiprintf_r(<[reent]>, <[strp]>, <[fmt]>, <[list]>)
-	struct _reent *<[reent]>;
-	char **<[strp]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int _vsiprintf_r(<[reent]>, <[str]>, <[fmt]>, <[list]>)
-	struct _reent *<[reent]>;
-	char *<[str]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int _vsniprintf_r(<[reent]>, <[str]>, <[size]>, <[fmt]>, <[list]>)
-	struct _reent *<[reent]>;
-	char *<[str]>;
-        size_t <[size]>;
-	char *<[fmt]>;
-	va_list <[list]>;
+	int _vsniprintf_r(struct _reent *<[reent]>, char *<[str]>,
+                          size_t <[size]>, const char *<[fmt]>,
+                          va_list <[list]>);
+	int _vasiprintf_r(struct _reent *<[reent]>, char **<[str]>,
+                          const char *<[fmt]>, va_list <[list]>);
+	char *_vasniprintf_r(struct _reent *<[reent]>, char *<[str]>,
+                             size_t *<[size]>, const char *<[fmt]>,
+                             va_list <[list]>);
 
 DESCRIPTION
-<<viprintf>>, <<vfiprintf>>, <<vasiprintf>>, <<vsiprintf>> and 
-<<vsniprintf>> are (respectively) variants of <<iprintf>>, <<fiprintf>>, 
-<<asiprintf>>, <<siprintf>>, and <<sniprintf>>.  They differ only in 
-restricting the caller to use non-floating-point format specifiers.
+<<viprintf>>, <<vfiprintf>>, <<vasiprintf>>, <<vsiprintf>>,
+<<vsniprintf>>, and <<vasniprintf>> are (respectively) variants of
+<<iprintf>>, <<fiprintf>>, <<asiprintf>>, <<siprintf>>, <<sniprintf>>,
+and <<asniprintf>>.  They differ only in allowing their caller to pass
+the variable argument list as a <<va_list>> object (initialized by
+<<va_start>>) rather than directly accepting a variable number of
+arguments.  The caller is responsible for calling <<va_end>>.
+
+<<_viprintf_r>>, <<_vfiprintf_r>>, <<_vasiprintf_r>>,
+<<_vsiprintf_r>>, <<_vsniprintf_r>>, and <<_vasniprintf_r>> are
+reentrant versions of the above.
 
 RETURNS
 The return values are consistent with the corresponding functions:
-<<vasiprintf>>/<<vsiprintf>> returns the number of bytes in the output string,
-save that the concluding <<NULL>> is not counted.
-<<viprintf>> and <<vfiprintf>> return the number of characters transmitted.
-If an error occurs, <<viprintf>> and <<vfiprintf>> return <<EOF>> and
-<<vasiprintf>> returns -1.  No error returns occur for <<vsiprintf>>.
 
 PORTABILITY
-<<viprintf>>, <<vfiprintf>>, <<vasiprintf>>, <<vsiprintf>> and <<vsniprintf>>
-are newlib extensions.
+All of these functions are newlib extensions.
 
 Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.

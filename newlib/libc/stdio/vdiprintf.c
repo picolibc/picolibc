@@ -2,6 +2,7 @@
  * Permission to use, copy, modify, and distribute this software
  * is freely granted, provided that this notice is preserved.
  */
+/* doc in diprintf.c */
 
 #include <_ansi.h>
 #include <reent.h>
@@ -18,13 +19,16 @@ _DEFUN(_vdiprintf_r, (ptr, fd, format, ap),
        va_list ap)
 {
   char *p;
-  int n;
+  char buf[512];
+  size_t n = sizeof buf;
 
   _REENT_SMALL_CHECK_INIT (ptr);
-  n = _vasiprintf_r (ptr, &p, format, ap);
-  if (n == -1) return -1;
+  p = _vasniprintf_r (ptr, buf, &n, format, ap);
+  if (!p)
+    return -1;
   n = _write_r (ptr, fd, p, n);
-  _free_r (ptr, p);
+  if (p != buf)
+    _free_r (ptr, p);
   return n;
 }
 

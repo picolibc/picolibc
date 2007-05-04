@@ -54,8 +54,7 @@ ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 am__DEPENDENCIES_1 = $(lpfx)vfiprintf.$(oext) $(lpfx)vfprintf.$(oext) \
 	$(lpfx)vfscanf.$(oext) $(lpfx)vfiscanf.$(oext)
-am__objects_1 = lib_a-clearerr.$(OBJEXT) lib_a-diprintf.$(OBJEXT) \
-	lib_a-dprintf.$(OBJEXT) lib_a-fclose.$(OBJEXT) \
+am__objects_1 = lib_a-clearerr.$(OBJEXT) lib_a-fclose.$(OBJEXT) \
 	lib_a-fdopen.$(OBJEXT) lib_a-feof.$(OBJEXT) \
 	lib_a-ferror.$(OBJEXT) lib_a-fflush.$(OBJEXT) \
 	lib_a-fgetc.$(OBJEXT) lib_a-fgetpos.$(OBJEXT) \
@@ -105,31 +104,43 @@ am__objects_1 = lib_a-clearerr.$(OBJEXT) lib_a-diprintf.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-putw.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-vasiprintf.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-vasprintf.$(OBJEXT)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_3 = lib_a-asniprintf.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-asnprintf.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-diprintf.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-dprintf.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-vasniprintf.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-vasnprintf.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
-@USE_LIBTOOL_FALSE@	$(am__objects_2)
+@USE_LIBTOOL_FALSE@	$(am__objects_2) $(am__objects_3)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-am__objects_3 = clearerr.lo diprintf.lo dprintf.lo fclose.lo fdopen.lo \
-	feof.lo ferror.lo fflush.lo fgetc.lo fgetpos.lo fgets.lo \
-	fileno.lo findfp.lo fiprintf.lo flags.lo fopen.lo fprintf.lo \
-	fputc.lo fputs.lo fread.lo freopen.lo fscanf.lo fiscanf.lo \
-	fseek.lo fsetpos.lo ftell.lo fvwrite.lo fwalk.lo fwrite.lo \
-	getc.lo getchar.lo getc_u.lo getchar_u.lo getdelim.lo \
-	getline.lo gets.lo iprintf.lo iscanf.lo makebuf.lo perror.lo \
-	printf.lo putc.lo putchar.lo putc_u.lo putchar_u.lo puts.lo \
-	refill.lo remove.lo rename.lo rewind.lo rget.lo scanf.lo \
-	sccl.lo setbuf.lo setbuffer.lo setlinebuf.lo setvbuf.lo \
-	siprintf.lo siscanf.lo sniprintf.lo snprintf.lo sprintf.lo \
-	sscanf.lo stdio.lo tmpfile.lo tmpnam.lo ungetc.lo vdiprintf.lo \
-	vdprintf.lo viprintf.lo viscanf.lo vprintf.lo vscanf.lo \
-	vsiprintf.lo vsiscanf.lo vsnprintf.lo vsniprintf.lo \
-	vsprintf.lo vsscanf.lo wbuf.lo wsetup.lo
-@ELIX_LEVEL_1_FALSE@am__objects_4 = asiprintf.lo asprintf.lo \
+am__objects_4 = clearerr.lo fclose.lo fdopen.lo feof.lo ferror.lo \
+	fflush.lo fgetc.lo fgetpos.lo fgets.lo fileno.lo findfp.lo \
+	fiprintf.lo flags.lo fopen.lo fprintf.lo fputc.lo fputs.lo \
+	fread.lo freopen.lo fscanf.lo fiscanf.lo fseek.lo fsetpos.lo \
+	ftell.lo fvwrite.lo fwalk.lo fwrite.lo getc.lo getchar.lo \
+	getc_u.lo getchar_u.lo getdelim.lo getline.lo gets.lo \
+	iprintf.lo iscanf.lo makebuf.lo perror.lo printf.lo putc.lo \
+	putchar.lo putc_u.lo putchar_u.lo puts.lo refill.lo remove.lo \
+	rename.lo rewind.lo rget.lo scanf.lo sccl.lo setbuf.lo \
+	setbuffer.lo setlinebuf.lo setvbuf.lo siprintf.lo siscanf.lo \
+	sniprintf.lo snprintf.lo sprintf.lo sscanf.lo stdio.lo \
+	tmpfile.lo tmpnam.lo ungetc.lo vdiprintf.lo vdprintf.lo \
+	viprintf.lo viscanf.lo vprintf.lo vscanf.lo vsiprintf.lo \
+	vsiscanf.lo vsnprintf.lo vsniprintf.lo vsprintf.lo vsscanf.lo \
+	wbuf.lo wsetup.lo
+@ELIX_LEVEL_1_FALSE@am__objects_5 = asiprintf.lo asprintf.lo \
 @ELIX_LEVEL_1_FALSE@	fcloseall.lo fseeko.lo ftello.lo getw.lo \
 @ELIX_LEVEL_1_FALSE@	mktemp.lo putw.lo vasiprintf.lo \
 @ELIX_LEVEL_1_FALSE@	vasprintf.lo
-@USE_LIBTOOL_TRUE@am_libstdio_la_OBJECTS = $(am__objects_3) \
-@USE_LIBTOOL_TRUE@	$(am__objects_4)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_6 = asniprintf.lo \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	asnprintf.lo \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	diprintf.lo \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	dprintf.lo \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vasniprintf.lo \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vasnprintf.lo
+@USE_LIBTOOL_TRUE@am_libstdio_la_OBJECTS = $(am__objects_4) \
+@USE_LIBTOOL_TRUE@	$(am__objects_5) $(am__objects_6)
 libstdio_la_OBJECTS = $(am_libstdio_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libstdio_la_rpath =
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -294,108 +305,117 @@ target_alias = @target_alias@
 AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 GENERAL_SOURCES = \
-	clearerr.c 			\
-	diprintf.c			\
-	dprintf.c			\
-	fclose.c 			\
-	fdopen.c 			\
-	feof.c 				\
-	ferror.c 			\
-	fflush.c 			\
-	fgetc.c 			\
-	fgetpos.c 			\
-	fgets.c 			\
+	clearerr.c			\
+	fclose.c			\
+	fdopen.c			\
+	feof.c				\
+	ferror.c			\
+	fflush.c			\
+	fgetc.c			\
+	fgetpos.c			\
+	fgets.c			\
 	fileno.c			\
-	findfp.c 			\
-	fiprintf.c 			\
-	flags.c 			\
-	fopen.c 			\
-	fprintf.c 			\
-	fputc.c 			\
-	fputs.c 			\
-	fread.c 			\
-	freopen.c 			\
-	fscanf.c 			\
-	fiscanf.c 			\
-	fseek.c 			\
-	fsetpos.c 			\
-	ftell.c 			\
-	fvwrite.c 			\
-	fwalk.c 			\
-	fwrite.c 			\
-	getc.c 				\
-	getchar.c 			\
+	findfp.c			\
+	fiprintf.c			\
+	flags.c			\
+	fopen.c			\
+	fprintf.c			\
+	fputc.c			\
+	fputs.c			\
+	fread.c			\
+	freopen.c			\
+	fscanf.c			\
+	fiscanf.c			\
+	fseek.c			\
+	fsetpos.c			\
+	ftell.c			\
+	fvwrite.c			\
+	fwalk.c			\
+	fwrite.c			\
+	getc.c				\
+	getchar.c			\
 	getc_u.c			\
 	getchar_u.c			\
 	getdelim.c			\
 	getline.c			\
-	gets.c 				\
-	iprintf.c 			\
-	iscanf.c 			\
+	gets.c				\
+	iprintf.c			\
+	iscanf.c			\
 	makebuf.c			\
-	perror.c 			\
-	printf.c 			\
-	putc.c 				\
-	putchar.c 			\
+	perror.c			\
+	printf.c			\
+	putc.c				\
+	putchar.c			\
 	putc_u.c			\
 	putchar_u.c			\
-	puts.c 				\
-	refill.c 			\
-	remove.c 			\
-	rename.c 			\
-	rewind.c 			\
-	rget.c 				\
-	scanf.c 			\
-	sccl.c	 			\
-	setbuf.c 			\
-	setbuffer.c 			\
-	setlinebuf.c 			\
-	setvbuf.c 			\
-	siprintf.c 			\
-	siscanf.c 			\
+	puts.c				\
+	refill.c			\
+	remove.c			\
+	rename.c			\
+	rewind.c			\
+	rget.c				\
+	scanf.c			\
+	sccl.c				\
+	setbuf.c			\
+	setbuffer.c			\
+	setlinebuf.c			\
+	setvbuf.c			\
+	siprintf.c			\
+	siscanf.c			\
 	sniprintf.c			\
 	snprintf.c			\
-	sprintf.c 			\
-	sscanf.c 			\
-	stdio.c 			\
-	tmpfile.c 			\
-	tmpnam.c 			\
-	ungetc.c 			\
+	sprintf.c			\
+	sscanf.c			\
+	stdio.c			\
+	tmpfile.c			\
+	tmpnam.c			\
+	ungetc.c			\
 	vdiprintf.c			\
 	vdprintf.c			\
-	viprintf.c 			\
+	viprintf.c			\
 	viscanf.c			\
-	vprintf.c 			\
+	vprintf.c			\
 	vscanf.c			\
-	vsiprintf.c 			\
+	vsiprintf.c			\
 	vsiscanf.c			\
 	vsnprintf.c			\
 	vsniprintf.c			\
-	vsprintf.c 			\
+	vsprintf.c			\
 	vsscanf.c			\
-	wbuf.c 				\
+	wbuf.c				\
 	wsetup.c
 
-@ELIX_LEVEL_1_FALSE@ELIX_SOURCES = \
+@ELIX_LEVEL_1_FALSE@ELIX_2_SOURCES = \
 @ELIX_LEVEL_1_FALSE@	asiprintf.c		\
 @ELIX_LEVEL_1_FALSE@	asprintf.c		\
 @ELIX_LEVEL_1_FALSE@	fcloseall.c		\
-@ELIX_LEVEL_1_FALSE@	fseeko.c 		\
-@ELIX_LEVEL_1_FALSE@	ftello.c 		\
+@ELIX_LEVEL_1_FALSE@	fseeko.c		\
+@ELIX_LEVEL_1_FALSE@	ftello.c		\
 @ELIX_LEVEL_1_FALSE@	getw.c			\
-@ELIX_LEVEL_1_FALSE@	mktemp.c 		\
-@ELIX_LEVEL_1_FALSE@	putw.c 			\
+@ELIX_LEVEL_1_FALSE@	mktemp.c		\
+@ELIX_LEVEL_1_FALSE@	putw.c			\
 @ELIX_LEVEL_1_FALSE@	vasiprintf.c		\
 @ELIX_LEVEL_1_FALSE@	vasprintf.c
 
-@ELIX_LEVEL_1_TRUE@ELIX_SOURCES = 
+@ELIX_LEVEL_1_TRUE@ELIX_2_SOURCES = 
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@ELIX_4_SOURCES = \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	asniprintf.c		\
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	asnprintf.c		\
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	diprintf.c		\
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	dprintf.c		\
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vasniprintf.c		\
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vasnprintf.c
+
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@ELIX_4_SOURCES = 
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@ELIX_4_SOURCES = 
+@ELIX_LEVEL_1_TRUE@ELIX_4_SOURCES = 
 LIBADD_OBJS = \
 	$(lpfx)vfiprintf.$(oext) $(lpfx)vfprintf.$(oext) \
 	$(lpfx)vfscanf.$(oext) $(lpfx)vfiscanf.$(oext)
 
 libstdio_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libstdio.la
-@USE_LIBTOOL_TRUE@libstdio_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
+@USE_LIBTOOL_TRUE@libstdio_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_2_SOURCES) $(ELIX_4_SOURCES)
 @USE_LIBTOOL_TRUE@libstdio_la_LIBADD = $(LIBADD_OBJS)
 @USE_LIBTOOL_TRUE@libstdio_la_DEPENDENCIES = $(LIBADD_OBJS)
 @USE_LIBTOOL_FALSE@LIB_COMPILE = $(COMPILE)
@@ -403,12 +423,13 @@ libstdio_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_2_SOURCES) $(ELIX_4_SOURCES)
 @USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIBADD_OBJS)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
 @USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIBADD_OBJS)
 CHEWOUT_FILES = \
 	clearerr.def		\
+	diprintf.def		\
 	dprintf.def		\
 	fclose.def		\
 	fcloseall.def		\
@@ -540,18 +561,6 @@ lib_a-clearerr.o: clearerr.c
 
 lib_a-clearerr.obj: clearerr.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clearerr.obj `if test -f 'clearerr.c'; then $(CYGPATH_W) 'clearerr.c'; else $(CYGPATH_W) '$(srcdir)/clearerr.c'; fi`
-
-lib_a-diprintf.o: diprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-diprintf.o `test -f 'diprintf.c' || echo '$(srcdir)/'`diprintf.c
-
-lib_a-diprintf.obj: diprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-diprintf.obj `if test -f 'diprintf.c'; then $(CYGPATH_W) 'diprintf.c'; else $(CYGPATH_W) '$(srcdir)/diprintf.c'; fi`
-
-lib_a-dprintf.o: dprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dprintf.o `test -f 'dprintf.c' || echo '$(srcdir)/'`dprintf.c
-
-lib_a-dprintf.obj: dprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dprintf.obj `if test -f 'dprintf.c'; then $(CYGPATH_W) 'dprintf.c'; else $(CYGPATH_W) '$(srcdir)/dprintf.c'; fi`
 
 lib_a-fclose.o: fclose.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fclose.o `test -f 'fclose.c' || echo '$(srcdir)/'`fclose.c
@@ -1080,6 +1089,42 @@ lib_a-vasprintf.o: vasprintf.c
 
 lib_a-vasprintf.obj: vasprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vasprintf.obj `if test -f 'vasprintf.c'; then $(CYGPATH_W) 'vasprintf.c'; else $(CYGPATH_W) '$(srcdir)/vasprintf.c'; fi`
+
+lib_a-asniprintf.o: asniprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asniprintf.o `test -f 'asniprintf.c' || echo '$(srcdir)/'`asniprintf.c
+
+lib_a-asniprintf.obj: asniprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asniprintf.obj `if test -f 'asniprintf.c'; then $(CYGPATH_W) 'asniprintf.c'; else $(CYGPATH_W) '$(srcdir)/asniprintf.c'; fi`
+
+lib_a-asnprintf.o: asnprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asnprintf.o `test -f 'asnprintf.c' || echo '$(srcdir)/'`asnprintf.c
+
+lib_a-asnprintf.obj: asnprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asnprintf.obj `if test -f 'asnprintf.c'; then $(CYGPATH_W) 'asnprintf.c'; else $(CYGPATH_W) '$(srcdir)/asnprintf.c'; fi`
+
+lib_a-diprintf.o: diprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-diprintf.o `test -f 'diprintf.c' || echo '$(srcdir)/'`diprintf.c
+
+lib_a-diprintf.obj: diprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-diprintf.obj `if test -f 'diprintf.c'; then $(CYGPATH_W) 'diprintf.c'; else $(CYGPATH_W) '$(srcdir)/diprintf.c'; fi`
+
+lib_a-dprintf.o: dprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dprintf.o `test -f 'dprintf.c' || echo '$(srcdir)/'`dprintf.c
+
+lib_a-dprintf.obj: dprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dprintf.obj `if test -f 'dprintf.c'; then $(CYGPATH_W) 'dprintf.c'; else $(CYGPATH_W) '$(srcdir)/dprintf.c'; fi`
+
+lib_a-vasniprintf.o: vasniprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vasniprintf.o `test -f 'vasniprintf.c' || echo '$(srcdir)/'`vasniprintf.c
+
+lib_a-vasniprintf.obj: vasniprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vasniprintf.obj `if test -f 'vasniprintf.c'; then $(CYGPATH_W) 'vasniprintf.c'; else $(CYGPATH_W) '$(srcdir)/vasniprintf.c'; fi`
+
+lib_a-vasnprintf.o: vasnprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vasnprintf.o `test -f 'vasnprintf.c' || echo '$(srcdir)/'`vasnprintf.c
+
+lib_a-vasnprintf.obj: vasnprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vasnprintf.obj `if test -f 'vasnprintf.c'; then $(CYGPATH_W) 'vasnprintf.c'; else $(CYGPATH_W) '$(srcdir)/vasnprintf.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

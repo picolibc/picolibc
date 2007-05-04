@@ -127,7 +127,7 @@ _DEFUN(__sfvwrite_r, (ptr, fp, uio),
 	  w = fp->_w;
 	  if (fp->_flags & __SSTR)
 	    {
-	      if (len >= w && fp->_flags & __SMBF)
+	      if (len >= w && fp->_flags & (__SMBF | __SOPT))
 		{ /* must be asprintf family */
 		  unsigned char *str;
 		  int curpos = (fp->_p - fp->_bf._base);
@@ -141,15 +141,30 @@ _DEFUN(__sfvwrite_r, (ptr, fp, uio),
 		  int newsize = fp->_bf._size * 3 / 2;
 		  if (newsize < curpos + len + 1)
 		    newsize = curpos + len + 1;
-		  str = (unsigned char *)_realloc_r (ptr, fp->_bf._base,
-						     newsize);
-		  if (!str)
+		  if (fp->_flags & __SOPT)
 		    {
-		      /* Free buffer which is no longer used.  */
-		      _free_r (ptr, fp->_bf._base);
-                      /* Ensure correct errno, even if free changed it.  */
-                      ptr->_errno = ENOMEM;
-		      goto err;
+		      /* asnprintf leaves original buffer alone.  */
+		      str = (unsigned char *)_malloc_r (ptr, newsize);
+		      if (!str)
+			{
+			  ptr->_errno = ENOMEM;
+			  goto err;
+			}
+		      memcpy (str, fp->_bf._base, curpos);
+		      fp->_flags = (fp->_flags & ~__SOPT) | __SMBF;
+		    }
+		  else
+		    {
+		      str = (unsigned char *)_realloc_r (ptr, fp->_bf._base,
+							 newsize);
+		      if (!str)
+			{
+			  /* Free buffer which is no longer used.  */
+			  _free_r (ptr, fp->_bf._base);
+			  /* Ensure correct errno, even if free changed it.  */
+			  ptr->_errno = ENOMEM;
+			  goto err;
+			}
 		    }
 		  fp->_bf._base = str;
 		  fp->_p = str + curpos;

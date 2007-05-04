@@ -5,7 +5,7 @@
 
 /*
 FUNCTION
-<<diprintf>>, <<vdiprintf>>---print to a file descriptor
+<<diprintf>>, <<vdiprintf>>---print to a file descriptor (integer only)
 
 INDEX
 	diprintf
@@ -25,6 +25,9 @@ ANSI_SYNOPSIS
 DESCRIPTION
 <<diprintf>> and <<vdiprintf>> are similar to <<dprintf>> and <<vdprintf>>,
 except that only integer format specifiers are processed.
+
+The functions <<_diprintf_r>> and <<_vdiprintf_r>> are simply
+reentrant versions of the functions above.
 
 RETURNS
 Similar to <<dprintf>> and <<vdprintf>>.
