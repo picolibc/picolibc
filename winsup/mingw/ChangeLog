@@ -1,3 +1,14 @@
+2007-05-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdint.h (intptr_t): Protect with _INTPTR_T_DEFINED.
+	 Condition on _WIN64.
+	(uintptr_t): Protect with _UINTPTR_T_DEFINED.  Condition on _WIN64.
+	(INTPTR_MIN, INTPTR_MAX, UINTPTR_MAX): Condition on _WIN64.
+	(PTRDIFF_MIN): Define as INTPTR_MIN.
+	(PTRDIFF_MAX): Define as INTPTR_MAX.
+	(SIG_ATOMIC_MIN): Define as INTPTR_MIN.
+	(SIG_ATOMIC_MAX): Define as INTPTR_MAX.
+
 2007-04-07  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* Makefile.in: Removed mansuffix variable.  Changed mansection to support
@@ -16,7 +27,7 @@
 
 	* include/_mingw.h (__CRT_INLINE): Make conditional on __GNUC_STDC_INLINE__.
 
-2003-03-20  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+2007-03-20  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* Makefile.in: Tweak srcdist to fix build issue.
 
