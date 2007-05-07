@@ -39,6 +39,7 @@ open (const char *filename, int flags, ...)
 {
         syscall_open_t sys ;
 	syscall_out_t	*psys_out = ( syscall_out_t* )&sys;
+        va_list ap;
 
         sys.pathname = ( unsigned int )filename;
 
@@ -63,22 +64,11 @@ open (const char *filename, int flags, ...)
 	sys.flags |= ( ( flags & O_WRONLY ) ? JSRE_O_WRONLY : 0 );
 	sys.flags |= ( ( flags & O_RDWR )  ? JSRE_O_RDWR  : 0 );
 
-
 	/* FIXME: we have to check/map all flags */
 
-        if ((sys.flags & O_CREAT))
-          {
-                  va_list ap;
-
-                  va_start (ap, flags);
-                  sys.mode = va_arg (ap, int);
-                  va_end (ap);
-
-          }
-        else
-          {
-                  sys.mode = 0;
-          }
+        va_start (ap, flags);
+        sys.mode = va_arg (ap, int);
+        va_end (ap);
 
         __send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_OPEN, &sys);
 

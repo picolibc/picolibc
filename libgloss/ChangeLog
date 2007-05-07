@@ -1,3 +1,8 @@
+2007-05-07  Patrick Mansfield  <patmans@us.ibm.com>
+
+	* spu/open.c: Unconditionally set the "mode" to fix a bug where
+	mode was not properly set.
+
 2007-05-03  Kazu Hirata  <kazu@codesourcery.com>
 
 	* m68k/fido-_exit.c (_exit): Use stop #0x700.
@@ -7,7 +12,7 @@
 	* m68k/fido.sc: Catch .text.*, .rodata.*, .data.*, .bss.*,
 	.ctor.*, and .dtor.*.  Wrap ctor/dtor-related sections with KEEP.
 
-2007-04-04  Patrick Mansfield <patmans@us.ibm.com>
+2007-04-04  Patrick Mansfield  <patmans@us.ibm.com>
  
 	* spu/syscalls.c: Rename _send_to_ppe __send_to_ppe, and set errno
 	on return from the offload call.
@@ -31,7 +36,7 @@
 	* spu/sbrk.c (sbrk): Adjust the stack pointer vector correctly so
 	that GCC runtime stack checking works.  Handle the backchain, too.
 
-2007-02-21  Patrick Mansfield <patmans@us.ibm.com>
+2007-02-21  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* spu/gettimeofday.c: New file which adds SPU gettimeofday.
 	* spu/jsre.h: Remove time, add gettimeofday.
