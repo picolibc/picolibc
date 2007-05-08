@@ -61,9 +61,9 @@ typedef unsigned long long   uint_fast64_t;
 #ifndef _INTPTR_T_DEFINED
 #define _INTPTR_T_DEFINED
 #ifdef _WIN64
-  typedef __int64 uintptr_t;
+  typedef __int64 intptr_t;
 #else
-  typedef int uintptr_t;
+  typedef int intptr_t;
 #endif
 #endif
 

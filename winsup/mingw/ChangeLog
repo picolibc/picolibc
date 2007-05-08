@@ -1,3 +1,8 @@
+2007-05-08  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdint.h (intptr_t): Fix typo.
+	Thanks to Charles Wilson for report.
+
 2007-05-07  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/stdint.h (intptr_t): Protect with _INTPTR_T_DEFINED.
