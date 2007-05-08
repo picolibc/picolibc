@@ -36,7 +36,7 @@
 
 /*
 FUNCTION
-<<vprintf>>, <<vfprintf>>, <<vsprintf>>, <<vsnprintf>>, <<vasprintf>>, vasnprintf>>---format argument list
+<<vprintf>>, <<vfprintf>>, <<vsprintf>>, <<vsnprintf>>, <<vasprintf>>, <<vasnprintf>>---format argument list
 
 INDEX
 	vprintf

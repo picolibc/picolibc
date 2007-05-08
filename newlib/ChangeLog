@@ -1,3 +1,7 @@
+2007-05-07  Charles Wilson  <cygwin@...>
+
+	* libc/stdio/vfprintf.c: Fix typo in comments that breaks docs.
+
 2007-05-03  Eric Blake  <ebb9@byu.net>
 
 	Add support for asnprintf, and improve *printf documentation.
