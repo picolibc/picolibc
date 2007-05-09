@@ -34,6 +34,7 @@ _DEFUN(_vasniprintf_r, (ptr, buf, lenp, fmt, ap),
       /* mark a zero-length reallocatable buffer */
       f._flags = __SWR | __SSTR | __SMBF;
       len = 0;
+      buf = NULL;
     }
   f._bf._base = f._p = (unsigned char *) buf;
   /* For now, inherit the 32-bit signed limit of FILE._bf._size.

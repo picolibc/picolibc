@@ -1,3 +1,12 @@
+2007-05-09  Eric Blake  <ebb9@byu.net>
+
+	Allow zero size with non-null buf in *asnprintf.
+	* libc/stdio/asnprintf.c (_asnprintf_r, asnprintf): Avoid free'ing
+	user's buf.
+	* libc/stdio/asniprintf.c (_asniprintf_r, asniprintf): Likewise.
+	* libc/stdio/vasniprintf.c (_vasniprintf_r): Likewise.
+	* libc/stdio/vasnprintf.c (_vasnprintf_r): Likewise.
+
 2007-05-07  Charles Wilson  <cygwin@...>
 
 	* libc/stdio/vfprintf.c: Fix typo in comments that breaks docs.
