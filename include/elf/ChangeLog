@@ -1,3 +1,7 @@
+2007-05-11  Alan Modra  <amodra@bigpond.net.au>
+
+	* spu.h (R_SPU_PPU32, R_SPU_PPU64): Define.
+
 2007-05-02  Alan Modra  <amodra@bigpond.net.au>
 
 	* internal.h (ELF_IS_SECTION_IN_SEGMENT): Check both file offset

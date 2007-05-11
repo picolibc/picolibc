@@ -1,6 +1,6 @@
 /* SPU ELF support for BFD.
 
-   Copyright 2006 Free Software Foundation, Inc.
+   Copyright 2006, 2007 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -39,6 +39,8 @@ START_RELOC_NUMBERS (elf_spu_reloc_type)
      RELOC_NUMBER (R_SPU_ADDR10I,	11)
      RELOC_NUMBER (R_SPU_ADDR16I,	12)
      RELOC_NUMBER (R_SPU_REL32,		13)
+     RELOC_NUMBER (R_SPU_PPU32,		14)
+     RELOC_NUMBER (R_SPU_PPU64,		15)
 END_RELOC_NUMBERS (R_SPU_max)
 
 /* Program header extensions */
