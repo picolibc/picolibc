@@ -138,13 +138,8 @@ static char *rcsid = "$Id$";
 #include <limits.h>
 #include <stdint.h>
 #include <wchar.h>
-#include <string.h>
 #include <sys/lock.h>
-#ifdef _HAVE_STDC
 #include <stdarg.h>
-#else
-#include <varargs.h>
-#endif
 #include "local.h"
 #include "fvwrite.h"
 #include "vfieeefp.h"
@@ -243,10 +238,12 @@ _DEFUN(__sbprintf, (rptr, fp, fmt, ap),
 
 #ifdef _NO_LONGDBL
 static char *
-_EXFUN(cvt, (struct _reent *, double, int, int, char *, int *, int, int *));
+_EXFUN(cvt, (struct _reent *, double, int, int, char *, int *, int, int *,
+	     char *));
 #else
 static char *
-_EXFUN(cvt, (struct _reent *, _LONG_DOUBLE, int, int, char *, int *, int, int *));
+_EXFUN(cvt, (struct _reent *, _LONG_DOUBLE, int, int, char *, int *, int,
+	     int *, char *));
 extern int _EXFUN(_ldcheck,(_LONG_DOUBLE *));
 #endif
 
@@ -375,16 +372,16 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	int prec;		/* precision from format (%.3d), or -1 */
 	char sign;		/* sign prefix (' ', '+', '-', or \0) */
 #ifdef FLOATING_POINT
-	char *decimal_point = localeconv()->decimal_point;
+	char *decimal_point = _localeconv_r (data)->decimal_point;
 	char softsign;		/* temporary negative sign for floats */
-#ifdef _NO_LONGDBL
+# ifdef _NO_LONGDBL
 	union { int i; double d; } _double_ = {0};
-	#define _fpvalue (_double_.d)
-#else
+#  define _fpvalue (_double_.d)
+# else
 	union { int i; _LONG_DOUBLE ld; } _long_double_ = {0};
-	#define _fpvalue (_long_double_.ld)
-	int tmp;  
-#endif
+#  define _fpvalue (_long_double_.ld)
+	int tmp;
+# endif
 	int expt;		/* integer value of exponent */
 	int expsize = 0;	/* character count for expstr */
 	int ndig = 0;		/* actual number of digits returned by cvt */
@@ -814,19 +811,15 @@ reswitch:	switch (ch) {
 			base = DEC;
 			goto number;
 #ifdef FLOATING_POINT
+		case 'a':
+		case 'A':
 		case 'e':
 		case 'E':
 		case 'f':
 		case 'F':
 		case 'g':
 		case 'G':
-			if (prec == -1) {
-				prec = DEFPREC;
-			} else if ((ch == 'g' || ch == 'G') && prec == 0) {
-				prec = 1;
-			}
-
-#ifdef _NO_LONGDBL
+# ifdef _NO_LONGDBL
 			if (flags & LONGDBL) {
 				_fpvalue = (double) GET_ARG (N, ap, _LONG_DOUBLE);
 			} else {
@@ -860,7 +853,7 @@ reswitch:	switch (ch) {
 				break;
 			}
 
-#else /* !_NO_LONGDBL */
+# else /* !_NO_LONGDBL */
 
 			if (flags & LONGDBL) {
 				_fpvalue = GET_ARG (N, ap, _LONG_DOUBLE);
@@ -890,12 +883,35 @@ reswitch:	switch (ch) {
 				flags &= ~ZEROPAD;
 				break;
 			}
-#endif /* !_NO_LONGDBL */
+# endif /* !_NO_LONGDBL */
+
+			if (ch == 'a' || ch == 'A') {
+				ox[0] = '0';
+				ox[1] = ch == 'a' ? 'x' : 'X';
+				flags |= HEXPREFIX;
+				if (prec >= BUF)
+				  {
+				    if ((malloc_buf =
+					 (char *)_malloc_r (data, prec + 1))
+					== NULL)
+				      {
+					fp->_flags |= __SERR;
+					goto error;
+				      }
+				    cp = malloc_buf;
+				  }
+				else
+				  cp = buf;
+			} else if (prec == -1) {
+				prec = DEFPREC;
+			} else if ((ch == 'g' || ch == 'G') && prec == 0) {
+				prec = 1;
+			}
 
 			flags |= FPT;
 
 			cp = cvt (data, _fpvalue, prec, flags, &softsign,
-				&expt, ch, &ndig);
+				  &expt, ch, &ndig, cp);
 
 			if (ch == 'g' || ch == 'G') {
 				if (expt <= -4 || expt > prec)
@@ -905,7 +921,7 @@ reswitch:	switch (ch) {
 			}
 			else if (ch == 'F')
 				ch = 'f';
-			if (ch <= 'e') {	/* 'e' or 'E' fmt */
+			if (ch <= 'e') {	/* 'a', 'A', 'e', or 'E' fmt */
 				--expt;
 				expsize = exponent (expstr, expt, ch);
 				size = expsize + ndig;
@@ -1067,8 +1083,11 @@ reswitch:	switch (ch) {
 hex:			_uquad = UARG ();
 			base = HEX;
 			/* leading 0x/X only if non-zero */
-			if (flags & ALT && _uquad != 0)
+			if (flags & ALT && _uquad != 0) {
+				ox[0] = '0';
+				ox[1] = ch;
 				flags |= HEXPREFIX;
+			}
 
 			/* unsigned conversions */
 nosign:			sign = '\0';
@@ -1161,7 +1180,7 @@ number:			if ((dprec = prec) >= 0)
 		 * required by a decimal [diouxX] precision, then print the
 		 * string proper, then emit zeroes required by any leftover
 		 * floating precision; finally, if LADJUST, pad with blanks.
-		 * If flags&FPT, ch must be in [eEfg].
+		 * If flags&FPT, ch must be in [aAeEfg].
 		 *
 		 * Compute actual size, so we know how much to pad.
 		 * size excludes decimal prec; realsz includes it.
@@ -1169,7 +1188,7 @@ number:			if ((dprec = prec) >= 0)
 		realsz = dprec > size ? dprec : size;
 		if (sign)
 			realsz++;
-		else if (flags & HEXPREFIX)
+		if (flags & HEXPREFIX)
 			realsz+= 2;
 
 		/* right-adjusting blank padding */
@@ -1177,13 +1196,10 @@ number:			if ((dprec = prec) >= 0)
 			PAD (width - realsz, blanks);
 
 		/* prefix */
-		if (sign) {
+		if (sign)
 			PRINT (&sign, 1);
-		} else if (flags & HEXPREFIX) {
-			ox[0] = '0';
-			ox[1] = ch;
+		if (flags & HEXPREFIX)
 			PRINT (ox, 2);
-		}
 
 		/* right-adjusting zero padding */
 		if ((flags & (LADJUST|ZEROPAD)) == ZEROPAD)
@@ -1223,11 +1239,11 @@ number:			if ((dprec = prec) >= 0)
 					PRINT (".", 1);
 					PRINT (cp, ndig - expt);
 				}
-			} else {	/* 'e' or 'E' */
+			} else {	/* 'a', 'A', 'e', or 'E' */
 				if (ndig > 1 || flags & ALT) {
-					ox[0] = *cp++;
-					ox[1] = '.';
-					PRINT (ox, 2);
+					PRINT (cp, 1);
+					cp++;
+					PRINT (decimal_point, 1);
 					if (_fpvalue) {
 						PRINT (cp, ndig - 1);
 					} else	/* 0.[0..] */
@@ -1238,7 +1254,7 @@ number:			if ((dprec = prec) >= 0)
 				PRINT (expstr, expsize);
 			}
 		}
-#else
+#else /* !FLOATING_POINT */
 		PRINT (cp, size);
 #endif
 		/* left-adjusting padding (always blank) */
@@ -1267,19 +1283,31 @@ error:
 
 #ifdef FLOATING_POINT
 
-#ifdef _NO_LONGDBL
+# ifdef _NO_LONGDBL
 extern char *_dtoa_r _PARAMS((struct _reent *, double, int,
 			      int, int *, int *, char **));
-#else
+#  define _DTOA_R _dtoa_r
+#  define FREXP frexp
+# else
 extern char *_ldtoa_r _PARAMS((struct _reent *, _LONG_DOUBLE, int,
 			      int, int *, int *, char **));
-#undef word0
-#define word0(x) ldword0(x)
-#endif
+#  define _DTOA_R _ldtoa_r
+/* FIXME - frexpl is not yet supported; and cvt infloops if (double)f
+   converts a finite value into infinity.  */
+/* #  define FREXP frexpl */
+#  define FREXP(f,e) ((_LONG_DOUBLE) frexp ((double)f, e))
+# endif
 
-#ifdef _NO_LONGDBL
+/* Using reentrant DATA, convert finite VALUE into a string of digits
+   with no decimal point, using NDIGITS precision and FLAGS as guides
+   to whether trailing zeros must be included.  Set *SIGN to nonzero
+   if VALUE was negative.  Set *DECPT to the exponent plus one.  Set
+   *LENGTH to the length of the returned string.  CH must be one of
+   [aAeEfFgG]; if it is [aA], then the return string lives in BUF,
+   otherwise the return value shares the mprec reentrant storage.  */
+# ifdef _NO_LONGDBL
 static char *
-_DEFUN(cvt, (data, value, ndigits, flags, sign, decpt, ch, length),
+_DEFUN(cvt, (data, value, ndigits, flags, sign, decpt, ch, length, buf),
        struct _reent *data _AND
        double value _AND
        int ndigits  _AND
@@ -1287,10 +1315,11 @@ _DEFUN(cvt, (data, value, ndigits, flags, sign, decpt, ch, length),
        char *sign   _AND
        int *decpt   _AND
        int ch       _AND
-       int *length)
-#else
+       int *length  _AND
+       char *buf)
+# else
 static char *
-_DEFUN(cvt, (data, value, ndigits, flags, sign, decpt, ch, length),
+_DEFUN(cvt, (data, value, ndigits, flags, sign, decpt, ch, length, buf),
        struct _reent *data _AND
        _LONG_DOUBLE value  _AND
        int ndigits         _AND
@@ -1298,26 +1327,71 @@ _DEFUN(cvt, (data, value, ndigits, flags, sign, decpt, ch, length),
        char *sign          _AND
        int *decpt          _AND
        int ch              _AND
-       int *length)
-#endif
+       int *length         _AND
+       char *buf)
+# endif
 {
 	int mode, dsgn;
 	char *digits, *bp, *rve;
-#ifdef _NO_LONGDBL
-        union double_union tmp;
-#else
+# ifdef _NO_LONGDBL
+	union double_union tmp;
+
+	tmp.d = value;
+	if (word0 (tmp) & Sign_bit) { /* this will check for < 0 and -0.0 */
+		value = -value;
+		*sign = '-';
+	} else
+		*sign = '\000';
+# else /* !_NO_LONGDBL */
 	union
 	{
 	  struct ldieee ieee;
 	  _LONG_DOUBLE val;
 	} ld;
-#endif
 
-	if (ch == 'f' || ch == 'F') {
+	ld.val = value;
+	if (ld.ieee.sign) { /* this will check for < 0 and -0.0 */
+		value = -value;
+		*sign = '-';
+	} else
+		*sign = '\000';
+# endif /* !_NO_LONGDBL */
+
+	if (ch == 'a' || ch == 'A') {
+		/* This code assumes FLT_RADIX is a power of 2.  The initial
+		   division ensures the digit before the decimal will be less
+		   than FLT_RADIX (unless it is rounded later).	 There is no
+		   loss of precision in these calculations.  */
+		value = FREXP (value, decpt) / 8;
+		if (!value)
+			*decpt = 1;
+		digits = ch == 'a' ? "0123456789abcdef" : "0123456789ABCDEF";
+		bp = buf;
+		do {
+			value *= 16;
+			mode = (int) value;
+			value -= mode;
+			*bp++ = digits[mode];
+		} while (ndigits-- && value);
+		if (value > 0.5 || (value == 0.5 && mode & 1)) {
+			/* round to even */
+			rve = bp;
+			while (*--rve == digits[0xf]) {
+				*rve = '0';
+			}
+			*rve = *rve == '9' ? digits[0xa] : *rve + 1;
+		} else {
+			while (ndigits-- >= 0) {
+				*bp++ = '0';
+			}
+		}
+		*length = bp - buf;
+		return buf;
+	} else if (ch == 'f' || ch == 'F') {
 		mode = 3;		/* ndigits after the decimal point */
 	} else {
-		/* To obtain ndigits after the decimal point for the 'e' 
-		 * and 'E' formats, round to ndigits + 1 significant 
+		/* To obtain ndigits after the decimal point for the 'e'
+		 * and 'E' formats, round to ndigits + 1 significant
 		 * figures.
 		 */
 		if (ch == 'e' || ch == 'E') {
@@ -1326,26 +1400,7 @@ _DEFUN(cvt, (data, value, ndigits, flags, sign, decpt, ch, length),
 		mode = 2;		/* ndigits significant digits */
 	}
 
-#ifdef _NO_LONGDBL
-        tmp.d = value;
-
-	if (word0 (tmp) & Sign_bit) { /* this will check for < 0 and -0.0 */
-		value = -value;
-		*sign = '-';
-        } else
-		*sign = '\000';
-
-	digits = _dtoa_r (data, value, mode, ndigits, decpt, &dsgn, &rve);
-#else /* !_NO_LONGDBL */
-	ld.val = value;
-	if (ld.ieee.sign) { /* this will check for < 0 and -0.0 */
-		value = -value;
-		*sign = '-';
-        } else
-		*sign = '\000';
-
-	digits = _ldtoa_r (data, value, mode, ndigits, decpt, &dsgn, &rve);
-#endif /* !_NO_LONGDBL */
+	digits = _DTOA_R (data, value, mode, ndigits, decpt, &dsgn, &rve);
 
 	if ((ch != 'g' && ch != 'G') || flags & ALT) {	/* Print trailing zeros */
 		bp = digits + ndigits;
@@ -1370,26 +1425,28 @@ _DEFUN(exponent, (p0, exp, fmtch),
        int fmtch)
 {
 	register char *p, *t;
-	char expbuf[40];
+	char expbuf[10];
+	int isa = fmtch == 'a' || fmtch == 'A';
 
 	p = p0;
-	*p++ = fmtch;
+	*p++ = isa ? 'p' - 'a' + fmtch : fmtch;
 	if (exp < 0) {
 		exp = -exp;
 		*p++ = '-';
 	}
 	else
 		*p++ = '+';
-	t = expbuf + 40;
+	t = expbuf + 10;
 	if (exp > 9) {
 		do {
 			*--t = to_char (exp % 10);
 		} while ((exp /= 10) > 9);
 		*--t = to_char (exp);
-		for (; t < expbuf + 40; *p++ = *t++);
+		for (; t < expbuf + 10; *p++ = *t++);
 	}
 	else {
-		*p++ = '0';
+		if (!isa)
+			*p++ = '0';
 		*p++ = to_char (exp);
 	}
 	return (p - p0);
@@ -1480,11 +1537,11 @@ _CONST static CH_CLASS chclass[256] = {
   /* 28-2f */  OTHER,   OTHER,   STAR,    FLAG,    OTHER,   FLAG,    DOT,     OTHER,
   /* 30-37 */  ZERO,    DIGIT,   DIGIT,   DIGIT,   DIGIT,   DIGIT,   DIGIT,   DIGIT,
   /* 38-3f */  DIGIT,   DIGIT,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* 40-47 */  OTHER,   OTHER,   OTHER,   SPEC,    SPEC,    SPEC,    SPEC,    SPEC,
+  /* 40-47 */  OTHER,   SPEC,    OTHER,   SPEC,    SPEC,    SPEC,    SPEC,    SPEC,
   /* 48-4f */  OTHER,   OTHER,   OTHER,   OTHER,   MODFR,   OTHER,   OTHER,   SPEC, 
   /* 50-57 */  OTHER,   OTHER,   OTHER,   SPEC,    OTHER,   SPEC,    OTHER,   OTHER,
   /* 58-5f */  SPEC,    OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* 60-67 */  OTHER,   OTHER,   OTHER,   SPEC,    SPEC,    SPEC,    SPEC,    SPEC, 
+  /* 60-67 */  OTHER,   SPEC,    OTHER,   SPEC,    SPEC,    SPEC,    SPEC,    SPEC,
   /* 68-6f */  MODFR,   SPEC,    MODFR,   OTHER,   MODFR,   OTHER,   SPEC,    SPEC,
   /* 70-77 */  SPEC,    MODFR,   OTHER,   SPEC,    MODFR,   SPEC,    OTHER,   OTHER,
   /* 78-7f */  SPEC,    OTHER,   MODFR,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
@@ -1693,6 +1750,8 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		  case 'O':
 		    spec_type = LONG_INT;
 		    break;
+		  case 'a':
+		  case 'A':
 		  case 'f':
 		  case 'F':
 		  case 'g':

@@ -1,3 +1,8 @@
+2007-05-11  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/vfprintf.c (_VFPRINTF_R, cvt, exponent, chclass)
+	(get_arg): Support '%a' and '%A'.
+
 2007-05-09  Eric Blake  <ebb9@byu.net>
 
 	Allow zero size with non-null buf in *asnprintf.
