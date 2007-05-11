@@ -361,33 +361,38 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  flags |= SUPPRESS;
 	  goto again;
 	case 'l':
+#if defined _WANT_IO_C99_FORMATS || !defined _NO_LONGLONG
 	  if (*fmt == 'l')	/* Check for 'll' = long long (SUSv3) */
 	    {
 	      ++fmt;
 	      flags |= LONGDBL;
 	    }
 	  else
+#endif
 	    flags |= LONG;
 	  goto again;
 	case 'L':
 	  flags |= LONGDBL;
 	  goto again;
 	case 'h':
+#ifdef _WANT_IO_C99_FORMATS
 	  if (*fmt == 'h')	/* Check for 'hh' = char int (SUSv3) */
 	    {
 	      ++fmt;
 	      flags |= CHAR;
 	    }
 	  else
+#endif
 	    flags |= SHORT;
 	  goto again;
-        case 'j':               /* intmax_t */
+#ifdef _WANT_IO_C99_FORMATS
+	case 'j': /* intmax_t */
 	  if (sizeof (intmax_t) == sizeof (long))
 	    flags |= LONG;
 	  else
 	    flags |= LONGDBL;
 	  goto again;
-        case 't':               /* ptrdiff_t */
+	case 't': /* ptrdiff_t */
 	  if (sizeof (ptrdiff_t) < sizeof (int))
 	    /* POSIX states ptrdiff_t is 16 or more bits, as
 	       is short.  */
@@ -403,7 +408,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	       have ptrdiff_t as wide as long long.  */
 	    flags |= LONGDBL;
 	  goto again;
-        case 'z':               /* size_t */
+	case 'z': /* size_t */
 	  if (sizeof (size_t) < sizeof (int))
 	    /* POSIX states size_t is 16 or more bits, as is short.  */
 	    flags |= SHORT;
@@ -418,6 +423,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	       have size_t as wide as long long.  */
 	    flags |= LONGDBL;
 	  goto again;
+#endif /* _WANT_IO_C99_FORMATS */
 
 	case '0':
 	case '1':
@@ -470,7 +476,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  base = 10;
 	  break;
 
-	case 'X':		/* compat   XXX */
+	case 'X':
 	case 'x':
 	  flags |= PFXOK;	/* enable 0x prefixing */
 	  c = CT_INT;
@@ -479,19 +485,25 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  break;
 
 #ifdef FLOATING_POINT
-	case 'E':		/* compat   XXX */
-	case 'G':		/* compat   XXX */
-/* ANSI says that E,G and X behave the same way as e,g,x */
-	  /* FALLTHROUGH */
+# ifdef _WANT_IO_C99_FORMATS
+	case 'a':
+	case 'A':
+	case 'F':
+# endif
+	case 'E':
+	case 'G':
 	case 'e':
 	case 'f':
 	case 'g':
 	  c = CT_FLOAT;
 	  break;
 #endif
-        case 'S':
-          flags |= LONG;
-          /* FALLTHROUGH */
+
+#ifdef _WANT_IO_C99_FORMATS
+	case 'S':
+	  flags |= LONG;
+	  /* FALLTHROUGH */
+#endif
 
 	case 's':
 	  c = CT_STRING;
@@ -503,9 +515,11 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  c = CT_CCL;
 	  break;
 
-        case 'C':
-          flags |= LONG;
-          /* FALLTHROUGH */
+#ifdef _WANT_IO_C99_FORMATS
+	case 'C':
+	  flags |= LONG;
+	  /* FALLTHROUGH */
+#endif
 
 	case 'c':
 	  flags |= NOSKIP;
@@ -522,12 +536,15 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	case 'n':
 	  if (flags & SUPPRESS)	/* ??? */
 	    continue;
+#ifdef _WANT_IO_C99_FORMATS
 	  if (flags & CHAR)
 	    {
 	      cp = va_arg (ap, char *);
 	      *cp = nread;
 	    }
-	  else if (flags & SHORT)
+	  else
+#endif
+	  if (flags & SHORT)
 	    {
 	      sp = va_arg (ap, short *);
 	      *sp = nread;
@@ -976,11 +993,13 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	      res = (*ccfn) (rptr, buf, (char **) NULL, base);
 	      if (flags & POINTER)
 		*(va_arg (ap, _PTR *)) = (_PTR) (unsigned _POINTER_INT) res;
+#ifdef _WANT_IO_C99_FORMATS
 	      else if (flags & CHAR)
 		{
 		  cp = va_arg (ap, char *);
 		  *cp = res;
 		}
+#endif
 	      else if (flags & SHORT)
 		{
 		  sp = va_arg (ap, short *);
@@ -1087,9 +1106,9 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		  break;
 		case 'n':
 		case 'N':
-	          if (nancount == 0
+		  if (nancount == 0
 		      && (flags & (SIGNOK | NDIGITS | DPTOK | EXPOK)) ==
-		      	          (SIGNOK | NDIGITS | DPTOK | EXPOK))
+				  (SIGNOK | NDIGITS | DPTOK | EXPOK))
 		    {
 		      flags &= ~(SIGNOK | DPTOK | EXPOK | NDIGITS);
 		      nancount = 1;
@@ -1230,7 +1249,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	         result.  */
 #ifndef _NO_LONGDBL /* !_NO_LONGDBL */
 	      if (flags & LONGDBL)
-	      	qres = _strtold (buf, NULL);
+		qres = _strtold (buf, NULL);
 	      else
 #endif
 	        res = _strtod_r (rptr, buf, NULL);

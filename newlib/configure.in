@@ -20,6 +20,15 @@ AC_ARG_ENABLE(newlib-io-pos-args,
   *)   AC_MSG_ERROR(bad value ${enableval} for newlib-io-pos-args option) ;;
  esac], [newlib_io_pos_args=])dnl
 
+dnl Support --enable-newlib-io-c99-formats
+AC_ARG_ENABLE(newlib-io-c99-formats,
+[  --enable-newlib-io-c99-formats   enable C99 support in IO functions like printf/scanf],
+[case "${enableval}" in
+  yes) newlib_io_c99_formats=yes;;
+  no)  newlib_io_c99_formats=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-io-c99-formats option) ;;
+ esac], [newlib_io_c99_formats=])dnl
+
 dnl Support --enable-newlib-io-long-long
 AC_ARG_ENABLE(newlib-io-long-long,
 [  --enable-newlib-io-long-long   enable long long type support in IO functions like printf/scanf],
@@ -229,6 +238,10 @@ if test "${newlib_elix_level}" -gt "0"; then
 AC_DEFINE_UNQUOTED(_ELIX_LEVEL,${newlib_elix_level})
 fi
 
+if test "${newlib_io_c99_formats}" = "yes"; then
+AC_DEFINE_UNQUOTED(_WANT_IO_C99_FORMATS)
+fi
+
 if test "${newlib_io_long_long}" = "yes"; then
 AC_DEFINE_UNQUOTED(_WANT_IO_LONG_LONG)
 fi
@@ -308,7 +321,7 @@ if test "x${iconv_encodings}" != "x" \
   for encoding in ${iconv_encodings1}; do
       result=`echo "${available_encodings}" | grep -e "\(^\| \)${encoding}\( \|\$\)"`
       if test $? != "0"; then
-          AC_MSG_ERROR(${encoding} is not supported - see ${srcdir}/libc/iconv/encoding.aliases file for the list of available encodings)
+	  AC_MSG_ERROR(${encoding} is not supported - see ${srcdir}/libc/iconv/encoding.aliases file for the list of available encodings)
       fi
       encoding1=`echo "${result}" | sed -e 's/\(^[[^ ]]*\).*$/\1/'`
       iconv_encodings="${iconv_encodings} ${encoding1}"
@@ -327,7 +340,7 @@ if test "x${iconv_encodings}" != "x" \
   for encoding in ${iconv_encodings1}; do
       result=`echo "${available_encodings}" | grep -e "\(^\| \)${encoding}\( \|\$\)"`
       if test $? != "0"; then
-          AC_MSG_ERROR(${encoding} is not supported - see ${srcdir}/libc/iconv/encoding.aliases file for the list of available encodings)
+	  AC_MSG_ERROR(${encoding} is not supported - see ${srcdir}/libc/iconv/encoding.aliases file for the list of available encodings)
       fi
       encoding1=`echo "${result}" | sed -e 's/\(^[[^ ]]*\).*$/\1/'`
       iconv_to_encodings="${iconv_to_encodings} ${encoding1}"
@@ -344,7 +357,7 @@ if test "x${iconv_encodings}" != "x" \
   for encoding in ${iconv_encodings1}; do
       result=`echo "${available_encodings}" | grep -e "\(^\| \)${encoding}\( \|\$\)"`
       if test $? != "0"; then
-          AC_MSG_ERROR(${encoding} is not supported - see ${srcdir}/libc/iconv/encoding.aliases file for the list of available encodings)
+	  AC_MSG_ERROR(${encoding} is not supported - see ${srcdir}/libc/iconv/encoding.aliases file for the list of available encodings)
       fi
       encoding1=`echo "${result}" | sed -e 's/\(^[[^ ]]*\).*$/\1/'`
       iconv_from_encodings="${iconv_from_encodings} ${encoding1}"

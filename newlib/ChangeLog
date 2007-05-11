@@ -1,5 +1,17 @@
 2007-05-11  Eric Blake  <ebb9@byu.net>
 
+	Minimize printf/scanf size on platforms that don't need C99.
+	* acconfig.h (_WANT_IO_C99_FORMATS): New macro.
+	* newlib.hin (_WANT_IO_C99_FORMATS): Likewise.
+	* configure.in (newlib-io-c99-formats): New configure option.
+	(_WANT_IO_C99_FORMATS): Define appropriately.
+	* configure.host (*-linux*, cygwin): Default c99-formats to yes.
+	* libc/stdio/vfprintf.c (_VFPRINTF_R) [!_WANT_IO_C99_FORMATS]:
+	Cripple ' flag; hh, z, j, t sizes; a, A, F, C, S specifiers.
+	* libc/stdio/vfscanf.c (_VFSCANF_R) [!_WANT_IO_C99_FORMATS]:
+	Likewise.
+	* configure: Regenerate.
+
 	* libc/stdio/vfprintf.c (_VFPRINTF_R, cvt, exponent, chclass)
 	(get_arg): Support '%a' and '%A'.
 

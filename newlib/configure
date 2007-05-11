@@ -823,6 +823,7 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-newlib-io-pos-args enable printf-family positional arg support
+  --enable-newlib-io-c99-formats   enable C99 support in IO functions like printf/scanf
   --enable-newlib-io-long-long   enable long long type support in IO functions like printf/scanf
   --enable-newlib-io-long-double   enable long double type support in IO functions printf/scanf
   --enable-newlib-mb        enable multibyte support
@@ -1356,6 +1357,19 @@ echo "$as_me: error: bad value ${enableval} for newlib-io-pos-args option" >&2;}
  esac
 else
   newlib_io_pos_args=
+fi;
+# Check whether --enable-newlib-io-c99-formats or --disable-newlib-io-c99-formats was given.
+if test "${enable_newlib_io_c99_formats+set}" = set; then
+  enableval="$enable_newlib_io_c99_formats"
+  case "${enableval}" in
+  yes) newlib_io_c99_formats=yes;;
+  no)  newlib_io_c99_formats=no ;;
+  *)   { { echo "$as_me:$LINENO: error: bad value ${enableval} for newlib-io-c99-formats option" >&5
+echo "$as_me: error: bad value ${enableval} for newlib-io-c99-formats option" >&2;}
+   { (exit 1); exit 1; }; } ;;
+ esac
+else
+  newlib_io_c99_formats=
 fi;
 # Check whether --enable-newlib-io-long-long or --disable-newlib-io-long-long was given.
 if test "${enable_newlib_io_long_long+set}" = set; then
@@ -4778,7 +4792,7 @@ test x"$pic_mode" = xno && libtool_flags="$libtool_flags --prefer-non-pic"
 case $host in
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4781 "configure"' > conftest.$ac_ext
+  echo '#line 4795 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -5197,6 +5211,13 @@ _ACEOF
 
 fi
 
+if test "${newlib_io_c99_formats}" = "yes"; then
+cat >>confdefs.h <<_ACEOF
+#define _WANT_IO_C99_FORMATS 1
+_ACEOF
+
+fi
+
 if test "${newlib_io_long_long}" = "yes"; then
 cat >>confdefs.h <<_ACEOF
 #define _WANT_IO_LONG_LONG 1
@@ -5307,7 +5328,7 @@ echo "$as_me: error: --enable-newlib-iconv-encodings, --enable-newlib-iconv-from
   for encoding in ${iconv_encodings1}; do
       result=`echo "${available_encodings}" | grep -e "\(^\| \)${encoding}\( \|\$\)"`
       if test $? != "0"; then
-          { { echo "$as_me:$LINENO: error: ${encoding} is not supported - see ${srcdir}/libc/iconv/encoding.aliases file for the list of available encodings" >&5
+	  { { echo "$as_me:$LINENO: error: ${encoding} is not supported - see ${srcdir}/libc/iconv/encoding.aliases file for the list of available encodings" >&5
 echo "$as_me: error: ${encoding} is not supported - see ${srcdir}/libc/iconv/encoding.aliases file for the list of available encodings" >&2;}
    { (exit 1); exit 1; }; }
       fi
@@ -5332,7 +5353,7 @@ _ACEOF
   for encoding in ${iconv_encodings1}; do
       result=`echo "${available_encodings}" | grep -e "\(^\| \)${encoding}\( \|\$\)"`
       if test $? != "0"; then
-          { { echo "$as_me:$LINENO: error: ${encoding} is not supported - see ${srcdir}/libc/iconv/encoding.aliases file for the list of available encodings" >&5
+	  { { echo "$as_me:$LINENO: error: ${encoding} is not supported - see ${srcdir}/libc/iconv/encoding.aliases file for the list of available encodings" >&5
 echo "$as_me: error: ${encoding} is not supported - see ${srcdir}/libc/iconv/encoding.aliases file for the list of available encodings" >&2;}
    { (exit 1); exit 1; }; }
       fi
@@ -5352,7 +5373,7 @@ _ACEOF
   for encoding in ${iconv_encodings1}; do
       result=`echo "${available_encodings}" | grep -e "\(^\| \)${encoding}\( \|\$\)"`
       if test $? != "0"; then
-          { { echo "$as_me:$LINENO: error: ${encoding} is not supported - see ${srcdir}/libc/iconv/encoding.aliases file for the list of available encodings" >&5
+	  { { echo "$as_me:$LINENO: error: ${encoding} is not supported - see ${srcdir}/libc/iconv/encoding.aliases file for the list of available encodings" >&5
 echo "$as_me: error: ${encoding} is not supported - see ${srcdir}/libc/iconv/encoding.aliases file for the list of available encodings" >&2;}
    { (exit 1); exit 1; }; }
       fi

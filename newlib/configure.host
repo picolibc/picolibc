@@ -24,6 +24,7 @@
 #   target_optspace	--enable-target-optspace ("yes", "no", "")
 #   newlib_multithread	--enable-newlib-multithread ("yes", "no", "yes")
 #   newlib_elix_level	--enable-newlib-elix-level ("1","2","3","4") ("4")
+#   newlib_io_c99_formats --enable-newlib-io-c99-formats ("yes", "no", "")
 #   newlib_io_long_long --enable-newlib-io-long-long ("yes", "no", "")
 #   newlib_io_long_double --enable-newlib-io-long-double ("yes", "no", "")
 
@@ -62,6 +63,7 @@ crt1_dir=
 have_crt0=
 use_libtool=no
 have_sys_mach_dir=no
+default_newlib_io_c99_formats=no
 default_newlib_io_long_long=no
 default_newlib_io_long_double=no
 default_newlib_io_pos_args=no
@@ -398,6 +400,7 @@ case "${host}" in
 	crt1=crt1.o
 	crt1_dir=libc/sys/${sys_dir}	
 	gcc_dir=`gcc -print-search-dirs | awk '/^install:/{print $2}'`
+	default_newlib_io_c99_formats="yes"
 	default_newlib_io_long_double="yes"
 	default_newlib_io_long_long="yes"
 	default_newlib_io_pos_args="yes"
@@ -498,6 +501,7 @@ case "${host}" in
   *-*-cygwin*)
 	test -z "$cygwin_srcdir" && cygwin_srcdir=`cd ${srcdir}/../winsup/cygwin; pwd`
 	export cygwin_srcdir
+	default_newlib_io_c99_formats="yes"
 	default_newlib_io_long_long="yes"
 	default_newlib_io_long_double="yes"
 	default_newlib_io_pos_args="yes"
@@ -743,6 +747,13 @@ case "${host}" in
 esac
 
 # Use defaults for certain settings if not specified by user
+
+# Enable C99 format support in I/O routines if requested.
+if [ "x${newlib_io_c99_formats}" = "x" ]; then
+	if [ ${default_newlib_io_c99_formats} = "yes" ]; then
+		newlib_io_c99_formats="yes";
+	fi
+fi
 
 # Enable long long support in I/O routines if requested.
 if [ "x${newlib_io_long_long}" = "x" ]; then

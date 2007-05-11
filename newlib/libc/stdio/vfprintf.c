@@ -319,16 +319,20 @@ _EXFUN(get_arg, (struct _reent *data, int n, char *fmt,
 #define	LONGDBL		0x008		/* long double */
 #define	LONGINT		0x010		/* long integer */
 #ifndef _NO_LONGLONG
-#define	QUADINT		0x020		/* quad integer */
+# define QUADINT	0x020		/* quad integer */
 #else /* ifdef _NO_LONGLONG, make QUADINT equivalent to LONGINT, so
 	 that %lld behaves the same as %ld, not as %d, as expected if:
 	 sizeof (long long) = sizeof long > sizeof int  */
-#define	QUADINT		LONGINT
+# define QUADINT	LONGINT
 #endif
 #define	SHORTINT	0x040		/* short integer */
 #define	ZEROPAD		0x080		/* zero (as opposed to blank) pad */
 #define FPT		0x100		/* Floating point number */
-#define CHARINT		0x200		/* char as integer */
+#ifdef _WANT_IO_C99_FORMATS
+# define CHARINT	0x200		/* char as integer */
+#else /* define as 0, to make SARG and UARG occupy fewer instructions  */
+# define CHARINT	0
+#endif
 
 int _EXFUN(_VFPRINTF_R, (struct _reent *, FILE *, _CONST char *, va_list));
 
@@ -416,7 +420,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	 {'0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'};
 
 #ifdef _MB_CAPABLE
-        memset (&state, '\0', sizeof (state));
+	memset (&state, '\0', sizeof (state));
 #endif
 	/*
 	 * BEWARE, these `goto error' on error, and PAD uses `n'.
@@ -565,12 +569,15 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 
 rflag:		ch = *fmt++;
 reswitch:	switch (ch) {
+#ifdef _WANT_IO_C99_FORMATS
 		case '\'':
-		  /* In the C locale, LC_NUMERIC requires
+		  /* The ' flag is required by POSIX, but not C99.
+		     In the C locale, LC_NUMERIC requires
 		     thousands_sep to be the empty string.  And since
 		     no other locales are supported (yet), this flag
 		     is currently a no-op.  */
 		  goto rflag;
+#endif
 		case ' ':
 			/*
 			 * ``If the space and + flags both appear, the space
@@ -714,24 +721,27 @@ reswitch:	switch (ch) {
 			goto rflag;
 #endif
 		case 'h':
+#ifdef _WANT_IO_C99_FORMATS
 			if (*fmt == 'h') {
 				fmt++;
 				flags |= CHARINT;
-			} else {
+			} else
+#endif
 				flags |= SHORTINT;
-			}
 			goto rflag;
 		case 'l':
+#if defined _WANT_IO_C99_FORMATS || !defined _NO_LONGLONG
 			if (*fmt == 'l') {
 				fmt++;
 				flags |= QUADINT;
-			} else {
+			} else
+#endif
 				flags |= LONGINT;
-			}
 			goto rflag;
-		case 'q':
+		case 'q': /* extension */
 			flags |= QUADINT;
 			goto rflag;
+#ifdef _WANT_IO_C99_FORMATS
 		case 'j':
 		  if (sizeof (intmax_t) == sizeof (long))
 		    flags |= LONGINT;
@@ -769,8 +779,9 @@ reswitch:	switch (ch) {
 		       have ptrdiff_t as wide as long long.  */
 		    flags |= QUADINT;
 		  goto rflag;
-		case 'c':
 		case 'C':
+#endif /* _WANT_IO_C99_FORMATS */
+		case 'c':
 			cp = buf;
 #ifdef _MB_CAPABLE
 			if (ch == 'C' || (flags & LONGINT)) {
@@ -792,7 +803,7 @@ reswitch:	switch (ch) {
 			}
 			sign = '\0';
 			break;
-		case 'D':
+		case 'D':  /* extension */
 			flags |= LONGINT;
 			/*FALLTHROUGH*/
 		case 'd':
@@ -811,12 +822,14 @@ reswitch:	switch (ch) {
 			base = DEC;
 			goto number;
 #ifdef FLOATING_POINT
+# ifdef _WANT_IO_C99_FORMATS
 		case 'a':
 		case 'A':
+		case 'F':
+# endif
 		case 'e':
 		case 'E':
 		case 'f':
-		case 'F':
 		case 'g':
 		case 'G':
 # ifdef _NO_LONGDBL
@@ -835,7 +848,7 @@ reswitch:	switch (ch) {
 			if (isinf (_fpvalue)) {
 				if (_fpvalue < 0)
 					sign = '-';
-				if (ch <= 'G') /* 'E', 'F', or 'G' */
+				if (ch <= 'G') /* 'A', 'E', 'F', or 'G' */
 					cp = "INF";
 				else
 					cp = "inf";
@@ -844,7 +857,7 @@ reswitch:	switch (ch) {
 				break;
 			}
 			if (isnan (_fpvalue)) {
-				if (ch <= 'G') /* 'E', 'F', or 'G' */
+				if (ch <= 'G') /* 'A', 'E', 'F', or 'G' */
 					cp = "NAN";
 				else
 					cp = "nan";
@@ -866,7 +879,7 @@ reswitch:	switch (ch) {
 			if (tmp == 2) {
 				if (_fpvalue < 0)
 					sign = '-';
-				if (ch <= 'G') /* 'E', 'F', or 'G' */
+				if (ch <= 'G') /* 'A', 'E', 'F', or 'G' */
 					cp = "INF";
 				else
 					cp = "inf";
@@ -875,7 +888,7 @@ reswitch:	switch (ch) {
 				break;
 			}
 			if (tmp == 1) {
-				if (ch <= 'G') /* 'E', 'F', or 'G' */
+				if (ch <= 'G') /* 'A', 'E', 'F', or 'G' */
 					cp = "NAN";
 				else
 					cp = "nan";
@@ -885,6 +898,7 @@ reswitch:	switch (ch) {
 			}
 # endif /* !_NO_LONGDBL */
 
+# ifdef _WANT_IO_C99_FORMATS
 			if (ch == 'a' || ch == 'A') {
 				ox[0] = '0';
 				ox[1] = ch == 'a' ? 'x' : 'X';
@@ -902,7 +916,9 @@ reswitch:	switch (ch) {
 				  }
 				else
 				  cp = buf;
-			} else if (prec == -1) {
+			} else
+# endif /* _WANT_IO_C99_FORMATS */
+			if (prec == -1) {
 				prec = DEFPREC;
 			} else if ((ch == 'g' || ch == 'G') && prec == 0) {
 				prec = 1;
@@ -919,8 +935,10 @@ reswitch:	switch (ch) {
 				else
 					ch = 'g';
 			}
+# ifdef _WANT_IO_C99_FORMATS
 			else if (ch == 'F')
 				ch = 'f';
+# endif
 			if (ch <= 'e') {	/* 'a', 'A', 'e', or 'E' fmt */
 				--expt;
 				expsize = exponent (expstr, expt, ch);
@@ -958,12 +976,14 @@ reswitch:	switch (ch) {
 				*GET_ARG (N, ap, long_ptr_t) = ret;
 			else if (flags & SHORTINT)
 				*GET_ARG (N, ap, short_ptr_t) = ret;
+#ifdef _WANT_IO_C99_FORMATS
 			else if (flags & CHARINT)
 				*GET_ARG (N, ap, char_ptr_t) = ret;
+#endif
 			else
 				*GET_ARG (N, ap, int_ptr_t) = ret;
 			continue;	/* no output */
-		case 'O':
+		case 'O': /* extension */
 			flags |= LONGINT;
 			/*FALLTHROUGH*/
 		case 'o':
@@ -986,7 +1006,9 @@ reswitch:	switch (ch) {
 			ch = 'x';
 			goto nosign;
 		case 's':
+#ifdef _WANT_IO_C99_FORMATS
 		case 'S':
+#endif
 			sign = '\0';
 			if ((cp = GET_ARG (N, ap, char_ptr_t)) == NULL) {
 				cp = "(null)";
@@ -1068,7 +1090,7 @@ reswitch:	switch (ch) {
 				size = strlen (cp);
 
 			break;
-		case 'U':
+		case 'U': /* extension */
 			flags |= LONGINT;
 			/*FALLTHROUGH*/
 		case 'u':
@@ -1357,6 +1379,7 @@ _DEFUN(cvt, (data, value, ndigits, flags, sign, decpt, ch, length, buf),
 		*sign = '\000';
 # endif /* !_NO_LONGDBL */
 
+# ifdef _WANT_IO_C99_FORMATS
 	if (ch == 'a' || ch == 'A') {
 		/* This code assumes FLT_RADIX is a power of 2.  The initial
 		   division ensures the digit before the decimal will be less
@@ -1387,7 +1410,9 @@ _DEFUN(cvt, (data, value, ndigits, flags, sign, decpt, ch, length, buf),
 		}
 		*length = bp - buf;
 		return buf;
-	} else if (ch == 'f' || ch == 'F') {
+	}
+# endif /* _WANT_IO_C99_FORMATS */
+	if (ch == 'f' || ch == 'F') {
 		mode = 3;		/* ndigits after the decimal point */
 	} else {
 		/* To obtain ndigits after the decimal point for the 'e'
@@ -1426,7 +1451,11 @@ _DEFUN(exponent, (p0, exp, fmtch),
 {
 	register char *p, *t;
 	char expbuf[10];
+# ifdef _WANT_IO_C99_FORMATS
 	int isa = fmtch == 'a' || fmtch == 'A';
+# else
+#  define isa 0
+# endif
 
 	p = p0;
 	*p++ = isa ? 'p' - 'a' + fmtch : fmtch;
@@ -1616,25 +1645,25 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
   int max_pos_arg = n;
   /* Only need types that can be reached via vararg promotions.  */
   enum types { INT, LONG_INT, QUAD_INT, CHAR_PTR, DOUBLE, LONG_DOUBLE, WIDE_CHAR };
-#ifdef _MB_CAPABLE
+# ifdef _MB_CAPABLE
   wchar_t wc;
   mbstate_t wc_state;
-  int nbytes; 
-#endif
-    
+  int nbytes;
+# endif
+
   /* if this isn't the first call, pick up where we left off last time */
   if (*last_fmt != NULL)
     fmt = *last_fmt;
 
-#ifdef _MB_CAPABLE
+# ifdef _MB_CAPABLE
   memset (&wc_state, '\0', sizeof (wc_state));
-#endif
+# endif
 
   /* we need to process either to end of fmt string or until we have actually
      read the desired parameter from the vararg list. */
   while (*fmt && n >= numargs)
     {
-#ifdef _MB_CAPABLE
+# ifdef _MB_CAPABLE
       while ((nbytes = _mbtowc_r (data, &wc, fmt, MB_CUR_MAX, &wc_state)) > 0) 
 	{
 	  fmt += nbytes;
@@ -1644,13 +1673,13 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 
       if (nbytes <= 0)
 	break;
-#else
+# else
       while (*fmt != '\0' && *fmt != '%')
 	fmt += 1;
 
       if (*fmt == '\0')
 	break;
-#endif
+# endif /* ! _MB_CAPABLE */
       state = START;
       flags = 0;
       pos = -1;
@@ -1667,14 +1696,14 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 	  next_state = state_table[state][chtype];
 	  action = action_table[state][chtype];
 	  state = next_state;
-	  
+
 	  switch (action)
 	    {
 	    case GETMOD:  /* we have format modifier */
 	      switch (ch)
 		{
 		case 'h':
-                  /* No flag needed, since short and char promote to int.  */
+		  /* No flag needed, since short and char promote to int.  */
 		  break;
 		case 'L':
 		  flags |= LONGDBL;
@@ -1682,6 +1711,7 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		case 'q':
 		  flags |= QUADINT;
 		  break;
+# ifdef _WANT_IO_C99_FORMATS
 		case 'j':
 		  if (sizeof (intmax_t) == sizeof (long))
 		    flags |= LONGINT;
@@ -1712,14 +1742,17 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		       have ptrdiff_t as wide as long long.  */
 		    flags |= QUADINT;
 		  break;
+# endif /* _WANT_IO_C99_FORMATS */
 		case 'l':
 		default:
+# if defined _WANT_IO_C99_FORMATS || !defined _NO_LONGLONG
 		  if (*fmt == 'l')
 		    {
 		      flags |= QUADINT;
 		      ++fmt;
 		    }
 		  else
+# endif
 		    flags |= LONGINT;
 		  break;
 		}
@@ -1738,10 +1771,10 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		  case 'u':
 		    if (flags & LONGINT)
 		      spec_type = LONG_INT;
-#ifndef _NO_LONGLONG
+# ifndef _NO_LONGLONG
 		    else if (flags & QUADINT)
 		      spec_type = QUAD_INT;
-#endif
+# endif
 		    else
 		      spec_type = INT;
 		    break;
@@ -1750,36 +1783,44 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		  case 'O':
 		    spec_type = LONG_INT;
 		    break;
+# ifdef _WANT_IO_C99_FORMATS
 		  case 'a':
 		  case 'A':
-		  case 'f':
 		  case 'F':
+# endif
+		  case 'f':
 		  case 'g':
 		  case 'G':
 		  case 'E':
 		  case 'e':
-#ifndef _NO_LONGDBL
+# ifndef _NO_LONGDBL
 		    if (flags & LONGDBL)
 		      spec_type = LONG_DOUBLE;
 		    else
-#endif
+# endif
 		      spec_type = DOUBLE;
 		    break;
 		  case 's':
+# ifdef _WANT_IO_C99_FORMATS
 		  case 'S':
+# endif
 		  case 'p':
 		  case 'n':
 		    spec_type = CHAR_PTR;
 		    break;
 		  case 'c':
+# ifdef _WANT_IO_C99_FORMATS
 		    if (flags & LONGINT)
 		      spec_type = WIDE_CHAR;
 		    else
+# endif
 		      spec_type = INT;
 		    break;
+# ifdef _WANT_IO_C99_FORMATS
 		  case 'C':
 		    spec_type = WIDE_CHAR;
 		    break;
+# endif
 		  }
 
 		/* if we have a positional parameter, just store the type, otherwise
