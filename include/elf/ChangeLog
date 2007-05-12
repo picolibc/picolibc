@@ -1,3 +1,8 @@
+2007-05-12  Alan Modra  <amodra@bigpond.net.au>
+
+	* spu.h (R_SPU_ADDR16X): Define.
+	(R_SPU_PPU32, R_SPU_PPU64): Renumber.
+
 2007-05-11  Alan Modra  <amodra@bigpond.net.au>
 
 	* spu.h (R_SPU_PPU32, R_SPU_PPU64): Define.
