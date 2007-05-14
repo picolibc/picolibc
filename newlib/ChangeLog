@@ -1,3 +1,12 @@
+2007-05-14 Eric Blake <ebb9@byu.net>
+
+	Reduce stack size of *printf.
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Fix use of decimal point
+	in %f.  Avoid malloc when possible for %S.
+	(BUF): Improve stack locality by using smaller size.
+	(MAXEXPLEN, _PRINTF_FLOAT_TYPE): Define.
+	(exponent): Use smaller stack size.
+
 2007-05-11  Eric Blake  <ebb9@byu.net>
 
 	Minimize printf/scanf size on platforms that don't need C99.

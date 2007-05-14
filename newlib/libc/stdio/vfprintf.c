@@ -224,43 +224,66 @@ _DEFUN(__sbprintf, (rptr, fp, fmt, ap),
 
 
 #ifdef FLOATING_POINT
-#include <locale.h>
-#include <math.h>
-#include "floatio.h"
+# include <locale.h>
+# include <math.h>
 
-#if ((MAXEXP+MAXFRACT+1) > MB_LEN_MAX)
-#  define BUF (MAXEXP+MAXFRACT+1) /* + decimal point */
-#else 
-#  define BUF MB_LEN_MAX
-#endif
+/* For %La, an exponent of 15 bits occupies the exponent character, a
+   sign, and up to 5 digits.  */
+# define MAXEXPLEN		7
+# define DEFPREC		6
 
-#define	DEFPREC		6
+# ifdef _NO_LONGDBL
 
-#ifdef _NO_LONGDBL
-static char *
-_EXFUN(cvt, (struct _reent *, double, int, int, char *, int *, int, int *,
-	     char *));
-#else
-static char *
-_EXFUN(cvt, (struct _reent *, _LONG_DOUBLE, int, int, char *, int *, int,
-	     int *, char *));
+extern char *_dtoa_r _PARAMS((struct _reent *, double, int,
+			      int, int *, int *, char **));
+
+#  define _PRINTF_FLOAT_TYPE double
+#  define _DTOA_R _dtoa_r
+#  define FREXP frexp
+
+# else /* !_NO_LONGDBL */
+
+extern char *_ldtoa_r _PARAMS((struct _reent *, _LONG_DOUBLE, int,
+			      int, int *, int *, char **));
+
 extern int _EXFUN(_ldcheck,(_LONG_DOUBLE *));
-#endif
 
-static int _EXFUN(exponent, (char *, int, int));
+#  define _PRINTF_FLOAT_TYPE _LONG_DOUBLE
+#  define _DTOA_R _ldtoa_r
+/* FIXME - frexpl is not yet supported; and cvt infloops if (double)f
+   converts a finite value into infinity.  */
+/* #  define FREXP frexpl */
+#  define FREXP(f,e) ((_LONG_DOUBLE) frexp ((double)f, e))
+# endif /* !_NO_LONGDBL */
 
-#else /* no FLOATING_POINT */
+static char *cvt(struct _reent *, _PRINTF_FLOAT_TYPE, int, int, char *, int *,
+                 int, int *, char *);
 
-#define	BUF		40
+static int exponent(char *, int, int);
 
 #endif /* FLOATING_POINT */
 
+/* BUF must be big enough for the maximum %#llo (assuming long long is
+   at most 64 bits, this would be 23 characters), the maximum
+   multibyte character %C, and the maximum default precision of %La
+   (assuming long double is at most 128 bits with 113 bits of
+   mantissa, this would be 29 characters).  %e, %f, and %g use
+   reentrant storage shared with mprec.  All other formats that use
+   buf get by with fewer characters.  Making BUF slightly bigger
+   reduces the need for malloc in %.*a and %S, when large precision or
+   long strings are processed.  */
+#define	BUF		40
+#if defined _MB_CAPABLE && MB_LEN_MAX > BUF
+# undef BUF
+# define BUF MB_LEN_MAX
+#endif
+
 #ifndef _NO_LONGLONG
-#define quad_t long long
-#define u_quad_t unsigned long long
+# define quad_t long long
+# define u_quad_t unsigned long long
 #else
-#define quad_t long
-#define u_quad_t unsigned long
+# define quad_t long
+# define u_quad_t unsigned long
 #endif
 
 typedef quad_t * quad_ptr_t;
@@ -378,19 +401,13 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 #ifdef FLOATING_POINT
 	char *decimal_point = _localeconv_r (data)->decimal_point;
 	char softsign;		/* temporary negative sign for floats */
-# ifdef _NO_LONGDBL
-	union { int i; double d; } _double_ = {0};
-#  define _fpvalue (_double_.d)
-# else
-	union { int i; _LONG_DOUBLE ld; } _long_double_ = {0};
-#  define _fpvalue (_long_double_.ld)
-	int tmp;
-# endif
+	union { int i; _PRINTF_FLOAT_TYPE fp; } _double_ = {0};
+# define _fpvalue (_double_.fp)
 	int expt;		/* integer value of exponent */
 	int expsize = 0;	/* character count for expstr */
 	int ndig = 0;		/* actual number of digits returned by cvt */
-	char expstr[7];		/* buffer for exponent string */
-#endif
+	char expstr[MAXEXPLEN];	/* buffer for exponent string */
+#endif /* FLOATING_POINT */
 	u_quad_t _uquad;	/* integer arguments %[diouxX] */
 	enum { OCT, DEC, HEX } base;/* base for [diouxX] conversion */
 	int dprec;		/* a copy of prec if [diouxX], 0 otherwise */
@@ -400,7 +417,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 #define NIOV 8
 	struct __suio uio;	/* output information: summary */
 	struct __siov iov[NIOV];/* ... and individual io vectors */
-	char buf[BUF];		/* space for %c, %[diouxX], %[eEfgG] */
+	char buf[BUF];		/* space for %c, %S, %[diouxX], %[aA] */
 	char ox[2];		/* space for 0x hex-prefix */
 #ifdef _MB_CAPABLE
 	wchar_t wc;
@@ -875,8 +892,8 @@ reswitch:	switch (ch) {
 			}
 
 			/* do this before tricky precision changes */
-			tmp = _ldcheck (&_fpvalue);
-			if (tmp == 2) {
+			expt = _ldcheck (&_fpvalue);
+			if (expt == 2) {
 				if (_fpvalue < 0)
 					sign = '-';
 				if (ch <= 'G') /* 'A', 'E', 'F', or 'G' */
@@ -887,7 +904,7 @@ reswitch:	switch (ch) {
 				flags &= ~ZEROPAD;
 				break;
 			}
-			if (tmp == 1) {
+			if (expt == 1) {
 				if (ch <= 'G') /* 'A', 'E', 'F', or 'G' */
 					cp = "NAN";
 				else
@@ -1030,8 +1047,8 @@ reswitch:	switch (ch) {
 					while (1) {
 						if (wcp[m] == L'\0')
 							break;
-						if ((n = (int)_wcrtomb_r (data, 
-                                                     buf, wcp[m], &ps)) == -1) {
+						if ((n = (int)_wcrtomb_r (data,
+						     buf, wcp[m], &ps)) == -1) {
 							fp->_flags |= __SERR;
 							goto error;
 						}
@@ -1044,31 +1061,35 @@ reswitch:	switch (ch) {
 					}
 				}
 				else {
-					if ((size = (int)_wcsrtombs_r (data, 
-                                                   NULL, &wcp, 0, &ps)) == -1) {
+					if ((size = (int)_wcsrtombs_r (data,
+						   NULL, &wcp, 0, &ps)) == -1) {
 						fp->_flags |= __SERR;
 						goto error;
 					}
 					wcp = (_CONST wchar_t *)cp;
 				}
- 
+
 				if (size == 0)
 					break;
- 
-				if ((malloc_buf = 
-				    (char *)_malloc_r (data, size + 1)) == NULL) {
-					fp->_flags |= __SERR;
-					goto error;
-				}
-                             
+
+				if (size >= BUF) {
+					if ((malloc_buf =
+					     (char *)_malloc_r (data, size + 1))
+					    == NULL) {
+						fp->_flags |= __SERR;
+						goto error;
+					}
+					cp = malloc_buf;
+				} else
+					cp = buf;
+
 				/* Convert widechar string to multibyte string. */
 				memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
-				if (_wcsrtombs_r (data, malloc_buf, 
-                                                 &wcp, size, &ps) != size) {
+				if (_wcsrtombs_r (data, malloc_buf,
+						 &wcp, size, &ps) != size) {
 					fp->_flags |= __SERR;
 					goto error;
 				}
-				cp = malloc_buf;
 				cp[size] = '\0';
 			}
 #endif /* _MB_CAPABLE */
@@ -1254,11 +1275,11 @@ number:			if ((dprec = prec) >= 0)
 					PRINT (cp, ndig);
 					PAD (expt - ndig, zeroes);
 					if (flags & ALT)
-						PRINT (".", 1);
+						PRINT (decimal_point, 1);
 				} else {
 					PRINT (cp, expt);
 					cp += expt;
-					PRINT (".", 1);
+					PRINT (decimal_point, 1);
 					PRINT (cp, ndig - expt);
 				}
 			} else {	/* 'a', 'A', 'e', or 'E' */
@@ -1305,21 +1326,6 @@ error:
 
 #ifdef FLOATING_POINT
 
-# ifdef _NO_LONGDBL
-extern char *_dtoa_r _PARAMS((struct _reent *, double, int,
-			      int, int *, int *, char **));
-#  define _DTOA_R _dtoa_r
-#  define FREXP frexp
-# else
-extern char *_ldtoa_r _PARAMS((struct _reent *, _LONG_DOUBLE, int,
-			      int, int *, int *, char **));
-#  define _DTOA_R _ldtoa_r
-/* FIXME - frexpl is not yet supported; and cvt infloops if (double)f
-   converts a finite value into infinity.  */
-/* #  define FREXP frexpl */
-#  define FREXP(f,e) ((_LONG_DOUBLE) frexp ((double)f, e))
-# endif
-
 /* Using reentrant DATA, convert finite VALUE into a string of digits
    with no decimal point, using NDIGITS precision and FLAGS as guides
    to whether trailing zeros must be included.  Set *SIGN to nonzero
@@ -1327,31 +1333,9 @@ extern char *_ldtoa_r _PARAMS((struct _reent *, _LONG_DOUBLE, int,
    *LENGTH to the length of the returned string.  CH must be one of
    [aAeEfFgG]; if it is [aA], then the return string lives in BUF,
    otherwise the return value shares the mprec reentrant storage.  */
-# ifdef _NO_LONGDBL
 static char *
-_DEFUN(cvt, (data, value, ndigits, flags, sign, decpt, ch, length, buf),
-       struct _reent *data _AND
-       double value _AND
-       int ndigits  _AND
-       int flags    _AND
-       char *sign   _AND
-       int *decpt   _AND
-       int ch       _AND
-       int *length  _AND
-       char *buf)
-# else
-static char *
-_DEFUN(cvt, (data, value, ndigits, flags, sign, decpt, ch, length, buf),
-       struct _reent *data _AND
-       _LONG_DOUBLE value  _AND
-       int ndigits         _AND
-       int flags           _AND
-       char *sign          _AND
-       int *decpt          _AND
-       int ch              _AND
-       int *length         _AND
-       char *buf)
-# endif
+cvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
+    char *sign, int *decpt, int ch, int *length, char *buf)
 {
 	int mode, dsgn;
 	char *digits, *bp, *rve;
@@ -1444,13 +1428,10 @@ _DEFUN(cvt, (data, value, ndigits, flags, sign, decpt, ch, length, buf),
 }
 
 static int
-_DEFUN(exponent, (p0, exp, fmtch),
-       char *p0 _AND
-       int exp  _AND
-       int fmtch)
+exponent(char *p0, int exp, int fmtch)
 {
 	register char *p, *t;
-	char expbuf[10];
+	char expbuf[MAXEXPLEN];
 # ifdef _WANT_IO_C99_FORMATS
 	int isa = fmtch == 'a' || fmtch == 'A';
 # else
@@ -1465,13 +1446,13 @@ _DEFUN(exponent, (p0, exp, fmtch),
 	}
 	else
 		*p++ = '+';
-	t = expbuf + 10;
+	t = expbuf + MAXEXPLEN;
 	if (exp > 9) {
 		do {
 			*--t = to_char (exp % 10);
 		} while ((exp /= 10) > 9);
 		*--t = to_char (exp);
-		for (; t < expbuf + 10; *p++ = *t++);
+		for (; t < expbuf + MAXEXPLEN; *p++ = *t++);
 	}
 	else {
 		if (!isa)
