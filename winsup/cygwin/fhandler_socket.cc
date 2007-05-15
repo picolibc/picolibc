@@ -50,6 +50,18 @@ int sscanf (const char *, const char *, ...);
 
 fhandler_dev_random* entropy_source;
 
+static inline mode_t
+adjust_socket_file_mode (mode_t mode)
+{
+  /* Kludge: Don't allow to remove read bit on socket files for
+     user/group/other, if the accompanying write bit is set.  It would
+     be nice to have exact permissions on a socket file, but it's
+     necessary that somebody able to access the socket can always read
+     the contents of the socket file to avoid spurious "permission
+     denied" messages. */
+  return mode | ((mode & (S_IWUSR | S_IWGRP | S_IWOTH)) << 1);
+}
+
 /* cygwin internal: map sockaddr into internet domain address */
 static int
 get_inet_addr (const struct sockaddr *in, int inlen,
@@ -687,7 +699,7 @@ fhandler_socket::fchmod (mode_t mode)
     {
       fhandler_disk_file fh (pc);
       fh.get_device () = FH_FS;
-      int ret = fh.fchmod (mode);
+      int ret = fh.fchmod (adjust_socket_file_mode (mode));
       SetFileAttributes	(pc, GetFileAttributes (pc) | FILE_ATTRIBUTE_SYSTEM);
       return ret;
     }
@@ -799,7 +811,8 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 	  set_errno (EADDRINUSE);
 	  goto out;
 	}
-      mode_t mode = (S_IRWXU | S_IRWXG | S_IRWXO) & ~cygheap->umask;
+      mode_t mode = adjust_socket_file_mode ((S_IRWXU | S_IRWXG | S_IRWXO)
+					     & ~cygheap->umask);
       DWORD attr = FILE_ATTRIBUTE_SYSTEM;
       if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
 	attr |= FILE_ATTRIBUTE_READONLY;

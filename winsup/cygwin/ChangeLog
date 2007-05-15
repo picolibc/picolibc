@@ -1,4 +1,11 @@
-007-03-19  Ryan C. Gordon  <icculus@icculus.org>
+2007-05-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (adjust_socket_file_mode): New inline function.
+	(fhandler_socket::fchmod): Squeeze mode through adjust_socket_file_mode
+	before using it.
+	(fhandler_socket::bind): Ditto.
+
+2007-03-19  Ryan C. Gordon  <icculus@icculus.org>
 
 	* path.cc (fs_info::update): Set and use is_cdrom.
 	* path.cc (fillout_mntent): Set ret.mnt_type to something more
@@ -10,7 +17,7 @@
 	* path.h (class path_conv): Add fs_is_cdrom method.  Add missing
 	fs_is_netapp method.
 
-007-05-14  Eric Blake  <ebb9@byu.net>
+2007-05-14  Eric Blake  <ebb9@byu.net>
 
 	* cygwin.din (asnprintf, dprint, _Exit, vasnprintf, vdprintf): Export.
 	* include/cygwin/version.h: Bump API minor number.
