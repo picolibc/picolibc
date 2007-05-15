@@ -1,3 +1,8 @@
+007-05-14  Eric Blake  <ebb9@byu.net>
+
+	* cygwin.din (asnprintf, dprint, _Exit, vasnprintf, vdprintf): Export.
+	* include/cygwin/version.h: Bump API minor number.
+
 2007-04-18  Brian Dessent  <brian@dessent.net>
 
 	* cygwin.sc: Remove duplicated .debug_macinfo section.

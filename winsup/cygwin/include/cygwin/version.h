@@ -307,12 +307,13 @@ details. */
 	   mq_send, mq_setattr, mq_timedreceive, mq_timedsend, mq_unlink.
       166: Export sem_unlink.
       167: Add st_birthtim to struct stat.
+      168: Export asnprintf, dprintf, _Exit, vasnprintf, vdprintf.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 167
+#define CYGWIN_VERSION_API_MINOR 168
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

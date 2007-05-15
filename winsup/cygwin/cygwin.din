@@ -112,6 +112,7 @@ asinh NOSIGFE
 _asinh = asinh NOSIGFE
 asinhf NOSIGFE
 _asinhf = asinhf NOSIGFE
+asnprintf SIGFE
 asprintf SIGFE
 _asprintf = asprintf SIGFE
 asprintf_r = _asprintf_r SIGFE
@@ -275,6 +276,7 @@ dn_expand = __dn_expand SIGFE
 __dn_expand SIGFE
 dn_skipname = __dn_skipname SIGFE
 __dn_skipname SIGFE
+dprintf SIGFE
 drand48 NOSIGFE
 _drand48 = drand48 NOSIGFE
 drem NOSIGFE
@@ -344,6 +346,7 @@ execvp SIGFE
 _execvp = execvp SIGFE
 exit = cygwin_exit SIGFE
 _exit SIGFE
+_Exit SIGFE
 exp NOSIGFE
 _exp = exp NOSIGFE
 exp2 NOSIGFE
@@ -1599,10 +1602,12 @@ utmpname SIGFE
 _utmpname = utmpname SIGFE
 utmpxname SIGFE
 valloc SIGFE
+vasnprintf SIGFE
 vasprintf SIGFE
 _vasprintf = vasprintf SIGFE
 vasprintf_r = _vasprintf_r SIGFE
 _vasprintf_r SIGFE
+vdprintf SIGFE
 verr SIGFE
 verrx SIGFE
 vfiprintf SIGFE
