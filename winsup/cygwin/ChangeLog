@@ -1,3 +1,15 @@
+007-03-19  Ryan C. Gordon  <icculus@icculus.org>
+
+	* path.cc (fs_info::update): Set and use is_cdrom.
+	* path.cc (fillout_mntent): Set ret.mnt_type to something more
+	Linux-like, based on data from fs_info.  Move "system" and "user"
+	strings from mnt_type to mnt_opts.
+	* path.h (struct fs_info): Add is_cdrom field.
+	* path.h (fs_info::clear): Initialize is_cdrom.
+	* path.h (struct fs_info): Add IMPLEMENT_STATUS_FLAG(bool,is_cdrom).
+	* path.h (class path_conv): Add fs_is_cdrom method.  Add missing
+	fs_is_netapp method.
+
 007-05-14  Eric Blake  <ebb9@byu.net>
 
 	* cygwin.din (asnprintf, dprint, _Exit, vasnprintf, vdprintf): Export.

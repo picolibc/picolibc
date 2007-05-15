@@ -102,15 +102,16 @@ struct fs_info
     DWORD serial; /* Volume serial number */
     unsigned is_remote_drive : 1;
     unsigned has_buggy_open  : 1;
-    unsigned has_ea          : 1;
-    unsigned has_acls        : 1;
+    unsigned has_ea	     : 1;
+    unsigned has_acls	     : 1;
     unsigned hasgood_inode   : 1;
     unsigned drive_type      : 3;
-    unsigned is_fat          : 1;
-    unsigned is_ntfs         : 1;
-    unsigned is_samba        : 1;
-    unsigned is_nfs          : 1;
+    unsigned is_fat	     : 1;
+    unsigned is_ntfs	     : 1;
+    unsigned is_samba	     : 1;
+    unsigned is_nfs	     : 1;
     unsigned is_netapp       : 1;
+    unsigned is_cdrom	     : 1;
   } status;
  public:
   void clear ()
@@ -129,6 +130,7 @@ struct fs_info
     is_samba (false);
     is_nfs (false);
     is_netapp (false);
+    is_cdrom (false);
   }
   inline DWORD& flags () {return status.flags;};
   inline DWORD& serial () {return status.serial;};
@@ -145,6 +147,7 @@ struct fs_info
   IMPLEMENT_STATUS_FLAG (bool, is_samba)
   IMPLEMENT_STATUS_FLAG (bool, is_nfs)
   IMPLEMENT_STATUS_FLAG (bool, is_netapp)
+  IMPLEMENT_STATUS_FLAG (bool, is_cdrom)
 
   bool update (const char *);
 };
@@ -274,6 +277,8 @@ class path_conv
   bool fs_is_ntfs () const {return fs.is_ntfs ();}
   bool fs_is_samba () const {return fs.is_samba ();}
   bool fs_is_nfs () const {return fs.is_nfs ();}
+  bool fs_is_netapp () const {return fs.is_netapp ();}
+  bool fs_is_cdrom () const {return fs.is_cdrom ();}
   void set_path (const char *p) {strcpy (path, p);}
   DWORD volser () { return fs.serial (); }
   void fillin (HANDLE h);

@@ -461,6 +461,7 @@ fs_info::update (const char *win32_path)
 	     && FS_IS_NETAPP_DATAONTAP);
   is_ntfs (strcmp (fsname, "NTFS") == 0 && !is_samba () && !is_netapp ());
   is_nfs (strcmp (fsname, "NFS") == 0);
+  is_cdrom (drive_type () == DRIVE_CDROM);
 
   has_ea (is_ntfs ());
   has_acls ((flags () & FS_PERSISTENT_ACLS)
@@ -474,8 +475,7 @@ fs_info::update (const char *win32_path)
   has_buggy_open (!strcmp (fsname, "SUNWNFS"));
 
   /* Only append non-removable drives to the global fsinfo storage */
-  if (drive_type () != DRIVE_REMOVABLE && drive_type () != DRIVE_CDROM
-      && idx < MAX_FS_INFO_CNT)
+  if (drive_type () != DRIVE_REMOVABLE && !is_cdrom () && idx < MAX_FS_INFO_CNT)
     {
       LONG exc_cnt;
       while ((exc_cnt = InterlockedExchange (&fsinfo_cnt, -1)) == -1)
@@ -2552,10 +2552,27 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
   strcpy (_my_tls.locals.mnt_dir, posix_path);
   ret.mnt_dir = _my_tls.locals.mnt_dir;
 
-  if (!(flags & MOUNT_SYSTEM))		/* user mount */
-    strcpy (_my_tls.locals.mnt_type, (char *) "user");
-  else					/* system mount */
-    strcpy (_my_tls.locals.mnt_type, (char *) "system");
+  /* Try to give a filesystem type that matches what a Linux application might
+     expect. Naturally, this is a moving target, but we can make some
+     reasonable guesses for popular types. */
+
+  fs_info mntinfo;
+  mntinfo.update (native_path);  /* this pulls from a cache, usually. */
+
+  if (mntinfo.is_samba())
+    strcpy (_my_tls.locals.mnt_type, (char *) "smbfs");
+  else if (mntinfo.is_nfs ())
+    strcpy (_my_tls.locals.mnt_type, (char *) "nfs");
+  else if (mntinfo.is_fat ())
+    strcpy (_my_tls.locals.mnt_type, (char *) "vfat");
+  else if (mntinfo.is_ntfs ())
+    strcpy (_my_tls.locals.mnt_type, (char *) "ntfs");
+  else if (mntinfo.is_netapp ())
+    strcpy (_my_tls.locals.mnt_type, (char *) "netapp");
+  else if (mntinfo.is_cdrom ())
+    strcpy (_my_tls.locals.mnt_type, (char *) "iso9660");
+  else
+    strcpy (_my_tls.locals.mnt_type, (char *) "unknown");
 
   ret.mnt_type = _my_tls.locals.mnt_type;
 
@@ -2579,6 +2596,12 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
 
   if ((flags & MOUNT_CYGDRIVE))		/* cygdrive */
     strcat (_my_tls.locals.mnt_opts, (char *) ",noumount");
+
+  if (!(flags & MOUNT_SYSTEM))		/* user mount */
+    strcat (_my_tls.locals.mnt_opts, (char *) ",user");
+  else					/* system mount */
+    strcat (_my_tls.locals.mnt_opts, (char *) ",system");
+
   ret.mnt_opts = _my_tls.locals.mnt_opts;
 
   ret.mnt_freq = 1;
@@ -4206,13 +4229,13 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
 	{
 	  /* We utilize the user parameter block.  The directory is
 	     stored manually there.  Why the hassle?
-	     
+
 	     - SetCurrentDirectory fails for directories with strict
 	       permissions even for processes with the SE_BACKUP_NAME
 	       privilege enabled.  The reason is apparently that
 	       SetCurrentDirectory calls NtOpenFile without the
 	       FILE_OPEN_FOR_BACKUP_INTENT flag set.
-	     
+ 
 	     - Unlinking a cwd fails because SetCurrentDirectory seems to
 	       open directories so that deleting the directory is disallowed.
 	       The below code opens with *all* sharing flags set. */
