@@ -1,5 +1,10 @@
 2007-05-16  Eric Blake  <ebb9@byu.net>
 
+	Close security hole in tmpfile.
+	* libc/stdio/tmpfile.c (_tmpfile_r): Avoid window between filename
+	generation and opening the fd.
+	* libc/stdio64/tmpfile64.c (_tmpfile64_r): Likewise.
+
 	* libc/include/math.h (INFINITY, NAN, FP_ILOGB0, FP_ILOGBNAN)
 	(MATH_ERRNO, MATH_ERREXCEPT, math_errhandling): Add macros
 	required by POSIX.
