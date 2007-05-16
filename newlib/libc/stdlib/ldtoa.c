@@ -1,4 +1,3 @@
-
  /* Extended precision arithmetic functions for long double I/O.
   * This program has been placed in the public domain.
   */
@@ -244,7 +243,7 @@ static char *ermsg[7] = {
  *
  * Exception flags are NOT fully supported.
  *
- * Define INFINITY in mconf.h for support of infinity; otherwise a
+ * Define USE_INFINITY in mconf.h for support of infinity; otherwise a
  * saturation arithmetic is implemented.
  *
  * Define NANS for support of Not-a-Number items; otherwise the
@@ -381,12 +380,12 @@ typedef struct
 #define VOLATILE 
 
 #define NANS
-#define INFINITY
+#define USE_INFINITY
 
 /* NaN's require infinity support. */
 #ifdef NANS
 #ifndef INFINITY
-#define INFINITY
+#define USE_INFINITY
 #endif
 #endif
 
@@ -544,7 +543,7 @@ static void einfin(register short unsigned int *x, register LDPARMS *ldp)
 {
 register int i;
 
-#ifdef INFINITY
+#ifdef USE_INFINITY
 for( i=0; i<NE-1; i++ )
 	*x++ = 0;
 *x |= 32767;
@@ -596,7 +595,7 @@ else
 /* get the exponent */
 *q = *p--;
 *q++ &= 0x7fff;	/* delete the sign bit */
-#ifdef INFINITY
+#ifdef USE_INFINITY
 if( (*(q-1) & 0x7fff) == 0x7fff )
 	{
 #ifdef NANS
@@ -639,7 +638,7 @@ if( i )
 	*q-- = *p++ | 0x8000;
 else
 	*q-- = *p++;
-#ifdef INFINITY
+#ifdef USE_INFINITY
 if( *(p-1) == 0x7fff )
 	{
 #ifdef NANS
@@ -1173,7 +1172,7 @@ unsigned short r;
 j = enormlz( s );
 
 /* a blank significand could mean either zero or infinity. */
-#ifndef INFINITY
+#ifndef USE_INFINITY
 if( j > NBITS )
 	{
 	ecleazs( s );
@@ -1181,7 +1180,7 @@ if( j > NBITS )
 	}
 #endif
 exp -= j;
-#ifndef INFINITY
+#ifndef USE_INFINITY
 if( exp >= 32767L )
 	goto overf;
 #else
@@ -1329,10 +1328,10 @@ mdfin:
 s[NI-1] = 0;
 if( exp >= 32767L )
 	{
-#ifndef INFINITY
+#ifndef USE_INFINITY
 overf:
 #endif
-#ifdef INFINITY
+#ifdef USE_INFINITY
 	s[1] = 32767;
 	for( i=2; i<NI-1; i++ )
 		s[i] = 0;
@@ -1405,7 +1404,7 @@ unsigned short ai[NI], bi[NI], ci[NI];
 int i, lost, j, k;
 long lt, lta, ltb;
 
-#ifdef INFINITY
+#ifdef USE_INFINITY
 if( eisinf(a) )
 	{
 	emov(a,c);
@@ -1536,7 +1535,7 @@ if( ((ecmp(a,ezero) == 0) && (ecmp(b,ezero) == 0))
 	}
 #endif
 /* Infinity over anything else is infinity. */
-#ifdef INFINITY
+#ifdef USE_INFINITY
 if( eisinf(b) )
 	{
 	if( eisneg(a) ^ eisneg(b) )
@@ -1640,7 +1639,7 @@ if( (eisinf(a) && (ecmp(b,ezero) == 0))
 	}
 #endif
 /* Infinity times anything else is infinity. */
-#ifdef INFINITY
+#ifdef USE_INFINITY
 if( eisinf(a) || eisinf(b) )
 	{
 	if( eisneg(a) ^ eisneg(b) )
@@ -1719,7 +1718,7 @@ yy[0] = 0;
 if( r & 0x8000 )
 	yy[0] = 0xffff;
 r &= 0x7fff;
-#ifdef INFINITY
+#ifdef USE_INFINITY
 if( r == 0x7fff )
 	{
 #ifdef NANS
@@ -1865,7 +1864,7 @@ if((yy[NE-1] & 0x7fff) == 0 && (yy[NE-2] & 0x8000) == 0)
     return;
   }
 #endif
-#ifdef INFINITY
+#ifdef USE_INFINITY
 /* Point to the exponent field.  */
 p = &yy[NE-1];
 if( (*p & 0x7fff) == 0x7fff )
@@ -1900,7 +1899,7 @@ if( (*p & 0x7fff) == 0x7fff )
 		eneg(y);
 	return;
 	}
-#endif /* INFINITY */
+#endif /* USE_INFINITY */
 p = yy;
 q = y;
 for( i=0; i<NE; i++ )
@@ -1955,7 +1954,7 @@ else
 for( i=0; i<4; i++ )
 	*q++ = *p++;
 #else
-#ifdef INFINITY
+#ifdef USE_INFINITY
 #ifdef IBMPC
 if (eiisinf (a))
         {
@@ -1967,7 +1966,7 @@ if (eiisinf (a))
 	return;
 	}
 #endif /* IBMPC */
-#endif /* INFINITY */
+#endif /* USE_INFINITY */
 for( i=0; i<4; i++ )
 	*q-- = *p++;
 #endif
@@ -2010,7 +2009,7 @@ if( r & 0x8000 )
 	yy[0] = 0xffff;
 yy[M] = (r & 0x0f) | 0x10;
 r &= ~0x800f;	/* strip sign and 4 significand bits */
-#ifdef INFINITY
+#ifdef USE_INFINITY
 if( r == 0x7ff0 )
 	{
 #ifdef NANS
@@ -2120,7 +2119,7 @@ if( *p++ )
 i = *p++;
 if( i >= (unsigned int )2047 )
 	{	/* Saturate at largest number less than infinity. */
-#ifdef INFINITY
+#ifdef USE_INFINITY
 	*y |= 0x7ff0;
 #ifdef IBMPC
 	*(--y) = 0;
@@ -2132,7 +2131,7 @@ if( i >= (unsigned int )2047 )
 	*y++ = 0;
 	*y++ = 0;
 #endif /* IBMPC */
-#else /* !INFINITY */
+#else /* !USE_INFINITY */
 	*y |= (unsigned short )0x7fef;
 #ifdef IBMPC
 	*(--y) = 0xffff;
@@ -2144,7 +2143,7 @@ if( i >= (unsigned int )2047 )
 	*y++ = 0xffff;
 	*y++ = 0xffff;
 #endif
-#endif /* !INFINITY */
+#endif /* !USE_INFINITY */
 	return;
 	}
 if( i == 0 )
@@ -2202,7 +2201,7 @@ if( r & 0x8000 )
 	yy[0] = 0xffff;
 yy[M] = (r & 0x7f) | 0200;
 r &= ~0x807f;	/* strip sign and 7 significand bits */
-#ifdef INFINITY
+#ifdef USE_INFINITY
 if( r == 0x7f80 )
 	{
 #ifdef NANS
@@ -2285,7 +2284,7 @@ if( *p++ )
 i = *p++;
 if( i >= 255 )
 	{	/* Saturate at largest number less than infinity. */
-#ifdef INFINITY
+#ifdef USE_INFINITY
 	*y |= (unsigned short )0x7f80;
 #ifdef IBMPC
 	*(--y) = 0;
@@ -2297,7 +2296,7 @@ if( i >= 255 )
 	++y;
 	*y = 0;
 #endif
-#else /* !INFINITY */
+#else /* !USE_INFINITY */
 	*y |= (unsigned short )0x7f7f;
 #ifdef IBMPC
 	*(--y) = 0xffff;
@@ -2309,7 +2308,7 @@ if( i >= 255 )
 	++y;
 	*y = 0xffff;
 #endif
-#endif /* !INFINITY */
+#endif /* !USE_INFINITY */
 	return;
 	}
 if( i == 0 )
@@ -3743,7 +3742,3 @@ switch( size )
 for (i=0; i < n; i++)
 	*nan++ = *p++;
 }
-
-
-
-

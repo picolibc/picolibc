@@ -1,5 +1,11 @@
 2007-05-16  Eric Blake  <ebb9@byu.net>
 
+	* libc/include/math.h (INFINITY, NAN, FP_ILOGB0, FP_ILOGBNAN)
+	(MATH_ERRNO, MATH_ERREXCEPT, math_errhandling): Add macros
+	required by POSIX.
+	* libc/stdlib/ldtoa.c (USE_INFINITY): Rename from INFINITY, to
+	avoid clash with <math.h>.
+
 	* libc/stdlib/wctomb_r.c (_wctomb_r): Avoid gcc warnings on cygwin.
 	* libc/search/hash.c (__hash_open): Likewise.
 
