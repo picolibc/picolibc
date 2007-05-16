@@ -1,3 +1,8 @@
+2007-05-16  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdlib/wctomb_r.c (_wctomb_r): Avoid gcc warnings on cygwin.
+	* libc/search/hash.c (__hash_open): Likewise.
+
 2007-05-14 Eric Blake <ebb9@byu.net>
 
 	Reduce stack size of *printf.
