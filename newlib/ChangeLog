@@ -1,3 +1,8 @@
+2007-05-17  Charles Wilson  <cygwin@...>
+
+	* stdio/tmpfile.c: Include <sys/stat.h>.
+	* stdio64/tmpfile64.c: Ditto.
+
 2007-05-16  Eric Blake  <ebb9@byu.net>
 
 	Close security hole in tmpfile.
