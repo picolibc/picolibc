@@ -1,3 +1,17 @@
+2007-05-17  Yaakov Selkowitz  <yselkowitz <at> users.sourceforge.net> 
+
+	* libm/common/Makefile.am: Add support for exp10, exp10f,
+	pow10, and pow10f functions.
+	* libm/common/Makefile.in: Regenerated.
+	* libm/common/s_pow10.c: New file.
+	* libm/common/sf_pow10.c: Ditto.
+	* libm/common/s_exp10.c: Ditto.
+	* libm/common/sf_exp10.c: Ditto.
+	* libc/include/math.h [!pow10]: New pow10 prototype.
+	[!pow10f]: New pow10f prototype.
+	[!exp10]: New exp10 prototype.
+	[!exp10f]: New exp10f prototype.
+
 2007-05-17  Charles Wilson  <cygwin@...>
 
 	* stdio/tmpfile.c: Include <sys/stat.h>.

@@ -55,12 +55,13 @@ lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am__objects_1 = lib_a-s_finite.$(OBJEXT) lib_a-s_copysign.$(OBJEXT) \
 	lib_a-s_modf.$(OBJEXT) lib_a-s_scalbn.$(OBJEXT) \
-	lib_a-s_cbrt.$(OBJEXT) lib_a-s_expm1.$(OBJEXT) \
-	lib_a-s_ilogb.$(OBJEXT) lib_a-s_infconst.$(OBJEXT) \
-	lib_a-s_infinity.$(OBJEXT) lib_a-s_isinf.$(OBJEXT) \
-	lib_a-s_isinfd.$(OBJEXT) lib_a-s_isnan.$(OBJEXT) \
-	lib_a-s_isnand.$(OBJEXT) lib_a-s_log1p.$(OBJEXT) \
-	lib_a-s_nan.$(OBJEXT) lib_a-s_nextafter.$(OBJEXT) \
+	lib_a-s_cbrt.$(OBJEXT) lib_a-s_exp10.$(OBJEXT) \
+	lib_a-s_expm1.$(OBJEXT) lib_a-s_ilogb.$(OBJEXT) \
+	lib_a-s_infconst.$(OBJEXT) lib_a-s_infinity.$(OBJEXT) \
+	lib_a-s_isinf.$(OBJEXT) lib_a-s_isinfd.$(OBJEXT) \
+	lib_a-s_isnan.$(OBJEXT) lib_a-s_isnand.$(OBJEXT) \
+	lib_a-s_log1p.$(OBJEXT) lib_a-s_nan.$(OBJEXT) \
+	lib_a-s_nextafter.$(OBJEXT) lib_a-s_pow10.$(OBJEXT) \
 	lib_a-s_rint.$(OBJEXT) lib_a-s_logb.$(OBJEXT) \
 	lib_a-s_matherr.$(OBJEXT) lib_a-s_lib_ver.$(OBJEXT) \
 	lib_a-s_fdim.$(OBJEXT) lib_a-s_fma.$(OBJEXT) \
@@ -72,12 +73,13 @@ am__objects_1 = lib_a-s_finite.$(OBJEXT) lib_a-s_copysign.$(OBJEXT) \
 	lib_a-s_trunc.$(OBJEXT)
 am__objects_2 = lib_a-sf_finite.$(OBJEXT) lib_a-sf_copysign.$(OBJEXT) \
 	lib_a-sf_modf.$(OBJEXT) lib_a-sf_scalbn.$(OBJEXT) \
-	lib_a-sf_cbrt.$(OBJEXT) lib_a-sf_expm1.$(OBJEXT) \
-	lib_a-sf_ilogb.$(OBJEXT) lib_a-sf_infinity.$(OBJEXT) \
-	lib_a-sf_isinf.$(OBJEXT) lib_a-sf_isinff.$(OBJEXT) \
-	lib_a-sf_isnan.$(OBJEXT) lib_a-sf_isnanf.$(OBJEXT) \
-	lib_a-sf_log1p.$(OBJEXT) lib_a-sf_nan.$(OBJEXT) \
-	lib_a-sf_nextafter.$(OBJEXT) lib_a-sf_rint.$(OBJEXT) \
+	lib_a-sf_cbrt.$(OBJEXT) lib_a-sf_exp10.$(OBJEXT) \
+	lib_a-sf_expm1.$(OBJEXT) lib_a-sf_ilogb.$(OBJEXT) \
+	lib_a-sf_infinity.$(OBJEXT) lib_a-sf_isinf.$(OBJEXT) \
+	lib_a-sf_isinff.$(OBJEXT) lib_a-sf_isnan.$(OBJEXT) \
+	lib_a-sf_isnanf.$(OBJEXT) lib_a-sf_log1p.$(OBJEXT) \
+	lib_a-sf_nan.$(OBJEXT) lib_a-sf_nextafter.$(OBJEXT) \
+	lib_a-sf_pow10.$(OBJEXT) lib_a-sf_rint.$(OBJEXT) \
 	lib_a-sf_logb.$(OBJEXT) lib_a-sf_fdim.$(OBJEXT) \
 	lib_a-sf_fma.$(OBJEXT) lib_a-sf_fmax.$(OBJEXT) \
 	lib_a-sf_fmin.$(OBJEXT) lib_a-sf_fpclassify.$(OBJEXT) \
@@ -91,19 +93,20 @@ lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libcommon_la_LIBADD =
 am__objects_3 = s_finite.lo s_copysign.lo s_modf.lo s_scalbn.lo \
-	s_cbrt.lo s_expm1.lo s_ilogb.lo s_infconst.lo s_infinity.lo \
-	s_isinf.lo s_isinfd.lo s_isnan.lo s_isnand.lo s_log1p.lo \
-	s_nan.lo s_nextafter.lo s_rint.lo s_logb.lo s_matherr.lo \
-	s_lib_ver.lo s_fdim.lo s_fma.lo s_fmax.lo s_fmin.lo \
-	s_fpclassify.lo s_lrint.lo s_lround.lo s_nearbyint.lo \
-	s_remquo.lo s_round.lo s_scalbln.lo s_signbit.lo s_trunc.lo
+	s_cbrt.lo s_exp10.lo s_expm1.lo s_ilogb.lo s_infconst.lo \
+	s_infinity.lo s_isinf.lo s_isinfd.lo s_isnan.lo s_isnand.lo \
+	s_log1p.lo s_nan.lo s_nextafter.lo s_pow10.lo s_rint.lo \
+	s_logb.lo s_matherr.lo s_lib_ver.lo s_fdim.lo s_fma.lo \
+	s_fmax.lo s_fmin.lo s_fpclassify.lo s_lrint.lo s_lround.lo \
+	s_nearbyint.lo s_remquo.lo s_round.lo s_scalbln.lo \
+	s_signbit.lo s_trunc.lo
 am__objects_4 = sf_finite.lo sf_copysign.lo sf_modf.lo sf_scalbn.lo \
-	sf_cbrt.lo sf_expm1.lo sf_ilogb.lo sf_infinity.lo sf_isinf.lo \
-	sf_isinff.lo sf_isnan.lo sf_isnanf.lo sf_log1p.lo sf_nan.lo \
-	sf_nextafter.lo sf_rint.lo sf_logb.lo sf_fdim.lo sf_fma.lo \
-	sf_fmax.lo sf_fmin.lo sf_fpclassify.lo sf_lrint.lo \
-	sf_lround.lo sf_nearbyint.lo sf_remquo.lo sf_round.lo \
-	sf_scalbln.lo sf_trunc.lo
+	sf_cbrt.lo sf_exp10.lo sf_expm1.lo sf_ilogb.lo sf_infinity.lo \
+	sf_isinf.lo sf_isinff.lo sf_isnan.lo sf_isnanf.lo sf_log1p.lo \
+	sf_nan.lo sf_nextafter.lo sf_pow10.lo sf_rint.lo sf_logb.lo \
+	sf_fdim.lo sf_fma.lo sf_fmax.lo sf_fmin.lo sf_fpclassify.lo \
+	sf_lrint.lo sf_lround.lo sf_nearbyint.lo sf_remquo.lo \
+	sf_round.lo sf_scalbln.lo sf_trunc.lo
 @USE_LIBTOOL_TRUE@am_libcommon_la_OBJECTS = $(am__objects_3) \
 @USE_LIBTOOL_TRUE@	$(am__objects_4)
 libcommon_la_OBJECTS = $(am_libcommon_la_OBJECTS)
@@ -244,18 +247,18 @@ target_alias = @target_alias@
 AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 src = s_finite.c s_copysign.c s_modf.c s_scalbn.c \
-	s_cbrt.c s_expm1.c s_ilogb.c s_infconst.c \
+	s_cbrt.c s_exp10.c s_expm1.c s_ilogb.c s_infconst.c \
 	s_infinity.c s_isinf.c s_isinfd.c s_isnan.c s_isnand.c \
-	s_log1p.c s_nan.c s_nextafter.c \
+	s_log1p.c s_nan.c s_nextafter.c s_pow10.c \
 	s_rint.c s_logb.c s_matherr.c s_lib_ver.c \
 	s_fdim.c s_fma.c s_fmax.c s_fmin.c s_fpclassify.c s_lrint.c \
 	s_lround.c s_nearbyint.c s_remquo.c s_round.c s_scalbln.c \
 	s_signbit.c s_trunc.c
 
 fsrc = sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c \
-	sf_cbrt.c sf_expm1.c sf_ilogb.c \
+	sf_cbrt.c sf_exp10.c sf_expm1.c sf_ilogb.c \
 	sf_infinity.c sf_isinf.c sf_isinff.c sf_isnan.c sf_isnanf.c \
-	sf_log1p.c sf_nan.c sf_nextafter.c \
+	sf_log1p.c sf_nan.c sf_nextafter.c sf_pow10.c \
 	sf_rint.c sf_logb.c \
 	sf_fdim.c sf_fma.c sf_fmax.c sf_fmin.c sf_fpclassify.c sf_lrint.c \
 	sf_lround.c sf_nearbyint.c sf_remquo.c sf_round.c \
@@ -269,9 +272,9 @@ libcommon_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
 @USE_LIBTOOL_FALSE@lib_a_SOURCES = $(src) $(fsrc)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
-chobj = scbrt.def scopysign.def sexpm1.def silogb.def \
+chobj = scbrt.def scopysign.def sexp10.def sexpm1.def silogb.def \
 	sinfinity.def sisnan.def slog1p.def smatherr.def smodf.def \
-	snan.def snextafter.def sscalbn.def
+	snan.def snextafter.def spow10.def sscalbn.def
 
 SUFFIXES = .def
 CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
@@ -374,6 +377,12 @@ lib_a-s_cbrt.o: s_cbrt.c
 lib_a-s_cbrt.obj: s_cbrt.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_cbrt.obj `if test -f 's_cbrt.c'; then $(CYGPATH_W) 's_cbrt.c'; else $(CYGPATH_W) '$(srcdir)/s_cbrt.c'; fi`
 
+lib_a-s_exp10.o: s_exp10.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_exp10.o `test -f 's_exp10.c' || echo '$(srcdir)/'`s_exp10.c
+
+lib_a-s_exp10.obj: s_exp10.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_exp10.obj `if test -f 's_exp10.c'; then $(CYGPATH_W) 's_exp10.c'; else $(CYGPATH_W) '$(srcdir)/s_exp10.c'; fi`
+
 lib_a-s_expm1.o: s_expm1.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_expm1.o `test -f 's_expm1.c' || echo '$(srcdir)/'`s_expm1.c
 
@@ -439,6 +448,12 @@ lib_a-s_nextafter.o: s_nextafter.c
 
 lib_a-s_nextafter.obj: s_nextafter.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_nextafter.obj `if test -f 's_nextafter.c'; then $(CYGPATH_W) 's_nextafter.c'; else $(CYGPATH_W) '$(srcdir)/s_nextafter.c'; fi`
+
+lib_a-s_pow10.o: s_pow10.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_pow10.o `test -f 's_pow10.c' || echo '$(srcdir)/'`s_pow10.c
+
+lib_a-s_pow10.obj: s_pow10.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_pow10.obj `if test -f 's_pow10.c'; then $(CYGPATH_W) 's_pow10.c'; else $(CYGPATH_W) '$(srcdir)/s_pow10.c'; fi`
 
 lib_a-s_rint.o: s_rint.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_rint.o `test -f 's_rint.c' || echo '$(srcdir)/'`s_rint.c
@@ -572,6 +587,12 @@ lib_a-sf_cbrt.o: sf_cbrt.c
 lib_a-sf_cbrt.obj: sf_cbrt.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_cbrt.obj `if test -f 'sf_cbrt.c'; then $(CYGPATH_W) 'sf_cbrt.c'; else $(CYGPATH_W) '$(srcdir)/sf_cbrt.c'; fi`
 
+lib_a-sf_exp10.o: sf_exp10.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_exp10.o `test -f 'sf_exp10.c' || echo '$(srcdir)/'`sf_exp10.c
+
+lib_a-sf_exp10.obj: sf_exp10.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_exp10.obj `if test -f 'sf_exp10.c'; then $(CYGPATH_W) 'sf_exp10.c'; else $(CYGPATH_W) '$(srcdir)/sf_exp10.c'; fi`
+
 lib_a-sf_expm1.o: sf_expm1.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_expm1.o `test -f 'sf_expm1.c' || echo '$(srcdir)/'`sf_expm1.c
 
@@ -631,6 +652,12 @@ lib_a-sf_nextafter.o: sf_nextafter.c
 
 lib_a-sf_nextafter.obj: sf_nextafter.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_nextafter.obj `if test -f 'sf_nextafter.c'; then $(CYGPATH_W) 'sf_nextafter.c'; else $(CYGPATH_W) '$(srcdir)/sf_nextafter.c'; fi`
+
+lib_a-sf_pow10.o: sf_pow10.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_pow10.o `test -f 'sf_pow10.c' || echo '$(srcdir)/'`sf_pow10.c
+
+lib_a-sf_pow10.obj: sf_pow10.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_pow10.obj `if test -f 'sf_pow10.c'; then $(CYGPATH_W) 'sf_pow10.c'; else $(CYGPATH_W) '$(srcdir)/sf_pow10.c'; fi`
 
 lib_a-sf_rint.o: sf_rint.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_rint.o `test -f 'sf_rint.c' || echo '$(srcdir)/'`sf_rint.c
@@ -879,16 +906,8 @@ doc: $(chobj)
 # Texinfo does not appear to support underscores in file names, so we
 # name the .def files without underscores.
 
-smodf.def: s_modf.c
-	$(CHEW) < $(srcdir)/s_modf.c >$@ 2>/dev/null
-	touch stmp-def
-
 scopysign.def: s_copysign.c
 	$(CHEW) < $(srcdir)/s_copysign.c >$@ 2>/dev/null
-	touch stmp-def
-
-sscalbn.def: s_scalbn.c
-	$(CHEW) < $(srcdir)/s_scalbn.c >$@ 2>/dev/null
 	touch stmp-def
 
 scbrt.def: s_cbrt.c
@@ -899,8 +918,8 @@ serf.def: s_erf.c
 	$(CHEW) < $(srcdir)/s_serf.c >$@ 2>/dev/null
 	touch stmp-def
 
-sexpn.def: s_expm.c
-	$(CHEW) < $(srcdir)/s_expn.c >$@ 2>/dev/null
+sexp10.def: s_exp10.c
+	$(CHEW) < $(srcdir)/s_exp10.c >$@ 2>/dev/null
 	touch stmp-def
 
 sexpm1.def: s_expm1.c
@@ -923,6 +942,10 @@ slog1p.def: s_log1p.c
 	$(CHEW) < $(srcdir)/s_log1p.c >$@ 2>/dev/null
 	touch stmp-def
 
+smodf.def: s_modf.c
+	$(CHEW) < $(srcdir)/s_modf.c >$@ 2>/dev/null
+	touch stmp-def
+
 smatherr.def: s_matherr.c
 	$(CHEW) < $(srcdir)/s_matherr.c >$@ 2>/dev/null
 	touch stmp-def
@@ -933,6 +956,14 @@ snan.def: s_nan.c
 
 snextafter.def: s_nextafter.c
 	$(CHEW) < $(srcdir)/s_nextafter.c >$@ 2>/dev/null
+	touch stmp-def
+
+spow10.def: s_pow10.c
+	$(CHEW) < $(srcdir)/s_pow10.c >$@ 2>/dev/null
+	touch stmp-def
+
+sscalbn.def: s_scalbn.c
+	$(CHEW) < $(srcdir)/s_scalbn.c >$@ 2>/dev/null
 	touch stmp-def
 
 # A partial dependency list.

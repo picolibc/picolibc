@@ -233,6 +233,14 @@ extern double fmin _PARAMS((double, double));
 extern double fma _PARAMS((double, double, double));
 extern void sincos _PARAMS((double, double *, double *));
 
+/* GNU extensions */
+# ifndef exp10
+extern double exp10 _PARAMS((double));
+# endif
+# ifndef pow10
+extern double pow10 _PARAMS((double));
+# endif
+
 #ifndef __math_68881
 extern double log1p _PARAMS((double));
 extern double expm1 _PARAMS((double));
@@ -334,6 +342,14 @@ extern float scalbnf _PARAMS((float, int));
 extern float log1pf _PARAMS((float));
 extern float expm1f _PARAMS((float));
 extern void sincosf _PARAMS((float, float *, float *));
+
+/* GNU extensions */
+# ifndef exp10f
+extern float exp10f _PARAMS((float));
+# endif
+# ifndef pow10f
+extern float pow10f _PARAMS((float));
+# endif
 
 #ifndef _REENT_ONLY
 extern float acoshf _PARAMS((float));
