@@ -153,7 +153,8 @@ static char *rcsid = "$Id$";
 #endif
 
 #define _NO_LONGLONG
-#if defined _WANT_IO_LONG_LONG && defined __GNUC__
+#if defined _WANT_IO_LONG_LONG \
+	&& (defined __GNUC__ || __STDC_VERSION__ >= 199901L)
 # undef _NO_LONGLONG
 #endif
 

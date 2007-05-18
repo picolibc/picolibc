@@ -1,10 +1,16 @@
+2007-05-18  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/vfprintf.c [_WANT_IO_LONG_LONG]: Allow non-gcc
+	compilers.
+	* libc/stdio/vfscanf.c: Likewise.
+
 2007-05-17  Cary R.  <cygcary <at> yahoo.com>
 
 	* libm/math/w_atan2.c: Fix atan2 to be consistent with glibc
 	(atan2(+0,-0), atan2(-0,-0) and atan(-0,+0))
 	* libm/math/wf_atan2.c: Ditto.
 
-2007-05-17  Yaakov Selkowitz  <yselkowitz <at> users.sourceforge.net> 
+2007-05-17  Yaakov Selkowitz  <yselkowitz <at> users.sourceforge.net>
 
 	* libm/common/Makefile.am: Add support for exp10, exp10f,
 	pow10, and pow10f functions.

@@ -164,7 +164,8 @@ extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
 #endif
 
 #define _NO_LONGLONG
-#if defined _WANT_IO_LONG_LONG && defined __GNUC__
+#if defined _WANT_IO_LONG_LONG \
+	&& (defined __GNUC__ || __STDC_VERSION__ >= 199901L)
 # undef _NO_LONGLONG
 #endif
 
