@@ -1,3 +1,7 @@
+2007-05-19  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/shellapi.h (NIN_POPUPOPEN, NIN_POPUPCLOSE): Define.
+
 2007-04-22  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/shellapi.h (NOTIFYICONDATAA, NOTIFYICONDATAW): Updated to support
