@@ -408,10 +408,10 @@ fhandler_dev_floppy::raw_write (const void *ptr, size_t len)
 _off64_t
 fhandler_dev_floppy::lseek (_off64_t offset, int whence)
 {
-  char buf[512];
+  char buf[bytes_per_sector];
   _off64_t lloffset = offset;
   LARGE_INTEGER sector_aligned_offset;
-  _off64_t bytes_left;
+  size_t bytes_left;
 
   if (whence == SEEK_END)
     {
@@ -453,9 +453,11 @@ fhandler_dev_floppy::lseek (_off64_t offset, int whence)
 
   if (bytes_left)
     {
-      size_t len = bytes_left;
-      raw_read (buf, len);
+      raw_read (buf, bytes_left);
+      if (bytes_left == (size_t) -1)
+	return -1;
     }
+
   return sector_aligned_offset.QuadPart + bytes_left;
 }
 

@@ -1,3 +1,10 @@
+2007-05-21  Christian Franke <franke@computer.org>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_floppy.cc (fhandler_dev_floppy::lseek): Set buf size to
+	sector size.  Simplify non-sector aligned case.  Handle errors from
+	raw_read.
+
 2007-05-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (adjust_socket_file_mode): New inline function.
