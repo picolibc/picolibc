@@ -1,3 +1,8 @@
+2007-05-18  Caroline Tice  <ctice@apple.com>
+
+	* dwarf2.h: (enum dwarf_location_atom): Add new DW_OP, 
+	DW_OP_GNU_uninit.
+
 2007-05-12  Alan Modra  <amodra@bigpond.net.au>
 
 	* spu.h (R_SPU_ADDR16X): Define.
