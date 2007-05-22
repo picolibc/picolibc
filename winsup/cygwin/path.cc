@@ -4224,8 +4224,7 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
 
   if (win32_cwd)
     {
-      if (!cwd_lock.acquired ())
-	cwd_lock.acquire ();
+      cwd_lock.acquire ();
       if (doit)
 	{
 	  /* We utilize the user parameter block.  The directory is
