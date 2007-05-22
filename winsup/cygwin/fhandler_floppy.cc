@@ -410,6 +410,7 @@ fhandler_dev_floppy::lseek (_off64_t offset, int whence)
 {
   char buf[bytes_per_sector];
   _off64_t lloffset = offset;
+  _off64_t current_pos = (_off64_t) -1;
   LARGE_INTEGER sector_aligned_offset;
   size_t bytes_left;
 
@@ -420,7 +421,8 @@ fhandler_dev_floppy::lseek (_off64_t offset, int whence)
     }
   else if (whence == SEEK_CUR)
     {
-      lloffset += get_current_position () - (devbufend - devbufstart);
+      current_pos = get_current_position ();
+      lloffset += current_pos - (devbufend - devbufstart);
       whence = SEEK_SET;
     }
 
@@ -428,6 +430,18 @@ fhandler_dev_floppy::lseek (_off64_t offset, int whence)
     {
       set_errno (EINVAL);
       return -1;
+    }
+
+  /* If new position is in buffered range, adjust buffer and return */
+  if (devbufstart < devbufend)
+    {
+      if (current_pos == (_off64_t) -1)
+	current_pos = get_current_position ();
+      if (current_pos - devbufend <= lloffset && lloffset <= current_pos)
+	{
+	  devbufstart = devbufend - (current_pos - lloffset);
+	  return lloffset;
+	}
     }
 
   sector_aligned_offset.QuadPart = (lloffset / bytes_per_sector)

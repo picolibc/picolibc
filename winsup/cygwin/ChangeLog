@@ -1,3 +1,8 @@
+2007-05-21  Christian Franke <franke@computer.org>
+
+	* fhandler_floppy.cc (fhandler_dev_floppy::lseek): Don't invalidate
+	devbuf if new position is within buffered range.
+
 2007-05-21  Eric Blake  <ebb9@byu.net>
 
 	* include/search.h (hsearch_r): Provide declaration.
