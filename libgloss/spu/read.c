@@ -37,14 +37,9 @@ int
 read (int file, void *ptr, size_t len)
 {
         syscall_write_t sys;
-	syscall_out_t	*psys_out = ( syscall_out_t* )&sys;
 
 	sys.file = file;
 	sys.ptr = ( unsigned int )ptr;
 	sys.len = len;
-
-	__send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_READ, &sys);
-
-        return ( psys_out->rc);
+	return __send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_READ, &sys);
 }
-

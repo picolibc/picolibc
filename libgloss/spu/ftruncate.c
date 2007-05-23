@@ -35,13 +35,8 @@ int
 ftruncate (int file, off_t length)
 {
 	syscall_ftruncate_t sys;
-	syscall_out_t	*psys_out = ( syscall_out_t* )&sys;
 
 	sys.file = file;
 	sys.length = length;
-
-	__send_to_ppe(JSRE_POSIX1_SIGNALCODE, JSRE_FTRUNCATE, &sys);
-
-	return ( psys_out->rc);
+	return __send_to_ppe(JSRE_POSIX1_SIGNALCODE, JSRE_FTRUNCATE, &sys);
 }
-

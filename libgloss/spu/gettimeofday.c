@@ -38,12 +38,8 @@ int
 gettimeofday (struct timeval *tv, struct timezone *tz)
 {
 	syscall_gettimeofday_t sys;
-	syscall_out_t *psys_out = ( syscall_out_t* )&sys;
 
 	sys.tv = (unsigned int)tv;
 	sys.tz = (unsigned int)tz;
-
-	__send_to_ppe(JSRE_POSIX1_SIGNALCODE, JSRE_GETTIMEOFDAY, &sys);
-
-	return (psys_out->rc);
+	return __send_to_ppe(JSRE_POSIX1_SIGNALCODE, JSRE_GETTIMEOFDAY, &sys);
 }

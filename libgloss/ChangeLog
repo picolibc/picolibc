@@ -1,3 +1,23 @@
+2007-05-23 Patrick Mansfield <patmans@us.ibm.com>
+
+	* spu/syscalls.c: Change __send_to_ppe to return the result stored
+	in stored in slot 0 of the data, rather than have each assisted
+	call retrieve the value.
+	* spu/jsre.h: Remove the now unused syscall_out_t.
+	* spu/access.c: Use the __send_to_ppe result instead of the slot 0
+	value, remove unused syscall_out_t variable.
+	* spu/close.c: Ditto.
+	* spu/dup.c: Ditto.
+	* spu/fstat.c: Ditto.
+	* spu/ftruncate.c: Ditto.
+	* spu/gettimeofday.c: Ditto.
+	* spu/lseek.c: Ditto.
+	* spu/open.c: Ditto.
+	* spu/read.c: Ditto.
+	* spu/stat.c: Ditto.
+	* spu/unlink.c: Ditto.
+	* spu/write.c: Ditto.
+
 2007-05-23  Kazu Hirata  <kazu@codesourcery.com>
 
 	* m68k/fido.sc (.data): Move .jcr to .text.  Catch .got.plt

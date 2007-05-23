@@ -165,13 +165,6 @@ typedef struct
         unsigned int    pad1[ 3 ];
 } syscall_stat_t;
 
-typedef struct
-{
-	unsigned int	rc;
-	unsigned int	pad0[ 2 ];
-	unsigned int	err;
-} syscall_out_t;
-
 typedef struct {
     unsigned int dev;
     unsigned int ino;

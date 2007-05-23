@@ -35,13 +35,8 @@ int
 access (const char *pathname, int mode)
 {
         syscall_access_t sys;
-        syscall_out_t   *psys_out = ( syscall_out_t* )&sys;
 
         sys.pathname = (unsigned int) pathname;
         sys.mode = mode;
-
-        __send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_ACCESS, &sys);
-
-        return ( psys_out->rc);
+        return __send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_ACCESS, &sys);
 }
-

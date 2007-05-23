@@ -37,8 +37,7 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 int
 open (const char *filename, int flags, ...)
 {
-        syscall_open_t sys ;
-	syscall_out_t	*psys_out = ( syscall_out_t* )&sys;
+        syscall_open_t sys;
         va_list ap;
 
         sys.pathname = ( unsigned int )filename;
@@ -70,8 +69,5 @@ open (const char *filename, int flags, ...)
         sys.mode = va_arg (ap, int);
         va_end (ap);
 
-        __send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_OPEN, &sys);
-
-        return ( psys_out->rc);
+        return __send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_OPEN, &sys);
 }
-

@@ -38,13 +38,12 @@ int
 stat (const char *pathname, struct stat *pstat)
 {
 	syscall_stat_t sys;
-	syscall_out_t   *psys_out = ( syscall_out_t* )&sys;
 	jsre_stat_t pjstat;
+	int ret;
 
 	sys.pathname = (unsigned int)pathname;
 	sys.ptr = ( unsigned int )&pjstat;
-
-	__send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_STAT, &sys);
+	ret = __send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_STAT, &sys);
 
 	pstat->st_dev = pjstat.dev;
 	pstat->st_ino = pjstat.ino;
@@ -60,6 +59,5 @@ stat (const char *pathname, struct stat *pstat)
 	pstat->st_mtime = pjstat.mtime;
 	pstat->st_ctime = pjstat.ctime;
 
-	return( psys_out->rc );
+	return ret;
 }
-

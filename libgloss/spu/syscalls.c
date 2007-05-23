@@ -32,7 +32,7 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #include <errno.h>
 #include "jsre.h"
 
-void
+int
 __send_to_ppe (unsigned int signalcode, unsigned int opcode, void *data)
 {
 
@@ -49,5 +49,10 @@ __send_to_ppe (unsigned int signalcode, unsigned int opcode, void *data)
         asm ("sync");
         f ();
         errno = ((unsigned int *) data)[3];
+
+        /*
+         * Return the rc code stored in slot 0.
+         */
+        return ((unsigned int *) data)[0];
 }
 

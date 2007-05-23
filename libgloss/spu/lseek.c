@@ -37,7 +37,6 @@ off_t
 lseek (int file, off_t offset, int whence)
 {
         syscall_lseek_t sys;
-	syscall_out_t	*psys_out = ( syscall_out_t* )&sys;
 
 	sys.file = file;
 	sys.offset = offset;
@@ -54,8 +53,5 @@ lseek (int file, off_t offset, int whence)
 			break;
 	}
 
-	__send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_LSEEK, &sys);
-
-        return ( psys_out->rc);
+	return __send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_LSEEK, &sys);
 }
-
