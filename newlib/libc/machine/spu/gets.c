@@ -44,8 +44,6 @@ gets (buf)
 
   /* The return value gets written over buf
    */
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_GETS, &buf);
-
-  return buf;
+  return (char*) __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_GETS, &buf);
 }
 #endif /* ! _REENT_ONLY */

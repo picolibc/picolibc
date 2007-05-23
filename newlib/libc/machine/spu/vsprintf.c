@@ -31,20 +31,15 @@ _DEFUN (vsprintf, (str, fmt, ap),
      _CONST char *fmt _AND
      va_list ap)
 {
-  int* ret;
   c99_vsprintf_t args;
 
   CHECK_STR_INIT(_REENT);
-
-  ret = (int*) &args;
 
   args.str = str;
   args.fmt = (char*) fmt;
   va_copy(args.ap,ap);
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VSPRINTF, &args);
-
-  return *ret;
+  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VSPRINTF, &args);
 }
 
 #endif /* ! _REENT_ONLY */

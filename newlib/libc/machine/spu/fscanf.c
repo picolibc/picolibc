@@ -58,12 +58,10 @@ typedef struct
 
 fscanf(FILE *fp, _CONST char *fmt, ...)
 {
-  int* ret;
+  int ret;
   c99_vfscanf_t args;
 
   CHECK_INIT(_REENT);
-
-  ret = (int*) &args;
 
   args.fp = fp->_fp;
   args.fmt = (char*) fmt;
@@ -74,9 +72,9 @@ fscanf(FILE *fp, _CONST char *fmt, ...)
 #endif
 
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VFSCANF, &args);
+  ret = __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VFSCANF, &args);
 
   va_end (args.ap);
-  return *ret;
+  return ret;
 }
 #endif /* ! _REENT_ONLY */

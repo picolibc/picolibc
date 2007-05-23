@@ -14,9 +14,7 @@ putchar (c)
 
   /* c gets overwritten before return */
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_PUTCHAR, &c);
-
-  return c;
+  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_PUTCHAR, &c);
 }
 
 #endif /* ! _REENT_ONLY */

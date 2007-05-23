@@ -62,20 +62,15 @@ _DEFUN (vsscanf, (str, fmt, ap),
     _CONST char *fmt _AND
     va_list ap)
 {
-  int* ret;
   c99_vsscanf_t args;
 
   CHECK_STR_INIT(_REENT);
-
-  ret = (int*) &args;
 
   args.str = str;
   args.fmt = (char*) fmt;
   va_copy(args.ap,ap);
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VSSCANF, &args);
-
-  return *ret;
+  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VSSCANF, &args);
 }
 
 #endif /* ! _REENT_ONLY */

@@ -52,7 +52,7 @@ _DEFUN (freopen, (file, mode, fp),
 	const char *mode _AND
 	FILE *fp)
 {
-  int *ret;
+  int ret;
   c99_freopen_t args;
 
   CHECK_INIT(_REENT);
@@ -60,12 +60,11 @@ _DEFUN (freopen, (file, mode, fp),
   args.file = file;
   args.mode = mode;
   args.fp = fp->_fp;
-  ret = (int *) &args;
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FREOPEN, &args);
+  ret = __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FREOPEN, &args);
 
-  if (*ret) {
-    fp->_fp = *ret;
+  if (ret) {
+    fp->_fp = ret;
     return fp;
   }
   else {

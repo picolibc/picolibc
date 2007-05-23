@@ -55,7 +55,6 @@ _DEFUN (fread, (buf, size, count, fp),
 	size_t count _AND
 	FILE * fp)
 {
-  size_t* ret;
   c99_fread_t args;
 
   CHECK_INIT(_REENT);
@@ -64,10 +63,7 @@ _DEFUN (fread, (buf, size, count, fp),
   args.size = size;
   args.count = count;
   args.fp = fp->_fp;
-  ret = (size_t*) &args;
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FREAD, &args);
-
-  return *ret;
+  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FREAD, &args);
 }
 #endif /* ! _REENT_ONLY */

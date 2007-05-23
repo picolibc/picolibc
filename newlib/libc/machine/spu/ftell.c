@@ -47,8 +47,6 @@ _DEFUN (ftell, (fp),
 
   ret = fp->_fp;
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FTELL, &ret);
-
-  return ret;
+  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FTELL, &ret);
 }
 #endif /* ! _REENT_ONLY */

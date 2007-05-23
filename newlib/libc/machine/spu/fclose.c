@@ -46,7 +46,7 @@ _DEFUN (fclose, (fp),
 
   ret = fp->_fp;
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FCLOSE, &ret);
+  ret = __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FCLOSE, &ret);
 
   __sfp_free(fp);
 

@@ -51,7 +51,6 @@ _DEFUN (fgets, (buf, n, fp),
 	int n _AND
 	FILE * fp)
 {
-  char** ret;
   c99_fgets_t args;
 
   CHECK_INIT(_REENT);
@@ -59,10 +58,7 @@ _DEFUN (fgets, (buf, n, fp),
   args.buf = buf;
   args.n = n;
   args.fp = fp->_fp;
-  ret = (char**) &args;
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FGETS, &args);
-
-  return *ret;
+  return (char*) __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FGETS, &args);
 }
 #endif /* ! _REENT_ONLY */

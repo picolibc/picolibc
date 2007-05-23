@@ -49,7 +49,7 @@ _DEFUN (fopen, (file, mode),
 	_CONST char *file _AND
 	_CONST char *mode)
 {
-  int *ret;
+  int ret;
   c99_fopen_t args;
   FILE *fp;
   struct _reent *ptr = _REENT;
@@ -63,12 +63,11 @@ _DEFUN (fopen, (file, mode),
 
   args.file = file;
   args.mode = mode;
-  ret = (int *) &args;
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FOPEN, &args);
+  ret = __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FOPEN, &args);
 
-  if (*ret) {
-    fp->_fp = *ret;
+  if (ret) {
+    fp->_fp = ret;
     return fp;
   }
   else {

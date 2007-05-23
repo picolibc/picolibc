@@ -49,17 +49,13 @@ _DEFUN (fsetpos, (iop, pos),
 	FILE * iop _AND
 	_CONST _fpos_t * pos)
 {
-  int* ret;
   c99_fsetpos_t args;
 
   CHECK_INIT(_REENT);
 
   args.fp = iop->_fp;
   args.pos = pos;
-  ret = (int*)&args;
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FSETPOS, &args);
-
-  return *ret;
+  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FSETPOS, &args);
 }
 #endif /* ! _REENT_ONLY */

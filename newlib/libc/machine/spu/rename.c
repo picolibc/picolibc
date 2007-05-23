@@ -48,13 +48,9 @@ rename (old, new)
      _CONST char *old;
      _CONST char *new;
 {
-  int *ret;
   c99_rename_t args;
   args.old = old;
   args.new = new;
-  ret = (int*) &args;
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_RENAME, &args);
-
-  return *ret;
+  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_RENAME, &args);
 }

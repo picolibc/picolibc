@@ -62,20 +62,15 @@ _DEFUN (vfprintf, (fp, fmt0, ap),
 	_CONST char *fmt0 _AND
 	va_list ap)
 {
-  int* ret;
   c99_vfprintf_t args;
 
   CHECK_INIT(_REENT);
-
-  ret = (int*) &args;
 
   args.fp = fp->_fp;
   args.fmt = (char*) fmt0;
   va_copy(args.ap,ap);
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VFPRINTF, &args);
-
-  return *ret;
+  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VFPRINTF, &args);
 }
 
 #endif /* ! _REENT_ONLY */

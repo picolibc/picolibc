@@ -61,12 +61,10 @@ _DEFUN(sscanf, (str, fmt),
        _CONST char *str _AND
        _CONST char *fmt _DOTS)
 {
-  int* ret;
+  int ret;
   c99_sscanf_t args;
 
   CHECK_STR_INIT(_REENT);
-
-  ret = (int*) &args;
 
   args.str = str;
   args.fmt = fmt;
@@ -76,10 +74,10 @@ _DEFUN(sscanf, (str, fmt),
   va_start (args.ap);
 #endif
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VSSCANF, &args);
+  ret = __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VSSCANF, &args);
 
   va_end (args.ap);
-  return *ret;
+  return ret;
 }
 
 #endif /* ! _REENT_ONLY */

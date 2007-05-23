@@ -50,17 +50,13 @@ _DEFUN (fputs, (s, fp),
 	char _CONST * s _AND
 	FILE * fp)
 {
-  int* ret;
   c99_fputs_t args;
 
   CHECK_INIT(_REENT);
 
   args.s = s;
   args.fp = fp->_fp;
-  ret = (int*)&args;
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FPUTS, &args);
-
-  return *ret;
+  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FPUTS, &args);
 }
 #endif /* ! _REENT_ONLY */

@@ -50,17 +50,13 @@ fputc (c, fp)
      int c;
      register FILE *fp;
 {
-  int* ret;
   c99_fputc_t args;
 
   CHECK_INIT(_REENT);
 
   args.ch = c;
   args.fp = fp->_fp;
-  ret = (int*)&args;
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FPUTC, &args);
-
-  return *ret;
+  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FPUTC, &args);
 }
 #endif /* ! _REENT_ONLY */

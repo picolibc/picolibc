@@ -50,7 +50,7 @@ _DEFUN_VOID (tmpfile)
     return NULL;
   }
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_TMPFILE, &ret);
+  ret = __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_TMPFILE, &ret);
 
   if (ret) {
     fp->_fp = ret;

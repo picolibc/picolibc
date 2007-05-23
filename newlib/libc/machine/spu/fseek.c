@@ -52,7 +52,6 @@ _DEFUN (fseek, (fp, offset, whence),
      long offset _AND
      int whence)
 {
-  int* ret;
   c99_fseek_t args;
 
   CHECK_INIT(_REENT);
@@ -60,10 +59,7 @@ _DEFUN (fseek, (fp, offset, whence),
   args.fp = fp->_fp;
   args.offset = offset;
   args.whence = whence;
-  ret = (int*)&args;
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FSEEK, &args);
-
-  return *ret;
+  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FSEEK, &args);
 }
 #endif /* ! _REENT_ONLY */

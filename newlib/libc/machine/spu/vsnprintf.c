@@ -33,21 +33,16 @@ _DEFUN (vsnprintf, (str, size, fmt, ap),
      _CONST char *fmt _AND
      va_list ap)
 {
-  int* ret;
   c99_vsnprintf_t args;
 
   CHECK_STR_INIT(_REENT);
-
-  ret = (int*) &args;
 
   args.str = str;
   args.size = size;
   args.fmt = fmt;
   va_copy(args.ap,ap);
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VSNPRINTF, &args);
-
-  return *ret;
+  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VSNPRINTF, &args);
 }
 
 #endif /* ! _REENT_ONLY */

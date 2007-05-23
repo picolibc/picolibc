@@ -59,12 +59,10 @@ typedef struct
 int
 fprintf(FILE * fp, _CONST char *fmt,...)
 {
-  int* ret;
+  int ret;
   c99_fprintf_t args;
 
   CHECK_INIT(_REENT);
-
-  ret = (int*) &args;
 
   args.fp = fp->_fp;
   args.fmt = (char*) fmt;
@@ -75,9 +73,9 @@ fprintf(FILE * fp, _CONST char *fmt,...)
   va_start (args.ap);
 #endif
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VFPRINTF, &args);
+  ret =__send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VFPRINTF, &args);
 
   va_end (args.ap);
-  return *ret;
+  return ret;
 }
 #endif /* ! _REENT_ONLY */

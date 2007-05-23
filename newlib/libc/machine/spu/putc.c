@@ -50,18 +50,14 @@ putc (c, fp)
      int c;
      register FILE *fp;
 {
-  int* ret;
   c99_putc_t args;
 
   CHECK_INIT(_REENT);
 
   args.ch = c;
   args.fp = fp->_fp;
-  ret = (int*)&args;
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_PUTC, &args);
-
-  return *ret;
+  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_PUTC, &args);
 }
 
 #endif /* ! _REENT_ONLY */

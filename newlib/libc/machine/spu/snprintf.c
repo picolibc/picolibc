@@ -63,12 +63,10 @@ _DEFUN(snprintf, (str, size, fmt),
        size_t size _AND
        _CONST char *fmt _DOTS)
 {
-  int* ret;
+  int ret;
   c99_snprintf_t args;
 
   CHECK_STR_INIT(_REENT);
-
-  ret = (int*) &args;
 
   args.str = str;
   args.size = size;
@@ -79,10 +77,10 @@ _DEFUN(snprintf, (str, size, fmt),
   va_start (args.ap);
 #endif
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VSNPRINTF, &args);
+  ret = __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VSNPRINTF, &args);
 
   va_end (args.ap);
-  return *ret;
+  return ret;
 }
 
 #endif /* ! _REENT_ONLY */

@@ -49,8 +49,6 @@ getc (fp)
 
   ret = fp->_fp;
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_GETC, &ret);
-
-  return ret;
+  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_GETC, &ret);
 }
 #endif /* ! _REENT_ONLY */

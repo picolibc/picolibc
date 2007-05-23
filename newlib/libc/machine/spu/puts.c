@@ -12,9 +12,7 @@ _DEFUN (puts, (s),
 
   /* The return value gets written over s
    */
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_PUTS, &s);
-
-  return (int)s;
+  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_PUTS, &s);
 }
 
 #endif /* ! _REENT_ONLY */

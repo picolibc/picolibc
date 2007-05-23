@@ -1,3 +1,53 @@
+2007-05-23 Patrick Mansfield <patmans@us.ibm.com>
+
+	* libc/machine/spu/sys/syscall.h: Update the __send_to_ppe
+	prototype.
+	* libc/machine/spu/fclose.c: Use the __send_to_ppe return value
+	instead of the slot 0 value, remove any now unused variables, and
+	for some cases, now store the result in an int vs int*.
+	* libc/machine/spu/feof.c: Ditto.
+	* libc/machine/spu/ferror.c: Ditto.
+	* libc/machine/spu/fflush.c: Ditto.
+	* libc/machine/spu/fgetc.c: Ditto.
+	* libc/machine/spu/fgetpos.c: Ditto.
+	* libc/machine/spu/fgets.c: Ditto.
+	* libc/machine/spu/fileno.c: Ditto.
+	* libc/machine/spu/fopen.c: Ditto.
+	* libc/machine/spu/fprintf.c: Ditto.
+	* libc/machine/spu/fputc.c: Ditto.
+	* libc/machine/spu/fputs.c: Ditto.
+	* libc/machine/spu/fread.c: Ditto.
+	* libc/machine/spu/freopen.c: Ditto.
+	* libc/machine/spu/fscanf.c: Ditto.
+	* libc/machine/spu/fseek.c: Ditto.
+	* libc/machine/spu/fsetpos.c: Ditto.
+	* libc/machine/spu/ftell.c: Ditto.
+	* libc/machine/spu/fwrite.c: Ditto.
+	* libc/machine/spu/getc.c: Ditto.
+	* libc/machine/spu/getchar.c: Ditto.
+	* libc/machine/spu/gets.c: Ditto.
+	* libc/machine/spu/printf.c: Ditto.
+	* libc/machine/spu/putc.c: Ditto.
+	* libc/machine/spu/putchar.c: Ditto.
+	* libc/machine/spu/puts.c: Ditto.
+	* libc/machine/spu/remove.c: Ditto.
+	* libc/machine/spu/rename.c: Ditto.
+	* libc/machine/spu/scanf.c: Ditto.
+	* libc/machine/spu/setvbuf.c: Ditto.
+	* libc/machine/spu/snprintf.c: Ditto.
+	* libc/machine/spu/sprintf.c: Ditto.
+	* libc/machine/spu/sscanf.c: Ditto.
+	* libc/machine/spu/tmpfile.c: Ditto.
+	* libc/machine/spu/tmpnam.c: Ditto.
+	* libc/machine/spu/ungetc.c: Ditto.
+	* libc/machine/spu/vfprintf.c: Ditto.
+	* libc/machine/spu/vfscanf.c: Ditto.
+	* libc/machine/spu/vprintf.c: Ditto.
+	* libc/machine/spu/vscanf.c: Ditto.
+	* libc/machine/spu/vsnprintf.c: Ditto.
+	* libc/machine/spu/vsprintf.c: Ditto.
+	* libc/machine/spu/vsscanf.c: Ditto.
+
 2007-05-23  Eric Blake  <ebb9@byu.net>
 
 	* libc/stdio/vfscanf.c (__SVFSCANF_R): Support scanf(%1$s).

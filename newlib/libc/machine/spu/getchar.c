@@ -45,8 +45,6 @@ getchar ()
 
   CHECK_STD_INIT(_REENT);
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_GETCHAR, &ret);
-
-  return ret;
+  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_GETCHAR, &ret);
 }
 #endif /* ! _REENT_ONLY */

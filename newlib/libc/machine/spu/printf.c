@@ -35,12 +35,10 @@ printf (fmt, va_alist)
      va_dcl
 #endif
 {
-  int* ret;
+  int ret;
   c99_printf_t args;
 
   CHECK_STD_INIT(_REENT);
-
-  ret = (int*) &args;
 
   args.fmt = fmt;
 #ifdef _HAVE_STDC
@@ -49,10 +47,10 @@ printf (fmt, va_alist)
   va_start (args.ap);
 #endif
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VPRINTF, &args);
+  ret = __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VPRINTF, &args);
 
   va_end (args.ap);
-  return *ret;
+  return ret;
 }
 
 #endif /* ! _REENT_ONLY */

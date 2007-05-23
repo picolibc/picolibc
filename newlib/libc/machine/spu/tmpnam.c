@@ -38,10 +38,7 @@ char *
 _DEFUN (tmpnam, (s),
 	char *s)
 {
-  char **ret = &s;
   /* The return value gets written over buf
    */
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_TMPNAM, &s);
-
-  return *ret;
+  return (char*) __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_TMPNAM, &s);
 }

@@ -56,7 +56,6 @@ _DEFUN (setvbuf, (fp, buf, mode, size),
 	int mode _AND
 	size_t size)
 {
-  int* ret;
   c99_setvbuf_t args;
 
   CHECK_INIT(_REENT);
@@ -65,11 +64,8 @@ _DEFUN (setvbuf, (fp, buf, mode, size),
   args.buf = buf;
   args.mode = mode;
   args.size = size;
-  ret = (int*)&args;
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_SETVBUF, &args);
-
-  return *ret;
+  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_SETVBUF, &args);
 }
 
 #endif /* ! _REENT_ONLY */

@@ -27,19 +27,14 @@ _DEFUN (vprintf, (fmt, ap),
      _CONST char *fmt _AND
      va_list ap)
 {
-  int* ret;
   c99_vprintf_t args;
 
   CHECK_STD_INIT(_REENT);
 
-  ret = (int*) &args;
-
   args.fmt = fmt;
   va_copy(args.ap,ap);
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VPRINTF, &args);
-
-  return *ret;
+  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VPRINTF, &args);
 }
 
 #endif /* ! _REENT_ONLY */

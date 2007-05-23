@@ -49,18 +49,12 @@ _DEFUN (fgetpos, (fp, pos),
 	_fpos_t * pos)
 {
   c99_fgetpos_t arg;
-  int* result;
 
   CHECK_INIT(_REENT);
-
-  result = (int*)&arg;
 
   arg.fp = fp->_fp;
   arg.pos = pos;
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FGETPOS, &arg);
-
-
-  return *result;
+  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FGETPOS, &arg);
 }
 #endif /* ! _REENT_ONLY */
