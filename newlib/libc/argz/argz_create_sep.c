@@ -31,6 +31,7 @@ _DEFUN (argz_create_sep, (string, sep, argz, argz_len),
   running = strdup(string);
   old_running = running;
 
+  *argz_len = 0;
   while ((token = strsep(&running, delim)))
     {
       len = strlen(token);
