@@ -156,6 +156,11 @@ SECTIONS {
     KEEP (*(SORT(.dtors.*)))
     KEEP (*crtend.o(.dtors))
 
+    . = ALIGN(0x4);
+    KEEP (*crtbegin.o(.jcr))
+    KEEP (*(EXCLUDE_FILE (*crtend.o) .jcr))
+    KEEP (*crtend.o(.jcr))
+
     *(.rodata .rodata.*)
     *(.gnu.linkonce.r.*)
     *(.gcc_except_table) 
@@ -187,7 +192,7 @@ SECTIONS {
   .data :
   {
     _data = .;
-    KEEP (*(.jcr));
+    *(.got.plt) *(.got)
     *(.shdata);
     *(.data .data.*)
     *(.gnu.linkonce.d.*)

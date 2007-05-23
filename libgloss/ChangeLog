@@ -1,3 +1,8 @@
+2007-05-23  Kazu Hirata  <kazu@codesourcery.com>
+
+	* m68k/fido.sc (.data): Move .jcr to .text.  Catch .got.plt
+	and .got.
+
 2007-05-07  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* spu/open.c: Unconditionally set the "mode" to fix a bug where
