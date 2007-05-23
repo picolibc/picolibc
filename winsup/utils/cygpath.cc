@@ -14,6 +14,7 @@ details. */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <argz.h>
 #include <limits.h>
 #include <getopt.h>
 #include <windows.h>
@@ -33,7 +34,8 @@ static char *file_arg, *output_arg;
 static int path_flag, unix_flag, windows_flag, absolute_flag;
 static int shortname_flag, longname_flag;
 static int ignore_flag, allusers_flag, output_flag;
-static int mixed_flag;
+static int mixed_flag, options_from_file_flag, mode_flag;
+
 static const char *format_type_arg;
 
 static struct option long_options[] = {
@@ -532,7 +534,7 @@ get_user_folder (char* path, int id, int allid)
 }
 
 static void
-dowin (char option)
+do_sysfolders (char option)
 {
   char *buf, buf1[MAX_PATH], buf2[MAX_PATH];
   DWORD len = MAX_PATH;
@@ -619,7 +621,6 @@ dowin (char option)
 	buf = get_mixed_name (buf);
     }
   printf ("%s\n", buf);
-  exit (0);
 }
 
 static void
@@ -641,7 +642,7 @@ report_mode (char *filename)
 }
 
 static void
-doit (char *filename)
+do_pathconv (char *filename)
 {
   char *buf;
   DWORD len;
@@ -745,37 +746,29 @@ print_version ()
   printf ("\
 cygpath (cygwin) %.*s\n\
 Path Conversion Utility\n\
-Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.\n\
+Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, \n\
+          2007 Red Hat, Inc.\n\
 Compiled on %s\n\
 ", len, v, __DATE__);
 }
 
-int
-main (int argc, char **argv)
+static int
+do_options (int argc, char **argv, int from_file)
 {
   int c, o = 0;
-  int options_from_file_flag;
-  int mode_flag;
-
-  prog_name = strrchr (argv[0], '/');
-  if (prog_name == NULL)
-    prog_name = strrchr (argv[0], '\\');
-  if (prog_name == NULL)
-    prog_name = argv[0];
-  else
-    prog_name++;
-
   path_flag = 0;
-  unix_flag = 1;
+  unix_flag = 0;
   windows_flag = 0;
   shortname_flag = 0;
   longname_flag = 0;
   mixed_flag = 0;
   ignore_flag = 0;
-  options_from_file_flag = 0;
   allusers_flag = 0;
   output_flag = 0;
   mode_flag = 0;
+  if (!from_file)
+    options_from_file_flag = 0;
+  optind = 0;
   while ((c = getopt_long (argc, argv, options,
 			   long_options, (int *) NULL)) != EOF)
     {
@@ -786,18 +779,19 @@ main (int argc, char **argv)
 	  break;
 
 	case 'c':
+	  if (!optarg)
+	    usage (stderr, 1);
 	  CloseHandle ((HANDLE) strtoul (optarg, NULL, 16));
 	  break;
 
 	case 'd':
-	  if (windows_flag)
-	    usage (stderr, 1);
-	  unix_flag = 0;
 	  windows_flag = 1;
 	  shortname_flag = 1;
 	  break;
 
 	case 'f':
+	  if (from_file || !optarg)
+	    usage (stderr, 1);
 	  file_arg = optarg;
 	  break;
 
@@ -806,6 +800,8 @@ main (int argc, char **argv)
 	  break;
 
 	case 'o':
+	  if (from_file)
+	    usage (stderr, 1);
 	  options_from_file_flag = 1;
 	  break;
 
@@ -814,20 +810,14 @@ main (int argc, char **argv)
 	  break;
 
 	case 'u':
-	  if (windows_flag || mixed_flag)
-	    usage (stderr, 1);
 	  unix_flag = 1;
 	  break;
 
 	case 'w':
-	  if (windows_flag || mixed_flag)
-	    usage (stderr, 1);
-	  unix_flag = 0;
 	  windows_flag = 1;
 	  break;
 
 	 case 'm':
-	  unix_flag = 0;
 	  windows_flag = 1;
 	  mixed_flag = 1;
 	  break;
@@ -840,37 +830,25 @@ main (int argc, char **argv)
 	  shortname_flag = 1;
 	  break;
 
-	 case 't':
-	  if (optarg == NULL)
+	case 't':
+	  if (!optarg)
 	    usage (stderr, 1);
 
 	  format_type_arg = (*optarg == '=') ? (optarg + 1) : (optarg);
 	  if (strcasecmp (format_type_arg, "dos") == 0)
 	    {
-	    if (windows_flag || longname_flag)
-	      usage (stderr, 1);
-	    unix_flag = 0;
-	    windows_flag = 1;
-	    shortname_flag = 1;
+	      windows_flag = 1;
+	      shortname_flag = 1;
 	    }
-	  else if (strcasecmp (format_type_arg, "mixed") == 0)
+	  else if (!strcasecmp (format_type_arg, "mixed"))
 	    {
-	    unix_flag = 0;
-	    mixed_flag = 1;
+	      windows_flag = 1;
+	      mixed_flag = 1;
 	    }
-	  else if (strcasecmp (format_type_arg, "unix") == 0)
-	    {
-	    if (windows_flag)
-	      usage (stderr, 1);
+	  else if (!strcasecmp (format_type_arg, "unix"))
 	    unix_flag = 1;
-	    }
-	  else if (strcasecmp (format_type_arg, "windows") == 0)
-	    {
-	    if (mixed_flag)
-	      usage (stderr, 1);
-	    unix_flag = 0;
+	  else if (!strcasecmp (format_type_arg, "windows"))
 	    windows_flag = 1;
-	    }
 	  else
 	    usage (stderr, 1);
 	  break;
@@ -885,16 +863,14 @@ main (int argc, char **argv)
 	case 'P':
 	case 'S':
 	case 'W':
-	  if (output_flag)
-	    usage (stderr, 1);
-	  output_flag = 1;
+	  ++output_flag;
 	  o = c;
 	  break;
 
 	case 'F':
-	  if (output_flag || !optarg)
+	  if (!optarg)
 	    usage (stderr, 1);
-	  output_flag = 1;
+	  ++output_flag;
 	  output_arg = optarg;
 	  o = c;
 	  break;
@@ -917,23 +893,43 @@ main (int argc, char **argv)
 	}
     }
 
-  if (options_from_file_flag && !file_arg)
+  /* If none of the "important" flags are set, -u is default. */
+  if (!unix_flag && !windows_flag && !options_from_file_flag && !output_flag
+      && !mode_flag)
+    unix_flag = 1;
+
+  /* Only one of ... */
+  if (unix_flag + windows_flag + output_flag + mode_flag > 1
+      + (!from_file ? options_from_file_flag : 0))
     usage (stderr, 1);
 
-  if (longname_flag && !windows_flag)
+  /* options_from_file_flag requires a file. */
+  if (!from_file && options_from_file_flag && !file_arg)
     usage (stderr, 1);
 
-  if (shortname_flag && !windows_flag)
+  /* longname and shortname don't play well together. */
+  if (longname_flag && shortname_flag)
     usage (stderr, 1);
 
-  if (!unix_flag && !windows_flag && !mixed_flag && !options_from_file_flag)
+  /* longname and shortname only make sense with Windows paths. */
+  if ((longname_flag || shortname_flag) && !windows_flag)
     usage (stderr, 1);
 
-  if (!file_arg)
+  return o;
+}
+
+static void
+action (int argc, char **argv, int opt)
+{
+  if (output_flag)
     {
-      if (output_flag)
-	dowin (o);
+      if (argv[optind])
+	usage (stderr, 1);
 
+      do_sysfolders (opt);
+    }
+  else
+    {
       if (optind > argc - 1)
 	usage (stderr, 1);
 
@@ -941,8 +937,27 @@ main (int argc, char **argv)
 	if (mode_flag)
 	  report_mode (argv[i]);
 	else
-	  doit (argv[i]);
+	  do_pathconv (argv[i]);
     }
+}
+
+int
+main (int argc, char **argv)
+{
+  int o;
+
+  prog_name = strrchr (argv[0], '/');
+  if (!prog_name)
+    prog_name = strrchr (argv[0], '\\');
+  if (!prog_name)
+    prog_name = argv[0];
+  else
+    prog_name++;
+
+  o = do_options (argc, argv, 0);
+
+  if (!file_arg)
+    action (argc, argv, o);
   else
     {
       FILE *fp;
@@ -951,82 +966,55 @@ main (int argc, char **argv)
       if (argv[optind])
 	usage (stderr, 1);
 
-      if (strcmp (file_arg, "-") != 0)
-	fp = fopen (file_arg, "rt");
+      if (strcmp (file_arg, "-"))
+	{
+	  if (!(fp = fopen (file_arg, "rt")))
+	    {
+	      perror ("cygpath");
+	      exit (1);
+	    }
+	}
       else
 	{
 	  fp = stdin;
 	  setmode (0, O_TEXT);
 	}
-      if (fp == NULL)
-	{
-	  perror ("cygpath");
-	  exit (1);
-	}
-
       setbuf (stdout, NULL);
-      while (fgets (buf, sizeof (buf), fp) != NULL)
+
+      while (fgets (buf, sizeof (buf), fp))
 	{
-	  char *s = buf;
-	  char *p = strchr (s, '\n');
+	  size_t azl = 0;
+	  int ac;
+	  char *az, **av;
+	  char *p = strchr (buf, '\n');
 	  if (p)
 	    *p = '\0';
-	  if (options_from_file_flag && *s == '-')
+	  if (argz_create_sep (buf, ' ', &az, &azl))
 	    {
-	      char c;
-	      for (c = *++s; c && !isspace (c); c = *++s)
-		switch (c)
-		  {
-		  case 'a':
-		    absolute_flag = 1;
-		    break;
-		  case 'i':
-		    ignore_flag = 1;
-		    break;
-		  case 's':
-		    shortname_flag = 1;
-		    longname_flag = 0;
-		    break;
-		  case 'l':
-		    shortname_flag = 0;
-		    longname_flag = 1;
-		    break;
-		  case 'm':
-		    unix_flag = 0;
-		    windows_flag = 1;
-		    mixed_flag = 1;
-		  case 'w':
-		    unix_flag = 0;
-		    windows_flag = 1;
-		    break;
-		  case 'u':
-		    windows_flag = 0;
-		    unix_flag = 1;
-		    break;
-		  case 'p':
-		    path_flag = 1;
-		    break;
-		  case 'D':
-		  case 'H':
-		  case 'O':
-		  case 'P':
-		  case 'S':
-		  case 'W':
-		    output_flag = 1;
-		    o = c;
-		    break;
-		  }
-	      if (*s)
-		do
-		  s++;
-		while (*s && isspace (*s));
+	      perror ("cygpath");
+	      exit (1);
 	    }
-	  if (*s && !output_flag)
-	    doit (s);
-	  if (!*s && output_flag)
-	    dowin (o);
+	  ac = argz_count (az, azl) + 1;
+	  av = (char **) malloc ((ac + 1) * sizeof (char *));
+	  if (!av)
+	    {
+	      perror ("cygpath");
+	      exit (1);
+	    }
+	  av[0] = prog_name;
+	  argz_extract (az, azl, av + 1);
+	  free (az);
+	  if (options_from_file_flag)
+	    o = do_options (ac, av, 1);
+	  else
+	    {
+	      optind = 1;
+	      unix_flag = 1;
+	      output_flag = mode_flag = windows_flag = 0;
+	    }
+	  action (ac, av, o);
+	  free (av);
 	}
     }
-
   exit (0);
 }

@@ -1,3 +1,18 @@
+2007-05-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygpath.cc: Include argz.h.
+	(options_from_file_flag): Move from main to global static variable.
+	(mode_flag): Ditto.
+	(do_sysfolders): Rename from dowin and accommodate throughout.
+	Don't exit from here.
+	(do_pathconv): Rename from doit and accommodate throughout.
+	(print_version): Change copyright.
+	(do_options): New function, centralizing option processing.
+	Rework checking options for correctness.
+	(action): New function, centralizing calling worker functions.
+	(main): Simplify.  Move option processing to do_options.  Move calling
+	worker functions to action.  Rework getting arguments from files.
+
 2007-03-30  Mark Mitchell  <mark@codesourcery.com>
 
 	* utils/cygpath.cc (get_long_path_name_w32impl): Close handles returned
