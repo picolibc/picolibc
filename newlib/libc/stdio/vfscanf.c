@@ -113,11 +113,8 @@ Supporting OS subroutines required:
 #include <limits.h>
 #include <wchar.h>
 #include <string.h>
-#ifdef _HAVE_STDC
 #include <stdarg.h>
-#else
-#include <varargs.h>
-#endif
+#include <errno.h>
 #include "local.h"
 
 #ifdef INTEGER_ONLY
@@ -168,6 +165,18 @@ extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
 	&& (defined __GNUC__ || __STDC_VERSION__ >= 199901L)
 # undef _NO_LONGLONG
 #endif
+
+#define _NO_POS_ARGS
+#ifdef _WANT_IO_POS_ARGS
+# undef _NO_POS_ARGS
+# ifdef NL_ARGMAX
+#  define MAX_POS_ARGS NL_ARGMAX
+# else
+#  define MAX_POS_ARGS 32
+# endif
+
+static void * get_arg (int, va_list *, int *, void **);
+#endif /* _WANT_IO_POS_ARGS */
 
 /*
  * Flags used during conversion.
@@ -276,6 +285,13 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
   register char *p0;		/* saves original value of p when necessary */
   int nassigned;		/* number of fields assigned */
   int nread;			/* number of characters consumed from fp */
+#ifndef _NO_POS_ARGS
+  int N;			/* arg number */
+  int arg_index = 0;		/* index into args processed directly */
+  int numargs = 0;		/* number of varargs read */
+  void *args[MAX_POS_ARGS];	/* positional args read */
+  int is_pos_arg;		/* is current format positional? */
+#endif
   int base = 0;			/* base argument to strtol/strtoul */
   int nbytes = 1;               /* number of bytes read from fmt string */
   wchar_t wc;                   /* wchar to use to read format string */
@@ -291,9 +307,11 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
   char *cp;
   short *sp;
   int *ip;
+#ifdef FLOATING_POINT
   float *flp;
   _LONG_DOUBLE *ldp;
   double *dp;
+#endif
   long *lp;
 #ifndef _NO_LONGLONG
   long long *llp;
@@ -302,6 +320,22 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
   /* `basefix' is used to avoid `if' tests in the integer scanner */
   static _CONST short basefix[17] =
     {10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+
+  /* Macro to support positional arguments */
+#ifndef _NO_POS_ARGS
+# define GET_ARG(n, ap, type)					\
+  ((type) (is_pos_arg						\
+	   ? (n < numargs					\
+	      ? args[n]						\
+	      : get_arg (n, &ap, &numargs, args))		\
+	   : (arg_index++ < numargs				\
+	      ? args[n]						\
+	      : (numargs < MAX_POS_ARGS				\
+		 ? args[numargs++] = va_arg (ap, void *)	\
+		 : va_arg (ap, void *)))))
+#else
+# define GET_ARG(n, ap, type) (va_arg (ap, type))
+#endif
 
   _flockfile (fp);
  
@@ -332,6 +366,10 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	goto literal;
       width = 0;
       flags = 0;
+#ifndef _NO_POS_ARGS
+      N = arg_index;
+      is_pos_arg = 0;
+#endif
 
       /*
        * switch on the format.  continue if done; break once format
@@ -439,6 +477,19 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  width = width * 10 + c - '0';
 	  goto again;
 
+#ifndef _NO_POS_ARGS
+	case '$':
+	  if (width <= MAX_POS_ARGS)
+	    {
+	      N = width - 1;
+	      is_pos_arg = 1;
+	      width = 0;
+	      goto again;
+	    }
+	  rptr->_errno = EINVAL;
+	  goto input_failure;
+#endif /* !_NO_POS_ARGS */
+
 	  /*
 	   * Conversions. Those marked `compat' are for
 	   * 4.[123]BSD compatibility.
@@ -540,31 +591,31 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 #ifdef _WANT_IO_C99_FORMATS
 	  if (flags & CHAR)
 	    {
-	      cp = va_arg (ap, char *);
+	      cp = GET_ARG (N, ap, char *);
 	      *cp = nread;
 	    }
 	  else
 #endif
 	  if (flags & SHORT)
 	    {
-	      sp = va_arg (ap, short *);
+	      sp = GET_ARG (N, ap, short *);
 	      *sp = nread;
 	    }
 	  else if (flags & LONG)
 	    {
-	      lp = va_arg (ap, long *);
+	      lp = GET_ARG (N, ap, long *);
 	      *lp = nread;
 	    }
 #ifndef _NO_LONGLONG
 	  else if (flags & LONGDBL)
 	    {
-	      llp = va_arg (ap, long long*);
+	      llp = GET_ARG (N, ap, long long*);
 	      *llp = nread;
 	    }
 #endif
 	  else
 	    {
-	      ip = va_arg (ap, int *);
+	      ip = GET_ARG (N, ap, int *);
 	      *ip = nread;
 	    }
 	  continue;
@@ -626,7 +677,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
           if (flags & LONG) 
             {
               if ((flags & SUPPRESS) == 0)
-                wcp = va_arg (ap, wchar_t *);
+                wcp = GET_ARG (N, ap, wchar_t *);
               else
                 wcp = NULL;
               n = 0;
@@ -690,7 +741,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	    }
 	  else
 	    {
-	      size_t r = fread ((_PTR) va_arg (ap, char *), 1, width, fp);
+	      size_t r = fread ((_PTR) GET_ARG (N, ap, char *), 1, width, fp);
 
 	      if (r == 0)
 		goto input_failure;
@@ -724,7 +775,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	    }
 	  else
 	    {
-	      p0 = p = va_arg (ap, char *);
+	      p0 = p = GET_ARG (N, ap, char *);
 	      while (ccltab[*fp->_p])
 		{
 		  fp->_r--;
@@ -755,7 +806,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
             {
               /* Process %S and %ls placeholders */
               if ((flags & SUPPRESS) == 0)
-                wcp = va_arg (ap, wchar_t *);
+                wcp = GET_ARG (N, ap, wchar_t *);
               else
                 wcp = &wc;
               n = 0;
@@ -814,7 +865,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	    }
 	  else
 	    {
-	      p0 = p = va_arg (ap, char *);
+	      p0 = p = GET_ARG (N, ap, char *);
 	      while (!isspace (*fp->_p))
 		{
 		  fp->_r--;
@@ -993,22 +1044,22 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	      *p = 0;
 	      res = (*ccfn) (rptr, buf, (char **) NULL, base);
 	      if (flags & POINTER)
-		*(va_arg (ap, _PTR *)) = (_PTR) (unsigned _POINTER_INT) res;
+		*(GET_ARG (N, ap, _PTR *)) = (_PTR) (unsigned _POINTER_INT) res;
 #ifdef _WANT_IO_C99_FORMATS
 	      else if (flags & CHAR)
 		{
-		  cp = va_arg (ap, char *);
+		  cp = GET_ARG (N, ap, char *);
 		  *cp = res;
 		}
 #endif
 	      else if (flags & SHORT)
 		{
-		  sp = va_arg (ap, short *);
+		  sp = GET_ARG (N, ap, short *);
 		  *sp = res;
 		}
 	      else if (flags & LONG)
 		{
-		  lp = va_arg (ap, long *);
+		  lp = GET_ARG (N, ap, long *);
 		  *lp = res;
 		}
 #ifndef _NO_LONGLONG
@@ -1019,13 +1070,13 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		    resll = _strtoull_r (rptr, buf, (char **) NULL, base);
 		  else
 		    resll = _strtoll_r (rptr, buf, (char **) NULL, base);
-		  llp = va_arg (ap, long long*);
+		  llp = GET_ARG (N, ap, long long*);
 		  *llp = resll;
 		}
 #endif
 	      else
 		{
-		  ip = va_arg (ap, int *);
+		  ip = GET_ARG (N, ap, int *);
 		  *ip = res;
 		}
 	      nassigned++;
@@ -1257,17 +1308,17 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 
 	      if (flags & LONG)
 		{
-		  dp = va_arg (ap, double *);
+		  dp = GET_ARG (N, ap, double *);
 		  *dp = res;
 		}
 	      else if (flags & LONGDBL)
 		{
-		  ldp = va_arg (ap, _LONG_DOUBLE *);
+		  ldp = GET_ARG (N, ap, _LONG_DOUBLE *);
 		  *ldp = QUAD_RES;
 		}
 	      else
 		{
-		  flp = va_arg (ap, float *);
+		  flp = GET_ARG (N, ap, float *);
 		  if (isnan (res))
 		    *flp = nanf (NULL);
 		  else
@@ -1288,3 +1339,18 @@ all_done:
   _funlockfile (fp);
   return nassigned;
 }
+
+#ifndef _NO_POS_ARGS
+/* Process all intermediate arguments.  Fortunately, with scanf, all
+   intermediate arguments are sizeof(void*), so we don't need to scan
+   ahead in the format string.  */
+static void *
+get_arg (int n, va_list *ap, int *numargs_p, void **args)
+{
+  int numargs = *numargs_p;
+  while (n >= numargs)
+    args[numargs++] = va_arg (*ap, void *);
+  *numargs_p = numargs;
+  return args[n];
+}
+#endif /* !_NO_POS_ARGS */

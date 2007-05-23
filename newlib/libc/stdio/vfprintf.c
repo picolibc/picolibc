@@ -125,8 +125,8 @@ static char *rcsid = "$Id$";
 # endif
 #endif
 
-#define _NO_POS_ARGS 
-#if defined _WANT_IO_POS_ARGS
+#define _NO_POS_ARGS
+#ifdef _WANT_IO_POS_ARGS
 # undef _NO_POS_ARGS
 #endif
 
@@ -385,9 +385,9 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	register struct __siov *iovp;/* for PRINT macro */
 	register int flags;	/* flags as above */
 	char *fmt_anchor;       /* current format spec being processed */
+#ifndef _NO_POS_ARGS
 	int N;                  /* arg number */
 	int arg_index;          /* index into args processed directly */
-#ifndef _NO_POS_ARGS
 	int numargs;            /* number of varargs read */
 	char *saved_fmt;        /* saved fmt pointer */
 	union arg_val args[MAX_POS_ARGS];
@@ -472,21 +472,21 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 
 	/* Macros to support positional arguments */
 #ifndef _NO_POS_ARGS
-#define GET_ARG(n, ap, type) \
-  ( is_pos_arg \
-      ? n < numargs \
-         ? args[n].val_##type \
-         : get_arg (data, n, fmt_anchor, &ap, &numargs, args, arg_type, &saved_fmt)->val_##type \
-      : arg_index++ < numargs \
-         ? args[n].val_##type \
-         : numargs < MAX_POS_ARGS \
-           ? args[numargs++].val_##type = va_arg (ap, type) \
-           : va_arg (ap, type) \
-  )
+# define GET_ARG(n, ap, type)						\
+	(is_pos_arg							\
+	 ? (n < numargs							\
+	    ? args[n].val_##type					\
+	    : get_arg (data, n, fmt_anchor, &ap, &numargs, args,	\
+		       arg_type, &saved_fmt)->val_##type)		\
+	 : (arg_index++ < numargs					\
+	    ? args[n].val_##type					\
+	    : (numargs < MAX_POS_ARGS					\
+	       ? args[numargs++].val_##type = va_arg (ap, type)		\
+	       : va_arg (ap, type))))
 #else
-#define GET_ARG(n, ap, type) (va_arg (ap, type))
+# define GET_ARG(n, ap, type) (va_arg (ap, type))
 #endif
-    
+
 	/*
 	 * To extend shorts properly, we need both signed and unsigned
 	 * argument extraction methods.
@@ -538,8 +538,8 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	uio.uio_resid = 0;
 	uio.uio_iovcnt = 0;
 	ret = 0;
-	arg_index = 0;
 #ifndef _NO_POS_ARGS
+	arg_index = 0;
 	saved_fmt = NULL;
 	arg_type[0] = -1;
 	numargs = 0;
@@ -580,8 +580,8 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 		width = 0;
 		prec = -1;
 		sign = '\0';
-		N = arg_index;
 #ifndef _NO_POS_ARGS
+		N = arg_index;
 		is_pos_arg = 0;
 #endif
 
@@ -609,9 +609,9 @@ reswitch:	switch (ch) {
 			flags |= ALT;
 			goto rflag;
 		case '*':
-			n = N;
 #ifndef _NO_POS_ARGS
 			/* we must check for positional arg used for dynamic width */
+			n = N;
 			old_is_pos_arg = is_pos_arg;
 			is_pos_arg = 0;
 			if (is_digit (*fmt)) {
@@ -661,9 +661,9 @@ reswitch:	switch (ch) {
 			goto rflag;
 		case '.':
 			if ((ch = *fmt++) == '*') {
-				n = N;
 #ifndef _NO_POS_ARGS
 				/* we must check for positional arg used for dynamic width */
+				n = N;
 				old_is_pos_arg = is_pos_arg;
 				is_pos_arg = 0;
 				if (is_digit (*fmt)) {

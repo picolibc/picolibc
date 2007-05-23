@@ -1,3 +1,10 @@
+2007-05-23  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/vfscanf.c (__SVFSCANF_R): Support scanf(%1$s).
+	Avoid warning when !FLOATING_POINT.
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Simplify _NO_POS_ARGS
+	slightly.
+
 2007-05-23  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/argz/argz_create_sep.c (argz_create_sep): Initialize *argz_len
