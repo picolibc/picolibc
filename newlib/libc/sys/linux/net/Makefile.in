@@ -42,9 +42,13 @@ DIST_COMMON = $(srcdir)/../../../../Makefile.shared \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am
 subdir = net
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/../../../acinclude.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/../../../../libtool.m4 \
+	$(top_srcdir)/../../../../ltoptions.m4 \
+	$(top_srcdir)/../../../../ltsugar.m4 \
+	$(top_srcdir)/../../../../ltversion.m4 \
+	$(top_srcdir)/../../../acinclude.m4 \
 	$(top_srcdir)/../../../confsubdir.m4 \
-	$(top_srcdir)/../../../libtool.m4 $(top_srcdir)/configure.in
+	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/../../../../mkinstalldirs
@@ -132,11 +136,11 @@ depcomp =
 am__depfiles_maybe =
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) \
+LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
 	$(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(lib_a_SOURCES) $(libnet_la_SOURCES)
 DATA = $(noinst_DATA)
@@ -157,13 +161,17 @@ CCAS = @CCAS@
 CCASFLAGS = @CCASFLAGS@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
+CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DLLTOOL = @DLLTOOL@
+DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
+EGREP = @EGREP@
 ELIX_LEVEL_0_FALSE = @ELIX_LEVEL_0_FALSE@
 ELIX_LEVEL_0_TRUE = @ELIX_LEVEL_0_TRUE@
 ELIX_LEVEL_1_FALSE = @ELIX_LEVEL_1_FALSE@
@@ -177,10 +185,13 @@ ELIX_LEVEL_4_TRUE = @ELIX_LEVEL_4_TRUE@
 EXEEXT = @EXEEXT@
 EXTRA_SUBDIRS = @EXTRA_SUBDIRS@
 EXTRA_SUBLIBS = @EXTRA_SUBLIBS@
+FGREP = @FGREP@
+GREP = @GREP@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
@@ -195,6 +206,8 @@ MAKEINFO = @MAKEINFO@
 MAY_SUPPLY_SYSCALLS_FALSE = @MAY_SUPPLY_SYSCALLS_FALSE@
 MAY_SUPPLY_SYSCALLS_TRUE = @MAY_SUPPLY_SYSCALLS_TRUE@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
+NM = @NM@
+OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -205,6 +218,7 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
 READELF = @READELF@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -214,6 +228,9 @@ VERSION = @VERSION@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_AS = @ac_ct_AS@
 ac_ct_CC = @ac_ct_CC@
+ac_ct_DLLTOOL = @ac_ct_DLLTOOL@
+ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
+ac_ct_OBJDUMP = @ac_ct_OBJDUMP@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_READELF = @ac_ct_READELF@
 ac_ct_STRIP = @ac_ct_STRIP@
@@ -246,6 +263,7 @@ libexecdir = @libexecdir@
 libm_machine_dir = @libm_machine_dir@
 localstatedir = @localstatedir@
 lpfx = @lpfx@
+lt_ECHO = @lt_ECHO@
 machine_dir = @machine_dir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
@@ -750,196 +768,196 @@ lib_a-vars.obj: vars.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vars.obj `if test -f 'vars.c'; then $(CYGPATH_W) 'vars.c'; else $(CYGPATH_W) '$(srcdir)/vars.c'; fi`
 
 libnet_la-addr2ascii.lo: addr2ascii.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-addr2ascii.lo `test -f 'addr2ascii.c' || echo '$(srcdir)/'`addr2ascii.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-addr2ascii.lo `test -f 'addr2ascii.c' || echo '$(srcdir)/'`addr2ascii.c
 
 libnet_la-ascii2addr.lo: ascii2addr.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-ascii2addr.lo `test -f 'ascii2addr.c' || echo '$(srcdir)/'`ascii2addr.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-ascii2addr.lo `test -f 'ascii2addr.c' || echo '$(srcdir)/'`ascii2addr.c
 
 libnet_la-base64.lo: base64.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-base64.lo `test -f 'base64.c' || echo '$(srcdir)/'`base64.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-base64.lo `test -f 'base64.c' || echo '$(srcdir)/'`base64.c
 
 libnet_la-bindresvport.lo: bindresvport.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-bindresvport.lo `test -f 'bindresvport.c' || echo '$(srcdir)/'`bindresvport.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-bindresvport.lo `test -f 'bindresvport.c' || echo '$(srcdir)/'`bindresvport.c
 
 libnet_la-ether_addr.lo: ether_addr.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-ether_addr.lo `test -f 'ether_addr.c' || echo '$(srcdir)/'`ether_addr.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-ether_addr.lo `test -f 'ether_addr.c' || echo '$(srcdir)/'`ether_addr.c
 
 libnet_la-getaddrinfo.lo: getaddrinfo.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getaddrinfo.lo `test -f 'getaddrinfo.c' || echo '$(srcdir)/'`getaddrinfo.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getaddrinfo.lo `test -f 'getaddrinfo.c' || echo '$(srcdir)/'`getaddrinfo.c
 
 libnet_la-gethostbydns.lo: gethostbydns.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-gethostbydns.lo `test -f 'gethostbydns.c' || echo '$(srcdir)/'`gethostbydns.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-gethostbydns.lo `test -f 'gethostbydns.c' || echo '$(srcdir)/'`gethostbydns.c
 
 libnet_la-gethostbyht.lo: gethostbyht.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-gethostbyht.lo `test -f 'gethostbyht.c' || echo '$(srcdir)/'`gethostbyht.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-gethostbyht.lo `test -f 'gethostbyht.c' || echo '$(srcdir)/'`gethostbyht.c
 
 libnet_la-gethostbynis.lo: gethostbynis.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-gethostbynis.lo `test -f 'gethostbynis.c' || echo '$(srcdir)/'`gethostbynis.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-gethostbynis.lo `test -f 'gethostbynis.c' || echo '$(srcdir)/'`gethostbynis.c
 
 libnet_la-gethostnamadr.lo: gethostnamadr.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-gethostnamadr.lo `test -f 'gethostnamadr.c' || echo '$(srcdir)/'`gethostnamadr.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-gethostnamadr.lo `test -f 'gethostnamadr.c' || echo '$(srcdir)/'`gethostnamadr.c
 
 libnet_la-getifaddrs.lo: getifaddrs.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getifaddrs.lo `test -f 'getifaddrs.c' || echo '$(srcdir)/'`getifaddrs.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getifaddrs.lo `test -f 'getifaddrs.c' || echo '$(srcdir)/'`getifaddrs.c
 
 libnet_la-getnameinfo.lo: getnameinfo.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getnameinfo.lo `test -f 'getnameinfo.c' || echo '$(srcdir)/'`getnameinfo.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getnameinfo.lo `test -f 'getnameinfo.c' || echo '$(srcdir)/'`getnameinfo.c
 
 libnet_la-getnetbydns.lo: getnetbydns.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getnetbydns.lo `test -f 'getnetbydns.c' || echo '$(srcdir)/'`getnetbydns.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getnetbydns.lo `test -f 'getnetbydns.c' || echo '$(srcdir)/'`getnetbydns.c
 
 libnet_la-getnetbyht.lo: getnetbyht.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getnetbyht.lo `test -f 'getnetbyht.c' || echo '$(srcdir)/'`getnetbyht.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getnetbyht.lo `test -f 'getnetbyht.c' || echo '$(srcdir)/'`getnetbyht.c
 
 libnet_la-getnetbynis.lo: getnetbynis.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getnetbynis.lo `test -f 'getnetbynis.c' || echo '$(srcdir)/'`getnetbynis.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getnetbynis.lo `test -f 'getnetbynis.c' || echo '$(srcdir)/'`getnetbynis.c
 
 libnet_la-getnetnamadr.lo: getnetnamadr.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getnetnamadr.lo `test -f 'getnetnamadr.c' || echo '$(srcdir)/'`getnetnamadr.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getnetnamadr.lo `test -f 'getnetnamadr.c' || echo '$(srcdir)/'`getnetnamadr.c
 
 libnet_la-getproto.lo: getproto.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getproto.lo `test -f 'getproto.c' || echo '$(srcdir)/'`getproto.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getproto.lo `test -f 'getproto.c' || echo '$(srcdir)/'`getproto.c
 
 libnet_la-getprotoent.lo: getprotoent.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getprotoent.lo `test -f 'getprotoent.c' || echo '$(srcdir)/'`getprotoent.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getprotoent.lo `test -f 'getprotoent.c' || echo '$(srcdir)/'`getprotoent.c
 
 libnet_la-getprotoname.lo: getprotoname.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getprotoname.lo `test -f 'getprotoname.c' || echo '$(srcdir)/'`getprotoname.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getprotoname.lo `test -f 'getprotoname.c' || echo '$(srcdir)/'`getprotoname.c
 
 libnet_la-getservbyname.lo: getservbyname.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getservbyname.lo `test -f 'getservbyname.c' || echo '$(srcdir)/'`getservbyname.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getservbyname.lo `test -f 'getservbyname.c' || echo '$(srcdir)/'`getservbyname.c
 
 libnet_la-getservbyport.lo: getservbyport.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getservbyport.lo `test -f 'getservbyport.c' || echo '$(srcdir)/'`getservbyport.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getservbyport.lo `test -f 'getservbyport.c' || echo '$(srcdir)/'`getservbyport.c
 
 libnet_la-getservent.lo: getservent.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getservent.lo `test -f 'getservent.c' || echo '$(srcdir)/'`getservent.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-getservent.lo `test -f 'getservent.c' || echo '$(srcdir)/'`getservent.c
 
 libnet_la-herror.lo: herror.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-herror.lo `test -f 'herror.c' || echo '$(srcdir)/'`herror.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-herror.lo `test -f 'herror.c' || echo '$(srcdir)/'`herror.c
 
 libnet_la-hesiod.lo: hesiod.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-hesiod.lo `test -f 'hesiod.c' || echo '$(srcdir)/'`hesiod.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-hesiod.lo `test -f 'hesiod.c' || echo '$(srcdir)/'`hesiod.c
 
 libnet_la-inet_addr.lo: inet_addr.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-inet_addr.lo `test -f 'inet_addr.c' || echo '$(srcdir)/'`inet_addr.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-inet_addr.lo `test -f 'inet_addr.c' || echo '$(srcdir)/'`inet_addr.c
 
 libnet_la-ifname.lo: ifname.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-ifname.lo `test -f 'ifname.c' || echo '$(srcdir)/'`ifname.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-ifname.lo `test -f 'ifname.c' || echo '$(srcdir)/'`ifname.c
 
 libnet_la-inet_lnaof.lo: inet_lnaof.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-inet_lnaof.lo `test -f 'inet_lnaof.c' || echo '$(srcdir)/'`inet_lnaof.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-inet_lnaof.lo `test -f 'inet_lnaof.c' || echo '$(srcdir)/'`inet_lnaof.c
 
 libnet_la-inet_makeaddr.lo: inet_makeaddr.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-inet_makeaddr.lo `test -f 'inet_makeaddr.c' || echo '$(srcdir)/'`inet_makeaddr.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-inet_makeaddr.lo `test -f 'inet_makeaddr.c' || echo '$(srcdir)/'`inet_makeaddr.c
 
 libnet_la-inet_net_ntop.lo: inet_net_ntop.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-inet_net_ntop.lo `test -f 'inet_net_ntop.c' || echo '$(srcdir)/'`inet_net_ntop.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-inet_net_ntop.lo `test -f 'inet_net_ntop.c' || echo '$(srcdir)/'`inet_net_ntop.c
 
 libnet_la-inet_net_pton.lo: inet_net_pton.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-inet_net_pton.lo `test -f 'inet_net_pton.c' || echo '$(srcdir)/'`inet_net_pton.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-inet_net_pton.lo `test -f 'inet_net_pton.c' || echo '$(srcdir)/'`inet_net_pton.c
 
 libnet_la-inet_neta.lo: inet_neta.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-inet_neta.lo `test -f 'inet_neta.c' || echo '$(srcdir)/'`inet_neta.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-inet_neta.lo `test -f 'inet_neta.c' || echo '$(srcdir)/'`inet_neta.c
 
 libnet_la-inet_netof.lo: inet_netof.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-inet_netof.lo `test -f 'inet_netof.c' || echo '$(srcdir)/'`inet_netof.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-inet_netof.lo `test -f 'inet_netof.c' || echo '$(srcdir)/'`inet_netof.c
 
 libnet_la-inet_network.lo: inet_network.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-inet_network.lo `test -f 'inet_network.c' || echo '$(srcdir)/'`inet_network.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-inet_network.lo `test -f 'inet_network.c' || echo '$(srcdir)/'`inet_network.c
 
 libnet_la-inet_ntoa.lo: inet_ntoa.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-inet_ntoa.lo `test -f 'inet_ntoa.c' || echo '$(srcdir)/'`inet_ntoa.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-inet_ntoa.lo `test -f 'inet_ntoa.c' || echo '$(srcdir)/'`inet_ntoa.c
 
 libnet_la-inet_ntop.lo: inet_ntop.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-inet_ntop.lo `test -f 'inet_ntop.c' || echo '$(srcdir)/'`inet_ntop.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-inet_ntop.lo `test -f 'inet_ntop.c' || echo '$(srcdir)/'`inet_ntop.c
 
 libnet_la-inet_pton.lo: inet_pton.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-inet_pton.lo `test -f 'inet_pton.c' || echo '$(srcdir)/'`inet_pton.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-inet_pton.lo `test -f 'inet_pton.c' || echo '$(srcdir)/'`inet_pton.c
 
 libnet_la-innetgr-stub.lo: innetgr-stub.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-innetgr-stub.lo `test -f 'innetgr-stub.c' || echo '$(srcdir)/'`innetgr-stub.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-innetgr-stub.lo `test -f 'innetgr-stub.c' || echo '$(srcdir)/'`innetgr-stub.c
 
 libnet_la-ip6opt.lo: ip6opt.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-ip6opt.lo `test -f 'ip6opt.c' || echo '$(srcdir)/'`ip6opt.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-ip6opt.lo `test -f 'ip6opt.c' || echo '$(srcdir)/'`ip6opt.c
 
 libnet_la-issetugid-stub.lo: issetugid-stub.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-issetugid-stub.lo `test -f 'issetugid-stub.c' || echo '$(srcdir)/'`issetugid-stub.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-issetugid-stub.lo `test -f 'issetugid-stub.c' || echo '$(srcdir)/'`issetugid-stub.c
 
 libnet_la-linkaddr.lo: linkaddr.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-linkaddr.lo `test -f 'linkaddr.c' || echo '$(srcdir)/'`linkaddr.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-linkaddr.lo `test -f 'linkaddr.c' || echo '$(srcdir)/'`linkaddr.c
 
 libnet_la-map_v4v6.lo: map_v4v6.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-map_v4v6.lo `test -f 'map_v4v6.c' || echo '$(srcdir)/'`map_v4v6.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-map_v4v6.lo `test -f 'map_v4v6.c' || echo '$(srcdir)/'`map_v4v6.c
 
 libnet_la-name6.lo: name6.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-name6.lo `test -f 'name6.c' || echo '$(srcdir)/'`name6.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-name6.lo `test -f 'name6.c' || echo '$(srcdir)/'`name6.c
 
 libnet_la-ns_addr.lo: ns_addr.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-ns_addr.lo `test -f 'ns_addr.c' || echo '$(srcdir)/'`ns_addr.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-ns_addr.lo `test -f 'ns_addr.c' || echo '$(srcdir)/'`ns_addr.c
 
 libnet_la-ns_name.lo: ns_name.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-ns_name.lo `test -f 'ns_name.c' || echo '$(srcdir)/'`ns_name.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-ns_name.lo `test -f 'ns_name.c' || echo '$(srcdir)/'`ns_name.c
 
 libnet_la-ns_netint.lo: ns_netint.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-ns_netint.lo `test -f 'ns_netint.c' || echo '$(srcdir)/'`ns_netint.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-ns_netint.lo `test -f 'ns_netint.c' || echo '$(srcdir)/'`ns_netint.c
 
 libnet_la-ns_ntoa.lo: ns_ntoa.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-ns_ntoa.lo `test -f 'ns_ntoa.c' || echo '$(srcdir)/'`ns_ntoa.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-ns_ntoa.lo `test -f 'ns_ntoa.c' || echo '$(srcdir)/'`ns_ntoa.c
 
 libnet_la-ns_parse.lo: ns_parse.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-ns_parse.lo `test -f 'ns_parse.c' || echo '$(srcdir)/'`ns_parse.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-ns_parse.lo `test -f 'ns_parse.c' || echo '$(srcdir)/'`ns_parse.c
 
 libnet_la-ns_print.lo: ns_print.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-ns_print.lo `test -f 'ns_print.c' || echo '$(srcdir)/'`ns_print.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-ns_print.lo `test -f 'ns_print.c' || echo '$(srcdir)/'`ns_print.c
 
 libnet_la-ns_ttl.lo: ns_ttl.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-ns_ttl.lo `test -f 'ns_ttl.c' || echo '$(srcdir)/'`ns_ttl.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-ns_ttl.lo `test -f 'ns_ttl.c' || echo '$(srcdir)/'`ns_ttl.c
 
 libnet_la-nsdispatch.lo: nsdispatch.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-nsdispatch.lo `test -f 'nsdispatch.c' || echo '$(srcdir)/'`nsdispatch.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-nsdispatch.lo `test -f 'nsdispatch.c' || echo '$(srcdir)/'`nsdispatch.c
 
 libnet_la-nslexer.lo: nslexer.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-nslexer.lo `test -f 'nslexer.c' || echo '$(srcdir)/'`nslexer.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-nslexer.lo `test -f 'nslexer.c' || echo '$(srcdir)/'`nslexer.c
 
 libnet_la-nsparser.lo: nsparser.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-nsparser.lo `test -f 'nsparser.c' || echo '$(srcdir)/'`nsparser.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-nsparser.lo `test -f 'nsparser.c' || echo '$(srcdir)/'`nsparser.c
 
 libnet_la-nsap_addr.lo: nsap_addr.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-nsap_addr.lo `test -f 'nsap_addr.c' || echo '$(srcdir)/'`nsap_addr.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-nsap_addr.lo `test -f 'nsap_addr.c' || echo '$(srcdir)/'`nsap_addr.c
 
 libnet_la-res_comp.lo: res_comp.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-res_comp.lo `test -f 'res_comp.c' || echo '$(srcdir)/'`res_comp.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-res_comp.lo `test -f 'res_comp.c' || echo '$(srcdir)/'`res_comp.c
 
 libnet_la-res_data.lo: res_data.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-res_data.lo `test -f 'res_data.c' || echo '$(srcdir)/'`res_data.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-res_data.lo `test -f 'res_data.c' || echo '$(srcdir)/'`res_data.c
 
 libnet_la-res_debug.lo: res_debug.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-res_debug.lo `test -f 'res_debug.c' || echo '$(srcdir)/'`res_debug.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-res_debug.lo `test -f 'res_debug.c' || echo '$(srcdir)/'`res_debug.c
 
 libnet_la-res_init.lo: res_init.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-res_init.lo `test -f 'res_init.c' || echo '$(srcdir)/'`res_init.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-res_init.lo `test -f 'res_init.c' || echo '$(srcdir)/'`res_init.c
 
 libnet_la-res_mkquery.lo: res_mkquery.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-res_mkquery.lo `test -f 'res_mkquery.c' || echo '$(srcdir)/'`res_mkquery.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-res_mkquery.lo `test -f 'res_mkquery.c' || echo '$(srcdir)/'`res_mkquery.c
 
 libnet_la-res_mkupdate.lo: res_mkupdate.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-res_mkupdate.lo `test -f 'res_mkupdate.c' || echo '$(srcdir)/'`res_mkupdate.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-res_mkupdate.lo `test -f 'res_mkupdate.c' || echo '$(srcdir)/'`res_mkupdate.c
 
 libnet_la-res_query.lo: res_query.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-res_query.lo `test -f 'res_query.c' || echo '$(srcdir)/'`res_query.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-res_query.lo `test -f 'res_query.c' || echo '$(srcdir)/'`res_query.c
 
 libnet_la-res_send.lo: res_send.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-res_send.lo `test -f 'res_send.c' || echo '$(srcdir)/'`res_send.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-res_send.lo `test -f 'res_send.c' || echo '$(srcdir)/'`res_send.c
 
 libnet_la-res_update.lo: res_update.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-res_update.lo `test -f 'res_update.c' || echo '$(srcdir)/'`res_update.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-res_update.lo `test -f 'res_update.c' || echo '$(srcdir)/'`res_update.c
 
 libnet_la-rthdr.lo: rthdr.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-rthdr.lo `test -f 'rthdr.c' || echo '$(srcdir)/'`rthdr.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-rthdr.lo `test -f 'rthdr.c' || echo '$(srcdir)/'`rthdr.c
 
 libnet_la-vars.lo: vars.c
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-vars.lo `test -f 'vars.c' || echo '$(srcdir)/'`vars.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnet_la_CFLAGS) $(CFLAGS) -c -o libnet_la-vars.lo `test -f 'vars.c' || echo '$(srcdir)/'`vars.c
 
 mostlyclean-libtool:
 	-rm -f *.lo

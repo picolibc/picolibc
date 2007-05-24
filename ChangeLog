@@ -1,3 +1,16 @@
+2007-05-24  Steve Ellcey  <sje@cup.hp.com>
+
+	* ltmain.sh: Update from GCC.
+	* libtool.m4: Update from GCC.
+	* ltsugar.m4: New. Update from GCC.
+	* ltversion.m4: New. Update from GCC.
+	* ltoptions.m4: New. Update from GCC.
+	* ltconfig: Remove.
+	* ltcf-c.sh: Remove.
+	* ltcf-cxx.sh: Remove.
+	* ltcf-gcj.sh: Remove.
+	* src-release: Update with new libtool file list.
+
 2007-05-16  Paolo Bonzini  <bonzini@gnu.org>
 
 	* Makefile.def (bootstrap_stage): Replace stage_make_flags with

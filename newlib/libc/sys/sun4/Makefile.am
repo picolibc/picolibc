@@ -95,5 +95,5 @@ all: crt0.o
 crt0.o:
 	cp /lib/crt0.o crt0.o
 
-ACLOCAL_AMFLAGS = -I ../../..
+ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

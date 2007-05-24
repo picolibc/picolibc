@@ -17,5 +17,5 @@ $(MKDOC): makedoc.o
 makedoc.o: makedoc.c
 	$(CC_FOR_BUILD) -g $(CFLAGS_FOR_BUILD) -c $(srcdir)/makedoc.c
 
-ACLOCAL_AMFLAGS = -I ..
+ACLOCAL_AMFLAGS = -I .. -I ../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

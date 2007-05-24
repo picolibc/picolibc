@@ -33,5 +33,5 @@ CLEANFILES = $(CRT0)
 
 doc:
 
-ACLOCAL_AMFLAGS = -I ../..
+ACLOCAL_AMFLAGS = -I ../.. -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

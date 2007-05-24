@@ -42,9 +42,11 @@ DIST_COMMON = $(srcdir)/../../Makefile.shared $(srcdir)/Makefile.in \
 	$(srcdir)/Makefile.am
 subdir = stdlib
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/../acinclude.m4 \
-	$(top_srcdir)/../confsubdir.m4 $(top_srcdir)/../libtool.m4 \
-	$(top_srcdir)/configure.in
+am__aclocal_m4_deps = $(top_srcdir)/../../libtool.m4 \
+	$(top_srcdir)/../../ltoptions.m4 \
+	$(top_srcdir)/../../ltsugar.m4 \
+	$(top_srcdir)/../../ltversion.m4 $(top_srcdir)/../acinclude.m4 \
+	$(top_srcdir)/../confsubdir.m4 $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/../../mkinstalldirs
@@ -156,11 +158,11 @@ depcomp =
 am__depfiles_maybe =
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) \
+LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
 	$(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(lib_a_SOURCES) $(libstdlib_la_SOURCES)
 DATA = $(noinst_DATA)
@@ -181,14 +183,18 @@ CCAS = @CCAS@
 CCASFLAGS = @CCASFLAGS@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
+CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CRT0 = @CRT0@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DLLTOOL = @DLLTOOL@
+DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
+EGREP = @EGREP@
 ELIX_LEVEL_0_FALSE = @ELIX_LEVEL_0_FALSE@
 ELIX_LEVEL_0_TRUE = @ELIX_LEVEL_0_TRUE@
 ELIX_LEVEL_1_FALSE = @ELIX_LEVEL_1_FALSE@
@@ -202,6 +208,8 @@ ELIX_LEVEL_4_TRUE = @ELIX_LEVEL_4_TRUE@
 ENABLE_NEWLIB_ICONV_FALSE = @ENABLE_NEWLIB_ICONV_FALSE@
 ENABLE_NEWLIB_ICONV_TRUE = @ENABLE_NEWLIB_ICONV_TRUE@
 EXEEXT = @EXEEXT@
+FGREP = @FGREP@
+GREP = @GREP@
 HAVE_POSIX_DIR_FALSE = @HAVE_POSIX_DIR_FALSE@
 HAVE_POSIX_DIR_TRUE = @HAVE_POSIX_DIR_TRUE@
 HAVE_SIGNAL_DIR_FALSE = @HAVE_SIGNAL_DIR_FALSE@
@@ -218,6 +226,7 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBC_EXTRA_DEF = @LIBC_EXTRA_DEF@
 LIBC_EXTRA_LIB = @LIBC_EXTRA_LIB@
@@ -244,6 +253,8 @@ MAKEINFO = @MAKEINFO@
 MAY_SUPPLY_SYSCALLS_FALSE = @MAY_SUPPLY_SYSCALLS_FALSE@
 MAY_SUPPLY_SYSCALLS_TRUE = @MAY_SUPPLY_SYSCALLS_TRUE@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
+NM = @NM@
+OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -254,6 +265,7 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
 READELF = @READELF@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -263,6 +275,9 @@ VERSION = @VERSION@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_AS = @ac_ct_AS@
 ac_ct_CC = @ac_ct_CC@
+ac_ct_DLLTOOL = @ac_ct_DLLTOOL@
+ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
+ac_ct_OBJDUMP = @ac_ct_OBJDUMP@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_READELF = @ac_ct_READELF@
 ac_ct_STRIP = @ac_ct_STRIP@
@@ -296,6 +311,7 @@ libexecdir = @libexecdir@
 libm_machine_dir = @libm_machine_dir@
 localstatedir = @localstatedir@
 lpfx = @lpfx@
+lt_ECHO = @lt_ECHO@
 machine_dir = @machine_dir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@

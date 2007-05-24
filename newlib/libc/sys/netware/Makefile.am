@@ -14,5 +14,5 @@ lib_a_SOURCES = \
 
 all: crt0.o
 
-ACLOCAL_AMFLAGS = -I ../../..
+ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

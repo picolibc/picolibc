@@ -23,5 +23,5 @@ lib_a_CFLAGS = $(AM_CFLAGS)
 
 all: crt0.o
 
-ACLOCAL_AMFLAGS = -I ../../..
+ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

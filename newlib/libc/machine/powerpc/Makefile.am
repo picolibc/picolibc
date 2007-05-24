@@ -16,7 +16,7 @@ lib_a_CFLAGS=$(AM_CFLAGS)
 lib_a_LIBADD = @extra_objs@
 lib_a_DEPENDENCIES = @extra_objs@
 
-ACLOCAL_AMFLAGS = -I ../../.. 
+ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. 
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 
 VEC_MALLOC_COMPILE = $(COMPILE) -DINTERNAL_NEWLIB

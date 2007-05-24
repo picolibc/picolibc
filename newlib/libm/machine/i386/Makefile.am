@@ -27,5 +27,5 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../../Makefile.shared
 
-ACLOCAL_AMFLAGS = -I ../../..
+ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

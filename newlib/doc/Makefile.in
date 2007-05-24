@@ -169,7 +169,7 @@ AUTOMAKE_OPTIONS = cygnus
 # We can't use noinst_PROGRAMS, because automake will add $(EXEEXT).
 noinst_DATA = makedoc
 MKDOC = makedoc$(EXEEXT_FOR_BUILD)
-ACLOCAL_AMFLAGS = -I ..
+ACLOCAL_AMFLAGS = -I .. -I ../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
 

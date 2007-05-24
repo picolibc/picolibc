@@ -208,7 +208,7 @@ COPYOFILES = \
 
 lib_a_SOURCES = _main.c
 lib_a_LIBADD = $(COPYOFILES)
-ACLOCAL_AMFLAGS = -I ../../..
+ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
 

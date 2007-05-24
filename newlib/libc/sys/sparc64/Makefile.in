@@ -258,7 +258,7 @@ lib_a_LIBADD = $(COPYOFILES) $(COPYRENAMEOFILES) $(COPYOMFILES) \
 	$(TEMPLATE_SFILES_R:_=_r.o) \
 	$(CFILES_R:.c=_r.o)
 
-ACLOCAL_AMFLAGS = -I ../../..
+ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
 

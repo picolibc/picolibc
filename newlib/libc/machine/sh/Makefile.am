@@ -24,5 +24,5 @@ $(lpfx)strcpy.o: asm.h
 $(lpfx)strcmp.o: asm.h
 $(lpfx)strncpy.o: asm.h
 
-ACLOCAL_AMFLAGS = -I ../../..
+ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

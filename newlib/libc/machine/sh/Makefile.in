@@ -198,7 +198,7 @@ noinst_LIBRARIES = lib.a
 @SH64_TRUE@lib_a_SOURCES = memcpy.S memset.S setjmp.S strcpy.S strlen.S strcmp.S strncpy.S
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
-ACLOCAL_AMFLAGS = -I ../../..
+ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
 
