@@ -1017,7 +1017,7 @@ reswitch:	switch (ch) {
 			 *	-- ANSI X3J11
 			 */
 			/* NOSTRICT */
-			_uquad = (u_long)(unsigned _POINTER_INT)GET_ARG (N, ap, void_ptr_t);
+			_uquad = (uintptr_t) GET_ARG (N, ap, void_ptr_t);
 			base = HEX;
 			xdigs = "0123456789abcdef";
 			flags |= HEXPREFIX;

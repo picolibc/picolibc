@@ -825,10 +825,10 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                     *wcp = L'\0';
                   if (mbslen != (size_t)-2) /* Incomplete sequence */
                     {
-                      if (iswspace(*wcp)) 
+                      if (iswspace(*wcp))
                         {
                           while (n != 0)
-                            ungetc (buf[--n], fp);
+                            _ungetc_r (rptr, (unsigned char) buf[--n], fp);
                           break;
                         }
                       nread += n;
@@ -987,15 +987,15 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		    }
 		  break;
 
-		  /* x ok iff flag still set & 2nd char */
+		  /* x ok iff flag still set & single 0 seen */
 		case 'x':
 		case 'X':
-		  if (flags & PFXOK && p == buf + 1)
+		  if ((flags & (PFXOK | NZDIGITS)) == PFXOK)
 		    {
 		      base = 16;/* if %i */
 		      flags &= ~PFXOK;
 		      /* We must reset the NZDIGITS and NDIGITS
-		         flags that would have been unset by seeing
+			 flags that would have been unset by seeing
 			 the zero that preceded the X or x.  */
 		      flags |= NZDIGITS | NDIGITS;
 		      goto ok;
@@ -1024,18 +1024,16 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	   * If we had only a sign, it is no good; push back the sign.
 	   * If the number ends in `x', it was [sign] '0' 'x', so push back
 	   * the x and treat it as [sign] '0'.
+	   * Use of ungetc here and below assumes ASCII encoding; we are only
+	   * pushing back 7-bit characters, so casting to unsigned char is
+	   * not necessary.
 	   */
 	  if (flags & NDIGITS)
 	    {
 	      if (p > buf)
-		_CAST_VOID ungetc (*(u_char *)-- p, fp);
-	      goto match_failure;
-	    }
-	  c = ((u_char *) p)[-1];
-	  if (c == 'x' || c == 'X')
-	    {
-	      --p;
-	      /*(void)*/ ungetc (c, fp);
+		_ungetc_r (rptr, *--p, fp); /* [-+xX] */
+	      if (p == buf)
+		goto match_failure;
 	    }
 	  if ((flags & SUPPRESS) == 0)
 	    {
@@ -1044,7 +1042,19 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	      *p = 0;
 	      res = (*ccfn) (rptr, buf, (char **) NULL, base);
 	      if (flags & POINTER)
-		*(GET_ARG (N, ap, _PTR *)) = (_PTR) (unsigned _POINTER_INT) res;
+		{
+		  void **vp = GET_ARG (N, ap, void **);
+#ifndef _NO_LONGLONG
+		  if (sizeof (uintptr_t) > sizeof (u_long))
+		    {
+		      u_long_long resll;
+		      resll = _strtoull_r (rptr, buf, (char **) NULL, base);
+		      *vp = (void *) (uintptr_t) resll;
+		    }
+		  else
+#endif /* !_NO_LONGLONG */
+		    *vp = (void *) (uintptr_t) res;
+		}
 #ifdef _WANT_IO_C99_FORMATS
 	      else if (flags & CHAR)
 		{
@@ -1096,7 +1106,8 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  long zeroes, exp_adjust;
 	  char *exp_start = NULL;
 	  unsigned width_left = 0;
-	  int nancount = 0;
+	  char nancount = 0;
+	  char infcount = 0;
 #ifdef hardway
 	  if (width == 0 || width > sizeof (buf) - 1)
 #else
@@ -1141,7 +1152,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		case '7':
 		case '8':
 		case '9':
-		  if (nancount == 0)
+		  if (nancount + infcount == 0)
 		    {
 		      flags &= ~(SIGNOK | NDIGITS);
 		      goto fok;
@@ -1159,16 +1170,21 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		case 'n':
 		case 'N':
 		  if (nancount == 0
-		      && (flags & (SIGNOK | NDIGITS | DPTOK | EXPOK)) ==
-				  (SIGNOK | NDIGITS | DPTOK | EXPOK))
+		      && (flags & (NDIGITS | DPTOK | EXPOK)) ==
+				  (NDIGITS | DPTOK | EXPOK))
 		    {
 		      flags &= ~(SIGNOK | DPTOK | EXPOK | NDIGITS);
 		      nancount = 1;
 		      goto fok;
 		    }
-		  else if (nancount == 2)
+		  if (nancount == 2)
 		    {
 		      nancount = 3;
+		      goto fok;
+		    }
+		  if (infcount == 1 || infcount == 4)
+		    {
+		      infcount++;
 		      goto fok;
 		    }
 		  break;
@@ -1177,6 +1193,46 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		  if (nancount == 1)
 		    {
 		      nancount = 2;
+		      goto fok;
+		    }
+		  break;
+		case 'i':
+		case 'I':
+		  if (infcount == 0
+		      && (flags & (NDIGITS | DPTOK | EXPOK)) ==
+				  (NDIGITS | DPTOK | EXPOK))
+		    {
+		      flags &= ~(SIGNOK | DPTOK | EXPOK | NDIGITS);
+		      infcount = 1;
+		      goto fok;
+		    }
+		  if (infcount == 3 || infcount == 5)
+		    {
+		      infcount++;
+		      goto fok;
+		    }
+		  break;
+		case 'f':
+		case 'F':
+		  if (infcount == 2)
+		    {
+		      infcount = 3;
+		      goto fok;
+		    }
+		  break;
+		case 't':
+		case 'T':
+		  if (infcount == 6)
+		    {
+		      infcount = 7;
+		      goto fok;
+		    }
+		  break;
+		case 'y':
+		case 'Y':
+		  if (infcount == 7)
+		    {
+		      infcount = 8;
 		      goto fok;
 		    }
 		  break;
@@ -1212,7 +1268,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	      *p++ = c;
 	    fskip:
 	      width--;
-              ++nread;
+	      ++nread;
 	      if (--fp->_r > 0)
 		fp->_p++;
 	      else
@@ -1221,24 +1277,48 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	    }
 	  if (zeroes)
 	    flags &= ~NDIGITS;
-          /* We may have a 'N' or possibly even a 'Na' as the start of 'NaN', 
-	     only to run out of chars before it was complete (or having 
-	     encountered a non- matching char).  So check here if we have an 
-	     outstanding nancount, and if so put back the chars we did 
-	     swallow and treat as a failed match. */
-          if (nancount && nancount != 3)
-            {
-              /* Ok... what are we supposed to do in the event that the
-              __srefill call above was triggered in the middle of the partial
-              'NaN' and so we can't put it all back? */
-              while (nancount-- && (p > buf))
-                {
-                  ungetc (*(u_char *)--p, fp);
-                  --nread;
-                }
-              goto match_failure;
-            }
-          /*
+	  /* We may have a 'N' or possibly even [sign] 'N' 'a' as the
+	     start of 'NaN', only to run out of chars before it was
+	     complete (or having encountered a non-matching char).  So
+	     check here if we have an outstanding nancount, and if so
+	     put back the chars we did swallow and treat as a failed
+	     match.
+
+	     FIXME - we still don't handle NAN([0xdigits]).  */
+	  if (nancount - 1U < 2U) /* nancount && nancount < 3 */
+	    {
+	      /* Newlib's ungetc works even if we called __srefill in
+		 the middle of a partial parse, but POSIX does not
+		 guarantee that in all implementations of ungetc.  */
+	      while (p > buf)
+		{
+		  _ungetc_r (rptr, *--p, fp); /* [-+nNaA] */
+		  --nread;
+		}
+	      goto match_failure;
+	    }
+	  /* Likewise for 'inf' and 'infinity'.	 But be careful that
+	     'infinite' consumes only 3 characters, leaving the stream
+	     at the second 'i'.	 */
+	  if (infcount - 1U < 7U) /* infcount && infcount < 8 */
+	    {
+	      if (infcount >= 3) /* valid 'inf', but short of 'infinity' */
+		while (infcount-- > 3)
+		  {
+		    _ungetc_r (rptr, *--p, fp); /* [iInNtT] */
+		    --nread;
+		  }
+	      else
+		{
+		  while (p > buf)
+		    {
+		      _ungetc_r (rptr, *--p, fp); /* [-+iInN] */
+		      --nread;
+		    }
+		  goto match_failure;
+		}
+	    }
+	  /*
 	   * If no digits, might be missing exponent digits
 	   * (just give back the exponent) or might be missing
 	   * regular digits, but had sign and/or decimal point.
@@ -1249,22 +1329,22 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		{
 		  /* no digits at all */
 		  while (p > buf)
-                    {
-		      ungetc (*(u_char *)--p, fp);
-                      --nread;
-                    }
+		    {
+		      _ungetc_r (rptr, *--p, fp); /* [-+.] */
+		      --nread;
+		    }
 		  goto match_failure;
 		}
 	      /* just a bad exponent (e and maybe sign) */
-	      c = *(u_char *)-- p;
-              --nread;
+	      c = *--p;
+	      --nread;
 	      if (c != 'e' && c != 'E')
 		{
-		  _CAST_VOID ungetc (c, fp);	/* sign */
-		  c = *(u_char *)-- p;
-                  --nread;
+		  _ungetc_r (rptr, c, fp); /* [-+] */
+		  c = *--p;
+		  --nread;
 		}
-	      _CAST_VOID ungetc (c, fp);
+	      _ungetc_r (rptr, c, fp); /* [eE] */
 	    }
 	  if ((flags & SUPPRESS) == 0)
 	    {
@@ -1332,10 +1412,15 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	}
     }
 input_failure:
+  /* On read failure, return EOF failure regardless of matches; errno
+     should have been set prior to here.  On EOF failure (including
+     invalid format string), return EOF if no matches yet, else number
+     of matches made prior to failure.  */
   _funlockfile (fp);
-  return nassigned ? nassigned : -1;
+  return nassigned && !(fp->_flags & __SERR) ? nassigned : EOF;
 match_failure:
 all_done:
+  /* Return number of matches, which can be 0 on match failure.  */
   _funlockfile (fp);
   return nassigned;
 }

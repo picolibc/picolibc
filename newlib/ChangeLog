@@ -1,3 +1,12 @@
+2007-05-23  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Don't truncate %p when
+	sizeof(void*) is 8 but sizeof(long) is 4.
+	* libc/stdio/vfscanf.c (__SVFSCANF_R): Likewise.  Fix %i scanning
+	of "-0x".  Support "-nan" and "inf" for %e.  Audit usage of ungetc
+	to fix reentrancy and bug on encoding error in multibyte locales.
+	Always return EOF on read error.
+
 2007-05-23 Patrick Mansfield <patmans@us.ibm.com>
 
 	* libc/machine/spu/sys/syscall.h: Update the __send_to_ppe
