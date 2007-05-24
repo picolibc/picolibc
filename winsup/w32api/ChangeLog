@@ -1,3 +1,10 @@
+2007-05-23  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* lib/secur32.def (InitSecurityInterfaceA, InitSecurityInterfaceW): Define.
+
+	Thanks to Jim Marshall (jim dot marshall at wbemsolutions dot com) for
+	supplying the information.
+
 2007-05-19  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/shellapi.h (NIN_POPUPOPEN, NIN_POPUPCLOSE): Define.

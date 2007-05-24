@@ -18,6 +18,8 @@ GetComputerObjectNameW@12
 GetUserNameExA@12
 GetUserNameExW@12
 ImpersonateSecurityContext@4
+InitSecurityInterfaceA@0
+InitSecurityInterfaceW@0
 InitializeSecurityContextA@48
 InitializeSecurityContextW@48
 LsaCallAuthenticationPackage@28
