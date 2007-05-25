@@ -1,3 +1,7 @@
+2007-05-25  Andreas Tobler  <a.tobler@schweiz.org>
+
+        * ltmain.sh: Fix Darwin verstring, remove ${wl}.
+
 2007-05-24  Steve Ellcey  <sje@cup.hp.com>
 
 	* ltmain.sh: Update from GCC.
@@ -482,7 +486,7 @@
 	whether target-libjava is being configured instead of whether the
 	java front end is enabled.
 	* configure: Regenerate.
-	
+
 2006-06-15  Mark Shinwell  <shinwell@codesourcery.com>
 
 	* include/elf/arm.h: Correct names of R_ARM_LDC_G{0,1,2}
@@ -507,13 +511,13 @@
 	Sync from gcc:
 
 	2006-06-12  David Ayers  <d.ayers@inode.at>
-	
+
 	PR bootstrap/27963
 	PR target/19970
-	* configure.in:	Remove target-boehm-gc from noconfigdirs where 
+	* configure.in:	Remove target-boehm-gc from noconfigdirs where
 	${libgcj} is specified.
 	* configure: Regenerate.
-	
+
 2006-06-08  Jeff Johnston  <jjohnstn@redhat.com>
 
 	Sync from gcc:
@@ -527,9 +531,9 @@
 2006-06-07  Carlos O'Donell  <carlos@codesourcery.com>
 
 	Sync from gcc:
-	
+
 	2006-06-06  David Ayers  <d.ayers@inode.at>
-	
+
 	PR libobjc/13946
 	* Makefile.def: Add dependencies for libobjc which boehm-gc.
 	* Makefile.in: Regenerate.
@@ -544,7 +548,7 @@
 	* configure: Regenerate.
 
 	2006-06-05  Paolo Bonzini  <bonzini@gnu.org>
-	
+
 	PR 27674
 	* Makefile.tpl (configure-[+prefix+][+module+],
 	all-[+prefix+][+module+]): Depend on stage_current if bootstrapping.
@@ -660,7 +664,7 @@
         * configure: Regenerate.
 
 	2006-02-21 Rafael Avila de Espindola <rafael.espindola@gmail.com>
-        
+
         * Makefile.tpl  (BUILD_CONFIGDIRS): Remove.
         (TARGET_CONFIGDIRS): Remove.
         * configure.in: Remove AC_SUBST(target_configdirs).
@@ -730,7 +734,7 @@
 
 2006-02-14  Paolo Bonzini  <bonzini@gnu.org>
 	    Andreas Schwab  <schwab@suse.de>
-	 
+
 	* configure: Regenerate.
 
 2006-01-16  Paolo Bonzini  <bonzini@gnu.org>
@@ -1022,7 +1026,7 @@
 	CONFIGURED_LIPO_FOR_TARGET, CONFIGURED_STRIP_FOR_TARGET.
 	* Makefile.in: Regenerate.
 	* configure: Regenerate.
-	
+
 2005-09-19  David Edelsohn  <edelsohn@gnu.org>
 
 	* configure.in (powerpc-*-aix*): Add target-libssp to noconfigdirs.
@@ -1089,7 +1093,7 @@
 2005-07-27  Mark Mitchell  <mark@codesourcery.com>
 
 	* Makefile.tpl (EXTRA_TARGET_FLAGS): Set LDFLAGS=LDFLAGS_FOR_TARGET.
-	* Makefile.def (flags_to_pass): Add LDFLAGS_FOR_TARGET. 
+	* Makefile.def (flags_to_pass): Add LDFLAGS_FOR_TARGET.
 	* Makefile.in: Regenerated.
 
 2005-07-26  Mark Mitchell  <mark@codesourcery.com>
@@ -1114,7 +1118,7 @@
 
 	* configure.in: Add cases for Renesas m32c.
 	* configure: Regenerated.
-	
+
 2005-07-14  Kelley Cook  <kcook@gcc.gnu.org>
 
 	* COPYING, compile, config-ml.in, config.guess,
@@ -1229,7 +1233,7 @@
 
 2005-05-19  Paul Brook  <paul@codesourcery.com>
 
-	* configure.in: Rewrite misleading error message when requested 
+	* configure.in: Rewrite misleading error message when requested
 	language cannot be built.
 	* configure: Regenerate.
 
