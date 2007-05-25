@@ -1,5 +1,9 @@
+2007-05-25  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/rewind.c (rewind): Fix regression of 2003-08-22.
+
 2007-05-24  Steve Ellcey  <sje@cup.hp.com>
-            Charles Wilson  <libtool@cwilson.fastmail.fm>
+	    Charles Wilson  <libtool@cwilson.fastmail.fm>
 
 	* libtool.m4: removed
 	* configure.in: invoke _LD_DECL_SED before conditionally initializing
