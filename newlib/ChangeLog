@@ -1,3 +1,8 @@
+2007-05-27  Brian Dessent  <brian@dessent.net>
+
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Populate 'ox' when
+	handling %p.
+
 2007-05-25  Eric Blake  <ebb9@byu.net>
 
 	* libc/stdio/rewind.c (rewind): Fix regression of 2003-08-22.

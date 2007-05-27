@@ -1021,7 +1021,8 @@ reswitch:	switch (ch) {
 			base = HEX;
 			xdigs = "0123456789abcdef";
 			flags |= HEXPREFIX;
-			ch = 'x';
+			ox[0] = '0';
+			ox[1] = ch = 'x';
 			goto nosign;
 		case 's':
 #ifdef _WANT_IO_C99_FORMATS
