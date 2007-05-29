@@ -1,3 +1,7 @@
+2007-05-29  Pedro Alves  <pedro_alves@portugalmail.pt>
+
+	* dumper.cc (dumper::prepare_core_dump): Record a phdr for each section.
+
 2007-05-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygpath.cc (do_options): Allow outputflag combined with other

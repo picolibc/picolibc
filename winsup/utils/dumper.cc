@@ -1,6 +1,6 @@
 /* dumper.cc
 
-   Copyright 1999, 2001, 2002, 2004, 2006 Red Hat Inc.
+   Copyright 1999, 2001, 2002, 2004, 2006, 2007 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -657,6 +657,8 @@ dumper::prepare_core_dump ()
     {
       sect_no++;
 
+      unsigned long phdr_type = PT_LOAD;
+
       switch (p->type)
 	{
 	case pr_ent_memory:
@@ -664,7 +666,7 @@ dumper::prepare_core_dump ()
 	  sect_flags = SEC_HAS_CONTENTS | SEC_ALLOC | SEC_LOAD;
 	  sect_size = p->u.memory.size;
 	  sect_vma = (bfd_vma) (p->u.memory.base);
-
+	  phdr_type = PT_LOAD;
 	  break;
 
 	case pr_ent_thread:
@@ -672,6 +674,7 @@ dumper::prepare_core_dump ()
 	  sect_flags = SEC_HAS_CONTENTS | SEC_LOAD;
 	  sect_size = sizeof (note_header) + sizeof (struct win32_pstatus);
 	  sect_vma = 0;
+	  phdr_type = PT_NOTE;
 	  break;
 
 	case pr_ent_module:
@@ -680,6 +683,7 @@ dumper::prepare_core_dump ()
 	  sect_size = sizeof (note_header) + sizeof (struct win32_pstatus) +
 	    (bfd_size_type) (strlen (p->u.module.name));
 	  sect_vma = 0;
+	  phdr_type = PT_NOTE;
 	  break;
 
 	default:
@@ -722,11 +726,62 @@ dumper::prepare_core_dump ()
 	};
 
       new_section->vma = sect_vma;
+      new_section->lma = 0;
       new_section->output_section = new_section;
       new_section->output_offset = 0;
       p->section = new_section;
-    }
+      int section_count = 1;
 
+      bfd_boolean filehdr = 0;
+      bfd_boolean phdrs = 0;
+
+      bfd_vma at = 0;
+      bfd_boolean valid_at = 0;
+
+      flagword flags = 0;
+      bfd_boolean valid_flags = 1;
+
+      if (p->type == pr_ent_memory)
+	{
+	  MEMORY_BASIC_INFORMATION mbi;
+	  if (!VirtualQueryEx (hProcess, (LPVOID)sect_vma, &mbi, sizeof (mbi)))
+	    {
+	      bfd_perror ("getting mem region flags");
+	      goto failed;
+	    }
+
+	  static const struct
+	  {
+	    DWORD protect;
+	    flagword flags;
+	  } mappings[] =
+	    {
+	      { PAGE_READONLY, PF_R },
+	      { PAGE_READWRITE, PF_R | PF_W },
+	      { PAGE_WRITECOPY, PF_W },
+	      { PAGE_EXECUTE, PF_X },
+	      { PAGE_EXECUTE_READ, PF_X | PF_R },
+	      { PAGE_EXECUTE_READWRITE, PF_X | PF_R | PF_W },
+	      { PAGE_EXECUTE_WRITECOPY, PF_X | PF_W }
+	    };
+
+	  for (size_t i = 0;
+	       i < sizeof (mappings) / sizeof (mappings[0]);
+	       i++)
+	    if ((mbi.Protect & mappings[i].protect) != 0)
+	      flags |= mappings[i].flags;
+	}
+
+      if (!bfd_record_phdr (core_bfd, phdr_type,
+			    valid_flags, flags,
+			    valid_at, at,
+			    filehdr, phdrs,
+			    section_count, &new_section))
+	{
+	  bfd_perror ("recording program headers");
+	  goto failed;
+	}
+    }
   return 1;
 
 failed:
