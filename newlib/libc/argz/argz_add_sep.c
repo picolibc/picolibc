@@ -23,11 +23,14 @@ _DEFUN (argz_add_sep, (argz, argz_len, str, sep),
 
   argz_create_sep (str, sep, &str_argz, &str_argz_len);
 
-  *argz_len += str_argz_len;
+  if (str_argz_len)
+    {
+      *argz_len += str_argz_len;
 
-  if(!(*argz = (char *)realloc(*argz, *argz_len)))
-    return ENOMEM;
+      if(!(*argz = (char *)realloc(*argz, *argz_len)))
+	return ENOMEM;
 
-  memcpy(*argz + last, str_argz, str_argz_len);
+      memcpy(*argz + last, str_argz, str_argz_len);
+    }
   return 0;
 }

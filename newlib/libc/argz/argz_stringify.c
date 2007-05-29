@@ -16,9 +16,10 @@ _DEFUN (argz_stringify, (argz, argz_len, sep),
   size_t i;
 
   /* len includes trailing \0, which we don't want to replace. */
-  for (i = 0; i < argz_len - 1; i++)
-    {
-      if (argz[i] == '\0')
-        argz[i] = sep;
-    }
+  if (argz_len > 1)
+    for (i = 0; i < argz_len - 1; i++)
+      {
+	if (argz[i] == '\0')
+	  argz[i] = sep;
+      }
 }

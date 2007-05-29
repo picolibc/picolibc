@@ -1,3 +1,14 @@
+2007-05-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/argz/argz_add_sep.c (argz_add_sep): Handle empty string
+	argument.
+	* libc/argz/argz_append.c (argz_append): Handle empty buf argument.
+	* libc/argz/argz_create_sep.c (argz_create_sep): Return (NULL, 0)
+	on empty input strings.
+	* libc/argz/argz_extract.c (argz_extract): Check argz_len before
+	looping through argz.
+	* libc/argz/argz_stringify.c (argz_stringify): Ditto.
+
 2007-05-27  Brian Dessent  <brian@dessent.net>
 
 	* libc/stdio/vfprintf.c (_VFPRINTF_R): Populate 'ox' when

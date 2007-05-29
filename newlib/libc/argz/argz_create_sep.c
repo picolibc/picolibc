@@ -25,13 +25,20 @@ _DEFUN (argz_create_sep, (string, sep, argz, argz_len),
   char *token = 0;
   char *iter = 0;
 
+  *argz_len = 0;
+
+  if (!string || string[0] == '\0')
+    {
+      *argz= NULL;
+      return 0;
+    }
+
   delim[0] = sep;
   delim[1] = '\0';
 
   running = strdup(string);
   old_running = running;
 
-  *argz_len = 0;
   while ((token = strsep(&running, delim)))
     {
       len = strlen(token);
