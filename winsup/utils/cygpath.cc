@@ -894,12 +894,12 @@ do_options (int argc, char **argv, int from_file)
     }
 
   /* If none of the "important" flags are set, -u is default. */
-  if (!unix_flag && !windows_flag && !options_from_file_flag && !output_flag
-      && !mode_flag)
+  if (!unix_flag && !windows_flag && !mode_flag
+      && (!from_file ? !options_from_file_flag : 1))
     unix_flag = 1;
 
   /* Only one of ... */
-  if (unix_flag + windows_flag + output_flag + mode_flag > 1
+  if (unix_flag + windows_flag + mode_flag > 1
       + (!from_file ? options_from_file_flag : 0))
     usage (stderr, 1);
 
@@ -994,6 +994,8 @@ main (int argc, char **argv)
 	      perror ("cygpath");
 	      exit (1);
 	    }
+	  if (!az)
+	    continue;
 	  ac = argz_count (az, azl) + 1;
 	  av = (char **) malloc ((ac + 1) * sizeof (char *));
 	  if (!av)
@@ -1003,16 +1005,12 @@ main (int argc, char **argv)
 	    }
 	  av[0] = prog_name;
 	  argz_extract (az, azl, av + 1);
-	  free (az);
 	  if (options_from_file_flag)
 	    o = do_options (ac, av, 1);
 	  else
-	    {
-	      optind = 1;
-	      unix_flag = 1;
-	      output_flag = mode_flag = windows_flag = 0;
-	    }
+	    optind = 1;
 	  action (ac, av, o);
+	  free (az);
 	  free (av);
 	}
     }

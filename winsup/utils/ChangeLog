@@ -1,3 +1,11 @@
+2007-05-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygpath.cc (do_options): Allow outputflag combined with other
+	basic flags.  Only check options_from_file_flag if reading options
+	from command line.
+	(main): Check for NULL argz vector.  Don't free argz vector prematurely.
+	Don't force flag combination in !options_from_file_flag case.
+
 2007-05-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygpath.cc: Include argz.h.
