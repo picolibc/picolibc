@@ -1,3 +1,15 @@
+2007-05-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (dtable::set_file_pointers_for_exec): Call SetFilePointer
+	correctly for 64 bit file access.  Comment out functionality.
+	* fhandler.cc (fhandler_base::open): Don't set append_mode.
+	(fhandler_base::write): Check for O_APPEND instead of append_mode.
+	Call SetFilePointer correctly for 64 bit file access.  Handle
+	errors from SetFilePointer.
+	* fhandler.h (class fhandler_base): Drop append_mode status flag.
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Handle
+	seeking correctly for 64 bit file access.
+
 2007-05-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (cwdstuff::set): Revert useless acquire check.

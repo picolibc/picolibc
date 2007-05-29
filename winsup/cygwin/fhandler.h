@@ -101,7 +101,6 @@ class fhandler_base
     unsigned wbinset            : 1; /* binary write mode explicitly set */
     unsigned nohandle           : 1; /* No handle associated with fhandler. */
     unsigned uninterruptible_io : 1; /* Set if I/O should be uninterruptible. */
-    unsigned append_mode        : 1; /* always append */
     unsigned did_lseek          : 1; /* set when lseek is called as a flag that
 					_write should check if we've moved
 					beyond EOF, zero filling or making
@@ -114,7 +113,7 @@ class fhandler_base
    public:
     status_flags () :
       rbinary (0), rbinset (0), wbinary (0), wbinset (0), nohandle (0),
-      uninterruptible_io (0), append_mode (0), did_lseek (0),
+      uninterruptible_io (0), did_lseek (0),
       query_open (no_query), close_on_exec (0), need_fork_fixup (0)
       {}
   } status, open_status;
@@ -191,7 +190,6 @@ class fhandler_base
   IMPLEMENT_STATUS_FLAG (bool, rbinset)
   IMPLEMENT_STATUS_FLAG (bool, nohandle)
   IMPLEMENT_STATUS_FLAG (bool, uninterruptible_io)
-  IMPLEMENT_STATUS_FLAG (bool, append_mode)
   IMPLEMENT_STATUS_FLAG (bool, did_lseek)
   IMPLEMENT_STATUS_FLAG (query_state, query_open)
   IMPLEMENT_STATUS_FLAG (bool, close_on_exec)

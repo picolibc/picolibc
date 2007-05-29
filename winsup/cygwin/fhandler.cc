@@ -550,9 +550,6 @@ fhandler_base::open (int flags, mode_t mode)
   if ((flags & O_EXCL) && (flags & O_CREAT))
     create_disposition = FILE_CREATE;
 
-  if (flags & O_APPEND)
-    append_mode (true);
-
   if (flags & O_CREAT && get_device () == FH_FS)
     {
       file_attributes = FILE_ATTRIBUTE_NORMAL;
@@ -711,8 +708,17 @@ fhandler_base::write (const void *ptr, size_t len)
 {
   int res;
 
-  if (append_mode ())
-    SetFilePointer (get_output_handle (), 0, 0, FILE_END);
+  if (get_flags () & O_APPEND)
+    {
+      LONG off_high = 0;
+      DWORD ret = SetFilePointer (get_output_handle (), 0, &off_high, FILE_END);
+      if (ret == INVALID_SET_FILE_POINTER && GetLastError () != NO_ERROR)
+        {
+	  debug_printf ("Seeking to EOF in append mode failed");
+	  __seterrno ();
+	  return -1;
+	}
+    }
   else if (did_lseek ())
     {
       _off64_t actual_length, current_position;

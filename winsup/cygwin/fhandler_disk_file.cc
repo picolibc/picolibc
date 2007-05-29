@@ -493,13 +493,14 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 	  if (pc.exec_state () == dont_know_if_executable)
 	    {
 	      DWORD cur, done;
+	      LONG curhigh = 0;
 	      char magic[3];
 
 	      /* First retrieve current position, set to beginning
 		 of file if not already there. */
-	      cur = SetFilePointer (get_handle (), 0, NULL, FILE_CURRENT);
-	      if (cur != INVALID_SET_FILE_POINTER
-		  && (!cur || SetFilePointer (get_handle (), 0, NULL, FILE_BEGIN)
+	      cur = SetFilePointer (get_handle (), 0, &curhigh, FILE_CURRENT);
+	      if ((cur != INVALID_SET_FILE_POINTER || GetLastError () == NO_ERROR)
+		  && ((!cur && !curhigh) || SetFilePointer (get_handle (), 0, NULL, FILE_BEGIN)
 		      != INVALID_SET_FILE_POINTER))
 		{
 		  /* FIXME should we use /etc/magic ? */
@@ -510,7 +511,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 		      pc.set_exec ();
 		      buf->st_mode |= STD_XBITS;
 		    }
-		  SetFilePointer (get_handle (), cur, NULL, FILE_BEGIN);
+		  SetFilePointer (get_handle (), cur, &curhigh, FILE_BEGIN);
 		}
 	    }
 	}
