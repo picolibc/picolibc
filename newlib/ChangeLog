@@ -1,3 +1,13 @@
+2007-05-29  Eric Blake  <ebb9@byu.net>
+
+	Avoid more compiler warnings.
+	* libc/stdlib/btowc.c: Add missing header.
+	* libc/stdlib/getopt.c (getopt_internal): Initialize variable.
+	* libc/stdlib/system.c (do_system) [__CYGWIN__]: Add declaration.
+	* libc/stdlib/wctob.c: Add missing header.
+	* libc/string/strcpy.c (strcpy): Avoid warnings.
+	* libc/string/strrchr.c (strrchr): Likewise.
+
 2007-05-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/argz/argz_add_sep.c (argz_add_sep): Handle empty string

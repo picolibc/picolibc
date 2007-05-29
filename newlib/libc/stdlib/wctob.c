@@ -2,6 +2,7 @@
 #include <wchar.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 int
 wctob (wint_t c)

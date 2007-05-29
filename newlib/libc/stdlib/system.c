@@ -179,6 +179,7 @@ do_system (ptr, s)
     return -1;
   else
     {
+      extern int _wait (int *);
       int rc = _wait (&status);
       if (rc == -1)
 	return -1;

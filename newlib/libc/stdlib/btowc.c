@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <reent.h>
+#include <string.h>
 
 wint_t
 btowc (int c)
