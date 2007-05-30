@@ -283,10 +283,10 @@ SYM (_start):
 	movel	IMM (SYM(__do_global_dtors)),(sp)
 	jsr	SYM (atexit)
 #endif
-	movel	IMM (__FINI_SECTION__),(sp)
+	movel	IMM (_fini),(sp)
 	jsr	SYM (atexit)
 
-	jsr	__INIT_SECTION__
+	jsr	_init
 
 /*
  * call the main routine from the application to get it going.

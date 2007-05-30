@@ -25,8 +25,8 @@ extern char __end[] __attribute__ ((aligned (4)));
 void *__heap_limit;
 extern void software_init_hook (void) __attribute__ ((weak));
 extern void hardware_init_hook (void) __attribute__ ((weak));
-extern void __INIT_SECTION__ (void);
-extern void __FINI_SECTION__ (void);
+extern void _init (void);
+extern void _fini (void);
 
 extern int main (int, char **, char **);
 
@@ -48,11 +48,11 @@ void __start1 (void *heap_limit)
   if (software_init_hook)
     software_init_hook ();
 
-  __INIT_SECTION__ ();
+  _init ();
 
   /* I'm not sure how useful it is to have a fini_section in an
      embedded system.  */
-  atexit (__FINI_SECTION__);
+  atexit (_fini);
   
   ix = main (0, NULL, NULL);
   exit (ix);

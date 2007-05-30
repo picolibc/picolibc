@@ -1,3 +1,9 @@
+2007-05-30  Kazu Hirata  <kazu@codesourcery.com>
+
+	* m68k/cf-crt1.C, m68k/cf.sc, m68k/fido.sc, m68k/fido-crt0.S:
+	Replace __INIT_SECTION__ and __FINI_SECTION__ with _init and
+	_fini, respectively.
+
 2007-05-23 Patrick Mansfield <patmans@us.ibm.com>
 
 	* spu/syscalls.c: Change __send_to_ppe to return the result stored
