@@ -1,3 +1,7 @@
+2007-05-31  Paolo Bonzini  <bonzini@gnu.org>
+
+	* ltgcc.m4: Update from GCC.
+
 2007-05-25  Andreas Tobler  <a.tobler@schweiz.org>
 
         * ltmain.sh: Fix Darwin verstring, remove ${wl}.
