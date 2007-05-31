@@ -395,6 +395,7 @@ struct bfd_link_info
   /* The list of input BFD's involved in the link.  These are chained
      together via the link_next field.  */
   bfd *input_bfds;
+  bfd **input_bfds_tail;
 
   /* If a symbol should be created for each input BFD, this is section
      where those symbols should be placed.  It must be a section in

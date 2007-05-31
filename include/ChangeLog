@@ -1,3 +1,8 @@
+2007-06-01  Noah Misch  <noah@cs.caltech.edu>
+	    Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (struct bfd_link_info): Add input_bfds_tail.
+
 2007-05-07  Nathan Froyd  <froydnj@codesourcery.com>
 
 	* libiberty.h (writeargv): Declare.
