@@ -1,7 +1,7 @@
 2007-06-01  Steve Ellcey  <sje@cup.hp.com>
 
-	* libltdl/m4/libtool.m4 (LT_CMD_MAX_LEN): Try using getconf
-	to set lt_cv_sys_max_cmd_len.
+	* libtool.m4 (LT_CMD_MAX_LEN): Try using getconf to set
+	lt_cv_sys_max_cmd_len.
 
 2007-05-31  Paolo Bonzini  <bonzini@gnu.org>
 
@@ -9,7 +9,7 @@
 
 2007-05-25  Andreas Tobler  <a.tobler@schweiz.org>
 
-        * ltmain.sh: Fix Darwin verstring, remove ${wl}.
+	* ltmain.sh: Fix Darwin verstring, remove ${wl}.
 
 2007-05-24  Steve Ellcey  <sje@cup.hp.com>
 
