@@ -38,6 +38,8 @@ int find_package = 0;
 int list_package = 0;
 int grep_packages = 0;
 
+static char emptystr[] = "";
+
 /* This is global because it's used in both internet_display_error as well
    as package_grep.  */
 BOOL (WINAPI *pInternetCloseHandle) (HINTERNET);
@@ -114,7 +116,16 @@ static common_apps[] = {
 };
 
 static int num_paths, max_paths;
-static char **paths;
+struct pathlike
+{
+  char *dir;
+  bool issys;
+  void pathlike::check_existence (const char *fn, int showall, int verbose,
+				  char* first, const char *ext1 = "",
+				  const char *ext2 = "");
+};
+
+pathlike *paths;
 int first_nonsys_path;
 
 void
@@ -130,15 +141,41 @@ eprintf (const char *format, ...)
  * display_error() is used to report failure modes
  */
 static int
-display_error (const char *name, bool show_error = true, bool print_failed = true)
+display_error (const char *name, bool show_error, bool print_failed)
 {
+  fprintf (stderr, "cygcheck: %s", name);
   if (show_error)
-    fprintf (stderr, "cygcheck: %s%s: %lu\n", name,
+    fprintf (stderr, "%s: %lu\n",
 	print_failed ? " failed" : "", GetLastError ());
   else
-    fprintf (stderr, "cygcheck: %s%s\n", name,
+    fprintf (stderr, "%s\n",
 	print_failed ? " failed" : "");
   return 1;
+}
+
+static int
+display_error (const char *name)
+{
+  return display_error (name, true, true);
+}
+
+static int
+display_error (const char *fmt, const char *x)
+{
+  char buf[4000];
+  sprintf (buf, fmt, x);
+  return display_error (buf, false, false);
+}
+
+static int
+display_error_fmt (const char *fmt, ...)
+{
+  char buf[4000];
+  va_list va;
+
+  va_start (va, fmt);
+  vsprintf (buf, fmt, va);
+  return display_error (buf, false, false);
 }
 
 /* Display a WinInet error message, and close a variable number of handles.
@@ -156,12 +193,12 @@ display_internet_error (const char *message, ...)
   if (err)
     {
       if (FormatMessage (FORMAT_MESSAGE_FROM_HMODULE,
-          GetModuleHandle ("wininet.dll"), err, 0, err_buf,
-          sizeof (err_buf), NULL) == 0)
-        strcpy (err_buf, "(Unknown error)");
+	  GetModuleHandle ("wininet.dll"), err, 0, err_buf,
+	  sizeof (err_buf), NULL) == 0)
+	strcpy (err_buf, "(Unknown error)");
 
       fprintf (stderr, "cygcheck: %s: %s (win32 error %d)\n", message,
-               err_buf, err);
+	       err_buf, err);
     }
   else
     fprintf (stderr, "cygcheck: %s\n", message);
@@ -175,33 +212,37 @@ display_internet_error (const char *message, ...)
 }
 
 static void
-add_path (char *s, int maxlen)
+add_path (char *s, int maxlen, bool issys)
 {
   if (num_paths >= max_paths)
     {
       max_paths += 10;
-      if (paths)
-	paths = (char **) realloc (paths, max_paths * sizeof (char *));
-      else
-	paths = (char **) malloc (max_paths * sizeof (char *));
+      /* Extend path array */
+      paths = (pathlike *) realloc (paths, (1 + max_paths) * sizeof (paths[0]));
     }
-  paths[num_paths] = (char *) malloc (maxlen + 1);
-  if (paths[num_paths] == NULL)
+
+  pathlike *pth = paths + num_paths;
+
+  /* Allocate space for directory in path list */
+  char *dir = (char *) calloc (maxlen + 2, sizeof (char));
+  if (dir == NULL)
     {
-      display_error ("add_path: malloc()");
+      display_error ("add_path: calloc() failed");
       return;
     }
-  memcpy (paths[num_paths], s, maxlen);
-  paths[num_paths][maxlen] = 0;
-  char *e = paths[num_paths] + strlen (paths[num_paths]);
-  if (e[-1] == '\\' && e[-2] != ':')
-    *--e = 0;
-  for (int i = 1; i < num_paths; i++)
-    if (strcasecmp (paths[num_paths], paths[i]) == 0)
-      {
-	free (paths[num_paths]);
-	return;
-      }
+
+  /* Copy input directory to path list */
+  memcpy (dir, s, maxlen);
+
+  /* Add a trailing slash by default */
+  char *e = strchr (dir, '\0');
+  if (e != dir && e[-1] != '\\')
+    strcpy (e, "\\");
+
+  /* Fill out this element */
+  pth->dir = dir;
+  pth->issys = issys;
+  pth[1].dir = NULL;
   num_paths++;
 }
 
@@ -209,39 +250,39 @@ static void
 init_paths ()
 {
   char tmp[4000], *sl;
-  add_path ((char *) ".", 1);	/* to be replaced later */
+  add_path ((char *) ".", 1, true);	/* to be replaced later */
 
   if (GetCurrentDirectory (4000, tmp))
-    add_path (tmp, strlen (tmp));
+    add_path (tmp, strlen (tmp), true);
   else
     display_error ("init_paths: GetCurrentDirectory()");
 
   if (GetSystemDirectory (tmp, 4000))
-    add_path (tmp, strlen (tmp));
+    add_path (tmp, strlen (tmp), true);
   else
     display_error ("init_paths: GetSystemDirectory()");
   sl = strrchr (tmp, '\\');
   if (sl)
     {
       strcpy (sl, "\\SYSTEM");
-      add_path (tmp, strlen (tmp));
+      add_path (tmp, strlen (tmp), true);
     }
   GetWindowsDirectory (tmp, 4000);
-  add_path (tmp, strlen (tmp));
-  first_nonsys_path = num_paths;
+  add_path (tmp, strlen (tmp), true);
 
   char *wpath = getenv ("PATH");
   if (!wpath)
-    fprintf (stderr, "WARNING: PATH is not set at all!\n");
+    display_error ("WARNING: PATH is not set\n", "");
   else
     {
       char *b, *e;
       b = wpath;
       while (1)
 	{
-	  for (e = b; *e && *e != ';'; e++);
-	  if (strncmp(b, ".", 1) && strncmp(b, ".\\", 2))
-	    add_path (b, e - b);
+	  for (e = b; *e && *e != ';'; e++)
+	    continue;	/* loop terminates at first ';' or EOS */
+	  if (strncmp(b, ".\\", 2) != 0)
+	    add_path (b, e - b, false);
 	  if (!*e)
 	    break;
 	  b = e + 1;
@@ -251,9 +292,16 @@ init_paths ()
 
 #define LINK_EXTENSION ".lnk"
 
-static bool
-check_existence (char *file, int showall, int foundone, char *first)
+void
+pathlike::check_existence (const char *fn, int showall, int verbose,
+			   char* first, const char *ext1, const char *ext2)
 {
+  char file[4000];
+  strcpy (file, dir);
+  strcat (file, fn);
+  strcat (file, ext1);
+  strcat (file, ext2);
+
   if (GetFileAttributes (file) != (DWORD) - 1)
     {
       char *lastdot = strrchr (file, '.');
@@ -263,7 +311,7 @@ check_existence (char *file, int showall, int foundone, char *first)
 	*lastdot = '\0';
       if (showall)
 	printf ("Found: %s\n", file);
-      if (foundone)
+      if (verbose && *first != '\0' && strcasecmp (first, file) != 0)
 	{
 	  char *flastdot = strrchr (first, '.');
 	  bool f_is_link = flastdot && !strcmp (flastdot, LINK_EXTENSION);
@@ -276,84 +324,81 @@ check_existence (char *file, int showall, int foundone, char *first)
 	}
       if (is_link)
 	*lastdot = '.';
-      return true;
+      if (!*first)
+	strcpy (first, file);
     }
-  return false;
 }
 
-static char *
-find_on_path (char *file, char *default_extension,
-	      int showall = 0, int search_sysdirs = 0, int checklinks = 0)
+static const char *
+find_on_path (const char *in_file, const char *ext, bool showall = false,
+	      bool search_sys = false, bool checklinks = false)
 {
   static char rv[4000];
-  char tmp[4000], *ptr = rv;
+
+  /* Sort of a kludge but we've already tested this once, so don't try it again */
+  if (in_file == rv)
+    return in_file;
+
+  static pathlike abspath[2] =
+  {
+    {emptystr, 0},
+    {NULL, 0}
+  };
+
+  *rv = '\0';
+  if (!in_file)
+    {
+      display_error ("internal error find_on_path: NULL pointer for file", false, false);
+      return 0;
+    }
+
+  if (!ext)
+    {
+      display_error ("internal error find_on_path: NULL pointer for default_extension", false, false);
+      return 0;
+    }
+
+  const char *file;
+  pathlike *search_paths;
+  if (!strpbrk (in_file, ":/\\"))
+    {
+      file = in_file;
+      search_paths = paths;
+    }
+  else
+    {
+      file = cygpath (in_file, NULL);
+      search_paths = abspath;
+      showall = false;
+    }
 
   if (!file)
     {
-      display_error ("find_on_path: NULL pointer for file", false, false);
+      display_error ("internal error find_on_path: cygpath conversion failed for %s\n", in_file);
       return 0;
     }
 
-  if (default_extension == NULL)
-    {
-      display_error ("find_on_path: NULL pointer for default_extension", false, false);
-      return 0;
-    }
+  char *hasext = strrchr (file, '.');
+  if (hasext && !strpbrk (hasext, "/\\"))
+    ext = "";
 
-  if (strchr (file, ':') || strchr (file, '\\') || strchr (file, '/'))
-    {
-      // FIXME: this will find "foo" before "foo.exe" -- contrary to Windows
-      char *fn = cygpath (file, NULL);
-      if (access (fn, F_OK) == 0)
-	return fn;
-      strcpy (rv, fn);
-      strcat (rv, default_extension);
-      if (access (rv, F_OK) == 0)
-	return rv;
-      if (!checklinks)
-	return fn;
-      strcat (rv, LINK_EXTENSION);
-      if (access (rv, F_OK) == 0)
-	return rv;
-      strcpy (rv, fn);
-      strcat (rv, LINK_EXTENSION);
-      return access (rv, F_OK) == 0 ? strdup (rv) : fn;
-    }
+  for (pathlike *pth = search_paths; pth->dir; pth++)
+    if (!pth->issys || search_sys)
+      {
+	pth->check_existence (file, showall, verbose, rv, ext);
 
-  if (strchr (file, '.'))
-    default_extension = (char *) "";
+	if (checklinks)
+	  pth->check_existence (file, showall, verbose, rv, ext, LINK_EXTENSION);
 
-  for (int i = search_sysdirs ? 0 : first_nonsys_path; i < num_paths; i++)
-    {
-      if (i == 0 || !search_sysdirs || strcasecmp (paths[i], paths[0]))
-	{
-	  sprintf (ptr, "%s\\%s%s", paths[i], file, default_extension);
-	  if (check_existence (ptr, showall, ptr == tmp && verbose, rv))
-	    ptr = tmp;
+	if (!*ext)
+	  continue;
 
-	  if (!checklinks)
-	    continue;
+	pth->check_existence (file, showall, verbose, rv);
+	if (checklinks)
+	  pth->check_existence (file, showall, verbose, rv, LINK_EXTENSION);
+      }
 
-	  sprintf (ptr, "%s\\%s%s%s", paths[i], file, default_extension, LINK_EXTENSION);
-	  if (check_existence (ptr, showall, ptr == tmp && verbose, rv))
-	    ptr = tmp;
-
-	  if (!*default_extension)
-	    continue;
-
-	  sprintf (ptr, "%s\\%s", paths[i], file);
-	  if (check_existence (ptr, showall, ptr == tmp && verbose, rv))
-	    ptr = tmp;
-	  sprintf (ptr, "%s\\%s%s", paths[i], file, LINK_EXTENSION);
-	  if (check_existence (ptr, showall, ptr == tmp && verbose, rv))
-	    ptr = tmp;
-	}
-    }
-
-  if (ptr == tmp)
-    return rv;
-
-  return 0;
+  return *rv ? rv : NULL;
 }
 
 #define DID_NEW		1
@@ -369,7 +414,7 @@ struct Did
 static Did *did = 0;
 
 static Did *
-already_did (char *file)
+already_did (const char *file)
 {
   Did *d;
   for (d = did; d; d = d->next)
@@ -440,8 +485,7 @@ struct ImpDirectory
   unsigned iat_rva;
 };
 
-
-static bool track_down (char *file, char *suffix, int lvl);
+static bool track_down (const char *file, const char *suffix, int lvl);
 
 #define CYGPREFIX (sizeof ("%%% Cygwin ") - 1)
 static void
@@ -647,7 +691,7 @@ dll_info (const char *path, HANDLE fh, int lvl, int recurse)
 
 // Return true on success, false if error printed
 static bool
-track_down (char *file, char *suffix, int lvl)
+track_down (const char *file, const char *suffix, int lvl)
 {
   if (file == NULL)
     {
@@ -661,10 +705,10 @@ track_down (char *file, char *suffix, int lvl)
       return false;
     }
 
-  char *path = find_on_path (file, suffix, 0, 1);
+  const char *path = find_on_path (file, suffix, false, true);
   if (!path)
     {
-      printf ("Error: could not find %s\n", file);
+      display_error ("track_down: could not find %s\n", file);
       return false;
     }
 
@@ -700,7 +744,7 @@ track_down (char *file, char *suffix, int lvl)
 
   if (!path)
     {
-      printf ("%s not found\n", file);
+      display_error ("file not found - '%s'\n", file);
       return false;
     }
 
@@ -711,7 +755,7 @@ track_down (char *file, char *suffix, int lvl)
 		NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
   if (fh == INVALID_HANDLE_VALUE)
     {
-      printf (" - Cannot open\n");
+      display_error ("cannot open - '%s'\n", path);
       return false;
     }
 
@@ -720,15 +764,15 @@ track_down (char *file, char *suffix, int lvl)
   if (is_exe (fh))
     dll_info (path, fh, lvl, 1);
   else if (is_symlink (fh))
-    printf (" - Found a symlink instead of a DLL\n");
+    display_error ("%s is a symlink instead of a DLL\n", path);
   else
     {
       int magic = get_word (fh, 0x0);
       if (magic == -1)
-        display_error ("get_word");
+	display_error ("get_word");
       magic &= 0x00FFFFFF;
-      printf (" - Not a DLL: magic number %x (%d) '%s'\n",
-              magic, magic, (char *)&magic);
+      display_error_fmt ("%s is not a DLL: magic number %x (%d) '%s'\n",
+			 path, magic, magic, (char *)&magic);
     }
 
   d->state = DID_INACTIVE;
@@ -760,19 +804,16 @@ ls (char *f)
 }
 
 // Find a real application on the path (possibly following symlinks)
-static char *
-find_app_on_path (char *app, int showall = 0)
+static const char *
+find_app_on_path (const char *app, bool showall = false)
 {
-  char *papp = find_on_path (app, (char *) ".exe", showall, 0, 1);
+  const char *papp = find_on_path (app, ".exe", showall, false, true);
 
   HANDLE fh =
     CreateFile (papp, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
 		NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
   if (fh == INVALID_HANDLE_VALUE)
-    {
-      printf (" - Cannot open\n");
-      return NULL;
-    }
+    return NULL;
 
   if (is_symlink (fh))
     {
@@ -806,28 +847,33 @@ find_app_on_path (char *app, int showall = 0)
 
 // Return true on success, false if error printed
 static bool
-cygcheck (char *app)
+cygcheck (const char *app)
 {
-  char *papp = find_app_on_path (app, 1);
+  const char *papp = find_app_on_path (app, 1);
   if (!papp)
     {
-      printf ("Error: could not find %s\n", app);
+      display_error ("could not find '%s'\n", app);
       return false;
     }
-  char *s = strdup (papp);
-  char *sl = 0, *t;
-  for (t = s; *t; t++)
-    if (*t == '/' || *t == '\\' || *t == ':')
-      sl = t;
-  if (sl == 0)
-    paths[0] = (char *) ".";
+
+  char *s;
+  char *sep = strpbrk (papp, ":/\\");
+  if (!sep)
+    {
+      static char dot[] = ".";
+      s = dot;
+    }
   else
     {
-      *sl = 0;
-      paths[0] = s;
+      int n = sep - papp;
+      s = (char *) malloc (n + 2);
+      memcpy ((char *) s, papp, n);
+      strcpy (s + n, "\\");
     }
-  did = 0;
-  return track_down (papp, (char *) ".exe", 0);
+
+  paths[0].dir = s;
+  did = NULL;
+  return track_down (papp, ".exe", 0);
 }
 
 
@@ -1192,15 +1238,15 @@ dump_sysinfo ()
 	  else if (osversion.dwMinorVersion == 1)
 	    {
 	      if (GetSystemMetrics (SM_MEDIACENTER))
-	        osname = "XP Media Center Edition";
+		osname = "XP Media Center Edition";
 	      else if (GetSystemMetrics (SM_TABLETPC))
-	        osname = "XP Tablet PC Edition";
+		osname = "XP Tablet PC Edition";
 	      else if (!more_info)
 		osname = "XP";
 	      else if (osversionex.wSuiteMask & VER_SUITE_PERSONAL)
-	        osname = "XP Home Edition";
+		osname = "XP Home Edition";
 	      else
-	        osname = "XP Professional";
+		osname = "XP Professional";
 	    }
 	  else if (osversion.dwMinorVersion == 2)
 	    {
@@ -1238,12 +1284,12 @@ dump_sysinfo ()
   if (wow64_func && wow64_func (GetCurrentProcess (), &is_wow64) && is_wow64)
     {
       void (WINAPI *nativinfo) (LPSYSTEM_INFO) = (void (WINAPI *)
-        (LPSYSTEM_INFO)) GetProcAddress (k32, "GetNativeSystemInfo");
+	(LPSYSTEM_INFO)) GetProcAddress (k32, "GetNativeSystemInfo");
       SYSTEM_INFO natinfo;
       nativinfo (&natinfo);
       fputs ("\nRunning under WOW64 on ", stdout);
       switch (natinfo.wProcessorArchitecture)
-        {
+	{
 	  case PROCESSOR_ARCHITECTURE_IA64:
 	    puts ("IA64");
 	    break;
@@ -1522,8 +1568,6 @@ dump_sysinfo ()
     }
   printf ("\n");
 
-  add_path ((char *) "\\bin", 4);	/* just in case */
-
   if (givehelp)
     printf
       ("Looking to see where common programs can be found, if at all...\n");
@@ -1540,10 +1584,10 @@ dump_sysinfo ()
   if (givehelp)
     printf ("Looking for various Cygwin DLLs...  (-v gives version info)\n");
   int cygwin_dll_count = 0;
-  for (i = 1; i < num_paths; i++)
+  for (pathlike *pth = paths; pth->dir; pth++)
     {
       WIN32_FIND_DATA ffinfo;
-      sprintf (tmp, "%s/*.*", paths[i]);
+      sprintf (tmp, "%s*.*", pth->dir);
       HANDLE ff = FindFirstFile (tmp, &ffinfo);
       int found = (ff != INVALID_HANDLE_VALUE);
       found_cygwin_dll = NULL;
@@ -1554,7 +1598,7 @@ dump_sysinfo ()
 	    {
 	      if (strncasecmp (f, "cyg", 3) == 0)
 		{
-		  sprintf (tmp, "%s\\%s", paths[i], f);
+		  sprintf (tmp, "%s%s", pth->dir, f);
 		  if (strcasecmp (f, "cygwin1.dll") == 0)
 		    {
 		      cygwin_dll_count++;
@@ -1672,7 +1716,7 @@ static const char safe_chars[] = "$-_.+!*'(),";
 
 /* the URL to query.  */
 static const char base_url[] =
-        "http://cygwin.com/cgi-bin2/package-grep.cgi?text=1&grep=";
+	"http://cygwin.com/cgi-bin2/package-grep.cgi?text=1&grep=";
 
 /* Queries Cygwin web site for packages containing files matching a regexp.
    Return value is 1 if there was a problem, otherwise 0.  */
@@ -1687,7 +1731,7 @@ package_grep (char *search)
   if (!(hWinInet = LoadLibrary ("wininet.dll")))
     {
       fputs ("Unable to locate WININET.DLL.  This feature requires Microsoft "
-             "Internet Explorer v3 or later to function.\n", stderr);
+	     "Internet Explorer v3 or later to function.\n", stderr);
       return 1;
     }
 
@@ -1696,25 +1740,25 @@ package_grep (char *search)
      and call GetProcAddress for each of them with the following macro.  */
 
   pInternetCloseHandle = (BOOL (WINAPI *) (HINTERNET))
-                            GetProcAddress (hWinInet, "InternetCloseHandle");
+			    GetProcAddress (hWinInet, "InternetCloseHandle");
 #define make_func_pointer(name, ret, args) ret (WINAPI * p##name) args = \
-            (ret (WINAPI *) args) GetProcAddress (hWinInet, #name);
+	    (ret (WINAPI *) args) GetProcAddress (hWinInet, #name);
   make_func_pointer (InternetAttemptConnect, DWORD, (DWORD));
-  make_func_pointer (InternetOpenA, HINTERNET, (LPCSTR, DWORD, LPCSTR, LPCSTR, 
-                                                DWORD));
-  make_func_pointer (InternetOpenUrlA, HINTERNET, (HINTERNET, LPCSTR, LPCSTR, 
-                                                   DWORD, DWORD, DWORD));
+  make_func_pointer (InternetOpenA, HINTERNET, (LPCSTR, DWORD, LPCSTR, LPCSTR,
+						DWORD));
+  make_func_pointer (InternetOpenUrlA, HINTERNET, (HINTERNET, LPCSTR, LPCSTR,
+						   DWORD, DWORD, DWORD));
   make_func_pointer (InternetReadFile, BOOL, (HINTERNET, PVOID, DWORD, PDWORD));
   make_func_pointer (HttpQueryInfoA, BOOL, (HINTERNET, DWORD, PVOID, PDWORD,
-                                            PDWORD));
+					    PDWORD));
 #undef make_func_pointer
 
   if(!pInternetCloseHandle || !pInternetAttemptConnect || !pInternetOpenA
      || !pInternetOpenUrlA || !pInternetReadFile || !pHttpQueryInfoA)
     {
       fputs ("Unable to load one or more functions from WININET.DLL.  This "
-             "feature requires Microsoft Internet Explorer v3 or later to "
-             "function.\n", stderr);
+	     "feature requires Microsoft Internet Explorer v3 or later to "
+	     "function.\n", stderr);
       return 1;
     }
 
@@ -1726,16 +1770,16 @@ package_grep (char *search)
   for (dest = &url[sizeof (base_url) - 1]; *search; search++)
     {
       if (isalnum (*search)
-          || memchr (safe_chars, *search, sizeof (safe_chars) - 1))
-        {
-          *dest++ = *search;
-        }
+	  || memchr (safe_chars, *search, sizeof (safe_chars) - 1))
+	{
+	  *dest++ = *search;
+	}
       else
-        {
-          *dest++ = '%';
-          sprintf (dest, "%02x", (unsigned char) *search);
-          dest += 2;
-        }
+	{
+	  *dest++ = '%';
+	  sprintf (dest, "%02x", (unsigned char) *search);
+	  dest += 2;
+	}
     }
   *dest = 0;
 
@@ -1753,18 +1797,18 @@ package_grep (char *search)
 
   if (!(hurl = pInternetOpenUrlA (hi, url, NULL, 0, 0, 0)))
     return display_internet_error ("unable to contact cygwin.com site, "
-                                   "InternetOpenUrl() failed", hi, NULL);
+				   "InternetOpenUrl() failed", hi, NULL);
 
   /* Check the HTTP response code.  */
   DWORD rc = 0, rc_s = sizeof (DWORD);
   if (!pHttpQueryInfoA (hurl, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER,
-                      (void *) &rc, &rc_s, NULL))
+		      (void *) &rc, &rc_s, NULL))
     return display_internet_error ("HttpQueryInfo() failed", hurl, hi, NULL);
 
   if (rc != HTTP_STATUS_OK)
     {
       sprintf (buf, "error retrieving results from cygwin.com site, "
-                    "HTTP status code %lu", rc);
+		    "HTTP status code %lu", rc);
       return display_internet_error (buf, hurl, hi, NULL);
     }
 
@@ -1773,9 +1817,9 @@ package_grep (char *search)
   do
     {
       if (!pInternetReadFile (hurl, (void *) buf, sizeof (buf), &numread))
-        return display_internet_error ("InternetReadFile failed", hurl, hi, NULL);
+	return display_internet_error ("InternetReadFile failed", hurl, hi, NULL);
       if (numread)
-        fwrite ((void *) buf, (size_t) numread, 1, stdout);
+	fwrite ((void *) buf, (size_t) numread, 1, stdout);
     }
   while (numread);
 
@@ -1955,8 +1999,8 @@ main (int argc, char **argv)
 	list_package = 1;
 	break;
       case 'p':
-        grep_packages = 1;
-        break;
+	grep_packages = 1;
+	break;
       case 'h':
 	givehelp = 1;
 	break;

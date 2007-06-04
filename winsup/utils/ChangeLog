@@ -1,3 +1,35 @@
+2007-06-03  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygcheck.cc (pathlike): New class.
+	(paths): Redefine as type pathlike.
+	(display_error): Declare a few different ways to allow more flexible
+	usage throughout.
+	(display_error_fmt): New function for those cases where C++ just isn't
+	enough.
+	(add_path): Rewrite to allocate pathlike paths.  Always tack on a
+	trailing slash since that's what everyone who uses it wants.  NULL
+	terminate the path list.  Register "it's a system path" field.
+	(init_path): Call add_path with info regarding whether path is a system
+	path or not.
+	(pathlike::check_existence): Move into pathlike class.  Accept file and
+	extension arguments to build up path on the fly.  Modify other
+	arguments.
+	(find_on_path): Constify return value and appropriate arguments.
+	Eliminate short-circuit for fully-qualified paths.  Simplify loop which
+	iterates over path.
+	(already_did): Constify argument.
+	(track_down): Ditto.  Regularize some error messages.
+	(find_app_on_path): Ditto.
+	(cygcheck): Constify argument.  Use 20th century string handling
+	functions.
+	(dump_sysinfo): Remove odd inclusion of '\\bin' "Just in case".
+	Accommodate change of paths to pathlike.
+	* path.cc (isslash): Rename from SLASH_P and use throughout.
+	(rel_vconcat): Front-end to vconcat which prepends cwd to path before
+	passing along for conversion to native windows.
+	(cygpath): Remove "./" test.  Call rel_vconcat if filename appears to
+	be relative.
+
 2007-05-29  Pedro Alves  <pedro_alves@portugalmail.pt>
 
 	* dumper.cc (dumper::prepare_core_dump): Record a phdr for each section.

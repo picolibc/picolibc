@@ -1,6 +1,6 @@
 /* path.cc
 
-   Copyright 2001, 2002, 2003, 2005 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -24,7 +24,7 @@ details. */
 #include "cygwin/include/mntent.h"
 
 /* Used when treating / and \ as equivalent. */
-#define SLASH_P(ch) \
+#define isslash(ch) \
   ({ \
       char __c = (ch); \
       ((__c) == '/' || (__c) == '\\'); \
@@ -150,7 +150,7 @@ is_symlink (HANDLE fh)
       if (got != size || !cmp_shortcut_header ((win_shortcut_hdr *) buf))
 	return false; /* Not a Cygwin symlink. */
       /* TODO: check for invalid path contents
-         (see symlink_info::check() in ../cygwin/path.cc) */
+	 (see symlink_info::check() in ../cygwin/path.cc) */
     }
   else /* magic == SYMLINK_MAGIC */
     {
@@ -161,7 +161,7 @@ is_symlink (HANDLE fh)
       if (!ReadFile (fh, buf, sizeof (buf), &got, 0))
 	return false;
       if (got != sizeof (buf) ||
-          memcmp (buf, SYMLINK_COOKIE, sizeof (buf)) != 0)
+	  memcmp (buf, SYMLINK_COOKIE, sizeof (buf)) != 0)
 	return false; /* Not a Cygwin symlink. */
     }
   return true;
@@ -184,11 +184,11 @@ readlink (HANDLE fh, char *path, int maxlen)
 	  return false;
 	}
       if (SetFilePointer (fh, 0x4c + offset + 4, 0, FILE_BEGIN) ==
-          INVALID_SET_FILE_POINTER && GetLastError () != NO_ERROR)
-        return false;
+	  INVALID_SET_FILE_POINTER && GetLastError () != NO_ERROR)
+	return false;
 
       if (!ReadFile (fh, path, slen, (DWORD *) &got, 0))
-        return false;
+	return false;
       else if (got < slen)
 	{
 	  SetLastError (ERROR_READ_FAULT);
@@ -203,15 +203,15 @@ readlink (HANDLE fh, char *path, int maxlen)
 
       if (SetFilePointer (fh, 0, 0, FILE_BEGIN) == INVALID_SET_FILE_POINTER
 	  && GetLastError () != NO_ERROR)
-        return false;
+	return false;
 
       if (!ReadFile (fh, cookie_buf, sizeof (cookie_buf), (DWORD *) &got, 0))
-        return false;
+	return false;
       else if (got == sizeof (cookie_buf)
 	       && memcmp (cookie_buf, SYMLINK_COOKIE, sizeof (cookie_buf)) == 0)
 	{
 	  if (!ReadFile (fh, path, maxlen, (DWORD *) &got, 0))
-            return false;
+	    return false;
 	  else if (got >= maxlen)
 	    {
 	      SetLastError (ERROR_FILENAME_EXCED_RANGE);
@@ -378,16 +378,16 @@ static int
 path_prefix_p (const char *path1, const char *path2, int len1)
 {
   /* Handle case where PATH1 has trailing '/' and when it doesn't.  */
-  if (len1 > 0 && SLASH_P (path1[len1 - 1]))
+  if (len1 > 0 && isslash (path1[len1 - 1]))
     len1--;
 
   if (len1 == 0)
-    return SLASH_P (path2[0]) && !SLASH_P (path2[1]);
+    return isslash (path2[0]) && !isslash (path2[1]);
 
   if (strncasecmp (path1, path2, len1) != 0)
     return 0;
 
-  return SLASH_P (path2[len1]) || path2[len1] == 0 || path1[len1 - 1] == ':';
+  return isslash (path2[len1]) || path2[len1] == 0 || path1[len1 - 1] == ':';
 }
 
 static char *
@@ -403,7 +403,7 @@ vconcat (const char *s, va_list v)
 
   len = strlen (s);
 
-  unc = SLASH_P (*s) && SLASH_P (s[1]);
+  unc = isslash (*s) && isslash (s[1]);
 
   while (1)
     {
@@ -462,6 +462,43 @@ concat (const char *s, ...)
   return vconcat (s, v);
 }
 
+static char *
+rel_vconcat (const char *s, va_list v)
+{
+  char path[MAX_PATH + 1];
+  if (!GetCurrentDirectory (MAX_PATH, path))
+    return NULL;
+
+  int max_len = -1;
+  struct mnt *m, *match = NULL;
+
+  if (s[0] == '.' && isslash (s[1]))
+    s += 2;
+
+  for (m = mount_table; m->posix ; m++)
+    {
+      if (m->flags & MOUNT_CYGDRIVE)
+	continue;
+
+      int n = strlen (m->native);
+      if (n < max_len || !path_prefix_p (m->native, path, n))
+	continue;
+      max_len = n;
+      match = m;
+    }
+
+  if (match)
+    strcpy (path, match->posix);
+
+  if (!isslash (strchr (path, '\0')[-1]))
+    strcat (path, "/");
+
+  char *temppath = concat (path, s, NULL);
+  char *res = vconcat (temppath, v);
+  free (temppath);
+  return res;
+}
+
 char *
 cygpath (const char *s, ...)
 {
@@ -472,9 +509,15 @@ cygpath (const char *s, ...)
   if (!mount_table[0].posix)
     read_mounts ();
   va_start (v, s);
-  char *path = vconcat (s, v);
-  if (strncmp (path, "./", 2) == 0)
-    memmove (path, path + 2, strlen (path + 2) + 1);
+  char *path;
+  if (s[0] == '/' || s[1] == ':')	/* FIXME: too crude? */
+    path = vconcat (s, v);
+  else
+    path = rel_vconcat (s, v);
+
+  if (!path)
+    return NULL;
+
   if (strncmp (path, "/./", 3) == 0)
     memmove (path + 1, path + 3, strlen (path + 3) + 1);
 
@@ -542,7 +585,7 @@ getmntent (FILE *)
     strcat (mnt.mnt_opts, (char *) ",noexec");
   if (m->flags & MOUNT_ENC)
     strcat (mnt.mnt_opts, ",managed");
-  if ((m->flags & MOUNT_CYGDRIVE))             /* cygdrive */
+  if ((m->flags & MOUNT_CYGDRIVE))	/* cygdrive */
     strcat (mnt.mnt_opts, (char *) ",cygdrive");
   mnt.mnt_freq = 1;
   mnt.mnt_passno = 1;
