@@ -98,7 +98,7 @@ _DEFUN(__sfvwrite_r, (ptr, fp, uio),
       do
 	{
 	  GETIOV (;);
-	  w = (*fp->_write) (fp->_cookie, p, MIN (len, BUFSIZ));
+	  w = fp->_write (ptr, fp->_cookie, p, MIN (len, BUFSIZ));
 	  if (w <= 0)
 	    goto err;
 	  p += w;
@@ -191,7 +191,7 @@ _DEFUN(__sfvwrite_r, (ptr, fp, uio),
 	  else if (len >= (w = fp->_bf._size))
 	    {
 	      /* write directly */
-	      w = (*fp->_write) (fp->_cookie, p, w);
+	      w = fp->_write (ptr, fp->_cookie, p, w);
 	      if (w <= 0)
 		goto err;
 	    }
@@ -240,7 +240,7 @@ _DEFUN(__sfvwrite_r, (ptr, fp, uio),
 	    }
 	  else if (s >= (w = fp->_bf._size))
 	    {
-	      w = (*fp->_write) (fp->_cookie, p, w);
+	      w = fp->_write (ptr, fp->_cookie, p, w);
 	      if (w <= 0)
 		goto err;
 	    }

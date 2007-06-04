@@ -33,7 +33,7 @@ TRAD_SYNOPSIS
 	#include <stdio.h>
 	int fclose(<[fp]>)
 	FILE *<[fp]>;
-        
+
 	int fclose(<[fp]>)
         struct _reent *<[reent]>
 	FILE *<[fp]>;
@@ -79,7 +79,7 @@ _DEFUN(_fclose_r, (rptr, fp),
   CHECK_INIT (rptr, fp);
 
   _flockfile (fp);
-  
+
   if (fp->_flags == 0)		/* not open! */
     {
       _funlockfile (fp);
@@ -90,7 +90,7 @@ _DEFUN(_fclose_r, (rptr, fp),
      files to reposition file to last byte processed as opposed to
      last byte read ahead into the buffer.  */
   r = fflush (fp);
-  if (fp->_close != NULL && (*fp->_close) (fp->_cookie) < 0)
+  if (fp->_close != NULL && fp->_close (rptr, fp->_cookie) < 0)
     r = EOF;
   if (fp->_flags & __SMBF)
     _free_r (rptr, (char *) fp->_bf._base);

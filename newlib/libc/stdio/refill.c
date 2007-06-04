@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990, 2007 The Regents of the University of California.
+ * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -104,7 +104,7 @@ _DEFUN(__srefill_r, (ptr, fp),
   if (fp->_flags & (__SLBF | __SNBF))
     _CAST_VOID _fwalk (_GLOBAL_REENT, lflush);
   fp->_p = fp->_bf._base;
-  fp->_r = (*fp->_read) (fp->_cookie, (char *) fp->_p, fp->_bf._size);
+  fp->_r = fp->_read (ptr, fp->_cookie, (char *) fp->_p, fp->_bf._size);
   fp->_flags &= ~__SMOD;	/* buffer contents are again pristine */
 #ifndef __CYGWIN__
   if (fp->_r <= 0)

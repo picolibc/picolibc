@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990, 2006 The Regents of the University of California.
+ * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -90,7 +90,7 @@ _DEFUN(fflush, (fp),
   t = fp->_flags;
   if ((t & __SWR) == 0)
     {
-      _fpos_t _EXFUN((*seekfn), (_PTR, _fpos_t, int));
+      _fpos_t _EXFUN((*seekfn), (struct _reent *, _PTR, _fpos_t, int));
 
       /* For a read stream, an fflush causes the next seek to be
          unoptimized (i.e. forces a system-level seek).  This conforms
@@ -114,7 +114,7 @@ _DEFUN(fflush, (fp),
           else
             {
               /* We don't know current physical offset, so ask for it.  */
-              curoff = (*seekfn) (fp->_cookie, (_fpos_t) 0, SEEK_CUR);
+              curoff = seekfn (_REENT, fp->_cookie, (_fpos_t) 0, SEEK_CUR);
               if (curoff == -1L)
                 {
                   _funlockfile (fp);
@@ -130,7 +130,7 @@ _DEFUN(fflush, (fp),
                 curoff -= fp->_ur;
             }
           /* Now physically seek to after byte last read.  */
-          if ((*seekfn)(fp->_cookie, curoff, SEEK_SET) != -1)
+          if (seekfn (_REENT, fp->_cookie, curoff, SEEK_SET) != -1)
             {
               /* Seek successful.  We can clear read buffer now.  */
               fp->_flags &= ~__SNPT;
@@ -139,7 +139,7 @@ _DEFUN(fflush, (fp),
               if (fp->_flags & __SOFF)
                 fp->_offset = curoff;
             }
-        } 
+        }
       _funlockfile (fp);
       return 0;
     }
@@ -161,7 +161,7 @@ _DEFUN(fflush, (fp),
 
   while (n > 0)
     {
-      t = (*fp->_write) (fp->_cookie, (char *) p, n);
+      t = fp->_write (_REENT, fp->_cookie, (char *) p, n);
       if (t <= 0)
 	{
           fp->_flags |= __SERR;

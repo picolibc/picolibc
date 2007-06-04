@@ -125,7 +125,7 @@ _DEFUN(_ftell_r, (ptr, fp),
     pos = fp->_offset;
   else
     {
-      pos = (*fp->_seek) (fp->_cookie, (_fpos_t) 0, SEEK_CUR);
+      pos = fp->_seek (ptr, fp->_cookie, (_fpos_t) 0, SEEK_CUR);
       if (pos == -1L)
         {
           _funlockfile (fp);
@@ -154,6 +154,11 @@ _DEFUN(_ftell_r, (ptr, fp),
     }
 
   _funlockfile (fp);
+  if ((long)pos != pos)
+    {
+      pos = -1;
+      ptr->_errno = EOVERFLOW;
+    }
   return pos;
 }
 

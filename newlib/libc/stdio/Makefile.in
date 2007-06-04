@@ -110,6 +110,8 @@ am__objects_1 = lib_a-clearerr.$(OBJEXT) lib_a-fclose.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-asnprintf.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-diprintf.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-dprintf.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-fopencookie.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-funopen.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-vasniprintf.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-vasnprintf.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
@@ -139,6 +141,8 @@ am__objects_4 = clearerr.lo fclose.lo fdopen.lo feof.lo ferror.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	asnprintf.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	diprintf.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	dprintf.lo \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fopencookie.lo \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	funopen.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vasniprintf.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vasnprintf.lo
 @USE_LIBTOOL_TRUE@am_libstdio_la_OBJECTS = $(am__objects_4) \
@@ -419,6 +423,8 @@ GENERAL_SOURCES = \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	asnprintf.c		\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	diprintf.c		\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	dprintf.c		\
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fopencookie.c		\
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	funopen.c		\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vasniprintf.c		\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vasnprintf.c
 
@@ -459,6 +465,7 @@ CHEWOUT_FILES = \
 	fileno.def		\
 	fiprintf.def		\
 	fopen.def		\
+	fopencookie.def		\
 	fputc.def		\
 	fputs.def		\
 	fread.def		\
@@ -466,6 +473,7 @@ CHEWOUT_FILES = \
 	fseek.def		\
 	fsetpos.def		\
 	ftell.def		\
+	funopen.def		\
 	fwrite.def		\
 	getc.def		\
 	getchar.def		\
@@ -1130,6 +1138,18 @@ lib_a-dprintf.o: dprintf.c
 lib_a-dprintf.obj: dprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dprintf.obj `if test -f 'dprintf.c'; then $(CYGPATH_W) 'dprintf.c'; else $(CYGPATH_W) '$(srcdir)/dprintf.c'; fi`
 
+lib_a-fopencookie.o: fopencookie.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fopencookie.o `test -f 'fopencookie.c' || echo '$(srcdir)/'`fopencookie.c
+
+lib_a-fopencookie.obj: fopencookie.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fopencookie.obj `if test -f 'fopencookie.c'; then $(CYGPATH_W) 'fopencookie.c'; else $(CYGPATH_W) '$(srcdir)/fopencookie.c'; fi`
+
+lib_a-funopen.o: funopen.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-funopen.o `test -f 'funopen.c' || echo '$(srcdir)/'`funopen.c
+
+lib_a-funopen.obj: funopen.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-funopen.obj `if test -f 'funopen.c'; then $(CYGPATH_W) 'funopen.c'; else $(CYGPATH_W) '$(srcdir)/funopen.c'; fi`
+
 lib_a-vasniprintf.o: vasniprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vasniprintf.o `test -f 'vasniprintf.c' || echo '$(srcdir)/'`vasniprintf.c
 
@@ -1323,11 +1343,13 @@ $(lpfx)fdopen.$(oext): local.h
 $(lpfx)fflush.$(oext): local.h
 $(lpfx)findfp.$(oext): local.h
 $(lpfx)fopen.$(oext): local.h
+$(lpfx)fopencookie.$(oext): local.h
 $(lpfx)fputs.$(oext): fvwrite.h
 $(lpfx)fread.$(oext): local.h
 $(lpfx)freopen.$(oext): local.h
 $(lpfx)fseek.$(oext): local.h
 $(lpfx)ftell.$(oext): local.h
+$(lpfx)funopen.$(oext): local.h
 $(lpfx)fvwrite.$(oext): local.h fvwrite.h
 $(lpfx)fwalk.$(oext): local.h
 $(lpfx)fwrite.$(oext): local.h fvwrite.h

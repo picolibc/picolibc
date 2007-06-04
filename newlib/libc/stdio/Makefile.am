@@ -117,6 +117,8 @@ ELIX_4_SOURCES = \
 	asnprintf.c		\
 	diprintf.c		\
 	dprintf.c		\
+	fopencookie.c		\
+	funopen.c		\
 	vasniprintf.c		\
 	vasnprintf.c
 endif !ELIX_LEVEL_3
@@ -179,6 +181,7 @@ CHEWOUT_FILES = \
 	fileno.def		\
 	fiprintf.def		\
 	fopen.def		\
+	fopencookie.def		\
 	fputc.def		\
 	fputs.def		\
 	fread.def		\
@@ -186,6 +189,7 @@ CHEWOUT_FILES = \
 	fseek.def		\
 	fsetpos.def		\
 	ftell.def		\
+	funopen.def		\
 	fwrite.def		\
 	getc.def		\
 	getchar.def		\
@@ -241,11 +245,13 @@ $(lpfx)fdopen.$(oext): local.h
 $(lpfx)fflush.$(oext): local.h
 $(lpfx)findfp.$(oext): local.h
 $(lpfx)fopen.$(oext): local.h
+$(lpfx)fopencookie.$(oext): local.h
 $(lpfx)fputs.$(oext): fvwrite.h
 $(lpfx)fread.$(oext): local.h
 $(lpfx)freopen.$(oext): local.h
 $(lpfx)fseek.$(oext): local.h
 $(lpfx)ftell.$(oext): local.h
+$(lpfx)funopen.$(oext): local.h
 $(lpfx)fvwrite.$(oext): local.h fvwrite.h
 $(lpfx)fwalk.$(oext): local.h
 $(lpfx)fwrite.$(oext): local.h fvwrite.h

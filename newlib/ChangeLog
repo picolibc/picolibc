@@ -1,3 +1,40 @@
+2007-06-04  Eric Blake  <ebb9@byu.net>
+
+	Implement funopen, fopencookie.
+	* libc/include/sys/reent.h (struct __sFILE, struct __sFILE64):
+	Switch to reentrant callbacks.
+	* libc/include/stdio.h (funopen): Fix declaration.
+	(fopencookie): Declare.
+	* libc/stdio/local.h (__sread, __swrite, __sseek, __sclose)
+	(__sseek64, __swrite64): Fix prototypes.
+	[__SCLE]: Pull in setmode declaration.
+	* libc/stdio/stdio.c (__sread, __swrite, __sseek, __sclose): Fix
+	reentrancy.
+	* libc/stdio64/stdio64.c (__sseek64_r, __swrite64_r): Delete.
+	(__sseek64, __swrite64): Fix reentrancy.
+	* libc/stdio/fseek.c (_fseek_r): Account for overflow, and fix
+	reentrancy.
+	* libc/stdio/ftell.c (_ftell_r): Likewise.
+	* libc/stdio/flags.c (__sflags): Don't lose __SAPP on "a+".
+	* libc/stdio/fclose.c (_fclose_r): Fix reentrancy.
+	* libc/stdio/freopen.c (_freopen_r): Likewise.
+	* libc/stdio/fvwrite.c (__sfvwrite_r): Likewise.
+	* libc/stdio/refill.c (__srefill_r): Likewise.
+	* libc/stdio/siscanf.c (eofread): Likewise.
+	* libc/stdio/sscanf.c (eofread): Likewise.
+	* libc/stdio/vsiscanf.c (eofread1): Likewise.
+	* libc/stdio/vsscanf.c (eofread1): Likewise.
+	* libc/stdio64/freopen64.c (_freopen64_r): Likewise.
+	* libc/stdio64/fseeko64.c (_fseeko64_r): Likewise.
+	* libc/stdio64/ftello64.c (_ftello64_r): Likewise.
+	* libc/stdio/fflush.c (fflush): Improve reentrancy, although more
+	could be fixed.
+	* libc/stdio/fopencookie.c (_fopencookie_r, fopencookie): New file.
+	* libc/stdio/funopen.c (_funopen_r, funopen): New file.
+	* libc/stdio/Makefile.am (ELIX_4_SOURCES, CHEWOUT_FILES): Build
+	new files.
+	* libc/stdio/Makefile.in: Regenerate.
+
 2007-05-29  Eric Blake  <ebb9@byu.net>
 
 	Avoid more compiler warnings.

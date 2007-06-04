@@ -29,7 +29,8 @@
 #include "local.h"
 
 static _READ_WRITE_RETURN_TYPE
-_DEFUN(eofread1, (cookie, buf, len),
+_DEFUN(eofread1, (ptr, cookie, buf, len),
+       struct _reent *ptr _AND
        _PTR cookie _AND
        char *buf   _AND
        int len)

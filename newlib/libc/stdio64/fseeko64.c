@@ -104,7 +104,7 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
      _off64_t offset _AND
      int whence)
 {
-  _fpos64_t _EXFUN ((*seekfn), (void *, _fpos64_t, int));
+  _fpos64_t _EXFUN ((*seekfn), (struct _reent *, void *, _fpos64_t, int));
   _fpos64_t target, curoff;
   size_t n;
 
@@ -155,7 +155,7 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
 	curoff = fp->_offset;
       else
 	{
-	  curoff = (*seekfn) (fp->_cookie, (_fpos64_t) 0, SEEK_CUR);
+	  curoff = seekfn (ptr, fp->_cookie, (_fpos64_t) 0, SEEK_CUR);
 	  if (curoff == -1L)
 	    {
 	      _funlockfile(fp);
@@ -238,7 +238,7 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
 	curoff = fp->_offset;
       else
 	{
-	  curoff = (*seekfn) (fp->_cookie, (_fpos64_t)0, SEEK_CUR);
+	  curoff = seekfn (ptr, fp->_cookie, (_fpos64_t)0, SEEK_CUR);
 	  if (curoff == POS_ERR)
 	    goto dumb;
 	}
@@ -299,7 +299,7 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
    */
 
   curoff = target & ~((_fpos64_t)(fp->_blksize - 1));
-  if ((*seekfn) (fp->_cookie, curoff, SEEK_SET) == POS_ERR)
+  if (seekfn (ptr, fp->_cookie, curoff, SEEK_SET) == POS_ERR)
     goto dumb;
   fp->_r = 0;
   fp->_p = fp->_bf._base;
@@ -323,7 +323,7 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
    */
 
 dumb:
-  if (fflush (fp) || (*seekfn) (fp->_cookie, offset, whence) == POS_ERR)
+  if (fflush (fp) || seekfn (ptr, fp->_cookie, offset, whence) == POS_ERR)
     {
       _funlockfile(fp);
       return EOF;

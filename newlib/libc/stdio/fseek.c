@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990, 2007 The Regents of the University of California.
+ * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -122,7 +122,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
        long offset        _AND
        int whence)
 {
-  _fpos_t _EXFUN((*seekfn), (_PTR, _fpos_t, int));
+  _fpos_t _EXFUN((*seekfn), (struct _reent *, _PTR, _fpos_t, int));
   _fpos_t target;
   _fpos_t curoff = 0;
   size_t n;
@@ -175,7 +175,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
 	curoff = fp->_offset;
       else
 	{
-	  curoff = (*seekfn) (fp->_cookie, (_fpos_t) 0, SEEK_CUR);
+	  curoff = seekfn (ptr, fp->_cookie, (_fpos_t) 0, SEEK_CUR);
 	  if (curoff == -1L)
 	    {
 	      _funlockfile (fp);
@@ -259,6 +259,11 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
 	goto dumb;
       target = st.st_size + offset;
     }
+  if ((long)target != target)
+    {
+      ptr->_errno = EOVERFLOW;
+      return EOF;
+    }
 
   if (!havepos)
     {
@@ -266,7 +271,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
 	curoff = fp->_offset;
       else
 	{
-	  curoff = (*seekfn) (fp->_cookie, 0L, SEEK_CUR);
+	  curoff = seekfn (ptr, fp->_cookie, 0L, SEEK_CUR);
 	  if (curoff == POS_ERR)
 	    goto dumb;
 	}
@@ -327,7 +332,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
    */
 
   curoff = target & ~(fp->_blksize - 1);
-  if ((*seekfn) (fp->_cookie, curoff, SEEK_SET) == POS_ERR)
+  if (seekfn (ptr, fp->_cookie, curoff, SEEK_SET) == POS_ERR)
     goto dumb;
   fp->_r = 0;
   fp->_p = fp->_bf._base;
@@ -351,7 +356,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
    */
 
 dumb:
-  if (fflush (fp) || (*seekfn) (fp->_cookie, offset, whence) == POS_ERR)
+  if (fflush (fp) || seekfn (ptr, fp->_cookie, offset, whence) == POS_ERR)
     {
       _funlockfile (fp);
       return EOF;

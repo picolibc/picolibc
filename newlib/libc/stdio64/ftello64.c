@@ -111,7 +111,7 @@ _DEFUN (_ftello64_r, (ptr, fp),
     pos = fp->_offset;
   else
     {
-      pos = (*fp->_seek64) (fp->_cookie, (_fpos64_t) 0, SEEK_CUR);
+      pos = fp->_seek64 (ptr, fp->_cookie, (_fpos64_t) 0, SEEK_CUR);
       if (pos == -1L)
         {
           _funlockfile(fp);

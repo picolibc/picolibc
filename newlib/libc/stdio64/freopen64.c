@@ -106,7 +106,7 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
   if ((flags = __sflags (ptr, mode, &oflags)) == 0)
     {
       _funlockfile(fp);
-      (void) _fclose_r (ptr, fp);
+      _fclose_r (ptr, fp);
       __sfp_lock_release ();
       return NULL;
     }
@@ -124,13 +124,13 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
   else
     {
       if (fp->_flags & __SWR)
-	(void) fflush (fp);
+	 fflush (fp);
       /*
        * If close is NULL, closing is a no-op, hence pointless.
        * If file is NULL, the file should not be closed.
        */
       if (fp->_close != NULL && file != NULL)
-	(void) (*fp->_close) (fp->_cookie);
+	fp->_close (ptr, fp->_cookie);
     }
 
   /*
@@ -154,10 +154,10 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
        */
       f = fp->_file;
       if ((oldflags = _fcntl_r (ptr, f, F_GETFL, 0)) == -1
-          || ! ((oldflags & O_ACCMODE) == O_RDWR
-                || ((oldflags ^ oflags) & O_ACCMODE) == 0)
-          || _fcntl_r (ptr, f, F_SETFL, oflags) == -1)
-        f = -1;
+	  || ! ((oldflags & O_ACCMODE) == O_RDWR
+		|| ((oldflags ^ oflags) & O_ACCMODE) == 0)
+	  || _fcntl_r (ptr, f, F_SETFL, oflags) == -1)
+	f = -1;
 #else
       /* We cannot modify without fcntl support.  */
       f = -1;
@@ -168,16 +168,16 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
        * F_SETFL doesn't change textmode.  Don't mess with modes of ttys.
        */
       if (0 <= f && ! isatty (f)
-          && setmode (f, oflags & (O_BINARY | O_TEXT)) == -1)
-        f = -1;
+	  && setmode (f, oflags & (O_BINARY | O_TEXT)) == -1)
+	f = -1;
 #endif
 
       if (f < 0)
-        {
-          e = EBADF;
-          if (fp->_close != NULL)
-            (void) (*fp->_close) (fp->_cookie);
-        }
+	{
+	  e = EBADF;
+	  if (fp->_close != NULL)
+	    fp->_close (ptr, fp->_cookie);
+	}
     }
 
   /*

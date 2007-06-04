@@ -467,7 +467,7 @@ int     _EXFUN(_fsetpos64_r, (struct _reent *, FILE *, const _fpos64_t *));
 FILE *  _EXFUN(_tmpfile64_r, (struct _reent *));
 #endif /* !__CYGWIN__ */
 #endif /* __LARGE64_FILES */
- 
+
 /*
  * Routines internal to the implementation.
  */
@@ -480,15 +480,47 @@ int	_EXFUN(__swbuf_r, (struct _reent *, int, FILE *));
  */
 
 #ifndef __STRICT_ANSI__
-FILE	*_EXFUN(funopen,(const _PTR _cookie,
-		int (*readfn)(_PTR _cookie, char *_buf, int _n),
-		int (*writefn)(_PTR _cookie, const char *_buf, int _n),
-		fpos_t (*seekfn)(_PTR _cookie, fpos_t _off, int _whence),
-		int (*closefn)(_PTR _cookie)));
+# ifdef __LARGE64_FILES
+FILE	*_EXFUN(funopen,(const _PTR __cookie,
+		int (*__readfn)(_PTR __c, char *__buf, int __n),
+		int (*__writefn)(_PTR __c, const char *__buf, int __n),
+		_fpos64_t (*__seekfn)(_PTR __c, _fpos64_t __off, int __whence),
+		int (*__closefn)(_PTR __c)));
+# else
+FILE	*_EXFUN(funopen,(const _PTR __cookie,
+		int (*__readfn)(_PTR __cookie, char *__buf, int __n),
+		int (*__writefn)(_PTR __cookie, const char *__buf, int __n),
+		fpos_t (*__seekfn)(_PTR __cookie, fpos_t __off, int __whence),
+		int (*__closefn)(_PTR __cookie)));
+# endif /* !__LARGE64_FILES */
 
-#define	fropen(cookie, fn) funopen(cookie, fn, (int (*)())0, (fpos_t (*)())0, (int (*)())0)
-#define	fwopen(cookie, fn) funopen(cookie, (int (*)())0, fn, (fpos_t (*)())0, (int (*)())0)
-#endif
+# define	fropen(__cookie, __fn) funopen(__cookie, __fn, (int (*)())0, \
+					       (fpos_t (*)())0, (int (*)())0)
+# define	fwopen(__cookie, __fn) funopen(__cookie, (int (*)())0, __fn, \
+					       (fpos_t (*)())0, (int (*)())0)
+
+typedef ssize_t cookie_read_function_t(void *__cookie, char *__buf, size_t __n);
+typedef ssize_t cookie_write_function_t(void *__cookie, const char *__buf,
+					size_t __n);
+# ifdef __LARGE64_FILES
+typedef int cookie_seek_function_t(void *__cookie, _off64_t *__off,
+				   int __whence);
+# else
+typedef int cookie_seek_function_t(void *__cookie, off_t *__off, int __whence);
+# endif /* !__LARGE64_FILES */
+typedef int cookie_close_function_t(void *__cookie);
+typedef struct
+{
+  /* These four struct member names are dictated by Linux; hopefully,
+     they don't conflict with any macros.  */
+  cookie_read_function_t  *read;
+  cookie_write_function_t *write;
+  cookie_seek_function_t  *seek;
+  cookie_close_function_t *close;
+} cookie_io_functions_t;
+FILE *_EXFUN(fopencookie,(void *__cookie, const char *__mode,
+			  cookie_io_functions_t __functions));
+#endif /* ! __STRICT_ANSI__ */
 
 #ifndef __CUSTOM_FILE_IO__
 /*
