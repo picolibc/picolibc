@@ -1,3 +1,12 @@
+2007-06-04  Paolo Bonzini  <bonzini@gnu.org>
+
+	Sync with gcc:
+	2007-05-30  Jakub Jelinek  <jakub@redhat.com>
+
+        PR bootstrap/29382
+        * configure.ac: Don't use -fkeep-inline-functions for GCC < 3.3.1.
+        * configure: Rebuilt.
+
 2007-06-01  Steve Ellcey  <sje@cup.hp.com>
 
 	* libtool.m4 (LT_CMD_MAX_LEN): Try using getconf to set
