@@ -1,3 +1,9 @@
+2007-06-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ansi.sgml: Delete.
+	* misc-std.sgml: Delete.
+	* posix.sgml: Rework entirely.
+
 2007-05-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dtable.cc (dtable::set_file_pointers_for_exec): Call SetFilePointer

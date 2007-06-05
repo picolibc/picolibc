@@ -1,98 +1,1295 @@
-<sect1 id="std-posix">
-<title>Compatibility with POSIX.1</title>
+<sect1 id="std-susv3"><title>System interfaces compatible with the Single Unix Specification, Version 3:</title>
 
-<para>The following functions are compatible with POSIX.1:</para>
+<para>Note that the core of the Single Unix Specification, Version 3 is
+also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
 
-<sect2><title>Process Primitives (Section 3) </title><para>
+<screen>
+    FD_CLR
+    FD_ISSET
+    FD_SET
+    FD_ZERO
+    _Exit
+    _exit
+    _longjmp
+    _setjmp
+    _tolower
+    _toupper
+    a64l
+    abort
+    abs
+    accept
+    access
+    acos
+    acosf
+    acosh
+    acoshf
+    alarm
+    asctime
+    asctime_r
+    asin
+    asinf
+    asinh
+    asinhf
+    atan
+    atan2
+    atan2f
+    atanf
+    atanh
+    atanhf
+    atexit
+    atof
+    atoff
+    atoi
+    atol
+    atoll
+    basename
+    bcmp
+    bcopy
+    bind
+    bsearch
+    btowc
+    bzero
+    cabs
+    cabsf
+    calloc
+    catclose 			(available in external "catgets" library)
+    catgets  			(available in external "catgets" library)
+    catopen  			(available in external "catgets" library)
+    cbrt
+    cbrtf
+    ceil
+    ceilf
+    cfgetispeed
+    cfgetospeed
+    cfsetispeed
+    cfsetospeed
+    chdir
+    chmod
+    chown
+    chroot			(see chapter "Implementation Notes")
+    clearerr
+    clock
+    clock_getres		(see chapter "Implementation Notes")
+    clock_gettime		(see chapter "Implementation Notes")
+    clock_setres		(see chapter "Implementation Notes")
+    close
+    closedir
+    closelog
+    connect
+    copysign
+    copysignf
+    cos
+    cosf
+    cosh
+    coshf
+    creat
+    crypt			(available in external "crypt" library)
+    ctermid
+    ctime
+    ctime_r
+    daylight
+    dbm_clearerr		(available in external "libgdbm" library)
+    dbm_close			(available in external "libgdbm" library)
+    dbm_delete			(available in external "libgdbm" library)
+    dbm_error			(available in external "libgdbm" library)
+    dbm_fetch			(available in external "libgdbm" library)
+    dbm_firstkey		(available in external "libgdbm" library)
+    dbm_nextkey			(available in external "libgdbm" library)
+    dbm_open			(available in external "libgdbm" library)
+    dbm_store			(available in external "libgdbm" library)
+    difftime
+    dirname
+    div
+    dlclose
+    dlerror
+    dlopen
+    dlsym
+    drand48
+    dup
+    dup2
+    ecvt
+    encrypt			(available in external "crypt" library)
+    endgrent
+    endhostent
+    endprotoent
+    endpwent
+    endservent
+    endutxent
+    environ
+    erand48
+    erf
+    erfc
+    erfcf
+    erff
+    errno
+    execl
+    execle
+    execlp
+    execv
+    execve
+    execvp
+    exit
+    exp
+    exp2
+    exp2f
+    expf
+    expm1
+    expm1f
+    fabs
+    fabsf
+    fchdir
+    fchmod
+    fchown
+    fclose
+    fcntl
+    fcvt
+    fdatasync
+    fdim
+    fdimf
+    fdopen
+    feof
+    ferror
+    fflush
+    ffs
+    fgetc
+    fgetpos
+    fgets
+    fileno
+    flockfile
+    floor
+    floorf
+    fma
+    fmaf
+    fmax
+    fmaxf
+    fmin
+    fminf
+    fmod
+    fmodf
+    fnmatch
+    fopen
+    fork
+    fpathconf
+    fprintf
+    fputc
+    fputs
+    fread
+    free
+    freeaddrinfo
+    freopen
+    frexp
+    frexpf
+    fscanf
+    fseek
+    fseeko
+    fsetpos
+    fstat
+    fstatvfs
+    fsync
+    ftell
+    ftello
+    ftime
+    ftok
+    ftruncate
+    ftrylockfile
+    ftw
+    funlockfile
+    futimes
+    fwrite
+    gai_strerror
+    gcvt
+    getaddrinfo
+    getc
+    getc_unlocked
+    getchar
+    getchar_unlocked
+    getcwd
+    getdelim
+    getdomainname
+    getegid
+    getenv
+    geteuid
+    getgid
+    getgrent
+    getgrgid
+    getgrgid_r
+    getgrnam
+    getgrnam_r
+    getgroups
+    gethostbyaddr
+    gethostbyname
+    gethostid
+    gethostname
+    getitimer			(see chapter "Implementation Notes")
+    getlogin
+    getlogin_r
+    getnameinfo
+    getopt
+    getpeername
+    getpgid
+    getpgrp
+    getpid
+    getppid
+    getpriority
+    getprotobyname
+    getprotobynumber
+    getprotoent
+    getpwent
+    getpwnam
+    getpwnam_r
+    getpwuid
+    getpwuid_r
+    getrlimit
+    getrusage
+    gets
+    getservbyname
+    getservbyport
+    getservent
+    getsid
+    getsockname
+    getsockopt
+    getsubopt
+    gettimeofday
+    getuid
+    getutxent
+    getutxid
+    getutxline
+    getwd
+    glob
+    globfree
+    gmtime
+    gmtime_r
+    grantpt
+    h_errno
+    hcreate
+    hdestroy
+    hsearch
+    hstrerror
+    htonl
+    htons
+    hypot
+    hypotf
+    iconv			(available in external "libiconv" library)
+    iconv_close			(available in external "libiconv" library)
+    iconv_open			(available in external "libiconv" library)
+    if_freenameindex
+    if_indextoname
+    if_nameindex
+    if_nametoindex
+    ilogb
+    ilogbf
+    imaxabs
+    imaxdiv
+    index
+    inet_addr
+    inet_ntoa
+    inet_ntop
+    inet_pton
+    initstate
+    ioctl
+    isalnum
+    isalpha
+    isascii
+    isatty
+    isblank
+    iscntrl
+    isdigit
+    isfinite
+    isgraph
+    isgreater
+    isgreaterequal
+    isinf
+    isless
+    islessequal
+    islessgreater
+    islower
+    isnan
+    isnormal
+    isprint
+    ispunct
+    isspace
+    isunordered
+    isupper
+    iswalnum
+    iswalpha
+    iswblank
+    iswcntrl
+    iswctype
+    iswdigit
+    iswgraph
+    iswlower
+    iswprint
+    iswpunct
+    iswspace
+    iswupper
+    iswxdigit
+    isxdigit
+    j0
+    j1
+    jn
+    jrand48
+    kill
+    killpg
+    l64a
+    labs
+    lchown
+    lcong48
+    ldexp
+    ldexpf
+    ldiv
+    lfind
+    lgamma
+    lgammaf
+    link
+    listen
+    llabs
+    lldiv
+    localeconv
+    localtime
+    localtime_r
+    log
+    log10
+    log10f
+    log1p
+    log1pf
+    logb
+    logbf
+    logf
+    longjmp
+    lrand48
+    lrint
+    lrintf
+    lround
+    lroundf
+    lsearch
+    lseek
+    lstat
+    malloc
+    mblen
+    mbrlen
+    mbrtowc
+    mbsinit
+    mbsrtowcs
+    mbstowcs
+    mbtowc
+    memccpy
+    memchr
+    memcmp
+    memcpy
+    memmove
+    memset
+    mkdir
+    mkfifo
+    mknod
+    mkstemp
+    mktemp
+    mktime
+    mlock
+    mmap
+    modf
+    modff
+    mprotect
+    mq_close
+    mq_getattr
+    mq_notify
+    mq_open
+    mq_receive
+    mq_send
+    mq_setattr
+    mq_timedreceive
+    mq_timedsend
+    mq_unlink
+    mrand48
+    msgctl			(see chapter "Implementation Notes")
+    msgget			(see chapter "Implementation Notes")
+    msgrcv			(see chapter "Implementation Notes")
+    msgsnd			(see chapter "Implementation Notes")
+    msync
+    munlock
+    munmap
+    nan
+    nanf
+    nanosleep
+    nearbyint
+    nearbyintf
+    nextafter
+    nextafterf
+    nftw
+    nice
+    nl_langinfo
+    nrand48
+    ntohl
+    ntohs
+    open
+    opendir
+    openlog
+    optarg
+    opterr
+    optind
+    optopt
+    pathconf
+    pause
+    pclose
+    perror
+    pipe
+    poll
+    popen
+    posix_fadvise
+    posix_fallocate
+    posix_madvise
+    posix_memalign
+    posix_openpt
+    pow
+    powf
+    pread
+    printf
+    pselect
+    pthread_atfork
+    pthread_attr_destroy
+    pthread_attr_getdetachstate
+    pthread_attr_getinheritsched
+    pthread_attr_getschedparam
+    pthread_attr_getschedpolicy
+    pthread_attr_getscope
+    pthread_attr_getstacksize
+    pthread_attr_init
+    pthread_attr_setdetachstate
+    pthread_attr_setinheritsched
+    pthread_attr_setschedparam
+    pthread_attr_setschedpolicy
+    pthread_attr_setscope
+    pthread_attr_setstacksize
+    pthread_cancel
+    pthread_cond_broadcast
+    pthread_cond_destroy
+    pthread_cond_init
+    pthread_cond_signal
+    pthread_cond_timedwait
+    pthread_cond_wait
+    pthread_condattr_destroy
+    pthread_condattr_getpshared
+    pthread_condattr_init
+    pthread_condattr_setpshared
+    pthread_create
+    pthread_detach
+    pthread_equal
+    pthread_exit
+    pthread_getconcurrency
+    pthread_getschedparam
+    pthread_getspecific
+    pthread_join
+    pthread_key_create
+    pthread_key_delete
+    pthread_kill
+    pthread_mutex_destroy
+    pthread_mutex_getprioceiling
+    pthread_mutex_init
+    pthread_mutex_lock
+    pthread_mutex_setprioceiling
+    pthread_mutex_trylock
+    pthread_mutex_unlock
+    pthread_mutexattr_destroy
+    pthread_mutexattr_getprioceiling
+    pthread_mutexattr_getprotocol
+    pthread_mutexattr_getpshared
+    pthread_mutexattr_gettype
+    pthread_mutexattr_init
+    pthread_mutexattr_setprioceiling
+    pthread_mutexattr_setprotocol
+    pthread_mutexattr_setpshared
+    pthread_mutexattr_settype
+    pthread_once
+    pthread_rwlock_destroy
+    pthread_rwlock_init
+    pthread_rwlock_rdlock
+    pthread_rwlock_tryrdlock
+    pthread_rwlock_trywrlock
+    pthread_rwlock_unlock
+    pthread_rwlock_wrlock
+    pthread_rwlockattr_destroy
+    pthread_rwlockattr_getpshared
+    pthread_rwlockattr_init
+    pthread_rwlockattr_setpshared
+    pthread_self
+    pthread_setcancelstate
+    pthread_setcanceltype
+    pthread_setconcurrency
+    pthread_setschedparam
+    pthread_setspecific
+    pthread_sigmask
+    pthread_testcancel
+    ptsname
+    putc
+    putc_unlocked
+    putchar
+    putchar_unlocked
+    putenv
+    puts
+    pututxline
+    pwrite
+    qsort
+    raise
+    rand
+    rand_r
+    random
+    read
+    readdir
+    readdir_r
+    readlink
+    readv
+    realloc
+    realpath
+    recv
+    recvfrom
+    recvmsg
+    regcomp
+    regerror
+    regexec
+    regfree
+    remainder
+    remainderf
+    remove
+    remque			(see chapter "Implementation Notes")
+    remquo
+    remquof
+    rename
+    rewind
+    rewinddir
+    rindex
+    rint
+    rintf
+    rmdir
+    round
+    roundf
+    scalb
+    scalbln
+    scalblnf
+    scalbn
+    scalbnf
+    scandir
+    scanf
+    sched_get_priority_max
+    sched_get_priority_min
+    sched_getparam
+    sched_getscheduler
+    sched_rr_get_interval
+    sched_setparam
+    sched_setscheduler
+    sched_yield
+    seed48
+    seekdir
+    select
+    sem_close
+    sem_destroy
+    sem_getvalue
+    sem_init
+    sem_open
+    sem_post
+    sem_timedwait
+    sem_trywait
+    sem_unlink
+    sem_wait
+    semctl			(see chapter "Implementation Notes")
+    semget			(see chapter "Implementation Notes")
+    semop			(see chapter "Implementation Notes")
+    send
+    sendmsg
+    sendto
+    setegid
+    setenv
+    seteuid
+    setgid
+    setgrent
+    sethostent
+    setitimer			(see chapter "Implementation Notes")
+    setjmp
+    setkey			(available in external "crypt" library)
+    setlocale
+    setlogmask
+    setpgid
+    setpgrp
+    setpriority
+    setprotoent
+    setpwent
+    setregid
+    setreuid
+    setrlimit
+    setservent
+    setsid
+    setsockopt
+    setstate
+    setuid
+    setutxent
+    setvbuf
+    shm_open
+    shm_unlink
+    shmat			(see chapter "Implementation Notes")
+    shmctl			(see chapter "Implementation Notes")
+    shmdt			(see chapter "Implementation Notes")
+    shmget			(see chapter "Implementation Notes")
+    shutdown
+    sigaction
+    sigaddset
+    sigdelset
+    sigemptyset
+    sigfillset
+    sighold
+    sigignore
+    siginterrupt
+    sigismember
+    siglongjmp
+    signal
+    signbit
+    signgam
+    sigpause
+    sigpending
+    sigprocmask
+    sigqueue
+    sigrelse
+    sigset
+    sigsetjmp
+    sigsuspend
+    sigwait
+    sigwaitinfo
+    sin
+    sinf
+    sinh
+    sinhf
+    sleep
+    snprintf
+    socket
+    socketpair
+    sprintf
+    sqrt
+    sqrtf
+    srand
+    srand48
+    srandom
+    sscanf
+    stat
+    statvfs
+    stderr
+    stdin
+    stdout
+    strcasecmp
+    strcat
+    strchr
+    strcmp
+    strcoll
+    strcpy
+    strcspn
+    strdup
+    strerror
+    strerror_r
+    strftime
+    strlen
+    strncasecmp
+    strncat
+    strncmp
+    strncpy
+    strpbrk
+    strptime
+    strrchr
+    strspn
+    strstr
+    strtod
+    strtof
+    strtoimax
+    strtok
+    strtok_r
+    strtol
+    strtoll
+    strtoul
+    strtoull
+    strtoumax
+    strxfrm
+    swab
+    symlink
+    sync
+    sysconf
+    syslog
+    system
+    tan
+    tanf
+    tanh
+    tanhf
+    tcdrain
+    tcflow
+    tcflush
+    tcgetattr
+    tcgetpgrp
+    tcsendbreak
+    tcsetattr
+    tcsetpgrp
+    tdelete
+    telldir
+    tempnam
+    tfind
+    tgamma
+    tgammaf
+    time
+    timer_create
+    timer_delete
+    timer_gettime
+    timer_settime
+    times
+    timezone
+    tmpfile
+    tmpnam
+    toascii
+    tolower
+    toupper
+    towctrans
+    towlower
+    towupper
+    trunc
+    truncate
+    truncf
+    tsearch
+    ttyname
+    ttyname_r
+    twalk
+    tzname
+    tzset
+    ualarm
+    umask
+    uname
+    ungetc
+    unlink
+    unlockpt
+    unsetenv
+    usleep
+    utime
+    utimes
+    va_arg
+    va_end
+    va_start
+    vfork			(see chapter "Implementation Notes")
+    vfprintf
+    vfscanf
+    vprintf
+    vscanf
+    vsnprintf
+    vsprintf
+    vsscanf
+    wait
+    waitpid
+    wcrtomb
+    wcscat
+    wcschr
+    wcscmp
+    wcscoll
+    wcscpy
+    wcscspn
+    wcslen
+    wcsncat
+    wcsncmp
+    wcsncpy
+    wcspbrk
+    wcsrchr
+    wcsrtombs
+    wcsspn
+    wcsstr
+    wcstombs
+    wcswidth
+    wctob
+    wctomb
+    wctrans
+    wctype
+    wcwidth
+    wmemchr
+    wmemcmp
+    wmemcpy
+    wmemmove
+    wmemset
+    wprintf
+    write
+    writev
+    y0
+    y1
+    yn
+</screen>
 
-fork, execl, execle, execlp, execv, execve, execvp, wait, waitpid,
-_exit, kill, sigemptyset, sigfillset, sigaddset, sigdelset,
-sigismember, sigaction, pthread_sigmask, sigprocmask, sigpending,
-sigsuspend, alarm, pause, sleep, pthread_kill, pthread_sigmask
+</sect1>
 
-</para></sect2>
-<sect2><title>Process Environment (Section 4) </title><para>
+<sect1 id="std-bsd"><title>System interfaces compatible with BSD functions:</title>
 
-getpid, getppid, getuid, geteuid, getgid, getegid, setuid, setgid,
-getgroups, getlogin, getpgrp, setsid, setpgid, uname, time, times,
-getenv, ctermid, ttyname, isatty, sysconf
+<screen>
+    alphasort
+    bindresvport
+    bindresvport_sa
+    daemon
+    dn_comp
+    dn_expand
+    dn_skipname
+    drem
+    endusershell
+    err
+    errx
+    finite
+    finitef
+    fiprintf
+    flock
+    forkpty
+    fstatfs
+    fts_children
+    fts_close
+    fts_get_clientptr
+    fts_get_stream
+    fts_open
+    fts_read
+    fts_set
+    fts_set_clientptr
+    gamma
+    gamma_r
+    gammaf
+    gammaf_r
+    getdtablesize
+    getpagesize
+    getpeereid
+    getprogname
+    getusershell
+    herror
+    inet_aton
+    inet_makeaddr
+    inet_netof
+    inet_network
+    initgroups
+    iruserok
+    iruserok_sa
+    login
+    login_tty
+    logout
+    logwtmp
+    mkdtemp
+    openpty
+    rcmd
+    rcmd_af
+    res_close
+    res_init
+    res_mkquery
+    res_nclose
+    res_ninit
+    res_nmkquery
+    res_nquery
+    res_nquerydomain
+    res_nsearch
+    res_nsend
+    res_query
+    res_querydomain
+    res_search
+    res_send
+    revoke
+    rexec
+    rresvport
+    rresvport_af
+    ruserok
+    sbrk
+    setbuffer
+    setgroups
+    setlinebuf
+    setpassent
+    setprogname
+    settimeofday
+    setusershell
+    statfs
+    strlcat
+    strlcpy
+    strsep
+    strsignal
+    updwtmp
+    valloc
+    verr
+    verrx
+    vhangup			(see chapter "Implementation Notes")
+    vsyslog
+    vwarn
+    vwarnx
+    wait3
+    wait4
+    warn
+    warnx
+    wcslcat
+    wcslcpy
+</screen>
 
-</para></sect2>
-<sect2><title>Files and Directories (Section 5) </title><para>
+</sect1>
 
-opendir, readdir, rewinddir, closedir, chdir, getcwd, open, creat,
-umask, link, mkdir, unlink, rmdir, rename, stat, fstat, access, chmod,
-fchmod, chown, utime, ftruncate, pathconf, fpathconf
+<sect1 id="std-gnu"><title>System interfaces compatible with GNU extensions:</title>
 
-</para></sect2>
-<sect2><title>Input and Output Primitives (Section 6) </title><para>
+<screen>
+    argz_add
+    argz_add_sep
+    argz_append
+    argz_count
+    argz_create
+    argz_create_sep
+    argz_delete
+    argz_extract
+    argz_insert
+    argz_next
+    argz_replace
+    argz_stringify
+    asnprintf
+    asprintf
+    asprintf_r
+    dprintf
+    dremf
+    envz_add
+    envz_entry
+    envz_get
+    envz_merge
+    envz_remove
+    envz_strip
+    fcloseall
+    fcloseall_r
+    getline
+    getopt_long
+    getopt_long_only
+    memmem
+    mempcpy
+    strndup
+    strnlen
+    tdestroy
+    timegm
+    timelocal
+    updwtmpx
+    utmpxname
+    vasnprintf
+    vasprintf
+    vasprintf_r
+    vdprintf
+</screen>
 
-pipe, dup, dup2, close, read, write, fcntl, lseek, fsync
+</sect1>
 
-</para></sect2>
-<sect2><title>Device- and Class-Specific Functions (Section 7) </title><para>
+<sect1 id="std-solaris"><title>System interfaces compatible with Solaris or SunOS functions:</title>
 
-cfgetispeed, cfgetospeed, cfsetispeed, cfsetospeed, tcdrain, tcflow,
-tcflush, tcgetattr, tcgetpgrp, tcsendbreak, tcsetattr, tcsetpgrp
+<screen>
+    acl
+    aclcheck
+    aclfrommode
+    aclfrompbits
+    aclfromtext
+    aclsort
+    acltomode
+    acltopbits
+    acltotext
+    endmntent
+    facl
+    getmntent
+    memalign
+    setmntent
+</screen>
 
-</para></sect2>
-<sect2><title>Language-Specific Services for the C Programming Language (Section 8) </title><para>
+</sect1>
 
-abort, exit, fclose, fdopen, fflush, fgetc, fgets, fileno, fopen,
-fprintf, fputc, fputs, fread, freopen, fscanf, fseek, ftell, fwrite,
-getc, getchar, gets, perror, printf, putc, putchar, puts, remove,
-rewind, scanf, setlocale, siglongjmp, sigsetjmp, tmpfile, tmpnam,
-tzset
+<sect1 id="std-deprec"><title>Other UNIX system interfaces, deprecated or not in POSIX.1-2001:</title>
 
-</para></sect2>
-<sect2><title>System Databases (Section 9) </title><para>
+<screen>
+    cuserid			(POSIX.1-1988, SUSv2)
+    endutent			(XPG2)
+    getpass			(SUSv2)
+    getutent			(XPG2)
+    getutid			(XPG2)
+    getutline			(XPG2)
+    getw			(SVID)
+    mallinfo			(SVID)
+    mallopt			(SVID)
+    on_exit			(SunOS)
+    pthread_continue		(XPG2)
+    pthread_getsequence_np	(Tru64)
+    pthread_suspend		(XPG2)
+    pututline			(XPG2)
+    putw			(SVID)
+    setbuf			(C89, C99)
+    setutent			(XPG2)
+    sys_errlist			(BSD)
+    sys_nerr			(BSD)
+    ttyslot			(SUSv2)
+    utmpname			(XPG2)
+</screen>
 
-getgrgid, getgrnam, getpwnam, getpwuid
+</sect1>
 
-</para></sect2>
-<sect2><title>Synchronization (Section 11) </title><para>
+<sect1 id="std-notimpl"><title>NOT implemented system interfaces from the Single Unix Specification, Volume 3:</title>
 
-sem_init, sem_destroy, sem_wait, sem_trywait, sem_post,
-pthread_mutex_init, pthread_mutex_destroy, pthread_mutex_lock,
-pthread_mutex_trylock, pthread_mutex_unlock
+<screen>
+    acoshl
+    acosl
+    aio_cancel
+    aio_error
+    aio_fsync
+    aio_read
+    aio_return
+    aio_suspend
+    aio_write
+    asinhl
+    asinl
+    atan2l
+    atanhl
+    atanl
+    bsd_signal
+    cabsl
+    cacos
+    cacosf
+    cacosh
+    cacoshf
+    cacoshl
+    cacosl
+    carg
+    cargf
+    cargl
+    casin
+    casinf
+    casinh
+    casinhf
+    casinhl
+    casinl
+    catan
+    catanf
+    catanh
+    catanhf
+    catanhl
+    catanl
+    cbrtl
+    ccos
+    ccosf
+    ccosh
+    ccoshf
+    ccoshl
+    ccosl
+    ceill
+    cexp
+    cexpf
+    cexpl
+    cimag
+    cimagf
+    cimagl
+    clock_getcpuclockid
+    clog
+    clogf
+    clogl
+    confstr
+    conj
+    conjf
+    conjl
+    copysignl
+    coshl
+    cosl
+    cpow
+    cpowf
+    cpowl
+    cproj
+    cprojf
+    cprojl
+    creal
+    crealf
+    creall
+    csin
+    csinf
+    csinh
+    csinhf
+    csinhl
+    csinl
+    csqrt
+    csqrtf
+    csqrtl
+    ctan
+    ctanf
+    ctanh
+    ctanhf
+    ctanhl
+    ctanl
+    endnetent
+    erfcl
+    erfl
+    exp2l
+    expl
+    expm1l
+    fabsl
+    fattach
+    fdiml
+    feclearexcept
+    fegetenv
+    fegetexceptflag
+    fegetround
+    feholdexcept
+    feraiseexcept
+    fesetenv
+    fesetexceptflag
+    fesetround
+    fetestexcept
+    feupdateenv
+    fgetwc
+    fgetws
+    floorl
+    fmal
+    fmaxl
+    fminl
+    fmodl
+    fmtmsg
+    fputwc
+    fputws
+    frexpl
+    fwide
+    fwprintf
+    fwscanf
+    getcontext
+    getdate
+    getdate_err
+    gethostent
+    getmsg
+    getnetbyaddr
+    getnetbyname
+    getnetent
+    getpmsg
+    getwc
+    getwchar
+    hypotl
+    ilogbl
+    initstate
+    insque
+    isastream
+    ldexpl
+    lgammal
+    lio_listio
+    llrint
+    llrintf
+    llrintl
+    llround
+    llroundf
+    llroundl
+    lockf
+    log10l
+    log1pl
+    log2l
+    logbl
+    logl
+    lrintl
+    lroundl
+    makecontext
+    mlockall
+    modfl
+    munlockall
+    nanl
+    nearbyintl
+    nextafterl
+    nexttowardl
+    posix_mem_offset
+    posix_spawn[...]
+    posix_trace[...]
+    posix_typed_[...]
+    powl
+    pthread_attr_getguardsize
+    pthread_attr_getstack
+    pthread_attr_getstackaddr
+    pthread_attr_setguardsize
+    pthread_attr_setstack
+    pthread_attr_setstackaddr
+    pthread_barrier[...]
+    pthread_condattr_getclock
+    pthread_condattr_setclock
+    pthread_getcpuclockid
+    pthread_mutex_timedlock
+    pthread_rwlock_timedrdlock
+    pthread_rwlock_timedwrlock
+    pthread_setschedprio
+    pthread_spin_[...]
+    putmsg
+    reminderl
+    remquol
+    rintl
+    roundl
+    scalblnl
+    scalbnl
+    setcontext
+    setnetent
+    sigaltstack
+    sigtimedwait
+    sinhl
+    sinl
+    sockatmark
+    sqrtl
+    strfmon
+    strtold
+    swabcontext
+    swprintf
+    swscanf
+    tanhl
+    tanl
+    tcgetsid
+    tgammal
+    timer_getoverrun
+    truncl
+    ulimit
+    va_copy
+    vfwprintf
+    vfwscanf
+    vswprintf
+    vswscanf
+    vwprintf
+    vwscanf
+    waitid
+    wcsftime
+    wcstod
+    wcstof
+    wcstoimax
+    wcstok
+    wcstol
+    wcstold
+    wcstoll
+    wcstoul
+    wcstoull
+    wcstoumax
+    wcswcs
+    wcsxfrm
+    wordexp
+    wordfree
+    wscanf
+</screen>
 
-</para></sect2>
-<sect2><title>Memory Management (Section 12) </title><para>
+</sect1>
 
-mmap, mprotect, msync, munmap
+<sect1 id="std-notes"><title>Implementation Notes</title>
 
-</para></sect2>
-<sect2><title>Thread Management (Section 16) </title><para>
+<para><function>chroot</function> only emulates a chroot function call
+by keeping track of the current root and accomodating this in the file
+related function calls.  A real chroot functionality is not supported by
+Windows however.</para>
 
-pthread_attr_init, pthread_attr_destroy, pthread_attr_setstacksize,
-pthread_attr_getstacksize, pthread_create, pthread_exit, pthread_self,
-pthread_equal
+<para><function>clock_getres</function>, <function>clock_gettime</function>
+and <function>clock_setres</function> only support CLOCK_REALTIME for
+now.</para>
 
-</para></sect2>
-<sect2><title>Thread-Specific Data Functions (Section 17) </title><para>
+<para><function>getitimer</function> and <function>setitimer</function>
+only support ITIMER_REAL for now.</para>
 
-pthread_key_create, pthread_setspecific, pthread_getspecific,
-pthread_key_delete
-
-</para></sect2>
-
-<sect2><title>Implementation Details</title>
-
-<para><function>setuid</function> and <function>setgid</function>
-always return ENOSYS.</para>
-
-<para><function>link</function> will copy the file if it can't
-implement a true symbolic link.  Currently, symbolic links work, if at
-all, only under Windows NT.</para>
-
-<para><function>chown</function> always returns zero.</para>
-
-<para><function>fcntl</function> doesn't support F_GETLK - it returns
--1 and sets errno to ENOSYS.</para>
+<para><function>link</function> will copy the file if it can't implement
+a true hardlink.  This is true at least for FAT and FAT32 filesystems.
+NTFS supports hardlinks.  </para>
 
 <para><function>lseek</function> only works properly on binary
 files.</para>
 
-</sect2>
+<para><function>setuid</function> is only safe against reverting the user
+switch after a call to one of the exec(2) functions took place.  Windows 
+doesn't support a non-revertable user switch within the context of Win32
+processes.</para>
+
+<para><function>vfork</function> just calls <function>fork</function>.</para>
+
+<para><function>vhangup</function> always returns -1 and sets errno to
+ENOSYS.</para>
+
+<para>The XSI IPC functions <function>semctl</function>,
+<function>semget</function>, <function>semop</function>,
+<function>shmat</function>, <function>shmctl</function>,
+<function>shmdt</function>, <function>shmget</function>,
+<function>msgctl</function>, <function>msgget</function>,
+<function>msgrcv</function> and <function>msgsnd</function> are only
+available when cygserver is running and the <envar>CYGWIN</envar>
+environment variable is set so that it contains the string
+<envar>server</envar>.</para>
 
 </sect1>
