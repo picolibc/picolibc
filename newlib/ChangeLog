@@ -1,7 +1,7 @@
 2007-06-05  Christian Groessler  <chris@groessler.org>
 
-	* libc/argz/argz_insert.c (delta): Move variable declaration
-	to top of function in keeping with C89 standard.
+	* libc/argz/argz_insert.c (argz_insert): Move delta variable 
+	declaration to top of function in keeping with C89 standard.
 
 2007-06-04  Eric Blake  <ebb9@byu.net>
 
