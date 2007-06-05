@@ -1,3 +1,7 @@
+2007-06-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin-api.in.sgml: Accommodate new "Compatibility" section layout.
+
 2006-12-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwinenv.sgml: Drop description of "traverse" option.
