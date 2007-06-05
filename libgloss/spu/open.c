@@ -34,6 +34,29 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #include <fcntl.h>
 #include "jsre.h"
 
+#define JSRE_O_RDONLY 0
+#define JSRE_O_WRONLY 1
+#define JSRE_O_RDWR 2
+
+#define JSRE_O_CREAT 64
+#define JSRE_O_EXCL 128
+#define JSRE_O_NOCTTY 256
+#define JSRE_O_TRUNC 512
+#define JSRE_O_APPEND 1024
+#define JSRE_O_NDELAY 2048
+#define JSRE_O_SYNC 4096
+#define JSRE_O_ASYNC 8192
+
+typedef struct
+{
+        unsigned int pathname;
+        unsigned int pad0[3];
+        unsigned int flags;
+        unsigned int pad1[3];
+        unsigned int mode;
+        unsigned int pad2[3];
+} syscall_open_t;
+
 int
 open (const char *filename, int flags, ...)
 {

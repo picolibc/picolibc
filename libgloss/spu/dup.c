@@ -34,8 +34,5 @@ POSSIBILITY OF SUCH DAMAGE.
 int
 dup (int oldfd)
 {
-        syscall_dup_t sys;
-
-        sys.oldfd = oldfd;
-        return __send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_DUP, &sys);
+        return __send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_DUP, &oldfd);
 }

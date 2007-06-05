@@ -34,6 +34,14 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #include <fcntl.h>
 #include "jsre.h"
 
+typedef struct
+{
+        unsigned int pathname;
+        unsigned int pad0[3];
+        unsigned int ptr;
+        unsigned int pad1[3];
+} syscall_stat_t;
+
 int
 stat (const char *pathname, struct stat *pstat)
 {

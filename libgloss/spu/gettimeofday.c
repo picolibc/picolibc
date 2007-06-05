@@ -34,6 +34,14 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <sys/time.h>
 #include "jsre.h"
 
+typedef struct
+{
+        unsigned int tv;
+        unsigned int pad0[3];
+        unsigned int tz;
+        unsigned int pad1[3];
+} syscall_gettimeofday_t;
+
 int
 gettimeofday (struct timeval *tv, struct timezone *tz)
 {

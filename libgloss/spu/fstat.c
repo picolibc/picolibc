@@ -33,6 +33,14 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #include <sys/stat.h>
 #include "jsre.h"
 
+typedef struct
+{
+        unsigned int    file;
+        unsigned int    pad0[3];
+        unsigned int    ptr;
+        unsigned int    pad1[3];
+} syscall_fstat_t;
+
 int
 fstat (int file, struct stat *pstat)
 {

@@ -33,6 +33,16 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #include <fcntl.h>
 #include "jsre.h"
 
+typedef struct
+{
+        unsigned int file;
+        unsigned int pad0[3];
+        unsigned int ptr;
+        unsigned int pad1[3];
+        unsigned int len;
+        unsigned int pad2[3];
+} syscall_write_t;
+
 int
 write (int file, const void *ptr, size_t len)
 {

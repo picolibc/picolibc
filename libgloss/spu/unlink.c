@@ -35,8 +35,5 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 int
 unlink (const char *pathname)
 {
-        syscall_unlink_t sys;
-
-	sys.pathname = ( unsigned int )pathname;
-        return __send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_UNLINK, &sys);
+        return __send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_UNLINK, &pathname);
 }

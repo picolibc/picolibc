@@ -35,8 +35,5 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 int
 close (int file)
 {
-        syscall_close_t sys;
-
-	sys.file = file;
-        return __send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_CLOSE, &sys);
+        return __send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_CLOSE, &file);
 }

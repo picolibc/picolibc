@@ -31,6 +31,14 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <unistd.h>
 #include "jsre.h"
 
+typedef struct
+{
+        unsigned int file;
+        unsigned int pad0[3];
+        unsigned int length;
+        unsigned int pad1[3];
+} syscall_ftruncate_t;
+
 int
 ftruncate (int file, off_t length)
 {

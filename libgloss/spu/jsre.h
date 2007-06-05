@@ -35,23 +35,6 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #ifndef __JSRE_H
 #define __JSRE_H
 
-#define JSRE_SEEK_SET 0
-#define JSRE_SEEK_CUR 1
-#define JSRE_SEEK_END 2
-
-#define JSRE_O_RDONLY 0
-#define JSRE_O_WRONLY 1
-#define JSRE_O_RDWR 2
-
-#define JSRE_O_CREAT 64
-#define JSRE_O_EXCL 128
-#define JSRE_O_NOCTTY 256
-#define JSRE_O_TRUNC 512
-#define JSRE_O_APPEND 1024
-#define JSRE_O_NDELAY 2048
-#define JSRE_O_SYNC 4096
-#define JSRE_O_ASYNC 8192
-
 #define JSRE_POSIX1_SIGNALCODE 0x2101
 
 #define JSRE_CLOSE 2
@@ -66,104 +49,6 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #define JSRE_FTRUNCATE 28
 #define JSRE_ACCESS 29
 #define JSRE_DUP 30
-
-typedef struct
-{
-	unsigned int	pathname;
-	unsigned int	pad0[ 3 ];
-	unsigned int	flags;
-	unsigned int	pad1[ 3 ];
-	unsigned int	mode;
-	unsigned int	pad2[ 3 ];
-} syscall_open_t;
-
-typedef struct
-{
-	unsigned int	file;
-	unsigned int	pad0[ 3 ];
-	unsigned int	ptr;
-	unsigned int	pad1[ 3 ];
-	unsigned int	len;
-	unsigned int	pad2[ 3 ];
-} syscall_write_t;
-
-typedef struct
-{
-	unsigned int	file;
-	unsigned int	pad0[ 3 ];
-	unsigned int	ptr;
-	unsigned int	pad1[ 3 ];
-	unsigned int	len;
-	unsigned int	pad2[ 3 ];
-} syscall_read_t;
-
-typedef struct
-{
-	unsigned int	file;
-	unsigned int	pad0[ 3 ];
-} syscall_close_t;
-
-typedef struct
-{
-	unsigned int	file;
-	unsigned int	pad0[ 3 ];
-	unsigned int	offset;
-	unsigned int	pad1[ 3 ];
-	unsigned int	whence;
-	unsigned int	pad2[ 3 ];
-} syscall_lseek_t;
-
-typedef struct
-{
-	unsigned int	file;
-	unsigned int	pad0[ 3 ];
-	unsigned int	length;
-	unsigned int	pad1[ 3 ];
-} syscall_ftruncate_t;
-
-typedef struct
-{
-        unsigned int    pathname;
-        unsigned int    pad0[ 3 ];
-        unsigned int    mode;
-        unsigned int    pad1[ 3 ];
-} syscall_access_t;
-
-typedef struct
-{
-	unsigned int	oldfd;
-	unsigned int	pad0[ 3 ];
-} syscall_dup_t;
-
-typedef struct
-{
-	unsigned int	tv;
-	unsigned int	pad0[ 3 ];
-	unsigned int	tz;
-	unsigned int	pad1[ 3 ];
-} syscall_gettimeofday_t;
-
-typedef struct
-{
-	unsigned int	pathname;
-	unsigned int	pad0[ 3 ];
-} syscall_unlink_t;
-
-typedef struct
-{
-        unsigned int    file;
-        unsigned int    pad0[ 3 ];
-        unsigned int    ptr;
-        unsigned int    pad1[ 3 ];
-} syscall_fstat_t;
-
-typedef struct
-{
-        unsigned int    pathname;
-        unsigned int    pad0[ 3 ];
-        unsigned int    ptr;
-        unsigned int    pad1[ 3 ];
-} syscall_stat_t;
 
 typedef struct {
     unsigned int dev;

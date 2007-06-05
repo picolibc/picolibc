@@ -31,6 +31,14 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "jsre.h"
 
+typedef struct
+{
+        unsigned int    pathname;
+        unsigned int    pad0[3];
+        unsigned int    mode;
+        unsigned int    pad1[3];
+} syscall_access_t;
+
 int
 access (const char *pathname, int mode)
 {

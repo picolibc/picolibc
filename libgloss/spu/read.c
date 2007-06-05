@@ -33,10 +33,20 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #include <fcntl.h>
 #include "jsre.h"
 
+typedef struct
+{
+        unsigned int file;
+        unsigned int pad0[3];
+        unsigned int ptr;
+        unsigned int pad1[3];
+        unsigned int len;
+        unsigned int pad2[3];
+} syscall_read_t;
+
 int
 read (int file, void *ptr, size_t len)
 {
-        syscall_write_t sys;
+        syscall_read_t sys;
 
 	sys.file = file;
 	sys.ptr = ( unsigned int )ptr;

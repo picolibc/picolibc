@@ -1,3 +1,24 @@
+2007-06-05  Patrick Mansfield  <patman@us.ibm.com>
+
+	* spu/jsre.h: Remove the assist call structs and defines that are
+	specific to one assist call from here.
+	* spu/access.c: Move struct syscall_access_t to here.
+	* spu/fstat.c: Move struct syscall_fstat_t to here.
+	* spu/ftruncate.c: Move struct syscall_ftruncate_t to here.
+	* spu/gettimeofday.c: Move struct syscall_gettimeofday_t to here.
+	* spu/lseek.c: Move struct syscall_lseek_t and JSRE_SEEK defines to 
+	here.
+	* spu/open.c: Move struct syscall_open_t and JSRE_O_ defines to here.
+	* spu/read.c: Move struct syscall_read_t to here, and actually use
+	it (it is the same as syscall_write_t).
+	* spu/stat.c: Move struct syscall_stat_t to here.
+	* spu/write.c: Move struct syscall_write_t to here.
+	* spu/close.c: Pass the address of the first and only argument to
+	__send_to_ppe rather than using an automatic variable and a
+	special struct.
+	* spu/dup.c: Ditto.
+	* spu/unlink.c: Ditto.
+
 2007-05-30  Kazu Hirata  <kazu@codesourcery.com>
 
 	* m68k/cf-crt1.C, m68k/cf.sc, m68k/fido.sc, m68k/fido-crt0.S:
