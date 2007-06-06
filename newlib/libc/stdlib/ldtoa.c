@@ -2868,10 +2868,10 @@ unsigned short e[NI];
 LDPARMS rnd;
 LDPARMS *ldp = &rnd;
 
+union uconv du;
+
 rnd.rlast = -1;
 rnd.rndprc = NBITS;
-
-union uconv du;
 du.d = *d;
 #if LDBL_MANT_DIG == 24
 e24toe( &du.pe, e, ldp );

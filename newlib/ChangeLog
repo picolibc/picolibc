@@ -1,3 +1,12 @@
+2007-06-06  Christian Groessler  <chris@groessler.org>
+
+	* libc/stdlib/ldtoa (_ldcheck): Make sure the setting of
+	rnd is done after the last local variable declaration.
+
+2007-06-06  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdlib/mprec.h[Just_16]: Make sure that Pack_16 is defined.
+
 2007-06-05  Christian Groessler  <chris@groessler.org>
 
 	* libc/argz/argz_insert.c (argz_insert): Move delta variable 

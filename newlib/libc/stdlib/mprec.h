@@ -351,10 +351,14 @@ extern double rnd_prod(double, double), rnd_quot(double, double);
  * slower.  Hence the default is now to store 32 bits per long.
  */
 
-#ifndef Pack_32
-#define Pack_32
-#endif
-#endif
+ #ifndef Pack_32
+  #define Pack_32
+ #endif
+#else  /* Just_16 */
+ #ifndef Pack_16
+  #define Pack_16
+ #endif
+#endif /* Just_16 */
 
 #ifdef Pack_32
 #define ULbits 32
