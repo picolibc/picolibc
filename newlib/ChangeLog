@@ -1,3 +1,11 @@
+2007-06-08  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/string/strcasestr.c: New file.
+	* libc/include/string.h: Add strcasestr.
+	* libc/string/strings.tex: Add strcasestr.
+	* libc/string/Makefile.am: Ditto.
+	* libc/string/Makefile.in: Regenerated.
+
 2007-06-06  Christian Groessler  <chris@groessler.org>
 
 	* libc/stdlib/ldtoa (_ldcheck): Make sure the setting of
