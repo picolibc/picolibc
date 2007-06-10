@@ -1,3 +1,13 @@
+2007-06-10  Hans-Peter Nilsson  <hp@bitrange.com>
+
+	* libc/sys/mmixware/access.c (access): Do not try to use a magic
+	file-handle and a direct syscall, just use _open.
+	* libc/sys/mmixware/sys/syscall.h (TMPFNO): Remove this magic
+	file-handle.
+
+	* libc/sys/mmixware/_exit.c (_exit): Update comment about
+	passing on the exit value.
+
 2007-06-08  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/string/strcasestr.c: New file.

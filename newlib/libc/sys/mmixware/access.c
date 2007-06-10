@@ -1,6 +1,6 @@
 /* access for MMIXware.
 
-   Copyright (C) 2001 Hans-Peter Nilsson
+   Copyright (C) 2001, 2007 Hans-Peter Nilsson
 
    Permission to use, copy, modify, and distribute this software is
    freely granted, provided that the above copyright notice, this notice
@@ -24,18 +24,17 @@ access (const char *fn, int flags)
      implementations.  Opening a directory as a file usually works, so
      let's try and open it and use the openability, regardless of what
      kind of test or file it is.  */
-  long ret;
+  int fd;
 
   /* We'll just assume that if we can open the file for reading, then it's
      Z-able, no matter what Z was.  */
-  ret = TRAP3f (SYS_Fopen, TMPFNO, fn, BinaryRead);
-  if (ret == 0)
+  fd = _open (fn, O_RDONLY);
+  if (fd >= 0)
     {
       /* Yes, this was readable.  As in other simulator access functions,
 	 we always return success in this case (though the others check
 	 for directory access).  */
-      TRAP1f (SYS_Fclose, TMPFNO);
-      return 0;
+      return _close (fd);
     }
 
   errno = EACCES;

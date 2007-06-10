@@ -18,9 +18,11 @@
 
 void _exit (int n)
 {
-  /* Unfortunately, the return status is not returned by Knuth's mmix
-     simulator, so it seems in effect ineffective.  We set it anyway;
-     there may be a purpose.  */
+  /* The return status is passed on at exit from the simulator by all
+     but the oldest versions of Knuth's mmixware simulator.  Beware,
+     "TRAP 0,0,0" is the instruction corresponding to (int32_t) 0 and
+     the value 0 in $255 is common enough that a program crash jumping
+     to e.g. uninitialized memory will look like "exit (0)".  */
   __asm__ ("SET $255,%0\n\tTRAP 0,0,0"
 	   : /* No outputs.  */
 	   : "r" (n)

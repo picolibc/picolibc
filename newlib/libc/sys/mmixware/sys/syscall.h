@@ -1,6 +1,6 @@
 /* syscall defines for MMIXware.
 
-   Copyright (C) 2001, 2002 Hans-Peter Nilsson
+   Copyright (C) 2001, 2002, 2007 Hans-Peter Nilsson
 
    Permission to use, copy, modify, and distribute this software is
    freely granted, provided that the above copyright notice, this notice
@@ -41,10 +41,6 @@ enum MMIX_filemode
    Had we got a filehandle from the simulator, we wouldn't have to keep
    track of it.  A value of 0 denotes a free handle.  */
 extern unsigned char _MMIX_allocated_filehandle[N_MMIX_FILEHANDLES];
-
-/* We use this file-handle number as a temporary; not used by usual file
-   I/O.  */
-#define TMPFNO 127
 
 /* Simulator call with one argument.  Also used for zero-argument calls;
    pass a zero as ARG1.  Make the asm volatile so we can safely ignore the
