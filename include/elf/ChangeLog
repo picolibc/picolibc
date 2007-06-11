@@ -1,3 +1,9 @@
+2007-06-11  Sterling Augustine  <sterling@tensilica.com>
+	    Bob Wilson  <bob.wilson@acm.org>
+	
+	* xtensa.h (XTENSA_PROP_INSN_NO_TRANSFORM): Renamed to...
+	(XTENSA_PROP_NO_TRANSFORM): ...this.
+	
 2007-05-18  Caroline Tice  <ctice@apple.com>
 
 	* dwarf2.h: (enum dwarf_location_atom): Add new DW_OP, 
