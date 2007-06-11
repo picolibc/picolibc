@@ -195,6 +195,7 @@ _close = close SIGFE
 closedir SIGFE
 _closedir = closedir SIGFE
 closelog SIGFE
+confstr SIGFE
 connect = cygwin_connect SIGFE
 copysign NOSIGFE
 _copysign = copysign NOSIGFE

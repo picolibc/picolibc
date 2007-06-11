@@ -75,6 +75,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     close
     closedir
     closelog
+    confstr
     connect
     copysign
     copysignf
@@ -1070,7 +1071,6 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     clog
     clogf
     clogl
-    confstr
     conj
     conjf
     conjl

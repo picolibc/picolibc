@@ -248,3 +248,51 @@ sysconf (int in)
   set_errno (EINVAL);
   return -1L;
 }
+
+#define ls(s)	sizeof(s),s
+
+static struct
+{
+  size_t l;
+  const char *s;
+} csa[] =
+{
+  {ls ("/bin:/usr/bin")},		/* _CS_PATH */
+  {0, NULL},				/* _CS_POSIX_V6_ILP32_OFF32_CFLAGS */
+  {0, NULL},				/* _CS_POSIX_V6_ILP32_OFF32_LDFLAGS */
+  {0, NULL},				/* _CS_POSIX_V6_ILP32_OFF32_LIBS */
+  {0, NULL},				/* _CS_POSIX_V6_ILP32_OFF32_LINTFLAGS */
+  {ls ("")},				/* _CS_POSIX_V6_ILP32_OFFBIG_CFLAGS */
+  {ls ("")},				/* _CS_POSIX_V6_ILP32_OFFBIG_LDFLAGS */
+  {ls ("")},				/* _CS_POSIX_V6_ILP32_OFFBIG_LIBS */
+  {ls ("")},				/* _CS_XBS5_ILP32_OFFBIG_LINTFLAGS */
+  {0, NULL},				/* _CS_POSIX_V6_LP64_OFF64_CFLAGS */
+  {0, NULL},				/* _CS_POSIX_V6_LP64_OFF64_LDFLAGS */
+  {0, NULL},				/* _CS_POSIX_V6_LP64_OFF64_LIBS */
+  {0, NULL},				/* _CS_XBS5_LP64_OFF64_LINTFLAGS */
+  {0, NULL},				/* _CS_POSIX_V6_LPBIG_OFFBIG_CFLAGS */
+  {0, NULL},				/* _CS_POSIX_V6_LPBIG_OFFBIG_LDFLAGS */
+  {0, NULL},				/* _CS_POSIX_V6_LPBIG_OFFBIG_LIBS */
+  {0, NULL},				/* _CS_XBS5_LPBIG_OFFBIG_LINTFLAGS */
+  {ls ("POSIX_V6_ILP32_OFFBIG")},	/* _CS_POSIX_V6_WIDTH_RESTRICTED_ENVS */
+};
+
+#define CS_MIN _CS_PATH
+#define CS_MAX _CS_POSIX_V6_WIDTH_RESTRICTED_ENVS
+
+extern "C" size_t
+confstr (int in, char *buf, size_t len)
+{
+  if (in >= CS_MIN && in <= CS_MAX)
+    {
+      if (csa[in].l && len)
+	{
+	  buf[0] = 0;
+	  strncat (buf, csa[in].s, min (len, csa[in].l) - 1);
+	}
+      return csa[in].l;
+    }
+  /* Invalid option value. */
+  set_errno (EINVAL);
+  return 0;
+}
