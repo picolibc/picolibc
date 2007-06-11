@@ -29,6 +29,7 @@
 #include "init.c"
 #include "cpu_features.h"
 
+extern void __main ();
 extern void _pei386_runtime_relocator (void);
 
 extern int main (int, char **, char **);
@@ -218,6 +219,14 @@ __mingw_CRTStartup (void)
   /* Align the stack to 16 bytes for the sake of SSE ops in main
      or in functions inlined into main.  */
   asm  __volatile__  ("andl $-16, %%esp" : : : "%esp");
+
+   /* From libgcc.a, __main calls global class constructors via
+      __do_global_ctors, This in turn  registers  __do_global_dtors
+      as the first entry of the app's atexit table.  We do this
+      explicitly at app startup rather than rely on gcc to generate
+      the call in main's  prologue, since main may be imported from a dll
+      which has its own __do_global_ctors.  */
+    __main ();
 
   /*
    * Call the main function. If the user does not supply one
