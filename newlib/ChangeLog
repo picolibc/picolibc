@@ -1,3 +1,8 @@
+2007-06-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/sys/unistd.h: Declare confstr for Cygwin.
+	Define confstr constants for Cygwin.  Add comment.
+
 2007-06-10  Hans-Peter Nilsson  <hp@bitrange.com>
 
 	* libc/sys/mmixware/access.c (access): Do not try to use a magic

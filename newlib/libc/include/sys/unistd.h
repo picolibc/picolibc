@@ -27,6 +27,9 @@ int     _EXFUN(chown, (const char *__path, uid_t __owner, gid_t __group ));
 int     _EXFUN(chroot, (const char *__path ));
 #endif
 int     _EXFUN(close, (int __fildes ));
+#if defined(__CYGWIN__)
+size_t	_EXFUN(confstr, (int __name, char *__buf, size_t __len));
+#endif
 char    _EXFUN(*ctermid, (char *__s ));
 char    _EXFUN(*cuserid, (char *__s ));
 #if defined(__CYGWIN__)
@@ -367,6 +370,10 @@ int     _EXFUN(symlink, (const char *__name1, const char *__name2));
 #define _SC_2_UPE                       120
 #define _SC_2_VERSION                   121
 
+/*
+ *  pathconf values per IEEE Std 1003.1, 2004 Edition
+ */
+
 #define _PC_LINK_MAX                      0
 #define _PC_MAX_CANON                     1
 #define _PC_MAX_INPUT                     2
@@ -387,6 +394,43 @@ int     _EXFUN(symlink, (const char *__name1, const char *__name2));
 #define _PC_POSIX_PERMISSIONS            90
 /* Ask for full POSIX permission support including uid/gid settings. */
 #define _PC_POSIX_SECURITY               91
+#endif
+
+/*
+ *  confstr values per IEEE Std 1003.1, 2004 Edition
+ */
+
+#ifdef __CYGWIN__	/* Only defined on Cygwin for now. */
+#define _CS_PATH                               0
+#define _CS_POSIX_V6_ILP32_OFF32_CFLAGS        1
+#define _CS_XBS5_ILP32_OFF32_CFLAGS           _CS_POSIX_V6_ILP32_OFF32_CFLAGS
+#define _CS_POSIX_V6_ILP32_OFF32_LDFLAGS       2
+#define _CS_XBS5_ILP32_OFF32_LDFLAGS          _CS_POSIX_V6_ILP32_OFF32_LDFLAGS
+#define _CS_POSIX_V6_ILP32_OFF32_LIBS          3
+#define _CS_XBS5_ILP32_OFF32_LIBS             _CS_POSIX_V6_ILP32_OFF32_LIBS
+#define _CS_XBS5_ILP32_OFF32_LINTFLAGS         4
+#define _CS_POSIX_V6_ILP32_OFFBIG_CFLAGS       5
+#define _CS_XBS5_ILP32_OFFBIG_CFLAGS          _CS_POSIX_V6_ILP32_OFFBIG_CFLAGS
+#define _CS_POSIX_V6_ILP32_OFFBIG_LDFLAGS      6
+#define _CS_XBS5_ILP32_OFFBIG_LDFLAGS         _CS_POSIX_V6_ILP32_OFFBIG_LDFLAGS
+#define _CS_POSIX_V6_ILP32_OFFBIG_LIBS         7
+#define _CS_XBS5_ILP32_OFFBIG_LIBS            _CS_POSIX_V6_ILP32_OFFBIG_LIBS
+#define _CS_XBS5_ILP32_OFFBIG_LINTFLAGS        8
+#define _CS_POSIX_V6_LP64_OFF64_CFLAGS         9
+#define _CS_XBS5_LP64_OFF64_CFLAGS            _CS_POSIX_V6_LP64_OFF64_CFLAGS
+#define _CS_POSIX_V6_LP64_OFF64_LDFLAGS       10
+#define _CS_XBS5_LP64_OFF64_LDFLAGS           _CS_POSIX_V6_LP64_OFF64_LDFLAGS
+#define _CS_POSIX_V6_LP64_OFF64_LIBS          11
+#define _CS_XBS5_LP64_OFF64_LIBS              _CS_POSIX_V6_LP64_OFF64_LIBS
+#define _CS_XBS5_LP64_OFF64_LINTFLAGS         12
+#define _CS_POSIX_V6_LPBIG_OFFBIG_CFLAGS      13
+#define _CS_XBS5_LPBIG_OFFBIG_CFLAGS          _CS_POSIX_V6_LPBIG_OFFBIG_CFLAGS
+#define _CS_POSIX_V6_LPBIG_OFFBIG_LDFLAGS     14
+#define _CS_XBS5_LPBIG_OFFBIG_LDFLAGS         _CS_POSIX_V6_LPBIG_OFFBIG_LDFLAGS
+#define _CS_POSIX_V6_LPBIG_OFFBIG_LIBS        15
+#define _CS_XBS5_LPBIG_OFFBIG_LIBS            _CS_POSIX_V6_LPBIG_OFFBIG_LIBS
+#define _CS_XBS5_LPBIG_OFFBIG_LINTFLAGS       16
+#define _CS_POSIX_V6_WIDTH_RESTRICTED_ENVS    17
 #endif
 
 /* FIXME: This is temporary until winsup gets sorted out.  */
