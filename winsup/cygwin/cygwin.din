@@ -195,7 +195,7 @@ _close = close SIGFE
 closedir SIGFE
 _closedir = closedir SIGFE
 closelog SIGFE
-confstr SIGFE
+confstr NOSIGFE
 connect = cygwin_connect SIGFE
 copysign NOSIGFE
 _copysign = copysign NOSIGFE
@@ -731,6 +731,7 @@ _infinityf = infinityf NOSIGFE
 initgroups SIGFE
 _initgroups32 = initgroups32 SIGFE
 initstate NOSIGFE
+insque NOSIGFE
 ioctl SIGFE
 _ioctl = ioctl SIGFE
 iprintf SIGFE
@@ -1146,6 +1147,7 @@ remainderf NOSIGFE
 _remainderf = remainderf NOSIGFE
 remove SIGFE
 _remove = remove SIGFE
+remque NOSIGFE
 remquo NOSIGFE
 remquof NOSIGFE
 rename SIGFE

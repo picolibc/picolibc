@@ -31,24 +31,16 @@ typedef	enum
   leaf
 } VISIT;
 
-#ifdef _SEARCH_PRIVATE
-typedef	struct node
-{
-  char *key;
-  struct node *llink, *rlink;
-} node_t;
-
-struct que_elem
-{
-  struct que_elem *next;
-  struct que_elem *prev;
-};
-#endif
-
 struct hsearch_data
 {
   struct internal_head *htable;
   size_t htablesize;
+};
+
+struct qelem
+{
+  struct qelem *q_forw;
+  struct qelem *q_back;
 };
 
 __BEGIN_DECLS
@@ -69,6 +61,8 @@ void *lfind (const void *, const void *, size_t *, size_t,
 	     int (*) (const void *, const void *));
 void *lsearch (const void *, void *, size_t *, size_t,
 	       int (*) (const void *, const void *));
+void insque (void *, void *);
+void remque (void *);
 __END_DECLS
 
 #endif /* !_SEARCH_H_ */

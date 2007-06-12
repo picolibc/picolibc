@@ -309,12 +309,13 @@ details. */
       167: Add st_birthtim to struct stat.
       168: Export asnprintf, dprintf, _Exit, vasnprintf, vdprintf.
       169: Export confstr.
+      170: Export insque, remque.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 169
+#define CYGWIN_VERSION_API_MINOR 170
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

@@ -1,5 +1,21 @@
 2007-06-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (DLL_OFILES): Add xsique.o.
+	* cygwin.din (confstr): Make NOSIGFE.
+	(insque): Export.
+	(remque): Export.
+	* lsearch.cc: Remove superfluous _SEARCH_PRIVATE define.
+	* posix.sgml: Move insque to defined SUSv3 interfaces.  Remove
+	comment for remque.
+	* include/search.h: Remove _SEARCH_PRIVATE guarded definitions.
+	Add struct qelem definition.  Add insque and remque declarations.
+	* include/cygwin/version.h: Bump API minor number.
+	* include/sys/queue.h: Remove insque/remque definitions so as not
+	to collide with SUSv3 compatible declaration in search.h.
+	* libc/xsique.cc: New file implementing insque and remque.
+
+2007-06-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (fhandler_base::fstat): Set pipe permission bits more
 	correctly.
 
