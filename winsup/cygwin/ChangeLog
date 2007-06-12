@@ -1,3 +1,7 @@
+2007-06-12  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* signal.cc (usleep): Use useconds_t for the type as per POSIX.
+
 2007-06-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (DLL_OFILES): Add xsique.o.

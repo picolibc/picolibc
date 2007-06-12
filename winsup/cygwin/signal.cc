@@ -135,7 +135,7 @@ sleep (unsigned int seconds)
 }
 
 extern "C" unsigned int
-usleep (unsigned int useconds)
+usleep (useconds_t useconds)
 {
   struct timespec req;
   req.tv_sec = useconds / 1000000;
