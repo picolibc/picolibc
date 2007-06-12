@@ -1127,13 +1127,13 @@ fhandler_base::fstat (struct __stat64 *buf)
   switch (get_device ())
     {
     case FH_PIPE:
-      buf->st_mode = S_IFIFO | STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
+      buf->st_mode = S_IFIFO | S_IRUSR | S_IWUSR;
       break;
     case FH_PIPEW:
-      buf->st_mode = S_IFIFO | STD_WBITS | S_IWGRP | S_IWOTH;
+      buf->st_mode = S_IFIFO | S_IWUSR;
       break;
     case FH_PIPER:
-      buf->st_mode = S_IFIFO | STD_RBITS;
+      buf->st_mode = S_IFIFO | S_IRUSR;
       break;
     case FH_FULL:
       buf->st_mode = S_IFCHR | S_IRUSR | S_IWUSR | S_IWGRP | S_IWOTH;
