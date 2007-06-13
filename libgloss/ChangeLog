@@ -1,3 +1,9 @@
+2007-06-13  Patrick Mansfield  <patmans@us.ibm.com>
+
+	* spu/Makefile.in: Add nanosleep.c.
+	* spu/jsre.h: Add JSRE_NANOSLEEP.
+	* spu/nanosleep.c: New file, supply nanosleep via an assist call.
+
 2007-06-05  Patrick Mansfield  <patman@us.ibm.com>
 
 	* spu/jsre.h: Remove the assist call structs and defines that are

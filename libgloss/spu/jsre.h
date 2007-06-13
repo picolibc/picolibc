@@ -1,5 +1,5 @@
 /*
-(C) Copyright IBM Corp. 2005, 2006
+(C) Copyright IBM Corp. 2005, 2006, 2007
 
 All rights reserved.
 
@@ -49,6 +49,7 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #define JSRE_FTRUNCATE 28
 #define JSRE_ACCESS 29
 #define JSRE_DUP 30
+#define JSRE_NANOSLEEP 32
 
 typedef struct {
     unsigned int dev;
