@@ -8,18 +8,19 @@ noinst_LIBRARIES = lib.a
 
 AM_CCASFLAGS = $(INCLUDES)
 
-lib_a_SOURCES = setjmp.S memcpy.c memmove.c memset.c strcat.c strchr.c strcmp.c strcpy.c strcspn.c strlen.c strncat.c strncmp.c strncpy.c strpbrk.c strrchr.c strspn.c strxfrm.c \
-	stdio.c clearerr.c feof.c ferror.c fileno.c fopen.c fclose.c freopen.c \
-	fflush.c fseek.c ftell.c rewind.c fgetpos.c fsetpos.c fread.c fwrite.c \
-	getc.c putc.c fgetc.c fgets.c fputc.c fputs.c ungetc.c \
-	fprintf.c fscanf.c vfprintf.c vfscanf.c \
-	perror.c gets.c getchar.c putchar.c puts.c \
-	printf.c scanf.c vprintf.c vscanf.c \
-	setbuf.c setvbuf.c tmpfile.c \
-	sprintf.c sscanf.c snprintf.c vsscanf.c vsnprintf.c vsprintf.c \
-	remove.c rename.c tmpnam.c \
-	iprintf.c fiprintf.c siprintf.c sniprintf.c viprintf.c vfiprintf.c vsiprintf.c vsniprintf.c \
-	iscanf.c fiscanf.c siscanf.c viscanf.c vfiscanf.c vsiscanf.c
+lib_a_SOURCES = clearerr.c fclose.c feof.c ferror.c fflush.c \
+	fgetc.c fgetpos.c fgets.c fileno.c fiprintf.c fiscanf.c fopen.c \
+	fprintf.c fputc.c fputs.c fread.c freopen.c fscanf.c fseek.c \
+	fsetpos.c ftell.c fwrite.c getc.c getchar.c gets.c iprintf.c \
+	iscanf.c memcpy.c memmove.c memset.c mktemp.c perror.c printf.c \
+	putc.c putchar.c puts.c remove.c rename.c rewind.c scanf.c \
+	setbuf.c setvbuf.c siprintf.c siscanf.c sleep.c sniprintf.c \
+	snprintf.c sprintf.c sscanf.c stdio.c strcat.c strchr.c strcmp.c \
+	strcpy.c strcspn.c strlen.c strncat.c strncmp.c strncpy.c strpbrk.c \
+	strrchr.c strspn.c strxfrm.c tmpfile.c tmpnam.c ungetc.c usleep.c \
+	vfiprintf.c vfiscanf.c vfprintf.c vfscanf.c viprintf.c viscanf.c \
+	vprintf.c vscanf.c vsiprintf.c vsiscanf.c vsniprintf.c vsnprintf.c \
+	vsprintf.c vsscanf.c
 
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)

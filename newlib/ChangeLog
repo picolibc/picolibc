@@ -1,3 +1,13 @@
+2007-06-13  Patrick Mansfield  <patmans@us.ibm.com>
+
+	* libc/include/sys/features.h: Define _POSIX_TIMERS for spu.
+	* libc/include/sys/unistd.h: Change usleep prototype to Posix
+	form and move outside of OS flag checks.
+	* libc/machine/spu/Makefile.am: Add sleep and usleep.
+	* libc/machine/spu/Makefile.in: Regenerate.
+	* libc/machine/spu/sleep.c: Copy libc/posix/sleep.c.
+	* libc/machine/spu/usleep.c: Copy libc/posix/usleep.c.
+
 2007-06-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/unistd.h: Declare confstr for Cygwin.

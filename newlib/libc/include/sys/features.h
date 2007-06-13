@@ -166,6 +166,11 @@ extern "C" {
 
 #endif
 
+#ifdef __SPU__
+/* Not much for now! */
+#define _POSIX_TIMERS				     1
+#endif
+
 #ifdef __cplusplus
 }
 #endif
