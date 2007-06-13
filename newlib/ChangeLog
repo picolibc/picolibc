@@ -1,3 +1,9 @@
+2007-06-13  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/machine/spu/Makefile.am: Re-add back setjmp.S which
+	I accidentally dropped.
+	* libc/machine/spu/Makefile.in: Regenerated.
+
 2007-06-13  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* libc/include/sys/features.h: Define _POSIX_TIMERS for spu.

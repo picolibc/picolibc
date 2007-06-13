@@ -95,51 +95,52 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am_lib_a_OBJECTS = lib_a-clearerr.$(OBJEXT) lib_a-fclose.$(OBJEXT) \
-	lib_a-feof.$(OBJEXT) lib_a-ferror.$(OBJEXT) \
-	lib_a-fflush.$(OBJEXT) lib_a-fgetc.$(OBJEXT) \
-	lib_a-fgetpos.$(OBJEXT) lib_a-fgets.$(OBJEXT) \
-	lib_a-fileno.$(OBJEXT) lib_a-fiprintf.$(OBJEXT) \
-	lib_a-fiscanf.$(OBJEXT) lib_a-fopen.$(OBJEXT) \
-	lib_a-fprintf.$(OBJEXT) lib_a-fputc.$(OBJEXT) \
-	lib_a-fputs.$(OBJEXT) lib_a-fread.$(OBJEXT) \
-	lib_a-freopen.$(OBJEXT) lib_a-fscanf.$(OBJEXT) \
-	lib_a-fseek.$(OBJEXT) lib_a-fsetpos.$(OBJEXT) \
-	lib_a-ftell.$(OBJEXT) lib_a-fwrite.$(OBJEXT) \
-	lib_a-getc.$(OBJEXT) lib_a-getchar.$(OBJEXT) \
-	lib_a-gets.$(OBJEXT) lib_a-iprintf.$(OBJEXT) \
-	lib_a-iscanf.$(OBJEXT) lib_a-memcpy.$(OBJEXT) \
-	lib_a-memmove.$(OBJEXT) lib_a-memset.$(OBJEXT) \
-	lib_a-mktemp.$(OBJEXT) lib_a-perror.$(OBJEXT) \
-	lib_a-printf.$(OBJEXT) lib_a-putc.$(OBJEXT) \
-	lib_a-putchar.$(OBJEXT) lib_a-puts.$(OBJEXT) \
-	lib_a-remove.$(OBJEXT) lib_a-rename.$(OBJEXT) \
-	lib_a-rewind.$(OBJEXT) lib_a-scanf.$(OBJEXT) \
-	lib_a-setbuf.$(OBJEXT) lib_a-setvbuf.$(OBJEXT) \
-	lib_a-siprintf.$(OBJEXT) lib_a-siscanf.$(OBJEXT) \
-	lib_a-sleep.$(OBJEXT) lib_a-sniprintf.$(OBJEXT) \
-	lib_a-snprintf.$(OBJEXT) lib_a-sprintf.$(OBJEXT) \
-	lib_a-sscanf.$(OBJEXT) lib_a-stdio.$(OBJEXT) \
-	lib_a-strcat.$(OBJEXT) lib_a-strchr.$(OBJEXT) \
-	lib_a-strcmp.$(OBJEXT) lib_a-strcpy.$(OBJEXT) \
-	lib_a-strcspn.$(OBJEXT) lib_a-strlen.$(OBJEXT) \
-	lib_a-strncat.$(OBJEXT) lib_a-strncmp.$(OBJEXT) \
-	lib_a-strncpy.$(OBJEXT) lib_a-strpbrk.$(OBJEXT) \
-	lib_a-strrchr.$(OBJEXT) lib_a-strspn.$(OBJEXT) \
-	lib_a-strxfrm.$(OBJEXT) lib_a-tmpfile.$(OBJEXT) \
-	lib_a-tmpnam.$(OBJEXT) lib_a-ungetc.$(OBJEXT) \
-	lib_a-usleep.$(OBJEXT) lib_a-vfiprintf.$(OBJEXT) \
-	lib_a-vfiscanf.$(OBJEXT) lib_a-vfprintf.$(OBJEXT) \
-	lib_a-vfscanf.$(OBJEXT) lib_a-viprintf.$(OBJEXT) \
-	lib_a-viscanf.$(OBJEXT) lib_a-vprintf.$(OBJEXT) \
-	lib_a-vscanf.$(OBJEXT) lib_a-vsiprintf.$(OBJEXT) \
-	lib_a-vsiscanf.$(OBJEXT) lib_a-vsniprintf.$(OBJEXT) \
-	lib_a-vsnprintf.$(OBJEXT) lib_a-vsprintf.$(OBJEXT) \
-	lib_a-vsscanf.$(OBJEXT)
+am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-clearerr.$(OBJEXT) \
+	lib_a-fclose.$(OBJEXT) lib_a-feof.$(OBJEXT) \
+	lib_a-ferror.$(OBJEXT) lib_a-fflush.$(OBJEXT) \
+	lib_a-fgetc.$(OBJEXT) lib_a-fgetpos.$(OBJEXT) \
+	lib_a-fgets.$(OBJEXT) lib_a-fileno.$(OBJEXT) \
+	lib_a-fiprintf.$(OBJEXT) lib_a-fiscanf.$(OBJEXT) \
+	lib_a-fopen.$(OBJEXT) lib_a-fprintf.$(OBJEXT) \
+	lib_a-fputc.$(OBJEXT) lib_a-fputs.$(OBJEXT) \
+	lib_a-fread.$(OBJEXT) lib_a-freopen.$(OBJEXT) \
+	lib_a-fscanf.$(OBJEXT) lib_a-fseek.$(OBJEXT) \
+	lib_a-fsetpos.$(OBJEXT) lib_a-ftell.$(OBJEXT) \
+	lib_a-fwrite.$(OBJEXT) lib_a-getc.$(OBJEXT) \
+	lib_a-getchar.$(OBJEXT) lib_a-gets.$(OBJEXT) \
+	lib_a-iprintf.$(OBJEXT) lib_a-iscanf.$(OBJEXT) \
+	lib_a-memcpy.$(OBJEXT) lib_a-memmove.$(OBJEXT) \
+	lib_a-memset.$(OBJEXT) lib_a-mktemp.$(OBJEXT) \
+	lib_a-perror.$(OBJEXT) lib_a-printf.$(OBJEXT) \
+	lib_a-putc.$(OBJEXT) lib_a-putchar.$(OBJEXT) \
+	lib_a-puts.$(OBJEXT) lib_a-remove.$(OBJEXT) \
+	lib_a-rename.$(OBJEXT) lib_a-rewind.$(OBJEXT) \
+	lib_a-scanf.$(OBJEXT) lib_a-setbuf.$(OBJEXT) \
+	lib_a-setvbuf.$(OBJEXT) lib_a-siprintf.$(OBJEXT) \
+	lib_a-siscanf.$(OBJEXT) lib_a-sleep.$(OBJEXT) \
+	lib_a-sniprintf.$(OBJEXT) lib_a-snprintf.$(OBJEXT) \
+	lib_a-sprintf.$(OBJEXT) lib_a-sscanf.$(OBJEXT) \
+	lib_a-stdio.$(OBJEXT) lib_a-strcat.$(OBJEXT) \
+	lib_a-strchr.$(OBJEXT) lib_a-strcmp.$(OBJEXT) \
+	lib_a-strcpy.$(OBJEXT) lib_a-strcspn.$(OBJEXT) \
+	lib_a-strlen.$(OBJEXT) lib_a-strncat.$(OBJEXT) \
+	lib_a-strncmp.$(OBJEXT) lib_a-strncpy.$(OBJEXT) \
+	lib_a-strpbrk.$(OBJEXT) lib_a-strrchr.$(OBJEXT) \
+	lib_a-strspn.$(OBJEXT) lib_a-strxfrm.$(OBJEXT) \
+	lib_a-tmpfile.$(OBJEXT) lib_a-tmpnam.$(OBJEXT) \
+	lib_a-ungetc.$(OBJEXT) lib_a-usleep.$(OBJEXT) \
+	lib_a-vfiprintf.$(OBJEXT) lib_a-vfiscanf.$(OBJEXT) \
+	lib_a-vfprintf.$(OBJEXT) lib_a-vfscanf.$(OBJEXT) \
+	lib_a-viprintf.$(OBJEXT) lib_a-viscanf.$(OBJEXT) \
+	lib_a-vprintf.$(OBJEXT) lib_a-vscanf.$(OBJEXT) \
+	lib_a-vsiprintf.$(OBJEXT) lib_a-vsiscanf.$(OBJEXT) \
+	lib_a-vsniprintf.$(OBJEXT) lib_a-vsnprintf.$(OBJEXT) \
+	lib_a-vsprintf.$(OBJEXT) lib_a-vsscanf.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
 am__depfiles_maybe =
+CCASCOMPILE = $(CCAS) $(AM_CCASFLAGS) $(CCASFLAGS)
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
@@ -259,7 +260,7 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 noinst_LIBRARIES = lib.a
 AM_CCASFLAGS = $(INCLUDES)
-lib_a_SOURCES = clearerr.c fclose.c feof.c ferror.c fflush.c \
+lib_a_SOURCES = setjmp.S clearerr.c fclose.c feof.c ferror.c fflush.c \
 	fgetc.c fgetpos.c fgets.c fileno.c fiprintf.c fiscanf.c fopen.c \
 	fprintf.c fputc.c fputs.c fread.c freopen.c fscanf.c fseek.c \
 	fsetpos.c ftell.c fwrite.c getc.c getchar.c gets.c iprintf.c \
@@ -280,7 +281,7 @@ CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .o .obj
+.SUFFIXES: .S .c .o .obj
 am--refresh:
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -327,6 +328,18 @@ mostlyclean-compile:
 
 distclean-compile:
 	-rm -f *.tab.c
+
+.S.o:
+	$(CCASCOMPILE) -c $<
+
+.S.obj:
+	$(CCASCOMPILE) -c `$(CYGPATH_W) '$<'`
+
+lib_a-setjmp.o: setjmp.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.o `test -f 'setjmp.S' || echo '$(srcdir)/'`setjmp.S
+
+lib_a-setjmp.obj: setjmp.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.obj `if test -f 'setjmp.S'; then $(CYGPATH_W) 'setjmp.S'; else $(CYGPATH_W) '$(srcdir)/setjmp.S'; fi`
 
 .c.o:
 	$(COMPILE) -c $<

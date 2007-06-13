@@ -8,7 +8,7 @@ noinst_LIBRARIES = lib.a
 
 AM_CCASFLAGS = $(INCLUDES)
 
-lib_a_SOURCES = clearerr.c fclose.c feof.c ferror.c fflush.c \
+lib_a_SOURCES = setjmp.S clearerr.c fclose.c feof.c ferror.c fflush.c \
 	fgetc.c fgetpos.c fgets.c fileno.c fiprintf.c fiscanf.c fopen.c \
 	fprintf.c fputc.c fputs.c fread.c freopen.c fscanf.c fseek.c \
 	fsetpos.c ftell.c fwrite.c getc.c getchar.c gets.c iprintf.c \
