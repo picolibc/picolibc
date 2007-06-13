@@ -1,5 +1,9 @@
 2007-06-13  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* Makefile.in (CRT0S): Add back CRTfmode.o.
+
+2007-06-13  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/stdlib.h: Don't include stdint.h.  Conditionally define intptr_t.
 	* include/io.h: Likewise.
 

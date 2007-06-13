@@ -171,7 +171,7 @@ FLAGS_TO_PASS:=\
 	TARFILEEXT="$(TARFILEEXT)"
 
 CRT0S = crt1.o dllcrt1.o crt2.o dllcrt2.o CRT_noglob.o crtmt.o crtst.o \
-	CRT_fp8.o CRT_fp10.o txtmode.o binmode.o
+	CRT_fp8.o CRT_fp10.o txtmode.o binmode.o CRTfmode.o
 MINGW_OBJS = CRTglob.o CRTfmode.o CRTinit.o  dllmain.o gccmain.o \
 	     main.o crtst.o mthr_stub.o CRT_fp10.o txtmode.o \
 	     pseudo-reloc.o pseudo-reloc-list.o cpu_features.o
