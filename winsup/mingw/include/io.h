@@ -18,7 +18,6 @@
  *       an inclusion of sys/types.h */
 
 #include <sys/types.h>	/* To get time_t.  */
-#include <stdint.h>  /* For intptr_t.  */
 
 /*
  * Attributes of files as returned by _findfirst et al.
@@ -33,6 +32,15 @@
 
 
 #ifndef RC_INVOKED
+
+#ifndef _INTPTR_T_DEFINED
+#define _INTPTR_T_DEFINED
+#ifdef _WIN64
+  typedef __int64 intptr_t;
+#else
+  typedef int intptr_t;
+#endif
+#endif
 
 #ifndef	_FSIZE_T_DEFINED
 typedef	unsigned long	_fsize_t;

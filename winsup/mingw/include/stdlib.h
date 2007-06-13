@@ -21,8 +21,6 @@
 #include <stddef.h>
 #endif /* RC_INVOKED */
 
-#include <stdint.h> /* For uintptr_t */
-
 /*
  * RAND_MAX is the maximum value that may be returned by rand.
  * The minimum is zero.
@@ -441,6 +439,14 @@ _CRTIMP int __cdecl _set_error_mode (int);
 #define _REPORT_ERRMODE	3
 
 #if __MSVCRT_VERSION__ >= 0x800
+#ifndef _INTPTR_T_DEFINED
+#define _INTPTR_T_DEFINED
+#ifdef _WIN64
+  typedef __int64 intptr_t;
+#else
+  typedef int intptr_t;
+#endif
+#endif
 _CRTIMP unsigned int __cdecl _set_abort_behavior (unsigned int, unsigned int);
 /* These masks work with msvcr80.dll version 8.0.50215.44 (a beta release).  */
 #define _WRITE_ABORT_MSG 1

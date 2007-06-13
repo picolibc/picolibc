@@ -1,3 +1,8 @@
+2007-06-13  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdlib.h: Don't include stdint.h.  Conditionally define intptr_t.
+	* include/io.h: Likewise.
+
 2007-06-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* crt1.c (__mingw_CRTStartup): Add explicit call to gcc's __main.
