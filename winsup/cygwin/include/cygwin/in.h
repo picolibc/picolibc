@@ -197,35 +197,35 @@ struct sockaddr_in
  * On subnets, host and network parts are found according
  * to the subnet mask, not these masks.
  */
-#define	IN_CLASSA(a)		((((long int) (a)) & 0x80000000) == 0)
+#define	IN_CLASSA(a)		((((in_addr_t) (a)) & 0x80000000) == 0)
 #define	IN_CLASSA_NET		0xff000000
 #define	IN_CLASSA_NSHIFT	24
 #define	IN_CLASSA_HOST		(0xffffffff & ~IN_CLASSA_NET)
 #define	IN_CLASSA_MAX		128
 
-#define	IN_CLASSB(a)		((((long int) (a)) & 0xc0000000) == 0x80000000)
+#define	IN_CLASSB(a)		((((in_addr_t) (a)) & 0xc0000000) == 0x80000000)
 #define	IN_CLASSB_NET		0xffff0000
 #define	IN_CLASSB_NSHIFT	16
 #define	IN_CLASSB_HOST		(0xffffffff & ~IN_CLASSB_NET)
 #define	IN_CLASSB_MAX		65536
 
-#define	IN_CLASSC(a)		((((long int) (a)) & 0xe0000000) == 0xc0000000)
+#define	IN_CLASSC(a)		((((in_addr_t) (a)) & 0xe0000000) == 0xc0000000)
 #define	IN_CLASSC_NET		0xffffff00
 #define	IN_CLASSC_NSHIFT	8
 #define	IN_CLASSC_HOST		(0xffffffff & ~IN_CLASSC_NET)
 
-#define	IN_CLASSD(a)		((((long int) (a)) & 0xf0000000) == 0xe0000000)
+#define	IN_CLASSD(a)		((((in_addr_t) (a)) & 0xf0000000) == 0xe0000000)
 #define	IN_MULTICAST(a)		IN_CLASSD(a)
 #define IN_MULTICAST_NET	0xF0000000
 
-#define	IN_EXPERIMENTAL(a)	((((long int) (a)) & 0xe0000000) == 0xe0000000)
-#define	IN_BADCLASS(a)		((((long int) (a)) & 0xf0000000) == 0xf0000000)
+#define	IN_EXPERIMENTAL(a)	((((in_addr_t) (a)) & 0xe0000000) == 0xe0000000)
+#define	IN_BADCLASS(a)		((((in_addr_t) (a)) & 0xf0000000) == 0xf0000000)
 
 /* Address to accept any incoming messages. */
-#define	INADDR_ANY		((unsigned long int) 0x00000000)
+#define	INADDR_ANY		((in_addr_t) 0x00000000)
 
 /* Address to send to all hosts. */
-#define	INADDR_BROADCAST	((unsigned long int) 0xffffffff)
+#define	INADDR_BROADCAST	((in_addr_t) 0xffffffff)
 
 /* Address indicating an error return. */
 #define	INADDR_NONE		0xffffffff
@@ -235,7 +235,7 @@ struct sockaddr_in
 
 /* Address to loopback in software to local host.  */
 #define	INADDR_LOOPBACK		0x7f000001	/* 127.0.0.1   */
-#define	IN_LOOPBACK(a)		((((long int) (a)) & 0xff000000) == 0x7f000000)
+#define	IN_LOOPBACK(a)		((((in_addr_t) (a)) & 0xff000000) == 0x7f000000)
 
 /* Defines for Multicast INADDR */
 #define INADDR_UNSPEC_GROUP	0xe0000000      /* 224.0.0.0   */

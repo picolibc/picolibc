@@ -64,6 +64,7 @@ struct ifreq {
   union {
     struct  sockaddr ifru_addr;
     struct  sockaddr ifru_broadaddr;
+    struct  sockaddr ifru_dstaddr;
     struct  sockaddr ifru_netmask;
     struct  sockaddr ifru_hwaddr;
     int     ifru_flags;
@@ -80,6 +81,7 @@ struct ifreq {
 #define ifr_name        ifr_ifrn.ifrn_name      /* interface name       */
 #define ifr_addr        ifr_ifru.ifru_addr      /* address              */
 #define ifr_broadaddr   ifr_ifru.ifru_broadaddr /* broadcast address    */
+#define ifr_dstaddr     ifr_ifru.ifru_dstaddr   /* destination address  */
 #define ifr_netmask     ifr_ifru.ifru_netmask   /* interface net mask   */
 #define ifr_flags       ifr_ifru.ifru_flags     /* flags                */
 #define ifr_hwaddr      ifr_ifru.ifru_hwaddr    /* MAC address          */

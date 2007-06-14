@@ -44,6 +44,7 @@ details. */
 #define SIOCGIFINDEX    _IOW('s', 108, struct ifreq) /* get if index */
 #define SIOGIFINDEX SIOCGIFINDEX /* backward compatibility w/ Linux typo. */
 #define SIOCGIFFRNDLYNAM _IOW('s', 109, struct ifreq) /* get friendly if name */
+#define SIOCGIFDSTADDR  _IOW('s', 110, struct ifreq) /* Get if dstaddr */
 
 #define SOL_SOCKET      0xffff          /* options for socket level */
 

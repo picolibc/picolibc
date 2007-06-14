@@ -1519,6 +1519,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
     case SIOCGIFMTU:
     case SIOCGIFINDEX:
     case SIOCGIFFRNDLYNAM:
+    case SIOCGIFDSTADDR:
       {
 	if (!p)
 	  {

@@ -1285,6 +1285,23 @@ convert_ifr_flags (u_long ws_flags)
 	 | ((ws_flags & WS_IFF_MULTICAST) << 8);
 }
 
+static u_long
+get_routedst (DWORD if_index)
+{
+  PMIB_IPFORWARDTABLE pift;
+  ULONG size = 0;
+  if (GetIpForwardTable (NULL, &size, FALSE) == ERROR_INSUFFICIENT_BUFFER
+      && (pift = (PMIB_IPFORWARDTABLE) alloca (size))
+      && GetIpForwardTable (pift, &size, FALSE) == NO_ERROR)
+    for (DWORD i = 0; i < pift->dwNumEntries; ++i)
+      {
+        if (pift->table[i].dwForwardIfIndex == if_index
+	    && pift->table[i].dwForwardMask == INADDR_BROADCAST)
+	  return pift->table[i].dwForwardDest;
+      }
+  return INADDR_ANY;
+}
+
 /*
  * IFCONF XP SP1 and above.
  * Use IP Helpper function GetAdaptersAddresses.
@@ -1363,6 +1380,20 @@ get_xp_ifconf (SOCKET s, struct ifconf *ifc, int what)
 	      memcpy (&ifr->ifr_broadaddr,
 		      &iie[iinf_idx].iiBroadcastAddress.AddressIn,
 		      sizeof (struct sockaddr_in));
+	      break;
+	    case SIOCGIFDSTADDR:
+	      if (pap->IfType == IF_TYPE_PPP)
+		{
+		  struct sockaddr_in *sa = (struct sockaddr_in *)
+					   &ifr->ifr_dstaddr;
+		  sa->sin_addr.s_addr = get_routedst (pap->IfIndex);
+		  sa->sin_family = AF_INET;
+		  sa->sin_port = 0;
+		}
+	      else
+		memcpy (&ifr->ifr_addr,
+			&iie[iinf_idx].iiAddress.AddressIn,
+			sizeof (struct sockaddr_in));
 	      break;
 	    case SIOCGIFNETMASK:
 	      memcpy (&ifr->ifr_netmask,
@@ -1565,6 +1596,17 @@ get_2k_ifconf (struct ifconf *ifc, int what)
 		sa->sin_port = 0;
 #endif
 		break;
+	      case SIOCGIFDSTADDR:
+		sa = (struct sockaddr_in *) &ifr->ifr_dstaddr;
+		if (ifrow->dwType == MIB_IF_TYPE_PPP
+		    || ifrow->dwType == MIB_IF_TYPE_SLIP)
+		  sa->sin_addr.s_addr =
+		  	get_routedst (ipt->table[ip_cnt].dwIndex);
+		else
+		  sa->sin_addr.s_addr = ipt->table[ip_cnt].dwAddr;
+		sa->sin_family = AF_INET;
+		sa->sin_port = 0;
+	        break;
 	      case SIOCGIFNETMASK:
 		sa = (struct sockaddr_in *) &ifr->ifr_netmask;
 		sa->sin_addr.s_addr = ipt->table[ip_cnt].dwMask;
@@ -1719,6 +1761,7 @@ get_nt_ifconf (struct ifconf *ifc, int what)
 			    break;
 			  case SIOCGIFCONF:
 			  case SIOCGIFADDR:
+			  case SIOCGIFDSTADDR:
 			    sa = (struct sockaddr_in *) &ifr->ifr_addr;
 			    sa->sin_addr.s_addr =
 			      cygwin_inet_addr (dhcpaddress);
@@ -1766,6 +1809,7 @@ get_nt_ifconf (struct ifconf *ifc, int what)
 			    break;
 			  case SIOCGIFCONF:
 			  case SIOCGIFADDR:
+			  case SIOCGIFDSTADDR:
 			    sa = (struct sockaddr_in *) &ifr->ifr_addr;
 			    sa->sin_addr.s_addr = cygwin_inet_addr (ip);
 			    sa->sin_family = AF_INET;
@@ -1845,6 +1889,7 @@ get_ifconf (SOCKET s, struct ifconf *ifc, int what)
 	    break;
 	  case SIOCGIFCONF:
 	  case SIOCGIFADDR:
+	  case SIOCGIFDSTADDR:
 	    sa = (struct sockaddr_in *) &ifr->ifr_addr;
 	    sa->sin_addr.s_addr = htonl (INADDR_LOOPBACK);
 	    sa->sin_family = AF_INET;

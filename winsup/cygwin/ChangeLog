@@ -1,3 +1,19 @@
+2007-06-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (GetIpForwardTable): Define.
+	* fhandler_socket.cc (fhandler_socket::ioctl): Handle SIOCGIFDSTADDR.
+	* net.cc (get_routedst): New static function to get destination
+	address of point-to-point interfaces.
+	(get_xp_ifconf): Handle SIOCGIFDSTADDR.
+	(get_2k_ifconf): Ditto.
+	(get_nt_ifconf): Ditto.
+	(get_ifconf): Ditto.
+	* include/asm/socket.h (SIOCGIFDSTADDR): Define.
+	* include/cygwin/if.h (struct ifreq): Add ifru_dstaddr member.
+	(ifr_dstaddr): Define.
+	* include/cygwin/in.h: Cast ipv4 addresses correctly to in_addr_t in
+	definitions.
+
 2007-06-12  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* signal.cc (usleep): Use useconds_t for the type as per POSIX.
