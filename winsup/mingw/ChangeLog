@@ -1,3 +1,8 @@
+2007-06-14  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/string.h (strcasecmp): Add prototype.
+	(strncasecmp): Add prototype.
+
 2007-06-13  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* Makefile.in (CRT0S): Revert last change.
