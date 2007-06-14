@@ -154,6 +154,7 @@ _CRTIMP intptr_t __cdecl _findnext64(intptr_t, struct __finddata64_t*);
 #endif /* __MSVCRT_VERSION__ >= 0x0601 */
 
 #ifndef __NO_MINGW_LFS
+__CRT_INLINE off64_t lseek64 (int, off64_t, int);
 __CRT_INLINE off64_t lseek64 (int fd, off64_t offset, int whence) 
 {
   return _lseeki64(fd, (__int64) offset, whence);
