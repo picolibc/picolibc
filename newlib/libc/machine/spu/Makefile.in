@@ -80,7 +80,7 @@ DIST_COMMON = $(srcdir)/../../../../config.guess \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
-	$(srcdir)/../../../../compile $(srcdir)/../../../../compile
+	$(srcdir)/../../../../compile
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../../acinclude.m4 \
@@ -111,32 +111,31 @@ am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-clearerr.$(OBJEXT) \
 	lib_a-gets.$(OBJEXT) lib_a-iprintf.$(OBJEXT) \
 	lib_a-iscanf.$(OBJEXT) lib_a-memcpy.$(OBJEXT) \
 	lib_a-memmove.$(OBJEXT) lib_a-memset.$(OBJEXT) \
-	lib_a-mktemp.$(OBJEXT) lib_a-perror.$(OBJEXT) \
-	lib_a-printf.$(OBJEXT) lib_a-putc.$(OBJEXT) \
-	lib_a-putchar.$(OBJEXT) lib_a-puts.$(OBJEXT) \
-	lib_a-remove.$(OBJEXT) lib_a-rename.$(OBJEXT) \
-	lib_a-rewind.$(OBJEXT) lib_a-scanf.$(OBJEXT) \
-	lib_a-setbuf.$(OBJEXT) lib_a-setvbuf.$(OBJEXT) \
-	lib_a-siprintf.$(OBJEXT) lib_a-siscanf.$(OBJEXT) \
-	lib_a-sleep.$(OBJEXT) lib_a-sniprintf.$(OBJEXT) \
-	lib_a-snprintf.$(OBJEXT) lib_a-sprintf.$(OBJEXT) \
-	lib_a-sscanf.$(OBJEXT) lib_a-stdio.$(OBJEXT) \
-	lib_a-strcat.$(OBJEXT) lib_a-strchr.$(OBJEXT) \
-	lib_a-strcmp.$(OBJEXT) lib_a-strcpy.$(OBJEXT) \
-	lib_a-strcspn.$(OBJEXT) lib_a-strlen.$(OBJEXT) \
-	lib_a-strncat.$(OBJEXT) lib_a-strncmp.$(OBJEXT) \
-	lib_a-strncpy.$(OBJEXT) lib_a-strpbrk.$(OBJEXT) \
-	lib_a-strrchr.$(OBJEXT) lib_a-strspn.$(OBJEXT) \
-	lib_a-strxfrm.$(OBJEXT) lib_a-tmpfile.$(OBJEXT) \
-	lib_a-tmpnam.$(OBJEXT) lib_a-ungetc.$(OBJEXT) \
-	lib_a-usleep.$(OBJEXT) lib_a-vfiprintf.$(OBJEXT) \
-	lib_a-vfiscanf.$(OBJEXT) lib_a-vfprintf.$(OBJEXT) \
-	lib_a-vfscanf.$(OBJEXT) lib_a-viprintf.$(OBJEXT) \
-	lib_a-viscanf.$(OBJEXT) lib_a-vprintf.$(OBJEXT) \
-	lib_a-vscanf.$(OBJEXT) lib_a-vsiprintf.$(OBJEXT) \
-	lib_a-vsiscanf.$(OBJEXT) lib_a-vsniprintf.$(OBJEXT) \
-	lib_a-vsnprintf.$(OBJEXT) lib_a-vsprintf.$(OBJEXT) \
-	lib_a-vsscanf.$(OBJEXT)
+	lib_a-perror.$(OBJEXT) lib_a-printf.$(OBJEXT) \
+	lib_a-putc.$(OBJEXT) lib_a-putchar.$(OBJEXT) \
+	lib_a-puts.$(OBJEXT) lib_a-remove.$(OBJEXT) \
+	lib_a-rename.$(OBJEXT) lib_a-rewind.$(OBJEXT) \
+	lib_a-scanf.$(OBJEXT) lib_a-setbuf.$(OBJEXT) \
+	lib_a-setvbuf.$(OBJEXT) lib_a-siprintf.$(OBJEXT) \
+	lib_a-siscanf.$(OBJEXT) lib_a-sleep.$(OBJEXT) \
+	lib_a-sniprintf.$(OBJEXT) lib_a-snprintf.$(OBJEXT) \
+	lib_a-sprintf.$(OBJEXT) lib_a-sscanf.$(OBJEXT) \
+	lib_a-stdio.$(OBJEXT) lib_a-strcat.$(OBJEXT) \
+	lib_a-strchr.$(OBJEXT) lib_a-strcmp.$(OBJEXT) \
+	lib_a-strcpy.$(OBJEXT) lib_a-strcspn.$(OBJEXT) \
+	lib_a-strlen.$(OBJEXT) lib_a-strncat.$(OBJEXT) \
+	lib_a-strncmp.$(OBJEXT) lib_a-strncpy.$(OBJEXT) \
+	lib_a-strpbrk.$(OBJEXT) lib_a-strrchr.$(OBJEXT) \
+	lib_a-strspn.$(OBJEXT) lib_a-strxfrm.$(OBJEXT) \
+	lib_a-tmpfile.$(OBJEXT) lib_a-tmpnam.$(OBJEXT) \
+	lib_a-ungetc.$(OBJEXT) lib_a-usleep.$(OBJEXT) \
+	lib_a-vfiprintf.$(OBJEXT) lib_a-vfiscanf.$(OBJEXT) \
+	lib_a-vfprintf.$(OBJEXT) lib_a-vfscanf.$(OBJEXT) \
+	lib_a-viprintf.$(OBJEXT) lib_a-viscanf.$(OBJEXT) \
+	lib_a-vprintf.$(OBJEXT) lib_a-vscanf.$(OBJEXT) \
+	lib_a-vsiprintf.$(OBJEXT) lib_a-vsiscanf.$(OBJEXT) \
+	lib_a-vsniprintf.$(OBJEXT) lib_a-vsnprintf.$(OBJEXT) \
+	lib_a-vsprintf.$(OBJEXT) lib_a-vsscanf.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -265,7 +264,7 @@ lib_a_SOURCES = setjmp.S clearerr.c creat.c fclose.c feof.c ferror.c fflush.c \
 	fgetc.c fgetpos.c fgets.c fileno.c fiprintf.c fiscanf.c fopen.c \
 	fprintf.c fputc.c fputs.c fread.c freopen.c fscanf.c fseek.c \
 	fsetpos.c ftell.c fwrite.c getc.c getchar.c gets.c iprintf.c \
-	iscanf.c memcpy.c memmove.c memset.c mktemp.c perror.c printf.c \
+	iscanf.c memcpy.c memmove.c memset.c perror.c printf.c \
 	putc.c putchar.c puts.c remove.c rename.c rewind.c scanf.c \
 	setbuf.c setvbuf.c siprintf.c siscanf.c sleep.c sniprintf.c \
 	snprintf.c sprintf.c sscanf.c stdio.c strcat.c strchr.c strcmp.c \
@@ -533,12 +532,6 @@ lib_a-memset.o: memset.c
 
 lib_a-memset.obj: memset.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memset.obj `if test -f 'memset.c'; then $(CYGPATH_W) 'memset.c'; else $(CYGPATH_W) '$(srcdir)/memset.c'; fi`
-
-lib_a-mktemp.o: mktemp.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mktemp.o `test -f 'mktemp.c' || echo '$(srcdir)/'`mktemp.c
-
-lib_a-mktemp.obj: mktemp.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mktemp.obj `if test -f 'mktemp.c'; then $(CYGPATH_W) 'mktemp.c'; else $(CYGPATH_W) '$(srcdir)/mktemp.c'; fi`
 
 lib_a-perror.o: perror.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-perror.o `test -f 'perror.c' || echo '$(srcdir)/'`perror.c
