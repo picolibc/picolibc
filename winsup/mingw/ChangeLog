@@ -1,3 +1,7 @@
+2007-06-16  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* include/string.h (strcasecmp): Fix typo in declaration prototype.
+
 2007-06-14  Danny Smith  <dannysmith@users.sourceforge.net>'
 
 	* include/io.h (lseek64) : Add prototype.

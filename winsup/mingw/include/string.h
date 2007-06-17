@@ -99,7 +99,7 @@ strcasecmp (const char * __sz1, const char * __sz2)
 _CRTIMP int __cdecl	stricoll (const char*, const char*);
 _CRTIMP char* __cdecl	strlwr (char*);
 _CRTIMP int __cdecl	strnicmp (const char*, const char*, size_t);
-__CRT_INLINE int  __cdecl strncasecmp (const char *. const char *, size_t);
+__CRT_INLINE int  __cdecl strncasecmp (const char *, const char *, size_t);
 __CRT_INLINE int __cdecl
 strncasecmp (const char * __sz1, const char * __sz2, size_t __sizeMaxCompare)
   {return _strnicmp (__sz1, __sz2, __sizeMaxCompare);}
