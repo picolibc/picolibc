@@ -31,6 +31,14 @@ typedef	enum
   leaf
 } VISIT;
 
+#ifdef _SEARCH_PRIVATE
+typedef	struct node
+{
+  char *key;
+  struct node *llink, *rlink;
+} node_t;
+#endif
+
 struct hsearch_data
 {
   struct internal_head *htable;

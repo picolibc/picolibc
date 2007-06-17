@@ -1,3 +1,11 @@
+2007-06-16  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* include/search.h: Reinstate node_t definition.
+
+2007-06-16  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* include/sys/cdefs.h: Remove in favor of newlib version.
+
 2007-06-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (GetIpForwardTable): Define.
