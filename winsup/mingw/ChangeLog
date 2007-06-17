@@ -1,5 +1,9 @@
 2007-06-16  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* CRTfmode.c: Fix nested comment.
+
+2007-06-16  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* include/string.h (strcasecmp): Fix typo in declaration prototype.
 
 2007-06-14  Danny Smith  <dannysmith@users.sourceforge.net>'

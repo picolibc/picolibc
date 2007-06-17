@@ -10,7 +10,7 @@
  * 	
  * To override the default, add, eg:
  *
- * #include <fcntl.h>	/*  _O_BINARY */
+ * #include <fcntl.h
  * int _CRT_fmode = _O_BINARY;
  *
  * to your app.	
