@@ -1,3 +1,7 @@
+2007-06-16  Danny Smith  <dannysmith@users.sourceforge.net>'
+
+	* CRTfmode.c: Nit-pick comment fix.
+
 2007-06-16  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* CRTfmode.c: Fix nested comment.
