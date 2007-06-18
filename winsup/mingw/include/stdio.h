@@ -206,10 +206,9 @@ _CRTIMP int __cdecl	vsprintf (char*, const char*, __VALIST);
 _CRTIMP int __cdecl	_vsnprintf (char*, size_t, const char*, __VALIST);
 
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
-int __cdecl snprintf(char* s, size_t n, const char*  format, ...);
-__CRT_INLINE int __cdecl
-vsnprintf (char* s, size_t n, const char* format, __VALIST arg)
-  { return _vsnprintf ( s, n, format, arg); }
+int __cdecl snprintf(char *, size_t, const char *, ...);
+int __cdecl vsnprintf (char *, size_t, const char *, __VALIST);
+
 int __cdecl vscanf (const char * __restrict__, __VALIST);
 int __cdecl vfscanf (FILE * __restrict__, const char * __restrict__,
 		     __VALIST);

@@ -1,4 +1,9 @@
-2007-06-16  Danny Smith  <dannysmith@users.sourceforge.net>'
+2007-06-18  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdio.h (vsnprintf): Remove inline definition.
+	Add prototype.
+
+2007-06-16  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* CRTfmode.c: Nit-pick comment fix.
 
@@ -10,7 +15,7 @@
 
 	* include/string.h (strcasecmp): Fix typo in declaration prototype.
 
-2007-06-14  Danny Smith  <dannysmith@users.sourceforge.net>'
+2007-06-14  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/io.h (lseek64) : Add prototype.
 
