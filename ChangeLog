@@ -1,3 +1,8 @@
+2007-06-18  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* Makefile.def: Add dependency from configure-gdb to all-bfd.
+	* Makefile.in: Regenerated.
+
 2007-06-14  Paolo Bonzini  <bonzini@gnu.org>
 
         * Makefile.tpl (cleanstrap): Don't delete the toplevel Makefile.
