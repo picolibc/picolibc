@@ -76,6 +76,8 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #define JSRE_DUP2 50
 #define JSRE_LOCKF 51
 #define JSRE_TRUNCATE 52
+#define JSRE_MKSTEMP 53
+#define JSRE_MKTEMP 54
 
 struct jsre_stat {
     unsigned int dev;

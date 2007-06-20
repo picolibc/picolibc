@@ -1,5 +1,12 @@
 2007-06-20  Patrick Mansfield  <patmans@us.ibm.com>
 
+	* spu/jsre.h: Add JSRE_MKSTEMP and JSRE_MKTEMP values.
+	* spu/mkstemp.c: New file to add mkstemp support via assist call.
+	* spu/mktemp.c: New file to add mktemp support via assist call.
+	* spu/Makefile.in: Add mkstemp.o and mktemp.o
+
+2007-06-20  Patrick Mansfield  <patmans@us.ibm.com>
+
 	* spu/jsre.h: Add new JSRE opcodes.
 	* spu/dup2.c: New file to add dup2 support via assist call.
 	* spu/fdatasync.c: New file to add fdatasync support via assist call.
