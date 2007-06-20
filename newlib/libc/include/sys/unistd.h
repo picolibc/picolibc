@@ -103,6 +103,13 @@ int	_EXFUN(nice, (int __nice_value ));
 #if !defined(__INSIDE_CYGWIN__)
 off_t   _EXFUN(lseek, (int __fildes, off_t __offset, int __whence ));
 #endif
+#if defined(__SPU__)
+#define F_ULOCK	0
+#define F_LOCK	1
+#define F_TLOCK	2
+#define F_TEST	3
+int     _EXFUN(lockf, (int __fd, int __cmd, off_t __len));
+#endif
 long    _EXFUN(pathconf, (const char *__path, int __name ));
 int     _EXFUN(pause, (void ));
 #ifdef __CYGWIN__
@@ -194,7 +201,7 @@ _READ_WRITE_RETURN_TYPE _EXFUN(_write, (int __fd, const void *__buf, size_t __nb
 int     _EXFUN(_execve, (const char *__path, char * const __argv[], char * const __envp[] ));
 #endif
 
-#if defined(__CYGWIN__) || defined(__rtems__) || defined(__sh__)
+#if defined(__CYGWIN__) || defined(__rtems__) || defined(__sh__) || defined(__SPU__)
 #if !defined(__INSIDE_CYGWIN__)
 int     _EXFUN(ftruncate, (int __fd, off_t __length));
 int     _EXFUN(truncate, (const char *, off_t __length));
@@ -210,12 +217,14 @@ useconds_t _EXFUN(ualarm, (useconds_t __useconds, useconds_t __interval));
  int	_EXFUN(gethostname, (char *__name, size_t __len));
 #endif
 char *	_EXFUN(mktemp, (char *));
-#if defined(__CYGWIN__)
+#endif
+
+#if defined(__CYGWIN__) || defined(__SPU__)
 void    _EXFUN(sync, (void));
-#else /* defined(__rtems__) */
+#elif defined(__rtems__)
 int     _EXFUN(sync, (void));
 #endif
-#endif
+
 int     _EXFUN(readlink, (const char *__path, char *__buf, int __buflen));
 int     _EXFUN(symlink, (const char *__name1, const char *__name2));
 

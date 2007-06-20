@@ -1,5 +1,10 @@
 2007-06-20  Patrick Mansfield  <patmans@us.ibm.com>
 
+	* libc/include/sys/unistd.h[__SPU__]: Add lockf prototype and related
+	defines; expose ftruncate, truncate and sync prototypes.
+
+2007-06-20  Patrick Mansfield  <patmans@us.ibm.com>
+
 	* libc/include/sys/unistd.h[__SPU__]: Make fchdir prototype visible.
 	* libc/include/sys/stat.h[__SPU__]: Make mknod and lstat prototypes 
 	visible.
