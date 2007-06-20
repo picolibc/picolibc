@@ -1,5 +1,16 @@
 2007-06-20  Patrick Mansfield  <patmans@us.ibm.com>
 
+	* spu/jsre.h: Add new JSRE opcodes.
+	* spu/dup2.c: New file to add dup2 support via assist call.
+	* spu/fdatasync.c: New file to add fdatasync support via assist call.
+	* spu/fsync.c: New file to add fsync support via assist call.
+	* spu/lockf.c: New file to add lockf support via assist call.
+	* spu/sync.c: New file to add sync support via assist call.
+	* spu/truncate.c: New file to add truncate support via assist call.
+	* spu/Makefile.in: Add new files.
+
+2007-06-20  Patrick Mansfield  <patmans@us.ibm.com>
+
 	* spu/jsre.h: JSRE_LINK, JSRE_SYMLINK and JSRE_READLINK.
 	* spu/link.c: New file to add link support via an assist call.
 	* spu/readlink.c: New file to add readlink support via an assist call.

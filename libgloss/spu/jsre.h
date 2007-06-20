@@ -70,6 +70,12 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #define JSRE_LINK 44
 #define JSRE_SYMLINK 45
 #define JSRE_READLINK 46
+#define JSRE_SYNC 47
+#define JSRE_FSYNC 48
+#define JSRE_FDATASYNC 49
+#define JSRE_DUP2 50
+#define JSRE_LOCKF 51
+#define JSRE_TRUNCATE 52
 
 struct jsre_stat {
     unsigned int dev;
