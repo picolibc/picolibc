@@ -1,3 +1,9 @@
+2007-06-20  Patrick Mansfield  <patmans@us.ibm.com>
+
+	* libc/include/sys/unistd.h[__SPU__]: Make fchdir prototype visible.
+	* libc/include/sys/stat.h[__SPU__]: Make mknod and lstat prototypes 
+	visible.
+
 2007-06-15  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* libc/machine/spu/Makefile.am: Remove mktemp.c, it was left in
