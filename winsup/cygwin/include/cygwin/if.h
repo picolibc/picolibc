@@ -22,7 +22,7 @@ extern "C" {
 #define IFF_UP           0x1             /* interface is up               */
 #define IFF_BROADCAST    0x2             /* broadcast address valid       */
 #define IFF_LOOPBACK     0x8             /* is a loopback net             */
-#define IFF_POINTTOPOINT 0x10            /* is a point-to-point interface */
+#define IFF_POINTOPOINT  0x10            /* is a point-to-point interface */
 #define IFF_NOTRAILERS   0x20            /* avoid use of trailers         */
 #define IFF_RUNNING      0x40            /* resources allocated           */
 #define IFF_NOARP        0x80            /* no ARP protocol               */
