@@ -1,5 +1,14 @@
 2007-06-20  Patrick Mansfield  <patmans@us.ibm.com>
 
+	* spu/jsre.h: Add JSRE_LSTAT.
+	* spu/lstat.c: New file add lstat support via an assist call.
+	* spu/conv_stat.c: New file, add common stat conversion code.
+	* spu/fstat.c: Use __conv_stat.
+	* spu/stat.c: Use __conv_stat.
+	* spu/Makefile.in: Add conv_stat.o and lstat.o.
+
+2007-06-20  Patrick Mansfield  <patmans@us.ibm.com>
+
 	* spu/jsre.h: Add JSRE_GETCWD.
 	* spu/getcwd.c: New file, implement getcwd with help from an
 	assist call.

@@ -32,6 +32,9 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 
 /* this file provides the mappings for the JSRE defined interface for PE assisted libary calls */
 
+#include <sys/stat.h>
+#include <sys/syscall.h>
+
 #ifndef __JSRE_H
 #define __JSRE_H
 
@@ -42,6 +45,7 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #define JSRE_GETPAGESIZE 6
 #define JSRE_GETTIMEOFDAY 7
 #define JSRE_LSEEK 9
+#define JSRE_LSTAT 10
 #define JSRE_OPEN 15
 #define JSRE_READ 16
 #define JSRE_STAT 23
@@ -64,7 +68,7 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #define JSRE_LCHOWN 42
 #define JSRE_GETCWD 43
 
-typedef struct {
+struct jsre_stat {
     unsigned int dev;
     unsigned int ino;
     unsigned int mode;
@@ -78,8 +82,8 @@ typedef struct {
     unsigned int atime;
     unsigned int mtime;
     unsigned int ctime;
-} jsre_stat_t;
+};
 
-#include <sys/syscall.h>
+void __conv_stat (struct stat *stat, struct jsre_stat *jstat);
 
 #endif
