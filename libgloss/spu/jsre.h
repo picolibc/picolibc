@@ -39,6 +39,7 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 
 #define JSRE_CLOSE 2
 #define JSRE_FSTAT 4
+#define JSRE_GETPAGESIZE 6
 #define JSRE_GETTIMEOFDAY 7
 #define JSRE_LSEEK 9
 #define JSRE_OPEN 15

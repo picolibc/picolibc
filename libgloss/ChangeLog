@@ -1,3 +1,9 @@
+2007-06-20  Patrick Mansfield  <patmans@us.ibm.com>
+
+	* spu/getpagesize.c: New file add getpagesize via an assist call.
+	* spu/jsre.h: Add JSRE_GETPAGESIZE.
+	* spu/Makefile.in: Add getpagesize.
+
 2007-06-13  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* spu/Makefile.in: Add nanosleep.c.
