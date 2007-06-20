@@ -1,5 +1,12 @@
 2007-06-20  Patrick Mansfield  <patmans@us.ibm.com>
 
+	* spu/jsre.h: Add JSRE_GETCWD.
+	* spu/getcwd.c: New file, implement getcwd with help from an
+	assist call.
+	* spu/Makefile.in: Add getcwd.
+
+2007-06-20  Patrick Mansfield  <patmans@us.ibm.com>
+
 	* spu/jsre.h: Add defines for new assist calls.
 	* spu/chdir.c: New file, support chdir via assist call.
 	* spu/chmod.c: New file, support chmod via assist call.

@@ -62,6 +62,7 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #define JSRE_CHOWN 40
 #define JSRE_FCHOWN 41
 #define JSRE_LCHOWN 42
+#define JSRE_GETCWD 43
 
 typedef struct {
     unsigned int dev;
