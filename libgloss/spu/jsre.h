@@ -67,6 +67,9 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #define JSRE_FCHOWN 41
 #define JSRE_LCHOWN 42
 #define JSRE_GETCWD 43
+#define JSRE_LINK 44
+#define JSRE_SYMLINK 45
+#define JSRE_READLINK 46
 
 struct jsre_stat {
     unsigned int dev;

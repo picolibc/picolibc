@@ -1,5 +1,13 @@
 2007-06-20  Patrick Mansfield  <patmans@us.ibm.com>
 
+	* spu/jsre.h: JSRE_LINK, JSRE_SYMLINK and JSRE_READLINK.
+	* spu/link.c: New file to add link support via an assist call.
+	* spu/readlink.c: New file to add readlink support via an assist call.
+	* spu/symlink.c: New file to add symlink support via an assist call.
+	* spu/Makefile.in: Add new files.
+
+2007-06-20  Patrick Mansfield  <patmans@us.ibm.com>
+
 	* spu/jsre.h: Add JSRE_LSTAT.
 	* spu/lstat.c: New file add lstat support via an assist call.
 	* spu/conv_stat.c: New file, add common stat conversion code.
