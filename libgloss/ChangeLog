@@ -1,5 +1,20 @@
 2007-06-20  Patrick Mansfield  <patmans@us.ibm.com>
 
+	* spu/jsre.h: Add defines for new assist calls.
+	* spu/chdir.c: New file, support chdir via assist call.
+	* spu/chmod.c: New file, support chmod via assist call.
+	* spu/chown.c: New file, support chown via assist call.
+	* spu/fchdir.c: New file, support fchdir via assist call.
+	* spu/fchmod.c: New file, support fchmod via assist call.
+	* spu/fchown.c: New file, support fchown via assist call.
+	* spu/lchown.c: New file, support lchown via assist call.
+	* spu/mkdir.c: New file, support mkdir via assist call.
+	* spu/mknod.c: New file, support mknod via assist call.
+	* spu/rmdir.c: New file, support rmdir via assist call.
+	* spu/Makefile.in: Add new files.
+
+2007-06-20  Patrick Mansfield  <patmans@us.ibm.com>
+
 	* spu/getpagesize.c: New file add getpagesize via an assist call.
 	* spu/jsre.h: Add JSRE_GETPAGESIZE.
 	* spu/Makefile.in: Add getpagesize.

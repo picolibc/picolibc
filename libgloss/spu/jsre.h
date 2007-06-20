@@ -52,6 +52,17 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #define JSRE_DUP 30
 #define JSRE_NANOSLEEP 32
 
+#define JSRE_CHDIR 33
+#define JSRE_FCHDIR 34
+#define JSRE_MKDIR 35
+#define JSRE_MKNOD 36
+#define JSRE_RMDIR 37
+#define JSRE_CHMOD 38
+#define JSRE_FCHMOD 39
+#define JSRE_CHOWN 40
+#define JSRE_FCHOWN 41
+#define JSRE_LCHOWN 42
+
 typedef struct {
     unsigned int dev;
     unsigned int ino;

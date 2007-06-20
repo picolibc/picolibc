@@ -54,9 +54,12 @@ OBJDUMP = `t='$(program_transform_name)'; echo objdump | sed -e $$t`
 OBJCOPY = `t='$(program_transform_name)'; echo objcopy | sed -e $$t`
 
 # object files needed
-OBJS = syscalls.o exit.o sbrk.o close.o fstat.o getpid.o isatty.o \
-	kill.o lseek.o nanosleep.o open.o read.o unlink.o write.o stat.o \
-	ftruncate.o dup.o access.o gettimeofday.o getpagesize.o
+OBJS = \
+	access.o chdir.o chmod.o chown.o close.o dup.o exit.o fchdir.o \
+	fchmod.o fchown.o fstat.o ftruncate.o getpagesize.o getpid.o \
+	gettimeofday.o isatty.o kill.o lchown.o lseek.o mkdir.o \
+	mknod.o nanosleep.o open.o read.o rmdir.o sbrk.o stat.o syscalls.o \
+	unlink.o write.o
 
 # Object files specific to particular targets.
 EVALOBJS = ${OBJS}
