@@ -350,6 +350,8 @@ _exit SIGFE
 _Exit SIGFE
 exp NOSIGFE
 _exp = exp NOSIGFE
+exp10 NOSIGFE
+exp10f NOSIGFE
 exp2 NOSIGFE
 exp2f NOSIGFE
 expf NOSIGFE
@@ -469,6 +471,7 @@ _fnmatch = fnmatch NOSIGFE
 fopen SIGFE
 _fopen = fopen SIGFE
 _fopen64 = fopen64 SIGFE
+fopencookie SIGFE
 fork SIGFE
 _fork = fork SIGFE
 forkpty SIGFE
@@ -536,6 +539,7 @@ fts_set NOSIGFE
 fts_set_clientptr NOSIGFE
 ftw SIGFE
 funlockfile SIGFE
+funopen SIGFE
 futimes SIGFE
 fwrite SIGFE
 _fwrite = fwrite SIGFE
@@ -1012,6 +1016,8 @@ posix_regexec SIGFE
 posix_regfree SIGFE
 pow NOSIGFE
 _pow = pow NOSIGFE
+pow10 NOSIGFE
+pow10f NOSIGFE
 powf NOSIGFE
 _powf = powf NOSIGFE
 pread SIGFE
@@ -1417,6 +1423,7 @@ _statfs = statfs SIGFE
 statvfs SIGFE
 strcasecmp NOSIGFE
 _strcasecmp = strcasecmp NOSIGFE
+strcasestr NOSIGFE
 strcat NOSIGFE
 _strcat = strcat NOSIGFE
 strchr NOSIGFE

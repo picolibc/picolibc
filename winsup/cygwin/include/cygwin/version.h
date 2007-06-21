@@ -310,12 +310,14 @@ details. */
       168: Export asnprintf, dprintf, _Exit, vasnprintf, vdprintf.
       169: Export confstr.
       170: Export insque, remque.
+      171: Export exp10, exp10f, pow10, pow10f, strcasestr, funopen,
+           fopencookie.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 170
+#define CYGWIN_VERSION_API_MINOR 171
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

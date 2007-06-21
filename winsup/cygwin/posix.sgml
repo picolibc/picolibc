@@ -171,6 +171,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     fopen
     fork
     fpathconf
+    fpclassify			(see chapter "Implementation Notes")
     fprintf
     fputc
     fputs
@@ -296,21 +297,21 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     isblank
     iscntrl
     isdigit
-    isfinite
+    isfinite			(see chapter "Implementation Notes")
     isgraph
-    isgreater
-    isgreaterequal
-    isinf
+    isgreater			(see chapter "Implementation Notes")
+    isgreaterequal		(see chapter "Implementation Notes")
+    isinf			(see chapter "Implementation Notes")
     isless
-    islessequal
-    islessgreater
+    islessequal			(see chapter "Implementation Notes")
+    islessgreater		(see chapter "Implementation Notes")
     islower
-    isnan
-    isnormal
+    isnan			(see chapter "Implementation Notes")
+    isnormal			(see chapter "Implementation Notes")
     isprint
     ispunct
     isspace
-    isunordered
+    isunordered			(see chapter "Implementation Notes")
     isupper
     iswalnum
     iswalpha
@@ -597,6 +598,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     send
     sendmsg
     sendto
+    setbuf
     setegid
     setenv
     seteuid
@@ -641,7 +643,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     sigismember
     siglongjmp
     signal
-    signbit
+    signbit			(see chapter "Implementation Notes")
     signgam
     sigpause
     sigpending
@@ -764,6 +766,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     utime
     utimes
     va_arg
+    va_copy
     va_end
     va_start
     vfork			(see chapter "Implementation Notes")
@@ -842,6 +845,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     fts_read
     fts_set
     fts_set_clientptr
+    funopen
     gamma
     gamma_r
     gammaf
@@ -895,6 +899,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     settimeofday
     setusershell
     statfs
+    strcasestr
     strlcat
     strlcpy
     strsep
@@ -943,13 +948,18 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     envz_merge
     envz_remove
     envz_strip
+    exp10
+    exp10f
     fcloseall
     fcloseall_r
+    fopencookie
     getline
     getopt_long
     getopt_long_only
     memmem
     mempcpy
+    pow10
+    pow10f
     strndup
     strnlen
     tdestroy
@@ -1004,7 +1014,6 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     pthread_suspend		(XPG2)
     pututline			(XPG2)
     putw			(SVID)
-    setbuf			(C89, C99)
     setutent			(XPG2)
     sys_errlist			(BSD)
     sys_nerr			(BSD)
@@ -1223,7 +1232,6 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     timer_getoverrun
     truncl
     ulimit
-    va_copy
     vfwprintf
     vfwscanf
     vswprintf
@@ -1261,6 +1269,14 @@ Windows however.</para>
 <para><function>clock_getres</function>, <function>clock_gettime</function>
 and <function>clock_setres</function> only support CLOCK_REALTIME for
 now.</para>
+
+<para><function>fpclassify</function>, <function>isfinite</function>,
+<function>isgreater</function>, <function>isgreaterequal</function>,
+<function>isinf</function>, <function>isless</function>,
+<function>islessequal</function>, <function>islessgreater</function>,
+<function>isnan</function>, <function>isnormal</function>,
+<function>isunordered</function>, and <function>signbit</function>
+only support float and double arguments, not long double arguments.</para>
 
 <para><function>getitimer</function> and <function>setitimer</function>
 only support ITIMER_REAL for now.</para>

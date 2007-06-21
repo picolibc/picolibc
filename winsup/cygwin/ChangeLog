@@ -1,3 +1,10 @@
+2007-06-20  Eric Blake  <ebb9@byu.net>
+
+	* cygwin.din: Export exp10, exp10f, pow10, pow10f, strcasestr,
+	funopen, fopencookie.
+	* include/cygwin/version.h: Bump API minor number.
+	* posix.sgml: Minor improvements.
+
 2007-06-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/if.h (IFF_POINTOPOINT): Fix typo.
